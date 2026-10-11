@@ -11,3 +11,5 @@ typedef struct ExtWork {
 
 void extInit(void);
 void extMain(void);
+void extReset(void);
+void extEntry(s32 count, void* data, void* data2, s32 arg3, s32 arg4);

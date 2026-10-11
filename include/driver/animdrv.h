@@ -151,7 +151,9 @@ typedef struct AnimationPose {
     s32 fileId;                         // 0x10
     s32 animId;                         // 0x14, current animation from AnimPoseData
     OSTime localTime;                   // 0x18
-    u8 field_0x20[0x3C - 0x20];         // 0x20
+    u8 field_0x20[0x24 - 0x20];         // 0x20
+    f32 localFrame;                     // 0x24
+    u8 field_0x28[0x3C - 0x28];         // 0x28
     s32 lastFrameZero;                  // 0x3C
     f32 lastFrameTime;                  // 0x40
     f32 localTimeRate;                  // 0x44
@@ -189,7 +191,9 @@ typedef struct AnimationPose {
     Mtx matrix;                         // 0x124
     void* dispCallback;                 // 0x154, TODO: re-type
     void* dispUserDataCallback;         // 0x158, TODO: re-type
-    u8 field_0x15C[0x170 - 0x15C];      // 0x15C
+    Vec** worldPositions;               // 0x15C, filled while animPoseWorldPositionEvalOn is set
+    s32 numWorldPositions;              // 0x160
+    u8 field_0x164[0x170 - 0x164];      // 0x164
 } AnimationPose;
 
 typedef struct AnimationPoseFile {
@@ -262,7 +266,7 @@ void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset);
 
 s32 animPaperPoseGetId(const char* animName, s32 group);
 void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag);
-void animPoseSetPaperAnim(s32 poseId, const char* animName);
+void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset);
 void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag);
 void animPoseSetEffectAnim(s32 poseId, const char* animName, BOOL reset);
 

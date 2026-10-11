@@ -1,0 +1,528 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "mario/mario.h"
+
+USER_FUNC(evt_bero_exec_wait);
+USER_FUNC(evt_bero_get_entername);
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_bero_mapchange);
+USER_FUNC(evt_bero_overwrite);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_road_reset);
+USER_FUNC(evt_del_case_evt);
+USER_FUNC(evt_eff_fukidashi);
+USER_FUNC(evt_fade_softfocus_onoff);
+USER_FUNC(evt_fade_tec_onoff);
+USER_FUNC(evt_hitobj_onoff);
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_dispflag_onoff);
+USER_FUNC(evt_mario_get_mode);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_kill_party);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_set_mode);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_npc_entry);
+USER_FUNC(evt_npc_set_autotalkpose);
+USER_FUNC(evt_npc_set_color);
+USER_FUNC(evt_npc_set_paper);
+USER_FUNC(evt_npc_set_paper_anim);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_paper_entry);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_peach_set_condition);
+USER_FUNC(evt_run_case_evt);
+USER_FUNC(evt_seq_wait);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envoff);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_set_rev_mode);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_get_stopwatch);
+USER_FUNC(evt_sub_intpl_msec_get_value);
+USER_FUNC(evt_sub_intpl_msec_init);
+static USER_FUNC(peach_set_pose);
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 bero_open_door_play_se[];
+extern s32 evt_bero_info_run[];
+extern s32 evt_emergency[];
+extern s32 evt_sub_stopwatch[];
+
+__declspec(section ".data") u64 fd_aji_16_negone_one_374;
+__declspec(section ".data") s32 fd_aji_16_neg_one_382[1];
+__declspec(section ".data") s32 fd_aji_16___local_PI_383[1];
+__declspec(section ".data") s32 fd_aji_16___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_aji_16_one_negone_373;
+__declspec(section ".data") s32 fd_aji_16___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_aji_16_one_381[1];
+__declspec(section ".data") u64 fd_aji_16_negone_one_360;
+__declspec(section ".data") s32 fd_aji_16_neg_one_365[1];
+__declspec(section ".data") s32 fd_aji_16___local_PI_366[1];
+__declspec(section ".data") s32 fd_aji_16___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_aji_16_one_negone_359;
+__declspec(section ".data") s32 fd_aji_16___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_aji_16_one_364[1];
+static s32 w_door_close[22];
+static s32 w_door_open[22];
+static s32 e_door_close[22];
+static s32 e_door_open[22];
+s32 w_bero_in_evt[15];
+static s32 bero_entry_data[45];
+static s32 bero_peach_data[30];
+s32 evt_last_mail_init[62];
+s32 evt_last_mail[56];
+s32 peach_evt_door_open[41];
+static s32 peach_evt_stg1[97];
+static s32 peach_evt_stg1_1[86];
+s32 peach_evt_stg2_1[103];
+static s32 peach_evt_stg2[107];
+static s32 peach_evt_stg3[158];
+static s32 peach_evt_stg6[138];
+static s32 peach_evt_door_stop[18];
+s32 aji_16_init_evt[167];
+
+__declspec(section ".data") u64 fd_aji_16_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_aji_16_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_aji_16___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_aji_16___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_aji_16_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_aji_16___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_aji_16_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_aji_16_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_aji_16_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_aji_16___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_aji_16___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_aji_16_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_aji_16___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_aji_16_one_364[] = {
+    1065353216,
+};
+
+static EVT_BEGIN(w_door_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
+    MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(w_door_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.22167969f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door1_1"), 0, 0, LW(0))
+    MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door1_2"), 0, 0, LW(0))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(e_door_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
+    MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(e_door_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.22167969f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door2_1"), 0, 0, LW(0))
+    MULTIPLY_FLOAT(LW(0), FLOAT(-1.0f))
+    CALL(evt_mapobj_trans, 0, STRING("S_door2_2"), 0, 0, LW(0))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(w_bero_in_evt)
+    CALL(evt_mario_get_mode, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_peach_set_condition, 0)
+    END_IF
+    SET_VALUE(LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_entry_data[] = {
+    (s32)"w_bero", 65546, 20000, 100000, 0, 0, -1, (s32)w_bero_in_evt,
+    -1, 0, (s32)"aji_15", (s32)"e_bero", 327685, (s32)w_door_close, (s32)w_door_open, (s32)"e_bero",
+    65546, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"aji_01", (s32)"w_bero_5", 327685, (s32)e_door_close, (s32)e_door_open, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+};
+
+static s32 bero_peach_data[] = {
+    (s32)"e_bero", 10, 20000, 100000, 0, 0, -1, 0,
+    8, 0, (s32)"aji_01", (s32)"w_bero_5", 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(evt_last_mail_init)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, -215, 0, 0)
+    CALL(evt_party_set_pos, 0, -215, 0, 0)
+    CALL(evt_npc_entry, STRING("peach"), STRING("c_peach"))
+    CALL(evt_paper_entry, STRING("p_b_st"))
+    CALL(evt_npc_set_paper, STRING("peach"), STRING("p_b_st"))
+    CALL(evt_npc_set_paper_anim, STRING("peach"), STRING("P_Z_7"))
+    CALL(evt_npc_set_position, STRING("peach"), 0, 0, 0)
+    CALL(evt_cam3d_evt_set, 100, 80, 285, 100, 40, -13, 0, 11)
+    CALL(evt_fade_softfocus_onoff, 1)
+    SPAWN_EVENT(PTR(evt_last_mail))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_last_mail)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_cam3d_evt_set, -100, 80, 285, -100, 40, -13, 5000, 0)
+    WAIT_MS(2500)
+    CALL(evt_sub_intpl_msec_init, 11, 255, 0, 2000)
+    LABEL(0)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL(evt_npc_set_color, STRING("peach"), 255, 255, 255, LW(0))
+    WAIT_FRAMES(1)
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("stg7_aji_58"), 0, 0)
+    WAIT_MS(300)
+    CALL(evt_bero_mapchange, STRING("aji_17"), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(peach_evt_door_open)
+    CALL(evt_cam3d_evt_set, 35, 114, 334, 157, 54, 17, 1000, 11)
+    WAIT_MS(1000)
+    WAIT_MS(1000)
+    SET_VALUE(LW(1), 1)
+    SPAWN_EVENT(PTR(bero_open_door_play_se))
+    CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
+    LABEL(0)
+    CALL(evt_sub_intpl_msec_get_value)
+    CALL_CHILD(PTR(e_door_open))
+    IF_INT_EQUAL(LW(1), 1)
+        GOTO(0)
+    END_IF
+    WAIT_MS(500)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_stg1)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG7_DUN1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG7_AJI2"))
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_dispflag_onoff, 0, 1)
+    CALL(evt_peach_set_condition, 4)
+    CALL(evt_mario_set_pos, 0, 0, 0)
+    CALL(evt_cam3d_evt_set, 0, 125, 381, 0, 55, -13, 0, 11)
+    CALL(evt_seq_wait, 2)
+    WAIT_MS(1000)
+    CALL(evt_fade_tec_onoff, 0, 1)
+    WAIT_MS(1000)
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_4"), STRING("P_T_4"))
+    CALL(evt_msg_print, 0, STRING("peach_aji_34"), 0, STRING("mario"))
+    CALL(evt_cam3d_evt_set, 0, 80, 209, 0, 40, -13, 1000, 11)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("peach_aji_34_01"), 0, STRING("mario"))
+    CALL(evt_peach_set_condition, 0)
+    SET_VALUE(GSW(0), 57)
+    WAIT_MS(300)
+    CALL(evt_cam3d_evt_off, 600, 11)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, 512)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_stg1_1)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_bero_exec_wait, 65536)
+    WAIT_MS(500)
+    CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_PEACH_SURPRISED1_3"), LW(3), LW(4), LW(5), 0)
+    CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+    WAIT_MS(300)
+    CALL_CHILD(PTR(peach_evt_door_open))
+    CALL(evt_msg_print, 0, STRING("peach_aji_38"), 0, STRING("mario"))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_del_case_evt, 0, GW(15))
+    SET_VALUE(GSW(0), 58)
+    CALL(evt_cam3d_evt_off, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, 512)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(peach_evt_stg2_1)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_bero_exec_wait, 65536)
+    SPAWN_EVENT_GET_ID(PTR(evt_sub_stopwatch), LW(0))
+    LOOP(0)
+        CALL(evt_sub_get_stopwatch, LW(0), LW(1))
+        IF_INT_GREATER_OR_EQUAL(LW(1), 5000)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_PEACH_SURPRISED1_3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+    WAIT_MS(1000)
+    CALL(evt_mario_set_dir, 90, 200, 0)
+    WAIT_MS(500)
+    CALL_CHILD(PTR(peach_evt_door_open))
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("peach_aji_75"), 0, STRING("mario"))
+    CALL(evt_cam3d_evt_off, 1000, 11)
+    WAIT_MS(1000)
+    SET_VALUE(GSW(0), 113)
+    CALL(evt_mario_key_onoff, 1)
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_del_case_evt, 0, GW(15))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_stg2)
+    CALL(evt_mario_set_mode, 1)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, 512)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_set_pos, -75, 0, -50)
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    WAIT_FRAMES(1)
+    CALL(evt_cam3d_evt_set, -138, 146, 432, 122, 53, -60, 0, 11)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_bero_exec_wait, 65536)
+    WAIT_MS(800)
+    CALL(peach_set_pose, STRING("P_S_4"))
+    CALL(evt_mario_dispflag_onoff, 1, 4)
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_4"), STRING("P_T_4"))
+    CALL(evt_msg_print, 0, STRING("peach_aji_73"), 0, 0)
+    CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_msg_print, 0, STRING("peach_aji_74"), 0, STRING("mario"))
+    CALL(evt_mario_dispflag_onoff, 0, 4)
+    CALL(peach_set_pose, STRING("P_S_1"))
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    CALL(evt_cam3d_evt_off, 1000, 11)
+    WAIT_MS(1000)
+    SPAWN_EVENT(PTR(peach_evt_stg2_1))
+    SET_VALUE(GSWF(4202), 1)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_stg3)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, 512)
+    CALL(evt_mario_set_pos, -75, 0, -50)
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    CALL(evt_cam3d_evt_set, 115, 90, 444, 115, 60, -55, 0, 11)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_bero_exec_wait, 65536)
+    CALL(evt_cam3d_evt_set, -75, 90, 444, -75, 60, -55, 2500, 0)
+    WAIT_MS(3000)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_PEACH_SAD1_1"), LW(0), LW(1), LW(2), 0)
+    CALL(peach_set_pose, STRING("P_U_1"))
+    WAIT_MS(1400)
+    CALL(evt_msg_print, 0, STRING("peach_aji_112"), 0, STRING("mario"))
+    CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 800, 11)
+    WAIT_MS(800)
+    CALL(evt_mario_set_dir, 90, 300, 0)
+    WAIT_MS(300)
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_P_1"), STRING("P_T_9"))
+    CALL(evt_msg_print, 0, STRING("peach_aji_113"), 0, STRING("mario"))
+    CALL_CHILD(PTR(peach_evt_door_open))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 0, 11)
+    WAIT_MS(500)
+    CALL(evt_msg_print, 0, STRING("peach_aji_114"), 0, STRING("mario"))
+    SET_VALUE(GSW(0), 165)
+    CALL(evt_cam3d_evt_off, 1000, 11)
+    WAIT_MS(1000)
+    CALL(peach_set_pose, STRING("P_S_1"))
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_stg6)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+    CALL(evt_snd_envoff, 512)
+    CALL(evt_mario_set_pos, -75, 0, -50)
+    CALL(evt_mario_set_dir, 270, 0, 0)
+    WAIT_FRAMES(1)
+    CALL(evt_cam3d_evt_set, 250, 140, 392, 35, 75, 2, 0, 11)
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_bero_exec_wait, 65536)
+    WAIT_MS(2000)
+    CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(peach_set_pose, STRING("P_S_7"))
+    WAIT_MS(500)
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_7"), STRING("P_T_13"))
+    CALL(evt_msg_print, 0, STRING("peach_aji_280"), 0, STRING("mario"))
+    CALL(evt_mario_set_dir, 90, 200, 0)
+    WAIT_MS(300)
+    WAIT_MS(500)
+    CALL_CHILD(PTR(peach_evt_door_open))
+    CALL(evt_cam3d_evt_set, -75, 80, 184, -75, 40, -63, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_B_2"), STRING("P_T_7"))
+    CALL(evt_msg_print, 0, STRING("peach_aji_281"), 0, STRING("mario"))
+    CALL(peach_set_pose, STRING("P_S_1"))
+    CALL(evt_npc_set_autotalkpose, STRING("mario"), STRING("P_S_1"), STRING("P_T_1"))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL(evt_bero_overwrite, STRING("e_bero"), PTR(bero_peach_data))
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    SET_VALUE(GSW(0), 340)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_evt_door_stop)
+    CALL(evt_mario_key_onoff, 0)
+    SUSPEND_TYPES_OTHER(239)
+    CALL(evt_msg_print, 0, STRING("peach_aji_38_01"), 0, STRING("mario"))
+    RESUME_TYPES_OTHER(239)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(aji_16_init_evt)
+    CALL(evt_bero_get_entername, LW(0))
+    IF_STR_EQUAL(LW(0), STRING("peach"))
+        CALL_CHILD(PTR(evt_last_mail_init))
+        RETURN
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("peach_evt_stg1"))
+        CALL(evt_cam3d_evt_set, 78, 152, 528, 78, 57, -13, 0, 11)
+        SPAWN_EVENT(PTR(peach_evt_stg1))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 57)
+        IF_INT_EQUAL(GSWF(4199), 1)
+            SPAWN_EVENT(PTR(peach_evt_stg1_1))
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSW(0), 112)
+        IF_INT_EQUAL(GSWF(4202), 0)
+            SPAWN_EVENT(PTR(peach_evt_stg2))
+            ELSE
+            SPAWN_EVENT(PTR(peach_evt_stg2_1))
+        END_IF
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("peach_evt_stg3"))
+        SPAWN_EVENT(PTR(peach_evt_stg3))
+    END_IF
+    IF_STR_EQUAL(LW(0), STRING("peach_evt_stg6"))
+        SPAWN_EVENT(PTR(peach_evt_stg6))
+    END_IF
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    IF_INT_EQUAL(GSW(0), 57)
+        CALL(evt_bero_get_entername, LW(0))
+        IF_STR_EQUAL(LW(0), STRING(""))
+            CALL(evt_mario_set_pos, 100, 0, 0)
+            WAIT_FRAMES(1)
+            CALL(evt_cam_road_reset)
+        END_IF
+    END_IF
+    IF_INT_LESS(GSW(0), 58)
+        SET_VALUE(LW(0), STRING("e_bero"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 112)
+        SET_VALUE(LW(0), STRING("e_bero"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(peach_evt_door_stop), GW(15))
+    END_IF
+    IF_INT_LESS(GSW(0), 352)
+        CALL(evt_mario_kill_party, 0)
+        CALL(evt_mario_set_mode, 1)
+        ELSE
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_PEACH1"))
+        CALL(evt_snd_envoff, 512)
+    END_IF
+    CALL(evt_snd_set_rev_mode, 1)
+    CALL(evt_hitobj_onoff, STRING("A_door1_1"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_door1_2"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_door2_1"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_door2_2"), 1, 0)
+    SPAWN_EVENT(PTR(evt_emergency))
+    RETURN
+EVT_END()
+
+static USER_FUNC(peach_set_pose) {
+    const char* pose = (const char*)evtGetValue(event, event->args[0]);
+    MarioWork* mario = marioGetPtr();
+    marioChgPose(pose);
+    return EVT_RETURN_DONE;
+}

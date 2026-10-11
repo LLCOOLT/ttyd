@@ -42,6 +42,14 @@
 #define BREAK_LOOP EVT_CMD(0, OPCODE_DO_BREAK),
 #define CONTINUE_LOOP EVT_CMD(0, OPCODE_DO_CONTINUE),
 
+// Debug output (left in retail scripts)
+#define DEBUG_PUT_MSG(msg) EVT_CMD(1, OPCODE_DEBUG_PUT_MSG), msg,
+#define DEBUG_MSG_CLEAR EVT_CMD(0, OPCODE_DEBUG_MSG_CLEAR),
+#define DEBUG_PUT_REG(reg) EVT_CMD(1, OPCODE_DEBUG_PUT_REG), reg,
+#define DEBUG_NAME(name) EVT_CMD(1, OPCODE_DEBUG_NAME), name,
+#define DEBUG_REM(msg) EVT_CMD(1, OPCODE_DEBUG_REM), msg,
+#define DEBUG_BP EVT_CMD(0, OPCODE_DEBUG_BP),
+
 // Waiting
 #define WAIT_FRAMES(FRAMES) EVT_CMD(1, OPCODE_WAIT_FRAME), FRAMES,
 #define WAIT_MS(MILLISECONDS) EVT_CMD(1, OPCODE_WAIT_MSEC), MILLISECONDS,
@@ -114,16 +122,16 @@
 // Sequential Reads
 #define SET_INT_READ_ADDR(ptr) EVT_CMD(1, OPCODE_SET_READ), ptr,
 #define READ_INT(dest) EVT_CMD(1, OPCODE_READ), dest,
-#define READ_INT2(dest) EVT_CMD(1, OPCODE_READ2), dest,
-#define READ_INT3(dest) EVT_CMD(1, OPCODE_READ3), dest,
-#define READ_INT4(dest) EVT_CMD(1, OPCODE_READ4), dest,
+#define READ_INT2(dest1, dest2) EVT_CMD(2, OPCODE_READ2), dest1, dest2,
+#define READ_INT3(dest1, dest2, dest3) EVT_CMD(3, OPCODE_READ3), dest1, dest2, dest3,
+#define READ_INT4(dest1, dest2, dest3, dest4) EVT_CMD(4, OPCODE_READ4), dest1, dest2, dest3, dest4,
 #define READ_INT_INDEXED(dest, offset) EVT_CMD(2, OPCODE_READ_N), dest, offset,
 
 #define SET_FLOAT_READ_ADDR(ptr) EVT_CMD(1, OPCODE_SET_READF), ptr,
 #define READ_FLOAT(dest) EVT_CMD(1, OPCODE_READF), dest,
-#define READ_FLOAT2(dest) EVT_CMD(1, OPCODE_READF2), dest,
-#define READ_FLOAT3(dest) EVT_CMD(1, OPCODE_READF3), dest,
-#define READ_FLOAT4(dest) EVT_CMD(1, OPCODE_READF4), dest,
+#define READ_FLOAT2(dest1, dest2) EVT_CMD(2, OPCODE_READF2), dest1, dest2,
+#define READ_FLOAT3(dest1, dest2, dest3) EVT_CMD(3, OPCODE_READF3), dest1, dest2, dest3,
+#define READ_FLOAT4(dest1, dest2, dest3, dest4) EVT_CMD(4, OPCODE_READF4), dest1, dest2, dest3, dest4,
 #define READ_FLOAT_INDEXED(dest, offset) EVT_CMD(2, OPCODE_READF_N), dest, offset,
 
 // User Work / User Flag Base

@@ -37,7 +37,17 @@ typedef void* (*ARAMUploadCallback)(u32, u32);
 typedef u32 (*SND_MESSAGE_CALLBACK)(u32, u32);
 
 extern SND_MESSAGE_CALLBACK salMessageCallback;
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+typedef struct SAL_HOOKS {
+  void* (*malloc)(size_t len);
+  void* (*mallocPhysical)(size_t len);
+  void (*free)(void* addr);
+} SAL_HOOKS;
+
+extern SAL_HOOKS salHooks;
+#else
 extern SND_HOOKS salHooks;
+#endif
 
 extern u32 dspHRTFOn;
 
@@ -129,8 +139,20 @@ size_t aramGetStreamBufferAddress(u8 id, size_t* len);
 void aramUploadData(void* mram, u32 aram, u32 len, u32 highPrio, void (*callback)(size_t),
                     u32 user);
 void aramFreeStreamBuffer(u8 id);
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+void* aramStoreData(void* src, u32 len, ARAMInfo* info);
+void aramRemoveData(void* aram, u32 len, ARAMInfo* info);
+#else
 void* aramStoreData(void* src, u32 len);
 void aramRemoveData(void* aram, u32 len);
+#endif
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+u32 aramGetFirstUserAddress();
+u32 aramGetUserBytes(u32 len);
+#endif
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+ARAMInfo* dataARAMDefaultGetInfo();
+#endif
 u8 aramAllocateStreamBuffer(u32 len);
 unsigned long aramGetZeroBuffer();
 void aramSetUploadCallback(ARAMUploadCallback callback, u32 chunckSize);

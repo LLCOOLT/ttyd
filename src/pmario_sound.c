@@ -4571,6 +4571,6 @@ void psndSetPosDirListener(Vec* position, f32 direction) {  //1:1
     psnd.direction = direction;
 }
 
-void psndSFXOn_3D(const char* name, Vec* position) {
-
+s32 psndSFXOn_3D(const char* name, Vec* position) {
+    return 0;
 }

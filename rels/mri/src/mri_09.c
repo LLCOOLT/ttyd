@@ -1,0 +1,510 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_bero_overwrite);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_shake);
+USER_FUNC(evt_eff);
+USER_FUNC(evt_fade_set_mapchange_type);
+USER_FUNC(evt_hitobj_onoff);
+USER_FUNC(evt_img_alloc_capture);
+USER_FUNC(evt_img_clear_virtual_point);
+USER_FUNC(evt_img_entry);
+USER_FUNC(evt_img_free_capture);
+USER_FUNC(evt_img_onoff);
+USER_FUNC(evt_img_release);
+USER_FUNC(evt_img_set_paper);
+USER_FUNC(evt_img_set_paper_anim);
+USER_FUNC(evt_img_wait_animend);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_item_flag_on);
+USER_FUNC(evt_item_get_item);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_mapobj_clear_offscreen);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_get_position);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mapobj_set_offscreen);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mobj_breaking_floor);
+USER_FUNC(evt_mobj_delete);
+USER_FUNC(evt_mobj_get_position);
+USER_FUNC(evt_mobj_hitevt_onoff);
+USER_FUNC(evt_mobj_itembox);
+USER_FUNC(evt_mobj_powerupblk);
+USER_FUNC(evt_mobj_switch_red);
+USER_FUNC(evt_mobj_wait_animation_end);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_npc_change_fbat_mode);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_offscreen_delete);
+USER_FUNC(evt_offscreen_entry);
+USER_FUNC(evt_offscreen_get_boundingbox);
+USER_FUNC(evt_paper_entry);
+USER_FUNC(evt_puni_all_fall_check);
+USER_FUNC(evt_puni_flag_onoff);
+USER_FUNC(evt_puni_mem_init);
+USER_FUNC(evt_puni_set_hamari);
+USER_FUNC(evt_puni_set_maze);
+USER_FUNC(evt_puni_set_mode);
+USER_FUNC(evt_puni_set_yuka);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_intpl_msec_get_value);
+USER_FUNC(evt_sub_intpl_msec_init);
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 evt_bero_info_run[];
+extern s32 evt_sub_kusa_access_entry[];
+extern s32 mri_guide_goryu[];
+extern s32 mri_puni_init[];
+extern s32 puni_disp_info[];
+extern s32 puni_piders_check[];
+
+__declspec(section ".data") u64 fd_mri_09_negone_one_374;
+__declspec(section ".data") s32 fd_mri_09_neg_one_382[1];
+__declspec(section ".data") s32 fd_mri_09___local_PI_383[1];
+__declspec(section ".data") s32 fd_mri_09___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_mri_09_one_negone_373;
+__declspec(section ".data") s32 fd_mri_09___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_mri_09_one_381[1];
+__declspec(section ".data") u64 fd_mri_09_negone_one_360;
+__declspec(section ".data") s32 fd_mri_09_neg_one_365[1];
+__declspec(section ".data") s32 fd_mri_09___local_PI_366[1];
+__declspec(section ".data") s32 fd_mri_09___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_mri_09_one_negone_359;
+__declspec(section ".data") s32 fd_mri_09___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_mri_09_one_364[1];
+s32 bero_bluejail[15];
+static s32 bero_entry_data[75];
+s32 wall_roll_sub[96];
+s32 wall_roll[264];
+static s32 breakyuka_init[17];
+static __declspec(section ".data") s32 breakyuka_main[9];
+static s32 ueki_access_data[24];
+s32 slot00_event[52];
+s32 slot01_event[52];
+s32 slot02_event[52];
+s32 slot03_event[52];
+s32 slot_event[66];
+s32 get_blue_jail_key[143];
+s32 mri_09_init_evt[228];
+
+__declspec(section ".data") u64 fd_mri_09_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_mri_09_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_mri_09___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_mri_09___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_mri_09_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_mri_09___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_mri_09_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_mri_09_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_mri_09_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_mri_09___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_mri_09___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_mri_09_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_mri_09___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_mri_09_one_364[] = {
+    1065353216,
+};
+
+s32 bero_bluejail[] = {
+    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"mri_03", (s32)"", 65537, 0, 0,
+};
+
+static s32 bero_entry_data[] = {
+    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"mri_08", (s32)"e_bero", 65537, 0, 0, (s32)"n_bero",
+    0, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"mri_10", (s32)"s_bero", 65537, 0, 0, (s32)"dokan2", 131072,
+    9, 100000, 0, 0, -1, 0, 6, 0,
+    0, (s32)"dokan3", 65537, 0, 0, (s32)"dokan3", 131072, 6,
+    100000, 0, 0, -1, 0, 10, 0, 0,
+    (s32)"dokan2", 65537, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0,
+};
+
+EVT_BEGIN(wall_roll_sub)
+    CALL(evt_img_entry, LW(2))
+    CALL(evt_img_set_paper, LW(2), LW(0))
+    CALL(evt_offscreen_entry, LW(3))
+    CALL(evt_mapobj_set_offscreen, 1, LW(1), LW(3))
+    CALL(evt_offscreen_get_boundingbox, LW(3), LW(10), LW(11), LW(12), LW(13))
+    CALL(evt_img_alloc_capture, LW(2), 0, 0, 1, LW(10), LW(11), LW(12), LW(13))
+    CALL(evt_img_clear_virtual_point, LW(2))
+    BEGIN_INLINE_EVENT
+        WAIT_MS(500)
+        CALL(evt_mapobj_get_position, LW(1), LW(10), LW(11), LW(12))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF2_SLOT_GOOUT1"), LW(10), LW(11), LW(12), LW(15))
+        WAIT_MS(1800)
+        CALL(evt_snd_sfxoff, LW(15))
+    END_INLINE_EVENT
+    CALL(evt_img_set_paper_anim, LW(2), STRING("A_1"))
+    WAIT_FRAMES(1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+    CALL(evt_img_wait_animend, LW(2))
+    CALL(evt_img_free_capture, LW(2), 0)
+    CALL(evt_img_free_capture, LW(2), 1)
+    CALL(evt_img_onoff, LW(2), 0)
+    CALL(evt_img_release, LW(2))
+    CALL(evt_mapobj_clear_offscreen, 1, LW(1))
+    CALL(evt_offscreen_delete, LW(3))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(wall_roll)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    WAIT_MS(500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_sfxon, STRING("SFX_STG2_QUAKE2"), LW(10))
+        CALL(evt_cam_shake, 4, FLOAT(0.01953125f), FLOAT(0.0f), 1000)
+        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 500)
+        CALL(evt_snd_sfxoff, LW(10))
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_cam3d_evt_set, 0, 159, 399, 0, 86, -18, 500, 11)
+    WAIT_MS(1000)
+    SET_VALUE(LW(0), STRING("OFF_d_roll_down"))
+    SET_VALUE(LW(1), STRING("S_isk_01A01"))
+    SET_VALUE(LW(2), STRING("img00"))
+    SET_VALUE(LW(3), STRING("ofs00"))
+    SPAWN_EVENT(PTR(wall_roll_sub))
+    WAIT_MS(2000)
+    SET_VALUE(LW(0), STRING("OFF_d_roll_left"))
+    SET_VALUE(LW(1), STRING("S_isk_01A02"))
+    SET_VALUE(LW(2), STRING("img01"))
+    SET_VALUE(LW(3), STRING("ofs01"))
+    SPAWN_EVENT(PTR(wall_roll_sub))
+    WAIT_MS(2000)
+    SET_VALUE(LW(0), STRING("OFF_d_roll_up"))
+    SET_VALUE(LW(1), STRING("S_isk_01A03"))
+    SET_VALUE(LW(2), STRING("img02"))
+    SET_VALUE(LW(3), STRING("ofs02"))
+    SPAWN_EVENT(PTR(wall_roll_sub))
+    WAIT_MS(2000)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(2000)
+        CALL(evt_snd_bgmoff, 1024)
+        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+        WAIT_MS(2000)
+        CALL(evt_snd_bgmoff, 513)
+        CALL(evt_snd_bgmon, 288, 0)
+    END_INLINE_EVENT
+    SET_VALUE(LW(0), STRING("OFF_d_roll_right"))
+    SET_VALUE(LW(1), STRING("S_isk_01A04"))
+    SET_VALUE(LW(2), STRING("img03"))
+    SET_VALUE(LW(3), STRING("ofs03"))
+    CALL_CHILD(PTR(wall_roll_sub))
+    CALL(evt_hitobj_onoff, STRING("A_isk_01A"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 1)
+    CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
+    SET_VALUE(GSWF(2850), 1)
+    WAIT_FRAMES(1)
+    CALL(evt_puni_all_fall_check)
+    CALL(evt_puni_set_maze)
+    CALL(evt_cam3d_evt_off, 300, 11)
+    WAIT_MS(500)
+    CALL(evt_mobj_get_position, STRING("slot00"), LW(0), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -20, 0, 3, 0, 0, 0, 0)
+    CALL(evt_mobj_get_position, STRING("slot01"), LW(0), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -20, 0, 3, 0, 0, 0, 0)
+    CALL(evt_mobj_get_position, STRING("slot02"), LW(0), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -20, 0, 3, 0, 0, 0, 0)
+    CALL(evt_mobj_get_position, STRING("slot03"), LW(0), LW(1), LW(2))
+    CALL(evt_eff, STRING(""), STRING("small_star"), 3, LW(0), LW(1), LW(2), 0, -20, 0, 3, 0, 0, 0, 0)
+    CALL(evt_mobj_delete, STRING("slot00"))
+    CALL(evt_mobj_delete, STRING("slot01"))
+    CALL(evt_mobj_delete, STRING("slot02"))
+    CALL(evt_mobj_delete, STRING("slot03"))
+    WAIT_MS(500)
+    SET_VALUE(GSW(0), 104)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(breakyuka_init)
+    IF_INT_EQUAL(GSWF(2851), 0)
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 0)
+        ELSE
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
+    END_IF
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(breakyuka_main)
+    CALL(evt_hitobj_onoff, STRING("A_f2_rak_02"), 1, 1)
+    CALL(evt_puni_all_fall_check)
+    RETURN
+EVT_END()
+
+static s32 ueki_access_data[] = {
+    1, (s32)"A_ueki_01", (s32)"S_ueki_01", 0, 1, (s32)"A_ueki_02", (s32)"S_ueki_02", 0,
+    1, (s32)"A_ueki_03", (s32)"S_ueki_03", 0, 1, (s32)"A_ueki_04", (s32)"S_ueki_04", 0,
+    1, (s32)"A_ueki_05", (s32)"S_ueki_05", 0, 4, 0, 0, 0,
+};
+
+EVT_BEGIN(slot00_event)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 104)
+        RETURN
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
+    SET_VALUE(LW(10), GW(0))
+    SET_VALUE(LW(11), GW(0))
+    ADD(LW(11), 90)
+    CALL(evt_sub_intpl_msec_init, 0, LW(10), LW(11), 500)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        SET_VALUE(GW(0), LW(0))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    IF_INT_GREATER_OR_EQUAL(GW(0), 360)
+        SUBTRACT(GW(0), 360)
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(slot01_event)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 104)
+        RETURN
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
+    SET_VALUE(LW(10), GW(1))
+    SET_VALUE(LW(11), GW(1))
+    ADD(LW(11), 90)
+    CALL(evt_sub_intpl_msec_init, 0, LW(10), LW(11), 500)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        SET_VALUE(GW(1), LW(0))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    IF_INT_GREATER_OR_EQUAL(GW(1), 360)
+        SUBTRACT(GW(1), 360)
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(slot02_event)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 104)
+        RETURN
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
+    SET_VALUE(LW(10), GW(2))
+    SET_VALUE(LW(11), GW(2))
+    ADD(LW(11), 90)
+    CALL(evt_sub_intpl_msec_init, 0, LW(10), LW(11), 500)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        SET_VALUE(GW(2), LW(0))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    IF_INT_GREATER_OR_EQUAL(GW(2), 360)
+        SUBTRACT(GW(2), 360)
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(slot03_event)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 104)
+        RETURN
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 0)
+    SET_VALUE(LW(10), GW(3))
+    SET_VALUE(LW(11), GW(3))
+    ADD(LW(11), 90)
+    CALL(evt_sub_intpl_msec_init, 0, LW(10), LW(11), 500)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        SET_VALUE(GW(3), LW(0))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    IF_INT_GREATER_OR_EQUAL(GW(3), 360)
+        SUBTRACT(GW(3), 360)
+    END_IF
+    CALL(evt_mobj_hitevt_onoff, STRING("me"), 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(slot_event)
+    SET_VALUE(GW(0), 0)
+    SET_VALUE(GW(1), 0)
+    SET_VALUE(GW(2), 0)
+    SET_VALUE(GW(3), 0)
+    LOOP(0)
+        CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A01a"), GW(0), 0, 0)
+        CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A02a"), GW(1), 0, 0)
+        CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A03a"), GW(2), 0, 0)
+        CALL(evt_mapobj_rotate, 1, STRING("S_isk_01A04a"), GW(3), 0, 0)
+        IF_INT_EQUAL(GW(0), 270)
+            IF_INT_EQUAL(GW(1), 180)
+                IF_INT_EQUAL(GW(2), 0)
+                    IF_INT_EQUAL(GW(3), 90)
+                        BREAK_LOOP
+                    END_IF
+                END_IF
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    SPAWN_EVENT(PTR(wall_roll))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(get_blue_jail_key)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mobj_get_position, STRING("mobj_box00"), LW(0), LW(1), LW(2))
+    CALL(evt_item_entry, STRING("item00"), 17, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("item00"), 2)
+    CALL(evt_mobj_wait_animation_end, STRING("mobj_box00"))
+    CALL(evt_item_get_item, STRING("item00"))
+    CALL_CHILD(PTR(mri_guide_goryu))
+    CALL(evt_puni_flag_onoff, 1, 0, 262144)
+    CALL(evt_puni_set_mode, 1, 30)
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイドsp"), 1536)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_npc_get_position, STRING("ガイドsp"), LW(10), LW(11), LW(12))
+        IF_INT_GREATER_OR_EQUAL(LW(10), LW(0))
+            CALL(evt_mario_set_dir, 90, 200, 0)
+            ELSE
+            CALL(evt_mario_set_dir, 270, 200, 0)
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_npc_get_position, STRING("ガイドsp"), LW(0), LW(1), LW(2))
+    CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+    IF_INT_GREATER_OR_EQUAL(LW(10), LW(0))
+        CALL(evt_npc_set_ry, STRING("ガイドsp"), 90)
+        ELSE
+        CALL(evt_npc_set_ry, STRING("ガイドsp"), 270)
+    END_IF
+    CALL(evt_msg_print, 0, STRING("stg2_mri_e18_00"), 0, STRING("ガイドsp"))
+    CALL(evt_puni_flag_onoff, 1, 1, 262144)
+    CALL(evt_puni_set_mode, 1, 1)
+    SET_VALUE(GSW(0), 98)
+    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    SET_VALUE(LW(0), STRING("w_bero"))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_bluejail))
+    SET_VALUE(LW(0), STRING("w_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(mri_09_init_evt)
+    CALL(evt_puni_mem_init)
+    CALL(evt_puni_set_yuka, 9, 100, 0, -310, -1000, 2, 2)
+    CALL(evt_puni_set_hamari, -250, 100, 78, 102, -2, -230, -311)
+    SET_VALUE(LW(6), 0)
+    SET_VALUE(LW(7), 0)
+    SET_VALUE(LW(8), 0)
+    SET_VALUE(LW(9), 0)
+    CALL_CHILD(PTR(mri_puni_init))
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    SPAWN_EVENT(PTR(puni_disp_info))
+    SPAWN_EVENT(PTR(puni_piders_check))
+    SET_VALUE(LW(0), PTR(ueki_access_data))
+    CALL_CHILD(PTR(evt_sub_kusa_access_entry))
+    SWITCH(GSW(0))
+        CASE_BETWEEN(109, 110)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI9"))
+        CASE_DEFAULT
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_MRI1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG2_MRI1"))
+    END_SWITCH
+    CALL(evt_npc_change_fbat_mode, 1)
+    CALL(evt_map_playanim, STRING("mizu_01"), 1, 0)
+    CALL(evt_map_playanim, STRING("mizu_02"), 1, 0)
+    CALL(evt_map_playanim, STRING("awa_01"), 1, 0)
+    CALL(evt_map_playanim, STRING("awa_02"), 1, 0)
+    SWITCH(GSW(0))
+        CASE_LESS(103)
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 0)
+        CASE_EQUAL(103)
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 0)
+        SPAWN_EVENT(PTR(slot_event))
+        CALL(evt_mobj_switch_red, 1, STRING("slot00"), -80, 0, 135, PTR(slot00_event), 0)
+        CALL(evt_mobj_switch_red, 1, STRING("slot01"), -30, 0, 135, PTR(slot01_event), 0)
+        CALL(evt_mobj_switch_red, 1, STRING("slot02"), 30, 0, 135, PTR(slot02_event), 0)
+        CALL(evt_mobj_switch_red, 1, STRING("slot03"), 80, 0, 135, PTR(slot03_event), 0)
+        CALL(evt_paper_entry, STRING("OFF_d_roll_down"))
+        CALL(evt_paper_entry, STRING("OFF_d_roll_up"))
+        CALL(evt_paper_entry, STRING("OFF_d_roll_left"))
+        CALL(evt_paper_entry, STRING("OFF_d_roll_right"))
+        CASE_GREATER_OR_EQUAL(104)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_isk_01A"), 1)
+        CALL(evt_hitobj_onoff, STRING("A_isk_01A"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak03"), 1, 1)
+        CALL(evt_hitobj_onoff, STRING("A_f2_rak04"), 1, 0)
+    END_SWITCH
+    CALL(evt_mobj_itembox, STRING("mobj_box00"), 125, 0, 25, 0, 0, PTR(get_blue_jail_key), GSWF(2852))
+    CALL(evt_item_entry, STRING("item100"), 256, -250, -234, 75, 16, GSWF(2853), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk1"), 0, -174, -125, 0, GSWF(5543), 0)
+    SPAWN_EVENT(PTR(breakyuka_init))
+    CALL(evt_mobj_breaking_floor, STRING("mobj_bf00"), 0, 0, 75, 1, PTR(breakyuka_main), GSWF(2851))
+    RETURN
+EVT_END()
+

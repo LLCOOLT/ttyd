@@ -69,7 +69,7 @@ dou_11.c:
 data/battle/battle_database_dou.c:
 	.text       start:0x000017F8 end:0x00001990
 	.rodata     start:0x00001B18 end:0x00001EE8
-	.data       start:0x0000E878 end:0x00011098
+	.data       start:0x0000E878 end:0x00011094
 
 unit/unit_kuriboo.c:
 	.text       start:0x00001990 end:0x00001AA8
@@ -88,8 +88,8 @@ unit/unit_killer.c:
 
 unit/unit_killer_cannon.c:
 	.text       start:0x00001F78 end:0x000020E8
-	.rodata     start:0x00002378 end:0x00002520
-	.data       start:0x00014150 end:0x000159B8
+	.rodata     start:0x00002378 end:0x0000251C
+	.data       start:0x00014150 end:0x000159B4
 
 unit/unit_heavy_bom.c:
 	.text       start:0x000020E8 end:0x00002248

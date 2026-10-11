@@ -35,7 +35,7 @@ typedef struct BattleGroupSetup {
 typedef struct NpcBattleInfo {
     u8 field_0[0x4 - 0x0];          // 0x0
     s32 field_4;                    // 0x4
-    u8 field_8[0xC - 0x8];          // 0x8
+    ItemType fixedItem;             // 0x8
     ItemType itemDropped;           // 0xC
     s32 heartsDropped;              // 0x10
     s32 flowersDropped;             // 0x14
@@ -44,7 +44,9 @@ typedef struct NpcBattleInfo {
     ItemDropData* itemDropLists[8]; // 0x3C
     ItemType stolenItems[8];        // 0x5C
     ItemType recoveredItems[8];     // 0x7C
-    u8 field_9C[0xC8 - 0x9C];       // 0x9C
+    u8 field_9C[0xC4 - 0x9C];       // 0x9C
+    u8 battleRule[3];               // 0xC4
+    u8 field_C7;                    // 0xC7
 } NpcBattleInfo;
 
 typedef struct NpcTribeInfo {
@@ -100,9 +102,9 @@ typedef struct NpcEntry {
     void* lostEvent;                // 0x134, verified
     void* returnEvent;              // 0x138, verified
     void* blowEvent;                // 0x13C, verified
-    u8 field_140[0x144 - 0x140];    // 0x140
+    u32 field_140;                  // 0x140, flags
     f32 direction;                  // 0x144, angle we're facing at, verified
-    u8 field_148[0x14C - 0x148];    // 0x148
+    f32 field_148;                  // 0x148, saved direction
     f32 width;                      // 0x14C
     f32 height;                     // 0x150
     f32 field_154;                  // 0x154
@@ -146,7 +148,7 @@ typedef struct NpcEntry {
     NpcBattleInfo battleInfo;       // 0x230
     s32 field_2F8;                  // 0x2F8
     u32 field_2FC;                  // 0x2FC
-    u8 field_300[0x304 - 0x300];    // 0x300
+    s32 field_0x300;                // 0x300
     void* unitWork[4];              // 0x304
     u8 field_314;                   // 0x314
     u8 btlCoinDropCount;            // 0x315
@@ -192,11 +194,24 @@ typedef struct FirstStrikeInfo {
     GXColor color;       // 0x1C
 } FirstStrikeInfo;
 
+typedef struct FieldBattleInfo {
+	u32 mode; //0x0, unused
+	BattleUnitType party; //0x4
+	u32 partyId; //0x8
+	NpcBattleInfo* setup; //0xC
+	u32 result; //0x10
+	u8 field_0x14[0x19 - 0x14]; //0x14
+	u8 ruleKeepResult; //0x19
+	u8 field_0x1A[0x1C - 0x1A]; //0x1A
+} FieldBattleInfo;
+
 typedef struct FieldBattleData {
     s16 mode;                    // 0x0
     u8 field_2[0x8 - 0x2];       // 0x2
     NpcEntry* target;            // 0x8
-    u8 field_C[0x4C - 0xC];      // 0xC
+    u8 field_C[0x20 - 0xC];      // 0xC
+    FieldBattleInfo info;        // 0x20
+    u8 field_3C[0x4C - 0x3C];    // 0x3C
     NpcDeadInfo deadInfo[64];    // 0x4C
     u8 field_54C[0x550 - 0x54C]; // 0x54C
     FirstStrikeInfo firstStrike; // 0x550
@@ -216,6 +231,19 @@ void npcDeleteGroup(NpcEntry* entry);
 void npcMain(void);
 NpcEntry* npcNameToPtr(const char* name);
 NpcEntry* npcNameToPtr_NoAssert(const char* name);
+void npcSetLink(NpcEntry* npc, NpcEntry* other);
+void npcSetBtlSetupWork(NpcEntry* npc, s32 index, s32 value);
+s32 npcGetBtlSetupWork(NpcEntry* npc, s32 index);
+void npcBlurOff(const char* name);
+void npcBlurOn(const char* name);
+void npcSetColor(const char* name, GXColor color);
+void npcStartForOneEvent(NpcEntry* npc);
+void npcStartForEvent(void);
+void npcStopForOneEvent(NpcEntry* npc);
+void npcStopForEvent(void);
+void npcCheckInterrupt(NpcEntry* npc);
+void npcGroupDead(NpcEntry* npc, BOOL arg1);
+f32 npcTransRytoFaceDir(NpcEntry* npc);
 
 FieldBattleData* fbatGetPointer(void);
 

@@ -164,3 +164,8 @@ USER_FUNC(btlevtcmd_CheckCommandUnit);
 
 USER_FUNC(btlevtcmd_ACRStart);
 USER_FUNC(btlevtcmd_ACRGetResult);
+USER_FUNC(btlevtcmd_SetEventWait);
+USER_FUNC(btlevtcmd_SetEventAttack);
+USER_FUNC(btlevtcmd_SetEventDamage);
+USER_FUNC(btlevtcmd_SetEventConfusion);
+USER_FUNC(btlevtcmd_StartWaitEvent);

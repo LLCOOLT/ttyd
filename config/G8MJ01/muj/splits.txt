@@ -39,9 +39,9 @@ muj_04.c:
 
 muj_05.c:
 	.text       start:0x000030F0 end:0x00003258
-	.rodata     start:0x00002A20 end:0x00003318
+	.rodata     start:0x00002A20 end:0x00003314
 	.data       start:0x00013118 end:0x00016890
-	.bss        start:0x00000018 end:0x00000020
+	.bss        start:0x00000018 end:0x0000001C
 
 muj_10.c:
 	.text       start:0x00003258 end:0x000034A0
@@ -66,7 +66,7 @@ muj_20.c:
 data/battle/battle_database_muj.c:
 	.text       start:0x00005BD0 end:0x00005D68
 	.rodata     start:0x000043A0 end:0x00004730
-	.data       start:0x0001FDA0 end:0x00021EB8
+	.data       start:0x0001FDA0 end:0x00021EB4
 
 unit/unit_boss_cortez.c:
 	.text       start:0x00005D68 end:0x00006524
@@ -96,7 +96,7 @@ unit/unit_boss_cortez_saber.c:
 
 unit/unit_kuriboo.c:
 	.text       start:0x00006524 end:0x0000663C
-	.rodata     start:0x000051B0 end:0x00005308
+	.rodata     start:0x000051B0 end:0x00005304
 	.data       start:0x0002C578 end:0x0002D110
 
 unit/unit_boss_kanbu3.c:
@@ -148,7 +148,7 @@ unit/unit_hermos.c:
 unit/unit_pakkun_flower.c:
 	.text       start:0x0000BE6C end:0x0000C0FC
 	.rodata     start:0x00006630 end:0x000067F0
-	.data       start:0x0003B4F0 end:0x0003C6B0
+	.data       start:0x0003B4F0 end:0x0003C6AC
 
 event/evt_lect_muj.c:
 	.text       start:0x0000C0FC end:0x0000D690

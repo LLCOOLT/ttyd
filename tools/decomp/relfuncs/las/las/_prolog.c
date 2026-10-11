@@ -1,0 +1,77 @@
+// include: data/mapdata.h
+// decl: typedef void (*voidfunctionptr)(void);
+// decl: extern voidfunctionptr _ctors[];
+// decl: extern voidfunctionptr _dtors[];
+// decl: extern s32 btl_las_setup_no_tbl[];
+// decl: extern s32 btlsetup_las_tbl[];
+// decl: extern s32 las_00_init_evt[];
+// decl: extern s32 las_01_init_evt[];
+// decl: extern s32 las_02_init_evt[];
+// decl: extern s32 las_03_init_evt[];
+// decl: extern s32 las_04_init_evt[];
+// decl: extern s32 las_05_init_evt[];
+// decl: extern s32 las_06_init_evt[];
+// decl: extern s32 las_07_init_evt[];
+// decl: extern s32 las_08_init_evt[];
+// decl: extern s32 las_09_init_evt[];
+// decl: extern s32 las_10_init_evt[];
+// decl: extern s32 las_11_init_evt[];
+// decl: extern s32 las_12_init_evt[];
+// decl: extern s32 las_13_init_evt[];
+// decl: extern s32 las_14_init_evt[];
+// decl: extern s32 las_15_init_evt[];
+// decl: extern s32 las_16_init_evt[];
+// decl: extern s32 las_17_init_evt[];
+// decl: extern s32 las_18_init_evt[];
+// decl: extern s32 las_19_init_evt[];
+// decl: extern s32 las_20_init_evt[];
+// decl: extern s32 las_21_init_evt[];
+// decl: extern s32 las_22_init_evt[];
+// decl: extern s32 las_23_init_evt[];
+// decl: extern s32 las_24_init_evt[];
+// decl: extern s32 las_25_init_evt[];
+// decl: extern s32 las_26_init_evt[];
+// decl: extern s32 las_27_init_evt[];
+// decl: extern s32 las_28_init_evt[];
+// decl: extern s32 las_29_init_evt[];
+// decl: extern s32 las_30_init_evt[];
+// proto: void _prolog(void);
+void _prolog(void) {
+    voidfunctionptr* ctor;
+
+    for (ctor = _ctors; *ctor != NULL; ctor++) {
+        (*ctor)();
+    }
+    relSetEvtAddr("las_00", las_00_init_evt);
+    relSetEvtAddr("las_01", las_01_init_evt);
+    relSetEvtAddr("las_02", las_02_init_evt);
+    relSetEvtAddr("las_03", las_03_init_evt);
+    relSetEvtAddr("las_04", las_04_init_evt);
+    relSetEvtAddr("las_05", las_05_init_evt);
+    relSetEvtAddr("las_06", las_06_init_evt);
+    relSetEvtAddr("las_07", las_07_init_evt);
+    relSetEvtAddr("las_08", las_08_init_evt);
+    relSetEvtAddr("las_09", las_09_init_evt);
+    relSetEvtAddr("las_10", las_10_init_evt);
+    relSetEvtAddr("las_11", las_11_init_evt);
+    relSetEvtAddr("las_12", las_12_init_evt);
+    relSetEvtAddr("las_13", las_13_init_evt);
+    relSetEvtAddr("las_14", las_14_init_evt);
+    relSetEvtAddr("las_15", las_15_init_evt);
+    relSetEvtAddr("las_16", las_16_init_evt);
+    relSetEvtAddr("las_17", las_17_init_evt);
+    relSetEvtAddr("las_18", las_18_init_evt);
+    relSetEvtAddr("las_19", las_19_init_evt);
+    relSetEvtAddr("las_20", las_20_init_evt);
+    relSetEvtAddr("las_21", las_21_init_evt);
+    relSetEvtAddr("las_22", las_22_init_evt);
+    relSetEvtAddr("las_23", las_23_init_evt);
+    relSetEvtAddr("las_24", las_24_init_evt);
+    relSetEvtAddr("las_25", las_25_init_evt);
+    relSetEvtAddr("las_26", las_26_init_evt);
+    relSetEvtAddr("las_27", las_27_init_evt);
+    relSetEvtAddr("las_28", las_28_init_evt);
+    relSetEvtAddr("las_29", las_29_init_evt);
+    relSetEvtAddr("las_30", las_30_init_evt);
+    relSetBtlAddr("las", btlsetup_las_tbl, btl_las_setup_no_tbl);
+}

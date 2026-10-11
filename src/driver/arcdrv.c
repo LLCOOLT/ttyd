@@ -4,14 +4,6 @@
 //.bss
 static ArchiveEntry work[4];
 
-
-
-
-//void* arcOpen(char* filename, )
-
-
-//BOOL arcDataCheck()
-
 void arcInit(void) {
 	int i;
 
@@ -20,21 +12,46 @@ void arcInit(void) {
 	}
 }
 
-void* arcOpen(const char* filename, void** addr, u32* length) {
-	ARCFileInfo info;
-	void* startAddr;
+BOOL arcDataCheck(void* addr) {
 	int i;
 
 	for (i = 0; i < 4; i++) {
-		if ((work[i].flags & 1) && ARCOpen(&work[i].handle, filename, &info)) {
-			startAddr = ARCGetStartAddrInMem(&info);
+		if ((u32)work[i].data <= (u32)addr && (u32)work[i].data + work[i].size >= (u32)addr) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+
+void arcEntry(s32 id, void* data, u32 size) {
+	ArchiveEntry* entry = &work[id];
+
+	entry->data = data;
+	entry->size = size;
+	ARCInitHandle(entry->data, &entry->handle);
+	entry->flags |= 1;
+}
+
+void arcDelete(s32 id) {
+	memset(&work[id], 0, sizeof(ArchiveEntry));
+}
+
+void* arcOpen(const char* filename, void** addr, u32* length) {
+	ARCFileInfo info;
+	ARCFileInfo* infop = &info;
+	int i;
+	void* startAddr;
+
+	for (i = 0; i < 4; i++) {
+		if ((work[i].flags & 1) && ARCOpen(&work[i].handle, filename, infop)) {
+			startAddr = ARCGetStartAddrInMem(infop);
 			if (addr) {
 				*addr = startAddr;
 			}
 			if (length) {
-				*length = ARCGetLength(&info);
+				*length = ARCGetLength(infop);
 			}
-			ARCClose();
+			ARCClose(infop);
 			return startAddr;
 		}
 	}
@@ -45,8 +62,4 @@ void* arcOpen(const char* filename, void** addr, u32* length) {
 		*length = 0;
 	}
 	return NULL;
-}
-
-void arcEntry(s32 id, void* data, u32 size) {
-
 }

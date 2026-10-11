@@ -83,15 +83,39 @@ typedef struct PartyEntry {
     u8 useMotionId;              // 0x39
     u8 field_3A[0x58 - 0x3A];    // 0x3A
     Vec position;                // 0x58
-    u8 field_64[0x160 - 0x64];   // 0x64
+    u8 field_64[0x6C - 0x64];    // 0x64
+    f32 field_6C;                // 0x6C, rotation (degrees)
+    Vec scale;                   // 0x70
+    u8 field_7C[0x8C - 0x7C];    // 0x7C
+    f32 field_8C;                // 0x8C, half height times scale
+    u8 field_90[0xAC - 0x90];    // 0x90
+    f32 field_AC;                // 0xAC
+    u8 field_B0[0xB4 - 0xB0];    // 0xB0
+    f32 field_B4;                // 0xB4
+    u8 field_B8[0xF0 - 0xB8];    // 0xB8
+    f32 field_F0;                // 0xF0, height
+    f32 width;                   // 0xF4
+    u8 field_F8[0xFC - 0xF8];    // 0xF8
+    f32 field_FC;                // 0xFC
+    f32 field_100;               // 0x100
+    u8 field_104[0x10C - 0x104]; // 0x104
+    f32 field_10C;               // 0x10C
+    f32 field_110;               // 0x110
+    u8 field_114[0x138 - 0x114]; // 0x114
+    struct HitEntry* field_138;  // 0x138, hit object stood on
+    u8 field_13C[0x144 - 0x13C]; // 0x13C
+    void* field_144;             // 0x144
+    u8 field_148[0x160 - 0x148]; // 0x148
     MarioWork* playerPtr;        // 0x160
     s32 camId;                   // 0x164
-    s32 yoshiPsndSFXId;          // 0x168
+    u32 yoshiPsndSFXId;          // 0x168
     s32 unk16C;                  // 0x16C
     void* useStruct;             // 0x170
     u8 field_168[0x188 - 0x174]; // 0x174
 } PartyEntry;
 
 PartyEntry* partyGetPtr(s32 index);
+void partyCtrlOn(PartyEntry* party);
+void partyCtrlOff(PartyEntry* party);
 PartyEntry* anotherPartyGetPtr(s32 index);
 BOOL partyPaperOn(PartyEntry* party, const char* animName);

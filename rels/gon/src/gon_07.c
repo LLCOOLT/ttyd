@@ -1,0 +1,375 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+
+USER_FUNC(evt_bero_exec_get);
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam3d_evt_set_at);
+USER_FUNC(evt_cam_shake);
+USER_FUNC(evt_exit_case_evt);
+USER_FUNC(evt_hitobj_onoff);
+USER_FUNC(evt_img_alloc_capture);
+USER_FUNC(evt_img_clear_virtual_point);
+USER_FUNC(evt_img_entry);
+USER_FUNC(evt_img_onoff);
+USER_FUNC(evt_img_release);
+USER_FUNC(evt_img_set_paper);
+USER_FUNC(evt_img_set_paper_anim);
+USER_FUNC(evt_img_wait_animend);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_item_flag_on);
+USER_FUNC(evt_item_get_item);
+USER_FUNC(evt_map_checkanim);
+USER_FUNC(evt_map_pauseanim);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_map_replayanim);
+USER_FUNC(evt_mapobj_clear_offscreen);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_get_position);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mapobj_set_offscreen);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mobj_get_position);
+USER_FUNC(evt_mobj_itembox);
+USER_FUNC(evt_mobj_wait_animation_end);
+USER_FUNC(evt_msg_print_party);
+USER_FUNC(evt_offscreen_delete);
+USER_FUNC(evt_offscreen_entry);
+USER_FUNC(evt_offscreen_get_boundingbox2);
+USER_FUNC(evt_paper_delete);
+USER_FUNC(evt_paper_entry);
+USER_FUNC(evt_party_move_pos2);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_run_case_evt);
+USER_FUNC(evt_seq_set_seq);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_set_rev_mode);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_countdown_end);
+USER_FUNC(evt_sub_countdown_get_status);
+USER_FUNC(evt_sub_countdown_start);
+USER_FUNC(evt_sub_rumble_onoff);
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 evt_bero_info_run[];
+
+__declspec(section ".data") u64 fd_gon_07_negone_one_374;
+__declspec(section ".data") s32 fd_gon_07_neg_one_382[1];
+__declspec(section ".data") s32 fd_gon_07___local_PI_383[1];
+__declspec(section ".data") s32 fd_gon_07___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_gon_07_one_negone_373;
+__declspec(section ".data") s32 fd_gon_07___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_gon_07_one_381[1];
+__declspec(section ".data") u64 fd_gon_07_negone_one_360;
+__declspec(section ".data") s32 fd_gon_07_neg_one_365[1];
+__declspec(section ".data") s32 fd_gon_07___local_PI_366[1];
+__declspec(section ".data") s32 fd_gon_07___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_gon_07_one_negone_359;
+__declspec(section ".data") s32 fd_gon_07___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_gon_07_one_364[1];
+static __declspec(section ".data") s32 door01_close[12];
+static __declspec(section ".data") s32 door01_open[12];
+s32 out_func[14];
+static s32 bero_entry_data[45];
+static s32 shake_evt[150];
+static s32 item_evt[268];
+static s32 bomb_wall_evt[179];
+s32 gon_07_init_evt[86];
+
+__declspec(section ".data") u64 fd_gon_07_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_gon_07_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_gon_07___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_gon_07___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_gon_07_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_gon_07___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_gon_07_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_gon_07_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_gon_07_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_gon_07___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_gon_07___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_gon_07_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_gon_07___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_gon_07_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") EVT_BEGIN(door01_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+    CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(door01_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
+    CALL(evt_mapobj_rotate, 1, STRING("door01"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(out_func)
+    CALL(evt_sub_countdown_end)
+    IF_INT_EQUAL(GSW(0), 43)
+        CALL(evt_snd_sfxoff, GW(10))
+    END_IF
+    SET_VALUE(LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_entry_data[] = {
+    (s32)"w_bero", 65548, 20000, 100000, 0, 0, -1, 0,
+    -1, (s32)out_func, (s32)"gon_06", (s32)"e_bero", 327685, (s32)door01_close, (s32)door01_open, (s32)"e_bero",
+    0, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"gon_13", (s32)"w_bero", 65537, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+};
+
+static EVT_BEGIN(shake_evt)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(2000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(2000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(2000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1200)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1200)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1200)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(1200)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 1000)
+    WAIT_MS(600)
+    CALL(evt_cam_shake, 4, FLOAT(0.0048828125f), FLOAT(0.0f), 0)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(item_evt)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 43)
+        RETURN
+    END_IF
+    SET_VALUE(GSW(0), 43)
+    SET_VALUE(GSWF(1494), 1)
+    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mobj_get_position, STRING("gon07treasure"), LW(0), LW(1), LW(2))
+    CALL(evt_item_entry, STRING("k_slit"), 34, LW(0), LW(1), LW(2), 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("k_slit"), 2)
+    CALL(evt_mobj_wait_animation_end, STRING("gon07treasure"))
+    CALL(evt_item_get_item, STRING("k_slit"))
+    CALL(evt_snd_sfxon, STRING("SFX_STG1_QUAKE4"), GW(10))
+    SPAWN_EVENT_GET_ID(PTR(shake_evt), LW(10))
+    WAIT_MS(500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_mov_pos2, 20, 35, FLOAT(60.0f))
+        CALL(evt_mario_set_dir, 270, 300, 0)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_move_pos2, 0, -20, 35, FLOAT(60.0f))
+        CALL(evt_party_set_dir, 0, 90, 300)
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, 0, 124, 408, 0, 57, 21, 500, 11)
+    WAIT_MS(400)
+    CALL(evt_snd_sfxon, STRING("SFX_STG1_TOGE_UP1"), 0)
+    WAIT_MS(100)
+    CALL(evt_hitobj_onoff, STRING("a_togeshita"), 1, 1)
+    CALL(evt_map_playanim, STRING("a_to_shita"), 0, 0)
+    LABEL(0)
+    CALL(evt_map_checkanim, STRING("a_to_shita"), LW(0), LW(1))
+    IF_INT_EQUAL(LW(0), 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    DELETE_EVENT(LW(10))
+    WAIT_FRAMES(2)
+    CALL(evt_sub_rumble_onoff, 1, 0)
+    WAIT_MS(1000)
+    CALL(evt_party_stop, 0)
+    WAIT_MS(200)
+    CALL(evt_msg_print_party, STRING("stg1_gon_15"))
+    CALL(evt_map_playanim, STRING("a_to_ue"), 0, 0)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER1"))
+    CALL(evt_cam3d_evt_set_at, 0, 300, 0, 0, 900, 11)
+    WAIT_MS(2600)
+    CALL(evt_cam3d_evt_set, 0, 124, 408, 0, 57, 21, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_map_playanim, STRING("a_to_ue"), 0, 1)
+    CALL(evt_map_pauseanim, 0, STRING("a_to_ue"))
+    CALL(evt_party_stop, 0)
+    WAIT_MS(200)
+    CALL(evt_msg_print_party, STRING("stg1_gon_16"))
+    CALL(evt_map_replayanim, 0, STRING("a_to_ue"))
+    SPAWN_EVENT_GET_ID(PTR(shake_evt), LW(10))
+    CALL(evt_map_checkanim, STRING("a_to_ue"), LW(0), LW(1))
+    CALL(evt_sub_countdown_start, LW(1), LW(1))
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_bero_exec_get, LW(0))
+            IF_BITS_SET(LW(0), 1)
+                DEBUG_PUT_MSG(STRING("脱出成功"))
+                BREAK_LOOP
+            END_IF
+            CALL(evt_sub_countdown_get_status, LW(0))
+            IF_INT_EQUAL(LW(0), 1)
+                SET_VALUE(LW(0), STRING("w_bero"))
+                CALL_CHILD(PTR(bero_case_switch_off))
+                CALL(evt_seq_set_seq, 5, 0, 0)
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_off, 500, 11)
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    BEGIN_INLINE_EVENT
+        LABEL(1)
+        CALL(evt_map_checkanim, STRING("a_to_ue"), LW(0), LW(1))
+        IF_INT_EQUAL(LW(0), 0)
+            WAIT_FRAMES(1)
+            GOTO(1)
+        END_IF
+        CALL(evt_snd_sfxoff, GW(10))
+    END_INLINE_EVENT
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(bomb_wall_evt)
+    CALL(evt_mario_key_onoff, 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(200)
+        CALL(evt_mapobj_get_position, STRING("S_ana"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF_WALL_BREAK1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_paper_entry, STRING("OFF_d_bom_ver2"))
+    CALL(evt_offscreen_entry, STRING("ofs"))
+    CALL(evt_img_entry, STRING("img"))
+    CALL(evt_img_onoff, STRING("img"), 0)
+    CALL(evt_img_set_paper, STRING("img"), STRING("OFF_d_bom_ver2"))
+    CALL(evt_mapobj_set_offscreen, 1, STRING("S_ana"), STRING("ofs"))
+    CALL(evt_offscreen_get_boundingbox2, STRING("ofs"), LW(0), LW(1), LW(2), LW(3))
+    SET_VALUE(LF(0), 0)
+    IF_INT_EQUAL(LW(2), 0)
+        IF_INT_EQUAL(LW(3), 0)
+            SET_VALUE(LF(0), 1)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_img_alloc_capture, STRING("img"), 0, STRING("ofs"), 1, LW(0), LW(1), LW(2), LW(3))
+        WAIT_FRAMES(1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+        CALL(evt_img_clear_virtual_point, STRING("img"))
+        CALL(evt_img_onoff, STRING("img"), 1)
+        CALL(evt_img_set_paper_anim, STRING("img"), STRING("A_1"))
+        CALL(evt_img_wait_animend, STRING("img"))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_ana_after"), 1)
+    END_IF
+    CALL(evt_img_release, STRING("img"))
+    CALL(evt_mapobj_clear_offscreen, 1, STRING("S_ana"))
+    CALL(evt_paper_delete, STRING("OFF_d_bom_ver2"))
+    CALL(evt_offscreen_delete, STRING("ofs"))
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
+    WAIT_MS(2000)
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
+    SET_VALUE(LW(0), STRING("e_bero"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    SET_VALUE(GSWF(1495), 1)
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_exit_case_evt)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(gon_07_init_evt)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_GON1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON1"))
+    CALL(evt_snd_set_rev_mode, 2)
+    CALL(evt_snd_bgmoff, 18432)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 43)
+        SET_VALUE(GSWF(1494), 1)
+    END_IF
+    CALL(evt_mobj_itembox, STRING("gon07treasure"), 0, 0, 0, 0, 0, PTR(item_evt), GSWF(1494))
+    CALL(evt_hitobj_onoff, STRING("a_togeshita"), 1, 0)
+    IF_INT_EQUAL(GSWF(1495), 0)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_after"), 1)
+        SET_VALUE(LW(0), STRING("e_bero"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_run_case_evt, 15, 1, STRING("san"), 0, PTR(bomb_wall_evt), 0)
+        ELSE
+        CALL(evt_hitobj_onoff, STRING("san"), 1, 0)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("S_ana_before"), 1)
+    END_IF
+    RETURN
+EVT_END()
+

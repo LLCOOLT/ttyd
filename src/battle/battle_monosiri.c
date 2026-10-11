@@ -728,53 +728,52 @@ BattleUnitType* battle_monosiri_same_tbl[] = {
 	same_tbl_magunum_battender,
 	same_tbl_magunum_battender_mkii,
 	same_tbl_moamoa,
-	same_tbl_iron_sinemon
+	same_tbl_iron_sinemon,
+	NULL
 };
 
 TattleEntry* battleGetUnitMonosiriPtr(s32 id) {
 	return &monosiriMessageTable[id];
 }
 
-BOOL battleCheckUnitMonosiriFlag(BattleUnit* unit) { //needs stmw, swGet | fix
+BOOL battleCheckUnitMonosiriFlag(BattleUnit* unit) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleUnitType kind = unit->currentKind;
-	u32 flag;
+	s32 flag;
 	if (wp->badgeEquippedFlags & 2) {
 		return TRUE;
 	}
-	flag = swGet(kind + 0x117A) | (wp->tattledUnitTypeFlags[kind / 32] & (1 << (kind % 32)));
+	flag = swGet(kind + 0x117A);
+	flag |= wp->tattledUnitTypeFlags[kind / 32] & (1 << (kind % 32));
 	if (unit->flags & 4) {
 		kind = unit->initialKind;
 		flag |= wp->tattledUnitTypeFlags[kind / 32] & (1 << (kind % 32));
 	}
-	if (flag) //TODO: should be able to permute to != 0 like swGet
+	if (flag) {
 		return TRUE;
-	else
-		return FALSE;
+	}
+	return FALSE;
 }
 
-void battleSetUnitMonosiriFlag(BattleUnitType kind) { //very non-matching, TODO permute
+void battleSetUnitMonosiriFlag(BattleUnitType kind) {
 	BattleWork* wp = _battleWorkPointer;
-	BattleUnitType** table;
-	int i, j, k;
+	BattleUnitType* group;
+	s32 i, j, k;
 
-	table = battle_monosiri_same_tbl;
-	i = 0;
-	while (table[i]) { //check main table hasn't run out of entries
-		j = 0;
-		while (table[i][j]) { //check this table hasn't run out of IDs
-			if (kind == table[i][j]) { //found the type in a group
-				k = 0;
-				while (table[i][k]) { //write bits for all entries
-					swSet(table[i][k] + 0x117A);
-					wp->tattledUnitTypeFlags[table[i][k] / 32] |= 1 << (table[i][k] % 32);
-					k++;
+	for (i = 0; ; i++) {
+		group = battle_monosiri_same_tbl[i];
+		if (group == NULL) {
+			break;
+		}
+		for (j = 0; group[j] != UNIT_NULL; j++) {
+			if (kind == group[j]) { //found the type in a group, write bits for all entries
+				for (k = 0; (kind = group[k]) != UNIT_NULL; k++) {
+					swSet(kind + 0x117A);
+					wp->tattledUnitTypeFlags[kind / 32] |= 1 << (kind % 32);
 				}
 				return;
 			}
-			j++;
 		}
-		i++;
 	}
 	//no group found, just write the single bit
 	swSet(kind + 0x117A);

@@ -324,13 +324,46 @@ typedef struct BattleUnitDefenseAttr {
     u8 defenseAttrs[5]; // 0x0
 } BattleUnitDefenseAttr;
 
+typedef struct StatusVulnerability {
+    u8 sleep;        // 0x0
+    u8 stop;         // 0x1
+    u8 dizzy;        // 0x2
+    u8 poison;       // 0x3
+    u8 confuse;      // 0x4
+    u8 electric;     // 0x5
+    u8 burn;         // 0x6
+    u8 freeze;       // 0x7
+    u8 huge;         // 0x8
+    u8 tiny;         // 0x9
+    u8 attackUp;     // 0xA
+    u8 attackDown;   // 0xB
+    u8 defenseUp;    // 0xC
+    u8 defenseDown;  // 0xD
+    u8 allergic;     // 0xE
+    u8 fright;       // 0xF
+    u8 galeForce;    // 0x10
+    u8 fast;         // 0x11
+    u8 slow;         // 0x12
+    u8 dodgy;        // 0x13
+    u8 invisible;    // 0x14
+    u8 ohko;         // 0x15
+} StatusVulnerability;
+
+typedef struct PoseTableEntry {
+    s32 poseType;         // 0x0
+    const char* poseName; // 0x4
+} PoseTableEntry;
+
 typedef struct BattleUnitKindPart {
     s32 partNum;                                   // 0x0
     const char* partName;                          // 0x4
     const char* modelName;                         // 0x8
     Vec positionOffset;                            // 0xC, TODO: shorter name?
     Vec hitBaseOffset;                             // 0x18, TODO: better name?
-    u8 field_0x24[0x38 - 0x24];                    // 0x24
+    Vec hitCursorBaseOffset;                       // 0x24
+    s16 field_0x30;                                // 0x30
+    s16 field_0x32;                                // 0x32
+    s16 baseAlpha;                                 // 0x34
     BattleUnitDefense* defense;                    // 0x38
     BattleUnitDefenseAttr* defenseAttr;            // 0x3C
     PartsAttribute_Flags attributes;               // 0x40
@@ -388,7 +421,8 @@ typedef struct BattleWorkUnitPart {
     BattleUnitDefense* defense;                    // 0x1B4
     BattleUnitDefenseAttr* defenseAttr;            // 0x1B8
     void* poseTable;                               // 0x1BC
-    u8 field_0x1C0[0x21C - 0x1C0];                 // 0x1C0
+    s32 poseId;                                    // 0x1C0
+    u8 field_0x1C4[0x21C - 0x1C4];                 // 0x1C4
     BattleWorkUnitPartBlur blurWork;               // 0x21C
     u8 field_0x4D0[0x4EC - 0x4D0];                 // 0x4D0
     struct BattleUnit* mOwner;                     // 0x4EC
@@ -550,7 +584,8 @@ typedef struct BattleUnit {
     f32 mMoveSpeedXZ;                            // 0x16C
     f32 mFallAccel;                              // 0x170
     f32 mMoveSpeedY;                             // 0x174
-    u8 field_0x178[0x184 - 0x178];               // 0x178
+    f32 mMoveDirection;                          // 0x178
+    u8 field_0x17C[0x184 - 0x17C];               // 0x17C
     s8 moveDirection;                            // 0x184
     s8 faceDirection;                            // 0x185
     u8 field_0x186[0x1F8 - 0x186];               // 0x186
@@ -586,27 +621,65 @@ typedef struct BattleUnit {
     ItemDropData* dropTable;                     // 0x308
     u8 field_0x30C[0x30D - 0x30C];               // 0x30C
     u8 mMoveColorLv;                             // 0x30D
-    u8 field_0x30E[0x334 - 0x30E];               // 0x30E
+    u8 field_0x30E[0x310 - 0x30E];               // 0x30E
+    struct BattleWeapon* countersetWeapon;       // 0x310
+    u8 field_0x314[0x334 - 0x314];               // 0x314
     s16 mBurnDamageFlameState;                   // 0x334
     s16 mbBurnDamageFlameActive;                 // 0x336
     s32 mBurnDamageFlameAnimTimer;               // 0x338
     f32 mBurnDamageFlameScale;                   // 0x33C
     EffectEntry* mBurnDamageFlameEff;            // 0x340
     BattleWorkStatusIcon mStatusIconWork;        // 0x344
-    u8 field_0xAE4[0xB30 - 0xAE4];               // 0xAE4
+    u8 field_0xAE4[0xB2C - 0xAE4];               // 0xAE4
+    s32 stageObjectId;                           // 0xB2C
 } BattleUnit;
 
 typedef struct BattleUnitKind {
-    BattleUnitType mUnitType;   // 0x0
-    u8 field_0x4[0xC - 0x4];    // 0x4
-    u8 mDangerHP;               // 0xC
-    u8 mPerilHP;                // 0xD
-    u8 mLevel;                  // 0xE
-    u8 mBonusExp;               // 0xF
-    u8 field_0x10[0xB8 - 0x10]; // 0x10
-    BattleUnitPart* mParts; // 0xB8
-    u8 field_0xBC[4];           // 0xBC
-    BattleDataEntry* dataTable; // 0xC0
+    BattleUnitType mUnitType;                 // 0x0
+    const char* name;                         // 0x4
+    s16 maxHp;                                // 0x8
+    s16 maxFp;                                // 0xA
+    u8 mDangerHP;                             // 0xC
+    u8 mPerilHP;                              // 0xD
+    u8 mLevel;                                // 0xE
+    u8 mBonusExp;                             // 0xF
+    u8 bonusCoin;                             // 0x10
+    u8 bonusCoinRate;                         // 0x11
+    u8 baseCoin;                              // 0x12
+    u8 runRate;                               // 0x13
+    s16 pbSoftCap;                            // 0x14
+    s16 width;                                // 0x16
+    s16 height;                               // 0x18
+    s16 hitOffset[2];                         // 0x1A
+    Vec centerOffset;                         // 0x20
+    s16 hpGaugeOffset[2];                     // 0x2C
+    Vec talkTogeBaseOffset;                   // 0x30
+    Vec heldItemBaseOffset;                   // 0x3C
+    Vec burnFlameOffset;                      // 0x48
+    f32 field_0x54;                           // 0x54
+    f32 field_0x58;                           // 0x58
+    Vec bintaHitOffset;                       // 0x5C
+    Vec kissHitOffset;                        // 0x68
+    Vec cutBaseOffset;                        // 0x74
+    f32 cutWidth;                             // 0x80
+    f32 cutHeight;                            // 0x84
+    s8 turnOrder;                             // 0x88
+    s8 turnOrderVariance;                     // 0x89
+    s8 swallowChance;                         // 0x8A
+    u8 swallowAttributes;                     // 0x8B
+    u8 hammerKnockbackChance;                 // 0x8C
+    u8 itemStealParam;                        // 0x8D
+    Vec starPointDispOffset;                  // 0x90
+    const char* damageSfxName;                // 0x9C
+    const char* fireDamageSfxName;            // 0xA0
+    const char* iceDamageSfxName;             // 0xA4
+    const char* explosionDamageSfxName;       // 0xA8
+    u32 attributeFlags;                       // 0xAC
+    StatusVulnerability* statusVulnerability; // 0xB0
+    s8 numParts;                              // 0xB4
+    BattleUnitKindPart* mParts;               // 0xB8
+    void* initEventCode;                      // 0xBC
+    BattleDataEntry* dataTable;               // 0xC0
 } BattleUnitKind;
 
 typedef struct BattleUnitSetup {
@@ -658,7 +731,7 @@ void BtlUnit_SetPartsBaseScale(BattleUnitPart* part, f32 x, f32 y, f32 z);
 void BtlUnit_SetPartsScale(BattleUnitPart* part, f32 x, f32 y, f32 z);
 void BtlUnit_AddPartsScale(BattleUnitPart* part, f32 x, f32 y, f32 z);
 s16 BtlUnit_GetWidth(BattleUnit* unit);
-s16 BtlUnit_GetHeight(BattleUnit* unit);
+s32 BtlUnit_GetHeight(BattleUnit* unit);
 void BtlUnit_SetHeight(BattleUnit* unit, s16 height);
 void BtlUnit_SetOffsetPos(BattleUnit* unit, f32 x, f32 y, f32 z);
 void BtlUnit_GetPartsOffsetPos(BattleUnitPart* part, f32* x, f32* y, f32* z);
@@ -711,3 +784,5 @@ BOOL BtlUnit_CheckData(BattleUnit* unit, s32 tag);
 BOOL BtlUnit_GetEnemyBelong(BattleUnit* unit);
 void BtlUnit_ReviseHpFp(BattleUnit* unit);
 void BtlUnit_SetParamFromPouch(BattleUnit* unit);
+s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan);
+BattleUnit* BtlUnit_GetGuardKouraPtr(BattleUnit* unit);

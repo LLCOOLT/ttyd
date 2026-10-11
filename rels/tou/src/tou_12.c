@@ -1,0 +1,335 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_eff_fukidashi);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_get_position);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mobj_flag_onoff);
+USER_FUNC(evt_mobj_lv_blk);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_party);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_move_position);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_rotate);
+USER_FUNC(evt_npc_setup);
+USER_FUNC(evt_npc_status_onoff);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_get_pos);
+USER_FUNC(evt_party_move_pos2);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_breed_pose);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envoff);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_random);
+extern s32 evt_bero_info_run[];
+
+__declspec(section ".data") u64 fd_tou_12_negone_one_374;
+__declspec(section ".data") s32 fd_tou_12_neg_one_382[1];
+__declspec(section ".data") s32 fd_tou_12___local_PI_383[1];
+__declspec(section ".data") s32 fd_tou_12___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_tou_12_one_negone_373;
+__declspec(section ".data") s32 fd_tou_12___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_tou_12_one_381[1];
+__declspec(section ".data") u64 fd_tou_12_negone_one_360;
+__declspec(section ".data") s32 fd_tou_12_neg_one_365[1];
+__declspec(section ".data") s32 fd_tou_12___local_PI_366[1];
+__declspec(section ".data") s32 fd_tou_12___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_tou_12_one_negone_359;
+__declspec(section ".data") s32 fd_tou_12___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_tou_12_one_364[1];
+static __declspec(section ".data") s32 w_door_open[12];
+static __declspec(section ".data") s32 w_door_close[12];
+static s32 bero_data[30];
+static s32 evt_kinoshikowa[111];
+static s32 evt_block_broken[57];
+static s32 init_michel[22];
+__declspec(section ".data") s32 init_michel_dummy[12];
+static __declspec(section ".data") s32 talk_michel[8];
+static s32 init_brots[35];
+__declspec(section ".data") s32 init_brots_dummy[12];
+static s32 talk_brots[91];
+static __declspec(section ".data") s32 init_kinoshikowa[2];
+static __declspec(section ".data") s32 talk_kinoshikowa[2];
+static s32 npcEnt[138];
+s32 tou_12_init_evt[133];
+
+__declspec(section ".data") u64 fd_tou_12_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_tou_12_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_tou_12___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_tou_12___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_tou_12_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_tou_12___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_tou_12_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_tou_12_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_tou_12_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_tou_12___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_tou_12___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_tou_12_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_tou_12___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_tou_12_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") EVT_BEGIN(w_door_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
+    CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(w_door_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+    CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_data[] = {
+    (s32)"w_bero", 65540, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"tou_06", (s32)"w_bero", 327685, (s32)w_door_close, (s32)w_door_open, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+static EVT_BEGIN(evt_kinoshikowa)
+    CALL(evt_npc_set_position, STRING("キノシコワ"), -200, 0, 10)
+    CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, 30, 0)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_LESS(LW(0), -55)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_eff_fukidashi, 1, 0, STRING("キノシコワ"), 0, 0, 0, 0, 0, 0, 0, 0)
+    WAIT_MS(500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_status_onoff, 1, STRING("キノシコワ"), 2)
+        CALL(evt_npc_move_position, STRING("キノシコワ"), -250, 10, 0, FLOAT(80.0f), 1)
+    END_INLINE_EVENT
+    CALL(evt_mapobj_get_position, STRING("door_1"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), LW(0), LW(1), LW(2), 0)
+    SET_VALUE(LW(0), 30)
+    LOOP(10)
+        SUBTRACT(LW(0), 3)
+        CALL(evt_mapobj_rotate, 1, STRING("door_1"), 0, LW(0), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_party_stop, 0)
+    WAIT_MS(300)
+    CALL(evt_msg_print_party, STRING("stg3_tou_307_13_00"))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(evt_block_broken)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 0)
+    CALL(evt_party_move_pos2, 0, 95, 10, FLOAT(80.0f))
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SURPRISED2"))
+    CALL(evt_party_set_dir, 0, 90, 200)
+    WAIT_MS(300)
+    CALL(evt_msg_print_party, STRING("stg3_tou_307_10"))
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    WAIT_MS(300)
+    CALL(evt_msg_print, 0, STRING("stg3_tou_307_11"), 0, STRING("ブロッツダミー"))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    SPAWN_EVENT(PTR(evt_kinoshikowa))
+    SET_VALUE(GSW(0), 156)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(init_michel)
+    IF_INT_LESS(GSW(0), 164)
+        CALL(evt_npc_set_anim, STRING("マイケル"), STRING("NKT_Z_1"))
+        CALL(evt_npc_set_position, STRING("マイケル"), 175, 0, -20)
+        CALL(evt_npc_set_rotate, STRING("マイケル"), -80, 0, 0)
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(init_michel_dummy)
+    IF_INT_LESS(GSW(0), 164)
+        CALL(evt_npc_set_position, STRING("マイケルダミー"), 175, 0, -20)
+    END_IF
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(talk_michel)
+    CALL(evt_msg_print, 0, STRING("stg3_tou_307_14_01"), 0, STRING("マイケル"))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(init_brots)
+    IF_INT_LESS(GSW(0), 164)
+        CALL(evt_npc_set_position, STRING("ブロッツ"), 110, 3, -60)
+        CALL(evt_npc_set_rotate, STRING("ブロッツ"), -70, 0, -80)
+        CALL(evt_npc_flag_onoff, 0, STRING("ブロッツ"), 1536)
+        CALL(evt_npc_set_anim, STRING("ブロッツ"), STRING("S_1"))
+        IF_INT_EQUAL(GSWF(2518), 1)
+            CALL(evt_npc_set_anim, STRING("ブロッツ"), STRING("X_1"))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(init_brots_dummy)
+    IF_INT_LESS(GSW(0), 164)
+        CALL(evt_npc_set_position, STRING("ブロッツダミー"), 125, 4, -60)
+    END_IF
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(talk_brots)
+    IF_INT_EQUAL(GSWF(2518), 0)
+        CALL(evt_party_cont_onoff, 0, 0)
+        CALL(evt_party_set_breed_pose, 0, 1)
+        CALL(evt_npc_get_position, STRING("ブロッツ"), LW(0), LW(1), LW(2))
+        CALL(evt_party_get_pos, 0, LW(3), LW(4), LW(5))
+        IF_INT_LESS(LW(0), LW(3))
+            CALL(evt_party_set_dir, 0, 270, 200)
+            ELSE
+            CALL(evt_party_set_dir, 0, 90, 200)
+        END_IF
+        CALL(evt_npc_flag_onoff, 1, STRING("ブロッツ"), 1536)
+        CALL(evt_msg_print, 0, STRING("stg3_tou_307_12"), 0, 0)
+        CALL(evt_npc_flag_onoff, 0, STRING("ブロッツ"), 1536)
+        CALL(evt_npc_set_anim, STRING("ブロッツ"), STRING("X_1"))
+        CALL(evt_msg_print_party, STRING("stg3_tou_307_13"))
+        SET_VALUE(GSWF(2518), 1)
+        CALL(evt_party_cont_onoff, 0, 1)
+        ELSE
+        CALL(evt_npc_flag_onoff, 0, STRING("ブロッツ"), 1536)
+        CALL(evt_npc_set_anim, STRING("ブロッツ"), STRING("S_1"))
+        CALL(evt_msg_print, 0, STRING("stg3_tou_307_14"), 0, 0)
+        CALL(evt_npc_set_anim, STRING("ブロッツ"), STRING("X_1"))
+    END_IF
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(init_kinoshikowa)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(talk_kinoshikowa)
+    RETURN
+EVT_END()
+
+static s32 npcEnt[] = {
+    (s32)/*"マイケル"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B", 1090519072, 0, (s32)init_michel, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, (s32)/*"ブロッツ"*/"\x83\x75\x83\x8D\x83\x62\x83\x63",
+    1090520608, 0, (s32)init_brots, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, (s32)/*"マイケルダミー"*/"\x83\x7D\x83\x43\x83\x50\x83\x8B\x83\x5F\x83\x7E\x81\x5B", 1090519168,
+    0, (s32)init_michel_dummy, 0, (s32)talk_michel, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, (s32)/*"ブロッツダミー"*/"\x83\x75\x83\x8D\x83\x62\x83\x63\x83\x5F\x83\x7E\x81\x5B", 1090519168, 0,
+    (s32)init_brots_dummy, 0, (s32)talk_brots, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, (s32)/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 1073743360, 0, (s32)init_kinoshikowa,
+    0, (s32)talk_kinoshikowa, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0,
+};
+
+EVT_BEGIN(tou_12_init_evt)
+    IF_INT_EQUAL(GSW(0), 163)
+        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_envoff, 512)
+        ELSE
+        SWITCH(GSW(0))
+            CASE_BETWEEN(127, 137)
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
+            CALL(evt_snd_bgmoff, 26624)
+            CASE_GREATER_OR_EQUAL(165)
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU2"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
+            CALL(evt_snd_bgmoff, 26624)
+            CASE_DEFAULT
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG3_TOU1"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG3_TOU6"))
+        END_SWITCH
+    END_IF
+    SET_VALUE(LW(0), PTR(bero_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_npc_setup, PTR(npcEnt))
+    CALL(evt_item_entry, STRING("item01"), 125, 190, 0, 30, 16, GSWF(5627), 0)
+    IF_INT_LESS(GSW(0), 156)
+        CALL(evt_mobj_lv_blk, STRING("aa"), 125, 0, 0, PTR(evt_block_broken), GSWF(2441), STRING("MOBJ_Lv1BigBigBlock"))
+        CALL(evt_mobj_flag_onoff, 0, STRING("aa"), 64)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 164)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("gor_hae"), 1)
+        ELSE
+        CALL(evt_map_playanim, STRING("anm_hae"), 1, 0)
+        BEGIN_INLINE_EVENT
+            LOOP(0)
+                CALL(evt_sub_random, 1000, LW(0))
+                ADD(LW(0), 3000)
+                WAIT_MS(LW(0))
+                CALL(evt_mapobj_get_position, STRING("gor_hae"), LW(0), LW(1), LW(2))
+                CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_FLY1"), LW(0), LW(1), LW(2), 0)
+            END_LOOP
+        END_INLINE_EVENT
+    END_IF
+    RETURN
+EVT_END()
+

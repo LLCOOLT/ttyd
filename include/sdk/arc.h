@@ -34,5 +34,5 @@ BOOL ARCInitHandle(void* arcStart, ARCHandle* handle);
 
 void* ARCGetStartAddrInMem(ARCFileInfo* info);
 u32 ARCGetLength(ARCFileInfo* info);
-void ARCClose(void);
+BOOL ARCClose(ARCFileInfo* info);
 

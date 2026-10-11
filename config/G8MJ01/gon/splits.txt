@@ -39,7 +39,7 @@ gon_05.c:
 
 gon_06.c:
 	.text       start:0x000013CC end:0x000014B0
-	.rodata     start:0x00000EF8 end:0x00001248
+	.rodata     start:0x00000EF8 end:0x00001244
 	.data       start:0x000072C8 end:0x00008850
 
 gon_07.c:
@@ -103,7 +103,7 @@ unit/unit_nokonoko.c:
 unit/unit_patakuri.c:
 	.text       start:0x00002654 end:0x0000276C
 	.rodata     start:0x00003130 end:0x00003368
-	.data       start:0x0001A0A0 end:0x0001B758
+	.data       start:0x0001A0A0 end:0x0001B754
 
 unit/unit_patapata.c:
 	.rodata     start:0x00003368 end:0x00003600

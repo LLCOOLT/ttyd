@@ -3,6 +3,7 @@
 #include "musyx/s3d.h"
 #include "musyx/sal.h"
 #include "musyx/seq.h"
+#include "musyx/snd.h"
 #include "musyx/stream.h"
 #include "musyx/synth.h"
 
@@ -21,7 +22,11 @@ u8 salFrame;
 u8 salAuxFrame;
 u8 salNumVoices;
 u8 salMaxStudioNum;
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+SAL_HOOKS salHooks;
+#else
 SND_HOOKS salHooks;
+#endif
 u8 salTimeOffset;
 void hwSetTimeOffset(u8 offset);
 
@@ -248,6 +253,10 @@ u8 hwGetSampleType(u32 voice) { return dspVoice[voice].smp_info.compType; }
 
 u16 hwGetSampleID(u32 voice) { return dspVoice[voice].smp_id; }
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+void* hwGetSampleExtraData(u32 voice) { return dspVoice[voice].smp_info.extraData; }
+#endif
+
 void hwSetStreamLoopPS(u32 voice, u8 ps) { dspVoice[voice].streamLoopPS = ps; }
 
 void hwStart(u32 v, u8 studio) {
@@ -287,6 +296,43 @@ void hwSetPolyPhaseFilter(u32 v, u8 salCoefSel) {
   dsp_vptr->srcCoefSelect = dspCoefSel[salCoefSel];
   dsp_vptr->changed[0] |= 0x80;
 }
+
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+void hwLowPassFrqToCoef(u32 frq, u16* _a0, u16* _b1) {
+  f32 c;
+  f32 b;
+
+  c = 2.f - sndCos((6.2831855f * frq) / 32000.f);
+  if (c > 1.f) {
+    b = sndSqrt(c * c - 1.f) - c;
+  } else {
+    b = -1.f;
+  }
+  b = b > 1.f ? 1.f : (b < -1.f ? -1.f : b);
+  *_a0 = 32768.f * (1.f + b);
+  *_b1 = 32768.f * -b;
+}
+
+void hwSetFilter(u32 v, u8 mode, u16 coefA, u16 coefB) {
+  DSPvoice* dsp_vptr = &dspVoice[v];
+
+  if (!dsp_vptr->filter.on) {
+    if (mode == 1) {
+      dsp_vptr->filter.on = 1;
+      dsp_vptr->filter.coefA = coefA;
+      dsp_vptr->filter.coefB = coefB;
+      dsp_vptr->changed[0] |= 0xC00;
+    }
+  } else if (mode == 1) {
+    dsp_vptr->filter.coefA = coefA;
+    dsp_vptr->filter.coefB = coefB;
+    dsp_vptr->changed[0] |= 0x800;
+  } else {
+    dsp_vptr->filter.on = 0;
+    dsp_vptr->changed[0] |= 0x400;
+  }
+}
+#endif
 
 static void SetupITD(DSPvoice* dsp_vptr, u8 pan) {
   dsp_vptr->itdShiftL = itdOffTab[pan];
@@ -422,6 +468,9 @@ u32 hwGetPos(u32 v) {
   case 3:
     pos = dspVoice[v].currentAddr - (u32)dspVoice[v].smp_info.addr;
     break;
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+  case 6:
+#endif
   case 2:
     pos = dspVoice[v].currentAddr - ((u32)dspVoice[v].smp_info.addr / 2);
     break;
@@ -495,7 +544,11 @@ void hwSaveSample(void* header, void* data
   u32 len = ((u32*)*((u32*)header))[1] & 0xFFFFFF;
   u8 type = ((u32*)*((u32*)header))[1] >> 0x18;
   len = convert_length(len, type);
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+  *((u32*)data) = (u32)aramStoreData((void*)*((u32*)data), len, aramInfo);
+#else
   *((u32*)data) = (u32)aramStoreData((void*)*((u32*)data), len);
+#endif
 #endif
 }
 
@@ -517,14 +570,26 @@ void hwRemoveSample(void* header, void* data
   u8 type = (((u32*)header))[1] >> 0x18;
   u32 len = convert_length((((u32*)header))[1] & 0xFFFFFF, type);
 #endif
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+  aramRemoveData(data, len, aramInfo);
+#else
   aramRemoveData(data, len);
+#endif
 }
 
 void hwSyncSampleMem() { aramSyncTransferQueue(); }
 
 void hwFrameDone() {}
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+void sndSetHooks(SND_HOOKS* hooks) {
+  salHooks.malloc = hooks->malloc;
+  salHooks.mallocPhysical = hooks->malloc;
+  salHooks.free = hooks->free;
+}
+#else
 void sndSetHooks(SND_HOOKS* hooks) { salHooks = *hooks; }
+#endif
 
 void hwEnableHRTF() {
   if (dspHRTFOn != FALSE) {

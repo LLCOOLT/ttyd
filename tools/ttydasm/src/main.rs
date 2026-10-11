@@ -38,7 +38,7 @@ impl EventReader {
         let bytes = std::fs::read(&path).context(format!("Unable to open file: {path:?}"))?;
         let file = object::File::parse(&*bytes)?;
 
-        let symbol = file.symbol_by_name(symbol).context("symbol not found")?;
+        let symbol = find_symbol(&file, symbol).context("symbol not found")?;
         let section_index = symbol.section_index().context("symbol has no section")?;
         let section = file.section_by_index(section_index)?;
 
@@ -57,7 +57,7 @@ impl EventReader {
     fn get_script<'a>(&'a self, symbol: &str) -> Option<EventScript<'a>> {
         let file = object::File::parse(&*self.bytes).ok()?;
 
-        let symbol = file.symbol_by_name(symbol)?;
+        let symbol = find_symbol(&file, symbol)?;
         let section_index = symbol.section_index()?;
         let section = file.section_by_index(section_index).ok()?;
 
@@ -65,6 +65,20 @@ impl EventReader {
         let base = symbol.address();
         let event = EventScript::new(file, script, base, &self.lookup);
         Some(event)
+    }
+}
+
+/// Looks up `name`, or `name@0xADDR` to pick one of several local symbols sharing a name.
+fn find_symbol<'data, 'file>(
+    file: &'file object::File<'data>,
+    spec: &str,
+) -> Option<object::Symbol<'data, 'file>> {
+    match spec.split_once('@') {
+        Some((name, addr)) => {
+            let addr = u64::from_str_radix(addr.trim_start_matches("0x"), 16).ok()?;
+            file.symbols().find(|s| s.name() == Ok(name) && s.address() == addr)
+        }
+        None => file.symbol_by_name(spec),
     }
 }
 
@@ -77,7 +91,7 @@ fn main() -> anyhow::Result<()> {
             let mut script = reader
                 .get_script(&cmd.symbol)
                 .context(format!("Symbol wasn't found in module: {} -> {}", cmd.module, cmd.symbol))?;
-            script.extract(&cmd.symbol)?;
+            script.extract(cmd.symbol.split('@').next().unwrap())?;
         }
     }
 

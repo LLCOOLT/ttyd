@@ -61,7 +61,7 @@ void iconEntry2D(const char* name, s16 iconId);
 void iconDelete(const char* name);
 void iconChange(const char* name, s16 iconId);
 void iconDispGxAlpha(Vec position, s16 flags, s16 iconId, u8 alpha, f32 scale);
-void iconDispGx(Vec position, s16 flags, s16 iconId, f32 scale);
+void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale);
 void iconDispGx2(Mtx mtx, s16 flags, s16 iconId);
 void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
 void iconGetTexObj(GXTexObj* texObj, s16 iconId);

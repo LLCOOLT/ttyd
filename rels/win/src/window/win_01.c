@@ -1,0 +1,363 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+
+USER_FUNC(evt_bero_exec_wait);
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_shift_reset);
+USER_FUNC(evt_eff_fukidashi);
+USER_FUNC(evt_item_delete_check);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_key_get_buttontrg);
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mario_balloon_bikkuri);
+USER_FUNC(evt_mario_balloon_off);
+USER_FUNC(evt_mario_clear_party);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_set_pose);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_party);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_jump_position);
+USER_FUNC(evt_npc_move_position);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_dispflg_onoff);
+USER_FUNC(evt_party_flg_onoff);
+USER_FUNC(evt_party_move_pos);
+USER_FUNC(evt_party_move_pos2);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_pouch_open_mail);
+USER_FUNC(evt_pouch_receive_mail);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_rumble_onoff);
+extern s32 evt_bero_info_run[];
+extern s32 evt_sub_mail_event[];
+extern s32 evt_sub_mail_vibration[];
+extern s32 evt_sub_tree_access_entry[];
+extern s32 win_puni_walk_se[];
+
+__declspec(section ".data") u64 fd_win_01_negone_one_374;
+__declspec(section ".data") s32 fd_win_01_neg_one_382[1];
+__declspec(section ".data") s32 fd_win_01___local_PI_383[1];
+__declspec(section ".data") s32 fd_win_01___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_win_01_one_negone_373;
+__declspec(section ".data") s32 fd_win_01___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_win_01_one_381[1];
+__declspec(section ".data") u64 fd_win_01_negone_one_360;
+__declspec(section ".data") s32 fd_win_01_neg_one_365[1];
+__declspec(section ".data") s32 fd_win_01___local_PI_366[1];
+__declspec(section ".data") s32 fd_win_01___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_win_01_one_negone_359;
+__declspec(section ".data") s32 fd_win_01___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_win_01_one_364[1];
+s32 evt_dokan1_message[52];
+__declspec(section ".data") s32 evt_dokan1[11];
+static s32 bero_entry_data[90];
+s32 guide_bigtree[336];
+static s32 peach_mail[257];
+s32 ki_data_evt_03[20];
+static s32 tree_access_data[30];
+s32 win_01_init_evt[46];
+
+__declspec(section ".data") u64 fd_win_01_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_win_01_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_win_01___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_win_01___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_win_01_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_win_01___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_win_01_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_win_01_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_win_01_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_win_01___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_win_01___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_win_01_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_win_01___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_win_01_one_364[] = {
+    1065353216,
+};
+
+EVT_BEGIN(evt_dokan1_message)
+    CALL(evt_bero_exec_wait, 65536)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_party_stop, 1)
+    CALL(evt_party_stop, 0)
+    WAIT_MS(700)
+    CALL(evt_mario_set_dir, 90, 200, 0)
+    CALL(evt_party_set_dir, 0, 90, 200)
+    CALL(evt_party_move_pos2, 1, 50, 20, FLOAT(60.0f))
+    WAIT_MS(300)
+    CALL(evt_msg_print, 0, STRING("stg2_win_e04_01"), 0, STRING("extparty"))
+    SET_VALUE(GSW(0), 79)
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_dokan1)
+    IF_INT_EQUAL(GSW(0), 78)
+        SPAWN_EVENT(PTR(evt_dokan1_message))
+    END_IF
+    SET_VALUE(LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_entry_data[] = {
+    (s32)"w_bero", 0, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"win_00", (s32)"e_bero", 65537, 0, 0, (s32)"e_bero",
+    0, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"win_02", (s32)"w_bero", 65537, 0, 0, (s32)"dokan1", 131072,
+    9, 100000, 0, 0, -1, (s32)evt_dokan1, 6, 0,
+    0, (s32)"dokan_2", 65537, 0, 0, (s32)"dokan_2", 268566528, 9,
+    100000, 0, 0, -1, 0, 6, 0, 0,
+    (s32)"dokan1", 65537, 0, 0, (s32)"n_bero", 268435456, 2, 248,
+    44, -450, -1, 0, -1, 0, (s32)"mri_00", (s32)"w_bero",
+    65537, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0,
+};
+
+EVT_BEGIN(guide_bigtree)
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_GREATER_OR_EQUAL(LW(0), -50)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_party_stop, 1)
+    WAIT_MS(300)
+    CALL(evt_eff_fukidashi, 0, STRING(""), 0, 0, 0, 0, 0, 0, 0, 0, 60)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(1000)
+        CALL(evt_mario_set_pose, STRING("M_N_3"))
+    END_INLINE_EVENT
+    CALL(evt_party_move_pos, 1, -15, 60, 2000)
+    CALL(evt_msg_print, 0, STRING("stg2_win_e02_00"), 0, STRING("extparty"))
+    WAIT_MS(200)
+    CALL(evt_cam3d_evt_set, 225, 250, FLOAT(385.8994f), 225, FLOAT(180.59961f), -8, 1000, 11)
+    WAIT_MS(3000)
+    CALL(evt_party_set_pos, 1, -15, 0, 60)
+    CALL(evt_cam3d_evt_set, -50, 100, 378, -50, 45, 58, 0, 11)
+    WAIT_MS(300)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_msg_print, 0, STRING("stg2_win_e02_01"), 0, STRING("extparty"))
+    CALL(evt_party_move_pos2, 1, 0, 25, FLOAT(120.0f))
+    CALL(evt_party_flg_onoff, 1, 58720256, 1)
+    CALL(evt_party_cont_onoff, 1, 0)
+    CALL(evt_party_set_pos, 1, 0, -1000, 0)
+    WAIT_MS(1500)
+    CALL(evt_party_dispflg_onoff, 1, 1, 0)
+    CALL(evt_party_cont_onoff, 1, 1)
+    CALL(evt_mario_clear_party, 1)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(100)
+        CALL(evt_cam3d_evt_off, 300, 11)
+        SET_VALUE(GSW(0), 73)
+        CALL(evt_mario_key_onoff, 1)
+    END_INLINE_EVENT
+    CALL(evt_mapobj_trans, 0, STRING("S_hai_dokan_2"), 0, 0, -4)
+    CALL(evt_npc_set_position, STRING("ガイド"), FLOAT(-158.7998f), FLOAT(-30.0f), FLOAT(-500.0f))
+    WAIT_MS(200)
+    CALL(evt_npc_set_position, STRING("ガイド"), FLOAT(-158.7998f), FLOAT(-0.5595703f), FLOAT(-448.0f))
+    CALL(evt_npc_flag_onoff, 1, STRING("ガイド"), 1073873936)
+    WAIT_MS(300)
+    SPAWN_EVENT_GET_ID(PTR(win_puni_walk_se), LW(10))
+    CALL(evt_npc_move_position, STRING("ガイド"), -83, -450, 0, 100, 0)
+    DELETE_EVENT(LW(10))
+    CALL(evt_mapobj_trans, 0, STRING("S_hai_dokan_2"), 0, 0, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING("ガイド"), LW(10), LW(11), LW(12))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNI_JUMP1"), LW(10), LW(11), LW(12), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_jump_position, STRING("ガイド"), FLOAT(-15.5f), FLOAT(-19.789063f), -450, 400, 100, 40, 1)
+    SPAWN_EVENT_GET_ID(PTR(win_puni_walk_se), LW(10))
+    CALL(evt_npc_move_position, STRING("ガイド"), -6, -450, 0, 100, 0)
+    DELETE_EVENT(LW(10))
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING("ガイド"), LW(10), LW(11), LW(12))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNI_JUMP1"), LW(10), LW(11), LW(12), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_jump_position, STRING("ガイド"), FLOAT(40.299805f), FLOAT(-3.7695313f), -450, 400, 110, 25, 1)
+    SPAWN_EVENT_GET_ID(PTR(win_puni_walk_se), LW(10))
+    CALL(evt_npc_move_position, STRING("ガイド"), 100, -450, 0, 100, 0)
+    DELETE_EVENT(LW(10))
+    BEGIN_INLINE_EVENT
+        CALL(evt_npc_get_position, STRING("ガイド"), LW(10), LW(11), LW(12))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG2_PUNI_JUMP1"), LW(10), LW(11), LW(12), 0)
+    END_INLINE_EVENT
+    CALL(evt_npc_jump_position, STRING("ガイド"), FLOAT(170.0f), FLOAT(-3.7597656f), -450, 400, 110, 25, 1)
+    SPAWN_EVENT_GET_ID(PTR(win_puni_walk_se), LW(10))
+    CALL(evt_npc_move_position, STRING("ガイド"), 244, -450, 0, 100, 0)
+    DELETE_EVENT(LW(10))
+    CALL(evt_npc_set_position, STRING("ガイド"), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 0, STRING("ガイド"), 132112)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(peach_mail)
+    LABEL(0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    IF_INT_LESS(LW(2), -200)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    IF_INT_LESS(LW(0), -200)
+        SET_VALUE(LF(0), 0)
+        GOTO(1)
+    END_IF
+    IF_INT_GREATER(LW(0), 200)
+        SET_VALUE(LF(0), 1)
+        GOTO(1)
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    LABEL(1)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_party_stop, 0)
+    CALL(evt_snd_bgmoff, 1024)
+    CALL(evt_snd_bgmon, 1, STRING("BGM_FF_MAIL_RECEPTION1"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_2"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    SPAWN_EVENT_GET_ID(PTR(evt_sub_mail_vibration), LW(10))
+    WAIT_MS(500)
+    CALL(evt_msg_print_party, STRING("stg2_mri_00"))
+    CALL(evt_mario_balloon_bikkuri)
+    LOOP(0)
+        CALL(evt_key_get_buttontrg, 0, LW(0))
+        IF_INT_EQUAL(LW(0), 256)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_mario_balloon_off)
+    CALL(evt_snd_bgmoff, 513)
+    CALL(evt_snd_bgmon, 288, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MAIL_RECEPTION1"), LW(0), LW(1), LW(2), 0)
+    DELETE_EVENT(LW(10))
+    WAIT_FRAMES(1)
+    CALL(evt_sub_rumble_onoff, 1, 0)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    SET_VALUE(LW(3), LW(2))
+    ADD(LW(3), 267)
+    SET_VALUE(LW(4), LW(2))
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_cam3d_evt_set, -184, 86, LW(3), -184, 38, LW(4), 1000, 11)
+        ELSE
+        CALL(evt_cam3d_evt_set, 184, 86, LW(3), 184, 38, LW(4), 1000, 11)
+    END_IF
+    WAIT_MS(1000)
+    CALL(evt_mario_set_pose, STRING("M_N_9"))
+    WAIT_MS(500)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MAIL_RECEPTION2"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mario_set_pose, STRING("M_N_10"))
+    WAIT_MS(500)
+    IF_INT_EQUAL(LF(0), 0)
+        CALL(evt_mario_set_dir, 90, 300, 0)
+        ELSE
+        CALL(evt_mario_set_dir, 270, 300, 0)
+    END_IF
+    CALL(evt_msg_print, 0, STRING("stg2_mri_01"), 0, 0)
+    CALL(evt_msg_print_party, STRING("stg2_mri_02"))
+    CALL(evt_mario_set_pose, STRING("M_N_2"))
+    WAIT_MS(1000)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    CALL(evt_cam_shift_reset)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    SET_VALUE(GSW(0), 119)
+    CALL(evt_pouch_receive_mail, 1)
+    CALL(evt_pouch_open_mail, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ki_data_evt_03)
+    CALL(evt_item_delete_check, STRING("item_ki03"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_item_entry, STRING("item_ki03"), 121, 312, 106, -122, 14, GSWF(2686), 0)
+    END_IF
+    RETURN
+EVT_END()
+
+static s32 tree_access_data[] = {
+    4, (s32)"A_tree_01", (s32)"S_tree_mki_01", (s32)"S_tree_ha01", 0, 0, 4, (s32)"A_tree_02",
+    (s32)"S_tree_mki_02", (s32)"S_tree_ha02", 0, 0, 4, (s32)"A_tree_03", (s32)"S_tree_mki_03", (s32)"S_tree_ha03",
+    0, (s32)ki_data_evt_03, 4, (s32)"A_tree_04", (s32)"S_tree_mki_04", (s32)"S_tree_ha04", 0, 0,
+    7, 0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(win_01_init_evt)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN1"))
+    SET_VALUE(LW(0), PTR(tree_access_data))
+    CALL_CHILD(PTR(evt_sub_tree_access_entry))
+    IF_INT_LESS_OR_EQUAL(GSW(0), 72)
+        SPAWN_EVENT(PTR(guide_bigtree))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 118)
+        SPAWN_EVENT(PTR(peach_mail))
+    END_IF
+    SPAWN_EVENT(PTR(evt_sub_mail_event))
+    CALL(evt_item_entry, STRING("item_00"), 164, 165, 0, -58, 16, GSWF(2687), 0)
+    RETURN
+EVT_END()
+

@@ -92,8 +92,8 @@ mri_15.c:
 mri_16.c:
 	.text       start:0x00003C5C end:0x00003D40
 	.rodata     start:0x00004CA8 end:0x00004F90
-	.data       start:0x00022538 end:0x00023420
-	.bss        start:0x00000030 end:0x00000038
+	.data       start:0x00022538 end:0x0002341C
+	.bss        start:0x00000030 end:0x00000034
 
 driver/punidrv.c:
 	.text       start:0x00003D40 end:0x0000506C
@@ -103,9 +103,9 @@ driver/punidrv.c:
 
 mri_puni.c:
 	.text       start:0x0000506C end:0x0001B048
-	.rodata     start:0x00004FE8 end:0x000059D8
+	.rodata     start:0x00004FE8 end:0x000059D4
 	.data       start:0x00023CE0 end:0x00024BD8
-	.bss        start:0x00000040 end:0x00000070
+	.bss        start:0x00000040 end:0x0000006C
 
 data/battle/battle_database_mri.c:
 	.rodata     start:0x000059D8 end:0x00005D98
@@ -150,7 +150,7 @@ unit/unit_dokugassun.c:
 unit/unit_pakkun_flower.c:
 	.text       start:0x0001EA8C end:0x0001ED1C
 	.rodata     start:0x00006C98 end:0x00006E58
-	.data       start:0x00032458 end:0x00033618
+	.data       start:0x00032458 end:0x00033614
 
 mri_17.c:
 	.text       start:0x0001ED1C end:0x0001ED84
@@ -180,7 +180,7 @@ unit/unit_monochrome_kurokumorn.c:
 unit/unit_monochrome_pakkun.c:
 	.text       start:0x0001ED84 end:0x0001F014
 	.rodata     start:0x000079B0 end:0x00007B70
-	.data       start:0x00038990 end:0x00039B50
+	.data       start:0x00038990 end:0x00039B4C
 
 event/evt_lect_mri.c:
 	.text       start:0x0001F014 end:0x00020254

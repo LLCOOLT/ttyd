@@ -26,7 +26,9 @@ typedef struct BattleStageData {
 } BattleStageData;
 
 typedef struct BattleWorkStage {
-	u8 field_0x0[0xB3C - 0x0]; //0x0
+	u8 field_0x0[0xB24 - 0x0]; //0x0
+	f32 field_0xB24; //0xB24, stage edge X?
+	u8 field_0xB28[0xB3C - 0xB28]; //0xB28
 } BattleStage;
 
 BattleStage* BattleStageGetPtr(void);

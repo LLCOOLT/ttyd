@@ -82,8 +82,8 @@ unit/unit_monochrome_kurokumorn.c:
 
 unit/unit_yami_togekuri.c:
 	.text       start:0x00000F34 end:0x0000124C
-	.rodata     start:0x00002428 end:0x000025F0
-	.data       start:0x00020108 end:0x000211A8
+	.rodata     start:0x00002428 end:0x000025EC
+	.data       start:0x00020108 end:0x000211A4
 
 unit/unit_borodo.c:
 	.text       start:0x0000124C end:0x00001530
@@ -167,7 +167,7 @@ unit/unit_twinkling_pansy.c:
 
 unit/unit_togenoko_ace.c:
 	.text       start:0x000026A0 end:0x00002720
-	.rodata     start:0x00004C10 end:0x00004E50
+	.rodata     start:0x00004C10 end:0x00004E4C
 	.data       start:0x000419C8 end:0x00043F18
 
 unit/unit_super_mahorn.c:
@@ -193,7 +193,7 @@ unit/unit_phantom.c:
 unit/unit_pakkun_flower.c:
 	.text       start:0x00003860 end:0x00003AF0
 	.rodata     start:0x00005610 end:0x000057D0
-	.data       start:0x0004C680 end:0x0004D840
+	.data       start:0x0004C680 end:0x0004D83C
 
 unit/unit_mahorn_custom.c:
 	.text       start:0x00003AF0 end:0x00004508
@@ -213,7 +213,7 @@ unit/unit_karon.c:
 unit/unit_ice_pakkun.c:
 	.text       start:0x00004D30 end:0x00004FC0
 	.rodata     start:0x00005FB0 end:0x00006168
-	.data       start:0x00057788 end:0x00058948
+	.data       start:0x00057788 end:0x00058944
 
 unit/unit_hyper_jyugem.c:
 	.text       start:0x00004FC0 end:0x00005060
@@ -272,5 +272,5 @@ unit/unit_hyper_togezo.c:
 
 unit/unit_churantalar.c:
 	.text       start:0x0000680C end:0x00006F74
-	.rodata     start:0x000076A8 end:0x00007840
+	.rodata     start:0x000076A8 end:0x00007858
 	.data       start:0x0006A3F0 end:0x0006C884

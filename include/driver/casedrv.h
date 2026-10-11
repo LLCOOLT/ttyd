@@ -23,7 +23,7 @@ typedef struct CaseEntry {
 	u32 swFlag; //0x4C
 	void* activeFunc; //0x50
 	s32 lwData[16]; //0x54
-	u8 field_0x94[4]; //0x94
+	s32 evtId; //0x94
 	void* evtCode; //0x98, TODO re-type
 	s32 priority; //0x9C
 } CaseEntry;
@@ -32,5 +32,6 @@ void caseInit(void);
 void caseReInit(void);
 s32 caseEntry(CaseSetup* setup);
 void caseDelete(s32 caseId);
+CaseEntry* caseIdToPtr(s32 caseId);
 void caseMain(void);
 CaseEntry* caseCheckHitObj(void* obj); // Takes HitEntry

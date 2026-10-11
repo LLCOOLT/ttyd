@@ -14,6 +14,10 @@ extract:
   header: assets/_mariost_icon_tlut.inc
 - symbol: _mariost_banner_tex
   header: assets/_mariost_banner_tex.inc
+# musyx/runtime/dsp_import.c
+- symbol: dspSlave
+  header: assets/dspSlave.inc
+  header_type: raw
 
 modules:
 - object: files/rel/aaa.rel

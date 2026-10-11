@@ -145,7 +145,12 @@ typedef struct MarioWork {
     s16 field_0x7A;                // 0x7A
     u8 field_0x7C[0x8C - 0x7C];    // 0x7C
     Vec position;                  // 0x8C
-    u8 field_0x98[0xC8 - 0x98];    // 0x98
+    Vec field_0x98;                // 0x98
+    Vec field_0xA4;                // 0xA4
+    u8 field_0xB0[0xB4 - 0xB0];    // 0xB0
+    f32 field_0xB4;                // 0xB4, half height times scale
+    u8 field_0xB8[0xC4 - 0xB8];    // 0xB8
+    f32 field_0xC4;                // 0xC4, rotation (degrees)
     Vec scale;                     // 0xC8
     u8 field_0xD4[0xEC - 0xD4];    // 0xD4
     Vec field_EC;                  // 0xEC
@@ -163,7 +168,8 @@ typedef struct MarioWork {
     u8 unk160[0x168 - 0x160];      // 0x160
     s32 unk168;                    // 0x168
     s32 unk16C;                    // 0x16C
-    u8 unk170[0x180 - 0x170];      // 0x170
+    u8 unk170[0x174 - 0x170];      // 0x170
+    Vec unk174;                    // 0x174, movement from a moving floor
 	f32 baseSpeed;                 // 0x180, same on US
     f32 mBaseWalkSpeed;            // 0x184
     f32 mBaseDashSpeed;            // 0x188, same on US
@@ -171,22 +177,26 @@ typedef struct MarioWork {
 	f32 controlStickSensitivity;   // 0x190
 	f32 controlStickAngle;         // 0x194
     f32 targetYaw;                 // 0x198
-    u8 unk19C[0x1A0 - 0x19C];      // 0x19C
+    f32 unk19C;                    // 0x19C
 	f32 directionView;             // 0x1A0
 	f32 unk1A4;                    // 0x1A4
     f32 unk1A8;                    // 0x1A8
-    u8 unk1AC[0x1B4 - 0x1AC];      // 0x1AC
+    f32 unk1AC;                    // 0x1AC
+    u8 unk1B0[0x1B4 - 0x1B0];      // 0x1B0
     Vec wPlayerCollisionBox;       // 0x1B4 JP, 0x1B8 US
     u8 field_0x1C0[0x1D8 - 0x1C0]; // 0x1C0
     s32 field_0x1D8;               // 0x1D8
-    u8 field_0x1DC[0x1E4 - 0x1DC]; // 0x1DC
+    s32 field_0x1DC;               // 0x1DC
+    s32 field_0x1E0;               // 0x1E0
 	void* hitobjStandOn;           // 0x1E4, 0x1E8 US HitEntry
 	void* hitobjJumpFrom;          // 0x1E8, 0x1EC US HitEntry
 	void* hitobjPush;              // 0x1EC JP, 0x1F0 US HitEntry
-	u8 field_0x1F0[0x224 - 0x1F0]; // 0x1F0
+	s32 field_0x1F0;               // 0x1F0
+	s32 field_0x1F4;               // 0x1F4
+	s32 field_0x1F8;               // 0x1F8
+	u8 field_0x1FC[0x224 - 0x1FC]; // 0x1FC
 	f32 playerGravity;             // 0x224 JP, 228 US
-    s32 paperAnimGroupId[3];       // 0x228 JP, 0x22C US
-    u8 field_0x234[0x23C - 0x234]; // 0x234
+    s32 paperAnimGroupId[5];       // 0x228 JP, 0x22C US
     s32 paperPoseId;               // 0x23C JP, 0x240 US
     u8 field_0x240[0x241 - 0x240]; // 0x240
     s8 currPartySlotId[2];         // 0x241 JP, 0x245 US

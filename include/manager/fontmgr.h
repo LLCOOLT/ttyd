@@ -1,5 +1,7 @@
 #pragma once
 
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
 #include <dolphin/types.h>
 
 typedef enum BinaryFontEncoding {
@@ -80,6 +82,11 @@ void fontmgrInit(void);
 void fontmgrTexSetup(void);
 void FontDrawStart(void);
 void FontDrawStart_alpha(u8 alpha);
+u16 FontGetMessageWidthLine(const char* msg, u16* lines);
+void FontDrawMessage(s32 x, s32 y, const char* msg);
+u16 FontGetMessageWidth(const char* message);
+void FontDrawStringMtx(Mtx mtx, const char* message);
+void FontDrawColor(GXColor color);
 
 
 

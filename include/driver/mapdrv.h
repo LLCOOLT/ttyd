@@ -93,7 +93,8 @@ typedef struct MapHeader {
 } MapHeader;
 
 typedef struct MapObject {
-    u8 field_0x0[0x8 - 0x0];     // 0x0
+    u32 flags;                   // 0x0
+    u8 field_0x4[0x8 - 0x4];     // 0x4
     MapFileJoint* joints;        // 0x8
     u8 field_0xC[0x1C - 0xC];    // 0xC
     Mtx modelWorldMtx;           // 0x1C
@@ -103,7 +104,8 @@ typedef struct MapObject {
     struct MapObject* parent;    // 0xE0
     struct MapObject* child;     // 0xE4
     struct MapObject* next;      // 0xE8
-    u8 field_0xEC[0x134 - 0xEC]; // 0xEC
+    u16 screenRect[4];           // 0xEC, projected bounds (0x3FF when off screen)
+    u8 field_0xF4[0x134 - 0xF4]; // 0xF4
 } MapObject;
 
 typedef struct MapError {
@@ -112,14 +114,17 @@ typedef struct MapError {
 } MapError;
 
 typedef struct MapEntryAnimData {
-    u8 field_0x0[0x20 - 0x0]; // 0x0
+    u16 flags;                // 0x0
+    u8 field_0x2[0x20 - 0x2]; // 0x2
 } MapEntryAnimData;
 
 typedef struct MapEntry {
     s32 count;                     // 0x0
     u16 flags;                     // 0x4
     char name[16];                 // 0x6
-    u8 field_0x16[0x38 - 0x16];    // 0x16
+    u8 field_0x16[0x1E - 0x16];    // 0x16
+    GXColor color;                 // 0x1E
+    u8 field_0x22[0x38 - 0x22];    // 0x22
     MapHeader header;              // 0x38
     void* dat;                     // 0x7C, ./map/%s/map.dat
     u32 datSize;                   // 0x80
@@ -165,6 +170,16 @@ void mapDisp(void);
 void mapSetMaterialLight(s32 flags, Vec position);
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2);
 void mapSetMaterialFog(void);
+typedef struct MapTevCallbackInfo {
+    u8 field_0x0[0xC]; // 0x0
+    s32 tevStage;      // 0xC, next free TEV stage
+    s32 texCoord;      // 0x10
+    s32 texMap;        // 0x14
+    s32 field_0x18;    // 0x18
+} MapTevCallbackInfo;
+
+typedef void (*MapTevCallback)(MapTevCallbackInfo* info);
+void mapSetTevCallback(s32 index, MapTevCallback callback);
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx);
 
 MapObject* mapGetMapObj(const char* name);

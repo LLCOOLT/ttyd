@@ -1,0 +1,498 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "memory.h"
+#include "mario/mariost.h"
+#include "driver/mapdrv.h"
+#include "dolphin/gx.h"
+#include "dolphin/os.h"
+#include "mario/mario.h"
+
+double sin(double x);
+static smartEntry* ind_lp;
+void envGlareFilter(s32 on, s16 x0, s16 y0, s16 x1, s16 y1);
+void envGlareFilterZ(f32 z);
+
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam_road_reset);
+USER_FUNC(evt_cloud_ent);
+USER_FUNC(evt_cloud_init);
+USER_FUNC(evt_hitobj_onoff);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_map_set_tevcallback);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mobj_brick);
+USER_FUNC(evt_mobj_powerupblk);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+static USER_FUNC(test_glare);
+static void sun_tev(MapTevCallbackInfo* info);
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 evt_bero_info_run[];
+
+__declspec(section ".data") u64 fd_eki_03_negone_one_374;
+__declspec(section ".data") s32 fd_eki_03_neg_one_382[1];
+__declspec(section ".data") s32 fd_eki_03___local_PI_383[1];
+__declspec(section ".data") s32 fd_eki_03___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_eki_03_one_negone_373;
+__declspec(section ".data") s32 fd_eki_03___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_eki_03_one_381[1];
+__declspec(section ".data") u64 fd_eki_03_negone_one_360;
+__declspec(section ".data") s32 fd_eki_03_neg_one_365[1];
+__declspec(section ".data") s32 fd_eki_03___local_PI_366[1];
+__declspec(section ".data") s32 fd_eki_03___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_eki_03_one_negone_359;
+__declspec(section ".data") s32 fd_eki_03___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_eki_03_one_364[1];
+static __declspec(section ".data") s32 w1_close[12];
+static __declspec(section ".data") s32 w1_open[12];
+static __declspec(section ".data") s32 w2_close[12];
+static __declspec(section ".data") s32 w2_open[12];
+static s32 bero_data[45];
+__declspec(section ".data") s32 evt_poster[10];
+static s32 evt_chk[74];
+static __declspec(section ".data") s32 evt_poster_1[7];
+static __declspec(section ".data") s32 evt_poster_2[7];
+static __declspec(section ".data") s32 evt_poster_3[7];
+static __declspec(section ".data") s32 evt_poster_4[7];
+static __declspec(section ".data") s32 evt_poster_5[7];
+static __declspec(section ".data") s32 evt_poster_6[7];
+static __declspec(section ".data") s32 evt_poster_7[7];
+static __declspec(section ".data") s32 evt_poster_8[7];
+static __declspec(section ".data") s32 evt_poster_9[7];
+__declspec(section ".data") s32 evt_poster_10[12];
+s32 evt_poster_11[27];
+s32 evt_poster_12[22];
+__declspec(section ".data") s32 evt_poster_13[7];
+__declspec(section ".data") s32 evt_poster_14[7];
+__declspec(section ".data") s32 evt_poster_15[7];
+s32 eki_03_init_evt[471];
+
+__declspec(section ".data") u64 fd_eki_03_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_eki_03_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_eki_03___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_eki_03___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_eki_03_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_eki_03___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_eki_03_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_eki_03_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_eki_03_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_eki_03___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_eki_03___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_eki_03_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_eki_03___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_eki_03_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") EVT_BEGIN(w1_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(w1_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door_1"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(w2_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(w2_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door_2"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_data[] = {
+    (s32)"w_bero_1", 65539, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"eki_01", (s32)"e_bero", 327685, (s32)w1_close, (s32)w1_open, (s32)"w_bero_2",
+    65539, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"eki_04", (s32)"e_bero", 327685, (s32)w2_close, (s32)w2_open, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+};
+
+__declspec(section ".data") EVT_BEGIN(evt_poster)
+    SET_VALUE(GSW(0), 316)
+    SET_VALUE(LW(0), 1)
+    CALL_CHILD(PTR(bero_case_switch_on))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(evt_chk)
+    IF_INT_EQUAL(GSWF(3733), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3734), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3735), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3736), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3737), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3738), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3739), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3740), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3741), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3742), 0)
+        RETURN
+    END_IF
+    IF_INT_EQUAL(GSWF(3743), 0)
+        RETURN
+    END_IF
+    SET_VALUE(LW(0), 1)
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_hitobj_onoff, STRING("a_kabe"), 1, 0)
+    IF_INT_LESS(GSW(0), 316)
+        SET_VALUE(GSW(0), 316)
+    END_IF
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_1)
+    SET_VALUE(GSWF(3729), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_2)
+    SET_VALUE(GSWF(3730), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_3)
+    SET_VALUE(GSWF(3731), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_4)
+    SET_VALUE(GSWF(3732), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_5)
+    SET_VALUE(GSWF(3733), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_6)
+    SET_VALUE(GSWF(3734), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_7)
+    SET_VALUE(GSWF(3735), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_8)
+    SET_VALUE(GSWF(3736), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_poster_9)
+    SET_VALUE(GSWF(3737), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_poster_10)
+    SET_VALUE(GSWF(3738), 1)
+    CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_poster_11)
+    SET_VALUE(GSWF(3739), 1)
+    CALL(evt_hitobj_onoff, STRING("a_kami_14"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("a_kami_15"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("a_kami_6"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("a_kami_7"), 1, 0)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_poster_12)
+    SET_VALUE(GSWF(3740), 1)
+    CALL(evt_hitobj_onoff, STRING("a_kami_8"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("a_kami_9"), 1, 0)
+    CALL(evt_hitobj_onoff, STRING("a_kami_5"), 1, 0)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_poster_13)
+    SET_VALUE(GSWF(3741), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_poster_14)
+    SET_VALUE(GSWF(3742), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_poster_15)
+    SET_VALUE(GSWF(3743), 1)
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(eki_03_init_evt)
+    SET_VALUE(LW(0), PTR(bero_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_cam_road_reset)
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI4"))
+    CALL(evt_snd_bgmoff, 26624)
+    CALL(evt_item_entry, STRING("item"), 278, -550, 220, -50, 16, GSWF(3746), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk01"), 450, 100, 10, 0, GSWF(5561), 0)
+    CALL(evt_mobj_brick, STRING("blk01"), 250, 300, -100, 0, 0, 0, LSWF(1))
+    CALL(evt_mobj_brick, STRING("blk02"), 250, 385, -100, 129, 11, 0, GSWF(3754))
+    CALL(evt_map_set_tevcallback, 2, PTR(sun_tev))
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sun"), 33554432)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("sun"), 256)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("sun"), 268435456)
+    BEGIN_INLINE_EVENT
+        CALL(test_glare)
+    END_INLINE_EVENT
+    CALL(evt_cloud_init)
+    IF_INT_EQUAL(GSWF(3729), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_0"), STRING("a_kami_1"), PTR(evt_poster_1))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_0"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_1"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3730), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_17"), STRING("a_kami_2"), PTR(evt_poster_2))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_17"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_2"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3731), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_16"), STRING("a_kami_3"), PTR(evt_poster_3))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_16"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_3"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3732), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_4"), STRING("a_kami_4"), PTR(evt_poster_4))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_4"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_4"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3733), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_5"), STRING("a_kami_12"), PTR(evt_poster_5))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_5"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3734), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_6"), STRING("a_kami_11"), PTR(evt_poster_6))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_6"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3735), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_7"), STRING("a_kami_11"), PTR(evt_poster_7))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_7"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3736), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_8"), STRING("a_kami_12"), PTR(evt_poster_8))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_8"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3737), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_9"), STRING("a_kami_12"), PTR(evt_poster_9))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_9"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_12"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3738), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_10"), STRING("a_kami_10"), PTR(evt_poster_10))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_10"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_13"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3739), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_11"), STRING("a_kami_10"), PTR(evt_poster_11))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_11"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_14"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_15"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_6"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_7"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3740), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_12"), STRING("a_kami_10"), PTR(evt_poster_12))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_12"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_8"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_9"), 1, 0)
+        CALL(evt_hitobj_onoff, STRING("a_kami_5"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3741), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_13"), STRING("a_kami_10"), PTR(evt_poster_13))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_13"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_10"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3742), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_14"), STRING("a_kami_11"), PTR(evt_poster_14))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_14"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
+    END_IF
+    IF_INT_EQUAL(GSWF(3743), 0)
+        CALL(evt_cloud_ent, 0, STRING("kami_15"), STRING("a_kami_11"), PTR(evt_poster_15))
+        ELSE
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("kami_15"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_kami_11"), 1, 0)
+    END_IF
+    CALL(evt_hitobj_onoff, STRING("a_kabe"), 1, 0)
+    SET_VALUE(LW(0), 1)
+    CALL_CHILD(PTR(bero_case_switch_off))
+    CALL_CHILD(PTR(evt_chk))
+    RETURN
+EVT_END()
+
+static void sun_tev(MapTevCallbackInfo* info) {
+    s32 i;
+    u8* buf;
+    s32 texCoord = info->texMap;
+    s32 texMap = info->texCoord;
+    s32 stage = info->tevStage;
+    GXTexObj obj;
+    f32 mtx[2][3];
+    s32 indStage = info->field_0x18;
+    s32 tile;
+    s32 row;
+    s32 j;
+
+    // a scrolling sine-wave warp texture for the sun's heat haze
+    if (ind_lp == NULL) {
+        ind_lp = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 1);
+    }
+    buf = ind_lp->address;
+    for (i = 0; i < 64; i++) {
+        tile = (i / 4) << 5;
+        row = i % 4;
+        for (j = 0; j < 64; j++) {
+            f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
+            u8* p = &buf[tile + ((j / 4) << 9) + ((row + ((j % 4) << 2)) << 1)];
+
+            p[0] = 3.0f * v + 128.0f;
+            p[1] = 0x80;
+        }
+    }
+    DCFlushRange(buf, 0x2000);
+    GXInitTexObj(&obj, buf, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, texMap);
+    mtx[0][0] = 0.5f;
+    mtx[0][1] = 0.0f;
+    mtx[0][2] = 0.0f;
+    mtx[1][0] = 0.0f;
+    mtx[1][1] = 0.5f;
+    mtx[1][2] = 0.0f;
+    GXSetIndTexMtx(GX_ITM_0, mtx, 1);
+    GXSetIndTexOrder(indStage, GX_TEXCOORD0, texMap);
+    GXSetIndTexCoordScale(indStage, GX_ITS_1, GX_ITS_1);
+    GXSetTevIndWarp(GX_TEVSTAGE0, indStage, GX_TRUE, GX_FALSE, GX_ITM_0);
+    info->tevStage = stage;
+    info->texMap = texCoord;
+    info->field_0x18 = indStage + 1;
+    info->texCoord = texMap + 1;
+}
+
+static USER_FUNC(test_glare) {
+    MapObject* sun = mapGetMapObj("sun");
+    u16* rect;
+
+    marioGetPtr();
+    if (isFirstCall) {
+        sun->flags |= 0x20000000;
+        return EVT_RETURN_BLOCK;
+    }
+    rect = sun->screenRect;
+    if (rect[0] == 0x3FF || rect[1] == 0x3FF || rect[2] == 0x3FF || rect[3] == 0x3FF) {
+        envGlareFilter(0, 0, 0, 0, 0);
+    } else if (rect[0] == 0 && rect[1] == 0 && rect[2] == 0 && rect[3] == 0) {
+        envGlareFilter(0, 0, 0, 0, 0);
+    } else {
+        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[2] + 50, rect[3] + 50);
+        envGlareFilterZ(0.998f);
+    }
+    return EVT_RETURN_BLOCK;
+}
+

@@ -411,7 +411,7 @@ s16 BtlUnit_GetWidth(BattleUnit* unit) {
     return unit->mWidth;
 }
 
-s16 BtlUnit_GetHeight(BattleUnit* unit) {
+s32 BtlUnit_GetHeight(BattleUnit* unit) {
     return unit->mHeight;
 }
 

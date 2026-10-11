@@ -1,5 +1,6 @@
 #include "musyx/assert.h"
 #include "musyx/musyx.h"
+#include "musyx/hardware.h"
 #include "musyx/platform.h"
 
 typedef struct STREAM_BUFFER {
@@ -121,7 +122,11 @@ void aramInit(unsigned long length) {
 
   aramBase = ARGetBaseAddress();
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+  tmpMem = (s16*)salMallocPhysical(sizeof(s16) * 640);
+#else
   tmpMem = (s16*)salMalloc(sizeof(s16) * 640);
+#endif
 #line 182
   MUSY_ASSERT_MSG(tmpMem != NULL, "Could not allocate temporary storage");
 
@@ -139,7 +144,9 @@ void aramInit(unsigned long length) {
     aramTop = ARGetSize();
   }
 
+#if MUSY_VERSION < MUSY_VERSION_CHECK(2, 0, 2)
   aramWrite = aramBase + sizeof(s16) * 640;
+#endif
   aramUploadCallback = NULL;
   InitStreamBuffers();
   MUSY_DEBUG("MusyX ARAM handler initialized\n");
@@ -148,6 +155,12 @@ void aramInit(unsigned long length) {
 void aramExit() {}
 
 unsigned long aramGetZeroBuffer() { return ARGetBaseAddress(); }
+
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+unsigned long aramGetFirstUserAddress() { return ARGetBaseAddress() + sizeof(s16) * 640; }
+
+unsigned long aramGetUserBytes(unsigned long len) { return len - sizeof(s16) * 640; }
+#endif
 
 void aramSetUploadCallback(void* (*callback)(unsigned long, unsigned long),
                            unsigned long chunckSize) {
@@ -162,6 +175,43 @@ void aramSetUploadCallback(void* (*callback)(unsigned long, unsigned long),
   aramUploadCallback = callback;
 }
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+void* aramStoreData(void* src, unsigned long len, ARAMInfo* info) {
+  unsigned long addr;
+  void* buffer;
+  unsigned long blkSize;
+  len = (len + 31) & ~31;
+  if (info->aramBase == aramGetFirstUserAddress()) {
+    if (info->aramWrite + len > aramStream) {
+      return NULL;
+    }
+  } else if (info->aramWrite + len > info->aramTop) {
+    return NULL;
+  }
+
+  addr = info->aramWrite;
+  if (aramUploadCallback == NULL) {
+    DCFlushRange(src, len);
+    aramUploadData(src, info->aramWrite, len, 0, NULL, 0);
+    info->aramWrite += len;
+    return (void*)addr;
+  }
+
+  while (len != 0) {
+    while (aramQueueLo.valid != 0) {
+    }
+    blkSize = len >= aramUploadChunkSize ? aramUploadChunkSize : len;
+    buffer = (void*)aramUploadCallback((u32)src, blkSize);
+    DCFlushRange(buffer, blkSize);
+    aramUploadData(buffer, info->aramWrite, blkSize, 0, NULL, 0);
+    len -= blkSize;
+    info->aramWrite += blkSize;
+    src = (void*)((u32)src + blkSize);
+  }
+
+  return (void*)addr;
+}
+#else
 void* aramStoreData(void* src, unsigned long len) {
   unsigned long addr;    // r26
   void* buffer;          // r27
@@ -193,10 +243,17 @@ void* aramStoreData(void* src, unsigned long len) {
 
   return (void*)addr;
 }
+#endif
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+void aramRemoveData(void* aram, unsigned long len, ARAMInfo* info) {
+  len = (len + 31) & ~31;
+  info->aramWrite -= len;
+#else
 void aramRemoveData(void* aram, unsigned long len) {
   len = (len + 31) & ~31;
   aramWrite -= len;
+#endif
 #line 328
   MUSY_ASSERT_MSG((u32)aram == aramWrite,
                   "Current ARAM address does not match originally allocated one");
@@ -238,7 +295,11 @@ unsigned char aramAllocateStreamBuffer(unsigned long len) {
   }
 
   if (oSb == NULL) {
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 2)
+    if (aramIdleStreamBuffers != NULL && aramStream - len >= dataARAMDefaultGetInfo()->aramWrite) {
+#else
     if (aramIdleStreamBuffers != NULL && aramStream - len >= aramWrite) {
+#endif
       oSb = aramIdleStreamBuffers;
       aramIdleStreamBuffers = oSb->next;
       oSb->allocLength = len;

@@ -58,8 +58,10 @@ void envInit(void);
 void envReInit(void);
 void envTexSetup(void);
 void envMain(void);
-//envBlurOn
-//envBlurOff
+void envBlurOn(s32 type, s32 msec);
+void envBlurOff(void);
 void envGlare(EnvironmentGlare* glare);
+struct MapTevCallbackInfo;
+void envSetWater(struct MapTevCallbackInfo* info);
 
 

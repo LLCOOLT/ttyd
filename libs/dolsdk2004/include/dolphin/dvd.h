@@ -205,6 +205,8 @@ s32 DVDGetTransferredSize(DVDFileInfo* fileinfo);
 
 #define DVDReadAsync(fileInfo, addr, length, offset, callback) \
     DVDReadAsyncPrio((fileInfo), (addr), (length), (offset), (callback), 2)
+#define DVDRead(fileInfo, addr, length, offset) \
+    DVDReadPrio((fileInfo), (addr), (length), (offset), 2)
 
 // DVD ID UTILS
 int DVDCompareDiskID(const DVDDiskID* id1, const DVDDiskID* id2);

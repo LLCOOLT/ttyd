@@ -179,6 +179,7 @@ struct EventEntry {
     union {
         s32 userdata[3];
         f32 userdataf[3];
+        void* userdatap[3];
     }; // 0x78, TODO check
     u32 field_84;              // 0x84
     OSTime wInterpRelatedTime; // 0x88

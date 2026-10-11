@@ -10,6 +10,20 @@
 static DSPTaskInfo dsp_task ATTRIBUTE_ALIGN(8);
 static u16 dram_image[4096] ATTRIBUTE_ALIGN(32);
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+// Uninitialized, so MWCC lays these out in reverse declaration order
+static SND_SOME_CALLBACK userCallback;
+static u8 salAIBufferIndex;
+void* salAIBufferBase;
+static volatile u32 salDspIsDone;
+static volatile u32 salLogicIsWaiting;
+static volatile u32 salLogicActive;
+static volatile OSTick salLastTick;
+static volatile u32 salDspInitIsDone;
+static OSThreadQueue salWaitForDSPThreadQueue;
+static volatile u16 hwIrqLevel;
+static volatile u32 oldState;
+#else
 static volatile u32 oldState = 0;
 static volatile u16 hwIrqLevel = 0;
 static volatile u32 salDspInitIsDone = 0;
@@ -20,6 +34,7 @@ static volatile u32 salDspIsDone = 0;
 void* salAIBufferBase = NULL;
 static u8 salAIBufferIndex = 0;
 static SND_SOME_CALLBACK userCallback = NULL;
+#endif
 
 #define DMA_BUFFER_LEN 0x280
 
@@ -60,8 +75,16 @@ void dspResumeCallback() {
   }
 }
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+void dspDoneCallback() { OSWakeupThread(&salWaitForDSPThreadQueue); }
+#endif
+
 u32 salInitAi(SND_SOME_CALLBACK callback, u32 unk, u32* outFreq) {
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+  if ((salAIBufferBase = salMallocPhysical(DMA_BUFFER_LEN * 4)) != NULL) {
+#else
   if ((salAIBufferBase = salMalloc(DMA_BUFFER_LEN * 4)) != NULL) {
+#endif
     memset(salAIBufferBase, 0, DMA_BUFFER_LEN * 4);
     DCFlushRange(salAIBufferBase, DMA_BUFFER_LEN * 4);
     salAIBufferIndex = TRUE;
@@ -107,9 +130,16 @@ u32 salInitDsp() {
   dsp_task.dsp_resume_vector = 0x30;
   dsp_task.init_cb = dspInitCallback;
   dsp_task.res_cb = dspResumeCallback;
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+  dsp_task.done_cb = dspDoneCallback;
+#else
   dsp_task.done_cb = NULL;
+#endif
   dsp_task.req_cb = NULL;
   dsp_task.priority = 0;
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 3)
+  OSInitThreadQueue(&salWaitForDSPThreadQueue);
+#endif
   DSPInit();
   DSPAddTask(&dsp_task);
   salDspInitIsDone = FALSE;

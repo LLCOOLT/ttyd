@@ -1,0 +1,606 @@
+#include "battle/battle.h"
+#include "battle/battle_sub.h"
+#include "driver/animdrv.h"
+#include "driver/mapdrv.h"
+#include "manager/evtmgr_cmd.h"
+#include "mario/mario_pouch.h"
+#include <dolphin/gx.h>
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+USER_FUNC(_get_local_frame);
+static USER_FUNC(_mario_makkuro_set);
+USER_FUNC(_mario_super_emblem_anim_set);
+USER_FUNC(btlevtcmd_AnimeChangePose);
+USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
+USER_FUNC(btlevtcmd_AnimeChangePoseType);
+USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable);
+USER_FUNC(btlevtcmd_AudienceAppeal);
+USER_FUNC(btlevtcmd_FaceDirectionAdd);
+USER_FUNC(btlevtcmd_FaceDirectionSub);
+USER_FUNC(btlevtcmd_GetHomePos);
+USER_FUNC(btlevtcmd_GetPos);
+USER_FUNC(btlevtcmd_JumpPosition);
+USER_FUNC(btlevtcmd_MovePosition);
+USER_FUNC(btlevtcmd_SetEventAttack);
+USER_FUNC(btlevtcmd_SetEventConfusion);
+USER_FUNC(btlevtcmd_SetEventDamage);
+USER_FUNC(btlevtcmd_SetEventEntry);
+USER_FUNC(btlevtcmd_SetEventWait);
+USER_FUNC(btlevtcmd_SetFallAccel);
+USER_FUNC(btlevtcmd_SetJumpSound);
+USER_FUNC(btlevtcmd_SetPartsWork);
+USER_FUNC(btlevtcmd_SetPos);
+USER_FUNC(btlevtcmd_SetRunSound);
+USER_FUNC(btlevtcmd_SetUnitWork);
+USER_FUNC(btlevtcmd_SetWalkSound);
+USER_FUNC(btlevtcmd_StartWaitEvent);
+USER_FUNC(evt_map_replayanim);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_random);
+static USER_FUNC(_get_mario_hammer_lv);
+void faker_mario_makkuro_set(void);
+static void callback(MapTevCallbackInfo* info);
+s32 mario_pinch_pose_sound_callback(BattleUnit* unit);
+extern s32 _attack_aud[];
+extern s32 _get_attack_aud_no[];
+extern s32 btldefaultevt_Confuse[];
+extern s32 btldefaultevt_Damage[];
+extern s32 btldefaultevt_Dummy[];
+extern s32 btldefaultevt_avoid_counter_event[];
+extern s32 btlevtcmd_AnimeWaitPlayComplete[];
+extern s32 btlevtcmd_ClearAllStatus[];
+extern s32 btlevtcmd_ConsumeItemReserve[];
+extern s32 btlevtcmd_DispItemIcon[];
+extern s32 btlevtcmd_GetFaceDirection[];
+extern s32 btlevtcmd_GetStageAudienceAreaSize[];
+extern s32 btlevtcmd_GetStageSize[];
+extern s32 btlevtcmd_JumpSetting[];
+extern s32 btlevtcmd_KillUnit[];
+extern s32 btlevtcmd_MarioJumpParam[];
+extern s32 btlevtcmd_MarioJumpPosition[];
+extern s32 btlevtcmd_OnOffStatus[];
+extern s32 btlevtcmd_RecoverHp[];
+extern s32 btlevtcmd_SetHp[];
+extern s32 btlevtcmd_SetMoveSpeed[];
+extern s32 btlevtcmd_WaitEventEnd[];
+extern s32 btlevtcmd_snd_se[];
+extern s32 evt_btl_camera_set_homing_unit[];
+extern s32 evt_btl_camera_set_homing_unit_audience[];
+extern s32 evt_btl_camera_set_mode[];
+extern s32 evt_btl_camera_set_moveSpeedLv[];
+extern s32 evt_btl_camera_set_prilimit[];
+extern s32 evt_btl_camera_set_zoom[];
+extern s32 evt_btl_camera_shake_h[];
+extern s32 evt_eff[];
+extern s32 evt_snd_sfxon[];
+extern s32 subset_attack_ready_jump_event[];
+
+PoseTableEntry pose_table_mario_stay[34];
+BattleDataEntry data_table_mario[10];
+static BattleUnitDefense defence;
+static BattleUnitDefenseAttr defence_attr;
+static StatusVulnerability regist;
+PoseTableEntry pose_table_object[3];
+BattleUnitKindPart unitpartsdata_Mario[3];
+BattleUnitKind unitdata_Mario;
+static s32 battle_entry_event[73];
+s32 mario_ride_btl_entry_event[120];
+static s32 init_event[75];
+s32 mario_dead_event[57];
+s32 mario_emergency_revival_event[130];
+s32 mario_appeal_event[30];
+static s32 attack_audience_event[15];
+s32 btlataudevtMarioJump[237];
+s32 btlataudevtMarioHammer[356];
+static s32 pose_sound_timing_table[10];
+static s32 damage_event[10];
+static s32 attack_event[2];
+static s32 wait_event[6];
+s32 mario_win_reaction[9];
+
+PoseTableEntry pose_table_mario_stay[] = {
+    {4, "M_S_3"},
+    {1, "M_N_5"},
+    {2, "M_Z_10"},
+    {9, "M_Z_10"},
+    {5, "M_X_1"},
+    {3, "M_X_1"},
+    {27, "M_Z_11"},
+    {28, "M_S_1"},
+    {35, "M_V_2"},
+    {37, "M_B_2"},
+    {36, "M_D_6"},
+    {31, "M_B_1"},
+    {32, "M_V_1"},
+    {38, "M_N_7"},
+    {39, "M_D_1"},
+    {43, "M_S_1"},
+    {40, "M_W_1"},
+    {42, "M_R_1"},
+    {44, "M_J_1B"},
+    {52, "M_I_1"},
+    {57, "M_S_3"},
+    {56, "M_S_3"},
+    {62, "M_V_2"},
+    {63, "M_V_2"},
+    {58, "M_A_3B"},
+    {59, "M_A_3B"},
+    {60, "M_D_2"},
+    {61, "M_V_1"},
+    {67, "M_C_3"},
+    {66, "M_N_8"},
+    {64, "M_I_O"},
+    {49, "M_J_1B"},
+    {45, "M_B_2"},
+    {69, "M_S_1"},
+};
+
+BattleDataEntry data_table_mario[] = {
+    {5, mario_appeal_event},
+    {6, attack_audience_event},
+    {48, btldefaultevt_Dummy},
+    {51, mario_emergency_revival_event},
+    {49, mario_dead_event},
+    {64, mario_win_reaction},
+    {7, subset_attack_ready_jump_event},
+    {65, mario_ride_btl_entry_event},
+    {47, btldefaultevt_avoid_counter_event},
+    {0, NULL},
+};
+
+static BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static StatusVulnerability regist = {100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100, 100};
+
+PoseTableEntry pose_table_object[] = {
+    {28, "KRN_H_1"},
+    {39, "KRN_H_1"},
+    {69, "KRN_H_1"},
+};
+
+BattleUnitKindPart unitpartsdata_Mario[] = {
+    {1, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, 0x9, 0, pose_table_mario_stay},
+    {2, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_object},
+    {3, "btl_un_mario", "b_mario", 0.0f, 0.0f, 0.0f, 16.0f, 36.0f, 5.0f, 0.0f, 40.0f, 0.0f, 20, 36, 255, &defence, &defence_attr, 0x13010000, 0, pose_table_object},
+};
+
+BattleUnitKind unitdata_Mario = {
+    222,
+    "btl_un_mario",
+    10,
+    5,
+    5,
+    1,
+    1,
+    0,
+    0,
+    0,
+    0,
+    100,
+    9,
+    22,
+    36,
+    11,
+    36,
+    0.0f,
+    0.0f,
+    0.0f,
+    0,
+    0,
+    0.0f,
+    40.0f,
+    0.0f,
+    0.0f,
+    40.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    11.0f,
+    0.0f,
+    0.0f,
+    11.0f,
+    23.4f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0,
+    0,
+    -1,
+    0,
+    100,
+    20,
+    0.0f,
+    0.0f,
+    0.0f,
+    "SFX_MARIO_DAMAGE1",
+    "SFX_MARIO_DAMAGE_FIRE1",
+    "SFX_MARIO_DAMAGE_ICE1",
+    "SFX_MARIO_DAMAGE_BIRIBIRI1",
+    0x2040000,
+    &regist,
+    3,
+    unitpartsdata_Mario,
+    init_event,
+    data_table_mario,
+};
+
+static EVT_BEGIN(battle_entry_event)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 250)
+    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_map_replayanim, 0, STRING("dontyo"))
+    WAIT_FRAMES(40)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 61, -1, 0)
+    LABEL(0)
+    CALL(_get_local_frame, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(50)
+    END_IF
+    IF_INT_EQUAL(LW(0), 10)
+        GOTO(50)
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    LABEL(50)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_S_1"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(mario_ride_btl_entry_event)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 250)
+    CALL(btlevtcmd_SetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_map_replayanim, 0, STRING("dontyo"))
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -4, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_FaceDirectionSub, -2, LW(0), 30)
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 50, -1, 0)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 44)
+    CALL(btlevtcmd_FaceDirectionAdd, -2, LW(0), 60)
+    CALL(btlevtcmd_SetFallAccel, -2, FLOAT(0.5f))
+    CALL(btlevtcmd_JumpPosition, -2, LW(0), LW(1), LW(2), 24, -1)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 42)
+    CALL(btlevtcmd_GetHomePos, -2, LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_MovePosition, -2, LW(0), LW(1), LW(2), 10, -1, 0)
+    LABEL(0)
+    CALL(_get_local_frame, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        GOTO(50)
+    END_IF
+    IF_INT_EQUAL(LW(0), 10)
+        GOTO(50)
+    END_IF
+    WAIT_FRAMES(1)
+    GOTO(0)
+    LABEL(50)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_S_1"))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(init_event)
+    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
+    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_SetJumpSound, -2, STRING("SFX_MARIO_BATTLE_JUMP1"), STRING("SFX_MARIO_JUMP_LANDING1"))
+    CALL(btlevtcmd_SetWalkSound, -2, STRING("SFX_MARIO_BATTLE_MOVE1L"), STRING("SFX_MARIO_BATTLE_MOVE1R"), 0, 20, 20)
+    CALL(btlevtcmd_SetRunSound, -2, STRING("SFX_MARIO_BATTLE_MOVE1L"), STRING("SFX_MARIO_BATTLE_MOVE1R"), 0, 10, 10)
+    CALL(btlevtcmd_AnimeSetPoseSoundTable, -2, 1, PTR(pose_sound_timing_table))
+    CALL(btlevtcmd_SetUnitWork, -2, 8, 0)
+    CALL(btlevtcmd_SetPartsWork, -2, 3, 0, 0)
+    CALL(_mario_super_emblem_anim_set, -2)
+    CALL(btlevtcmd_SetEventEntry, -2, PTR(battle_entry_event))
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 201)
+        IF_INT_LESS(GSW(0), 212)
+            CALL(_mario_makkuro_set)
+        END_IF
+    END_IF
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+USER_FUNC(_get_local_frame) {
+    s32* args = event->args;
+    s32 index = args[0];
+    BattleUnitPart* part;
+    AnimationPose* pose;
+
+    part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
+    pose = animPoseGetAnimPosePtr(part->poseId);
+    evtSetValue(event, index, pose->localFrame);
+    return EVT_RETURN_DONE;
+}
+
+s32 mario_pinch_pose_sound_callback(BattleUnit* unit) {
+    s32 ret;
+
+    if (unit->work[8] & 1) {
+        ret = BtlUnit_snd_se(unit, "SFX_VOICE_MARIO_RELIEF2", -250000000, 0);
+    } else {
+        ret = BtlUnit_snd_se(unit, "SFX_VOICE_MARIO_RELIEF1", -250000000, 0);
+    }
+    unit->work[8]++;
+    return ret;
+}
+
+static void callback(MapTevCallbackInfo* info) {
+    GXColor color = {0x4D, 0x09, 0x52, 0xFF};
+    s32 tevStage = info->tevStage;
+    s32 texCoord = info->texCoord;
+    s32 texMap = info->texMap;
+    s32 field_0x18 = info->field_0x18;
+
+    GXSetTevColor(GX_TEVREG0, color);
+    GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+    GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    info->tevStage = tevStage + 1;
+    info->texMap = texMap;
+    info->field_0x18 = field_0x18;
+    info->texCoord = texCoord;
+}
+
+void faker_mario_makkuro_set(void) {
+    mapSetTevCallback(11, callback);
+}
+
+static USER_FUNC(_mario_makkuro_set) {
+    BattleUnit* unit = BattleGetMarioPtr(_battleWorkPointer);
+
+    if (unit) {
+        mapSetTevCallback(11, callback);
+        animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, 1)->poseId, 0xB000000);
+        animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, 2)->poseId, 0xB000000);
+        animPoseSetMaterialFlagOn(BtlUnit_GetPartsPtr(unit, 3)->poseId, 0xB000000);
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_mario_super_emblem_anim_set) {
+    s32* args = event->args;
+    BattleWork* wp = _battleWorkPointer;
+    BattleUnitPart* part;
+    const char* animName;
+    s32 id, type;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    BattleGetUnitPtr(wp, id);
+    type = 0;
+    if (pouchEquipCheckBadge(0x147)) {
+        type = 1;
+    }
+    if (pouchEquipCheckBadge(0x148)) {
+        type += 2;
+    }
+    switch (type) {
+        case 1:
+            animName = "b_mario_l";
+            break;
+        case 2:
+            animName = "b_mario_w";
+            break;
+        case 3:
+            animName = "b_mario_wl";
+            break;
+        default:
+            animName = NULL;
+            break;
+    }
+    if (isFirstCall) {
+        if (!animName) {
+            return EVT_RETURN_DONE;
+        }
+        part = BattleGetUnitPartsPtr(id, 1);
+        animPoseGetAnimPosePtr(part->poseId);
+        if (part->poseId != -1) {
+            animPoseRelease(part->poseId);
+            part->poseId = -1;
+        }
+        part = BattleGetUnitPartsPtr(id, 2);
+        animPoseGetAnimPosePtr(part->poseId);
+        if (part->poseId != -1) {
+            animPoseRelease(part->poseId);
+            part->poseId = -1;
+        }
+        part = BattleGetUnitPartsPtr(id, 3);
+        animPoseGetAnimPosePtr(part->poseId);
+        if (part->poseId != -1) {
+            animPoseRelease(part->poseId);
+            part->poseId = -1;
+        }
+    }
+    if (animEffectAsync(animName, 1)) {
+        part = BattleGetUnitPartsPtr(id, 1);
+        part->poseId = animPoseEntry(animName, 1);
+        part = BattleGetUnitPartsPtr(id, 2);
+        part->poseId = animPoseEntry(animName, 1);
+        part = BattleGetUnitPartsPtr(id, 3);
+        part->poseId = animPoseEntry(animName, 1);
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(_get_mario_hammer_lv) {
+    s32 index = event->args[0];
+
+    evtSetValue(event, index, pouchGetPtr()->hammerLevel);
+    return EVT_RETURN_DONE;
+}
+
+s32 mario_dead_event[] = {
+    131163, (s32)evt_btl_camera_set_prilimit, 1, 196699, (s32)evt_btl_camera_set_mode, 1, 7, 262235,
+    (s32)evt_btl_camera_set_homing_unit, 1, -29999990, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 1, 2,
+    196699, (s32)evt_btl_camera_set_zoom, 1, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_DOWN1",
+    -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_I_S",
+    65546, 2066, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_CONDITION_DOWN1", -250000000, 0,
+    -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_D_2", 65546, 2000,
+    196699, (s32)btlevtcmd_KillUnit, -29999990, 1, 131163, (s32)evt_btl_camera_set_prilimit, 0, 2,
+    1,
+};
+
+s32 mario_emergency_revival_event[] = {
+    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_DOWN1", -250000000, 0, -250000000, 262235,
+    (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_I_S", 65546, 2066, 131163, (s32)btlevtcmd_ClearAllStatus,
+    -29999990, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_CONDITION_DOWN1", -250000000, 0, -250000000,
+    262235, (s32)btlevtcmd_AnimeChangePose, -29999990, -29999989, (s32)"M_D_2", 65546, 1000, 196699,
+    (s32)btlevtcmd_ConsumeItemReserve, -29999990, 151, 65546, 1000, 110, 327771, (s32)btlevtcmd_GetPos,
+    -29999990, -30000000, -29999999, -29999998, 131125, -29999999, 40, 393307,
+    (s32)btlevtcmd_DispItemIcon, -30000000, -29999999, -29999998, 151, 120, 112, 65545,
+    120, 393307, (s32)btlevtcmd_OnOffStatus, -29999990, 27, 0, 0, 0,
+    196699, (s32)btlevtcmd_SetHp, -29999990, 0, 262235, (s32)btlevtcmd_RecoverHp, -29999990, -29999989,
+    10, 327771, (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 131125,
+    -29999999, 30, 983131, (s32)evt_eff, 0, (s32)"recovery", 0, -30000000,
+    -29999999, -29999998, 10, 0, 0, 0, 0, 0,
+    0, 0, 65546, 2000, 262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989,
+    44, 327771, (s32)btlevtcmd_JumpSetting, -29999990, 0, -230000000, -229999284, 327771,
+    (s32)btlevtcmd_GetPos, -29999990, -30000000, -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2,
+    -30000000, -29999999, -29999998, 20, -1, 131163, (s32)btlevtcmd_StartWaitEvent, -2,
+    2, 1,
+};
+
+EVT_BEGIN(mario_appeal_event)
+    CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 66)
+    CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_APPEAL1"), LW(0), LW(1), LW(2), 0)
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_AudienceAppeal, -2)
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_audience_event)
+    CALL(evt_sub_random, 1, LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL_CHILD(PTR(btlataudevtMarioJump))
+        ELSE
+        CALL_CHILD(PTR(btlataudevtMarioHammer))
+    END_IF
+    RETURN
+EVT_END()
+
+s32 btlataudevtMarioJump[] = {
+    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_J_1B", 327771, (s32)_get_attack_aud_no, -29999997,
+    -30000000, -29999999, -29999998, 110, 65545, 15, 196699, (s32)evt_btl_camera_set_mode,
+    0, 13, 327771, (s32)evt_btl_camera_set_homing_unit_audience, 0, -2, 1, -29999997,
+    196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200,
+    112, 131122, -29999995, -29999999, 131125, -29999999, 28, 262235,
+    (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 5, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856,
+    196699, (s32)btlevtcmd_SetFallAccel, -2, -229999386, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_VOICE_MARIO_BATTLE_JUMP1",
+    -250000000, 0, -250000000, 131122, -29999994, 36, 393307, (s32)btlevtcmd_MarioJumpParam,
+    -2, -30000000, -29999999, -29999998, -29999994, 524379, (s32)btlevtcmd_MarioJumpPosition, -2,
+    -30000000, -29999999, -29999998, -29999994, 0, -1, 262235, (s32)btlevtcmd_AnimeChangePose,
+    -2, 1, (s32)"M_J_1D", 65545, 3, 196699, (s32)_attack_aud, -29999997,
+    0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_J_1B", 196699, (s32)btlevtcmd_SetFallAccel,
+    -2, -229999386, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 262235, (s32)btlevtcmd_FaceDirectionSub,
+    -2, -30000000, 40, 131122, -29999999, -29999995, 131125, -29999998,
+    5, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, 20,
+    -1, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20, 458843, (s32)btlevtcmd_JumpPosition,
+    -2, -30000000, -29999999, -29999998, 10, -1, 262235, (s32)btlevtcmd_FaceDirectionSub,
+    -2, -30000000, 10, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,
+    -29999998, 6, -1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 42,
+    65647, -29999985, 65546, 500, 196699, (s32)evt_btl_camera_set_mode, 0, 0,
+    65546, 1000, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229991808, 131122,
+    -30000000, 0, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize, -29999996, -250000000, -250000000, 262235,
+    (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000,
+    -29999999, -29999998, 0, -1, 0, 327771, (s32)btlevtcmd_GetHomePos, -2,
+    -30000000, -29999999, -29999998, 131122, -30000000, 0, 262235, (s32)btlevtcmd_GetStageSize,
+    -29999996, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996,
+    327771, (s32)btlevtcmd_SetPos, -2, -30000000, -29999999, -29999998, 131163, (s32)btlevtcmd_WaitEventEnd,
+    -29999985, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379,
+    (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1, 0,
+    131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+
+s32 btlataudevtMarioHammer[] = {
+    327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageSize,
+    -29999997, -250000000, -250000000, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999996, 131122,
+    -29999992, -29999997, 131127, -29999992, -29999996, 131127, -29999992, -1,
+    196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
+    42, 524379, (s32)btlevtcmd_MovePosition, -2, -29999992, -29999999, -29999998, 0,
+    -1, 0, 65545, 20, 327771, (s32)_get_attack_aud_no, -29999997, -30000000,
+    -29999999, -29999998, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize, -29999996, -250000000, -250000000, 196699,
+    (s32)btlevtcmd_GetFaceDirection, -2, -29999995, 131122, -29999994, -29999996, 131127, -29999994,
+    -29999995, 131127, -29999994, -1, 327771, (s32)btlevtcmd_SetPos, -2, -29999994,
+    -29999999, -29999998, 196699, (s32)evt_btl_camera_set_mode, 0, 13, 327771, (s32)evt_btl_camera_set_homing_unit_audience,
+    0, -2, 1, -29999997, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 2,
+    196699, (s32)evt_btl_camera_set_zoom, 0, 100, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000,
+    20, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0,
+    -1, 0, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 131163, (s32)_get_mario_hammer_lv,
+    -30000000, 65570, -30000000, 65572, 2, 131122, -30000000, (s32)"M_H_5A",
+    131122, -29999999, (s32)"M_H_5B", 131122, -29999998, (s32)"M_H_14", 65572, 3,
+    131122, -30000000, (s32)"M_H_9A", 131122, -29999999, (s32)"M_H_9B", 131122, -29999998,
+    (s32)"M_H_15", 42, 131122, -30000000, (s32)"M_H_1A", 131122, -29999999, (s32)"M_H_1B",
+    131122, -29999998, (s32)"M_H_13", 49, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
+    -30000000, 131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572, 2,
+    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD2", -250000000, 0, -250000000, 65572,
+    1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD1", -250000000, 0, -250000000,
+    42, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_HAMMER_HOLD3", -250000000, 0, -250000000,
+    49, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999999,
+    65545, 1, 131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572,
+    2, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING2", 0, 65572, 1, 196699,
+    (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING1", 0, 42, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_SWING3", 0,
+    49, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999998, 65545, 7,
+    131163, (s32)_get_mario_hammer_lv, -30000000, 65570, -30000000, 65572, 2, 196699,
+    (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND3", 0, 65572, 1, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND2",
+    0, 42, 196699, (s32)evt_snd_sfxon, (s32)"SFX_MARIO_HAMMER_HIT_GROUND1", 0, 49, 196699,
+    (s32)_attack_aud, -29999997, 0, 196699, (s32)evt_btl_camera_set_mode, 0, 3, 393307,
+    (s32)evt_btl_camera_shake_h, 0, 2, 0, 10, 13, 65647, -29999985,
+    65546, 1500, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 65546, 1000,
+    112, 65546, 500, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_H_16",
+    196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
+    42, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 196699,
+    (s32)btlevtcmd_SetMoveSpeed, -2, -229991808, 131122, -30000000, 0, 262235, (s32)btlevtcmd_GetStageAudienceAreaSize,
+    -29999996, -250000000, -250000000, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, -29999996,
+    524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
+    0, 131163, (s32)btlevtcmd_WaitEventEnd, -29999985, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000,
+    -29999999, -29999998, 327771, (s32)btlevtcmd_SetPos, -2, -29999992, -29999999, -29999998,
+    327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 524379, (s32)btlevtcmd_MovePosition,
+    -2, -30000000, -29999999, -29999998, 0, -1, 0, 131163,
+    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
+
+static s32 pose_sound_timing_table[] = {
+    (s32)"M_S_3", 1048576000, (s32)mario_pinch_pose_sound_callback, 0, 1, 0, 0, 0,
+    0, 1,
+};
+
+static EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(attack_event)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(mario_win_reaction)
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("M_V_2"))
+    WAIT_MS(1000)
+    RETURN
+EVT_END()
+

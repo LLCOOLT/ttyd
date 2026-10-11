@@ -47,6 +47,7 @@ USER_FUNC(evt_npc_set_rotate);
 USER_FUNC(evt_npc_add_rotate);
 USER_FUNC(evt_npc_set_rotate_offset);
 USER_FUNC(evt_npc_move_position);
+f32 _intplGetFloat(s32 mode, f32 t);
 
 
 

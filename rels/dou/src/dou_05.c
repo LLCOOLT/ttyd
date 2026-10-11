@@ -1,0 +1,353 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "memory.h"
+#include "driver/mapdrv.h"
+#include "dolphin/gx.h"
+
+static u8* _ap;
+
+static USER_FUNC(alpha_init_func);
+static USER_FUNC(alpha_set_func);
+USER_FUNC(cam_displacement);
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_shake);
+USER_FUNC(evt_hit_damage_return_set);
+USER_FUNC(evt_hitobj_attr_onoff);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_item_flag_on);
+USER_FUNC(evt_item_get_item);
+USER_FUNC(evt_map_entry_airport_harbor);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_map_set_tevcallback);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_set_mov_spd);
+USER_FUNC(evt_mario_wait_landon);
+USER_FUNC(evt_mobj_brick);
+USER_FUNC(evt_mobj_exec_cancel);
+USER_FUNC(evt_mobj_itembox);
+USER_FUNC(evt_mobj_lock);
+USER_FUNC(evt_mobj_powerupblk);
+USER_FUNC(evt_mobj_save_blk);
+USER_FUNC(evt_mobj_switch_blue);
+USER_FUNC(evt_mobj_wait_animation_end);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_toge);
+USER_FUNC(evt_pouch_check_item);
+USER_FUNC(evt_run_case_evt);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_set_rev_mode);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_sub_intpl_msec_get_value_para);
+USER_FUNC(evt_sub_intpl_msec_init);
+USER_FUNC(evt_win_item_select);
+static void alpha_tev(MapTevCallbackInfo* info);
+extern s32 bero_case_switch_off[];
+extern s32 bero_case_switch_on[];
+extern s32 evt_bero_info_run[];
+extern s32 evt_gazigazi_entry[];
+
+__declspec(section ".data") u64 fd_dou_05_negone_one_374;
+__declspec(section ".data") s32 fd_dou_05_neg_one_382[1];
+__declspec(section ".data") s32 fd_dou_05___local_PI_383[1];
+__declspec(section ".data") s32 fd_dou_05___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_dou_05_one_negone_373;
+__declspec(section ".data") s32 fd_dou_05___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_dou_05_one_381[1];
+__declspec(section ".data") u64 fd_dou_05_negone_one_360;
+__declspec(section ".data") s32 fd_dou_05_neg_one_365[1];
+__declspec(section ".data") s32 fd_dou_05___local_PI_366[1];
+__declspec(section ".data") s32 fd_dou_05___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_dou_05_one_negone_359;
+__declspec(section ".data") s32 fd_dou_05___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_dou_05_one_364[1];
+static s32 bero_entry_data[75];
+static __declspec(section ".data") s32 key_tbl[2];
+static s32 evt_chk[23];
+static __declspec(section ".data") s32 evt_unlock[7];
+s32 bigdoor_event_init[36];
+s32 bigdoor_event[152];
+static s32 hitDmgRetPoints[24];
+static s32 mobj_box00[28];
+s32 waterfall_main[30];
+s32 waterfall_init[25];
+__declspec(section ".data") s32 ride_waterfall[5];
+s32 nonride_waterfall[19];
+s32 dou_05_init_evt[136];
+
+void* camRoadGetWorkPtr(void);
+
+USER_FUNC(cam_displacement) {
+    u8* work = camRoadGetWorkPtr();
+
+    *(f32*)(work + 0x1C4) = 1.7f;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(alpha_set_func) {
+    *_ap = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(alpha_init_func) {
+    _ap = _mapAlloc(1);
+    *_ap = 255;
+    return EVT_RETURN_DONE;
+}
+
+static void alpha_tev(MapTevCallbackInfo* info) {
+    s32 stage = info->tevStage;
+    u8* alpha = _ap;
+
+    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    info->tevStage++;
+}
+
+__declspec(section ".data") u64 fd_dou_05_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_dou_05_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_dou_05___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_dou_05___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_dou_05_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_dou_05___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_dou_05_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_dou_05_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_dou_05_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_dou_05___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_dou_05___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_dou_05_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_dou_05___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_dou_05_one_364[] = {
+    1065353216,
+};
+
+static s32 bero_entry_data[] = {
+    (s32)"w_bero_1", 0, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"dou_03", (s32)"e_bero_1", 65537, 0, 0, (s32)"w_bero_2",
+    0, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"dou_03", (s32)"e_bero_2", 65537, 0, 0, (s32)"w_bero_3", 0,
+    20000, 100000, 0, 0, -1, 0, -1, 0,
+    (s32)"dou_03", (s32)"e_bero_3", 65537, 0, 0, (s32)"e_bero", 65542, 20000,
+    100000, 0, 0, -1, 0, -1, 0, (s32)"dou_06",
+    (s32)"w_bero", 65537, (s32)"door_01", (s32)"door_02", 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0,
+};
+
+static __declspec(section ".data") s32 key_tbl[] = {
+    20, -1,
+};
+
+static EVT_BEGIN(evt_chk)
+    CALL(evt_pouch_check_item, 20, LW(0))
+    IF_INT_GREATER(LW(0), 0)
+        CALL(evt_win_item_select, 0, PTR(key_tbl), LW(0), 0)
+        IF_INT_EQUAL(LW(0), -1)
+            CALL(evt_mobj_exec_cancel, STRING("mobj_jump01"))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(evt_unlock)
+    SET_VALUE(LW(0), STRING("mod_02"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bigdoor_event_init)
+    IF_INT_LESS(GSW(0), 245)
+        DEBUG_PUT_MSG(STRING("mod_03"))
+        SET_VALUE(LW(0), STRING("mod_04"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_mapobj_trans, 0, STRING("mod_06"), 1, 0, 0)
+        ELSE
+        DEBUG_PUT_MSG(STRING("mod_08"))
+        CALL(evt_hitobj_attr_onoff, 1, 1, STRING("mod_04"), 4)
+        CALL(evt_mapobj_trans, 0, STRING("mod_06"), 1, 100, 0)
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bigdoor_event)
+    CALL(evt_mario_key_onoff, 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_wait_landon)
+        CALL(evt_mario_set_mov_spd, FLOAT(0.0f))
+    END_INLINE_EVENT
+    CALL(evt_cam3d_evt_set, 150, 432, 40, 0, 337, -480, 500, 11)
+    WAIT_MS(1000)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
+        WAIT_MS(200)
+        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
+        WAIT_MS(200)
+        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
+        WAIT_MS(200)
+        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 200)
+        WAIT_MS(200)
+        CALL(evt_cam_shake, 4, FLOAT(0.0009765625f), FLOAT(0.0f), 400)
+    END_INLINE_EVENT
+    CALL(evt_snd_sfxon, STRING("Ship_Change"), LW(10))
+    CALL(evt_sub_intpl_msec_init, 0, 0, 100, 2000)
+    SET_FLOAT_VALUE(LW(3), FLOAT(0.0f))
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(evt_mapobj_trans, 0, STRING("mod_06"), 1, LW(0), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_snd_sfxoff, LW(10))
+    CALL(evt_snd_sfxon, STRING("SFX_STG5_SHIP_ON1"), 0)
+    BEGIN_INLINE_EVENT
+        CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.0f), 250)
+    END_INLINE_EVENT
+    WAIT_MS(1500)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_snd_sfxon, STRING("BGM_STG5_DOU1"), 0)
+    CALL(evt_msg_print, 0, STRING("ENV_STG5_DOU3"), 0, 0)
+    SET_VALUE(LW(0), STRING("mod_04"))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    CALL(evt_hitobj_attr_onoff, 1, 1, STRING("mod_04"), 4)
+    SET_VALUE(GSW(0), 245)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static s32 hitDmgRetPoints[] = {
+    (s32)"mod_01", 0, -998637568, 0, (s32)"mod_02", 0, -998637568, 0,
+    (s32)"mod_03", 0, -998637568, 0, (s32)"mod_04", 0, -998637568, 0,
+    (s32)"Ship_Change", 0, -998637568, 0, 0, 0, 0, 0,
+};
+
+static EVT_BEGIN(mobj_box00)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_item_entry, STRING("moku"), 277, 0, -1000, 0, 16, -1, 0)
+    CALL(evt_item_flag_on, STRING("moku"), 258)
+    CALL(evt_mobj_wait_animation_end, STRING("s02_fune_01"))
+    CALL(evt_item_get_item, STRING("moku"))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(waterfall_main)
+    SET_VALUE(LW(0), 255)
+    LOOP(0)
+        ADD(LW(0), GW(0))
+        IF_INT_GREATER_OR_EQUAL(LW(0), 255)
+            SET_VALUE(LW(0), 255)
+        END_IF
+        IF_INT_LESS_OR_EQUAL(LW(0), 0)
+            SET_VALUE(LW(0), 0)
+        END_IF
+        CALL(alpha_set_func, LW(0))
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(waterfall_init)
+    CALL(alpha_init_func)
+    CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("a02_fune_01"), 16777216)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("a02_fune_01"), 256)
+    SET_VALUE(GW(0), 0)
+    SPAWN_EVENT(PTR(waterfall_main))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(ride_waterfall)
+    SET_VALUE(GW(0), -4)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(nonride_waterfall)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    IF_INT_LESS_OR_EQUAL(LW(2), -700)
+        SET_VALUE(GW(0), -4)
+        ELSE
+        SET_VALUE(GW(0), 4)
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(dou_05_init_evt)
+    CALL(evt_snd_bgmon, 512, STRING("a02_fune_ata1"))
+    CALL(evt_snd_envon, 272, STRING("s02_fune02"))
+    CALL(evt_snd_set_rev_mode, 2)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    WAIT_FRAMES(1)
+    CALL(evt_map_playanim, STRING("a02_fune_02"), 1, 0)
+    CALL(evt_map_playanim, STRING("a02_fune_ata2"), 1, 0)
+    CALL(evt_mobj_save_blk, STRING("handle"), 175, 120, -135, 0, 0)
+    CALL(evt_mobj_lock, STRING("item_00"), 20, 190, 10, 0, 270, PTR(evt_chk), PTR(evt_unlock), GSWF(2979))
+    IF_INT_EQUAL(GSWF(2979), 1)
+        SET_VALUE(LW(0), STRING("mod_02"))
+        CALL_CHILD(PTR(bero_case_switch_on))
+        ELSE
+        SET_VALUE(LW(0), STRING("mod_02"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+    END_IF
+    CALL(evt_mobj_switch_blue, 0, STRING("nami"), -60, 330, -565, PTR(bigdoor_event), GSWF(2978))
+    SPAWN_EVENT(PTR(bigdoor_event_init))
+    CALL(evt_mobj_itembox, STRING("s02_fune_01"), 500, 275, -800, 0, 0, PTR(mobj_box00), GSWF(2986))
+    CALL(evt_mobj_powerupblk, STRING("mod_03"), -65, 280, -175, 0, GSWF(5556), 0)
+    CALL(evt_mobj_brick, STRING("mod_06"), -35, 255, -175, 121, 11, 0, GSWF(2993))
+    CALL(evt_hit_damage_return_set, PTR(hitDmgRetPoints))
+    CALL_CHILD(PTR(evt_gazigazi_entry))
+    CALL(evt_map_entry_airport_harbor, 1, STRING("mod_08"), STRING("pblk1"))
+    CALL_CHILD(PTR(waterfall_init))
+    CALL(evt_run_case_evt, 0, 1, STRING("S_Ship_Change"), 0, PTR(ride_waterfall), 0)
+    CALL(evt_run_case_evt, 1, 1, STRING("S_Ship_Change"), 0, PTR(nonride_waterfall), 0)
+    CALL(cam_displacement)
+    RETURN
+EVT_END()
+

@@ -142,9 +142,23 @@ impl<'a> EventScript<'a> {
                 .data_range(symbol.address(), symbol.size())?
                 .context("symbol range out of section bounds")?;
             let (cow, _, had_errors) = encoding_rs::SHIFT_JIS.decode(bytes);
-            match had_errors {
+            let text = cow.trim_end_matches('\0');
+            match had_errors || text.contains('\0') {
                 true => Ok(Arg::Symbol { name: name.to_string() }),
-                false => Ok(Arg::Symbol { name: format!("STRING(\"{cow}\")") }),
+                false => {
+                    // Escape so the result is a valid C string literal.
+                    let mut esc = String::new();
+                    for c in text.chars() {
+                        match c {
+                            '"' => esc.push_str("\\\""),
+                            '\\' => esc.push_str("\\\\"),
+                            '\n' => esc.push_str("\\n"),
+                            c if (c as u32) < 0x20 || c as u32 == 0x7F => esc.push_str(&format!("\\{:03o}", c as u32)),
+                            c => esc.push(c),
+                        }
+                    }
+                    Ok(Arg::Symbol { name: format!("STRING(\"{esc}\")") })
+                }
             }
         } else {
             match category {

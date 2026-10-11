@@ -455,9 +455,9 @@ u32 pouchCheckItem(u32 itemId);
 
 BOOL pouchRemoveItem(ItemType type);
 
-s16 pouchGetCoin(void);
+s32 pouchGetCoin(void);
 s16 pouchAddCoin(s16 coins);
-s16 pouchSetCoin(s16 coins);
+s32 pouchSetCoin(s32 coins);
 s16 pouchGetSuperCoin(void);
 s16 pouchSetSuperCoin(s16 count);
 s16 pouchGetStarPiece(void);

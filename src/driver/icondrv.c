@@ -342,8 +342,8 @@ void iconDispGxAlpha(Vec position, s16 flags, s16 iconId, u8 alpha, f32 scale) {
     }
 }
 
-void iconDispGx(Vec position, s16 flags, s16 iconId, f32 scale) {
-    iconDispGxAlpha(position, flags, iconId, 0xFF, scale);
+void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
+    iconDispGxAlpha(*position, flags, iconId, 0xFF, scale);
 }
 
 void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {

@@ -453,7 +453,7 @@ s32 animPaperPoseGetId(const char* animName, s32 group) {
 void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) {
 }
 
-void animPoseSetPaperAnim(s32 poseId, const char* animName) {
+void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
 }
 
 void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {

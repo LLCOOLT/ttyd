@@ -1,13 +1,6 @@
 #include "data/npc_data.h"
 #include "driver/npcdrv.h"
 
-NpcTerritoryInfo npc_define_territory_type[] = {
-	{"NPC_TERRITORY_TYPE_NOTHING", NPC_TERRITORY_TYPE_NOTHING},
-	{"NPC_TERRITORY_TYPE_CIRCLE", NPC_TERRITORY_TYPE_CIRCLE},
-	{"NPC_TERRITORY_TYPE_SQUARE", NPC_TERRITORY_TYPE_SQUARE},
-	{0}
-};
-
 NpcTribeInfo npcTribe[] = {
 	{/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", "c_pkr", "PKR_S_1", "PKR_Z_1", "PKR_S_1", "PKR_T_1", "PKR_W_1", "PKR_R_1", "PKR_D_1", "PKR_D_1", 20.0f, 27.0f, 0.0f, 0.0f, 0.0f, 20.0f, "SFX_FLD_NPC_PARTY_MOVE1L", "SFX_FLD_NPC_PARTY_MOVE1R", 12000, "SFX_FLD_NPC_PARTY_JUMP1", "SFX_FLD_NPC_PARTY_LANDING1"},
 	{/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", "c_nokonoko", "NOK_S_1", "NOK_Z_1", "NOK_S_1", "NOK_T_1", "NOK_W_1", "NOK_R_1", "NOK_S_1", "NOK_S_1", 30.0f, 35.0f, 0.0f, 0.0f, 0.0f, 50.0f, "SFX_FLD_NPC_NOKO_MOVE1L", "SFX_FLD_NPC_NOKO_MOVE1R", 12000, "SFX_FLD_NPC_JUMP1", "SFX_FLD_NPC_LANDING1"},
@@ -337,4 +330,276 @@ NpcTribeInfo npcTribe[] = {
 	{/*"ゾンババ"*/"\x83\x5D\x83\x93\x83\x6F\x83\x6F", "c_gonbaba_z", "GNB_S_1", "GNB_Z_1", "GNB_S_1", "GNB_T_1", "GNB_S_1", "GNB_S_1", "GNB_S_1", "GNB_S_1", 450.0f, 20.0f, 0.0f, 0.0f, -50.0f, 50.0f, NULL, NULL, 0, NULL, NULL},
 	{/*"パラシュートボム"*/"\x83\x70\x83\x89\x83\x56\x83\x85\x81\x5B\x83\x67\x83\x7B\x83\x80", "c_bom_sen", "S_2", "S_2", "S_2", "S_2", "S_2", "S_2", "S_2", "S_2", 450.0f, 20.0f, 0.0f, 0.0f, -50.0f, 50.0f, NULL, NULL, 0, NULL, NULL},
 	{NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, NULL, NULL, 0, NULL, NULL}
+};
+
+extern s32 npc_init_evt[];
+extern s32 testenemynpc_init_event[];
+extern s32 unk_evt_8033d458[];
+extern s32 enemy_common_dead_event[];
+extern s32 enemy_common_blow_event[];
+extern s32 kuriboo_init_event[];
+extern s32 kuriboo_move_event[];
+extern s32 kuriboo_find_event[];
+extern s32 kuriboo_lost_event[];
+extern s32 kuriboo_return_event[];
+extern s32 patakuri_init_event[];
+extern s32 patakuri_move_event[];
+extern s32 patakuri_find_event[];
+extern s32 patakuri_lost_event[];
+extern s32 patakuri_return_event[];
+extern s32 nokonoko_init_event[];
+extern s32 nokonoko_move_event[];
+extern s32 nokonoko_find_event[];
+extern s32 nokonoko_lost_event[];
+extern s32 nokonoko_return_event[];
+extern s32 patapata_init_event[];
+extern s32 patapata_move_event[];
+extern s32 patapata_find_event[];
+extern s32 patapata_lost_event[];
+extern s32 patapata_return_event[];
+extern s32 met_init_event[];
+extern s32 met_move_event[];
+extern s32 met_find_event[];
+extern s32 met_lost_event[];
+extern s32 met_return_event[];
+extern s32 met_init_event_ceil[];
+extern s32 togemet_init_event[];
+extern s32 togemet_init_event_ceil[];
+extern s32 patamet_init_event[];
+extern s32 patamet_move_event[];
+extern s32 patamet_find_event[];
+extern s32 patamet_lost_event[];
+extern s32 patamet_return_event[];
+extern s32 honenoko2_init_event[];
+extern s32 honenoko2_move_event[];
+extern s32 honenoko2_find_event[];
+extern s32 honenoko2_lost_event[];
+extern s32 honenoko2_return_event[];
+extern s32 karon_init_event[];
+extern s32 karon_move_event[];
+extern s32 karon_dead_event[];
+extern s32 karon_find_event[];
+extern s32 karon_lost_event[];
+extern s32 karon_return_event[];
+extern s32 karon_blow_event[];
+extern s32 chorobon_init_event[];
+extern s32 chorobon_move_event[];
+extern s32 chorobon_find_event[];
+extern s32 chorobon_lost_event[];
+extern s32 chorobon_return_event[];
+extern s32 killer_cannon_init_event[];
+extern s32 killer_cannon_move_event[];
+extern s32 killer_init_event[];
+extern s32 killer_dead_event[];
+extern s32 sambo_init_event[];
+extern s32 sambo_move_event[];
+extern s32 sambo_find_event[];
+extern s32 sambo_lost_event[];
+extern s32 sambo_return_event[];
+extern s32 sinnosuke_init_event[];
+extern s32 sinnosuke_move_event[];
+extern s32 sinnosuke_find_event[];
+extern s32 sinnosuke_lost_event[];
+extern s32 sinnosuke_return_event[];
+extern s32 sinemon_init_event[];
+extern s32 sinemon_move_event[];
+extern s32 sinemon_find_event[];
+extern s32 sinemon_lost_event[];
+extern s32 sinemon_return_event[];
+extern s32 togedaruma_init_event[];
+extern s32 togedaruma_move_event[];
+extern s32 togedaruma_find_event[];
+extern s32 togedaruma_lost_event[];
+extern s32 togedaruma_return_event[];
+extern s32 barriern_init_event[];
+extern s32 barriern_move_event[];
+extern s32 barriern_dead_event[];
+extern s32 barriern_find_event[];
+extern s32 barriern_lost_event[];
+extern s32 barriern_return_event[];
+extern s32 barriern_blow_event[];
+extern s32 barriern2_move_event[];
+extern s32 piders_init_event[];
+extern s32 piders_move_event[];
+extern s32 piders_find_event[];
+extern s32 piders_blow_event[];
+extern s32 pakkun_init_event[];
+extern s32 pakkun_move_event[];
+extern s32 pakkun_find_event[];
+extern s32 pakkun_return_event[];
+extern s32 dokugassun_init_event[];
+extern s32 dokugassun_move_event[];
+extern s32 dokugassun_find_event[];
+extern s32 dokugassun_lost_event[];
+extern s32 dokugassun_return_event[];
+extern s32 basabasa_init_event[];
+extern s32 basabasa_move_event[];
+extern s32 basabasa_dead_event[];
+extern s32 basabasa_find_event[];
+extern s32 basabasa_lost_event[];
+extern s32 basabasa_return_event[];
+extern s32 basabasa2_init_event[];
+extern s32 basabasa2_move_event[];
+extern s32 basabasa2_dead_event[];
+extern s32 basabasa2_find_event[];
+extern s32 basabasa2_lost_event[];
+extern s32 basabasa2_return_event[];
+extern s32 teresa_init_event[];
+extern s32 teresa_move_event[];
+extern s32 teresa_dead_event[];
+extern s32 teresa_find_event[];
+extern s32 teresa_lost_event[];
+extern s32 teresa_return_event[];
+extern s32 pansy_init_event[];
+extern s32 pansy_move_event[];
+extern s32 pansy_find_event[];
+extern s32 pansy_lost_event[];
+extern s32 pansy_return_event[];
+extern s32 twinkling_pansy_init_event[];
+extern s32 twinkling_pansy_move_event[];
+extern s32 twinkling_pansy_find_event[];
+extern s32 twinkling_pansy_lost_event[];
+extern s32 twinkling_pansy_return_event[];
+extern s32 bubble_init_event[];
+extern s32 bubble_move_event[];
+extern s32 bubble_find_event[];
+extern s32 bubble_lost_event[];
+extern s32 bubble_return_event[];
+extern s32 hbom_init_event[];
+extern s32 hbom_move_event[];
+extern s32 hbom_find_event[];
+extern s32 hbom_lost_event[];
+extern s32 hbom_return_event[];
+extern s32 mahoon_init_event[];
+extern s32 mahoon_move_event[];
+extern s32 mahoon_dead_event[];
+extern s32 mahoon_find_event[];
+extern s32 mahoon_lost_event[];
+extern s32 mahoon_return_event[];
+extern s32 zakowiz_init_event[];
+extern s32 zakowiz_move_event[];
+extern s32 zakowiz_dead_event[];
+extern s32 zakowiz_find_event[];
+extern s32 zakowiz_lost_event[];
+extern s32 zakowiz_return_event[];
+extern s32 zakowiz_blow_event[];
+extern s32 hannya_init_event[];
+extern s32 hannya_move_event[];
+extern s32 hannya_find_event[];
+extern s32 hannya_lost_event[];
+extern s32 hannya_return_event[];
+extern s32 kamec_init_event[];
+extern s32 kamec_move_event[];
+extern s32 kamec_dead_event[];
+extern s32 kamec_find_event[];
+extern s32 kamec_lost_event[];
+extern s32 kamec_return_event[];
+extern s32 kamec_blow_event[];
+extern s32 kamec2_init_event[];
+extern s32 kamec2_move_event[];
+extern s32 kamec2_dead_event[];
+extern s32 kamec2_find_event[];
+extern s32 kamec2_lost_event[];
+extern s32 kamec2_return_event[];
+extern s32 kamec2_blow_event[];
+extern s32 hbross_init_event[];
+extern s32 hbross_move_event[];
+extern s32 hbross_dead_event[];
+extern s32 hbross_find_event[];
+extern s32 hbross_lost_event[];
+extern s32 hbross_return_event[];
+extern s32 hbross_blow_event[];
+extern s32 wanwan_init_event[];
+extern s32 wanwan_move_event[];
+extern s32 wanwan_find_event[];
+extern s32 togenoko_init_event[];
+extern s32 togenoko_move_event[];
+extern s32 togenoko_find_event[];
+extern s32 togenoko_lost_event[];
+extern s32 togenoko_return_event[];
+extern s32 enemy_2d_common_dead_event[];
+extern s32 kuriboo2D_init_event[];
+extern s32 kuriboo2D_move_event[];
+extern s32 kuriboo2D_find_event[];
+extern s32 zako2D_init_event[];
+extern s32 zako2D_move_event[];
+extern s32 zako2D_find_event[];
+extern s32 dokan2D_init_event[];
+extern s32 dokan2D_regl_event[];
+extern s32 fall2D_init_event[];
+extern s32 fall2D_regl_event[];
+extern s32 gesso2D_init_event[];
+extern s32 gesso2D_move_event[];
+extern s32 zakoM2D_init_event[];
+extern s32 zakoM2D_move_event[];
+extern s32 zakoM2D_dead_event[];
+extern s32 unk_evt_803497e8[];
+extern s32 npc_urouro_init_event[];
+extern s32 npc_urouro_move_event[];
+
+NpcAiInfo npc_ai_type_table[] = {
+	{/*"なし"*/"\x82\xC8\x82\xB5", 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	{/*"不動キャラ汎用"*/"\x95\x73\x93\xAE\x83\x4C\x83\x83\x83\x89\x94\xC4\x97\x70", 0, npc_init_evt, NULL, NULL, NULL, NULL, NULL, NULL},
+	{/*"イベント用不動壁当たりなし"*/"\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70\x95\x73\x93\xAE\x95\xC7\x93\x96\x82\xBD\x82\xE8\x82\xC8\x82\xB5", 0x40000600, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+	{/*"不動テスト敵キャラ汎用"*/"\x95\x73\x93\xAE\x83\x65\x83\x58\x83\x67\x93\x47\x83\x4C\x83\x83\x83\x89\x94\xC4\x97\x70", 0, testenemynpc_init_event, unk_evt_8033d458, enemy_common_dead_event, NULL, NULL, NULL, enemy_common_blow_event},
+	{/*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B", 0, kuriboo_init_event, kuriboo_move_event, enemy_common_dead_event, kuriboo_find_event, kuriboo_lost_event, kuriboo_return_event, enemy_common_blow_event},
+	{/*"トゲクリ"*/"\x83\x67\x83\x51\x83\x4E\x83\x8A", 0, kuriboo_init_event, kuriboo_move_event, enemy_common_dead_event, kuriboo_find_event, kuriboo_lost_event, kuriboo_return_event, enemy_common_blow_event},
+	{/*"パタクリ"*/"\x83\x70\x83\x5E\x83\x4E\x83\x8A", 0, patakuri_init_event, patakuri_move_event, enemy_common_dead_event, patakuri_find_event, patakuri_lost_event, patakuri_return_event, enemy_common_blow_event},
+	{/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", 0, nokonoko_init_event, nokonoko_move_event, enemy_common_dead_event, nokonoko_find_event, nokonoko_lost_event, nokonoko_return_event, enemy_common_blow_event},
+	{/*"パタパタ"*/"\x83\x70\x83\x5E\x83\x70\x83\x5E", 0, patapata_init_event, patapata_move_event, enemy_common_dead_event, patapata_find_event, patapata_lost_event, patapata_return_event, enemy_common_blow_event},
+	{/*"メット"*/"\x83\x81\x83\x62\x83\x67", 0, met_init_event, met_move_event, enemy_common_dead_event, met_find_event, met_lost_event, met_return_event, enemy_common_blow_event},
+	{/*"天井メット"*/"\x93\x56\x88\xE4\x83\x81\x83\x62\x83\x67", 0, met_init_event_ceil, met_move_event, enemy_common_dead_event, met_find_event, met_lost_event, met_return_event, enemy_common_blow_event},
+	{/*"トゲメット"*/"\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", 0, togemet_init_event, met_move_event, enemy_common_dead_event, met_find_event, met_lost_event, met_return_event, enemy_common_blow_event},
+	{/*"天井トゲメット"*/"\x93\x56\x88\xE4\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67", 0, togemet_init_event_ceil, met_move_event, enemy_common_dead_event, met_find_event, met_lost_event, met_return_event, enemy_common_blow_event},
+	{/*"パタメット"*/"\x83\x70\x83\x5E\x83\x81\x83\x62\x83\x67", 0, patamet_init_event, patamet_move_event, enemy_common_dead_event, patamet_find_event, patamet_lost_event, patamet_return_event, enemy_common_blow_event},
+	{/*"ホネノコ(歩行)"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52\x28\x95\xE0\x8D\x73\x29", 0, honenoko2_init_event, honenoko2_move_event, enemy_common_dead_event, honenoko2_find_event, honenoko2_lost_event, honenoko2_return_event, enemy_common_blow_event},
+	{/*"カロン(骨投げ)"*/"\x83\x4A\x83\x8D\x83\x93\x28\x8D\x9C\x93\x8A\x82\xB0\x29", 0, karon_init_event, karon_move_event, karon_dead_event, karon_find_event, karon_lost_event, karon_return_event, karon_blow_event},
+	{/*"チョロボン"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", 0, chorobon_init_event, chorobon_move_event, enemy_common_dead_event, chorobon_find_event, chorobon_lost_event, chorobon_return_event, enemy_common_blow_event},
+	{/*"ゴールドチョロボン"*/"\x83\x53\x81\x5B\x83\x8B\x83\x68\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", 0, NULL, NULL, enemy_common_dead_event, NULL, NULL, NULL, NULL},
+	{/*"キラー大砲"*/"\x83\x4C\x83\x89\x81\x5B\x91\xE5\x96\x43", 0, killer_cannon_init_event, killer_cannon_move_event, enemy_common_dead_event, NULL, NULL, NULL, enemy_common_blow_event},
+	{/*"キラー"*/"\x83\x4C\x83\x89\x81\x5B", 0, killer_init_event, NULL, killer_dead_event, NULL, NULL, NULL, enemy_common_blow_event},
+	{/*"サンボ"*/"\x83\x54\x83\x93\x83\x7B", 0, sambo_init_event, sambo_move_event, enemy_common_dead_event, sambo_find_event, sambo_lost_event, sambo_return_event, enemy_common_blow_event},
+	{/*"シンノスケ"*/"\x83\x56\x83\x93\x83\x6D\x83\x58\x83\x50", 0, sinnosuke_init_event, sinnosuke_move_event, enemy_common_dead_event, sinnosuke_find_event, sinnosuke_lost_event, sinnosuke_return_event, enemy_common_blow_event},
+	{/*"シンエモン"*/"\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93", 0, sinemon_init_event, sinemon_move_event, enemy_common_dead_event, sinemon_find_event, sinemon_lost_event, sinemon_return_event, enemy_common_blow_event},
+	{/*"トゲダルマー"*/"\x83\x67\x83\x51\x83\x5F\x83\x8B\x83\x7D\x81\x5B", 0, togedaruma_init_event, togedaruma_move_event, enemy_common_dead_event, togedaruma_find_event, togedaruma_lost_event, togedaruma_return_event, enemy_common_blow_event},
+	{/*"軍団ザコ"*/"\x8C\x52\x92\x63\x83\x55\x83\x52", 0, kuriboo_init_event, kuriboo_move_event, enemy_common_dead_event, kuriboo_find_event, kuriboo_lost_event, kuriboo_return_event, enemy_common_blow_event},
+	{/*"バリアーン"*/"\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93", 0, barriern_init_event, barriern_move_event, barriern_dead_event, barriern_find_event, barriern_lost_event, barriern_return_event, barriern_blow_event},
+	{/*"バリアーンカスタム"*/"\x83\x6F\x83\x8A\x83\x41\x81\x5B\x83\x93\x83\x4A\x83\x58\x83\x5E\x83\x80", 0, barriern_init_event, barriern2_move_event, barriern_dead_event, barriern_find_event, barriern_lost_event, barriern_return_event, barriern_blow_event},
+	{/*"パイダース"*/"\x83\x70\x83\x43\x83\x5F\x81\x5B\x83\x58", 0, piders_init_event, piders_move_event, enemy_common_dead_event, piders_find_event, NULL, NULL, piders_blow_event},
+	{/*"パックンフラワー"*/"\x83\x70\x83\x62\x83\x4E\x83\x93\x83\x74\x83\x89\x83\x8F\x81\x5B", 0, pakkun_init_event, pakkun_move_event, enemy_common_dead_event, pakkun_find_event, NULL, pakkun_return_event, enemy_common_blow_event},
+	{/*"ドクガッスン"*/"\x83\x68\x83\x4E\x83\x4B\x83\x62\x83\x58\x83\x93", 0, dokugassun_init_event, dokugassun_move_event, enemy_common_dead_event, dokugassun_find_event, dokugassun_lost_event, dokugassun_return_event, enemy_common_blow_event},
+	{/*"ボロドー"*/"\x83\x7B\x83\x8D\x83\x68\x81\x5B", 0, kuriboo_init_event, kuriboo_move_event, enemy_common_dead_event, kuriboo_find_event, kuriboo_lost_event, kuriboo_return_event, enemy_common_blow_event},
+	{/*"バサバサ（天井）"*/"\x83\x6F\x83\x54\x83\x6F\x83\x54\x81\x69\x93\x56\x88\xE4\x81\x6A", 0, basabasa_init_event, basabasa_move_event, basabasa_dead_event, basabasa_find_event, basabasa_lost_event, basabasa_return_event, enemy_common_blow_event},
+	{/*"バサバサ（空中）"*/"\x83\x6F\x83\x54\x83\x6F\x83\x54\x81\x69\x8B\xF3\x92\x86\x81\x6A", 0, basabasa2_init_event, basabasa2_move_event, basabasa2_dead_event, basabasa2_find_event, basabasa2_lost_event, basabasa2_return_event, enemy_common_blow_event},
+	{/*"テレサ"*/"\x83\x65\x83\x8C\x83\x54", 0, teresa_init_event, teresa_move_event, teresa_dead_event, teresa_find_event, teresa_lost_event, teresa_return_event, enemy_common_blow_event},
+	{/*"パンジーさん"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", 0, pansy_init_event, pansy_move_event, enemy_common_dead_event, pansy_find_event, pansy_lost_event, pansy_return_event, enemy_common_blow_event},
+	{/*"きらめくパンジーさん"*/"\x82\xAB\x82\xE7\x82\xDF\x82\xAD\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", 0, twinkling_pansy_init_event, twinkling_pansy_move_event, enemy_common_dead_event, twinkling_pansy_find_event, twinkling_pansy_lost_event, twinkling_pansy_return_event, enemy_common_blow_event},
+	{/*"バブル"*/"\x83\x6F\x83\x75\x83\x8B", 0, bubble_init_event, bubble_move_event, enemy_common_dead_event, bubble_find_event, bubble_lost_event, bubble_return_event, enemy_common_blow_event},
+	{/*"ヘビーボム"*/"\x83\x77\x83\x72\x81\x5B\x83\x7B\x83\x80", 0, hbom_init_event, hbom_move_event, enemy_common_dead_event, hbom_find_event, hbom_lost_event, hbom_return_event, enemy_common_blow_event},
+	{/*"マホーン"*/"\x83\x7D\x83\x7A\x81\x5B\x83\x93", 0, mahoon_init_event, mahoon_move_event, mahoon_dead_event, mahoon_find_event, mahoon_lost_event, mahoon_return_event, enemy_common_blow_event},
+	{/*"軍団ザコ魔法使い"*/"\x8C\x52\x92\x63\x83\x55\x83\x52\x96\x82\x96\x40\x8E\x67\x82\xA2", 0, zakowiz_init_event, zakowiz_move_event, zakowiz_dead_event, zakowiz_find_event, zakowiz_lost_event, zakowiz_return_event, zakowiz_blow_event},
+	{/*"ハンニャー"*/"\x83\x6E\x83\x93\x83\x6A\x83\x83\x81\x5B", 0, hannya_init_event, hannya_move_event, enemy_common_dead_event, hannya_find_event, hannya_lost_event, hannya_return_event, enemy_common_blow_event},
+	{/*"カメック（空中）"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x81\x69\x8B\xF3\x92\x86\x81\x6A", 0, kamec_init_event, kamec_move_event, kamec_dead_event, kamec_find_event, kamec_lost_event, kamec_return_event, kamec_blow_event},
+	{/*"カメック（地上）"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x81\x69\x92\x6E\x8F\xE3\x81\x6A", 0, kamec2_init_event, kamec2_move_event, kamec2_dead_event, kamec2_find_event, kamec2_lost_event, kamec2_return_event, kamec2_blow_event},
+	{/*"ハンマーブロス"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x83\x75\x83\x8D\x83\x58", 0, hbross_init_event, hbross_move_event, hbross_dead_event, hbross_find_event, hbross_lost_event, hbross_return_event, hbross_blow_event},
+	{/*"ワンワン"*/"\x83\x8F\x83\x93\x83\x8F\x83\x93", 0, wanwan_init_event, wanwan_move_event, enemy_common_dead_event, wanwan_find_event, NULL, NULL, enemy_common_blow_event},
+	{/*"トゲノコ"*/"\x83\x67\x83\x51\x83\x6D\x83\x52", 0, togenoko_init_event, togenoko_move_event, enemy_common_dead_event, togenoko_find_event, togenoko_lost_event, togenoko_return_event, enemy_common_blow_event},
+	{/*"2D不動キャラ汎用"*/"\x32\x44\x95\x73\x93\xAE\x83\x4C\x83\x83\x83\x89\x94\xC4\x97\x70", 0x08000000, testenemynpc_init_event, unk_evt_8033d458, enemy_2d_common_dead_event, NULL, NULL, NULL, NULL},
+	{/*"2Dクリボー"*/"\x32\x44\x83\x4E\x83\x8A\x83\x7B\x81\x5B", 0x08000000, kuriboo2D_init_event, kuriboo2D_move_event, enemy_2d_common_dead_event, kuriboo2D_find_event, NULL, NULL, NULL},
+	{/*"2D軍団ザコ"*/"\x32\x44\x8C\x52\x92\x63\x83\x55\x83\x52", 0x08000000, zako2D_init_event, zako2D_move_event, enemy_2d_common_dead_event, zako2D_find_event, NULL, NULL, NULL},
+	{/*"2D軍団ザコ土管"*/"\x32\x44\x8C\x52\x92\x63\x83\x55\x83\x52\x93\x79\x8A\xC7", 0x08000000, zako2D_init_event, zako2D_move_event, enemy_2d_common_dead_event, zako2D_find_event, NULL, NULL, NULL},
+	{/*"2D軍団がでるザコ土管"*/"\x32\x44\x8C\x52\x92\x63\x82\xAA\x82\xC5\x82\xE9\x83\x55\x83\x52\x93\x79\x8A\xC7", 0x08000000, dokan2D_init_event, dokan2D_regl_event, NULL, NULL, NULL, NULL, NULL},
+	{/*"２Ｄ軍団ザコ降下"*/"\x82\x51\x82\x63\x8C\x52\x92\x63\x83\x55\x83\x52\x8D\x7E\x89\xBA", 0x08000000, zako2D_init_event, zako2D_move_event, enemy_2d_common_dead_event, zako2D_find_event, NULL, NULL, NULL},
+	{/*"２Ｄ軍団ザコ降下地点"*/"\x82\x51\x82\x63\x8C\x52\x92\x63\x83\x55\x83\x52\x8D\x7E\x89\xBA\x92\x6E\x93\x5F", 0x08000000, fall2D_init_event, fall2D_regl_event, NULL, NULL, NULL, NULL, NULL},
+	{/*"２Ｄゲッソー"*/"\x82\x51\x82\x63\x83\x51\x83\x62\x83\x5C\x81\x5B", 0x08000000, gesso2D_init_event, gesso2D_move_event, enemy_2d_common_dead_event, NULL, NULL, NULL, NULL},
+	{/*"2D軍団ザコ研究員"*/"\x32\x44\x8C\x52\x92\x63\x83\x55\x83\x52\x8C\xA4\x8B\x86\x88\xF5", 0x08000000, zakoM2D_init_event, zakoM2D_move_event, zakoM2D_dead_event, unk_evt_803497e8, NULL, NULL, NULL},
+	{/*"イベント用汎用うろうろ"*/"\x83\x43\x83\x78\x83\x93\x83\x67\x97\x70\x94\xC4\x97\x70\x82\xA4\x82\xEB\x82\xA4\x82\xEB", 0, npc_urouro_init_event, npc_urouro_move_event, NULL, NULL, NULL, NULL, NULL},
+	{NULL, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL},
+};
+
+NpcTerritoryInfo npc_define_territory_type[] = {
+	{"NPC_TERRITORY_TYPE_NOTHING", NPC_TERRITORY_TYPE_NOTHING},
+	{"NPC_TERRITORY_TYPE_CIRCLE", NPC_TERRITORY_TYPE_CIRCLE},
+	{"NPC_TERRITORY_TYPE_SQUARE", NPC_TERRITORY_TYPE_SQUARE},
+	{0}
 };

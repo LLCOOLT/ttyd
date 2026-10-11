@@ -1,0 +1,313 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "battle/battle.h"
+#include "battle/battle_unit.h"
+#include "battle/battle_sub.h"
+
+USER_FUNC(btlevtcmd_AnimeChangePose);
+USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
+USER_FUNC(btlevtcmd_CheckActStatus);
+USER_FUNC(btlevtcmd_CheckStatus);
+USER_FUNC(btlevtcmd_GetUnitWork);
+USER_FUNC(btlevtcmd_OnUnitFlag);
+USER_FUNC(btlevtcmd_SetEventAttack);
+USER_FUNC(btlevtcmd_SetEventConfusion);
+USER_FUNC(btlevtcmd_SetEventDamage);
+USER_FUNC(btlevtcmd_SetEventUnisonPhase);
+USER_FUNC(btlevtcmd_SetEventWait);
+USER_FUNC(btlevtcmd_StartWaitEvent);
+USER_FUNC(evt_sub_random);
+static USER_FUNC(battleGetBarriernSatelliteInitPos);
+extern s32 btldefaultevt_Confuse[];
+extern s32 btldefaultevt_Damage[];
+
+__declspec(section ".data") u64 fd_barriern_satellite_negone_one_374;
+__declspec(section ".data") s32 fd_barriern_satellite_neg_one_382[1];
+__declspec(section ".data") s32 fd_barriern_satellite___local_PI_383[1];
+__declspec(section ".data") s32 fd_barriern_satellite___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_barriern_satellite_one_negone_373;
+__declspec(section ".data") s32 fd_barriern_satellite___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_barriern_satellite_one_381[1];
+__declspec(section ".data") u64 fd_barriern_satellite_negone_one_360;
+__declspec(section ".data") s32 fd_barriern_satellite_neg_one_365[1];
+__declspec(section ".data") s32 fd_barriern_satellite___local_PI_366[1];
+__declspec(section ".data") s32 fd_barriern_satellite___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_barriern_satellite_one_negone_359;
+__declspec(section ".data") s32 fd_barriern_satellite___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_barriern_satellite_one_364[1];
+BattleUnitKind unit_barriern_satellite_19_data_30B08;
+static __declspec(section ".data") BattleUnitDefense defence;
+static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
+static BattleUnitKindPart parts[6];
+static __declspec(section ".data") StatusVulnerability regist;
+static PoseTableEntry pose_table[17];
+static __declspec(section ".data") BattleDataEntry data_table[1];
+static s32 init_event[29];
+static __declspec(section ".data") s32 damage_event[10];
+static __declspec(section ".data") s32 phase_event[2];
+static __declspec(section ".data") s32 unison_phase_event[5];
+static __declspec(section ".data") s32 attack_event[5];
+static s32 wait_event[56];
+
+__declspec(section ".data") u64 fd_barriern_satellite_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_barriern_satellite_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_barriern_satellite_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_barriern_satellite_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_barriern_satellite_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_barriern_satellite_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_barriern_satellite___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_barriern_satellite_one_364[] = {
+    1065353216,
+};
+
+BattleUnitKind unit_barriern_satellite_19_data_30B08 = {
+    30,
+    "btl_un_barriern_satellite",
+    1,
+    0,
+    1,
+    1,
+    0,
+    0,
+    0,
+    70,
+    0,
+    50,
+    9999,
+    16,
+    16,
+    0,
+    8,
+    0.0f,
+    0.0f,
+    0.0f,
+    -3,
+    -6,
+    0.0f,
+    0.0f,
+    0.0f,
+    8.0f,
+    0.0f,
+    -10.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    8.0f,
+    0.0f,
+    0.0f,
+    5.0f,
+    6.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    0.0f,
+    16.0f,
+    16.0f,
+    0,
+    0,
+    0,
+    2,
+    100,
+    20,
+    0.0f,
+    0.0f,
+    0.0f,
+    "SFX_ENM_BARRI_DAMAGED1",
+    "SFX_BTL_DAMAGE_FIRE1",
+    "SFX_BTL_DAMAGE_ICE1",
+    "SFX_BTL_DAMAGE_BIRIBIRI1",
+    0x4,
+    &regist,
+    6,
+    parts,
+    init_event,
+    data_table,
+};
+
+static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+
+static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+
+static BattleUnitKindPart parts[] = {
+    {1, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x600009, 0, pose_table},
+    {2, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {3, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {4, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {5, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+    {6, "btl_un_barriern_satellite", "c_baria", 0.0f, 0.0f, 0.0f, 0.0f, 5.0f, 0.0f, 0.0f, 10.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x13010000, 0, pose_table},
+};
+
+static __declspec(section ".data") StatusVulnerability regist = {80, 100, 100, 0, 90, 100, 0, 0, 100, 90, 100, 90, 100, 95, 90, 0, 100, 100, 90, 100, 100, 100};
+
+static PoseTableEntry pose_table[] = {
+    {1, "N_2"},
+    {2, "Y_2"},
+    {9, "Y_2"},
+    {5, "K_2"},
+    {4, "X_2"},
+    {3, "X_2"},
+    {28, "S_2"},
+    {29, "Q_2"},
+    {30, "Q_2"},
+    {31, "S_2"},
+    {39, "D_2"},
+    {42, "R_2"},
+    {41, "R_2"},
+    {40, "W_2"},
+    {56, "X_2"},
+    {57, "X_2"},
+    {69, "S_2"},
+};
+
+static __declspec(section ".data") BattleDataEntry data_table[] = {
+    {0, NULL},
+};
+
+static EVT_BEGIN(init_event)
+    CALL(btlevtcmd_SetEventWait, -2, PTR(wait_event))
+    CALL(btlevtcmd_SetEventUnisonPhase, -2, PTR(unison_phase_event))
+    CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
+    CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
+    CALL(btlevtcmd_SetEventConfusion, -2, PTR(btldefaultevt_Confuse))
+    CALL(btlevtcmd_OnUnitFlag, -2, 3145728)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(damage_event)
+    SET_VALUE(LW(10), -2)
+    SET_VALUE(LW(11), 1)
+    CALL_CHILD(PTR(btldefaultevt_Damage))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(phase_event)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(unison_phase_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(attack_event)
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    LABEL(0)
+    CALL(evt_sub_random, 120, LW(0))
+    ADD(LW(0), 30)
+    WAIT_FRAMES(LW(0))
+    CALL(btlevtcmd_GetUnitWork, -2, 1, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(btlevtcmd_CheckActStatus, -2, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_CheckStatus, -2, 5, LW(0))
+            IF_INT_EQUAL(LW(0), 0)
+                CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_4"))
+                WAIT_FRAMES(180)
+                CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+            END_IF
+        END_IF
+    END_IF
+    GOTO(0)
+    RETURN
+EVT_END()
+
+static USER_FUNC(battleGetBarriernSatelliteInitPos) {
+    s32* args = event->args;
+    BattleUnit* unit;
+    s32 num;
+    s32 index;
+    s32 id;
+    s32 x;
+    s32 y;
+    s32 z;
+    s32 i;
+    s32 j;
+    static const Vec VecData[] = {
+        // 1 satellite
+        {25.0f, 0.0f, 0.0f},
+        // 2 satellites
+        {25.0f, 0.0f, 0.0f},
+        {-25.0f, 0.0f, 0.0f},
+        // 3 satellites
+        {0.0f, 25.0f, 0.0f},
+        {25.0f, -25.0f, 0.0f},
+        {-25.0f, -25.0f, 0.0f},
+        // 4 satellites
+        {25.0f, 25.0f, 0.0f},
+        {-25.0f, 25.0f, 0.0f},
+        {25.0f, -25.0f, 0.0f},
+        {-25.0f, -25.0f, 0.0f},
+    };
+    const Vec* p;
+    BattleWork* wp = _battleWorkPointer;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(wp, id);
+    num = evtGetValue(event, args[1]);
+    index = evtGetValue(event, args[2]);
+    x = args[3];
+    y = args[4];
+    z = args[5];
+    p = VecData;
+    for (i = 0; i < num; i++) {
+        for (j = 0; j < i; j++) {
+            p++;
+        }
+    }
+    for (j = 0; j < index; j++) {
+        p++;
+    }
+    evtSetValue(event, x, (s32)(p->x * unit->faceDirection));
+    evtSetValue(event, y, (s32)p->y);
+    evtSetValue(event, z, (s32)p->z);
+    return EVT_RETURN_DONE;
+}
+

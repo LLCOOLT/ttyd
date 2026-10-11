@@ -148,7 +148,7 @@ u32 BattlePadGetNow(void) {
 	return _battleWorkPointer->padWork[0].mButtonsHistory[0];
 }
 
-u32 BattlePadCheckTrigger(s32 mask) {
+BOOL BattlePadCheckTrigger(s32 mask) {
 	return BattlePadMultiCheckTrigger(0, mask);
 }
 
@@ -157,7 +157,7 @@ u32  BattlePadMultiCheckTrigger(s32 chan, s32 mask) {
 	return history[0] & mask;
 }
 
-u32 BattlePadCheckRecordTrigger(s32 frame, s32 mask) {
+BOOL BattlePadCheckRecordTrigger(s32 frame, s32 mask) {
 	return BattlePadMultiCheckRecordTrigger(0, frame, mask);
 }
 

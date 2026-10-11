@@ -39,6 +39,13 @@ typedef enum BattleSequence {
     SEQ_END = 7
 } BattleSequence;
 
+typedef struct BattleAnnounce {
+    s16 x;                           // 0x0
+    s16 y;                           // 0x2
+    s32 params[4];                   // 0x4
+    char text[0x18FE0 - 0x18C84];    // 0x14
+} BattleAnnounce;
+
 // deprecated ------------------------------------------------------------
 struct BattleWorkCommandAction {
     u32 mType;      // 0x0
@@ -136,6 +143,21 @@ typedef struct BattleWorkPartyInfo {
     s32 field_24;             // 0x24
 } BattleWorkPartyInfo;
 
+typedef struct BattleWorkTarget {
+    s16 unitIdx;                  // 0x0
+    s16 partIdx;                  // 0x2
+    u8 field_0x4[0x24 - 0x4];     // 0x4
+} BattleWorkTarget;
+
+typedef struct BattleWorkWeaponTargets {
+    BattleWeapon* weapon;          // 0x0
+    BattleWorkTarget targets[74];  // 0x4
+    s8 numTargets;                 // 0xA6C
+    s8 targetIndices[74];          // 0xA6D
+    s8 currentTarget;              // 0xAB7
+    u8 field_0xAB8[0xACC - 0xAB8]; // 0xAB8
+} BattleWorkWeaponTargets;
+
 struct BattleWork {
     s16 turnCount;                      // 0x0
     u8 field_2[0x4 - 0x2];              // 0x2
@@ -145,7 +167,7 @@ struct BattleWork {
     u8 field_120[0x420 - 0x120];        // 0x120
     s32 activeUnitId;                   // 0x420
     s32 field_424;                      // 0x424
-    u8 field_428[0xEF4 - 0x428];        // 0x428
+    BattleWorkWeaponTargets weaponTargets; // 0x428
     u32 flags;                          // 0xEF4
     s32 dispFlags;                      // 0xEF8
     u8 field_EFC[0xF0C - 0xEFC];        // 0xEFC
@@ -169,7 +191,9 @@ struct BattleWork {
     s32 mStylishResult;                 // 0x2730
     s32 mStylishEarlyFrames;            // 0xA2734
     FieldBattleInfo* fbatInfo;          // 0x2738
-    u8 field_273C[0x2754 - 0x273C];     // 0x273C
+    s32 statusWindowOff;                // 0x273C
+    s32 lectureMode;                    // 0x2740
+    u8 field_2744[0x2754 - 0x2744];     // 0x2744
     BattleCameraWork cameraWork;        // 0x2754
     BattleAudience audience;            // 0x2858
     u8 field_1616C[0x162A0 - 0x1616C];  // 0x1616C
@@ -178,15 +202,24 @@ struct BattleWork {
     s32 badgeEquippedFlags;             // 0x163D8
     FileEntry* menuTex;                 // 0x163DC
     BattleStage stage;                  // 0x163E0
-    u8 field_16F1C[0x17140 - 0x16F1C];  // 0x16F1C
+    u8 field_16F1C[0x16F3C - 0x16F1C];  // 0x16F1C
+    u8 marioAcSuccess;                  // 0x16F3C
+    u8 marioAcFailed;                   // 0x16F3D
+    u8 field_16F3E[0x17140 - 0x16F3E];  // 0x16F3E
     BattleStageObject stageObjects[32]; // 0x17140
-    u8 field_180C0[0x182B0 - 0x180C0];  // 0x180C0
+    u8 field_180C0[0x180DC - 0x180C0];  // 0x180C0
+    u8 field_180DC;                     // 0x180DC, 0x20: stage has a ceiling
+    u8 field_180DD[0x182B0 - 0x180DD];  // 0x180DD
     BattleIcon icons[10];               // 0x182B0
-    u8 field_188C8[0x18FE0 - 0x188C8];  // 0x188C8
+    u8 field_188C8[0x18C70 - 0x188C8];  // 0x188C8
+    BattleAnnounce announce;            // 0x18C70
     s8 alertTick;                       // 0x18FE0
     u8 field_18FE1[0x18FE4 - 0x18FE1];  // 0x18FE1
     StarPowerInfo impendingBonuses;     // 0x18FE4
-    u8 field_18FF0[0x19050 - 0x18FF0];  // 0x18FF0
+    const char* acHelpMsg;              // 0x18FF0
+    s32 acHelpDispType;                 // 0x18FF4
+    u8 field_18FF8[0x19038 - 0x18FF8];  // 0x18FF8
+    s32 commandDisabled[6];             // 0x19038, set to 3 by Bowser's command-blocking attacks
     u32 reserveItems[4];                // 0x19050
     s32 field_19060;                    // 0x19060
     u8 field_19064[0x19088 - 0x19064];  // 0x19064

@@ -11,9 +11,9 @@
 extern SequenceCallback seq_data[8][3];
 
 //.sdata
-SequenceType prev_seq = SEQ_UNDEFINED;
-SequenceType next_seq = SEQ_UNDEFINED;
 SequenceType now_seq = SEQ_UNDEFINED;
+SequenceType next_seq = SEQ_UNDEFINED;
+SequenceType prev_seq = SEQ_UNDEFINED;
 
 //.sbss
 SequenceWork seqWork;
@@ -64,5 +64,5 @@ SequenceType seqGetNextSeq(void) {
 }
 
 BOOL seqCheckSeq(void) {
-	return next_seq != now_seq;
+	return now_seq != next_seq;
 }

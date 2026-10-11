@@ -24,6 +24,6 @@ void BattleInformationSetResult(FieldBattleInfo* info, u32 result) {
 	info->result = result;
 }
 
-u32 BattleInformationGetResult(FieldBattleInfo* info) {
+s32 BattleInformationGetResult(FieldBattleInfo* info) {
 	return info->result;
 }

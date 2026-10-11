@@ -8,9 +8,9 @@ Sections:
 
 jin.c:
 	.text       start:0x00000000 end:0x00000258
-	.rodata     start:0x00000000 end:0x00000068
+	.rodata     start:0x00000000 end:0x00000064
 	.data       start:0x00000000 end:0x00000060
-	.bss        start:0x00000000 end:0x00000008
+	.bss        start:0x00000000 end:0x00000004
 
 jin_00.c:
 	.text       start:0x00000258 end:0x00003E6C

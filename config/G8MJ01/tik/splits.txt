@@ -9,7 +9,7 @@ Sections:
 tik.c:
 	.text       start:0x00000000 end:0x000003B8
 	.rodata     start:0x00000000 end:0x000000D0
-	.data       start:0x00000000 end:0x000001F8
+	.data       start:0x00000000 end:0x000001F4
 
 tik_00.c:
 	.text       start:0x000003B8 end:0x000011C0
@@ -83,7 +83,7 @@ unit/unit_boss_gesso.c:
 data/battle/battle_database_tik.c:
 	.text       start:0x0000558C end:0x00005724
 	.rodata     start:0x00003528 end:0x00003980
-	.data       start:0x00017E70 end:0x0001B138
+	.data       start:0x00017E70 end:0x0001B134
 
 tik_14.c:
 	.rodata     start:0x00003980 end:0x000039D8
@@ -147,13 +147,13 @@ unit/unit_patakuri.c:
 
 unit/unit_togekuri.c:
 	.text       start:0x00005AE0 end:0x00005DF8
-	.rodata     start:0x00004C00 end:0x00004DC0
-	.data       start:0x00023000 end:0x000240A0
+	.rodata     start:0x00004C00 end:0x00004DBC
+	.data       start:0x00023000 end:0x0002409C
 
 unit/unit_hammer_bros.c:
 	.text       start:0x00005DF8 end:0x0000600C
 	.rodata     start:0x00004DC0 end:0x00004EF0
-	.data       start:0x000240A0 end:0x00025B20
+	.data       start:0x000240A0 end:0x00025B1C
 
 unit/unit_kamec.c:
 	.text       start:0x0000600C end:0x00006800

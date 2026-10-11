@@ -40,9 +40,9 @@ gra_06.c:
 
 gra.c:
 	.text       start:0x0000050C end:0x00000700
-	.rodata     start:0x00000A10 end:0x00000A50
+	.rodata     start:0x00000A10 end:0x00000A4C
 	.data       start:0x00004EE8 end:0x00004F38
-	.bss        start:0x00000000 end:0x00000008
+	.bss        start:0x00000000 end:0x00000004
 
 event/evt_kagemario.c:
 	.text       start:0x00000700 end:0x00000B0C

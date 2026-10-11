@@ -177,7 +177,8 @@ s32 DVDMgrRead(DVDEntry* entry, void* address, u32 size, s32 offset) {
 	entry->status &= ~DVDMGR_FINISHED;
 	entry->callback = NULL;
 	entry->position = 0;
-	while (!(entry->status & DVDMGR_FINISHED)) {
+	while (TRUE) {
+		if (entry->status & DVDMGR_FINISHED) break;
 		OSYieldThread();
 	}
 	return entry->info.length;

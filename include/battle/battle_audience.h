@@ -203,3 +203,4 @@ BOOL BattleAudience_GetSysCtrl(s32 index);
 BOOL BattleAudience_GetWaiting(s32 index);
 s32 BattleAudience_HaitiRandForFallObject(void);
 s32 BattleAudience_GetAudienceNum(void);
+void BattleAudience_WinSetActive(u8 active);

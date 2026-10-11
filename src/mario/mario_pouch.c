@@ -618,7 +618,7 @@ s16 pouchGetSuperCoin(void) {
 	return mpp->mShineSpriteCount;
 }
 
-s16 pouchSetCoin(s16 coins) {
+s32 pouchSetCoin(s32 coins) {
 	mpp->coins = coins;
 	if (mpp->coins < 0) {
 		mpp->coins = 0;
@@ -640,7 +640,7 @@ s16 pouchAddCoin(s16 coins) {
 	return mpp->coins;
 }
 
-s16 pouchGetCoin(void) {
+s32 pouchGetCoin(void) {
 	return mpp->coins;
 }
 

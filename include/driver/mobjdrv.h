@@ -48,3 +48,7 @@ typedef struct MapObjectWork {
 
 void mobjInit(void);
 void mobjMain(void);
+MapObjectEntry* mobjNameToPtrNoAssert(const char* name);
+MapObjectEntry* mobjNameToPtr(const char* name);
+void mobjCalcMtx(MapObjectEntry* mobj);
+void mobjCalcMtx2(MapObjectEntry* mobj);
