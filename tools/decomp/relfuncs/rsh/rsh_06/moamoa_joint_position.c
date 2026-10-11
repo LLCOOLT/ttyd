@@ -1,0 +1,37 @@
+// include: manager/evtmgr.h
+// include: driver/mapdrv.h
+// include: string.h
+// include: memory.h
+// include: dolphin/os.h
+// include: dolphin/mtx.h
+// include: mario/mariost.h
+// decl: typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
+// decl: typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
+// decl: typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; Vec field_0x30; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
+// decl: typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
+// decl: typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
+// decl: static MoamoaWork* wp;
+// decl: ExtPose* extGetPosePtr(void);
+// decl: s32 extGetPoseNum(void);
+// decl: void extReset(void);
+// decl: int rand(void);
+// decl: static f32 randf(f32 min, f32 max);
+// decl: static void moamoa_pose_init(void);
+// decl: static void moamoa_pose_main(void);
+// decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
+// include: driver/npcdrv.h
+// include: driver/animdrv.h
+// proto: void moamoa_joint_position(Moamoa* moa, Vec* out);
+void moamoa_joint_position(Moamoa* moa, Vec* out) {
+    NpcEntry* npc = npcNameToPtr("base");
+    AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
+    MoamoaWork* w = wp;
+    f32 t = (f32)moa->order / (f32)w->chainNum[moa->group];
+    Vec* b = anim->worldPositions[0] + w->chainIdx[moa->group][1];
+    Vec* a = anim->worldPositions[0] + w->chainIdx[moa->group][0];
+    Vec tmp;
+
+    PSVECScale(a, out, t);
+    PSVECScale(b, &tmp, 1.0f - t);
+    PSVECAdd(out, &tmp, out);
+}

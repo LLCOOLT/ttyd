@@ -17,13 +17,16 @@ static OffscreenWork work[2]; //field, battle
 //local prototypes
 void offscreenDisp(CameraId camId, void* param);
 
-void offscreenInit(void) { //TODO: fix r31
+void offscreenInit(void) {
+	OffscreenWork* wp;
+
 	work[0].count = 10;
 	work[0].entries = __memAlloc(HEAP_DEFAULT, work[0].count * sizeof(OffscreenEntry));
 	memset(work[0].entries, 0, work[0].count * sizeof(OffscreenEntry));
-	work[1].count = 10;
-	work[1].entries = __memAlloc(HEAP_DEFAULT, work[1].count * sizeof(OffscreenEntry));
-	memset(work[1].entries, 0, work[0].count * sizeof(OffscreenEntry));
+	wp = &work[1];
+	wp->count = 10;
+	wp->entries = __memAlloc(HEAP_DEFAULT, wp->count * sizeof(OffscreenEntry));
+	memset(wp->entries, 0, wp->count * sizeof(OffscreenEntry));
 }
 
 void offscreenReset(BOOL inBattle) { //1:1
@@ -64,8 +67,26 @@ s32 offscreenEntry(const char* name) { //1:1, needs variable names
 }
 
 void offscreenDisp(CameraId camId, void* param) {
-	//param is null
+	OffscreenWork* wp = offscreenGetWorkGp();
+	int i, count;
+	OffscreenEntry* entry;
+	u16 width, height;
 
+	for (i = 0, count = wp->count, entry = wp->entries; i < count; i++, entry++) {
+		if (entry->flags & 1 && entry->flags & 2) {
+			width = entry->currRight - entry->currLeft;
+			height = entry->currBottom - entry->currTop;
+			GXSetTexCopySrc(entry->currLeft, entry->currTop, width, height);
+			GXSetTexCopyDst(width, height, (GXTexFmt)entry->unk3C, GX_FALSE);
+			entry->texBuf = smartAlloc(GXGetTexBufferSize(width, height, (u32)entry->unk3C, GX_FALSE, 0), 3);
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+			GXCopyTex(entry->texBuf->address, GX_TRUE);
+			GXPixModeSync();
+			GXInitTexObj(&entry->texObj, entry->texBuf->address, width, height, (GXTexFmt)entry->unk40,
+				GX_CLAMP, GX_CLAMP, GX_FALSE);
+			entry->flags |= 4;
+		}
+	}
 }
 
 void offscreenMain(void) { //1:1, need variable names
@@ -120,14 +141,107 @@ void offscreenAddBoundingBox(s32 id, u16 left, u16 top, u16 right, u16 bottom) {
 				entry->currTop = top;
 				entry->flags |= 2;
 			}
-			if (right < entry->currRight) {
+			if (right > entry->currRight) {
 				entry->currRight = right;
 				entry->flags |= 2;
 			}
-			if (bottom < entry->currBottom) {
+			if (bottom > entry->currBottom) {
 				entry->currBottom = bottom;
 				entry->flags |= 2;
 			}
 		}
 	}
+}
+
+BOOL offscreenGetBoundingBox(s32 id, u16* left, u16* top, u16* right, u16* bottom) {
+	OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
+
+	if (!(entry->flags & 1)) {
+		return FALSE;
+	}
+	if (!(entry->flags & 2)) {
+		return FALSE;
+	}
+	*left = entry->currLeft;
+	*top = entry->currTop;
+	*right = entry->currRight;
+	*bottom = entry->currBottom;
+	return TRUE;
+}
+
+void offscreenGetTexObj(s32 id, GXTexObj** texObj, smartEntry** texBuf) {
+	OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
+
+	if (!(entry->flags & 1)) {
+		*texObj = NULL;
+		*texBuf = NULL;
+		return;
+	}
+	if (!(entry->flags & 2)) {
+		*texObj = NULL;
+		*texBuf = NULL;
+		return;
+	}
+	if (!(entry->flags & 4)) {
+		*texObj = NULL;
+		*texBuf = NULL;
+		return;
+	}
+	*texObj = &entry->texObj;
+	*texBuf = entry->texBuf;
+}
+
+s32 offscreenNameToId(const char* name) {
+	OffscreenWork* wp = offscreenGetWorkGp();
+	int i, count;
+	OffscreenEntry* entry;
+
+	for (i = 0, count = wp->count, entry = wp->entries; i < count; i++, entry++) {
+		if (entry->flags & 1 && !strcmp(entry->name, name)) {
+			break;
+		}
+	}
+	return i;
+}
+
+OffscreenEntry* offscreenNameToPtr(const char* name) {
+	OffscreenWork* wp = offscreenGetWorkGp();
+	int i, count;
+	OffscreenEntry* entry;
+
+	for (i = 0, count = wp->count, entry = wp->entries; i < count; i++, entry++) {
+		if (entry->flags & 1 && !strcmp(entry->name, name)) {
+			break;
+		}
+	}
+	return entry;
+}
+
+void offscreenDelete(const char* name) {
+	OffscreenWork* wp = offscreenGetWorkGp();
+	int i, count;
+	OffscreenEntry* entry;
+
+	for (i = 0, count = wp->count, entry = wp->entries; i < count; i++, entry++) {
+		if (entry->flags & 1 && !strcmp(entry->name, name)) {
+			break;
+		}
+	}
+	entry->flags = 0;
+}
+
+BOOL offscreenGetBoundingBox_BeforeFrame(s32 id, u16* left, u16* top, u16* right, u16* bottom) {
+	OffscreenEntry* entry = &offscreenGetWorkGp()->entries[id];
+
+	if (!(entry->flags & 1)) {
+		return FALSE;
+	}
+	if (entry->prevLeft > entry->prevRight) {
+		return FALSE;
+	}
+	*left = entry->prevLeft;
+	*top = entry->prevTop;
+	*right = entry->prevRight;
+	*bottom = entry->prevBottom;
+	return TRUE;
 }

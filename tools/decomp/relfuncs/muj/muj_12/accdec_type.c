@@ -1,11 +1,14 @@
 // proto: static f32 accdec_type(s32 step, s32 total, f32 start, f32 end);
 static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
-    f32 speed = 0.0f;
-    f32 sum = 0.0f;
     f32 cur;
+    f32 speed;
+    f32 sum;
     s32 accel = total * 20 / 100;
     s32 decel = total * 80 / 100;
     s32 i;
+
+    speed = 0.0f;
+    sum = 0.0f;
 
     for (i = 0; i < total; i++) {
         if (i <= accel) {

@@ -79,7 +79,11 @@ typedef struct PartyEntry {
     s8 currentSlotId;            // 0x2F
     u8 field_30;                 // 0x30
     s8 currentMemberId;          // 0x31, PartyMembers
-    u8 field_32[0x39 - 0x32];    // 0x32
+    u8 field_32[0x34 - 0x32];    // 0x32
+    u8 field_34;                 // 0x34
+    u8 field_35[0x37 - 0x35];    // 0x35
+    u8 field_37;                 // 0x37
+    u8 field_38;                 // 0x38
     u8 useMotionId;              // 0x39
     u8 field_3A[0x58 - 0x3A];    // 0x3A
     Vec position;                // 0x58

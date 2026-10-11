@@ -427,16 +427,18 @@ EVT_BEGIN(eki_03_init_evt)
 EVT_END()
 
 static void sun_tev(MapTevCallbackInfo* info) {
-    s32 i;
-    u8* buf;
-    s32 texCoord = info->texMap;
-    s32 texMap = info->texCoord;
+    static const s32 texmtx_tbl[] = {
+        GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4,
+        GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
+    };
     s32 stage = info->tevStage;
+    s32 texMap = info->texCoord;
+    s32 texCoord = info->texMap;
+    s32 indStage = info->field_0x18;
     GXTexObj obj;
     f32 mtx[2][3];
-    s32 indStage = info->field_0x18;
-    s32 tile;
-    s32 row;
+    u8* buf;
+    s32 i;
     s32 j;
 
     // a scrolling sine-wave warp texture for the sun's heat haze
@@ -445,14 +447,13 @@ static void sun_tev(MapTevCallbackInfo* info) {
     }
     buf = ind_lp->address;
     for (i = 0; i < 64; i++) {
-        tile = (i / 4) << 5;
-        row = i % 4;
         for (j = 0; j < 64; j++) {
             f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
-            u8* p = &buf[tile + ((j / 4) << 9) + ((row + ((j % 4) << 2)) << 1)];
+            s32 off = ((i / 4) << 5) + ((j / 4) << 9);
 
-            p[0] = 3.0f * v + 128.0f;
-            p[1] = 0x80;
+            off += ((i % 4) + ((j % 4) << 2)) * 2;
+            buf[off] = 3.0f * v + 128.0f;
+            buf[off + 1] = 0x80;
         }
     }
     DCFlushRange(buf, 0x2000);
@@ -490,9 +491,8 @@ static USER_FUNC(test_glare) {
     } else if (rect[0] == 0 && rect[1] == 0 && rect[2] == 0 && rect[3] == 0) {
         envGlareFilter(0, 0, 0, 0, 0);
     } else {
-        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[2] + 50, rect[3] + 50);
-        envGlareFilterZ(0.998f);
+        envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
+        envGlareFilterZ(1.148f);
     }
     return EVT_RETURN_BLOCK;
 }
-

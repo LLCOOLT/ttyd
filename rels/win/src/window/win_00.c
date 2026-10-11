@@ -1021,53 +1021,6 @@ EVT_BEGIN(iri_28_enemy_all_dead)
     RETURN
 EVT_END()
 
-USER_FUNC(item_check_necklace_exist) {
-    ItemEntry* item = itemNameToPtr("necklace");
-
-    if (item != NULL && itemFlag(item, 1)) {
-        return EVT_RETURN_BLOCK;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(win_item_move_3d_position) {
-    s32* args = event->args;
-    char* name = (char*)evtGetValue(event, args[0]);
-    f32 x = evtGetValue(event, args[1]);
-    f32 y = evtGetValue(event, args[2]);
-    f32 z = evtGetValue(event, args[3]);
-    s32 frames = evtGetValue(event, args[4]);
-    s32 mode = evtGetValue(event, args[5]);
-    f32 yOffset = evtGetFloat(event, args[6]);
-    ItemEntry* item = itemNameToPtr(name);
-    s32 elapsed;
-
-    if (isFirstCall) {
-        if (item == NULL) {
-            return EVT_RETURN_DONE;
-        }
-        event->userdata[0] = gp->renderTime;
-        event->userdataf[1] = item->position.x;
-        event->userdataf[2] = item->position.y;
-        *(f32*)&event->field_84 = item->position.z;
-    }
-    elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0]);
-    if (elapsed < frames) {
-        item->position.x = intplGetValue(mode, elapsed, frames, event->userdataf[1], x);
-        item->position.y = yOffset + intplGetValue(mode, elapsed, frames, event->userdataf[2], y);
-        item->position.z = intplGetValue(mode, elapsed, frames, *(f32*)&event->field_84, z);
-        return EVT_RETURN_BLOCK;
-    }
-    item->position.x = x;
-    item->position.y = y + yOffset;
-    item->position.z = z;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(mariowalk_wait) {
-    return !(marioGetPtr()->flags & 0x20);
-}
-
 EVT_BEGIN(iri_28_enemy_dead)
     CALL_CHILD(PTR(enemy_common_dead_event))
     ADD(GSW(1469), 1)
@@ -1136,3 +1089,51 @@ EVT_BEGIN(win_00_init_evt)
     RETURN
 EVT_END()
 
+USER_FUNC(mariowalk_wait) {
+    return !(marioGetPtr()->flags & 0x20);
+}
+
+USER_FUNC(win_item_move_3d_position) {
+    s32* args = event->args;
+    char* name = (char*)evtGetValue(event, args[0]);
+    f32 x = evtGetValue(event, args[1]);
+    f32 y = evtGetValue(event, args[2]);
+    f32 z = evtGetValue(event, args[3]);
+    s32 frames = evtGetValue(event, args[4]);
+    s32 mode = evtGetValue(event, args[5]);
+    f32 yOffset = evtGetFloat(event, args[6]);
+    ItemEntry* item = itemNameToPtr(name);
+    s32 elapsed;
+
+    if (isFirstCall) {
+        if (item == NULL) {
+            return EVT_RETURN_DONE;
+        }
+        event->userdata[0] = gp->renderTime;
+        event->userdataf[1] = item->position.x;
+        event->userdataf[2] = item->position.y;
+        *(f32*)&event->field_84 = item->position.z;
+    }
+    elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0]);
+    if (elapsed < frames) {
+        // the elapsed time is kept in the (dead) isFirstCall parameter
+        isFirstCall = elapsed;
+        item->position.x = intplGetValue(mode, isFirstCall, frames, event->userdataf[1], x);
+        item->position.y = yOffset + intplGetValue(mode, isFirstCall, frames, event->userdataf[2], y);
+        item->position.z = intplGetValue(mode, isFirstCall, frames, *(f32*)&event->field_84, z);
+        return EVT_RETURN_BLOCK;
+    }
+    item->position.x = x;
+    item->position.y = y + yOffset;
+    item->position.z = z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(item_check_necklace_exist) {
+    ItemEntry* item = itemNameToPtr("necklace");
+
+    if (item != NULL && itemFlag(item, 1)) {
+        return EVT_RETURN_BLOCK;
+    }
+    return EVT_RETURN_DONE;
+}

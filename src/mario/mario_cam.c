@@ -65,6 +65,27 @@ void marioPreCamera(void) {
 }
 
 void marioCamMain(void) {
+    MarioWork* mario = marioGetPtr();
+    CameraEntry* camera;
+    MarioWork* mario2;
+
+    if (mario->currMotionId != 0x1D) {
+        marioUpdateCam();
+    }
+    marioCamZoomUpLevelMain();
+    marioCamZoomOff();
+
+    camera = camGetPtr(CAMERA_3D);
+    mario2 = marioGetPtr();
+    if (mario2->controlStickSensitivity) {
+        if (camera->cameraPos.x == mario2->unk160) {
+            mario2->dispFlags |= 0x20;
+        } else {
+            mario2->dispFlags &= ~0x20;
+        }
+    }
+    mario2->unk160 = camera->cameraPos.x;
+    mario->dispFlags &= ~0x40000;
 }
 
 void marioUpdateCamCollision(Vec collision) {
@@ -73,7 +94,34 @@ void marioUpdateCamCollision(Vec collision) {
     mario->dispFlags |= 0x40000;
 }
 
+#define UPDATE_CAM_SHIFT(cur, target, rate)     {                                               f32 c_ = cur;                               f32 t_ = target;                            f32 r_ = rate;                              f32 d_;                                     if (c_ > t_) {                                  d_ = r_ * ((t_ - 1.0f) - c_);               cur = c_ + d_;                              if (cur < target) {                             cur = target;                           }                                       } else if (c_ < t_) {                           d_ = r_ * ((1.0f + t_) - c_);               cur = c_ + d_;                              if (cur > target) {                             cur = target;                           }                                       }                                       }
+
 void marioUpdateCam(void) {
+    MarioWork* mario = marioGetPtr();
+    f32 sin;
+    f32 cos;
+
+    UPDATE_CAM_SHIFT(mario->unk13C, mario->unk138, mario->unk150.x);
+    UPDATE_CAM_SHIFT(mario->unk144, mario->unk140, mario->unk150.y);
+    UPDATE_CAM_SHIFT(mario->unk14C, mario->unk148, mario->unk150.z);
+
+    if (!(mario->dispFlags & 0x10000)) {
+        camGetPtr(CAMERA_3D);
+        sincosf(&sin, &cos, camGetPtr(CAMERA_3D)->viewYaw - 90.0f);
+        if (!(mario->dispFlags & 0x20000)) {
+            mario->field_EC.x = mario->position.x + sin * mario->unk13C;
+            mario->field_EC.z = mario->position.z + cos * mario->unk13C;
+            mario->field_EC.y = mario->unk144 + (mario->position.y + mario->field_0x98.y);
+            if (mario->currMotionId == 0x19) {
+                mario->field_EC.y += 10.0f;
+            }
+            mario->field_64 = mario->unk14C;
+        } else {
+            mario->field_EC.x = mario->position.x + sin * mario->unk13C + sin * mario->unk14C;
+            mario->field_EC.z = mario->position.z + cos * mario->unk13C + cos * mario->unk14C;
+            mario->field_64 = mario->unk14C;
+        }
+    }
 }
 
 void marioUpdateCamPos(void) {
@@ -233,5 +281,72 @@ BOOL marioCamZoomUp(void) {
 }
 
 BOOL marioCamZoomUpLevelMain(void) {
+    MarioWork* mario;
+    EventEntry event;
+    s32 args[10];
+    Vec cloudPos;
+    Vec targetPos;
+    Vec cameraDir;
+    Vec sp8;
+    f32 xOffset;
+    f32 yOffset;
+    f32 zoomDistance;
+    CameraEntry* camera;
 
+    mario = marioGetPtr();
+    if (!(mario->trigFlags & 0x10)) {
+        return FALSE;
+    }
+    mario->trigFlags &= ~0x10;
+
+    if (marioBgmodeChk() == 1) {
+        return FALSE;
+    }
+
+    mario->dispFlags |= 0x100000;
+    mario->unk5E = 0;
+
+    if (mario->unk60 == 1) {
+        zoomDistance = 520.0f;
+    } else if (mario->unk60 == 2) {
+        zoomDistance = 475.0f;
+    } else if (mario->unk60 == 3) {
+        zoomDistance = 440.0f;
+    } else {
+        zoomDistance = 450.0f;
+    }
+
+    xOffset = (f32)(mario->unk168 - 303) / 5.0f;
+    yOffset = 0.0f;
+
+    if ((f32)mario->unk16C > 320.0f) {
+        yOffset = (320.0f - (f32)mario->unk16C) / 3.5f;
+    }
+
+    camera = camGetPtr(CAMERA_3D);
+
+    sp8 = (Vec){ 0.0f, 0.0f, 0.0f };
+    sp8.x = camera->cameraAt.x + xOffset;
+    sp8.y = camera->cameraAt.y + yOffset;
+    sp8.z = camera->cameraAt.z;
+    cloudPos = sp8;
+    targetPos = cloudPos;
+
+    PSVECSubtract(&camera->cameraPos, &camera->cameraAt, &cameraDir);
+    PSVECNormalize(&cameraDir, &cameraDir);
+    PSVECScale(&cameraDir, &cameraDir, zoomDistance);
+    PSVECAdd(&targetPos, &cameraDir, &targetPos);
+
+    args[0] = (s16)(s32)targetPos.x;
+    args[1] = (s16)(s32)targetPos.y;
+    args[2] = (s16)(s32)targetPos.z;
+    args[3] = (s16)(s32)cloudPos.x;
+    args[4] = (s16)(s32)cloudPos.y;
+    args[5] = (s16)(s32)cloudPos.z;
+    args[6] = 1500;
+    args[7] = 3;
+
+    event.args = args;
+    evt_cam3d_evt_set(&event, TRUE);
+    return TRUE;
 }

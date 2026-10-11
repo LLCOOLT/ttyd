@@ -1,0 +1,1492 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "driver/animdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/camdrv.h"
+#include "driver/mapdrv.h"
+#include "driver/msgdrv.h"
+#include "driver/windowdrv.h"
+#include "driver/swdrv.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
+#include "manager/filemgr.h"
+#include "manager/fontmgr.h"
+#include "mario/mariost.h"
+#include "memory.h"
+#include "string.h"
+#include "stdio.h"
+#include "pmario_sound.h"
+#include "system.h"
+#include "sdk/texPalette.h"
+#include "data/mapdata.h"
+#include "dolphin/gx.h"
+#include "dolphin/mtx.h"
+
+#define ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
+typedef struct EndMoa { Vec pos; s32 chain; s32 idx; } EndMoa;
+typedef struct EndExtData { const char* anim; const char* pose; f32 speed; } EndExtData;
+typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 tevAlpha; s32 win1[3]; s32 win2[3]; s32 field_0x2c; s32 pos; EventEntry* evt; } EndWork;
+typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
+typedef struct CreditNpc { const char* agb; const char* anim; s32* evt; } CreditNpc;
+typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
+EndMoa* unk_end_bss00000000;
+EndExtData* unk_end_bss00000004;
+s32* unk_end_bss00000008;
+s32 (*unk_end_bss0000000c)[2];
+EndWork unk_end_bss00000010;
+extern EndWork* dat_ptr_end_00003218;
+extern CreditMsg unk_end_0000321c[50];
+extern CreditNpc R_credits_npc_info[152];
+extern const char* dat_ptr_end_00005034;
+extern const char* dat_ptr_end_00005038;
+extern const char* g_moamoa_chain_tbl[][2];
+extern const s32 dat_80419a28;
+ExtPose* extGetPosePtr(void);
+s32 extGetPoseNum(void);
+void extReset(void);
+void extLoadRenderMode(void);
+void extLoadVertex(void);
+void extLoadTexture(void);
+void extLoadTev(void);
+void extDraw(void);
+void extLoadTextureExit(void);
+int rand(void);
+double tan(double x);
+s32 EXIGetType(s32 chan, u32 dev, u32* type);
+void L_animPoseWorldPositionEvalOff(s32 poseId);
+void animPoseVivianMain(s32 poseId, Vec* pos);
+s32 msgWindow_Entry(const char* msg, s32 a, s32 b);
+void msgWindow_Continue(s32 id);
+void JUTFont_Free(void);
+void JUTFontSetup(s32 mode);
+typedef void (*voidfunctionptr)(void);
+extern voidfunctionptr _ctors[];
+extern voidfunctionptr _dtors[];
+
+USER_FUNC(evt_bg_set_color);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam_letter_box_disable);
+USER_FUNC(evt_ext_entry);
+USER_FUNC(evt_fade_end_wait);
+USER_FUNC(evt_fade_entry);
+USER_FUNC(evt_fade_set_mapchange_type);
+USER_FUNC(evt_key_get_buttontrg);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_npc_delete);
+USER_FUNC(evt_npc_entry);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_rotate);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_npc_set_scale);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_seq_set_seq);
+USER_FUNC(evt_snd_bgmoff_f);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_sub_intpl_msec_get_value);
+USER_FUNC(evt_sub_intpl_msec_init);
+USER_FUNC(unk_end_000000c4);
+USER_FUNC(unk_end_0000012c);
+USER_FUNC(unk_end_00000938);
+USER_FUNC(unk_end_000009cc);
+USER_FUNC(unk_end_00000a6c);
+USER_FUNC(unk_end_00000bc8);
+USER_FUNC(unk_end_000011f0);
+USER_FUNC(unk_end_0000122c);
+USER_FUNC(unk_end_00001268);
+USER_FUNC(unk_end_000012a4);
+USER_FUNC(unk_end_000012e0);
+USER_FUNC(unk_end_00001d90);
+USER_FUNC(unk_end_000022e8);
+void unk_end_0000035c(void);
+void unk_end_0000039c(CameraId cameraId, void* param);
+void unk_end_00000440(void);
+void unk_end_000006f8(void);
+f32 unk_end_000008bc(f32 min, f32 max);
+USER_FUNC(unk_end_000009a4);
+void unk_end_00000a14(void);
+void unk_end_00001324(CameraId cameraId, void* param);
+void unk_end_000023ac(CameraId cameraId, void* param);
+void unk_end_00002494(s32 wXluStage);
+void unk_end_00002508(MapTevCallbackInfo* info);
+void _unresolved(void);
+void _epilog(void);
+void _prolog(void);
+
+extern s32 evt_memcard_save[];
+
+s32 unk_evt_end_00004044[44];
+s32 unk_end_0000410c[123];
+s32 unk_evt_end_000042e0[187];
+s32 unk_evt_end_000045cc[49];
+s32 unk_evt_end_00004690[63];
+s32 unk_evt_end_0000478c[48];
+s32 unk_evt_end_0000484c[89];
+s32 unk_evt_end_000049b0[54];
+s32 unk_evt_end_00004a88[60];
+s32 unk_evt_end_00004b78[81];
+s32 unk_evt_end_00004cbc[50];
+s32 unk_evt_end_00004d84[83];
+s32 unk_evt_end_00004ed0[89];
+s32 unk_evt_end_0000503c[108];
+__declspec(section ".data") u64 fd_end_unknown_negone_one_374;
+__declspec(section ".data") s32 fd_end_unknown_neg_one_382[1];
+__declspec(section ".data") s32 fd_end_unknown___local_PI_383[1];
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_end_unknown_one_negone_373;
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_end_unknown_one_381[1];
+__declspec(section ".data") u64 fd_end_unknown_negone_one_360;
+__declspec(section ".data") s32 fd_end_unknown_neg_one_365[1];
+__declspec(section ".data") s32 fd_end_unknown___local_PI_366[1];
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_end_unknown_one_negone_359;
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_end_unknown_one_364[1];
+
+
+
+void _prolog(void) {
+    voidfunctionptr* ctor;
+
+    for (ctor = _ctors; *ctor != NULL; ctor++) {
+        (*ctor)();
+    }
+    relSetEvtAddr("end_00", unk_evt_end_00004690);
+}
+
+void _epilog(void) {
+    voidfunctionptr* dtor;
+
+    for (dtor = _dtors; *dtor != NULL; dtor++) {
+        (*dtor)();
+    }
+    unk_end_00000a14();
+}
+
+void _unresolved(void) {
+}
+
+void unk_end_00002508(MapTevCallbackInfo* info) {
+    GXSetTevColorIn(info->tevStage - 1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+}
+
+void unk_end_00002494(s32 wXluStage) {
+    animGetPtr()->currDispMode = wXluStage;
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_FALSE);
+    GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+}
+
+void unk_end_000023ac(CameraId cameraId, void* param) {
+    CreditActor* actor = param;
+
+    if (evtGetValue(NULL, GF(10)) == 0) {
+        mapSetTevCallback(1, unk_end_00002508);
+        animPoseSetMaterialFlagOn(actor->poseId, 0x1000000);
+        animPoseSetGXFunc(actor->poseId, unk_end_00002494, 0);
+        animPoseDrawMtx(actor->poseId, actor->mtx, 1, 0.0f, 2.0f);
+        animPoseDrawMtx(actor->poseId, actor->mtx, 2, 0.0f, 2.0f);
+        animPoseDrawMtx(actor->poseId, actor->mtx, 3, 0.0f, 2.0f);
+        animPoseSetMaterialFlagOff(actor->poseId, 0x1000000);
+    }
+}
+
+USER_FUNC(unk_end_000022e8) {
+    s32* args = event->args;
+    u32 id = evtGetValue(event, args[0]);
+
+    if (id >= ARRAY_SIZE(R_credits_npc_info)) {
+        evtSetValue(event, args[1], 0);
+        return 2;
+    }
+    if (R_credits_npc_info[id].evt != NULL) {
+        evtSetValue(event, args[1], 0);
+    } else if (strcmp(R_credits_npc_info[id].agb, "c_gazigazi") == 0) {
+        evtSetValue(event, args[1], 2);
+    } else {
+        evtSetValue(event, args[1], 1);
+    }
+    return 2;
+}
+
+__declspec(section ".data") EndWork* dat_ptr_end_00003218 = &unk_end_bss00000010;
+
+CreditMsg unk_end_0000321c[] = {
+    0, 0, 0, 0, 0, 0, "a00", 0,
+    0, 0, 0, 1, 0, "a01", 0, "b00",
+    0, 0, 0, 0, 2, 0, "a02", 0,
+    "b01", 0, 0, 0, 0, 3, 0, 0,
+    0, "b02", "b03", 0, 0, 0, 4, 0,
+    "a03", 0, "b04", 0, 0, 0, 0, 5,
+    0, "a04", 0, "b05", 0, 0, 0, 0,
+    6, 0, "a05", 0, "b06", 0, 0, 0,
+    0, 7, 0, "a06", 0, "b07", 0, 0,
+    0, 0, 8, 0, "a07", 0, "b08", 0,
+    0, 0, 0, 9, 0, "a08", 0, "b09",
+    0, 0, 0, 0, 10, 0, 0, 0,
+    "b10", "b11", 0, 0, 1, 11, 0, "a09",
+    0, "b12", 0, 0, 0, 1, 12, 0,
+    0, 0, "b13", 0, 0, 0, 1, 13,
+    0, 0, 0, "b14", 0, 0, 0, 1,
+    14, 0, 0, 0, "b15", "b16", 0, 0,
+    1, 15, 0, "a10", 0, "b17", 0, 0,
+    0, 1, 16, 0, "a11", 0, "b18", 0,
+    0, 0, 1, 17, 0, "a12", 0, "b19",
+    0, 0, 0, 1, 18, 0, "a13", 0,
+    "b20", 0, 0, 0, 1, 19, 0, 0,
+    0, "b21", 0, 0, 0, 2, 20, 0,
+    "a14", 0, "b22", 0, 0, 0, 2, 21,
+    0, 0, 0, "b23", 0, 0, 0, 2,
+    22, 0, 0, 0, "b24", 0, 0, 0,
+    2, 23, 0, 0, 0, "b25", 0, 0,
+    0, 2, 24, 0, "a15", 0, "b26", 0,
+    0, 0, 2, 25, 0, 0, 0, "b27",
+    0, 0, 0, 2, 26, 0, "a17", 0,
+    "b28", 0, 0, 0, 2, 27, 0, 0,
+    0, "b29", 0, 0, 0, 2, 28, 0,
+    "a18", 0, "b30", 0, 0, 0, 2, 29,
+    0, 0, 0, "b31", "b32", 0, 0, 3,
+    30, 0, "a19", 0, "b33", 0, 0, 0,
+    3, 31, 0, "a20", 0, "b34", "b35", "b36",
+    0, 3, 32, 0, "a21", 0, "b37", "b38",
+    0, 0, 3, 33, 0, 0, 0, "b39",
+    "b40", 0, 0, 3, 34, 0, 0, 0,
+    "b41", "b42", 0, 0, 3, 35, 0, 0,
+    0, "b43", "b44", 0, 0, 3, 36, 0,
+    0, 0, "b45", 0, 0, 0, 3, 37,
+    0, 0, 0, "b46", "b47", 0, 0, 3,
+    38, 0, "a22", 0, "b48", "b49", 0, 0,
+    3, 39, 0, 0, 0, "b50", "b51", 0,
+    0, 0, 40, 0, "a23", 0, "b52", "b53",
+    0, 0, 0, 41, 0, "a24", 0, "b54",
+    0, 0, 0, 0, 42, 0, "a25", 0,
+    "b55", 0, 0, 0, 0, 43, 0, "a26",
+    0, "b56", 0, 0, 0, 0, 44, 0,
+    "a27", 0, "b57", 0, 0, 0, 0, 45,
+    0, "a28", 0, "b58", "b59", 0, 0, 0,
+    46, 0, 0, 0, "b60", "b61", 0, 0,
+    0, 47, 0, "a29", 0, "b62", "b63", 0,
+    0, 0, 48, 0, "a30", 0, "b64", 0,
+    0, 0, 4, 49, "c00", 0, 0, "c01",
+    0, 0,
+};
+
+CreditNpc R_credits_npc_info[] = {
+    "c_luigi", "W_1", 0, "c_pkr", "PKR_W_1", 0, "c_kuri_h", "W_1",
+    0, "c_kino_ji", "W_1", 0, "c_cook", "W_1", 0, "c_deale",
+    "W_1", 0, "c_levela", "W_1", 0, "c_uranai", "W_1", 0,
+    "c_majinai", "W_1", 0, "c_botta", "W_1", 0, "c_mania", "MNA_W_1",
+    0, "c_joho_a", "W_1", 0, "c_gesso", "GSO_S2_1", unk_evt_end_0000478c, "c_joho_b",
+    "W_1", 0, "c_gshop_m", "W_2", 0, "c_gshop_m", "W_1", 0,
+    "c_pub_m", "W_1", 0, "c_roten", "W_1", 0, "c_tyusan", "CHU_W_1",
+    0, "c_borodo_n", "W_1", 0, "c_bom_deb", "W_1", 0, "c_kuribo_n",
+    "W_1", 0, "c_hannya", "W_1", 0, "c_hannya_n", "W_1", 0,
+    "c_pnk", "PNK_W_1", 0, "c_nokorin", "W_1", 0, "c_nokopapa", "NKP_W_1",
+    0, "c_nokoson", "NKS_W_1", 0, "c_nokonoko", "NOK_W_1", 0, "c_kinopio",
+    "KNP_W_1", 0, "c_kinopiko", "KNF_W_1", 0, "c_kokinopio", "CKP_W_1", 0,
+    "c_gonbaba", "GNB_S_3", unk_evt_end_0000484c, "c_flower", "W_1", 0, "c_kiza", "W_1",
+    0, "c_kuribo", "KUR_W_1", 0, "c_kuribo", "TGK_W_1", 0, "c_kuribo",
+    "PTK_W_1", 0, "c_nokoteki", "NKT_W_1", 0, "c_nokoteki", "PTP_W_1", 0,
+    "c_sinnosuke", "SIS_W_1", 0, "c_togedaruma", "TGD_S_1", 0, "c_chorobon", "CBN_W_1",
+    0, "c_karon_h", "KRN_W_1", 0, "c_windy", "PWD_W_1", 0, "c_pguide",
+    "W_1", 0, "c_psister", "W_1", 0, "c_psoncho", "W_1", 0,
+    "c_pshop", "W_1", 0, "c_puni", "W_1", 0, "c_puni", "W_1",
+    0, "c_puni", "W_1", 0, "c_puni", "W_1", 0, "c_puni",
+    "W_1", 0, "c_mb_robo_1a", "W_1", unk_evt_end_00004d84, "c_puni", "W_1", 0,
+    "c_prival", "W_1", 0, "c_toge", "W_1", 0, "c_tchibi", "W_1",
+    0, "c_sinemon", "SIN_W_1", 0, "c_paid", "PAI_W_1", 0, "c_m_boss",
+    "W_1", 0, "c_m_buka", "W_1", 0, "c_m_waka", "W_1", 0,
+    "c_m_ojo", "W_1", 0, "c_binbo", "W_1", 0, "c_monban", "W_1",
+    0, "c_bteresa", "BTS_W_1", 0, "c_babyyoshi", "PYS_W_1", 0, "c_ksikowa",
+    "W_1", 0, "c_k_chof", "W_1", 0, "c_gans", "W_1", 0,
+    "c_bred_h", "W_1", 0, "c_report", "W_1", 0, "c_hotdog", "W_1",
+    0, "c_shasho_g", "W_1", 0, "c_jugem_n", "W_1", 0, "c_togezo",
+    "TGZ_W_1", 0, "c_heavy", "W_1", 0, "c_kamek", "KMK_W_1", 0,
+    "c_togenoko_b", "W_1", 0, "c_burosu_h", "BRO_W_1", 0, "c_koopa", "KPA_W_1",
+    0, "c_atmic_trs", "W_1", unk_evt_end_00004a88, "c_kamek_be", "W_1", 0, "c_f_son",
+    "W_1", 0, "c_bubusan", "W_1", 0, "c_f_mura", "W_1", 0,
+    "c_f_mama", "W_1", 0, "c_f_child_a", "W_1", 0, "c_f_oji", "W_1",
+    0, "c_f_oba", "W_1", 0, "c_f_karas", "A_1", 0, "c_teresa",
+    "W_1", 0, "c_ranpel", "W_1", 0, "c_f_owm", "A_1", 0,
+    "c_met", "MET_W_1", 0, "c_met", "TMT_W_1", 0, "c_pansy", "PAN_W_1",
+    0, "c_majyorin", "MJR_W_1", 0, "c_maririn", "MRR_W_1", 0, "c_vivian",
+    "PTR_W_1", 0, "c_korutesu1", "KRT_S_1", unk_evt_end_00004b78, "c_dance_r", "W_1", 0,
+    "c_dance_p", "W_1", 0, "c_dance_k", "W_1", 0, "c_bomt_n", "W_1",
+    0, "c_marco", "W_1", 0, "c_gara", "W_1", 0, "c_megane",
+    "W_1", 0, "c_odo_k", "W_1", 0, "c_suifu_k", "W_1", 0,
+    "c_suifu_b", "W_1", 0, "c_elmos", "W_1", 0, "c_kilr", "KIL_W_1",
+    0, "c_pakflwr", "PKF_S_1", 0, "c_tyutyu", "PCH_W_1", 0, "c_powan",
+    "W_1", 0, "c_g_moamoa", "S_3", unk_evt_end_0000503c, "c_papab", "W_1", 0,
+    "c_mamab", "W_1", 0, "c_konari", "W_1", 0, "c_unten", "W_1",
+    0, "c_shasho_r", "W_1", 0, "c_smoko", "W_1", 0, "c_rose",
+    "W_1", 0, "c_kinodebu", "W_1", 0, "c_ghost_k", "W_1", 0,
+    "c_bom_sen", "S_2", unk_evt_end_00004cbc, "c_waitress", "W_1", 0, "c_puku_c", "W_1",
+    0, "c_kinopiko", "KNF_W_1", 0, "c_n_moa_a", "W_1", 0, "c_met",
+    "PMT_W_1", 0, "c_sanbo", "SNB_W_1", 0, "c_bomson", "W_1", 0,
+    "c_mb_robo_2a", "J_2", unk_evt_end_000049b0, "c_bwhite", "W_1", 0, "c_hito_b", "W_1",
+    0, "c_bom_n", "W_1", 0, "c_kmoon", "W_1", 0, "c_baria",
+    "W_1", 0, "c_basabasa", "BSA_W_1", 0, "c_wanwan", "WAN_A_1", 0,
+    "c_maho", "MAH_W_1", 0, "c_zako_n", "W_1", 0, "c_zako_m", "W_1",
+    0, "c_shuryo", "W_1", 0, "c_q_kage_m", "KRT_Z_1", unk_evt_end_00004ed0, "c_gazigazi",
+    "GAZ_A_1", 0, "a_mario", "M_W_1", 0, "c_peach", "P_W_1", 0,
+};
+
+USER_FUNC(unk_end_00001d90) {
+    s32 id = evtGetValue(event, event->args[0]);
+    BOOL inBattle;
+    CreditActor* actor;
+    f32 x;
+    f32 y;
+    f32 r;
+    Mtx m3;
+    Mtx m2;
+    Mtx m1;
+    Vec v;
+    u32 type;
+
+    inBattle = gp->inBattle != 0;
+    if (R_credits_npc_info[id].evt != NULL) {
+        evtEntry(R_credits_npc_info[id].evt, 0, 0);
+        if (id + 5 < ARRAY_SIZE(R_credits_npc_info)) {
+            animGroupBaseAsync(R_credits_npc_info[id + 5].agb, inBattle, NULL);
+        }
+        return 2;
+    }
+    if (isFirstCall) {
+        actor = _mapAlloc(sizeof(CreditActor));
+        memset(actor, 0, sizeof(CreditActor));
+        actor->state = 0;
+        actor->pos = dat_ptr_end_00003218->pos;
+        switch (actor->pos) {
+            case 0:
+                actor->angle = -20.0f;
+                actor->limit = 90.0f + actor->angle + 30.0f;
+                break;
+            case 1:
+            case 4:
+                actor->angle = 160.0f;
+                actor->limit = 90.0f + actor->angle + 30.0f;
+                break;
+            case 2:
+                actor->angle = 250.0f;
+                actor->limit = 90.0f + actor->angle + 30.0f;
+                break;
+            default:
+                actor->angle = 70.0f;
+                actor->limit = 90.0f + actor->angle + 30.0f;
+                break;
+        }
+        if (id + 5 < ARRAY_SIZE(R_credits_npc_info)) {
+            animGroupBaseAsync(R_credits_npc_info[id + 5].agb, inBattle, NULL);
+        }
+        event->userdatap[0] = actor;
+    }
+    actor = event->userdatap[0];
+    switch (actor->pos) {
+        case 0:
+            x = 304.0f;
+            y = -240.0f;
+            r = 100.0f;
+            break;
+        case 1:
+        case 4:
+            x = -304.0f;
+            y = 240.0f;
+            r = 100.0f;
+            break;
+        case 2:
+            x = -304.0f;
+            y = -240.0f;
+            r = 100.0f;
+            break;
+        default:
+            x = 304.0f;
+            y = 240.0f;
+            r = 100.0f;
+            break;
+    }
+    if (!animGroupBaseAsync(R_credits_npc_info[id].agb, inBattle, NULL)) {
+        return 0;
+    }
+    switch (actor->state) {
+        case 0:
+            EXIGetType(0, 2, &type);
+            if (type != 0x05070000) {
+                actor->poseId = animPoseEntry(R_credits_npc_info[id].agb, inBattle);
+                animPoseSetAnim(actor->poseId, R_credits_npc_info[id].anim, 1);
+            } else {
+                actor->poseId = animPoseEntry("a_mario", inBattle);
+                animPoseSetAnim(actor->poseId, "M_W_1", 1);
+            }
+            actor->state++;
+            break;
+        case 1:
+            actor->angle += 0.15f;
+            if (actor->angle > actor->limit) {
+                animPoseRelease(actor->poseId);
+                _mapFree(actor);
+                return 2;
+            }
+            break;
+    }
+    PSMTXTrans(m1, 0.0f, r, 0.0f);
+    PSMTXRotRad(m2, 'z', 0.017453292f * actor->angle);
+    PSMTXConcat(m2, m1, m1);
+    PSMTXTrans(m2, x * 0.5f, y * 0.5f, 0.0f);
+    PSMTXConcat(m2, m1, actor->mtx);
+    PSMTXScale(m3, 1.0f, 1.0f, 0.01f);
+    PSMTXConcat(actor->mtx, m3, actor->mtx);
+    if (animPoseGetVivianType(actor->poseId)) {
+        v = (Vec){0.0f, 0.0f, 0.0f};
+        v.x = actor->mtx[0][3];
+        v.y = actor->mtx[1][3];
+        v.z = actor->mtx[2][3];
+        animPoseVivianMain(actor->poseId, &v);
+    }
+    if (strcmp((const char*)animPoseGetCurrentAnim(actor->poseId), "GAZ_A_1") == 0 && animPoseGetLoopTimes(actor->poseId) > 0.9f) {
+        animPoseSetAnim(actor->poseId, "GAZ_A_1", 1);
+    }
+    animPoseMain(actor->poseId);
+    dispEntry(CAMERA_3D, 0.0f, 1, unk_end_000023ac, actor);
+    return 0;
+}
+
+EVT_BEGIN(unk_evt_end_00004044)
+    SET_VALUE(LW(0), 0)
+    LOOP(0)
+        CALL(unk_end_000022e8, LW(0), LW(1))
+        BEGIN_INLINE_EVENT
+            CALL(unk_end_00001d90, LW(0))
+        END_INLINE_EVENT
+        IF_INT_EQUAL(LW(1), 1)
+            WAIT_MS(1920)
+        END_IF
+        IF_INT_EQUAL(LW(1), 2)
+            WAIT_MS(6000)
+        END_IF
+        ADD(LW(0), 1)
+        IF_INT_GREATER_OR_EQUAL(LW(0), 152)
+            DEBUG_PUT_MSG(STRING("あにめおわり"))
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(GF(10), 1)
+            RETURN
+        END_IF
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_end_0000410c)
+    LOOP(0)
+        CALL(unk_end_0000122c, 1)
+        CALL(unk_end_000011f0, 0)
+        WAIT_MS(18000)
+        CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000011f0, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+        CALL(unk_end_000011f0, 255)
+        WAIT_MS(4000)
+        CALL(unk_end_0000122c, 2)
+        CALL(unk_end_000011f0, 0)
+        WAIT_MS(4000)
+        CALL(evt_sub_intpl_msec_init, 11, 0, 255, 4000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000011f0, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+        CALL(unk_end_000011f0, 255)
+        WAIT_MS(18000)
+        CALL(evt_sub_intpl_msec_init, 11, 255, 0, 4000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000011f0, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+        CALL(unk_end_000011f0, 0)
+        WAIT_MS(4000)
+        CALL(unk_end_0000122c, 1)
+        CALL(evt_sub_intpl_msec_init, 11, 255, 0, 4000)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000011f0, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_000042e0)
+    LOOP(0)
+        IF_INT_EQUAL(GF(10), 1)
+            RETURN
+        END_IF
+        LOOP(0)
+            IF_INT_EQUAL(GW(10), 1)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        BEGIN_INLINE_EVENT_GET_ID(LW(9))
+            CALL(unk_end_000012e0)
+        END_INLINE_EVENT
+        CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000012a4, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+        LOOP(0)
+            IF_INT_EQUAL(GW(10), 2)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        IF_INT_EQUAL(GW(11), 49)
+            WAIT_MS(500)
+            CALL(evt_sub_intpl_msec_init, 11, 0, 255, 500)
+            LOOP(0)
+                CALL(evt_sub_intpl_msec_get_value)
+                CALL(unk_end_00001268, LW(0))
+                WAIT_FRAMES(1)
+                IF_INT_EQUAL(LW(1), 0)
+                    BREAK_LOOP
+                END_IF
+            END_LOOP
+            WAIT_MS(3000)
+            SET_VALUE(GF(0), 0)
+            BEGIN_INLINE_EVENT
+                CALL(evt_snd_bgmoff_f, 512, 5000)
+                WAIT_MS(5000)
+                IF_INT_EQUAL(GF(0), 0)
+                    CALL(evt_snd_bgmon, 513, STRING("BGM_EVT_PEACH1"))
+                END_IF
+            END_INLINE_EVENT
+            WAIT_MS(500)
+            SPAWN_EVENT_GET_ID(PTR(unk_end_0000410c), LW(10))
+            LOOP(0)
+                CALL(evt_key_get_buttontrg, 0, LW(0))
+                IF_BITS_SET(LW(0), 4352)
+                    BREAK_LOOP
+                END_IF
+                WAIT_FRAMES(1)
+            END_LOOP
+            SET_VALUE(GF(0), 1)
+            DELETE_EVENT(LW(10))
+            CALL(evt_fade_entry, 10, 500, 0, 0, 0)
+            CALL(evt_fade_end_wait)
+            CALL(unk_end_0000122c, 0)
+            CALL(unk_end_000012a4, LW(0))
+            CALL(unk_end_00001268, LW(0))
+            CALL(evt_fade_entry, 9, 0, 0, 0, 0)
+            CALL(evt_fade_end_wait)
+            SET_VALUE(GW(10), 0)
+            SPAWN_EVENT(PTR(unk_evt_end_000045cc))
+            RETURN
+        END_IF
+        CALL(evt_sub_intpl_msec_init, 11, 255, 0, 500)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(unk_end_000012a4, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+        DELETE_EVENT(LW(9))
+        SET_VALUE(GW(10), 0)
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_000045cc)
+    CALL(evt_fade_entry, 12, 2000, 0, 0, 0)
+    CALL(evt_fade_end_wait)
+    WAIT_MS(1500)
+    SET_VALUE(GF(10), 1)
+    CALL(unk_end_000009cc)
+    SET_VALUE(GSW(0), 404)
+    SET_VALUE(LF(10), 0)
+    SET_VALUE(LW(0), 21)
+    CALL_CHILD(PTR(evt_memcard_save))
+    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_snd_bgmoff_f, 513, 2000)
+    CALL(evt_fade_set_mapchange_type, 1, 17, 2000, -1, -1)
+    CALL(evt_seq_set_seq, 3, STRING("title"), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004690)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_cam3d_evt_set, 0, 0, 545, 0, 0, 0, 0, 11)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("pPlane1"), 1)
+    CALL(evt_bg_set_color, 0, 0, 0, 255)
+    SET_VALUE(GF(10), 0)
+    CALL(unk_end_00000a6c)
+    SPAWN_EVENT(PTR(unk_evt_end_00004044))
+    BEGIN_INLINE_EVENT
+        CALL(unk_end_00000bc8)
+    END_INLINE_EVENT
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STAFF_ROLL1"))
+    SET_VALUE(GSW(0), 404)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_0000478c)
+    CALL(evt_npc_entry, STRING("gesso"), STRING("c_gesso"))
+    CALL(evt_npc_set_anim, STRING("gesso"), STRING("GSO_S2_1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("gesso"), 64)
+    CALL(unk_end_00000938, STRING("gesso"))
+    CALL(evt_sub_intpl_msec_init, 11, -4000, 4000, 5000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("gesso"), 130, LW(0), 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("gesso"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_0000484c)
+    CALL(evt_npc_entry, STRING("gonbaba"), STRING("c_gonbaba"))
+    CALL(evt_npc_set_anim, STRING("gonbaba"), STRING("GNB_S_3"))
+    CALL(evt_npc_flag_onoff, 1, STRING("gonbaba"), 64)
+    CALL(unk_end_00000938, STRING("gonbaba"))
+    CALL(evt_npc_set_scale, STRING("gonbaba"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
+    CALL(evt_npc_set_rotate, STRING("gonbaba"), 0, 180, 0)
+    CALL(evt_sub_intpl_msec_init, 11, -10000, -1300, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("gonbaba"), LW(0), -20, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, -1300, -10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("gonbaba"), LW(0), -20, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("gonbaba"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_000049b0)
+    CALL(evt_npc_entry, STRING("batten2"), STRING("c_mb_robo_2a"))
+    CALL(evt_npc_set_anim, STRING("batten2"), STRING("J_2"))
+    CALL(evt_npc_flag_onoff, 1, STRING("batten2"), 64)
+    CALL(unk_end_00000938, STRING("batten2"))
+    CALL(evt_npc_set_rotate, STRING("batten2"), 180, 0, 0)
+    CALL(evt_sub_intpl_msec_init, 11, 4000, -4000, 4000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("batten2"), 100, LW(0), 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("batten2"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004a88)
+    CALL(evt_npc_entry, STRING("atomic"), STRING("c_atmic_trs"))
+    CALL(evt_npc_set_anim, STRING("atomic"), STRING("W_1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("atomic"), 32832)
+    CALL(unk_end_00000938, STRING("atomic"))
+    CALL(evt_npc_set_rotate, STRING("atomic"), 0, 180, 0)
+    CALL(evt_npc_set_scale, STRING("atomic"), FLOAT(0.7998047f), FLOAT(0.7998047f), FLOAT(0.7998047f))
+    CALL(evt_sub_intpl_msec_init, 11, -5000, 5000, 6000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("atomic"), LW(0), 20, 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("atomic"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004b78)
+    CALL(evt_npc_entry, STRING("korutesu"), STRING("c_korutesu1"))
+    CALL(evt_npc_set_anim, STRING("korutesu"), STRING("KRT_S_1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("korutesu"), 32832)
+    CALL(evt_npc_set_ry, STRING("korutesu"), 90)
+    CALL(unk_end_00000938, STRING("korutesu"))
+    CALL(evt_sub_intpl_msec_init, 11, -10000, -2000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("korutesu"), LW(0), -150, 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, -2000, -10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("korutesu"), LW(0), -150, 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("korutesu"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004cbc)
+    WAIT_MS(1000)
+    CALL(evt_npc_entry, STRING("para"), STRING("c_bom_sen"))
+    CALL(evt_npc_set_anim, STRING("para"), STRING("S_2"))
+    CALL(evt_npc_flag_onoff, 1, STRING("para"), 32832)
+    CALL(unk_end_00000938, STRING("para"))
+    CALL(evt_sub_intpl_msec_init, 11, 3000, -3000, 6000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("para"), 50, LW(0), 0)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("para"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004d84)
+    CALL(evt_npc_entry, STRING("batten"), STRING("c_mb_robo_1a"))
+    CALL(evt_npc_set_anim, STRING("batten"), STRING("W_1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("batten"), 64)
+    CALL(unk_end_00000938, STRING("batten"))
+    CALL(evt_npc_set_scale, STRING("batten"), FLOAT(0.5996094f), FLOAT(0.5996094f), FLOAT(0.5996094f))
+    CALL(evt_sub_intpl_msec_init, 11, 10000, 500, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("batten"), LW(0), -70, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, 500, 10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("batten"), LW(0), -70, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("batten"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_end_00004ed0)
+    WAIT_MS(7000)
+    CALL(evt_npc_entry, STRING("queen"), STRING("c_q_kage_m"))
+    CALL(evt_npc_set_anim, STRING("queen"), STRING("KRT_Z_1"))
+    CALL(evt_npc_flag_onoff, 1, STRING("queen"), 64)
+    CALL(unk_end_00000938, STRING("queen"))
+    CALL(evt_npc_set_scale, STRING("queen"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
+    CALL(evt_npc_set_ry, STRING("queen"), 90)
+    CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("queen"), LW(0), -20, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, -1000, -10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("queen"), LW(0), -20, 200)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_npc_delete, STRING("queen"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") const char* dat_ptr_end_00005034 = "c_n_moa_a";
+
+__declspec(section ".data") const char* dat_ptr_end_00005038 = "S_1";
+
+EVT_BEGIN(unk_evt_end_0000503c)
+    CALL(evt_npc_entry, STRING("モアモアダミー"), STRING("c_n_moa_a"))
+    CALL(evt_npc_set_position, STRING("モアモアダミー"), 0, -1000, 0)
+    CALL(unk_end_00000938, STRING("モアモアダミー"))
+    CALL(evt_npc_entry, STRING("モアモア"), STRING("c_g_moamoa"))
+    CALL(evt_npc_set_anim, STRING("モアモア"), STRING("S_3"))
+    CALL(evt_npc_set_position, STRING("モアモア"), 0, -1000, 0)
+    CALL(evt_npc_set_scale, STRING("モアモア"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
+    CALL(unk_end_0000012c)
+    CALL(evt_ext_entry, 300, LW(10), PTR(unk_end_000006f8), PTR(unk_end_00000440), PTR(unk_end_0000035c))
+    CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, -1000, -10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(unk_end_000000c4)
+    CALL(evt_npc_delete, STRING("モアモアダミー"))
+    CALL(evt_npc_delete, STRING("モアモア"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") u64 fd_end_unknown_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_end_unknown_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_end_unknown_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_end_unknown_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_end_unknown_one_364[] = {
+    1065353216,
+};
+
+void unk_end_00001324(CameraId cameraId, void* param) {
+    CameraEntry* cam = camGetPtr(cameraId);
+    s32 id = evtGetValue(NULL, GW(11));
+    s32 pos = evtGetValue(NULL, GW(12));
+    s32 i;
+    f32 w;
+    f32 h;
+    Vec target;
+    Vec up;
+    Vec camPos;
+    GXTexObj obj;
+    Mtx lookAt;
+    Mtx scale;
+    Mtx mtx;
+
+    if (dat_ptr_end_00003218->tpl == NULL) {
+        return;
+    }
+    if (id >= ((TEXPalette*)*dat_ptr_end_00003218->tpl->data)->numDescriptors) {
+        return;
+    }
+    if (id == 9 && swGet(0x5E7)) {
+        id = 53;
+    }
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
+    switch (dat_ptr_end_00003218->mode) {
+        case 0:
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, id);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            break;
+        case 1:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 49);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
+            GXLoadTexObj(&obj, GX_TEXMAP1);
+            break;
+        case 2:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 51);
+            GXLoadTexObj(&obj, GX_TEXMAP1);
+            break;
+    }
+    switch (dat_ptr_end_00003218->mode) {
+        case 0:
+            GXSetNumTevStages(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            break;
+        default:
+            GXSetNumTevStages(2);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+            GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_A0, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            break;
+    }
+    switch (pos) {
+        case 0:
+            PSMTXTrans(mtx, 51.0f, 30.0f, -30.0f);
+            break;
+        case 1:
+            PSMTXTrans(mtx, -51.0f, -30.0f, -30.0f);
+            break;
+        case 2:
+            PSMTXTrans(mtx, -51.0f, 30.0f, -30.0f);
+            break;
+        case 3:
+            PSMTXTrans(mtx, 51.0f, -30.0f, -30.0f);
+            break;
+        case 4:
+            PSMTXTrans(mtx, 0.0f, 30.0f, -30.0f);
+            break;
+    }
+    PSMTXScale(scale, 0.6f, 0.6f, 1.0f);
+    PSMTXConcat(mtx, scale, mtx);
+    PSMTXConcat(cam->view, mtx, mtx);
+    GXLoadPosMtxImm(mtx, GX_PNMTX0);
+    GXSetCurrentMtx(GX_PNMTX0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    for (i = 0; i < 2; i++) {
+        if (i == 0) {
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+        } else {
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, dat_ptr_end_00003218->alpha});
+            GXSetZMode(GX_TRUE, GX_GREATER, GX_FALSE);
+        }
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        w = GXGetTexObjWidth(&obj);
+        h = GXGetTexObjHeight(&obj);
+        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+        GXTexCoord2f32(0.0f, 0.0f);
+        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+        GXTexCoord2f32(1.0f, 0.0f);
+        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+        GXTexCoord2f32(1.0f, 1.0f);
+        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+        GXTexCoord2f32(0.0f, 1.0f);
+        GXEnd();
+    }
+    if (dat_ptr_end_00003218->alpha2 > 0) {
+        camPos = (Vec){0.0f, 0.0f, 240.0f / (f32)tan(0.21816615760326385)};
+        up = (Vec){0.0f, 1.0f, 0.0f};
+        target = (Vec){0.0f, 0.0f, 0.0f};
+        GXSetNumTevStages(1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+        GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 52);
+        GXLoadTexObj(&obj, GX_TEXMAP0);
+        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha2});
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+        C_MTXLookAt(lookAt, &camPos, &up, &target);
+        PSMTXTrans(mtx, 0.0f, -138.0f, 0.0f);
+        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
+        PSMTXConcat(lookAt, mtx, mtx);
+        PSMTXConcat(mtx, scale, mtx);
+        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        w = GXGetTexObjWidth(&obj);
+        h = GXGetTexObjHeight(&obj);
+        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+        GXTexCoord2f32(0.0f, 0.0f);
+        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+        GXTexCoord2f32(1.0f, 0.0f);
+        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+        GXTexCoord2f32(1.0f, 1.0f);
+        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+        GXTexCoord2f32(0.0f, 1.0f);
+        GXEnd();
+    }
+}
+
+USER_FUNC(unk_end_000012e0) {
+    dispEntry(CAMERA_3D, 0.0f, 7, unk_end_00001324, NULL);
+    return 0;
+}
+
+USER_FUNC(unk_end_000012a4) {
+    dat_ptr_end_00003218->alpha = evtGetValue(event, event->args[0]);
+    return 2;
+}
+
+USER_FUNC(unk_end_00001268) {
+    dat_ptr_end_00003218->alpha2 = evtGetValue(event, event->args[0]);
+    return 2;
+}
+
+USER_FUNC(unk_end_0000122c) {
+    dat_ptr_end_00003218->mode = evtGetValue(event, event->args[0]);
+    return 2;
+}
+
+USER_FUNC(unk_end_000011f0) {
+    dat_ptr_end_00003218->tevAlpha = evtGetValue(event, event->args[0]);
+    return 2;
+}
+
+USER_FUNC(unk_end_00000bc8) {
+    s32 state = event->userdata[0];
+    s32 idx = event->userdata[1];
+    s32 i;
+    s32 x;
+    s32 y;
+    s32 wx;
+    s32 wy;
+    s32 n;
+    const char* msg;
+    char buf1[0x400];
+    char buf2[0x400];
+
+    if (isFirstCall) {
+        state = 0;
+        idx = 0;
+        for (i = 0; i < 3; i++) {
+            dat_ptr_end_00003218->win1[i] = -1;
+        }
+        for (i = 0; i < 3; i++) {
+            dat_ptr_end_00003218->win2[i] = -1;
+        }
+        evtSetValue(event, GW(10), 0);
+        dat_ptr_end_00003218->evt = evtEntry(unk_evt_end_000042e0, 0, 0);
+    }
+    dat_ptr_end_00003218->pos = unk_end_0000321c[idx].pos;
+    switch (dat_ptr_end_00003218->pos) {
+        case 0:
+            x = -274;
+            y = -24;
+            break;
+        case 1:
+            x = 274;
+            y = 250;
+            break;
+        case 2:
+            x = 274;
+            y = -24;
+            break;
+        case 3:
+            x = -274;
+            y = 250;
+            break;
+        case 4:
+            x = 0;
+            y = -60;
+            break;
+    }
+    switch (state) {
+        case 0:
+            for (i = 0; i < 3; i++) {
+                if (unk_end_0000321c[idx].msg1[i] != NULL) {
+                    msg = msgSearch(unk_end_0000321c[idx].msg1[i]);
+                    wx = x;
+                    wy = y - i * 22 - 4;
+                    if (x == 0) {
+                        wx = x - 0.5f * (0.8f * FontGetMessageWidth(msg));
+                    } else if (x > 0) {
+                        wx = x - 0.8f * FontGetMessageWidth(msg);
+                    }
+                    sprintf(buf1, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0><scale 0.8>%s</scale></speed></col><wait 500></dkey><once_stop>", wx - 62, wy, msg);
+                    dat_ptr_end_00003218->win1[i] = msgWindow_Entry(buf1, 0, 0);
+                }
+            }
+            for (i = 0; i < 3; i++) {
+                if (unk_end_0000321c[idx].msg2[i] != NULL) {
+                    msg = msgSearch(unk_end_0000321c[idx].msg2[i]);
+                    wx = x;
+                    wy = y - i * 24 - 50;
+                    if (x == 0) {
+                        wx = x - FontGetMessageWidth(msg) * 0.5f;
+                    } else if (x > 0) {
+                        wx = x - FontGetMessageWidth(msg);
+                    }
+                    sprintf(buf2, "<clear><dkey><wpos %d %d 400 200><col f0f0f0ff><speed 0>%s</speed></col><wait 5200></dkey><once_stop>", wx - 62, wy, msg);
+                    dat_ptr_end_00003218->win2[i] = msgWindow_Entry(buf2, 0, 0);
+                } else {
+                    dat_ptr_end_00003218->win2[i] = -1;
+                }
+            }
+            evtSetValue(event, GW(10), 1);
+            evtSetValue(event, GW(11), unk_end_0000321c[idx].type);
+            evtSetValue(event, GW(12), unk_end_0000321c[idx].pos);
+            state++;
+            break;
+        case 1:
+            for (i = 0; i < 3; i++) {
+                if (dat_ptr_end_00003218->win1[i] != -1 && windowCheckID(dat_ptr_end_00003218->win1[i])) {
+                    break;
+                }
+            }
+            if (i < 3) {
+                break;
+            }
+            for (i = 0; i < 3; i++) {
+                if (dat_ptr_end_00003218->win2[i] != -1 && windowCheckID(dat_ptr_end_00003218->win2[i])) {
+                    break;
+                }
+            }
+            if (i < 3) {
+                break;
+            }
+            state++;
+            break;
+        case 2:
+            n = idx + 1;
+            if (n < ARRAY_SIZE(unk_end_0000321c)) {
+                for (i = 0; i < 3; i++) {
+                    if (unk_end_0000321c[n].msg1[i] != NULL) {
+                        break;
+                    }
+                }
+            } else {
+                i = 0;
+            }
+            if (i < 3) {
+                for (i = 0; i < 3; i++) {
+                    if (dat_ptr_end_00003218->win1[i] != -1) {
+                        msgWindow_Continue(dat_ptr_end_00003218->win1[i]);
+                    }
+                }
+            }
+            for (i = 0; i < 3; i++) {
+                if (dat_ptr_end_00003218->win2[i] != -1) {
+                    msgWindow_Continue(dat_ptr_end_00003218->win2[i]);
+                }
+            }
+            evtSetValue(event, GW(10), 2);
+            if (n < ARRAY_SIZE(unk_end_0000321c)) {
+                state++;
+            } else {
+                state += 2;
+            }
+            break;
+        case 3:
+            if (evtGetValue(event, GW(10)) == 0) {
+                state = 0;
+                idx++;
+            }
+            break;
+        case 4:
+            return 2;
+    }
+    event->userdata[0] = state;
+    event->userdata[1] = idx;
+    return 0;
+}
+
+USER_FUNC(unk_end_00000a6c) {
+    BOOL inBattle = gp->inBattle != 0;
+    s32 i;
+
+    if (isFirstCall) {
+        dat_ptr_end_00003218->tpl = NULL;
+        dat_ptr_end_00003218->alpha = 0;
+        dat_ptr_end_00003218->mode = 0;
+        dat_ptr_end_00003218->pos = 0;
+        psndSetFlag(4);
+        gp->language = 1;
+        JUTFont_Free();
+        JUTFontSetup(1);
+    }
+    if ((u32)fileAsyncf(4, NULL, "%s/ending.tpl", getMarioStDvdRoot()) == 0) {
+        return 0;
+    }
+    if (dat_ptr_end_00003218->tpl == NULL) {
+        dat_ptr_end_00003218->tpl = fileAllocf(4, "%s/ending.tpl", getMarioStDvdRoot());
+    }
+    for (i = 0; i < 5; i++) {
+        if (!animGroupBaseAsync(R_credits_npc_info[i].agb, inBattle, NULL)) {
+            return 0;
+        }
+    }
+    for (i = 0; i < 5; i++) {
+    }
+    return 2;
+}
+
+#pragma dont_inline on
+void unk_end_00000a14(void) {
+    fileFree(dat_ptr_end_00003218->tpl);
+    psndClearFlag(4);
+    gp->language = 0;
+    JUTFont_Free();
+    JUTFontSetup(0);
+}
+#pragma dont_inline reset
+
+USER_FUNC(unk_end_000009cc) {
+    gp->language = 0;
+    JUTFont_Free();
+    JUTFontSetup(0);
+    psndClearFlag(4);
+    return 2;
+}
+
+USER_FUNC(unk_end_000009a4) {
+    psndSetFlag(0x1000);
+    return 2;
+}
+
+USER_FUNC(unk_end_00000938) {
+    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    mapSetTevCallback(1, unk_end_00002508);
+    animPoseSetMaterialFlagOn(npc->poseId, 0x1000000);
+    animPoseSetGXFunc(npc->poseId, unk_end_00002494, 0);
+    return 2;
+}
+
+f32 unk_end_000008bc(f32 min, f32 max) {
+    f32 r = rand() / 32767.0f;
+
+    return r * (max - min) + min;
+}
+
+void unk_end_000006f8(void) {
+    ExtPose* pose = extGetPosePtr();
+    EndMoa* elem = unk_end_bss00000000;
+    s32 i;
+    Vec v;
+
+    for (i = 0; i < extGetPoseNum(); i++, pose++, elem++) {
+        pose->flags |= 5;
+        PSMTXIdentity(pose->mtx);
+        v = (Vec){0.0f, 0.0f, 0.0f};
+        v.x = unk_end_000008bc(-10.0f, 10.0f);
+        v.y = unk_end_000008bc(-10.0f, 10.0f);
+        v.z = unk_end_000008bc(-10.0f, 10.0f);
+        elem->pos = v;
+        elem->chain = i % dat_80419a28;
+        elem->idx = unk_end_bss00000008[elem->chain]++;
+    }
+}
+
+void unk_end_00000440(void) {
+    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+    Vec* wpos = *animPoseGetAnimPosePtr(npc->poseId)->worldPositions;
+    s32 i;
+    ExtPose* pose;
+    EndMoa* elem;
+    AnimationPose* ap;
+    Vec* p;
+    s32 n;
+    Vec* a;
+    Vec* b;
+    f32 t;
+    f32 s;
+    Mtx m1;
+    Mtx m3;
+    Mtx m2;
+    Vec v;
+    Vec w;
+
+    if (wpos == NULL) {
+        return;
+    }
+    pose = extGetPosePtr();
+    elem = unk_end_bss00000000;
+    for (i = 0; i < extGetPoseNum(); i++, elem++, pose++) {
+        a = &wpos[unk_end_bss0000000c[elem->chain][0]];
+        b = &wpos[unk_end_bss0000000c[elem->chain][1]];
+        t = (f32)elem->idx / (f32)unk_end_bss00000008[elem->chain];
+        s = 1.0f - t;
+        if (a->y == -1000.0f || b->y == -1000.0f) {
+            v = (Vec){0.0f, -1000.0f, 0.0f};
+            pose->flags &= ~1;
+        } else {
+            PSVECScale(a, &v, t);
+            PSVECScale(b, &w, s);
+            PSVECAdd(&v, &w, &v);
+            pose->flags |= 1;
+        }
+        PSMTXTrans(m1, v.x, v.y, v.z);
+        PSMTXScale(m2, npc->scale.x, npc->scale.y, npc->scale.z);
+        PSMTXConcat(m1, m2, m1);
+        PSMTXTrans(m3, elem->pos.x, elem->pos.y, elem->pos.z);
+        PSMTXConcat(m1, m3, pose->mtx);
+        pose->frame = (gp->retraceCount + i) % 40;
+    }
+    ap = animPoseGetAnimPosePtr(npc->poseId);
+    n = ap->numWorldPositions;
+    p = *ap->worldPositions;
+    for (i = 0; i < n; i++) {
+        p[i] = (Vec){0.0f, -1000.0f, 0.0f};
+    }
+}
+
+void unk_end_0000039c(CameraId cameraId, void* param) {
+    extLoadRenderMode();
+    extLoadVertex();
+    extLoadTexture();
+    extLoadTev();
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+    unk_end_00002494(0);
+    extDraw();
+    extLoadTextureExit();
+}
+
+void unk_end_0000035c(void) {
+    dispEntry(CAMERA_3D, 0.0f, 1, unk_end_0000039c, NULL);
+}
+
+USER_FUNC(unk_end_0000012c) {
+    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+    AnimationPose* ap;
+    Vec* p;
+    s32 n;
+    s32 i;
+
+    unk_end_bss00000000 = _mapAlloc(sizeof(EndMoa) * 300);
+    memset(unk_end_bss00000000, 0, sizeof(EndMoa) * 300);
+    animPoseWorldPositionEvalOn(npc->poseId);
+    unk_end_bss00000004 = _mapAlloc(sizeof(EndExtData) * 41);
+    memset(unk_end_bss00000004, 0, sizeof(EndExtData) * 41);
+    for (i = 0; i < 40; i++) {
+        unk_end_bss00000004[i].anim = dat_ptr_end_00005034;
+        unk_end_bss00000004[i].pose = dat_ptr_end_00005038;
+        unk_end_bss00000004[i].speed = i;
+    }
+    evtSetValue(event, LW(10), (s32)unk_end_bss00000004);
+    ap = animPoseGetAnimPosePtr(npc->poseId);
+    n = ap->numWorldPositions;
+    p = *ap->worldPositions;
+    for (i = 0; i < n; i++) {
+        p[i] = (Vec){0.0f, -1000.0f, 0.0f};
+    }
+    unk_end_bss00000008 = _mapAlloc(dat_80419a28 * sizeof(s32));
+    memset(unk_end_bss00000008, 0, dat_80419a28 * sizeof(s32));
+    unk_end_bss0000000c = _mapAlloc(dat_80419a28 * sizeof(s32[2]));
+    memset(unk_end_bss0000000c, 0, dat_80419a28 * sizeof(s32[2]));
+    for (i = 0; i < dat_80419a28; i++) {
+        unk_end_bss0000000c[i][0] = animPoseGetGroupIdx(npc->poseId, g_moamoa_chain_tbl[i][0]);
+        unk_end_bss0000000c[i][1] = animPoseGetGroupIdx(npc->poseId, g_moamoa_chain_tbl[i][1]);
+    }
+    return 2;
+}
+
+USER_FUNC(unk_end_000000c4) {
+    NpcEntry* npc = npcNameToPtr("\203\202\203A\203\202\203A");
+
+    L_animPoseWorldPositionEvalOff(npc->poseId);
+    _mapFree(unk_end_bss00000000);
+    extReset();
+    _mapFree(unk_end_bss0000000c);
+    _mapFree(unk_end_bss00000008);
+    return 2;
+}
+

@@ -27,9 +27,11 @@ USER_FUNC(muj_item_move_3d_position) {
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
     if (elapsed < frames) {
-        item->position.x = intplGetValue(mode, elapsed, frames, event->userdataf[1], x);
-        item->position.y = intplGetValue(mode, elapsed, frames, event->userdataf[2], y);
-        item->position.z = intplGetValue(mode, elapsed, frames, *(f32*)&event->field_84, z);
+        // the elapsed time is kept in the (dead) isFirstCall parameter
+        isFirstCall = elapsed;
+        item->position.x = intplGetValue(mode, isFirstCall, frames, event->userdataf[1], x);
+        item->position.y = intplGetValue(mode, isFirstCall, frames, event->userdataf[2], y);
+        item->position.z = intplGetValue(mode, isFirstCall, frames, *(f32*)&event->field_84, z);
         item->position.y += yOffset;
         return EVT_RETURN_BLOCK;
     }

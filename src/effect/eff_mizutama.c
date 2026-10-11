@@ -20,9 +20,10 @@ typedef struct EffMizutamaWork {
 } EffMizutamaWork;
 
 EffectEntry* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
+    s32 radius;
     EffectEntry* effect;
     EffMizutamaWork* work;
-    s32 count, radius, i;
+    s32 count, i;
     f32 dist, rad;
 
     effect = effEntry();
@@ -49,7 +50,8 @@ EffectEntry* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffMizutamaWork) * effect->count);
     effect->userdata = work;
     effect->callback = effMizutamaMain;
-    radius = (type + 1) * 10;
+    radius = type + 1;
+    radius *= 10;
     work->type = type;
     work->position.x = x;
     work->position.y = y;
@@ -75,9 +77,9 @@ EffectEntry* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
         }
         else {
             // scattered along a line, splashing outwards
-            dist = radius;
+            z = radius;
             irand(360);
-            work->position.x = irand((s32)dist * 2) - dist;
+            work->position.x = irand((s32)z * 2) - z;
             work->position.y = 0.0f;
             work->position.z = 0.0f;
             angle = work->position.x < 0.0f ? 225.0f : 135.0f;

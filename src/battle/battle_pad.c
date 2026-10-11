@@ -1,5 +1,5 @@
 /* "battle_pad" - Battle (Game)Pad Helper
- * Status: Complete, not 1:1 (need to fix loop unrolling)
+ * Status: Complete, 1:1
  *
  * Function: helper functions for reading/writing controller inputs
  */
@@ -9,6 +9,9 @@
 
 extern BattleWork* _battleWorkPointer;
 extern GlobalWork* gp;
+
+#pragma dont_inline on
+#pragma optimize_for_size on
 
 void BattlePadInit(void) {
 	int i;
@@ -55,15 +58,12 @@ void BtlPad_WorkInit(BattleWorkPad* pad) {
 void BtlPad_WorkUpdate(BattleWorkPad* pad, s32 chan) {
 	int i, repeat;
 
-	//TODO: inline memcpy?
-	*(u32*)((u32)&pad->mPadData[1] + 0) = *(u32*)((u32)&pad->mPadData[0] + 0);
-	*(u32*)((u32)&pad->mPadData[1] + 4) = *(u32*)((u32)&pad->mPadData[0] + 4);
-	*(u32*)((u32)&pad->mPadData[1] + 8) = *(u32*)((u32)&pad->mPadData[0] + 8);
+	pad->mPadData[1] = pad->mPadData[0];
 
-	for (i = 0; i < 29; i++) {
-		pad->mButtonsPressedHistory[30 - i - 1] = pad->mButtonsPressedHistory[30 - i];
-		pad->mButtonsHeldHistory[30 - i - 1] = pad->mButtonsHeldHistory[30 - i];
-		pad->mButtonsHistory[30 - i - 1] = pad->mButtonsHistory[30 - i];
+	for (i = 28; i >= 0; i--) {
+		pad->mButtonsPressedHistory[i + 1] = pad->mButtonsPressedHistory[i];
+		pad->mButtonsHeldHistory[i + 1] = pad->mButtonsHeldHistory[i];
+		pad->mButtonsHistory[i + 1] = pad->mButtonsHistory[i];
 	}
 
 	//after moving old data back, write new data
@@ -111,31 +111,25 @@ void BtlPad_WorkUpdate(BattleWorkPad* pad, s32 chan) {
 
 	pad->mButtonsPressedHistory[0] |= pad->mButtonsHistory[0] & ~pad->mButtonsHistory[1] & 0xFFFF0000;
 
-	if (pad->mButtonsHistory[0]) {
-		if (pad->mButtonsHistory[0] == pad->mButtonsHistory[1]) {
-			repeat = 8;
-			pad->mHoldRepeatFrameCounter++;
-			if (pad->mHoldRepeatState == 1) {
-				repeat = 16;
-			}
-
-			if (pad->mHoldRepeatFrameCounter >= repeat) {
-				pad->mButtonsHeldHistory[0] |= pad->mButtonsHistory[0] & 0xFFFF0000;
-				pad->mHoldRepeatState = 2;
-				pad->mHoldRepeatFrameCounter = 0;
-			}
-		}
-		else {
-			pad->mButtonsHeldHistory[0] |= pad->mButtonsHistory[0] & 0xFFFF0000;
-			pad->mButtonsHeldHistory[0] &= pad->mButtonsPressedHistory[0] & 0xFFFF0000 | 0xFFFF;
-			pad->mHoldRepeatState = 1;
-			pad->mHoldRepeatFrameCounter = 0;
-		}
-	}
-	else {
+	if (!pad->mButtonsHistory[0]) {
 		pad->mButtonsHeldHistory[0] = 0;
 		pad->mHoldRepeatState = 0;
 		pad->mHoldRepeatFrameCounter = 0;
+	}
+	else if (pad->mButtonsHistory[0] != pad->mButtonsHistory[1]) {
+		pad->mButtonsHeldHistory[0] |= pad->mButtonsHistory[0] & 0xFFFF0000;
+		pad->mButtonsHeldHistory[0] &= pad->mButtonsPressedHistory[0] & 0xFFFF0000 | 0xFFFF;
+		pad->mHoldRepeatState = 1;
+		pad->mHoldRepeatFrameCounter = 0;
+	}
+	else {
+		repeat = 8;
+		pad->mHoldRepeatFrameCounter++;
+		if (pad->mHoldRepeatFrameCounter >= (pad->mHoldRepeatState == 1 ? 16 : repeat)) {
+			pad->mButtonsHeldHistory[0] |= pad->mButtonsHistory[0] & 0xFFFF0000;
+			pad->mHoldRepeatState = 2;
+			pad->mHoldRepeatFrameCounter = 0;
+		}
 	}
 	pad->mButtonsReleasedHistory[0] |= pad->mButtonsHistory[1] & (pad->mButtonsHistory[1] ^ pad->mButtonsHistory[0]) & 0xFFFF0000;
 }
@@ -162,8 +156,8 @@ BOOL BattlePadCheckRecordTrigger(s32 frame, s32 mask) {
 }
 
 u32 BattlePadMultiCheckRecordTrigger(s32 chan, s32 frame, s32 mask) {
-	u32* history = _battleWorkPointer->padWork[chan].mButtonsPressedHistory;
-	return mask & history[frame];
+	BattleWorkPad* pad = &_battleWorkPointer->padWork[chan];
+	return pad->mButtonsPressedHistory[frame] & mask;
 }
 
 u32 BattlePadCheckNow(s32 mask) {

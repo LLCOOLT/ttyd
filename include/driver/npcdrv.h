@@ -26,10 +26,22 @@ typedef struct NpcDeadInfo {
 } NpcDeadInfo;
 
 // TODO: move this somewhere better?
+typedef struct PointDropData {
+    s32 maxStatPercent;    // 0x0, 0 terminates the table
+    s32 overallDropChance; // 0x4
+    s32 numDrops;          // 0x8
+    s32 dropChance;        // 0xC
+} PointDropData;
+
 typedef struct BattleGroupSetup {
-    s32 numEnemies;             // 0x0
-    BattleUnitSetup* enemyData; // 0x4
-    u8 field_0[0x20 - 0x0];     // 0x8
+    s32 numEnemies;              // 0x0
+    BattleUnitSetup* enemyData;  // 0x4
+    s32 heldItemWeight;          // 0x8
+    s32 randomItemWeight;        // 0xC
+    s32 noItemWeight;            // 0x10
+    PointDropData* hpDropTable;  // 0x14
+    PointDropData* fpDropTable;  // 0x18
+    u8 field_1C[0x20 - 0x1C];    // 0x1C
 } BattleGroupSetup;
 
 typedef struct NpcBattleInfo {
@@ -200,9 +212,11 @@ typedef struct FieldBattleInfo {
 	u32 partyId; //0x8
 	NpcBattleInfo* setup; //0xC
 	u32 result; //0x10
-	u8 field_0x14[0x19 - 0x14]; //0x14
+	u32 field_0x14; //0x14
+	u8 field_0x18; //0x18
 	u8 ruleKeepResult; //0x19
-	u8 field_0x1A[0x1C - 0x1A]; //0x1A
+	u8 field_0x1A; //0x1A
+	u8 field_0x1B; //0x1B
 } FieldBattleInfo;
 
 typedef struct FieldBattleData {

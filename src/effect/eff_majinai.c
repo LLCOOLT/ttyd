@@ -53,7 +53,7 @@ void effMajinaiMain(EffectEntry* effect) {
     s32 color, i;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
-    inBattle = gp->inBattle != 0;
+    inBattle = gp->inBattle ? TRUE : FALSE;
 
     // soft delete
     if (effect->flags & 4) {

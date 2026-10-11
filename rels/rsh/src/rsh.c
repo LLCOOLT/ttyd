@@ -1,0 +1,1632 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "stdio.h"
+#include "string.h"
+#include "evt/evt_npc.h"
+#include "driver/npcdrv.h"
+#include "dolphin/gx.h"
+#include "dolphin/mtx.h"
+#include "memory.h"
+#include "driver/mapdrv.h"
+#include "driver/camdrv.h"
+#include "mario/mariost.h"
+#include "driver/imgdrv.h"
+#include "data/mapdata.h"
+#include "driver/swdrv.h"
+
+typedef struct RshRndNpc { const char* name; const char* model; s32* talkEvt; } RshRndNpc;
+double tan(double x);
+typedef void (*voidfunctionptr)(void);
+extern voidfunctionptr _ctors[];
+extern voidfunctionptr _dtors[];
+extern s32 btl_rsh_setup_no_tbl[];
+extern s32 btlsetup_rsh_tbl[];
+extern s32 rsh_00_a_init_evt[];
+extern s32 rsh_00_a_init_evt_nidome[];
+extern s32 rsh_00_b_init_evt[];
+extern s32 rsh_00_b_init_evt_nidome[];
+extern s32 rsh_00_c_init_evt[];
+extern s32 rsh_00_c_init_evt_nidome[];
+extern s32 rsh_01_a_init_evt[];
+extern s32 rsh_01_a_init_evt_nidome[];
+extern s32 rsh_01_b_init_evt[];
+extern s32 rsh_01_b_init_evt_nidome[];
+extern s32 rsh_01_c_init_evt[];
+extern s32 rsh_01_c_init_evt_nidome[];
+extern s32 rsh_02_a_init_evt[];
+extern s32 rsh_02_a_init_evt_nidome[];
+extern s32 rsh_02_b_init_evt[];
+extern s32 rsh_02_b_init_evt_nidome[];
+extern s32 rsh_02_c_init_evt[];
+extern s32 rsh_02_c_init_evt_nidome[];
+extern s32 rsh_03_a_init_evt[];
+extern s32 rsh_03_a_init_evt_nidome[];
+extern s32 rsh_03_b_init_evt[];
+extern s32 rsh_03_b_init_evt_nidome[];
+extern s32 rsh_03_c_init_evt[];
+extern s32 rsh_03_c_init_evt_nidome[];
+extern s32 rsh_04_a_init_evt[];
+extern s32 rsh_04_a_init_evt_nidome[];
+extern s32 rsh_04_b_init_evt[];
+extern s32 rsh_04_b_init_evt_nidome[];
+extern s32 rsh_04_c_init_evt[];
+extern s32 rsh_04_c_init_evt_nidome[];
+extern s32 rsh_05_a_init_evt[];
+extern s32 rsh_05_a_init_evt_nidome[];
+extern s32 rsh_06_a_init_evt[];
+extern s32 rsh_06_a_init_evt_nidome[];
+extern s32 rsh_07_a_init_evt[];
+extern s32 rsh_07_b_init_evt[];
+extern s32 rsh_07_c_init_evt[];
+extern s32 rsh_08_a_init_evt[];
+
+USER_FUNC(debug_print_func);
+USER_FUNC(evt_bero_mapchange);
+USER_FUNC(evt_cam_letter_box_disable);
+USER_FUNC(evt_hit_get_position);
+USER_FUNC(evt_hitobj_attr_onoff);
+USER_FUNC(evt_img_alloc_capture);
+USER_FUNC(evt_img_entry);
+USER_FUNC(evt_img_free_capture);
+USER_FUNC(evt_img_onoff);
+USER_FUNC(evt_img_set_paper);
+USER_FUNC(evt_img_set_paper_anim);
+USER_FUNC(evt_img_wait_animend);
+USER_FUNC(evt_map_checkanim);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_map_set_tevcallback);
+USER_FUNC(evt_mapobj_clear_offscreen);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_set_offscreen);
+USER_FUNC(evt_mario_get_party);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_mov_pos);
+USER_FUNC(evt_mario_party_door_move);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_add);
+USER_FUNC(evt_msg_select);
+USER_FUNC(evt_npc_check);
+USER_FUNC(evt_npc_entry);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_set_offscreen);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_npc_set_tribe);
+USER_FUNC(evt_npc_setup);
+USER_FUNC(evt_offscreen_entry);
+USER_FUNC(evt_paper_entry);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_rsh_get_rnd_npc);
+USER_FUNC(evt_rsh_get_rnd_npc_data);
+USER_FUNC(evt_rsh_get_rnd_npc_talk_evt);
+USER_FUNC(evt_rsh_set_rnd_npc);
+USER_FUNC(evt_rsh_set_rnd_npc_talk_evt);
+USER_FUNC(evt_run_case_evt);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_get_mapname);
+USER_FUNC(evt_sub_random);
+BOOL img_wait(void);
+RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index);
+void rsh_window_tev(MapTevCallbackInfo* info);
+void _unresolved(void);
+void _epilog(void);
+void _prolog(void);
+extern s32 npc_urouro_init_event[];
+extern s32 npc_urouro_move_event[];
+extern s32 npc_urouro_return_event[];
+
+__declspec(section ".data") u64 fd_rsh_negone_one_374;
+__declspec(section ".data") s32 fd_rsh_neg_one_382[1];
+__declspec(section ".data") s32 fd_rsh___local_PI_383[1];
+__declspec(section ".data") s32 fd_rsh___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_rsh_one_negone_373;
+__declspec(section ".data") s32 fd_rsh___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_rsh_one_381[1];
+__declspec(section ".data") u64 fd_rsh_negone_one_360;
+__declspec(section ".data") s32 fd_rsh_neg_one_365[1];
+__declspec(section ".data") s32 fd_rsh___local_PI_366[1];
+__declspec(section ".data") s32 fd_rsh___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_rsh_one_negone_359;
+__declspec(section ".data") s32 fd_rsh___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_rsh_one_364[1];
+__declspec(section ".data") s32 fd_rsh__three_localstatic4_sqrtf[2];
+__declspec(section ".data") s32 fd_rsh__half_localstatic3_sqrtf[2];
+s32 simi_check[57];
+s32 simi_offscreen_check[41];
+s32 kami_check[85];
+s32 kami_offscreen_check[41];
+s32 evt_rsh_door_init[23];
+s32 evt_rsh_door_entry[46];
+s32 evt_rsh_door_open[548];
+s32 evt_rsh_door_close[404];
+s32 evt_rsh_window[30];
+s32 rsh_01_rnd_npc_1[15];
+__declspec(section ".data") s32 rsh_01_rnd_npc_2[9];
+__declspec(section ".data") s32 rsh_01_rnd_npc_3[6];
+s32 rsh_03_rnd_npc_1[39];
+s32 rsh_03_rnd_npc_2[21];
+__declspec(section ".data") s32 rsh_04_rnd_npc_1[6];
+__declspec(section ".data") s32 rsh_04_rnd_npc_2[6];
+__declspec(section ".data") s32 rsh_04_rnd_npc_3[6];
+__declspec(section ".data") s32 rsh_04_rnd_npc_4[12];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_1_talk[8];
+s32 evt_rsh_rnd_npc_2_2_talk[16];
+s32 evt_rsh_rnd_npc_2_3_talk[16];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_4_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_5_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_6_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_7_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_8_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_9_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_2_10_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_1_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_2_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_3_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_4_talk[8];
+s32 evt_rsh_rnd_npc_3_5_talk[25];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_6_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_7_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_8_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_9_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_3_10_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_1_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_2_talk[8];
+s32 evt_rsh_rnd_npc_4_3_talk[16];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_4_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_5_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_6_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_7_talk[8];
+s32 evt_rsh_rnd_npc_4_8_talk[39];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_9_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_4_10_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_1_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_2_talk[8];
+s32 evt_rsh_rnd_npc_5_3_talk[47];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_4_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_5_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_6_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_7_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_8_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_9_talk[8];
+__declspec(section ".data") s32 evt_rsh_rnd_npc_5_10_talk[8];
+__declspec(section ".data") s32 rsh_01_rnd_npc_1_list[5];
+__declspec(section ".data") s32 rsh_01_rnd_npc_2_list[3];
+__declspec(section ".data") s32 rsh_01_rnd_npc_3_list[2];
+s32 rsh_03_rnd_npc_1_list[13];
+__declspec(section ".data") s32 rsh_03_rnd_npc_2_list[7];
+__declspec(section ".data") s32 rsh_04_rnd_npc_1_list[2];
+__declspec(section ".data") s32 rsh_04_rnd_npc_2_list[2];
+__declspec(section ".data") s32 rsh_04_rnd_npc_3_list[2];
+__declspec(section ".data") s32 rsh_04_rnd_npc_4_list[4];
+s32 debug_print_rnd_npc[61];
+s32 evt_rsh_rnd_npc_init[94];
+s32 evt_rsh_01_rnd_npc_entry[137];
+s32 rsh_03_rnd_npc_2_ent[46];
+s32 evt_rsh_03_rnd_npc_entry[95];
+s32 rsh_04_rnd_npc_3_ent[46];
+s32 evt_rsh_04_rnd_npc_entry[185];
+
+__declspec(section ".data") u64 fd_rsh_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_rsh_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_rsh___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_rsh___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_rsh_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_rsh___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_rsh_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_rsh_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_rsh_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_rsh___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_rsh___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_rsh_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_rsh___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_rsh_one_364[] = {
+    1065353216,
+};
+
+__declspec(section ".data") s32 fd_rsh__three_localstatic4_sqrtf[] = {
+    1074266112, 0,
+};
+
+__declspec(section ".data") s32 fd_rsh__half_localstatic3_sqrtf[] = {
+    1071644672, 0,
+};
+
+EVT_BEGIN(simi_check)
+    SET_VALUE(LF(0), 0)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_03_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        SWITCH(GSW(0))
+            CASE_BETWEEN(283, 302)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_yuka"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_yuka_simi"), 1)
+            CASE_DEFAULT
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("s_yuka"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("s_yuka_simi"), 1)
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(simi_offscreen_check)
+    SET_VALUE(LF(0), 0)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_03_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        SWITCH(GSW(0))
+            CASE_BETWEEN(283, 302)
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("s_yuka"))
+            CASE_DEFAULT
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("s_yuka_simi"))
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kami_check)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
+        IF_INT_EQUAL(GSW(0), 304)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_3_kami"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_3"), 1)
+            ELSE
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_3_kami"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_3"), 1)
+        END_IF
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SWITCH(GSW(0))
+            CASE_BETWEEN(306, 307)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_5_kami"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami_2"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5"), 1)
+            CASE_DEFAULT
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 1, STRING("yuka_5_kami_2"), 1)
+            CALL(evt_mapobj_flag_onoff, 1, 0, STRING("yuka_5"), 1)
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kami_offscreen_check)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_01_a"))
+        IF_INT_EQUAL(GSW(0), 304)
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_3"))
+            ELSE
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_3_kami"))
+        END_IF
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SWITCH(GSW(0))
+            CASE_BETWEEN(306, 307)
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_5"))
+            CASE_DEFAULT
+            CALL(evt_mapobj_clear_offscreen, 0, STRING("yuka_5_kami"))
+        END_SWITCH
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_door_init)
+    CALL(evt_paper_entry, STRING("OFF_d_meku"))
+    CALL(evt_img_entry, STRING("capture_img"))
+    CALL(evt_img_set_paper, STRING("capture_img"), STRING("OFF_d_meku"))
+    CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("Z_1"))
+    CALL(evt_offscreen_entry, STRING("offscreen"))
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_door_entry)
+    SET_INT_READ_ADDR(LW(0))
+    READ_INT(LW(1))
+    READ_INT(LW(2))
+    READ_INT(LW(3))
+    READ_INT(LW(4))
+    READ_INT(LW(5))
+    READ_INT(LW(6))
+    READ_INT(LW(7))
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(2), 1)
+    CALL(evt_run_case_evt, 9, 1, LW(4), 0, PTR(evt_rsh_door_open), 0)
+    CALL(evt_run_case_evt, 9, 1, LW(6), 0, PTR(evt_rsh_door_close), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_door_open)
+    SET_INT_READ_ADDR(LW(0))
+    READ_INT(LW(1))
+    READ_INT(LW(2))
+    READ_INT(LW(3))
+    READ_INT(LW(4))
+    READ_INT(LW(5))
+    READ_INT(LW(6))
+    READ_INT(LW(7))
+    CALL(evt_hitobj_attr_onoff, 0, 1, LW(4), 8388608)
+    CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(img_wait)
+    CALL(evt_mapobj_flag_onoff, 1, 0, LW(1), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, LW(2), 1)
+    CALL_CHILD(PTR(kami_check))
+    CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_map_playanim, LW(5), 0, 0)
+    CALL(evt_map_checkanim, LW(5), LW(10), LW(11))
+    WAIT_MS(500)
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(3), 1)
+    CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
+    SUBTRACT(LW(12), 50)
+    CALL(evt_mario_party_door_move, LW(10), LW(12), FLOAT(80.0f))
+    CALL(evt_img_free_capture, STRING("capture_img"), 0)
+    CALL(evt_img_free_capture, STRING("capture_img"), 1)
+    CALL(evt_img_free_capture, STRING("capture_img"), 2)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, 0, 0, 0, 0)
+    CALL(evt_mapobj_set_offscreen, 1, STRING("rouka"), STRING("offscreen"))
+    CALL_CHILD(PTR(simi_offscreen_check))
+    CALL(evt_mapobj_set_offscreen, 1, STRING("w_tobira"), STRING("offscreen"))
+    CALL(evt_mapobj_set_offscreen, 1, STRING("e_tobira"), STRING("offscreen"))
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("rouka"), 1)
+    CALL(evt_npc_check, STRING("車掌"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_npc_set_offscreen, STRING("車掌"), STRING("offscreen"))
+        CALL(evt_npc_flag_onoff, 1, STRING("車掌"), 128)
+    END_IF
+    BEGIN_INLINE_EVENT
+        WAIT_MS(300)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_IN1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_1"))
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
+        CALL(evt_mapobj_clear_offscreen, 1, STRING("w_tobira"))
+        CALL(evt_mapobj_clear_offscreen, 1, STRING("e_tobira"))
+        CALL(evt_npc_check, STRING("車掌"), LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(evt_npc_set_offscreen, STRING("車掌"), 0)
+        END_IF
+        CALL(evt_img_wait_animend, STRING("capture_img"))
+        CALL(evt_img_onoff, STRING("capture_img"), 0)
+    END_INLINE_EVENT
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_cam_letter_box_disable, 0)
+    CALL(evt_hitobj_attr_onoff, 0, 0, LW(4), 8388608)
+    CALL(evt_hitobj_attr_onoff, 0, 0, LW(6), 8388608)
+    SET_VALUE(LF(0), 0)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_b"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        IF_STR_EQUAL(LW(1), STRING("heya_5"))
+            SWITCH(GSW(0))
+                CASE_EQUAL(301)
+                CALL(evt_mario_key_onoff, 0)
+                CALL(evt_img_wait_animend, STRING("capture_img"))
+                CALL(evt_party_stop, 0)
+                WAIT_MS(300)
+                CALL(evt_mario_get_party, LW(0))
+                SWITCH(LW(0))
+                    CASE_EQUAL(1)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_0"), 0, STRING("party"))
+                    CASE_EQUAL(2)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_1"), 0, STRING("party"))
+                    CASE_EQUAL(4)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_2"), 0, STRING("party"))
+                    CASE_EQUAL(5)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_3"), 0, STRING("party"))
+                    CASE_EQUAL(6)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_4"), 0, STRING("party"))
+                    CASE_EQUAL(3)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_5"), 0, STRING("party"))
+                    CASE_EQUAL(7)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_146_6"), 0, STRING("party"))
+                END_SWITCH
+                CALL(evt_party_run, 0)
+                CALL(evt_mario_key_onoff, 1)
+                CASE_BETWEEN(306, 307)
+                CALL(evt_snd_bgmoff, 18432)
+                CASE_EQUAL(326)
+                CALL(evt_mario_key_onoff, 0)
+                CALL(evt_img_wait_animend, STRING("capture_img"))
+                CALL(evt_party_stop, 0)
+                WAIT_MS(300)
+                CALL(evt_mario_get_party, LW(0))
+                SWITCH(LW(0))
+                    CASE_EQUAL(1)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_0"), 0, STRING("party"))
+                    CASE_EQUAL(2)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_1"), 0, STRING("party"))
+                    CASE_EQUAL(4)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_2"), 0, STRING("party"))
+                    CASE_EQUAL(5)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_3"), 0, STRING("party"))
+                    CASE_EQUAL(6)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_4"), 0, STRING("party"))
+                    CASE_EQUAL(3)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_5"), 0, STRING("party"))
+                    CASE_EQUAL(7)
+                    CALL(evt_msg_print, 0, STRING("stg6_rsh_224_6"), 0, STRING("party"))
+                END_SWITCH
+                CALL(evt_party_run, 0)
+                CALL(evt_mario_key_onoff, 1)
+                CASE_DEFAULT
+                CALL(evt_mario_key_onoff, 0)
+                CALL(evt_img_wait_animend, STRING("capture_img"))
+                CALL(evt_mario_key_onoff, 1)
+            END_SWITCH
+        END_IF
+    END_IF
+    SET_VALUE(LF(0), 0)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_b"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        IF_STR_EQUAL(LW(1), STRING("heya_4"))
+            IF_INT_EQUAL(GSWF(3434), 1)
+                SET_VALUE(GSWF(3435), 1)
+            END_IF
+            IF_INT_EQUAL(GSWF(3445), 1)
+                CALL(evt_snd_bgmoff, 2048)
+            END_IF
+            SET_VALUE(GSWF(3459), 1)
+        END_IF
+    END_IF
+    SET_VALUE(LF(0), 0)
+    CALL(evt_sub_get_mapname, LW(10))
+    IF_STR_EQUAL(LW(10), STRING("rsh_04_a"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_04_b"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_STR_EQUAL(LW(10), STRING("rsh_04_c"))
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        IF_STR_EQUAL(LW(1), STRING("heya_5"))
+            SET_VALUE(GSWF(3446), 1)
+        END_IF
+        IF_STR_EQUAL(LW(1), STRING("heya_3"))
+            SET_VALUE(GSWF(3447), 1)
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_door_close)
+    SET_INT_READ_ADDR(LW(0))
+    READ_INT(LW(1))
+    READ_INT(LW(2))
+    READ_INT(LW(3))
+    READ_INT(LW(4))
+    READ_INT(LW(5))
+    READ_INT(LW(6))
+    READ_INT(LW(7))
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_hitobj_attr_onoff, 0, 1, LW(4), 8388608)
+    CALL(evt_hitobj_attr_onoff, 0, 1, LW(6), 8388608)
+    CALL(img_wait)
+    BEGIN_INLINE_EVENT
+        IF_INT_EQUAL(GSW(0), 288)
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("rsh_04_a"))
+                WAIT_MS(1000)
+                SET_VALUE(GSWF(3444), 1)
+                CALL(evt_bero_mapchange, STRING("rsh_04_b"), STRING("e_bero"))
+            END_IF
+        END_IF
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        IF_INT_EQUAL(GSW(0), 294)
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("rsh_04_b"))
+                WAIT_MS(1000)
+                SET_VALUE(GSWF(3444), 1)
+                CALL(evt_bero_mapchange, STRING("rsh_04_c"), STRING("e_bero"))
+            END_IF
+        END_IF
+    END_INLINE_EVENT
+    IF_INT_EQUAL(GSW(0), 297)
+        CALL(evt_sub_get_mapname, LW(10))
+        IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
+            IF_INT_EQUAL(GSWF(3439), 0)
+                SET_VALUE(GSWF(3439), 1)
+                CALL(evt_msg_print, 0, STRING("stg6_rsh_123"), 0, STRING("ゆうれい"))
+            END_IF
+        END_IF
+    END_IF
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_get_mapname, LW(10))
+        IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+            IF_STR_EQUAL(LW(1), STRING("heya_5"))
+                SWITCH(GSW(0))
+                    CASE_BETWEEN(306, 307)
+                    CALL(evt_snd_bgmon, 160, 0)
+                END_SWITCH
+            END_IF
+        END_IF
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_sub_get_mapname, LW(10))
+        SET_VALUE(LF(0), 0)
+        IF_STR_EQUAL(LW(10), STRING("rsh_02_a"))
+            SET_VALUE(LF(0), 1)
+        END_IF
+        IF_STR_EQUAL(LW(10), STRING("rsh_02_b"))
+            SET_VALUE(LF(0), 1)
+        END_IF
+        IF_STR_EQUAL(LW(10), STRING("rsh_02_c"))
+            SET_VALUE(LF(0), 1)
+        END_IF
+        IF_INT_EQUAL(LF(0), 1)
+            IF_STR_EQUAL(LW(1), STRING("heya_4"))
+                IF_INT_EQUAL(GSWF(3445), 1)
+                    CALL(evt_snd_bgmon, 160, 0)
+                END_IF
+            END_IF
+        END_IF
+    END_INLINE_EVENT
+    SET_VALUE(GSWF(3446), 0)
+    SET_VALUE(GSWF(3447), 0)
+    SET_VALUE(GSWF(3459), 0)
+    CALL(evt_map_playanim, LW(5), 2, 0)
+    CALL(evt_img_free_capture, STRING("capture_img"), 0)
+    CALL(evt_img_free_capture, STRING("capture_img"), 1)
+    CALL(evt_img_free_capture, STRING("capture_img"), 2)
+    CALL(evt_img_alloc_capture, STRING("capture_img"), 0, STRING("offscreen"), 1, 0, 0, 608, 480)
+    CALL(evt_mapobj_set_offscreen, 1, STRING("rouka"), STRING("offscreen"))
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
+    CALL_CHILD(PTR(kami_offscreen_check))
+    CALL_CHILD(PTR(simi_offscreen_check))
+    CALL(evt_npc_check, STRING("車掌"), LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_npc_set_offscreen, STRING("車掌"), STRING("offscreen"))
+    END_IF
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_OFF6_ROOM_OUT1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    CALL(evt_img_set_paper_anim, STRING("capture_img"), STRING("A_2"))
+    CALL(evt_img_onoff, STRING("capture_img"), 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(10), LW(11), LW(12))
+        CALL(evt_hit_get_position, LW(6), LW(13), LW(14), LW(15))
+        CALL(evt_mario_mov_pos, LW(13), LW(12), 300)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_mapobj_clear_offscreen, 1, STRING("rouka"))
+        CALL(evt_mapobj_clear_offscreen, 1, LW(1))
+        CALL(evt_mapobj_clear_offscreen, 1, LW(2))
+        CALL(evt_npc_check, STRING("車掌"), LW(0))
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(evt_npc_flag_onoff, 0, STRING("車掌"), 128)
+        END_IF
+        IF_INT_EQUAL(LW(0), 1)
+            CALL(evt_npc_set_offscreen, STRING("車掌"), 0)
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_img_wait_animend, STRING("capture_img"))
+    CALL(evt_img_onoff, STRING("capture_img"), 0)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("rouka"), 1)
+    CALL_CHILD(PTR(simi_check))
+    BEGIN_INLINE_EVENT
+        CALL(evt_hit_get_position, LW(6), LW(10), LW(11), LW(12))
+        ADD(LW(12), 50)
+        CALL(evt_mario_party_door_move, LW(10), LW(12), FLOAT(80.0f))
+    END_INLINE_EVENT
+    CALL(evt_hit_get_position, LW(4), LW(10), LW(11), LW(12))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1_2"), LW(10), LW(11), LW(12), 0)
+    CALL(evt_mapobj_flag_onoff, 1, 0, LW(3), 1)
+    CALL(evt_map_playanim, LW(7), 0, 0)
+    CALL(evt_map_checkanim, LW(7), LW(10), LW(11))
+    WAIT_MS(LW(11))
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(1), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, LW(2), 1)
+    CALL(evt_hitobj_attr_onoff, 0, 0, LW(4), 8388608)
+    CALL(evt_hitobj_attr_onoff, 0, 0, LW(6), 8388608)
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_cam_letter_box_disable, 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_window)
+    CALL(evt_map_set_tevcallback, 1, PTR(rsh_window_tev))
+    SET_INT_READ_ADDR(LW(0))
+    LOOP(0)
+        READ_INT(LW(1))
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(evt_mapobj_flag_onoff, 0, 1, LW(1), 16777216)
+        CALL(evt_mapobj_flag_onoff, 0, 0, LW(1), 256)
+    END_LOOP
+    RETURN
+EVT_END()
+
+static const s32 rsh_texmtx_tbl[] = {
+    GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
+};
+
+s32 rsh_01_rnd_npc_1[] = {
+    (s32)"c_kinopiko_v", (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", (s32)evt_rsh_rnd_npc_2_1_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_2_2_talk, (s32)"c_kinopio_g", (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE",
+    (s32)evt_rsh_rnd_npc_2_3_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_2_4_talk, (s32)"c_kuribo_n", (s32)/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", (s32)evt_rsh_rnd_npc_2_5_talk,
+};
+
+__declspec(section ".data") s32 rsh_01_rnd_npc_2[] = {
+    (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_2_6_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_2_8_talk, (s32)"c_kinopiko", (s32)/*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97",
+    (s32)evt_rsh_rnd_npc_2_9_talk,
+};
+
+__declspec(section ".data") s32 rsh_01_rnd_npc_3[] = {
+    (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_2_7_talk, (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", (s32)evt_rsh_rnd_npc_2_10_talk,
+};
+
+s32 rsh_03_rnd_npc_1[] = {
+    (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", (s32)evt_rsh_rnd_npc_3_1_talk, (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_3_2_talk, (s32)"c_kinopiko_v", (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87",
+    (s32)evt_rsh_rnd_npc_3_3_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_3_4_talk, (s32)"c_kinopiko_p", (s32)/*"キノピオ女桃"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x93\x8D", (s32)evt_rsh_rnd_npc_3_5_talk, (s32)"c_kinopiko_v",
+    (s32)/*"キノピオ女紫"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97\x8E\x87", (s32)evt_rsh_rnd_npc_3_7_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_3_8_talk, (s32)"c_yoshi", (s32)/*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", (s32)evt_rsh_rnd_npc_3_9_talk,
+    (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_1_talk, (s32)"c_yoshi", (s32)/*"ヨッシー大"*/"\x83\x88\x83\x62\x83\x56\x81\x5B\x91\xE5", (s32)evt_rsh_rnd_npc_4_2_talk, (s32)"c_jugem_n", (s32)/*"ＮＰＣジュゲム"*/"\x82\x6D\x82\x6F\x82\x62\x83\x57\x83\x85\x83\x51\x83\x80",
+    (s32)evt_rsh_rnd_npc_4_3_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_4_4_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_5_talk,
+};
+
+s32 rsh_03_rnd_npc_2[] = {
+    (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_3_6_talk, (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_3_10_talk, (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49",
+    (s32)evt_rsh_rnd_npc_4_6_talk, (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_4_7_talk, (s32)"c_kuribo_n", (s32)/*"NPCクリボー"*/"\x4E\x50\x43\x83\x4E\x83\x8A\x83\x7B\x81\x5B", (s32)evt_rsh_rnd_npc_4_8_talk, (s32)"c_kinopio_g",
+    (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", (s32)evt_rsh_rnd_npc_4_9_talk, (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_4_10_talk,
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_1[] = {
+    (s32)"c_kinopio_g", (s32)/*"キノピオ緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x97\xCE", (s32)evt_rsh_rnd_npc_5_2_talk, (s32)"c_kinopio_b", (s32)/*"キノピオ青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x90\xC2", (s32)evt_rsh_rnd_npc_5_10_talk,
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_2[] = {
+    (s32)"c_nokonoko", (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", (s32)evt_rsh_rnd_npc_5_8_talk, (s32)"c_kinopio", (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", (s32)evt_rsh_rnd_npc_5_9_talk,
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_3[] = {
+    (s32)"c_kokinopio_g", (s32)/*"キノピオ子緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x97\xCE", (s32)evt_rsh_rnd_npc_5_5_talk, (s32)"c_kokinopio", (s32)/*"キノピオ子"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71", (s32)evt_rsh_rnd_npc_5_6_talk,
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_4[] = {
+    (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2", (s32)evt_rsh_rnd_npc_5_1_talk, (s32)"c_kokinopio_y", (s32)/*"キノピオ子黄緑"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x89\xA9\x97\xCE", (s32)evt_rsh_rnd_npc_5_3_talk, (s32)"c_kokinopio_b", (s32)/*"キノピオ子青"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8E\x71\x90\xC2",
+    (s32)evt_rsh_rnd_npc_5_4_talk, (s32)"c_kinopiko", (s32)/*"キノピオ女"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49\x8F\x97", (s32)evt_rsh_rnd_npc_5_7_talk,
+};
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_1_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_15"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_2_2_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_16"), 0, STRING("me"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_c_16_sel"))
+    CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_16_01"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_2_3_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_17"), 0, STRING("me"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_c_17_sel"))
+    CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_17_01"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_4_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_18"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_5_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_19"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_6_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_20"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_7_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_21"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_8_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_22"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_9_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_23"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_2_10_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_24"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_1_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_25"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_2_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_26"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_3_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_27"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_4_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_28"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_3_5_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_29"), 0, STRING("me"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_c_29_sel"))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_29_01"))
+        ELSE
+        CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_29_02"))
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_6_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_30"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_7_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_31"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_8_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_32"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_9_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_33"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_3_10_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_34"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_1_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_35"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_2_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_36"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_4_3_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_37"), 0, STRING("me"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_c_37_sel"))
+    CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_37_01"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_4_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_38"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_5_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_39"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_6_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_40"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_7_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_41"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_4_8_talk)
+    IF_INT_EQUAL(GSWF(3457), 0)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_c_42"), 0, STRING("me"))
+        CALL(evt_msg_select, 0, STRING("stg6_rsh_c_42_sel"))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_42_01"))
+            SET_VALUE(GSWF(3457), 1)
+            ELSE
+            CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_42_02"))
+        END_IF
+        ELSE
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_c_42_03"), 0, STRING("me"))
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_9_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_43"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_4_10_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_44"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_1_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_45"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_2_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_46"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_rnd_npc_5_3_talk)
+    IF_INT_EQUAL(GSWF(3458), 0)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_c_47"), 0, STRING("me"))
+        CALL(evt_msg_select, 0, STRING("stg6_rsh_c_47_sel"))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_47_01"))
+            CASE_EQUAL(1)
+            CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_47_02"))
+            CASE_EQUAL(2)
+            CALL(evt_msg_print_add, 0, STRING("stg6_rsh_c_47_03"))
+        END_SWITCH
+        SET_VALUE(GSWF(3458), 1)
+        ELSE
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_c_47_04"), 0, STRING("me"))
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_4_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_48"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_5_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_49"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_6_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_50"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_7_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_51"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_8_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_52"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_9_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_53"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(evt_rsh_rnd_npc_5_10_talk)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_c_54"), 0, STRING("me"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") s32 rsh_01_rnd_npc_1_list[] = {
+    (s32)/*"２−１"*/"\x82\x51\x81\x7C\x82\x50", (s32)/*"２−２"*/"\x82\x51\x81\x7C\x82\x51", (s32)/*"２−３"*/"\x82\x51\x81\x7C\x82\x52", (s32)/*"２−４"*/"\x82\x51\x81\x7C\x82\x53", (s32)/*"２−５"*/"\x82\x51\x81\x7C\x82\x54",
+};
+
+__declspec(section ".data") s32 rsh_01_rnd_npc_2_list[] = {
+    (s32)/*"２−６"*/"\x82\x51\x81\x7C\x82\x55", (s32)/*"２−８"*/"\x82\x51\x81\x7C\x82\x57", (s32)/*"２−９"*/"\x82\x51\x81\x7C\x82\x58",
+};
+
+__declspec(section ".data") s32 rsh_01_rnd_npc_3_list[] = {
+    (s32)/*"２−７"*/"\x82\x51\x81\x7C\x82\x56", (s32)/*"２−１０"*/"\x82\x51\x81\x7C\x82\x50\x82\x4F",
+};
+
+s32 rsh_03_rnd_npc_1_list[] = {
+    (s32)/*"３−１"*/"\x82\x52\x81\x7C\x82\x50", (s32)/*"３−２"*/"\x82\x52\x81\x7C\x82\x51", (s32)/*"３−３"*/"\x82\x52\x81\x7C\x82\x52", (s32)/*"３−４"*/"\x82\x52\x81\x7C\x82\x53", (s32)/*"３−５"*/"\x82\x52\x81\x7C\x82\x54", (s32)/*"３−７"*/"\x82\x52\x81\x7C\x82\x56", (s32)/*"３−８"*/"\x82\x52\x81\x7C\x82\x57", (s32)/*"３−９"*/"\x82\x52\x81\x7C\x82\x58",
+    (s32)/*"４−１"*/"\x82\x53\x81\x7C\x82\x50", (s32)/*"４−２"*/"\x82\x53\x81\x7C\x82\x51", (s32)/*"４−３"*/"\x82\x53\x81\x7C\x82\x52", (s32)/*"４−４"*/"\x82\x53\x81\x7C\x82\x53", (s32)/*"４−５"*/"\x82\x53\x81\x7C\x82\x54",
+};
+
+__declspec(section ".data") s32 rsh_03_rnd_npc_2_list[] = {
+    (s32)/*"３−６"*/"\x82\x52\x81\x7C\x82\x55", (s32)/*"３−１０"*/"\x82\x52\x81\x7C\x82\x50\x82\x4F", (s32)/*"４−６"*/"\x82\x53\x81\x7C\x82\x55", (s32)/*"４−７"*/"\x82\x53\x81\x7C\x82\x56", (s32)/*"４−８"*/"\x82\x53\x81\x7C\x82\x57", (s32)/*"４−９"*/"\x82\x53\x81\x7C\x82\x58", (s32)/*"４−１０"*/"\x82\x53\x81\x7C\x82\x50\x82\x4F",
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_1_list[] = {
+    (s32)/*"５−２"*/"\x82\x54\x81\x7C\x82\x51", (s32)/*"５−１０"*/"\x82\x54\x81\x7C\x82\x50\x82\x4F",
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_2_list[] = {
+    (s32)/*"５−８"*/"\x82\x54\x81\x7C\x82\x57", (s32)/*"５−９"*/"\x82\x54\x81\x7C\x82\x58",
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_3_list[] = {
+    (s32)/*"５−５"*/"\x82\x54\x81\x7C\x82\x54", (s32)/*"５−６"*/"\x82\x54\x81\x7C\x82\x55",
+};
+
+__declspec(section ".data") s32 rsh_04_rnd_npc_4_list[] = {
+    (s32)/*"５−１"*/"\x82\x54\x81\x7C\x82\x50", (s32)/*"５−３"*/"\x82\x54\x81\x7C\x82\x52", (s32)/*"５−４"*/"\x82\x54\x81\x7C\x82\x53", (s32)/*"５−７"*/"\x82\x54\x81\x7C\x82\x56",
+};
+
+EVT_BEGIN(debug_print_rnd_npc)
+    SET_VALUE(LW(0), 0)
+    LOOP(9)
+        SWITCH(LW(0))
+            CASE_LESS(3)
+            SET_VALUE(LW(1), 0)
+            SET_VALUE(LW(2), LW(0))
+            CASE_LESS(5)
+            SET_VALUE(LW(1), 1)
+            SET_VALUE(LW(2), LW(0))
+            SUBTRACT(LW(2), 3)
+            CASE_DEFAULT
+            SET_VALUE(LW(1), 2)
+            SET_VALUE(LW(2), LW(0))
+            SUBTRACT(LW(2), 5)
+        END_SWITCH
+        CALL(evt_rsh_get_rnd_npc, LW(1), LW(2), LW(3))
+        CALL(evt_rsh_get_rnd_npc_data, LW(1), LW(2), LW(3), LW(4), LW(5))
+        CALL(debug_print_func, LW(1), LW(2), LW(3), LW(4))
+        ADD(LW(0), 1)
+    END_LOOP
+    RETURN
+EVT_END()
+
+typedef struct RshDebugStr {
+    char str[256];
+} RshDebugStr;
+
+static const RshDebugStr rsh_debug_str_init = {0};
+
+EVT_BEGIN(evt_rsh_rnd_npc_init)
+    SET_VALUE(GSW(821), 0)
+    SET_VALUE(GSW(822), 0)
+    SET_VALUE(GSW(823), 0)
+    CALL(evt_sub_random, 4, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 0, 0, LW(0))
+    CALL(evt_sub_random, 2, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 0, 1, LW(0))
+    CALL(evt_sub_random, 1, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 0, 2, LW(0))
+    CALL(evt_sub_random, 12, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 1, 0, LW(0))
+    CALL(evt_sub_random, 6, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 1, 1, LW(0))
+    CALL(evt_sub_random, 1, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 2, 0, LW(0))
+    CALL(evt_sub_random, 1, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 2, 1, LW(0))
+    CALL(evt_sub_random, 1, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 2, 2, LW(0))
+    CALL(evt_sub_random, 3, LW(0))
+    CALL(evt_rsh_set_rnd_npc, 2, 3, LW(0))
+    CALL_CHILD(PTR(debug_print_rnd_npc))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_01_rnd_npc_entry)
+    CALL(evt_rsh_get_rnd_npc, 0, 0, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 0, 0, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 0, 0, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客１"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客１"), -275, 0, -225)
+    CALL(evt_npc_set_ry, STRING("乗客１"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 0, 1, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 0, 1, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 0, 1, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客２"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客２"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客２"), -45, 0, -175)
+    CALL(evt_npc_set_ry, STRING("乗客２"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 0, 2, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 0, 2, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 0, 2, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客３"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客３"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客３"), 85, 16, -255)
+    CALL(evt_npc_set_ry, STRING("乗客３"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客３"), LW(3))
+    RETURN
+EVT_END()
+
+s32 rsh_03_rnd_npc_2_ent[] = {
+    (s32)/*"乗客２"*/"\x8F\xE6\x8B\x71\x82\x51", 0, 0, (s32)npc_urouro_init_event, (s32)npc_urouro_move_event, 0, 0, 0,
+    0, (s32)npc_urouro_return_event, 0, 1, -1011613696, 0, -1054867456, 1112014848,
+    0, 0, 0, 0, 0, 0, -1, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(evt_rsh_03_rnd_npc_entry)
+    CALL(evt_rsh_get_rnd_npc, 1, 0, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 1, 0, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 1, 0, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客１"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客１"), 460, 0, -60)
+    CALL(evt_npc_set_ry, STRING("乗客１"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 1, 1, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 1, 1, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 1, 1, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客２"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客２"), LW(2))
+    CALL(evt_npc_setup, PTR(rsh_03_rnd_npc_2_ent))
+    CALL(evt_npc_set_position, STRING("乗客２"), -360, 0, -10)
+    CALL(evt_npc_set_ry, STRING("乗客２"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 1536)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
+    RETURN
+EVT_END()
+
+s32 rsh_04_rnd_npc_3_ent[] = {
+    (s32)/*"乗客３"*/"\x8F\xE6\x8B\x71\x82\x52", 0, 0, (s32)npc_urouro_init_event, (s32)npc_urouro_move_event, 0, 0, 0,
+    0, (s32)npc_urouro_return_event, 0, 1, -1020002304, 0, -1022296064, 1112014848,
+    0, 1112014848, 0, 0, 0, 0, -1, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(evt_rsh_04_rnd_npc_entry)
+    CALL(evt_rsh_get_rnd_npc, 2, 0, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 2, 0, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 0, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客１"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客１"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客１"), 265, 0, -150)
+    CALL(evt_npc_set_ry, STRING("乗客１"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客１"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客１"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 2, 1, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 2, 1, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 1, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客２"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客２"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客２"), -230, 0, -215)
+    CALL(evt_npc_set_ry, STRING("乗客２"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客２"), 512)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客２"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 2, 2, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 2, 2, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 2, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客３"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客３"), LW(2))
+    CALL(evt_npc_setup, PTR(rsh_04_rnd_npc_3_ent))
+    CALL(evt_npc_set_position, STRING("乗客３"), -180, 0, -145)
+    CALL(evt_npc_set_ry, STRING("乗客３"), 270)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客３"), 1536)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客３"), LW(3))
+    CALL(evt_rsh_get_rnd_npc, 2, 3, LW(0))
+    CALL(evt_rsh_get_rnd_npc_data, 2, 3, LW(0), LW(1), LW(2))
+    CALL(evt_rsh_get_rnd_npc_talk_evt, 2, 3, LW(0), LW(3))
+    CALL(evt_npc_entry, STRING("乗客４"), LW(1))
+    CALL(evt_npc_set_tribe, STRING("乗客４"), LW(2))
+    CALL(evt_npc_set_position, STRING("乗客４"), -85, 16, -255)
+    CALL(evt_npc_set_ry, STRING("乗客４"), 90)
+    CALL(evt_npc_flag_onoff, 1, STRING("乗客４"), 1536)
+    CALL(evt_rsh_set_rnd_npc_talk_evt, STRING("乗客４"), LW(3))
+    RETURN
+EVT_END()
+
+USER_FUNC(debug_print_func) {
+    s32* args = event->args;
+    s32 room = evtGetValue(event, args[0]);
+    s32 group = evtGetValue(event, args[1]);
+    s32 index = evtGetValue(event, args[2]);
+    s32 value = evtGetValue(event, args[3]);
+    char header[256];
+    char buf[256];
+    const char** list;
+
+    *(RshDebugStr*)header = rsh_debug_str_init;
+
+    switch (room) {
+    case 0:
+        strcpy(header, "RSH_01:");
+        switch (group) {
+        case 0:
+            list = (const char**)rsh_01_rnd_npc_1_list;
+            break;
+        case 1:
+            list = (const char**)rsh_01_rnd_npc_2_list;
+            break;
+        case 2:
+            list = (const char**)rsh_01_rnd_npc_3_list;
+            break;
+        }
+        break;
+    case 1:
+        strcpy(header, "RSH_03:");
+        switch (group) {
+        case 0:
+            list = (const char**)rsh_03_rnd_npc_1_list;
+            break;
+        case 1:
+            list = (const char**)rsh_03_rnd_npc_2_list;
+            break;
+        }
+        break;
+    case 2:
+        strcpy(header, "RSH_04:");
+        switch (group) {
+        case 0:
+            list = (const char**)rsh_04_rnd_npc_1_list;
+            break;
+        case 1:
+            list = (const char**)rsh_04_rnd_npc_2_list;
+            break;
+        case 2:
+            list = (const char**)rsh_04_rnd_npc_3_list;
+            break;
+        case 3:
+            list = (const char**)rsh_04_rnd_npc_4_list;
+            break;
+        }
+        break;
+    }
+    sprintf(buf, "%s%d(%s, %s)\n", header, group, list[index], value);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_rsh_set_rnd_npc_talk_evt) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    void* evt = (void*)evtGetValue(event, args[1]);
+
+    evtNpcNameToPtr(event, name)->talkEvt = evt;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_rsh_get_rnd_npc_talk_evt) {
+    s32* args = event->args;
+    s32 room = evtGetValue(event, args[0]);
+    s32 group = evtGetValue(event, args[1]);
+    s32 index = evtGetValue(event, args[2]);
+
+    evtSetValue(event, args[3], (s32)_get_rnd_npc_data(room, group, index)->talkEvt);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_rsh_get_rnd_npc_data) {
+    s32* args = event->args;
+    s32 room = evtGetValue(event, args[0]);
+    s32 group = evtGetValue(event, args[1]);
+    s32 index = evtGetValue(event, args[2]);
+    RshRndNpc* data = _get_rnd_npc_data(room, group, index);
+
+    evtSetValue(event, args[3], (s32)data->name);
+    evtSetValue(event, args[4], (s32)data->model);
+    return EVT_RETURN_DONE;
+}
+
+RshRndNpc* _get_rnd_npc_data(s32 room, s32 group, s32 index) {
+    RshRndNpc* data = NULL;
+
+    switch (room) {
+    case 0:
+        switch (group) {
+        case 0:
+            data = (RshRndNpc*)rsh_01_rnd_npc_1;
+            break;
+        case 1:
+            data = (RshRndNpc*)rsh_01_rnd_npc_2;
+            break;
+        case 2:
+            data = (RshRndNpc*)rsh_01_rnd_npc_3;
+            break;
+        }
+        break;
+    case 1:
+        switch (group) {
+        case 0:
+            data = (RshRndNpc*)rsh_03_rnd_npc_1;
+            break;
+        case 1:
+            data = (RshRndNpc*)rsh_03_rnd_npc_2;
+            break;
+        }
+        break;
+    case 2:
+        switch (group) {
+        case 0:
+            data = (RshRndNpc*)rsh_04_rnd_npc_1;
+            break;
+        case 1:
+            data = (RshRndNpc*)rsh_04_rnd_npc_2;
+            break;
+        case 2:
+            data = (RshRndNpc*)rsh_04_rnd_npc_3;
+            break;
+        case 3:
+            data = (RshRndNpc*)rsh_04_rnd_npc_4;
+            break;
+        }
+        break;
+    }
+    if (data == NULL) {
+        data = (RshRndNpc*)rsh_01_rnd_npc_1;
+        index = 0;
+    }
+    return &data[index];
+}
+
+USER_FUNC(evt_rsh_set_rnd_npc) {
+    s32* args = event->args;
+    s32 room = evtGetValue(event, args[0]);
+    s32 group = evtGetValue(event, args[1]);
+    s32 index = evtGetValue(event, args[2]);
+    s32 value;
+
+    switch (room) {
+    case 0:
+        value = evtGetValue(NULL, GSW(821));
+        switch (group) {
+        case 0:
+            value |= index & 7;
+            break;
+        case 1:
+            value |= (index & 3) << 3;
+            break;
+        case 2:
+            value |= (index & 1) << 5;
+            break;
+        }
+        evtSetValue(NULL, GSW(821), value);
+        break;
+    case 1:
+        value = evtGetValue(NULL, GSW(822));
+        switch (group) {
+        case 0:
+            value |= index & 0xF;
+            break;
+        case 1:
+            value |= (index & 7) << 4;
+            break;
+        }
+        evtSetValue(NULL, GSW(822), value);
+        break;
+    case 2:
+        value = evtGetValue(NULL, GSW(823));
+        switch (group) {
+        case 0:
+            value |= index & 1;
+            break;
+        case 1:
+            value |= (index & 1) << 1;
+            break;
+        case 2:
+            value |= (index & 1) << 2;
+            break;
+        case 3:
+            value |= (index & 3) << 3;
+            break;
+        }
+        evtSetValue(NULL, GSW(823), value);
+        break;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_rsh_get_rnd_npc) {
+    s32* args = event->args;
+    s32 room = evtGetValue(event, args[0]);
+    s32 group = evtGetValue(event, args[1]);
+    s32 value;
+    s32 index;
+
+    switch (room) {
+    case 0:
+        value = evtGetValue(NULL, GSW(821));
+        switch (group) {
+        case 0:
+            index = value & 7;
+            break;
+        case 1:
+            index = (value >> 3) & 3;
+            break;
+        case 2:
+            index = (value >> 5) & 1;
+            break;
+        default:
+            index = 0;
+            break;
+        }
+        break;
+    case 1:
+        value = evtGetValue(NULL, GSW(822));
+        switch (group) {
+        case 0:
+            index = value & 0xF;
+            break;
+        case 1:
+            index = (value >> 4) & 7;
+            break;
+        default:
+            index = 0;
+            break;
+        }
+        break;
+    case 2:
+        value = evtGetValue(NULL, GSW(823));
+        switch (group) {
+        case 0:
+            index = value & 1;
+            break;
+        case 1:
+            index = (value >> 1) & 1;
+            break;
+        case 2:
+            index = (value >> 2) & 1;
+            break;
+        case 3:
+            index = (value >> 3) & 3;
+            break;
+        default:
+            index = 0;
+            break;
+        }
+        break;
+    }
+    evtSetValue(event, args[2], index);
+    return EVT_RETURN_DONE;
+}
+
+void rsh_window_tev(MapTevCallbackInfo* info) {
+    s32 tevStage = info->tevStage;
+    s32 texMap = info->texCoord;
+    s32 texCoord = info->texMap;
+    s32 field_0x18 = info->field_0x18;
+    MapObject* obj = *(MapObject**)info->field_0x0;
+    u16 x0, y0, x1, y1;
+    s32 height, width;
+    s32 halfHeight, halfWidth;
+    void* buf;
+    GXTexObj tex;
+    Mtx mtx;
+    f32 t;
+
+    if (obj->flags & 0x20) {
+        while ((obj = obj->parent) != NULL) {
+            if (obj->flags & 0x10) {
+                if (!(obj->flags & 0x20000000)) {
+                    obj->flags |= 0x20000000;
+                    return;
+                }
+                x0 = obj->screenRect[0];
+                y0 = obj->screenRect[1];
+                x1 = obj->screenRect[2];
+                y1 = obj->screenRect[3];
+                break;
+            }
+        }
+    } else {
+        if (!(obj->flags & 0x20000000)) {
+            obj->flags |= 0x20000000;
+            return;
+        }
+        x0 = obj->screenRect[0];
+        y0 = obj->screenRect[1];
+        x1 = obj->screenRect[2];
+        y1 = obj->screenRect[3];
+    }
+    if (x0 == 0x3FF || y0 == 0x3FF || x1 == 0x3FF || y1 == 0x3FF) {
+        return;
+    }
+    if (x0 == 0 && y0 == 0 && x1 == 0 && y1 == 0) {
+        return;
+    }
+    x0 -= x0 & 1;
+    y0 -= y0 & 1;
+    x1 += x1 & 1;
+    y1 += y1 & 1;
+    if (x1 > gp->fbWidth) {
+        x1 = gp->fbWidth;
+    }
+    if (y1 > gp->efbHeight) {
+        y1 = gp->efbHeight;
+    }
+    width = x1 - x0;
+    height = y1 - y0;
+    halfWidth = width / 2;
+    halfHeight = height / 2;
+    buf = smartAlloc(GXGetTexBufferSize(halfWidth, halfHeight, GX_TF_RGB5A3, GX_FALSE, 0), 3)->address;
+    GXSetTexCopySrc(x0, y0, width, height);
+    GXSetTexCopyDst(halfWidth, halfHeight, GX_TF_RGB5A3, GX_TRUE);
+    GXCopyTex(buf, GX_FALSE);
+    GXInvalidateTexAll();
+    GXPixModeSync();
+    GXTexModeSync();
+    GXInitTexObj(&tex, buf, halfWidth, halfHeight, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    t = tan(6.2831855f * (camGetPtr(4)->fovY / 2.0f) / 360.0f);
+    C_MTXLightFrustum(mtx, gp->efbHeight / 2 - y1, gp->efbHeight / 2 - y0, x0 - gp->fbWidth / 2,
+                      x1 - gp->fbWidth / 2, gp->efbHeight / 2.0f / t, 0.5f, 0.5f, 0.4f, 0.6f);
+    PSMTXConcat(mtx, camGetCurPtr()->view, mtx);
+    PSMTXConcat(mtx, info->mtx, mtx);
+    GXSetTexCoordGen2(texCoord, GX_TG_MTX3x4, GX_TG_POS, rsh_texmtx_tbl[texMap], GX_FALSE, GX_PTIDENTITY);
+    GXLoadTexMtxImm(mtx, rsh_texmtx_tbl[texMap], GX_MTX3x4);
+    GXLoadTexObj(&tex, texMap);
+    GXSetTevOrder(tevStage, texCoord, texMap, GX_COLOR_NULL);
+    GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
+    GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
+    tevStage++;
+    texMap++;
+    texCoord++;
+    info->tevStage = tevStage;
+    info->texMap = texCoord;
+    info->field_0x18 = field_0x18;
+    info->texCoord = texMap;
+}
+
+BOOL img_wait(void) {
+    ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);
+
+    if (!(img->flags & 2) && img->field_0x118 < 1.0f) {
+        return FALSE;
+    }
+    return TRUE;
+}
+
+void _unresolved(void) {
+}
+
+void _epilog(void) {
+    voidfunctionptr* dtor;
+
+    for (dtor = _dtors; *dtor != NULL; dtor++) {
+        (*dtor)();
+    }
+}
+
+void _prolog(void) {
+    voidfunctionptr* ctor;
+
+    for (ctor = _ctors; *ctor != NULL; ctor++) {
+        (*ctor)();
+    }
+    if (swByteGet(0) < 0x153) {
+        relSetEvtAddr("rsh_00_a", rsh_00_a_init_evt);
+        relSetEvtAddr("rsh_00_b", rsh_00_b_init_evt);
+        relSetEvtAddr("rsh_00_c", rsh_00_c_init_evt);
+        relSetEvtAddr("rsh_01_a", rsh_01_a_init_evt);
+        relSetEvtAddr("rsh_01_b", rsh_01_b_init_evt);
+        relSetEvtAddr("rsh_01_c", rsh_01_c_init_evt);
+        relSetEvtAddr("rsh_02_a", rsh_02_a_init_evt);
+        relSetEvtAddr("rsh_02_b", rsh_02_b_init_evt);
+        relSetEvtAddr("rsh_02_c", rsh_02_c_init_evt);
+        relSetEvtAddr("rsh_03_a", rsh_03_a_init_evt);
+        relSetEvtAddr("rsh_03_b", rsh_03_b_init_evt);
+        relSetEvtAddr("rsh_03_c", rsh_03_c_init_evt);
+        relSetEvtAddr("rsh_04_a", rsh_04_a_init_evt);
+        relSetEvtAddr("rsh_04_b", rsh_04_b_init_evt);
+        relSetEvtAddr("rsh_04_c", rsh_04_c_init_evt);
+        relSetEvtAddr("rsh_05_a", rsh_05_a_init_evt);
+        relSetEvtAddr("rsh_06_a", rsh_06_a_init_evt);
+        relSetEvtAddr("rsh_07_a", rsh_07_a_init_evt);
+        relSetEvtAddr("rsh_07_b", rsh_07_b_init_evt);
+        relSetEvtAddr("rsh_07_c", rsh_07_c_init_evt);
+        relSetEvtAddr("rsh_08_a", rsh_08_a_init_evt);
+    } else {
+        relSetEvtAddr("rsh_00_a", rsh_00_a_init_evt_nidome);
+        relSetEvtAddr("rsh_00_b", rsh_00_b_init_evt_nidome);
+        relSetEvtAddr("rsh_00_c", rsh_00_c_init_evt_nidome);
+        relSetEvtAddr("rsh_01_a", rsh_01_a_init_evt_nidome);
+        relSetEvtAddr("rsh_01_b", rsh_01_b_init_evt_nidome);
+        relSetEvtAddr("rsh_01_c", rsh_01_c_init_evt_nidome);
+        relSetEvtAddr("rsh_02_a", rsh_02_a_init_evt_nidome);
+        relSetEvtAddr("rsh_02_b", rsh_02_b_init_evt_nidome);
+        relSetEvtAddr("rsh_02_c", rsh_02_c_init_evt_nidome);
+        relSetEvtAddr("rsh_03_a", rsh_03_a_init_evt_nidome);
+        relSetEvtAddr("rsh_03_b", rsh_03_b_init_evt_nidome);
+        relSetEvtAddr("rsh_03_c", rsh_03_c_init_evt_nidome);
+        relSetEvtAddr("rsh_04_a", rsh_04_a_init_evt_nidome);
+        relSetEvtAddr("rsh_04_b", rsh_04_b_init_evt_nidome);
+        relSetEvtAddr("rsh_04_c", rsh_04_c_init_evt_nidome);
+        relSetEvtAddr("rsh_05_a", rsh_05_a_init_evt_nidome);
+        relSetEvtAddr("rsh_06_a", rsh_06_a_init_evt_nidome);
+        relSetEvtAddr("rsh_07_a", rsh_07_a_init_evt);
+        relSetEvtAddr("rsh_07_b", rsh_07_b_init_evt);
+        relSetEvtAddr("rsh_07_c", rsh_07_c_init_evt);
+        relSetEvtAddr("rsh_08_a", rsh_08_a_init_evt);
+    }
+    relSetBtlAddr("rsh", btlsetup_rsh_tbl, btl_rsh_setup_no_tbl);
+}
+

@@ -123,7 +123,8 @@ typedef struct MarioWork {
     u8 field_0x2A[0x2E - 0x2A];    // 0x2A
     MarioMotion currMotionId;      // 0x2E
     MarioMotion prevMotionId;      // 0x30, TODO check
-    u8 field_0x32[0x3C - 0x32];    // 0x32
+    u8 field_0x32[0x3B - 0x32];    // 0x32
+    s8 field_0x3B;                 // 0x3B
     s8 characterId;                // 0x3C
     s8 colorId;                    // 0x3D
     u8 field_0x3E[0x40 - 0x3E];    // 0x3E
@@ -165,7 +166,8 @@ typedef struct MarioWork {
     f32 unk14C;                    // 0x14C
     Vec unk150;                    // 0x150
     f32 camFollowRate;             // 0x15C
-    u8 unk160[0x168 - 0x160];      // 0x160
+    f32 unk160;                    // 0x160
+    u8 unk164[0x168 - 0x164];      // 0x164
     s32 unk168;                    // 0x168
     s32 unk16C;                    // 0x16C
     u8 unk170[0x174 - 0x170];      // 0x170
@@ -194,14 +196,18 @@ typedef struct MarioWork {
 	s32 field_0x1F0;               // 0x1F0
 	s32 field_0x1F4;               // 0x1F4
 	s32 field_0x1F8;               // 0x1F8
-	u8 field_0x1FC[0x224 - 0x1FC]; // 0x1FC
+	u8 field_0x1FC[0x204 - 0x1FC]; // 0x1FC
+	void* damageHit;               // 0x204, HitEntry
+	u8 field_0x208[0x224 - 0x208]; // 0x208
 	f32 playerGravity;             // 0x224 JP, 228 US
     s32 paperAnimGroupId[5];       // 0x228 JP, 0x22C US
     s32 paperPoseId;               // 0x23C JP, 0x240 US
     u8 field_0x240[0x241 - 0x240]; // 0x240
     s8 currPartySlotId[2];         // 0x241 JP, 0x245 US
     s8 prevPartyMemberId[2];       // 0x243 JP, 0x247 US
-    u8 field_0x245[0x24E - 0x245]; // 0x245
+    u8 field_0x245[0x248 - 0x245]; // 0x245
+    u16 field_0x248;               // 0x248
+    u8 field_0x24A[0x24E - 0x24A]; // 0x24A
 	u8 wStickDir1;                 // 0x24E JP, 0x252 US
 	u8 wStickDir2;                 // 0x24F JP, 0x253 US
 	u8 field_0x250[0x288 - 0x250]; // 0x250

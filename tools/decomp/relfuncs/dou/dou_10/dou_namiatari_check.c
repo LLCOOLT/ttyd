@@ -1,5 +1,6 @@
 // include: mario/mario.h
 // include: manager/evtmgr_cmd.h
+// decl: static inline f32 addf(f32 a, f32 b) { return a + b; }
 // proto: USER_FUNC(dou_namiatari_check);
 USER_FUNC(dou_namiatari_check) {
     s32* args = event->args;
@@ -24,10 +25,11 @@ USER_FUNC(dou_namiatari_check) {
         d *= r;
     }
     hit = TRUE;
-    if (__fabsf(x - mx) > __fabsf(20.0f + w)) {
+    // FAKEMATCH (decomp-permuter): the addf inline fixes the fadds operand order
+    if (__fabsf(x - mx) > __fabsf(addf(w, 20.0f))) {
         hit = FALSE;
     }
-    if (__fabsf(z - mz) > __fabsf(10.0f + d)) {
+    if (__fabsf(z - mz) > __fabsf(addf(d, 10.0f))) {
         hit = FALSE;
     }
     evtSetValue(event, args[3], hit);

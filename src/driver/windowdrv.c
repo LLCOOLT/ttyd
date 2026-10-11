@@ -12,100 +12,105 @@
 extern int sprintf(char* str, const char* format, ...);
 
 //.sbss
-static TEXPalette* tpldata; //new in retail
-static BOOL tpl_loaded; //new in retail
+TEXPalette* winTpl; //new in retail
+BOOL unk_804187fc; //new in retail, tpl loaded
 f32 scrl;
 GXTexObj* wakuTexObj;
 WindowEntry* WinObjects;
 
 //local prototypes
-static void _callback(s32 error, DVDFileInfo* info);
+void unk_8007f204(s32 error, DVDFileInfo* info);
 void _windowDispGX_Message(s32 type, s32 a2, u8 alpha, BOOL dark, f32 x, f32 y, f32 height, f32 width, f32 a9, f32 a10);
 
 void windowInit(void) {
-	WinObjects = __memAlloc(HEAP_DEFAULT, sizeof(WindowEntry) * 7);
-	WinObjects[0].flags = 0;
-	WinObjects[0].userdata = NULL;
-	WinObjects[1].flags = 0;
-	WinObjects[1].userdata = NULL;
-	WinObjects[2].flags = 0;
-	WinObjects[2].userdata = NULL;
-	WinObjects[3].flags = 0;
-	WinObjects[3].userdata = NULL;
-	WinObjects[4].flags = 0;
-	WinObjects[4].userdata = NULL;
-	WinObjects[5].flags = 0;
-	WinObjects[5].userdata = NULL;
-	WinObjects[6].flags = 0;
-	WinObjects[6].userdata = NULL;
-	tpldata = NULL;
-	tpl_loaded = FALSE;
+	WindowEntry* w;
+
+	w = WinObjects = __memAlloc(HEAP_DEFAULT, sizeof(WindowEntry) * 7);
+	w[0].flags = 0;
+	w[0].userdata = NULL;
+	w[1].flags = 0;
+	w[1].userdata = NULL;
+	w[2].flags = 0;
+	w[2].userdata = NULL;
+	w[3].flags = 0;
+	w[3].userdata = NULL;
+	w[4].flags = 0;
+	w[4].userdata = NULL;
+	w[5].flags = 0;
+	w[5].userdata = NULL;
+	w[6].flags = 0;
+	w[6].userdata = NULL;
+	winTpl = NULL;
+	unk_804187fc = FALSE;
 }
 
 //new in retail
-static void _callback(s32 error, DVDFileInfo* info) {
-	u32 i;
+void unk_8007f204(s32 error, DVDFileInfo* info) {
+	DVDEntry* entry = info->cb.userData;
+	s32 i;
 
-	UnpackTexPalette(tpldata);
-	DVDMgrClose(info->cb.userData);
-	wakuTexObj = __memAlloc(HEAP_DEFAULT, sizeof(GXTexObj) * tpldata->numDescriptors);
+	UnpackTexPalette(winTpl);
+	DVDMgrClose(entry);
+	wakuTexObj = __memAlloc(HEAP_DEFAULT, sizeof(GXTexObj) * winTpl->numDescriptors);
 
-	for (i = 0; i < tpldata->numDescriptors; i++) {
-		TEXGetGXTexObjFromPalette(tpldata, &wakuTexObj[i], i);
+	for (i = 0; i < winTpl->numDescriptors; i++) {
+		TEXGetGXTexObjFromPalette(winTpl, &wakuTexObj[i], i);
 	}
-	tpl_loaded = TRUE;
+	unk_804187fc = TRUE;
 }
 
 void windowTexSetup(void) {
 	DVDEntry* entry;
 	u32 size;
 	char path[128];
-	u32 i;
+	s32 i;
 
-	tpldata = NULL;
-	tpl_loaded = FALSE;
-	tpldata = arcOpen("font/msgWindow.tpl", NULL, NULL);
-	if (tpldata) {
-		UnpackTexPalette(tpldata);
-		wakuTexObj = __memAlloc(HEAP_DEFAULT, sizeof(GXTexObj) * tpldata->numDescriptors);
-
-		for (i = 0; i < tpldata->numDescriptors; i++) {
-			TEXGetGXTexObjFromPalette(tpldata, &wakuTexObj[i], i);
-		}
-	}
-	else {
+	winTpl = NULL;
+	unk_804187fc = FALSE;
+	winTpl = arcOpen("font/msgWindow.tpl", NULL, NULL);
+	if (!winTpl) {
 		sprintf(path, "%s/f/msgWindow.tpl", getMarioStDvdRoot());
 		entry = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
-		tpldata = __memAlloc(HEAP_DEFAULT, size);
+		winTpl = __memAlloc(HEAP_DEFAULT, size);
 		entry->info.cb.userData = entry;
-		DVDMgrReadAsync(entry, tpldata, size, 0, _callback);
+		DVDMgrReadAsync(entry, winTpl, size, 0, unk_8007f204);
+	}
+	else {
+		UnpackTexPalette(winTpl);
+		wakuTexObj = __memAlloc(HEAP_DEFAULT, sizeof(GXTexObj) * winTpl->numDescriptors);
+
+		for (i = 0; i < winTpl->numDescriptors; i++) {
+			TEXGetGXTexObjFromPalette(winTpl, &wakuTexObj[i], i);
+		}
 	}
 }
 
 void windowReInit(void) {
-	WinObjects[0].flags = 0;
-	WinObjects[0].userdata = NULL;
-	WinObjects[1].flags = 0;
-	WinObjects[1].userdata = NULL;
-	WinObjects[2].flags = 0;
-	WinObjects[2].userdata = NULL;
-	WinObjects[3].flags = 0;
-	WinObjects[3].userdata = NULL;
-	WinObjects[4].flags = 0;
-	WinObjects[4].userdata = NULL;
-	WinObjects[5].flags = 0;
-	WinObjects[5].userdata = NULL;
-	WinObjects[6].flags = 0;
-	WinObjects[6].userdata = NULL;
+	WindowEntry* w = WinObjects;
+
+	w[0].flags = 0;
+	w[0].userdata = NULL;
+	w[1].flags = 0;
+	w[1].userdata = NULL;
+	w[2].flags = 0;
+	w[2].userdata = NULL;
+	w[3].flags = 0;
+	w[3].userdata = NULL;
+	w[4].flags = 0;
+	w[4].userdata = NULL;
+	w[5].flags = 0;
+	w[5].userdata = NULL;
+	w[6].flags = 0;
+	w[6].userdata = NULL;
 }
 
 s32 windowEntry(u16 a1) {
 	WindowEntry* entry;
 	int i;
 
-	for (i = 0; i < 7; i++) {
-		entry = &WinObjects[i];
+	entry = WinObjects;
+	for (i = 0; i < 7; i++, entry++) {
 		if (!(entry->flags & 1)) {
 			memset(entry, 0, sizeof(WindowEntry));
 			entry->flags = 1;
@@ -142,8 +147,8 @@ void windowMain(void) {
 	WindowEntry* entry;
 	int i;
 
-	for (i = 0; i < 7; i++) {
-		entry = &WinObjects[i];
+	entry = WinObjects;
+	for (i = 0; i < 7; i++, entry++) {
 		if (entry->flags & 1) {
 			if (entry->main) {
 				entry->main(entry);
@@ -1058,7 +1063,7 @@ void windowDispGX_Waku_col(s16 gxTexMapID, GXColor color, f32 x, f32 y, f32 heig
 	Mtx mtx;
 	f32 fVar1, fVar2, fVar3, fVar4, fVar5, fVar6; //TODO: rename
 
-	if (tpl_loaded) {
+	if (unk_804187fc) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}
@@ -1230,7 +1235,7 @@ void windowDispGX2_Waku_col(Mtx mtx, s16 gxTexMapID, GXColor color, f32 x, f32 y
 	Mtx mtx2;
 	f32 fVar1, fVar2, fVar3, fVar4, fVar5, fVar6, dVar9, dVar10; //TODO: rename
 
-	if (tpl_loaded) {
+	if (unk_804187fc) {
 		if (gxTexMapID) {
 			gxTexMapID = 0;
 		}
@@ -1402,7 +1407,7 @@ void windowDispGX2_Waku_col(Mtx mtx, s16 gxTexMapID, GXColor color, f32 x, f32 y
 }
 
 s32 windowCheckID(s32 id) {
-	return WinObjects[id].flags & 2;
+	return windowGetPointer(id)->flags & 2;
 }
 
 WindowEntry* windowGetPointer(s32 id) {

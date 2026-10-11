@@ -2,6 +2,7 @@
 // include: string.h
 // include: dolphin/mtx.h
 // decl: double atan2(double y, double x);
+// decl: static inline f32 fid(f32 x) { return x; }
 // proto: static USER_FUNC(cam_kaiten_init);
 static USER_FUNC(cam_kaiten_init) {
     s32* args = event->args;
@@ -33,7 +34,7 @@ static USER_FUNC(cam_kaiten_init) {
     target.y = 0.0f;
     pos.y = 0.0f;
     dist = PSVECDistance(&pos, &target);
-    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
+    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
     ckp0->dist = dist;
 
     pos = ckp1->pos;

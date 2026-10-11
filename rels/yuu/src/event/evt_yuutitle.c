@@ -39,21 +39,42 @@ __declspec(section ".data") s32 fd_evt_yuutitle___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_evt_yuutitle_one_364[1];
 static __declspec(section ".data") s32 main_evt[4];
 
-USER_FUNC(evt_yuutitle_free) {
-    YuuTitleWork* wp = _wp;
+void evt_yuutitle_disp_func(CameraId camera, void* param) {
+    YuuTitleWork* wp = param;
+    f32 scale = 2.0f;
+    f32 halfWidth;
 
-    if (wp == NULL) {
+    if (wp->alpha < 255) {
+        f32 t;
+
+        wp->alpha += 6;
+        if (wp->alpha > 255) {
+            wp->alpha = 255;
+        }
+        t = wp->alpha / 255.0f;
+        wp->x = wp->targetX * t + wp->startX * (1.0f - t);
+        wp->y = wp->targetY * t + wp->startY * (1.0f - t);
+        t = 0.2f + 0.8f * t;
+        scale *= t;
+    }
+    halfWidth = scale * FontGetMessageWidth(wp->msg) / 2;
+    FontDrawStart();
+    FontDrawScale(scale);
+    FontDrawEdge();
+    FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+    FontDrawString(wp->x - halfWidth, wp->y, wp->msg);
+    FontDrawEdgeOff();
+}
+
+USER_FUNC(evt_yuutitle_main_func) {
+    YuuTitleWork* wp = (YuuTitleWork*)event->lwData[0];
+
+    if (wp->flags & 1) {
+        wp->flags |= 2;
         return EVT_RETURN_DONE;
     }
-    if (isFirstCall) {
-        wp->flags |= 1;
-    }
-    if (!(wp->flags & 2)) {
-        return EVT_RETURN_BLOCK;
-    }
-    _mapFree(_wp);
-    _wp = NULL;
-    return EVT_RETURN_DONE;
+    dispEntry(CAMERA_2D, 1000.0f, 0, evt_yuutitle_disp_func, wp);
+    return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(evt_yuutitle_alloc) {
@@ -73,41 +94,21 @@ USER_FUNC(evt_yuutitle_alloc) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_yuutitle_main_func) {
-    YuuTitleWork* wp = (YuuTitleWork*)event->lwData[0];
+USER_FUNC(evt_yuutitle_free) {
+    YuuTitleWork* wp = _wp;
 
-    if (wp->flags & 1) {
-        wp->flags |= 2;
+    if (wp == NULL) {
         return EVT_RETURN_DONE;
     }
-    dispEntry(CAMERA_2D, 1000.0f, 0, evt_yuutitle_disp_func, wp);
-    return EVT_RETURN_BLOCK;
-}
-
-void evt_yuutitle_disp_func(CameraId camera, void* param) {
-    YuuTitleWork* wp = param;
-    f32 scale = 2.0f;
-    f32 halfWidth;
-
-    if (wp->alpha < 255) {
-        f32 t;
-
-        wp->alpha += 6;
-        if (wp->alpha > 255) {
-            wp->alpha = 255;
-        }
-        t = wp->alpha / 255.0f;
-        wp->x = wp->targetX * t + wp->startX * (1.0f - t);
-        wp->y = wp->targetY * t + wp->startY * (1.0f - t);
-        scale *= 0.2f + 0.8f * t;
+    if (isFirstCall) {
+        wp->flags |= 1;
     }
-    halfWidth = scale * FontGetMessageWidth(wp->msg) / 2;
-    FontDrawStart();
-    FontDrawScale(scale);
-    FontDrawEdge();
-    FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
-    FontDrawString(wp->x - halfWidth, wp->y, wp->msg);
-    FontDrawEdgeOff();
+    if (!(wp->flags & 2)) {
+        return EVT_RETURN_BLOCK;
+    }
+    _mapFree(_wp);
+    _wp = NULL;
+    return EVT_RETURN_DONE;
 }
 
 __declspec(section ".data") u64 fd_evt_yuutitle_negone_one_374 = 0xBF8000003F800000;

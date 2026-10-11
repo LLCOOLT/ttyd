@@ -19,7 +19,7 @@ USER_FUNC(muj_npc_guruguru) {
     f32 x;
     f32 z;
     f32 y;
-    s32 frame;
+    f32 angle;
 
     if (isFirstCall) {
         event->savedTime = gp->renderTime;
@@ -27,11 +27,11 @@ USER_FUNC(muj_npc_guruguru) {
         event->userdataf[2] = distABf(cx, cz, npc->position.x, npc->position.z);
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    frame = 0.5f + sysMsec2FrameFloat(elapsed);
+    angle = speed * (s32)(0.5f + sysMsec2FrameFloat(elapsed)) + event->userdataf[1];
     x = cx;
     y = npc->position.y;
     z = cz;
-    movePos(&x, &z, event->userdataf[2], speed * frame + event->userdataf[1]);
+    movePos(&x, &z, event->userdataf[2], angle);
     if (dir == 0) {
         if (npc->position.x > x) {
             npc->direction = 270.0f;

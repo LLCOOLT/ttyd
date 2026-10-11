@@ -9,6 +9,8 @@
 // proto: USER_FUNC(_steal_item);
 USER_FUNC(_steal_item) {
     s32* args = event->args;
+    s32 coins;
+    s32 num;
     PouchData* pouch = pouchGetPtr();
     BattleUnit* unit;
     BattleUnit* target;
@@ -37,9 +39,8 @@ USER_FUNC(_steal_item) {
     evtSetValue(event, iconVar, 0);
     evtSetValue(event, numVar, 0);
     if (irand(100) < 100) {
-        s32 coins = pouchGetCoin();
-        s32 num = 5;
-
+        coins = pouchGetCoin();
+        num = 5;
         if (coins < 5) {
             num = coins;
         }

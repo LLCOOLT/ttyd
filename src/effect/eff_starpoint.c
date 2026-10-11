@@ -24,46 +24,91 @@ typedef struct EffStarPointWork {
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
 static inline f32 _sinf(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
     f32 y;
+    f32 x2;
 
     if (x <= PI) {
         if (x <= HALF_PI) {
-            return ((0.00761f * (x * x) - 0.16605f) * (x * x) + 1.0f) * x;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * x;
         }
-        y = HALF_PI - (x - HALF_PI);
-        return ((0.00761f * (y * y) - 0.16605f) * (y * y) + 1.0f) * y;
+        else {
+            y = HALF_PI - (x - HALF_PI);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = a * y;
+        }
     }
-    if (x < 4.712389f) {
+    else if (x < 4.712389f) {
         y = x - PI;
-        return -(((0.00761f * (y * y) - 0.16605f) * (y * y) + 1.0f) * y);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
     }
-    y = HALF_PI - (x - 4.712389f);
-    return -(((0.00761f * (y * y) - 0.16605f) * (y * y) + 1.0f) * y);
+    else {
+        y = HALF_PI - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = a * y;
+        a = -a;
+    }
+    return a;
 }
 
 static inline f32 _cosf(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
     f32 y;
+    f32 x2;
 
     if (x <= PI) {
         if (x <= HALF_PI) {
-            return (0.03705f * (x * x) - 0.4967f) * (x * x) + 1.0f;
+            x2 = x * x;
+            a = a * x2 - b;
+            a = a * x2 + c;
         }
-        y = HALF_PI - (x - HALF_PI);
-        return -((0.03705f * (y * y) - 0.4967f) * (y * y) + 1.0f);
+        else {
+            y = HALF_PI - (x - HALF_PI);
+            x2 = y * y;
+            a = a * x2 - b;
+            a = a * x2 + c;
+            a = -a;
+        }
     }
-    if (x < 4.712389f) {
+    else if (x < 4.712389f) {
         y = x - PI;
-        return -((0.03705f * (y * y) - 0.4967f) * (y * y) + 1.0f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+        a = -a;
     }
-    y = HALF_PI - (x - 4.712389f);
-    return (0.03705f * (y * y) - 0.4967f) * (y * y) + 1.0f;
+    else {
+        y = HALF_PI - (x - 4.712389f);
+        x2 = y * y;
+        a = a * x2 - b;
+        a = a * x2 + c;
+    }
+    return a;
 }
 
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
+    s32 delay;
     EffectEntry* effect;
     EffStarPointWork* work;
-    EffStarPointWork* star;
-    s32 i, delay;
+    s32 i;
+    f32 r;
     f32 angle;
 
     effect = effEntry();
@@ -79,25 +124,26 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     work->timer = 60;
     work->frame = 0;
 
-    star = work + 1;
-    for (i = 1, delay = 4; i < effect->count; i++, delay += 3, star++) {
-        star->position.x = 0.0f;
-        star->position.y = 0.0f;
-        star->position.z = 0.0f;
-        angle = 6.2831855f * (rand() % 360) / 360.0f;
-        star->velX = 2.0f * _sinf(angle);
-        star->velZ = 2.0f * _cosf(angle);
-        star->velY = 14.0f;
-        star->gravity = 2.0f;
-        star->alpha = 0;
-        star->delay = delay;
+    for (i = 1, delay = 4, work++; i < effect->count; i++, delay += 3, work++) {
+        r = rand() % 360;
+        work->position.x = 0.0f;
+        work->position.y = 0.0f;
+        work->position.z = 0.0f;
+        angle = 6.2831855f * r / 360.0f;
+        work->velX = 2.0f * _sinf(angle);
+        work->velZ = 2.0f * _cosf(angle);
+        work->velY = 14.0f;
+        work->gravity = 2.0f;
+        work->alpha = 0;
+        work->delay = delay;
     }
     return effect;
 }
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset
 
 void effStarPointMain(EffectEntry* effect) {
     EffStarPointWork* work = effect->userdata;
-    EffStarPointWork* star;
     Vec position;
     s32 i;
 
@@ -108,25 +154,24 @@ void effStarPointMain(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
-    star = work + 1;
-    for (i = 1; i < effect->count; i++, star++) {
-        if (star->delay) {
-            star->delay--;
-            star->alpha = 0;
+    for (i = 1, work++; i < effect->count; i++, work++) {
+        if (work->delay) {
+            work->delay--;
+            work->alpha = 0;
         }
         else {
-            star->velY -= star->gravity;
-            star->position.x += star->velX;
-            star->position.y += star->velY;
-            star->position.z += star->velZ;
-            if (star->velY < 0.0f) {
-                star->alpha -= 2;
-                if (star->alpha < 0) {
-                    star->alpha = 0;
+            work->velY -= work->gravity;
+            work->position.x += work->velX;
+            work->position.y += work->velY;
+            work->position.z += work->velZ;
+            if (work->velY < 0.0f) {
+                work->alpha -= 2;
+                if (work->alpha < 0) {
+                    work->alpha = 0;
                 }
             }
             else {
-                star->alpha = 255;
+                work->alpha = 255;
             }
         }
     }
@@ -135,7 +180,6 @@ void effStarPointMain(EffectEntry* effect) {
 
 void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
     EffStarPointWork* work = effect->userdata;
-    EffStarPointWork* star;
     Mtx mtx;
     Mtx rot;
     Mtx trans;
@@ -144,10 +188,9 @@ void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(CAMERA_3D)->viewYaw));
     PSMTXConcat(mtx, rot, mtx);
-    star = work + 1;
-    for (i = 1; i < effect->count; i++, star++) {
-        if (star->alpha) {
-            PSMTXTrans(trans, star->position.x, star->position.y, star->position.z);
+    for (i = 1, work++; i < effect->count; i++, work++) {
+        if (work->alpha) {
+            PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
             PSMTXConcat(mtx, trans, trans);
             iconDispGx2(trans, 0, 0x18C);
         }

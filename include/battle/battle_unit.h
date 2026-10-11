@@ -489,7 +489,8 @@ typedef struct BattleWorkHpGauge { // TODO: diff header file?
 // TODO: move somewhere more sensible
 typedef struct ItemDropData {
     ItemType type;         // 0x0
-    u8 field_4[0x8 - 0x4]; // 0x4
+    s16 holdWeight;        // 0x4
+    s16 dropWeight;        // 0x6
 } ItemDropData;
 
 // note to self: +4 is near mUnk_HpGauge at 0x1FC
@@ -686,7 +687,7 @@ typedef struct BattleUnitSetup {
     BattleUnitKind* mUnitKindParams; // 0x0
     u8 field_4[0x1C - 0x4];          // 0x4
     s32 field_1C[4];                 // 0x1C, ??? "unitWork" TODO: verify
-    u8 field_2C[0x30 - 0x2C];        // 0x2C
+    ItemDropData* itemDropTable;     // 0x2C
 } BattleUnitSetup;
 
 BOOL BtlUnit_Init(void);

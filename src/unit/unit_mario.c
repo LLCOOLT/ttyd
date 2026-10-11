@@ -372,13 +372,13 @@ static USER_FUNC(_mario_makkuro_set) {
 }
 
 USER_FUNC(_mario_super_emblem_anim_set) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnitPart* part;
     const char* animName;
     s32 id, type;
 
-    id = evtGetValue(event, args[0]);
+    id = evtGetValue(event, *args++);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     type = 0;

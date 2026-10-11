@@ -2,16 +2,16 @@
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
-#include "evt/evt_npc.h"
-#include "manager/evtmgr_cmd.h"
 #include "driver/effdrv.h"
+#include "mario/mario.h"
+#include "manager/evtmgr_cmd.h"
 #include "driver/npcdrv.h"
 #include "system.h"
-#include "mario/mario.h"
+#include "evt/evt_npc.h"
 
 EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-static inline f32 hoshi_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; return ((a * x2 - b) * x2 + c) * x; } y = 1.5707964f - (x - 1.5707964f); x2 = y * y; return ((a * x2 - b) * x2 + c) * y; } if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; return -(((a * x2 - b) * x2 + c) * y); } y = 1.5707964f - (x - 4.712389f); x2 = y * y; return -(((a * x2 - b) * x2 + c) * y); }
-static inline f32 hoshi_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; return (a * x2 - b) * x2 + c; } y = 1.5707964f - (x - 1.5707964f); x2 = y * y; return -((a * x2 - b) * x2 + c); } if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; return -((a * x2 - b) * x2 + c); } y = 1.5707964f - (x - 4.712389f); x2 = y * y; return (a * x2 - b) * x2 + c; }
+static inline f32 hoshi_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
+static inline f32 hoshi_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
 USER_FUNC(evt_bero_exec_wait);
@@ -417,6 +417,143 @@ static USER_FUNC(npc_set_pos) {
 
     npc->prevPosition = (Vec){x, y, z};
     npc->position = npc->prevPosition;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(hoshi) {
+    event->lwData[10] = (s32)effStarStoneEntry(5, 0.0f, 60.0f, -950.0f, 1.0f);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(hoshi_delete) {
+    effSoftDelete((EffectEntry*)event->lwData[10]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(hoshi_r) {
+    EffectEntry* eff = (EffectEntry*)event->lwData[10];
+
+    ((f32*)eff->userdata)[7] = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+#pragma opt_propagation off
+#pragma opt_lifetimes off
+USER_FUNC(hoshi_jump) {
+    f32* pos = (f32*)((EffectEntry*)event->lwData[10])->userdata + 2;
+    NpcEntry* npc = npcNameToPtr("\203}\203W\203\207\203\212\203\223");
+    f32 vy;
+    f32 speed;
+    f32 t;
+    f32 x = npc->position.x;
+    f32 y = 50.0f + npc->position.y;
+    f32 z = npc->position.z;
+    f32 angle;
+    f32 g;
+    f32 dy;
+
+    speed = 0.5f;
+    if (isFirstCall) {
+        t = distABf(x, z, pos[0], pos[2]) / speed;
+        dy = y - pos[1];
+        g = 0.1f * t;
+        vy = dy / t + g / 2.0f;
+        event->userdata[0] = *(s32*)&t;
+        event->userdata[1] = *(s32*)&vy;
+        event->userdata[2] = *(s32*)&speed;
+        event->field_84 = 0;
+    }
+    t = event->userdataf[0];
+    vy = event->userdataf[1];
+    speed = event->userdataf[2];
+    angle = 6.2831855f * angleABf(pos[0], pos[2], x, z) / 360.0f;
+    pos[0] = speed * hoshi_sin(angle) + pos[0];
+    pos[2] = pos[2] - speed * hoshi_cos(angle);
+    pos[1] += vy;
+    vy -= 0.1f;
+    t -= 1.0f;
+    if (t < 0.0f) {
+        pos[0] = x;
+        pos[1] = y;
+        pos[2] = z;
+        return EVT_RETURN_DONE;
+    }
+    event->userdata[0] = *(s32*)&t;
+    event->userdata[1] = *(s32*)&vy;
+    return EVT_RETURN_BLOCK;
+}
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset
+
+USER_FUNC(get_starstone_seq) {
+    s32* args = event->args;
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
+
+    evtSetValue(event, args[1], ((s32*)eff->userdata)[15]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_fall) {
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    ((s32*)eff->userdata)[15] = 1;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(set_starstone_pos) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[2] = x;
+    ((f32*)eff->userdata)[3] = y;
+    ((f32*)eff->userdata)[4] = z;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(get_starstone_pos) {
+    s32* args = event->args;
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
+
+    evtSetFloat(event, args[1], ((f32*)eff->userdata)[2]);
+    evtSetFloat(event, args[2], ((f32*)eff->userdata)[3]);
+    evtSetFloat(event, args[3], ((f32*)eff->userdata)[4]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_entry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 type = evtGetValue(event, args[1]);
+    f32 x = evtGetFloat(event, args[2]);
+    f32 y = evtGetFloat(event, args[3]);
+    f32 z = evtGetFloat(event, args[4]);
+    f32 scale = evtGetFloat(event, args[5]);
+    EffectEntry* eff = effStarStoneEntry(type, x, y, z, scale);
+
+    effSetName(eff, name);
+    ((u16*)eff->userdata)[2] |= 0x10;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(stone_bg) {
+    EffectEntry* eff;
+
+    eff = effNameToPtr("sub_bg");
+    ((s32*)eff->userdata)[14] = 5;
+    eff = effNameToPtr("nise");
+    ((s32*)eff->userdata)[14] = 5;
+    marioSetCamId(5);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(reset_stone_cam) {
+    EffectEntry* eff = effNameToPtr("nise");
+
+    ((s32*)eff->userdata)[14] = 4;
     return EVT_RETURN_DONE;
 }
 
@@ -994,126 +1131,4 @@ EVT_BEGIN(pik_02_init_evt)
     CALL(evt_cam_letter_box_disable, 0)
     RETURN
 EVT_END()
-
-USER_FUNC(hoshi) {
-    event->lwData[10] = (s32)effStarStoneEntry(5, 0.0f, 60.0f, -950.0f, 1.0f);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(hoshi_delete) {
-    effSoftDelete((EffectEntry*)event->lwData[10]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(hoshi_r) {
-    EffectEntry* eff = (EffectEntry*)event->lwData[10];
-
-    ((f32*)eff->userdata)[7] = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(hoshi_jump) {
-    f32* pos = (f32*)((EffectEntry*)event->lwData[10])->userdata + 2;
-    NpcEntry* npc = npcNameToPtr("\203}\203W\203\207\203\212\203\223");
-    f32 vy;
-    f32 speed = 0.5f;
-    f32 t;
-    f32 x = npc->position.x;
-    f32 y = 50.0f + npc->position.y;
-    f32 z = npc->position.z;
-    f32 angle;
-
-    if (isFirstCall) {
-        t = distABf(x, z, pos[0], pos[2]) / speed;
-        vy = (y - pos[1]) / t + 0.1f * t * 0.5f;
-        event->userdata[0] = *(s32*)&t;
-        event->userdata[1] = *(s32*)&vy;
-        event->userdata[2] = *(s32*)&speed;
-        event->field_84 = 0;
-    }
-    t = event->userdataf[0];
-    vy = event->userdataf[1];
-    speed = event->userdataf[2];
-    angle = 6.2831855f * angleABf(pos[0], pos[2], x, z) / 360.0f;
-    pos[0] = speed * hoshi_sin(angle) + pos[0];
-    pos[2] = pos[2] - speed * hoshi_cos(angle);
-    t -= 1.0f;
-    pos[1] += vy;
-    vy -= 0.1f;
-    if (t < 0.0f) {
-        pos[0] = x;
-        pos[1] = y;
-        pos[2] = z;
-        return EVT_RETURN_DONE;
-    }
-    event->userdata[0] = *(s32*)&t;
-    event->userdata[1] = *(s32*)&vy;
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(get_starstone_seq) {
-    s32* args = event->args;
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-
-    evtSetValue(event, args[1], ((s32*)eff->userdata)[15]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_fall) {
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
-
-    ((s32*)eff->userdata)[15] = 1;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(set_starstone_pos) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(get_starstone_pos) {
-    s32* args = event->args;
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-
-    evtSetFloat(event, args[1], ((f32*)eff->userdata)[2]);
-    evtSetFloat(event, args[2], ((f32*)eff->userdata)[3]);
-    evtSetFloat(event, args[3], ((f32*)eff->userdata)[4]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 type = evtGetValue(event, args[1]);
-    f32 x = evtGetFloat(event, args[2]);
-    f32 y = evtGetFloat(event, args[3]);
-    f32 z = evtGetFloat(event, args[4]);
-    f32 scale = evtGetFloat(event, args[5]);
-    EffectEntry* eff = effStarStoneEntry(type, x, y, z, scale);
-
-    effSetName(eff, name);
-    ((u16*)eff->userdata)[2] |= 0x10;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(stone_bg) {
-    ((s32*)effNameToPtr("sub_bg")->userdata)[14] = 5;
-    ((s32*)effNameToPtr("nise")->userdata)[14] = 5;
-    marioSetCamId(5);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(reset_stone_cam) {
-    ((s32*)effNameToPtr("nise")->userdata)[14] = 4;
-    return EVT_RETURN_DONE;
-}
 

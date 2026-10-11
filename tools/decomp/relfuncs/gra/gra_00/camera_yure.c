@@ -7,6 +7,7 @@ USER_FUNC(camera_yure) {
     CameraEntry* cam = camGetPtr(CAMERA_3D);
     Vec v;
     f32 amp;
+    s32 left;
 
     if (isFirstCall) {
         event->userdata[0] = 0;
@@ -14,7 +15,8 @@ USER_FUNC(camera_yure) {
     }
     // shake three times, fading out
     amp = sin(18.849556f * event->userdata[0] / event->userdata[1]);
-    amp = (event->userdata[1] - event->userdata[0]) * (0.1f * amp) / event->userdata[1];
+    left = event->userdata[1] - event->userdata[0];
+    amp = left * (0.1f * amp) / event->userdata[1];
     PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
     PSVECScale(&v, &v, amp);
     cam->viewOffset.x = v.x;

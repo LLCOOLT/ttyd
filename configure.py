@@ -392,7 +392,7 @@ config.libs = [
             Object(NonMatching, "battle/ac/ac_timing_wide.c"),
             Object(NonMatching, "battle/ac/ac_pendulum_crane_timing.c"),
             Object(NonMatching, "battle/ac/ac_air_gauge.c"),
-            Object(NonMatching, "battle/ac/ac_crane_timing.c"),
+            Object(Matching, "battle/ac/ac_crane_timing.c"),
             Object(NonMatching, "battle/ac/ac_power_gauge.c"),
             Object(NonMatching, "battle/ac/ac_power_gauge_lv.c"),
             Object(NonMatching, "battle/ac/ac_signal_timing.c"),
@@ -453,7 +453,7 @@ config.libs = [
             Object(NonMatching, "driver/mobjdrv.c"),
             Object(NonMatching, "driver/casedrv.c"),
             Object(NonMatching, "driver/imgdrv.c"),
-            Object(NonMatching, "driver/offscreendrv.c"),
+            Object(Matching, "driver/offscreendrv.c"),
             Object(Matching, "driver/arcdrv.c"),
             Object(NonMatching, "driver/windowdrv.c"),
             Object(NonMatching, "driver/msgdrv.c"),
@@ -507,7 +507,7 @@ config.libs = [
             Object(NonMatching, "effect/eff_mobj_broken.c"),
             Object(NonMatching, "effect/eff_mahojin.c"),
             Object(NonMatching, "effect/eff_nozle.c"),
-            Object(NonMatching, "effect/eff_mizutama.c"),
+            Object(Matching, "effect/eff_mizutama.c"),
             Object(NonMatching, "effect/eff_minigame.c"),
             Object(NonMatching, "effect/eff_splash.c"),
             Object(Matching, "effect/eff_treasure_map.c"),
@@ -529,7 +529,7 @@ config.libs = [
             Object(Matching, "effect/eff_mahorn.c"),
             Object(NonMatching, "effect/eff_spirit.c"),
             Object(Matching, "effect/eff_indirect.c"),
-            Object(NonMatching, "effect/eff_syuryou.c"),
+            Object(Matching, "effect/eff_syuryou.c"),
             Object(Matching, "effect/eff_uranoko.c"),
             Object(NonMatching, "effect/eff_hibashira.c"),
             Object(NonMatching, "effect/eff_number.c"),
@@ -540,9 +540,9 @@ config.libs = [
             Object(Matching, "effect/eff_energy.c"),
             Object(Matching, "effect/eff_nokotarou.c"),
             Object(Matching, "effect/eff_queen.c"),
-            Object(NonMatching, "effect/eff_queen2.c"),
+            Object(Matching, "effect/eff_queen2.c"),
             Object(NonMatching, "effect/eff_gonbaba_breath.c"),
-            Object(NonMatching, "effect/eff_majinai.c"),
+            Object(Matching, "effect/eff_majinai.c"),
             Object(NonMatching, "effect/eff_mahorn2.c"),
             Object(NonMatching, "effect/eff_ultra_hammer.c"),
         ],
@@ -613,7 +613,7 @@ config.libs = [
             Object(NonMatching, "effect/n64/eff_magic2_n64.c"),
             Object(NonMatching, "effect/n64/eff_magic3_n64.c"),
             Object(NonMatching, "effect/n64/eff_magic_horao_n64.c"),
-            Object(NonMatching, "effect/n64/eff_n64.c"),
+            Object(Matching, "effect/n64/eff_n64.c"),
             Object(NonMatching, "effect/n64/eff_onpu_n64.c"),
             Object(NonMatching, "effect/n64/eff_opuku_jetw_n64.c"),
             Object(NonMatching, "effect/n64/eff_opuku_jetwrain_n64.c"),
@@ -688,13 +688,13 @@ config.libs = [
             Object(Matching, "event/evt_bg.c"),
             Object(NonMatching, "event/evt_damage.c"),
             Object(NonMatching, "event/evt_nannpc.c"),
-            Object(NonMatching, "event/evt_fade.c"),
+            Object(Matching, "event/evt_fade.c"),
             Object(Matching, "event/evt_light.c"),
             Object(NonMatching, "event/evt_audience.c"),
             Object(NonMatching, "event/evt_batstage.c"),
             Object(Matching, "event/evt_seq.c"),
             Object(NonMatching, "event/evt_twoddisp.c"),
-            Object(NonMatching, "event/evt_snd.c"),
+            Object(Matching, "event/evt_snd.c"),
             Object(NonMatching, "event/evt_win.c"),
             Object(NonMatching, "event/evt_cloud.c"),
             Object(Matching, "event/evt_env.c"),
@@ -722,7 +722,7 @@ config.libs = [
             Object(NonMatching, "manager/fontmgr.c"),
             Object(NonMatching, "manager/cardmgr.c"),
             Object(Matching, "manager/dvdmgr.c"),
-            Object(NonMatching, "manager/arammgr.c"),
+            Object(Matching, "manager/arammgr.c"),
             Object(NonMatching, "manager/filemgr.c"),
             Object(NonMatching, "manager/winmgr.c"),
         ],
@@ -742,7 +742,7 @@ config.libs = [
             Object(NonMatching, "mario/mario_balloon.c"),
             Object(NonMatching, "mario/mario_kemuri.c"),
             Object(NonMatching, "mario/mario_party.c"),
-            Object(NonMatching, "mario/mario_cam.c"),
+            Object(Matching, "mario/mario_cam.c"),
         ],
     },
     {
@@ -809,7 +809,7 @@ config.libs = [
         "cflags": cflags_static,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "unit/unit_mario.c"),
+            Object(Matching, "unit/unit_mario.c"),
             Object(Matching, "unit/unit_bomzou.c"),
             Object(Matching, "unit/unit_koura.c"),
             Object(Matching, "unit/unit_object_tree.c"),
@@ -853,7 +853,7 @@ config.libs = [
         "cflags": cflags_static,
         "progress_category": "game",
         "objects": [
-            Object(NonMatching, "sdk/arc.c"),
+            Object(Matching, "sdk/arc.c"),
             Object(NonMatching, "sdk/DEMOInit.c"),
             Object(Matching, "sdk/DEMOPad.c"),
             Object(Matching, "sdk/texPalette.c"),
@@ -866,7 +866,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "cam_road.c"),
-            Object(NonMatching, "cam_shift.c"),
+            Object(Matching, "cam_shift.c"),
             Object(NonMatching, "countdown.c"),
             Object(NonMatching, "database.c"),
             Object(NonMatching, "error_handler.c"),
@@ -1325,7 +1325,7 @@ config.libs = [
             Object(Matching, "mri_18.c"),
             Object(Matching, "mri_19.c"),
             Object(Matching, "unit/unit_monochrome_kurokumorn.c"),
-            Object(NonMatching, "mri_16.c"),
+            Object(Matching, "mri_16.c"),
             Object(Matching, "unit/unit_pakkun_flower.c"),
             Object(Matching, "mri_17.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_kanbu2.c"),
@@ -1347,6 +1347,8 @@ config.libs = [
             Object(Matching, "mri_00.c"),
             Object(Matching, "unit/unit_boss_magnum_battender.c"),
             Object(Matching, "unit/unit_barriern.c"),
+            Object(Matching, "driver/punidrv.c"),
+            Object(Matching, "mri.c"),
         ],
     ),
     Rel(
@@ -1359,7 +1361,7 @@ config.libs = [
             Object(Matching, "battle_database_pik.c"),
             Object(Matching, "pik_01.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "pik_00.c"),
-            Object(NonMatching, "pik_02.c"),
+            Object(Matching, "pik_02.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1403,6 +1405,7 @@ config.libs = [
             Object(Matching, "unit/unit_patakuri.c"),
             Object(Matching, "unit/unit_boss_gesso.c"),
             Object(Matching, "tik_11.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "tik_00.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1439,6 +1442,7 @@ config.libs = [
             Object(Matching, "unit/unit_barriern_custom.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_barriern_z.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_magnum_battender_mkII.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "aji_06.c"),
         ]
     ),
     Rel(
@@ -1481,6 +1485,7 @@ config.libs = [
             Object(Matching, "dou_11.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_lect_dou.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_kuriboo.c"),
+            Object(Matching, "dou_10.c"),
         ]
     ),
     Rel(
@@ -1558,6 +1563,8 @@ config.libs = [
             Object(Matching, "unit/unit_kuriboo.c"),
             Object(Matching, "unit/unit_lecture_frankli_sac.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "gor_02.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "gor_01.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "gor_10.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1580,7 +1587,7 @@ config.libs = [
             Object(Matching, "unit/unit_hyper_togekuri.c"),
             Object(Matching, "event/evt_kagemario.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_iwamove.c"),
-            Object(NonMatching, "gra_00.c"),
+            Object(Matching, "gra_00.c"),
             Object(Matching, "unit/unit_kuriboo.c"),
         ]
     ),
@@ -1653,6 +1660,7 @@ config.libs = [
             Object(Matching, "unit/unit_boss_rampell.c"),
             Object(Matching, "event/evt_kagemario.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_faker_mario.c"),
+            Object(Matching, "unit/unit_atmic_teresa.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1705,8 +1713,8 @@ config.libs = [
             Object(Matching, "unit/unit_dokugassun.c"),
             Object(Matching, "unit/unit_bubble.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_phantom.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "unit/unit_borodo.c"),
-            Object(NonMatching, "unit/unit_badge_borodo.c"),
+            Object(Matching, "unit/unit_borodo.c"),
+            Object(Matching, "unit/unit_badge_borodo.c"),
             Object(Matching, "unit/unit_piders.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_churantalar.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_wanwan.c"),
@@ -1786,6 +1794,8 @@ config.libs = [
             Object(Matching, "unit/unit_red_honenoko.c"),
             Object(Matching, "las_14.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_batten_satellite.c"),
+            Object(Matching, "las_04.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "las_29.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1831,9 +1841,13 @@ config.libs = [
             Object(Matching, "unit/unit_hermos.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_poison_pakkun.c"),
             Object(Matching, "muj_10.c"),
-            Object(NonMatching, "muj_01.c"),
+            Object(Matching, "muj_01.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_lect_muj.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_flower_chorobon.c"),
+            Object(Matching, "muj.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "unit/unit_boss_cortez.c"),
+            Object(Matching, "muj_12.c"),
+            Object(Matching, "unit/unit_boss_gundan_zako_group3.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1921,9 +1935,9 @@ config.libs = [
             Object(Matching, "unit/unit_boss_majolyne.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "window/win_03.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_dokugassun.c"),
-            Object(NonMatching, "window/win_00.c"),
-            Object(NonMatching, "window/win_04.c"),
-            Object(NonMatching, "window/win_06.c"),
+            Object(Matching, "window/win_00.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "window/win_04.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "window/win_06.c"),
             Object(Matching, "event/evt_lect_win.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
@@ -1931,7 +1945,7 @@ config.libs = [
         "yuu",
         [
             Object(Matching, "yuu.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "event/evt_yuutitle.c"),
+            Object(Matching, "event/evt_yuutitle.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_yuuminigame.c"),
         ]
     ),
@@ -1946,6 +1960,13 @@ config.libs = [
         "dmo",
         [
             Object(Matching, "dmo.c", extra_cflags=["-inline auto,deferred"]),
+            Object(Matching, "dmo_00.c", extra_cflags=["-inline auto,deferred"]),
+        ]
+    ),
+    Rel(
+        "sys",
+        [
+            Object(Matching, "sys.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1979,9 +2000,9 @@ config.libs = [
             Object(Matching, "unit/unit_ura_pata.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_monochrome_pakkun.c"),
             Object(Matching, "unit/unit_hammer_bros.c"),
-            Object(NonMatching, "unit/unit_borodo.c"),
+            Object(Matching, "unit/unit_borodo.c"),
             Object(Matching, "unit/unit_boss_koopa_tou.c"),
-            Object(NonMatching, "unit/unit_borodo_king.c"),
+            Object(Matching, "unit/unit_borodo_king.c"),
             Object(Matching, "unit/unit_fire_bros.c"),
             Object(Matching, "unit/unit_boss_champion.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_piders.c", extra_cflags=["-inline auto,deferred"]),

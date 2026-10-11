@@ -1,9 +1,27 @@
 #include "tou2.h"
 #include "dolphin/types.h"
+#include "dolphin/mtx.h"
+#include "dolphin/gx.h"
 #include "driver/swdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/animdrv.h"
+#include "driver/camdrv.h"
+#include "driver/effdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/windowdrv.h"
+#include "driver/icondrv.h"
+#include "driver/msgdrv.h"
+#include "manager/fontmgr.h"
 #include "manager/evtmgr_cmd.h"
 #include "evt/evt_cmd.h"
+#include "battle/battle_monosiri.h"
+#include "data/mapdata.h"
+#include "mario/mario_pouch.h"
+#include "pmario_sound.h"
+#include "system.h"
 #include "memory.h"
+#include "string.h"
+#include "stdio.h"
 
 typedef struct RankEntry {
     u16 flags;
@@ -75,8 +93,120 @@ typedef enum FighterId {
     FIGHTER_SPINIA = 22,
 } FighterId;
 
-RankData rank_work;
-FighterData fighterDt[23] = {
+typedef struct RuleData {
+    const char* name;
+    const char* desc;
+    s32 id;
+    s32 field_C;
+    s32 field_10;
+} RuleData;
+
+typedef struct DispWork {
+    f32 scroll;
+    f32 target;
+    s32 page;
+} DispWork;
+
+// battle setup table layout (only the fields used here)
+typedef struct TouUnitKind {
+    s32 type;
+} TouUnitKind;
+
+typedef struct TouUnitSetup {
+    TouUnitKind* kind;
+    u8 pad_4[0x30 - 0x4];
+} TouUnitSetup;
+
+typedef struct TouGroupSetup {
+    s32 num;
+    TouUnitSetup* units;
+} TouGroupSetup;
+
+typedef struct TouLoadout {
+    s32 weight;
+    TouGroupSetup* group;
+} TouLoadout;
+
+typedef struct TouBattleSetup {
+    u8 pad_0[0x14];
+    TouLoadout* loadouts;
+    u8 pad_18[0x44 - 0x18];
+} TouBattleSetup;
+
+typedef struct StarStoneWork {
+    u8 pad_0[0x8];
+    Vec pos;
+    u8 pad_14[0x8];
+    f32 rot;
+} StarStoneWork;
+
+typedef void (*voidfunctionptr)(void);
+extern voidfunctionptr _ctors[];
+extern voidfunctionptr _dtors[];
+extern TouBattleSetup btlsetup_tou_tbl[];
+extern s32 btl_tou_setup_no_tbl[];
+extern s32 tou_03_init_evt[];
+extern NpcTribeInfo npcTribe[];
+
+double atan2(double y, double x);
+int rand(void);
+EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+void FontDrawScale(f32 scale);
+void FontDrawMessageMtx(Mtx mtx, const char* msg);
+
+static s32 champion_belt_onoff;
+static DispWork disp_work;
+static RankData rank_work;
+
+__declspec(section ".data") u64 fd_tou2_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_tou2_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_tou2___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_tou2___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_tou2_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_tou2___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_tou2_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_tou2_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_tou2_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_tou2___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_tou2___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_tou2_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_tou2___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_tou2_one_364[] = {
+    1065353216,
+};
+
+static FighterData fighterDt[23] = {
     { FIGHT_CHAMPION, "stg3_tou_sensyu_00", "stg3_tou_sensyu2_00", 22, "stg3_tou_400_02", "stg3_tou_400_03", 250 },                // Rawk Hawk
     { FIGHT_KOOPATROL | FIGHT_MAJOR, "stg3_tou_sensyu_01", "stg3_tou_sensyu2_01", 19, "stg3_tou_118_00", "stg3_tou_118_01", 200 }, // The Koopinator
     { FIGHT_MAJOR, "stg3_tou_sensyu_02", "stg3_tou_sensyu2_02", 18, "stg3_tou_118_02", "stg3_tou_118_03", 180 },                   // Chomp Country
@@ -102,7 +232,7 @@ FighterData fighterDt[23] = {
     { FIGHT_MINOR, "stg3_tou_sensyu_22", "stg3_tou_sensyu2_22", 21, "stg3_tou_118_36_04", "stg3_tou_118_36_05", 0 },               // The Destructors
 };
 
-FighterData fighterDt_re[21] = {
+static FighterData fighterDt_re[21] = {
     { FIGHT_CHAMPION, "stg3_tou_re_315", "stg3_tou_re_338", 22, "stg3_tou_re_289", "stg3_tou_re_290", 250 },                // Rawk Hawk
     { FIGHT_KOOPATROL | FIGHT_MAJOR, "stg3_tou_re_316", "stg3_tou_re_339", 19, "stg3_tou_re_179", "stg3_tou_re_180", 200 }, // The Koopinator
     { FIGHT_MAJOR, "stg3_tou_re_317", "stg3_tou_re_340", 18, "stg3_tou_re_181", "stg3_tou_re_182", 180 },                   // Chomp Country
@@ -127,106 +257,597 @@ FighterData fighterDt_re[21] = {
     //{ FIGHT_MINOR, "stg3_tou_re_336", "stg3_tou_re_359", 20, "stg3_tou_re_217", "stg3_tou_re_218", 5 },                     // Wings of Night (cut)
     //{ FIGHT_MINOR, "stg3_tou_re_337", "stg3_tou_re_360", 21, "stg3_tou_re_219", "stg3_tou_re_220", 0 },                     // The Destructors (cut)
 };
-RankData* rank_wp = &rank_work;
-const char* suuji[] = { "０", "１", "２", "３", "４", "５", "６", "７", "８", "９" };
+
+static RuleData ruleDt_2bu[10] = {
+    { "stg3_tou_107_01", "stg3_tou_cp_000", 18, 3, 3 },
+    { "stg3_tou_107_02", "stg3_tou_cp_001", 1, 1, 1 },
+    { "stg3_tou_107_03", "stg3_tou_cp_002", 3, 1, 1 },
+    { "stg3_tou_107_04", "stg3_tou_cp_003", 48, 1, 1 },
+    { "stg3_tou_107_05", "stg3_tou_cp_004", 5, 1, 1 },
+    { "stg3_tou_107_06", "stg3_tou_cp_005", 26, 1, 1 },
+    { "stg3_tou_107_07", "stg3_tou_cp_006", 32, 1, 1 },
+    { "stg3_tou_107_08", "stg3_tou_cp_007", 59, 5, 5 },
+    { "stg3_tou_107_12", "stg3_tou_cp_008", 6, 1, 1 },
+    { "stg3_tou_107_16", "stg3_tou_cp_009", 43, 1, 1 },
+};
+
+static RuleData ruleDt_1bu[14] = {
+    { "stg3_tou_107_01", "stg3_tou_cp_010", 18, 5, 5 },
+    { "stg3_tou_107_02", "stg3_tou_cp_011", 1, 1, 1 },
+    { "stg3_tou_107_03", "stg3_tou_cp_012", 3, 1, 1 },
+    { "stg3_tou_107_04", "stg3_tou_cp_013", 48, 1, 1 },
+    { "stg3_tou_107_05", "stg3_tou_cp_014", 5, 1, 1 },
+    { "stg3_tou_107_06", "stg3_tou_cp_015", 26, 1, 1 },
+    { "stg3_tou_107_07", "stg3_tou_cp_016", 32, 1, 1 },
+    { "stg3_tou_107_08", "stg3_tou_cp_017", 59, 5, 5 },
+    { "stg3_tou_107_12", "stg3_tou_cp_019", 6, 1, 1 },
+    { "stg3_tou_107_13", "stg3_tou_cp_020", 11, 20, 20 },
+    { "stg3_tou_107_16", "stg3_tou_cp_021", 43, 3, 3 },
+    { "stg3_tou_107_17", "stg3_tou_cp_022", 65, 3, 3 },
+    { "stg3_tou_107_19", "stg3_tou_cp_023", 64, 255, 255 },
+    { "stg3_tou_107_20", "stg3_tou_cp_024", 63, 255, 255 },
+};
+
+static RuleData ruleDt_re[14] = {
+    { "stg3_tou_re_362", "stg3_tou_cp_040", 18, 5, 5 },
+    { "stg3_tou_re_363", "stg3_tou_cp_041", 1, 1, 1 },
+    { "stg3_tou_re_364", "stg3_tou_cp_042", 3, 1, 1 },
+    { "stg3_tou_re_365", "stg3_tou_cp_043", 48, 1, 1 },
+    { "stg3_tou_re_366", "stg3_tou_cp_044", 5, 1, 1 },
+    { "stg3_tou_re_367", "stg3_tou_cp_045", 26, 1, 1 },
+    { "stg3_tou_re_368", "stg3_tou_cp_046", 32, 1, 1 },
+    { "stg3_tou_re_369", "stg3_tou_cp_047", 59, 5, 5 },
+    { "stg3_tou_re_371", "stg3_tou_cp_049", 6, 1, 1 },
+    { "stg3_tou_re_372", "stg3_tou_cp_050", 11, 20, 20 },
+    { "stg3_tou_re_373", "stg3_tou_cp_051", 43, 3, 3 },
+    { "stg3_tou_re_374", "stg3_tou_cp_052", 65, 3, 3 },
+    { "stg3_tou_re_375", "stg3_tou_cp_053", 64, 255, 255 },
+    { "stg3_tou_re_376", "stg3_tou_cp_054", 63, 255, 255 },
+};
+
+static RankData* rank_wp = &rank_work;
+static DispWork* dwp = &disp_work;
+static const char* suuji[] = { "０", "１", "２", "３", "４", "５", "６", "７", "８", "９" };
 
 // local prototypes
-void rankingControll(void);
+static f32 camGetRy(void);
+f32 atan2f(f32 y, f32 x);
+static void disp_proc(CameraId cameraId, void* param);
+static void printRanking(void);
+static void rankingControll(void);
+static void insert(s32* arr, s32 n, s32 from, s32 to);
+static void rankingExit(void);
+static void rankingInit(void);
 
-void rankingInit(void) {
-    s32 temp;
-    s32 count;
-    int i;
-    RankEntry* entry;
+// Number of visible fighters ranked above the player
+static inline s32 rankGetPlayerRank(void) {
+    s32 i;
+    s32 rank = 0;
 
-    memset(rank_wp, 0, sizeof(RankData));
-    // We need to handle the excluded entries if we're doing rematches
-    temp = evtGetValue(NULL, GSW(0));
-    count = 21;
-    if (temp < 172) {
-        count = 23;
-    }
-    rank_wp->count = count;
-    rank_wp->entries = _mapAlloc(rank_wp->count * sizeof(RankEntry));
-    memset(rank_wp->entries, 0, rank_wp->count * sizeof(RankEntry));
-
-    for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
-        entry->flags = 0;
-        entry->id = i;
-        if (swGet(entry->id + 2465)) {
-            entry->flags |= RANK_BELOW;
-        }
-        if (swGet(2529)) {
-            int j;
-            for (j = 0; j < 2; j++) {
-                entry->points[j] = swByteGet(2 * entry->id + 519 + j);
+    for (i = 0; i < rank_wp->count; i++) {
+        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+            if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                break;
             }
-        } else {
-            *(s16*)entry->points = fighterDt[entry->id].field_18;
-        }
-        if (entry->id == FIGHTER_PLAYER) {
-            entry->flags |= RANK_PLAYER;
+            rank++;
         }
     }
-
-    swSet(2529);
-
-    // Set up the initial run-through
-    if (evtGetValue(NULL, GSW(0)) < 172) {
-        rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_HIDDEN;
-        rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_HIDDEN;
-
-        // If we're past this point in the story, hide King K
-        if (evtGetValue(NULL, GSWF(2412))) {
-            rank_wp->entries[FIGHTER_KP_KOOPAS].flags |= RANK_HIDDEN;
-        }
-
-        // If we're past this story, Sir Swoop has been introduced
-        if (evtGetValue(NULL, GSWF(2413))) {
-            rank_wp->entries[FIGHTER_SWOOPS].flags &= ~RANK_HIDDEN;
-
-            if (!evtGetValue(NULL, GSWF(2530))) {
-                rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_BELOW;
-            }
-            evtSetValue(NULL, GSWF(2530), TRUE);
-        }
-
-        // If we're past this point in the story, Bandy Andy got "retired" and The Destructors were added.
-        if (evtGetValue(NULL, GSWF(2421))) {
-            rank_wp->entries[FIGHTER_BANDITS].flags |= RANK_HIDDEN;
-            rank_wp->entries[FIGHTER_SPINIA].flags &= ~RANK_HIDDEN;
-
-            if (!evtGetValue(NULL, GSWF(2531))) {
-                rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_BELOW;
-            }
-            evtSetValue(NULL, GSWF(2531), TRUE);
-        }
-    }
-    rankingControll();
+    return rank;
 }
 
-#pragma dont_inline on
-static void insert(s32* arr, s32 n, s32 from, s32 to) {
+USER_FUNC(tou_champion_belt_onoff_28_text_29DC) {
+    champion_belt_onoff = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(tou_champion_belt_28_text_2A10) {
+    NpcEntry* npc;
+    EffectEntry* eff;
+    AnimationPose* pose;
+    Vec* positions;
+    s32 group;
+    f32 angle;
+
+    npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    if (isFirstCall) {
+        eff = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
+        animPoseWorldPositionEvalOn(npc->poseId);
+        event->userdatap[0] = eff;
+        champion_belt_onoff = 0;
+    }
+    pose = animPoseGetAnimPosePtr(npc->poseId);
+    positions = *pose->worldPositions;
+    group = animPoseGetGroupIdx(npc->poseId, "locator8");
+    angle = reviseAngle(camGetRy() - pose->rotationY);
+    eff = event->userdatap[0];
+    ((StarStoneWork*)eff->userdata)->pos.x = positions[group].x;
+    ((StarStoneWork*)eff->userdata)->pos.y = positions[group].y;
+    ((StarStoneWork*)eff->userdata)->pos.z = positions[group].z;
+    if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
+        ((StarStoneWork*)eff->userdata)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+    } else {
+        ((StarStoneWork*)eff->userdata)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+    }
+    if (npc->position.y <= -1000.0f) {
+        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
+        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
+        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+    }
+    if (champion_belt_onoff) {
+        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
+        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
+        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static f32 camGetRy(void) {
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    f32 ry = reviseAngle(57.29579f * atan2f(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
+
+    if (ry < 0.0f) {
+        ry += 360.0f;
+    }
+    return ry;
+}
+
+f32 atan2f(f32 y, f32 x) {
+    return atan2(y, x);
+}
+
+static USER_FUNC(evt_tou_print_ranking) {
+    s32 i;
+    s32 rank;
+
+    if (isFirstCall) {
+        memset(dwp, 0, sizeof(DispWork));
+        rank = 0;
+        for (i = 0; i < rank_wp->count; i++) {
+            if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+                if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                    break;
+                }
+                rank++;
+            }
+        }
+        dwp->page = rank / 11;
+        dwp->scroll = dwp->target = dwp->page * 220;
+        printRanking();
+        return EVT_RETURN_BLOCK;
+    }
+    if (keyGetButtonTrg(0) & 0x200) {
+        psndSFXOn((const char*)0x13);
+        return EVT_RETURN_YIELD;
+    }
+    if (dwp->page > 0 && (keyGetButtonTrg(0) & 0x40)) {
+        psndSFXOn((const char*)5);
+        dwp->page--;
+    }
+    if (dwp->page < 1 && (keyGetButtonTrg(0) & 0x20)) {
+        dwp->page++;
+        psndSFXOn((const char*)5);
+    }
+    dwp->target = dwp->page * 220;
+    dwp->scroll += (dwp->target - dwp->scroll) / 8.0f;
+    dispEntry(CAMERA_2D, 300.0f, 0, disp_proc, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
+static void disp_proc(CameraId cameraId, void* param) {
+    FighterData* fighters;
+    f32 left;
+    u16 width;
+    u16 scissorX;
+    u16 scissorW;
+    s32 i;
+    s32 num;
+    f32 y;
+    Mtx scale;
+    Mtx mtx;
+    char buf[0x100];
+
+    fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+    left = -250.0f * 0.5f;
+    windowDispGX_System(0, 0xFF, left - 30.0f, 165.0f, 310.0f, 330.0f);
+    FontDrawStart();
+    FontDrawScale(1.0f);
+    width = FontGetMessageWidth("\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
+    {
+        GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+        FontDrawColor(color);
+    }
+    FontDrawMessage(-width / 2, 135.0f, "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
+    scissorX = 304.0f + left;
+    scissorW = 250.0f;
+    GXSetScissor(scissorX, (u16)145.0f, scissorW, (u16)220.0f);
+
+    num = 0;
+    for (i = 0; i < rank_wp->count; i++) {
+        y = dwp->scroll + (135.0f - num * 20 - 40.0f);
+        if (rank_wp->entries[i].flags & RANK_HIDDEN) {
+            continue;
+        }
+        PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
+        if (num != 0) {
+            sprintf(buf, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
+            FontDrawStart();
+            {
+                GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+                FontDrawColor(color);
+            }
+            PSMTXTrans(mtx, 10.0f + left, y, 0.0f);
+            PSMTXConcat(mtx, scale, mtx);
+            FontDrawMessageMtx(mtx, buf);
+        }
+        FontDrawStart();
+        if (rank_wp->entries[i].flags & RANK_PLAYER) {
+            GXColor color = { 0xFF, 0x00, 0x00, 0xFF };
+            FontDrawColor(color);
+        } else {
+            GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+            FontDrawColor(color);
+        }
+        PSMTXTrans(mtx, 40.0f + (10.0f + left), y, 0.0f);
+        PSMTXConcat(mtx, scale, mtx);
+        FontDrawMessageMtx(mtx, msgSearch(fighters[rank_wp->entries[i].id].name));
+        num++;
+    }
+    GXSetScissor(scissorX, (u16)137.0f, scissorW, (u16)228.0f);
+    {
+        Vec pos = { 0.0f, 0.0f, 0.0f };
+        pos.x = 15.0f + left;
+        pos.y = (95.0f + dwp->scroll) - 24.0f;
+        iconDispGx(&pos, 0x10, 0x123, 0.8f);
+    }
+    GXSetScissor(0, 0, 608, 480);
+    if (dwp->page > 0) {
+        {
+            Vec pos = { 0.0f, 125.0f, 0.0f };
+            pos.x = left + 250.0f;
+            iconDispGx(&pos, 0x10, 0x205, 1.0f);
+        }
+        {
+            Vec pos = { 0.0f, 75.0f, 0.0f };
+            pos.x = left + 250.0f;
+            iconDispGx(&pos, 0x10, 0x7E, 0.6f);
+        }
+    }
+    if (dwp->page < 1) {
+        {
+            Vec pos = { 0.0f, -140.0f, 0.0f };
+            pos.x = left + 250.0f;
+            iconDispGx(&pos, 0x10, 0x205, 1.0f);
+        }
+        {
+            Vec pos = { 0.0f, -125.0f, 0.0f };
+            pos.x = left + 250.0f;
+            iconDispGx(&pos, 0x10, 0x80, 0.6f);
+        }
+    }
+}
+
+static void printRanking(void) {
     s32 i;
 
-    if (from < to) {
-        s32 tmp = arr[from];
-        for (i = from; i < to; i++) {
-            arr[i] = arr[i + 1];
-        }
-        arr[to] = tmp;
-    } else {
-        s32 tmp = arr[from];
-        for (i = from; i > to; i--) {
-            arr[i] = arr[i - 1];
-        }
-        arr[to] = tmp;
+    evtGetValue(NULL, GSW(0));
+    for (i = 0; i < rank_wp->count; i++) {
     }
 }
-#pragma dont_inline reset
 
-// TODO: this is mostly there
-void rankingControll(void) {
+USER_FUNC(evt_tou_set_rule_result_28_text_355C) {
+    s32 result = evtGetValue(event, event->args[0]);
+
+    if (result & 4) {
+        swSet(2443);
+    } else if (result & 2) {
+        swClear(2443);
+    } else if (result & 1) {
+        swClear(2443);
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_set_ranking_win_lose_28_text_35C0) {
+    s32* args = event->args;
+    s32 lose = evtGetValue(event, args[0]);
+    s32 id = evtGetValue(event, args[1]);
+    s16 min;
+    s16 max;
+    s32 i;
+
+    if (lose == 0) {
+        for (i = 0; i < rank_wp->count; i++) {
+            if (id == rank_wp->entries[i].id) {
+                rank_wp->entries[i].flags |= RANK_BELOW;
+                break;
+            }
+        }
+        swSet(2442);
+    } else {
+        for (i = 0; i < rank_wp->count; i++) {
+            if (id == rank_wp->entries[i].id) {
+                rank_wp->entries[i].flags &= ~RANK_BELOW;
+                break;
+            }
+        }
+        swClear(2442);
+    }
+
+    min = 1000;
+    max = -1000;
+    for (i = 0; i < rank_wp->count; i++) {
+        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+            s32 a = rand() % 4;
+            s32 b = rand() % 4;
+            *(s16*)rank_wp->entries[i].points += a + b - 3;
+            if (*(s16*)rank_wp->entries[i].points < min) {
+                min = *(s16*)rank_wp->entries[i].points;
+            }
+            if (*(s16*)rank_wp->entries[i].points > max) {
+                max = *(s16*)rank_wp->entries[i].points;
+            }
+        }
+    }
+    swByteSet(507, id);
+    swSet(2532);
+    rankingControll();
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(evt_tou_get_rule_msg2) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    s32 num;
+    RuleData* rules;
+    s32 i;
+    s32 rank;
+
+    if (evtGetValue(NULL, GSW(0)) < 172) {
+        rank = 0;
+        for (i = 0; i < rank_wp->count; i++) {
+            if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+                if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                    break;
+                }
+                rank++;
+            }
+        }
+        if (rank > 10) {
+            rules = ruleDt_2bu;
+            num = 10;
+        } else {
+            rules = ruleDt_1bu;
+            num = 14;
+        }
+    } else {
+        rules = ruleDt_re;
+        num = 14;
+    }
+    for (i = 0; i < num; i++) {
+        if (id == rules[i].id) {
+            break;
+        }
+    }
+    if (i == num) {
+        i = num - 1;
+    }
+    evtSetValue(event, args[1], (s32)msgSearch(rules[i].desc));
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(evt_tou_get_rule_info) {
+    s32* args = event->args;
+    s32 type = evtGetValue(event, args[0]);
+    s32 num;
+    RuleData* rules;
+    s32 i;
+    s32 rank;
+
+    if (evtGetValue(NULL, GSW(0)) < 172) {
+        rank = 0;
+        for (i = 0; i < rank_wp->count; i++) {
+            if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+                if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                    break;
+                }
+                rank++;
+            }
+        }
+        if (rank > 10) {
+            rules = ruleDt_2bu;
+            num = 10;
+        } else {
+            rules = ruleDt_1bu;
+            num = 14;
+        }
+    } else {
+        rules = ruleDt_re;
+        num = 14;
+    }
+    if (type == 0) {
+        for (i = 0; i < num; i++) {
+            if (rules[i].id == 6) {
+                break;
+            }
+        }
+    } else if (type == 10) {
+        while (TRUE) {
+            i = rand() % num;
+            if (rules[i].id != 48 && rules[i].id != 32 && rules[i].id != 64) {
+                break;
+            }
+        }
+    } else {
+        i = rand() % num;
+    }
+    evtSetValue(event, args[1], (s32)rules[i].name);
+    evtSetValue(event, args[2], rules[i].id);
+    evtSetValue(event, args[3], rules[i].field_C);
+    evtSetValue(event, args[4], rules[i].field_10);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_fighter_tribe) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    s32 idx = evtGetValue(event, args[1]);
+    s32 setupId = fighterDt[id].setupId;
+    TattleEntry* tattle = battleGetUnitMonosiriPtr(btlsetup_tou_tbl[setupId].loadouts->group->units[idx].kind->type);
+    NpcTribeInfo* tribe;
+    const char* name;
+    BOOL found = FALSE;
+
+    for (tribe = npcTribe; tribe->nameJp != NULL; tribe++) {
+        if (strcmp(tribe->modelName, tattle->modelName) == 0) {
+            found = TRUE;
+            break;
+        }
+    }
+    if (!found) {
+        name = "\x83\x4E\x83\x8A\x83\x7B\x81\x5B";
+        tribe = npcGetTribe(name);
+    } else {
+        name = tribe->nameJp;
+    }
+    if (setupId == 2 && idx == 1) {
+        name = "\x83\x70\x83\x5E\x83\x74\x83\x40\x83\x43\x83\x5E\x81\x5B";
+        tribe = npcGetTribe(name);
+    }
+    if (setupId == 10 && idx == 1) {
+        name = "\x83\x41\x83\x43\x83\x41\x83\x93\x83\x56\x83\x93\x83\x47\x83\x82\x83\x93\x32";
+        tribe = npcGetTribe(name);
+    }
+    if (setupId == 13 && idx == 1) {
+        name = "\x83\x45\x83\x89\x83\x70\x83\x5E";
+        tribe = npcGetTribe(name);
+    }
+    if (setupId == 15 && idx == 2) {
+        name = "\x83\x4A\x83\x81\x83\x62\x83\x4E\x97\xCE\x8B\xF3";
+        tribe = npcGetTribe(name);
+    }
+    if (setupId == 11) {
+        name = "\x83\x6E\x83\x43\x83\x70\x81\x5B\x83\x67\x83\x51\x83\x81\x83\x62\x83\x67";
+        tribe = npcGetTribe(name);
+    }
+    evtSetValue(event, args[2], (s32)tribe->modelName);
+    evtSetValue(event, args[3], (s32)name);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_fighter_num) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+
+    evtSetValue(event, args[1], btlsetup_tou_tbl[fighterDt[id].setupId].loadouts->group->num);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_fighter_battle_msg_28_text_3CB4) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+
+    evtSetValue(event, args[1], (s32)fighters[id].taunt);
+    evtSetValue(event, args[2], (s32)fighters[id].victory);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(evt_tou_get_fighter_rank) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    s32 rank = 0;
+    s32 i;
+
+    for (i = 0; i < rank_wp->count; i++) {
+        RankEntry* entry = &rank_wp->entries[i];
+        if (!(entry->flags & RANK_HIDDEN)) {
+            if (id == entry->id) {
+                break;
+            }
+            rank++;
+        }
+    }
+    evtSetValue(event, args[1], rank);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_fighter_name2_28_text_3DD4) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+
+    evtSetValue(event, args[1], (s32)msgSearch(fighters[id].title));
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_fighter_info_28_text_3E58) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    FighterData* fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
+
+    evtSetValue(event, args[1], (s32)msgSearch(fighters[id].name));
+    evtSetValue(event, args[2], fighterDt[id].setupId);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(evt_tou_get_next_match) {
+    s32* args = event->args;
+    BOOL reverse = evtGetValue(event, GSWF(2443));
+    s32 list[32];
+    s32 num;
+    s32 rank;
+    s32 i;
+
+    num = 0;
+    for (i = 0; i < rank_wp->count; i++) {
+        RankEntry* entry = &rank_wp->entries[i];
+        if (!(entry->flags & RANK_HIDDEN)) {
+            list[num++] = entry->id;
+        }
+    }
+    rank = 0;
+    for (i = 0; i < rank_wp->count; i++) {
+        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+            if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                break;
+            }
+            rank++;
+        }
+    }
+    if (rank > 0) {
+        if (reverse) {
+            evtSetValue(event, args[0], list[rank - 1]);
+        } else if (rank + 1 < num) {
+            evtSetValue(event, args[0], list[rank + 1]);
+        } else {
+            evtSetValue(event, args[0], list[rank - 1]);
+        }
+    } else {
+        evtSetValue(event, args[0], list[1]);
+    }
+    printRanking();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_tou_get_ranking_28_text_4048) {
+    s32* args = event->args;
+    s32 i;
+    s32 rank;
+
+    rank = 0;
+    for (i = 0; i < rank_wp->count; i++) {
+        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+            if (rank_wp->entries[i].flags & RANK_PLAYER) {
+                break;
+            }
+            rank++;
+        }
+    }
+    evtSetValue(event, args[0], rank);
+    return EVT_RETURN_DONE;
+}
+
+static void rankingControll(void) {
     s32 above[32];
     s32 below[32];
     s32 nAbove;
@@ -446,4 +1067,164 @@ void rankingControll(void) {
         }
     }
     swByteSet(580, rank);
+}
+
+static void insert(s32* arr, s32 n, s32 from, s32 to) {
+    s32 i;
+
+    if (from < to) {
+        s32 tmp = arr[from];
+        for (i = from; i < to; i++) {
+            arr[i] = arr[i + 1];
+        }
+        arr[to] = tmp;
+    } else {
+        s32 tmp = arr[from];
+        for (i = from; i > to; i--) {
+            arr[i] = arr[i - 1];
+        }
+        arr[to] = tmp;
+    }
+}
+
+USER_FUNC(unk_tou2_00004b50) {
+    s32 i;
+
+    rankingExit();
+    pouchRemoveItem(0x41);
+    for (i = 0; i < 20; i++) {
+        swClear(i + 2465);
+    }
+    swClear(2392);
+    swClear(2399);
+    swClear(2400);
+    swClear(2383);
+    swClear(2529);
+    swClear(2532);
+    swClear(2403);
+    rankingInit();
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(evt_rankingReInit) {
+    rankingExit();
+    rankingInit();
+    return EVT_RETURN_DONE;
+}
+
+#pragma dont_inline on
+static void rankingExit(void) {
+    s32 i;
+    s32 j;
+    RankEntry* entry;
+
+    for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
+        if (entry->flags & RANK_BELOW) {
+            swSet(entry->id + 2465);
+        } else {
+            swClear(entry->id + 2465);
+        }
+        for (j = 0; j < 2; j++) {
+            swByteSet(2 * entry->id + 519 + j, entry->points[j]);
+        }
+    }
+    _mapFree(rank_wp->entries);
+}
+#pragma dont_inline reset
+
+static void rankingInit(void) {
+    s32 temp;
+    s32 count;
+    int i;
+    RankEntry* entry;
+
+    memset(rank_wp, 0, sizeof(RankData));
+    // We need to handle the excluded entries if we're doing rematches
+    temp = evtGetValue(NULL, GSW(0));
+    count = 21;
+    if (temp < 172) {
+        count = 23;
+    }
+    rank_wp->count = count;
+    rank_wp->entries = _mapAlloc(rank_wp->count * sizeof(RankEntry));
+    memset(rank_wp->entries, 0, rank_wp->count * sizeof(RankEntry));
+
+    for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
+        entry->flags = 0;
+        entry->id = i;
+        if (swGet(entry->id + 2465)) {
+            entry->flags |= RANK_BELOW;
+        }
+        if (swGet(2529)) {
+            int j;
+            for (j = 0; j < 2; j++) {
+                entry->points[j] = swByteGet(2 * entry->id + 519 + j);
+            }
+        } else {
+            *(s16*)entry->points = fighterDt[entry->id].field_18;
+        }
+        if (entry->id == FIGHTER_PLAYER) {
+            entry->flags |= RANK_PLAYER;
+        }
+    }
+
+    swSet(2529);
+
+    // Set up the initial run-through
+    if (evtGetValue(NULL, GSW(0)) < 172) {
+        rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_HIDDEN;
+        rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_HIDDEN;
+
+        // If we're past this point in the story, hide King K
+        if (evtGetValue(NULL, GSWF(2412))) {
+            rank_wp->entries[FIGHTER_KP_KOOPAS].flags |= RANK_HIDDEN;
+        }
+
+        // If we're past this story, Sir Swoop has been introduced
+        if (evtGetValue(NULL, GSWF(2413))) {
+            rank_wp->entries[FIGHTER_SWOOPS].flags &= ~RANK_HIDDEN;
+
+            if (!evtGetValue(NULL, GSWF(2530))) {
+                rank_wp->entries[FIGHTER_SWOOPS].flags |= RANK_BELOW;
+            }
+            evtSetValue(NULL, GSWF(2530), TRUE);
+        }
+
+        // If we're past this point in the story, Bandy Andy got "retired" and The Destructors were added.
+        if (evtGetValue(NULL, GSWF(2421))) {
+            rank_wp->entries[FIGHTER_BANDITS].flags |= RANK_HIDDEN;
+            rank_wp->entries[FIGHTER_SPINIA].flags &= ~RANK_HIDDEN;
+
+            if (!evtGetValue(NULL, GSWF(2531))) {
+                rank_wp->entries[FIGHTER_SPINIA].flags |= RANK_BELOW;
+            }
+            evtSetValue(NULL, GSWF(2531), TRUE);
+        }
+    }
+    rankingControll();
+}
+
+void _unresolved(void) {
+}
+
+void _epilog(void) {
+    voidfunctionptr* dtor;
+
+    rankingExit();
+    relSetEvtAddr("tou_03", NULL);
+    relSetBtlAddr("tou", NULL, NULL);
+    for (dtor = _dtors; *dtor != NULL; dtor++) {
+        (*dtor)();
+    }
+}
+
+void _prolog(void) {
+    voidfunctionptr* ctor;
+
+    for (ctor = _ctors; *ctor != NULL; ctor++) {
+        (*ctor)();
+    }
+    relSetEvtAddr("tou_03", tou_03_init_evt);
+    relSetBtlAddr("tou", btlsetup_tou_tbl, btl_tou_setup_no_tbl);
+    rankingInit();
 }

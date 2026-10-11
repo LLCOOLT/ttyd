@@ -101,8 +101,15 @@ static f32 angleABTBL[] = { 1.0f,       1.273187f,  1.27303f,   1.272768f,  1.27
                             1.053216f,  1.049087f,  1.04496f,   1.040838f,  1.036721f,  1.0326101f, 1.028504f,
                             1.024406f,  1.020316f,  1.016234f,  1.0121599f, 1.0080971f, 1.004043f,  1.0f };
 
-char* dat_ptr_8040f260 = "Jun 17 2004";
-char* dat_ptr_8040f264 = "17:20:01";
+const char R_build_date[] = "Jun 17 2004";
+const char R_build_time[] = "17:20:01";
+
+const char* dat_ptr_8040f260 = R_build_date;
+const char* dat_ptr_8040f264 = R_build_time;
+
+const char* systemStrippedPool0(void) {
+    return "assertion \"%s\" failed.\n \"%s\"\n";
+}
 
 const char* getMarioStDvdRoot(void) {
     return ".";
@@ -232,17 +239,17 @@ f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end) {
         case 3:
             return start + (((step * step * step * step) * (end - start)) / (total * (total * (total * total))));
         case 7:
-            f2 = (f32)cos(4.0f * (PI * (step / total)));
+            f2 = (f32)cos(4.0f * (3.141592f * (step / total)));
             f1 = (end - start);
             f3 = (total - step);
             return end - ((f3 * (f3 * (f1 * f2))) / (total * total));
         case 8:
-            f2 = (f32)cos((4.0f * (PI * ((step * step) / total))) / ((15.0f * total) / 100.0f));
+            f2 = (f32)cos((4.0f * (3.141592f * ((step * step) / total))) / ((15.0f * total) / 100.0f));
             f1 = (end - start);
             f3 = (total - step);
             return end - ((f3 * (f3 * (f1 * f2))) / (total * total));
         case 9:
-            return end - ((step * (step * ((end - start) * (f32)cos((4.0f * (PI * ((step * step) / total))) /
+            return end - ((step * (step * ((end - start) * (f32)cos((4.0f * (3.141592f * ((step * step) / total))) /
                                                                     ((15.0f * total) / 100.0f))))) /
                           (total * total));
         case 4:
@@ -255,7 +262,7 @@ f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end) {
             f4 = (total - step);
             return (start + (end - start)) - (((f4 * f4 * f4 * f4) * (end - start)) / (total * total * total * total));
         case 10:
-            f2 = (f32)cos((4.0f * (PI * ((step * step) / total))) / ((40.0f * total) / 100.0f));
+            f2 = (f32)cos((4.0f * (3.141592f * ((step * step) / total))) / ((40.0f * total) / 100.0f));
             f3 = (total - step);
             f1 = (f3 * (f3 * f2)) / (total * total);
             if (f1 < 0.0f) {
@@ -263,7 +270,7 @@ f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end) {
             }
             return -((f1 * (end - start)) - end);
         case 11:
-            f3 = (f32)cos((PI * step) / total);
+            f3 = (f32)cos((3.141592f * step) / total);
             f2 = (end - start);
             f0 = 0.5f;
             f1 = (f2 * (1.0f - f3));
@@ -963,86 +970,26 @@ asm void* memcpy_as4(void* dest, const void* src, u32 count) {
 #endif
 // clang-format on
 
-// unknown function, is used for many functions to "initialize"/copy some value into the local stack, with an extra vec
-Vec initializeVec(Vec* input) {
-    Vec temp = (Vec){ 0.0f, 0.0f, 0.0f };
-    temp.x = input->x;
-    temp.y = input->y;
-    temp.z = input->z;
-    return temp;
-}
-
-/*char* unk_formatting2 = "assertion \"%s\" failed.\n \"%s\"\n";
-f64 forceRodata6(void) { return 360.0; }
-f64 forceRodata5(void) { return 1.7; }
-f64 forceRodata4(void) { return 2.5; }
-f64 forceRodata3(void) { return 1.5; }
-char* unk_formatting = "[%8s:% 4d] %s";
-f64 forceRodata2(void) { return 0.0; }
-f64 forceRodata1(void) { return 3.0; }
-f64 forceRodata(void) { return 0.5; }*/
-char* forceRodata9(void) {
-    return "SIN_DECEL";
-}
-char* forceRodata8(void) {
-    return "SIN_ACCEL";
-}
-char* forceRodata7(void) {
-    return "BURURUN_DECEL";
-}
-char* forceRodata6(void) {
-    return "BURURUN";
-}
-char* forceRodata5(void) {
-    return "GEMINI";
-}
-char* forceRodata4(void) {
-    return "TRIPLE_DECEL";
-}
-char* forceRodata3(void) {
-    return "DOUBLE_DECEL";
-}
-char* forceRodata2(void) {
-    return "TRIPLE_ACCEL";
-}
-char* forceRodata1(void) {
-    return "DOUBLE_ACCEL";
-}
-char* forceRodata(void) {
-    return "LINEAR";
-}
-f32 forceSdata10(void) {
-    return 3.141592f;
-}
-f32 forceSdata9(void) {
-    return 4.0f;
-}
-f32 forceSdata8(void) {
-    return 180.0f;
-}
-f32 forceSdata7(void) {
-    return PI;
-}
-f32 forceSdata6(void) {
-    return 360.0f;
-}
-f32 forceSdata5(void) {
-    return TWO_PI;
-}
-f32 forceSdata4(void) {
-    return 20.0f;
-}
-f32 forceSdata3(void) {
-    return 60.0f;
-}
-f32 forceSdata2(void) {
-    return 1000.0f;
-}
-f32 forceSdata1(void) {
-    return 0.0f;
-}
-f32 forceSdata0(void) {
-    return 1.0f;
+// The original file had debug functions that the linker dead-stripped; their constants
+// stayed in the literal pools. These stand-ins recreate the pool contents in order.
+void systemStrippedPool1(const char** str, f32* f, f64* d, f32 x) {
+    f[0] = 1.0f;
+    str[0] = "LINEAR";
+    str[1] = "DOUBLE_ACCEL";
+    str[2] = "TRIPLE_ACCEL";
+    str[3] = "DOUBLE_DECEL";
+    str[4] = "TRIPLE_DECEL";
+    str[5] = "GEMINI";
+    str[6] = "BURURUN";
+    str[7] = "BURURUN_DECEL";
+    str[8] = "SIN_ACCEL";
+    str[9] = "SIN_DECEL";
+    f[1] = sqrtf(x);
+    str[10] = "[%8s:% 4d] %s";
+    d[0] = 1.5;
+    d[1] = 2.5;
+    d[2] = 1.7;
+    f[2] = 1000.0f;
 }
 
 #pragma pool_data off

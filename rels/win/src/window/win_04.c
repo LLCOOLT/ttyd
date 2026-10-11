@@ -2,20 +2,20 @@
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
-#include "manager/evtmgr_cmd.h"
-#include "driver/fadedrv.h"
+#include "driver/dispdrv.h"
+#include "stdlib.h"
+#include "memory.h"
 #include "driver/camdrv.h"
 #include "dolphin/gx.h"
 #include "dolphin/mtx.h"
-#include "memory.h"
-#include "driver/dispdrv.h"
-#include "stdlib.h"
+#include "driver/fadedrv.h"
+#include "manager/evtmgr_cmd.h"
 
-static s32 ssf[3];
-void envAddTev(s32 type, void* param);
-void flower_disp(CameraId camera, void* param);
 typedef struct Flower { s16 state; s16 timer; f32 x; f32 y; f32 scale; f32 targetScale; s32 alpha; } Flower;
 typedef struct FlowerWork { s32 count; Flower* flowers; } FlowerWork;
+void flower_disp(CameraId camera, void* param);
+void envAddTev(s32 type, void* param);
+static s32 ssf[3];
 
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_info);
@@ -152,35 +152,7 @@ s32 flower_disp_pos[21];
 static s32 cloud_toujou[95];
 s32 win_04_init_evt[94];
 
-USER_FUNC(ss_ch_check) {
-    s32* args = event->args;
-
-    evtSetFloat(event, args[1], ssf[evtGetValue(event, args[0])]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(ss_ch_set) {
-    s32* args = event->args;
-    s32 index = evtGetValue(event, args[0]);
-
-    ssf[index] = evtGetValue(event, args[1]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(fade_alpha) {
-    s32* args = event->args;
-    s32 r = evtGetValue(event, args[0]);
-    s32 g = evtGetValue(event, args[1]);
-    s32 b = evtGetValue(event, args[2]);
-    s32 a = evtGetValue(event, args[3]);
-
-    fadeEntry(13, 0, (GXColor){r, g, b, a});
-    return EVT_RETURN_DONE;
-}
-
-void mirror_ball(void* param) {
-    envAddTev(10, param);
-}
+int rand(void);
 
 __declspec(section ".data") u64 fd_win_04_negone_one_374 = 0xBF8000003F800000;
 
@@ -563,6 +535,35 @@ EVT_BEGIN(dummy2_jump)
     CALL(ss_ch_set, 1, 1)
     RETURN
 EVT_END()
+
+USER_FUNC(ss_ch_check) {
+    u64 out; // FAKEMATCH (decomp-permuter): reorders the args[1] load
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+
+    out = args[1];
+    evtSetFloat(event, out, ssf[index]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(ss_ch_set) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+
+    ssf[index] = evtGetValue(event, args[1]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(fade_alpha) {
+    s32* args = event->args;
+    s32 r = evtGetValue(event, args[0]);
+    s32 g = evtGetValue(event, args[1]);
+    s32 b = evtGetValue(event, args[2]);
+    s32 a = evtGetValue(event, args[3]);
+
+    fadeEntry(13, 0, (GXColor){r, g, b, a});
+    return EVT_RETURN_DONE;
+}
 
 static __declspec(section ".data") s32 item_list[] = {
     63, -1,
@@ -1259,62 +1260,9 @@ EVT_BEGIN(flower_disp_pos)
     RETURN
 EVT_END()
 
-static EVT_BEGIN(cloud_toujou)
-    CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mario_cont_onoff, 0)
-    CALL(evt_party_cont_onoff, 0, 0)
-    CALL(evt_party_cont_onoff, 1, 0)
-    CALL(evt_mario_set_pos, 0, -1000, 0)
-    CALL(evt_party_set_pos, 0, 0, -1000, 0)
-    CALL(evt_party_set_pos, 1, 0, -1000, 0)
-    CALL(evt_cam3d_evt_set, 75, 205, 539, 75, 110, -3, 0, 11)
-    CALL(evt_seq_wait, 2)
-    WAIT_MS(1000)
-    CALL(evt_msg_toge, 1, 0, 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_02"), 0, 0)
-    CALL(evt_cam3d_evt_set, 60, 120, 352, 276, 120, 15, 0, 11)
-    WAIT_MS(1000)
-    CALL(evt_msg_toge, 2, 300, 80, 40)
-    CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_03"), 0, 0)
-    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
-    CALL(evt_bero_mapchange, STRING("win_05"), STRING(""))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(win_04_init_evt)
-    SET_VALUE(GSWF(253), 1)
-    SET_VALUE(LW(0), PTR(bero_entry_data))
-    CALL(evt_bero_get_info)
-    CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
-    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2"))
-    CALL(evt_snd_bgmoff, 22528)
-    CALL(evt_snd_env_lpf, 0, 800)
-    CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, -95, 0, 0)
-    IF_INT_EQUAL(GSW(0), 80)
-        SPAWN_EVENT(PTR(meet_clouda))
-    END_IF
-    IF_INT_EQUAL(GSW(0), 81)
-        SPAWN_EVENT(PTR(meet_clouda2))
-    END_IF
-    IF_INT_EQUAL(GSW(0), 83)
-        SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_witchtrio))
-        SET_VALUE(LW(0), STRING("w_bero"))
-        CALL_CHILD(PTR(bero_case_switch_on))
-    END_IF
-    IF_INT_LESS_OR_EQUAL(GSW(0), 86)
-        SET_VALUE(LW(0), STRING("e_bero"))
-        CALL_CHILD(PTR(bero_case_switch_off))
-        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(touch_door), 0)
-    END_IF
-    IF_INT_EQUAL(GSW(0), 76)
-        SPAWN_EVENT(PTR(cloud_toujou))
-    END_IF
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika_"), 1)
-    RETURN
-EVT_END()
+void mirror_ball(void* param) {
+    envAddTev(10, param);
+}
 
 void flower_disp(CameraId camera, void* param) {
     FlowerWork* wp = param;
@@ -1374,10 +1322,67 @@ void flower_disp(CameraId camera, void* param) {
     }
 }
 
-int rand(void);
+static EVT_BEGIN(cloud_toujou)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_party_cont_onoff, 1, 0)
+    CALL(evt_mario_set_pos, 0, -1000, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_party_set_pos, 1, 0, -1000, 0)
+    CALL(evt_cam3d_evt_set, 75, 205, 539, 75, 110, -3, 0, 11)
+    CALL(evt_seq_wait, 2)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 1, 0, 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_02"), 0, 0)
+    CALL(evt_cam3d_evt_set, 60, 120, 352, 276, 120, 15, 0, 11)
+    WAIT_MS(1000)
+    CALL(evt_msg_toge, 2, 300, 80, 40)
+    CALL(evt_msg_print, 0, STRING("stg2_win_e04_00_03"), 0, 0)
+    CALL(evt_fade_set_mapchange_type, 0, 2, 500, 1, 500)
+    CALL(evt_bero_mapchange, STRING("win_05"), STRING(""))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(win_04_init_evt)
+    SET_VALUE(GSWF(253), 1)
+    SET_VALUE(LW(0), PTR(bero_entry_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG2_WIN1"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG2_WIN2"))
+    CALL(evt_snd_bgmoff, 22528)
+    CALL(evt_snd_env_lpf, 0, 800)
+    CALL(evt_mobj_save_blk, STRING("mobj_save"), -125, 60, -95, 0, 0)
+    IF_INT_EQUAL(GSW(0), 80)
+        SPAWN_EVENT(PTR(meet_clouda))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 81)
+        SPAWN_EVENT(PTR(meet_clouda2))
+    END_IF
+    IF_INT_EQUAL(GSW(0), 83)
+        SET_VALUE(LW(0), STRING("w_bero"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_bero_overwrite, STRING("w_bero"), PTR(bero_witchtrio))
+        SET_VALUE(LW(0), STRING("w_bero"))
+        CALL_CHILD(PTR(bero_case_switch_on))
+    END_IF
+    IF_INT_LESS_OR_EQUAL(GSW(0), 86)
+        SET_VALUE(LW(0), STRING("e_bero"))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        CALL(evt_run_case_evt, 9, 1, STRING("e_bero"), 0, PTR(touch_door), 0)
+    END_IF
+    IF_INT_EQUAL(GSW(0), 76)
+        SPAWN_EVENT(PTR(cloud_toujou))
+    END_IF
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("hika_"), 1)
+    RETURN
+EVT_END()
 
 static f32 randf(f32 min, f32 max) {
-    return min + (max - min) * (rand() / 32767.0f);
+    f32 r = rand() / 32767.0f;
+
+    return (max - min) * r + min;
 }
 
 USER_FUNC(evt_flower_init) {
@@ -1468,4 +1473,3 @@ USER_FUNC(flower_pos_report) {
     }
     return EVT_RETURN_DONE;
 }
-

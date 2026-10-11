@@ -43,15 +43,19 @@ EffectEntry* effSyuryouEntry(s32 type, s32 duration, f32 x, f32 y, f32 z) {
     return effect;
 }
 
+#pragma push
+#pragma opt_dead_assignments off
 void effSyuryouMain(EffectEntry* effect) {
     EffSyuryouWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
+    s32 type;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
+    type = work->type;
     inBattle = gp->inBattle != 0;
 
-    switch (work->type) {
+    switch (type) {
         case 0:
             if (!animGroupBaseAsync("EFF_batug_tue", inBattle, NULL)) {
                 return;
@@ -100,6 +104,7 @@ void effSyuryouMain(EffectEntry* effect) {
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effSyuryouDisp, effect);
 }
+#pragma pop
 
 void effSyuryouDisp(CameraId cameraId, EffectEntry* effect) {
     EffSyuryouWork* work = effect->userdata;

@@ -113,31 +113,25 @@ static s32 escape_event[115];
 static s32 wait_event[26];
 
 static USER_FUNC(_steal_item) {
+    s32* args = event->args;
+    PouchData* pouch = pouchGetPtr();
     BattleUnit* unit;
-    PouchData* pouch;
     BattleUnit* target;
     s32 itemVar;
     s32 iconVar;
-    s32* args = event->args;
     s32 numVar;
-    s32 item;
-    s32 coins;
-    s32 num;
-    s32 count;
     s32 id;
-    s32 i;
-    s32 r;
+    s32 tid;
 
-    pouch = pouchGetPtr();
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     if (unit == NULL) {
         return EVT_RETURN_DONE;
     }
-    id = evtGetValue(event, args[1]);
-    id = BattleTransID(event, id);
-    target = BattleGetUnitPtr(_battleWorkPointer, id);
+    tid = evtGetValue(event, args[1]);
+    tid = BattleTransID(event, tid);
+    target = BattleGetUnitPtr(_battleWorkPointer, tid);
     if (target == NULL) {
         return EVT_RETURN_DONE;
     }
@@ -147,10 +141,11 @@ static USER_FUNC(_steal_item) {
     evtSetValue(event, itemVar, 0);
     evtSetValue(event, iconVar, 0);
     evtSetValue(event, numVar, 0);
-    if (irand(100) < 100) {
-        coins = pouchGetCoin();
-        num = 5;
-        if (coins < 5) {
+    if (irand(100) < 40) {
+        s32 coins = pouchGetCoin();
+        s32 num = 10;
+
+        if (coins < 10) {
             num = coins;
         }
         if (num > 0) {
@@ -163,53 +158,63 @@ static USER_FUNC(_steal_item) {
         }
         return EVT_RETURN_DONE;
     }
-    item = 0;
-    count = 0;
-    for (i = 0; i < 20; i++) {
-        if (pouch->heldItems[i] != 0) {
-            count++;
-        }
-    }
-    if (count <= 0) {
-        return EVT_RETURN_DONE;
-    }
-    r = irand(count);
-    if (r >= count) {
-        r -= count;
+    {
+        s32 item = 0;
+        s32 count = 0;
+        s32 held = 0;
+        s32 r;
+        s32 i;
+
         for (i = 0; i < 200; i++) {
             if (pouch->badges[i] != 0) {
-                if (--r < 0) {
-                    item = pouch->badges[i];
-                    break;
-                }
+                count++;
             }
         }
-    } else {
-        for (i = 0; i < 20; i++) {
-            if (pouch->heldItems[i] != 0) {
-                if (--r < 0) {
-                    item = pouch->heldItems[i];
-                    break;
-                }
-            }
-        }
-    }
-    if (item != 0) {
-        if (!pouchRemoveItem(item)) {
+        if (count <= 0) {
             return EVT_RETURN_DONE;
         }
-        unit->heldItem = item;
-        if (item >= 240 && item < 339) {
-            if (target->currentKind == 222) {
-                BtlUnit_EquipItem(target, 3, 0);
-            } else if (target->currentKind >= 224 && target->currentKind < 231) {
-                BtlUnit_EquipItem(target, 5, 0);
+        r = irand(count);
+        if (r >= held) {
+            s32 j;
+
+            r -= held;
+            for (j = 0; j < 200; j++) {
+                if (pouch->badges[j] != 0) {
+                    if (--r < 0) {
+                        item = pouch->badges[j];
+                        break;
+                    }
+                }
             }
-            pouchReviseMarioParam();
-            pouchRevisePartyParam();
+        } else {
+            s32 k;
+
+            for (k = 0; k < 20; k++) {
+                if (pouch->heldItems[k] != 0) {
+                    if (--r < 0) {
+                        item = pouch->heldItems[k];
+                        break;
+                    }
+                }
+            }
         }
-        evtSetValue(event, itemVar, item);
-        evtSetValue(event, iconVar, *(u16*)&itemDataTable[item].icon_id);
+        if (item != 0) {
+            if (!pouchRemoveItem(item)) {
+                return EVT_RETURN_DONE;
+            }
+            unit->heldItem = item;
+            if (item >= 240 && item < 339) {
+                if (target->currentKind == 222) {
+                    BtlUnit_EquipItem(target, 3, 0);
+                } else if (target->currentKind >= 224 && target->currentKind < 231) {
+                    BtlUnit_EquipItem(target, 5, 0);
+                }
+                pouchReviseMarioParam();
+                pouchRevisePartyParam();
+            }
+            evtSetValue(event, itemVar, item);
+            evtSetValue(event, iconVar, itemDataTable[item].icon_id);
+        }
     }
     return EVT_RETURN_DONE;
 }
@@ -400,8 +405,8 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventAttack, -2, PTR(attack_event))
     CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, -2, PTR(attack_event))
-    CALL(btlevtcmd_SetRunSound, -2, STRING("パイダース"), STRING("ヤミトゲクリ"), 0, 6, 6)
-    CALL(btlevtcmd_SetWalkSound, -2, STRING("パイダース"), STRING("ヤミトゲクリ"), 0, 10, 10)
+    CALL(btlevtcmd_SetRunSound, -2, STRING("SFX_ENM_BORODO_MOVE1L"), STRING("SFX_ENM_BORODO_MOVE1R"), 0, 6, 6)
+    CALL(btlevtcmd_SetWalkSound, -2, STRING("SFX_ENM_BORODO_MOVE1L"), STRING("SFX_ENM_BORODO_MOVE1R"), 0, 10, 10)
     CALL(btlevtcmd_CheckUnitFlag, -2, 1073741824, LW(0))
     IF_INT_EQUAL(LW(0), 0)
         CALL(btlevtcmd_AnimeSetPoseTable, -2, 1, PTR(pose_table))

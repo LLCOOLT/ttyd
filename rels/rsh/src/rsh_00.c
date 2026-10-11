@@ -1,0 +1,1039 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "string.h"
+#include "dolphin/os.h"
+#include "mario/mariost.h"
+#include "memory.h"
+#include "dolphin/mtx.h"
+#include "driver/camdrv.h"
+#include "system.h"
+#include "driver/dispdrv.h"
+#include "manager/evtmgr_cmd.h"
+
+typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
+typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16 pose; u64 startTime; } Moamoa;
+typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
+typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
+static MoamoaWork* wp;
+ExtPose* extGetPosePtr(void);
+s32 extGetPoseNum(void);
+int rand(void);
+static f32 randf(f32 min, f32 max);
+static void moamoa_pose_init(void);
+static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
+void extLoadRenderMode(void);
+void extLoadVertex(void);
+void extLoadTexture(void);
+void extLoadTev(void);
+void extDraw(void);
+void extLoadTextureExit(void);
+double sin(double x);
+double cos(double x);
+static void moamoa_pose_main(void);
+static void ext_disp(CameraId camera, void* param);
+
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_eff_fukidashi);
+USER_FUNC(evt_ext_entry);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_item_get_item);
+USER_FUNC(evt_item_get_item_end_wait);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mario_get_party);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_set_pose);
+USER_FUNC(evt_moamoa_set_one);
+USER_FUNC(evt_moamoa_set_seq_all);
+USER_FUNC(evt_mobj_kururing_floor);
+USER_FUNC(evt_mobj_save_blk);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_npc_entry);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_reverse_ry);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_setup);
+USER_FUNC(evt_party_move_pos2);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_dir);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_run_case_evt);
+USER_FUNC(evt_set_dir_to_target);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmoff_f);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envoff);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_sfx_vol);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_get_mapname);
+USER_FUNC(evt_sub_intpl_msec_get_value);
+USER_FUNC(evt_sub_intpl_msec_init);
+USER_FUNC(evt_sub_random);
+void moamoa_dispent(void);
+void moamoa_main(void);
+static void ext_disp(CameraId camera, void* param);
+void moamoa_init(void);
+static f32 randf(f32 min, f32 max);
+static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
+static void moamoa_pose_main(void);
+static void moamoa_pose_init(void);
+extern s32 evt_bero_info_run[];
+extern s32 evt_rsh_window[];
+
+__declspec(section ".data") u64 fd_rsh_00_negone_one_374;
+__declspec(section ".data") s32 fd_rsh_00_neg_one_382[1];
+__declspec(section ".data") s32 fd_rsh_00___local_PI_383[1];
+__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_rsh_00_one_negone_373;
+__declspec(section ".data") s32 fd_rsh_00___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_rsh_00_one_381[1];
+__declspec(section ".data") u64 fd_rsh_00_negone_one_360;
+__declspec(section ".data") s32 fd_rsh_00_neg_one_365[1];
+__declspec(section ".data") s32 fd_rsh_00___local_PI_366[1];
+__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_rsh_00_one_negone_359;
+__declspec(section ".data") s32 fd_rsh_00___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_rsh_00_one_364[1];
+s32 moamoa_data[243];
+static s32 evt_moamoa[324];
+s32 evt_rsh_moamoa_on_window[46];
+static s32 bero_data_a[30];
+static s32 bero_data_b[30];
+static s32 bero_data_c[30];
+s32 evt_handle[107];
+s32 regu_unten[210];
+static s32 init_unten[17];
+static s32 talk_unten[236];
+static s32 npc_data[46];
+static __declspec(section ".data") s32 access_tbl[5];
+static s32 evt_access[14];
+static s32 evt_access_entry[23];
+s32 rsh_00_init_evt[194];
+s32 rsh_00_a_init_evt[51];
+__declspec(section ".data") s32 rsh_00_b_init_evt[11];
+static __declspec(section ".data") s32 window_tbl[5];
+s32 rsh_00_c_init_evt[16];
+s32 rsh_00_init_evt_nidome[164];
+__declspec(section ".data") s32 rsh_00_a_init_evt_nidome[11];
+__declspec(section ".data") s32 rsh_00_b_init_evt_nidome[11];
+s32 rsh_00_c_init_evt_nidome[16];
+
+__declspec(section ".data") u64 fd_rsh_00_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_rsh_00_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_rsh_00___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_rsh_00_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_rsh_00___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_rsh_00_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_rsh_00_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_rsh_00_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_rsh_00___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_rsh_00___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_rsh_00_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_rsh_00___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_rsh_00_one_364[] = {
+    1065353216,
+};
+
+s32 moamoa_data[] = {
+    (s32)"c_n_moa_a", (s32)"S_1", 0, (s32)"c_n_moa_a", (s32)"S_1", 1065353216, (s32)"c_n_moa_a", (s32)"S_1",
+    1073741824, (s32)"c_n_moa_a", (s32)"S_1", 1077936128, (s32)"c_n_moa_a", (s32)"S_1", 1082130432, (s32)"c_n_moa_a",
+    (s32)"S_1", 1084227584, (s32)"c_n_moa_a", (s32)"S_1", 1086324736, (s32)"c_n_moa_a", (s32)"S_1", 1088421888,
+    (s32)"c_n_moa_a", (s32)"S_1", 1090519040, (s32)"c_n_moa_a", (s32)"S_1", 1091567616, (s32)"c_n_moa_a", (s32)"S_1",
+    1092616192, (s32)"c_n_moa_a", (s32)"S_1", 1093664768, (s32)"c_n_moa_a", (s32)"S_1", 1094713344, (s32)"c_n_moa_a",
+    (s32)"S_1", 1095761920, (s32)"c_n_moa_a", (s32)"S_1", 1096810496, (s32)"c_n_moa_a", (s32)"S_1", 1097859072,
+    (s32)"c_n_moa_a", (s32)"S_1", 1098907648, (s32)"c_n_moa_a", (s32)"S_1", 1099431936, (s32)"c_n_moa_a", (s32)"S_1",
+    1099956224, (s32)"c_n_moa_a", (s32)"S_1", 1100480512, (s32)"c_n_moa_a", (s32)"S_1", 1101004800, (s32)"c_n_moa_a",
+    (s32)"S_1", 1101529088, (s32)"c_n_moa_a", (s32)"S_1", 1102053376, (s32)"c_n_moa_a", (s32)"S_1", 1102577664,
+    (s32)"c_n_moa_a", (s32)"S_1", 1103101952, (s32)"c_n_moa_a", (s32)"S_1", 1103626240, (s32)"c_n_moa_a", (s32)"S_1",
+    1104150528, (s32)"c_n_moa_a", (s32)"S_1", 1104674816, (s32)"c_n_moa_a", (s32)"S_1", 1105199104, (s32)"c_n_moa_a",
+    (s32)"S_1", 1105723392, (s32)"c_n_moa_a", (s32)"S_1", 1106247680, (s32)"c_n_moa_a", (s32)"S_1", 1106771968,
+    (s32)"c_n_moa_a", (s32)"S_1", 1107296256, (s32)"c_n_moa_a", (s32)"S_1", 1107558400, (s32)"c_n_moa_a", (s32)"S_1",
+    1107820544, (s32)"c_n_moa_a", (s32)"S_1", 1108082688, (s32)"c_n_moa_a", (s32)"S_1", 1108344832, (s32)"c_n_moa_a",
+    (s32)"S_1", 1108606976, (s32)"c_n_moa_a", (s32)"S_1", 1108869120, (s32)"c_n_moa_a", (s32)"S_1", 1109131264,
+    (s32)"c_n_moa_b", (s32)"S_1", 0, (s32)"c_n_moa_b", (s32)"S_1", 1065353216, (s32)"c_n_moa_b", (s32)"S_1",
+    1073741824, (s32)"c_n_moa_b", (s32)"S_1", 1077936128, (s32)"c_n_moa_b", (s32)"S_1", 1082130432, (s32)"c_n_moa_b",
+    (s32)"S_1", 1084227584, (s32)"c_n_moa_b", (s32)"S_1", 1086324736, (s32)"c_n_moa_b", (s32)"S_1", 1088421888,
+    (s32)"c_n_moa_b", (s32)"S_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 1091567616, (s32)"c_n_moa_b", (s32)"S_1",
+    1092616192, (s32)"c_n_moa_b", (s32)"S_1", 1093664768, (s32)"c_n_moa_b", (s32)"S_1", 1094713344, (s32)"c_n_moa_b",
+    (s32)"S_1", 1095761920, (s32)"c_n_moa_b", (s32)"S_1", 1096810496, (s32)"c_n_moa_b", (s32)"S_1", 1097859072,
+    (s32)"c_n_moa_b", (s32)"S_1", 1098907648, (s32)"c_n_moa_b", (s32)"S_1", 1099431936, (s32)"c_n_moa_b", (s32)"S_1",
+    1099956224, (s32)"c_n_moa_b", (s32)"S_1", 1100480512, (s32)"c_n_moa_b", (s32)"S_1", 1101004800, (s32)"c_n_moa_b",
+    (s32)"S_1", 1101529088, (s32)"c_n_moa_b", (s32)"S_1", 1102053376, (s32)"c_n_moa_b", (s32)"S_1", 1102577664,
+    (s32)"c_n_moa_b", (s32)"S_1", 1103101952, (s32)"c_n_moa_b", (s32)"S_1", 1103626240, (s32)"c_n_moa_b", (s32)"S_1",
+    1104150528, (s32)"c_n_moa_b", (s32)"S_1", 1104674816, (s32)"c_n_moa_b", (s32)"S_1", 1105199104, (s32)"c_n_moa_b",
+    (s32)"S_1", 1105723392, (s32)"c_n_moa_b", (s32)"S_1", 1106247680, (s32)"c_n_moa_b", (s32)"S_1", 1106771968,
+    (s32)"c_n_moa_b", (s32)"S_1", 1107296256, (s32)"c_n_moa_b", (s32)"S_1", 1107558400, (s32)"c_n_moa_b", (s32)"S_1",
+    1107820544, (s32)"c_n_moa_b", (s32)"S_1", 1108082688, (s32)"c_n_moa_b", (s32)"S_1", 1108344832, (s32)"c_n_moa_b",
+    (s32)"S_1", 1108606976, (s32)"c_n_moa_b", (s32)"S_1", 1108869120, (s32)"c_n_moa_b", (s32)"S_1", 1109131264,
+    0, 0, 0,
+};
+
+#pragma dont_inline on
+static void moamoa_pose_init(void) {
+    MoamoaData* data = (MoamoaData*)moamoa_data;
+    s32 i = 0;
+    s32 start;
+    char model[32];
+    char anim[32];
+
+    strcpy(model, "");
+    strcpy(anim, "");
+    wp->numDefs = -1;
+    do {
+        if (strcmp(data->model, model)) {
+            strcpy(model, data->model);
+            strcpy(anim, "");
+        }
+        if (strcmp(data->anim, anim)) {
+            strcpy(anim, data->anim);
+            start = i;
+            wp->numDefs++;
+        }
+        strcpy(wp->defs[wp->numDefs].model, model);
+        strcpy(wp->defs[wp->numDefs].anim, anim);
+        wp->defs[wp->numDefs].start = start;
+        wp->defs[wp->numDefs].count = i - start + 1;
+        wp->defs[wp->numDefs].speed = data->speed;
+        wp->defs[wp->numDefs].loop = 1;
+        if (!strncmp(anim, "J", 1)) {
+            wp->defs[wp->numDefs].loop = 0;
+        }
+        i++;
+    } while ((++data)->model != NULL);
+    wp->numDefs++;
+}
+
+#pragma dont_inline reset
+static void moamoa_pose_main(void) {
+    f32 t;
+    u64 now;
+    s32 i;
+    ExtPose* pose;
+    Moamoa* moa;
+    MoamoaPoseDef* def;
+
+    pose = extGetPosePtr();
+    moa = wp->moa;
+    for (i = 0; i < wp->count; i++, moa++, pose++) {
+        now = gp->renderTime;
+        def = &wp->defs[moa->pose];
+        t = 60.0f * OSTicksToMilliseconds(now - moa->startTime) / 1000.0f / def->speed;
+
+        if (t >= 1.0f) {
+            if (def->loop) {
+                moa->startTime = now;
+                t = 0.0f;
+            } else {
+                t = 1.0f;
+            }
+        }
+        pose->frame = def->start + (s32)((def->count - 1) * t);
+    }
+}
+
+static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
+    MoamoaPoseDef* def = wp->defs;
+    s32 i;
+
+    if (moa->flags & 2) {
+        model = "c_n_moa_b";
+    }
+    for (i = 0; i < wp->numDefs; i++, def++) {
+        if (!strcmp(def->model, model) && !strcmp(def->anim, anim)) {
+            break;
+        }
+    }
+    if (i < wp->numDefs && moa->pose != i) {
+        moa->pose = i;
+        moa->startTime = gp->renderTime;
+    }
+}
+
+static f32 randf(f32 min, f32 max) {
+    f32 r = rand() / 32767.0f;
+
+    return r * (max - min) + min;
+}
+
+void moamoa_init(void) {
+    s32 i;
+    ExtPose* pose;
+    Moamoa* moa;
+    f32 x, y, z;
+
+    wp = _mapAlloc(sizeof(MoamoaWork));
+    memset(wp, 0, sizeof(MoamoaWork));
+    wp->count = extGetPoseNum();
+    wp->moa = _mapAlloc(wp->count * sizeof(Moamoa));
+    memset(wp->moa, 0, wp->count * sizeof(Moamoa));
+    moamoa_pose_init();
+    pose = extGetPosePtr();
+    moa = wp->moa;
+    for (i = 0; i < wp->count; i++, pose++, moa++) {
+        PSMTXIdentity(pose->mtx);
+        pose->flags |= 5;
+        moa->flags = 0;
+        moa->state = 0;
+        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        if (!strncmp(gp->currentMapName, "rsh_00", 6)) {
+            x = randf(-200.0f, 400.0f);
+            if (x > 257.0f) {
+                x = randf(257.0f, 262.0f);
+            }
+            y = randf(20.0f, 100.0f);
+            if (x < 185.0f) {
+                z = randf(-160.0f, -165.0f);
+            } else if (x < 257.0f) {
+                z = 0.8f * (x - 185.0f) + -160.0f;
+            } else {
+                z = randf(-90.0f, -20.0f);
+            }
+            {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+
+                pos.x = x;
+                pos.y = y;
+                pos.z = z - 100.0f;
+                moa->pos = pos;
+            }
+            pose->mtx[0][3] = 0.0f;
+            pose->mtx[1][3] = -1000.0f;
+            pose->mtx[2][3] = 0.0f;
+            if (!(x < 185.0f)) {
+                if (x < 257.0f) {
+                    Mtx m;
+
+                    PSMTXRotRad(m, 'y', -0.7853982f);
+                    PSMTXConcat(pose->mtx, m, pose->mtx);
+                    moa->flags |= 1;
+                } else {
+                    Mtx m;
+
+                    PSMTXRotRad(m, 'y', 1.5707964f);
+                    PSMTXConcat(pose->mtx, m, pose->mtx);
+                    moa->flags |= 1;
+                }
+            }
+        } else {
+            if (!strncmp(gp->currentMapName, "rsh_03", 6)) {
+                x = randf(-500.0f, 500.0f);
+                y = randf(20.0f, 100.0f) - 10.0f;
+                z = randf(-170.0f, -180.0f);
+                z -= 100.0f;
+            } else {
+                x = randf(-350.0f, 350.0f);
+                y = randf(20.0f, 100.0f);
+                z = randf(-290.0f, -300.0f);
+            }
+            {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+
+                pos.x = x;
+                pos.y = y;
+                pos.z = z;
+                moa->pos = pos;
+            }
+            pose->mtx[0][3] = 0.0f;
+            pose->mtx[1][3] = -1000.0f;
+            pose->mtx[2][3] = 0.0f;
+        }
+    }
+}
+
+static void ext_disp(CameraId camera, void* param) {
+    extLoadRenderMode();
+    extLoadVertex();
+    extLoadTexture();
+    extLoadTev();
+    extDraw();
+    extLoadTextureExit();
+}
+
+void moamoa_main(void) {
+    s32 i;
+    ExtPose* pose;
+    Moamoa* moa;
+    f32 r;
+
+    pose = extGetPosePtr();
+    moa = wp->moa;
+    for (i = 0; i < wp->count; i++, pose++, moa++) {
+        switch (moa->state) {
+            case 0:
+                break;
+            case 1:
+                moa->timer = rand() % 60;
+                moa->state++;
+                break;
+            case 2:
+                if (--moa->timer > 0) {
+                    break;
+                }
+                moa->state++;
+                moa->angle = randf(0.0f, 6.283184f);
+                break;
+            case 3:
+                if (moa->timer < 20) {
+                    if (!(moa->flags & 1)) {
+                        r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
+                        pose->mtx[0][3] = moa->pos.x + r * (f32)sin(moa->angle);
+                        pose->mtx[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
+                        pose->mtx[2][3] = moa->pos.z;
+                    } else {
+                        r = intplGetValue(2, ++moa->timer, 20, 50.0f, 0.0f);
+                        pose->mtx[0][3] = moa->pos.x;
+                        pose->mtx[1][3] = moa->pos.y - r * (f32)cos(moa->angle);
+                        pose->mtx[2][3] = moa->pos.z;
+                    }
+                } else {
+                    moa->state++;
+                }
+                break;
+            case 4:
+                pose->mtx[0][3] = moa->pos.x;
+                pose->mtx[1][3] = moa->pos.y;
+                pose->mtx[2][3] = moa->pos.z;
+                break;
+        }
+        if (pose->mtx[2][3] > 45.0f) {
+            pose->mtx[2][3] = 45.0f;
+        }
+    }
+    moamoa_pose_main();
+}
+
+void moamoa_dispent(void) {
+    dispEntry(CAMERA_3D, 0.0f, 1, ext_disp, NULL);
+}
+
+USER_FUNC(evt_moamoa_set_one) {
+    s32* args = event->args;
+    s32 idx = evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    ExtPose* pose;
+    Moamoa* moa;
+    Mtx m;
+
+    pose = extGetPosePtr();
+
+    (moa = &wp->moa[idx])->state = 3;
+    {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+
+        pos.x = x;
+        pos.y = y;
+        pos.z = z;
+        moa->pos = pos;
+    }
+    if (!(moa->flags & 1)) {
+        PSMTXRotRad(m, 'y', 1.5707964f);
+        PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
+        moa->flags |= 1;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_moamoa_set_seq_all) {
+    s32 seq = evtGetValue(event, event->args[0]);
+    s32 i;
+    Moamoa* moa;
+
+    extGetPosePtr();
+    moa = wp->moa;
+    for (i = 0; i < wp->count; i++, moa++) {
+        moa->state = seq;
+    }
+    return EVT_RETURN_DONE;
+}
+
+static EVT_BEGIN(evt_moamoa)
+    CALL(evt_snd_bgmoff_f, 512, 120)
+    CALL(evt_cam3d_evt_set, -70, 113, 373, 126, 38, -13, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_npc_flag_onoff, 1, STRING("運転手"), 32)
+    BEGIN_INLINE_EVENT
+        CALL(evt_party_move_pos2, 0, 85, -110, FLOAT(80.0f))
+        CALL(evt_party_set_dir, 0, 90, 200)
+    END_INLINE_EVENT
+    CALL(evt_mario_mov_pos2, 115, -110, FLOAT(80.0f))
+    CALL(evt_mario_set_dir, 90, 200, 0)
+    CALL(evt_set_dir_to_target, STRING("運転手"), STRING("mario"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_231"), 0, STRING("me"))
+    CALL(evt_npc_flag_onoff, 0, STRING("運転手"), 32)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_VOICE1"), 265, 25, -145, 0)
+    CALL(evt_moamoa_set_one, 0, 265, 25, -145)
+    CALL(evt_moamoa_set_one, 1, 265, 35, -230)
+    WAIT_MS(1000)
+    CALL(evt_npc_reverse_ry, STRING("me"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_232"), 0, STRING("me"))
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_bgmoff, 1024)
+        CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SURPRISED1"))
+        WAIT_MS(2000)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), LW(10))
+        WAIT_MS(1000)
+        CALL(evt_snd_sfxoff, LW(10))
+    END_INLINE_EVENT
+    CALL(evt_moamoa_set_seq_all, 1)
+    WAIT_MS(500)
+    SET_VALUE(GSW(0), 329)
+    LOOP(3)
+        CALL(evt_cam3d_evt_set, -2, 86, 230, 126, 38, -13, 350, 11)
+        WAIT_MS(350)
+        CALL(evt_cam3d_evt_set, -70, 113, 373, 126, 38, -13, 350, 11)
+        WAIT_MS(350)
+    END_LOOP
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2_3"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_eff_fukidashi, 0, STRING("a"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff_fukidashi, 3, STRING("b"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_npc_flag_onoff, 0, STRING("me"), 1536)
+    CALL(evt_npc_set_anim, STRING("me"), STRING("B_1"))
+    CALL(evt_mario_set_pose, STRING("M_I_N"))
+    WAIT_MS(1000)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_npc_set_anim, STRING("me"), STRING("T_2"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_233"), 0, STRING("me"))
+    CALL(evt_npc_set_anim, STRING("me"), STRING("B_2"))
+    CALL(evt_cam3d_evt_set, -2, 86, 230, 126, 38, -13, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_party_stop, 0)
+    WAIT_MS(300)
+    CALL(evt_mario_get_party, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(1)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_0"), 0, STRING("party"))
+        CASE_EQUAL(2)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_1"), 0, STRING("party"))
+        CASE_EQUAL(4)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_2"), 0, STRING("party"))
+        CASE_EQUAL(5)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_3"), 0, STRING("party"))
+        CASE_EQUAL(6)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_4"), 0, STRING("party"))
+        CASE_EQUAL(3)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_5"), 0, STRING("party"))
+        CASE_EQUAL(7)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_234_6"), 0, STRING("party"))
+    END_SWITCH
+    CALL(evt_party_run, 0)
+    CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), LW(10))
+    CALL(evt_snd_sfx_vol, LW(10), 88)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_235_00"), 0, STRING("me"))
+    CALL(evt_cam3d_evt_off, 500, 11)
+    WAIT_MS(500)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_rsh_moamoa_on_window)
+    SWITCH(GSW(0))
+        CASE_BETWEEN(329, 331)
+        CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), LW(10))
+        CALL(evt_snd_sfx_vol, LW(10), 88)
+        CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
+        CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
+        CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
+        CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
+        CALL(evt_ext_entry, 1000, PTR(moamoa_data), PTR(moamoa_init), PTR(moamoa_main), PTR(moamoa_dispent))
+        CALL(evt_moamoa_set_seq_all, 4)
+    END_SWITCH
+    RETURN
+EVT_END()
+
+static s32 bero_data_a[] = {
+    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"rsh_01_a", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+static s32 bero_data_b[] = {
+    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"rsh_01_b", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+static s32 bero_data_c[] = {
+    (s32)"w_bero", 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"rsh_01_c", (s32)"e_bero", 65537, (s32)"w_door_close", (s32)"w_door_open", 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(evt_handle)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
+            IF_INT_LESS(GSW(0), 334)
+                BREAK_LOOP
+            END_IF
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), 0)
+        LOOP(0)
+            ADD(LW(0), 10)
+            MODULO(LW(0), 360)
+            CALL(evt_mapobj_rotate, 1, STRING("handoru_1"), 0, LW(0), 0)
+            SET_VALUE(LW(1), LW(0))
+            MULTIPLY(LW(1), -1)
+            CALL(evt_mapobj_rotate, 1, STRING("handoru_2"), 0, LW(1), 0)
+            WAIT_FRAMES(1)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_init, 11, 0, -40, 300)
+            LABEL(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_mapobj_trans, 1, STRING("handoru_3"), LW(0), 0, 0)
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(0)
+            END_IF
+            CALL(evt_sub_intpl_msec_init, 11, -40, 0, 300)
+            LABEL(1)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_mapobj_trans, 1, STRING("handoru_3"), LW(0), 0, 0)
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(1)
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    RETURN
+EVT_END()
+
+EVT_BEGIN(regu_unten)
+    SET_VALUE(LW(2), 0)
+    SET_VALUE(LW(3), 0)
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 0)
+    SET_VALUE(LW(7), 0)
+    LOOP(0)
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 310)
+            IF_INT_LESS(GSW(0), 326)
+                RETURN
+            END_IF
+        END_IF
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
+            IF_INT_LESS(GSW(0), 339)
+                RETURN
+            END_IF
+        END_IF
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 346)
+            IF_INT_EQUAL(GSWF(3579), 1)
+                RETURN
+            END_IF
+            IF_INT_EQUAL(GSWF(3581), 1)
+                RETURN
+            END_IF
+            IF_INT_EQUAL(GSWF(3580), 1)
+                RETURN
+            END_IF
+        END_IF
+        CALL(evt_sub_random, 300, LW(10))
+        SWITCH(LW(10))
+            CASE_LESS(100)
+            IF_INT_LESS(GSW(0), 328)
+            END_IF
+            SET_VALUE(LW(2), LW(3))
+            CALL(evt_sub_random, 135, LW(10))
+            SUBTRACT(LW(10), 45)
+            SET_VALUE(LW(3), LW(10))
+            CALL(evt_sub_intpl_msec_init, 11, LW(2), LW(3), 1000)
+            LABEL(0)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_mapobj_rotate, 1, STRING("handoru_1"), 0, LW(0), 0)
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(0)
+            END_IF
+            CASE_LESS(200)
+            IF_INT_LESS(GSW(0), 328)
+            END_IF
+            SET_VALUE(LW(4), LW(5))
+            CALL(evt_sub_random, 40, LW(10))
+            MULTIPLY(LW(10), -1)
+            SET_VALUE(LW(5), LW(10))
+            CALL(evt_sub_intpl_msec_init, 11, LW(4), LW(5), 500)
+            LABEL(1)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_mapobj_trans, 1, STRING("handoru_3"), LW(0), 0, 0)
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(1)
+            END_IF
+            CASE_DEFAULT
+            IF_INT_LESS(GSW(0), 328)
+            END_IF
+            SET_VALUE(LW(6), LW(7))
+            CALL(evt_sub_random, 135, LW(10))
+            SUBTRACT(LW(10), 90)
+            SET_VALUE(LW(7), LW(10))
+            CALL(evt_sub_intpl_msec_init, 11, LW(6), LW(7), 1000)
+            LABEL(2)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_mapobj_rotate, 1, STRING("handoru_2"), 0, LW(0), 0)
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(2)
+            END_IF
+        END_SWITCH
+        CALL(evt_sub_random, 2, LW(10))
+        ADD(LW(10), 1)
+        MULTIPLY(LW(10), 1000)
+        WAIT_MS(LW(10))
+    END_LOOP
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(init_unten)
+    SWITCH(GSW(0))
+        CASE_BETWEEN(329, 331)
+        CALL(evt_npc_flag_onoff, 0, STRING("me"), 1536)
+        CALL(evt_npc_set_anim, STRING("me"), STRING("B_2"))
+    END_SWITCH
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(talk_unten)
+    SWITCH(GSW(0))
+        CASE_LESS(288)
+        IF_INT_EQUAL(LSWF(1), 0)
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_00"), 0, 0)
+            SET_VALUE(LSWF(1), 1)
+            ELSE
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_01"), 0, 0)
+            SET_VALUE(LSWF(1), 0)
+        END_IF
+        CASE_LESS(292)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
+        CASE_LESS(293)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_108"), 0, STRING("me"))
+        CALL(evt_npc_set_anim, STRING("me"), STRING("A_1"))
+        WAIT_MS(500)
+        CALL(evt_npc_get_position, STRING("me"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_DRIVER_SIGN1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_npc_set_anim, STRING("me"), STRING("A_2"))
+        WAIT_MS(2000)
+        CALL(evt_npc_set_anim, STRING("me"), STRING("A_3"))
+        WAIT_MS(500)
+        CALL(evt_item_entry, STRING("sign"), 77, 0, 0, 0, 17, -1, 0)
+        CALL(evt_item_get_item, STRING("sign"))
+        CALL(evt_item_get_item_end_wait, STRING("sign"))
+        CALL(evt_npc_set_anim, STRING("me"), STRING("T_1"))
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_110"), 0, STRING("me"))
+        SET_VALUE(GSW(0), 293)
+        CASE_LESS(294)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_01_01"), 0, 0)
+        CASE_LESS(301)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_01_02"), 0, 0)
+        CASE_LESS(303)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_147_01"), 0, 0)
+        CASE_LESS(310)
+        IF_INT_EQUAL(LSWF(2), 0)
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_152"), 0, 0)
+            SET_VALUE(LSWF(2), 1)
+            ELSE
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_153"), 0, 0)
+        END_IF
+        CASE_LESS(326)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_209"), 0, 0)
+        CASE_LESS(327)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_217"), 0, 0)
+        CASE_LESS(329)
+        CALL_CHILD(PTR(evt_moamoa))
+        CASE_LESS(332)
+        CALL(evt_npc_set_anim, STRING("me"), STRING("T_2"))
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_235"), 0, 0)
+        CALL(evt_npc_set_anim, STRING("me"), STRING("B_2"))
+        CASE_LESS(346)
+        CALL(evt_msg_print, 0, STRING("stg6_rsh_253"), 0, 0)
+        CASE_DEFAULT
+        IF_INT_EQUAL(GSWF(3580), 1)
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
+            RETURN
+        END_IF
+        IF_INT_EQUAL(GSWF(3578), 0)
+            CALL(evt_msg_print, 0, STRING("stg6_rsh_c_07"), 0, 0)
+            ELSE
+            IF_INT_EQUAL(GSWF(3581), 0)
+                CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08"), 0, 0)
+                ELSE
+                CALL(evt_msg_print, 0, STRING("stg6_rsh_c_08_1"), 0, 0)
+            END_IF
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
+
+static s32 npc_data[] = {
+    (s32)/*"運転手"*/"\x89\x5E\x93\x5D\x8E\xE8", 1073874448, 0, (s32)init_unten, (s32)regu_unten, (s32)talk_unten, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+};
+
+static __declspec(section ".data") s32 access_tbl[] = {
+    (s32)"nittei", (s32)"stg6_rsh_259", (s32)"soujyuu", (s32)"stg6_rsh_260", 0,
+};
+
+static EVT_BEGIN(evt_access)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_msg_print, 0, LW(1), 0, 0)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(evt_access_entry)
+    SET_INT_READ_ADDR(PTR(access_tbl))
+    LOOP(0)
+        READ_INT2(LW(0), LW(1))
+        IF_INT_EQUAL(LW(0), 0)
+            BREAK_LOOP
+        END_IF
+        CALL(evt_run_case_evt, 9, 1, LW(0), 0, PTR(evt_access), 0)
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(rsh_00_init_evt)
+    SWITCH(GSW(0))
+        CASE_BETWEEN(310, 325)
+        CASE_GREATER_OR_EQUAL(333)
+        CASE_DEFAULT
+        CALL(evt_map_playanim, STRING("yure"), 1, 0)
+        CALL(evt_map_playanim, STRING("hai_sora"), 1, 0)
+        CALL(evt_map_playanim, STRING("hai_yama"), 1, 0)
+        CALL(evt_map_playanim, STRING("hai_iwayama"), 1, 0)
+        CALL(evt_map_playanim, STRING("hai_saboten"), 1, 0)
+        CALL(evt_map_playanim, STRING("hai_hosi"), 1, 0)
+    END_SWITCH
+    CALL(evt_npc_setup, PTR(npc_data))
+    CALL_CHILD(PTR(evt_access_entry))
+    SPAWN_EVENT(PTR(evt_handle))
+    CALL(evt_mobj_save_blk, STRING("mobj_save"), -210, 60, -145, 0, 0)
+    CALL(evt_sub_get_mapname, LW(0))
+    IF_STR_NOT_EQUAL(LW(0), STRING("rsh_00_c"))
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(5648))
+        ELSE
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(5648))
+    END_IF
+    SWITCH(GSW(0))
+        CASE_BETWEEN(284, 286)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(304, 309)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(310, 325)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
+        CALL(evt_snd_envoff, 512)
+        CALL(evt_snd_bgmoff, 26624)
+        CASE_BETWEEN(327, 328)
+        CALL(evt_snd_bgmoff, 512)
+        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(329, 331)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
+        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        CASE_BETWEEN(334, 344)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_envoff, 512)
+        CALL(evt_snd_bgmoff, 26624)
+        CASE_DEFAULT
+        CALL(evt_sub_get_mapname, LW(0))
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_a"))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH1"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        END_IF
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_b"))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH3"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        END_IF
+        IF_STR_EQUAL(LW(0), STRING("rsh_00_c"))
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH2"))
+            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(rsh_00_a_init_evt)
+    SET_VALUE(LW(0), PTR(bero_data_a))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt))
+    SWITCH(GSW(0))
+        CASE_BETWEEN(328, 331)
+        CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
+        CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
+        CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
+        CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
+        CALL(evt_ext_entry, 1000, PTR(moamoa_data), PTR(moamoa_init), PTR(moamoa_main), PTR(moamoa_dispent))
+        IF_INT_GREATER_OR_EQUAL(GSW(0), 329)
+            CALL(evt_moamoa_set_seq_all, 4)
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt)
+    SET_VALUE(LW(0), PTR(bero_data_b))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt))
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") s32 window_tbl[] = {
+    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", (s32)"mado_uturi_4", 0,
+};
+
+EVT_BEGIN(rsh_00_c_init_evt)
+    SET_VALUE(LW(0), PTR(bero_data_c))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt))
+    SET_VALUE(LW(0), PTR(window_tbl))
+    CALL_CHILD(PTR(evt_rsh_window))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(rsh_00_init_evt_nidome)
+    IF_INT_EQUAL(GSWF(3579), 0)
+        IF_INT_EQUAL(GSWF(3580), 0)
+            IF_INT_EQUAL(GSWF(3581), 0)
+                CALL(evt_map_playanim, STRING("yure"), 1, 0)
+                IF_INT_EQUAL(GSWF(3578), 0)
+                    CALL(evt_map_playanim, STRING("hai_sora"), 1, 0)
+                    CALL(evt_map_playanim, STRING("hai_yama"), 1, 0)
+                    CALL(evt_map_playanim, STRING("hai_iwayama"), 1, 0)
+                    CALL(evt_map_playanim, STRING("hai_saboten"), 1, 0)
+                    ELSE
+                    CALL(evt_map_playanim, STRING("rt_hai_sora"), 1, 0)
+                    CALL(evt_map_playanim, STRING("rt_hai_yama"), 1, 0)
+                    CALL(evt_map_playanim, STRING("rt_hai_iwayama"), 1, 0)
+                    CALL(evt_map_playanim, STRING("rt_hai_saboten"), 1, 0)
+                END_IF
+            END_IF
+        END_IF
+    END_IF
+    CALL(evt_npc_setup, PTR(npc_data))
+    CALL(evt_mobj_save_blk, STRING("mobj_save"), -210, 60, -145, 0, 0)
+    CALL(evt_sub_get_mapname, LW(0))
+    IF_STR_NOT_EQUAL(LW(0), STRING("rsh_00_c"))
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_zentai"), 125, GSWF(5648))
+        ELSE
+        CALL(evt_mobj_kururing_floor, STRING("kururin1"), -132, 0, -95, STRING("s_yuka1"), 125, GSWF(5648))
+    END_IF
+    CALL_CHILD(PTR(evt_access_entry))
+    IF_INT_EQUAL(GSWF(3460), 1)
+        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_envoff, 512)
+        CALL(evt_snd_bgmoff, 26624)
+        ELSE
+        IF_INT_EQUAL(GSWF(3461), 1)
+            CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
+            CALL(evt_snd_envoff, 512)
+            CALL(evt_snd_bgmoff, 26624)
+            ELSE
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("rsh_00_a"))
+                CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH1"))
+                CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+            END_IF
+            IF_STR_EQUAL(LW(0), STRING("rsh_00_b"))
+            END_IF
+            IF_STR_EQUAL(LW(0), STRING("rsh_00_c"))
+                CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_RSH2"))
+                CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_4"))
+            END_IF
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(rsh_00_a_init_evt_nidome)
+    SET_VALUE(LW(0), PTR(bero_data_a))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") EVT_BEGIN(rsh_00_b_init_evt_nidome)
+    SET_VALUE(LW(0), PTR(bero_data_b))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(rsh_00_c_init_evt_nidome)
+    SET_VALUE(LW(0), PTR(bero_data_c))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL_CHILD(PTR(rsh_00_init_evt_nidome))
+    SET_VALUE(LW(0), PTR(window_tbl))
+    CALL_CHILD(PTR(evt_rsh_window))
+    RETURN
+EVT_END()
+
+
+int rand(void);

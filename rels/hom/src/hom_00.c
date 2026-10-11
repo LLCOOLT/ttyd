@@ -7,7 +7,7 @@
 #include "driver/mapdrv.h"
 #include "dolphin/gx.h"
 #include "dolphin/os.h"
-#include "mario/mario.h"
+#include "evt/evt_cmd.h"
 
 double sin(double x);
 static smartEntry* ind_lp;
@@ -140,51 +140,6 @@ s32 evt_train_nidome[307];
 s32 evt_hom_touchaku[460];
 s32 evt_hom_touchaku_nidome[56];
 s32 hom_00_init_evt[247];
-
-static void sun_tev(MapTevCallbackInfo* info) {
-    s32 stage = info->tevStage;
-    s32 texMap = info->texCoord;
-    s32 texCoord = info->texMap;
-    s32 indStage = info->field_0x18;
-    GXTexObj obj;
-    f32 mtx[2][3];
-    u8* buf;
-    s32 i;
-    s32 j;
-
-    // a scrolling sine-wave warp texture for the sun's heat haze
-    if (ind_lp == NULL) {
-        ind_lp = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 1);
-    }
-    buf = ind_lp->address;
-    for (i = 0; i < 64; i++) {
-        for (j = 0; j < 64; j++) {
-            f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
-            u8* p = &buf[((i / 4) << 5) + ((j / 4) << 9) + (((i % 4) + ((j % 4) << 2)) << 1)];
-
-            p[0] = 3.0f * v + 128.0f;
-            p[1] = 0x80;
-        }
-    }
-    DCFlushRange(buf, 0x2000);
-    GXInitTexObj(&obj, buf, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    GXLoadTexObj(&obj, texMap);
-    mtx[0][0] = 0.5f;
-    mtx[0][1] = 0.0f;
-    mtx[0][2] = 0.0f;
-    mtx[1][0] = 0.0f;
-    mtx[1][1] = 0.5f;
-    mtx[1][2] = 0.0f;
-    GXSetIndTexMtx(GX_ITM_0, mtx, 1);
-    GXSetIndTexOrder(indStage, GX_TEXCOORD0, texMap);
-    GXSetIndTexCoordScale(indStage, GX_ITS_1, GX_ITS_1);
-    GXSetTevIndWarp(GX_TEVSTAGE0, indStage, GX_TRUE, GX_FALSE, GX_ITM_0);
-    info->tevStage = stage;
-    info->texMap = texCoord;
-    info->field_0x18 = indStage + 1;
-    info->texCoord = texMap + 1;
-}
 
 __declspec(section ".data") u64 fd_hom_00_negone_one_374 = 0xBF8000003F800000;
 
@@ -783,11 +738,60 @@ EVT_BEGIN(hom_00_init_evt)
     RETURN
 EVT_END()
 
+static void sun_tev(MapTevCallbackInfo* info) {
+    static const s32 texmtx_tbl[] = {
+        GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4,
+        GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9,
+    };
+    s32 stage = info->tevStage;
+    s32 texMap = info->texCoord;
+    s32 texCoord = info->texMap;
+    s32 indStage = info->field_0x18;
+    GXTexObj obj;
+    f32 mtx[2][3];
+    u8* buf;
+    s32 i;
+    s32 j;
+
+    // a scrolling sine-wave warp texture for the sun's heat haze
+    if (ind_lp == NULL) {
+        ind_lp = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 1);
+    }
+    buf = ind_lp->address;
+    for (i = 0; i < 64; i++) {
+        for (j = 0; j < 64; j++) {
+            f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
+            s32 off = ((i / 4) << 5) + ((j / 4) << 9);
+
+            off += ((i % 4) + ((j % 4) << 2)) * 2;
+            buf[off] = 3.0f * v + 128.0f;
+            buf[off + 1] = 0x80;
+        }
+    }
+    DCFlushRange(buf, 0x2000);
+    GXInitTexObj(&obj, buf, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, texMap);
+    mtx[0][0] = 0.5f;
+    mtx[0][1] = 0.0f;
+    mtx[0][2] = 0.0f;
+    mtx[1][0] = 0.0f;
+    mtx[1][1] = 0.5f;
+    mtx[1][2] = 0.0f;
+    GXSetIndTexMtx(GX_ITM_0, mtx, 1);
+    GXSetIndTexOrder(indStage, GX_TEXCOORD0, texMap);
+    GXSetIndTexCoordScale(indStage, GX_ITS_1, GX_ITS_1);
+    GXSetTevIndWarp(GX_TEVSTAGE0, indStage, GX_TRUE, GX_FALSE, GX_ITM_0);
+    info->tevStage = stage;
+    info->texMap = texCoord;
+    info->field_0x18 = indStage + 1;
+    info->texCoord = texMap + 1;
+}
+
 static USER_FUNC(test_glare) {
     MapObject* sun = mapGetMapObj("sun");
     u16* rect;
 
-    marioGetPtr();
     if (isFirstCall) {
         sun->flags |= 0x20000000;
         return EVT_RETURN_BLOCK;
@@ -797,21 +801,23 @@ static USER_FUNC(test_glare) {
         envGlareFilter(0, 0, 0, 0, 0);
     } else if (rect[0] == 0 && rect[1] == 0 && rect[2] == 0 && rect[3] == 0) {
         envGlareFilter(0, 0, 0, 0, 0);
+    } else if (evtGetValue(event, GF(15))) {
+        envGlareFilter(0, 0, 0, 0, 0);
     } else {
         envGlareFilter(1, rect[1] - 50, rect[0] - 50, rect[3] + 50, rect[2] + 50);
-        envGlareFilterZ(0.998f);
     }
     return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(tokei) {
+    s32 min;
     OSCalendarTime time;
-    s32 sec;
+    u32 sec;
 
     OSTicksToCalendarTime(OSGetTime(), &time);
-    sec = time.hour * 3600 + time.min * 60 + time.sec;
+    min = time.min * 60;
+    sec = time.hour * 3600 + min + time.sec;
     event->lwData[0] = (s32)(1024.0f * -(360.0f * (sec / 3600.0f) / 12.0f)) - 230000000;
     event->lwData[1] = (s32)(1024.0f * -(360.0f * (sec / 60.0f) / 60.0f)) - 230000000;
     return EVT_RETURN_DONE;
 }
-

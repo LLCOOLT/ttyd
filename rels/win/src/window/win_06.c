@@ -72,60 +72,6 @@ __declspec(section ".data") s32 welcome_wonderforest_init[6];
 s32 welcome_wonderforest[260];
 s32 win_06_init_evt[82];
 
-static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    p->pos.x = evtGetFloat(event, args[1]);
-    p->pos.y = evtGetFloat(event, args[2]);
-    p->pos.z = evtGetFloat(event, args[3]);
-    p->target.x = evtGetFloat(event, args[4]);
-    p->target.y = evtGetFloat(event, args[5]);
-    p->target.z = evtGetFloat(event, args[6]);
-    p->angle = evtGetFloat(event, args[7]);
-    p->dist = evtGetFloat(event, args[8]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    evtSetFloat(event, args[1], p->pos.x);
-    evtSetFloat(event, args[2], p->pos.y);
-    evtSetFloat(event, args[3], p->pos.z);
-    evtSetFloat(event, args[4], p->target.x);
-    evtSetFloat(event, args[5], p->target.y);
-    evtSetFloat(event, args[6], p->target.z);
-    evtSetFloat(event, args[7], p->angle);
-    evtSetFloat(event, args[8], p->dist);
-    return EVT_RETURN_DONE;
-}
-
 __declspec(section ".data") u64 fd_win_06_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_win_06_neg_one_382[] = {
@@ -305,6 +251,60 @@ EVT_BEGIN(win_06_init_evt)
     RETURN
 EVT_END()
 
+static USER_FUNC(cam_kaiten_set_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    p->pos.x = evtGetFloat(event, args[1]);
+    p->pos.y = evtGetFloat(event, args[2]);
+    p->pos.z = evtGetFloat(event, args[3]);
+    p->target.x = evtGetFloat(event, args[4]);
+    p->target.y = evtGetFloat(event, args[5]);
+    p->target.z = evtGetFloat(event, args[6]);
+    p->angle = evtGetFloat(event, args[7]);
+    p->dist = evtGetFloat(event, args[8]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_get_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    evtSetFloat(event, args[1], p->pos.x);
+    evtSetFloat(event, args[2], p->pos.y);
+    evtSetFloat(event, args[3], p->pos.z);
+    evtSetFloat(event, args[4], p->target.x);
+    evtSetFloat(event, args[5], p->target.y);
+    evtSetFloat(event, args[6], p->target.z);
+    evtSetFloat(event, args[7], p->angle);
+    evtSetFloat(event, args[8], p->dist);
+    return EVT_RETURN_DONE;
+}
+
 static USER_FUNC(cam_kaiten_set_direct) {
     CameraEntry* camera = camGetPtr(4);
     f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
@@ -321,6 +321,10 @@ static USER_FUNC(cam_kaiten_set_direct) {
     camera->stateA = 3;
     camera->curveA = 11;
     return EVT_RETURN_DONE;
+}
+
+static inline f32 fid(f32 x) {
+    return x;
 }
 
 static USER_FUNC(cam_kaiten_init) {
@@ -353,7 +357,7 @@ static USER_FUNC(cam_kaiten_init) {
     target.y = 0.0f;
     pos.y = 0.0f;
     dist = PSVECDistance(&pos, &target);
-    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
+    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
     ckp0->dist = dist;
 
     pos = ckp1->pos;
@@ -384,4 +388,3 @@ USER_FUNC(camps30) {
     camGetPtr(4)->fovY = fovY;
     return EVT_RETURN_DONE;
 }
-

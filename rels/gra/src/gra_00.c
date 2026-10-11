@@ -116,92 +116,6 @@ static __declspec(section ".data") s32 tree_tbl[12];
 __declspec(section ".data") s32 evt_majin_key[5];
 s32 gra_00_init_evt[74];
 
-static USER_FUNC(cam_r) {
-    f32 roll = evtGetFloat(event, event->args[0]);
-    CameraEntry* cam = camGetPtr(CAMERA_3D);
-
-    if (!roll) {
-        cam->rollAngle = 0.0f;
-        cam->viewOffset.z = 0.0f;
-    } else {
-        cam->rollAngle = roll;
-        cam->viewOffset.z = -__fabsf(15.0f * (f32)sin(gp->retraceCount / 10.0f));
-        cam->cameraPos.y = 97.0f;
-        cam->cameraAt.y = 45.0f;
-    }
-    return EVT_RETURN_DONE;
-}
-
-void msg_callback(s32 type, void* param) {
-    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0x7A00);
-
-    switch (type) {
-        case 0:
-            evtSetValue(ev, GW(0), 0);
-            evtSetValue(ev, GW(1), 0);
-            ev->lwData[15] = 0;
-            break;
-        case 5:
-            if (ev->lwData[15] == 3) {
-                marioKeyOff();
-            }
-            ev->lwData[15]++;
-            break;
-        case 1:
-            evtSetValue(ev, GW(1), 1);
-            break;
-        case 3:
-            evtSetValue(ev, GW(0), 1);
-            break;
-    }
-}
-
-static USER_FUNC(zoom) {
-    s32* args = event->args;
-    CameraEntry* cam = camGetPtr(CAMERA_3D);
-    Vec v;
-
-    PSVECSubtract(&cam->cameraPos, &cam->cameraAt, &v);
-    PSVECScale(&v, &v, 0.6f);
-    PSVECAdd(&cam->cameraAt, &v, &v);
-    evtSetFloat(event, args[0], v.x);
-    evtSetFloat(event, args[1], v.y);
-    evtSetFloat(event, args[2], v.z);
-    evtSetFloat(event, args[3], cam->cameraAt.x);
-    evtSetFloat(event, args[4], cam->cameraAt.y);
-    evtSetFloat(event, args[5], cam->cameraAt.z);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(camera_yure) {
-    s32 frames = evtGetValue(event, event->args[0]);
-    CameraEntry* cam = camGetPtr(CAMERA_3D);
-    Vec v;
-    f32 amp;
-
-    if (isFirstCall) {
-        event->userdata[0] = 0;
-        event->userdata[1] = frames;
-    }
-    // shake three times, fading out
-    amp = sin(18.849556f * event->userdata[0] / event->userdata[1]);
-    amp = (event->userdata[1] - event->userdata[0]) * (0.1f * amp) / event->userdata[1];
-    PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
-    PSVECScale(&v, &v, amp);
-    cam->viewOffset.x = v.x;
-    cam->viewOffset.y = v.y;
-    cam->viewOffset.z = v.z;
-    cam = camGetPtr(CAMERA_3D_IMAGE);
-    cam->viewOffset.x = v.x;
-    cam->viewOffset.y = v.y;
-    cam->viewOffset.z = v.z;
-    event->userdata[0]++;
-    if (event->userdata[0] > event->userdata[1]) {
-        return EVT_RETURN_DONE;
-    }
-    return EVT_RETURN_BLOCK;
-}
-
 __declspec(section ".data") u64 fd_gra_00_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_gra_00_neg_one_382[] = {
@@ -764,3 +678,92 @@ EVT_BEGIN(gra_00_init_evt)
     RETURN
 EVT_END()
 
+static USER_FUNC(cam_r) {
+    f32 roll = evtGetFloat(event, event->args[0]);
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    f32 s;
+
+    if (!roll) {
+        cam->rollAngle = 0.0f;
+        cam->viewOffset.z = 0.0f;
+    } else {
+        cam->rollAngle = roll;
+        s = sin(gp->retraceCount / 10.0f);
+        cam->viewOffset.z = -__fabsf(15.0f * s);
+        cam->cameraPos.y = 97.0f;
+        cam->cameraAt.y = 45.0f;
+    }
+    return EVT_RETURN_DONE;
+}
+
+void msg_callback(s32 type, void* param) {
+    EventEntry* ev = *(EventEntry**)(*(u8**)param + 0x7A00);
+
+    switch (type) {
+        case 0:
+            evtSetValue(ev, GW(0), 0);
+            evtSetValue(ev, GW(1), 0);
+            ev->lwData[15] = 0;
+            break;
+        case 5:
+            if (ev->lwData[15] == 3) {
+                marioKeyOff();
+            }
+            ev->lwData[15]++;
+            break;
+        case 1:
+            evtSetValue(ev, GW(1), 1);
+            break;
+        case 3:
+            evtSetValue(ev, GW(0), 1);
+            break;
+    }
+}
+
+static USER_FUNC(zoom) {
+    s32* args = event->args;
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    Vec v;
+
+    PSVECSubtract(&cam->cameraPos, &cam->cameraAt, &v);
+    PSVECScale(&v, &v, 0.6f);
+    PSVECAdd(&cam->cameraAt, &v, &v);
+    evtSetFloat(event, args[0], v.x);
+    evtSetFloat(event, args[1], v.y);
+    evtSetFloat(event, args[2], v.z);
+    evtSetFloat(event, args[3], cam->cameraAt.x);
+    evtSetFloat(event, args[4], cam->cameraAt.y);
+    evtSetFloat(event, args[5], cam->cameraAt.z);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(camera_yure) {
+    s32 frames = evtGetValue(event, event->args[0]);
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    Vec v;
+    f32 amp;
+    s32 left;
+
+    if (isFirstCall) {
+        event->userdata[0] = 0;
+        event->userdata[1] = frames;
+    }
+    // shake three times, fading out
+    amp = sin(18.849556f * event->userdata[0] / event->userdata[1]);
+    left = event->userdata[1] - event->userdata[0];
+    amp = left * (0.1f * amp) / event->userdata[1];
+    PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
+    PSVECScale(&v, &v, amp);
+    cam->viewOffset.x = v.x;
+    cam->viewOffset.y = v.y;
+    cam->viewOffset.z = v.z;
+    cam = camGetPtr(CAMERA_3D_IMAGE);
+    cam->viewOffset.x = v.x;
+    cam->viewOffset.y = v.y;
+    cam->viewOffset.z = v.z;
+    event->userdata[0]++;
+    if (event->userdata[0] > event->userdata[1]) {
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}

@@ -141,6 +141,8 @@ extern s32 evt_npc_sound_data_set[];
 extern s32 evt_shop_setup[];
 extern s32 npc_init_evt[];
 
+EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+void envSetYamiView(Mtx mtx);
 __declspec(section ".data") u64 fd_muj_01_negone_one_374;
 __declspec(section ".data") s32 fd_muj_01_neg_one_382[1];
 __declspec(section ".data") s32 fd_muj_01___local_PI_383[1];
@@ -224,41 +226,6 @@ static s32 epilogue_evt[88];
 s32 yakan_anime[17];
 s32 muj_01_init_evt[225];
 
-static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 ry = evtGetFloat(event, args[1]);
-
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
-    return EVT_RETURN_DONE;
-}
-
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-
-static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-
-    effSetName(effStarStoneEntry(4, x, y, z, 1.0f), name);
-    return EVT_RETURN_DONE;
-}
 
 __declspec(section ".data") u64 fd_muj_01_negone_one_374 = 0xBF8000003F800000;
 
@@ -1595,6 +1562,142 @@ static __declspec(section ".data") EVT_BEGIN(sekai_yami_shake)
     RETURN
 EVT_END()
 
+static USER_FUNC(make_itemsel_table) {
+    s32* args = event->args;
+    PouchData* pouch = pouchGetPtr();
+    s32* p;
+    s32 count;
+    s32 i;
+
+    itemsel_table_ram = _mapAlloc(0x54);
+    p = itemsel_table_ram;
+    count = 0;
+    for (i = 0; i < 20; i++) {
+        s32 item = pouch->heldItems[i];
+
+        if (item > 0) {
+            *p++ = item;
+            count++;
+        }
+    }
+    *p = -1;
+    evtSetValue(event, args[0], count);
+    event->lwData[10] = (s32)itemsel_table_ram;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(delete_itemsel_table) {
+    _mapFree(itemsel_table_ram);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mario_get_reqdir) {
+    s32* args = event->args;
+
+    evtSetFloat(event, args[0], marioGetPtr()->unk1AC);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(muj_get_door_check) {
+    s32* args = event->args;
+    s32* door = (s32*)evtGetValue(event, args[0]);
+    f32 range = evtGetFloat(event, args[1]);
+    Vec hitPos;
+    Vec marioPos;
+
+    hitObjGetPos((const char*)door[5], &hitPos);
+    marioPos = marioGetPtr()->position;
+    marioPos.y = hitPos.y = 0.0f;
+    if (PSVECDistance(&hitPos, &marioPos) > range) {
+        evtSetValue(event, args[2], 0);
+    } else {
+        evtSetValue(event, args[2], 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(yami_view) {
+    f32 z = evtGetFloat(event, event->args[0]);
+    Mtx mtx;
+
+    C_MTXLookAt(mtx, &(Vec){0.0f, 100.0f, 100.0f + z}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){0.0f, 0.0f, z});
+    envSetYamiView(mtx);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(anim_tevcallback) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 flag = evtGetValue(event, args[1]);
+    NpcEntry* npc = npcNameToPtr_NoAssert(name);
+
+    if (npc == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    animPoseSetMaterialFlagOn(npc->poseId, (flag & 0xF) << 24);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(anim_tevcallback_mobj) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 flag = evtGetValue(event, args[1]);
+    MapObjectEntry* mobj = mobjNameToPtrNoAssert(name);
+
+    if (mobj == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    animPoseSetMaterialFlagOn(mobj->poseId, (flag & 0xF) << 24);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(sekai_yami_omise) {
+    char name[40];
+    s32 i;
+    IconEntry* icon;
+
+    for (i = 0; i < 6; i++) {
+        sprintf(name, "shp%d", i);
+        icon = iconNameToPtr(name);
+        icon->color = (GXColor){0x40, 0x40, 0x40, 0xFF};
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_entry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+
+    effSetName(effStarStoneEntry(4, x, y, z, 1.0f), name);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_set_pos) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[2] = x;
+    ((f32*)eff->userdata)[3] = y;
+    ((f32*)eff->userdata)[4] = z;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_set_ry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 ry = evtGetFloat(event, args[1]);
+
+    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    return EVT_RETURN_DONE;
+}
+
 static EVT_BEGIN(sekai_yami_evt)
     CALL(evt_mario_key_onoff, 0)
     CALL(evt_mario_cont_onoff, 0)
@@ -1897,106 +2000,4 @@ s32 muj_01_init_evt[] = {
     33, 327771, (s32)evt_mapobj_flag_onoff, 1, 0, (s32)"S_mise", 2, 2,
     1,
 };
-
-USER_FUNC(sekai_yami_omise) {
-    char name[44];
-    s32 i;
-
-    for (i = 0; i < 6; i++) {
-        sprintf(name, "shp%d", i);
-        iconNameToPtr(name)->color = (GXColor){0x40, 0x40, 0x40, 0xFF};
-    }
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(anim_tevcallback_mobj) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 flag = evtGetValue(event, args[1]);
-    MapObjectEntry* mobj = mobjNameToPtrNoAssert(name);
-
-    if (mobj == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    animPoseSetMaterialFlagOn(mobj->poseId, (flag & 0xF) << 24);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 flag = evtGetValue(event, args[1]);
-    NpcEntry* npc = npcNameToPtr_NoAssert(name);
-
-    if (npc == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    animPoseSetMaterialFlagOn(npc->poseId, (flag & 0xF) << 24);
-    return EVT_RETURN_DONE;
-}
-
-void envSetYamiView(Mtx mtx);
-
-static USER_FUNC(yami_view) {
-    f32 z = evtGetFloat(event, event->args[0]);
-    Mtx mtx;
-
-    C_MTXLookAt(mtx, &(Vec){0.0f, 100.0f, 100.0f + z}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){0.0f, 0.0f, z});
-    envSetYamiView(mtx);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(muj_get_door_check) {
-    s32* args = event->args;
-    s32* door = (s32*)evtGetValue(event, args[0]);
-    f32 range = evtGetFloat(event, args[1]);
-    Vec hitPos;
-    Vec marioPos;
-
-    hitObjGetPos((const char*)door[5], &hitPos);
-    marioPos = marioGetPtr()->position;
-    marioPos.y = hitPos.y = 0.0f;
-    if (PSVECDistance(&hitPos, &marioPos) > range) {
-        evtSetValue(event, args[2], 0);
-    } else {
-        evtSetValue(event, args[2], 1);
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_mario_get_reqdir) {
-    s32* args = event->args;
-
-    evtSetFloat(event, args[0], marioGetPtr()->unk1AC);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(delete_itemsel_table) {
-    _mapFree(itemsel_table_ram);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(make_itemsel_table) {
-    s32* args = event->args;
-    PouchData* pouch = pouchGetPtr();
-    s32* p;
-    s32 count;
-    s32 i;
-
-    itemsel_table_ram = _mapAlloc(0x54);
-    p = itemsel_table_ram;
-    count = 0;
-    for (i = 0; i < 20; i++) {
-        s32 item = pouch->heldItems[i];
-
-        if (item > 0) {
-            *p++ = item;
-            count++;
-        }
-    }
-    *p = -1;
-    evtSetValue(event, args[0], count);
-    event->lwData[10] = (s32)itemsel_table_ram;
-    return EVT_RETURN_DONE;
-}
 

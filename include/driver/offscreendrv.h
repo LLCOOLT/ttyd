@@ -1,19 +1,20 @@
 #pragma once
 
 #include <dolphin/types.h>
+#include <dolphin/gx.h>
+#include "memory.h"
 
 typedef struct OffscreenEntry {
 	s32 flags; //0x0
-	char name[4]; //0x4, TODO get full size
-	u8 field_0x8[0x14 - 0x8]; //0x8
+	char name[16]; //0x4
 	u16 currLeft; //0x14
 	u16 currTop; //0x16
 	u16 currRight; //0x18
 	u16 currBottom; //0x1A
-	u8 field_0x1C[0x3C - 0x1C]; //0x1C
-	s32 unk3C; //0x3C
-	s32 unk40; //0x40
-	u8 field_0x44[0x48 - 0x44]; //0x44
+	GXTexObj texObj; //0x1C
+	s32 unk3C; //0x3C, copy format
+	s32 unk40; //0x40, texture format
+	smartEntry* texBuf; //0x44
 	u16 prevLeft; //0x48
 	u16 prevTop; //0x4A
 	u16 prevRight; //0x4C
@@ -32,5 +33,7 @@ s32 offscreenNameToId(const char* name);
 OffscreenEntry* offscreenNameToPtr(const char* name);
 void offscreenDelete(const char* name);
 BOOL offscreenGetBoundingBox_BeforeFrame(s32 id, u16* left, u16* top, u16* right, u16* bottom);
+void offscreenGetTexObj(s32 id, GXTexObj** texObj, smartEntry** texBuf);
+BOOL offscreenGetBoundingBox(s32 id, u16* left, u16* top, u16* right, u16* bottom);
 void offscreenMain(void);
 void offscreenAddBoundingBox(s32 id, u16 left, u16 top, u16 right, u16 bottom);
