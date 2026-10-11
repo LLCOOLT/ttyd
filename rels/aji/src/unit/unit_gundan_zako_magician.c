@@ -99,6 +99,29 @@ static s32 yokeyoke_bottle_event_with_kanbu[15];
 static s32 ziwaziwa_bottle_event[15];
 static __declspec(section ".data") s32 wait_event[6];
 
+static USER_FUNC(kanbu_get_id) {
+    s32* args = event->args;
+    s32 id = -1;
+    s32 i;
+    BattleWork* wp = _battleWorkPointer;
+    BattleUnit* unit;
+
+    for (i = 0; i < 64; i++) {
+        unit = BattleGetUnitPtr(wp, i);
+        if (unit != NULL && unit->initialKind == 99) {
+            id = i;
+            break;
+        }
+    }
+    evtSetValue(event, args[0], id);
+    if (id != -1) {
+        evtSetValue(event, args[1], BtlUnit_GetBodyPartsId(unit));
+    } else {
+        evtSetValue(event, args[1], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_gundan_zako_magician_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_gundan_zako_magician_neg_one_382[] = {
@@ -689,25 +712,3 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static USER_FUNC(kanbu_get_id) {
-    s32* args = event->args;
-    s32 id = -1;
-    s32 i;
-    BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit;
-
-    for (i = 0; i < 64; i++) {
-        unit = BattleGetUnitPtr(wp, i);
-        if (unit != NULL && unit->initialKind == 99) {
-            id = i;
-            break;
-        }
-    }
-    evtSetValue(event, args[0], id);
-    if (id != -1) {
-        evtSetValue(event, args[1], BtlUnit_GetBodyPartsId(unit));
-    } else {
-        evtSetValue(event, args[1], 0);
-    }
-    return EVT_RETURN_DONE;
-}

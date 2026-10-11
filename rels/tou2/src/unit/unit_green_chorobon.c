@@ -111,19 +111,6 @@ static s32 return_event[24];
 static s32 drain_attack_event[887];
 static __declspec(section ".data") s32 wait_event[6];
 
-static USER_FUNC(chorobon_copy_status) {
-    s32* args = event->args;
-    s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
-    s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
-    BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit1 = BattleGetUnitPtr(wp, id1);
-    BattleUnit* unit2 = BattleGetUnitPtr(wp, id2);
-
-    unit2->mSizeChangeTurns = unit1->mSizeChangeTurns;
-    unit2->mSizeChangeStrength = unit1->mSizeChangeStrength;
-    return EVT_RETURN_DONE;
-}
-
 __declspec(section ".data") u64 fd_green_chorobon_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_green_chorobon_neg_one_382[] = {
@@ -425,7 +412,7 @@ static EVT_BEGIN(init_event)
     CALL(btlevtcmd_SetEventDamage, -2, PTR(damage_event))
     CALL(btlevtcmd_SetEventConfusion, -2, PTR(attack_event))
     CALL(btlevtcmd_AnimeSetPoseSoundTable, -2, 1, PTR(pose_sound_timing_table))
-    CALL(btlevtcmd_SetJumpSound, -2, STRING("ザ・トゲトゲン"), 0)
+    CALL(btlevtcmd_SetJumpSound, -2, STRING("SFX_ENM_CHORO2_MOVE1"), 0)
     CALL(btlevtcmd_StartWaitEvent, -2)
     RETURN
 EVT_END()
@@ -576,6 +563,26 @@ static s32 drain_attack_event[] = {
     (s32)return_event, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 65539, 99, 131163,
     (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
+
+static USER_FUNC(chorobon_copy_status) {
+    s32* args = event->args;
+    s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
+    s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
+    BattleWork* wp = _battleWorkPointer;
+    BattleUnit* unit1 = BattleGetUnitPtr(wp, id1);
+    BattleUnit* unit2 = BattleGetUnitPtr(wp, id2);
+
+    unit2->currentHp = unit1->currentHp;
+    if (unit2->currentHp > unit2->maxHp) {
+        unit2->currentHp = unit2->maxHp;
+    }
+    unit2->mSizeChangeTurns = unit1->mSizeChangeTurns;
+    unit2->mSizeChangeStrength = unit1->mSizeChangeStrength;
+    unit2->hpGauge.field_0xC = unit2->currentHp;
+    unit2->hpGauge.field_0x10 = unit2->currentHp;
+    unit2->hpGauge.field_0x14 = unit2->hpGauge.field_0x18 = (f32)unit2->currentHp / unit2->maxHp;
+    return EVT_RETURN_DONE;
+}
 
 static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)

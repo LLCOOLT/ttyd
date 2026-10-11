@@ -10,13 +10,16 @@
 // printCount comes first so the deferred compile emits both functions in the original order
 void printCount(CameraId camera, void* param) {
     char buf[36];
+    s32 n;
 
     // %3d回
-    sprintf(buf, "%3d\x89\xF1", evtGetValue(NULL, GW(0)));
+    n = evtGetValue(NULL, GW(0));
+    sprintf(buf, "%3d\x89\xF1", n);
     FontDrawStart();
     FontDrawStringPitch(90.0f, 120.0f, 20.0f, buf);
     // かい
-    sprintf(buf, "\x82\xA9\x82\xA2", evtGetValue(NULL, GW(0)));
+    n = evtGetValue(NULL, GW(0));
+    sprintf(buf, "\x82\xA9\x82\xA2", n);
     FontDrawScale(0.55f);
     FontDrawStringPitch(148.0f, 131.0f, 20.0f, buf);
 }

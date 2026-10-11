@@ -25,13 +25,13 @@ u32 BattlePadGetTrigger(void);
 u32 BattlePadGetNow(void);
 
 BOOL BattlePadCheckTrigger(s32 mask);
-u32 BattlePadMultiCheckTrigger(s32 chan, s32 mask);
+BOOL BattlePadMultiCheckTrigger(s32 chan, s32 mask);
 
 BOOL BattlePadCheckRecordTrigger(s32 frame, s32 mask);
 u32 BattlePadMultiCheckRecordTrigger(s32 chan, s32 frame, s32 mask);
 
 u32 BattlePadCheckNow(s32 mask);
-u32 BattlePadMultiCheckNow(s32 chan, s32 mask);
+BOOL BattlePadMultiCheckNow(s32 chan, s32 mask);
 
 u32 BattlePadCheckUp(s32 mask);
 u32 BattlePadMultiCheckUp(s32 chan, s32 mask);

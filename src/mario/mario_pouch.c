@@ -303,7 +303,7 @@ void pouchAddKpaCoin(u8 coins) {
 	}
 }
 
-u8 pouchGetKpaCoin(void) {
+s32 pouchGetKpaCoin(void) {
 	return mpp->mSuperBowserCoins;
 }
 

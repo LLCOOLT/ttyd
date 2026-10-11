@@ -18,7 +18,7 @@ if r.returncode:
     sys.exit(1)
 ours = os.path.join(tmp, os.path.basename(rel) + '.o')
 target = f'build/G8MJ01/{mod}/obj/{rel}.o'
-out = os.path.join(tmp, 'fd.json')
+out = os.path.join(tmp, 'fd%d.json' % os.getpid())
 for sym in syms:
     subprocess.run([os.path.join('build', 'tools', 'objdiff-cli.exe'), 'diff', '-1', target, '-2', ours, '-o', out, sym],
                    capture_output=True)
@@ -43,3 +43,8 @@ for sym in syms:
         fb = b.get('instruction', {}).get('formatted', '')
         k = a.get('diff_kind') or b.get('diff_kind') or ''
         print(f"{'!!' if k else '  '} {fa:40s} | {fb}")
+
+try:
+    os.remove(out)
+except OSError:
+    pass

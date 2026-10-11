@@ -309,7 +309,7 @@ void iconDisp(CameraId camId, void* param) {
     iconGX(mtx, entry);
 }
 
-void iconDispGxAlpha(Vec position, s16 flags, s16 iconId, u8 alpha, f32 scale) {
+void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) {
     CameraEntry* camera;
     IconBinaryEntry* data;
     IconEntry entry;
@@ -317,7 +317,7 @@ void iconDispGxAlpha(Vec position, s16 flags, s16 iconId, u8 alpha, f32 scale) {
 
     camera = camGetCurPtr();
     if (icon_tpl_ok && icon_bin_ok) {
-        MTXTrans(transmtx, position.x, position.y, position.z);
+        MTXTrans(transmtx, position->x, position->y, position->z);
         MTXScale(scalemtx, scale, scale, scale);
         MTXRotRad(rotmtx, 'y', MTXDegToRad(-camera->viewYaw));
         MTXConcat(transmtx, rotmtx, mtx);
@@ -343,7 +343,7 @@ void iconDispGxAlpha(Vec position, s16 flags, s16 iconId, u8 alpha, f32 scale) {
 }
 
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
-    iconDispGxAlpha(*position, flags, iconId, 0xFF, scale);
+    iconDispGxAlpha(position, flags, iconId, 0xFF, scale);
 }
 
 void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {

@@ -107,7 +107,9 @@ strs = {o['name']: bytes(o['data']).split(b'\0')[0] for o in objs if o['name'].s
 # dtk sometimes labels a plain string with dat_ (e.g. when it is global); treat those as strings too
 for o in objs:
     d = bytes(o['data']) + b'\0'  # .string adds the terminator
-    if o['name'].startswith('dat_') and o['section'] == '.rodata' and not o['relocs']:
+    # also strings dtk typed as floats (e.g. "GSO_D2_1" read as vec3_) when data points at them
+    guessed = o['name'].startswith(('vec3_', 'float_')) and f'.4byte {o["name"]}\n' in src
+    if (o['name'].startswith('dat_') or guessed) and o['section'] == '.rodata' and not o['relocs']:
         s, _, rest = d.partition(b'\0')
         if s and not rest.strip(b'\0') and all(b >= 0x20 or b in (9, 10) for b in s):
             strs[o['name']] = s
@@ -288,7 +290,7 @@ def emit(o):
         r = subprocess.run([TTYDASM, 'extract', '-m', module, '-s', f'{n}@0x{o["addr"]:X}', '-p', '.'],
                            capture_output=True, text=True, encoding='utf-8')
         if r.returncode == 0 and 'EVT_BEGIN' in r.stdout:
-            return st + fix_script(r.stdout)
+            return st + ptr_offsets(o, fix_script(r.stdout))
         t = None
     if is_pair(o):
         return f'{st}u64 {n} = 0x{d.hex().upper()};\n'
@@ -297,7 +299,34 @@ def emit(o):
         vals = [('(s32)' + v if (i in o['relocs']) else v) for i, v in ((i, word_val(o, i, 'i')) for i in range(0, len(d), 4))]
         rows = ['    ' + ', '.join(vals[i:i + 8]) + ',' for i in range(0, len(vals), 8)]
         return f'{st}s32 {n}[] = {{\n' + '\n'.join(rows) + '\n};\n'
+    # odd-sized string object (e.g. a pose name in .data)
+    text = d.rstrip(b'\0')
+    if text and not o['relocs'] and all(32 <= c < 127 for c in text):
+        esc = text.decode().replace('\\', '\\\\').replace('"', '\\"')
+        return f'{st}char {n}[] = "{esc}";\n'
     return f'// TODO {n}: {len(d)} bytes\n'
+
+
+def ptr_offsets(o, text):
+    """ttydasm prints a pointer to sym+off as PTR(sym): restore the offsets from the object's relocations,
+    matching each symbol's PTR() uses in order with its relocations in offset order."""
+    per = {}
+    for off in sorted(o['relocs']):
+        sym, add = o['relocs'][off]
+        per.setdefault(sym, []).append(add if isinstance(add, int) else 0)
+    if not any(any(v) for v in per.values()):
+        return text
+    seen = {}
+
+    def fix(m):
+        sym = m.group(1)
+        i = seen.get(sym, 0)
+        seen[sym] = i + 1
+        adds = per.get(sym, [])
+        if i < len(adds) and adds[i]:
+            return f'PTR((u8*){sym} + 0x{adds[i]:X})'
+        return m.group(0)
+    return re.sub(r'PTR\((\w+)\)', fix, text)
 
 
 def fix_script(text):
@@ -487,6 +516,8 @@ for o in order:
     decl = (f'u64 {n}' if is_pair(o) else None) or {'parts': f'BattleUnitKindPart {n}[{size // 0x4C}]', 'regist': f'StatusVulnerability {n}',
             'defence': ('BattleUnitDefenseAttr ' if 'attr' in n else 'BattleUnitDefense ') + n, 'pose': f'PoseTableEntry {n}[{size // 8}]',
             'datatable': f'BattleDataEntry {n}[{size // 8}]', 'kind': f'BattleUnitKind {n}'}.get(t, f's32 {n}[{size // 4}]')
+    if size % 4 and t is None and emit(o).startswith(('char ', 'static char ', '__declspec(section ".data") char ')):
+        decl = f'char {n}[]'
     fwd.append(('static ' if o['scope'] == 'local' and '$' not in o['name'] else '') + ('__declspec(section ".data") ' if o['section'] == '.data' and len(o['data']) <= 48 else '') + f'{decl};')
 
 _out = []

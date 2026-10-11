@@ -1,131 +1,298 @@
-#include "dolphin/exi.h"
-#include "driver/animdrv.h"
-#include "driver/dispdrv.h"
-#include "driver/npcdrv.h"
+#include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
-#include "evt/evt_npc.h"
-#include "forcedata.h"
-#include "manager/evtmgr_cmd.h"
-#include "mario/mariost.h"
-#include "memory.h"
-#include "sdk/DEMOInit.h"
+
+#pragma force_active on
 #include "seq/seq_demo.h"
-#include <stdlib.h>
-// #include <stdlib.h>
+#include "memory.h"
+#include "manager/fontmgr.h"
+#include "mario/mariost.h"
+#include "sdk/DEMOInit.h"
+#include "driver/dispdrv.h"
+#include "string.h"
+#include "driver/npcdrv.h"
+#include "evt/evt_npc.h"
+#include "stdlib.h"
 
-#pragma pool_data off
+void FontDrawString(f32 x, f32 y, const char* str);
+void movie_draw(CameraId camera, void* param);
+typedef struct DigAnim { const char* name; u32 mask; s32 anim; } DigAnim;
+#define ANIM_TBL ((DigAnim*)anim_tbl)
+static s32 work[1];
+#define DIG_WP ((s32*)wp[0])
+s32 EXIGetType(s32 chan, u32 dev, u32* type);
+double tan(double x);
 
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(z);
+USER_FUNC(evt_action_sub);
 USER_FUNC(evt_cam3d_evt_set);
 USER_FUNC(evt_cam_letter_box_disable);
-USER_FUNC(movie);
-USER_FUNC(evt_fade_set_mapchange_type);
-USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_fade_end_wait);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(sound_fade);
 USER_FUNC(evt_fade_entry);
-USER_FUNC(evt_seq_set_seq);
-USER_FUNC(evt_action_sub);
+USER_FUNC(evt_fade_set_mapchange_type);
+USER_FUNC(evt_key_get_buttontrg);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_npc_delete);
 USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_sub_random);
-USER_FUNC(gravity_scale);
-USER_FUNC(evt_npc_set_walk_anim);
-USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_height);
+USER_FUNC(evt_npc_get_position);
 USER_FUNC(evt_npc_jump_position_nohit);
+USER_FUNC(evt_npc_move_position);
+USER_FUNC(evt_npc_reverse_ry);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_npc_set_scale);
+USER_FUNC(evt_npc_set_tribe);
+USER_FUNC(evt_npc_set_walk_anim);
+USER_FUNC(evt_npc_status_onoff);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_seq_set_seq);
+USER_FUNC(evt_seq_wait);
 USER_FUNC(evt_sub_intpl_msec_get_value);
 USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(evt_npc_reverse_ry);
+USER_FUNC(evt_sub_random);
+USER_FUNC(gravity_scale);
+USER_FUNC(movie);
+USER_FUNC(sound_fade);
+static USER_FUNC(z);
+void movie_draw(CameraId camera, void* param);
+void dig_thpStop(void);
+void dig_thpInit(void);
 
-// clang-format off
-extend_data(0,
-     u64, negone_one, 0xBF8000003F800000,
-     u32, neg_one, 0xBF800000,
-     f32, __local_PI, 3.1415926535897932384626433832795f,
-     f32, __local_3PIO2, 3.0f * 1.57079632679489661923132169163975f,
-     u64, one_negone, 0x3F800000BF800000,
-     f32, __local_PIO2, 1.57079632679489661923132169163975f,
-     f32, one, 1.0f);
-extend_data(1,
-     u64, negone_one, 0xBF8000003F800000,
-     u32, neg_one, 0xBF800000,
-     f32, __local_PI, 3.1415926535897932384626433832795f,
-     f32, __local_3PIO2, 3.0f * 1.57079632679489661923132169163975f,
-     u64, one_negone, 0x3F800000BF800000,
-     f32, __local_PIO2, 1.57079632679489661923132169163975f,
-     f32, one, 1.0f)
-// clang-format on
+__declspec(section ".data") u64 fd_dig_00_negone_one_374;
+__declspec(section ".data") s32 fd_dig_00_neg_one_382[1];
+__declspec(section ".data") s32 fd_dig_00___local_PI_383[1];
+__declspec(section ".data") s32 fd_dig_00___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_dig_00_one_negone_373;
+__declspec(section ".data") s32 fd_dig_00___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_dig_00_one_381[1];
+__declspec(section ".data") u64 fd_dig_00_negone_one_360;
+__declspec(section ".data") s32 fd_dig_00_neg_one_365[1];
+__declspec(section ".data") s32 fd_dig_00___local_PI_366[1];
+__declspec(section ".data") s32 fd_dig_00___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_dig_00_one_negone_359;
+__declspec(section ".data") s32 fd_dig_00___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_dig_00_one_364[1];
+static __declspec(section ".data") s32 wp[1];
+static s32 anim_tbl[144];
+s32 evt_action_1_2[154];
+__declspec(section ".data") s32 evt_action_1[7];
+__declspec(section ".data") s32 evt_action_2[7];
+s32 evt_action_jump[42];
+s32 evt_action_fall[45];
+s32 evt_action_walk[57];
+s32 evt_action[111];
+s32 dig_00_init_evt[107];
 
-typedef struct DigestWork {
-    s32 frameNumber; // 0x0
-} DigestWork;
+void dig_thpInit(void) {
+    u32 type;
 
-DigestWork work;
-DigestWork* wp = &work;
+    EXIGetType(0, 2, &type);
+    if (type != 0x05070000) {
+        THPSimpleInit(2);
+        THPSimpleOpen("demo.thp");
+        THPSimpleSetBuffer(_mapAlloc(THPSimpleCalcNeedMemory()));
+        THPSimpleAudioStop();
+        THPSimplePreLoad(0);
+        THPSimpleAudioStart();
+        THPSimpleSetVolume(80, 0);
+    }
+}
 
-typedef struct AnimTblUnknown {
-    const char* field_0; // 0x0
-    s32 field_4;         // 0x4
-    s32 field_8;         // 0x8
-} AnimTblUnknown;
-AnimTblUnknown anim_tbl[] = {
-    { "ダイジェストマリオ", 7, 0 },
-    { "ルイージ", 7, 0 },
-    { "ダイジェストピーチ", 3, 0 },
-    { "ダイジェストピーチ２", 3, 0 },
-    { "クッパ", 11, 0 },
-    { "カメックババ", 3, 0 },
-    { "第三勢力総統", 3, 0 },
-    { "第三勢力幹部", 3, 0 },
-    { "軍団ザコ敵", 3, 0 },
-    { "マジョリン", 3, 0 },
-    { "マリリン", 3, 0 },
-    { "クリスチーヌ", 7, 0 },
-    { "ノコタロウ", 3, 0 },
-    { "クラウダ", 3, 0 },
-    { "ヨッシー", 3, 0 },
-    { "サンダース", 3, 0 },
-    { "チュチュリーナ", 3, 0 },
-    { "キノじい", 3, 0 },
-    { "クリハカセ", 3, 0 },
-    { "パラシュートボム", 8, 0 },
-    { "ノコノコ", 3, 0 },
-    { "クリボー", 3, 0 },
-    { "パワーアップ屋", 3, 0 },
-    { "キノピオ", 3, 0 },
-    { "ノコリン", 3, 0 },
-    { "プニ族", 32, 0 },
-    { "トゲ族", 32, 0 },
-    { "キノシコワ", 3, 0 },
-    { "美女", 3, 0 },
-    { "ガンス", 3, 0 },
-    { "ブレッドハート", 3, 0 },
-    { "ランペル", 3, 0 },
-    { "パンジーさん", 19, 0 },
-    { "ガラの悪い水夫", 3, 0 },
-    { "マルコ", 3, 0 },
-    { "ポワン探偵", 3, 0 },
-    { "グルメキノピオ", 3, 0 },
-    { "ホワイト将軍", 3, 0 },
-    { "モニー", 3, 0 },
-    { "ボッタクール", 3, 0 },
-    { "フラワーさん", 3, 0 },
-    { "星マニア", 3, 0 },
-    { "バニーテレサ", 17, 0 },
-    { "キザ野郎", 3, 0 },
-    { "ウスグラ店おじさん", 3, 0 },
-    { "ハンマーブロス", 35, 0 },
-    { "ホネノコ", 3, 0 },
-    { "チョロボン", 3, 0 },
+void dig_thpStop(void) {
+    u32 type;
+
+    EXIGetType(0, 2, &type);
+    if (type != 0x05070000) {
+        THPSimpleAudioStop();
+        THPSimpleLoadStop();
+        THPSimpleClose();
+        THPSimpleQuit();
+    }
+}
+
+void movie_draw(CameraId camera, void* param) {
+    u16 width;
+    u16 height;
+    const char* msg;
+    u32 type;
+
+    EXIGetType(0, 2, &type);
+    if (type == 0x05070000) {
+        msg = "\202\261\202\261\202\311\203\200\201[\203r\201[\202\252\202\310\202\252\202\352\202\334\202\267";
+        FontDrawStart();
+        FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        FontDrawString(-FontGetMessageWidth(msg) / 2, 0.0f, msg);
+        (*DIG_WP)++;
+    } else {
+        width = gp->fbWidth;
+        height = gp->efbHeight;
+        if (THPSimpleDecode(0) != 1) {
+            *DIG_WP = THPSimpleDrawCurrentFrame(DEMOGetRenderModeObj(), 0, 0, width, height);
+        }
+    }
+}
+
+USER_FUNC(movie) {
+    u32 type;
+
+    if (isFirstCall) {
+        memset(DIG_WP, 0, 4);
+        evtSetValue(event, GF(0), FALSE);
+    }
+    EXIGetType(0, 2, &type);
+    if (type != 0x05070000) {
+        if ((u32)*DIG_WP >= THPSimpleGetTotalFrame() - 2) {
+            evtSetValue(event, GF(0), TRUE);
+        }
+    } else if (*DIG_WP >= 300) {
+        evtSetValue(event, GF(0), TRUE);
+    }
+    dispEntry(CAMERA_3D, 0.0f, 3, movie_draw, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(sound_fade) {
+    THPSimpleSetVolume(0, 2000);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(gravity_scale) {
+    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    npc->jumpGravity = 0.1f;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_action_sub) {
+    s32* args = event->args;
+    s32 idx;
+    u32* maskp;
+    u32 mask;
+    s32 n;
+    s32 k;
+    s32 i;
+    s32 bit;
+    const char* name;
+    u32 type;
+
+    rand();
+    do {
+        idx = (u32)rand() % 48;
+    } while (evtNpcNameToPtr_NoAssert(event, ANIM_TBL[idx].name) != NULL);
+    maskp = &ANIM_TBL[idx].mask;
+    mask = *maskp;
+    n = 0;
+    for (i = 0; i < 6; i++) {
+        if ((1 << i) & mask) {
+            n++;
+        }
+    }
+    *maskp = mask;
+    k = rand() % n;
+    for (i = 0; i < 6; i++) {
+        if ((1 << i) & *maskp) {
+            if (--k < 0) {
+                break;
+            }
+        }
+    }
+    name = ANIM_TBL[idx].name;
+    bit = 1 << i;
+    EXIGetType(0, 2, &type);
+    if (type != 0x05070000) {
+        evtSetValue(event, *args++, (s32)npcGetTribe(name)->modelName);
+        evtSetValue(event, *args++, (s32)name);
+    } else {
+        evtSetValue(event, *args++, (s32)"a_mario");
+        evtSetValue(event, *args++, (s32)"\202\311\202\271\203}\203\212\203I\202Q");
+    }
+    evtSetValue(event, *args++, bit);
+    evtSetValue(event, *args++, anim_tbl[idx * 3 + 2]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(z) {
+    f32 t = tan(0.21816612780094147);
+
+    event->lwData[0] = (s32)(1024.0f * (240.0f / t)) - 230000000;
+    return EVT_RETURN_DONE;
+}
+
+__declspec(section ".data") u64 fd_dig_00_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_dig_00_neg_one_382[] = {
+    -1082130432,
 };
 
-// clang-format off
+__declspec(section ".data") s32 fd_dig_00___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_dig_00___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_dig_00_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_dig_00___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_dig_00_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_dig_00_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_dig_00_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_dig_00___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_dig_00___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_dig_00_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_dig_00___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_dig_00_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") s32 wp[] = {
+    (s32)work,
+};
+
+static s32 anim_tbl[] = {
+    (s32)/*"ダイジェストマリオ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x7D\x83\x8A\x83\x49", 7, 0, (s32)/*"ルイージ"*/"\x83\x8B\x83\x43\x81\x5B\x83\x57", 7, 0, (s32)/*"ダイジェストピーチ"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60", 3,
+    0, (s32)/*"ダイジェストピーチ２"*/"\x83\x5F\x83\x43\x83\x57\x83\x46\x83\x58\x83\x67\x83\x73\x81\x5B\x83\x60\x82\x51", 3, 0, (s32)/*"クッパ"*/"\x83\x4E\x83\x62\x83\x70", 11, 0, (s32)/*"カメックババ"*/"\x83\x4A\x83\x81\x83\x62\x83\x4E\x83\x6F\x83\x6F",
+    3, 0, (s32)/*"第三勢力総統"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x91\x8D\x93\x9D", 3, 0, (s32)/*"第三勢力幹部"*/"\x91\xE6\x8E\x4F\x90\xA8\x97\xCD\x8A\xB2\x95\x94", 3, 0,
+    (s32)/*"軍団ザコ敵"*/"\x8C\x52\x92\x63\x83\x55\x83\x52\x93\x47", 3, 0, (s32)/*"マジョリン"*/"\x83\x7D\x83\x57\x83\x87\x83\x8A\x83\x93", 3, 0, (s32)/*"マリリン"*/"\x83\x7D\x83\x8A\x83\x8A\x83\x93", 3,
+    0, (s32)/*"クリスチーヌ"*/"\x83\x4E\x83\x8A\x83\x58\x83\x60\x81\x5B\x83\x6B", 7, 0, (s32)/*"ノコタロウ"*/"\x83\x6D\x83\x52\x83\x5E\x83\x8D\x83\x45", 3, 0, (s32)/*"クラウダ"*/"\x83\x4E\x83\x89\x83\x45\x83\x5F",
+    3, 0, (s32)/*"ヨッシー"*/"\x83\x88\x83\x62\x83\x56\x81\x5B", 3, 0, (s32)/*"サンダース"*/"\x83\x54\x83\x93\x83\x5F\x81\x5B\x83\x58", 3, 0,
+    (s32)/*"チュチュリーナ"*/"\x83\x60\x83\x85\x83\x60\x83\x85\x83\x8A\x81\x5B\x83\x69", 3, 0, (s32)/*"キノじい"*/"\x83\x4C\x83\x6D\x82\xB6\x82\xA2", 3, 0, (s32)/*"クリハカセ"*/"\x83\x4E\x83\x8A\x83\x6E\x83\x4A\x83\x5A", 3,
+    0, (s32)/*"パラシュートボム"*/"\x83\x70\x83\x89\x83\x56\x83\x85\x81\x5B\x83\x67\x83\x7B\x83\x80", 8, 0, (s32)/*"ノコノコ"*/"\x83\x6D\x83\x52\x83\x6D\x83\x52", 3, 0, (s32)/*"クリボー"*/"\x83\x4E\x83\x8A\x83\x7B\x81\x5B",
+    3, 0, (s32)/*"パワーアップ屋"*/"\x83\x70\x83\x8F\x81\x5B\x83\x41\x83\x62\x83\x76\x89\xAE", 3, 0, (s32)/*"キノピオ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0,
+    (s32)/*"ノコリン"*/"\x83\x6D\x83\x52\x83\x8A\x83\x93", 3, 0, (s32)/*"プニ族"*/"\x83\x76\x83\x6A\x91\xB0", 32, 0, (s32)/*"トゲ族"*/"\x83\x67\x83\x51\x91\xB0", 32,
+    0, (s32)/*"キノシコワ"*/"\x83\x4C\x83\x6D\x83\x56\x83\x52\x83\x8F", 3, 0, (s32)/*"美女"*/"\x94\xFC\x8F\x97", 3, 0, (s32)/*"ガンス"*/"\x83\x4B\x83\x93\x83\x58",
+    3, 0, (s32)/*"ブレッドハート"*/"\x83\x75\x83\x8C\x83\x62\x83\x68\x83\x6E\x81\x5B\x83\x67", 3, 0, (s32)/*"ランペル"*/"\x83\x89\x83\x93\x83\x79\x83\x8B", 3, 0,
+    (s32)/*"パンジーさん"*/"\x83\x70\x83\x93\x83\x57\x81\x5B\x82\xB3\x82\xF1", 19, 0, (s32)/*"ガラの悪い水夫"*/"\x83\x4B\x83\x89\x82\xCC\x88\xAB\x82\xA2\x90\x85\x95\x76", 3, 0, (s32)/*"マルコ"*/"\x83\x7D\x83\x8B\x83\x52", 3,
+    0, (s32)/*"ポワン探偵"*/"\x83\x7C\x83\x8F\x83\x93\x92\x54\x92\xE3", 3, 0, (s32)/*"グルメキノピオ"*/"\x83\x4F\x83\x8B\x83\x81\x83\x4C\x83\x6D\x83\x73\x83\x49", 3, 0, (s32)/*"ホワイト将軍"*/"\x83\x7A\x83\x8F\x83\x43\x83\x67\x8F\xAB\x8C\x52",
+    3, 0, (s32)/*"モニー"*/"\x83\x82\x83\x6A\x81\x5B", 3, 0, (s32)/*"ボッタクール"*/"\x83\x7B\x83\x62\x83\x5E\x83\x4E\x81\x5B\x83\x8B", 3, 0,
+    (s32)/*"フラワーさん"*/"\x83\x74\x83\x89\x83\x8F\x81\x5B\x82\xB3\x82\xF1", 3, 0, (s32)/*"星マニア"*/"\x90\xAF\x83\x7D\x83\x6A\x83\x41", 3, 0, (s32)/*"バニーテレサ"*/"\x83\x6F\x83\x6A\x81\x5B\x83\x65\x83\x8C\x83\x54", 17,
+    0, (s32)/*"キザ野郎"*/"\x83\x4C\x83\x55\x96\xEC\x98\x59", 3, 0, (s32)/*"ウスグラ店おじさん"*/"\x83\x45\x83\x58\x83\x4F\x83\x89\x93\x58\x82\xA8\x82\xB6\x82\xB3\x82\xF1", 3, 0, (s32)/*"ハンマーブロス"*/"\x83\x6E\x83\x93\x83\x7D\x81\x5B\x83\x75\x83\x8D\x83\x58",
+    35, 0, (s32)/*"ホネノコ"*/"\x83\x7A\x83\x6C\x83\x6D\x83\x52", 3, 0, (s32)/*"チョロボン"*/"\x83\x60\x83\x87\x83\x8D\x83\x7B\x83\x93", 3, 0,
+};
+
 EVT_BEGIN(evt_action_1_2)
     CALL(evt_sub_random, 400, LW(0))
     SUBTRACT(LW(0), 200)
@@ -179,21 +346,18 @@ EVT_BEGIN(evt_action_1_2)
     END_LOOP
     CALL(evt_npc_delete, LW(5))
     RETURN
-    END
 EVT_END()
 
-EVT_BEGIN(evt_action_1)
+__declspec(section ".data") EVT_BEGIN(evt_action_1)
     SET_VALUE(LF(0), 0)
-    CALL_CHILD(evt_action_1_2)
+    CALL_CHILD(PTR(evt_action_1_2))
     RETURN
-    END
 EVT_END()
 
-EVT_BEGIN(evt_action_2)
+__declspec(section ".data") EVT_BEGIN(evt_action_2)
     SET_VALUE(LF(0), 1)
-    CALL_CHILD(evt_action_1_2)
+    CALL_CHILD(PTR(evt_action_1_2))
     RETURN
-    END
 EVT_END()
 
 EVT_BEGIN(evt_action_jump)
@@ -207,7 +371,6 @@ EVT_BEGIN(evt_action_jump)
     CALL(evt_npc_jump_position_nohit, LW(10), LW(0), -400, 0, 1500, 250)
     CALL(evt_npc_delete, LW(10))
     RETURN
-    END
 EVT_END()
 
 EVT_BEGIN(evt_action_fall)
@@ -226,7 +389,6 @@ EVT_BEGIN(evt_action_fall)
     END_LOOP
     CALL(evt_npc_delete, LW(10))
     RETURN
-    END
 EVT_END()
 
 EVT_BEGIN(evt_action_walk)
@@ -244,7 +406,6 @@ EVT_BEGIN(evt_action_walk)
     END_IF
     CALL(evt_npc_delete, LW(10))
     RETURN
-    END
 EVT_END()
 
 EVT_BEGIN(evt_action)
@@ -258,23 +419,23 @@ EVT_BEGIN(evt_action)
         CALL(evt_npc_status_onoff, 1, LW(10), 2)
         CALL(evt_npc_set_tribe, LW(10), LW(1))
         IF_BITS_SET(LW(2), 1)
-            SPAWN_EVENT(evt_action_1)
+            SPAWN_EVENT(PTR(evt_action_1))
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), 2)
-            SPAWN_EVENT(evt_action_2)
+            SPAWN_EVENT(PTR(evt_action_2))
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), 4)
-            SPAWN_EVENT(evt_action_jump)
+            SPAWN_EVENT(PTR(evt_action_jump))
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), 8)
-            SPAWN_EVENT(evt_action_fall)
+            SPAWN_EVENT(PTR(evt_action_fall))
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), 16)
-            SPAWN_EVENT(evt_action_walk)
+            SPAWN_EVENT(PTR(evt_action_walk))
             GOTO(0)
         END_IF
         IF_BITS_SET(LW(2), 32)
@@ -291,7 +452,6 @@ EVT_BEGIN(evt_action)
         WAIT_MS(LW(0))
     END_LOOP
     RETURN
-    END
 EVT_END()
 
 EVT_BEGIN(dig_00_init_evt)
@@ -302,7 +462,7 @@ EVT_BEGIN(dig_00_init_evt)
     CALL(z, LW(0))
     CALL(evt_cam3d_evt_set, 0, 0, LW(0), 0, 0, 0, 0, 11)
     CALL(evt_cam_letter_box_disable, 1)
-    SPAWN_EVENT(evt_action)
+    SPAWN_EVENT(PTR(evt_action))
     SET_VALUE(GF(0), 0)
     BEGIN_INLINE_EVENT
         SET_TYPE(0)
@@ -330,163 +490,5 @@ EVT_BEGIN(dig_00_init_evt)
         CALL(evt_seq_set_seq, 3, STRING("title"), 0)
     END_INLINE_EVENT
     RETURN
-    END
-EVT_END();
-// clang-format on
+EVT_END()
 
-void dig_thpInit(void) {
-    u32 size;
-    u8* buffer;
-    u32 type;
-
-    EXIGetType(0, 2, &type);
-    if (type != EXI_IS_VIEWER) {
-        THPSimpleInit(2);
-        THPSimpleOpen("demo.thp");
-        size = THPSimpleCalcNeedMemory();
-        buffer = _mapAlloc(size);
-        THPSimpleSetBuffer(buffer);
-        THPSimpleAudioStop();
-        THPSimplePreLoad(0);
-        THPSimpleAudioStart();
-        THPSimpleSetVolume(80, 0);
-    }
-}
-
-void dig_thpStop(void) {
-    u32 type;
-
-    EXIGetType(0, 2, &type);
-    if (type != EXI_IS_VIEWER) {
-        THPSimpleAudioStop();
-        THPSimpleLoadStop();
-        THPSimpleClose();
-        THPSimpleQuit();
-    }
-}
-
-void FontDrawString(const char*, f32, f32);
-u16 FontGetMessageWidth(const char*);
-
-void movie_draw(CameraId cameraId, void* param) {
-    u32 width, height;
-    u32 type;
-    const char* string;
-
-    EXIGetType(0, 2, &type);
-    if (type == EXI_IS_VIEWER) {
-        string = "ここにムービーがながれます";
-        FontDrawStart();
-        FontDrawColor((GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
-        FontDrawString(string, (f32)(-FontGetMessageWidth(string) / 2), 0.0f);
-        wp->frameNumber++;
-    } else {
-        width = gp->fbWidth;
-        height = gp->efbHeight;
-        if (THPSimpleDecode(0) != 1) {
-            GXRenderModeObj* rmode = DEMOGetRenderModeObj();
-            wp->frameNumber = THPSimpleDrawCurrentFrame(rmode, 0, 0, width, height);
-        }
-    }
-}
-
-USER_FUNC(movie) {
-    u32 type;
-
-    if (isFirstCall != 0) {
-        memset(wp, 0, sizeof(DigestWork));
-        evtSetValue(event, GF(0), 0);
-    }
-
-    EXIGetType(0, 2, &type);
-    if (type != EXI_IS_VIEWER) {
-        if (wp->frameNumber >= THPSimpleGetTotalFrame() - 2) {
-            evtSetValue(event, GF(0), 1);
-        }
-    } else if (wp->frameNumber >= 300) {
-        evtSetValue(event, GF(0), 1);
-    }
-    dispEntry(CAMERA_3D, 0.0f, 3, movie_draw, NULL);
-    return EVT_RETURN_BLOCK;
-}
-USER_FUNC(sound_fade) {
-    THPSimpleSetVolume(0, 2000);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gravity_scale) {
-    const char* name = (const char*)evtGetValue(event, *event->args);
-    NpcEntry* npc = npcNameToPtr(name);
-    npc->jumpGravity = 0.1f;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_action_sub) {
-    s32* args = event->args;
-    AnimTblUnknown* anim;
-
-    rand();
-
-    do {
-        anim = &anim_tbl[rand() % 48u];
-    } while (evtNpcNameToPtr_NoAssert(event, anim->field_0) != NULL);
-    
-}
-/*
-USER_FUNC(evt_action_sub) {
-    s32* args = event->args;
-    s32 index;
-    AnimTblUnknown* entry;
-    s32 flags;
-    s32 numAnims;
-    s32 sel;
-    s32 mask;
-    s32 i;
-    u32 type;
-    const char* name;
-
-    rand();
-
-    do {
-        entry = &anim_tbl[rand() % 48u];
-    } while (evtNpcNameToPtr_NoAssert(event, entry->field_0) != NULL);
-
-    flags = entry->field_4;
-    numAnims = 0;
-    for (i = 0; i < 6; i++) {
-        if (flags & (1 << i)) {
-            numAnims++;
-        }
-    }
-    entry->field_4 = flags;
-
-    sel = rand() % numAnims;
-    for (i = 0; i < 6; i++) {
-        if (entry->field_4 & (1 << i)) {
-            if (--sel < 0) {
-                break;
-            }
-        }
-    }
-    mask = 1 << i;
-
-    name = entry->field_0;
-    EXIGetType(0, 2, &type);
-    if (type != 0x05070000) {
-        NpcTribeInfo* tribe = npcGetTribe(name);
-        evtSetValue(event, *args++, (s32)tribe->modelName);
-        evtSetValue(event, *args++, (s32)name);
-    } else {
-        evtSetValue(event, *args++, (s32)"a_mario");
-        evtSetValue(event, *args++, (s32)"にせマリオ２");
-    }
-    evtSetValue(event, *args++, mask);
-    evtSetValue(event, *args++, entry->field_8);
-
-    return EVT_RETURN_DONE;
-}
-*/
-
-USER_FUNC(z) {
-    return EVT_RETURN_DONE;
-}

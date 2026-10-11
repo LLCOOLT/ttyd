@@ -1,5 +1,5 @@
 // include: driver/effdrv.h
-// include: system.h
+// decl: s32 irand(s32 scalar);
 // include: stdlib.h
 // decl: EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
 // proto: USER_FUNC(eff_poison_breath);

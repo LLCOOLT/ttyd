@@ -109,6 +109,17 @@ static s32 normal_attack_event[386];
 static s32 charge_event[58];
 static __declspec(section ".data") s32 wait_event[12];
 
+static USER_FUNC(eff_ice_barrier_end) {
+    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+
+    if (unit->work[1] != 0) {
+        effDelete((EffectEntry*)unit->work[1]);
+        unit->work[1] = 0;
+    }
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_bllizard_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_bllizard_neg_one_382[] = {
@@ -504,17 +515,6 @@ static USER_FUNC(eff_ice_barrier) {
     ((f32*)eff->userdata)[2] = 10.0f * unit->mSizeMultiplier + y;
     ((f32*)eff->userdata)[3] = z;
     ((f32*)eff->userdata)[23] = unit->mSizeMultiplier;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(eff_ice_barrier_end) {
-    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-
-    if (unit->work[1] != 0) {
-        effDelete((EffectEntry*)unit->work[1]);
-        unit->work[1] = 0;
-    }
     return EVT_RETURN_DONE;
 }
 

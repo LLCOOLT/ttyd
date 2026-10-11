@@ -5,6 +5,8 @@
 #include "battle/battle_stage_object.h"
 #include "system.h"
 
+f32 sinfd(f32 degrees);
+
 static USER_FUNC(_wave_offset);
 extern s32 battle_flower_drop_param_default[];
 extern s32 battle_flower_drop_param_default2[];
@@ -113,34 +115,6 @@ __declspec(section ".data") s32 btlgrpsel_dou_btlno_dou_13_99_off[6];
 s32 btlsetup_dou_tbl[476];
 s32 btl_dou_setup_no_tbl[56];
 s32 bgset_dou_wave_event[77];
-
-static USER_FUNC(_wave_offset) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 varX = args[1];
-    s32 stepX = evtGetValue(event, varX);
-    s32 periodX = evtGetValue(event, args[2]);
-    s32 ampX = evtGetValue(event, args[3]);
-    s32 varY = args[4];
-    s32 stepY = evtGetValue(event, varY);
-    s32 periodY = evtGetValue(event, args[5]);
-    s32 ampY = evtGetValue(event, args[6]);
-    BattleStageObject* obj = BattleSearchObjectPtr(name);
-
-    obj->field_0x10.x = ampX * sinfd(stepX * 360 / periodX);
-    obj->field_0x10.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
-    stepX++;
-    if (stepX >= periodX) {
-        stepX = 0;
-    }
-    evtSetValue(event, varX, stepX);
-    stepY++;
-    if (stepY >= periodY) {
-        stepY = 0;
-    }
-    evtSetValue(event, varY, stepY);
-    return EVT_RETURN_DONE;
-}
 
 __declspec(section ".data") u64 fd_battle_database_dou_negone_one_374 = 0xBF8000003F800000;
 
@@ -730,6 +704,34 @@ s32 btl_dou_setup_no_tbl[] = {
     (s32)"BTLNO_DOU_13_03", 24, (s32)"BTLNO_DOU_13_04", 25, (s32)"BTLNO_DOU_13_99", 26, 0, 0,
 };
 
+static USER_FUNC(_wave_offset) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 varX = args[1];
+    s32 stepX = evtGetValue(event, varX);
+    s32 periodX = evtGetValue(event, args[2]);
+    s32 ampX = evtGetValue(event, args[3]);
+    s32 varY = args[4];
+    s32 stepY = evtGetValue(event, varY);
+    s32 periodY = evtGetValue(event, args[5]);
+    s32 ampY = evtGetValue(event, args[6]);
+    BattleStageObject* obj = BattleSearchObjectPtr(name);
+
+    obj->field_0x10.x = ampX * sinfd(stepX * 360 / periodX);
+    obj->field_0x10.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
+    stepX++;
+    if (stepX >= periodX) {
+        stepX = 0;
+    }
+    evtSetValue(event, varX, stepX);
+    stepY++;
+    if (stepY >= periodY) {
+        stepY = 0;
+    }
+    evtSetValue(event, varY, stepY);
+    return EVT_RETURN_DONE;
+}
+
 EVT_BEGIN(bgset_dou_wave_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 200)
@@ -740,11 +742,11 @@ EVT_BEGIN(bgset_dou_wave_event)
     SET_VALUE(LW(6), 400)
     SET_VALUE(LW(7), 2500)
     LABEL(0)
-    CALL(_wave_offset, STRING("s00_suimen"), LW(0), 800, 30, LW(1), 300, 10)
-    CALL(_wave_offset, STRING("mobj_jump01"), LW(2), 600, 20, LW(3), 250, 6)
-    CALL(_wave_offset, STRING("SFX_STG5_SHIP_ON1"), LW(4), 1100, 40, LW(5), 360, 7)
-    CALL(_wave_offset, STRING("BGM_STG5_DOU1"), LW(6), 1250, 50, LW(7), 450, 8)
-    CALL(_wave_offset, STRING("ENV_STG5_DOU3"), LW(8), 1100, 50, LW(9), 400, 6)
+    CALL(_wave_offset, STRING("nami_00"), LW(0), 800, 30, LW(1), 300, 10)
+    CALL(_wave_offset, STRING("nami_01"), LW(2), 600, 20, LW(3), 250, 6)
+    CALL(_wave_offset, STRING("nami_02"), LW(4), 1100, 40, LW(5), 360, 7)
+    CALL(_wave_offset, STRING("nami_03"), LW(6), 1250, 50, LW(7), 450, 8)
+    CALL(_wave_offset, STRING("nami_04"), LW(8), 1100, 50, LW(9), 400, 6)
     WAIT_FRAMES(1)
     GOTO(0)
     RETURN

@@ -1,5 +1,6 @@
 // include: battle/battle_stage_object.h
 // include: system.h
+// decl: f32 sinfd(f32 degrees);
 // proto: USER_FUNC(_wave_offset);
 USER_FUNC(_wave_offset) {
     s32* args = event->args;

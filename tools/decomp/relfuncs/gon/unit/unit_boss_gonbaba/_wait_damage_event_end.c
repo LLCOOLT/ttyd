@@ -4,10 +4,11 @@
 // proto: USER_FUNC(_wait_damage_event_end);
 USER_FUNC(_wait_damage_event_end) {
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 id;
     BattleUnit* unit;
 
-    id = evtGetValue(event, event->args[0]);
+    id = evtGetValue(event, *args++);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     if (unit == NULL) {

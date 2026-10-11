@@ -5,6 +5,7 @@ Generated files go to rels/<module>/src/<path>.c with `#pragma force_active on` 
 keeps unreferenced data like the original. Files with .bss or non-string .rodata objects are skipped."""
 import os
 import re
+import struct
 import subprocess
 import sys
 
@@ -20,6 +21,16 @@ def snippet(name, f):
         if os.path.exists(path):
             return path
     return None
+
+
+def is_str(src, name):
+    """a rodata object dtk typed as floats whose bytes are really a NUL-padded string"""
+    m = re.search(r'^\.obj ' + re.escape(name) + r', \w+\n((?:\t\.float .*\n)+)\.endobj', src, re.M)
+    if not m:
+        return False
+    d = b''.join(struct.pack('>f', float(v)) for v in re.findall(r'\.float (\S+)', m.group(1)))
+    s, _, rest = d.partition(b'\0')
+    return bool(s) and not rest.strip(b'\0') and all(0x20 <= b < 0x7F for b in s)
 
 
 def candidates():
@@ -51,7 +62,8 @@ def candidates():
         # compiler float constants are fine when only code uses them (the snippets recreate them)
         # (a code-only "jumptable_" of string pointers is a local array's initializer template)
         bad = [r for r in ro if not r.startswith(('str_', 'gap_', 'zero_', 'dat_'))
-               and not (r.startswith(('float_', 'double_', 'vec3_', 'jumptable_')) and f'.4byte {r}' not in src)]
+               and not (r.startswith(('float_', 'double_', 'vec3_', 'jumptable_')) and f'.4byte {r}' not in src)
+               and not (r.startswith(('float_', 'vec3_')) and is_str(src, r))]
         if bad:
             yield name, 'rodata objs ' + ','.join(bad[:3])
             continue

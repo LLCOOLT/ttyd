@@ -193,7 +193,9 @@ typedef struct AnimationPose {
     void* dispUserDataCallback;         // 0x158, TODO: re-type
     Vec** worldPositions;               // 0x15C, filled while animPoseWorldPositionEvalOn is set
     s32 numWorldPositions;              // 0x160
-    u8 field_0x164[0x170 - 0x164];      // 0x164
+    Mtx** worldMatrices;                // 0x164, filled while animPoseWorldMatrixEvalOn is set
+    s32 numWorldMatrices;               // 0x168
+    u8 field_0x16C[0x170 - 0x16C];      // 0x16C
 } AnimationPose;
 
 typedef struct AnimationPoseFile {

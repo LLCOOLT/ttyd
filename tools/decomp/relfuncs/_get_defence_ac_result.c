@@ -1,9 +1,10 @@
 // include: battle/battle.h
 // proto: USER_FUNC(_get_defence_ac_result);
 USER_FUNC(_get_defence_ac_result) {
-    s32* args = event->args;
-    s32 result = 0;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    s32 var = args[0];
+    s32 result = 0;
 
     switch (wp->actionCommands.mDefenseResult) {
         case 1:
@@ -19,6 +20,6 @@ USER_FUNC(_get_defence_ac_result) {
             result = 0;
             break;
     }
-    evtSetValue(event, args[0], result);
+    evtSetValue(event, var, result);
     return EVT_RETURN_DONE;
 }

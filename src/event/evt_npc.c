@@ -492,7 +492,7 @@ USER_FUNC(evt_npc_move_position) {
     f32 targetZ = evtGetFloat(event, *args++);
     f32 moveTime = (f32)evtGetValue(event, *args++) / 1000.0f;
     f32 speed = evtGetFloat(event, *args++);
-    s32 moveFlags = args[5];
+    s32 moveFlags = *args;
 
     NpcEntry* npc = evtNpcNameToPtr(event, npcName);
     Vec diff;

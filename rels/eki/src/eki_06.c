@@ -1,0 +1,456 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "manager/evtmgr_cmd.h"
+#include "driver/mobjdrv.h"
+#include "driver/animdrv.h"
+#include "mario/mariost.h"
+#include "mario/mario_motion.h"
+#include "pmario_sound.h"
+#include "string.h"
+
+static s32 lock;
+extern s32 evt_sw_complete[];
+
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_hitobj_onoff);
+USER_FUNC(evt_map_checkanim);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mapobj_get_position);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mobj_delete);
+USER_FUNC(evt_mobj_get_position);
+USER_FUNC(evt_mobj_powerupblk);
+USER_FUNC(evt_mobj_set_anim);
+USER_FUNC(evt_mobj_wait_animation_end);
+USER_FUNC(evt_npc_change_fbat_mode);
+USER_FUNC(evt_npc_get_ReactionOfLivingBody);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_envon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(sw_entry);
+s32 sw_main(MapObjectEntry* mobj);
+void sw_reset(void);
+s32 sw_cnt(MapObjectEntry* mobj);
+void sw_cntup(MapObjectEntry* mobj);
+extern s32 evt_bero_info_run[];
+
+__declspec(section ".data") u64 fd_eki_06_negone_one_374;
+__declspec(section ".data") s32 fd_eki_06_neg_one_382[1];
+__declspec(section ".data") s32 fd_eki_06___local_PI_383[1];
+__declspec(section ".data") s32 fd_eki_06___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_eki_06_one_negone_373;
+__declspec(section ".data") s32 fd_eki_06___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_eki_06_one_381[1];
+__declspec(section ".data") u64 fd_eki_06_negone_one_360;
+__declspec(section ".data") s32 fd_eki_06_neg_one_365[1];
+__declspec(section ".data") s32 fd_eki_06___local_PI_366[1];
+__declspec(section ".data") s32 fd_eki_06___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_eki_06_one_negone_359;
+__declspec(section ".data") s32 fd_eki_06___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_eki_06_one_364[1];
+static __declspec(section ".data") s32 e_close[12];
+static __declspec(section ".data") s32 e_open[12];
+static s32 bero_data[45];
+s32 evt_box_open[115];
+s32 evt_sw_complete[272];
+s32 eki_06_init_evt[132];
+
+__declspec(section ".data") u64 fd_eki_06_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_eki_06_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_eki_06___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_eki_06___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_eki_06_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_eki_06___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_eki_06_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_eki_06_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_eki_06_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_eki_06___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_eki_06___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_eki_06_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_eki_06___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_eki_06_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") EVT_BEGIN(e_close)
+    MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static __declspec(section ".data") EVT_BEGIN(e_open)
+    MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
+    CALL(evt_mapobj_rotate, 0, STRING("door"), 0, LW(0), 0)
+    RETURN
+EVT_END()
+
+static s32 bero_data[] = {
+    (s32)"e_bero_1", 65539, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)"eki_05", (s32)"w_bero_2", 327685, (s32)e_close, (s32)e_open, (s32)"e_bero_2",
+    0, 20000, 100000, 0, 0, -1, 0, -1,
+    0, (s32)"eki_05", (s32)"w_bero_1", 65537, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+};
+
+EVT_BEGIN(evt_box_open)
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 317)
+        RETURN
+    END_IF
+    LABEL(0)
+    CALL(evt_npc_get_ReactionOfLivingBody, 0, LW(0))
+    IF_INT_GREATER(LW(0), 0)
+        WAIT_FRAMES(1)
+        GOTO(0)
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_cam3d_evt_set, -140, 152, 528, -140, 57, -12, 500, 11)
+    WAIT_MS(500)
+    SET_VALUE(GW(0), 0)
+    SET_VALUE(GW(1), 0)
+    SET_VALUE(GW(2), 0)
+    CALL(sw_entry, STRING("MOBJ_eki_06_su3"), -240, 0, 40)
+    CALL(sw_entry, STRING("MOBJ_eki_06_su2"), -140, 0, 40)
+    CALL(sw_entry, STRING("MOBJ_eki_06_su1"), -40, 0, 40)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_BOX_OPEN1"), -240, 0, 40, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_BOX_OPEN1"), -140, 0, 40, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_BOX_OPEN1"), -40, 0, 40, 0)
+    CALL(evt_map_playanim, STRING("anm_hako"), 0, 0)
+    CALL(evt_map_checkanim, STRING("anm_hako"), LW(0), LW(1))
+    WAIT_MS(LW(1))
+    CALL(evt_hitobj_onoff, STRING("a_hako"), 1, 0)
+    CALL(evt_cam3d_evt_off, 500, 11)
+    WAIT_MS(500)
+    SET_VALUE(GSW(0), 317)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_sw_complete)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_cam3d_evt_set, -140, 152, 528, -140, 57, -12, 500, 11)
+    WAIT_MS(500)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mobj_set_anim, STRING("MOBJ_eki_06_su1"), STRING("ANIM_6"))
+        CALL(evt_mobj_get_position, STRING("MOBJ_eki_06_su1"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_SMALL1"), LW(0), LW(1), LW(2), 0)
+        WAIT_MS(600)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_JUMP1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(400)
+        CALL(evt_mobj_set_anim, STRING("MOBJ_eki_06_su2"), STRING("ANIM_8"))
+        CALL(evt_mobj_get_position, STRING("MOBJ_eki_06_su2"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_SMALL1"), LW(0), LW(1), LW(2), 0)
+        WAIT_MS(600)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_JUMP1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        WAIT_MS(800)
+        CALL(evt_mobj_set_anim, STRING("MOBJ_eki_06_su3"), STRING("ANIM_8"))
+        CALL(evt_mobj_get_position, STRING("MOBJ_eki_06_su3"), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_SMALL1"), LW(0), LW(1), LW(2), 0)
+        WAIT_MS(600)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_OBJ_SWITCH_JUMP1"), LW(0), LW(1), LW(2), 0)
+    END_INLINE_EVENT
+    WAIT_MS(1000)
+    CALL(evt_mobj_wait_animation_end, STRING("MOBJ_eki_06_su1"))
+    CALL(evt_mobj_wait_animation_end, STRING("MOBJ_eki_06_su2"))
+    CALL(evt_mobj_wait_animation_end, STRING("MOBJ_eki_06_su3"))
+    CALL(evt_mobj_delete, STRING("MOBJ_eki_06_su1"))
+    CALL(evt_mobj_delete, STRING("MOBJ_eki_06_su2"))
+    CALL(evt_mobj_delete, STRING("MOBJ_eki_06_su3"))
+    CALL(evt_cam3d_evt_set, -80, 202, 448, -80, 107, -92, 500, 11)
+    WAIT_MS(500)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("origami"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
+    CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 1)
+    BEGIN_INLINE_EVENT
+        CALL(evt_mapobj_get_position, STRING("origami"), LW(0), LW(1), LW(2))
+        LOOP(3)
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PERA_KAI_OPEN1"), LW(0), LW(1), LW(2), 0)
+            WAIT_MS(300)
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PERA_KAI_OPEN1_2"), LW(0), LW(1), LW(2), 0)
+        END_LOOP
+    END_INLINE_EVENT
+    BEGIN_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        IF_INT_LESS(LW(2), -60)
+            CALL(evt_mario_mov_pos2, LW(0), -25, FLOAT(80.0f))
+        END_IF
+    END_INLINE_EVENT
+    CALL(evt_map_playanim, STRING("anm_kaidan167"), 0, 0)
+    BEGIN_INLINE_EVENT
+        WAIT_MS(900)
+        CALL(evt_mapobj_get_position, STRING("origami"), LW(0), LW(1), LW(2))
+        LOOP(6)
+            CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_PERA_KAI_OPEN2"), LW(0), LW(1), LW(2), 0)
+            WAIT_MS(300)
+        END_LOOP
+    END_INLINE_EVENT
+    WAIT_FRAMES(100)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_1"), 1)
+    WAIT_FRAMES(32)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_2"), 1)
+    WAIT_FRAMES(34)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_3"), 1)
+    CALL(evt_map_checkanim, STRING("anm_kaidan167"), LW(0), LW(1))
+    WAIT_MS(LW(1))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_FF_ENV_SUCCESS1"))
+    CALL(evt_cam3d_evt_off, 500, 11)
+    WAIT_MS(500)
+    SET_VALUE(GSW(0), 318)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+void sw_cntup(MapObjectEntry* mobj) {
+    if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
+        evtSetValue(NULL, GW(0), evtGetValue(NULL, GW(0)) + 1);
+    } else if (strcmp(mobj->name, "MOBJ_eki_06_su2") == 0) {
+        evtSetValue(NULL, GW(1), evtGetValue(NULL, GW(1)) + 1);
+    } else if (strcmp(mobj->name, "MOBJ_eki_06_su3") == 0) {
+        evtSetValue(NULL, GW(2), evtGetValue(NULL, GW(2)) + 1);
+    }
+}
+
+
+s32 sw_cnt(MapObjectEntry* mobj) {
+    if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
+        return evtGetValue(NULL, GW(0));
+    }
+    if (strcmp(mobj->name, "MOBJ_eki_06_su2") == 0) {
+        return evtGetValue(NULL, GW(1));
+    }
+    if (!strcmp(mobj->name, "MOBJ_eki_06_su3")) {
+        return evtGetValue(NULL, GW(2));
+    }
+    return 0;
+}
+
+void sw_reset(void) {
+    MapObjectEntry* mobj;
+
+    mobj = mobjNameToPtr("MOBJ_eki_06_su1");
+    mobj->flags &= ~2;
+    switch (sw_cnt(mobj)) {
+        case 2:
+            animPoseSetAnim(mobj->poseId, "ANIM_5", 1);
+            evtSetValue(NULL, GW(0), 0);
+            break;
+    }
+
+    mobj = mobjNameToPtr("MOBJ_eki_06_su2");
+    mobj->flags &= ~2;
+    switch (sw_cnt(mobj)) {
+        case 11:
+            animPoseSetAnim(mobj->poseId, "ANIM_7", 1);
+            evtSetValue(NULL, GW(1), 0);
+            break;
+    }
+
+    mobj = mobjNameToPtr("MOBJ_eki_06_su3");
+    mobj->flags &= ~2;
+    switch (sw_cnt(mobj)) {
+        case 4:
+            animPoseSetAnim(mobj->poseId, "ANIM_7", 1);
+            evtSetValue(NULL, GW(2), 0);
+            break;
+    }
+}
+
+s32 sw_main(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+        case 2:
+            break;
+        case 0:
+            if (!(mobj->flags & 8)) {
+                break;
+            }
+            if (lock != 0) {
+                break;
+            }
+            lock = 1;
+            if (mobj->unk1E0 == 0x200000) {
+                marioChgMot(5);
+            }
+            psndSFXOn_3D("SFX_STG6_OBJ_SWITCH_ON1", &mobj->position);
+            sw_cntup(mobj);
+            if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
+                if (sw_cnt(mobj) == 1) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_2", 1);
+                } else {
+                    sw_reset();
+                }
+            }
+            if (strcmp(mobj->name, "MOBJ_eki_06_su2") == 0) {
+                if (sw_cnt(mobj) < 10) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_2", 1);
+                } else if (sw_cnt(mobj) == 10) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_4", 1);
+                } else {
+                    sw_reset();
+                }
+            }
+            if (strcmp(mobj->name, "MOBJ_eki_06_su3") == 0) {
+                if (sw_cnt(mobj) < 3) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_2", 1);
+                } else if (sw_cnt(mobj) == 3) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_4", 1);
+                } else {
+                    sw_reset();
+                }
+            }
+            mobj->unk1DC++;
+            break;
+        case 1:
+            if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+                break;
+            }
+            if (evtGetValue(NULL, GW(0)) == 1 && evtGetValue(NULL, GW(1)) == 10 && evtGetValue(NULL, GW(2)) == 3) {
+                evtEntry(evt_sw_complete, 0, 0);
+                mobj->unk1DC++;
+                break;
+            }
+            mobjNameToPtr("MOBJ_eki_06_su1")->flags |= 2;
+            mobjNameToPtr("MOBJ_eki_06_su2")->flags |= 2;
+            mobjNameToPtr("MOBJ_eki_06_su3")->flags |= 2;
+            if (strcmp(mobj->name, "MOBJ_eki_06_su1") == 0) {
+                if (sw_cnt(mobj) == 1) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_3", 1);
+                } else {
+                    animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
+                }
+            }
+            if (strcmp(mobj->name, "MOBJ_eki_06_su2") == 0) {
+                if (sw_cnt(mobj) == 10) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_5", 1);
+                } else {
+                    animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
+                }
+            }
+            if (strcmp(mobj->name, "MOBJ_eki_06_su3") == 0) {
+                if (sw_cnt(mobj) == 3) {
+                    animPoseSetAnim(mobj->poseId, "ANIM_5", 1);
+                } else {
+                    animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
+                }
+            }
+            mobj->flags &= ~8;
+            mobj->unk1DC = 0;
+            lock = 0;
+            break;
+    }
+    return 0;
+}
+
+USER_FUNC(sw_entry) {
+    s32* args = event->args;
+    const char* name;
+    f32 x, y, z;
+    MapObjectEntry* mobj;
+    Vec pos;
+
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    if (!animGroupBaseAsync(name, gp->inBattle != 0, NULL)) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, name);
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 6;
+    pos = (Vec){0.0f, 0.0f, 0.0f};
+    pos.x = x;
+    pos.y = y;
+    pos.z = z;
+    mobj->position = pos;
+    mobj->mainFunc = sw_main;
+    mobj->flags |= 0xA10000;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "ANIM_1", 1);
+    lock = 0;
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(eki_06_init_evt)
+    SET_VALUE(LW(0), PTR(bero_data))
+    CALL(evt_bero_get_info)
+    CALL_CHILD(PTR(evt_bero_info_run))
+    CALL(evt_snd_bgmoff, 512)
+    CALL(evt_snd_envon, 272, STRING("ENV_STG6_EKI2"))
+    CALL(evt_npc_change_fbat_mode, 1)
+    SPAWN_EVENT(PTR(evt_box_open))
+    SWITCH(GSW(0))
+        CASE_LESS(317)
+        CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 0)
+        CASE_EQUAL(317)
+        SET_VALUE(GW(0), 0)
+        SET_VALUE(GW(1), 0)
+        SET_VALUE(GW(2), 0)
+        CALL(sw_entry, STRING("MOBJ_eki_06_su3"), -240, 0, 40)
+        CALL(sw_entry, STRING("MOBJ_eki_06_su2"), -140, 0, 40)
+        CALL(sw_entry, STRING("MOBJ_eki_06_su1"), -40, 0, 40)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("origami"), 1)
+        CALL(evt_hitobj_onoff, STRING("a_ori"), 1, 0)
+        CASE_DEFAULT
+        CALL(evt_map_playanim, STRING("anm_kaidan167"), 2, 0)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n_origami"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_1"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_2"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("oku_3"), 1)
+    END_SWITCH
+    IF_INT_LESS(GSW(0), 317)
+        ELSE
+        CALL(evt_map_playanim, STRING("anm_hako"), 2, 0)
+        CALL(evt_hitobj_onoff, STRING("a_hako"), 1, 0)
+    END_IF
+    CALL(evt_mapobj_trans, 1, STRING("HAKO"), 0, FLOAT(0.099609375f), 0)
+    CALL(evt_mobj_powerupblk, STRING("pblk01"), 95, 295, -80, 0, GSWF(5562), 0)
+    RETURN
+EVT_END()

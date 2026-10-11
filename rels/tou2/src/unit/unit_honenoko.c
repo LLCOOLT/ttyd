@@ -117,6 +117,19 @@ static s32 normal_attack_event[428];
 static s32 call_friend_event[311];
 static __declspec(section ".data") s32 wait_event[6];
 
+static USER_FUNC(honenoko_copy_status) {
+    s32* args = event->args;
+    s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
+    s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
+    BattleWork* wp = _battleWorkPointer;
+    BattleUnit* unit1 = BattleGetUnitPtr(wp, id1);
+    BattleUnit* unit2 = BattleGetUnitPtr(wp, id2);
+
+    unit2->mSizeChangeTurns = unit1->mSizeChangeTurns;
+    unit2->mSizeChangeStrength = unit1->mSizeChangeStrength;
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_honenoko_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_honenoko_neg_one_382[] = {
@@ -554,15 +567,3 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static USER_FUNC(honenoko_copy_status) {
-    s32* args = event->args;
-    s32 id1 = BattleTransID(event, evtGetValue(event, args[0]));
-    s32 id2 = BattleTransID(event, evtGetValue(event, args[1]));
-    BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit1 = BattleGetUnitPtr(wp, id1);
-    BattleUnit* unit2 = BattleGetUnitPtr(wp, id2);
-
-    unit2->mSizeChangeTurns = unit1->mSizeChangeTurns;
-    unit2->mSizeChangeStrength = unit1->mSizeChangeStrength;
-    return EVT_RETURN_DONE;
-}

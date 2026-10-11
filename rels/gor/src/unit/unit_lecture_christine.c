@@ -110,9 +110,10 @@ s32 lec_weapon_zutsuki_2[48];
 s32 lecture_zutsuki_attack_event[570];
 
 USER_FUNC(_get_defence_ac_result) {
-    s32* args = event->args;
-    s32 result = 0;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    s32 var = args[0];
+    s32 result = 0;
 
     switch (wp->actionCommands.mDefenseResult) {
         case 1:
@@ -128,7 +129,7 @@ USER_FUNC(_get_defence_ac_result) {
             result = 0;
             break;
     }
-    evtSetValue(event, args[0], result);
+    evtSetValue(event, var, result);
     return EVT_RETURN_DONE;
 }
 
@@ -465,9 +466,10 @@ static USER_FUNC(_krb_get_dir) {
 
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 value;
 
-    value = evtGetValue(event, event->args[0]);
+    value = evtGetValue(event, *args++);
     wp->field_424 = value;
     return EVT_RETURN_DONE;
 }

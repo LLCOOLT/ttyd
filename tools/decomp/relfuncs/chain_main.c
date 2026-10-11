@@ -5,6 +5,7 @@
 // proto: USER_FUNC(chain_main);
 USER_FUNC(chain_main) {
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 id;
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -20,8 +21,12 @@ USER_FUNC(chain_main) {
     f32 len;
     f32 sag;
     s32 i;
+    f32 dx;
+    f32 dy;
+    f32 dz;
+    f32 t;
 
-    id = evtGetValue(event, event->args[0]);
+    id = evtGetValue(event, *args++);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     if (unit == NULL) {
@@ -54,7 +59,10 @@ USER_FUNC(chain_main) {
     // otherwise hang the links between the chomp and the stake
     BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 1), &x1, &y1, &z1);
     BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 9), &x2, &y2, &z2);
-    len = (f32)sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2) + (z1 - z2) * (z1 - z2)) / 8;
+    dx = x1 - x2;
+    dy = y1 - y2;
+    dz = z1 - z2;
+    len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 8;
     if (len < 10.0f) {
         len = 10.0f;
     }
@@ -66,15 +74,10 @@ USER_FUNC(chain_main) {
     }
     BtlUnit_SetPartsPos(part, x, y, z);
     BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, 1), &x, &y, &z);
-    y += 16.0f;
     x += -(unit->faceDirection * 16);
+    y += 16.0f;
     BtlUnit_SetPartsPos(BtlUnit_GetPartsPtr(unit, 2), x, y, z);
     for (i = 2; i <= 7; i++) {
-        f32 dx;
-        f32 dy;
-        f32 dz;
-        f32 t;
-
         BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, i), &x1, &y1, &z1);
         part = BtlUnit_GetPartsPtr(unit, i + 1);
         BtlUnit_GetPartsPos(part, &x2, &y2, &z2);
@@ -92,11 +95,6 @@ USER_FUNC(chain_main) {
         BtlUnit_SetPartsPos(part, x2, y2, z2);
     }
     for (i = 9; i >= 3; i--) {
-        f32 dx;
-        f32 dy;
-        f32 dz;
-        f32 t;
-
         BtlUnit_GetPartsPos(BtlUnit_GetPartsPtr(unit, i), &x1, &y1, &z1);
         part = BtlUnit_GetPartsPtr(unit, i - 1);
         BtlUnit_GetPartsPos(part, &x2, &y2, &z2);

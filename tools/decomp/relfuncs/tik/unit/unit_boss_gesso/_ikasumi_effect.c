@@ -5,8 +5,8 @@
 // decl: EffectEntry* effOpukuJetwN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
 // proto: USER_FUNC(_ikasumi_effect);
 USER_FUNC(_ikasumi_effect) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 count = evtGetValue(event, args[1]);
     BattleUnit* unit = BattleGetUnitPtr(wp, BattleTransID(event, id));

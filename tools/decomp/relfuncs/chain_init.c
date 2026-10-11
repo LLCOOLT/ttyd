@@ -5,6 +5,7 @@
 // proto: USER_FUNC(chain_init);
 USER_FUNC(chain_init) {
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 id;
     BattleUnit* unit;
     BattleUnitPart* part;
@@ -13,7 +14,7 @@ USER_FUNC(chain_init) {
     f32 z;
     s32 i;
 
-    id = evtGetValue(event, event->args[0]);
+    id = evtGetValue(event, *args++);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     BtlUnit_GetPos(unit, &x, &y, &z);

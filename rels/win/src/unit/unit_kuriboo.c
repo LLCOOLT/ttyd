@@ -289,11 +289,6 @@ static s32 attack_event[] = {
     (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
 static USER_FUNC(krb_get_dir) {
     s32* args = event->args;
     f32 x1 = evtGetFloat(event, args[0]);
@@ -311,3 +306,9 @@ static USER_FUNC(krb_get_dir) {
     evtSetValue(event, args[4], angleABf(dx, dz, 0.0f, 0.0f));
     return EVT_RETURN_DONE;
 }
+
+static __declspec(section ".data") EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+

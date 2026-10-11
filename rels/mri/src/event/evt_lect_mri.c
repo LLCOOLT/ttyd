@@ -1,0 +1,817 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "mario/mario.h"
+#include "manager/evtmgr_cmd.h"
+#include "dolphin/os.h"
+#include "driver/icondrv.h"
+#include "driver/dispdrv.h"
+#include "string.h"
+#include "driver/mapdrv.h"
+#include "driver/effdrv.h"
+#include "driver/camdrv.h"
+#include "mario/mariost.h"
+#include "dolphin/mtx.h"
+#include "driver/mobjdrv.h"
+#include "driver/itemdrv.h"
+#include "driver/animdrv.h"
+#include "system.h"
+
+static OSTime wwstart;
+void statusWinForceClose(void);
+void statusWinForceCloseClear(void);
+static s32 x_flag_data[2];
+static void lecture_button_disp(CameraId camera, void* param);
+typedef struct LectButtonDisp { s32 unk0; Vec pos; } LectButtonDisp;
+typedef struct LectButton { u8 flags; u8 seq; u8 pad_2[0x8 - 0x2]; LectButtonDisp disp; u8 pad_18[0x40 - 0x18]; s16 iconId; s16 alpha; } LectButton;
+static LectButton lbtn[2];
+static inline void effitemget_cam_move(CameraEntry* camera, Vec ofs) { camera->presetPos = camera->cameraPos; camera->presetAt = camera->cameraAt; PSVECAdd(&camera->cameraPos, &ofs, &camera->storedPos); PSVECAdd(&camera->cameraAt, &ofs, &camera->storedAt); camera->startTimeA = gp->renderTime; camera->durationA = 0; camera->stateA = 3; camera->curveA = 11; }
+void hitGrpFlagOn(const char* name, u32 flags);
+void itemSetPosition(ItemEntry* item, f32 x, f32 y, f32 z);
+void marioChgStayMotion(void);
+
+USER_FUNC(evt_cam3d_evt_set_rel);
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_get_motion);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_set_enable_key);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_mario_set_pose);
+USER_FUNC(evt_mario_trigflag_onoff);
+USER_FUNC(evt_mobj_delete);
+USER_FUNC(evt_mobj_entry);
+USER_FUNC(evt_mobj_flag_onoff);
+USER_FUNC(evt_mobj_set_camid);
+USER_FUNC(evt_mobj_set_gravity_bound);
+USER_FUNC(evt_mobj_set_position);
+USER_FUNC(evt_msg_continue);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_add);
+USER_FUNC(evt_msg_select);
+USER_FUNC(evt_msg_toge);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_get_position);
+USER_FUNC(evt_npc_move_position);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_autotalkpose);
+USER_FUNC(evt_npc_set_camid);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_ry);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_sub_random);
+static USER_FUNC(lect_mario_ido_sum);
+static USER_FUNC(lect_mobj_hit_nasi);
+static USER_FUNC(lect_status_off);
+static USER_FUNC(lect_status_on);
+static USER_FUNC(lecture_button_flag_on_off);
+static USER_FUNC(lecture_button_rtn);
+static USER_FUNC(lecture_button_seq_wait);
+static USER_FUNC(lecture_button_set_icon_id);
+static USER_FUNC(lecture_button_set_pos);
+static USER_FUNC(lecture_button_set_seq);
+USER_FUNC(mainwindow_opendisable);
+USER_FUNC(mainwindow_openenable);
+static USER_FUNC(x_flag_get);
+static USER_FUNC(x_flag_set);
+static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start);
+static USER_FUNC(x_flag_add);
+static USER_FUNC(x_flag_wait);
+static void lecture_button_disp(CameraId camera, void* param);
+static USER_FUNC(lecture_button_set_alpha);
+static USER_FUNC(lecture_button_get_icon_id);
+static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings);
+static USER_FUNC(lect_map_cam_chg);
+static USER_FUNC(effitemgetchange_cam);
+static USER_FUNC(effitemgetchange_cam_ptr);
+static USER_FUNC(effitemget_open);
+static USER_FUNC(effitemget_open_ptr);
+static USER_FUNC(effitemget_busaiku);
+static USER_FUNC(juyoitem_get_no);
+static USER_FUNC(juyoitem_end);
+static USER_FUNC(juyoitem_gogo);
+static USER_FUNC(juyoitem_goato);
+static USER_FUNC(lect_mobj_set_nosysblend);
+static USER_FUNC(lect_push_a_check);
+static USER_FUNC(lect_push_b_check);
+static USER_FUNC(bgm_start_wait);
+extern s32 evt_cam3d_evt_off[];
+extern s32 evt_cam_road_reset[];
+extern s32 evt_eff_softdelete_ptr[];
+extern s32 evt_img_alloc_capture[];
+extern s32 evt_img_clear_virtual_point[];
+extern s32 evt_img_entry[];
+extern s32 evt_img_free_capture[];
+extern s32 evt_img_onoff[];
+extern s32 evt_img_release[];
+extern s32 evt_img_set_paper[];
+extern s32 evt_img_set_paper_anim[];
+extern s32 evt_img_wait_animend[];
+extern s32 evt_mario_dispflag_onoff[];
+extern s32 evt_mario_init_camid[];
+extern s32 evt_mario_normalize[];
+extern s32 evt_mario_set_camid[];
+extern s32 evt_npc_sound_data_set[];
+extern s32 evt_npc_start_for_event[];
+extern s32 evt_npc_start_for_one_event[];
+extern s32 evt_npc_stop_for_event[];
+extern s32 evt_paper_delete[];
+extern s32 evt_paper_entry[];
+extern s32 evt_party_run[];
+extern s32 evt_party_stop[];
+extern s32 evt_snd_bgmoff[];
+extern s32 evt_snd_bgmon[];
+extern s32 evt_snd_envoff[];
+extern s32 evt_snd_envon[];
+extern s32 evt_snd_sfxon_3d[];
+extern s32 lect_cam_load[];
+extern s32 lect_cam_save[];
+extern s32 lect_test_systemlevel[];
+
+__declspec(section ".data") u64 fd_evt_lect_mri_negone_one_374;
+__declspec(section ".data") s32 fd_evt_lect_mri_neg_one_382[1];
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PI_383[1];
+__declspec(section ".data") s32 fd_evt_lect_mri___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_evt_lect_mri_one_negone_373;
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_evt_lect_mri_one_381[1];
+__declspec(section ".data") u64 fd_evt_lect_mri_negone_one_360;
+__declspec(section ".data") s32 fd_evt_lect_mri_neg_one_365[1];
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PI_366[1];
+__declspec(section ".data") s32 fd_evt_lect_mri___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_evt_lect_mri_one_negone_359;
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_evt_lect_mri_one_364[1];
+s32 boots_lv2_juyoitem_lecture_init[66];
+s32 boots_lv2_juyoitem_lecture[550];
+s32 all_juyoitem_lecture_rel_19_data_3A540[252];
+
+static f32 lect_mario_ido_sub(f32 elapsed, f32 total, f32 end, f32 start) {
+    f32 rem = total - elapsed;
+
+    return (rem * end + elapsed * start) / total;
+}
+
+static USER_FUNC(lect_mario_ido_sum) {
+    s32* args = event->args;
+    MarioWork* mario = marioGetPtr();
+    s32 frames = evtGetValue(event, args[0]);
+    s32 elapsed;
+
+    if (isFirstCall) {
+        wwstart = event->lifetime;
+        evtSetFloat(event, LW(0), mario->position.x);
+        evtSetFloat(event, LW(1), mario->position.y);
+        evtSetFloat(event, LW(2), mario->position.z);
+    }
+    elapsed = OSTicksToMilliseconds((u64)(s32)((u32)event->lifetime - (u32)wwstart));
+    if (elapsed > frames) {
+        elapsed = frames;
+    }
+    mario->position.x = lect_mario_ido_sub(elapsed, frames, evtGetFloat(event, LW(3)), evtGetFloat(event, LW(0)));
+    mario->position.y = lect_mario_ido_sub(elapsed, frames, evtGetFloat(event, LW(4)), evtGetFloat(event, LW(1)));
+    mario->position.z = lect_mario_ido_sub(elapsed, frames, evtGetFloat(event, LW(5)), evtGetFloat(event, LW(2)));
+    if (elapsed >= frames) {
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(lect_status_off) {
+    statusWinForceClose();
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lect_status_on) {
+    statusWinForceCloseClear();
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(x_flag_set) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+
+    x_flag_data[index] = evtGetValue(event, args[1]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(x_flag_add) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+
+    x_flag_data[index] += evtGetValue(event, args[1]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(x_flag_get) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+
+    evtSetValue(event, args[1], x_flag_data[index]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(x_flag_wait) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    s32 value = evtGetValue(event, args[1]);
+
+    if (value == x_flag_data[index]) {
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static void lecture_button_disp(CameraId camera, void* param) {
+    s32 i;
+
+    for (i = 0; i < 2; i++) {
+        LectButton* btn = &lbtn[i];
+        LectButtonDisp* disp = &btn->disp;
+
+        if (!(btn->flags & 1)) {
+            f32 ofs;
+            Vec pos;
+
+            switch (btn->iconId) {
+                case 0x75:
+                case 0x76:
+                case 0x77:
+                case 0x78:
+                case 0x79:
+                case 0x7A:
+                case 0x7B:
+                case 0x7C:
+                case 0x7D:
+                    ofs = -15.0f;
+                    break;
+                default:
+                    ofs = 0.0f;
+                    break;
+            }
+            pos = disp->pos;
+            pos.y += ofs;
+            iconDispGxAlpha(&pos, 0x50, btn->iconId, btn->alpha, 1.0f);
+        }
+    }
+}
+
+static USER_FUNC(lecture_button_rtn) {
+    LectButton* btn;
+    s32 i;
+    s32 done;
+
+    if (isFirstCall) {
+        memset(lbtn, 0, sizeof(lbtn));
+        {
+            Vec pos = {200.0f, -25.0f, 0.0f};
+
+            for (i = 0; i < 2; i++) {
+                lbtn[i].disp.pos = pos;
+            }
+        }
+    }
+    done = 0;
+    for (i = 0; i < 2; i++) {
+        btn = &lbtn[i];
+        switch (btn->seq) {
+            case 0:
+                btn->iconId = 0x68;
+                btn->seq = 1;
+                break;
+            case 2:
+                btn->alpha += 7;
+                if (btn->alpha >= 255) {
+                    btn->alpha = 255;
+                    btn->seq = 1;
+                }
+                break;
+            case 3:
+                btn->alpha -= 7;
+                if (btn->alpha <= 0) {
+                    btn->alpha = 0;
+                    btn->seq = 1;
+                }
+                break;
+            case 4:
+                btn->flags |= 1;
+                done++;
+                break;
+        }
+    }
+    if (done >= 2) {
+        return EVT_RETURN_DONE;
+    }
+    dispEntry(CAMERA_2D, 0.0f, 1, lecture_button_disp, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(lecture_button_set_icon_id) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    s32 value = evtGetValue(event, args[1]);
+    LectButton* btn = &lbtn[index];
+
+    btn->iconId = value;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_set_alpha) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    s32 value = evtGetValue(event, args[1]);
+    LectButton* btn = &lbtn[index];
+
+    btn->alpha = value;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_flag_on_off) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    u8 flag = evtGetValue(event, args[1]);
+
+    s32 on = evtGetValue(event, args[2]);
+    LectButton* btn = &lbtn[index];
+
+    if (on) {
+        btn->flags |= flag;
+    } else {
+        btn->flags &= ~flag;
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_set_seq) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    s32 value = evtGetValue(event, args[1]);
+    LectButton* btn = &lbtn[index];
+
+    btn->seq = value;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_get_icon_id) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    LectButton* btn = &lbtn[index];
+
+    evtSetValue(event, args[1], btn->seq);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_seq_wait) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    s32 seq = evtGetValue(event, args[1]);
+    LectButton* btn = &lbtn[index];
+
+    if (btn->seq != seq) {
+        return EVT_RETURN_BLOCK;
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lecture_button_set_pos) {
+    s32* args = event->args;
+    s32 index = evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    LectButton* btn = &lbtn[index];
+
+    btn->disp.pos = (Vec){x, y, z};
+    return EVT_RETURN_DONE;
+}
+
+static void lect_map_cam_chg_sub(MapObject* obj, s32 camId, BOOL siblings) {
+    obj->field_0x4[1] = camId;
+    if (obj->child != NULL) {
+        lect_map_cam_chg_sub(obj->child, camId, TRUE);
+    }
+    if (siblings && obj->next != NULL) {
+        lect_map_cam_chg_sub(obj->next, camId, TRUE);
+    }
+}
+
+static USER_FUNC(lect_map_cam_chg) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 camId = evtGetValue(event, args[1]);
+    MapObject* obj = mapGetMapObj(name);
+
+    if (obj != NULL) {
+        lect_map_cam_chg_sub(obj, camId, FALSE);
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(effitemgetchange_cam) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 camId = evtGetValue(event, args[1]);
+
+    ((s32*)effNameToPtr(name)->userdata)[14] = camId;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(effitemgetchange_cam_ptr) {
+    s32* args = event->args;
+    EffectEntry* eff = (EffectEntry*)evtGetValue(event, args[0]);
+
+    ((s32*)eff->userdata)[14] = evtGetValue(event, args[1]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(effitemget_open) {
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    ((s32*)eff->userdata)[8] = 1;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(effitemget_open_ptr) {
+    EffectEntry* eff = (EffectEntry*)evtGetValue(event, event->args[0]);
+
+    ((s32*)eff->userdata)[8] = 1;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(effitemget_busaiku) {
+    s32 up = evtGetValue(event, event->args[0]);
+    CameraEntry* camera = camGetPtr(4);
+    Vec ofs;
+
+    if (up) {
+        ofs = (Vec){0.0f, 2016.0f, 0.0f};
+    } else {
+        ofs = (Vec){0.0f, -2016.0f, 0.0f};
+    }
+    effitemget_cam_move(camera, ofs);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lect_mobj_hit_nasi) {
+    const char* name = (const char*)evtGetValue(event, event->args[0]);
+    MapObjectEntry* mobj;
+    s32 i;
+
+    if (strcmp(name, "me") != 0) {
+        mobj = mobjNameToPtr(name);
+    } else {
+        mobj = event->thisMapObj;
+    }
+    for (i = 0; i < 2; i++) {
+        if (mobj->hitObj[i].name != NULL && strcmp(mobj->hitObj[i].name, "") != 0) {
+            hitGrpFlagOn(mobj->hitObj[i].name, 1);
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(juyoitem_get_no) {
+    evtSetValue(event, event->args[0], ((ItemEntry*)event->lwData[8])->itemId);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(juyoitem_end) {
+    ItemEntry* item = (ItemEntry*)event->lwData[8];
+
+    effSoftDelete((EffectEntry*)event->lwData[9]);
+    marioSetCamId(4);
+    iconFlagOff(item->name, 0x200);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(juyoitem_gogo) {
+    ItemEntry* item = (ItemEntry*)event->lwData[8];
+
+    iconFlagOff(item->name, 0x200);
+    itemSetPosition(item, 0.0f, -1000.0f, 0.0f);
+    marioChgStayMotion();
+    marioStSystemLevel(0);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(juyoitem_goato) {
+    iconFlagOn(((ItemEntry*)event->lwData[8])->name, 2);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lect_mobj_set_nosysblend) {
+    const char* name = (const char*)evtGetValue(event, event->args[0]);
+    MapObjectEntry* mobj;
+
+    if (strcmp(name, "me") != 0) {
+        mobj = mobjNameToPtr(name);
+    } else {
+        mobj = event->thisMapObj;
+    }
+    animPoseSetMaterialFlagOn(mobj->poseId, 0x1800);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lect_push_a_check) {
+    s32* args = event->args;
+
+    if (keyGetButton(0) & 0x100) {
+        evtSetValue(event, args[0], TRUE);
+    } else {
+        evtSetValue(event, args[0], FALSE);
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(lect_push_b_check) {
+    s32* args = event->args;
+
+    if (keyGetButton(0) & 0x200) {
+        evtSetValue(event, args[0], TRUE);
+    } else {
+        evtSetValue(event, args[0], FALSE);
+    }
+    return EVT_RETURN_DONE;
+}
+
+BOOL psndBGMStartCheck(s32 id);
+
+static USER_FUNC(bgm_start_wait) {
+    return psndBGMStartCheck(1) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+}
+
+__declspec(section ".data") u64 fd_evt_lect_mri_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_evt_lect_mri_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_evt_lect_mri_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_evt_lect_mri_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_evt_lect_mri_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_evt_lect_mri_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_evt_lect_mri___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_evt_lect_mri_one_364[] = {
+    1065353216,
+};
+
+EVT_BEGIN(boots_lv2_juyoitem_lecture_init)
+    CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+    CALL(evt_mario_set_pos, 0, 0, 70)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(0), 150)
+    CALL(evt_npc_flag_onoff, 1, STRING("キノピコ"), 1536)
+    CALL(evt_npc_flag_onoff, 1, STRING("キノピコ"), 1073741856)
+    CALL(evt_npc_set_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
+    CALL(evt_npc_set_ry, STRING("キノピコ"), 270)
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.0f), FLOAT(26.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(lect_mario_ido_sum, 1000)
+    CALL(evt_mario_cont_onoff, 1)
+    CALL(evt_mario_set_dir, 90, 300, 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(boots_lv2_juyoitem_lecture)
+    BEGIN_SIBLING_EVENT
+        CALL(lecture_button_rtn)
+    END_SIBLING_EVENT
+    CALL(evt_npc_set_camid, STRING("キノピコ"), 7)
+    WAIT_FRAMES(1)
+    CALL(lecture_button_set_pos, 0, FLOAT(-200.0f), FLOAT(-25.0f), FLOAT(0.0f))
+    CALL(evt_npc_get_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
+    SUBTRACT(LW(0), 85)
+    CALL(evt_npc_move_position, STRING("キノピコ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    CALL(evt_msg_print, 0, STRING("lecture_s_boots_04"), 0, STRING("キノピコ"))
+    CALL(evt_msg_print_add, 0, STRING("lecture_s_boots_05"))
+    LOOP(0)
+        CALL(evt_msg_toge, 1, 0, 0, 0)
+        CALL(evt_msg_print, 0, STRING("lecture_s_boots_06"), 0, 0)
+        CALL(x_flag_set, 1, 1)
+        BEGIN_INLINE_EVENT
+            CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_3"), STRING("T_3"))
+            CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("S_3"))
+            LOOP(0)
+                CALL(evt_sub_random, 2, LW(1))
+                ADD(LW(1), 4)
+                MULTIPLY(LW(1), 2)
+                LOOP(LW(1))
+                    WAIT_MS(500)
+                    CALL(x_flag_get, 1, LW(0))
+                    IF_INT_EQUAL(LW(0), 2)
+                        BREAK_LOOP
+                    END_IF
+                END_LOOP
+                CALL(x_flag_get, 1, LW(0))
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+                CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("T_3"))
+                CALL(evt_msg_print, 0, STRING("lecture_s_boots_07"), 0, STRING("キノピコ"))
+                CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("S_3"))
+            END_LOOP
+            CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_1"), STRING("T_1"))
+            CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("S_1"))
+        END_INLINE_EVENT
+        CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(85.0f), FLOAT(520.0f), FLOAT(0.0f), FLOAT(40.0f), FLOAT(-100.0f), 1000, 11)
+        WAIT_MS(1000)
+        CALL(lecture_button_flag_on_off, 0, 2, 1)
+        CALL(lecture_button_set_icon_id, 0, 100)
+        CALL(lecture_button_set_seq, 0, 2)
+        CALL(lecture_button_seq_wait, 0, 1)
+        CALL(x_flag_set, 0, 1)
+        BEGIN_INLINE_EVENT
+            LOOP(0)
+                CALL(lecture_button_set_icon_id, 0, 101)
+                WAIT_MS(300)
+                CALL(x_flag_get, 0, LW(0))
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+                CALL(lecture_button_set_icon_id, 0, 100)
+                WAIT_MS(300)
+                CALL(x_flag_get, 0, LW(0))
+                IF_INT_EQUAL(LW(0), 2)
+                    BREAK_LOOP
+                END_IF
+            END_LOOP
+        END_INLINE_EVENT
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SET_VALUE(LW(7), 0)
+        CALL(mainwindow_opendisable)
+        CALL(evt_mario_trigflag_onoff, 1, 134217728)
+        CALL(evt_mario_trigflag_onoff, 1, 67108864)
+        CALL(evt_mario_set_enable_key, 256)
+        CALL(evt_mario_key_onoff, 1)
+        CALL(evt_mario_key_onoff, 1)
+        CALL(evt_mario_key_onoff, 1)
+        LOOP(0)
+            CALL(lect_status_off)
+            WAIT_FRAMES(1)
+            CALL(evt_mario_get_motion, LW(3))
+            IF_INT_EQUAL(LW(7), 0)
+                IF_INT_EQUAL(LW(3), 17)
+                    CALL(lecture_button_set_seq, 0, 3)
+                    ADD(LW(7), 1)
+                    CALL(x_flag_set, 1, 2)
+                END_IF
+                ELSE
+                IF_INT_EQUAL(LW(7), 1)
+                    IF_INT_NOT_EQUAL(LW(3), 17)
+                        BREAK_LOOP
+                    END_IF
+                END_IF
+            END_IF
+        END_LOOP
+        CALL(evt_mario_key_onoff, 0)
+        CALL(evt_mario_key_onoff, 0)
+        CALL(evt_mario_key_onoff, 0)
+        CALL(lect_status_on)
+        CALL(evt_mario_trigflag_onoff, 0, 134217728)
+        CALL(evt_mario_trigflag_onoff, 0, 67108864)
+        CALL(evt_mario_set_enable_key, 0)
+        CALL(mainwindow_openenable)
+        CALL(x_flag_set, 0, 2)
+        CALL(evt_mario_set_pose, STRING("M_S_1"))
+        CALL(evt_mario_adjust_dir)
+        CALL(evt_msg_continue)
+        CALL(evt_mario_set_pose, STRING("M_V_2"))
+        WAIT_MS(500)
+        CALL(lecture_button_seq_wait, 0, 1)
+        WAIT_MS(300)
+        CALL(evt_mario_set_pose, STRING("M_S_1"))
+        CALL(evt_mario_adjust_dir)
+        CALL(evt_mario_set_dir, 90, 150, 0)
+        CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.0f), FLOAT(26.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 0)
+        WAIT_MS(1000)
+        CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_2"), STRING("T_2"))
+        CALL(evt_msg_print, 0, STRING("lecture_s_boots_08"), 0, STRING("キノピコ"))
+        CALL(evt_msg_select, 0, STRING("lecture_s_boots_09"))
+        CALL(evt_npc_set_autotalkpose, STRING("キノピコ"), STRING("S_1"), STRING("T_1"))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(evt_msg_print_add, 0, STRING("lecture_s_boots_10"))
+            ELSE
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(evt_msg_print_add, 0, STRING("lecture_s_boots_11"))
+    CALL(evt_cam3d_evt_set_rel, FLOAT(0.0f), FLOAT(80.0f), FLOAT(455.0f), FLOAT(52.0f), FLOAT(30.0f), FLOAT(-100.0f), 1000, 11)
+    CALL(evt_npc_get_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
+    ADD(LW(0), 35)
+    CALL(evt_npc_set_ry, STRING("キノピコ"), 90)
+    WAIT_MS(300)
+    CALL(evt_npc_move_position, STRING("キノピコ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    CALL(evt_npc_set_ry, STRING("キノピコ"), 270)
+    WAIT_MS(300)
+    CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("A_1"))
+    WAIT_MS(200)
+    SET_VALUE(LW(1), STRING("TESTMOBJ"))
+    CALL(evt_mobj_entry, LW(1), STRING("MOBJ_BlackBreakingFloor"))
+    CALL(lect_mobj_hit_nasi, LW(1))
+    CALL(evt_mobj_set_camid, LW(1), 7)
+    CALL(evt_mario_get_pos, 0, LW(2), LW(3), LW(4))
+    ADD(LW(2), 50)
+    ADD(LW(3), 150)
+    SET_VALUE(LW(4), 0)
+    CALL(evt_mobj_flag_onoff, 1, LW(1), 64)
+    CALL(evt_mobj_set_position, LW(1), LW(2), LW(3), LW(4))
+    CALL(evt_snd_sfxon, STRING("SFX_EVT_LECTURE_BLOCK_FALL1"), LW(7))
+    CALL(evt_mobj_set_gravity_bound, LW(1), FLOAT(0.16601563f), FLOAT(1.0f))
+    WAIT_MS(600)
+    CALL(evt_snd_sfxoff, LW(7))
+    CALL(evt_snd_sfxon, STRING("SFX_EVT_LECTURE_BLOCK_DOWN1"), 0)
+    WAIT_MS(400)
+    CALL(evt_npc_set_anim, STRING("キノピコ"), STRING("A_2"))
+    WAIT_MS(170)
+    CALL(evt_msg_print, 0, STRING("lecture_s_boots_12"), 0, STRING("キノピコ"))
+    WAIT_MS(300)
+    LOOP(6)
+        CALL(evt_mobj_flag_onoff, 1, LW(1), 16384)
+        WAIT_MS(100)
+        CALL(evt_mobj_flag_onoff, 0, LW(1), 16384)
+        WAIT_MS(100)
+    END_LOOP
+    CALL(evt_mobj_delete, LW(1))
+    WAIT_MS(300)
+    CALL(evt_msg_print, 0, STRING("lecture_s_boots_13"), 0, STRING("キノピコ"))
+    CALL(evt_npc_get_position, STRING("キノピコ"), LW(0), LW(1), LW(2))
+    ADD(LW(0), 100)
+    CALL(evt_npc_set_ry, STRING("キノピコ"), 90)
+    WAIT_MS(300)
+    CALL(evt_npc_move_position, STRING("キノピコ"), LW(0), LW(2), 0, FLOAT(80.0f), 0)
+    CALL(evt_npc_set_position, STRING("キノピコ"), 0, -1000, 0)
+    RETURN
+EVT_END()
+
+s32 all_juyoitem_lecture_rel_19_data_3A540[] = {
+    65627, (s32)evt_mario_normalize, 131163, (s32)juyoitem_get_no, -29999990, 131163, (s32)evt_mario_set_camid, 7,
+    131163, (s32)effitemget_open_ptr, -29999991, 65627, (s32)juyoitem_gogo, 327771, (s32)evt_mario_get_pos, 0,
+    -30000000, -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_OFF_PARTY_LECTURE1_1", -30000000, -29999999,
+    -29999998, 0, 65627, (s32)evt_npc_stop_for_event, 131163, (s32)evt_npc_start_for_one_event, (s32)/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52", 131163,
+    (s32)evt_party_stop, 0, 65546, 1000, 131163, (s32)evt_snd_bgmoff, 1024, 196699,
+    (s32)evt_snd_bgmon, 1, (s32)"BGM_EVT_LECTURE1", 131163, (s32)evt_snd_envoff, 1024, 65627, (s32)bgm_start_wait,
+    65627, (s32)lect_cam_save, 131163, (s32)effitemget_busaiku, 1, 65545, 1, 131163,
+    (s32)evt_mario_cont_onoff, 0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998,
+    131122, -29999997, -29999999, 131130, -29999997, -227935616, 262235, (s32)evt_mario_set_pos,
+    -30000000, -29999997, -29999998, 196699, (s32)effitemgetchange_cam_ptr, -29999991, 4, 131163,
+    (s32)evt_paper_entry, (s32)"OFF_d_seal_upper_right", 131163, (s32)evt_img_entry, (s32)"img", 196699, (s32)evt_img_set_paper, (s32)"img",
+    (s32)"OFF_d_seal_upper_right", 196699, (s32)evt_img_free_capture, (s32)"img", 0, 589915, (s32)evt_img_alloc_capture, (s32)"img",
+    0, 0, 1, 0, 0, 608, 480, 131163,
+    (s32)evt_img_clear_virtual_point, (s32)"img", 196699, (s32)evt_img_set_paper_anim, (s32)"img", (s32)"Z_1", 196699, (s32)evt_img_onoff,
+    (s32)"img", 1, 65545, 1, 131163, (s32)effitemget_busaiku, 0, 131163,
+    (s32)evt_eff_softdelete_ptr, -29999991, 65545, 1, 262235, (s32)evt_mario_set_pos, -30000000, -29999999,
+    -29999998, 131163, (s32)evt_mario_cont_onoff, 1, 65627, (s32)lect_test_systemlevel, 458843, (s32)evt_npc_sound_data_set,
+    (s32)/*"キノピコ"*/"\x83\x4C\x83\x6D\x83\x73\x83\x52", (s32)"SFX_FLD_NPC_KINOPIO_MOVE1L", (s32)"SFX_FLD_NPC_KINOPIO_MOVE1R", -250000000, -250000000, -250000000, 65570, -29999990,
+    65572, 7, 65630, (s32)boots_lv2_juyoitem_lecture_init, 49, 65570, -29999990, 65572,
+    7, 65630, (s32)boots_lv2_juyoitem_lecture, 49, 65541, 6, 196699, (s32)evt_mario_dispflag_onoff,
+    1, 1, 65546, 100, 327771, (s32)evt_mario_get_pos, 0, -30000000,
+    -29999999, -29999998, 393307, (s32)evt_snd_sfxon_3d, (s32)"SFX_EVT_LECTUREN_BLINKING1", -30000000, -29999999, -29999998,
+    0, 196699, (s32)evt_mario_dispflag_onoff, 0, 1, 65546, 100, 6,
+    196699, (s32)evt_mario_dispflag_onoff, 1, 1, 65627, (s32)evt_mario_init_camid, 131163, (s32)lect_cam_load,
+    0, 196699, (s32)evt_cam3d_evt_off, 0, 11, 65627, (s32)evt_cam_road_reset, 196699,
+    (s32)evt_mario_dispflag_onoff, 0, 1, 131163, (s32)evt_snd_bgmoff, 513, 196699, (s32)evt_snd_bgmon,
+    288, 0, 131163, (s32)evt_snd_envoff, 513, 196699, (s32)evt_snd_envon, 288,
+    0, 327771, (s32)evt_mario_get_pos, 0, -30000000, -29999999, -29999998, 393307,
+    (s32)evt_snd_sfxon_3d, (s32)"SFX_OFF_PARTY_LECTURE1", -30000000, -29999999, -29999998, 0, 196699, (s32)evt_img_set_paper_anim,
+    (s32)"img", (s32)"A_1", 131163, (s32)evt_img_wait_animend, (s32)"img", 65627, (s32)juyoitem_goato, 131163,
+    (s32)evt_img_release, (s32)"img", 131163, (s32)evt_paper_delete, (s32)"OFF_d_seal_upper_right", 65627, (s32)evt_npc_start_for_event, 131163,
+    (s32)evt_party_run, 0, 2, 1,
+};
+

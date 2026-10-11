@@ -189,34 +189,6 @@ static USER_FUNC(_leg_smoke_effect) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(_btlgon_get_escape_param) {
-    s32* args = event->args;
-    s32 x = evtGetValue(event, args[0]);
-    s32 y = evtGetValue(event, args[1]);
-    s32 dxVar = args[2];
-    s32 dyVar = args[3];
-    s32 speedVar = args[4];
-    f32 angle = angleABf(100.0f, 205.0f, x, y);
-    s32 dx;
-    s32 dy;
-    f32 speed;
-
-    if (angle > 270.0f && angle < 360.0f) {
-        angle = 270.0f;
-    }
-    if (angle < 90.0f) {
-        angle = 90.0f;
-    }
-    dx = 500.0f * sinfd(angle);
-    dy = 500.0f * -cosfd(angle);
-    speed = 6.0f + rand() % 6;
-    speed = 0.67f * speed;
-    evtSetValue(event, dxVar, dx);
-    evtSetValue(event, dyVar, dy);
-    evtSetFloat(event, speedVar, speed);
-    return EVT_RETURN_DONE;
-}
-
 __declspec(section ".data") u64 fd_boss_gonbaba_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_boss_gonbaba_neg_one_382[] = {
@@ -450,6 +422,34 @@ static s32 battle_entry_event[] = {
     0, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 3, 2, 1,
 };
 
+USER_FUNC(_btlgon_get_escape_param) {
+    s32* args = event->args;
+    s32 x = evtGetValue(event, args[0]);
+    s32 y = evtGetValue(event, args[1]);
+    s32 dxVar = args[2];
+    s32 dyVar = args[3];
+    s32 speedVar = args[4];
+    f32 angle = angleABf(100.0f, 205.0f, x, y);
+    s32 dx;
+    s32 dy;
+    f32 speed;
+
+    if (angle > 270.0f && angle < 360.0f) {
+        angle = 270.0f;
+    }
+    if (angle < 90.0f) {
+        angle = 90.0f;
+    }
+    dx = 500.0f * sinfd(angle);
+    dy = 500.0f * -cosfd(angle);
+    speed = 6.0f + rand() % 6;
+    speed = 0.67f * speed;
+    evtSetValue(event, dxVar, dx);
+    evtSetValue(event, dyVar, dy);
+    evtSetFloat(event, speedVar, speed);
+    return EVT_RETURN_DONE;
+}
+
 s32 negotiation_event[] = {
     131163, (s32)evt_btl_camera_set_prilimit, 1, 65627, (s32)evt_btl_camera_wait_move_end, 131163, (s32)btlevtcmd_ClearAllStatus, -2,
     262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1, (s32)pose_table, 196699, (s32)evt_btl_camera_set_mode, 1,
@@ -677,6 +677,16 @@ s32 negotiation_event[] = {
     2, 1,
 };
 
+USER_FUNC(_set_gonbaba_light) {
+    u8* light = lightGetPaperCraft();
+    Mtx mtx;
+
+    *(Vec*)(light + 0x24) = (Vec){-200.0f, 50.0f, 500.0f};
+    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
+    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
+    return EVT_RETURN_DONE;
+}
+
 s32 gon_extra_eaten_event[] = {
     65545, 14, 262235, (s32)btlevtcmd_SetUnitWork, -2, 4, 6, 196699,
     (s32)evt_audience_flag_on, -30000000, 18, 196699, (s32)evt_audience_flag_off, -30000000, 4, 262235,
@@ -728,6 +738,24 @@ s32 gon_extra_eaten_event[] = {
     131163, (s32)evt_audience_num_updown_in_event, -230001024, 2, 33, 131163, (s32)evt_audience_delete, -30000000,
     131163, (s32)evt_audience_num_updown_in_event, -230001024, 2, 1,
 };
+
+USER_FUNC(_wait_damage_event_end) {
+    BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    s32 id;
+    BattleUnit* unit;
+
+    id = evtGetValue(event, *args++);
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(wp, id);
+    if (unit == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    if (unit->damageEventId != 0 && evtCheckID(unit->damageEventId)) {
+        return EVT_RETURN_BLOCK;
+    }
+    return EVT_RETURN_DONE;
+}
 
 static __declspec(section ".data") EVT_BEGIN(damage_event)
     SET_VALUE(LW(10), -2)
@@ -1016,31 +1044,4 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
     RETURN
 EVT_END()
-
-USER_FUNC(_set_gonbaba_light) {
-    u8* light = lightGetPaperCraft();
-    Mtx mtx;
-
-    *(Vec*)(light + 0x24) = (Vec){-200.0f, 50.0f, 500.0f};
-    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
-    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_wait_damage_event_end) {
-    BattleWork* wp = _battleWorkPointer;
-    s32 id;
-    BattleUnit* unit;
-
-    id = evtGetValue(event, event->args[0]);
-    id = BattleTransID(event, id);
-    unit = BattleGetUnitPtr(wp, id);
-    if (unit == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    if (unit->damageEventId != 0 && evtCheckID(unit->damageEventId)) {
-        return EVT_RETURN_BLOCK;
-    }
-    return EVT_RETURN_DONE;
-}
 

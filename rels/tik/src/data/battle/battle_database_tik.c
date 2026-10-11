@@ -5,6 +5,8 @@
 #include "battle/battle_stage_object.h"
 #include "system.h"
 
+f32 sinfd(f32 degrees);
+
 static USER_FUNC(_wave_offset);
 extern s32 battle_flower_drop_param_default[];
 extern s32 battle_flower_drop_param_default2[];
@@ -190,34 +192,6 @@ __declspec(section ".data") s32 btlgrpsel_tik_btlno_tik_20_06_off[6];
 s32 btlsetup_tik_tbl[510];
 s32 btl_tik_setup_no_tbl[60];
 s32 bgset_tik_wave_event[59];
-
-static USER_FUNC(_wave_offset) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 varX = args[1];
-    s32 stepX = evtGetValue(event, varX);
-    s32 periodX = evtGetValue(event, args[2]);
-    s32 ampX = evtGetValue(event, args[3]);
-    s32 varY = args[4];
-    s32 stepY = evtGetValue(event, varY);
-    s32 periodY = evtGetValue(event, args[5]);
-    s32 ampY = evtGetValue(event, args[6]);
-    BattleStageObject* obj = BattleSearchObjectPtr(name);
-
-    obj->field_0x10.x = ampX * sinfd(stepX * 360 / periodX);
-    obj->field_0x10.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
-    stepX++;
-    if (stepX >= periodX) {
-        stepX = 0;
-    }
-    evtSetValue(event, varX, stepX);
-    stepY++;
-    if (stepY >= periodY) {
-        stepY = 0;
-    }
-    evtSetValue(event, varY, stepY);
-    return EVT_RETURN_DONE;
-}
 
 __declspec(section ".data") u64 fd_battle_database_tik_negone_one_374 = 0xBF8000003F800000;
 
@@ -1090,6 +1064,34 @@ s32 btl_tik_setup_no_tbl[] = {
     (s32)"BTLNO_TIK_20_06", 28, 0, 0,
 };
 
+static USER_FUNC(_wave_offset) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 varX = args[1];
+    s32 stepX = evtGetValue(event, varX);
+    s32 periodX = evtGetValue(event, args[2]);
+    s32 ampX = evtGetValue(event, args[3]);
+    s32 varY = args[4];
+    s32 stepY = evtGetValue(event, varY);
+    s32 periodY = evtGetValue(event, args[5]);
+    s32 ampY = evtGetValue(event, args[6]);
+    BattleStageObject* obj = BattleSearchObjectPtr(name);
+
+    obj->field_0x10.x = ampX * sinfd(stepX * 360 / periodX);
+    obj->field_0x10.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
+    stepX++;
+    if (stepX >= periodX) {
+        stepX = 0;
+    }
+    evtSetValue(event, varX, stepX);
+    stepY++;
+    if (stepY >= periodY) {
+        stepY = 0;
+    }
+    evtSetValue(event, varY, stepY);
+    return EVT_RETURN_DONE;
+}
+
 EVT_BEGIN(bgset_tik_wave_event)
     SET_VALUE(LW(0), 0)
     SET_VALUE(LW(1), 0)
@@ -1100,9 +1102,9 @@ EVT_BEGIN(bgset_tik_wave_event)
     SET_VALUE(LW(6), 0)
     SET_VALUE(LW(7), 0)
     LABEL(0)
-    CALL(_wave_offset, STRING("e_bero"), LW(2), 600, 20, LW(3), 250, 6)
-    CALL(_wave_offset, STRING("e_bero_1"), LW(4), 1100, 40, LW(5), 360, 7)
-    CALL(_wave_offset, STRING("クリボー１"), LW(6), 1250, 50, LW(7), 450, 8)
+    CALL(_wave_offset, STRING("nami_1"), LW(2), 600, 20, LW(3), 250, 6)
+    CALL(_wave_offset, STRING("nami_2"), LW(4), 1100, 40, LW(5), 360, 7)
+    CALL(_wave_offset, STRING("nami_3"), LW(6), 1250, 50, LW(7), 450, 8)
     WAIT_FRAMES(1)
     GOTO(0)
     RETURN

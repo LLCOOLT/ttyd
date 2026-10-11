@@ -31,9 +31,10 @@ typedef struct MapObjectEntry {
     s32 offscreenId;             // 0x19C
     u8 unk1A0[0x1CC - 0x1A0];    // 0x1A0
     s32 eventId;                 // 0x1CC
-    u8 unk1A4[0x1DC - 0x1D0];    // 0x1D0
+    s32 (*mainFunc)(struct MapObjectEntry*); // 0x1D0
+    u8 unk1D4[0x1DC - 0x1D4];    // 0x1D4
     s32 unk1DC;                  // 0x1DC
-    u8 unk1E0[0x1E4 - 0x1E0];    // 0x1E0
+    s32 unk1E0;                  // 0x1E0
     s32 unk1E4;                  // 0x1E4
     GXTexObj paperTexObj;        // 0x1E8
     void* unk208;                // 0x208

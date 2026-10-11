@@ -495,7 +495,7 @@ BOOL pouchEquipBadgeID(s32 badgeId);
 BOOL pouchUnEquipBadgeID(s32 badgeId);
 s32 pouchArriveBadge(s32 id);
 void pouchMajinaiInit(u32 curseCount);
-u8 pouchGetKpaCoin(void);
+s32 pouchGetKpaCoin(void);
 void pouchAddKpaCoin(u8 coins);
 u32 pouchGetKpaScore(void);
 void pouchAddKpaScore(u32 score);

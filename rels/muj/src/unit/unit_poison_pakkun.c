@@ -4,10 +4,11 @@
 #pragma force_active on
 #include "battle/battle.h"
 #include "battle/battle_sub.h"
-#include "system.h"
 #include "driver/effdrv.h"
 #include "stdlib.h"
 
+f32 intplGetValue(f32 start, f32 end, s32 mode, s32 currStep, s32 steps);
+s32 irand(s32 scalar);
 EffectEntry* effVaporN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 delay);
 
 USER_FUNC(btlevtcmd_AnimeChangePose);
@@ -110,89 +111,6 @@ static s32 ceil_fall_ready_event[131];
 static s32 return_event[256];
 static s32 normal_attack_event[311];
 static __declspec(section ".data") s32 wait_event[6];
-
-static USER_FUNC(shadow_scale_return) {
-    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
-
-    if (isFirstCall) {
-        unit->work[1] = 0;
-    }
-    part->field_0x78 = intplGetValue(0, unit->work[1], 15.0f, 0.0f, unit->work[0]);
-    if (unit->work[1] >= 15) {
-        return EVT_RETURN_DONE;
-    }
-    unit->work[1]++;
-    return EVT_RETURN_BLOCK;
-}
-
-static USER_FUNC(shadow_scale_small) {
-    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
-
-    if (isFirstCall) {
-        unit->work[1] = 0;
-    }
-    {
-        f32 start = unit->work[0];
-        part->field_0x78 = intplGetValue(0, unit->work[1], 15, start, 0.0f);
-    }
-    if (unit->work[1] >= 15) {
-        return EVT_RETURN_DONE;
-    }
-    unit->work[1]++;
-    return EVT_RETURN_BLOCK;
-}
-
-static USER_FUNC(shadow_scale_memory) {
-    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
-
-    unit->work[0] = part->field_0x78;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(pakkun_ceil_exist) {
-    s32* args = event->args;
-
-    if (_battleWorkPointer->field_180DC & 0x20) {
-        evtSetValue(event, args[0], 0);
-    } else {
-        evtSetValue(event, args[0], 1);
-    }
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(eff_poison_breath) {
-    f32 x;
-    f32 y;
-    f32 z;
-    EffectEntry* eff;
-    s32* wk;
-
-    if (evtGetValue(event, event->args[0]) == 0) {
-        x = -125.0f;
-    } else {
-        x = 125.0f;
-    }
-    x += irand(150) - 75;
-    y = irand(70);
-    z = irand(80) - 40;
-    eff = effVaporN64Entry(0, x, y, z, 2.5f + rand() / 32767.0f, 15);
-    wk = eff->userdata;
-    wk[6] = 32;
-    wk[7] = 115;
-    wk[8] = 100;
-    wk[9] = 255;
-    wk[10] = 32;
-    wk[11] = 115;
-    wk[12] = 100;
-    wk[13] = 255;
-    return EVT_RETURN_DONE;
-}
 
 __declspec(section ".data") u64 fd_poison_pakkun_negone_one_374 = 0xBF8000003F800000;
 
@@ -495,7 +413,7 @@ EVT_END()
 static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     CALL(btlevtcmd_AnimeChangePoseType, -2, 1, 31)
     WAIT_MS(250)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_kuwa_move_05"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PKF_S_1"))
     CALL(btlevtcmd_GetPos, -2, LW(0), LW(1), LW(2))
     CALL(btlevtcmd_CheckStatus, -2, 10, LW(3))
     IF_INT_NOT_EQUAL(LW(3), 0)
@@ -510,7 +428,7 @@ static EVT_BEGIN(dmg_avoid_counter_thorn_head_event)
     ADD(LW(1), 50)
     GOTO(90)
     LABEL(90)
-    CALL(evt_eff, STRING("A_kuwa_move_06"), STRING("S_kuwa_move_06"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff, STRING(""), STRING("toge_flush"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
     RETURN
 EVT_END()
 
@@ -522,7 +440,7 @@ static __declspec(section ".data") EVT_BEGIN(damage_event)
 EVT_END()
 
 static EVT_BEGIN(counter_damage_event)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("A_kuwa_move_07"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("PKF_D_1"))
     WAIT_MS(1000)
     CALL(btlevtcmd_CheckDamageCode, -2, 512, LW(0))
     IF_INT_NOT_EQUAL(LW(0), 0)
@@ -637,3 +555,82 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
+static USER_FUNC(shadow_scale_return) {
+    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
+
+    if (isFirstCall) {
+        unit->work[1] = 0;
+    }
+    part->field_0x78 = intplGetValue(0.0f, unit->work[0], 0, unit->work[1], 15);
+    if (unit->work[1] >= 15) {
+        return EVT_RETURN_DONE;
+    }
+    unit->work[1]++;
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(shadow_scale_small) {
+    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
+
+    if (isFirstCall) {
+        unit->work[1] = 0;
+    }
+    part->field_0x78 = intplGetValue(unit->work[0], 0.0f, 0, unit->work[1], 15);
+    if (unit->work[1] >= 15) {
+        return EVT_RETURN_DONE;
+    }
+    unit->work[1]++;
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(shadow_scale_memory) {
+    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
+
+    unit->work[0] = part->field_0x78;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(pakkun_ceil_exist) {
+    s32* args = event->args;
+
+    if (_battleWorkPointer->field_180DC & 0x20) {
+        evtSetValue(event, args[0], 0);
+    } else {
+        evtSetValue(event, args[0], 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(eff_poison_breath) {
+    f32 x;
+    f32 y;
+    f32 z;
+    EffectEntry* eff;
+    s32* wk;
+
+    if (evtGetValue(event, event->args[0]) == 0) {
+        x = -125.0f;
+    } else {
+        x = 125.0f;
+    }
+    x += irand(150) - 75;
+    y = irand(70);
+    z = irand(80) - 40;
+    eff = effVaporN64Entry(0, x, y, z, 2.5f + rand() / 32767.0f, 15);
+    wk = eff->userdata;
+    wk[6] = 32;
+    wk[7] = 115;
+    wk[8] = 100;
+    wk[9] = 255;
+    wk[10] = 32;
+    wk[11] = 115;
+    wk[12] = 100;
+    wk[13] = 255;
+    return EVT_RETURN_DONE;
+}

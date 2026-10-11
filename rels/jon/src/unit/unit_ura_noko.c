@@ -531,11 +531,6 @@ static s32 ura_attack_event[] = {
     131163, (s32)btlevtcmd_ResetFaceDirection, -2, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
-static __declspec(section ".data") EVT_BEGIN(wait_event)
-    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
-    RETURN
-EVT_END()
-
 static USER_FUNC(eff_aura) {
     s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -558,3 +553,9 @@ static USER_FUNC(eff_aura) {
     work->baseScale = unit->mSizeMultiplier;
     return EVT_RETURN_BLOCK;
 }
+
+static __declspec(section ".data") EVT_BEGIN(wait_event)
+    CALL(btlevtcmd_AnimeChangePoseFromTable, -2, 1)
+    RETURN
+EVT_END()
+

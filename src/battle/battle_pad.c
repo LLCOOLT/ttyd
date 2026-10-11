@@ -152,7 +152,7 @@ BOOL BattlePadCheckTrigger(s32 mask) {
 	return BattlePadMultiCheckTrigger(0, mask);
 }
 
-u32  BattlePadMultiCheckTrigger(s32 chan, s32 mask) {
+BOOL BattlePadMultiCheckTrigger(s32 chan, s32 mask) {
 	u32* history = _battleWorkPointer->padWork[chan].mButtonsPressedHistory;
 	return history[0] & mask;
 }
@@ -170,7 +170,7 @@ u32 BattlePadCheckNow(s32 mask) {
 	return BattlePadMultiCheckNow(0, mask);
 }
 
-u32 BattlePadMultiCheckNow(s32 chan, s32 mask) {
+BOOL BattlePadMultiCheckNow(s32 chan, s32 mask) {
 	u32* history = _battleWorkPointer->padWork[chan].mButtonsHistory;
 	return history[0] & mask;
 }

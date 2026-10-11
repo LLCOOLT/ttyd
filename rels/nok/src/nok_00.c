@@ -282,16 +282,16 @@ EVT_BEGIN(nokonoko_B_talk)
         CASE_LESS_OR_EQUAL(402)
         CALL(evt_msg_print, 0, STRING("stg1_nok_05_1"), 0, 0)
         CASE_DEFAULT
-        CALL(evt_msg_print, 0, STRING(""), 0, 0)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_05_1_1"), 0, 0)
     END_SWITCH
     RETURN
 EVT_END()
 
 EVT_BEGIN(nokonoko_B_damage)
     CALL(evt_npc_set_anim, STRING("me"), STRING("KNP_O_1"))
-    CALL(evt_msg_print, 1, STRING(""), 0, 0)
+    CALL(evt_msg_print, 1, STRING("イャーン　さわらないで！！<key>"), 0, 0)
     WAIT_MS(200)
-    CALL(evt_npc_set_anim, STRING("me"), STRING(""))
+    CALL(evt_npc_set_anim, STRING("me"), STRING("KNP_S_1"))
     RETURN
 EVT_END()
 
@@ -311,7 +311,7 @@ EVT_BEGIN(nokonoko_C_talk)
         CASE_LESS(65)
         CALL(evt_msg_print, 0, STRING("stg1_nok_07"), 0, 0)
         CASE_LESS_OR_EQUAL(402)
-        CALL(evt_msg_print, 0, STRING("me"), 0, 0)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_07_1"), 0, 0)
         CASE_DEFAULT
         CALL(evt_msg_print, 0, STRING("stg1_nok_07_1_1"), 0, 0)
     END_SWITCH
@@ -321,7 +321,7 @@ EVT_END()
 EVT_BEGIN(nokonoko_D_talk)
     SWITCH(GSW(0))
         CASE_LESS(32)
-        CALL(evt_msg_print, 0, STRING("me"), 0, 0)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_08"), 0, 0)
         CASE_LESS(56)
         CALL(evt_msg_print, 0, STRING("stg1_nok_08_01"), 0, 0)
         CASE_LESS(65)
@@ -347,7 +347,7 @@ __declspec(section ".data") s32 iri_15_item_tbl2[] = {
 EVT_BEGIN(nokonoko_F_talk)
     IF_INT_EQUAL(GSW(1420), 15)
         IF_INT_EQUAL(GSWF(5405), 0)
-            CALL(evt_msg_print, 0, STRING(""), 0, 0)
+            CALL(evt_msg_print, 0, STRING("irai_15_001"), 0, 0)
             SET_VALUE(GSWF(5405), 1)
             ELSE
             CALL(evt_msg_print, 0, STRING("irai_15_002"), 0, 0)
@@ -364,7 +364,7 @@ EVT_BEGIN(nokonoko_F_talk)
                 IF_INT_EQUAL(LW(0), 159)
                     CALL(evt_pouch_remove_item, 159, LW(0))
                     IF_INT_EQUAL(GSWF(5406), 0)
-                        CALL(evt_msg_print, 0, STRING(""), 0, 0)
+                        CALL(evt_msg_print, 0, STRING("irai_15_003"), 0, 0)
                         SET_VALUE(GSWF(5406), 1)
                         ELSE
                         CALL(evt_msg_print, 0, STRING("irai_15_004"), 0, 0)
@@ -380,20 +380,20 @@ EVT_BEGIN(nokonoko_F_talk)
                 ELSE
                 IF_INT_EQUAL(LW(0), 206)
                     CALL(evt_pouch_remove_item, 206, LW(0))
-                    CALL(evt_msg_print, 0, STRING("nok_00"), 0, 0)
-                    CALL(evt_item_entry, STRING("nok_01"), 167, 0, -1000, 0, 17, -1, 0)
-                    CALL(evt_item_get_item, STRING("nok_01"))
-                    CALL(evt_item_get_item_end_wait, STRING("nok_01"))
-                    CALL(evt_msg_print, 0, STRING("nok_00"), 0, 0)
+                    CALL(evt_msg_print, 0, STRING("irai_15_005"), 0, 0)
+                    CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 17, -1, 0)
+                    CALL(evt_item_get_item, STRING("df"))
+                    CALL(evt_item_get_item_end_wait, STRING("df"))
+                    CALL(evt_msg_print, 0, STRING("irai_15_007"), 0, 0)
                     CALL(evt_sub_save_playtime, GSW(1445))
                     SET_VALUE(GSW(1420), 0)
                     SET_VALUE(GSWF(5389), 1)
-                    CALL(evt_msg_print, 0, STRING("nok_01"), 0, 0)
+                    CALL(evt_msg_print, 0, STRING("sys_request_finish"), 0, 0)
                     ELSE
                     IF_INT_EQUAL(LF(0), 0)
-                        CALL(evt_msg_print, 0, STRING("me"), 0, 0)
+                        CALL(evt_msg_print, 0, STRING("irai_15_009"), 0, 0)
                         ELSE
-                        CALL(evt_msg_print_add, 0, STRING("me"))
+                        CALL(evt_msg_print_add, 0, STRING("irai_15_009"))
                     END_IF
                 END_IF
             END_IF
@@ -417,9 +417,9 @@ EVT_BEGIN(nokonoko_F_talk)
             IF_INT_EQUAL(LW(0), 159)
                 CALL(evt_pouch_remove_item, 159, LW(0))
                 CALL(evt_msg_print, 0, STRING("irai_15_013"), 0, 0)
-                CALL(evt_item_entry, STRING("nok_01"), 167, 0, -1000, 0, 17, -1, 0)
-                CALL(evt_item_get_item, STRING("nok_01"))
-                CALL(evt_item_get_item_end_wait, STRING("nok_01"))
+                CALL(evt_item_entry, STRING("df"), 167, 0, -1000, 0, 17, -1, 0)
+                CALL(evt_item_get_item, STRING("df"))
+                CALL(evt_item_get_item_end_wait, STRING("df"))
                 CALL(evt_msg_print, 0, STRING("irai_15_015"), 0, 0)
                 ELSE
                 IF_INT_EQUAL(LF(0), 0)
@@ -469,9 +469,9 @@ static EVT_BEGIN(talk_white)
         CASE_LESS(55)
         CALL(evt_msg_print, 0, STRING("stg1_nok_19_02"), 0, 0)
         CASE_LESS(112)
-        CALL(evt_msg_print, 0, STRING("nok_00"), 0, 0)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_19_03"), 0, 0)
         CASE_DEFAULT
-        CALL(evt_msg_print, 0, STRING("nok_01"), 0, 0)
+        CALL(evt_msg_print, 0, STRING("stg1_nok_19_04"), 0, 0)
     END_SWITCH
     RETURN
 EVT_END()
@@ -487,7 +487,7 @@ static EVT_BEGIN(kizayarou_talk)
     CALL(evt_mario_get_party, LW(0))
     IF_INT_EQUAL(LW(0), 1)
         IF_INT_EQUAL(LSWF(1), 0)
-            CALL(evt_msg_print, 0, STRING("nok"), 0, 0)
+            CALL(evt_msg_print, 0, STRING("stg1_nok_10"), 0, 0)
             CALL(evt_party_set_dir_npc, 0, STRING("me"))
             CALL(evt_party_cont_onoff, 0, 0)
             CALL(evt_msg_print, 0, STRING("stg1_nok_11"), 0, STRING("party"))
@@ -1079,10 +1079,9 @@ USER_FUNC(pposter_init) {
 void draw_poster(void* userdata, s32 group) {
     NpcEntry* npc = npcNameToPtr("poster");
 
-    if (group == poster->group) {
-        if ((poster->flags & 1) != 0) {
-            animPoseDrawShape(npc->poseId, poster->shape);
-        }
+    if (group != poster->group || !(poster->flags & 1)) {
+        return;
     }
+    animPoseDrawShape(npc->poseId, poster->shape);
 }
 

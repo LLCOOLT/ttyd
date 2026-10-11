@@ -66,9 +66,10 @@ static USER_FUNC(lecture_init) {
 
 static USER_FUNC(_battle_set_lecture_unit_id) {
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 value;
 
-    value = evtGetValue(event, event->args[0]);
+    value = evtGetValue(event, *args++);
     wp->field_424 = value;
     return EVT_RETURN_DONE;
 }
@@ -229,9 +230,9 @@ EVT_END()
 static EVT_BEGIN(entry_event)
     WAIT_MS(900)
     CALL(btlevtcmd_SetPos, -2, -250, 0, -30)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("dokan_1"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("R_1"))
     CALL(btlevtcmd_MovePosition, -2, -60, 0, -30, 45, -1, 0)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("tik_15"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("S_1"))
     RETURN
 EVT_END()
 
@@ -241,31 +242,31 @@ static EVT_BEGIN(phase_event)
         CALL(btlevtcmd_get_turn, LW(0))
         IF_INT_EQUAL(LW(0), 1)
             CALL(btlevtcmd_StopWaitEvent, -3)
-            CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("dokan_2"))
-            CALL(btlevtcmd_SetTalkPose, -2, STRING("gor_02"))
-            CALL(btlevtcmd_SetStayPose, -2, STRING("tik_15"))
+            CALL(btlevtcmd_AnimeChangePose, -3, 1, STRING("M_S_1"))
+            CALL(btlevtcmd_SetTalkPose, -2, STRING("T_1"))
+            CALL(btlevtcmd_SetStayPose, -2, STRING("S_1"))
             CALL(btlevtcmd_StatusWindowOnOff, 0)
-            CALL(evt_msg_print, 2, STRING("dokan"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_01"), 0, -2)
             CALL(evt_btl_camera_set_mode, 0, 3)
             CALL(evt_btl_camera_set_moveto, 0, 71, 49, 213, 71, 35, 0, 30, 11)
             WAIT_FRAMES(30)
             CALL(evt_msg_toge, 1, 0, 0, 0)
-            CALL(evt_msg_print, 2, STRING("dokan_3"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_02"), 0, -2)
             CALL(evt_btl_camera_set_moveto, 0, 111, 85, 213, 111, 71, 0, 30, 11)
             WAIT_FRAMES(30)
             CALL(evt_msg_toge, 1, 0, 0, 0)
-            CALL(evt_msg_print, 2, STRING("dokan_5"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_03"), 0, -2)
             CALL(btlevtcmd_ChangeFaceDirection, -2, -1)
             CALL(evt_btl_camera_set_mode, 0, 0)
             WAIT_FRAMES(60)
-            CALL(evt_msg_print, 2, STRING("dokan_4"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_04"), 0, -2)
             CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
             WAIT_MS(1500)
             CALL(btlevtcmd_ChangeFaceDirection, -2, -1)
             CALL(evt_btl_camera_set_mode, 0, 3)
             CALL(evt_btl_camera_set_moveto, 0, -60, 82, 340, -60, 60, 13, 30, 11)
             WAIT_FRAMES(30)
-            CALL(evt_msg_print, 2, STRING("dokan_6"), 0, -2)
+            CALL(evt_msg_print, 2, STRING("mac_0_092_05"), 0, -2)
             CALL(btlevtcmd_ChangeFaceDirection, -2, 1)
             CALL(btlevtcmd_StatusWindowOnOff, 1)
             CALL(evt_btl_camera_set_mode, 0, 0)

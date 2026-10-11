@@ -132,6 +132,21 @@ static s32 guard_cancel_event[90];
 static s32 friend_event[88];
 static __declspec(section ".data") s32 wait_event[6];
 
+static USER_FUNC(togenoko_getnum) {
+    s32* args = event->args;
+    s32 num = 0;
+    s32 i;
+
+    for (i = 0; i < 64; i++) {
+        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
+        if (unit != NULL && unit->currentKind == 0x3C) {
+            num++;
+        }
+    }
+    evtSetValue(event, args[0], num);
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_togenoko_ace_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_togenoko_ace_neg_one_382[] = {
@@ -796,17 +811,3 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static USER_FUNC(togenoko_getnum) {
-    s32* args = event->args;
-    s32 num = 0;
-    s32 i;
-
-    for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
-        if (unit != NULL && unit->currentKind == 11) {
-            num++;
-        }
-    }
-    evtSetValue(event, args[0], num);
-    return EVT_RETURN_DONE;
-}

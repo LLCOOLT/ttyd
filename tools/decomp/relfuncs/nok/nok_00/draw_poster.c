@@ -7,9 +7,8 @@
 void draw_poster(void* userdata, s32 group) {
     NpcEntry* npc = npcNameToPtr("poster");
 
-    if (group == poster->group) {
-        if ((poster->flags & 1) != 0) {
-            animPoseDrawShape(npc->poseId, poster->shape);
-        }
+    if (group != poster->group || !(poster->flags & 1)) {
+        return;
     }
+    animPoseDrawShape(npc->poseId, poster->shape);
 }

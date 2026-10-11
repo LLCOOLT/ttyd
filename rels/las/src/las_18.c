@@ -57,18 +57,6 @@ static s32 switch_evt[48];
 static s32 hint_plate[14];
 s32 las_18_init_evt[71];
 
-USER_FUNC(get_mobj_seq) {
-    s32* args = event->args;
-    MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
-
-    if (mobj == NULL) {
-        evtSetValue(event, args[1], 1);
-    } else {
-        evtSetValue(event, args[1], mobj->unk1DC);
-    }
-    return EVT_RETURN_DONE;
-}
-
 __declspec(section ".data") u64 fd_las_18_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_las_18_neg_one_382[] = {
@@ -119,13 +107,13 @@ __declspec(section ".data") s32 fd_las_18_one_364[] = {
 
 static __declspec(section ".data") EVT_BEGIN(w_door_close)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.44433594f))
-    CALL(evt_mapobj_rotate, 1, STRING("S_doa_l_01"), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(w_door_open)
     MULTIPLY_FLOAT(LW(0), FLOAT(-0.44433594f))
-    CALL(evt_mapobj_rotate, 1, STRING("S_doa_l_01"), 0, LW(0), 0)
+    CALL(evt_mapobj_rotate, 1, STRING("S_door1"), 0, LW(0), 0)
     RETURN
 EVT_END()
 
@@ -138,19 +126,48 @@ static s32 bero_entry_data[] = {
 
 static EVT_BEGIN(box_evt)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_mobj_get_position, STRING("w_bero"), LW(0), LW(1), LW(2))
-    CALL(evt_item_entry, STRING("tik_05"), 45, LW(0), LW(1), LW(2), 17, -1, 0)
-    CALL(evt_mobj_wait_animation_end, STRING("w_bero"))
-    CALL(evt_item_get_item, STRING("tik_05"))
+    CALL(evt_mobj_get_position, STRING("box"), LW(0), LW(1), LW(2))
+    CALL(evt_item_entry, STRING("key"), 45, LW(0), LW(1), LW(2), 17, -1, 0)
+    CALL(evt_mobj_wait_animation_end, STRING("box"))
+    CALL(evt_item_get_item, STRING("key"))
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
+
+USER_FUNC(switch_set_alpha) {
+    s32 alpha = evtGetValue(event, event->args[0]);
+    MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
+
+    if (mobj == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    if (alpha > 0x24) {
+        mobj->flags &= ~2;
+    } else {
+        mobj->flags |= 2;
+    }
+    animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, alpha});
+    animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(switch_alpha_off) {
+    MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
+
+    if (mobj == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    mobj->flags &= ~2;
+    animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, 255});
+    animPoseSetMaterialFlagOff(mobj->poseId, 0x40);
+    return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(vivian_check)
     CALL(evt_seq_wait, 2)
     SET_VALUE(LW(15), 0)
     LOOP(0)
-        CALL(get_mobj_seq, STRING("n_bero"), LW(0))
+        CALL(get_mobj_seq, STRING("switch"), LW(0))
         IF_INT_GREATER(LW(0), 0)
             BREAK_LOOP
         END_IF
@@ -176,7 +193,7 @@ EVT_BEGIN(vivian_check)
             IF_INT_EQUAL(GSWF(4382), 0)
                 SET_VALUE(GSWF(4382), 1)
                 CALL(evt_snd_bgmoff, 1024)
-                CALL(evt_snd_bgmon, 1, STRING("e_bero"))
+                CALL(evt_snd_bgmon, 1, STRING("BGM_FF_ENV_SUCCESS1"))
                 WAIT_MS(2000)
                 CALL(evt_snd_bgmoff, 513)
                 CALL(evt_snd_bgmon, 288, 0)
@@ -187,16 +204,28 @@ EVT_BEGIN(vivian_check)
     RETURN
 EVT_END()
 
+USER_FUNC(get_mobj_seq) {
+    s32* args = event->args;
+    MapObjectEntry* mobj = mobjNameToPtrNoAssert((const char*)evtGetValue(event, args[0]));
+
+    if (mobj == NULL) {
+        evtSetValue(event, args[1], 1);
+    } else {
+        evtSetValue(event, args[1], mobj->unk1DC);
+    }
+    return EVT_RETURN_DONE;
+}
+
 static EVT_BEGIN(switch_evt)
     CALL(switch_alpha_off)
     CALL(evt_mario_key_onoff, 0)
     WAIT_MS(1250)
     CALL(evt_cam3d_evt_set, 0, 100, 363, 0, 30, -30, 500, 11)
     WAIT_MS(1000)
-    CALL(evt_mobj_set_position, STRING("w_bero"), 0, -30, 0)
-    CALL(evt_mobj_flag_onoff, 0, STRING("w_bero"), 16448)
-    CALL(evt_mobj_hit_onoff, STRING("w_bero"), 1)
-    SET_VALUE(LW(0), STRING("w_bero"))
+    CALL(evt_mobj_set_position, STRING("box"), 0, -30, 0)
+    CALL(evt_mobj_flag_onoff, 0, STRING("box"), 16448)
+    CALL(evt_mobj_hit_onoff, STRING("box"), 1)
+    SET_VALUE(LW(0), STRING("box"))
     CALL_CHILD(PTR(box_syutugen))
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
@@ -205,58 +234,29 @@ EVT_END()
 
 static EVT_BEGIN(hint_plate)
     CALL(evt_mario_key_onoff, 0)
-    CALL(evt_msg_print, 0, STRING("las_01"), 0, 0)
+    CALL(evt_msg_print, 0, STRING("stg8_las_43"), 0, 0)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
 
 EVT_BEGIN(las_18_init_evt)
-    CALL(evt_snd_bgmon, 512, STRING("stg8_las_01"))
-    CALL(evt_snd_envon, 272, STRING("SFX_VOICE_MARIO_NOD1_4"))
+    CALL(evt_snd_bgmon, 512, STRING("BGM_STG8_LST2"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG8_LAS1"))
     CALL(evt_snd_set_rev_mode, 2)
     SET_VALUE(LW(0), PTR(bero_entry_data))
     CALL(evt_bero_get_info)
     CALL_CHILD(PTR(evt_bero_info_run))
-    CALL(evt_mobj_floatswitch_blue, 0, STRING("n_bero"), 75, 60, 0, PTR(switch_evt), GSWF(4352))
-    CALL(evt_mobj_flag_onoff, 1, STRING("n_bero"), 2)
+    CALL(evt_mobj_floatswitch_blue, 0, STRING("switch"), 75, 60, 0, PTR(switch_evt), GSWF(4352))
+    CALL(evt_mobj_flag_onoff, 1, STRING("switch"), 2)
     IF_INT_EQUAL(GSWF(4352), 0)
         SPAWN_EVENT(PTR(vivian_check))
     END_IF
-    CALL(evt_mobj_itembox, STRING("w_bero"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(4369))
+    CALL(evt_mobj_itembox, STRING("box"), 0, 0, 0, 0, 0, PTR(box_evt), GSWF(4369))
     IF_INT_EQUAL(GSWF(4352), 0)
-        CALL(evt_mobj_flag_onoff, 1, STRING("w_bero"), 16384)
-        CALL(evt_mobj_hit_onoff, STRING("w_bero"), 0)
+        CALL(evt_mobj_flag_onoff, 1, STRING("box"), 16384)
+        CALL(evt_mobj_hit_onoff, STRING("box"), 0)
     END_IF
-    CALL(evt_run_case_evt, 9, 1, STRING("M_N_2"), 0, PTR(hint_plate), 0)
+    CALL(evt_run_case_evt, 9, 1, STRING("A_pure"), 0, PTR(hint_plate), 0)
     RETURN
 EVT_END()
-
-USER_FUNC(switch_alpha_off) {
-    MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
-
-    if (mobj == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    mobj->flags &= ~2;
-    animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, 255});
-    animPoseSetMaterialFlagOff(mobj->poseId, 0x40);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(switch_set_alpha) {
-    s32 alpha = evtGetValue(event, event->args[0]);
-    MapObjectEntry* mobj = mobjNameToPtrNoAssert("switch");
-
-    if (mobj == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    if (alpha > 0x24) {
-        mobj->flags &= ~2;
-    } else {
-        mobj->flags |= 2;
-    }
-    animPoseSetMaterialEvtColor(mobj->poseId, (GXColor){255, 255, 255, alpha});
-    animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
-    return EVT_RETURN_DONE;
-}
 

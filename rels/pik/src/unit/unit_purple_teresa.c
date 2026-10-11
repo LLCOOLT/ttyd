@@ -100,6 +100,78 @@ static s32 move_event[84];
 static s32 move_event_sub[103];
 static __declspec(section ".data") s32 wait_event[6];
 
+static USER_FUNC(teresa_check_teresa) {
+    s32* args = event->args;
+    s32 id = evtGetValue(event, args[0]);
+    s32 result = 0;
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+
+    if (unit == NULL) {
+        evtSetValue(event, args[1], 0);
+        return EVT_RETURN_DONE;
+    }
+    if (unit->currentKind == 0x4B) {
+        result = 1;
+    }
+    if (unit->currentKind == 0x6A) {
+        result = 1;
+    }
+    evtSetValue(event, args[1], result);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(teresa_check_move) {
+    s32* args = event->args;
+    s32 num = 0;
+    s32 i;
+
+    for (i = 0; i < 64; i++) {
+        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
+        if (unit != NULL) {
+            if (unit->currentKind == 0x4B && unit->work[0] == 0) {
+                num++;
+            }
+            if (unit->currentKind == 0x6A && unit->work[0] == 0) {
+                num++;
+            }
+        }
+    }
+    if (num >= 1) {
+        evtSetValue(event, args[0], 1);
+    } else {
+        evtSetValue(event, args[0], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(teresa_check_trans) {
+    s32* args = event->args;
+    s32 num = 0;
+    s32 id = evtGetValue(event, args[0]);
+    s32 self;
+    s32 i;
+
+    self = BattleTransID(event, id);
+
+    for (i = 0; i < 64; i++) {
+        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
+        if (unit != NULL) {
+            if (unit->currentKind == 0x4B && !BtlUnit_CheckStatus(unit, 0x12) && i != self) {
+                num++;
+            }
+            if (unit->currentKind == 0x6A && !BtlUnit_CheckStatus(unit, 0x12) && i != self) {
+                num++;
+            }
+        }
+    }
+    if (num >= 1) {
+        evtSetValue(event, args[1], 1);
+    } else {
+        evtSetValue(event, args[1], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_purple_teresa_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_purple_teresa_neg_one_382[] = {
@@ -540,72 +612,3 @@ static __declspec(section ".data") EVT_BEGIN(wait_event)
     RETURN
 EVT_END()
 
-static USER_FUNC(teresa_check_trans) {
-    s32* args = event->args;
-    s32 num = 0;
-    s32 id = evtGetValue(event, args[0]);
-    s32 self;
-    s32 i;
-
-    self = BattleTransID(event, id);
-
-    for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
-        if (unit != NULL) {
-            if (unit->currentKind == 0x4B && !BtlUnit_CheckStatus(unit, 0x12) && i != self) {
-                num++;
-            }
-            if (unit->currentKind == 0x6A && !BtlUnit_CheckStatus(unit, 0x12) && i != self) {
-                num++;
-            }
-        }
-    }
-    if (num >= 1) {
-        evtSetValue(event, args[1], 1);
-    } else {
-        evtSetValue(event, args[1], 0);
-    }
-    return EVT_RETURN_DONE;
-}
-static USER_FUNC(teresa_check_move) {
-    s32* args = event->args;
-    s32 num = 0;
-    s32 i;
-
-    for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, i);
-        if (unit != NULL) {
-            if (unit->currentKind == 0x4B && unit->work[0] == 0) {
-                num++;
-            }
-            if (unit->currentKind == 0x6A && unit->work[0] == 0) {
-                num++;
-            }
-        }
-    }
-    if (num >= 1) {
-        evtSetValue(event, args[0], 1);
-    } else {
-        evtSetValue(event, args[0], 0);
-    }
-    return EVT_RETURN_DONE;
-}
-static USER_FUNC(teresa_check_teresa) {
-    s32* args = event->args;
-    s32 id = evtGetValue(event, args[0]);
-    s32 result = 0;
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-
-    if (unit == NULL) {
-        evtSetValue(event, args[1], 0);
-        return EVT_RETURN_DONE;
-    }
-    if (unit->currentKind == 0x4B) {
-        result = 1;
-    }
-    if (unit->currentKind == 0x6A) {
-        result = 1;
-    }
-    evtSetValue(event, args[1], result);
-    return EVT_RETURN_DONE;
-}

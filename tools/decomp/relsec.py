@@ -53,8 +53,10 @@ def sections(path):
             nm, value, size, info, _, shndx = struct.unpack_from('>IIIBBH', d, st[4] + j * 16)
             sname = d[strs[4] + nm:d.index(b'\0', strs[4] + nm)].decode(errors='replace')
             if shndx == bss[0] and size and not sname.startswith('gap_'):
-                objs.append((value, size))
-        secs['.bss'] = (secs['.bss'][0], b''.join(struct.pack('>I', v) for v in sorted(set(v for v, _ in objs))))
+                objs.append((value, size, sname))
+        secs['.bss'] = (secs['.bss'][0], b''.join(struct.pack('>I', v) for v in sorted(set(v for v, _, _ in objs))))
+        # names too, so swapped objects of the same size are caught when both sides use the same names
+        secs['.bss names'] = {n: v for v, _, n in objs}
     return secs, relocs
 
 
@@ -67,6 +69,9 @@ if r.returncode:
     sys.exit(r.stdout + r.stderr)
 ours, our_rel = sections(os.path.join(tmp, os.path.basename(rel) + '.o'))
 target, tgt_rel = sections(f'build/G8MJ01/{mod}/obj/{rel}.o')
+tn, on = target.pop('.bss names', {}), ours.pop('.bss names', {})
+# same object names on both sides but at different offsets (swapped same-size statics)
+bss_swapped = set(tn) == set(on) and len(tn) > 1 and tn != on
 if '--score' in sys.argv:
     # total differing words over all sections (size mismatches count heavily); 0 = identical
     total = 0
@@ -74,7 +79,7 @@ if '--score' in sys.argv:
         t = target.get(sec, (0, b''))
         o = ours.get(sec, (0, b''))
         if sec == '.bss':
-            total += 0 if t[1] == o[1] and o[0] <= t[0] < o[0] + 8 else 4 + abs(t[0] - o[0])
+            total += 0 if t[1] == o[1] and o[0] <= t[0] < o[0] + 8 and not bss_swapped else 4 + abs(t[0] - o[0])
             continue
         if not (o[0] < t[0] < o[0] + 8 and not t[1][o[0]:].strip(b'\0')):
             total += abs(t[0] - o[0]) * 4
@@ -90,6 +95,8 @@ for sec in ('.text', '.rodata', '.data', '.bss'):
     status = 'OK' if t[0] == o[0] and not diffs else 'DIFF'
     if sec == '.bss':
         status = ('OK' if t[0] == o[0] else 'OK (tail padding)') if t[1] == o[1] and o[0] <= t[0] < o[0] + 8 else 'DIFF (layout)'
+        if bss_swapped:
+            status = 'DIFF (order: ' + ', '.join(sorted(tn, key=tn.get)) + ')'
         diffs = []
     # the split's end can include alignment padding the linker adds anyway
     if status == 'DIFF' and not diffs and o[0] < t[0] and t[0] - o[0] < 8 and not t[1][o[0]:].strip(b'\0'):

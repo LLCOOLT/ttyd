@@ -407,7 +407,7 @@ void BtlUnit_AddPartsScale(BattleUnitPart* part, f32 x, f32 y, f32 z) {
     }
 }
 
-s16 BtlUnit_GetWidth(BattleUnit* unit) {
+s32 BtlUnit_GetWidth(BattleUnit* unit) {
     return unit->mWidth;
 }
 
