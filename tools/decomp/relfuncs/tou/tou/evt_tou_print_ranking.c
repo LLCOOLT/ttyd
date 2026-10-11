@@ -12,14 +12,18 @@
 // include: pmario_sound.h
 // include: driver/dispdrv.h
 // include: string.h
-// decl: static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+// decl: #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 // decl: static void printRanking(void);
 // decl: static void disp_proc(CameraId cameraId, void* param);
 // proto: USER_FUNC(evt_tou_print_ranking);
 USER_FUNC(evt_tou_print_ranking) {
+    s32 rank;
+    s32 i;
+
     if (isFirstCall) {
         memset(dwp, 0, sizeof(DispWork));
-        dwp->page = getRank() / 11;
+        GET_RANK(rank, i);
+        dwp->page = rank / 11;
         dwp->y = dwp->targetY = dwp->page * 220;
         printRanking();
         return EVT_RETURN_BLOCK;

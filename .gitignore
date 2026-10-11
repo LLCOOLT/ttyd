@@ -69,3 +69,9 @@ rustc-ice-*.txt
 
 # Checker handoff files
 .checker/
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Compiler dependency files written to the repo root by tools that replay ninja compile commands
+/*.d

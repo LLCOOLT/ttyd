@@ -17,9 +17,9 @@ USER_FUNC(evt_ryushi) {
     RyushiWork* p;
     s32 i;
     s32 n;
-    f32 camX;
-    f32 alphaScale;
     f32 speed;
+    f32 alphaScale;
+    f32 camX;
     f32 scale;
     f32 w;
     f32 d;
@@ -92,17 +92,20 @@ USER_FUNC(evt_ryushi) {
                 }
                 break;
         }
-        w = 10.0f * xwp->base.x;
-        n = (p->pos.x - camX) / (w * 0.5f);
+        n = (p->pos.x - camX) / (10.0f * xwp->base.x / 2.0f);
         if (n != 0) {
             if (n > 0) {
                 n++;
             } else {
                 n--;
             }
-            p->pos.x += (-n / 2) * w;
+            p->pos.x += (-n / 2) * (10.0f * xwp->base.x);
         }
-        d = p->pos.z < 0.0f ? -p->pos.z : p->pos.z;
+        if (p->pos.z < 0.0f) {
+            d = -p->pos.z;
+        } else {
+            d = p->pos.z;
+        }
         d -= 100.0f;
         if (d < 0.0f) {
             d = 0.0f;

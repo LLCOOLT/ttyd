@@ -2,6 +2,8 @@
 // include: mario/mariost.h
 // include: system.h
 // include: dolphin/os.h
+// decl: typedef struct FuwaTable { f32 v[40]; } FuwaTable;
+// decl: static const FuwaTable fuwa_table = {{0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f, -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f}};
 // proto: USER_FUNC(gor_npc_fuwafuwa);
 USER_FUNC(gor_npc_fuwafuwa) {
     s32* args = event->args;
@@ -9,8 +11,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 speed = evtGetFloat(event, args[1]);
     s32 duration = evtGetValue(event, args[2]);
-    f32 table[40] = {0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f,
-                     -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f};
+    FuwaTable table = fuwa_table;
     Vec* base = (Vec*)&event->userdataf[1];
     s32 elapsed;
     s32 frame;
@@ -25,7 +26,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
     frame = (0.5f + sysMsec2FrameFloat(elapsed)) * speed;
     y = base->y;
-    y += table[(u32)frame % 40];
+    y += table.v[(u32)frame % 40];
     npc->position.y = npc->prevPosition.y = y;
     if (duration == 0) {
         return EVT_RETURN_BLOCK;

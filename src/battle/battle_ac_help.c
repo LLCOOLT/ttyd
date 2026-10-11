@@ -30,8 +30,9 @@ void _ac_help_disp(CameraId cameraId, void* param);
 
 void BattleAcHelpMain(void) {
 	BattleWork* wp = _battleWorkPointer;
+	s32* type = &wp->acHelpDispType;
 
-	if (wp->acHelpMsg && wp->acHelpDispType && !(wp->flags & 2)) {
+	if (wp->acHelpMsg && *type && !(wp->flags & 2)) {
 		dispEntry(CAMERA_2D, 498.0f, 1, _ac_help_disp, NULL);
 	}
 }
@@ -46,21 +47,22 @@ void _ac_help_disp(CameraId cameraId, void* param) {
 	u8 alpha;
 	f32 x;
 	f32 y;
+	const char** help = &wp->acHelpMsg;
 
 	alpha = 0xFF;
 	if (wp->acHelpDispType == 1) {
 		alpha = 0x80;
 	}
-	msg = msgSearch(wp->acHelpMsg);
+	msg = msgSearch(*help);
 	if (!msg) {
-		msg = "めっせーじがみつかりません";
+		msg = (0, "めっせーじがみつかりません");
 	}
 	width = FontGetMessageWidthLine(msg, &lines);
 	lines++;
 	col = color;
 	col.a = alpha;
-	x = 0.0f;
-	x -= width / 2;
+	y = 0.0f;
+	x = y - width / 2;
 	y = -148.0f;
 	windowDispGX_Waku_col(0, col, x - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
 	FontDrawStart_alpha(alpha);

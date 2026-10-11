@@ -1,0 +1,613 @@
+#include "party.h"
+#include "driver/hitdrv.h"
+#include "driver/mobjdrv.h"
+#include "mario/mario.h"
+#include "system.h"
+#include <dolphin/types.h>
+#include <string.h>
+#include <dolphin/mtx.h>
+
+extern MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
+
+#include "mario/mario_party.h"
+#include "mario/mario_sbr.h"
+
+extern int __float_nan[];
+
+extern double sin(double);
+extern double cos(double);
+extern f32 partyGetHeight(PartyEntry* party);
+extern f32 partyToMovedir(PartyEntry* party, f32 angle);
+
+
+extern HitEntry* marioHitCheckVec(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
+extern s32 yoshiGetStatus(void);
+
+#define PF(p, off) (*(f32*)((u8*)(p) + (off)))
+
+extern void partyChgMot(PartyEntry* party, s32 mot);
+extern HitEntry* partySearchGround(PartyEntry* party, f32 a, f32 b);
+extern HitEntry* partyChkFrontStep(PartyEntry* party, f32 a, f32* x, f32* y, f32* z);
+
+BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
+    MapObjectEntry* mobj;
+    marioGetPtr();
+    if (entry->attributes & 0x80080) {
+        return TRUE;
+    }
+    if (entry->attributes & 0x800004) {
+        return FALSE;
+    }
+    if (!(entry->attributes & 0x80000000)) {
+        return TRUE;
+    }
+    mobj = mobjHitObjPtrToPtr(entry);
+    if (!strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock") || !strcmp(mobj->animName, "MOBJ_HiddenBadgeBlock") ||
+        !strcmp(mobj->animName, "MOBJ_Hidden10CountBlock")) {
+        mobjHitObjPtrToPtr(entry);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL chkfilterYoshi(HitCheckQuery* query, HitEntry* entry) {
+    MapObjectEntry* mobj;
+    marioGetPtr();
+    if (entry->attributes & 0x80080) {
+        return TRUE;
+    }
+    if (entry->attributes & 0x800000) {
+        return TRUE;
+    }
+    if (entry->attributes & 0x4) {
+        return FALSE;
+    }
+    if (!(entry->attributes & 0x80000000)) {
+        return TRUE;
+    }
+    mobj = mobjHitObjPtrToPtr(entry);
+    if (!strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock") || !strcmp(mobj->animName, "MOBJ_HiddenBadgeBlock") ||
+        !strcmp(mobj->animName, "MOBJ_Hidden10CountBlock")) {
+        mobjHitObjPtrToPtr(entry);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
+    MapObjectEntry* mobj;
+    marioGetPtr();
+    if (entry->attributes & 0x800005) {
+        return FALSE;
+    }
+    if (entry->attributes & 0x80080) {
+        return TRUE;
+    }
+    if (!(entry->attributes & 0x80000000)) {
+        return TRUE;
+    }
+    mobj = mobjHitObjPtrToPtr(entry);
+    if (!strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock") || !strcmp(mobj->animName, "MOBJ_HiddenBadgeBlock") ||
+        !strcmp(mobj->animName, "MOBJ_Hidden10CountBlock")) {
+        mobjHitObjPtrToPtr(entry);
+        return FALSE;
+    }
+    return TRUE;
+}
+
+static inline HitEntry* partyHitCheckInl(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
+    HitCheckQuery query;
+    Vec d = *dir;
+    HitEntry* hit;
+    f32 rf;
+
+    query.targetPos = *pos;
+    query.targetDir = d;
+    query.targetDistance = *dist;
+    if (yoshiGetStatus()) {
+        hit = hitCheckVecFilter(&query, chkfilterYoshi);
+    } else if (party->currentMemberId == PARTY_MEMBER_KOOPS && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
+        hit = hitCheckVecFilter(&query, chkfilterNokotaro);
+    } else {
+        hit = hitCheckVecFilter(&query, chkfilter);
+    }
+    if (!hit) {
+        return hit;
+    }
+    if (query.targetDistance >= 0.0f) {
+        rf = 0.5f;
+    } else {
+        rf = -0.5f;
+    }
+    *dist = (s32)((1000.0f * query.targetDistance) + rf) / 1000.0f;
+    if (query.hitPos.x >= 0.0f) {
+        rf = 0.5f;
+    } else {
+        rf = -0.5f;
+    }
+    outPos->x = (s32)((1000.0f * query.hitPos.x) + rf) / 1000.0f;
+    if (query.hitPos.y >= 0.0f) {
+        rf = 0.5f;
+    } else {
+        rf = -0.5f;
+    }
+    outPos->y = (s32)((1000.0f * query.hitPos.y) + rf) / 1000.0f;
+    if (query.hitPos.z >= 0.0f) {
+        rf = 0.5f;
+    } else {
+        rf = -0.5f;
+    }
+    outPos->z = (s32)((1000.0f * query.hitPos.z) + rf) / 1000.0f;
+    outNrm->x = query.hitNormal.x;
+    outNrm->y = query.hitNormal.y;
+    outNrm->z = query.hitNormal.z;
+    return hit;
+}
+
+HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
+    return partyHitCheckInl(party, pos, dir, outPos, outNrm, dist);
+}
+
+static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
+static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
+
+f32 partyNrmToAngle(Vec* n) {
+    f32 x = n->x;
+    f32 z = n->z;
+    return angleABf(0.0f, 0.0f, party_sqrtf(x * x + z * z), -n->y);
+}
+
+void partyChkGnd(PartyEntry* party) {
+    s32 attr;
+    HitEntry* hit;
+    f32 a, b, c;
+
+    if (!(party->flags & 0x2000000)) {
+        attr = 0;
+        hit = partySearchGround(party, 11.0f, PF(party, 0x114));
+        if (hit) {
+            attr = hitGetAttr(hit);
+            if (attr & 0x200) {
+                hit = NULL;
+            }
+        }
+        party->field_138 = hit;
+        party->flags &= ~0x80;
+        if (hit == NULL) {
+            party->flags &= ~0x2;
+            partyChgMot(party, 3);
+            PF(party, 0x11C) = -1.0f;
+        } else {
+            party->flags |= 0x2;
+            if (attr & 0x100) {
+                party->flags |= 0x80;
+            } else {
+                party->flags &= ~0x80;
+            }
+        }
+        party->position.y = PF(party, 0xE4);
+        if (!(party->flags & 0x30)) {
+            partyChkFrontStep(party, 11.0f, &a, &b, &c);
+            if (a - party->position.y >= 5.0f && PF(party, 0xE0) <= 30.0f) {
+                PF(party, 0x120) = a;
+                if (PF(party, 0x104) != 0.0f) {
+                    partyChgMot(party, 6);
+                }
+            }
+        }
+    }
+}
+
+static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
+    PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
+    PF(party, 0xC8) = 0.0f;
+    PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+    return partyNrmToAngle(&n);
+}
+
+HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
+    HitEntry* hit;
+    HitEntry* best;
+    s32 i;
+    f32 ox, oz, gy, nsz, nsx, len, bestY, sx, sz, px, baseY, pz, probeY, rad, d;
+    Vec pos, outPos, outNrm;
+    f32 dist;
+
+    if (party->flags & 0x2000000) {
+        return NULL;
+    }
+    {
+        Vec zero = {0.0f, 0.0f, 0.0f};
+        *(Vec*)((u8*)party + 0xC4) = zero;
+    }
+    range = __fabsf(range) + 0.1f;
+    PF(party, 0xE0) = 0.0f;
+    if (marioGetPtr()->currMotionId == 0x1A) {
+        d = 5.0f;
+    } else {
+        d = 0.75f * partyGetHeight(party);
+    }
+    PF(party, 0xE4) = party->position.y;
+    PF(party, 0xE8) = -1.0f;
+    if (PF(party, 0x104) != 0.0f) {
+        rad = PF(party, 0x100);
+    } else {
+        rad = partyToMovedir(party, PF(party, 0x10C));
+    }
+    rad = 3.1415927f * rad / 180.0f;
+    sx = 0.375f * (party->width * (f32)sin(rad));
+    nsx = -sx;
+    sz = 0.375f * (party->width * -(f32)cos(rad));
+    baseY = party->position.y;
+    nsz = -sz;
+    probeY = baseY + d;
+    len = d + range;
+    {
+    Vec dir = {0.0f, -1.0f, 0.0f};
+    best = NULL;
+    px = party->position.x;
+    pz = party->position.z;
+    bestY = -10000.0f;
+    for (i = 0; i < 5; i++) {
+        if (i == 0) {
+            ox = 0.0f;
+            oz = 0.0f;
+        } else if (i == 1) {
+            ox = sx;
+            oz = sz;
+        } else if (i == 2) {
+            ox = nsz;
+            oz = sx;
+        } else if (i == 3) {
+            ox = sz;
+            oz = nsx;
+        } else if (i == 4) {
+            ox = nsx;
+            oz = nsz;
+        }
+        pos.x = px + ox;
+        pos.y = probeY;
+        pos.z = pz + oz;
+        dist = len;
+        hit = partyHitCheckInl(party, &pos, &dir, &outPos, &outNrm, &dist);
+        gy = outPos.y;
+        if (hit) {
+            if (partyNrmSet(party, outNrm) >= 50.0f) {
+                hit = NULL;
+            }
+        }
+        if (hit) {
+            PF(party, 0xE0) = partyNrmSet(party, outNrm);
+            if (gy < baseY && __fabsf(gy - baseY) >= 2.0f) {
+                if (__fabsf(gy - baseY) > __fabsf(depth)) {
+                    PF(party, 0xE8) = __fabsf(baseY - gy);
+                } else if (gy > bestY) {
+                    bestY = gy;
+                    best = hit;
+                }
+            } else if (__fabsf(gy - baseY) <= 11.0f) {
+                if (gy > bestY) {
+                    bestY = gy;
+                    best = hit;
+                }
+            }
+        }
+    }
+    }
+    if (best) {
+        PF(party, 0xE4) = bestY;
+        PF(party, 0xE8) = 0.0f;
+        return best;
+    }
+    return NULL;
+}
+
+HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng) {
+    HitEntry* hit;
+    f32 h, ang, sn, cs, ox, oy, oz, dx, gy;
+    Vec pos, outPos, outNrm;
+    f32 dist;
+
+    range += 0.01f;
+    {
+        Vec zero = {0.0f, 0.0f, 0.0f};
+        *(Vec*)((u8*)party + 0xC4) = zero;
+    }
+    PF(party, 0xE0) = 0.0f;
+    h = partyGetHeight(party);
+    *outY = party->position.y;
+    *outDist = -1.0f;
+    if (PF(party, 0x104) != 0.0f) {
+        ang = PF(party, 0x100);
+    } else {
+        ang = toMovedir(PF(party, 0x10C));
+    }
+    ang = revise360((s32)(0.5f + ang));
+    ang = 3.1415927f * ang / 180.0f;
+    dx = 0.265f * party->width;
+    sn = (f32)sin(ang);
+    cs = (f32)cos(ang);
+    oy = party->position.y;
+    ox = party->position.x;
+    oz = party->position.z;
+    {
+        Vec p = {0.0f, 0.0f, 0.0f};
+        Vec dir = {0.0f, -1.0f, 0.0f};
+        f32 mx;
+        f32 mz;
+        mx = dx * sn;
+        mz = dx * -cs;
+        p.x = ox + mx;
+        p.y = oy + h;
+        p.z = oz + mz;
+        pos = p;
+        dist = h + range;
+        hit = partyHitCheckInl(party, &pos, &dir, &outPos, &outNrm, &dist);
+    }
+    if (hit) {
+        PF(party, 0xE0) = partyNrmSet(party, outNrm);
+        gy = outPos.y;
+        if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
+            *outDist = oy - gy;
+            *outAng = angleABf(ox, oz, outPos.x, outPos.z);
+            return NULL;
+        }
+        *outY = gy;
+        *outDist = 0.0f;
+        *outAng = angleABf(ox, oz, outNrm.x, outNrm.z);
+        return hit;
+    }
+    return NULL;
+}
+
+static inline void partyWallSlide(Vec* out, Vec n, f32 d, f32 sn, f32 cs) {
+    Vec unused = {0.0f, 0.0f, 0.0f};
+    f32 mx = sn * d;
+    f32 mz = cs * d;
+    f32 dot = mx * n.x + mz * n.z;
+    out->x += 0.5f * (mx - dot * n.x);
+    out->z += 0.5f * (mz - dot * n.z);
+}
+
+HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
+    Vec qpos;
+    Vec qdir;
+    Vec outPos;
+    Vec bestNrm;
+    Vec nrm;
+    Vec v = {0.0f, 0.0f, 0.0f};
+    f32 arr[4];
+    f32 sn, cs, sn2, cs2;
+    f32 bestD, d;
+    f32 rd, maxD;
+    HitEntry* best;
+    HitEntry* hit;
+    s32 i;
+
+    sincosf(&sn, &cs, ang);
+    arr[0] = 0.75f * partyGetHeight(party);
+    arr[1] = 0.5f * partyGetHeight(party);
+    if ((party->flags & 0x30) || yoshiGetStatus() == 2) {
+        arr[2] = 1.0f;
+    } else {
+        arr[2] = 11.0f;
+    }
+    rd = 0.5f * party->width;
+    best = NULL;
+    maxD = rd + dist;
+    bestD = maxD;
+    {
+    Vec dir1 = {0.0f, 0.0f, 0.0f};
+    dir1.x = sn;
+    dir1.z = cs;
+    qpos = *pos;
+    qdir = dir1;
+    }
+    for (i = 0; i < 3; i++) {
+        d = maxD;
+        qpos.y = pos->y + arr[i];
+        hit = marioHitCheckVec(&qpos, &qdir, &outPos, &nrm, &d);
+        if (hit) {
+            if (best) {
+                if (d < bestD) {
+                    best = hit;
+                    bestD = d;
+                    bestNrm = nrm;
+                }
+            } else {
+                best = hit;
+                bestD = d;
+                bestNrm = nrm;
+            }
+        }
+    }
+    if (best) {
+        Vec nn;
+        f32 mx, mz, dot;
+        nn = bestNrm;
+        mx = sn * dist;
+        mz = cs * dist;
+        dot = mx * nn.x + mz * nn.z;
+        v.x += 0.5f * (mx - dot * nn.x);
+        v.z += 0.5f * (mz - dot * nn.z);
+    }
+    sincosf(&sn2, &cs2, ang + 45.0f);
+    bestD = rd;
+    {
+    Vec dir2 = {0.0f, 0.0f, 0.0f};
+    dir2.x = sn2;
+    dir2.z = cs2;
+    qpos = *pos;
+    qdir = dir2;
+    }
+    for (i = 0; i < 3; i++) {
+        bestD = rd;
+        qpos.y = pos->y + arr[i];
+        hit = marioHitCheckVec(&qpos, &qdir, NULL, NULL, &bestD);
+        if (hit) {
+            break;
+        }
+    }
+    if (hit) {
+        sincosf(&sn2, &cs2, ang - 45.0f);
+        for (i = 0; i < 3; i++) {
+            Vec dd = {0.0f, 0.0f, 0.0f};
+            bestD = rd;
+            qpos.y = pos->y + arr[i];
+            dd.x = sn2;
+            dd.z = cs2;
+            qdir = dd;
+            hit = marioHitCheckVec(&qpos, &qdir, NULL, NULL, &bestD);
+        }
+    }
+    if (best) {
+        if (!hit) {
+            pos->x += v.x;
+            pos->z += v.z;
+        }
+        return best;
+    }
+    if (!hit) {
+        pos->x += dist * sn;
+        pos->z += dist * cs;
+    }
+    return NULL;
+}
+
+HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
+    f32 sn, cs;
+    f32 d, dy, hh;
+    HitEntry* hit;
+    Vec p, nrm;
+
+    sincosf(&sn, &cs, ang);
+    d = 0.5f * party->width + dist;
+    hh = 0.75f * partyGetHeight(party);
+    p = party->position;
+    p.y += hh;
+    {
+    Vec dir = {0.0f, 0.0f, 0.0f};
+    Vec outPos = {0.0f, 0.0f, 0.0f};
+    dir.x = sn;
+    dir.z = cs;
+    hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
+    if (hit) {
+        PF(party, 0xEC) = d;
+        partyWallSlide(pos, nrm, dist, sn, cs);
+        return hit;
+    }
+    dy = 11.0f;
+    if (party->currentMemberId == PARTY_MEMBER_BOBBERY && (party->flags & PARTY_FLAG_IS_BEING_USED)) {
+        dy = 1.0f;
+    }
+    p = party->position;
+    d = 0.5f * party->width + dist;
+    p.y += dy;
+    hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
+    if (hit) {
+        if (partyNrmToAngle(&nrm) >= 45.0f) {
+            PF(party, 0xEC) = d;
+            partyWallSlide(pos, nrm, dist, sn, cs);
+            return hit;
+        }
+    }
+    }
+    PF(party, 0xEC) = -1.0f;
+    pos->x += dist * sn;
+    pos->z += dist * cs;
+    return NULL;
+}
+
+void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
+    Vec t;
+    f32 s, c;
+    f32 bx, by, bz;
+    f32 d0, nz0, ny0, nx0, hz0, hy0, hx0;
+    f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
+    f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
+    f32 d3, nz3, ny3, nx3, hz3, hy3, hx3;
+    f32 ox, oz, lx, ly, lz;
+    HitEntry* hit;
+    f32 best;
+
+    oz = 0.3f * party->width;
+    sincosf(&s, &c, angle);
+    bx = pos->x;
+    by = pos->y;
+    bz = pos->z;
+    ox = -oz * c;
+    oz = oz * s;
+    best = *dist;
+    {
+        Vec v0 = {0.0f, 0.0f, 0.0f};
+        lx = bx + oz;
+        ly = by;
+        lz = bz + ox;
+        v0.x = lx;
+        v0.y = ly;
+        v0.z = lz;
+        t = v0;
+        d0 = best;
+        hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        if (hit && best >= d0) {
+            best = d0;
+        }
+    }
+    if (!hit) {
+        Vec v1 = {0.0f, 0.0f, 0.0f};
+        lx = bx - oz;
+        ly = by;
+        lz = bz - ox;
+        v1.x = lx;
+        v1.y = ly;
+        v1.z = lz;
+        t = v1;
+        d1 = best;
+        hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        if (hit && best >= d1) {
+            best = d1;
+        }
+    }
+    if (!hit) {
+        Vec v2 = {0.0f, 0.0f, 0.0f};
+        lx = bx + ox;
+        ly = by;
+        lz = bz + oz;
+        v2.x = lx;
+        v2.y = ly;
+        v2.z = lz;
+        t = v2;
+        d2 = best;
+        hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        if (hit && best >= d2) {
+            best = d2;
+        }
+    }
+    if (!hit) {
+        Vec v3 = {0.0f, 0.0f, 0.0f};
+        lx = bx - ox;
+        ly = by;
+        lz = bz - oz;
+        v3.x = lx;
+        v3.y = ly;
+        v3.z = lz;
+        t = v3;
+        d3 = best;
+        hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        if (hit && best >= d3) {
+            best = d3;
+        }
+    }
+    if (hit) {
+        pos->x = lx;
+        pos->y = ly;
+        pos->z = lz;
+        *dist = best;
+    }
+    if (!hit) {
+        pos->x = lx;
+        pos->y = ly;
+        pos->z = lz;
+        *dist = 0.0f;
+    }
+}

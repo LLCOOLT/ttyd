@@ -1,0 +1,405 @@
+#include "dolphin/types.h"
+#include "mario/mario.h"
+#include "mario/mario_motion.h"
+#include "mot/mot_walk.h"
+#include "pmario_sound.h"
+#include "system.h"
+#include "driver/animdrv.h"
+#include "peach.h"
+
+int strcmp(const char*, const char*);
+void marioChkOverhead(void);
+void marioBottomless(void);
+void marioBalloonMain(void);
+void mario_kemuri_80130474(void);
+void partyMain(void);
+void marioCamMain(void);
+void marioSetFallPara(void);
+void marioJump(void);
+void marioFall(void);
+void marioChkGnd(void);
+void marioChkGnd2(void);
+void marioBoots(void);
+void marioAdjustMoveDir(void);
+f32 marioGetWalkSpd(void);
+void npcSetMarioAutoTalkPose(const char*, const char*);
+
+void peachChgPose(const char* name);
+void peachTransformOff(void);
+
+static inline void peachStepSe(s32 d1, s32 d2) {
+    MarioWork* mp = marioGetPtr();
+    s32 a, b;
+    if (!(mp->peachFlags & 0x2000)) {
+        if ((mp->peachFlags & 0x20) && mp->scale.y == 0.0f) {
+            a = 0x80C;
+            b = 0x80B;
+        } else {
+            a = 0x7C4;
+            b = 0x7C3;
+        }
+    } else {
+        a = 0x7E9;
+        b = 0x7E8;
+    }
+    if (*(s32*)&mp->multiTimer % d1 == 0) {
+        psndSFXOn_3D((char*)a, &mp->position);
+    } else if (*(s32*)&mp->multiTimer % d2 == 0) {
+        psndSFXOn_3D((char*)b, &mp->position);
+    }
+    mp->multiTimer++;
+}
+
+void peachSetStsNormal(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->peachFlags & 0x2000) {
+        peachTransformOff();
+    } else {
+        mp->peachFlags &= ~0x7F0;
+        peachChgPose("P_S_1");
+    }
+}
+
+void peachSetStsAftershower(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x10;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsInvisible(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x20;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsHappy(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x40;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsUneasy(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x80;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsAngry(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x100;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsOrdinary(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x200;
+    peachChgPose("P_S_1");
+}
+
+void peachSetStsCarry(void) {
+    MarioWork* mp = marioGetPtr();
+    mp->peachFlags &= ~0x7F0;
+    mp->peachFlags |= 0x400;
+    peachChgPose("P_S_1");
+}
+
+void peachChgPose(const char* name) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->dispFlags & 2) return;
+    if (mp->peachFlags & 0x2000) {
+        if (strcmp(name, "P_Z_1") == 0) name = "Z_1";
+        else if (strcmp(name, "P_S_1") == 0) name = "S_1";
+        else if (strcmp(name, "P_W_1") == 0) name = "W_1";
+        else if (strcmp(name, "P_R_1") == 0) name = "R_1";
+        else if (strcmp(name, "P_T_1") == 0) name = "T_1";
+    }
+    else if (mp->peachFlags & 0x10) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_2";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_2";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_2";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_2";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_2";
+    }
+    else if (mp->peachFlags & 0x20) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_3";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_3";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_3";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_3";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_3";
+    }
+    else if (mp->peachFlags & 0x80) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_4";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_4";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_4";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_4";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_4";
+    }
+    else if (mp->peachFlags & 0x40) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_5";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_5";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_5";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_5";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_5";
+    }
+    else if (mp->peachFlags & 0x100) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_6";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_6";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_6";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_6";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_6";
+    }
+    else if (mp->peachFlags & 0x200) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_7";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_7";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_7";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_7";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_13";
+    }
+    else if (mp->peachFlags & 0x400) {
+        if (strcmp(name, "P_Z_1") == 0) name = "P_Z_8";
+        else if (strcmp(name, "P_S_1") == 0) name = "P_S_8";
+        else if (strcmp(name, "P_W_1") == 0) name = "P_W_8";
+        else if (strcmp(name, "P_R_1") == 0) name = "P_R_8";
+        else if (strcmp(name, "P_T_1") == 0) name = "P_T_14\0";
+    }
+    if (mp->animName == NULL || strcmp(mp->animName, name) != 0) {
+        mp->animName = name;
+        mp->poseTime = 0;
+        mp->dispFlags &= ~0x30000000;
+        mp->trigFlags |= 0x1000;
+    }
+}
+
+void peachTransformOn(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->characterId != 1) {
+        marioSetCharMode(1);
+    }
+    if (!(mp->peachFlags & 0x2000)) {
+        mp->peachFlags |= 0x2000;
+        if (mp->paperAnimGroupId[0] >= 0) {
+            animPoseRelease(mp->paperAnimGroupId[0]);
+        }
+        mp->paperAnimGroupId[0] = animPoseEntry("c_zako_n", 2);
+        npcSetMarioAutoTalkPose("S_1", "T_1");
+        mp->wPlayerCollisionBox.y = 30.0f;
+        mp->wPlayerCollisionBox.x = 30.0f;
+    }
+}
+
+void peachTransformOff(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->characterId != 1) {
+        marioSetCharMode(1);
+    }
+    if (mp->peachFlags & 0x2000) {
+        mp->peachFlags &= ~0x2000;
+        if (mp->paperAnimGroupId[0] >= 0) {
+            animPoseRelease(mp->paperAnimGroupId[0]);
+        }
+        mp->paperAnimGroupId[0] = animPoseEntry("c_peach", 2);
+        npcSetMarioAutoTalkPose("P_S_1", "P_T_1");
+        mp->wPlayerCollisionBox.y = 47.0f;
+        mp->wPlayerCollisionBox.x = 20.0f;
+    }
+}
+
+void peachPreInit(void) {}
+
+s32 peachMain(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->currMotionId == 8) {
+        *(Vec*)((u8*)mp + 0x110) = mp->position;
+        mp->unk174.x = 0.0f;
+        mp->unk174.y = 0.0f;
+        mp->unk174.z = 0.0f;
+        marioBottomless();
+        marioPreDisp();
+        marioBalloonMain();
+        mario_kemuri_80130474();
+        partyMain();
+        marioCamMain();
+        (*(s32*)((u8*)mp + 0x34))++;
+        return 1;
+    }
+    if (mp->flags & 0x40000) {
+        marioMove();
+        marioChkOverhead();
+        if (mp->airTimer > 100) {
+            marioChgMot(10);
+            marioSetFallPara();
+        }
+    } else if (mp->flags & 0x10000) {
+        marioJump();
+        marioMove();
+        marioChkOverhead();
+        if (mp->airTimer > 5) marioChkGnd2();
+    } else if (mp->flags & 0x20000) {
+        marioMove();
+        marioFall();
+        marioChkOverhead();
+        if (mp->currMotionId != 16 && mp->currMotionId != 17 && mp->airTimer > 5) marioChkGnd2();
+    } else {
+        marioMove();
+        marioChkOverhead();
+        marioChkGnd();
+    }
+    if (mp->flags & 0x20) {
+        mp->forceMoveTimer--;
+        if (mp->forceMoveTimer <= 0) {
+            mp->forceMoveTimer = 0;
+            mp->flags &= ~0x20;
+        }
+    }
+    marioBoots();
+    marioBottomless();
+    marioPreDisp();
+    marioBalloonMain();
+    mario_kemuri_80130474();
+    partyMain();
+    marioCamMain();
+    (*(s32*)((u8*)mp + 0x34))++;
+    *(Vec*)((u8*)mp + 0x110) = mp->position;
+    mp->unk174.x = 0.0f;
+    mp->unk174.y = 0.0f;
+    mp->unk174.z = 0.0f;
+    return 1;
+}
+
+void peach_stay(void) {
+    MarioWork* mp = marioGetPtr();
+#define MT (*(s32*)&mp->multiTimer)
+    if (mp->trigFlags & 1) {
+        mp->trigFlags &= ~1;
+        mp->flags &= 0xFFF0FFFF;
+        mp->airTimer = 0;
+        MT = 0;
+        mp->currSubMotionId = 0;
+        peachChgPose("P_S_1");
+        if (!(mp->flags & 0x20)) {
+            mp->baseSpeed = 0.0f;
+        }
+    }
+    if (mp->controlStickSensitivity > 0.0f) {
+        marioChgMot(1);
+    }
+    if (!(mp->flags & 8)) {
+        if (mp->dispFlags & 0x40000000) {
+            return;
+        }
+        if (!(mp->peachFlags & 0x27F0)) {
+        switch (mp->currSubMotionId) {
+        case 0:
+            if (++MT >= sysMsec2Frame(50000)) {
+                marioChgPose("P_U_1");
+                MT = 80;
+                mp->currSubMotionId = 1;
+                mp->soundId[0] = psndSFXOn_3D((char*)0x101, &mp->position);
+                marioAdjustMoveDir();
+            }
+            break;
+        case 1:
+            if (--MT < 0) {
+                marioChgPose("P_S_1");
+                MT = 100;
+                mp->currSubMotionId = 2;
+            }
+            break;
+        case 2:
+            if (--MT < 0) {
+                marioChgPose("P_N_1");
+                MT = 0;
+                mp->currSubMotionId = 20;
+                *(s32*)((u8*)mp + 0x2b4) = 0;
+            }
+            break;
+        case 20:
+            if (++*(s32*)((u8*)mp + 0x2b4) >= sysMsec2Frame(10000)) {
+                *(s32*)((u8*)mp + 0x2b4) = sysMsec2Frame(10000);
+            }
+            if (++MT >= 100) {
+                MT = 0;
+            }
+            if (mp->flags & 8) {
+                marioChgPose("P_S_1");
+                mp->currSubMotionId = 0;
+            }
+            break;
+        }
+        }
+    }
+#undef MT
+}
+
+void peach_walk(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->trigFlags & 1) {
+        mp->trigFlags &= ~1;
+        mp->flags &= 0xFFF0FFFF;
+        if (mp->forceMoveTimer == 0) {
+            mp->baseSpeed = marioGetWalkSpd();
+        }
+        peachChgPose("P_W_1");
+        mp->currSubMotionId = 0;
+        mp->multiTimer = 0;
+    }
+    if (mp->forceMoveTimer == 0) {
+        mp->baseSpeed = marioGetWalkSpd();
+    }
+    if ((s8)mp->wStickDir1 * (s8)mp->wStickDir1 + (s8)mp->wStickDir2 * (s8)mp->wStickDir2 > 3025) {
+        marioChgMot(2);
+    } else {
+        mp->directionView = mp->controlStickAngle;
+        peachStepSe(40, 20);
+        if (!mp->controlStickSensitivity) {
+            marioChgMot(0);
+        }
+    }
+}
+
+void peach_dash(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->trigFlags & 1) {
+        mp->trigFlags &= ~1;
+        mp->flags &= 0xFFF0FFFF;
+        if (mp->forceMoveTimer == 0) {
+            mp->baseSpeed = marioGetDashSpd();
+        }
+        peachChgPose("P_R_1");
+        mp->currSubMotionId = 0;
+        mp->multiTimer = 0;
+    }
+    if (mp->forceMoveTimer == 0) {
+        mp->baseSpeed = marioGetDashSpd();
+    }
+    if (mp->flags & 0x20) {
+        peachStepSe(20, 10);
+    } else if ((s8)mp->wStickDir1 * (s8)mp->wStickDir1 + (s8)mp->wStickDir2 * (s8)mp->wStickDir2 <= 3025) {
+        marioChgMot(1);
+    } else {
+        mp->directionView = mp->controlStickAngle;
+        peachStepSe(20, 10);
+        if (!mp->controlStickSensitivity) {
+            marioChgMot(0);
+        }
+    }
+}
+
+void peach_talk(void) {
+    MarioWork* mp = marioGetPtr();
+    if (mp->trigFlags & 1) {
+        mp->trigFlags &= ~1;
+        mp->multiTimer = 0;
+        mp->airTimer = 0;
+        mp->currSubMotionId = 0;
+        mp->baseSpeed = 0.0f;
+        marioAdjustMoveDir();
+        peachChgPose("P_T_1");
+    }
+}

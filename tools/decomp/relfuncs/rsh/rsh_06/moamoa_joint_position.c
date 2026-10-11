@@ -25,12 +25,12 @@
 void moamoa_joint_position(Moamoa* moa, Vec* out) {
     NpcEntry* npc = npcNameToPtr("base");
     AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
-    MoamoaWork* w = wp;
-    f32 t = (f32)moa->order / (f32)w->chainNum[moa->group];
-    Vec* b = anim->worldPositions[0] + w->chainIdx[moa->group][1];
-    Vec* a = anim->worldPositions[0] + w->chainIdx[moa->group][0];
+    f32 t;
+    Vec* b = anim->worldPositions[0] + wp->chainIdx[moa->group][1];
+    Vec* a = anim->worldPositions[0] + wp->chainIdx[moa->group][0];
     Vec tmp;
 
+    t = (f32)moa->order / (f32)wp->chainNum[moa->group];
     PSVECScale(a, out, t);
     PSVECScale(b, &tmp, 1.0f - t);
     PSVECAdd(out, &tmp, out);

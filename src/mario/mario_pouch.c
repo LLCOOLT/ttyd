@@ -220,8 +220,8 @@ void pouchSetYoshiName(char* name) {
 	strcpy(mpp->yoshiName, name);
 }
 
-void pouchSetPartyColor(PartyId partnerId, u16 color) {
-	mpp->partyData[partnerId].flags = (u16)((mpp->partyData[partnerId].flags & 0x1FFF) | (color << 13));
+void pouchSetPartyColor(PartyId partnerId, s32 color) {
+	mpp->partyData[partnerId].flags = (mpp->partyData[partnerId].flags & 0x1FFF) | (u16)(color << 13);
 }
 
 s32 pouchGetPartyColor(PartyId partnerId) {

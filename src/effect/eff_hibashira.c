@@ -70,7 +70,10 @@ EffectEntry* effHibashiraEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, 
         pillar->position.x = (i - 1) * (dx / (num - 1));
         pillar->position.y = (i - 1) * (dy / (num - 1));
         pillar->position.z = (i - 1) * (dz / (num - 1));
-        pillar->scale = (f32)sin(3.1415927f * i / (effect->count - 1)) + 0.5f;
+        {
+            f32 s = sin(3.1415927f * i / (effect->count - 1));
+            pillar->scale = s + 0.5f;
+        }
         pillar->poseId = -1;
         pillar->alpha = 255;
         pillar->timer = 0;
@@ -82,15 +85,13 @@ EffectEntry* effHibashiraEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, 
 
 void effHibashiraMain(EffectEntry* effect) {
     EffHibashiraWork* work = effect->userdata;
-    s32 type;
-    BOOL inBattle;
     EffHibashiraWork* pillar;
     Vec position;
-    s32 i;
-    s32 j;
+    BOOL inBattle;
+    s32 type, i, j;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
-    inBattle = gp->inBattle != 0;
+    inBattle = gp->inBattle ? TRUE : FALSE;
     type = work->type;
 
     // soft delete: start fading out

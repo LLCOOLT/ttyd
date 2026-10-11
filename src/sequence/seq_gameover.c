@@ -1,0 +1,297 @@
+// NOTE: seq_gameOverExit/seq_gameOverInit and N_evt_snd_bgm_unpause live in the
+// event/evt_snd.c split (0x80077EC4..0x80077F88), which is really the tail of this TU.
+// mapdrv.h declares mapPreLoad(void), but this version takes the map name
+#define mapPreLoad mapPreLoad_unused
+#include "driver/camdrv.h"
+#include "driver/fadedrv.h"
+#include "driver/seqdrv.h"
+#include "evt/evt_cam.h"
+#include "evt/evt_cmd.h"
+#include "evt/evt_map.h"
+#include "manager/evtmgr.h"
+#include "mario/mario.h"
+#include "mario/mariost.h"
+#include "nameent.h"
+#include "pmario_sound.h"
+#include "system.h"
+#include <string.h>
+#undef mapPreLoad
+
+// sound.h pulls in math.h's sqrt localstatics (.rodata); use a minimal view instead
+typedef struct SoundStream {
+    u16 flags;              // 0x0
+    u8 unk2[0x138 - 0x2];   // 0x2
+} SoundStream;
+
+typedef struct SoundWork {
+    u8 unk0[0x100];         // 0x0
+    SoundStream* streams;   // 0x100
+} SoundWork;
+
+typedef struct GameOverWork {
+    EventEntry* evt; // 0x0
+} GameOverWork;
+
+extern SoundWork sound;
+extern PaperSoundBGM psbgm[2];
+
+BOOL mapPreLoad(const char* map);
+void _relUnLoad(void);
+void _unload(const char* map, const char* nextMap, const char* nextBero);
+void statusWinForceOff(void);
+void statusWinDispOff(void);
+void statusWinDispOn(void);
+void npcClearDeadInfo(void);
+void countDownEnd(void);
+void camRoadReset(void);
+void camShiftReset(void);
+
+USER_FUNC(evt_mapobj_trans);
+USER_FUNC(evt_mapobj_flag_onoff);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_cam_road_reset);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_mario_kill_party);
+USER_FUNC(evt_mario_clear_party);
+USER_FUNC(N_evt_snd_bgm_unpause);
+USER_FUNC(evt_mario_dispflag_onoff);
+USER_FUNC(evt_mario_set_pose);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_cam_ctrl_onoff);
+
+static GameOverWork work;
+static GameOverWork* wp = &work;
+
+s32 fall_data[] = {
+    200, 170, 140, 110, 80, 50, 20, 10, 26, 29, 30, 29, 26,
+    10, 0, 12, 15, 16, 15, 11, 6, 0, 4, 3, 1, 0,
+};
+
+s32 fall_data2[] = {
+    200, 170, 140, 110, 80, 50, 20, 0, 12, 15, 16, 15, 11, 6, 0, 4, 3, 1, 0,
+};
+
+EVT_BEGIN(_fall_char)
+    SET_INT_READ_ADDR(PTR(fall_data))
+    LOOP(26)
+        READ_INT(LW(1))
+        CALL(evt_mapobj_trans, 1, LW(0), 0, LW(1), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_fall_char_last)
+    SET_INT_READ_ADDR(PTR(fall_data2))
+    LOOP(19)
+        READ_INT(LW(1))
+        CALL(evt_mapobj_trans, 1, LW(0), 0, LW(1), 0)
+        WAIT_FRAMES(1)
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(fall_gameover)
+    SET_VALUE(LW(0), STRING("g"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(10)
+    SET_VALUE(LW(0), STRING("a"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(20)
+    SET_VALUE(LW(0), STRING("m"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(10)
+    SET_VALUE(LW(0), STRING("e"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(10)
+    SET_VALUE(LW(0), STRING("o"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(10)
+    SET_VALUE(LW(0), STRING("v"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(10)
+    SET_VALUE(LW(0), STRING("e2"))
+    SPAWN_EVENT(_fall_char)
+    WAIT_FRAMES(30)
+    SET_VALUE(LW(0), STRING("r"))
+    SPAWN_EVENT_GET_ID(PTR(_fall_char_last), LW(10))
+    LOOP(0)
+        IS_EVENT_RUNNING(LW(10), LW(11))
+        IF_INT_EQUAL(LW(11), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    WAIT_FRAMES(60)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_gameover)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_normalize)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_mario_set_pos, 0, 0, 0)
+    CALL(evt_cam_road_reset)
+    CALL(evt_party_cont_onoff, 0, 0)
+    CALL(evt_party_set_pos, 0, 0, -1000, 0)
+    CALL(evt_mario_kill_party, 0)
+    CALL(evt_party_cont_onoff, 1, 0)
+    CALL(evt_party_set_pos, 1, 0, -1000, 0)
+    CALL(evt_mario_clear_party, 1)
+    WAIT_FRAMES(1)
+    CALL(N_evt_snd_bgm_unpause)
+    CALL(evt_mario_dispflag_onoff, 1, 2)
+    CALL(evt_mario_set_pose, STRING("M_D_2"))
+    CALL(evt_mario_set_dir, 180, 0, 0)
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("f"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("i"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("n"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("d"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e3"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("l"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("j"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("u"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("e4"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("g1"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("o289"), 1)
+    CALL(evt_mapobj_trans, 1, STRING("g"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("a"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("m"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("e"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("o"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("v"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("e2"), 0, 200, 0)
+    CALL(evt_mapobj_trans, 1, STRING("r"), 0, 200, 0)
+    CALL(evt_cam_ctrl_onoff, 4, 1)
+    CALL(evt_cam3d_evt_set, 0, 208, 653, 0, 91, -30, 0, 11)
+    WAIT_FRAMES(1)
+    CALL(evt_map_playanim, STRING("anm_hokori"), 1, 0)
+    CALL_CHILD(fall_gameover)
+    RETURN
+EVT_END()
+
+void seq_gameOverMain(SequenceWork* work) {
+    CameraEntry* camera;
+    MarioWork* mario;
+
+    switch (work->state) {
+        case 0:
+            if (work->mapName == NULL) {
+                GXColor color = {0, 0, 0, 255};
+                fadeEntry(2, 1000, color);
+                gp->areaFadeInType = 10;
+                gp->areaFadeInDuration = 300;
+            }
+            mapPreLoad("sys_00");
+            work->state++;
+            break;
+        case 1:
+            if (!fadeIsFinish()) {
+                break;
+            }
+            _relUnLoad();
+            _unload(gp->currentMapName, NULL, NULL);
+            strcpy(gp->currentAreaName + 0x10, gp->currentMapName);
+            statusWinForceOff();
+            statusWinDispOff();
+            camera = camGetPtr(4);
+            camera->viewport[0] = 0.0f;
+            camera->viewport[1] = 0.0f;
+            camera->viewport[2] = gp->fbWidth;
+            camera->viewport[3] = gp->efbHeight;
+            camera = camGetPtr(8);
+            camera->viewport[0] = 0.0f;
+            camera->viewport[1] = 0.0f;
+            camera->viewport[2] = gp->fbWidth;
+            camera->viewport[3] = gp->efbHeight;
+            camGetPtr(8)->flags &= ~0x100;
+            camGetPtr(8)->flags |= 0x400;
+            camGetPtr(8)->flags |= 0x200;
+            fadeTecOff();
+            fadeSoftFocusOff();
+            npcClearDeadInfo();
+            countDownEnd();
+            nameEntReInit();
+            work->state++;
+            break;
+        case 2:
+            if (!mapPreLoad("sys_00")) {
+                break;
+            }
+            mapLoad("sys_00");
+            camera = camGetPtr(4);
+            mario = marioGetPtr();
+            {
+                camera->marioPos.x = 0.0f;
+                camera->marioPos.y = 0.01f;
+                camera->marioPos.z = 0.0f;
+                camera->marioAt.x = camera->marioPos.x;
+                camera->marioAt.y = camera->marioPos.y;
+                camera->marioAt.z = camera->marioPos.z;
+                mario->position = (Vec){0.0f, 0.0f, 0.0f};
+                mario->field_EC = mario->position;
+            }
+            camRoadReset();
+            camShiftReset();
+            work->state++;
+            break;
+        case 3: {
+            GXColor color = {0, 0, 0, 255};
+            fadeEntry(31, 200, color);
+            work->state++;
+            break;
+        }
+        case 4:
+            if (!fadeIsFinish()) {
+                break;
+            } else {
+                GXColor color = {0, 0, 0, 255};
+                fadeEntry(9, 1000, color);
+            }
+            marioReset();
+            marioEntry();
+            psndBGMOn(0x200, (char*)0x93);
+            if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
+                sound.streams[psbgm[0].streamId].flags |= 0x8000;
+            }
+            wp->evt = evtEntryType(evt_gameover, 0, 0, 0);
+            work->state++;
+            break;
+        case 5:
+            if (evtCheckID(wp->evt->eventId)) {
+                if (!(keyGetButtonTrg(0) & 0x1100)) {
+                    break;
+                }
+            }
+            {
+                GXColor color = {0, 0, 0, 255};
+                fadeEntry(36, 0, color);
+            }
+            psndBGMOff_f_d(0x200, 4000, FALSE);
+            work->state++;
+            break;
+        case 6:
+            if (!fadeIsFinish()) {
+                break;
+            }
+            _relUnLoad();
+            _unload("sys_00", NULL, NULL);
+            strcpy(gp->beroEnterName, "");
+            strcpy(gp->currentMapName, "");
+            strcpy(gp->currentAreaName, "");
+            statusWinDispOn();
+            camGetPtr(8)->flags &= ~0x200;
+            if (gp->flags & 0x1000) {
+                seqSetSeq(7, NULL, NULL);
+            } else {
+                seqSetSeq(1, NULL, NULL);
+            }
+            break;
+    }
+}

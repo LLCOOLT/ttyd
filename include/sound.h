@@ -81,29 +81,43 @@ typedef struct SoundStreamEntry {
     DVDEntry* dvd;             // 0x0
     ARQRequest request;        // 0x4
     SND_STREAMID streamId;     // 0x24
-    void* unk28;               // 0x28, TODO: re-type? buffer
-    u32 loadBuffer;            // 0x2C
-    void* unk30;               // 0x30, TODO: re-type?
-    u32 bytesLoaded;           // 0x34, number of bytes already loaded from the file
-    u8 unk38[0x48 - 0x38];     // 0x38
-    u32 requestLength;         // 0x48, number of bytes to load next ARQPostRequest
-    u8 unk4C[0x68 - 0x4C];     // 0x4C
+    void* buffer;              // 0x28, sndStream sample buffer, also header read buffer
+    u8* loadBuffer[2];         // 0x2C
+    u32 offset;                // 0x34, file read position
+    u32 pos;                   // 0x38, sample position / aram write position
+    u32 loadedLen[2];          // 0x3C
+    u32 srcPos;                // 0x44, read position in current load buffer
+    u32 requestLength;         // 0x48
+    u16 curBuf;                // 0x4C
+    s16 initHist;              // 0x4E
+    s16 loopHist;              // 0x50
+    s16 hist;                  // 0x52
+    s16 loaded;                // 0x54
+    s16 ready;                 // 0x56
+    u16 scale;                 // 0x58
+    u16 nibble;                // 0x5A
+    u16 runCount;              // 0x5C
+    u8 pad5E[2];               // 0x5E
+    u32 size;                  // 0x60
+    u32 loopStart;             // 0x64
     SND_ADPCMSTREAM_INFO info; // 0x68
 } SoundStreamEntry;
 
 typedef struct SoundStream {
     u16 flags;                   // 0x0
-    u16 unk2;                    // 0x2
-    u16 unk4;                    // 0x4
+    u16 slot;                    // 0x2, aram slot
+    u16 dataOffset;              // 0x4
     u16 pan;                     // 0x6
     u16 span;                    // 0x8
-    u8 unkA[0xC - 0xA];          // 0xA
+    u8 padA[0xC - 0xA];          // 0xA
     f32 vol;                     // 0xC
-    f32 unk10;                   // 0x10, some volume setting
-    f32 unk14;                   // 0x14, some other volume setting
+    f32 curVol;                  // 0x10
+    f32 fadeStep;                // 0x14
     u16 freq;                    // 0x18
     u16 count;                   // 0x1A
-    u8 unk1C[0x28 - 0x1C];       // 0x1C
+    u32 loopEnd;                 // 0x1C
+    u32 loopStart;               // 0x20
+    u32 samplePos;               // 0x24
     SoundStreamEntry entries[2]; // 0x28
 } SoundStream;
 
@@ -151,20 +165,20 @@ typedef struct SoundWork {
     u16 unk214;                // 0x214, some "mute" thing
     u8 pad216[2];              // 0x216
     SND_OUTPUTMODE outputMode; // 0x218
-    u8 unk21C[0x224 - 0x21C];  // 0x21C
-    u16 unk224;                // 0x224
-    u16 unk226[2];             // 0x226
+    u32 aramAddr[2];           // 0x21C
+    u16 slotCount;             // 0x224
+    u16 slotUsed[2];           // 0x226
     char filepath[0x100];      // 0x22A
     u8 pad32A[2];              // 0x32A
     void* filedata;            // 0x32C
-    s16 unk330;                // 0x330
+    u16 sampleBank;            // 0x330
     u8 pad332[2];              // 0x332
     u8* dmaAddress;            // 0x334
     u32 dmaLength;             // 0x338
-    u8 unk33C[0x5BC - 0x33C];  // 0x33C
+    u16 dmaBuf[0x140];         // 0x33C
     AIDCallback callback;      // 0x5BC
-    u8 unk5C0[0x15C0 - 0x5C0]; // 0x5C0
-    s32 unk15C0;               // 0x15C0
+    s16 samples[2][0x400];     // 0x5C0
+    u32 sampleIndex;           // 0x15C0
 } SoundWork;
 
 void SoundInit(void);

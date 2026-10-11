@@ -162,7 +162,7 @@ void romFontMake(void) {
 
 double tan(double);
 
-static RomFontChar* romFontFindChar(u16 code) {
+static inline RomFontChar* romFontFindChar(u16 code) {
     RomFontChar* table = wp->unk0;
     RomFontChar* cur = table;
     s32 n;
@@ -185,7 +185,7 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
     Point3d camPos;  // 0x084
     va_list ap;
     s32 i = 0;
-    s16 curX = 0;
+    s32 curX = 0;
     s16 curY = 0;
     RomFontChar* glyph;
 
@@ -258,9 +258,9 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition3s16(curX, curY + 24, 0);
         GXTexCoord2s16(0, 0);
-        GXPosition3s16(curX + 24, curY + 24, 0);
+        GXPosition3s16((s16)curX + 24, curY + 24, 0);
         GXTexCoord2s16(1, 0);
-        GXPosition3s16(curX + 24, curY, 0);
+        GXPosition3s16((s16)curX + 24, curY, 0);
         GXTexCoord2s16(1, 1);
         GXPosition3s16(curX, curY, 0);
         GXTexCoord2s16(0, 1);
@@ -271,5 +271,36 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
 }
 
 s32 romFontGetWidth(const char* message) {
-    return 0;
+    s32 width = 0;
+    s32 i = 0;
+    s32 max = 0;
+    RomFontChar* glyph;
+
+    for (;;) {
+        u16 c16 = *(u16*)&message[i];
+        u32 c = message[i];
+
+        if (c >= 0x20 && c < 0x80) {
+            glyph = romFontFindChar(c & 0xFFFF);
+            i += 1;
+        } else if ((c >= 0x80 && c < 0xA0) || c >= 0xE0) {
+            glyph = romFontFindChar(c16);
+            i += 2;
+        } else if (c == 0x00) {
+            if (max < width) {
+                max = width;
+            }
+            break;
+        } else if (c == 0x0A) {
+            if (max < width) {
+                max = width;
+            }
+            width = 0;
+            i += 1;
+        } else {
+            i += 1;
+        }
+        width += glyph->width;
+    }
+    return max;
 }

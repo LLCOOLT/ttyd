@@ -1,0 +1,241 @@
+#include "battle/battle.h"
+#include "battle/battle_ac.h"
+#include "battle/battle_pad.h"
+#include "battle/battle_unit.h"
+#include "driver/icondrv.h"
+#include "pmario_sound.h"
+#include "system.h"
+#include <string.h>
+
+#pragma optimize_for_size on
+
+void btlDispTex4(s32 id, Vec pos, Vec scale, Vec rot, GXColor color);
+void btlGetScreenPoint(Vec* in, Vec* out);
+s32 BattleACGetButtonIcon(s32 button, s32 pressed);
+s32 _getmaxcount(void);
+
+typedef struct MonosiriTargetParams {
+    u8 field_0x0[0x38];
+    s32 unitId;  // 0x38
+    s32 partsId; // 0x3C
+} MonosiriTargetParams;
+
+typedef struct MonosiriTargetWork {
+    s32 frame;      // 0x0
+    s32 maxFrames;  // 0x4
+    Vec hitPos;     // 0x8
+    Vec pos;        // 0x14
+    Vec targetPos;  // 0x20
+    f32 angle;      // 0x2C
+    s32 inRange;    // 0x30
+    s32 inRangeCnt; // 0x34
+    u32 sfxId;      // 0x38
+    s32 endTimer;   // 0x3C
+} MonosiriTargetWork;
+
+#define MT_PARAMS(work) ((MonosiriTargetParams*)&(work)->actionCommands)
+
+#pragma dont_inline on
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    MonosiriTargetWork* cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
+    f32 alpha = 0.0f;
+    Vec screen;
+    Vec screen2;
+    Vec pos;
+    s32 icon;
+    s32 pressedIcon;
+
+    btlGetScreenPoint(&cw->pos, &screen);
+    {
+        Vec scale = {1.0f, 1.0f, 1.0f};
+        Vec rot = {0.0f, 0.0f, 0.0f};
+        {
+            GXColor col = {255, 255, 255, 255};
+            btlDispTex4(0x42, screen, scale, rot, col);
+        }
+    }
+    screen.x += 4.0f;
+    screen.y -= 4.0f;
+    screen.z -= 2.0f;
+    {
+        Vec scale = {1.0f, 1.0f, 1.0f};
+        Vec rot = {0.0f, 0.0f, 0.0f};
+        {
+            GXColor col = {128, 128, 128, 255};
+            btlDispTex4(0x42, screen, scale, rot, col);
+        }
+    }
+
+    if (cw->inRange) {
+        s32 t = cw->inRangeCnt % 30;
+        if (t < 20) {
+            alpha = 0.01f * intplGetValue(5, t, 20, 100.0f, 0.0f);
+        }
+    }
+
+    btlGetScreenPoint(&cw->targetPos, &screen2);
+    {
+        Vec scale = {1.0f, 1.0f, 1.0f};
+        Vec rot = {0.0f, 0.0f, 0.0f};
+        rot.z = cw->angle;
+        {
+            GXColor col = {255, 255, 255, 255};
+            btlDispTex4(0x41, screen2, scale, rot, col);
+        }
+    }
+    if (alpha > 0.0f) {
+        Vec scale = {0.0f, 0.0f, 1.0f};
+        Vec rot = {0.0f, 0.0f, 0.0f};
+        scale.x = alpha;
+        scale.y = alpha;
+        rot.z = cw->angle;
+        {
+            GXColor col = {255, 255, 255, 255};
+            btlDispTex4(0x41, screen2, scale, rot, col);
+        }
+    }
+    screen2.x += 4.0f;
+    screen2.y -= 4.0f;
+    screen2.z -= 2.0f;
+    {
+        Vec scale = {1.0f, 1.0f, 1.0f};
+        Vec rot = {0.0f, 0.0f, 0.0f};
+        rot.z = cw->angle;
+        {
+            GXColor col = {128, 128, 128, 255};
+            btlDispTex4(0x41, screen2, scale, rot, col);
+        }
+    }
+    cw->angle += 2.0f;
+
+    pressedIcon = BattleACGetButtonIcon(0x100, 1);
+    icon = BattleACGetButtonIcon(0x100, 0);
+    if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
+        icon = pressedIcon;
+    }
+    pos.x = 0.0f;
+    pos.y = 0.0f;
+    pos.z = 0.0f;
+    pos.x = -200.0f + x;
+    pos.y = 50.0f + y;
+    iconDispGx(&pos, 0x10, icon, 1.0f);
+}
+#pragma dont_inline reset
+
+void battleAcDelete_MonosiriTarget(BattleWork* work) {
+    work->actionCommands.mAcState = 1002;
+}
+
+void battleAcDisp_MonosiriTarget(CameraId cameraId, void* param) {
+    BattleWork* work = _battleWorkPointer;
+    switch (work->actionCommands.mAcState) {
+        case 1000:
+            actionCommandDisp(0.0f, 0.0f);
+            break;
+    }
+}
+
+s32 battleAcResult_MonosiriTarget(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+s32 battleAcMain_MonosiriTarget(BattleWork* work) {
+    BattleActions* ac;
+    MonosiriTargetWork* cw;
+    BattleACDispParams* disp;
+    BattleUnit* unit;
+    BattleUnitPart* parts;
+    BOOL autoCommand;
+
+    ac = &work->actionCommands;
+    autoCommand = FALSE;
+    cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
+    disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
+        autoCommand = TRUE;
+    }
+    unit = BattleGetUnitPtr(work, MT_PARAMS(work)->unitId);
+    parts = BtlUnit_GetPartsPtr(unit, MT_PARAMS(work)->partsId);
+
+    switch (work->actionCommands.mAcState) {
+        case 0:
+            memset(disp, 0, sizeof(BattleACDispParams));
+            disp->iconX = -300.0f;
+            disp->iconY = 0.0f;
+            *(s32*)&disp->field_0x1C[4] = 20;
+            cw->frame = 0;
+            cw->maxFrames = _getmaxcount();
+            BtlUnit_GetHitPos(unit, parts, &cw->hitPos.x, &cw->hitPos.y, &cw->hitPos.z);
+            cw->pos = cw->hitPos;
+            cw->targetPos = cw->hitPos;
+            cw->inRange = 0;
+            cw->angle = 0.0f;
+            work->actionCommands.mAcState = 99;
+            work->actionCommands.result = 1;
+            cw->sfxId = -1;
+            break;
+        case 100:
+            cw->frame = 0;
+            cw->sfxId = ((s32(*)(const char*))psndSFXOn)("SFX_AC_CURSOR_MOVE1");
+            work->actionCommands.mAcState = 1000;
+        case 1000:
+            cw->frame++;
+            cw->pos.x = (cw->hitPos.x - 80.0f) + intplGetValue(0, cw->frame, cw->maxFrames, 0.0f, 160.0f);
+            if (__fabs(cw->pos.x - cw->targetPos.x) < 28.0) {
+                cw->inRange = 1;
+            } else {
+                cw->inRange = 0;
+            }
+            if (cw->inRange == 0) {
+                cw->inRangeCnt = 0;
+            } else {
+                cw->inRangeCnt++;
+            }
+            if (cw->frame >= cw->maxFrames) {
+                work->actionCommands.result = 0;
+                work->actionCommands.mAcState = 1002;
+                break;
+            }
+            if (BattlePadCheckTrigger(0x100) || autoCommand) {
+                if (cw->inRange) {
+                    work->actionCommands.result = 2;
+                    work->actionCommands.mResultCount++;
+                } else {
+                    if (autoCommand) {
+                        break;
+                    }
+                    work->actionCommands.result = 0;
+                }
+                work->actionCommands.mAcState = 1002;
+            }
+            break;
+        case 1002:
+            cw->endTimer = 60;
+            work->actionCommands.mAcState = 1003;
+            if (cw->sfxId != -1) {
+                psndSFXOff(cw->sfxId);
+            }
+        case 1003:
+            cw->endTimer--;
+            if (cw->endTimer <= 0) {
+                work->actionCommands.mAcState = 1004;
+            }
+            break;
+        case 1004:
+            work->actionCommands.maincb = NULL;
+            work->actionCommands.dispcb = NULL;
+            work->actionCommands.resultcb = NULL;
+            work->actionCommands.deletecb = NULL;
+            return 0;
+    }
+    return 1;
+}
+
+s32 _frame_table[] = {240, 180, 120, 90, 70, 40, 20};
+
+#pragma dont_inline on
+s32 _getmaxcount(void) {
+    return _frame_table[((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(_battleWorkPointer)];
+}

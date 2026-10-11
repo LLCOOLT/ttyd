@@ -35,6 +35,8 @@ void suifu100taikikan_seq01(NanNpc* npc);
 void suifu100taikikan_seq00(NanNpc* npc);
 extern s32 partyCtrlNo;
 typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
+static u8* _ap;
+static s32* itemsel_table_ram;
 static KaitenParam* ckp0;
 static KaitenParam* ckp1;
 static KaitenParam* ckpw;
@@ -45,8 +47,6 @@ static inline f32 fid(f32 x) { return x; }
 void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 void gundan1000tai_seq01(NanNpc* npc);
 void gundan1000tai_seq00(NanNpc* npc);
-static s32* itemsel_table_ram;
-static u8* _ap;
 
 USER_FUNC(L_evt_pouch_get_hp);
 USER_FUNC(L_evt_pouch_set_hp);
@@ -412,39 +412,6 @@ s32 return_gorotsuki_town_init[25];
 s32 return_gorotsuki_town[625];
 s32 gor_00_init_evt[537];
 
-USER_FUNC(unk_gor_000006d8) {
-    NpcWork* wp = npcGetWorkPtr();
-    s32 i;
-    s32 total = wp->total;
-    NpcEntry* npc = wp->entries;
-
-    for (i = 0; i < total; i++, npc++) {
-        if (npc->flags & 1) {
-            if (npc->moveEvent != NULL) {
-                if (npc->regularEvtId != 0) {
-                    evtDeleteID(npc->regularEvtId);
-                }
-                npc->regularEvtId = 0;
-                npc->moveEvent = NULL;
-            }
-            npcDelete(npc);
-        }
-    }
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(get_yoshi_color) {
-    s32* args = event->args;
-    evtSetValue(event, args[0], pouchGetPartyColor(4));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(funechange_func) {
-    s32* args = event->args;
-    evtSetValue(event, args[0], marioShipChanging());
-    return EVT_RETURN_DONE;
-}
-
 __declspec(section ".data") u64 fd_gor_00_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_gor_00_neg_one_382[] = {
@@ -547,6 +514,19 @@ static s32 bero_entry_data[] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
 };
+
+static void alpha_tev(MapTevCallbackInfo* info) {
+    s32 stage = info->tevStage;
+    u8* alpha = _ap;
+
+    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    info->tevStage++;
+}
 
 static EVT_BEGIN(mony_init)
     SWITCH(GSW(0))
@@ -3134,6 +3114,760 @@ __declspec(section ".data") Vec suifu100kaidanUP[] = {
     {201.0f, 115.0f, -562.0f},
 };
 
+static USER_FUNC(alpha_init_func) {
+    _ap = _mapAlloc(1);
+    *_ap = 255;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(alpha_set_func) {
+    *_ap = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+f32 lineardec_type(s32 step, s32 total, f32 start, f32 end) {
+    f32 cur;
+    f32 speed;
+    f32 sum;
+    s32 accel = total * 20 / 100;
+    s32 decel = total * 80 / 100;
+    s32 i;
+
+    speed = accel;
+    sum = speed;
+
+    for (i = 0; i < total; i++) {
+        if (i >= decel) {
+            speed -= 1.0f;
+        }
+        sum += speed;
+        if (i == step) {
+            cur = sum;
+        }
+    }
+    return start + cur * (end - start) / sum;
+}
+
+static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
+    f32 cur;
+    f32 speed;
+    f32 sum;
+    s32 accel = total * 10 / 100;
+    s32 decel = total * 90 / 100;
+    s32 i;
+
+    speed = 0.0f;
+    sum = 0.0f;
+
+    for (i = 0; i < total; i++) {
+        if (i <= accel) {
+            speed += 1.0f;
+        } else if (i >= decel) {
+            speed -= 1.0f;
+        }
+        sum += speed;
+        if (i == step) {
+            cur = sum;
+        }
+    }
+    return start + cur * (end - start) / sum;
+}
+
+static USER_FUNC(make_itemsel_table) {
+    s32* args = event->args;
+    PouchData* pouch = pouchGetPtr();
+    s32* p;
+    s32 count;
+    s32 i;
+
+    itemsel_table_ram = _mapAlloc(0x54);
+    p = itemsel_table_ram;
+    count = 0;
+    for (i = 0; i < 20; i++) {
+        s32 item = pouch->heldItems[i];
+
+        if (item >= 0xB3 && item < 0xEC) {
+            *p++ = item;
+            count++;
+        }
+        if (item >= 0x94 && item < 0xA1) {
+            *p++ = item;
+            count++;
+        }
+        switch (item) {
+            case 0xA6:
+            case 0xA7:
+            case 0xA8:
+            case 0xA9:
+            case 0xAA:
+            case 0xAB:
+            case 0xAD:
+            case 0xAE:
+            case 0xAF:
+            case 0xB0:
+                *p++ = item;
+                count++;
+                break;
+        }
+    }
+    *p = -1;
+    evtSetValue(event, args[0], count);
+    event->lwData[10] = (s32)itemsel_table_ram;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(delete_itemsel_table) {
+    _mapFree(itemsel_table_ram);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(fune_yure_func_init) {
+    *(f32*)&event->lwData[0] = evtGetFloat(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(fune_yure_func) {
+    s32* args = event->args;
+    s32 dir = evtGetValue(event, args[0]);
+    f32 amp = evtGetFloat(event, args[1]);
+    s32 done;
+    f32 step;
+
+    if (0.0f == amp) {
+        evtSetFloat(event, args[2], 0.0f);
+        evtSetValue(event, args[3], 1);
+        return EVT_RETURN_DONE;
+    }
+    done = 0;
+    step = 2.0f * amp / sysMsec2FrameFloat(2000.0f);
+    if (dir == 0) {
+        *(f32*)&event->lwData[0] += step;
+        if (*(f32*)&event->lwData[0] >= amp) {
+            *(f32*)&event->lwData[0] = amp;
+            done = 1;
+        }
+    } else {
+        *(f32*)&event->lwData[0] -= step;
+        if (*(f32*)&event->lwData[0] <= -amp) {
+            *(f32*)&event->lwData[0] = -amp;
+            done = 1;
+        }
+    }
+    evtSetFloat(event, args[2], *(f32*)&event->lwData[0]);
+    evtSetValue(event, args[3], done);
+    return EVT_RETURN_DONE;
+}
+
+void geundan1000tai_circle_pos(Vec* pos) {
+    f32 s;
+    f32 angle;
+    f32 radius;
+    f32 c;
+
+    radius = irand(180) + 120;
+    angle = 6.2831855f * irand(360) / 360.0f;
+    s = sin(angle);
+    c = cos(angle);
+
+    pos->x = 0.9f * (radius * s);
+    pos->y = 15.0f;
+    pos->z = 0.5f * (radius * c) - 300.0f;
+}
+
+USER_FUNC(gundan1000tai_circle_pos_func) {
+    f32 radius;
+    f32 s;
+    f32 c;
+    f32 angle;
+    s32* args = event->args;
+
+    radius = irand(180) + 120;
+    angle = 6.2831855f * irand(360) / 360.0f;
+    s = sin(angle);
+    c = cos(angle);
+
+    evtSetFloat(event, args[0], 0.9f * (radius * s));
+    evtSetFloat(event, args[1], 15.0f);
+    evtSetFloat(event, args[2], 0.5f * (radius * c) - 300.0f);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(gundan1000tai_init) {
+    f32 angle;
+    f32 s;
+    f32 radius;
+    f32 c;
+    f32 base;
+    s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        radius = irand(180) + 120;
+        angle = 6.2831855f * irand(360) / 360.0f;
+        s = sin(angle);
+        c = cos(angle);
+        npc->posA.x = 0.9f * (radius * s);
+        npc->posA.y = 15.0f;
+        npc->posA.z = 0.5f * (radius * c) - 300.0f;
+        if (npc->posA.x < 30.0f) {
+            base = -280.0f;
+            npc->dir = 90.0f;
+        } else {
+            base = 340.0f;
+            npc->dir = 270.0f;
+        }
+        radius = irand(100);
+        angle = 6.2831855f * irand(360) / 360.0f;
+        s = sin(angle);
+        c = cos(angle);
+        npc->pos.x = radius * s + base;
+        npc->pos.y = 15.0f;
+        npc->pos.z = radius * c - 300.0f;
+        npc->func = gundan1000tai_seq00;
+        npc->state = 0;
+        npc->work74 = i;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(gundan1000tai_totsugeki) {
+    s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        npc->func = gundan1000tai_seq01;
+        npc->state = 0;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(gundan1000tai_areacheck) {
+    s32* args = event->args;
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(1);
+    s32 area;
+
+    if (mario->position.y > 70.0f) {
+        area = 0;
+    } else if (mario->position.x < 60.0f) {
+        area = 0x10;
+    } else if (mario->position.x < 80.0f) {
+        area = 4;
+    } else if (mario->position.x < 100.0f) {
+        area = 2;
+    } else if (mario->position.x < 120.0f) {
+        area = 1;
+    } else {
+        area = 0;
+    }
+    evtSetValue(event, args[0], area);
+    if (party->position.y > 70.0f) {
+        area = 0;
+    } else if (party->position.x < 60.0f) {
+        area = 0x10;
+    } else if (party->position.x < 80.0f) {
+        area = 4;
+    } else if (party->position.x < 100.0f) {
+        area = 2;
+    } else if (party->position.x < 120.0f) {
+        area = 1;
+    } else {
+        area = 0;
+    }
+    evtSetValue(event, args[1], area);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(gundan1000tai_totsuend) {
+    s32 i;
+    NanNpcWork* wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        wp->entries[i].workA8 = 1;
+    }
+    return EVT_RETURN_DONE;
+}
+
+void gundan1000tai_seq00(NanNpc* npc) {
+    MarioWork* mario = marioGetPtr();
+    s32 wait;
+    f32 dist;
+    f32 speed;
+    f32 angle;
+
+    switch (npc->state) {
+        case 0:
+            npc->time = gp->renderTime;
+            wait = (npc->work74 % 6) * 500;
+            npc->work6C = wait + irand(500);
+            npc->state++;
+        case 1:
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+                npc->state++;
+            }
+            break;
+        case 2:
+            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            angle = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            speed = dist / 2.0f + (irand(180) + 180);
+            speed = sysFrame2SecFloat(speed / 2.0f);
+            npc->work78 = speed;
+            npc->work7C = angle;
+            npc->work70 = dist / speed;
+            npc->work6C = 0;
+            npc->workA4 = 0;
+            evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
+            npc->state++;
+        case 3:
+            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
+            npc->work6C++;
+            if (npc->work6C >= npc->work70) {
+                npc->pos.x = npc->posA.x;
+                npc->pos.z = npc->posA.z;
+                npc->workA4 = 1;
+                evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
+                npc->state++;
+            }
+            break;
+        case 4:
+            npc->posB = npc->pos;
+            break;
+    }
+}
+
+void gundan1000tai_seq01(NanNpc* npc) {
+    f32 radius;
+    f32 s;
+    f32 angle;
+    f32 c;
+    f32 t;
+    f32 dist;
+    f32 speed;
+    f32 dir;
+    MarioWork* mario = marioGetPtr();
+    s32 r;
+    s32 elapsed;
+
+    switch (npc->state) {
+        case 0:
+            npc->posB = npc->pos;
+            npc->workA4 = 0;
+            npc->workA8 = 0;
+            r = irand(1000);
+            if (r < 50) {
+                npc->state = 10;
+            } else if (r < 150) {
+                npc->state = 1;
+                npc->work6C = irand(500) + 300;
+                npc->time = gp->renderTime;
+            } else {
+                npc->state = 1;
+                npc->work6C = irand(2500) + 500;
+                npc->time = gp->renderTime;
+            }
+            break;
+        case 1:
+            if (npc->workA8) {
+                npc->state = 100;
+            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+                evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
+                npc->state = 10;
+            }
+            break;
+        case 10:
+        case 11:
+            npc->time = gp->renderTime;
+            npc->posA = npc->pos;
+            if (npc->state == 10) {
+                radius = irand(25) + 25;
+            } else {
+                radius = irand(180) + 120;
+            }
+            angle = 6.2831855f * irand(360) / 360.0f;
+            s = sin(angle);
+            c = cos(angle);
+            npc->posC.x = 0.9f * (radius * s) + 30.0f;
+            npc->posC.y = 15.0f;
+            npc->posC.z = 0.5f * (radius * c) - 300.0f;
+            npc->work78 = -4.0f * (irand(60) + 50);
+            npc->work7C = npc->posC.y - npc->posA.y - npc->work78;
+            npc->work6C = irand(500) + 600;
+            if (npc->state == 10) {
+                npc->work70 = 21;
+                if (npc->posA.x < npc->posC.x) {
+                    npc->dir = 90.0f;
+                } else {
+                    npc->dir = 270.0f;
+                }
+            } else {
+                npc->work70 = 22;
+                if (npc->posA.x < npc->posC.x) {
+                    npc->dir = 270.0f;
+                } else {
+                    npc->dir = 90.0f;
+                }
+            }
+            npc->state = 20;
+            evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
+            break;
+        case 20:
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            if (elapsed < npc->work6C) {
+                t = (f32)elapsed / (f32)npc->work6C;
+                npc->pos.x = intplGetValue(0, elapsed, npc->work6C, npc->posA.x, npc->posC.x);
+                npc->pos.z = intplGetValue(0, elapsed, npc->work6C, npc->posA.z, npc->posC.z);
+                npc->pos.y = npc->posA.y + t * (npc->work78 * t + npc->work7C);
+            } else {
+                npc->pos = npc->posC;
+                npc->state = npc->work70;
+                npc->time = gp->renderTime;
+                npc->work6C = irand(2000) + 500;
+            }
+            break;
+        case 21:
+            if (npc->workA8) {
+                npc->state = 100;
+            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+                npc->state = 11;
+            }
+            break;
+        case 22:
+            if (npc->workA8) {
+                npc->state = 102;
+                break;
+            }
+            npc->work6C = irand(2000) + 500;
+            npc->time = gp->renderTime;
+            npc->posB = npc->pos;
+            npc->work78 = 15.0f + npc->posB.x;
+            npc->work7C = npc->posB.x - 15.0f;
+            if (irand(1)) {
+                npc->work80 = 1.0f;
+                npc->dir = 90.0f;
+            } else {
+                npc->work80 = -1.0f;
+                npc->dir = 270.0f;
+            }
+            npc->state = 30;
+            break;
+        case 30:
+            if (npc->workA8) {
+                npc->state = 102;
+                break;
+            }
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
+                npc->state = 10;
+                break;
+            }
+            if (npc->work78 < npc->pos.x) {
+                npc->work80 = -1.0f;
+                npc->dir = 270.0f;
+            }
+            if (npc->work7C > npc->pos.x) {
+                npc->work80 = 1.0f;
+                npc->dir = 90.0f;
+            }
+            npc->pos.x += npc->work80;
+            break;
+        case 100:
+            dir = irand(180) + 120;
+            angle = 6.2831855f * irand(360) / 360.0f;
+            dist = sin(angle);
+            c = cos(angle);
+            npc->posC.x = 0.9f * (dir * dist) + 30.0f;
+            npc->posC.z = 0.5f * (dir * c) - 300.0f;
+            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            dir = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            speed = dist / 2.0f + (irand(180) + 180);
+            speed = sysFrame2SecFloat(speed);
+            npc->work78 = speed;
+            npc->work7C = dir;
+            npc->work70 = dist / speed;
+            npc->work6C = 0;
+            npc->state = 101;
+        case 101:
+            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
+            npc->work6C++;
+            if (npc->work6C >= npc->work70) {
+                npc->pos.x = npc->posA.x;
+                npc->pos.z = npc->posA.z;
+                npc->state = 102;
+            }
+            break;
+        case 102:
+            evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
+            npc->workA4 = 1;
+            break;
+    }
+}
+
+static USER_FUNC(cam_kaiten_init) {
+    s32* args = event->args;
+    Vec target;
+    Vec pos;
+    f32 dist;
+
+    ckp0 = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp0, 0, sizeof(KaitenParam));
+    ckp1 = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp1, 0, sizeof(KaitenParam));
+    ckpw = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp1, 0, sizeof(KaitenParam));
+    ckp0->pos.x = evtGetFloat(event, args[0]);
+    ckp0->pos.y = evtGetFloat(event, args[1]);
+    ckp0->pos.z = evtGetFloat(event, args[2]);
+    ckp0->target.x = evtGetFloat(event, args[3]);
+    ckp0->target.y = evtGetFloat(event, args[4]);
+    ckp0->target.z = evtGetFloat(event, args[5]);
+    ckp1->pos.x = evtGetFloat(event, args[6]);
+    ckp1->pos.y = evtGetFloat(event, args[7]);
+    ckp1->pos.z = evtGetFloat(event, args[8]);
+    ckp1->target.x = evtGetFloat(event, args[9]);
+    ckp1->target.y = evtGetFloat(event, args[10]);
+    ckp1->target.z = evtGetFloat(event, args[11]);
+
+    pos = ckp0->pos;
+    target = ckp0->target;
+    target.y = 0.0f;
+    pos.y = 0.0f;
+    dist = PSVECDistance(&pos, &target);
+    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
+    ckp0->dist = dist;
+
+    pos = ckp1->pos;
+    target = ckp1->target;
+    target.y = 0.0f;
+    pos.y = 0.0f;
+    dist = PSVECDistance(&pos, &target);
+    ckp1->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
+    ckp1->dist = dist;
+
+    ckpw->pos = ckp0->pos;
+    ckpw->target = ckp0->target;
+    ckpw->angle = ckp0->angle;
+    ckpw->dist = ckp0->dist;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_set_direct) {
+    CameraEntry* camera = camGetPtr(4);
+    f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
+    f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
+
+    ckpw->pos.x = ckpw->dist * s + ckpw->target.x;
+    ckpw->pos.z = ckpw->target.z - ckpw->dist * c;
+    camera->presetPos = camera->cameraPos;
+    camera->presetAt = camera->cameraAt;
+    camera->storedPos = ckpw->pos;
+    camera->storedAt = ckpw->target;
+    camera->startTimeA = gp->renderTime;
+    camera->durationA = 0;
+    camera->stateA = 3;
+    camera->curveA = 11;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_get_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    evtSetFloat(event, args[1], p->pos.x);
+    evtSetFloat(event, args[2], p->pos.y);
+    evtSetFloat(event, args[3], p->pos.z);
+    evtSetFloat(event, args[4], p->target.x);
+    evtSetFloat(event, args[5], p->target.y);
+    evtSetFloat(event, args[6], p->target.z);
+    evtSetFloat(event, args[7], p->angle);
+    evtSetFloat(event, args[8], p->dist);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_set_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    p->pos.x = evtGetFloat(event, args[1]);
+    p->pos.y = evtGetFloat(event, args[2]);
+    p->pos.z = evtGetFloat(event, args[3]);
+    p->target.x = evtGetFloat(event, args[4]);
+    p->target.y = evtGetFloat(event, args[5]);
+    p->target.z = evtGetFloat(event, args[6]);
+    p->angle = evtGetFloat(event, args[7]);
+    p->dist = evtGetFloat(event, args[8]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(hosei_mario_pos) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    MarioWork* mario = marioGetPtr();
+
+    mario->position.x += x;
+    mario->position.y += y;
+    mario->position.z += z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(hosei_party_pos) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    PartyEntry* party = partyGetPtr(partyCtrlNo);
+
+    if (party == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    party->position.x += x;
+    party->position.y += y;
+    party->position.z += z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(suifu100taikikan_init) {
+    s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        npc->dir = 90.0f;
+        npc->pos.x = irand(135) - 100;
+        npc->pos.y = 15.0f;
+        npc->pos.z = irand(50) + 190;
+        npc->func = suifu100taikikan_seq00;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(suifu100taikikan_away) {
+    s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        npc->dir = 90.0f;
+        npc->func = suifu100taikikan_seq01;
+        npc->state = 0;
+    }
+    return EVT_RETURN_DONE;
+}
+
+void suifu100taikikan_seq00(NanNpc* npc) {
+    npc->state = 0;
+}
+
+void suifu100taikikan_seq01(NanNpc* npc) {
+    Vec v;
+    Vec d;
+    s32 elapsed;
+    s32 duration;
+
+    switch (npc->state) {
+        case 0:
+            npc->posA = npc->pos;
+            npc->posA.x = -180.0f + irand(50);
+            npc->work78 = 140.0f + irand(120);
+            npc->dir = 270.0f;
+            npc->work70 = 1;
+            npc->state = 100;
+            break;
+        case 1:
+            npc->posA = npc->pos;
+            npc->posA.x = -255.0f + irand(30);
+            npc->posA.z = -230.0f + irand(30);
+            npc->work70 = 10;
+            npc->state = 100;
+            break;
+        case 10:
+            npc->posA = npc->pos;
+            npc->posA.z = -350.0f + irand(50);
+            npc->work70 = 20;
+            npc->state = 100;
+            break;
+        case 20:
+            npc->posA = npc->pos;
+            npc->posA.x += 520.0f + irand(50);
+            npc->dir = 90.0f;
+            npc->work70 = 30;
+            npc->state = 100;
+            break;
+        case 30:
+            npc->posA = suifu100kaidanDOWN[irand(3)];
+            npc->work70 = 40;
+            npc->state = 100;
+            break;
+        case 40:
+            npc->posA = suifu100kaidanUP[irand(3)];
+            npc->dir = 270.0f;
+            npc->work70 = 50;
+            npc->state = 100;
+            break;
+        case 50:
+            npc->posA = npc->pos;
+            npc->posA.x = -30.0f + irand(60);
+            npc->work70 = 60;
+            npc->state = 100;
+            break;
+        case 60:
+            npc->posA = npc->pos;
+            npc->posA.z -= 100.0f;
+            npc->work70 = 99;
+            npc->state = 100;
+            break;
+        case 99:
+            npc->pos = (Vec){0.0f, -1000.0f, 0.0f};
+            break;
+        case 100:
+            npc->time = gp->renderTime;
+            npc->posB = npc->pos;
+            npc->state = 101;
+        case 101:
+            PSVECSubtract(&npc->posA, &npc->posB, &v);
+            duration = 1000.0f * PSVECMag(&v) / npc->work78;
+            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            PSVECScale(&v, &d, (f32)elapsed / (f32)duration);
+            if (elapsed < duration) {
+                PSVECAdd(&npc->posB, &d, &npc->pos);
+            } else {
+                npc->pos = npc->posA;
+                npc->state = npc->work70;
+            }
+            break;
+    }
+}
+
 EVT_BEGIN(unk_evt_gor_000277f4)
     CALL(evt_npc_set_ry, STRING("マルコ"), 270)
     CALL(evt_npc_move_position, STRING("マルコ"), -130, 200, 0, FLOAT(240.0f), 0)
@@ -3834,28 +4568,6 @@ EVT_BEGIN(gor_muj_ship_sub)
     RETURN
 EVT_END()
 
-USER_FUNC(funeflag_load) {
-    mapGrpFlagOff("S_fune_b", 1);
-    mapGrpFlagOn("S_fune_b", event->lwData[8]);
-    mapGrpFlagOff("S_fune_c", 1);
-    mapGrpFlagOn("S_fune_c", event->lwData[9]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(funeflag_reset) {
-    mapGrpFlagOn("S_fune_b", 1);
-    mapGrpFlagOn("S_fune_c", 1);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(funeflag_save) {
-    MapObject* b = mapGetMapObj("S_fune_b");
-    MapObject* c = mapGetMapObj("S_fune_c");
-    event->lwData[8] = b->flags & 1;
-    event->lwData[9] = c->flags & 1;
-    return EVT_RETURN_DONE;
-}
-
 static EVT_BEGIN(option_ship_mario)
     SET_FLOAT_VALUE(LW(10), GW(13))
     SET_FLOAT_VALUE(LW(11), GW(14))
@@ -3939,6 +4651,149 @@ EVT_BEGIN(gor_muj_ship_pera)
     CALL(evt_paper_delete, STRING("OFF_d_kaiten"))
     RETURN
 EVT_END()
+
+void gor_stg4_018_cb(s32 type, GorCbInfo** param) {
+    GorCbInfo* info = *param;
+
+    switch (type) {
+        case 3:
+            if (info->field_0x8 == 1) {
+                evtSetValue(NULL, LSWF(6), 1);
+            }
+            break;
+    }
+}
+
+static USER_FUNC(fune_eff) {
+    EffectEntry* eff1;
+    EffectEntry* eff2;
+    f32 oldX;
+    f32 oldZ;
+    f32 dist;
+    f32 angle;
+    f32 sign;
+    Vec pos;
+
+    if (isFirstCall) {
+        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
+        event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
+        mapObjGetPos("S_fune_a", &pos);
+        event->userdataf[2] = pos.x;
+        *(f32*)&event->field_84 = pos.z;
+    }
+    eff1 = event->userdatap[0];
+    eff2 = event->userdatap[1];
+    oldX = event->userdataf[2];
+    oldZ = *(f32*)&event->field_84;
+    mapObjGetPos("S_fune_a", &pos);
+    event->userdataf[2] = pos.x;
+    *(f32*)&event->field_84 = pos.z;
+    dist = distABf(oldX, oldZ, pos.x, pos.z);
+    angle = angleABf(oldX, oldZ, pos.x, pos.z);
+    if (angle < 180.0f) {
+        sign = 1.0f;
+    } else {
+        sign = -1.0f;
+    }
+    ((f32*)eff1->userdata)[17] = 3.0f;
+    ((f32*)eff1->userdata)[1] = pos.x + 85.0f * sign;
+    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
+    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
+    ((f32*)eff1->userdata)[4] = dist;
+    if (angle < 180.0f) {
+        ((f32*)eff1->userdata)[5] = 135.0f + angle;
+    } else {
+        ((f32*)eff1->userdata)[5] = 45.0f + angle;
+    }
+    ((f32*)eff2->userdata)[1] = pos.x - 15.0f * sign;
+    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
+    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
+    ((f32*)eff2->userdata)[4] = dist;
+    ((f32*)eff2->userdata)[5] = 90.0f + angle;
+    if (dist > 1.0f && gp->retraceCount % 15 == 0) {
+        effWaterDamageN64Entry(5, 30, pos.x - 150.0f * sign, pos.y - 50.0f, pos.z, 2.0f);
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(gor_ship_puka_func) {
+    s32* args = event->args;
+    s32 idx = evtGetValue(event, args[0]);
+    f32 f = evtGetFloat(event, args[1]);
+    evtSetFloat(event, args[2], f * gor_ship_puka_data[idx & 0xF]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(scale_func) {
+    f32 s = evtGetFloat(event, event->args[0]);
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(0);
+    PartyEntry* party2 = partyGetPtr(1);
+
+    mario->scale = (Vec){s, s, s};
+    if (party != NULL) {
+        party->scale = (Vec){s, s, s};
+    }
+    if (party2 != NULL) {
+        party2->scale = (Vec){s, s, s};
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(funeflag_save) {
+    MapObject* b = mapGetMapObj("S_fune_b");
+    MapObject* c = mapGetMapObj("S_fune_c");
+    event->lwData[8] = b->flags & 1;
+    event->lwData[9] = c->flags & 1;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(funeflag_reset) {
+    mapGrpFlagOn("S_fune_b", 1);
+    mapGrpFlagOn("S_fune_c", 1);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(funeflag_load) {
+    mapGrpFlagOff("S_fune_b", 1);
+    mapGrpFlagOn("S_fune_b", event->lwData[8]);
+    mapGrpFlagOff("S_fune_c", 1);
+    mapGrpFlagOn("S_fune_c", event->lwData[9]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(funechange_func) {
+    s32* args = event->args;
+    evtSetValue(event, args[0], marioShipChanging());
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(get_yoshi_color) {
+    s32* args = event->args;
+    evtSetValue(event, args[0], pouchGetPartyColor(4));
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_gor_000006d8) {
+    NpcWork* wp = npcGetWorkPtr();
+    s32 i;
+    s32 total = wp->total;
+    NpcEntry* npc = wp->entries;
+
+    for (i = 0; i < total; i++, npc++) {
+        if (npc->flags & 1) {
+            if (npc->moveEvent != NULL) {
+                if (npc->regularEvtId != 0) {
+                    evtDeleteID(npc->regularEvtId);
+                }
+                npc->regularEvtId = 0;
+                npc->moveEvent = NULL;
+            }
+            npcDelete(npc);
+        }
+    }
+    return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(gor_muj_ship_start)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("S_c_hikinami"), 1)
@@ -5059,849 +5914,3 @@ EVT_BEGIN(gor_00_init_evt)
     END_INLINE_EVENT
     RETURN
 EVT_END()
-
-static USER_FUNC(scale_func) {
-    f32 s = evtGetFloat(event, event->args[0]);
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(0);
-    PartyEntry* party2 = partyGetPtr(1);
-
-    mario->scale = (Vec){s, s, s};
-    if (party != NULL) {
-        party->scale = (Vec){s, s, s};
-    }
-    if (party2 != NULL) {
-        party2->scale = (Vec){s, s, s};
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gor_ship_puka_func) {
-    s32* args = event->args;
-    s32 idx = evtGetValue(event, args[0]);
-    f32 f = evtGetFloat(event, args[1]);
-    evtSetFloat(event, args[2], f * gor_ship_puka_data[idx & 0xF]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(fune_eff) {
-    EffectEntry* eff1;
-    EffectEntry* eff2;
-    f32 oldX;
-    f32 oldZ;
-    f32 dist;
-    f32 angle;
-    f32 sign;
-    Vec pos;
-
-    if (isFirstCall) {
-        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
-        event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
-        mapObjGetPos("S_fune_a", &pos);
-        event->userdataf[2] = pos.x;
-        *(f32*)&event->field_84 = pos.z;
-    }
-    eff1 = event->userdatap[0];
-    eff2 = event->userdatap[1];
-    oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->field_84;
-    mapObjGetPos("S_fune_a", &pos);
-    event->userdataf[2] = pos.x;
-    *(f32*)&event->field_84 = pos.z;
-    dist = distABf(oldX, oldZ, pos.x, pos.z);
-    angle = angleABf(oldX, oldZ, pos.x, pos.z);
-    if (angle < 180.0f) {
-        sign = 1.0f;
-    } else {
-        sign = -1.0f;
-    }
-    ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x + 85.0f * sign;
-    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
-    ((f32*)eff1->userdata)[4] = dist;
-    if (angle < 180.0f) {
-        ((f32*)eff1->userdata)[5] = 135.0f + angle;
-    } else {
-        ((f32*)eff1->userdata)[5] = 45.0f + angle;
-    }
-    ((f32*)eff2->userdata)[1] = pos.x - 15.0f * sign;
-    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
-    ((f32*)eff2->userdata)[4] = dist;
-    ((f32*)eff2->userdata)[5] = 90.0f + angle;
-    if (dist > 1.0f && gp->retraceCount % 15 == 0) {
-        effWaterDamageN64Entry(5, 30, pos.x - 150.0f * sign, pos.y - 50.0f, pos.z, 2.0f);
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-void gor_stg4_018_cb(s32 type, GorCbInfo** param) {
-    GorCbInfo* info = *param;
-
-    switch (type) {
-        case 3:
-            if (info->field_0x8 == 1) {
-                evtSetValue(NULL, LSWF(6), 1);
-            }
-            break;
-    }
-}
-
-void suifu100taikikan_seq01(NanNpc* npc) {
-    Vec v;
-    Vec d;
-    s32 elapsed;
-    s32 duration;
-
-    switch (npc->state) {
-        case 0:
-            npc->posA = npc->pos;
-            npc->posA.x = -180.0f + irand(50);
-            npc->work78 = 140.0f + irand(120);
-            npc->dir = 270.0f;
-            npc->work70 = 1;
-            npc->state = 100;
-            break;
-        case 1:
-            npc->posA = npc->pos;
-            npc->posA.x = -255.0f + irand(30);
-            npc->posA.z = -230.0f + irand(30);
-            npc->work70 = 10;
-            npc->state = 100;
-            break;
-        case 10:
-            npc->posA = npc->pos;
-            npc->posA.z = -350.0f + irand(50);
-            npc->work70 = 20;
-            npc->state = 100;
-            break;
-        case 20:
-            npc->posA = npc->pos;
-            npc->posA.x += 520.0f + irand(50);
-            npc->dir = 90.0f;
-            npc->work70 = 30;
-            npc->state = 100;
-            break;
-        case 30:
-            npc->posA = suifu100kaidanDOWN[irand(3)];
-            npc->work70 = 40;
-            npc->state = 100;
-            break;
-        case 40:
-            npc->posA = suifu100kaidanUP[irand(3)];
-            npc->dir = 270.0f;
-            npc->work70 = 50;
-            npc->state = 100;
-            break;
-        case 50:
-            npc->posA = npc->pos;
-            npc->posA.x = -30.0f + irand(60);
-            npc->work70 = 60;
-            npc->state = 100;
-            break;
-        case 60:
-            npc->posA = npc->pos;
-            npc->posA.z -= 100.0f;
-            npc->work70 = 99;
-            npc->state = 100;
-            break;
-        case 99:
-            npc->pos = (Vec){0.0f, -1000.0f, 0.0f};
-            break;
-        case 100:
-            npc->time = gp->renderTime;
-            npc->posB = npc->pos;
-            npc->state = 101;
-        case 101:
-            PSVECSubtract(&npc->posA, &npc->posB, &v);
-            duration = 1000.0f * PSVECMag(&v) / npc->work78;
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
-            PSVECScale(&v, &d, (f32)elapsed / (f32)duration);
-            if (elapsed < duration) {
-                PSVECAdd(&npc->posB, &d, &npc->pos);
-            } else {
-                npc->pos = npc->posA;
-                npc->state = npc->work70;
-            }
-            break;
-    }
-}
-
-void suifu100taikikan_seq00(NanNpc* npc) {
-    npc->state = 0;
-}
-
-USER_FUNC(suifu100taikikan_away) {
-    s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
-
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->dir = 90.0f;
-        npc->func = suifu100taikikan_seq01;
-        npc->state = 0;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(suifu100taikikan_init) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
-    s32 i;
-
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->dir = 90.0f;
-        npc->pos.x = irand(135) - 100;
-        npc->pos.y = 15.0f;
-        npc->pos.z = irand(50) + 190;
-        npc->func = suifu100taikikan_seq00;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(hosei_party_pos) {
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-    PartyEntry* party = partyGetPtr(partyCtrlNo);
-
-    if (party == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    party->position.x += x;
-    party->position.y += y;
-    party->position.z += z;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(hosei_mario_pos) {
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-    MarioWork* mario = marioGetPtr();
-
-    mario->position.x += x;
-    mario->position.y += y;
-    mario->position.z += z;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    p->pos.x = evtGetFloat(event, args[1]);
-    p->pos.y = evtGetFloat(event, args[2]);
-    p->pos.z = evtGetFloat(event, args[3]);
-    p->target.x = evtGetFloat(event, args[4]);
-    p->target.y = evtGetFloat(event, args[5]);
-    p->target.z = evtGetFloat(event, args[6]);
-    p->angle = evtGetFloat(event, args[7]);
-    p->dist = evtGetFloat(event, args[8]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    evtSetFloat(event, args[1], p->pos.x);
-    evtSetFloat(event, args[2], p->pos.y);
-    evtSetFloat(event, args[3], p->pos.z);
-    evtSetFloat(event, args[4], p->target.x);
-    evtSetFloat(event, args[5], p->target.y);
-    evtSetFloat(event, args[6], p->target.z);
-    evtSetFloat(event, args[7], p->angle);
-    evtSetFloat(event, args[8], p->dist);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_set_direct) {
-    CameraEntry* camera = camGetPtr(4);
-    f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
-    f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
-
-    ckpw->pos.x = ckpw->dist * s + ckpw->target.x;
-    ckpw->pos.z = ckpw->target.z - ckpw->dist * c;
-    camera->presetPos = camera->cameraPos;
-    camera->presetAt = camera->cameraAt;
-    camera->storedPos = ckpw->pos;
-    camera->storedAt = ckpw->target;
-    camera->startTimeA = gp->renderTime;
-    camera->durationA = 0;
-    camera->stateA = 3;
-    camera->curveA = 11;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_init) {
-    s32* args = event->args;
-    Vec target;
-    Vec pos;
-    f32 dist;
-
-    ckp0 = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp0, 0, sizeof(KaitenParam));
-    ckp1 = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp1, 0, sizeof(KaitenParam));
-    ckpw = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp1, 0, sizeof(KaitenParam));
-    ckp0->pos.x = evtGetFloat(event, args[0]);
-    ckp0->pos.y = evtGetFloat(event, args[1]);
-    ckp0->pos.z = evtGetFloat(event, args[2]);
-    ckp0->target.x = evtGetFloat(event, args[3]);
-    ckp0->target.y = evtGetFloat(event, args[4]);
-    ckp0->target.z = evtGetFloat(event, args[5]);
-    ckp1->pos.x = evtGetFloat(event, args[6]);
-    ckp1->pos.y = evtGetFloat(event, args[7]);
-    ckp1->pos.z = evtGetFloat(event, args[8]);
-    ckp1->target.x = evtGetFloat(event, args[9]);
-    ckp1->target.y = evtGetFloat(event, args[10]);
-    ckp1->target.z = evtGetFloat(event, args[11]);
-
-    pos = ckp0->pos;
-    target = ckp0->target;
-    target.y = 0.0f;
-    pos.y = 0.0f;
-    dist = PSVECDistance(&pos, &target);
-    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
-    ckp0->dist = dist;
-
-    pos = ckp1->pos;
-    target = ckp1->target;
-    target.y = 0.0f;
-    pos.y = 0.0f;
-    dist = PSVECDistance(&pos, &target);
-    ckp1->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
-    ckp1->dist = dist;
-
-    ckpw->pos = ckp0->pos;
-    ckpw->target = ckp0->target;
-    ckpw->angle = ckp0->angle;
-    ckpw->dist = ckp0->dist;
-    return EVT_RETURN_DONE;
-}
-
-void gundan1000tai_seq01(NanNpc* npc) {
-    MarioWork* mario = marioGetPtr();
-    s32 r;
-    s32 elapsed;
-    f32 radius;
-    f32 angle;
-    f32 s;
-    f32 c;
-    f32 t;
-    f32 dist;
-    f32 speed;
-    f32 dir;
-
-    switch (npc->state) {
-        case 0:
-            npc->posB = npc->pos;
-            npc->workA4 = 0;
-            npc->workA8 = 0;
-            r = irand(1000);
-            if (r < 50) {
-                npc->state = 10;
-            } else if (r < 150) {
-                npc->state = 1;
-                npc->work6C = irand(500) + 300;
-                npc->time = gp->renderTime;
-            } else {
-                npc->state = 1;
-                npc->work6C = irand(2500) + 500;
-                npc->time = gp->renderTime;
-            }
-            break;
-        case 1:
-            if (npc->workA8) {
-                npc->state = 100;
-            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
-                evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
-                npc->state = 10;
-            }
-            break;
-        case 10:
-        case 11:
-            npc->time = gp->renderTime;
-            npc->posA = npc->pos;
-            if (npc->state == 10) {
-                radius = irand(25) + 25;
-            } else {
-                radius = irand(180) + 120;
-            }
-            angle = 6.2831855f * irand(360) / 360.0f;
-            s = sin(angle);
-            c = cos(angle);
-            npc->posC.x = 0.9f * (radius * s) + 30.0f;
-            npc->posC.y = 15.0f;
-            npc->posC.z = 0.5f * (radius * c) - 300.0f;
-            npc->work78 = -4.0f * (irand(60) + 50);
-            npc->work7C = npc->posC.y - npc->posA.y - npc->work78;
-            npc->work6C = irand(500) + 600;
-            if (npc->state == 10) {
-                npc->work70 = 21;
-                if (npc->posA.x < npc->posC.x) {
-                    npc->dir = 90.0f;
-                } else {
-                    npc->dir = 270.0f;
-                }
-            } else {
-                npc->work70 = 22;
-                if (npc->posA.x < npc->posC.x) {
-                    npc->dir = 270.0f;
-                } else {
-                    npc->dir = 90.0f;
-                }
-            }
-            npc->state = 20;
-            evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
-            break;
-        case 20:
-            elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
-            if (elapsed < npc->work6C) {
-                t = (f32)elapsed / (f32)npc->work6C;
-                npc->pos.x = intplGetValue(0, elapsed, npc->work6C, npc->posA.x, npc->posC.x);
-                npc->pos.z = intplGetValue(0, elapsed, npc->work6C, npc->posA.z, npc->posC.z);
-                npc->pos.y = npc->posA.y + t * (npc->work78 * t + npc->work7C);
-            } else {
-                npc->pos = npc->posC;
-                npc->state = npc->work70;
-                npc->time = gp->renderTime;
-                npc->work6C = irand(2000) + 500;
-            }
-            break;
-        case 21:
-            if (npc->workA8) {
-                npc->state = 100;
-            } else if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
-                npc->state = 11;
-            }
-            break;
-        case 22:
-            if (npc->workA8) {
-                npc->state = 102;
-                break;
-            }
-            npc->work6C = irand(2000) + 500;
-            npc->time = gp->renderTime;
-            npc->posB = npc->pos;
-            npc->work78 = 15.0f + npc->posB.x;
-            npc->work7C = npc->posB.x - 15.0f;
-            if (irand(1)) {
-                npc->work80 = 1.0f;
-                npc->dir = 90.0f;
-            } else {
-                npc->work80 = -1.0f;
-                npc->dir = 270.0f;
-            }
-            npc->state = 30;
-            break;
-        case 30:
-            if (npc->workA8) {
-                npc->state = 102;
-                break;
-            }
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
-                npc->state = 10;
-                break;
-            }
-            if (npc->work78 < npc->pos.x) {
-                npc->work80 = -1.0f;
-                npc->dir = 270.0f;
-            }
-            if (npc->work7C > npc->pos.x) {
-                npc->work80 = 1.0f;
-                npc->dir = 90.0f;
-            }
-            npc->pos.x += npc->work80;
-            break;
-        case 100:
-            radius = irand(180) + 120;
-            angle = 6.2831855f * irand(360) / 360.0f;
-            s = sin(angle);
-            c = cos(angle);
-            npc->posC.x = 0.9f * (radius * s) + 30.0f;
-            npc->posC.z = 0.5f * (radius * c) - 300.0f;
-            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            dir = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            speed = dist / 2.0f + (irand(180) + 180);
-            speed = sysFrame2SecFloat(speed);
-            npc->work78 = speed;
-            npc->work7C = dir;
-            npc->work70 = dist / speed;
-            npc->work6C = 0;
-            npc->state = 101;
-        case 101:
-            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
-            npc->work6C++;
-            if (npc->work6C >= npc->work70) {
-                npc->pos.x = npc->posA.x;
-                npc->pos.z = npc->posA.z;
-                npc->state = 102;
-            }
-            break;
-        case 102:
-            evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
-            npc->workA4 = 1;
-            break;
-    }
-}
-
-void gundan1000tai_seq00(NanNpc* npc) {
-    MarioWork* mario = marioGetPtr();
-    s32 wait;
-    f32 dist;
-    f32 speed;
-    f32 angle;
-
-    switch (npc->state) {
-        case 0:
-            npc->time = gp->renderTime;
-            wait = (npc->work74 % 6) * 500;
-            npc->work6C = wait + irand(500);
-            npc->state++;
-        case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
-                npc->state++;
-            }
-            break;
-        case 2:
-            dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            angle = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            speed = dist / 2.0f + (irand(180) + 180);
-            speed = sysFrame2SecFloat(speed / 2.0f);
-            npc->work78 = speed;
-            npc->work7C = angle;
-            npc->work70 = dist / speed;
-            npc->work6C = 0;
-            npc->workA4 = 0;
-            evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);
-            npc->state++;
-        case 3:
-            movePos(&npc->pos.x, &npc->pos.z, npc->work78, npc->work7C);
-            npc->work6C++;
-            if (npc->work6C >= npc->work70) {
-                npc->pos.x = npc->posA.x;
-                npc->pos.z = npc->posA.z;
-                npc->workA4 = 1;
-                evt_nannpc_set_animtbl_sub(npc, dai3_animtbl);
-                npc->state++;
-            }
-            break;
-        case 4:
-            npc->posB = npc->pos;
-            break;
-    }
-}
-
-USER_FUNC(gundan1000tai_totsuend) {
-    NanNpcWork* wp = nanNPCWork;
-    s32 i;
-
-    for (i = 0; i < wp->count; i++) {
-        wp->entries[i].workA8 = 1;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gundan1000tai_areacheck) {
-    s32* args = event->args;
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(1);
-    s32 area;
-
-    if (mario->position.y > 70.0f) {
-        area = 0;
-    } else if (mario->position.x < 60.0f) {
-        area = 0x10;
-    } else if (mario->position.x < 80.0f) {
-        area = 4;
-    } else if (mario->position.x < 100.0f) {
-        area = 2;
-    } else if (mario->position.x < 120.0f) {
-        area = 1;
-    } else {
-        area = 0;
-    }
-    evtSetValue(event, args[0], area);
-    if (party->position.y > 70.0f) {
-        area = 0;
-    } else if (party->position.x < 60.0f) {
-        area = 0x10;
-    } else if (party->position.x < 80.0f) {
-        area = 4;
-    } else if (party->position.x < 100.0f) {
-        area = 2;
-    } else if (party->position.x < 120.0f) {
-        area = 1;
-    } else {
-        area = 0;
-    }
-    evtSetValue(event, args[1], area);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gundan1000tai_totsugeki) {
-    s32 i;
-    NanNpc* npc;
-    NanNpcWork* wp = nanNPCWork;
-
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->func = gundan1000tai_seq01;
-        npc->state = 0;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gundan1000tai_init) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
-    f32 radius;
-    f32 angle;
-    f32 s;
-    f32 c;
-    f32 base;
-    s32 i;
-
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        radius = irand(180) + 120;
-        angle = 6.2831855f * irand(360) / 360.0f;
-        s = sin(angle);
-        c = cos(angle);
-        npc->posA.x = 0.9f * (radius * s);
-        npc->posA.y = 15.0f;
-        npc->posA.z = 0.5f * (radius * c) - 300.0f;
-        if (npc->posA.x < 30.0f) {
-            npc->dir = 90.0f;
-            base = -280.0f;
-        } else {
-            npc->dir = 270.0f;
-            base = 340.0f;
-        }
-        radius = irand(100);
-        angle = 6.2831855f * irand(360) / 360.0f;
-        s = sin(angle);
-        c = cos(angle);
-        npc->pos.x = radius * s + base;
-        npc->pos.y = 15.0f;
-        npc->pos.z = radius * c - 300.0f;
-        npc->func = gundan1000tai_seq00;
-        npc->state = 0;
-        npc->work74 = i;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gundan1000tai_circle_pos_func) {
-    s32* args = event->args;
-    f32 radius = irand(180) + 120;
-    f32 angle = 6.2831855f * irand(360) / 360.0f;
-    f32 s = sin(angle);
-    f32 c = cos(angle);
-
-    evtSetFloat(event, args[0], 0.9f * (radius * s));
-    evtSetFloat(event, args[1], 15.0f);
-    evtSetFloat(event, args[2], 0.5f * (radius * c) - 300.0f);
-    return EVT_RETURN_DONE;
-}
-
-void geundan1000tai_circle_pos(Vec* pos) {
-    f32 radius = irand(180) + 120;
-    f32 angle = 6.2831855f * irand(360) / 360.0f;
-    f32 s = sin(angle);
-    f32 c = cos(angle);
-
-    pos->x = 0.9f * (radius * s);
-    pos->y = 15.0f;
-    pos->z = 0.5f * (radius * c) - 300.0f;
-}
-
-USER_FUNC(fune_yure_func) {
-    s32* args = event->args;
-    s32 dir = evtGetValue(event, args[0]);
-    f32 amp = evtGetFloat(event, args[1]);
-    s32 done;
-    f32 step;
-
-    if (0.0f == amp) {
-        evtSetFloat(event, args[2], 0.0f);
-        evtSetValue(event, args[3], 1);
-        return EVT_RETURN_DONE;
-    }
-    done = 0;
-    step = 2.0f * amp / sysMsec2FrameFloat(2000.0f);
-    if (dir == 0) {
-        *(f32*)&event->lwData[0] += step;
-        if (*(f32*)&event->lwData[0] >= amp) {
-            *(f32*)&event->lwData[0] = amp;
-            done = 1;
-        }
-    } else {
-        *(f32*)&event->lwData[0] -= step;
-        if (*(f32*)&event->lwData[0] <= -amp) {
-            *(f32*)&event->lwData[0] = -amp;
-            done = 1;
-        }
-    }
-    evtSetFloat(event, args[2], *(f32*)&event->lwData[0]);
-    evtSetValue(event, args[3], done);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(fune_yure_func_init) {
-    *(f32*)&event->lwData[0] = evtGetFloat(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(delete_itemsel_table) {
-    _mapFree(itemsel_table_ram);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(make_itemsel_table) {
-    s32* args = event->args;
-    PouchData* pouch = pouchGetPtr();
-    s32* p;
-    s32 count;
-    s32 i;
-
-    itemsel_table_ram = _mapAlloc(0x54);
-    p = itemsel_table_ram;
-    count = 0;
-    for (i = 0; i < 20; i++) {
-        s32 item = pouch->heldItems[i];
-
-        if (item >= 0xB3 && item < 0xEC) {
-            *p++ = item;
-            count++;
-        }
-        if (item >= 0x94 && item < 0xA1) {
-            *p++ = item;
-            count++;
-        }
-        switch (item) {
-            case 0xA6:
-            case 0xA7:
-            case 0xA8:
-            case 0xA9:
-            case 0xAA:
-            case 0xAB:
-            case 0xAD:
-            case 0xAE:
-            case 0xAF:
-            case 0xB0:
-                *p++ = item;
-                count++;
-                break;
-        }
-    }
-    *p = -1;
-    evtSetValue(event, args[0], count);
-    event->lwData[10] = (s32)itemsel_table_ram;
-    return EVT_RETURN_DONE;
-}
-
-static f32 accdec_type(s32 step, s32 total, f32 start, f32 end) {
-    f32 cur;
-    f32 speed;
-    f32 sum;
-    s32 accel = total * 10 / 100;
-    s32 decel = total * 90 / 100;
-    s32 i;
-
-    speed = 0.0f;
-    sum = 0.0f;
-
-    for (i = 0; i < total; i++) {
-        if (i <= accel) {
-            speed += 1.0f;
-        } else if (i >= decel) {
-            speed -= 1.0f;
-        }
-        sum += speed;
-        if (i == step) {
-            cur = sum;
-        }
-    }
-    return start + cur * (end - start) / sum;
-}
-
-f32 lineardec_type(s32 step, s32 total, f32 start, f32 end) {
-    f32 cur;
-    f32 speed;
-    f32 sum;
-    s32 decel;
-    s32 i;
-
-    speed = total * 20 / 100;
-    sum = speed;
-    decel = total * 80 / 100;
-
-    for (i = 0; i < total; i++) {
-        if (i >= decel) {
-            speed -= 1.0f;
-        }
-        sum += speed;
-        if (i == step) {
-            cur = sum;
-        }
-    }
-    return start + cur * (end - start) / sum;
-}
-
-static USER_FUNC(alpha_set_func) {
-    *_ap = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(alpha_init_func) {
-    _ap = _mapAlloc(1);
-    *_ap = 255;
-    return EVT_RETURN_DONE;
-}
-
-static void alpha_tev(MapTevCallbackInfo* info) {
-    s32 stage = info->tevStage;
-    u8* alpha = _ap;
-
-    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
-    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
-    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
-    info->tevStage++;
-}
-

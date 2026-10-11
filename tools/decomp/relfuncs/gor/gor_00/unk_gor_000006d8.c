@@ -2,9 +2,9 @@
 // proto: USER_FUNC(unk_gor_000006d8);
 USER_FUNC(unk_gor_000006d8) {
     NpcWork* wp = npcGetWorkPtr();
+    s32 i;
     s32 total = wp->total;
     NpcEntry* npc = wp->entries;
-    s32 i;
 
     for (i = 0; i < total; i++, npc++) {
         if (npc->flags & 1) {

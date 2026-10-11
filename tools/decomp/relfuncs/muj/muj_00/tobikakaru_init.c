@@ -11,8 +11,8 @@
 USER_FUNC(tobikakaru_init) {
     NanNpcWork* wp = nanNPCWork;
     TobiWork* p;
-    NanNpc* npc;
     s32 i;
+    NanNpc* npc;
 
     p = _mapAlloc(0x1310);
     Tobidat = p;

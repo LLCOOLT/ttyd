@@ -20,6 +20,9 @@
 // decl: void zakogun_ext_main2(void);
 // decl: void zakogun_ext_main3(void);
 // decl: void zakogun_ext_disp(CameraId camera, void* param);
+// include: mario/mariost.h
+// decl: s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, s32 vol, s32 pan, Vec* pos);
+// decl: void btl_camera_set_mode(s32 a, s32 b);
 // proto: void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div);
 void zakogun_set_pose(ZakoGun* zako, s32 base, s32 num, s32 div) {
     zako->poseBase = base;

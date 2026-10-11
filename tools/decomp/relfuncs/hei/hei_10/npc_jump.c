@@ -4,6 +4,7 @@
 // include: system.h
 // decl: static inline f32 chb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 // decl: static inline f32 chb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
+// decl: static inline s32 npc_jump_get_time(EventEntry* event, s32* args) { return evtGetValue(event, args[6]); }
 // proto: static USER_FUNC(npc_jump);
 #pragma opt_propagation off
 #pragma opt_lifetimes off
@@ -15,7 +16,7 @@ static USER_FUNC(npc_jump) {
     f32 z = evtGetFloat(event, args[3]);
     f32 speed = evtGetFloat(event, args[4]);
     f32 gravity = evtGetFloat(event, args[5]);
-    f32 t = 60.0f * (f32)evtGetValue(event, args[6]) / 1000.0f;
+    f32 t = 60.0f * (f32)npc_jump_get_time(event, args) / 1000.0f;
     NpcEntry* npc = npcNameToPtr(name);
     f32 vy;
     f32 dist;

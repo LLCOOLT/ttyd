@@ -22,6 +22,7 @@ USER_FUNC(urouro_fuwafuwa_func) {
         -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f, -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
     };
     s32 t;
+    f32 dy;
 
     if (isFirstCall) {
         event->savedTime = gp->renderTime;
@@ -38,14 +39,9 @@ USER_FUNC(urouro_fuwafuwa_func) {
                 npc->direction = 90.0f;
             }
         }
-        {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = sx;
-            pos.y = sy + tbl[sysMsec2Frame(t) & 31];
-            pos.z = sz;
-            npc->prevPosition = pos;
-            npc->position = npc->prevPosition;
-        }
+        dy = tbl[sysMsec2Frame(t) & 31];
+        npc->prevPosition = (Vec){sx, sy + dy, sz};
+        npc->position = npc->prevPosition;
         return EVT_RETURN_BLOCK;
     }
     if (!noDir) {
@@ -55,13 +51,7 @@ USER_FUNC(urouro_fuwafuwa_func) {
             npc->direction = 90.0f;
         }
     }
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = ex;
-        pos.y = ey;
-        pos.z = ez;
-        npc->prevPosition = pos;
-        npc->position = npc->prevPosition;
-    }
+    npc->prevPosition = (Vec){ex, ey, ez};
+    npc->position = npc->prevPosition;
     return EVT_RETURN_DONE;
 }

@@ -513,7 +513,9 @@ typedef struct BattleUnit {
     s8 activeTurns;                              // 0x24
     s8 swallowRate;                              // 0x25
     s8 swallowAttribute;                         // 0x26
-    u8 field_0x27[0x30 - 0x27];                  // 0x27
+    u8 field_0x27;                               // 0x27
+    s32 movePriority;                            // 0x28
+    s32 attackPhase;                             // 0x2C
     Vec mHomePosition;                           // 0x30
     Vec mPosition;                               // 0x3C
     Vec mPositionOffset;                         // 0x48

@@ -8,17 +8,17 @@
 // decl: typedef struct RuleData { s32 name; const char* msg; s32 id; s32 a; s32 b; } RuleData;
 // decl: static __declspec(section ".data") RankWork* rank_wp;
 // decl: static __declspec(section ".data") DispWork* dwp;
-// decl: static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+// decl: #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 // decl: static void printRanking(void);
 // proto: USER_FUNC(evt_tou_get_next_match);
 USER_FUNC(evt_tou_get_next_match) {
     s32* args = event->args;
     s32 flag = evtGetValue(event, GSWF(2443));
-    s32 list[32];
-    s32 n = 0;
-    s32 i;
     s32 rank;
     RankEntry* entry;
+    s32 i;
+    s32 n = 0;
+    s32 list[32];
 
     for (i = 0; i < rank_wp->num; i++) {
         entry = &rank_wp->entries[i];
@@ -26,7 +26,7 @@ USER_FUNC(evt_tou_get_next_match) {
             list[n++] = entry->id;
         }
     }
-    rank = getRank();
+    GET_RANK(rank, i);
     if (rank > 0) {
         if (flag) {
             evtSetValue(event, args[0], list[rank - 1]);

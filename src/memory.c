@@ -29,7 +29,7 @@ s32 size_table[6][2] = {
 static SmartWork* wp = &smartWork;
 
 //.sbss
-s16 count;
+u16 count;
 BOOL g_bFirstSmartAlloc;
 u32 mapalloc_size;
 void* mapalloc_base_ptr;
@@ -39,6 +39,7 @@ OSHeapHandle heapHandle[6];
 
 //local prototypes
 void smartGarbage(void);
+extern OSThread dvdmgr_thread;
 
 void memInit(void) { //almost 1:1, stubborn regalloc at the end
     MapAllocEntry* entry;
@@ -101,20 +102,17 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
 }
 
 void memClear(HEAP_TYPE heap) {
-	MapAllocEntry* entry;
-	void* ptr;
 	u32 size;
+	MapAllocEntry* entry;
 
 	OSDestroyHeap(heapHandle[heap]);
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
 	if (heap == HEAP_MALLOC) {
 		size = (u32)heapEnd[1] - (u32)heapStart[1] - 32;
-		//inline __memAlloc?
-		ptr = OSAllocFromHeap(heapHandle[1], size);
-		entry = ptr;
-		if (ptr) {
-			memset(ptr, 0, size);
-			DCFlushRange(ptr, size);
+		entry = OSAllocFromHeap(heapHandle[1], size);
+		if (entry) {
+			memset(entry, 0, size);
+			DCFlushRange(entry, size);
 		}
 		entry->next = NULL;
 		entry->size = size - 32;
@@ -277,8 +275,9 @@ void _mapFree(void* alloc) {
 }
 
 void smartInit(void) {
-	void* ptr;
+	smartEntry* e;
 	u32 size;
+	void* ptr;
 	int i;
 
 	size = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
@@ -290,12 +289,13 @@ void smartInit(void) {
 	wp->ptr = ptr;
 	wp->field_0xE008 = 0;
 	wp->field_0xE00C = 0;
-	wp->bytesLeft = size;
-	memset(wp->ptr, 0, size);
+	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
+	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
-	for (i = 0; i < 0x800; i++) {
-		wp->work[i].next = &wp->work[i + 1];
-		wp->work[i].prev = &wp->work[i - 1];
+	e = wp->work;
+	for (i = 0; i < 0x800; i++, e++) {
+		e->next = e + 1;
+		e->prev = e - 1;
 	}
 	wp->head = &wp->work[0];
 	wp->head->prev = NULL;
@@ -305,40 +305,102 @@ void smartInit(void) {
 	g_bFirstSmartAlloc = FALSE;
 }
 
-void smartReInit(void) {
-	u32 size;
+void L_smartReInit(void) {
+	smartEntry* e;
 	int i;
 
 	wp->field_0xE008 = 0;
 	wp->field_0xE00C = 0;
-	size = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
-	wp->bytesLeft = size;
-	memset(wp->ptr, 0, size);
+	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
+	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
-	for (i = 0; i < 0x800; i++) {
-		wp->work[i].next = &wp->work[i + 1];
-		wp->work[i].prev = &wp->work[i - 1];
+	e = wp->work;
+	for (i = 0; i < 0x800; i++, e++) {
+		e->next = e + 1;
+		e->prev = e - 1;
 	}
 	wp->head = &wp->work[0];
 	wp->head->prev = NULL;
 	wp->tail = &wp->work[0x7FF];
 	wp->tail->next = NULL;
-	wp->waitsync = 0;
 	g_bFirstSmartAlloc = 0;
 }
 
+#pragma dont_inline on
+void smartAutoFree(s32 a1) {
+	smartEntry* entry;
+	smartEntry* next;
+	u16 type = a1;
 
-
-void smartAutoFree(u32 a1) {
-
+	for (entry = wp->field_0xE008; entry; entry = next) {
+		next = entry->next;
+		if (entry->type == type) {
+			smartFree(entry);
+		}
+	}
+	if (a1 == 3) {
+		for (entry = wp->field_0xE008; entry; entry = next) {
+			next = entry->next;
+			if ((s32)entry->type == 4) {
+				smartFree(entry);
+			}
+		}
+	}
 }
 
+#pragma dont_inline reset
 void smartFree(smartEntry* entry) {
+	u32 total;
 
+	if (entry->type == 4) {
+		entry->type = 3;
+		return;
+	}
+	if (!entry->prev) {
+		wp->field_0xE008 = entry->next;
+		if (wp->field_0xE008) {
+			wp->field_0xE008->prev = NULL;
+		}
+	}
+	else {
+		entry->prev->next = entry->next;
+	}
+	if (!entry->next) {
+		wp->field_0xE00C = entry->prev;
+		if (wp->field_0xE00C) {
+			wp->field_0xE00C->next = NULL;
+		}
+	}
+	else {
+		entry->next->prev = entry->prev;
+	}
+	total = entry->size + entry->field_0x10;
+	if (entry->prev) {
+		entry->prev->field_0x10 += total;
+	}
+	else {
+		wp->bytesLeft += total;
+	}
+	if (!wp->head) {
+		wp->head = entry;
+		entry->prev = NULL;
+	}
+	else {
+		wp->tail->next = entry;
+		entry->prev = wp->tail;
+	}
+	entry->field_0xC = 0;
+	entry->next = NULL;
+	entry->size = 0;
+	entry->field_0x10 = 0;
+	entry->field_0x8 = NULL;
+	wp->tail = entry;
+	wp->waitsync++;
 }
 
 smartEntry* smartAlloc(u32 size, u8 type) {
-	smartEntry* entry1, * entry2;
+	smartEntry* entry1;
+	smartEntry* entry2;
 	int i;
 
 	if (!g_bFirstSmartAlloc) {
@@ -417,13 +479,14 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		}
 		for (i = 0; i < 3; i++) {
 			switch (i) {
+				case 0:
+					break;
 				case 1:
 					_fileGarbage(1);
 					break;
 				case 2:
 					_fileGarbage(0);
 					break;
-				default: break;
 			}
 			smartGarbage();
 			entry1 = wp->field_0xE00C;
@@ -448,7 +511,51 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 }
 
 void smartGarbage(void) {
+	u8* addr;
+	u8* ptr;
+	u32 total;
+	smartEntry* entry;
+	smartEntry* prev;
 
+	sysWaitDrawSync();
+	if (wp->field_0xE008) {
+		wp->bytesLeft = 0;
+	}
+	else {
+		wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
+	}
+	prev = NULL;
+	ptr = wp->ptr;
+	for (entry = wp->field_0xE008; entry; prev = entry, entry = entry->next) {
+		addr = entry->address;
+		if (addr != ptr) {
+			if (entry->field_0x8) {
+				if (entry->field_0x8->state == 3 && entry->field_0x8->entry && OSGetCurrentThread() != &dvdmgr_thread) {
+					if (prev) {
+						prev->field_0x10 = addr - ptr;
+					}
+					else {
+						wp->bytesLeft = addr - ptr;
+					}
+					ptr = (u8*)entry->address + entry->size;
+					entry->field_0x10 = 0;
+					continue;
+				}
+				fileGarbageMoveMem(ptr, entry->field_0x8);
+			}
+			else {
+				memmove(ptr, addr, entry->size);
+				entry->address = ptr;
+			}
+		}
+		entry->field_0x10 = 0;
+		ptr = (u8*)entry->address + entry->size;
+	}
+	entry = wp->field_0xE00C;
+	if (entry) {
+		entry->field_0x10 = (u32)(((u8*)heapEnd[5] - (u8*)heapStart[5]) + (u8*)wp->ptr - 32) - (u32)entry->address - entry->size;
+	}
+	DCFlushRange(wp->ptr, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 }
 
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr) {

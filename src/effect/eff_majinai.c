@@ -47,10 +47,11 @@ void effMajinaiMain(EffectEntry* effect) {
     EffMajinaiWork* work = effect->userdata;
     Vec position;
     BOOL inBattle;
-    MapWork* map;
-    MarioWork* mario;
     BattleUnit* unit;
-    s32 color, i;
+    MapWork* map;
+    s32 i;
+    s32 color;
+    MarioWork* mario;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
     inBattle = gp->inBattle ? TRUE : FALSE;

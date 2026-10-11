@@ -44,8 +44,27 @@ typedef struct BattleGroupSetup {
     u8 field_1C[0x20 - 0x1C];    // 0x1C
 } BattleGroupSetup;
 
+typedef struct NpcBattleSelect {
+    s32 weight;                  // 0x0, 0 terminates the table
+    BattleGroupSetup* groupSetup; // 0x4
+    struct BattleStageData* stageData; // 0x8
+} NpcBattleSelect;
+
+typedef struct NpcSetupBattleInfo {
+    const char* name;            // 0x0
+    s32 field_4;                 // 0x4
+    ItemType fixedItem;          // 0x8
+    s32 swFlag;                  // 0xC
+    NpcBattleSelect* altSelect;  // 0x10, used when swFlag is set
+    NpcBattleSelect* select;     // 0x14
+    s32 field_18;                // 0x18
+    s32 field_1C;                // 0x1C
+    s8 field_20[16][2];          // 0x20, {min, max}
+    s32 field_40;                // 0x40
+} NpcSetupBattleInfo;
+
 typedef struct NpcBattleInfo {
-    u8 field_0[0x4 - 0x0];          // 0x0
+    struct BattleStageData* stageData; // 0x0
     s32 field_4;                    // 0x4
     ItemType fixedItem;             // 0x8
     ItemType itemDropped;           // 0xC
@@ -56,7 +75,15 @@ typedef struct NpcBattleInfo {
     ItemDropData* itemDropLists[8]; // 0x3C
     ItemType stolenItems[8];        // 0x5C
     ItemType recoveredItems[8];     // 0x7C
-    u8 field_9C[0xC4 - 0x9C];       // 0x9C
+    union {
+        s32 btlSetupWork[10];       // 0x9C
+        struct {
+            s32 field_9C[4];        // 0x9C
+            s32 field_AC;           // 0xAC
+            u8 field_B0[16];        // 0xB0
+            s32 field_C0;           // 0xC0
+        };
+    };
     u8 battleRule[3];               // 0xC4
     u8 field_C7;                    // 0xC7
 } NpcBattleInfo;
@@ -140,7 +167,7 @@ typedef struct NpcEntry {
     f32 jumpYScale;                 // 0x1C8
     f32 jumpGravity;                // 0x1CC
     f32 field_1D0;                  // 0x1D0
-    s32 jumpFlags;                  // 0x1D4, TODO verify
+    u32 jumpFlags;                  // 0x1D4, TODO verify
     s16 footstepToggle;             // 0x1D8
     f32 footstepAccum;              // 0x1DC
     const char* footstepSfxA;       // 0x1E0
@@ -160,7 +187,7 @@ typedef struct NpcEntry {
     NpcBattleInfo battleInfo;       // 0x230
     s32 field_2F8;                  // 0x2F8
     u32 field_2FC;                  // 0x2FC
-    s32 field_0x300;                // 0x300
+    struct HitEntry* field_0x300;   // 0x300, hit object
     void* unitWork[4];              // 0x304
     u8 field_314;                   // 0x314
     u8 btlCoinDropCount;            // 0x315
@@ -168,7 +195,7 @@ typedef struct NpcEntry {
     u8 balloonType;                 // 0x317
     u8 field_318[0x31C - 0x318];    // 0x318
     u16 koopaEncounterType;         // 0x31C
-    u8 field_31E[0x320 - 0x31E];    // 0x31E
+    u16 field_31E;                  // 0x31E
     s16 wFbatHitCheckRelated;       // 0x320
     u8 pad_322[2];                  // 0x322
     struct NpcEntry* prev;          // 0x324
@@ -227,9 +254,14 @@ typedef struct FieldBattleData {
     FieldBattleInfo info;        // 0x20
     u8 field_3C[0x4C - 0x3C];    // 0x3C
     NpcDeadInfo deadInfo[64];    // 0x4C
-    u8 field_54C[0x550 - 0x54C]; // 0x54C
+    u8 field_54C;                // 0x54C
+    u8 sandersBombTrigger;       // 0x54D
+    u8 field_54E[0x550 - 0x54E]; // 0x54E
     FirstStrikeInfo firstStrike; // 0x550
-    u8 field_570[0x580 - 0x570]; // 0x570
+    u8 field_570[0x574 - 0x570]; // 0x570
+    s32 field_574;               // 0x574
+    s32 field_578;               // 0x578
+    s32 field_57C;               // 0x57C
 } FieldBattleData;
 
 NpcWork* npcGetWorkPtr(void);

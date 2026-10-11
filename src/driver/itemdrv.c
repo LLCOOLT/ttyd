@@ -1,18 +1,102 @@
 #include "driver/itemdrv.h"
-#include "driver/icondrv.h"
 #include "driver/swdrv.h"
+#define iconEntry iconEntry_hidden
+#define iconChange iconChange_hidden
+#include "driver/icondrv.h"
+#undef iconEntry
+#undef iconChange
+#include "driver/windowdrv.h"
+#include "manager/evtmgr.h"
+#include "driver/camdrv.h"
+#include "driver/mobjdrv.h"
+#include "eff/eff_stardust.h"
+#include "pmario_sound.h"
+#include "driver/effdrv.h"
+#include "driver/hitdrv.h"
+#include "driver/msgdrv.h"
+#include "driver/seqdrv.h"
+#include "data/item_data.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr_cmd.h"
+#include "manager/fontmgr.h"
+#include "manager/winmgr.h"
+#include "mario/mario.h"
+#include "mario/mario_party.h"
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
+#include "party.h"
+#include "party/party_vivian.h"
 #include "memory.h"
+#include "system.h"
 #include <string.h>
+
+
+inline Vec unknownVec0(void) {
+    return (Vec){ 0.0f, 0.0f, 0.0f };
+}
+
+inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
+    Vec v = (Vec){ 0.0f, 0.0f, 0.0f };
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
+extern int __float_nan[];
+static inline s32 item_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
+static inline f32 item_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (item_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
 extern GlobalWork* gp;
 extern int sprintf(char* str, const char* format, ...);
+extern ItemData itemDataTable[];
+void iconEntry(const char* name, u16 iconId);
+void iconChange(const char* name, u16 iconId);
+BOOL marioChkItemGetMotion(void);
+void marioChgGetItemMotion(void);
+void marioChgStayMotion(void);
+void marioSetCamId(s32 camId);
+EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
+u32 psndBGMChkSilent(s32 a1);
+BOOL psndBGMChk(s32 a1);
+BOOL psndBGMOff(u32 flags);
+s32 msgWindow_Entry(const char* msg, s32 a2, s32 a3);
+extern s32 all_juyoitem_lecture[];
+BOOL nokonoko_holdItem(void);
+BOOL N_fbatPreventMarioEventChk(void);
+s32 marioGetJabaraState(void);
+EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+MapObjectEntry* mobjHitObjPtrToPtr(HitEntry* hit);
+double sin(double);
+double cos(double);
+EffectEntry* effHagetakaFlushN64Entry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale);
+
+BOOL itemGetNokoCheck(ItemEntry* entry);
+void winNameDisp(WinMgrEntry* win);
+void winNameDisp2(WinMgrEntry* win);
+void winHelpMain(WinMgrEntry* win);
+void winHelpDisp(WinMgrEntry* win);
+void winFullDisp(WinMgrEntry* win);
+BOOL N_itemPickUpFromFieldCheck(void);
+ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
+void itemseq_Bound(ItemEntry* entry);
+HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle);
+void itemseq_GetItem(ItemEntry* entry);
+void itemDelete(const char* name);
+void itemModeChange(ItemEntry* entry, s32 mode);
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
 
 //.bss
 static ItemWork work[2];
+
+//.data
+WinMgrDesc itemdrv_window_desc[4] = {
+	{0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, winNameDisp},
+	{0, 0, 8, -240, -130, 500, 80, {0xF0, 0xF0, 0xF0, 0xFF}, winHelpMain, winHelpDisp},
+	{0, 0, 8, -175, 200, 350, 75, {0x2B, 0xA4, 0xFF, 0xFF}, NULL, winFullDisp},
+	{0, 0, 8, -175, 120, 350, 42, {0xE1, 0xD7, 0x9B, 0xFF}, NULL, winNameDisp2},
+};
 
 //TODO: inline function? I see nothing in the symbol map
 #define itemGetWork() (gp->inBattle ? &work[1] : &work[0])
@@ -64,63 +148,1470 @@ void itemReInit(void) {
     }
 }
 
+void itemCoinDrop(Vec* position) {
+	ItemEntry* entry;
 
+	if (pouchGetCoin() > 0) {
+		pouchAddCoin(-1);
+		entry = itemEntry(NULL, 0x79, 8, -1, 0, position->x, position->y, position->z);
+		if (entry) {
+			entry->flags2 |= 0x40;
+		}
+	}
+}
 
+BOOL itemGetCheck(ItemEntry* entry) {
+	MarioWork* mario = marioGetPtr();
 
+	if (!entry) return FALSE;
+	if (entry->flags2 & 0x100000) return FALSE;
+	if (mario->characterId == 2) {
+		if (!(*(s32*)mario->field_0x14 & 1)) {
+			if (marioStGetSystemLevel() != 0U) return FALSE;
+			if (mario->flags & 0xA) return FALSE;
+		}
+	}
+	else {
+		if (marioStGetSystemLevel() != 0U) return FALSE;
+		if (mario->flags & 0xA) return FALSE;
+	}
+	if (*(s32*)&gp->field_0x164) return FALSE;
+	if (seqGetSeq() != 2) return FALSE;
+	if (mario->currMotionId == 0x19) return FALSE;
+	if (mario->currMotionId == 0x18) return FALSE;
+	if (vivianGetStatus()) return FALSE;
+	if (mario->currMotionId == 0x1F || mario->currMotionId == 0x20) return FALSE;
+	if (nokonoko_holdItem()) return FALSE;
+	{
+		ItemWork* wp = itemGetWork();
+		ItemEntry* item;
+		int i;
+		for (item = wp->entries, i = 0; i < wp->count; i++, item++) {
+			if (item->flags & 1 && item->mode == 2) {
+				return FALSE;
+			}
+		}
+	}
+	if (N_fbatPreventMarioEventChk()) return FALSE;
+	switch (entry->mode) {
+		case 5:
+		case 6:
+			if (!entry->field_0x26) break;
+			if (entry->flags2 & 4) break;
+			if (entry->flags2 & 8) break;
+			return TRUE;
+		case 3:
+		case 4:
+			if (entry->flags2 & 8) break;
+			return TRUE;
+		case 1:
+		case 7:
+			return TRUE;
+	}
+	return FALSE;
+}
 
+#pragma dont_inline on
+BOOL itemGetNokoCheck(ItemEntry* entry) {
+	MarioWork* mario = marioGetPtr();
 
-ItemEntry* itemEntry(const char* name, ItemType type, s32 a3, s32 evtId, s32 a5, f32 a6, f32 a7, f32 a8) {
+	if (!entry) return FALSE;
+	if (entry->flags2 & 0x100000) return FALSE;
+	if (marioStGetSystemLevel() != 0U) return FALSE;
+	if (mario->flags & 0xA) return FALSE;
+	if (entry->flags2 & 0x2000000) return FALSE;
+	if (*(s32*)&gp->field_0x164) return FALSE;
+	if (seqGetSeq() != 2) return FALSE;
+	if (mario->currMotionId == 0x19) return FALSE;
+	if (vivianGetStatus()) return FALSE;
+	if (mario->currMotionId == 0x1F || mario->currMotionId == 0x20) return FALSE;
+	if ((u16)(mario->currMotionId - 5) <= 3 || mario->currMotionId == 0xF || mario->currMotionId == 0xE) return FALSE;
+	{
+		ItemWork* wp = itemGetWork();
+		ItemEntry* item;
+		int i;
+		for (item = wp->entries, i = 0; i < wp->count; i++, item++) {
+			if (item->flags & 1 && item->mode == 2) {
+				return FALSE;
+			}
+		}
+	}
+	return !N_fbatPreventMarioEventChk();
+}
+#pragma dont_inline reset
+
+BOOL N_itemPickUpFromFieldCheck(void) {
 	ItemWork* wp = itemGetWork();
 	ItemEntry* entry;
-	s32 evtVar;
 	int i;
-	char itemName[64];
 
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (entry->flags & 1 && entry->mode == 2) {
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 
-	evtVar = evtId;
-	if (evtId != -1) {
-		if (evtId >= GSWF(0) && evtId <= EVTDAT_GSWF_MAX) {
-			evtVar = evtId + EVTDAT_GSWF_BASE;
-			if (swGet(evtId + EVTDAT_GSWF_BASE)) {
-				return NULL;
+typedef struct ItemEffPos {
+	u8 pad[8];
+	Vec position;
+} ItemEffPos;
+
+static inline HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
+	HitEntry* hit;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+
+	hitDist = 20.0 + __fabs(vy);
+	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
+	if (hit) {
+		*outY = hitY;
+	}
+	return hit;
+}
+
+void itemMain(void) {
+	ItemWork* wp = itemGetWork();
+	MarioWork* mario;
+	ItemEntry* entry;
+	PartyEntry* party;
+	HitEntry* hit;
+	BOOL active;
+	u16 mode;
+	int i;
+	f32 y, newY;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+	s32 dx, dy;
+
+	mario = marioGetPtr();
+	entry = itemHitCheck(mario->position.x, mario->position.y, mario->position.z, mario->wPlayerCollisionBox.x * 0.5f + 12.0f);
+	if (itemGetCheck(entry)) {
+		itemModeChange(entry, 2);
+	}
+
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (!(entry->flags & 1)) continue;
+		mode = entry->mode;
+		active = TRUE;
+		switch (mode) {
+			case 2:
+			case 7:
+			case 8:
+			case 10:
+				break;
+			default:
+				if (gp->systemLevelFlags & 0xF) {
+					active = FALSE;
+				}
+				break;
+		}
+		if (!active) {
+			entry->field_0x68 = gp->renderTime;
+			continue;
+		}
+		if (mode != 2) {
+			if (entry->timer == 0) {
+				entry->flags2 &= ~0x100;
+			}
+			else if (entry->flags2 & 0x4000) {
+				entry->flags2 &= ~0x100;
+			}
+			else {
+				y = OSTicksToMicroseconds(gp->renderTime - entry->field_0x68) / 1000.0f;
+				entry->timer = (f32)entry->timer - y;
+				if (entry->timer <= 0) {
+					itemModeChange(entry, 9);
+				}
+				else if (entry->timer <= 3000) {
+					if ((entry->timer >> 4) & 1) {
+						entry->flags2 ^= 0x100;
+					}
+				}
 			}
 		}
 		else {
-			if (evtId >= LSWF(0) && evtId <= EVTDAT_LSWF_MAX) {
-				evtVar = evtId + EVTDAT_LSWF_BASE;
-				if (_swGet(evtId + EVTDAT_LSWF_BASE)) {
-					return NULL;
+			entry->flags2 &= ~0x100;
+		}
+
+		switch (entry->mode) {
+			case 5:
+			case 6:
+			case 10:
+				itemseq_Bound(entry);
+				break;
+			case 3:
+			case 4:
+				itemseq_Bound(entry);
+				break;
+			case 1:
+				y = entry->position.y;
+				if (entry->flags2 & 0x100000) {
+					hit = NULL;
+					newY = y + -1.0f;
+				}
+				else {
+					hitDist = 20.0 + __fabs(-1.0f);
+					hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
+						entry->position.x, 20.0f + y, entry->position.z, 0.0f, -1.0f, 0.0f);
+					if (hit) {
+						newY = hitY;
+					}
+					else {
+						hit = NULL;
+						newY = y + -1.0f;
+					}
+				}
+				if (!hit) {
+					itemModeChange(entry, 3);
+				}
+				else {
+					entry->position.y = newY;
+				}
+				break;
+			case 2:
+				itemseq_GetItem(entry);
+				break;
+			case 8:
+				party = partyGetPtr(marioGetPartyId());
+				if (party) {
+					entry->position.x = party->position.x;
+					entry->position.y = 15.0f + party->position.y;
+					entry->position.z = party->position.z;
+				}
+				else {
+					itemModeChange(entry, 3);
+					entry->flags2 &= ~0x1000;
+				}
+				break;
+			case 9:
+				itemDelete(entry->name);
+				break;
+		}
+
+		if (entry->flags & 1) {
+			if (entry->itemId >= 0x72 && entry->itemId < 0x79) {
+				if (!(entry->flags2 & 0x100)) {
+					((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
+					((ItemEffPos*)entry->effect->userdata)->position.y = 16.0f + entry->position.y;
+					((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
+				}
+				else {
+					((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
+					((ItemEffPos*)entry->effect->userdata)->position.y = -1000.0f;
+					((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
+				}
+			}
+			else {
+				if (!(entry->flags2 & 0x100)) {
+					iconSetPos(entry->name, entry->position.x, entry->position.y, entry->position.z);
+					iconSetScale(entry->name, entry->scale);
+					iconSetAlpha(entry->name, entry->alpha);
+				}
+				else {
+					iconSetPos(entry->name, entry->position.x, -1000.0f, entry->position.z);
+				}
+			}
+			entry->field_0x68 = gp->renderTime;
+			if (entry->itemId == 0x79 || entry->itemId == 0x7A) {
+				if (irand(1000) < 30) {
+					dx = 10 - irand(20);
+					dy = irand(20) + 10;
+					effHagetakaFlushN64Entry(0, 10, entry->position.x + dx, entry->position.y + dy, entry->position.z, 1.0f);
 				}
 			}
 		}
 	}
 
+	wp = gp->inBattle ? &work[0] : &work[1];
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (entry->flags & 1) {
+			entry->field_0x68 = gp->renderTime;
+		}
+	}
+}
+
+void itemModeChange(ItemEntry* entry, s32 mode) {
+	entry->mode = mode;
+	entry->field_0x26 = 0;
+}
+
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z) {
+	ItemWork* wp = itemGetWork();
+	int i;
+	ItemEntry* entry;
+	BOOL isGswf, isLswf;
+	char itemName[8];
+
+	isGswf = FALSE;
+	isLswf = FALSE;
+	if (evtId != -1) {
+		if (evtId >= GSWF(0) && evtId <= EVTDAT_GSWF_MAX) {
+			evtId += EVTDAT_GSWF_BASE;
+			isGswf = TRUE;
+			if (swGet(evtId)) {
+				return NULL;
+			}
+		}
+		else if (evtId >= LSWF(0) && evtId <= EVTDAT_LSWF_MAX) {
+			evtId += EVTDAT_LSWF_BASE;
+			isLswf = TRUE;
+			if (_swGet(evtId)) {
+				return NULL;
+			}
+		}
+	}
+
 	if (name == NULL) {
-		if (++wp->currId >= 0xFFFFF) { //fix overflow
+		wp->currId++;
+		if (wp->currId >= 0xFFFFF) {
 			wp->currId = 1;
 		}
 		sprintf(itemName, "_i%05x", wp->currId);
 		name = itemName;
 	}
 
-	entry = wp->entries;
-	for (i = 0; i < wp->count; i++, entry++) {
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
 		if (entry->flags & 1 && !strcmp(entry->name, name)) {
 			break;
 		}
 	}
 
-	entry = wp->entries;
-	if (wp->count > 0) { //TODO: redundant check?
-		for (i = 0; i < wp->count; i++, entry++) {
-			if (!(entry->flags & 1)) {
-				break;
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (!(entry->flags & 1)) {
+			break;
+		}
+	}
+
+	if (i >= wp->count) {
+		entry = wp->entries;
+		if (entry->flags & 1 && entry->itemId == 0x79 && entry->flags & 0x400) {
+			itemDelete(entry->name);
+		}
+		else {
+			entry = wp->entries;
+			if (entry->flags & 1 && entry->itemId == 0x7C && entry->flags & 0x400) {
+				itemDelete(entry->name);
 			}
+			else {
+				entry = wp->entries;
+				if (entry->flags & 1 && entry->itemId == 0x7B && entry->flags & 0x400) {
+					itemDelete(entry->name);
+				}
+				else {
+					entry = NULL;
+				}
+			}
+		}
+		if (entry == NULL) {
+			return NULL;
+		}
+	}
+
+	memset(entry, 0, sizeof(ItemEntry));
+	strcpy(entry->name, name);
+	entry->position.x = x;
+	entry->position.y = y;
+	entry->position.z = z;
+	entry->itemId = itemId;
+	entry->field_0x2 = type;
+	entry->field_0x20 = a5;
+	entry->flags |= 1;
+	entry->scale = 1.0f;
+	entry->alpha = 0xFF;
+	if (evtId != -1) {
+		if (isGswf) {
+			entry->evtId = evtId;
+			entry->flags |= 0x20;
+		}
+		else if (isLswf) {
+			entry->evtId = evtId;
+			entry->flags |= 0x40;
+		}
+	}
+	else {
+		entry->evtId = -1;
+	}
+
+	switch (entry->itemId) {
+	case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78:
+		entry->effect = effStarStoneEntry(entry->itemId - 0x72, x, 16.0f + y, z, 1.0f);
+		break;
+	default:
+		entry->effect = NULL;
+		iconEntry(entry->name, itemDataTable[itemId].icon_id);
+		iconSetPos(entry->name, x, y, z);
+		iconSetScale(entry->name, entry->scale);
+		iconSetAlpha(entry->name, entry->alpha);
+		break;
+	}
+	entry->field_0x80 = entry->field_0x84 = 1.0f;
+	entry->field_0x68 = gp->renderTime;
+	switch (entry->itemId) {
+	case 0x79: case 0x7A: case 0x7B: case 0x7C:
+		entry->flags |= 4;
+		break;
+	}
+
+	switch ((u16)type) {
+		case 17:
+			entry->flags |= 2;
+		case 16:
+			itemModeChange(entry, 7);
+			break;
+		case 0:
+			itemModeChange(entry, 1);
+			break;
+		case 1:
+			itemModeChange(entry, 1);
+			entry->flags |= 2;
+			break;
+		case 4:
+			itemModeChange(entry, 6);
+			break;
+		case 3:
+			entry->timer = 5000;
+			itemModeChange(entry, 5);
+			break;
+		case 11:
+			entry->flags2 |= 0x4000;
+			entry->timer = 20000;
+			itemModeChange(entry, 6);
+			break;
+		case 12:
+			entry->flags2 |= 0x4000;
+			entry->timer = 20000;
+			itemModeChange(entry, 6);
+			entry->flags |= 0x400;
+			break;
+		case 9:
+			entry->flags |= 0x100;
+		case 8:
+			entry->flags2 |= 0x4000;
+			entry->timer = 8000;
+			itemModeChange(entry, 6);
+			break;
+		case 10:
+			entry->flags2 |= 0x4000;
+			entry->timer = 8000;
+			itemModeChange(entry, 6);
+			entry->flags |= 0x400;
+			break;
+		case 7:
+			entry->flags2 |= 0x4000;
+		case 5:
+			entry->timer = 5000;
+			itemModeChange(entry, 6);
+			break;
+		case 6:
+			entry->timer = 5000;
+			entry->flags2 |= 0x40;
+			itemModeChange(entry, 6);
+			break;
+		case 2:
+			itemModeChange(entry, 5);
+			break;
+		case 13:
+			itemModeChange(entry, 3);
+			break;
+		case 14:
+			itemModeChange(entry, 4);
+			break;
+		case 15:
+			itemModeChange(entry, 10);
+			break;
+	}
+	return entry;
+}
+
+void itemDelete(const char* name) {
+	ItemWork* wp = itemGetWork();
+	ItemEntry* entry;
+	int i;
+
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (!strcmp(entry->name, name)) {
+			itemCheckBadge(entry);
+			switch (entry->itemId) {
+				case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78:
+					effSoftDelete(entry->effect);
+					break;
+				default:
+					iconDelete(entry->name);
+					break;
+			}
+			entry->flags &= ~1;
 		}
 	}
 }
 
+ItemEntry* itemNameToPtr(char* name) {
+	ItemWork* wp = itemGetWork();
+	ItemEntry* entry;
+	int i;
 
-void itemMain(void) {
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (!strcmp(entry->name, name)) {
+			return entry;
+		}
+	}
+	return NULL;
+}
 
+ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range) {
+	ItemWork* wp = itemGetWork();
+	ItemEntry* entry;
+	ItemEntry* found;
+	MarioWork* mario;
+	int i;
+	f32 dx, dy, dz, xzdist, dist;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+	HitEntry* hit;
+
+	mario = marioGetPtr();
+	found = NULL;
+	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
+		if (!(entry->flags & 1)) continue;
+		if (entry->flags & 2) continue;
+		if (entry->flags2 & 0x1000) continue;
+		if (entry->mode == 2) continue;
+		dx = x - entry->position.x;
+		dz = z - entry->position.z;
+		dy = y - entry->position.y;
+		xzdist = item_sqrtf(dx * dx + dz * dz);
+		dist = item_sqrtf(dx * dx + dy * dy + dz * dz);
+		if (xzdist < range && marioItemGetOk() && marioGetJabaraState() != 1 &&
+			marioGetJabaraState() != 4 && marioGetJabaraState() != 5)
+		{
+			if (__fabs((y + mario->wPlayerCollisionBox.y * 0.5f) - entry->position.y) < mario->wPlayerCollisionBox.y * 0.5f + 10.0f) {
+				hit = NULL;
+				if (y < entry->position.y) {
+					hitDist = 10.0f + (entry->position.y - y);
+					if (hitDist > 0.0f) {
+						hit = hitCheckAttr(0x80000000, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f);
+					}
+				}
+				if (!hit) {
+					found = entry;
+					range = dist;
+				}
+			}
+		}
+	}
+	return found;
+}
+
+ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
+	MarioWork* mario = marioGetPtr();
+	ItemWork* wp = itemGetWork();
+	ItemEntry* entry;
+	ItemEntry* found;
+	int i;
+	Vec itemPos, diff, pos;
+	f32 dist;
+
+	entry = wp->entries;
+	found = NULL;
+	i = 0;
+	pos = makeVecByValue(x, y, z);
+	for (; i < wp->count; i++, entry++) {
+		if (!(entry->flags & 1)) continue;
+		if (entry->flags2 & 0x1000) continue;
+		if (entry->flags2 & 0x100000) continue;
+		if (entry->mode == 2) continue;
+		if (entry->flags2 & 0x2000000) continue;
+		itemPos = makeVecByValue(entry->position.x, entry->position.y, entry->position.z);
+		PSVECSubtract(&itemPos, &pos, &diff);
+		dist = PSVECMag(&diff);
+		if (dist < range) {
+			found = entry;
+			range = dist;
+		}
+	}
+	return found;
+}
+
+void winNameDisp(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+	const char* name;
+	u16 width;
+	char buffer[1024];
+
+	name = msgSearch(itemDataTable[entry->itemId].name);
+	if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+		sprintf(buffer, msgSearch("msg_window_badge_get"), name);
+	}
+	else {
+		sprintf(buffer, msgSearch("msg_window_item_get"), name);
+	}
+	width = FontGetMessageWidth(buffer);
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	if (!winMgrAction(entry->winId[0])) {
+		FontDrawStart();
+		FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 8, buffer);
+	}
+}
+
+void winNameDisp2(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+	const char* name;
+	u16 width;
+	char buffer[1024];
+
+	name = msgSearch(itemDataTable[entry->itemId].name);
+	sprintf(buffer, msgSearch("msg_window_item_release"), name);
+	width = FontGetMessageWidth(buffer);
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	if (!winMgrAction(entry->winId[0])) {
+		FontDrawStart();
+		FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 8, buffer);
+	}
+}
+
+void winHelpMain(WinMgrEntry* win) {
+	winMgrHelpMain(win);
+}
+
+void winHelpDisp(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+
+	if (!winMgrAction(entry->winId[1])) {
+		win->msg = msgSearch(itemDataTable[entry->itemId].description);
+		winMgrHelpDraw(win);
+	}
+}
+
+void winFullDisp(WinMgrEntry* win) {
+	ItemEntry* entry = win->param;
+	BOOL isBadge = FALSE;
+	const char* msg;
+	u16 width;
+
+
+	if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+		isBadge = TRUE;
+	}
+	if (isBadge) {
+		msg = msgSearch("msg_window_badge_full");
+	}
+	else {
+		msg = msgSearch("msg_window_item_full");
+	}
+	width = FontGetMessageWidth(msg);
+	if (width + 20 > win->width) {
+		win->width = width + 20;
+		win->x = -win->width / 2;
+	}
+	if (!winMgrAction(entry->winId[2])) {
+		FontDrawStart();
+		FontDrawEdge();
+		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		FontDrawMessage(-width / 2, win->y - 10, msg);
+		FontDrawEdgeOff();
+	}
+}
+
+static inline BOOL itemGetPouch(ItemEntry* entry) {
+	EventEntry* evt;
+
+	if (!pouchGetItem(entry->itemId)) {
+		return FALSE;
+	}
+	if (entry->flags & 0x20) {
+		swSet(entry->evtId);
+	}
+	else if (entry->flags & 0x40) {
+		_swSet(entry->evtId);
+	}
+	if (entry->field_0x20) {
+		evt = evtEntry((void*)entry->field_0x20, 0, 0x20);
+		evt->lwData[0] = FLOAT(entry->position.x);
+		evt->lwData[1] = FLOAT(entry->position.y);
+		evt->lwData[2] = FLOAT(entry->position.z);
+	}
+	entry->flags2 |= 1;
+	return TRUE;
+}
+
+static inline void itemGetSound(ItemEntry* entry) {
+	Vec pos;
+
+	pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
+	switch (entry->itemId) {
+		case 0x79:
+			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
+			psndSFXOn_3D("SFX_COIN_GET1", &pos);
+			break;
+		case 0x7A:
+			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
+			psndSFXOn_3D("SFX_EVT_GAME_MONTE_COUNT1", &pos);
+			break;
+		case 0x7B:
+			psndSFXOn_3D("SFX_HEART_GET1", &pos);
+			break;
+		case 0x7C:
+			psndSFXOn_3D("SFX_FLOWER_GET1", &pos);
+			break;
+		case 0x7D:
+			break;
+	}
+}
+
+static inline void itemGetEnd(ItemEntry* entry) {
+	marioStSystemLevel(0);
+	psndClearFlag(0x80);
+	if (entry->flags2 & 0x1000000) {
+		entry->flags2 &= ~0x1000000;
+		marioCtrlOn();
+	}
+	marioKeyOn();
+	marioChgStayMotion();
+	camGetPtr(8)->flags &= ~0x200;
+}
+
+void itemseq_GetItem(ItemEntry* entry) {
+	ItemWork* wp = itemGetWork();
+	MarioWork* mario;
+	s32 type, bgm;
+	s32 select;
+
+	mario = marioGetPtr();
+	switch (entry->field_0x26) {
+		case 0:
+			entry->flags2 &= ~0x10000;
+			if (entry->flags & 0x100) {
+				entry->flags2 |= 0x4000000;
+			}
+			else {
+				entry->flags2 &= ~0x4000000;
+			}
+			entry->flags &= ~0x100;
+			if (entry->flags & 4) {
+				if (itemGetPouch(entry)) {
+					entry->timer = 0;
+					itemGetSound(entry);
+					itemDelete(entry->name);
+				}
+				else {
+					itemModeChange(entry, 4);
+				}
+				break;
+			}
+			entry->field_0x26 = 1;
+			entry->timer = 0;
+			camGetPtr(8)->flags |= 0x200;
+			marioKeyOff();
+			marioStSystemLevel(2);
+			psndSetFlag(0x80);
+			mario->unk174.x = 0.0f;
+			mario->unk174.z = 0.0f;
+			mario->baseSpeed = 0.0f;
+			*(f32*)mario->unk18C = 0.0f;
+			if (entry->itemId == 7 || entry->itemId == 8 || entry->itemId == 10 || entry->itemId == 11) {
+				entry->flags2 |= 0x2000;
+			}
+		case 1:
+			if (!(entry->flags & 0x1000) || entry->flags & 0x4000) {
+				if (!marioChkItemGetMotion()) {
+					if (mario->currMotionId == 5 || (u16)(mario->currMotionId - 6) <= 2 ||
+						mario->currMotionId == 0xF || mario->currMotionId == 0xE)
+					{
+						entry->field_0x26 = 8;
+					}
+					break;
+				}
+			}
+			entry->field_0x26 = 2;
+			marioChgGetItemMotion();
+			entry->position.x = mario->position.x;
+			entry->position.y = 50.0f + mario->position.y;
+			entry->position.z = mario->position.z;
+			type = 7;
+			bgm = -1;
+			if (entry->itemId == 0x57) {
+				type = 4;
+				bgm = -1;
+			}
+			else if (entry->itemId == 0x7D) {
+				type = 8;
+				bgm = 0;
+			}
+			else if (entry->itemId < 0xC) {
+				type = 3;
+				bgm = 3;
+			}
+			else if (entry->itemId < 0x72) {
+				type = 6;
+				bgm = 1;
+			}
+			else if (entry->itemId < 0x79) {
+				type = 0;
+				bgm = -1;
+			}
+			else if (entry->itemId < 0xEC) {
+				type = 7;
+				bgm = -1;
+			}
+			else if (entry->itemId < 0x153) {
+				type = 5;
+				bgm = 2;
+			}
+			wp->effect = effItemGetEntry(type, mario->position.x, 62.0f + mario->position.y, mario->position.z);
+			if (entry->flags2 & 0x2000) {
+				((s32*)wp->effect->userdata)[14] = 5;
+				iconFlagOn(entry->name, 0x200);
+				marioSetCamId(7);
+			}
+			else {
+				((s32*)wp->effect->userdata)[14] = 5;
+				iconFlagOn(entry->name, 0x100);
+				if (type == 0 || type == 3) {
+					marioSetCamId(5);
+				}
+			}
+			if (!(entry->flags & 0x8000)) {
+				if (psndBGMChkSilent(0)) {
+					entry->flags |= 8;
+				}
+				switch (bgm) {
+					case 0:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_STARPIECE1");
+						break;
+					case 1:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_KEYITEM1");
+						break;
+					case 2:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_BADGE1");
+						break;
+					case 3:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_IMPORTANT_ITEM1");
+						break;
+					default:
+						if (!(entry->flags & 8)) {
+							psndBGMOff(0x3800);
+						}
+						psndBGMOn(0x211, "BGM_FF_GET_ITEM1");
+						break;
+				}
+			}
+			if (type == 8) {
+				evtSetValue(NULL, 0xF5DE01A2, evtGetValue(NULL, 0xF5DE01A2) + 1);
+			}
+			entry->flags &= ~0x4000;
+			itemGetSound(entry);
+			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[0]);
+			winMgrOpen(entry->winId[0]);
+			winMgrSetParam(entry->winId[0], entry);
+			if (!(entry->flags2 & 0x2000)) {
+				entry->winId[1] = winMgrEntry(&itemdrv_window_desc[1]);
+				winMgrOpen(entry->winId[1]);
+				winMgrSetParam(entry->winId[1], entry);
+			}
+			if (!itemGetPouch(entry)) {
+				entry->winId[2] = winMgrEntry(&itemdrv_window_desc[2]);
+				winMgrOpen(entry->winId[2]);
+				winMgrSetParam(entry->winId[2], entry);
+			}
+			if (entry->itemId == 0x49) {
+				iconChange(entry->name, 0x114);
+			}
+			if (!entry->effect) {
+				iconNameToPtr(entry->name)->flags |= 0x80;
+			}
+			break;
+		case 2:
+			if (!(entry->flags2 & 0x2000)) {
+				marioCtrlOff();
+				entry->flags2 |= 0x1000000;
+			}
+			entry->field_0x26 = 3;
+		case 3:
+			if (!(entry->flags & 0x8000) && !(entry->flags & 0x2000)) {
+				if (psndBGMChk(1)) {
+					entry->flags |= 0x2000;
+					psndBGMOff(0x201);
+					if (!(entry->flags & 8)) {
+						psndBGMOn(0xA0, NULL);
+					}
+				}
+			}
+			if (winMgrAction(entry->winId[0])) {
+				break;
+			}
+			if (!(keyGetButtonTrg(0) & 0x300)) {
+				break;
+			}
+			winMgrCloseAutoDelete(entry->winId[0]);
+			if (!(entry->flags2 & 0x2000)) {
+				winMgrCloseAutoDelete(entry->winId[1]);
+			}
+			if (!(entry->flags & 0x8000) && !(entry->flags & 0x2000)) {
+				psndBGMOff(0x201);
+				if (!(entry->flags & 8)) {
+					psndBGMOn(0xA0, NULL);
+				}
+			}
+			if (entry->flags2 & 0x2000) {
+				entry->field_0x26 = 6;
+				break;
+			}
+			if (entry->itemId >= 0x79 && entry->itemId < 0xEC && entry->itemId != 0x7D && !swGet(0xEB) && !(gp->flags & 0x1000)) {
+				swSet(0xEB);
+				entry->field_0x26 = 4;
+				wp->msgWindowId = msgWindow_Entry(msgSearch("item_first_hit"), 0, 0);
+				break;
+			}
+			effSoftDelete(wp->effect);
+			marioSetCamId(4);
+			iconFlagOff(entry->name, 0x100);
+			if (entry->itemId == 0x49) {
+				iconChange(entry->name, 0x115);
+			}
+			if (!entry->effect) {
+				iconNameToPtr(entry->name)->flags &= ~0x80;
+			}
+			if (entry->flags2 & 1) {
+				itemGetEnd(entry);
+				itemDelete(entry->name);
+				break;
+			}
+			entry->field_0x26 = 5;
+			winMgrCloseAutoDelete(entry->winId[2]);
+			marioChgStayMotion();
+			iconFlagOn(entry->name, 2);
+			if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+				wp->select = winMgrSelectEntry(2, entry->itemId, 1);
+			}
+			else {
+				wp->select = winMgrSelectEntry(1, entry->itemId, 1);
+			}
+			break;
+		case 4:
+			if (windowCheckID(wp->msgWindowId)) {
+				break;
+			}
+			effSoftDelete(wp->effect);
+			marioSetCamId(4);
+			iconFlagOff(entry->name, 0x100);
+			itemGetEnd(entry);
+			itemDelete(entry->name);
+			break;
+		case 5:
+			select = winMgrSelect(wp->select);
+			if (!select) {
+				break;
+			}
+			winMgrSelectDelete(wp->select);
+			if (select < 0) {
+				if (entry->flags2 & 0x4000000) {
+					entry->flags |= 0x100;
+				}
+			}
+			else {
+				pouchRemoveItem(select);
+				itemGetPouch(entry);
+				entry->flags2 &= ~1;
+				entry->itemId = select;
+				entry->field_0x20 = 0;
+				entry->evtId = 0;
+				entry->flags &= ~0x60;
+				iconChange(entry->name, itemDataTable[entry->itemId].icon_id);
+				wp->currId++;
+				sprintf(iconNameToPtr(entry->name)->name, "_i%05x", wp->currId);
+				sprintf(entry->name, "_i%05x", wp->currId);
+				entry->flags |= 0x100;
+			}
+			entry->flags &= ~0x1000;
+			entry->speed = 85.0f;
+			entry->velocityY = 120.0f;
+			entry->field_0x80 = 0.7f;
+			entry->field_0x84 = 1.0f;
+			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[3]);
+			winMgrOpen(entry->winId[0]);
+			winMgrSetParam(entry->winId[0], entry);
+			marioChgGetItemMotion();
+			iconFlagOff(entry->name, 2);
+			if (mario->flags & 0x2000000) {
+				entry->flags2 |= 0x8000;
+			}
+			entry->field_0x26 = 9;
+			break;
+		case 6:
+			wp->lectureEvt = evtEntryType(all_juyoitem_lecture, 0, 0, 0);
+			wp->lectureEvt->lwData[8] = (s32)entry;
+			wp->lectureEvt->lwData[9] = (s32)wp->effect;
+			psndClearFlag(0x80);
+			entry->field_0x26 = 7;
+			break;
+		case 7:
+			if (evtCheckID(wp->lectureEvt->eventId)) {
+				break;
+			}
+			itemGetEnd(entry);
+			itemDelete(entry->name);
+			break;
+		case 9:
+			if (!(keyGetButtonTrg(0) & 0x100)) {
+				break;
+			}
+			winMgrCloseAutoDelete(entry->winId[0]);
+			entry->flags2 |= 8;
+			itemModeChange(entry, 6);
+			entry->flags &= ~0x10;
+			if (entry->itemId >= 1 && entry->itemId < 0x79) {
+				entry->timer = 0;
+			}
+			else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+				entry->timer = 0;
+			}
+			else {
+				entry->timer = 20000;
+			}
+			entry->flags2 |= 0x10000;
+			entry->flags2 &= ~0x1000;
+			entry->flags &= ~2;
+			itemGetEnd(entry);
+			break;
+		case 8:
+			if (mario->flags & 0x2000000) {
+				entry->flags2 |= 0x8000;
+			}
+			entry->timer = 0;
+			if (entry->flags2 & 0x1000) {
+				itemModeChange(entry, 1);
+				entry->flags2 &= ~4;
+				entry->flags2 &= ~8;
+				entry->flags2 &= ~0x4000;
+				entry->flags2 &= ~0x1000;
+				entry->flags &= ~0x1000;
+			}
+			else {
+				entry->speed = 85.0f;
+				entry->velocityY = 120.0f;
+				entry->field_0x80 = 0.7f;
+				entry->field_0x84 = 1.0f;
+				entry->flags2 |= 8;
+				itemModeChange(entry, 6);
+				entry->flags &= ~0x10;
+				entry->flags2 &= ~0x1000;
+				entry->flags &= ~2;
+				entry->flags &= ~0x1000;
+			}
+			marioStSystemLevel(0);
+			psndClearFlag(0x80);
+			if (entry->flags2 & 0x1000000) {
+				entry->flags2 &= ~0x1000000;
+				marioCtrlOn();
+			}
+			marioKeyOn();
+			break;
+	}
+}
+
+void itemseq_Bound(ItemEntry* entry) {
+	static s32 _move_dir;
+	MarioWork* mario;
+	CameraEntry* camera;
+	HitEntry* hit;
+	MapObjectEntry* mobj;
+	BOOL isFloor, bounce;
+	s64 delta;
+	f32 t2sq, dt, dy, t2, dx;
+	f32 dz, v, peak, height, hitY;
+	f32 newX, newZ;
+	s32 newDir;
+	s32 itemId;
+
+	mario = marioGetPtr();
+	camera = camGetPtr(4);
+	switch (entry->field_0x26) {
+		case 0:
+			entry->field_0x26 = 1;
+			entry->airTime = 0;
+			entry->field_0x68 = gp->renderTime;
+			entry->field_0x70 = gp->renderTime;
+			entry->field_0x8C = 0;
+			if (entry->flags2 & 0x10) {
+				break;
+			}
+			switch (entry->mode) {
+				case 6:
+					entry->flags2 |= 4;
+				case 5:
+					if (!(entry->flags & 0x10)) {
+						entry->field_0x80 = 1.0f;
+						entry->field_0x84 = 1.0f;
+						entry->field_0x88 = 0;
+						entry->velocityY = 500.0f;
+					}
+					if (!(entry->flags2 & 0x40)) {
+						switch (entry->itemId) {
+							case 0x79:
+							case 0x7B:
+							case 0x7C:
+								entry->speed = irand(30) + 45;
+								if (irand(100) < 50) {
+									entry->direction = 90.0f + camera->viewYaw + irand(60) - 30.0f;
+								}
+								else {
+									entry->direction = camera->viewYaw - 90.0f + irand(60) - 30.0f;
+								}
+								break;
+							default:
+								entry->speed = 100.0f;
+								if (irand(100) < 50) {
+									entry->direction = 90.0f + camera->viewYaw + irand(30) - 15.0f;
+								}
+								else {
+									entry->direction = camera->viewYaw - 90.0f + irand(30) - 15.0f;
+								}
+								break;
+						}
+					}
+					else {
+						entry->direction = _move_dir;
+						_move_dir += 132;
+						if (_move_dir >= 360) {
+							_move_dir -= 360;
+						}
+						entry->speed = 0.67f * (irand(30) + 65);
+					}
+					break;
+				case 4:
+					entry->flags2 |= 8;
+				case 3:
+					if (!(entry->flags & 0x10)) {
+						entry->field_0x80 = 1.0f;
+						entry->field_0x84 = 1.0f;
+						entry->field_0x88 = 0;
+					}
+					entry->speed = 0.0f;
+					entry->direction = 0;
+					entry->velocityY = 0.0f;
+					break;
+				case 10:
+					entry->field_0x80 = 1.0f;
+					entry->field_0x84 = 1.0f;
+					entry->field_0x88 = 0;
+					entry->velocityY = 500.0f;
+					entry->speed = 0.0f;
+					entry->direction = 0;
+					entry->flags2 |= 0x20;
+					entry->flags2 |= 4;
+					break;
+			}
+			break;
+		case 1:
+			entry->field_0x70 = gp->renderTime;
+			delta = entry->field_0x70 - entry->field_0x68;
+			dt = OSTicksToMicroseconds(delta) / 1000000.0f;
+			dy = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
+			t2 = OSTicksToMicroseconds(entry->airTime + delta) / 1000000.0f;
+			dx = dt * (entry->speed * (f32)sin(6.2831855f * entry->direction / 360.0f));
+			dz = dt * (entry->speed * -(f32)cos(6.2831855f * entry->direction / 360.0f));
+			if (entry->flags2 & 0x8000) {
+				dz = 0.0f;
+			}
+			t2sq = t2 * t2;
+			dy = entry->velocityY * dt + (-980.0f * entry->field_0x84) * (t2sq - dy * dy);
+			if (entry->flags2 & 4) {
+				if (entry->field_0x8C != 0 || dy < 0.0f) {
+					entry->flags2 &= ~4;
+				}
+			}
+			if (entry->flags2 & 8 && entry->field_0x8C != 0) {
+				entry->flags2 &= ~8;
+			}
+			if (entry->flags2 & 0x20 && dy < 0.0f) {
+				effStardustEntry(1, 3, 30, entry->position.x, entry->position.y, entry->position.z, 16.0f, 16.0f);
+				itemDelete(entry->name);
+				return;
+			}
+			newDir = entry->direction;
+			hit = itemHitCheckSide(entry, dx, dz, &newX, &newZ, &newDir);
+			entry->position.x = newX;
+			entry->position.z = newZ;
+			entry->direction = newDir;
+			if (hit) {
+				entry->speed *= 0.25f;
+			}
+			if (!(entry->flags2 & 0x20) && !(entry->flags & 0x800)) {
+				if (dy <= 0.0f) {
+					hit = NULL;
+				}
+				else if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, 1.0f, dy, &hitY)) {
+					entry->position.y = hitY - 20.0f - 4.0f;
+				}
+				else if (hit = itemHitCheckY(entry->position.x, entry->position.y, entry->position.z, 1.0f, dy, &hitY)) {
+					entry->position.y = hitY - 20.0f;
+				}
+				else {
+					hit = NULL;
+				}
+				if (hit) {
+					entry->velocityY = -entry->velocityY * 0.25f;
+					dy = 0.0f;
+					entry->airTime = 0;
+					entry->field_0x68 = entry->field_0x70;
+				}
+			}
+			if (entry->flags2 & 0x100000 && entry->position.y <= -1000.0f) {
+				itemModeChange(entry, 7);
+				entry->flags2 &= ~4;
+				entry->flags2 &= ~8;
+				entry->flags2 &= ~0x4000;
+				if (entry->itemId >= 1 && entry->itemId < 0x79) {
+					entry->timer = 0;
+				}
+				else if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
+					entry->timer = 0;
+				}
+				else {
+					entry->timer = 20000;
+				}
+				entry->flags2 |= 0x10000;
+				entry->flags2 &= ~0x1000;
+				entry->flags |= 0x100;
+				break;
+			}
+			if (dy >= 0.0f) {
+				hit = NULL;
+				entry->position.y += dy;
+			}
+			else if (entry->flags2 & 0x100000) {
+				hit = NULL;
+				entry->position.y += dy;
+			}
+			else if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, -1.0f, dy, &hitY)) {
+				entry->position.y = hitY;
+			}
+			else {
+				hit = NULL;
+				entry->position.y += dy;
+			}
+			if (hit) {
+				if (hitGetAttr(hit) & 0x600) {
+					entry->flags2 |= 0x100000;
+					{
+						Vec sndPos = (Vec){0.0f, 0.0f, 0.0f};
+						sndPos.x = entry->position.x;
+						sndPos.y = entry->position.y;
+						sndPos.z = entry->position.z;
+						psndSFXOn_3D((const char*)0x194, &sndPos);
+					}
+					effSplashEntry(0, entry->position.x, entry->position.y, entry->position.z, 0.7f);
+					entry->flags |= 2;
+				}
+				else {
+					entry->field_0x8C++;
+					if (!(hitGetAttr(hit) & 0x80000000) && entry->field_0x88 != 0 && entry->field_0x8C >= entry->field_0x88) {
+						itemModeChange(entry, 1);
+						entry->flags2 &= ~4;
+						entry->flags2 &= ~8;
+						entry->flags2 &= ~0x4000;
+						break;
+					}
+					{
+					Vec pos;
+					pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
+					switch (itemId = entry->itemId) {
+						case 0x79:
+							psndSFXOn_3D("SFX_COIN_LEAPED1", &pos);
+							break;
+						case 0x7A:
+							psndSFXOn_3D("SFX_EVT_GAME_MONTE_LEAPED1", &pos);
+							break;
+						case 0x7B:
+							psndSFXOn_3D("SFX_HEART_LEAPED1", &pos);
+							break;
+						case 0x7C:
+							psndSFXOn_3D("SFX_FLOWER_LEAPED1", &pos);
+							break;
+						case 0x7D:
+							psndSFXOn_3D("SFX_STAR_PIECE_LEAPED1", &pos);
+							break;
+						case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78:
+							psndSFXOn_3D("SFX_EVT_STARSTONE_JUMP1", &pos);
+							break;
+						default:
+							if (itemId >= 0xF0 && itemId < 0x153) {
+								psndSFXOn_3D("SFX_BADGE_LEAPED1", &pos);
+							}
+							else {
+								psndSFXOn_3D("SFX_ITEM_LEAPED1", &pos);
+							}
+							break;
+					}
+					}
+					isFloor = FALSE;
+					if (entry->flags & 0x80 && entry->velocityY != 0.0f) {
+						bounce = TRUE;
+					}
+					else if (hitGetAttr(hit) & 0x80000000 && entry->velocityY != 0.0f) {
+						mobj = mobjHitObjPtrToPtr(hit);
+						if (mario->characterId == 2) {
+							bounce = FALSE;
+						}
+						else if (mobj && strcmp(mobj->animName, "MOBJ_KururinFloor")) {
+							bounce = TRUE;
+							isFloor = TRUE;
+						}
+						else {
+							bounce = FALSE;
+						}
+					}
+					else {
+						bounce = FALSE;
+					}
+					if (!bounce) {
+						v = entry->velocityY * dt + (-980.0f * entry->field_0x84) * ((t2 + dt) * (t2 + dt) - t2sq);
+						entry->velocityY = 0.7f * (entry->field_0x80 * (-v / dt));
+					}
+					peak = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->field_0x84)));
+					height = entry->velocityY * peak + peak * ((-980.0f * entry->field_0x84) * peak);
+					if (!isFloor && height <= 8.0f) {
+						itemModeChange(entry, 1);
+						entry->flags2 &= ~4;
+						entry->flags2 &= ~8;
+						entry->flags2 &= ~0x4000;
+					}
+					if (entry->flags & 0x200 && entry->field_0x8C <= 1) {
+						entry->direction = entry->field_0x90;
+						entry->speed = entry->field_0x94;
+						entry->flags &= ~0x200;
+					}
+					entry->airTime = 0;
+					entry->field_0x68 = gp->renderTime;
+					break;
+				}
+			}
+			entry->airTime += delta;
+			entry->field_0x68 = entry->field_0x70;
+			break;
+	}
+	entry->flags2 &= ~0x10;
+}
+
+void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z) {
+	entry->position.x = x;
+	entry->position.y = y;
+	entry->position.z = z;
+}
+
+HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle) {
+	HitEntry* hit;
+	f32 lenSq, len, a, b;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+	f32 sin, cos;
+	f32 dot, ox, oz;
+
+	*outX = entry->position.x;
+	*outZ = entry->position.z;
+	if (dx == 0.0f && dz == 0.0f) {
+		return NULL;
+	}
+	sincosf(&sin, &cos, angleABf(0.0f, 0.0f, dx, dz));
+	lenSq = dx * dx + dz * dz;
+	len = item_sqrtf(lenSq);
+	hitDist = 10.0f + len;
+	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
+		entry->position.x, entry->position.y + 15.0f, entry->position.z, sin, 0.0f, cos);
+	if (hit) {
+		dot = dx * hitNX + dz * hitNZ;
+		ox = 0.5f * (dx - dot * hitNX);
+		oz = 0.5f * (dz - dot * hitNZ);
+		*outX += ox;
+		*outZ += oz;
+		a = reviseAngle(180.0f + *angle);
+		b = reviseAngle(angleABf(0.0f, 0.0f, 100.0f * hitNX, 100.0f * hitNZ));
+		*angle = reviseAngle(b + reviseAngle(b - a));
+		return hit;
+	}
+	hitDist = 10.0f + item_sqrtf(lenSq);
+	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
+		entry->position.x, entry->position.y + 15.0f, entry->position.z, sin, 0.0f, cos);
+	if (hit) {
+		dot = dx * hitNX + dz * hitNZ;
+		ox = 0.5f * (dx - dot * hitNX);
+		oz = 0.5f * (dz - dot * hitNZ);
+		*outX += ox;
+		*outZ += oz;
+		a = reviseAngle(180.0f + *angle);
+		b = reviseAngle(angleABf(0.0f, 0.0f, 100.0f * hitNX, 100.0f * hitNZ));
+		*angle = reviseAngle(b + reviseAngle(b - a));
+		return hit;
+	}
+	*outX += dx;
+	*outZ += dz;
+	return NULL;
+}
+
+void itemForceGet(ItemEntry* entry) {
+	entry->timer = 0;
+	itemModeChange(entry, 2);
+	entry->flags |= 0x1000;
+	entry->flags2 &= ~0x10000;
+}
+
+void itemNokoForceGet(ItemEntry* entry) {
+	if (itemGetNokoCheck(entry)) {
+		entry->timer = 0;
+		itemModeChange(entry, 2);
+		entry->flags |= 0x5000;
+		entry->flags2 &= ~0x10000;
+	}
+	else {
+		entry->timer = 0;
+		itemModeChange(entry, 1);
+		entry->flags2 &= ~4;
+		entry->flags2 &= ~8;
+		entry->flags2 &= ~0x4000;
+		entry->flags2 &= ~0x1000;
+	}
+}
+
+void itemFlagOn(ItemEntry* entry, u16 flags) {
+	entry->flags |= flags;
+}
+
+void itemFlagOff(ItemEntry* entry, u16 flags) {
+	entry->flags &= ~flags;
+}
+
+u16 itemFlag(ItemEntry* entry, u16 flags) {
+	return entry->flags & flags;
+}
+
+void itemStatusOn(ItemEntry* entry, u32 flags) {
+	entry->flags2 |= flags;
+}
+
+u32 itemStatus(ItemEntry* entry, u32 flags) {
+	return entry->flags2 & flags;
+}
+
+void itemPickUp(ItemEntry* entry) {
+	entry->flags2 |= 0x1000;
+	itemModeChange(entry, 8);
+	entry->timer = 0;
+	entry->flags2 &= ~0x100;
 }

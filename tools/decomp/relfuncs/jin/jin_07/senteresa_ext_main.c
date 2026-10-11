@@ -8,7 +8,7 @@
 // decl: s32 extGetPoseNum(void);
 // decl: s32 g_nNumOutBox[1];
 // decl: static s32 g_nNumEndProc[1];
-// decl: static void computePosHermite(ExtPose* pose, Teresa* ter);
+// decl: void computePosHermite(ExtPose* pose, Teresa* ter);
 // proto: static void senteresa_ext_main(void);
 static void senteresa_ext_main(void) {
     ExtPose* pose = extGetPosePtr();

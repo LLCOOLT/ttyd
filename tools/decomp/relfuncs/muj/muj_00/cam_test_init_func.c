@@ -4,8 +4,8 @@
 // proto: USER_FUNC(cam_test_init_func);
 USER_FUNC(cam_test_init_func) {
     s32* args = event->args;
-    Vec a;
     Vec b;
+    Vec a;
     f32 dist;
 
     a.x = evtGetValue(event, args[0]);

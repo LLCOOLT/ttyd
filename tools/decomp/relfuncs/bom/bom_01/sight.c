@@ -6,7 +6,7 @@
 // include: manager/evtmgr_cmd.h
 // include: driver/dispdrv.h
 // include: driver/camdrv.h
-// decl: typedef struct SightWork { FileEntry* tpl; s32 field_0x4[5]; s32 dir; s32 field_0x20; s32 field_0x24; } SightWork;
+// decl: typedef struct SightWork { FileEntry* tpl; s32 level[5]; f32 rot; s32 dir; s32 count1; s32 count2; } SightWork;
 // decl: SightWork* sight_wp;
 // decl: void disp_sight(CameraId camera, void* param);
 // proto: USER_FUNC(sight);
@@ -17,10 +17,10 @@ USER_FUNC(sight) {
         sight_wp = _mapAlloc(sizeof(SightWork));
         memset(sight_wp, 0, sizeof(SightWork));
         for (i = 0; i < 5; i++) {
-            sight_wp->field_0x4[i] = 0;
+            sight_wp->level[i] = 0;
         }
-        sight_wp->field_0x20 = rand();
-        sight_wp->field_0x24 = rand();
+        sight_wp->count1 = rand();
+        sight_wp->count2 = rand();
         sight_wp->dir = 5;
     }
     if (sight_wp->tpl == NULL) {

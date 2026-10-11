@@ -5,6 +5,7 @@
 #include "driver/seqdrv.h"
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
+#include "manager/fontmgr.h"
 #include "mario/mario.h"
 #include "memory.h"
 #include "party.h"
@@ -28,6 +29,9 @@ static s32 cnt;
 // local prototypes
 void winDisp(CameraId camId, void* param);
 void winDispKoopa(CameraId camId, void* param);
+
+void statusWinForceOff(void);
+void allPartyForceSlitOff(void);
 
 WindowWork* winGetPtr(void) {
     return wp;
@@ -181,6 +185,20 @@ USER_FUNC(itemUseFunc) {
     /*switch (cnt) {
 
     }*/
+}
+
+USER_FUNC(itemUseFunc2) {
+    statusWinForceOff();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_80177cf8) {
+    allPartyForceSlitOff();
+    return EVT_RETURN_DONE;
+}
+
+void winFontInit(void) {
+    FontDrawStart();
 }
 
 void winTexInit(TEXPalette* texture) {

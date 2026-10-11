@@ -1022,7 +1022,7 @@ static USER_FUNC(fall_rtn) {
             sub->scale = 1.0f;
         }
     }
-    sfx = "SFX_EVT_GAME_MONTE_COUNT1";
+    sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->num; i++) {
         m = &monte_p[i];
         switch (m->state) {

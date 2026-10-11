@@ -106,7 +106,9 @@ typedef struct AnimationPoseData {
     char fileName[64];             // 0x4
     char textureName[64];          // 0x44
     char mBuildTime[64];           // 0x84
-    u8 field_0xC4[0xD0 - 0xC4];    // 0xC4
+    u32 flags;                     // 0xC4
+    s32 radius;                    // 0xC8
+    s32 height;                    // 0xCC
     Vec bboxMin;                   // 0xD0
     Vec bboxMax;                   // 0xDC
     s32 shapeCount;                // 0xE8
@@ -138,7 +140,7 @@ typedef struct AnimationPoseData {
     AnimPoseTexEntry* texData;     // 0x194, TODO: rename
     AnimTexBind* texBinds;         // 0x198, TODO: rename
     AnimPoseShapeDraw* draws;      // 0x19C
-    u8 field_0x1A0[0x1A4 - 0x1A0]; // 0x1A0
+    u8 field_0x1A0[0x1A8 - 0x1A0]; // 0x1A0
     AnimPoseGroup* groups;         // 0x1A8
     AnimTableEntry* mpAnims;       // 0x1AC
 } AnimationPoseData;
@@ -153,7 +155,8 @@ typedef struct AnimationPose {
     OSTime localTime;                   // 0x18
     u8 field_0x20[0x24 - 0x20];         // 0x20
     f32 localFrame;                     // 0x24
-    u8 field_0x28[0x3C - 0x28];         // 0x28
+    s32 field_0x28;                     // 0x28
+    u8 field_0x2C[0x3C - 0x2C];         // 0x2C
     s32 lastFrameZero;                  // 0x3C
     f32 lastFrameTime;                  // 0x40
     f32 localTimeRate;                  // 0x44
@@ -233,8 +236,8 @@ typedef struct AnimationWork {
     u8 field_0xE4[0xE8 - 0xE4];       // 0xE4
     u32 mbUseFloatScratch;            // 0xE8
     Vec* mpFloatScratch;              // 0xEC
-    u32 mFloatScratchRP;              // 0xF0
-    u32 mFloatScratchWP;              // 0xF4
+    s32 mFloatScratchRP;              // 0xF0
+    s32 mFloatScratchWP;              // 0xF4
     Vec* vtxArrayPos;                 // 0xF8
     Vec* vtxArrayNrm;                 // 0xFC
     FileEntry* mp_ag2tg;              // 0x100
@@ -280,7 +283,7 @@ AnimationPose* animPoseGetAnimPosePtr(s32 poseId);
 void animPaperPoseRelease(s32 poseId);
 void animPoseRelease(s32 poseId);
 
-GXColor* animPoseGetMaterialEvtColor(s32 poseId);
+GXColor animPoseGetMaterialEvtColor(s32 poseId);
 u32 animPoseGetMaterialLightFlag(s32 poseId);
 u32 animPoseGetMaterialFlag(s32 poseId);
 void animPoseSetMaterialEvtColor(s32 poseId, GXColor color);

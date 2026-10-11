@@ -4,20 +4,29 @@
 #include "driver/icondrv.h"
 
 typedef struct BattleWorkIcon {
-	s16 flags; //0x0
-	s16 iconId; //0x2
+	u16 flags; //0x0
+	u16 iconId; //0x2
 	s32 index; //0x4, TODO: rename?
 	Vec position; //0x8
 	f32 field_0x14; //0x14, prob X, TODO
 	f32 field_0x18; //0x18
 	IconEntry* base; //0x1C
-	u8 field_0x20[0x4C - 0x20]; //0x20
+	Vec jumpStart; //0x20
+	Vec jumpPos; //0x2C
+	Vec jumpTarget; //0x38
+	s32 jumpFrames; //0x44
+	f32 jumpSpeed; //0x48
 	f32 fallAccel; //0x4C
-	u8 field_0x50[0x9C - 0x50]; //0x50
+	f32 jumpVelY; //0x50
+	f32 jumpAngle; //0x54
+	f32 jumpDist; //0x58
+	u8 field_0x5C[4]; //0x5C
+	s8 jumpDir; //0x60
+	u8 field_0x61[0x9C - 0x61]; //0x61
 } BattleIcon;
 
 void BattleIconInit(void);
 void BattleIconMain(void);
 void BattleIconEnd(void);
-BattleIcon* BtlIcon_Entry(s16 iconId, f32 x, f32 y, f32 z);
+BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z);
 void BtlIcon_Delete(BattleIcon* icon);

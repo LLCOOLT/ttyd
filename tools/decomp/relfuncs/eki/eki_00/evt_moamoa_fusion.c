@@ -33,11 +33,7 @@ USER_FUNC(evt_moamoa_fusion) {
             pose->mtx[0][0] = 1.0f;
             moa->next = 14;
             moa->state = 14;
-            if (i < 100) {
-                moa->timer = i % 100;
-            } else {
-                moa->timer = i % 60 + 100;
-            }
+            moa->timer = i < 100 ? i % 100 : i % 60 + 100;
             moa->flags |= 0x100;
         }
     }

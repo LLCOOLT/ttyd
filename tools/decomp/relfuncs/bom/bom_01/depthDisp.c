@@ -6,42 +6,50 @@
 // include: dolphin/gx.h
 // include: dolphin/mtx.h
 // proto: static void depthDisp(CameraId camera, void* param);
-static inline f32 dd_sinp(f32 x) {
-    return ((0.00761f * (x * x) - 0.16605f) * (x * x) + 1.0f) * x;
-}
-
-static inline f32 dd_cosp(f32 x) {
-    return (0.03705f * (x * x) - 0.4967f) * (x * x) + 1.0f;
-}
-
-static inline f32 dd_sin(f32 a) {
-    if (a <= 3.1415927f) {
-        if (a <= 1.5707964f) {
-            return dd_sinp(a);
+static inline f32 dd_sin(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y;
         }
-        return dd_sinp(1.5707964f - (a - 1.5707964f));
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
     }
-    if (a < 4.712389f) {
-        return -dd_sinp(a - 3.1415927f);
-    }
-    return -dd_sinp(1.5707964f - (a - 4.712389f));
+    return a;
 }
 
-static inline f32 dd_cos(f32 a) {
-    if (a <= 3.1415927f) {
-        if (a <= 1.5707964f) {
-            return dd_cosp(a);
+static inline f32 dd_cos(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x; a = a * x2 - b; a = a * x2 + c;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
         }
-        return -dd_cosp(1.5707964f - (a - 1.5707964f));
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c;
     }
-    if (a < 4.712389f) {
-        return -dd_cosp(a - 3.1415927f);
-    }
-    return dd_cosp(1.5707964f - (a - 4.712389f));
+    return a;
 }
 
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 static void depthDisp(CameraId camera, void* param) {
-    f32 amp = evtGetFloat(NULL, GW(0)) / 100.0f;
+    f32 amp = evtGetValue(NULL, GW(5)) / 100.0f;
     CameraEntry* cam = camGetPtr(camera);
     smartEntry* buf = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_RGB565, GX_FALSE, 0), 3);
     GXTexObj obj;
@@ -50,6 +58,8 @@ static void depthDisp(CameraId camera, void* param) {
     f32 s;
     f32 c;
     s32 i;
+    BOOL first;
+    GXTevColorArg carg;
 
     GXSetTexCopySrc(0, 0, 608, 480);
     GXSetTexCopyDst(608, 480, GX_TF_RGB565, GX_FALSE);
@@ -78,8 +88,10 @@ static void depthDisp(CameraId camera, void* param) {
         GXSetTevOrder((GXTevStageID)i, (GXTexCoordID)i, GX_TEXMAP0, GX_COLOR_NULL);
         GXSetTevColorOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
         GXSetTevAlphaOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn((GXTevStageID)i, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, i == 0 ? GX_CC_ZERO : GX_CC_CPREV);
-        GXSetTevAlphaIn((GXTevStageID)i, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, i == 0 ? GX_CA_ZERO : GX_CA_APREV);
+        first = !i;
+        carg = first ? GX_CC_ZERO : GX_CC_CPREV;
+        GXSetTevColorIn((GXTevStageID)i, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, carg);
+        GXSetTevAlphaIn((GXTevStageID)i, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, first ? GX_CA_ZERO : GX_CA_APREV);
         GXSetTevSwapMode((GXTevStageID)i, GX_TEV_SWAP0, GX_TEV_SWAP0);
     }
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
@@ -102,3 +114,5 @@ static void depthDisp(CameraId camera, void* param) {
     GXEnd();
     sysWaitDrawSync();
 }
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset

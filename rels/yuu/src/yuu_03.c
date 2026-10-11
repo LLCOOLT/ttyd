@@ -20,8 +20,6 @@ typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags
 typedef struct SlitWork { u32 flags; s32 phase; s32 coins; s32 result; s32 state; s32 timer; f32 rot1; f32 rot2; s32 monteCount; EventEntry* viewEvent; } SlitWork;
 typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
 typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-Monte* unk_yuu_bss00000010;
-static void* yuunpc_wp;
 void unk_yuu_0000365c(CameraId camera, void* param);
 extern s32 unk_evt_yuu_00015fe0[];
 void marioSlitForceCancel(void);
@@ -31,8 +29,10 @@ void unk_8009f9c8(void);
 void motSlitCancel3(void);
 BOOL marioRollKeyDisable(void);
 typedef struct RyushiWork { s32 flag; s32 mode; Vec base; Vec pos; s32 alpha; s32 count; f32 scale; s32 r; s32 g; s32 b; s32 r2; s32 g2; s32 b2; } RyushiWork;
-RyushiWork* xwp;
+static void* yuunpc_wp;
 s32 ryuwp;
+RyushiWork* xwp;
+Monte* unk_yuu_bss00000010;
 extern f32 yuusintbl[];
 static void polygon(f32 x, f32 y, f32 w, f32 h, f32 u, f32 v);
 int rand(void);
@@ -323,10 +323,6 @@ void ryushi_disp(CameraId camera, void* param) {
     Mtx out;
     Mtx base;
     GXTexObj tex;
-    GXColor c2a;
-    GXColor c2;
-    GXColor ca;
-    GXColor c;
 
     PSMTXScale(base, hdr->scale, hdr->scale, 1.0f);
     PSMTXTransApply(base, base, hdr->pos.x, hdr->pos.y, hdr->pos.z);
@@ -334,12 +330,7 @@ void ryushi_disp(CameraId camera, void* param) {
     PSMTXConcat(base, rot, base);
     effGetTexObj(0x1E, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
-    c2 = (GXColor){0, 0, 0, 0};
-    c2.r = hdr->r2;
-    c2.g = hdr->g2;
-    c2.b = hdr->b2;
-    c2a = c2;
-    GXSetTevColor(GX_TEVREG1, c2a);
+    GXSetTevColor(GX_TEVREG1, (GXColor){hdr->r2, hdr->g2, hdr->b2});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTexGens(1);
@@ -363,15 +354,9 @@ void ryushi_disp(CameraId camera, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     for (i = 1, p = hdr + 1; i < ryuwp; i++, p++) {
         scale = p->scale;
-        if (scale != 0.0f) {
-            c = (GXColor){0, 0, 0, 0};
-            c.r = amp;
-            c.g = g;
-            c.b = b;
-            c.a = p->alpha;
-            ca = c;
-            GXSetTevColor(GX_TEVREG0, ca);
-            deg = 180.0f * ((p->pos.z * 0.125f + 3.14f * i * 0.25f) / 3.14f);
+        if (scale) {
+            GXSetTevColor(GX_TEVREG0, (GXColor){amp, g, b, p->alpha});
+            deg = 180.0f * ((p->pos.z / 8.0f + 3.14f * i / 4.0f) / 3.14f);
             n = deg / 360.0f;
             if (deg < 0.0f) {
                 n--;
@@ -423,18 +408,16 @@ USER_FUNC(evt_ryushi_init) {
 }
 
 USER_FUNC(evt_ryushi_clr) {
+    RyushiWork* p = xwp;
     s32* args = event->args;
-    RyushiWork* p;
-    s32 n;
     s32 i;
+    s32 n = ryuwp;
     s32 j;
     s32 x;
     s32 y;
     s32 z;
 
-    p = xwp;
-    n = ryuwp;
-    p->mode = evtGetValue(event, args[0]);
+    p->mode = evtGetValue(event, *args++);
     p->count = 0;
     p->alpha = 0;
     p->pos.x = 0.0f;
@@ -449,7 +432,7 @@ USER_FUNC(evt_ryushi_clr) {
         x = j % 10;
         y = (j / 10) % 6;
         z = j / 60;
-        p->base.x = x * xwp->base.x - 4.5f * xwp->base.x + xwp->base.x * 0.5f * ((y + z) & 1);
+        p->base.x = x * xwp->base.x - 4.5f * xwp->base.x + xwp->base.x / 2.0f * ((y + z) & 1);
         p->base.y = y * xwp->base.y - 2.5f * xwp->base.y;
         p->base.z = z * xwp->base.z - 1.5f * xwp->base.z;
         p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);
@@ -457,6 +440,116 @@ USER_FUNC(evt_ryushi_clr) {
         p->pos.z = p->base.z + randf(0.3f * -xwp->base.z, 0.3f * xwp->base.z);
         p->scale = 0.5f;
     }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_ryushi) {
+    RyushiWork* hdr = xwp;
+    Vec pos2;
+    Vec pos = {0.0f, 0.0f, 0.0f};
+    SlitWork* data;
+    RyushiWork* p;
+    s32 i;
+    s32 n;
+    f32 speed;
+    f32 alphaScale;
+    f32 camX;
+    f32 scale;
+    f32 w;
+    f32 d;
+
+    pos.x = hdr->pos.x;
+    pos.y = hdr->pos.y;
+    pos.z = hdr->pos.z;
+    pos2 = pos;
+    speed = 0.0f;
+    alphaScale = 0.0f;
+    scale = 1.0f;
+    data = ((MiniGameWork*)event->lwData[0])->data;
+    camX = camGetPtr(CAMERA_3D)->cameraAt.x;
+    switch (data->state) {
+        case 2:
+        case 3:
+        case 4:
+            speed = 2.9166667f;
+            alphaScale = 1.0f;
+            break;
+        case 6:
+        case 7:
+        case 8:
+            speed = 2.9166667f;
+            alphaScale = 1.0f;
+            break;
+    }
+    switch (data->state) {
+        case 1:
+        case 5:
+            alphaScale = (60 - data->timer) / 60.0f;
+            scale = alphaScale;
+            break;
+        case 2:
+        case 6:
+            speed = speed * (60 - data->timer) / 60.0f;
+            break;
+        case 4:
+        case 8:
+            alphaScale = data->timer / 48.0f;
+            break;
+    }
+    hdr->count++;
+    n = hdr->count;
+    if (n <= 20) {
+        hdr->alpha = n * 12;
+    } else {
+        hdr->alpha = 255;
+    }
+    if (n & 1) {
+        hdr->alpha /= 2;
+    }
+    scale = 0.5f * scale;
+    for (i = 1, p = hdr + 1; i < ryuwp; i++, p++) {
+        switch (xwp->mode) {
+            case 0:
+                p->pos.z -= speed;
+                if (p->pos.z < -200.0f) {
+                    p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);
+                    p->pos.y = p->base.y + randf(0.3f * -xwp->base.y, 0.3f * xwp->base.y);
+                    p->pos.z = 200.0f + randf(0.3f * -xwp->base.z, 0.3f * xwp->base.z);
+                }
+                break;
+            case 1:
+                p->pos.z += speed;
+                if (p->pos.z > 200.0f) {
+                    p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);
+                    p->pos.y = p->base.y + randf(0.3f * -xwp->base.y, 0.3f * xwp->base.y);
+                    p->pos.z = -200.0f + randf(0.3f * -xwp->base.z, 0.3f * xwp->base.z);
+                }
+                break;
+        }
+        n = (p->pos.x - camX) / (10.0f * xwp->base.x / 2.0f);
+        if (n != 0) {
+            if (n > 0) {
+                n++;
+            } else {
+                n--;
+            }
+            p->pos.x += (-n / 2) * (10.0f * xwp->base.x);
+        }
+        if (p->pos.z < 0.0f) {
+            d = -p->pos.z;
+        } else {
+            d = p->pos.z;
+        }
+        d -= 100.0f;
+        if (d < 0.0f) {
+            d = 0.0f;
+        } else if (d > 100.0f) {
+            d = 100.0f;
+        }
+        p->alpha = 0.7 * (255.0f * ((100.0f - d) / 100.0f) * alphaScale);
+        p->scale = scale;
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, ryushi_disp, NULL);
     return EVT_RETURN_DONE;
 }
 
@@ -721,112 +814,6 @@ EVT_BEGIN(yuu_03_init_evt)
     RETURN
 EVT_END()
 
-USER_FUNC(evt_ryushi) {
-    RyushiWork* hdr = xwp;
-    Vec pos2;
-    Vec pos = {0.0f, 0.0f, 0.0f};
-    SlitWork* data;
-    RyushiWork* p;
-    s32 i;
-    s32 n;
-    f32 camX;
-    f32 alphaScale;
-    f32 speed;
-    f32 scale;
-    f32 w;
-    f32 d;
-
-    pos.x = hdr->pos.x;
-    pos.y = hdr->pos.y;
-    pos.z = hdr->pos.z;
-    pos2 = pos;
-    speed = 0.0f;
-    alphaScale = 0.0f;
-    scale = 1.0f;
-    data = ((MiniGameWork*)event->lwData[0])->data;
-    camX = camGetPtr(CAMERA_3D)->cameraAt.x;
-    switch (data->state) {
-        case 2:
-        case 3:
-        case 4:
-            speed = 2.9166667f;
-            alphaScale = 1.0f;
-            break;
-        case 6:
-        case 7:
-        case 8:
-            speed = 2.9166667f;
-            alphaScale = 1.0f;
-            break;
-    }
-    switch (data->state) {
-        case 1:
-        case 5:
-            alphaScale = (60 - data->timer) / 60.0f;
-            scale = alphaScale;
-            break;
-        case 2:
-        case 6:
-            speed = speed * (60 - data->timer) / 60.0f;
-            break;
-        case 4:
-        case 8:
-            alphaScale = data->timer / 48.0f;
-            break;
-    }
-    hdr->count++;
-    n = hdr->count;
-    if (n <= 20) {
-        hdr->alpha = n * 12;
-    } else {
-        hdr->alpha = 255;
-    }
-    if (n & 1) {
-        hdr->alpha /= 2;
-    }
-    scale = 0.5f * scale;
-    for (i = 1, p = hdr + 1; i < ryuwp; i++, p++) {
-        switch (xwp->mode) {
-            case 0:
-                p->pos.z -= speed;
-                if (p->pos.z < -200.0f) {
-                    p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);
-                    p->pos.y = p->base.y + randf(0.3f * -xwp->base.y, 0.3f * xwp->base.y);
-                    p->pos.z = 200.0f + randf(0.3f * -xwp->base.z, 0.3f * xwp->base.z);
-                }
-                break;
-            case 1:
-                p->pos.z += speed;
-                if (p->pos.z > 200.0f) {
-                    p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);
-                    p->pos.y = p->base.y + randf(0.3f * -xwp->base.y, 0.3f * xwp->base.y);
-                    p->pos.z = -200.0f + randf(0.3f * -xwp->base.z, 0.3f * xwp->base.z);
-                }
-                break;
-        }
-        w = 10.0f * xwp->base.x;
-        n = (p->pos.x - camX) / (w * 0.5f);
-        if (n != 0) {
-            if (n > 0) {
-                n++;
-            } else {
-                n--;
-            }
-            p->pos.x += (-n / 2) * w;
-        }
-        d = p->pos.z < 0.0f ? -p->pos.z : p->pos.z;
-        d -= 100.0f;
-        if (d < 0.0f) {
-            d = 0.0f;
-        } else if (d > 100.0f) {
-            d = 100.0f;
-        }
-        p->alpha = 0.7 * (255.0f * ((100.0f - d) / 100.0f) * alphaScale);
-        p->scale = scale;
-    }
-    dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, ryushi_disp, NULL);
-    return EVT_RETURN_DONE;
-}
 
 void yuuminigame_init_4slit(EventEntry* event, BOOL isFirstCall) {
     SlitWork* data = ((MiniGameWork*)event->lwData[0])->data;

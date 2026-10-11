@@ -3,8 +3,8 @@
 // decl: extern NanNpcWork* nanNPCWork;
 // proto: USER_FUNC(gundan1000tai_totsuend);
 USER_FUNC(gundan1000tai_totsuend) {
-    NanNpcWork* wp = nanNPCWork;
     s32 i;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < wp->count; i++) {
         wp->entries[i].workA8 = 1;

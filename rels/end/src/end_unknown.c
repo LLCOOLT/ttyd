@@ -33,11 +33,11 @@ typedef struct EndWork { FileEntry* tpl; s32 mode; s32 alpha; s32 alpha2; s32 te
 typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
 typedef struct CreditNpc { const char* agb; const char* anim; s32* evt; } CreditNpc;
 typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
-EndMoa* unk_end_bss00000000;
-EndExtData* unk_end_bss00000004;
-s32* unk_end_bss00000008;
-s32 (*unk_end_bss0000000c)[2];
 EndWork unk_end_bss00000010;
+s32 (*unk_end_bss0000000c)[2];
+s32* unk_end_bss00000008;
+EndExtData* unk_end_bss00000004;
+EndMoa* unk_end_bss00000000;
 extern EndWork* dat_ptr_end_00003218;
 extern CreditMsg unk_end_0000321c[50];
 extern CreditNpc R_credits_npc_info[152];
@@ -56,6 +56,7 @@ void extDraw(void);
 void extLoadTextureExit(void);
 int rand(void);
 double tan(double x);
+static inline f32 tanf(f32 x) { return tan(x); }
 s32 EXIGetType(s32 chan, u32 dev, u32* type);
 void L_animPoseWorldPositionEvalOff(s32 poseId);
 void animPoseVivianMain(s32 poseId, Vec* pos);
@@ -348,9 +349,9 @@ USER_FUNC(unk_end_00001d90) {
     f32 x;
     f32 y;
     f32 r;
-    Mtx m3;
-    Mtx m2;
     Mtx m1;
+    Mtx m2;
+    Mtx m3;
     Vec v;
     u32 type;
 
@@ -442,7 +443,7 @@ USER_FUNC(unk_end_00001d90) {
     PSMTXTrans(m1, 0.0f, r, 0.0f);
     PSMTXRotRad(m2, 'z', 0.017453292f * actor->angle);
     PSMTXConcat(m2, m1, m1);
-    PSMTXTrans(m2, x * 0.5f, y * 0.5f, 0.0f);
+    PSMTXTrans(m2, x / 2.0f, y / 2.0f, 0.0f);
     PSMTXConcat(m2, m1, actor->mtx);
     PSMTXScale(m3, 1.0f, 1.0f, 0.01f);
     PSMTXConcat(actor->mtx, m3, actor->mtx);
@@ -540,6 +541,165 @@ EVT_BEGIN(unk_end_0000410c)
     END_LOOP
     RETURN
 EVT_END()
+
+void unk_end_00001324(CameraId cameraId, void* param) {
+    s32 i;
+    f32 w;
+    f32 h;
+    CameraEntry* cam = camGetPtr(cameraId);
+    s32 id = evtGetValue(NULL, GW(11));
+    s32 pos = evtGetValue(NULL, GW(12));
+    Vec camPos;
+    Vec up;
+    Vec target;
+    GXTexObj obj;
+    Mtx mtx;
+    Mtx scale;
+    Mtx lookAt;
+
+    if (dat_ptr_end_00003218->tpl == NULL) {
+        return;
+    }
+    if (id >= ((TEXPalette*)*dat_ptr_end_00003218->tpl->data)->numDescriptors) {
+        return;
+    }
+    if (id == 9 && swGet(0x5E7)) {
+        id = 53;
+    }
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
+    switch (dat_ptr_end_00003218->mode) {
+        case 0:
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, id);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            break;
+        case 1:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 49);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
+            GXLoadTexObj(&obj, GX_TEXMAP1);
+            break;
+        case 2:
+            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
+            GXLoadTexObj(&obj, GX_TEXMAP0);
+            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 51);
+            GXLoadTexObj(&obj, GX_TEXMAP1);
+            break;
+    }
+    switch (dat_ptr_end_00003218->mode) {
+        case 0:
+            GXSetNumTevStages(1);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+            GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+            break;
+        default:
+            GXSetNumTevStages(2);
+            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+            GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
+            GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+            GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_A0, GX_CC_ZERO);
+            GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            break;
+    }
+    switch (pos) {
+        case 0:
+            PSMTXTrans(mtx, 51.0f, 30.0f, -30.0f);
+            break;
+        case 1:
+            PSMTXTrans(mtx, -51.0f, -30.0f, -30.0f);
+            break;
+        case 2:
+            PSMTXTrans(mtx, -51.0f, 30.0f, -30.0f);
+            break;
+        case 3:
+            PSMTXTrans(mtx, 51.0f, -30.0f, -30.0f);
+            break;
+        case 4:
+            PSMTXTrans(mtx, 0.0f, 30.0f, -30.0f);
+            break;
+    }
+    PSMTXScale(scale, 0.6f, 0.6f, 1.0f);
+    PSMTXConcat(mtx, scale, mtx);
+    PSMTXConcat(cam->view, mtx, mtx);
+    GXLoadPosMtxImm(mtx, GX_PNMTX0);
+    GXSetCurrentMtx(GX_PNMTX0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    for (i = 0; i < 2; i++) {
+        if (i == 0) {
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
+            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+        } else {
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, dat_ptr_end_00003218->alpha});
+            GXSetZMode(GX_TRUE, GX_GREATER, GX_FALSE);
+        }
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        w = GXGetTexObjWidth(&obj);
+        h = GXGetTexObjHeight(&obj);
+        GXPosition3f32(-w / 2.0f, h / 2.0f, 0.0f);
+        GXTexCoord2f32(0.0f, 0.0f);
+        GXPosition3f32(w / 2.0f, h / 2.0f, 0.0f);
+        GXTexCoord2f32(1.0f, 0.0f);
+        GXPosition3f32(w / 2.0f, -h / 2.0f, 0.0f);
+        GXTexCoord2f32(1.0f, 1.0f);
+        GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
+        GXTexCoord2f32(0.0f, 1.0f);
+        GXEnd();
+    }
+    if (dat_ptr_end_00003218->alpha2 > 0) {
+        f32 w2;
+        f32 h2;
+
+        camPos = (Vec){0.0f, 0.0f, 240.0f / tanf(0.21816616f)};
+        up = (Vec){0.0f, 1.0f, 0.0f};
+        target = (Vec){0.0f, 0.0f, 0.0f};
+        GXSetNumTevStages(1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+        GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+        TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 52);
+        GXLoadTexObj(&obj, GX_TEXMAP0);
+        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha2});
+        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+        C_MTXLookAt(lookAt, &camPos, &up, &target);
+        PSMTXTrans(mtx, 0.0f, -138.0f, 0.0f);
+        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
+        PSMTXConcat(lookAt, mtx, mtx);
+        PSMTXConcat(mtx, scale, mtx);
+        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        w2 = GXGetTexObjWidth(&obj);
+        h2 = GXGetTexObjHeight(&obj);
+        GXPosition3f32(-w2 / 2.0f, h2 / 2.0f, 0.0f);
+        GXTexCoord2f32(0.0f, 0.0f);
+        GXPosition3f32(w2 / 2.0f, h2 / 2.0f, 0.0f);
+        GXTexCoord2f32(1.0f, 0.0f);
+        GXPosition3f32(w2 / 2.0f, -h2 / 2.0f, 0.0f);
+        GXTexCoord2f32(1.0f, 1.0f);
+        GXPosition3f32(-w2 / 2.0f, -h2 / 2.0f, 0.0f);
+        GXTexCoord2f32(0.0f, 1.0f);
+        GXEnd();
+    }
+}
 
 EVT_BEGIN(unk_evt_end_000042e0)
     LOOP(0)
@@ -875,247 +1035,6 @@ __declspec(section ".data") const char* dat_ptr_end_00005034 = "c_n_moa_a";
 
 __declspec(section ".data") const char* dat_ptr_end_00005038 = "S_1";
 
-EVT_BEGIN(unk_evt_end_0000503c)
-    CALL(evt_npc_entry, STRING("モアモアダミー"), STRING("c_n_moa_a"))
-    CALL(evt_npc_set_position, STRING("モアモアダミー"), 0, -1000, 0)
-    CALL(unk_end_00000938, STRING("モアモアダミー"))
-    CALL(evt_npc_entry, STRING("モアモア"), STRING("c_g_moamoa"))
-    CALL(evt_npc_set_anim, STRING("モアモア"), STRING("S_3"))
-    CALL(evt_npc_set_position, STRING("モアモア"), 0, -1000, 0)
-    CALL(evt_npc_set_scale, STRING("モアモア"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
-    CALL(unk_end_0000012c)
-    CALL(evt_ext_entry, 300, LW(10), PTR(unk_end_000006f8), PTR(unk_end_00000440), PTR(unk_end_0000035c))
-    CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
-    LOOP(0)
-        CALL(evt_sub_intpl_msec_get_value)
-        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
-        WAIT_FRAMES(1)
-        IF_INT_EQUAL(LW(1), 0)
-            BREAK_LOOP
-        END_IF
-    END_LOOP
-    WAIT_MS(3000)
-    CALL(evt_sub_intpl_msec_init, 11, -1000, -10000, 2000)
-    LOOP(0)
-        CALL(evt_sub_intpl_msec_get_value)
-        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
-        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
-        WAIT_FRAMES(1)
-        IF_INT_EQUAL(LW(1), 0)
-            BREAK_LOOP
-        END_IF
-    END_LOOP
-    CALL(unk_end_000000c4)
-    CALL(evt_npc_delete, STRING("モアモアダミー"))
-    CALL(evt_npc_delete, STRING("モアモア"))
-    RETURN
-EVT_END()
-
-__declspec(section ".data") u64 fd_end_unknown_negone_one_374 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_end_unknown_neg_one_382[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_end_unknown___local_PI_383[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_385[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_end_unknown_one_negone_373 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_end_unknown___local_PIO2_384[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_end_unknown_one_381[] = {
-    1065353216,
-};
-
-__declspec(section ".data") u64 fd_end_unknown_negone_one_360 = 0xBF8000003F800000;
-
-__declspec(section ".data") s32 fd_end_unknown_neg_one_365[] = {
-    -1082130432,
-};
-
-__declspec(section ".data") s32 fd_end_unknown___local_PI_366[] = {
-    1078530011,
-};
-
-__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_368[] = {
-    1083624420,
-};
-
-__declspec(section ".data") u64 fd_end_unknown_one_negone_359 = 0x3F800000BF800000;
-
-__declspec(section ".data") s32 fd_end_unknown___local_PIO2_367[] = {
-    1070141403,
-};
-
-__declspec(section ".data") s32 fd_end_unknown_one_364[] = {
-    1065353216,
-};
-
-void unk_end_00001324(CameraId cameraId, void* param) {
-    CameraEntry* cam = camGetPtr(cameraId);
-    s32 id = evtGetValue(NULL, GW(11));
-    s32 pos = evtGetValue(NULL, GW(12));
-    s32 i;
-    f32 w;
-    f32 h;
-    Vec target;
-    Vec up;
-    Vec camPos;
-    GXTexObj obj;
-    Mtx lookAt;
-    Mtx scale;
-    Mtx mtx;
-
-    if (dat_ptr_end_00003218->tpl == NULL) {
-        return;
-    }
-    if (id >= ((TEXPalette*)*dat_ptr_end_00003218->tpl->data)->numDescriptors) {
-        return;
-    }
-    if (id == 9 && swGet(0x5E7)) {
-        id = 53;
-    }
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-    GXSetZCompLoc(GX_TRUE);
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-    GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
-    switch (dat_ptr_end_00003218->mode) {
-        case 0:
-            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, id);
-            GXLoadTexObj(&obj, GX_TEXMAP0);
-            break;
-        case 1:
-            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
-            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 49);
-            GXLoadTexObj(&obj, GX_TEXMAP0);
-            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
-            GXLoadTexObj(&obj, GX_TEXMAP1);
-            break;
-        case 2:
-            GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, dat_ptr_end_00003218->tevAlpha});
-            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 50);
-            GXLoadTexObj(&obj, GX_TEXMAP0);
-            TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 51);
-            GXLoadTexObj(&obj, GX_TEXMAP1);
-            break;
-    }
-    switch (dat_ptr_end_00003218->mode) {
-        case 0:
-            GXSetNumTevStages(1);
-            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-            GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-            break;
-        default:
-            GXSetNumTevStages(2);
-            GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-            GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-            GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-            GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP1, GX_COLOR_NULL);
-            GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_CPREV, GX_CC_TEXC, GX_CC_A0, GX_CC_ZERO);
-            GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-            break;
-    }
-    switch (pos) {
-        case 0:
-            PSMTXTrans(mtx, 51.0f, 30.0f, -30.0f);
-            break;
-        case 1:
-            PSMTXTrans(mtx, -51.0f, -30.0f, -30.0f);
-            break;
-        case 2:
-            PSMTXTrans(mtx, -51.0f, 30.0f, -30.0f);
-            break;
-        case 3:
-            PSMTXTrans(mtx, 51.0f, -30.0f, -30.0f);
-            break;
-        case 4:
-            PSMTXTrans(mtx, 0.0f, 30.0f, -30.0f);
-            break;
-    }
-    PSMTXScale(scale, 0.6f, 0.6f, 1.0f);
-    PSMTXConcat(mtx, scale, mtx);
-    PSMTXConcat(cam->view, mtx, mtx);
-    GXLoadPosMtxImm(mtx, GX_PNMTX0);
-    GXSetCurrentMtx(GX_PNMTX0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    for (i = 0; i < 2; i++) {
-        if (i == 0) {
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha});
-            GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-        } else {
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, dat_ptr_end_00003218->alpha});
-            GXSetZMode(GX_TRUE, GX_GREATER, GX_FALSE);
-        }
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        w = GXGetTexObjWidth(&obj);
-        h = GXGetTexObjHeight(&obj);
-        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        GXEnd();
-    }
-    if (dat_ptr_end_00003218->alpha2 > 0) {
-        camPos = (Vec){0.0f, 0.0f, 240.0f / (f32)tan(0.21816615760326385)};
-        up = (Vec){0.0f, 1.0f, 0.0f};
-        target = (Vec){0.0f, 0.0f, 0.0f};
-        GXSetNumTevStages(1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-        GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-        TEXGetGXTexObjFromPalette(*dat_ptr_end_00003218->tpl->data, &obj, 52);
-        GXLoadTexObj(&obj, GX_TEXMAP0);
-        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, dat_ptr_end_00003218->alpha2});
-        GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-        C_MTXLookAt(lookAt, &camPos, &up, &target);
-        PSMTXTrans(mtx, 0.0f, -138.0f, 0.0f);
-        PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
-        PSMTXConcat(lookAt, mtx, mtx);
-        PSMTXConcat(mtx, scale, mtx);
-        GXLoadPosMtxImm(mtx, GX_PNMTX0);
-        GXSetCurrentMtx(GX_PNMTX0);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        w = GXGetTexObjWidth(&obj);
-        h = GXGetTexObjHeight(&obj);
-        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
-        GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
-        GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
-        GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
-        GXTexCoord2f32(0.0f, 1.0f);
-        GXEnd();
-    }
-}
-
 USER_FUNC(unk_end_000012e0) {
     dispEntry(CAMERA_3D, 0.0f, 7, unk_end_00001324, NULL);
     return 0;
@@ -1197,7 +1116,7 @@ USER_FUNC(unk_end_00000bc8) {
                     wx = x;
                     wy = y - i * 22 - 4;
                     if (x == 0) {
-                        wx = x - 0.5f * (0.8f * FontGetMessageWidth(msg));
+                        wx = x - 0.8f * FontGetMessageWidth(msg) / 2.0f;
                     } else if (x > 0) {
                         wx = x - 0.8f * FontGetMessageWidth(msg);
                     }
@@ -1211,7 +1130,7 @@ USER_FUNC(unk_end_00000bc8) {
                     wx = x;
                     wy = y - i * 24 - 50;
                     if (x == 0) {
-                        wx = x - FontGetMessageWidth(msg) * 0.5f;
+                        wx = x - FontGetMessageWidth(msg) / 2.0f;
                     } else if (x > 0) {
                         wx = x - FontGetMessageWidth(msg);
                     }
@@ -1290,7 +1209,7 @@ USER_FUNC(unk_end_00000bc8) {
 }
 
 USER_FUNC(unk_end_00000a6c) {
-    BOOL inBattle = gp->inBattle != 0;
+    BOOL inBattle = gp->inBattle ? TRUE : FALSE;
     s32 i;
 
     if (isFirstCall) {
@@ -1490,3 +1409,88 @@ USER_FUNC(unk_end_000000c4) {
     return 2;
 }
 
+
+EVT_BEGIN(unk_evt_end_0000503c)
+    CALL(evt_npc_entry, STRING("モアモアダミー"), STRING("c_n_moa_a"))
+    CALL(evt_npc_set_position, STRING("モアモアダミー"), 0, -1000, 0)
+    CALL(unk_end_00000938, STRING("モアモアダミー"))
+    CALL(evt_npc_entry, STRING("モアモア"), STRING("c_g_moamoa"))
+    CALL(evt_npc_set_anim, STRING("モアモア"), STRING("S_3"))
+    CALL(evt_npc_set_position, STRING("モアモア"), 0, -1000, 0)
+    CALL(evt_npc_set_scale, STRING("モアモア"), FLOAT(0.5f), FLOAT(0.5f), FLOAT(0.5f))
+    CALL(unk_end_0000012c)
+    CALL(evt_ext_entry, 300, LW(10), PTR(unk_end_000006f8), PTR(unk_end_00000440), PTR(unk_end_0000035c))
+    CALL(evt_sub_intpl_msec_init, 11, -10000, -1000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    WAIT_MS(3000)
+    CALL(evt_sub_intpl_msec_init, 11, -1000, -10000, 2000)
+    LOOP(0)
+        CALL(evt_sub_intpl_msec_get_value)
+        DIVIDE_FLOAT(LW(0), FLOAT(10.0f))
+        CALL(evt_npc_set_position, STRING("モアモア"), 0, LW(0), 100)
+        WAIT_FRAMES(1)
+        IF_INT_EQUAL(LW(1), 0)
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    CALL(unk_end_000000c4)
+    CALL(evt_npc_delete, STRING("モアモアダミー"))
+    CALL(evt_npc_delete, STRING("モアモア"))
+    RETURN
+EVT_END()
+
+__declspec(section ".data") u64 fd_end_unknown_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_end_unknown_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_end_unknown_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_end_unknown_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_end_unknown___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_end_unknown_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_end_unknown___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_end_unknown_one_364[] = {
+    1065353216,
+};

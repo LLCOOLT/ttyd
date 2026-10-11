@@ -29,5 +29,7 @@ void elmos1000tai_seq00(NanNpc* npc) {
                 npc->state = 3;
             }
             break;
+        case 3:
+            break;
     }
 }

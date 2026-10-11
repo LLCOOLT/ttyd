@@ -9,17 +9,18 @@
 // decl: static s32 champion_belt_onoff;
 // proto: USER_FUNC(tou_champion_belt_27_text_34);
 USER_FUNC(tou_champion_belt_27_text_34) {
-    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     EffectEntry* eff;
-    AnimationPose* pose;
-    Vec* positions;
     s32 idx;
+    Vec* positions;
+    NpcEntry* npc;
     f32 angle;
+    AnimationPose* pose;
 
+    npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     if (isFirstCall) {
-        eff = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
+        EffectEntry* entry = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
         animPoseWorldPositionEvalOn(npc->poseId);
-        event->userdatap[0] = eff;
+        event->userdatap[0] = entry;
         champion_belt_onoff = 0;
     }
     pose = animPoseGetAnimPosePtr(npc->poseId);

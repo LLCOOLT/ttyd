@@ -19,14 +19,12 @@
 #include "driver/camdrv.h"
 #include "dolphin/mtx.h"
 
-typedef struct QuizData { const char* q; const char* a; const char* b; s32 ans; } QuizData;
 typedef struct DanceData { u16 flags; u8 step; u8 movePos; f32 cx; f32 cy; f32 rot; } DanceData;
-DanceData dance_dt;
 double sin(double x);
 double cos(double x);
-typedef struct MovePos { f32 x; f32 z; } MovePos;
 typedef struct HorogramWork { void* buf0; void* buf1; GXTexObj tex0; GXTexObj tex1; u16 ready; u16 flags; } HorogramWork;
 HorogramWork* horogram_wp;
+DanceData dance_dt;
 void peach_capture(CameraId cameraId, void* param);
 void disp_horogram(CameraId cameraId, void* param);
 void noiseDisp(CameraId cameraId, void* param);
@@ -3410,20 +3408,20 @@ USER_FUNC(noise) {
 }
 
 void noiseDisp(CameraId cameraId, void* param) {
-    GXTexObj tex;
-    Mtx mtx;
     CameraEntry* cam;
     s32 y;
     s32 x;
-    s32 start;
+    Mtx mtx;
     s32 i;
     u8* buf;
     s32 n;
     s32 len;
+    s32 start;
     s32 by;
     s32 ry;
     s32 off;
     u8 col;
+    GXTexObj tex;
 
     cam = camGetPtr(cameraId);
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;

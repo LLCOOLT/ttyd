@@ -3,11 +3,10 @@
 #include <dolphin/gx.h>
 
 void DEMOInit(GXRenderModeObj* mode);
-void DEMOReInit(GXRenderModeObj* mode);
 void DEMOBeforeRender(void);
 void DEMODoneRender(void);
-void DEMOSwapBuffers(void);
 GXRenderModeObj* DEMOGetRenderModeObj(void);
-void* DEMOGetCurrentBuffer(void);
+void* L_DEMOGetCurrentBuffer(void);
+#define DEMOGetCurrentBuffer L_DEMOGetCurrentBuffer
 void DEMOEnableGPHangWorkaround(u32 timeoutFrames);
 void DEMOSetGPHangMetric(GXBool enable);

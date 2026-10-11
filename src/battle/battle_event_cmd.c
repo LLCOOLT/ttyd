@@ -2534,3 +2534,10 @@ USER_FUNC(btlevtcmd_ACRGetResult) {
     }
     return EVT_RETURN_DONE;
 }
+
+BOOL BattleFogForceStop(void);
+
+USER_FUNC(btlevtcmd_StageDispellFog) {
+    BattleFogForceStop();
+    return EVT_RETURN_DONE;
+}

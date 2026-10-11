@@ -1,0 +1,293 @@
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/effdrv.h"
+#include "memory.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <dolphin/os/OSFastCast.h>
+#include <string.h>
+
+double sin(double);
+
+typedef struct effN64Vtx {
+    s16 x, y, z;   // 0x0
+    s16 s, t;      // 0x6
+    u8 r, g, b, a; // 0xA
+} effN64Vtx;
+
+void effGetTexObjN64(u32 id, GXTexObj* obj);
+void effSetVtxDescN64(effN64Vtx* vtx);
+void tri2();
+
+typedef struct EffHoraoSpellN64Work {
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    s32 lifetime; // 0x10
+    s32 frame;    // 0x14
+    s32 colorR;   // 0x18
+    s32 colorG;   // 0x1C
+    s32 colorB;   // 0x20
+    s32 alpha;    // 0x24
+    s32 color2R;  // 0x28
+    s32 color2G;  // 0x2C
+    s32 color2B;  // 0x30
+    s32 color2A;  // 0x34
+    f32 scale;    // 0x38
+} EffHoraoSpellN64Work;
+
+static inline s16 __OSf32tos16(register f32 inF) {
+    s32 out;
+    register s16* outPtr = (s16*)&out;
+    asm { psq_st inF, 0(outPtr), 1, OS_FASTCAST_S16 }
+    return *(s16*)&out;
+}
+
+static inline void OSf32tos16(f32* f, s16* out) {
+    *out = __OSf32tos16(*f);
+}
+
+static inline f32 __OSs16tof32(register s16* arg) {
+    register f32 ret;
+    asm { psq_l ret, 0(arg), 1, OS_FASTCAST_S16 }
+    return ret;
+}
+
+static inline void OSs16tof32(s16* in, f32* out) {
+    *out = __OSs16tof32(in);
+}
+
+effN64Vtx horao_spell_vtx[] = {
+    {0, -8, 0, 0, 0, 0, 0, 0, 0},
+    {0, 8, 0, 0, 1024, 0, 0, 0, 0},
+    {0, -8, 0, 512, 0, 0, 0, 0, 50},
+    {0, 8, 0, 512, 1024, 0, 0, 0, 50},
+    {0, -8, 0, 1024, 0, 0, 0, 0, 100},
+    {0, 8, 0, 1024, 1024, 0, 0, 0, 100},
+    {0, -8, 0, 1536, 0, 0, 0, 0, 150},
+    {0, 8, 0, 1536, 1024, 0, 0, 0, 150},
+    {0, -8, 0, 2048, 0, 0, 0, 0, 200},
+    {0, 8, 0, 2048, 1024, 0, 0, 0, 200},
+    {0, -8, 0, 2560, 0, 0, 0, 0, 250},
+    {0, 8, 0, 2560, 1024, 0, 0, 0, 250},
+    {0, -8, 0, 3072, 0, 0, 0, 0, 255},
+    {0, 8, 0, 3072, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 3584, 0, 0, 0, 0, 255},
+    {0, 8, 0, 3584, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 4096, 0, 0, 0, 0, 255},
+    {0, 8, 0, 4096, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 4608, 0, 0, 0, 0, 255},
+    {0, 8, 0, 4608, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 5120, 0, 0, 0, 0, 255},
+    {0, 8, 0, 5120, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 5632, 0, 0, 0, 0, 255},
+    {0, 8, 0, 5632, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 6144, 0, 0, 0, 0, 255},
+    {0, 8, 0, 6144, 1024, 0, 0, 0, 255},
+    {0, -8, 0, 6656, 0, 0, 0, 0, 200},
+    {0, 8, 0, 6656, 1024, 0, 0, 0, 200},
+    {0, -8, 0, 7168, 0, 0, 0, 0, 100},
+    {0, 8, 0, 7168, 1024, 0, 0, 0, 100},
+    {0, -8, 0, 7680, 0, 0, 0, 0, 0},
+    {0, 8, 0, 7680, 1024, 0, 0, 0, 0},
+};
+
+void effHoraoSpellMain(EffectEntry* effect);
+void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effHoraoSpellN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
+    EffectEntry* effect;
+    EffHoraoSpellN64Work* work;
+
+    effect = effEntry();
+    effect->type = "HoraoSpellN64\0\0";
+    effect->count = 1;
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffHoraoSpellN64Work));
+    effect->userdata = work;
+    effect->callback = effHoraoSpellMain;
+    effect->flags |= 2;
+    work->type = type;
+    work->frame = 0;
+    if (lifetime <= 0) {
+        work->lifetime = 1000;
+    } else {
+        work->lifetime = lifetime;
+    }
+    work->alpha = 0;
+    work->position.x = x;
+    work->position.y = y;
+    work->position.z = z;
+    work->scale = scale;
+    work->colorR = 70;
+    work->colorG = 180;
+    work->colorB = 120;
+    work->color2R = 20;
+    work->color2G = 230;
+    work->color2B = 50;
+    work->color2A = 255;
+    return effect;
+}
+
+void effHoraoSpellMain(EffectEntry* effect) {
+    EffHoraoSpellN64Work* work = effect->userdata;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
+
+    tmp.x = work->position.x;
+    tmp.y = work->position.y;
+    tmp.z = work->position.z;
+    position = tmp;
+    if (effect->flags & 4) {
+        effect->flags &= ~4;
+        work->lifetime = 16;
+    }
+    if (work->lifetime < 1000) {
+        work->lifetime--;
+    }
+    work->frame++;
+    if (work->lifetime < 0) {
+        effDelete(effect);
+        return;
+    }
+    if (work->lifetime < 16) {
+        work->alpha = work->lifetime * 16;
+    }
+    if (work->frame < 16) {
+        work->alpha = work->frame * 16 + 15;
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHoraoSpellDisp, effect);
+}
+
+void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
+    CameraEntry* camera;
+    EffHoraoSpellN64Work* work;
+    GXTexObj texObj;
+    Mtx mtx;
+    Mtx scale;
+    Mtx rot;
+    Mtx base;
+    Mtx mtx2;
+    Vec v1;
+    Vec v2;
+    effN64Vtx* vtx;
+    effN64Vtx* p;
+    effN64Vtx* q;
+    s32 frame;
+    s32 alpha;
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 n;
+    static u8 colr[20] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
+    static u8 colg[20] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
+    static u8 colb[20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
+    GXColor c1;
+    GXColor c2;
+    GXColor c3;
+
+    camera = camGetPtr(cameraId);
+    work = effect->userdata;
+    frame = work->frame;
+    alpha = work->alpha;
+    PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
+    PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
+    PSMTXConcat(mtx, rot, mtx);
+    PSMTXScale(scale, work->scale, work->scale, work->scale);
+    PSMTXConcat(mtx, scale, mtx);
+    PSMTXConcat(camera->view, mtx, base);
+
+    c1 = (GXColor){0, 0, 0, 0};
+    c1.r = work->colorR;
+    c1.g = work->colorG;
+    c1.b = work->colorB;
+    c1.a = alpha;
+    GXSetTevColor(GX_TEVREG0, c1);
+    c2 = (GXColor){0, 0, 0, 0};
+    c2.r = work->color2R;
+    c2.g = work->color2G;
+    c2.b = work->color2B;
+    c2.a = work->color2A;
+    GXSetTevColor(GX_TEVREG1, c2);
+    GXSetNumChans(1);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+    GXSetNumTevStages(2);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_TEXC, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_RASA, GX_CA_RASA);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_C0, GX_CC_C1, GX_CC_CPREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    effGetTexObjN64(0x73, &texObj);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    PSMTXScale(scale, 0.0078125f, 0.03125f, 0.0f);
+    GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+    GXSetCullMode(GX_CULL_NONE);
+    for (i = 0; i < 2; i++) {
+        PSMTXRotRad(rot, 'z', 0.017453292f * (-282 + i * 36));
+        PSMTXConcat(base, rot, mtx);
+        GXLoadPosMtxImm(mtx, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        c3 = (GXColor){0, 0, 0, 0};
+        c3.r = colr[(frame + i * 4) % 17];
+        c3.g = colg[(frame + i * 4) % 17];
+        c3.b = colb[(frame + i * 4) % 17];
+        c3.a = work->alpha;
+        GXSetTevColor(GX_TEVREG0, c3);
+        GXSetTevColor(GX_TEVREG1, (GXColor){255, 255, 255, 0});
+        PSMTXScale(scale, 0.0078125f, 0.03125f, 0.0f);
+        PSMTXTrans(mtx, (f32)(-frame * 2), 0.0f, 0.0f);
+        PSMTXConcat(scale, mtx, scale);
+        GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+        PSMTXRotRad(rot, 'x', 0.34906584f);
+        PSMTXTrans(mtx, 6.0f, 0.0f, 0.0f);
+        PSMTXConcat(rot, mtx, mtx);
+        PSMTXRotRad(rot, 'y', 0.017453292f * (-30.0f * (f32)sin(6.2831855f * (78.75f + (f32)(frame * 8)) / 360.0f)));
+        PSMTXConcat(mtx, rot, mtx2);
+        vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+        for (j = 0, n = 0; j < 16; j++, n += 2) {
+            PSMTXTrans(mtx, 8.0f, 0.0f, 0.0f);
+            PSMTXRotRad(rot, 'y', 0.017453292f * (30.0f * (f32)sin(6.2831855f * (f32)(frame * 8 + j * 720 / 15) / 360.0f)));
+            PSMTXConcat(mtx, rot, mtx);
+            PSMTXRotRad(rot, 'z', 0.10471976f);
+            PSMTXConcat(mtx, rot, mtx);
+            PSMTXScale(scale, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f);
+            PSMTXConcat(mtx, scale, mtx);
+            PSMTXConcat(mtx2, mtx, mtx2);
+            p = vtx + j * 2;
+            q = &vtx[n + 1];
+            memcpy(p, &horao_spell_vtx[j * 2], sizeof(effN64Vtx));
+            OSInitFastCast();
+            OSs16tof32(&p->x, &v1.x);
+            OSs16tof32(&p->y, &v1.y);
+            OSs16tof32(&p->z, &v1.z);
+            PSMTXMultVec(mtx2, &v1, &v1);
+            OSInitFastCast();
+            OSf32tos16(&v1.x, &p->x);
+            OSf32tos16(&v1.y, &p->y);
+            OSf32tos16(&v1.z, &p->z);
+            memcpy(q, &horao_spell_vtx[n + 1], sizeof(effN64Vtx));
+            OSInitFastCast();
+            OSs16tof32(&q->x, &v2.x);
+            OSs16tof32(&q->y, &v2.y);
+            OSs16tof32(&q->z, &v2.z);
+            PSMTXMultVec(mtx2, &v2, &v2);
+            OSInitFastCast();
+            OSf32tos16(&v2.x, &q->x);
+            OSf32tos16(&v2.y, &p[1].y);
+            OSf32tos16(&v2.z, &p[1].z);
+        }
+        DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
+        GXInvalidateVtxCache();
+        effSetVtxDescN64(vtx);
+        for (k = 0; k < 15; k++) {
+            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+            tri2(k * 2, k * 2 + 2, k * 2 + 1, k * 2, k * 2 + 1, k * 2 + 2, k * 2 + 3, k * 2);
+        }
+    }
+}

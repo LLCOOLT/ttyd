@@ -1,8 +1,8 @@
 // decl: typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 // decl: typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 field_0x1C; f32 field_0x20; f32 field_0x24; s32 wait; u8 state; } Teresa;
 // decl: static Teresa* pTeresa;
-// proto: static void computePosHermite(ExtPose* pose, Teresa* ter);
-static void computePosHermite(ExtPose* pose, Teresa* ter) {
+// proto: void computePosHermite(ExtPose* pose, Teresa* ter);
+void computePosHermite(ExtPose* pose, Teresa* ter) {
     Vec m0 = {0.0f, 0.0f, 0.0f};
     Vec m1 = {1.0f, 0.0f, 0.0f};
     f32 t = ter->t;

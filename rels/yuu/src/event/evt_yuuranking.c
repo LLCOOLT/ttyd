@@ -1,0 +1,868 @@
+#include "battle/battle_unit.h"
+#include "evt/evt_cmd.h"
+
+#pragma force_active on
+#include "manager/fontmgr.h"
+#include "driver/msgdrv.h"
+#include "dolphin/mtx.h"
+#include "driver/windowdrv.h"
+#include "driver/icondrv.h"
+#include "driver/camdrv.h"
+#include "stdio.h"
+#include "manager/evtmgr_cmd.h"
+#include "driver/dispdrv.h"
+#include "memory.h"
+#include "string.h"
+#include "system.h"
+
+const GXColor yuuranking_unused_color = {0xFF, 0xFF, 0xFF, 0xFF};
+void FontDrawMessageMtx(Mtx mtx, const char* msg);
+typedef struct YuuRankingWork { EventEntry* event; u16 flags; u32 dispFlags; f32 x; f32 y; s32 type; s32 mode; s32 score; s32 bonus; s32 mul; s32 rank; s32 max; s32 phase; s32 monte; s32 dispScore; s32 timer; } YuuRankingWork;
+typedef struct YuuParlorRank { u8 pad[0x14]; s32 used[4][6]; s32 score[4][6]; s32 pts[4][6]; } YuuParlorRank;
+extern YuuParlorRank* yuwp;
+static YuuRankingWork* _wp;
+void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* str);
+void FontDrawScale(f32 scale);
+s32 psndSFXOn(const char* name);
+void psndSFXOff(s32 id);
+
+static USER_FUNC(evt_yuuranking_main_func);
+USER_FUNC(yuuranking_get_monte_31_text_51C0);
+USER_FUNC(yuuranking_wait_button_31_text_51F8);
+USER_FUNC(evt_yuuranking_free_31_text_5274);
+USER_FUNC(evt_yuuranking_alloc_31_text_52F8);
+static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max);
+static void evt_yuuranking_disp_func(CameraId camera, void* param);
+void unk_yuu_00008e40(f32 x, f32 y, f32 scale, const char* msg, s32 width);
+static s32 fontlenpitch(const char* str, s32 pitch);
+
+__declspec(section ".data") u64 fd_evt_yuuranking_negone_one_374;
+__declspec(section ".data") s32 fd_evt_yuuranking_neg_one_382[1];
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PI_383[1];
+__declspec(section ".data") s32 fd_evt_yuuranking___local_3PIO2_385[1];
+__declspec(section ".data") u64 fd_evt_yuuranking_one_negone_373;
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PIO2_384[1];
+__declspec(section ".data") s32 fd_evt_yuuranking_one_381[1];
+__declspec(section ".data") u64 fd_evt_yuuranking_negone_one_360;
+__declspec(section ".data") s32 fd_evt_yuuranking_neg_one_365[1];
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PI_366[1];
+__declspec(section ".data") s32 fd_evt_yuuranking___local_3PIO2_368[1];
+__declspec(section ".data") u64 fd_evt_yuuranking_one_negone_359;
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PIO2_367[1];
+__declspec(section ".data") s32 fd_evt_yuuranking_one_364[1];
+static __declspec(section ".data") s32 main_evt[4];
+
+static s32 fontlenpitch(const char* str, s32 pitch) {
+    const s8* p;
+    s32 n;
+
+    if (pitch != 0) {
+        p = (const s8*)str;
+        n = 0;
+        while (*p != '\0') {
+            if (_ismbblead(*p)) {
+                n++;
+                p++;
+            } else {
+                n++;
+            }
+            p++;
+        }
+        return n * pitch;
+    }
+    return FontGetMessageWidth(str);
+}
+
+void unk_yuu_00008e40(f32 x, f32 y, f32 scale, const char* msg, s32 width) {
+    Mtx trans;
+    Mtx scl;
+    Mtx mtx;
+    f32 sx;
+
+    PSMTXTrans(trans, x, y, 0.0f);
+    if (FontGetMessageWidth(msg) > width) {
+        sx = (width * scale) / FontGetMessageWidth(msg);
+    } else {
+        sx = scale;
+    }
+    PSMTXScale(scl, sx, scale, scale);
+    PSMTXConcat(trans, scl, mtx);
+    FontDrawMessageMtx(mtx, msg);
+}
+
+__declspec(section ".data") u64 fd_evt_yuuranking_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_evt_yuuranking_neg_one_382[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PI_383[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_3PIO2_385[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_evt_yuuranking_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PIO2_384[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking_one_381[] = {
+    1065353216,
+};
+
+__declspec(section ".data") u64 fd_evt_yuuranking_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") s32 fd_evt_yuuranking_neg_one_365[] = {
+    -1082130432,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PI_366[] = {
+    1078530011,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_3PIO2_368[] = {
+    1083624420,
+};
+
+__declspec(section ".data") u64 fd_evt_yuuranking_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 fd_evt_yuuranking___local_PIO2_367[] = {
+    1070141403,
+};
+
+__declspec(section ".data") s32 fd_evt_yuuranking_one_364[] = {
+    1065353216,
+};
+
+static __declspec(section ".data") EVT_BEGIN(main_evt)
+    CALL(evt_yuuranking_main_func)
+    RETURN
+EVT_END()
+
+static void evt_yuuranking_disp_func(CameraId camera, void* param) {
+    YuuRankingWork* wp = param;
+    const char* titles[4] = {"menu_title_minigame1", "menu_title_minigame4", "menu_title_minigame3", "menu_title_minigame2"};
+    const char* scoreTitles[4] = {"menu_title_score", "menu_title_score", "menu_title_score", "menu_title_score"};
+    const char* ranks[6] = {"\x81\x40\x82\x50", "\x81\x40\x82\x51", "\x81\x40\x82\x52", "\x81\x40\x82\x53", "\x81\x40\x82\x54", "menu_subtitle2_rankgai"};
+    char buf[32];
+    const char* title;
+    const char* str;
+    const u8* rk;
+    const char* msg;
+    s32 score;
+    s32 sec;
+    s32 min;
+    s32 rscore;
+    s32 rsec;
+    s32 rmin;
+    s32 i;
+    f32 ofs;
+    s32 ix;
+    s32 iy;
+    Mtx mtx;
+    f32 scale;
+
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -196.0f + wp->x, 112.0f + wp->y, 392.0f, 224.0f, 20.0f);
+    switch (wp->mode) {
+        case 0:
+            title = msgSearch(scoreTitles[wp->type]);
+            break;
+        case 1:
+        case 2:
+            title = msgSearch(titles[wp->type]);
+            break;
+    }
+    scale = 1.0f;
+    windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA3, 0xFF, 0xFF}, wp->x + -(scale * FontGetMessageWidth(title) + 50.0f) / 2.0f, scale + (128.0f + wp->y), scale * FontGetMessageWidth(title) + 50.0f, 28.0f, 8.0f);
+    FontDrawStart();
+    FontDrawScale(1.0f);
+    FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    FontDrawMessage(wp->x + scale * -FontGetMessageWidth(title) / 2.0f, 128.0f + wp->y, title);
+    if (wp->mode == 0) {
+        switch (wp->type) {
+            case 0:
+                FontDrawStart();
+                FontDrawScale(1.0f);
+                FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                unk_yuu_00008e40(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame1"), 165);
+                if (wp->dispScore >= 0) {
+                    sprintf(buf, "%3d%s%02d", wp->dispScore / 1000, msgSearch("menu_decimal_point"), (wp->dispScore % 1000) / 10);
+                    msg = buf;
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(msg, 18)), 56.0f + wp->y, 18.0f, msg);
+                    if (wp->phase >= 4) {
+                        FontDrawStart();
+                        FontDrawScale(1.0f);
+                        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                        unk_yuu_00008e40(-150.4f + wp->x, 32.0f + wp->y, 1.0f, msgSearch("menu_subtitle4_getmonte"), 165);
+                        sprintf(buf, "%4d", wp->bonus);
+                        msg = buf;
+                        FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 32.0f + wp->y, 18.0f, msg);
+                    }
+                    if (wp->phase >= 7) {
+                        FontDrawStart();
+                        FontDrawScale(1.0f);
+                        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                        if (wp->mul > 1) {
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame1"), 165);
+                            if (wp->mul < 0x100) {
+                                sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
+                            } else {
+                                sprintf(buf, "%2d", wp->mul - 0x100);
+                            }
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        } else if (wp->mul < 0) {
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        }
+                    }
+                } else {
+                    FontDrawColor((GXColor){0xFF, 0x3F, 0x3F, 0xFF});
+                    sprintf(buf, msgSearch("menu_error_minigame1"));
+                    msg = buf;
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, msg);
+                }
+                break;
+            case 3:
+            case 2:
+                FontDrawStart();
+                FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                switch (wp->type) {
+                    case 3:
+                        str = msgSearch("menu_subtitle1_minigame2");
+                        break;
+                    case 2:
+                        str = msgSearch("menu_subtitle1_minigame3");
+                        break;
+                }
+                unk_yuu_00008e40(-150.4f + wp->x, 56.0f + wp->y, 1.0f, str, 165);
+                FontDrawScale(1.0f);
+                score = wp->dispScore;
+                if (score >= 0) {
+                    sec = score / 1000;
+                    min = sec / 60;
+                    sec = sec % 60;
+                    sprintf(buf, "%1d%s%02d%s%02d", min, msgSearch("menu_colon"), sec, msgSearch("menu_colon"), (score % 1000) / 10);
+                    msg = buf;
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, msg);
+                    if (wp->phase >= 4) {
+                        FontDrawStart();
+                        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                        switch (wp->type) {
+                            case 3:
+                                str = msgSearch("menu_subtitle4_getmonte");
+                                break;
+                            case 2:
+                                str = msgSearch("menu_subtitle4_getmonte");
+                                break;
+                        }
+                        unk_yuu_00008e40(-150.4f + wp->x, 32.0f + wp->y, 1.0f, str, 165);
+                        FontDrawScale(1.0f);
+                        sprintf(buf, "%4d", wp->bonus);
+                        FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 32.0f + wp->y, 18.0f, buf);
+                    }
+                    if (wp->phase >= 7) {
+                        FontDrawStart();
+                        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                        if (wp->mul > 1) {
+                            switch (wp->type) {
+                                case 3:
+                                    str = msgSearch("menu_subtitle2_minigame2");
+                                    break;
+                                case 2:
+                                    str = msgSearch("menu_subtitle2_minigame3");
+                                    break;
+                            }
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, str, 165);
+                            FontDrawScale(1.0f);
+                            if (wp->mul < 0x100) {
+                                sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
+                            } else {
+                                sprintf(buf, "%2d", wp->mul - 0x100);
+                            }
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        } else if (wp->mul < 0) {
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            FontDrawScale(1.0f);
+                            sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        }
+                    }
+                } else {
+                    FontDrawColor((GXColor){0xFF, 0x3F, 0x3F, 0xFF});
+                    if (wp->type == 3) {
+                        sprintf(buf, msgSearch("menu_error_minigame2"));
+                    } else {
+                        sprintf(buf, msgSearch("menu_error_minigame3"));
+                    }
+                    msg = buf;
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, msg);
+                }
+                break;
+            case 1:
+                FontDrawStart();
+                FontDrawScale(1.0f);
+                FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                unk_yuu_00008e40(-150.4f + wp->x, 56.0f + wp->y, 1.0f, msgSearch("menu_subtitle1_minigame4"), 165);
+                if (wp->dispScore < wp->max) {
+                    sprintf(buf, "%4d", wp->dispScore + 1);
+                    msg = buf;
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, msg);
+                    if (wp->phase >= 7) {
+                        FontDrawStart();
+                        FontDrawScale(1.0f);
+                        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+                        if (wp->mul > 1) {
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle2_minigame4"), 165);
+                            if (wp->mul < 0x100) {
+                                sprintf(buf, msgSearch("menu_subtitle4_minigame1"), wp->mul);
+                            } else {
+                                sprintf(buf, "%2d", wp->mul - 0x100);
+                            }
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        } else if (wp->mul < 0) {
+                            unk_yuu_00008e40(-150.4f + wp->x, 8.0f + wp->y, 1.0f, msgSearch("menu_subtitle5_minigame1"), 165);
+                            sprintf(buf, msgSearch("menu_subtitle6_minigame1"), -wp->mul);
+                            msg = buf;
+                            FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 8.0f + wp->y, 18.0f, msg);
+                        }
+                    }
+                } else {
+                    FontDrawColor((GXColor){0xFF, 0x3F, 0x3F, 0xFF});
+                    sprintf(buf, msgSearch("menu_error_minigame4"));
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, buf);
+                }
+                break;
+        }
+        FontDrawStart();
+        FontDrawScale(1.0f);
+        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+        unk_yuu_00008e40(-150.4f + wp->x, -40.0f + wp->y, 1.0f, msgSearch("menu_subtitle3_totalmonte"), 165);
+        ix = 70.0f + (10.399994f + wp->x);
+        iy = (-40.0f + wp->y) - 24.0f;
+        PSMTXTrans(mtx, ix - 10, iy + 2, 0.0f);
+        iconDispGxCol(mtx, 0x10, 0x13F, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        PSMTXTrans(mtx, ix + 60, iy + 2, 0.0f);
+        iconNumberDispGx(mtx, wp->monte, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+    } else {
+        FontDrawStart();
+        FontDrawScale(1.0f);
+        FontDrawMessage(-150.4f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle5_rank"));
+        FontDrawMessage(75.19998f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle1_monte"));
+        FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+        switch (wp->type) {
+            case 0:
+                FontDrawMessage(-75.200005f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle1_minigame1"));
+                break;
+            case 3:
+                FontDrawMessage(-75.200005f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle1_minigame2"));
+                break;
+            case 2:
+                FontDrawMessage(-75.200005f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle1_minigame3"));
+                break;
+            case 1:
+                FontDrawMessage(-75.200005f + wp->x, 80.0f + wp->y, msgSearch("menu_subtitle1_minigame4"));
+                break;
+        }
+        for (i = 0; i < 6; i++) {
+            if (yuwp->used[wp->type][i] == 0) {
+                continue;
+            }
+            ofs = 2.0f + i;
+            if (i == 5) {
+                ofs += 0.5f;
+            }
+            FontDrawStart();
+            FontDrawScale(1.0f);
+            if (i != wp->rank) {
+                FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+            } else {
+                FontDrawColor((GXColor){0xFF, 0x3F, 0x3F, 0xFF});
+            }
+            rk = (const u8*)ranks[i];
+            if ((s32)rk[0] == 'm' && (s32)rk[1] == 'e' && (s32)rk[2] == 'n' && (s32)rk[3] == 'u' && (s32)rk[4] == '_') {
+                rk = (const u8*)msgSearch((const char*)rk);
+            }
+            if (i == 5) {
+                FontDrawMessage(18.8f + (-188.0f + wp->x), wp->y + (104.0f - 24.0f * ofs), (const char*)rk);
+            } else {
+                FontDrawStringPitch(-150.4f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, (const char*)rk);
+            }
+            switch (wp->type) {
+                case 0:
+                    rscore = yuwp->score[wp->type][i];
+                    if (rscore >= 0) {
+                        sprintf(buf, "%3d%s%02d", yuwp->score[wp->type][i] / 1000, msgSearch("menu_decimal_point"), (rscore % 1000) / 10);
+                        FontDrawStringPitch(-75.200005f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                        sprintf(buf, "%4d", yuwp->pts[wp->type][i]);
+                        FontDrawStringPitch(75.19998f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                    } else {
+                        sprintf(buf, msgSearch("menu_error_minigame1"));
+                        FontDrawMessage(-75.200005f + wp->x, wp->y + (104.0f - 24.0f * ofs), buf);
+                    }
+                    break;
+                case 3:
+                case 2:
+                    rscore = yuwp->score[wp->type][i];
+                    if (rscore >= 0) {
+                        rsec = rscore / 1000;
+                        rmin = rsec / 60;
+                        rsec = rsec % 60;
+                        sprintf(buf, "%1d%s%02d%s%02d", rmin, msgSearch("menu_colon"), rsec, msgSearch("menu_colon"), (rscore % 1000) / 10);
+                        FontDrawStringPitch(-75.200005f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                        sprintf(buf, "%4d", yuwp->pts[wp->type][i]);
+                        FontDrawStringPitch(75.19998f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                    } else {
+                        if (wp->type == 3) {
+                            sprintf(buf, msgSearch("menu_error_minigame2"));
+                        } else {
+                            sprintf(buf, msgSearch("menu_error_minigame3"));
+                        }
+                        FontDrawMessage(-75.200005f + wp->x, wp->y + (104.0f - 24.0f * ofs), buf);
+                    }
+                    break;
+                case 1:
+                    if (yuwp->score[wp->type][i] < wp->max) {
+                        sprintf(buf, "%4d", yuwp->score[wp->type][i] + 1);
+                        FontDrawStringPitch(-37.600006f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                        sprintf(buf, "%4d", yuwp->pts[wp->type][i]);
+                        FontDrawStringPitch(75.19998f + wp->x, wp->y + (104.0f - 24.0f * ofs), 18.0f, buf);
+                    } else {
+                        sprintf(buf, msgSearch("menu_error_minigame4"));
+                        FontDrawMessage(-75.200005f + wp->x, wp->y + (104.0f - 24.0f * ofs), buf);
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+static USER_FUNC(evt_yuuranking_main_func) {
+    YuuRankingWork* wp = (YuuRankingWork*)event->lwData[0];
+    static s32 snd_id;
+
+    if (wp->flags & 1) {
+        wp->flags |= 2;
+        return EVT_RETURN_DONE;
+    }
+    dispEntry(CAMERA_2D, 1000.0f, 0, evt_yuuranking_disp_func, wp);
+    if (wp->mode == 0) {
+        switch (wp->phase) {
+            case 0:
+                wp->timer = 30;
+                wp->phase++;
+                break;
+            case 1:
+                if (wp->timer != 0) {
+                    wp->timer--;
+                    break;
+                }
+                wp->phase++;
+                if (wp->score != 0) {
+                    snd_id = psndSFXOn((const char*)0x8D7);
+                }
+                break;
+            case 2:
+                switch (wp->type) {
+                    case 0:
+                        wp->dispScore += 5590;
+                        if (wp->dispScore > wp->score) {
+                            wp->dispScore = wp->score;
+                        }
+                        break;
+                    case 3:
+                        wp->dispScore += 1090;
+                        if (wp->dispScore > wp->score) {
+                            wp->dispScore = wp->score;
+                        }
+                        break;
+                    case 2:
+                        wp->dispScore += 1090;
+                        if (wp->dispScore > wp->score) {
+                            wp->dispScore = wp->score;
+                        }
+                        break;
+                    case 1:
+                        wp->dispScore -= 11;
+                        if (wp->dispScore < wp->score) {
+                            wp->dispScore = wp->score;
+                        }
+                        break;
+                }
+                wp->monte = yuu_kesan(wp->type, wp->dispScore, 0, 0, wp->max);
+                if (wp->dispScore == wp->score) {
+                    if (wp->score != 0) {
+                        psndSFXOff(snd_id);
+                    }
+                    switch (wp->type) {
+                        case 0:
+                        case 3:
+                        case 2:
+                            if (wp->score > 0) {
+                                wp->timer = 48;
+                                wp->phase++;
+                            } else {
+                                wp->timer = 30;
+                                wp->phase = 9;
+                            }
+                            break;
+                        case 1:
+                            if (wp->mul > 1 || wp->mul < 0) {
+                                if (wp->score < wp->max) {
+                                    wp->timer = 48;
+                                    wp->phase = 6;
+                                } else {
+                                    wp->timer = 30;
+                                    wp->phase = 9;
+                                }
+                            } else {
+                                wp->timer = 30;
+                                wp->phase = 9;
+                            }
+                            break;
+                    }
+                }
+                break;
+            case 3:
+                if (wp->timer != 0) {
+                    wp->timer--;
+                    break;
+                }
+                wp->timer = 48;
+                wp->phase++;
+                break;
+            case 4:
+                if (wp->timer != 0) {
+                    wp->timer--;
+                    break;
+                }
+                wp->phase++;
+                break;
+            case 5: {
+                s32 target;
+
+                switch (wp->type) {
+                    case 0:
+                    case 3:
+                    case 2:
+                        target = yuu_kesan(wp->type, wp->dispScore, wp->bonus, 0, wp->max);
+                        if (wp->monte < target) {
+                            wp->monte++;
+                            psndSFXOn((const char*)0x8CA);
+                        } else if (wp->monte > target) {
+                            wp->monte--;
+                        } else if (wp->score > 0 && (wp->mul > 1 || wp->mul < 0)) {
+                            wp->timer = 48;
+                            wp->phase++;
+                        } else {
+                            wp->timer = 30;
+                            wp->phase = 9;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 6:
+                if (wp->timer != 0) {
+                    wp->timer--;
+                    break;
+                }
+                wp->timer = 48;
+                wp->phase++;
+                break;
+            case 7:
+                if (wp->timer != 0) {
+                    wp->timer--;
+                    break;
+                }
+                wp->phase++;
+                break;
+            case 8: {
+                s32 target;
+
+                switch (wp->type) {
+                    case 0:
+                    case 3:
+                    case 2:
+                    case 1:
+                        target = yuu_kesan(wp->type, wp->dispScore, wp->bonus, wp->mul, wp->max);
+                        if (wp->monte < target) {
+                            wp->monte++;
+                            psndSFXOn((const char*)0x8CA);
+                        } else if (wp->monte > target) {
+                            wp->monte--;
+                        } else {
+                            wp->timer = 30;
+                            wp->phase++;
+                        }
+                        break;
+                }
+                break;
+            }
+            case 9:
+                wp->dispFlags &= ~4;
+                break;
+        }
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
+    s32 ret;
+
+    if (score < 0) {
+        return 0;
+    }
+    switch (type) {
+        case 0:
+            ret = score / 30000;
+            break;
+        case 3:
+            ret = (score - 74000) / 2000;
+            break;
+        case 2:
+            ret = (score - 109000) / 2000;
+            break;
+        case 1:
+            ret = ((max - score) * 15) / max;
+            break;
+    }
+    if (ret < 0) {
+        ret = 0;
+    }
+    ret += bonus;
+    if (mul > 0) {
+        if (mul < 0x100) {
+            ret *= mul;
+        } else {
+            ret += mul - 0x100;
+        }
+    } else {
+        ret += mul;
+        if (ret < 0) {
+            ret = 0;
+        }
+    }
+    if (ret < 0) {
+        ret = 0;
+    }
+    return ret;
+}
+
+USER_FUNC(evt_yuuranking_alloc_31_text_52F8) {
+    s32* args = event->args;
+    YuuRankingWork* wp = _mapAlloc(sizeof(YuuRankingWork));
+    s32 i;
+    s32 j;
+    s32 score;
+
+    memset(wp, 0, sizeof(YuuRankingWork));
+    _wp = wp;
+    wp->x = evtGetFloat(event, args[0]);
+    wp->y = evtGetFloat(event, args[1]);
+    wp->type = evtGetValue(event, args[2]);
+    wp->mode = evtGetValue(event, args[3]);
+    wp->score = evtGetValue(event, args[4]);
+    wp->bonus = evtGetValue(event, args[5]);
+    wp->mul = evtGetValue(event, args[6]);
+    switch (wp->type) {
+        case 0:
+            yuwp->used[wp->type][5] = 0;
+            yuwp->score[wp->type][5] = 0;
+            yuwp->pts[wp->type][5] = 0;
+            wp->rank = -1;
+            if (wp->mode == 1) {
+                score = wp->score;
+                if (score >= 0) {
+                    for (i = 0; i < 6; i++) {
+                        if (yuwp->used[wp->type][i] == 0) {
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            break;
+                        }
+                        if (score >= yuwp->score[wp->type][i]) {
+                            for (j = 4; j > i; j--) {
+                                yuwp->used[wp->type][j] = yuwp->used[wp->type][j - 1];
+                                yuwp->score[wp->type][j] = yuwp->score[wp->type][j - 1];
+                                yuwp->pts[wp->type][j] = yuwp->pts[wp->type][j - 1];
+                            }
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            if (i == 0) {
+                                evtSetValue(NULL, GSWF(1240), TRUE);
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    yuwp->used[wp->type][5] = 1;
+                    yuwp->score[wp->type][5] = wp->score;
+                    yuwp->pts[wp->type][5] = 0;
+                    wp->rank = 5;
+                }
+            } else if (wp->mode == 0) {
+                wp->dispScore = 0;
+                if (wp->score < wp->dispScore) {
+                    wp->dispScore = wp->score;
+                }
+            }
+            break;
+        case 3:
+        case 2:
+            yuwp->used[wp->type][5] = 0;
+            yuwp->score[wp->type][5] = 0;
+            yuwp->pts[wp->type][5] = 0;
+            wp->rank = -1;
+            if (wp->mode == 1) {
+                score = wp->score;
+                if (score >= 0) {
+                    for (i = 0; i < 6; i++) {
+                        if (yuwp->used[wp->type][i] == 0) {
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            break;
+                        }
+                        if (score >= yuwp->score[wp->type][i]) {
+                            for (j = 4; j > i; j--) {
+                                yuwp->used[wp->type][j] = yuwp->used[wp->type][j - 1];
+                                yuwp->score[wp->type][j] = yuwp->score[wp->type][j - 1];
+                                yuwp->pts[wp->type][j] = yuwp->pts[wp->type][j - 1];
+                            }
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            if (i == 0) {
+                                if (wp->type == 3) {
+                                    evtSetValue(NULL, GSWF(1241), TRUE);
+                                } else {
+                                    evtSetValue(NULL, GSWF(1242), TRUE);
+                                }
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    yuwp->used[wp->type][5] = 1;
+                    yuwp->score[wp->type][5] = wp->score;
+                    yuwp->pts[wp->type][5] = 0;
+                    wp->rank = 5;
+                }
+            } else if (wp->mode == 0) {
+                wp->dispScore = 0;
+                if (wp->score < wp->dispScore) {
+                    wp->dispScore = wp->score;
+                }
+            }
+            break;
+        case 1:
+            wp->max = evtGetValue(event, args[7]);
+            yuwp->used[wp->type][5] = 0;
+            yuwp->score[wp->type][5] = 0;
+            yuwp->pts[wp->type][5] = 0;
+            wp->rank = -1;
+            if (wp->mode == 1) {
+                score = wp->score;
+                if (score < wp->max) {
+                    for (i = 0; i < 6; i++) {
+                        if (yuwp->used[wp->type][i] == 0) {
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            break;
+                        }
+                        if (score <= yuwp->score[wp->type][i]) {
+                            for (j = 4; j > i; j--) {
+                                yuwp->used[wp->type][j] = yuwp->used[wp->type][j - 1];
+                                yuwp->score[wp->type][j] = yuwp->score[wp->type][j - 1];
+                                yuwp->pts[wp->type][j] = yuwp->pts[wp->type][j - 1];
+                            }
+                            yuwp->used[wp->type][i] = 1;
+                            yuwp->score[wp->type][i] = wp->score;
+                            yuwp->pts[wp->type][i] = yuu_kesan(wp->type, wp->score, wp->bonus, wp->mul, wp->max);
+                            wp->rank = i;
+                            if (i == 0) {
+                                evtSetValue(NULL, GSWF(1243), TRUE);
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    yuwp->used[wp->type][5] = 1;
+                    yuwp->score[wp->type][5] = wp->score;
+                    yuwp->pts[wp->type][5] = 0;
+                    wp->rank = 5;
+                }
+            } else {
+                if (wp->mode == 2) {
+                    wp->max = 10000;
+                }
+                if (wp->mode == 0) {
+                    wp->dispScore = wp->max - 1;
+                    if (wp->score > wp->dispScore) {
+                        wp->dispScore = wp->score;
+                    }
+                }
+            }
+            break;
+    }
+    if (wp->mode == 0) {
+        wp->dispFlags |= 4;
+    }
+    wp->event = evtEntry(main_evt, 0, 0);
+    wp->event->lwData[0] = (s32)wp;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_yuuranking_free_31_text_5274) {
+    YuuRankingWork* wp = _wp;
+
+    if (wp == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    if (isFirstCall) {
+        wp->flags |= 1;
+    }
+    if (!(wp->flags & 2)) {
+        return EVT_RETURN_BLOCK;
+    }
+    _mapFree(_wp);
+    _wp = NULL;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(yuuranking_wait_button_31_text_51F8) {
+    YuuRankingWork* wp = _wp;
+
+    if (isFirstCall) {
+        wp->dispFlags |= 2;
+    }
+    if (!(wp->dispFlags & 4) && (keyGetButtonTrg(0) & 0x300)) {
+        wp->dispFlags &= ~2;
+        psndSFXOn((const char*)0x12);
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(yuuranking_get_monte_31_text_51C0) {
+    evtSetValue(event, event->args[0], _wp->monte);
+    return EVT_RETURN_DONE;
+}
+

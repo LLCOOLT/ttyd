@@ -224,8 +224,7 @@ u32 effTblRandN64(u32 rand, s32 index) {
 	return val % (s32)(rand + 1);
 }
 
-//TODO: re-type array
-void effSetVtxDescN64(effVtxArray* array) {
+void effSetVtxDescN64(effN64Vtx* vtx) {
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
 	GXSetVtxDesc(GX_VA_CLR0, GX_INDEX16);
@@ -233,9 +232,9 @@ void effSetVtxDescN64(effVtxArray* array) {
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 5);
-	GXSetArray(GX_VA_POS, array->pos, 0xEu);
-	GXSetArray(GX_VA_CLR0, array->clr0, 0xEu);
-	GXSetArray(GX_VA_TEX0, array->tex0, 0xEu);
+	GXSetArray(GX_VA_POS, &vtx->x, sizeof(effN64Vtx));
+	GXSetArray(GX_VA_CLR0, &vtx->r, sizeof(effN64Vtx));
+	GXSetArray(GX_VA_TEX0, &vtx->s, sizeof(effN64Vtx));
 }
 
 void tri1(u16 x, u16 y, u16 z, u16 flag) {

@@ -44,33 +44,33 @@ USER_FUNC(peach_talk_synchro_shadow_head_evt) {
     BattleUnitPart* part;
 
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part + 0x1C4, "KRT_T_1") == 0 || strcmp((char*)part + 0x1C4, "KRT_T_2") == 0 ||
-        strcmp((char*)part + 0x1C4, "KRT_T_3") == 0) {
+    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0 || strcmp((char*)part->field_0x1C4, "KRT_T_2") == 0 ||
+        strcmp((char*)part->field_0x1C4, "KRT_T_3") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_T_1") != 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_T_1");
             return 0;
         }
     }
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part + 0x1C4, "KRT_T_1") != 0 && strcmp((char*)part + 0x1C4, "KRT_T_2") != 0 &&
-        strcmp((char*)part + 0x1C4, "KRT_T_3") != 0) {
+    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0 && strcmp((char*)part->field_0x1C4, "KRT_T_2") != 0 &&
+        strcmp((char*)part->field_0x1C4, "KRT_T_3") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_T_1") == 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1) + 0x1C4, "KRT_D_1") == 0) {
+    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_D_1") != 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_D_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1) + 0x1C4, "KRT_D_1") != 0) {
+    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_D_1") == 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }

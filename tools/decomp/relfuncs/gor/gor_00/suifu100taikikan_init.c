@@ -5,9 +5,9 @@
 // decl: void suifu100taikikan_seq00(NanNpc* npc);
 // proto: USER_FUNC(suifu100taikikan_init);
 USER_FUNC(suifu100taikikan_init) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
     s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < wp->count; i++) {
         npc = &wp->entries[i];

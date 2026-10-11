@@ -9,7 +9,7 @@
 // decl: static __declspec(section ".data") RankWork* rank_wp;
 // decl: static __declspec(section ".data") DispWork* dwp;
 // include: stdlib.h
-// decl: static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+// decl: #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 // decl: static s32 ruleDt_2bu_raw[50];
 // decl: #define ruleDt_2bu ((RuleData*)ruleDt_2bu_raw)
 // decl: static s32 ruleDt_1bu_raw[70];
@@ -20,12 +20,14 @@
 USER_FUNC(evt_tou_get_rule_info) {
     s32* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
-    RuleData* dt;
     s32 num;
+    RuleData* dt;
     s32 i;
+    s32 rank;
 
     if (evtGetValue(NULL, GSW(0)) < 0xAC) {
-        if (getRank() > 10) {
+        GET_RANK(rank, i);
+        if (rank > 10) {
             num = 10;
             dt = ruleDt_2bu;
         } else {
@@ -43,9 +45,12 @@ USER_FUNC(evt_tou_get_rule_info) {
             }
         }
     } else if (mode == 10) {
-        do {
+        while (TRUE) {
             i = rand() % num;
-        } while (dt[i].id == 0x30 || dt[i].id == 0x20 || dt[i].id == 0x40);
+            if (dt[i].id != 0x30 && dt[i].id != 0x20 && dt[i].id != 0x40) {
+                break;
+            }
+        }
     } else {
         i = rand() % num;
     }

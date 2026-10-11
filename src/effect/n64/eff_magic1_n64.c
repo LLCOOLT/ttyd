@@ -1,0 +1,269 @@
+#include "eff/eff_n64.h"
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/effdrv.h"
+#include "mario/mariost.h"
+#include "memory.h"
+#include "system.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+
+extern double sin(double x);
+extern double cos(double x);
+
+typedef struct EffMagic1N64Work {
+    s32 type;     // 0x0
+    Vec position; // 0x4
+    Vec offset;   // 0x10
+    Vec velocity; // 0x1C
+    f32 scale;    // 0x28
+    s32 age;      // 0x2C
+    s32 life;     // 0x30
+    s32 alpha;    // 0x34
+} EffMagic1N64Work;
+
+extern GXColor unk_804231a8;
+
+static u8 anime_data[12] = {0x00, 0xFF, 0xD0, 0x1A, 0x78, 0x4D, 0xD0, 0xFE, 0xF0, 0xFE, 0x4C, 0x6E};
+
+void effMagic1Main(EffectEntry* effect);
+void effMagic1Disp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32 tz) {
+    EffectEntry* effect;
+    EffMagic1N64Work* w;
+
+    effect = effEntry();
+    effect->type = "Magic1N64\0\0";
+    effect->count = 1;
+    w = __memAlloc(HEAP_EFFECT, sizeof(EffMagic1N64Work));
+    effect->userdata = w;
+    effect->callback = effMagic1Main;
+    effect->flags |= 2;
+    w->age = 0;
+    w->type = type;
+    w->alpha = 255;
+    w->position.x = x;
+    w->position.y = y;
+    w->position.z = z;
+    w->scale = 1.0f;
+    switch (type) {
+    case 0: {
+        f32 inv;
+        w->offset.x = 0.0f;
+        w->offset.y = 0.0f;
+        w->offset.z = 0.0f;
+        inv = 1.0f / (f32)life;
+        w->velocity.x = inv * (tx - x);
+        w->velocity.y = inv * (ty - y);
+        w->velocity.z = inv * (tz - z);
+        w->life = life;
+        break;
+    }
+    default:
+        w->offset.x = 29.0f;
+        w->offset.y = 0.0f;
+        w->offset.z = 0.0f;
+        w->velocity.x = 6.2f;
+        w->velocity.y = 0.0f;
+        w->velocity.z = 0.0f;
+        w->life = 24;
+        break;
+    }
+    return effect;
+}
+
+void effMagic1Main(EffectEntry* effect) {
+    EffMagic1N64Work* work = effect->userdata;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
+    s32 type;
+
+    tmp.x = work->offset.x;
+    tmp.y = work->offset.y;
+    tmp.z = work->offset.z;
+    position = tmp;
+    if (marioStGetSystemLevel() != 0) {
+        dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
+        return;
+    }
+    if (effect->flags & 4) {
+        effect->flags &= ~4;
+        work->life = 0;
+    }
+    work->life--;
+    work->age++;
+    if (work->life < 0) {
+        effDelete(effect);
+        return;
+    }
+    type = work->type;
+    if (type == 0 && work->life == 0) {
+        EffectEntry* e = effMagic1N64Entry(1, 0x30, work->position.x + work->offset.x, work->position.y + work->offset.y,
+                                           work->position.z + work->offset.z, 0.0f, 0.0f, 0.0f);
+        ((EffMagic1N64Work*)e->userdata)->scale = work->scale;
+    }
+    if (type == 1) {
+        work->velocity.x *= 0.83f;
+        work->alpha = (s32)((f32)work->alpha * 0.9f);
+    }
+    work->offset.x += work->velocity.x;
+    work->offset.y += work->velocity.y;
+    work->offset.z += work->velocity.z;
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
+}
+
+static void main_dl(EffectEntry* effect, Mtx base) {
+    EffMagic1N64Work* w = effect->userdata;
+    s32 type = w->type;
+    f32 scale = w->scale;
+    s32 life = w->life;
+    s32 alpha = w->alpha;
+    f32 ox = w->offset.x;
+    f32 oy = w->offset.y;
+    f32 oz = w->offset.z;
+    f32 yaw;
+    f32 radius;
+    f32 ang;
+    f32 c;
+    f32 yr;
+    s32 i;
+    s32 j;
+    u8* a;
+    s16 sz;
+    GXTexObj texObj;
+    Mtx m38;
+    Mtx m68;
+    Mtx m98;
+    Mtx mc8;
+    Mtx mf8;
+
+    switch (type) {
+        case 0:
+            radius = 9.0f;
+            ang = (f32)(life * 35);
+            yaw = -camGetPtr(CAMERA_3D)->viewYaw;
+            break;
+        default:
+            ox *= scale;
+            radius = 6.0f;
+            yaw = 0.0f;
+            ang = (f32)(life * 25);
+            break;
+    }
+    GXSetNumChans(0);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_C0, GX_CC_C1, GX_CC_TEXC, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+    effGetTexObjN64(0x10, &texObj);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    yr = 0.017453292f * yaw;
+    for (i = 0; i < 3; i++) {
+        if (i > 0) {
+            if (type == 0) {
+                ang -= 70.0f;
+                ox -= 2.0f * w->velocity.x;
+                oy -= 2.0f * w->velocity.y;
+                oz -= 2.0f * w->velocity.z;
+            } else {
+                ang -= 50.0f;
+                ox -= 2.0f * (1.2048193f * w->velocity.x);
+            }
+            alpha = (s32)(100.0f * (f32)w->alpha / 255.0f);
+        }
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+        PSMTXTrans(mf8, ox, oy, oz);
+        PSMTXScale(m98, scale, scale, scale);
+        PSMTXRotRad(mc8, 'y', yr);
+        PSMTXConcat(mc8, mf8, mf8);
+        PSMTXConcat(mf8, m98, m68);
+        a = anime_data;
+        for (j = 0; j < 3; j++) {
+            GXColor c0;
+            GXColor c1;
+            yaw = 6.2831855f * ang / 360.0f;
+            c = (f32)cos(yaw);
+            PSMTXTrans(m38, radius * (f32)sin(yaw), radius * c, 0.0f);
+            ang += 120.0f;
+            PSMTXConcat(m68, m38, m38);
+            PSMTXConcat(base, m38, m38);
+            GXLoadPosMtxImm(m38, GX_PNMTX0);
+            c0 = unk_804231a8;
+            c0.r = (u8)((f32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
+            c0.g = (u8)((f32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
+            c0.b = (u8)((f32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
+            c0.a = alpha;
+            GXSetTevColor(GX_TEVREG1, c0);
+            c1 = (GXColor){0, 0, 0, 255};
+            c1.r = (u8)((f32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.g = (u8)((f32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.b = (u8)((f32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            GXSetTevColor(GX_TEVREG2, c1);
+            sz = (type == 0) ? 15 : 10;
+            PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
+            PSMTXTrans(mf8, 0.0f, 64.0f * (f32)(3 - j) * 0.00390625f, 0.0f);
+            PSMTXConcat(mf8, m98, mf8);
+            GXLoadTexMtxImm(mf8, GX_TEXMTX0, GX_MTX2x4);
+            GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+            GXPosition3s16(-sz, sz, 0);
+            GXTexCoord2f32(0.0f, 0.0f);
+            GXPosition3s16(sz, sz, 0);
+            GXTexCoord2f32(1.0f, 0.0f);
+            GXPosition3s16(sz, -sz, 0);
+            GXTexCoord2f32(1.0f, 1.0f);
+            GXPosition3s16(-sz, -sz, 0);
+            GXTexCoord2f32(0.0f, 1.0f);
+            a += 4;
+        }
+    }
+}
+
+void effMagic1Disp(CameraId cameraId, EffectEntry* effect) {
+    CameraEntry* camera;
+    EffMagic1N64Work* w;
+    f32 yaw;
+    s32 type;
+    s32 i;
+    Mtx m98;
+    Mtx m68;
+    Mtx m38;
+    Mtx m8;
+
+    camera = camGetPtr(cameraId);
+    w = effect->userdata;
+    type = w->type;
+    switch (type) {
+        case 0:
+            yaw = 0.0f;
+            break;
+        default:
+            yaw = -camGetPtr(CAMERA_3D)->viewYaw;
+            break;
+    }
+    PSMTXTrans(m98, w->position.x, w->position.y, w->position.z);
+    PSMTXRotRad(m68, 'y', 0.017453292f * yaw);
+    PSMTXConcat(m98, m68, m38);
+    PSMTXConcat(camera->view, m38, m38);
+    switch (type) {
+        case 0:
+            main_dl(effect, m38);
+            break;
+        case 1:
+            for (i = 0; i < 12; i++) {
+                PSMTXRotRad(m8, 'z', 0.017453292f * (f32)(i * 30));
+                PSMTXConcat(m38, m8, m8);
+                main_dl(effect, m8);
+            }
+            break;
+    }
+}

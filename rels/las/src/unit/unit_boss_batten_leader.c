@@ -16,8 +16,8 @@
 
 EffectEntry* effPokopiThunderN64Entry(s32 type, s32 time, f32 x1, f32 y1, f32 z1, f32 x2, f32 y2, f32 z2, f32 scale);
 int rand(void);
-f32 maer;
 Vec nowv;
+f32 maer;
 s32 irand(s32 scalar);
 EffectEntry* effGlassN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
 static s32 xlw[16];
@@ -512,6 +512,304 @@ __declspec(section ".data") s32 hakai_snd_event[] = {
     393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_SRYO_BARRIER_BREAK1", -250000000, 0, -250000000, 2,
     1,
 };
+
+USER_FUNC(evt_eff_pokopi_thunder) {
+    f32 top;
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+
+    top = 250.0f + y;
+
+    effPokopiThunderN64Entry(0, 30, x, top, z, x, y, z, 1.0f);
+    effPokopiThunderN64Entry(1, 30, x, top, z, x, y, z, 1.0f);
+    effPokopiThunderN64Entry(1, 30, x, top, z, x, y, z, 1.0f);
+    return EVT_RETURN_DONE;
+}
+USER_FUNC(evt_eff_colorchange00) {
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    ((s32*)eff->userdata)[6] = 255;
+    ((s32*)eff->userdata)[7] = 255;
+    ((s32*)eff->userdata)[8] = 255;
+    ((s32*)eff->userdata)[10] = 255;
+    ((s32*)eff->userdata)[11] = 245;
+    ((s32*)eff->userdata)[12] = 0;
+    ((f32*)eff->userdata)[2] = 65.0f + ((f32*)eff->userdata)[2];
+    ((f32*)eff->userdata)[3] = 10.0f + ((f32*)eff->userdata)[3];
+
+    return EVT_RETURN_DONE;
+}
+USER_FUNC(evt_eff_barriersizechange) {
+    s32* args = event->args;
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
+
+    ((f32*)eff->userdata)[4] = evtGetFloat(event, args[1]);
+    return EVT_RETURN_DONE;
+}
+USER_FUNC(evt_eff_firechange00) {
+    Mtx m;
+    Vec target;
+    Vec pos;
+    Vec dir;
+    s32* args = event->args;
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
+    s32 mode = evtGetValue(event, args[1]);
+    BOOL reset;
+    f32 a;
+    f32 d;
+
+    target.x = evtGetValue(event, args[2]);
+    target.y = evtGetValue(event, args[3]);
+    target.z = 0.0f;
+    pos.x = ((f32*)eff->userdata)[14];
+    pos.y = ((f32*)eff->userdata)[15];
+    pos.z = 0.0f;
+    if (isFirstCall) {
+        event->field_84 = 0;
+        if (mode == 0) {
+            PSVECSubtract(&target, &pos, &nowv);
+            PSVECNormalize(&nowv, &nowv);
+            maer = rand() % 60 - 30;
+            maer += (maer < 0.0f) ? -30 : 31;
+            ((s32*)eff->userdata)[6] = 255;
+            ((s32*)eff->userdata)[7] = 255;
+            ((s32*)eff->userdata)[8] = 255;
+            ((s32*)eff->userdata)[10] = 255;
+            ((s32*)eff->userdata)[11] = 65;
+            ((s32*)eff->userdata)[12] = 20;
+        }
+    }
+    switch (event->field_84) {
+        case 0:
+            break;
+        case 1:
+            target.x = -2700.0f;
+            break;
+    }
+    PSVECSubtract(&target, &pos, &dir);
+    reset = FALSE;
+    if (PSVECSquareMag(&dir) > 2500.0f) {
+        maer += rand() % 41 - 20;
+        if (maer > 80.0f || maer < -80.0f || (maer < 20.0f && maer > -20.0f)) {
+            maer = rand() % 60 - 30;
+            maer += (maer < 0.0f) ? -30 : 31;
+            reset = TRUE;
+        }
+        PSMTXRotRad(m, 'Z', 0.017453292f * maer);
+        PSMTXMultVec(m, &dir, &dir);
+    } else {
+        reset = TRUE;
+    }
+    PSVECNormalize(&dir, &dir);
+    a = angleABf(0.0f, 0.0f, nowv.x, nowv.y);
+    d = angleABf(0.0f, 0.0f, dir.x, dir.y);
+    d = compAngle(a, d);
+    if (!reset) {
+        if ((d >= 0.0f ? d : -d) > 15.0f) {
+            d = (d > 0.0f) ? 15.0f : -15.0f;
+        }
+    }
+    PSMTXRotRad(m, 'Z', 0.017453292f * d);
+    PSMTXMultVec(m, &nowv, &nowv);
+    PSVECScale(&nowv, &dir, 15.0f);
+    PSVECAdd(&pos, &dir, &pos);
+    if (pos.y < 10.0f) {
+        if (((f32*)eff->userdata)[15] >= 10.0f) {
+            nowv.y = -nowv.y;
+        } else if (nowv.y < 0.0f) {
+            nowv.y = -nowv.y;
+        }
+    }
+    ((f32*)eff->userdata)[14] = pos.x;
+    ((f32*)eff->userdata)[15] = pos.y;
+    switch (event->field_84) {
+        case 0:
+            if (PSVECSquareDistance(&pos, &target) < 225.0f) {
+                if (mode) {
+                    event->field_84 = 1;
+                } else {
+                    return 1;
+                }
+            }
+            break;
+        case 1:
+            if (pos.x <= -270.0f) {
+                effSoftDelete(eff);
+                return 1;
+            }
+            break;
+    }
+    return 0;
+}
+static USER_FUNC(eff_staff) {
+    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    f32 x;
+    f32 y;
+    f32 z;
+    f32* wk;
+
+    wk = effSyuryouEntry(0, 90, 0.0f, -1000.0f, 0.0f)->userdata;
+    BtlUnit_GetPos(unit, &x, &y, &z);
+    wk[1] = x + 6.0f * (unit->mSizeMultiplier * unit->faceDirection);
+    wk[2] = y + 68.0f * unit->mSizeMultiplier;
+    wk[3] = 5.0f + z;
+    wk[4] = unit->mSizeMultiplier;
+    return EVT_RETURN_DONE;
+}
+USER_FUNC(check_satellite) {
+    s32 id = BattleTransID(event, -2);
+    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BattleUnitPart* part;
+    BattleUnitPart* part2;
+    EventEntry* evt;
+    f32 x;
+    f32 y;
+    f32 z;
+    s32 i;
+    s32 count;
+    BOOL all;
+
+    count = 0;
+    all = FALSE;
+    if (unit == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    for (i = 9; i < 13; i++) {
+        if (unit->work[i] != -1) {
+            if (BattleGetUnitPtr(_battleWorkPointer, unit->work[i]) != NULL) {
+                count++;
+            } else {
+                unit->work[i] = -1;
+            }
+        }
+    }
+    if (count >= 4) {
+        all = TRUE;
+    }
+    if (!all) {
+        part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
+        part2 = BtlUnit_GetPartsPtr(unit, 2);
+        if (part->attributes & 0x40000000) {
+            evt = evtEntryType(hakai_snd_event, event->priority, 0, event->type);
+            evt->unitId = event->unitId;
+            evt->ownerNPC = event->ownerNPC;
+            for (i = 0; i < 16; i++) {
+                evt->lwData[i] = event->lwData[i];
+            }
+            for (i = 0; i < 3; i++) {
+                evt->lfData[i] = event->lfData[i];
+            }
+            evt->uwBase = event->uwBase;
+            evt->ufBase = event->ufBase;
+            effDelete((EffectEntry*)unit->work[8]);
+            unit->work[8] = 0;
+            BtlUnit_GetPos(unit, &x, &y, &z);
+            for (i = 0; i < 20; i++) {
+                s32 w = BtlUnit_GetWidth(unit) + 15;
+                s32 h = BtlUnit_GetHeight(unit) + 15;
+                s32 dx = irand(w) - w / 2;
+                s32 dy = irand(h) - h / 2;
+
+                effGlassN64Entry(2, 60, x + dx, y + dy, z, 1.0f);
+            }
+        }
+        part->attributes &= ~0x40000000;
+        part2->attributes &= ~0x20000000;
+        part->defenseAttr = &defence_attr;
+        for (i = 0; i < 5; i++) {
+            part->defense->defenses[i] = ((u8*)defencecopy)[i];
+        }
+        part->defense->defenses[0] += count;
+    } else {
+        part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
+        part2 = BtlUnit_GetPartsPtr(unit, 2);
+        if (!(part->attributes & 0x40000000)) {
+            f32 px;
+            f32 py;
+            f32 pz;
+
+            BtlUnit_snd_se(unit, "SFX_BOSS_SRYO_LIGHT_ROUND1", 0xF1194D80, 0);
+            BtlUnit_GetPos(unit, &px, &py, &pz);
+            unit->work[8] = (s32)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
+        }
+        if (unit->work[8] != 0) {
+            f32* ud = ((EffectEntry*)unit->work[8])->userdata;
+            f32 ex;
+            f32 ey;
+            f32 ez;
+
+            BtlUnit_GetPos(unit, &ex, &ey, &ez);
+            ud[1] = ex;
+            ud[2] = ey - 12.5f * unit->mSizeMultiplier;
+            ud[3] = 10.0f + ez;
+
+            ud[4] = 2.5f * unit->mSizeMultiplier;
+        }
+        part->attributes |= 0x40000000;
+        part2->attributes |= 0x20000000;
+        part->defenseAttr = (BattleUnitDefenseAttr*)defence_attr_muteki;
+        for (i = 0; i < 5; i++) {
+            part->defense->defenses[i] = ((u8*)defencecopy)[i];
+        }
+        part->defense->defenses[0] += count;
+    }
+    return EVT_RETURN_DONE;
+}
+USER_FUNC(battleGetBattenSatelliteInitPos) {
+    s32* args = event->args;
+    BattleUnit* unit;
+    s32 num;
+    s32 index;
+    s32 id;
+    s32 x;
+    s32 y;
+    s32 z;
+    s32 i;
+    s32 j;
+    static const Vec VecData[] = {
+        // 1 satellite
+        {38.0f, 45.0f, 5.0f},
+        // 2 satellites
+        {38.0f, 45.0f, 5.0f},
+        {-38.0f, 45.0f, 5.0f},
+        // 3 satellites
+        {0.0f, 83.0f, 5.0f},
+        {38.0f, 7.0f, 5.0f},
+        {-38.0f, 7.0f, 5.0f},
+        // 4 satellites
+        {38.0f, 83.0f, 5.0f},
+        {-38.0f, 83.0f, 5.0f},
+        {38.0f, 7.0f, 5.0f},
+        {-38.0f, 7.0f, 5.0f},
+    };
+    const Vec* p;
+    BattleWork* wp = _battleWorkPointer;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(wp, id);
+    num = evtGetValue(event, args[1]);
+    index = evtGetValue(event, args[2]);
+    x = args[3];
+    y = args[4];
+    z = args[5];
+    p = VecData;
+    for (i = 0; i < num; i++) {
+        for (j = 0; j < i; j++) {
+            p++;
+        }
+    }
+    for (j = 0; j < index; j++) {
+        p++;
+    }
+    evtSetValue(event, x, (s32)(p->x * unit->faceDirection));
+    evtSetValue(event, y, (s32)p->y);
+    evtSetValue(event, z, (s32)p->z);
+    return EVT_RETURN_DONE;
+}
 
 __declspec(section ".data") s32 entry_batten_satellite[] = {
     (s32)unit_boss_batten_satellite, 16777216, 67108868, 1148846080, 0, 1148846080, 0, 0,
@@ -1746,303 +2044,6 @@ static s32 wait_event[] = {
     65545, 1, 65627, (s32)check_satellite, 6, 2, 1, 0,
 };
 
-USER_FUNC(evt_eff_pokopi_thunder) {
-    f32 top;
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-
-    top = 250.0f + y;
-
-    effPokopiThunderN64Entry(0, 30, x, top, z, x, y, z, 1.0f);
-    effPokopiThunderN64Entry(1, 30, x, top, z, x, y, z, 1.0f);
-    effPokopiThunderN64Entry(1, 30, x, top, z, x, y, z, 1.0f);
-    return EVT_RETURN_DONE;
-}
-USER_FUNC(evt_eff_colorchange00) {
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
-
-    ((s32*)eff->userdata)[6] = 255;
-    ((s32*)eff->userdata)[7] = 255;
-    ((s32*)eff->userdata)[8] = 255;
-    ((s32*)eff->userdata)[10] = 255;
-    ((s32*)eff->userdata)[11] = 245;
-    ((s32*)eff->userdata)[12] = 0;
-    ((f32*)eff->userdata)[2] = 65.0f + ((f32*)eff->userdata)[2];
-    ((f32*)eff->userdata)[3] = 10.0f + ((f32*)eff->userdata)[3];
-
-    return EVT_RETURN_DONE;
-}
-USER_FUNC(evt_eff_barriersizechange) {
-    s32* args = event->args;
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-
-    ((f32*)eff->userdata)[4] = evtGetFloat(event, args[1]);
-    return EVT_RETURN_DONE;
-}
-USER_FUNC(evt_eff_firechange00) {
-    Mtx m;
-    Vec target;
-    Vec pos;
-    Vec dir;
-    s32* args = event->args;
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-    s32 mode = evtGetValue(event, args[1]);
-    BOOL reset;
-    f32 a;
-    f32 d;
-
-    target.x = evtGetValue(event, args[2]);
-    target.y = evtGetValue(event, args[3]);
-    target.z = 0.0f;
-    pos.x = ((f32*)eff->userdata)[14];
-    pos.y = ((f32*)eff->userdata)[15];
-    pos.z = 0.0f;
-    if (isFirstCall) {
-        event->field_84 = 0;
-        if (mode == 0) {
-            PSVECSubtract(&target, &pos, &nowv);
-            PSVECNormalize(&nowv, &nowv);
-            maer = rand() % 60 - 30;
-            maer += (maer < 0.0f) ? -30 : 31;
-            ((s32*)eff->userdata)[6] = 255;
-            ((s32*)eff->userdata)[7] = 255;
-            ((s32*)eff->userdata)[8] = 255;
-            ((s32*)eff->userdata)[10] = 255;
-            ((s32*)eff->userdata)[11] = 65;
-            ((s32*)eff->userdata)[12] = 20;
-        }
-    }
-    switch (event->field_84) {
-        case 0:
-            break;
-        case 1:
-            target.x = -2700.0f;
-            break;
-    }
-    PSVECSubtract(&target, &pos, &dir);
-    reset = FALSE;
-    if (PSVECSquareMag(&dir) > 2500.0f) {
-        maer += rand() % 41 - 20;
-        if (maer > 80.0f || maer < -80.0f || (maer < 20.0f && maer > -20.0f)) {
-            maer = rand() % 60 - 30;
-            maer += (maer < 0.0f) ? -30 : 31;
-            reset = TRUE;
-        }
-        PSMTXRotRad(m, 'Z', 0.017453292f * maer);
-        PSMTXMultVec(m, &dir, &dir);
-    } else {
-        reset = TRUE;
-    }
-    PSVECNormalize(&dir, &dir);
-    a = angleABf(0.0f, 0.0f, nowv.x, nowv.y);
-    d = angleABf(0.0f, 0.0f, dir.x, dir.y);
-    d = compAngle(a, d);
-    if (!reset) {
-        if ((d >= 0.0f ? d : -d) > 15.0f) {
-            d = (d > 0.0f) ? 15.0f : -15.0f;
-        }
-    }
-    PSMTXRotRad(m, 'Z', 0.017453292f * d);
-    PSMTXMultVec(m, &nowv, &nowv);
-    PSVECScale(&nowv, &dir, 15.0f);
-    PSVECAdd(&pos, &dir, &pos);
-    if (pos.y < 10.0f) {
-        if (((f32*)eff->userdata)[15] >= 10.0f) {
-            nowv.y = -nowv.y;
-        } else if (nowv.y < 0.0f) {
-            nowv.y = -nowv.y;
-        }
-    }
-    ((f32*)eff->userdata)[14] = pos.x;
-    ((f32*)eff->userdata)[15] = pos.y;
-    switch (event->field_84) {
-        case 0:
-            if (PSVECSquareDistance(&pos, &target) < 225.0f) {
-                if (mode) {
-                    event->field_84 = 1;
-                } else {
-                    return 1;
-                }
-            }
-            break;
-        case 1:
-            if (pos.x <= -270.0f) {
-                effSoftDelete(eff);
-                return 1;
-            }
-            break;
-    }
-    return 0;
-}
-static USER_FUNC(eff_staff) {
-    s32 id = BattleTransID(event, evtGetValue(event, event->args[0]));
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    f32 x;
-    f32 y;
-    f32 z;
-    f32* wk;
-
-    wk = effSyuryouEntry(0, 90, 0.0f, -1000.0f, 0.0f)->userdata;
-    BtlUnit_GetPos(unit, &x, &y, &z);
-    wk[1] = x + 6.0f * (unit->mSizeMultiplier * unit->faceDirection);
-    wk[2] = y + 68.0f * unit->mSizeMultiplier;
-    wk[3] = 5.0f + z;
-    wk[4] = unit->mSizeMultiplier;
-    return EVT_RETURN_DONE;
-}
-USER_FUNC(check_satellite) {
-    s32 id = BattleTransID(event, -2);
-    BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    BattleUnitPart* part;
-    BattleUnitPart* part2;
-    EventEntry* evt;
-    f32 x;
-    f32 y;
-    f32 z;
-    s32 i;
-    s32 count;
-    BOOL all;
-
-    count = 0;
-    all = FALSE;
-    if (unit == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    for (i = 9; i < 13; i++) {
-        if (unit->work[i] != -1) {
-            if (BattleGetUnitPtr(_battleWorkPointer, unit->work[i]) != NULL) {
-                count++;
-            } else {
-                unit->work[i] = -1;
-            }
-        }
-    }
-    if (count >= 4) {
-        all = TRUE;
-    }
-    if (!all) {
-        part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-        part2 = BtlUnit_GetPartsPtr(unit, 2);
-        if (part->attributes & 0x40000000) {
-            evt = evtEntryType(hakai_snd_event, event->priority, 0, event->type);
-            evt->unitId = event->unitId;
-            evt->ownerNPC = event->ownerNPC;
-            for (i = 0; i < 16; i++) {
-                evt->lwData[i] = event->lwData[i];
-            }
-            for (i = 0; i < 3; i++) {
-                evt->lfData[i] = event->lfData[i];
-            }
-            evt->uwBase = event->uwBase;
-            evt->ufBase = event->ufBase;
-            effDelete((EffectEntry*)unit->work[8]);
-            unit->work[8] = 0;
-            BtlUnit_GetPos(unit, &x, &y, &z);
-            for (i = 0; i < 20; i++) {
-                s32 w = BtlUnit_GetWidth(unit) + 15;
-                s32 h = BtlUnit_GetHeight(unit) + 15;
-                s32 dx = irand(w) - w / 2;
-                s32 dy = irand(h) - h / 2;
-
-                effGlassN64Entry(2, 60, x + dx, y + dy, z, 1.0f);
-            }
-        }
-        part->attributes &= ~0x40000000;
-        part2->attributes &= ~0x20000000;
-        part->defenseAttr = &defence_attr;
-        for (i = 0; i < 5; i++) {
-            part->defense->defenses[i] = ((u8*)defencecopy)[i];
-        }
-        part->defense->defenses[0] += count;
-    } else {
-        part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-        part2 = BtlUnit_GetPartsPtr(unit, 2);
-        if (!(part->attributes & 0x40000000)) {
-            f32 px;
-            f32 py;
-            f32 pz;
-
-            BtlUnit_snd_se(unit, "SFX_BOSS_SRYO_LIGHT_ROUND1", 0xF1194D80, 0);
-            BtlUnit_GetPos(unit, &px, &py, &pz);
-            unit->work[8] = (s32)effSyuryouEntry(1, 1000, 0.0f, -1000.0f, 0.0f);
-        }
-        if (unit->work[8] != 0) {
-            f32* ud = ((EffectEntry*)unit->work[8])->userdata;
-            f32 ex;
-            f32 ey;
-            f32 ez;
-
-            BtlUnit_GetPos(unit, &ex, &ey, &ez);
-            ud[1] = ex;
-            ud[2] = ey - 12.5f * unit->mSizeMultiplier;
-            ud[3] = 10.0f + ez;
-
-            ud[4] = 2.5f * unit->mSizeMultiplier;
-        }
-        part->attributes |= 0x40000000;
-        part2->attributes |= 0x20000000;
-        part->defenseAttr = (BattleUnitDefenseAttr*)defence_attr_muteki;
-        for (i = 0; i < 5; i++) {
-            part->defense->defenses[i] = ((u8*)defencecopy)[i];
-        }
-        part->defense->defenses[0] += count;
-    }
-    return EVT_RETURN_DONE;
-}
-USER_FUNC(battleGetBattenSatelliteInitPos) {
-    s32* args = event->args;
-    BattleUnit* unit;
-    s32 num;
-    s32 index;
-    s32 id;
-    s32 x;
-    s32 y;
-    s32 z;
-    s32 i;
-    s32 j;
-    static const Vec VecData[] = {
-        // 1 satellite
-        {38.0f, 45.0f, 5.0f},
-        // 2 satellites
-        {38.0f, 45.0f, 5.0f},
-        {-38.0f, 45.0f, 5.0f},
-        // 3 satellites
-        {0.0f, 83.0f, 5.0f},
-        {38.0f, 7.0f, 5.0f},
-        {-38.0f, 7.0f, 5.0f},
-        // 4 satellites
-        {38.0f, 83.0f, 5.0f},
-        {-38.0f, 83.0f, 5.0f},
-        {38.0f, 7.0f, 5.0f},
-        {-38.0f, 7.0f, 5.0f},
-    };
-    const Vec* p;
-    BattleWork* wp = _battleWorkPointer;
-
-    id = evtGetValue(event, args[0]);
-    id = BattleTransID(event, id);
-    unit = BattleGetUnitPtr(wp, id);
-    num = evtGetValue(event, args[1]);
-    index = evtGetValue(event, args[2]);
-    x = args[3];
-    y = args[4];
-    z = args[5];
-    p = VecData;
-    for (i = 0; i < num; i++) {
-        for (j = 0; j < i; j++) {
-            p++;
-        }
-    }
-    for (j = 0; j < index; j++) {
-        p++;
-    }
-    evtSetValue(event, x, (s32)(p->x * unit->faceDirection));
-    evtSetValue(event, y, (s32)p->y);
-    evtSetValue(event, z, (s32)p->z);
-    return EVT_RETURN_DONE;
-}
 USER_FUNC(btlevtcmd_AnimeGetPose) {
     s32 id;
     s32* args = event->args;

@@ -14,11 +14,16 @@
 // decl: static inline f32 tb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 // decl: void tiz_broken_draw(CameraId cameraId, void* param);
 // proto: USER_FUNC(tiz_broken);
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 USER_FUNC(tiz_broken) {
-    s32 done = 0;
-    BrokenPiece* p;
     s32 x;
     s32 y;
+    s32 done = 0;
+    BrokenPiece* p;
+    BrokenPiece* q;
+    s32 i;
+    s32 j;
     f32 dx;
     f32 dy;
     f32 nx;
@@ -28,14 +33,14 @@ USER_FUNC(tiz_broken) {
 
     if (isFirstCall) {
         memset(broken_wp, 0, sizeof(BrokenWork));
-        broken_wp->tex = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB565, GX_FALSE, 0), 1);
+        broken_wp->tex = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB5A3, GX_FALSE, 0), 1);
         broken_wp->pieces = smartAlloc(sizeof(BrokenPiece) * 31 * 39, 1);
         broken_wp->copied = 0;
         p = broken_wp->pieces->address;
         for (y = 0; y < 30; y++) {
             for (x = 0; x < 38; x++) {
-                dy = 0.5f + -y / 29.0f;
                 dx = x / 37.0f - 0.5f;
+                dy = 0.5f + -y / 29.0f;
                 if (dy > 0.0f) {
                     if (dx < 0.0f) {
                         p->dir = 0;
@@ -49,7 +54,7 @@ USER_FUNC(tiz_broken) {
                         p->dir = 3;
                     }
                 }
-                if (dx != 0.0f || dy != 0.0f) {
+                if (dx || dy) {
                     len = tb_sqrtf(dx * dx + dy * dy);
                     nx = dx / len;
                     ny = dy / len;
@@ -67,43 +72,44 @@ USER_FUNC(tiz_broken) {
                 p->vel.y = -ny * param_tbl[1];
                 p->vel.z = 10.0f;
                 angle = 6.2831855f * angleABf(0.0f, 0.0f, dx, dy) / 360.0f;
-                p->gx = param_tbl[3] * tb_sin(angle);
-                p->gy = param_tbl[3] * -tb_cos(angle);
+                nx = param_tbl[3];
+                p->gx = nx * tb_sin(angle);
+                p->gy = nx * -tb_cos(angle);
                 p++;
             }
             p++;
         }
     }
-    p = broken_wp->pieces->address;
-    for (y = 0; y < 30; y++) {
-        for (x = 0; x < 38; x++) {
-            switch (p->state) {
+    q = broken_wp->pieces->address;
+    for (i = 0; i < 30; i++) {
+        for (j = 0; j < 38; j++) {
+            switch (q->state) {
                 case 0:
-                    if (p->delay != 0) {
-                        p->delay--;
+                    if (q->delay != 0) {
+                        q->delay--;
                         break;
                     }
-                    p->pos.x += p->gx;
-                    p->pos.y += p->gy;
-                    p->pos.x += p->vel.x;
-                    p->pos.y += p->vel.y;
-                    p->pos.z += p->vel.z;
-                    p->vel.x *= param_tbl[2];
-                    p->vel.y *= param_tbl[2];
-                    p->vel.z *= param_tbl[2];
-                    p->rotSpeed += param_tbl[4];
-                    p->rot += p->rotSpeed;
-                    if (__fabs(p->pos.x) > 340.0 || __fabs(p->pos.y) > 260.0) {
-                        p->state++;
+                    q->pos.x += q->gx;
+                    q->pos.y += q->gy;
+                    q->pos.x += q->vel.x;
+                    q->pos.y += q->vel.y;
+                    q->pos.z += q->vel.z;
+                    q->vel.x *= param_tbl[2];
+                    q->vel.y *= param_tbl[2];
+                    q->vel.z *= param_tbl[2];
+                    q->rotSpeed += param_tbl[4];
+                    q->rot += q->rotSpeed;
+                    if (__fabs(q->pos.x) > 340.0 || __fabs(q->pos.y) > 260.0) {
+                        q->state++;
                     }
                     break;
                 case 1:
                     done++;
                     break;
             }
-            p++;
+            q++;
         }
-        p++;
+        q++;
     }
     if (done >= 30 * 38) {
         smartFree(broken_wp->tex);
@@ -113,3 +119,5 @@ USER_FUNC(tiz_broken) {
     dispEntry((CameraId)8, 0.0f, 0, tiz_broken_draw, NULL);
     return EVT_RETURN_BLOCK;
 }
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset

@@ -1,65 +1,1574 @@
 #include "battle/battle_stage_object.h"
 #include "battle/battle.h"
+#include "battle/battle_audience.h"
+#include "battle/battle_damage.h"
+#include "battle/battle_database_common.h"
+#include "battle/battle_stage.h"
+#include "battle/battle_unit.h"
+#include "battle/battle_unit_event.h"
+#include "driver/dispdrv.h"
+#include "driver/effdrv.h"
+#include "driver/mapdrv.h"
+#include "driver/msgdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/windowdrv.h"
+#include "eff/eff_nice.h"
+#include "eff/n64/eff_confetti_n64.h"
+#include "eff/n64/eff_kemuri1_n64.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
+#include "manager/fontmgr.h"
+#include "mario/mario_pouch.h"
+#include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
 
+#pragma optimize_for_size on
+#pragma dont_inline on
+
+// raw words, so the tables don't depend on how much of BattleWeapon is named
+typedef union BattleWeaponData {
+	u32 raw[0xC0 / 4];
+	BattleWeapon weapon;
+} BattleWeaponData;
+
+typedef struct BattleStageNozzleData {
+	u8 dirRate[3][4]; //0x0, weights for each nozzle's next direction
+	u8 typeRate[4]; //0xC
+	BattleWeaponData weapons[4]; //0x10, per nozzle type
+} BattleStageNozzleData;
+
+typedef struct BattleStageFallObjectData {
+	BattleWeaponData frameWeapon; //0x0, falling iron frame
+	u8 rates[9]; //0xC0
+	BattleWeaponData weapons[9]; //0xCC
+} BattleStageFallObjectData;
+
+// lives in BattleWork at 0x180C0
+typedef struct BattleStageObjectWork {
+	u8 field_0x0[0x4 - 0x0]; //0x0
+	Vec bgRotation; //0x4
+	Vec bgRotationPrev; //0x10
+	u8 flags; //0x1C
+	s32 bgDestroyEvtId; //0x20
+	s32 bgEvtId[4]; //0x24
+	BattleStageNozzleData* nozzleData; //0x34
+	BattleStageFallObjectData* fallObjectData; //0x38
+	BattleWeapon* nozzleWeapons[2]; //0x3C
+	BattleWeapon nozzleWeaponWork[2]; //0x44
+	u8 nozzleDir[3]; //0x1C4
+	u8 nozzleNextDir[3]; //0x1C7
+	s8 nozzleType; //0x1CA
+	s32 nozzleTurnEvtId[3]; //0x1CC
+	s32 nozzleWorkEvtId; //0x1D8
+	s32 fogTimer; //0x1DC
+	EffectEntry* fogEffect; //0x1E0
+	s32 closeWallEvtId; //0x1E4
+	s32 fallFrameEvtId; //0x1E8
+	s32 objectFallEvtId; //0x1EC
+} BattleStageObjectWork;
+
+#define STAGE_WORK(wp) ((BattleStageObjectWork*)(wp)->field_180C0)
+#define EVT_UW(evt, n) (((s32*)(evt)->userdata)[n])
+#define UNIT_FIELD(unit, type, off) (*(type*)((u8*)(unit) + (off)))
+
 extern BattleWork* _battleWorkPointer;
+extern s32 weaponGetPowerDefault[];
+extern BattleUnitKind unit_object_tree;
+extern BattleUnitKind unit_object_switch;
+
+void mapGrpFlagOn(const char* name, u32 flags);
+void mapGrpFlagOff(const char* name, u32 flags);
+void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
+void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
+void mapGrpSetColor(const char* name, GXColor color);
+void mapPlayAnimationLv(const char* name, s32 a, s32 b);
+f32 intpl_sub(s32 type, f32 start, f32 end, s32 cur, s32 max);
+f32 sinfd(f32 degrees);
+f32 cosfd(f32 degrees);
+void FontDrawString(f32 x, f32 y, const char* str);
+BOOL BattleCheckConcluded(BattleWork* wp);
+BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp);
+void BattleAudience_Case_HaikeiSet(void);
+void BattleAudience_Case_FallObject_Aud(s32 index, s32 type);
+void BattleAudience_Case_FallObject_Stage(void);
+EffectEntry* effNozleEntry(s32 type, f32 x, f32 y, f32 z, f32 rx, f32 ry, s32 lifetime);
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
+BOOL effFallCheckHit(EffectEntry* effect);
+void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
+void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* targets, u32 flags, s32* unitId, s32* partId);
+s32 BattlePreCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags);
+BOOL BtlUnit_GetACPossibility(BattleUnit* unit);
+s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon);
+f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
+void btl_camera_set_mode(s32 a, s32 b);
+void btl_camera_set_moveSpeedLv(s32 a, s32 b);
 
 //local prototypes
 void BattleObjectConfig(void);
+void _mobj_shake_main(BattleStageObject* obj);
+void _Nozzle_Change_Check(u8 index, u8* rate);
+void _disp_escape_wall_message(CameraId camera, void* param);
+void _nozzle_type_init(void);
+f32 _get_nozzle_dir(s32 index);
+s32 _get_nozzle_attack_index(u8 index);
+void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+USER_FUNC(_object_fall_attack);
+USER_FUNC(_object_fall_wait);
+USER_FUNC(_nozzle_work_get_weapon_address);
+USER_FUNC(_nozzle_work_attack_set);
+USER_FUNC(_nozzle_work_effect);
+USER_FUNC(_nozzle_work_wait);
+USER_FUNC(_fall_frame_delete);
+USER_FUNC(_fall_frame);
+USER_FUNC(_fall_frame_wait_unit_ready);
+USER_FUNC(_fall_frame_wait);
+USER_FUNC(_announce_wall_message);
+USER_FUNC(_nozzle_turn);
+USER_FUNC(_set_mobj_shake);
+USER_FUNC(_bgset_audience_bgset_access);
+USER_FUNC(_bgset_kemuri_effect);
+USER_FUNC(_get_bgset_attack_data);
+USER_FUNC(_mobj_destroy);
+USER_FUNC(_mobj_set_alpha);
+USER_FUNC(_set_mobj_rotate_x);
+
+USER_FUNC(btlevtcmd_CheckDamage);
+USER_FUNC(btlevtcmd_GetACPossibility);
+USER_FUNC(btlevtcmd_GetEnemyBelong);
+USER_FUNC(btlevtcmd_GetSelectEnemy);
+USER_FUNC(btlevtcmd_GetSelectNextEnemy);
+USER_FUNC(btlevtcmd_PreCheckDamage);
+USER_FUNC(btlevtcmd_ResultACDefence);
+USER_FUNC(btlevtcmd_SamplingEnemy);
+USER_FUNC(btlevtcmd_StartAvoid);
+USER_FUNC(btlevtcmd_WaitAttackEnd);
+USER_FUNC(btlevtcmd_check_battleflag);
+USER_FUNC(evt_btl_camera_shake_h);
+
+extern BattleWeaponData _nozzle_at_base_mario;
+extern BattleWeaponData _nozzle_at_base_monster;
+extern BattleStageNozzleData battle_stage_nozzle_data[];
+extern BattleStageFallObjectData battle_stage_fall_object_data[];
+extern BattleStageObjectData _object_nozzle_data[];
+extern s32 _object_turn_event_core[];
+extern s32 _fall_frame_event[];
+extern s32 _nozzle_work_event_core[];
+extern s32 _object_fall_event[];
+extern BattleStageObjectData _object_wall_data;
+extern BattleStageObjectData _object_spot_light_data[];
+extern s32 _entry_tree_data[];
+extern s32 _entry_switch_data[];
+extern s32 _object_turn_event_A1[];
+extern s32 _object_turn_event_A2[];
+extern s32 _object_turn_event_B[];
+extern s32 _nozzle_turn_event[];
+extern s32 _close_wall_event[];
+extern s32 _nozzle_work_event_0[];
+extern s32 _nozzle_work_event_1[];
 
 BattleStageObject* BattleGetObjectPtr(s32 id) {
 	BattleWork* wp = _battleWorkPointer;
+	BattleStageObject* obj;
 	int i;
 
 	for (i = 0; i < 32; i++) {
-		if (wp->stageObjects[i].id == id) {
-			return &wp->stageObjects[i];
+		obj = &wp->stageObjects[i];
+		if (obj->id == id) {
+			return obj;
 		}
 	}
-	return NULL; //if none of the IDs match
+	return NULL;
 }
 
 BattleStageObject* BattleSearchObjectPtr(const char* name) {
 	BattleWork* wp = _battleWorkPointer;
-	BattleStageObject* object;
 	int i;
+	BattleStageObject* obj;
 
 	for (i = 0; i < 32; i++) {
-		object = &wp->stageObjects[i];
-		if (object->id && !strcmp(object->data->name, name)) {
-			return object;
+		obj = &wp->stageObjects[i];
+		if (obj->id && !strcmp(obj->data->name, name)) {
+			return obj;
 		}
 	}
-	return NULL; //if name not found
+	return NULL;
 }
 
 void BattleStageObjectInit(void) {
+	s32 countA1 = 0;
+	s32 countA2 = 0;
+	s32 countB = 0;
+	s32 countC = 0;
+	BOOL hasIronFrame = FALSE;
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageData* stage = wp->fbatInfo->setup->stageData;
+	s32 numObjects = stage->mNumObjects;
+	BattleStageObjectData* data = stage->mObjects;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32 id;
+	BattleStageObject* obj;
+	BattleUnit* unit;
+	int i;
 
+	memset(wp->stageObjects, 0, sizeof(wp->stageObjects));
+	switch (pouchGetPtr()->rank) {
+		case 1:
+		case 2:
+		case 3:
+			mapPlayAnimationLv("den", 1, 0);
+			break;
+	}
+	switch (pouchGetPtr()->rank) {
+		case 1:
+		case 2:
+		case 3:
+			sw->nozzleData = &battle_stage_nozzle_data[pouchGetPtr()->rank];
+			break;
+		default:
+			sw->nozzleData = NULL;
+			break;
+	}
+	sw->fallObjectData = &battle_stage_fall_object_data[pouchGetPtr()->rank];
+	sw->nozzleType = -1;
+	sw->fogTimer = 0;
+	sw->fogEffect = NULL;
+	mapGrpFlagOff(mapGetWork()->entries[0].rootMapObj->joints->name, 2);
+	if (mapGetMapObj("A1")) {
+		mapGrpFlagOn("A1", 1);
+		mapGrpFlagOff("A1", 2);
+	}
+	if (mapGetMapObj("A2")) {
+		mapGrpFlagOn("A2", 1);
+		mapGrpFlagOff("A2", 2);
+	}
+	if (mapGetMapObj("B")) {
+		mapGrpFlagOn("B", 1);
+		mapGrpFlagOff("B", 2);
+	}
+	if (mapGetMapObj("C")) {
+		mapGrpFlagOn("C", 1);
+		mapGrpFlagOff("C", 2);
+	}
+	mapGrpFlagOn("escape_wall", 1);
+
+	id = 1;
+	if (data) {
+		for (; numObjects != 0; numObjects--, data++, id++) {
+			for (i = 0; i < 32; i++) {
+				obj = &wp->stageObjects[i];
+				if (obj->id <= 0) {
+					break;
+				}
+			}
+			if (i >= 32) {
+				break;
+			}
+			obj->data = data;
+			obj->id = id;
+			obj->mBattleUnitIdx = -1;
+			switch (obj->data->mLayer) {
+				case 0:
+					countA1++;
+					break;
+				case 1:
+					countA2++;
+					break;
+				case 2:
+					countB++;
+					break;
+				case 3:
+					countC++;
+					break;
+				case 6:
+					hasIronFrame = TRUE;
+					break;
+			}
+			switch (obj->data->mLayer) {
+				case 0:
+				case 1:
+				case 6:
+				case 7:
+					obj->mPosition = data->mPosition;
+					break;
+				case 2:
+				case 3:
+					obj->mPosition = data->mPosition;
+					break;
+			}
+			obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
+			obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+			mapGrpFlagOff(obj->data->name, 1);
+			switch (data->mSpawnSpecialUnitType) {
+				case 0:
+					unit = BtlUnit_Entry((BattleUnitSetup*)_entry_tree_data);
+					unit->stageObjectId = obj->id;
+					obj->mBattleUnitIdx = unit->unitId;
+					BtlUnit_SetPos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
+					BtlUnit_SetHomePos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
+					break;
+				case 1:
+					unit = BtlUnit_Entry((BattleUnitSetup*)_entry_switch_data);
+					unit->stageObjectId = obj->id;
+					obj->mBattleUnitIdx = unit->unitId;
+					BtlUnit_SetPos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
+					BtlUnit_SetHomePos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
+					break;
+			}
+		}
+	}
+
+	if (pouchGetPtr()->rank > 0) {
+		data = _object_nozzle_data;
+		for (numObjects = 0; numObjects < 3; numObjects++, data++, id++) {
+			for (i = 0; i < 32; i++) {
+				obj = &wp->stageObjects[i];
+				if (obj->id <= 0) {
+					break;
+				}
+			}
+			if (i >= 32) {
+				break;
+			}
+			obj->data = data;
+			obj->id = id;
+			obj->mBattleUnitIdx = -1;
+			obj->mPosition = data->mPosition;
+			obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
+			obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
+			obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+			mapGrpFlagOff(obj->data->name, 1);
+		}
+	}
+
+	data = &_object_wall_data;
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id <= 0) {
+			break;
+		}
+	}
+	obj->data = data;
+	obj->id = id;
+	obj->mBattleUnitIdx = -1;
+	obj->mPosition = data->mPosition;
+	obj->mPosition.y = BattleStageGetPtr()->field_0xB28;
+	obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
+	obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
+	obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
+	obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
+	obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+	mapGrpFlagOn(obj->data->name, 1);
+	obj->mFlags |= 1;
+	id++;
+
+	for (data = _object_spot_light_data; data->name; data++, id++) {
+		for (i = 0; i < 32; i++) {
+			obj = &wp->stageObjects[i];
+			if (obj->id <= 0) {
+				break;
+			}
+		}
+		obj->data = data;
+		obj->id = id;
+		obj->mBattleUnitIdx = -1;
+		obj->mPosition = data->mPosition;
+		obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
+		obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
+		obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
+		obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
+		obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+		mapGrpFlagOn(obj->data->name, 1);
+		obj->mFlags |= 1;
+	}
+
+	if (stage->initEvt) {
+		evtEntry(stage->initEvt, 10, 0);
+	}
+	if (countA1 && stage->bgA1Evt) {
+		STAGE_WORK(wp)->bgEvtId[0] = evtEntry(stage->bgA1Evt, 10, 0)->eventId;
+	}
+	if (countA2 && stage->bgA2Evt) {
+		STAGE_WORK(wp)->bgEvtId[1] = evtEntry(stage->bgA2Evt, 10, 0)->eventId;
+	}
+	if (countB && stage->bgBEvt) {
+		STAGE_WORK(wp)->bgEvtId[2] = evtEntry(stage->bgBEvt, 10, 0)->eventId;
+	}
+	if (countC && stage->bgCEvt) {
+		STAGE_WORK(wp)->bgEvtId[3] = evtEntry(stage->bgCEvt, 10, 0)->eventId;
+	}
+	if (!countA1) {
+		STAGE_WORK(wp)->flags |= 2;
+	}
+	if (!countA2) {
+		STAGE_WORK(wp)->flags |= 4;
+	}
+	if (!countB) {
+		STAGE_WORK(wp)->flags |= 8;
+	}
+	if (stage->disableBgA1Destroy) {
+		STAGE_WORK(wp)->flags |= 2;
+	}
+	if (stage->disableBgA2Destroy) {
+		STAGE_WORK(wp)->flags |= 4;
+	}
+	if (stage->disableBgBDestroy) {
+		STAGE_WORK(wp)->flags |= 8;
+	}
+	if (!hasIronFrame) {
+		STAGE_WORK(wp)->flags |= 0x20;
+		mapGrpFlagOn("if_body", 1);
+		mapGrpFlagOn("if_wire", 1);
+	}
 }
 
-
-
-
-
-USER_FUNC(_set_mobj_shake_init) {
+void BattleStageObjectMain(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	BattleStageObject* obj;
-	int i, layer;
-	u8 position;
-
-	//get the layer this object is on
-	layer = evtGetValue(event, *event->args);
+	BOOL changed;
+	int i;
 
 	for (i = 0; i < 32; i++) {
-		obj = &_battleWorkPointer->stageObjects[i];
+		obj = &wp->stageObjects[i];
+		if (obj->id <= 0) {
+			continue;
+		}
+		changed = FALSE;
+		if (obj->mPosition.x != obj->field_0x34.x || obj->mPosition.y != obj->field_0x34.y || obj->mPosition.z != obj->field_0x34.z) {
+			obj->field_0x34 = obj->mPosition;
+			changed = TRUE;
+		}
+		if (obj->field_0x10.x != obj->field_0x40.x || obj->field_0x10.y != obj->field_0x40.y || obj->field_0x10.z != obj->field_0x40.z) {
+			obj->field_0x40 = obj->field_0x10;
+			changed = TRUE;
+		}
+		if (obj->field_0x28.x != obj->field_0x58.x || obj->field_0x28.y != obj->field_0x58.y || obj->field_0x28.z != obj->field_0x58.z) {
+			obj->field_0x58 = obj->field_0x28;
+			changed = TRUE;
+		}
+		if (obj->mRotation.x != obj->field_0x4C.x || obj->mRotation.y != obj->field_0x4C.y || obj->mRotation.z != obj->field_0x4C.z) {
+			obj->field_0x4C = obj->mRotation;
+			changed = TRUE;
+		}
+		if (obj->mFlags & 2) {
+			obj->mFlags &= ~2;
+			changed = TRUE;
+		}
+		switch (obj->data->mLayer) {
+			case 2:
+				if (sw->bgRotation.x != sw->bgRotationPrev.x ||
+					sw->bgRotation.y != sw->bgRotationPrev.y ||
+					sw->bgRotation.z != sw->bgRotationPrev.z) {
+					sw->bgRotationPrev = sw->bgRotation;
+					changed = TRUE;
+				}
+				break;
+		}
+		switch (obj->data->mLayer) {
+			case 0:
+			case 1:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+				if (changed) {
+					mapObjTranslate(obj->data->name,
+						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
+						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
+						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
+					mapObjRotate(obj->data->name, obj->mRotation.x, obj->mRotation.y, obj->mRotation.z);
+				}
+				break;
+			case 2:
+				if (changed) {
+					mapObjTranslate(obj->data->name,
+						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
+						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
+						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
+					mapObjTranslate(obj->data->name, 0.0f, -obj->field_0x10.y, 0.0f);
+					mapObjRotate(obj->data->name, sw->bgRotation.x, sw->bgRotation.y, sw->bgRotation.z);
+					mapObjTranslate(obj->data->name, 0.0f, obj->field_0x10.y, 0.0f);
+				}
+				break;
+			case 3:
+				if (changed) {
+					mapObjTranslate(obj->data->name,
+						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
+						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
+						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
+					mapObjTranslate(obj->data->name, 0.0f, -obj->mPosition.y, 0.0f);
+					mapObjRotate(obj->data->name, obj->mRotation.x, obj->mRotation.y, obj->mRotation.z);
+					mapObjTranslate(obj->data->name, 0.0f, obj->mPosition.y, 0.0f);
+				}
+				break;
+		}
+		if (obj->mFlags & 1) {
+			if (!(mapGetMapObj(obj->data->name)->flags & 1)) {
+				mapGrpFlagOn(obj->data->name, 1);
+			}
+		}
+		else {
+			if (mapGetMapObj(obj->data->name)->flags & 1) {
+				mapGrpFlagOff(obj->data->name, 1);
+			}
+		}
+	}
+	BattleObjectConfig();
+}
+
+void BattleObjectConfig(void) {
+	//stubbed in retail
+}
+
+void BattleStage_DestroyA1(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgA1Evt;
+	EventEntry* entry;
+
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[0]);
+	STAGE_WORK(wp)->bgEvtId[0] = 0;
+	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
+		evtDeleteID(STAGE_WORK(wp)->bgDestroyEvtId);
+	}
+	if (!evt) {
+		evt = _object_turn_event_A1;
+	}
+	entry = evtEntry(evt, 10, 0);
+	if (entry) {
+		STAGE_WORK(wp)->bgDestroyEvtId = entry->eventId;
+	}
+}
+
+void BattleStage_DestroyA2(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgA2Evt;
+
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[1]);
+	STAGE_WORK(wp)->bgEvtId[1] = 0;
+	if (!evt) {
+		evt = _object_turn_event_A2;
+	}
+	evtEntry(evt, 10, 0);
+}
+
+void BattleStage_DestroyB(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgBEvt;
+	EventEntry* entry;
+
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[2]);
+	STAGE_WORK(wp)->bgEvtId[2] = 0;
+	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
+		evtDeleteID(STAGE_WORK(wp)->bgDestroyEvtId);
+	}
+	if (!evt) {
+		evt = _object_turn_event_B;
+	}
+	entry = evtEntry(evt, 10, 0);
+	if (entry) {
+		STAGE_WORK(wp)->bgDestroyEvtId = entry->eventId;
+	}
+}
+
+__declspec(section ".data") u64 lbl_80371490 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_battle_stage_object_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803714A0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_battle_stage_object_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 lbl_803714B0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_battle_stage_object_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803714C0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_battle_stage_object_one_negone_359 = 0x3F800000BF800000;
+
+BattleWeaponData _nozzle_at_base_mario = {{
+	0, 0, 0, 0, 0x64000002, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0x02000070, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0x00000064, 0, 0,
+}};
+
+BattleWeaponData _nozzle_at_base_monster = {{
+	0, 0, 0, 0, 0x64000002, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0x0200006F, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+	0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0x00000064, 0, 0,
+}};
+
+BattleStageNozzleData battle_stage_nozzle_data[] = {
+	{
+		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {100, 0, 0, 0},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {60, 40, 0, 0},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0x00640100, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {40, 30, 30, 0},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0x00640100, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x03000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{0, 0, 50, 50}, {0, 50, 0, 50}, {0, 50, 50, 0}}, {20, 30, 30, 20},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x02000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0x00640100, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x03000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x01000302, 0, 0, 0x000007FF, 0,
+				0, 0, 0, 0x00000064, 0x03000000, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+};
+
+BattleStageFallObjectData battle_stage_fall_object_data[] = {
+	{
+		{{
+			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+			0x00000001, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+		}},
+		{0, 10, 0, 0, 0, 0, 0, 0, 10},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0x64000000, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
+				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
+				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000005, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00640300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000003, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{
+			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+			0x00000001, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+		}},
+		{10, 10, 0, 0, 0, 10, 0, 0, 10},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0x64000000, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
+				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
+				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000005, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00640300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000003, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{
+			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+			0x00000001, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+		}},
+		{10, 10, 10, 10, 10, 10, 0, 0, 10},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0x64000000, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
+				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
+				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000005, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00640300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000003, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+	{
+		{{
+			0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+			0x00000001, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0,
+			0, 0, 0, 0, 0, 0, 0, 0,
+			0, 0, 0, 0, 0, 0x00000064, 0, 0,
+		}},
+		{10, 10, 10, 10, 10, 10, 10, 10, 10},
+		{
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00010302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00320300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000002, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0, 0x000007FF, 0x80000000,
+				0x64000000, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x00000302, 0, 0x00000100, 0x000007FF, 0x80000000,
+				0x64006400, 0x64006400, 0x00640064, 0x00000064, 0x00640000, 0, 0, 0x0000009D,
+				0, 0x00009D00, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000005, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00640300, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000003, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x02100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0x32030000, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+			{{
+				0, 0, 0, 0, 0x64000002, 0, 0, (u32)weaponGetPowerDefault,
+				0x00000001, 0, 0, 0, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0, 0, 0,
+				0, 0x01100060, 0x20000000, 0x000A0302, 0, 0, 0x000007FF, 0x80000000,
+				0, 0, 0x00000019, 0x03000000, 0, 0, 0, 0,
+				0, 0, 0, 0, 0, 0x00000064, 0, 0,
+			}},
+		},
+	},
+};
+
+BattleStageObjectData _object_nozzle_data[] = {
+	{"nozzle_l", 3, 4, {-117.0f, 0.0f, 90.0f}, 0, 0},
+	{"nozzle_c", 3, 4, {0.0f, 0.0f, 90.0f}, 0, 0},
+	{"nozzle_r", 3, 4, {120.0f, 0.0f, 90.0f}, 0, 0},
+};
+
+EVT_BEGIN(_object_turn_event_core)
+    CALL(_set_mobj_shake_init, LW(9))
+    CALL(_set_mobj_shake, LW(9))
+    CALL(_set_mobj_rotate_x, LW(9))
+    IF_INT_NOT_EQUAL(LW(9), 1)
+        CALL(evt_btl_camera_shake_h, 0, 4, 0, 30, 13)
+    END_IF
+    CALL(_bgset_kemuri_effect, LW(9))
+    IF_INT_NOT_EQUAL(LW(9), 1)
+        CALL(_bgset_audience_bgset_access)
+    END_IF
+    CALL(btlevtcmd_check_battleflag, LW(0), 256)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        GOTO(20)
+    END_IF
+    CALL(_get_bgset_attack_data, LW(9), LW(12))
+    IF_INT_EQUAL(LW(12), 0)
+        GOTO(20)
+    END_IF
+    CALL(btlevtcmd_GetEnemyBelong, -5, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -5, LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    SET_VALUE(LW(15), 0)
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(20)
+    END_IF
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_GetACPossibility, LW(10), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            ADD(LW(15), 1)
+            CALL(btlevtcmd_ResultACDefence, LW(10), LW(12))
+        END_IF
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(4)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(10), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(10), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(10), 39)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+        CASE_DEFAULT
+    END_SWITCH
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    GOTO(10)
+    LABEL(20)
+    WAIT_FRAMES(50)
+    SET_VALUE(LW(0), 255)
+    SET_VALUE(LW(1), 51)
+    LABEL(50)
+    SUBTRACT(LW(0), 5)
+    CALL(_mobj_set_alpha, LW(9), LW(0))
+    SUBTRACT(LW(1), 1)
+    IF_INT_GREATER(LW(1), 0)
+        WAIT_FRAMES(1)
+        GOTO(50)
+    END_IF
+    CALL(_mobj_destroy, LW(9))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_fall_frame_event)
+    CALL(_fall_frame_wait)
+    CALL(_fall_frame_wait_unit_ready)
+    CALL(_fall_frame, LW(12))
+    CALL(btlevtcmd_GetEnemyBelong, -5, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -5, LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    SET_VALUE(LW(15), 0)
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(20)
+    END_IF
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_GetACPossibility, LW(10), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            ADD(LW(15), 1)
+            CALL(btlevtcmd_ResultACDefence, LW(10), LW(12))
+        END_IF
+    END_IF
+    CALL(btlevtcmd_CheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    GOTO(10)
+    LABEL(20)
+    CALL(evt_btl_camera_shake_h, 0, 10, 0, 20, 13)
+    CALL(_fall_frame_delete)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_core)
+    CALL(_nozzle_work_wait)
+    CALL(_nozzle_work_effect, LW(10), LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(_nozzle_work_attack_set)
+    CALL(_nozzle_work_get_weapon_address, 0, LW(12))
+    IF_INT_EQUAL(LW(12), 0)
+        GOTO(19)
+    END_IF
+    CALL(btlevtcmd_GetEnemyBelong, -5, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -5, LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    SET_VALUE(LW(15), 0)
+    LABEL(10)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(19)
+    END_IF
+    IF_INT_EQUAL(LW(15), 0)
+        CALL(btlevtcmd_GetACPossibility, LW(10), LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            ADD(LW(15), 1)
+            CALL(btlevtcmd_ResultACDefence, LW(10), LW(12))
+        END_IF
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(4)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(10), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(10), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(10), 39)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+        CASE_DEFAULT
+    END_SWITCH
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    GOTO(10)
+    LABEL(19)
+    CALL(_nozzle_work_get_weapon_address, 1, LW(12))
+    IF_INT_EQUAL(LW(12), 0)
+        GOTO(29)
+    END_IF
+    CALL(btlevtcmd_GetEnemyBelong, -5, LW(0))
+    CALL(btlevtcmd_SamplingEnemy, -5, LW(0), LW(12))
+    CALL(btlevtcmd_GetSelectEnemy, LW(10), LW(11))
+    LABEL(20)
+    IF_INT_EQUAL(LW(10), -1)
+        GOTO(29)
+    END_IF
+    CALL(btlevtcmd_PreCheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+    SWITCH(LW(5))
+        CASE_EQUAL(4)
+        CASE_EQUAL(2)
+        CALL(btlevtcmd_StartAvoid, LW(10), 40)
+        CASE_EQUAL(3)
+        CALL(btlevtcmd_StartAvoid, LW(10), 38)
+        CASE_EQUAL(6)
+        CALL(btlevtcmd_StartAvoid, LW(10), 39)
+        CASE_EQUAL(1)
+        CALL(btlevtcmd_CheckDamage, -5, LW(10), LW(11), LW(12), 256, LW(5))
+        CASE_DEFAULT
+    END_SWITCH
+    CALL(btlevtcmd_GetSelectNextEnemy, LW(10), LW(11))
+    GOTO(20)
+    LABEL(29)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_object_fall_event)
+    CALL(_object_fall_wait)
+    CALL(_object_fall_attack, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    RETURN
+EVT_END()
+
+BattleStageObjectData _object_wall_data = {"escape_wall", 4, 5, {-175.0f, 0.0f, 0.0f}, 0, 0};
+
+BattleStageObjectData _object_spot_light_data[] = {
+	{"spotlight", 6, 7, {0.0f, 240.0f, 0.0f}, 0, 0},
+	{NULL, 6, 7, {0.0f, 0.0f, 0.0f}, 0, 0},
+};
+
+s32 _entry_tree_data[] = {
+	(s32)&unit_object_tree, 0x02000000, 0x04000005, 0xC3480000, 0xC3480000, 0xC3480000, 0, 0,
+	0, 0, 0, 0,
+};
+
+s32 _entry_switch_data[] = {
+	(s32)&unit_object_switch, 0x02000000, 0x04000005, 0xC3480000, 0xC3480000, 0xC3480000, 0, 0,
+	0, 0, 0, 0,
+};
+
+EVT_BEGIN(_object_turn_event_A1)
+    SET_VALUE(LW(9), 0)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_object_turn_event_A2)
+    SET_VALUE(LW(9), 1)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_object_turn_event_B)
+    SET_VALUE(LW(9), 2)
+    CALL_CHILD(PTR(_object_turn_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_turn_event)
+    CALL(_nozzle_turn)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_close_wall_event)
+    CALL(btlevtcmd_WaitAttackEnd)
+    CALL(_announce_wall_message)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_0)
+    SET_VALUE(LW(10), 0)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(_nozzle_work_event_1)
+    SET_VALUE(LW(10), 1)
+    CALL_CHILD(PTR(_nozzle_work_event_core))
+    RETURN
+EVT_END()
+USER_FUNC(_set_mobj_rotate_x) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	BOOL busy = FALSE;
+	BattleStageObject* obj;
+	s32 layer;
+	int i;
+
+	layer = evtGetValue(event, event->args[0]);
+	if (isFirstCall) {
+		switch (layer) {
+			case 0:
+			case 1:
+				for (i = 0; i < 32; i++) {
+					obj = &wp->stageObjects[i];
+					if (obj->id > 0 && obj->data->mLayer == layer) {
+						obj->mNumFramesToStartFalling = obj->data->mNumFramesToStartFalling;
+						obj->mNumFramesFalling = 0;
+					}
+				}
+				break;
+			case 2:
+				EVT_UW(event, 1) = 0;
+				EVT_UW(event, 2) = 60;
+				EVT_UW(event, 3) = 0;
+				break;
+		}
+	}
+	switch (layer) {
+		case 0:
+		case 1:
+			for (i = 0; i < 32; i++) {
+				obj = &wp->stageObjects[i];
+				if (obj->id > 0 && obj->data->mLayer == layer) {
+					if (obj->mNumFramesToStartFalling) {
+						obj->mNumFramesToStartFalling--;
+						busy = TRUE;
+						_mobj_shake_main(obj);
+					}
+					else {
+						if (obj->mNumFramesFalling == 0) {
+							if (layer == 0) {
+								psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL1", &obj->mPosition);
+							}
+							else {
+								psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL3", &obj->mPosition);
+							}
+						}
+						obj->mNumFramesFalling++;
+						obj->mRotation.x = intpl_sub(2, obj->mShakeAngle, 90.0f, obj->mNumFramesFalling, obj->data->mNumFramesToFall);
+						if (obj->mNumFramesFalling < obj->data->mNumFramesToFall) {
+							busy = TRUE;
+						}
+					}
+				}
+			}
+			break;
+		case 2:
+			if (EVT_UW(event, 1)) {
+				EVT_UW(event, 1)--;
+				busy = TRUE;
+			}
+			else {
+				if (EVT_UW(event, 3) == 0) {
+					psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL2", &(Vec){0.0f, 0.0f, -100.0f});
+				}
+				EVT_UW(event, 3)++;
+				sw->bgRotation.x = (s32)intpl_sub(2, 0.0f, 90.0f, EVT_UW(event, 3), EVT_UW(event, 2));
+				if (EVT_UW(event, 3) < EVT_UW(event, 2)) {
+					busy = TRUE;
+				}
+			}
+			break;
+	}
+	return busy ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
+}
+
+USER_FUNC(_mobj_set_alpha) {
+	s32* args = event->args;
+	s32 layer = evtGetValue(event, args[0]);
+	u8 alpha = evtGetValue(event, args[1]);
+
+	switch (layer) {
+		case 0:
+			if (mapGetMapObj("A1")) {
+				mapGrpSetColor("A1", (GXColor){255, 255, 255, alpha});
+			}
+			break;
+		case 1:
+			if (mapGetMapObj("A2")) {
+				mapGrpSetColor("A2", (GXColor){255, 255, 255, alpha});
+			}
+			break;
+		case 2:
+			if (mapGetMapObj("B")) {
+				mapGrpSetColor("B", (GXColor){255, 255, 255, alpha});
+			}
+			break;
+		case 3:
+			if (mapGetMapObj("C")) {
+				mapGrpSetColor("C", (GXColor){255, 255, 255, alpha});
+			}
+			break;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_mobj_destroy) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObject* obj;
+	BattleUnit* unit;
+	BattleUnitPart* part;
+	s32 layer;
+	int i;
+
+	layer = evtGetValue(event, event->args[0]);
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id > 0 && obj->data->mLayer == layer) {
+			obj->mFlags |= 1;
+			unit = BattleGetUnitPtr(wp, obj->mBattleUnitIdx);
+			if (unit) {
+				for (part = unit->mParts; part; part = part->mNextPart) {
+					part->attributes |= 0x10000;
+				}
+			}
+		}
+	}
+	switch (layer) {
+		case 0:
+			STAGE_WORK(wp)->flags |= 2;
+			break;
+		case 1:
+			STAGE_WORK(wp)->flags |= 4;
+			break;
+		case 2:
+			STAGE_WORK(wp)->flags |= 8;
+			break;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_get_bgset_attack_data) {
+	BattleWork* wp = _battleWorkPointer;
+	s32* args = event->args;
+	BattleWeapon* weapon;
+
+	switch (evtGetValue(event, args[0])) {
+		case 0:
+			weapon = &wp->fbatInfo->setup->stageData->bgAWeapon;
+			break;
+		case 2:
+			weapon = &wp->fbatInfo->setup->stageData->bgBWeapon;
+			break;
+		case 1:
+		default:
+			weapon = NULL;
+			break;
+	}
+	if (weapon && !weapon->hpDamageFn) {
+		weapon = NULL;
+	}
+	evtSetValue(event, args[1], (s32)weapon);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_bgset_kemuri_effect) {
+	s32 layer;
+	const char* sfxA1;
+	const char* sfxA2;
+	const char* sfxB;
+	BattleWork* wp = _battleWorkPointer;
+	int i;
+	BattleStageObject* obj;
+	f32 x, y, z;
+
+	layer = evtGetValue(event, event->args[0]);
+	sfxA1 = "SFX_BTL_STAGE_SET_DOWN1";
+	sfxA2 = "SFX_BTL_STAGE_SET_DOWN3";
+	sfxB = "SFX_BTL_STAGE_SET_DOWN2";
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id > 0 && obj->data->mLayer == layer) {
+			x = obj->mPosition.x;
+			y = obj->mPosition.y;
+			z = obj->mPosition.z;
+			switch (layer) {
+				case 0:
+					z += 30.0f;
+					effKemuri1N64Entry(3, x, y, z, 0.0f);
+					psndSFXOn_3D(sfxA1, &obj->mPosition);
+					break;
+				case 1:
+					z += 15.0f;
+					effKemuri1N64Entry(0, x, y, z, 0.0f);
+					psndSFXOn_3D(sfxA2, &obj->mPosition);
+					break;
+				case 2:
+					z += 30.0f;
+					effKemuri1N64Entry(3, x, y, z, 0.0f);
+					effKemuri1N64Entry(4, x, y, z, 0.0f);
+					psndSFXOn_3D(sfxB, &obj->mPosition);
+					break;
+			}
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_bgset_audience_bgset_access) {
+	BattleAudience_Case_HaikeiSet();
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_set_mobj_shake_init) {
+	BattleWork* wp = _battleWorkPointer;
+	s32 layer;
+	int i;
+	BattleStageObject* obj;
+	u8 position;
+
+	layer = evtGetValue(event, event->args[0]);
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
 		if (obj->id > 0 && obj->data->mLayer == layer) {
 			obj->field_0x72 = 0;
-			obj->mShakePeriodLength = (u8)(irand(10) + 60);
+			obj->mShakePeriodLength = irand(10) + 60;
 			if (irand(100) & 1) {
 				position = 0;
 			}
 			else {
-				position = (u8)(obj->mShakePeriodLength / 2);
+				position = obj->mShakePeriodLength / 2;
 			}
 			obj->mShakePeriodPosition = position;
 			obj->mShakeAngle = 0.0f;
@@ -68,16 +1577,747 @@ USER_FUNC(_set_mobj_shake_init) {
 	return EVT_RETURN_DONE;
 }
 
+USER_FUNC(_set_mobj_shake) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObject* obj;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32 layer;
+	int i;
 
-
-
-
-
-
-void BattleObjectConfig(void) {
-	//stubbed in retail
+	layer = evtGetValue(event, event->args[0]);
+	if (BattleWaitAllActiveEvtEnd_NoBgSetEndWait(wp)) {
+		if (!sw->nozzleWorkEvtId || !evtCheckID(sw->nozzleWorkEvtId)) {
+			if (!sw->fallFrameEvtId || !evtCheckID(sw->fallFrameEvtId)) {
+				return EVT_RETURN_DONE;
+			}
+		}
+	}
+	switch (layer) {
+		case 0:
+		case 1:
+			for (i = 0; i < 32; i++) {
+				obj = &wp->stageObjects[i];
+				if (obj->id > 0 && obj->data->mLayer == layer) {
+					_mobj_shake_main(obj);
+				}
+			}
+			break;
+		case 2:
+			break;
+	}
+	return EVT_RETURN_BLOCK;
 }
 
-void BattleStageObjectMain(void) {
-
+void _mobj_shake_main(BattleStageObject* obj) {
+	obj->mShakePeriodPosition++;
+	if (obj->mShakePeriodPosition >= obj->mShakePeriodLength) {
+		obj->mShakePeriodPosition = 0;
+	}
+	obj->mShakeAngle = 5.0f * sinfd(obj->mShakePeriodPosition * 360 / obj->mShakePeriodLength);
+	obj->mRotation.x = obj->mShakeAngle;
 }
+
+void BattleStage_NozzleDirChangeCheck(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	u8 i;
+
+	if (sw->nozzleData) {
+		for (i = 0; i < 3; i++) {
+			_Nozzle_Change_Check(i, sw->nozzleData->dirRate[i]);
+		}
+	}
+}
+
+void _Nozzle_Change_Check(u8 index, u8* rate) {
+	BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
+	u8* cur = &sw->nozzleDir[index];
+	EventEntry* evt;
+	s32 total = 0;
+	u8* p;
+	u8 dir;
+	int i;
+
+	for (i = 0; i < 4; i++) {
+		total += rate[i];
+	}
+	total = irand(total);
+	for (dir = 0, p = rate; dir < 4; p++, dir++) {
+		total -= *p;
+		if (total < 0) {
+			break;
+		}
+	}
+	if (dir != *cur) {
+		if (sw->nozzleTurnEvtId[index] && !evtCheckID(sw->nozzleTurnEvtId[index])) {
+			sw->nozzleTurnEvtId[index] = 0;
+		}
+		if (sw->nozzleTurnEvtId[index] == 0) {
+			sw->nozzleNextDir[index] = dir;
+			evt = evtEntry(_nozzle_turn_event, 10, 0);
+			sw->nozzleTurnEvtId[index] = evt->eventId;
+			if (evt) {
+				evt->unitId = index;
+			}
+		}
+	}
+}
+
+USER_FUNC(_nozzle_turn) {
+	BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
+	s32 index = event->unitId;
+	const char* name;
+	f32 rotX, rotY, from, to;
+
+	if (isFirstCall) {
+		EVT_UW(event, 2) = 0;
+		EVT_UW(event, 3) = 0;
+		if (sw->nozzleDir[index]) {
+			EVT_UW(event, 2) = 30;
+		}
+	}
+	switch (index) {
+		case 0:
+			name = "nozzle_l";
+			break;
+		case 1:
+			name = "nozzle_c";
+			break;
+		case 2:
+			name = "nozzle_r";
+			break;
+		default:
+			return EVT_RETURN_DONE;
+	}
+	BattleSearchObjectPtr(name);
+	if (EVT_UW(event, 2) < 30) {
+		EVT_UW(event, 2)++;
+		rotX = intpl_sub(2, 0.0f, -80.0f, EVT_UW(event, 2), 30);
+	}
+	else {
+		rotX = -80.0f;
+	}
+	if (EVT_UW(event, 3) < 30) {
+		EVT_UW(event, 3)++;
+		switch (sw->nozzleDir[index]) {
+			case 1:
+				from = 45.0f;
+				break;
+			case 2:
+				from = 0.0f;
+				break;
+			case 3:
+				from = -45.0f;
+				break;
+			case 0:
+			default:
+				from = 0.0f;
+				break;
+		}
+		switch (sw->nozzleNextDir[index]) {
+			case 1:
+				to = 45.0f;
+				break;
+			case 2:
+				to = 0.0f;
+				break;
+			case 3:
+				to = -45.0f;
+				break;
+			case 0:
+			default:
+				to = 0.0f;
+				break;
+		}
+		rotY = intpl_sub(12, from, to, EVT_UW(event, 3), 30);
+	}
+	switch (index) {
+		case 0:
+			mapObjRotate("n_head_l", rotX, rotY, 0.0f);
+			break;
+		case 1:
+			mapObjRotate("n_head_c", rotX, rotY, 0.0f);
+			break;
+		case 2:
+			mapObjRotate("n_head_r", rotX, rotY, 0.0f);
+			break;
+	}
+	if (EVT_UW(event, 2) >= 30 && EVT_UW(event, 3) >= 30) {
+		sw->nozzleDir[index] = sw->nozzleNextDir[index];
+		sw->nozzleTurnEvtId[index] = 0;
+		return EVT_RETURN_DONE;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+void BattleStage_WallCloseCheck(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (!(sw->flags & 0x10)) {
+		sw->flags |= 0x10;
+		sw->closeWallEvtId = evtEntry(_close_wall_event, 10, 0)->eventId;
+	}
+}
+
+USER_FUNC(_announce_wall_message) {
+	if (isFirstCall) {
+		event->userdata[0] = 60;
+	}
+	if (event->userdata[0] < 0) {
+		return EVT_RETURN_DONE;
+	}
+	event->userdata[0]--;
+	dispEntry(CAMERA_2D, 900.0f, 1, _disp_escape_wall_message, NULL);
+	return EVT_RETURN_BLOCK;
+}
+
+void _disp_escape_wall_message(CameraId camera, void* param) {
+	const char* msg = msgSearch("btl_msg_escape_wall_close2");
+	s32 width = FontGetMessageWidth(msg);
+	f32 x = 0.0f;
+
+	x -= width / 2;
+	windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, x - 20.0f, -117.0f, width + 40, 30.0f, 10.0f);
+	FontDrawStart();
+	FontDrawString(x, -120.0f, msg);
+}
+
+void BattleStage_IronFrameFallCheck(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (!(sw->flags & 0x40) && !(sw->flags & 0x20)) {
+		sw->flags |= 0x20;
+		sw->fallFrameEvtId = evtEntry(_fall_frame_event, 10, 0)->eventId;
+	}
+}
+
+USER_FUNC(_fall_frame_wait) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (!BattleWaitAllActiveEvtEnd_NoBgSetEndWait(wp)) {
+		return EVT_RETURN_BLOCK;
+	}
+	if (sw->nozzleWorkEvtId) {
+		if (evtCheckID(sw->nozzleWorkEvtId)) {
+			return EVT_RETURN_BLOCK;
+		}
+		sw->nozzleWorkEvtId = 0;
+	}
+	return EVT_RETURN_YIELD;
+}
+
+USER_FUNC(_fall_frame_wait_unit_ready) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleUnit* unit;
+	EventEntry* evt;
+	int i;
+
+	if (isFirstCall) {
+		for (i = 0; i < 64; i++) {
+			unit = BattleGetUnitPtr(wp, i);
+			if (unit && !(unit->flags & 0x80000000) && !BtlUnit_CheckStatus(unit, 0x1B) && UNIT_FIELD(unit, void*, 0x2BC)) {
+				evt = evtEntry(UNIT_FIELD(unit, void*, 0x2BC), 10, 0);
+				if (evt) {
+					evt->unitId = unit->unitId;
+				}
+				UNIT_FIELD(unit, s32, 0x2C0) = evt->eventId;
+			}
+		}
+	}
+	for (i = 0; i < 64; i++) {
+		unit = BattleGetUnitPtr(wp, i);
+		if (unit && !(unit->flags & 0x80000000)) {
+			if (UNIT_FIELD(unit, s32, 0x2C0) && !evtCheckID(UNIT_FIELD(unit, s32, 0x2C0))) {
+				UNIT_FIELD(unit, s32, 0x2C0) = 0;
+			}
+			if (UNIT_FIELD(unit, s32, 0x2C0)) {
+				return EVT_RETURN_BLOCK;
+			}
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_fall_frame) {
+	BattleWork* wp;
+	s32 arg = event->args[0];
+	BattleStageObject* body;
+	BattleStageObjectWork* sw;
+
+	wp = _battleWorkPointer;
+	sw = STAGE_WORK(wp);
+	body = BattleSearchObjectPtr("if_body");
+	if (isFirstCall) {
+		EVT_UW(event, 2) = 0;
+		EVT_UW(event, 3) = body->mPosition.y;
+	}
+	EVT_UW(event, 2)++;
+	body->mPosition.y = intpl_sub(2, EVT_UW(event, 3), 0.0f, EVT_UW(event, 2) * EVT_UW(event, 2) / 60, 60);
+	if (EVT_UW(event, 2) < 60) {
+		return EVT_RETURN_BLOCK;
+	}
+	evtSetValue(event, arg, (s32)sw->fallObjectData);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_fall_frame_delete) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (isFirstCall) {
+		EVT_UW(event, 2) = 255;
+	}
+	EVT_UW(event, 2) -= 5;
+	mapGrpSetColor("if_body", (GXColor){255, 255, 255, EVT_UW(event, 2)});
+	if (EVT_UW(event, 2) > 0) {
+		return EVT_RETURN_BLOCK;
+	}
+	sw->fallFrameEvtId = 0;
+	return EVT_RETURN_DONE;
+}
+
+void BattleStage_NozzleWorkCheck(s32 type) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	EventEntry* evt;
+
+	if (pouchGetPtr()->rank > 0) {
+		_nozzle_type_init();
+		if (type || sw->nozzleType) {
+			if (sw->nozzleWorkEvtId && !evtCheckID(sw->nozzleWorkEvtId)) {
+				sw->nozzleWorkEvtId = 0;
+			}
+			if (sw->nozzleWorkEvtId == 0) {
+				if (type) {
+					evt = evtEntry(_nozzle_work_event_1, 10, 0);
+				}
+				else {
+					evt = evtEntry(_nozzle_work_event_0, 10, 0);
+				}
+				sw->nozzleWorkEvtId = evt->eventId;
+			}
+		}
+	}
+}
+
+void _nozzle_type_init(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	BattleStageNozzleData* data = sw->nozzleData;
+	s32 total;
+	s8 i;
+
+	if (sw->nozzleType == -1) {
+		total = 0;
+		for (i = 0; i < 4; i++) {
+			total += data->typeRate[i];
+		}
+		total = irand(total);
+		for (i = 0; i < 4; i++) {
+			total -= data->typeRate[i];
+			if (total < 0) {
+				break;
+			}
+		}
+		sw->nozzleType = i;
+	}
+}
+
+USER_FUNC(_nozzle_work_wait) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	int i;
+
+	if (!BattleWaitAllActiveEvtEnd_NoBgSetEndWait(wp)) {
+		return EVT_RETURN_BLOCK;
+	}
+	for (i = 0; i < 3; i++) {
+		if (sw->nozzleTurnEvtId[i]) {
+			if (evtCheckID(sw->nozzleTurnEvtId[i])) {
+				return EVT_RETURN_BLOCK;
+			}
+			sw->nozzleTurnEvtId[i] = 0;
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+f32 _get_nozzle_dir(s32 index) {
+	switch (STAGE_WORK(_battleWorkPointer)->nozzleDir[index]) {
+		case 1:
+			return -45.0f;
+		case 3:
+			return -135.0f;
+		case 2:
+		default:
+			return -90.0f;
+	}
+}
+
+USER_FUNC(_nozzle_work_effect) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32* args = event->args;
+	s32 effType = 0;
+	BOOL started;
+	const char* sfx;
+	BattleStageObject* obj;
+	f32 angle, rot, z;
+	s32 fog;
+	s32 out;
+
+	fog = evtGetValue(event, args[0]);
+	out = args[1];
+	started = FALSE;
+	if (isFirstCall) {
+		if (BattleCheckConcluded(wp)) {
+			evtSetValue(event, out, 0);
+			return EVT_RETURN_DONE;
+		}
+		EVT_UW(event, 0) = 90;
+		switch (sw->nozzleType) {
+			case 1:
+				sfx = "SFX_BTL_STAGE_SMOKE1";
+				effType = 0;
+				break;
+			case 2:
+				sfx = NULL;
+				effType = 1;
+				break;
+			case 3:
+				sfx = "SFX_BTL_STAGE_FIRE1";
+				effType = 2;
+				break;
+		}
+		switch (sw->nozzleType) {
+			case 1:
+			case 2:
+			case 3:
+				obj = BattleSearchObjectPtr("nozzle_l");
+				angle = _get_nozzle_dir(0);
+				if (sw->nozzleDir[0]) {
+					if (sfx) {
+						EVT_UW(event, 5) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 5) = -1;
+					}
+					rot = reviseAngle(90.0f + angle);
+					z = 10.0f * sinfd(angle) + obj->mPosition.z;
+					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+				}
+				else {
+					if (sfx) {
+						EVT_UW(event, 5) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 5) = -1;
+					}
+					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					if (fog == 0) {
+						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
+					}
+				}
+				obj = BattleSearchObjectPtr("nozzle_c");
+				angle = _get_nozzle_dir(1);
+				if (sw->nozzleDir[1]) {
+					if (sfx) {
+						EVT_UW(event, 6) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 6) = -1;
+					}
+					rot = reviseAngle(90.0f + angle);
+					z = 10.0f * sinfd(angle) + obj->mPosition.z;
+					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+				}
+				else {
+					if (sfx) {
+						EVT_UW(event, 6) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 6) = -1;
+					}
+					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					if (fog == 0) {
+						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
+					}
+				}
+				obj = BattleSearchObjectPtr("nozzle_r");
+				angle = _get_nozzle_dir(2);
+				if (sw->nozzleDir[2]) {
+					if (sfx) {
+						EVT_UW(event, 7) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 7) = -1;
+					}
+					rot = reviseAngle(90.0f + angle);
+					z = 10.0f * sinfd(angle) + obj->mPosition.z;
+					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+				}
+				else {
+					if (sfx) {
+						EVT_UW(event, 7) = psndSFXOn_3D(sfx, &obj->mPosition);
+					}
+					else {
+						EVT_UW(event, 7) = -1;
+					}
+					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 0.0f, 0.0f, 90);
+					if (fog == 0) {
+						effConfettiN64Entry(4, 90, obj->mPosition.x, 20.0f + obj->mPosition.y, 8.0f + obj->mPosition.z, 1.0f);
+					}
+				}
+				started = TRUE;
+				break;
+			default:
+				if (fog && !sw->fogEffect) {
+					EVT_UW(event, 0) = 120;
+					EVT_UW(event, 1) = 0;
+					EVT_UW(event, 3) = 0;
+					EVT_UW(event, 2) = 0;
+					sw->fogEffect = effNozleEntry(3, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1000);
+					EVT_UW(event, 3) = (s32)sw->fogEffect;
+					sw->fogTimer = 2;
+					EVT_UW(event, 5) = psndSFXOn_3D("SFX_BTL_STAGE_DRYICE1", &BattleSearchObjectPtr("nozzle_c")->mPosition);
+					started = TRUE;
+					EVT_UW(event, 6) = -1;
+					EVT_UW(event, 7) = -1;
+				}
+				break;
+		}
+		if (!started) {
+			evtSetValue(event, out, 0);
+			return EVT_RETURN_DONE;
+		}
+	}
+	if (EVT_UW(event, 0) > 0) {
+		EVT_UW(event, 0)--;
+		if (EVT_UW(event, 0) <= 0) {
+			if (EVT_UW(event, 5) != -1) {
+				psndSFXOff(EVT_UW(event, 5));
+			}
+			if (EVT_UW(event, 6) != -1) {
+				psndSFXOff(EVT_UW(event, 6));
+			}
+			if (EVT_UW(event, 7) != -1) {
+				psndSFXOff(EVT_UW(event, 7));
+			}
+		}
+		return EVT_RETURN_BLOCK;
+	}
+	evtSetValue(event, out, 1);
+	return EVT_RETURN_DONE;
+}
+
+BOOL BattleFogEndCheck(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (sw->fogTimer == 0) {
+		return TRUE;
+	}
+	sw->fogTimer--;
+	if (sw->fogTimer > 0) {
+		return FALSE;
+	}
+	if (sw->fogEffect) {
+		effSoftDelete(sw->fogEffect);
+		sw->fogEffect = NULL;
+	}
+	return TRUE;
+}
+
+BOOL BattleFogForceStop(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (sw->fogTimer == 0) {
+		return FALSE;
+	}
+	if (sw->fogEffect) {
+		effSoftDelete(sw->fogEffect);
+		sw->fogEffect = NULL;
+	}
+	return TRUE;
+}
+
+USER_FUNC(_nozzle_work_attack_set) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32 index;
+	int i;
+
+	sw->nozzleWeapons[0] = NULL;
+	sw->nozzleWeapons[1] = NULL;
+	memset(&sw->nozzleWeaponWork[0], 0, sizeof(BattleWeapon));
+	memset(&sw->nozzleWeaponWork[1], 0, sizeof(BattleWeapon));
+	_combine_nozzle_weapon(TRUE, &sw->nozzleWeaponWork[0], &_nozzle_at_base_mario.weapon);
+	_combine_nozzle_weapon(TRUE, &sw->nozzleWeaponWork[1], &_nozzle_at_base_monster.weapon);
+	for (i = 0; i < 3; i++) {
+		index = _get_nozzle_attack_index(i);
+		if (index >= 0) {
+			if (!sw->nozzleWeapons[index]) {
+				sw->nozzleWeapons[index] = &sw->nozzleWeaponWork[index];
+			}
+			_combine_nozzle_weapon(FALSE, sw->nozzleWeapons[index], &sw->nozzleData->weapons[sw->nozzleType].weapon);
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+s32 _get_nozzle_attack_index(u8 index) {
+	BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
+
+	switch (index) {
+		case 0:
+			switch (sw->nozzleDir[index]) {
+				case 1:
+					return -1;
+				case 2:
+					return 0;
+				case 3:
+					return 1;
+			}
+		case 2:
+			switch (sw->nozzleDir[index]) {
+				case 1:
+					return 0;
+				case 2:
+					return 1;
+				case 3:
+					return -1;
+			}
+		case 1:
+			switch (sw->nozzleDir[index]) {
+				case 1:
+					return 0;
+				case 2:
+					return -1;
+				case 3:
+					return 1;
+			}
+	}
+	return -1;
+}
+
+void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
+	if (*srcChance <= 0) {
+		return;
+	}
+	if (*srcChance > *dstChance) {
+		*dstChance = *srcChance;
+	}
+	*dstTime += *srcTime;
+}
+
+void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength) {
+	if (*srcChance <= 0) {
+		return;
+	}
+	if (*srcChance > *dstChance) {
+		*dstChance = *srcChance;
+	}
+	*dstTime += *srcTime;
+	*dstStrength += *srcStrength;
+	if (*dstStrength == 0) {
+		*dstChance = 0;
+		*dstTime = 0;
+	}
+}
+
+void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
+	s8* d;
+	s8* s;
+	int i;
+
+	if (copy) {
+		*dst = *src;
+		return;
+	}
+	dst->baseFpCost += src->baseFpCost;
+	dst->baseSpCost += src->baseSpCost;
+	if (!dst->hpDamageFn) {
+		dst->hpDamageFn = src->hpDamageFn;
+	}
+	for (i = 0; i < 8; i++) {
+		dst->hpDamageWork[i] += src->hpDamageWork[i];
+	}
+	dst->element = src->element;
+	s = (s8*)src + 0x80;
+	d = (s8*)dst + 0x80;
+	_rate_mix(&d[0x0], &d[0x1], &s[0x0], &s[0x1]);
+	_rate_mix(&d[0x2], &d[0x3], &s[0x2], &s[0x3]);
+	_rate_mix(&d[0x4], &d[0x5], &s[0x4], &s[0x5]);
+	_rate_mix(&d[0x6], &d[0x7], &s[0x6], &s[0x8]);
+	_rate_mix(&d[0x9], &d[0xA], &s[0x9], &s[0xA]);
+	_rate_mix(&d[0xB], &d[0xC], &s[0xB], &s[0xC]);
+	_rate_mix(&d[0xD], &d[0xE], &s[0xD], &s[0xE]);
+	_rate_mix(&d[0xF], &d[0x10], &s[0xF], &s[0x10]);
+	_rate_mix(&d[0x11], &d[0x12], &s[0x11], &s[0x12]);
+	_rate_mix_3(&d[0x13], &d[0x14], &d[0x15], &s[0x13], &s[0x14], &s[0x15]);
+	_rate_mix_3(&d[0x19], &d[0x1A], &d[0x1B], &s[0x19], &s[0x1A], &s[0x1B]);
+	_rate_mix(&d[0x1C], &d[0x1D], &s[0x1C], &s[0x1D]);
+	d[0x1F] += s[0x1F];
+	_rate_mix(&d[0x20], &d[0x21], &s[0x20], &s[0x21]);
+	_rate_mix(&d[0x22], &d[0x23], &s[0x22], &s[0x23]);
+	d[0x2A] += s[0x2A];
+	d[0x2B] += s[0x2B];
+	d[0x2C] += s[0x2C];
+	d[0x2D] += s[0x2D];
+}
+
+USER_FUNC(_nozzle_work_get_weapon_address) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32* args = event->args;
+	s32 index = evtGetValue(event, args[0]);
+
+	evtSetValue(event, args[1], (s32)sw->nozzleWeapons[index]);
+	return EVT_RETURN_DONE;
+}
+
+s32 BattleStage_ObjectFallCheck(void) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	EventEntry* evt;
+
+	if (wp->flags & 0x1000) {
+		return 0;
+	}
+	evt = evtEntry(_object_fall_event, 10, 0);
+	sw->objectFallEvtId = evt->eventId;
+	return evt->eventId;
+}
+
+USER_FUNC(_object_fall_wait) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
+	if (!BattleWaitAllActiveEvtEnd_NoBgSetEndWait(wp)) {
+		return EVT_RETURN_BLOCK;
+	}
+	if (sw->nozzleWorkEvtId) {
+		if (evtCheckID(sw->nozzleWorkEvtId)) {
+			return EVT_RETURN_BLOCK;
+		}
+		sw->nozzleWorkEvtId = 0;
+	}
+	if (sw->fallFrameEvtId) {
+		if (evtCheckID(sw->fallFrameEvtId)) {
+			return EVT_RETURN_BLOCK;
+		}
+		sw->fallFrameEvtId = 0;
+	}
+	if (sw->bgDestroyEvtId) {
+		if (evtCheckID(sw->bgDestroyEvtId)) {
+			return EVT_RETURN_BLOCK;
+		}
+		sw->bgDestroyEvtId = 0;
+	}
+	return EVT_RETURN_DONE;
+}
+

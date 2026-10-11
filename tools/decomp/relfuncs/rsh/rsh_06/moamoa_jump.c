@@ -21,8 +21,8 @@
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // include: driver/hitdrv.h
 // include: system.h
-// include: math.h
 // proto: static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
+#pragma dont_inline on
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;
@@ -33,7 +33,7 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
         hitX = hitY = hitZ = 0.0f;
         dist = 1000000.0f;
         if (hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &nx, &ny, &nz, x, 100.0f + y, z, 0.0f, -1.0f, 0.0f)) {
-            if (fabs(y - hitY) > 30.0) {
+            if (__fabs(y - hitY) > 30.0) {
                 speed -= 0.1f;
                 gravity += 0.1f;
             }
@@ -55,3 +55,4 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
     pose->flags |= 0x10;
     pose->flags &= ~4;
 }
+#pragma dont_inline reset

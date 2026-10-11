@@ -57,7 +57,7 @@ static void hand_init(void) {
         pose->flags |= 6;
         PSMTXIdentity(pose->mtx);
         elem->animIdx = 0;
-        elem->time = gp->renderTime - (s64)irand(100) * 10000000;
+        elem->time = gp->renderTime - (u64)irand(100) * 10000000;
         elem->flip = irand(1);
     }
 }

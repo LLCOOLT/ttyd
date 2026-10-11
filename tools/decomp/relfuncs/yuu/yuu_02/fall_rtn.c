@@ -41,6 +41,7 @@ static USER_FUNC(fall_rtn) {
     Vec b;
     Vec hit;
     HitCheckQuery query;
+    HitCheckQuery* qp;
     Monte* m;
 
     if (isFirstCall) {
@@ -83,7 +84,8 @@ static USER_FUNC(fall_rtn) {
                     lo = montetable[t].z1;
                     hi = montetable[t].z0;
                 }
-                sub->pos.z = lo + irand(100.0f * (hi - lo)) / 100.0f;
+                hi -= lo;
+                sub->pos.z = lo + irand(100.0f * hi) / 100.0f;
                 a = sub->pos;
                 a.y = 0.0f;
                 for (j = 0; j < k; j++) {
@@ -97,15 +99,16 @@ static USER_FUNC(fall_rtn) {
                 if (j != k) {
                     continue;
                 }
+                qp = &query;
                 query.targetPos = sub->pos;
-                query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
                 query.targetDistance = 220.0f;
-                if (hitCheckVecFilter(&query, NULL) == NULL) {
+                query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
+                if (hitCheckVecFilter(qp, NULL) == NULL) {
                     continue;
                 }
-                hit = query.hitPos;
                 query.targetPos.x -= 9.0f;
-                if (hitCheckVecFilter(&query, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
+                hit = query.hitPos;
+                if (hitCheckVecFilter(qp, NULL) != NULL && query.hitPos.y > hit.y + 1.0f) {
                     continue;
                 }
                 sub->pos.y = query.hitPos.y;
@@ -118,13 +121,12 @@ static USER_FUNC(fall_rtn) {
                         monte_p[i - j].hidden = 1;
                         monte_p[i - j].state = 1;
                     }
-                    for (j = 0; j < montetable[t].num;) {
-                        r = irand(n);
-                        if (monte_p[i - r].hidden) {
-                            monte_p[i - r].hidden = 0;
-                            monte_p[i - r].state = 0;
-                            j++;
-                        }
+                    for (j = 0; j < montetable[t].num; j++) {
+                        do {
+                            r = irand(n);
+                        } while (!monte_p[i - r].hidden);
+                        monte_p[i - r].hidden = 0;
+                        monte_p[i - r].state = 0;
                     }
                     n = 0;
                 }
@@ -134,7 +136,7 @@ static USER_FUNC(fall_rtn) {
             sub->scale = 1.0f;
         }
     }
-    sfx = "SFX_EVT_GAME_MONTE_COUNT1";
+    sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1"); /* comma expr: string address into its own saved reg */
     for (i = 0; i < monte_p->num; i++) {
         m = &monte_p[i];
         switch (m->state) {

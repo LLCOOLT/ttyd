@@ -961,12 +961,12 @@ USER_FUNC(zakogun_attack1) {
             zakogun[i].state = 30;
         }
     }
+    i = 0;
     n = 0;
-    for (i = 0; i < 6; i++) {
+    for (; i < 6; i++) {
         if (zakogun[i].state == 20) {
             n++;
         }
     }
     return n == 6 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
-    (void)event;
 }

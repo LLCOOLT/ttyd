@@ -1,5 +1,6 @@
 #include "evt/evt_shop.h"
 #include "mario/mariost.h"
+#include "manager/winmgr.h"
 #include "memory.h"
 #include <string.h>
 
@@ -31,4 +32,8 @@ USER_FUNC(evt_shop_setup) {
 
 	}
 	return EVT_RETURN_DONE;
+}
+
+void help_main(WinMgrEntry* entry) {
+	winMgrHelpMain(entry);
 }

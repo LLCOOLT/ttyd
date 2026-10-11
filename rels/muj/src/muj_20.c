@@ -2,44 +2,44 @@
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
+#include "driver/npcdrv.h"
+#include "mario/mariost.h"
+#include "dolphin/os.h"
+#include "system.h"
+#include "memory.h"
+#include "manager/evtmgr_cmd.h"
+#include "driver/mapdrv.h"
+#include "dolphin/gx.h"
+#include "driver/effdrv.h"
+#include "dolphin/mtx.h"
 #include "driver/camdrv.h"
+#include "win/win_main.h"
 #include "driver/dispdrv.h"
 #include "manager/filemgr.h"
-#include "mario/mariost.h"
-#include "memory.h"
 #include "string.h"
-#include "system.h"
-#include "win/win_main.h"
-#include "dolphin/gx.h"
-#include "dolphin/mtx.h"
-#include "manager/evtmgr_cmd.h"
-#include "driver/effdrv.h"
-#include "dolphin/os.h"
-#include "driver/npcdrv.h"
-#include "driver/mapdrv.h"
 
-typedef struct LogoWork { FileEntry* tpl; f32 y; s32 alpha; s32 state; s32 counter; } LogoWork;
-static void draw(CameraId camera, void* param);
-EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
-EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
-void mapObjGetPos(const char* name, Vec* pos);
-f32 distABf(f32 x1, f32 z1, f32 x2, f32 z2);
-f32 angleABf(f32 x1, f32 z1, f32 x2, f32 z2);
-EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
-EffectEntry* effMistEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
+typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 field_0x14; OSTime time; } MarcoShip;
+MarcoShip* marcoship;
+void mapSetPlayRate(const char* name, f32 rate);
+typedef struct MapAnimRate { f32 fune; f32 funeTarget; f32 nami; f32 namiTarget; } MapAnimRate;
+MapAnimRate mapAnimRate;
+static u8* _ap;
 typedef struct NanNpc { u8 field_0x0[0x10]; NpcEntry* npc; u8 field_0x14[0x18 - 0x14]; Vec pos; u8 field_0x24[0x50 - 0x24]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 duration; s32 index; s32 dist; u8 field_0x78[0xBF - 0x78]; u8 alpha; } NanNpc;
 typedef struct NanNpcWork { NanNpc* entries; u8 field_0x4[0xC - 0x4]; s32 count; u32 flags; } NanNpcWork;
 extern NanNpcWork* nanNPCWork;
 double sin(double x);
 double cos(double x);
-static u8* _ap;
-typedef struct MapAnimRate { f32 fune; f32 funeTarget; f32 nami; f32 namiTarget; } MapAnimRate;
-MapAnimRate mapAnimRate;
-void mapSetPlayRate(const char* name, f32 rate);
-typedef struct MarcoShip { f32 angle; f32 speed; f32 max; s32 stopped; s32 state; s32 field_0x14; OSTime time; } MarcoShip;
-MarcoShip* marcoship;
-NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
+EffectEntry* effMistEntry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5);
+void mapObjTranslate(const char* name, f32 x, f32 y, f32 z);
+EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5);
+void mapObjGetPos(const char* name, Vec* pos);
+f32 distABf(f32 x1, f32 z1, f32 x2, f32 z2);
+f32 angleABf(f32 x1, f32 z1, f32 x2, f32 z2);
+EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
+typedef struct LogoWork { FileEntry* tpl; f32 y; s32 alpha; s32 state; s32 counter; } LogoWork;
+static void draw(CameraId camera, void* param);
 
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
@@ -205,6 +205,49 @@ s32 fune_move[136];
 static s32 epilogue_evt[97];
 s32 muj_20_init_evt[362];
 
+USER_FUNC(urouro_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 sx = evtGetValue(event, args[1]);
+    f32 sz = evtGetValue(event, args[2]);
+    f32 ex = evtGetValue(event, args[3]);
+    f32 ez = evtGetValue(event, args[4]);
+    s32 noDir = evtGetValue(event, args[5]);
+    s32 duration = evtGetValue(event, args[6]);
+    s32 mode = evtGetValue(event, args[7]);
+    NpcEntry* npc = evtNpcNameToPtr(event, name);
+    s32 t;
+
+    if (isFirstCall) {
+        event->savedTime = gp->renderTime;
+    }
+    t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
+    if (t < duration) {
+        sx = intplGetValue(mode, t, duration, sx, ex);
+        sz = intplGetValue(mode, t, duration, sz, ez);
+        if (!noDir) {
+            if (npc->position.x > sx) {
+                npc->direction = 270.0f;
+            } else {
+                npc->direction = 90.0f;
+            }
+        }
+        npc->position.x = npc->prevPosition.x = sx;
+        npc->position.z = npc->prevPosition.z = sz;
+        return EVT_RETURN_BLOCK;
+    }
+    if (!noDir) {
+        if (npc->position.x > ex) {
+            npc->direction = 270.0f;
+        } else {
+            npc->direction = 90.0f;
+        }
+    }
+    npc->position.x = npc->prevPosition.x = ex;
+    npc->position.z = npc->prevPosition.z = ez;
+    return EVT_RETURN_DONE;
+}
+
 __declspec(section ".data") u64 fd_muj_20_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_muj_20_neg_one_382[] = {
@@ -295,6 +338,58 @@ EVT_BEGIN(yoru_hiru_event)
     RETURN
 EVT_END()
 
+USER_FUNC(urouro_fuwafuwa_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 sx = evtGetValue(event, args[1]);
+    f32 sy = evtGetValue(event, args[2]);
+    f32 sz = evtGetValue(event, args[3]);
+    f32 ex = evtGetValue(event, args[4]);
+    f32 ey = evtGetValue(event, args[5]);
+    f32 ez = evtGetValue(event, args[6]);
+    s32 noDir = evtGetValue(event, args[7]);
+    s32 duration = evtGetValue(event, args[8]);
+    s32 mode = evtGetValue(event, args[9]);
+    NpcEntry* npc = evtNpcNameToPtr(event, name);
+    f32 tbl[32] = {
+        0.0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.2f, 2.5f, 2.7f, 2.7f, 2.7f, 2.5f, 2.2f, 2.0f, 1.5f, 1.0f, 0.5f,
+        -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f, -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
+    };
+    s32 t;
+    f32 dy;
+
+    if (isFirstCall) {
+        event->savedTime = gp->renderTime;
+    }
+    t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
+    if (t < duration) {
+        sx = intplGetValue(mode, t, duration, sx, ex);
+        sy = intplGetValue(mode, t, duration, sy, ey);
+        sz = intplGetValue(mode, t, duration, sz, ez);
+        if (!noDir) {
+            if (npc->position.x > sx) {
+                npc->direction = 270.0f;
+            } else {
+                npc->direction = 90.0f;
+            }
+        }
+        dy = tbl[sysMsec2Frame(t) & 31];
+        npc->prevPosition = (Vec){sx, sy + dy, sz};
+        npc->position = npc->prevPosition;
+        return EVT_RETURN_BLOCK;
+    }
+    if (!noDir) {
+        if (npc->position.x > ex) {
+            npc->direction = 270.0f;
+        } else {
+            npc->direction = 90.0f;
+        }
+    }
+    npc->prevPosition = (Vec){ex, ey, ez};
+    npc->position = npc->prevPosition;
+    return EVT_RETURN_DONE;
+}
+
 EVT_BEGIN(urouro)
     CALL(evt_npc_get_position, LW(0), LW(11), LW(12), LW(13))
     LOOP(0)
@@ -311,6 +406,117 @@ EVT_BEGIN(urouro)
     END_LOOP
     RETURN
 EVT_END()
+
+USER_FUNC(marcoship_yure_init_func) {
+    MarcoShip* ms;
+
+    marcoship = ms = _mapAlloc(sizeof(MarcoShip));
+    ms->angle = 0.0f;
+    ms->speed = 0.02f;
+    ms->max = 1.5f;
+    ms->stopped = 0;
+    ms->state = 0;
+    ms->time = 0;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(marcoship_yure_func) {
+    MarcoShip* ms = marcoship;
+    s32* args = event->args;
+
+    switch (ms->state) {
+        case 0:
+            if (ms->speed > 0.0f) {
+                if (ms->angle > ms->max) {
+                    ms->speed *= -1.0f;
+                    ms->state = 1;
+                    ms->time = gp->renderTime;
+                    break;
+                }
+            } else if (ms->angle < -ms->max) {
+                ms->speed *= -1.0f;
+                ms->state = 1;
+                ms->time = gp->renderTime;
+                break;
+            }
+            ms->angle += ms->speed;
+            break;
+        case 1:
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)ms->time) > 500) {
+                ms->state = 0;
+            }
+            break;
+        case 2:
+            if (ms->speed > 0.0f) {
+                if (ms->angle > 0.0f) {
+                    ms->state = 3;
+                    break;
+                }
+            } else if (ms->angle < 0.0f) {
+                ms->state = 3;
+                break;
+            }
+            ms->angle += ms->speed;
+            break;
+        case 3:
+            ms->angle = 0.0f;
+            ms->stopped = 1;
+            break;
+    }
+    evtSetFloat(event, args[0], ms->angle);
+    evtSetValue(event, args[1], ms->stopped);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(marcoship_stop_func) {
+    marcoship->state = 2;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(marcoship_stop_wait_func) {
+    return marcoship->stopped ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_map_anim_rate) {
+    MapAnimRate* rate = &mapAnimRate;
+    f32 d;
+
+    if (isFirstCall) {
+        rate->fune = 1.0f;
+        rate->nami = 1.0f;
+        rate->funeTarget = 1.0f;
+        rate->namiTarget = 1.0f;
+    }
+    d = rate->funeTarget - rate->fune;
+    if (d >= 0.005f) {
+        d = 0.005f;
+    } else if (d <= -0.005f) {
+        d = -0.005f;
+    }
+    rate->fune += d;
+    d = rate->namiTarget - rate->nami;
+    if (d >= 0.005f) {
+        d = 0.005f;
+    } else if (d <= -0.005f) {
+        d = -0.005f;
+    }
+    rate->nami += d;
+    mapSetPlayRate("fune", rate->fune);
+    mapSetPlayRate("fune_01", rate->fune);
+    mapSetPlayRate("nami", rate->nami);
+    mapSetPlayRate("nami_02", rate->nami);
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_set_fune_anim_rate) {
+    mapAnimRate.funeTarget = evtGetFloat(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_set_nami_anim_rate) {
+    mapAnimRate.namiTarget = evtGetFloat(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(urouro_fuwafuwa)
     CALL(evt_npc_get_position, LW(0), LW(11), LW(12), LW(13))
@@ -456,6 +662,209 @@ EVT_BEGIN(moya_effect05)
     END_LOOP
     RETURN
 EVT_END()
+
+static void alpha_tev(MapTevCallbackInfo* info) {
+    s32 stage = info->tevStage;
+    u8* alpha = _ap;
+
+    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    info->tevStage++;
+}
+
+static USER_FUNC(alpha_init_func) {
+    _ap = _mapAlloc(1);
+    *_ap = 255;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(alpha_set_func) {
+    *_ap = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(elmos1000tai_init) {
+    NanNpcWork* wp = nanNPCWork;
+    s32 i;
+    NanNpc* npc;
+    s32 deg;
+    s32 a;
+    s32 r;
+    f32 sn;
+    f32 rad;
+    f32 cs;
+    f32 dist;
+    f32 fdeg;
+
+    wp->flags |= 1;
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        npc->npc->flags |= 4;
+        npc->alpha = 0;
+        npc->dir = 90.0f;
+        npc->index = i;
+        if (i % 3) {
+            deg = irand(140) + 110;
+        } else {
+            deg = irand(360);
+        }
+        fdeg = deg;
+        npc->dist = 250;
+        r = 330;
+        a = __abs(180 - deg);
+        if (a < 70) {
+            r = (70 - a) * 1000 / 70 + 330;
+        }
+        npc->dist += irand(r);
+        rad = 6.2831855f * fdeg / 360.0f;
+        dist = npc->dist;
+        sn = sin(rad);
+        cs = cos(rad);
+        npc->pos.x = 0.9f * (dist * sn);
+        npc->pos.y = 100.0f;
+        npc->pos.z = 0.5f * (dist * cs) - 100.0f;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(elmos1000tai_start) {
+    s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp;
+
+    wp = nanNPCWork;
+
+    for (i = 0; i < wp->count; i++) {
+        npc = &wp->entries[i];
+        npc->func = elmos1000tai_seq00;
+        npc->state = 0;
+    }
+    return EVT_RETURN_DONE;
+}
+
+void elmos1000tai_seq00(NanNpc* npc) {
+    s32 t;
+
+    switch (npc->state) {
+        case 0:
+            npc->time = gp->renderTime;
+            npc->duration = irand(1000) + npc->dist * 3;
+            npc->state = 1;
+        case 1:
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) >= npc->duration) {
+                npc->time = gp->renderTime;
+                npc->duration = 500;
+                npc->state = 2;
+            }
+            break;
+        case 2:
+            t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
+            if (t < npc->duration) {
+                npc->alpha = intplGetValue(0, t, npc->duration, 0.0f, 255.0f);
+            } else {
+                npc->state = 3;
+            }
+            break;
+        case 3:
+            break;
+    }
+}
+
+USER_FUNC(mist_func) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    EffectEntry* eff;
+    BOOL done = FALSE;
+
+    if (isFirstCall) {
+        x += irand(150) - 75;
+        y += irand(150) - 75;
+        z += irand(150) - 75;
+        event->userdatap[1] = effMistEntry(0, 0, x, y, z, 0.0f);
+        event->userdata[0] = 0;
+    }
+    eff = event->userdatap[1];
+    switch (event->userdata[0]) {
+        case 0:
+            event->savedTime = gp->renderTime;
+            event->userdata[2] = irand(1000) + 3000;
+            event->userdata[0] = 1;
+            break;
+        case 1:
+            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime) > event->userdata[2]) {
+                event->userdata[0] = 2;
+            }
+            break;
+        case 2:
+            done = TRUE;
+            break;
+    }
+    if (!done) {
+        return EVT_RETURN_BLOCK;
+    }
+    effSoftDelete(eff);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(marcoship_shizumu_func) {
+    f32 y = evtGetFloat(event, event->args[0]);
+
+    mapObjTranslate("S_a1", 0.0f, y, 0.0f);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(splash_eff) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+
+    effSplashEntry(0, x, y, z, 3.0f);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(kaizoku_fune_eff) {
+    EffectEntry* eff;
+    Vec pos;
+    f32 oldX, oldZ, speed, angle, dir;
+
+    if (isFirstCall) {
+        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
+        mapObjGetPos("S_b", &pos);
+        event->userdataf[2] = pos.x;
+        *(f32*)&event->field_84 = pos.z;
+    }
+    eff = event->userdatap[0];
+    oldX = event->userdataf[2];
+    oldZ = *(f32*)&event->field_84;
+    mapObjGetPos("S_b", &pos);
+    event->userdataf[2] = pos.x;
+    *(f32*)&event->field_84 = pos.z;
+    speed = distABf(oldX, oldZ, pos.x, pos.z);
+    angle = angleABf(oldX, oldZ, pos.x, pos.z);
+    if (angle < 180.0f) {
+        dir = 1.0f;
+    } else {
+        dir = -1.0f;
+    }
+    ((f32*)eff->userdata)[17] = 5.0f;
+    ((f32*)eff->userdata)[1] = 140.0f * dir + pos.x;
+    ((f32*)eff->userdata)[2] = pos.y - 160.0f;
+    ((f32*)eff->userdata)[3] = 40.0f + pos.z;
+    ((f32*)eff->userdata)[4] = speed;
+    if (angle < 180.0f) {
+        ((f32*)eff->userdata)[5] = 135.0f + angle;
+    } else {
+        ((f32*)eff->userdata)[5] = 45.0f + angle;
+    }
+    return EVT_RETURN_BLOCK;
+}
 
 EVT_BEGIN(nami_alpha)
     CALL(alpha_init_func)
@@ -1225,6 +1634,73 @@ EVT_BEGIN(anm_neji)
     RETURN
 EVT_END()
 
+static USER_FUNC(fune_eff) {
+    EffectEntry* eff1;
+    EffectEntry* eff2;
+    Vec pos;
+    f32 oldX, oldZ, off85, speed;
+
+    if (isFirstCall) {
+        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
+        event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
+        mapObjGetPos("S_fune_m", &pos);
+        event->userdataf[2] = pos.x;
+        *(f32*)&event->field_84 = pos.z;
+    }
+    eff1 = event->userdatap[0];
+    eff2 = event->userdatap[1];
+    oldX = event->userdataf[2];
+    oldZ = *(f32*)&event->field_84;
+    mapObjGetPos("S_fune_m", &pos);
+    event->userdataf[2] = pos.x;
+    *(f32*)&event->field_84 = pos.z;
+    speed = distABf(oldX, oldZ, pos.x, pos.z);
+    angleABf(oldX, oldZ, pos.x, pos.z);
+    off85 = 85.0f;
+    if (evtGetValue(event, GSW(0)) == 2) {
+        speed = 2.0f;
+    }
+    ((f32*)eff1->userdata)[17] = 3.0f;
+    ((f32*)eff1->userdata)[1] = pos.x + off85;
+    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
+    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
+    ((f32*)eff1->userdata)[4] = speed;
+    ((f32*)eff1->userdata)[5] = 225.0f;
+    ((f32*)eff2->userdata)[1] = pos.x - 15.0f;
+    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
+    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
+    ((f32*)eff2->userdata)[4] = speed;
+    ((f32*)eff2->userdata)[5] = 180.0f;
+    if (speed > 1.0f && gp->retraceCount % 15 == 0) {
+        effWaterDamageN64Entry(5, 30, pos.x - 150.0f, pos.y - 50.0f, pos.z, 2.0f);
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(unk_muj_00004328) {
+    f32 x = evtGetFloat(event, GW(0));
+    f32 y = evtGetFloat(event, GW(1));
+    f32 z = evtGetFloat(event, GW(2));
+    f32 rot = evtGetFloat(event, LW(0));
+    f32 angle;
+    Vec out;
+    Mtx trans, rotm, m;
+
+    out = (Vec){x, y, z};
+    angle = 5.0f * x / -6000.0f;
+    MTXTrans(trans, 0.0f, -6000.0f, 0.0f);
+    MTXRotRad(rotm, 'z', angle * 0.017453292f);
+    MTXConcat(trans, rotm, m);
+    MTXTrans(trans, 0.0f, 6000.0f, 0.0f);
+    MTXConcat(m, trans, m);
+    MTXMultVec(m, &out, &out);
+    evtSetFloat(event, LW(7), out.x);
+    evtSetFloat(event, LW(8), out.y);
+    evtSetFloat(event, LW(9), out.z);
+    evtSetFloat(event, LW(0), rot + angle);
+    return EVT_RETURN_DONE;
+}
+
 EVT_BEGIN(anm_yure)
     CALL(evt_mapobj_trans, 1, STRING("S_fune_m"), GW(0), GW(1), GW(2))
     CALL(evt_mapobj_trans, 1, STRING("S_umi_l_siro_b"), GW(0), GW(1), GW(2))
@@ -1263,6 +1739,85 @@ EVT_BEGIN(anm_yure)
     END_LOOP
     RETURN
 EVT_END()
+
+static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
+    CameraEntry* camera = camGetCurPtr();
+    GXTexObj startText, gradient;
+    Mtx v17, v16;
+
+    TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, 8);
+    GXLoadTexObj(&startText, GX_TEXMAP0);
+    TEXGetGXTexObjFromPalette(*wp->tpl->data, &gradient, 9);
+    GXLoadTexObj(&gradient, GX_TEXMAP1);
+    GXSetNumTevStages(2);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    GXSetTevColor(GX_TEVREG0, (GXColor){ 0x00, 0x00, 0x00, alpha });
+    GXSetNumChans(0);
+    GXSetNumTexGens(2);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 60);
+    GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 30);
+    MTXScale(v16, 1.0f, 1.0f, 1.0f);
+    MTXTrans(v17, (f32)gp->retraceCount / -200.0f, 0.0f, 0.0f);
+    MTXConcat(v16, v17, v17);
+    GXLoadTexMtxImm(v17, 30, GX_MTX2x4);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    MTXTrans(v17, x, y, 0.0f);
+    MTXScale(v16, (f32)GXGetTexObjWidth(&startText), (f32)GXGetTexObjHeight(&startText), 1.0f);
+    MTXConcat(v17, v16, v17);
+    MTXConcat(camera->view, v17, v17);
+    GXLoadPosMtxImm(v17, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+    GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+}
+
+extern void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color);
+static void draw(CameraId camera, void* param) {
+    LogoWork* wp = param;
+    CameraEntry saved;
+    f32 viewport[6];
+    f32 projection[7];
+    CameraEntry* cam;
+
+    GXGetViewportv(viewport);
+    GXGetProjectionv(projection);
+    cam = camGetPtr(CAMERA_2D);
+    GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
+    saved = *camGetCurPtr();
+    cam = camGetPtr(CAMERA_2D);
+    *camGetCurPtr() = *cam;
+    winTexInit(*(TEXPalette**)wp->tpl->data);
+    unk_80177008(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
+    *camGetCurPtr() = saved;
+    GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
+    GXSetProjectionv(projection);
+}
 
 static EVT_BEGIN(evt_prologue)
     WAIT_MS(500)
@@ -1530,7 +2085,7 @@ USER_FUNC(logo) {
         event->userdatap[0] = wp;
     }
     wp = event->userdatap[0];
-    if (!fileAsyncf(4, NULL, "%s/mariost.tpl", getMarioStDvdRoot())) {
+    if ((u32)fileAsyncf(4, NULL, "%s/mariost.tpl", getMarioStDvdRoot()) == 0) {
         return EVT_RETURN_BLOCK;
     }
     switch (wp->state) {
@@ -1575,567 +2130,5 @@ USER_FUNC(logo) {
         dispEntry(CAMERA_2D, 1000.0f, 0, draw, wp);
     }
     return EVT_RETURN_BLOCK;
-}
-
-static void draw(CameraId camera, void* param) {
-    LogoWork* wp = param;
-    CameraEntry saved;
-    f32 viewport[6];
-    f32 projection[7];
-    CameraEntry* cam;
-
-    GXGetViewportv(viewport);
-    GXGetProjectionv(projection);
-    cam = camGetPtr(CAMERA_2D);
-    GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
-    saved = *camGetCurPtr();
-    cam = camGetPtr(CAMERA_2D);
-    *camGetCurPtr() = *cam;
-    winTexInit(*(TEXPalette**)wp->tpl->data);
-    winTexSet(5, (Vec){0.0f, 100.0f + wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, wp->alpha});
-    *camGetCurPtr() = saved;
-    GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
-    GXSetProjectionv(projection);
-}
-
-static void pressStartGX(LogoWork* wp, s32 alpha, f32 x, f32 y) {
-    CameraEntry* camera = camGetCurPtr();
-    GXTexObj startText, gradient;
-    Mtx v17, v16;
-
-    TEXGetGXTexObjFromPalette(*wp->tpl->data, &startText, 8);
-    GXLoadTexObj(&startText, GX_TEXMAP0);
-    TEXGetGXTexObjFromPalette(*wp->tpl->data, &gradient, 9);
-    GXLoadTexObj(&gradient, GX_TEXMAP1);
-    GXSetNumTevStages(2);
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
-    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 0x00, 0x00, 0x00, alpha });
-    GXSetNumChans(0);
-    GXSetNumTexGens(2);
-    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 60);
-    GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 30);
-    MTXScale(v16, 1.0f, 1.0f, 1.0f);
-    MTXTrans(v17, (f32)gp->retraceCount / -200.0f, 0.0f, 0.0f);
-    MTXConcat(v16, v17, v17);
-    GXLoadTexMtxImm(v17, 30, GX_MTX2x4);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-    GXSetZCompLoc(GX_TRUE);
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_DISABLE, GX_LEQUAL, GX_DISABLE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    MTXTrans(v17, x, y, 0.0f);
-    MTXScale(v16, (f32)GXGetTexObjWidth(&startText), (f32)GXGetTexObjHeight(&startText), 1.0f);
-    MTXConcat(v17, v16, v17);
-    MTXConcat(camera->view, v17, v17);
-    GXLoadPosMtxImm(v17, 0);
-    GXSetCurrentMtx(0);
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(-0.5f, -0.5f, 0.0f);
-    GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
-    GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
-    GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
-    GXTexCoord2f32(0.0f, 0.0f);
-    GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
-}
-
-USER_FUNC(unk_muj_00004328) {
-    f32 x = evtGetFloat(event, GW(0));
-    f32 y = evtGetFloat(event, GW(1));
-    f32 z = evtGetFloat(event, GW(2));
-    f32 rot = evtGetFloat(event, LW(0));
-    f32 angle = 5.0f * x / -6000.0f;
-    Vec pos = {0.0f, 0.0f, 0.0f};
-    Vec out;
-    Mtx m, rotm, trans;
-
-    pos.x = x;
-    pos.y = y;
-    pos.z = z;
-    out = pos;
-    MTXTrans(trans, 0.0f, -6000.0f, 0.0f);
-    MTXRotRad(rotm, 'z', angle * 0.017453292f);
-    MTXConcat(trans, rotm, m);
-    MTXTrans(trans, 0.0f, 6000.0f, 0.0f);
-    MTXConcat(m, trans, m);
-    MTXMultVec(m, &out, &out);
-    evtSetFloat(event, LW(7), out.x);
-    evtSetFloat(event, LW(8), out.y);
-    evtSetFloat(event, LW(9), out.z);
-    evtSetFloat(event, LW(0), rot + angle);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(fune_eff) {
-    EffectEntry* eff1;
-    EffectEntry* eff2;
-    Vec pos;
-    f32 oldX, oldZ, speed;
-
-    if (isFirstCall) {
-        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
-        event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
-        mapObjGetPos("S_fune_m", &pos);
-        event->userdataf[2] = pos.x;
-        *(f32*)&event->field_84 = pos.z;
-    }
-    eff1 = event->userdatap[0];
-    eff2 = event->userdatap[1];
-    oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->field_84;
-    mapObjGetPos("S_fune_m", &pos);
-    event->userdataf[2] = pos.x;
-    *(f32*)&event->field_84 = pos.z;
-    speed = distABf(oldX, oldZ, pos.x, pos.z);
-    angleABf(oldX, oldZ, pos.x, pos.z);
-    if (evtGetValue(event, GSW(0)) == 2) {
-        speed = 2.0f;
-    }
-    ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x + 85.0f;
-    ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
-    ((f32*)eff1->userdata)[4] = speed;
-    ((f32*)eff1->userdata)[5] = 225.0f;
-    ((f32*)eff2->userdata)[1] = pos.x - 15.0f;
-    ((f32*)eff2->userdata)[2] = pos.y - 51.0f;
-    ((f32*)eff2->userdata)[3] = 90.0f + pos.z;
-    ((f32*)eff2->userdata)[4] = speed;
-    ((f32*)eff2->userdata)[5] = 180.0f;
-    if (speed > 1.0f && gp->retraceCount % 15 == 0) {
-        effWaterDamageN64Entry(5, 30, pos.x - 150.0f, pos.y - 50.0f, pos.z, 2.0f);
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(kaizoku_fune_eff) {
-    EffectEntry* eff;
-    Vec pos;
-    f32 oldX, oldZ, speed, angle, dir;
-
-    if (isFirstCall) {
-        event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
-        mapObjGetPos("S_b", &pos);
-        event->userdataf[2] = pos.x;
-        *(f32*)&event->field_84 = pos.z;
-    }
-    eff = event->userdatap[0];
-    oldX = event->userdataf[2];
-    oldZ = *(f32*)&event->field_84;
-    mapObjGetPos("S_b", &pos);
-    event->userdataf[2] = pos.x;
-    *(f32*)&event->field_84 = pos.z;
-    speed = distABf(oldX, oldZ, pos.x, pos.z);
-    angle = angleABf(oldX, oldZ, pos.x, pos.z);
-    if (angle < 180.0f) {
-        dir = 1.0f;
-    } else {
-        dir = -1.0f;
-    }
-    ((f32*)eff->userdata)[17] = 5.0f;
-    ((f32*)eff->userdata)[1] = 140.0f * dir + pos.x;
-    ((f32*)eff->userdata)[2] = pos.y - 160.0f;
-    ((f32*)eff->userdata)[3] = 40.0f + pos.z;
-    ((f32*)eff->userdata)[4] = speed;
-    if (angle < 180.0f) {
-        ((f32*)eff->userdata)[5] = 135.0f + angle;
-    } else {
-        ((f32*)eff->userdata)[5] = 45.0f + angle;
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(splash_eff) {
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-
-    effSplashEntry(0, x, y, z, 3.0f);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(marcoship_shizumu_func) {
-    f32 y = evtGetFloat(event, event->args[0]);
-
-    mapObjTranslate("S_a1", 0.0f, y, 0.0f);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(mist_func) {
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-    BOOL done = FALSE;
-    EffectEntry* eff;
-
-    if (isFirstCall) {
-        x += irand(150) - 75;
-        y += irand(150) - 75;
-        z += irand(150) - 75;
-        event->userdatap[1] = effMistEntry(0, 0, x, y, z, 0.0f);
-        event->userdata[0] = 0;
-    }
-    eff = event->userdatap[1];
-    switch (event->userdata[0]) {
-        case 0:
-            event->savedTime = gp->renderTime;
-            event->userdata[2] = irand(1000) + 3000;
-            event->userdata[0] = 1;
-            break;
-        case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime) > event->userdata[2]) {
-                event->userdata[0] = 2;
-            }
-            break;
-        case 2:
-            done = TRUE;
-            break;
-    }
-    if (!done) {
-        return EVT_RETURN_BLOCK;
-    }
-    effSoftDelete(eff);
-    return EVT_RETURN_DONE;
-}
-
-void elmos1000tai_seq00(NanNpc* npc) {
-    s32 t;
-
-    switch (npc->state) {
-        case 0:
-            npc->time = gp->renderTime;
-            npc->duration = irand(1000) + npc->dist * 3;
-            npc->state = 1;
-        case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) >= npc->duration) {
-                npc->time = gp->renderTime;
-                npc->duration = 500;
-                npc->state = 2;
-            }
-            break;
-        case 2:
-            t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time);
-            if (t < npc->duration) {
-                npc->alpha = intplGetValue(0, t, npc->duration, 0.0f, 255.0f);
-            } else {
-                npc->state = 3;
-            }
-            break;
-    }
-}
-
-USER_FUNC(elmos1000tai_start) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
-    s32 i;
-
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->func = elmos1000tai_seq00;
-        npc->state = 0;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(elmos1000tai_init) {
-    NanNpcWork* wp = nanNPCWork;
-    s32 i;
-    NanNpc* npc;
-    s32 deg;
-    s32 a;
-    s32 r;
-    f32 dist;
-    f32 cs;
-    f32 rad;
-    f32 sn;
-    f32 fdeg;
-
-    wp->flags |= 1;
-    for (i = 0; i < wp->count; i++) {
-        npc = &wp->entries[i];
-        npc->npc->flags |= 4;
-        npc->alpha = 0;
-        npc->dir = 90.0f;
-        npc->index = i;
-        if (i % 3) {
-            deg = irand(140) + 110;
-        } else {
-            deg = irand(360);
-        }
-        fdeg = deg;
-        a = __abs(180 - deg);
-        npc->dist = 250;
-        r = 330;
-        if (a < 70) {
-            r = (70 - a) * 1000 / 70 + 330;
-        }
-        npc->dist += irand(r);
-        rad = 6.2831855f * fdeg / 360.0f;
-        dist = npc->dist;
-        sn = sin(rad);
-        cs = cos(rad);
-        npc->pos.x = 0.9f * (dist * sn);
-        npc->pos.y = 100.0f;
-        npc->pos.z = 0.5f * (dist * cs) - 100.0f;
-    }
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(alpha_set_func) {
-    *_ap = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(alpha_init_func) {
-    _ap = _mapAlloc(1);
-    *_ap = 255;
-    return EVT_RETURN_DONE;
-}
-
-static void alpha_tev(MapTevCallbackInfo* info) {
-    s32 stage = info->tevStage;
-    u8* alpha = _ap;
-
-    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
-    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
-    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
-    info->tevStage++;
-}
-
-USER_FUNC(evt_set_nami_anim_rate) {
-    mapAnimRate.namiTarget = evtGetFloat(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_set_fune_anim_rate) {
-    mapAnimRate.funeTarget = evtGetFloat(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_map_anim_rate) {
-    MapAnimRate* rate = &mapAnimRate;
-    f32 d;
-
-    if (isFirstCall) {
-        rate->fune = 1.0f;
-        rate->nami = 1.0f;
-        rate->funeTarget = 1.0f;
-        rate->namiTarget = 1.0f;
-    }
-    d = rate->funeTarget - rate->fune;
-    if (d >= 0.005f) {
-        d = 0.005f;
-    } else if (d <= -0.005f) {
-        d = -0.005f;
-    }
-    rate->fune += d;
-    d = rate->namiTarget - rate->nami;
-    if (d >= 0.005f) {
-        d = 0.005f;
-    } else if (d <= -0.005f) {
-        d = -0.005f;
-    }
-    rate->nami += d;
-    mapSetPlayRate("fune", rate->fune);
-    mapSetPlayRate("fune_01", rate->fune);
-    mapSetPlayRate("nami", rate->nami);
-    mapSetPlayRate("nami_02", rate->nami);
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(marcoship_stop_wait_func) {
-    return marcoship->stopped ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(marcoship_stop_func) {
-    marcoship->state = 2;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(marcoship_yure_func) {
-    MarcoShip* ms = marcoship;
-    s32* args = event->args;
-
-    switch (ms->state) {
-        case 0:
-            if (ms->speed > 0.0f) {
-                if (ms->angle > ms->max) {
-                    ms->speed *= -1.0f;
-                    ms->state = 1;
-                    ms->time = gp->renderTime;
-                    break;
-                }
-            } else if (ms->angle < -ms->max) {
-                ms->speed *= -1.0f;
-                ms->state = 1;
-                ms->time = gp->renderTime;
-                break;
-            }
-            ms->angle += ms->speed;
-            break;
-        case 1:
-            if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)ms->time) > 500) {
-                ms->state = 0;
-            }
-            break;
-        case 2:
-            if (ms->speed > 0.0f) {
-                if (ms->angle > 0.0f) {
-                    ms->state = 3;
-                    break;
-                }
-            } else if (ms->angle < 0.0f) {
-                ms->state = 3;
-                break;
-            }
-            ms->angle += ms->speed;
-            break;
-        case 3:
-            ms->angle = 0.0f;
-            ms->stopped = 1;
-            break;
-    }
-    evtSetFloat(event, args[0], ms->angle);
-    evtSetValue(event, args[1], ms->stopped);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(marcoship_yure_init_func) {
-    MarcoShip* ms;
-
-    marcoship = ms = _mapAlloc(sizeof(MarcoShip));
-    ms->angle = 0.0f;
-    ms->speed = 0.02f;
-    ms->max = 1.5f;
-    ms->stopped = 0;
-    ms->state = 0;
-    ms->time = 0;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(urouro_fuwafuwa_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 sx = evtGetValue(event, args[1]);
-    f32 sy = evtGetValue(event, args[2]);
-    f32 sz = evtGetValue(event, args[3]);
-    f32 ex = evtGetValue(event, args[4]);
-    f32 ey = evtGetValue(event, args[5]);
-    f32 ez = evtGetValue(event, args[6]);
-    s32 noDir = evtGetValue(event, args[7]);
-    s32 duration = evtGetValue(event, args[8]);
-    s32 mode = evtGetValue(event, args[9]);
-    NpcEntry* npc = evtNpcNameToPtr(event, name);
-    f32 tbl[32] = {
-        0.0f, 0.5f, 1.0f, 1.5f, 2.0f, 2.2f, 2.5f, 2.7f, 2.7f, 2.7f, 2.5f, 2.2f, 2.0f, 1.5f, 1.0f, 0.5f,
-        -0.0f, -0.5f, -1.0f, -1.5f, -2.0f, -2.2f, -2.5f, -2.7f, -2.7f, -2.7f, -2.5f, -2.2f, -2.0f, -1.5f, -1.0f, -0.5f,
-    };
-    s32 t;
-
-    if (isFirstCall) {
-        event->savedTime = gp->renderTime;
-    }
-    t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    if (t < duration) {
-        sx = intplGetValue(mode, t, duration, sx, ex);
-        sy = intplGetValue(mode, t, duration, sy, ey);
-        sz = intplGetValue(mode, t, duration, sz, ez);
-        if (!noDir) {
-            if (npc->position.x > sx) {
-                npc->direction = 270.0f;
-            } else {
-                npc->direction = 90.0f;
-            }
-        }
-        {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = sx;
-            pos.y = sy + tbl[sysMsec2Frame(t) & 31];
-            pos.z = sz;
-            npc->prevPosition = pos;
-            npc->position = npc->prevPosition;
-        }
-        return EVT_RETURN_BLOCK;
-    }
-    if (!noDir) {
-        if (npc->position.x > ex) {
-            npc->direction = 270.0f;
-        } else {
-            npc->direction = 90.0f;
-        }
-    }
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = ex;
-        pos.y = ey;
-        pos.z = ez;
-        npc->prevPosition = pos;
-        npc->position = npc->prevPosition;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(urouro_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 sx = evtGetValue(event, args[1]);
-    f32 sz = evtGetValue(event, args[2]);
-    f32 ex = evtGetValue(event, args[3]);
-    f32 ez = evtGetValue(event, args[4]);
-    s32 noDir = evtGetValue(event, args[5]);
-    s32 duration = evtGetValue(event, args[6]);
-    s32 mode = evtGetValue(event, args[7]);
-    NpcEntry* npc = evtNpcNameToPtr(event, name);
-    s32 t;
-
-    if (isFirstCall) {
-        event->savedTime = gp->renderTime;
-    }
-    t = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    if (t < duration) {
-        sx = intplGetValue(mode, t, duration, sx, ex);
-        sz = intplGetValue(mode, t, duration, sz, ez);
-        if (!noDir) {
-            if (npc->position.x > sx) {
-                npc->direction = 270.0f;
-            } else {
-                npc->direction = 90.0f;
-            }
-        }
-        npc->position.x = npc->prevPosition.x = sx;
-        npc->position.z = npc->prevPosition.z = sz;
-        return EVT_RETURN_BLOCK;
-    }
-    if (!noDir) {
-        if (npc->position.x > ex) {
-            npc->direction = 270.0f;
-        } else {
-            npc->direction = 90.0f;
-        }
-    }
-    npc->position.x = npc->prevPosition.x = ex;
-    npc->position.z = npc->prevPosition.z = ez;
-    return EVT_RETURN_DONE;
 }
 

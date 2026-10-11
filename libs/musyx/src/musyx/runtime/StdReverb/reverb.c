@@ -1,18 +1,24 @@
-#include <math.h>
+// skip <math.h> (pulled in by musyx.h): its inline sqrt/sqrtf emit unused localstatics into .sdata2
+#define _MATH_H_
 #include <string.h>
 
 #include "musyx/musyx.h"
 
 #include "musyx/sal.h"
 
-static void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {
+// TTYD symbols.txt names this static U_HandleReverb (avoids clashing with creverb.c's HandleReverb)
+#define HandleReverb U_HandleReverb
+
+extern double pow(double x, double y);
+
+static inline void DLsetdelay(_SND_REVHI_DELAYLINE* delayline, s32 len) {
   delayline->outPoint = delayline->inPoint - (len * sizeof(f32));
   while (delayline->outPoint < 0) {
     delayline->outPoint += delayline->length;
   }
 }
 
-static void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
+static inline void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
   delayline->length = (s32)length * sizeof(f32);
   delayline->inputs = (f32*)salMalloc(length * sizeof(f32));
   memset(delayline->inputs, 0, length * sizeof(length));
@@ -22,7 +28,7 @@ static void DLcreate(_SND_REVHI_DELAYLINE* delayline, s32 length) {
   delayline->outPoint = 0;
 }
 
-static void DLdelete(_SND_REVHI_DELAYLINE* delayline) { salFree(delayline->inputs); }
+static inline void DLdelete(_SND_REVHI_DELAYLINE* delayline) { salFree(delayline->inputs); }
 bool ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32 damping,
                     f32 preDelay, f32 crosstalk) {
   static int lens[] = {1789, 1999, 2333, 433, 149, 47, 73, 67};
@@ -40,7 +46,7 @@ bool ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32
     for (i = 0; i < 3; ++i) {
       DLcreate(&rev->C[i + k * 3], lens[i] + 2);
       DLsetdelay(&rev->C[i + k * 3], lens[i]);
-      rev->combCoef[i + k * 3] = powf(10.f, (lens[i] * -3) / (32000.f * time));
+      rev->combCoef[i + k * 3] = pow(10.f, (lens[i] * -3) / (32000.f * time));
     }
 
     for (i = 0; i < 2; ++i) {
@@ -79,6 +85,7 @@ bool ReverbHICreate(_SND_REVHI_WORK* rev, f32 coloration, f32 time, f32 mix, f32
   return TRUE;
 }
 
+#if 0 // stripped in TTYD
 bool ReverbHIModify(struct _SND_REVHI_WORK* rv, float coloration, float time, float mix,
                     float damping, float preDelay, float crosstalk) {
   u8 i; // r30
@@ -116,6 +123,8 @@ bool ReverbHIModify(struct _SND_REVHI_WORK* rv, float coloration, float time, fl
   return ReverbHICreate(rv, coloration, time, mix, damping, preDelay, crosstalk);
 }
 
+#endif
+
 #ifdef __MWERKS__
 static const float value0_3 = 0.3f;
 static const float value0_6 = 0.6f;
@@ -136,13 +145,17 @@ static asm void DoCrossTalk(s32* a, s32* b, f32 start, f32 end) {
   stw r5, 0x20(r1)
   ps_merge00 f3, f2, f1
   ps_merge00 f4, f1, f2
+#if MUSY_VERSION < MUSY_VERSION_CHECK(2, 0, 3)
   lis r5, value0_6@ha
   lfs f5, value0_6@l(r5)
+#endif
   li r5, 0x4f
   mtctr r5
   li r10, -0x8
   li r11, -0x4
+#if MUSY_VERSION < MUSY_VERSION_CHECK(2, 0, 3)
   ps_muls0 f4, f4, f5
+#endif
   lwz r6, 0x0(r3)
   lwz r7, 0x0(r4)
   xoris r6, r6, 0x8000
@@ -618,6 +631,7 @@ void ReverbHICallback(s32* left, s32* right, s32* surround, SND_AUX_REVERBHI* re
   }
 }
 
+#if 0 // stripped in TTYD
 void ReverbHIFree(_SND_REVHI_WORK* rv) {
   u8 i;
   for (i = 0; i < 9; ++i) {
@@ -632,3 +646,4 @@ void ReverbHIFree(_SND_REVHI_WORK* rv) {
     }
   }
 }
+#endif

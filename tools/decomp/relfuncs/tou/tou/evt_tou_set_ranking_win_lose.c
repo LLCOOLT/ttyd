@@ -41,8 +41,8 @@ USER_FUNC(evt_tou_set_ranking_win_lose) {
     max = -1000;
     for (i = 0; i < rank_wp->num; i++) {
         if (!(rank_wp->entries[i].flags & 2)) {
-            r = rand() % 4;
-            rank_wp->entries[i].score += r + rand() % 4 - 3;
+            r = rand() % 4 + rand() % 4;
+            rank_wp->entries[i].score += r - 3;
             if (rank_wp->entries[i].score < min) {
                 min = rank_wp->entries[i].score;
             }

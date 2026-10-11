@@ -28,11 +28,11 @@
 // decl: typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
 // decl: typedef struct CreditNpc { const char* agb; const char* anim; s32* evt; } CreditNpc;
 // decl: typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
-// decl: EndMoa* unk_end_bss00000000;
-// decl: EndExtData* unk_end_bss00000004;
-// decl: s32* unk_end_bss00000008;
-// decl: s32 (*unk_end_bss0000000c)[2];
 // decl: EndWork unk_end_bss00000010;
+// decl: s32 (*unk_end_bss0000000c)[2];
+// decl: s32* unk_end_bss00000008;
+// decl: EndExtData* unk_end_bss00000004;
+// decl: EndMoa* unk_end_bss00000000;
 // decl: extern EndWork* dat_ptr_end_00003218;
 // decl: extern CreditMsg unk_end_0000321c[50];
 // decl: extern CreditNpc R_credits_npc_info[152];
@@ -51,6 +51,7 @@
 // decl: void extLoadTextureExit(void);
 // decl: int rand(void);
 // decl: double tan(double x);
+// decl: static inline f32 tanf(f32 x) { return tan(x); }
 // decl: s32 EXIGetType(s32 chan, u32 dev, u32* type);
 // decl: void L_animPoseWorldPositionEvalOff(s32 poseId);
 // decl: void animPoseVivianMain(s32 poseId, Vec* pos);
@@ -60,19 +61,19 @@
 // decl: void JUTFontSetup(s32 mode);
 // proto: void unk_end_00001324(CameraId cameraId, void* param);
 void unk_end_00001324(CameraId cameraId, void* param) {
-    CameraEntry* cam = camGetPtr(cameraId);
-    s32 id = evtGetValue(NULL, GW(11));
-    s32 pos = evtGetValue(NULL, GW(12));
     s32 i;
     f32 w;
     f32 h;
-    Vec target;
-    Vec up;
+    CameraEntry* cam = camGetPtr(cameraId);
+    s32 id = evtGetValue(NULL, GW(11));
+    s32 pos = evtGetValue(NULL, GW(12));
     Vec camPos;
+    Vec up;
+    Vec target;
     GXTexObj obj;
-    Mtx lookAt;
-    Mtx scale;
     Mtx mtx;
+    Mtx scale;
+    Mtx lookAt;
 
     if (dat_ptr_end_00003218->tpl == NULL) {
         return;
@@ -172,18 +173,21 @@ void unk_end_00001324(CameraId cameraId, void* param) {
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         w = GXGetTexObjWidth(&obj);
         h = GXGetTexObjHeight(&obj);
-        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+        GXPosition3f32(-w / 2.0f, h / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+        GXPosition3f32(w / 2.0f, h / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(w / 2.0f, -h / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);
         GXEnd();
     }
     if (dat_ptr_end_00003218->alpha2 > 0) {
-        camPos = (Vec){0.0f, 0.0f, 240.0f / (f32)tan(0.21816615760326385)};
+        f32 w2;
+        f32 h2;
+
+        camPos = (Vec){0.0f, 0.0f, 240.0f / tanf(0.21816616f)};
         up = (Vec){0.0f, 1.0f, 0.0f};
         target = (Vec){0.0f, 0.0f, 0.0f};
         GXSetNumTevStages(1);
@@ -201,15 +205,15 @@ void unk_end_00001324(CameraId cameraId, void* param) {
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        w = GXGetTexObjWidth(&obj);
-        h = GXGetTexObjHeight(&obj);
-        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+        w2 = GXGetTexObjWidth(&obj);
+        h2 = GXGetTexObjHeight(&obj);
+        GXPosition3f32(-w2 / 2.0f, h2 / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+        GXPosition3f32(w2 / 2.0f, h2 / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(w2 / 2.0f, -h2 / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(-w2 / 2.0f, -h2 / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);
         GXEnd();
     }

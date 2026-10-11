@@ -32,7 +32,7 @@ typedef struct SmartWork {
 	smartEntry* field_0xE00C; //0xE00C
 	smartEntry* head; //0xE010
 	smartEntry* tail; //0xE014
-	u32 waitsync; //0xE018
+	s32 waitsync; //0xE018
 } SmartWork;
 
 void memInit(void);
@@ -44,7 +44,7 @@ void* _mapAllocTail(u32 size);
 void _mapFree(void* alloc);
 void smartInit(void);
 void smartReInit(void);
-void smartAutoFree(u32 a1);
+void smartAutoFree(s32 a1);
 void smartFree(smartEntry* entry);
 smartEntry* smartAlloc(u32 size, u8 type);
 GXTexObj* smartTexObj(GXTexObj* obj, void** image_ptr);

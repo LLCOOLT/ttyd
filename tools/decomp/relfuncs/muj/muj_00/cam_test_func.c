@@ -9,8 +9,12 @@ USER_FUNC(cam_test_func) {
     f32 rad = 6.2831855f * angle / 360.0f;
     f32 s = sin(rad);
     f32 c = cos(rad);
+    Vec center;
 
-    evtSetValue(event, args[0], dist * s + 70.0f);
-    evtSetValue(event, args[1], 0.0f - dist * c);
+    center.x = 70.0f;
+    center.y = 110.0f;
+    center.z = 0.0f;
+    evtSetValue(event, *args++, center.x + dist * s);
+    evtSetValue(event, *args++, center.z - dist * c);
     return EVT_RETURN_DONE;
 }

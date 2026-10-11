@@ -9,13 +9,16 @@
 // proto: void gundan1000tai_seq00(NanNpc* npc);
 void gundan1000tai_seq00(NanNpc* npc) {
     MarioWork* mario = marioGetPtr();
+    s32 wait;
     f32 dist;
+    f32 speed;
     f32 angle;
 
     switch (npc->state) {
         case 0:
             npc->time = gp->renderTime;
-            npc->work6C = (npc->work74 % 6) * 500 + irand(500);
+            wait = (npc->work74 % 6) * 500;
+            npc->work6C = wait + irand(500);
             npc->state++;
         case 1:
             if ((s32)OSTicksToMilliseconds((u32)gp->renderTime - (u32)npc->time) > npc->work6C) {
@@ -25,9 +28,11 @@ void gundan1000tai_seq00(NanNpc* npc) {
         case 2:
             dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
             angle = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            npc->work78 = sysFrame2SecFloat((dist * 0.5f + (irand(180) + 180)) * 0.5f);
+            speed = dist / 2.0f + (irand(180) + 180);
+            speed = sysFrame2SecFloat(speed / 2.0f);
+            npc->work78 = speed;
             npc->work7C = angle;
-            npc->work70 = dist / npc->work78;
+            npc->work70 = dist / speed;
             npc->work6C = 0;
             npc->workA4 = 0;
             evt_nannpc_set_animtbl_sub(npc, dai3_run_animtbl);

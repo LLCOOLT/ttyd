@@ -545,8 +545,8 @@ void zakogun_ext_main2(void) {
     BattleUnit* unit = zakogun_get_ptr();
     ExtPose* pose = extGetPosePtr();
     BattleStageObject* body;
-    ZakoGun* zako;
     s32 i;
+    ZakoGun* zako;
     f32 x, y, z;
     Mtx m;
     const char* se1;
@@ -557,9 +557,9 @@ void zakogun_ext_main2(void) {
         return;
     }
     body = BattleSearchObjectPtr("if_body");
-    se1 = "SFX_BOSS_TEAM_3RD_ATTACK2";
-    se2 = "SFX_BOSS_TEAM_3RD_MOVE_CAILING2";
-    se3 = se1;
+    se1 = (0, "SFX_BOSS_TEAM_3RD_ATTACK2");
+    se2 = (0, "SFX_BOSS_TEAM_3RD_MOVE_CAILING2");
+    se3 = "SFX_BOSS_TEAM_3RD_ATTACK2";
     for (i = 0; i < 25; i++, pose++) {
         zako = &zakogun[i];
         pose->frame = zako->poseBase + zako->poseCount / zako->poseDiv;

@@ -10,6 +10,7 @@
 // decl: ExtPose* extGetPosePtr(void);
 // decl: s32 extGetPoseNum(void);
 // proto: static void pose_change(Kyaku* kyaku, const char* name, const char* anim);
+#pragma dont_inline on
 static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
     KyakuAnim* a;
     s32 i;
@@ -24,3 +25,4 @@ static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
         kyaku->time = gp->renderTime + rand();
     }
 }
+#pragma dont_inline reset

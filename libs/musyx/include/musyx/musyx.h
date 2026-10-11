@@ -387,6 +387,8 @@ typedef u16 SND_INSTID; // Virtual sample instance ID
 typedef struct SND_VIRTUALSAMPLE_INFO {
   SND_VSID smpID;    // ID of sample to be streamed
   SND_INSTID instID; // ID of this instance of the stream
+  u32 pubID;
+  u32 seqInstID;
 
   union vsData {
     struct vsUpdate { // Buffer update info
@@ -395,6 +397,7 @@ typedef struct SND_VIRTUALSAMPLE_INFO {
       u32 off2;
       u32 len2;
     } update;
+    u32 extraData;
   } data;
 } SND_VIRTUALSAMPLE_INFO;
 

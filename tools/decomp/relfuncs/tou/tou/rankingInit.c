@@ -33,7 +33,7 @@ static void rankingInit(void) {
         }
         if (swGet(0x9E1)) {
             for (j = 0; j < 2; j++) {
-                entry->sw[j] = swByteGet(entry->id * 2 + j + 0x207);
+                entry->sw[j] = swByteGet(j + (entry->id * 2 + 0x207));
             }
         } else {
             entry->score = fighterDt[entry->id].score;

@@ -1,7 +1,13 @@
 #include "evt/evt_audience.h"
 #include "battle/battle_audience.h"
 #include "system.h"
-#include <math.h>
+#include "manager/evtmgr_cmd.h"
+double sqrt(double);
+
+extern void BattleAudienceJoyEnding(void);
+extern void BattleAudience_Case_AcrobatNoTry(void);
+extern void BattleAudienceAddTargetNum(f32 a, f32 b);
+extern void BattleAudienceSoundCheer(s32 a, s32 b);
 
 //s32* mask
 USER_FUNC(evt_audience_base_flag_on) {
@@ -18,10 +24,12 @@ USER_FUNC(evt_audience_base_flag_on) {
 USER_FUNC(evt_audience_flag_check) {
 	s32* args = event->args;
 	s32 id, flags;
+	u32 fl;
 
 	id = evtGetValue(event, args[0]);
 	flags = evtGetValue(event, args[1]);
-	if (BattleAudienceGetPtr(id)->flags & flags) {
+	fl = BattleAudienceGetPtr(id)->flags;
+	if (fl & flags) {
 		evtSetValue(event, args[2], TRUE);
 	}
 	else {
@@ -135,13 +143,11 @@ USER_FUNC(evt_audience_move_position_frame) {
 		member->interpFramesTotal = frames;
 	}
 	compare = member->targetPosX - member->startPosX;
-	if (compare <= 0.0f) {
-		if (compare < 0.0f) {
-			member->field_0xE8 = 0.0f;
-		}
-	}
-	else {
+	if (compare > 0.0f) {
 		member->field_0xE8 = 180.0f;
+	}
+	else if (compare < 0.0f) {
+		member->field_0xE8 = 0.0f;
 	}
 	x = intplGetValue(
 		member->interpType,
@@ -162,13 +168,12 @@ USER_FUNC(evt_audience_move_position_frame) {
 		member->startPosZ,
 		member->targetPosZ);
 	BattleAudience_SetPosition(id, x, y, z);
-	if (--member->interpFramesLeft > 0) {
-		return EVT_RETURN_BLOCK;
-	}
-	else {
+	member->interpFramesLeft--;
+	if (member->interpFramesLeft <= 0) {
 		BattleAudience_SetPosition(id, member->targetPosX, member->targetPosY, member->targetPosZ);
 		return EVT_RETURN_DONE;
 	}
+	return EVT_RETURN_BLOCK;
 }
 
 //s32* memberId, f32* targetX, f32* targetY, f32* targetZ, f32* interpSpeed
@@ -196,38 +201,36 @@ USER_FUNC(evt_audience_move_position_speed) {
 		delta = (f32)sqrt((amountX * amountX) + (amountY * amountY) + (amountZ * amountZ));
 
 		frames = (s32)(delta / speed);
-		if (amountX == 0.0f) {
-			member->interpDelta.x = 0.0f;
-		}
-		else {
+		if (amountX != 0.0f) {
 			member->interpDelta.x = speed * (amountX / delta);
 		}
-		
-		if (amountY == 0.0f) {
-			member->interpDelta.y = 0.0f;
-		}
 		else {
+			member->interpDelta.x = 0.0f;
+		}
+		
+		if (amountY != 0.0f) {
 			member->interpDelta.y = speed * (amountY / delta);
 		}
+		else {
+			member->interpDelta.y = 0.0f;
+		}
 		
-		if (amountZ == 0.0f) {
-			member->interpDelta.z = 0.0f;
+		if (amountZ != 0.0f) {
+			member->interpDelta.z = speed * (amountZ / delta);
 		}
 		else {
-			member->interpDelta.z = speed * (amountZ / delta);
+			member->interpDelta.z = 0.0f;
 		}
 		member->interpFramesLeft = frames;
 		member->interpFramesTotal = frames;
 	}
 
 	compare = member->interpDelta.x;
-	if (compare <= 0.0f) {
-		if (compare < 0.0f) {
-			member->field_0xE8 = 0.0f;
-		}
-	}
-	else {
+	if (compare > 0.0f) {
 		member->field_0xE8 = 180.0f;
+	}
+	else if (compare < 0.0f) {
+		member->field_0xE8 = 0.0f;
 	}
 
 	BattleAudience_SetPosition(
@@ -243,13 +246,11 @@ USER_FUNC(evt_audience_move_position_speed) {
 		member->interpFramesLeft++;
 	}
 
-	if (member->interpFramesLeft) {
-		return EVT_RETURN_BLOCK;
-	}
-	else {
+	if (member->interpFramesLeft == 0) {
 		BattleAudience_SetPosition(id, member->targetPosX, member->targetPosY, member->targetPosZ);
 		return EVT_RETURN_DONE;
 	}
+	return EVT_RETURN_BLOCK;
 }
 
 //s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* deltaY
@@ -269,13 +270,13 @@ USER_FUNC(evt_audience_jump_position_firstsp) {
 	deltaY = evtGetFloat(event, args[5]);
 	member = BattleAudienceGetPtr(id);
 	if (isFirstCall) {
-		amountX = (targetX - member->position.x) / (f32)frames;
+		amountX = targetX - member->position.x;
 		amountY = targetY - member->position.y;
 		amountZ = targetZ - member->position.z;
 		member->targetPosX = targetX;
 		member->targetPosY = targetY;
 		member->targetPosZ = targetZ;
-		member->interpDelta.x = amountX;
+		member->interpDelta.x = amountX / (f32)frames;
 		member->interpDelta.y = deltaY;
 		member->interpDelta.z = amountZ / (f32)frames;
 		member->interpGravity = (2.0f * -((deltaY * (f32)frames) - amountY)) / (f32)(frames * frames);
@@ -290,13 +291,12 @@ USER_FUNC(evt_audience_jump_position_firstsp) {
 		member->position.z + member->interpDelta.z);
 
 	member->interpDelta.y += member->interpGravity;
-	if (--member->interpFramesLeft > 0) {
-		return EVT_RETURN_BLOCK;
-	}
-	else {
+	member->interpFramesLeft--;
+	if (member->interpFramesLeft <= 0) {
 		BattleAudience_SetPosition(id, member->targetPosX, member->targetPosY, member->targetPosZ);
 		return EVT_RETURN_DONE;
 	}
+	return EVT_RETURN_BLOCK;
 }
 
 //s32* memberId, f32* targetX, f32* targetY, f32* targetZ, s32* numFrames, f32* gravity
@@ -317,14 +317,14 @@ USER_FUNC(evt_audience_jump_position_gravity) {
 	member = BattleAudienceGetPtr(id);
 	if (isFirstCall) {
 		amountX = targetX - member->position.x;
-		amountY = (targetY - member->position.y) / (f32)frames;
+		amountY = targetY - member->position.y;
 		amountZ = targetZ - member->position.z;
 		deltaY = 0.5f * gravity;
 		member->targetPosX = targetX;
 		member->targetPosY = targetY;
 		member->targetPosZ = targetZ;
 		member->interpDelta.x = amountX / (f32)frames;
-		member->interpDelta.y = -(deltaY * (f32)frames) - amountY;
+		member->interpDelta.y = amountY / (f32)frames - (deltaY * (f32)frames);
 		member->interpDelta.z = amountZ / (f32)frames;
 		member->interpGravity = gravity;
 		member->interpFramesLeft = frames;
@@ -338,13 +338,12 @@ USER_FUNC(evt_audience_jump_position_gravity) {
 		member->position.z + member->interpDelta.z);
 
 	member->interpDelta.y += member->interpGravity;
-	if (--member->interpFramesLeft > 0) {
-		return EVT_RETURN_BLOCK;
-	}
-	else {
+	member->interpFramesLeft--;
+	if (member->interpFramesLeft <= 0) {
 		BattleAudience_SetPosition(id, member->targetPosX, member->targetPosY, member->targetPosZ);
 		return EVT_RETURN_DONE;
 	}
+	return EVT_RETURN_BLOCK;
 }
 
 //s32* memberId, s32* animId, BOOL* force
@@ -368,7 +367,7 @@ USER_FUNC(evt_audience_entry) {
 	args = event->args;
 	id = evtGetValue(event, args[0]);
 	type = (AudienceMemberType)evtGetValue(event, args[1]);
-	if (BattleAudience_Entry(id, type, 0)) {
+	if (BattleAudience_Entry(id, type, 0) == 1) {
 		BattleAudience_SetAnim(id, 1, TRUE);
 	}
 	return EVT_RETURN_DONE;
@@ -392,9 +391,10 @@ USER_FUNC(evt_audience_reflesh_natural_all) {
 	chance = evtGetValue(event, args[0]);
 	evtGetValue(event, args[1]); //unused
 	evtGetValue(event, args[2]); //unused
+	i = 0;
 	member = BattleAudienceGetPtr(0);
-	for (i = 0; i < 200; i++, member++) {
-		if (member->flags & 1 && member->status == 13 && member->field_0x4 == 1 && chance > irand(100)) {
+	for (; i < 200; i++, member++) {
+		if (member->flags & 1 && member->status == 13 && member->field_0x4 == 1 && irand(100) < chance) {
 			member->field_0x4 = 2;
 		}
 	}
@@ -410,14 +410,41 @@ USER_FUNC(evt_audience_abnormal_natural_all) {
 	chance = evtGetValue(event, args[0]);
 	evtGetValue(event, args[1]); //unused
 	evtGetValue(event, args[2]); //unused
+	i = 0;
 	member = BattleAudienceGetPtr(0);
-	for (i = 0; i < 200; i++, member++) {
-		if (BattleAudience_GetSysCtrl(i)) {
+	for (; i < 200; i++, member++) {
+		if ((u8)BattleAudience_GetSysCtrl(i)) {
 			status = member->status;
-			if ((status <= 3 || status - 4 <= 2 || status == 7) && chance > irand(100)) {
+			if ((status <= 3 || (u8)(status - 4) <= 2 || status == 7) && irand(100) < chance) {
 				BattleAudience_ChangeStatus(i, 13);
 			}
 		}
 	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_audience_sound_cheer) {
+	s32* args = event->args;
+	s32 a, b;
+
+	a = evtGetValue(event, args[0]);
+	b = evtGetValue(event, args[1]);
+	BattleAudienceSoundCheer(a, b);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_audience_num_updown_in_event) {
+	f32 v = evtGetFloat(event, *event->args);
+	BattleAudienceAddTargetNum(0.0f, v);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_audience_acrobat_notry) {
+	BattleAudience_Case_AcrobatNoTry();
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_audience_joy_ending) {
+	BattleAudienceJoyEnding();
 	return EVT_RETURN_DONE;
 }

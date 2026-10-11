@@ -19,6 +19,7 @@
 // decl: static void moamoa_pose_init(void);
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
+// decl: #pragma inline_max_total_size(100000)
 // decl: static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 // decl: static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 // include: mario/mario.h
@@ -45,7 +46,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (pose->mtx[1][3] > mario->position.y + mario->wPlayerCollisionBox.y) {
         return 0;
     }
-    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) * 0.5f
+    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
         && wp->field_0x558 < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
@@ -91,7 +92,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     e = (Vec){mario->position.x, pose->mtx[1][3], mario->position.z};
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-    range = (20.0f + mario->wPlayerCollisionBox.x) * 0.5f;
+    range = (20.0f + mario->wPlayerCollisionBox.x) / 2;
     if (PSVECDistance(&e, &f) < range) {
         pose->mtx[0][3] = moa->field_0x28;
         pose->mtx[2][3] = moa->field_0x2c;

@@ -22,9 +22,11 @@ void monitor_tev(MapTevCallbackInfo* info) {
         GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
         {
             GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+            GXColor tmp;
 
             color.a = gans_wp->alpha;
-            GXSetTevColor(GX_TEVREG0, color);
+            tmp = color;
+            GXSetTevColor(GX_TEVREG0, tmp);
         }
         info->tevStage = 2;
         info->texMap = 2;

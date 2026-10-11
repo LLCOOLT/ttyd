@@ -1,6 +1,6 @@
 // include: mario/mario.h
 // decl: typedef struct Senkaron { s8 state; u16 area; s32 timer; f32 vx; f32 vy; f32 vz; u32 flags; } Senkaron;
-// decl: typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; s32 field_C; s32 marioPushed; s32 field_14; Senkaron* sk; } SenkaronWork;
+// decl: typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; u32 frameCount; s32 marioPushed; s32 hammerFrame; Senkaron* sk; } SenkaronWork;
 // decl: SenkaronWork* skwp;
 // decl: typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 // decl: ExtPose* extGetPosePtr(void);
@@ -19,7 +19,7 @@ void move_check(ExtPose* pose, s32 idx) {
     cnt = extGetPoseNum() - (idx + 1);
     if (sk[idx].state == 1) {
         pose2 = pose + 1;
-        for (j = idx + 1; cnt != 0; cnt--, j++, pose2++) {
+        for (j = idx + 1; cnt != 0; j++, pose2++, cnt--) {
             if (sk[j].state == 1 && sk[j].area == sk[idx].area) {
                 f32 dx1 = __fabsf(pose->mtx[0][3] - mario->position.x);
                 f32 dz1 = __fabsf(pose->mtx[2][3] - mario->position.z);

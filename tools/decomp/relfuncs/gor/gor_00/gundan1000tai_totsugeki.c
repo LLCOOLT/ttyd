@@ -4,12 +4,14 @@
 // decl: void gundan1000tai_seq01(NanNpc* npc);
 // proto: USER_FUNC(gundan1000tai_totsugeki);
 USER_FUNC(gundan1000tai_totsugeki) {
-    NanNpcWork* wp = nanNPCWork;
     s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < wp->count; i++) {
-        wp->entries[i].func = gundan1000tai_seq01;
-        wp->entries[i].state = 0;
+        npc = &wp->entries[i];
+        npc->func = gundan1000tai_seq01;
+        npc->state = 0;
     }
     return EVT_RETURN_DONE;
 }

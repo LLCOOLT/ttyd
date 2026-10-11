@@ -413,19 +413,20 @@ USER_FUNC(dai3_butai_main_func) {
     f32 cx = evtGetValue(event, args[2]);
     f32 cz = evtGetValue(event, args[3]);
     s32 d = b - a;
-    NanNpcWork* wp = nanNPCWork;
     s32 i;
     NanNpc* npc;
     f32 r;
     f32 rad;
     f32 s;
     f32 c;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < 100; i++) {
         npc = &wp->entries[i + 205];
         npc->angle += d;
         r = npc->radius;
-        rad = 3.141592f * npc->angle / 180.0f;
+        rad = npc->angle;
+        rad = 3.141592f * rad / 180.0f;
         s = sin(rad);
         c = cos(rad);
         npc->pos.x = r * s + cx;
@@ -441,19 +442,20 @@ USER_FUNC(kaizoku_main_func) {
     f32 cx = evtGetValue(event, args[2]);
     f32 cz = evtGetValue(event, args[3]);
     s32 d = b - a;
-    NanNpcWork* wp = nanNPCWork;
     s32 i;
     NanNpc* npc;
     f32 r;
     f32 rad;
     f32 s;
     f32 c;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < 95; i++) {
         npc = &wp->entries[i + 10];
         npc->angle += d;
         r = npc->radius;
-        rad = 3.141592f * npc->angle / 180.0f;
+        rad = npc->angle;
+        rad = 3.141592f * rad / 180.0f;
         s = sin(rad);
         c = cos(rad);
         npc->pos.x = r * s + cx;
@@ -463,10 +465,11 @@ USER_FUNC(kaizoku_main_func) {
         npc = &wp->entries[i + 105];
         npc->angle += d;
         r = npc->radius;
-        rad = 3.141592f * npc->angle / 180.0f;
+        rad = npc->angle;
+        rad = 3.141592f * rad / 180.0f;
         s = sin(rad);
         c = cos(rad);
-        npc->pos.x = r * s + cx;
+        npc->pos.x = s * r + cx;
         npc->pos.z = r * c + cz;
     }
     return EVT_RETURN_DONE;
@@ -526,10 +529,6 @@ USER_FUNC(mario_main_func) {
     NpcEntry* npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
     NpcEntry* npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
     f32 d = b - a;
-    f32 rad;
-    f32 r;
-    f32 x;
-    f32 z;
 
     ORBIT(0, mario->position);
     ORBIT(1, party->position);
@@ -3223,6 +3222,22 @@ static EVT_BEGIN(ship_pera)
     RETURN
 EVT_END()
 
+static USER_FUNC(scale_func) {
+    f32 s = evtGetFloat(event, event->args[0]);
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(0);
+    PartyEntry* party2 = partyGetPtr(1);
+
+    mario->scale = (Vec){s, s, s};
+    if (party != NULL) {
+        party->scale = (Vec){s, s, s};
+    }
+    if (party2 != NULL) {
+        party2->scale = (Vec){s, s, s};
+    }
+    return EVT_RETURN_DONE;
+}
+
 EVT_BEGIN(muj_gor_ship_start)
     CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG5_GHOST_SHIP1"))
     BEGIN_INLINE_EVENT
@@ -3503,19 +3518,4 @@ s32 muj_00_init_evt[] = {
     1, 0, 2, 1,
 };
 
-static USER_FUNC(scale_func) {
-    f32 s = evtGetFloat(event, event->args[0]);
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(0);
-    PartyEntry* party2 = partyGetPtr(1);
-
-    mario->scale = (Vec){s, s, s};
-    if (party != NULL) {
-        party->scale = (Vec){s, s, s};
-    }
-    if (party2 != NULL) {
-        party2->scale = (Vec){s, s, s};
-    }
-    return EVT_RETURN_DONE;
-}
 

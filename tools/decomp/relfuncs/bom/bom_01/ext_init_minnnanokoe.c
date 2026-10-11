@@ -16,8 +16,8 @@
 // decl: #define EXT_DATA ((ExtAnimDef*)ext_data)
 // decl: ExtPose* extGetPosePtr(void);
 // decl: s32 extGetPoseNum(void);
-// decl: static inline void bom_set_anim(s32 i, const char* name) { BomWork* wp = lp->address; s32 j = 0; BomAnim* a; for (a = wp->anims; j < wp->animCount; j++, a++) { if (strcmp(a->name, name) == 0) { break; } } if (j < wp->animCount && wp->bom[i].anim != j) { wp->bom[i].anim = (s16)j; wp->bom[i].time = gp->renderTime + rand(); } }
-// decl: static inline void bom_init_anim(void) { BomWork* wp; ExtAnimDef* def; char buf[32]; s32 i; s32 start; i = 0; wp = lp->address; def = EXT_DATA; strcpy(buf, ""); wp->animCount = -1; do { if (strcmp(def->name, buf) != 0) { strcpy(buf, def->name); wp->animCount++; start = i; } strcpy(wp->anims[wp->animCount].name, buf); wp->anims[wp->animCount].start = start; wp->anims[wp->animCount].count = i - start + 1; i++; wp->anims[wp->animCount].time = def->time; } while ((++def)->file != NULL); wp->animCount++; }
+// decl: static void pose_change(s32 i, const char* name);
+// decl: static void pose_init(void);
 // proto: void ext_init_minnnanokoe(void);
 void ext_init_minnnanokoe(void) {
     s32 i;
@@ -30,7 +30,7 @@ void ext_init_minnnanokoe(void) {
     wp = lp->address;
     memset(wp, 0, sizeof(BomWork));
     wp->count = extGetPoseNum();
-    bom_init_anim();
+    pose_init();
 
     pose = extGetPosePtr();
     for (i = 0; i < wp->count; i++, pose++) {
@@ -45,6 +45,6 @@ void ext_init_minnnanokoe(void) {
         pose->mtx[1][3] = 0.0f;
         pose->mtx[2][3] = z;
         pose->rot = 270.0f;
-        bom_set_anim(i, "S_1");
+        pose_change(i, "S_1");
     }
 }

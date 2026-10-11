@@ -19,7 +19,6 @@ void BattleAudience_Case_Escape_Good(void);
 s32 BattleDamageDirect(s32 attackerId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage,
                        u32 flags, s32 code, u32 counter);
 
-
 static USER_FUNC(_anime_load);
 static USER_FUNC(_anime_load_wait);
 USER_FUNC(_backfire);
@@ -615,53 +614,6 @@ EVT_BEGIN(btldefaultevt_ChangeParty)
     RETURN
 EVT_END()
 
-USER_FUNC(_get_flower_suitoru_point) {
-    s32* args = event->args;
-    s32 id = args[0];
-    BattleWork* wp = _battleWorkPointer;
-    s32 out = args[1];
-
-    BattleUnit* unit;
-    s32 point;
-
-    unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
-    point = 0;
-    if (unit) {
-        point = unit->badgesEquipped.FpDrain;
-        if (point > BTL_UNIT_280(unit)) {
-            point = BTL_UNIT_280(unit);
-        }
-    }
-    evtSetValue(event, out, point);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_get_heart_suitoru_point) {
-    BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
-    s32 out = args[1];
-    BattleUnit* unit;
-    s32 point;
-
-    unit = BattleGetUnitPtr(wp, BattleTransID(event, args[0]));
-    point = 0;
-    if (unit) {
-        point = unit->badgesEquipped.HpDrain;
-        if (point > BTL_UNIT_280(unit)) {
-            point = BTL_UNIT_280(unit);
-        }
-    }
-    evtSetValue(event, out, point);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_get_escape_rate) {
-    BattleWork* wp = _battleWorkPointer;
-    evtSetValue(event, event->args[0],
-                wp->fbatInfo->setup->groupSetup->enemyData->mUnitKindParams->runRate);
-    return EVT_RETURN_DONE;
-}
-
 EVT_BEGIN(btldefaultevt_BiribiriMove)
     CALL(evt_sub_intpl_init, 8, 0, 5, 16)
     LABEL(0)
@@ -981,101 +933,6 @@ EVT_BEGIN(btldefaultevt_SuitoruBadgeEffect)
     RETURN
 EVT_END()
 
-USER_FUNC(_set_escape_ac_hlp_msg) {
-    BattleAcHelpSetHelp("msg_ac_escape");
-    BattleAcHelpSetDispType(2);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_btl_escape_reset_move_color_lv_player_unit_all) {
-    BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit;
-
-    unit = BattleGetMarioPtr(wp);
-    unit->mMoveColorLv = 0xFF;
-    unit = BattleGetPartyPtr(wp);
-    if (unit) {
-        unit->mMoveColorLv = 0xFF;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(btlevtcmd_audience_code_escape_fail) {
-    BattleAudience_Case_Escape_Bad();
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(btlevtcmd_audience_code_escape_success) {
-    BattleAudience_Case_Escape_Good();
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(btlevtcmd_audience_code_escape) {
-    BattleAudience_Case_Escape();
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_check_pose_stay) {
-    BattleWork* wp = _battleWorkPointer;
-    s32 out = event->args[0];
-    BattleUnit* unit;
-    s32 stay;
-    s32 id;
-
-    id = BattleTransID(event, -2);
-    unit = BattleGetUnitPtr(wp, id);
-    stay = FALSE;
-    if (unit->currentKind == UNIT_MARIO) {
-        stay = TRUE;
-        if (wp->badgeEquippedFlags & 1) {
-            if (!(unit->mTokenFlags & 0x10)) {
-                stay = FALSE;
-            }
-        }
-    }
-    evtSetValue(event, out, stay);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(_anime_load_wait) {
-    return BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer)) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
-}
-
-static USER_FUNC(_anime_load) {
-    BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(_backfire) {
-    s32 id;
-    BattleUnit* unit;
-    BattleWork* wp = _battleWorkPointer;
-    f32 x, y, z;
-    EffectEntry* eff;
-
-    id = evtGetValue(event, event->args[0]);
-    id = BattleTransID(event, id);
-    unit = BattleGetUnitPtr(wp, id);
-    if (!unit) {
-        return EVT_RETURN_DONE;
-    }
-    if (isFirstCall) {
-        BtlUnit_GetPos(unit, &x, &y, &z);
-        event->userdatap[0] = effFireEntry(0, 0, x, y, z, 1.0f);
-        event->userdata[1] = 0;
-    }
-    eff = event->userdatap[0];
-    isFirstCall = (BOOL)eff->userdata;
-    event->userdata[1]++;
-    if (event->userdata[1] >= 60) {
-        effDelete(event->userdatap[0]);
-        BattleDamageDirect(-5, unit, NULL, 1, 0, 0x118, 0, 1);
-        return id == BattleTransID(event, event->unitId) ? EVT_RETURN_FINISH : EVT_RETURN_DONE;
-    }
-    *(f32*)((u8*)isFirstCall + 0x24) = 1.6f * sinfd(event->userdata[1] * 3) + 0.4f;
-    return EVT_RETURN_BLOCK;
-}
-
 s32 btldefaultevt_avoid_counter_event[] = {
     262235, (s32)btlevtcmd_AnimeChangePoseType, -29999990, -29999989, 49, 65647, -30000000, 327771,
     (s32)evt_sub_intpl_init, 5, 0, 1800, 40, 65541, 40, 196699,
@@ -1116,3 +973,151 @@ EVT_BEGIN(btldefaultevt_DefendParty)
     RETURN
 EVT_END()
 
+USER_FUNC(_backfire) {
+    s32 id;
+    BattleUnit* unit;
+    BattleWork* wp = _battleWorkPointer;
+    f32 x, y, z;
+    s32 self;
+    EffectEntry* eff;
+
+    id = evtGetValue(event, event->args[0]);
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(wp, id);
+    if (!unit) {
+        return EVT_RETURN_DONE;
+    }
+    if (isFirstCall) {
+        BtlUnit_GetPos(unit, &x, &y, &z);
+        event->userdatap[0] = effFireEntry(0, 0, x, y, z, 1.0f);
+        event->userdata[1] = 0;
+    }
+    eff = event->userdatap[0];
+    isFirstCall = (BOOL)eff->userdata;
+    event->userdata[1]++;
+    if (event->userdata[1] >= 60) {
+        effDelete(event->userdatap[0]);
+        BattleDamageDirect(-5, unit, NULL, 1, 0, 0x118, 0, 1);
+        self = BattleTransID(event, event->unitId);
+        if (self != id) {
+            return EVT_RETURN_DONE;
+        }
+        return EVT_RETURN_FINISH;
+    }
+    *(f32*)((u8*)isFirstCall + 0x24) = 1.6f * sinfd(event->userdata[1] * 3) + 0.4f;
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(_anime_load) {
+    BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer));
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(_anime_load_wait) {
+    return BattlePartyAnimeLoad(BTL_WORK_1C68(_battleWorkPointer)) ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(_check_pose_stay) {
+    BattleWork* wp = _battleWorkPointer;
+    s32 out = event->args[0];
+    BattleUnit* unit;
+    s32 stay;
+    s32 id;
+
+    id = BattleTransID(event, -2);
+    unit = BattleGetUnitPtr(wp, id);
+    stay = FALSE;
+    if (unit->currentKind == UNIT_MARIO) {
+        stay = TRUE;
+        if (wp->badgeEquippedFlags & 1) {
+            if (!(unit->mTokenFlags & 0x10)) {
+                stay = FALSE;
+            }
+        }
+    }
+    evtSetValue(event, out, stay);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(btlevtcmd_audience_code_escape) {
+    BattleAudience_Case_Escape();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(btlevtcmd_audience_code_escape_success) {
+    BattleAudience_Case_Escape_Good();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(btlevtcmd_audience_code_escape_fail) {
+    BattleAudience_Case_Escape_Bad();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_btl_escape_reset_move_color_lv_player_unit_all) {
+    BattleWork* wp = _battleWorkPointer;
+    BattleUnit* unit;
+
+    unit = BattleGetMarioPtr(wp);
+    unit->mMoveColorLv = 0xFF;
+    unit = BattleGetPartyPtr(wp);
+    if (unit) {
+        unit->mMoveColorLv = 0xFF;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_set_escape_ac_hlp_msg) {
+    BattleAcHelpSetHelp("msg_ac_escape");
+    BattleAcHelpSetDispType(2);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_get_escape_rate) {
+    BattleWork* wp = _battleWorkPointer;
+    evtSetValue(event, event->args[0],
+                wp->fbatInfo->setup->groupSetup->enemyData->mUnitKindParams->runRate);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_get_heart_suitoru_point) {
+    BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    s32 id = *args++;
+    s32 out = *args++;
+
+    BattleUnit* unit;
+    s32 point;
+
+    unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
+    point = 0;
+    if (unit) {
+        point = unit->badgesEquipped.HpDrain;
+        if (point > BTL_UNIT_280(unit)) {
+            point = BTL_UNIT_280(unit);
+        }
+    }
+    evtSetValue(event, out, point);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(_get_flower_suitoru_point) {
+    BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    s32 id = *args++;
+    s32 out = *args++;
+
+    BattleUnit* unit;
+    s32 point;
+
+    unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
+    point = 0;
+    if (unit) {
+        point = unit->badgesEquipped.FpDrain;
+        if (point > BTL_UNIT_280(unit)) {
+            point = BTL_UNIT_280(unit);
+        }
+    }
+    evtSetValue(event, out, point);
+    return EVT_RETURN_DONE;
+}

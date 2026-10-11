@@ -42,7 +42,7 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 LightEntry* lightNameToPtr(const char* name);
 LightEntry* lightNumberToPtr(s32 index);
 s32 lightGetEntryNum(void);
-void lightGetNearObj(Vec position, LightEntry* entry, s32 count, LightEntryFlags flags);
+void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags);
 
 
 

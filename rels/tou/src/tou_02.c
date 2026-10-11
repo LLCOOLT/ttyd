@@ -1546,6 +1546,7 @@ void ext_fan_main(void) {
         f32 spd;
         f32 x;
         f32 z;
+        f32 dir2;
 
         sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1";
         sfx2 = "SFX_STG3_AUDIENCE_FAN_FLY1";
@@ -1581,7 +1582,8 @@ void ext_fan_main(void) {
                         static const Vec zero = {0.0f, 0.0f, 0.0f};
 
                         angle = angleABf(mario->position.x, mario->position.z, fan->pos.x, fan->pos.z);
-                        angle = (angle + cloudGetBreathDir()) * 0.5f;
+                        dir2 = cloudGetBreathDir();
+                        angle = (angle + dir2) * 0.5f;
                         fan->state = 20;
                         fan->target = zero;
                         spd = randf(0.1f, 0.2f);
@@ -1664,6 +1666,8 @@ void ext_fan_main(void) {
                 case 100:
                     pose->flags &= ~3;
                     fan->state++;
+                    break;
+                case 101:
                     break;
             }
             if (fan->flags & 1) {

@@ -75,7 +75,9 @@ typedef struct PartyEntry {
     char* field_18;              // 0x18
     u32 field_1C;                // 0x1C, unsigned
     u16 field_20;                // 0x20
-    u8 field_22[0x2F - 0x22];    // 0x22
+    u8 field_22[0x28 - 0x22];    // 0x22
+    s16 field_28;                // 0x28
+    u8 field_2A[0x2F - 0x2A];    // 0x2A
     s8 currentSlotId;            // 0x2F
     u8 field_30;                 // 0x30
     s8 currentMemberId;          // 0x31, PartyMembers
@@ -96,13 +98,15 @@ typedef struct PartyEntry {
     f32 field_AC;                // 0xAC
     u8 field_B0[0xB4 - 0xB0];    // 0xB0
     f32 field_B4;                // 0xB4
-    u8 field_B8[0xF0 - 0xB8];    // 0xB8
+    Vec field_B8;                // 0xB8
+    u8 field_C4[0xF0 - 0xC4];    // 0xC4
     f32 field_F0;                // 0xF0, height
     f32 width;                   // 0xF4
     u8 field_F8[0xFC - 0xF8];    // 0xF8
     f32 field_FC;                // 0xFC
     f32 field_100;               // 0x100
-    u8 field_104[0x10C - 0x104]; // 0x104
+    f32 field_104;               // 0x104
+    u8 field_108[0x10C - 0x108]; // 0x108
     f32 field_10C;               // 0x10C
     f32 field_110;               // 0x110
     u8 field_114[0x138 - 0x114]; // 0x114

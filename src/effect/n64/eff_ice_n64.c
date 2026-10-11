@@ -1,0 +1,189 @@
+#include "eff/eff_n64.h"
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/effdrv.h"
+#include "memory.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <stdlib.h>
+
+double sin(double);
+double cos(double);
+
+typedef struct EffIceN64Piece {
+    s32 unk0;     // 0x0
+    f32 x;        // 0x4
+    f32 y;        // 0x8
+    f32 z;        // 0xC
+    f32 velX;     // 0x10
+    f32 velY;     // 0x14
+    f32 rotZ;     // 0x18
+    f32 rotVel;   // 0x1C
+    f32 rotY;     // 0x20
+    f32 unk24;    // 0x24
+    f32 unk28;    // 0x28
+    f32 unk2C;    // 0x2C
+} EffIceN64Piece;
+
+typedef struct EffIceN64Work {
+    s32 type;       // 0x0
+    Vec position;   // 0x4
+    s32 pad10[5];   // 0x10
+    s32 alpha;      // 0x24
+    s32 lifetime;   // 0x28
+    s32 frame;      // 0x2C
+    EffIceN64Piece pieces[8]; // 0x30
+} EffIceN64Work;
+
+u32 ice_vtx[14] = { 0xFFF0FFF0, 0x00000000, 0x00000000, 0x00FF0010, 0xFFF00000, 0x08000000, 0x000000FF,
+                    0x00100010, 0x00000800, 0x08000000, 0x00FFFFF0, 0x00100000, 0x00000800, 0x000000FF };
+u32 ice_s_vtx[14] = { 0xFFFCFFFC, 0x00000000, 0x00000000, 0x00FF0004, 0xFFFC0000, 0x08000000, 0x000000FF,
+                      0x00040004, 0x00000800, 0x08000000, 0x00FFFFFC, 0x00040000, 0x00000800, 0x000000FF };
+
+static void effIceMain(EffectEntry* effect);
+static void effIceDisp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effIceN64Entry(s32 type, f32 x, f32 y, f32 z) {
+    EffectEntry* effect;
+    EffIceN64Work* work;
+    EffIceN64Piece* p;
+    s32 i;
+
+    effect = effEntry();
+    effect->type = "IceN64\0";
+    effect->count = 9;
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffIceN64Work));
+    effect->userdata = work;
+    effect->callback = effIceMain;
+    work->type = type;
+    work->position.x = x;
+    work->position.y = y;
+    work->position.z = z;
+    work->lifetime = 30;
+    work->frame = 0;
+    work->alpha = 0;
+    p = (EffIceN64Piece*)work + 1;
+    for (i = 1; i < 9; i++, p++) {
+        p->x = rand() % 10 - 5;
+        p->y = rand() % 10 + 5;
+        p->z = 10.0f;
+        p->rotZ = rand() % 360;
+        p->rotY = rand() % 360;
+        p->rotVel = (rand() % 100) / 10;
+        p->velX = 0.0f;
+        p->velY = 2.0f;
+    }
+    return effect;
+}
+
+#pragma opt_propagation off
+#pragma opt_lifetimes off
+static void effIceMain(EffectEntry* effect) {
+    EffIceN64Work* work = effect->userdata;
+    Vec calcPos;
+    Vec pos = { 0.0f, 0.0f, 0.0f };
+    s32 idx;
+    s32 i;
+    s32 life;
+    EffIceN64Piece* p;
+    f32 s;
+
+    pos.x = work->position.x;
+    pos.y = work->position.y;
+    pos.z = work->position.z;
+    calcPos = pos;
+
+    work->lifetime--;
+    work->frame++;
+    life = work->lifetime;
+    if (life < 0) {
+        effDelete(effect);
+        return;
+    }
+    if (work->frame < 10) {
+        work->alpha = work->alpha + 0.3f * (255 - work->alpha);
+    }
+    if (life < 10) {
+        work->alpha *= 0.8f;
+    }
+    work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
+    idx = life + 20;
+    for (i = 1; i < effect->count; i++, idx += 20, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
+        p = (EffIceN64Piece*)work;
+        s = (f32)sin(6.2831855f * (2.0f * ((EffIceN64Piece*)work)->rotZ) / 360.0f);
+        p->velY += -0.05f;
+        s = 0.2f * s;
+        p->velX += s;
+        p->velY += -0.05f;
+        p->velX *= 0.92f;
+        p->rotVel += (s32)effTblRandN64(50, idx) - 25;
+        p->rotZ += 10.0f * (f32)sin(6.2831855f * p->rotVel / 360.0f);
+        p->rotY += 10.0f * (f32)cos(6.2831855f * (p->rotVel * 0.5f) / 360.0f);
+        p->x += p->velX;
+        p->y += p->velY;
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 2, (DispCallback)effIceDisp, effect);
+}
+
+static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
+    EffIceN64Work* work;
+    CameraEntry* cam;
+    Mtx trans;
+    Mtx scale;
+    Mtx rot;
+    Mtx mtx;
+    GXTexObj texObj;
+    s32 i;
+    u32* vtx;
+    GXColor color = { 0x14, 0x64, 0x14, 0x00 };
+
+    cam = camGetPtr(cameraId);
+    work = effect->userdata;
+    GXSetNumChans(0);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+    GXSetCullMode(GX_CULL_NONE);
+    PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
+    PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
+    PSMTXConcat(trans, rot, mtx);
+    PSMTXConcat(cam->view, mtx, mtx);
+    color.a = work->alpha;
+    GXSetTevColor(GX_TEVREG0, color);
+    work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
+    for (i = 1; i < effect->count; i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
+        if (i & 1) {
+            vtx = ice_s_vtx;
+            effGetTexObjN64(8, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            PSMTXScale(scale, 0.015625f, 0.015625f, 0.0f);
+            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+        } else {
+            vtx = ice_vtx;
+            effGetTexObjN64(7, &texObj);
+            GXLoadTexObj(&texObj, GX_TEXMAP0);
+            PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
+            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
+        }
+        effSetVtxDescN64((effN64Vtx*)vtx);
+        if (i & 1) {
+            PSMTXTrans(trans, ((EffIceN64Piece*)work)->x, ((EffIceN64Piece*)work)->y, ((EffIceN64Piece*)work)->z);
+        } else {
+            PSMTXTrans(trans, ((EffIceN64Piece*)work)->x, ((EffIceN64Piece*)work)->y, ((EffIceN64Piece*)work)->z);
+            PSMTXRotRad(rot, 'z', 0.017453292f * ((EffIceN64Piece*)work)->rotZ);
+            PSMTXConcat(trans, rot, trans);
+            PSMTXRotRad(rot, 'y', 0.017453292f * ((EffIceN64Piece*)work)->rotY);
+            PSMTXConcat(trans, rot, trans);
+        }
+        PSMTXConcat(mtx, trans, trans);
+        GXLoadPosMtxImm(trans, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 6);
+        tri2(0, 1, 2, 0, 0, 2, 3, 0);
+    }
+}

@@ -68,6 +68,29 @@ EVT_BEGIN(evt_gazigazi_appear)
     RETURN
 EVT_END()
 
+USER_FUNC(camdir) {
+    f32 yaw;
+    s32 dir;
+    CameraEntry* camera;
+    MarioWork* mario;
+    Vec* pos;
+
+    camera = camGetPtr(CAMERA_3D);
+    yaw = camera->viewYaw;
+    mario = marioGetPtr();
+    dir = 1;
+    if (mario->damageHit) {
+        pos = hitGetDamageReturnPos(mario->damageHit);
+        if (reviseAngle(yaw - angleABf((f32)event->lwData[0], (f32)event->lwData[2], pos->x, pos->z)) > 180.0f) {
+            yaw = reviseAngle(180.0f + yaw);
+            dir = -1;
+        }
+    }
+    event->lwData[3] = FLOAT(-yaw);
+    event->lwData[4] = ((yaw > 90.0f && yaw < 270.0f) ? -dir : dir) * 1024 - EVTDAT_FLOAT_BASE;
+    return EVT_RETURN_DONE;
+}
+
 // const char* name, s32 x0, s32 y0, s32 z0, s32 x1, s32 y1, s32 z1, s32 msec, s32 mode
 USER_FUNC(evt_gazigazi_move_position) {
     s32* args = event->args;
@@ -114,27 +137,4 @@ USER_FUNC(evt_gazigazi_move_position) {
         npc->position = npc->prevPosition;
         return EVT_RETURN_DONE;
     }
-}
-
-USER_FUNC(camdir) {
-    f32 yaw;
-    s32 dir;
-    CameraEntry* camera;
-    MarioWork* mario;
-    Vec* pos;
-
-    camera = camGetPtr(CAMERA_3D);
-    yaw = camera->viewYaw;
-    mario = marioGetPtr();
-    dir = 1;
-    if (mario->damageHit) {
-        pos = hitGetDamageReturnPos(mario->damageHit);
-        if (reviseAngle(yaw - angleABf((f32)event->lwData[0], (f32)event->lwData[2], pos->x, pos->z)) > 180.0f) {
-            yaw = reviseAngle(180.0f + yaw);
-            dir = -1;
-        }
-    }
-    event->lwData[3] = FLOAT(-yaw);
-    event->lwData[4] = ((yaw > 90.0f && yaw < 270.0f) ? -dir : dir) * 1024 - EVTDAT_FLOAT_BASE;
-    return EVT_RETURN_DONE;
 }

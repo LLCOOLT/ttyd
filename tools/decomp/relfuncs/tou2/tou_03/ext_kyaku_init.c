@@ -21,13 +21,13 @@
 // decl: void __tou_srand(u32 seed);
 // proto: void ext_kyaku_init(void);
 void ext_kyaku_init(void) {
+    s32 far;
+    s32 i;
     ExtPose* pose;
     Kyaku* kyaku;
-    s32 i;
-    s32 far;
     s32 side;
-    f32 angle;
     f32 dist;
+    f32 angle;
     f32 x;
     f32 z;
     f32 hx;
@@ -57,16 +57,12 @@ void ext_kyaku_init(void) {
                 dist = randf(250.0f, 500.0f);
             } else {
                 side = angle < 0.7853982f || angle > 5.4977875f;
-                if (side) {
-                    dist = randf(550.0f, 650.0f);
-                } else {
-                    dist = randf(550.0f, 850.0f);
-                }
+                dist = side ? randf(550.0f, 650.0f) : randf(550.0f, 850.0f);
             }
             x = dist * sinf(angle);
             z = dist * cosf(angle);
             if (!far) {
-                if (__fabs(z) <= 70.0) {
+                if (!(__fabs(z) > 70.0)) {
                     continue;
                 }
                 hd = 100000.0f;

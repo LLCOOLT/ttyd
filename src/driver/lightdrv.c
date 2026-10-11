@@ -5,23 +5,16 @@
 #include <string.h>
 
 extern int sprintf(char* str, const char* format, ...);
-
-//.rodata
-const Vec decay_tbl[] = {
-	{1.0f, 0.0f, 0.0f},
-	{0.0f, 0.1f, 0.0f},
-	{0.0f, 0.0f, 0.01f}, 
-	{0.0f, 0.0f, 0.01f}
-};
+void qqsort(void* base, u32 n, u32 size, s32 (*compare)(const void*, const void*));
 
 //.sbss
 static LightWork work[2];
 
 //.bss
-LightEntry booLight;
-LightEntry paperCraft;
-LightEntry paperLight3DImg;
 LightEntry paperLight3D;
+LightEntry paperLight3DImg;
+LightEntry paperCraft;
+LightEntry booLight;
 
 //local prototypes
 static s32 _sort(const void* a, const void* b);
@@ -77,26 +70,48 @@ void lightReInit(void) {
 	memset(wp->entries, 0, sizeof(LightEntry) * wp->count);
 }
 
+static const Vec camDir = {0.0f, 0.0f, 1.0f};
+
+static inline Vec camTransform(Vec w, Vec a, Vec b, Vec c) {
+	Vec r = {0.0f, 0.0f, 0.0f};
+
+	r.x = a.x * w.x + b.x * w.y + c.x * w.z;
+	r.y = a.y * w.x + b.y * w.y + c.y * w.z;
+	r.z = a.z * w.x + b.z * w.y + c.z * w.z;
+	return r;
+}
+
 void lightMain(void) {
 	CameraEntry* camera;
 	Vec position;
 
 	camera = camGetPtr(CAMERA_3D);
-	position.x = (camera->view[0][0] * 0.0f) + (camera->view[1][0] * 0.0f) + (camera->view[2][0] * 1.0f);
-	position.y = (camera->view[0][1] * 0.0f) + (camera->view[1][1] * 0.0f) + (camera->view[2][1] * 1.0f);
-	position.z = (camera->view[0][2] * 0.0f) + (camera->view[1][2] * 0.0f) + (camera->view[2][2] * 1.0f);
+	position = camTransform(camDir, *(Vec*)camera->view[0], *(Vec*)camera->view[1], *(Vec*)camera->view[2]);
 	VECNormalize(&position, &position);
-	paperLight3D.position.x = 1048576.0f * position.x;
-	paperLight3D.position.y = 1048576.0f * position.y;
-	paperLight3D.position.z = 1048576.0f * position.z;
+	{
+		Vec tmp = {0.0f, 0.0f, 0.0f};
+
+		tmp.x = 1048576.0f * position.x;
+		tmp.y = 1048576.0f * position.y;
+		tmp.z = 1048576.0f * position.z;
+		paperLight3D.position = tmp;
+	}
 	booLight.position = (Vec){0.0f, 1000.0f, 0.0f};
 }
+
+
+const Vec decay_tbl[] = {
+	{1.0f, 0.0f, 0.0f},
+	{0.0f, 0.1f, 0.0f},
+	{0.0f, 0.0f, 0.01f}, 
+	{0.0f, 0.0f, 0.01f}
+};
 
 s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
 	LightWork* wp = lightGetWork();
 	LightEntry* entry;
-	s32 i, j, k;
-	char v41[320]; //TODO: rename, verify size
+	s32 i, j, k, n;
+	char v41[256];
 
 	entry = wp->entries;
 	for (i = 0; i < wp->count; i++, entry++) {
@@ -122,7 +137,7 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	}
 
 	entry = wp->entries;
-	for (i = 0; i < wp->count; i++, entry++) {
+	for (n = 0; n < wp->count; n++, entry++) {
 		if (!(entry->flags & 1)) {
 			break;
 		}
@@ -135,7 +150,9 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;
-	entry->attenDistCoef = decay_tbl[attenType];
+	entry->attenDistCoef.x = decay_tbl[attenType].x;
+	entry->attenDistCoef.y = decay_tbl[attenType].y;
+	entry->attenDistCoef.z = decay_tbl[attenType].z;
 	entry->flags |= 1;
 	switch (type) {
 		case 0:
@@ -145,13 +162,16 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 			entry->flags |= LIGHT_POINT;
 			break;
 		case 2:
-			entry->flags |= LIGHT_DIRECTIONAL;
-			break;
-		case 3:
 			entry->flags |= LIGHT_SPOT;
 			break;
+		case 3:
+			entry->flags |= LIGHT_DIRECTIONAL;
+			break;
 	}
-	return i;
+	if (flags & 2) {
+		entry->flags |= LIGHT_CHARA;
+	}
+	return n;
 }
 
 LightEntry* lightNameToPtr(const char* name) {
@@ -167,21 +187,153 @@ LightEntry* lightNameToPtr(const char* name) {
 	return NULL;
 }
 
-//TODO: cleanup?
-s32 _sort(const void* a, const void* b) {
-	f32 value1, value2;
+typedef struct NearWork {
+	LightEntry* entry;
+	f32 dist;
+} NearWork;
 
-	value1 = *(f32*)(*(u32*)a + 4);
-	value2 = *(f32*)(*(u32*)b + 4);
+static s32 _sort(const void* a, const void* b) {
+	f32 value2, value1;
+
+	value1 = ((NearWork*)a)->dist;
+	value2 = ((NearWork*)b)->dist;
+
 	if (value1 > value2) {
 		return 1;
 	}
-	if (value1 >= value2) {
-		return 0;
+	if (value1 < value2) {
+		return -1;
 	}
-	return -1;
+	return 0;
 }
 
-void lightGetNearObj(Vec position, LightEntry* entry, s32 count, LightEntryFlags flags) {
+void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
+	LightWork* wp = lightGetWork();
+	NearWork tmp[32];
+	NearWork* tp;
+	LightEntry* entry;
+	u32 n;
+	s32 i, found;
+	LightEntry** op;
 
+	if (lightGetEntryNum() > 8) {
+		entry = wp->entries;
+		tp = tmp;
+		n = 0;
+		for (i = 0; i < wp->count; i++, entry++) {
+			if (entry->flags & LIGHT_ENABLED) {
+				tp->entry = entry;
+				tp->dist = VECDistance(&position, &entry->position);
+				tp++;
+				n++;
+			}
+		}
+		qqsort(tmp, n, 8, _sort);
+	}
+	else {
+		entry = wp->entries;
+		tp = tmp;
+		n = 0;
+		for (i = 0; i < wp->count; i++, entry++) {
+			if (entry->flags & LIGHT_ENABLED) {
+				tmp[n].entry = entry;
+				n++;
+			}
+		}
+	}
+
+	found = 0;
+	op = out;
+	tp = tmp;
+	for (i = 0; i < n; i++, tp++) {
+		entry = tp->entry;
+		if (!(entry->flags & LIGHT_AMBIENT) && (flags == 0 || (flags & entry->flags))) {
+			*op++ = entry;
+			found++;
+			if (found >= count) {
+				break;
+			}
+		}
+	}
+	for (i = found; i < count; i++) {
+		out[i] = NULL;
+	}
+}
+
+LightEntry* lightGetAmbient(void) {
+	LightWork* wp = lightGetWork();
+	LightEntry* entry = wp->entries;
+	s32 i;
+
+	for (i = 0; i < wp->count; i++, entry++) {
+		if ((entry->flags & LIGHT_ENABLED) && !(entry->flags & LIGHT_CHARA) && (entry->flags & LIGHT_AMBIENT)) {
+			return entry;
+		}
+	}
+	return NULL;
+}
+
+LightEntry* lightGetCharaAmbient(void) {
+	LightWork* wp = lightGetWork();
+	LightEntry* entry = wp->entries;
+	s32 i;
+
+	for (i = 0; i < wp->count; i++, entry++) {
+		if ((entry->flags & LIGHT_ENABLED) && (entry->flags & LIGHT_CHARA) && (entry->flags & LIGHT_AMBIENT)) {
+			return entry;
+		}
+	}
+	return NULL;
+}
+
+s32 lightCheckCharaLight(void) {
+	LightWork* wp = lightGetWork();
+	LightEntry* entry = wp->entries;
+	s32 i;
+
+	for (i = 0; i < wp->count; i++, entry++) {
+		if ((entry->flags & LIGHT_ENABLED) && (entry->flags & LIGHT_CHARA)) {
+			return 1;
+		}
+	}
+	return 0;
+}
+
+LightEntry* lightGetPaper(void) {
+	s32 cam = camGetCurNo();
+
+	if (cam == CAMERA_3D) {
+		return &paperLight3D;
+	}
+	if (cam == CAMERA_3D_IMAGE) {
+		return &paperLight3DImg;
+	}
+	return &paperLight3DImg;
+}
+
+LightEntry* lightGetPaperCraft(void) {
+	return &paperCraft;
+}
+
+s32 lightGetEntryNum(void) {
+	LightWork* wp = lightGetWork();
+	LightEntry* entry = wp->entries;
+	s32 i, n = 0;
+
+	for (i = 0; i < wp->count; i++, entry++) {
+		if (entry->flags & LIGHT_ENABLED) {
+			n++;
+		}
+	}
+	return n;
+}
+
+LightEntry* lightNumberToPtr(s32 index) {
+	LightWork* wp = lightGetWork();
+	LightEntry* entry = &wp->entries[index];
+
+	if (entry->flags & LIGHT_ENABLED) {
+		return entry;
+	}
+	return NULL;
 }

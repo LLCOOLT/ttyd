@@ -116,7 +116,7 @@ void JUTFont_DrawStart(GXColor color) {
 
 u16 JUTFont_CodeToGlyph(u32 code);
 
-u16 kanjiSearch(u16 code) {
+u16 kanjiSearch(u32 code) {
 	return JUTFont_CodeToGlyph(code);
 }
 

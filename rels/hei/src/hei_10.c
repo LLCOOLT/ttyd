@@ -107,6 +107,10 @@ s32 hei_10_init_evt[80];
 
 int rand(void);
 
+static inline f32 randf_scale(f32 r, f32 min, f32 max) {
+    return r * (max - min) + min;
+}
+
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
@@ -271,26 +275,31 @@ static void ext_main(void) {
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         switch (chb->state) {
             case 0:
-                angle = randf(0.0f, 360.0f);
+                angle = rand() / 32767.0f;
                 dist = randf(4.0f, 7.0f);
-                rad = 3.1415927f * angle / 180.0f;
+                rad = 3.1415927f * randf_scale(angle, 0.0f, 360.0f) / 180.0f;
                 x = pose->mtx[0][3] + dist * chb_sin(rad);
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3] - dist * chb_cos(rad);
-                speed = randf(0.3f, 0.5f);
-                gravity = randf(0.5f, 0.8f);
-                chb_jump(pose, chb, chb->state, x, y, z, speed, gravity);
+                speed = rand() / 32767.0f;
+                gravity = rand() / 32767.0f;
+                chb_jump(pose, chb, chb->state, x, y, z, randf_scale(speed, 0.3f, 0.5f), randf_scale(gravity, 0.5f, 0.8f));
                 break;
             case 1:
                 if (distABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]) < 800.0f) {
-                    angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]) + randf(-45.0f, 45.0f);
-                    dist = randf(15.0f, 20.0f);
+                    rad = rand() / 32767.0f;
+                    angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
+                    angle = angle + randf_scale(rad, -45.0f, 45.0f);
+                    dist = rand() / 32767.0f;
                     rad = 3.1415927f * angle / 180.0f;
+                    dist = randf_scale(dist, 15.0f, 20.0f);
                     x = pose->mtx[0][3] + dist * chb_sin(rad);
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - dist * chb_cos(rad);
-                    speed = 2.0f * randf(1.0f, 1.2f);
-                    gravity = randf(0.8f, 0.8f);
+                    speed = rand() / 32767.0f;
+                    gravity = rand() / 32767.0f;
+                    speed = 2.0f * randf_scale(speed, 1.0f, 1.2f);
+                    gravity = randf_scale(gravity, 0.8f, 0.8f);
                     chb_jump(pose, chb, chb->state, x, y, z, speed, gravity);
                     if (rand() % 150 == 0) {
                         pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
@@ -341,7 +350,7 @@ static void ext_main(void) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-// unused in the original build; only its Vec template survives in .rodata
+/* unused in the original build; only its Vec template survives in .rodata */
 static inline void chb_zero(Vec* v) {
     *v = (Vec){0.0f, 0.0f, 0.0f};
 }
@@ -377,6 +386,10 @@ USER_FUNC(evt_chorobon_wait) {
 }
 
 
+static inline s32 npc_jump_get_time(EventEntry* event, s32* args) {
+    return evtGetValue(event, args[6]);
+}
+
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static USER_FUNC(npc_jump) {
@@ -387,7 +400,7 @@ static USER_FUNC(npc_jump) {
     f32 z = evtGetFloat(event, args[3]);
     f32 speed = evtGetFloat(event, args[4]);
     f32 gravity = evtGetFloat(event, args[5]);
-    f32 t = 60.0f * (f32)evtGetValue(event, args[6]) / 1000.0f;
+    f32 t = 60.0f * (f32)npc_jump_get_time(event, args) / 1000.0f;
     NpcEntry* npc = npcNameToPtr(name);
     f32 vy;
     f32 dist;

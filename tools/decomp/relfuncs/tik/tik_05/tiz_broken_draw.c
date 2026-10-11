@@ -4,35 +4,35 @@
 // proto: void tiz_broken_draw(CameraId cameraId, void* param);
 void tiz_broken_draw(CameraId cameraId, void* param) {
     GXTexObj tex;
-    Mtx ident;
-    Mtx rot;
-    Mtx scale;
     Mtx mtx;
+    Mtx scale;
+    Mtx rot;
+    Mtx ident;
     CameraEntry* cam = camGetPtr(cameraId);
-    BrokenPiece* p;
     s32 x;
     s32 y;
-    s32 xo;
+    BrokenPiece* p;
     s32 yo;
+    s32 xo;
     f32 py;
     f32 rz;
 
     if (broken_wp->copied == 0) {
         GXSetTexCopySrc(0, 0, 608, 480);
-        GXSetTexCopyDst(304, 240, GX_TF_RGB565, GX_TRUE);
+        GXSetTexCopyDst(304, 240, GX_TF_RGB5A3, GX_TRUE);
         GXCopyTex(broken_wp->tex->address, GX_FALSE);
         GXPixModeSync();
         broken_wp->copied = 1;
     }
     GXSetNumChans(0);
-    GXInitTexObj(&tex, broken_wp->tex->address, 304, 240, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&tex, broken_wp->tex->address, 304, 240, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXLoadTexObj(&tex, GX_TEXMAP0);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetNumTevStages(1);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_NOOP);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
@@ -45,9 +45,9 @@ void tiz_broken_draw(CameraId cameraId, void* param) {
     GXSetCurrentMtx(0);
     PSMTXIdentity(ident);
     p = broken_wp->pieces->address;
-    for (y = 0, yo = 0; y < 30; y++, yo += 16) {
+    for (y = 0, yo = 0; y < 30; y++, yo += 16, p++) {
         py = 232.0f - yo;
-        for (x = 0, xo = 0; x < 38; x++, xo += 16) {
+        for (x = 0, xo = 0; x < 38; x++, xo += 16, p++) {
             if (p->delay == 0) {
                 PSMTXScale(scale, 1.0f / 38.0f, 1.0f / 30.0f, 1.0f);
                 PSMTXTrans(mtx, x, y, 0.0f);
@@ -88,8 +88,6 @@ void tiz_broken_draw(CameraId cameraId, void* param) {
                 GXPosition3f32(-8.0f, -8.0f, 0.0f);
                 GXTexCoord2f32(0.0f, 1.0f);
             }
-            p++;
         }
-        p++;
     }
 }

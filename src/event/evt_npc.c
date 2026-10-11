@@ -1461,7 +1461,7 @@ USER_FUNC(evt_npc_status_onoff) {
     npc = evtNpcNameToPtr(event, name);
     switch (type) {
         case 0:
-            npc->jumpFlags &= ~mask;
+            npc->jumpFlags &= ~(u32)mask;
             break;
         case 1:
             npc->jumpFlags |= mask;

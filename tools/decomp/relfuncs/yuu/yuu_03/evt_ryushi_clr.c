@@ -6,18 +6,16 @@
 // decl: static f32 randf(f32 min, f32 max);
 // proto: USER_FUNC(evt_ryushi_clr);
 USER_FUNC(evt_ryushi_clr) {
+    RyushiWork* p = xwp;
     s32* args = event->args;
-    RyushiWork* p;
-    s32 n;
     s32 i;
+    s32 n = ryuwp;
     s32 j;
     s32 x;
     s32 y;
     s32 z;
 
-    p = xwp;
-    n = ryuwp;
-    p->mode = evtGetValue(event, args[0]);
+    p->mode = evtGetValue(event, *args++);
     p->count = 0;
     p->alpha = 0;
     p->pos.x = 0.0f;
@@ -32,7 +30,7 @@ USER_FUNC(evt_ryushi_clr) {
         x = j % 10;
         y = (j / 10) % 6;
         z = j / 60;
-        p->base.x = x * xwp->base.x - 4.5f * xwp->base.x + xwp->base.x * 0.5f * ((y + z) & 1);
+        p->base.x = x * xwp->base.x - 4.5f * xwp->base.x + xwp->base.x / 2.0f * ((y + z) & 1);
         p->base.y = y * xwp->base.y - 2.5f * xwp->base.y;
         p->base.z = z * xwp->base.z - 1.5f * xwp->base.z;
         p->pos.x = p->base.x + randf(0.3f * -xwp->base.x, 0.3f * xwp->base.x);

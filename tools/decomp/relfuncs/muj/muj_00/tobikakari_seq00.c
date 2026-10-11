@@ -33,7 +33,7 @@ void tobikakari_seq00(NanNpc* npc) {
             npc->start = npc->pos;
             target = random_choice_target(work->type);
             npc->target = target->work->pos;
-            npc->target.y += 2.0f;
+            npc->target.z += 2.0f;
             npc->vy = -4.0f * (f32)(irand(30) + 100);
             npc->dy = npc->target.y - npc->start.y - npc->vy;
             npc->duration = irand(500) + 400;
@@ -60,7 +60,7 @@ void tobikakari_seq00(NanNpc* npc) {
             if (elapsed < npc->duration) {
                 t = (f32)elapsed / (f32)npc->duration;
                 npc->pos.x = intplGetValue(0, elapsed, npc->duration, npc->start.x, npc->target.x);
-                npc->pos.z = intplGetValue(0, elapsed, npc->duration, npc->start.z, npc->target.z);
+                npc->pos.z = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(npc->start.z, npc->target.z, 0, elapsed, npc->duration);
                 npc->pos.y = npc->start.y + t * (npc->vy * t + npc->dy);
             } else {
                 npc->pos = npc->target;

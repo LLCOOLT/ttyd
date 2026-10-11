@@ -8,6 +8,7 @@
 // decl: ExtPose* extGetPosePtr(void);
 // decl: s32 extGetPoseNum(void);
 // proto: static void pose_init(void);
+#pragma dont_inline on
 static void pose_init(void) {
     char name[32];
     char anim[32];
@@ -39,3 +40,4 @@ static void pose_init(void) {
     } while (d->name != NULL);
     kyaku_wp->animNum++;
 }
+#pragma dont_inline reset

@@ -16,7 +16,8 @@ USER_FUNC(tobikakaru_end) {
         evt_nannpc_set_animtbl_sub(npc, suifu_animtbl);
     }
     for (i = 0; i < 100; i++) {
-        wp->entries[i + 105].func = NULL;
+        npc = &wp->entries[i + 105];
+        npc->func = NULL;
     }
     for (i = 0; i < 100; i++) {
         npc = &wp->entries[i + 205];

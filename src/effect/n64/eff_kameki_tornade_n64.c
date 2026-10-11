@@ -1,0 +1,337 @@
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/effdrv.h"
+#include "memory.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <dolphin/os/OSFastCast.h>
+#include <stdlib.h>
+#include <string.h>
+
+double sin(double);
+double cos(double);
+
+static inline s16 __OSf32tos16(register f32 inF) {
+    s32 out;
+    register s16* outPtr = (s16*)&out;
+    asm { psq_st inF, 0(outPtr), 1, OS_FASTCAST_S16 }
+    return *(s16*)&out;
+}
+
+static inline void OSf32tos16(f32* f, s16* out) {
+    *out = __OSf32tos16(*f);
+}
+
+static inline f32 __OSs16tof32(register s16* arg) {
+    register f32 ret;
+    asm { psq_l ret, 0(arg), 1, OS_FASTCAST_S16 }
+    return ret;
+}
+
+static inline void OSs16tof32(s16* in, f32* out) {
+    *out = __OSs16tof32(in);
+}
+
+typedef struct effN64Vtx {
+    s16 x, y, z;   // 0x0
+    s16 s, t;      // 0x6
+    u8 r, g, b, a; // 0xA
+} effN64Vtx;
+
+void effGetTexObjN64(u32 id, GXTexObj* obj);
+void effSetVtxDescN64(effN64Vtx* vtx);
+void tri2();
+
+typedef struct EffKamekiTornadeN64Work {
+    s32 type;      // 0x0
+    Vec position;  // 0x4
+    s32 life;      // 0x10
+    s32 frame;     // 0x14
+    s32 c0r;       // 0x18
+    s32 c0g;       // 0x1C
+    s32 c0b;       // 0x20
+    s32 alpha;     // 0x24
+    s32 c1r;       // 0x28
+    s32 c1g;       // 0x2C
+    s32 c1b;       // 0x30
+    f32 scale;     // 0x34
+    f32 px[8];     // 0x38
+    f32 py[8];     // 0x58
+    f32 pz[8];     // 0x78
+    f32 sc[8];     // 0x98
+    f32 ang[8];    // 0xB8
+    f32 angVel[8]; // 0xD8
+    f32 radius[8]; // 0xF8
+    f32 rot[8];    // 0x118
+    f32 twist;     // 0x138
+    f32 scrollS;   // 0x13C
+    f32 scrollT;   // 0x140
+    f32 unk144;    // 0x144
+    f32 unk148;    // 0x148
+} EffKamekiTornadeN64Work;
+
+void effKamekiTornadeMain(EffectEntry* effect);
+void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale) {
+    EffectEntry* effect;
+    EffKamekiTornadeN64Work* work;
+    s32 i;
+
+    effect = effEntry();
+    effect->type = "KamekiTornadeN64\0\0\0";
+    effect->count = 1;
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffKamekiTornadeN64Work));
+    effect->userdata = work;
+    effect->callback = effKamekiTornadeMain;
+    effect->flags |= 2;
+    work->type = type;
+    work->frame = 0;
+    if (life <= 0) {
+        work->life = 1000;
+    } else {
+        work->life = life;
+    }
+    work->alpha = 0;
+    work->position.x = x;
+    work->position.y = y;
+    work->position.z = z;
+    work->scale = scale;
+    work->c0r = 255;
+    work->c0g = 255;
+    work->c0b = 255;
+    work->c1r = 255;
+    work->c1g = 255;
+    work->c1b = 235;
+    for (i = 0; i < 8; i++) {
+        work->px[i] = x;
+        work->py[i] = y;
+        work->pz[i] = z;
+        work->sc[i] = 0.2f * (f32)i + 1.0f;
+        work->ang[i] = (f32)(rand() % 360);
+        work->angVel[i] = 0.1f * (f32)(rand() % 100) + 2.0f;
+        work->radius[i] = 0.1f * (f32)(rand() % 30);
+        work->rot[i] = 0.0f;
+    }
+    work->twist = 0.0f;
+    work->unk144 = 0.0f;
+    work->scrollS = 0.0f;
+    work->scrollT = 0.0f;
+    work->unk148 = 1.0f;
+    return effect;
+}
+
+void effKamekiTornadeMain(EffectEntry* effect) {
+    EffKamekiTornadeN64Work* work = effect->userdata;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
+    s32 i;
+    s32 life;
+    s32 frame;
+    f32 scale;
+
+    tmp.x = work->position.x;
+    tmp.y = work->position.y;
+    tmp.z = work->position.z;
+    position = tmp;
+    if (effect->flags & 4) {
+        effect->flags &= ~4;
+        work->life = 16;
+    }
+    if (work->life < 1000) {
+        work->life--;
+    }
+    work->frame++;
+    life = work->life;
+    if (life < 0) {
+        effDelete(effect);
+        return;
+    }
+    frame = work->frame;
+    scale = work->scale;
+    if (life < 16) {
+        work->alpha = life * 16;
+    }
+    if (frame < 16) {
+        work->alpha = frame * 16 + 15;
+    }
+    work->px[0] = work->position.x;
+    work->py[0] = work->position.y;
+    work->pz[0] = work->position.z;
+    for (i = 7; i > 0; i--) {
+        work->rot[i] = 4.0f * (work->px[i - 1] - work->px[i]);
+        work->px[i] = work->px[i - 1];
+        work->py[i] = work->py[i - 1] + 5.0f * scale;
+        work->pz[i] = work->pz[i - 1];
+        if (work->rot[i] > 90.0f) {
+            work->rot[i] = 90.0f;
+        } else if (work->rot[i] < -90.0f) {
+            work->rot[i] = -90.0f;
+        }
+    }
+    work->twist += 10.0f;
+    work->scrollS += 12.959999f;
+    work->scrollT += 17.28f;
+    if (work->scrollS > 64.0f) {
+        work->scrollS -= 64.0f;
+    }
+    if (work->scrollT > 64.0f) {
+        work->scrollT -= 64.0f;
+    }
+    for (i = 0; i < 8; i++) {
+        work->ang[i] += work->angVel[i];
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effKamekiTornadeDisp, effect);
+}
+
+void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 i;
+    EffKamekiTornadeN64Work* work;
+    s32 life;
+    effN64Vtx* tmpl;
+    effN64Vtx* vtx;
+    effN64Vtx* p;
+    effN64Vtx* q;
+    s32 j;
+    CameraEntry* camera;
+    s32 a;
+    f32 scale;
+    f32 ang;
+    f32 s;
+    f32 r;
+    Mtx mtx;
+    Mtx tex;
+    Mtx rot;
+    Mtx base;
+    GXTexObj texObj;
+    Vec axis;
+    Vec v1;
+    Vec v2;
+
+    camera = camGetPtr(cameraId);
+    work = effect->userdata;
+    a = work->alpha >> 1;
+    life = work->life;
+    scale = work->scale;
+    GXSetNumChans(0);
+    GXSetNumTevStages(3);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_TEXC, GX_CC_CPREV, GX_CC_CPREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
+    GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_C0, GX_CC_C1, GX_CC_CPREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    GXSetNumTexGens(2);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+    effGetTexObjN64(0x6C, &texObj);
+    GXLoadTexObj(&texObj, GX_TEXMAP0);
+    GXLoadTexObj(&texObj, GX_TEXMAP1);
+    GXSetTevColor(GX_TEVREG0, (GXColor){work->c0r, work->c0g, work->c0b, (s32)((f32)a * work->unk148)});
+    GXSetTevColor(GX_TEVREG1, (GXColor){work->c1r, work->c1g, work->c1b, 32});
+    GXSetCullMode(GX_CULL_NONE);
+    tmpl = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+    p = tmpl;
+    for (j = 0; j < 16; j++) {
+        p = &tmpl[j];
+        ang = 6.2831855f * (f32)(j * 360 / 15) / 360.0f;
+        p->x = 100.0f * (f32)cos(ang);
+        p->y = 0;
+        p->z = 100.0f * (f32)sin(ang);
+        p->s = j * 128;
+        p->t = 0;
+        q = &tmpl[j + 16];
+        q->x = 100.0f * (f32)cos(ang);
+        q->y = 0;
+        q->z = 100.0f * (f32)sin(ang);
+        q->s = j * 512;
+        q->t = 1024;
+    }
+    PSMTXRotRad(rot, 'z', 0.017453292f * work->unk144);
+    PSMTXScale(base, 0.1f, 0.1f, 0.1f);
+    PSMTXConcat(rot, base, base);
+    for (i = 0; i < 7; i++) {
+        vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+        effSetVtxDescN64(vtx);
+        PSMTXTrans(mtx, 10.0f * work->px[i], 10.0f * work->py[i], 10.0f * work->pz[i]);
+        PSMTXRotRad(rot, 'z', 0.017453292f * work->rot[i]);
+        PSMTXConcat(mtx, rot, mtx);
+        axis = (Vec){-0.03f, 1.0f, 0.1f};
+        PSMTXRotAxisRad(rot, &axis, 0.017453292f * (work->twist + (f32)(i * i)));
+        PSMTXConcat(mtx, rot, mtx);
+        s = work->sc[i] * scale;
+        if (life < 16) {
+            s += 0.02f * (f32)(127 - a);
+        }
+        PSMTXScale(tex, s, scale, s);
+        PSMTXConcat(mtx, tex, mtx);
+        ang = 6.2831855f * work->ang[i] / 360.0f;
+        r = 10.0f * work->radius[i];
+        s = (f32)sin(ang);
+        PSMTXTrans(tex, r * s, 0.0f, r * (f32)cos(ang));
+        PSMTXConcat(mtx, tex, mtx);
+        PSMTXConcat(base, mtx, mtx);
+        for (j = 0; j < 16; j++) {
+            memcpy(&vtx[j], &tmpl[j], sizeof(effN64Vtx));
+            OSInitFastCast();
+            OSs16tof32(&vtx[j].x, &v1.x);
+            OSs16tof32(&vtx[j].y, &v1.y);
+            OSs16tof32(&vtx[j].z, &v1.z);
+            PSMTXMultVec(mtx, &v1, &v1);
+            OSInitFastCast();
+            OSf32tos16(&v1.x, &vtx[j].x);
+            OSf32tos16(&v1.y, &vtx[j].y);
+            OSf32tos16(&v1.z, &vtx[j].z);
+        }
+        PSMTXTrans(mtx, 10.0f * work->px[i + 1], 10.0f * work->py[i + 1], 10.0f * work->pz[i + 1]);
+        PSMTXRotRad(rot, 'z', 0.017453292f * work->rot[i + 1]);
+        PSMTXConcat(mtx, rot, mtx);
+        axis = (Vec){0.03f, 1.0f, 0.0f};
+        PSMTXRotAxisRad(rot, &axis, 0.017453292f * (work->twist + (f32)(i * i)));
+        PSMTXConcat(mtx, rot, mtx);
+        PSMTXScale(tex, work->sc[i + 1] * scale, scale, work->sc[i + 1] * scale);
+        PSMTXConcat(mtx, tex, mtx);
+        r = 10.0f * work->radius[i];
+        s = (f32)sin(6.2831855f * work->ang[i] / 360.0f);
+        PSMTXTrans(tex, r * s, 0.0f, r * (f32)cos(6.2831855f * work->ang[i] / 360.0f));
+        PSMTXConcat(mtx, tex, mtx);
+        PSMTXConcat(base, mtx, mtx);
+        for (j = 16; j < 32; j++) {
+            memcpy(&vtx[j], &tmpl[j], sizeof(effN64Vtx));
+            OSInitFastCast();
+            OSs16tof32(&vtx[j].x, &v2.x);
+            OSs16tof32(&vtx[j].y, &v2.y);
+            OSs16tof32(&vtx[j].z, &v2.z);
+            PSMTXMultVec(mtx, &v2, &v2);
+            OSInitFastCast();
+            OSf32tos16(&v2.x, &vtx[j].x);
+            OSf32tos16(&v2.y, &vtx[j].y);
+            OSf32tos16(&v2.z, &vtx[j].z);
+        }
+        GXInvalidateVtxCache();
+        DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
+        PSMTXScale(tex, 0.015625f, 0.03125f, 0.0f);
+        PSMTXTrans(mtx, work->scrollS + (f32)(i * 4), 0.0f, 0.0f);
+        PSMTXConcat(tex, mtx, tex);
+        GXLoadTexMtxImm(tex, GX_TEXMTX0, GX_MTX2x4);
+        PSMTXScale(tex, 0.015625f, 0.03125f, 0.0f);
+        PSMTXTrans(mtx, work->scrollT + (f32)(i * 2), 0.0f, 0.0f);
+        PSMTXConcat(tex, mtx, tex);
+        GXLoadTexMtxImm(tex, GX_TEXMTX1, GX_MTX2x4);
+        GXLoadPosMtxImm(camera->view, GX_PNMTX0);
+        GXSetCurrentMtx(GX_PNMTX0);
+        for (j = 0; j < 15; j++) {
+            GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+            tri2(j + 16, j + 1, j, 0, j + 1, j + 16, j + 17, 1);
+        }
+    }
+}

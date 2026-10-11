@@ -2,53 +2,53 @@
 #include "evt/evt_cmd.h"
 
 #pragma force_active on
-#include "driver/animdrv.h"
 #include "driver/effdrv.h"
-#include "system.h"
-#include "driver/camdrv.h"
-#include "mario/mariost.h"
-#include "dolphin/os.h"
-#include "mario/mario.h"
-#include "driver/fadedrv.h"
+#include "driver/mapdrv.h"
+#include "dolphin/gx.h"
 #include "memory.h"
 #include "string.h"
-#include "dolphin/gx.h"
-#include "driver/dispdrv.h"
 #include "dolphin/mtx.h"
-#include "driver/imgdrv.h"
-#include "driver/itemdrv.h"
+#include "driver/camdrv.h"
+#include "mario/mariost.h"
 #include "manager/evtmgr_cmd.h"
-#include "driver/mapdrv.h"
+#include "driver/itemdrv.h"
+#include "driver/imgdrv.h"
+#include "driver/animdrv.h"
+#include "system.h"
+#include "driver/dispdrv.h"
+#include "driver/fadedrv.h"
+#include "dolphin/os.h"
+#include "mario/mario.h"
 
-s32 EXIGetType(s32 chan, u32 dev, u32* type);
+double sin(double);
+double cos(double);
+double atan2(double y, double x);
+static inline f32 fid(f32 x) { return x; }
+double sin(double x);
+double cos(double x);
+typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
 void effStardustN64SetDrawCam(EffectEntry* eff, s32 camera);
-void effStarStoneDraw(CameraId camera, void* param);
-typedef struct MahojinStone { EffectEntry* eff; void* draw; u8 field_0x8[0x30 - 0x8]; } MahojinStone;
-typedef struct MahojinWork { u8 field_0x0[0x88]; MahojinStone stones[7]; } MahojinWork;
-void N_mapDispOn(void);
-void N_mapDispOff(void);
+void effStardust2N64SetDrawCam(EffectEntry* eff, s32 camera);
 typedef struct BrokenPiece { s32 state; s32 delay; s32 dir; Vec vel; Vec pos; f32 rot; f32 rotSpeed; f32 gx; f32 gy; } BrokenPiece;
 typedef struct BrokenWork { s32 copied; smartEntry* tex; smartEntry* pieces; } BrokenWork;
-s32 select;
+static u8* _ap;
+static KaitenParam* ckp0;
+static KaitenParam* ckp1;
+static KaitenParam* ckpw;
 BrokenWork broken_work;
+s32 select;
 extern int __float_nan[];
 static inline s32 tb_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 tb_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0; if (x > 0.0f) { f64 guess = __frsqrte(x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); guess = _half * guess * (_three - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (tb_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 static inline f32 tb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 tb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 void tiz_broken_draw(CameraId cameraId, void* param);
-void effStardust2N64SetDrawCam(EffectEntry* eff, s32 camera);
-double sin(double);
-double cos(double);
-typedef struct KaitenParam { Vec pos; Vec target; f32 angle; f32 dist; } KaitenParam;
-static KaitenParam* ckp0;
-static KaitenParam* ckp1;
-static KaitenParam* ckpw;
-double sin(double x);
-double cos(double x);
-double atan2(double y, double x);
-static inline f32 fid(f32 x) { return x; }
-static u8* _ap;
+void N_mapDispOn(void);
+void N_mapDispOff(void);
+void effStarStoneDraw(CameraId camera, void* param);
+typedef struct MahojinStone { EffectEntry* eff; void* draw; u8 field_0x8[0x30 - 0x8]; } MahojinStone;
+typedef struct MahojinWork { u8 field_0x0[0x88]; MahojinStone stones[7]; } MahojinWork;
+s32 EXIGetType(s32 chan, u32 dev, u32* type);
 
 static USER_FUNC(alpha_init_func);
 static USER_FUNC(alpha_set_func);
@@ -345,6 +345,108 @@ static s32 npcEnt[] = {
     0, 0, 0, 0, 0, 0,
 };
 
+USER_FUNC(starstone_set_position) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[2] = x;
+    ((f32*)eff->userdata)[3] = y;
+    ((f32*)eff->userdata)[4] = z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_get_position) {
+    s32* args = event->args;
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
+    f32 x = ((f32*)eff->userdata)[2];
+    f32 y = ((f32*)eff->userdata)[3];
+    f32 z = ((f32*)eff->userdata)[4];
+
+    evtSetFloat(event, args[1], x);
+    evtSetFloat(event, args[2], y);
+    evtSetFloat(event, args[3], z);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_set_ry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 ry = evtGetFloat(event, args[1]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[7] = ry - 360.0f * ((s32)ry / 360);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_set_alpha) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    u8 alpha = evtGetValue(event, args[1]);
+
+    ((u8*)effNameToPtr(name)->userdata)[0x5F] = alpha;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_set_scale) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 scale = evtGetFloat(event, args[1]);
+
+    ((f32*)effNameToPtr(name)->userdata)[5] = scale;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_circle_link_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 idx = evtGetValue(event, args[1]) - 1;
+    f32 x = evtGetFloat(event, args[2]);
+    f32 y = evtGetFloat(event, args[3]);
+    f32 z = evtGetFloat(event, args[4]);
+    f32 ry = evtGetFloat(event, args[5]);
+    f32 r = evtGetFloat(event, args[6]);
+    EffectEntry* eff = effNameToPtr(name);
+    f32 angle;
+    f32 s;
+    f32 c;
+
+    ry = ry - 360.0f * ((s32)ry / 360);
+    angle = 6.2831855f * (360.0f * idx / 7.0f + ry) / 360.0f;
+    s = sin(angle);
+    c = cos(angle);
+
+    ((f32*)eff->userdata)[2] = s * r + x;
+    ((f32*)eff->userdata)[3] = y;
+    ((f32*)eff->userdata)[4] = -c * r + z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(eff_starstone_sound_off) {
+    *(u16*)((u8*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata + 4) &= ~4;
+    return EVT_RETURN_DONE;
+}
+
+static void alpha_tev(MapTevCallbackInfo* info) {
+    s32 stage = info->tevStage;
+    u8* alpha = _ap;
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+    info->tevStage++;
+}
+
 EVT_BEGIN(mahojin_alpha)
     CALL(evt_map_set_tevcallback, 1, PTR(alpha_tev))
     CALL(evt_mapobj_flag_onoff, 0, 1, STRING("hosi_2"), 16777216)
@@ -579,6 +681,458 @@ EVT_BEGIN(disp_treasure_map)
     RETURN
 EVT_END()
 
+static USER_FUNC(alpha_init_func) {
+    _ap = _mapAlloc(1);
+    *_ap = 255;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(alpha_set_func) {
+    *_ap = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_init) {
+    s32* args = event->args;
+    Vec target;
+    Vec pos;
+    f32 dist;
+
+    ckp0 = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp0, 0, sizeof(KaitenParam));
+    ckp1 = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp1, 0, sizeof(KaitenParam));
+    ckpw = _mapAlloc(sizeof(KaitenParam));
+    memset(ckp1, 0, sizeof(KaitenParam));
+    ckp0->pos.x = evtGetFloat(event, args[0]);
+    ckp0->pos.y = evtGetFloat(event, args[1]);
+    ckp0->pos.z = evtGetFloat(event, args[2]);
+    ckp0->target.x = evtGetFloat(event, args[3]);
+    ckp0->target.y = evtGetFloat(event, args[4]);
+    ckp0->target.z = evtGetFloat(event, args[5]);
+    ckp1->pos.x = evtGetFloat(event, args[6]);
+    ckp1->pos.y = evtGetFloat(event, args[7]);
+    ckp1->pos.z = evtGetFloat(event, args[8]);
+    ckp1->target.x = evtGetFloat(event, args[9]);
+    ckp1->target.y = evtGetFloat(event, args[10]);
+    ckp1->target.z = evtGetFloat(event, args[11]);
+
+    pos = ckp0->pos;
+    target = ckp0->target;
+    target.y = 0.0f;
+    pos.y = 0.0f;
+    dist = PSVECDistance(&pos, &target);
+    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
+    ckp0->dist = dist;
+
+    pos = ckp1->pos;
+    target = ckp1->target;
+    target.y = 0.0f;
+    pos.y = 0.0f;
+    dist = PSVECDistance(&pos, &target);
+    ckp1->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
+    ckp1->dist = dist;
+
+    ckpw->pos = ckp0->pos;
+    ckpw->target = ckp0->target;
+    ckpw->angle = ckp0->angle;
+    ckpw->dist = ckp0->dist;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_set_direct) {
+    CameraEntry* camera = camGetPtr(4);
+    f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
+    f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
+
+    ckpw->pos.x = ckpw->dist * s + ckpw->target.x;
+    ckpw->pos.z = ckpw->target.z - ckpw->dist * c;
+    camera->presetPos = camera->cameraPos;
+    camera->presetAt = camera->cameraAt;
+    camera->storedPos = ckpw->pos;
+    camera->storedAt = ckpw->target;
+    camera->startTimeA = gp->renderTime;
+    camera->durationA = 0;
+    camera->stateA = 3;
+    camera->curveA = 11;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_get_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    evtSetFloat(event, args[1], p->pos.x);
+    evtSetFloat(event, args[2], p->pos.y);
+    evtSetFloat(event, args[3], p->pos.z);
+    evtSetFloat(event, args[4], p->target.x);
+    evtSetFloat(event, args[5], p->target.y);
+    evtSetFloat(event, args[6], p->target.z);
+    evtSetFloat(event, args[7], p->angle);
+    evtSetFloat(event, args[8], p->dist);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(cam_kaiten_set_para) {
+    s32* args = event->args;
+    KaitenParam* p;
+
+    switch (evtGetValue(event, args[0])) {
+        case 0:
+            p = ckp0;
+            break;
+        case 1:
+            p = ckp1;
+            break;
+        case 2:
+        default:
+            p = ckpw;
+            break;
+    }
+    p->pos.x = evtGetFloat(event, args[1]);
+    p->pos.y = evtGetFloat(event, args[2]);
+    p->pos.z = evtGetFloat(event, args[3]);
+    p->target.x = evtGetFloat(event, args[4]);
+    p->target.y = evtGetFloat(event, args[5]);
+    p->target.z = evtGetFloat(event, args[6]);
+    p->angle = evtGetFloat(event, args[7]);
+    p->dist = evtGetFloat(event, args[8]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(disp_lighteffect_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    f32 ry = evtGetFloat(event, args[4]);
+    EffectEntry* eff = effNameToPtr(name);
+    f32 s;
+    f32 c;
+    f32 angle = 6.2831855f * -ry / 360.0f;
+
+    s = sin(angle);
+    c = cos(angle);
+    ((f32*)eff->userdata)[1] = 30.0f * s + x;
+    ((f32*)eff->userdata)[2] = y;
+    ((f32*)eff->userdata)[3] = 30.0f * -c + z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(disp_treasure_map_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    f32 ry = evtGetFloat(event, args[4]);
+    u8 alpha = evtGetValue(event, args[5]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[1] = x;
+    ((f32*)eff->userdata)[2] = y;
+    ((f32*)eff->userdata)[3] = z;
+    ((f32*)eff->userdata)[8] = 180.0f + ry;
+    ((s32*)eff->userdata)[5] = alpha;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(mahojin_effect_alpha) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    u8 alpha = evtGetValue(event, args[1]);
+
+    ((s32*)effNameToPtr(name)->userdata)[8] = alpha;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(effect_position) {
+    ItemEntry* item = itemNameToPtr("item00");
+    f32 angle = -(6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f);
+    f32 x;
+    f32 z;
+    EffectEntry* eff;
+
+    x = 5.0f * (f32)sin(angle);
+    z = 5.0f * (f32)cos(angle);
+    eff = effNameToPtr("map_wave");
+    if (eff != NULL) {
+        ((f32*)eff->userdata)[1] = item->position.x + x;
+        ((f32*)eff->userdata)[2] = item->position.y;
+        ((f32*)eff->userdata)[3] = item->position.z + z;
+    }
+    x = 10.0f * (f32)sin(angle);
+    z = 10.0f * (f32)cos(angle);
+    eff = effNameToPtr("map_map");
+    if (eff != NULL) {
+        ((f32*)eff->userdata)[1] = item->position.x + x;
+        ((f32*)eff->userdata)[2] = item->position.y;
+        ((f32*)eff->userdata)[3] = item->position.z + z;
+        ((f32*)eff->userdata)[8] = 180.0f - camGetPtr(CAMERA_3D)->viewYaw;
+        ((s32*)eff->userdata)[5] = evtGetValue(event, (s32)0xFD050F8B);
+        ((f32*)eff->userdata)[4] = 0.9f;
+    }
+    x = 15.0f * (f32)sin(angle);
+    z = 15.0f * (f32)cos(angle);
+    eff = effNameToPtr("map_ball");
+    if (eff != NULL) {
+        ((f32*)eff->userdata)[1] = item->position.x + x;
+        ((f32*)eff->userdata)[2] = item->position.y;
+        ((f32*)eff->userdata)[3] = item->position.z + z;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(img_alpha) {
+    Mtx trans;
+    Mtx scale;
+    Mtx rot;
+    s32 alpha = evtGetValue(event, event->args[0]);
+    ImageEntry* img = imgNameToPtr("img", gp->inBattle != 0);
+
+    animPoseSetMaterialFlagOn(img->poseId, 0x40);
+    animPoseSetMaterialEvtColor(img->poseId, (GXColor){0xFF, 0xFF, 0xFF, alpha});
+    PSMTXTrans(trans, 0.0f, 1.5f, 0.0f);
+    PSMTXScale(scale, 0.9f, 0.9f, 0.9f);
+    PSMTXRotRad(rot, 'x', -0.5235988f);
+    PSMTXConcat(trans, scale, trans);
+    PSMTXConcat(trans, rot, img->field_0x120);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(tiz_stone) {
+    f32 t = evtGetValue(event, event->args[0]);
+    EffectEntry* eff;
+
+    t /= 10000.0f;
+    eff = effNameToPtr("tiz_dust");
+    if (eff != NULL) {
+        effStardustN64SetDrawCam(eff, 7);
+    }
+    eff = effNameToPtr("tiz_stone");
+    if (eff != NULL) {
+        ((s32*)eff->userdata)[14] = 7;
+        ((u8*)eff->userdata)[0x5F] = 255.0f * t;
+        ((f32*)eff->userdata)[7] = 5.0f * (360.0f * t);
+    }
+    eff = effNameToPtr("tiz_dust2");
+    if (eff != NULL) {
+        effStardust2N64SetDrawCam(eff, 7);
+    }
+    return EVT_RETURN_DONE;
+}
+
+void tiz_broken_draw(CameraId cameraId, void* param) {
+    GXTexObj tex;
+    Mtx mtx;
+    Mtx scale;
+    Mtx rot;
+    Mtx ident;
+    CameraEntry* cam = camGetPtr(cameraId);
+    s32 x;
+    s32 y;
+    BrokenPiece* p;
+    s32 yo;
+    s32 xo;
+    f32 py;
+    f32 rz;
+
+    if (broken_wp->copied == 0) {
+        GXSetTexCopySrc(0, 0, 608, 480);
+        GXSetTexCopyDst(304, 240, GX_TF_RGB5A3, GX_TRUE);
+        GXCopyTex(broken_wp->tex->address, GX_FALSE);
+        GXPixModeSync();
+        broken_wp->copied = 1;
+    }
+    GXSetNumChans(0);
+    GXInitTexObj(&tex, broken_wp->tex->address, 304, 240, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXLoadTexObj(&tex, GX_TEXMAP0);
+    GXSetNumTexGens(1);
+    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_OR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetCullMode(GX_CULL_NONE);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    GXSetCurrentMtx(0);
+    PSMTXIdentity(ident);
+    p = broken_wp->pieces->address;
+    for (y = 0, yo = 0; y < 30; y++, yo += 16, p++) {
+        py = 232.0f - yo;
+        for (x = 0, xo = 0; x < 38; x++, xo += 16, p++) {
+            if (p->delay == 0) {
+                PSMTXScale(scale, 1.0f / 38.0f, 1.0f / 30.0f, 1.0f);
+                PSMTXTrans(mtx, x, y, 0.0f);
+                PSMTXConcat(scale, mtx, mtx);
+                GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
+                PSMTXTrans(mtx, -296.0f + xo, py, 0.0f);
+                switch (p->dir) {
+                    case 0:
+                        rz = -45.0f;
+                        break;
+                    case 1:
+                        rz = 45.0f;
+                        break;
+                    case 2:
+                        rz = 225.0f;
+                        break;
+                    case 3:
+                        rz = 135.0f;
+                        break;
+                }
+                PSMTXTrans(rot, p->pos.x, p->pos.y, p->pos.z);
+                PSMTXConcat(mtx, rot, mtx);
+                PSMTXRotRad(rot, 'z', 0.017453292f * rz);
+                PSMTXConcat(mtx, rot, mtx);
+                PSMTXRotRad(rot, 'y', 0.017453292f * p->rot);
+                PSMTXConcat(mtx, rot, mtx);
+                PSMTXRotRad(rot, 'z', 0.017453292f * -rz);
+                PSMTXConcat(mtx, rot, mtx);
+                PSMTXConcat(cam->view, mtx, mtx);
+                GXLoadPosMtxImm(mtx, GX_PNMTX0);
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(-8.0f, 8.0f, 0.0f);
+                GXTexCoord2f32(0.0f, 0.0f);
+                GXPosition3f32(8.0f, 8.0f, 0.0f);
+                GXTexCoord2f32(1.0f, 0.0f);
+                GXPosition3f32(8.0f, -8.0f, 0.0f);
+                GXTexCoord2f32(1.0f, 1.0f);
+                GXPosition3f32(-8.0f, -8.0f, 0.0f);
+                GXTexCoord2f32(0.0f, 1.0f);
+            }
+        }
+    }
+}
+
+#pragma opt_propagation off
+#pragma opt_lifetimes off
+USER_FUNC(tiz_broken) {
+    s32 x;
+    s32 y;
+    s32 done = 0;
+    BrokenPiece* p;
+    BrokenPiece* q;
+    s32 i;
+    s32 j;
+    f32 dx;
+    f32 dy;
+    f32 nx;
+    f32 ny;
+    f32 len;
+    f32 angle;
+
+    if (isFirstCall) {
+        memset(broken_wp, 0, sizeof(BrokenWork));
+        broken_wp->tex = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB5A3, GX_FALSE, 0), 1);
+        broken_wp->pieces = smartAlloc(sizeof(BrokenPiece) * 31 * 39, 1);
+        broken_wp->copied = 0;
+        p = broken_wp->pieces->address;
+        for (y = 0; y < 30; y++) {
+            for (x = 0; x < 38; x++) {
+                dx = x / 37.0f - 0.5f;
+                dy = 0.5f + -y / 29.0f;
+                if (dy > 0.0f) {
+                    if (dx < 0.0f) {
+                        p->dir = 0;
+                    } else {
+                        p->dir = 1;
+                    }
+                } else {
+                    if (dx < 0.0f) {
+                        p->dir = 2;
+                    } else {
+                        p->dir = 3;
+                    }
+                }
+                if (dx || dy) {
+                    len = tb_sqrtf(dx * dx + dy * dy);
+                    nx = dx / len;
+                    ny = dy / len;
+                } else {
+                    nx = ny = len = 0.0f;
+                }
+                p->state = 0;
+                p->delay = param_tbl[0] * len;
+                p->pos.x = 0.0f;
+                p->pos.y = 0.0f;
+                p->pos.z = 0.0f;
+                p->rotSpeed = 0.0f;
+                p->rot = 0.0f;
+                p->vel.x = -nx * param_tbl[1];
+                p->vel.y = -ny * param_tbl[1];
+                p->vel.z = 10.0f;
+                angle = 6.2831855f * angleABf(0.0f, 0.0f, dx, dy) / 360.0f;
+                nx = param_tbl[3];
+                p->gx = nx * tb_sin(angle);
+                p->gy = nx * -tb_cos(angle);
+                p++;
+            }
+            p++;
+        }
+    }
+    q = broken_wp->pieces->address;
+    for (i = 0; i < 30; i++) {
+        for (j = 0; j < 38; j++) {
+            switch (q->state) {
+                case 0:
+                    if (q->delay != 0) {
+                        q->delay--;
+                        break;
+                    }
+                    q->pos.x += q->gx;
+                    q->pos.y += q->gy;
+                    q->pos.x += q->vel.x;
+                    q->pos.y += q->vel.y;
+                    q->pos.z += q->vel.z;
+                    q->vel.x *= param_tbl[2];
+                    q->vel.y *= param_tbl[2];
+                    q->vel.z *= param_tbl[2];
+                    q->rotSpeed += param_tbl[4];
+                    q->rot += q->rotSpeed;
+                    if (__fabs(q->pos.x) > 340.0 || __fabs(q->pos.y) > 260.0) {
+                        q->state++;
+                    }
+                    break;
+                case 1:
+                    done++;
+                    break;
+            }
+            q++;
+        }
+        q++;
+    }
+    if (done >= 30 * 38) {
+        smartFree(broken_wp->tex);
+        smartFree(broken_wp->pieces);
+        return EVT_RETURN_DONE;
+    }
+    dispEntry((CameraId)8, 0.0f, 0, tiz_broken_draw, NULL);
+    return EVT_RETURN_BLOCK;
+}
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset
+
 __declspec(section ".data") BrokenWork* broken_wp = &broken_work;
 
 __declspec(section ".data") f32 param_tbl[] = {
@@ -592,6 +1146,234 @@ __declspec(section ".data") f32 add_tbl[] = {
 static __declspec(section ".data") s32 name_tbl[] = {
     (s32)"delay", (s32)"v0", (s32)"vscale", (s32)"pow", (s32)"vr",
 };
+
+static USER_FUNC(evtflash) {
+    s32* args = event->args;
+    s32 in = evtGetValue(event, args[0]);
+    s32 wait = evtGetValue(event, args[1]);
+    s32 out = evtGetValue(event, args[2]);
+
+    if (isFirstCall) {
+        event->userdata[2] = 0;
+    }
+    switch (event->userdata[2]) {
+        case 0: {
+            GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+            fadeEntry(10, in, color);
+            event->userdata[2]++;
+        }
+        case 1:
+            if (fadeIsFinish() != TRUE) {
+                return EVT_RETURN_BLOCK;
+            }
+            event->userdata[0] = wait;
+            event->savedTime = (s32)gp->renderTime;
+            event->userdata[2]++;
+            if (event->userdata[0] == 0) {
+                event->userdata[2]++;
+            }
+            return EVT_RETURN_BLOCK;
+        case 2:
+            if (OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime) < (u32)event->userdata[0]) {
+                return EVT_RETURN_BLOCK;
+            }
+            event->userdata[2]++;
+            return EVT_RETURN_BLOCK;
+        case 3: {
+            GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+            fadeEntry(9, out, color);
+            event->userdata[2]++;
+        }
+        case 4:
+            if (fadeIsFinish() != TRUE) {
+                return EVT_RETURN_BLOCK;
+            }
+            return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_tik_0000247c) {
+    if (evtGetValue(event, event->args[0])) {
+        N_mapDispOn();
+    } else {
+        N_mapDispOff();
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(crystal_bgmode) {
+    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
+
+    ((s32*)eff->userdata)[14] = 5;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(map_bgmode) {
+    s32* args = event->args;
+    const char* name1 = (const char*)evtGetValue(event, args[0]);
+    const char* name2 = (const char*)evtGetValue(event, args[1]);
+    EffectEntry* eff = effNameToPtr(name1);
+
+    ((s32*)eff->userdata)[14] = 5;
+    ((f32*)eff->userdata)[5] = 4.3f;
+    eff = effNameToPtr(name2);
+    ((s32*)eff->userdata)[10] = 5;
+    marioSetCamId(5);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(map_bgmode_end) {
+    s32* args = event->args;
+    const char* name1 = (const char*)evtGetValue(event, args[0]);
+    const char* name2 = (const char*)evtGetValue(event, args[1]);
+    EffectEntry* eff;
+
+    eff = effNameToPtr(name1);
+    ((s32*)eff->userdata)[14] = 4;
+    eff = effNameToPtr(name2);
+    ((s32*)eff->userdata)[10] = 4;
+    marioSetCamId(4);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(cam_mahojin_kaiten_main) {
+    s32 frames;
+    s32 msec;
+    s32* args = event->args;
+    f32 start = evtGetFloat(event, args[0]);
+    f32 end = evtGetFloat(event, args[1]);
+    s32 cont;
+    f32 cur;
+    f32 total;
+    f32 speed;
+    s32 elapsed;
+    s32 i;
+
+    msec = evtGetValue(event, args[2]);
+    frames = sysMsec2Frame(msec);
+    cont = 1;
+
+    if (event->lwData[15] == 0) {
+        event->lwData[14] = 0;
+        event->lwData[15] = 1;
+        event->savedTime = gp->renderTime;
+    }
+    total = 0.0f;
+    speed = total;
+    for (i = 0; i < frames; i++) {
+        if (i <= frames * 20 / 100) {
+            speed += 1.0f;
+        } else if (i >= frames * 80 / 100) {
+            speed -= 1.0f;
+        }
+        total += speed;
+        if (i == event->lwData[14]) {
+            cur = total;
+        }
+    }
+    elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
+    if (elapsed > msec) {
+        elapsed = msec;
+    }
+    event->lwData[14] = sysMsec2Frame(elapsed);
+    if (frames == event->lwData[14]) {
+        cont = 0;
+    }
+    evtSetFloat(event, args[3], start + cur * (end - start) / total);
+    evtSetValue(event, args[4], cont);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_setting) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 idx = evtGetValue(event, args[1]);
+    EffectEntry* eff = effNameToPtr(name);
+    EffectEntry* mahojin = effNameToPtr("mahojin");
+
+    *(u16*)((u8*)eff->userdata + 4) |= 0x20;
+    ((MahojinWork*)mahojin->userdata)->stones[idx].eff = eff;
+    ((MahojinWork*)mahojin->userdata)->stones[idx].draw = effStarStoneDraw;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(kemuri_set_position) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[1] = x;
+    ((f32*)eff->userdata)[2] = y;
+    ((f32*)eff->userdata)[3] = z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(kemuri_set_color) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    u8 r = evtGetValue(event, args[1]);
+    u8 g = evtGetValue(event, args[2]);
+    u8 b = evtGetValue(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((u8*)eff->userdata)[0x38] = r;
+    ((u8*)eff->userdata)[0x39] = g;
+    ((u8*)eff->userdata)[0x3A] = b;
+    ((f32*)eff->userdata)[6] = 1.0f + irand(30) / 10.0f;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(pcharge_set_position) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[1] = x;
+    ((f32*)eff->userdata)[2] = y;
+    ((f32*)eff->userdata)[3] = z;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(stardust_setting) {
+    s32* args = event->args;
+    const char* name1 = (const char*)evtGetValue(event, args[0]);
+    const char* name2 = (const char*)evtGetValue(event, args[1]);
+    EffectEntry* eff1 = effNameToPtr(name1);
+    EffectEntry* eff2 = effNameToPtr(name2);
+
+    effStardustN64SetDrawCam(eff1, 5);
+    effStardustN64SetDrawCam(eff2, 5);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(is_dol_viewer) {
+    u32 type;
+
+    EXIGetType(0, 2, &type);
+    if (type == 0x05070000) {
+        animPoseRelease(animPoseEntry("MOBJ_EFF_las_mon", 0));
+        animPoseRelease(animPoseEntry("EFF_treasure_map", 0));
+        animPoseRelease(animPoseEntry("MOBJ_EFF_mahojin_omote", 0));
+        animPoseRelease(animPoseEntry("MOBJ_EFF_mahojin_ura", 0));
+        animPoseRelease(animPoseEntry("MOBJ_EFF_laser", 0));
+        animPoseRelease(animPoseEntry("OFF_d_tizu_tex", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_1", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_2", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_3", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_4", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_5", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_6", 0));
+        animPoseRelease(animPoseEntry("TIZ_stg_7", 0));
+    }
+    return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(evt_mapwrite)
     WAIT_MS(800)
@@ -2009,772 +2791,4 @@ EVT_BEGIN(tik_05_init_evt)
     CALL(is_dol_viewer)
     RETURN
 EVT_END()
-
-USER_FUNC(is_dol_viewer) {
-    u32 type;
-
-    EXIGetType(0, 2, &type);
-    if (type == 0x05070000) {
-        animPoseRelease(animPoseEntry("MOBJ_EFF_las_mon", 0));
-        animPoseRelease(animPoseEntry("EFF_treasure_map", 0));
-        animPoseRelease(animPoseEntry("MOBJ_EFF_mahojin_omote", 0));
-        animPoseRelease(animPoseEntry("MOBJ_EFF_mahojin_ura", 0));
-        animPoseRelease(animPoseEntry("MOBJ_EFF_laser", 0));
-        animPoseRelease(animPoseEntry("OFF_d_tizu_tex", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_1", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_2", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_3", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_4", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_5", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_6", 0));
-        animPoseRelease(animPoseEntry("TIZ_stg_7", 0));
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(stardust_setting) {
-    s32* args = event->args;
-    const char* name1 = (const char*)evtGetValue(event, args[0]);
-    const char* name2 = (const char*)evtGetValue(event, args[1]);
-    EffectEntry* eff1 = effNameToPtr(name1);
-    EffectEntry* eff2 = effNameToPtr(name2);
-
-    effStardustN64SetDrawCam(eff1, 5);
-    effStardustN64SetDrawCam(eff2, 5);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(pcharge_set_position) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(kemuri_set_color) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    u8 r = evtGetValue(event, args[1]);
-    u8 g = evtGetValue(event, args[2]);
-    u8 b = evtGetValue(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((u8*)eff->userdata)[0x38] = r;
-    ((u8*)eff->userdata)[0x39] = g;
-    ((u8*)eff->userdata)[0x3A] = b;
-    ((f32*)eff->userdata)[6] = 1.0f + irand(30) / 10.0f;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(kemuri_set_position) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_setting) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 idx = evtGetValue(event, args[1]);
-    EffectEntry* eff = effNameToPtr(name);
-    EffectEntry* mahojin = effNameToPtr("mahojin");
-
-    *(u16*)((u8*)eff->userdata + 4) |= 0x20;
-    ((MahojinWork*)mahojin->userdata)->stones[idx].eff = eff;
-    ((MahojinWork*)mahojin->userdata)->stones[idx].draw = effStarStoneDraw;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(cam_mahojin_kaiten_main) {
-    s32* args = event->args;
-    f32 start = evtGetFloat(event, args[0]);
-    f32 end = evtGetFloat(event, args[1]);
-    s32 msec = evtGetValue(event, args[2]);
-    s32 frames = sysMsec2Frame(msec);
-    s32 cont = 1;
-    f32 total;
-    f32 cur;
-    f32 speed;
-    s32 elapsed;
-    s32 i;
-
-    if (event->lwData[15] == 0) {
-        event->lwData[14] = 0;
-        event->lwData[15] = 1;
-        event->savedTime = gp->renderTime;
-    }
-    total = 0.0f;
-    speed = total;
-    for (i = 0; i < frames; i++) {
-        if (i <= frames * 20 / 100) {
-            speed += 1.0f;
-        } else if (i >= frames * 80 / 100) {
-            speed -= 1.0f;
-        }
-        total += speed;
-        if (i == event->lwData[14]) {
-            cur = total;
-        }
-    }
-    elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    if (elapsed > msec) {
-        elapsed = msec;
-    }
-    event->lwData[14] = sysMsec2Frame(elapsed);
-    if (frames == event->lwData[14]) {
-        cont = 0;
-    }
-    evtSetFloat(event, args[3], start + cur * (end - start) / total);
-    evtSetValue(event, args[4], cont);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(map_bgmode_end) {
-    s32* args = event->args;
-    const char* name1 = (const char*)evtGetValue(event, args[0]);
-    const char* name2 = (const char*)evtGetValue(event, args[1]);
-    EffectEntry* eff;
-
-    eff = effNameToPtr(name1);
-    ((s32*)eff->userdata)[14] = 4;
-    eff = effNameToPtr(name2);
-    ((s32*)eff->userdata)[10] = 4;
-    marioSetCamId(4);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(map_bgmode) {
-    s32* args = event->args;
-    const char* name1 = (const char*)evtGetValue(event, args[0]);
-    const char* name2 = (const char*)evtGetValue(event, args[1]);
-    EffectEntry* eff = effNameToPtr(name1);
-
-    ((s32*)eff->userdata)[14] = 5;
-    ((f32*)eff->userdata)[5] = 4.3f;
-    eff = effNameToPtr(name2);
-    ((s32*)eff->userdata)[10] = 5;
-    marioSetCamId(5);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(crystal_bgmode) {
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, event->args[0]));
-
-    ((s32*)eff->userdata)[14] = 5;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(unk_tik_0000247c) {
-    if (evtGetValue(event, event->args[0])) {
-        N_mapDispOn();
-    } else {
-        N_mapDispOff();
-    }
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(evtflash) {
-    s32* args = event->args;
-    s32 in = evtGetValue(event, args[0]);
-    s32 wait = evtGetValue(event, args[1]);
-    s32 out = evtGetValue(event, args[2]);
-
-    if (isFirstCall) {
-        event->userdata[2] = 0;
-    }
-    switch (event->userdata[2]) {
-        case 0: {
-            GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-            fadeEntry(10, in, color);
-            event->userdata[2]++;
-        }
-        case 1:
-            if (fadeIsFinish() != TRUE) {
-                return EVT_RETURN_BLOCK;
-            }
-            event->userdata[0] = wait;
-            event->savedTime = (s32)gp->renderTime;
-            event->userdata[2]++;
-            if (event->userdata[0] == 0) {
-                event->userdata[2]++;
-            }
-            return EVT_RETURN_BLOCK;
-        case 2:
-            if (OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime) < (u32)event->userdata[0]) {
-                return EVT_RETURN_BLOCK;
-            }
-            event->userdata[2]++;
-            return EVT_RETURN_BLOCK;
-        case 3: {
-            GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-            fadeEntry(9, out, color);
-            event->userdata[2]++;
-        }
-        case 4:
-            if (fadeIsFinish() != TRUE) {
-                return EVT_RETURN_BLOCK;
-            }
-            return EVT_RETURN_DONE;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(tiz_broken) {
-    s32 done = 0;
-    BrokenPiece* p;
-    s32 x;
-    s32 y;
-    f32 dx;
-    f32 dy;
-    f32 nx;
-    f32 ny;
-    f32 len;
-    f32 angle;
-
-    if (isFirstCall) {
-        memset(broken_wp, 0, sizeof(BrokenWork));
-        broken_wp->tex = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB565, GX_FALSE, 0), 1);
-        broken_wp->pieces = smartAlloc(sizeof(BrokenPiece) * 31 * 39, 1);
-        broken_wp->copied = 0;
-        p = broken_wp->pieces->address;
-        for (y = 0; y < 30; y++) {
-            for (x = 0; x < 38; x++) {
-                dy = 0.5f + -y / 29.0f;
-                dx = x / 37.0f - 0.5f;
-                if (dy > 0.0f) {
-                    if (dx < 0.0f) {
-                        p->dir = 0;
-                    } else {
-                        p->dir = 1;
-                    }
-                } else {
-                    if (dx < 0.0f) {
-                        p->dir = 2;
-                    } else {
-                        p->dir = 3;
-                    }
-                }
-                if (dx != 0.0f || dy != 0.0f) {
-                    len = tb_sqrtf(dx * dx + dy * dy);
-                    nx = dx / len;
-                    ny = dy / len;
-                } else {
-                    nx = ny = len = 0.0f;
-                }
-                p->state = 0;
-                p->delay = param_tbl[0] * len;
-                p->pos.x = 0.0f;
-                p->pos.y = 0.0f;
-                p->pos.z = 0.0f;
-                p->rotSpeed = 0.0f;
-                p->rot = 0.0f;
-                p->vel.x = -nx * param_tbl[1];
-                p->vel.y = -ny * param_tbl[1];
-                p->vel.z = 10.0f;
-                angle = 6.2831855f * angleABf(0.0f, 0.0f, dx, dy) / 360.0f;
-                p->gx = param_tbl[3] * tb_sin(angle);
-                p->gy = param_tbl[3] * -tb_cos(angle);
-                p++;
-            }
-            p++;
-        }
-    }
-    p = broken_wp->pieces->address;
-    for (y = 0; y < 30; y++) {
-        for (x = 0; x < 38; x++) {
-            switch (p->state) {
-                case 0:
-                    if (p->delay != 0) {
-                        p->delay--;
-                        break;
-                    }
-                    p->pos.x += p->gx;
-                    p->pos.y += p->gy;
-                    p->pos.x += p->vel.x;
-                    p->pos.y += p->vel.y;
-                    p->pos.z += p->vel.z;
-                    p->vel.x *= param_tbl[2];
-                    p->vel.y *= param_tbl[2];
-                    p->vel.z *= param_tbl[2];
-                    p->rotSpeed += param_tbl[4];
-                    p->rot += p->rotSpeed;
-                    if (__fabs(p->pos.x) > 340.0 || __fabs(p->pos.y) > 260.0) {
-                        p->state++;
-                    }
-                    break;
-                case 1:
-                    done++;
-                    break;
-            }
-            p++;
-        }
-        p++;
-    }
-    if (done >= 30 * 38) {
-        smartFree(broken_wp->tex);
-        smartFree(broken_wp->pieces);
-        return EVT_RETURN_DONE;
-    }
-    dispEntry((CameraId)8, 0.0f, 0, tiz_broken_draw, NULL);
-    return EVT_RETURN_BLOCK;
-}
-
-void tiz_broken_draw(CameraId cameraId, void* param) {
-    GXTexObj tex;
-    Mtx ident;
-    Mtx rot;
-    Mtx scale;
-    Mtx mtx;
-    CameraEntry* cam = camGetPtr(cameraId);
-    BrokenPiece* p;
-    s32 x;
-    s32 y;
-    s32 xo;
-    s32 yo;
-    f32 py;
-    f32 rz;
-
-    if (broken_wp->copied == 0) {
-        GXSetTexCopySrc(0, 0, 608, 480);
-        GXSetTexCopyDst(304, 240, GX_TF_RGB565, GX_TRUE);
-        GXCopyTex(broken_wp->tex->address, GX_FALSE);
-        GXPixModeSync();
-        broken_wp->copied = 1;
-    }
-    GXSetNumChans(0);
-    GXInitTexObj(&tex, broken_wp->tex->address, 304, 240, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXLoadTexObj(&tex, GX_TEXMAP0);
-    GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    GXSetNumTevStages(1);
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-    GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-    GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_NOOP);
-    GXSetZCompLoc(GX_TRUE);
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    GXSetCullMode(GX_CULL_NONE);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    GXSetCurrentMtx(0);
-    PSMTXIdentity(ident);
-    p = broken_wp->pieces->address;
-    for (y = 0, yo = 0; y < 30; y++, yo += 16) {
-        py = 232.0f - yo;
-        for (x = 0, xo = 0; x < 38; x++, xo += 16) {
-            if (p->delay == 0) {
-                PSMTXScale(scale, 1.0f / 38.0f, 1.0f / 30.0f, 1.0f);
-                PSMTXTrans(mtx, x, y, 0.0f);
-                PSMTXConcat(scale, mtx, mtx);
-                GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
-                PSMTXTrans(mtx, -296.0f + xo, py, 0.0f);
-                switch (p->dir) {
-                    case 0:
-                        rz = -45.0f;
-                        break;
-                    case 1:
-                        rz = 45.0f;
-                        break;
-                    case 2:
-                        rz = 225.0f;
-                        break;
-                    case 3:
-                        rz = 135.0f;
-                        break;
-                }
-                PSMTXTrans(rot, p->pos.x, p->pos.y, p->pos.z);
-                PSMTXConcat(mtx, rot, mtx);
-                PSMTXRotRad(rot, 'z', 0.017453292f * rz);
-                PSMTXConcat(mtx, rot, mtx);
-                PSMTXRotRad(rot, 'y', 0.017453292f * p->rot);
-                PSMTXConcat(mtx, rot, mtx);
-                PSMTXRotRad(rot, 'z', 0.017453292f * -rz);
-                PSMTXConcat(mtx, rot, mtx);
-                PSMTXConcat(cam->view, mtx, mtx);
-                GXLoadPosMtxImm(mtx, GX_PNMTX0);
-                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(-8.0f, 8.0f, 0.0f);
-                GXTexCoord2f32(0.0f, 0.0f);
-                GXPosition3f32(8.0f, 8.0f, 0.0f);
-                GXTexCoord2f32(1.0f, 0.0f);
-                GXPosition3f32(8.0f, -8.0f, 0.0f);
-                GXTexCoord2f32(1.0f, 1.0f);
-                GXPosition3f32(-8.0f, -8.0f, 0.0f);
-                GXTexCoord2f32(0.0f, 1.0f);
-            }
-            p++;
-        }
-        p++;
-    }
-}
-
-USER_FUNC(tiz_stone) {
-    f32 t = evtGetValue(event, event->args[0]);
-    EffectEntry* eff;
-
-    t /= 10000.0f;
-    eff = effNameToPtr("tiz_dust");
-    if (eff != NULL) {
-        effStardustN64SetDrawCam(eff, 7);
-    }
-    eff = effNameToPtr("tiz_stone");
-    if (eff != NULL) {
-        ((s32*)eff->userdata)[14] = 7;
-        ((u8*)eff->userdata)[0x5F] = 255.0f * t;
-        ((f32*)eff->userdata)[7] = 5.0f * (360.0f * t);
-    }
-    eff = effNameToPtr("tiz_dust2");
-    if (eff != NULL) {
-        effStardust2N64SetDrawCam(eff, 7);
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(img_alpha) {
-    Mtx trans;
-    Mtx scale;
-    Mtx rot;
-    s32 alpha = evtGetValue(event, event->args[0]);
-    ImageEntry* img = imgNameToPtr("img", gp->inBattle != 0);
-
-    animPoseSetMaterialFlagOn(img->poseId, 0x40);
-    animPoseSetMaterialEvtColor(img->poseId, (GXColor){0xFF, 0xFF, 0xFF, alpha});
-    PSMTXTrans(trans, 0.0f, 1.5f, 0.0f);
-    PSMTXScale(scale, 0.9f, 0.9f, 0.9f);
-    PSMTXRotRad(rot, 'x', -0.5235988f);
-    PSMTXConcat(trans, scale, trans);
-    PSMTXConcat(trans, rot, img->field_0x120);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(effect_position) {
-    ItemEntry* item = itemNameToPtr("item00");
-    f32 angle = -(6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f);
-    f32 x;
-    f32 z;
-    EffectEntry* eff;
-
-    x = 5.0f * (f32)sin(angle);
-    z = 5.0f * (f32)cos(angle);
-    eff = effNameToPtr("map_wave");
-    if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
-    }
-    x = 10.0f * (f32)sin(angle);
-    z = 10.0f * (f32)cos(angle);
-    eff = effNameToPtr("map_map");
-    if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
-        ((f32*)eff->userdata)[8] = 180.0f - camGetPtr(CAMERA_3D)->viewYaw;
-        ((s32*)eff->userdata)[5] = evtGetValue(event, (s32)0xFD050F8B);
-        ((f32*)eff->userdata)[4] = 0.9f;
-    }
-    x = 15.0f * (f32)sin(angle);
-    z = 15.0f * (f32)cos(angle);
-    eff = effNameToPtr("map_ball");
-    if (eff != NULL) {
-        ((f32*)eff->userdata)[1] = item->position.x + x;
-        ((f32*)eff->userdata)[2] = item->position.y;
-        ((f32*)eff->userdata)[3] = item->position.z + z;
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(mahojin_effect_alpha) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    u8 alpha = evtGetValue(event, args[1]);
-
-    ((s32*)effNameToPtr(name)->userdata)[8] = alpha;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(disp_treasure_map_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    f32 ry = evtGetFloat(event, args[4]);
-    u8 alpha = evtGetValue(event, args[5]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[1] = x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = z;
-    ((f32*)eff->userdata)[8] = 180.0f + ry;
-    ((s32*)eff->userdata)[5] = alpha;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(disp_lighteffect_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    f32 ry = evtGetFloat(event, args[4]);
-    EffectEntry* eff = effNameToPtr(name);
-    f32 s;
-    f32 c;
-    f32 angle = 6.2831855f * -ry / 360.0f;
-
-    s = sin(angle);
-    c = cos(angle);
-    ((f32*)eff->userdata)[1] = 30.0f * s + x;
-    ((f32*)eff->userdata)[2] = y;
-    ((f32*)eff->userdata)[3] = 30.0f * -c + z;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_set_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    p->pos.x = evtGetFloat(event, args[1]);
-    p->pos.y = evtGetFloat(event, args[2]);
-    p->pos.z = evtGetFloat(event, args[3]);
-    p->target.x = evtGetFloat(event, args[4]);
-    p->target.y = evtGetFloat(event, args[5]);
-    p->target.z = evtGetFloat(event, args[6]);
-    p->angle = evtGetFloat(event, args[7]);
-    p->dist = evtGetFloat(event, args[8]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_get_para) {
-    s32* args = event->args;
-    KaitenParam* p;
-
-    switch (evtGetValue(event, args[0])) {
-        case 0:
-            p = ckp0;
-            break;
-        case 1:
-            p = ckp1;
-            break;
-        case 2:
-        default:
-            p = ckpw;
-            break;
-    }
-    evtSetFloat(event, args[1], p->pos.x);
-    evtSetFloat(event, args[2], p->pos.y);
-    evtSetFloat(event, args[3], p->pos.z);
-    evtSetFloat(event, args[4], p->target.x);
-    evtSetFloat(event, args[5], p->target.y);
-    evtSetFloat(event, args[6], p->target.z);
-    evtSetFloat(event, args[7], p->angle);
-    evtSetFloat(event, args[8], p->dist);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_set_direct) {
-    CameraEntry* camera = camGetPtr(4);
-    f32 s = sin(6.2831855f * ckpw->angle / 360.0f);
-    f32 c = cos(6.2831855f * ckpw->angle / 360.0f);
-
-    ckpw->pos.x = ckpw->dist * s + ckpw->target.x;
-    ckpw->pos.z = ckpw->target.z - ckpw->dist * c;
-    camera->presetPos = camera->cameraPos;
-    camera->presetAt = camera->cameraAt;
-    camera->storedPos = ckpw->pos;
-    camera->storedAt = ckpw->target;
-    camera->startTimeA = gp->renderTime;
-    camera->durationA = 0;
-    camera->stateA = 3;
-    camera->curveA = 11;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(cam_kaiten_init) {
-    s32* args = event->args;
-    Vec target;
-    Vec pos;
-    f32 dist;
-
-    ckp0 = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp0, 0, sizeof(KaitenParam));
-    ckp1 = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp1, 0, sizeof(KaitenParam));
-    ckpw = _mapAlloc(sizeof(KaitenParam));
-    memset(ckp1, 0, sizeof(KaitenParam));
-    ckp0->pos.x = evtGetFloat(event, args[0]);
-    ckp0->pos.y = evtGetFloat(event, args[1]);
-    ckp0->pos.z = evtGetFloat(event, args[2]);
-    ckp0->target.x = evtGetFloat(event, args[3]);
-    ckp0->target.y = evtGetFloat(event, args[4]);
-    ckp0->target.z = evtGetFloat(event, args[5]);
-    ckp1->pos.x = evtGetFloat(event, args[6]);
-    ckp1->pos.y = evtGetFloat(event, args[7]);
-    ckp1->pos.z = evtGetFloat(event, args[8]);
-    ckp1->target.x = evtGetFloat(event, args[9]);
-    ckp1->target.y = evtGetFloat(event, args[10]);
-    ckp1->target.z = evtGetFloat(event, args[11]);
-
-    pos = ckp0->pos;
-    target = ckp0->target;
-    target.y = 0.0f;
-    pos.y = 0.0f;
-    dist = PSVECDistance(&pos, &target);
-    ckp0->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), fid(target.z - pos.z));
-    ckp0->dist = dist;
-
-    pos = ckp1->pos;
-    target = ckp1->target;
-    target.y = 0.0f;
-    pos.y = 0.0f;
-    dist = PSVECDistance(&pos, &target);
-    ckp1->angle = 57.29579f * (f32)atan2(-(target.x - pos.x), target.z - pos.z);
-    ckp1->dist = dist;
-
-    ckpw->pos = ckp0->pos;
-    ckpw->target = ckp0->target;
-    ckpw->angle = ckp0->angle;
-    ckpw->dist = ckp0->dist;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(alpha_set_func) {
-    *_ap = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(alpha_init_func) {
-    _ap = _mapAlloc(1);
-    *_ap = 255;
-    return EVT_RETURN_DONE;
-}
-
-static void alpha_tev(MapTevCallbackInfo* info) {
-    s32 stage = info->tevStage;
-    u8* alpha = _ap;
-
-    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, *alpha});
-    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
-    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
-    info->tevStage++;
-}
-
-USER_FUNC(eff_starstone_sound_off) {
-    *(u16*)((u8*)effNameToPtr((const char*)evtGetValue(event, event->args[0]))->userdata + 4) &= ~4;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_circle_link_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 idx = evtGetValue(event, args[1]) - 1;
-    f32 x = evtGetFloat(event, args[2]);
-    f32 y = evtGetFloat(event, args[3]);
-    f32 z = evtGetFloat(event, args[4]);
-    f32 ry = evtGetFloat(event, args[5]);
-    f32 r = evtGetFloat(event, args[6]);
-    EffectEntry* eff = effNameToPtr(name);
-    f32 angle;
-    f32 s;
-    f32 c;
-
-    ry = ry - 360.0f * ((s32)ry / 360);
-    angle = 6.2831855f * (360.0f * idx / 7.0f + ry) / 360.0f;
-    s = sin(angle);
-    c = cos(angle);
-
-    ((f32*)eff->userdata)[2] = s * r + x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = -c * r + z;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_set_scale) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 scale = evtGetFloat(event, args[1]);
-
-    ((f32*)effNameToPtr(name)->userdata)[5] = scale;
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_set_alpha) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    u8 alpha = evtGetValue(event, args[1]);
-
-    ((u8*)effNameToPtr(name)->userdata)[0x5F] = alpha;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 ry = evtGetFloat(event, args[1]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[7] = ry - 360.0f * ((s32)ry / 360);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_get_position) {
-    s32* args = event->args;
-    EffectEntry* eff = effNameToPtr((const char*)evtGetValue(event, args[0]));
-    f32 x = ((f32*)eff->userdata)[2];
-    f32 y = ((f32*)eff->userdata)[3];
-    f32 z = ((f32*)eff->userdata)[4];
-
-    evtSetFloat(event, args[1], x);
-    evtSetFloat(event, args[2], y);
-    evtSetFloat(event, args[3], z);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_set_position) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
-    return EVT_RETURN_DONE;
-}
 

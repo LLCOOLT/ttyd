@@ -20,13 +20,15 @@
 // decl: void zakogun_ext_main2(void);
 // decl: void zakogun_ext_main3(void);
 // decl: void zakogun_ext_disp(CameraId camera, void* param);
+// include: mario/mariost.h
+// decl: s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* name, s32 vol, s32 pan, Vec* pos);
+// decl: void btl_camera_set_mode(s32 a, s32 b);
 // proto: s32 zakogun_get_kanbu_id(void);
 s32 zakogun_get_kanbu_id(void) {
-    s32 id = -1;
-    BattleUnit* unit;
     s32 i;
+    BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
-
+    s32 id = -1;
 
     for (i = 0; i < 64; i++) {
         unit = BattleGetUnitPtr(wp, i);

@@ -10,15 +10,17 @@
 // decl: void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 // proto: void gundan1000tai_seq01(NanNpc* npc);
 void gundan1000tai_seq01(NanNpc* npc) {
-    MarioWork* mario = marioGetPtr();
-    s32 r;
-    s32 elapsed;
     f32 radius;
-    f32 angle;
     f32 s;
+    f32 angle;
     f32 c;
     f32 t;
     f32 dist;
+    f32 speed;
+    f32 dir;
+    MarioWork* mario = marioGetPtr();
+    s32 r;
+    s32 elapsed;
 
     switch (npc->state) {
         case 0:
@@ -142,17 +144,19 @@ void gundan1000tai_seq01(NanNpc* npc) {
             npc->pos.x += npc->work80;
             break;
         case 100:
-            radius = irand(180) + 120;
+            dir = irand(180) + 120;
             angle = 6.2831855f * irand(360) / 360.0f;
-            s = sin(angle);
+            dist = sin(angle);
             c = cos(angle);
-            npc->posC.x = 0.9f * (radius * s) + 30.0f;
-            npc->posC.z = 0.5f * (radius * c) - 300.0f;
+            npc->posC.x = 0.9f * (dir * dist) + 30.0f;
+            npc->posC.z = 0.5f * (dir * c) - 300.0f;
             dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            angle = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
-            npc->work78 = sysFrame2SecFloat(dist * 0.5f + (irand(180) + 180));
-            npc->work7C = angle;
-            npc->work70 = dist / npc->work78;
+            dir = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
+            speed = dist / 2.0f + (irand(180) + 180);
+            speed = sysFrame2SecFloat(speed);
+            npc->work78 = speed;
+            npc->work7C = dir;
+            npc->work70 = dist / speed;
             npc->work6C = 0;
             npc->state = 101;
         case 101:

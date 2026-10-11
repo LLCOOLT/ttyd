@@ -31,10 +31,12 @@ static void disp_proc(CameraId cameraId, void* param) {
     f32 y;
     u16 sx;
     u16 sw;
+    s32 i;
     s32 rank;
     s32 yoff;
-    s32 i;
-    u16 w;
+    s32 w;
+    f32 winW;
+    f32 top;
     Mtx scale;
     Mtx mtx;
     char buf[0x100];
@@ -44,24 +46,30 @@ static void disp_proc(CameraId cameraId, void* param) {
     } else {
         dt = fighterDt_re;
     }
-    x = -250.0f * 0.5f;
+    winW = 250.0f;
+    x = -winW * 0.5f;
     windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
     FontDrawStart();
     FontDrawScale(1.0f);
-    w = FontGetMessageWidth("\203\211\203\223\203L\203\223\203O");
+    w = (u16)FontGetMessageWidth("\203\211\203\223\203L\203\223\203O");
     {
         GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
         FontDrawColor(color);
     }
-    FontDrawMessage(-w / 2, 135.0f, "\203\211\203\223\203L\203\223\203O");
+    top = 135.0f;
+    FontDrawMessage(-w / 2, top, "\203\211\203\223\203L\203\223\203O");
     sx = 304.0f + x;
-    sw = 250.0f;
-    GXSetScissor(sx, (u16)145.0f, sw, (u16)220.0f);
-    tx = 10.0f + x;
+    sw = winW;
+    {
+        f32 sy = 145.0f;
+        f32 sh = 220.0f;
+        GXSetScissor(sx, (u16)sy, sw, (u16)sh);
+    }
     rank = 0;
     yoff = 0;
     for (i = 0; i < rank_wp->num; i++) {
-        y = dwp->y + (135.0f - yoff - 40.0f);
+        tx = 10.0f + x;
+        y = dwp->y + (top - yoff - 40.0f);
         if (!(rank_wp->entries[i].flags & 2)) {
             PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
             if (rank != 0) {
@@ -83,42 +91,48 @@ static void disp_proc(CameraId cameraId, void* param) {
                 GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
                 FontDrawColor(color);
             }
-            PSMTXTrans(mtx, 40.0f + tx, y, 0.0f);
+            tx = 40.0f + tx;
+            PSMTXTrans(mtx, tx, y, 0.0f);
             PSMTXConcat(mtx, scale, mtx);
             FontDrawMessageMtx(mtx, msgSearch(dt[rank_wp->entries[i].id].name));
             rank++;
             yoff += 20;
         }
     }
-    GXSetScissor(sx, (u16)137.0f, sw, (u16)228.0f);
     {
+        f32 sy = 137.0f;
+        f32 sh = 228.0f;
+        GXSetScissor(sx, (u16)sy, sw, (u16)sh);
+    }
+    {
+        f32 yy = 95.0f + dwp->y;
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = 15.0f + x;
-        pos.y = 95.0f + dwp->y - 24.0f;
+        pos.y = yy - 24.0f;
         iconDispGx(&pos, 0x10, 0x123, 0.8f);
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if (dwp->page > 0) {
         {
             Vec pos = {0.0f, 125.0f, 0.0f};
-            pos.x = x + 250.0f;
+            pos.x = x + winW;
             iconDispGx(&pos, 0x10, 0x205, -1.0f);
         }
         {
             Vec pos = {0.0f, 75.0f, 0.0f};
-            pos.x = x + 250.0f;
+            pos.x = x + winW;
             iconDispGx(&pos, 0x10, 0x7E, 0.6f);
         }
     }
     if (dwp->page < 1) {
         {
             Vec pos = {0.0f, -140.0f, 0.0f};
-            pos.x = x + 250.0f;
+            pos.x = x + winW;
             iconDispGx(&pos, 0x10, 0x205, 1.0f);
         }
         {
             Vec pos = {0.0f, -125.0f, 0.0f};
-            pos.x = x + 250.0f;
+            pos.x = x + winW;
             iconDispGx(&pos, 0x10, 0x80, 0.6f);
         }
     }

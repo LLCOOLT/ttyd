@@ -7,8 +7,8 @@
 // decl: s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
 // proto: s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
-    static s32 flag;
     static s32 count;
+    static s32 flag;
     f32 angle;
 
     if (!(kurokaron_move_flag & 2)) {

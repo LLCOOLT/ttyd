@@ -1,6 +1,7 @@
 #include "driver/extdrv.h"
 #include "driver/dispdrv.h"
 #include "mario/mariost.h"
+#include <dolphin/gx.h>
 
 extern GlobalWork* gp;
 
@@ -24,4 +25,8 @@ void extMain(void) {
 
 void extMakeTexture(CameraId camId, void* param) {
 
+}
+
+void extLoadTextureExit(void) {
+    GXTexModeSync();
 }

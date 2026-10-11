@@ -13,35 +13,48 @@
 #include "stdio.h"
 #include "dolphin/mtx.h"
 #include "driver/camdrv.h"
-#include "manager/evtmgr_cmd.h"
 #include "driver/icondrv.h"
 #include "mario/mario.h"
+#include "driver/dispdrv.h"
+#include "pmario_sound.h"
+#include "driver/casedrv.h"
+#include "dolphin/gx.h"
+#include "manager/evtmgr_cmd.h"
 #include "evt/evt_badgeshop.h"
 #include "driver/effdrv.h"
 #include "driver/animdrv.h"
 
+typedef struct FuwaTable { f32 v[40]; } FuwaTable;
+static const FuwaTable fuwa_table = {{0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f, -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f}};
 typedef struct ExchangeRyokin { s32 ryokin; s32 medal; } ExchangeRyokin;
-#define RYOKIN_TBL exchange_ryokin_medal_tbl
+#define RYOKIN_TBL ((ExchangeRyokin(*)[3])exchange_ryokin_medal_tbl)
 s32 exchange_ret_tbl_no(void);
 char* exchange_msgp;
 static s32 dataadr[8];
 s32 yuugijou_montemedal_keep(EventEntry* event, BOOL isFirstCall);
 void monteCountDisp(void);
 typedef struct GoryuuWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } GoryuuWork;
-typedef struct SlotWork { u32 flags; s32 phase; f32 unk8; f32 angle[2][3]; u8 unk24[0x30 - 0x24]; s8 state[3]; s8 face[2][3]; u8 unk39[0x54 - 0x39]; s32 unk54; u8 unk58[0x60 - 0x58]; s32 nowSlot; s32 caseId[2]; s32 unk6C; u8 unk70[4]; s16 unk74; u8 unk76[2]; } SlotWork;
-typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
-typedef struct HikokiWork { u32 flags; s32 phase; s32 coins; s32 result; s32 monteCount; EventEntry* viewEvent; } HikokiWork;
-typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
-typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
-static Monte* monte_p;
-static void* yuunpc_wp;
+typedef struct SlotWork { u32 flags; s32 phase; f32 reberAngle; f32 angle[2][3]; f32 speed[3]; s8 state[3]; s8 face[2][3]; s8 stopCount[3]; s32 wait[3]; s32 extra[3]; s32 counter; s32 neonCount; s32 monteCount; s32 nowSlot; s32 caseId[2]; EventEntry* monteEvt; s32 sfxId; s16 cursor; } SlotWork;
+typedef struct GMonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } GMonteSub;
+typedef struct GMonte { u8 hidden; u8 state; s16 wait; s16 timer; u8 unk6[2]; GMonteSub sub; Vec vel; SlotWork* owner; } GMonte;
+static GMonte* monte_p;
+typedef struct GorYuuWork { s32 unk0; s32 unk4; s32 medals; } GorYuuWork;
+extern GorYuuWork* yuwp;
+int rand(void);
+static void monte_disp(CameraId camera, void* param);
+static BOOL get_monte_check(Vec* a, Vec* b);
 void mapGrpFlagOn(const char* name, u32 flags);
 typedef struct SlotDrum { const char* drum[3]; const char* reber; const char* anim; const char* window[3][3]; const char* neon[3]; } SlotDrum;
-#define DRUMNAME drumname
+#define DRUMNAME ((SlotDrum*)drumname)
 void mapObjRotate(const char* name, f32 x, f32 y, f32 z);
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel);
-#define UPSIDEGARA upsidegara
+#define UPSIDEGARA ((s32(*)[3][8])upsidegara)
+void mapPlayAnimationLv(const char* name, s32 a, s32 b);
+void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel);
+#define SLOTGARA ((s32(*)[3][8])slotgara)
+s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel);
+void slot_neon_sub(GoryuuWork* wp, SlotWork* data);
+void mapObjGetPos(const char* name, Vec* pos);
 static EffectEntry* eff;
 NpcEntry* npc;
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
@@ -253,9 +266,9 @@ USER_FUNC(yuugijou_set_yupflag);
 USER_FUNC(yuuranking_wait_button_10_text_A37C);
 void kuji_bomb_055_callback(s32 type, KujiMsgWork** work);
 void goryuugijo_disp_slot(CameraId camera, void* param);
-s32 goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall);
-s32 slot_rotate_sub(void* wp, void* data, s32 reel);
-void slot_neon_sub(void* wp, void* data);
+void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall);
+s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel);
+void slot_neon_sub(GoryuuWork* wp, SlotWork* data);
 void goryuugijo_init_slot(EventEntry* event, BOOL isFirstCall);
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel);
 void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel);
@@ -346,7 +359,7 @@ s32 exchange_keep_sub[111];
 s32 gor_03_dokan_init_evt[35];
 s32 gor_03_dokan_up_evt[60];
 s32 gor_03_dokan_down_evt[63];
-ExchangeRyokin exchange_ryokin_medal_tbl[9][3];
+s32 exchange_ryokin_medal_tbl[54];
 s32 bteresa_talk_sub_minigame[245];
 s32 bteresa_talk_sub_keihin[220];
 s32 bteresa_table_talk[437];
@@ -361,10 +374,10 @@ __declspec(section ".data") s32 slot_fall_monte[4];
 s32 slot_set[148];
 __declspec(section ".data") s32 slot1_set[7];
 __declspec(section ".data") s32 slot2_set[7];
-SlotDrum drumname[2];
+s32 drumname[34];
 __declspec(section ".data") s32 slotevttbl[2];
 s32 slotgara[48];
-s32 upsidegara[2][3][8];
+s32 upsidegara[48];
 s32 ranking_set[65];
 s32 exchange_set[195];
 s32 roten_4_init[13];
@@ -473,8 +486,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     f32 speed = evtGetFloat(event, args[1]);
     s32 duration = evtGetValue(event, args[2]);
-    f32 table[40] = {0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 2.5f, 2.6f, 2.7f, 2.7f, 2.7f, 2.6f, 2.5f, 2.3f, 2.0f, 1.8f, 1.4f, 1.0f, 0.5f,
-                     -0.0f, -0.5f, -1.0f, -1.4f, -1.8f, -2.0f, -2.3f, -2.5f, -2.6f, -2.7f, -2.7f, -2.7f, -2.6f, -2.5f, -2.3f, -2.0f, -1.8f, -1.4f, -1.0f, -0.5f};
+    FuwaTable table = fuwa_table;
     Vec* base = (Vec*)&event->userdataf[1];
     s32 elapsed;
     s32 frame;
@@ -489,7 +501,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
     frame = (0.5f + sysMsec2FrameFloat(elapsed)) * speed;
     y = base->y;
-    y += table[(u32)frame % 40];
+    y += table.v[(u32)frame % 40];
     npc->position.y = npc->prevPosition.y = y;
     if (duration == 0) {
         return EVT_RETURN_BLOCK;
@@ -563,13 +575,13 @@ USER_FUNC(evt_exchange_msg_set) {
 
 USER_FUNC(minigameselect_msg_set) {
     s32* args = event->args;
-    const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
+    const s8* msg = (const s8*)msgSearch((const char*)evtGetValue(event, args[0]));
     s32 flags[4];
-    s32 i;
-    s32 j;
     s32 k;
-    s32 count;
+    s32 i;
     s32 val;
+    s32 j;
+    s32 count;
 
     flags[0] = evtGetValue(event, GSWF(1232));
     flags[1] = evtGetValue(event, GSWF(1235));
@@ -601,15 +613,17 @@ USER_FUNC(minigameselect_msg_set) {
     }
     exchange_msgp[j] = msg[i];
     k = 0;
-    while (exchange_msgp[k] != '>') {
+    while (((s8*)exchange_msgp)[k] != '>') {
         k++;
     }
-    while (exchange_msgp[k] != ' ') {
+    while (((s8*)exchange_msgp)[k] != ' ') {
         k--;
     }
     val = 80 - (4 - count) * 12;
-    exchange_msgp[k + 1] = val / 10 + '0';
-    exchange_msgp[k + 2] = val % 10 + '0';
+    k++;
+    exchange_msgp[k] = val / 10 + '0';
+    k++;
+    exchange_msgp[k] = val % 10 + '0';
     evtSetValue(event, args[1], (s32)exchange_msgp);
     return EVT_RETURN_DONE;
 }
@@ -706,14 +720,12 @@ static BOOL get_monte_check(Vec* a, Vec* b) {
 }
 
 static void monte_disp(CameraId camera, void* param) {
-    Monte* monte = param;
+    GMonte* monte = param;
     s32 i;
 
-    if (monte != NULL) {
-        for (i = 0; i < monte->num; i++) {
-            if (monte[i].hidden == 0) {
-                iconDispGx(&monte[i].sub.pos, 0, 0x13F, 1.0f);
-            }
+    for (i = 0; i < monte->owner->monteCount; i++) {
+        if (monte[i].hidden == 0) {
+            iconDispGx(&monte[i].sub.pos, 0x40, 0x13F, 1.0f);
         }
     }
 }
@@ -2116,7 +2128,7 @@ EVT_BEGIN(gor_03_dokan_down_evt)
     RETURN
 EVT_END()
 
-ExchangeRyokin exchange_ryokin_medal_tbl[][3] = {
+s32 exchange_ryokin_medal_tbl[] = {
     3, 1, 15, 5, 30, 10, 3, 1,
     15, 5, 30, 10, 3, 1, 15, 5,
     30, 10, 3, 1, 15, 5, 30, 10,
@@ -2566,6 +2578,9 @@ __declspec(section ".data") EVT_BEGIN(slot_fall_monte)
     RETURN
 EVT_END()
 
+static const Vec fall_pos0 = {-113.0f, 70.0f, 0.0f}; /* @place "slot_mess_01" */
+static const Vec fall_vel0 = {0.0f, 10.0f, 0.0f}; /* @place "slot_mess_01" */
+
 EVT_BEGIN(slot_set)
     CALL(goryuugijo_get_dataadr, 1, LW(0))
     CALL(evt_goryuugijo_set_nowslot, LW(0), LW(8))
@@ -2636,12 +2651,12 @@ __declspec(section ".data") EVT_BEGIN(slot2_set)
     RETURN
 EVT_END()
 
-SlotDrum drumname[] = {
-    "S_srot01_dram_01", "S_srot01_dram_02", "S_srot01_dram_03", "S_srot01_reber", "A_srot01", "S_srot01_m_01", "S_srot01_s_01", "S_srot01_7_01",
-    "S_srot01_m_02", "S_srot01_s_02", "S_srot01_7_02", "S_srot01_m_03", "S_srot01_s_03", "S_srot01_7_03", "neon_01", "neon_03",
-    "neon_02", "S_srot02_dram_01", "S_srot02_dram_02", "S_srot02_dram_03", "S_srot02_reber", "A_srot02", "S_srot02_m_01", "S_srot02_s_01",
-    "S_srot02_7_01", "S_srot02_m_02", "S_srot02_s_02", "S_srot02_7_02", "S_srot02_m_03", "S_srot02_s_03", "S_srot02_7_03", "neon_04",
-    "neon_06", "neon_05",
+s32 drumname[] = {
+    (s32)"S_srot01_dram_01", (s32)"S_srot01_dram_02", (s32)"S_srot01_dram_03", (s32)"S_srot01_reber", (s32)"A_srot01", (s32)"S_srot01_m_01", (s32)"S_srot01_s_01", (s32)"S_srot01_7_01",
+    (s32)"S_srot01_m_02", (s32)"S_srot01_s_02", (s32)"S_srot01_7_02", (s32)"S_srot01_m_03", (s32)"S_srot01_s_03", (s32)"S_srot01_7_03", (s32)"neon_01", (s32)"neon_03",
+    (s32)"neon_02", (s32)"S_srot02_dram_01", (s32)"S_srot02_dram_02", (s32)"S_srot02_dram_03", (s32)"S_srot02_reber", (s32)"A_srot02", (s32)"S_srot02_m_01", (s32)"S_srot02_s_01",
+    (s32)"S_srot02_7_01", (s32)"S_srot02_m_02", (s32)"S_srot02_s_02", (s32)"S_srot02_7_02", (s32)"S_srot02_m_03", (s32)"S_srot02_s_03", (s32)"S_srot02_7_03", (s32)"neon_04",
+    (s32)"neon_06", (s32)"neon_05",
 };
 
 __declspec(section ".data") s32 slotevttbl[] = {
@@ -2657,7 +2672,7 @@ s32 slotgara[] = {
     1, 0, 0, 2, 0, 0, 1, 0,
 };
 
-s32 upsidegara[][3][8] = {
+s32 upsidegara[] = {
     0, 0, 2, 0, 1, 1, 0, 1,
     0, 1, 0, 1, 0, 1, 0, 2,
     1, 0, 0, 2, 0, 0, 1, 0,
@@ -2665,6 +2680,44 @@ s32 upsidegara[][3][8] = {
     0, 1, 0, 1, 0, 1, 0, 2,
     1, 0, 0, 2, 0, 0, 1, 0,
 };
+
+void goryuugijo_disp_slot(CameraId camera, void* param) {
+    SlotWork* data = ((GoryuuWork*)param)->data;
+    s32 icons[3] = {0x1F3, 0x1F3, 0x1F3};
+    s32 i;
+    Vec pos;
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    CameraEntry* cam;
+    f32 proj[7];
+    f32 vp[6];
+    Mtx trans;
+    Mtx scale;
+    Mtx mtx;
+
+    for (i = 0; i < 3; i++) {
+        if (data->state[i] == 2 && i == data->cursor) {
+            mapObjGetPos(DRUMNAME[data->nowSlot].drum[i], &pos);
+            pos.x -= 25.0f;
+            pos.y += 10.0f;
+            cam = camGetPtr(CAMERA_3D);
+            GXSetProjection(cam->projection, cam->projType);
+            GXGetProjectionv(proj);
+            GXGetViewportv(vp);
+            GXProject(pos.x, pos.y, pos.z, cam->view, proj, vp, &sx, &sy, &sz);
+            cam = camGetPtr(camera);
+            GXSetProjection(cam->projection, cam->projType);
+            PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
+            PSMTXTrans(trans, -304.0f + sx, 240.0f - sy, 0.0f);
+            PSMTXConcat(trans, scale, mtx);
+            iconDispGx2(mtx, 0x10, 0x1F2);
+            PSMTXTrans(trans, -304.0f + sx, 31.35f + (240.0f - sy), 0.0f);
+            PSMTXConcat(trans, scale, mtx);
+            ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons[i]);
+        }
+    }
+}
 
 EVT_BEGIN(ranking_set)
     CALL(evt_mario_key_onoff, 0)
@@ -3613,11 +3666,13 @@ static s32 door_data_03_roll[] = {
     (s32)evt_door_03_open, (s32)evt_door_03_close,
 };
 
-static s32 evt_door_03_entry[] = {
-    393307, (s32)evt_door_param, -30000000, 1, -29999999, -29999998, -29999997, 131122,
-    -29999985, 0, 458843, (s32)evt_run_case_evt, 8, 1, -29999997, 0,
-    (s32)evt_door_03_caseopen, 0, 196699, (s32)evt_hit_bind_mapobj, (s32)"A_i03_tan_hiki", (s32)"S_i03_tan_hiki", 2, 1,
-};
+static EVT_BEGIN(evt_door_03_entry)
+    CALL(evt_door_param, LW(0), 1, LW(1), LW(2), LW(3))
+    SET_VALUE(LW(15), 0)
+    CALL(evt_run_case_evt, 8, 1, LW(3), 0, PTR(evt_door_03_caseopen), 0)
+    CALL(evt_hit_bind_mapobj, STRING("A_i03_tan_hiki"), STRING("S_i03_tan_hiki"))
+    RETURN
+EVT_END()
 
 static __declspec(section ".data") EVT_BEGIN(evt_door_04_00)
     MULTIPLY_FLOAT(LW(0), FLOAT(0.5996094f))
@@ -4841,6 +4896,119 @@ EVT_BEGIN(gor_03_init_evt)
 EVT_END()
 
 static USER_FUNC(fall_rtn) {
+    Vec pos;
+    s32 done = 0;
+    const char* sfx1;
+    const char* sfx2;
+    const char* sfx3;
+    SlotWork* data;
+    GMonte* m;
+    s32 i;
+
+    if (isFirstCall) {
+        data = ((GoryuuWork*)event->lwData[0])->data;
+        monte_p = _mapAlloc(data->monteCount * sizeof(GMonte));
+        memset(monte_p, 0, data->monteCount * sizeof(GMonte));
+        monte_p->owner = data;
+        for (i = 0; i < monte_p->owner->monteCount; i++) {
+            GMonteSub* sub = &monte_p[i].sub;
+            Vec pos = fall_pos0;
+            f32 s;
+            f32 c;
+            f32 ofs;
+
+            pos.z = ((f32*)montemedalzpos)[monte_p->owner->nowSlot];
+            sub->pos = pos;
+            ofs = ((i & 1) * 2.0f - 1.0f) * ((rand() % 101) / 10.0f);
+            sub->pos.z += ofs;
+            sub->scale = 1.0f;
+            s = 0.0f;
+            c = 0.0f;
+            movePos(&s, &c, 2.0f + (rand() % 300) / 100.0f, 270.0f - 3.0f * ofs);
+            {
+                Vec vel = fall_vel0;
+
+                vel.x = s;
+                vel.z = c;
+                monte_p[i].vel = vel;
+            }
+            monte_p[i].wait = ((rand() % 700 + 100) * 60) / 1000;
+        }
+    }
+    sfx2 = "SFX_EVT_GAME_MONTE_COUNT1";
+    sfx1 = "SFX_EVT_GAME_MONTE_LEAPED1";
+    sfx3 = sfx2;
+    for (i = 0; i < monte_p->owner->monteCount; i++) {
+        m = &monte_p[i];
+        switch (m->state) {
+            case 0:
+                if (m->wait != 0) {
+                    m->wait--;
+                } else {
+                    m->state++;
+                }
+                break;
+            case 1:
+                PSVECAdd(&m->sub.pos, &m->vel, &m->sub.pos);
+                m->vel.y -= 0.81667f;
+                if (m->sub.pos.y <= 0.0f) {
+                    m->sub.pos.y = 0.0f;
+                    psndSFXOn_3D(sfx1, &m->sub.pos);
+                    if (__fabs(m->vel.y) <= 4.0) {
+                        m->state++;
+                        m->timer = 300;
+                    } else {
+                        m->vel.y *= -(0.5f + (rand() % 21) / 100.0f);
+                        m->vel.x = 0.0f;
+                        m->vel.z = 0.0f;
+                    }
+                }
+                if (get_monte_check(&m->sub.pos, &marioGetPtr()->position) == TRUE) {
+                    psndSFXOn_3D(sfx2, &m->sub.pos);
+                    if (yuwp->medals < 99999) {
+                        yuwp->medals++;
+                    }
+                    m->hidden = 1;
+                    m->state = 3;
+                }
+                break;
+            case 2:
+                m->timer--;
+                if (m->timer == 0) {
+                    m->hidden = 1;
+                    m->state++;
+                }
+                if (m->timer < 60) {
+                    if (m->timer & 2) {
+                        m->sub.pos.y = 0.0f;
+                    } else {
+                        m->sub.pos.y = -1000.0f;
+                    }
+                }
+                pos = m->sub.pos;
+                pos.y = 0.0f;
+                if (get_monte_check(&pos, &marioGetPtr()->position) == TRUE) {
+                    psndSFXOn_3D(sfx3, &m->sub.pos);
+                    if (yuwp->medals < 99999) {
+                        yuwp->medals++;
+                    }
+                    m->hidden = 1;
+                    m->state = 3;
+                }
+                break;
+            case 3:
+                done++;
+                break;
+        }
+    }
+    if (done < monte_p->owner->monteCount) {
+        dispEntry(CAMERA_3D, 0.0f, 1, monte_disp, monte_p);
+        return EVT_RETURN_BLOCK;
+    }
+    monte_p->owner->monteCount = 0;
+    monte_p->owner->monteEvt = NULL;
+    _mapFree(monte_p);
+    return EVT_RETURN_DONE;
 }
 
 USER_FUNC(goryuugijo_set_slot_phase) {
@@ -4895,23 +5063,486 @@ USER_FUNC(goryuugijo_door_init_slot) {
 void goryuugijo_init_slot(EventEntry* event, BOOL isFirstCall) {
     SlotWork* data = ((GoryuuWork*)event->lwData[0])->data;
 
-    data->unk54 = 0;
-    data->unk8 = 0.0f;
-    data->unk6C = 0;
+    data->counter = 0;
+    data->reberAngle = 0.0f;
+    data->monteEvt = NULL;
     data->flags &= ~1;
 }
 
-void slot_neon_sub(void* wp, void* data) {
+void slot_neon_sub(GoryuuWork* wp, SlotWork* data) {
+    s32 i;
+    s32 r;
+
+    if (data->neonCount > 78) {
+        return;
+    }
+    if (data->neonCount == 0) {
+        if (irand(10) == 0) {
+            data->flags |= 2;
+        }
+        data->flags &= ~2;
+    }
+    if (data->neonCount < 27) {
+        if (data->neonCount & 1) {
+            for (i = 0; i < 3; i++) {
+                r = irand(8);
+                while (data->face[data->nowSlot][i] == UPSIDEGARA[data->nowSlot][i][r]) {
+                    r = (r + 1) & 7;
+                }
+                data->face[data->nowSlot][i] = UPSIDEGARA[data->nowSlot][i][r];
+                if (data->flags & 2) {
+                    goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
+                } else {
+                    goryuugijo_upsidewindow_dispoff_sub(data->nowSlot, i);
+                }
+            }
+        }
+    } else if (data->neonCount == 27) {
+        for (i = 0; i < 3; i++) {
+            data->face[data->nowSlot][i] = i;
+            goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
+        }
+        if (data->face[data->nowSlot][0] == data->face[data->nowSlot][1] && data->face[data->nowSlot][1] == data->face[data->nowSlot][2]) {
+            data->flags |= 4;
+        }
+        if ((data->flags & 4) && (data->flags & 2)) {
+            data->speed[0] = data->speed[1] = data->speed[2] = 2.8125f;
+        } else {
+            data->speed[0] = data->speed[1] = data->speed[2] = 11.25f;
+        }
+        data->state[0] = data->state[1] = data->state[2] = 2;
+    } else if (data->flags & 4) {
+        if (data->neonCount == 33 || data->neonCount == 51 || data->neonCount == 69) {
+            for (i = 0; i < 3; i++) {
+                goryuugijo_upsidewindow_dispoff_sub(data->nowSlot, i);
+            }
+        }
+        if (data->neonCount == 42 || data->neonCount == 60 || data->neonCount == 78) {
+            for (i = 0; i < 3; i++) {
+                goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
+            }
+        }
+    }
+    if (data->flags & 2) {
+        if (data->neonCount == 0 || data->neonCount == 12 || data->neonCount == 24) {
+            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+        }
+        if (data->neonCount == 6 || data->neonCount == 18) {
+            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+        }
+    } else if (data->neonCount == 24) {
+        mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+    }
+    if (data->neonCount <= 78) {
+        data->neonCount++;
+    }
 }
 
-s32 slot_rotate_sub(void* wp, void* data, s32 reel) {
+s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel) {
+    s32 stopped = 0;
+    f32 angle = data->angle[data->nowSlot][reel];
+    f32 speed = data->speed[reel];
+    s32 face = (s32)angle / 45.0f;
+    s32 cross;
+    f32 d;
+
+    if (speed > 0.0f) {
+        face = (face + 1) & 7;
+        d = 45.0f * face - angle;
+        if (d < 0.0f) {
+            d += 360.0f;
+        }
+        if (d <= speed) {
+            cross = 1;
+        } else {
+            cross = 0;
+        }
+    } else {
+        d = 45.0f * face - angle;
+        if (d > 0.0f) {
+            d -= 360.0f;
+        }
+        if (d > speed) {
+            cross = -1;
+        } else {
+            cross = 0;
+        }
+    }
+    if ((data->state[reel] == 3 || data->state[reel] == 4) && cross != 0) {
+        if (data->stopCount[reel] != 0) {
+            if (data->state[reel] == 4) {
+                if (data->wait[reel] == 0) {
+                    if (data->extra[reel] != 0) {
+                        data->extra[reel]--;
+                        data->wait[reel] = 0;
+                    } else {
+                        data->wait[reel] = 18;
+                    }
+                } else {
+                    data->wait[reel]--;
+                }
+            }
+            if (data->wait[reel] != 0) {
+                goto rotate;
+            }
+            data->stopCount[reel]--;
+        } else {
+            stopped = 1;
+            data->state[reel] = 0;
+            data->angle[data->nowSlot][reel] = 45.0f * face;
+            goto rotate;
+        }
+    }
+    data->angle[data->nowSlot][reel] += data->speed[reel];
+    if (data->angle[data->nowSlot][reel] >= 360.0f) {
+        data->angle[data->nowSlot][reel] -= 360.0f;
+    }
+    if (data->angle[data->nowSlot][reel] < 0.0f) {
+        data->angle[data->nowSlot][reel] += 360.0f;
+    }
+rotate:
+    mapObjRotate(DRUMNAME[data->nowSlot].drum[reel], 0.0f, 0.0f, data->angle[data->nowSlot][reel]);
+    return stopped;
 }
 
-s32 goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
+void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
+    GoryuuWork* wp = (GoryuuWork*)event->lwData[0];
+    SlotWork* data = wp->data;
+    s32 r;
+    const char* sfx;
+    s32 dir;
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 count;
+    s32 press;
+    CaseSetup setup;
+    s32 tbl[3][3];
+    s32 gara[3];
+    s32 gara2[3];
+
+    switch (data->phase) {
+        case 1:
+            data->cursor = 0;
+            data->counter = 0;
+            data->neonCount = 0;
+            data->wait[0] = data->wait[1] = data->wait[2] = 0;
+            data->extra[0] = data->extra[1] = data->extra[2] = 0;
+            data->state[0] = data->state[1] = data->state[2] = 1;
+            data->speed[0] = data->speed[1] = data->speed[2] = 0.0f;
+            data->flags &= ~2;
+            data->flags &= ~4;
+            data->phase++;
+            break;
+        case 2:
+            slot_neon_sub(wp, data);
+            if (data->counter >= 15) {
+                data->counter = 0;
+                data->phase++;
+                data->sfxId = ((s32 (*)(const char*))psndSFXOn)("SFX_EVT_GAME_SLOT_ROUND1");
+            } else {
+                data->counter++;
+                data->reberAngle += 4.0f;
+                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+            }
+            break;
+        case 3:
+            slot_neon_sub(wp, data);
+            if (data->counter <= 6) {
+                if (data->counter >= 6) {
+                    data->reberAngle = 0.0f;
+                } else {
+                    data->reberAngle -= 10.0f;
+                }
+                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+                data->counter++;
+            }
+            if (data->state[data->cursor] != 2 || (keyGetDirRep(0) & 0xC000)) {
+                if (data->state[data->cursor] != 2) {
+                    dir = 1;
+                } else {
+                    u32 key = keyGetDirRep(0);
+
+                    dir = 1;
+                    if (key & 0x4000) {
+                        dir = -1;
+                    }
+                }
+                for (i = 0; i < 3; i++) {
+                    data->cursor += dir;
+                    if (data->cursor < 0) {
+                        data->cursor = 2;
+                    } else if (data->cursor > 2) {
+                        data->cursor = 0;
+                    }
+                    if (data->state[data->cursor] == 2) {
+                        break;
+                    }
+                }
+            }
+            sfx = "SFX_EVT_GAME_SLOT_STOP1";
+            count = 0;
+            for (i = 0; i < 3; i++) {
+                if (data->state[i] == 0) {
+                    count++;
+                    continue;
+                }
+                if (i == data->cursor) {
+                    switch (i) {
+                        case 0:
+                            if (keyGetButtonTrg(0) & 0x100) {
+                                press = 1;
+                            } else {
+                                press = 0;
+                            }
+                            break;
+                        case 1:
+                            if (keyGetButtonTrg(0) & 0x100) {
+                                press = 1;
+                            } else {
+                                press = 0;
+                            }
+                            break;
+                        case 2:
+                            if (keyGetButtonTrg(0) & 0x100) {
+                                press = 1;
+                            } else {
+                                press = 0;
+                            }
+                            break;
+                    }
+                } else {
+                    press = 0;
+                }
+                if (press && data->state[i] == 2) {
+                    data->state[i] = 3;
+                    if (data->flags & 2) {
+                        data->stopCount[i] = 0;
+                    } else {
+                        data->stopCount[i] = irand(2);
+                    }
+                    psndSFXOn(sfx);
+                }
+                count += slot_rotate_sub(wp, data, i);
+            }
+            if (count == 3) {
+                for (i = 0; i < 3; i++) {
+                    goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
+                }
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+                data->counter = 0;
+                data->phase++;
+            }
+            break;
+        case 4:
+            if (data->counter == 0) {
+                for (i = 0; i < 3; i++) {
+                    gara[i] = SLOTGARA[data->nowSlot][i][(s32)(data->angle[data->nowSlot][i] / 45.0f)];
+                }
+                if (gara[0] == gara[1] && gara[1] == gara[2]) {
+                    data->phase = 6;
+                    break;
+                }
+                if (!(data->flags & 4)) {
+                    data->phase = 6;
+                    break;
+                }
+                count = 0;
+                for (i = 0; i < 3; i++) {
+                    if (data->face[data->nowSlot][i] == gara[i]) {
+                        count++;
+                    }
+                }
+                if (count < 2) {
+                    data->phase = 6;
+                    break;
+                }
+            }
+            if (data->counter == 0 || data->counter == 18 || data->counter == 36) {
+                for (i = 0; i < 3; i++) {
+                    goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
+                }
+            }
+            if (data->counter == 9 || data->counter == 27 || data->counter == 45) {
+                for (i = 0; i < 3; i++) {
+                    goryuugijo_upsidewindow_dispoff_sub(data->nowSlot, i);
+                }
+            }
+            if (data->counter == 45) {
+                for (j = 0; j < 3; j++) {
+                    s32 f = data->angle[data->nowSlot][j] / 45.0f;
+
+                    for (k = 0; k < 3; k++) {
+                        tbl[k][j] = SLOTGARA[data->nowSlot][j][(f + k - 1) & 7];
+                    }
+                }
+                for (i = 0; i < 3; i++) {
+                    if (tbl[1][i] != data->face[data->nowSlot][i]) {
+                        r = irand(2);
+                        for (k = 0; k < 2; k++) {
+                            r = (r + 1) & 1;
+                            switch (r) {
+                                case 0:
+                                    if (data->face[data->nowSlot][i] == tbl[0][i] ||
+                                        !(data->face[data->nowSlot][i] == tbl[0][i] || tbl[2][i] == data->face[data->nowSlot][i])) {
+                                        if (data->face[data->nowSlot][i] == 0) {
+                                            data->stopCount[i] = 1;
+                                            data->extra[i] = 1;
+                                            data->speed[i] = -1.40625f;
+                                        } else {
+                                            data->stopCount[i] = 6;
+                                            if (data->face[data->nowSlot][i] == 2) {
+                                                data->stopCount[i] += 8;
+                                            }
+                                            data->extra[i] = 0;
+                                            data->speed[i] = 1.40625f;
+                                        }
+                                        data->state[i] = 4;
+                                        k = 1;
+                                    }
+                                    break;
+                                case 1:
+                                    if (tbl[2][i] == data->face[data->nowSlot][i] ||
+                                        !(data->face[data->nowSlot][i] == tbl[0][i] || tbl[2][i] == data->face[data->nowSlot][i])) {
+                                        if (data->face[data->nowSlot][i] == 0) {
+                                            data->stopCount[i] = 0;
+                                            data->extra[i] = 0;
+                                            data->speed[i] = 1.40625f;
+                                        } else {
+                                            data->stopCount[i] = 7;
+                                            if (data->face[data->nowSlot][i] == 2) {
+                                                data->stopCount[i] += 8;
+                                            }
+                                            data->extra[i] = 1;
+                                            data->speed[i] = -1.40625f;
+                                        }
+                                        data->state[i] = 4;
+                                        k = 1;
+                                    }
+                                    break;
+                            }
+                        }
+                    }
+                }
+                data->phase++;
+            }
+            data->counter++;
+            break;
+        case 5:
+            press = 0;
+            for (i = 0; i < 3; i++) {
+                if (data->state[i] == 0) {
+                    press++;
+                } else {
+                    press += slot_rotate_sub(wp, data, i);
+                }
+            }
+            if (press == 3) {
+                data->counter = 0;
+                data->phase++;
+            }
+            break;
+        case 6:
+            for (i = 0; i < 3; i++) {
+                gara2[i] = SLOTGARA[data->nowSlot][i][(s32)(data->angle[data->nowSlot][i] / 45.0f)];
+            }
+            if (gara2[0] == gara2[1] && gara2[1] == gara2[2]) {
+                data->counter = 0;
+                data->phase++;
+                psndSFXOn("SFX_EVT_GAME_SLOT_SUCCESS1");
+                switch (gara2[0]) {
+                    case 0:
+                        data->monteCount = 3;
+                        break;
+                    case 1:
+                        data->monteCount = 15;
+                        break;
+                    case 2:
+                        data->monteCount = 100;
+                        break;
+                }
+                caseDelete(data->caseId[0]);
+                caseDelete(data->caseId[1]);
+                data->flags |= 1;
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 1, 0);
+                data->flags |= 8;
+            } else {
+                data->phase = 11;
+            }
+            psndSFXOff(data->sfxId);
+            break;
+        case 7:
+            if (data->counter >= 48) {
+                data->counter = 0;
+                data->phase++;
+            }
+            data->counter++;
+            break;
+        case 8:
+            if (data->counter >= 36) {
+                data->counter = 19;
+                data->phase++;
+            }
+            data->counter++;
+            break;
+        case 9:
+            if (data->counter >= 19) {
+                data->counter = 0;
+                if (data->monteEvt == NULL) {
+                    data->monteEvt = evtEntry(slot_fall_monte, 0, 0);
+                    data->monteEvt->lwData[0] = event->lwData[0];
+                }
+                data->phase++;
+            } else {
+                data->counter++;
+            }
+            break;
+        case 10:
+            if (data->monteEvt == NULL || !evtCheckID(data->monteEvt->eventId)) {
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
+                data->flags &= ~8;
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+                data->counter = 0;
+                data->monteEvt = NULL;
+                data->phase++;
+            } else {
+                data->counter++;
+            }
+            break;
+        case 11:
+            if (data->monteEvt != NULL) {
+                monte_p->owner->monteCount = 0;
+                _mapFree(monte_p);
+                evtDeleteID(data->monteEvt->eventId);
+                data->monteEvt = NULL;
+            }
+            data->counter = 0;
+            data->neonCount = 0;
+            data->phase = 0;
+            data->wait[0] = data->wait[1] = data->wait[2] = 0;
+            data->extra[0] = data->extra[1] = data->extra[2] = 0;
+            if (data->flags & 1) {
+                data->flags &= ~1;
+                for (i = 0; i < 2; i++) {
+                    setup.activeConditionId = 0x8009;
+                    setup.hitObjName = DRUMNAME[i].anim;
+                    setup.swFlag = 0;
+                    setup.activeFunc = NULL;
+                    setup.evtCode = (void*)slotevttbl[i];
+                    setup.priority = 0;
+                    memcpy(setup.lwData, event->lwData, sizeof(setup.lwData));
+                    data->caseId[i] = caseEntry(&setup);
+                }
+            }
+            if (data->flags & 8) {
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
+                data->flags &= ~8;
+                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+            }
+            break;
+    }
 }
 
-void goryuugijo_disp_slot(CameraId camera, void* param) {
-}
 
 static USER_FUNC(mario_keyoff_wait) {
     switch (!marioChkKey()) {

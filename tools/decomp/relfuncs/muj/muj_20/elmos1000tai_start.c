@@ -4,9 +4,11 @@
 // decl: extern NanNpcWork* nanNPCWork;
 // proto: USER_FUNC(elmos1000tai_start);
 USER_FUNC(elmos1000tai_start) {
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
     s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp;
+
+    wp = nanNPCWork;
 
     for (i = 0; i < wp->count; i++) {
         npc = &wp->entries[i];

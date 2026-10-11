@@ -1,23 +1,17 @@
-// include: manager/evtmgr_cmd.h
 // include: driver/camdrv.h
 // include: driver/icondrv.h
-// decl: typedef struct MiniGameWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } MiniGameWork;
-// decl: typedef struct HikokiWork { u32 flags; s32 phase; s32 coins; s32 result; s32 monteCount; EventEntry* viewEvent; } HikokiWork;
-// decl: typedef struct MonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } MonteSub;
-// decl: typedef struct Monte { u8 hidden; u8 unk1; s16 num; u8 state; u8 unk5[3]; MonteSub sub; MiniGameWork* wp; } Monte;
-// decl: typedef struct MonteTable { f32 x0; f32 x1; f32 y0; f32 y1; s32 num; } MonteTable;
-// decl: static Monte* monte_p;
-// decl: static void* yuunpc_wp;
+// decl: typedef struct SlotWork { u32 flags; s32 phase; f32 reberAngle; f32 angle[2][3]; f32 speed[3]; s8 state[3]; s8 face[2][3]; s8 stopCount[3]; s32 wait[3]; s32 extra[3]; s32 counter; s32 neonCount; s32 monteCount; s32 nowSlot; s32 caseId[2]; EventEntry* monteEvt; s32 sfxId; s16 cursor; } SlotWork;
+// decl: typedef struct GMonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } GMonteSub;
+// decl: typedef struct GMonte { u8 hidden; u8 state; s16 wait; s16 timer; u8 unk6[2]; GMonteSub sub; Vec vel; SlotWork* owner; } GMonte;
+// decl: static GMonte* monte_p;
 // proto: static void monte_disp(CameraId camera, void* param);
 static void monte_disp(CameraId camera, void* param) {
-    Monte* monte = param;
+    GMonte* monte = param;
     s32 i;
 
-    if (monte != NULL) {
-        for (i = 0; i < monte->num; i++) {
-            if (monte[i].hidden == 0) {
-                iconDispGx(&monte[i].sub.pos, 0, 0x13F, 1.0f);
-            }
+    for (i = 0; i < monte->owner->monteCount; i++) {
+        if (monte[i].hidden == 0) {
+            iconDispGx(&monte[i].sub.pos, 0x40, 0x13F, 1.0f);
         }
     }
 }

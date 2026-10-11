@@ -59,12 +59,12 @@ static s32 fighterDt_raw[161];
 static s32 fighterDt_re_raw[147];
 #define fighterDt_re ((FighterData*)fighterDt_re_raw)
 static void rankingControll(void);
-static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+#define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 static void insert(s32* list, s32 num, s32 from, s32 to);
-static inline void sortScore(s32* list, s32 num) { s32 i; s32 j; s32 a; s32 b; for (i = 0; i < num - 1; i++) { for (j = i + 1; j < num; j++) { a = list[i]; b = list[j]; if (rank_wp->entries[a].score < rank_wp->entries[b].score) { list[i] = b; list[j] = a; } } } }
-static inline void sortFlag(s32* list, s32 num) { s32 i; s32 j; s32 a; s32 b; for (i = 0; i < num - 1; i++) { for (j = i + 1; j < num; j++) { b = list[j]; a = list[i]; if ((fighterDt[rank_wp->entries[b].id].flags & 5) && (fighterDt[rank_wp->entries[a].id].flags & 2)) { list[i] = b; list[j] = a; } } } }
-static inline s32 findFlag(s32* list, s32 num, u16 flag) { s32 i; for (i = 0; i < num; i++) { if (fighterDt[rank_wp->entries[list[i]].id].flags & flag) { break; } } return i; }
-static inline void moveFlag(s32* list, s32 num, u16 flag, s32 pos) { s32 i = findFlag(list, num, flag); if (i < num) { insert(list, num, i, pos); } }
+#define SORT_SCORE(list, n) for (i = 0; i < n - 1; i++) { for (j = i + 1; j < n; j++) { if (rank_wp->entries[list[i]].score < rank_wp->entries[list[j]].score) { tmp = list[i]; list[i] = list[j]; list[j] = tmp; } } }
+#define SORT_FLAG(list, n) for (i = 0; i < n - 1; i++) { for (j = i + 1; j < n; j++) { pb = &fighterDt[rank_wp->entries[list[i]].id]; if ((fighterDt[rank_wp->entries[list[j]].id].flags & 5) && (pb->flags & 2)) { tmp = list[i]; list[i] = list[j]; list[j] = tmp; } } }
+#define FIND_FLAG(k, list, n, flag) for (k = 0; k < n; k++) { if (fighterDt[rank_wp->entries[list[k]].id].flags & flag) { break; } }
+#define MOVE_FLAG(list, n, flag, pos) FIND_FLAG(k, list, n, flag); if (k < n) { insert(list, n, k, pos); }
 static void printRanking(void);
 static s32 ruleDt_2bu_raw[50];
 #define ruleDt_2bu ((RuleData*)ruleDt_2bu_raw)
@@ -340,7 +340,7 @@ static void rankingInit(void) {
         }
         if (swGet(0x9E1)) {
             for (j = 0; j < 2; j++) {
-                entry->sw[j] = swByteGet(entry->id * 2 + j + 0x207);
+                entry->sw[j] = swByteGet(j + (entry->id * 2 + 0x207));
             }
         } else {
             entry->score = fighterDt[entry->id].score;
@@ -387,7 +387,7 @@ static void rankingExit(void) {
             swClear(entry->id + 0x9A1);
         }
         for (j = 0; j < 2; j++) {
-            swByteSet(entry->id * 2 + j + 0x207, entry->sw[j]);
+            swByteSet(j + (entry->id * 2 + 0x207), entry->sw[j]);
         }
     }
     _mapFree(rank_wp->entries);
@@ -419,17 +419,16 @@ USER_FUNC(unk_tou_00002e24) {
 }
 
 static void insert(s32* list, s32 num, s32 from, s32 to) {
-    s32 tmp;
     s32 i;
 
     if (from < to) {
-        tmp = list[from];
+        s32 tmp = list[from];
         for (i = from; i < to; i++) {
             list[i] = list[i + 1];
         }
         list[to] = tmp;
     } else {
-        tmp = list[from];
+        s32 tmp = list[from];
         for (i = from; i > to; i--) {
             list[i] = list[i - 1];
         }
@@ -438,12 +437,16 @@ static void insert(s32* list, s32 num, s32 from, s32 to) {
 }
 
 static void rankingControll(void) {
-    s32 lose[32];
     s32 win[32];
+    s32 lose[32];
     s32 nwin = 0;
     s32 nlose = 0;
     s32 i;
     s32 j;
+    s32 m;
+    s32 k;
+    s32 tmp;
+    FighterData* pb;
     RankEntry* entry;
     RankEntry* work;
 
@@ -458,25 +461,25 @@ static void rankingControll(void) {
         }
     }
     if (nwin > 0) {
-        sortScore(win, nwin);
-        sortFlag(win, nwin);
+        SORT_SCORE(win, nwin);
+        SORT_FLAG(win, nwin);
         if (nwin > 0) {
-            moveFlag(win, nwin, 0x4, 0);
+            MOVE_FLAG(win, nwin, 0x4, 0);
         }
         if (nwin > 1) {
-            moveFlag(win, nwin, 0x1000, 1);
+            MOVE_FLAG(win, nwin, 0x1000, 1);
         }
         if (nwin > 10) {
-            moveFlag(win, nwin, 0x800, 10);
+            MOVE_FLAG(win, nwin, 0x800, 10);
         }
         if (nwin > 18) {
-            moveFlag(win, nwin, 0x200, 18);
+            MOVE_FLAG(win, nwin, 0x200, 18);
         }
         if (nwin > 19) {
-            moveFlag(win, nwin, 0x400, 19);
+            MOVE_FLAG(win, nwin, 0x400, 19);
         }
         if (nwin > 16) {
-            moveFlag(win, nwin, 0x100, 14);
+            MOVE_FLAG(win, nwin, 0x100, 14);
         }
         if (swGet(0x9E4)) {
             for (i = 0; i < nwin; i++) {
@@ -490,17 +493,17 @@ static void rankingControll(void) {
         }
     }
     if (nlose > 0) {
-        sortScore(lose, nlose);
-        sortFlag(lose, nlose);
+        SORT_SCORE(lose, nlose);
+        SORT_FLAG(lose, nlose);
         if (nlose > 0) {
-            moveFlag(lose, nlose, 0x4, 0);
+            MOVE_FLAG(lose, nlose, 0x4, 0);
         }
         if (nlose > 0) {
-            i = findFlag(lose, nlose, 0x800);
-            if (i < nlose) {
-                j = findFlag(lose, nlose, 0x2);
-                if (j < nlose && j > 0) {
-                    insert(lose, nlose, i, j - 1);
+            FIND_FLAG(m, lose, nlose, 0x800);
+            if (m < nlose) {
+                FIND_FLAG(k, lose, nlose, 0x2);
+                if (k < nlose && k > 0) {
+                    insert(lose, nlose, m, k - 1);
                 }
             }
         }
@@ -523,27 +526,32 @@ static void rankingControll(void) {
     work[nwin].id = 20;
     work[nwin].score = 0;
     for (i = 0; i < nlose; i++) {
-        work[nwin + i + 1] = rank_wp->entries[lose[i]];
+        work[nwin + 1 + i] = rank_wp->entries[lose[i]];
     }
     memcpy(rank_wp->entries, work, rank_wp->num * sizeof(RankEntry));
     __memFree(HEAP_DEFAULT, work);
-    swByteSet(0x244, getRank());
+    GET_RANK(j, i);
+    swByteSet(0x244, j);
 }
 
 USER_FUNC(evt_tou_get_ranking_27_text_1ED4) {
     s32* args = event->args;
-    evtSetValue(event, args[0], getRank());
+    s32 rank;
+    s32 i;
+
+    GET_RANK(rank, i);
+    evtSetValue(event, args[0], rank);
     return EVT_RETURN_DONE;
 }
 
 static USER_FUNC(evt_tou_get_next_match) {
     s32* args = event->args;
     s32 flag = evtGetValue(event, GSWF(2443));
-    s32 list[32];
-    s32 n = 0;
-    s32 i;
     s32 rank;
     RankEntry* entry;
+    s32 i;
+    s32 n = 0;
+    s32 list[32];
 
     for (i = 0; i < rank_wp->num; i++) {
         entry = &rank_wp->entries[i];
@@ -551,7 +559,7 @@ static USER_FUNC(evt_tou_get_next_match) {
             list[n++] = entry->id;
         }
     }
-    rank = getRank();
+    GET_RANK(rank, i);
     if (rank > 0) {
         if (flag) {
             evtSetValue(event, args[0], list[rank - 1]);
@@ -634,12 +642,14 @@ static USER_FUNC(evt_tou_get_fighter_battle_msg) {
 static USER_FUNC(evt_tou_get_rule_info) {
     s32* args = event->args;
     s32 mode = evtGetValue(event, args[0]);
-    RuleData* dt;
     s32 num;
+    RuleData* dt;
     s32 i;
+    s32 rank;
 
     if (evtGetValue(NULL, GSW(0)) < 0xAC) {
-        if (getRank() > 10) {
+        GET_RANK(rank, i);
+        if (rank > 10) {
             num = 10;
             dt = ruleDt_2bu;
         } else {
@@ -657,9 +667,12 @@ static USER_FUNC(evt_tou_get_rule_info) {
             }
         }
     } else if (mode == 10) {
-        do {
+        while (TRUE) {
             i = rand() % num;
-        } while (dt[i].id == 0x30 || dt[i].id == 0x20 || dt[i].id == 0x40);
+            if (dt[i].id != 0x30 && dt[i].id != 0x20 && dt[i].id != 0x40) {
+                break;
+            }
+        }
     } else {
         i = rand() % num;
     }
@@ -673,12 +686,14 @@ static USER_FUNC(evt_tou_get_rule_info) {
 USER_FUNC(evt_tou_get_rule_msg2_27_text_182C) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
-    RuleData* dt;
     s32 num;
+    RuleData* dt;
     s32 i;
+    s32 rank;
 
     if (evtGetValue(NULL, GSW(0)) < 0xAC) {
-        if (getRank() > 10) {
+        GET_RANK(rank, i);
+        if (rank > 10) {
             num = 10;
             dt = ruleDt_2bu;
         } else {
@@ -731,8 +746,8 @@ static USER_FUNC(evt_tou_set_ranking_win_lose) {
     max = -1000;
     for (i = 0; i < rank_wp->num; i++) {
         if (!(rank_wp->entries[i].flags & 2)) {
-            r = rand() % 4;
-            rank_wp->entries[i].score += r + rand() % 4 - 3;
+            r = rand() % 4 + rand() % 4;
+            rank_wp->entries[i].score += r - 3;
             if (rank_wp->entries[i].score < min) {
                 min = rank_wp->entries[i].score;
             }
@@ -913,6 +928,120 @@ static __declspec(section ".data") const char* suuji[] = {
     /*"８"*/"\x82\x57", /*"９"*/"\x82\x58",
 };
 
+static void disp_proc(CameraId cameraId, void* param) {
+    FighterData* dt;
+    f32 x;
+    f32 tx;
+    f32 y;
+    u16 sx;
+    u16 sw;
+    s32 i;
+    s32 rank;
+    s32 yoff;
+    s32 w;
+    f32 winW;
+    f32 top;
+    Mtx scale;
+    Mtx mtx;
+    char buf[0x100];
+
+    if (evtGetValue(NULL, GSW(0)) < 0xAC) {
+        dt = fighterDt;
+    } else {
+        dt = fighterDt_re;
+    }
+    winW = 250.0f;
+    x = -winW * 0.5f;
+    windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
+    FontDrawStart();
+    FontDrawScale(1.0f);
+    w = (u16)FontGetMessageWidth("\203\211\203\223\203L\203\223\203O");
+    {
+        GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
+        FontDrawColor(color);
+    }
+    top = 135.0f;
+    FontDrawMessage(-w / 2, top, "\203\211\203\223\203L\203\223\203O");
+    sx = 304.0f + x;
+    sw = winW;
+    {
+        f32 sy = 145.0f;
+        f32 sh = 220.0f;
+        GXSetScissor(sx, (u16)sy, sw, (u16)sh);
+    }
+    rank = 0;
+    yoff = 0;
+    for (i = 0; i < rank_wp->num; i++) {
+        tx = 10.0f + x;
+        y = dwp->y + (top - yoff - 40.0f);
+        if (!(rank_wp->entries[i].flags & 2)) {
+            PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
+            if (rank != 0) {
+                sprintf(buf, "%s%s", rank / 10 ? suuji[rank / 10] : "", suuji[rank % 10]);
+                FontDrawStart();
+                {
+                    GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
+                    FontDrawColor(color);
+                }
+                PSMTXTrans(mtx, tx, y, 0.0f);
+                PSMTXConcat(mtx, scale, mtx);
+                FontDrawMessageMtx(mtx, buf);
+            }
+            FontDrawStart();
+            if (rank_wp->entries[i].flags & 4) {
+                GXColor color = {0xFF, 0x00, 0x00, 0xFF};
+                FontDrawColor(color);
+            } else {
+                GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
+                FontDrawColor(color);
+            }
+            tx = 40.0f + tx;
+            PSMTXTrans(mtx, tx, y, 0.0f);
+            PSMTXConcat(mtx, scale, mtx);
+            FontDrawMessageMtx(mtx, msgSearch(dt[rank_wp->entries[i].id].name));
+            rank++;
+            yoff += 20;
+        }
+    }
+    {
+        f32 sy = 137.0f;
+        f32 sh = 228.0f;
+        GXSetScissor(sx, (u16)sy, sw, (u16)sh);
+    }
+    {
+        f32 yy = 95.0f + dwp->y;
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = 15.0f + x;
+        pos.y = yy - 24.0f;
+        iconDispGx(&pos, 0x10, 0x123, 0.8f);
+    }
+    GXSetScissor(0, 0, 0x260, 0x1E0);
+    if (dwp->page > 0) {
+        {
+            Vec pos = {0.0f, 125.0f, 0.0f};
+            pos.x = x + winW;
+            iconDispGx(&pos, 0x10, 0x205, -1.0f);
+        }
+        {
+            Vec pos = {0.0f, 75.0f, 0.0f};
+            pos.x = x + winW;
+            iconDispGx(&pos, 0x10, 0x7E, 0.6f);
+        }
+    }
+    if (dwp->page < 1) {
+        {
+            Vec pos = {0.0f, -140.0f, 0.0f};
+            pos.x = x + winW;
+            iconDispGx(&pos, 0x10, 0x205, 1.0f);
+        }
+        {
+            Vec pos = {0.0f, -125.0f, 0.0f};
+            pos.x = x + winW;
+            iconDispGx(&pos, 0x10, 0x80, 0.6f);
+        }
+    }
+}
+
 s32 lockerDt[] = {
     (s32)"R_door_1", (s32)"a_door_1", (s32)"a_door_1_omote", (s32)"a_door_1_ura", (s32)"a_R_1_asi", (s32)"R_door_2", (s32)"a_door_2", (s32)"a_door_2_omote",
     (s32)"a_door_2_ura", (s32)"a_R_2_asi", (s32)"R_door_3", (s32)"a_door_3", (s32)"a_door_3_omote", (s32)"a_door_3_ura", (s32)"a_R_3_asi", (s32)"R_door_5",
@@ -1080,6 +1209,89 @@ EVT_BEGIN(evt_tou_locker_init)
     END_LOOP
     RETURN
 EVT_END()
+
+void gans_tex(CameraId cameraId, void* param) {
+    GansWork* wp = param;
+    CameraEntry saved;
+    Mtx44 projMtx;
+    Mtx lookAt;
+    Mtx ident;
+    f32 viewport[6];
+    f32 proj[7];
+    u32 sx, sy, sw, sh;
+    NpcEntry* npc;
+
+    GXGetViewportv(viewport);
+    GXGetProjectionv(proj);
+    GXGetScissor(&sx, &sy, &sw, &sh);
+    GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
+    GXSetScissor(1, 1, 126, 126);
+    C_MTXPerspective(projMtx, 25.0f, 1.0f, 1.0f, 1000.0f);
+    GXSetProjection(projMtx, GX_PERSPECTIVE);
+    {
+        static const Vec gans_pos = {0.0f, 20.0f, 130.0f};
+        static const Vec gans_up = {0.0f, 1.0f, 0.0f};
+        static const Vec gans_target = {0.0f, 20.0f, 0.0f};
+        Vec pos;
+        Vec up;
+        Vec target;
+
+        target = gans_target;
+        up = gans_up;
+        pos = gans_pos;
+
+        C_MTXLookAt(lookAt, &pos, &up, &target);
+    }
+    saved = *camGetPtr(cameraId);
+    npc = npcNameToPtr(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
+    PSMTXCopy(lookAt, camGetCurPtr()->view);
+    animPosePeraOff(npc->poseId);
+    PSMTXIdentity(ident);
+    animPoseMain(npc->poseId);
+    animPoseDrawMtx(npc->poseId, ident, 1, 0.0f, 2.0f);
+    animPoseDrawMtx(npc->poseId, ident, 2, 0.0f, 2.0f);
+    animPoseDrawMtx(npc->poseId, ident, 3, 0.0f, 2.0f);
+    animPosePeraOn(npc->poseId);
+    PSMTXCopy(saved.view, camGetCurPtr()->view);
+    GXSetTexCopySrc(0, 0, 0x80, 0x80);
+    GXSetTexCopyDst(0x80, 0x80, GX_TF_RGB5A3, GX_FALSE);
+    GXCopyTex(wp->buf->address, GX_TRUE);
+    GXPixModeSync();
+    GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
+    GXSetProjectionv(proj);
+    GXSetScissor(sx, sy, sw, sh);
+    wp->ready = 1;
+}
+
+void monitor_tev(MapTevCallbackInfo* info) {
+    if (gans_wp->ready) {
+        GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
+        GXLoadTexObj(smartTexObj(&gans_wp->tex, &gans_wp->buf->address), GX_TEXMAP1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_TEXC, GX_CC_CPREV, GX_CC_A0, GX_CC_ZERO);
+        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        {
+            GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+            GXColor tmp;
+
+            color.a = gans_wp->alpha;
+            tmp = color;
+            GXSetTevColor(GX_TEVREG0, tmp);
+        }
+        info->tevStage = 2;
+        info->texMap = 2;
+        info->texCoord = 2;
+    }
+}
 
 EVT_BEGIN(evt_tou_monitor_on)
     CALL(evt_hit_get_position, STRING("M_make"), LW(0), LW(1), LW(2))
@@ -2125,6 +2337,27 @@ EVT_BEGIN(evt_michel_7)
     CALL(evt_npc_set_ry, STRING("マイケル"), 270)
     RETURN
 EVT_END()
+
+USER_FUNC(octo_stop) {
+    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
+
+    if (npc != NULL) {
+        evtStopID(npc->regularEvtId);
+        npc->prevPosition = (Vec){80.0f, 0.0f, 85.0f};
+        npc->position = npc->prevPosition;
+        npc->direction = 270.0f;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(octo_start) {
+    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
+
+    if (npc != NULL) {
+        evtStartID(npc->regularEvtId);
+    }
+    return EVT_RETURN_DONE;
+}
 
 EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_set_position, STRING("オクトール"), 145, 0, 50)
@@ -3185,110 +3418,15 @@ EVT_BEGIN(evt_tou_match_after_default)
     RETURN
 EVT_END()
 
-static void disp_proc(CameraId cameraId, void* param) {
-    FighterData* dt;
-    f32 x;
-    f32 tx;
-    f32 y;
-    u16 sx;
-    u16 sw;
-    s32 rank;
-    s32 yoff;
-    s32 i;
-    u16 w;
-    Mtx scale;
-    Mtx mtx;
-    char buf[0x100];
-
-    if (evtGetValue(NULL, GSW(0)) < 0xAC) {
-        dt = fighterDt;
-    } else {
-        dt = fighterDt_re;
-    }
-    x = -250.0f * 0.5f;
-    windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
-    FontDrawStart();
-    FontDrawScale(1.0f);
-    w = FontGetMessageWidth("\203\211\203\223\203L\203\223\203O");
-    {
-        GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
-        FontDrawColor(color);
-    }
-    FontDrawMessage(-w / 2, 135.0f, "\203\211\203\223\203L\203\223\203O");
-    sx = 304.0f + x;
-    sw = 250.0f;
-    GXSetScissor(sx, (u16)145.0f, sw, (u16)220.0f);
-    tx = 10.0f + x;
-    rank = 0;
-    yoff = 0;
-    for (i = 0; i < rank_wp->num; i++) {
-        y = dwp->y + (135.0f - yoff - 40.0f);
-        if (!(rank_wp->entries[i].flags & 2)) {
-            PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
-            if (rank != 0) {
-                sprintf(buf, "%s%s", rank / 10 ? suuji[rank / 10] : "", suuji[rank % 10]);
-                FontDrawStart();
-                {
-                    GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
-                    FontDrawColor(color);
-                }
-                PSMTXTrans(mtx, tx, y, 0.0f);
-                PSMTXConcat(mtx, scale, mtx);
-                FontDrawMessageMtx(mtx, buf);
-            }
-            FontDrawStart();
-            if (rank_wp->entries[i].flags & 4) {
-                GXColor color = {0xFF, 0x00, 0x00, 0xFF};
-                FontDrawColor(color);
-            } else {
-                GXColor color = {0xDC, 0xC8, 0xDC, 0xFF};
-                FontDrawColor(color);
-            }
-            PSMTXTrans(mtx, 40.0f + tx, y, 0.0f);
-            PSMTXConcat(mtx, scale, mtx);
-            FontDrawMessageMtx(mtx, msgSearch(dt[rank_wp->entries[i].id].name));
-            rank++;
-            yoff += 20;
-        }
-    }
-    GXSetScissor(sx, (u16)137.0f, sw, (u16)228.0f);
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = 15.0f + x;
-        pos.y = 95.0f + dwp->y - 24.0f;
-        iconDispGx(&pos, 0x10, 0x123, 0.8f);
-    }
-    GXSetScissor(0, 0, 0x260, 0x1E0);
-    if (dwp->page > 0) {
-        {
-            Vec pos = {0.0f, 125.0f, 0.0f};
-            pos.x = x + 250.0f;
-            iconDispGx(&pos, 0x10, 0x205, -1.0f);
-        }
-        {
-            Vec pos = {0.0f, 75.0f, 0.0f};
-            pos.x = x + 250.0f;
-            iconDispGx(&pos, 0x10, 0x7E, 0.6f);
-        }
-    }
-    if (dwp->page < 1) {
-        {
-            Vec pos = {0.0f, -140.0f, 0.0f};
-            pos.x = x + 250.0f;
-            iconDispGx(&pos, 0x10, 0x205, 1.0f);
-        }
-        {
-            Vec pos = {0.0f, -125.0f, 0.0f};
-            pos.x = x + 250.0f;
-            iconDispGx(&pos, 0x10, 0x80, 0.6f);
-        }
-    }
-}
 
 static USER_FUNC(evt_tou_print_ranking) {
+    s32 rank;
+    s32 i;
+
     if (isFirstCall) {
         memset(dwp, 0, sizeof(DispWork));
-        dwp->page = getRank() / 11;
+        GET_RANK(rank, i);
+        dwp->page = rank / 11;
         dwp->y = dwp->targetY = dwp->page * 220;
         printRanking();
         return EVT_RETURN_BLOCK;
@@ -3311,58 +3449,6 @@ static USER_FUNC(evt_tou_print_ranking) {
     return EVT_RETURN_BLOCK;
 }
 
-void gans_tex(CameraId cameraId, void* param) {
-    GansWork* wp = param;
-    CameraEntry saved;
-    Mtx44 projMtx;
-    Mtx lookAt;
-    Mtx ident;
-    f32 viewport[6];
-    f32 proj[7];
-    u32 sx, sy, sw, sh;
-    NpcEntry* npc;
-
-    GXGetViewportv(viewport);
-    GXGetProjectionv(proj);
-    GXGetScissor(&sx, &sy, &sw, &sh);
-    GXSetViewport(0.0f, 0.0f, 128.0f, 128.0f, 0.0f, 1.0f);
-    GXSetScissor(1, 1, 126, 126);
-    C_MTXPerspective(projMtx, 25.0f, 1.0f, 1.0f, 1000.0f);
-    GXSetProjection(projMtx, GX_PERSPECTIVE);
-    {
-        static const Vec gans_pos = {0.0f, 20.0f, 130.0f};
-        static const Vec gans_up = {0.0f, 1.0f, 0.0f};
-        static const Vec gans_target = {0.0f, 20.0f, 0.0f};
-        Vec pos;
-        Vec up;
-        Vec target;
-
-        target = gans_target;
-        up = gans_up;
-        pos = gans_pos;
-
-        C_MTXLookAt(lookAt, &pos, &up, &target);
-    }
-    saved = *camGetPtr(cameraId);
-    npc = npcNameToPtr(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
-    PSMTXCopy(lookAt, camGetCurPtr()->view);
-    animPosePeraOff(npc->poseId);
-    PSMTXIdentity(ident);
-    animPoseMain(npc->poseId);
-    animPoseDrawMtx(npc->poseId, ident, 1, 0.0f, 2.0f);
-    animPoseDrawMtx(npc->poseId, ident, 2, 0.0f, 2.0f);
-    animPoseDrawMtx(npc->poseId, ident, 3, 0.0f, 2.0f);
-    animPosePeraOn(npc->poseId);
-    PSMTXCopy(saved.view, camGetCurPtr()->view);
-    GXSetTexCopySrc(0, 0, 0x80, 0x80);
-    GXSetTexCopyDst(0x80, 0x80, GX_TF_RGB5A3, GX_FALSE);
-    GXCopyTex(wp->buf->address, GX_TRUE);
-    GXPixModeSync();
-    GXSetViewport(viewport[0], viewport[1], viewport[2], viewport[3], viewport[4], viewport[5]);
-    GXSetProjectionv(proj);
-    GXSetScissor(sx, sy, sw, sh);
-    wp->ready = 1;
-}
 
 USER_FUNC(make_monitor) {
     NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
@@ -3397,33 +3483,6 @@ USER_FUNC(make_monitor) {
     return EVT_RETURN_BLOCK;
 }
 
-void monitor_tev(MapTevCallbackInfo* info) {
-    if (gans_wp->ready) {
-        GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
-        GXLoadTexObj(smartTexObj(&gans_wp->tex, &gans_wp->buf->address), GX_TEXMAP1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_TEXC, GX_CC_CPREV, GX_CC_A0, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        {
-            GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-
-            color.a = gans_wp->alpha;
-            GXSetTevColor(GX_TEVREG0, color);
-        }
-        info->tevStage = 2;
-        info->texMap = 2;
-        info->texCoord = 2;
-    }
-}
 
 USER_FUNC(onoff) {
     gans_wp->onoff = evtGetValue(event, event->args[0]);
@@ -3469,26 +3528,7 @@ USER_FUNC(unk_tou_000005d0) {
     return EVT_RETURN_DONE;
 }
 
-USER_FUNC(octo_stop) {
-    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
 
-    if (npc != NULL) {
-        evtStopID(npc->regularEvtId);
-        npc->prevPosition = (Vec){80.0f, 0.0f, 85.0f};
-        npc->position = npc->prevPosition;
-        npc->direction = 270.0f;
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(octo_start) {
-    NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
-
-    if (npc != NULL) {
-        evtStartID(npc->regularEvtId);
-    }
-    return EVT_RETURN_DONE;
-}
 
 USER_FUNC(fight_money) {
     s32* args = event->args;
@@ -3522,17 +3562,18 @@ static f32 camGetRy(void) {
 }
 
 USER_FUNC(tou_champion_belt_27_text_34) {
-    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     EffectEntry* eff;
-    AnimationPose* pose;
-    Vec* positions;
     s32 idx;
+    Vec* positions;
+    NpcEntry* npc;
     f32 angle;
+    AnimationPose* pose;
 
+    npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
     if (isFirstCall) {
-        eff = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
+        EffectEntry* entry = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
         animPoseWorldPositionEvalOn(npc->poseId);
-        event->userdatap[0] = eff;
+        event->userdatap[0] = entry;
         champion_belt_onoff = 0;
     }
     pose = animPoseGetAnimPosePtr(npc->poseId);

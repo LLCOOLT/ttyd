@@ -1,5 +1,4 @@
 // include: manager/evtmgr_cmd.h
-// note: rels file declares the data as s32 peach_evt_stg4_quiz_data[5][4] (hand edit after gen)
 // proto: USER_FUNC(peach_evt_stg4_read_quiz_data);
 USER_FUNC(peach_evt_stg4_read_quiz_data) {
     s32* args = event->args;

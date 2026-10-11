@@ -28,11 +28,11 @@
 // decl: typedef struct CreditMsg { s32 field_0x0; s32 pos; s32 type; const char* msg1[3]; const char* msg2[3]; } CreditMsg;
 // decl: typedef struct CreditNpc { const char* agb; const char* anim; s32* evt; } CreditNpc;
 // decl: typedef struct CreditActor { s32 state; s32 poseId; f32 angle; f32 limit; s32 pos; Mtx mtx; } CreditActor;
-// decl: EndMoa* unk_end_bss00000000;
-// decl: EndExtData* unk_end_bss00000004;
-// decl: s32* unk_end_bss00000008;
-// decl: s32 (*unk_end_bss0000000c)[2];
 // decl: EndWork unk_end_bss00000010;
+// decl: s32 (*unk_end_bss0000000c)[2];
+// decl: s32* unk_end_bss00000008;
+// decl: EndExtData* unk_end_bss00000004;
+// decl: EndMoa* unk_end_bss00000000;
 // decl: extern EndWork* dat_ptr_end_00003218;
 // decl: extern CreditMsg unk_end_0000321c[50];
 // decl: extern CreditNpc R_credits_npc_info[152];
@@ -51,6 +51,7 @@
 // decl: void extLoadTextureExit(void);
 // decl: int rand(void);
 // decl: double tan(double x);
+// decl: static inline f32 tanf(f32 x) { return tan(x); }
 // decl: s32 EXIGetType(s32 chan, u32 dev, u32* type);
 // decl: void L_animPoseWorldPositionEvalOff(s32 poseId);
 // decl: void animPoseVivianMain(s32 poseId, Vec* pos);

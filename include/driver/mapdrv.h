@@ -94,18 +94,30 @@ typedef struct MapHeader {
 
 typedef struct MapObject {
     u32 flags;                   // 0x0
-    u8 field_0x4[0x8 - 0x4];     // 0x4
+    union {
+        u8 field_0x4[0x8 - 0x4]; // 0x4 (old name, used by linked evt_lect_*.c)
+        struct {
+            u8 blendMode;        // 0x4
+            u8 unk5;             // 0x5
+            u8 field_0x6[0x8 - 0x6]; // 0x6
+        };
+    };
     MapFileJoint* joints;        // 0x8
-    u8 field_0xC[0x1C - 0xC];    // 0xC
+    GXColor color;               // 0xC
+    Vec center;                  // 0x10
     Mtx modelWorldMtx;           // 0x1C
-    u8 field_0x4C[0xAC - 0x4C];  // 0x4C
+    Mtx localMtx;                // 0x4C
+    Mtx unk7C;                   // 0x7C
     Mtx unkAC;                   // 0xAC
-    u8 field_0xDC[0xE0 - 0xDC];  // 0xDC
+    s16 offscreenId;             // 0xDC
+    s16 groupIndex;              // 0xDE
     struct MapObject* parent;    // 0xE0
     struct MapObject* child;     // 0xE4
     struct MapObject* next;      // 0xE8
     u16 screenRect[4];           // 0xEC, projected bounds (0x3FF when off screen)
-    u8 field_0xF4[0x134 - 0xF4]; // 0xF4
+    u8 field_0xF4[0x114 - 0xF4]; // 0xF4
+    void* unk114;                // 0x114
+    u8 field_0x118[0x134 - 0x118]; // 0x118
 } MapObject;
 
 typedef struct MapError {
@@ -122,9 +134,14 @@ typedef struct MapEntry {
     s32 count;                     // 0x0
     u16 flags;                     // 0x4
     char name[16];                 // 0x6
-    u8 field_0x16[0x1E - 0x16];    // 0x16
+    GXColor blend;                 // 0x16
+    GXColor blend2;                // 0x1A
     GXColor color;                 // 0x1E
-    u8 field_0x22[0x38 - 0x22];    // 0x22
+    u8 field_0x22[0x28 - 0x22];    // 0x22
+    s32 fogType;                   // 0x28
+    f32 fogStart;                  // 0x2C
+    f32 fogEnd;                    // 0x30
+    GXColor fogColor;              // 0x34
     MapHeader header;              // 0x38
     void* dat;                     // 0x7C, ./map/%s/map.dat
     u32 datSize;                   // 0x80
@@ -134,12 +151,12 @@ typedef struct MapEntry {
     MapObject* rootMapObj;         // 0xA8
     struct HitEntry* rootHitObj;     // 0xAC
     Vec bbox[8];                   // 0xB0
-    u8 field_110[0x150 - 0x110];   // 0x110
+    void* tevCallbacks[16];        // 0x110
     s32 numJoints;                 // 0x150, TODO: rename? see: hitNumJoints
     MapObject* objects;            // 0x154, TODO: rename? see: hitNumJoints
     s32 hitNumJoints;              // 0x158
     struct HitEntry* hitEntries;     // 0x15C
-    u8 field_0x160[0x164 - 0x160]; // 0x160
+    s32 numAnims;                  // 0x160
     MapEntryAnimData* animData;    // 0x164
     u8 field_0x168[0x178 - 0x168]; // 0x168
 } MapEntry;
@@ -151,8 +168,8 @@ typedef struct MapWork {
 
 void mapErrorEntry(s32 arg0, const char* arg1);
 const char* getMapDataDvdRoot(void);
-void mapDispOff(void);
-void mapDispOn(void);
+void N_mapDispOff(void);
+void N_mapDispOn(void);
 MapWork* mapGetWork(void);
 s32 mapGetActiveGroup(void);
 s32 mapGetJoints(MapFileJoint* joint);

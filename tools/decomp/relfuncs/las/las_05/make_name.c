@@ -1,7 +1,7 @@
 // include: stdio.h
+// decl: static char name[20];
 // proto: USER_FUNC(make_name);
 USER_FUNC(make_name) {
-    static char name[20];
     s32* args = event->args;
 
     s32 a = evtGetValue(event, args[0]);

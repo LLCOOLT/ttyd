@@ -4,13 +4,15 @@
 // decl: void suifu100taikikan_seq01(NanNpc* npc);
 // proto: USER_FUNC(suifu100taikikan_away);
 USER_FUNC(suifu100taikikan_away) {
-    NanNpcWork* wp = nanNPCWork;
     s32 i;
+    NanNpc* npc;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < wp->count; i++) {
-        wp->entries[i].dir = 90.0f;
-        wp->entries[i].func = suifu100taikikan_seq01;
-        wp->entries[i].state = 0;
+        npc = &wp->entries[i];
+        npc->dir = 90.0f;
+        npc->func = suifu100taikikan_seq01;
+        npc->state = 0;
     }
     return EVT_RETURN_DONE;
 }

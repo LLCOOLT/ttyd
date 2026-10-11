@@ -3,17 +3,21 @@
 // include: dolphin/os.h
 // proto: USER_FUNC(cam_mahojin_kaiten_main);
 USER_FUNC(cam_mahojin_kaiten_main) {
+    s32 frames;
+    s32 msec;
     s32* args = event->args;
     f32 start = evtGetFloat(event, args[0]);
     f32 end = evtGetFloat(event, args[1]);
-    s32 msec = evtGetValue(event, args[2]);
-    s32 frames = sysMsec2Frame(msec);
-    s32 cont = 1;
-    f32 total;
+    s32 cont;
     f32 cur;
+    f32 total;
     f32 speed;
     s32 elapsed;
     s32 i;
+
+    msec = evtGetValue(event, args[2]);
+    frames = sysMsec2Frame(msec);
+    cont = 1;
 
     if (event->lwData[15] == 0) {
         event->lwData[14] = 0;

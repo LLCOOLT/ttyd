@@ -5,7 +5,7 @@
 extern int sprintf(char* str, const char* format, ...);
 
 //.data
-InformantWork _jdt;
+InformantWork _jdt = {0};
 const char* evtNoLabel[] = {
 	"STG0_00", "STG0_01", "STG0_02", "STG0_03", "STG0_04", "STG0_05", "STG0_06", "STG0_07", "STG0_08",
 	"STG0_09", "STG0_10", "STG0_10_01", "STG0_11", "STG0_12", "STG0_12_01", "STG0_12_02", "STG0_13",
@@ -60,6 +60,9 @@ const char* evtNoLabel[] = {
 
 //local prototypes
 s32 johoya_data_make(const char* prefix, s32 type);
+s16 johoya_get(u8* table, s16 id);
+s16 johoya_set(u8* table, s16 id, s16 val);
+const char* search_evt_moji(s32 id);
 
 USER_FUNC(johoya_data_alloc) {
     InformantWork* wp = &_jdt;
@@ -86,6 +89,124 @@ USER_FUNC(johoya_data_free) {
     return 2;
 }
 
+USER_FUNC(johoya_keti_newjoho_check) {
+    InformantWork* wp = &_jdt;
+    s32* args = event->args;
+    u8* table = wp->unk14.unk0;
+    s32 count = 0;
+    s32 i;
+
+    for (i = 0; i < wp->count; i++) {
+        if (johoya_get(table, wp->info[i].storyId) == 0) {
+            count++;
+        }
+    }
+    evtSetValue(event, args[0], count);
+    return 2;
+}
+
+USER_FUNC(johoya_keti_newjoho_makelabel) {
+    s32* args = event->args;
+    char tmp[64];
+    const char* msg;
+    s32 target = evtGetValue(event, args[0]);
+    InformantWork* wp = &_jdt;
+    u8* table = wp->unk14.unk0;
+    s32 n = 0;
+    s32 i;
+
+    for (i = 0; i < wp->count; i++) {
+        if (johoya_get(table, wp->info[i].storyId) == 0) {
+            if (target == n) {
+                sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
+                sprintf(tmp, "jketi_title_%04d", wp->info[i].storyId);
+                msg = msgSearch(tmp);
+                evtSetValue(event, args[1], (s32)wp->infoEnd);
+                evtSetValue(event, args[2], (s32)msg);
+                evtSetValue(event, args[3], strlen(msg));
+                evtSetValue(event, args[4], wp->info[i].unkA);
+                *(s32*)wp->unk10 = i;
+                return 2;
+            }
+            n++;
+        }
+    }
+    *(char*)wp->infoEnd = 0;
+    evtSetValue(event, args[1], (s32)wp->infoEnd);
+    evtSetValue(event, args[2], (s32)wp->infoEnd);
+    evtSetValue(event, args[3], 0);
+    evtSetValue(event, args[4], 0);
+    return 2;
+}
+
+USER_FUNC(johoya_keti_newjoho_setreadflag) {
+    s32 cur = *(s32*)_jdt.unk10;
+    johoya_set(_jdt.unk14.unk0, _jdt.info[cur].storyId, 1);
+    _jdt.info[cur].unk0 |= 1;
+    return 2;
+}
+
+USER_FUNC(johoya_keti_oldspeak_check) {
+    InformantWork* wp = &_jdt;
+    s32* args = event->args;
+    u8* table = wp->unk14.unk0;
+    s32 count = 0;
+    s32 i;
+
+    for (i = 0; i < wp->count; i++) {
+        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].unk0 & 1) == 0) {
+            count++;
+        }
+    }
+    evtSetValue(event, args[0], count);
+    return 2;
+}
+
+USER_FUNC(johoya_keti_oldspeak_makelabel) {
+    s32* args = event->args;
+    s32 target = evtGetValue(event, args[0]);
+    InformantWork* wp = &_jdt;
+    u8* table = wp->unk14.unk0;
+    s32 n = 0;
+    s32 i;
+
+    for (i = 0; i < wp->count; i++) {
+        if (johoya_get(table, wp->info[i].storyId) != 0 && (wp->info[i].unk0 & 1) == 0) {
+            if (target == n) {
+                sprintf((char*)wp->infoEnd, "%s_%04d", wp->prefix, wp->info[i].storyId);
+                evtSetValue(event, args[1], (s32)wp->infoEnd);
+                evtSetValue(event, args[2], wp->info[i].initEndPos);
+                evtSetValue(event, args[3], wp->info[i].tagEndPos);
+                evtSetValue(event, args[4], 0);
+                *(s32*)wp->unk10 = i;
+                return 2;
+            }
+            n++;
+        }
+    }
+    *(char*)wp->infoEnd = 0;
+    evtSetValue(event, args[1], (s32)wp->infoEnd);
+    evtSetValue(event, args[2], (s32)wp->infoEnd);
+    evtSetValue(event, args[3], 0);
+    evtSetValue(event, args[4], 0);
+    return 2;
+}
+
+USER_FUNC(johoya_keti_oldspeak_setreadflag) {
+    _jdt.info[*(s32*)_jdt.unk10].unk0 |= 1;
+    return 2;
+}
+
+USER_FUNC(johoya_perfect_newjoho_setreadflag) {
+    johoya_set(_jdt.unk14.unkD, _jdt.info[*(s32*)_jdt.unk10].storyId, 1);
+    return 2;
+}
+
+USER_FUNC(johoya_luigi_newjoho_setreadflag) {
+    johoya_set(_jdt.unk14.unk1A, _jdt.info[*(s32*)_jdt.unk10].storyId, 1);
+    return 2;
+}
+
 s32 johoya_data_make(const char* prefix, s32 type) {
     InformantWork* wp = &_jdt;
     char label[64];
@@ -98,8 +219,8 @@ s32 johoya_data_make(const char* prefix, s32 type) {
     s32 infoId;
     s32 initEndPos;
     s16 tagEndPos;
-    const char* msg;
-    const char* tagdata;
+    const s8* msg;
+    const s8* tagdata;
     s32 count;    
     s32 labelId;
     
@@ -110,7 +231,7 @@ s32 johoya_data_make(const char* prefix, s32 type) {
     infoId = 0;
     while (1) {
         sprintf(label, "%s_%04d", prefix, storyId);
-        msg = msgSearch(label);
+        msg = (const s8*)msgSearch(label);
         if (msg[0] != '<') {
             break;
         }
@@ -201,6 +322,49 @@ void johoya_init(void) {
 
 
 
+s16 johoya_set(u8* table, s16 id, s16 val) {
+    u8 mask;
+    s32 shift;
+    s32 idx;
+
+    switch (id & 7) {
+        case 0: mask = 0xFE; shift = 0; break;
+        case 1: mask = 0xFD; shift = 1; break;
+        case 2: mask = 0xFB; shift = 2; break;
+        case 3: mask = 0xF7; shift = 3; break;
+        case 4: mask = 0xEF; shift = 4; break;
+        case 5: mask = 0xDF; shift = 5; break;
+        case 6: mask = 0xBF; shift = 6; break;
+        case 7: mask = 0x7F; shift = 7; break;
+    }
+    idx = id / 8;
+    if (val < 0) {
+        val = 0;
+    }
+    else if (val > 1) {
+        val = 1;
+    }
+    table[idx] = (u8)(mask & table[idx]) + (u8)(val << shift);
+    return val;
+}
+
+s16 johoya_get(u8* table, s16 id) {
+    u8 mask;
+    s32 shift;
+
+    switch (id & 7) {
+        case 0: mask = 0x01; shift = 0; break;
+        case 1: mask = 0x02; shift = 1; break;
+        case 2: mask = 0x04; shift = 2; break;
+        case 3: mask = 0x08; shift = 3; break;
+        case 4: mask = 0x10; shift = 4; break;
+        case 5: mask = 0x20; shift = 5; break;
+        case 6: mask = 0x40; shift = 6; break;
+        case 7: mask = 0x80; shift = 7; break;
+    }
+    return (mask & table[id / 8]) >> shift;
+}
+
 s32 search_evt_no(const char* label) {
     s32 labelId;
 
@@ -210,4 +374,8 @@ s32 search_evt_no(const char* label) {
         }
     }
     return -1;
+}
+
+const char* search_evt_moji(s32 id) {
+    return evtNoLabel[id];
 }

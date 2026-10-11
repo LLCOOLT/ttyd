@@ -8,10 +8,14 @@
 // decl: typedef struct RuleData { s32 name; const char* msg; s32 id; s32 a; s32 b; } RuleData;
 // decl: static __declspec(section ".data") RankWork* rank_wp;
 // decl: static __declspec(section ".data") DispWork* dwp;
-// decl: static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+// decl: #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 // proto: USER_FUNC(evt_tou_get_ranking_27_text_1ED4);
 USER_FUNC(evt_tou_get_ranking_27_text_1ED4) {
     s32* args = event->args;
-    evtSetValue(event, args[0], getRank());
+    s32 rank;
+    s32 i;
+
+    GET_RANK(rank, i);
+    evtSetValue(event, args[0], rank);
     return EVT_RETURN_DONE;
 }

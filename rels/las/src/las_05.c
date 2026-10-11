@@ -15,21 +15,22 @@
 #include "party.h"
 #include "mario/mario_party.h"
 #include "party/party_cloud.h"
+#include "mario/mariost.h"
 #include "driver/dispdrv.h"
 #include "driver/camdrv.h"
 #include "stdio.h"
 
-u8 kurokaron_move_flag;
-u8 kurokaron_move_index;
+extern u8 kurokaron_move_flag;
+extern u8 kurokaron_move_index;
 extern f32 kurokaron_move_list[6][2];
 int rand(void);
 s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz);
 void npcTuningRy(NpcEntry* npc, f32 ry);
-u8 kurokaron_same_goal;
+extern u8 kurokaron_same_goal;
 extern u8 kurokaron_prev_goal;
-s32 kurokaron_vivian_prev_sts;
-u8 kurokaron_stop_cnt;
-u16 kurokaron_run_cnt;
+extern s32 kurokaron_vivian_prev_sts;
+extern u8 kurokaron_stop_cnt;
+extern u16 kurokaron_run_cnt;
 extern int __float_nan[];
 double sin(double x);
 double cos(double x);
@@ -39,7 +40,7 @@ static inline f32 k_sqrtf(f32 x) { const f64 _half = .5; const f64 _three = 3.0;
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 void _kurokaron_next_move_index(void);
 typedef struct Senkaron { s8 state; u16 area; s32 timer; f32 vx; f32 vy; f32 vz; u32 flags; } Senkaron;
-typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; s32 field_C; s32 marioPushed; s32 field_14; Senkaron* sk; } SenkaronWork;
+typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; u32 frameCount; s32 marioPushed; s32 hammerFrame; Senkaron* sk; } SenkaronWork;
 SenkaronWork* skwp;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 ExtPose* extGetPosePtr(void);
@@ -47,6 +48,12 @@ s32 extGetPoseNum(void);
 static f32 randf(f32 min, f32 max);
 s32 nokonokoGetStatus(void);
 f32 cloudGetBreathDist(void);
+double sqrt(double x);
+f32 marioGetAngleKaitenHammer(void);
+extern s32 move_check_list[];
+s32 party_hit_check(f32* dir, f32 x, f32 z);
+void calc_area(s32 i, f32 x, f32 z);
+void move_check(ExtPose* pose, s32 idx);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 void extLoadRenderMode(void);
@@ -61,7 +68,7 @@ void extLoadShadowVertex(void);
 void extLoadShadowTev(void);
 void extDrawShadow(void);
 extern s32 partyCtrlNo;
-s32 party_hit_check(f32* dir, f32 x, f32 z);
+static char name[20];
 
 USER_FUNC(chk_mario_ctrloff);
 USER_FUNC(evt_bero_get_info);
@@ -283,8 +290,8 @@ s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
 }
 
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
-    static s32 flag;
     static s32 count;
+    static s32 flag;
     f32 angle;
 
     if (!(kurokaron_move_flag & 2)) {
@@ -516,7 +523,7 @@ void move_check(ExtPose* pose, s32 idx) {
     cnt = extGetPoseNum() - (idx + 1);
     if (sk[idx].state == 1) {
         pose2 = pose + 1;
-        for (j = idx + 1; cnt != 0; cnt--, j++, pose2++) {
+        for (j = idx + 1; cnt != 0; j++, pose2++, cnt--) {
             if (sk[j].state == 1 && sk[j].area == sk[idx].area) {
                 f32 dx1 = __fabsf(pose->mtx[0][3] - mario->position.x);
                 f32 dz1 = __fabsf(pose->mtx[2][3] - mario->position.z);
@@ -538,9 +545,13 @@ void move_check(ExtPose* pose, s32 idx) {
 void calc_area(s32 i, f32 x, f32 z) {
     f32 fx = x - -570.0f;
     f32 fz = z - -270.0f;
-    u16 iz = fz / 40.0f;
-    u16 ix = fx / 40.0f;
+    u16 iz;
+    u16 ix;
 
+    fx /= 40.0f;
+    fz /= 40.0f;
+    iz = fz;
+    ix = fx;
     skwp->sk[i].area = ix + iz * 29.5f;
 }
 
@@ -764,6 +775,335 @@ s32 move_check_list[] = {
 };
 
 static void senkaron_ext_main(void) {
+    MarioWork* mario;
+    ExtPose* pose;
+    s32 hit;
+    f32 range;
+    ExtPose* p;
+    ExtPose* ep;
+    Senkaron* sk;
+    Senkaron* s;
+    f32 near;
+    const char* sfxLand;
+    const char* sfxFly;
+    s32 hammerDir;
+    s32 group;
+    s32 start;
+    s32 end;
+    s32 i;
+    f32 scale;
+    f32 push;
+    f32 dx;
+    f32 adx;
+    f32 adz;
+    f32 dist;
+    f32 angle;
+    f32 speed;
+
+    pose = extGetPosePtr();
+    mario = marioGetPtr();
+    hammerDir = 0;
+    sk = skwp->sk;
+    scale = mario->wPlayerCollisionBox.x / 2.0f;
+    skwp->marioPushed = 0;
+    if (mario->currMotionId == 0x12) {
+        skwp->hammerFrame++;
+        skwp->hammerFrame %= 15;
+    } else {
+        skwp->hammerFrame = 0;
+    }
+    if (mario->currMotionId == 0x12 && skwp->hammerFrame == 10) {
+        if (0.0f == mario->unk1AC) {
+            hammerDir = 1;
+        } else if (180.0f == mario->unk1AC) {
+            hammerDir = 2;
+        } else if (mario->unk1A8 < 90.0f || 270.0f < mario->unk1A8) {
+            hammerDir = 1;
+        } else {
+            hammerDir = 2;
+        }
+    }
+    group = skwp->frameCount % 20;
+    if (group != 0) {
+        start = move_check_list[group - 1] + 1;
+    } else {
+        start = 0;
+    }
+    end = move_check_list[group];
+    p = &pose[start];
+    for (i = start; i < end; i++, p++) {
+        sk[i].flags &= ~2;
+        calc_area(i, p->mtx[0][3], p->mtx[2][3]);
+    }
+    p = &extGetPosePtr()[start];
+    for (i = start; i < end; i++, p++) {
+        move_check(p, i);
+    }
+    skwp->frameCount++;
+    ep = extGetPosePtr();
+    sfxLand = "SFX_STG8_KARON_LANDING1";
+    range = 1.5f * (6.0f * scale);
+    sfxFly = "SFX_STG8_KARON_FLY1";
+    near = 3.0f * scale;
+    for (i = 0; i < 1000; i++, ep++) {
+        s = &sk[i];
+        switch (s->state) {
+            case 0:
+                ep->frame = (gp->retraceCount + i * i) % 24;
+                if (s->timer > 0) {
+                    if (skwp->escape) {
+                        ep->flags &= ~1;
+                        s->state = 0x63;
+                    } else if (skwp->attackStart) {
+                        s->timer--;
+                    }
+                    break;
+                }
+                ep->mtx[1][3] += s->vy;
+                s->vy -= 0.3f;
+                if (ep->mtx[1][3] < 0.0f) {
+                    ep->mtx[1][3] = 0.0f;
+                    s->state = 1;
+                    s->timer = 0;
+                    s->flags &= 0xFFFE;
+                    if (i % 8 == 0) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = ep->mtx[0][3];
+                        pos.y = ep->mtx[1][3];
+                        pos.z = ep->mtx[2][3];
+                        psndSFXOn_3D(sfxLand, &pos);
+                    }
+                }
+                break;
+            case 1:
+                ep->frame = (gp->retraceCount + i * i) % 24;
+                if (skwp->escape) {
+                    if (0.0f == ep->mtx[0][3] && 0.0f == ep->mtx[2][3]) {
+                        s->vx = 1.0f;
+                        s->vz = 1.0f;
+                    } else {
+                        dist = sqrt(ep->mtx[0][3] * ep->mtx[0][3] + ep->mtx[2][3] * ep->mtx[2][3]);
+                        s->vx = 4.0f * ep->mtx[0][3] / dist;
+                        s->vz = 4.0f * ep->mtx[2][3] / dist;
+                    }
+                    if (s->vx < 0.0f) {
+                        ep->rot = 90.0f;
+                    } else {
+                        ep->rot = 270.0f;
+                    }
+                    s->state = 0x62;
+                    s->timer = 300;
+                    break;
+                }
+                hit = 0;
+                dx = ep->mtx[0][3] - mario->position.x;
+                push = 0.0f;
+                adx = __fabsf(dx);
+                adz = __fabsf(ep->mtx[2][3] - mario->position.z);
+                if (ep->mtx[0][3] >= mario->position.x) {
+                    if (s->flags & 1) {
+                        ep->rot = 270.0f;
+                    } else {
+                        ep->rot = 90.0f;
+                    }
+                } else {
+                    if (s->flags & 1) {
+                        ep->rot = 90.0f;
+                    } else {
+                        ep->rot = 270.0f;
+                    }
+                }
+                if (skwp->mesPushing) {
+                    break;
+                }
+                if (hammerDir != 0 && adz < 80.0f) {
+                    if (hammerDir == 2) {
+                        if (ep->mtx[0][3] > mario->position.x && adx < range) {
+                            hit = 1;
+                            push = 1.0f;
+                        }
+                    } else {
+                        if (ep->mtx[0][3] < mario->position.x && adx < range) {
+                            hit = 1;
+                            push = -1.0f;
+                        }
+                    }
+                }
+                angle = marioGetAngleKaitenHammer();
+                if (angle >= 0.0f && adx < 80.0f && adz < 80.0f) {
+                    if (angle >= 0.0f && angle < 90.0f) {
+                        if (ep->mtx[2][3] > mario->position.z && ep->mtx[0][3] > mario->position.x) {
+                            hit = 1;
+                            push = 1.0f;
+                        }
+                    } else if (angle >= 90.0f && angle < 180.0f) {
+                        if (ep->mtx[2][3] > mario->position.z && ep->mtx[0][3] < mario->position.x) {
+                            hit = 1;
+                            push = -1.0f;
+                        }
+                    } else if (angle >= 180.0f && angle < 270.0f) {
+                        if (ep->mtx[2][3] < mario->position.z && ep->mtx[0][3] < mario->position.x) {
+                            hit = 1;
+                            push = -1.0f;
+                        }
+                    } else {
+                        if (ep->mtx[2][3] < mario->position.z && ep->mtx[0][3] > mario->position.x) {
+                            hit = 1;
+                            push = -1.0f;
+                        }
+                    }
+                }
+                {
+                    f32 dir = 0.0f;
+
+                    if (party_hit_check(&dir, ep->mtx[0][3], ep->mtx[2][3])) {
+                        hit = 2;
+                        push = dir;
+                    }
+                }
+                if (hit != 0) {
+                    dist = k_sqrtf(adx * adx + adz * adz);
+                    s->vx = push + 3.0f * dx / dist;
+                    s->vy = randf(5.0f, 10.0f);
+                    s->vz = randf(-5.0f, 10.0f);
+                    s->state = 0x61;
+                    if (hit == 1) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = ep->mtx[0][3];
+                        pos.y = ep->mtx[1][3];
+                        pos.z = ep->mtx[2][3];
+                        psndSFXOn_3D(sfxFly, &pos);
+                    }
+                    break;
+                }
+                if (adz < 40.0f && vivianGetStatus() != 1 && vivianGetStatus() != 2 && vivianGetStatus() != 3) {
+                    if (ep->mtx[0][3] > 0.0f) {
+                        if (ep->mtx[0][3] > mario->position.x + scale - 10.0f && ep->mtx[0][3] < mario->position.x + near) {
+                            skwp->marioPushed |= 1;
+                        }
+                    } else {
+                        if (ep->mtx[0][3] > mario->position.x - near && ep->mtx[0][3] < 10.0f + (mario->position.x - scale)) {
+                            skwp->marioPushed |= 2;
+                        }
+                    }
+                }
+                if (s->timer == 0) {
+                    f32 tz = ep->mtx[2][3] - mario->position.z;
+                    f32 tx = ep->mtx[0][3] - mario->position.x;
+                    f32 td = 10.0f * (f32)sqrt(tx * tx + tz * tz);
+                    s32 r = rand() % 50;
+
+                    s->vx = randf(-0.5f, 0.5f);
+                    s->vz = randf(-0.5f, 0.5f);
+                    s->vx -= tx / td;
+                    s->vz -= tz / td;
+                    if (r == 1) {
+                        s->flags |= 1;
+                    } else {
+                        s->flags &= 0xFFFE;
+                    }
+                    s->timer = 60;
+                }
+                s->timer--;
+                if (s->flags & 2) {
+                    ep->mtx[0][3] -= s->vx;
+                    ep->mtx[2][3] -= s->vz;
+                } else {
+                    ep->mtx[0][3] += s->vx;
+                    ep->mtx[2][3] += s->vz;
+                }
+                if (ep->mtx[0][3] > 570.0f) {
+                    ep->mtx[0][3] = 570.0f;
+                }
+                if (ep->mtx[0][3] < -570.0f) {
+                    ep->mtx[0][3] = -570.0f;
+                }
+                if (ep->mtx[2][3] > 270.0f) {
+                    ep->mtx[2][3] = 270.0f;
+                }
+                if (ep->mtx[2][3] < -270.0f) {
+                    ep->mtx[2][3] = -270.0f;
+                }
+                break;
+            case 0x61:
+                ep->flags |= 4;
+                if (ep->mtx[1][3] > -100.0f) {
+                    ep->mtx[0][3] += s->vx;
+                    ep->mtx[1][3] += s->vy;
+                    ep->mtx[2][3] += s->vz;
+                    if (ep->mtx[2][3] <= -270.0f) {
+                        ep->mtx[2][3] = -270.0f;
+                    }
+                    s->vy -= 0.3f;
+                    ep->frame = 24;
+                } else {
+                    marioGetPtr();
+                    ep->mtx[0][3] = randf(-570.0f, 570.0f);
+                    ep->mtx[1][3] = 250.0f;
+                    ep->mtx[2][3] = randf(-270.0f, 270.0f);
+                    ep->rot = randf(0.0f, 360.0f);
+                    ep->flags &= ~4;
+                    s->state = 0;
+                    s->timer = rand() % 1000 + 1;
+                    s->vy = 0.0f;
+                }
+                break;
+            case 0x62:
+                if (s->timer > 0) {
+                    ep->mtx[0][3] += s->vx;
+                    ep->mtx[2][3] += s->vz;
+                    s->timer--;
+                    if (s->timer % 10 == 0) {
+                        if (!((s->timer / 5) & 1)) {
+                            Vec pos = {0.0f, 0.0f, 0.0f};
+                            pos.x = ep->mtx[0][3];
+                            pos.y = ep->mtx[1][3];
+                            pos.z = ep->mtx[2][3];
+                            psndSFXOn_3D((const char*)0xAFB, &pos);
+                        } else {
+                            Vec pos = {0.0f, 0.0f, 0.0f};
+                            pos.x = ep->mtx[0][3];
+                            pos.y = ep->mtx[1][3];
+                            pos.z = ep->mtx[2][3];
+                            psndSFXOn_3D((const char*)0xAFC, &pos);
+                        }
+                    }
+                } else {
+                    ep->flags &= ~1;
+                    s->state = 0x63;
+                }
+                ep->frame = (gp->retraceCount + i * i) % 24;
+                break;
+            case 0x63:
+                break;
+        }
+    }
+    if (((skwp->marioPushed & 1) && mario->position.x > 0.0f) || ((skwp->marioPushed & 2) && mario->position.x < 0.0f)) {
+        f32 mz = -mario->position.z;
+        f32 mx = -mario->position.x;
+
+        dist = k_sqrtf(mx * mx + mz * mz);
+        switch (mario->currMotionId) {
+            case 0x12:
+            case 0x13:
+                speed = 0.0f;
+                break;
+            case 1:
+                speed = randf(3.0f, 3.5f);
+                break;
+            case 2:
+                speed = randf(3.8f, 4.3f);
+                break;
+            case 3:
+                speed = randf(3.3f, 3.8f);
+                break;
+            default:
+                speed = randf(1.7f, 2.2f);
+                break;
+        }
+        mario->position.x += speed * (mx / dist);
+        mario->position.z += speed * (mz / dist);
+    }
 }
 
 static void senkaron_ext_dispent(void) {
@@ -1325,7 +1665,6 @@ EVT_BEGIN(las_05_init_evt)
 EVT_END()
 
 static USER_FUNC(make_name) {
-    static char name[20];
     s32* args = event->args;
 
     s32 a = evtGetValue(event, args[0]);
@@ -1336,3 +1675,9 @@ static USER_FUNC(make_name) {
     return EVT_RETURN_DONE;
 }
 
+u16 kurokaron_run_cnt;
+u8 kurokaron_stop_cnt;
+s32 kurokaron_vivian_prev_sts;
+u8 kurokaron_same_goal;
+u8 kurokaron_move_flag;
+u8 kurokaron_move_index;

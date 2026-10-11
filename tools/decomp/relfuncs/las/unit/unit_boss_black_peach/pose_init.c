@@ -43,15 +43,13 @@
 static void pose_init(void) {
     char name[32];
     char anim[32];
-    Mtx mtx;
     HandData* d = hand_data;
     s32 i = 0;
     s32 start;
-    u8* light = lightGetPaperCraft();
 
-    *(Vec*)(light + 0x24) = (Vec){-200.0f, 100.0f, 500.0f};
-    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
-    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
+    // hand_light_init is an inline helper defined by hand before EVT_BEGIN(shadow_queen_1000) in the
+    // rels/ source: its (Vec){-200, 100, 500} template must sit there in .rodata
+    hand_light_init();
     strcpy(name, "");
     strcpy(anim, "");
     hand_wp->animNum = -1;

@@ -1,12 +1,28 @@
 #include "countdown.h"
 
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/icondrv.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
 #include "mario/mariost.h"
+#include "system.h"
+#include <dolphin/mtx.h>
+#include <dolphin/os.h>
 #include <string.h>
 
 extern GlobalWork* gp;
+s32 psndSFXOff(s32 id);
+s32 psndSFXOn(const char* name);
+
+//.sdata2
+static const GXColor sWhite = {255, 255, 255, 255};
+static const GXColor sShadow = {255, 255, 255, 153};
 
 //.sbss
 static CountdownWork* wp;
+
+static void countDownDisp(CameraId cameraId, void* param);
 
 void countDownInit(void) {
     wp = &gp->countdown;
@@ -14,9 +30,136 @@ void countDownInit(void) {
 }
 
 void countDownSaveReStart(void) {
+    CountdownWork* work = wp;
+    if ((work->flags & 1) != 0) {
+        u32 ticks = OS_TIMER_CLOCK / 1000;
+        s64 ms = work->elapsed / ticks;
+        if ((u32)(work->limit - ms) <= work->restart) {
+            work->elapsed = (s64)ticks * (u32)(work->limit - work->restart);
+        }
+        wp->prevTime = gp->renderTime;
+        if (evtGetValue(NULL, GSW(0)) < 0x160) {
+            wp->sfxId = psndSFXOn("SFX_STG2_BOMB_TIMER1");
+        } else {
+            wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
+        }
+    }
+}
+
+void countDownStart(u32 limit, u32 restart) {
+    wp->limit = limit;
+    wp->restart = restart;
+    wp->prevTime = gp->renderTime;
+    wp->elapsed = 0;
+    wp->unk30 = 0;
+    wp->counter = 0;
+    wp->offX = 0.0f;
+    wp->offY = 0.0f;
+    wp->x = 180.0f;
+    wp->y = -180.0f;
+    wp->flags = 0;
+    wp->flags |= 1;
+    if (evtGetValue(NULL, GSW(0)) < 0x160) {
+        wp->sfxId = psndSFXOn("SFX_STG2_BOMB_TIMER1");
+    } else {
+        wp->sfxId = psndSFXOn("SFX_STG7_ALART_WARNING1");
+    }
+}
+
+void countDownSetRestartTime(u32 restart) {
+    wp->restart = restart;
 }
 
 void countDownMain(void) {
+    if ((wp->flags & 1) != 0) {
+        switch (wp->unk30) {
+        case 0:
+            if (++wp->counter < 30) {
+                wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(300.0f, 0.0f, 11, wp->counter, 30);
+            } else {
+                wp->counter = 0;
+                wp->unk30++;
+            }
+            break;
+        case 1:
+            if ((wp->flags & 2) != 0) {
+                psndSFXOff(wp->sfxId);
+                wp->sfxId = -1;
+            }
+            break;
+        case 2:
+            if (++wp->counter < 30) {
+                wp->offX = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 300.0f, 11, wp->counter, 30);
+            } else {
+                wp->counter = 0;
+                wp->unk30++;
+                wp->flags &= ~1;
+                psndSFXOff(wp->sfxId);
+            }
+            break;
+        }
+        if ((wp->flags & 8) == 0 && marioStGetSystemLevel() == 0U) {
+            wp->elapsed += (s32)((u32)gp->renderTime - (u32)wp->prevTime);
+        }
+        wp->prevTime = gp->renderTime;
+        {
+            CountdownWork* work = wp;
+            if (work->elapsed / (OS_TIMER_CLOCK / 1000) >= work->limit) {
+                work->flags |= 2;
+            }
+        }
+        dispEntry(CAMERA_2D, 1000.0f, 0, countDownDisp, NULL);
+    }
+}
+
+static void countDownDisp(CameraId cameraId, void* param) {
+    GXColor white = sWhite;
+    GXColor white2 = sWhite;
+    GXColor white3 = sWhite;
+    CountdownWork* work = wp;
+    s32 remaining;
+    Mtx mtx;
+    Mtx scale;
+    Mtx base;
+    remaining = work->limit - work->elapsed / (OS_TIMER_CLOCK / 1000);
+    if ((work->flags & 4) == 0) {
+        s32 sec, msec;
+        s32 digits[3];
+        s32 i;
+        if ((work->flags & 2) != 0) {
+            remaining = 0;
+        }
+        sec = remaining / 1000;
+        msec = remaining % 1000;
+        PSMTXTrans(base, work->x + work->offX, work->y + work->offY, 0.0f);
+        PSMTXScale(scale, 2.5f, 1.0f, 1.0f);
+        PSMTXConcat(base, scale, mtx);
+        {
+            GXColor shadow = sShadow;
+            iconDispGxCol(mtx, 0x10, 0x1f6, shadow);
+        }
+        digits[0] = sec / 100;
+        sec %= 100;
+        digits[1] = sec / 10;
+        digits[2] = sec % 10;
+        for (i = 0; i < 3; i++) {
+            PSMTXTrans(mtx, i * 30 - 50, 8.0f, 0.0f);
+            PSMTXConcat(base, mtx, mtx);
+            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7), white2);
+        }
+        PSMTXTrans(mtx, 28.0f, 10.0f, 0.0f);
+        PSMTXConcat(base, mtx, mtx);
+        iconDispGxCol(mtx, 0x10, 0x201, white3);
+        digits[0] = msec / 100;
+        digits[1] = (msec % 100) / 10;
+        for (i = 0; i < 2; i++) {
+            PSMTXTrans(mtx, i * 15 + 40, 8.0f, 0.0f);
+            PSMTXScale(scale, 0.5f, 0.5f, 0.5f);
+            PSMTXConcat(mtx, scale, mtx);
+            PSMTXConcat(base, mtx, mtx);
+            iconDispGxCol(mtx, 0x10, (u16)(digits[i] + 0x1f7), white2);
+        }
+    }
 }
 
 s32 countDownGetStatus(void) {
@@ -28,4 +171,17 @@ void countDownEnd(void) {
     if ((wp->flags & 1) != 0) {
         wp->unk30 = 2;
     }
+}
+
+void countDownStop(void) {
+    wp->flags |= 8;
+    psndSFXOff(wp->sfxId);
+}
+
+void countDownFlagOn(u16 flag) {
+    wp->flags |= flag;
+}
+
+void countDownFlagOff(u16 flag) {
+    wp->flags &= ~flag;
 }

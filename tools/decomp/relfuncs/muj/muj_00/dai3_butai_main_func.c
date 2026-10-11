@@ -13,19 +13,24 @@ USER_FUNC(dai3_butai_main_func) {
     f32 cx = evtGetValue(event, args[2]);
     f32 cz = evtGetValue(event, args[3]);
     s32 d = b - a;
-    NanNpcWork* wp = nanNPCWork;
-    NanNpc* npc;
-    f32 rad;
-    f32 r;
     s32 i;
+    NanNpc* npc;
+    f32 r;
+    f32 rad;
+    f32 s;
+    f32 c;
+    NanNpcWork* wp = nanNPCWork;
 
     for (i = 0; i < 100; i++) {
         npc = &wp->entries[i + 205];
         npc->angle += d;
-        rad = 3.141592f * npc->angle / 180.0f;
         r = npc->radius;
-        npc->pos.x = r * (f32)sin(rad) + cx;
-        npc->pos.z = r * (f32)cos(rad) + cz;
+        rad = npc->angle;
+        rad = 3.141592f * rad / 180.0f;
+        s = sin(rad);
+        c = cos(rad);
+        npc->pos.x = r * s + cx;
+        npc->pos.z = r * c + cz;
     }
     return EVT_RETURN_DONE;
 }

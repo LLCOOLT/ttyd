@@ -34,7 +34,7 @@ static void senkaron_ext_main(void) {
 
     pose = extGetPosePtr();
     mario = marioGetPtr();
-    scale = mario->wPlayerCollisionBox.x * 0.5f;
+    scale = mario->wPlayerCollisionBox.x / 2;
     marioPushedFlag = 0;
     if (mario->currMotionId == 0x12) {
         if (++marioHammerFrame == 15) {
@@ -44,11 +44,11 @@ static void senkaron_ext_main(void) {
         marioHammerFrame = 0;
     }
     n = extGetPoseNum();
-    sfxLand = "SFX_STG1_HONE_LANDING1";
+    sfxLand = (0, "SFX_STG1_HONE_LANDING1");
     range = 1.5f * (6.0f * scale);
-    sfxFly = "SFX_STG1_HONE_FLY1";
+    sfxFly = (0, "SFX_STG1_HONE_FLY1");
     near = 3.0f * scale;
-    sfxFly2 = "SFX_STG1_HONE_FLY1";
+    sfxFly2 = (0, "SFX_STG1_HONE_FLY1");
     for (i = n - 1; i >= 0; i--, pose++) {
         switch (senkaron[i].state) {
             case 0:

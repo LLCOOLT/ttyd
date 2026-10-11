@@ -8,7 +8,12 @@
 // decl: void FontDrawString(const char* message, f32 x, f32 y);
 // decl: void FontDrawScale(f32 scale);
 // proto: void irai_window_disp(CameraId camera, void* param);
+static inline f32 iraiAddI(f32 a, s32 b) {
+    return a + b;
+}
+
 void irai_window_disp(CameraId camera, void* param) {
+    f32 negX;
     IraiWork* wp = param;
     u32 left;
     u32 top;
@@ -34,9 +39,10 @@ void irai_window_disp(CameraId camera, void* param) {
     FontDrawStart();
     FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     FontDrawScale(0.85f);
+    negX = -77.0f;
     msg = msgSearch("irai_client_win");
     FontDrawEdge();
-    FontDrawString(msg, -77.0f, 180.0f);
+    FontDrawString(msg, negX, 180.0f);
     FontDrawEdgeOff();
     msg = msgSearch("irai_contents_win");
     FontDrawEdge();
@@ -57,7 +63,7 @@ void irai_window_disp(CameraId camera, void* param) {
             FontDrawColor((GXColor){0xFF, 0x00, 0x00, 0xFF});
         }
         no = wp->list[i] - 1;
-        FontDrawString(wp->client[no], -119.0f, wp->scroll + (140 - i * 30));
+        FontDrawString(wp->client[no], -119.0f, iraiAddI(wp->scroll, 140 - i * 30));
         FontDrawString(wp->contents[no], 51.0f, wp->scroll + (140 - i * 30));
     }
     GXSetScissor(left, top, width, height);

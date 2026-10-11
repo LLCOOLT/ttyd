@@ -6,9 +6,12 @@
 #include <string.h>
 
 extern BattleWork* _battleWorkPointer;
-extern ItemData* itemDataTable;
+extern ItemData itemDataTable[];
+#include "system.h"
+extern void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
 extern int sprintf(char* str, const char* format, ...);
 
+#pragma dont_inline on
 BattleIcon* BtlIconGetPtr(s32 index) {
 	BattleIcon* icon;
 	int i;
@@ -29,22 +32,20 @@ void BattleIconInit(void) {
 void BattleIconMain(void) {
 	BattleWork* wp;
 	BattleIcon* icon;
-	IconEntry* base;
 	int i;
 
 	wp = _battleWorkPointer;
 	for (i = 0; i < 16; i++) {
 		icon = &wp->icons[i];
 		if (icon->flags & 1) { //in use
-			base = icon->base;
-			if (base) {
-				iconSetPos(base->name, icon->position.x, icon->position.y, icon->position.z);
-				iconSetScale(base->name, icon->field_0x14 * icon->field_0x18);
+			if (icon->base) {
+				iconSetPos(icon->base->name, icon->position.x, icon->position.y, icon->position.z);
+				iconSetScale(icon->base->name, icon->field_0x14 * icon->field_0x18);
 				if (icon->flags & 2) {
-					iconFlagOn(base->name, 2);
+					iconFlagOn(icon->base->name, 2);
 				}
 				else {
-					iconFlagOff(base->name, 2);
+					iconFlagOff(icon->base->name, 2);
 				}
 			}
 		}
@@ -60,10 +61,10 @@ void BattleIconEnd(void) {
 	}
 }
 
-BattleIcon* BtlIcon_Entry(s16 iconId, f32 x, f32 y, f32 z) {
+BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z) {
 	BattleIcon* icon;
 	int i;
-	char name[32];
+	char name[8];
 
 	for (i = 0; i < 16; i++) {
 		icon = &_battleWorkPointer->icons[i];
@@ -71,23 +72,23 @@ BattleIcon* BtlIcon_Entry(s16 iconId, f32 x, f32 y, f32 z) {
 			break; //found one not in use
 		}
 	}
-	if (i < 16) {
-		memset(icon, 0, sizeof(BattleIcon));
-		icon->index = i;
-		icon->flags = 1;
-		icon->field_0x14 = 1.0f;
-		icon->field_0x18 = 1.0f;
-		icon->position = (Vec){x, y, z};
-		icon->iconId = iconId;
-		sprintf(name, "_biu_%02x", icon->index);
-		iconEntry(name, icon->iconId);
-		icon->base = iconNameToPtr(name);
-		iconSetPos(icon->base->name, icon->position.x, icon->position.y, icon->position.z);
-		return icon;
-	}
-	else {
+	if (i >= 16) {
 		return NULL;
 	}
+	memset(icon, 0, sizeof(BattleIcon));
+	icon->index = i;
+	icon->flags = 1;
+	icon->field_0x14 = 1.0f;
+	icon->field_0x18 = 1.0f;
+	icon->position.x = x;
+	icon->position.y = y;
+	icon->position.z = z;
+	icon->iconId = iconId;
+	sprintf(name, "_biu_%02x", icon->index);
+	((void (*)(const char*, u16))iconEntry)(name, icon->iconId);
+	icon->base = iconNameToPtr(name);
+	iconSetPos(icon->base->name, icon->position.x, icon->position.y, icon->position.z);
+	return icon;
 }
 
 void BtlIcon_Delete(BattleIcon* icon) {
@@ -154,7 +155,9 @@ USER_FUNC(btlevtcmd_BtlIconSetPosition) {
 	x = evtGetFloat(event, args[1]);
 	y = evtGetFloat(event, args[2]);
 	z = evtGetFloat(event, args[3]);
-	icon->position = (Vec){x, y, z};
+	icon->position.x = x;
+	icon->position.y = y;
+	icon->position.z = z;
 	return EVT_RETURN_DONE;
 }
 
@@ -168,6 +171,74 @@ USER_FUNC(btlevtcmd_BtlIconSetFallAccel) {
 }
 
 USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
-	//TODO: revisit when more of BattleWorkIcon is filled out
-	return 2;
+	s32* args = event->args;
+	BattleIcon* icon;
+	s32 index, frames;
+	f32 sx, sy, sz;
+	f32 x, y, z;
+	f32 dy;
+
+	index = evtGetValue(event, args[0]);
+	x = (f32)evtGetValue(event, args[1]);
+	y = (f32)evtGetValue(event, args[2]);
+	z = (f32)evtGetValue(event, args[3]);
+	frames = evtGetValue(event, args[4]);
+	icon = BtlIconGetPtr(index);
+	if (isFirstCall) {
+		event->blocked = 1;
+		if (frames) {
+			icon->jumpFrames = frames;
+		}
+		icon->jumpTarget.x = x;
+		icon->jumpTarget.y = y;
+		icon->jumpTarget.z = z;
+		sx = icon->position.x;
+		sz = icon->position.z;
+		sy = icon->position.y;
+		icon->jumpPos.x = sx;
+		icon->jumpStart.x = sx;
+		icon->jumpPos.y = sy;
+		icon->jumpStart.y = sy;
+		icon->jumpPos.z = sz;
+		icon->jumpStart.z = sz;
+		icon->jumpAngle = angleABf(sx, sz, x, z);
+		icon->jumpDist = distABf(sx, sz, x, z);
+		if (x - sx > 0.0f) {
+			icon->jumpDir = 1;
+		}
+		else if (x - sx < 0.0f) {
+			icon->jumpDir = -1;
+		}
+		dy = y - sy;
+		if (icon->jumpFrames == 0) {
+			icon->jumpFrames = (s32)(icon->jumpDist / icon->jumpSpeed);
+			icon->jumpDist -= icon->jumpFrames * icon->jumpSpeed;
+		}
+		else {
+			icon->jumpSpeed = icon->jumpDist / icon->jumpFrames;
+			icon->jumpDist -= icon->jumpFrames * icon->jumpSpeed;
+		}
+		if (icon->jumpFrames == 0) {
+			return 2;
+		}
+		icon->jumpVelY = dy / icon->jumpFrames + icon->jumpFrames * icon->fallAccel * 0.5f;
+		icon->jumpSpeed += icon->jumpDist / icon->jumpFrames;
+	}
+	icon->jumpPos.y += icon->jumpVelY;
+	icon->jumpVelY -= icon->fallAccel;
+	if (icon->jumpVelY < 0.0f && icon->jumpPos.y < icon->jumpTarget.y) {
+		icon->jumpPos.y = icon->jumpTarget.y;
+	}
+	btlMovePos(icon->jumpSpeed, icon->jumpAngle, &icon->jumpPos.x, &icon->jumpPos.z);
+	icon->position.x = icon->jumpPos.x;
+	icon->position.y = icon->jumpPos.y;
+	icon->position.z = icon->jumpPos.z;
+	icon->jumpFrames--;
+	if (icon->jumpFrames <= 0) {
+		icon->position.x = icon->jumpTarget.x;
+		icon->position.y = icon->jumpTarget.y;
+		icon->position.z = icon->jumpTarget.z;
+		return 1;
+	}
+	return 0;
 }

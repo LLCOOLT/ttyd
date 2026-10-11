@@ -18,11 +18,14 @@
 // decl: static void moamoa_pose_init(void);
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-// decl: static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
-// decl: static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
+// decl: #pragma inline_max_total_size(100000)
+// decl: static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
+// decl: static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
 // include: driver/hitdrv.h
 // decl: static void ext_moamoa_main(void);
 // proto: static void ext_moamoa_init(void);
+#pragma opt_propagation off
+#pragma opt_lifetimes off
 static void ext_moamoa_init(void) {
     s32 i;
     ExtPose* pose;
@@ -33,9 +36,18 @@ static void ext_moamoa_init(void) {
 
     wp = _mapAlloc(sizeof(MoamoaWork));
     memset(wp, 0, sizeof(MoamoaWork));
-    wp->target[0] = (Vec){0.0f, 0.0f, 10.0f};
-    wp->target[1] = (Vec){0.0f, 0.0f, 10.0f};
-    wp->target[2] = (Vec){0.0f, 0.0f, 10.0f};
+    {
+        static const Vec tv0 = {0.0f, 0.0f, 10.0f};
+        wp->target[0] = tv0;
+    }
+    {
+        static const Vec tv1 = {0.0f, 0.0f, 10.0f};
+        wp->target[1] = tv1;
+    }
+    {
+        static const Vec tv2 = {0.0f, 0.0f, 10.0f};
+        wp->target[2] = tv2;
+    }
     wp->count = extGetPoseNum();
     wp->moa = _mapAlloc(wp->count * sizeof(Moamoa));
     memset(wp->moa, 0, wp->count * sizeof(Moamoa));
@@ -64,3 +76,5 @@ static void ext_moamoa_init(void) {
         ext_moamoa_main();
     }
 }
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset

@@ -20,6 +20,7 @@ USER_FUNC(chorogun_dive_target) {
     s32 list[1000];
     s32 i;
     f32 t;
+    f32* row;
     f32 x, y, z;
     f32 dx, dy, dz;
     ExtPose* p;
@@ -31,7 +32,7 @@ USER_FUNC(chorogun_dive_target) {
     t = frames;
     pose = extGetPosePtr();
     for (i = 0; i < extGetPoseNum(); i++) {
-        if (chorogun[i].flags & 1) {
+        if (chorogun[i & 0xFFFFFFFFFFFFFFFFu].flags & 1) {
             list[n++] = i;
         }
     }
@@ -41,9 +42,10 @@ USER_FUNC(chorogun_dive_target) {
     c->timer = frames;
     BtlUnit_GetPos(BattleGetUnitPtr(_battleWorkPointer, chorogun_targetId), &x, &y, &z);
     p = &pose[sel];
+    row = p->mtx[2];
     dx = x - p->mtx[0][3];
-    dy = y - p->mtx[2][3];
-    dz = z - p->mtx[2][3];
+    dy = y - row[3];
+    dz = z - row[3];
     c->vel.x = dx / t;
     c->vel.y = (2.0f * dy - -0.5f * t * t) / (2.0f * t);
     c->vel.z = dz / t;

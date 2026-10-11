@@ -15,7 +15,7 @@
 // decl: #define EXT_DATA ((ExtAnimDef*)ext_data)
 // decl: ExtPose* extGetPosePtr(void);
 // decl: s32 extGetPoseNum(void);
-// decl: static inline void bom_set_anim(s32 i, const char* name) { BomWork* wp = lp->address; s32 j = 0; BomAnim* a; for (a = wp->anims; j < wp->animCount; j++, a++) { if (strcmp(a->name, name) == 0) { break; } } if (j < wp->animCount && wp->bom[i].anim != j) { wp->bom[i].anim = (s16)j; wp->bom[i].time = gp->renderTime + rand(); } }
+// decl: static void pose_change(s32 i, const char* name);
 // proto: USER_FUNC(bom_fall);
 USER_FUNC(bom_fall) {
     BomWork* wp = lp->address;
@@ -27,7 +27,7 @@ USER_FUNC(bom_fall) {
         pose->mtx[0][3] = 600.0f * rand() / 32767.0f;
         pose->mtx[1][3] = 300.0f + 3700.0f * rand() / 32767.0f;
         pose->mtx[2][3] = -650.0f + -450.0f * rand() / 32767.0f;
-        bom_set_anim(i, "S_2");
+        pose_change(i, "S_2");
     }
     return EVT_RETURN_DONE;
 }

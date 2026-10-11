@@ -2,8 +2,180 @@
 #include "driver/dispdrv.h"
 #include "memory.h"
 #include "system.h"
+#include "sdk/DEMOInit.h"
+#include "pmario_sound.h"
+#include <dolphin/mtx.h>
+#include <dolphin/os.h>
+#include <dolphin/vi.h>
+#include <string.h>
+
+u8 wakka_dl_0_0[];
+u8 wakka_dl_0_1[];
+u8 wakka_dl_0_2[];
+u8 wakka_dl_0_3[];
+u8 wakka_dl_0_4[];
+u8 wakka_dl_0_5[];
+u8 wakka_dl_0_6[];
+u8 wakka_dl_0_7[];
+u8 wakka_dl_0_8[];
+u8 wakka_dl_0_9[];
+u8 wakka_dl_0_10[];
+u8 wakka_dl_0_11[];
+u8 wakka_dl_0_12[];
+u8 wakka_dl_0_13[];
+u8 wakka_dl_0_14[];
+u8 wakka_dl_0_15[];
+u8 wakka_dl_0_16[];
+u8 wakka_dl_0_17[];
+u8 wakka_dl_0_18[];
+u8 wakka_dl_0_19[];
+void* wakka_dl_0_tbl[];
+u8 wakka_dl_0_size_tbl[];
+s16 wakka_vertex_tbl[];
+s8 wakka_normal_tbl[];
+u8 wakka_color0_tbl[];
+s16 wakka_texcoord0_tbl[];
 
 #ifdef __MWERKS__
+__declspec(section ".data") u64 lbl_803B70C0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803B70D0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 lbl_803B70E0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803B70F0 = 0x3F800000BF800000;
+__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+
+s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
+	24347, 0, -8825, // 0
+	20710, 0, -15961, // 1
+	15047, 0, -21625, // 2
+	7910, 0, -25261, // 3
+	0, 0, -26514, // 4
+	-7910, 0, -25261, // 5
+	-15047, 0, -21625, // 6
+	-20710, 0, -15961, // 7
+	-24347, 0, -8825, // 8
+	-25600, 0, -914, // 9
+	-24347, 0, 6996, // 10
+	-20710, 0, 14133, // 11
+	-15047, 0, 19796, // 12
+	-7910, 0, 23432, // 13
+	0, 0, 24685, // 14
+	7910, 0, 23432, // 15
+	15047, 0, 19796, // 16
+	20710, 0, 14133, // 17
+	24347, 0, 6996, // 18
+	25600, 0, -914, // 19
+	12173, 0, -4869, // 20
+	10355, 0, -8437, // 21
+	7523, 0, -11269, // 22
+	3955, 0, -13087, // 23
+	0, 0, -13714, // 24
+	-3955, 0, -13087, // 25
+	-7523, 0, -11269, // 26
+	-10355, 0, -8437, // 27
+	-12173, 0, -4869, // 28
+	-12800, 0, -914, // 29
+	-12173, 0, 3041, // 30
+	-10355, 0, 6609, // 31
+	-7523, 0, 9441, // 32
+	-3955, 0, 11259, // 33
+	0, 0, 11885, // 34
+	3955, 0, 11259, // 35
+	7523, 0, 9441, // 36
+	10355, 0, 6609, // 37
+	12173, 0, 3041, // 38
+	12800, 0, -914, // 39
+	0, 0, -13714, // 40
+	0, 0, -26514, // 41
+};
+
+s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
+	24576, 0, // 0
+	25600, 0, // 1
+	25600, 8192, // 2
+	24576, 8192, // 3
+	26624, 0, // 4
+	26624, 8192, // 5
+	27648, 0, // 6
+	27648, 8192, // 7
+	8192, 0, // 8
+	9216, 0, // 9
+	9216, 8192, // 10
+	8192, 8192, // 11
+	10240, 0, // 12
+	10240, 8192, // 13
+	11264, 0, // 14
+	11264, 8192, // 15
+	12288, 0, // 16
+	12288, 8192, // 17
+	13312, 0, // 18
+	13312, 8192, // 19
+	14336, 0, // 20
+	14336, 8192, // 21
+	15360, 0, // 22
+	15360, 8192, // 23
+	16384, 0, // 24
+	16384, 8192, // 25
+	17408, 0, // 26
+	17408, 8192, // 27
+	18432, 0, // 28
+	18432, 8192, // 29
+	19456, 0, // 30
+	19456, 8192, // 31
+	20480, 0, // 32
+	20480, 8192, // 33
+	21504, 0, // 34
+	21504, 8192, // 35
+	22528, 0, // 36
+	22528, 8192, // 37
+	23552, 0, // 38
+	23552, 8192, // 39
+	28672, 0, // 40
+	28672, 8192, // 41
+};
+
+void* wakka_dl_0_tbl[] = {
+	wakka_dl_0_0, // 0
+	wakka_dl_0_1, // 1
+	wakka_dl_0_2, // 2
+	wakka_dl_0_3, // 3
+	wakka_dl_0_4, // 4
+	wakka_dl_0_5, // 5
+	wakka_dl_0_6, // 6
+	wakka_dl_0_7, // 7
+	wakka_dl_0_8, // 8
+	wakka_dl_0_9, // 9
+	wakka_dl_0_10, // 10
+	wakka_dl_0_11, // 11
+	wakka_dl_0_12, // 12
+	wakka_dl_0_13, // 13
+	wakka_dl_0_14, // 14
+	wakka_dl_0_15, // 15
+	wakka_dl_0_16, // 16
+	wakka_dl_0_17, // 17
+	wakka_dl_0_18, // 18
+	wakka_dl_0_19, // 19
+};
+
+f32 scroll_tbl[] = {
+	0.0f, -0.14583334f, -0.29166669f, -0.43750003f, -0.58333337f,
+	-0.72916669f, -0.87500006f, -1.0208334f, -1.1666667f, -1.3125f,
+	-1.4583334f, -1.6041666f, -1.75f, -1.8958334f, -2.0416667f,
+	-2.1875f, -2.3333333f, -2.4791667f, -2.625f, -2.7708333f,
+	-2.9166667f, -3.0625f, -3.2083333f, -3.3541667f, -3.5f
+};
+
+s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
+	0, 64, 0, // 0
+};
+
+u8 wakka_color0_tbl[] ATTRIBUTE_ALIGN(32) = {
+	0xFF, 0xFF, 0xFF, 0x7F, // 0
+	0xFF, 0xFF, 0xFF, 0x00  // 1
+};
+
 u8 wakka_dl_0_0[] ATTRIBUTE_ALIGN(32) = {
 	(GX_DRAW_TRIANGLE_STRIP | GX_VTXFMT0), // command
 	0, 4, //number of verts
@@ -247,167 +419,213 @@ u8 wakka_dl_0_size_tbl[] = {
 	1, // 19
 };
 
-s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
-	24347, 0, -8825, // 0
-	20710, 0, -15961, // 1
-	15047, 0, -21625, // 2
-	7910, 0, -25261, // 3
-	0, 0, -26514, // 4
-	-7910, 0, -25261, // 5
-	-15047, 0, -21625, // 6
-	-20710, 0, -15961, // 7
-	-24347, 0, -8825, // 8
-	-25600, 0, -914, // 9
-	-24347, 0, 6996, // 10
-	-20710, 0, 14133, // 11
-	-15047, 0, 19796, // 12
-	-7910, 0, 23432, // 13
-	0, 0, 24685, // 14
-	7910, 0, 23432, // 15
-	15047, 0, 19796, // 16
-	20710, 0, 14133, // 17
-	24347, 0, 6996, // 18
-	25600, 0, -914, // 19
-	12173, 0, -4869, // 20
-	10355, 0, -8437, // 21
-	7523, 0, -11269, // 22
-	3955, 0, -13087, // 23
-	0, 0, -13714, // 24
-	-3955, 0, -13087, // 25
-	-7523, 0, -11269, // 26
-	-10355, 0, -8437, // 27
-	-12173, 0, -4869, // 28
-	-12800, 0, -914, // 29
-	-12173, 0, 3041, // 30
-	-10355, 0, 6609, // 31
-	-7523, 0, 9441, // 32
-	-3955, 0, 11259, // 33
-	0, 0, 11885, // 34
-	3955, 0, 11259, // 35
-	7523, 0, 9441, // 36
-	10355, 0, 6609, // 37
-	12173, 0, 3041, // 38
-	12800, 0, -914, // 39
-	0, 0, -13714, // 40
-	0, 0, -26514, // 41
-};
-
-s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
-	0, 64, 0, // 0
-};
-
-u8 wakka_color0_tbl[] ATTRIBUTE_ALIGN(32) = {
-	0xFF, 0xFF, 0xFF, 0x7F, // 0
-	0xFF, 0xFF, 0xFF, 0x00  // 1
-};
-
-s16 wakka_texcoord0_tbl[] ATTRIBUTE_ALIGN(32) = {
-	24576, 0, // 0
-	25600, 0, // 1
-	25600, 8192, // 2
-	24576, 8192, // 3
-	26624, 0, // 4
-	26624, 8192, // 5
-	27648, 0, // 6
-	27648, 8192, // 7
-	8192, 0, // 8
-	9216, 0, // 9
-	9216, 8192, // 10
-	8192, 8192, // 11
-	10240, 0, // 12
-	10240, 8192, // 13
-	11264, 0, // 14
-	11264, 8192, // 15
-	12288, 0, // 16
-	12288, 8192, // 17
-	13312, 0, // 18
-	13312, 8192, // 19
-	14336, 0, // 20
-	14336, 8192, // 21
-	15360, 0, // 22
-	15360, 8192, // 23
-	16384, 0, // 24
-	16384, 8192, // 25
-	17408, 0, // 26
-	17408, 8192, // 27
-	18432, 0, // 28
-	18432, 8192, // 29
-	19456, 0, // 30
-	19456, 8192, // 31
-	20480, 0, // 32
-	20480, 8192, // 33
-	21504, 0, // 34
-	21504, 8192, // 35
-	22528, 0, // 36
-	22528, 8192, // 37
-	23552, 0, // 38
-	23552, 8192, // 39
-	28672, 0, // 40
-	28672, 8192, // 41
-};
-
-void* wakka_dl_0_tbl[] = {
-	wakka_dl_0_0, // 0
-	wakka_dl_0_1, // 1
-	wakka_dl_0_2, // 2
-	wakka_dl_0_3, // 3
-	wakka_dl_0_4, // 4
-	wakka_dl_0_5, // 5
-	wakka_dl_0_6, // 6
-	wakka_dl_0_7, // 7
-	wakka_dl_0_8, // 8
-	wakka_dl_0_9, // 9
-	wakka_dl_0_10, // 10
-	wakka_dl_0_11, // 11
-	wakka_dl_0_12, // 12
-	wakka_dl_0_13, // 13
-	wakka_dl_0_14, // 14
-	wakka_dl_0_15, // 15
-	wakka_dl_0_16, // 16
-	wakka_dl_0_17, // 17
-	wakka_dl_0_18, // 18
-	wakka_dl_0_19, // 19
-};
-#else
-u8 wakka_dl_0_0[];
-u8 wakka_dl_0_1[];
-u8 wakka_dl_0_2[];
-u8 wakka_dl_0_3[];
-u8 wakka_dl_0_4[];
-u8 wakka_dl_0_5[];
-u8 wakka_dl_0_6[];
-u8 wakka_dl_0_7[];
-u8 wakka_dl_0_8[];
-u8 wakka_dl_0_9[];
-u8 wakka_dl_0_10[];
-u8 wakka_dl_0_11[];
-u8 wakka_dl_0_12[];
-u8 wakka_dl_0_13[];
-u8 wakka_dl_0_14[];
-u8 wakka_dl_0_15[];
-u8 wakka_dl_0_16[];
-u8 wakka_dl_0_17[];
-u8 wakka_dl_0_18[];
-u8 wakka_dl_0_19[];
-void* wakka_dl_0_tbl[];
-u8 wakka_dl_0_size_tbl[];
-s16 wakka_vertex_tbl[];
-s8 wakka_normal_tbl[];
-u32 wakka_color0_tbl[];
-s16 wakka_texcoord0_tbl[];
 #endif
 
 //-3.5 / 24 * i (up to 25) with some imprecision
-f32 scroll_tbl[] = {
-	0.0f, -0.14583334f, -0.29166669f, -0.43750003f, -0.58333337f,
-	-0.72916669f, -0.87500006f, -1.0208334f, -1.1666667f, -1.3125f,
-	-1.4583334f, -1.6041666f, -1.75f, -1.8958334f, -2.0416667f,
-	-2.1875f, -2.3333333f, -2.4791667f, -2.625f, -2.7708333f,
-	-2.9166667f, -3.0625f, -3.2083333f, -3.3541667f, -3.5f
-};
 
 void effUltraHammerMain(EffectEntry* effect);
 void effUltraHammerDisp(enum CameraId camId, void *param);
+
+extern void* DemoCurrentBuffer, * DemoFrameBuffer1, * DemoFrameBuffer2;
+extern int sprintf(char* str, const char* format, ...);
+extern s32 N_getDebugMode(void);
+extern void L_smartReInit(void);
+
+//local prototypes
+void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);
+
+void N_setupErrorHandler(void) {
+	OSSetErrorHandler(OS_ERROR_DSI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
+	OSSetErrorHandler(OS_ERROR_ISI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
+	OSSetErrorHandler(OS_ERROR_PROGRAM, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
+}
+
+void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
+	//registers
+	char* textBase;
+	OSFontHeader* fontHeader;
+	s8* loop_newline;
+	s8* loop_zero;
+	int width2, height2;
+	int i;
+	u32 count, stack;
+	s16 w1, w2, h1, h2, x2, y2;
+	int x1, y1;
+	//stack vars
+	char print_buffer2[0x400]; // 0x10E0
+	char print_buffer[0x1000]; // 0xE0
+	Mtx44 projection; // 0xA0
+	Mtx matrix; // 0x70
+	Mtx matrix2; // 0x40
+	GXTexObj texObj; // 0x20
+	void* image; // 0x1C
+	s32 x; // 0x18
+	s32 y; // 0x14
+	s32 width; // 0x10
+
+	if (N_getDebugMode() >= 0) {
+		psndExit();
+		while (1) {} //softlock
+	}
+
+	switch (error) {
+		case OS_ERROR_DSI:
+			strcpy(print_buffer, "---- OS_ERROR_DSI ----\n");
+			break;
+		case OS_ERROR_ISI:
+			strcpy(print_buffer, "---- OS_ERROR_ISI ----\n");
+			break;
+		case OS_ERROR_PROGRAM:
+			strcpy(print_buffer, "---- OS_ERROR_PROGRAM ----\n");
+			break;
+	}
+	sprintf(print_buffer2, "---- Context 0x%08x ----\n", context);
+	strcat(print_buffer, print_buffer2);
+	for (i = 0; i < 16; i++) {
+		sprintf(print_buffer2, "r%-2d  = 0x%08x r%-2d  = 0x%08x\n",
+			i, context->gpr[i],
+			i + 16, context->gpr[i + 16]
+		);
+		strcat(print_buffer, print_buffer2);
+	}
+	sprintf(print_buffer2, "LR   = 0x%08x CR   = 0x%08x\n", context->lr, context->cr);
+	strcat(print_buffer, print_buffer2);
+	sprintf(print_buffer2, "SRR0 = 0x%08x SRR1 = 0x%08x\n", context->srr0, context->srr1);
+	strcat(print_buffer, print_buffer2);
+	sprintf(print_buffer2, "DSISR= 0x%08x DAR  = 0x%08x\n", dsisr, dar);
+	strcat(print_buffer, print_buffer2);
+	strcat(print_buffer, "\n");
+	sprintf(print_buffer2, "Address:      Back Chain    LR Save\n");
+	strcat(print_buffer, print_buffer2);
+	stack = context->gpr[1]; //get r1 (stack)
+	i = 0;
+	while ((stack != 0) && (stack != 0xFFFFFFFF) && (i++ < 16)) {
+		sprintf(print_buffer2, "0x%08x:   0x%08x    0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
+		strcat(print_buffer, print_buffer2);
+		stack = *(u32*)stack;
+	}
+	strcat(print_buffer, "\n");
+	sprintf(print_buffer2, "Instruction at 0x%x\n(read from SRR0) attempted to access\ninvalid address 0x%x (read from DAR)\n", context->srr0, dar);
+	strcat(print_buffer, print_buffer2);
+	psndExit();
+	OSFillFPUContext(context);
+#ifdef __MWERKS__
+	asm{
+		mfmsr	r5
+		ori		r5, r5, 0x8000
+		ori		r5, r5, 2
+		mtmsr	r5
+		isync
+	};
+#endif
+	L_smartReInit();
+	if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
+		fontHeader = smartAlloc(OS_FONT_SIZE_SJIS, 0)->address;
+	}
+	else {
+		fontHeader = smartAlloc(OS_FONT_SIZE_ANSI, 0)->address;
+	}
+	OSInitFont(fontHeader);
+	GXSetCopyClear((GXColor) { 0, 0, 0, 0xFF }, 0xFFFFFF);
+	GXCopyDisp(DEMOGetCurrentBuffer(), 1);
+	GXSetViewport(0.0f, 0.0f, 608.0f, 480.0f, 0.0f, 1.0f);
+	GXSetScissor(0, 0, 608, 480);
+	MTXOrtho(projection, 0.0f, 608.0f, 0.0f, 480.0f, 0.0f, 1.0f);
+	GXSetProjection(projection, GX_ORTHOGRAPHIC);
+	MTXScale(matrix, 0.5f, 0.5f, 1.0f);
+	GXLoadPosMtxImm(matrix, 0);
+	GXSetCurrentMtx(0);
+	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+	GXSetNumChans(0);
+	GXSetNumTevStages(1);
+	GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_LO_CLEAR);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, 1, 3, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, 1, 3, 0);
+	textBase = print_buffer;
+	while (1) {
+		count = VIGetRetraceCount();
+		loop_newline = (s8*)&print_buffer;
+		width2 = 50;
+		height2 = 50;
+		i = 0;
+		loop_zero = loop_newline;
+		while (*loop_zero != '\0') {
+			if (*loop_newline == '\n') {
+				width2 = 50;
+				height2 += 24;
+				i++;
+				loop_zero++;
+				loop_newline++;
+			}
+			else {
+				OSGetFontTexture(textBase + i, &image, &x, &y, &width);
+				GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
+					(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
+				GXLoadTexObj(&texObj, GX_TEXMAP0);
+				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
+				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
+				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+				w1 = width2;
+				w2 = w1 + fontHeader->cellWidth;
+				h1 = height2;
+				h2 = h1 + fontHeader->cellHeight;
+				x1 = x;
+				y1 = y;
+				x2 = x1 + fontHeader->cellWidth;
+				y2 = y1 + fontHeader->cellHeight;
+
+				GXPosition1x16(w1);
+				GXPosition1x16(h1);
+				GXPosition1x16(0);
+				GXPosition1x16(x1);
+				GXPosition1x16(y1);
+
+				GXPosition1x16(w2);
+				GXPosition1x16(h1);
+				GXPosition1x16(0);
+				GXPosition1x16(x2);
+				GXPosition1x16(y1);
+
+				GXPosition1x16(w2);
+				GXPosition1x16(h2);
+				GXPosition1x16(0);
+				GXPosition1x16(x2);
+				GXPosition1x16(y2);
+
+				GXPosition1x16(w1);
+				GXPosition1x16(h2);
+				GXPosition1x16(0);
+				GXPosition1x16(x1);
+				GXPosition1x16(y2);
+
+				i++;
+				loop_zero++;
+				loop_newline++;
+				width2 += width;
+			}
+		}
+		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+		GXSetColorUpdate(1);
+		GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+		GXSetAlphaUpdate(1);
+		GXCopyDisp(DemoCurrentBuffer, GX_TRUE);
+		VISetNextFrameBuffer(DemoCurrentBuffer);
+		VISetBlack(0);
+		VIFlush();
+		do { ; } while (count == VIGetRetraceCount());
+		if (DemoCurrentBuffer == DemoFrameBuffer1)
+			DemoCurrentBuffer = DemoFrameBuffer2;
+		else
+			DemoCurrentBuffer = DemoFrameBuffer1;
+	}
+}
 
 EffectEntry* effUltraHammerEntry(BOOL arg0, s32 counter, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -493,17 +711,16 @@ inline Vec initializeVec(Vec* input) {
 
 
 void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
-    EffectEntry *effect;
-    EffUltraHammerData *data;
-    int i;
+    u32 j;
     CameraEntry *temp_r31;
+    EffUltraHammerData *data;
     s32 temp_r24;
+    EffectEntry *effect;
     Mtx spC0;
     Mtx sp90;
     Mtx sp60;
     Mtx sp30;
     GXTexObj sp10;
-    u32 j;
     
     effect = param;
     data = effect->userdata;
@@ -535,7 +752,7 @@ void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
     GXSetCullMode(GX_CULL_NONE);
     GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
     data++;
-    for (i = 1; i < effect->count; i++, data++) {
+    for (camId = 1; camId < effect->count; camId++, data++) {
         if (data->update == 0) {
             PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
             PSMTXScale(sp60, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);

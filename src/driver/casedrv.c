@@ -1,6 +1,23 @@
 #include "driver/casedrv.h"
+#include "driver/hitdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/swdrv.h"
+#define evtEntry evtEntry_hdr
+#include "manager/evtmgr.h"
+#undef evtEntry
+extern EventEntry* evtEntry(void* evtCode, s32 priority, u8 flags);
+#include "mario/mario.h"
+#include "mario/mario_party.h"
+#include "mario/mariost.h"
 #include "memory.h"
+#include "party.h"
+#include "system.h"
+#include "win/win_main.h"
 #include <string.h>
+
+extern s32 yoshiGetStatus(void);
+extern BOOL N_fbatPreventMarioEventChk(void);
+extern void* fbatNpcTalkCheck(void);
 
 typedef struct CaseWork {
 	s32 count; //0x0
@@ -10,6 +27,9 @@ typedef struct CaseWork {
 //.sbss
 static CaseWork work;
 static CaseWork* wp = &work;
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_8041030C_sdata[1] = {0};
+#pragma force_active reset
 
 
 void caseInit(void) {
@@ -19,28 +39,26 @@ void caseInit(void) {
 }
 
 void caseReInit(void) {
+	CaseEntry* entry = wp->entries;
 	int i;
 
-	for (i = 0; i < wp->count; i++) {
-		wp->entries[i].flags &= ~1;
+	for (i = 0; i < wp->count; i++, entry++) {
+		entry->flags &= ~1;
 	}
 }
 
 s32 caseEntry(CaseSetup* setup) {
 	CaseEntry* entry;
-	int i;
-	if (wp->count > 0) {
-		for (i = 0; i < wp->count; i++) {
-			entry = &wp->entries[i];
-			if (!(entry->flags & 1)) {
-				break; //unused entry
-			}
+	int i = 0;
+	for (entry = wp->entries; i < wp->count; i++, entry++) {
+		if (!(entry->flags & 1)) {
+			break; //unused entry
 		}
 	}
 	memset(entry, 0, sizeof(CaseEntry));
 	entry->caseId = i;
 	entry->flags = 0;
-	entry->activeConditionId = setup->activeConditionId & 0x7FFF;
+	entry->activeConditionId = setup->activeConditionId & ~0x8000;
 	if (setup->activeConditionId & 0x8000) {
 		entry->flags |= 4u;
 	}
@@ -52,13 +70,196 @@ s32 caseEntry(CaseSetup* setup) {
 	entry->priority = setup->priority;
 	entry->lwData[16] = 0;
 	memcpy(entry->lwData, setup->lwData, sizeof(entry->lwData));
-	return i;
+	return i & 0xFFFFFFFFFFFFFFFFu;
 }
 
 void caseDelete(s32 caseId) {
 	wp->entries[caseId].flags &= ~1u;
 }
 
-void caseMain(void) {
+#define SET_HIT(entry) (entry)->flags |= 2
 
+void caseMain(void) {
+	MarioWork* mario;
+	PartyEntry* party;
+	s32 flag100;
+	CaseEntry* entry;
+	s32 i;
+	u16 btn;
+	HitEntry* standOn;
+	HitEntry* h1f8;
+	HitEntry* jumpFrom;
+	HitEntry* h1e0;
+	HitEntry* push;
+	HitEntry* h1fc;
+	HitEntry* h1f4;
+
+	mario = marioGetPtr();
+	partyGetPtr(marioGetPartyId());
+	standOn = mario->hitobjStandOn;
+	h1f8 = mario->field_0x1F8;
+	jumpFrom = mario->hitobjJumpFrom;
+	h1e0 = mario->field_0x1E0;
+	push = mario->hitobjPush;
+	h1fc = mario->field_0x1FC;
+	h1f4 = mario->field_0x1F4;
+	btn = mario->field_0x248;
+	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
+	    !N_fbatPreventMarioEventChk() && marioCaseEventValidChk()) {
+		if (mario->currMotionId != 0 && mario->currMotionId != 1 && mario->currMotionId != 2 &&
+		    yoshiGetStatus() != 1) {
+			btn = 0;
+		}
+		flag100 = btn & 0x100;
+		entry = wp->entries;
+		for (i = 0; i < wp->count; i++, entry++) {
+			if (!(entry->flags & 1)) continue;
+			switch (entry->activeConditionId) {
+			case 0:
+				if (standOn != NULL && !strcmp(hitGetName(standOn), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 1:
+				if (standOn != NULL) {
+					if (strcmp(hitGetName(standOn), entry->hitObjName) != 0) SET_HIT(entry);
+				} else {
+					SET_HIT(entry);
+				}
+				break;
+			case 2:
+				if (h1f8 != NULL && !strcmp(hitGetName(h1f8), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 3:
+				if (h1f8 != NULL) {
+					if (strcmp(hitGetName(h1f8), entry->hitObjName) != 0) SET_HIT(entry);
+				} else {
+					SET_HIT(entry);
+				}
+				break;
+			case 8:
+				if (h1e0 != NULL && !strcmp(hitGetName(h1e0), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 4:
+				if (jumpFrom != NULL && mario->airTimer == 1 && fbatNpcTalkCheck() == NULL &&
+				    !strcmp(hitGetName(jumpFrom), entry->hitObjName) && (mario->field_0x248 & 0x100)) {
+					SET_HIT(entry);
+				}
+				break;
+			case 5:
+				if (standOn != NULL && fbatNpcTalkCheck() == NULL &&
+				    !strcmp(hitGetName(standOn), entry->hitObjName) && flag100) {
+					SET_HIT(entry);
+				}
+				break;
+			case 6:
+				if (standOn != NULL && !strcmp(hitGetName(standOn), entry->hitObjName) &&
+				    (s8)mario->wStickDir2 > 30) {
+					SET_HIT(entry);
+				}
+				break;
+			case 7:
+				if (standOn != NULL && !strcmp(hitGetName(standOn), entry->hitObjName) &&
+				    (keyGetDirTrg(0) & 0x1000)) {
+					SET_HIT(entry);
+				}
+				break;
+			case 9:
+				if (h1e0 != NULL && fbatNpcTalkCheck() == NULL &&
+				    !strcmp(hitGetName(h1e0), entry->hitObjName) && flag100) {
+					SET_HIT(entry);
+				}
+				break;
+			case 10:
+				if (push != NULL && !strcmp(hitGetName(push), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 11:
+				if (push == NULL || strcmp(hitGetName(push), entry->hitObjName) != 0) SET_HIT(entry);
+				break;
+			case 12:
+				if (push != NULL && fbatNpcTalkCheck() == NULL &&
+				    !strcmp(hitGetName(push), entry->hitObjName) && flag100) {
+					SET_HIT(entry);
+				}
+				break;
+			case 13:
+				if (h1fc != NULL && !strcmp(hitGetName(h1fc), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 14:
+				if (h1fc != NULL && mario->currMotionId == 0x13 &&
+				    !strcmp(hitGetName(h1fc), entry->hitObjName)) {
+					SET_HIT(entry);
+				}
+				break;
+			case 15:
+				party = partyGetPtr(marioGetPartyId());
+				if (party != NULL && party->currentMemberId == 3) {
+					HitEntry* ph = *(HitEntry**)((u8*)party + 0x130);
+					if (ph != NULL && !strcmp(hitGetName(ph), entry->hitObjName)) SET_HIT(entry);
+				}
+				break;
+			case 16:
+				if (h1f4 != NULL && !strcmp(hitGetName(h1f4), entry->hitObjName)) SET_HIT(entry);
+				break;
+			case 18:
+				if (swGet(entry->swFlag)) SET_HIT(entry);
+				break;
+			case 19:
+				if (_swGet(entry->swFlag)) SET_HIT(entry);
+				break;
+			case 17:
+				if (entry->activeFunc != NULL && ((s32 (*)(CaseEntry*))entry->activeFunc)(entry)) {
+					SET_HIT(entry);
+				}
+				break;
+			}
+		}
+		entry = wp->entries;
+		for (i = 0; i < wp->count; i++, entry++) {
+			if ((entry->flags & 1) && (entry->flags & 2)) {
+				EventEntry* evt;
+				if (!evtCheckID(entry->evtId)) entry->evtId = 0;
+				if (entry->evtId == 0) {
+					evt = evtEntry(entry->evtCode, entry->priority, 0x20);
+					evt->caseId = entry->caseId;
+					entry->evtId = evt->eventId;
+					memcpy(evt->lwData, entry->lwData, sizeof(entry->lwData));
+					if (entry->priority == 0x14) npcStopForEvent();
+				}
+				entry->flags &= ~2;
+			}
+		}
+	}
+}
+
+CaseEntry* caseCheckHitObj(void* obj) {
+	CaseEntry* entry;
+	int i;
+	if (gp->inBattle != 0) return NULL;
+	entry = wp->entries;
+	for (i = 0; i < wp->count; i++, entry++) {
+		if ((entry->flags & 1) && entry->activeConditionId != 0x11 &&
+		    (u32)(entry->activeConditionId - 0x12) > 1) {
+			if (!strcmp(hitGetName(obj), entry->hitObjName)) return entry;
+		}
+	}
+	return NULL;
+}
+
+CaseEntry* caseCheckHitObj2(void* obj) {
+	CaseEntry* entry;
+	int i;
+	if (gp->inBattle != 0) return NULL;
+	entry = wp->entries;
+	for (i = 0; i < wp->count; i++, entry++) {
+		if ((entry->flags & 1) && entry->activeConditionId != 0x11 &&
+		    (u32)(entry->activeConditionId - 0x12) > 1 && entry->activeConditionId == 0xF) {
+			if (!strcmp(hitGetName(obj), entry->hitObjName)) return entry;
+		}
+	}
+	return NULL;
+}
+
+CaseEntry* caseIdToPtr(s32 caseId) {
+	CaseEntry* entry = &wp->entries[caseId];
+	if (!(entry->flags & 1)) return NULL;
+	return entry;
 }

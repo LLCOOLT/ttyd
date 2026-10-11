@@ -4,7 +4,7 @@
 #include <dolphin/types.h>
 
 typedef struct {
-    s16 unk0; //0x0
+    u16 unk0; //0x0
     s16 labelId; //0x2
     s32 initEndPos; //0x4
     s16 tagEndPos; //0x8

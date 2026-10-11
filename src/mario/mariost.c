@@ -51,7 +51,6 @@
 #include "nameent.h"
 #include "pmario_sound.h"
 #include "romfont.h"
-#include "sound.h"
 #include "statuswindow.h"
 #include "system.h"
 
@@ -59,52 +58,35 @@
 #include <string.h>
 
 extern void DEMOPadInit(void);
+extern void N_setupErrorHandler(void);
+extern void SoundSetOutputMode(s32 mode);
+extern void SoundOpenCover(void);
+extern void SoundCloseCover(void);
+#define OSIsRestart() ((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)
 extern BOOL g_bFirstSmartAlloc;
 
 //.bss
 GlobalWork marioSt;
 OSThread DvdCheckThread;
-static u8 stack[0x1000];
 
 //.sdata
-static OSTime off_time[4] = {0, 0, 0, 0};
-static BOOL off_trg[4] = {FALSE, FALSE, FALSE, FALSE};
 GlobalWork* gp = &marioSt;
 
 //.sbss
 OSTime none_key;
 s32 _mariostSystemLevel;
-BOOL DvdCheckThreadOn; //DvdCheckTreadOn
+BOOL DvdCheckTreadOn;
 
 //.data
-GXRenderModeObj GXNtsc480ProgMarioSt = {
-	VI_TVMODE_NTSC_PROG, //viTVmode
-	0x260, //fbWidth
-	0x1E0, //efbHeight
-	0x1E0, //xfbHeight
-	0x1E, //viXOrigin
-	0x0, //viYOrigin
-	0x294, //viWidth
-	0x1E0, //viHeight
-	VI_XFBMODE_SF, //xFBmode
-	0, //field_rendering
-	0, //aa
-	6, 6, 6, 6, 6, 6, //pix 0
-	6, 6, 6, 6, 6, 6, //pix 1
-	6, 6, 6, 6, 6, 6, //pix 2
-	6, 6, 6, 6, 6, 6, //pix 3
-	8, 8, 10, 12, 10, 8, 8, //vfilter
-};
-
-GXRenderModeObj GXNtsc480IntDfMarioSt = {
+GXRenderModeObj sRMObjHReso = {
 	VI_TVMODE_NTSC_INT, //viTVmode
 	0x260, //fbWidth
-	0x1E0, //efbHeight
-	0x1E0, //xfbHeight
-	0x1E, //viXOrigin
-	0x0, //viYOrigin
-	0x294, //viWidth
-	0x1E0, //viHeight
+	0x1C0, //efbHeight
+	0x1C0, //xfbHeight
+	0x1B, //viXOrigin
+	0x10, //viYOrigin
+	0x29A, //viWidth
+	0x1C0, //viHeight
 	VI_XFBMODE_DF, //xFBmode
 	0, //field_rendering
 	0, //aa
@@ -134,16 +116,35 @@ GXRenderModeObj sRMObjHReso_prog = {
 	8, 8, 10, 12, 10, 8, 8, //vfilter
 };
 
-GXRenderModeObj sRMObjHReso = {
+GXRenderModeObj GXNtsc480IntDfMarioSt = {
 	VI_TVMODE_NTSC_INT, //viTVmode
 	0x260, //fbWidth
-	0x1C0, //efbHeight
-	0x1C0, //xfbHeight
-	0x1B, //viXOrigin
-	0x10, //viYOrigin
-	0x29A, //viWidth
-	0x1C0, //viHeight
+	0x1E0, //efbHeight
+	0x1E0, //xfbHeight
+	0x1E, //viXOrigin
+	0x0, //viYOrigin
+	0x294, //viWidth
+	0x1E0, //viHeight
 	VI_XFBMODE_DF, //xFBmode
+	0, //field_rendering
+	0, //aa
+	6, 6, 6, 6, 6, 6, //pix 0
+	6, 6, 6, 6, 6, 6, //pix 1
+	6, 6, 6, 6, 6, 6, //pix 2
+	6, 6, 6, 6, 6, 6, //pix 3
+	8, 8, 10, 12, 10, 8, 8, //vfilter
+};
+
+GXRenderModeObj GXNtsc480ProgMarioSt = {
+	VI_TVMODE_NTSC_PROG, //viTVmode
+	0x260, //fbWidth
+	0x1E0, //efbHeight
+	0x1E0, //xfbHeight
+	0x1E, //viXOrigin
+	0x0, //viYOrigin
+	0x294, //viWidth
+	0x1E0, //viHeight
+	VI_XFBMODE_SF, //xFBmode
 	0, //field_rendering
 	0, //aa
 	6, 6, 6, 6, 6, 6, //pix 0
@@ -157,9 +158,10 @@ GXRenderModeObj sRMObjHReso = {
 void viPostCallback(u32 retraceCount);
 void* gcDvdCheckThread(void* param);
 void gcRumbleCheck(void);
-void gcResetCheck(void);
+void L_gcResetCheck(void);
 
 void marioStInit(void) {
+	static u8 stack[0x1000];
 	if (!OSIsRestart() || (OSGetResetCode() & OS_RESET_SHUTDOWN)) {
 		DEMOInit(&GXNtsc480IntDfMarioSt);
 	}
@@ -174,7 +176,7 @@ void marioStInit(void) {
 		}
 	}
 	DEMOEnableGPHangWorkaround(5);
-	setupErrorHandler();
+	N_setupErrorHandler();
 	DEMOPadInit();
 	GXSetCopyClear((GXColor){0, 0, 0, 0}, 0xFFFFFF);
 	__GXSetIndirectMask(0);
@@ -217,7 +219,7 @@ void marioStInit(void) {
 	VISetPostRetraceCallback(viPostCallback);
 	romFontInit();
 	OSCreateThread(&DvdCheckThread, gcDvdCheckThread, NULL, (void*)((u32)&stack + sizeof(stack)), sizeof(stack), 16, OS_THREAD_ATTR_DETACH);
-	DvdCheckThreadOn = TRUE;
+	DvdCheckTreadOn = TRUE;
 	OSResumeThread(&DvdCheckThread);
 	DVDMgrInit();
 	psndInit();
@@ -260,10 +262,10 @@ void marioStInit(void) {
 	seqSetSeq(0, NULL, NULL);
 	gp->unk1274 = 0;
 	if (OSGetSoundMode() == OS_SOUND_MODE_MONO) {
-		SoundSetOutputMode(SND_OUTPUTMODE_MONO);
+		SoundSetOutputMode(0);
 	}
 	else {
-		SoundSetOutputMode(SND_OUTPUTMODE_STEREO);
+		SoundSetOutputMode(1);
 	}
 }
 
@@ -305,7 +307,7 @@ void marioStMain(void) {
 	nameEntMain();
 	winMgrMain();
 	effMain();
-	gcResetCheck();
+	L_gcResetCheck();
 	if (gp->flags & 0x1000) {
 		for (i = 0; i < 4; i++) {
 			if (gp->dirs[i]) break;
@@ -371,15 +373,14 @@ s32 marioStGetSystemLevel(void) {
 }
 
 void viPostCallback(u32 retraceCount) {
-	OSTime time, check;
+	OSTime time;
 	u32 reset = PAD_BUTTON_B | PAD_BUTTON_X | PAD_BUTTON_START; //TODO: make sure it inlines right
 
 	time = OSGetTime();
 	gp->retraceDeltaTime = time - gp->retraceTime;
 	gp->retraceLocalTime += gp->retraceDeltaTime;
-	check = OSSecondsToTicks(359999999);
-	if (check < gp->retraceLocalTime) {
-		gp->retraceLocalTime = check;
+	if (gp->retraceLocalTime > (OS_TIMER_CLOCK * (OSTime)359999999)) {
+		gp->retraceLocalTime = (OS_TIMER_CLOCK * (OSTime)359999999);
 	}
 	if (!(gp->systemLevelFlags & 8)) {
 		gp->systemLv3Time += gp->retraceDeltaTime;
@@ -405,14 +406,14 @@ void viPostCallback(u32 retraceCount) {
 		gp->unk127C = FALSE;
 	}
 	else {
-		if (gp->unk127C) {
-			if (!OSGetResetButtonState()) {
-				gp->resetType = 1;
+		if (!gp->unk127C) {
+			if (OSGetResetButtonState()) {
+				gp->unk127C = TRUE;
 			}
 		}
 		else {
-			if (OSGetResetButtonState()) {
-				gp->unk127C = TRUE;
+			if (!OSGetResetButtonState()) {
+				gp->resetType = 1;
 			}
 		}
 		if (gp->unk1324) {
@@ -451,7 +452,8 @@ exitcheck:
 void* gcDvdCheckThread(void* param) {
 	const char* message;
 	s32 msgId;
-	f32 width;
+	s32 width;
+	f32 xpos;
 	Mtx44 mtx;
 
 	while (1) {
@@ -480,7 +482,7 @@ void* gcDvdCheckThread(void* param) {
 			default:
 				gp->dvdError = FALSE;
 				break;
-			case DVD_STATE_WAITING:
+			case DVD_STATE_BUSY:
 				break;
 		}
 		if (gp->dvdError) {
@@ -501,34 +503,83 @@ void* gcDvdCheckThread(void* param) {
 				width = (f32)romFontGetWidth(message);
 				MTXPerspective(mtx, 25.0f, 1.2666667f, 1.0f, 10000.0f);
 				GXSetProjection(mtx, GX_PERSPECTIVE);
-				romFontPrintGX(-width * 0.5f, 60.0f, 1.0f, &(GXColor){0xFF, 0xFF, 0xFF, 0xFF}, message);
+				xpos = -width / 2.0f;
+				romFontPrintGX(xpos, 60.0f, 1.0f, &(GXColor){0xFF, 0xFF, 0xFF, 0xFF}, message);
 			}
 			DEMODoneRender();
 			makeKey();
-			gcResetCheck();
+			L_gcResetCheck();
 		}
 		OSYieldThread();
 	}
 }
 
 void gcRumbleCheck(void) {
-	/*OSTime start;
-	volatile BOOL array[4] = { 0 };
+	static BOOL off_trg[4] = {FALSE, FALSE, FALSE, FALSE};
+	static OSTime off_time[4] = {0, 0, 0, 0};
+	OSTime now;
+	OSTime diff;
+	BOOL array[4] = {0};
 	int i;
 
-	start = OSGetTime();
+	now = OSGetTime();
 	for (i = 0; i < 4; i++) {
-		if (gp->field_0x12E8[i]) {
-			if (OSTicksToMilliseconds(start - gp->field_0x12F0[i]) > 30000) {
-				gp->field_0x12EC[i] = 0;
-				gp->field_0x12E8[i] = 0;
+		if (!gp->field_0x12E8[i]) {
+			if (padGetRumbleStatus(i) == 1) {
+				if (!gp->rumbleStart[i]) {
+					gp->rumbleStart[i] = TRUE;
+					gp->rumbleStartTime[i] = now;
+				}
+diff = (s32)now - (s32)gp->rumbleStartTime[i];
+				if (OSTicksToMilliseconds(diff) > 30000) {
+					if (!gp->field_0x12EC[i]) {
+						gp->field_0x12EC[i] = TRUE;
+						gp->field_0x12E8[i] = TRUE;
+						gp->field_0x12F0[i] = now;
+					}
+				}
+				off_trg[i] = FALSE;
+			}
+			else if (gp->rumbleStart[i]) {
+				if (!off_trg[i]) {
+					off_trg[i] = TRUE;
+					off_time[i] = now;
+				}
+				if (off_trg[i]) {
+diff = (s32)now - (s32)off_time[i];
+					if (OSTicksToMilliseconds(diff) > 100) {
+						off_trg[i] = FALSE;
+						gp->rumbleStart[i] = FALSE;
+					}
+				}
+			}
+		}
+		else {
+diff = (s32)now - (s32)gp->field_0x12F0[i];
+			if (OSTicksToMilliseconds(diff) > 30000) {
+				gp->field_0x12EC[i] = FALSE;
+				gp->field_0x12E8[i] = FALSE;
+				gp->rumbleStart[i] = FALSE;
 			}
 			array[i] = TRUE;
 		}
-	}*/
+		if (gp->dvdError) {
+			array[i] = TRUE;
+		}
+		if (gp->systemLevelFlags != 0U) {
+			array[i] = TRUE;
+		}
+		if (array[i]) {
+			gp->unk1310[i] = TRUE;
+		}
+		else {
+			gp->unk1310[i] = FALSE;
+		}
+	}
 }
 
-void gcResetCheck(void) {
+#pragma dont_inline on
+void L_gcResetCheck(void) {
 	u32 code;
 
 	if (gp->resetType) {
@@ -539,9 +590,9 @@ void gcResetCheck(void) {
 		VIWaitForRetrace();
 		psndExit();
 		DVDMgrDelete();
-		if ((OSGetCurrentThread() != &DvdCheckThread) && DvdCheckThreadOn) {
+		if ((OSGetCurrentThread() != &DvdCheckThread) && DvdCheckTreadOn) {
 			OSCancelThread(&DvdCheckThread);
-			DvdCheckThreadOn = FALSE;
+			DvdCheckTreadOn = FALSE;
 		}
 		while (cardIsExec()) {
 			cardMain();
@@ -567,3 +618,4 @@ void gcResetCheck(void) {
 		while (1) {}
 	}
 }
+#pragma dont_inline reset

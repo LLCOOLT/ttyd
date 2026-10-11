@@ -17,6 +17,7 @@
 // decl: #define MONTETABLE ((MonteTable*)montetable)
 // decl: static void monte_disp(CameraId camera, void* param);
 // decl: static BOOL get_monte_check(Vec* a, Vec* b);
+// decl: static inline f32 randRange(f32 d) { return irand(100.0f * d) / 100.0f; }
 // proto: static USER_FUNC(fall_rtn);
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
@@ -60,7 +61,8 @@ static USER_FUNC(fall_rtn) {
                     lo = MONTETABLE[t].x1;
                     hi = MONTETABLE[t].x0;
                 }
-                sub->pos.x = lo + irand(100.0f * (hi - lo)) / 100.0f;
+                hi -= lo;
+                sub->pos.x = lo + randRange(hi);
                 if (MONTETABLE[t].y0 < MONTETABLE[t].y1) {
                     lo = MONTETABLE[t].y0;
                     hi = MONTETABLE[t].y1;
@@ -68,7 +70,8 @@ static USER_FUNC(fall_rtn) {
                     lo = MONTETABLE[t].y1;
                     hi = MONTETABLE[t].y0;
                 }
-                sub->pos.y = lo + irand(100.0f * (hi - lo)) / 100.0f;
+                hi -= lo;
+                sub->pos.y = lo + randRange(hi);
                 for (j = 0; j < k; j++) {
                     PSVECSubtract(&sub->pos, &(sub - (j + 1))->pos, &v);
                     if (PSVECMag(&v) < 20.0f) {
@@ -83,7 +86,7 @@ static USER_FUNC(fall_rtn) {
             sub->scale = 1.0f;
         }
     }
-    sfx = "SFX_EVT_GAME_MONTE_COUNT1";
+    sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->num; i++) {
         m = &monte_p[i];
         switch (m->state) {

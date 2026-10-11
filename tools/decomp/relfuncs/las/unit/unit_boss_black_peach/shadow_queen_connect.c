@@ -60,8 +60,8 @@ USER_FUNC(shadow_queen_connect) {
     }
     wk = event->userdatap[0];
     wpos = *animPoseGetAnimPosePtr(wk->poseId[0])->worldPositions;
-    BtlUnit_SetPartsPos(BattleGetUnitPartsPtr(BattleTransID(event, -2), 3), wpos[wk->idx[0]].x, wpos[wk->idx[0]].y,
-                        wpos[wk->idx[0]].z);
+    part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
+    BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 5);
     *(f32*)((u8*)part + 0x4F8) = 7.0f;
     BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);

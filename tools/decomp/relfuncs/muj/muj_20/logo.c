@@ -17,7 +17,7 @@ USER_FUNC(logo) {
         event->userdatap[0] = wp;
     }
     wp = event->userdatap[0];
-    if (!fileAsyncf(4, NULL, "%s/mariost.tpl", getMarioStDvdRoot())) {
+    if ((u32)fileAsyncf(4, NULL, "%s/mariost.tpl", getMarioStDvdRoot()) == 0) {
         return EVT_RETURN_BLOCK;
     }
     switch (wp->state) {

@@ -21,8 +21,6 @@
 #include "memory.h"
 #include "mario/mariost.h"
 #include "driver/hitdrv.h"
-
-s32 gans_alpha;
 static void callback(MapTevCallbackInfo* info);
 typedef struct StoneEffWork { s32 field_0x0; Vec pos; } StoneEffWork;
 typedef struct StoneEffWork2 { u8 field_0x0[0x1C]; f32 rot; } StoneEffWork2;
@@ -34,7 +32,6 @@ double cos(double x);
 double sin(double x);
 void psndMapChange(void);
 typedef struct ScreenWork { void* buf; s32 ready; f32 scale; f32 scaleTarget; f32 x; f32 xTarget; f32 y; f32 yTarget; s32 count; s32 mode; f32 field_0x28; u8* noise; } ScreenWork;
-static ScreenWork* screen_wp;
 static f32 randf(f32 min, f32 max);
 void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
 static void screen_capture(CameraId cameraId, void* param);
@@ -52,6 +49,8 @@ typedef struct KyakuAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 
 typedef struct KyakuWork { s32 field_0x0; s32 num; Kyaku* kyakus; s32 animNum; KyakuAnim anim[32]; } KyakuWork;
 typedef struct KyakuData { const char* name; const char* anim; f32 rate; } KyakuData;
 KyakuWork* kyaku_wp;
+static ScreenWork* screen_wp;
+s32 gans_alpha;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static void pose_init(void);
@@ -384,6 +383,206 @@ s32 ext_kyaku_data[] = {
 __declspec(section ".data") EVT_BEGIN(x)
 EVT_END()
 
+USER_FUNC(_firstattack_setting) {
+    FieldBattleData* fbat = fbatGetPointer();
+
+    *(s32*)&fbat->field_C[4] = 0x10000000;
+    *(s32*)&fbat->field_C[8] = 0x10;
+    *(u32*)&fbat->field_C[0x10] &= ~1;
+    fbatSetAttackAnnounce(0x10000000);
+    fbatSetAttackAnnounceEnable();
+    return EVT_RETURN_DONE;
+}
+
+#pragma dont_inline on
+static void pose_init(void) {
+    char name[32];
+    char anim[32];
+    KyakuData* d = (KyakuData*)ext_kyaku_data;
+    s32 i = 0;
+    s32 start;
+
+    strcpy(name, "");
+    strcpy(anim, "");
+    kyaku_wp->animNum = -1;
+    do {
+        if (strcmp(d->name, name) != 0) {
+            strcpy(name, d->name);
+            strcpy(anim, "");
+        }
+        if (strcmp(d->anim, anim) != 0) {
+            strcpy(anim, d->anim);
+            start = i;
+            kyaku_wp->animNum++;
+        }
+        strcpy(kyaku_wp->anim[kyaku_wp->animNum].name, name);
+        strcpy(kyaku_wp->anim[kyaku_wp->animNum].anim, anim);
+        kyaku_wp->anim[kyaku_wp->animNum].start = start;
+        kyaku_wp->anim[kyaku_wp->animNum].count = i - start + 1;
+        kyaku_wp->anim[kyaku_wp->animNum].rate = d->rate;
+        kyaku_wp->anim[kyaku_wp->animNum].loop = 1;
+        i++;
+        d++;
+    } while (d->name != NULL);
+    kyaku_wp->animNum++;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+static void pose_main(void) {
+    s32 i;
+    ExtPose* pose;
+    Kyaku* kyaku;
+    KyakuAnim* a;
+    f32 t;
+
+    pose = extGetPosePtr();
+    kyaku = kyaku_wp->kyakus;
+
+    for (i = 0; i < kyaku_wp->num; i++, kyaku++, pose++) {
+        a = &kyaku_wp->anim[kyaku->animIdx];
+        t = 60.0f * OSTicksToMilliseconds((u64)(gp->renderTime - kyaku->time)) / 1000.0f / a->rate;
+        if (t >= 1.0f) {
+            kyaku->time = gp->renderTime;
+            t = 0.0f;
+        }
+        pose->frame = a->start + (s32)((a->count - 1) * t);
+    }
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
+    KyakuAnim* a;
+    s32 i;
+
+    for (i = 0, a = kyaku_wp->anim; i < kyaku_wp->animNum; i++, a++) {
+        if (strcmp(a->name, name) == 0 && strcmp(a->anim, anim) == 0) {
+            break;
+        }
+    }
+    if (i < kyaku_wp->animNum && kyaku->animIdx != i) {
+        kyaku->animIdx = i;
+        kyaku->time = gp->renderTime + rand();
+    }
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void __tou_srand(u32 seed) {
+    x[0] = seed;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+u32 __tou_rand(void) {
+    x[0] = x[0] * 1103515245 + 12345;
+    return ((u32)x[0] >> 16) & 0x7FFF;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+static f32 randf(f32 min, f32 max) {
+    f32 r = __tou_rand() / 32767.0f;
+
+    return r * (max - min) + min;
+}
+#pragma dont_inline reset
+
+void ext_kyaku_init(void) {
+    s32 far;
+    s32 i;
+    ExtPose* pose;
+    Kyaku* kyaku;
+    s32 side;
+    f32 dist;
+    f32 angle;
+    f32 x;
+    f32 z;
+    f32 hx;
+    f32 hy;
+    f32 hz;
+    f32 hd;
+    f32 nx;
+    f32 ny;
+    f32 nz;
+
+    kyaku_wp = _mapAlloc(sizeof(KyakuWork));
+    memset(kyaku_wp, 0, sizeof(KyakuWork));
+    kyaku_wp->num = extGetPoseNum();
+    kyaku_wp->kyakus = _mapAlloc(kyaku_wp->num * sizeof(Kyaku));
+    memset(kyaku_wp->kyakus, 0, kyaku_wp->num * sizeof(Kyaku));
+    pose_init();
+    __tou_srand(0x25B0E2B);
+    pose = extGetPosePtr();
+    kyaku = kyaku_wp->kyakus;
+    for (i = 0; i < kyaku_wp->num; i++, pose++, kyaku++) {
+        pose->flags |= 7;
+        PSMTXIdentity(pose->mtx);
+        while (TRUE) {
+            far = __tou_rand() % 100 >= 30;
+            angle = randf(0.0f, 6.283184f);
+            if (!far) {
+                dist = randf(250.0f, 500.0f);
+            } else {
+                side = angle < 0.7853982f || angle > 5.4977875f;
+                dist = side ? randf(550.0f, 650.0f) : randf(550.0f, 850.0f);
+            }
+            x = dist * sinf(angle);
+            z = dist * cosf(angle);
+            if (!far) {
+                if (!(__fabs(z) > 70.0)) {
+                    continue;
+                }
+                hd = 100000.0f;
+                if (hitCheckFilter(NULL, &hx, &hy, &hz, &hd, &nx, &ny, &nz, x, 100.0f, z, 0.0f, -1.0f, 0.0f) == NULL) {
+                    continue;
+                }
+                if (0.0f != hy) {
+                    continue;
+                }
+                pose->mtx[0][3] = hx;
+                pose->mtx[2][3] = hz;
+                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
+            } else {
+                hd = 100000.0f;
+                if (hitCheckFilter(NULL, &hx, &hy, &hz, &hd, &nx, &ny, &nz, x, 500.0f, z, 0.0f, -1.0f, 0.0f) == NULL) {
+                    continue;
+                }
+                pose->mtx[0][3] = hx;
+                pose->mtx[1][3] = hy;
+                pose->mtx[2][3] = hz;
+                if (hz > 570.0f && __fabsf(hx) > 40.0f && __fabsf(hx) < 60.0f) {
+                    pose->mtx[0][3] += hx > 0.0f ? -15 : 15;
+                }
+                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
+            }
+            break;
+        }
+        if (strcmp(gp->beroEnterName, "s_bero_2") != 0 && pose->mtx[2][3] > 350.0f) {
+            pose->flags &= ~1;
+        }
+        if (0.0f != pose->mtx[1][3]) {
+            kyaku->flags |= 1;
+        }
+        kyaku->pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        switch (irand(1000) % 4) {
+            case 0:
+                pose_change(kyaku, "c_kinopio", "KNP_S_1");
+                break;
+            case 1:
+                pose_change(kyaku, "c_kinopiko", "KNF_S_1");
+                break;
+            case 2:
+                pose_change(kyaku, "c_roten", "S_1");
+                break;
+            case 3:
+                pose_change(kyaku, "c_jugemu", "JGM_S_1");
+                break;
+        }
+    }
+}
+
 EVT_BEGIN(evt_kyaku)
     CALL(evt_npc_entry, STRING("kyaku1"), STRING("c_kinopio"))
     CALL(evt_npc_entry, STRING("kyaku2"), STRING("c_kinopiko"))
@@ -418,7 +617,7 @@ EVT_BEGIN(evt_kyaku)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") s32 inta_tex[] = {
+static __declspec(section ".data") s32 inta_tex[] __attribute__((aligned(32))) = {
     -1, 0, -1, 0, -1, 0, -1, 0,
 };
 
@@ -708,30 +907,6 @@ s32 evt_tougi[] = {
     (s32)"n_bero_1", 32, 196699, (s32)evt_bero_mapchange, (s32)"tou_02", (s32)"n_bero_2", 33, 2,
     1,
 };
-
-USER_FUNC(gans_white_off) {
-    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
-
-    mapSetTevCallback(12, NULL);
-    animPoseSetMaterialFlagOff(npc->poseId, 0xC000000);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(gans_white_on) {
-    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
-
-    if (isFirstCall) {
-        gans_alpha = 0;
-        mapSetTevCallback(12, callback);
-        animPoseSetMaterialFlagOn(npc->poseId, 0xC000000);
-    }
-    gans_alpha += 5;
-    if (gans_alpha > 255) {
-        gans_alpha = 255;
-        return EVT_RETURN_DONE;
-    }
-    return EVT_RETURN_BLOCK;
-}
 
 EVT_BEGIN(init_kinosikowa)
     IF_INT_GREATER_OR_EQUAL(GSW(0), 172)
@@ -2724,6 +2899,290 @@ EVT_BEGIN(evt_champion2)
     RETURN
 EVT_END()
 
+void kyaku_disp(CameraId camera, void* param) {
+    extLoadRenderMode();
+    extLoadVertex();
+    extLoadTexture();
+    extLoadTev();
+    extDraw();
+    extLoadTextureExit();
+}
+
+void ext_kyaku_main(void) {
+    pose_main();
+}
+
+void ext_kyaku_dispent(void) {
+    dispEntry(CAMERA_3D, 0.0f, 1, kyaku_disp, NULL);
+}
+
+static void screen_capture(CameraId cameraId, void* param) {
+    GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
+    GXSetTexCopyDst(0x130, 0xF0, GX_TF_RGB565, GX_TRUE);
+    GXCopyTex(screen_wp->buf, GX_FALSE);
+    GXPixModeSync();
+    screen_wp->ready = 1;
+}
+
+USER_FUNC(screen_init) {
+    u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_I4, GX_FALSE, 0);
+
+    screen_wp = _mapAlloc(sizeof(ScreenWork));
+    screen_wp->buf = _mapAlloc(size);
+    screen_wp->ready = 0;
+    screen_wp->scale = screen_wp->scaleTarget = 1.0f;
+    screen_wp->x = screen_wp->xTarget = 0.0f;
+    screen_wp->y = screen_wp->yTarget = 0.0f;
+    screen_wp->count = 0;
+    screen_wp->field_0x28 = -1.0f;
+    screen_wp->noise = _mapAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0));
+    if (evtGetValue(event, GSW(0)) == 163) {
+        screen_wp->mode = 1;
+    }
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(screen_evt) {
+    dispEntry(CAMERA_2D, 1000.0f, 0, screen_capture, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
+#pragma dont_inline on
+void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx) {
+    GXSetTexCoordGen2(dst, func, src, mtx, GX_FALSE, GX_PTIDENTITY);
+}
+#pragma dont_inline reset
+
+void screen_tev(MapTevCallbackInfo* info) {
+    GXTexObj tex;
+    Mtx trans;
+    Mtx scale;
+    Mtx mtx;
+    u8* buf;
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 n;
+    s32 len;
+    s32 start;
+    u8 col;
+    f32 lim;
+    f32 x;
+    f32 y;
+
+    if (screen_wp->ready) {
+        if (screen_wp->mode) {
+            buf = screen_wp->noise;
+            for (i = 0; i < 64; i++) {
+                for (j = 0; j < 64; j++) {
+                    buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = (i & 1) ? 0xFF : 0;
+                }
+                n = rand() % 100 + 100;
+                for (k = 0; k < n; k++) {
+                    len = rand() % 4 + 2;
+                    start = rand() % (65 - len);
+                    col = rand() % 256;
+                    for (j = start; j < start + len; j++) {
+                        buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = col;
+                    }
+                }
+            }
+            DCFlushRange(buf, 0x1000);
+            GXInitTexObj(&tex, buf, 64, 64, GX_TF_I8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+            GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+            GXLoadTexObj(&tex, GX_TEXMAP0);
+        } else {
+            GXInitTexObj(&tex, screen_wp->buf, 0x130, 0xF0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        }
+        GXLoadTexObj(&tex, GX_TEXMAP0);
+        GXInitTexObj(&tex, inta_tex, 4, 8, GX_TF_I4, GX_REPEAT, GX_REPEAT, GX_FALSE);
+        GXInitTexObjLOD(&tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXLoadTexObj(&tex, GX_TEXMAP1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+        if (screen_wp->mode == 0) {
+            screen_wp->count++;
+            if (screen_wp->count % 200 == 0) {
+                switch (rand() % 3) {
+                    case 0:
+                        screen_wp->xTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
+                        screen_wp->yTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
+                        break;
+                    case 1:
+                        screen_wp->scaleTarget = randf(1.0f, 0.25f);
+                        break;
+                }
+            }
+            screen_wp->scale += (screen_wp->scaleTarget - screen_wp->scale) / 60.0f;
+            screen_wp->x += (screen_wp->xTarget - screen_wp->x) / 60.0f;
+            screen_wp->y += (screen_wp->yTarget - screen_wp->y) / 60.0f;
+            PSMTXScale(scale, screen_wp->scale, screen_wp->scale, 1.0f);
+            lim = (1.0f - screen_wp->scale) / screen_wp->scale;
+            y = screen_wp->y > lim ? lim : screen_wp->y;
+            if (screen_wp->x > lim) {
+                x = lim;
+            } else {
+                x = screen_wp->x;
+            }
+            PSMTXTrans(trans, x, y, 0.0f);
+            PSMTXConcat(scale, trans, mtx);
+        } else {
+            PSMTXScale(mtx, 4.75f, 3.75f, 0.0f);
+        }
+        GXSetTexCoordGen_(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+        GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
+        PSMTXScale(mtx, 1.0f, 6.0f * ((100.0f - camGetPtr(CAMERA_3D)->cameraPos.z) / 1000.0f) + 16.0f, 1.0f);
+        GXSetTexCoordGen_(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
+        GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
+        info->tevStage = 2;
+        info->texMap = 2;
+        info->texCoord = 2;
+    }
+}
+
+USER_FUNC(tribe_chk) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    const char* tribe = (const char*)evtGetValue(event, args[1]);
+
+    if (strcmp(npcNameToPtr(name)->tribe->nameJp, tribe) == 0) {
+        evtSetValue(event, args[2], 1);
+    } else {
+        evtSetValue(event, args[2], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(burst_chain) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 id = evtGetValue(event, args[1]);
+    NpcEntry* npc = npcNameToPtr(name);
+    NpcEntry* a;
+    NpcEntry* b;
+    char buf[32];
+    s32 i;
+    f32 t;
+    f32 dist;
+
+    sprintf(buf, "\215\275%d_%d", id, 0);
+    npcNameToPtr(buf)->position = npc->position;
+    for (i = 0; i < 4; i++) {
+        sprintf(buf, "\215\275%d_%d", id, i);
+        a = npcNameToPtr(buf);
+        sprintf(buf, "\215\275%d_%d", id, i + 1);
+        b = npcNameToPtr(buf);
+        b->position.y -= 3.0f;
+        dist = PSVECDistance(&a->position, &b->position);
+        t = 1.0f - 10.0f / dist;
+        b->position.x += t * (a->position.x - b->position.x);
+        b->position.y += t * (a->position.y - b->position.y);
+        b->position.z += t * (a->position.z - b->position.z);
+        if (b->position.x > 210.0f || b->position.x < -210.0f) {
+            if (b->position.y < 0.0f) {
+                b->position.y = 0.0f;
+            }
+        } else {
+            if (b->position.y < 60.0f) {
+                b->position.y = 60.0f;
+            }
+        }
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(snd_sfx_stop) {
+    psndMapChange();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(confupose) {
+    s32* args = event->args;
+    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
+
+    evtSetValue(event, args[1], (s32)npc->tribe->confuseAnimation);
+    return EVT_RETURN_DONE;
+}
+
+#pragma dont_inline on
+static f32 sinf(f32 x) {
+    return sin(x);
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+static f32 cosf(f32 x) {
+    return cos(x);
+}
+#pragma dont_inline reset
+
+static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, f32 g) {
+    s32* args = event->args;
+    f32 z;
+    f32 y;
+    f32 x;
+    ItemEntry* item;
+    f32 angle;
+    f32 dy;
+    f32 t;
+    f32 vy;
+
+    x = evtGetFloat(event, args[0]);
+    y = evtGetFloat(event, args[1]);
+    z = evtGetFloat(event, args[2]);
+    item = itemNameToPtr("stone");
+    if (isFirstCall) {
+        dy = y - item->position.y;
+        t = distABf(x, z, item->position.x, item->position.z) / speed;
+        vy = dy / t + 0.5f * t * g;
+        angle = angleABf(item->position.x, item->position.z, x, z);
+        event->userdata[0] = *(s32*)&t;
+        event->userdata[1] = *(s32*)&vy;
+        event->userdata[2] = *(s32*)&angle;
+    }
+    t = event->userdataf[0];
+    vy = event->userdataf[1];
+    angle = event->userdataf[2];
+    item->position.x += speed * sinf(6.2831855f * angle / 360.0f);
+    item->position.z -= speed * cosf(6.2831855f * angle / 360.0f);
+    item->position.y += vy;
+    vy -= g;
+    t -= speed;
+    if (t < 0.0f) {
+        item->position.x = x;
+        item->position.y = y;
+        item->position.z = z;
+        {
+            Vec zero = {0.0f, 0.0f, 0.0f};
+            Vec tmp = {0.0f, 0.0f, 0.0f};
+            Vec pos;
+
+            tmp.x = item->position.x;
+            tmp.y = item->position.y;
+            tmp.z = item->position.z;
+            pos = tmp;
+            psndSFXOn_3D("SFX_EVT_STARSTONE_JUMP1", &pos);
+        }
+        return 1;
+    }
+    event->userdata[0] = *(s32*)&t;
+    event->userdata[1] = *(s32*)&vy;
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(item_jump) {
+    return item_jump_sub(event, isFirstCall, 1.0f, 0.5f);
+}
+
 __declspec(section ".data") s32 block_data[] = {
     (s32)"block_1", (s32)"block_2", (s32)"block_3", (s32)"block_4", (s32)"block_5", (s32)"block_6", (s32)"block_7", (s32)"block_8",
     (s32)"block_9",
@@ -2764,6 +3223,116 @@ EVT_BEGIN(evt_boss_stone)
     END_LOOP
     RETURN
 EVT_END()
+
+USER_FUNC(getY) {
+    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
+    MapObject* obj = mapGetMapObj("block_5");
+    Vec pos;
+    f32 y;
+
+    mapObjGetPos("group151", &pos);
+    y = 100.0f + obj->modelWorldMtx[1][3];
+    if (y > pos.y) {
+        npc->position.y = y;
+    } else {
+        npc->position.x = npc->position.z = 0.0f;
+        npc->position.y = pos.y;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(starstone_sound_onoff) {
+    s32 flag = evtGetValue(event, event->args[0]);
+    EffectEntry* eff = itemNameToPtr("stone")->effect;
+
+    if (eff) {
+        if (flag == 0) {
+            ((StoneEffWork3*)eff->userdata)->flags &= ~4;
+        }
+        if (flag == 1) {
+            ((StoneEffWork3*)eff->userdata)->flags |= 4;
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_boss_stone_r) {
+    s32* args = event->args;
+    EffectEntry* eff = itemNameToPtr("stone")->effect;
+
+    ((StoneEffWork2*)eff->userdata)->rot = evtGetFloat(event, args[0]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(eff_pos) {
+    ItemEntry* item = itemNameToPtr("stone");
+    EffectEntry* eff1 = effNameToPtr("eff_1");
+    EffectEntry* eff2 = effNameToPtr("eff_2");
+
+    if (item) {
+        if (eff1) {
+            ((StoneEffWork*)eff1->userdata)->pos.x = item->position.x;
+            ((StoneEffWork*)eff1->userdata)->pos.y = 15.0f + item->position.y;
+            ((StoneEffWork*)eff1->userdata)->pos.z = item->position.z;
+        }
+        if (eff2) {
+            ((StoneEffWork*)eff2->userdata)->pos.x = item->position.x;
+            ((StoneEffWork*)eff2->userdata)->pos.y = 15.0f + item->position.y;
+            ((StoneEffWork*)eff2->userdata)->pos.z = item->position.z;
+        }
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static inline void cb_set_color(u8 a) {
+    GXColor color = {255, 255, 255, 0};
+
+    color.a = a;
+    GXSetTevColor(GX_TEVREG0, color);
+}
+
+static void callback(MapTevCallbackInfo* info) {
+    s32 stage = info->tevStage;
+    s32 texCoord = info->texCoord;
+    s32 texMap = info->texMap;
+    s32 field_0x18 = info->field_0x18;
+
+    cb_set_color(gans_alpha);
+    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_CPREV, GX_CC_C0, GX_CC_A0, GX_CC_ZERO);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    info->tevStage = stage + 1;
+    info->texMap = texMap;
+    info->field_0x18 = field_0x18;
+    info->texCoord = texCoord;
+}
+
+USER_FUNC(gans_white_on) {
+    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
+
+    if (isFirstCall) {
+        gans_alpha = 0;
+        mapSetTevCallback(12, callback);
+        animPoseSetMaterialFlagOn(npc->poseId, 0xC000000);
+    }
+    gans_alpha += 5;
+    if (gans_alpha > 255) {
+        gans_alpha = 255;
+        return EVT_RETURN_DONE;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(gans_white_off) {
+    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
+
+    mapSetTevCallback(12, NULL);
+    animPoseSetMaterialFlagOff(npc->poseId, 0xC000000);
+    return EVT_RETURN_DONE;
+}
 
 static EVT_BEGIN(evt_boss)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group34"), 1)
@@ -3709,541 +4278,3 @@ EVT_BEGIN(tou_03_init_evt)
     END_IF
     RETURN
 EVT_END()
-
-static void callback(MapTevCallbackInfo* info) {
-    s32 stage = info->tevStage;
-    s32 texCoord = info->texCoord;
-    s32 texMap = info->texMap;
-    s32 field_0x18 = info->field_0x18;
-    GXColor color = {255, 255, 255, 0};
-
-    color.a = gans_alpha;
-    GXSetTevColor(GX_TEVREG0, color);
-    GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
-    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(stage, GX_CC_CPREV, GX_CC_C0, GX_CC_A0, GX_CC_ZERO);
-    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-    GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    info->tevStage = stage + 1;
-    info->texMap = texMap;
-    info->field_0x18 = field_0x18;
-    info->texCoord = texCoord;
-}
-
-USER_FUNC(eff_pos) {
-    ItemEntry* item = itemNameToPtr("stone");
-    EffectEntry* eff1 = effNameToPtr("eff_1");
-    EffectEntry* eff2 = effNameToPtr("eff_2");
-
-    if (item) {
-        if (eff1) {
-            ((StoneEffWork*)eff1->userdata)->pos.x = item->position.x;
-            ((StoneEffWork*)eff1->userdata)->pos.y = 15.0f + item->position.y;
-            ((StoneEffWork*)eff1->userdata)->pos.z = item->position.z;
-        }
-        if (eff2) {
-            ((StoneEffWork*)eff2->userdata)->pos.x = item->position.x;
-            ((StoneEffWork*)eff2->userdata)->pos.y = 15.0f + item->position.y;
-            ((StoneEffWork*)eff2->userdata)->pos.z = item->position.z;
-        }
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(evt_boss_stone_r) {
-    s32* args = event->args;
-    EffectEntry* eff = itemNameToPtr("stone")->effect;
-
-    ((StoneEffWork2*)eff->userdata)->rot = evtGetFloat(event, args[0]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(starstone_sound_onoff) {
-    s32 flag = evtGetValue(event, event->args[0]);
-    EffectEntry* eff = itemNameToPtr("stone")->effect;
-
-    if (eff) {
-        if (flag == 0) {
-            ((StoneEffWork3*)eff->userdata)->flags &= ~4;
-        }
-        if (flag == 1) {
-            ((StoneEffWork3*)eff->userdata)->flags |= 4;
-        }
-    }
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(getY) {
-    NpcEntry* npc = npcNameToPtr("\203K\203\223\203X");
-    MapObject* obj = mapGetMapObj("block_5");
-    Vec pos;
-    f32 y;
-
-    mapObjGetPos("group151", &pos);
-    y = 100.0f + obj->modelWorldMtx[1][3];
-    if (y > pos.y) {
-        npc->position.y = y;
-    } else {
-        npc->position.x = npc->position.z = 0.0f;
-        npc->position.y = pos.y;
-    }
-    return EVT_RETURN_DONE;
-}
-
-static inline void item_jump_sfx(const char* name, Vec pos) {
-    psndSFXOn_3D(name, &pos);
-}
-
-static inline s32 item_jump_sub(EventEntry* event, BOOL isFirstCall, f32 speed, f32 g) {
-    s32* args = event->args;
-    f32 x = evtGetFloat(event, args[0]);
-    f32 y = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-    ItemEntry* item = itemNameToPtr("stone");
-    f32 angle;
-    f32 dy;
-    f32 t;
-    f32 vy;
-
-    if (isFirstCall) {
-        dy = y - item->position.y;
-        t = distABf(x, z, item->position.x, item->position.z) / speed;
-        vy = dy / t + 0.5f * t * g;
-        angle = angleABf(item->position.x, item->position.z, x, z);
-        event->userdata[0] = *(s32*)&t;
-        event->userdata[1] = *(s32*)&vy;
-        event->userdata[2] = *(s32*)&angle;
-    }
-    t = event->userdataf[0];
-    vy = event->userdataf[1];
-    angle = event->userdataf[2];
-    item->position.x += speed * sinf(6.2831855f * angle / 360.0f);
-    item->position.z -= speed * cosf(6.2831855f * angle / 360.0f);
-    item->position.y += vy;
-    vy -= g;
-    t -= speed;
-    if (t < 0.0f) {
-        item->position.x = x;
-        item->position.y = y;
-        item->position.z = z;
-        item_jump_sfx("SFX_EVT_STARSTONE_JUMP1", (Vec){item->position.x, item->position.y, item->position.z});
-        return 1;
-    }
-    event->userdata[0] = *(s32*)&t;
-    event->userdata[1] = *(s32*)&vy;
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(item_jump) {
-    return item_jump_sub(event, isFirstCall, 1.0f, 0.5f);
-}
-
-static f32 cosf(f32 x) {
-    return cos(x);
-}
-
-static f32 sinf(f32 x) {
-    return sin(x);
-}
-
-USER_FUNC(confupose) {
-    s32* args = event->args;
-    NpcEntry* npc = npcNameToPtr((const char*)evtGetValue(event, args[0]));
-
-    evtSetValue(event, args[1], (s32)npc->tribe->confuseAnimation);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(snd_sfx_stop) {
-    psndMapChange();
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(burst_chain) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 id = evtGetValue(event, args[1]);
-    NpcEntry* npc = npcNameToPtr(name);
-    NpcEntry* a;
-    NpcEntry* b;
-    char buf[32];
-    s32 i;
-    f32 t;
-    f32 dist;
-
-    sprintf(buf, "\215\275%d_%d", id, 0);
-    npcNameToPtr(buf)->position = npc->position;
-    for (i = 0; i < 4; i++) {
-        sprintf(buf, "\215\275%d_%d", id, i);
-        a = npcNameToPtr(buf);
-        sprintf(buf, "\215\275%d_%d", id, i + 1);
-        b = npcNameToPtr(buf);
-        b->position.y -= 3.0f;
-        dist = PSVECDistance(&a->position, &b->position);
-        t = 1.0f - 10.0f / dist;
-        b->position.x += t * (a->position.x - b->position.x);
-        b->position.y += t * (a->position.y - b->position.y);
-        b->position.z += t * (a->position.z - b->position.z);
-        if (b->position.x > 210.0f || b->position.x < -210.0f) {
-            if (b->position.y < 0.0f) {
-                b->position.y = 0.0f;
-            }
-        } else {
-            if (b->position.y < 60.0f) {
-                b->position.y = 60.0f;
-            }
-        }
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(tribe_chk) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    const char* tribe = (const char*)evtGetValue(event, args[1]);
-
-    if (strcmp(npcNameToPtr(name)->tribe->nameJp, tribe) == 0) {
-        evtSetValue(event, args[2], 1);
-    } else {
-        evtSetValue(event, args[2], 0);
-    }
-    return EVT_RETURN_DONE;
-}
-
-void screen_tev(MapTevCallbackInfo* info) {
-    GXTexObj tex;
-    Mtx trans;
-    Mtx scale;
-    Mtx mtx;
-    u8* buf;
-    s32 i;
-    s32 j;
-    s32 k;
-    s32 n;
-    s32 len;
-    s32 start;
-    u8 col;
-    f32 lim;
-    f32 x;
-    f32 y;
-
-    if (screen_wp->ready) {
-        if (screen_wp->mode) {
-            buf = screen_wp->noise;
-            for (i = 0; i < 64; i++) {
-                for (j = 0; j < 64; j++) {
-                    buf[(j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8] = (i & 1) ? 0xFF : 0;
-                }
-                n = rand() % 100 + 100;
-                for (k = 0; k < n; k++) {
-                    len = rand() % 4 + 2;
-                    start = rand() % (65 - len);
-                    col = rand() % 256;
-                    for (j = start; j < start + len; j++) {
-                        buf[(j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8] = col;
-                    }
-                }
-            }
-            DCFlushRange(buf, 0x1000);
-            GXInitTexObj(&tex, buf, 64, 64, GX_TF_I8, GX_REPEAT, GX_REPEAT, GX_FALSE);
-            GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-            GXLoadTexObj(&tex, GX_TEXMAP0);
-        } else {
-            GXInitTexObj(&tex, screen_wp->buf, 0x130, 0xF0, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-            GXInitTexObjLOD(&tex, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        }
-        GXLoadTexObj(&tex, GX_TEXMAP0);
-        GXInitTexObj(&tex, inta_tex, 4, 8, GX_TF_I4, GX_REPEAT, GX_REPEAT, GX_FALSE);
-        GXInitTexObjLOD(&tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-        GXLoadTexObj(&tex, GX_TEXMAP1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
-        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
-        if (screen_wp->mode == 0) {
-            screen_wp->count++;
-            if (screen_wp->count % 200 == 0) {
-                switch (rand() % 3) {
-                    case 0:
-                        screen_wp->xTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
-                        screen_wp->yTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
-                        break;
-                    case 1:
-                        screen_wp->scaleTarget = randf(1.0f, 0.25f);
-                        break;
-                }
-            }
-            screen_wp->scale += (screen_wp->scaleTarget - screen_wp->scale) / 60.0f;
-            screen_wp->x += (screen_wp->xTarget - screen_wp->x) / 60.0f;
-            screen_wp->y += (screen_wp->yTarget - screen_wp->y) / 60.0f;
-            PSMTXScale(scale, screen_wp->scale, screen_wp->scale, 1.0f);
-            lim = (1.0f - screen_wp->scale) / screen_wp->scale;
-            y = screen_wp->y > lim ? lim : screen_wp->y;
-            x = screen_wp->x > lim ? lim : screen_wp->x;
-            PSMTXTrans(trans, x, y, 0.0f);
-            PSMTXConcat(scale, trans, mtx);
-        } else {
-            PSMTXScale(mtx, 4.75f, 3.75f, 0.0f);
-        }
-        GXSetTexCoordGen_(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
-        GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
-        PSMTXScale(mtx, 1.0f, 6.0f * ((100.0f - camGetPtr(CAMERA_3D)->cameraPos.z) / 1000.0f) + 16.0f, 1.0f);
-        GXSetTexCoordGen_(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
-        GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
-        info->tevStage = 2;
-        info->texMap = 2;
-        info->texCoord = 2;
-    }
-}
-
-void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx) {
-    GXSetTexCoordGen2(dst, func, src, mtx, GX_FALSE, GX_PTIDENTITY);
-}
-
-static USER_FUNC(screen_evt) {
-    dispEntry(CAMERA_2D, 1000.0f, 0, screen_capture, NULL);
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(screen_init) {
-    u32 size = GXGetTexBufferSize(0x260, 0x1E0, GX_TF_I4, GX_FALSE, 0);
-
-    screen_wp = _mapAlloc(sizeof(ScreenWork));
-    screen_wp->buf = _mapAlloc(size);
-    screen_wp->ready = 0;
-    screen_wp->scale = screen_wp->scaleTarget = 1.0f;
-    screen_wp->x = screen_wp->xTarget = 0.0f;
-    screen_wp->y = screen_wp->yTarget = 0.0f;
-    screen_wp->count = 0;
-    screen_wp->field_0x28 = -1.0f;
-    screen_wp->noise = _mapAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0));
-    if (evtGetValue(event, GSW(0)) == 163) {
-        screen_wp->mode = 1;
-    }
-    return EVT_RETURN_DONE;
-}
-
-static void screen_capture(CameraId cameraId, void* param) {
-    GXSetTexCopySrc(0, 0, 0x260, 0x1E0);
-    GXSetTexCopyDst(0x130, 0xF0, GX_TF_RGB565, GX_TRUE);
-    GXCopyTex(screen_wp->buf, GX_FALSE);
-    GXPixModeSync();
-    screen_wp->ready = 1;
-}
-
-void ext_kyaku_dispent(void) {
-    dispEntry(CAMERA_3D, 0.0f, 1, kyaku_disp, NULL);
-}
-
-void ext_kyaku_main(void) {
-    pose_main();
-}
-
-void kyaku_disp(CameraId camera, void* param) {
-    extLoadRenderMode();
-    extLoadVertex();
-    extLoadTexture();
-    extLoadTev();
-    extDraw();
-    extLoadTextureExit();
-}
-
-void ext_kyaku_init(void) {
-    ExtPose* pose;
-    Kyaku* kyaku;
-    s32 i;
-    s32 far;
-    s32 side;
-    f32 angle;
-    f32 dist;
-    f32 x;
-    f32 z;
-    f32 hx;
-    f32 hy;
-    f32 hz;
-    f32 hd;
-    f32 nx;
-    f32 ny;
-    f32 nz;
-
-    kyaku_wp = _mapAlloc(sizeof(KyakuWork));
-    memset(kyaku_wp, 0, sizeof(KyakuWork));
-    kyaku_wp->num = extGetPoseNum();
-    kyaku_wp->kyakus = _mapAlloc(kyaku_wp->num * sizeof(Kyaku));
-    memset(kyaku_wp->kyakus, 0, kyaku_wp->num * sizeof(Kyaku));
-    pose_init();
-    __tou_srand(0x25B0E2B);
-    pose = extGetPosePtr();
-    kyaku = kyaku_wp->kyakus;
-    for (i = 0; i < kyaku_wp->num; i++, pose++, kyaku++) {
-        pose->flags |= 7;
-        PSMTXIdentity(pose->mtx);
-        while (TRUE) {
-            far = __tou_rand() % 100 >= 30;
-            angle = randf(0.0f, 6.283184f);
-            if (!far) {
-                dist = randf(250.0f, 500.0f);
-            } else {
-                side = angle < 0.7853982f || angle > 5.4977875f;
-                if (side) {
-                    dist = randf(550.0f, 650.0f);
-                } else {
-                    dist = randf(550.0f, 850.0f);
-                }
-            }
-            x = dist * sinf(angle);
-            z = dist * cosf(angle);
-            if (!far) {
-                if (__fabs(z) <= 70.0) {
-                    continue;
-                }
-                hd = 100000.0f;
-                if (hitCheckFilter(NULL, &hx, &hy, &hz, &hd, &nx, &ny, &nz, x, 100.0f, z, 0.0f, -1.0f, 0.0f) == NULL) {
-                    continue;
-                }
-                if (0.0f != hy) {
-                    continue;
-                }
-                pose->mtx[0][3] = hx;
-                pose->mtx[2][3] = hz;
-                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
-            } else {
-                hd = 100000.0f;
-                if (hitCheckFilter(NULL, &hx, &hy, &hz, &hd, &nx, &ny, &nz, x, 500.0f, z, 0.0f, -1.0f, 0.0f) == NULL) {
-                    continue;
-                }
-                pose->mtx[0][3] = hx;
-                pose->mtx[1][3] = hy;
-                pose->mtx[2][3] = hz;
-                if (hz > 570.0f && __fabsf(hx) > 40.0f && __fabsf(hx) < 60.0f) {
-                    pose->mtx[0][3] += hx > 0.0f ? -15 : 15;
-                }
-                pose->rot = angleABf(0.0f, 0.0f, hx, hz);
-            }
-            break;
-        }
-        if (strcmp(gp->beroEnterName, "s_bero_2") != 0 && pose->mtx[2][3] > 350.0f) {
-            pose->flags &= ~1;
-        }
-        if (0.0f != pose->mtx[1][3]) {
-            kyaku->flags |= 1;
-        }
-        kyaku->pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-        switch (irand(1000) % 4) {
-            case 0:
-                pose_change(kyaku, "c_kinopio", "KNP_S_1");
-                break;
-            case 1:
-                pose_change(kyaku, "c_kinopiko", "KNF_S_1");
-                break;
-            case 2:
-                pose_change(kyaku, "c_roten", "S_1");
-                break;
-            case 3:
-                pose_change(kyaku, "c_jugemu", "JGM_S_1");
-                break;
-        }
-    }
-}
-
-static f32 randf(f32 min, f32 max) {
-    f32 r = __tou_rand() / 32767.0f;
-
-    return r * (max - min) + min;
-}
-
-u32 __tou_rand(void) {
-    x[0] = x[0] * 1103515245 + 12345;
-    return ((u32)x[0] >> 16) & 0x7FFF;
-}
-
-void __tou_srand(u32 seed) {
-    x[0] = seed;
-}
-
-static void pose_change(Kyaku* kyaku, const char* name, const char* anim) {
-    KyakuAnim* a;
-    s32 i;
-
-    for (i = 0, a = kyaku_wp->anim; i < kyaku_wp->animNum; i++, a++) {
-        if (strcmp(a->name, name) == 0 && strcmp(a->anim, anim) == 0) {
-            break;
-        }
-    }
-    if (i < kyaku_wp->animNum && kyaku->animIdx != i) {
-        kyaku->animIdx = i;
-        kyaku->time = gp->renderTime + rand();
-    }
-}
-
-static void pose_main(void) {
-    s32 i;
-    ExtPose* pose;
-    Kyaku* kyaku;
-    KyakuAnim* a;
-    f32 t;
-
-    pose = extGetPosePtr();
-    kyaku = kyaku_wp->kyakus;
-
-    for (i = 0; i < kyaku_wp->num; i++, kyaku++, pose++) {
-        a = &kyaku_wp->anim[kyaku->animIdx];
-        t = 60.0f * OSTicksToMilliseconds((u64)(gp->renderTime - kyaku->time)) / 1000.0f / a->rate;
-        if (t >= 1.0f) {
-            kyaku->time = gp->renderTime;
-            t = 0.0f;
-        }
-        pose->frame = a->start + (s32)((a->count - 1) * t);
-    }
-}
-
-static void pose_init(void) {
-    char name[32];
-    char anim[32];
-    KyakuData* d = (KyakuData*)ext_kyaku_data;
-    s32 i = 0;
-    s32 start;
-
-    strcpy(name, "");
-    strcpy(anim, "");
-    kyaku_wp->animNum = -1;
-    do {
-        if (strcmp(d->name, name) != 0) {
-            strcpy(name, d->name);
-            strcpy(anim, "");
-        }
-        if (strcmp(d->anim, anim) != 0) {
-            strcpy(anim, d->anim);
-            start = i;
-            kyaku_wp->animNum++;
-        }
-        strcpy(kyaku_wp->anim[kyaku_wp->animNum].name, name);
-        strcpy(kyaku_wp->anim[kyaku_wp->animNum].anim, anim);
-        kyaku_wp->anim[kyaku_wp->animNum].start = start;
-        kyaku_wp->anim[kyaku_wp->animNum].count = i - start + 1;
-        kyaku_wp->anim[kyaku_wp->animNum].rate = d->rate;
-        kyaku_wp->anim[kyaku_wp->animNum].loop = 1;
-        i++;
-        d++;
-    } while (d->name != NULL);
-    kyaku_wp->animNum++;
-}
-
-USER_FUNC(_firstattack_setting) {
-    FieldBattleData* fbat = fbatGetPointer();
-
-    *(s32*)&fbat->field_C[4] = 0x10000000;
-    *(s32*)&fbat->field_C[8] = 0x10;
-    *(u32*)&fbat->field_C[0x10] &= ~1;
-    fbatSetAttackAnnounce(0x10000000);
-    fbatSetAttackAnnounceEnable();
-    return EVT_RETURN_DONE;
-}
-

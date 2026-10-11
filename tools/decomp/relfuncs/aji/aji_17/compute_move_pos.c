@@ -1,7 +1,6 @@
 // include: manager/evtmgr_cmd.h
 // decl: typedef struct DanceData { u16 flags; u8 step; u8 movePos; f32 cx; f32 cy; f32 rot; } DanceData;
 // decl: DanceData dance_dt;
-// note: rels file declares the data as f32 move_pos_list[15][2] (hand edit after gen)
 // proto: USER_FUNC(compute_move_pos);
 USER_FUNC(compute_move_pos) {
     s32* args = event->args;

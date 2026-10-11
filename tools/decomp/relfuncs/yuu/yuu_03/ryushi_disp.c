@@ -25,10 +25,6 @@ void ryushi_disp(CameraId camera, void* param) {
     Mtx out;
     Mtx base;
     GXTexObj tex;
-    GXColor c2a;
-    GXColor c2;
-    GXColor ca;
-    GXColor c;
 
     PSMTXScale(base, hdr->scale, hdr->scale, 1.0f);
     PSMTXTransApply(base, base, hdr->pos.x, hdr->pos.y, hdr->pos.z);
@@ -36,12 +32,7 @@ void ryushi_disp(CameraId camera, void* param) {
     PSMTXConcat(base, rot, base);
     effGetTexObj(0x1E, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
-    c2 = (GXColor){0, 0, 0, 0};
-    c2.r = hdr->r2;
-    c2.g = hdr->g2;
-    c2.b = hdr->b2;
-    c2a = c2;
-    GXSetTevColor(GX_TEVREG1, c2a);
+    GXSetTevColor(GX_TEVREG1, (GXColor){hdr->r2, hdr->g2, hdr->b2});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTexGens(1);
@@ -65,15 +56,9 @@ void ryushi_disp(CameraId camera, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     for (i = 1, p = hdr + 1; i < ryuwp; i++, p++) {
         scale = p->scale;
-        if (scale != 0.0f) {
-            c = (GXColor){0, 0, 0, 0};
-            c.r = amp;
-            c.g = g;
-            c.b = b;
-            c.a = p->alpha;
-            ca = c;
-            GXSetTevColor(GX_TEVREG0, ca);
-            deg = 180.0f * ((p->pos.z * 0.125f + 3.14f * i * 0.25f) / 3.14f);
+        if (scale) {
+            GXSetTevColor(GX_TEVREG0, (GXColor){amp, g, b, p->alpha});
+            deg = 180.0f * ((p->pos.z / 8.0f + 3.14f * i / 4.0f) / 3.14f);
             n = deg / 360.0f;
             if (deg < 0.0f) {
                 n--;

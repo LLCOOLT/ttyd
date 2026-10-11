@@ -133,11 +133,7 @@ void effTexSetup(void) {
 	wp->texture = NULL;
 	wp->texLoaded = FALSE;
 	wp->texture = arcOpen("effect.tpl", 0, 0);
-	if (wp->texture) {
-		UnpackTexPalette(wp->texture);
-		wp->texLoaded = TRUE;
-	}
-	else {
+	if (!wp->texture) {
 		sprintf(path, "%s/e/jp/effect.tpl", getMarioStDvdRoot());
 		entry = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
@@ -145,15 +141,19 @@ void effTexSetup(void) {
 		entry->info.cb.userData = entry;
 		DVDMgrReadAsync(entry, wp->texture, size, 0, _callback_tpl);
 	}
+	else {
+		UnpackTexPalette(wp->texture);
+		wp->texLoaded = TRUE;
+	}
 	effTexSetupN64();
 }
 
 void effGetTexObj(u32 id, GXTexObj* obj) {
 #ifdef __MWERKS__
 #pragma explicit_zero_data on
-	if (id < 146) { //number of images in effect.tpl
+	if ((s32)id < 146) { //number of images in effect.tpl
 		if (!wp->texLoaded) {
-			static char dummy ATTRIBUTE_ALIGN(8) = '\0';
+			static char dummy ATTRIBUTE_ALIGN(32) = '\0';
 			GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
 		}
 		else {
@@ -161,7 +161,7 @@ void effGetTexObj(u32 id, GXTexObj* obj) {
 		}
 	}
 	else {
-		static char dummy ATTRIBUTE_ALIGN(8) = '\0';
+		static char dummy ATTRIBUTE_ALIGN(32) = '\0';
 		if (!wp->handle) {
 			GXInitTexObj(obj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
 		}
@@ -174,11 +174,12 @@ void effGetTexObj(u32 id, GXTexObj* obj) {
 }
 
 void effAutoRelease(BOOL inBattle) {
-	EffectEntry* entry = wp->entries;
 	int i;
+	int count = wp->count;
+	EffectEntry* entry = wp->entries;
 
-	for (i = 0; i < wp->count; i++, entry++) {
-		if (entry->flags & 1 && entry->inBattle == inBattle && entry && entry->flags) {
+	for (i = 0; i < count; i++, entry++) {
+		if (entry->flags & 1 && (s32)entry->inBattle == inBattle && entry && entry->flags) {
 			__memFree(HEAP_EFFECT, entry->userdata);
 			entry->flags = 0;
 		}
@@ -205,11 +206,12 @@ EffectEntry* effEntry(void) {
 }
 
 void effSetName(EffectEntry* effect, const char* name) {
-	EffectEntry* entry = wp->entries;
 	int i;
+	int count = wp->count;
+	EffectEntry* entry = wp->entries;
 
-	for (i = 0; i < wp->count; i++, entry++) {
-		if (!entry->flags && !strcmp(entry->name, name)) {
+	for (i = 0; i < count; i++, entry++) {
+		if (entry->flags && !strcmp(entry->name, name)) {
 			break;
 		}
 	}
@@ -218,16 +220,17 @@ void effSetName(EffectEntry* effect, const char* name) {
 
 void effMain(void) {
 	const char *dvdroot, *prefix;
-	EffectEntry* entry = wp->entries;
 	int i;
+	int count = wp->count;
+	EffectEntry* entry = wp->entries;
 
-	for (i = 0; i < wp->count; i++, entry++) {
+	for (i = 0; i < count; i++, entry++) {
 		if (gp->inBattle) {
-			if (!entry->inBattle) {
+			if ((s32)entry->inBattle != 1) {
 				continue;
 			}
 		}
-		else if (entry->inBattle) {
+		else if ((s32)entry->inBattle != 0) {
 			continue;
 		}
 		if (entry->flags & 1) {
@@ -236,20 +239,19 @@ void effMain(void) {
 			}
 		}
 	}
-	if (wp->language != gp->language) {
+	if ((u32)wp->language != (u32)gp->language) {
 		if (wp->handle) {
 			fileFree(wp->handle);
 			wp->handle = NULL;
 		}
 		prefix = prefix_tbl[gp->language];
 		dvdroot = getMarioStDvdRoot();
-		if (fileAsyncf(4, 0, "%s/e/%s/effect_%s.tpl", dvdroot, prefix, prefix)) {
+		if (fileAsyncf(4, 0, "%s/e/%s/effect_%s.tpl", dvdroot, prefix, prefix) != 0U) {
 			prefix = prefix_tbl[gp->language];
-			dvdroot = getMarioStDvdRoot();
-			wp->handle = fileAllocf(4, "%s/e/%s/effect_%s.tpl", dvdroot, prefix, prefix);
+			wp->handle = fileAllocf(4, "%s/e/%s/effect_%s.tpl", getMarioStDvdRoot(), prefix, prefix);
 			wp->language = gp->language;
 		}
- 	}
+	}
 }
 
 void effDelete(EffectEntry* effect) {
@@ -271,30 +273,215 @@ void effSoftDelete(EffectEntry* effect) {
 }
 
 EffectEntry* effNameToPtr(const char* name) {
-	EffectEntry* entry = wp->entries;
 	int i;
+	int count = wp->count;
+	EffectEntry* entry = wp->entries;
 
-	for (i = 0; i < wp->count; i++, entry++) {
-		if (entry->flags && !strcmp(name, entry->name)) {
+	for (i = 0; i < count; i++, entry++) {
+		if (entry->flags && !strcmp(entry->name, name)) {
 			break;
 		}
 	}
-	if (i < wp->count) { //found a match
-		return entry;
+	if (i >= count) {
+		return NULL;
 	}
 	else {
-		return NULL;
+		return entry; //found a match
 	}
 }
 
 EffectSet* effGetSet(const char* name) {
-	EffectSet* set = eff_set_table;
+	s32 i;
 
-	while (set->id != -1) { //run until end of table
-		if (!strcmp(set->name, name)) {
-			return set;
+	for (i = 0; eff_set_table[i].id != -1; i++) { //run until end of table
+		if (!strcmp(eff_set_table[i].name, name)) {
+			return &eff_set_table[i];
 		}
-		set++;
 	}
 	return NULL;
+}
+
+typedef struct MayaKey {
+	s16 time;
+	u8 data[0xb0];
+} MayaKey;
+
+typedef struct MayaKeyList {
+	s32 count;
+	MayaKey* keys;
+	s32 pad[2];
+} MayaKeyList;
+
+typedef struct MayaListHdr {
+	s32 count;
+	MayaKeyList* entries;
+} MayaListHdr;
+
+typedef struct MayaAnimData {
+	u8 pad0[4];
+	f32 endTime;
+	MayaListHdr* lists;
+} MayaAnimData;
+
+typedef struct MayaJoint {
+	Mtx mtx;
+	f32 alpha;
+} MayaJoint;
+
+typedef struct MayaAnim {
+	u16 flags;
+	f32 time;
+	OSTime startTime;
+	MayaAnimData* data;
+	MayaJoint joints[1];
+} MayaAnim;
+
+typedef struct MayaPoly {
+	s32 pad0[2];
+	s32 count;
+	s16** strips;
+} MayaPoly;
+
+void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {
+	f32 buf[22];
+	Mtx trans, scale, tmp2, pivot2, pivot2Inv, trans3, pivot1, pivot1Inv, trans2, rotX, rotY, rotZ, tmp;
+	register u32 gqr = 0x06070607;
+	s32 n = list->count;
+	s32 k;
+
+	for (k = 1; k < n; k++) {
+		MayaKey* prev;
+		f32 a;
+		s32 i;
+		f32* out;
+		f32 t, ct;
+		MayaKey* curr;
+		register s8* pb;
+		register s8* pa;
+		curr = &list->keys[k];
+		prev = &list->keys[k - 1];
+		asm { mtspr GQR5, gqr }
+		ct = curr->time;
+		if (anim->time <= ct) {
+			t = anim->time;
+		}
+		else if (k == n - 1) {
+			t = curr->time;
+		}
+		else {
+			continue;
+		}
+		pa = (s8*)prev;
+		pb = (s8*)curr;
+		out = buf;
+		for (i = 0; i < 22; i++) {
+			register f32 d0, d1, v0, m0, v1, m1;
+			asm {
+				psq_l v0, 2(pa), 1, 5
+				psq_l d0, 4(pa), 1, 5
+				psq_l m0, 6(pa), 1, 5
+				psq_l v1, 2(pb), 1, 5
+				psq_l m1, 4(pb), 1, 5
+				psq_l d1, 6(pb), 1, 5
+			}
+			if (pa[9] != 0) {
+				*out = v0;
+			}
+			else {
+				f32 dt = curr->time - prev->time;
+				f32 t0 = prev->time;
+				f32 u = t - t0;
+				f32 s, s2, s3;
+				f32 div = (!dt) ? 0.00000001f : dt;
+				s = u / div;
+				s2 = s * s;
+				s3 = s2 * s;
+				*out = v0 * (1.0f + (2.0f * s3 - 3.0f * s2)) + m0 * (dt * (s + (s3 - 2.0f * s2))) + v1 * (-2.0f * s3 + 3.0f * s2) + m1 * (dt * (s3 - s2));
+			}
+			pa += 8;
+			pb += 8;
+			out++;
+		}
+		PSMTXTrans(trans, buf[0], buf[1], buf[2]);
+		PSMTXRotRad(rotX, 'x', buf[3]);
+		PSMTXRotRad(rotY, 'y', buf[4]);
+		PSMTXRotRad(rotZ, 'z', buf[5]);
+		PSMTXScale(scale, buf[6], buf[7], buf[8]);
+		PSMTXTrans(pivot1, buf[9], buf[10], buf[11]);
+		PSMTXTrans(pivot1Inv, -buf[9], -buf[10], -buf[11]);
+		PSMTXTrans(trans2, buf[12], buf[13], buf[14]);
+		PSMTXTrans(pivot2, buf[15], buf[16], buf[17]);
+		PSMTXTrans(pivot2Inv, -buf[15], -buf[16], -buf[17]);
+		PSMTXTrans(trans3, buf[18], buf[19], buf[20]);
+		PSMTXConcat(trans3, pivot2, tmp);
+		PSMTXConcat(tmp, scale, tmp);
+		PSMTXConcat(tmp, pivot2Inv, scale);
+		PSMTXConcat(trans2, pivot1, tmp);
+		PSMTXConcat(tmp, rotZ, tmp);
+		PSMTXConcat(tmp, rotY, tmp);
+		PSMTXConcat(tmp, rotX, tmp);
+		PSMTXConcat(tmp, pivot1Inv, tmp2);
+		PSMTXConcat(trans, tmp2, tmp);
+		PSMTXConcat(tmp, scale, (MtxPtr)mtx);
+		a = buf[21];
+		*alpha = a > 1.0f ? 1.0f : (a < 0.0f ? 0.0f : a);
+		return;
+	}
+}
+
+MayaAnim* effMayaAnimAlloc(MayaAnimData* data) {
+	s32 size = data->lists->count * sizeof(MayaJoint) + 0x18;
+	MayaAnim* anim = __memAlloc(HEAP_EFFECT, size);
+	memset(anim, 0, size);
+	anim->data = data;
+	return anim;
+}
+
+void effDeleteMayaAnim(MayaAnim* anim) {
+	__memFree(HEAP_EFFECT, anim);
+}
+
+void effPlayMayaAnim(MayaAnim* anim) {
+	OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
+	anim->startTime = now / (OS_TIMER_CLOCK / 1000);
+	anim->time = 0.0f;
+	anim->flags |= 1;
+}
+
+void effCalcMayaAnim(MayaAnim* anim) {
+	if ((anim->flags & 1) && !(anim->flags & 2)) {
+		OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
+		s32 i;
+		now = now / (OS_TIMER_CLOCK / 1000);
+		anim->time = (f32)(u64)(now - anim->startTime) * gp->framerate / 1000.0f;
+		if (anim->time >= anim->data->endTime) {
+			anim->time = anim->data->endTime;
+			anim->flags |= 2;
+		}
+		for (i = 0; i < anim->data->lists->count; i++) {
+			effCalcMayaAnimMatrix(anim, &anim->data->lists->entries[i], (f32*)anim->joints[i].mtx, &anim->joints[i].alpha);
+		}
+	}
+}
+
+void effDrawMayaPoly(MayaPoly* poly) {
+	s32 i;
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 9);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 9);
+	GXSetCullMode(GX_CULL_NONE);
+	for (i = 0; i < poly->count; i++) {
+		s16* strip = poly->strips[i];
+		u16 n = strip[0];
+		s16* v;
+		s32 j;
+		GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, n);
+		v = strip + 1;
+		for (j = 0; j < n; j++, v += 5) {
+			GXPosition3s16(v[0], v[1], v[2]);
+			GXTexCoord2s16(v[3], v[4]);
+		}
+	}
 }

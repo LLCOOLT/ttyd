@@ -1537,7 +1537,7 @@ USER_FUNC(senteresa_dispoff) {
 
 USER_FUNC(senteresa_huttobu) {
     ExtPose* pose = extGetPosePtr();
-    NpcEntry* npc = npcNameToPtr("\203e\203\214\203T");
+    NpcEntry* npc = npcNameToPtr("\203A\203g\203~\203b\203N\203e\203\214\203T");
     s32 n = extGetPoseNum();
     s32 i;
     f32 scale;

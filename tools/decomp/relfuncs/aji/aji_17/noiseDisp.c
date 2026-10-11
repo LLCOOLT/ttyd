@@ -8,14 +8,23 @@
 // decl: const GXColor noise_color = {0, 0, 0, 0};
 // proto: void noiseDisp(CameraId cameraId, void* param);
 void noiseDisp(CameraId cameraId, void* param) {
-    GXTexObj tex;
+    CameraEntry* cam;
+    s32 y;
+    s32 x;
     Mtx mtx;
-    CameraEntry* cam = camGetPtr(cameraId);
-    u8* buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
-    s32 y, x, i, n, len, start;
-    s32 by, ry, off;
+    s32 i;
+    u8* buf;
+    s32 n;
+    s32 len;
+    s32 start;
+    s32 by;
+    s32 ry;
+    s32 off;
     u8 col;
+    GXTexObj tex;
 
+    cam = camGetPtr(cameraId);
+    buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
         by = y / 4;
         ry = y % 4;

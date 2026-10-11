@@ -15,7 +15,7 @@ obj = f'build\\G8MJ01\\src\\{rel.replace("/", chr(92))}.o'
 cmd = subprocess.run([sys.executable, '-m', 'ninja', '-t', 'commands', obj], capture_output=True, text=True).stdout.strip().splitlines()
 if not cmd:
     print('no ninja command for', obj); sys.exit(1)
-line = cmd[-1]
+line = cmd[-1].replace(' -MMD', '').replace(' -MD', '')  # no stray .d in cwd
 tmp = os.path.join(tempfile.gettempdir(), 'dolfd', str(os.getpid()))
 os.makedirs(tmp, exist_ok=True)
 # compile into a private dir instead of build/

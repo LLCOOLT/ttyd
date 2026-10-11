@@ -166,8 +166,9 @@ s32 marioPartyHello(PartyId id) {
 
 BOOL marioPartyGoodbye(void) {
     BOOL ret = FALSE;
-    if (marioGetPtr()->currPartySlotId[0] >= 0) {
-        partyGoodbye(marioGetPtr()->currPartySlotId[0]);
+    s8 slot = marioGetPtr()->currPartySlotId[0];
+    if (slot >= 0) {
+        partyGoodbye(slot);
         ret = TRUE;
     }
     return ret;
@@ -249,7 +250,8 @@ void partyLeft(PartyId partnerId) {
 BOOL partyChkJoin(PartyId partnerId) {
     BOOL ret = FALSE;
     if (partnerId < 8) {
-        ret = pouchGetPtr()->partyData[partnerId].flags & 1;
+        u32 joined = pouchGetPtr()->partyData[partnerId].flags & 1;
+        ret = joined;
     }
     return ret;
 }

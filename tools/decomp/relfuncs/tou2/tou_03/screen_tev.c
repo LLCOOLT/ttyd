@@ -31,7 +31,7 @@ void screen_tev(MapTevCallbackInfo* info) {
             buf = screen_wp->noise;
             for (i = 0; i < 64; i++) {
                 for (j = 0; j < 64; j++) {
-                    buf[(j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8] = (i & 1) ? 0xFF : 0;
+                    buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = (i & 1) ? 0xFF : 0;
                 }
                 n = rand() % 100 + 100;
                 for (k = 0; k < n; k++) {
@@ -39,7 +39,7 @@ void screen_tev(MapTevCallbackInfo* info) {
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        buf[(j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8] = col;
+                        buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = col;
                     }
                 }
             }
@@ -84,7 +84,11 @@ void screen_tev(MapTevCallbackInfo* info) {
             PSMTXScale(scale, screen_wp->scale, screen_wp->scale, 1.0f);
             lim = (1.0f - screen_wp->scale) / screen_wp->scale;
             y = screen_wp->y > lim ? lim : screen_wp->y;
-            x = screen_wp->x > lim ? lim : screen_wp->x;
+            if (screen_wp->x > lim) {
+                x = lim;
+            } else {
+                x = screen_wp->x;
+            }
             PSMTXTrans(trans, x, y, 0.0f);
             PSMTXConcat(scale, trans, mtx);
         } else {

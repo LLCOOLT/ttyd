@@ -1,9 +1,11 @@
 #include "battle/battle_information.h"
 #include "battle/battle.h"
 #include "evt/evt_cmd.h"
-#include "evt/evt_lottery.h"
 #include "mario/mario_pouch.h"
 #include "system.h"
+
+#pragma auto_inline off
+#pragma optimize_for_size on
 
 void BattleInformationSetMode(FieldBattleInfo* info, u32 mode) {
 	info->mode = mode;
@@ -60,8 +62,11 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	s32 held, random, none;
 	s32 type;
 	s32 r;
+	s32 sum;
 	s32 i;
 	ItemDropData* drop;
+	ItemDropData* p;
+	ItemType item;
 	ItemHogTable hog;
 
 	pct = mario->currentHp * 100 / mario->maxHp;
@@ -71,8 +76,10 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	setup->heartsDropped = 0;
 	for (; hp->maxStatPercent; hp++) {
 		if (pct <= hp->maxStatPercent) {
-			if (irand(100) < hp->overallDropChance) {
-				for (n = hp->numDrops; n != 0; n--) {
+			r = irand(100);
+			n = hp->numDrops;
+			if (r < hp->overallDropChance) {
+				for (; n != 0; n--) {
 					if (irand(100) < hp->dropChance) {
 						setup->heartsDropped++;
 					}
@@ -89,8 +96,10 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	setup->flowersDropped = 0;
 	for (; fp->maxStatPercent; fp++) {
 		if (pct <= fp->maxStatPercent) {
-			if (irand(100) < fp->overallDropChance) {
-				for (n = fp->numDrops; n != 0; n--) {
+			r = irand(100);
+			n = fp->numDrops;
+			if (r < fp->overallDropChance) {
+				for (; n != 0; n--) {
 					if (irand(100) < fp->dropChance) {
 						setup->flowersDropped++;
 					}
@@ -104,7 +113,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	random = group->randomItemWeight;
 	none = group->noItemWeight;
 	type = 0;
-	if (evtGetValue(NULL, GSW(0)) < 20) {
+	if (evtGetValue(NULL, GSW(0)) <= 19) {
 		random = 0;
 		held = 0;
 		none = 100;
@@ -114,7 +123,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 		held *= n + 1;
 		random *= n + 1;
 	}
-	r = irand(random + (held + none));
+	r = irand(random + held + none);
 	if ((r -= random) < 0) {
 		type = 1;
 	} else if ((r -= held) < 0) {
@@ -122,15 +131,18 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	}
 	setup->itemDropped = 0;
 	switch (type) {
+		case 0:
+			break;
 		case 1:
 			drop = group->enemyData->itemDropTable;
+			p = drop;
 			if (drop) {
-				r = 0;
-				for (i = 0; drop[i].dropWeight > 0 || drop[i].type != 0; i++) {
-					r += drop[i].dropWeight;
+				sum = 0;
+				for (; p->dropWeight > 0 || p->type != 0; p++) {
+					sum += p->dropWeight;
 				}
-				if (r > 0) {
-					r = irand(r);
+				if (sum > 0) {
+					r = irand(sum);
 					for (;; drop++) {
 						if ((r -= drop->dropWeight) < 0) {
 							setup->itemDropped = drop->type;
@@ -141,8 +153,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 			}
 			break;
 		case 2:
-			n = 0;
-			for (i = 0; i < 8; i++) {
+			for (n = i = 0; i < 8; i++) {
 				if (setup->heldItems[i]) {
 					n++;
 				}
@@ -150,8 +161,9 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 			if (n > 0) {
 				r = irand(n);
 				for (i = 0; i < 8; i++) {
-					if (setup->heldItems[i] && --r < 0) {
-						setup->itemDropped = setup->heldItems[i];
+					item = setup->heldItems[i];
+					if (item && --r < 0) {
+						setup->itemDropped = item;
 						break;
 					}
 				}

@@ -8,6 +8,8 @@ USER_FUNC(ship_rotate) {
     f32 x2 = evtGetFloat(event, args[2]);
     f32 z2 = evtGetFloat(event, args[3]);
 
-    evtSetFloat(event, args[4], angleABf(x1, -z1, x2, -z2) - 90.0f);
+    f32 angle = angleABf(x1, -z1, x2, -z2);
+
+    evtSetFloat(event, args[4], angle - 90.0f);
     return EVT_RETURN_DONE;
 }

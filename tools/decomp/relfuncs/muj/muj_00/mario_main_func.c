@@ -7,7 +7,7 @@
 // decl: OrbitData* _op;
 // decl: double sin(double x);
 // decl: double cos(double x);
-// decl: #define ORBIT(i, pos) op[i].angle += d; rad = 3.141592f * op[i].angle / 180.0f; r = op[i].dist; (pos).x = r * (f32)sin(rad) + cx; (pos).z = r * (f32)cos(rad) + cz;
+// decl: #define ORBIT(i, pos) { f32 rad; f32 r; f32 x; f32 z; op[i].angle += d; rad = 3.141592f * op[i].angle / 180.0f; r = op[i].dist; x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; (pos).x = x; (pos).z = z; }
 // proto: USER_FUNC(mario_main_func);
 USER_FUNC(mario_main_func) {
     s32* args = event->args;
@@ -25,8 +25,6 @@ USER_FUNC(mario_main_func) {
     NpcEntry* npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
     NpcEntry* npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
     f32 d = b - a;
-    f32 rad;
-    f32 r;
 
     ORBIT(0, mario->position);
     ORBIT(1, party->position);

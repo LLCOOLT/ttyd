@@ -10,8 +10,8 @@ USER_FUNC(mist_func) {
     f32 x = evtGetFloat(event, args[0]);
     f32 y = evtGetFloat(event, args[1]);
     f32 z = evtGetFloat(event, args[2]);
-    BOOL done = FALSE;
     EffectEntry* eff;
+    BOOL done = FALSE;
 
     if (isFirstCall) {
         x += irand(150) - 75;

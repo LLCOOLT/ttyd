@@ -1,0 +1,222 @@
+#include "driver/animdrv.h"
+#include "driver/imgdrv.h"
+#include "driver/offscreendrv.h"
+#include "evt/evt_cmd.h"
+#include "mario/mariost.h"
+#include "manager/evtmgr_cmd.h"
+#include <dolphin/gx.h>
+
+typedef struct DEMORenderModeObj {
+    u8 pad[4];
+    u16 fbWidth;
+    u16 efbHeight;
+} DEMORenderModeObj;
+extern DEMORenderModeObj* DEMOGetRenderModeObj(void);
+
+USER_FUNC(evt_img_entry) {
+    imgEntry((const char*)evtGetValue(event, event->args[0]), gp->inBattle != 0);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_position) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    img->field_0xE8 = x;
+    img->field_0xEC = y;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_paper) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    const char* anim = (const char*)evtGetValue(event, args[1]);
+    s32 group = gp->inBattle != 0;
+    ImageEntry* img = imgNameToPtr(name, group);
+    img->poseId = animPaperPoseGetId(anim, group);
+    *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+    animPoseSetMaterialFlagOn(img->poseId, 0x1800);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_paper_anim) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 anim = evtGetValue(event, args[1]);
+    s32 group = gp->inBattle != 0;
+    ImageEntry* img = imgNameToPtr(name, group);
+    img->field_0x108 = anim;
+    *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_alloc_capture) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 shadowId = evtGetValue(event, args[1]);
+    const char* offName = (const char*)evtGetValue(event, args[2]);
+    s32 unk = evtGetValue(event, args[3]);
+    s32 x = evtGetValue(event, args[4]);
+    s32 y = evtGetValue(event, args[5]);
+    s32 w = evtGetValue(event, args[6]);
+    s32 h = evtGetValue(event, args[7]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    ImageShadow* sh = &img->shadows[shadowId];
+    s32 offId;
+    s32 i;
+
+    if (offName != NULL) {
+        offId = offscreenNameToId(offName);
+    } else {
+        offId = -1;
+    }
+    if (sh->flags & 4) {
+        return EVT_RETURN_DONE;
+    }
+    x -= x & 1;
+    y -= y & 1;
+    w += w & 1;
+    h += h & 1;
+    for (i = 0; i < 3; i++) {
+        if (i != shadowId && (img->shadows[i].flags & 4) && (img->field_0xE4 != (u16)w || img->field_0xE6 != (u16)h)) {
+            return EVT_RETURN_DONE;
+        }
+    }
+    if (x == 0 && y == 0 && w == 0 && h == 0 && offId != -1) {
+        img->field_0xE4 = 0;
+        img->field_0xE6 = 0;
+        sh->field_0x4 = 0;
+        sh->field_0x6 = 0;
+        if (shadowId == 2) {
+            sh->field_0x14 = 39;
+            sh->field_0x18 = 1;
+        } else {
+            sh->field_0x14 = 6;
+            sh->field_0x18 = 6;
+        }
+        img->flags |= 4;
+    } else {
+        if (x < 0 || y < 0 || w <= 0 || h <= 0 ||
+            x + w > DEMOGetRenderModeObj()->fbWidth || y + h > DEMOGetRenderModeObj()->efbHeight) {
+            return EVT_RETURN_DONE;
+        }
+        img->field_0xE4 = w;
+        img->field_0xE6 = h;
+        sh->field_0x4 = x;
+        sh->field_0x6 = y;
+        if (shadowId == 2) {
+            sh->field_0x14 = 39;
+            sh->field_0x18 = 1;
+        } else {
+            sh->field_0x14 = 6;
+            sh->field_0x18 = 6;
+        }
+    }
+    sh->field_0x10 = offId;
+    sh->flags = 0x14;
+    sh->field_0x40 = unk;
+    if (unk != 0) {
+        sh->flags |= 0x100;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_free_capture) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 shadowId = evtGetValue(event, args[1]);
+    imgFreeCapture(imgNameToPtr(name, gp->inBattle != 0), shadowId);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_onoff) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 on = evtGetValue(event, args[1]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    if (on != 0) {
+        img->flags &= ~2;
+    } else {
+        img->flags |= 2;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_virtual_point) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    Vec tmp;
+    Vec pos = { 0.0f, 0.0f, 0.0f };
+    pos.x = x;
+    pos.y = y;
+    pos.z = z;
+    tmp = pos;
+    imgSetVirtualPoint(img, &tmp);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_clear_virtual_point) {
+    imgClearVirtualPoint(imgNameToPtr((const char*)evtGetValue(event, event->args[0]), gp->inBattle != 0));
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_release) {
+    ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, event->args[0]), gp->inBattle != 0);
+    imgRelease(img, gp->inBattle != 0);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_wait_animend) {
+    ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, event->args[0]), gp->inBattle != 0);
+    if (isFirstCall) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (img->field_0x118 < 1.0f) {
+        return EVT_RETURN_BLOCK;
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_shadow) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 id = evtGetValue(event, args[1]);
+    imgSetShadow(imgNameToPtr(name, gp->inBattle != 0), id);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_paper_timerate) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 rate = evtGetFloat(event, args[1]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    animPoseSetLocalTimeRate(img->poseId, rate);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_img_set_color) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    u8 r = evtGetValue(event, args[1]);
+    u8 g = evtGetValue(event, args[2]);
+    u8 b = evtGetValue(event, args[3]);
+    u8 a = evtGetValue(event, args[4]);
+    ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
+    animPoseSetMaterialFlagOn(img->poseId, 0x40);
+    animPoseSetMaterialEvtColor(img->poseId, (GXColor){r, g, b, a});
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(N_evt_img_set_z) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 z = evtGetFloat(event, args[1]);
+    imgNameToPtr(name, gp->inBattle != 0)->order = z;
+    return EVT_RETURN_DONE;
+}

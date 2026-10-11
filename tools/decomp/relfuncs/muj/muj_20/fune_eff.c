@@ -10,7 +10,7 @@ static USER_FUNC(fune_eff) {
     EffectEntry* eff1;
     EffectEntry* eff2;
     Vec pos;
-    f32 oldX, oldZ, speed;
+    f32 oldX, oldZ, off85, speed;
 
     if (isFirstCall) {
         event->userdatap[0] = effFunemizuEntry(0, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
@@ -28,11 +28,12 @@ static USER_FUNC(fune_eff) {
     *(f32*)&event->field_84 = pos.z;
     speed = distABf(oldX, oldZ, pos.x, pos.z);
     angleABf(oldX, oldZ, pos.x, pos.z);
+    off85 = 85.0f;
     if (evtGetValue(event, GSW(0)) == 2) {
         speed = 2.0f;
     }
     ((f32*)eff1->userdata)[17] = 3.0f;
-    ((f32*)eff1->userdata)[1] = pos.x + 85.0f;
+    ((f32*)eff1->userdata)[1] = pos.x + off85;
     ((f32*)eff1->userdata)[2] = pos.y - 51.0f;
     ((f32*)eff1->userdata)[3] = 30.0f + pos.z;
     ((f32*)eff1->userdata)[4] = speed;

@@ -9,6 +9,7 @@
 // decl: ExtPose* extGetPosePtr(void);
 // decl: s32 extGetPoseNum(void);
 // proto: static void pose_main(void);
+#pragma dont_inline on
 static void pose_main(void) {
     s32 i;
     ExtPose* pose;
@@ -29,3 +30,4 @@ static void pose_main(void) {
         pose->frame = a->start + (s32)((a->count - 1) * t);
     }
 }
+#pragma dont_inline reset

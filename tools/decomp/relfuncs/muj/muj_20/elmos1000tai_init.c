@@ -13,10 +13,10 @@ USER_FUNC(elmos1000tai_init) {
     s32 deg;
     s32 a;
     s32 r;
-    f32 dist;
-    f32 cs;
-    f32 rad;
     f32 sn;
+    f32 rad;
+    f32 cs;
+    f32 dist;
     f32 fdeg;
 
     wp->flags |= 1;
@@ -32,9 +32,9 @@ USER_FUNC(elmos1000tai_init) {
             deg = irand(360);
         }
         fdeg = deg;
-        a = __abs(180 - deg);
         npc->dist = 250;
         r = 330;
+        a = __abs(180 - deg);
         if (a < 70) {
             r = (70 - a) * 1000 / 70 + 330;
         }

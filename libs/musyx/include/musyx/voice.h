@@ -110,6 +110,16 @@ typedef struct _PBADPCMLOOP {
   u16 loop_yn2;        // offset 0x4, size 0x2
 } _PBADPCMLOOP;
 
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+typedef struct _PBLPF {
+  // total size: 0x8
+  u16 on;  // offset 0x0, size 0x2
+  u16 yn1; // offset 0x2, size 0x2
+  u16 a0;  // offset 0x4, size 0x2
+  u16 b0;  // offset 0x6, size 0x2
+} _PBLPF;
+#endif
+
 typedef struct _PB {
   // total size: 0xBC
   u16 nextHi;             // offset 0x0, size 0x2
@@ -131,7 +141,10 @@ typedef struct _PB {
   _PBADPCM adpcm;         // offset 0x7E, size 0x28
   _PBSRC src;             // offset 0xA6, size 0xE
   _PBADPCMLOOP adpcmLoop; // offset 0xB4, size 0x6
-  u16 streamLoopCnt;      // offset 0xBA, size 0x2
+#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
+  _PBLPF lpf;             // offset 0xBA, size 0x8
+#endif
+  u16 streamLoopCnt;
 } _PB;
 
 typedef struct VSampleInfo {
@@ -142,7 +155,7 @@ typedef struct VSampleInfo {
 } VSampleInfo;
 
 typedef struct VS_BUFFER {
-  // total size: 0x24
+  // total size: 0x2C
   u8 state;                    // offset 0x0, size 0x1
   u8 hwId;                     // offset 0x1, size 0x1
   u8 smpType;                  // offset 0x2, size 0x1
@@ -154,10 +167,10 @@ typedef struct VS_BUFFER {
 } VS_BUFFER;
 
 typedef struct _VS {
-  // total size: 0x950
+  // total size: 0xB50
   u8 numBuffers;              // offset 0x0, size 0x1
   u32 bufferLength;           // offset 0x4, size 0x4
-  VS_BUFFER streamBuffer[64]; // offset 0x8, size 0x900
+  VS_BUFFER streamBuffer[64]; // offset 0x8, size 0xB00
   u8 voices[64];              // offset 0x908, size 0x40
   u16 nextInstID;             // offset 0x948, size 0x2
   u32 (*callback)(u8,

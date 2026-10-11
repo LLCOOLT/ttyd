@@ -123,7 +123,10 @@ typedef struct MarioWork {
     u8 field_0x2A[0x2E - 0x2A];    // 0x2A
     MarioMotion currMotionId;      // 0x2E
     MarioMotion prevMotionId;      // 0x30, TODO check
-    u8 field_0x32[0x3B - 0x32];    // 0x32
+    u8 field_0x32[0x38 - 0x32];    // 0x32
+    s8 ctrlOffCount;               // 0x38
+    s8 keyOffCount;                // 0x39
+    u8 field_0x3A[0x3B - 0x3A];    // 0x3A
     s8 field_0x3B;                 // 0x3B
     s8 characterId;                // 0x3C
     s8 colorId;                    // 0x3D
@@ -148,15 +151,26 @@ typedef struct MarioWork {
     Vec position;                  // 0x8C
     Vec field_0x98;                // 0x98
     Vec field_0xA4;                // 0xA4
-    u8 field_0xB0[0xB4 - 0xB0];    // 0xB0
-    f32 field_0xB4;                // 0xB4, half height times scale
-    u8 field_0xB8[0xC4 - 0xB8];    // 0xB8
-    f32 field_0xC4;                // 0xC4, rotation (degrees)
+    union {
+        Vec rotOfs;                // 0xB0
+        struct {
+            u8 field_0xB0[0xB4 - 0xB0]; // 0xB0
+            f32 field_0xB4;        // 0xB4, half height times scale
+        };
+    };
+    union {
+        Vec rot;                   // 0xBC
+        struct {
+            u8 field_0xBC[0xC4 - 0xBC]; // 0xBC
+            f32 field_0xC4;        // 0xC4, rotation (degrees)
+        };
+    };
     Vec scale;                     // 0xC8
     u8 field_0xD4[0xEC - 0xD4];    // 0xD4
     Vec field_EC;                  // 0xEC
     Vec field_F8;                  // 0xF8
-    u8 unk104[0x134 - 0x104];      // 0x104
+    u8 unk104[0x130 - 0x104];      // 0x104
+    f32 unk130;                    // 0x130, y scale while in tube mode
     CameraId camId;                // 0x134
     f32 unk138;                    // 0x138
     f32 unk13C;                    // 0x13C
@@ -188,15 +202,16 @@ typedef struct MarioWork {
     Vec wPlayerCollisionBox;       // 0x1B4 JP, 0x1B8 US
     u8 field_0x1C0[0x1D8 - 0x1C0]; // 0x1C0
     s32 field_0x1D8;               // 0x1D8
-    s32 field_0x1DC;               // 0x1DC
-    s32 field_0x1E0;               // 0x1E0
+    void* field_0x1DC;              // 0x1DC
+    void* field_0x1E0;              // 0x1E0
 	void* hitobjStandOn;           // 0x1E4, 0x1E8 US HitEntry
 	void* hitobjJumpFrom;          // 0x1E8, 0x1EC US HitEntry
 	void* hitobjPush;              // 0x1EC JP, 0x1F0 US HitEntry
-	s32 field_0x1F0;               // 0x1F0
-	s32 field_0x1F4;               // 0x1F4
-	s32 field_0x1F8;               // 0x1F8
-	u8 field_0x1FC[0x204 - 0x1FC]; // 0x1FC
+	void* field_0x1F0;              // 0x1F0
+	void* field_0x1F4;              // 0x1F4
+	void* field_0x1F8;              // 0x1F8
+	void* field_0x1FC;              // 0x1FC
+	u8 field_0x200[0x204 - 0x200]; // 0x200
 	void* damageHit;               // 0x204, HitEntry
 	u8 field_0x208[0x224 - 0x208]; // 0x208
 	f32 playerGravity;             // 0x224 JP, 228 US
@@ -210,11 +225,18 @@ typedef struct MarioWork {
     u8 field_0x24A[0x24E - 0x24A]; // 0x24A
 	u8 wStickDir1;                 // 0x24E JP, 0x252 US
 	u8 wStickDir2;                 // 0x24F JP, 0x253 US
-	u8 field_0x250[0x288 - 0x250]; // 0x250
+	u8 field_0x250[0x260 - 0x250]; // 0x250
+	void* balloonEffect;           // 0x260, EffectEntry*
+	void* balloonNpc;              // 0x264, NpcEntry*
+	u8 field_0x268[0x278 - 0x268]; // 0x268
+	s32 soundId[3];                // 0x278
+	u8 field_0x284[0x288 - 0x284]; // 0x284
     void* motStruct;               // 0x288, motion userdata, TODO rename?
     u8 field_0x28C[0x2A8 - 0x28C]; // 0x28C
     f32 wCamVal1;                  // 0x2A8, TODO: double check
-    u8 field_0x2AC[0x2CC - 0x2AC]; // 0x2AC
+    u8 field_0x2AC[0x2B8 - 0x2AC]; // 0x2AC
+    f32 unk2B8;                    // 0x2B8, yoshi z rotation
+    u8 field_0x2BC[0x2CC - 0x2BC]; // 0x2BC
     Vec bottomlessResetPosition;   // 0x2CC JP, 0x2E4 US
     u8 field_0x2D8[0x2E0 - 0x2D8]; // 0x2D8
 } MarioWork;                       // size 0x2E0 on Japan
@@ -229,11 +251,11 @@ void marioItemGetDisable(void);
 void marioItemGetChk(void);
 BOOL marioItemGetOk(void);
 BOOL marioCaseEventValidChk(void);
-BOOL mario8005BB80(void);
+BOOL unk_8005bb80(void);
 BOOL marioCheckMenuDisable(void);
 BOOL marioChkKey(void);
 BOOL marioChkCtrl(void);
-s32 mario8005B5A8(void);
+BOOL N_marioChkUseParty(void);
 void marioFBattlePrepare(void);
 void marioFBattlePost(void);
 s32 marioCtrlOffChk(void);
@@ -262,13 +284,13 @@ void marioMove(void);
 void marioMoveMain(void);
 BOOL marioChkPushAnime(void);
 s32 marioAnimeId(void);
-void mario80058374(void);
+void unk_80058374(void);
 void marioChgEvtPose(const char* name);
 const char* toDotMarioPose(const char* name);
 void marioChgPose(const char* name);
 void marioChgPoseTime(const char* name, s16 frames);
 void marioChgPaper(const char* name);
-void marioSetPaperAnimeLocalTime(s16 frames);
+void marioSetPaperAnimeLocalTime(s32 frames);
 BOOL marioPaperOn(const char* name);
 void marioPaperOff(void);
 void marioPaperLightOn(void);

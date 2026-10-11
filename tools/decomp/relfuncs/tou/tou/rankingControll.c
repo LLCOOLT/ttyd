@@ -9,22 +9,26 @@
 // decl: static __declspec(section ".data") RankWork* rank_wp;
 // decl: static __declspec(section ".data") DispWork* dwp;
 // include: string.h
-// decl: static inline s32 getRank(void) { s32 i; s32 rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } else { rank++; } } } return rank; }
+// decl: #define GET_RANK(rank, i) rank = 0; for (i = 0; i < rank_wp->num; i++) { if (!(rank_wp->entries[i].flags & 2)) { if (rank_wp->entries[i].flags & 4) { break; } rank++; } }
 // decl: static s32 fighterDt_raw[161];
 // decl: #define fighterDt ((FighterData*)fighterDt_raw)
 // decl: static void insert(s32* list, s32 num, s32 from, s32 to);
-// decl: static inline void sortScore(s32* list, s32 num) { s32 i; s32 j; s32 a; s32 b; for (i = 0; i < num - 1; i++) { for (j = i + 1; j < num; j++) { a = list[i]; b = list[j]; if (rank_wp->entries[a].score < rank_wp->entries[b].score) { list[i] = b; list[j] = a; } } } }
-// decl: static inline void sortFlag(s32* list, s32 num) { s32 i; s32 j; s32 a; s32 b; for (i = 0; i < num - 1; i++) { for (j = i + 1; j < num; j++) { b = list[j]; a = list[i]; if ((fighterDt[rank_wp->entries[b].id].flags & 5) && (fighterDt[rank_wp->entries[a].id].flags & 2)) { list[i] = b; list[j] = a; } } } }
-// decl: static inline s32 findFlag(s32* list, s32 num, u16 flag) { s32 i; for (i = 0; i < num; i++) { if (fighterDt[rank_wp->entries[list[i]].id].flags & flag) { break; } } return i; }
-// decl: static inline void moveFlag(s32* list, s32 num, u16 flag, s32 pos) { s32 i = findFlag(list, num, flag); if (i < num) { insert(list, num, i, pos); } }
+// decl: #define SORT_SCORE(list, n) for (i = 0; i < n - 1; i++) { for (j = i + 1; j < n; j++) { if (rank_wp->entries[list[i]].score < rank_wp->entries[list[j]].score) { tmp = list[i]; list[i] = list[j]; list[j] = tmp; } } }
+// decl: #define SORT_FLAG(list, n) for (i = 0; i < n - 1; i++) { for (j = i + 1; j < n; j++) { pb = &fighterDt[rank_wp->entries[list[i]].id]; if ((fighterDt[rank_wp->entries[list[j]].id].flags & 5) && (pb->flags & 2)) { tmp = list[i]; list[i] = list[j]; list[j] = tmp; } } }
+// decl: #define FIND_FLAG(k, list, n, flag) for (k = 0; k < n; k++) { if (fighterDt[rank_wp->entries[list[k]].id].flags & flag) { break; } }
+// decl: #define MOVE_FLAG(list, n, flag, pos) FIND_FLAG(k, list, n, flag); if (k < n) { insert(list, n, k, pos); }
 // proto: static void rankingControll(void);
 static void rankingControll(void) {
-    s32 lose[32];
     s32 win[32];
+    s32 lose[32];
     s32 nwin = 0;
     s32 nlose = 0;
     s32 i;
     s32 j;
+    s32 m;
+    s32 k;
+    s32 tmp;
+    FighterData* pb;
     RankEntry* entry;
     RankEntry* work;
 
@@ -39,25 +43,25 @@ static void rankingControll(void) {
         }
     }
     if (nwin > 0) {
-        sortScore(win, nwin);
-        sortFlag(win, nwin);
+        SORT_SCORE(win, nwin);
+        SORT_FLAG(win, nwin);
         if (nwin > 0) {
-            moveFlag(win, nwin, 0x4, 0);
+            MOVE_FLAG(win, nwin, 0x4, 0);
         }
         if (nwin > 1) {
-            moveFlag(win, nwin, 0x1000, 1);
+            MOVE_FLAG(win, nwin, 0x1000, 1);
         }
         if (nwin > 10) {
-            moveFlag(win, nwin, 0x800, 10);
+            MOVE_FLAG(win, nwin, 0x800, 10);
         }
         if (nwin > 18) {
-            moveFlag(win, nwin, 0x200, 18);
+            MOVE_FLAG(win, nwin, 0x200, 18);
         }
         if (nwin > 19) {
-            moveFlag(win, nwin, 0x400, 19);
+            MOVE_FLAG(win, nwin, 0x400, 19);
         }
         if (nwin > 16) {
-            moveFlag(win, nwin, 0x100, 14);
+            MOVE_FLAG(win, nwin, 0x100, 14);
         }
         if (swGet(0x9E4)) {
             for (i = 0; i < nwin; i++) {
@@ -71,17 +75,17 @@ static void rankingControll(void) {
         }
     }
     if (nlose > 0) {
-        sortScore(lose, nlose);
-        sortFlag(lose, nlose);
+        SORT_SCORE(lose, nlose);
+        SORT_FLAG(lose, nlose);
         if (nlose > 0) {
-            moveFlag(lose, nlose, 0x4, 0);
+            MOVE_FLAG(lose, nlose, 0x4, 0);
         }
         if (nlose > 0) {
-            i = findFlag(lose, nlose, 0x800);
-            if (i < nlose) {
-                j = findFlag(lose, nlose, 0x2);
-                if (j < nlose && j > 0) {
-                    insert(lose, nlose, i, j - 1);
+            FIND_FLAG(m, lose, nlose, 0x800);
+            if (m < nlose) {
+                FIND_FLAG(k, lose, nlose, 0x2);
+                if (k < nlose && k > 0) {
+                    insert(lose, nlose, m, k - 1);
                 }
             }
         }
@@ -104,9 +108,10 @@ static void rankingControll(void) {
     work[nwin].id = 20;
     work[nwin].score = 0;
     for (i = 0; i < nlose; i++) {
-        work[nwin + i + 1] = rank_wp->entries[lose[i]];
+        work[nwin + 1 + i] = rank_wp->entries[lose[i]];
     }
     memcpy(rank_wp->entries, work, rank_wp->num * sizeof(RankEntry));
     __memFree(HEAP_DEFAULT, work);
-    swByteSet(0x244, getRank());
+    GET_RANK(j, i);
+    swByteSet(0x244, j);
 }

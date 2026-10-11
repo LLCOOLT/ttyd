@@ -21,7 +21,7 @@ static void rankingExit(void) {
             swClear(entry->id + 0x9A1);
         }
         for (j = 0; j < 2; j++) {
-            swByteSet(entry->id * 2 + j + 0x207, entry->sw[j]);
+            swByteSet(j + (entry->id * 2 + 0x207), entry->sw[j]);
         }
     }
     _mapFree(rank_wp->entries);

@@ -3,13 +3,13 @@
 // proto: USER_FUNC(minigameselect_msg_set);
 USER_FUNC(minigameselect_msg_set) {
     s32* args = event->args;
-    const char* msg = msgSearch((const char*)evtGetValue(event, args[0]));
+    const s8* msg = (const s8*)msgSearch((const char*)evtGetValue(event, args[0]));
     s32 flags[4];
-    s32 i;
-    s32 j;
     s32 k;
-    s32 count;
+    s32 i;
     s32 val;
+    s32 j;
+    s32 count;
 
     flags[0] = evtGetValue(event, GSWF(1232));
     flags[1] = evtGetValue(event, GSWF(1235));
@@ -41,15 +41,17 @@ USER_FUNC(minigameselect_msg_set) {
     }
     exchange_msgp[j] = msg[i];
     k = 0;
-    while (exchange_msgp[k] != '>') {
+    while (((s8*)exchange_msgp)[k] != '>') {
         k++;
     }
-    while (exchange_msgp[k] != ' ') {
+    while (((s8*)exchange_msgp)[k] != ' ') {
         k--;
     }
     val = 80 - (4 - count) * 12;
-    exchange_msgp[k + 1] = val / 10 + '0';
-    exchange_msgp[k + 2] = val % 10 + '0';
+    k++;
+    exchange_msgp[k] = val / 10 + '0';
+    k++;
+    exchange_msgp[k] = val % 10 + '0';
     evtSetValue(event, args[1], (s32)exchange_msgp);
     return EVT_RETURN_DONE;
 }

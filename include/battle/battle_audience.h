@@ -37,16 +37,32 @@ typedef struct StarPowerInfo {
 typedef struct BattleAudienceMember {
     s32 flags;                     // 0x0
     s32 field_0x4;                 // 0x4
-    u8 field_0x8[0x19 - 0x8];      // 0x8
+    s32 field_0x8;                 // 0x8
+    f32 field_0xC;                 // 0xC
+    f32 field_0x10;                // 0x10
+    f32 field_0x14;                // 0x14
+    u8 field_0x18;                 // 0x18
     u8 status;                     // 0x19
     u8 field_0x1A;                 // 0x1A
     u8 type;                       // 0x1B, AudienceMemberType
     s16 itemId;                    // 0x1C, -1 is invalid
     u8 field_0x1E[0x20 - 0x1E];    // 0x1E
     s32** animTable;               // 0x20, set in BattleAudience_Entry_Sub
-    u8 field_0x24[0x48 - 0x24];    // 0x24
+    u8 field_0x24[0x30 - 0x24];    // 0x24
+    s32 field_0x30;                // 0x30
+    u8 field_0x34[0x41 - 0x34];    // 0x34
+    u8 field_0x41;                 // 0x41
+    u8 field_0x42;                 // 0x42
+    u8 field_0x43;                 // 0x43
+    u8 field_0x44;                 // 0x44
+    u8 field_0x45[0x48 - 0x45];    // 0x45
     Vec position;                  // 0x48
-    u8 field_0x54[0x9C - 0x54];    // 0x54
+    u8 field_0x54[0x60 - 0x54];    // 0x54
+    Vec field_0x60;                // 0x60
+    Vec field_0x6C;                // 0x6C
+    Vec field_0x78;                // 0x78
+    u8 field_0x84[0x90 - 0x84];    // 0x84
+    Vec field_0x90;                // 0x90
     Vec mRotation;                 // 0x9C
     Vec mRotationOffset;           // 0xA8
     Vec mHomePosition;             // 0xB4
@@ -157,11 +173,17 @@ typedef struct BattleAudience {
     s32 mCurrentAudienceIntCountRight; // 0x13788, TODO verify name
     s32 mCurrentAudienceIntCountLeft;  // 0x1378C, TODO verify name
     s32 mMaxAudience;                  // 0x13790
-    u8 field_13794[0x137D4 - 0x13794]; // 0x13794
+    u8 field_13794[0x137C4 - 0x13794]; // 0x13794
+    s32 field_137C4;                   // 0x137C4
+    u8 field_137C8[0x137D4 - 0x137C8]; // 0x137C8
     s32 mNumStylishCommandsThisAttack; // 0x137D4
     u8 field_137D8[0x137DC - 0x137D8]; // 0x137D8
     s32 mCheckPhaseReactionState;      // 0x137DC, TODO: rename
-    u8 field_137E0[0x138BC - 0x137E0]; // 0x137E0
+    u8 field_137E0[0x137E4 - 0x137E0]; // 0x137E0
+    s32 presentItemNo;                 // 0x137E4
+    s32 presentItemType;               // 0x137E8
+    s32 presentTargetUnitId;           // 0x137EC
+    u8 field_137F0[0x138BC - 0x137F0]; // 0x137F0
     s32 mItemOnMemberId;               // 0x138BC, TODO better name
     Vec mItemOnMemberPos;              // 0x138C0, TODO better name?
     u8 field_138CC[0x13908 - 0x138CC]; // 0x138CC

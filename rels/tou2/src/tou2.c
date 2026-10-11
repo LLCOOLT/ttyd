@@ -27,7 +27,10 @@ typedef struct RankEntry {
     u16 flags;
     // pad 2 bytes
     s32 id;
-    u8 points[2]; // TODO: see if there's a way to re-type this to s16 and keep rankingInit matching
+    union {
+        s16 total;
+        u8 bytes[2];
+    } points;
     // pad 2 bytes
 } RankEntry;
 
@@ -154,9 +157,9 @@ EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
 void FontDrawScale(f32 scale);
 void FontDrawMessageMtx(Mtx mtx, const char* msg);
 
-static s32 champion_belt_onoff;
-static DispWork disp_work;
 static RankData rank_work;
+static DispWork disp_work;
+static s32 champion_belt_onoff;
 
 __declspec(section ".data") u64 fd_tou2_negone_one_374 = 0xBF8000003F800000;
 
@@ -309,6 +312,17 @@ static RankData* rank_wp = &rank_work;
 static DispWork* dwp = &disp_work;
 static const char* suuji[] = { "０", "１", "２", "３", "４", "５", "６", "７", "８", "９" };
 
+// disp_proc templates
+static const GXColor titleColor = { 0xDC, 0xC8, 0xDC, 0xFF };
+static const GXColor numberColor = { 0xDC, 0xC8, 0xDC, 0xFF };
+static const GXColor playerColor = { 0xFF, 0x00, 0x00, 0xFF };
+static const GXColor nameColor = { 0xDC, 0xC8, 0xDC, 0xFF };
+static const Vec cursorPos = { 0.0f, 0.0f, 0.0f };
+static const Vec upArrowPos = { 0.0f, 125.0f, 0.0f };
+static const Vec upButtonPos = { 0.0f, 75.0f, 0.0f };
+static const Vec downArrowPos = { 0.0f, -140.0f, 0.0f };
+static const Vec downButtonPos = { 0.0f, -125.0f, 0.0f };
+
 // local prototypes
 static f32 camGetRy(void);
 f32 atan2f(f32 y, f32 x);
@@ -318,23 +332,6 @@ static void rankingControll(void);
 static void insert(s32* arr, s32 n, s32 from, s32 to);
 static void rankingExit(void);
 static void rankingInit(void);
-
-// Number of visible fighters ranked above the player
-static inline s32 rankGetPlayerRank(void) {
-    s32 i;
-    s32 rank = 0;
-
-    for (i = 0; i < rank_wp->count; i++) {
-        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
-            if (rank_wp->entries[i].flags & RANK_PLAYER) {
-                break;
-            }
-            rank++;
-        }
-    }
-    return rank;
-}
-
 USER_FUNC(tou_champion_belt_onoff_28_text_29DC) {
     champion_belt_onoff = evtGetValue(event, event->args[0]);
     return EVT_RETURN_DONE;
@@ -345,6 +342,7 @@ USER_FUNC(tou_champion_belt_28_text_2A10) {
     EffectEntry* eff;
     AnimationPose* pose;
     Vec* positions;
+    StarStoneWork** work;
     s32 group;
     f32 angle;
 
@@ -360,23 +358,24 @@ USER_FUNC(tou_champion_belt_28_text_2A10) {
     group = animPoseGetGroupIdx(npc->poseId, "locator8");
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
-    ((StarStoneWork*)eff->userdata)->pos.x = positions[group].x;
-    ((StarStoneWork*)eff->userdata)->pos.y = positions[group].y;
-    ((StarStoneWork*)eff->userdata)->pos.z = positions[group].z;
+    work = (StarStoneWork**)&eff->userdata;
+    (*work)->pos.x = positions[group].x;
+    (*work)->pos.y = positions[group].y;
+    (*work)->pos.z = positions[group].z;
     if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
-        ((StarStoneWork*)eff->userdata)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+        (*work)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
-        ((StarStoneWork*)eff->userdata)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+        (*work)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
     }
     if (npc->position.y <= -1000.0f) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        (*work)->pos.x = 0.0f;
+        (*work)->pos.y = -1000.0f;
+        (*work)->pos.z = 0.0f;
     }
     if (champion_belt_onoff) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        (*work)->pos.x = 0.0f;
+        (*work)->pos.y = -1000.0f;
+        (*work)->pos.z = 0.0f;
     }
     return EVT_RETURN_BLOCK;
 }
@@ -435,8 +434,11 @@ static USER_FUNC(evt_tou_print_ranking) {
 
 static void disp_proc(CameraId cameraId, void* param) {
     FighterData* fighters;
+    f32 winW;
     f32 left;
-    u16 width;
+    f32 top;
+    f32 x;
+    s32 width;
     u16 scissorX;
     u16 scissorW;
     s32 i;
@@ -447,23 +449,31 @@ static void disp_proc(CameraId cameraId, void* param) {
     char buf[0x100];
 
     fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
-    left = -250.0f * 0.5f;
+    winW = 250.0f;
+    left = -winW / 2.0f;
     windowDispGX_System(0, 0xFF, left - 30.0f, 165.0f, 310.0f, 330.0f);
     FontDrawStart();
     FontDrawScale(1.0f);
     width = FontGetMessageWidth("\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
     {
-        GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+        GXColor color = titleColor;
         FontDrawColor(color);
     }
-    FontDrawMessage(-width / 2, 135.0f, "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
-    scissorX = 304.0f + left;
-    scissorW = 250.0f;
-    GXSetScissor(scissorX, (u16)145.0f, scissorW, (u16)220.0f);
+    top = 135.0f;
+    FontDrawMessage(-width / 2, top, "\x83\x89\x83\x93\x83\x4C\x83\x93\x83\x4F");
+    {
+        f32 sy = 145.0f;
+        f32 sh = 220.0f;
+        scissorX = 304.0f + left;
+        scissorW = winW;
+        GXSetScissor(scissorX, (u16)sy, scissorW, (u16)sh);
+    }
+
 
     num = 0;
     for (i = 0; i < rank_wp->count; i++) {
-        y = dwp->scroll + (135.0f - num * 20 - 40.0f);
+        x = 10.0f + left;
+        y = dwp->scroll + (top - num * 20 - 40.0f);
         if (rank_wp->entries[i].flags & RANK_HIDDEN) {
             continue;
         }
@@ -472,60 +482,67 @@ static void disp_proc(CameraId cameraId, void* param) {
             sprintf(buf, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
             FontDrawStart();
             {
-                GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+                GXColor color = numberColor;
                 FontDrawColor(color);
             }
-            PSMTXTrans(mtx, 10.0f + left, y, 0.0f);
+            PSMTXTrans(mtx, x, y, 0.0f);
             PSMTXConcat(mtx, scale, mtx);
             FontDrawMessageMtx(mtx, buf);
         }
         FontDrawStart();
         if (rank_wp->entries[i].flags & RANK_PLAYER) {
-            GXColor color = { 0xFF, 0x00, 0x00, 0xFF };
+            GXColor color = playerColor;
             FontDrawColor(color);
         } else {
-            GXColor color = { 0xDC, 0xC8, 0xDC, 0xFF };
+            GXColor color = nameColor;
             FontDrawColor(color);
         }
-        PSMTXTrans(mtx, 40.0f + (10.0f + left), y, 0.0f);
+        x = 40.0f + x;
+        PSMTXTrans(mtx, x, y, 0.0f);
         PSMTXConcat(mtx, scale, mtx);
         FontDrawMessageMtx(mtx, msgSearch(fighters[rank_wp->entries[i].id].name));
         num++;
     }
-    GXSetScissor(scissorX, (u16)137.0f, scissorW, (u16)228.0f);
     {
-        Vec pos = { 0.0f, 0.0f, 0.0f };
+        f32 sy = 137.0f;
+        f32 sh = 228.0f;
+        GXSetScissor(scissorX, (u16)sy, scissorW, (u16)sh);
+    }
+    {
+        f32 y = 95.0f + dwp->scroll;
+        Vec pos = cursorPos;
         pos.x = 15.0f + left;
-        pos.y = (95.0f + dwp->scroll) - 24.0f;
+        pos.y = y - 24.0f;
         iconDispGx(&pos, 0x10, 0x123, 0.8f);
     }
     GXSetScissor(0, 0, 608, 480);
     if (dwp->page > 0) {
         {
-            Vec pos = { 0.0f, 125.0f, 0.0f };
-            pos.x = left + 250.0f;
-            iconDispGx(&pos, 0x10, 0x205, 1.0f);
+            Vec pos = upArrowPos;
+            pos.x = left + winW;
+            iconDispGx(&pos, 0x10, 0x205, -1.0f);
         }
         {
-            Vec pos = { 0.0f, 75.0f, 0.0f };
-            pos.x = left + 250.0f;
+            Vec pos = upButtonPos;
+            pos.x = left + winW;
             iconDispGx(&pos, 0x10, 0x7E, 0.6f);
         }
     }
     if (dwp->page < 1) {
         {
-            Vec pos = { 0.0f, -140.0f, 0.0f };
-            pos.x = left + 250.0f;
+            Vec pos = downArrowPos;
+            pos.x = left + winW;
             iconDispGx(&pos, 0x10, 0x205, 1.0f);
         }
         {
-            Vec pos = { 0.0f, -125.0f, 0.0f };
-            pos.x = left + 250.0f;
+            Vec pos = downButtonPos;
+            pos.x = left + winW;
             iconDispGx(&pos, 0x10, 0x80, 0.6f);
         }
     }
 }
 
+#pragma dont_inline on
 static void printRanking(void) {
     s32 i;
 
@@ -533,6 +550,7 @@ static void printRanking(void) {
     for (i = 0; i < rank_wp->count; i++) {
     }
 }
+#pragma dont_inline reset
 
 USER_FUNC(evt_tou_set_rule_result_28_text_355C) {
     s32 result = evtGetValue(event, event->args[0]);
@@ -578,13 +596,13 @@ USER_FUNC(evt_tou_set_ranking_win_lose_28_text_35C0) {
     for (i = 0; i < rank_wp->count; i++) {
         if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
             s32 a = rand() % 4;
-            s32 b = rand() % 4;
-            *(s16*)rank_wp->entries[i].points += a + b - 3;
-            if (*(s16*)rank_wp->entries[i].points < min) {
-                min = *(s16*)rank_wp->entries[i].points;
+            s32 b = a + rand() % 4;
+            rank_wp->entries[i].points.total += b - 3;
+            if (rank_wp->entries[i].points.total < min) {
+                min = rank_wp->entries[i].points.total;
             }
-            if (*(s16*)rank_wp->entries[i].points > max) {
-                max = *(s16*)rank_wp->entries[i].points;
+            if (rank_wp->entries[i].points.total > max) {
+                max = rank_wp->entries[i].points.total;
             }
         }
     }
@@ -850,16 +868,16 @@ USER_FUNC(evt_tou_get_ranking_28_text_4048) {
 static void rankingControll(void) {
     s32 above[32];
     s32 below[32];
-    s32 nAbove;
     s32 nBelow;
     s32 i;
-    s32 j;
     s32 tmp;
-    s32 idx;
     s32 idx2;
-    s32 rank;
-    RankEntry* entry;
+    s32 idx;
 
+    s32 rank;
+    s32 nAbove;
+    s32 j;
+    RankEntry* entry;
     nAbove = 0;
     nBelow = 0;
     for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
@@ -877,7 +895,7 @@ static void rankingControll(void) {
     if (nAbove > 0) {
         for (i = 0; i < nAbove - 1; i++) {
             for (j = i + 1; j < nAbove; j++) {
-                if (*(s16*)rank_wp->entries[above[i]].points < *(s16*)rank_wp->entries[above[j]].points) {
+                if (rank_wp->entries[above[i]].points.total < rank_wp->entries[above[j]].points.total) {
                     tmp = above[i];
                     above[i] = above[j];
                     above[j] = tmp;
@@ -979,7 +997,7 @@ static void rankingControll(void) {
     if (nBelow > 0) {
         for (i = 0; i < nBelow - 1; i++) {
             for (j = i + 1; j < nBelow; j++) {
-                if (*(s16*)rank_wp->entries[below[i]].points < *(s16*)rank_wp->entries[below[j]].points) {
+                if (rank_wp->entries[below[i]].points.total < rank_wp->entries[below[j]].points.total) {
                     tmp = below[i];
                     below[i] = below[j];
                     below[j] = tmp;
@@ -1048,9 +1066,9 @@ static void rankingControll(void) {
     // TODO: fixup
     entry[nAbove].flags = RANK_PLAYER;
     entry[nAbove].id = FIGHTER_PLAYER;
-    *(s16*)entry[nAbove].points = 0;
+    entry[nAbove].points.total = 0;
     for (i = 0; i < nBelow; i++) {
-        j = nAbove + i + 1;
+        j = nAbove + 1 + i;
         entry[j] = rank_wp->entries[below[i]];
     }
     memcpy(rank_wp->entries, entry, sizeof(RankEntry) * rank_wp->count);
@@ -1125,7 +1143,7 @@ static void rankingExit(void) {
             swClear(entry->id + 2465);
         }
         for (j = 0; j < 2; j++) {
-            swByteSet(2 * entry->id + 519 + j, entry->points[j]);
+            swByteSet(2 * entry->id + 519 + j, entry->points.bytes[j]);
         }
     }
     _mapFree(rank_wp->entries);
@@ -1158,10 +1176,10 @@ static void rankingInit(void) {
         if (swGet(2529)) {
             int j;
             for (j = 0; j < 2; j++) {
-                entry->points[j] = swByteGet(2 * entry->id + 519 + j);
+                entry->points.bytes[j] = swByteGet(2 * entry->id + 519 + j);
             }
         } else {
-            *(s16*)entry->points = fighterDt[entry->id].field_18;
+            entry->points.total = fighterDt[entry->id].field_18;
         }
         if (entry->id == FIGHTER_PLAYER) {
             entry->flags |= RANK_PLAYER;

@@ -706,7 +706,15 @@ s32 hair_offset[] = {
     0, 1095761920, 0, -1045954560,
 };
 
-static const Vec hand_light_pos = {-200.0f, 100.0f, 500.0f};
+// inline helper for pose_init: defined here so its Vec template lands at this .rodata position
+inline void hand_light_init(void) {
+    Mtx mtx;
+    u8* light = lightGetPaperCraft();
+
+    *(Vec*)(light + 0x24) = (Vec){-200.0f, 100.0f, 500.0f};
+    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
+    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
+}
 
 EVT_BEGIN(shadow_queen_1000)
     CALL(evt_npc_entry, STRING("dummy"), STRING("c_s_hand"))
@@ -4408,7 +4416,7 @@ static void hand_init(void) {
         pose->flags |= 6;
         PSMTXIdentity(pose->mtx);
         elem->animIdx = 0;
-        elem->time = gp->renderTime - (s64)irand(100) * 10000000;
+        elem->time = gp->renderTime - (u64)irand(100) * 10000000;
         elem->flip = irand(1);
     }
 }
@@ -4452,15 +4460,13 @@ static void pose_main(void) {
 static void pose_init(void) {
     char name[32];
     char anim[32];
-    Mtx mtx;
     HandData* d = hand_data;
     s32 i = 0;
     s32 start;
-    u8* light = lightGetPaperCraft();
 
-    *(Vec*)(light + 0x24) = hand_light_pos;
-    PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
-    PSMTXMultVec(mtx, (Vec*)(light + 0x24), (Vec*)(light + 0x24));
+    // hand_light_init is an inline helper defined by hand before EVT_BEGIN(shadow_queen_1000) in the
+    // rels/ source: its (Vec){-200, 100, 500} template must sit there in .rodata
+    hand_light_init();
     strcpy(name, "");
     strcpy(anim, "");
     hand_wp->animNum = -1;
@@ -4507,33 +4513,33 @@ USER_FUNC(peach_talk_synchro_shadow_head_evt) {
     BattleUnitPart* part;
 
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part + 0x1C4, "KRT_T_1") == 0 || strcmp((char*)part + 0x1C4, "KRT_T_2") == 0 ||
-        strcmp((char*)part + 0x1C4, "KRT_T_3") == 0) {
+    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0 || strcmp((char*)part->field_0x1C4, "KRT_T_2") == 0 ||
+        strcmp((char*)part->field_0x1C4, "KRT_T_3") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_T_1") != 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_T_1");
             return 0;
         }
     }
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part + 0x1C4, "KRT_T_1") != 0 && strcmp((char*)part + 0x1C4, "KRT_T_2") != 0 &&
-        strcmp((char*)part + 0x1C4, "KRT_T_3") != 0) {
+    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0 && strcmp((char*)part->field_0x1C4, "KRT_T_2") != 0 &&
+        strcmp((char*)part->field_0x1C4, "KRT_T_3") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_T_1") == 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1) + 0x1C4, "KRT_D_1") == 0) {
+    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_D_1") != 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_D_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1) + 0x1C4, "KRT_D_1") != 0) {
+    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part + 0x1C4, "KRT_D_1") == 0) {
+        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }
@@ -4561,8 +4567,8 @@ USER_FUNC(shadow_queen_connect) {
     }
     wk = event->userdatap[0];
     wpos = *animPoseGetAnimPosePtr(wk->poseId[0])->worldPositions;
-    BtlUnit_SetPartsPos(BattleGetUnitPartsPtr(BattleTransID(event, -2), 3), wpos[wk->idx[0]].x, wpos[wk->idx[0]].y,
-                        wpos[wk->idx[0]].z);
+    part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
+    BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 5);
     *(f32*)((u8*)part + 0x4F8) = 7.0f;
     BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);

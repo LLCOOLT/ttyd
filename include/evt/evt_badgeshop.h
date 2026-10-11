@@ -12,7 +12,7 @@ typedef struct BadgeShopWork {
 	u8 align[3];
 	s32 field_0xF8[5]; //0xF8
 	s32 field_0x10C; //0x10C
-	u32 field_0x110; //0x110
+	s32 field_0x110; //0x110
 	u16 field_0x114; //0x114
 	u16 field_0x116; //0x116
 	u32 field_0x118; //0x118
@@ -27,9 +27,9 @@ void badgeShop_init(void);
 void badgeShop_bottakuruGeneration(void);
 void badgeShop_bteresaGeneration(void);
 void badgeShop_bargainGeneration(void);
-s32 badgeShop_set(u8* table, s16 id, s16 val);
+s16 badgeShop_set(u8* table, s16 id, s16 val);
 s32 badgeShop_get(u8* table, s16 id);
-s32 badgeShop_add(u8* table, s32 id, s32 val);
+s32 badgeShop_add(u8* table, s16 id, s32 val);
 USER_FUNC(badgeShop_getBargainTable);
 USER_FUNC(evt_badgeShop_throw_inc);
 USER_FUNC(evt_badgeShop_throw_dec);
@@ -39,7 +39,7 @@ USER_FUNC(evt_badgeShop_bottakuru_dec);
 USER_FUNC(evt_badgeShop_throw_get_kind_cnt);
 USER_FUNC(evt_badgeShop_starmaniac_get_kind_cnt);
 USER_FUNC(evt_badgeShop_bottakuru_get_kind_cnt);
-USER_FUNC(evt_badgeShop_get_special_zaiko); //TODO: unknown name
+USER_FUNC(U_evt_badgeShop_get_special_zaiko); //TODO: unknown name
 USER_FUNC(evt_badgeShop_bteresa_get_kind_cnt);
 s32 badgeShop_ThrowCheck(s32 itemId);
-s32 badgeShop_SpecialCheck(void);
+s32 U_badgeShop_SpecialCheck(void);
