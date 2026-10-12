@@ -1258,11 +1258,11 @@ USER_FUNC(get_ride_pos) {
     s32* args = event->args;
 
     if (evtGetValue(event, *args++) == 0) {
-        evtSetFloat(event, *args++, 0.5f * (0.25f * (64.0f * w->scale.x)) + w->starPos.x);
+        evtSetFloat(event, *args++, 0.5f * (0.25f * (w->scale.x * 64.0f)) + w->starPos.x);
     } else {
-        evtSetFloat(event, *args++, w->starPos.x - 0.5f * (0.25f * (64.0f * w->scale.x)));
+        evtSetFloat(event, *args++, w->starPos.x - 0.5f * (0.25f * (w->scale.x * 64.0f)));
     }
-    evtSetFloat(event, *args++, 0.25f * (0.25f * (64.0f * w->scale.y)) + w->starPos.y);
+    evtSetFloat(event, *args++, 0.25f * (0.25f * (w->scale.y * 64.0f)) + w->starPos.y);
     evtSetFloat(event, *args++, 5.0f + w->starPos.z + 4.0f * w->scale.z);
     return 2;
 }

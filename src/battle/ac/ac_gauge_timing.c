@@ -374,6 +374,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
+    GaugeAC* g;
     GaugeWork* cw;
     f32 ratio;
     u16 pressed;
@@ -384,15 +385,16 @@ static void actionCommandDisp(f32 x, f32 y) {
     s32 n;
 
     camGetPtr(8);
+    g = (GaugeAC*)ac;
     cw = (GaugeWork*)((u8*)ac + 0x2BC);
     ratio = cw->gauge / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;
     }
     disp->ratio = ratio;
-    switch (GAC(work)->mode) {
+    switch (g->mode) {
     case 1: {
-        f32 t = 100.0f * disp->ratio / (f32)GAC(work)->target;
+        f32 t = 100.0f * disp->ratio / (f32)g->target;
         u16 icon;
         if (t > 100.0f) {
             t = 100.0f;
@@ -402,7 +404,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         } else {
             BattleAcDrawGauge((s32)x, (s32)y, 0xB2, t, 100, 100, 100, 100, 0);
         }
-        if (cw->gauge >= (f32)GAC(work)->target) {
+        if (cw->gauge >= (f32)g->target) {
             icon = 0x95;
         } else {
             icon = 0x91;
@@ -427,15 +429,15 @@ static void actionCommandDisp(f32 x, f32 y) {
             GXLoadPosMtxImm(cam->view, 0);
             btlDispGXQuads2DRasta(qx, qy, 10.0f + qx, qy - 16.0f, 0, 255, 0, 255);
         }
-        n = GAC(work)->target;
+        n = g->target;
         for (i = 0; i < n; i++) {
+            f32 step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
             u16 icon = 0x91;
             if (cw->inRange) {
                 icon = 0x95;
             }
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                f32 step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
                 pos.x = (-288.0f + x) + 176.0f * step / 100.0f;
                 pos.y = 20.0f + y;
                 iconDispGx(&pos, 0x10, icon, 0.8f);
@@ -445,7 +447,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     }
 
-    switch (GAC(work)->type) {
+    switch (g->type) {
         case 0:
             pressed = BattleACGetButtonIcon(0x20, 1);
             unpressed = BattleACGetButtonIcon(0x20, 0);
@@ -467,7 +469,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
     }
 
-    switch (work->actionCommands.mAcState) {
+    switch (ac->mAcState) {
         case 99:
         case 100:
         case 1003:
@@ -475,15 +477,17 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1005:
             if (pressed2) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                Vec pos2 = {0.0f, 0.0f, 0.0f};
                 f32 px = -228.0f + x;
                 f32 py = 55.0f + y;
                 pos.x = px;
                 pos.y = py;
                 iconDispGx(&pos, 0x10, unpressed, 1.0f);
+                {
+                Vec pos2 = {0.0f, 0.0f, 0.0f};
                 pos2.x = 56.0f + px;
                 pos2.y = py;
                 iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
+                }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = 28.0f + (-228.0f + x);
@@ -497,15 +501,17 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         f32 px = -228.0f + x;
                         f32 py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);
+                        {
+                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         pos2.x = 56.0f + px;
                         pos2.y = py;
                         iconDispGx(&pos2, 0x10, pressed2, 1.0f);
+                        }
                     } else {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         pos.x = 28.0f + (-228.0f + x);
@@ -515,15 +521,17 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         f32 px = -228.0f + x;
                         f32 py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
+                        {
+                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         pos2.x = 56.0f + px;
                         pos2.y = py;
                         iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
+                        }
                     } else {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         pos.x = 28.0f + (-228.0f + x);
@@ -535,15 +543,17 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         f32 px = -228.0f + x;
                         f32 py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
+                        {
+                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         pos2.x = 56.0f + px;
                         pos2.y = py;
                         iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
+                        }
                     } else {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         pos.x = 28.0f + (-228.0f + x);
@@ -553,15 +563,17 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         f32 px = -228.0f + x;
                         f32 py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);
+                        {
+                        Vec pos2 = {0.0f, 0.0f, 0.0f};
                         pos2.x = 56.0f + px;
                         pos2.y = py;
                         iconDispGx(&pos2, 0x10, pressed2, 1.0f);
+                        }
                     } else {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         pos.x = 28.0f + (-228.0f + x);

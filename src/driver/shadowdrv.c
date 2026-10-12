@@ -186,30 +186,18 @@ GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
 };
 
-void shadowInit(void) { //almost 1:1, minor regalloc
+static void charShadowInit(void);
+static inline void depthShadowInit(void);
+static inline void projShadowInit(void);
+
+void shadowInit(void) {
     u8* ramp8;
     u16* ramp16;
     u32 i;
     u32 bufferSize;
-    CharShadowWork* wp;
 
-    cswp->unk0 = 0;
-    cswp->unk4 = 0;
-    cswp->unk8 = 1;
-    cswp->unk100 = (GXColor){0, 0, 0, 0x6E};
-    cswp->unk10C = 1;
-    cswp->unk110 = 2;
-    cswp->unk114 = 20.0f;
-    cswp->unk118 = 1;
-    cswp->unk104 = 0;
-    cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
-    memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
-    wp = cswp;
-    wp->unkFC = smartAlloc(GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0), 0);
-    dswp->unk0 = 2;
-    dswp->unk4 = 0;
-    dswp->unk8 = 0;
-    dswp->unk100 = (GXColor){0, 0, 0, 0x40};
+    charShadowInit();
+    depthShadowInit();
 
     bufferSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
     ramp8 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0));
@@ -228,11 +216,8 @@ void shadowInit(void) { //almost 1:1, minor regalloc
     GXInitTexObj(&rampTex16, ramp16, 0x100, 0x100, GX_TF_IA8, GX_CLAMP, GX_REPEAT, GX_FALSE);
     GXInitTexObjLOD(&rampTex16, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(ramp16, bufferSize);
+    projShadowInit();
 
-    pswp->unk0 = 2;
-    pswp->unk4 = 0;
-    pswp->unk8 = 0;
-    pswp->unk100 = (GXColor){0, 0, 0, 0x40};
 }
 
 void shadowMain(void) {
@@ -369,6 +354,24 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
     return TRUE;
 }
 
+static void charShadowInit(void) {
+    CharShadowWork* wp;
+
+    cswp->unk0 = 0;
+    cswp->unk4 = 0;
+    cswp->unk8 = 1;
+    cswp->unk100 = (GXColor){0, 0, 0, 0x6E};
+    cswp->unk10C = 1;
+    cswp->unk110 = 2;
+    cswp->unk114 = 20.0f;
+    cswp->unk118 = 1;
+    cswp->unk104 = 0;
+    cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
+    memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
+    wp = cswp;
+    wp->unkFC = smartAlloc(GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0), 0);
+}
+
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
@@ -408,14 +411,6 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
         }
         entry->flags |= 2;
     }
-}
-
-static inline GXColor shadowMkGray(u8 v) {
-    GXColor c = {0, 0, 0, 0xFF};
-    c.r = v;
-    c.g = v;
-    c.b = v;
-    return c;
 }
 
 void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
@@ -864,6 +859,13 @@ f32 (*shadowGetDepthShadowProjTexMtx(void))[4] {
     return dswp->texMtx;
 }
 
+static inline void depthShadowInit(void) {
+    dswp->unk0 = 2;
+    dswp->unk4 = 0;
+    dswp->unk8 = 0;
+    dswp->unk100 = (GXColor){0, 0, 0, 0x40};
+}
+
 GXColor shadowGetDepthShadowColor(void) {
     GXColor c;
     c.r = ((0xFF - dswp->unk100.r) * dswp->unk100.a) / 0xFF;
@@ -890,6 +892,13 @@ GXTexObj* shadowGetProjShadowTexObj(void) {
 
 f32 (*shadowGetProjShadowProjTexMtx(void))[4] {
     return pswp->texMtx;
+}
+
+static inline void projShadowInit(void) {
+    pswp->unk0 = 2;
+    pswp->unk4 = 0;
+    pswp->unk8 = 0;
+    pswp->unk100 = (GXColor){0, 0, 0, 0x40};
 }
 
 GXColor shadowGetProjShadowColor(void) {

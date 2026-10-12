@@ -967,7 +967,8 @@ void SoundEfxSetVolume(s32 chan, u8 vol) {
 }
 
 u8 SoundEfxGetVolume(s32 chan) {
-    return (u8)sound.effects[chan].vol;
+    s32 off = chan * sizeof(SoundEffect);
+    return (u8)*(u16*)((u8*)sound.effects + off + 4);
 }
 
 void SoundEfxSetAux1(s32 chan, u8 reverb) {
@@ -988,9 +989,10 @@ void SoundEfxSetAux1(s32 chan, u8 reverb) {
 void SoundEfxSetPan(s32 chan, u8 pan) {
     SoundEffect* sfx;
     SND_VOICEID vid;
+    s32 off = chan * sizeof(SoundEffect);
 
-    sound.effects[chan].pan = pan;
-    sfx = &sound.effects[chan];
+    *(u16*)((u8*)sound.effects + off + 6) = pan;
+    sfx = (SoundEffect*)((u8*)sound.effects + off);
     if (sfx->flags & 0x10) {
         vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
     } else {
@@ -1004,26 +1006,21 @@ void SoundEfxSetPan(s32 chan, u8 pan) {
 void SoundEfxSetSrndPan(s32 chan, u8 span) {
     SoundEffect* sfx;
     SND_VOICEID vid;
-    u16 doppler;
-    u16 offset;
+    s32 doppler;
+    s32 off = chan * sizeof(SoundEffect);
 
-    sound.effects[chan].span = span;
-    sfx = &sound.effects[chan];
-    if (sfx->flags & 0x10) {
-        vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
-    } else {
-        vid = sndFXCheck(sfx->voiceId);
-    }
+    *(u16*)((u8*)sound.effects + off + 8) = span;
+    sfx = (SoundEffect*)((u8*)sound.effects + off);
+    vid = (sfx->flags & 0x10) ? sndFXCheck(sndEmitterVoiceID(&sfx->emitter))
+                              : sndFXCheck(sfx->voiceId);
     if (vid != -1) {
         sndFXSurroundPanning(vid, span);
-        if (span) {
-            if (span >= 64)
-                offset = (u16)(3 * (span - 64));
-            else
-                offset = (u16)(3 * (64 - span));
-            doppler = (u16)(0x2000 - offset);
-        } else {
+        if (span == 0) {
             doppler = 0x2000;
+        } else if (span < 64) {
+            doppler = 0x2000 - 3 * (64 - span);
+        } else {
+            doppler = 0x2000 - 3 * (span - 64);
         }
         sndFXDoppler(vid, doppler);
     }
@@ -1040,10 +1037,12 @@ void SoundEfxSetLPF(s32 chan, s16 freq) {
         voiceId = sndFXCheck(sfx->voiceId);
     }
     if (voiceId != -1) {
-        if (freq && freq < 16000) {
-            sndFXSetFilter(voiceId, SND_FILTER_LOWPASS, freq);
-        } else {
+        if (!freq) {
             sndFXSetFilter(voiceId, SND_FILTER_NONE, 0);
+        } else if (freq >= 16000) {
+            sndFXSetFilter(voiceId, SND_FILTER_NONE, 0);
+        } else {
+            sndFXSetFilter(voiceId, SND_FILTER_LOWPASS, freq);
         }
     }
 }
@@ -1055,10 +1054,20 @@ BOOL SoundEfxCheck(s32 chan) {
     if (!sfx->flags) {
         return FALSE;
     }
-    if (sfx->flags & 0x10 && !sndCheckEmitter(&sfx->emitter)) {
-        return FALSE;
-    } else if (sndFXCheck(sndFXCheck(sfx->voiceId)) == -1) {
-        return FALSE;
+    if (!(sfx->flags & 0x10)) {
+        SND_VOICEID vid;
+        if (sfx->flags & 0x10) {
+            vid = sndFXCheck(sndEmitterVoiceID(&sfx->emitter));
+        } else {
+            vid = sndFXCheck(sfx->voiceId);
+        }
+        if (sndFXCheck(vid) == -1) {
+            return FALSE;
+        }
+    } else {
+        if (!sndCheckEmitter(&sfx->emitter)) {
+            return FALSE;
+        }
     }
     return TRUE;
 }
@@ -1530,12 +1539,12 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
             dst = buffer1;
-            for (i = 0; i < len1; i++) {
+            for (i = len1; i != 0; i--) {
                 *dst++ = 0;
                 stream->samplePos++;
             }
             dst = buffer2;
-            for (i = 0; i < len2; i++) {
+            for (i = len2; i != 0; i--) {
                 *dst++ = 0;
                 stream->samplePos++;
             }
@@ -1785,13 +1794,13 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
                 stream->flags |= 0x100;
                 src = (u8*)header + 0x5C;
                 dst = (u8*)&stream->entries[0].info;
-                for (j = 0; j < sizeof(SND_ADPCMSTREAM_INFO); j++) {
+                for (j = 32; j != 0; j--) {
                     *dst++ = *src++;
                 }
                 if (stream->count == 2) {
                     src = (u8*)header + 0xBC;
                     dst = (u8*)&stream->entries[1].info;
-                    for (j = 0; j < sizeof(SND_ADPCMSTREAM_INFO); j++) {
+                    for (j = 32; j != 0; j--) {
                         *dst++ = *src++;
                     }
                 }

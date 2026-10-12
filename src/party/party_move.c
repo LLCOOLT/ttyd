@@ -996,7 +996,7 @@ s16 partyMarioHosei(PartyEntry* party) {
         if (mario->baseSpeed) {
             d = dir - PF(mario, 0x1A0);
             if (__fabsf(d) <= 4.0f) {
-                if (d >= 0.0f) {
+                if (dir - PF(mario, 0x1A0) >= 0.0f) {
                     dir += 90.0f;
                 } else {
                     dir -= 90.0f;

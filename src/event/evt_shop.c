@@ -41,6 +41,11 @@ typedef struct ShopperData {
 	const char* msgs[1]; //0xC
 } ShopperData;
 
+typedef struct ShopPoint {
+	s32 pts; //0x0
+	s32 item; //0x4
+} ShopPoint;
+
 typedef struct ShopDb {
 	s32 id; //0x0
 	s16 price; //0x4
@@ -141,7 +146,7 @@ USER_FUNC(shopper_name);
 USER_FUNC(unkeep_pouchcheck_func);
 
 static s32 window_desc[30];
-s32 shopPointList[22];
+ShopPoint shopPointList[11];
 s32 list_desc[30];
 static s32 buy_evt[326];
 s32 shopper_talk_evt[352];
@@ -160,7 +165,7 @@ static s32 window_desc[] = {
     -130, 150, 45, -252645121, 0, (s32)point_disp,
 };
 
-s32 shopPointList[] = {
+ShopPoint shopPointList[] = {
     10, 148, 20, 131, 30, 149, 50, 129,
     70, 130, 100, 126, 150, 151, 200, 150,
     250, 156, 300, 127, -1, -1,
@@ -669,11 +674,11 @@ void help_main(WinMgrEntry* entry) {
 
 void help_disp(WinMgrEntry* entry) {
 	ShopWork* wp = _wp;
-	s32 cur = wp->cur;
+	s32 off = wp->cur * (s32)sizeof(ShopItem);
 	ShopItem* items = wp->items;
 
 	if (!winMgrAction(wp->win[1])) {
-		entry->msg = msgSearch(itemDataTable[items[cur].id].description);
+		entry->msg = msgSearch(itemDataTable[((ShopItem*)((u8*)items + off))->id].description);
 		winMgrHelpDraw(entry);
 	}
 }
@@ -729,7 +734,6 @@ void list_disp(WinMgrEntry* entry) {
 	PouchData* pouch;
 	const char* msg;
 	s32 i;
-	s32* p;
 	s32 y;
 	u32 mask;
 	ItemData* item;
@@ -747,17 +751,17 @@ void list_disp(WinMgrEntry* entry) {
 	FontDrawStart();
 	FontDrawEdge();
 	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-	FontDrawMessage(entry->x + (100 - FontGetMessageWidth(msg)) / 2 + 10, entry->y + 13, msg);
+	FontDrawMessage(entry->x + 10 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
 	FontDrawEdgeOff();
 	msg = msgSearch("msg_shop_point_list6");
 	FontDrawStart();
 	FontDrawEdge();
 	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-	FontDrawMessage(entry->x + (entry->width / 2 - 10 + (100 - FontGetMessageWidth(msg)) / 2), entry->y + 13, msg);
+	FontDrawMessage(entry->x - 10 + entry->width / 2 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
 	FontDrawEdgeOff();
 	FontDrawStart();
-	for (p = shopPointList, y = 0; p[0] != -1; p += 2, y += 26, i++) {
-		item = &itemDataTable[p[1]];
+	for (y = 0; shopPointList[i].pts != -1; i++, y += 26) {
+		item = &itemDataTable[shopPointList[i].item];
 		FontDrawStart();
 		mask = 1 << i;
 		if (pouch->field_0x5B4 & mask) {
@@ -766,7 +770,7 @@ void list_disp(WinMgrEntry* entry) {
 		else {
 			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
 		}
-		sprintf(buf, "%s", winZenkakuStr(p[0]));
+		sprintf(buf, "%s", winZenkakuStr(shopPointList[i].pts));
 		w = FontGetMessageWidth(buf);
 		FontDrawMessage(entry->x + (entry->width / 2 - w - 90), entry->y - 20 - y, buf);
 		FontDrawStart();
@@ -815,15 +819,15 @@ USER_FUNC(disp_list) {
 }
 
 USER_FUNC(evt_shop_setup) {
+	ShopWork* wp;
 	s32* args = event->args;
 	ShopObj* objs = (ShopObj*)evtGetValue(event, args[0]);
 	ShopItem* items = (ShopItem*)evtGetValue(event, args[1]);
 	ShopperData* shopper = (ShopperData*)evtGetValue(event, args[2]);
 	ShopDb* db = (ShopDb*)evtGetValue(event, args[3]);
-	ShopWork* wp;
 	s32 i;
 	Vec pos;
-	char buf[48];
+	char buf[32];
 
 	wp = _mapAlloc(sizeof(ShopWork));
 	memset(wp, 0, sizeof(ShopWork));
@@ -838,30 +842,30 @@ USER_FUNC(evt_shop_setup) {
 		mapObjGetPos(wp->objs[i].mobj, &pos);
 		mapObjFlagOn(wp->objs[i].mobj, 0x4000);
 		sprintf(buf, "shp%d", i);
-		iconEntry(buf, itemDataTable[wp->items[i].id].icon_id);
+		((void (*)(const char*, u16))iconEntry)(buf, itemDataTable[wp->items[i].id].icon_id);
 		iconSetPos(buf, pos.x, pos.y + 6.0f, pos.z);
 		iconFlagOn(buf, 0x40);
 		wp->itemFlags[i] = 0;
-		if (wp->items[i].id == 0x33 && pouchCheckItem(0x33)) {
+		if (wp->items[i].id == 0x33 && ((s32 (*)(s32))pouchCheckItem)(0x33)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x37 && pouchCheckItem(0x37)) {
+		if (wp->items[i].id == 0x37 && ((s32 (*)(s32))pouchCheckItem)(0x37)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x38 && pouchCheckItem(0x38)) {
+		if (wp->items[i].id == 0x38 && ((s32 (*)(s32))pouchCheckItem)(0x38)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x39 && pouchCheckItem(0x39)) {
+		if (wp->items[i].id == 0x39 && ((s32 (*)(s32))pouchCheckItem)(0x39)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x3A && pouchCheckItem(0x3A)) {
+		if (wp->items[i].id == 0x3A && ((s32 (*)(s32))pouchCheckItem)(0x3A)) {
 			wp->itemFlags[i] |= 1;
 		}
-		if (wp->items[i].id == 0x3B && pouchCheckItem(0x3B)) {
+		if (wp->items[i].id == 0x3B && ((s32 (*)(s32))pouchCheckItem)(0x3B)) {
 			wp->itemFlags[i] |= 1;
 		}
 	}
-	npcNameToPtr(shopper->name)->talkEvt = shopper_talk_evt;
+	{ NpcEntry* npc = npcNameToPtr(shopper->name); npc->talkEvt = shopper_talk_evt; }
 	wp->mainEvt = evtEntryType(main_evt, 0, 0x20, 0);
 	wp->mainEvt->lwData[0] = (s32)wp;
 	for (i = 0; i < 3; i++) {
@@ -900,11 +904,12 @@ USER_FUNC(shop_flag_onoff) {
 	s32* args = event->args;
 	s32 on = evtGetValue(event, args[0]);
 	s32 mask = evtGetValue(event, args[1]);
+	ShopWork* wp = _wp;
 	if (on) {
-		_wp->flags |= mask;
+		wp->flags |= mask;
 	}
 	else {
-		_wp->flags &= ~mask;
+		wp->flags &= ~mask;
 	}
 	return EVT_RETURN_DONE;
 }
@@ -951,26 +956,24 @@ USER_FUNC(chk_shop_point) {
 	s32* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	s32 i = 0;
-	s32* p;
-	s32* q;
 	s32 j;
+	ShopPoint* p;
+	ShopPoint* q;
+	s32 v;
 
-	for (p = shopPointList; p[0] != -1; p += 2, i++) {
-		if (p[0] <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
+	for (p = shopPointList; (v = p->pts) != -1; i++, p++) {
+		if (v <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
 			if (SHOP_PTS(pouch) != 300) {
 				evtSetValue(event, args[0], 0);
-				evtSetValue(event, args[1], p[1]);
-				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p[1]].name));
+				evtSetValue(event, args[1], p->item);
+				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p->item].name));
 			}
 			else {
-				j = 0;
-				for (q = shopPointList; q[0] != 300; q += 2) {
-					j++;
+				for (j = 0; shopPointList[j].pts != 300; j++) {
 				}
 				evtSetValue(event, args[0], 0);
-				p = &shopPointList[j * 2];
-				evtSetValue(event, args[1], *++p);
-				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[*p].name));
+				evtSetValue(event, args[1], shopPointList[j].item);
+				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[shopPointList[j].item].name));
 			}
 			return EVT_RETURN_DONE;
 		}
@@ -983,11 +986,12 @@ USER_FUNC(chk_shop_point) {
 
 USER_FUNC(exchange_shop_point) {
 	PouchData* pouch = pouchGetPtr();
+	ShopPoint* p;
 	s32 i = 0;
-	s32* p;
+	s32 v;
 
-	for (p = shopPointList; p[0] != -1; p += 2, i++) {
-		if (p[0] <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
+	for (p = shopPointList; (v = p->pts) != -1; i++, p++) {
+		if (v <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
 			pouch->field_0x5B4 |= (1 << i);
 			return EVT_RETURN_DONE;
 		}
@@ -998,13 +1002,14 @@ USER_FUNC(exchange_shop_point) {
 USER_FUNC(shop_point_item) {
 	s32* args = event->args;
 	s32 pts = evtGetValue(event, args[0]);
-	s32* p;
+	ShopPoint* p;
+	s32 v;
 
 	pouchGetPtr();
-	for (p = shopPointList; p[0] != -1; p += 2) {
-		if (p[0] == pts) {
-			evtSetValue(event, args[1], p[1]);
-			evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p[1]].name));
+	for (p = shopPointList; (v = p->pts) != -1; p++) {
+		if (v == pts) {
+			evtSetValue(event, args[1], p->item);
+			evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p->item].name));
 			return EVT_RETURN_DONE;
 		}
 	}

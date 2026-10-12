@@ -362,14 +362,13 @@ void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scl;
     Mtx rot;
     CameraEntry* camera;
-    s32 t;
-    s32 anim;
+    s32 new_var[2];
     EffBoobooN64Work* work;
     s32 i;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    t = work->time * 30;
+    new_var[1] = work->time * 30;
     for (i = 0; i < 11; i++) {
         if (!(work->flags[i] & 1)) {
             continue;
@@ -386,13 +385,13 @@ void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
             continue;
         }
         if (work->type[i] == 8 || work->type[i] == 9) {
-            f32 s = (f32)sin(6.2831855f * (f32)(t + i * 20) / 360.0f);
+            f32 s = (f32)sin(6.2831855f * (f32)(new_var[1] + i * 20) / 360.0f);
             s32 v = (s32)(63.0f * s + 63.0f);
             GXSetTevColor(GX_TEVREG0, (GXColor){v, v, v});
         }
-        anim = work->anim[i];
+        new_var[0] = work->anim[i];
         GXSetCullMode(GX_CULL_BACK);
-        switch (anim) {
+        switch (new_var[0]) {
         case 0:
             boo_polygon_0();
             break;

@@ -25,11 +25,12 @@ static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
 static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
-    s32 count;
     s32 i;
-    s32 k;
     s32 end = NN * 3 + 2;
+    s32 k;
+    s32 count;
     s32 off;
+    s32 j;
     f32 bx = -200.0f + x;
     f32 by;
     f32 lx = bx - 40.0f;
@@ -54,8 +55,8 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     }
     if (*(u32*)((u8*)work + 0x1cc4) & 1) {
         count = 0;
-        for (i = 0; i < NN; i++) {
-            if (!(*(s32*)((u8*)p + (i) * 4 + 0x3c))) {
+        for (i = 0, j = 0; i < NN; i++, j += 4) {
+            if (!(*(s32*)((u8*)p + j + 0x3c))) {
                 break;
             }
             count++;
@@ -67,9 +68,13 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
         count = NN;
     }
     off = 0;
-    for (i = 0; i < count; i++, off += 0x30) {
+    j = 0;
+    for (i = 0; i < count; i++, off += 0x30, j += 4) {
         s32 a, b;
-        switch (p->button[i]) {
+        if (*(u32*)((u8*)p + j + 8) == 0U) {
+            continue;
+        }
+        switch (*(u32*)((u8*)p + j + 8)) {
             case 0x100:
                 a = 0x65;
                 b = 0x64;
@@ -98,23 +103,22 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
                 a = 0x83;
                 b = 0x82;
                 break;
-            case 0:
             case 0x40000:
             default:
                 a = 0x78;
                 b = 0x79;
                 break;
         }
-        if (p->pressed[i]) {
+        if (*(s32*)((u8*)p + j + 0x3c)) {
             Vec pos4 = {0.0f, 0.0f, 0.0f};
             pos4.x = bx + (f32)off;
             pos4.y = by;
-            iconDispGx(&pos4, 16, a, 1.0f);
+            ((void (*)())iconDispGx)(&pos4, 16, a, 1.0f);
         } else {
             Vec pos5 = {0.0f, 0.0f, 0.0f};
             pos5.x = bx + (f32)off;
             pos5.y = by;
-            iconDispGx(&pos5, 16, b, 1.0f);
+            ((void (*)())iconDispGx)(&pos5, 16, b, 1.0f);
         }
     }
 }

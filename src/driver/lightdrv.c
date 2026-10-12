@@ -72,21 +72,24 @@ void lightReInit(void) {
 
 static const Vec camDir = {0.0f, 0.0f, 1.0f};
 
-static inline Vec camTransform(Vec w, Vec a, Vec b, Vec c) {
-	Vec r = {0.0f, 0.0f, 0.0f};
-
-	r.x = a.x * w.x + b.x * w.y + c.x * w.z;
-	r.y = a.y * w.x + b.y * w.y + c.y * w.z;
-	r.z = a.z * w.x + b.z * w.y + c.z * w.z;
-	return r;
-}
 
 void lightMain(void) {
 	CameraEntry* camera;
+	Vec w = camDir;
+	Vec a, b, c;
 	Vec position;
 
 	camera = camGetPtr(CAMERA_3D);
-	position = camTransform(camDir, *(Vec*)camera->view[0], *(Vec*)camera->view[1], *(Vec*)camera->view[2]);
+	a = *(Vec*)camera->view[0];
+	b = *(Vec*)camera->view[1];
+	c = *(Vec*)camera->view[2];
+	{
+		Vec r = {0.0f, 0.0f, 0.0f};
+		r.x = a.x * w.x + b.x * w.y + c.x * w.z;
+		r.y = a.y * w.x + b.y * w.y + c.y * w.z;
+		r.z = a.z * w.x + b.z * w.y + c.z * w.z;
+		position = r;
+	}
 	VECNormalize(&position, &position);
 	{
 		Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -125,12 +128,12 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 			sprintf(v41, "%s_%04d", name, j);
 			entry = wp->entries;
 			name = v41; //will keep getting longer
-			for (k = 0; k < wp->count; k++, entry++) {
+			for (i = 0; i < wp->count; i++, entry++) {
 				if (entry->flags & 1 && !strcmp(entry->name, name)) {
 					break;
 				}
 			}
-			if (k >= LIGHT_ENTRY_COUNT) {
+			if (i >= LIGHT_ENTRY_COUNT) {
 				break;
 			}
 		}
@@ -146,7 +149,7 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	strcpy(entry->name, name);
 	entry->position = position;
 	entry->rotation = rotation;
-	entry->field_0x3C = position;
+	entry->field_0x3C = entry->position;
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;

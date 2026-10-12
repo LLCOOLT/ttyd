@@ -45,7 +45,7 @@ typedef struct BattleSubMenu {
     s32 field_C0[7];                // 0xC0
     s32 field_DC[7];                // 0xDC
     s32 field_F8[7];                // 0xF8
-    u8 pad114[8];
+    u8 field_114[8];
     s32 field_11C; // 0x11C
     f32 field_120; // 0x120
 } BattleSubMenu;
@@ -80,6 +80,9 @@ extern GlobalWork* gp;
 void FontDrawStringCenterMtx(Mtx mtx, const char* msg);
 void btlDispGXPoint2D(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a, f32 s, f32 t);
 void FontDrawColor(GXColor color);
+void GetRingCenter(Vec* out);
+void GetRingOffset(f32 angle, f32* x, f32* y);
+f32 kakutable[3][5] = {{240.0f, 120.0f, 0.0f, 0.0f, 0.0f}, {270.0f, 180.0f, 90.0f, 0.0f, 0.0f}, {270.0f, 203.0f, 157.0f, 90.0f, 0.0f}};
 
 //.sdata
 GXColor seleItemCoordCol = {0xFF, 0xC0, 0xC0, 0xCF};
@@ -282,8 +285,6 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
 }
 
 void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s) {
-    f32 pos[4][8] = {{-20.0f, 40.0f, 0.0f, 40.0f, 0.0f, 20.0f, -20.0f, 20.0f}, {20.0f, 40.0f, 20.0f, 20.0f, 0.0f, 20.0f, 0.0f, 40.0f}, {-20.0f, 20.0f, 0.0f, 20.0f, 0.0f, 0.0f, -20.0f, 0.0f}, {0.0f, 20.0f, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f}};
-    f32 uv[4][8] = {{0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f}};
     Mtx rot;
     Mtx scl;
     Mtx trn;
@@ -292,7 +293,7 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     u8 c;
-    u16 icon;
+    u32 icon;
     f32 rad;
     f32 ofs;
     f32 sc;
@@ -305,7 +306,7 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     GXSetTevColor(GX_TEVREG0, (GXColor){0xE1, 0xE1, 0xE1, 0xFF});
     GXSetNumTevStages(1);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C1, GX_CC_ZERO);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -325,6 +326,9 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     if (s >= 180.0f && s <= 360.0f) {
         ofs = (-4.0f + 8.0f * (s - 180.0f) / 180.0f) / 1.3f;
     }
+    {
+    f32 pos[4][8] = {{-20.0f, 40.0f, 0.0f, 40.0f, 0.0f, 20.0f, -20.0f, 20.0f}, {20.0f, 40.0f, 20.0f, 20.0f, 0.0f, 20.0f, 0.0f, 40.0f}, {-20.0f, 20.0f, 0.0f, 20.0f, 0.0f, 0.0f, -20.0f, 0.0f}, {0.0f, 20.0f, 20.0f, 20.0f, 20.0f, 0.0f, 0.0f, 0.0f}};
+    f32 uv[4][8] = {{0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 1.0f}, {0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f}, {0.0f, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f}};
     for (i = 0; i < 4; i++) {
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         for (j = 0; j < 7; j += 2) {
@@ -336,6 +340,7 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
         for (j = 0; j < 7; j += 2) {
             btlDispGXPoint2D(pos[i][j], pos[i][j + 1], c, c, c, 0xFF, uv[i][j], uv[i][j + 1]);
         }
+    }
     }
     PSMTXTrans(trn, 0.0f, 7.5f, 0.0f);
     sc = 0.66f * (1.3f - 0.005f * v.z);
@@ -604,14 +609,16 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-        pos.x = 155.0f + v->x;
+        f32 x = 155.0f + v->x;
         pos.y = 15.0f + v->y + bob;
+        pos.x = x;
         pos.z = 0.0f;
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
-        pos.x = 155.0f + v->x;
+        f32 x = 155.0f + v->x;
         pos.y = 20.0f + v->y - 164.0f - bob;
+        pos.x = x;
         pos.z = 0.0f;
         iconDispGx(&pos, 0x10, 0x1B6, 0.75f);
     }
@@ -622,8 +629,8 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
     if (n >= 6) {
         n = 5;
     }
+    pos.y = v->y - (f32)n * 24.0f;
     pos.x = v->x;
-    pos.y = v->y - 24.0f * n;
     pos.z = 0.0f;
     iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
 }
@@ -734,6 +741,197 @@ void DrawSubMenuCommonProcessSub1(BattleSubMenu* menu, BattleCursor* cursor, s32
         for (i = 0; i < 7; i++) {
             menu->field_C0[i] = 20;
             menu->field_DC[i] = 0;
+        }
+    }
+}
+
+void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d) {
+    Mtx tm;
+    Mtx sm;
+    f32 ox;
+    f32 oy;
+    BattleWork* wp = _battleWorkPointer;
+    BattleSubMenu* menu = WP_SUBMENU(wp);
+    BattleCursor* cursor = menu->cursor;
+    BattleCursor* mainCursor;
+    s32 steps;
+    s32 prev;
+    s32 n;
+    s32 cnt;
+    s32 cnt2;
+    s32 i;
+    f32 ang;
+    f32 s;
+
+    if (BattleGetUnitPtr(wp, wp->activeUnitId)->currentKind == 0xDE) {
+        mainCursor = &wp->commandMenu.cursor[0];
+    } else {
+        mainCursor = &wp->commandMenu.cursor[1];
+    }
+    n = 6;
+    if (cursor->unk8 < 6) {
+        n = cursor->unk8;
+    }
+    prev = cursor->field_4;
+    if (cursor->field_0 <= prev) {
+        cursor->field_4 = cursor->field_0 - 1;
+    } else if (cursor->field_0 >= prev + (n - 1)) {
+        cursor->field_4 = cursor->field_0 - n + 2;
+    }
+    if (cursor->field_4 < 0) {
+        cursor->field_4 = 0;
+    }
+    if (cursor->field_4 >= cursor->unk8 - n) {
+        cursor->field_4 = cursor->unk8 - n;
+    }
+    *x = -200.0f;
+    *y = -100.0f;
+    switch (menu->field_C) {
+        case 0:
+            menu->field_14 = 1;
+            menu->field_98 = cursor->field_4;
+            cnt = 0;
+            for (i = 0; i < mainCursor->unk8; i++) {
+                if (menu->field_34[i] == 1 || menu->field_34[i] == 11) {
+                    cnt++;
+                }
+            }
+            cnt2 = 0;
+            for (i = 0; i < 7; i++) {
+                if (menu->field_C0[i] == 2) {
+                    cnt2++;
+                }
+            }
+            if (cnt == mainCursor->unk8 && cnt2 == 7) {
+                menu->field_C = 2;
+            }
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            break;
+        case 2:
+            menu->field_14 = 1;
+            menu->field_98 = cursor->field_4;
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            break;
+        case 10:
+        case 20:
+        case 30:
+        case 40:
+            if (menu->field_C == 10 || menu->field_C == 20) {
+                menu->field_14 = 1;
+            }
+            cnt = 0;
+            for (i = 0; i < 7; i++) {
+                if (menu->field_C0[i] == 2) {
+                    cnt++;
+                }
+            }
+            if (cnt == 7) {
+                menu->field_C = 2;
+                menu->field_98 = cursor->field_4;
+            }
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            break;
+    }
+    menu->field_1C = 0;
+    for (i = 0; i < mainCursor->unk8; i++) {
+        switch (menu->field_34[i]) {
+            case 0:
+                menu->field_20[i] |= 1;
+                menu->field_20[i] |= 2;
+                GetRingCenter(&((Vec*)b)[i]);
+                ((Vec*)b)[i].x = intplGetValue(4, menu->field_48[i], 12, ((Vec*)b)[i].x, -60.0f);
+                ((Vec*)b)[i].y = intplGetValue(4, menu->field_48[i], 12, ((Vec*)b)[i].y, 55.0f);
+                PSMTXTrans(((Mtx*)a)[i], 20.0f + ((Vec*)b)[i].x, ((Vec*)b)[i].y, ((Vec*)b)[i].z);
+                ((f32*)c)[i] = intplGetValue(0, menu->field_48[i], 12, 0.0f, 360.0f);
+                if (((f32*)c)[i] > 360.0f) {
+                    ((f32*)c)[i] -= 360.0f;
+                }
+                if (menu->field_48[i] >= 3) {
+                    menu->field_1C = 1;
+                }
+                menu->field_48[i]++;
+                if (menu->field_48[i] > 12) {
+                    menu->field_34[i] = 1;
+                }
+                break;
+            case 1:
+                menu->field_20[i] |= 1;
+                menu->field_20[i] |= 2;
+                PSMTXTrans(((Mtx*)a)[i], -40.0f, 55.0f, 0.0f);
+                ((f32*)c)[i] = 360.0f;
+                menu->field_1C = 1;
+                break;
+            case 10:
+                menu->field_20[i] |= 1;
+                menu->field_20[i] &= ~2;
+                ang = 3.1415927f * kakutable[mainCursor->unk8 - 3][menu->field_84[i]] / 180.0f;
+                GetRingCenter(&((Vec*)b)[i]);
+                GetRingOffset(ang, &ox, &oy);
+                ((Vec*)b)[i].x += ox;
+                ((Vec*)b)[i].y += oy;
+                ((Vec*)b)[i].z = oy;
+                s = 1.0f - 0.1f * menu->field_48[i];
+                if (s <= 0.0f) {
+                    menu->field_34[i] = 11;
+                }
+                PSMTXScale(sm, s, s, 1.0f);
+                PSMTXTrans(tm, ((Vec*)b)[i].x, ((Vec*)b)[i].y, ((Vec*)b)[i].z);
+                PSMTXConcat(tm, sm, ((Mtx*)a)[i]);
+                ((f32*)c)[i] = 0.0f;
+                menu->field_48[i]++;
+                break;
+            case 11:
+                menu->field_20[i] &= ~1;
+                break;
+        }
+    }
+    for (i = 0; i < 7; i++) {
+        switch (menu->field_C0[i]) {
+            case 0:
+                menu->field_A4[i] &= ~1;
+                menu->field_114[i] = 0xFF;
+                break;
+            case 1:
+                menu->field_A4[i] &= ~1;
+                menu->field_114[i] = 0xFF;
+                if (menu->field_DC[i] >= 0 && i != 6) {
+                    s = intplGetValue(0, menu->field_DC[i], 12, 90.0f, 0.0f);
+                    menu->field_A4[i] |= 1;
+                    PSMTXRotRad(((Mtx*)d)[i], 'y', 0.017453292f * s);
+                }
+                menu->field_DC[i]++;
+                if (menu->field_DC[i] > 12) {
+                    menu->field_C0[i] = 2;
+                }
+                break;
+            case 2:
+                menu->field_114[i] = 0xFF;
+                if (i != 6) {
+                    menu->field_A4[i] |= 1;
+                    PSMTXIdentity(((Mtx*)d)[i]);
+                } else {
+                    menu->field_A4[i] &= ~1;
+                }
+                break;
+            case 10:
+            case 20:
+            case 30:
+            case 40:
+                if (menu->field_C0[i] == 10 || menu->field_C0[i] == 20) {
+                    steps = 12;
+                }
+                if (menu->field_C0[i] == 30 || menu->field_C0[i] == 40) {
+                    steps = (cursor->unk8 - 6) / 2 + 12;
+                }
+                menu->field_A4[i] |= 1;
+                PSMTXIdentity(((Mtx*)d)[i]);
+                menu->field_98 = intplGetValue(4, menu->field_DC[i], steps, menu->field_9C, menu->field_A0);
+                menu->field_DC[i]++;
+                if (menu->field_DC[i] > steps) {
+                    menu->field_C0[i] = 2;
+                    menu->field_DC[i] = 0;
+                }
+                break;
         }
     }
 }

@@ -978,6 +978,8 @@ static f32 z(void) {
 	CameraEntry* camera;
 	Vec pos;
 	f32 base;
+	f32 one = 1.0f;
+	f32 pz;
 
 	camera = camGetPtr(CAMERA_3D);
 	if (camera->projType == GX_PERSPECTIVE) {
@@ -985,12 +987,13 @@ static f32 z(void) {
 	}
 	camera = camGetPtr(CAMERA_FADE);
 	PSMTXMultVec(camera->view, &work->entries[1].VirtualPos, &pos);
+	pz = pos.z;
 	base = camera->viewport[5] + (camera->viewport[5] - camera->viewport[4]) *
-		((1.0f / -pos.z) * (camera->projection[2][2] * pos.z + camera->projection[2][3]));
+		((1.0f / -pz) * (camera->projection[2][2] * pz + camera->projection[2][3]));
 	camera = camGetPtr(CAMERA_3D);
 	PSMTXMultVec(camera->view, &work->entries[1].VirtualPos, &pos);
 	return (camera->viewport[5] + (camera->viewport[5] - camera->viewport[4]) *
-		(1.0f * (camera->projection[2][2] * pos.z + camera->projection[2][3]))) / base;
+		(one * (camera->projection[2][2] * pos.z + camera->projection[2][3]))) / base;
 }
 
 #pragma dont_inline reset
@@ -1049,12 +1052,13 @@ static void zFill(void) {
 	GXSetColorUpdate(GX_TRUE);
 }
 
+static inline f32 fadeMadd(f32 a, f32 b, f32 c) { return a * b + c; }
 void disp_maku(CameraId camId, void* param) {
 	FadeEntry* entry = param;
 	CameraEntry* camera;
 	f32 scale, depth, mag, sx;
-	Mtx mtx2;
 	Mtx mtx;
+	Mtx mtx2;
 	Vec dist;
 	Vec dir;
 
@@ -1081,7 +1085,7 @@ void disp_maku(CameraId camId, void* param) {
 	}
 	if (entry->flags & 4) {
 		camera = camGetPtr(CAMERA_3D);
-		depth = tan(3.141592f * ((camera->fovY * 0.5f) / 180.0f));
+		depth = 0.5f * camera->fovY; depth = tan(3.141592f * (depth / 180.0f));
 		depth = 24.0f / depth;
 		PSVECSubtract(&camGetPtr(CAMERA_3D)->cameraPos, &entry->VirtualPos, &dist);
 		camera = camGetPtr(CAMERA_3D);
@@ -1101,8 +1105,8 @@ void disp_maku(CameraId camId, void* param) {
 		depth = 0.0f;
 		zFill();
 	}
-	PSMTXTrans(mtx, 64.0f * ((entry->animOffsetX * scale + 0.0f) / gp->fbWidth),
-		48.0f * ((entry->animOffsetY * scale + 0.0f) / gp->efbHeight), depth);
+	PSMTXTrans(mtx, 64.0f * (fadeMadd(entry->animOffsetX, scale, 0.0f) / gp->fbWidth),
+		48.0f * (fadeMadd(entry->animOffsetY, scale, 0.0f) / gp->efbHeight), depth);
 	PSMTXTrans(mtx2, -32.0f, 24.0f, 0.0f);
 	PSMTXConcat(mtx, mtx2, mtx);
 	sx = 608.0f / gp->fbWidth;

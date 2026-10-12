@@ -260,7 +260,7 @@ typedef struct ItemEffPos {
 
 static inline HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
 	HitEntry* hit;
-	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+	f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
 
 	hitDist = 20.0 + __fabs(vy);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
@@ -350,7 +350,7 @@ void itemMain(void) {
 					newY = y + -1.0f;
 				}
 				else {
-					hitDist = 20.0 + __fabs(-1.0f);
+					hitDist = 20.0 + __fabs(-1.0);
 					hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 						entry->position.x, 20.0f + y, entry->position.z, 0.0f, -1.0f, 0.0f);
 					if (hit) {
@@ -374,9 +374,10 @@ void itemMain(void) {
 			case 8:
 				party = partyGetPtr(marioGetPartyId());
 				if (party) {
-					entry->position.x = party->position.x;
-					entry->position.y = 15.0f + party->position.y;
-					entry->position.z = party->position.z;
+					f32 px = party->position.x, py = 15.0f + party->position.y, pz = party->position.z;
+					entry->position.x = px;
+					entry->position.y = py;
+					entry->position.z = pz;
 				}
 				else {
 					itemModeChange(entry, 3);
@@ -389,7 +390,7 @@ void itemMain(void) {
 		}
 
 		if (entry->flags & 1) {
-			if (entry->itemId >= 0x72 && entry->itemId < 0x79) {
+			if (entry->itemId < 0x79 && entry->itemId >= 0x72) {
 				if (!(entry->flags2 & 0x100)) {
 					((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
 					((ItemEffPos*)entry->effect->userdata)->position.y = 16.0f + entry->position.y;

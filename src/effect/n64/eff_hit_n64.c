@@ -64,6 +64,7 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
     s32 i;
     s32 count;
     s32 n;
+    s32 r;
 
     effect = effEntry();
     effect->type = "HitN64\0";
@@ -118,16 +119,17 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
     n = count - 1;
     p = work + 1;
     for (i = 1; i < count; i++, p++) {
-        s32 r = rand();
-        p->rotZ = (f32)(i * 360 / n);
+        r = rand();
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
         p->vel10 = 0.0f;
         p->vel14 = 0.0f;
         p->pad20 = 0.0f;
-        p->rotY = (f32)(r % 360);
+        p->rotZ = (f32)(i * 360 / n);
         p->type = 0;
+        p->rotY = (f32)(r % 360);
+        p->vel10 = 0.0f;
         p->alpha = 255;
     }
     return effect;
@@ -160,16 +162,16 @@ void effHitMain(EffectEntry* effect) {
     } else {
         work->progress = 1.0f;
     }
-    p = work + 1;
-    for (i = 1; i < effect->count; i++, p++) {
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
         if (frame <= cnt_table[type]) {
             idx = frame - 1;
         } else {
             idx = 12;
         }
-        p->position.x = radius_data[idx];
-        p->position.y = 0.0f;
-        p->position.z = 0.0f;
+        work->position.x = radius_data[idx];
+        work->position.y = 0.0f;
+        work->position.z = 0.0f;
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHitDisp, effect);
 }

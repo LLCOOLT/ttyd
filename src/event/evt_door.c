@@ -1573,6 +1573,7 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
     MapObject* obj = mapGetMapObj(map);
     f32 w = 10.0f;
     f32 a, b;
+    f32 t;
 
     if (!mario) {
         a = 40.0f;
@@ -1587,7 +1588,12 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
         PSMTXMultVec(m, &obj->joints->bboxMin, &min);
         PSMTXMultVec(m, &obj->joints->bboxMax, &max);
         PSVECSubtract(&max, &min, &d);
-        w = d.x ? d.x / (f32)cos((f32)atan(d.z / d.x)) * 0.5f : d.z * 0.5f;
+        if (d.x) {
+            t = d.x / (f32)cos((f32)atan(d.z / d.x)); t /= 2.0f;
+        } else {
+            t = d.z / 2.0f;
+        }
+        w = t;
     }
     switch (type) {
         case 0:
@@ -1787,10 +1793,10 @@ USER_FUNC(npc_hide_onoff) {
     s32* args = event->args;
     DoorData* d = (DoorData*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
-    s32 i;
+    const char** list;
 
-    for (i = 0; d->npcs[i]; i++) {
-        NpcEntry* npc = npcNameToPtr_NoAssert(d->npcs[i]);
+    for (list = d->npcs; *list; list++) {
+        NpcEntry* npc = npcNameToPtr_NoAssert(*list);
         if (npc) {
             if (on) {
                 npc->flags |= 0x800;

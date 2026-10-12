@@ -160,8 +160,7 @@ void vivianUnhold(VivianParty* party) {
     if (party->currentMemberId != 6) {
         return;
     }
-    if (party->flags & 0x100) {
-    } else {
+    if ((party->flags & 0x100) == 0) {
         return;
     }
     if (party->useMotionId == 10) {

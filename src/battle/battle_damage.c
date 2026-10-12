@@ -282,7 +282,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
                 }
             }
             if (fpDamage > 0 && BtlUnit_GetBelong(target) == 0) {
-                psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos);
+                psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos)psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos)", &pos);
             }
         }
     }
@@ -1007,6 +1007,458 @@ u8 _getRegistStatus(BattleUnit* unit, s32 type) {
         case 18: return v->invisibleRate;
     }
     return 100;
+}
+
+#include "eff/n64/eff_stamp_n64.h"
+EffectEntry* effUpdownEntry(s32 type, s32 strength, s32 time, f32 x, f32 y, f32 z);
+EffectEntry* effVaporN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 scale);
+void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 value, s32 flag);
+void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 type, s32 flag);
+
+#define STAMP_COL(e, a, b, c, d, f, g)                 \
+    ((u8*)(e)->userdata)[0x38] = (a);                  \
+    ((u8*)(e)->userdata)[0x39] = (b);                  \
+    ((u8*)(e)->userdata)[0x3A] = (c);                  \
+    ((u8*)(e)->userdata)[0x3B] = (d);                  \
+    ((u8*)(e)->userdata)[0x3C] = (f);                  \
+    ((u8*)(e)->userdata)[0x3D] = (g)
+
+s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s8 rate, s32 levelDiff, s8 time, s8 strength) {
+    s32 ok;
+    s32 announce;
+    s32 chance;
+    u8 regist;
+    f32 x, y, z;
+    EffectEntry* eff;
+    Vec hitPos;
+    s8 prevStrength;
+    s8 curTurns;
+    s8 curStrength;
+
+    ok = 0;
+    chance = rate;
+    BtlUnit_GetStatus(unit, 0x10, NULL, &prevStrength);
+    switch (type) {
+        case 0x13:
+        case 0x14:
+            if (time <= 0) {
+                ok = 1;
+            }
+            break;
+        case 0:
+        case 0x15:
+            if (time <= 0) {
+                ok = 1;
+            }
+            break;
+        case 0xa:
+        case 0xb:
+        case 0xc:
+        case 0xd:
+        case 0xe:
+        case 0xf:
+            if (strength == 0) {
+                ok = 1;
+            }
+            break;
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+            if (time == 0) {
+                ok = 1;
+            }
+            break;
+    }
+    if (part->attributes & 0x20000000) {
+        return 0;
+    }
+    if (part->attributes & 0x80000000) {
+        return 0;
+    }
+    if (BtlUnit_CheckStatus(unit, 0) && !ok) {
+        return 0;
+    }
+    if (part->attributes & 0x40000000) {
+        switch (type) {
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 8:
+            case 9:
+            case 0xb:
+            case 0xd:
+            case 0xf:
+            case 0x14:
+            case 0x19:
+            case 0x1a:
+            case 0x1b:
+                if (!ok) {
+                    return 0;
+                }
+                break;
+        }
+    }
+    if (unit->badgesEquipped.FeelingFine) {
+        switch (type) {
+            case 1:
+            case 2:
+            case 3:
+            case 4:
+            case 5:
+            case 6:
+            case 0xb:
+            case 0xd:
+            case 0xf:
+            case 0x1b:
+                return 0;
+        }
+    }
+    if (type == 8 && unit->badgesEquipped.IcePower) {
+        return 0;
+    }
+    if (chance <= 0) {
+        return 0;
+    }
+    regist = _getRegistStatus(unit, type);
+    if (!(special & 0x100) || regist == 0) {
+        chance = chance * regist / 100;
+        if (!(special & 0x100) && regist > 0) {
+            chance += levelDiff;
+        }
+    }
+    if (irand(100) >= chance) {
+        return 0;
+    }
+
+    ok = 0;
+    if (type == 0x19) {
+        *result |= 4;
+    } else if (type == 0x1a) {
+        *result |= 8;
+    } else {
+        if (type == 1) {
+            *result |= 0x20;
+        }
+        if (type == 0x1b) {
+            *result |= 0x10;
+        }
+        ok = BtlUnit_SetStatus(unit, (s8)type, time, strength);
+    }
+    switch (type) {
+        case 6:
+        case 7:
+        case 0xa:
+        case 0xc:
+        case 0xe:
+        case 0x10:
+        case 0x12:
+        case 0x13:
+        case 0x15:
+        case 0x16:
+        case 0x17:
+        case 0x18:
+            *result |= 2;
+            break;
+        default:
+            if (time > 0) {
+                *result |= 1;
+            } else {
+                *result |= 2;
+            }
+            break;
+    }
+
+    if (ok) {
+        BtlUnit_GetPos(unit, &x, &y, &z);
+        if (unit->mAttributeFlags & 2) {
+            y -= BtlUnit_GetHeight(unit) / 2;
+        } else {
+            y += BtlUnit_GetHeight(unit) / 2;
+        }
+        switch (unit->currentKind) {
+            case 0x17:
+            case 0x84:
+            case 0xab:
+                x -= 300.0f;
+                z += 30.0f;
+                break;
+        }
+        switch (type) {
+            case 1:
+                effStampN64Entry(0, x, y, 10.0f + z);
+                break;
+            case 5:
+                effStampN64Entry(1, x, y, 10.0f + z);
+                break;
+            case 2:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 110, 110, 10, 10, 10);
+                break;
+            case 3:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 0, 110, 220, 10, 10, 10);
+                break;
+            case 4:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 0, 220, 0, 10, 10, 10);
+                break;
+            case 6:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 0, 10, 10, 10);
+                break;
+            case 0x10:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 220, 220, 0);
+                break;
+            case 0x15:
+            case 0x16:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 0, 0, 0, 220);
+                break;
+            case 0xa:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 220, 0, 0);
+                break;
+            case 0xb:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 0, 0, 10, 10, 10);
+                break;
+            case 0xc:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 220, 0, 0);
+                break;
+            case 0xd:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 0, 0, 10, 10, 10);
+                break;
+            case 0xe:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 0, 0, 220);
+                break;
+            case 0xf:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 0, 0, 220, 10, 10, 10);
+                break;
+            case 0x13:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 220, 110, 0);
+                break;
+            case 0x14:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 110, 0, 10, 10, 10);
+                break;
+            case 8:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 0, 220, 0, 0);
+                break;
+            case 9:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 0, 110, 220);
+                break;
+            case 0:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 160, 220, 0, 10, 10, 10);
+                break;
+            case 0x12:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 110, 110, 110);
+                break;
+            case 0x17:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 220, 110, 110);
+                break;
+            case 0x18:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 160, 220, 0);
+                break;
+            case 7:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 0, 220, 0);
+                break;
+            case 0x1b:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 220, 220, 220, 10, 10, 10);
+                break;
+            default:
+                eff = effStampN64Entry(2, x, y, 10.0f + z);
+                STAMP_COL(eff, 200, 200, 200, 10, 10, 10);
+                break;
+        }
+        switch (type) {
+            case 0xe:
+            case 0xf:
+                effUpdownEntry(1, strength, 0x3c, x, y, 20.0f + z);
+                break;
+            case 0xa:
+            case 0xb:
+            case 0xc:
+            case 0xd:
+            case 0x10:
+                effUpdownEntry(0, strength, 0x3c, x, y, 15.0f + z);
+                break;
+        }
+    } else {
+        BtlUnit_GetPos(unit, &x, &y, &z);
+        y += BtlUnit_GetHeight(unit) / 2;
+        switch (type) {
+            case 8:
+                if (*(EffectEntry**)((u8*)unit + 0x328)) {
+                    effSoftDelete(*(EffectEntry**)((u8*)unit + 0x328));
+                }
+                break;
+            case 9:
+                eff = effVaporN64Entry(0, 0x3c, x, y, z, 1.0f);
+                *(s32*)((u8*)eff->userdata + 0x18) = 0xff;
+                *(s32*)((u8*)eff->userdata + 0x1c) = 0xff;
+                *(s32*)((u8*)eff->userdata + 0x20) = 0xff;
+                *(s32*)((u8*)eff->userdata + 0x28) = 0xff;
+                *(s32*)((u8*)eff->userdata + 0x2c) = 0xff;
+                *(s32*)((u8*)eff->userdata + 0x30) = 0xff;
+                break;
+        }
+    }
+
+    announce = 0;
+    if (ok) {
+        BtlUnit_GetStatus(unit, (s8)type, &curTurns, &curStrength);
+        switch (type) {
+            case 0x10:
+                if (curStrength > 0) {
+                    if (prevStrength != curStrength) {
+                        BattleStatusChangeInfoSetAnnouce(unit, type, curStrength, 1);
+                        BattleStatusChangeMsgSetAnnouce(unit, type, 1);
+                        announce = 1;
+                    } else {
+                        BattleStatusChangeInfoSetAnnouce(unit, type, curStrength, 0);
+                        BattleStatusChangeMsgSetAnnouce(unit, type, 0);
+                        announce = 1;
+                    }
+                }
+                break;
+            case 4:
+                if (curStrength > 0) {
+                    BattleStatusChangeInfoSetAnnouce(unit, type, curStrength, 1);
+                    BattleStatusChangeMsgSetAnnouce(unit, type, 1);
+                    announce = 1;
+                }
+                break;
+            case 0:
+            case 1:
+            case 2:
+            case 3:
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 0xa:
+            case 0xb:
+            case 0xc:
+            case 0xd:
+            case 0xe:
+            case 0xf:
+            case 0x12:
+            case 0x13:
+            case 0x14:
+            case 0x15:
+            case 0x16:
+            case 0x17:
+            case 0x18:
+                if (curTurns > 0) {
+                    BattleStatusChangeInfoSetAnnouce(unit, type, curTurns, 1);
+                    BattleStatusChangeMsgSetAnnouce(unit, type, 1);
+                    announce = 1;
+                }
+                break;
+        }
+    }
+    BtlUnit_GetHitPos(unit, part, &hitPos.x, &hitPos.y, &hitPos.z);
+    if (announce) {
+        switch (type) {
+            case 1:
+                psndSFXOn_3D("SFX_CONDITION_SLEEP1", &hitPos);
+                break;
+            case 2:
+                psndSFXOn_3D("SFX_CONDITION_STOP1", &hitPos);
+                break;
+            case 3:
+                psndSFXOn_3D("SFX_CONDITION_GURUGURU1", &hitPos);
+                break;
+            case 5:
+                psndSFXOn_3D("SFX_CONDITION_CONFUSE1", &hitPos);
+                break;
+            case 4:
+                psndSFXOn_3D("SFX_CONDITION_POISON1", &hitPos);
+                break;
+            case 7:
+                psndSFXOn_3D("SFX_CONDITION_YOKEYOKE1", &hitPos);
+                break;
+            case 6:
+                psndSFXOn_3D("SFX_CONDITION_BIRIBIRI1", &hitPos);
+                break;
+            case 0xa:
+                psndSFXOn_3D("SFX_CONDITION_DEKADEKA1", &hitPos);
+                break;
+            case 0xb:
+                psndSFXOn_3D("SFX_CONDITION_MINIMINI1", &hitPos);
+                break;
+            case 0xe:
+                psndSFXOn_3D("SFX_CONDITION_KATIKATI1", &hitPos);
+                break;
+            case 0xf:
+                psndSFXOn_3D("SFX_BTL_FUNYA1", &hitPos);
+                break;
+            case 0x14:
+                psndSFXOn_3D("SFX_CONDITION_SLOW1", &hitPos);
+                break;
+            case 8:
+                psndSFXOn_3D("SFX_CONDITION_FIRE1", &hitPos);
+                break;
+            case 9:
+                psndSFXOn_3D("SFX_CONDITION_ICE1", &hitPos);
+                break;
+            case 0x13:
+                psndSFXOn_3D("SFX_CONDITION_FAST1", &hitPos);
+                break;
+            case 0x17:
+                psndSFXOn_3D("SFX_CONDITION_REST_HP_SLOW1", &hitPos);
+                break;
+            case 0x18:
+                psndSFXOn_3D("SFX_CONDITION_REST_FP_SLOW1", &hitPos);
+                break;
+            case 0:
+                psndSFXOn_3D("SFX_CONDITION_ALLERGY1", &hitPos);
+                break;
+            case 0xc:
+                psndSFXOn_3D("SFX_CONDITION_TUYOTUYO1", &hitPos);
+                break;
+            case 0xd:
+                psndSFXOn_3D("SFX_CONDITION_YOWAYOWA1", &hitPos);
+                break;
+            case 0x10:
+                psndSFXOn_3D("SFX_CONDITION_CHARGE1", &hitPos);
+                break;
+            case 0x12:
+                psndSFXOn_3D("SFX_CONDITION_TOUMEI1", &hitPos);
+                break;
+            case 0x15:
+                psndSFXOn_3D("SFX_CONDITION_COUNTER1", &hitPos);
+                break;
+            case 0x16:
+                psndSFXOn_3D("SFX_BTL_THUNDERS_COUNTER1", &hitPos);
+                break;
+        }
+    }
+    return 1;
 }
 
 s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags) {

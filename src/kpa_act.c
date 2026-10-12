@@ -51,7 +51,7 @@ USER_FUNC(kpa_score_disp_main) {
 
 USER_FUNC(kpa_score_disp_init) {
 	EventEntry* e;
-	s32 i;
+	u32 i;
 	e = evtEntryType(kpa_score_disp_evt, event->priority, 0, event->type);
 	e->unitId = event->unitId;
 	e->ownerNPC = event->ownerNPC;
@@ -80,7 +80,7 @@ USER_FUNC(kpa_score_disp_init) {
 	for (i = 0; i < 50; i++) {
 		ksdp[i].str[0] = 0;
 		ksdp[i].timer = 0;
-		ksdp[i].pos = *(Vec*)&vec3_802fe200;
+		ksdp[i].pos = (Vec){0.0f, 0.0f, 0.0f};
 	}
 	return EVT_RETURN_DONE;
 }
@@ -98,11 +98,11 @@ void kpaAddCoin(s32 coins) {
 }
 
 static inline void kpaSetScoreStr(s32 score, Vec* pos) {
-	s32 i;
-	s32 n;
-	s8 d0, d1, d2, d3, d4;
-	s32 t;
 	char* p;
+	s32 t;
+	s8 d0, d1, d2, d3, d4;
+	s32 n;
+	s32 i;
 	for (i = 0; i < 50; i++) {
 		if (ksdp[i].timer == 0) {
 			p = ksdp[i].str;
@@ -163,4 +163,4 @@ USER_FUNC(kpa_chg_pose) {
 	return EVT_RETURN_DONE;
 }
 
-const Vec vec3_802fe200 = {0.0f, 0.0f, 0.0f};
+

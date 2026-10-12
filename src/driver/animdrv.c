@@ -550,10 +550,13 @@ void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) 
 
 void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
     AnimationPose* pose = &wp->poses[poseId];
+    s32 id;
+    AnimationPoseData* data;
 
-    animPosePaperAnimId(pose) = animPoseGetAnimIdx(animPoseGetAnimBaseDataPtr(pose->paperId), animName);
+    animPosePaperAnimId(pose) = animPoseGetAnimIdx(data = animPoseGetAnimBaseDataPtr(pose->paperId), animName);
     pose->mLocalTimeInit = animTimeGetTime(pose->type);
-    if (pose->paperId != -1 && !(wp->poses[pose->paperId].typeFlags & 2)) {
+    id = pose->paperId;
+    if (id != -1 && !(*(u32*)((u8*)wp->poses + id * sizeof(AnimationPose) + 4) & 2)) {
         animPoseMain(pose->paperId);
     }
 }
@@ -685,12 +688,12 @@ void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     Mtx rc1, rc2, rc3;
     MtxPtr p;
     u32 flags;
+    f32 sx, sy, sz;
     f32 rx, ry, rz;
     f32 rcx, rcy, rcz;
     f32 scx, scy, scz;
     f32 rtx, rty, rtz;
     f32 stx, sty, stz;
-    f32 sz, sy, sx;
     f32 tx, ty, tz;
 
     flags = 0;
@@ -926,16 +929,16 @@ void renderProc(s32 shapeId, s32 unused) {
             data = wp->mpCurPoseData;
             posVtxSize = (s32)sizeof(Vec) * posFirstVtx;
             clr0VtxSize = (s32)sizeof(GXColor) * clr0FirstVtx;
-            nrmVtxSize = nrmFirstVtx;
+            nrmVtxSize = (s32)sizeof(Vec) * nrmFirstVtx;
             buffer = data->texVtxBuffer;
-            texVtxIndices[0] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[0].first];
-            texVtxIndices[1] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[1].first];
-            texVtxIndices[2] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[2].first];
-            texVtxIndices[3] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[3].first];
-            texVtxIndices[4] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[4].first];
-            texVtxIndices[5] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[5].first];
-            texVtxIndices[6] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[6].first];
-            texVtxIndices[7] = &buffer[(sizeof(f32) * 2) * shape->vtxTex[7].first];
+            texVtxIndices[0] = &buffer[2 * shape->vtxTex[0].first];
+            texVtxIndices[1] = &buffer[2 * shape->vtxTex[1].first];
+            texVtxIndices[2] = &buffer[2 * shape->vtxTex[2].first];
+            texVtxIndices[3] = &buffer[2 * shape->vtxTex[3].first];
+            texVtxIndices[4] = &buffer[2 * shape->vtxTex[4].first];
+            texVtxIndices[5] = &buffer[2 * shape->vtxTex[5].first];
+            texVtxIndices[6] = &buffer[2 * shape->vtxTex[6].first];
+            texVtxIndices[7] = &buffer[2 * shape->vtxTex[7].first];
 
             for (i = 0; i < drawCount; i++, draw++) {
                 texCount = draw->texCount;
@@ -1017,18 +1020,18 @@ void renderProc(s32 shapeId, s32 unused) {
                 drawCall = &data->drawCalls[draw->firstDrawCall];
                 texCount = draw->texCount;
                 drawCallCount = draw->drawCallCount;
-                clr0VtxPtr = &data->clr0VtxBuffer[clr0VtxSize / 4];
+                clr0VtxPtr = (GXColor*)((u8*)data->clr0VtxBuffer + clr0VtxSize);
                 posFirstId = draw->firstIdPos;
                 nrmFirstId = draw->firstIdNrm;
                 clr0FirstId = draw->firstIdClr0;
 
                 if (wp->mbUseFloatScratch) {
-                    nrmVtxPtr = &wp->vtxArrayNrm[nrmVtxSize];
-                    posVtxPtr = &wp->vtxArrayPos[posVtxSize / sizeof(Vec)];
+                    nrmVtxPtr = (Vec*)((u8*)wp->vtxArrayNrm + nrmVtxSize);
+                    posVtxPtr = (Vec*)((u8*)wp->vtxArrayPos + posVtxSize);
                 } else {
                     pose = wp->mpCurPose;
-                    posVtxPtr = &pose->mpVtxArrayPos[posVtxSize / sizeof(Vec)];
-                    nrmVtxPtr = &pose->mpVtxArrayNrm[nrmVtxSize];
+                    posVtxPtr = (Vec*)((u8*)pose->mpVtxArrayPos + posVtxSize);
+                    nrmVtxPtr = (Vec*)((u8*)pose->mpVtxArrayNrm + nrmVtxSize);
                 }
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1087,7 +1090,7 @@ void renderProc(s32 shapeId, s32 unused) {
                             for (l = 0; l < texCount; l++) {
                                 index = texIds[texCount - l - 1];
                                 GXTexCoord1x16(wp->mpCurPoseData
-                                                   ->texIndex[index][((firstDrawId + firstId[index]) * 2) + texIndex]);
+                                                   ->texIndex[index][((drawCall->first + firstId[index]) * 2) + texIndex]);
                             }
                             texIndex += 2;
                             posIndexPtr += 2;

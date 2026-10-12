@@ -1,3 +1,4 @@
+#pragma optimize_for_size on
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
 #include "battle/battle_pad.h"
@@ -46,6 +47,7 @@ s32 ac_signaltiming_ok_frame_range_2[7] = {30, 30, 30, 30, 25, 20, 15};
 static void actionCommandDisp(f32 x, f32 y);
 s32 _get_ok_frame_range(s32 difficulty);
 
+#pragma dont_inline on
 s32 _get_ok_frame_range(s32 difficulty) {
     BattleWork* work = _battleWorkPointer;
     switch (W32(work, 0x1CCC)) {
@@ -55,16 +57,17 @@ s32 _get_ok_frame_range(s32 difficulty) {
     return W32(work, 0x1CE4) + ac_signaltiming_ok_frame_range[difficulty];
 }
 
+#pragma dont_inline reset
 s32 battleAcMain_SignalTiming(BattleWork* work) {
-    BattleActions* ac = &work->actionCommands;
-    SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
     const char* sfxPi = "SFX_AC_PI1";
     const char* sfxPone = "SFX_AC_PONE1";
     const char* sfxOk = "SFX_AC_COMMAND_OK1";
     const char* sfxNg = "SFX_AC_COMMAND_NG1\0";
-    BOOL autoCommand = FALSE;
+    BattleActions* ac = &work->actionCommands;
+    SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
     BOOL loop;
+    BOOL autoCommand = FALSE;
     BOOL got;
     BOOL good;
     BOOL unique;
@@ -92,7 +95,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 w->frame = 0;
                 w->index = 0;
                 w->next = 0;
-                w->difficulty = BattleActionCommandGetDifficulty(work);
+                w->difficulty = ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
                 w->okFlag = 0;
                 W32(work, 0x1CEC) = 0;
                 for (i = 0; i < 5; i++) {
@@ -142,7 +145,8 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 w->rangeStart = w->index * ST_STEP(work);
                 w->rangeEnd = (w->index + 1) * ST_STEP(work) - 1;
                 w->okStart = w->rangeStart;
-                w->okEnd = w->okStart + (_get_ok_frame_range(w->difficulty) - 1);
+                j = _get_ok_frame_range(w->difficulty) - 1;
+ w->okEnd = w->okStart + j;
                 ac->mAcState = 1000;
             case 1000:
                 w->unk28 = (w->next + 1) * ST_STEP(work) - 1;
@@ -176,13 +180,15 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                     got = TRUE;
                 }
                 if (got) {
-                    if (W32(work, 0x1CD8) == 2) {
+                    switch (W32(work, 0x1CD8)) {
+                    case 2:
                         if (w->button == BattlePadGetTrigger()) {
                             good = TRUE;
                         } else {
                             good = FALSE;
                         }
-                    } else {
+                        break;
+                    default:
                         good = TRUE;
                     }
                 }
@@ -243,7 +249,8 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                         w->rangeStart = w->index * ST_STEP(work) - 10;
                         w->rangeEnd = (w->index + 1) * ST_STEP(work) - 1;
                         w->okStart = w->index * ST_STEP(work);
-                        w->okEnd = w->okStart + (_get_ok_frame_range(w->difficulty) - 1);
+                        j = _get_ok_frame_range(w->difficulty) - 1;
+ w->okEnd = w->okStart + j;
                         w->pressed = 0;
                         if (w->index >= ST_LEAD(work) && w->index < ST_COUNT(work) + ST_LEAD(work)) {
                             w->button = w->buttons[w->index - ST_LEAD(work)];
@@ -342,6 +349,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     s32 n;
     s32 i;
     s32 num;
+    s32 num2;
     f32 yb;
     f32 yd;
     f32 fx;
@@ -409,10 +417,11 @@ static void actionCommandDisp(f32 x, f32 y) {
         fx = -200.0f + x;
         num = w->hits + W32(work, 0x1CDC);
         if (ST_FLAGS(work) & 1) {
-            PSMTXTrans(mTrans, fx + (f32)(count * 0x30 + ST_LEAD(work) * 32 - 26), yb, 0.0f);
+            num2 = count * 0x30 + ST_LEAD(work) * 32 - 26;
         } else {
-            PSMTXTrans(mTrans, fx + (f32)(count * 0x30 + ST_LEAD(work) * 32 - 26), yb, 0.0f);
+            num2 = count * 0x30 + ST_LEAD(work) * 32;
         }
+        PSMTXTrans(mTrans, fx + (f32)num2, yb, 0.0f);
         if (ST_FLAGS(work) & 8) {
             PSMTXScale(mScale, 1.5f, 1.5f, 1.5f);
         } else {

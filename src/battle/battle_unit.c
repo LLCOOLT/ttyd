@@ -608,33 +608,27 @@ void BtlUnit_GetPartsRotate(BattleUnitPart* part, f32* x, f32* y, f32* z) {
 
 void BtlUnit_AddPartsRotate(BattleUnitPart* part, f32 x, f32 y, f32 z) {
     part->mRotation.x += x;
-    if (part->mRotation.x <= 360.0f) {
-        if (part->mRotation.x < 0.0f) {
-            part->mRotation.x += 360.0f;
-        }
-    }
-    else {
+    if (part->mRotation.x > 360.0f) {
         part->mRotation.x -= 360.0f;
+    }
+    else if (part->mRotation.x < 0.0f) {
+        part->mRotation.x += 360.0f;
     }
 
     part->mRotation.y += y;
-    if (part->mRotation.y <= 360.0f) {
-        if (part->mRotation.y < 0.0f) {
-            part->mRotation.y += 360.0f;
-        }
-    }
-    else {
+    if (part->mRotation.y > 360.0f) {
         part->mRotation.y -= 360.0f;
+    }
+    else if (part->mRotation.y < 0.0f) {
+        part->mRotation.y += 360.0f;
     }
 
     part->mRotation.z += z;
-    if (part->mRotation.z <= 360.0f) {
-        if (part->mRotation.z < 0.0f) {
-            part->mRotation.z += 360.0f;
-        }
-    }
-    else {
+    if (part->mRotation.z > 360.0f) {
         part->mRotation.z -= 360.0f;
+    }
+    else if (part->mRotation.z < 0.0f) {
+        part->mRotation.z += 360.0f;
     }
 }
 
@@ -1113,7 +1107,7 @@ void BtlUnit_GetStatus(BattleUnit* unit, StatusEffectType type, s8* turns, s8* s
 }
 
 BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 strength) {
-    switch (type) {
+    switch ((s8)type) {
         case STATUS_SLEEP:
             unit->mSleepTurns = turns;
             unit->mSleepStrength = 0;
@@ -1328,16 +1322,19 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
     if (!turns) {
         return FALSE;
     }
-    switch (type) {
+    switch ((s8)type) {
         case STATUS_SLEEP:
-            if (turns <= 1) {
-                turns = 0;
-            }
-            else {
+            if (turns > 1) {
                 turns--;
             }
+            else {
+                turns = 0;
+            }
             unit->mSleepTurns = turns;
-            return turns == 0;
+            if (!turns) {
+                return TRUE;
+            }
+            return FALSE;
         case STATUS_ALLERGIC:
         case STATUS_STOP:
         case STATUS_DIZZY:
@@ -1351,73 +1348,85 @@ BOOL BtlUnit_CheckRecoveryStatus(BattleUnit* unit, StatusEffectType type) {
         case STATUS_SLOW:
         case STATUS_PAYBACK:
         case STATUS_HOLD_FAST:
-            if (turns < 0) {
-                turns++;
-            }
-            else {
+            if (turns >= 0) {
                 turns--;
             }
-            if (strength < 0) {
-                strength++;
+            else {
+                turns++;
+            }
+            if (strength >= 0) {
+                strength--;
             }
             else {
-                strength--;
+                strength++;
             }
             if (!turns) {
                 strength = 0;
             }
             BtlUnit_SetStatus(unit, type, turns, strength);
-            return turns == 0;
+            if (!turns) {
+                return TRUE;
+            }
+            return FALSE;
         case STATUS_HUGE:
         case STATUS_TINY:
-            if (turns <= 0) {
-                if (turns >= 0) {
-                    return FALSE;
-                }
+            if (turns > 0) {
+                turns--;
+            }
+            else if (turns < 0) {
                 turns++;
             }
             else {
-                turns--;
+                return FALSE;
             }
             if (!turns) {
                 strength = 0;
             }
             unit->mSizeChangeTurns = turns;
             unit->mSizeChangeStrength = strength;
-            return turns == 0;
+            if (!turns) {
+                return TRUE;
+            }
+            return FALSE;
         case STATUS_ATTACK_UP:
         case STATUS_ATTACK_DOWN:
-            if (turns <= 0) {
-                if (turns >= 0) {
-                    return FALSE;
-                }
+            if (turns > 0) {
+                turns--;
+            }
+            else if (turns < 0) {
                 turns++;
             }
             else {
-                turns--;
+                return FALSE;
             }
             if (!turns) {
                 strength = 0;
             }
             unit->mAtkChangeTurns = turns;
             unit->mAtkChangeStrength = strength;
-            return turns == 0;
+            if (!turns) {
+                return TRUE;
+            }
+            return FALSE;
         case STATUS_POISON:
         case STATUS_DEFENSE_UP:
         case STATUS_DEFENSE_DOWN:
         case STATUS_HP_REGEN:
         case STATUS_FP_REGEN:
-            if (turns < 0) {
-                turns++;
+            if (turns >= 0) {
+                turns--;
             }
             else {
-                turns--;
+                turns++;
             }
             if (!turns) {
                 strength = 0;
             }
             BtlUnit_SetStatus(unit, type, turns, strength);
-            return turns == 0;
+            if (!turns) {
+                return TRUE;
+            }
+            return FALSE;
         default:
             return FALSE;
     }
@@ -1698,7 +1707,8 @@ void BtlUnit_SetParamToPouch(BattleUnit* unit) {
         pouch->currentFP = unit->currentFp;
     }
     else if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
-        *(s16*)((u8*)pouch + BattleTransPartyId(unit->currentKind) * 0xE + 6) = unit->currentHp;
+        s32 id = BattleTransPartyId(unit->currentKind);
+        *(s16*)((u8*)pouch + id * 0xE + 6) = unit->currentHp;
         info = &wp->partyInfo[unit->currentKind - TYPE_PARTNER_MIN];
         info->field_0 = unit->mSizeMultiplier;
         info->field_24 = unit->mStatusFlags;
@@ -1759,7 +1769,10 @@ s32 BtlUnit_GetExp(BattleUnit* unit) {
             scale = 1.5f;
             break;
     }
-    return (s32)(scale * (f32)(unitLevel - level) * 0.5f) + unit->mKindParams->mBonusExp;
+    {
+        f32 t = scale * (f32)(unitLevel - level);
+        return (s32)(t / 2.0f) + unit->mKindParams->mBonusExp;
+    }
 }
 
 s32 BtlUnit_GetCoin(BattleUnit* unit) {
@@ -2009,17 +2022,19 @@ void BtlUnit_LoadSeMode(s32 mode, s32 kind, BtlPoseSoundTable* table, BtlPoseSou
                     work->field_0x10 = 0;
                     break;
             }
-            break;
+            work->field_0x12 = work->field_0xC;
+            return;
         case -2:
-            break;
+            work->field_0x12 = work->field_0xC;
+            return;
         default:
-            work->name0 = NULL;
-            work->name1 = NULL;
-            work->field_0xC = 0;
-            work->field_0xE = 0;
-            work->field_0x10 = 0;
             break;
     }
+    work->name0 = NULL;
+    work->name1 = NULL;
+    work->field_0xC = 0;
+    work->field_0xE = 0;
+    work->field_0x10 = 0;
     work->field_0x12 = work->field_0xC;
 }
 
@@ -2218,7 +2233,7 @@ void BtlUnit_HpGaugeMain(BattleUnit* unit) {
                     gauge->field_0x18 = 0.0f;
                     maxHp = unit->maxHp;
                     t = intplGetValue(0, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f);
-                    gauge->field_0x14 = (f32)unit->currentHp / (f32)maxHp + (f32)(gauge->field_0xC - gauge->field_0x10) * t / (f32)maxHp;
+                    gauge->field_0x14 = (f32)(gauge->field_0xC - gauge->field_0x10) * t / (f32)maxHp + (f32)unit->currentHp / (f32)maxHp;
                     break;
             }
         }

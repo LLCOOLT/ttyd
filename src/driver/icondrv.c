@@ -30,8 +30,6 @@ BOOL icon_bin_ok;
 static IconWork work[2];
 
 //.sdata
-u16 suuji[] = { 473, 475, 477, 479, 481, 483, 485, 487, 489, 491 };   // 0-9
-u16 suuji_s[] = { 474, 476, 478, 480, 482, 484, 486, 488, 490, 492 }; // 0-9 small
 
 typedef struct IconFrame {
     u16 tplId; // 0x0
@@ -86,6 +84,18 @@ void iconGX(Mtx mtx, IconEntry* entry);
 
 
 // TODO: remove? no function in original symbol map
+inline IconEntry* iconFindIn(IconWork* wp, const char* name) {
+    int i;
+    IconEntry* entry = wp->entries;
+
+    for (i = 0; i < wp->count; i++, entry++) {
+        if (entry->uflags & 1 && !strcmp(entry->name, name)) {
+            return entry;
+        }
+    }
+    return NULL;
+}
+
 inline IconEntry* iconGetEntry(const char* name) {
     IconWork* wp = iconGetWork();
     IconEntry* entry = wp->entries;
@@ -156,18 +166,20 @@ void iconReInit(void) {
     memset(wp->entries, 0, sizeof(IconEntry) * wp->count);
 }
 
+s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
+
 void iconMain(void) {
-    IconBinData* data;
     IconWork* wp;
     IconEntry* entry;
     int i;
+    IconBinData* data;
 
     wp = iconGetWork();
     if (!icon_tpl_ok)
         return;
-    if (!icon_bin_ok)
+    if (!icon_bin_ok) {
         return;
-
+    }
     for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
         if (entry->uflags & 1) {
             if (entry->uflags & 0x2000) {
@@ -192,7 +204,7 @@ void iconMain(void) {
                     if (entry->currIcon >= entry->numIcons) {
                         entry->currIcon = 0;
                     }
-                    data = iconGetBinData(entry->iconId);
+                    data = iconGetBinData(*(u16*)&entry->iconId);
                     entry->tplId = data->frames[entry->currIcon].tplId;
                     entry->frameDelay = data->frames[entry->currIcon].delay;
                 }
@@ -201,19 +213,18 @@ void iconMain(void) {
                 if (entry->uflags & 0x10) {
                     dispEntry(CAMERA_2D, 200.0f, 1, iconDisp, entry);
                 }
-                // TODO: uncomment shadowEntry when added
                 else if (entry->uflags & 0x100) {
-                    // shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
+                    shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
                     dispEntry(CAMERA_3D_EFFECTA, dispCalcZ(&entry->position), 1, iconDisp, entry);
                 } else if (entry->uflags & 0x200) {
-                    // shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
+                    shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
                     dispEntry(CAMERA_3D_EFFECTB, dispCalcZ(&entry->position), 1, iconDisp, entry);
                 } else {
-                    // shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
-                    if (entry->color.a == 0xFF) {
-                        dispEntry(CAMERA_3D, dispCalcZ(&entry->position), 1, iconDisp, entry);
-                    } else {
+                    shadowEntry(entry->position.x, entry->position.y, entry->position.z, 10.0f);
+                    if (entry->color.a != 0xFF) {
                         dispEntry(CAMERA_3D, dispCalcZ(&entry->position), 2, iconDisp, entry);
+                    } else {
+                        dispEntry(CAMERA_3D, dispCalcZ(&entry->position), 1, iconDisp, entry);
                     }
                 }
             }
@@ -223,9 +234,9 @@ void iconMain(void) {
 
 void iconEntry(const char* name, s16 iconId) {
     IconWork* wp = iconGetWork();
-    IconEntry* entry = iconNameToPtr(name); // inline
-    IconBinData* data;
     int i;
+    IconEntry* entry = iconFindIn(wp, name); // inline
+    IconBinData* data;
 
     for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
         if (!(entry->uflags & 1)) { // looking for unused entry to allocate
@@ -239,7 +250,7 @@ void iconEntry(const char* name, s16 iconId) {
     entry->color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     strcpy(entry->name, name);
     entry->iconId = iconId;
-    data = iconGetBinData(iconId);
+    data = iconGetBinData(*(u16*)&entry->iconId);
     if (data) {
         entry->width = data->width;
         entry->height = data->height;
@@ -255,19 +266,19 @@ void iconEntry(const char* name, s16 iconId) {
     }
     entry->uflags |= 1;
     if (mapGetWork()->entries[0].flags & 2) {
-        if (strncmp(gp->currentMapName, "aji", 3) || evtGetValue(0, GSW(0)) != 0x178) {
-            entry->uflags |= 0x40;
-        } else {
+        if (!strncmp(gp->currentMapName, "aji", 3) && evtGetValue(0, GSW(0)) == 0x178) {
             entry->uflags &= ~0x40;
+        } else {
+            entry->uflags |= 0x40;
         }
     }
 }
 
 void iconEntry2D(const char* name, s16 iconId) {
     IconWork* wp = iconGetWork();
-    IconEntry* entry = iconNameToPtr(name); // inline
-    IconBinData* data;
     int i;
+    IconEntry* entry = iconFindIn(wp, name); // inline
+    IconBinData* data;
 
     for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
         if (!(entry->uflags & 1)) { // looking for unused entry to allocate
@@ -281,7 +292,7 @@ void iconEntry2D(const char* name, s16 iconId) {
     entry->color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     strcpy(entry->name, name);
     entry->iconId = iconId;
-    data = iconGetBinData(iconId);
+    data = iconGetBinData(*(u16*)&entry->iconId);
     if (data) {
         entry->width = data->width;
         entry->height = data->height;
@@ -316,7 +327,7 @@ void iconChange(const char* name, s16 iconId) {
     IconBinData* data;
 
     entry->iconId = iconId;
-    data = iconGetBinData(entry->iconId);
+    data = iconGetBinData(*(u16*)&entry->iconId);
     entry->width = data->width;
     entry->height = data->height;
     entry->numIcons = data->numIcons;
@@ -349,6 +360,7 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     Mtx transmtx, scalemtx, rotmtx, mtx;
     CameraEntry* camera;
     IconBinData* data;
+    IconEntry* ep = &entry;
 
     camera = camGetCurPtr();
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -369,7 +381,7 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     entry.tplId = data->frames[0].tplId;
     entry.frameDelay = data->frames[0].delay;
     ICON_ANIM_TPL(data, entry.tplId);
-    iconGX(mtx, &entry);
+    iconGX(mtx, ep);
 }
 
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
@@ -381,22 +393,26 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {
     Mtx m;
     CameraEntry* camera;
     IconBinData* data;
+    IconEntry* ep;
+    u16 id;
 
     camera = camGetCurPtr();
+    ep = &entry;
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
+    id = iconId;
     entry.uflags = flags;
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     entry.iconId = iconId;
-    data = iconGetBinData((u16)iconId);
+    data = iconGetBinData(id);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
     entry.frameDelay = data->frames[0].delay;
     ICON_ANIM_TPL(data, entry.tplId);
     MTXConcat(camera->view, mtx, m);
-    iconGX(m, &entry);
+    iconGX(m, ep);
 }
 
 void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
@@ -404,6 +420,7 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     Mtx m;
     CameraEntry* camera;
     IconBinData* data;
+    IconEntry* ep = &entry;
 
     camera = camGetCurPtr();
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -419,16 +436,16 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     entry.frameDelay = data->frames[0].delay;
     ICON_ANIM_TPL(data, entry.tplId);
     MTXConcat(camera->view, pos, m);
-    iconGX(m, &entry);
+    iconGX(m, ep);
 }
 
 void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
-    static u8 dummy ATTRIBUTE_ALIGN(32) = 0;
+    static char dummy[] ATTRIBUTE_ALIGN(32) = "";
     IconBinData* data;
     u16 tplId;
 
     if (!icon_tpl_ok || !icon_bin_ok) {
-        GXInitTexObj(texObj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+        GXInitTexObj(texObj, dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
         return;
     }
     data = iconGetBinData((u16)iconId);
@@ -453,7 +470,7 @@ void iconGetWidthHight(u16* width, u16* height, s16 iconId) {
 }
 
 void iconGX(Mtx mtx, IconEntry* entry) {
-    static u8 dummy ATTRIBUTE_ALIGN(32) = 0;
+    static char dummy[] ATTRIBUTE_ALIGN(32) = "";
     f32 x, y, w, hn;
     f32 h;
     Mtx scalemtx, m;
@@ -476,7 +493,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
     {
         u16 tplId = entry->tplId;
         if (!icon_tpl_ok || !icon_bin_ok) {
-            GXInitTexObj(&texObj, &dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+            GXInitTexObj(&texObj, dummy, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
         } else {
             TEXGetGXTexObjFromPalette(icon_tpl, &texObj, tplId);
             GXInitTexObjLOD(&texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -672,6 +689,9 @@ void iconSetAlpha(const char* name, u8 alpha) {
         entry->color = color;
     }
 }
+
+static u16 suuji[] = { 473, 475, 477, 479, 481, 483, 485, 487, 489, 491 };   // 0-9
+u16 suuji_s[] = { 474, 476, 478, 480, 482, 484, 486, 488, 490, 492 }; // 0-9 small
 
 s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     s32 digits[5];

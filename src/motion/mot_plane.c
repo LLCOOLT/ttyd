@@ -39,6 +39,15 @@ void marioChkOverhead(void);
 BOOL chkCollision(f32* outY);
 static void flyMain(void);
 
+
+f32 planeData[41] = {
+	5.0f, -0.02f, -0.03f, 25.0f, -45.0f, 0.4f, 1.0f, 0.1f, -0.1f, 1.5f,
+	0.2f, 0.05f, 3.4f, 1.0f, 0.025f, 0.045f, 0.8f, 1.5f, -0.3f, -5.0f,
+	3.9f, -0.112f, 0.118f, 0.5f, 0.4f, -8.0f, -2.0f, -4.0f, -2.0f, 0.2f,
+	0.0f, 1.2f, 1.0f, 15.0f, -30.0f, 12.0f, 0.0f, 30.0f, -30.0f, 6.0f,
+	28.0f,
+};
+
 EVT_BEGIN(sound_evt)
 CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_AIRPLANE1"), LW(0), LW(1), LW(2), 0)
 WAIT_FRAMES(12)
@@ -49,14 +58,6 @@ WAIT_FRAMES(12)
 CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_AIRPLANE1"), LW(0), LW(1), LW(2), 0)
 RETURN
 EVT_END()
-
-f32 planeData[41] = {
-	5.0f, -0.02f, -0.03f, 25.0f, -45.0f, 0.4f, 1.0f, 0.1f, -0.1f, 1.5f,
-	0.2f, 0.05f, 3.4f, 1.0f, 0.025f, 0.045f, 0.8f, 1.5f, -0.3f, -5.0f,
-	3.9f, -0.112f, 0.118f, 0.5f, 0.4f, -8.0f, -2.0f, -4.0f, -2.0f, 0.2f,
-	0.0f, 1.2f, 1.0f, 15.0f, -30.0f, 12.0f, 0.0f, 30.0f, -30.0f, 6.0f,
-	28.0f,
-};
 
 static inline void planeSetSpd(f32 a, f32 b, f32 c) {
 	MarioWork* m = marioGetPtr();
@@ -317,7 +318,7 @@ void mot_plane(void) {
 			break;
 		}
 		planeReset();
-		marioChgPose("M_J_1C");
+		marioChgPose("M_J_1C\0");
 		MW(mp, 0x90, f32) = 1.0f + (MW(mp, 0x2ac, f32) - 37.0f);
 		MW(mp, 0x180, f32) = 0.0f;
 		marioSetFallPara();
@@ -767,6 +768,10 @@ void mot_plane_post(void) {
 	allPartyRideOff2();
 }
 
+static f32 planeDead270(void) {
+	return 270.0f;
+}
+
 BOOL chkCollision(f32* outY) {
 	Vec dir, hpos, v, v2;
 	f32 s1, c1, s0, c0, s2, c2;
@@ -791,9 +796,12 @@ BOOL chkCollision(f32* outY) {
 	MW(mp, 0x1e0, HitEntry*) = NULL;
 	r = planeData[40];
 	sincosf(&s1, &c1, MD(8, f32));
-	x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32)) + r * (s1 * -c0);
-	y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32)) + s0 * r;
-	z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32)) + r * (c1 * -c0);
+	x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32));
+	y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32));
+	z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
+	x += r * (s1 * -c0);
+	y += s0 * r;
+	z += r * (c1 * -c0);
 	sincosf(&s0, &c0, MD(4, f32) - 90.0f);
 	r = planeData[39];
 	x += r * (c0 * s1) - r * (s2 * c1);
@@ -858,4 +866,8 @@ BOOL chkCollision(f32* outY) {
 		}
 	}
 	return ret;
+}
+
+static f32 planeDead4(void) {
+	return 4.0f;
 }

@@ -3454,7 +3454,7 @@ USER_FUNC(chain_main) {
     dy = me->position.y - end->position.y;
     dx = me->position.x - end->position.x;
     dz = me->position.z - end->position.z;
-    len = (f32)sqrt(dy * dy + dx * dx + dz * dz) * 0.25f;
+    len = 0.25f * (f32)sqrt(dy * dy + dx * dx + dz * dz);
     if (len < 10.0f) {
         len = 10.0f;
     }

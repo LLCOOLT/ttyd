@@ -1353,9 +1353,9 @@ USER_FUNC(object_entry) {
 
 USER_FUNC(object_get_num) {
     GenkiWork* w = get_ptr();
-    s32 n = 0;
     s32 i;
-    for (i = 0; i < 10; i++) {
+    s32 n;
+    for (i = 0, n = 0; i < 10; i++) {
         if (w->object[i].state == 2) {
             n++;
         }

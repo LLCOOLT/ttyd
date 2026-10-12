@@ -80,6 +80,7 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
     f32 step, stepY;
     f32 a, sn, cs, b, fy;
     s32 r;
+    f32 tx, ty;
 
     effect = effEntry();
     effect->type = "Stardust2N64\0\0\0";
@@ -116,6 +117,8 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
         cs = (f32)cos(a);
         b = (f32)sin(6.2831855f * (10.0f * spread - 90.0f) / 360.0f);
         fy = ((f32)i - 1.0f) * stepY;
+        tx = 0.4f * vx - 0.1f * vx * b;
+        ty = 0.4f * vy - 0.1f * vy * b;
         p->scale = 1.0f;
         p->frame = 0;
         p->life = i + 30;
@@ -123,15 +126,15 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
         case 0:
         case 1:
             p->velocity.z = 0.0f;
-            p->velocity.x = sn * (0.4f * vx - 0.1f * vx * b);
-            p->velocity.y = cs * (0.4f * vy - 0.1f * vy * b);
+            p->velocity.x = sn * tx;
+            p->velocity.y = cs * ty;
             p->position.z = 0.0f;
             break;
         case 2:
         case 5:
-            p->velocity.x = sn * (0.4f * vx - 0.1f * vx * b);
+            p->velocity.x = sn * tx;
             p->position.y = fy;
-            p->position.z = cs * (0.4f * vx - 0.1f * vx * b);
+            p->position.z = cs * tx;
             p->velocity.y = 0.03f * (f32)(-(rand() % 10));
             p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
             break;
@@ -142,13 +145,12 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
             p->velocity.y = 0.0f;
             p->velocity.x = 0.0f;
             p->velocity.z = 0.0f;
-            p->life += i;
-            p->life += i;
+            p->life = p->life + i + i;
             break;
         default:
-            p->velocity.x = sn * (0.4f * vx - 0.1f * vx * b);
+            p->velocity.x = sn * tx;
             p->position.y = fy;
-            p->position.z = cs * (0.4f * vx - 0.1f * vx * b);
+            p->position.z = cs * tx;
             p->velocity.y = 0.03f * (f32)(-(rand() % 10));
             p->velocity.z = 0.04f * (f32)(rand() % 10) + 0.01f;
             break;

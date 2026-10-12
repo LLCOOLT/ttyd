@@ -279,28 +279,19 @@ void effReleaseMain(EffectEntry* effect) {
             work->alpha[3] = 0;
             break;
         }
-        step = work->step;
-        if (step < 30) {
-            e = &anime_data[step];
-            v = 0.01f * (f32)e->time + 0.3f * (f32)step;
-            val = e->value & 0xFF;
-            work->alpha[0] = 0;
-            work->size[0] = 0.0f;
-            work->alpha[1] = val;
-            work->alpha[2] = val;
-            work->size[1] = v;
-            work->size[2] = 0.6f + v;
+        if (work->step < 30) {
+            v = 0.01f * (f32)anime_data[work->step].time + 0.3f * (f32)work->step;
+            val = anime_data[work->step].value & 0xFF;
         } else {
-            e = &anime_data[29];
-            v = 0.3f * (f32)step + 0.01f * (f32)e->time;
-            val = e->value & 0xFF;
-            work->alpha[0] = 0;
-            work->size[0] = 0.0f;
-            work->alpha[1] = val;
-            work->alpha[2] = val;
-            work->size[1] = v;
-            work->size[2] = 0.6f + v;
+            v = 0.3f * (f32)work->step + 0.01f * (f32)anime_data[29].time;
+            val = anime_data[29].value & 0xFF;
         }
+        work->alpha[0] = 0;
+        work->size[0] = 0.0f;
+        work->alpha[1] = val & 0xFF;
+        work->alpha[2] = val & 0xFF;
+        work->size[1] = v;
+        work->size[2] = 0.6f + v;
         work->step++;
         break;
     case 1:
@@ -319,7 +310,7 @@ void effReleaseMain(EffectEntry* effect) {
             break;
         }
         e = &anime_data[work->step];
-        v = 0.01f * (f32)e->time;
+        v = 0.01f * (f32)anime_data[work->step].time;
         work->alpha[0] = 0;
         work->alpha[1] = e->value & 0xFF;
         work->alpha[2] = e->value & 0xFF;

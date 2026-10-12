@@ -229,14 +229,16 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
     GXSetCullMode(GX_CULL_NONE);
     for (i = 0; i < 2; i++) {
+        k = (frame + i * 4) % 17;
         PSMTXRotRad(rot, 'z', 0.017453292f * (-282 + i * 36));
         PSMTXConcat(base, rot, mtx);
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         c3 = (GXColor){0, 0, 0, 0};
-        c3.r = colr[(frame + i * 4) % 17];
-        c3.g = colg[(frame + i * 4) % 17];
-        c3.b = colb[(frame + i * 4) % 17];
+        c3.r = colr[k];
+        c3.g = colg[k];
+        c3.b = colb[k];
+
         c3.a = work->alpha;
         GXSetTevColor(GX_TEVREG0, c3);
         GXSetTevColor(GX_TEVREG1, (GXColor){255, 255, 255, 0});
@@ -259,9 +261,10 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXScale(scale, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f);
             PSMTXConcat(mtx, scale, mtx);
             PSMTXConcat(mtx2, mtx, mtx2);
-            p = vtx + j * 2;
-            q = &vtx[n + 1];
-            memcpy(p, &horao_spell_vtx[j * 2], sizeof(effN64Vtx));
+            k = j * 2;
+            p = &vtx[k];
+            memcpy(p, &horao_spell_vtx[k], sizeof(effN64Vtx));
+
             OSInitFastCast();
             OSs16tof32(&p->x, &v1.x);
             OSs16tof32(&p->y, &v1.y);
@@ -271,7 +274,9 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
             OSf32tos16(&v1.x, &p->x);
             OSf32tos16(&v1.y, &p->y);
             OSf32tos16(&v1.z, &p->z);
+            q = &vtx[n + 1];
             memcpy(q, &horao_spell_vtx[n + 1], sizeof(effN64Vtx));
+
             OSInitFastCast();
             OSs16tof32(&q->x, &v2.x);
             OSs16tof32(&q->y, &v2.y);
@@ -285,9 +290,10 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
         GXInvalidateVtxCache();
         effSetVtxDescN64(vtx);
-        for (k = 0; k < 15; k++) {
+        for (k = 0, n = 0; k < 15; k++, n += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(k * 2, k * 2 + 2, k * 2 + 1, k * 2, k * 2 + 1, k * 2 + 2, k * 2 + 3, k * 2);
+            tri2(n, n + 2, n + 1, n, n + 1, n + 2, n + 3, n);
         }
+
     }
 }

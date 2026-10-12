@@ -2957,9 +2957,9 @@ void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 
 
 void screen_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
-    Mtx trans;
-    Mtx scale;
     Mtx mtx;
+    Mtx scale;
+    Mtx trans;
     u8* buf;
     s32 i;
     s32 j;
@@ -2985,7 +2985,7 @@ void screen_tev(MapTevCallbackInfo* info) {
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = col;
+                        buf[(u32)((j / 8) * 32 + (((i / 4) << 8) + j % 8) + ((i % 4) << 3))] = col;
                     }
                 }
             }
@@ -3015,6 +3015,8 @@ void screen_tev(MapTevCallbackInfo* info) {
             screen_wp->count++;
             if (screen_wp->count % 200 == 0) {
                 switch (rand() % 3) {
+                    default:
+                        break;
                     case 0:
                         screen_wp->xTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
                         screen_wp->yTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
@@ -3042,7 +3044,8 @@ void screen_tev(MapTevCallbackInfo* info) {
         }
         GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
-        PSMTXScale(mtx, 1.0f, 6.0f * ((100.0f - camGetPtr(CAMERA_3D)->cameraPos.z) / 1000.0f) + 16.0f, 1.0f);
+        x = 100.0f - camGetPtr(CAMERA_3D)->cameraPos.z;
+        PSMTXScale(mtx, 1.0f, 6.0f * (x / 1000.0f) + 16.0f, 1.0f);
         GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
         info->tevStage = 2;

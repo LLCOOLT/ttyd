@@ -39,7 +39,7 @@ void screen_tev(MapTevCallbackInfo* info) {
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        buf[(u32)((j / 8) * 32 + (i / 4) * 256 + j % 8 + (i % 4) * 8)] = col;
+                        buf[(u32)((j / 8) * 32 + (((i / 4) << 8) + j % 8) + ((i % 4) << 3))] = col;
                     }
                 }
             }

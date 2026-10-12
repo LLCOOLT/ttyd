@@ -114,19 +114,23 @@ void countDownMain(void) {
 
 static void countDownDisp(CameraId cameraId, void* param) {
     GXColor white = sWhite;
-    GXColor white2 = sWhite;
-    GXColor white3 = sWhite;
+    GXColor white2;
+    GXColor white3;
     CountdownWork* work = wp;
     s32 remaining;
+    u16 flags;
     Mtx mtx;
     Mtx scale;
     Mtx base;
+    white3 = sWhite;
+    white2 = sWhite;
+    flags = work->flags;
     remaining = work->limit - work->elapsed / (OS_TIMER_CLOCK / 1000);
-    if ((work->flags & 4) == 0) {
+    if ((flags & 4) == 0) {
         s32 sec, msec;
         s32 digits[3];
         s32 i;
-        if ((work->flags & 2) != 0) {
+        if ((flags & 2) != 0) {
             remaining = 0;
         }
         sec = remaining / 1000;

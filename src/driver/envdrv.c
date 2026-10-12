@@ -972,7 +972,7 @@ static inline void envTexObj(TEXPalette* pal, GXTexObj* to, u32 id) {
     } else {
         mipMap = GX_TRUE;
     }
-    GXInitTexObj(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXTexFmt)tdp->textureHeader->format, tdp->textureHeader->wrapS, tdp->textureHeader->wrapT, mipMap);
+    GXInitTexObj(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXTexFmt)tdp->textureHeader->format, GX_CLAMP, GX_CLAMP, mipMap);
     GXInitTexObjLOD(to, tdp->textureHeader->minFilter, tdp->textureHeader->magFilter, tdp->textureHeader->minLOD, tdp->textureHeader->maxLOD, tdp->textureHeader->LODBias, GX_DISABLE, tdp->textureHeader->edgeLODEnable, GX_ANISO_1);
 }
 
@@ -987,7 +987,7 @@ static inline void envTexObjCI(TEXPalette* pal, GXTexObj* to, GXTlutObj* tlo, GX
         mipMap = GX_TRUE;
     }
     GXInitTlutObj(tlo, tdp->CLUTHeader->data, tdp->CLUTHeader->format, tdp->CLUTHeader->numEntries);
-    GXInitTexObjCI(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXCITexFmt)tdp->textureHeader->format, tdp->textureHeader->wrapS, tdp->textureHeader->wrapT, mipMap, tluts);
+    GXInitTexObjCI(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXCITexFmt)tdp->textureHeader->format, GX_CLAMP, GX_CLAMP, mipMap, tluts);
     GXInitTexObjLOD(to, tdp->textureHeader->minFilter, tdp->textureHeader->magFilter, tdp->textureHeader->minLOD, tdp->textureHeader->maxLOD, tdp->textureHeader->LODBias, GX_DISABLE, tdp->textureHeader->edgeLODEnable, GX_ANISO_1);
 }
 
@@ -1010,8 +1010,8 @@ static inline void envLoadTex(u32 id, s32 map) {
     envTevLoadTexMtxImm(t, (GXTexMtx)texmtx_tbl[map], GX_PTTEXMTX0, mtxType)
 
 void envAddTev(s32 type, MapTevCallbackInfo* info) {
+    s32 unk18, coord, map, stage;
     EnvironmentWork* wp = envGetWork();
-    s32 stage, map, coord, unk18;
     Mtx mtx;
 
     stage = info->tevStage;
@@ -1244,9 +1244,9 @@ void envSetWater(MapTevCallbackInfo* info) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 s = sin((f32)gp->retraceCount / 10.0f + 18.849556f * j * 0.015625f);
-            s32 off = (i / 4) * 32 + (j / 4) * 512 + ((i % 4) + (j % 4) * 4) * 2;
-            buf2[off] = 0.6f + (scale * s + 128.0f);
-            buf2[off + 1] = 0x80;
+            u8* p = &buf2[(i / 4) * 32 + (j / 4) * 512 + ((i % 4) + (j % 4) * 4) * 2];
+            p[0] = 0.6f + (scale * s + 128.0f);
+            p[1] = 0x80;
         }
     }
     DCFlushRange(buf2, 0x2000);
@@ -1293,11 +1293,11 @@ void envSetYami(MapTevCallbackInfo* info) {
     static f32 u1;
     static f32 u2;
     static u32 v_count;
-    s32 unk18;
-    s32 coord;
-    s32 map;
-    s32 stage;
     EnvironmentWork* wp;
+    GXTevStageID stage;
+    GXTexMapID map;
+    GXTexCoordID coord;
+    s32 unk18;
     GXTexObj obj;
     Mtx mtx;
     u32 rc;
@@ -1324,12 +1324,12 @@ void envSetYami(MapTevCallbackInfo* info) {
     GXSetTevColorOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
     GXSetTevAlphaOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
     C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u1, 0.5f);
-    PSMTXConcat(mtx, (MtxPtr)((u8*)wp + 0xC0), mtx);
+    PSMTXConcat(mtx, (MtxPtr)wp->unkC0, mtx);
     PSMTXConcat(mtx, info->mtx, mtx);
     GXLoadTexMtxImm(mtx, texmtx_tbl[map], GX_MTX3x4);
     GXSetTexCoordGen2(coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
     C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u2, 0.5f);
-    PSMTXConcat(mtx, (MtxPtr)((u8*)wp + 0xC0), mtx);
+    PSMTXConcat(mtx, (MtxPtr)wp->unkC0, mtx);
     PSMTXConcat(mtx, info->mtx, mtx);
     GXLoadTexMtxImm(mtx, texmtx_tbl[map + 1], GX_MTX3x4);
     GXSetTexCoordGen2(coord + 1, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map + 1], GX_FALSE, GX_PTIDENTITY);

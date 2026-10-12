@@ -140,6 +140,8 @@ EffectEntry* effFireworksN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     return effect;
 }
 
+#pragma push
+#pragma opt_unroll_instr_count 16
 void effFireworksMain(EffectEntry* effect) {
     EffFireworksN64Work* work = effect->userdata;
     Vec position2;
@@ -177,7 +179,7 @@ void effFireworksMain(EffectEntry* effect) {
         work->vel.y *= 0.95f;
         work->vel.z *= 0.95f;
         work->vel.y -= 0.15f;
-        work->scale = 0.11f * (work->scaleTarget - work->scale) + work->scale;
+        work->scale += 0.11f * (work->scaleTarget - work->scale);
     } else {
         idx = frame & 3;
         work->px[idx] = work->position.x - work->vel.x * (f32)(32 - frame);
@@ -201,7 +203,6 @@ void effFireworksMain(EffectEntry* effect) {
                 work->py[i] += work->vy[i];
                 work->pz[i] += work->vz[i];
                 work->vy[i] -= 0.15f;
-                work->py[i] = -1000.0f;
             }
         }
         if (frame >= 32) {
@@ -211,6 +212,7 @@ void effFireworksMain(EffectEntry* effect) {
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position2), 2, (DispCallback)effFireworksDisp, effect);
 }
+#pragma pop
 
 void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
     static s32 sflag;
@@ -300,16 +302,19 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
         }
         {
             Vec pt = {0.0f, 0.0f, 0.0f};
-            Vec target = {0.0f, 0.0f, 0.0f};
-            Vec pos = {0.0f, 0.0f, 1000.0f};
-            Vec up = {0.0f, 1.0f, 0.0f};
+            Vec t;
             pt.x = x;
             pt.y = y;
             pt.z = z;
-            PSMTXMultVec(camera->view, &pt, &pt);
-            PSMTX44MultVec(camera->projection, &pt, &pt);
-            sx = pt.x * gp->fbWidth * 0.5f;
-            sy = pt.y * gp->efbHeight * 0.5f;
+            t = pt;
+            PSMTXMultVec(camera->view, &t, &t);
+            PSMTX44MultVec(camera->projection, &t, &t);
+            sx = t.x * gp->fbWidth / 2.0f;
+            sy = t.y * gp->efbHeight / 2.0f;
+            {
+            Vec target = {0.0f, 0.0f, 0.0f};
+            Vec pos = {0.0f, 0.0f, 1000.0f};
+            Vec up = {0.0f, 1.0f, 0.0f};
             GXGetProjectionv(proj);
             MTXOrtho(ortho, 480.0f, 0.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
             GXSetProjection(ortho, GX_ORTHOGRAPHIC);
@@ -326,6 +331,7 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
             GXPosition3f32(sx, sy - 8.0f, 0.0f);
             GXTexCoord2s16(0, 0);
             GXSetProjectionv(proj);
+            }
         }
     }
 }

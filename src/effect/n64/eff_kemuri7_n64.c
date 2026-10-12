@@ -76,11 +76,11 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     work->rotation.x = 0.0f;
     work->rotation.y = 30.0f * side + angle - 15.0f;
     work->rotation.z = 0.0f;
-    sideAngle = 180.0f * side;
     twoPi = 6.2831855f;
     full = 360.0f;
     ofs = 45.0f;
     dist = 5.0f;
+    sideAngle = 180.0f * side;
     z = reviseAngle(angle);
     rad = twoPi * z / full;
     work->sinAngle = sin(rad);

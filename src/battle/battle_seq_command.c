@@ -1506,6 +1506,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 	Vec pos;
 	u32 len;
 	f32 w;
+	f32 x;
 
 	pouchGetPtr();
 	sprintf(buf, msgSearch("btl_msg_multi_item_cancel_check"));
@@ -1514,7 +1515,8 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - w, 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f);
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
 	FontDrawStart();
-	FontDrawString(0.0f - w, 27.0f, buf);
+	x = 0.0f;
+	FontDrawString(x - w, 27.0f, buf);
 	FontDrawString(-20.0f, -13.0f, "\202\315\202\242\201@");
 	FontDrawString(-20.0f, -38.0f, "\202\242\202\242\202\246");
 	pos.x = -40.0f;
@@ -1814,6 +1816,106 @@ void BattleCommandDisplay_TargetSelectMenuSetup(BattleWork* wp) {
 }
 #pragma dont_inline reset
 
+u16 FontGetMessageWidth(const char* message);
+void btl_camera_set_mode(s32 id, s32 mode);
+
+void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
+	BattleWork* wp = param;
+	Vec icon;
+	Vec pos1;
+	Vec screen1;
+	Vec pos2;
+	Vec screen2;
+	BattleCommand* cmd = &wp->commandMenu;
+	BattleCursor* cursor;
+	BattleWorkTarget* t;
+	BattleWorkWeaponTargets* wt;
+	BattleUnit* unit;
+	BattleUnitPart* part;
+	const char* name;
+	s32 i;
+
+	_btlcmd_GetCursorPtr(cmd, CMD_S32(wp, 0x1c5c), &cursor);
+	if (cmd->weapon[cursor->field_0].weapon->targetClassFlags & 0x1000000) {
+		wt = &wp->weaponTargets;
+		t = &wt->targets[wt->targetIndices[wt->currentTarget]];
+		unit = BattleGetUnitPtr(wp, t->unitIdx);
+		part = BtlUnit_GetPartsPtr(unit, t->partIdx);
+		pos1.x = ((s16*)t->field_0x4)[0];
+		pos1.y = ((s16*)t->field_0x4)[1];
+		pos1.z = ((s16*)t->field_0x4)[2];
+		if (!(unit->mAttributeFlags & 2)) {
+			btlGetScreenPoint(&pos1, &screen1);
+			icon.x = screen1.x;
+			icon.y = screen1.y;
+			icon.z = 0.0f;
+			iconDispGx(&icon, 0x10, 0x1ef, 1.0f);
+			if (unit->currentKind == 0xe2) {
+				name = pouchGetYoshiName();
+			} else {
+				name = msgSearch(part->partName);
+			}
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, 16.0f + FontGetMessageWidth(name), 32.0f, 10.0f);
+			FontDrawStart();
+			FontDrawString(-232.0f, 83.0f, name);
+		} else {
+			btlGetScreenPoint(&pos1, &screen1);
+			icon.x = screen1.x;
+			icon.y = screen1.y;
+			icon.z = 0.0f;
+			iconDispGx(&icon, 0x18, 0x1ef, 1.0f);
+			if (unit->currentKind == 0xe2) {
+				name = pouchGetYoshiName();
+			} else {
+				name = msgSearch(part->partName);
+			}
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, 16.0f + FontGetMessageWidth(name), 32.0f, 10.0f);
+			FontDrawStart();
+			FontDrawString(-232.0f, 83.0f, name);
+		}
+	} else {
+		wt = &wp->weaponTargets;
+		for (i = 0; i < wt->numTargets; i++) {
+			t = &wt->targets[wt->targetIndices[i]];
+			unit = BattleGetUnitPtr(wp, t->unitIdx);
+			part = BtlUnit_GetPartsPtr(unit, t->partIdx);
+			pos2.x = ((s16*)t->field_0x4)[0];
+			pos2.y = ((s16*)t->field_0x4)[1];
+			pos2.z = ((s16*)t->field_0x4)[2];
+			if (!(unit->mAttributeFlags & 2)) {
+				btlGetScreenPoint(&pos2, &screen2);
+				icon.x = screen2.x;
+				icon.y = screen2.y;
+				icon.z = 0.0f;
+				iconDispGx(&icon, 0x10, 0x1ef, 1.0f);
+				if (unit->currentKind == 0xe2) {
+					name = pouchGetYoshiName();
+				} else {
+					name = msgSearch(part->partName);
+				}
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 118.0f - (f32)(i * 32), 16.0f + FontGetMessageWidth(name), 32.0f, 10.0f);
+				FontDrawStart();
+				FontDrawString(-232.0f, 115.0f - (f32)(i * 32), name);
+			} else {
+				btlGetScreenPoint(&pos2, &screen2);
+				icon.x = screen2.x;
+				icon.y = screen2.y;
+				icon.z = 0.0f;
+				iconDispGx(&icon, 0x18, 0x1ef, 1.0f);
+				if (unit->currentKind == 0xe2) {
+					name = pouchGetYoshiName();
+				} else {
+					name = msgSearch(part->partName);
+				}
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 118.0f - (f32)(i * 32), 16.0f + FontGetMessageWidth(name), 32.0f, 10.0f);
+				FontDrawStart();
+				FontDrawString(-232.0f, 115.0f - (f32)(i * 32), name);
+			}
+		}
+	}
+	btl_camera_set_mode(0, 0);
+}
+
 void BattleCommandDisplay_TargetSelectMenuEnd(BattleWork* wp) {
 	BattleCommand* cmd = &wp->commandMenu;
 	BattleCursor* cursor;
@@ -2001,10 +2103,12 @@ void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color) {
 			btlDispGXInit2DRasta();
 			GXLoadPosMtxImm(cam->view, 0);
 		}
-		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - unit->hpGauge.field_0x14), pos.y - 3.0f, 0.0f, unit->hpGauge.field_0x14, 1.0f);
+		x = unit->hpGauge.field_0x14;
+		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - x), pos.y - 3.0f, 0.0f, x, 1.0f);
 		break;
 	default:
-		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - unit->hpGauge.field_0x14), pos.y - 3.0f, 0.0f, unit->hpGauge.field_0x14, 1.0f);
+		x = unit->hpGauge.field_0x14;
+		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - x), pos.y - 3.0f, 0.0f, x, 1.0f);
 		break;
 	}
 }

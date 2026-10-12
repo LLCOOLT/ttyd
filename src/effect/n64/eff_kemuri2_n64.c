@@ -149,11 +149,13 @@ static void main_dl(s32 type) {
 static void effKemuri2Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri2N64Work* work = effect->userdata;
+    s32 cell;
+    s32 i;
+    s32 wf = work->frame;
     s32 type = work->type;
     s32 flag = 0;
-    s32 i;
     s32 frame;
-    s32 cell;
+
     f32 texW;
     f32 sx;
     f32 texH;
@@ -166,7 +168,7 @@ static void effKemuri2Disp(CameraId cameraId, EffectEntry* effect) {
     GXColor c1;
     GXColor c2;
 
-    if ((work->kind == 0 && work->frame == 6) || (work->kind == 1 && work->frame == 7)) {
+    if ((work->kind == 0 && wf == 6) || (work->kind == 1 && wf == 7)) {
         flag = 1;
     }
     c1 = (GXColor){0xE6, 0xDE, 0xDE, 0x6E};
@@ -192,7 +194,7 @@ static void effKemuri2Disp(CameraId cameraId, EffectEntry* effect) {
     if (type == 0) {
         cell = 24;
     }
-    frame = work->frame * cell;
+    frame = wf * cell;
     sx = (f32)cell / texW;
     sy = (f32)cell / texH;
     PSMTXScale(scaleMtx, sx, sy, 1.0f);

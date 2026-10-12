@@ -78,10 +78,12 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     s32 count;
     s32 camera;
     s32 i;
+    s32 k;
+    s32 lf;
 
     effect = effEntry();
     flag = 0;
-    if (type >= 10) {
+    if (type > 9) {
         flag = 1;
         type = type % 10;
     }
@@ -130,12 +132,16 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
         break;
     default:
         p = work + 1;
+        lf = 0x20;
         for (i = 1; i < effect->count; i++) {
             p->y = 0.0f;
-            p->life = 0x20 + (i - 1) * 2;
-            p->rotX = (f32)r_data[(i - 1) * 5];
-            p->rotY = (f32)r_data[(i - 1) * 5 + 1];
-            p->rotZ = (f32)r_data[(i - 1) * 5 + 2];
+            k = (i - 1) * 5;
+            p->life = lf;
+            lf += 2;
+            p->rotX = (f32)r_data[k++];
+            p->rotY = (f32)r_data[k++];
+            p->rotZ = (f32)r_data[k];
+            k += 2;
             p->alpha = 0;
             p->frame = 0;
             p->scroll2 = 0.0f;
@@ -148,7 +154,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             p->scrollVel3 = 0.6f;
             p->rotVelX = 0.0f;
             p->rotVelY = 0.0f;
-            p->rotVelZ = 0.1f * (f32)r_data[(i - 1) * 5 + 4];
+            p->rotVelZ = 0.1f * (f32)r_data[k];
             p->delay = 0;
             p++;
         }
@@ -158,16 +164,18 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 }
 
 void effRadiationMain(EffectEntry* effect) {
+    s32 base1;
+    s32 base2;
+    s32 base;
     EffRadiationN64Work* p = effect->userdata;
     EffRadiationN64Work* w2;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 type;
-    s32 base;
-    s32 base1;
-    s32 base2;
     s32 life;
     s32 i;
+    s32 k;
+    s32 lf;
 
     tmp.x = p->pos0.x;
     tmp.y = p->pos0.y;
@@ -194,7 +202,7 @@ void effRadiationMain(EffectEntry* effect) {
         base1 = base + 1;
         base2 = base + 2;
         p++;
-        for (i = 1; i < effect->count; i++) {
+        for (i = 1; i < effect->count; i++, p++) {
             p->life--;
             p->frame++;
             if (p->frame < 10) {
@@ -217,12 +225,12 @@ void effRadiationMain(EffectEntry* effect) {
                 p->alpha = 0;
                 p->frame = 0;
             }
-            p++;
         }
         break;
     default:
         p++;
-        for (i = 1; i < effect->count; i++) {
+        lf = 0x20;
+        for (i = 1; i < effect->count; lf += 2, i++, p++) {
             p->scroll0 += p->scrollVel0;
             if (p->scroll0 > 256.0f) {
                 p->scroll0 -= 256.0f;
@@ -264,10 +272,12 @@ void effRadiationMain(EffectEntry* effect) {
             }
             if (p->life <= 0) {
                 p->y = 0.0f;
-                p->life = 0x20 + (i - 1) * 2;
-                p->rotX = (f32)r_data[(i - 1) * 5];
-                p->rotY = (f32)r_data[(i - 1) * 5 + 1];
-                p->rotZ = (f32)r_data[(i - 1) * 5 + 2];
+                k = (i - 1) * 5;
+                p->life = lf;
+                p->rotX = (f32)r_data[k++];
+                p->rotY = (f32)r_data[k++];
+                p->rotZ = (f32)r_data[k];
+                k += 2;
                 p->alpha = 0;
                 p->frame = 0;
                 p->scroll2 = 0.0f;
@@ -280,7 +290,7 @@ void effRadiationMain(EffectEntry* effect) {
                 p->scrollVel3 = 0.6f;
                 p->rotVelX = 0.0f;
                 p->rotVelY = 0.0f;
-                p->rotVelZ = 0.1f * (f32)r_data[(i - 1) * 5 + 4];
+                p->rotVelZ = 0.1f * (f32)r_data[k];
                 p->delay = 0;
             }
             if (p->delay <= 0 || (--p->delay, p->delay <= 0)) {
@@ -288,7 +298,6 @@ void effRadiationMain(EffectEntry* effect) {
                 p->rotY += p->rotVelY;
                 p->rotZ += p->rotVelZ;
             }
-            p++;
         }
         break;
     }
@@ -311,6 +320,8 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     u32* vtx;
     s32 i;
+    s32 k;
+    s32 lf;
     s32 type;
     f32 a;
     f32 sx;

@@ -95,12 +95,17 @@ void seq_mapChangeInit(SequenceWork* work) {
     }
     psndENVOff(0x200);
     psndENVOff(0x201);
-    if (strcmp(gp->currentMapName, "") && strcmp(gp->currentMapName, "gor_01") && strcmp(_next_map, "gor_01")) {
+    {
+    int c0 = strcmp(gp->currentMapName, "");
+    int c1 = strcmp(gp->currentMapName, "gor_01");
+    int c2 = strcmp(_next_map, "gor_01");
+    if (c0 && c1 && c2) {
         bdsw->field_0x114 |= 1;
-    } else if (!strcmp(_next_map, "gor_01") && bdsw->field_0x114 & 1) {
+    } else if (!c2 && bdsw->field_0x114 & 1) {
         badgeShop_bargainGeneration();
         badgeShop_bottakuruGeneration();
         bdsw->field_0x114 &= 0xFFFE;
+    }
     }
 }
 

@@ -115,9 +115,7 @@ void effBalloonMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     f32 scale;
-    s32 b;
     s32 lifetime;
-    s32 a;
     s32 i;
     s32 frame;
 
@@ -145,12 +143,12 @@ void effBalloonMain(EffectEntry* effect) {
     work->scale += 0.1f * (work->targetScale - work->scale);
     scale = work->scale;
     scale = scale + 0.1f * (scale * (f32)sin(6.2831855f * (f32)(frame * 3) / 360.0f));
-    for (i = 0, a = 0, b = 0; i < 20; i++, a += 53, b += 36, pt++) {
+    for (i = 0; i < 20; i++, pt++) {
         f32 ang = 6.2831855f * (17.0f + 360.0f * (f32)i / 21.0f) / 360.0f;
         pt->x = scale * (f32)sin(ang);
         pt->y = -scale * (f32)cos(ang);
-        pt->x += 1.5f * (f32)sin(6.2831855f * (30.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)sin(6.2831855f * (f32)a / 360.0f))) / 360.0f);
-        pt->y += 1.5f * (f32)cos(6.2831855f * (50.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)cos(6.2831855f * (f32)b / 360.0f))) / 360.0f);
+        pt->x += 1.5f * (f32)sin(6.2831855f * (30.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)sin(6.2831855f * (f32)(i * 53) / 360.0f))) / 360.0f);
+        pt->y += 1.5f * (f32)cos(6.2831855f * (50.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)cos(6.2831855f * (f32)(i * 36) / 360.0f))) / 360.0f);
     }
     work->offsetX = 0.0f;
     if (lifetime < 100) {

@@ -8,7 +8,7 @@ typedef void (*FileCallback)(struct FileEntry* file);
 typedef struct FileEntry {
 	u8 state; //0x0
 	s8 field_0x1; //0x1, TODO enum archivetype/type
-	u16 references; //0x2
+	s16 references; //0x2
 	void* field_0x4; //0x4
 	u8 field_0x8[0x20 - 0x8]; //0x8
 	char filename[64]; //0x20
@@ -31,8 +31,8 @@ typedef struct FileManagerWork {
 void fileInit(void);
 void fileGarbageMoveMem(void* data, FileEntry* file);
 void _fileGarbage(BOOL a1);
-FileEntry* fileAllocf(u8 type, const char* format, ...);
-FileEntry* fileAlloc(const char* filename, u8 type);
+FileEntry* fileAllocf(s32 type, const char* format, ...);
+FileEntry* fileAlloc(const char* filename, s32 type);
 void fileFree(FileEntry* handle);
-s32 fileAsyncf(u8 type, FileCallback callback, const char* format, ...);
+s32 fileAsyncf(s32 type, FileCallback callback, const char* format, ...);
 void fileSetCurrentArchiveType(s32 type);

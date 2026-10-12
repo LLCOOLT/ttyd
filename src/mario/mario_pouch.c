@@ -78,12 +78,15 @@ void pouchInit(void) {
 	mpp->jumpLevel = 0;
 	mpp->hammerLevel = 0;
 	for (i = 0; i < 8; i++) {
-		mpp->partyData[i].flags = 0;
-		mpp->partyData[i].baseMaxHP = 10;
-		mpp->partyData[i].maximumHP = mpp->partyData[i].baseMaxHP;
-		mpp->partyData[i].currentHP = mpp->partyData[i].baseMaxHP;
-		mpp->partyData[i].attackLevel = 0;
-		mpp->partyData[i].techLevel = 0;
+		PouchPartyData* party = &mpp->partyData[i];
+		if (i != PARTNER_NONE) {
+			party->flags = 0;
+			party->baseMaxHP = 10;
+			party->maximumHP = party->baseMaxHP;
+			party->currentHP = party->baseMaxHP;
+			party->attackLevel = 0;
+			party->techLevel = 0;
+		}
 	}
 	strcpy(mpp->yoshiName, "チビヨッシー"); //TODO: US
 }
@@ -253,14 +256,16 @@ void pouchOpenMail(s32 mailId) {
 }
 
 void pouchReceiveMail(s32 mailId) {
-	s32 index, shift, count;
 	int i;
+	s32 count;
+	s32 index, shift;
 
 	shift = mailId % 32;
 	index = mailId / 32;
 
 	//increment through known IDs to add to mEmailIds
-	for (i = 0, count = 0; i < 99; i++) {
+	count = 0;
+	for (i = count; i < 99; i++) {
 		if (mpp->mEmailReceivedFlags[i / 32] & (1 << (i % 32))) {
 			count++;
 		}
@@ -333,7 +338,7 @@ s32 pouchArriveBadge(s32 id) {
 	return badgeShop_add(bdsw->special_table, (s16)id, 1);
 }
 
-BOOL pouchUnEquipBadgeID(s32 badgeId) {
+BOOL N_pouchUnEquipBadgeID(s32 badgeId) {
 	int i;
 
 	for (i = 0; i < 200; i++) {
@@ -708,24 +713,25 @@ BOOL pouchRemoveItem(ItemType type) {
 			if (table2 != 0) {
 				table2[i] = ITEM_NULL;
 			}
+			temp = maximum - 1;
 			if (table2) {
-				for (j = maximum - i, temp = 0; j != 0; j--, temp++) {
-					table1[temp] = table1[temp + 1];
-					table1[temp + 1] = ITEM_NULL;
-					table2[temp] = table2[temp + 1];
-					table2[temp + 1] = ITEM_NULL;
+				for (j = i; j < temp; j++) {
+					table1[j] = table1[j + 1];
+					table1[j + 1] = ITEM_NULL;
+					table2[j] = table2[j + 1];
+					table2[j + 1] = ITEM_NULL;
 				}
 			}
 			else {
-				for (j = maximum - i, temp = 0; j != 0; j--, temp++) {
-					table1[temp] = table1[temp + 1];
-					table1[temp + 1] = ITEM_NULL;
+				for (j = i; j < temp; j++) {
+					table1[j] = table1[j + 1];
+					table1[j + 1] = ITEM_NULL;
 				}
 			}
-			break;
+			return TRUE;
 		}
 	}
-	return TRUE;
+	return FALSE;
 }
 
 

@@ -73,9 +73,12 @@ EffectEntry* effSparkEntry(s32 type, f32 x, f32 y, f32 z) {
     work->y = y;
     work->z = z;
     work->scale = 0.9f;
+    {
+    EffSparkParticle* p = work->part;
     f = max_seq_num[type] * 0.5f;
-    for (i = 1; i < 6; i++) {
-        work->part[i - 1].seq = -1.0f - f * (i & 1);
+    for (i = 1; i < 6; i++, p++) {
+        p->seq = -1.0f - f * (i & 1);
+    }
     }
     return effect;
 }

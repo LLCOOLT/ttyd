@@ -236,10 +236,10 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 		s32 nhit;
 		s32 j;
 		s32 k;
+		nhit = 0;
 		for (j = 0; j < 2; j++) {
 			flags[j] = 0;
 		}
-		nhit = 0;
 		for (j = 0; j < t->n; j++) {
 			if (nhit == 2) break;
 			if (zubastar_get_kouten(p0->x, p0->y, p1->x, p1->y, t->v[j].x, t->v[j].y,
@@ -274,9 +274,8 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			for (j = 0; j <= idx[0]; j++) {
 				a->v[k++] = t->v[j];
 			}
-			a->v[k] = hit[0];
-			a->v[k + 1] = hit[1];
-			k += 2;
+			a->v[k++] = hit[0];
+			a->v[k++] = hit[1];
 			for (j = idx[1] + 1; j < t->n; j++) {
 				a->v[k++] = t->v[j];
 			}

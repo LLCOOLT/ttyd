@@ -96,12 +96,11 @@ void FontDrawStart(void) {
 void FontDrawStart_alpha(u8 alpha) {
 	GXColor start;
 
-	start = fontColTbl[0];
+	fontColor = start = fontColTbl[0];
 	fontAlpha = alpha;
+	start.a = (start.a * alpha) / 255;
 	fontScale = (Vec){1.0f, 1.0f, 1.0f};
 	fontEdge = FALSE;
-	*(u32*)&fontColor = *(u32*)&fontColTbl[0];
-	start.a = (start.a * alpha) / 255;
 	JUTFont_DrawStart(start);
 }
 

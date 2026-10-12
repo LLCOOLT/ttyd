@@ -262,25 +262,26 @@ static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     CameraEntry* cam;
     f32 baseX;
-    f32 baseY;
     f32 baseB;
+    f32 px;
+    f32 baseY;
     s32 i;
 
     camGetPtr(8);
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -200.0f + x;
+        pos.x = px = -200.0f + x;
         pos.y = 25.0f + y;
         iconDispGx(&pos, 0x10, 0x8C, 1.0f);
     }
     cam = camGetPtr(8);
     btlDispGXInit2DRasta();
     GXLoadPosMtxImm(cam->view, 0);
-    baseX = (-200.0f + x) - 88.0f;
+    baseX = px - 88.0f;
     baseY = 50.0f + y;
     baseB = baseY - 18.0f;
     for (i = 0; i < 7; i++) {
-        btlDispGXQuads2DRasta(i == 0 ? baseX : baseX + (f32)(_hp_tbl[(i - 1) * 2] * 175) / 100.0f, baseY, baseX + (f32)(_hp_tbl[i * 2] * 175) / 100.0f, baseB, (3 - abs(3 - i)) * 60, 0,
+        btlDispGXQuads2DRasta(i == 0 ? baseX : baseX + (f32)(_hp_tbl[i * 2 - 2] * 175) / 100.0f, baseY, baseX + (f32)(_hp_tbl[i * 2] * 175) / 100.0f, baseB, (3 - abs(3 - i)) * 60, 0,
                               180 - (3 - abs(3 - i)) * 60, 255);
     }
     {

@@ -1448,13 +1448,17 @@ USER_FUNC(unitwin_getpartylank) {
 
 #define PP ((PouchPartyData*)((u8*)pouch + idx))
 USER_FUNC(unitwin_setpartylank) {
-	s32 idx;
+	PouchPartyData* new_var2;
+	unsigned int idx;
 	s16 v;
+	s32 new_var;
 	s32* args = event->args;
 	PouchData* pouch = pouchGetPtr();
 	idx = evtGetValue(event, args[0]) * 14;
 	v = evtGetValue(event, args[1]);
-	PP->HPLevel = PP->attackLevel = PP->techLevel = v;
+	new_var = idx;
+	new_var2 = (PouchPartyData*)((u8*)pouch + new_var);
+	new_var2->HPLevel = ((PouchPartyData*)((u8*)pouch + new_var))->attackLevel = ((PouchPartyData*)((u8*)pouch + new_var))->techLevel = v;
 	pouchRevisePartyParam();
 	PP->currentHP = PP->maximumHP;
 	return EVT_RETURN_DONE;

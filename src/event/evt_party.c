@@ -230,7 +230,12 @@ USER_FUNC(evt_party_get_pos) {
 	return EVT_RETURN_DONE;
 }
 
+inline float inline_fn(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
+	return (arg0 - arg1) * (arg2 / (f32)arg3);
+}
+
 USER_FUNC(evt_party_set_dir) {
+	f32* new_var;
 	s32* args = event->args;
 	PartyEntry* p;
 	f32 ang, t, st;
@@ -261,19 +266,22 @@ USER_FUNC(evt_party_set_dir) {
 	if (fr > 0) {
 		t = revise360(270.0f - ang);
 		st = event->userdataf[1];
-		PF(p, 0x10C) = revise360(st + (t - st) * ((f32)event->userdata[2] / (f32)fr));
+		PF(p, 0x10C) = revise360(st + inline_fn(t, st, (f32)event->userdata[2], fr));
 		PF(p, 0x110) = PF(p, 0x10C);
 		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
 		c = event->userdata[2] + 1;
 		event->userdata[2] = c;
 		return c > fr;
-	} else if (fr < 0) {
-		PF(p, 0x110) = revise360(270.0f - ang);
-		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
-	} else if (fr == 0) {
-		PF(p, 0x10C) = revise360(270.0f - ang);
-		PF(p, 0x110) = PF(p, 0x10C);
-		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+	} else {
+		new_var = &PF(p, 0x110);
+		if (fr < 0) {
+			PF(p, 0x110) = revise360(270.0f - ang);
+			PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+		} else if (fr == 0) {
+			PF(p, 0x10C) = revise360(270.0f - ang);
+			*new_var = PF(p, 0x10C);
+			PF(p, 0x100) = toMovedirSimple(*new_var);
+		}
 	}
 	return EVT_RETURN_DONE;
 }

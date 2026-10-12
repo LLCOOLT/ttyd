@@ -51,13 +51,17 @@ typedef struct SeqEndWork {
     u8 field_0x28[0x30 - 0x28];    // 0x28
     u32 flags;                     // 0x30
     IconEntry* icons[19];          // 0x34
-    u8 field_0x80[0x200 - 0x80];   // 0x80
+    s32 alpha[19];                 // 0x80
+    s32 counter[19];               // 0xCC
+    Vec iconPos[19];               // 0x118
+    u8 field_0x1FC[0x200 - 0x1FC]; // 0x1FC
     SeqEndObj objs[3];             // 0x200
     u8 field_0x29C[0x2A0 - 0x29C]; // 0x29C
     s32 whistleTimer;              // 0x2A0
     s32 confettiEvtId;             // 0x2A4
     u8 field_0x2A8[0x2AC - 0x2A8]; // 0x2A8
 } SeqEndWork;
+void _GetExpIcon_Init(SeqEndWork* work);
 
 typedef struct SeqEndUnitSetup {
     u8* kind;                 // 0x0
@@ -77,6 +81,7 @@ typedef struct SeqEndSpot {
     Vec scale;               // 0x1C
     GXColor color;           // 0x28
 } SeqEndSpot;
+EffectEntry* effPokopiPchargeN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale);
 
 void _GetExpIcon_Main(BattleWork* wp);
 void _LvupParamConfirmDisp(CameraId camId, void* param);
@@ -343,38 +348,6 @@ EVT_BEGIN(_koura_delete_event)
     RETURN
 EVT_END()
 
-// TODO: USER_FUNC(_disable_enemy_unit_disp) { }
-
-// TODO: USER_FUNC(_lvup_ap_recover_full) { }
-
-// TODO: USER_FUNC(_nozzle_set_offset) { }
-
-// TODO: USER_FUNC(_GetExpIcon_End) { }
-
-// TODO: USER_FUNC(_GetExpIcon_Disp) { }
-
-// TODO: USER_FUNC(_GetExpIcon_Main) { }
-
-// TODO: USER_FUNC(_GetExpIcon_Init) { }
-
-// TODO: USER_FUNC(L__LvupParamHelpMsgDisp) { }
-
-// TODO: USER_FUNC(_LvupParamConfirmDisp) { }
-
-// TODO: USER_FUNC(_MarioExpDisp) { }
-
-// TODO: USER_FUNC(btlseqEnd_DispMain) { }
-
-// TODO: USER_FUNC(btlseqEnd_DispInit) { }
-
-// TODO: USER_FUNC(_ExecAllUnitBattleEndEvent) { }
-
-// TODO: USER_FUNC(btlseqEnd) { }
-
-// TODO: USER_FUNC(BattleGetRankNameLabel) { }
-
-// TODO: USER_FUNC(_get_rank_data) { }
-
 
 
 #pragma dont_inline on
@@ -479,12 +452,11 @@ void _MarioExpDisp(CameraId camId, void* param) {
 }
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
-    SeqEndWork*
- work = SEW((BattleWork*)param);
     Vec pos;
     char buf[0x14];
     f32 w;
     u32 len;
+    SeqEndWork* work = SEW((BattleWork*)param);
 
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
@@ -540,6 +512,89 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     FontDrawStart_alpha(0xFF);
     y = -148.0f;
     FontDrawMessage(x, (s32)y + (lines - 1) * 29, msg);
+}
+
+void _GetExpIcon_Init(SeqEndWork* work) {
+    s32 i;
+    char name[16];
+
+    for (i = 0; i < 10; i++) {
+        sprintf(name, "_Bgsp%d", i);
+        iconEntry2D(name, 0x18C);
+        work->icons[i] = iconNameToPtr(name);
+        iconSetScale(name, 0.9f);
+        iconFlagOn(name, 2);
+        work->counter[i] = 0;
+        work->iconPos[i].x = 24.0f - 18.0f * (work->expDisp / 10) + 36.0f * i;
+        work->iconPos[i].y = 25.0f;
+        work->iconPos[i].z = 0.0f;
+        iconSetPos(name, work->iconPos[i].x, work->iconPos[i].y, work->iconPos[i].z);
+    }
+    for (i = 10; i < 19; i++) {
+        sprintf(name, "_Bgsp%d", i);
+        iconEntry2D(name, 0x18C);
+        work->icons[i] = iconNameToPtr(name);
+        iconSetScale(name, 0.45f);
+        iconFlagOn(name, 2);
+        work->counter[i] = 0;
+        work->iconPos[i].x = 86.9f - 16.2f * (i - 9);
+        work->iconPos[i].y = 0.0f;
+        work->iconPos[i].z = 0.0f;
+        iconSetPos(name, work->iconPos[i].x, work->iconPos[i].y, work->iconPos[i].z);
+    }
+    work->flags |= 2;
+}
+
+void _GetExpIcon_Main(BattleWork* wp) {
+    s32 tens;
+    SeqEndWork* work = SEW(wp);
+    s32 exp = work->expDisp;
+    s32 ones;
+    s32 i;
+    f32 ofs;
+
+    tens = exp / 10;
+    for (i = 0; i < tens; i++) {
+        iconFlagOff(work->icons[i]->name, 2);
+        if (work->alpha[i] <= 0) {
+            work->alpha[i] = 0x40;
+        } else {
+            work->alpha[i] += 0x40;
+            if (work->alpha[i] > 0xFF) {
+                work->alpha[i] = 0xFF;
+            }
+        }
+        if (work->counter[i] < 16) {
+            work->counter[i]++;
+        }
+        work->iconPos[i].x = 24.0f - 18.0f * (work->expDisp / 10) + 36.0f * i;
+    }
+    for (; i < 10; i++) {
+        iconFlagOn(work->icons[i]->name, 2);
+        work->alpha[i] = 0;
+        work->counter[i] = 0;
+    }
+    ones = exp % 10;
+    for (tens = 10; tens - 10 < ones; tens++) {
+        iconFlagOff(work->icons[tens]->name, 2);
+        if (work->alpha[tens] <= 0) {
+            work->alpha[tens] = 0x40;
+        } else {
+            work->alpha[tens] += 0x40;
+            if (work->alpha[tens] > 0xFF) {
+                work->alpha[tens] = 0xFF;
+            }
+        }
+    }
+    for (; tens < 19; tens++) {
+        iconFlagOn(work->icons[tens]->name, 2);
+        work->alpha[tens] = 0;
+    }
+    ofs = 0.0f;
+    for (i = 0; i < 19; i++) {
+        iconSetAlpha(work->icons[i]->name, work->alpha[i]);
+        iconSetPos(work->icons[i]->name, work->iconPos[i].x, work->iconPos[i].y + ofs, work->iconPos[i].z);
+    }
 }
 
 void _GetExpIcon_Disp(CameraId camId, void* param) {
@@ -670,11 +725,12 @@ USER_FUNC(_lvup_disp_flag_onoff) {
 
 USER_FUNC(_lvup_spot_on) {
     BattleSpotWork* spot = BatSpotGetPtr();
+    s32* args = event->args;
     s32 n;
     SeqEndSpot* e;
 
     spot->skipRender = 1;
-    n = evtGetValue(event, event->args[0]);
+    n = evtGetValue(event, args[0]);
     e = (SeqEndSpot*)spot->entries + n;
     switch (n) {
     case 0: {

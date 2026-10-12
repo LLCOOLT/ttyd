@@ -26,7 +26,7 @@ void BattleStatusIconInit(BattleUnit* unit) {
 void BattleStatusIconMain(BattleUnit* unit) {
 	BattleWorkStatusIcon* icon = &unit->mStatusIconWork;
 	BattleWork* work = _battleWorkPointer;
-	int i;
+	u32 i;
 
 	icon->mNumStatusIcons = 0;
 	if (work->flags & 0x10000 || work->dispFlags & 1) {
@@ -36,18 +36,18 @@ void BattleStatusIconMain(BattleUnit* unit) {
 		icon->mScreenSpaceOffset.x = 13.440001f;
 		icon->mScreenSpaceOffset.z = 0.0f;
 		icon->mFlags = 0;
-		if (unit->mAttributeFlags & kCeiling) {
+		if (!(unit->mAttributeFlags & kCeiling)) {
 			icon->mDistanceBetweenIcons = 25.6f;
-			icon->mScreenSpaceOffset.y = 0.0f;
+			icon->mScreenSpaceOffset.y = 19.200001f;
 		}
 		else {
 			icon->mDistanceBetweenIcons = 25.6f;
-			icon->mScreenSpaceOffset.y = 19.200001f;
+			icon->mScreenSpaceOffset.y = 0.0f;
 		}
 
 		for (i = 0; i < 0x17; i++) {
 			if (_disp_table[i].id == -1) break;
-			if (_disp_table[i].callback(unit, &_disp_table[i], &icon->mIcons[i])) {
+			if (_disp_table[i].callback(unit, &_disp_table[i], &icon->mIcons[icon->mNumStatusIcons])) {
 				icon->mNumStatusIcons++;
 			}
 		}

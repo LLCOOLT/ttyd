@@ -95,9 +95,9 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
     EffOpukuJetwrainN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
+    s32 i, j;
     s32 frame;
     s32 alpha;
-    s32 i, j;
     f32 fa;
     f32 g4, cs, sd;
 
@@ -134,9 +134,9 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
     }
     for (i = 1; i < 18; i++) {
         for (j = 1; j < 12; j++) {
+            g4 = 4.0f * (f32)work->grid[i][j];
             cs = (f32)work->grid[i+1][j+1] + (f32)work->grid[i-1][j+1] + (f32)work->grid[i+1][j-1] + (f32)work->grid[i-1][j-1];
             sd = (f32)work->grid[i+1][j] + (f32)work->grid[i-1][j] + (f32)work->grid[i][j+1] + (f32)work->grid[i][j-1];
-            g4 = 4.0f * (f32)work->grid[i][j];
             cs *= 0.5f;
             work->vel[i][j] = (s16)((f32)work->vel[i][j] + (cs + (sd - g4) - 0.7f * g4));
             work->vel[i][j] = (s16)((f32)work->vel[i][j] * 0.98f);
@@ -202,21 +202,25 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadPosMtxImm(view, GX_PNMTX0);
     GXSetCurrentMtx(0);
     for (row = 0; row < 12; row++) {
+        s32 rflag = 0, yo0, yo1, y0, y1, yb;
+        if (row == 0) {
+            yo0 = -4;
+            rflag = 1;
+        } else {
+            yo0 = 0;
+        }
+        if (row == 11) {
+            yo1 = 4;
+            rflag = 1;
+        } else {
+            yo1 = 0;
+        }
+        yb = row * 16 + 24;
+        y0 = yb + yo0;
+        y1 = yb + (yo1 + 16);
         for (col = 0; col < 18; col++) {
-            s32 rflag = 0, cflag = 0, x0, x1, y0, y1, v;
-            s32 xo0, xo1, yo0, yo1;
-            if (row == 0) {
-                yo0 = -4;
-                rflag = 1;
-            } else {
-                yo0 = 0;
-            }
-            if (row == 11) {
-                yo1 = 4;
-                rflag = 1;
-            } else {
-                yo1 = 0;
-            }
+            s32 cflag = 0, x0, x1, v;
+            s32 xo0, xo1;
             if (col == 0) {
                 xo0 = -4;
                 cflag = 1;
@@ -231,9 +235,7 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
             }
             PSMTXScale(scale, 0.00390625f, 0.00390625f, 1.0f);
             x0 = col * 16 + 16 + xo0;
-            y0 = row * 16 + 24 + yo0;
             x1 = col * 16 + 16 + 16 + xo1;
-            y1 = row * 16 + 24 + 16 + yo1;
             PSMTXTrans(trans, (f32)x0, (f32)y0, 0.0f);
             PSMTXConcat(scale, trans, scale);
             GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);

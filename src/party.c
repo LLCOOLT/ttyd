@@ -952,6 +952,103 @@ s32 partyGoodbyeInit(PartyEntry* party) {
 }
 
 /* @@DOKAN@@ */
+s32 partyDokanMain(PartyEntry* party) {
+    MarioWork* mario = party->playerPtr;
+    s32 n;
+
+    switch (PU8(party, 0x38)) {
+    case 0:
+        party->position = *(Vec*)((u8*)mario + 0x8C);
+        PF32(party, 0x10C) = revise360(PF32(party, 0x10C) + PF32(party, 0x124));
+        party->scale.x += 0.05f;
+        if (party->scale.x >= 1.0f) {
+            party->scale.x = 1.0f;
+        }
+        party->scale.y = party->scale.x;
+        party->scale.z = party->scale.x;
+        break;
+    case 10:
+        PF32(party, 0x64) += PF32(party, 0x124);
+        break;
+    case 100:
+        switch (PS8(party, 0x2E)) {
+        case 0:
+        case 1:
+            partyChgPaper(party, "PM_D_1B");
+            *(s32*)((u8*)party + 0x24) = 18;
+            PU8(party, 0x38) = 101;
+            break;
+        case 4:
+            partyChgPaper(party, "PM_D_1B");
+            *(s32*)((u8*)party + 0x24) = 18;
+            PU8(party, 0x38) = 101;
+            break;
+        }
+        break;
+    case 101:
+        switch (PS8(party, 0x2E)) {
+        case 0:
+        case 1:
+            party->position.z += -0.2f;
+            break;
+        }
+        if (--*(s32*)((u8*)party + 0x24) <= 0) {
+            PU8(party, 0x38) = 102;
+        }
+        break;
+    case 102:
+        party->scale = (Vec){1.0f, 1.0f, 1.0f};
+        *(Vec*)((u8*)party + 0x64) = (Vec){0.0f, 0.0f, 0.0f};
+        *(Vec*)((u8*)party + 0x88) = (Vec){0.0f, 0.0f, 0.0f};
+        *(Vec*)((u8*)party + 0x7C) = (Vec){0.0f, 0.0f, 0.0f};
+        PF32(party, 0x110) = PF32(mario, 0x1AC);
+        PF32(party, 0x10C) = PF32(party, 0x110);
+        PF32(party, 0x100) = PF32(mario, 0x1A0);
+        PF32(party, 0xFC) = PF32(mario, 0x1A0);
+        partyPaperOff(party);
+        animPoseSetMaterialLightFlagOn(party->paperAnimGroup, 1);
+        party->flags2 &= ~8;
+        party->flags2 &= ~0x10;
+        party->flags &= ~0x4000000;
+        party->flags &= ~0x2000000;
+        partyShadowOn(party);
+        L_partyVivianTailStart(party);
+        party->field_B8 = party->position;
+        partyChgRunMode(party, 1);
+        n = 0;
+        if (partyGetPtr(marioGetPartyId())) {
+            n = 1;
+        }
+        if (partyGetPtr(marioGetExtraPartyId())) {
+            n++;
+        }
+        if ((s8)PU8(party, 0x2E) == 4) {
+            if (n == 1) {
+                party->position.z += -4.0f;
+            } else if (!(party->flags & 8)) {
+                party->position.z += -4.0f;
+                party->position.x += 1.5f;
+            } else {
+                party->position.z += -3.0f;
+                party->position.x += -1.5f;
+            }
+        }
+        if ((s8)PU8(party, 0x2E) == 1) {
+            if (n == 1) {
+                party->position.z += -4.0f;
+            } else if (!(party->flags & 8)) {
+                party->position.z += -4.0f;
+                party->position.x += 1.5f;
+            } else {
+                party->position.z += -3.0f;
+                party->position.x += -1.5f;
+            }
+        }
+        break;
+    }
+    return 0;
+}
+
 
 void partyDokanEnd(s32 id, s32 dir) {
     PartyEntry* party = partyGetPtr(id);

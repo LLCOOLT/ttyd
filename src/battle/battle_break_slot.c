@@ -305,11 +305,11 @@ void BattleBreakSlot_Main(void) {
 	BattleUnit* mario = BattleGetMarioPtr(wp);
 	BattleUnit* party = BattleGetPartyPtr(wp);
 	BreakSlotReel* reel;
+	BreakSlotReel* rr;
 	s32 count;
 	s32 item;
 	s32 k;
 	s32 i;
-	s32 x;
 	f32 y;
 
 	switch (slot->phase) {
@@ -323,7 +323,7 @@ void BattleBreakSlot_Main(void) {
 			}
 			if (count == 2) {
 				item = BattleBreakSlotReelGetPtr(1)->item;
-				if (BattleBreakSlotReelGetPtr(0)->item != item) {
+				if (item != BattleBreakSlotReelGetPtr(0)->item) {
 					slot->phase = 1;
 					slot->field_8 = 0;
 				}
@@ -482,7 +482,7 @@ void BattleBreakSlot_Main(void) {
 						break;
 					case 4:
 						evtEntry(doku_kinoko_effect, 0, 0x20);
-						pouchSetAP(pouchGetAP() / 2);
+						((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() / 2);
 						break;
 				}
 			}
@@ -520,7 +520,7 @@ void BattleBreakSlot_Main(void) {
 					updown = 0.0f;
 				}
 			}
-			if (slot->field_8 == 209 && updown) {
+			if (slot->field_8 == 209 && updown != 0.0f) {
 				BattleAudienceSoundRun(0);
 			}
 			if (slot->field_8 == 210) {
@@ -548,7 +548,7 @@ void BattleBreakSlot_Main(void) {
 				BattleAudienceAddTargetNum(0.0f, updown);
 				slot->phase = 8;
 				slot->flags &= ~4;
-				if (gp->language == 0) {
+				if (gp->language == 0U) {
 					switch (BattleBreakSlotReelGetPtr(0)->item) {
 						case 0:
 							slot->evt = evtEntry(msg_hp_max, 0, 0x20);
@@ -588,203 +588,202 @@ void BattleBreakSlot_Main(void) {
 	}
 
 	i = 0;
-	x = 0;
-	reel = BattleBreakSlotReelGetPtr(0);
-	for (; i < 3; i++, reel++, x += 128) {
-		switch (reel->state) {
+	rr = BattleBreakSlotReelGetPtr(0);
+	for (; i < 3; i++, rr++) {
+		switch (rr->state) {
 			case 0:
-				reel->flags &= ~1;
-				reel->alpha = 255;
+				rr->flags &= ~1;
+				rr->alpha = 255;
 				break;
 			case 1:
 				if (i != 2) {
-					reel->flags |= 1;
+					rr->flags |= 1;
 				}
-				reel->counter++;
-				if (reel->counter <= 5) {
-					y = intplGetValue(0, reel->counter, 5, 110.0f, 142.0f);
-					reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
-					reel->scale = (Vec){0.8f, 0.8f, 0.8f};
-					reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-					reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
-					reel->alpha = 255;
+				rr->counter++;
+				if (rr->counter <= 5) {
+					y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(110.0f, 142.0f, 0, rr->counter, 5);
+					rr->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+					rr->scale = (Vec){0.8f, 0.8f, 0.8f};
+					rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+					rr->pivot = (Vec){0.0f, 0.0f, 0.0f};
+					rr->alpha = 255;
 				} else {
-					y = intplGetValue(4, reel->counter - 5, 20, 142.0f, 174.0f);
-					reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
-					reel->scale = (Vec){0.8f, 0.8f, 0.8f};
-					reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-					reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
-					reel->alpha = 255;
+					y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(142.0f, 174.0f, 4, rr->counter - 5, 20);
+					rr->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+					rr->scale = (Vec){0.8f, 0.8f, 0.8f};
+					rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+					rr->pivot = (Vec){0.0f, 0.0f, 0.0f};
+					rr->alpha = 255;
 				}
-				if (reel->counter >= 25) {
-					reel->state = 2;
-					reel->index++;
-					if (reel->index >= reel->numCards) {
-						reel->index -= reel->numCards;
+				if (rr->counter >= 25) {
+					rr->state = 2;
+					rr->index++;
+					if (rr->index >= rr->numCards) {
+						rr->index -= rr->numCards;
 					}
-					reel->item = reel->cards[reel->index];
-					reel->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
+					rr->item = rr->cards[rr->index];
+					rr->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
 				}
 				break;
 			case 2:
-				reel->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
-				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				if (reel->flags & 2) {
-					reel->flags &= ~2;
-					reel->state = 3;
-					reel->counter = 0;
+				rr->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
+				rr->scale = (Vec){0.8f, 0.8f, 0.8f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (rr->flags & 2) {
+					rr->flags &= ~2;
+					rr->state = 3;
+					rr->counter = 0;
 				}
 				break;
 			case 3:
-				y = intplGetValue(0, reel->counter, 20, 142.0f, 174.0f);
-				reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
-				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				reel->counter++;
-				if (reel->counter > 20) {
-					reel->state = 0;
-					reel->counter = 0;
-					reel->flags &= ~1;
+				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(142.0f, 174.0f, 0, rr->counter, 20);
+				rr->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+				rr->scale = (Vec){0.8f, 0.8f, 0.8f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				rr->counter++;
+				if (rr->counter > 20) {
+					rr->state = 0;
+					rr->counter = 0;
+					rr->flags &= ~1;
 				}
 				break;
 			case 4:
-				y = intplGetValue(0, reel->counter, 20, 142.0f, 174.0f);
-				reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
-				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				reel->counter++;
-				if (reel->counter > 20) {
-					reel->state = 5;
-					reel->pos = (Vec){x - 128, -128.0f, 0.0f};
-					reel->counter = 0;
+				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(142.0f, 174.0f, 0, rr->counter, 20);
+				rr->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+				rr->scale = (Vec){0.8f, 0.8f, 0.8f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				rr->counter++;
+				if (rr->counter > 20) {
+					rr->state = 5;
+					rr->pos = (Vec){i * 128 - 128, -128.0f, 0.0f};
+					rr->counter = 0;
 				}
 				break;
 			case 5:
-				reel->flags |= 1;
-				y = intplGetValue(0, reel->counter, 40, -128.0f, 0.0f);
-				reel->pos = (Vec){x - 128, y, 0.0f};
-				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				reel->counter++;
-				if (reel->counter > 40) {
-					if (reel->kind == 2) {
-						reel->state = 6;
-						reel->counter = 0;
+				rr->flags |= 1;
+				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-128.0f, 0.0f, 0, rr->counter, 40);
+				rr->pos = (Vec){i * 128 - 128, y, 0.0f};
+				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				rr->counter++;
+				if (rr->counter > 40) {
+					if (rr->kind == 2) {
+						rr->state = 6;
+						rr->counter = 0;
 					} else {
-						reel->state = 10;
-						reel->counter = 0;
+						rr->state = 10;
+						rr->counter = 0;
 					}
 				}
 				break;
 			case 6:
 				break;
 			case 7:
-				reel->field_50 = intplGetValue(0, reel->counter, 20, 0.0f, 22.5f);
-				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
-				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
-				if (reel->pos.y >= 128.0f) {
-					reel->pos.y -= 128.0f;
-					reel->index++;
-					if (reel->index >= reel->numCards) {
-						reel->index = 0;
+				rr->field_50 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 22.5f, 0, rr->counter, 20);
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				rr->pivot = (Vec){0.0f, 0.0f, 0.0f};
+				if (rr->pos.y >= 128.0f) {
+					rr->pos.y -= 128.0f;
+					rr->index++;
+					if (rr->index >= rr->numCards) {
+						rr->index = 0;
 					}
-					reel->item = reel->cards[reel->index];
+					rr->item = rr->cards[rr->index];
 				}
-				reel->counter++;
-				if (reel->counter > 20) {
-					reel->state = 8;
-					reel->counter = 0;
+				rr->counter++;
+				if (rr->counter > 20) {
+					rr->state = 8;
+					rr->counter = 0;
 				}
 				break;
 			case 8:
-				reel->field_50 = 22.5f;
-				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
-				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				if (reel->pos.y >= 128.0f) {
-					reel->pos.y -= 128.0f;
-					reel->index++;
-					if (reel->index >= reel->numCards) {
-						reel->index = 0;
+				rr->field_50 = 22.5f;
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (rr->pos.y >= 128.0f) {
+					rr->pos.y -= 128.0f;
+					rr->index++;
+					if (rr->index >= rr->numCards) {
+						rr->index = 0;
 					}
-					reel->item = reel->cards[reel->index];
+					rr->item = rr->cards[rr->index];
 				}
 				break;
 			case 9:
-				reel->field_50 += reel->field_54;
-				if (reel->field_50 < 20.0f) {
-					reel->field_50 = 20.0f;
+				rr->field_50 += rr->field_54;
+				if (rr->field_50 < 20.0f) {
+					rr->field_50 = 20.0f;
 				}
-				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
-				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				if (reel->field_50 >= 0.0f && reel->pos.y >= 128.0f) {
-					reel->pos.y -= 128.0f;
-					reel->index++;
-					if (reel->index == reel->numCards) {
-						reel->index = 0;
+				rr->pos = (Vec){128.0f * i + -128.0f, rr->pos.y + rr->field_50, 0.0f};
+				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (rr->field_50 >= 0.0f && rr->pos.y >= 128.0f) {
+					rr->pos.y -= 128.0f;
+					rr->index++;
+					if (rr->index == rr->numCards) {
+						rr->index = 0;
 					}
-					reel->item = reel->cards[reel->index];
+					rr->item = rr->cards[rr->index];
 					if ((aud->flags & 0x4000) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
-					    BattleBreakSlotReelGetPtr(1)->item == 4 && reel->item == 4) {
+					    BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
 						break;
 					}
 					if ((slot->flags & 2) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
-					    BattleBreakSlotReelGetPtr(1)->item == 4 && reel->item == 4) {
+					    BattleBreakSlotReelGetPtr(1)->item == 4 && rr->item == 4) {
 						break;
 					}
-					if ((slot->flags & 1) && reel->item != 3) {
+					if ((slot->flags & 1) && rr->item != 3) {
 						break;
 					}
-					if ((slot->flags & 4) && reel->item != 3) {
+					if ((slot->flags & 4) && rr->item != 3) {
 						break;
 					}
-					if ((*(u32*)(wp2 - 0x6F98) & 0x80000) && reel->item != *(s32*)(wp2 - 0x6F84)) {
+					if ((*(u32*)(wp2 - 0x6F98) & 0x80000) && rr->item != *(s32*)(wp2 - 0x6F84)) {
 						break;
 					}
-					reel->pos.y = 0.0f;
-					reel->state = 10;
-					reel->counter = 0;
-					reel->field_54 = reel->field_50;
+					rr->pos.y = 0.0f;
+					rr->state = 10;
+					rr->counter = 0;
+					rr->field_54 = rr->field_50;
 				}
 				break;
 			case 10:
 				if (i == 2) {
-					reel->counter++;
-					reel->field_50 = intplGetValue(0, reel->counter, 20, reel->field_50, 0.0f);
-					reel->pos.y = reel->field_50 * (f32)sin(3.141592f * (2.0f * reel->counter) * 0.125f);
+					rr->counter++;
+					rr->field_50 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(rr->field_50, 0.0f, 0, rr->counter, 20);
+					rr->pos.y = rr->field_50 * (f32)sin(3.141592f * (2.0f * rr->counter) * 0.125f);
 				}
 				break;
 			case 11:
-				reel->field_50 = 0.0f;
-				reel->pos.y = 0.0f;
-				y = intplGetValue(0, reel->counter, 60, 1.0f, 2.0f);
-				reel->scale = (Vec){y, y, 1.0f};
-				reel->alpha = intplGetValue(0, reel->counter, 60, 255.0f, 0.0f);
-				reel->counter++;
-				if (reel->counter > 60) {
-					reel->state = 13;
-					reel->flags &= ~1;
+				rr->field_50 = 0.0f;
+				rr->pos.y = 0.0f;
+				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(1.0f, 2.0f, 0, rr->counter, 60);
+				rr->scale = (Vec){y, y, 1.0f};
+				rr->alpha = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(255.0f, 0.0f, 0, rr->counter, 60);
+				rr->counter++;
+				if (rr->counter > 60) {
+					rr->state = 13;
+					rr->flags &= ~1;
 				}
 				break;
 			case 12:
-				reel->field_50 = 0.0f;
-				reel->pos.y = 0.0f;
-				y = intplGetValue(0, reel->counter, 40, 0.0f, 128.0f);
-				reel->pos = (Vec){128.0f * i + -128.0f, y, 0.0f};
-				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
-				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
-				reel->counter++;
-				if (reel->counter > 40) {
-					reel->state = 13;
-					reel->flags &= ~1;
+				rr->field_50 = 0.0f;
+				rr->pos.y = 0.0f;
+				y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 128.0f, 0, rr->counter, 40);
+				rr->pos = (Vec){128.0f * i + -128.0f, y, 0.0f};
+				rr->scale = (Vec){1.0f, 1.0f, 1.0f};
+				rr->rot = (Vec){0.0f, 0.0f, 0.0f};
+				rr->counter++;
+				if (rr->counter > 40) {
+					rr->state = 13;
+					rr->flags &= ~1;
 				}
 				break;
 			case 13:
-				reel->state = 0;
+				rr->state = 0;
 				break;
 		}
 	}

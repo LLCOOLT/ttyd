@@ -207,7 +207,7 @@ void marioForceShipAnime(void) {
 	marioPaperOn(paper_ship[marioGetColor()]);
 	marioChgPaper("PM_H_1B");
 	marioChgPose("M_J_1B");
-	m->trigFlags |= 8;
+	m->dispFlags |= 8;
 }
 
 void marioShipChgFall(void) {

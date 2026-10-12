@@ -146,7 +146,6 @@ void marioSetCharMode(s32 mode) {
 	u32 matFlag;
 	u32 lightFlag;
 	s32 color;
-	u16 motion;
 
 	if (mode == 1) {
 		wp->characterId = 1;
@@ -161,7 +160,7 @@ void marioSetCharMode(s32 mode) {
 			wp->paperAnimGroupId[0] = animPoseEntry("c_zako_n", 2);
 			wp->paperAnimGroupId[1] = animPoseEntry("c_peach_r", 2);
 			npcSetMarioAutoTalkPose("S_1", "T_1");
-			wp->wPlayerCollisionBox.y = wp->wPlayerCollisionBox.x = 30.0f;
+			wp->wPlayerCollisionBox.x = wp->wPlayerCollisionBox.y = 30.0f;
 		}
 		marioSetSpec();
 		wp->trigFlags |= 0x1000;
@@ -205,16 +204,15 @@ void marioSetCharMode(s32 mode) {
 		marioSetFamicomMode(1);
 	}
 	if (!(wp->flags & 0x2000000)) {
-		motion = wp->currMotionId;
-		if (motion == 0x18) {
+		if (wp->currMotionId == 0x18) {
 			marioForcePlaneAnime();
 			return;
 		}
-		else if (motion == 0x19) {
+		else if (wp->currMotionId == 0x19) {
 			marioForceShipAnime();
 			return;
 		}
-		else if (motion == 0x16) {
+		else if (wp->currMotionId == 0x16) {
 			marioForceRollAnime();
 			return;
 		}
@@ -222,18 +220,17 @@ void marioSetCharMode(s32 mode) {
 			marioForceSlitAnime();
 			return;
 		}
-		else if (motion == 0x1c) {
+		else if (wp->currMotionId == 0x1c) {
 			N_marioForceVivianAnime();
 			return;
 		}
-		else if (motion == 0x1a) {
+		else if (wp->currMotionId == 0x1a) {
 			marioChgPose("M_Y_2");
 			marioChgPose("M_Y_1");
 			return;
 		}
 	}
-	motion = wp->currMotionId;
-	if (motion != 0x18 && motion != 0x19 && motion != 0x14) {
+	if (wp->currMotionId != 0x18 && wp->currMotionId != 0x19 && wp->currMotionId != 0x14) {
 		marioSetSpec();
 	}
 }
@@ -1013,11 +1010,13 @@ void marioMain(void) {
 	if (MFLD(wp, s16, 0x2C0) > 0) {
 		MFLD(wp, s16, 0x2C0)--;
 		if (MFLD(wp, s16, 0x2C0) % 30 == 0 && MFLD(wp, s16, 0x2C0) > 0) {
+			Vec drop;
 			Vec pos = {0.0f, 0.0f, 0.0f};
 			pos.x = wp->position.x;
 			pos.y = 30.0f + wp->position.y;
 			pos.z = wp->position.z;
-			marioCoinDropSub(pos);
+			drop = pos;
+			itemCoinDrop(&drop);
 		}
 	}
 	if (wp->unk5E > 0) {
@@ -1246,7 +1245,6 @@ void marioCtrlOff2Main(void) {
 	}
 }
 
-void marioCamZoomOff(void);
 f32 PSVECDistance(const Vec* a, const Vec* b);
 
 void marioMove(void) {
@@ -1291,7 +1289,7 @@ void marioMove(void) {
 				}
 			}
 			else {
-				stick = MFLD(wp, u8, 0x24E);
+				stick = MFLD(wp, s8, 0x24E);
 				stick = stick * stick;
 				if (stick < 25) {
 					marioChgPose("M_Z_1");
@@ -1976,7 +1974,8 @@ void marioPreDisp(void) {
 	if (wp->characterId == 2) {
 		size = 30.0f;
 		xo = 14.0f * (f32)sin(3.1415927f * wp->targetYaw / 180.0f);
-		zo = 14.0f * -(f32)cos(3.1415927f * wp->targetYaw / 180.0f);
+		dy = -(f32)cos(3.1415927f * wp->targetYaw / 180.0f);
+		zo = 14.0f * dy;
 	}
 	else {
 		xo = 0.0f;
@@ -1991,7 +1990,8 @@ void marioPreDisp(void) {
 		else {
 			sz = size;
 		}
-		shadowEntryMode(bit ? 0 : 2, wp->position.x + xo, wp->position.y, wp->position.z + zo, sz);
+		t = 2; if (bit) { t = 0; }
+		shadowEntryMode(t, wp->position.x + xo, wp->position.y, wp->position.z + zo, sz);
 	}
 	else {
 		dy = wp->position.y - *(f32*)((u8*)wp + 0x1C0);
@@ -2001,7 +2001,11 @@ void marioPreDisp(void) {
 				size = 0.0f;
 			}
 			if (size) {
-				shadowEntryMode((wp->flags & 0x2000000) ? 0 : 2, wp->position.x + xo, wp->position.y, wp->position.z + zo, size);
+				t = 2;
+				if (wp->flags & 0x2000000) {
+					t = 0;
+				}
+				shadowEntryMode(t, wp->position.x + xo, wp->position.y, wp->position.z + zo, size);
 			}
 		}
 	}
@@ -2095,30 +2099,44 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 3, 0.0f, 1.0f);
 }
 
+#pragma opt_dead_assignments off
 void marioDispBlur(CameraId camId, void* param) {
 	MarioWork* wp = param;
 	s32 i;
 	u32 flag;
 	f32 angle;
+	s32 q;
 	Mtx mtx;
 
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 	angle = 6.2831855f * wp->targetYaw / 360.0f;
 	if (angle <= 3.1415927f) {
 		if (angle <= 1.5707964f) {
+			q = 0;
 		}
 		else {
+			q = 1;
 		}
 	}
 	else if (angle <= 4.712389f) {
+		q = 2;
+	}
+	else {
+		q = 3;
 	}
 	if (angle <= 3.1415927f) {
 		if (angle <= 1.5707964f) {
+			q = 0;
 		}
 		else {
+			q = 1;
 		}
 	}
 	else if (angle <= 4.712389f) {
+		q = 2;
+	}
+	else {
+		q = 3;
 	}
 	for (i = 7; i > 0; i--) {
 		marioDispBlurSub(mtx, i);
@@ -2126,6 +2144,7 @@ void marioDispBlur(CameraId camId, void* param) {
 	animPoseSetMaterialFlagOff(wp->paperAnimGroupId[marioAnimeId()], 0x40);
 	animPoseSetMaterialFlagOn(wp->paperAnimGroupId[marioAnimeId()], flag);
 }
+#pragma opt_dead_assignments reset
 
 void marioDisp(CameraId camId, void* param) {
 	MarioWork* wp = mp;

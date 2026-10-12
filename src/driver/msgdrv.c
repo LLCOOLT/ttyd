@@ -3,6 +3,7 @@
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/icondrv.h"
+#include "driver/npcdrv.h"
 #include "driver/windowdrv.h"
 #include "manager/dvdmgr.h"
 #include "manager/fontmgr.h"
@@ -17,12 +18,23 @@ extern int sprintf(char* str, const char* format, ...);
 
 #define WIN_STATE(w) (*(u16*)(w)->field_0x0)
 
+typedef struct MsgChar {
+	u32 value; //0x0
+	u16 glyph; //0x4
+	s16 field_0x6; //0x6
+	s16 field_0x8; //0x8
+	u8 field_0xA[0xC - 0xA]; //0xA
+	u32 time; //0xC
+	u8 field_0x10[0x18 - 0x10]; //0x10
+} MsgChar;
+
 typedef struct MsgWinData {
 	const char* tag; //0x0
 	u32 flags; //0x4
-	u8 field_0x8[0xA - 0x8]; //0x8
-	s16 field_0xA; //0xA
-	u8 field_0xC[0x10 - 0xC]; //0xC
+	u16 field_0x8; //0x8
+	u16 field_0xA; //0xA
+	u16 field_0xC; //0xC
+	u8 field_0xE[0x10 - 0xE]; //0xE
 	s32 field_0x10; //0x10
 	u8 field_0x14[0x18 - 0x14]; //0x14
 	OSTime time18; //0x18
@@ -32,7 +44,7 @@ typedef struct MsgWinData {
 	u8 field_0x2C[0x30 - 0x2C]; //0x2C
 	OSTime time30; //0x30
 	s32 count; //0x38
-	u8 field_0x3C[0x783C - 0x3C]; //0x3C
+	MsgChar entries[0x500]; //0x3C
 	s32 page; //0x783C
 	s32 field_0x7840; //0x7840
 	s32 pageY[(0x79FC - 0x7844) / 4]; //0x7844
@@ -61,6 +73,7 @@ typedef struct MsgWinData {
 	s32 field_0x7A54; //0x7A54
 } MsgWinData;
 
+#define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->field_0x79FC)
 #define WIN_DATA(w) ((MsgWinData*)(w)->userdata->address)
 #define WIN_TIME(w) (*(OSTime*)((u8*)(w) + 0x20))
 void msgWindow_Disp(CameraId camId, void* param);
@@ -76,6 +89,7 @@ void BtlUnit_ChangeStayAnim(s32 unitId);
 void npcSetStayPose(const char* name);
 void BtlUnit_ChangeTalkAnim(s32 unitId);
 void npcSetTalkPose(const char* name);
+s32 psndSFXOnVol(const char* name, u8 vol);
 
 typedef struct MsgLookupEntry {
 	u32 startaddr; //0x0
@@ -234,7 +248,186 @@ void msgLoad(const char* filename, s32 index) {
 	}
 }
 
-//s32 msgMain(void* somearray)
+static inline void msgAddPage(smartEntry* smart, s32 y) {
+	MsgWinData* d = smart->address;
+	if (!(d->flags & 0x200) && d->field_0x7840 < 110) {
+		if (d->field_0x7840 == 0 || d->pageY[d->field_0x7840 - 1] != y) {
+			d->pageY[d->field_0x7840++] = y;
+		}
+	}
+}
+
+static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
+	u32 btn;
+	if (!(data->flags & 0x80)) {
+		btn = 0x100;
+		if (((MsgWinData*)smart->address)->flags & 0x100) {
+			btn = 0x500;
+		}
+		if (keyGetButtonTrg(0) & (btn | 0x200)) {
+			data->flags |= 4;
+		}
+	}
+}
+
+static inline void msgVoiceSE(smartEntry* smart) {
+	MsgWinData* d = smart->address;
+	if (d->window->type != 1 && !msgSEflag) {
+		psndSFXOnVol((const char*)0x20044, d->field_0x7A2C);
+		msgSEflag = 1;
+	}
+}
+
+s32 msgMain(smartEntry* smart) {
+	MsgWinData* data = smart->address;
+	MsgChar* entry;
+	s32 i;
+	s32 ms;
+	NpcEntry* npc;
+
+	msgSEflag = 0;
+	if (data->flags & 2) {
+		if (MSG_CB(data)) {
+			MSG_CB(data)(0, smart);
+		}
+		data->flags &= ~2;
+		msgAddPage(smart, 0);
+	}
+	if (data->field_0x24 > data->field_0x28) {
+		data->field_0x28 = data->field_0x28 + 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+		msgCheckSkip(smart, data);
+		if (!(data->flags & 0x10) && (data->flags & 4)) {
+			data->field_0x28 = data->field_0x28 + 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+		}
+		if (data->field_0x24 < data->field_0x28) {
+			data->field_0x28 = data->field_0x24;
+		}
+		data->time30 = gp->renderTime;
+		return 3;
+	}
+	switch (data->field_0xA) {
+	case 1:
+		return 2;
+	case 2:
+		data->field_0xC = 1;
+		data->field_0x8++;
+		data->field_0xA = 0;
+		psndSFXOn((const char*)0x2003D);
+		data->field_0x20 += 100;
+		if (MSG_CB(data)) {
+			MSG_CB(data)(3, smart);
+		}
+		break;
+	default:
+		ms = OSTicksToMilliseconds(gp->renderTime - data->time30);
+		msgCheckSkip(smart, data);
+		if (!(data->flags & 0x10) && (data->flags & 4)) {
+			ms *= 100;
+		}
+		data->field_0x20 += ms;
+		break;
+	}
+	data->time30 = gp->renderTime;
+	i = data->field_0x10;
+	entry = &data->entries[i];
+	for (; i < 0x500; i++, entry++) {
+		if (entry->time > data->field_0x20) {
+			break;
+		}
+		switch (entry->glyph) {
+		case 0xFFFF:
+			if (MSG_CB(data)) {
+				MSG_CB(data)(1, smart);
+			}
+			data->field_0x10 = i;
+			return 0;
+		case 0xFFFE:
+			if (entry->field_0x6 == data->field_0x8) {
+				data->field_0xA = 1;
+				data->field_0x20 = entry->time;
+				data->flags &= ~4;
+				if (MSG_CB(data)) {
+					MSG_CB(data)(2, smart);
+				}
+			}
+			break;
+		case 0xFFFD:
+			data->field_0x24 -= entry->field_0x8;
+			data->field_0x20 = entry->time;
+			msgAddPage(smart, data->field_0x24);
+			break;
+		case 0xFFFC:
+			data->field_0x10 = i + 1;
+			data->field_0x20 = entry->time;
+			data->flags &= ~4;
+			return 1;
+		case 0xFFFB:
+			if (MSG_CB(data)) {
+				MSG_CB(data)(4, smart);
+			}
+			break;
+		case 0xFFFA:
+			data->field_0x7A28 = entry->value;
+			break;
+		case 0xFFF9:
+			data->field_0x7A2C = entry->value;
+			break;
+		case 0xFFF5:
+			if (entry->value) {
+				data->flags |= 0x80;
+				data->flags &= ~4;
+				data->field_0x20 = entry->time;
+			}
+			else {
+				data->flags &= ~0x80;
+			}
+			break;
+		case 0xFFF3:
+			npc = (NpcEntry*)entry->value;
+			if (!npc) {
+				npc = npcNameToPtr(data->stayPose);
+			}
+			animPoseSetPaperAnimGroup(npc->poseId, "p_b_st", 1);
+			animPosePaperPeraOn(npc->poseId);
+			animPoseSetPaperAnim(npc->poseId, paperPoseTbl[entry->time], 1);
+			break;
+		case 0xFFF2:
+			npc = (NpcEntry*)entry->value;
+			if (data->field_0xA) {
+				i--;
+				break;
+			}
+			if (!npc) {
+				npc = npcNameToPtr(data->stayPose);
+			}
+			animPoseSetPaperAnimGroup(npc->poseId, NULL, 1);
+			break;
+		case 0xFFF4:
+		case 0xFFF8:
+			break;
+		default:
+			if (MSG_CB(data)) {
+				MSG_CB(data)(5, smart);
+			}
+			if (entry->value & 0x10) {
+				msgVoiceSE(smart);
+			}
+			else if (entry->value & 8) {
+				if (((MsgWinData*)smart->address)->window->type != 3) {
+					((MsgWinData*)smart->address)->field_0x7A50 = 15;
+				}
+				msgVoiceSE(smart);
+			}
+			break;
+		}
+	}
+	data->field_0x10 = i;
+	if (data->field_0xA) {
+		return 2;
+	}
+	return 3;
+}
+
 
 #pragma dont_inline on
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
@@ -583,9 +776,11 @@ static inline BOOL msgWinPrevPage(WindowEntry* window) {
 
 static inline void msgWinNextPage(WindowEntry* window) {
 	MsgWinData* d = WIN_DATA(window);
+	s32 max;
 	d->page++;
-	if (d->field_0x7840 - 1 < d->page) {
-		d->page = d->field_0x7840 - 1;
+	max = d->field_0x7840 - 1;
+	if (d->page > max) {
+		d->page = max;
 	}
 }
 
@@ -595,6 +790,7 @@ void msgWindow_Main(WindowEntry* window) {
 	MsgWinData* data = smart->address;
 	s32 se;
 	s32 target;
+	u32 trg;
 
 	if (data->field_0x7A50) {
 		if (!data->field_0x7A54) {
@@ -691,7 +887,8 @@ void msgWindow_Main(WindowEntry* window) {
 		if (WIN_DATA(window)->flags & 0x100) {
 			target = 0x500;
 		}
-		if (keyGetButtonTrg(0) & (target | 0x200)) {
+		trg = keyGetButtonTrg(0);
+		if (trg & (target | 0x200)) {
 			WIN_STATE(window) = 1;
 			data->field_0xA = 2;
 			if (keyGetButtonTrg(0) & 0x200) {
@@ -743,7 +940,8 @@ void msgWindow_Main(WindowEntry* window) {
 		if (WIN_DATA(window)->flags & 0x100) {
 			target = 0x500;
 		}
-		if (keyGetButtonTrg(0) & target) {
+		trg = keyGetButtonTrg(0);
+		if (trg & target) {
 			WIN_STATE(window) = 10;
 			WIN_TIME(window) = gp->renderTime;
 			msgWinNextPage(window);

@@ -245,7 +245,8 @@ void puniMapInit(void) {
 }
 
 s32 randi(s32 min, s32 max) {
-    return rand() % (max - min + 1) + min;
+    s32 r = rand() % (max - min + 1);
+    return r + min;
 }
 
 static f32 randf(f32 min, f32 max) {
@@ -625,11 +626,15 @@ void puniModeNormal(PuniData* p) {
     }
 }
 
+static inline s32 puni_bero_id_filter(s32 id) {
+    return bero_id_filter(id);
+}
+
 USER_FUNC(evt_puni_dokan_onoff) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     s32 on = evtGetValue(event, args[1]);
-    PuniData* p = &Punidat[bero_id_filter(id)] + 103;
+    PuniData* p = &Punidat[puni_bero_id_filter(id)] + 103;
     if (on == 0) {
         p->unk4 |= 0x100000;
     } else {
@@ -852,8 +857,8 @@ PuniData* searchMikata(PuniData* self) {
 PuniData* searchTeki(PuniData* self) {
     f32 minDist = 1000000.0f;
     PuniData* found = NULL;
-    s32 i;
     PuniData* q = &Punidat[110];
+    s32 i;
 
     for (i = 110; i < 210; i++, q++) {
         if ((q->unk4 & 0x400) && !(q->unk4 & 0x4000) && q->unkC != 9 && q->unkC != 13) {
@@ -1465,17 +1470,13 @@ static const Vec puni_fall_dir = {0.0f, -1.0f, 0.0f};
 static const Vec puni_fall_vel = {0.0f, 0.0f, 0.0f};
 
 void puniModeChangeFallCheck(void) {
-    s32 i;
-    PuniData* p = &Punidat[1];
     Vec dir;
     Vec pos;
-    f32 nz;
-    f32 ny;
-    f32 nx;
-    f32 hz;
-    f32 hy;
-    f32 hx;
+    Vec nrm;
+    Vec hit;
     f32 dist;
+    s32 i;
+    PuniData* p = &Punidat[1];
 
     for (i = 1; i <= 102; i++, p++) {
         if (!(p->unk4 & 0x400)) {
@@ -1485,7 +1486,7 @@ void puniModeChangeFallCheck(void) {
         pos.y = 1.0f + pos.y;
         dir = puni_fall_dir;
         dist = 2.0f;
-        if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z) ==
+        if (hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &dist, &nrm.x, &nrm.y, &nrm.z, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z) ==
             NULL) {
             PuniDokuritsu(p);
             p->vel = puni_fall_vel;
@@ -1500,17 +1501,13 @@ void puniModeChangeFallCheck(void) {
 }
 
 USER_FUNC(evt_puni_all_fall_check) {
-    f32 hz;
-    f32 hy;
-    f32 hx;
-    f32 nz;
-    f32 ny;
-    f32 nx;
+    PuniData* p = &Punidat[1];
+    s32 i;
+    Vec hit;
+    Vec nrm;
     Vec pos;
     Vec dir;
     f32 dist;
-    s32 i;
-    PuniData* p = &Punidat[1];
 
     for (i = 1; i <= 102; i++, p++) {
         if (!(p->unk4 & 0x400)) {
@@ -1520,7 +1517,7 @@ USER_FUNC(evt_puni_all_fall_check) {
         pos.y = 1.0f + pos.y;
         dir = puni_fall_dir;
         dist = 2.0f;
-        if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z) ==
+        if (hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &dist, &nrm.x, &nrm.y, &nrm.z, pos.x, pos.y, pos.z, dir.x, dir.y, dir.z) ==
             NULL) {
             PuniDokuritsu(p);
             p->vel = puni_fall_vel;

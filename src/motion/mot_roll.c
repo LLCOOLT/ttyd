@@ -208,10 +208,10 @@ s32 unk_8009fcbc(void) {
     if (MI(0x2a4) & 0x200) {
         return 1;
     }
-    if (mario->flags & 0x8000000) {
+    if ((mario->flags & 0x8000000) != 0) {
         return 1;
     }
-    return mario->hitobjStandOn ? (marioSlitChkWallAround() != 0) : 1;
+    return !mario->hitobjStandOn ? 1 : (marioSlitChkWallAround() != 0);
 }
 
 s32 marioRollKeyDisable(void) {
@@ -431,7 +431,7 @@ void rollEvtJumpSetup(void) {
 void marioReInit_roll(void) {
     void* p;
     MarioWork* mario = marioGetPtr();
-    MarioWork* m;
+    f32* new_var;
     f32 z0;
     f32 z1;
     p = __memAlloc(0, 0x14);
@@ -451,7 +451,7 @@ void marioReInit_roll(void) {
     mario->dispFlags |= 8;
     mario->dispFlags |= 0x100;
     mario->currSubMotionId = 0x1e;
-    m = marioGetPtr();
+    mario = marioGetPtr();
     z0 = 0.0f;
     MF(0x1b4) = 14.8f;
     MF(0x1b8) = 14.8f;
@@ -459,9 +459,10 @@ void marioReInit_roll(void) {
     RW()->x = z0;
     z1 = 0.0f;
     RW()->z = z1;
-    MF(0xb0) = -6.0f;
+    *(f32*)(0xb0 + (u8*)mario) = -6.0f;
     MF(0xb4) = 6.0f;
-    MF(0x98) = 6.0f;
+    new_var = (f32*)((u8*)mario + 0x98);
+    *new_var = 6.0f;
     MF(0x9c) = 0.0f;
     MF(0xc8) = 1.0f;
     MF(0xcc) = 1.0f;

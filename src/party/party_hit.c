@@ -151,10 +151,16 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
 static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
+#pragma fp_contract off
+static inline f32 party_sumsq(f32 x, f32 z) { return x * x + z * z; }
+#pragma fp_contract reset
+
 f32 partyNrmToAngle(Vec* n) {
     f32 x = n->x;
     f32 z = n->z;
-    return angleABf(0.0f, 0.0f, party_sqrtf(x * x + z * z), -n->y);
+    x = x * x;
+    z = z * z;
+    return angleABf(0.0f, 0.0f, party_sqrtf(x + z), -n->y);
 }
 
 void partyChkGnd(PartyEntry* party) {
@@ -521,7 +527,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     Vec t;
     f32 s, c;
-    f32 bx, by, bz;
+    Vec base;
     f32 d0, nz0, ny0, nx0, hz0, hy0, hx0;
     f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
     f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
@@ -532,17 +538,15 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
 
     oz = 0.3f * party->width;
     sincosf(&s, &c, angle);
-    bx = pos->x;
-    by = pos->y;
-    bz = pos->z;
+    base = *pos;
     ox = -oz * c;
     oz = oz * s;
     best = *dist;
     {
         Vec v0 = {0.0f, 0.0f, 0.0f};
-        lx = bx + oz;
-        ly = by;
-        lz = bz + ox;
+        lx = base.x + oz;
+        ly = base.y;
+        lz = base.z + ox;
         v0.x = lx;
         v0.y = ly;
         v0.z = lz;
@@ -555,9 +559,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v1 = {0.0f, 0.0f, 0.0f};
-        lx = bx - oz;
-        ly = by;
-        lz = bz - ox;
+        lx = base.x - oz;
+        ly = base.y;
+        lz = base.z - ox;
         v1.x = lx;
         v1.y = ly;
         v1.z = lz;
@@ -570,9 +574,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v2 = {0.0f, 0.0f, 0.0f};
-        lx = bx + ox;
-        ly = by;
-        lz = bz + oz;
+        lx = base.x + ox;
+        ly = base.y;
+        lz = base.z + oz;
         v2.x = lx;
         v2.y = ly;
         v2.z = lz;
@@ -585,9 +589,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v3 = {0.0f, 0.0f, 0.0f};
-        lx = bx - ox;
-        ly = by;
-        lz = bz - oz;
+        lx = base.x - ox;
+        ly = base.y;
+        lz = base.z - oz;
         v3.x = lx;
         v3.y = ly;
         v3.z = lz;

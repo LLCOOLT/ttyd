@@ -62,9 +62,9 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     Vec a;
     u8* efp;
     u8* e;
-    f32 s;
-    f32 r;
     f32 half;
+    f32 r;
+    f32 s;
     s32 i;
 
     efp = getKoopaFireEfp();
@@ -95,13 +95,15 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     e += 0x50;
     for (i = 1; i < *(s32*)(efp + 8); i++, e += 0x50) {
         if (*(s32*)(e + 0x44) == 0) {
-            Vec zero = {0.0f, 0.0f, 0.0f};
             r = 7.0f * MF(e, 0x40);
             PSMTXTrans(m1, MF(e, 4), MF(e, 8), MF(e, 0xC));
             PSMTXScale(m3, r, r, r);
             PSMTXConcat(m1, m3, m1);
             PSMTXConcat(m4, m1, m1);
-            PSMTXMultVec(m1, &zero, &out);
+            {
+                Vec zero = {0.0f, 0.0f, 0.0f};
+                PSMTXMultVec(m1, &zero, &out);
+            }
             PSVECSubtract(&b, &out, &diff);
             if (PSVECMag(&diff) < r * s + half) {
                 return 1;
@@ -278,9 +280,9 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
     HitEntry* hit;
     HitEntry* best;
     s32* tbl;
-    s32 n, i;
+    s32 n, i, j;
     MarioWork* m;
-    f32 deg, rad, off, c, s_, x, y, z, hy, hx, hz, d, nx, ny, nz;
+    f32 deg, rad, off, c, s_, x, y, z, hx, hy, hz, nx, ny, nz, d;
     f32 oy, oz, mode;
     s32 md;
 
@@ -296,9 +298,9 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
     }
     off = *outB;
     *outB = -1.0f;
-    for (i = 0; i < 10; i++) {
-        KHEAD(i) = NULL;
-        KHEADD(i) = 1000.0f;
+    for (j = 0; j < 10; j++) {
+        KHEAD(j) = NULL;
+        KHEADD(j) = 1000.0f;
     }
     tbl = headchkofs[kpaGetLevel()];
     n = *tbl++;
@@ -318,8 +320,12 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
             break;
         }
     } else {
-        if (kpaGetLevel() == 0 && m->currMotionId == 0x25) {
-            off = 10.0f;
+        if (kpaGetLevel() == 0) {
+            if (m->currMotionId == 0x25) {
+                off = 10.0f;
+            } else {
+                off = hgt;
+            }
         } else {
             off = hgt;
         }
@@ -397,14 +403,20 @@ HitEntry* kpaChkHitobjRide(void) {
                             }
                         }
                     }
+                    if (!r && !r && !r) {
+                    }
                 }
             }
         }
     }
-    return r;
+    if (r) {
+        return r;
+    } else {
+        return r;
+    }
 }
 
-void kpaClearHitobjRide(void) {
+long kpaClearHitobjRide(void) {
     MarioWork* m = marioGetPtr();
     *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x4C) = NULL;
     *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x50) = NULL;
@@ -441,12 +453,12 @@ static s32 head_sphere_data_lv0[] = {1, 10, 15, 6, 0};
 static s32* head_sphere_data[] = {head_sphere_data_lv0, head_sphere_data_lv1, head_sphere_data_lv2, head_sphere_data_lv3};
 
 HitEntry* kpaHitCheck(void) {
+    s32 n, i, j;
     MarioWork* m;
     HitEntry* best;
     HitEntry* hit;
     s32* p;
     f32 rad, x, y, z, r, sn;
-    s32 n, i;
 
     best = NULL;
     m = marioGetPtr();
@@ -463,7 +475,7 @@ HitEntry* kpaHitCheck(void) {
     }
     p = head_sphere_data[kpaGetLevel()];
     n = *p++;
-    for (i = 0; i < n; i++, p += 4) {
+    for (j = 0; j < n; j++, p += 4) {
         sn = (f32)sin(3.1415927f * m->directionView / 180.0f);
         x = MF(m, 0x8C) + p[0] * sn;
         z = MF(m, 0x94) - p[0] * (f32)cos(3.1415927f * m->directionView / 180.0f);
@@ -488,7 +500,7 @@ HitEntry* kpaHitCheck(void) {
         }
         hit = hitCheckSphereFilter(NULL, x, y, z, r);
         if ((m->flags & 0x10000) && (hitGetAttr(hit) & 0x80000000) && *(f32*)((u8*)mobjHitObjPtrToPtr(hit) + 0x3C) > y) {
-            KHEAD(i) = hit;
+            KHEAD(j) = hit;
         }
         if (hit) {
             best = hit;

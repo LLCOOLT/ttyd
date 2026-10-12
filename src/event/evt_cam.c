@@ -70,6 +70,7 @@ USER_FUNC(evt_cam_shake) {
     CameraId id;
     f32 x, y;
     s32 msec;
+    s64 mask = -1;
     u64 now;
     u64 last;
     f32 len;
@@ -82,9 +83,9 @@ USER_FUNC(evt_cam_shake) {
     now = event->lifetime;
     if (isFirstCall) {
         event->userdata[0] = 0;
-        *(OSTime*)&event->userdata[1] = now;
+        *(OSTime*)&event->userdata[1] = now & mask;
         *(s32*)&event->field_84 = 0;
-        event->wInterpRelatedTime = now;
+        event->wInterpRelatedTime = now & mask;
     }
     event->userdata[0]++;
     event->userdata[0] %= 4;
@@ -111,14 +112,14 @@ USER_FUNC(evt_cam_shake) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = now;
+                event->wInterpRelatedTime = now & mask;
             }
         }
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = now;
+                event->wInterpRelatedTime = now & mask;
             }
         }
     }
@@ -239,12 +240,15 @@ USER_FUNC(evt_cam3d_evt_set_rel) {
 
         (Vec){0.0f, 0.0f, 0.0f};
         (Vec){0.0f, 0.0f, 0.0f};
-        at.x = mario->position.x + ax;
-        at.y = mario->position.y + ay;
-        at.z = mario->position.z + az;
-        pos.x = px + at.x;
-        pos.y = py + at.y;
-        pos.z = pz + at.z;
+        ax = mario->position.x + ax;
+        ay = mario->position.y + ay;
+        az = mario->position.z + az;
+        pos.x = px + ax;
+        pos.y = py + ay;
+        pos.z = pz + az;
+        at.x = ax;
+        at.y = ay;
+        at.z = az;
 
         camera->presetPos = camera->cameraPos;
         camera->presetAt = camera->cameraAt;
@@ -266,7 +270,7 @@ USER_FUNC(evt_cam3d_evt_set_npc_rel) {
     s32 msec, curve;
     CameraEntry* camera;
     NpcEntry* npc;
-    Vec npcAt, npcPos;
+    Vec npcPos, npcAt;
     Vec pos, at;
 
     name = (const char*)evtGetValue(event, args[0]);
@@ -304,7 +308,7 @@ USER_FUNC(evt_cam3d_evt_set_rel_dir) {
     CameraEntry* camera;
     MarioWork* mario;
     Mtx mtx;
-    Vec marAt, marPos;
+    Vec marPos, marAt;
     Vec pos, at;
 
     px = evtGetValue(event, args[0]);

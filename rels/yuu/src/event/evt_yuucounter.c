@@ -245,7 +245,7 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
                 if (!skip) {
                     PSMTXTrans(mtx, xOfs + (f32)(j * 30), 8.0f, 0.0f);
                     PSMTXConcat(base, mtx, mtx);
-                    iconDispGxCol(mtx, 0x10, digit + 0x1F7, numColor);
+l                    iconDispGxCol(mtx, 0x10, digit + 0x1F7, numColor);
                 }
             }
             break;
@@ -388,4 +388,3 @@ EVT_END()
 __declspec(section ".data") EVT_BEGIN(unk_evt_yuu_00019740)
     RETURN
 EVT_END()
-

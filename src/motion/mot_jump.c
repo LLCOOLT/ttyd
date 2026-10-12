@@ -153,6 +153,8 @@ void mot_jumpSw(void) {
 	MarioWork* mario = marioGetPtr();
 	void* mobj;
 	f32 dir;
+	f32 x, z;
+	f32 c, s;
 	if (mario->trigFlags & 1) {
 		mario->trigFlags &= ~1;
 		marioResetCamFollowRate();
@@ -179,20 +181,22 @@ void mot_jumpSw(void) {
 				}
 				}
 				{
-				f32 s2, c2;
-				sincosf(&s2, &c2, MF(0x1A0));
+				sincosf(&s, &c, MF(0x1A0));
+				x = 30.0f * s + MO(mobj, 0x38);
+				z = 30.0f * c + MO(mobj, 0x40);
 				MI(0x48) = 20;
-				MF(0x180) = distABf(MF(0x8C), MF(0x94), 30.0f * s2 + MO(mobj, 0x38), 30.0f * c2 + MO(mobj, 0x40)) / (f32)MI(0x48);
+				MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
 				}
 			}
 		} else {
-			f32 s, c;
 			dir = revise360(180.0f + MF(0x1A0));
 			sincosf(&s, &c, dir);
+			x = 30.0f * s + MF(0x8C);
+			z = 30.0f * c + MF(0x94);
 			MF(0x1A0) = dir;
 			MF(0x19C) = dir;
 			MI(0x48) = 20;
-			MF(0x180) = distABf(MF(0x8C), MF(0x94), 30.0f * s + MF(0x8C), 30.0f * c + MF(0x94)) / (f32)MI(0x48);
+			MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
 		}
 		MI(0x44) = 0;
 	}
@@ -227,6 +231,8 @@ void mot_jumpNpc(void) {
 	MarioWork* mario = marioGetPtr();
 	void* mobj;
 	f32 dir;
+	f32 x, z;
+	f32 c, s;
 	if (mario->characterId == 2) {
 		kpa_jumpNpc();
 		return;
@@ -270,21 +276,23 @@ void mot_jumpNpc(void) {
 				}
 				}
 				{
-				f32 s2, c2;
-				sincosf(&s2, &c2, MF(0x1A0));
+				sincosf(&s, &c, MF(0x1A0));
+				x = 30.0f * s + MO(mobj, 0x38);
+				z = 30.0f * c + MO(mobj, 0x40);
 				MI(0x48) = 20;
-				MF(0x180) = distABf(MF(0x8C), MF(0x94), 30.0f * s2 + MO(mobj, 0x38), 30.0f * c2 + MO(mobj, 0x40)) / (f32)MI(0x48);
+				MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
 				}
 			}
 		} else {
-			f32 s, c;
 			revise360(180.0f + MF(0x1A0));
 			dir = MF(0x1A0);
 			sincosf(&s, &c, dir);
+			x = 30.0f * s + MF(0x8C);
+			z = 30.0f * c + MF(0x94);
 			MF(0x1A0) = dir;
 			MF(0x19C) = dir;
 			MI(0x48) = 20;
-			MF(0x180) = distABf(MF(0x8C), MF(0x94), 30.0f * s + MF(0x8C), 30.0f * c + MF(0x94)) / (f32)MI(0x48);
+			MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
 		}
 		MI(0x44) = 0;
 	}

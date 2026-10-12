@@ -1159,7 +1159,8 @@ const char* winGetMapTplName(void) {
 }
 
 double sin(double);
-double fabs(double);
+double __fabs(double);
+static inline double fabs(double x) { return __fabs(x); }
 
 
 void mapGX(WinLogWork* w, f32 x, f32 y) {
@@ -1250,7 +1251,8 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexSet(0xBF, (Vec){4.0f + (230.0f + x), y, 0.0f}, (Vec){1.0f, 32.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, 4.0f + top, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, (y - 120.0f) - 4.0f, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
-        s = fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+        s = sin(gp->retraceCount * 0.125f);
+        s = fabs(2.0f * s);
         winTexInit(w->res->tex->tpl);
         winTexSet(0xBD, (Vec){x, top + (-240.0f == w->scrollY ? 0.0f : s), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         o = -148.0f == w->scrollX ? 0.0f : s;

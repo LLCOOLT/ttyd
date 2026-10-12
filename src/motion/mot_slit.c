@@ -131,13 +131,13 @@ BOOL marioCreviceWallChk(Vec* p) {
 	f32 angB;
 	HitEntry* hitA;
 	HitEntry* hitB;
-	f32 dist;
 	f32 s;
 	f32 c;
-	Vec outNrm;
-	Vec outPos;
-	Vec dir;
+	f32 dist;
 	Vec pos;
+	Vec dir;
+	Vec outPos;
+	Vec outNrm;
 
 	marioGetPtr();
 	sincosf(&s, &c, toMovedirSimple(270.0f));
@@ -146,15 +146,14 @@ BOOL marioCreviceWallChk(Vec* p) {
 	angA = 0.0f;
 	angB = angA;
 	sincosf(&s, &c, toMovedirSimple(180.0f));
+	pos = *p;
 	{
 		Vec t1 = {0, 0, 0};
 		t1.x = s;
 		t1.z = c;
 		dir = t1;
 	}
-	pos.x = p->x;
-	pos.y = p->y + 10.0f;
-	pos.z = p->z;
+	pos.y += 10.0f;
 	dist = 20.0f;
 	hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitA) {
@@ -185,15 +184,14 @@ BOOL marioCreviceWallChk(Vec* p) {
 		}
 	}
 	sincosf(&s, &c, toMovedirSimple(0.0f));
+	pos = *p;
 	{
 		Vec u1 = {0, 0, 0};
 		u1.x = s;
 		u1.z = c;
 		dir = u1;
 	}
-	pos.x = p->x;
-	pos.y = p->y + 10.0f;
-	pos.z = p->z;
+	pos.y += 10.0f;
 	dist = 20.0f;
 	hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitB) {
@@ -366,7 +364,8 @@ void marioSlitForceCancel(void) {
 void mot_slit_post(void) {
 	MarioWork* m = marioGetPtr();
 	u16 id = m->currMotionId;
-	if (id == 0x15 || (u16)(id - 0xb) <= 1 || id <= 7 || id == 8) {
+	int new_var;
+	if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == 8) {
 		return;
 	}
 	if (!(m->flags & 0x100000)) {
@@ -386,9 +385,10 @@ void mot_slit_post(void) {
 			marioAdjustMoveDir();
 			allPartyForceSlitOff();
 		}
-	} else if (id != 10) {
+	} else if (m->currMotionId != 10) {
 		m->flags &= ~0x100000;
 		MW(m, 0x1b4, f32) = 20.0f;
+		new_var = 0xFEFFF3FF;
 		if (m->directionView >= 180.0f) {
 			m->unk1A8 = 0.0f;
 			m->unk1AC = m->unk1A8;
@@ -396,7 +396,10 @@ void mot_slit_post(void) {
 			m->unk1A8 = 180.0f;
 			m->unk1AC = m->unk1A8;
 		}
-		CLR_SLITFLAGS(m)
+		m->flags &= ~0x400000;
+		m->flags &= ~0x200000;
+		m->dispFlags &= new_var;
+		m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;

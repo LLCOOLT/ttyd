@@ -13,6 +13,8 @@
 #include "system.h"
 #include <string.h>
 
+f32 BattleGetFloorHeight(BattleWork* wp, f32 x, f32 y, f32 z);
+
 extern ItemData itemDataTable[];
 f32 sinfd(f32 degrees);
 s32 BtlUnit_EnemyItemCanUseCheck(s32 item);
@@ -58,17 +60,15 @@ void btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, GXColor color);
 void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color);
 void _btlStockExpDisp(CameraId camId, void* param);
 
-const char* searchPoseTbl(BattleDispPose* table, s32 poseId) { //TODO: fix mtctr
+const char* searchPoseTbl(BattleDispPose* table, s32 poseId) {
 	int i;
 
 	if (!table) return NULL;
-	i = 0x1C;
-	do {
-		if (table->poseId == poseId || table->poseId == 0x1C) {
+	for (i = 0; i < 0x1C; i++, table++) {
+		if ((s32)table->poseId == poseId || (s32)table->poseId == 0x1C) {
 			return table->poseName;
 		}
-		table++;
-	} while (--i);
+	}
 	return NULL;
 }
 
@@ -163,20 +163,22 @@ void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, G
 	
 	TEXGetGXTexObjFromPalette(*_battleWorkPointer->menuTex->data, &texobj, id);
 	GXLoadTexObj(&texobj, GX_TEXMAP0);
-	if (!GXGetTexObjFmt(&texobj)) {
-		GXSetNumTevStages(1);
-		GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-		GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-	}
-	else {
+	switch (GXGetTexObjFmt(&texobj)) {
+	case GX_TF_I4:
 		GXSetNumTevStages(1);
 		GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 		GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
 		GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 		GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
 		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+		break;
+	default:
+		GXSetNumTevStages(1);
+		GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+		GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
+		break;
 	}
 
 	x = 0.5f * (f32)GXGetTexObjWidth(&texobj);
@@ -272,7 +274,9 @@ StatusEffectType _GetStatusPoseType(BattleUnit* unit) { //TODO: extsb
 	return STATUS_INVALID;
 }
 
-#define UF(u, T, o) (*(T*)((u8*)(u) + (o)))
+#define UNF(u, T, o) (*(T*)((u8*)(u) + (o)))
+typedef void (*PartsDispCb)(BattleUnitPart*, s32);
+void shadowEntry(f32 x, f32 y, f32 z, f32 s);
 void BtlUnit_HpGaugeMain(BattleUnit* unit);
 void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part);
 BOOL animPoseTestXLU(s32 poseId);
@@ -294,25 +298,26 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part);
 StatusEffectType _GetStatusPoseType(BattleUnit* unit);
 
 void btlDispMain(void) {
-	BattleWork* wp = _battleWorkPointer;
 	BattleUnit* unit;
-	BattleUnit* target;
 	BattleUnitPart* part;
-	const char* poseName;
+	BattleWork* wp = _battleWorkPointer;
 	s32 i;
+	const char* poseName;
+	BattleUnit* target;
 	s32 loop;
 	s32 type;
-	Vec pos;
-	Vec tpos;
+	BattleUnit* partner;
 	f32 h;
-	s8 turns, strength;
 	f32 scale;
+	Vec tpos;
+	Vec pos;
 	Vec zpos;
 	Vec ppos;
-	Vec wpos;
 	Vec spos;
 	Vec vpos;
-	BattleUnit* partner;
+	Vec viv;
+	f32 wx, wy, wz;
+	s8 turns, strength;
 
 	for (i = 0; i < 0x40; i++) {
 		unit = BattleGetUnitPtr(_battleWorkPointer, i);
@@ -321,7 +326,7 @@ void btlDispMain(void) {
 			target = BattleGetUnitPtr(wp, unit->work[0]);
 			if (target) {
 				if (target->attackEventId && evtCheckID(target->attackEventId)) {
-					if (!(UF(target, u32, 0x2A8) & 4)) goto next;
+					if (!(UNF(target, u32, 0x2A8) & 4)) goto next;
 				}
 				if (target->damageEventId && evtCheckID(target->damageEventId)) goto next;
 				BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
@@ -361,7 +366,7 @@ void btlDispMain(void) {
 			}
 		}
 next:
-		loop = UF(unit, u8, 0x30E);
+		loop = UNF(unit, u8, 0x30E);
 		BtlUnit_OffUnitFlag(unit, 2);
 		if (loop != unit->mMoveColorLv) {
 			BtlUnit_OnUnitFlag(unit, 2);
@@ -374,7 +379,7 @@ next:
 				if (loop < unit->mMoveColorLv) loop = unit->mMoveColorLv;
 			}
 		}
-		UF(unit, u8, 0x30E) = loop;
+		UNF(unit, u8, 0x30E) = loop;
 		BtlUnit_HpGaugeMain(unit);
 		unit->mSizeMultiplier = 1.0f;
 		BtlUnit_GetStatus(unit, 0xB, &turns, &strength);
@@ -461,8 +466,8 @@ next:
 					}
 				}
 				if (loop && (part->attributes & 0x8000)) {
-					PART_POSETYPE(part) = 0;
 					loop = 0;
+					PART_POSETYPE(part) = 0;
 				}
 				if (!(PART_ANIMFLAGS(part) & 4)) {
 					if (loop && !(PART_ANIMFLAGS(part) & 0x40)) {
@@ -476,9 +481,9 @@ next:
 			gravityOffsetControl(part);
 			floatOffsetControl(part);
 			statusPoseControl(part);
-			BtlUnit_GetPartsWorldPos(part, &wpos.x, &wpos.y, &wpos.z);
+			BtlUnit_GetPartsWorldPos(part, &wx, &wy, &wz);
 			animPoseMain(part->poseId);
-			zpos = (Vec){wpos.x, wpos.y, wpos.z + PART_FIELD(part, f32, 0x4F8)};
+			zpos = (Vec){wx, wy, wz + PART_FIELD(part, f32, 0x4F8)};
 			PART_FIELD(part, u8, 0x4F7) = part->mKindPartParams->baseAlpha;
 			if (BtlUnit_CheckStatus(unit, 0x12) || (unit->mAttributeFlags & 8)) {
 				PART_FIELD(part, u8, 0x4F7) = (PART_FIELD(part, u8, 0x4F7) << 7) / 255;
@@ -501,7 +506,7 @@ next:
 					}
 				}
 				if (part->attributes & 0x4000000) {
-					dispEntry(CAMERA_3D, wpos.z, 2, (DispCallback)btlUnitPartsBlurDisp, part);
+					dispEntry(CAMERA_3D, wz, 2, (DispCallback)btlUnitPartsBlurDisp, part);
 				}
 			}
 			if (!(unit->mAttributeFlags & 0x20000000) && !(part->attributes & 0x2000000)) {
@@ -516,7 +521,7 @@ next:
 					spos.y *= 0.5f;
 					spos.z *= 0.5f;
 				}
-				h = spos.y = BattleGetFloorHeight(wp, spos.x, spos.y, spos.z);
+				spos.y = BattleGetFloorHeight(wp, spos.x, spos.y, spos.z); h = spos.y;
 				if (ppos.y <= h) {
 					scale = 1.0f;
 				}
@@ -528,25 +533,15 @@ next:
 				scale = scale * ((f32)PART_FIELD(part, s16, 0x1A2) * unit->mScale.x * part->mScale.x * unit->mSizeMultiplier) * part->field_0x78;
 				if ((unit->flags & 0x10000) && scale < 16.0f) scale = 16.0f;
 				if (scale < 10.0f) scale = 8.0f;
-				((void (*)(f32, f32, f32, f32))shadowEntry)(spos.x, 10.0f + h, spos.z, scale);
+				shadowEntry(spos.x, 10.0f + h, spos.z, scale);
 			}
-			switch (unit->currentKind) {
-				case 0xE4:
-				case 0x8D:
-				case 0x86:
-				case 0x1F:
-				case 0x20:
-				case 0x21:
-				case 0xBD:
-				case 0xBE:
-				case 0xBF:
-				case 0xC0:
-				case 0xC1:
-				case 0x85:
-					vpos = (Vec){(f32)unit->work[0], (f32)unit->work[1], (f32)unit->work[2]};
-					animPoseVivianMain(part->poseId, &vpos);
-					break;
-			}
+			{ s32 k = unit->currentKind;
+			if (k == 0xE4 || k == 0x8D || k == 0x86 || (u32)(k - 0x1F) <= 2 || (u32)(k - 0xBD) <= 4 || k == 0x85) {
+					viv.x = unit->work[0];
+					viv.y = unit->work[1];
+					viv.z = unit->work[2];
+					animPoseVivianMain(part->poseId, &viv);
+			} }
 			BtlUnit_ControlPoseSoundMain(part);
 		}
 		if (unit->heldItem) {
@@ -816,14 +811,14 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 			color->r = color->r * 160 / 255;
 			color->b = color->r * 160 / 255;
 		}
-		color->r = color->r * UF(unit, u8, 0x30E) / 255;
-		color->g = color->g * UF(unit, u8, 0x30E) / 255;
-		color->b = color->b * UF(unit, u8, 0x30E) / 255;
+		color->r = color->r * UNF(unit, u8, 0x30E) / 255;
+		color->g = color->g * UNF(unit, u8, 0x30E) / 255;
+		color->b = color->b * UNF(unit, u8, 0x30E) / 255;
 	}
 	animPoseSetMaterialEvtColor(part->poseId, *color);
 	animPoseSetMaterialFlagOn(part->poseId, 0x40);
 	if (PART_FIELD(part, void*, 0x210)) {
-		PART_FIELD(part, void (*)(BattleUnitPart*, s32), 0x210)(part, 0);
+		PART_FIELD(part, PartsDispCb, 0x210)(part, 0);
 	}
 	if (BtlUnit_CheckStatus(unit, 0x10)) {
 		animPoseSetMaterialFlagOn(part->poseId, 0x800000);
@@ -835,249 +830,9 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	animPoseDrawMtx(part->poseId, drawMtx, 2, rotY, 2.0f);
 	animPoseDrawMtx(part->poseId, drawMtx, 3, rotY, 2.0f);
 	if (PART_FIELD(part, void*, 0x210)) {
-		PART_FIELD(part, void (*)(BattleUnitPart*, s32), 0x210)(part, 1);
+		PART_FIELD(part, PartsDispCb, 0x210)(part, 1);
 	}
 	btlUnitPartsBlurControl(part, 0, blurMtx, *color, rotY);
-}
-
-void btlUnitItemDisp(CameraId camId, BattleUnit* unit);
-void _pose_def(BattleUnitPart* part);
-void _pose_one_pattern(BattleUnitPart* part);
-void _pose_two_pattern(BattleUnitPart* part);
-void btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, GXColor color);
-void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXColor color);
-void _btlStockExpDisp(CameraId camId, void* param);
-
-const char* searchPoseTbl(BattleDispPose* table, s32 poseId) { //TODO: fix mtctr
-	int i;
-
-	if (!table) return NULL;
-	i = 0x1C;
-	do {
-		if (table->poseId == poseId || table->poseId == 0x1C) {
-			return table->poseName;
-		}
-		table++;
-	} while (--i);
-	return NULL;
-}
-
-void btlDispGXInit2DSub(void) {
-	GXSetCullMode(GX_CULL_NONE);
-	GXSetZCompLoc(GX_TRUE);
-	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
-	GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-	GXClearVtxDesc();
-	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_VTX, GX_SRC_VTX, 0, GX_DF_CLAMP, GX_AF_NONE);
-}
-
-void btlDispGXInit2DRasta(void) {
-	btlDispGXInit2DSub();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GXSetNumTexGens(0);
-	GXSetNumTevStages(1);
-	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
-}
-
-void btlDispGXInit2D(void) {
-	btlDispGXInit2DSub();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-	GXSetNumTevStages(1);
-	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
-	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-}
-
-void btlDispGXPoint2DRasta(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a) {
-	GXPosition3f32(x, y, 0.0f);
-	GXColor4u8(r, g, b, a);
-}
-
-void btlDispGXQuads2DRasta(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a) {
-	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	btlDispGXPoint2DRasta(x0, y0, r, g, b, a);
-	btlDispGXPoint2DRasta(x1, y0, r, g, b, a);
-	btlDispGXPoint2DRasta(x1, y1, r, g, b, a);
-	btlDispGXPoint2DRasta(x0, y1, r, g, b, a);
-}
-
-void btlDispGXPoint2D(f32 x, f32 y, u8 r, u8 g, u8 b, u8 a, f32 s, f32 t) {
-	GXPosition3f32(x, y, 0.0f);
-	GXColor4u8(r, g, b, a);
-	GXTexCoord2f32(s, t);
-}
-
-void btlDispGXQuads2D(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a) {
-	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	btlDispGXPoint2D(x0, y0, r, g, b, a, 0.0f, 0.0f);
-	btlDispGXPoint2D(x1, y0, r, g, b, a, 1.0f, 0.0f);
-	btlDispGXPoint2D(x1, y1, r, g, b, a, 1.0f, 1.0f);
-	btlDispGXPoint2D(x0, y1, r, g, b, a, 0.0f, 1.0f);
-}
-void btlDispTexPlaneInit(void) {
-	GXSetCullMode(GX_CULL_NONE);
-	GXClearVtxDesc();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-	GXSetNumChans(1);
-	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_CLAMP, GX_AF_NONE);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
-}
-
-void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3) {
-	GXTexObj texobj;
-	f32 x, y;
-	
-	TEXGetGXTexObjFromPalette(*_battleWorkPointer->menuTex->data, &texobj, id);
-	GXLoadTexObj(&texobj, GX_TEXMAP0);
-	if (!GXGetTexObjFmt(&texobj)) {
-		GXSetNumTevStages(1);
-		GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-		GXSetTevOp(GX_TEVSTAGE0, GX_MODULATE);
-	}
-	else {
-		GXSetNumTevStages(1);
-		GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-		GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
-		GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-	}
-
-	x = 0.5f * (f32)GXGetTexObjWidth(&texobj);
-	y = 0.5f * (f32)GXGetTexObjHeight(&texobj);
-	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-
-	GXPosition3f32(-x, y, 0.0f);
-	GXColor4u8(color0.r, color0.g, color0.b, color0.a);
-	GXTexCoord2f32(0.0f, 0.0f);
-
-	GXPosition3f32(x, y, 0.0f);
-	GXColor4u8(color1.r, color1.g, color1.b, color1.a);
-	GXTexCoord2f32(1.0f, 0.0f);
-
-	GXPosition3f32(x, -y, 0.0f);
-	GXColor4u8(color2.r, color2.g, color2.b, color2.a);
-	GXTexCoord2f32(1.0f, 1.0f);
-
-	GXPosition3f32(-x, -y, 0.0f);
-	GXColor4u8(color3.r, color3.g, color3.b, color3.a);
-	GXTexCoord2f32(0.0f, 1.0f);
-}
-
-void btlDispTexPlane(u32 id, GXColor color, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY) {
-	CameraEntry* camera;
-	Mtx scale, trans, mtx;
-
-	btlDispTexPlaneInit();
-	camera = camGetCurPtr();
-	PSMTXScale(scale, sX, sY, 1.0f);
-	PSMTXTrans(trans, tX, tY, tZ);
-	PSMTXConcat(trans, scale, mtx);
-	PSMTXConcat(camera->view, mtx, mtx);
-	GXLoadPosMtxImm(mtx, 0);
-	btlDispTexPlainGX(id, color, color, color, color);
-}
-
-void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color) {
-	CameraEntry* camera;
-	Mtx mtx2;
-
-	btlDispTexPlaneInit();
-	MTXCopy(mtx, mtx2);
-	camera = camGetCurPtr();
-	MTXConcat(camera->view, mtx2, mtx2);
-	GXLoadPosMtxImm(mtx2, 0);
-	btlDispTexPlainGX(id, color, color, color, color);
-}
-
-void btlDispTexPlane3(Mtx mtx, u32 id, GXColor color0, GXColor color1, GXColor color2, GXColor color3) {
-	CameraEntry* camera;
-	Mtx mtx2;
-
-	btlDispTexPlaneInit();
-	PSMTXCopy(mtx, mtx2);
-	camera = camGetCurPtr();
-	PSMTXConcat(camera->view, mtx2, mtx2);
-	GXLoadPosMtxImm(mtx2, 0);
-	btlDispTexPlainGX(id, color0, color1, color2, color3);
-}
-
-void btlDispGetTexSize(u32 id, u16* width, u16* height) {
-	GXTexObj texobj;
-
-	TEXGetGXTexObjFromPalette(*_battleWorkPointer->menuTex->data, &texobj, id);
-	*width = GXGetTexObjWidth(&texobj);
-	*height = GXGetTexObjHeight(&texobj);
-}
-
-void btlDispInit(void) {
-	BattleWork* wp = _battleWorkPointer;
-	
-	battleCameraInit();
-	battleMenuDispInit();
-	wp->dispFlags |= 2;
-}
-
-StatusEffectType _GetStatusPoseType(BattleUnit* unit) { //TODO: extsb
-	s32* table = _status_pose_table;
-	StatusEffectType type;
-
-	if (unit->mAttributeFlags & 0x20000) {
-		return STATUS_INSTANT_KILL;
-	}
-	while (1) {
-		type = *table;
-		if (*table == -1) break;
-		if (((BOOL (*)(BattleUnit*, s8))BtlUnit_CheckStatus)(unit, type)) {
-			return type;
-		}
-		table++;
-	}
-	return STATUS_INVALID;
-}
-
-void btlDispMain(void) {
-	BattleUnit* unit;
-	int i;
-
-	for (i = 0; i < 0x40; i++) {
-		unit = BattleGetUnitPtr(_battleWorkPointer, i);
-		if (unit) {
-			if (unit->currentKind == UNIT_SHELL_SHIELD) {
-
-			}
-		}
-	}
-}
-
-void btlUnitPartsDisp(CameraId camId, BattleUnitPart* parts) {
-
 }
 
 void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {

@@ -352,10 +352,10 @@ config.libs = [
             Object(NonMatching, "battle/battle_unit.c"),
             Object(Matching, "battle/battle_unit_event.c", extra_cflags=["-O4,s", "-inline none"]),
             Object(NonMatching, "battle/battle_camera.c"),
-            Object(NonMatching, "battle/battle_item_data.c"),
+            Object(NonMatching, "data/battle/battle_item_data.c"),
             Object(Matching, "battle/battle_monosiri.c", extra_cflags=["-O4,s"]),
             Object(NonMatching, "battle/battle_stage.c"),
-            Object(NonMatching, "battle/battle_database_common.c"),
+            Object(NonMatching, "data/battle/battle_database_common.c"),
             Object(NonMatching, "battle/battle_attack_audience.c"),
             Object(NonMatching, "battle/battle_stage_object.c"),
             Object(Matching, "battle/battle_weapon_power.c", extra_cflags=["-O4,s", "-inline none"]),
@@ -370,7 +370,7 @@ config.libs = [
             Object(NonMatching, "battle/battle_break_slot.c"),
             Object(NonMatching, "battle/battle_seq_end.c"),
             Object(NonMatching, "battle/battle_ac_help.c", extra_cflags=["-O4,s"]),
-            Object(NonMatching, "battle/battle_audience_kind_data.c"),
+            Object(NonMatching, "data/battle/battle_audience_kind_data.c"),
             Object(NonMatching, "battle/battle_status_icon.c"),
         ],
     },
@@ -397,7 +397,7 @@ config.libs = [
             Object(Matching, "battle/ac/ac_power_gauge_lv.c"),
             Object(NonMatching, "battle/ac/ac_signal_timing.c"),
             Object(NonMatching, "battle/ac/ac_gauge_timing.c"),
-            Object(NonMatching, "battle/ac/ac_shot_target.c"),
+            Object(Matching, "battle/ac/ac_shot_target.c"),
             Object(NonMatching, "battle/ac/ac_gauge_timing2.c"),
             Object(NonMatching, "battle/ac/ac_power_gauge_lv2.c"),
             Object(NonMatching, "battle/ac/ac_monosiri_target.c"),
@@ -459,7 +459,7 @@ config.libs = [
             Object(NonMatching, "driver/msgdrv.c"),
             Object(Matching, "driver/swdrv.c"),
             Object(NonMatching, "driver/itemdrv.c"),
-            Object(NonMatching, "driver/extdrv.c"),
+            Object(Matching, "driver/extdrv.c"),
             Object(NonMatching, "driver/envdrv.c"),
         ],
     },
@@ -595,9 +595,9 @@ config.libs = [
             Object(NonMatching, "effect/n64/eff_ice_n64.c"),
             Object(NonMatching, "effect/n64/eff_kameki_tornade_n64.c"),
             Object(NonMatching, "effect/n64/eff_kemuri1_n64.c"),
-            Object(NonMatching, "effect/n64/eff_kemuri2_n64.c"),
+            Object(Matching, "effect/n64/eff_kemuri2_n64.c"),
             Object(Matching, "effect/n64/eff_kemuri3_n64.c"),
-            Object(NonMatching, "effect/n64/eff_kemuri4_n64.c"),
+            Object(Matching, "effect/n64/eff_kemuri4_n64.c"),
             Object(NonMatching, "effect/n64/eff_kemuri5_n64.c"),
             Object(NonMatching, "effect/n64/eff_kemuri6_n64.c"),
             Object(NonMatching, "effect/n64/eff_kemuri7_n64.c"),
@@ -636,7 +636,7 @@ config.libs = [
             Object(Matching, "effect/n64/eff_rothammer_success_n64.c"),
             Object(Matching, "effect/n64/eff_rubble_n64.c"),
             Object(Matching, "effect/n64/eff_shock_n64.c"),
-            Object(NonMatching, "effect/n64/eff_small_star_n64.c"),
+            Object(Matching, "effect/n64/eff_small_star_n64.c"),
             Object(Matching, "effect/n64/eff_snow_n64.c"),
             Object(NonMatching, "effect/n64/eff_snowfall_n64.c"),
             Object(Matching, "effect/n64/eff_snowman_n64.c"),
@@ -734,7 +734,7 @@ config.libs = [
         "progress_category": "game",
         "objects": [
             Object(NonMatching, "mario/mario.c"),
-            Object(NonMatching, "mario/mariost.c"),
+            Object(Matching, "mario/mariost.c"),
             Object(NonMatching, "mario/mario_hit.c"),
             Object(Matching, "mario/mario_motion.c"),
             Object(NonMatching, "mario/mario_sbr.c"),
@@ -774,7 +774,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "party/party_yoshi.c"),
             Object(NonMatching, "party/party_bomhei.c"),
-            Object(NonMatching, "party/party_data.c"),
+            Object(NonMatching, "data/party_data.c"),
             Object(NonMatching, "party/party_hit.c"),
             Object(NonMatching, "party/party_kuribo.c"),
             Object(NonMatching, "party/party_move.c"),
@@ -867,7 +867,7 @@ config.libs = [
         "objects": [
             Object(NonMatching, "cam_road.c"),
             Object(Matching, "cam_shift.c"),
-            Object(NonMatching, "countdown.c"),
+            Object(Matching, "countdown.c"),
             Object(NonMatching, "database.c"),
             Object(NonMatching, "error_handler.c"),
             Object(Matching, "event.c"),
@@ -924,6 +924,8 @@ config.libs = [
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/k_sin.c"),
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/ansi_fp.c", extra_cflags=["-inline noauto,deferred"]),
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/strtoul.c"),
+            Object(NonMatching, "MSL_C.PPCEABI.bare.H.a/printf.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "MSL_C.PPCEABI.bare.H.a/strtold.c"),
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/mbstring.c"),
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/alloc.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "MSL_C.PPCEABI.bare.H.a/direct_io.c"),
@@ -1406,7 +1408,7 @@ config.libs = [
             Object(Matching, "unit/unit_boss_gesso.c"),
             Object(Matching, "tik_11.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "tik_00.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "tik_05.c"),
+            Object(NonMatching, "tik_05.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1444,7 +1446,7 @@ config.libs = [
             Object(Matching, "unit/unit_barriern_z.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_magnum_battender_mkII.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "aji_06.c"),
-            Object(NonMatching, "aji_17.c"),
+            Object(NonMatching, "aji_17.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1459,7 +1461,7 @@ config.libs = [
             Object(Matching, "bom_02.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "bom.c"),
             Object(Matching, "unit/unit_bllizard.c"),
-            Object(NonMatching, "bom_01.c"),
+            Object(NonMatching, "bom_01.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1508,14 +1510,14 @@ config.libs = [
             Object(Matching, "event/evt_lect_eki.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_kuriboo.c"),
             Object(Matching, "eki_06.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "eki_00.c"),
+            Object(NonMatching, "eki_00.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
         "end",
         [
             Object(Matching, "end.c"),
-            Object(NonMatching, "end_unknown.c"),
+            Object(Matching, "end_unknown.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1573,9 +1575,9 @@ config.libs = [
             Object(Matching, "gor_01.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "gor_10.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "gor_irai.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "event/evt_yuuranking.c"),
-            Object(NonMatching, "gor_03.c"),
-            Object(NonMatching, "gor_00.c"),
+            Object(NonMatching, "event/evt_yuuranking.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "gor_03.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "gor_00.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1633,7 +1635,7 @@ config.libs = [
             Object(Matching, "hei_00.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_lect_hei.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_kuriboo.c"),
-            Object(NonMatching, "unit/unit_chorobon_gundan.c"),
+            Object(NonMatching, "unit/unit_chorobon_gundan.c", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "hei_10.c"),
         ]
     ),
@@ -1813,7 +1815,7 @@ config.libs = [
             Object(Matching, "las_04.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "las_29.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_black_peach.c"),
-            Object(NonMatching, "las_05.c"),
+            Object(NonMatching, "las_05.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_batten_leader.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
@@ -1869,8 +1871,8 @@ config.libs = [
             Object(Matching, "unit/unit_boss_gundan_zako_group3.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_gundan_zako_group1.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "unit/unit_boss_gundan_zako_group2.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "muj_20.c"),
-            Object(NonMatching, "muj_00.c"),
+            Object(NonMatching, "muj_20.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "muj_00.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1909,9 +1911,9 @@ config.libs = [
             Object(Matching, "rsh_07.c"),
             Object(Matching, "rsh_02.c"),
             Object(Matching, "rsh_03.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "rsh_06.c"),
-            Object(NonMatching, "rsh_05.c"),
-            Object(NonMatching, "unit/unit_boss_moamoa.c"),
+            Object(NonMatching, "rsh_06.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "rsh_05.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "unit/unit_boss_moamoa.c", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "rsh_00.c"),
             Object(NonMatching, "rsh.c"),
         ]
@@ -1933,8 +1935,8 @@ config.libs = [
             Object(Matching, "tou_10.c"),
             Object(Matching, "tou_01.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "event/evt_lect_tou.c", extra_cflags=["-inline auto,deferred"]),
-            Object(NonMatching, "tou.c"),
-            Object(NonMatching, "tou_02.c"),
+            Object(NonMatching, "tou.c", extra_cflags=["-inline auto,deferred"]),
+            Object(NonMatching, "tou_02.c", extra_cflags=["-inline auto,deferred"]),
         ]
     ),
     Rel(
@@ -1981,7 +1983,7 @@ config.libs = [
             Object(Matching, "yuu_02.c", extra_cflags=["-inline auto,deferred"]),
             Object(Matching, "yuu_03.c", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "event/evt_yuunpc.c"),
-            Object(NonMatching, "event/evt_yuuranking.c"),
+            Object(NonMatching, "event/evt_yuuranking.c", extra_cflags=["-inline auto,deferred"]),
             Object(NonMatching, "yuu_01.c"),
             Object(NonMatching, "event/evt_yuucounter.c"),
             Object(NonMatching, "yuu_00.c"),
@@ -2054,7 +2056,7 @@ config.libs = [
             Object(Matching, "unit/unit_hinnya.c"),
             Object(Matching, "unit/unit_sambo.c"),
             Object(Matching, "unit/unit_wanawana.c", extra_cflags=["-inline noauto,deferred"]),
-            Object(NonMatching, "tou_03.c"),
+            Object(NonMatching, "tou_03.c", extra_cflags=["-inline auto,deferred"]),
         ]
     )
 ]

@@ -341,6 +341,8 @@ static void ext_main(void) {
                     pose->mtx[2][3] = -100.0f;
                 }
                 break;
+            case 1:
+                break;
         }
         if (gp->retraceCount & 1) {
             pose->frame = (gp->retraceCount + i) % 20;

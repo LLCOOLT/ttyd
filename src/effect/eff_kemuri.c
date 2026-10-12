@@ -148,7 +148,8 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	EffectEntry* entry;
 	effKemuri2Data* data;
 	f32 vx, vz, angle;
-	f32 speed, vy, rv, rot;
+	f32 speed, vy, rv, rot, zz;
+	s32 ia;
 
 	entry = effEntry();
 	entry->type = "Kemuri2";
@@ -161,18 +162,19 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	vz = 1000.0f * dz;
 	angle = 360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f;
 	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + camGetPtr(4)->viewYaw);
+	ia = (s32)angle;
+	zz = 5.0f + z;
 	data->timer = 0;
-	z = 5.0f + z;
 	speed = 1.0f;
 	vy = 0.7f;
 	rv = -20.0f;
 	rot = 0.0f;
-	angle = 6.2831855f * (s32)angle / 360.0f;
+	angle = 6.2831855f * ia / 360.0f;
 	data->dirX = sin(angle);
 	data->dirZ = cos(angle);
 	data->x = x;
 	data->y = y;
-	data->z = z;
+	data->z = zz;
 	data->speed = speed;
 	data->vy = vy;
 	data->rotVel = rv;
@@ -188,8 +190,8 @@ void effKemuriMain(EffectEntry* effect) {
 	effKemuriData* data = effect->userdata;
 	Vec pos2;
 	Vec pos = {0.0f, 0.0f, 0.0f};
-	s32 type;
 	s32 i;
+	s32 type;
 
 	pos.x = data->field_0x4;
 	pos.y = data->field_0x8;

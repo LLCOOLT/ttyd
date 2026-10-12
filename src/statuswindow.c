@@ -161,7 +161,7 @@ void statusWinMain(void) {
     switch (seqGetSeq()) {
         case 2:
         case 3:
-            if (!marioChkCtrl() || !marioChkKey() || !(mario->flags & 1)) {
+            if ((marioChkCtrl() ? FALSE : TRUE) || (marioChkKey() ? FALSE : TRUE) || !(mario->flags & 1)) {
                 if (statusWinCheck()) {
                     statusWinClose();
                 }
@@ -242,7 +242,8 @@ void statusWinMain(void) {
             wp->flags &= ~0x100;
         }
     } else {
-        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (1.0f - (f32)cos(3.1415927f * wp->timer / wp->duration)) * 0.5f;
+        inv = (f32)cos(3.1415927f * wp->timer / wp->duration);
+        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (1.0f - inv) / 2.0f;
     }
     t = wp->t;
     inv = 1.0f - t;
@@ -259,10 +260,12 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
     s32 max;
     s32 full;
     s32 part;
+    Vec pos;
+    Vec pos2;
 
     max = 0;
-    for (i = 0; i < 8; i++) {
-        if (pouchGetPtr()->mStarPowersObtained & (1 << i)) {
+    for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
+        if (*(u16*)&pouchGetPtr()->mStarPowersObtained & (1 << i)) {
             max += 100;
         }
     }
@@ -273,27 +276,33 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         sp = 0;
     }
     full = sp / 100;
-    part = (sp % 100) * 15 / 99;
+    part = sp % 100;
+    part = part * 15 / 99;
     if (sp % 100 && sp && !part) {
         part = 1;
     }
     if (part) {
-        iconDispGx(&(Vec){x + (f32)(full * 32), y, 0.0f}, 0x10, gauge_wakka[part], 1.0f);
+        pos.x = x + (f32)(full * 32);
+        pos.y = y;
+        pos.z = 0.0f;
+        iconDispGx(&pos, 0x10, gauge_wakka[part], 1.0f);
     }
     y = 12.0f + y;
-    for (i = 0; i < 8; i++) {
-        if (!(pouchGetPtr()->mStarPowersObtained & (1 << i))) {
+    for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
+        if (!(*(u16*)&pouchGetPtr()->mStarPowersObtained & (1 << i))) {
             break;
         }
-        iconDispGx(&(Vec){x + (f32)(i * 32), y, 0.0f}, 0x10, i < full ? gauge_back[i] : 0x1BF, 1.0f);
+        pos2.x = x + (f32)(i * 32);
+        pos2.y = y;
+        pos2.z = 0.0f;
+        iconDispGx(&pos2, 0x10, i < full ? gauge_back[i] : 0x1BF, 1.0f);
     }
 }
 
 static inline void numDisp(f32 x, f32 y, s32 value, BOOL small) {
     Mtx m;
-    GXColor c = { 0xFF, 0xFF, 0xFF, 0xFF };
     MTXTrans(m, x, y, 0.0f);
-    iconNumberDispGx(m, value, small, c);
+    iconNumberDispGx(m, value, small, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 }
 
 void statusWinDisp(CameraId camId, void* param) {
@@ -314,8 +323,8 @@ void statusWinDisp(CameraId camId, void* param) {
     }
 
     e = alwaysDt;
-    for (i = 0; i < 13; i++, e++) {
-        if (e->iconId == 466 && !pouchGetPtr()->mStarPowersObtained) {
+    for (i = 0; i < sizeof(alwaysDt) / sizeof(alwaysDt[0]); i++, e++) {
+        if (e->iconId == 466 && !*(u16*)&pouchGetPtr()->mStarPowersObtained) {
             break;
         }
         if (!blinkOn) {
@@ -384,7 +393,7 @@ void statusWinDisp(CameraId camId, void* param) {
             }
         }
         e = partysDt;
-        for (i = 0; i < 3; i++, e++) {
+        for (i = 0; i < sizeof(partysDt) / sizeof(partysDt[0]); i++, e++) {
             if (wp->blink & 8 && !blinkOn && i == 1) {
                 continue;
             }
@@ -443,7 +452,7 @@ void statusGetValue(SVal* values) {
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
         if (!marioBgmodeChk()) {
-            values->party = marioGetParty();
+            values->party = ((s16 (*)(void))marioGetParty)();
         } else {
             values->party = marioGetPtr()->prevPartyMemberId[0];
         }
@@ -528,7 +537,7 @@ BOOL valueCheck(void) {
     return changed;
 }
 
-static inline s32 calcStep(s32 cur, s32 target) {
+static inline s32 calcStep(s32 target, s32 cur) {
     s32 d = target - cur;
     if (d) {
         d /= 10;
@@ -556,22 +565,22 @@ void valueUpdate(void) {
     if (!statusWinCheck()) {
         return;
     }
-    d = calcStep(wp->cur.coins, v.coins);
+    d = calcStep(v.coins, wp->cur.coins);
     if (d && !(count % 8)) {
         psndSFXOn("SFX_COUNT_COIN1");
     }
-    wp->cur.hp += calcStep(wp->cur.hp, v.hp);
-    wp->cur.maxHp += calcStep(wp->cur.maxHp, v.maxHp);
-    wp->cur.fp += calcStep(wp->cur.fp, v.fp);
-    wp->cur.maxFp += calcStep(wp->cur.maxFp, v.maxFp);
-    wp->cur.ap += calcStep(wp->cur.ap, v.ap);
-    wp->cur.maxAp += calcStep(wp->cur.maxAp, v.maxAp);
-    wp->cur.starPoints += calcStep(wp->cur.starPoints, v.starPoints);
-    wp->cur.coins += calcStep(wp->cur.coins, v.coins);
+    wp->cur.hp += calcStep(v.hp, wp->cur.hp);
+    wp->cur.maxHp += calcStep(v.maxHp, wp->cur.maxHp);
+    wp->cur.fp += calcStep(v.fp, wp->cur.fp);
+    wp->cur.maxFp += calcStep(v.maxFp, wp->cur.maxFp);
+    wp->cur.ap += calcStep(v.ap, wp->cur.ap);
+    wp->cur.maxAp += calcStep(v.maxAp, wp->cur.maxAp);
+    wp->cur.starPoints += calcStep(v.starPoints, wp->cur.starPoints);
+    wp->cur.coins += calcStep(v.coins, wp->cur.coins);
     wp->cur.party = v.party;
     if (wp->cur.party) {
-        wp->cur.partyHp += calcStep(wp->cur.partyHp, v.partyHp);
-        wp->cur.partyMaxHp += calcStep(wp->cur.partyMaxHp, v.partyMaxHp);
+        wp->cur.partyHp += calcStep(v.partyHp, wp->cur.partyHp);
+        wp->cur.partyMaxHp += calcStep(v.partyMaxHp, wp->cur.partyMaxHp);
     }
     if (wp->cur.starPoints > 99) {
         wp->cur.starPoints = 99;
@@ -631,7 +640,7 @@ void statusWinDispOff(void) {
 }
 
 BOOL statusWinCheck(void) {
-    return (wp->flags & 0x11) != 0;
+    return (wp->flags & 0x11) ? TRUE : FALSE;
 }
 
 BOOL statusWinCheckUpdate(void) {

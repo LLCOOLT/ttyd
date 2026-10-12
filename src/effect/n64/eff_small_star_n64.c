@@ -258,6 +258,7 @@ static inline f32 _cosf(f32 x) {
     return a;
 }
 
+inline f32 alphaf(f32 m, s32 x) { return x * m; }
 void effSmallStarMain(EffectEntry* effect) {
     EffSmallStarN64Work* w = effect->userdata;
     Vec position;
@@ -287,7 +288,7 @@ void effSmallStarMain(EffectEntry* effect) {
             w->velocity.z *= 0.94f;
             if (w->velocity.y < 0.0f) {
                 w->rotVel *= 0.8f;
-                w->alpha = (s32)((f32)w->alpha * 0.6f);
+                w->alpha = (s32)alphaf(0.6f, w->alpha);
             }
         } else {
             if (life > 5) {
@@ -301,7 +302,7 @@ void effSmallStarMain(EffectEntry* effect) {
                 }
             } else if (life < 5) {
                 w->rotVel *= 0.8f;
-                w->alpha = (s32)((f32)w->alpha * 0.6f);
+                w->alpha = (s32)alphaf(0.6f, w->alpha);
                 w->velocity.x *= 0.7f;
                 w->velocity.y *= 0.7f;
                 w->velocity.z *= 0.7f;

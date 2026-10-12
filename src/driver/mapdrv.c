@@ -175,12 +175,77 @@ void mapInit(void) {
 	mapClipOffFlag = FALSE;
 }
 
+typedef struct MapTexInfo {
+	char* name;   // 0x0
+	u8 format;    // 0x4
+	u8 pad5[3];
+	u16 width;    // 0x8
+	u16 height;   // 0xA
+	void* data;   // 0xC
+} MapTexInfo;
+
+typedef struct MapTexSampler {
+	MapTexInfo* tex; // 0x0
+} MapTexSampler;
+
+typedef struct MapTexMaterial {
+	u8 pad0[0xB];
+	u8 samplerCount;          // 0xB
+	MapTexSampler* samplers[]; // 0xC
+} MapTexMaterial;
+
+typedef struct MapTexTable {
+	s32 count;
+	char* names[];
+} MapTexTable;
+
+static inline s32 mapSearchTexName(MapTexTable* table, char* name) {
+	s32 i;
+
+	for (i = 0; i < table->count; i++) {
+		if (strcmp(table->names[i], name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
 	int i;
-	MapFileJointPart* part;
+	int j;
+	int k;
+	int idx;
+	MapTexMaterial* mat;
+	MapTexSampler* sampler;
+	TEXDescriptor* desc;
 
 	for (i = 0; i < obj->joints->partCount; i++) {
-		part = &obj->joints->parts[i];
+		mat = obj->joints->parts[i].material;
+		for (j = 0; j < mat->samplerCount; j++) {
+			sampler = mat->samplers[j];
+			k = mapSearchTexName(table, sampler->tex->name);
+			idx = k;
+			if (k == -1) {
+				idx = 0;
+			}
+			desc = TEXGet(texture, idx);
+			sampler->tex->data = desc->textureHeader->data;
+			sampler->tex->width = desc->textureHeader->width;
+			sampler->tex->height = desc->textureHeader->height;
+			switch (desc->textureHeader->format) {
+				case 4: sampler->tex->format = 0; break;
+				case 5: sampler->tex->format = 1; break;
+				case 6: sampler->tex->format = 2; break;
+				case 14: sampler->tex->format = 3; break;
+				case 0: sampler->tex->format = 4; break;
+				case 1: sampler->tex->format = 5; break;
+				case 2: sampler->tex->format = 6; break;
+				case 3: sampler->tex->format = 7; break;
+				case 8: sampler->tex->format = 8; break;
+				case 9: sampler->tex->format = 9; break;
+				case 10: sampler->tex->format = 10; break;
+			}
+		}
 	}
 	if (obj->child) {
 		mapBuildTexture(obj->child, texture, table);
@@ -190,6 +255,7 @@ void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
 	}
 }
 
+#pragma dont_inline on
 MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 	return NULL;
 
@@ -198,6 +264,7 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 
 }
 
+#pragma dont_inline reset
 MapObject* mapEntrySub(MapFileJoint* joint, MapObject* parent, Mtx mtx, BOOL isRoot, s32 index) {
 	MapObject* obj = _mapEnt(joint, parent, mtx, index);
 	if (joint->child) {
@@ -811,8 +878,9 @@ typedef struct MapAnimJoint {
 } MapAnimJoint;
 
 static inline f32 mapHermite(f32 cur, f32 t0, f32 t1, f32 p0, f32 m0, f32 p1, f32 m1) {
+	f32 s = cur - t0;
 	f32 dt = t1 - t0;
-	f32 t = (cur - t0) / (!dt ? 1e-8f : dt);
+	f32 t = s / (!dt ? 1e-8f : dt);
 	f32 t2 = t * t;
 	f32 t3 = t2 * t;
 
@@ -823,8 +891,7 @@ static inline f32 mapHermite(f32 cur, f32 t0, f32 t1, f32 p0, f32 m0, f32 p1, f3
 }
 
 void mapCalcAnimMatrix(Mtx out, Mtx in, MapAnim* anim, MapAnimJoint* joint) {
-
-	f32 v[9];
+	f32 v[21];
 	Mtx mT;
 	Mtx mS;
 	Mtx mX;
@@ -833,10 +900,11 @@ void mapCalcAnimMatrix(Mtx out, Mtx in, MapAnim* anim, MapAnimJoint* joint) {
 	Mtx m;
 	f32 dx, dy, dz, rx, ry, sx, sy, sz, rz;
 	f32 cur, t, t2, t3, dt;
+	int c;
+	int i;
 	MapAnimKey* k0;
 	MapAnimKey* k1;
-	int i;
-	int c;
+
 
 	for (i = 1; i < joint->keyCount; i++) {
 		k1 = &joint->keys[i];
@@ -901,7 +969,45 @@ void mapCalcAnimMatrix(Mtx out, Mtx in, MapAnim* anim, MapAnimJoint* joint) {
 	}
 }
 
+void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
+	BOOL dirty = FALSE;
+
+	if (obj->flags & 0x200) {
+		dirty = TRUE;
+	}
+	if (force) {
+		dirty = TRUE;
+	}
+	if (dirty) {
+		if (obj->flags & 0x2000) {
+			PSMTXConcat(mtx, obj->unk7C, obj->modelWorldMtx);
+		}
+		else {
+			PSMTXConcat(mtx, obj->localMtx, obj->modelWorldMtx);
+		}
+		if (obj->flags & 0x200000) {
+			PSMTXConcat(obj->modelWorldMtx, obj->unkAC, obj->modelWorldMtx);
+		}
+		obj->flags &= ~0x200;
+		if (obj->child) {
+			mapReCalcMatrix(obj->child, obj->modelWorldMtx, TRUE);
+		}
+		if (obj->next) {
+			mapReCalcMatrix(obj->next, mtx, force);
+		}
+	}
+	else {
+		if (obj->child) {
+			mapReCalcMatrix(obj->child, obj->modelWorldMtx, force);
+		}
+		if (obj->next) {
+			mapReCalcMatrix(obj->next, mtx, force);
+		}
+	}
+}
+
 void mapMain(void) {
+
 
 
 }
@@ -2023,13 +2129,13 @@ void mapObjGetPos(const char* name, Vec* pos) {
 }
 
 void mapSetFog(s32 type, f32 start, f32 end, GXColor* color) {
-	MapWork* wp = mapGetWork();
-	GXColor c = *color;
+	MapWork* wp = &mapWork[activeGroup];
+	u32 c = *(u32*)color;
 
 	wp->entries[0].fogType = type;
 	wp->entries[0].fogStart = start;
 	wp->entries[0].fogEnd = end;
-	wp->entries[0].fogColor = c;
+	*(u32*)&wp->entries[0].fogColor = c;
 }
 
 void mapGetFog(s32* type, f32* start, f32* end, GXColor* color) {

@@ -1,3 +1,4 @@
+#pragma optimize_for_size on
 #include "battle/battle_seq.h"
 #include "battle/battle.h"
 #include "battle/battle_unit.h"
@@ -225,9 +226,9 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 					unit->currentKind < TYPE_PARTNER_MAX) {
 					if (unit->currentHp > 0) {
 						v6 = TRUE;
-						break;
 					}
 				}
+				break;
 			}
 		}
 	}
@@ -255,9 +256,9 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 						unit->currentKind < TYPE_PARTNER_MAX) {
 						if (unit->currentHp > 0) {
 							v6 = TRUE;
-							break;
 						}
 					}
+					break;
 				}
 			}
 		}
@@ -369,6 +370,10 @@ USER_FUNC(_set_effect_luck) {
 	BattleUnitPart* part;
 	NiceEffectWork* effect;
 	int i;
+	const char* sfx = "SFX_SYSTEM_LUCKY1";
+	BattleWeapon* pw = &weapon;
+	f32* pz = &z;
+	f32* py = &y;
 
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
@@ -408,9 +413,9 @@ USER_FUNC(_set_effect_luck) {
 					break;
 			}
 			part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-			BattleSetStatusDamageFromWeapon(BattleGetSystemPtr(wp), unit, part, &weapon, 0x100);
-			BtlUnit_GetPos(unit, &x, &y, &z);
-			psndSFXOn("SFX_SYSTEM_LUCKY1");
+			BattleSetStatusDamageFromWeapon(BattleGetSystemPtr(wp), unit, part, pw, 0x100);
+			BtlUnit_GetPos(unit, &x, py, pz);
+			psndSFXOn(sfx);
 			effect = effNiceEntry(6, x - 45.0f, 60.0f + y, z)->userdata;
 			effect->field_0x1C = 0.75f;
 		}
@@ -1228,30 +1233,30 @@ void btlseqAct(BattleWork* wp) {
 
 	switch (BattleGetSeq(wp, SEQ_ACT)) {
 		case 0x6000000: {
-			BattleUnit* unit0;
+			BattleUnit* unit;
 			BOOL cantMove;
 
-			unit0 = BattleGetUnitPtr(wp, wp->activeUnitId);
+			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 			effNiceAsync(1);
-			FIELD(unit0, s32, 0x280) = 0;
-			FIELD(unit0, s32, 0x2CC) = 0;
+			FIELD(unit, s32, 0x280) = 0;
+			FIELD(unit, s32, 0x2CC) = 0;
 			BattleAudience_ActInit();
 			cantMove = TRUE;
-			switch (unit0->currentKind) {
+			switch (unit->currentKind) {
 				case UNIT_MARIO:
-					if (!BtlUnit_CheckStatus(unit0, 1) &&
-						!BtlUnit_CheckStatus(unit0, 2) &&
-						!BtlUnit_CheckStatus(unit0, 9) &&
-						!BtlUnit_CheckStatus(unit0, STATUS_INSTANT_KILL)) {
+					if (!BtlUnit_CheckStatus(unit, 1) &&
+						!BtlUnit_CheckStatus(unit, 2) &&
+						!BtlUnit_CheckStatus(unit, 9) &&
+						!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
 						cantMove = FALSE;
 					}
 					break;
 				default:
-					if (unit0->currentKind >= TYPE_PARTNER_MIN && unit0->currentKind < TYPE_PARTNER_MAX) {
-						if (!BtlUnit_CheckStatus(unit0, 1) &&
-							!BtlUnit_CheckStatus(unit0, 2) &&
-							!BtlUnit_CheckStatus(unit0, 9) &&
-							!BtlUnit_CheckStatus(unit0, STATUS_INSTANT_KILL)) {
+					if (unit->currentKind >= TYPE_PARTNER_MIN && unit->currentKind < TYPE_PARTNER_MAX) {
+						if (!BtlUnit_CheckStatus(unit, 1) &&
+							!BtlUnit_CheckStatus(unit, 2) &&
+							!BtlUnit_CheckStatus(unit, 9) &&
+							!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
 							cantMove = FALSE;
 						}
 					}
@@ -1260,13 +1265,13 @@ void btlseqAct(BattleWork* wp) {
 			if (cantMove) {
 				BattleSetSeq(wp, SEQ_ACT, 0x6000003);
 			}
-			else if (unit0->mAttributeFlags & 0x10) {
+			else if (unit->mAttributeFlags & 0x10) {
 				BattleSetSeq(wp, SEQ_ACT, 0x6000004);
 			}
-			else if (unit0->currentKind == UNIT_VIVIAN && (BattleGetMarioPtr(wp)->mAttributeFlags & 0x10)) {
+			else if (unit->currentKind == UNIT_VIVIAN && (BattleGetMarioPtr(wp)->mAttributeFlags & 0x10)) {
 				BattleSetSeq(wp, SEQ_ACT, 0x6000004);
 			}
-			else if (unit0->flippedTurns) {
+			else if (unit->flippedTurns) {
 				BattleSetSeq(wp, SEQ_ACT, 0x6000005);
 			}
 			else {
@@ -1551,12 +1556,12 @@ void btlseqPhaseFirstProcess(BattleWork* wp) {
 }
 
 void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
+	int i, j;
 	BattleUnit* unit1;
 	BattleUnit* unit2;
 	f32 x1, y1, z1;
 	f32 x2, y2, z2;
 	s32 tmp;
-	int i, j;
 
 	if (count <= 0) {
 		count = 0;
@@ -1677,8 +1682,8 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 	BattleUnit* unit;
-	BOOL done = TRUE;
 	int i;
+	BOOL done = TRUE;
 
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
@@ -1727,7 +1732,6 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 }
 
 BOOL BattleCheckConcluded(BattleWork* wp) {
-	BattleAlliance* alliance;
 	BattleUnit* unit;
 	s32 count;
 	s32 i;
@@ -1735,41 +1739,40 @@ BOOL BattleCheckConcluded(BattleWork* wp) {
 
 	count = 0;
 	for (i = 0; i < 3; i++) {
-		alliance = &wp->alliances[i];
-		alliance->clearConditionMet = 0;
-		if (alliance->allianceId == 0) {
-			alliance->clearConditionMet = 1;
+		wp->alliances[i].clearConditionMet = 0;
+		if (wp->alliances[i].allianceId == 0) {
+			wp->alliances[i].clearConditionMet = 1;
 			count++;
 			continue;
 		}
-		if (alliance->allianceId & 1) {
+		if (wp->alliances[i].allianceId & 1) {
 			for (j = 0; j < 64; j++) {
 				unit = BattleGetUnitPtr(wp, j);
 				if (unit && unit->mAlliance == i &&
 					!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) &&
 					!(unit->mAttributeFlags & 0x20000) &&
-					(unit->mAttributeFlags & 0x10000000)) {
+					!(unit->mAttributeFlags & 0x10000000)) {
 					break;
 				}
 			}
 			if (j >= 64) {
-				alliance->clearConditionMet = 1;
+				wp->alliances[i].clearConditionMet = 1;
 				count++;
 				continue;
 			}
 		}
-		if (alliance->allianceId & 2) {
+		if (wp->alliances[i].allianceId & 2) {
 			for (j = 0; j < 64; j++) {
 				unit = BattleGetUnitPtr(wp, j);
 				if (unit && unit->mAlliance == i &&
 					(unit->mAttributeFlags & 0x40000) &&
 					!BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) &&
-					(unit->mAttributeFlags & 0x10000000)) {
+					!(unit->mAttributeFlags & 0x10000000)) {
 					break;
 				}
 			}
 			if (j >= 64) {
-				alliance->clearConditionMet = 1;
+				wp->alliances[i].clearConditionMet = 1;
 				count++;
 			}
 		}

@@ -43,30 +43,15 @@ static void actionCommandDisp(f32 x, f32 y) {
     f32 alpha = 0.0f;
     Vec screen;
     Vec screen2;
-    Vec pos;
     s32 icon;
     s32 pressedIcon;
 
     btlGetScreenPoint(&cw->pos, &screen);
-    {
-        Vec scale = {1.0f, 1.0f, 1.0f};
-        Vec rot = {0.0f, 0.0f, 0.0f};
-        {
-            GXColor col = {255, 255, 255, 255};
-            btlDispTex4(0x42, screen, scale, rot, col);
-        }
-    }
+    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
     screen.x += 4.0f;
     screen.y -= 4.0f;
     screen.z -= 2.0f;
-    {
-        Vec scale = {1.0f, 1.0f, 1.0f};
-        Vec rot = {0.0f, 0.0f, 0.0f};
-        {
-            GXColor col = {128, 128, 128, 255};
-            btlDispTex4(0x42, screen, scale, rot, col);
-        }
-    }
+    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
 
     if (cw->inRange) {
         s32 t = cw->inRangeCnt % 30;
@@ -76,38 +61,14 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     btlGetScreenPoint(&cw->targetPos, &screen2);
-    {
-        Vec scale = {1.0f, 1.0f, 1.0f};
-        Vec rot = {0.0f, 0.0f, 0.0f};
-        rot.z = cw->angle;
-        {
-            GXColor col = {255, 255, 255, 255};
-            btlDispTex4(0x41, screen2, scale, rot, col);
-        }
-    }
+    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
     if (alpha > 0.0f) {
-        Vec scale = {0.0f, 0.0f, 1.0f};
-        Vec rot = {0.0f, 0.0f, 0.0f};
-        scale.x = alpha;
-        scale.y = alpha;
-        rot.z = cw->angle;
-        {
-            GXColor col = {255, 255, 255, 255};
-            btlDispTex4(0x41, screen2, scale, rot, col);
-        }
+        btlDispTex4(0x41, screen2, (Vec){alpha, alpha, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
     }
     screen2.x += 4.0f;
     screen2.y -= 4.0f;
     screen2.z -= 2.0f;
-    {
-        Vec scale = {1.0f, 1.0f, 1.0f};
-        Vec rot = {0.0f, 0.0f, 0.0f};
-        rot.z = cw->angle;
-        {
-            GXColor col = {128, 128, 128, 255};
-            btlDispTex4(0x41, screen2, scale, rot, col);
-        }
-    }
+    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
     cw->angle += 2.0f;
 
     pressedIcon = BattleACGetButtonIcon(0x100, 1);
@@ -115,12 +76,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
         icon = pressedIcon;
     }
-    pos.x = 0.0f;
-    pos.y = 0.0f;
-    pos.z = 0.0f;
-    pos.x = -200.0f + x;
-    pos.y = 50.0f + y;
-    iconDispGx(&pos, 0x10, icon, 1.0f);
+    ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, 0x10, icon, 1.0f);
 }
 #pragma dont_inline reset
 

@@ -8,6 +8,7 @@
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
 #include "memory.h"
+#include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 #include <string.h>
@@ -125,6 +126,8 @@ void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode);
 void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode);
 void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode);
 void batSpotInit(void);
+f32 getSpline(f32* a, f32* b, f32* c, f32* d, s32* t, s32 n, s32 x);
+void batSpotMain();
 void drawCone(CameraId camId, BattleSpotEntry* e);
 double sin(double);
 double cos(double);
@@ -166,7 +169,99 @@ void BattleStageInit(void) {
 	batSpotInit();
 }
 
+typedef struct LightSpline {
+	s32 n;          // 0x0
+	s32 t[8];       // 0x4
+	f32 x[4][8];    // 0x24
+	f32 y[4][8];    // 0xA4
+	f32 z[4][8];    // 0x124
+} LightSpline;
+
 void BattleStageMain(void) {
+	StageWork* s = STG;
+	s32 i;
+	StageLight* l;
+	LightSpline* sp;
+	StageDark* d;
+
+	batSpotMain();
+	for (i = 0; i < 12; i++) {
+		l = &s->lights[i];
+		if (l->flags & 1) {
+			if (l->colorTime > 0) {
+				l->colorTime--;
+				l->color.r = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.r, l->colorTarget.r);
+				l->color.g = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.g, l->colorTarget.g);
+				l->color.b = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.b, l->colorTarget.b);
+				if ((l->flags & 2) && l->color.r == 0 && l->color.g == 0 && l->color.b == 0) {
+					l->flags = 0;
+					continue;
+				}
+			}
+			if (l->widthTime > 0) {
+				l->widthTime--;
+				l->width = intplGetValue((s8)l->widthMode, l->widthMax - l->widthTime, l->widthMax, l->widthStart, l->widthTarget);
+			}
+			if (l->posTime > 0) {
+				l->posTime--;
+				l->pos.x = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.x, l->posTarget.x);
+				l->pos.y = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.y, l->posTarget.y);
+				l->pos.z = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.z, l->posTarget.z);
+			}
+			if (l->flags & 4) {
+				sp = l->data;
+				l->target.x = getSpline(sp->x[0], sp->x[1], sp->x[2], sp->x[3], sp->t, sp->n, l->targetTime);
+				l->target.y = getSpline(sp->y[0], sp->y[1], sp->y[2], sp->y[3], sp->t, sp->n, l->targetTime);
+				l->target.z = getSpline(sp->z[0], sp->z[1], sp->z[2], sp->z[3], sp->t, sp->n, l->targetTime);
+				l->targetTime++;
+				if (l->targetTime >= sp->t[sp->n - 1]) {
+					if (l->flags & 8) {
+						l->targetTime -= sp->t[sp->n - 1];
+					} else {
+						l->targetTime = sp->t[sp->n - 1];
+					}
+				}
+			} else {
+				if (l->targetTime > 0) {
+					l->targetTime--;
+					l->target.x = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.x, l->targetTarget.x);
+					l->target.y = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.y, l->targetTarget.y);
+					l->target.z = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.z, l->targetTarget.z);
+				}
+				if (l->data != NULL) {
+					__memFree(HEAP_BATTLE, l->data);
+					l->data = NULL;
+				}
+			}
+			if (l->upTime > 0) {
+				l->upTime--;
+				l->up.x = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.x, l->upTarget.x);
+				l->up.y = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.y, l->upTarget.y);
+				l->up.z = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.z, l->upTarget.z);
+			}
+		} else {
+			if (l->data != NULL) {
+				__memFree(HEAP_BATTLE, l->data);
+				l->data = NULL;
+			}
+		}
+	}
+	if (s->stgDark.time > 0) {
+		s->stgDark.time--;
+		s->stgDark.cur = intplGetValue((s8)s->stgDark.mode, s->stgDark.max - s->stgDark.time, s->stgDark.max, s->stgDark.start, s->stgDark.target);
+	}
+	if (s->stgDark.baseTime > 0) {
+		s->stgDark.baseTime--;
+		s->stgDark.base = intplGetValue((s8)s->stgDark.baseMode, s->stgDark.baseMax - s->stgDark.baseTime, s->stgDark.baseMax, s->stgDark.baseStart, s->stgDark.baseTarget);
+	}
+	if (s->audDark.time > 0) {
+		s->audDark.time--;
+		s->audDark.cur = intplGetValue((s8)s->audDark.mode, s->audDark.max - s->audDark.time, s->audDark.max, s->audDark.start, s->audDark.target);
+	}
+	if (s->audDark.baseTime > 0) {
+		s->audDark.baseTime--;
+		s->audDark.base = intplGetValue((s8)s->audDark.baseMode, s->audDark.baseMax - s->audDark.baseTime, s->audDark.baseMax, s->audDark.baseStart, s->audDark.baseTarget);
+	}
 }
 
 void BattleStageEnd(void) {
@@ -565,6 +660,7 @@ void batSpotInit(void) {
 }
 #pragma dont_inline reset
 
+#pragma dont_inline on
 void batSpotMain() {
     s32 count = wp->count;
 
@@ -573,6 +669,7 @@ void batSpotMain() {
         dispEntry(CAMERA_3D_IMAGE, -1000.0f, 0, batSpotDisp, NULL);
     }
 }
+#pragma dont_inline reset
 
 void batSpotDisp(CameraId camId, void* param) {
 	int i;

@@ -280,16 +280,16 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     u16 flags;
     s32 i, j, k, n;
     EffMahojinWork* p;
-    s32 poseId;
-    GXColor color;
     Mtx mtx;
     f32 z[16];
     s32 idx[16];
+    f32* zp;
 
     camGetPtr(cameraId);
     alpha = work->alpha;
     map = mapGetWork();
     flags = map->entries[0].flags;
+    zp = z;
     for (pass = 0; pass < 2; pass++) {
         n = 0;
         if (pass == 0) {
@@ -304,15 +304,16 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
             idx[n++] = 1;
         }
         for (i = 2; i < effect->count; i++) {
-            idx[n] = i;
-            z[n++] = dispCalcZ(&pos_tbl[i - 2]);
+            f32 zz = dispCalcZ(&pos_tbl[i - 2]);
+            z[n] = zz;
+            idx[n++] = i;
         }
         for (i = 0; i < effect->count - 1; i++) {
             for (j = i + 1; j < effect->count; j++) {
-                if (z[i] > z[j]) {
-                    f32 tz = z[i];
+                if (zp[i] > z[j]) {
+                    f32 tz = zp[i];
                     s32 ti = idx[i];
-                    z[i] = z[j];
+                    zp[i] = z[j];
                     idx[i] = idx[j];
                     z[j] = tz;
                     idx[j] = ti;
@@ -326,14 +327,14 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
             if (pass == 1 && p->arg != NULL) {
                 p->func(cameraId, p->arg);
             }
-            poseId = p->poseId[pass];
-            if (poseId != -1) {
-                animPoseMain(poseId);
-                animPoseSetMaterialFlagOn(poseId, 0x40);
+            if (p->poseId[pass] != -1) {
+                GXColor color;
+                animPoseMain(p->poseId[pass]);
+                animPoseSetMaterialFlagOn(p->poseId[pass], 0x40);
                 color = (GXColor){ 0xFF, 0xFF, 0xFF, 0x00 };
                 color.a = p->alpha * alpha / 255;
-                animPoseSetMaterialEvtColor(poseId, color);
-                animPoseDrawMtx(poseId, mtx, 3, 0.0f, 10.0f);
+                animPoseSetMaterialEvtColor(p->poseId[pass], color);
+                animPoseDrawMtx(p->poseId[pass], mtx, 3, 0.0f, 10.0f);
             }
         }
         map->entries[0].flags = flags;

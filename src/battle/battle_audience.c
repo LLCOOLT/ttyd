@@ -51,7 +51,7 @@ char* strcpy(char* dst, const char* src);
 
 // local prototypes
 FileEntry* tplRead(const char* path);
-BOOL check_exe_phase_evt_status(s32 index, AudienceMemberType type);
+BOOL check_exe_phase_evt_status(s32 index, s32 type);
 void BattleAudienceSettingAudience(void);
 void BattleAudienceGuestTPLRead(s32 index, AudienceMemberType member, const char* tplName);
 void BattleAudienceCtrlProcess(void);
@@ -371,46 +371,39 @@ BOOL BattleAudience_CheckReaction(void) {
 }
 
 //@@ check_exe_phase_evt_status
-BOOL check_exe_phase_evt_status(s32 index, AudienceMemberType type) {
+BOOL check_exe_phase_evt_status(s32 index, s32 type) {
 	BattleAudienceMember* member;
+	u8 status;
 
 	member = BattleAudienceGetPtr(index);
-	if (!BattleAudience_GetSysCtrl(index)) {
+	if (!(u8)BattleAudience_GetSysCtrl(index)) {
 		return FALSE;
 	}
 	if (member->type != type) {
 		return FALSE;
 	}
-	switch (member->status) { //TODO: check if switch, might be IDA
-		case 13:
-			return FALSE;
-		case 12:
-			return FALSE;
-		case 11:
-			return FALSE;
-		case 21:
-			return FALSE;
-		case 22:
-			return FALSE;
-		default:
-			return (member->flags >> 3) & 1;
-	}
+	status = member->status;
+	if (status == 13) return FALSE;
+	if (status == 12) return FALSE;
+	if (status == 11) return FALSE;
+	if (status == 21) return FALSE;
+	if (status == 22) return FALSE;
+	return (member->flags >> 3) & 1;
 }
 
 //@@ BattleAudience_PerPhase
 void BattleAudience_PerPhase(u32 value) {
 	BattleAudience* audience;
 	BattleAudienceMember* member;
-	s32 i, itemId;
+	s32 i;
 
 	audience = BattleAudienceBaseGetPtr();
 	if (value == 0x4000002 && !(audience->flags & 0x40000)) {
 		for (i = 0; i < 200; i++) {
 			member = BattleAudienceGetPtr(i);
-			if (BattleAudience_GetExist(i) && member->status == 7) {
-				itemId = member->itemId;
-				if (itemId != -1) {
-					BattleAudienceItemGetPtr(itemId)->flags = 0;
+			if ((u8)BattleAudience_GetExist(i) == 1 && member->status == 7) {
+				if (member->itemId != -1) {
+					BattleAudienceItemGetPtr(member->itemId)->flags = 0;
 				}
 				member->itemId = -1;
 				BattleAudience_ChangeStatus(i, 0);
@@ -734,12 +727,6 @@ void BattleAudienceDispItem(CameraId camId, void* param) {
 }
 
 //@@ BattleAudienceDispApSrc
-static inline GXColor audApSrcColor(u8 a) {
-	GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
-	col.a = a;
-	return col;
-}
-
 void BattleAudienceDispApSrc(CameraId camId, void* param) {
 	s32 i;
 	AudApSrc* star;
@@ -747,6 +734,7 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 	Mtx scale;
 	Mtx trans;
 	Mtx mtx;
+	GXColor arg;
 
 	star = (AudApSrc*)BattleAudienceBaseGetPtr();
 	camGetPtr(CAMERA_2D);
@@ -763,11 +751,15 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 			PSMTXTrans(trans, star->x, star->y, 0.0f);
 			PSMTXConcat(scale, rot, mtx);
 			PSMTXConcat(trans, mtx, mtx);
-			iconDispGxCol(mtx, 0x10, 0x1B2, audApSrcColor(star->alpha));
+			{
+				GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
+				col.a = star->alpha;
+				arg = col;
+			}
+			iconDispGxCol(mtx, 0x10, 0x1B2, arg);
 		}
 	}
 }
-
 //@@ BattleAudienceDispWin
 void BattleAudienceDispWin(CameraId camId, void* param) {
 	BattleAudienceWindow* win;

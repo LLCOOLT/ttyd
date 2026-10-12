@@ -86,24 +86,16 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     work->alpha = 0;
     work->scale2 = 1.0f;
     p = pos_data;
-    for (i = 0; i < 5; i++) {
-        work->posX[i * 2] = p[0];
-        work->posY[i * 2] = p[1];
-        work->posZ[i * 2] = 0.0f;
-        work->rotX[i * 2] = 0.0f;
-        work->rotY[i * 2] = 0.0f;
-        work->rotZ[i * 2] = 0.0f;
-        work->digitAlpha[i * 2] = 0;
-        work->delay[i * 2] = p[2];
-        work->posX[i * 2 + 1] = p[3];
-        work->posY[i * 2 + 1] = p[4];
-        work->posZ[i * 2 + 1] = 0.0f;
-        work->rotX[i * 2 + 1] = 0.0f;
-        work->rotY[i * 2 + 1] = 0.0f;
-        work->rotZ[i * 2 + 1] = 0.0f;
-        work->digitAlpha[i * 2 + 1] = 0;
-        work->delay[i * 2 + 1] = p[5];
-        p += 6;
+    for (i = 0; i < 10; i++) {
+        work->posX[i] = p[0];
+        work->posY[i] = p[1];
+        work->posZ[i] = 0.0f;
+        work->rotX[i] = 0.0f;
+        work->rotY[i] = 0.0f;
+        work->rotZ[i] = 0.0f;
+        work->digitAlpha[i] = 0;
+        work->delay[i] = p[2];
+        p += 3;
     }
     return effect;
 }

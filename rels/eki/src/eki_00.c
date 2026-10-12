@@ -847,12 +847,12 @@ static void ext_moamoa_main(void) {
                     done = 1;
                 }
             } else if (hit == 3) {
+                angle = (wp->breathDir + wp->angleToMario) * 0.5f;
                 moa->flags |= 0x84;
                 moa->state = 48;
-                angle = (wp->breathDir + wp->angleToMario) * 0.5f;
                 moa->target = (Vec){0.0f, 0.0f, 0.0f};
-                rad = 6.2831855f * angle / 360.0f;
                 speed = randf(0.1f, 0.2f);
+                rad = 6.2831855f * angle / 360.0f;
                 moa->vy = speed * moa_sin(rad);
                 moa->speed = randf(0.03f, 0.06f);
                 moa->gravity = speed * -moa_cos(rad);
@@ -870,7 +870,7 @@ static void ext_moamoa_main(void) {
             }
         }
         if ((wp->flags & 1) && !(moa->flags & 0x444) && i == gp->retraceCount % wp->count && irand(1000) < 200) {
-            psndSFXOn_3D(sfx, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
+            v = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]}; psndSFXOn_3D(sfx, &v);
         }
         switch (moa->state) {
             case 0:

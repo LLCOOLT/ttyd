@@ -1547,6 +1547,7 @@ USER_FUNC(evt_mobj_signboard) {
 }
 
 USER_FUNC(evt_mobj_recovery_blk) {
+    BOOL inBattle;
     s32 arg6;
     s32* args = event->args;
     const char* anim;
@@ -1560,9 +1561,10 @@ USER_FUNC(evt_mobj_recovery_blk) {
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     evtGetValue(event, args[5]);
+    inBattle = gp->inBattle != 0;
     arg6 = args[6];
     anim = kind == 0 ? "MOBJ_RecoveryBlock" : "MOBJ_CoinTakenRecoveryBlock";
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
     mobjEntry(name, anim);
@@ -2089,16 +2091,15 @@ USER_FUNC(evt_mobj_brick) {
 }
 
 s32 mobj_breaking_floor(MapObjectEntry* mobj) {
-    GXColor c1 = {0xff, 0xff, 0xff, 0xff};
-    GXColor c2 = {0xff, 0xff, 0xff, 0xff};
-    GXColor c3 = {0xff, 0xff, 0xff, 0xff};
+    GXColor c1, c2, c3;
     marioGetPtr();
+    c1 = c2 = c3 = (GXColor){0xff, 0xff, 0xff, 0xff};
     switch (mobj->unk1DC) {
     case 0:
         if (mobj->flags & 8) {
             psndSFXOn_3D((const char*)0x401e8, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            if (mobj->unk1D4) {
+            if ((u32)mobj->unk1D4 != 0U) {
                 mobjRunEvent(mobj, (s32*)mobj->unk1D4);
             }
             if (mobj->hitObj[0].hitObject) {
@@ -2954,12 +2955,13 @@ USER_FUNC(kpa_score_to_str) {
     s32 score = evtGetValue(event, event->args[0]);
     s32 d1000, d100, d10, d1;
     s32 i;
+    s32 r;
     d1000 = score / 1000;
-    score = score % 1000;
-    d100 = score / 100;
-    score = score % 100;
-    d10 = score / 10;
-    d1 = score % 10;
+    r = score % 1000;
+    d100 = r / 100;
+    r = r % 100;
+    d10 = r / 10;
+    d1 = r % 10;
     i = 0;
     if (i != 0 || d1000 != 0) {
         psw->str[i] = d1000 + '0';
@@ -3197,3 +3199,186 @@ EVT_BEGIN(kpa_move_to_toride)
     RETURN
 EVT_END()
 
+
+s32 mobj_koopa_pole_evt(MapObjectEntry* mobj);
+
+s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
+    MarioWork* mario = marioGetPtr();
+    s32 next = 0;
+    s32 off;
+    s32 i;
+    s32 score;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (!(mobj->flags & 8)) {
+            break;
+        }
+        if (FLD(s8, mario, 0x3c) != 2) {
+            mobj->flags &= ~8;
+            break;
+        }
+        switch (kpaGetLevel()) {
+        case 0:
+        case 1:
+            if (FLD(f32, mario, 0x90) < 25.0f) {
+                mobj->flags &= ~8;
+                break;
+            }
+            next = 10;
+            break;
+        case 2:
+        case 3:
+            next = 50;
+            break;
+        }
+        if (next == 0) {
+            break;
+        }
+        for (i = 0, off = 0; i < FLD(s32, npcGetWorkPtr(), 0x4); i++, off += 0x340) {
+            NpcEntry* npc = (NpcEntry*)(FLD(s32, npcGetWorkPtr(), 0xc) + off);
+            u32 flags = FLD(u32, npc, 0);
+            if ((flags & 1) && !(FLD(u32, npc, 0x1d4) & 4) && (flags & 0x8000000) && (flags & 8)) {
+                npcGroupDead(npc, 0x20);
+            }
+        }
+        marioKeyOff();
+        evtSetValue(NULL, mobj->unk1E4, 1);
+        FLD(s16, mario, 0x78) = 0;
+        mobj->unk1DC = next;
+        break;
+    case 10:
+        mario = marioGetPtr();
+        score = 0;
+        if (kpaGetLevel() == 3) {
+            kpaAddScore(2000);
+        } else if (kpaGetLevel() >= 2) {
+            kpaAddScore(1000);
+        } else {
+            if (FLD(f32, mario, 0x90) >= 170.0f) {
+                score = 1000;
+            } else if (FLD(f32, mario, 0x90) >= 100.0f) {
+                score = 500;
+            } else if (FLD(f32, mario, 0x90) >= 50.0f) {
+                score = 200;
+            } else {
+                score = 100;
+            }
+            kpaAddScore(score);
+        }
+        mobjRunEvent(mobj, kpa_pole)->lwData[0] = score;
+        mobj->unk1DC++;
+        break;
+    case 11:
+        if (evtCheckID(mobj->eventId) != 1) {
+            mobj->unk1DC = 90;
+        }
+        break;
+    case 50:
+        mario = marioGetPtr();
+        if (kpaGetLevel() == 3) {
+            kpaAddScore(2000);
+        } else if (kpaGetLevel() >= 2) {
+            kpaAddScore(1000);
+        } else {
+            if (FLD(f32, mario, 0x90) >= 170.0f) {
+                score = 1000;
+            } else if (FLD(f32, mario, 0x90) >= 100.0f) {
+                score = 500;
+            } else if (FLD(f32, mario, 0x90) >= 50.0f) {
+                score = 200;
+            } else {
+                score = 100;
+            }
+            kpaAddScore(score);
+        }
+        mobjRunEvent(mobj, kpa_pole_move);
+        mobj->unk1DC++;
+        break;
+    case 51:
+        if (evtCheckID(mobj->eventId) != 1) {
+            mobj->unk1DC = 90;
+        }
+        break;
+    case 90:
+        mobjRunEvent(mobj, kpa_move_to_toride);
+        mobj->unk1DC++;
+        break;
+    case 91:
+        if (evtCheckID(mobj->eventId) != 1) {
+            mobj->eventId = 0;
+            mobj->unk1DC++;
+        }
+        break;
+    case 92:
+        mobjRunEvent(mobj, (s32*)mobj->unk1D8);
+        mobj->unk1DC++;
+        break;
+    case 93:
+        if (evtCheckID(mobj->eventId) == 1) {
+            break;
+        }
+        mobj->eventId = 0;
+        mobj->unk1DC++;
+    case 94:
+        mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+        mobj->unk1DC++;
+        break;
+    case 95:
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_pole) {
+    s32 inBattle;
+    s32 val2;
+    s32 val;
+    const char* name;
+    s32* args = event->args;
+    s32 arg6;
+    MapObjectEntry* mobj;
+    MapObjectEntry* hata;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    val2 = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    inBattle = gp->inBattle != 0;
+    if (animGroupBaseAsync("MOBJ_goal_pole", inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (animGroupBaseAsync("MOBJ_goal_hata", inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, "MOBJ_goal_pole");
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 0x84;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_koopa_pole_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = val2;
+    mobj->flags |= 0x1c280000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 99;
+    }
+    strcpy(mobj->unk1B8, name);
+    strcat(mobj->unk1B8, "_h");
+    mobjEntry(mobj->unk1B8, "MOBJ_goal_hata");
+    hata = mobjNameToPtr(mobj->unk1B8);
+    hata->position = (Vec){x, 180.0f + y, z};
+    hata->mainFunc = NULL;
+    hata->unk1D4 = 0;
+    hata->unk1D8 = 0;
+    hata->unk1E4 = 0;
+    hata->unk1DC = 0;
+    strcpy(hata->unk1B8, name);
+    if (hata->hitObj[0].hitObject) {
+        FLD(u16, hata->hitObj[0].hitObject, 0) |= 1;
+    }
+    return EVT_RETURN_DONE;
+}

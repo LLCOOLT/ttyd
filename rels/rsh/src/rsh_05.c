@@ -948,6 +948,7 @@ static void ext_moamoa_main(void) {
                 moa->timer = 0;
             case 52:
                 if (moa->timer < 200) {
+                    t = 1.0f;
                 } else {
                     t = (800 - moa->timer) / 600.0f;
                 }

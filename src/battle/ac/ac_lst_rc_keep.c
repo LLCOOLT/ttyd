@@ -31,7 +31,7 @@ s32 ac_lstrckeep_ok_frame[] = {0x50, 0x46, 0x3C, 0x28, 0x14, 0x0A, 0x05};
 const char* ac_lstrckeep_iconname[] = {"_AcSkl1", "_AcSkl2", "_AcSkl3", "_AcSkl4"};
 
 #pragma dont_inline on
-static void actionCommandDisp(s32 n, f32 x, f32 y) {
+static void actionCommandDisp(f32 x, f32 y, s32 n) {
     s32 off;
     s32 i;
     camGetPtr(8);
@@ -99,15 +99,16 @@ void battleAcDelete_LstRcKeep(BattleWork* work) {
 
 void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
-        LstRcWork* lw = LR_WORK(&work->actionCommands);
-    LstRcDisp* disp = (LstRcDisp*)((u8*)&work->actionCommands + 0x290);
-    switch (work->actionCommands.mAcState) {
+    BattleActions* ac = &work->actionCommands;
+    LstRcDisp* disp = (LstRcDisp*)((u8*)ac + 0x290);
+    LstRcWork* lw = (LstRcWork*)((u8*)ac + 0x2BC);
+    switch (ac->mAcState) {
         case 99:
         case 100:
         case 1000:
             disp->count = -1;
             disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->count, disp->iconX, disp->iconY);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
             if (disp->timer > 0) {
                 (disp->timer)--;
             }
@@ -115,7 +116,7 @@ void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
         case 1001:
             disp->count = lw->count - 1;
             disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->count, disp->iconX, disp->iconY);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
             if (disp->timer > 0) {
                 (disp->timer)--;
             }
@@ -123,7 +124,7 @@ void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
         case 1002:
         case 1003:
         case 1004:
-            actionCommandDisp(disp->count, 30.0f, 0.0f);
+            actionCommandDisp(30.0f, 0.0f, disp->count);
             break;
         case 1005:
         case 1006:
@@ -132,7 +133,7 @@ void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
             } else {
                 disp->iconX = 30.0f;
             }
-            actionCommandDisp(disp->count, disp->iconX, disp->iconY);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
             if (disp->timer < 60) {
                 (disp->timer)++;
             }

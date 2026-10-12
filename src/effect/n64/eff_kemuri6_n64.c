@@ -47,6 +47,7 @@ void effKemuri6Disp(CameraId cameraId, EffectEntry* effect);
 EffectEntry* effKemuri6N64Entry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     EffKemuri6N64Work* work;
+    int i;
 
     effect = effEntry();
     effect->type = "Kemuri6N64";
@@ -54,26 +55,28 @@ EffectEntry* effKemuri6N64Entry(s32 type, f32 x, f32 y, f32 z) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri6N64Work));
     effect->userdata = work;
     effect->callback = effKemuri6Main;
-    work->active = TRUE;
-    work->type = type;
-    work->accelAdd = 0.0f;
-    work->field_0x44 = 0.0f;
-    work->position.x = x;
-    work->position.y = y;
-    work->position.z = z;
-    work->scaleX = 1.0f;
-    work->scaleY = 1.0f;
-    work->scaleZ = 1.0f;
-    work->alpha = 255;
-    work->baseX = 0.03f * (rand() % 11) + 1.4f;
-    work->baseY = 0.03f * (rand() % 11) + 1.5f;
-    work->angle = rand() % 61;
-    work->type = type;
-    work->velocity = 2.0f;
-    work->accel = -0.5f;
-    work->timer = 15;
-    work->rotation = rand() % 361;
-    work->alpha = 255;
+    for (i = 0; i < 1; i++) {
+        work->active = TRUE;
+        work->type = type;
+        work->accelAdd = 0.0f;
+        work->field_0x44 = 0.0f;
+        work->position.x = x;
+        work->position.y = y;
+        work->position.z = z;
+        work->scaleX = 1.0f;
+        work->scaleY = 1.0f;
+        work->scaleZ = 1.0f;
+        work->alpha = 255;
+        work->baseX = 0.03f * (rand() % 11) + 1.4f;
+        work->baseY = 0.03f * (rand() % 11) + 1.5f;
+        work->angle = rand() % 61;
+        work->type = type;
+        work->velocity = 2.0f;
+        work->accel = -0.5f;
+        work->timer = 15;
+        work->rotation = rand() % 361;
+        work->alpha = 255;
+    }
     return effect;
 }
 

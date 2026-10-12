@@ -83,17 +83,11 @@ EffectEntry* effThunderflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z
             break;
     }
     e = work + 1;
-    for (i = 0; i < 30; i += 2) {
-        e->rotA = i * 3240 / 30;
+    for (i = 1; i < 31; i++, e++) {
+        e->rotA = (i - 1) * 3240 / 30;
         e->rotB = 0.0f;
-        e->dist = i * 100 / 30;
+        e->dist = (i - 1) * 100 / 30;
         e->unk0 = 0;
-        e++;
-        e->rotA = (i + 1) * 3240 / 30;
-        e->rotB = 0.0f;
-        e->dist = (i + 1) * 100 / 30;
-        e->unk0 = 0;
-        e++;
     }
     return effect;
 }
@@ -163,8 +157,8 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     s32 a;
     s32 i;
     GXTexObj tex;
-    GXColor c1;
     GXColor c0;
+    GXColor c1;
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -207,7 +201,7 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     effSetVtxDescN64(size16x16_tex32x32_vtx);
     for (i = 1; i < effect->count; i++, work++) {
         sc = work->scale;
-        if (0.0f != sc) {
+        if (sc) {
             c0 = unk_804232ac;
             c0.r = cr;
             c0.g = cg;
@@ -220,9 +214,9 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(view, mtx, mtx);
             GXLoadPosMtxImm(mtx, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
-            a = (i & 1) * 4;
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(a, a + 1, a + 2, 0, a, a + 2, a + 3, 0);
+            a = (i & 1) * 4;
+            ((void (*)())tri2)(a, a + 1, a + 2, 0, a, a + 2, a + 3, 0);
         }
     }
 }

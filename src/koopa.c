@@ -165,6 +165,7 @@ s32 kpaCamFollow(void) {
 }
 
 void kpaPreInit(void) {
+    u8* new_var;
     MarioWork* mp = marioGetPtr();
     if (KPW(mp) == NULL) {
         KPW(mp) = (u8*)__memAlloc(0, 0x154);
@@ -174,7 +175,8 @@ void kpaPreInit(void) {
     MU32(KPW(mp), 0xD0) = 1;
     MU32(KPW(mp), 0xE0) = 0;
     MU32(KPW(mp), 0xD8) = 1;
-    *(s32*)(KPW(marioGetPtr()) + 0x14C) = -1;
+    new_var = KPW(marioGetPtr()) + 0x14C;
+    *(s32*)new_var = -1;
     mp = marioGetPtr();
     if (strcmp((char*)gp + 0x12C, "kpa_02") == 0 || strcmp((char*)gp + 0x12C, "kpa_03") == 0 ||
         strcmp((char*)gp + 0x12C, "kpa_04") == 0 || strcmp((char*)gp + 0x12C, "kpa_05") == 0 ||
@@ -393,25 +395,28 @@ void kpa3DMain(void) {
     MF(mp, 0x17C) = 0.0f;
 }
 
+#define SETPV(m, v, a, b, c, d) do { JP(m, v) = (a); JP(m, 1) = (b); JP(m, 2) = (c); JP(m, 3) = (d); } while (v)
 f32 kpaSetJumpPara(void) {
+    int new_var;
     f32* jd = marioJumpData;
     MarioWork* mp = marioGetPtr();
-    SETP(mp, jd[0], jd[1], jd[2], jd[3]);
+    new_var = 0;
+    SETPV(mp, new_var, jd[new_var], jd[1], jd[2], jd[3]);
     switch (MU32(KPW(mp), 4)) {
     case 0:
-        SETP(mp, 7.0f, -0.4f, 0.08f, -0.02f);
+        SETPV(mp, new_var, 7.0f, -0.4f, 0.08f, -0.02f);
         break;
     case 1:
-        SETP(mp, 8.1f, -0.3f, 0.08f, -0.02f);
+        SETPV(mp, new_var, 8.1f, -0.3f, 0.08f, -0.02f);
         break;
     case 2:
-        SETP(mp, 8.4f, -0.1f, 0.08f, -0.018f);
+        SETPV(mp, new_var, 8.4f, -0.1f, 0.08f, -0.018f);
         break;
     case 3:
-        SETP(mp, 10.5f, -0.12f, 0.08f, -0.018f);
+        SETPV(mp, new_var, 10.5f, -0.12f, 0.08f, -0.018f);
         break;
     }
-    return JP(mp, 0);
+    return JP(mp, new_var);
 }
 
 f32 kpaSetFallPara(void) {

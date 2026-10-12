@@ -223,16 +223,11 @@ EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
             work->b1 = 255;
             break;
     }
-    p = work + 1;
-    for (i = 1; i < 31; i += 2, p += 2) {
-        p[0].yaw = 9.0f * (360.0f * (i - 1)) / 30.0f;
-        p[0].pitch = 0.0f;
-        p[0].dist = (i - 1) * 100 / 30;
-        p[0].state = 0;
-        p[1].yaw = 9.0f * (360.0f * i) / 30.0f;
-        p[1].pitch = 0.0f;
-        p[1].dist = i * 100 / 30;
-        p[1].state = 0;
+    for (i = 1, p = work + 1; i <= 30; i++, p++) {
+        p->yaw = 9.0f * (360.0f * (i - 1)) / 30.0f;
+        p->pitch = 0.0f;
+        p->dist = (i - 1) * 100 / 30;
+        p->state = 0;
     }
     return effect;
 }

@@ -11,6 +11,7 @@ extern ItemData itemDataTable[];
 extern void btlMovePos(f32 speed, f32 angle, f32* x, f32* z);
 extern int sprintf(char* str, const char* format, ...);
 
+#pragma optimize_for_size on
 #pragma dont_inline on
 BattleIcon* BtlIconGetPtr(s32 index) {
 	BattleIcon* icon;

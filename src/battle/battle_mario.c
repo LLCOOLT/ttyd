@@ -2629,6 +2629,8 @@ EVT_BEGIN(marioAttackEvent_SuperChargeP)
     RETURN
 EVT_END()
 
+static const Vec majinai_effect_pos = {0.0f, 10.0f, 0.0f};
+
 EVT_BEGIN(marioAttackEvent_MajinaiPowerUpCheck)
     CALL(_majinai_powerup_check, LW(0))
     IF_INT_EQUAL(LW(0), 0)
@@ -3028,7 +3030,7 @@ USER_FUNC(_majinai_powerup_check) {
 USER_FUNC(_battle_majinai_effect) {
     BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
     if (isFirstCall) {
-        Vec v = {0.0f, 10.0f, 0.0f};
+        Vec v = majinai_effect_pos;
         event->userdata[0] = (s32)effMajinaiEntry(0, v.x, v.y, v.z);
         effSetName((EffectEntry*)event->userdata[0], "mjef_coinup");
     }

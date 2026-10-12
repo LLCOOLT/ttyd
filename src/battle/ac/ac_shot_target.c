@@ -63,11 +63,12 @@ static void actionCommandDisp(f32 x, f32 y);
 void _ac_rumble_param_set(u32 difficulty, s16* period, s16* count, f32* amp);
 
 s32 battleAcMain_ShotTarget(BattleWork* work) {
+    const char* sfxName;
     BattleActions* ac;
     ShotTargetWork* cw;
-    u32 difficulty;
-    BOOL autoCommand;
     BOOL repeat;
+    BOOL autoCommand;
+    u32 difficulty;
     BattleUnit* unit;
     BattleUnitPart* parts;
     Vec hit;
@@ -80,6 +81,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
     }
     difficulty = ((ShotTargetParams*)&work->actionCommands)->difficulty;
     do {
+        sfxName = "SFX_AC_CURSOR_MOVE1";
         repeat = FALSE;
         switch (ac->mAcState) {
             case 0:
@@ -105,7 +107,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
             case 100:
                 cw->frame = ((ShotTargetParams*)&work->actionCommands)->startFrame;
                 ac->mAcState = 1000;
-                cw->sfxId = ((s32(*)(const char*))psndSFXOn)("SFX_AC_CURSOR_MOVE1");
+                cw->sfxId = ((s32(*)(const char*))psndSFXOn)(sfxName);
             case 1000:
                 if (((ShotTargetParams*)&work->actionCommands)->shotCount > 0) {
                     (((ShotTargetParams*)&work->actionCommands)->shotCount)--;
@@ -183,7 +185,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
             case 1003:
                 cw->endTimer = 60;
                 ac->mAcState = 1004;
-                if (cw->sfxId != -1) {
+                if ((u32)cw->sfxId != 0xFFFFFFFF) {
                     psndSFXOff(cw->sfxId);
                 }
                 break;

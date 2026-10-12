@@ -122,18 +122,18 @@ void marioHitCheckWidth(void) {
     MarioWork* w = marioGetPtr();
     f32 v;
     if (!(w->flags & 0x100000)) {
-        f32 lim = (w->flags & 0x1000000) ? 18.0f : MF(w, 0x1b4, f32);
-        v = MF(w, 0x1bc, f32) + 1.0f;
-        MF(w, 0x1bc, f32) = v;
-        if (v > lim) {
-            MF(w, 0x1bc, f32) = lim;
+        f32 lim = !(w->flags & 0x1000000) ? MF(w, 0x1b4, f32) : 18.0f;
+        f32 c = MF(w, 0x1bc, f32);
+        f32 s = c + 1.0f;
+        MF(w, 0x1bc, f32) = s;
+        if (s > lim) {
         }
     } else {
         v = MF(w, 0x1bc, f32);
         if (v > 6.0f) {
-            v -= 1.0f;
-            MF(w, 0x1bc, f32) = v;
-            if (v < 6.0f) {
+            f32 t = v - 1.0f;
+            MF(w, 0x1bc, f32) = t;
+            if (t < 6.0f) {
                 MF(w, 0x1bc, f32) = 6.0f;
             }
         }

@@ -13,12 +13,21 @@ typedef struct TitleWork {
 	f32 field_0x14; //0x14
 	f32 field_0x18; //0x18
 	f32 field_0x1C; //0x1C
-	u8 field_0x20[0x30 - 0x20]; //0x20
+	union {
+		u8 field_0x20[0x30 - 0x20]; //0x20
+		struct {
+			s32 counter; //0x20
+			s32 timer; //0x24
+			s32 idle; //0x28
+			s32 frame; //0x2C
+		};
+	};
 	s32 debug; //0x30
 } TitleWork;
 
 const char* DbgBtlSel_GetMsgDataPtr(void);
 s32 getDebugMode(void);
+s32 N_getDebugMode(void);
 void seq_titleInit(SequenceWork* work);
 void seq_titleMain(SequenceWork* work);
 void seq_titleExit(SequenceWork* work);

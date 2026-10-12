@@ -59,6 +59,7 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     f32 r;
     f32 s;
     f32 c;
+    f32 yaw;
 
     effect = effEntry();
     n1 = 0;
@@ -85,7 +86,7 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
         break;
     }
     effect->type = "splash\0";
-    effect->count = n1 + (n2 + 1);
+    effect->count = n1 + n2 + 1;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(EffSplashWork));
     effect->userdata = work;
     effect->callback = effSplashMain;
@@ -98,6 +99,7 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     work->sx = size;
     work->timer = 0;
     work->hasColor = 0;
+    work++;
     for (i = 1; i < n1 + 1; i++, work++) {
         work->position.z = 0.0f;
         work->position.y = 0.0f;
@@ -113,7 +115,7 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
             if (i == 1) {
                 work->vy = 5.0f;
                 work->grav = 0.4f;
-                work->sz = work->sy = work->sx = 0.7f;
+                work->sx = work->sy = work->sz = 0.7f;
             } else {
                 work->vy = 4.0f;
                 work->grav = 0.4f;
@@ -158,13 +160,14 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
                 work->vy = 3.6f;
                 work->grav = 0.8f;
             }
-            work->sx = 0.01f;
+            work->sz = 0.01f;
             break;
         }
     }
     for (i = n1 + 1; i < effect->count; i++, work++) {
-        ang = 6.2831855f * (f32)irand(360) / 360.0f;
+        ang = (f32)irand(360);
         r = (f32)irand(5);
+        ang = 6.2831855f * ang / 360.0f;
         work->f10 = r * (f32)sin(ang);
         work->f14 = r * (f32)cos(ang);
         work->position.x = 2.0f * work->f10;
@@ -173,14 +176,14 @@ EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
         work->vy = 10.0f;
         work->grav = 1.0f;
         work->delay = irand(10);
-        work->sx = 0.5f;
-        work->sy = 0.5f;
         work->sz = 0.5f;
+        work->sy = 0.5f;
+        work->sx = 0.5f;
     }
     if (type == 2) {
-        ang = 6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f;
-        s = (f32)sin(ang);
-        c = (f32)cos(ang);
+        yaw = 6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f;
+        s = (f32)sin(yaw);
+        c = (f32)cos(yaw);
         effKemuTestEntry(6, x + size * (-30.0f * s), y + 5.0f * size, z + size * (30.0f * c), size);
     }
     return effect;

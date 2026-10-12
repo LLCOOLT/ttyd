@@ -279,7 +279,7 @@ USER_FUNC(evt_bero_get_info) {
 	int i;
 
 	for (i = 0; i < 16; i++) {
-		table[i] = 0;
+		BeroINFOARR[i] = 0;
 	}
 	for (entry = (BeroEntry*)event->lwData[0];; entry++) {
 		hit = hitNameToPtr(entry->hitName);

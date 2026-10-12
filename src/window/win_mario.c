@@ -194,8 +194,7 @@ void winMarioExit(WinMarioWork* w) {
     psndSFXOn((const char*)0x20005);
 
 s32 winMarioMain(WinMarioWork* w) {
-    const char* anim2;
-    const char* anim;
+    const char* anims[2];
     LinkDt* lp;
     LinkDt* p;
 
@@ -210,11 +209,11 @@ s32 winMarioMain(WinMarioWork* w) {
             } else if (w->buttonTrg & 0x200) {
                 psndSFXOn((const char*)0x20013);
                 if (w->flags & 0x2000) {
-                    COLOR_ANIM(anim, "S_1")
+                    COLOR_ANIM(anims[1], "S_1")
                 } else {
-                    anim = "M_S_1";
+                    anims[1] = "M_S_1";
                 }
-                animPoseSetAnim(w->poseId, anim, 0);
+                animPoseSetAnim(w->poseId, anims[1], 0);
                 return -1;
             } else if (w->buttonTrg & 0x1000) {
                 return -2;
@@ -233,11 +232,11 @@ s32 winMarioMain(WinMarioWork* w) {
             switch (w->idx) {
             case 2:
                 if (w->flags & 0x2000) {
-                    COLOR_ANIM(anim2, lp->pose2)
+                    COLOR_ANIM(anims[0], lp->pose2)
                 } else {
-                    anim2 = hammer_pose[pouchGetHammerLv()];
+                    anims[0] = hammer_pose[pouchGetHammerLv()];
                 }
-                animPoseSetAnim(w->poseId, anim2, 0);
+                animPoseSetAnim(w->poseId, anims[0], 0);
                 if (w->f18C == 0) {
                     if (animPoseGetLoopTimes(w->poseId) >= 0.89f) {
                         w->f18C = 30;
@@ -252,11 +251,11 @@ s32 winMarioMain(WinMarioWork* w) {
             default:
                 w->f18C = 0;
                 if (w->flags & 0x2000) {
-                    COLOR_ANIM(anim2, lp->pose2)
+                    COLOR_ANIM(anims[0], lp->pose2)
                 } else {
-                    anim2 = lp->pose0;
+                    anims[0] = lp->pose0;
                 }
-                animPoseSetAnim(w->poseId, anim2, 0);
+                animPoseSetAnim(w->poseId, anims[0], 0);
                 break;
             }
             switch (w->idx) {

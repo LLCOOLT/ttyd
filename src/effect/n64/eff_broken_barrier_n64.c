@@ -9,6 +9,7 @@
 #include <stdlib.h>
 
 extern double sin(double x);
+extern double cos(double x);
 
 
 extern int __float_nan[];

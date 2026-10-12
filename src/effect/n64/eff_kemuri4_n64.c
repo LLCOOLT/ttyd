@@ -82,15 +82,12 @@ effN64Vtx flowers_v[] = {
 void effKemuri4Main(EffectEntry* effect);
 void effKemuri4Disp(CameraId cameraId, EffectEntry* effect);
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 flip) {
     EffectEntry* effect;
     EffKemuri4N64Work* work;
+    f32 zero = 0.0f;
     f32 rad;
-    f32 zero;
-    f32 twoPi;
-    f32 full;
+    s32 i;
 
     effect = effEntry();
     effect->type = "Kemuri4N64";
@@ -98,10 +95,11 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri4N64Work));
     effect->userdata = work;
     effect->callback = effKemuri4Main;
-    zero = 0.0f;
+    
+    for (i = 0; i < 1; i++, work++) {
     work->active = 1;
     work->type = type;
-    work->field_6C = zero;
+    work->field_6C = 0.0f;
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
@@ -115,22 +113,19 @@ EffectEntry* effKemuri4N64Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 fl
     work->velocity = 0.5f;
     work->accel = -0.07f;
     work->accel2 = 0.003f;
-    work->accel3 = zero;
+    work->accel3 = 0.0f;
     work->timer = 15;
     work->rotation.y = angle;
-    work->rotation.x = zero;
-    work->rotation.z = zero;
-    twoPi = 6.2831855f;
-    full = 360.0f;
+    work->rotation.x = 0.0f;
+    work->rotation.z = 0.0f;
     work->texFlag = (rand() % 100 >> 4) & 1;
-    rad = twoPi * reviseAngle(angle + (f32)(flip != zero ? -90 : 90)) / full;
+    rad = 6.2831855f * reviseAngle(angle + (f32)(flip != zero ? -90 : 90)) / 360.0f;
     work->dirX = (f32)sin(rad);
     work->dirZ = (f32)cos(rad);
+    }
     return effect;
 }
 
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 void effKemuri4Main(EffectEntry* effect) {
     EffKemuri4N64Work* work = effect->userdata;
     Vec position;
@@ -156,7 +151,7 @@ void effKemuri4Main(EffectEntry* effect) {
             continue;
         }
         anyActive = 1;
-        if (work->type == 0 && work->field_68 != 0.0f && marioGetPtr()->currMotionId == 0U) {
+        if (work->type == 0 && work->field_68 && marioGetPtr()->currMotionId == 0U) {
             work->timer++;
         } else {
             work->accel2 = work->accel2 + work->accel3;
