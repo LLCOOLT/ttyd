@@ -303,11 +303,10 @@ void battleAcDisp_Repeatedly(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
     switch (ac->mAcState) {
-        case 1000:
-        case 1001:
-            break;
         case 99:
         case 100:
+        case 1000:
+        case 1001:
             disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
             actionCommandDisp(disp->iconX, disp->iconY);
             if (*(s32*)&disp->field_0x1C[4] > 0) {

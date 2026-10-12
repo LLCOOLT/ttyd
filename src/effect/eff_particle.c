@@ -329,8 +329,8 @@ void effParticleDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(mX, 0);
         GXSetCurrentMtx(0);
         ex = 2.0f;
-        ox = -hx * 0.5f;
-        oy = -hy * 0.5f;
+        ox = -hx / 2.0f;
+        oy = -hy / 2.0f;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition3f32(ox, hx, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);

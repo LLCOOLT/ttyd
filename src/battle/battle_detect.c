@@ -25,7 +25,7 @@ typedef struct DetTarget {
     s32 z;         // 0x14
     s32 score;     // 0x18
     u8 forwardLv;  // 0x1C
-    u8 side;       // 0x1D
+    s8 side;       // 0x1D
     u8 pad_0x1E[2];
     s32 field_0x20; // 0x20
 } DetTarget;
@@ -46,9 +46,9 @@ typedef struct DetWork {
 
 
 void _btlSamplingEnemy(DetWork* d) {
+    BattleWork* wp = _battleWorkPointer;
     DetTarget* t = d->t;
     s32 n = 0;
-    BattleWork* wp = _battleWorkPointer;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -62,12 +62,13 @@ void _btlSamplingEnemy(DetWork* d) {
             u8 np = unit->mKindParams->numParts;
             BattleUnitPart* part = unit->mParts;
             s32 j;
-            for (j = 0; j < np; j++, part = part->mNextPart) {
+            for (j = 0; j < np; j++) {
                 BattleUnitKindPart* kp;
                 s32 dir;
                 f32 x, y, z;
                 f32 ox, oy, oz;
                 if (part->attributes & 0x10000) {
+                    part = part->mNextPart;
                     continue;
                 }
                 kp = part->mKindPartParams;
@@ -97,11 +98,12 @@ void _btlSamplingEnemy(DetWork* d) {
                 t->y = (s16)oy;
                 t->z = (s16)oz;
                 t->forwardLv = BtlCompForwardLv(d->direction, t->x);
-                if (t->z >= -30) {
-                    t->side = 1;
-                } else {
+                if (t->z < -30) {
                     t->side = 0;
+                } else {
+                    t->side = 1;
                 }
+                part = part->mNextPart;
                 n++;
                 t++;
             }
@@ -111,13 +113,14 @@ void _btlSamplingEnemy(DetWork* d) {
     d->curTarget = 0;
     d->numTargets = n;
     n = d->numTargets;
+    t = d->t;
 
     {
         s32 i;
         s32 j;
         s32 k;
         for (i = 0; n > i; i++) {
-            DetTarget* tg = &d->t[i];
+            DetTarget* tg = &t[i];
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, tg->partIdx);
             {
@@ -190,21 +193,13 @@ void _btlSamplingEnemy(DetWork* d) {
             }
             if (flags & 0x200000) {
                 u32 a = part->attributes;
-                if ((a & 1) || (a & 2)) {
-                    if (a & 0x40000) {
-                        { ok = FALSE; break; }
-                    }
-                } else {
+                if (!((a & 1) || (a & 2)) || (a & 0x40000)) {
                     { ok = FALSE; break; }
                 }
             }
             if (flags & 0x400000) {
                 u32 a = part->attributes;
-                if ((a & 1) || (a & 2) || (a & 4)) {
-                    if (a & 0x40000) {
-                        { ok = FALSE; break; }
-                    }
-                } else {
+                if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x40000)) {
                     { ok = FALSE; break; }
                 }
             }
@@ -226,14 +221,13 @@ void _btlSamplingEnemy(DetWork* d) {
         s32 j;
         s32 k;
         for (i = 0; n > i; i++) {
-            DetTarget* tg = &d->t[i];
+            DetTarget* tg = &t[i];
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, tg->partIdx);
             {
         BOOL ok;
         do {
-            u32 flags = d->propFlags;
-            if (flags & 1) {
+                        if (d->propFlags & 1) {
                 if (part->attributes & 0x80000) {
                     { ok = FALSE; break; }
                 }
@@ -244,55 +238,55 @@ void _btlSamplingEnemy(DetWork* d) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 2) {
+            if (d->propFlags & 2) {
                 if (unit->mAttributeFlags & 4) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 4) {
+            if (d->propFlags & 4) {
                 if (unit->mAttributeFlags & 2) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 8) {
+            if (d->propFlags & 8) {
                 if (unit->mAttributeFlags & 4) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x10) {
+            if (d->propFlags & 0x10) {
                 u32 a = unit->mAttributeFlags;
                 if (!(a & 4) && !(a & 2)) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x1000) {
+            if (d->propFlags & 0x1000) {
                 if (part->attributes & 0x100000) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x2000) {
+            if (d->propFlags & 0x2000) {
                 if (part->attributes & 0x200000) {
-                    if (!(flags & 0x100000) || d->unitId != unit->unitId) {
+                    if (!(d->propFlags & 0x100000) || d->unitId != unit->unitId) {
                         { ok = FALSE; break; }
                     }
                 }
             }
-            if (flags & 0x4000) {
+            if (d->propFlags & 0x4000) {
                 if (part->attributes & 0x400000) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x8000) {
+            if (d->propFlags & 0x8000) {
                 if (!(part->attributes & 0x400000)) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x2000000) {
+            if (d->propFlags & 0x2000000) {
                 if (unit->mAttributeFlags & 0x20) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x4000000) {
+            if (d->propFlags & 0x4000000) {
                 if (part->attributes & 0x2000000) {
                     { ok = FALSE; break; }
                 }
@@ -316,12 +310,12 @@ void _btlSamplingEnemy(DetWork* d) {
             s32 j;
             s32 k;
             for (i = 0; n > i; i++) {
-                DetTarget* tg = &d->t[i];
+                DetTarget* tg = &t[i];
                 BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
                 BOOL keep = TRUE;
                 if (part->attributes & 2) {
                     for (j = 0; j < n; j++) {
-                        DetTarget* o = &d->t[j];
+                        DetTarget* o = &t[j];
                         if (tg != o && tg->unitIdx == o->unitIdx) {
                             if (BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, o->unitIdx), o->partIdx)->attributes & 1) {
                                 keep = FALSE;
@@ -346,19 +340,19 @@ void _btlSamplingEnemy(DetWork* d) {
         s32 j;
         s32 k;
         for (i = 0; n > i; i++) {
-            DetTarget* tg = &d->t[i];
+            DetTarget* tg = &t[i];
             BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
             BOOL keep;
             if ((d->propFlags & 0x1000000) && !(part->attributes & 0x10)) {
                 BOOL ok = TRUE;
                 for (j = 0; j < n; j++) {
-                    DetTarget* o = &d->t[j];
+                    DetTarget* o = &t[j];
                     if (tg != o && tg->side == o->side) {
                         s32 a = tg->x;
                         s32 b = o->x;
                         if (d->direction < 0) {
-                            a = -a;
-                            b = -b;
+                            a *= -1;
+                            b *= -1;
                         }
                         if (a > b) {
                             u32 pa = BattleGetUnitPartsPtr(o->unitIdx, o->partIdx)->attributes;
@@ -373,7 +367,7 @@ void _btlSamplingEnemy(DetWork* d) {
                         }
                     }
                 }
-                keep = ok ? TRUE : FALSE;
+                if (!ok) { keep = FALSE; } else { keep = TRUE; }
             } else {
                 keep = TRUE;
             }
@@ -391,29 +385,31 @@ void _btlSamplingEnemy(DetWork* d) {
     {
     s32 i;
     s32 j;
-    for (i = 0; i < d->numTargets; i++) {
-        d->idx[i] = i;
-    }
+    s8* idx = d->idx;
+    t = d->t;
     n = d->numTargets;
+    for (i = 0; i < n; i++) {
+        idx[i] = i;
+    }
     if (d->direction > 0) {
         for (i = 0; i < n - 1; i++) {
             for (j = i + 1; j < n; j++) {
-                s8 a = d->idx[i];
-                s8 b = d->idx[j];
-                if (d->t[a].posX + d->t[a].score * 10 > d->t[b].posX + d->t[b].score * 10) {
-                    d->idx[i] = b;
-                    d->idx[j] = a;
+                s8 a = idx[i];
+                s8 b = idx[j];
+                if (t[a].posX + t[a].score * 10 > t[b].posX + t[b].score * 10) {
+                    idx[i] = b;
+                    idx[j] = a;
                 }
             }
         }
     } else {
         for (i = 0; i < n - 1; i++) {
             for (j = i + 1; j < n; j++) {
-                s8 a = d->idx[i];
-                s8 b = d->idx[j];
-                if (d->t[a].posX + d->t[a].score * 10 <= d->t[b].posX + d->t[b].score * 10) {
-                    d->idx[i] = b;
-                    d->idx[j] = a;
+                s8 a = idx[i];
+                s8 b = idx[j];
+                if (t[a].posX + t[a].score * 10 <= t[b].posX + t[b].score * 10) {
+                    idx[i] = b;
+                    idx[j] = a;
                 }
             }
         }

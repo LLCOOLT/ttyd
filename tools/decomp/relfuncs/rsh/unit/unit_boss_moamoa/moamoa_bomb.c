@@ -46,15 +46,15 @@ USER_FUNC(moamoa_bomb) {
                 if (elem->flags & 1) {
                     elem->vel.x = randf(0.0f, 60.0f) - 30.0f;
                     elem->vel.y = randf(0.0f, 35.0f);
-                    n++;
                     elem->vel.z = 60.0f + randf(0.0f, 30.0f);
+                    n++;
                     elem->pos2.x = pose->mtx[0][3];
                     elem->pos2.y = pose->mtx[1][3];
                     elem->pos2.z = pose->mtx[2][3];
-                    if (n >= 10) {
-                        break;
-                    }
                 }
+            }
+            if (n >= 10) {
+                break;
             }
         }
     }

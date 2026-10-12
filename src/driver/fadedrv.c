@@ -3,52 +3,57 @@
 #include "driver/arcdrv.h"
 #include "driver/camdrv.h"
 #include "driver/imgdrv.h"
+#include "driver/dispdrv.h"
+#include "driver/offscreendrv.h"
 #include "manager/dvdmgr.h"
+#include "manager/evtmgr.h"
+#include "pmario_sound.h"
+#include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
 #include <dolphin/dvd.h>
 #include <string.h>
 
 extern int sprintf(char* str, const char* format, ...);
-
-u8 i4tex = 0xFF; //TODO: align 32-byte
+double tan(double);
+s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
+extern GlobalWork* gp;
 
 static FadeWork* wp;
 
 //local prototypes
 void _callback(s32 error, DVDFileInfo* info);
 void disp_texture(CameraId camId, void* param);
-void z(void);
+static f32 z(void);
 static void zFill(void);
 void disp_maku(CameraId camId, void* param);
 void disp_tec(CameraId camId, void* param);
 void disp_dummy_black(CameraId camId, void* param);
 
 void _callback(s32 error, DVDFileInfo* info) {
+	DVDEntry* entry = info->cb.userData;
 	UnpackTexPalette(wp->texture);
-	DVDMgrClose(info->cb.userData);
+	DVDMgrClose(entry);
 	wp->loaded = TRUE;
 }
 
 void fadeInit(void) {
+	FadeEntry* entry;
 	int i;
 
 	wp = __memAlloc(HEAP_DEFAULT, sizeof(FadeWork));
 	memset(wp, 0, sizeof(FadeWork));
 
 	for (i = 0; i < 5; i++) {
-		wp->entries[i].field_0x6C = -1;
-		wp->entries[i].field_0x70 = -1;
-
-		wp->entries[i].fadeSpotX = 0.0f;
-		wp->entries[i].fadeSpotY = 0.0f;
-
-		wp->entries[i].animOffsetX = 0.0f;
-		wp->entries[i].animOffsetY = 0.0f;
-
-		wp->entries[i].field_0x90 = 1.0f;
-
-		wp->entries[i].field_0xA4 = 0;
+		entry = &wp->entries[i];
+		entry->field_0x6C = -1;
+		entry->field_0x70 = -1;
+		entry->fadeSpotX = 0.0f;
+		entry->fadeSpotY = 0.0f;
+		entry->animOffsetX = 0.0f;
+		entry->animOffsetY = 0.0f;
+		entry->field_0x90 = 1.0f;
+		entry->field_0xA4 = 0;
 	}
 
 	wp->field_0x350 = -1;
@@ -63,11 +68,7 @@ void fadeTexSetup(void) {
 
 	wp->texture = NULL;
 	wp->texture = arcOpen("fade.tpl", NULL, NULL);
-	if (wp->texture) {
-		UnpackTexPalette(wp->texture);
-		wp->loaded = TRUE;
-	}
-	else {
+	if (!wp->texture) {
 		sprintf(path, "%s/fade.tpl", getMarioStDvdRoot());
 		dvd = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(dvd));
@@ -75,10 +76,16 @@ void fadeTexSetup(void) {
 		dvd->info.cb.userData = dvd;
 		DVDMgrReadAsync(dvd, wp->texture, size, 0, _callback);
 	}
+	else {
+		UnpackTexPalette(wp->texture);
+		wp->loaded = TRUE;
+	}
 }
 
-//TODO: probably lots of switch statements
 void fadeEntry(s32 type, s32 duration, GXColor color) {
+	FadeEntry* entry;
+	s32 id;
+
 	if (!type) {
 		return;
 	}
@@ -115,10 +122,224 @@ void fadeEntry(s32 type, s32 duration, GXColor color) {
 	else if (type == 8) {
 		type = 4;
 	}
-	else if (((type - 3) <= 2 || type == 6) && duration < 1000) {
+	else if (((u32)(type - 3) <= 2 || type == 6) && duration < 1000) {
 		duration = 1000;
 	}
-
+	switch (type) {
+		case 0x1: case 0x2: case 0x3: case 0x4: case 0x5: case 0x6: case 0x9: case 0xA: case 0xB: case 0xC: case 0xD: case 0xE: case 0xF:
+			id = 0;
+			entry = &wp->entries[0];
+			fadeReset(2);
+			entry->field_0xA4 = 0;
+			switch (type) {
+				case 1: case 3: case 5: case 9: case 11: case 14:
+					if (duration) {
+						entry->field_0xA4 = 2;
+					}
+					break;
+			}
+			break;
+		case 0x16: case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28: case 0x33:
+			id = 1;
+			entry = &wp->entries[1];
+			break;
+		case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+			id = 2;
+			entry = &wp->entries[2];
+			fadeReset(0);
+			break;
+		case 0x31: case 0x32: case 0x34: case 0x35: case 0x36: case 0x37: case 0x38: case 0x39: case 0x3A: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+			id = 3;
+			entry = &wp->entries[3];
+			switch (type) {
+				case 0x32: case 0x35: case 0x36: case 0x38: case 0x3A:
+					fadeReset(0);
+					break;
+			}
+			break;
+		case 0x3F: case 0x40:
+			id = 4;
+			entry = &wp->entries[4];
+			break;
+	}
+	entry->flags = 0;
+	entry->flags |= 1;
+	entry->type = type;
+	*(s64*)&entry->field_0x10 = duration;
+	entry->color = color;
+	entry->field_0x24 = 0.0f;
+	entry->field_0x28 = 0.0f;
+	entry->field_0x5C = 0.0f;
+	entry->field_0x8 = 0;
+	entry->animOffsetX = 0.0f;
+	entry->animOffsetY = 0.0f;
+	entry->field_0x90 = 1.0f;
+	if (type != 0x32 && type != 0x35) {
+		entry->callback = NULL;
+	}
+	wp->field_0x350 = id;
+	if (type == 0x22 || type == 0x28) {
+		entry->field_0x90 = 3.0f;
+	}
+	switch (type) {
+		case 0x2B:
+			entry->field_0x60 = "OFF_d_dokan_down";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x2C:
+			entry->field_0x60 = "OFF_d_dokan_down";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x29:
+			entry->field_0x60 = "OFF_d_dokan_up";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x2A:
+			entry->field_0x60 = "OFF_d_dokan_up";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x2D:
+			entry->field_0x60 = "OFF_d_dokan_left";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x2E:
+			entry->field_0x60 = "OFF_d_dokan_left";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x2F:
+			entry->field_0x60 = "OFF_d_dokan_right";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x30:
+			entry->field_0x60 = "OFF_d_dokan_right";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x16:
+			entry->field_0x60 = "OFF_d_maku_up_down";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x17:
+			entry->field_0x60 = "OFF_d_maku_up_down";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x18:
+		case 0x1B:
+		case 0x3F:
+			entry->field_0x60 = "OFF_d_maku_left_right";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x1A:
+			entry->field_0x60 = "OFF_d_maku_left_right";
+			entry->field_0x64 = "Z_1";
+			entry->imageType = 2;
+			break;
+		case 0x19:
+		case 0x1C:
+		case 0x40:
+			entry->field_0x60 = "OFF_d_maku_left_right";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x1D:
+		case 0x23:
+			entry->field_0x60 = "OFF_d_maku_center";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x1E:
+		case 0x24:
+			entry->field_0x60 = "OFF_d_maku_center";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x1F:
+		case 0x22:
+		case 0x25:
+		case 0x28:
+			entry->field_0x60 = "OFF_d_maku_center";
+			entry->field_0x64 = "Z_2";
+			entry->imageType = 2;
+			break;
+		case 0x20:
+		case 0x26:
+			entry->field_0x60 = "OFF_d_maku_center";
+			entry->field_0x64 = "Z_1";
+			entry->imageType = 2;
+			break;
+		case 0x31:
+		case 0x34:
+			entry->field_0x60 = "OFF_d_meku";
+			entry->field_0x64 = "Z_1";
+			entry->imageType = 2;
+			break;
+		case 0x32:
+		case 0x35:
+			entry->field_0x60 = "OFF_d_meku";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x33:
+			entry->field_0x60 = "OFF_d_four_meku_5sec";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x36:
+			entry->field_0x60 = "OFF_f_in_out_mario";
+			entry->field_0x64 = "A_3";
+			entry->imageType = 2;
+			break;
+		case 0x37:
+			entry->field_0x60 = "OFF_f_in_out_mario";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x38:
+			entry->field_0x60 = "OFF_f_in_out_peach";
+			entry->field_0x64 = "A_3";
+			entry->imageType = 2;
+			break;
+		case 0x39:
+			entry->field_0x60 = "OFF_f_in_out_peach";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x3A:
+			entry->field_0x60 = "OFF_f_in_out_kuppa";
+			entry->field_0x64 = "A_3";
+			entry->imageType = 2;
+			break;
+		case 0x3B:
+			entry->field_0x60 = "OFF_f_in_out_kuppa";
+			entry->field_0x64 = "A_1";
+			entry->imageType = 2;
+			break;
+		case 0x3C:
+			entry->field_0x60 = "OFF_f_in_out_mario";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x3D:
+			entry->field_0x60 = "OFF_f_in_out_peach";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+		case 0x3E:
+			entry->field_0x60 = "OFF_f_in_out_kuppa";
+			entry->field_0x64 = "A_2";
+			entry->imageType = 2;
+			break;
+	}
 }
 
 void fadeTecOn(void) {
@@ -156,13 +377,15 @@ void fadeWhiteOutOff(void) {
 }
 
 void fadeSetSpotPos(f32 x, f32 y) {
-	wp->entries[0].fadeSpotX = x;
-	wp->entries[0].fadeSpotY = y;
+	FadeEntry* entry = &wp->entries[0];
+	entry->fadeSpotX = x;
+	entry->fadeSpotY = y;
 }
 
 void fadeSetAnimOfsPos(f32 x, f32 y) {
-	wp->entries[1].animOffsetX = x;
-	wp->entries[1].animOffsetY = y;
+	FadeEntry* entry = &wp->entries[1];
+	entry->animOffsetX = x;
+	entry->animOffsetY = y;
 }
 
 void fadeSetAnimVirtualPos(f32 x, f32 y, f32 z) {
@@ -172,43 +395,852 @@ void fadeSetAnimVirtualPos(f32 x, f32 y, f32 z) {
 }
 
 void fadeSetOffscreenCallback(OffscreenCallback callback, void* param) {
-	wp->entries[3].callback = callback;
-	wp->entries[3].offparam = param;
+	FadeEntry* entry = &wp->entries[3];
+	entry->callback = callback;
+	entry->offparam = param;
 }
+
+static inline void fadeCapture(const char* name, const char* off, s32 mode) {
+	EventEntry evt;
+	s32 args[10];
+
+	evt.args = args;
+	args[0] = (s32)name;
+	args[1] = 0;
+	args[2] = (s32)off;
+	args[3] = mode;
+	args[4] = 0;
+	args[5] = 0;
+	args[6] = 608;
+	args[7] = 480;
+	evt_img_alloc_capture(&evt, TRUE);
+}
+
+#define FADE_DURATION(e) (*(s64*)&(e)->field_0x10)
+#define IMG_TIME(img) (*(OSTime*)((u8*)(img) + 0x110))
+#define SFX_ON(id) ((s32 (*)(s32))psndSFXOn)(id)
 
 void fadeMain(void) {
+	FadeEntry* entry;
+	s32 i;
 
+	entry = &wp->entries[0];
+	for (i = 0; i < 5; i++, entry++) {
+		if (!(entry->flags & 1)) {
+			continue;
+		}
+		switch (entry->type) {
+			case 1: case 3: case 5: case 9: case 11: case 14:
+				switch (entry->field_0x8) {
+					case 0:
+						if (FADE_DURATION(entry) != 0) {
+							if ((s32)entry->field_0xA4 != 0) {
+								entry->field_0xA4--;
+							}
+							else {
+								entry->field_0x5C += 16.666666f;
+							}
+							entry->field_0x24 = entry->field_0x5C / FADE_DURATION(entry);
+							entry->field_0x24 = 1.0f - entry->field_0x24;
+							entry->field_0x28 += 10.0f;
+							if (entry->field_0x24 < 0.0f) {
+								entry->field_0x24 = 0.0f;
+								entry->flags |= 2;
+								entry->field_0x8++;
+							}
+						}
+						else {
+							entry->field_0x24 = 0.0f;
+							entry->flags |= 2;
+							entry->field_0x8++;
+						}
+						break;
+				}
+				break;
+			case 2: case 4: case 6: case 10: case 12: case 13: case 15:
+				switch (entry->field_0x8) {
+					case 0:
+						if (FADE_DURATION(entry) != 0) {
+							entry->field_0x5C += 16.666666f;
+							entry->field_0x24 = entry->field_0x5C / FADE_DURATION(entry);
+							entry->field_0x28 -= 10.0f;
+							if (entry->field_0x24 > 1.0f) {
+								entry->field_0x24 = 1.0f;
+								entry->flags |= 2;
+								entry->field_0x8++;
+							}
+						}
+						else {
+							entry->field_0x24 = 1.0f;
+							entry->flags |= 2;
+							entry->field_0x8++;
+						}
+						break;
+				}
+				break;
+			case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+				switch (entry->field_0x8) {
+					case 0:
+						if ((s32)animGroupBaseAsync(entry->field_0x60, entry->imageType, NULL) == 0) {
+							if (entry->field_0x70 < 0 && (entry->type == 0x2A || entry->type == 0x2C || entry->type == 0x2E || entry->type == 0x30)) {
+								wp->flags |= 0x8000;
+							}
+							break;
+						}
+						wp->flags &= ~0x8000;
+						if (entry->field_0x70 >= 0) {
+							imgRelease(entry->image, entry->imageType);
+							animPaperPoseRelease(entry->field_0x70);
+							entry->field_0x70 = -1;
+							entry->image = NULL;
+						}
+						entry->field_0x70 = animPaperPoseEntry(entry->field_0x60, entry->imageType);
+						imgEntry("fImg_dokan", entry->imageType);
+						entry->image = imgNameToPtr("fImg_dokan", entry->imageType);
+						entry->image->poseId = animPaperPoseGetId(entry->field_0x60, entry->imageType);
+						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->field_0x108 = (s32)entry->field_0x64;
+						imgClearVirtualPoint(entry->image);
+						fadeCapture("fImg_dokan", NULL, 0);
+						switch (entry->type) {
+							case 0x2D:
+								entry->field_0x98 = SFX_ON(0x403AB);
+								break;
+							case 0x2F:
+								entry->field_0x98 = SFX_ON(0x403AC);
+								break;
+							case 0x29:
+								entry->field_0x98 = SFX_ON(0x403AD);
+								break;
+							case 0x2B:
+								entry->field_0x98 = SFX_ON(0x403AE);
+								break;
+							case 0x2E:
+								entry->field_0x98 = SFX_ON(0x403AF);
+								break;
+							case 0x30:
+								entry->field_0x98 = SFX_ON(0x403B0);
+								break;
+							case 0x2A:
+								entry->field_0x98 = SFX_ON(0x403B1);
+								break;
+							case 0x2C:
+								entry->field_0x98 = SFX_ON(0x403B2);
+								break;
+						}
+						entry->field_0x8++;
+						break;
+					case 1:
+						if (entry->image->field_0x118 >= 1.0f) {
+							entry->flags |= 2;
+							switch (entry->type) {
+								case 0x2A: case 0x2C: case 0x2E: case 0x30:
+									imgRelease(entry->image, entry->imageType);
+									animPaperPoseRelease(entry->field_0x70);
+									entry->field_0x70 = -1;
+									entry->image = NULL;
+									break;
+							}
+							entry->field_0x8++;
+						}
+						break;
+				}
+				break;
+			case 0x31: case 0x34: case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+				switch (entry->field_0x8) {
+					case 0:
+						if ((s32)animGroupBaseAsync(entry->field_0x60, entry->imageType, NULL) == 0) {
+							break;
+						}
+						if (entry->field_0x70 >= 0) {
+							imgRelease(entry->image, entry->imageType);
+							animPaperPoseRelease(entry->field_0x70);
+							entry->field_0x70 = -1;
+							entry->image = NULL;
+						}
+						entry->field_0x70 = animPaperPoseEntry(entry->field_0x60, entry->imageType);
+						animPoseSetMaterialFlagOn(entry->field_0x70, 0x1800);
+						imgEntry("fImg_peron", entry->imageType);
+						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
+						entry->image->poseId = animPaperPoseGetId(entry->field_0x60, entry->imageType);
+						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->field_0x108 = (s32)entry->field_0x64;
+						imgClearVirtualPoint(entry->image);
+						switch (entry->type) {
+							case 0x34:
+								offscreenEntry("fOff_peron");
+								fadeCapture("fImg_peron", "fOff_peron", 0);
+								break;
+							case 0x37: case 0x39: case 0x3B:
+								fadeCapture("fImg_peron", NULL, 2);
+								entry->image->camId = 10;
+								entry->image->field_0x154 = 10;
+								SFX_ON(0x403B4);
+								break;
+							case 0x3C: case 0x3D: case 0x3E:
+								fadeCapture("fImg_peron", NULL, 2);
+								entry->image->camId = 9;
+								entry->image->field_0x154 = 9;
+								break;
+							default:
+								fadeCapture("fImg_peron", NULL, 2);
+								break;
+						}
+						entry->field_0x8++;
+						break;
+					case 1:
+						if (entry->image->field_0x118 >= 1.0f) {
+							switch (entry->type) {
+								case 0x37: case 0x39: case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+									IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+									*(const char**)&entry->image->field_0x108 = "A_2";
+									break;
+								default:
+									entry->flags |= 2;
+									break;
+							}
+							entry->field_0x8++;
+						}
+						break;
+					case 2:
+						if (entry->image->field_0x118 >= 1.0f) {
+							entry->flags |= 2;
+							entry->field_0x8++;
+						}
+						break;
+				}
+				break;
+			case 0x32: case 0x35: case 0x36: case 0x38: case 0x3A:
+				switch (entry->field_0x8) {
+					case 0:
+						entry->image = imgNameToPtr("fImg_peron", entry->imageType);
+						entry->image->poseId = animPaperPoseGetId(entry->field_0x60, entry->imageType);
+						IMG_TIME(entry->image) = animTimeGetTime(entry->imageType);
+						entry->image->field_0x108 = (s32)entry->field_0x64;
+						imgClearVirtualPoint(entry->image);
+						switch (entry->type) {
+							case 0x36: case 0x38: case 0x3A:
+								SFX_ON(0x403B5);
+								break;
+							case 0x32: case 0x35:
+								SFX_ON(0x40365);
+								break;
+						}
+						entry->field_0x8++;
+						break;
+					case 1:
+						if (entry->image->field_0x118 >= 1.0f) {
+							entry->flags |= 2;
+							imgRelease(entry->image, entry->imageType);
+							animPaperPoseRelease(entry->field_0x70);
+							entry->field_0x70 = -1;
+							entry->image = NULL;
+							if (entry->type == 0x35) {
+								offscreenDelete("fOff_peron");
+							}
+							entry->field_0x8++;
+						}
+						break;
+				}
+				break;
+			case 0x16:
+				switch (entry->field_0x8) {
+					case 0:
+						if ((s32)animGroupBaseAsync(entry->field_0x60, entry->imageType, NULL) == 0) {
+							break;
+						}
+						if (entry->field_0x6C >= 0) {
+							animPoseRelease(entry->field_0x6C);
+						}
+						entry->field_0x6C = animPoseEntry(entry->field_0x60, entry->imageType);
+						animPoseSetMaterialFlagOn(entry->field_0x6C, 0x1800);
+						animPoseSetAnim(entry->field_0x6C, entry->field_0x64, TRUE);
+						entry->animColor = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+						animPoseSetMaterialFlagOff(entry->field_0x6C, 0x40);
+						entry->field_0x8++;
+					case 1:
+						animPoseMain(entry->field_0x6C);
+						if (animPoseGetLoopTimes(entry->field_0x6C) >= 1.0f) {
+							entry->flags |= 2;
+							entry->field_0x8++;
+						}
+						break;
+					case 2:
+						animPoseMain(entry->field_0x6C);
+						break;
+				}
+				break;
+			case 0x17:
+				switch (entry->field_0x8) {
+					case 0:
+						if ((s32)animGroupBaseAsync(entry->field_0x60, entry->imageType, NULL) == 0) {
+							break;
+						}
+						if (entry->field_0x6C >= 0) {
+							animPoseRelease(entry->field_0x6C);
+						}
+						entry->field_0x6C = animPoseEntry(entry->field_0x60, entry->imageType);
+						animPoseSetMaterialFlagOn(entry->field_0x6C, 0x1800);
+						animPoseSetAnim(entry->field_0x6C, entry->field_0x64, TRUE);
+						entry->animColor = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+						animPoseSetMaterialFlagOff(entry->field_0x6C, 0x40);
+						entry->field_0x8++;
+					case 1:
+						if (animPoseGetLoopTimes(entry->field_0x6C) >= 0.5f) {
+							entry->animColor.r *= 0.98f;
+							entry->animColor.g *= 0.98f;
+							entry->animColor.b *= 0.98f;
+							animPoseSetMaterialEvtColor(entry->field_0x6C, entry->animColor);
+							animPoseSetMaterialFlagOn(entry->field_0x6C, 0x40);
+						}
+						animPoseMain(entry->field_0x6C);
+						if (animPoseGetLoopTimes(entry->field_0x6C) >= 1.0f) {
+							entry->flags |= 2;
+							entry->field_0x8++;
+							animPoseRelease(entry->field_0x6C);
+							entry->field_0x6C = -1;
+						}
+						break;
+				}
+				break;
+			case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C: case 0x1D: case 0x1E: case 0x1F: case 0x20:
+			case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x28: case 0x33: case 0x3F: case 0x40:
+				switch (entry->field_0x8) {
+					case 0:
+						if ((s32)animGroupBaseAsync(entry->field_0x60, entry->imageType, NULL) == 0) {
+							break;
+						}
+						switch (entry->type) {
+							case 0x18: case 0x1B: case 0x3F:
+								entry->field_0x98 = SFX_ON(0x40325);
+								break;
+							case 0x19: case 0x1C: case 0x40:
+								entry->field_0x98 = SFX_ON(0x40326);
+								break;
+							case 0x1D: case 0x23:
+								entry->field_0x98 = SFX_ON(0x40321);
+								break;
+							case 0x1E: case 0x24:
+								entry->field_0x98 = SFX_ON(0x40322);
+								break;
+						}
+						if (entry->field_0x6C >= 0) {
+							animPoseRelease(entry->field_0x6C);
+						}
+						entry->field_0x6C = animPoseEntry(entry->field_0x60, entry->imageType);
+						animPoseSetMaterialFlagOn(entry->field_0x6C, 0x1800);
+						animPoseSetAnim(entry->field_0x6C, entry->field_0x64, TRUE);
+						entry->field_0x8++;
+						if (entry->type == 0x22 || entry->type == 0x28) {
+							entry->field_0x90 = 3.0f;
+							entry->field_0x94 = 0;
+						}
+					case 1:
+						animPoseMain(entry->field_0x6C);
+						if (entry->type == 0x22 || entry->type == 0x28) {
+							if (!(entry->flags & 8)) {
+								if (entry->field_0x94 < 180) {
+									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 180, 3.0f, 1.0f);
+								}
+							}
+							else {
+								if (entry->field_0x94 < 90) {
+									entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 90, 1.5f, 1.0f);
+								}
+							}
+						}
+						if (animPoseGetLoopTimes(entry->field_0x6C) >= 1.0f) {
+							if (entry->type == 0x22 || entry->type == 0x28) {
+								if (!(entry->flags & 8)) {
+									if (entry->field_0x94 == 180) {
+										entry->flags |= 2;
+										entry->field_0x8++;
+									}
+								}
+								else {
+									if (entry->field_0x94 == 90) {
+										entry->flags |= 2;
+										entry->field_0x8++;
+									}
+								}
+							}
+							else {
+								entry->flags |= 2;
+								entry->field_0x8++;
+								psndSFXOff(entry->field_0x98);
+								if (entry->type == 0x19 || entry->type == 0x1C || entry->type == 0x40) {
+									animPoseRelease(entry->field_0x6C);
+									entry->field_0x6C = -1;
+								}
+							}
+						}
+						break;
+					case 2:
+						if (entry->field_0x6C >= 0) {
+							animPoseMain(entry->field_0x6C);
+						}
+						break;
+				}
+				break;
+			case 0x21: case 0x27:
+				switch (entry->field_0x8) {
+					case 0:
+						entry->field_0x90 = 1.0f;
+						entry->field_0x94 = 0;
+						entry->field_0x8++;
+					case 1:
+						animPoseMain(entry->field_0x6C);
+						if (entry->field_0x94 < 120) {
+							entry->field_0x90 = intplGetValue(12, ++entry->field_0x94, 120, 1.0f, 3.0f);
+						}
+						else {
+							entry->flags |= 2;
+							entry->field_0x8++;
+							animPoseRelease(entry->field_0x6C);
+							entry->field_0x6C = -1;
+						}
+						break;
+				}
+				break;
+		}
+		switch (entry->type) {
+			case 0x16: case 0x17: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27: case 0x28:
+				dispEntry(CAMERA_FADE, 0.0f, 0, disp_maku, entry);
+				break;
+			case 0x1B: case 0x1C: case 0x3F: case 0x40:
+				dispEntry(CAMERA_FADE2, 0.0f, 0, disp_maku, entry);
+				break;
+			case 0x18: case 0x19: case 0x1A: case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x33:
+				dispEntry(CAMERA_3D_IMAGE, 0.0f, 0, disp_maku, entry);
+				break;
+			case 0x31: case 0x32: case 0x34: case 0x35: case 0x36: case 0x37: case 0x38: case 0x39: case 0x3A:
+			case 0x3B: case 0x3C: case 0x3D: case 0x3E:
+				if (entry->field_0x70 >= 0 && entry->callback) {
+					dispEntry(CAMERA_OFFSCREEN2, 0.0f, 0, entry->callback, entry->offparam);
+				}
+				break;
+			case 0xB: case 0xC: case 0xD:
+				dispEntry(CAMERA_2D, 1000.0f, 0, disp_texture, wp);
+				break;
+			case 5: case 6: case 0xE: case 0xF:
+				dispEntry(CAMERA_3D, 0.0f, 7, disp_texture, wp);
+				break;
+			case 0x29: case 0x2A: case 0x2B: case 0x2C: case 0x2D: case 0x2E: case 0x2F: case 0x30:
+				break;
+			default:
+				dispEntry(CAMERA_FADE, 0.0f, 0, disp_texture, wp);
+				break;
+		}
+	}
+	if (wp->flags & 0x3000) {
+		dispEntry(CAMERA_2D, 999.0f, 0, disp_tec, wp);
+	}
+	if (wp->flags & 0x8000) {
+		dispEntry(CAMERA_FADE, -100.0f, 0, disp_dummy_black, wp);
+	}
+	if (wp->flags & 0x4000) {
+		dispEntry(CAMERA_3D, 1000.0f, 7, disp_dummy_black, wp);
+	}
 }
+
 
 void disp_texture(CameraId camId, void* param) {
-	//passed wp, unused
+	FadeWork* work;
+	CameraEntry* camera;
+	f32 scale;
+	f32 p;
+	f32 size;
+	Mtx mtx1;
+	Mtx mtx2;
+	Mtx mtx3;
+	Mtx mtx4;
+	GXTexObj obj;
+	f32 proj[7];
+	static u8 i4tex = 0xFF;
+
+	camera = camGetPtr(CAMERA_2D);
+	work = wp;
+	switch (work->entries[0].type) {
+		case 1:
+		case 3:
+		case 5:
+		case 9:
+		case 11:
+		case 14:
+			if (work->entries[0].flags & 2) {
+				return;
+			}
+	}
+	GXGetProjectionv(proj);
+	GXSetProjection(camera->projection, camera->projType);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, (GXLogicOp)7);
+	GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+	GXSetNumChans(0);
+	GXSetNumTevStages(1);
+	GXSetNumTexGens(1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
+	GXSetCullMode(GX_CULL_BACK);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+	switch (work->entries[0].type) {
+		case 1:
+		case 2:
+			GXLoadPosMtxImm(camera->view, 0);
+			GXSetCurrentMtx(0);
+			TEXGetGXTexObjFromPalette(wp->texture, &obj, 0);
+			GXLoadTexObj(&obj, GX_TEXMAP0);
+			if (!(work->entries[0].flags & 2)) {
+				p = work->entries[0].field_0x24;
+				scale = p * (p * (p * (100.0f * p * p)));
+				PSMTXTrans(mtx1, 0.5f, 0.5f, 0.0f);
+				PSMTXScale(mtx3, scale, scale, 1.0f);
+				PSMTXTrans(mtx2, -0.5f, -0.5f, 0.0f);
+				PSMTXConcat(mtx1, mtx3, mtx3);
+				PSMTXConcat(mtx3, mtx2, work->entries[0].texMtx);
+			}
+			else if (work->entries[0].type == 2) {
+				PSMTXTrans(work->entries[0].texMtx, 1.0f, 1.0f, 0.0f);
+			}
+			break;
+		case 3:
+		case 4:
+		case 5:
+		case 6:
+			GXLoadPosMtxImm(camera->view, 0);
+			GXSetCurrentMtx(0);
+			TEXGetGXTexObjFromPalette(wp->texture, &obj, 1);
+			GXLoadTexObj(&obj, GX_TEXMAP0);
+			if (!(work->entries[0].flags & 2)) {
+				p = work->entries[0].field_0x24;
+				scale = p * (p * (p * (100.0f * p * p)));
+				PSMTXTrans(mtx1, 0.5f, 0.5f, 0.0f);
+				PSMTXScale(mtx3, scale, scale, 1.0f);
+				PSMTXRotRad(mtx4, 'z', 0.017453292f * work->entries[0].field_0x28);
+				PSMTXTrans(mtx2, -0.5f - work->entries[0].fadeSpotX / gp->fbWidth,
+					-0.5f + work->entries[0].fadeSpotY / gp->efbHeight, 0.0f);
+				PSMTXConcat(mtx1, mtx3, mtx3);
+				PSMTXConcat(mtx3, mtx4, mtx3);
+				PSMTXConcat(mtx3, mtx2, work->entries[0].texMtx);
+			}
+			else if (work->entries[0].type == 4 || work->entries[0].type == 6) {
+				PSMTXTrans(work->entries[0].texMtx, 1.0f, 1.0f, 0.0f);
+			}
+			break;
+		case 9:
+		case 10:
+		case 11:
+		case 12:
+		case 14:
+		case 15:
+			GXLoadPosMtxImm(camera->view, 0);
+			GXSetCurrentMtx(0);
+			GXInitTexObj(&obj, &i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+			GXLoadTexObj(&obj, GX_TEXMAP0);
+			PSMTXIdentity(work->entries[0].texMtx);
+			work->entries[0].color.a = 255.0f * work->entries[0].field_0x24;
+			break;
+		case 13:
+			GXLoadPosMtxImm(camera->view, 0);
+			GXSetCurrentMtx(0);
+			GXInitTexObj(&obj, &i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+			GXLoadTexObj(&obj, GX_TEXMAP0);
+			PSMTXIdentity(work->entries[0].texMtx);
+			break;
+	}
+	GXLoadTexMtxImm(work->entries[0].texMtx, GX_TEXMTX0, GX_MTX2x4);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+	GXSetTevColor(GX_TEVREG0, work->entries[0].color);
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	size = 304.0f;
+	GXPosition3f32(-size, size, 0.0f);
+	GXTexCoord2f32(0.0f, 0.0f);
+	GXPosition3f32(size, size, 0.0f);
+	GXTexCoord2f32(1.0f, 0.0f);
+	GXPosition3f32(size, -size, 0.0f);
+	GXTexCoord2f32(1.0f, 1.0f);
+	GXPosition3f32(-size, -size, 0.0f);
+	GXTexCoord2f32(0.0f, 1.0f);
+	GXSetProjectionv(proj);
 }
 
-void z(void) {
+#pragma dont_inline on
+static f32 z(void) {
+	FadeWork* work = wp;
+	CameraEntry* camera;
+	Vec pos;
+	f32 base;
 
+	camera = camGetPtr(CAMERA_3D);
+	if (camera->projType == GX_PERSPECTIVE) {
+		return 1.0f;
+	}
+	camera = camGetPtr(CAMERA_FADE);
+	PSMTXMultVec(camera->view, &work->entries[1].VirtualPos, &pos);
+	base = camera->viewport[5] + (camera->viewport[5] - camera->viewport[4]) *
+		((1.0f / -pos.z) * (camera->projection[2][2] * pos.z + camera->projection[2][3]));
+	camera = camGetPtr(CAMERA_3D);
+	PSMTXMultVec(camera->view, &work->entries[1].VirtualPos, &pos);
+	return (camera->viewport[5] + (camera->viewport[5] - camera->viewport[4]) *
+		(1.0f * (camera->projection[2][2] * pos.z + camera->projection[2][3]))) / base;
 }
+
+#pragma dont_inline reset
 
 static void zFill(void) {
+	static s32 depth_image[32] = {
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
+		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+	CameraEntry* camera;
+	f32 y0, y1, x0, x1;
+	f32 zpos;
+	GXTexObj obj;
+	Mtx mtx;
 
+	camera = camGetCurPtr();
+	y0 = (camera->near + camera->far) * 0.5f;
+	y0 = y0 * (f32)tan(0.5f * ((6.2831855f * camera->fovY) / 360.0f));
+	x1 = y0 * camera->aspect;
+	y1 = -y0;
+	x0 = -x1;
+	GXInitTexObj(&obj, depth_image, 4, 4, GX_TF_Z8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+	GXLoadTexObj(&obj, GX_TEXMAP0);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	GXSetNumTevStages(1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GXSetZTexture(GX_ZT_REPLACE, GX_TF_Z8, 0);
+	GXSetNumChans(0);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetBlendMode(GX_BM_LOGIC, GX_BL_ONE, GX_BL_ZERO, GX_LO_COPY);
+	GXSetZMode(GX_TRUE, GX_ALWAYS, GX_TRUE);
+	GXSetColorUpdate(GX_FALSE);
+	GXSetAlphaUpdate(GX_FALSE);
+	GXSetCullMode(GX_CULL_NONE);
+	GXClearVtxDesc();
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_U8, 0);
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	PSMTXIdentity(mtx);
+	GXLoadPosMtxImm(camera->view, 0);
+	GXSetCurrentMtx(0);
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	zpos = -10000.0f;
+	GXPosition3f32(x0, y0, zpos);
+	GXTexCoord2u8(0, 0);
+	GXPosition3f32(x1, y0, zpos);
+	GXTexCoord2u8(1, 0);
+	GXPosition3f32(x1, y1, zpos);
+	GXTexCoord2u8(1, 1);
+	GXPosition3f32(x0, y1, zpos);
+	GXTexCoord2u8(0, 1);
+	GXSetZTexture(GX_ZT_DISABLE, GX_TF_Z8, 0);
+	GXSetColorUpdate(GX_TRUE);
 }
 
 void disp_maku(CameraId camId, void* param) {
 	FadeEntry* entry = param;
+	CameraEntry* camera;
+	f32 scale, depth, mag, sx;
+	Mtx mtx2;
+	Mtx mtx;
+	Vec dist;
+	Vec dir;
 
+	camera = camGetPtr(camId);
+	switch (entry->type) {
+		case 0x17:
+		case 0x19:
+		case 0x1C:
+		case 0x40:
+			if (entry->flags & 2) {
+				return;
+			}
+	}
+	switch (entry->type) {
+		case 0x16: case 0x17: case 0x18: case 0x19: case 0x1A: case 0x1B: case 0x1C:
+		case 0x1D: case 0x1E: case 0x1F: case 0x20: case 0x21: case 0x22: case 0x23:
+		case 0x24: case 0x25: case 0x26: case 0x27: case 0x28: case 0x33: case 0x3F: case 0x40:
+			break;
+		default:
+			return;
+	}
+	if (entry->field_0x6C < 0) {
+		return;
+	}
+	if (entry->flags & 4) {
+		camera = camGetPtr(CAMERA_3D);
+		depth = tan(3.141592f * ((camera->fovY * 0.5f) / 180.0f));
+		depth = 24.0f / depth;
+		PSVECSubtract(&camGetPtr(CAMERA_3D)->cameraPos, &entry->VirtualPos, &dist);
+		camera = camGetPtr(CAMERA_3D);
+		dir = *(Vec*)camera->view[2];
+		PSVECNormalize(&dir, &dir);
+		dist.x *= dir.x;
+		dist.y *= dir.y;
+		dist.z *= dir.z;
+		mag = PSVECMag(&dist);
+		scale = mag / depth;
+		depth = depth - mag;
+		animPoseSetGXFunc(entry->field_0x6C, NULL, FALSE);
+		GXSetZScaleOffset(z(), 0.0f);
+	}
+	else {
+		scale = entry->field_0x90;
+		depth = 0.0f;
+		zFill();
+	}
+	PSMTXTrans(mtx, 64.0f * ((entry->animOffsetX * scale + 0.0f) / gp->fbWidth),
+		48.0f * ((entry->animOffsetY * scale + 0.0f) / gp->efbHeight), depth);
+	PSMTXTrans(mtx2, -32.0f, 24.0f, 0.0f);
+	PSMTXConcat(mtx, mtx2, mtx);
+	sx = 608.0f / gp->fbWidth;
+	PSMTXScale(mtx2, sx, 480.0f / gp->efbHeight, sx);
+	PSMTXConcat(mtx, mtx2, mtx);
+	PSMTXTrans(mtx2, 32.0f, -24.0f, 0.0f);
+	PSMTXConcat(mtx, mtx2, mtx);
+	animPoseDrawMtx(entry->field_0x6C, mtx, 1, 0.0f, scale);
+	animPoseDrawMtx(entry->field_0x6C, mtx, 2, 0.0f, scale);
+	animPoseDrawMtx(entry->field_0x6C, mtx, 3, 0.0f, scale);
+	sysWaitDrawSync();
+}
+
+static inline GXColor fadeTecAlpha(f32 a) {
+	GXColor c = (GXColor){0, 0, 0, 0};
+	c.a = 255.0f * a;
+	return c;
 }
 
 void disp_tec(CameraId camId, void* param) {
-	//passed wp, unused
+	CameraEntry* camera;
+	GXTexObj obj;
 
+	camera = camGetPtr(camId);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, (GXLogicOp)7);
+	GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+	GXSetNumChans(0);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY);
+	if (wp->flags & 0x1000) {
+		TEXGetGXTexObjFromPalette(wp->texture, &obj, 2);
+		GXLoadTexObj(&obj, GX_TEXMAP0);
+	}
+	else {
+		TEXGetGXTexObjFromPalette(wp->texture, &obj, 3);
+		GXLoadTexObj(&obj, GX_TEXMAP0);
+	}
+	GXSetNumTevStages(1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_A0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_ZERO);
+	if (wp->flags & 0x1000) {
+		GXSetTevColor(GX_TEVREG0, (GXColor){0x19, 0x23, 0x2A, 0xFF});
+	}
+	else {
+		GXSetTevColor(GX_TEVREG0, (GXColor){0xE6, 0xE6, 0xE6, 0xFF});
+	}
+	if (wp->flags & 0x30) {
+		if (wp->flags & 0x10) {
+			wp->field_0x354 += 0.04f;
+			if (wp->field_0x354 > 1.0f) {
+				wp->field_0x354 = 1.0f;
+				wp->flags &= ~0x10;
+			}
+		}
+		else {
+			wp->field_0x354 -= 0.04f;
+			if (wp->field_0x354 < 0.0f) {
+				wp->field_0x354 = 0.0f;
+				wp->flags &= ~0x20;
+				wp->flags &= ~0x3000;
+			}
+		}
+		GXSetTevColor(GX_TEVREG1, fadeTecAlpha(wp->field_0x354));
+		GXSetNumTevStages(2);
+		GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+		GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+		GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A1, GX_CA_ZERO);
+	}
+	GXSetCullMode(GX_CULL_BACK);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+	GXLoadPosMtxImm(camera->view, 0);
+	GXSetCurrentMtx(0);
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	GXPosition3s16(-308, 244, 0);
+	GXTexCoord2f32(0.0f, 0.0f);
+	GXPosition3s16(308, 244, 0);
+	GXTexCoord2f32(2.0f, 0.0f);
+	GXPosition3s16(308, -244, 0);
+	GXTexCoord2f32(2.0f, 2.0f);
+	GXPosition3s16(-308, -244, 0);
+	GXTexCoord2f32(0.0f, 2.0f);
 }
 
 void disp_dummy_black(CameraId camId, void* param) {
-	//passed wp, unused
+	CameraEntry* camera;
+	f32 proj[7];
 
+	camera = camGetPtr(CAMERA_FADE);
+	GXGetProjectionv(proj);
+	GXSetProjection(camera->projection, camera->projType);
+	GXSetZCompLoc(GX_FALSE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, (GXLogicOp)7);
+	GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
+	if (wp->flags & 0x8000) {
+		GXSetChanMatColor(GX_COLOR0A0, (GXColor){0x00, 0x00, 0x00, 0xFF});
+	}
+	else {
+		GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	}
+	GXSetNumTevStages(1);
+	GXSetNumTexGens(1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevOp(GX_TEVSTAGE0, GX_PASSCLR);
+	GXLoadPosMtxImm(camera->view, 0);
+	GXSetCurrentMtx(0);
+	GXSetCullMode(GX_CULL_BACK);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	GXPosition3s16(-32, 24, 0);
+	GXPosition3s16(32, 24, 0);
+	GXPosition3s16(32, -24, 0);
+	GXPosition3s16(-32, -24, 0);
+	GXSetProjectionv(proj);
 }
 
 BOOL fadeIsFinish(void) {
-	return TRUE;
+	if (wp->field_0x350 == -1) {
+		return TRUE;
+	}
+	return (*(u16*)((u8*)wp + wp->field_0x350 * sizeof(FadeEntry) + 8) >> 1) & 1;
 }
 
 void fadeReset(s32 id) { //TODO: better param name?

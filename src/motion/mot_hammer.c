@@ -67,24 +67,30 @@ static inline s32 hamLv(void) {
 
 typedef struct { u8 pad[0x15]; char name[0x10]; } HamMobj;
 
+static s32 isS1(char* n);
+static s32 isB1(char* n);
+static s32 isS2(char* n);
+static s32 isB2(char* n);
+static s32 isS3(char* n);
+static s32 isB3(char* n);
+
 static inline s32 chkBlock(HamMobj* obj) {
 	s32 ok = 0;
-	if (strcmp(obj->name, "MOBJ_Lv1Block") == 0 || strcmp(obj->name, "MOBJ_Lv1BigBlock") == 0) {
+	if ((isS1(obj->name) || isB1(obj->name))) {
 		if (pouchGetPtr()->hammerLevel >= 1) {
 			ok = 1;
 		}
-	} else if (strcmp(obj->name, "MOBJ_Lv2Block") == 0 || strcmp(obj->name, "MOBJ_Lv2BigBlock") == 0) {
+	} else if ((isS2(obj->name) || isB2(obj->name))) {
 		if (pouchGetPtr()->hammerLevel >= 2) {
 			ok = 1;
 		}
-	} else if (strcmp(obj->name, "MOBJ_Lv3Block") == 0 || strcmp(obj->name, "MOBJ_Lv3BigBlock") == 0) {
+	} else if ((isS3(obj->name) || isB3(obj->name))) {
 		if (pouchGetPtr()->hammerLevel >= 3) {
 			ok = 1;
 		}
 	}
 	return ok;
 }
-
 
 s32 marioGetHammerLevel(void) {
 	return pouchGetPtr()->hammerLevel;
@@ -318,7 +324,7 @@ void mot_hammer(void) {
 
 s32 marioChkHammer2(void) {
 	MarioWork* mario = marioGetPtr();
-	s32 a, b;
+	s32 b, a;
 	f32 c;
 	if (pouchGetPtr()->hammerLevel < 2) {
 		return 0;
@@ -334,7 +340,7 @@ s32 marioChkHammer2(void) {
 		return 0;
 	}
 	mario->wMotionTimer++;
-	if (mario->controlStickSensitivity != 0 && mario->wMotionTimer > 10 && mario->currMotionId == 0 && !(mario->dispFlags & 0x40000000)) {
+	if (mario->controlStickSensitivity && mario->wMotionTimer > 10 && mario->currMotionId == 0 && !(mario->dispFlags & 0x40000000)) {
 		marioChgPose("M_I_Y");
 		marioVoiceGlareOn();
 	}
@@ -405,7 +411,7 @@ static const Vec v = {0.0f, 40.0f, 0.0f};
 
 void mot_hammer2(void) {
 	MarioWork* mario = marioGetPtr();
-	s32 a, b;
+	s32 b, a;
 	f32 c;
 	HitEntry* hit;
 	f32 ang, ang2;
@@ -624,6 +630,30 @@ void mot_hammer2(void) {
 	}
 }
 
+
+static s32 isB3(char* n) {
+	return strcmp(n, "MOBJ_Lv3BigBlock") == 0;
+}
+
+static s32 isS3(char* n) {
+	return strcmp(n, "MOBJ_Lv3Block") == 0;
+}
+
+static s32 isB2(char* n) {
+	return strcmp(n, "MOBJ_Lv2BigBlock") == 0;
+}
+
+static s32 isS2(char* n) {
+	return strcmp(n, "MOBJ_Lv2Block") == 0;
+}
+
+static s32 isB1(char* n) {
+	return strcmp(n, "MOBJ_Lv1BigBlock") == 0;
+}
+
+static s32 isS1(char* n) {
+	return strcmp(n, "MOBJ_Lv1Block") == 0;
+}
 
 f32 marioGetAngleKaitenHammer(void) {
 	MarioWork* mario = marioGetPtr();

@@ -1,3 +1,4 @@
+#pragma defer_codegen off
 #include "eff/n64/eff_ripple_n64.h"
 #include "eff/eff_n64.h"
 #include "driver/camdrv.h"
@@ -105,8 +106,8 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 void effRippleMain(EffectEntry* effect) {
-    s32 type;
     s32 lifetime;
+    s32 type;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     EffRippleN64Work* work = effect->userdata;
@@ -156,7 +157,7 @@ EffectEntry* effRippleN64Entry(s32 type, f32 x, f32 y, f32 z, f32 arg4) {
     EffRippleN64Work* work;
 
     effect = effEntry();
-    effect->type = "RippleN64";
+    effect->type = "RippleN64\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffRippleN64Work));
     effect->userdata = work;

@@ -381,7 +381,7 @@ static inline s32 badgeTexB(s32 e) { if (e) return 0x1C; return 0x1D; }
 void badge_disp(BWin* w, f32 xo, f32 yo) {
     GXColor colA = {255, 255, 255, 255};
     GXColor colB;
-    char buf[32];
+    char buf[64];
     s32 cnt;
     s32 i;
     s32 rowOff;

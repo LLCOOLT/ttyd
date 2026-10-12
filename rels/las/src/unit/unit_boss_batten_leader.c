@@ -2180,29 +2180,39 @@ void _light_point_callback(BattleUnitPart* part, s32 group) {
     }
     switch (idx) {
         case 0:
-            poseId = BtlUnit_GetPartsPtr(unit, 3)->poseId;
-            shape = animPoseGetShapeIdx(poseId, "pPlaneShape34");
-            animPoseDrawShape(poseId, shape);
+            {
+                s32 pose = BtlUnit_GetPartsPtr(unit, 3)->poseId;
+                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape34");
+                animPoseDrawShape(pose, sh);
+            }
             break;
         case 1:
-            poseId = BtlUnit_GetPartsPtr(unit, 4)->poseId;
-            shape = animPoseGetShapeIdx(poseId, "pPlaneShape37");
-            animPoseDrawShape(poseId, shape);
+            {
+                s32 pose = BtlUnit_GetPartsPtr(unit, 4)->poseId;
+                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape37");
+                animPoseDrawShape(pose, sh);
+            }
             break;
         case 2:
-            poseId = BtlUnit_GetPartsPtr(unit, 5)->poseId;
-            shape = animPoseGetShapeIdx(poseId, "pPlaneShape36");
-            animPoseDrawShape(poseId, shape);
+            {
+                s32 pose = BtlUnit_GetPartsPtr(unit, 5)->poseId;
+                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
+                animPoseDrawShape(pose, sh);
+            }
             break;
         case 3:
-            poseId = BtlUnit_GetPartsPtr(unit, 6)->poseId;
-            shape = animPoseGetShapeIdx(poseId, "pPlaneShape35");
-            animPoseDrawShape(poseId, shape);
+            {
+                s32 pose = BtlUnit_GetPartsPtr(unit, 6)->poseId;
+                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape35");
+                animPoseDrawShape(pose, sh);
+            }
             break;
         case 4:
-            poseId = BtlUnit_GetPartsPtr(unit, 7)->poseId;
-            shape = animPoseGetShapeIdx(poseId, "pPlaneShape36");
-            animPoseDrawShape(poseId, shape);
+            {
+                s32 pose = BtlUnit_GetPartsPtr(unit, 7)->poseId;
+                s32 sh = animPoseGetShapeIdx(pose, "pPlaneShape36");
+                animPoseDrawShape(pose, sh);
+            }
             break;
     }
 }

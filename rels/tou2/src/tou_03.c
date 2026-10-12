@@ -1,3 +1,4 @@
+#define GXSetTexCoordGen GXSetTexCoordGen_inline_hidden
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -21,6 +22,7 @@
 #include "memory.h"
 #include "mario/mariost.h"
 #include "driver/hitdrv.h"
+#undef GXSetTexCoordGen
 static void callback(MapTevCallbackInfo* info);
 typedef struct StoneEffWork { s32 field_0x0; Vec pos; } StoneEffWork;
 typedef struct StoneEffWork2 { u8 field_0x0[0x1C]; f32 rot; } StoneEffWork2;
@@ -33,7 +35,7 @@ double sin(double x);
 void psndMapChange(void);
 typedef struct ScreenWork { void* buf; s32 ready; f32 scale; f32 scaleTarget; f32 x; f32 xTarget; f32 y; f32 yTarget; s32 count; s32 mode; f32 field_0x28; u8* noise; } ScreenWork;
 static f32 randf(f32 min, f32 max);
-void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
+void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
 static void screen_capture(CameraId cameraId, void* param);
 void kyaku_disp(CameraId camera, void* param);
 static void pose_main(void);
@@ -193,7 +195,7 @@ static f32 cosf(f32 x);
 static f32 sinf(f32 x);
 USER_FUNC(tribe_chk);
 void screen_tev(MapTevCallbackInfo* info);
-void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
+void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
 static void screen_capture(CameraId cameraId, void* param);
 void ext_kyaku_dispent(void);
 void ext_kyaku_main(void);
@@ -2948,7 +2950,7 @@ static USER_FUNC(screen_evt) {
 }
 
 #pragma dont_inline on
-void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx) {
+void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx) {
     GXSetTexCoordGen2(dst, func, src, mtx, GX_FALSE, GX_PTIDENTITY);
 }
 #pragma dont_inline reset
@@ -3038,10 +3040,10 @@ void screen_tev(MapTevCallbackInfo* info) {
         } else {
             PSMTXScale(mtx, 4.75f, 3.75f, 0.0f);
         }
-        GXSetTexCoordGen_(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
         PSMTXScale(mtx, 1.0f, 6.0f * ((100.0f - camGetPtr(CAMERA_3D)->cameraPos.z) / 1000.0f) + 16.0f, 1.0f);
-        GXSetTexCoordGen_(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
+        GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
         info->tevStage = 2;
         info->texMap = 2;

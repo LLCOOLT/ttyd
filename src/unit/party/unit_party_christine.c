@@ -764,7 +764,7 @@ s32 partyChristineAttack_Kiss[] = {
 s32 christine_appeal_event[] = {
     196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1,
     66, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_APPEAL1", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_MARIO_APPEAL1\0\0", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos,
     -2, -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_FaceDirectionAdd, -2, -30000000,
     15, 131125, -29999999, 30, 196699, (s32)btlevtcmd_GetFaceDirection, -2, -29999986,
     131127, -29999986, 45, 983131, (s32)evt_eff, (s32)"", (s32)"kiss", 1,
@@ -931,19 +931,23 @@ USER_FUNC(_monosiri_flag_on) {
 }
 
 USER_FUNC(_dictionary) {
+    EventEntry* new_var3;
+    s32 new_var2;
+    s32* args = event->args;
     s32 state;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 selfId, targetId;
-    s32* args = event->args;
+    int new_var;
     void* work;
 
-    selfId = BattleTransID(event, -2);
+    selfId = (0, BattleTransID(event, -2));
     targetId = evtGetValue(event, args[0]);
-    targetId = BattleTransID(event, targetId);
+    new_var3 = event;
+    targetId = BattleTransID(new_var3, targetId);
     evtGetValue(event, args[1]);
     unit = BattleGetUnitPtr(wp, selfId);
-    state = unit->work[0];
+    state = (new_var2 = unit->work[0]);
     work = (void*)unit->work[1];
     switch (state) {
         case 0:
@@ -954,7 +958,8 @@ USER_FUNC(_dictionary) {
             break;
         case 2:
             monosiriMain(work);
-            state = 3;
+            new_var = 3;
+            state = new_var;
             break;
         case 3:
             monosiriMain(work);

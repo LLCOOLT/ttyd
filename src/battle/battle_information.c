@@ -58,7 +58,7 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	PointDropData* fp = group->fpDropTable;
 	BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
 	s32 pct;
-	s32 n;
+	s32 n, n2;
 	s32 held, random, none;
 	s32 type;
 	s32 r;
@@ -97,9 +97,9 @@ void BattleInformationSetDropMaterial(FieldBattleInfo* info) {
 	for (; fp->maxStatPercent; fp++) {
 		if (pct <= fp->maxStatPercent) {
 			r = irand(100);
-			n = fp->numDrops;
+			n2 = fp->numDrops;
 			if (r < fp->overallDropChance) {
-				for (; n != 0; n--) {
+				for (; n2 != 0; n2--) {
 					if (irand(100) < fp->dropChance) {
 						setup->flowersDropped++;
 					}

@@ -144,7 +144,7 @@ static void __NoHangRetraceCallback(u32 count) {
 		ovFrameCount++;
 		if (ovFrameCount >= FrameMissThreshold) {
 			__DEMODiagnoseHang();
-			strcpy(__GXErrorMessage, "---------WARNING : HANG AT HIGH WATERMARK----------\n");
+			strcpy(__GXErrorMessage, "---------WARNING : HANG AT HIGH WATERMARK----------\n\0\0\0");
 		}
 	}
 	else {

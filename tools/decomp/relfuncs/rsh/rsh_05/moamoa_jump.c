@@ -27,6 +27,7 @@
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;
+    f32 d;
     f32 angle;
 
     if (checkGround) {
@@ -44,9 +45,9 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
     moa->speed = speed;
     moa->gravity = gravity;
     dy = moa->target.y - pose->mtx[1][3];
-    dist = distABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
+    d = distABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
     angle = angleABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
-    moa->jumpTimer = dist / moa->speed;
+    moa->jumpTimer = d / moa->speed;
     moa->vy = dy / moa->jumpTimer + moa->gravity * moa->jumpTimer / 2;
     moa->state = 3;
     moa->next = next;

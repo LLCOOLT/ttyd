@@ -1,8 +1,9 @@
 name: Build
 
 on:
-  push:
-  pull_request:
+  # The build container (ghcr.io/doldecomp/ttyd-build) is private to upstream, so runs on this fork
+  # cannot pull it. Build status comes from the local checker's SHA-1 check (README badge) instead.
+  workflow_dispatch:
 
 jobs:
   build:

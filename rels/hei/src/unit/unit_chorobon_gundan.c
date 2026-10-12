@@ -494,7 +494,6 @@ void chorogun_ext_main(void) {
     f32 tz;
     f32 dz2;
     f32 dx2;
-    f32 d2;
     f32 x, y, z;
 
     wp = _battleWorkPointer;
@@ -546,8 +545,8 @@ void chorogun_ext_main(void) {
             break;
         case 10:
             if (pose->mtx[1][3] <= 0.0f) {
-                dz = c->pos.z - pose->mtx[2][3];
                 dx = c->pos.x - pose->mtx[0][3];
+                dz = c->pos.z - pose->mtx[2][3];
                 d = sqrt(dx * dx + dz * dz);
                 if (i % 100 == 0) {
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_TEAM_CHORO_TOGETHER1", 0x7F, 0, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
@@ -578,16 +577,16 @@ void chorogun_ext_main(void) {
             tx = unit->mPosition.x - unit->mHomePosition.x + intplGetValue(0, n, 1000, c->pos.x, unit->mHomePosition.x);
             tz = unit->mPosition.z - unit->mHomePosition.z + intplGetValue(0, n, 1000, c->pos.z, unit->mHomePosition.z);
             if (pose->mtx[1][3] <= unit->mPosition.y) {
-                dz2 = tz - pose->mtx[2][3];
                 dx2 = tx - pose->mtx[0][3];
-                d2 = sqrt(dx2 * dx2 + dz2 * dz2);
+                dz2 = tz - pose->mtx[2][3];
+                d = sqrt(dx2 * dx2 + dz2 * dz2);
                 if (i % 100 == 0) {
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_TEAM_CHORO_WAIT1", 0x60, 0, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                 }
                 c->speed = 3.0f + 0.5f * rand() / 32767.0f;
-                c->vel.x = c->speed * (dx2 / d2);
+                c->vel.x = c->speed * (dx2 / d);
                 c->vel.y = c->speed;
-                c->vel.z = c->speed * (dz2 / d2);
+                c->vel.z = c->speed * (dz2 / d);
                 pose->mtx[1][3] = unit->mPosition.y;
             } else {
                 c->vel.y += -0.5f;
@@ -603,18 +602,18 @@ void chorogun_ext_main(void) {
             c->target.z = z;
         case 31:
             if (pose->mtx[1][3] <= 0.0f) {
-                dz2 = c->target.z - pose->mtx[2][3];
                 dx2 = c->target.x - pose->mtx[0][3];
-                d2 = sqrt(dx2 * dx2 + dz2 * dz2);
+                dz2 = c->target.z - pose->mtx[2][3];
+                d = sqrt(dx2 * dx2 + dz2 * dz2);
                 if (i % 100 == 0) {
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_TEAM_CHORO_MOVE1", 0x60, 0, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                 }
-                if (d2 <= 30.0f || c->timer >= 240) {
+                if (d <= 30.0f || c->timer >= 240) {
                     c->state = 40;
                 } else {
-                    c->vel.x = c->speed * (dx2 / d2);
+                    c->vel.x = c->speed * (dx2 / d);
                     c->vel.y = c->speed;
-                    c->vel.z = c->speed * (dz2 / d2);
+                    c->vel.z = c->speed * (dz2 / d);
                     pose->mtx[1][3] = 0.0f;
                     c->timer++;
                 }

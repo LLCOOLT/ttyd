@@ -330,7 +330,9 @@ void effFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 pass;
     s32 passes;
     s32 i;
+    u8** dp;
     u32 j;
+    u8* sp;
     f32 degToRad;
     Mtx mF;
     Mtx mD;
@@ -529,8 +531,9 @@ void effFukidashiDisp(CameraId cameraId, EffectEntry* effect) {
                 GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
                 GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
                 GXSetArray(GX_VA_CLR0, moja_model_color0_tbl, 4);
-                for (j = 0; j < 21; j++) {
-                    GXCallDisplayList(moja_model_dl_0_tbl[j], moja_model_dl_0_size_tbl[j] << 5);
+                dp = moja_model_dl_0_tbl;
+                for (j = 0, sp = moja_model_dl_0_size_tbl; j < 21; j++, sp++, dp++) {
+                    GXCallDisplayList(*dp, *sp << 5);
                 }
                 break;
             case 3:

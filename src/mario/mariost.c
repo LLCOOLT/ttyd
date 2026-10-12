@@ -1,7 +1,4 @@
 #include "mario/mariost.h"
-#pragma force_active on
-__declspec(section ".sdata2") static const float mariost_zero_pad = 0.0f;
-#pragma force_active reset
 
 #include "battle/battle.h"
 

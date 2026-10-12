@@ -3190,10 +3190,10 @@ USER_FUNC(dance_get_step) {
 }
 
 USER_FUNC(set_local_rotate) {
-    f64 rot = evtGetFloat(event, event->args[0]);
-    f32 r = rot;
+    f32 r;
 
-    dance_dt.rot = rot;
+    dance_dt.rot = evtGetFloat(event, event->args[0]);
+    r = dance_dt.rot;
     if (r > 6.2831855f) {
         dance_dt.rot = r - 6.2831855f;
     }
@@ -3408,6 +3408,7 @@ USER_FUNC(noise) {
 }
 
 void noiseDisp(CameraId cameraId, void* param) {
+    s32 ry;
     CameraEntry* cam;
     s32 y;
     s32 x;
@@ -3418,7 +3419,6 @@ void noiseDisp(CameraId cameraId, void* param) {
     s32 len;
     s32 start;
     s32 by;
-    s32 ry;
     s32 off;
     u8 col;
     GXTexObj tex;
@@ -3429,9 +3429,9 @@ void noiseDisp(CameraId cameraId, void* param) {
         by = y / 4;
         ry = y % 4;
         for (x = 0; x < 64; x++) {
-            off = (x / 8) * 32 + by * 256;
+            off = (x / 8) * 32 + (by << 8);
             off += x % 8;
-            off += ry * 8;
+            off += (ry << 3);
             buf[off] = (y & 1) ? 0xFF : 0;
         }
         n = rand() % 100 + 100;
@@ -3486,7 +3486,7 @@ void noiseDisp(CameraId cameraId, void* param) {
     GXTexCoord2s16(1, 1);
     GXPosition3s16(gp->fbWidth / 2, -gp->efbHeight / 2, 0);
     GXTexCoord2s16(1, 0);
-    GXPosition3s16(-gp->fbWidth / 2, -gp->efbHeight / 2, 0);
+    GXPosition3s16(-gp->fbWidth, -gp->efbHeight / 2, 0);
     GXTexCoord2s16(0, 0);
 }
 

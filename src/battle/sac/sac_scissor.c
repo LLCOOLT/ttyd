@@ -699,46 +699,6 @@ s32 star_control(EventEntry* evt, BOOL first) {
     return 0;
 }
 
-s32 marioAttackEvent_Scissor[] = {
-    65627, (s32)scissor_init, 110, 65627, (s32)star_control, 112, 65630, (s32)sac_start_camera_evt,
-    65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0,
-    -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 65627, (s32)star_stone_appear, 110, 65630,
-    (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3",
-    -250000000, 0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode,
-    0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630, (s32)sac_mario_back_home,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 110, 65545, 30,
-    196699, (s32)evt_btl_camera_set_mode, 0, 3, 655451, (s32)evt_btl_camera_set_moveto, 0, 75,
-    105, 600, 75, 55, 0, 30, 0, 112,
-    65627, (s32)wait_star_standby, 110, 65627, (s32)scissor_timer_main, 112, 110, 131163,
-    (s32)sac_cheer, 1, 112, 65627, (s32)sac_ac_help_on, 65541, 0, 131122,
-    -29999990, (s32)"OFF_d_bom", 131163, (s32)evt_paper_entry, -29999990, 131163, (s32)evt_offscreen_entry, (s32)"ofs",
-    131163, (s32)evt_img_entry, (s32)"img", 196699, (s32)evt_img_set_paper, (s32)"img", -29999990, 196699,
-    (s32)evt_img_onoff, (s32)"img", 0, 65627, (s32)scissor_control, 131163, (s32)scissor_timer_get, -30000000,
-    131100, -30000000, 59, 196699, (s32)evt_img_onoff, (s32)"img", 0, 196699,
-    (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163, (s32)evt_offscreen_delete,
-    (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 65540, 90, 33, 65545,
-    1, 65627, (s32)scissor_tess, 65545, 1, 65627, (s32)scissor_offscreen, 589915,
-    (s32)evt_img_alloc_capture, (s32)"img", 0, (s32)"ofs", 1, 0, 0, 0,
-    0, 65545, 1, 131163, (s32)scissor_ofscreen_ok, -30000000, 131097, -30000000,
-    0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_KAKONDEPON2", 0, 196699, (s32)evt_img_onoff, (s32)"img",
-    1, 196699, (s32)evt_img_set_shadow, (s32)"img", 2, 131163, (s32)scissor_damage, -30000000,
-    131101, -30000000, 2, 327771, (s32)btlevtcmd_ACSuccessEffect, -30000000, 75, 100,
-    -100, 33, 196699, (s32)evt_img_set_paper_anim, (s32)"img", (s32)"A_1", 131163, (s32)evt_img_clear_virtual_point,
-    (s32)"img", 65545, 60, 33, 196699, (s32)evt_img_onoff, (s32)"img", 0,
-    196699, (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163,
-    (s32)evt_offscreen_delete, (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 131163, (s32)scissor_timer_get, -30000000,
-    131100, -30000000, 59, 65540, 90, 33, 6, 65539,
-    90, 65627, (s32)sac_ac_help_off, 65627, (s32)sac_cheer_end, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
-    -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress,
-    -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65539, 95, 131096,
-    -29999997, -1, 65540, 97, 33, 196699, (s32)btlevtcmd_GetTotalDamage, -29999997,
-    -30000000, 131101, -30000000, 1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997,
-    -29999996, (s32)weapon_scissor_finish, 256, -29999995, 33, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997,
-    -29999996, 65540, 95, 65539, 97, 196699, (s32)evt_btl_camera_set_mode, 0,
-    0, 65546, 1000, 65627, (s32)scissor_end, 65539, 99, 131163,
-    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
 
 #pragma dont_inline on
 void star_disp2D(CameraId camera, void* param) {
@@ -851,44 +811,8 @@ s32 scissor_timer_main(void) {
 }
 
 GXColor HSV2RGB(GXColor);
-
-void scissor_disp_control(CameraId camera, void* param) {
-    ScissorWork* w = GetScissorPtr();
-    f32* pts = (f32*)w->buf114;
-    s32 i;
-    w->unk_10 = w->unk_10 + 1;
-    if (w->unk_10 >= 60) {
-        w->unk_10 -= 60;
-    }
-    if (w->unk_10 <= 29) {
-        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 255.0f, 0, w->unk_10, 29);
-    } else {
-        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(255.0f, 0.0f, 0, w->unk_10 - 30, 59);
-    }
-    GXSetCullMode(0);
-    GXClearVtxDesc();
-    GXSetVtxDesc(9, 1);
-    GXSetVtxAttrFmt(0, 9, 1, 4, 0);
-    GXSetNumChans(1);
-    GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
-    GXSetNumTexGens(0);
-    GXSetNumTevStages(1);
-    GXSetTevOrder(0, 0xFF, 0xFF, 4);
-    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
-    GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
-    GXSetTevOp(0, 4);
-    GXLoadPosMtxImm(camGetPtr(camera)->view, 0);
-    GXSetCurrentMtx(0);
-    GXSetLineWidth(16, 0);
-    for (i = 0; i < w->count - 1; i++) {
-        GXColor hsv = {0x00, 0xFF, 0xFF, 0xFF};
-        hsv.r = (gp->retraceCount + i * 2) % 127 * 2;
-        GXSetChanMatColor(4, HSV2RGB(hsv));
-        GXBegin(0xA8, 0, 2);
-        GXPosition3f32(pts[i * 2], pts[i * 2 + 1], 0.0f);
-        GXPosition3f32(pts[i * 2 + 2], pts[i * 2 + 3], 0.0f);
-    }
-}
+void scissor_disp_control(CameraId camera, void* param);
+void scissor_disp_region(CameraId camera, void* param);
 
 s32 scissor_control(EventEntry* evt, BOOL first) {
     ScissorWork* w = GetScissorPtr();
@@ -1146,6 +1070,51 @@ void scissor_capture(CameraId camera, void* param) {
     GXPixModeSync();
 }
 
+void scissor_disp_control(CameraId camera, void* param) {
+    ScissorWork* w = GetScissorPtr();
+    f32* pts = (f32*)w->buf114;
+    s32 i;
+    w->unk_10 = w->unk_10 + 1;
+    if (w->unk_10 >= 60) {
+        w->unk_10 -= 60;
+    }
+    if (w->unk_10 <= 29) {
+        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 255.0f, 0, w->unk_10, 29);
+    } else {
+        ((f32(*)(f32, f32, s32, s32, s32))intplGetValue)(255.0f, 0.0f, 0, w->unk_10 - 30, 59);
+    }
+    GXSetCullMode(0);
+    GXClearVtxDesc();
+    GXSetVtxDesc(9, 1);
+    GXSetVtxAttrFmt(0, 9, 1, 4, 0);
+    GXSetNumChans(1);
+    GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
+    GXSetNumTexGens(0);
+    GXSetNumTevStages(1);
+    GXSetTevOrder(0, 0xFF, 0xFF, 4);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+    GXSetTevOp(0, 4);
+    GXLoadPosMtxImm(camGetPtr(camera)->view, 0);
+    GXSetCurrentMtx(0);
+    GXSetLineWidth(16, 0);
+    for (i = 0; i < w->count - 1; i++) {
+        GXColor hsv = {0x00, 0xFF, 0xFF, 0xFF};
+        hsv.r = (gp->retraceCount + i * 2) % 127 * 2;
+        GXSetChanMatColor(4, HSV2RGB(hsv));
+        GXBegin(0xA8, 0, 2);
+        GXPosition3f32(pts[i * 2], pts[i * 2 + 1], 0.0f);
+        GXPosition3f32(pts[i * 2 + 2], pts[i * 2 + 3], 0.0f);
+    }
+}
+
+s32 scissor_offscreen(void) {
+    GetScissorPtr();
+    dispEntry(1, 0.0f, 1, scissor_disp_region, NULL);
+    return 2;
+}
+
+
 void scissor_disp_region(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXTexObj texObj;
@@ -1197,12 +1166,6 @@ void scissor_disp_region(CameraId camera, void* param) {
     offscreenAddBoundingBox(offscreenNameToId("ofs"), left, top, right, bottom);
 }
 
-s32 scissor_offscreen(void) {
-    GetScissorPtr();
-    dispEntry(1, 0.0f, 1, scissor_disp_region, NULL);
-    return 2;
-}
-
 s32 scissor_init(void) {
     ScissorWork* w = GetScissorPtr();
     memset(w, 0, 0x174);
@@ -1238,3 +1201,44 @@ static s32 star_stone_appear(void) {
 s32 wait_star_standby(void) {
     return GetScissorPtr()->phase == 5 ? 2 : 0;
 }
+
+s32 marioAttackEvent_Scissor[] = {
+    65627, (s32)scissor_init, 110, 65627, (s32)star_control, 112, 65630, (s32)sac_start_camera_evt,
+    65546, 500, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START1", -250000000, 0,
+    -250000000, 65630, (s32)sac_mario_item_on_evt, 65546, 500, 393307, (s32)btlevtcmd_snd_se, -2,
+    (s32)"SFX_BTL_SAC_START2", -250000000, 0, -29999989, 65627, (s32)star_stone_appear, 110, 65630,
+    (s32)sac_start_stardust, 112, 65545, 100, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_SAC_START3",
+    -250000000, 0, -250000000, 131163, (s32)evt_snd_sfxoff, -29999989, 196699, (s32)evt_btl_camera_set_mode,
+    0, 0, 65545, 40, 65630, (s32)sac_mario_item_on_end_evt, 65630, (s32)sac_mario_back_home,
+    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_I_Y", 110, 65545, 30,
+    196699, (s32)evt_btl_camera_set_mode, 0, 3, 655451, (s32)evt_btl_camera_set_moveto, 0, 75,
+    105, 600, 75, 55, 0, 30, 0, 112,
+    65627, (s32)wait_star_standby, 110, 65627, (s32)scissor_timer_main, 112, 110, 131163,
+    (s32)sac_cheer, 1, 112, 65627, (s32)sac_ac_help_on, 65541, 0, 131122,
+    -29999990, (s32)"OFF_d_bom", 131163, (s32)evt_paper_entry, -29999990, 131163, (s32)evt_offscreen_entry, (s32)"ofs",
+    131163, (s32)evt_img_entry, (s32)"img", 196699, (s32)evt_img_set_paper, (s32)"img", -29999990, 196699,
+    (s32)evt_img_onoff, (s32)"img", 0, 65627, (s32)scissor_control, 131163, (s32)scissor_timer_get, -30000000,
+    131100, -30000000, 59, 196699, (s32)evt_img_onoff, (s32)"img", 0, 196699,
+    (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163, (s32)evt_offscreen_delete,
+    (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 65540, 90, 33, 65545,
+    1, 65627, (s32)scissor_tess, 65545, 1, 65627, (s32)scissor_offscreen, 589915,
+    (s32)evt_img_alloc_capture, (s32)"img", 0, (s32)"ofs", 1, 0, 0, 0,
+    0, 65545, 1, 131163, (s32)scissor_ofscreen_ok, -30000000, 131097, -30000000,
+    0, 196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_SAC_KAKONDEPON2", 0, 196699, (s32)evt_img_onoff, (s32)"img",
+    1, 196699, (s32)evt_img_set_shadow, (s32)"img", 2, 131163, (s32)scissor_damage, -30000000,
+    131101, -30000000, 2, 327771, (s32)btlevtcmd_ACSuccessEffect, -30000000, 75, 100,
+    -100, 33, 196699, (s32)evt_img_set_paper_anim, (s32)"img", (s32)"A_1", 131163, (s32)evt_img_clear_virtual_point,
+    (s32)"img", 65545, 60, 33, 196699, (s32)evt_img_onoff, (s32)"img", 0,
+    196699, (s32)evt_img_set_shadow, (s32)"img", 0, 131163, (s32)evt_img_release, (s32)"img", 131163,
+    (s32)evt_offscreen_delete, (s32)"ofs", 131163, (s32)evt_paper_delete, -29999990, 131163, (s32)scissor_timer_get, -30000000,
+    131100, -30000000, 59, 65540, 90, 33, 6, 65539,
+    90, 65627, (s32)sac_ac_help_off, 65627, (s32)sac_cheer_end, 196699, (s32)btlevtcmd_GetSelectEnemy, -29999997,
+    -29999996, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2, 196699, (s32)btlevtcmd_CommandGetWeaponAddress,
+    -2, -30000000, 131163, (s32)btlevtcmd_WeaponAftereffect, -30000000, 65539, 95, 131096,
+    -29999997, -1, 65540, 97, 33, 196699, (s32)btlevtcmd_GetTotalDamage, -29999997,
+    -30000000, 131101, -30000000, 1, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997,
+    -29999996, (s32)weapon_scissor_finish, 256, -29999995, 33, 196699, (s32)btlevtcmd_GetSelectNextEnemy, -29999997,
+    -29999996, 65540, 95, 65539, 97, 196699, (s32)evt_btl_camera_set_mode, 0,
+    0, 65546, 1000, 65627, (s32)scissor_end, 65539, 99, 131163,
+    (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};

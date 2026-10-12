@@ -7,7 +7,7 @@
 // decl: typedef struct ScreenWork { void* buf; s32 ready; f32 scale; f32 scaleTarget; f32 x; f32 xTarget; f32 y; f32 yTarget; s32 count; s32 mode; f32 field_0x28; u8* noise; } ScreenWork;
 // decl: static ScreenWork* screen_wp;
 // decl: static f32 randf(f32 min, f32 max);
-// decl: void GXSetTexCoordGen_(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
+// decl: void GXSetTexCoordGen(GXTexCoordID dst, GXTexGenType func, GXTexGenSrc src, u32 mtx);
 // proto: void screen_tev(MapTevCallbackInfo* info);
 void screen_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
@@ -94,10 +94,10 @@ void screen_tev(MapTevCallbackInfo* info) {
         } else {
             PSMTXScale(mtx, 4.75f, 3.75f, 0.0f);
         }
-        GXSetTexCoordGen_(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
+        GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
         PSMTXScale(mtx, 1.0f, 6.0f * ((100.0f - camGetPtr(CAMERA_3D)->cameraPos.z) / 1000.0f) + 16.0f, 1.0f);
-        GXSetTexCoordGen_(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
+        GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
         info->tevStage = 2;
         info->texMap = 2;

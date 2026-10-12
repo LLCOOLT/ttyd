@@ -60,9 +60,6 @@ static void actionCommandDisp(f32 x, f32 y);
 s32 battleAcMain_GaugeTiming2(BattleWork* work) {
     GT2Work* gw = GT_WORK(work);
     GT2Disp* disp = GT_DISP(work);
-    const char* sfxNg = "SFX_AC_COMMAND_NG1";
-    const char* sfxPone = "SFX_AC_PONE1";
-    const char* sfxOk = "SFX_AC_COMMAND_OK1\0";
     BOOL autoCommand = FALSE;
     BOOL pressed;
     BOOL allDone;
@@ -141,18 +138,24 @@ s32 battleAcMain_GaugeTiming2(BattleWork* work) {
             }
             gw->frame2++;
             gw->cursor = 100.0f * (f32)gw->frame2 / (f32)gw->totalFrames;
-            for (i = 0; i < GT_PARAMS(work)->count; i++) {
-                if (!gw->state[i] && gw->cursor > 6.0f + gw->targets[i]) {
-                    gw->state[i] = -1;
-                    psndSFXOn(sfxNg);
+            {
+                const char* sfxNg = "SFX_AC_COMMAND_NG1";
+                for (i = 0; i < GT_PARAMS(work)->count; i++) {
+                    if (!gw->state[i] && gw->cursor > 6.0f + gw->targets[i]) {
+                        gw->state[i] = -1;
+                        psndSFXOn(sfxNg);
+                    }
                 }
             }
             gw->hit = 0;
-            for (i = 0; i < GT_PARAMS(work)->count; i++) {
-                if (!gw->state[i] && __fabs(gw->cursor - gw->targets[i]) <= 6.0) {
-                    gw->hit = 1;
-                    if (gw->sfx[i] == -1) {
-                        gw->sfx[i] = ((s32(*)(const char*))psndSFXOn)("SFX_AC_PONE1");
+            {
+                const char* sfxPone = "SFX_AC_PONE1";
+                for (i = 0; i < GT_PARAMS(work)->count; i++) {
+                    if (!gw->state[i] && __fabs(gw->cursor - gw->targets[i]) <= 6.0) {
+                        gw->hit = 1;
+                        if (gw->sfx[i] == -1) {
+                            gw->sfx[i] = ((s32(*)(const char*))psndSFXOn)(sfxPone);
+                        }
                     }
                 }
             }
@@ -170,6 +173,8 @@ s32 battleAcMain_GaugeTiming2(BattleWork* work) {
                 }
             }
             if (pressed || autoCommand) {
+                const char* sfxNg = "SFX_AC_COMMAND_NG1";
+                const char* sfxOk = "SFX_AC_COMMAND_OK1\0";
                 found = FALSE;
                 for (i = 0; i < GT_PARAMS(work)->count; i++) {
                     if (!gw->state[i] && !found) {
@@ -277,13 +282,14 @@ void battleAcDelete_GaugeTiming2(BattleWork* work) {
 }
 
 #pragma dont_inline on
+#pragma opt_loop_invariants off
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     GT2Disp* disp = GT_DISP(work);
     GT2Work* gw = GT_WORK(work);
     CameraEntry* cam;
     f32 x0, y0, y1, x1, y2, y3, ratio, t;
-    s32 v, q, r, i, icon, pressedIcon, id;
+    s32 cnt, q, r, v, i, icon, pressedIcon, id;
     Vec pos;
     Vec d0, d1;
 
@@ -307,8 +313,8 @@ static void actionCommandDisp(f32 x, f32 y) {
         if (i != q - 1) {
             TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, t + (f32)(i * 4), y1, 0.0f, 1.0f, 1.0f);
         } else {
-            f32 w = t + (f32)r;
-            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, (f32)(i * 4) + w, y1, 0.0f, 1.0f, 1.0f);
+            f32 fi = (f32)(i * 4);
+            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, fi + (t + (f32)r), y1, 0.0f, 1.0f, 1.0f);
         }
     }
     TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, (16.0f + x0) + (f32)v, y1, 0.0f, -1.0f, 1.0f);
@@ -328,7 +334,8 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     y3 = 23.0f + y;
-    for (i = 0; i < GT_PARAMS(work)->count; i++) {
+    cnt = GT_PARAMS(work)->count;
+    for (i = 0; i < cnt; i++) {
         f32 target = gw->targets[i];
         if (target <= gw->cursor || __fabs(gw->cursor - target) <= 6.0) {
             id = 0x95;
@@ -396,7 +403,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     {
-        Mtx m1, m2, m3;
+        Mtx m3, m1, m2;
         s32 num = work->actionCommands.outputParams[0] + GT_PARAMS(work)->bonus;
         PSMTXTrans(m1, ((-200.0f + x) + (f32)gw->width) - 60.0f, y1, 0.0f);
         PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
@@ -404,4 +411,5 @@ static void actionCommandDisp(f32 x, f32 y) {
         iconNumberDispGx(m3, num, FALSE, (GXColor){255, 255, 255, 255});
     }
 }
+#pragma opt_loop_invariants reset
 #pragma dont_inline reset

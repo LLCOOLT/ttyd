@@ -644,12 +644,12 @@ EffectEntry* effThunderN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a, f32 b) {
 }
 
 void effThunderMain(EffectEntry* effect) {
-    s32 type;
     EffThunderN64Work* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 life;
     s32 frame;
+    s32 type;
 
     work = effect->userdata;
 

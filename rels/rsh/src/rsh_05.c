@@ -296,12 +296,8 @@ static void moamoa_pose_main(void) {
         t = 60.0f * OSTicksToMilliseconds(now - moa->startTime) / 1000.0f / def->speed;
 
         if (t >= 1.0f) {
-            if (def->loop) {
-                moa->startTime = now;
-                t = 0.0f;
-            } else {
-                t = 1.0f;
-            }
+            moa->startTime = now;
+            t = 0.0f;
         }
         pose->frame = def->start + (s32)((def->count - 1) * t);
     }
@@ -447,11 +443,7 @@ static USER_FUNC(evt_moamoa_fusion) {
             pose->mtx[0][0] = 1.0f;
             moa->next = 14;
             moa->state = 14;
-            if (i < 100) {
-                moa->timer = i % 100;
-            } else {
-                moa->timer = i % 60 + 100;
-            }
+            moa->timer = i < 100 ? i % 100 : i % 60 + 100;
             moa->flags |= 0x100;
         }
     }
@@ -645,6 +637,7 @@ static void ext_shadow_disp(CameraId camera, void* param) {
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;
+    f32 d;
     f32 angle;
 
     if (checkGround) {
@@ -662,9 +655,9 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
     moa->speed = speed;
     moa->gravity = gravity;
     dy = moa->target.y - pose->mtx[1][3];
-    dist = distABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
+    d = distABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
     angle = angleABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z);
-    moa->jumpTimer = dist / moa->speed;
+    moa->jumpTimer = d / moa->speed;
     moa->vy = dy / moa->jumpTimer + moa->gravity * moa->jumpTimer / 2;
     moa->state = 3;
     moa->next = next;
@@ -706,12 +699,12 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         cam = camGetPtr(CAMERA_3D);
         rad = 6.2831855f * reviseAngle(mario->unk1A8 - 90.0f + cam->viewYaw) / 360.0f;
-        if (distABf(pose->mtx[0][3], pose->mtx[2][3], 35.0f * moa_sin(rad) + mario->position.x,
-                    mario->position.z - 35.0f * moa_cos(rad)) < 35.0f) {
+        dist = 35.0f * moa_sin(rad) + mario->position.x;
+        if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cos(rad)) < 35.0f) {
             return 2;
         }
     }
-    if (mario->currMotionId == 0x13 && mario->currSubMotionId == 0x14) {
+    if (mario->currMotionId == 0x13 && (s32)mario->currSubMotionId == 0x14) {
         a = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
         if (PSVECDistance(&mario->position, &a) < 65.0f) {
             return 2;
@@ -749,9 +742,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
                 mario->unk174.x = -((range - dist) * moa_sin(6.2831855f * mario->directionView / 360.0f));
                 mario->unk174.z = (range - dist) * moa_cos(6.2831855f * mario->directionView / 360.0f);
             } else {
-                rad = 6.2831855f * angle / 360.0f;
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
+                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(6.2831855f * angle / 360.0f) - mario->position.x;
+                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(6.2831855f * angle / 360.0f) - mario->position.z;
             }
         }
     }
@@ -763,6 +755,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 #pragma dont_inline reset
 
 #pragma opt_propagation off
+#pragma opt_lifetimes off
 static void ext_moamoa_main(void) {
     MarioWork* mario;
     PartyEntry* party;
@@ -1214,7 +1207,8 @@ static USER_FUNC(npc_jump) {
     f32 z = evtGetFloat(event, args[3]);
     f32 speed = evtGetFloat(event, args[4]);
     f32 gravity = evtGetFloat(event, args[5]);
-    f32 t = 60.0f * (f32)evtGetValue(event, args[6]) / 1000.0f;
+    s32 frames = evtGetValue(event, args[6]);
+    f32 t = 60.0f * frames / 1000.0f;
     NpcEntry* npc = npcNameToPtr(name);
     f32 vy;
     f32 dist;

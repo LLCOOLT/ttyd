@@ -7,11 +7,13 @@
 // decl: void gundan1000tai_seq00(NanNpc* npc);
 // proto: USER_FUNC(gundan1000tai_init);
 USER_FUNC(gundan1000tai_init) {
+    f32 a2;
     f32 angle;
     f32 s;
     f32 radius;
     f32 c;
     f32 base;
+    f32 nv;
     s32 i;
     NanNpc* npc;
     NanNpcWork* wp = nanNPCWork;
@@ -33,9 +35,10 @@ USER_FUNC(gundan1000tai_init) {
             npc->dir = 270.0f;
         }
         radius = irand(100);
-        angle = 6.2831855f * irand(360) / 360.0f;
-        s = sin(angle);
-        c = cos(angle);
+        nv = 6.2831855f * irand(360);
+        a2 = nv / 360.0f;
+        s = sin(a2);
+        c = cos(a2);
         npc->pos.x = radius * s + base;
         npc->pos.y = 15.0f;
         npc->pos.z = radius * c - 300.0f;

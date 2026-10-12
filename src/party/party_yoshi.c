@@ -282,14 +282,12 @@ void yoshi_exit(PartyEntry* party) {
 void yoshi_jumpStand(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
 
-    if (party != NULL && party->currentMemberId == 4) {
-        if ((party->flags & 0x100) == 0) {
-            return;
-        }
-        if (!(party->useMotionId >= 60 && party->useMotionId <= 66)) {
+    if (party == NULL || party->currentMemberId != 4 || !(party->flags & 0x100)) {
+        return;
+    }
+    if (!(party->useMotionId >= 60 && party->useMotionId <= 66)) {
             party->useMotionId = 60;
         }
-    }
 }
 
 void unk_800b474c(PartyEntry* party) {
@@ -1011,6 +1009,7 @@ void inertia(PartyEntry* party) {
     f32 vz = P_F32(mario, 0x2B4);
     f32 k;
     f32 lim = 16.0f;
+    f32 acc = 0.01f;
     f32 zero = 0.0f;
     s32 dir;
 
@@ -1029,7 +1028,7 @@ void inertia(PartyEntry* party) {
         }
     } else if (vx * vx + vz * vz <= 256.0f) {
         dir = ((YoshiWork*)party->useStruct)->dir;
-        vx += sx * 0.01f;
+        vx += sx * acc;
         if (dir > 0 && vx <= 0.0f) {
             vx = 0.0f;
         }
@@ -1039,7 +1038,7 @@ void inertia(PartyEntry* party) {
         vz -= zero;
     } else {
         vz -= zero;
-        vx += sx * 0.01f;
+        vx += sx * acc;
         if (vx < -lim) {
             vx = -lim;
         }

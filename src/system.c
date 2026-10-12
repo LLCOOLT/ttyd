@@ -108,11 +108,11 @@ const char* dat_ptr_8040f260 = R_build_date;
 const char* dat_ptr_8040f264 = R_build_time;
 
 const char* systemStrippedPool0(void) {
-    return "assertion \"%s\" failed.\n \"%s\"\n";
+    return "assertion \"%s\" failed.\n \"%s\"\n\0\0";
 }
 
 const char* getMarioStDvdRoot(void) {
-    return ".";
+    return ".\0\0";
 }
 
 f32 reviseAngle(f32 angle) {
@@ -560,7 +560,7 @@ void qqsort(void* base, u32 n, u32 size, int (*compare)(void*, void*)) {
     }
 }
 
-DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) { // should auto-inline
+static inline DEMOPadStatus* GET_DEMO_PAD_STATUS(u32 i) {
     return DemoPad + i;
 }
 

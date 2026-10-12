@@ -58,12 +58,12 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         cam = camGetPtr(CAMERA_3D);
         rad = 6.2831855f * reviseAngle(mario->unk1A8 - 90.0f + cam->viewYaw) / 360.0f;
-        if (distABf(pose->mtx[0][3], pose->mtx[2][3], 35.0f * moa_sin(rad) + mario->position.x,
-                    mario->position.z - 35.0f * moa_cos(rad)) < 35.0f) {
+        dist = 35.0f * moa_sin(rad) + mario->position.x;
+        if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cos(rad)) < 35.0f) {
             return 2;
         }
     }
-    if (mario->currMotionId == 0x13 && mario->currSubMotionId == 0x14) {
+    if (mario->currMotionId == 0x13 && (s32)mario->currSubMotionId == 0x14) {
         a = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
         if (PSVECDistance(&mario->position, &a) < 65.0f) {
             return 2;
@@ -101,9 +101,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
                 mario->unk174.x = -((range - dist) * moa_sin(6.2831855f * mario->directionView / 360.0f));
                 mario->unk174.z = (range - dist) * moa_cos(6.2831855f * mario->directionView / 360.0f);
             } else {
-                rad = 6.2831855f * angle / 360.0f;
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(rad) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(rad) - mario->position.z;
+                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(6.2831855f * angle / 360.0f) - mario->position.x;
+                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(6.2831855f * angle / 360.0f) - mario->position.z;
             }
         }
     }

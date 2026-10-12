@@ -15,7 +15,8 @@ static USER_FUNC(npc_jump) {
     f32 z = evtGetFloat(event, args[3]);
     f32 speed = evtGetFloat(event, args[4]);
     f32 gravity = evtGetFloat(event, args[5]);
-    f32 t = 60.0f * (f32)evtGetValue(event, args[6]) / 1000.0f;
+    s32 frames = evtGetValue(event, args[6]);
+    f32 t = 60.0f * frames / 1000.0f;
     NpcEntry* npc = npcNameToPtr(name);
     f32 vy;
     f32 dist;

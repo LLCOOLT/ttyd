@@ -24,7 +24,7 @@ USER_FUNC(sight) {
         sight_wp->dir = 5;
     }
     if (sight_wp->tpl == NULL) {
-        if (!fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl")) {
+        if (fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl") == 0U) {
             return EVT_RETURN_BLOCK;
         }
         sight_wp->tpl = fileAllocf(4, "%s/%s", getMarioStDvdRoot(), "taihou.tpl");

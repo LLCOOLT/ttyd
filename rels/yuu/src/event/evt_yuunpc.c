@@ -107,32 +107,6 @@ s32 evt_yuunpc_minigame2[69];
 s32 evt_yuunpc_minigame3[69];
 s32 evt_yuunpc_minigame4[167];
 
-void yuunpc_maphit_init(void) {
-    signed char key[3] = "\x81\xA1";
-    s32 i;
-    s32 j;
-
-    for (i = 0; i < 72; i++) {
-        yuunpc_wp->hitY[i] = (hitdata[i * 2] - '0') * 10 + (hitdata[i * 2 + 1] - '0');
-    }
-    for (i = 0; i < 72; i++) {
-        s16 h = -((hitdata[0x90 + i * 2] - '0') * 10 + (hitdata[0x90 + i * 2 + 1] - '0'));
-        yuunpc_wp->hit[i + 72 * 5] = h;
-        yuunpc_wp->hit[i + 72 * 4] = h;
-        yuunpc_wp->hit[i + 72 * 3] = h;
-        yuunpc_wp->hit[i + 72 * 2] = h;
-        yuunpc_wp->hit[i + 72 * 1] = h;
-        yuunpc_wp->hit[i] = h;
-    }
-    for (j = 0; j < 6; j++) {
-        for (i = 0; i < 72; i++) {
-            if (key[0] == hitdata[0x120 + j * 0x90 + i * 2] && key[1] == hitdata[0x120 + j * 0x90 + i * 2 + 1]) {
-                yuunpc_wp->hit[i + j * 72] = -500;
-            }
-        }
-    }
-}
-
 void yuunpc_pose_init(YuuNpcData* data) {
     char name[32];
     char anim[32];
@@ -526,97 +500,31 @@ __declspec(section ".data") s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
 
-EVT_BEGIN(evt_yuunpc_minigame1)
-    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
-    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
-    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
-    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
-    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
-    CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame1_data), PTR(ext_yuunpc_minigame1_init), PTR(ext_yuunpc_minigame1_main), PTR(ext_yuunpc_dispent))
-    RETURN
-EVT_END()
+void yuunpc_maphit_init(void) {
+    signed char key[3] = "\x81\xA1";
+    s32 i;
+    s32 j;
 
-EVT_BEGIN(evt_yuunpc_minigame2)
-    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
-    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
-    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
-    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
-    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
-    CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame2_data), PTR(ext_yuunpc_minigame2_init), PTR(ext_yuunpc_minigame2_main), PTR(ext_yuunpc_dispent))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(evt_yuunpc_minigame3)
-    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
-    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
-    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
-    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
-    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
-    CALL(evt_ext_entry, 360, PTR(ext_yuunpc_minigame3_data), PTR(ext_yuunpc_minigame3_init), PTR(ext_yuunpc_minigame3_main), PTR(ext_yuunpc_dispent))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(evt_yuunpc_minigame4)
-    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
-    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
-    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
-    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
-    CALL(evt_npc_entry, STRING("yuunpc4"), STRING("c_bom_n"))
-    CALL(evt_npc_entry, STRING("yuunpc5"), STRING("c_tyusan"))
-    CALL(evt_npc_entry, STRING("yuusp0"), STRING("c_luigi"))
-    CALL(evt_npc_entry, STRING("yuusp1"), STRING("c_nokorin"))
-    CALL(evt_npc_entry, STRING("yuusp2"), STRING("c_joho_a"))
-    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc4"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuunpc5"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuusp0"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuusp1"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("yuusp2"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc4"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc5"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), 32)
-    CALL(evt_ext_entry, 900, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
-    BEGIN_INLINE_EVENT
-        CALL(evt_seq_wait, 2)
-        CALL(evt_npc_delete, STRING("yuunpc0"))
-        CALL(evt_npc_delete, STRING("yuunpc1"))
-        CALL(evt_npc_delete, STRING("yuunpc2"))
-        CALL(evt_npc_delete, STRING("yuunpc3"))
-        CALL(evt_npc_delete, STRING("yuunpc4"))
-        CALL(evt_npc_delete, STRING("yuunpc5"))
-    END_INLINE_EVENT
-    RETURN
-EVT_END()
+    for (i = 0; i < 72; i++) {
+        yuunpc_wp->hitY[i] = (hitdata[i * 2] - '0') * 10 + (hitdata[i * 2 + 1] - '0');
+    }
+    for (i = 0; i < 72; i++) {
+        s16 h = -((hitdata[0x90 + i * 2] - '0') * 10 + (hitdata[0x90 + i * 2 + 1] - '0'));
+        yuunpc_wp->hit[i + 72 * 5] = h;
+        yuunpc_wp->hit[i + 72 * 4] = h;
+        yuunpc_wp->hit[i + 72 * 3] = h;
+        yuunpc_wp->hit[i + 72 * 2] = h;
+        yuunpc_wp->hit[i + 72 * 1] = h;
+        yuunpc_wp->hit[i] = h;
+    }
+    for (j = 0; j < 6; j++) {
+        for (i = 0; i < 72; i++) {
+            if (key[0] == hitdata[0x120 + j * 0x90 + i * 2] && key[1] == hitdata[0x120 + j * 0x90 + i * 2 + 1]) {
+                yuunpc_wp->hit[i + j * 72] = -500;
+            }
+        }
+    }
+}
 
 void ext_yuunpc_minigame1_init(void) {
     f32 ytbl[5] = {260.0f, 220.0f, 180.0f, 140.0f, 100.0f};
@@ -2156,3 +2064,95 @@ void ext_yuunpc_minigame4_main(void) {
     yuunpc_pose_minigame4_main();
 }
 
+
+EVT_BEGIN(evt_yuunpc_minigame1)
+    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
+    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
+    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
+    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
+    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame1_data), PTR(ext_yuunpc_minigame1_init), PTR(ext_yuunpc_minigame1_main), PTR(ext_yuunpc_dispent))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_yuunpc_minigame2)
+    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
+    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
+    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
+    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
+    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_ext_entry, 300, PTR(ext_yuunpc_minigame2_data), PTR(ext_yuunpc_minigame2_init), PTR(ext_yuunpc_minigame2_main), PTR(ext_yuunpc_dispent))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_yuunpc_minigame3)
+    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
+    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
+    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
+    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
+    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_ext_entry, 360, PTR(ext_yuunpc_minigame3_data), PTR(ext_yuunpc_minigame3_init), PTR(ext_yuunpc_minigame3_main), PTR(ext_yuunpc_dispent))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_yuunpc_minigame4)
+    CALL(evt_npc_entry, STRING("yuunpc0"), STRING("c_kinopiko"))
+    CALL(evt_npc_entry, STRING("yuunpc1"), STRING("c_roten"))
+    CALL(evt_npc_entry, STRING("yuunpc2"), STRING("c_jugemu"))
+    CALL(evt_npc_entry, STRING("yuunpc3"), STRING("c_kinopio"))
+    CALL(evt_npc_entry, STRING("yuunpc4"), STRING("c_bom_n"))
+    CALL(evt_npc_entry, STRING("yuunpc5"), STRING("c_tyusan"))
+    CALL(evt_npc_entry, STRING("yuusp0"), STRING("c_luigi"))
+    CALL(evt_npc_entry, STRING("yuusp1"), STRING("c_nokorin"))
+    CALL(evt_npc_entry, STRING("yuusp2"), STRING("c_joho_a"))
+    CALL(evt_npc_set_position, STRING("yuunpc0"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc1"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc2"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc3"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc4"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuunpc5"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuusp0"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuusp1"), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING("yuusp2"), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc0"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc1"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc2"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc3"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc4"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuunpc5"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp0"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp1"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("yuusp2"), 32)
+    CALL(evt_ext_entry, 900, PTR(ext_yuunpc_minigame4_data), PTR(ext_yuunpc_minigame4_init), PTR(ext_yuunpc_minigame4_main), PTR(ext_yuunpc_dispent))
+    BEGIN_INLINE_EVENT
+        CALL(evt_seq_wait, 2)
+        CALL(evt_npc_delete, STRING("yuunpc0"))
+        CALL(evt_npc_delete, STRING("yuunpc1"))
+        CALL(evt_npc_delete, STRING("yuunpc2"))
+        CALL(evt_npc_delete, STRING("yuunpc3"))
+        CALL(evt_npc_delete, STRING("yuunpc4"))
+        CALL(evt_npc_delete, STRING("yuunpc5"))
+    END_INLINE_EVENT
+    RETURN
+EVT_END()

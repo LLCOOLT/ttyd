@@ -31,6 +31,117 @@ static inline MapObjectEntry* MOBJ_PTR2(EventEntry* event, const char* name) {
     return !strcmp(name, "me") ? event->thisMapObj : mobjNameToPtr(name);
 }
 
+__declspec(section ".data") u64 fd_evt_mobj_negone_one_374 = 0xBF8000003F800000;
+
+__declspec(section ".data") u64 lbl_80309CF0 = 0xBF8000003F800000;
+
+__declspec(section ".data") u64 fd_evt_mobj_one_negone_373 = 0x3F800000BF800000;
+
+__declspec(section ".data") u64 lbl_80309D00 = 0x3F800000BF800000;
+
+__declspec(section ".data") u64 fd_evt_mobj_negone_one_360 = 0xBF8000003F800000;
+
+__declspec(section ".data") u64 lbl_80309D10 = 0xBF8000003F800000;
+
+__declspec(section ".data") u64 fd_evt_mobj_one_negone_359 = 0x3F800000BF800000;
+
+__declspec(section ".data") u64 lbl_80309D20 = 0x3F800000BF800000;
+
+
+extern s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
+static s32 evt_shake[] = {0x0005005B, (s32)evt_cam_shake, 4, 0xF24A7A80, 0xF24A7A8A, 200, 2, 1};
+const char* _switch_anim[] = {"A_1", "A_2", "A_3", "A_4", "A_5", "S_1"};
+
+#define FLD(type, p, off) (*(type*)((u8*)(p) + (off)))
+extern void marioChgJumpStandMotion(f32 power);
+extern s32 irand(s32 max);
+extern s32 psndSFXOn(const char* name);
+extern s32 marioGetPartyId(void);
+extern void* partyGetPtr(s32 id);
+
+s32 mobj_lv_blk_evt(MapObjectEntry* mobj);
+
+static inline HitEntry* blkHitCheck(MapObjectEntry* m) {
+    f32 hx, hy, hz, dist, nx, ny, nz;
+    dist = 1.0f + (f32)__fabs(m->unk5C.y);
+    return hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, m->position.x, m->position.y + 0.5f, m->position.z, 0.0f, -1.0f, 0.0f);
+}
+
+static inline BOOL isAnimA13(const char* a) {
+    if (a[0] == 'A' && a[2] >= '1' && a[2] <= '3') {
+        return TRUE;
+    }
+    return FALSE;
+}
+
+extern void* itemEntry(const char* name, s32 id, s32 mode, s32 collect, void* script, f32 x, f32 y, f32 z);
+extern void itemForceGet(void* item);
+extern void* itemNameToPtr(char* name);
+extern void itemFlagOn(void* item, u32 flag);
+extern s16 pouchAddCoin(s16 coins);
+extern void marioStSystemLevel(s32 level);
+extern s32 mobj_save_blk_sysevt[];
+s32 mobj_recovery_blk(MapObjectEntry* mobj);
+
+extern void mobjHitEntry(MapObjectEntry* mobj, s32 idx);
+extern void npcKoopaModeMobjBoundDeadCheck(void* hit);
+extern void effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z);
+s32 mobj_koopa_brickblk(MapObjectEntry* mobj);
+s32 mobj_koopa_badgeblk(MapObjectEntry* mobj);
+
+s32 mobj_brickblk(MapObjectEntry* mobj);
+
+extern s32 kpaMutekiCheck(void);
+extern void kpaAddCoin(s32 coin);
+extern void itemStatusOn(void* item, u32 flag);
+s32 kpa_powerup(EventEntry* event, BOOL isFirstCall);
+s32 fire_func(EventEntry* event, BOOL isFirstCall);
+s32 kpa_powerup_evt[] = {0x0004005B, (s32)kpa_powerup, 0xFE363C80, 0xFE363C81, 0xFE363C82, 2, 1};
+s32 evt_fire[] = {0x0005005B, (s32)fire_func, 0xFE363C80, 0xFE363C81, 0xFE363C82, 0xFE363C83, 2, 1};
+
+extern void partyKeyOff(void);
+extern void mapGrpFlagOn(const char* name, u32 flag);
+extern void animPoseWorldPositionEvalOn(s32 poseId);
+s32 mobj_koopa_sango_evt(MapObjectEntry* mobj);
+s32 mobj_kururing_floor(MapObjectEntry* mobj);
+s32 mobj_lock(MapObjectEntry* mobj);
+
+USER_FUNC(evt_cam3d_event_from_road);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam3d_evt_set);
+USER_FUNC(evt_cam3d_get_shift);
+USER_FUNC(evt_cam_get_at);
+USER_FUNC(evt_cam_get_pos);
+USER_FUNC(evt_cam_letter_box_disable);
+USER_FUNC(evt_cam_letter_box_onoff);
+USER_FUNC(evt_cam_shake);
+USER_FUNC(evt_mapobj_get_position);
+USER_FUNC(evt_mario_cam_y_on);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_dispflag_onoff);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_set_dir);
+USER_FUNC(evt_mario_set_mov_spd);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_mario_wait_landon);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_snd_sfxoff);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_get_mapname);
+USER_FUNC(kpa_chg_pose);
+USER_FUNC(kpa_clear_jump_data);
+USER_FUNC(kpa_disp_pole_init);
+USER_FUNC(kpa_disp_pole_score_main);
+USER_FUNC(kpa_get_hata_name);
+USER_FUNC(kpa_get_pole_name);
+USER_FUNC(kpa_get_width);
+USER_FUNC(kpa_powerup);
+USER_FUNC(kpa_score_to_str);
+static USER_FUNC(kpa_get_level);
+extern s32 evt_memcard_save[];
+
 // ---- BEGIN tail (defined in reverse of target order) ----
 
 USER_FUNC(evt_mobj_entry) {
@@ -287,56 +398,37 @@ s32 mobj_switch_blue(MapObjectEntry* mobj) {
     return 0;
 }
 
-s32 mobj_switch_red(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
-    case 0:
-        if (mobj->flags & 8) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            if (mobj->unk1E0 == 0x200000 || mobj->unk1E0 == 0x1000000) {
-                marioChgMot(MARIO_MOTION_JUMP_SW);
-            }
-            psndSFXOn_3D((const char*)0x1d2, &mobj->position);
-            animPoseSetAnim(mobj->poseId, "A_1", 1);
-            mobj->flags &= ~8;
-        }
-        break;
-    case 1:
-        if (mobj->flags & 8) {
-            psndSFXOn_3D((const char*)0x1d2, &mobj->position);
-            if (mobj->unk1E0 == 0x200000) {
-                marioChgMot(MARIO_MOTION_JUMP_SW);
-            }
-            animPoseSetAnim(mobj->poseId, "A_1", 1);
-            mobj->flags &= ~8;
-        }
-        if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
-            animPoseSetAnim(mobj->poseId, "S_1", 1);
-            mobj->flags &= ~8;
-            mobj->unk1DC = 0;
-        }
-        break;
-    }
-    return 0;
-}
-
-USER_FUNC(evt_mobj_tornadoswitch_blue) {
-    f32 x, y, z;
-    MapObjectEntry* mobj;
-    s32 val;
-    const char* anim;
-    s32* args = event->args;
+USER_FUNC(evt_mobj_switch_blue) {
     s32 arg6;
+    s32 val;
+    s32* args = event->args;
+    s32 kind;
+    s32 inBattle;
+    const char* anim;
     const char* name;
-
-    evtGetValue(event, args[0]);
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    kind = evtGetValue(event, args[0]);
     name = (const char*)evtGetValue(event, args[1]);
     x = evtGetFloat(event, args[2]);
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     val = evtGetValue(event, args[5]);
     arg6 = args[6];
-    anim = "MOBJ_BlueTornadoSwitch";
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        anim = "MOBJ_BlueSwitch";
+        break;
+    case 1:
+        anim = "MOBJ_BlackSwitch";
+        break;
+    case 2:
+    default:
+        anim = "HOBJ_BlueSwitch";
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
     mobjEntry(name, anim);
@@ -344,10 +436,13 @@ USER_FUNC(evt_mobj_tornadoswitch_blue) {
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_blue;
     mobj->unk1D4 = val;
-    mobj->flags |= 4;
-    mobj->flags |= 0x1000000;
+    mobj->flags |= 0x44;
+    mobj->flags |= 0xa10000;
     mobj->unk1E4 = arg6;
     mobj->unk1DC = 0;
+    if (kind == 2) {
+        mobj->flags |= 2;
+    }
     if (evtGetValue(event, arg6)) {
         mobj->unk1DC = 99;
     }
@@ -390,6 +485,1704 @@ USER_FUNC(evt_mobj_floatswitch_blue) {
     return EVT_RETURN_DONE;
 }
 
+USER_FUNC(evt_mobj_tornadoswitch_blue) {
+    f32 x, y, z;
+    MapObjectEntry* mobj;
+    s32 val;
+    const char* anim;
+    s32* args = event->args;
+    s32 arg6;
+    const char* name;
+
+    evtGetValue(event, args[0]);
+    name = (const char*)evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = "MOBJ_BlueTornadoSwitch";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_switch_blue;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x1000000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 99;
+    }
+    mobjCalcMtx(mobj);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_switch_red(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            if (mobj->unk1E0 == 0x200000 || mobj->unk1E0 == 0x1000000) {
+                marioChgMot(MARIO_MOTION_JUMP_SW);
+            }
+            psndSFXOn_3D((const char*)0x1d2, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->flags &= ~8;
+        }
+        break;
+    case 1:
+        if (mobj->flags & 8) {
+            psndSFXOn_3D((const char*)0x1d2, &mobj->position);
+            if (mobj->unk1E0 == 0x200000) {
+                marioChgMot(MARIO_MOTION_JUMP_SW);
+            }
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->flags &= ~8;
+        }
+        if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            mobj->flags &= ~8;
+            mobj->unk1DC = 0;
+        }
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_switch_red) {
+    s32 arg6;
+    s32 val;
+    s32* args = event->args;
+    s32 kind;
+    s32 inBattle;
+    const char* anim;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    kind = evtGetValue(event, args[0]);
+    name = (const char*)evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        anim = "MOBJ_RedSwitch";
+        break;
+    case 1:
+    default:
+        anim = "MOBJ_WhiteSwitch";
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_switch_red;
+    mobj->unk1D4 = val;
+    mobj->flags |= 0x44;
+    mobj->flags |= 0xa10000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mobj_floatswitch_red) {
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    f32 x, y, z;
+    s32 arg6;
+    MapObjectEntry* mobj;
+    const char* anim;
+    evtGetValue(event, args[0]);
+    name = (const char*)evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = "MOBJ_RedSwitchBlock";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_switch_red;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x400000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 99;
+    }
+    mobjCalcMtx(mobj);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_timerswitch(MapObjectEntry* mobj) {
+    MapObjectEntry* other = mobjNameToPtr(mobj->unk1B8);
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            if (mobj->unk1E0 == 0x200000) {
+                marioChgMot(MARIO_MOTION_JUMP_SW);
+            }
+            if (other->unk1DC != 2) {
+                psndSFXOn_3D((const char*)0x1c1, &mobj->position);
+            } else {
+                psndSFXOn_3D((const char*)0x1c2, &mobj->position);
+            }
+            evtEntryType(evt_shake, 0, 0, 0);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->unk1DC++;
+            mobj->flags &= ~8;
+        }
+        break;
+    case 1:
+        if (mobj->flags & 8) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            animPoseSetAnim(other->poseId, "S_1", 1);
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 0.3f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "A_2", 1);
+        animPoseSetAnim(other->poseId, "A_2", 1);
+        mobj->unk1DC++;
+        mobj->unk1B0 = mobj->unk1B4;
+        mobj->flags &= ~8;
+        break;
+    case 2:
+        if (mobj->flags & 8) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            animPoseSetAnim(other->poseId, "S_1", 1);
+            mobj->unk1DC = 0;
+            break;
+        }
+        mobj->unk1B0--;
+        if (mobj->unk1B0 <= 0) {
+            mobj->flags &= ~8;
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            animPoseSetAnim(other->poseId, "S_1", 1);
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (other->unk1DC == 2) {
+            if (marioKeyOffChk() || marioCtrlOffChk()) {
+                mobj->unk1DC = 0;
+                break;
+            }
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            if (!strcmp(mobj->animName, "MOBJ_RedTimerSwitch")) {
+                mobj->flags &= ~8;
+                other->flags &= ~8;
+                animPoseSetAnim(mobj->poseId, "S_1", 1);
+                animPoseSetAnim(other->poseId, "S_1", 1);
+                mobj->unk1DC = 0;
+                other->unk1DC = 0;
+                break;
+            }
+            effSmallStarEntry(0, 8, mobj->position.x, mobj->position.y + 12.5f, mobj->position.z, 0.0f, -1.0f, 0.0f);
+            effSmallStarEntry(0, 8, other->position.x, other->position.y + 12.5f, other->position.z, 0.0f, -1.0f, 0.0f);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            evtSetValue(NULL, other->unk1E4, 1);
+            mobjDelete(mobj->name);
+            mobjDelete(other->name);
+        }
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_timerswitch) {
+    const char* names[2];
+    f32 x[2];
+    f32 y[2];
+    f32 z[2];
+    MapObjectEntry* mobjs[2];
+    s32* args = event->args;
+    s32 kind = evtGetValue(event, args[0]);
+    const char* anims[2] = {"MOBJ_BlueTimerSwitch", "MOBJ_RedTimerSwitch"};
+    const char* anim = anims[kind];
+    s32 inBattle = gp->inBattle != 0;
+    s32 time;
+    s32 val;
+    s32 arg;
+    s32 i;
+    names[0] = (const char*)evtGetValue(event, args[1]);
+    x[0] = evtGetFloat(event, args[2]);
+    y[0] = evtGetFloat(event, args[3]);
+    z[0] = evtGetFloat(event, args[4]);
+    names[1] = (const char*)evtGetValue(event, args[5]);
+    x[1] = evtGetFloat(event, args[6]);
+    y[1] = evtGetFloat(event, args[7]);
+    z[1] = evtGetFloat(event, args[8]);
+    time = evtGetValue(event, args[9]);
+    val = evtGetValue(event, args[10]);
+    arg = args[11];
+    if (kind == 0 && evtGetValue(event, arg)) {
+        return EVT_RETURN_DONE;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    for (i = 0; i < 2; i++) {
+        mobjEntry(names[i], anim);
+        mobjs[i] = mobjNameToPtr(names[i]);
+        strcpy(mobjs[i]->unk1B8, i == 0 ? names[1] : names[0]);
+        mobjSetPosition(names[i], x[i], y[i], z[i]);
+        mobjs[i]->mainFunc = mobj_timerswitch;
+        mobjs[i]->unk1D4 = val;
+        mobjs[i]->flags |= 0x44;
+        mobjs[i]->flags |= 0xa10000;
+        mobjs[i]->unk1E4 = arg;
+        mobjs[i]->unk1DC = 0;
+        mobjs[i]->unk1B4 = time;
+        if (evtGetValue(event, arg)) {
+            mobjs[i]->unk1DC = 99;
+        }
+        mobjCalcMtx(mobjs[i]);
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
+    f32 x, y, z;
+    void* data;
+    f32 mag;
+    Vec size;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            psndSFXOn_3D((const char*)0x1d3, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->unk1DC = 1;
+        }
+        break;
+    case 1:
+        y = mobj->scale2.y - 0.9f;
+        x = mobj->scale2.x;
+        z = mobj->scale2.z;
+        if (y <= 0.2f) {
+            mobj->unk1DC = 2;
+            y = 0.2f;
+            mobj->flags &= ~8;
+        }
+        mobj->scale2 = (Vec){x, y, z};
+        mobjCalcMtx2(mobj);
+        break;
+    case 2:
+        data = animPoseGetAnimBaseDataPtr(mobj->poseId);
+        size = (Vec){0.8f * (10.0f * FLD(f32, data, 0xdc)), 10.0f * FLD(f32, data, 0xe0), 0.8f * (10.0f * FLD(f32, data, 0xe4))};
+        mag = PSVECMag(&size);
+        if (PSVECDistance(&mobj->position, &FLD(Vec, marioGetPtr(), 0x8c)) > mag) {
+            if (!(mobj->flags & 8)) {
+                mobj->unk1DC = 3;
+                animPoseSetAnim(mobj->poseId, "A_2", 1);
+                psndSFXOn_3D((const char*)0x1d4, &mobj->position);
+                mobjRunEvent(mobj, (s32*)mobj->unk1D8);
+            } else {
+                mobj->flags &= ~8;
+            }
+        }
+        break;
+    case 3:
+        y = mobj->scale2.y + 0.9f;
+        x = mobj->scale2.x;
+        z = mobj->scale2.z;
+        if (y >= 15.0f) {
+            mobj->unk1DC = 0;
+            y = 15.0f;
+        }
+        mobj->scale2 = (Vec){x, y, z};
+        mobjCalcMtx2(mobj);
+        mobj->flags &= ~8;
+        break;
+    case 99:
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_rideswitch_lightblue) {
+    s32 val2;
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    f32 x, y, z;
+    s32 arg6;
+    MapObjectEntry* mobj;
+    const char* anim;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    val2 = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = "MOBJ_RideSwitchC";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->scale2.x *= 0.8f;
+    mobj->scale2.z *= 0.8f;
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_rideswitch_lightblue;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = val2;
+    mobj->flags |= 4;
+    mobj->flags |= 0x200000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    mobjCalcMtx2(mobj);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
+    void* mario = marioGetPtr();
+    EventEntry* ev;
+    partyGetPtr(marioGetPartyId());
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            FLD(s32, gp, 0x18) |= 0x10;
+            ev = mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            if (ev) {
+                FLD(s32, ev, 0x9c) = FLD(f32, mario, 0xd8) < FLD(f32, mario, 0x90) ? 0 : (FLD(f32, mario, 0xd8) < mobj->position.y + FLD(f32, mario, 0x1b8) ? 0 : 1);
+            }
+            if (FLD(u8, mario, 0x3c) != 2) {
+                if (!strcmp(mobj->animName, "MOBJ_RedJumpStand")) {
+                    psndSFXOn_3D((const char*)0x1eb, &mobj->position);
+                } else {
+                    psndSFXOn_3D((const char*)0x1ec, &mobj->position);
+                }
+                switch (irand(4)) {
+                case 0:
+                    psndSFXOn_3D((const char*)0xab, &mobj->position);
+                    break;
+                case 1:
+                    psndSFXOn_3D((const char*)0xac, &mobj->position);
+                    break;
+                case 2:
+                    psndSFXOn_3D((const char*)0xad, &mobj->position);
+                    break;
+                case 3:
+                    psndSFXOn_3D((const char*)0xae, &mobj->position);
+                    break;
+                case 4:
+                    psndSFXOn_3D((const char*)0xaf, &mobj->position);
+                    break;
+                }
+            } else if (!strcmp(mobj->animName, "MOBJ_RedJumpStand")) {
+                psndSFXOn((const char*)0x1eb);
+            } else {
+                psndSFXOn((const char*)0x1ec);
+            }
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->flags &= ~8;
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if ((mobj->flags & 8) && evtCheckID(mobj->eventId) == 0) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (evtCheckID(mobj->eventId) == 1) {
+            break;
+        }
+        FLD(s32, gp, 0x18) &= ~0x10;
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->unk1DC = 0;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_jumpstand_red) {
+    s32* args = event->args;
+    s32 kind = evtGetValue(event, args[0]);
+    const char* name = (const char*)evtGetValue(event, args[1]);
+    f32 x = evtGetFloat(event, args[2]);
+    f32 y = evtGetFloat(event, args[3]);
+    f32 z = evtGetFloat(event, args[4]);
+    s32 val = evtGetValue(event, args[5]);
+    const char* anims[2] = {"MOBJ_RedJumpStand", "MOBJ_RedJumpStand2"};
+    s32 arg6 = args[6];
+    const char* anim = anims[kind];
+    MapObjectEntry* mobj;
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_jumpstand_red;
+    mobj->unk1D4 = val;
+    mobj->flags |= 0x44;
+    mobj->flags |= 0x200000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
+    void* mario = marioGetPtr();
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            FLD(s32, gp, 0x18) |= 0x10;
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            if (mobj->unk1E0 == 0x200000) {
+                marioChgJumpStandMotion(FLD(f32, mobj, 0x1ac));
+            }
+            if (FLD(u8, mario, 0x3c) != 2) {
+                if (!strcmp(mobj->animName, "MOBJ_BlueJumpStand")) {
+                    psndSFXOn_3D((const char*)0x1eb, &mobj->position);
+                } else {
+                    psndSFXOn_3D((const char*)0x1ec, &mobj->position);
+                }
+                switch (irand(4)) {
+                case 0:
+                    psndSFXOn_3D((const char*)0xab, &mobj->position);
+                    break;
+                case 1:
+                    psndSFXOn_3D((const char*)0xac, &mobj->position);
+                    break;
+                case 2:
+                    psndSFXOn_3D((const char*)0xad, &mobj->position);
+                    break;
+                case 3:
+                    psndSFXOn_3D((const char*)0xae, &mobj->position);
+                    break;
+                case 4:
+                    psndSFXOn_3D((const char*)0xaf, &mobj->position);
+                    break;
+                }
+            } else if (!strcmp(mobj->animName, "MOBJ_BlueJumpStand")) {
+                psndSFXOn((const char*)0x1eb);
+            } else {
+                psndSFXOn((const char*)0x1ec);
+            }
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            mobj->flags &= ~8;
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if (mobj->flags & 8) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (evtCheckID(mobj->eventId) == 1) {
+            break;
+        }
+        FLD(s32, gp, 0x18) &= ~0x10;
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->unk1DC = 0;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_jumpstand_blue) {
+    s32* args = event->args;
+    s32 kind = evtGetValue(event, args[0]);
+    const char* name = (const char*)evtGetValue(event, args[1]);
+    f32 power = evtGetFloat(event, args[2]);
+    f32 x = evtGetFloat(event, args[3]);
+    f32 y = evtGetFloat(event, args[4]);
+    f32 z = evtGetFloat(event, args[5]);
+    s32 val = evtGetValue(event, args[6]);
+    const char* anims[2] = {"MOBJ_BlueJumpStand", "MOBJ_BlueJumpStand2"};
+    s32 arg7 = args[7];
+    const char* anim = anims[kind];
+    MapObjectEntry* mobj;
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_jumpstand_blue;
+    mobj->unk1D4 = val;
+    mobj->flags |= 0x44;
+    mobj->flags |= 0x200000;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 0;
+    FLD(f32, mobj, 0x1ac) = power;
+    mobjCalcMtx(mobj);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mobj_lv_blk) {
+    s32 val;
+    s32 arg5;
+    s32* args = event->args;
+    const char* anim;
+    const char* name;
+    s32 inBattle;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    anim = (const char*)evtGetValue(event, args[6]);
+    inBattle = gp->inBattle != 0;
+    if (evtGetValue(event, arg5)) {
+        return EVT_RETURN_DONE;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (animGroupBaseAsync("P_box_y", inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 0x44;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_lv_blk_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = 0;
+    mobj->flags |= 0x10000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_float_blk(MapObjectEntry* mobj) {
+    MapObjectEntry* other;
+    const char* cur;
+    switch (mobj->unk1DC) {
+    case 99:
+        if (mobj->unk1B8[0] == 0) {
+            if (blkHitCheck(mobj)) {
+                if (strcmp((const char*)animPoseGetCurrentAnim(mobj->poseId), "S_1")) {
+                    animPoseSetAnim(mobj->poseId, "S_1", 1);
+                    mobj->flags |= 2;
+                }
+            } else if (strcmp((const char*)animPoseGetCurrentAnim(mobj->poseId), "A_1")) {
+                animPoseSetAnim(mobj->poseId, "A_1", 1);
+                mobj->flags &= ~2;
+            }
+        } else {
+            other = mobjNameToPtr(mobj->unk1B8);
+            cur = (const char*)animPoseGetCurrentAnim(other->poseId);
+            if (cur[0] == 'A' && cur[2] >= '1' && cur[2] <= '3') {
+                animPoseSetAnim(mobj->poseId, "A_1", 0);
+            } else {
+                animPoseSetAnim(mobj->poseId, "S_1", 1);
+            }
+        }
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_float_blk) {
+    s32 arg7;
+    s32* args = event->args;
+    const char* name;
+    s32 color;
+    s32 size;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    color = args[4];
+    size = args[5];
+    evtGetValue(event, args[6]);
+    arg7 = args[7];
+    inBattle = gp->inBattle != 0;
+    switch (color) {
+    case 0:
+        if (size == 0) {
+            size = (s32) "MOBJ_green_FlowBlock";
+        } else if (size == 1) {
+            size = (s32) "MOBJ_green_big_FlowBlock";
+        } else {
+            size = (s32) "MOBJ_green_big02_FlowBlock";
+        }
+        break;
+    case 1:
+        if (size == 0) {
+            size = (s32) "MOBJ_purple_FlowBlock";
+        } else if (size == 1) {
+            size = (s32) "MOBJ_purple_big_FlowBlock";
+        } else {
+            size = (s32) "MOBJ_purple_big02_FlowBlock";
+        }
+        break;
+    case 2:
+        if (size == 0) {
+            size = (s32) "MOBJ_orange_FlowBlock";
+        } else if (size == 1) {
+            size = (s32) "MOBJ_orange_big_FlowBlock";
+        } else {
+            size = (s32) "MOBJ_orange_big02_FlowBlock";
+        }
+        break;
+    case 3:
+        size = (s32) "MOBJ_red_big02_FlowBlock";
+        break;
+    default:
+        if (size == 0) {
+            size = (s32) "MOBJ_green_FlowBlock";
+        } else if (size == 1) {
+            size = (s32) "MOBJ_green_big_FlowBlock";
+        } else {
+            size = (s32) "MOBJ_green_big02_FlowBlock";
+        }
+        break;
+    }
+    if (animGroupBaseAsync((const char*)size, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, (const char*)size);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_float_blk;
+    mobj->flags |= 4;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 99;
+    mobjCalcMtx(mobj);
+    if (blkHitCheck(mobj)) {
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->flags |= 2;
+    } else {
+        animPoseSetAnim(mobj->poseId, "A_1", 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
+    s32 i;
+    s32 idx;
+    s32 anim;
+    const char* cur;
+    BOOL a;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (!(mobj->flags & 8)) {
+            break;
+        }
+        cur = (const char*)animPoseGetCurrentAnim(mobj->poseId);
+        idx = 0;
+        for (i = 0; i < 6; i++) {
+            if (!strcmp(_switch_anim[i], cur)) {
+                idx = i;
+                break;
+            }
+        }
+        FLD(s32, mobj, 0x1a4) = (FLD(s32, mobj, 0x1a4) & 0x40000000) | idx;
+        if (mobj->unk1B8[0]) {
+            if (blkHitCheck(mobjNameToPtr(mobj->unk1B8))) {
+                if (evtCheckID(mobj->eventId)) {
+                    if (isAnimA13((const char*)animPoseGetCurrentAnim(mobj->poseId))) {
+                        anim = 0;
+                    } else {
+                        anim = 3;
+                    }
+                } else {
+                    FLD(u32, mobj, 0x1a4) |= 0x80000000;
+                    anim = 0;
+                }
+            } else if (evtCheckID(mobj->eventId)) {
+                cur = (const char*)animPoseGetCurrentAnim(mobj->poseId);
+                if (cur[0] == 'A' && cur[2] >= '1' && cur[2] <= '2') {
+                    anim = 0;
+                } else if (cur[0] == 'A' && cur[2] == '3') {
+                    FLD(u32, mobj, 0x1a4) |= 0x40000000;
+                    anim = 0;
+                } else if (cur[0] == 'A' && cur[2] >= '4' && cur[2] <= '5') {
+                    anim = 3;
+                } else {
+                    anim = 3;
+                }
+            } else {
+                FLD(u32, mobj, 0x1a4) |= 0x80000000;
+                anim = 3;
+            }
+        } else {
+            a = isAnimA13((const char*)animPoseGetCurrentAnim(mobj->poseId));
+            FLD(u32, mobj, 0x1a4) |= 0x80000000;
+            anim = a ? 3 : 0;
+        }
+        mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+        if (mobj->unk1E0 == 0x200000) {
+            marioChgMot(MARIO_MOTION_JUMP_SW);
+        }
+        psndSFXOn_3D((const char*)0x1b5, &mobj->position);
+        switch (mobj->unk1E0) {
+        case 0x400000:
+            animPoseSetAnim(mobj->poseId, _switch_anim[anim + 1], 1);
+            break;
+        default:
+            animPoseSetAnim(mobj->poseId, _switch_anim[anim], 1);
+            break;
+        }
+        mobj->flags &= ~8;
+        if (mobj->unk1B0) {
+            mobj->unk1DC = 10;
+        } else {
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if (mobj->flags & 8) {
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (mobj->flags & 0x1000) {
+            mobj->flags &= ~0x1000;
+            mobj->unk1DC = 10;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        if (mobj->unk1B8[0]) {
+            mobjNameToPtr(mobj->unk1B8);
+        }
+        animPoseSetAnim(mobj->poseId, isAnimA13((const char*)animPoseGetCurrentAnim(mobj->poseId)) ? "A_3" : "S_1", 1);
+        mobj->unk1DC++;
+        break;
+    case 2:
+        if (mobj->flags & 8) {
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (mobj->flags & 0x1000) {
+            mobj->flags &= ~0x1000;
+            mobj->unk1DC = 10;
+        }
+        if (evtCheckID(mobj->eventId) == 0) {
+            mobj->unk1DC = 0;
+            FLD(s32, mobj, 0x1a4) = 0;
+        }
+        break;
+    case 10:
+        if (mobj->flags & 8) {
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        if (isAnimA13((const char*)animPoseGetCurrentAnim(mobj->poseId))) {
+            animPoseSetAnim(mobj->poseId, "A_3", 1);
+        } else {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+        }
+        mobj->unk1B0 = 120;
+        mobj->unk1DC++;
+    case 11:
+        if (mobj->flags & 8) {
+            mobj->unk1DC = 0;
+            break;
+        }
+        mobj->unk1B0--;
+        if (mobj->unk1B0 != 0) {
+            break;
+        }
+        if (mobj->unk1B8[0]) {
+            if (blkHitCheck(mobjNameToPtr(mobj->unk1B8))) {
+                animPoseSetAnim(mobj->poseId, "S_1", 0);
+            } else {
+                animPoseSetAnim(mobj->poseId, "A_3", 0);
+            }
+        } else if (isAnimA13((const char*)animPoseGetCurrentAnim(mobj->poseId))) {
+            animPoseSetAnim(mobj->poseId, "A_3", 1);
+        } else {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+        }
+        mobj->unk1DC = 0;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_switch_float_blk) {
+    s32 arg7;
+    s32 partner;
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    s32 color;
+    MapObjectEntry* mobj;
+    MapObjectEntry* other;
+    s32 inBattle;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    partner = evtGetValue(event, args[4]);
+    color = args[5];
+    val = evtGetValue(event, args[6]);
+    arg7 = args[7];
+    inBattle = gp->inBattle != 0;
+    switch (color) {
+    case 0:
+        color = (s32) "MOBJ_green_FlowBlockSwitch";
+        break;
+    case 1:
+        color = (s32) "MOBJ_purple_FlowBlockSwitch";
+        break;
+    case 2:
+        color = (s32) "MOBJ_orange_FlowBlockSwitch";
+        break;
+    case 3:
+        color = (s32) "MOBJ_red_FlowBlockSwitch";
+        break;
+    default:
+        color = (s32) "MOBJ_green_FlowBlockSwitch";
+        break;
+    }
+    if (animGroupBaseAsync((const char*)color, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, (const char*)color);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_switch_float_blk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0xe10000;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 0;
+    mobj->unk1B0 = 0;
+    mobjCalcMtx(mobj);
+    strcpy(mobj->unk1B8, (const char*)partner);
+    if (mobj->unk1B8[0]) {
+        other = mobjNameToPtr(mobj->unk1B8);
+        strcpy(other->unk1B8, mobj->name);
+        if (blkHitCheck(other)) {
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+        } else {
+            animPoseSetAnim(mobj->poseId, "A_3", 1);
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mobj_lock_unlock) {
+    MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    if (strcmp(mobj->animName, "MOBJ_Lock")) {
+        return EVT_RETURN_DONE;
+    }
+    if (!mobj->mainFunc) {
+        mobj->mainFunc = mobj_lock;
+    }
+    mobj->flags |= 8;
+    marioKeyOff();
+    partyKeyOff();
+    marioStSystemLevel(1);
+    mobj->unk1DC = 3;
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(evt_lock_sound)
+    WAIT_MS(100)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_LOCK_SWING1"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(200)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_UNLOCK1"), LW(0), LW(1), LW(2), 0)
+    RETURN
+EVT_END()
+
+USER_FUNC(evt_mobj_lock) {
+    s32 arg8;
+    s32 val2;
+    s32 val;
+    s32 item;
+    const char* name;
+    s32 inBattle;
+    const char* anim;
+    s32* args = event->args;
+    MapObjectEntry* mobj;
+    f32 rot;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    item = evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    rot = evtGetFloat(event, args[5]);
+    val = evtGetValue(event, args[6]);
+    val2 = evtGetValue(event, args[7]);
+    arg8 = args[8];
+    anim = "MOBJ_Lock";
+    inBattle = gp->inBattle != 0;
+    if (evtGetValue(event, arg8)) {
+        return EVT_RETURN_DONE;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjHitEntry(mobj, 2);
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjSetPosition(name, x, y, z);
+    mobj->rotation.y = rot;
+    mobj->mainFunc = mobj_lock;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = val2;
+    mobj->flags |= 0x26;
+    mobj->flags |= 0x40000;
+    mobj->unk1E4 = arg8;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "Z_1", 1);
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(evt_box_sound1)
+    WAIT_MS(100)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_SWING1"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(200)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_OPEN1"), LW(0), LW(1), LW(2), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_box_sound2)
+    WAIT_MS(100)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_SWING2"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(200)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_TREASURE_BOX_OPEN2"), LW(0), LW(1), LW(2), 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_box_sound3)
+    WAIT_MS(100)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BLACKBOX_SWING1"), LW(0), LW(1), LW(2), LW(15))
+    WAIT_MS(200)
+    CALL(evt_snd_sfxoff, LW(15))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MOBJ_BLACKBOX_OPEN1"), LW(0), LW(1), LW(2), 0)
+    RETURN
+EVT_END()
+
+s32 mobj_signboard(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            marioKeyOff();
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if (evtCheckID(mobj->eventId) != 1) {
+            marioKeyOn();
+            mobj->eventId = 0;
+            mobj->flags &= ~8;
+            mobj->unk1DC = 0;
+        }
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_signboard) {
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    s32 arg5;
+    MapObjectEntry* mobj;
+    const char* anim;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    anim = "MOBJ_Signboard";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_signboard;
+    mobj->unk1D4 = val;
+    mobj->flags |= 0x24;
+    mobj->flags |= 0x40000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mobj_recovery_blk) {
+    s32 arg6;
+    s32* args = event->args;
+    const char* anim;
+    s32 kind;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    kind = evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = kind == 0 ? "MOBJ_RecoveryBlock" : "MOBJ_CoinTakenRecoveryBlock";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    FLD(s32, mobj, 0x1a4) = kind;
+    mobjSetPosition(name, x, y, z);
+    mobj->flags |= 4;
+    mobj->mainFunc = mobj_recovery_blk;
+    mobj->unk1D4 = 0;
+    mobj->unk1D8 = 0;
+    mobj->flags |= 4;
+    mobj->flags |= 0x400000;
+    mobj->unk1E4 = arg6;
+    if (kind == 0) {
+        mobj->unk1DC = 0;
+    } else {
+        mobj->unk1DC = -1;
+    }
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    return EVT_RETURN_DONE;
+}
+
+EVT_BEGIN(mobj_save_blk_sysevt)
+    SET_TYPE(0)
+    CALL(evt_mario_key_onoff, 0)
+    SET_VALUE(LF(10), 0)
+    IF_INT_EQUAL(GSWF(233), 0)
+        SET_VALUE(GSWF(233), 1)
+        CALL(evt_msg_print, 0, STRING("save_first_hit"), 0, 0)
+        SET_VALUE(LF(10), 1)
+    END_IF
+    IF_INT_GREATER_OR_EQUAL(GSW(0), 7)
+        SET_VALUE(GSWF(236), 1)
+    END_IF
+    SET_VALUE(LW(0), 0)
+    CALL_CHILD(PTR(evt_memcard_save))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+s32 mobj_save_blk(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            marioKeyOff();
+            marioStSystemLevel(1);
+            psndSFXOn_3D((const char*)0x1af, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            FLD(u16, camGetPtr((CameraId)8), 0) |= 0x200;
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        if (mobj->unk1D4) {
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            mobj->unk1DC++;
+        } else {
+            mobj->unk1DC = 3;
+        }
+        break;
+    case 2:
+        if (evtCheckID(mobj->eventId) != 1) {
+            mobj->eventId = 0;
+            mobj->unk1DC++;
+        }
+        break;
+    case 3:
+        mobjRunEvent(mobj, (s32*)mobj->unk1D8);
+        mobj->unk1DC++;
+        break;
+    case 4:
+        if (evtCheckID(mobj->eventId) != 1) {
+            marioStSystemLevel(0);
+            FLD(u16, camGetPtr((CameraId)8), 0) &= ~0x200;
+            mobj->flags &= ~8;
+            marioKeyOn();
+            mobj->unk1DC = 0;
+        }
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_save_blk) {
+    s32 arg5;
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    const char* anim;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    anim = "MOBJ_SaveBlock";
+    inBattle = gp->inBattle != 0;
+    if (FLD(u32, gp, 0) & 0x20) {
+        return EVT_RETURN_DONE;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_save_blk;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = (s32)mobj_save_blk_sysevt;
+    mobj->flags |= 0x84;
+    mobj->flags |= 0x400000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_badgeblk(MapObjectEntry* mobj) {
+    void* item;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            if (!strcmp(mobj->animName, "MOBJ_BadgeBlock") || !strcmp(mobj->animName, "MOBJ_BrickBadgeBlock") ||
+                !strcmp(mobj->animName, "MOBJ_HiddenBadgeBlock")) {
+                psndSFXOn_3D((const char*)0x1bb, &mobj->position);
+            } else {
+                psndSFXOn_3D((const char*)0x1ba, &mobj->position);
+            }
+            if (mobj->flags & 0x800) {
+                mobj->flags &= ~0x800;
+            }
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            if (mobj->unk1D4) {
+                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            } else if (FLD(s32, mobj, 0x1a0) != 0x79) {
+                itemEntry(mobj->name, FLD(s32, mobj, 0x1a0), 4, mobj->unk1E4, NULL, mobj->position.x, mobj->position.y + 40.0f, mobj->position.z);
+                item = itemNameToPtr(mobj->name);
+                itemFlagOn(item, 0x10);
+                FLD(f32, item, 0x80) = 0.7f;
+                FLD(f32, item, 0x84) = 1.0f;
+                FLD(s32, item, 0x88) = 0;
+                FLD(f32, item, 0x58) = 360.0f;
+                psndSFXOn_3D((const char*)0x1bc, &mobj->position);
+            } else {
+                pouchAddCoin(1);
+                itemEntry(NULL, 0x79, 0xf, -1, NULL, mobj->position.x, mobj->position.y, mobj->position.z);
+                evtSetValue(NULL, mobj->unk1E4, 1);
+                psndSFXOn_3D((const char*)0x5b, &mobj->position);
+            }
+            mobj->unk1DC++;
+        }
+        break;
+    case 1:
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+        mobj->flags &= ~8;
+        mobj->unk1DC = 90;
+        if (!strcmp(mobj->animName, "MOBJ_HatenaBlock") || !strcmp(mobj->animName, "MOBJ_BrickHatenaBlock") ||
+            !strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock")) {
+            strcpy(mobj->animName, "MOBJ_Block");
+        } else {
+            strcpy(mobj->animName, "MOBJ_PinkBlock");
+        }
+        break;
+    case 90:
+        if (mobj->flags & 8) {
+            mobj->flags &= ~8;
+            animPoseSetAnim(mobj->poseId, "A_2", 1);
+            psndSFXOn_3D((const char*)0x1b7, &mobj->position);
+            mobj->unk1DC++;
+        }
+        break;
+    case 91:
+        if (!(mobj->flags & 8)) {
+            mobj->unk1DC = 90;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+        mobj->unk1DC = 90;
+        mobj->flags &= ~8;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_badgeblk) {
+    s32 item;
+    s32 arg6;
+    s32 kind;
+    const char* anim;
+    s32 val;
+    const char* name;
+    MapObjectEntry* mobj;
+    s32* args = event->args;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    item = evtGetValue(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    kind = args[7];
+    anim = "MOBJ_HatenaBlock";
+    if (kind != 0) {
+        anim = "MOBJ_BadgeBlock";
+    }
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_badgeblk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0xc10000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 90;
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+        strcpy(mobj->animName, kind == 0 ? "MOBJ_Block" : "MOBJ_PinkBlock");
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_powerupblk(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+    case 0:
+        if (!(mobj->flags & 8)) {
+            break;
+        }
+        if (marioKeyOffChk() || marioCtrlOffChk()) {
+            mobj->flags &= ~8;
+            break;
+        }
+        marioKeyOff();
+        if (!strcmp((char*)gp + 0x12c, "dou_02")) {
+            marioCtrlOff();
+        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->unk1E0 == 0x800000) {
+            marioCtrlOff();
+        }
+        FLD(s32, gp, 0x18) |= 3;
+        psndSFXOn_3D((const char*)0x201c0, &mobj->position);
+        animPoseSetAnim(mobj->poseId, "A_1", 1);
+        itemEntry("pwrblk1", 0x57, 0xf, -1, NULL, mobj->position.x, mobj->position.y, mobj->position.z);
+        mobj->unk1DC++;
+        break;
+    case 1:
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "A_2", 1);
+        mobj->flags &= ~8;
+        FLD(s32, mobj, 0x1a4) = 1;
+        mobj->unk1DC++;
+        break;
+    case 2:
+        if (FLD(s32, mobj, 0x1a4)) {
+            FLD(s32, mobj, 0x1a4)--;
+            break;
+        }
+        itemForceGet(itemEntry("pwrblk2", 0x57, 0x11, -1, NULL, mobj->position.x, mobj->position.y + 40.0f, mobj->position.z));
+        evtSetValue(NULL, mobj->unk1E4, 1);
+        marioKeyOn();
+        if (!strcmp((char*)gp + 0x12c, "dou_02")) {
+            marioCtrlOn();
+        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->unk1E0 == 0x800000) {
+            marioCtrlOn();
+        }
+        mobj->unk1DC = 90;
+        break;
+    case 90:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_powerupblk) {
+    s32 arg5;
+    s32 val;
+    s32* args = event->args;
+    const char* name;
+    const char* anim;
+    MapObjectEntry* mobj;
+    f32 rot;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    rot = evtGetFloat(event, args[6]);
+    anim = "MOBJ_PowerUpBlock";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_powerupblk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0xc10000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    mobj->rotation.y = rot;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    if (evtGetValue(event, arg5)) {
+        mobj->unk1DC = 90;
+        animPoseSetAnim(mobj->poseId, "A_2", 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_10countblk(MapObjectEntry* mobj) {
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            if (mobj->flags & 0x800) {
+                mobj->flags &= ~0x800;
+                strcpy(mobj->animName, "MOBJ_Block");
+            }
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            psndSFXOn_3D((const char*)0x1be, &mobj->position);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            if (mobj->unk1D4) {
+                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            } else {
+                pouchAddCoin(1);
+                itemEntry(NULL, 0x79, 0xf, -1, NULL, mobj->position.x, mobj->position.y, mobj->position.z);
+                mobj->unk1B0 = 200;
+            }
+            mobj->unk1DC++;
+            mobj->flags &= ~8;
+        }
+        break;
+    case 1:
+        if (mobj->unk1B0 > 0) {
+            mobj->unk1B0--;
+        }
+        if (mobj->unk1B0 <= 0) {
+            mobj->unk1DC = 90;
+            animPoseSetAnim(mobj->poseId, "S_2", 1);
+            strcpy(mobj->animName, "MOBJ_Block");
+            break;
+        }
+        if (mobj->flags & 8) {
+            psndSFXOn_3D((const char*)0x1bf, &mobj->position);
+            pouchAddCoin(1);
+            itemEntry(NULL, 0x79, 0xf, -1, NULL, mobj->position.x, mobj->position.y, mobj->position.z);
+            mobj->flags &= ~8;
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+        }
+        break;
+    case 90:
+        if (mobj->flags & 8) {
+            psndSFXOn_3D((const char*)0x1b7, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_3", 1);
+            mobj->flags &= ~8;
+            mobj->unk1DC++;
+        }
+        break;
+    case 91:
+        if (!(mobj->flags & 8)) {
+            mobj->unk1DC = 90;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+        mobj->unk1DC = 90;
+        mobj->flags &= ~8;
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_brick) {
+    s32 val;
+    s32 item;
+    const char* name;
+    u32 kind;
+    s32* args = event->args;
+    s32 arg7;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    const char* anim;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    item = evtGetValue(event, args[4]);
+    kind = args[5];
+    val = evtGetValue(event, args[6]);
+    arg7 = args[7];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        anim = "MOBJ_FlowBrickBlock";
+        break;
+    case 1:
+        anim = "MOBJ_BrickHatenaBlock";
+        break;
+    case 2:
+        anim = "MOBJ_BrickBadgeBlock";
+        break;
+    case 3:
+        anim = "MOBJ_10CountBlock";
+        break;
+    case 10:
+        anim = "MOBJ_HiddenHatenaBlock";
+        break;
+    case 11:
+        anim = "MOBJ_HiddenHatenaBlock";
+        break;
+    case 12:
+        anim = "MOBJ_HiddenBadgeBlock";
+        break;
+    case 13:
+        anim = "MOBJ_Hidden10CountBlock";
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    if (animGroupBaseAsync("P_box_y", inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    if ((s32)kind >= 10) {
+        mobj->flags |= 0x800;
+    }
+    switch (kind) {
+    case 0:
+    case 10:
+        mobj->mainFunc = mobj_brickblk;
+        break;
+    case 1:
+    case 11:
+        mobj->mainFunc = mobj_badgeblk;
+        break;
+    case 2:
+    case 12:
+        mobj->mainFunc = mobj_badgeblk;
+        break;
+    case 3:
+    case 13:
+        mobj->mainFunc = mobj_10countblk;
+        break;
+    }
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0xc10000;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 0;
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjCalcMtx(mobj);
+    if ((s32)kind < 10) {
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+    } else if (kind == 13) {
+        animPoseSetAnim(mobj->poseId, "S_3", 1);
+    } else {
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+    }
+    if (evtGetValue(event, arg7)) {
+        anim = NULL;
+        switch (kind) {
+        case 0:
+        case 10:
+            animPoseSetAnim(mobj->poseId, "S_1", 1);
+            mobj->unk1DC = 99;
+            break;
+        case 1:
+        case 11:
+            animPoseSetAnim(mobj->poseId, "S_2", 1);
+            anim = "MOBJ_Block";
+            mobj->unk1DC = 90;
+            break;
+        case 2:
+        case 12:
+            animPoseSetAnim(mobj->poseId, "S_2", 1);
+            anim = "MOBJ_PinkBlock";
+            mobj->unk1DC = 90;
+            break;
+        case 3:
+        case 13:
+            animPoseSetAnim(mobj->poseId, "S_2", 1);
+            anim = "MOBJ_Block";
+            mobj->unk1DC = 90;
+            break;
+        }
+        if (anim) {
+            strcpy(mobj->animName, anim);
+        }
+        mobj->flags &= ~0x800;
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_breaking_floor(MapObjectEntry* mobj) {
+    GXColor c1 = {0xff, 0xff, 0xff, 0xff};
+    GXColor c2 = {0xff, 0xff, 0xff, 0xff};
+    GXColor c3 = {0xff, 0xff, 0xff, 0xff};
+    marioGetPtr();
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            psndSFXOn_3D((const char*)0x401e8, &mobj->position);
+            animPoseSetAnim(mobj->poseId, "A_1", 1);
+            if (mobj->unk1D4) {
+                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            mobj->unk1DC = 1;
+            animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
+            animPoseSetMaterialEvtColor(mobj->poseId, c2);
+            mobj->unk1B0 = 64;
+        }
+        break;
+    case 1:
+        c3 = animPoseGetMaterialEvtColor(mobj->poseId);
+        if (c3.a >= 4) {
+            c3.a -= 4;
+        } else {
+            c3.a = 0;
+            mobj->unk1DC = 99;
+        }
+        animPoseSetMaterialEvtColor(mobj->poseId, c3);
+        mobj->unk1B0--;
+        if (mobj->unk1B0 <= 0) {
+            mobj->unk1DC = 99;
+        }
+        break;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_breaking_floor) {
+    char anim[128];
+    s32 arg6;
+    s32 val;
+    s32* args = event->args;
+    s32 kind;
+    const char* name;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    kind = evtGetValue(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        strcpy(anim, "MOBJ_BreakingFloor");
+        break;
+    case 1:
+        strcpy(anim, "MOBJ_BlackBreakingFloor");
+        break;
+    default:
+        strcpy(anim, "MOBJ_BreakingFloor");
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_breaking_floor;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x1000000;
+    mobj->unk1E4 = arg6;
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 99;
+    } else {
+        mobj->unk1DC = 0;
+    }
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    return EVT_RETURN_DONE;
+}
+
 // ---- kpa ----
 
 typedef struct KpaPoleScoreWork {
@@ -400,6 +2193,42 @@ typedef struct KpaPoleScoreWork {
 } KpaPoleScoreWork;
 
 static KpaPoleScoreWork* psw;
+
+USER_FUNC(evt_mobj_kururing_floor) {
+    s32 arg6;
+    s32 grp;
+    s32* args = event->args;
+    const char* anim;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    grp = evtGetValue(event, args[4]);
+    evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = "MOBJ_KururinFloor";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->position = (Vec){x, 0.1f + y, z};
+    mobj->mainFunc = mobj_kururing_floor;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    mobj->flags |= 0x1010000;
+    mobj->flags |= 2;
+    mobjCalcMtx(mobj);
+    mobj->scale2 = (Vec){200.0f, mobj->scale2.y, 200.0f};
+    mobjCalcMtx2(mobj);
+    mapGrpFlagOn((const char*)grp, 0x400000);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    animPoseWorldPositionEvalOn(mobj->poseId);
+    return EVT_RETURN_DONE;
+}
 
 USER_FUNC(kpa_powerup) {
     s32* args = event->args;
@@ -412,6 +2241,678 @@ USER_FUNC(kpa_powerup) {
         kpaAddScore(1000);
     }
     kpaPowUp();
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
+    BOOL ok = FALSE;
+    void* item;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            switch (kpaGetLevel()) {
+            case 0:
+            case 1:
+                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x4000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 2:
+                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x10000000 || mobj->unk1E0 == 0x4000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 3:
+                ok = TRUE;
+                break;
+            }
+            if (!ok) {
+                mobj->flags &= ~8;
+                break;
+            }
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            if (mobj->unk1E0 == 0x4000000) {
+                npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            kpaAddScore(kpaMutekiCheck() ? 500 : 400);
+            mobj->unk1DC = 10;
+        }
+        break;
+    case 10:
+        psndSFXOn_3D((const char*)0x1c4, &mobj->position);
+        effMObjBrokenEntry(5, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
+        item = itemEntry(mobj->name, 0x59, 4, -1, kpa_powerup_evt, mobj->position.x, 25.0f + mobj->position.y, mobj->position.z);
+        if (item) {
+            itemStatusOn(item, 0x10);
+            itemFlagOn(item, 0x14);
+            FLD(s32, item, 0x7c) = 10000;
+            FLD(s32, item, 0x78) = 0;
+            FLD(f32, item, 0x80) = 0.45f;
+            FLD(f32, item, 0x84) = 0.7f;
+            FLD(s32, item, 0x88) = 0;
+            FLD(f32, item, 0x58) = 500.0f;
+            FLD(f32, item, 0x50) = 120.0f;
+            FLD(s32, item, 0x54) = 90;
+            psndSFXOn_3D((const char*)0x836, &mobj->position);
+        }
+        mobj->unk1DC = 99;
+        break;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_ojama_blk) {
+    s32 val;
+    s32 arg5;
+    s32* args = event->args;
+    const char* anim;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    anim = (const char*)evtGetValue(event, args[6]);
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 4;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_koopa_ojama_blk_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = 0;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg5)) {
+        mobj->unk1DC = 99;
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj) {
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_stone_blk) {
+    s32 val;
+    s32 arg5;
+    s32* args = event->args;
+    const char* anim;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    anim = (const char*)evtGetValue(event, args[6]);
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 4;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_koopa_stone_blk_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = 0;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 99;
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
+    BOOL ok = FALSE;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            switch (kpaGetLevel()) {
+            case 0:
+                if (mobj->unk1E0 == 0x20000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 1:
+                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x4000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 2:
+                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x10000000 || mobj->unk1E0 == 0x4000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 3:
+                ok = TRUE;
+                break;
+            }
+            if (!ok) {
+                if (mobj->unk1E0 == 0x4000000) {
+                    npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+                    mobj->unk1DC = 20;
+                    break;
+                }
+                mobj->flags &= ~8;
+                break;
+            }
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            if (mobj->unk1E0 == 0x4000000) {
+                npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            kpaAddScore(kpaMutekiCheck() ? 500 : 400);
+            mobj->unk1DC = 10;
+        }
+        break;
+    case 10:
+        psndSFXOn_3D((const char*)0x1b8, &mobj->position);
+        if (!strcmp(mobj->animName, "MOBJ_FlowBrickBlock")) {
+            effMObjBrokenEntry(0, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
+        } else if (!strcmp(mobj->animName, "MOBJ_block_ky")) {
+            effMObjBrokenEntry(1, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
+        } else if (!strcmp(mobj->animName, "MOBJ_bigblock_01")) {
+            effMObjBrokenEntry(3, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
+        } else if (!strcmp(mobj->animName, "MOBJ_bigblock_02")) {
+            effMObjBrokenEntry(4, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
+        }
+        mobj->unk1DC = 99;
+        break;
+    case 20:
+        psndSFXOn_3D((const char*)0x1b7, &mobj->position);
+        animPoseSetAnim(mobj->poseId, "A_1", 1);
+        mobj->unk1DC = 21;
+        break;
+    case 21:
+        if (!(mobj->flags & 8)) {
+            mobj->unk1DC = 0;
+            break;
+        }
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->unk1DC = 0;
+        mobj->flags &= ~8;
+        break;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_brick) {
+    s32 arg7;
+    s32 val;
+    s32* args = event->args;
+    s32 item;
+    s32 kind;
+    const char* name;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    item = evtGetValue(event, args[4]);
+    kind = args[5];
+    val = evtGetValue(event, args[6]);
+    arg7 = args[7];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        kind = (s32) "MOBJ_FlowBrickBlock";
+        break;
+    case 1:
+        kind = (s32) "MOBJ_block_ky";
+        break;
+    case 2:
+        kind = (s32) "MOBJ_bigblock_01";
+        break;
+    default:
+        kind = (s32) "MOBJ_bigblock_02";
+        break;
+    }
+    if (animGroupBaseAsync((const char*)kind, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, (const char*)kind);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_koopa_brickblk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 0;
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    if (evtGetValue(event, arg7)) {
+        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        mobj->unk1DC = 99;
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
+    void* item;
+    BOOL ok;
+    marioGetPtr();
+    ok = FALSE;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (!(mobj->flags & 8)) {
+            break;
+        }
+        if (mobj->unk1E0 != 0x4000000) {
+            mobj->flags &= ~8;
+            break;
+        }
+        if (mobj->flags & 0x800) {
+            mobjHitEntry(mobj, 0);
+        }
+        animPoseSetAnim(mobj->poseId, "A_1", 1);
+        if (mobj->unk1D4) {
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+        } else if (FLD(s32, mobj, 0x1a0) == 0x59) {
+            itemEntry(mobj->name, 0x59, 4, -1, kpa_powerup_evt, mobj->position.x, 12.5f + mobj->position.y, mobj->position.z);
+            item = itemNameToPtr(mobj->name);
+            itemStatusOn(item, 0x10);
+            itemFlagOn(item, 0x14);
+            FLD(s32, item, 0x7c) = 10000;
+            FLD(s32, item, 0x78) = 0;
+            FLD(f32, item, 0x80) = 0.45f;
+            FLD(f32, item, 0x84) = 0.7f;
+            FLD(s32, item, 0x88) = 0;
+            FLD(f32, item, 0x58) = 500.0f;
+            FLD(f32, item, 0x50) = 120.0f;
+            FLD(s32, item, 0x54) = 90;
+            psndSFXOn_3D((const char*)0x836, &mobj->position);
+        } else {
+            kpaAddCoin(1);
+            itemEntry(NULL, 0x79, 0xf, -1, NULL, mobj->position.x, mobj->position.y, mobj->position.z);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            psndSFXOn_3D((const char*)0x5b, &mobj->position);
+        }
+        if (mobj->unk1E0 == 0x4000000) {
+            npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+        }
+        mobj->unk1DC++;
+        break;
+    case 1:
+        if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
+            break;
+        }
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+        mobj->flags &= ~8;
+        mobj->unk1DC = 90;
+        strcpy(mobj->animName, "MOBJ_Block");
+        break;
+    case 90:
+        if (mobj->flags & 8) {
+            switch (kpaGetLevel()) {
+            case 3:
+                ok = TRUE;
+                break;
+            }
+            if (!ok) {
+                mobj->flags &= ~8;
+                break;
+            }
+            if (mobj->unk1E0 == 0x4000000) {
+                npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            mobj->unk1DC++;
+        }
+        break;
+    case 91:
+        psndSFXOn_3D((const char*)0x1b8, &mobj->position);
+        effMObjBrokenEntry(2, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
+        mobj->unk1DC = 99;
+        break;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_badgeblk) {
+    s32 val;
+    s32 item;
+    s32* args = event->args;
+    s32 arg6;
+    const char* name;
+    MapObjectEntry* mobj;
+    const char* anim;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    item = evtGetValue(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    anim = "MOBJ_HatenaBlock";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_koopa_badgeblk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 90;
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_mobj_koopa_hidden_blk) {
+    s32 item;
+    s32 arg7;
+    s32* args = event->args;
+    s32 val;
+    const char* name;
+    MapObjectEntry* mobj;
+    const char* anim;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    item = evtGetValue(event, args[4]);
+    val = evtGetValue(event, args[6]);
+    arg7 = args[7];
+    anim = "MOBJ_HiddenHatenaBlock";
+    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->flags |= 0x800;
+    mobjHitEntry(mobj, 1);
+    mobj->mainFunc = mobj_koopa_badgeblk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg7;
+    mobj->unk1DC = 0;
+    FLD(s32, mobj, 0x1a0) = item;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    if (evtGetValue(event, arg7)) {
+        mobj->unk1DC = 90;
+        animPoseSetAnim(mobj->poseId, "S_2", 1);
+    }
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_blk(MapObjectEntry* mobj) {
+    BOOL ok = FALSE;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            switch (kpaGetLevel()) {
+            case 3:
+                ok = TRUE;
+                break;
+            }
+            if (!ok) {
+                mobj->flags &= ~8;
+                break;
+            }
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            if (mobj->unk1E0 == 0x4000000) {
+                npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            mobj->unk1DC = 10;
+        }
+        break;
+    case 10:
+        psndSFXOn_3D((const char*)0x1b8, &mobj->position);
+        effMObjBrokenEntry(2, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
+        mobj->unk1DC = 99;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_blk) {
+    s32 val;
+    s32* args = event->args;
+    s32 arg6;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    if (animGroupBaseAsync("MOBJ_Block", gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, "MOBJ_Block");
+    mobj = mobjNameToPtr(name);
+    mobjSetPosition(name, x, y, z);
+    mobj->mainFunc = mobj_koopa_blk;
+    mobj->unk1D4 = val;
+    mobj->flags |= 4;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    return EVT_RETURN_DONE;
+}
+
+s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
+    BOOL ok = FALSE;
+    switch (mobj->unk1DC) {
+    case 0:
+        if (mobj->flags & 8) {
+            switch (kpaGetLevel()) {
+            case 0:
+                break;
+            case 1:
+            case 2:
+                if (mobj->unk1E0 == 0x20000000) {
+                    ok = TRUE;
+                }
+                break;
+            case 3:
+                ok = TRUE;
+                break;
+            }
+            if (!ok) {
+                mobj->flags &= ~8;
+                break;
+            }
+            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            evtSetValue(NULL, mobj->unk1E4, 1);
+            if (mobj->unk1E0 == 0x4000000) {
+                npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
+            }
+            if (mobj->hitObj[0].hitObject) {
+                FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
+            }
+            mobj->flags |= 2;
+            kpaAddScore(kpaMutekiCheck() ? 500 : 400);
+            mobj->unk1DC = 10;
+        }
+        break;
+    case 10:
+        if (!strcmp(mobj->animName, "MOBJ_GreenPipe_ks")) {
+            effMObjBrokenEntry(6, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
+        } else if (!strcmp(mobj->animName, "MOBJ_GreenPipe_kl")) {
+            effMObjBrokenEntry(6, mobj->position.x, 7.5f + (25.0f + mobj->position.y), 25.0f + mobj->position.z);
+        } else {
+            effMObjBrokenEntry(6, mobj->position.x - 25.0f, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
+        }
+        psndSFXOn_3D((const char*)0x834, &mobj->position);
+        mobj->unk1DC = 99;
+        break;
+    case 99:
+        mobjDelete(mobj->name);
+        break;
+    }
+    return 0;
+}
+
+USER_FUNC(evt_mobj_koopa_dokan) {
+    s32 kind;
+    s32 val;
+    s32* args = event->args;
+    s32 arg6;
+    const char* name;
+    const char* anim;
+    MapObjectEntry* mobj;
+    s32 inBattle;
+    f32 x, y, z;
+    kind = evtGetValue(event, args[0]);
+    name = (const char*)evtGetValue(event, args[1]);
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    val = evtGetValue(event, args[5]);
+    arg6 = args[6];
+    inBattle = gp->inBattle != 0;
+    switch (kind) {
+    case 0:
+        anim = "MOBJ_GreenPipe_ks";
+        break;
+    case 1:
+        anim = "MOBJ_GreenPipe_kl";
+        break;
+    case 2:
+        anim = "MOBJ_GreenPipe_ky";
+        break;
+    }
+    if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, anim);
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 6;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_koopa_dokan_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = 0;
+    mobjCalcMtx(mobj);
+    animPoseSetAnim(mobj->poseId, "S_1", 1);
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg6;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg6)) {
+        mobj->unk1DC = 99;
+    }
+    return EVT_RETURN_DONE;
+}
+
+extern EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale);
+
+USER_FUNC(fire_func) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    s32 dur = evtGetValue(event, args[3]);
+    EffectEntry* eff;
+    f32 a, b;
+    if (isFirstCall) {
+        f32 t = (f32)irand(10) / 10.0f;
+        event->userdatap[0] = effFireEntry(5, dur, x, y, z, 0.8f + t);
+    }
+    a = event->userdataf[1];
+    b = event->userdataf[2];
+    a = a + (1.0f - a) / 8.0f;
+    b = b + (1.0f - b) / 8.0f;
+    eff = event->userdatap[0];
+    FLD(f32, eff->userdata, 0x78) = a;
+    FLD(f32, eff->userdata, 0x7c) = b;
+    if (a >= 0.99f) {
+        FLD(f32, eff->userdata, 0x78) = 1.0f;
+        FLD(f32, eff->userdata, 0x7c) = 1.0f;
+        return EVT_RETURN_DONE;
+    }
+    event->userdataf[1] = a;
+    event->userdataf[2] = b;
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_mobj_koopa_sango) {
+    s32 val;
+    s32 arg5;
+    s32* args = event->args;
+    const char* name;
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    name = (const char*)evtGetValue(event, args[0]);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    val = evtGetValue(event, args[4]);
+    arg5 = args[5];
+    if (animGroupBaseAsync("MOBJ_sango", gp->inBattle != 0, NULL) == 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    mobjEntry(name, "MOBJ_sango");
+    mobj = mobjNameToPtr(name);
+    mobj->flags |= 0x84;
+    mobj->position = (Vec){x, y, z};
+    mobj->mainFunc = mobj_koopa_sango_evt;
+    mobj->unk1D4 = val;
+    mobj->unk1D8 = 0;
+    mobj->flags |= 0x3c000000;
+    mobj->unk1E4 = arg5;
+    mobj->unk1DC = 0;
+    if (evtGetValue(event, arg5)) {
+        mobj->unk1DC = 99;
+    }
     return EVT_RETURN_DONE;
 }
 
@@ -449,6 +2950,37 @@ USER_FUNC(kpa_get_width) {
     return EVT_RETURN_DONE;
 }
 
+USER_FUNC(kpa_score_to_str) {
+    s32 score = evtGetValue(event, event->args[0]);
+    s32 d1000, d100, d10, d1;
+    s32 i;
+    d1000 = score / 1000;
+    score = score % 1000;
+    d100 = score / 100;
+    score = score % 100;
+    d10 = score / 10;
+    d1 = score % 10;
+    i = 0;
+    if (i != 0 || d1000 != 0) {
+        psw->str[i] = d1000 + '0';
+        i++;
+    }
+    if (i != 0 || d100 != 0) {
+        psw->str[i] = d100 + '0';
+        i++;
+    }
+    if (i != 0 || d10 != 0) {
+        psw->str[i] = d10 + '0';
+        i++;
+    }
+    if (i != 0 || d1 != 0) {
+        psw->str[i] = d1 + '0';
+        i++;
+    }
+    psw->str[4] = 0;
+    return EVT_RETURN_DONE;
+}
+
 void kpa_disp_pole_score(CameraId camId, void* param) {
     Mtx trans;
     Mtx scale;
@@ -458,6 +2990,26 @@ void kpa_disp_pole_score(CameraId camId, void* param) {
     FontDrawStart();
     FontDrawColor((GXColor){255, 255, 255, 255});
     FontDrawStringMtx(trans, psw->str);
+}
+
+USER_FUNC(kpa_disp_pole_score_main) {
+    s32* args = event->args;
+    f32 x = evtGetFloat(event, args[0]);
+    f32 y = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    f32 spd = evtGetFloat(event, args[3]);
+    if (isFirstCall) {
+        psw->x = x;
+        psw->y = y;
+        psw->z = z;
+    }
+    if (psw->y < 230.0f) {
+        psw->y += spd;
+    } else {
+        psw->y = 230.0f;
+    }
+    dispEntry(CAMERA_3D, 0.0f, 2, kpa_disp_pole_score, NULL);
+    return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(kpa_disp_pole_init) {
@@ -474,3 +3026,174 @@ USER_FUNC(kpa_clear_jump_data) {
     mario->airTimer = 0;
     return EVT_RETURN_DONE;
 }
+
+EVT_BEGIN(kpa_pole)
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_cam_letter_box_onoff, 0, 0)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_mario_cam_y_on)
+    CALL(kpa_disp_pole_init)
+    CALL(kpa_clear_jump_data)
+    CALL(kpa_get_hata_name, LW(15))
+    CALL(evt_mario_set_dir, 90, 0, 0)
+    CALL(kpa_chg_pose, STRING("KPA2_G_1"))
+    CALL(evt_mario_get_pos, 0, LW(1), LW(2), LW(3))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_POST_JUMP1"), LW(1), LW(2), LW(3), 0)
+    CALL(evt_mobj_get_x_position, LW(15), LW(4))
+    CALL(kpa_get_width, LW(5))
+    MULTIPLY_FLOAT(LW(5), FLOAT(0.5996094f))
+    SUBTRACT_FLOAT(LW(4), LW(5))
+    CALL(evt_mario_set_pos, LW(4), LW(2), LW(3))
+    CALL(kpa_score_to_str, LW(0))
+    SET_FLOAT_VALUE(LW(14), FLOAT(2.0f))
+    SET_FLOAT_VALUE(LW(13), FLOAT(2.0f))
+    SET_FLOAT_VALUE(LW(7), FLOAT(50.0f))
+    BEGIN_INLINE_EVENT
+        CALL(evt_mobj_get_position, LW(15), LW(3), LW(4), LW(5))
+        ADD_FLOAT(LW(3), FLOAT(7.5f))
+        CALL(kpa_disp_pole_score_main, LW(3), LW(7), LW(5), LW(13))
+    END_INLINE_EVENT
+    CALL(evt_mario_get_pos, 0, LW(1), LW(2), LW(3))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_POST_SLIDE1"), LW(1), LW(2), LW(3), LW(10))
+    BEGIN_INLINE_EVENT_GET_ID(LW(6))
+        LOOP(0)
+            CALL(evt_mobj_get_y_position, LW(15), LW(4))
+            SUBTRACT_FLOAT(LW(4), LW(14))
+            CALL(evt_mobj_set_y_position, LW(15), LW(4))
+            WAIT_FRAMES(1)
+            IF_INT_LESS_OR_EQUAL(LW(4), 25)
+                CALL(evt_mobj_set_y_position, LW(15), FLOAT(25.0f))
+                BREAK_LOOP
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    LOOP(0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        SUBTRACT_FLOAT(LW(1), FLOAT(2.0f))
+        CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+        IF_INT_LESS_OR_EQUAL(LW(1), FLOAT(25.0f))
+            CALL(evt_mario_set_pos, LW(0), FLOAT(25.0f), LW(2))
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    LOOP(0)
+        IS_EVENT_RUNNING(LW(6), LW(7))
+        IF_INT_EQUAL(LW(7), 0)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_snd_sfxoff, LW(10))
+    WAIT_MS(200)
+    CALL(evt_cam_get_pos, 4, LW(4), LW(5), LW(6))
+    CALL(evt_cam_get_at, 4, LW(7), LW(8), LW(9))
+    CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 0, 11)
+    WAIT_FRAMES(1)
+    CALL(kpa_get_width, LW(3))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    MULTIPLY_FLOAT(LW(3), FLOAT(1.1992188f))
+    ADD_FLOAT(LW(0), LW(3))
+    CALL(evt_cam3d_get_shift, LW(0), LW(1), LW(2), LW(3))
+    CALL(evt_cam3d_event_from_road, LW(0), LW(1), LW(2), LW(3), LW(4), LW(5), LW(6), LW(7), LW(8), LW(9))
+    CALL(evt_cam3d_evt_set, LW(4), LW(5), LW(6), LW(7), LW(8), LW(9), 300, 0)
+    WAIT_MS(200)
+    CALL(evt_mario_set_pos, LW(0), LW(1), LW(2))
+    CALL(evt_mario_set_dir, 270, 0, 0)
+    CALL(evt_mario_set_mov_spd, 0)
+    WAIT_MS(200)
+    ADD(LW(0), 20)
+    CALL(evt_mario_set_pos, LW(0), 0, 10)
+    WAIT_FRAMES(1)
+    CALL(evt_mario_cont_onoff, 1)
+    CALL(evt_cam3d_evt_off, 200, 11)
+    WAIT_MS(200)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kpa_pole_move)
+    CALL(evt_cam_letter_box_disable, 1)
+    CALL(evt_cam_letter_box_onoff, 0, 0)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(kpa_get_pole_name, LW(14))
+    CALL(kpa_get_hata_name, LW(15))
+    CALL(evt_mobj_get_x_position, LW(14), LW(0))
+    CALL(evt_mobj_get_y_position, LW(14), LW(1))
+    CALL(evt_mobj_get_z_position, LW(14), LW(2))
+    SET_FLOAT_VALUE(LW(6), FLOAT(2.0f))
+    SET_FLOAT_VALUE(LW(7), FLOAT(9.0f))
+    SET_FLOAT_VALUE(LW(8), FLOAT(5.7998047f))
+    CALL(evt_mobj_get_x_position, LW(15), LW(3))
+    CALL(evt_mobj_get_y_position, LW(15), LW(4))
+    CALL(evt_mobj_get_z_position, LW(15), LW(5))
+    SET_FLOAT_VALUE(LW(9), FLOAT(2.0f))
+    SET_FLOAT_VALUE(LW(11), FLOAT(5.7998047f))
+    SET_FLOAT_VALUE(LW(12), FLOAT(1.0f))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_POST_THROW1"), LW(0), LW(1), LW(2), LW(13))
+    LOOP(100)
+        ADD_FLOAT(LW(0), LW(6))
+        ADD_FLOAT(LW(1), LW(7))
+        ADD_FLOAT(LW(2), LW(8))
+        ADD_FLOAT(LW(3), LW(9))
+        SET_FLOAT_VALUE(LW(4), FLOAT(180.0f))
+        MULTIPLY_FLOAT(LW(4), LW(12))
+        ADD_FLOAT(LW(4), LW(1))
+        ADD_FLOAT(LW(5), LW(11))
+        CALL(evt_mobj_set_position, LW(14), LW(0), LW(1), LW(2))
+        CALL(evt_mobj_set_scale, LW(14), LW(12), LW(12), LW(12))
+        CALL(evt_mobj_set_position, LW(15), LW(3), LW(4), LW(5))
+        CALL(evt_mobj_set_scale, LW(15), LW(12), LW(12), LW(12))
+        ADD_FLOAT(LW(6), FLOAT(0.0f))
+        ADD_FLOAT(LW(7), FLOAT(-0.7998047f))
+        ADD_FLOAT(LW(8), FLOAT(0.0f))
+        ADD_FLOAT(LW(9), FLOAT(0.0f))
+        ADD_FLOAT(LW(11), FLOAT(0.0f))
+        ADD_FLOAT(LW(12), FLOAT(0.0390625f))
+        IF_INT_GREATER(LW(12), 3)
+            SET_FLOAT_VALUE(LW(12), FLOAT(3.0f))
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    CALL(evt_snd_sfxoff, LW(13))
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kpa_move_to_toride)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_wait_landon)
+    SET_VALUE(LSWF(5), 1)
+    CALL(evt_sub_get_mapname, LW(0))
+    IF_STR_EQUAL(LW(0), STRING("kpa_06"))
+        CALL(evt_mapobj_get_position, STRING("toride"), LW(0), LW(1), LW(2))
+        ELSE
+        CALL(evt_mapobj_get_position, STRING("toride_"), LW(0), LW(1), LW(2))
+    END_IF
+    CALL(kpa_get_level, LW(6))
+    SWITCH(LW(6))
+        CASE_LESS_OR_EQUAL(1)
+        ADD(LW(0), 100)
+        CASE_EQUAL(2)
+        CALL(kpa_get_width, LW(7))
+        MULTIPLY_FLOAT(LW(7), FLOAT(1.1992188f))
+        SUBTRACT_FLOAT(LW(0), LW(7))
+        CASE_EQUAL(3)
+        CALL(kpa_get_width, LW(7))
+        MULTIPLY_FLOAT(LW(7), FLOAT(1.1992188f))
+        SUBTRACT_FLOAT(LW(0), LW(7))
+    END_SWITCH
+    CALL(evt_mario_get_pos, 0, LW(3), LW(4), LW(5))
+    CALL(evt_mario_mov_pos2, LW(0), LW(5), 90)
+    IF_INT_GREATER_OR_EQUAL(LW(6), 2)
+        CALL(evt_mario_get_pos, 0, LW(1), LW(2), LW(3))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_KUPPA_STRUGGLE1"), LW(1), LW(2), LW(3), LW(10))
+        CALL(evt_mario_dispflag_onoff, 1, 2)
+        WAIT_MS(2000)
+        CALL(evt_mario_dispflag_onoff, 0, 2)
+        CALL(evt_snd_sfxoff, LW(10))
+        CALL(kpa_chg_pose, STRING("KPA2_S_1"))
+    END_IF
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+

@@ -925,8 +925,8 @@ USER_FUNC(evt_npc_glide_position) {
     dt = (elapsed - dt) / total;
     curr = _intplGetFloat(mode, elapsed / total);
     prev = _intplGetFloat(mode, dt);
-    dx = npc->jumpTargetPos.x - npc->jumpStartPos.x;
     delta = curr - prev;
+    dx = npc->jumpTargetPos.x - npc->jumpStartPos.x;
     dz = npc->jumpTargetPos.z - npc->jumpStartPos.z;
     npc->moveOffset.x += dx * delta;
     npc->moveOffset.z += dz * delta;

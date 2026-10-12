@@ -26,7 +26,11 @@
 // proto: static void ext_moamoa_init(void);
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+static const Vec tv0 = {0.0f, 0.0f, 10.0f};
+static const Vec tv1 = {0.0f, 0.0f, 10.0f};
+static const Vec tv2 = {0.0f, 0.0f, 10.0f};
 static void ext_moamoa_init(void) {
+    s32 j;
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -34,20 +38,12 @@ static void ext_moamoa_init(void) {
     f32 dist;
     f32 hitX, hitY, hitZ, hitDist, nx, ny, nz;
 
+
     wp = _mapAlloc(sizeof(MoamoaWork));
     memset(wp, 0, sizeof(MoamoaWork));
-    {
-        static const Vec tv0 = {0.0f, 0.0f, 10.0f};
-        wp->target[0] = tv0;
-    }
-    {
-        static const Vec tv1 = {0.0f, 0.0f, 10.0f};
-        wp->target[1] = tv1;
-    }
-    {
-        static const Vec tv2 = {0.0f, 0.0f, 10.0f};
-        wp->target[2] = tv2;
-    }
+    wp->target[0] = tv0;
+    wp->target[1] = tv1;
+    wp->target[2] = tv2;
     wp->count = extGetPoseNum();
     wp->moa = _mapAlloc(wp->count * sizeof(Moamoa));
     memset(wp->moa, 0, wp->count * sizeof(Moamoa));
@@ -65,14 +61,14 @@ static void ext_moamoa_init(void) {
         PSMTXIdentity(pose->mtx);
         pose->mtx[0][3] = wp->target[0].x + dist * moa_sin(angle);
         pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = wp->target[0].z - dist * moa_cos(angle);
+        pose->mtx[0][3] = wp->target[0].z - dist * moa_cos(angle);
         hitX = hitY = hitZ = 0.0f;
         hitDist = 1000000.0f;
         if (hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &nx, &ny, &nz, pose->mtx[0][3], 100.0f + pose->mtx[1][3], pose->mtx[2][3], 0.0f, -1.0f, 0.0f)) {
             pose->mtx[1][3] = hitY;
         }
     }
-    for (i = 0; i < 600; i++) {
+    for (j = 0; j < 600; j++) {
         ext_moamoa_main();
     }
 }

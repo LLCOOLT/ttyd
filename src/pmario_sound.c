@@ -1,64 +1,278 @@
 #include "pmario_sound.h"
 #include "sound.h"
 #include <string.h>
+#include "mario/mariost.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr_cmd.h"
+
+typedef struct SoundBGMEntry { const char* name; u32 flags; const char* path; u32 unkC; } SoundBGMEntry;
 //TODO: put this in a folder?
 
 //.data
-static f32 angleABTBL[] = {
-	1.0f, 1.273187f, 1.27303f, 1.272768f, 1.272402f, 1.271932f, 1.271358f,
-	1.270681f, 1.269902f, 1.269021f, 1.268038f, 1.266956f, 1.265774f, 1.2644939f,
-	1.263116f, 1.2616431f, 1.260075f, 1.258413f, 1.256659f, 1.254815f, 1.2528811f,
-	1.250859f, 1.248752f, 1.24656f, 1.244285f, 1.2419291f, 1.239494f, 1.236981f,
-	1.234393f, 1.2317311f, 1.228997f, 1.226192f, 1.22332f, 1.220382f, 1.217379f,
-	1.2143151f, 1.211189f, 1.208006f, 1.204766f, 1.201471f, 1.1981241f, 1.1947269f,
-	1.191281f, 1.1877871f, 1.18425f, 1.180669f, 1.177047f, 1.173386f, 1.169687f,
-	1.165952f, 1.162184f, 1.158384f, 1.1545531f, 1.1506931f, 1.146806f, 1.142893f,
-	1.138957f, 1.134998f, 1.131018f, 1.127019f, 1.1230021f, 1.118969f, 1.11492f,
-	1.110858f, 1.106783f, 1.102697f, 1.098601f, 1.094496f, 1.090384f, 1.086266f,
-	1.082142f, 1.078014f, 1.0738831f, 1.06975f, 1.065616f, 1.061482f, 1.057348f,
-	1.053216f, 1.049087f, 1.04496f, 1.040838f, 1.036721f, 1.0326101f, 1.028504f,
-	1.024406f, 1.020316f, 1.016234f, 1.0121599f, 1.0080971f, 1.004043f, 1.0f
+SoundBGMEntry psbgmlist[] = {
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_TITLE1\000", 0x80000000, "sound/stream/sys_tit1_32k\000\000", 0x58400101},
+	{"BGM_DEMO1\000\000", 0x80000000, "sound/stream/sys_demo1_32k\000", 0x5A400001},
+	{"BGM_DEMO2\000\000", 0x80000000, "sound/stream/sys_demo2_32k\000", 0x4D400001},
+	{"BGM_DIGEST1", 0x80000000, "sound/stream/sys_dig1_32k\000\000", 0x53400001},
+	{"BGM_FILE_MENU1\000", 0x80000000, "sound/stream/sys_mmc1_32k\000\000", 0x58400101},
+	{"BGM_OPENING1\000\000\000", 0x80000000, "sound/stream/sys_opn1_32k\000\000", 0x56400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_ENDING1", 0x80000000, "sound/stream/evt_ed1_32k\000\000\000", 0x50400001},
+	{"BGM_ENDING2", 0x80000000, "sound/stream/evt_ed2_32k\000\000\000", 0x43400001},
+	{"BGM_ENDING3", 0x80000000, "sound/stream/evt_ed3_32k\000\000\000", 0x55400001},
+	{"BGM_ENDING4", 0x80000000, "sound/stream/evt_ed4_32k\000\000\000", 0x4B400001},
+	{"BGM_ENDING5", 0x80000000, "sound/stream/evt_ed5_32k\000\000\000", 0x4B400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STAFF_ROLL1", 0x80000000, "sound/stream/sys_stf1_32k\000\000", 0x5F400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG0_GOR1", 0x80000000, "sound/stream/stg_gor2_32k\000\000", 0x3C400101},
+	{"BGM_M_STG0_TIK1", 0x80000000, "sound/stream/stg_tik2_32k\000\000", 0x3C400201},
+	{"BGM_M_STG0_TIK2", 0x80000000, "sound/stream/stg_tik1_32k\000\000", 0x5A400301},
+	{"BGM_M_STG0_CSN1", 0x80000000, "sound/stream/stg_gor1_32k\000\000", 0x50400401},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG1_HEI1", 0x80000000, "sound/stream/stg_dor1_32k\000\000", 0x46400501},
+	{"BGM_M_STG1_NOK1", 0x80000000, "sound/stream/stg_nok1_32k\000\000", 0x53400601},
+	{"BGM_M_STG1_TORIDE1\000", 0x80000000, "sound/stream/stg_stn1_32k\000\000", 0x46400701},
+	{"BGM_M_STG1_GON1", 0x80000000, "sound/stream/stg_gnb1_32k\000\000", 0x4E400801},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG2_WIN1", 0x80000000, "sound/stream/stg_fsg1_32k\000\000", 0x46400901},
+	{"BGM_M_STG2_MRI1", 0x80000000, "sound/stream/stg_okk1_32k\000\000", 0x5A400A01},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG3_URN1", 0x80000000, "sound/stream/stg_urg11_32k\000", 0x5A400B01},
+	{"BGM_M_STG3_TOU1", 0x80000000, "sound/stream/stg_tgm1_32k\000\000", 0x50400C01},
+	{"BGM_M_STG3_TOU2", 0x80000000, "sound/stream/stg_tog1_32k\000\000", 0x4D400D01},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG4_USU1", 0x80000000, "sound/stream/stg_ugt1_32k\000\000", 0x53400E01},
+	{"BGM_M_STG4_GRA1", 0x80000000, "sound/stream/stg_gra1_32k\000\000", 0x55400F01},
+	{"BGM_M_STG4_JIN1", 0x80000000, "sound/stream/stg_dim1_32k\000\000", 0x55401001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG5_MUJ1", 0x80000000, "sound/stream/stg_mjn1_32k\000\000", 0x55401101},
+	{"BGM_M_STG5_DOU1", 0x80000000, "sound/stream/stg_duk1_32k\000\000", 0x5A401201},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG6_RSH1", 0x80000000, "sound/stream/stg_rsh_a1_32k", 0x46401301},
+	{"BGM_M_STG6_RSH2", 0x80000000, "sound/stream/stg_rsh_b1_32k", 0x46401401},
+	{"BGM_M_STG6_RSH3", 0x80000000, "sound/stream/stg_rsh_c1_32k", 0x46401501},
+	{"BGM_M_STG6_HOM1", 0x80000000, "sound/stream/stg_hom1_32k\000\000", 0x46401601},
+	{"BGM_M_STG6_EKI1", 0x80000000, "sound/stream/stg_eki1_32k\000\000", 0x46401701},
+	{"BGM_M_STG6_PIK1", 0x80000000, "sound/stream/stg_pik1_32k\000\000", 0x46401801},
+	{"BGM_M_STG6_PIK2", 0x80000000, "sound/stream/stg_snd1_32k\000\000", 0x46401901},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG7_BOM1", 0x80000000, "sound/stream/stg_bmm1_32k\000\000", 0x50401A01},
+	{"BGM_M_STG7_MON1", 0x80000000, "sound/stream/stg_gtm1_32k\000\000", 0x5A401B01},
+	{"BGM_M_STG7_DUN1", 0x80000000, "sound/stream/stg_tkd1_32k\000\000", 0x55401C01},
+	{"BGM_M_STG7_DUN2", 0x80000000, "sound/stream/stg_tkd2_32k\000\000", 0x46401D01},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STG8_LST1", 0x80000000, "sound/stream/stg_ldn1_32k\000\000", 0x5A501E01},
+	{"BGM_M_STG8_LST2", 0x80000000, "sound/stream/stg_ldn2_32k\000\000", 0x5A501F01},
+	{"BGM_M_STG8_LST3", 0x80000000, "sound/stream/stg_ldn3_32k\000\000", 0x5A502001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_M_STGK_CASTLE1\000", 0x80000000, "sound/stream/stg_kpa1_32k\000\000", 0x50402101},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG0_GOR1\000\000", 0x80000000, "sound/stream/stg_gor2_32k\000\000", 0x46400000},
+	{"BGM_STG0_TIK1\000\000", 0x80000000, "sound/stream/stg_tik2_32k\000\000", 0x39400000},
+	{"BGM_STG0_TIK2\000\000", 0x80000000, "sound/stream/stg_tik3_32k\000\000", 0x5A400000},
+	{"BGM_STG0_CSN1\000\000", 0x80000000, "sound/stream/stg_gor1_32k\000\000", 0x4B400000},
+	{"BGM_STG0_100DN1", 0x80000000, "sound/stream/stg_tik1_32k\000\000", 0x32400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG1_HEI1\000\000", 0x80000000, "sound/stream/stg_dor1_32k\000\000", 0x46400000},
+	{"BGM_STG1_NOK1\000\000", 0x80000000, "sound/stream/stg_nok1_32k\000\000", 0x57400000},
+	{"BGM_STG1_TORIDE1\000\000\000", 0x80000000, "sound/stream/stg_stn1_32k\000\000", 0x3F400000},
+	{"BGM_STG1_GON1\000\000", 0x80000000, "sound/stream/stg_gnb1_32k\000\000", 0x44400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG2_WIN1\000\000", 0x80000000, "sound/stream/stg_fsg1_32k\000\000", 0x46400000},
+	{"BGM_STG2_MRI1\000\000", 0x80000000, "sound/stream/stg_okk1_32k\000\000", 0x4B400000},
+	{"BGM_STG2_MRI2\000\000", 0x80000000, "sound/stream/evt_pun1_32k\000\000", 0x48400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG3_URN1\000\000", 0x80000000, "sound/stream/stg_urg11_32k\000", 0x50400000},
+	{"BGM_STG3_TOU1\000\000", 0x80000000, "sound/stream/stg_tog1_32k\000\000", 0x4D400000},
+	{"BGM_STG3_TOU2\000\000", 0x80000000, "sound/stream/stg_tgm1_32k\000\000", 0x50400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG4_USU1\000\000", 0x80000000, "sound/stream/stg_ugt1_32k\000\000", 0x3E400000},
+	{"BGM_STG4_GRA1\000\000", 0x80000000, "sound/stream/stg_gra1_32k\000\000", 0x2D400000},
+	{"BGM_STG4_JIN1\000\000", 0x80000000, "sound/stream/stg_dim1_32k\000\000", 0x55400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG5_MUJ1\000\000", 0x80000000, "sound/stream/stg_mjn1_32k\000\000", 0x55400000},
+	{"BGM_STG5_DOU1\000\000", 0x80000000, "sound/stream/stg_duk1_32k\000\000", 0x5A400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG6_RSH1\000\000", 0x80000000, "sound/stream/stg_rsh_a1_32k", 0x46400000},
+	{"BGM_STG6_RSH2\000\000", 0x80000000, "sound/stream/stg_rsh_b1_32k", 0x46400000},
+	{"BGM_STG6_RSH3\000\000", 0x80000000, "sound/stream/stg_rsh_c1_32k", 0x46400000},
+	{"BGM_STG6_HOM1\000\000", 0x80000000, "sound/stream/stg_hom1_32k\000\000", 0x46400000},
+	{"BGM_STG6_EKI1\000\000", 0x80000000, "sound/stream/stg_eki1_32k\000\000", 0x46400000},
+	{"BGM_STG6_PIK1\000\000", 0x80000000, "sound/stream/stg_pik1_32k\000\000", 0x46400000},
+	{"BGM_STG6_PIK2\000\000", 0x80000000, "sound/stream/stg_snd1_32k\000\000", 0x46400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG7_BOM1\000\000", 0x80000000, "sound/stream/stg_bmm1_32k\000\000", 0x4B400000},
+	{"BGM_STG7_MON1\000\000", 0x80000000, "sound/stream/stg_gtm1_32k\000\000", 0x4B400000},
+	{"BGM_STG7_DUN1\000\000", 0x80000000, "sound/stream/stg_tkd1_32k\000\000", 0x55400000},
+	{"BGM_STG7_DUN2\000\000", 0x80000000, "sound/stream/stg_tkd2_32k\000\000", 0x49400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STG8_LST1\000\000", 0x80000000, "sound/stream/stg_ldn1_32k\000\000", 0x55500000},
+	{"BGM_STG8_LST2\000\000", 0x80000000, "sound/stream/stg_ldn2_32k\000\000", 0x5A500000},
+	{"BGM_STG8_LST3\000\000", 0x80000000, "sound/stream/stg_ldn3_32k\000\000", 0x5D500000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STGK_CASTLE1\000\000\000", 0x80000000, "sound/stream/stg_kpa1_32k\000\000", 0x4B400000},
+	{"BGM_STGK_FIELD1", 0x80000000, "sound/stream/stgk_fld1_32k\000", 0x5F400000},
+	{"BGM_STGK_FIELD2", 0x80000000, "sound/stream/stg_kpa3_32k\000\000", 0x5A400000},
+	{"BGM_STGK_FIELD3", 0x80000000, "sound/stream/stgk_fld2_32k\000", 0x55400000},
+	{"BGM_STGK_FIELD4", 0x80000000, "sound/stream/stgk_fld3_32k\000", 0x5A400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_STGK_FIELD1_UP1", 0x80000000, "sound/stream/stgk_fld1_up1_32k\000", 0x5F400000},
+	{"BGM_STGK_FIELD1_UP2", 0x80000000, "sound/stream/stgk_fld1_up2_32k\000", 0x5A400000},
+	{"BGM_STGK_FIELD3_UP1", 0x80000000, "sound/stream/stgk_fld2_up1_32k\000", 0x55400000},
+	{"BGM_STGK_FIELD4_UP1", 0x80000000, "sound/stream/stgk_fld3_up1_32k\000", 0x5A400000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_ZAKO_BATTLE1\000\000\000", 0x80000000, "sound/stream/btl_zak1_32k\000\000", 0x4B400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_KOBOSS_BATTLE1\000", 0x80000000, "sound/stream/btl_kbs1_32k\000\000", 0x4B400001},
+	{"BGM_CHUBOSS_BATTLE1", 0x80000000, "sound/stream/btl_cbs1_32k\000\000", 0x4D400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_BOSS_STG1_GONBABA1\000", 0x80000000, "sound/stream/btl_gnb1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG3_3RDLEADER1\000\000\000", 0x80000000, "sound/stream/btl_mag1_32k\000\000", 0x51400001},
+	{"BGM_BOSS_STG3_3WOMEN1\000\000", 0x80000000, "sound/stream/btl_wom1_32k\000\000", 0x54400001},
+	{"BGM_BOSS_STG3_CHAMP1\000\000\000", 0x80000000, "sound/stream/btl_cap1_32k\000\000", 0x55400001},
+	{"BGM_BOSS_STG3_GANCE1\000\000\000", 0x80000000, "sound/stream/btl_gns1_32k\000\000", 0x5C400001},
+	{"BGM_BOSS_STG4_RUNPELL1\000", 0x80000000, "sound/stream/btl_rpl1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG4_FAKEMARIO1\000\000\000", 0x80000000, "sound/stream/btl_rpl1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG5_KORTESS1\000", 0x80000000, "sound/stream/btl_krt1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG5_SHIP1", 0x80000000, "sound/stream/btl_sif1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG6_GREAT_MOAMOA1", 0x80000000, "sound/stream/btl_gmm1_32k\000\000", 0x5D400001},
+	{"BGM_BOSS_STG8_3RDHEAD1\000", 0x80000000, "sound/stream/btl_3dh1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG8_WITCH", 0x80000000, "sound/stream/btl_wit1_32k\000\000", 0x5A400001},
+	{"BGM_BOSS_STG8_KOOPA", 0x80000000, "sound/stream/btl_kpa3_32k\000\000", 0x4B400001},
+	{"BGM_BOSS_STG8_LAST_BOSS1\000\000\000", 0x80000000, "sound/stream/btl_bpc1_32k\000\000", 0x5E400001},
+	{"BGM_BOSS_STG8_LAST_BOSS2\000\000\000", 0x80000000, "sound/stream/btl_wth3_32k\000\000", 0x5F400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_BATTLE_WIN1", 0x80000000, "sound/stream/btl_win1_32k\000\000", 0x50400001},
+	{"BGM_BATTLE_WIN2", 0x80000000, "sound/stream/btl_win2_32k\000\000", 0x50400001},
+	{"BGM_BATTLE_WIN3", 0x80000000, "sound/stream/btl_win3_32k\000\000", 0x50400001},
+	{"BGM_BATTLE_LOSE1\000\000\000", 0x80000000, "sound/stream/btl_die1_32k\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_EVT_LECTURE1\000\000\000", 0x80000000, "sound/stream/evt_lec1_32k\000\000", 0x49400001},
+	{"BGM_EVT_PERAMAJIN1\000", 0x80000000, "sound/stream/evt_prm1_32k\000\000", 0x53400001},
+	{"BGM_EVT_NOK1\000\000\000", 0x80000000, "sound/stream/evt_nok1_32k\000\000", 0x64400000},
+	{"BGM_EVT_GONBABA_FLY1\000\000\000", 0x80000000, "sound/stream/evt_gnb1_32k\000\000", 0x69400001},
+	{"BGM_EVT_GONBABA_FLY2\000\000\000", 0x80000000, "sound/stream/evt_gnb4_32k\000\000", 0x5A400001},
+	{"BGM_EVT_CASTLE1", 0x80000000, "sound/stream/evt_gnb3_32k\000\000", 0x50400001},
+	{"BGM_EVT_QUIZ1\000\000", 0x80000000, "sound/stream/evt_qiz1_32k\000\000", 0x55400001},
+	{"BGM_EVT_QUIZ2\000\000", 0x80000000, "sound/stream/evt_qiz2_32k\000\000", 0x50400001},
+	{"BGM_EVT_DANGER1", 0x80000000, "sound/stream/evt_kik1_32k\000\000", 0x55400001},
+	{"BGM_EVT_DANGER2", 0x80000000, "sound/stream/evt_kik2_32k\000\000", 0x50400001},
+	{"BGM_EVT_DANGER3", 0x80000000, "sound/stream/evt_kik3_32k\000\000", 0x50400001},
+	{"BGM_EVT_DANGER4", 0x80000000, "sound/stream/evt_kik4_32k\000\000", 0x53400001},
+	{"BGM_EVT_HAPPY1\000", 0x80000000, "sound/stream/evt_hpy1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_CYUCYURINA1", 0x80000000, "sound/stream/evt_ccr1_32k\000\000", 0x46400001},
+	{"BGM_EVT_NOKO_SAIKAI1\000\000\000", 0x80000000, "sound/stream/evt_nsk1_32k\000\000", 0x46400001},
+	{"BGM_EVT_USU1\000\000\000", 0x80000000, "sound/stream/evt_usg1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_JIN1\000\000\000", 0x80000000, "sound/stream/evt_dim1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_SAILING1\000\000\000", 0x80000000, "sound/stream/evt_kou1_32k\000\000", 0x4E400001},
+	{"BGM_EVT_MINIGAME1\000\000", 0x80000000, "sound/stream/btl_zak3_32k\000\000", 0x50400001},
+	{"BGM_EVT_FRANKURI1\000\000", 0x80000000, "sound/stream/evt_fkh1_32k\000\000", 0x50400001},
+	{"BGM_EVT_3RD_ENEMY\000\000", 0x80000000, "sound/stream/evt_3rd1_32k\000\000", 0x4D400001},
+	{"BGM_EVT_REST1\000\000", 0x80000000, "sound/stream/evt_rst1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_POWAN1\000", 0x80000000, "sound/stream/evt_pwn1_32k\000\000", 0x46400001},
+	{"BGM_EVT_STG6_PIK1\000\000", 0x80000000, "sound/stream/evt_pik1_32k\000\000", 0x5A400000},
+	{"BGM_EVT_STG2_MORI1\000", 0x80000000, "sound/stream/evt_fsg1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_STG2_TAIJU1", 0x80000000, "sound/stream/evt_okk1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_WITCH1\000", 0x80000000, "sound/stream/evt_wit1_32k\000\000", 0x52400001},
+	{"BGM_EVT_CLOUDA1", 0x80000000, "sound/stream/evt_cld1_32k\000\000", 0x4B400001},
+	{"BGM_EVT_STG2_PUNI1\000", 0x80000000, "sound/stream/evt_pun1_32k\000\000", 0x46400001},
+	{"BGM_EVT_STG2_PUNITOGE1\000", 0x80000000, "sound/stream/evt_pvt1_32k\000\000", 0x50400001},
+	{"BGM_EVT_STG3_URON1\000", 0x80000000, "sound/stream/evt_urn1_32k\000\000", 0x5A400000},
+	{"BGM_EVT_STG3_TOUGI1", 0x80000000, "sound/stream/evt_tug1_32k\000\000", 0x5A400000},
+	{"BGM_EVT_STG3_EGG1\000\000", 0x80000000, "sound/stream/evt_egg1_32k\000\000", 0x4B400001},
+	{"BGM_EVT_STG3_GANCE1", 0x80000000, "sound/stream/evt_gns1_32k\000\000", 0x48400001},
+	{"BGM_EVT_STG3_GANCE2", 0x80000000, "sound/stream/evt_gns2_32k\000\000", 0x4B400001},
+	{"BGM_EVT_STG4_FAKEMARIO1", 0x80000000, "sound/stream/evt_fmo1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_STG5_GHOST1", 0x80000000, "sound/stream/evt_elmos_app1_32k", 0x50400001},
+	{"BGM_EVT_STG5_KORTESS1\000\000", 0x80000000, "sound/stream/evt_kts1_32k\000\000", 0x54400001},
+	{"BGM_EVT_STG5_VS_3RD_ENEMY\000\000", 0x80000000, "sound/stream/evt_v3d1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_STG7_HUGE_GUN1\000", 0x80000000, "sound/stream/evt_huge_gun1_32k\000", 0x62400001},
+	{"BGM_EVT_MAGNUM_APP1", 0x80000000, "sound/stream/evt_mag1_32k\000\000", 0x4D400001},
+	{"BGM_EVT_KUPPA1\000", 0x80000000, "sound/stream/evt_kpa1_32k\000\000", 0x50400000},
+	{"BGM_EVT_KUPPA2\000", 0x80000000, "sound/stream/evt_kpa1_32k\000\000", 0x50400001},
+	{"BGM_EVT_STG8_3RDHEAD1\000\000", 0x80000000, "sound/stream/evt_3dh1_32k\000\000", 0x50400001},
+	{"BGM_EVT_STG8_WITCH\000", 0x80000000, "sound/stream/evt_wit2_32k\000\000", 0x58400001},
+	{"BGM_EVT_COOKING1\000\000\000", 0x80000000, "sound/stream/evt_cok1_32k\000\000", 0x53400001},
+	{"BGM_EVT_STAGE_CLEAR1\000\000\000", 0x80000000, "sound/stream/evt_stc1_32k\000\000", 0x62400001},
+	{"BGM_EVT_ORGEL1\000", 0x80000000, "sound/stream/evt_org1_32k\000\000", 0x3E400001},
+	{"BGM_EVT_RUIJI1\000", 0x80000000, "sound/stream/evt_rui1_32k\000\000", 0x50400001},
+	{"BGM_EVT_PEACH_WALTZ1\000\000\000", 0x80000000, "sound/stream/evt_wlt1_32k\000\000", 0x4B400001},
+	{"BGM_EVT_MARIO_HOUSE1\000\000\000", 0x80000000, "sound/stream/evt_mri1_32k\000\000", 0x50400001},
+	{"BGM_EVT_MARIO_HOUSE2\000\000\000", 0x80000000, "sound/stream/evt_mri2_32k\000\000", 0x37400001},
+	{"BGM_EVT_PEACH1\000", 0x80000000, "sound/stream/evt_peh1_32k\000\000", 0x4D400001},
+	{"BGM_EVT_STG4_TRAIN1", 0x80000000, "sound/stream/evt_rit1_32k\000\000", 0x5A400001},
+	{"BGM_EVT_DOT_MARIO1\000", 0x80000000, "sound/stream/evt_dot1_32k\000\000", 0x46400001},
+	{"BGM_EVT_STG3_AIRSHIP1\000\000", 0x80000000, "sound/stream/evt_air1_32k\000\000", 0x55400001},
+	{"BGM_EVT_STG8_VOICE1", 0x80000000, "sound/stream/evt_vce1_32k\000\000", 0x55400001},
+	{"BGM_EVT_STG5_GHOST_SHIP1\000\000\000", 0x80000000, "sound/stream/evt_gstship1_32k\000\000", 0x55400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_GET_STARSTONE1\000\000", 0x80000000, "sound/stream/ff_stg1_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_KEYITEM1", 0x80000000, "sound/stream/ff_get2_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_BADGE1\000\000", 0x80000000, "sound/stream/ff_get3_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_ITEM1\000\000\000", 0x80000000, "sound/stream/ff_get4_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_PARTY1\000\000", 0x80000000, "sound/stream/ff_get8_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_STARPIECE1\000\000", 0x80000000, "sound/stream/ff_get6_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_PERA1\000\000\000", 0x80000000, "sound/stream/ff_get7_32k\000\000\000", 0x50400001},
+	{"BGM_FF_GET_IMPORTANT_ITEM1\000", 0x80000000, "sound/stream/ff_get8_32k\000\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_STG_START1\000\000", 0x80000000, "sound/stream/ff_stt1_32k\000\000\000", 0x4B400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_SURPRISED1\000\000", 0x80000000, "sound/stream/ff_spr1_32k\000\000\000", 0x55400001},
+	{"BGM_FF_ENV_SURPRISED2\000\000", 0x80000000, "sound/stream/ff_spr2_32k\000\000\000", 0x50400001},
+	{"BGM_FF_ENV_SURPRISED3\000\000", 0x80000000, "sound/stream/ff_spr3_32k\000\000\000", 0x50400001},
+	{"BGM_FF_ENV_ADMIRE1\000", 0x80000000, "sound/stream/ff_adm1_32k\000\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_SUCCESS1", 0x80000000, "sound/stream/ff_scs1_32k\000\000\000", 0x50400001},
+	{"BGM_FF_ENV_SUCCESS2", 0x80000000, "sound/stream/ff_scs1_32k\000\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_GO_SLEEPING1", 0x80000000, "sound/stream/ff_slp1_32k\000\000\000", 0x46400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_CRISIS1\000", 0x80000000, "sound/stream/ff_crs1_32k\000\000\000", 0x50400001},
+	{"BGM_FF_ENV_TOU1", 0x80000000, "sound/stream/ff_tou1_32k\000\000\000", 0x57400001},
+	{"BGM_FF_ENV_TOU2", 0x80000000, "sound/stream/ff_tou2_32k\000\000\000", 0x52400001},
+	{"BGM_FF_ENV_TOU3", 0x80000000, "sound/stream/ff_tou3_32k\000\000\000", 0x5C400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_RPL_APPEAR1\000", 0x80000000, "sound/stream/ff_r_apr2_32k\000", 0x54400001},
+	{"BGM_FF_ENV_SHIP_APPEAR1", 0x80000000, "sound/stream/ff_s_apr1_32k\000", 0x5A400001},
+	{"BGM_FF_ENV_WITCH_APPEAR1\000\000\000", 0x80000000, "sound/stream/ff_w_apr1_32k\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_BOKE1\000\000\000", 0x80000000, "sound/stream/ff_bok1_32k\000\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_ENV_MAP1", 0x80000000, "sound/stream/ff_map1_32k\000\000\000", 0x5A400001},
+	{"BGM_FF_ENV_OPEN_DOOR1\000\000", 0x80000000, "sound/stream/ff_dor1_32k\000\000\000", 0x5A400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_KUPPA_GOAL1\000", 0x80000000, "sound/stream/ff_kpa1_32k\000\000\000", 0x5A400001},
+	{"BGM_FF_KUPPA_DOWN1\000", 0x80000000, "sound/stream/ff_kpa2_32k\000\000\000", 0x5A400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_PEACH_DISCSET1\000\000", 0x80000000, "sound/stream/ff_disc_set1_32k\000\000", 0x50400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_POWERUP1", 0x80000000, "sound/stream/ff_pow1_32k\000\000\000", 0x64400001},
+	{"BGM_FF_POWERDOWN1\000\000", 0x80000000, "sound/stream/ff_pow1_32k\000\000\000", 0x64400001},
+	{"", 0x00000000, "", 0x00000000},
+	{"BGM_FF_MAIL_RECEPTION1\000", 0x80000000, "sound/stream/ff_mail_chakusin1_32k\000", 0x46400001},
+	{"BGM_FF_MAIL_RECEPTION2\000", 0x80000000, "sound/stream/ff_mail_chakusin2_32k\000", 0x46400001},
+	{"BGM_FF_MAIL_RECEPTION3\000", 0x80000000, "sound/stream/ff_mail_chakusin3_32k\000", 0x46400001}
 };
-
-//silent_tbl
-
-const char* psenvlistname[] = {
-	"",
-	"ENV_OPN_AAA1",
-	"ENV_OPN_MUJ1",
-	"ENV_STG0_GOR0", "ENV_STG0_GOR1", "ENV_STG0_GOR3", "ENV_STG0_GOR4", "ENV_STG0_GOR5", "ENV_STG0_GOR6",
-	"ENV_STG0_TIK1", "ENV_STG0_TIK2", "ENV_STG0_TIK3", "ENV_STG0_TIK4", "ENV_STG0_TIK5", "ENV_STG0_TIK6", "ENV_STG0_TIK7",
-	"ENV_STG0_DAN1",
-	"ENV_STG1_HEI1", "ENV_STG1_HEI2", "ENV_STG1_HEI3", "ENV_STG1_HEI4",
-	"ENV_STG1_NOK1", "ENV_STG1_NOK2",
-	"ENV_STG1_GON1", "ENV_STG1_GON2", "ENV_STG1_GON3", "ENV_STG1_GON4",
-	"ENV_STG2_WIN1", "ENV_STG2_WIN2",
-	"ENV_STG2_MRI1", "ENV_STG2_MRI2", "ENV_STG2_MRI3", "ENV_STG2_MRI4", "ENV_STG2_MRI5",
-	"ENV_STG2_MRI6", "ENV_STG2_MRI7", "ENV_STG2_MRI8", "ENV_STG2_MRI9", "ENV_STG2_MRI10",
-	"ENV_STG3_TOU1", "ENV_STG3_TOU2", "ENV_STG3_TOU3", "ENV_STG3_TOU4",
-	"ENV_STG3_TOU5", "ENV_STG3_TOU6", "ENV_STG3_TOU7", "ENV_STG3_TOU8",
-	"ENV_STG4_USU1",
-	"ENV_STG4_GRA1",
-	"ENV_STG4_JIN1", "ENV_STG4_JIN2", "ENV_STG4_JIN3",
-	"ENV_STG5_MUJ1_1", "ENV_STG5_MUJ1_2", "ENV_STG5_MUJ2", "ENV_STG5_MUJ3", "ENV_STG5_MUJ4",
-	"ENV_STG5_MUJ5", "ENV_STG5_MUJ6", "ENV_STG5_MUJ7", "ENV_STG5_MUJ8", "ENV_STG5_MUJ9",
-	"ENV_STG5_DOU1", "ENV_STG5_DOU2", "ENV_STG5_DOU3", "ENV_STG5_DOU4", "ENV_STG5_DOU5", "ENV_STG5_DOU6",
-	"ENV_STG5_DOU7", "ENV_STG5_DOU8", "ENV_STG5_DOU9", "ENV_STG5_DOU10", "ENV_STG5_DOU11", "ENV_STG5_DOU12",
-	"ENV_STG6_RSH1", "ENV_STG6_RSH1_2", "ENV_STG6_RSH1_3", "ENV_STG6_RSH1_4", "ENV_STG6_RSH2",
-	"ENV_STG6_EKI1", "ENV_STG6_EKI2", "ENV_STG6_EKI2_2", "ENV_STG6_EKI3", "ENV_STG6_EKI4",
-	"ENV_STG6_PIK1", "ENV_STG6_PIK1_1", "ENV_STG6_PIK1_2", "ENV_STG6_PIK2", "ENV_STG6_PIK3",
-	"ENV_STG7_BOM1", "ENV_STG7_BOM2", "ENV_STG7_BOM3",
-	"ENV_STG7_MOO1", "ENV_STG7_MOO2", "ENV_STG7_MOO3", "ENV_STG7_MOO4",
-	"ENV_STG7_AJI1", "ENV_STG7_AJI2", "ENV_STG7_AJI3", "ENV_STG7_AJI4", "ENV_STG7_AJI5", "ENV_STG7_AJI6", "ENV_STG7_AJI7",
-	"ENV_STG8_LAS1", "ENV_STG8_LAS2", "ENV_STG8_LAS3", "ENV_STG8_LAS4", "ENV_STG8_LAS5",
-	"ENV_STG8_LAS6", "ENV_STG8_LAS7", "ENV_STG8_LAS8", "ENV_STG8_LAS9",
-	"ENV_KOOPA_KPA1",
-	"ENV_END_MUJ1", "ENV_END_MUJ2", "ENV_END_MUJ3",
-	"ENV_END_AAA1",
-	"ENV_SYS_FL1"
-};
-
-//psenvlist
 
 SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -601,7 +815,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_ITEM_POW_APPEAR1", SFX_FLAG_2 | 0x19F, "", 120, 64, 0, 1, 0, 0, 0x555},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_ITEM_WHAT1", SFX_FLAG_2 | 0x19F, "", 120, 64, 0, 1, 0, 0, 0x555},
-	{"SFX_ITEM_WHAT2", SFX_FLAG_4 | 0x5A5A, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_ITEM_WHAT2", SFX_FLAG_4 | 0x45A5A, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_ITEM_WHAT3", SFX_FLAG_2 | 0x41A, "btl_e_fall1_22k", 100, 64, 0, 1, 0, 0, 0xFAAB},
 	{"SFX_ITEM_WHAT4", SFX_FLAG_2 | 0x3CC, "", 100, 64, 0, 1, 0, 0, 0x800},
 	{"SFX_ITEM_WHAT5", SFX_FLAG_2 | 0x224, "", 100, 64, 0, 1, 0, 0, 0xFAAB},
@@ -687,7 +901,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_EVT_STARSTONE_SHINE1", SFX_FLAG_2 | 0x172, "", 55, 64, 0, 10, 0, 0, 0},
 	{"SFX_EVT_STARSTONE_JUMP1", SFX_FLAG_2 | 0x3D, "SE2_EVT_1_STARSTONE_JUMP1", 100, 64, 0, 10, 0, 0, 0},
 	{"SFX_EVT_STARSTONE_MOVE1", SFX_FLAG_2, "SE2_EVT_1_STARSTONE_MOVE1", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_SE2_EVT_STARSTONE_GET1", SFX_FLAG_4 | 0x3434, "", 85, 64, 0, 1, 0, 3, 0},
+	{"SFX_SE2_EVT_STARSTONE_GET1", SFX_FLAG_4 | 0x43434, "", 85, 64, 0, 1, 0, 3, 0},
 	{"SFX_EVT_STARSTONE_WHITEOUT1", SFX_FLAG_2 | 0x218, "", 60, 64, 0, 70, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_WITCH_SHADOW_SPREAD1", SFX_FLAG_2 | 0x244, "", 90, 64, 0, 20, 0, 0, 0},
@@ -705,35 +919,35 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_EVT_NPC_BIKKURI_MARK1", SFX_FLAG_2 | 0x265, "", 70, 64, 0, 0, 0, 0, 0},
 	{"SFX_EVT_NPC_QUESTION_MARK1", SFX_FLAG_2 | 0x3C, "", 70, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU1", SFX_FLAG_4 | 0x1B1B, "", 110, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU1_2", SFX_FLAG_4 | 0x4141, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU1", SFX_FLAG_4 | 0x41B1B, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU1_2", SFX_FLAG_4 | 0x44141, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_MAP_NEXT_APPEAR1", SFX_FLAG_2 | 0x209, "", 80, 64, 0, 60, 0, 0, 0},
-	{"SFX_EVT_MAP_STG1_APPEAR1", SFX_FLAG_4 | 0x5B5B, "", 90, 64, 0, 1, 0, 2, 0},
-	{"SFX_EVT_MAP_STG2_APPEAR1", SFX_FLAG_4 | 0x5C5C, "", 90, 64, 0, 1, 0, 3, 0},
-	{"SFX_EVT_MAP_STG3_APPEAR1", SFX_FLAG_4 | 0x5D5D, "", 90, 64, 0, 1, 0, 2, 0},
-	{"SFX_EVT_MAP_STG4_APPEAR1", SFX_FLAG_4 | 0x5E5E, "", 90, 64, 0, 1, 0, 7, 0},
-	{"SFX_EVT_MAP_STG5_APPEAR1", SFX_FLAG_4 | 0x5F5F, "", 90, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_MAP_STG6_APPEAR1", SFX_FLAG_4 | 0x6060, "", 90, 64, 0, 1, 0, 6, 0},
-	{"SFX_EVT_MAP_STG7_APPEAR1", SFX_FLAG_4 | 0x6161, "", 90, 64, 0, 1, 0, 2, 0},
+	{"SFX_EVT_MAP_STG1_APPEAR1", SFX_FLAG_4 | 0x45B5B, "", 90, 64, 0, 1, 0, 2, 0},
+	{"SFX_EVT_MAP_STG2_APPEAR1", SFX_FLAG_4 | 0x45C5C, "", 90, 64, 0, 1, 0, 3, 0},
+	{"SFX_EVT_MAP_STG3_APPEAR1", SFX_FLAG_4 | 0x45D5D, "", 90, 64, 0, 1, 0, 2, 0},
+	{"SFX_EVT_MAP_STG4_APPEAR1", SFX_FLAG_4 | 0x45E5E, "", 90, 64, 0, 1, 0, 7, 0},
+	{"SFX_EVT_MAP_STG5_APPEAR1", SFX_FLAG_4 | 0x45F5F, "", 90, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_STG6_APPEAR1", SFX_FLAG_4 | 0x46060, "", 90, 64, 0, 1, 0, 6, 0},
+	{"SFX_EVT_MAP_STG7_APPEAR1", SFX_FLAG_4 | 0x46161, "", 90, 64, 0, 1, 0, 2, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_MAP_NEXT_APPEAR2", SFX_FLAG_2, "SE2_EVT_MAP_NEXT_APPEAR2", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_MAP_NEXT_APPEAR2_2", SFX_FLAG_2, "SE2_EVT_MAP_NEXT_APPEAR2_2", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_MAP_NEXT_APPEAR2_3", SFX_FLAG_2, "SE2_EVT_MAP_NEXT_APPEAR2_3", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU2", SFX_FLAG_4 | 0x3535, "", 95, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU2_2", SFX_FLAG_4 | 0x3636, "", 110, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU2_3", SFX_FLAG_4 | 0x4141, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU2", SFX_FLAG_4 | 0x43535, "", 95, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU2_2", SFX_FLAG_4 | 0x43636, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU2_3", SFX_FLAG_4 | 0x44141, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU3_1", SFX_FLAG_4 | 0x4242, "", 95, 64, 0, 1, 0, 15, 0},
-	{"SFX_EVT_MAP_KAKAGERU3_2", SFX_FLAG_4 | 0x4343, "", 100, 64, 0, 1, 0, 15, 0},
-	{"SFX_EVT_MAP_KAKAGERU3_3", SFX_FLAG_4 | 0x4444, "", 85, 64, 0, 1, 0, 10, 0},
+	{"SFX_EVT_MAP_KAKAGERU3_1", SFX_FLAG_4 | 0x44242, "", 95, 64, 0, 1, 0, 15, 0},
+	{"SFX_EVT_MAP_KAKAGERU3_2", SFX_FLAG_4 | 0x44343, "", 100, 64, 0, 1, 0, 15, 0},
+	{"SFX_EVT_MAP_KAKAGERU3_3", SFX_FLAG_4 | 0x44444, "", 85, 64, 0, 1, 0, 10, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_STAGE_CLEAR1", SFX_FLAG_2 | 0x150, "", 50, 64, 0, 0, 0, 6, 0x555},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_PERAMAJIN_LIGHT1", SFX_FLAG_4 | 0x3737, "", 80, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_PERAMAJIN_LIGHT1", SFX_FLAG_4 | 0x43737, "", 80, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_PERAMAJIN_BLINKING1", SFX_FLAG_2 | 0x249, "", 50, 64, 0, 1, 0, 0, 0xAAA},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_LECTUREN_BLINKING1", SFX_FLAG_2 | 0x249, "", 50, 64, 0, 1, 0, 0, 0xAAA},
@@ -876,8 +1090,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF_PARTY_LECTURE1_1", SFX_FLAG_4 | 0x4040, "", 95, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_PARTY_LECTURE1", SFX_FLAG_4 | 0x1717, "", 75, 64, 0, 1, 0, 20, 0},
+	{"SFX_OFF_PARTY_LECTURE1_1", SFX_FLAG_4 | 0x44040, "", 95, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_PARTY_LECTURE1", SFX_FLAG_4 | 0x41717, "", 75, 64, 0, 1, 0, 20, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -892,7 +1106,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_OFF_STEP_APPEAR2", SFX_FLAG_2 | 0x551, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF_STEP_APPEAR3", SFX_FLAG_2 | 0x552, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF0_STEP_APPEAR1_2", SFX_FLAG_4 | 0x1616, "", 115, 64, 0, 20, 0, 0, 0},
+	{"SFX_OFF0_STEP_APPEAR1_2", SFX_FLAG_4 | 0x41616, "", 115, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -902,11 +1116,11 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_OFF1_PUZZLE1", SFX_FLAG_2 | 0x533, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF1_PUZZLE2", SFX_FLAG_2 | 0x534, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF1_PUZZLE_MOVE1", SFX_FLAG_2 | 0x535, "", 80, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG1_PERA_STEP1", SFX_FLAG_4 | 0x3D3D, "", 75, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG1_PERA_STEP2", SFX_FLAG_4 | 0x3E3E, "", 75, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG1_PERA2", SFX_FLAG_4 | 0x3F3F, "", 90, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG1_PERA_STEP1", SFX_FLAG_4 | 0x43D3D, "", 75, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG1_PERA_STEP2", SFX_FLAG_4 | 0x43E3E, "", 75, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG1_PERA2", SFX_FLAG_4 | 0x43F3F, "", 90, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF1_PERA_BREAK1", SFX_FLAG_4 | 0x6666, "", 90, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF1_PERA_BREAK1", SFX_FLAG_4 | 0x46666, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF1_PERA_FALL1", SFX_FLAG_2 | 0x538, "", 85, 64, 0, 1, 0, 0, 0xFAAB},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -924,19 +1138,19 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF3_VIEW_ROOM1", SFX_FLAG_4 | 0x7B7B, "", 110, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF3_VIEW_ROOM2", SFX_FLAG_4 | 0x7C7C, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF3_VIEW_ROOM1", SFX_FLAG_4 | 0x97B7B, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF3_VIEW_ROOM2", SFX_FLAG_4 | 0x97C7C, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF3_PERA_KAIDAN_APPEAR1", SFX_FLAG_2 | 0x46B, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF3_PERA_KAIDAN_APPEAR2", SFX_FLAG_2 | 0x23D, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF3_NAME_ENTRY1", SFX_FLAG_4 | 0x7777, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF3_NAME_ENTRY2", SFX_FLAG_4 | 0x7878, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF3_NAME_ENTRY1", SFX_FLAG_4 | 0x97777, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF3_NAME_ENTRY2", SFX_FLAG_4 | 0x97878, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF3_MAP_CHANGE1", SFX_FLAG_2 | 0x53E, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_OFF4_LANPEL_APPEAR1", SFX_FLAG_2 | 0x46C, "", 110, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF4_NAME_ENTRY1", SFX_FLAG_4 | 0x7777, "", 127, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF4_NAME_ENTRY2", SFX_FLAG_4 | 0x7878, "", 127, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF4_NAME_ENTRY1", SFX_FLAG_4 | 0x97777, "", 127, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF4_NAME_ENTRY2", SFX_FLAG_4 | 0x97878, "", 127, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -953,9 +1167,9 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF7_KAIDAN_APPEAR1", SFX_FLAG_4 | 0x7F7F, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF7_PASSWORD_ENTRY1", SFX_FLAG_4 | 0x7777, "", 127, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF7_PASSWORD_ENTRY2", SFX_FLAG_4 | 0x7878, "", 127, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF7_KAIDAN_APPEAR1", SFX_FLAG_4 | 0x97F7F, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF7_PASSWORD_ENTRY1", SFX_FLAG_4 | 0x97777, "", 127, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF7_PASSWORD_ENTRY2", SFX_FLAG_4 | 0x97878, "", 127, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF7_PUZZLE1", SFX_FLAG_2 | 0x533, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF7_PUZZLE2", SFX_FLAG_2 | 0x534, "", 90, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -980,8 +1194,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_OFF_PERAMAJIN_APPEAR1", SFX_FLAG_2 | 0x54D, "", 85, 64, 0, 1, 0, 6, 0},
-	{"SFX_OFF_PERAMAJIN_COME1", SFX_FLAG_4 | 0x8585, "", 105, 64, 0, 1, 0, 10, 0},
-	{"SFX_OFF_PERAMAJIN_GOOUT1", SFX_FLAG_4 | 0x8686, "", 100, 64, 0, 1, 0, 10, 0},
+	{"SFX_OFF_PERAMAJIN_COME1", SFX_FLAG_4 | 0xB8585, "", 105, 64, 0, 1, 0, 10, 0},
+	{"SFX_OFF_PERAMAJIN_GOOUT1", SFX_FLAG_4 | 0xB8686, "", 100, 64, 0, 1, 0, 10, 0},
 	{"SFX_OFF_PERAMAJIN_GOOUT2", SFX_FLAG_2 | 0x54E, "", 80, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1000,17 +1214,17 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_OFF_CHANGE_MAP6", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF_CHANGE_MAP7", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_OFF_CHANGE_MAP8", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN1", SFX_FLAG_4 | 0x7D7D, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN2", SFX_FLAG_4 | 0x7D7D, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN3", SFX_FLAG_4 | 0x7D7D, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN4", SFX_FLAG_4 | 0x7D7D, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN5", SFX_FLAG_4 | 0x7E7E, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN6", SFX_FLAG_4 | 0x7E7E, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN7", SFX_FLAG_4 | 0x7E7E, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_OFF_CHANGE_MAP_DOKAN8", SFX_FLAG_4 | 0x7E7E, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN1", SFX_FLAG_4 | 0x97D7D, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN2", SFX_FLAG_4 | 0x97D7D, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN3", SFX_FLAG_4 | 0x97D7D, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN4", SFX_FLAG_4 | 0x97D7D, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN5", SFX_FLAG_4 | 0x97E7E, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN6", SFX_FLAG_4 | 0x97E7E, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN7", SFX_FLAG_4 | 0x97E7E, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_OFF_CHANGE_MAP_DOKAN8", SFX_FLAG_4 | 0x97E7E, "", 85, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_OFF_CHANGE_STORY1", SFX_FLAG_4 | 0x8383, "", 85, 64, 0, 1, 0, 7, 0},
-	{"SFX_OFF_CHANGE_STORY2", SFX_FLAG_4 | 0x8484, "", 85, 64, 0, 1, 0, 2, 0},
+	{"SFX_OFF_CHANGE_STORY1", SFX_FLAG_4 | 0x98383, "", 85, 64, 0, 1, 0, 7, 0},
+	{"SFX_OFF_CHANGE_STORY2", SFX_FLAG_4 | 0x98484, "", 85, 64, 0, 1, 0, 2, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1051,7 +1265,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG0_3RD_TOGETHER1L", SFX_FLAG_2 | 0x4B0, "btl_e_3rd_walkl1_22k", 90, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_3RD_TOGETHER1R", SFX_FLAG_2 | 0x4B1, "btl_e_3rd_walkr1_22k", 90, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG0_3RD_TOGETHER1_2", SFX_FLAG_4 | 0x1515, "", 80, 64, 0, 20, 0, 10, 0},
+	{"SFX_STG0_3RD_TOGETHER1_2", SFX_FLAG_4 | 0x41515, "", 80, 64, 0, 20, 0, 10, 0},
 	{"SFX_STG0_3RD_ATTACK1", SFX_FLAG_2 | 0x4C9, "", 70, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_3RD_ATTACK2", SFX_FLAG_2 | 0x369, "", 80, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_3RD_ATTACK3", SFX_FLAG_2 | 0x412, "", 85, 64, 0, 20, 0, 0, 0},
@@ -1108,7 +1322,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG0_GESO_LEG_MOVE2", SFX_FLAG_2 | 0x21B, "", 90, 64, 0, 20, 0, 0, 0x800},
 	{"SFX_STG0_GESO_JUMP1", SFX_FLAG_2 | 0xD5, "", 120, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_GESO_LANDING1", SFX_FLAG_2 | 0x15D, "", 110, 64, 1, 20, 0, 0, 0},
-	{"SFX_STG0_GESO_APPEAR2", SFX_FLAG_4 | 0x3838, "", 110, 64, 1, 20, 0, 0, 0},
+	{"SFX_STG0_GESO_APPEAR2", SFX_FLAG_4 | 0x43838, "", 110, 64, 1, 20, 0, 0, 0},
 	{"SFX_STG0_GESO_SHAKE1", SFX_FLAG_2 | 0x15E, "", 50, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_GESO_CRASH1", SFX_FLAG_2 | 0x54A, "", 120, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG0_ROAD_APPEAR1", SFX_FLAG_2 | 0x556, "", 80, 64, 0, 20, 0, 0, 0},
@@ -1125,7 +1339,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG2_AIR_SHIP_DRIVE1", SFX_FLAG_2 | 0x53, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG3_KURAGARI_PEN1", SFX_FLAG_4 | 0x1D1D, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_KURAGARI_PEN1", SFX_FLAG_4 | 0x41D1D, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG4_MARIO_ROLL_DOWN1", SFX_FLAG_2 | 0x552, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG4_MARIO_ROLL_DOWN2", SFX_FLAG_2 | 0x16A, "", 100, 64, 0, 1, 0, 0, 0},
@@ -1136,8 +1350,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG4_SHIP_MOVE2", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_TRAIN_BELL1", SFX_FLAG_2 | 0x1C8, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_TRAIN_MOVE1", SFX_FLAG_4, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_TRAIN_MOVE2", SFX_FLAG_4 | 0x101, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_TRAIN_MOVE1", SFX_FLAG_4 | 0x10000, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_TRAIN_MOVE2", SFX_FLAG_4 | 0x10101, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_TBOX_FALL1", SFX_FLAG_2 | 0x37A, "", 70, 64, 0, 1, 0, 0, 0x1000},
 	{"SFX_STG6_TBOX_FALL2", SFX_FLAG_2 | 0x163, "", 100, 64, 0, 1, 0, 0, 0},
@@ -1214,9 +1428,9 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG1_HONE_DOWN1", SFX_FLAG_2, "SE2_AUD_THROW_OBJ2", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG1_HONE_DOWN1_2", SFX_FLAG_2 | 0xC6, "", 110, 64, 0, 1, 0, 20, 0},
 	{"SFX_STG1_HONE_LANDING1", SFX_FLAG_2 | 0x4F5, "", 70, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG1_HONE__MOVE1", SFX_FLAG_4 | 0x1212, "", 70, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG1_HONE__MOVE1", SFX_FLAG_4 | 0x41212, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG1_HONE_FLY1", SFX_FLAG_2 | 0x166, "", 90, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG1_HONE_ESCAPE1", SFX_FLAG_4 | 0x3939, "", 80, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG1_HONE_ESCAPE1", SFX_FLAG_4 | 0x43939, "", 80, 64, 0, 1, 0, 0, 0},
 	{"SFX__STG1_HONE__MOVE1", SFX_FLAG_2, "SE6_BTL_E_NOKO_MOVE3L", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX__STG1_HONE__MOVE2", SFX_FLAG_2, "SE6_BTL_E_NOKO_MOVE3R", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1269,7 +1483,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG2_CRAUD_LIGHT2", SFX_FLAG_2 | 0x57, "", 50, 64, 0, 10, 0, 0, 0},
 	{"SFX_STG2_CRAUD_FLOWER1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_CRAUD_WINK1", SFX_FLAG_2 | 0x36C, "", 100, 64, 0, 60, 0, 0, 0},
-	{"SFX_STG2_CRAUD_KISS1", SFX_FLAG_4 | 0x7373, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG2_CRAUD_KISS1", SFX_FLAG_4 | 0x77373, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_CRAUD_ATTACK1", SFX_FLAG_2 | 0x332, "", 85, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG2_LOCK_OPEN1", SFX_FLAG_2 | 0x3EC, "", 105, 64, 0, 1, 0, 0, 0},
@@ -1358,8 +1572,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG2_FLOOR_MOVE1", SFX_FLAG_2 | 0x52, "", 60, 64, 0, 1, 0, 0, 0xFAAB},
 	{"SFX_STG2_FLOOR_STOP1", SFX_FLAG_2 | 0x16A, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG2_LIGHT1", SFX_FLAG_4 | 0x3B3B, "", 90, 64, 0, 30, 0, 0, 0},
-	{"SFX_STG2_STARSTONE_APPEAR1", SFX_FLAG_4 | 0x3C3C, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG2_LIGHT1", SFX_FLAG_4 | 0x43B3B, "", 90, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG2_STARSTONE_APPEAR1", SFX_FLAG_4 | 0x43C3C, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_KANBU_STARSTONE_GET1", SFX_FLAG_2 | 0x176, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOMB_SWITCH_APPEAR1", SFX_FLAG_2 | 0x4A9, "btl_e_3rd_hoist1_22k", 75, 64, 0, 1, 0, 10, 0},
 	{"SFX_STG2_BOMB_SWITCH_AWAY1", SFX_FLAG_2 | 0x4A4, "btl_e_3rd_cloth1_22k", 65, 64, 0, 0, 0, 5, 0},
@@ -1379,15 +1593,15 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG2_BOSS_APPEAR1", SFX_FLAG_2 | 0x57, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOSS_APPEAR2", SFX_FLAG_2 | 0x167, "", 127, 64, 0, 1, 0, 0, 0xFAAB},
-	{"SFX_STG2_BOSS_LIGHT1", SFX_FLAG_4 | 0x3737, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG2_BOSS_LIGHT1", SFX_FLAG_4 | 0x43737, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOSS_SET1", SFX_FLAG_2 | 0x1DA, "", 100, 64, 0, 1, 0, 0, 0x555},
-	{"SFX_STG2_BOSS_SET2", SFX_FLAG_4 | 0x6464, "", 90, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG2_BOSS_SET2", SFX_FLAG_4 | 0x46464, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOSS_LANDING1", SFX_FLAG_2 | 0x103, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOSS_MOVE1L", SFX_FLAG_2 | 0x106, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG2_BOSS_MOVE1R", SFX_FLAG_2 | 0x106, "", 90, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG2_3RD_EXPLSION1", SFX_FLAG_2 | 0x2F5, "", 85, 64, 0, 30, 0, 0, 0},
-	{"SFX_STG2_3RD_EXPLSION2", SFX_FLAG_4 | 0x4A4A, "", 90, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG2_3RD_EXPLSION2", SFX_FLAG_4 | 0x44A4A, "", 90, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG2_3RD_EXPLSION3", SFX_FLAG_2 | 0x1C9, "", 127, 64, 0, 40, 0, 0, 0},
 	{"SFX_STG2_KANBU_ROUND1", SFX_FLAG_2 | 0x4A2, "btl_e_3rd_att1_22k", 100, 64, 0, 1, 0, 0, 0xFD55},
 	{"SFX_STG2_KANBU_STICK1", SFX_FLAG_2 | 0x177, "", 100, 64, 0, 1, 0, 0, 0xFD55},
@@ -1398,10 +1612,10 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG3_AIR_SHIP_DRIVE1", SFX_FLAG_2 | 0x53, "", 60, 64, 0, 1, 0, 0, 0x555},
 	{"SFX_STG3_AIR_SHIP_DRIVE1_2", SFX_FLAG_2 | 0x19B, "", 65, 64, 0, 1, 0, 0, 0x555},
-	{"SFX_STG3_AIR_SHIP_DRIVE2", SFX_FLAG_4 | 0x2A2A, "", 70, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG3_AIR_SHIP_DRIVE3", SFX_FLAG_4 | 0x2B2B, "", 60, 64, 0, 1, 0, 30, 0},
-	{"SFX_STG3_AIR_SHIP_DRIVE4", SFX_FLAG_4 | 0x2C2C, "", 60, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG3_AIR_SHIP_DRIVE5", SFX_FLAG_4 | 0x2D2D, "", 60, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_AIR_SHIP_DRIVE2", SFX_FLAG_4 | 0x42A2A, "", 70, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_AIR_SHIP_DRIVE3", SFX_FLAG_4 | 0x42B2B, "", 60, 64, 0, 1, 0, 30, 0},
+	{"SFX_STG3_AIR_SHIP_DRIVE4", SFX_FLAG_4 | 0x42C2C, "", 60, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_AIR_SHIP_DRIVE5", SFX_FLAG_4 | 0x42D2D, "", 60, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG3_AIR_SHIP_REVERSE1", SFX_FLAG_2 | 0x54F, "", 80, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG3_AIR_SHIP_STOP1", SFX_FLAG_2, "SE2_AMB_AIRSHIP_IDOL1", 0, 64, 0, 1, 0, 0, 0},
@@ -1420,7 +1634,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX__STG3_AUDIENCE_FAN1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX__STG3_AUDIENCE_FAN2", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX__STG3_AUDIENCE_FAN3", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG3_AUDIENCE_FAN1", SFX_FLAG_4 | 0x1313, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_AUDIENCE_FAN1", SFX_FLAG_4 | 0x41313, "", 120, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG3_AUDIENCE_FAN_FLY1", SFX_FLAG_2 | 0x166, "", 90, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1452,7 +1666,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG3_LOCKER_OPEN1", SFX_FLAG_2 | 0x19A, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG3_LOCKER_CLOSE1", SFX_FLAG_2 | 0x199, "", 100, 64, 0, 1, 0, 20, 0},
 	{"SFX_STG3_TOILET1", SFX_FLAG_2 | 0x19D, "", 100, 64, 0, 20, 0, 0, 0},
-	{"SFX_STG3_DRAINING1", SFX_FLAG_4 | 0x1414, "", 90, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG3_DRAINING1", SFX_FLAG_4 | 0x41414, "", 90, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG3_FLY1", SFX_FLAG_2 | 0x191, "", 50, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX__STG3_NAME_ENTRY1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
@@ -1480,9 +1694,9 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG3_GANSU_BIG1", SFX_FLAG_2 | 0x192, "", 120, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG3_GANSU_BIG2", SFX_FLAG_2 | 0x193, "", 110, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG3_STARSTONE_ROUND1", SFX_FLAG_4 | 0x4545, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG3_STARSTONE_ROUND1", SFX_FLAG_4 | 0x44545, "", 100, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG3_KINOSICHOFU_LANDING1", SFX_FLAG_2 | 0x20A, "", 70, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG3_STARSTONE_ROUND2", SFX_FLAG_4 | 0x4646, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG3_STARSTONE_ROUND2", SFX_FLAG_4 | 0x44646, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX__STG3_PERA_KAIDAN_APPEAR1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1548,11 +1762,11 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG4_BOX_SWING1", SFX_FLAG_2 | 0x15E, "", 50, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_BOX_OPEN1", SFX_FLAG_2 | 0x3DC, "", 100, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_VOICE1", SFX_FLAG_2, "SE6_EVT_4_TELESA_VOICE1", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG4_TELESA_APPEAR1", SFX_FLAG_4 | 0x1818, "", 90, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG4_TELESA_APPEAR1", SFX_FLAG_4 | 0x41818, "", 90, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_SURPRISED1", SFX_FLAG_2 | 0x467, "", 110, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_APPEAR1_2", SFX_FLAG_2 | 0x45A, "", 90, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG4_TELESA_APPEAR2", SFX_FLAG_4 | 0xD0D, "", 117, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG4_TELESA_APPEAR2", SFX_FLAG_4 | 0x40D0D, "", 117, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_TOGETHER1", SFX_FLAG_2 | 0x45A, "", 60, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_LIGHT1", SFX_FLAG_2 | 0x1A6, "", 100, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG4_TELESA_A_APPEAR1", SFX_FLAG_2 | 0x19F, "SE2_EVT_4_ATMTELESA_APPEAR1", 120, 64, 0, 30, 0, 0, 0},
@@ -1590,7 +1804,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG4_LANPEL_M_FALL1", SFX_FLAG_2 | 0x37A, "", 10, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG4_MARIO_ROUND1", SFX_FLAG_2 | 0x52B, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG4_MARIO_RETURN1_1", SFX_FLAG_4 | 0x1A1A, "", 120, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG4_MARIO_RETURN1_1", SFX_FLAG_4 | 0x41A1A, "", 120, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG4_MARIO_RETURN1", SFX_FLAG_2 | 0x1A0, "", 90, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG4_LANPEL_MOVE1L", SFX_FLAG_2 | 0x55D, "btl_e_met_move1l_22k", 70, 64, 0, 0, 0, 0, 0},
@@ -1600,14 +1814,14 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_SHIP_STARTING1", SFX_FLAG_4 | 0x2E2E, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_STARTING1", SFX_FLAG_4 | 0x42E2E, "", 100, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG5_SHIP_ARRIVAL1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_SHIP_STARTING1_2", SFX_FLAG_4 | 0x2F2F, "", 105, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_STARTING1_2", SFX_FLAG_4 | 0x42F2F, "", 105, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_SHIP_STARTING1_3", SFX_FLAG_4 | 0x3030, "", 100, 64, 0, 30, 0, 0, 0},
-	{"SFX_STG5_SHIP_STARTING1_4", SFX_FLAG_4 | 0x3131, "", 100, 64, 0, 30, 0, 0, 0},
-	{"SFX_STG5_SHIP_ARRIVAL1_3", SFX_FLAG_4 | 0x3232, "", 100, 64, 0, 30, 0, 0, 0},
-	{"SFX_STG5_SHIP_ARRIVAL1_4", SFX_FLAG_4 | 0x3333, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_STARTING1_3", SFX_FLAG_4 | 0x43030, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_STARTING1_4", SFX_FLAG_4 | 0x43131, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_ARRIVAL1_3", SFX_FLAG_4 | 0x43232, "", 100, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_SHIP_ARRIVAL1_4", SFX_FLAG_4 | 0x43333, "", 100, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_MARCO_MOVE1L", SFX_FLAG_2 | 0x20B, "", 70, 64, 0, 1, 0, 0, 0xFAAB},
 	{"SFX_STG5_MARCO_MOVE1R", SFX_FLAG_2 | 0x20C, "", 70, 64, 0, 1, 0, 0, 0xFAAB},
@@ -1630,8 +1844,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_SHIP_QUAKE1", SFX_FLAG_2 | 0x1F1, "", 70, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG5_SHIP_SINK1", SFX_FLAG_2 | 0x1B5, "", 100, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_ELMOS_APPEAR1_2", SFX_FLAG_4 | 0x909, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_ELMOS_APPEAR2", SFX_FLAG_4 | 0xA0A, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_ELMOS_APPEAR1_2", SFX_FLAG_4 | 0x20909, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_ELMOS_APPEAR2", SFX_FLAG_4 | 0x20A0A, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_ELMOS_MOVE1", SFX_FLAG_2 | 0x4CD, "btl_e_bubble_move1_22k", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_ELMOS_MOVE1_2", SFX_FLAG_2 | 0x559, "", 70, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1680,7 +1894,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_TOGE_IN2", SFX_FLAG_2, "", 0, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_MINIGAME_SHIP_SINK1", SFX_FLAG_4 | 0x4747, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_MINIGAME_SHIP_SINK1", SFX_FLAG_4 | 0x44747, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_MINIGAME_SHIP_FLOAT1", SFX_FLAG_2 | 0x556, "", 80, 64, 0, 1, 0, 30, 0x555},
 	{"SFX_STG5_MINIGAME_WAVE1", SFX_FLAG_2 | 0xF, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_MINIGAME_WAVE2", SFX_FLAG_2, "SE6_STG0_SHIP_LANDING1", 0, 64, 0, 1, 0, 0, 0},
@@ -1690,7 +1904,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_SHIP_SHAKE1", SFX_FLAG_2 | 0x76, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_KINOPIO_MOVE1", SFX_FLAG_2, "SE2_AUD_RUN1", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG5_KINOPIO_MOVE2", SFX_FLAG_2, "SE4_FLD_P_JUMP1", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_KINOPIO_MOVE1_2", SFX_FLAG_4 | 0x8787, "", 70, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_KINOPIO_MOVE1_2", SFX_FLAG_4 | 0xB8787, "", 70, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_BARREL_APPEAR1", SFX_FLAG_2 | 0x1A9, "SE6_STG0_SHIP_LANDING1", 100, 64, 0, 30, 0, 0, 0},
@@ -1699,14 +1913,14 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_KOR_APPEAR1", SFX_FLAG_2 | 0x1AD, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG5_KOR_APPEAR2", SFX_FLAG_2 | 0x1AE, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG5_KOR_GOOUT1", SFX_FLAG_2 | 0x1AF, "", 100, 64, 0, 20, 0, 0, 0},
-	{"SFX_STG5_KOR_APPEAR_LIGHT1", SFX_FLAG_4 | 0x4848, "", 70, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG5_KOR_APPEAR_LIGHT1", SFX_FLAG_4 | 0x44848, "", 70, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_SHIP_SHAKE2", SFX_FLAG_2 | 0x1F1, "", 100, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_KOR_HEAD_MOVE1", SFX_FLAG_2 | 0x1B0, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG5_KOR_HEAD_MOVE2", SFX_FLAG_2 | 0x1B1, "", 100, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_KINOPIO_MOVE3", SFX_FLAG_4 | 0x8E8E, "", 70, 64, 0, 30, 0, 0, 0},
+	{"SFX_STG5_KINOPIO_MOVE3", SFX_FLAG_4 | 0xB8E8E, "", 70, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_MARCO_SHAKE1", SFX_FLAG_2 | 0x1B4, "", 30, 64, 0, 1, 0, 0, 0x555},
 	{"SFX_STG5_JUWEL_MOVE1", SFX_FLAG_2 | 0x4B9, "", 50, 64, 0, 30, 0, 0, 0xFAAB},
@@ -1714,7 +1928,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_KOR_SHIP_MOVE1", SFX_FLAG_2 | 0x1B3, "", 80, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG5_3RD_SHIP_MOVE1", SFX_FLAG_2 | 0x1A8, "", 80, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG5_ELMOS_APPEAR3", SFX_FLAG_4 | 0x909, "", 100, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG5_ELMOS_APPEAR3", SFX_FLAG_4 | 0x20909, "", 100, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_CANNON_FIRING1", SFX_FLAG_2 | 0x42, "", 120, 64, 0, 30, 0, 0, 0},
@@ -1725,7 +1939,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG5_SHIP_MOVE1", SFX_FLAG_2 | 0x47, "", 70, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG5_KORTESS_VOICE1", SFX_FLAG_2 | 0x44, "", 100, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG5_KORTESS_TURN1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG5_ELM_VS_3RD1", SFX_FLAG_4 | 0x8888, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG5_ELM_VS_3RD1", SFX_FLAG_4 | 0xB8888, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG5_KANBU_TURN1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1743,21 +1957,21 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG6_ROSE_MOVE1R", SFX_FLAG_2 | 0x198, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_TRAIN_BELL1", SFX_FLAG_2 | 0x1C8, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE1", SFX_FLAG_4, "", 120, 64, 0, 1, 0, 30, 0},
-	{"SFX_STG6_TRAIN_MOVE1_2", SFX_FLAG_4 | 0x202, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE1_2_2", SFX_FLAG_4 | 0x606, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE1_2_3", SFX_FLAG_4 | 0x303, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE1_3", SFX_FLAG_4 | 0x303, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE2", SFX_FLAG_4 | 0x101, "", 120, 64, 0, 1, 0, 10, 0},
-	{"SFX_STG6_TRAIN_MOVE2_2", SFX_FLAG_4 | 0x404, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE2_2_2", SFX_FLAG_4 | 0x707, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_MOVE2_3", SFX_FLAG_4 | 0x505, "", 120, 64, 0, 1, 0, 30, 0},
+	{"SFX_STG6_TRAIN_MOVE1", SFX_FLAG_4 | 0x10000, "", 120, 64, 0, 1, 0, 30, 0},
+	{"SFX_STG6_TRAIN_MOVE1_2", SFX_FLAG_4 | 0x10202, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE1_2_2", SFX_FLAG_4 | 0x10606, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE1_2_3", SFX_FLAG_4 | 0x10303, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE1_3", SFX_FLAG_4 | 0x10303, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE2", SFX_FLAG_4 | 0x10101, "", 120, 64, 0, 1, 0, 10, 0},
+	{"SFX_STG6_TRAIN_MOVE2_2", SFX_FLAG_4 | 0x10404, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE2_2_2", SFX_FLAG_4 | 0x10707, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_MOVE2_3", SFX_FLAG_4 | 0x10505, "", 120, 64, 0, 1, 0, 30, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_TRAIN_MOVE3", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG6_TRAIN_CHIME1", SFX_FLAG_4 | 0xC0C, "", 70, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_TRAIN_CHIME1", SFX_FLAG_4 | 0x40C0C, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG6_TRAIN_HANDLE_MOVE1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG6_DRIVER_SIGN1", SFX_FLAG_4 | 0x1D1D, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG6_DRIVER_SIGN1", SFX_FLAG_4 | 0x41D1D, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_GHOST_SHAKE1", SFX_FLAG_2 | 0xDE, "", 100, 64, 0, 1, 0, 0, 0xF800},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1772,7 +1986,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG6_LANPEL_CHANGE1", SFX_FLAG_2 | 0x1A0, "", 120, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG6_LANPEL_JUMP1", SFX_FLAG_2 | 0x4FF, "btl_e_pata_move2_22k", 65, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG6_PERA_KAI_DOWN1", SFX_FLAG_4 | 0x8080, "", 100, 64, 0, 25, 0, 0, 0},
+	{"SFX_STG6_PERA_KAI_DOWN1", SFX_FLAG_4 | 0x98080, "", 100, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG6_PERA_KAI_DOWN2", SFX_FLAG_2 | 0x46B, "", 110, 64, 0, 25, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_BOX_OPEN1", SFX_FLAG_2 | 0x23D, "", 100, 64, 0, 25, 0, 0, 0},
@@ -1791,9 +2005,9 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG6_ELEVATOR_MOVE1", SFX_FLAG_2 | 0x1BC, "", 100, 64, 0, 25, 0, 45, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_MOAMOA_VOICE1", SFX_FLAG_2 | 0x1C0, "", 60, 64, 0, 25, 0, 0, 0},
-	{"SFX_STG6_MOAMOA_VOICE2", SFX_FLAG_4 | 0x1E1E, "", 60, 64, 0, 25, 0, 0, 0},
+	{"SFX_STG6_MOAMOA_VOICE2", SFX_FLAG_4 | 0x41E1E, "", 60, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG6_MOAMOA_DAMAGED1", SFX_FLAG_2 | 0x166, "", 90, 64, 0, 25, 0, 0, 0},
-	{"SFX_STG6_MOA_TOGETHER_MOVE1", SFX_FLAG_4 | 0x1F1F, "", 100, 64, 0, 25, 0, 0, 0},
+	{"SFX_STG6_MOA_TOGETHER_MOVE1", SFX_FLAG_4 | 0x41F1F, "", 100, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG6_MOA_TOGETHER_MOVE2", SFX_FLAG_2 | 0x1C2, "", 100, 64, 0, 30, 0, 0, 0xFAAB},
 	{"SFX_STG6_MOAMOA_TOGETHER1", SFX_FLAG_2, "SE2_EVT_6_MOAMOA_G_TOGETHER1", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG6_MOAMOA_G_LEG1", SFX_FLAG_2 | 0x1C1, "", 100, 64, 0, 30, 0, 0, 0},
@@ -1803,11 +2017,11 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG6_MOAMOA_G_APPEAR1", SFX_FLAG_2, "SE2_EVT_3_GANSU_BIG1", 0, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG6_MOAMOA_G_APPEAR2", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG6_MOAMOA_G_MOVE1", SFX_FLAG_2 | 0x1BF, "", 100, 64, 0, 25, 0, 0, 0},
-	{"SFX_STG6_MOAMOA_G_ESCAPE1", SFX_FLAG_4 | 0x2020, "", 100, 64, 0, 25, 0, 0, 0},
+	{"SFX_STG6_MOAMOA_G_ESCAPE1", SFX_FLAG_4 | 0x42020, "", 100, 64, 0, 25, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG6_SWITCH_MOVE1", SFX_FLAG_2 | 0x1C7, "", 100, 64, 0, 25, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG6_ORIGAMI_APPEAR1", SFX_FLAG_4 | 0x8181, "SE5_EVT_6_ORIGAMI_KAIDAN_APPEAR2", 100, 64, 0, 25, 0, 0, 0},
+	{"SFX_STG6_ORIGAMI_APPEAR1", SFX_FLAG_4 | 0x98181, "SE5_EVT_6_ORIGAMI_KAIDAN_APPEAR2", 100, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG6_ORIGAMI_APPEAR2", SFX_FLAG_2 | 0x23C, "", 70, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG6_OBJ_SWITCH_APPEAR1", SFX_FLAG_2 | 0x1C6, "", 127, 64, 0, 25, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1850,8 +2064,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG7_HATCH_OPEN1", SFX_FLAG_2 | 0x1D8, "", 80, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG7_HATCH_SHUT1", SFX_FLAG_2 | 0x1D8, "", 80, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG7_CANNON_DISCHARGE1", SFX_FLAG_2 | 0x1C9, "", 127, 64, 0, 20, 0, 0, 0xFAAB},
-	{"SFX_STG7_BOMB_TOGETHER1", SFX_FLAG_4 | 0x8282, "", 100, 64, 0, 20, 0, 0, 0},
-	{"SFX_STG7_BOMB_TOGETHER1_2", SFX_FLAG_4 | 0x8282, "", 50, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG7_BOMB_TOGETHER1", SFX_FLAG_4 | 0x98282, "", 100, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG7_BOMB_TOGETHER1_2", SFX_FLAG_4 | 0x98282, "", 50, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG7_BOMB_TOGETHER2", SFX_FLAG_2 | 0x3F8, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG7_BOMB_FALL1", SFX_FLAG_2 | 0x377, "", 120, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1909,7 +2123,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG7_3RD_EXPLSION1", SFX_FLAG_2 | 0x2F5, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG7_3RD_EXPLSION2", SFX_FLAG_4 | 0x4A4A, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG7_3RD_EXPLSION2", SFX_FLAG_4 | 0x44A4A, "", 85, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG7_3RD_EXPLSION3", SFX_FLAG_2 | 0x1C9, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG7_3RD_FLY1", SFX_FLAG_2 | 0xAD, "", 50, 64, 0, 70, 0, 0, 0x1000},
 	{"SFX_STG7_3RD_LIGHT1", SFX_FLAG_2 | 0x1F4, "", 110, 64, 0, 70, 0, 0, 0x555},
@@ -1927,7 +2141,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG7_TEC_SHUTDOWN1", SFX_FLAG_2 | 0x1DE, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG7_TEC_LIGHT1", SFX_FLAG_2 | 0x1F4, "", 100, 64, 0, 70, 0, 0, 0},
-	{"SFX_STG7_TEC_LIGHT2", SFX_FLAG_4 | 0x4A4A, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG7_TEC_LIGHT2", SFX_FLAG_4 | 0x44A4A, "", 85, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1937,7 +2151,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG8_KARON_APPEAR1", SFX_FLAG_2 | 0x52C, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_KARON_DOWN1", SFX_FLAG_2 | 0xC6, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_KARON_LANDING1", SFX_FLAG_2 | 0x4F5, "", 70, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_KARON_MOVE1", SFX_FLAG_4 | 0x1212, "", 70, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_KARON_MOVE1", SFX_FLAG_4 | 0x41212, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_KARON_FLY1", SFX_FLAG_2 | 0x166, "", 90, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_KARON_ESCAPE1", SFX_FLAG_2, "SE2_EVT_8_KARON_ESCAPE1", 0, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -1969,7 +2183,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG8_KEYSTAND_SHAKE1", SFX_FLAG_2 | 0x168, "", 100, 64, 0, 20, 0, 0, 0x800},
 	{"SFX_STG8_KEYSTAND_ROUND1", SFX_FLAG_2 | 0x3A9, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG8_CELESTIAL_SHAKE1", SFX_FLAG_2 | 0x168, "", 100, 64, 0, 20, 0, 0, 0},
-	{"SFX_STG8_CELESTIAL_MOVE1", SFX_FLAG_4 | 0x2929, "", 120, 64, 0, 20, 0, 0, 0},
+	{"SFX_STG8_CELESTIAL_MOVE1", SFX_FLAG_4 | 0x42929, "", 120, 64, 0, 20, 0, 0, 0},
 	{"SFX_STG8_CELESTIAL_MOVE2", SFX_FLAG_2 | 0x1EB, "", 85, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG8_MAP_MOVE1", SFX_FLAG_2 | 0x25B, "", 100, 64, 0, 30, 0, 0, 0},
@@ -1987,7 +2201,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG8_STAR_LIGHTUP2", SFX_FLAG_2 | 0x1F5, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUAKE3", SFX_FLAG_2 | 0x168, "", 100, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG8_PEACH_APPEAR1", SFX_FLAG_4 | 0x2121, "", 90, 64, 0, 15, 0, 0, 0},
+	{"SFX_STG8_PEACH_APPEAR1", SFX_FLAG_4 | 0x42121, "", 90, 64, 0, 15, 0, 0, 0},
 	{"SFX_STG8_SHURYO_THUNDER1", SFX_FLAG_2 | 0x250, "", 110, 64, 0, 25, 0, 0, 0},
 	{"SFX_STG8_SHURYO_THUNDER2", SFX_FLAG_2 | 0x314, "", 60, 64, 0, 1, 0, 0, 0xFAAB},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -2007,38 +2221,38 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_STG8_GRAVE_SHAKE1", SFX_FLAG_2 | 0x1EE, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_GRAVE_MOVE1", SFX_FLAG_2 | 0x3A9, "", 110, 64, 0, 1, 0, 0, 0xF800},
 	{"SFX_STG8_GRAVE_DOWN1", SFX_FLAG_2 | 0x25B, "", 127, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_GRAVE_LIGHT2", SFX_FLAG_4 | 0x2222, "", 105, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_GRAVE_LIGHT2", SFX_FLAG_4 | 0x42222, "", 105, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUEEN_APPEAR1", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUEEN_APPEAR2", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_WORLD_DARK1", SFX_FLAG_4 | 0x2323, "", 80, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_WORLD_DARK1", SFX_FLAG_4 | 0x42323, "", 80, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG8_QUEEN_MOVE1", SFX_FLAG_4 | 0x2525, "", 105, 64, 0, 1, 0, 10, 0},
-	{"SFX_STG8_QUEEN_MOVE2", SFX_FLAG_4 | 0x2626, "", 105, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_MOVE1", SFX_FLAG_4 | 0x42525, "", 105, 64, 0, 1, 0, 10, 0},
+	{"SFX_STG8_QUEEN_MOVE2", SFX_FLAG_4 | 0x42626, "", 105, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_SHURYO_HEAD_LEAPED1", SFX_FLAG_2 | 0x3D, "", 100, 64, 0, 1, 0, 0, 0xF556},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG8_THUNDER1", SFX_FLAG_2 | 0x250, "", 100, 64, 0, 45, 0, 0, 0xF800},
-	{"SFX_STG8_LIGHT1", SFX_FLAG_4 | 0x2424, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_LIGHT1", SFX_FLAG_4 | 0x42424, "", 85, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_LIGHT2", SFX_FLAG_2, "", 0, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUAKE1", SFX_FLAG_2 | 0x1F1, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG8_STARSTONE_SHINE1", SFX_FLAG_2 | 0x1F3, "", 100, 64, 0, 60, 0, 0, 0},
-	{"SFX_STG8_STARSTONE_ROUND1", SFX_FLAG_4 | 0x4D4D, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_STARSTONE_ROUND2", SFX_FLAG_4 | 0x4E4E, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_STARSTONE_EFFECT1", SFX_FLAG_4 | 0x4F4F, "", 97, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_STARSTONE_ROUND1", SFX_FLAG_4 | 0x44D4D, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_STARSTONE_ROUND2", SFX_FLAG_4 | 0x44E4E, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_STARSTONE_EFFECT1", SFX_FLAG_4 | 0x44F4F, "", 97, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG8_QUEEN_SHINE1", SFX_FLAG_2 | 0x172, "", 55, 64, 0, 20, 0, 0, 0},
-	{"SFX_STG8_QUEEN_SHINE2", SFX_FLAG_4 | 0x5050, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_QUEEN_SHINE2_2", SFX_FLAG_4 | 0x6D6D, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_QUEEN_SHINE2_3", SFX_FLAG_4 | 0x6E6E, "", 120, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_QUEEN_SHINE3", SFX_FLAG_4 | 0x5151, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_SHINE2", SFX_FLAG_4 | 0x45050, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_SHINE2_2", SFX_FLAG_4 | 0x46D6D, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_SHINE2_3", SFX_FLAG_4 | 0x46E6E, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_SHINE3", SFX_FLAG_4 | 0x45151, "", 120, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUEEN_SHINE4", SFX_FLAG_2 | 0x1F2, "", 127, 64, 0, 60, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG8_PEACH_SHINE1", SFX_FLAG_4 | 0x5252, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_STG8_MARIO_SHINE1", SFX_FLAG_4 | 0x5353, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_PEACH_SHINE1", SFX_FLAG_4 | 0x45252, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_MARIO_SHINE1", SFX_FLAG_4 | 0x45353, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_STG8_QUEEN_DIE1", SFX_FLAG_4 | 0x2727, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_DIE1", SFX_FLAG_4 | 0x42727, "", 120, 64, 0, 1, 0, 0, 0},
 	{"SFX_STG8_QUEEN_DIE2", SFX_FLAG_2 | 0x250, "", 90, 64, 0, 60, 0, 0, 0x800},
-	{"SFX_STG8_QUEEN_DIE3", SFX_FLAG_4 | 0x2828, "", 120, 64, 0, 1, 0, 0, 0},
+	{"SFX_STG8_QUEEN_DIE3", SFX_FLAG_4 | 0x42828, "", 120, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_STG8_CANDLE_DARK_OFF1", SFX_FLAG_2 | 0x1E4, "", 85, 64, 0, 30, 0, 0, 0},
 	{"SFX_STG8_CANDLE_ON1", SFX_FLAG_2 | 0x1E7, "", 85, 64, 0, 30, 0, 0, 0},
@@ -2216,14 +2430,14 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_KUPPA_KAMEBABA_SHUGOU1", SFX_FLAG_2 | 0x50F, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_TOGENOKO_MOVE1", SFX_FLAG_2 | 0x514, "", 80, 64, 0, 20, 0, 0, 0},
 	{"SFX_KUPPA_TOGENOKO_MOVE2", SFX_FLAG_2 | 0x515, "", 80, 64, 0, 20, 0, 0, 0},
-	{"SFX_KUPPA_TAIGUN_MOVE1", SFX_FLAG_4 | 0x4949, "", 100, 64, 0, 20, 0, 0, 0},
+	{"SFX_KUPPA_TAIGUN_MOVE1", SFX_FLAG_4 | 0x44949, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_APPEAR1", SFX_FLAG_2 | 0x4A9, "", 60, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_SHINE1", SFX_FLAG_2 | 0x32E, "", 70, 64, 0, 50, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_FLY1", SFX_FLAG_2 | 0x4AF, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_HIT1", SFX_FLAG_2 | 0x142, "", 70, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_JUMP1", SFX_FLAG_2 | 0x3E9, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_BIRIBIRI1", SFX_FLAG_2 | 0x2F5, "", 60, 64, 0, 1, 0, 0, 0},
-	{"SFX_KUPPA_ITIKORO_LIGHT1", SFX_FLAG_4 | 0x4A4A, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_KUPPA_ITIKORO_LIGHT1", SFX_FLAG_4 | 0x44A4A, "", 85, 64, 0, 1, 0, 0, 0},
 	{"SFX_KUPPA_ITIKORO_EXPLOSION1", SFX_FLAG_2 | 0x1C9, "", 127, 64, 0, 60, 0, 0, 0xF800},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_KUPPA_PEAPLE_ESCAPE1", SFX_FLAG_2 | 0x364, "", 100, 64, 0, 1, 0, 0, 0},
@@ -2314,9 +2528,9 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_EVT_GAME_MONTE_COUNT1", SFX_FLAG_2 | 0x47A, "", 50, 64, 0, 1, 0, 0, 0xFD55},
 	{"SFX_EVT_GAME_MONTE_LEAPED1", SFX_FLAG_2 | 0x247, "", 55, 64, 0, 1, 0, 0, 0xFD55},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_GAME_SLOT_ROUND1", SFX_FLAG_4 | 0x7979, "", 70, 64, 0, 0, 0, 0, 0},
+	{"SFX_EVT_GAME_SLOT_ROUND1", SFX_FLAG_4 | 0x97979, "", 70, 64, 0, 0, 0, 0, 0},
 	{"SFX_EVT_GAME_SLOT_STOP1", SFX_FLAG_2 | 0x173, "", 100, 64, 0, 0, 0, 0, 0},
-	{"SFX_EVT_GAME_SLOT_SUCCESS1", SFX_FLAG_4 | 0x7A7A, "", 80, 64, 0, 0, 0, 0, 0},
+	{"SFX_EVT_GAME_SLOT_SUCCESS1", SFX_FLAG_4 | 0x97A7A, "", 80, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_GAME_COUNT1", SFX_FLAG_2 | 0x35E, "", 95, 64, 0, 0, 0, 0, 0},
 	{"SFX_EVT_GAME_START1", SFX_FLAG_2 | 0x35D, "", 95, 64, 0, 0, 0, 0, 0},
@@ -2328,8 +2542,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_GAME_BOAT_WATER1", SFX_FLAG_2 | 0x62, "", 40, 64, 0, 1, 0, 0, 0xFD55},
 	{"SFX_EVT_GAME_BOAT_BARREL1", SFX_FLAG_2 | 0x39E, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_GAME_BOAT_UZUSIO1", SFX_FLAG_4 | 0x6565, "", 100, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_GAME_BOAT_UZUSIO2", SFX_FLAG_4 | 0x4747, "", 70, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_GAME_BOAT_UZUSIO1", SFX_FLAG_4 | 0x46565, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_GAME_BOAT_UZUSIO2", SFX_FLAG_4 | 0x44747, "", 70, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_GAME_SLIT_NPC_MOVE1L", SFX_FLAG_2 | 0x20B, "", 50, 64, 0, 1, 100, 0, 0},
 	{"SFX_EVT_GAME_SLIT_NPC_MOVE1R", SFX_FLAG_2 | 0x20C, "", 50, 64, 0, 1, 100, 0, 0},
@@ -2344,17 +2558,17 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_FORTUNE_CARD_MOVE1", SFX_FLAG_4 | 0xE0E, "", 80, 64, 0, 1, 0, 25, 0},
+	{"SFX_EVT_FORTUNE_CARD_MOVE1", SFX_FLAG_4 | 0x40E0E, "", 80, 64, 0, 1, 0, 25, 0},
 	{"SFX_EVT_FORTUNE_CARD_MOVE2", SFX_FLAG_2 | 0x1F8, "", 120, 64, 0, 1, 0, 20, 0},
-	{"SFX_EVT_FORTUNE_CARD_MOVE3", SFX_FLAG_4 | 0xF0F, "", 80, 64, 0, 1, 0, 20, 0},
-	{"SFX_EVT_FORTUNE_CARD_MOVE4", SFX_FLAG_4 | 0x1010, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_FORTUNE_CARD_MOVE5", SFX_FLAG_4 | 0x1111, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_FORTUNE_CARD_MOVE3", SFX_FLAG_4 | 0x40F0F, "", 80, 64, 0, 1, 0, 20, 0},
+	{"SFX_EVT_FORTUNE_CARD_MOVE4", SFX_FLAG_4 | 0x41010, "", 85, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_FORTUNE_CARD_MOVE5", SFX_FLAG_4 | 0x41111, "", 85, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_INCANT_LIGHT1", SFX_FLAG_2 | 0x1FF, "", 90, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_INCANT_CUBE1", SFX_FLAG_2 | 0x1F9, "", 100, 64, 0, 60, 0, 15, 0},
 	{"SFX_EVT_INCANT_CUBE2", SFX_FLAG_2 | 0x1FA, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_INCANT_CUBE3", SFX_FLAG_2 | 0x1FB, "", 100, 64, 0, 60, 0, 0, 0},
-	{"SFX_EVT_INCANT_CUBE4", SFX_FLAG_4 | 0x6F6F, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_INCANT_CUBE4", SFX_FLAG_4 | 0x46F6F, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_INCANT_CUBE4_2", SFX_FLAG_2 | 0x1FC, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_INCANT_CUBE5", SFX_FLAG_2 | 0x1FD, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_INCANT_CUBE6", SFX_FLAG_2 | 0x23D, "", 100, 64, 0, 60, 0, 0, 0},
@@ -2362,13 +2576,13 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_FLD_INCANT_CUBE1", SFX_FLAG_2 | 0x1F9, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_FLD_INCANT_CUBE2", SFX_FLAG_2 | 0x1FA, "", 100, 64, 0, 60, 0, 0, 0},
-	{"SFX_EVT_FLD_INCANT_CUBE3", SFX_FLAG_4 | 0x7070, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_FLD_INCANT_CUBE3", SFX_FLAG_4 | 0x47070, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_FLD_INCANT_CUBE4", SFX_FLAG_2 | 0x23D, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_FLD_INCANT_CUBE5", SFX_FLAG_2 | 0x1FE, "", 100, 64, 0, 60, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_BTL_INCANT_CUBE1", SFX_FLAG_2 | 0x1F9, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_BTL_INCANT_CUBE2", SFX_FLAG_2 | 0x1FA, "", 100, 64, 0, 60, 0, 0, 0},
-	{"SFX_EVT_BTL_INCANT_CUBE3", SFX_FLAG_4 | 0x7070, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_BTL_INCANT_CUBE3", SFX_FLAG_4 | 0x47070, "", 100, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_BTL_INCANT_CUBE4", SFX_FLAG_2 | 0x23D, "", 100, 64, 0, 60, 0, 0, 0},
 	{"SFX_EVT_BTL_INCANT_CUBE5", SFX_FLAG_2 | 0x1FE, "", 100, 64, 0, 60, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -2385,7 +2599,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_COOK_COOKING1", SFX_FLAG_2 | 0x7E, "", 85, 64, 0, 1, 0, 0, 0},
-	{"SFX_EVT_COOK_COOKING2", SFX_FLAG_4 | 0x7474, "", 80, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_COOK_COOKING2", SFX_FLAG_4 | 0x77474, "", 80, 64, 0, 1, 0, 0, 0},
 	{"SFX_EVT_COOK_COOKING3", SFX_FLAG_2 | 0x1F7, "", 125, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -2696,8 +2910,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_SPECIAL_AC_PONE1", SFX_FLAG_2, "SE4_BTL_S_AC_S_END1", 0, 64, 0, 0, 0, 0, 0},
 	{"SFX_AC_SPECIAL1", SFX_FLAG_2, "SE4_BTL_S_AC_S_METER1", 0, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_BTL_SLOT_START1", SFX_FLAG_4 | 0x7979, "", 75, 64, 0, 0, 0, 0, 0},
-	{"SFX_BTL_SLOT_SUCCESS1", SFX_FLAG_4 | 0x7A7A, "", 75, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_SLOT_START1", SFX_FLAG_4 | 0x97979, "", 75, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_SLOT_SUCCESS1", SFX_FLAG_4 | 0x97A7A, "", 75, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BTL_LVUP_CURSOR1", SFX_FLAG_2 | 0x477, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_LVUP_BLOCK_MOVE1", SFX_FLAG_2 | 0x153, "", 100, 64, 0, 0, 0, 0, 0},
@@ -2713,7 +2927,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_BTL_SAC_START1", SFX_FLAG_4 | 0x1C1C, "", 110, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_SAC_START1", SFX_FLAG_4 | 0x41C1C, "", 110, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_SAC_START2", SFX_FLAG_2 | 0x139, "", 70, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_SAC_START3", SFX_FLAG_2 | 0x13A, "", 110, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -2759,7 +2973,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BTL_SAC_SUKKIRI3", SFX_FLAG_2 | 0x13A, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_SAC_SUKKIRI4", SFX_FLAG_2 | 0x54A, "", 90, 64, 0, 0, 0, 0, 0x800},
 	{"SFX_BTL_SAC_SUKKIRI4_2", SFX_FLAG_2, "", 0, 64, 0, 0, 0, 0, 0},
-	{"SFX_BTL_SAC_SUKKIRI5", SFX_FLAG_4 | 0x4848, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_SAC_SUKKIRI5", SFX_FLAG_4 | 0x44848, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BTL_SAC_ZUBA_STAR1", SFX_FLAG_2 | 0x154, "", 70, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_SAC_ZUBA_STAR2", SFX_FLAG_2 | 0x13C, "", 110, 64, 0, 0, 0, 0, 0},
@@ -2787,7 +3001,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BTL_KURI_ATTACK1", SFX_FLAG_2 | 0x338, "", 90, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_KURI_ATTACK2", SFX_FLAG_2 | 0x339, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_KURI_KISS1", SFX_FLAG_2 | 0x33A, "", 100, 64, 0, 0, 0, 0, 0},
-	{"SFX_BTL_KURI_CHEER_KISS1", SFX_FLAG_4 | 0x7676, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_KURI_CHEER_KISS1", SFX_FLAG_4 | 0x77676, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_KURI_SQUAT1", SFX_FLAG_2 | 0x33D, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_KURI_LEARNED1", SFX_FLAG_2 | 0x33B, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_KURI_LEARNED2", SFX_FLAG_2 | 0x33C, "", 100, 64, 0, 0, 0, 0, 0},
@@ -2809,7 +3023,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BTL_CLAUD_BREATH1", SFX_FLAG_2 | 0x333, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_CLAUD_BREATH2", SFX_FLAG_2 | 0x334, "", 110, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_CLAUD_BREATH3", SFX_FLAG_2 | 0x335, "", 95, 64, 0, 0, 0, 0, 0},
-	{"SFX_BTL_CLAUD_KISS1", SFX_FLAG_4 | 0x7575, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BTL_CLAUD_KISS1", SFX_FLAG_4 | 0x77575, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_CLAUD_KISS2", SFX_FLAG_2 | 0x336, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BTL_CLAUD_HIDE1", SFX_FLAG_2 | 0x1B4, "", 60, 64, 0, 0, 0, 0, 0x800},
 	{"SFX_BTL_CLAUD_HIDE2", SFX_FLAG_2 | 0x4A8, "btl_e_3rd_fumble1_22k", 110, 64, 0, 0, 0, 0, 0xD55},
@@ -3675,8 +3889,8 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_MBTN_MOTOR_ACTIVE1", SFX_FLAG_2 | 0x1D8, "", 90, 64, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_MBTN_INHALE1", SFX_FLAG_2 | 0x53, "", 120, 64, 0, 50, 0, 0, 0x555},
 	{"SFX_BOSS_MBTN_CHEST_OPEN1", SFX_FLAG_2 | 0x508, "btl_e_togeda_move1_22k", 110, 64, 0, 0, 0, 0, 0xFAAB},
-	{"SFX_BOSS_MBTN_SEARCH1", SFX_FLAG_4 | 0x6262, "", 80, 64, 0, 0, 0, 0, 0x555},
-	{"SFX_BOSS_MBTN_LOCKON1", SFX_FLAG_4 | 0x6363, "btl_e_barri_att6_22k", 80, 64, 0, 0, 0, 0, 0},
+	{"SFX_BOSS_MBTN_SEARCH1", SFX_FLAG_4 | 0x46262, "", 80, 64, 0, 0, 0, 0, 0x555},
+	{"SFX_BOSS_MBTN_LOCKON1", SFX_FLAG_4 | 0x46363, "btl_e_barri_att6_22k", 80, 64, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_MBTN_MACHINEGUN1", SFX_FLAG_2 | 0x41D, "btl_e_firling1_22k", 110, 64, 0, 50, 0, 0, 0x800},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -3810,7 +4024,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_KOR_SWORD_SHAKE1", SFX_FLAG_2 | 0xF6, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_SWORD_READY1", SFX_FLAG_2 | 0xED, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_SWORD_STICK1", SFX_FLAG_2 | 0xF4, "", 127, 64, 0, 20, 0, 0, 0},
-	{"SFX_BOSS_KOR_SWORD_FALL1", SFX_FLAG_4 | 0x1919, "SE2_BOS_KOR_SWORD_FALL2", 75, 64, 0, 20, 0, 0, 0},
+	{"SFX_BOSS_KOR_SWORD_FALL1", SFX_FLAG_4 | 0x41919, "SE2_BOS_KOR_SWORD_FALL2", 75, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_HEAD_ATTACK1", SFX_FLAG_2 | 0xED, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_HEAD_ATTACK2", SFX_FLAG_2 | 0xEE, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_MOVE1", SFX_FLAG_2 | 0xF2, "", 105, 64, 0, 20, 0, 0, 0},
@@ -3827,7 +4041,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_KOR_BITE1", SFX_FLAG_2 | 0xEA, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_ROUND1", SFX_FLAG_2 | 0xF3, "", 127, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_KOR_SWORD_FALL2", SFX_FLAG_2 | 0xF7, "", 110, 64, 0, 20, 0, 0, 0},
-	{"SFX_BOSS_KOR_INHALE2", SFX_FLAG_4 | 0x6767, "", 110, 64, 0, 20, 0, 0, 0},
+	{"SFX_BOSS_KOR_INHALE2", SFX_FLAG_4 | 0x46767, "", 110, 64, 0, 20, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_KOR_DAMAGED1", SFX_FLAG_2 | 0x40F, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -3839,14 +4053,14 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_TEAM_3RD_ATTACK1_2", SFX_FLAG_2 | 0x4AC, "btl_e_3rd_miss1_22k", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_TEAM_3RD_WAKE1", SFX_FLAG_2 | 0x4AE, "", 100, 64, 0, 0, 0, 0, 0x555},
 	{"SFX_BOSS_TEAM_3RD_MOVE_CAILING1", SFX_FLAG_2 | 0x1B8, "", 110, 64, 0, 10, 0, 0, 0x555},
-	{"SFX_BOSS_TEAM_3RD_MOVE_CAILING2", SFX_FLAG_4 | 0x8B8B, "", 95, 64, 0, 0, 0, 20, 0},
+	{"SFX_BOSS_TEAM_3RD_MOVE_CAILING2", SFX_FLAG_4 | 0xB8B8B, "", 95, 64, 0, 0, 0, 20, 0},
 	{"SFX_BOSS_TEAM_3RD_MOVE_CAILING3", SFX_FLAG_2 | 0xC2, "", 110, 64, 0, 20, 0, 0, 0xFAAB},
 	{"SFX_BOSS_TEAM_3RD_ATTACK2", SFX_FLAG_2 | 0x558, "", 60, 64, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_TEAM_3RD_MOVE2", SFX_FLAG_4 | 0x8A8A, "", 100, 64, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_TEAM_3RD_ADHERE1", SFX_FLAG_4 | 0x8989, "", 100, 64, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_TEAM_3RD_ADHERE2", SFX_FLAG_4 | 0x8C8C, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BOSS_TEAM_3RD_MOVE2", SFX_FLAG_4 | 0xB8A8A, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BOSS_TEAM_3RD_ADHERE1", SFX_FLAG_4 | 0xB8989, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BOSS_TEAM_3RD_ADHERE2", SFX_FLAG_4 | 0xB8C8C, "", 100, 64, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_TEAM_3RD_ROUND1", SFX_FLAG_2 | 0x261, "", 105, 64, 0, 10, 0, 20, 0x800},
-	{"SFX_BOSS_TEAM_3RD_ESCAPE1", SFX_FLAG_4 | 0x8D8D, "", 100, 64, 0, 0, 0, 0, 0},
+	{"SFX_BOSS_TEAM_3RD_ESCAPE1", SFX_FLAG_4 | 0xB8D8D, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_TEAM_3RD_DAMAGED1", SFX_FLAG_2 | 0x411, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -3859,14 +4073,14 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_MOA_G_ARM_MOVE3_2", SFX_FLAG_2 | 0x10D, "", 107, 64, 0, 30, 0, 0, 0},
 	{"SFX_BOSS_MOA_G_ARM_MOVE4", SFX_FLAG_2 | 0x10E, "", 107, 64, 0, 30, 0, 0, 0},
 	{"SFX_BOSS_MOA_G_ARM_MOVE5", SFX_FLAG_2 | 0x10F, "", 107, 64, 0, 30, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_ARM_DOWN1", SFX_FLAG_4 | 0x5555, "", 110, 64, 0, 30, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_ARM_DOWN2", SFX_FLAG_4 | 0x5656, "", 107, 64, 0, 30, 0, 10, 0},
-	{"SFX_BOSS_MOA_G_BIG1", SFX_FLAG_4 | 0x5858, "", 90, 64, 0, 30, 0, 5, 0},
+	{"SFX_BOSS_MOA_G_ARM_DOWN1", SFX_FLAG_4 | 0x45555, "", 110, 64, 0, 30, 0, 0, 0},
+	{"SFX_BOSS_MOA_G_ARM_DOWN2", SFX_FLAG_4 | 0x45656, "", 107, 64, 0, 30, 0, 10, 0},
+	{"SFX_BOSS_MOA_G_BIG1", SFX_FLAG_4 | 0x45858, "", 90, 64, 0, 30, 0, 5, 0},
 	{"SFX_BOSS_MOA_G_BIG2", SFX_FLAG_2 | 0x4D9, "btl_e_charge1_22k", 90, 64, 0, 30, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_ARM_RESTORE1", SFX_FLAG_4 | 0x5959, "", 120, 64, 0, 60, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_ARM_RESTORE2", SFX_FLAG_4 | 0x5454, "", 120, 64, 0, 30, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_LUMP1", SFX_FLAG_4 | 0x5555, "", 110, 64, 0, 30, 0, 0, 0},
-	{"SFX_BOSS_MOA_G_EXPLOSION1", SFX_FLAG_4 | 0x5757, "", 110, 64, 0, 30, 0, 0, 0},
+	{"SFX_BOSS_MOA_G_ARM_RESTORE1", SFX_FLAG_4 | 0x45959, "", 120, 64, 0, 60, 0, 0, 0},
+	{"SFX_BOSS_MOA_G_ARM_RESTORE2", SFX_FLAG_4 | 0x45454, "", 120, 64, 0, 30, 0, 0, 0},
+	{"SFX_BOSS_MOA_G_LUMP1", SFX_FLAG_4 | 0x45555, "", 110, 64, 0, 30, 0, 0, 0},
+	{"SFX_BOSS_MOA_G_EXPLOSION1", SFX_FLAG_4 | 0x45757, "", 110, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_MOA_G_DAMAGED1", SFX_FLAG_2 | 0x411, "", 100, 64, 0, 30, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -3937,10 +4151,10 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_BPCH_DARK_POWER1", SFX_FLAG_2 | 0xC3, "", 110, 64, 0, 45, 0, 0, 0},
 	{"SFX_BOSS_BPCH_HAND_UP1", SFX_FLAG_2 | 0xC4, "", 110, 64, 0, 45, 0, 0, 0},
 	{"SFX_BOSS_BPCH_QWEN_APPEAR1", SFX_FLAG_2 | 0xC5, "", 80, 64, 0, 45, 0, 0, 0},
-	{"SFX_BOSS_BPCH_HAND_APPEAR1", SFX_FLAG_4 | 0x6868, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_BPCH_HAND_APPEAR1", SFX_FLAG_4 | 0x46868, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_BOSS_BPCH_HAND_IN1", SFX_FLAG_2, "", 0, 64, 0, 60, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_BPCH_QWEN_APPEAR2", SFX_FLAG_4 | 0x6969, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_BPCH_QWEN_APPEAR2", SFX_FLAG_4 | 0x46969, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_BPCH_DAMAGED1", SFX_FLAG_2 | 0x411, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -3950,7 +4164,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_QWEN_THUNDER1", SFX_FLAG_2 | 0x250, "", 115, 64, 0, 45, 0, 0, 0xF800},
 	{"SFX_BOSS_QWEN_DARK_POWER1", SFX_FLAG_2 | 0x112, "", 110, 64, 0, 45, 0, 0, 0},
 	{"SFX_BOSS_QWEN_DARK_CHERGE1", SFX_FLAG_2, "", 0, 64, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_QWEN_DARK_WAVE1", SFX_FLAG_4 | 0x6A6A, "", 115, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_QWEN_DARK_WAVE1", SFX_FLAG_4 | 0x46A6A, "", 115, 64, 0, 1, 0, 0, 0},
 	{"SFX_BOSS_QWEN_DARK_WAVE2", SFX_FLAG_2 | 0x2F5, "", 100, 64, 0, 20, 0, 0, 0},
 	{"SFX_BOSS_QWEN_DARK_WAVE3", SFX_FLAG_2 | 0x113, "", 115, 64, 0, 30, 0, 0, 0},
 	{"SFX_BOSS_QWEN_BREATH1", SFX_FLAG_2 | 0x110, "", 115, 64, 0, 45, 0, 0, 0},
@@ -3960,12 +4174,12 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_BOSS_QWEN_HAND_UP1", SFX_FLAG_2 | 0x117, "", 110, 64, 0, 45, 0, 0, 0},
 	{"SFX_BOSS_QWEN_HAND_DOWN1", SFX_FLAG_2, "", 0, 64, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_QWEN_HANDS_MOVE1", SFX_FLAG_2 | 0x116, "", 110, 64, 0, 20, 0, 0, 0},
-	{"SFX_BOSS_QWENH_HAND_APPEAR1", SFX_FLAG_4 | 0x6868, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_QWENH_HAND_APPEAR1", SFX_FLAG_4 | 0x46868, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_BOSS_QWEN_HAND_IN1", SFX_FLAG_2, "", 0, 64, 0, 50, 0, 0, 0},
-	{"SFX_BOSS_QWEN_HAND_APPEAR1_2", SFX_FLAG_4 | 0x6B6B, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_QWEN_HAND_APPEAR1_2", SFX_FLAG_4 | 0x46B6B, "", 110, 64, 0, 1, 0, 0, 0},
 	{"SFX_BOSS_QWEN_HAND_GOOUT1", SFX_FLAG_2 | 0x115, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_BOSS_QWENH_HAND_APPEAR2", SFX_FLAG_4 | 0x6C6C, "", 110, 64, 0, 1, 0, 0, 0},
+	{"SFX_BOSS_QWENH_HAND_APPEAR2", SFX_FLAG_4 | 0x46C6C, "", 110, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_QWEN_DAMAGED1", SFX_FLAG_2 | 0x411, "", 100, 64, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
@@ -4011,7 +4225,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_AUDIENCE_HANDBEAT1", SFX_FLAG_2 | 0x9D, "", 110, 64, 0, 50, 10, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_AUDIENCE_PANIC_SCREAM1", SFX_FLAG_4 | 0x7171, "SE2_AUD_PANIC_SCRMLP2", 105, 64, 0, 0, 0, 0, 0},
+	{"SFX_AUDIENCE_PANIC_SCREAM1", SFX_FLAG_4 | 0x47171, "SE2_AUD_PANIC_SCRMLP2", 105, 64, 0, 0, 0, 0, 0},
 	{"SFX_AUDIENCE_PANIC_SCREAM2", SFX_FLAG_2 | 0xA4, "", 70, 64, 0, 10, 0, 0, 0},
 	{"SFX_AUDIENCE_PANIC_SCREAM3", SFX_FLAG_2 | 0xA5, "", 70, 64, 0, 10, 0, 0, 0},
 	{"SFX_AUDIENCE_PANIC_RUN1", SFX_FLAG_2 | 0xA7, "", 70, 64, 0, 10, 0, 0, 0},
@@ -4025,7 +4239,7 @@ SoundEffectEntry pssfxlist[] = {
 	{"SFX_AUDIENCE_RUN2", SFX_FLAG_2 | 0xA7, "", 60, 64, 0, 0, 0, 0, 0xFAAB},
 	{"SFX_AUDIENCE_RUN3", SFX_FLAG_2 | 0xA8, "", 50, 64, 0, 10, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_AUDIENCE_GNB_PANIC1", SFX_FLAG_4 | 0x3A3A, "", 105, 64, 0, 10, 0, 0, 0},
+	{"SFX_AUDIENCE_GNB_PANIC1", SFX_FLAG_4 | 0x43A3A, "", 105, 64, 0, 10, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_AUDIENCE_SLEEP1", SFX_FLAG_2 | 0xAA, "", 70, 64, 0, 10, 40, 0, 0},
@@ -4298,14 +4512,404 @@ SoundEffectEntry pssfxlist[] = {
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_EVT_50_HOTEL_SHUTTER1", SFX_FLAG_2 | 0x2EF, "", 90, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
-	{"SFX_EVT_MAP_KAKAGERU1_3", SFX_FLAG_4 | 0x7272, "", 100, 64, 0, 1, 0, 0, 0},
+	{"SFX_EVT_MAP_KAKAGERU1_3", SFX_FLAG_4 | 0x47272, "", 100, 64, 0, 1, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"SFX_BOSS_BPCH_DIE1", SFX_FLAG_2 | 0x1EF, "", 110, 64, 0, 60, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0},
 	{"", 0, "", 0, 0, 0, 0, 0, 0, 0}
 };
 
-//psbgmlist
+SoundEnvList psenvlist[] = {
+	{0x1, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1, 0x1045, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1, 0x1046, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3, 0x1013, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4, 0x102A, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5, 0x102A, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5, 0x1083, 0x5F, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x43C80000, 0x14, 0x32, 0x12},
+	{0x6, 0x102A, 0x32, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6, 0x1076, 0x50, 0x0, 0x1, 0x2, 0x1, 0x43AF0000, 0x0, 0x43C80000, 0x14, 0x32, 0x7},
+	{0x7, 0x103E, 0x5F, 0x0, 0x1, 0x2, 0x1, 0x43B18000, 0x42F00000, 0xC3B00000, 0x14, 0x32, 0x12},
+	{0x7, 0x103F, 0x5F, 0x0, 0x1, 0x2, 0x1, 0x42480000, 0x42C80000, 0xC1A00000, 0x14, 0x32, 0x12},
+	{0x7, 0x102A, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x8, 0x1013, 0x55, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x9, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xA, 0x1082, 0x28, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x442F0000, 0x14, 0x32, 0x12},
+	{0xA, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xB, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xB, 0x103C, 0x2D, 0x0, 0x3, 0x2, 0x1, 0xC3C60000, 0x41A00000, 0xC35C0000, 0x14, 0x32, 0x12},
+	{0xC, 0x1082, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xC, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xD, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xE, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xF, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0xF, 0x1082, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x10, 0x107C, 0x41, 0x0, 0x0, 0x3, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x11, 0x1045, 0x3C, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x11, 0x1046, 0x3C, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x11, 0x102E, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x11, 0x102F, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x11, 0x1030, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x12, 0x1045, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x12, 0x1046, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x12, 0x1083, 0x7D, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x43480000, 0x14, 0x32, 0x12},
+	{0x12, 0x102E, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x12, 0x102F, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x12, 0x1030, 0x3C, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x13, 0x1082, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x13, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x14, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x15, 0x1046, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x15, 0x100E, 0x55, 0x0, 0x1, 0x2, 0x1, 0xC3130000, 0x0, 0x44078000, 0x14, 0x32, 0x12},
+	{0x15, 0x1083, 0x55, 0x0, 0x1, 0x2, 0x1, 0xC3890000, 0x0, 0x43EE8000, 0x14, 0x32, 0x12},
+	{0x15, 0x1010, 0x55, 0x0, 0x1, 0x2, 0x1, 0x43848000, 0x0, 0x43FA0000, 0x14, 0x32, 0x12},
+	{0x15, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x15, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x15, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x16, 0x1045, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x16, 0x1046, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x16, 0x1083, 0x5A, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x43A80000, 0x14, 0x32, 0x12},
+	{0x16, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x16, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x16, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x17, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x18, 0x1082, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x18, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x19, 0x107F, 0x5F, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x19, 0x1080, 0x46, 0x0, 0x0, 0x7, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x1A, 0x107F, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1A, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1A, 0x1080, 0x28, 0x0, 0x0, 0x7, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x1B, 0x1042, 0x23, 0x0, 0x0, 0x8, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1B, 0x1045, 0x3C, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1B, 0x1046, 0x3C, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1B, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1C, 0x1009, 0xA, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1D, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1D, 0x1045, 0x37, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1D, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1E, 0x1042, 0x23, 0x0, 0x0, 0x8, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1E, 0x1045, 0x37, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1E, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0xC3FA0000, 0x0, 0xC3140000, 0x14, 0x32, 0x8},
+	{0x1E, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0xC35A0000, 0x0, 0xC3930000, 0x14, 0x32, 0x8},
+	{0x1E, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1F, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1F, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x1F, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0x42DC0000, 0x0, 0xC2480000, 0x14, 0x32, 0x8},
+	{0x1F, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x20, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x20, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x20, 0x104A, 0x2D, 0x0, 0x1, 0x2, 0x1, 0xC2500000, 0x0, 0x42440000, 0x14, 0x32, 0x8},
+	{0x20, 0x1047, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x21, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x21, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x21, 0x104A, 0x2D, 0x0, 0x1, 0x2, 0x1, 0xC2920000, 0x0, 0x420C0000, 0x14, 0x32, 0x8},
+	{0x21, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x22, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x22, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x22, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0x0, 0xC37A0000, 0x41B00000, 0x14, 0x32, 0x12},
+	{0x22, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x23, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x23, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x23, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0xC2D80000, 0x0, 0xC30C0000, 0x14, 0x32, 0x8},
+	{0x23, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x24, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x24, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x24, 0x1049, 0x41, 0x0, 0x1, 0x2, 0x1, 0x42D60000, 0x0, 0xC31E0000, 0x14, 0x32, 0x8},
+	{0x24, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x25, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x25, 0x1045, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x25, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x26, 0x1048, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x26, 0x100E, 0x50, 0x0, 0x1, 0x2, 0x1, 0xC1700000, 0x42540000, 0x42AA0000, 0x14, 0x32, 0xA},
+	{0x26, 0x1047, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x27, 0x103E, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC1700000, 0x42540000, 0x42AA0000, 0x14, 0x32, 0x12},
+	{0x27, 0x102A, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x27, 0x104D, 0x5F, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x28, 0x104D, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x29, 0x104E, 0x5A, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2A, 0x104E, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2B, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2C, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2D, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2D, 0x1051, 0x55, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2E, 0x102A, 0x46, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2F, 0x1065, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2F, 0x1053, 0x64, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x2F, 0x105B, 0x78, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x2F, 0x105C, 0x78, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x30, 0x1067, 0x46, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x30, 0x1053, 0x64, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x30, 0x1045, 0x2D, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x30, 0x105B, 0x7F, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x30, 0x105C, 0x7F, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x31, 0x100A, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x31, 0x107D, 0x3C, 0x0, 0x0, 0x3, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x32, 0x1045, 0x41, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x32, 0x1067, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x32, 0x105B, 0x78, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x32, 0x105C, 0x78, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x32, 0x107D, 0x28, 0x0, 0x0, 0x3, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x33, 0x100A, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x33, 0x107D, 0x3C, 0x0, 0x0, 0x3, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x34, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x34, 0x1016, 0x46, 0x0, 0x1, 0x2, 0x1, 0x42C80000, 0x0, 0xC2C80000, 0x14, 0x32, 0x0},
+	{0x35, 0x1016, 0x46, 0x0, 0x1, 0x2, 0x1, 0x42C80000, 0x0, 0xC2C80000, 0x14, 0x32, 0x0},
+	{0x35, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x36, 0x1014, 0x55, 0x0, 0x1, 0x2, 0x1, 0x43918000, 0xC1700000, 0x44160000, 0x14, 0x32, 0x12},
+	{0x36, 0x1013, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x37, 0x1014, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x12},
+	{0x37, 0x1013, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x38, 0x1019, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x38, 0x1083, 0x64, 0x0, 0x1, 0x2, 0x1, 0x431A0000, 0x0, 0x42B00000, 0x14, 0x32, 0xC},
+	{0x39, 0x1019, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3A, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3A, 0x102A, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3A, 0x1014, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3B, 0x1019, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3B, 0x1083, 0x50, 0x0, 0x1, 0x2, 0x1, 0x44110000, 0x0, 0x42E20000, 0x14, 0x32, 0xC},
+	{0x3C, 0x1016, 0x41, 0x0, 0x1, 0x2, 0x1, 0xC2B40000, 0x0, 0xC2480000, 0x14, 0x32, 0x12},
+	{0x3C, 0x1013, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3D, 0x1016, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3D, 0x1013, 0x23, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3E, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x3E, 0x1082, 0x37, 0x0, 0x1, 0x2, 0x1, 0xC2C80000, 0x0, 0x430C0000, 0x14, 0x32, 0x12},
+	{0x3E, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x3F, 0x101D, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x3F, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x40, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x40, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x40, 0x1013, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x41, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x41, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x41, 0x1013, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x41, 0x1015, 0x73, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0xC2C80000, 0x14, 0x32, 0xC},
+	{0x42, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x42, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x42, 0x1082, 0x37, 0x0, 0x1, 0x2, 0x1, 0x0, 0x438C0000, 0x0, 0x14, 0x32, 0xC},
+	{0x42, 0x1015, 0x41, 0x0, 0x1, 0x2, 0x1, 0x42FA0000, 0x438C0000, 0xC3480000, 0x14, 0x32, 0x12},
+	{0x43, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x43, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x43, 0x1082, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x44, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x44, 0x1013, 0x28, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x44, 0x1015, 0x23, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x45, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x45, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x45, 0x1013, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x45, 0x1015, 0x5F, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0xC3480000, 0x14, 0x32, 0x12},
+	{0x46, 0x101D, 0x50, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x46, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x47, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x47, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x47, 0x1013, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x48, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x48, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x48, 0x1013, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x48, 0x1016, 0x41, 0x0, 0x1, 0x2, 0x1, 0x42A00000, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x49, 0x101D, 0x46, 0x0, 0x1, 0x2, 0x1, 0x0, 0x0, 0x44480000, 0x14, 0x32, 0x14},
+	{0x49, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x49, 0x1013, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x49, 0x1014, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x49, 0x1016, 0x32, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4A, 0x101F, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4B, 0x101F, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4B, 0x1021, 0x41, 0x0, 0x2, 0x2, 0x1, 0x43BB0000, 0x41F00000, 0xC3650000, 0x14, 0x32, 0x8},
+	{0x4B, 0x1022, 0x41, 0x0, 0x2, 0x2, 0x1, 0x43440000, 0x41F00000, 0xC3650000, 0x14, 0x32, 0x8},
+	{0x4C, 0x101F, 0x50, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4D, 0x101F, 0x50, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4D, 0x103F, 0x3C, 0x0, 0x1, 0x2, 0x1, 0xC29A0000, 0x0, 0xC34B0000, 0x14, 0x32, 0x12},
+	{0x4E, 0x1020, 0x64, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x4F, 0x1031, 0x55, 0x0, 0x0, 0x6, 0x1, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x4F, 0x1032, 0x55, 0x0, 0x0, 0x6, 0x1, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x4F, 0x102A, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x50, 0x1056, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x50, 0x1057, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x50, 0x1058, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x50, 0x1059, 0x69, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x50, 0x105A, 0x69, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x50, 0x1065, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x51, 0x1056, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x51, 0x1057, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x51, 0x1058, 0x4B, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x50, 0x32, 0x12},
+	{0x51, 0x1059, 0x69, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x51, 0x105A, 0x69, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x51, 0x1065, 0x32, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x51, 0x105F, 0x23, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x52, 0x105F, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x52, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC2A60000, 0x430C0000, 0x42880000, 0x14, 0x32, 0x12},
+	{0x52, 0x1061, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC2F60000, 0x43420000, 0xC0000000, 0x14, 0x32, 0x12},
+	{0x52, 0x1062, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x42780000, 0x430C0000, 0x42040000, 0x14, 0x32, 0x12},
+	{0x52, 0x1063, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x43420000, 0x430C0000, 0x42040000, 0x14, 0x32, 0x12},
+	{0x52, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x43C68000, 0x430C0000, 0xC0C00000, 0x14, 0x32, 0x12},
+	{0x53, 0x1031, 0x69, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x53, 0x1032, 0x69, 0x0, 0x0, 0x6, 0x4, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x53, 0x102A, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x54, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x54, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x54, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x55, 0x1076, 0x50, 0x0, 0x1, 0x2, 0x1, 0xC3270000, 0x0, 0x43270000, 0x14, 0x32, 0xF},
+	{0x55, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x55, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x55, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x56, 0x1076, 0x50, 0x0, 0x1, 0x2, 0x1, 0xC2860000, 0x0, 0x43AB8000, 0x14, 0x32, 0xF},
+	{0x56, 0x102E, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x56, 0x102F, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x56, 0x1030, 0x41, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x57, 0x1077, 0x1E, 0x0, 0x0, 0x2, 0x4, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x57, 0x1079, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x58, 0x1078, 0x1E, 0x0, 0x0, 0x2, 0x4, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x58, 0x107A, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x59, 0x1066, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x59, 0x1059, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x59, 0x105A, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5A, 0x1066, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5A, 0x1059, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5A, 0x105A, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5A, 0x1069, 0x46, 0x0, 0x1, 0x2, 0x1, 0xC3AB8000, 0x42A00000, 0xC38C0000, 0x14, 0x32, 0x6},
+	{0x5A, 0x1069, 0x46, 0x0, 0x1, 0x2, 0x1, 0x43AB8000, 0x42A00000, 0xC38C0000, 0x14, 0x32, 0x6},
+	{0x5B, 0x1066, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5B, 0x1059, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5B, 0x105A, 0x5A, 0x0, 0x0, 0x5, 0x5, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5B, 0x1069, 0x46, 0x0, 0x1, 0x2, 0x1, 0x42F00000, 0x42A00000, 0xC3480000, 0x14, 0x32, 0x6},
+	{0x5C, 0x106C, 0x55, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5D, 0x106D, 0x55, 0x0, 0x1, 0x2, 0x1, 0x433D0000, 0x42960000, 0xC3FA8000, 0x14, 0x32, 0x12},
+	{0x5D, 0x106C, 0x46, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5E, 0x106E, 0x1E, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5E, 0x106C, 0x32, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x5F, 0x106C, 0x46, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x60, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x60, 0x106F, 0x46, 0x0, 0x0, 0x3, 0x2, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x60, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x61, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x61, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x62, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x62, 0x1070, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x63, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x63, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x63, 0x103D, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x64, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x64, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x64, 0x103C, 0x5F, 0x0, 0x1, 0x2, 0x1, 0x437E0000, 0x42200000, 0x3F800000, 0x14, 0x32, 0xC},
+	{0x65, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x65, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x65, 0x1048, 0x2D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x66, 0x1009, 0x14, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x66, 0x1070, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x66, 0x105F, 0x32, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x67, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x67, 0x1072, 0x5A, 0x0, 0x2, 0x5, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x68, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x68, 0x1082, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x68, 0x1072, 0x5A, 0x0, 0x2, 0x5, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x69, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x69, 0x1082, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x69, 0x100E, 0x73, 0x0, 0x1, 0x2, 0x1, 0xC3E60000, 0xC1700000, 0x43160000, 0x14, 0x32, 0x12},
+	{0x69, 0x1083, 0x73, 0x0, 0x1, 0x2, 0x1, 0x0, 0xC1700000, 0x43820000, 0x14, 0x32, 0x12},
+	{0x69, 0x1010, 0x73, 0x0, 0x1, 0x2, 0x1, 0x43E60000, 0xC1700000, 0x43160000, 0x14, 0x32, 0x12},
+	{0x69, 0x1072, 0x5A, 0x0, 0x2, 0x5, 0x7, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6A, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6B, 0x105F, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6B, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x43AC8000, 0x42340000, 0xC3310000, 0x14, 0x32, 0x12},
+	{0x6B, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC3B40000, 0x42AA0000, 0xC3200000, 0x14, 0x32, 0x12},
+	{0x6C, 0x105F, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6C, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC40D0000, 0x43660000, 0xC3200000, 0x14, 0x32, 0x12},
+	{0x6C, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x43400000, 0xC2D80000, 0xC3240000, 0x14, 0x32, 0x12},
+	{0x6C, 0x1063, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC3870000, 0xC40E8000, 0xC2140000, 0x14, 0x32, 0x12},
+	{0x6C, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x439C0000, 0xC4004000, 0x40C00000, 0x14, 0x32, 0x12},
+	{0x6D, 0x105F, 0x37, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6D, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0xC3E20000, 0xC1B00000, 0xC30C0000, 0x14, 0x32, 0x12},
+	{0x6D, 0x1060, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x43720000, 0xC3210000, 0xC3180000, 0x14, 0x32, 0x12},
+	{0x6D, 0x1063, 0x4B, 0x0, 0x1, 0x2, 0x1, 0x4417C000, 0xC3C50000, 0xC3250000, 0x14, 0x32, 0x12},
+	{0x6E, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6F, 0x1009, 0xF, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x6F, 0x1073, 0x3C, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x70, 0x1067, 0x55, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x70, 0x107F, 0x5F, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x70, 0x1080, 0x46, 0x0, 0x0, 0x7, 0x5, 0x0, 0x0, 0x0, 0x32, 0x32, 0x12},
+	{0x71, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x72, 0x1016, 0x41, 0x0, 0x1, 0x2, 0x1, 0x42C80000, 0x0, 0xC2C80000, 0x14, 0x32, 0x0},
+	{0x72, 0x1013, 0x41, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x73, 0x1013, 0x4B, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x73, 0x1016, 0x46, 0x0, 0x1, 0x2, 0x1, 0x42C80000, 0x0, 0xC2C80000, 0x14, 0x32, 0x0},
+	{0x74, 0x102E, 0x28, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x74, 0x102F, 0x28, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x74, 0x1030, 0x28, 0x0, 0x0, 0x7, 0x3, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x1045, 0x4B, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x1046, 0x4B, 0x0, 0x0, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x1083, 0x7D, 0x0, 0x3, 0x2, 0x1, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x102E, 0x46, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x102F, 0x46, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x75, 0x1030, 0x46, 0x0, 0x0, 0x8, 0x4, 0x0, 0x0, 0x0, 0x14, 0x32, 0x12},
+	{0x76, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}
+};
+
+const char* psenvlistname[] = {
+	"",
+	"ENV_OPN_AAA1",
+	"ENV_OPN_MUJ1",
+	"ENV_STG0_GOR0", "ENV_STG0_GOR1", "ENV_STG0_GOR3", "ENV_STG0_GOR4", "ENV_STG0_GOR5", "ENV_STG0_GOR6",
+	"ENV_STG0_TIK1", "ENV_STG0_TIK2", "ENV_STG0_TIK3", "ENV_STG0_TIK4", "ENV_STG0_TIK5", "ENV_STG0_TIK6", "ENV_STG0_TIK7",
+	"ENV_STG0_DAN1",
+	"ENV_STG1_HEI1", "ENV_STG1_HEI2", "ENV_STG1_HEI3", "ENV_STG1_HEI4",
+	"ENV_STG1_NOK1", "ENV_STG1_NOK2",
+	"ENV_STG1_GON1", "ENV_STG1_GON2", "ENV_STG1_GON3", "ENV_STG1_GON4",
+	"ENV_STG2_WIN1", "ENV_STG2_WIN2",
+	"ENV_STG2_MRI1", "ENV_STG2_MRI2", "ENV_STG2_MRI3", "ENV_STG2_MRI4", "ENV_STG2_MRI5",
+	"ENV_STG2_MRI6", "ENV_STG2_MRI7", "ENV_STG2_MRI8", "ENV_STG2_MRI9", "ENV_STG2_MRI10",
+	"ENV_STG3_TOU1", "ENV_STG3_TOU2", "ENV_STG3_TOU3", "ENV_STG3_TOU4",
+	"ENV_STG3_TOU5", "ENV_STG3_TOU6", "ENV_STG3_TOU7", "ENV_STG3_TOU8",
+	"ENV_STG4_USU1",
+	"ENV_STG4_GRA1",
+	"ENV_STG4_JIN1", "ENV_STG4_JIN2", "ENV_STG4_JIN3",
+	"ENV_STG5_MUJ1_1", "ENV_STG5_MUJ1_2", "ENV_STG5_MUJ2", "ENV_STG5_MUJ3", "ENV_STG5_MUJ4",
+	"ENV_STG5_MUJ5", "ENV_STG5_MUJ6", "ENV_STG5_MUJ7", "ENV_STG5_MUJ8", "ENV_STG5_MUJ9",
+	"ENV_STG5_DOU1", "ENV_STG5_DOU2", "ENV_STG5_DOU3", "ENV_STG5_DOU4", "ENV_STG5_DOU5", "ENV_STG5_DOU6",
+	"ENV_STG5_DOU7", "ENV_STG5_DOU8", "ENV_STG5_DOU9", "ENV_STG5_DOU10", "ENV_STG5_DOU11", "ENV_STG5_DOU12",
+	"ENV_STG6_RSH1", "ENV_STG6_RSH1_2", "ENV_STG6_RSH1_3", "ENV_STG6_RSH1_4", "ENV_STG6_RSH2",
+	"ENV_STG6_EKI1", "ENV_STG6_EKI2", "ENV_STG6_EKI2_2", "ENV_STG6_EKI3", "ENV_STG6_EKI4",
+	"ENV_STG6_PIK1", "ENV_STG6_PIK1_1", "ENV_STG6_PIK1_2", "ENV_STG6_PIK2", "ENV_STG6_PIK3",
+	"ENV_STG7_BOM1", "ENV_STG7_BOM2", "ENV_STG7_BOM3",
+	"ENV_STG7_MOO1", "ENV_STG7_MOO2", "ENV_STG7_MOO3", "ENV_STG7_MOO4",
+	"ENV_STG7_AJI1", "ENV_STG7_AJI2", "ENV_STG7_AJI3", "ENV_STG7_AJI4", "ENV_STG7_AJI5", "ENV_STG7_AJI6", "ENV_STG7_AJI7",
+	"ENV_STG8_LAS1", "ENV_STG8_LAS2", "ENV_STG8_LAS3", "ENV_STG8_LAS4", "ENV_STG8_LAS5",
+	"ENV_STG8_LAS6", "ENV_STG8_LAS7", "ENV_STG8_LAS8", "ENV_STG8_LAS9",
+	"ENV_KOOPA_KPA1",
+	"ENV_END_MUJ1", "ENV_END_MUJ2", "ENV_END_MUJ3",
+	"ENV_END_AAA1",
+	"ENV_SYS_FL1"
+};
+
+static f32 angleABTBL[] = {
+	1.0f, 1.273187f, 1.27303f, 1.272768f, 1.272402f, 1.271932f, 1.271358f,
+	1.270681f, 1.269902f, 1.269021f, 1.268038f, 1.266956f, 1.265774f, 1.2644939f,
+	1.263116f, 1.2616431f, 1.260075f, 1.258413f, 1.256659f, 1.254815f, 1.2528811f,
+	1.250859f, 1.248752f, 1.24656f, 1.244285f, 1.2419291f, 1.239494f, 1.236981f,
+	1.234393f, 1.2317311f, 1.228997f, 1.226192f, 1.22332f, 1.220382f, 1.217379f,
+	1.2143151f, 1.211189f, 1.208006f, 1.204766f, 1.201471f, 1.1981241f, 1.1947269f,
+	1.191281f, 1.1877871f, 1.18425f, 1.180669f, 1.177047f, 1.173386f, 1.169687f,
+	1.165952f, 1.162184f, 1.158384f, 1.1545531f, 1.1506931f, 1.146806f, 1.142893f,
+	1.138957f, 1.134998f, 1.131018f, 1.127019f, 1.1230021f, 1.118969f, 1.11492f,
+	1.110858f, 1.106783f, 1.102697f, 1.098601f, 1.094496f, 1.090384f, 1.086266f,
+	1.082142f, 1.078014f, 1.0738831f, 1.06975f, 1.065616f, 1.061482f, 1.057348f,
+	1.053216f, 1.049087f, 1.04496f, 1.040838f, 1.036721f, 1.0326101f, 1.028504f,
+	1.024406f, 1.020316f, 1.016234f, 1.0121599f, 1.0080971f, 1.004043f, 1.0f
+};
+
+//silent_tbl
+
+
+
+
+
+
+
+
+
+
 
 //.bss
 PaperSoundBGM psbgm[2];
@@ -4314,16 +4918,28 @@ PaperSoundEnv psenv[16];
 PaperSoundWork psnd;
 u8 _buf[0x80];
 
+//.sdata
+s32 silent_tbl[] = {10, 20, 30, 40, 50, 60, 70, 80, 90, 100};
+
 //.sbss
-static s8 tbl[2];
-s32 group;
 BOOL _psndPushGroup_trg;
 BOOL init_f;
 
 //local definitions
+void stub_fn(void);
+#define STUB_BODY stub_fn();
+
+u16 SoundSSCheck(s32 chan);
+void SoundSSStopCh(s32 chan);
+void SoundSSSetPlayFreqCh(s32 chan, u16 freq);
+
 void psndBGMMain(void);
 void psndENVMain(void);
 void psndSFXMain(void);
+BOOL psndBGMOn_f_d(u32 r3, char* bgm_name, u16 fadetime, u16 r6, s32 r7);
+BOOL psndENVOn_f_d(u32 flags, const char* name, u16 fadetime, s32 r6);
+BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5);
+s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u16 r8, u16 dist, s32 r10);
 
 static f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
 	f32 xdiff, ydiff;
@@ -4402,6 +5018,10 @@ static f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2) {
 }
 
 //calc3D, returns the first bit of SND_3DINFO (vol, pan, span, unused)
+s32 calc3D(PaperSoundEffect* sfx, SoundEffectEntry* entry, u8* out) {
+	static s8 PAN[4];
+	return PAN[0];
+}
 
 s32 searchPSSFXList(const char* name) {
 	SoundEffectEntry* entry = pssfxlist;
@@ -4430,7 +5050,7 @@ void psndInit(void) { //1:1
     SoundInit();
     for (i = 0; i < 2; i++) {
         psbgm[i].unk0 = -1;
-        psbgm[i].unk20 = 0;
+        psbgm[i].fade.state = 0;
     }
     for (i = 0; i < 40; i++) {
         var_r6 = &pssfx[i];
@@ -4442,10 +5062,10 @@ void psndInit(void) { //1:1
         temp_r6 = &psenv[i];
         temp_r6->unk4 = 0;
     }
-    psnd.unk18 = 0;
-    psnd.unk0 = 0;
-    psnd.unk1A = 0;
-    psnd.unkC = 0;
+    psnd.unk18[0] = 0;
+    psnd.fade[0].state = 0;
+    psnd.unk18[1] = 0;
+    psnd.fade[1].state = 0;
     psnd.direction = 0.0f;
     psnd.unk50 = 0;
     psnd.unk54 = 0;
@@ -4460,8 +5080,6 @@ void psndInit(void) { //1:1
 }
 
 void psndMain(void) { //1:1
-    u8 temp_r3;
-
     if (init_f) {
         if (psnd.unk5C) {
             psnd.unk5C--;
@@ -4486,74 +5104,73 @@ void psndExit(void) {
 }
 
 BOOL psndPushGroup(void) {
+	static s32 group;
+	static u8 tbl[2];
+
 	if (_psndPushGroup_trg) {
 		return TRUE;
 	}
-	if (group <= 11) {
-		_psndPushGroup_trg = TRUE;
-		tbl[0] = group;
-		tbl[1] = -1;
+	if (group > 11) {
+		init_f = TRUE;
+		SoundLoadDVD2Free();
+		return FALSE;
 	}
+	_psndPushGroup_trg = TRUE;
+	tbl[0] = group;
+	tbl[1] = 0xFF;
+	SoundLoadDVD2PushGroup(tbl);
+	_psndPushGroup_trg = FALSE;
+	group++;
+	return TRUE;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-void psndBGMMain(void) {
-
-}
-
-void psndENVMain(void) {
-
-}
-
-void psndSFXMain(void) {
-
+void psndSetPosDirListener(Vec* position, f32 direction) {  //1:1
+    psnd.position = *position;
+    psnd.direction = direction;
 }
 
 void psndStopAllFadeOut(void) {
+	PaperSoundWork* wp = &psnd;
+	PaperSoundEffect* sfx;
+	int i;
 
+	psndBGMOff_f_d(0x200, 1000, FALSE);
+	psndBGMOff_f_d(0x201, 1000, FALSE);
+	psndENVOff(0x200);
+	psndENVOff(0x201);
+	for (i = 0; i < 40; i++) {
+		sfx = &pssfx[i];
+		if (sfx->unk0 != 0xFFFFFFFF) {
+			sfx->unk6 |= 0x40;
+		}
+	}
+	wp->unk24 = 2;
+	wp->unk26 = 45;
+	wp->unk28 = 45;
 }
 
-BOOL psndBGMOn(u32 r3, char* bgm_name) {
-	return FALSE;
+void psndSetReverb(s32 mode) {
+	switch (mode) {
+		case 0:
+			psnd.unk52 = 0;
+			break;
+		case 1:
+			psnd.unk52 = 20;
+			break;
+		case 2:
+			psnd.unk52 = 40;
+			break;
+		case 3:
+			psnd.unk52 = 60;
+			break;
+	}
 }
 
-BOOL psndENVOff(u32 r3) { //probably "id"
-	return FALSE;
-}
-
-void psndSFXAllOff(void) {
-
-}
-
-
-void psndSFXOn(const char* sfx_name) {
-
-}
-
-BOOL psndBGMOff_f_d(s32 flags, u16 fadetime, BOOL someswitch) {
-
-}
-
-BOOL psndBGMStartCheck(s32 id) {
-
-}
-
-void psndSetFlag(s32 flag) { //1:1 except maybe param
+void psndSetFlag(s32 flag) {
     psnd.unk56 |= flag;
     if (psnd.unk56 & 1) {
-        psndBGMOff_f_d(0, 0x3E8, 0);
-        psndBGMOff_f_d(1, 0x3E8, 0);
+        psndBGMOff_f_d(0, 1000, FALSE);
+        psndBGMOff_f_d(1, 1000, FALSE);
     }
     if (psnd.unk56 & 2) {
         psndENVOff(0);
@@ -4561,16 +5178,460 @@ void psndSetFlag(s32 flag) { //1:1 except maybe param
     }
 }
 
-void psndClearFlag(s32 flag) { //1:1 except maybe param
+void psndClearFlag(s32 flag) {
 	psnd.unk56 &= ~flag;
 }
 
+s32 psndGetFlag(void) {
+	return psnd.unk56;
+}
 
-void psndSetPosDirListener(Vec* position, f32 direction) {  //1:1
-    psnd.position = *position;
-    psnd.direction = direction;
+void psndMapChange(void) {
+	if (strcmp(psnd.unk40, gp->currentMapName)) {
+		psnd.unk52 = 0;
+	}
+	strcpy(psnd.unk40, gp->currentMapName);
+	psnd.unk56 &= ~0x100;
+	psndSFXAllOff();
+}
+
+void psndSFXAllOff(void) {
+	PaperSoundWork* wp = &psnd;
+	PaperSoundEffect* sfx;
+	int i;
+
+	for (i = 0; i < 40; i++) {
+		sfx = &pssfx[i];
+		if (sfx->unk0 != 0xFFFFFFFF && !(sfx->unk6 & 0xA0)) {
+			sfx->unk6 |= 0x40;
+		}
+	}
+	if (wp->unk24 != 2) {
+		wp->unk24 = 2;
+		wp->unk26 = 45;
+		wp->unk28 = 45;
+	}
+}
+
+void L_psndBGM_stop(void) {
+	PaperSoundEffect* sfx;
+	int i;
+
+	psnd.unk56 &= ~0x10;
+	for (i = 0; i < 40; i++) {
+		sfx = &pssfx[i];
+		if (sfx->unk0 != 0xFFFFFFFF && (sfx->unk6 & 0x10) && !(sfx->unk6 & 0x820)) {
+			psndSFXOff(i);
+		}
+	}
+
+}
+
+void psndBGM_rate(s32 id, u16 rate) {
+	PaperSoundBGM* bgm = &psbgm[id & 0xF];
+	SoundBGMEntry* entry;
+
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	entry = &psbgmlist[bgm->unk0];
+	if (entry->flags & 0x80000000) {
+		SoundSSSetPlayFreqCh(bgm->streamId, rate);
+	}
+}
+
+#pragma dont_inline on
+void psndBGMMain(void) {
+	STUB_BODY
+}
+#pragma dont_inline reset
+
+BOOL psndBGMOn(u32 r3, char* bgm_name) {
+	return psndBGMOn_f_d(r3, bgm_name, 1000, 750, 0);
+}
+
+BOOL unk_800d7270(u32 r3, char* bgm_name, u16 fadetime, s32 r6) {
+	return psndBGMOn_f_d(r3, bgm_name, fadetime, 750, r6);
+}
+
+#pragma dont_inline on
+BOOL psndBGMOn_f_d(u32 r3, char* bgm_name, u16 fadetime, u16 r6, s32 r7) {
+	STUB_BODY
+	return FALSE;
+}
+#pragma dont_inline reset
+
+BOOL psndBGMOff(u32 flags) {
+	return psndBGMOff_f_d(flags, 1000, FALSE);
+}
+
+#pragma dont_inline on
+BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
+	PaperSoundBGM* bgm = &psbgm[flags & 0xF];
+	s32 silent = silent_tbl[(flags >> 12) & 0xF];
+	SoundBGMEntry* entry;
+	PaperSoundFade* fade;
+
+	SoundSetFadeTime(fadetime, fadetime);
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return FALSE;
+	}
+	if (!someswitch) {
+		if (evtGetValue(NULL, GSW(0)) >= 109 && evtGetValue(NULL, GSW(0)) < 111 && bgm->unk0 == 0xA4) {
+			return FALSE;
+		}
+		if (evtGetValue(NULL, GSW(0)) >= 127 && evtGetValue(NULL, GSW(0)) < 178 && psbgm[0].unk0 == 0xC3) {
+			if (bgm->unk0 != 0x92) {
+				return FALSE;
+			}
+			psndBGMOn_f_d(0x120, NULL, 750, 750, 1);
+		}
+	}
+	entry = &psbgmlist[bgm->unk0];
+	fade = &bgm->fade;
+	if (flags & 0x200) {
+		if (fade->state == 2) {
+		}
+		else if (fade->state != 4) {
+			fade->state = 2;
+			fade->time = fadetime / 16.667f;
+			fade->timeMax = fade->time;
+		}
+		else {
+			fade->state = 2;
+		}
+	}
+	else if (flags & 0x400) {
+		if (fade->state != 2 && fade->state != 4) {
+			fade->state = 4;
+			fade->time = fadetime / 16.667f;
+			fade->timeMax = fade->time;
+		}
+	}
+	else if (flags & 0x800) {
+		if (fade->unk6 != 8) {
+			fade->unk6 = 8;
+			fade->unk7 = silent;
+			fade->unk8 = fadetime / 16.667f;
+			fade->unkA = fade->unk8;
+			if ((flags & 0x40) || (gp->flags & 1)) {
+				bgm->unk8 |= 0x40;
+			}
+			else {
+				bgm->unk8 &= ~0x40;
+			}
+
+
+		}
+	}
+	else {
+		if (entry->flags & 0x80000000) {
+			SoundSSStopCh(bgm->streamId);
+		}
+		else {
+			SoundSongStopCh(bgm->streamId);
+		}
+		bgm->unk0 = -1;
+	}
+	return TRUE;
+}
+
+#pragma dont_inline reset
+
+s32 psndBGMChk(s32 id) {
+	return psbgm[id & 0xF].unk0 == 0xFFFFFFFF ? -1 : 0;
+}
+
+BOOL psndBGMChkSilent(s32 id) {
+	PaperSoundBGM* bgm = &psbgm[id & 0xF];
+
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return FALSE;
+	}
+	return bgm->fade.unk6 == 8;
+}
+
+void psndBGMScope(s32 id, s32 scope) {
+	PaperSoundBGM* bgm = &psbgm[id & 0xF];
+
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	if (scope > 0) {
+		bgm->unk10 = 0xFF;
+	}
+	if (scope < 0) {
+		bgm->unk10 = 0;
+	}
+	if (scope == 0) {
+		bgm->unk10 = 30;
+	}
+}
+
+BOOL psndBGMStartCheck(s32 id) {
+	PaperSoundBGM* bgm = &psbgm[id & 0xF];
+
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return TRUE;
+	}
+	return (SoundSSCheck(bgm->streamId) >> 3) & 1;
+}
+
+s32 psndBGMPlayTime(s32 id) {
+	PaperSoundBGM* bgm = &psbgm[id & 0xF];
+
+	if (bgm->unk0 == 0xFFFFFFFF) {
+		return 600000;
+	}
+	return OSTicksToMilliseconds(gp->renderTime - bgm->unk30);
+}
+
+#pragma dont_inline on
+void psndSFXMain(void) {
+	STUB_BODY
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u16 r8, u16 dist, s32 r10) {
+	STUB_BODY
+	return -1;
+}
+#pragma dont_inline reset
+
+s32 psndSFXOn_(const char* name) {
+	return __psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 1);
+}
+
+void psndSFXOn(const char* name) {
+	__psndSFXOn(name, 0xFF, 0xFF, 0, NULL, 0, 0x10, 0);
+}
+
+s32 psndSFXOnVol(const char* name, u8 vol) {
+	return __psndSFXOn(name, vol, 0xFF, 0, NULL, 0, 0x10, 0);
 }
 
 s32 psndSFXOn_3D(const char* name, Vec* position) {
-    return 0;
+	return __psndSFXOn(name, 0xFF, 0xFF, 0, position, 0, 0x10, 0);
+}
+
+s32 psndSFXOnEx_3D(const char* name, Vec* position, u8 vol, u8 pan, u16 pitch, u16 dist) {
+	return __psndSFXOn(name, vol, pan, pitch, position, 0, dist, 0);
+}
+
+void psndSFX_vol(s32 id, u8 vol) {
+	PaperSoundEffect* sfx;
+
+	if (id == 0xFFFFFFFF) {
+		return;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	sfx->unk8 = vol;
+}
+
+void psndSFX_pit(s32 id, u16 pitch) {
+	PaperSoundEffect* sfx;
+
+	if (id == 0xFFFFFFFF) {
+		return;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	if (sfx->unk6 & 1) {
+		sfx->unk14 = pitch;
+	}
+	else {
+		SoundEffectEntry* entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+		if (!(entry->field_0x4 & 0x80000000)) {
+			if (!(entry->field_0x4 & 0x80000000)) {
+				SoundEfxSetPitch(sfx->unk18, pitch);
+			}
+		}
+	}
+}
+
+void psndSFX_pos(s32 id, Vec* position) {
+	PaperSoundEffect* sfx;
+
+	if (id == 0xFFFFFFFF) {
+		return;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	sfx->unk1C = *position;
+}
+
+void psndSFX_dist(s32 id, u16 dist) {
+	PaperSoundEffect* sfx;
+
+	if (id == 0xFFFFFFFF) {
+		return;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	sfx->unk12 = dist;
+}
+
+void psndSFXOff(s32 id) {
+	PaperSoundEffect* sfx;
+	SoundEffectEntry* entry;
+
+	if (id == 0xFFFFFFFF) {
+		return;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return;
+	}
+	if (sfx->unk6 & 1) {
+		sfx->unk0 = -1;
+		sfx->unk18 = -1;
+		return;
+	}
+	entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+	if (sfx->unk18 != 0xFFFFFFFF) {
+		if (entry->field_0x4 & 0x80000000) {
+			SoundSSStopCh(sfx->unk18);
+		}
+		else if (entry->field_0x4 & 0x40000000) {
+			SoundSongStopCh(sfx->unk18);
+		}
+		else {
+			SoundEfxStop(sfx->unk18);
+		}
+	}
+	sfx->unk0 = -1;
+	sfx->unk18 = -1;
+}
+
+s32 psndSFXChk(s32 id) {
+	PaperSoundEffect* sfx;
+	u16 tag;
+
+
+	if (id == 0xFFFFFFFF) {
+		return -1;
+	}
+	tag = (u32)id >> 8;
+	sfx = &pssfx[id & 0xFF];
+	if (tag != sfx->unk4) {
+		return -1;
+	}
+
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return -1;
+	}
+	return 0;
+}
+
+
+u8 psndSFX_get_vol(s32 id) {
+	PaperSoundEffect* sfx;
+
+	if (id == 0xFFFFFFFF) {
+		return 0;
+	}
+	sfx = &pssfx[id & 0xFF];
+	if (sfx->unk0 == 0xFFFFFFFF) {
+		return 0;
+	}
+	return sfx->unk8;
+}
+
+#pragma dont_inline on
+void psndENV_stop(u16 id) {
+	STUB_BODY
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void psndENVMain(void) {
+	STUB_BODY
+}
+#pragma dont_inline reset
+
+BOOL psndENVOn(u32 flags, const char* name) {
+	return psndENVOn_f_d(flags, name, 1000, 0);
+}
+
+#pragma dont_inline on
+BOOL psndENVOn_f_d(u32 flags, const char* name, u16 fadetime, s32 r6) {
+	STUB_BODY
+	return FALSE;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+BOOL psndENVOff(u32 flags) {
+	return psndENVOff_f_d(flags, 1000, 0);
+}
+#pragma dont_inline reset
+
+
+#pragma dont_inline on
+#pragma dont_inline on
+BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
+	s32 silent = silent_tbl[(flags >> 12) & 0xF];
+	u16* env = &psnd.unk18[flags & 0xF];
+	PaperSoundFade* fade;
+
+	if (*env == 0) {
+		return FALSE;
+	}
+	fade = &psnd.fade[flags & 0xF];
+	if (flags & 0x200) {
+		if (fade->state == 2) {
+		}
+		else if (fade->state != 4) {
+			fade->state = 2;
+			fade->time = fadetime / 16.667f;
+			fade->timeMax = fade->time;
+		}
+		else {
+			fade->state = 2;
+		}
+
+	}
+	else if (flags & 0x400) {
+		if (fade->state != 2 && fade->state != 4) {
+			fade->state = 4;
+			fade->time = fadetime / 16.667f;
+			fade->timeMax = fade->time;
+		}
+	}
+	else if (flags & 0x800) {
+		fade->unk6 = 8;
+		fade->unk8 = fadetime / 16.667f;
+		fade->unkA = fade->unk8;
+		fade->unk7 = silent;
+	}
+	else {
+		psndENV_stop(*env);
+		*env = 0;
+	}
+	return TRUE;
+}
+#pragma dont_inline reset
+
+
+#pragma dont_inline reset
+
+BOOL psndENV_LPF(s32 id, u16 freq) {
+	if (psnd.unk18[id & 0xF] == 0) {
+		return FALSE;
+	}
+	if (freq == 0) {
+		freq = 0x7D00;
+	}
+	psnd.unk20[id & 0xF] = freq;
+	return TRUE;
 }

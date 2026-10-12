@@ -1,4 +1,7 @@
+#define npcCheckInterrupt npcCheckInterrupt_hdr_void
 #include "driver/npcdrv.h"
+#undef npcCheckInterrupt
+BOOL npcCheckInterrupt(NpcEntry* npc);
 #include "dolphin/gx/GXStruct.h"
 #include "driver/animdrv.h"
 #include "driver/msgdrv.h"
@@ -21,6 +24,8 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
+#include "driver/dispdrv.h"
+#include "driver/offscreendrv.h"
 #include <string.h>
 
 extern GlobalWork* gp;
@@ -275,14 +280,228 @@ void npcDisp_xlu(CameraId cameraId, void* param) {
 
 void npcDisp(CameraId camId, void* param) {
     NpcEntry* entry = param; // cast to proper type
+    Mtx mtx;
+    GXColor color;
+    f32 rotY;
+
+    rotY = reviseAngle(-entry->direction);
+    mtx_setup(entry, mtx, -1);
+
+    switch (dispGetCurWork()->renderMode) {
+        case 0:
+            color = entry->color;
+            if (entry->jumpFlags & 0x400000) {
+                color.r /= 2;
+                color.g /= 2;
+                color.b /= 2;
+                animPoseSetMaterialEvtColor(entry->poseId, color);
+                animPoseSetMaterialFlagOn(entry->poseId, 0x40);
+            }
+
+            if (entry->flags & 0x800000) {
+                AnimTableEntry* anim;
+                AnimationPose* animPose;
+                CameraEntry* camera;
+                f32 dx, dz;
+                f32 angle;
+                u32 i;
+
+                animPoseGetCurrentAnim(entry->poseId);
+                animPose = animPoseGetAnimPosePtr(entry->poseId);
+                anim = animPoseGetCurrentAnim(entry->poseId);
+
+                camera = camGetPtr(CAMERA_3D);
+                dx = camera->cameraAt.x - camera->cameraPos.x;
+                dz = camera->cameraAt.z - camera->cameraPos.z;
+                angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+                if (angle < 0.0f) {
+                    angle += 360.0f;
+                }
+                angle = reviseAngle((angle - animPose->rotationY));
+
+        
+                if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
+                    for (i = 0; i < 14; i++) {
+                        if (!strcmp(luigi_pose[i][0], anim->name)) {
+                            break;
+                        }
+                    }
+                    if (i < 14) {
+                        animPoseSetAnim(entry->poseId, luigi_pose[i][1], FALSE);
+                    }
+                } else {
+                    for (i = 0; i < 14; i++) {
+                        if (!strcmp(luigi_pose[i][1], anim->name)) {
+                            break;
+                        }
+                    }
+                    if (i < 14) {
+                        animPoseSetAnim(entry->poseId, luigi_pose[i][0], FALSE);
+                    }
+                }
+            }
+            animPoseMain(entry->poseId);
+            animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
+            break;
+        case 1:
+            animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
+            break;
+        case 2:
+            animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
+            break;
+    }
 }
 
 void npcDisp_offscreen_xlu(CameraId camId, void* param) {
     NpcEntry* entry = param; // cast to proper type
+    u16 left, top, right, bottom;
+    Mtx mtx;
+    GXColor color;
+    f32 rotY;
+
+    sysWaitDrawSync();
+    GXClearBoundingBox();
+    rotY = reviseAngle(-entry->direction);
+    mtx_setup(entry, mtx, -1);
+
+    color = entry->color;
+    if (entry->jumpFlags & 0x400000) {
+        color.r /= 2;
+        color.g /= 2;
+        color.b /= 2;
+        animPoseSetMaterialEvtColor(entry->poseId, color);
+        animPoseSetMaterialFlagOn(entry->poseId, 0x40);
+    }
+
+    if (entry->flags & 0x800000) {
+        AnimTableEntry* anim;
+        AnimationPose* animPose;
+        CameraEntry* camera;
+        f32 dx, dz;
+        f32 angle;
+        u32 i;
+
+        animPoseGetCurrentAnim(entry->poseId);
+        animPose = animPoseGetAnimPosePtr(entry->poseId);
+        anim = animPoseGetCurrentAnim(entry->poseId);
+
+        camera = camGetPtr(CAMERA_3D);
+        dx = camera->cameraAt.x - camera->cameraPos.x;
+        dz = camera->cameraAt.z - camera->cameraPos.z;
+        angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+        if (angle < 0.0f) {
+            angle += 360.0f;
+        }
+        angle = reviseAngle((angle - animPose->rotationY));
+
+        
+        if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
+            for (i = 0; i < 14; i++) {
+                if (!strcmp(luigi_pose[i][0], anim->name)) {
+                    break;
+                }
+            }
+            if (i < 14) {
+                animPoseSetAnim(entry->poseId, luigi_pose[i][1], FALSE);
+            }
+        } else {
+            for (i = 0; i < 14; i++) {
+                if (!strcmp(luigi_pose[i][1], anim->name)) {
+                    break;
+                }
+            }
+            if (i < 14) {
+                animPoseSetAnim(entry->poseId, luigi_pose[i][0], FALSE);
+            }
+        }
+    }
+    animPoseMain(entry->poseId);
+    animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
+    animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
+    animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
+    sysWaitDrawSync();
+    GXReadBoundingBox(&left, &top, &right, &bottom);
+    offscreenAddBoundingBox(entry->field_110, left, top, right, bottom);
 }
 
 void npcDisp_offscreen(CameraId camId, void* param) {
     NpcEntry* entry = param; // cast to proper type
+    u16 left, top, right, bottom;
+    Mtx mtx;
+    GXColor color;
+    f32 rotY;
+
+    sysWaitDrawSync();
+    GXClearBoundingBox();
+    rotY = reviseAngle(-entry->direction);
+    mtx_setup(entry, mtx, -1);
+
+    switch (dispGetCurWork()->renderMode) {
+        case 0:
+            color = entry->color;
+            if (entry->jumpFlags & 0x400000) {
+                color.r /= 2;
+                color.g /= 2;
+                color.b /= 2;
+                animPoseSetMaterialEvtColor(entry->poseId, color);
+                animPoseSetMaterialFlagOn(entry->poseId, 0x40);
+            }
+
+            if (entry->flags & 0x800000) {
+                AnimTableEntry* anim;
+                AnimationPose* animPose;
+                CameraEntry* camera;
+                f32 dx, dz;
+                f32 angle;
+                u32 i;
+
+                animPoseGetCurrentAnim(entry->poseId);
+                animPose = animPoseGetAnimPosePtr(entry->poseId);
+                anim = animPoseGetCurrentAnim(entry->poseId);
+
+                camera = camGetPtr(CAMERA_3D);
+                dx = camera->cameraAt.x - camera->cameraPos.x;
+                dz = camera->cameraAt.z - camera->cameraPos.z;
+                angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+                if (angle < 0.0f) {
+                    angle += 360.0f;
+                }
+                angle = reviseAngle((angle - animPose->rotationY));
+
+        
+                if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
+                    for (i = 0; i < 14; i++) {
+                        if (!strcmp(luigi_pose[i][0], anim->name)) {
+                            break;
+                        }
+                    }
+                    if (i < 14) {
+                        animPoseSetAnim(entry->poseId, luigi_pose[i][1], FALSE);
+                    }
+                } else {
+                    for (i = 0; i < 14; i++) {
+                        if (!strcmp(luigi_pose[i][1], anim->name)) {
+                            break;
+                        }
+                    }
+                    if (i < 14) {
+                        animPoseSetAnim(entry->poseId, luigi_pose[i][0], FALSE);
+                    }
+                }
+            }
+            animPoseMain(entry->poseId);
+            animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
+            break;
+        case 1:
+            animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
+            break;
+        case 2:
+            animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
+            break;
+    }
+    sysWaitDrawSync();
+    GXReadBoundingBox(&left, &top, &right, &bottom);
+    offscreenAddBoundingBox(entry->field_110, left, top, right, bottom);
 }
 
 void npcDisp_blur(CameraId camId, void* param) {
@@ -839,6 +1058,216 @@ void _fbatFirstAttackAnnouceDisp(CameraId camId, void* param) {
     FontDrawColor((GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
     FontDrawScale(0.1f);
     FontDrawStringShake(mulf(0.1f, x - width / 2.0f), mulf(y - 3.0f, 0.1f), message);
+}
+
+#define FBAT_SUB(d) (((u8*)(d))[2])
+#define FBAT_NPC(d) (*(NpcEntry**)((u8*)(d) + 4))
+#define FBAT_EVTID(d) (*(s32*)((u8*)(d) + 0xC))
+
+void partyKeyOn(void);
+void partyKeyOff(void);
+void marioChgTalkMotion(void);
+void marioChgStayMotion(void);
+BOOL marioChkTalkable(void);
+void* fbatHitCheck(u32 flags, void* a1);
+
+void fbatTalkMode(void) {
+    FieldBattleData* data = gp->fbatData;
+    NpcEntry* npc = FBAT_NPC(data);
+    MarioWork* mario = marioGetPtr();
+    EventEntry* evt;
+
+    switch (FBAT_SUB(data)) {
+        case 0:
+            evtStopID(FBAT_NPC(data)->regularEvtId);
+            if (!(npc->flags & 0x01000000)) {
+                npc->direction = reviseAngle(angleABf(npc->position.x, npc->position.z,
+                                                      mario->position.x, mario->position.z));
+            }
+            marioKeyOff();
+            partyKeyOff();
+            switch (data->mode) {
+                case 3:
+                    evt = evtEntry(npc->deadEvent, 0, 0);
+                    evt->wNpcEventType = 6;
+                    break;
+                default:
+                    evt = evtEntry(npc->talkEvt, 0, 0);
+                    evt->wNpcEventType = 6;
+                    marioChgTalkMotion();
+                    break;
+            }
+            evt->ownerNPC = npc;
+            FBAT_EVTID(data) = evt->eventId;
+            FBAT_SUB(data)++;
+            break;
+        case 1:
+            if (!evtCheckID(FBAT_EVTID(data))) {
+                if (!(npc->jumpFlags & 0x20000000)) {
+                    evtStartID(FBAT_NPC(data)->regularEvtId);
+                    npc->direction = npc->field_148;
+                }
+                if (npc->flags & 0x400) {
+                    npc->field_108 = 0;
+                }
+                if (npc->flags & 0x200) {
+                    animPoseSetAnim(npc->poseId, npc->currentAnim, 1);
+                }
+                marioKeyOn();
+                partyKeyOn();
+                marioChgStayMotion();
+                data->mode = 1;
+                npcGetWorkPtrInline()->field_0x10 = NULL;
+            }
+            break;
+    }
+}
+
+void _npcDead(NpcEntry* npc, s32 reason) {
+    npc->field_140 |= 0x10;
+    npc->jumpFlags |= 4;
+    npc->koopaEncounterType = reason;
+    if (npc->flags & 4) {
+        fbatGetPointer()->deadInfo[0].mask |= 1 << npc->field_314;
+    }
+}
+
+void _npcGroupDead(NpcEntry* entry, s32 reason) {
+    int i;
+
+    if (entry->next) {
+        _npcGroupDead(entry->next, reason);
+    }
+    for (i = 0; i < 4; i++) {
+        if (entry->slaves[i]) {
+            _npcDead(entry->slaves[i], reason);
+        }
+    }
+    _npcDead(entry, reason);
+}
+
+void npcGroupDead(NpcEntry* entry, BOOL reason) {
+    if (entry->master) {
+        entry = entry->master;
+    }
+    while (entry->prev) {
+        entry = entry->prev;
+    }
+    _npcGroupDead(entry, reason);
+}
+
+NpcEntry* fbatNpcTalkCheck(void) {
+    NpcWork* wp = npcGetWorkPtrInline();
+    if (wp->field_0x10 && marioChkTalkable()) {
+        return wp->field_0x10;
+    }
+    return NULL;
+}
+
+void fbatHitCheckAll(void) {
+    fbatHitCheck(0x13f1, NULL);
+}
+
+NpcEntry* _npcHitCheckSphere(NpcEntry* npc, f32* dist, f32 x, f32 y, f32 z, f32 r) {
+    f32 dx = x - npc->position.x;
+    f32 dy = y - npc->position.y;
+    f32 dz = z - npc->position.z;
+
+    if (y != npc->position.y) {
+        if (y >= npc->position.y && y <= npc->position.y + npc->height) {
+            dy = 0.0f;
+        } else if (y > npc->position.y + npc->height) {
+            dy = y - (npc->position.y + npc->height);
+        }
+    }
+    *dist = npc_sqrtf(dx * dx + dy * dy + dz * dz);
+    if (*dist < 0.5f * npc->width + r) {
+        return npc;
+    }
+    return NULL;
+}
+
+NpcEntry* _npcHitCheckHammerAllMotion(NpcEntry* npc, f32* dist, f32 r, f32 angle) {
+    f32 t;
+    f32 d;
+    NpcEntry* hit;
+
+    for (t = 0.0f; t <= 11.0f; t += 1.0f) {
+        f32 f = t;
+        MarioWork* mario = marioGetPtr();
+        s32 tbl[11] = {0, 0, 0, 0, 45, 60, 90, 100, 101, 101, 101};
+        f32 c2, s2, c1, s1;
+        f32 x, y, z;
+
+        if (f < 0.0f) {
+            f = 0.0f;
+        }
+        if (f >= 11.0f) {
+            f = 10.0f;
+        }
+        sincosf(&s1, &c1, angle);
+        sincosf(&s2, &c2, tbl[(s32)f]);
+        x = mario->position.x + s2 * (s1 * r);
+        z = mario->position.z + s2 * (c1 * r);
+        y = mario->position.y + r * c2;
+        hit = _npcHitCheckSphere(npc, &d, x, y, z, 12.0f);
+        if (hit) {
+            break;
+        }
+    }
+    *dist = d;
+    return hit;
+}
+
+BOOL npcCheckInterrupt(NpcEntry* npc) {
+    EventEntry* evt;
+    u32 flags;
+
+    evtGetPtrID(npc->regularEvtId);
+    flags = npc->field_140;
+    if (flags & ~0xF00) {
+        evt = NULL;
+        if ((flags & 0x10) && npc->deadEvent) {
+            evt = evtEntry(npc->deadEvent, 0, 0x20);
+            evt->wNpcEventType = 8;
+            evt->ownerNPC = npc;
+        } else if ((flags & 0x10000000) && npc->moveEvent) {
+            evt = evtEntry(npc->moveEvent, 0, 0x20);
+            evt->wNpcEventType = 1;
+            evt->ownerNPC = npc;
+        } else if ((flags & 8) && npc->blowEvent) {
+            evt = evtEntry(npc->blowEvent, 0, 0x20);
+            evt->wNpcEventType = 5;
+            evt->ownerNPC = npc;
+        } else if ((flags & 1) && npc->findEvent && !(npc->jumpFlags & 0x1000) &&
+                   !(npc->flags & 0x200000) && !(flags & 0x100)) {
+            evt = evtEntry(npc->findEvent, 0, 0x20);
+            evt->wNpcEventType = 2;
+            evt->ownerNPC = npc;
+        } else if ((flags & 2) && npc->lostEvent && !(npc->jumpFlags & 0x1000) &&
+                   !(npc->flags & 0x200000)) {
+            evt = evtEntry(npc->lostEvent, 0, 0x20);
+            evt->wNpcEventType = 3;
+            evt->ownerNPC = npc;
+        } else if ((flags & 4) && npc->returnEvent && !(npc->jumpFlags & 0x1000) &&
+                   !(npc->flags & 0x200000)) {
+            evt = evtEntry(npc->returnEvent, 0, 0x20);
+            evt->wNpcEventType = 4;
+            evt->ownerNPC = npc;
+        }
+        if (evt) {
+            evtDeleteID(npc->regularEvtId);
+            npc->regularEvtId = evt->eventId;
+            npc->field_140 &= 0xF00;
+            npc->jumpFlags &= ~0x1000;
+            npc->field_188 = 0;
+            npc->moveSpeed = 0.0f;
+            return TRUE;
+        }
+    }
+    npc->field_140 &= 0xF00;
+    npc->jumpFlags &= ~0x1000;
+    return FALSE;
 }
 
 void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {

@@ -1,39 +1,1239 @@
 #include "evt/evt_shop.h"
-#include "mario/mariost.h"
+#include "evt/evt_cmd.h"
+#include "evt/evt_case.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
 #include "manager/winmgr.h"
+#include "manager/fontmgr.h"
+#include "driver/msgdrv.h"
+#include "driver/icondrv.h"
+#include "driver/mapdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/hitdrv.h"
+#include "driver/camdrv.h"
+#include "driver/swdrv.h"
+#include "mario/mario.h"
+#include "mario/mario_pouch.h"
+#include "mario/mariost.h"
+#include "data/item_data.h"
+#include "party.h"
+#include "system.h"
 #include "memory.h"
+#include "pmario_sound.h"
+#include <dolphin/mtx.h>
 #include <string.h>
+#include <stdio.h>
+
+typedef struct ShopObj {
+	const char* mobj; //0x0
+	const char* hit; //0x4
+} ShopObj;
+
+typedef struct ShopItem {
+	s32 id; //0x0
+	s32 price; //0x4
+} ShopItem;
+
+typedef struct ShopperData {
+	const char* name; //0x0
+	void* fook_evt; //0x4
+	void* buy_evt; //0x8
+	const char* msgs[1]; //0xC
+} ShopperData;
+
+typedef struct ShopDb {
+	s32 id; //0x0
+	s16 price; //0x4
+	s16 save; //0x6
+} ShopDb;
+
+typedef struct ShopWork {
+	u16 flags; //0x0
+	ShopObj* objs; //0x4
+	ShopItem* items; //0x8
+	ShopperData* shopper; //0xC
+	ShopDb* db; //0x10
+	u16 itemFlags[6]; //0x14
+	s32 count; //0x20
+	EventEntry* mainEvt; //0x24
+	EventEntry* buyEvt; //0x28
+	s32 cur; //0x2C
+	u8 field_0x30[0x38 - 0x30]; //0x30
+	s32 points; //0x38
+	u8 field_0x3C[0x50 - 0x3C]; //0x3C
+	s32 win[3]; //0x50
+	u8 field_0x5C[0xD0 - 0x5C]; //0x5C
+	s32 sel; //0xD0
+	s32 buyItem; //0xD4
+} ShopWork;
+
+#define SHOP_PTS(p) (*(s16*)&(p)->mShopPoints)
 
 extern GlobalWork* gp;
+extern ItemData itemDataTable[];
+void FontDrawString(f32 x, f32 y, const char* str);
+void FontDrawMessageMtx(Mtx mtx, const char* msg);
+const char* winZenkakuStr(s32 num);
+void mapObjGetPos(const char* name, Vec* pos);
+void mapObjFlagOn(const char* name, u32 mask);
+BOOL N_itemPickUpFromFieldCheck(void);
+BOOL winGhostDiaryChk(void);
 
 //.sbss
 char mapname[16];
-static evt_shop_work* _wp;
+static ShopWork* _wp;
 
-USER_FUNC(evt_shop_setup) {
-	evt_shop_work* work_ptr;
-	s32 r25, r27, r28, r30;
-	int i;
+void list_disp(WinMgrEntry* entry);
+void title_disp(WinMgrEntry* entry);
+void point_disp(WinMgrEntry* entry);
+void help_disp(WinMgrEntry* entry);
+void help_main(WinMgrEntry* entry);
+void name_disp(WinMgrEntry* entry);
 
-	r28 = evtGetValue(event, event->args[0]);
-	r27 = evtGetValue(event, event->args[1]);
-	r30 = evtGetValue(event, event->args[2]);
-	r25 = evtGetValue(event, event->args[3]);
-	work_ptr = _mapAlloc(sizeof(evt_shop_work));
-	memset(work_ptr, 0, sizeof(evt_shop_work));
-	_wp = work_ptr;
-	strncpy(mapname, gp->currentMapName, sizeof(gp->currentMapName) - 1);
-	work_ptr->field_0x4 = r28;
-	work_ptr->field_0x8 = r27;
-	work_ptr->field_0xC = r30;
-	work_ptr->field_0x10 = r25;
-	work_ptr->field_0x20 = 6;
-	for (i = 0; i < work_ptr->field_0x20; i++) {
+USER_FUNC(N_evt_pouch_remove_item_index);
+USER_FUNC(add_shop_point);
+USER_FUNC(chk_shop_point);
+USER_FUNC(disp_list);
+USER_FUNC(disp_off);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mario_set_dir_npc);
+USER_FUNC(evt_msg_continue);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_add);
+USER_FUNC(evt_msg_print_add_insert);
+USER_FUNC(evt_msg_print_insert);
+USER_FUNC(evt_msg_select);
+USER_FUNC(evt_pouch_add_coin);
+USER_FUNC(evt_pouch_add_item);
+USER_FUNC(evt_pouch_add_keepitem);
+USER_FUNC(evt_pouch_get_coin);
+USER_FUNC(evt_pouch_remove_keepitem);
+USER_FUNC(evt_set_dir_to_target);
+USER_FUNC(evt_shop_main_func);
+USER_FUNC(evt_sub_get_language);
+USER_FUNC(evt_sub_get_mapname);
+USER_FUNC(evt_sub_get_system_flag);
+USER_FUNC(evt_sub_load_progresstime);
+USER_FUNC(evt_win_coin_off);
+USER_FUNC(evt_win_coin_on);
+USER_FUNC(evt_win_coin_wait);
+USER_FUNC(evt_win_item_select);
+USER_FUNC(exchange_shop_point);
+USER_FUNC(get_buy_evt);
+USER_FUNC(get_fook_evt);
+USER_FUNC(get_msg);
+USER_FUNC(get_ptr);
+USER_FUNC(get_shop_point);
+USER_FUNC(get_value);
+USER_FUNC(item_data_db_arrange);
+USER_FUNC(item_data_db_restore);
+USER_FUNC(keep_pouchcheck_func);
+USER_FUNC(name_price);
+USER_FUNC(point_disp_onoff);
+USER_FUNC(point_wait);
+USER_FUNC(reset_shop_point);
+USER_FUNC(sell_pouchcheck_func);
+USER_FUNC(set_buy_item_id);
+USER_FUNC(shop_flag_onoff);
+USER_FUNC(shop_point_item);
+USER_FUNC(shopper_name);
+USER_FUNC(unkeep_pouchcheck_func);
 
+static s32 window_desc[30];
+s32 shopPointList[22];
+s32 list_desc[30];
+static s32 buy_evt[326];
+s32 shopper_talk_evt[352];
+s32 first_shopping_evt[86];
+static s32 sell_evt[196];
+s32 keep_evt[148];
+s32 unkeep_evt[147];
+s32 point_evt[15];
+s32 evt_shoplist[10];
+static s32 main_evt[4];
+
+static s32 window_desc[] = {
+    0, 0, 8, -150, 120, 300, 50, 732233727,
+    0, (s32)name_disp, 0, 0, 8, -240, -130, 500,
+    80, -252645121, (s32)help_main, (s32)help_disp, 2, 0, 8, -250,
+    -130, 150, 45, -252645121, 0, (s32)point_disp,
+};
+
+s32 shopPointList[] = {
+    10, 148, 20, 131, 30, 149, 50, 129,
+    70, 130, 100, 126, 150, 151, 200, 150,
+    250, 156, 300, 127, -1, -1,
+};
+
+s32 list_desc[] = {
+    0, 0, 8, -280, 160, 210, 80, 732233727,
+    0, (s32)title_disp, 0, 3, 8, -60, 160, 340,
+    300, -252645121, 0, (s32)list_disp, 2, 0, 8, -250,
+    -130, 150, 45, -252645121, 0, (s32)point_disp,
+};
+
+static EVT_BEGIN(buy_evt)
+    CALL(evt_mario_normalize)
+    SET_VALUE(LW(10), LW(0))
+    CALL(disp_off, LW(10))
+    IF_INT_EQUAL(GSWF(0), 0)
+        SET_VALUE(GSWF(0), 1)
+        CALL_CHILD(PTR(first_shopping_evt))
+        RETURN
+    END_IF
+    CALL(shopper_name, LW(9))
+    CALL(evt_set_dir_to_target, LW(9), STRING("mario"))
+    CALL(evt_win_coin_on, 0, LW(8))
+    CALL(point_disp_onoff, 1)
+    CALL(get_value, LW(10), LW(11), LW(12), LW(13))
+    CALL(get_msg, LW(10), 0, LW(14))
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(13), LW(11))
+        ELSE
+        CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(11), LW(13))
+    END_IF
+    CALL(get_msg, LW(10), 24, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        CALL(evt_win_coin_off, LW(8))
+        CALL(point_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(evt_pouch_get_coin, LW(0))
+    IF_INT_LESS(LW(0), LW(13))
+        CALL(get_msg, LW(10), 1, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        CALL(evt_win_coin_off, LW(8))
+        CALL(point_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(evt_pouch_add_item, LW(12), LW(0))
+    IF_INT_EQUAL(LW(0), -1)
+        CALL(get_msg, LW(10), 2, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        CALL(evt_win_coin_off, LW(8))
+        CALL(point_disp_onoff, 0)
+        RETURN
+    END_IF
+    CALL(set_buy_item_id, LW(12))
+    CALL(evt_sub_load_progresstime, GSW(5), LW(0))
+    CALL(evt_sub_load_progresstime, GSW(14), LW(1))
+    CALL(evt_sub_load_progresstime, GSW(23), LW(2))
+    CALL(add_shop_point, 1, LW(0), LW(1), LW(2))
+    MULTIPLY(LW(13), -1)
+    CALL(evt_pouch_add_coin, LW(13))
+    CALL(evt_win_coin_wait, LW(8))
+    CALL(point_wait)
+    WAIT_MS(200)
+    CALL(evt_win_coin_off, LW(8))
+    CALL(point_disp_onoff, 0)
+    CALL(evt_msg_continue)
+    CALL(evt_sub_get_system_flag, LW(0))
+    IF_BITS_CLEAR(LW(0), 4096)
+        IF_INT_EQUAL(GSWF(235), 0)
+            SET_VALUE(GSWF(235), 1)
+            CALL(evt_msg_print, 0, STRING("item_first_hit"), 0, 0)
+        END_IF
+    END_IF
+    LOOP(0)
+        CALL(chk_shop_point, LW(0), LW(1), LW(2))
+        IF_INT_EQUAL(LW(0), -1)
+            GOTO(123)
+            RETURN
+        END_IF
+        SET_VALUE(LF(0), 0)
+        CALL(get_shop_point, LW(0))
+        IF_INT_NOT_EQUAL(LW(0), 300)
+            CALL(get_msg, LW(10), 26, LW(14))
+            CALL(evt_msg_print_insert, 0, LW(14), 0, LW(9), LW(2))
+            ELSE
+            CALL(get_msg, LW(10), 34, LW(14))
+            CALL(evt_msg_print, 0, LW(14), 0, LW(9))
+            CALL(evt_win_coin_on, 0, LW(8))
+            CALL(point_disp_onoff, 1)
+            CALL(reset_shop_point)
+            CALL(evt_win_coin_wait, LW(8))
+            CALL(point_wait)
+            WAIT_MS(500)
+            CALL(evt_win_coin_off, LW(8))
+            CALL(point_disp_onoff, 0)
+            SET_VALUE(LF(0), 1)
+        END_IF
+        CALL(evt_pouch_add_item, LW(1), LW(0))
+        IF_INT_EQUAL(LW(0), -1)
+            CALL(get_msg, LW(10), 27, LW(14))
+            CALL(evt_msg_print, 0, LW(14), 0, LW(9))
+            IF_INT_EQUAL(LF(0), 1)
+                SET_VALUE(GSWF(1), 1)
+            END_IF
+            GOTO(123)
+            RETURN
+        END_IF
+        CALL(exchange_shop_point)
+    END_LOOP
+    LABEL(123)
+    CALL(get_buy_evt, LW(1))
+    IF_INT_NOT_EQUAL(LW(1), 0)
+        SET_VALUE(LW(0), LW(12))
+        CALL_CHILD(LW(1))
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(shopper_talk_evt)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(get_ptr, LW(10))
+    SET_VALUE(LF(10), 0)
+    CALL(get_fook_evt, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL_CHILD(LW(0))
+        IF_INT_EQUAL(LW(0), -1)
+            CALL(evt_mario_key_onoff, 1)
+            RETURN
+        END_IF
+        IF_INT_EQUAL(LW(0), -100)
+            SET_VALUE(LF(10), 1)
+        END_IF
+    END_IF
+    IF_INT_EQUAL(GSWF(0), 0)
+        SET_VALUE(GSWF(0), 1)
+        CALL_CHILD(PTR(first_shopping_evt))
+        CALL(evt_mario_key_onoff, 1)
+        RETURN
+    END_IF
+    SET_VALUE(LF(0), 0)
+    LOOP(0)
+        CALL(chk_shop_point, LW(0), LW(1), LW(2))
+        IF_INT_EQUAL(GSWF(1), 1)
+            SET_VALUE(LW(0), 0)
+            CALL(shop_point_item, 300, LW(1), LW(2))
+        END_IF
+        IF_INT_EQUAL(LW(0), -1)
+            IF_INT_EQUAL(LF(0), 1)
+                CALL(evt_mario_key_onoff, 1)
+                RETURN
+            END_IF
+            SET_VALUE(LF(11), 0)
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("mri_07"))
+                IF_INT_EQUAL(GSWF(250), 1)
+                    CALL(evt_sub_load_progresstime, GSW(5), LW(0))
+                    IF_INT_LESS(LW(0), 900000)
+                        SET_VALUE(LW(14), STRING("stg2_shop_04_1"))
+                        SET_VALUE(LF(11), 1)
+                    END_IF
+                END_IF
+            END_IF
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("usu_01"))
+                IF_INT_EQUAL(GSWF(251), 1)
+                    CALL(evt_sub_load_progresstime, GSW(14), LW(0))
+                    IF_INT_LESS(LW(0), 900000)
+                        SET_VALUE(LW(14), STRING("usugurashop_04_1"))
+                        SET_VALUE(LF(11), 1)
+                    END_IF
+                END_IF
+            END_IF
+            SET_VALUE(LF(12), 0)
+            CALL(evt_sub_get_mapname, LW(0))
+            IF_STR_EQUAL(LW(0), STRING("rsh_03_a"))
+                SET_VALUE(LF(12), 1)
+            END_IF
+            IF_STR_EQUAL(LW(0), STRING("rsh_03_b"))
+                SET_VALUE(LF(12), 1)
+            END_IF
+            IF_STR_EQUAL(LW(0), STRING("rsh_03_c"))
+                SET_VALUE(LF(12), 1)
+            END_IF
+            IF_INT_EQUAL(LF(12), 1)
+                IF_INT_EQUAL(GSWF(252), 1)
+                    CALL(evt_sub_load_progresstime, GSW(23), LW(0))
+                    IF_INT_LESS(LW(0), 900000)
+                        SET_VALUE(LW(14), STRING("stg6_shop_04_1"))
+                        SET_VALUE(LF(11), 1)
+                    END_IF
+                END_IF
+            END_IF
+            IF_INT_EQUAL(LF(11), 0)
+                CALL(get_msg, LW(10), 4, LW(14))
+            END_IF
+            IF_INT_EQUAL(LF(10), 0)
+                CALL(evt_msg_print, 0, LW(14), 0, 0)
+                ELSE
+                SET_VALUE(LF(10), 0)
+                CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+                CALL(evt_msg_print_add, 0, LW(14))
+            END_IF
+            BREAK_LOOP
+        END_IF
+        CALL(evt_pouch_add_item, LW(1), LW(0))
+        IF_INT_EQUAL(LW(0), -1)
+            CALL(get_msg, LW(10), 29, LW(14))
+            IF_INT_EQUAL(LF(10), 0)
+                CALL(evt_msg_print, 0, LW(14), 0, 0)
+                ELSE
+                SET_VALUE(LF(10), 0)
+                CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+                CALL(evt_msg_print_add, 0, LW(14))
+            END_IF
+            BREAK_LOOP
+        END_IF
+        CALL(get_msg, LW(10), 28, LW(14))
+        IF_INT_EQUAL(LF(10), 0)
+            CALL(evt_msg_print_insert, 0, LW(14), 0, 0, LW(2))
+            ELSE
+            SET_VALUE(LF(10), 0)
+            CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+            CALL(evt_msg_print_add_insert, 0, LW(14), LW(2))
+        END_IF
+        IF_INT_EQUAL(GSWF(1), 0)
+            CALL(exchange_shop_point)
+        END_IF
+        SET_VALUE(LF(0), 1)
+        IF_INT_EQUAL(GSWF(1), 1)
+            SET_VALUE(GSWF(1), 0)
+        END_IF
+    END_LOOP
+    CALL(shop_flag_onoff, 1, 16384)
+    CALL(get_msg, LW(10), 23, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    CALL(shop_flag_onoff, 0, 16384)
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CALL(get_msg, LW(10), 5, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        CASE_EQUAL(1)
+        CALL_CHILD(PTR(sell_evt))
+        CASE_EQUAL(2)
+        CALL_CHILD(PTR(keep_evt))
+        CASE_EQUAL(3)
+        CALL_CHILD(PTR(unkeep_evt))
+        CASE_EQUAL(4)
+        CALL_CHILD(PTR(point_evt))
+        CASE_EQUAL(5)
+        CALL(evt_msg_continue)
+    END_SWITCH
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+EVT_BEGIN(first_shopping_evt)
+    CALL(shopper_name, LW(9))
+    CALL(evt_set_dir_to_target, LW(9), STRING("mario"))
+    CALL(evt_mario_set_dir_npc, LW(9))
+    CALL(get_msg, LW(10), 30, LW(14))
+    IF_INT_EQUAL(LF(10), 0)
+        CALL(evt_msg_print, 0, LW(14), 0, LW(9))
+        ELSE
+        SET_VALUE(LF(10), 0)
+        CALL(evt_msg_print_add, 1, STRING("<scrl_auto><once_stop>"))
+        CALL(evt_msg_print_add, 0, LW(14))
+    END_IF
+    LOOP(0)
+        CALL(get_msg, LW(10), 31, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, LW(9))
+        CALL(get_msg, LW(10), 24, LW(14))
+        CALL(evt_msg_select, 0, LW(14))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(get_msg, LW(10), 32, LW(14))
+            CALL(evt_msg_print_add, 0, LW(14))
+            ELSE
+            CALL(get_msg, LW(10), 33, LW(14))
+            CALL(evt_msg_print_add, 0, LW(14))
+            RETURN
+        END_IF
+    END_LOOP
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(sell_evt)
+    CALL(sell_pouchcheck_func)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(get_msg, LW(10), 6, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 7, LW(14))
+    CALL(evt_msg_print_add, 0, LW(14))
+    CALL(evt_win_coin_on, 0, LW(8))
+    LABEL(0)
+    CALL(item_data_db_arrange)
+    CALL(evt_win_item_select, 1, 3, LW(1), LW(4))
+    CALL(item_data_db_restore)
+    IF_INT_LESS_OR_EQUAL(LW(1), 0)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+        CALL(evt_win_coin_off, LW(8))
+        RETURN
+    END_IF
+    CALL(item_data_db_arrange)
+    CALL(name_price, LW(1), LW(2), LW(3))
+    CALL(item_data_db_restore)
+    CALL(get_msg, LW(10), 8, LW(14))
+    CALL(evt_sub_get_language, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_print_insert, 0, LW(14), 0, STRING("me"), LW(3), LW(2))
+        ELSE
+        CALL(evt_msg_print_insert, 0, LW(14), 0, STRING("me"), LW(2), LW(3))
+    END_IF
+    CALL(get_msg, LW(10), 24, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(get_msg, LW(10), 9, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        GOTO(0)
+    END_IF
+    CALL(N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
+    CALL(evt_pouch_add_coin, LW(3))
+    CALL(evt_win_coin_wait, LW(8))
+    WAIT_MS(200)
+    CALL(evt_win_coin_off, LW(8))
+    CALL(sell_pouchcheck_func)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(get_msg, LW(10), 11, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 10, LW(14))
+    CALL(evt_msg_print_add, 0, LW(14))
+    CALL(get_msg, LW(10), 24, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    CALL(evt_win_coin_on, 0, LW(8))
+    GOTO(0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(keep_evt)
+    CALL(keep_pouchcheck_func)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(get_msg, LW(10), 12, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    IF_INT_EQUAL(LW(1), 0)
+        CALL(get_msg, LW(10), 13, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 14, LW(14))
+    CALL(evt_msg_print_add_insert, 0, LW(14), LW(1))
+    LABEL(0)
+    CALL(evt_win_item_select, 1, 4, LW(1), LW(4))
+    IF_INT_LESS_OR_EQUAL(LW(1), 0)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(N_evt_pouch_remove_item_index, LW(1), LW(4), LW(0))
+    CALL(evt_pouch_add_keepitem, LW(1), LW(0))
+    CALL(keep_pouchcheck_func)
+    SET_VALUE(LF(0), 0)
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LW(1), 0)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        CALL(get_msg, LW(10), 15, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 16, LW(14))
+    CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+    CALL(get_msg, LW(10), 24, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    GOTO(0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unkeep_evt)
+    CALL(unkeep_pouchcheck_func)
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(get_msg, LW(10), 17, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    IF_INT_EQUAL(LW(1), 0)
+        CALL(get_msg, LW(10), 18, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 19, LW(14))
+    CALL(evt_msg_print_add, 0, LW(14))
+    LABEL(0)
+    CALL(evt_win_item_select, 1, 5, LW(1), LW(4))
+    IF_INT_LESS_OR_EQUAL(LW(1), 0)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(evt_pouch_remove_keepitem, LW(1), LW(4), LW(0))
+    CALL(evt_pouch_add_item, LW(1), LW(0))
+    CALL(unkeep_pouchcheck_func)
+    SET_VALUE(LF(0), 0)
+    IF_INT_EQUAL(LW(0), 0)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LW(1), 0)
+        SET_VALUE(LF(0), 1)
+    END_IF
+    IF_INT_EQUAL(LF(0), 1)
+        CALL(get_msg, LW(10), 20, LW(14))
+        CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+        RETURN
+    END_IF
+    CALL(get_msg, LW(10), 21, LW(14))
+    CALL(evt_msg_print, 0, LW(14), 0, STRING("me"))
+    CALL(get_msg, LW(10), 24, LW(14))
+    CALL(evt_msg_select, 0, LW(14))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(get_msg, LW(10), 22, LW(14))
+        CALL(evt_msg_print_add, 0, LW(14))
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    GOTO(0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(point_evt)
+    CALL(get_shop_point, LW(0))
+    CALL(get_msg, LW(10), 25, LW(14))
+    CALL(evt_msg_print_add_insert, 0, LW(14), LW(0))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_shoplist)
+    CALL(evt_mario_key_onoff, 0)
+    CALL(disp_list)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+static EVT_BEGIN(main_evt)
+    CALL(evt_shop_main_func)
+    RETURN
+EVT_END()
+
+void name_disp(WinMgrEntry* entry) {
+	ShopWork* wp = _wp;
+	const char* name;
+	s32 i;
+	Vec pos;
+	char buf[64];
+	Mtx m;
+
+	name = msgSearch(itemDataTable[wp->items[wp->cur].id].name);
+	if (!winMgrAction(wp->win[0])) {
+		FontDrawStart();
+		FontDrawEdge();
+		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		FontDrawString(-FontGetMessageWidth(name) / 2, 108.0f, name);
+		FontDrawEdgeOff();
 	}
-	return EVT_RETURN_DONE;
+	for (i = 0; i < wp->count; i++) {
+		if (wp->itemFlags[i] & 1) {
+			continue;
+		}
+		mapObjGetPos(wp->objs[i].mobj, &pos);
+		pos.y += 30.0f;
+		PSMTXMultVec(camGetPtr(CAMERA_3D)->view, &pos, &pos);
+		PSMTX44MultVec(camGetPtr(CAMERA_3D)->projection, &pos, &pos);
+		pos.x *= gp->fbWidth * 0.5f;
+		pos.y *= gp->efbHeight * 0.5f;
+		sprintf(buf, "%d", wp->items[i].price);
+		PSMTXTrans(m, 12.0f * (strlen(buf) - 1) + pos.x, pos.y, pos.z);
+		iconNumberDispGx(m, wp->items[i].price, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	}
 }
 
 void help_main(WinMgrEntry* entry) {
 	winMgrHelpMain(entry);
+}
+
+void help_disp(WinMgrEntry* entry) {
+	ShopWork* wp = _wp;
+	s32 cur = wp->cur;
+	ShopItem* items = wp->items;
+
+	if (!winMgrAction(wp->win[1])) {
+		entry->msg = msgSearch(itemDataTable[items[cur].id].description);
+		winMgrHelpDraw(entry);
+	}
+}
+
+void point_disp(WinMgrEntry* entry) {
+	ShopWork* wp = _wp;
+	PouchData* pouch = pouchGetPtr();
+	s32 diff;
+	Mtx m;
+	Mtx s;
+
+	if (entry->flags & 4) {
+		return;
+	}
+	PSMTXTrans(m, 10.0f + (30.0f + entry->x), entry->y - 36.0f, 0.0f);
+	if (gp->language == 0U) {
+		PSMTXScale(s, 1.1f, 1.1f, 1.1f);
+		PSMTXConcat(m, s, m);
+		iconDispGx2(m, 0x10, 0x1F1);
+	}
+	else {
+		PSMTXScale(s, 0.8f, 1.1f, 1.1f);
+		PSMTXConcat(m, s, m);
+		iconDispGx2(m, 0x10, 0x20A);
+	}
+	PSMTXTrans(m, 124.0f + entry->x, entry->y - 38.0f, 0.0f);
+	iconNumberDispGx(m, wp->points, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	diff = SHOP_PTS(pouch) - wp->points;
+	if (diff) {
+		diff /= 10;
+		if (!diff) {
+			diff = SHOP_PTS(pouch) > wp->points ? 1 : -1;
+		}
+		wp->points += diff;
+	}
+}
+
+void title_disp(WinMgrEntry* entry) {
+	const char* msg;
+
+	if (entry->flags & 4) {
+		return;
+	}
+	msg = msgSearch("msg_shop_point_list4");
+	FontDrawStart();
+	FontDrawEdge();
+	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawMessage(entry->x + (entry->width - FontGetMessageWidth(msg)) / 2, entry->y - 12, msg);
+	FontDrawEdgeOff();
+}
+
+void list_disp(WinMgrEntry* entry) {
+	PouchData* pouch;
+	const char* msg;
+	s32 i;
+	s32* p;
+	s32 y;
+	u32 mask;
+	ItemData* item;
+	u16 w;
+	char buf[256];
+	Mtx m;
+	Mtx s;
+
+	if (entry->flags & 4) {
+		return;
+	}
+	pouch = pouchGetPtr();
+	i = 0;
+	msg = msgSearch("msg_shop_point_list5");
+	FontDrawStart();
+	FontDrawEdge();
+	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawMessage(entry->x + (100 - FontGetMessageWidth(msg)) / 2 + 10, entry->y + 13, msg);
+	FontDrawEdgeOff();
+	msg = msgSearch("msg_shop_point_list6");
+	FontDrawStart();
+	FontDrawEdge();
+	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawMessage(entry->x + (entry->width / 2 - 10 + (100 - FontGetMessageWidth(msg)) / 2), entry->y + 13, msg);
+	FontDrawEdgeOff();
+	FontDrawStart();
+	for (p = shopPointList, y = 0; p[0] != -1; p += 2, y += 26, i++) {
+		item = &itemDataTable[p[1]];
+		FontDrawStart();
+		mask = 1 << i;
+		if (pouch->field_0x5B4 & mask) {
+			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+		}
+		else {
+			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		}
+		sprintf(buf, "%s", winZenkakuStr(p[0]));
+		w = FontGetMessageWidth(buf);
+		FontDrawMessage(entry->x + (entry->width / 2 - w - 90), entry->y - 20 - y, buf);
+		FontDrawStart();
+		if (pouch->field_0x5B4 & mask) {
+			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+		}
+		else {
+			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		}
+		sprintf(buf, "%s", msgSearch("msg_shop_point_list5"));
+		w = FontGetMessageWidth(buf);
+		PSMTXTrans(m, entry->x + (entry->width / 2 - 0.6f * w) - 40.0f, entry->y - 28 - y, 0.0f);
+		PSMTXScale(s, 0.64f, 0.64f, 0.64f);
+		PSMTXConcat(m, s, m);
+		FontDrawMessageMtx(m, buf);
+		msg = msgSearch(item->name);
+		FontDrawStart();
+		if (pouch->field_0x5B4 & mask) {
+			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+		}
+		else {
+			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		}
+		FontDrawMessage(entry->x + (entry->width / 2 - 10), entry->y - 20 - y, msg);
+	}
+}
+
+USER_FUNC(disp_list) {
+	if (isFirstCall) {
+		event->userdata[0] = winMgrEntry(&((WinMgrDesc*)list_desc)[0]);
+		event->userdata[1] = winMgrEntry(&((WinMgrDesc*)list_desc)[1]);
+		event->userdata[2] = winMgrEntry(&((WinMgrDesc*)list_desc)[2]);
+		winMgrOpen(event->userdata[0]);
+		winMgrOpen(event->userdata[1]);
+		winMgrOpen(event->userdata[2]);
+		psndSFXOn((const char*)0x2A);
+	}
+	if (keyGetButtonTrg(0) & 0x200) {
+		winMgrCloseAutoDelete(event->userdata[0]);
+		winMgrCloseAutoDelete(event->userdata[1]);
+		winMgrCloseAutoDelete(event->userdata[2]);
+		psndSFXOn((const char*)0x2B);
+		return EVT_RETURN_YIELD;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_shop_setup) {
+	s32* args = event->args;
+	ShopObj* objs = (ShopObj*)evtGetValue(event, args[0]);
+	ShopItem* items = (ShopItem*)evtGetValue(event, args[1]);
+	ShopperData* shopper = (ShopperData*)evtGetValue(event, args[2]);
+	ShopDb* db = (ShopDb*)evtGetValue(event, args[3]);
+	ShopWork* wp;
+	s32 i;
+	Vec pos;
+	char buf[48];
+
+	wp = _mapAlloc(sizeof(ShopWork));
+	memset(wp, 0, sizeof(ShopWork));
+	_wp = wp;
+	strncpy(mapname, gp->currentMapName, sizeof(gp->currentMapName) - 1);
+	wp->objs = objs;
+	wp->items = items;
+	wp->shopper = shopper;
+	wp->db = db;
+	wp->count = 6;
+	for (i = 0; i < wp->count; i++) {
+		mapObjGetPos(wp->objs[i].mobj, &pos);
+		mapObjFlagOn(wp->objs[i].mobj, 0x4000);
+		sprintf(buf, "shp%d", i);
+		iconEntry(buf, itemDataTable[wp->items[i].id].icon_id);
+		iconSetPos(buf, pos.x, pos.y + 6.0f, pos.z);
+		iconFlagOn(buf, 0x40);
+		wp->itemFlags[i] = 0;
+		if (wp->items[i].id == 0x33 && pouchCheckItem(0x33)) {
+			wp->itemFlags[i] |= 1;
+		}
+		if (wp->items[i].id == 0x37 && pouchCheckItem(0x37)) {
+			wp->itemFlags[i] |= 1;
+		}
+		if (wp->items[i].id == 0x38 && pouchCheckItem(0x38)) {
+			wp->itemFlags[i] |= 1;
+		}
+		if (wp->items[i].id == 0x39 && pouchCheckItem(0x39)) {
+			wp->itemFlags[i] |= 1;
+		}
+		if (wp->items[i].id == 0x3A && pouchCheckItem(0x3A)) {
+			wp->itemFlags[i] |= 1;
+		}
+		if (wp->items[i].id == 0x3B && pouchCheckItem(0x3B)) {
+			wp->itemFlags[i] |= 1;
+		}
+	}
+	npcNameToPtr(shopper->name)->talkEvt = shopper_talk_evt;
+	wp->mainEvt = evtEntryType(main_evt, 0, 0x20, 0);
+	wp->mainEvt->lwData[0] = (s32)wp;
+	for (i = 0; i < 3; i++) {
+		wp->win[i] = winMgrEntry(&((WinMgrDesc*)window_desc)[i]);
+	}
+	wp->sel = -1;
+	evtRunCaseEntry(9, TRUE, "a_shop_keihin", 0, evt_shoplist, 0);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(point_disp_onoff) {
+	s32 on = evtGetValue(event, event->args[0]);
+	PouchData* pouch = pouchGetPtr();
+	ShopWork* wp = _wp;
+	wp->points = SHOP_PTS(pouch);
+	if (on) {
+		winMgrOpen(wp->win[2]);
+	}
+	else {
+		winMgrClose(wp->win[2]);
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(point_wait) {
+	ShopWork* wp = _wp;
+	PouchData* pouch = pouchGetPtr();
+	if (wp->points != SHOP_PTS(pouch)) {
+		psndSFXOn((const char*)0x8CA);
+		return EVT_RETURN_BLOCK;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(shop_flag_onoff) {
+	s32* args = event->args;
+	s32 on = evtGetValue(event, args[0]);
+	s32 mask = evtGetValue(event, args[1]);
+	if (on) {
+		_wp->flags |= mask;
+	}
+	else {
+		_wp->flags &= ~mask;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(get_shop_point) {
+	s32* args = event->args;
+	PouchData* pouch = pouchGetPtr();
+	evtSetValue(event, args[0], SHOP_PTS(pouch));
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(add_shop_point) {
+	s32* args = event->args;
+	s32 add = evtGetValue(event, args[0]);
+	s32 t1 = evtGetValue(event, args[1]);
+	s32 t2 = evtGetValue(event, args[2]);
+	s32 t3 = evtGetValue(event, args[3]);
+	PouchData* pouch = pouchGetPtr();
+
+	if (!strcmp(gp->currentMapName, "mri_07") && swGet(0xFA) && t1 < 900000) {
+		add *= 2;
+	}
+	if (!strcmp(gp->currentMapName, "usu_01") && swGet(0xFB) && t2 < 900000) {
+		add *= 2;
+	}
+	if (!strncmp(gp->currentMapName, "rsh_03", 6) && swGet(0xFC) && t3 < 900000) {
+		add *= 2;
+	}
+	SHOP_PTS(pouch) += add;
+	if (SHOP_PTS(pouch) > 300) {
+		SHOP_PTS(pouch) = 300;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(reset_shop_point) {
+	PouchData* pouch = pouchGetPtr();
+	SHOP_PTS(pouch) = 0;
+	pouch->field_0x5B4 = 0;
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(chk_shop_point) {
+	s32* args = event->args;
+	PouchData* pouch = pouchGetPtr();
+	s32 i = 0;
+	s32* p;
+	s32* q;
+	s32 j;
+
+	for (p = shopPointList; p[0] != -1; p += 2, i++) {
+		if (p[0] <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
+			if (SHOP_PTS(pouch) != 300) {
+				evtSetValue(event, args[0], 0);
+				evtSetValue(event, args[1], p[1]);
+				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p[1]].name));
+			}
+			else {
+				j = 0;
+				for (q = shopPointList; q[0] != 300; q += 2) {
+					j++;
+				}
+				evtSetValue(event, args[0], 0);
+				p = &shopPointList[j * 2];
+				evtSetValue(event, args[1], *++p);
+				evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[*p].name));
+			}
+			return EVT_RETURN_DONE;
+		}
+	}
+	evtSetValue(event, args[0], -1);
+	evtSetValue(event, args[1], -1);
+	evtSetValue(event, args[2], -1);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(exchange_shop_point) {
+	PouchData* pouch = pouchGetPtr();
+	s32 i = 0;
+	s32* p;
+
+	for (p = shopPointList; p[0] != -1; p += 2, i++) {
+		if (p[0] <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
+			pouch->field_0x5B4 |= (1 << i);
+			return EVT_RETURN_DONE;
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(shop_point_item) {
+	s32* args = event->args;
+	s32 pts = evtGetValue(event, args[0]);
+	s32* p;
+
+	pouchGetPtr();
+	for (p = shopPointList; p[0] != -1; p += 2) {
+		if (p[0] == pts) {
+			evtSetValue(event, args[1], p[1]);
+			evtSetValue(event, args[2], (s32)msgSearch(itemDataTable[p[1]].name));
+			return EVT_RETURN_DONE;
+		}
+	}
+	evtSetValue(event, args[1], -1);
+	evtSetValue(event, args[2], -1);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(shopper_name) {
+	evtSetValue(event, event->args[0], (s32)_wp->shopper->name);
+	return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(disp_off) {
+	ShopWork* wp = (ShopWork*)evtGetValue(event, event->args[0]);
+	wp->flags &= ~1;
+	return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(get_value) {
+	s32* args = event->args;
+	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
+	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[wp->items[wp->cur].id].name));
+	evtSetValue(event, args[2], wp->items[wp->cur].id);
+	evtSetValue(event, args[3], wp->items[wp->cur].price);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(get_msg) {
+	s32* args = event->args;
+	ShopWork* wp = (ShopWork*)evtGetValue(event, args[0]);
+	s32 i = evtGetValue(event, args[1]);
+	evtSetValue(event, args[2], (s32)wp->shopper->msgs[i]);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(get_buy_evt) {
+	evtSetValue(event, event->args[0], (s32)_wp->shopper->buy_evt);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(set_buy_item_id) {
+	_wp->buyItem = evtGetValue(event, event->args[0]);
+	return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(get_ptr) {
+	evtSetValue(event, event->args[0], (s32)_wp);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(get_fook_evt) {
+	evtSetValue(event, event->args[0], (s32)_wp->shopper->fook_evt);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(name_price) {
+	s32* args = event->args;
+	s32 id = evtGetValue(event, args[0]);
+	evtSetValue(event, args[1], (s32)msgSearch(itemDataTable[id].name));
+	evtSetValue(event, args[2], itemDataTable[id].sell_price);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(sell_pouchcheck_func) {
+	pouchGetPtr();
+	event->lwData[0] = pouchGetHaveItemCnt();
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(item_data_db_arrange) {
+	ShopDb* db = _wp->db;
+	if (db) {
+		for (; db->id; db++) {
+			db->save = itemDataTable[db->id].sell_price;
+			itemDataTable[db->id].sell_price = db->price;
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(item_data_db_restore) {
+	ShopDb* db = _wp->db;
+	if (db) {
+		for (; db->id; db++) {
+			itemDataTable[db->id].sell_price = db->save;
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(keep_pouchcheck_func) {
+	pouchGetPtr();
+	event->lwData[0] = pouchGetHaveItemCnt();
+	event->lwData[1] = pouchGetEmptyKeepItemCnt();
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unkeep_pouchcheck_func) {
+	pouchGetPtr();
+	event->lwData[0] = pouchGetKeepItemCnt();
+	event->lwData[1] = pouchGetEmptyHaveItemCnt();
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_shop_main_func) {
+	ShopWork* wp;
+	MarioWork* mario;
+	PartyEntry* party;
+	HitEntry* hit;
+	u32 trg;
+	BOOL found;
+	s32 i;
+	MapObject* mobj;
+	char buf[32];
+
+	found = FALSE;
+	wp = (ShopWork*)event->lwData[0];
+	mario = marioGetPtr();
+	party = partyGetPtr(0);
+	hit = mario->hitobjStandOn;
+	wp->flags &= ~1;
+	trg = keyGetButtonTrg(0);
+	if (!marioChkCtrl() || !marioChkKey()) {
+		trg = 0;
+	}
+	if (!strncmp(gp->currentMapName, "rsh_03", strlen("rsh_03")) &&
+		evtGetValue(event, GSW(0)) >= 0x148 && evtGetValue(event, GSW(0)) < 0x14C &&
+		!evtGetValue(event, GSWF(3442))) {
+		return EVT_RETURN_BLOCK;
+	}
+	if (party && (party->flags & 0x100)) {
+		if (wp->sel != -1) {
+			wp->sel = -1;
+			winMgrClose(wp->win[0]);
+			winMgrClose(wp->win[1]);
+		}
+		return EVT_RETURN_BLOCK;
+	}
+	if (winGhostDiaryChk() || N_itemPickUpFromFieldCheck()) {
+		if (wp->sel != -1) {
+			wp->sel = -1;
+			winMgrClose(wp->win[0]);
+			winMgrClose(wp->win[1]);
+		}
+		return EVT_RETURN_BLOCK;
+	}
+	if (!(wp->flags & 2)) {
+		if (hit) {
+			for (i = 0; i < wp->count; i++) {
+				if (!strcmp(wp->objs[i].hit, hitGetName(hit))) {
+					break;
+				}
+			}
+			if (!(wp->itemFlags[i] & 1) && i < wp->count) {
+				if (wp->sel != i) {
+					if (wp->sel == -1) {
+						winMgrOpen(wp->win[0]);
+						winMgrOpen(wp->win[1]);
+					}
+					wp->sel = i;
+					wp->cur = i;
+					winMgrHelpInit(winMgrGetPtr(wp->win[1]));
+				}
+				found = TRUE;
+			}
+		}
+		if (!found && wp->sel != -1) {
+			wp->sel = -1;
+			winMgrClose(wp->win[0]);
+			winMgrClose(wp->win[1]);
+		}
+		if (wp->sel != -1) {
+			wp->flags |= 1;
+			if (trg & 0x100) {
+				marioKeyOff();
+				wp->buyEvt = evtEntry(buy_evt, 0, 0);
+				wp->buyEvt->lwData[0] = (s32)wp;
+				wp->flags |= 2;
+				winMgrClose(wp->win[0]);
+				winMgrClose(wp->win[1]);
+				wp->sel = -1;
+				wp->buyItem = 0;
+			}
+		}
+	}
+	else if (!evtCheckID(wp->buyEvt->eventId)) {
+		wp->flags &= ~2;
+		marioKeyOn();
+		if (wp->buyItem == 0x33) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+		if (wp->buyItem == 0x37) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+		if (wp->buyItem == 0x38) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+		if (wp->buyItem == 0x39) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+		if (wp->buyItem == 0x3A) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+		if (wp->buyItem == 0x3B) {
+			wp->itemFlags[wp->cur] |= 1;
+		}
+	}
+	for (i = 0; i < wp->count; i++) {
+		mobj = mapGetMapObj(wp->objs[i].mobj);
+		if (mobj) {
+			sprintf(buf, "shp%d", i);
+			if (wp->itemFlags[i] & 1) {
+				iconFlagOn(buf, 2);
+			}
+			else if (mobj->flags & 1) {
+				iconFlagOn(buf, 2);
+			}
+			else {
+				iconFlagOff(buf, 2);
+			}
+		}
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+BOOL evtShopIsActive(void) {
+	if (!strcmp(gp->currentMapName, mapname) && _wp->flags) {
+		return TRUE;
+	}
+	return FALSE;
 }

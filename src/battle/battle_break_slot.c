@@ -1,13 +1,1018 @@
+#pragma optimize_for_size on
 #include "battle/battle_break_slot.h"
+#include "battle/battle.h"
+#include "battle/battle_audience.h"
+#include "battle/battle_disp.h"
+#include "eff/eff_break.h"
+#include "pmario_sound.h"
+#include "battle/battle_unit.h"
+#include "driver/dispdrv.h"
+#include "driver/icondrv.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr.h"
+#include "mario/mario_pouch.h"
+#include "mario/mariost.h"
+#include "system.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <string.h>
+#include <stdlib.h>
 
-void BattleBreakSlot_Init(void) {
+extern BattleWork* _battleWorkPointer;
+extern GlobalWork* gp;
 
+typedef struct BreakSlotReel {
+	s32 kind;        // 0x00
+	u32 flags;       // 0x04
+	s32 state;       // 0x08
+	s32 counter;     // 0x0C
+	s32 item;        // 0x10
+	s32* cards;      // 0x14
+	s32 numCards;    // 0x18
+	s32 index;       // 0x1C
+	Vec pos;         // 0x20
+	Vec rot;         // 0x2C
+	Vec scale;       // 0x38
+	Vec pivot;       // 0x44
+	f32 field_50;    // 0x50
+	f32 field_54;    // 0x54
+	u8 alpha;        // 0x58
+	u8 pad_59[3];    // 0x59
+} BreakSlotReel;
+
+typedef struct BreakSlotWork {
+	u32 flags;                // 0x000
+	s32 phase;                // 0x004
+	s32 field_8;              // 0x008
+	s32 reelNo;               // 0x00C
+	s32 breakTurn;            // 0x010
+	f32 field_14;             // 0x014
+	BreakSlotReel reels[3];   // 0x018
+	s32 field_12C;            // 0x12C
+	EventEntry* evt;           // 0x130
+} BreakSlotWork;
+
+typedef struct { s32 v[8]; } SlotCards8;
+typedef struct { s32 v[5]; } SlotCards5;
+
+void btl_camera_set_mode(s32 pri, s32 mode);
+void btl_camera_set_moveSpeedLv(s32 pri, s32 lv);
+void BattleAudienceNumToTarget(void);
+
+BreakSlotWork* BattleBreakSlotGetPtr(void);
+BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no);
+void BattleBreakSlot_Start(void);
+void BattleBreakSlotDispReel(CameraId camId, void* param);
+void item_appear_force(BreakSlotReel* reel, s32 item);
+
+USER_FUNC(btlevtcmd_AnimeChangePoseFromTable);
+USER_FUNC(btlevtcmd_AnnounceMessage);
+USER_FUNC(btlevtcmd_CheckDamage);
+USER_FUNC(btlevtcmd_CheckStatus);
+USER_FUNC(btlevtcmd_GetBodyId);
+USER_FUNC(btlevtcmd_GetMaxFp);
+USER_FUNC(btlevtcmd_GetMaxHp);
+USER_FUNC(btlevtcmd_GetPos);
+USER_FUNC(btlevtcmd_GetUnitId);
+USER_FUNC(btlevtcmd_RecoverFp);
+USER_FUNC(btlevtcmd_RecoverHp);
+USER_FUNC(evt_eff);
+extern s32 weaponGetFPPowerFPHalf[];
+extern s32 weaponGetPowerHPHalf[];
+
+__declspec(section ".data") u64 lbl_803AB118 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_battle_break_slot_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803AB128 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_battle_break_slot_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 lbl_803AB138 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_battle_break_slot_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803AB148 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_battle_break_slot_one_negone_359 = 0x3F800000BF800000;
+
+EVT_BEGIN(kinoko_effect)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(1), 50)
+    CALL(evt_eff, STRING(""), STRING("recovery"), 4, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_RecoverHp, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
+    CALL(btlevtcmd_GetUnitId, -4, LW(3))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+            CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
+            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+            ADD(LW(1), 50)
+            CALL(evt_eff, STRING(""), STRING("recovery"), 4, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+            CALL(btlevtcmd_RecoverHp, LW(3), LW(4), LW(5))
+            CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
+        END_IF
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(flower_effect)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_GetMaxFp, LW(3), LW(5))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(1), 50)
+    CALL(evt_eff, STRING(""), STRING("recovery"), 5, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_RecoverFp, LW(3), LW(4), LW(5))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(shine_effect)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(1), 50)
+    CALL(evt_eff, STRING(""), STRING("recovery"), 4, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_RecoverHp, LW(3), LW(4), LW(5))
+    CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
+    CALL(btlevtcmd_GetUnitId, -4, LW(3))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+            CALL(btlevtcmd_GetMaxHp, LW(3), LW(5))
+            CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+            ADD(LW(1), 50)
+            CALL(evt_eff, STRING(""), STRING("recovery"), 4, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+            CALL(btlevtcmd_RecoverHp, LW(3), LW(4), LW(5))
+            CALL(btlevtcmd_AnimeChangePoseFromTable, LW(3), LW(4))
+        END_IF
+    END_IF
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_GetMaxFp, LW(3), LW(5))
+    CALL(btlevtcmd_GetPos, LW(3), LW(0), LW(1), LW(2))
+    ADD(LW(1), 50)
+    CALL(evt_eff, STRING(""), STRING("recovery"), 5, LW(0), LW(1), LW(2), LW(5), 0, 0, 0, 0, 0, 0, 0)
+    CALL(btlevtcmd_RecoverFp, LW(3), LW(4), LW(5))
+    RETURN
+EVT_END()
+
+s32 weapon_doku_kinoko[] = {
+    0, 0, 0, 0, 1677721600, 0, 0, (s32)weaponGetPowerHPHalf,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 34603360, 536870912, 770, 0, 131144, 2047, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 100, 0, 0,
+};
+
+s32 weapon_doku_kinoko_fp[] = {
+    0, 0, 0, 0, 1677721600, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    (s32)weaponGetFPPowerFPHalf, 0, 0, 0, 0, 0, 0, 0,
+    0, 34603360, 536870912, 770, 0, 131144, 2047, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 100, 0, 0,
+};
+
+EVT_BEGIN(doku_kinoko_effect)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko), 0, LW(5))
+    CALL(btlevtcmd_GetUnitId, -4, LW(3))
+    IF_INT_NOT_EQUAL(LW(3), -1)
+        CALL(btlevtcmd_CheckStatus, LW(3), 27, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+            CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko), 256, LW(5))
+        END_IF
+    END_IF
+    WAIT_FRAMES(60)
+    CALL(btlevtcmd_GetUnitId, -3, LW(3))
+    CALL(btlevtcmd_GetBodyId, LW(3), LW(4))
+    CALL(btlevtcmd_CheckDamage, -3, LW(3), LW(4), PTR(weapon_doku_kinoko_fp), 256, LW(5))
+    RETURN
+EVT_END()
+
+
+
+u16 tex_id_list_small[6] = {0x2B, 0x2D, 0x2F, 0x2E, 0x2C, 0};
+u16 tex_id_list_big[6] = {0x30, 0x32, 0x34, 0x33, 0x31, 0};
+
+EVT_BEGIN(star_effect)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(msg_hp_max)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HP_max"), 120)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(msg_fp_max)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_FP_max"), 120)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(msg_star_max)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_SP_max"), 120)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(msg_super_max)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HPFPSP_max"), 120)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(msg_fault)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -205, STRING("msg_slot_HPFPSP_half"), 120)
+    RETURN
+EVT_END()
+
+
+#pragma dont_inline on
+BreakSlotWork* BattleBreakSlotGetPtr(void) {
+	return (BreakSlotWork*)&_battleWorkPointer->field_1616C;
 }
 
-void BattleBreakSlot_Main(void) {
+BreakSlotReel* BattleBreakSlotReelGetPtr(s32 no) {
+	return &BattleBreakSlotGetPtr()->reels[no];
+}
+#pragma dont_inline reset
 
+const SlotCards8 R_slot_1_cards = {{0, 1, 2, 1, 2, 0, 3, 4}};
+const SlotCards8 R_slot_2_cards = {{3, 1, 0, 1, 4, 2, 0, 2}};
+const SlotCards5 R_slot_3_cards = {{0, 1, 2, 3, 4}};
+
+void BattleBreakSlot_Init(void) {
+	BreakSlotWork* wp = BattleBreakSlotGetPtr();
+	SlotCards8 c1 = R_slot_1_cards;
+	SlotCards8 c2 = R_slot_2_cards;
+	SlotCards5 c3 = R_slot_3_cards;
+	BreakSlotReel* reel;
+	s32 i;
+
+	memset(wp, 0, sizeof(BreakSlotWork));
+	wp->phase = 0;
+	reel = BattleBreakSlotReelGetPtr(0);
+	for (i = 0; i < 3; i++, reel++) {
+		reel->kind = i;
+		reel->state = 0;
+	}
+	reel = BattleBreakSlotReelGetPtr(0);
+	reel->numCards = 8;
+	reel->cards = BattleAlloc(reel->numCards * 4);
+	memcpy(reel->cards, &c1, reel->numCards * 4);
+	reel = BattleBreakSlotReelGetPtr(1);
+	reel->numCards = 8;
+	reel->cards = BattleAlloc(reel->numCards * 4);
+	memcpy(reel->cards, &c2, reel->numCards * 4);
+	reel = BattleBreakSlotReelGetPtr(2);
+	reel->numCards = 5;
+	reel->cards = BattleAlloc(reel->numCards * 4);
+	memcpy(reel->cards, &c3, reel->numCards * 4);
+}
+
+extern s32 kinoko_effect[];
+extern s32 flower_effect[];
+extern s32 shine_effect[];
+extern s32 doku_kinoko_effect[];
+extern s32 star_effect[];
+extern s32 msg_hp_max[];
+extern s32 msg_fp_max[];
+extern s32 msg_star_max[];
+extern s32 msg_super_max[];
+extern s32 msg_fault[];
+
+s32 BattleAudienceAddAudienceNum(s32 num);
+void BattleAudienceAddTargetNum(f32 a, f32 b);
+void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 x);
+void btl_camera_noshake(s32 pri);
+void BattleAudienceSoundStop(s32 id);
+void BattleAudienceSoundRun(s32 id);
+void BattleAudienceSoundCheer(s32 a, s32 b);
+void BattleAudienceSoundBooing(void);
+double sin(double);
+
+#define SFX_ON ((s32 (*)(const char*))psndSFXOn)
+
+void BattleBreakSlot_Main(void) {
+	static f32 updown;
+	BattleWork* wp = _battleWorkPointer;
+	u8* wp2 = (u8*)wp + 0x20000;
+	BattleAudience* aud = BattleAudienceBaseGetPtr();
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+	BattleUnit* mario = BattleGetMarioPtr(wp);
+	BattleUnit* party = BattleGetPartyPtr(wp);
+	BreakSlotReel* reel;
+	s32 count;
+	s32 item;
+	s32 k;
+	s32 i;
+	s32 x;
+	f32 y;
+
+	switch (slot->phase) {
+		case 0:
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 2) {
+					count++;
+				}
+			}
+			if (count == 2) {
+				item = BattleBreakSlotReelGetPtr(1)->item;
+				if (BattleBreakSlotReelGetPtr(0)->item != item) {
+					slot->phase = 1;
+					slot->field_8 = 0;
+				}
+			}
+			break;
+		case 1:
+			if (slot->field_8 == 60) {
+				reel = BattleBreakSlotReelGetPtr(0);
+				for (i = 0; i < 2; i++, reel++) {
+					reel->state = 3;
+					reel->counter = 0;
+				}
+			}
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 0) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				slot->phase = 8;
+				slot->reelNo = 0;
+			}
+			slot->field_8++;
+			break;
+		case 2:
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 6 || reel->state == 10) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				slot->phase = 3;
+				slot->field_8 = 0;
+				reel = BattleBreakSlotReelGetPtr(0);
+				for (i = 0; i < 3; i++, reel++) {
+					if (reel->state == 6) {
+						reel->state = 7;
+					}
+				}
+				slot->field_12C = SFX_ON("SFX_BTL_SLOT_START1");
+			}
+			break;
+		case 3:
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 10) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				slot->phase = 4;
+				slot->field_8 = 0;
+				psndSFXOff(slot->field_12C);
+			}
+			if ((keyGetButtonTrg(0) & 0x100) && slot->field_8 >= 15) {
+				reel = BattleBreakSlotReelGetPtr(0);
+				for (i = 0; i < 3; i++, reel++) {
+					if (reel->state == 8) {
+						reel->state = 9;
+						reel->field_54 = -1.0f * (0.2f + 0.15f * rand() / 32767.0f);
+						reel->field_54 = -1.0f;
+						break;
+					}
+				}
+			}
+			slot->field_8++;
+			break;
+		case 4:
+			if (slot->field_8 == 20) {
+				count = 0;
+				reel = BattleBreakSlotReelGetPtr(0);
+				for (i = 0; i < 2; i++, reel++) {
+					if (reel->item == reel[1].item) {
+						count++;
+					}
+				}
+				if (count >= 2) {
+					slot->phase = 5;
+					SFX_ON("SFX_BTL_SLOT_SUCCESS1");
+					reel = BattleBreakSlotReelGetPtr(0);
+					for (i = 0; i < 3; i++, reel++) {
+						reel->state = 11;
+						reel->counter = 0;
+					}
+				} else {
+					slot->phase = 7;
+					SFX_ON("SFX_BTL_SYS_BREAK_FAILRE1");
+					reel = BattleBreakSlotReelGetPtr(0);
+					for (i = 0; i < 3; i++, reel++) {
+						reel->state = 12;
+						reel->counter = 0;
+					}
+				}
+			}
+			slot->field_8++;
+			break;
+		case 5:
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 0) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				slot->phase = 6;
+				slot->field_8 = 0;
+			}
+			break;
+		case 6:
+			if (slot->field_8 == 0) {
+				if (BattleBreakSlotReelGetPtr(0)->item != 4) {
+					effBreakEntry(0, 240, 0.0f, 80.0f, 0.0f);
+				} else {
+					slot->field_8 = 101;
+					BattleAudienceSoundBooing();
+				}
+			}
+			if (slot->field_8 == 20 || slot->field_8 == 40 || slot->field_8 == 60 || slot->field_8 == 80 ||
+			    slot->field_8 == 100 || slot->field_8 == 120) {
+				SFX_ON("SFX_BTL_SYS_BREAK1");
+				btl_camera_shake_h(0, 5.0f, 0.0f, 10, 0);
+			}
+			if (slot->field_8 == 120) {
+				BattleAudienceSoundCheer(240, 240);
+			}
+			if (slot->field_8 == 130) {
+				switch (BattleBreakSlotReelGetPtr(0)->item) {
+					case 0:
+						evtEntry(kinoko_effect, 0, 0x20);
+						slot->breakTurn = 4;
+						slot->field_14 = 2.0f;
+						break;
+					case 1:
+						evtEntry(flower_effect, 0, 0x20);
+						slot->breakTurn = 4;
+						slot->field_14 = 2.0f;
+						break;
+					case 2:
+						evtEntry(star_effect, 0, 0x20);
+						pouchSetAP(pouchGetMaxAP());
+						SFX_ON("SFX_HP_RECOVER_BIG1");
+						slot->breakTurn = 4;
+						slot->field_14 = 2.0f;
+						break;
+					case 3:
+						evtEntry(shine_effect, 0, 0x20);
+						pouchSetAP(pouchGetMaxAP());
+						slot->breakTurn = 6;
+						slot->field_14 = 3.0f;
+						break;
+					case 4:
+						evtEntry(doku_kinoko_effect, 0, 0x20);
+						pouchSetAP(pouchGetAP() / 2);
+						break;
+				}
+			}
+			if (slot->field_8 == 140) {
+				switch (BattleBreakSlotReelGetPtr(0)->item) {
+					case 0:
+					case 1:
+					case 2:
+					case 3:
+					case 4:
+						btl_camera_set_mode(0, 6);
+						btl_camera_set_moveSpeedLv(0, 2);
+						break;
+				}
+				if (_battleWorkPointer->flags & 0x100) {
+					btl_camera_set_mode(0, 0);
+				}
+			}
+			if (slot->field_8 == 180) {
+				updown = 0.0f;
+				switch (BattleBreakSlotReelGetPtr(0)->item) {
+					case 0:
+					case 1:
+					case 2:
+						updown = BattleAudienceAddAudienceNum(*(s32*)((u8*)aud + 0x13790) / 2);
+						break;
+					case 3:
+						updown = BattleAudienceAddAudienceNum(*(s32*)((u8*)aud + 0x13790));
+						break;
+					case 4:
+						updown = BattleAudienceAddAudienceNum(-*(s32*)((u8*)aud + 0x13790));
+						break;
+				}
+				if (_battleWorkPointer->flags & 0x100) {
+					updown = 0.0f;
+				}
+			}
+			if (slot->field_8 == 209 && updown) {
+				BattleAudienceSoundRun(0);
+			}
+			if (slot->field_8 == 210) {
+				if (!(*(u32*)((u8*)_battleWorkPointer + 0x2754) & 2)) {
+					btl_camera_shake_h(0, 2.0f, 2.0f, 1000, 0);
+				}
+				for (k = 0; k < 200; k++) {
+					if ((u8)BattleAudience_GetExist(k) == 1) {
+						if (BattleAudienceGetPtr(k)->status == 11 || BattleAudienceGetPtr(k)->status == 12) {
+							slot->field_8--;
+							break;
+						}
+					}
+				}
+				if (k == 200) {
+					btl_camera_noshake(0);
+					BattleAudienceSoundStop(13);
+				}
+			}
+			if (slot->field_8 == 220 && k == 200) {
+				btl_camera_set_mode(0, 0);
+				btl_camera_noshake(0);
+			}
+			if (slot->field_8 == 270) {
+				BattleAudienceAddTargetNum(0.0f, updown);
+				slot->phase = 8;
+				slot->flags &= ~4;
+				if (gp->language == 0) {
+					switch (BattleBreakSlotReelGetPtr(0)->item) {
+						case 0:
+							slot->evt = evtEntry(msg_hp_max, 0, 0x20);
+							break;
+						case 1:
+							slot->evt = evtEntry(msg_fp_max, 0, 0x20);
+							break;
+						case 2:
+							slot->evt = evtEntry(msg_star_max, 0, 0x20);
+							break;
+						case 3:
+							slot->evt = evtEntry(msg_super_max, 0, 0x20);
+							break;
+						case 4:
+							slot->evt = evtEntry(msg_fault, 0, 0x20);
+							break;
+					}
+				}
+			}
+			slot->field_8++;
+			break;
+		case 7:
+			count = 0;
+			reel = BattleBreakSlotReelGetPtr(0);
+			for (i = 0; i < 3; i++, reel++) {
+				if (reel->state == 0) {
+					count++;
+				}
+			}
+			if (count == 3) {
+				slot->phase = 8;
+			}
+			break;
+		case 8:
+			slot->phase = 0;
+			break;
+	}
+
+	i = 0;
+	x = 0;
+	reel = BattleBreakSlotReelGetPtr(0);
+	for (; i < 3; i++, reel++, x += 128) {
+		switch (reel->state) {
+			case 0:
+				reel->flags &= ~1;
+				reel->alpha = 255;
+				break;
+			case 1:
+				if (i != 2) {
+					reel->flags |= 1;
+				}
+				reel->counter++;
+				if (reel->counter <= 5) {
+					y = intplGetValue(0, reel->counter, 5, 110.0f, 142.0f);
+					reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+					reel->scale = (Vec){0.8f, 0.8f, 0.8f};
+					reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+					reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
+					reel->alpha = 255;
+				} else {
+					y = intplGetValue(4, reel->counter - 5, 20, 142.0f, 174.0f);
+					reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+					reel->scale = (Vec){0.8f, 0.8f, 0.8f};
+					reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+					reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
+					reel->alpha = 255;
+				}
+				if (reel->counter >= 25) {
+					reel->state = 2;
+					reel->index++;
+					if (reel->index >= reel->numCards) {
+						reel->index -= reel->numCards;
+					}
+					reel->item = reel->cards[reel->index];
+					reel->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
+				}
+				break;
+			case 2:
+				reel->pos = (Vec){42.0f * i + 226.0f, 142.0f, 0.0f};
+				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (reel->flags & 2) {
+					reel->flags &= ~2;
+					reel->state = 3;
+					reel->counter = 0;
+				}
+				break;
+			case 3:
+				y = intplGetValue(0, reel->counter, 20, 142.0f, 174.0f);
+				reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				reel->counter++;
+				if (reel->counter > 20) {
+					reel->state = 0;
+					reel->counter = 0;
+					reel->flags &= ~1;
+				}
+				break;
+			case 4:
+				y = intplGetValue(0, reel->counter, 20, 142.0f, 174.0f);
+				reel->pos = (Vec){42.0f * i + 226.0f, y, 0.0f};
+				reel->scale = (Vec){0.8f, 0.8f, 0.8f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				reel->counter++;
+				if (reel->counter > 20) {
+					reel->state = 5;
+					reel->pos = (Vec){x - 128, -128.0f, 0.0f};
+					reel->counter = 0;
+				}
+				break;
+			case 5:
+				reel->flags |= 1;
+				y = intplGetValue(0, reel->counter, 40, -128.0f, 0.0f);
+				reel->pos = (Vec){x - 128, y, 0.0f};
+				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				reel->counter++;
+				if (reel->counter > 40) {
+					if (reel->kind == 2) {
+						reel->state = 6;
+						reel->counter = 0;
+					} else {
+						reel->state = 10;
+						reel->counter = 0;
+					}
+				}
+				break;
+			case 6:
+				break;
+			case 7:
+				reel->field_50 = intplGetValue(0, reel->counter, 20, 0.0f, 22.5f);
+				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
+				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				reel->pivot = (Vec){0.0f, 0.0f, 0.0f};
+				if (reel->pos.y >= 128.0f) {
+					reel->pos.y -= 128.0f;
+					reel->index++;
+					if (reel->index >= reel->numCards) {
+						reel->index = 0;
+					}
+					reel->item = reel->cards[reel->index];
+				}
+				reel->counter++;
+				if (reel->counter > 20) {
+					reel->state = 8;
+					reel->counter = 0;
+				}
+				break;
+			case 8:
+				reel->field_50 = 22.5f;
+				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
+				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (reel->pos.y >= 128.0f) {
+					reel->pos.y -= 128.0f;
+					reel->index++;
+					if (reel->index >= reel->numCards) {
+						reel->index = 0;
+					}
+					reel->item = reel->cards[reel->index];
+				}
+				break;
+			case 9:
+				reel->field_50 += reel->field_54;
+				if (reel->field_50 < 20.0f) {
+					reel->field_50 = 20.0f;
+				}
+				reel->pos = (Vec){128.0f * i + -128.0f, reel->pos.y + reel->field_50, 0.0f};
+				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				if (reel->field_50 >= 0.0f && reel->pos.y >= 128.0f) {
+					reel->pos.y -= 128.0f;
+					reel->index++;
+					if (reel->index == reel->numCards) {
+						reel->index = 0;
+					}
+					reel->item = reel->cards[reel->index];
+					if ((aud->flags & 0x4000) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
+					    BattleBreakSlotReelGetPtr(1)->item == 4 && reel->item == 4) {
+						break;
+					}
+					if ((slot->flags & 2) && BattleBreakSlotReelGetPtr(0)->item == 4 &&
+					    BattleBreakSlotReelGetPtr(1)->item == 4 && reel->item == 4) {
+						break;
+					}
+					if ((slot->flags & 1) && reel->item != 3) {
+						break;
+					}
+					if ((slot->flags & 4) && reel->item != 3) {
+						break;
+					}
+					if ((*(u32*)(wp2 - 0x6F98) & 0x80000) && reel->item != *(s32*)(wp2 - 0x6F84)) {
+						break;
+					}
+					reel->pos.y = 0.0f;
+					reel->state = 10;
+					reel->counter = 0;
+					reel->field_54 = reel->field_50;
+				}
+				break;
+			case 10:
+				if (i == 2) {
+					reel->counter++;
+					reel->field_50 = intplGetValue(0, reel->counter, 20, reel->field_50, 0.0f);
+					reel->pos.y = reel->field_50 * (f32)sin(3.141592f * (2.0f * reel->counter) * 0.125f);
+				}
+				break;
+			case 11:
+				reel->field_50 = 0.0f;
+				reel->pos.y = 0.0f;
+				y = intplGetValue(0, reel->counter, 60, 1.0f, 2.0f);
+				reel->scale = (Vec){y, y, 1.0f};
+				reel->alpha = intplGetValue(0, reel->counter, 60, 255.0f, 0.0f);
+				reel->counter++;
+				if (reel->counter > 60) {
+					reel->state = 13;
+					reel->flags &= ~1;
+				}
+				break;
+			case 12:
+				reel->field_50 = 0.0f;
+				reel->pos.y = 0.0f;
+				y = intplGetValue(0, reel->counter, 40, 0.0f, 128.0f);
+				reel->pos = (Vec){128.0f * i + -128.0f, y, 0.0f};
+				reel->scale = (Vec){1.0f, 1.0f, 1.0f};
+				reel->rot = (Vec){0.0f, 0.0f, 0.0f};
+				reel->counter++;
+				if (reel->counter > 40) {
+					reel->state = 13;
+					reel->flags &= ~1;
+				}
+				break;
+			case 13:
+				reel->state = 0;
+				break;
+		}
+	}
+}
+
+void BattleBreakSlot_Disp(void) {
+	dispEntry(CAMERA_2D, 490.0f, 0, BattleBreakSlotDispReel, NULL);
+}
+
+static inline GXColor slotColor(u8 a) {
+	GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+	c.a = a;
+	return c;
+}
+
+void BattleBreakSlotDispReel(CameraId camId, void* param) {
+	Mtx trans;
+	Mtx scale;
+	Mtx pivot;
+	Mtx negPivot;
+	Mtx rot;
+	Mtx rx;
+	Mtx ry;
+	Mtx rz;
+	Mtx m;
+	s32 j;
+	s32 idx;
+	u16 next;
+	BreakSlotReel* reel;
+	u16* tex;
+	s32 i;
+
+	i = 0;
+	reel = BattleBreakSlotReelGetPtr(0);
+	for (; i < 3; i++, reel++) {
+		if ((reel->flags & 1) && reel->state >= 1 && reel->state <= 4) {
+			PSMTXTrans(trans, 42.0f * i + 226.0f, 122.0f, 0.0f);
+			iconDispGxCol(trans, 0x10, 0x1D4, (GXColor){0xFF, 0xFF, 0xFF, 0xD0});
+		}
+	}
+
+	reel = BattleBreakSlotReelGetPtr(0);
+	if (reel->state >= 1 && reel->state <= 4) {
+		GXSetScissor(0, 0x52, 0x260, 0x20);
+		tex = tex_id_list_small;
+	} else {
+		tex = tex_id_list_big;
+		if (reel->state != 11) {
+			GXSetScissor(0, 0xB0, 0x260, 0x80);
+		}
+	}
+
+	j = 0;
+	reel = BattleBreakSlotReelGetPtr(0);
+	for (; j < 3; j++, reel++) {
+		if (!(reel->flags & 1)) {
+			continue;
+		}
+		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+		GXSetZCompLoc(GX_TRUE);
+		GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+		PSMTXTrans(trans, reel->pos.x, reel->pos.y, reel->pos.z);
+		PSMTXScale(scale, reel->scale.x, reel->scale.y, reel->scale.z);
+		PSMTXRotRad(rx, 'x', 0.017453292f * reel->rot.x);
+		PSMTXRotRad(ry, 'y', 0.017453292f * reel->rot.y);
+		PSMTXRotRad(rz, 'z', 0.017453292f * reel->rot.z);
+		PSMTXConcat(rx, rz, rot);
+		PSMTXConcat(ry, rot, rot);
+		PSMTXTrans(pivot, reel->pivot.x, reel->pivot.y, reel->pivot.z);
+		PSMTXTrans(negPivot, -reel->pivot.x, -reel->pivot.y, -reel->pivot.z);
+		PSMTXConcat(rot, pivot, m);
+		PSMTXConcat(negPivot, m, m);
+		PSMTXConcat(scale, m, m);
+		PSMTXConcat(trans, m, m);
+		((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, tex[reel->item], slotColor(reel->alpha), 0);
+		if (reel->state <= 10 && reel->state != 3 && reel->state != 4) {
+			idx = reel->index + 1;
+			if (idx >= reel->numCards) {
+				idx = 0;
+			}
+			next = tex[reel->cards[idx]];
+			if (reel->state >= 1 && reel->state <= 4) {
+				PSMTXTrans(trans, 0.0f, -32.0f, 0.0f);
+			} else {
+				PSMTXTrans(trans, 0.0f, -128.0f, 0.0f);
+			}
+			PSMTXConcat(trans, m, m);
+			((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, next, slotColor(reel->alpha), 0);
+		}
+	}
+	GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);
 }
 
 void BattleBreakSlot_End(void) {
 	//stubbed in retail
 }
+
+void BattleBreakSlot_PointInc(void) {
+	u8* wp = (u8*)_battleWorkPointer + 0x20000;
+	BreakSlotReel* reel;
+	BreakSlotReel* reel2;
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+
+	if (*(u16*)((u8*)pouchGetPtr() + 0x8C) == 0) {
+		return;
+	}
+	reel = BattleBreakSlotReelGetPtr(slot->reelNo);
+	reel->state = 1;
+	reel->counter = 0;
+	slot->reelNo++;
+	if (slot->reelNo > 3) {
+		slot->reelNo = 3;
+		return;
+	}
+	switch (reel->kind) {
+		case 0:
+			reel->index = irand(reel->numCards) - 1;
+			if (reel->index == -1) {
+				reel->index = reel->numCards - 1;
+			}
+			reel->item = reel->cards[reel->index];
+			if (*(u32*)(wp - 0x6F98) & 0x80000) {
+				item_appear_force(reel, *(s32*)(wp - 0x6F84));
+			}
+			if (slot->flags & 1) {
+				item_appear_force(reel, 3);
+			}
+			if (slot->flags & 4) {
+				item_appear_force(reel, 3);
+			}
+			break;
+		case 1:
+			reel->index = irand(reel->numCards) - 1;
+			if (reel->index == -1) {
+				reel->index = reel->numCards - 1;
+			}
+			reel->item = reel->cards[reel->index];
+			if (*(u32*)(wp - 0x6F98) & 0x80000) {
+				item_appear_force(reel, *(s32*)(wp - 0x6F84));
+			}
+			if (slot->flags & 1) {
+				item_appear_force(reel, 3);
+			}
+			if (slot->flags & 4) {
+				item_appear_force(reel, 3);
+			}
+			break;
+		case 2:
+			do {
+				reel2 = BattleBreakSlotReelGetPtr(1);
+				reel->index = irand(reel->numCards);
+				reel->item = reel->cards[reel->index];
+			} while (reel->item == reel2->item);
+			break;
+	}
+}
+
+#pragma dont_inline on
+void BattleBreakSlot_Start(void) {
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+	BreakSlotReel* reel;
+	s32 i;
+
+	if (slot->reelNo >= 3) {
+		slot->reelNo = 0;
+		slot->phase = 2;
+		reel = BattleBreakSlotReelGetPtr(0);
+		for (i = 0; i < 3; i++, reel++) {
+			reel->state = 4;
+			reel->counter = 0;
+		}
+	}
+}
+#pragma dont_inline reset
+
+BOOL BattleBreakSlot_CheckReaction(void) {
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+
+	BattleBreakSlot_Start();
+	if (slot->phase >= 1 && slot->phase <= 8) {
+		return TRUE;
+	}
+	if (slot->evt && evtCheckID(slot->evt->eventId)) {
+		return TRUE;
+	}
+	btl_camera_set_mode(0, 0);
+	btl_camera_set_moveSpeedLv(0, 2);
+	BattleAudienceNumToTarget();
+	slot->evt = NULL;
+	return FALSE;
+}
+
+s32 BattleBreakSlot_GetBreakTurn(void) {
+	return BattleBreakSlotGetPtr()->breakTurn;
+}
+
+void BattleBreakSlot_DecBreakTurn(void) {
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+
+	slot->breakTurn--;
+	if (slot->breakTurn < 0) {
+		slot->breakTurn = 0;
+	}
+}
+
+void BattleBreakSlot_HideReel(void) {
+	BreakSlotWork* slot = BattleBreakSlotGetPtr();
+	BreakSlotReel* reel = BattleBreakSlotReelGetPtr(0);
+	s32 i;
+
+	for (i = 0; i < 3; i++, reel++) {
+		reel->flags |= 2;
+	}
+	slot->reelNo = 0;
+}
+
+#pragma dont_inline on
+void item_appear_force(BreakSlotReel* reel, s32 item) {
+	s32 i;
+
+	for (i = 0; i < reel->numCards; i++) {
+		if (item == reel->cards[i]) {
+			reel->index = i - 1;
+		}
+		if (reel->index == -1) {
+			reel->index = reel->numCards - 1;
+		}
+	}
+}
+#pragma dont_inline reset

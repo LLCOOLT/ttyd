@@ -39,6 +39,12 @@ static effN64Vtx kmr_a_1_v[] = {
 };
 
 void effKemuri5Main(EffectEntry* effect);
+static inline GXColor mkc(u8 a) {
+    GXColor c = {0x70, 0x60, 0x18, 0};
+    c.a = a;
+    return c;
+}
+
 void effKemuri5Disp(CameraId cameraId, EffectEntry* effect);
 
 #pragma opt_propagation off
@@ -124,8 +130,8 @@ void effKemuri5Main(EffectEntry* effect) {
         }
         anyActive = 1;
         work->angle = reviseAngle(12.0f + work->angle);
-        work->scale.x = 0.1f * (f32)sin(6.2831855f * work->angle / 360.0f) + work->baseScaleX;
-        work->scale.y = 0.1f * (f32)cos(6.2831855f * work->angle / 360.0f) + work->baseScaleY;
+        { f32 sv = (f32)sin(6.2831855f * work->angle / 360.0f); work->scale.x = 0.1f * sv + work->baseScaleX; }
+        { f32 cv = (f32)cos(6.2831855f * work->angle / 360.0f); work->scale.y = 0.1f * cv + work->baseScaleY; }
         work->speed *= 0.83f;
         work->position.x = work->speed * work->dirX + work->position.x;
         work->position.z = work->speed * work->dirZ + work->position.z;
@@ -135,7 +141,7 @@ void effKemuri5Main(EffectEntry* effect) {
         work->baseScaleX += 0.006f * (7.5f - work->baseScaleX);
         work->baseScaleY *= 0.98f;
         if (work->timer < 10) {
-            work->baseScaleY = work->baseScaleY * 0.9f;
+            work->baseScaleY *= 0.9f;
         }
         if (work->timer < 15) {
             work->alpha -= 16;
@@ -156,8 +162,8 @@ void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
     EffKemuri5N64Work* work = effect->userdata;
     s32 i;
     Mtx mtx;
-    Mtx rot;
     Mtx scaleMtx;
+    Mtx rot;
     GXTexObj texObj;
     GXColor color;
 
@@ -180,9 +186,7 @@ void effKemuri5Disp(CameraId cameraId, EffectEntry* effect) {
         if (work->active == 0) {
             continue;
         }
-        color = (GXColor){0x70, 0x60, 0x18, 0};
-        color.a = work->alpha;
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, mkc(work->alpha));
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
         PSMTXConcat(mtx, rot, mtx);

@@ -11,11 +11,38 @@ typedef struct WindowWork {
     u32 buttonRep;              // 0x8
     u32 dirTrg;                 // 0xC
     u32 dirRep;                 // 0x10
-    u8 field_0x14[0x20 - 0x14]; // 0x14
+    union {
+        u8 field_0x14[0x20 - 0x14]; // 0x14 (old name, used by bom_01.c / muj_20.c)
+        struct {
+            s32 lectureStep;            // 0x14
+            EventEntry* lectureEvent;   // 0x18
+            union {
+                u8 field_0x1C[0x20 - 0x1C]; // 0x1C
+                s32 menuSel;                // 0x1C
+            };
+        };
+    };
     s32 menuState;              // 0x20, TODO: rename?
-    u8 field_0x24[0x3C - 0x24]; // 0x24
+    union {
+        u8 field_0x24[0x3C - 0x24]; // 0x24 (old name)
+        struct {
+            s32 field_0x24_s32;     // 0x24
+            void* res;              // 0x28, FileEntry*
+        };
+    };
     EventEntry* currentEvent;   // 0x3C
-    u8 field_40[0x1210 - 0x40]; // 0x40
+    union {
+        u8 field_40[0x1210 - 0x40]; // 0x40 (old name)
+        struct {
+            u8 field_0x40_pad[0x1BC - 0x40]; // 0x40
+            s32 partyIds[8];                 // 0x1BC
+            s32 partySel;                    // 0x1DC
+            u8 field_0x1E0[0x2D4 - 0x1E0];   // 0x1E0
+            s32 itemId;                      // 0x2D4
+            s32 itemIdx;                     // 0x2D8
+            s32 itemTarget;                  // 0x2DC
+        };
+    };
 } WindowWork;
 
 typedef struct WindowPartyDt {

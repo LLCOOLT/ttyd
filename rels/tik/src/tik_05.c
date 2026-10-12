@@ -2792,3 +2792,7 @@ EVT_BEGIN(tik_05_init_evt)
     RETURN
 EVT_END()
 
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_000116AC_data[1] = {0};
+#pragma force_active reset

@@ -78,3 +78,9 @@ rustc-ice-*.txt
 
 # Personal coordination notes for the agent sessions (kept on disk, not in the repo)
 /docs/COORDINATION.md
+
+# Scratch space and temporaries from assembly scripts and workers
+/scratch/
+*.tmp
+*.bak
+*~

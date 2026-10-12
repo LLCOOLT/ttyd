@@ -26,6 +26,7 @@ typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
 typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; u8 field_0xc[8]; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; EventEntry* escapeEvt; u8 field_0x48[4]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angleToMario; f32 distToMario; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
+static s32 gap_bss_04;
 static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -532,7 +533,11 @@ static f32 randf(f32 min, f32 max) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+static const Vec tv0 = {0.0f, 0.0f, 10.0f};
+static const Vec tv1 = {0.0f, 0.0f, 10.0f};
+static const Vec tv2 = {0.0f, 0.0f, 10.0f};
 static void ext_moamoa_init(void) {
+    s32 j;
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -540,20 +545,12 @@ static void ext_moamoa_init(void) {
     f32 dist;
     f32 hitX, hitY, hitZ, hitDist, nx, ny, nz;
 
+
     wp = _mapAlloc(sizeof(MoamoaWork));
     memset(wp, 0, sizeof(MoamoaWork));
-    {
-        static const Vec tv0 = {0.0f, 0.0f, 10.0f};
-        wp->target[0] = tv0;
-    }
-    {
-        static const Vec tv1 = {0.0f, 0.0f, 10.0f};
-        wp->target[1] = tv1;
-    }
-    {
-        static const Vec tv2 = {0.0f, 0.0f, 10.0f};
-        wp->target[2] = tv2;
-    }
+    wp->target[0] = tv0;
+    wp->target[1] = tv1;
+    wp->target[2] = tv2;
     wp->count = extGetPoseNum();
     wp->moa = _mapAlloc(wp->count * sizeof(Moamoa));
     memset(wp->moa, 0, wp->count * sizeof(Moamoa));
@@ -571,14 +568,14 @@ static void ext_moamoa_init(void) {
         PSMTXIdentity(pose->mtx);
         pose->mtx[0][3] = wp->target[0].x + dist * moa_sin(angle);
         pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = wp->target[0].z - dist * moa_cos(angle);
+        pose->mtx[0][3] = wp->target[0].z - dist * moa_cos(angle);
         hitX = hitY = hitZ = 0.0f;
         hitDist = 1000000.0f;
         if (hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &nx, &ny, &nz, pose->mtx[0][3], 100.0f + pose->mtx[1][3], pose->mtx[2][3], 0.0f, -1.0f, 0.0f)) {
             pose->mtx[1][3] = hitY;
         }
     }
-    for (i = 0; i < 600; i++) {
+    for (j = 0; j < 600; j++) {
         ext_moamoa_main();
     }
 }

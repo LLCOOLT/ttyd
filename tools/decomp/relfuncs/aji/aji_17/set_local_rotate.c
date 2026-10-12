@@ -3,10 +3,10 @@
 // decl: DanceData dance_dt;
 // proto: USER_FUNC(set_local_rotate);
 USER_FUNC(set_local_rotate) {
-    f64 rot = evtGetFloat(event, event->args[0]);
-    f32 r = rot;
+    f32 r;
 
-    dance_dt.rot = rot;
+    dance_dt.rot = evtGetFloat(event, event->args[0]);
+    r = dance_dt.rot;
     if (r > 6.2831855f) {
         dance_dt.rot = r - 6.2831855f;
     }

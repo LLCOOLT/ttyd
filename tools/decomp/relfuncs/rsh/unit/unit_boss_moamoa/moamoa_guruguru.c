@@ -19,9 +19,9 @@
 // decl: int rand(void);
 // proto: USER_FUNC(moamoa_guruguru);
 USER_FUNC(moamoa_guruguru) {
-    ExtPose* pose;
-    Moamoa* elem;
     s32 i;
+    Moamoa* elem;
+    ExtPose* pose;
     f32 cnt;
     f32 ang;
     Vec v;

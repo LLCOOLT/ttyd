@@ -720,7 +720,7 @@ void loadMain(SequenceWork* seq) {
     }
     wp->x += (wp->tx - wp->x) / 4.0f;
     wp->y += (wp->ty - wp->y) / 4.0f;
-    wp->x += __fabsf(2.0f * (f32)sin(gp->retraceCount / 8.0f));
+    { f32 s = 2.0f * (f32)sin(gp->retraceCount / 8.0f); wp->x += __fabsf(s); }
     dispEntry(CAMERA_3D, 1000.0f, 0, loadDraw, NULL);
 }
 
@@ -773,6 +773,7 @@ void loadDraw(CameraId camera, void* param) {
     f32 proj[7];
     CameraEntry saved;
     WinDt* win;
+    WinDt* win1;
     s32 i;
     s32 j;
     char buf[0x20];
@@ -782,6 +783,7 @@ void loadDraw(CameraId camera, void* param) {
     f32 x;
     f32 y;
     f32 w;
+    f32* py;
 
     if (wp->unk18 >= 0x20 && wp->unk18 < 0x28) {
         return;
@@ -813,7 +815,8 @@ void loadDraw(CameraId camera, void* param) {
     loadDrawBg(0x34, -272.0f, 240.0f, 272.0f, -240.0f);
     loadDrawBg(0x36, 272.0f, 240.0f, 304.0f, -240.0f);
 
-    for (i = 0, win = win_dt; i < 9; i++, win++) {
+    win = win_dt;
+    for (i = 0, win1 = win; i < 9; i++, win1++) {
         GXColor col = gray;
         if (i == wp->slot) {
             col = white;
@@ -827,39 +830,21 @@ void loadDraw(CameraId camera, void* param) {
         if (i == 5 && (wp->flags & 0x20)) {
             col = dark;
         }
-        switch (win->unk10) {
+        switch (win1->unk10) {
             case 10:
             case 11:
             case 12:
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.x = win->x;
-                    t.y = win->y;
-                    winTexSet(0xe, t, sc, col);
-                }
+                winTexSet(0xe, (Vec){win1->x, win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 winTexInit(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.x = win->x;
-                    t.y = 60.0f + win->y;
-                    winTexSet(win->unk10, t, sc, col);
-                }
+                winTexSet(win1->unk10, (Vec){win1->x, 60.0f + win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.x = win->x;
-                    t.y = win->y;
-                    winTexSet_x2(win->unk10, win->unk14, t, sc, col);
-                }
+                winTexSet_x2(win1->unk10, win1->unk14, (Vec){win1->x, win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
         }
@@ -872,7 +857,7 @@ void loadDraw(CameraId camera, void* param) {
         FontDrawMessage(-FontGetMessageWidth(msg) / 2, 192, msg);
     }
 
-    for (i = 0, win = win_dt; i < 4; i++, win++) {
+    for (i = 0; i < 4; i++, win++) {
         CardSaveSlot* save = &cardGetFilePtr()->saves[i];
         u16 flags = save->data.flags;
         char* name = (char*)save->data.global.field_0x11BC;
@@ -935,13 +920,15 @@ void loadDraw(CameraId camera, void* param) {
             FontDrawString(win->x - w, win->y, buf2);
             strcpy(buf2, "\x83\x76\x83\x8c\x83\x43\x82\xb6\x82\xa9\x82\xf1\x81\x40");
             strcat(buf2, unk_8016af5c(hours, 2));
-            PSMTXTrans(m, 8.0f + (FontGetMessageWidth(buf2) + (win->x - w)), 1.0f + (win->y - 22.0f), 0.0f);
+            x = FontGetMessageWidth(buf2);
+            PSMTXTrans(m, 8.0f + (x + (win->x - w)), 1.0f + (win->y - 22.0f), 0.0f);
             PSMTXScale(s, 1.5f, 1.5f, 1.5f);
             PSMTXConcat(m, s, m);
             iconDispGxCol(m, 0, 0x201, (GXColor){0, 0, 0, 255});
+            py = &win->y;
             for (j = 0; j < 7; j++) {
                 if (stars & (1 << (j + 1))) {
-                    PSMTXTrans(m, (win->x - 106.0f) + j * 32, win->y - 52.0f, 0.0f);
+                    PSMTXTrans(m, (win->x - 106.0f) + j * 32, *py - 52.0f, 0.0f);
                     iconDispGxCol(m, 0, (u16)stone_id[j], i == wp->slot ? white : gray);
                 }
             }
@@ -963,82 +950,36 @@ void loadDraw(CameraId camera, void* param) {
 
     if (wp->unk18 >= 100 && wp->unk18 < 200) {
         winTexInit(*wp->file->data);
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            winTexSet(0xf, t, sc, (GXColor){255, 255, 255, 255});
-        }
+        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        {
-            Vec t = {0.0f, 100.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            winTexSet_x2(0x13, 0x1f, t, sc, (GXColor){255, 255, 255, 255});
-        }
+        winTexSet_x2(0x13, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         for (j = 0; j < 3; j++) {
             if (j == wp->unk24) {
                 winTexInit(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 50 - j * 50;
-                    winTexSet(0x33, t, sc, (GXColor){0, 0, 0, 64});
-                }
+                winTexSet(0x33, (Vec){0.0f, 50 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                {
-                    Vec t = {-4.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 54 - j * 50;
-                    winTexSet_x2(j + 0x15, 0x33, t, sc, (GXColor){255, 255, 255, 255});
-                }
+                winTexSet_x2(j + 0x15, 0x33, (Vec){-4.0f, 54 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 50 - j * 50;
-                    winTexSet_x2(j + 0x15, 0x33, t, sc, (GXColor){255, 255, 255, 255});
-                }
+                winTexSet_x2(j + 0x15, 0x33, (Vec){0.0f, 50 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             }
         }
     }
 
     if (wp->unk18 >= 200 && wp->unk18 < 300) {
         winTexInit(*wp->file->data);
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            winTexSet(0xf, t, sc, (GXColor){255, 255, 255, 255});
-        }
+        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        {
-            Vec t = {0.0f, 100.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            winTexSet_x2(0x14, 0x1f, t, sc, (GXColor){255, 255, 255, 255});
-        }
+        winTexSet_x2(0x14, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         for (j = 0; j < 2; j++) {
             if (j == wp->unk28) {
                 winTexInit(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 30 - j * 50;
-                    winTexSet(0x33, t, sc, (GXColor){0, 0, 0, 64});
-                }
+                winTexSet(0x33, (Vec){0.0f, 30 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                {
-                    Vec t = {-4.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 34 - j * 50;
-                    winTexSet_x2(j + 0x18, 0x33, t, sc, (GXColor){255, 255, 255, 255});
-                }
+                winTexSet_x2(j + 0x18, 0x33, (Vec){-4.0f, 34 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                {
-                    Vec t = {0.0f, 0.0f, 0.0f};
-                    Vec sc = {1.0f, 1.0f, 1.0f};
-                    t.y = 30 - j * 50;
-                    winTexSet_x2(j + 0x18, 0x33, t, sc, (GXColor){255, 255, 255, 255});
-                }
+                winTexSet_x2(j + 0x18, 0x33, (Vec){0.0f, 30 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             }
         }
     }
@@ -1050,55 +991,33 @@ void loadDraw(CameraId camera, void* param) {
             {0.0f, -45.0f, 0.0f, -90.0f},
             {45.0f, 0.0f, 90.0f, 0.0f},
         };
+        f32 cx;
+        f32 cy;
         if (!(f32)fmod(angle[wp->unk30][wp->unk34], 90.0)) {
             f32 r0 = wp->unk30 / 2;
             f32 r1 = wp->unk34 / 2;
             f32 c0 = wp->unk30 % 2;
             if (r0 == r1) {
-                x = 0.0f;
-                y = 120.0f - 140.0f * r0;
+                cx = 0.0f;
+                cy = 120.0f - 140.0f * r0;
             } else {
-                x = -150.0f + 300.0f * c0;
-                y = 50.0f;
+                cx = -150.0f + 300.0f * c0;
+                cy = 50.0f;
             }
         } else {
-            x = 0.0f;
-            y = 50.0f;
+            cx = 0.0f;
+            cy = 50.0f;
         }
-        y -= 40.0f;
+        cy -= 40.0f;
         winTexInit(*wp->file->data);
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            t.x = 2.0f + x;
-            t.y = y - 2.0f;
-            winTexSetRot(0x1d, t, sc, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
-        }
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            t.x = x;
-            t.y = y;
-            winTexSetRot(0x1d, t, sc, white, angle[wp->unk30][wp->unk34]);
-        }
+        winTexSetRot(0x1d, (Vec){2.0f + cx, cy - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
+        winTexSetRot(0x1d, (Vec){cx, cy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, angle[wp->unk30][wp->unk34]);
     }
 
     if (!(wp->flags & 0x40)) {
         winTexInit(*wp->file->data);
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            t.x = 2.0f + wp->x;
-            t.y = wp->y - 2.0f;
-            winTexSet(0, t, sc, (GXColor){0, 0, 0, 128});
-        }
-        {
-            Vec t = {0.0f, 0.0f, 0.0f};
-            Vec sc = {1.0f, 1.0f, 1.0f};
-            t.x = wp->x;
-            t.y = wp->y;
-            winTexSet(0, t, sc, white);
-        }
+        winTexSet(0, (Vec){2.0f + wp->x, wp->y - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128});
+        winTexSet(0, (Vec){wp->x, wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
 
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);

@@ -186,6 +186,7 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     RecoveryWork* work;
     s32 i;
+    RecoveryWork* pp;
     s32 size;
     f32 ang;
     f32 zero;
@@ -230,8 +231,8 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     work->alpha = 255;
     work->baseY = -30.0f;
     {
-    Vec pos = { 0.0f, 0.0f, 0.0f };
     Vec sfxPos;
+    Vec pos = { 0.0f, 0.0f, 0.0f };
     pos.x = work->position.x;
     pos.y = work->position.y;
     pos.z = work->position.z;
@@ -273,8 +274,9 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     }
     zero = 0.0f;
     delay = 8;
-    work++;
-    for (i = 1; i < effect->count; i++, work++, delay += 8) {
+    pp = work + 1;
+    for (i = 1; i < effect->count; i++, pp++, delay += 8) {
+        work = pp;
         work->position.x = zero;
         switch (type) {
         case 4:
@@ -339,7 +341,7 @@ void effRecoveryMain(EffectEntry* effect) {
         n = 1;
     }
     while (n-- != 0) {
-        work = effect->userdata;
+        p = work = effect->userdata;
         amount = work->amount;
         x = work->position.x;
         y = work->position.y;
@@ -351,7 +353,7 @@ void effRecoveryMain(EffectEntry* effect) {
         if (work->timer > 10) {
             go = 1;
         }
-        p = work + 1;
+        p++;
         for (i = 1; i < effect->count; i++, p++) {
             switch (p->state) {
             case 0:
@@ -387,8 +389,7 @@ void effRecoveryMain(EffectEntry* effect) {
                 break;
             case 3:
                 if (p->timer < 40) {
-                    p->timer++;
-                    a = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 360.0f, 11, p->timer, 40);
+                    a = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 360.0f, 11, ++p->timer, 40);
                     d = distABf(0.0f, 0.0f, p->position.x, p->position.z) * 0.99f;
                     a = 6.2831855f * (90.0f + (a + 360.0f * (f32)(i - 2) / (f32)amount)) / 360.0f;
                     p->position.x = d * (f32)sin(a);
@@ -424,9 +425,10 @@ void effRecoveryMain(EffectEntry* effect) {
             if (done >= amount) {
                 work = effect->userdata;
                 if (type != 7 && type != 8) {
-                    Vec pos = { 0.0f, 0.0f, 0.0f };
                     Vec sfxPos;
                     effStardustEntry(2, x, y - 20.0f, z, 30.0f, 30.0f, 2, 30);
+                    {
+                    Vec pos = { 0.0f, 0.0f, 0.0f };
                     pos.x = work->position.x;
                     pos.y = work->position.y;
                     pos.z = work->position.z;
@@ -456,6 +458,7 @@ void effRecoveryMain(EffectEntry* effect) {
                     case 5:
                         psndSFXOn_3D("SFX_FP_RECOVER_SHINE3", &sfxPos);
                         break;
+                    }
                     }
                 }
                 effDeleteMayaAnim(work->anim);

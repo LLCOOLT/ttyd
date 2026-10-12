@@ -1,13 +1,177 @@
 #include "mario/mario_sbr.h"
 #include "mario/mario.h"
+#include "mario/mariost.h"
+#include "mario/mario_motion.h"
+#include "mario/mario_party.h"
+#include "driver/hitdrv.h"
+#include "driver/seqdrv.h"
+#include "party.h"
+#include "system.h"
+#include <string.h>
 
-// new in retail
-void marioSetBottomlessResetPosition(f32 x, f32 y, f32 z) {
+#define MW(m, off, T) (*(T*)((u8*)(m) + (off)))
+#define REVISE360(a) while ((a) < 0.0f) { (a) += 360.0f; } while ((a) >= 360.0f) { (a) -= 360.0f; }
+
+typedef struct RubWork {
+    s32 unk0;       // 0x0
+    s32 count;      // 0x4
+    s32 num;        // 0x8
+    s32 idx;        // 0xC
+    s32 dir;        // 0x10
+    s32 start;      // 0x14
+    s32 unk18;      // 0x18
+    s32 unk1C;      // 0x1C
+    s32 revDir;     // 0x20
+    s32 idleTimer;  // 0x24
+    u8 unk28[0x3C - 0x28]; // 0x28
+    s16 hist[21];   // 0x3C
+} RubWork;
+
+extern GlobalWork* gp;
+extern u8 DemoPad[];
+extern s32 kpaGetStageViewType(void);
+extern s32 yoshiGetStatus(void);
+extern BOOL marioGetMotSlitCancel3(void);
+extern f32 marioGetDashSpd(void);
+extern f32 marioGetWalkSpd(void);
+extern double cos(double);
+
+void marioGetRubInit(void);
+void marioGetStick(f32* dir, f32* mag);
+f32 toMovedirSimple(f32 angle);
+
+RubWork rubwork;
+
+void marioBottomless(void) {
+    MarioWork* mp = marioGetPtr();
+    PartyEntry* party;
+
+    if (mp->position.y > -2000.0f) {
+        return;
+    }
+    if (marioBgmodeChk() == TRUE) {
+        marioChgMot(MARIO_MOTION_BOTTOMLESS);
+    } else if (MW(mp, 0x2C8, u32)) {
+        seqSetSeq(SEQ_MAP_CHANGE, gp->currentMapName, gp->beroEnterName);
+    } else {
+        mp->position = mp->bottomlessResetPosition;
+        party = partyGetPtr(marioGetPartyId());
+        if (party) {
+            party->position = mp->position;
+        }
+        party = partyGetPtr(marioGetExtraPartyId());
+        if (party) {
+            party->position = mp->position;
+        }
+        if (marioBgmodeChk() == TRUE) {
+            mp->position.z = -450.0f;
+        }
+        marioChgMot(MARIO_MOTION_FORCE_RESET);
+    }
+}
+
+void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z) {
     MarioWork* wp = marioGetPtr();
     Vec position;
 
     position = (Vec){ x, y + 37.0f, z };
     wp->bottomlessResetPosition = position;
+}
+
+void N_marioSetBottomlessRespawnPos(f32 x, f32 y, f32 z) {
+    MarioWork* wp = marioGetPtr();
+    Vec position;
+
+    position = (Vec){ x, y, z };
+    wp->bottomlessResetPosition = position;
+}
+
+void N_marioReloadMapOnBottomlessOn(void) {
+    MarioWork* mp = marioGetPtr();
+    MW(mp, 0x2C8, s32) = 1;
+}
+
+void N_marioReloadMapOnBottomlessOff(void) {
+    MarioWork* mp = marioGetPtr();
+    MW(mp, 0x2C8, s32) = 0;
+}
+
+BOOL marioSetDirEventMain(void) {
+    MarioWork* mp = marioGetPtr();
+    s32 frames;
+    f32 target;
+
+    if (!(mp->dispFlags & 0x8000)) {
+        return TRUE;
+    }
+    frames = sysMsec2Frame(MW(mp, 0x298, s32));
+    if (frames > 0) {
+        target = revise360(270.0f - MW(mp, 0x294, f32));
+        target = (target - MW(mp, 0x290, f32)) * ((f32)MW(mp, 0x29C, s32) / (f32)frames);
+        mp->unk1A8 = revise360(MW(mp, 0x290, f32) + target);
+        mp->unk1AC = mp->unk1A8;
+        mp->directionView = toMovedirSimple(mp->unk1A8);
+        mp->unk19C = mp->directionView;
+        if (++MW(mp, 0x29C, s32) > frames) {
+            mp->dispFlags &= ~0x8000;
+            return TRUE;
+        }
+        return FALSE;
+    } else {
+        mp->unk1A8 = revise360(270.0f - MW(mp, 0x294, f32));
+        mp->unk1AC = mp->unk1A8;
+        mp->directionView = toMovedirSimple(mp->unk1A8);
+        mp->unk19C = mp->directionView;
+        mp->dispFlags &= ~0x8000;
+        return TRUE;
+    }
+}
+
+f32 marioGetMoveRate(f32 dir) {
+    f32 c = cos(3.1415927f * (dir - marioGetPtr()->targetYaw) / 180.0f);
+    return 1.0f + (1.19f - 1.0f) * __fabsf(c);
+}
+
+static inline void marioSetGravity(f32 g) {
+    marioGetPtr()->playerGravity = g;
+}
+
+void marioResetGravity(void) {
+    marioSetGravity(1.0f);
+}
+
+void* marioGetTouchNpcPtr(void) {
+    return MW(marioGetPtr(), 0x1D4, void*);
+}
+
+BOOL marioChkPlanePlace(HitEntry* hit) {
+    return (hitGetAttr(hit) & 0x38) != 0;
+}
+
+void marioSetPeakYpos(void) {
+    MarioWork* mp = marioGetPtr();
+    MW(mp, 0x12C, f32) = mp->position.y;
+}
+
+void marioAdjustMoveDir(void) {
+    MarioWork* mp = marioGetPtr();
+
+    if (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) {
+        mp->unk19C = toMovedir(90.0f);
+        mp->directionView = mp->unk19C;
+        mp->unk1A8 = 180.0f;
+        mp->unk1AC = 180.0f;
+    } else {
+        mp->unk19C = toMovedir(90.0f);
+        mp->directionView = mp->unk19C;
+        mp->unk1A8 = 0.0f;
+        mp->unk1AC = 0.0f;
+    }
+}
+
+f32 marioGetDispDir(void) {
+    MarioWork* mp = marioGetPtr();
+    return revise360(mp->unk1A8 - 90.0f + mp->targetYaw);
 }
 
 f32 revise360(f32 angle) {
@@ -21,5 +185,434 @@ f32 revise360(f32 angle) {
 }
 
 f32 toMovedir(f32 angle) {
-    
+    MarioWork* mp = marioGetPtr();
+
+    if (mp->flags & 0x100000) {
+        if (mp->unk1A8 == 280.0f || mp->unk1A8 == 460.0f) {
+            angle = 0.0f;
+        } else if (mp->unk1A8 == 260.0f || mp->unk1A8 == 440.0f) {
+            angle = 180.0f;
+        } else if (revise360(mp->unk1A8) >= 180.0f) {
+            angle = 0.0f;
+        } else {
+            angle = 180.0f;
+        }
+    }
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    REVISE360(angle);
+    return angle;
+}
+
+f32 partyToMovedir(PartyEntry* party, f32 angle) {
+    void* cam = MW(party, 0x160, void*);
+
+    if (MW(party, 0x0, u32) & 0x1000) {
+        if (MW(party, 0x10C, f32) == 280.0f || MW(party, 0x10C, f32) == 460.0f) {
+            angle = 0.0f;
+        } else if (MW(party, 0x10C, f32) == 260.0f || MW(party, 0x10C, f32) == 440.0f) {
+            angle = 180.0f;
+        } else if (revise360(MW(party, 0x10C, f32)) >= 180.0f) {
+            angle = 0.0f;
+        } else {
+            angle = 180.0f;
+        }
+    }
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + MW(cam, 0x198, f32)))) / 100.0f;
+    REVISE360(angle);
+    return angle;
+}
+
+f32 toMovedirSimple(f32 angle) {
+    MarioWork* mp = marioGetPtr();
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    while (angle < 0.0f) {
+        angle += 360.0f;
+    }
+    while (angle >= 360.0f) {
+        angle -= 360.0f;
+    }
+    return angle;
+}
+
+f32 toMovedir2(f32 angle, f32 ofs) {
+    MarioWork* mp = marioGetPtr();
+
+    if (mp->flags & 0x100000) {
+        if (mp->unk1A8 == 280.0f || mp->unk1A8 == 460.0f) {
+            angle = 0.0f;
+        } else if (mp->unk1A8 == 260.0f || mp->unk1A8 == 440.0f) {
+            angle = 180.0f;
+        } else if (revise360(mp->unk1A8) >= 180.0f) {
+            angle = 0.0f;
+        } else {
+            angle = 180.0f;
+        }
+    }
+    angle = (s32)(100.0f * (0.05f + (270.0f - angle + mp->targetYaw))) / 100.0f;
+    REVISE360(angle);
+    angle += revise360(angle - mp->targetYaw) >= 180.0f ? -ofs : ofs;
+    return revise360(angle);
+}
+
+void marioForceMoveMain(void) {
+    MarioWork* mp = marioGetPtr();
+
+    if (mp->flags & 0x20) {
+        if (--mp->forceMoveTimer <= 0) {
+            mp->forceMoveTimer = 0;
+            mp->flags &= ~0x20;
+            mp->baseSpeed = 0.0f;
+            if (mp->controlStickSensitivity > 1.0f) {
+                mp->baseSpeed = marioGetDashSpd();
+            } else if (mp->controlStickSensitivity > 0.0f) {
+                mp->baseSpeed = marioGetWalkSpd();
+            }
+        }
+    }
+}
+
+void marioSetForceMove(f32 dir, s32 time, f32 speed) {
+    MarioWork* mp = marioGetPtr();
+
+    mp->flags |= 0x20;
+    mp->unk19C = dir;
+    mp->directionView = dir;
+    mp->forceMoveTimer = time;
+    mp->baseSpeed = speed;
+    if (MW(mp, 0x2E, u16) == 0x19 || (MW(mp, 0x2E, u16) == 0x15 || MW(mp, 0x2E, u16) == 0x16) || MW(mp, 0x2E, u16) == 0x1A) {
+    } else {
+            marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
+            mp->unk19C = dir;
+            mp->directionView = dir;
+            mp->forceMoveTimer = time;
+            mp->baseSpeed = speed;
+    }
+}
+
+void marioUpdateKeyData(void) {
+    MarioWork* mp = marioGetPtr();
+    u32 mask = 0xFFFFFFFF;
+    u16 btn;
+
+    MW(mp, 0x24E, s8) = gp->stickX[0];
+    MW(mp, 0x24F, s8) = -gp->stickY[0];
+    MW(mp, 0x250, s8) = gp->substickX[0];
+    MW(mp, 0x251, s8) = -gp->substickY[0];
+    MW(mp, 0x252, u8) = gp->triggerLeft[0];
+    MW(mp, 0x253, u8) = gp->triggerRight[0];
+    MW(mp, 0x254, u8) = 0;
+    MW(mp, 0x255, u8) = 0;
+    if (MW(mp, 0x284, u32)) {
+        mask = MW(mp, 0x284, u32);
+    }
+    MW(mp, 0x246, u16) = gp->button[0] & mask;
+    MW(mp, 0x248, u16) = gp->buttonNew[0] & mask;
+    MW(mp, 0x24A, u16) = gp->buttonRepeat[0] & mask;
+    MW(mp, 0x24C, u16) = gp->buttonUp[0] & mask;
+    if (!(mp->flags & 0xE)) {
+        if (mp->trigFlags & 0x08000000) {
+            MW(mp, 0x24E, u8) = 0;
+            MW(mp, 0x24F, u8) = 0;
+        }
+        if (mp->trigFlags & 0x04000000) {
+            MW(mp, 0x250, u8) = 0;
+            MW(mp, 0x251, u8) = 0;
+        }
+        if (mp->trigFlags & 0x02000000) {
+            MW(mp, 0x252, u8) = 0;
+            MW(mp, 0x253, u8) = 0;
+        }
+        if (mp->trigFlags & 0x01000000) {
+            MW(mp, 0x254, u8) = 0;
+            MW(mp, 0x255, u8) = 0;
+        }
+    }
+    if ((mp->flags & 0xE) || !marioChkKey()) {
+        MW(mp, 0x24E, u8) = 0;
+        MW(mp, 0x24F, u8) = 0;
+        MW(mp, 0x250, u8) = 0;
+        MW(mp, 0x251, u8) = 0;
+        MW(mp, 0x252, u8) = 0;
+        MW(mp, 0x253, u8) = 0;
+        MW(mp, 0x254, u8) = 0;
+        MW(mp, 0x255, u8) = 0;
+        if (!MW(mp, 0x284, u32)) {
+            MW(mp, 0x246, u16) = 0;
+            MW(mp, 0x248, u16) = 0;
+            MW(mp, 0x24A, u16) = 0;
+            MW(mp, 0x24C, u16) = 0;
+        }
+        if (!marioGetMotSlitCancel3() && (mp->dispFlags & 0x01000000)) {
+            MW(mp, 0x246, u16) = 0x20;
+        }
+    }
+    btn = MW(DemoPad, 0x10, u16);
+    MW(mp, 0x25C, u32) = btn & (btn ^ MW(mp, 0x258, u32));
+    MW(mp, 0x258, u32) = btn;
+}
+
+void marioGetStick(f32* dir, f32* mag) {
+    MarioWork* mp = marioGetPtr();
+    s32 x;
+    s32 y;
+    f32 m;
+    f32 a;
+
+    if (mp->flags & 0x20) {
+        *dir = mp->directionView;
+        *mag = mp->baseSpeed;
+        return;
+    }
+    x = MW(mp, 0x24E, s8);
+    y = 0;
+    if ((mp->flags & 0x02000000) || kpaGetStageViewType() == 0) {
+        y = 1;
+    }
+    y = y ? 0 : -MW(mp, 0x24F, s8);
+    if (yoshiGetStatus() == 2) {
+        y = 0;
+    }
+    y = -y;
+    m = distABf(0.0f, 0.0f, x, y);
+    if (m >= 70.0f) {
+        m = 70.0f;
+    }
+    a = angleABf(0.0f, 0.0f, x, y);
+    if (!m) {
+        a = mp->unk19C;
+    }
+    *dir = revise360(a + mp->targetYaw);
+    *mag = m;
+}
+
+s32 N_marioGetMovementSpeed(void) {
+    MarioWork* mp = marioGetPtr();
+    s8 x = MW(mp, 0x24E, s8);
+
+    if (x == 0 && MW(mp, 0x24F, s8) == 0) {
+        return 0;
+    }
+    if (x * x + MW(mp, 0x24F, s8) * MW(mp, 0x24F, s8) > 3025) {
+        return 2;
+    }
+    return 1;
+}
+
+void marioGetRubInit(void) {
+    memset(&rubwork, 0, sizeof(rubwork));
+    rubwork.revDir = -1;
+}
+
+s32 chkRevolveDir(s32* cw, s32* ccw) {
+    RubWork* rw = &rubwork;
+    s32 cwCount = 0;
+    s32 ccwCount = 0;
+    s32 i;
+    s32 j;
+    s32 cur;
+    s32 prev;
+    s32 d;
+
+    for (i = 0; i < 10; i++) {
+        j = rw->idx - i;
+        while (j < 0) {
+            j += 20;
+        }
+        cur = rw->hist[j];
+        j = rw->idx - i - 1;
+        while (j < 0) {
+            j += 20;
+        }
+        prev = rw->hist[j];
+        if (i == 0 && cur == prev) {
+            continue;
+        }
+        d = cur - prev;
+        if (__fabsf(d) > 180.0f) {
+            cur += d > 0 ? 360 : -360;
+        }
+        d = cur - prev;
+        if (d > -90 && d < 0) {
+            cwCount++;
+        }
+        if (d > 0 && d < 90) {
+            ccwCount++;
+        }
+    }
+    if (cwCount == 0 && ccwCount >= 4) {
+        rw->revDir = 0;
+        *cw = cwCount;
+        *ccw = ccwCount;
+        return 0;
+    }
+    if (ccwCount == 0 && cwCount >= 4) {
+        rw->revDir = 1;
+        *cw = cwCount;
+        *ccw = ccwCount;
+        return 1;
+    }
+    *cw = cwCount;
+    *ccw = ccwCount;
+    rw->revDir = -1;
+    return -1;
+}
+
+s32 checkOneRevolution(s32 dir) {
+    RubWork* rw = &rubwork;
+    s32 ret = 0;
+    s32 idx;
+    s32 start;
+    s32 cur;
+    s32 v;
+    s32 i;
+    s32 j;
+
+    if (rw->num < 2) {
+        return -1;
+    }
+    idx = rw->idx;
+    start = rw->start;
+    cur = rw->hist[idx];
+    for (i = 1; i <= 20; i++) {
+        j = idx - i;
+        while (j < 0) {
+            j += 20;
+        }
+        v = rw->hist[j];
+        if (cur != v) {
+            break;
+        }
+    }
+    if (cur == v) {
+        return -1;
+    }
+    if (v == -1) {
+        return -1;
+    }
+    if (dir) {
+        if (cur > v) {
+            if (start < v || cur <= start) {
+                ret = 1;
+            }
+        } else {
+            if (cur <= start && start < v) {
+                ret = 1;
+            }
+        }
+    } else {
+        if (cur < v) {
+            if (start > v || start <= cur) {
+                ret = 1;
+            }
+        } else {
+            if (cur >= start && start > v) {
+                ret = 1;
+            }
+        }
+    }
+    return ret;
+}
+
+static inline void rubClearHist(s32 v) {
+    s16* p = rubwork.hist;
+    p[0] = v; p[1] = v; p[2] = v; p[3] = v; p[4] = v; p[5] = v; p[6] = v;
+    p[7] = v; p[8] = v; p[9] = v; p[10] = v; p[11] = v; p[12] = v; p[13] = v;
+    p[14] = v; p[15] = v; p[16] = v; p[17] = v; p[18] = v; p[19] = v; p[20] = v;
+}
+
+s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
+    s32 ret = 0;
+    MarioWork* mp = marioGetPtr();
+    RubWork* rw = &rubwork;
+    f32 dir;
+    f32 mag;
+    s32 a;
+    s32 r;
+    s32 j;
+    s32 cw;
+    s32 ccw;
+
+    if (btn && !(MW(mp, 0x246, u16) & btn)) {
+        marioGetRubInit();
+        *dirOut = -1;
+        *countOut = 0;
+        *magOut = 0.0f;
+        return -1;
+    }
+    marioGetStick(&dir, &mag);
+    a = dir;
+    if (mag < 50.0f) {
+        if (++rw->idleTimer > 10) {
+            rubClearHist(a);
+            rw->num = 0;
+        }
+        return -1;
+    }
+    rw->idleTimer = 0;
+    rw->hist[rw->idx] = a;
+    j = rubwork.idx + 1;
+    while (j < 0) {
+        j += 20;
+    }
+    rw->hist[j] = -1;
+    r = chkRevolveDir(&cw, &ccw);
+    if (r == 0) {
+        if (rw->dir == 2) {
+            rw->num = 0;
+            rw->count = 0;
+        }
+        if (rw->num == 0) {
+            rw->start = a;
+            rubClearHist(a);
+        }
+        rw->unk1C = 0;
+        rw->num++;
+        if (checkOneRevolution(0) == 1) {
+            ret = 1;
+            rubClearHist(rw->start);
+            rw->count++;
+        }
+        rw->dir = 1;
+    }
+    if (r == 0) {
+        *dirOut = rw->dir - 1;
+        *countOut = rw->count;
+        rw->idx++;
+        if (rw->idx >= 20) {
+            rw->idx -= 20;
+        }
+        return ret;
+    }
+    if (r == 1) {
+        if (rw->dir == 1) {
+            rw->num = 0;
+            rw->count = 0;
+        }
+        if (rw->num == 0) {
+            rw->start = a;
+            rubClearHist(a);
+        }
+        rw->unk1C = 0;
+        rw->num++;
+        if (checkOneRevolution(1) == 1) {
+            ret = 1;
+            rubClearHist(rw->start);
+            rw->count++;
+        }
+        rw->dir = 2;
+    }
+    if (r == 1) {
+        *dirOut = rw->dir - 1;
+        *countOut = rw->count;
+        rw->idx++;
+        if (rw->idx >= 20) {
+            rw->idx -= 20;
+        }
+        return ret;
+    }
+    rw->idx++;
+    if (rw->idx >= 20) {
+        rw->idx -= 20;
+    }
+    return -1;
 }

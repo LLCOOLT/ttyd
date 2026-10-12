@@ -1,3 +1,4 @@
+#pragma defer_codegen off
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -183,7 +184,7 @@ EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
     s32 i;
 
     effect = effEntry();
-    effect->type = "Charge";
+    effect->type = "Charge\0";
     effect->count = 31;
     work = __memAlloc(HEAP_EFFECT, 0x8b8);
     effect->userdata = work;

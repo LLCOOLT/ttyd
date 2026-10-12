@@ -180,7 +180,7 @@ LightEntry* lightNameToPtr(const char* name) {
 	s32 i;
 
 	for (i = 0; i < wp->count; i++, entry++) {
-		if (entry->flags & 1 && !strcmp(entry->name, name)) {
+		if (entry->flags & 1 && !strcmp(name, entry->name)) {
 			return entry;
 		}
 	}

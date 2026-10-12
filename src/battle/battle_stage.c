@@ -1,40 +1,552 @@
+#pragma optimize_for_size on
 #include "battle/battle_stage.h"
 #include "battle/battle.h"
+#include "battle/battle_unit.h"
+#include "driver/camdrv.h"
+#include "driver/dispdrv.h"
+#include "evt/evt_cmd.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
 #include "memory.h"
+#include <dolphin/gx.h>
+#include <dolphin/mtx.h>
+#include <string.h>
+
+extern int rand(void);
+
+typedef struct StageLight {
+	u32 flags;              // 0x0
+	char name[0x20];        // 0x4
+	GXColor color;          // 0x24
+	GXColor colorStart;     // 0x28
+	GXColor colorTarget;    // 0x2C
+	s32 colorTime;          // 0x30
+	s32 colorMax;           // 0x34
+	u8 colorMode;           // 0x38
+	f32 width;              // 0x3C
+	f32 widthStart;         // 0x40
+	f32 widthTarget;        // 0x44
+	s32 widthTime;          // 0x48
+	s32 widthMax;           // 0x4C
+	u8 widthMode;           // 0x50
+	Vec pos;                // 0x54
+	Vec posStart;           // 0x60
+	Vec posTarget;          // 0x6C
+	s32 posTime;            // 0x78
+	s32 posMax;             // 0x7C
+	u8 posMode;             // 0x80
+	Vec target;             // 0x84
+	Vec targetStart;        // 0x90
+	Vec targetTarget;       // 0x9C
+	s32 targetTime;         // 0xA8
+	s32 targetMax;          // 0xAC
+	u8 targetMode;          // 0xB0
+	Vec up;                 // 0xB4
+	Vec upStart;            // 0xC0
+	Vec upTarget;           // 0xCC
+	s32 upTime;             // 0xD8
+	s32 upMax;              // 0xDC
+	u8 upMode;              // 0xE0
+	void* data;             // 0xE4
+} StageLight;
+
+typedef struct StageDark {
+	s32 flags;      // 0x0
+	u8 cur;         // 0x4
+	u8 base;        // 0x5
+	u8 start;       // 0x6
+	u8 baseStart;   // 0x7
+	u8 target;      // 0x8
+	u8 baseTarget;  // 0x9
+	u8 pad_a[2];    // 0xA
+	s32 time;       // 0xC
+	s32 baseTime;   // 0x10
+	s32 max;        // 0x14
+	s32 baseMax;    // 0x18
+	u8 mode;        // 0x1C
+	u8 baseMode;    // 0x1D
+} StageDark;
+
+typedef struct StageWork {
+	s32 field_0;            // 0x0
+	StageLight lights[12];  // 0x4
+	StageDark stgDark;      // 0xAE4
+	StageDark audDark;      // 0xB04
+	f32 field_B24;          // 0xB24
+	f32 field_B28;          // 0xB28
+	f32 field_B2C;          // 0xB2C
+	f32 field_B30;          // 0xB30
+	f32 field_B34;          // 0xB34
+	f32 field_B38;          // 0xB38
+} StageWork;
+
+#define STG ((StageWork*)BattleStageGetPtr())
+
+typedef struct ScreenWork {
+	void* tex;      // 0x0
+	s32 captured;   // 0x4
+	f32 field_8;    // 0x8
+	f32 field_C;    // 0xC
+	f32 field_10;   // 0x10
+	f32 field_14;   // 0x14
+	f32 field_18;   // 0x18
+	f32 field_1C;   // 0x1C
+	s32 field_20;   // 0x20
+	s32 field_24;   // 0x24
+	f32 field_28;   // 0x28
+} ScreenWork;
 
 //.sbss
+static ScreenWork* screen_wp;
 static BattleSpotWork work;
 
-//.sbss2
-s32 batSpotEntry_28;
 
 //.sdata
 static BattleSpotWork* wp = &work;
 
-//.sdata2
-s32 batSpotInit_28 = -1;
+
+USER_FUNC(screen_evt_func);
+
+static EVT_BEGIN(screen_evt)
+	BEGIN_INLINE_EVENT
+		CALL(screen_evt_func, LW(0))
+	END_INLINE_EVENT
+	RETURN
+EVT_END()
 
 // forward declarations
 void batSpotDisp(CameraId camId, void* param);
 BattleSpotEntry* batSpotEntry(void);
+void BattleStageDispDark(CameraId camId, void* param);
+void BattleStageDispLight(CameraId camId, void* param);
+void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z);
+void DarkBySquare(u8 alpha, f32 x0, f32 y0, f32 x1, f32 y1, f32 z);
+void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode);
+void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode);
+void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode);
+void batSpotInit(void);
+void drawCone(CameraId camId, BattleSpotEntry* e);
+double sin(double);
+double cos(double);
 
 BattleStage* BattleStageGetPtr(void) {
     return &_battleWorkPointer->stage;
 }
 
 void BattleStageInit(void) {
+	StageWork* s = STG;
+	s32 i;
+
+	memset(s, 0, sizeof(StageWork));
+	s->field_0 = 0;
+	for (i = 0; i < 12; i++) {
+		StageLight* l = &s->lights[i];
+		l->flags = 0;
+		l->data = NULL;
+	}
+	s->stgDark.flags = 1;
+	s->stgDark.cur = s->stgDark.base = 0;
+	s->stgDark.start = 0;
+	s->stgDark.target = 0;
+	s->stgDark.time = 0;
+	s->stgDark.max = 0;
+	s->audDark.flags = 1;
+	s->audDark.cur = s->audDark.base = 0x8C;
+	s->audDark.start = 0;
+	s->audDark.target = 0;
+	s->audDark.time = 0;
+	s->audDark.max = 0;
+	s->field_B24 = 290.0f;
+	s->field_B28 = 200.0f;
+	s->field_B2C = 90.0f;
+	s->field_B30 = s->field_B24;
+	s->field_B34 = -50.0f;
+	s->field_B38 = 200.0f;
+	BattleStageObjectInit();
+	batSpotInit();
 }
 
 void BattleStageMain(void) {
 }
 
 void BattleStageEnd(void) {
+	s32 i;
+	StageWork* s = STG;
+
+	for (i = 0; i < 12; i++) {
+		StageLight* l = &s->lights[i];
+		if (l->data != NULL) {
+			__memFree(HEAP_BATTLE, l->data);
+			l->data = NULL;
+		}
+	}
 }
 
+void BattleStageDisp(void) {
+	BattleGetUnitPtr(_battleWorkPointer, _battleWorkPointer->activeUnitId);
+	dispEntry(CAMERA_3D, 5000.0f, 2, BattleStageDispDark, NULL);
+	dispEntry(CAMERA_3D, 6000.0f, 2, BattleStageDispLight, NULL);
+}
+
+#pragma dont_inline on
+void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
+	GXPosition3f32(x, y, z);
+	GXColor4u8(0, 0, 0, alpha);
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void DarkBySquare(u8 alpha, f32 x0, f32 y0, f32 x1, f32 y1, f32 z) {
+	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+	DarkByPoint(alpha, x0, y0, z);
+	DarkByPoint(alpha, x1, y0, z);
+	DarkByPoint(alpha, x1, y1, z);
+	DarkByPoint(alpha, x0, y1, z);
+}
+#pragma dont_inline reset
+
+void BattleStageDispDark(CameraId camId, void* param) {
+	StageWork* s = STG;
+	CameraEntry* cam = camGetPtr(CAMERA_3D);
+	StageDark* aud;
+
+	GXSetCullMode(GX_CULL_BACK);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_NOOP);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_VTX, GX_SRC_VTX, 0, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetNumTexGens(0);
+	GXLoadPosMtxImm(cam->view, GX_PNMTX0);
+	GXSetNumTevStages(1);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	aud = &s->audDark;
+	GXSetZMode(GX_TRUE, GX_GEQUAL, GX_FALSE);
+	DarkBySquare(aud->cur, -640.0f, 640.0f, 640.0f, -640.0f, 105.0f);
+	GXSetZMode(GX_TRUE, GX_LESS, GX_FALSE);
+	DarkBySquare(aud->cur, 640.0f, 640.0f, -640.0f, -640.0f, 105.0f);
+	GXSetZMode(GX_TRUE, GX_LESS, GX_FALSE);
+	DarkBySquare(s->stgDark.cur, -640.0f, 640.0f, 640.0f, -640.0f, 105.0f);
+}
+
+void BattleStageDispLight(CameraId camId, void* param) {
+	s32 i, j;
+	StageWork* s = STG;
+	CameraEntry* cam = camGetPtr(CAMERA_3D);
+
+	GXSetCullMode(GX_CULL_BACK);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCCLR, GX_BL_ONE, GX_LO_NOOP);
+	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_ALPHA0, GX_FALSE, GX_SRC_VTX, GX_SRC_VTX, 0, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetNumTexGens(0);
+	GXSetNumTevStages(1);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+	GXLoadPosMtxImm(cam->view, GX_PNMTX0);
+	for (i = 0; i < 12; i++) {
+		if (s->lights[i].flags & 1) {
+			Mtx m;
+			Vec v;
+			Vec axis;
+			f32 width;
+
+			axis = (Vec){s->lights[i].target.x - s->lights[i].pos.x, s->lights[i].target.y - s->lights[i].pos.y, s->lights[i].target.z - s->lights[i].pos.z};
+			width = s->lights[i].width;
+			v = s->lights[i].up;
+			for (j = 0; j < 18; j++) {
+				f32 px = s->lights[i].pos.x;
+				f32 py = s->lights[i].pos.y;
+				f32 pz = s->lights[i].pos.z;
+				f32 ex = 2.0f * (s->lights[i].target.x - px) + px;
+				f32 ey = 2.0f * (s->lights[i].target.y - py) + py;
+				f32 ez = 2.0f * (s->lights[i].target.z - pz) + pz;
+				f32 ax = v.x * width + ex;
+				f32 ay = v.y * width + ey;
+				f32 az = v.z * width + ez;
+				f32 bx, by, bz;
+				u8 r, g, b;
+
+				PSMTXRotAxisRad(m, &axis, 0.34906584f);
+				PSMTXMultVec(m, &v, &v);
+				PSVECNormalize(&v, &v);
+				bx = v.x * width + ex;
+				by = v.y * width + ey;
+				bz = v.z * width + ez;
+				r = s->lights[i].color.r;
+				g = s->lights[i].color.g;
+				b = s->lights[i].color.b;
+				GXBegin(GX_TRIANGLES, GX_VTXFMT0, 3);
+				GXPosition3f32(px, py, pz);
+				GXColor4u8(r, g, b, 0);
+				GXPosition3f32(ax, ay, az);
+				GXColor4u8(r, g, b, 0);
+				GXPosition3f32(bx, by, bz);
+				GXColor4u8(r, g, b, 0);
+			}
+		}
+	}
+}
+
+void BattleStageOnLightInCommand(void) {
+}
+
+void BattleStageOffLightInCommand(void) {
+}
+
+void BattleStageOnLightFriendInCommand(void) {
+}
+
+void BattleStageOffLightFriendInCommand(void) {
+}
+
+void BattleStageOnLightEnemyInCommand(void) {
+}
+
+void BattleStageOffLightEnemyInCommand(void) {
+}
+
+s32 BattleStageGetLightNumberByName(const char* name) {
+	StageWork* s = STG;
+	s32 i;
+
+	for (i = 0; i < 12; i++) {
+		StageLight* l = &s->lights[i];
+		if ((l->flags & 1) && !strcmp(l->name, name)) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+s32 BattleStageSysLightEntry(const char* name) {
+	StageWork* s = STG;
+	s32 i;
+
+	for (i = 0; i <= 6; i++) {
+		StageLight* l = &s->lights[i];
+		if ((l->flags & 1) && !strcmp(l->name, name)) {
+		}
+	}
+	for (i = 0; i < 7; i++) {
+		StageLight* l = &s->lights[i];
+		if (!(l->flags & 1)) {
+			l->flags = 1;
+			strcpy(l->name, name);
+			break;
+		}
+	}
+	return i;
+}
+
+#pragma opt_propagation off
+void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	if (l->flags & 1) {
+		if (time == 0) {
+			l->flags = 0;
+		} else {
+			l->flags |= 2;
+			l->colorStart = (GXColor){l->color.r, l->color.g, l->color.b};
+			l->colorTarget = (GXColor){0, 0, 0};
+			l->colorTime = time;
+			l->colorMax = time;
+			l->colorMode = mode;
+		}
+	}
+}
+#pragma opt_propagation reset
+
+#pragma opt_propagation off
+void BattleStageLightSetLightColor(s32 idx, u8 r, u8 g, u8 b, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	l->colorStart = (GXColor){l->color.r, l->color.g, l->color.b};
+	l->colorTarget = (GXColor){r, g, b};
+	l->colorTime = time;
+	l->colorMax = time;
+	l->colorMode = mode;
+	if (time == 0) {
+		l->color = (GXColor){l->color.r, l->color.g, l->color.b, 0xFF};
+	}
+}
+#pragma opt_propagation reset
+
+#pragma opt_propagation off
+void BattleStageLightSetWidth(s32 idx, s32 width, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	l->widthStart = l->width;
+	l->widthTarget = width;
+	l->widthTime = time;
+	l->widthMax = time;
+	l->widthMode = mode;
+	if (time == 0) {
+		l->width = width;
+	}
+}
+#pragma opt_propagation reset
+
+#pragma opt_propagation off
+void BattleStageLightSetPosition(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	l->posStart.x = l->pos.x;
+	l->posStart.y = l->pos.y;
+	l->posStart.z = l->pos.z;
+	l->posTarget.x = x;
+	l->posTarget.y = y;
+	l->posTarget.z = z;
+	l->posTime = time;
+	l->posMax = time;
+	l->posMode = mode;
+	if (time == 0) {
+		l->pos = (Vec){x, y, z};
+	}
+}
+#pragma opt_propagation reset
+
+#pragma dont_inline on
+#pragma opt_propagation off
+void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	l->targetStart.x = l->target.x;
+	l->targetStart.y = l->target.y;
+	l->targetStart.z = l->target.z;
+	l->targetTarget.x = x;
+	l->targetTarget.y = y;
+	l->targetTarget.z = z;
+	l->targetTime = time;
+	l->targetMax = time;
+	l->targetMode = mode;
+	l->flags &= ~4;
+	if (time == 0) {
+		l->target = (Vec){x, y, z};
+	}
+}
+#pragma opt_propagation reset
+#pragma dont_inline reset
+
+void BattleStageLightSetTargetByUnit(s32 idx, s32 unitId, f32 x, f32 y, f32 z, s32 time, u8 mode) {
+	f32 px, py, pz;
+	BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, unitId);
+
+	BtlUnit_GetPos(unit, &px, &py, &pz);
+	px += x;
+	py += y;
+	pz += z;
+	BattleStageLightSetTarget(idx, px, py, pz, time, mode);
+}
+
+#pragma opt_propagation off
+void BattleStageLightSetUpVec(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode) {
+	StageLight* l = &STG->lights[idx];
+
+	l->upStart.x = l->up.x;
+	l->upStart.y = l->up.y;
+	l->upStart.z = l->up.z;
+	l->upTarget.x = x;
+	l->upTarget.y = y;
+	l->upTarget.z = z;
+	l->upTime = time;
+	l->upMax = time;
+	l->upMode = mode;
+	if (time == 0) {
+		l->up = (Vec){x, y, z};
+	}
+}
+#pragma opt_propagation reset
+
+#pragma dont_inline on
+void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode) {
+	d->start = d->cur;
+	d->target = v;
+	d->time = time;
+	d->max = time;
+	d->mode = mode;
+	if (time == 0) {
+		d->cur = v;
+	}
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode) {
+	d->baseStart = d->base;
+	d->baseTarget = v;
+	d->baseTime = time;
+	d->baseMax = time;
+	d->baseMode = mode;
+	if (time == 0) {
+		d->base = v;
+	}
+}
+#pragma dont_inline reset
+
+void BattleStageSetStgDark(u8 v, s32 time, u8 mode) {
+	BattleStageSetDark(&STG->stgDark, v, time, mode);
+}
+
+void BattleStageSetStgDarkBase(u8 v, s32 time, u8 mode) {
+	BattleStageSetDarkBase(&STG->stgDark, v, time, mode);
+}
+
+void BattleStageReturnStgDarkBase(s32 time, u8 mode) {
+	StageDark* d = &STG->stgDark;
+	BattleStageSetDark(d, d->base, time, mode);
+}
+
+void BattleStageSetAudDark(u8 v, s32 time, u8 mode) {
+	BattleStageSetDark(&STG->audDark, v, time, mode);
+}
+
+void BattleStageSetAudDarkBase(u8 v, s32 time, u8 mode) {
+	BattleStageSetDarkBase(&STG->audDark, v, time, mode);
+}
+
+void BattleStageReturnAudDarkBase(s32 time, u8 mode) {
+	StageDark* d = &STG->audDark;
+	BattleStageSetDark(d, d->base, time, mode);
+}
+
+f32 getSpline(f32* a, f32* b, f32* c, f32* d, s32* t, s32 n, s32 x) {
+	s32 i;
+	f32 f;
+
+	for (i = n - 1; i >= 0; i--) {
+		if ((f32)(x - t[i]) >= 0.0f) {
+			break;
+		}
+	}
+	f = x - t[i];
+	return f * (f * (f * d[i] + c[i]) + b[i]) + a[i];
+}
 BattleSpotWork* BatSpotGetPtr(void) {
     return wp;
 }
 
+#pragma dont_inline on
 void batSpotInit(void) {
 	int i;
 	BattleSpotEntry* entry;
@@ -48,9 +560,10 @@ void batSpotInit(void) {
 		entry->field_4 = (Vec){50.0f * i + -100.0f, 0.0f, -50.0f};
 		entry->field_10 = (Vec){0.0f, 0.0f, 0.0f};
 		entry->field_1C = (Vec){20.0f, 20.0f, 150.0f};
-		entry->field_28 = batSpotInit_28;
+		*(GXColor*)&entry->field_28 = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	}
 }
+#pragma dont_inline reset
 
 void batSpotMain() {
     s32 count = wp->count;
@@ -62,11 +575,92 @@ void batSpotMain() {
 }
 
 void batSpotDisp(CameraId camId, void* param) {
+	int i;
+	BattleSpotEntry* e;
+
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetNumTexGens(0);
+	GXSetNumTevStages(1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
+	GXSetZCompLoc(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+	GXSetNumChans(1);
+	for (i = 0, e = wp->entries; i < wp->count; i++, e++) {
+		if ((e->flags & 1) && (e->flags & 2)) {
+			GXSetCullMode(GX_CULL_BACK);
+			GXSetAlphaUpdate(GX_TRUE);
+			GXSetColorUpdate(GX_FALSE);
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+			GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+			GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_CLAMP, GX_AF_NONE);
+			drawCone(camId, e);
+			GXSetCullMode(GX_CULL_FRONT);
+			GXSetAlphaUpdate(GX_TRUE);
+			GXSetColorUpdate(GX_FALSE);
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+			GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+			GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
+			GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
+			drawCone(camId, e);
+			GXSetCullMode(GX_CULL_BACK);
+			GXSetAlphaUpdate(GX_FALSE);
+			GXSetColorUpdate(GX_TRUE);
+			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+			GXSetBlendMode(GX_BM_BLEND, GX_BL_DSTALPHA, GX_BL_INVDSTALPHA, GX_LO_CLEAR);
+			GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, 0, GX_DF_CLAMP, GX_AF_NONE);
+			GXSetChanMatColor(GX_COLOR0A0, *(GXColor*)&e->field_28);
+			drawCone(camId, e);
+		}
+	}
 }
 
-//drawCone
+#pragma dont_inline on
+void drawCone(CameraId camId, BattleSpotEntry* e) {
+	Mtx trans, scale, m, rx, ry, rz;
+	CameraEntry* cam;
+	s32 i;
+	f32 a, s, c;
+
+	cam = camGetPtr(camId);
+	PSMTXTrans(trans, e->field_4.x, e->field_4.y, e->field_4.z);
+	PSMTXScale(scale, e->field_1C.x, e->field_1C.y, e->field_1C.z);
+	PSMTXRotRad(rx, 'x', 0.017453292f * e->field_10.x);
+	PSMTXRotRad(ry, 'y', 0.017453292f * e->field_10.y);
+	PSMTXRotRad(rz, 'z', 0.017453292f * e->field_10.z);
+	PSMTXConcat(rz, ry, ry);
+	PSMTXConcat(ry, rx, m);
+	PSMTXConcat(cam->view, trans, trans);
+	PSMTXConcat(trans, m, m);
+	PSMTXConcat(m, scale, m);
+	GXLoadPosMtxImm(m, GX_PNMTX0);
+	GXSetCurrentMtx(GX_PNMTX0);
+	GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, 32);
+	GXPosition3f32(0.0f, 0.0f, 0.0f);
+	GXColor4u8(0, 0, 0, ((GXColor*)&e->field_28)->a);
+	for (i = 0; i < 31; i++) {
+		if (i == 30) {
+			a = 0.0f;
+		} else {
+			a = 6.2831855f * (f32)-i / 30.0f;
+		}
+		s = (f32)sin(a);
+		c = (f32)cos(a);
+		GXPosition3f32(c, s, -1.0f);
+		GXColor4u8(0, 0, 0, ((GXColor*)&e->field_28)->a / 3);
+	}
+}
+#pragma dont_inline reset
 
 // TODO: get this to not inline into batSpotInit
+#pragma dont_inline on
 BattleSpotEntry* batSpotEntry(void) {
 	int i;
 	BattleSpotEntry* entry = wp->entries;
@@ -80,8 +674,44 @@ BattleSpotEntry* batSpotEntry(void) {
 	entry->field_4 = (Vec){0.0, 0.0, 0.0};
 	entry->field_1C = (Vec){1.0, 1.0, 1.0};
 	entry->field_10 = (Vec){0.0, 0.0, 0.0};
-	entry->field_28 = batSpotEntry_28;
+	*(GXColor*)&entry->field_28 = (GXColor){0, 0, 0, 0};
 	entry->flags |= 1;
 
 	return entry;
+}
+#pragma dont_inline reset
+
+static f32 randf(f32 min, f32 max) {
+	return (max - min) * ((f32)rand() / 32767.0f) + min;
+}
+
+static void screen_capture(CameraId camId, void* param) {
+	GXSetTexCopySrc(0, 0, 608, 480);
+	GXSetTexCopyDst(304, 240, GX_TF_RGB565, GX_TRUE);
+	GXCopyTex(screen_wp->tex, GX_FALSE);
+	GXPixModeSync();
+	screen_wp->captured = 1;
+}
+
+USER_FUNC(screen_evt_func) {
+	dispEntry(CAMERA_2D, 1000.0f, 0, screen_capture, NULL);
+	return 0;
+}
+
+USER_FUNC(tou_gamen_screen_tev_init) {
+	u32 size = GXGetTexBufferSize(608, 480, GX_TF_I4, GX_FALSE, 0);
+
+	screen_wp = _mapAlloc(sizeof(ScreenWork));
+	screen_wp->tex = _mapAlloc(size);
+	screen_wp->captured = 0;
+	screen_wp->field_8 = screen_wp->field_C = 1.0f;
+	screen_wp->field_10 = screen_wp->field_14 = 0.0f;
+	screen_wp->field_18 = screen_wp->field_1C = 0.0f;
+	screen_wp->field_20 = 0;
+	screen_wp->field_28 = -1.0f;
+	if (evtGetValue(event, GSW(0)) == 163) {
+		screen_wp->field_24 = 1;
+	}
+	evtEntry(screen_evt, 0, 0);
+	return 2;
 }

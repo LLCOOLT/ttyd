@@ -41,6 +41,7 @@ s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario);
 void _kurokaron_next_move_index(void);
 typedef struct Senkaron { s8 state; u16 area; s32 timer; f32 vx; f32 vy; f32 vz; u32 flags; } Senkaron;
 typedef struct SenkaronWork { s32 attackStart; s32 escape; s32 mesPushing; u32 frameCount; s32 marioPushed; s32 hammerFrame; Senkaron* sk; } SenkaronWork;
+s32 gap_05_0000004C_bss;
 SenkaronWork* skwp;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 ExtPose* extGetPosePtr(void);
@@ -68,7 +69,6 @@ void extLoadShadowVertex(void);
 void extLoadShadowTev(void);
 void extDrawShadow(void);
 extern s32 partyCtrlNo;
-static char name[20];
 
 USER_FUNC(chk_mario_ctrloff);
 USER_FUNC(evt_bero_get_info);
@@ -1665,6 +1665,7 @@ EVT_BEGIN(las_05_init_evt)
 EVT_END()
 
 static USER_FUNC(make_name) {
+    static char name[20];
     s32* args = event->args;
 
     s32 a = evtGetValue(event, args[0]);

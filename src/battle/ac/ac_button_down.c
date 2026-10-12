@@ -22,24 +22,24 @@ typedef struct BDWork {
 
 static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
 
-static void actionCommandDisp(f32 x, f32 y) {
+static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
     BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
     s32 count;
-    s32 n = NN;
     s32 i;
     s32 k;
+    s32 end = NN * 3 + 2;
     s32 off;
     f32 bx = -200.0f + x;
-    f32 lx;
-    f32 by = 70.0f + y;
+    f32 by;
+    f32 lx = bx - 40.0f;
     Vec pos = {0.0f, 0.0f, -2.0f};
-    lx = bx - 40.0f;
+    by = 70.0f + y;
     pos.x = lx;
     pos.y = by;
     iconDispGx(&pos, 16, 0x8f, 1.0f);
     lx += 16.0f;
-    for (k = 1; k < n * 3 + 2; k++) {
+    for (k = 1; k < end; k++) {
         Vec pos2 = {0.0f, 0.0f, -2.0f};
         pos2.x = lx;
         pos2.y = by;
@@ -54,17 +54,17 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     if (*(u32*)((u8*)work + 0x1cc4) & 1) {
         count = 0;
-        for (i = 0; i < n; i++) {
-            if (!p->pressed[i]) {
+        for (i = 0; i < NN; i++) {
+            if (!(*(s32*)((u8*)p + (i) * 4 + 0x3c))) {
                 break;
             }
             count++;
         }
-        if (count < n) {
+        if (count < NN) {
             count++;
         }
     } else {
-        count = n;
+        count = NN;
     }
     off = 0;
     for (i = 0; i < count; i++, off += 0x30) {
@@ -98,6 +98,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 a = 0x83;
                 b = 0x82;
                 break;
+            case 0:
+            case 0x40000:
             default:
                 a = 0x78;
                 b = 0x79;
@@ -140,7 +142,7 @@ void battleAcDisp_ButtonDown(CameraId cameraId, void* param) {
             x = y = 0.0f;
             break;
     }
-    actionCommandDisp(x, y);
+    actionCommandDisp(0, x, y);
 }
 
 s32 battleAcResult_ButtonDown(BattleWork* work) {

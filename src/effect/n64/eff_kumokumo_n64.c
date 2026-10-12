@@ -236,12 +236,12 @@ void effKumokumoMain(EffectEntry* effect) {
     EffKumokumoN64Particle* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
-    CameraId camera;
-    s32 type;
-    s32 fr;
     s32 i;
-    f32 rad;
+    s32 type;
+    CameraId camera;
+    s32 fr;
     f32 ang;
+    f32 rad;
     f32 tmp2;
 
     tmp.x = work->x;
@@ -257,11 +257,12 @@ void effKumokumoMain(EffectEntry* effect) {
     if (work->delay < 1000) {
         work->delay--;
     }
-    fr = ++work->frame;
+    work->frame++;
     if (work->delay < 0) {
         effDelete(effect);
         return;
     }
+    fr = work->frame;
     if (work->delay < 16) {
         work->alpha = work->delay * 16;
     }
@@ -298,16 +299,16 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += work->s1 * tmp2;
+                work->y += tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
         case 2:
             work->alpha += (255 - work->alpha) / 4;
-            work->scale += 0.03125f * -work->scale;
-            work->x += 0.03125f * -work->x;
-            work->y += 0.03125f * -work->y;
-            work->z += 0.03125f * -work->z;
+            work->scale += -work->scale / 32.0f;
+            work->x += -work->x / 32.0f;
+            work->y += -work->y / 32.0f;
+            work->z += -work->z / 32.0f;
             if (work->scale < 0.1f) {
                 work->x = (f32)(200 - irand(400));
                 work->y = -(f32)(irand(50) + 200);
@@ -322,10 +323,10 @@ void effKumokumoMain(EffectEntry* effect) {
             break;
         case 3:
             work->alpha += (192 - work->alpha) / 4;
-            work->scale += 0.03125f * -work->scale;
-            work->x += 0.03125f * -work->x;
-            work->y += 0.03125f * -work->y;
-            work->z += 0.03125f * -work->z;
+            work->scale += -work->scale / 32.0f;
+            work->x += -work->x / 32.0f;
+            work->y += -work->y / 32.0f;
+            work->z += -work->z / 32.0f;
             if (work->scale < 0.1f) {
                 ang = (f32)irand(360);
                 rad = 200.0f + (f32)irand(200);
@@ -355,7 +356,7 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += work->s1 * tmp2;
+                work->y += tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;

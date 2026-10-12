@@ -36,12 +36,8 @@ static void moamoa_pose_main(void) {
         t = 60.0f * OSTicksToMilliseconds(now - moa->startTime) / 1000.0f / def->speed;
 
         if (t >= 1.0f) {
-            if (def->loop) {
-                moa->startTime = now;
-                t = 0.0f;
-            } else {
-                t = 1.0f;
-            }
+            moa->startTime = now;
+            t = 0.0f;
         }
         pose->frame = def->start + (s32)((def->count - 1) * t);
     }

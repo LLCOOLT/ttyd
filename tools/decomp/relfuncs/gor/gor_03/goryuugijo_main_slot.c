@@ -96,13 +96,13 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             }
             sfx = (0, "SFX_EVT_GAME_SLOT_STOP1");
             count = 0;
-            for (i = 0; i < 3; i++) {
-                if (data->state[i] == 0) {
+            for (j = 0; j < 3; j++) {
+                if (data->state[j] == 0) {
                     count++;
                     continue;
                 }
-                if (i == data->cursor) {
-                    switch (i) {
+                if (j == data->cursor) {
+                    switch (j) {
                         case 0:
                             if (keyGetButtonTrg(0) & 0x100) {
                                 press = 1;
@@ -128,22 +128,22 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 } else {
                     press = 0;
                 }
-                if (press && data->state[i] == 2) {
-                    data->state[i] = 3;
+                if (press && data->state[j] == 2) {
+                    data->state[j] = 3;
                     if (data->flags & 2) {
-                        data->stopCount[i] = 0;
+                        data->stopCount[j] = 0;
                     } else {
-                        data->stopCount[i] = irand(2);
+                        data->stopCount[j] = irand(2);
                     }
                     psndSFXOn(sfx);
                 }
-                count += slot_rotate_sub(wp, data, i);
+                count += slot_rotate_sub(wp, data, j);
             }
             if (count == 3) {
                 for (i = 0; i < 3; i++) {
                     goryuugijo_upsidewindow_disp_sub(data->nowSlot, i);
                 }
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
                 data->counter = 0;
                 data->phase++;
             }
@@ -315,7 +315,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             if (data->monteEvt == NULL || !evtCheckID(data->monteEvt->eventId)) {
                 mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
                 data->flags &= ~8;
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
                 data->counter = 0;
                 data->monteEvt = NULL;
                 data->phase++;
@@ -351,7 +351,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             if (data->flags & 8) {
                 mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
                 data->flags &= ~8;
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
             }
             break;
     }

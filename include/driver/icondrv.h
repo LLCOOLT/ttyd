@@ -31,7 +31,10 @@ typedef struct IconBinary {
 // flags, 1 = in use, 0x10 = 2D, 0x1000 = animated(?), 0x2000 = ?(something to do with bin)
 
 typedef struct IconEntry {
-    s16 flags;        // 0x0
+    union {
+        s16 flags;    // 0x0
+        u16 uflags;   // 0x0, unsigned view (icondrv uses lhz)
+    };
     u8 field_0x2;     // 0x2
     Vec position;     // 0x4
     f32 scale;        // 0x10
@@ -66,6 +69,7 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId);
 void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
 void iconGetTexObj(GXTexObj* texObj, s16 iconId);
 void iconGetWidthHeight(u16* width, u16* height, s16 iconId);
+void iconGetWidthHight(u16* width, u16* height, s16 iconId);
 IconEntry* iconNameToPtr(const char* name);
 void iconSetPos(const char* name, f32 x, f32 y, f32 z);
 void iconFlagOn(const char* name, s16 flags);

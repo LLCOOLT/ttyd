@@ -1448,6 +1448,9 @@ void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Vec dir;
     Vec target = {0.0f, 0.0f, 0.0f};
+    ExtPose* pose;
+    Fan* fan;
+    s32 i;
 
     if (mario->currMotionId == 0x12) {
         fan_wp->hammerTimer++;
@@ -1457,7 +1460,6 @@ void ext_fan_main(void) {
     if (evtGetValue(NULL, GF(10))) {
         ExtPose* pose = extGetPosePtr();
         Fan* fan = fan_wp->fans;
-        s32 i;
 
         for (i = 0; i < fan_wp->num; i++, fan++, pose++) {
             if (fan->state == 0) {
@@ -1470,8 +1472,6 @@ void ext_fan_main(void) {
         }
     } else {
         s32 i;
-        ExtPose* pose;
-        Fan* fan;
         s32 found = 0;
 
         pose = extGetPosePtr();
@@ -1496,6 +1496,7 @@ void ext_fan_main(void) {
     }
 
     {
+
         Fan* fan;
         s32 i;
 
@@ -1513,8 +1514,6 @@ void ext_fan_main(void) {
     }
 
     {
-        s32 i;
-        Fan* fan;
 
         for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++) {
             if (fan->state == 0) {
@@ -1538,8 +1537,6 @@ void ext_fan_main(void) {
     {
         const char* sfx1;
         const char* sfx2;
-        s32 i;
-        Fan* fan;
         f32 angle;
         f32 dist;
         f32 dy;
@@ -1549,7 +1546,7 @@ void ext_fan_main(void) {
         f32 dir2;
 
         sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1";
-        sfx2 = "SFX_STG3_AUDIENCE_FAN_FLY1";
+        sfx2 = sfx1;
         for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++) {
             if (fan->state == 0) {
                 switch (check_hammer(fan)) {
@@ -1603,9 +1600,6 @@ void ext_fan_main(void) {
 
     {
         HitCheckQuery query;
-        s32 i;
-        ExtPose* pose;
-        Fan* fan;
         f32 angle;
         f32 dist;
         f32 h;
@@ -1635,9 +1629,8 @@ void ext_fan_main(void) {
                     if (fan->pos.x > 350.0f) {
                         fan->pos.x = 350.0f;
                     }
-                    h = 195.0f + i / 100.0f;
-                    if (fan->pos.y > h) {
-                        fan->pos.y = h;
+                    if (fan->pos.z > (h = 195.0f + i / 100.0f)) {
+                        fan->pos.z = h;
                     }
                     break;
                 case 10:

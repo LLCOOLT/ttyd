@@ -565,7 +565,7 @@ u8* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale);
 
 static inline void kpaFireSEOn(void);
 static inline void kpaFireSEOff(void);
-static void kpaFireEntry(Vec pos);
+static inline void kpaFireEntry(Vec pos);
 
 void kpaFireAttack(void) {
     MarioWork* mp = marioGetPtr();
@@ -775,7 +775,7 @@ static inline void kpaFireEntry2(Vec pos) {
     }
 }
 
-static void kpaFireEntry(Vec pos) {
+static inline void kpaFireEntry(Vec pos) {
     MarioWork* mp = marioGetPtr();
     kpaFireEntry2(pos);
 }
@@ -816,34 +816,38 @@ void kpaFireMain(void) {
     Mtx m20;
     Vec out;
     Vec zero;
-    s32 flag = 0;
+    s32 flag;
     s32 lv;
     u8* fe;
     u8* w;
     s32 i;
-    f32 x;
     f32 f31;
+    f32 f30;
     f32 f29;
-    *(s32*)(KPW(mp) + 0x18) = flag;
+    *(s32*)(KPW(mp) + 0x18) = flag = 0;
     if (fireefp) {
-        f32 dir, scale, y, z;
+        f32 dir;
+        f32 scale;
+        f32 x;
+        f32 y;
+        f32 z;
         s32 t;
         if (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) {
             flag = 1;
         }
         dir = flag ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
-        x = 40.0f * dir * scale + mp->position.x;
+        f30 = 40.0f * dir * scale + mp->position.x;
         t = (MU32(marioGetPtr(), 0x14) & 1) ^ 1;
         y = mp->position.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
         z = mp->position.z;
-        MF(*(u8**)(fireefp + 0xC), 4) = x;
+                MF(*(u8**)(fireefp + 0xC), 4) = f30;
         MF(*(u8**)(fireefp + 0xC), 8) = y;
         MF(*(u8**)(fireefp + 0xC), 0xC) = z;
         {
             u8* w2 = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
             if (w2) {
-                MF(*(u8**)(w2 + 0xC), 4) = x;
+                MF(*(u8**)(w2 + 0xC), 4) = f30;
                 MF(*(u8**)(*(u8**)(*(u8**)(fireefp + 0xC) + 0x4C) + 0xC), 8) = y;
                 MF(*(u8**)(*(u8**)(*(u8**)(fireefp + 0xC) + 0x4C) + 0xC), 0xC) = z;
             }
@@ -867,16 +871,16 @@ void kpaFireMain(void) {
             for (i = 1; i < *(s32*)(fe + 8); i++, w += 0x50) {
                 if (((i - 1) & 3) == 0 && *(s32*)(w + 0x44) == 0 && *(s32*)(w + 0x1C) > 0x10) {
                     void* hit;
-                    x = 7.0f * MF(w, 0x40);
-                    f31 = x * f29;
-                    if (!(f31 < 7.0f)) {
+                    f31 = 7.0f * MF(w, 0x40);
+                    f30 = f31 * f29;
+                    if (!(f30 < 7.0f)) {
                         PSMTXTrans(m80, MF(w, 4), MF(w, 8), MF(w, 0xC));
-                        PSMTXScale(mb0, x, x, x);
+                        PSMTXScale(mb0, f31, f31, f31);
                         PSMTXConcat(m80, mb0, m80);
                         PSMTXConcat(m20, m80, m80);
                         zero = *(Vec*)vec3_zero;
                         PSMTXMultVec(m80, &zero, &out);
-                        hit = kpaFlameHitCheck(out.x, out.y, out.z, f31);
+                        hit = kpaFlameHitCheck(out.x, out.y, out.z, f30);
                         if (hit) {
                             *(void**)(KPW(mp) + 0x18) = hit;
                             break;

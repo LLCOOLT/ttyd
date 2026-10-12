@@ -1270,7 +1270,7 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     BattleUnit* unit;
     s32 id, outSpeed, outFrames;
     f32 tx, ty, tz, speed;
-    f32 z, y, x;
+    f32 x, y, z;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -1491,7 +1491,7 @@ static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
     case 1:
         if (p->delay > 0) {
             p->delay--;
-            return TRUE;
+            break;
         }
     case 2:
         p->z += p->vz;
@@ -1509,11 +1509,11 @@ static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
             p->vx = 0.0f;
             p->state = 999;
         }
-        return TRUE;
+        break;
     default:
         return FALSE;
     }
-    return FALSE;
+    return TRUE;
 }
 
 USER_FUNC(_gundan_yoshi_run_effect) {
@@ -1563,8 +1563,10 @@ USER_FUNC(_gundan_yoshi_run_effect) {
         if (event->userdata[0] > 0) {
             event->userdata[0]--;
         } else {
+            f32 sc;
             p = &w->parts[irand(256)];
-            effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(15), 65.0f, 1.0f + 0.05f * (f32)irand(20));
+            sc = 1.0f + 0.05f * (f32)irand(20);
+            effKemuTestEntry(0, p->x, 5.0f + p->y + (f32)irand(15), 65.0f, sc);
         }
         w->timer *= 0.00390625f;
         pos.x = w->timer;
@@ -1588,11 +1590,12 @@ USER_FUNC(_gundan_yoshi_run_effect) {
 }
 void _btlYoshiDisp(CameraId camera, f32* p) {
     f32 s;
+    f32* q;
 
     if (p[3] < 0.0f) {
         s = 0.4f;
     } else {
         s = -0.4f;
     }
-    ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)p)[0x25]], (GXColor){255, 255, 255, 255}, 0, p[0], p[1] + 20.0f, p[2], s, 0.4f);
+    ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
 }

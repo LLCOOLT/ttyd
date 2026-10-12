@@ -2235,127 +2235,6 @@ s32 ItemWeaponData_PoisonKinoko[] = {
     0, 0, 0, 0, (s32)ItemEvent_Poison_Kinoko, 100, 328965, 83886080,
 };
 
-EVT_BEGIN(ItemEvent_LastDinner)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_PoisonKinoko))
-    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
-    WAIT_FRAMES(30)
-    CALL(btlevtcmd_WeaponAftereffect, LW(12))
-    CALL_CHILD(PTR(ItemEvent_GetTarget))
-    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
-    CALL(btlevtcmd_GetHeight, LW(10), LW(5))
-    CALL(btlevtcmd_GetStatusMg, LW(10), LW(6))
-    MULTIPLY_FLOAT(LW(5), LW(6))
-    DIVIDE(LW(5), 2)
-    ADD(LW(1), LW(5))
-    ADD(LW(2), 10)
-    CALL(evt_eff, 0, STRING("charge"), 1, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST1"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_eff, 0, STRING("mist"), 6, LW(0), LW(1), LW(2), 0, 180, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST2"), LW(0), LW(1), LW(2), LW(7))
-    WAIT_MS(2000)
-    CALL(evt_snd_sfxoff, LW(7))
-    CALL(btlevtcmd_SetHp, LW(10), 1)
-    CALL(btlevtcmd_SetFp, LW(10), 0)
-    CALL(_full_ap_recover, LW(10))
-    CALL(btlevtcmd_StatusWindowOnOff, 2)
-    CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
-    CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
-    WAIT_MS(250)
-    CALL(evt_eff, 0, STRING("hit"), 1, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
-    WAIT_MS(250)
-    CALL(evt_eff, 0, STRING("hit"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
-    WAIT_MS(250)
-    CALL(evt_eff, 0, STRING("hit"), 3, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
-    WAIT_MS(1750)
-    CALL(evt_audience_ap_recovery)
-    CALL_CHILD(PTR(_return_home_event))
-    CALL(btlevtcmd_StartWaitEvent, -2)
-    RETURN
-EVT_END()
-
-s32 ItemWeaponData_LastDinner[] = {
-    0, 0, 218, 0, 1677721600, 1065353216, 16843009, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
-    0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, (s32)ItemEvent_LastDinner, 100, 0, 0,
-};
-
-EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Dokkan))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Gorogoro))
-    CALL_CHILD(PTR(ItemEvent_Kaminari))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Madowaseno_Kona)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Madowaseno_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Dekadeka_Drink)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Dekadeka_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Katikati_Koura)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Katikati_Koura))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Minimini_Kun)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Minimini_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Funyafunya_Kun)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Funyafunya_Kun))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Sukkiri_Drink)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Sukkiri_Drink))
-    CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Shikaeshino_Kona))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-EVT_BEGIN(ItemEvent_Kameno_Noroi)
-    SET_VALUE(LW(12), PTR(ItemWeaponData_Kameno_Noroi))
-    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
-    RETURN
-EVT_END()
-
-
-
-
-
-
-
-
-
-
-
 
 #define EVW(evt, off) (*(s32*)((u8*)(evt) + (off)))
 #define EVP(evt, off) (*(ThrowWork**)((u8*)(evt) + (off)))
@@ -2672,3 +2551,125 @@ USER_FUNC(_full_ap_recover) {
     }
     return EVT_RETURN_DONE;
 }
+
+EVT_BEGIN(ItemEvent_LastDinner)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_PoisonKinoko))
+    CALL_CHILD(PTR(ItemEvent_Support_Sub_UseDeclere))
+    WAIT_FRAMES(30)
+    CALL(btlevtcmd_WeaponAftereffect, LW(12))
+    CALL_CHILD(PTR(ItemEvent_GetTarget))
+    CALL(btlevtcmd_GetPos, LW(10), LW(0), LW(1), LW(2))
+    CALL(btlevtcmd_GetHeight, LW(10), LW(5))
+    CALL(btlevtcmd_GetStatusMg, LW(10), LW(6))
+    MULTIPLY_FLOAT(LW(5), LW(6))
+    DIVIDE(LW(5), 2)
+    ADD(LW(1), LW(5))
+    ADD(LW(2), 10)
+    CALL(evt_eff, 0, STRING("charge"), 1, LW(0), LW(1), LW(2), FLOAT(1.0f), 120, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_eff, 0, STRING("mist"), 6, LW(0), LW(1), LW(2), 0, 180, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST2"), LW(0), LW(1), LW(2), LW(7))
+    WAIT_MS(2000)
+    CALL(evt_snd_sfxoff, LW(7))
+    CALL(btlevtcmd_SetHp, LW(10), 1)
+    CALL(btlevtcmd_SetFp, LW(10), 0)
+    CALL(_full_ap_recover, LW(10))
+    CALL(btlevtcmd_StatusWindowOnOff, 2)
+    CALL(evt_eff, 0, STRING("indirect"), 0, LW(0), LW(1), LW(2), 60, 0, 0, 0, 0, 0, 0, 0)
+    CALL(evt_eff, 0, STRING("hit"), 0, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 1, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 2, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(250)
+    CALL(evt_eff, 0, STRING("hit"), 3, LW(0), LW(1), LW(2), FLOAT(1.0f), 3, 0, 0, 0, 0, 0, 0)
+    CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_COOK_LAST3"), LW(0), LW(1), LW(2), 0)
+    WAIT_MS(1750)
+    CALL(evt_audience_ap_recovery)
+    CALL_CHILD(PTR(_return_home_event))
+    CALL(btlevtcmd_StartWaitEvent, -2)
+    RETURN
+EVT_END()
+
+s32 ItemWeaponData_LastDinner[] = {
+    0, 0, 218, 0, 1677721600, 1065353216, 16843009, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 17826144, 268435456, 770, 0, 196872, 2047, -2147483648,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, (s32)ItemEvent_LastDinner, 100, 0, 0,
+};
+
+EVT_BEGIN(ItemEvent_Kaminari_Dokkan)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Dokkan))
+    CALL_CHILD(PTR(ItemEvent_Kaminari))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Kaminari_Gorogoro)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Kaminari_Gorogoro))
+    CALL_CHILD(PTR(ItemEvent_Kaminari))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Madowaseno_Kona)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Madowaseno_Kona))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Dekadeka_Drink)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Dekadeka_Drink))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Katikati_Koura)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Katikati_Koura))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Minimini_Kun)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Minimini_Kun))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Funyafunya_Kun)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Funyafunya_Kun))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Sukkiri_Drink)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Sukkiri_Drink))
+    CALL_CHILD(PTR(ItemEvent_Support_RefreshEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Shikaeshino_Kona)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Shikaeshino_Kona))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(ItemEvent_Kameno_Noroi)
+    SET_VALUE(LW(12), PTR(ItemWeaponData_Kameno_Noroi))
+    CALL_CHILD(PTR(ItemEvent_Support_NoEffect))
+    RETURN
+EVT_END()
+
+
+
+
+
+
+
+
+
+
+

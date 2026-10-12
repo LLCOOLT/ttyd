@@ -467,36 +467,140 @@ void animPoseSetStartTime(s32 poseId, OSTime startTime) {
     pose->localTime = startTime;
 }
 
-void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset) {
-    AnimationPoseData* data;
-    AnimationPose* pose;
+#define animPosePaperAnimId(pose) (*(s32*)(pose)->field_0x94)
+#define animPoseGetBaseDataId(id) (*(AnimationPoseData**)(wp->files[wp->poses[id].fileId].handle->data))
 
-    pose = &wp->poses[poseId];
-    data = *wp->files[pose->fileId].handle->data;
-}
+inline s32 animPoseGetAnimIdx(AnimationPoseData* data, const char* name) {
+    s32 count = data->mAnimCount;
+    s32 i = (s32)name;
 
-s32 animPaperPoseGetId(const char* animName, s32 group) {
+    if (i < 0) {
+        for (i = 0; i < count; i++) {
+            if (!strcmp(data->mpAnims[i].name, name)) {
+                return i;
+            }
+        }
+    }
+    else if (i < count) {
+        return i;
+    }
     return 0;
 }
 
-asm void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) {
-    nofralloc
-    blr
+void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset) {
+    AnimationPose* pose;
+    s32 animId;
+
+    pose = &wp->poses[poseId];
+    animId = animPoseGetAnimIdx(animPoseGetBaseData(pose), animName);
+    if (reset || animId != pose->animId) {
+        pose->animId = animId;
+        if (pose->paperId != -1 && pose->flags & 2) {
+            pose->flags |= 4;
+        }
+        pose->localTime = animTimeGetTime(pose->type);
+        pose->lastFrameZero = -1;
+        pose->lastFrameTime = 0.0f;
+        pose->field_0x80 = 0;
+        pose->loopTime = 0.0f;
+    }
 }
 
-asm void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
-    nofralloc
-    blr
+s32 animPaperPoseGetId(const char* animName, s32 group) {
+    AnimationPose* pose;
+    s32 i;
+
+    for (i = 0; i < wp->totalPoses; i++) {
+        pose = &wp->poses[i];
+        if (pose->flags & 1 && pose->typeFlags & 1 && pose->typeFlags & 2 && pose->type == group &&
+            !strcmp(animPoseGetBaseData(pose)->fileName, animName)) {
+            break;
+        }
+    }
+    if (i == wp->totalPoses) {
+        i = -1;
+    }
+    return i;
 }
 
-asm void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
-    nofralloc
-    blr
+void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) {
+    AnimationPose* pose = &wp->poses[poseId];
+
+    if (!animName) {
+        pose->paperId = -1;
+        animPoseSetMaterialLightFlagOff(poseId, 1);
+        return;
+    }
+    pose->paperId = animPaperPoseGetId(animName, pose->type);
+    if (pose->paperId < 0) {
+        pose->paperId = animPaperPoseGetId(animName, 2);
+    }
+    animPosePaperAnimId(pose) = -1;
+    pose->mLocalTimeInit = animTimeGetTime(pose->type);
+    if (someflag) {
+        pose->flags |= 2;
+        pose->flags |= 4;
+    }
+    else {
+        pose->flags &= ~2;
+        pose->flags &= ~4;
+    }
+    animPoseSetMaterialLightFlagOn(poseId, 1);
 }
 
-asm void animPoseSetEffectAnim(s32 poseId, const char* animName, BOOL reset) {
-    nofralloc
-    blr
+void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
+    AnimationPose* pose = &wp->poses[poseId];
+
+    animPosePaperAnimId(pose) = animPoseGetAnimIdx(animPoseGetAnimBaseDataPtr(pose->paperId), animName);
+    pose->mLocalTimeInit = animTimeGetTime(pose->type);
+    if (pose->paperId != -1 && !(wp->poses[pose->paperId].typeFlags & 2)) {
+        animPoseMain(pose->paperId);
+    }
+}
+
+void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
+    AnimationPose* pose = &wp->poses[poseId];
+    AnimationPose* paper;
+    s32 id;
+
+    if (pose->paperId != -1) {
+        if (animName && !strcmp(animPoseGetAnimBaseDataPtr(pose->paperId)->fileName, animName) &&
+            (s32)((pose->flags >> 1) & 1) == someflag) {
+            return;
+        }
+        animPaperPoseRelease(pose->paperId);
+    }
+    if (!animName) {
+        pose->paperId = -1;
+        animPoseSetMaterialLightFlagOff(poseId, 1);
+        return;
+    }
+    id = animPoseEntry(animName, pose->type);
+    if (id != -2) {
+        paper = &wp->poses[id];
+        paper->typeFlags = 1;
+        paper->references = 0;
+        paper->flags |= 1;
+    }
+    pose->paperId = id;
+    animPosePaperAnimId(pose) = -1;
+    pose->mLocalTimeInit = animTimeGetTime(pose->type);
+    if (someflag) {
+        pose->flags |= 2;
+        pose->flags |= 4;
+    }
+    else {
+        pose->flags &= ~2;
+    }
+    animPoseSetMaterialLightFlagOn(poseId, 1);
+}
+
+void animPoseSetEffectAnim(s32 poseId, const char* animName, BOOL reset) {
+    AnimationPose* pose = &wp->poses[poseId];
+
+    if (pose->paperId != -1) {
+        animPoseSetAnim(pose->paperId, animName, reset);
+    }
 }
 
 void animPoseSetGXFunc(s32 poseId, void (*callback)(s32 wXluStage), BOOL disableDraw) {
@@ -575,7 +679,131 @@ asm void animPoseMain(s32 poseId) {
     blr
 }
 
-// pushGXModelMtx_TransformNode__
+void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
+    Mtx trans, scale, rot, tmp;
+    Mtx sc1, sc2, sc3;
+    Mtx rc1, rc2, rc3;
+    MtxPtr p;
+    u32 flags;
+    f32 rx, ry, rz;
+    f32 rcx, rcy, rcz;
+    f32 scx, scy, scz;
+    f32 rtx, rty, rtz;
+    f32 stx, sty, stz;
+    f32 sz, sy, sx;
+    f32 tx, ty, tz;
+
+    flags = 0;
+    tx = node->mTranslation.x;
+    ty = node->mTranslation.y;
+    tz = node->mTranslation.z;
+    sx = node->mScale.x;
+    sy = node->mScale.y;
+    sz = node->mScale.z;
+    rx = 2.0f * node->mRot1.x;
+    ry = 2.0f * node->mRot1.y;
+    rz = 2.0f * node->mRot1.z;
+    rcx = node->mRotationCenter.x;
+    rcy = node->mRotationCenter.y;
+    rcz = node->mRotationCenter.z;
+    scx = node->mScaleCenter.x;
+    scy = node->mScaleCenter.y;
+    scz = node->mScaleCenter.z;
+    rtx = node->mRotationTranslation.x;
+    rty = node->mRotationTranslation.y;
+    rtz = node->mRotationTranslation.z;
+    stx = node->mScaleTranslation.x;
+    sty = node->mScaleTranslation.y;
+    stz = node->mScaleTranslation.z;
+
+    if (tx || ty || tz) {
+        PSMTXTrans(trans, tx, ty, tz);
+        flags |= 1;
+    }
+    if (sx != 1.0f || sy != 1.0f || sz != 1.0f) {
+        PSMTXScale(scale, sx, sy, sz);
+        flags |= 2;
+    }
+    if (scx != 0.0f || scy != 0.0f || scz != 0.0f) {
+        if (flags & 2) {
+            PSMTXTrans(sc2, -scx, -scy, -scz);
+            PSMTXTrans(sc1, scx, scy, scz);
+            PSMTXTrans(sc3, stx, sty, stz);
+            PSMTXConcat(sc3, sc1, tmp);
+            PSMTXConcat(tmp, scale, tmp);
+            PSMTXConcat(tmp, sc2, scale);
+        }
+        else if (stx || sty || stz) {
+            PSMTXTrans(scale, stx, sty, stz);
+            flags |= 2;
+        }
+    }
+    PSMTXIdentity(rot);
+    if (rz) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * rz);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 4;
+    }
+    if (ry) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * ry);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 4;
+    }
+    if (rx) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * rx);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 4;
+    }
+    if (rcx != 0.0f || rcy != 0.0f || rcz != 0.0f) {
+        if (flags & 4) {
+            PSMTXTrans(rc2, -rcx, -rcy, -rcz);
+            PSMTXTrans(rc1, rcx, rcy, rcz);
+            PSMTXTrans(rc3, rtx, rty, rtz);
+            PSMTXConcat(rc3, rc1, tmp);
+            PSMTXConcat(tmp, rot, rot);
+            PSMTXConcat(rot, rc2, rot);
+        }
+        else if (rtx || rty || rtz) {
+            PSMTXTrans(rot, rtx, rty, rtz);
+            flags |= 4;
+        }
+    }
+    g_modeling_mtx_lv++;
+    g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
+    switch (flags) {
+        case 0:
+            PSMTXIdentity(tmp);
+            p = tmp;
+            break;
+        case 1:
+            p = trans;
+            break;
+        case 2:
+            p = scale;
+            break;
+        case 3:
+            PSMTXConcat(trans, scale, tmp);
+            p = tmp;
+            break;
+        case 4:
+            p = rot;
+            break;
+        case 5:
+            PSMTXConcat(trans, rot, tmp);
+            p = tmp;
+            break;
+        case 6:
+            PSMTXConcat(rot, scale, tmp);
+            p = tmp;
+            break;
+        case 7:
+            PSMTXConcat(trans, rot, tmp);
+            PSMTXConcat(tmp, scale, trans);
+            p = trans;
+            break;
+    }
+    PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
+}
 // pushGXModelMtx_JointNode__
 
 asm void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries,
@@ -874,6 +1102,107 @@ void renderProc(s32 shapeId, s32 unused) {
 }
 
 // dispProc
+
+void materialProc(s32 shapeId, s32 xluStage);
+void vivihimo(Mtx a, Mtx b, f32 speed, f32 scale, f32 offA, f32 offB);
+
+void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4) {
+    AnimPoseGroup* group;
+    AnimPoseGroup* parent;
+    AnimPoseNode* node;
+    AnimationPose* pose;
+    AnimationPoseData* data;
+    f32 sx, sy, sz;
+
+    if (groupId == -1) {
+        return;
+    }
+    data = wp->mpCurPoseData;
+    group = &data->groups[groupId];
+    if (*(s8*)&wp->mpCurPose->mpGroupVisibility[group->visibilityId]) {
+        pose = wp->mpCurPose;
+        node = (AnimPoseNode*)((u32*)pose->mpNodes + group->nodeId);
+        if (group->useSSC) {
+            if (parentId == -1) {
+                sx = sy = sz = 1.0f;
+            }
+            else {
+                parent = &data->groups[parentId];
+                if (!parent->useSSC) {
+                    sx = sy = sz = 1.0f;
+                }
+                else {
+                    AnimPoseNode* pnode = (AnimPoseNode*)((u32*)pose->mpNodes + parent->nodeId);
+                    sx = pnode->mScale.x;
+                    sy = pnode->mScale.y;
+                    sz = pnode->mScale.z;
+                }
+            }
+            pushGXModelMtx_JointNode__(node, sx, sy, sz);
+        }
+        else {
+            pushGXModelMtx_TransformNode__(node);
+        }
+        if (wp->mpCurPose->flags & 0x40) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = (*g_modeling_mtx)[0][3];
+            pos.y = (*g_modeling_mtx)[1][3];
+            pos.z = (*g_modeling_mtx)[2][3];
+            (*wp->mpCurPose->worldPositions)[groupId] = pos;
+        }
+        if (wp->mpCurPose->flags & 0x80) {
+            PSMTXCopy(*g_modeling_mtx, (*wp->mpCurPose->worldMatrices)[groupId]);
+        }
+        pose = wp->mpCurPose;
+        if (pose->flags & 0x20 && groupId == pose->vivianGroupNo[0]) {
+            Mtx* m;
+            MtxPtr mat;
+            f32* speed;
+            f32 offA, offB;
+            int i, j;
+            s32 type;
+
+            offB = offA = 0.0f;
+            type = pose->vivianType;
+            speed = (f32*)vivihimoData[type] + pose->animId * 2;
+            m = g_modeling_mtx;
+            mat = pose->matrix;
+            switch (type) {
+                case 1:
+                    offA = -2.0f;
+                    offB = 0.5f;
+                    break;
+                case 2:
+                    offA = -3.0f;
+                    offB = 0.5f;
+                    break;
+                case 3:
+                    offA = -1.0f;
+                    offB = 0.5f;
+                    break;
+            }
+            materialProc(group->shapeId, xluStage);
+            vivihimo(*m, mat, speed[0], speed[1], offA, offB);
+            wp->mpCurPose->flags &= ~0x20;
+            for (i = 0; i < 3; i++) {
+                for (j = 0; j < 3; j++) {
+                    mat[i][j] += 0.04f * ((*m)[i][j] - mat[i][j]);
+                }
+            }
+        }
+        else {
+            if (pose->dispCallback) {
+                ((void (*)(void*, s32, Mtx*))pose->dispCallback)(pose->dispUserDataCallback, groupId, g_modeling_mtx);
+            }
+            renderProc(group->shapeId, xluStage);
+            dispProc(groupId, group->childGroupId, xluStage, arg3, arg4);
+        }
+        g_modeling_mtx_lv--;
+        g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
+    }
+    dispProc(groupId, group->brotherGroupId, xluStage, arg3, arg4);
+}
+
 
 void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluMode) {
     Mtx matrix;

@@ -466,7 +466,7 @@ USER_FUNC(sight) {
         sight_wp->dir = 5;
     }
     if (sight_wp->tpl == NULL) {
-        if (!fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl")) {
+        if (fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "taihou.tpl") == 0U) {
             return EVT_RETURN_BLOCK;
         }
         sight_wp->tpl = fileAllocf(4, "%s/%s", getMarioStDvdRoot(), "taihou.tpl");
@@ -2318,12 +2318,13 @@ void ext_dispent_minnnanokoe(void) {
 
 USER_FUNC(bom1000_msg) {
     s32* args = event->args;
-    s32 type = evtGetValue(event, args[0]);
-    s32 idx = evtGetValue(event, args[1]);
+    s32* fa = args;
+    s32 flag;
+    s32 type = evtGetValue(event, *fa++);
+    s32 idx = evtGetValue(event, *fa++);
     ExtPose* pose = extGetPosePtr();
     ExtPose* p;
     s32 row;
-    s32 flag;
     s32 n;
 
     if (type == 0) {
@@ -2339,8 +2340,8 @@ USER_FUNC(bom1000_msg) {
     p = &pose[n];
     evtSetValue(event, args[0], flag);
     evtSetValue(event, args[1], idx);
-    evtSetFloat(event, args[2], p->mtx[0][3]);
-    evtSetFloat(event, args[3], p->mtx[2][3]);
+    evtSetFloat(event, fa[0], p->mtx[0][3]);
+    evtSetFloat(event, fa[1], p->mtx[2][3]);
     return EVT_RETURN_DONE;
 }
 

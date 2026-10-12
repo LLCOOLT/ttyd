@@ -13,6 +13,11 @@
 #include "mario/mario_pouch.h"
 #include "mario/mariost.h"
 #include "data/item_data.h"
+#include "driver/windowdrv.h"
+#include "evt/evt_badgeshop.h"
+#include "evt/evt_johoya.h"
+#include "evt/evt_lottery.h"
+#include "pmario_sound.h"
 #include "memory.h"
 #include "party.h"
 #include "system.h"
@@ -31,6 +36,12 @@ void FontDrawEdge(void);
 void FontDrawEdgeOff(void);
 BOOL winGhostDiaryChk(void);
 BOOL N_itemPickUpFromFieldCheck(void);
+void statusWinForceUpdateCoin(void);
+void FontDrawScale(f32 scale);
+s16 johoya_get(u8* table, s16 id);
+extern BadgeShopWork* bdsw;
+extern s32 badge_bottakuru100_table[];
+extern InformantWork _jdt;
 s32 marioKeyOn(void);
 
 typedef struct UnitWinEntry {
@@ -52,10 +63,17 @@ typedef struct UnitWinWork {
 	s32 timer;             // 0x28
 	s32 coin;              // 0x2C
 	s32 coinDisp;          // 0x30
-	u8 pad34[0x50 - 0x34]; // 0x34
+	f32 cursor;            // 0x34
+	u8 pad38[4];           // 0x38
+	f32 cursorX;           // 0x3C
+	f32 cursorY;           // 0x40
+	f32 scroll;            // 0x44
+	u8 pad48[4];           // 0x48
+	s32 field_0x4C;        // 0x4C
 	s32 field_0x50;        // 0x50
 	u16 flags2;            // 0x54
-	u8 pad56[0x5C - 0x56]; // 0x56
+	u8 pad56[2];           // 0x56
+	s32 count;             // 0x58
 	s32 field_0x5C;        // 0x5C
 	s32 winId[3];          // 0x60
 	u8 pad6C[0xE0 - 0x6C]; // 0x6C
@@ -128,6 +146,10 @@ void unk_8017599c(WinMgrEntry* entry) {
 	}
 }
 
+static void unitwin_make_name(char* buf, const char* name, s32 n) {
+	sprintf(buf, "%s_%04d", name, n);
+}
+
 void unk_8017597c(WinMgrEntry* entry) {
 	winMgrHelpMain(entry);
 }
@@ -145,6 +167,7 @@ void unk_801758fc(WinMgrEntry* entry) {
 void unk_80175710(WinMgrEntry* entry) {
 	UnitWinWork* wp = _wp;
 	PouchData* pouch = pouchGetPtr();
+	s32 mode;
 	Mtx trans;
 	Mtx scale;
 	s32 d;
@@ -412,6 +435,987 @@ USER_FUNC(evt_unitwin_main_func) {
 	return EVT_RETURN_BLOCK;
 }
 
+static inline s32 unitwin_party_icon(s32 icon) {
+	if (icon == 0x158) {
+		switch (pouchGetPartyColor(4)) {
+			case 0:
+				icon = 0x158;
+				break;
+			case 1:
+				icon = 0x159;
+				break;
+			case 2:
+				icon = 0x15A;
+				break;
+			case 3:
+				icon = 0x15B;
+				break;
+			case 4:
+				icon = 0x15C;
+				break;
+			case 5:
+				icon = 0x15D;
+				break;
+			case 6:
+			default:
+				icon = 0x15E;
+				break;
+		}
+	}
+	return icon;
+}
+
+#define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
+
+void evt_unitwin_disp_func(CameraId cameraId, void* param) {
+	UnitWinWork* wp = (UnitWinWork*)param;
+	s32 mode;
+	PouchData* pouch = pouchGetPtr();
+
+	if (wp->flags & 1) {
+		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
+		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
+		s32 i;
+		s32 off4;
+		s32 off12;
+
+		windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, -150.0f, 120.0f, 300.0f, 50.0f, 20.0f);
+		FontDrawStart();
+		FontDrawEdge();
+		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		FontDrawString((s32)(strlen(name) * 24 / 4) * -1, 108.0f, name);
+		FontDrawEdgeOff();
+		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+		FontDrawStart();
+		FontDrawMessage(-220, -138, msgSearch(desc));
+
+		for (i = 0; i < wp->goodsMax; i++) {
+			if (wp->goods[i] != 0) {
+				Vec pos;
+				f32 proj[7];
+				f32 vp[6];
+				f32 sx, sy, sz;
+				Mtx mtx;
+				CameraEntry* cam;
+				s32 id;
+				u8 price;
+
+				mapObjGetPos(wp->entries[i].mapObj, &pos);
+				cam = camGetPtr(4);
+				GXSetProjection(cam->projection, cam->projType);
+				GXGetProjectionv(proj);
+				GXGetViewportv(vp);
+				GXProject(pos.x, pos.y, pos.z, cam->view, proj, vp, &sx, &sy, &sz);
+				cam = camGetPtr(cameraId);
+				GXSetProjection(cam->projection, cam->projType);
+				id = wp->goods[i];
+				if (id >= 0xF0 && id < 0x153) {
+					price = itemDataTable[id].discount_price;
+				} else {
+					price = itemDataTable[id].buy_price;
+				}
+				PSMTXTrans(mtx, 8.0f + (-304.0f + sx), 240.0f - (sy - 60.0f), 0.0f);
+				iconNumberDispGx(mtx, price, 1, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			}
+		}
+	}
+
+	if (wp->flags & 0xD000) {
+		Mtx mtx;
+		Mtx scale;
+		s32 coin;
+		s32 delta;
+
+		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -75.0f, 150.0f, 45.0f, 20.0f);
+		PSMTXTrans(mtx, -220.0f, -113.0f, 0.0f);
+		PSMTXScale(scale, 0.7f, 0.7f, 0.7f);
+		PSMTXConcat(mtx, scale, mtx);
+		if (wp->flags & 0x1000) {
+			iconDispGx2(mtx, 0x10, 0x18B);
+			coin = pouchGetCoin();
+		} else if (wp->flags & 0x4000) {
+			iconDispGx2(mtx, 0x10, 0x102);
+			coin = ((s32 (*)(void))pouchGetSuperCoin)();
+		} else {
+			iconDispGx2(mtx, 0x10, 0x18D);
+			coin = ((s32 (*)(void))pouchGetStarPiece)();
+		}
+		PSMTXTrans(mtx, -192.0f, -113.0f, 0.0f);
+		iconDispGx2(mtx, 0x10, 0x1D6);
+		PSMTXTrans(mtx, -126.0f, -113.0f, 0.0f);
+		iconNumberDispGx(mtx, wp->coin, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		if ((delta = coin - wp->coin)) {
+			delta /= 10;
+			if (!delta) {
+				delta = coin > wp->coin ? 1 : -1;
+			}
+			if (wp->field_0x5C & 1) {
+				wp->coin += delta;
+				statusWinForceUpdateCoin();
+			}
+			wp->field_0x5C++;
+			wp->field_0x5C %= 1200;
+			if (!unk_804189fc) {
+				psndSFXOn("SFX_COUNT_COIN1");
+				unk_804189fc = 7;
+			}
+		}
+		if (unk_804189fc > 0) {
+			unk_804189fc--;
+		}
+	}
+
+	if (wp->flags & 0x2000) {
+		Mtx mtx;
+		Mtx scale;
+		s32 delta;
+
+		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
+		PSMTXTrans(mtx, -210.0f, -166.0f, 0.0f);
+		PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
+		PSMTXConcat(mtx, scale, mtx);
+		iconDispGx2(mtx, 0x10, 0x1F1);
+		PSMTXTrans(mtx, -126.0f, -168.0f, 0.0f);
+		iconNumberDispGx(mtx, wp->coinDisp, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		if (!(gp->retraceCount & 3)) {
+			if ((delta = pouch->mShineSpriteCount - wp->coinDisp)) {
+				delta /= 10;
+				if (!delta) {
+					delta = pouch->mShineSpriteCount > wp->coinDisp ? 1 : -1;
+				}
+				wp->coinDisp += delta;
+			}
+		}
+	}
+
+	if ((wp->flags & 0x100) && (lotteryGetPtr()->mFlags & 2)) {
+		Mtx mtx;
+		char buf[32];
+		s32 i;
+
+		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
+		PSMTXTrans(mtx, -220.0f, -172.0f, 0.0f);
+		iconDispGx2(mtx, 0x10, 0x140);
+		sprintf(buf, "%04d", *(s16*)((u8*)lotteryGetPtr() + 0x20));
+		for (i = 0; i < 4; i++) {
+			PSMTXTrans(mtx, 20.0f * i + -126.0f - 60.0f, -168.0f, 0.0f);
+			iconNumberDispGx(mtx, ((s8*)buf)[i] - '0', 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		}
+	}
+
+	switch (mode = wp->field_0x50) {
+		case 0:
+		case 1:
+			break;
+		case 4: {
+			const char* desc;
+			s32 row;
+			s32 i;
+			s32 h;
+			u32 sl, st, sw, sh;
+
+			row = 0;
+			desc = NULL;
+
+			h = (8 - pouchGetKeepItemCnt() > 0 ? 8 - pouchGetKeepItemCnt() : 0) * 24;
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 51.0f, 114.0f, 150.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(81.0f, 111.0f, msgSearch("msg_window_title_1"));
+			FontDrawEdgeOff();
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0; i < 32; i++) {
+				s32 id = pouchKeepItem(i);
+				ItemData* item = &itemDataTable[id];
+				if (id) {
+					iconDispGx(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, 0x10, item->icon_id, 0.5f);
+					FontDrawStart();
+					FontDrawString(36.0f, wp->scroll + (80 - row * 24), item->id);
+					if (row == wp->cursor) {
+						desc = item->description;
+					}
+					row++;
+				}
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (desc) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(desc));
+			}
+			break;
+		}
+		case 2:
+		case 3:
+		case 11:
+		case 12:
+		case 13:
+		case 14:
+		case 15:
+		case 16: {
+			s32 h;
+			s32* tbl;
+			const char* title;
+			s32 titleX;
+			s32 i;
+			s32 row;
+			const char* desc;
+			s32 max;
+			u32 sl, st, sw, sh;
+
+			row = 0;
+			desc = NULL;
+			if (mode == 2 || mode == 3) {
+				h = (8 - pouchGetHaveItemCnt() > 0 ? 8 - pouchGetHaveItemCnt() : 0) * 24;
+				max = 20;
+				title = msgSearch("msg_window_title_1");
+				titleX = 30;
+			} else if (mode == 12) {
+				h = (8 - pouchGetHaveBadgeCnt() > 0 ? 8 - pouchGetHaveBadgeCnt() : 0) * 24;
+				max = 200;
+				title = msgSearch("msg_window_title_2");
+				titleX = 40;
+			} else if (mode == 14) {
+				h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+				max = 0x152;
+				title = msgSearch("msg_window_title_3");
+				titleX = 20;
+			} else if (mode == 15) {
+				h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+				max = wp->count;
+				title = msgSearch("msg_window_title_3");
+				titleX = 20;
+			} else if (mode == 16) {
+				h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+				max = 0x152;
+				title = msgSearch("msg_window_title_4");
+				titleX = 30;
+			} else {
+				h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+				max = 99;
+				title = msgSearch("msg_window_title_2");
+				titleX = 40;
+			}
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 51.0f, 114.0f, 150.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(titleX + 51, 111.0f, title);
+			FontDrawEdgeOff();
+			if (wp->field_0x50 != 3) {
+				Mtx mtx;
+				Mtx scale;
+				s32 icon;
+				PSMTXTrans(mtx, 244.0f, 82.0f, 0.0f);
+				PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
+				PSMTXConcat(mtx, scale, mtx);
+				iconDispGxCol(mtx, 0x10, 0x211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
+				if (wp->field_0x50 == 13) {
+					icon = 0x18D;
+				} else if (wp->field_0x50 == 16) {
+					icon = 0x13F;
+				} else {
+					icon = 0x18B;
+				}
+				{
+					iconDispGx(&(Vec){244.0f, 86.0f, 0.0f}, 0x10, icon, 0.6f);
+				}
+			}
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0, tbl = badge_bottakuru100_table; i < max; i++) {
+				s32 flag = 0;
+				GXColor color = {0x00, 0x00, 0x00, 0xFF};
+				s32 id;
+				ItemData* item;
+				switch (wp->field_0x50) {
+					case 2:
+					case 3:
+						id = pouchHaveItem(i);
+						break;
+					case 12:
+						id = pouchHaveBadge(i);
+						break;
+					case 11:
+						id = (s16)badgeShop_get(bdsw->bargain_table, i + 0xF0);
+						if (id - badgeShop_ThrowCheck(i + 0xF0) > 0) {
+							id = i + 0xF0;
+						} else {
+							id = 0;
+						}
+						break;
+					case 13:
+						if ((s16)badgeShop_get(bdsw->starmaniac_table, i + 0xF0) > 0) {
+							id = i + 0xF0;
+						} else {
+							id = 0;
+						}
+						break;
+					case 14:
+						if ((s16)badgeShop_get(bdsw->bottakuru_table, i + 1) > 0) {
+							id = i + 1;
+						} else {
+							id = 0;
+						}
+						break;
+					case 15:
+						id = tbl[i];
+						break;
+					case 16:
+						if ((s16)badgeShop_get(bdsw->bteresa_table, i + 1) > 0) {
+							id = i + 1;
+						} else {
+							id = 0;
+						}
+						break;
+				}
+				item = &itemDataTable[id];
+				if (id) {
+					s32 ty;
+					if (wp->field_0x50 == 13 && item->star_piece_price > ((s32 (*)(void))pouchGetStarPiece)()) {
+						color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+						flag = 0x20;
+					}
+					{
+						ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, item->icon_id, 0.5f);
+					}
+					FontDrawStart();
+					FontDrawScale(0.8f);
+					FontDrawColor(color);
+					ty = 80 - row * 24;
+					FontDrawString(36.0f, wp->scroll + ty - 2.0f, item->id);
+					if (wp->field_0x50 != 3) {
+						char buf[32];
+						f32 sc;
+						s32 xoff;
+						switch (wp->field_0x50) {
+							case 14:
+								sprintf(buf, "%2d", item->buy_price * 12 / 10);
+								sc = 1.0f;
+								xoff = 0;
+								break;
+							case 15:
+								sprintf(buf, "%3d", item->buy_price * (evtGetValue(NULL, 0xF5DE06A9) + 11) / 10);
+								sc = 1.0f;
+								xoff = -14;
+								break;
+							case 16:
+								sprintf(buf, "%4d", (item->buy_price * 2 + 2) / 3);
+								sc = 0.8f;
+								xoff = -20;
+								break;
+							case 11:
+								sprintf(buf, "%2d", item->buy_price);
+								sc = 1.0f;
+								xoff = 0;
+								break;
+							case 13:
+								sprintf(buf, "%2d", item->star_piece_price);
+								sc = 1.0f;
+								xoff = 0;
+								break;
+							case 12:
+							default:
+								sprintf(buf, "%2d", item->sell_price);
+								xoff = 0;
+								sc = 1.0f;
+								break;
+						}
+						FontDrawStart();
+						FontDrawScale(sc);
+						FontDrawColor(color);
+						FontDrawString(xoff + 226, wp->scroll + ty, buf);
+					}
+					if (row == wp->cursor) {
+						desc = item->description;
+					}
+					row++;
+				}
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (desc) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(desc));
+			}
+			break;
+		}
+		case 17:
+		case 18: {
+			InformantWork* jdt = &_jdt;
+			s32 h;
+			u8* tbl;
+			const char* title;
+			u32 sl, st, sw, sh;
+			s32 i;
+			InformantInfo* info;
+
+			h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+			if (mode == 17) {
+				title = msgSearch("msg_window_title_5");
+				tbl = jdt->unk14.unkD;
+			} else {
+				title = msgSearch("msg_window_title_6");
+				tbl = jdt->unk14.unk1A;
+			}
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 51.0f, 114.0f, 150.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(71.0f, 111.0f, title);
+			FontDrawEdgeOff();
+			if (wp->field_0x50 == 17) {
+				Mtx mtx;
+				Mtx scale;
+				PSMTXTrans(mtx, 244.0f, 82.0f, 0.0f);
+				PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
+				PSMTXConcat(mtx, scale, mtx);
+				iconDispGxCol(mtx, 0x10, 0x211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
+				{
+					iconDispGx(&(Vec){244.0f, 86.0f, 0.0f}, 0x10, 0x18B, 0.6f);
+				}
+			}
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0, info = jdt->info; i < wp->count; i++, info++) {
+				char buf[32];
+				GXColor color;
+				char c;
+				s32 ty;
+				if (johoya_get(tbl, info->storyId)) {
+					sprintf(buf, "");
+					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+				} else {
+					sprintf(buf, "%3d", info->unkA);
+					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+				}
+				FontDrawStart();
+				c = ((char*)info->initEndPos)[info->tagEndPos];
+				((char*)info->initEndPos)[info->tagEndPos] = 0;
+				FontDrawColor(color);
+				FontDrawScale(0.8f);
+				ty = 80 - i * 24;
+				FontDrawString(1.0f, wp->scroll + ty, (char*)info->initEndPos);
+				((char*)info->initEndPos)[info->tagEndPos] = c;
+				if (wp->field_0x50 == 17) {
+					FontDrawStart();
+					FontDrawColor(color);
+					FontDrawString(221.0f, wp->scroll + ty, buf);
+				}
+			}
+			GXSetScissor(sl, st, sw, sh);
+			break;
+		}
+		case 5:
+		case 6:
+		case 7: {
+			char msgName[64] = {0};
+			s32 row = 0;
+			s32 h;
+			u32 sl, st, sw, sh;
+			s32 i;
+			s32* pid;
+			s32 lv;
+			s32 flag;
+			GXColor color;
+			const char* name;
+
+			h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 16.0f, 114.0f, 120.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(41.0f, 111.0f, msgSearch("msg_window_title_7"));
+			FontDrawEdgeOff();
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 167.0f, 114.0f, 85.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(177.0f, 111.0f, msgSearch("msg_window_title_8"));
+			FontDrawEdgeOff();
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0, pid = party_id_table; *pid; i++, pid++) {
+				s32 icon;
+				s32 ty;
+				char buf[32];
+				char help[16];
+				char dir[16];
+				if (wp->field_0x50 == 5 || wp->field_0x50 == 6) {
+					if (!partyChkJoin(*pid)) {
+						continue;
+					}
+					if (evtGetValue(NULL, 0xF8406022) == 0) {
+						if (pouch->partyData[*pid].techLevel < 1) {
+							color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+							lv = 0;
+							flag = 0;
+						} else {
+							color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+							lv = 1;
+							flag = 0x20;
+						}
+					} else {
+						if (pouch->partyData[*pid].techLevel < 2) {
+							color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+							lv = 0;
+							flag = 0;
+						} else {
+							color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+							lv = 2;
+							flag = 0x20;
+						}
+					}
+				} else {
+					if (!partyChkJoin(*pid)) {
+						continue;
+					}
+					if (wp->field_0x4C == *pid) {
+						continue;
+					}
+					if (pouch->partyData[*pid].techLevel > 0) {
+						color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+						lv = 0;
+						flag = 0;
+					} else {
+						color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+						lv = 1;
+						flag = 0x20;
+					}
+				}
+				ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, unitwin_party_icon(party_icon_table[i]), 0.5f);
+				FontDrawStart();
+				FontDrawColor(color);
+				switch (i) {
+					case 0:
+						name = msgSearch("name_party0");
+						break;
+					case 1:
+						name = msgSearch("name_party1");
+						break;
+					case 2:
+						name = msgSearch("name_party4");
+						break;
+					case 3:
+						name = pouchGetYoshiName();
+						break;
+					case 4:
+						name = msgSearch("name_party5");
+						break;
+					case 5:
+						name = msgSearch("name_party2");
+						break;
+					case 6:
+						name = msgSearch("name_party6");
+						break;
+				}
+				ty = 80 - row * 24;
+				FontDrawString(36.0f, wp->scroll + ty, name);
+				sprintf(buf, "%d", pouch->partyData[*pid].techLevel);
+				FontDrawStart();
+				FontDrawString(236.0f, wp->scroll + ty, buf);
+				if (row == wp->cursor) {
+					if (lv == 0) {
+						sprintf(help, "help");
+					} else {
+						sprintf(help, "helperr");
+					}
+					if (wp->field_0x50 == 5 || wp->field_0x50 == 6) {
+						sprintf(dir, "lankup");
+					} else {
+						sprintf(dir, "lankdown");
+					}
+					sprintf(msgName, "%s_%s_lank%d%s", help, dir, pouch->partyData[*pid].techLevel + 1, party_labelname_table[i]);
+				}
+				row++;
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (*(s8*)msgName) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(msgName));
+			}
+			break;
+		}
+		case 8: {
+			char msgName[64] = {0};
+			s32 row = 0;
+			s32 h;
+			u32 sl, st, sw, sh;
+			s32 i;
+			s32 j;
+			s32 flag;
+			s32 lv;
+			s32 v;
+			s32 icon;
+			s32 bob;
+			s32 iy;
+			s32 iflag;
+			s32 ty;
+			GXColor color;
+
+			h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 16.0f, 114.0f, 120.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(21.0f, 111.0f, msgSearch("msg_window_title_9"));
+			FontDrawEdgeOff();
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 167.0f, 114.0f, 85.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(177.0f, 111.0f, msgSearch("msg_window_title_10"));
+			FontDrawEdgeOff();
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0; i < wp->count; i++, row++) {
+				char buf[32];
+				char help[16];
+				flag = 0;
+				for (j = 0; j < wp->count; j++) {
+					if (j != wp->cursor && *mario_status_point_table[j] - mario_status_henka_table[j] <= 0) {
+						flag = 1;
+					}
+				}
+				if (!flag) {
+					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+					lv = 0;
+					iflag = 0;
+				} else {
+					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+					lv = 1;
+					iflag = 0x20;
+				}
+				iy = 56 - i * 24;
+				iflag |= 0x10;
+				{
+					ICONGX(&(Vec){11.0f, wp->scroll + iy, 0.0f}, iflag, mario_status_icon_table[i], 0.5f);
+				}
+				FontDrawStart();
+				FontDrawColor(color);
+				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
+				ty = 80 - i * 24;
+				FontDrawString(36.0f, wp->scroll + ty, buf);
+				bob = (gp->retraceCount & 0xF) > 7 ? 0 : 2;
+				if (row == wp->cursor) {
+					if (lv == 0) {
+						sprintf(help, "help");
+					} else {
+						sprintf(help, "helperr");
+					}
+					sprintf(msgName, "%s_levelup%s", help, mario_status_labelname_table[i]);
+					v = *mario_status_point_table[i] + mario_status_henka_table[i] * 2;
+					if (v > 0) {
+						icon = 0x1B5;
+					} else {
+						icon = 0x162;
+						bob = 0;
+					}
+					{
+						ICONGX(&(Vec){166.0f, bob + (wp->scroll + iy), 0.0f}, iflag, icon, 0.5f);
+					}
+					{
+						ICONGX(&(Vec){186.0f, bob + (wp->scroll + iy), 0.0f}, iflag, icon, 0.5f);
+					}
+				} else {
+					v = *mario_status_point_table[i] - mario_status_henka_table[i];
+					if (v > 0) {
+						icon = 0x1B6;
+					} else {
+						icon = 0x162;
+						bob = 0;
+					}
+					{
+						ICONGX(&(Vec){176.0f, (wp->scroll + iy) - bob, 0.0f}, iflag, icon, 0.5f);
+					}
+				}
+				if (v > 0) {
+					sprintf(buf, "%3d", v);
+				} else {
+					sprintf(buf, "  \x81\x48", v);
+				}
+				FontDrawStart();
+				FontDrawString(206.0f, wp->scroll + ty, buf);
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (*(s8*)msgName) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(msgName));
+			}
+			break;
+		}
+		case 9: {
+			char msgName[64] = {0};
+			s32 row = 0;
+			s32 h;
+			u32 sl, st, sw, sh;
+			s32 i;
+			s32 j;
+			s32 cnt;
+			s32 lv;
+			s32 v;
+			s32 ty;
+			GXColor color;
+
+			h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 16.0f, 114.0f, 120.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(21.0f, 111.0f, msgSearch("msg_window_title_9"));
+			FontDrawEdgeOff();
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 167.0f, 114.0f, 85.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(177.0f, 111.0f, msgSearch("msg_window_title_10"));
+			FontDrawEdgeOff();
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0; i < wp->count; i++, row++) {
+				char buf[32];
+				char help[16];
+				cnt = 0;
+				for (j = 0; j < wp->count; j++) {
+					if (j != wp->cursor && *mario_status_point_table[j] - mario_status_henka_table[j] <= 0) {
+						cnt++;
+					}
+				}
+				if (cnt < 2) {
+					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+					lv = 0;
+					j = 0;
+				} else {
+					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+					lv = 1;
+					j = 0x20;
+				}
+				{
+					ICONGX(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, j | 0x10, mario_status_icon_table[i], 0.5f);
+				}
+				FontDrawStart();
+				FontDrawColor(color);
+				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
+				ty = 80 - i * 24;
+				FontDrawString(36.0f, wp->scroll + ty, buf);
+				if (row == wp->cursor) {
+					if (lv == 0) {
+						sprintf(help, "help");
+					} else {
+						sprintf(help, "helperr");
+					}
+					sprintf(msgName, "%s_levelup%s", help, mario_status_labelname_table[i]);
+					v = *mario_status_point_table[i] + mario_status_henka_table[i];
+					if (v > 0) {
+						sprintf(buf, "%3d", v);
+					} else {
+						sprintf(buf, "  \x81\x48", v);
+					}
+					FontDrawStart();
+					FontDrawString(206.0f, wp->scroll + ty, buf);
+				}
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (*(s8*)msgName) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(msgName));
+			}
+			break;
+		}
+		case 10: {
+			char msgName[64] = {0};
+			s32 row = 0;
+			s32 h;
+			u32 sl, st, sw, sh;
+			s32 i;
+			s32 lv;
+			s32 v;
+			s32 ty;
+			s32 flag;
+			GXColor color;
+
+			h = 8 - wp->count;
+			h = (h > 0 ? h : 0) * 24;
+			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 16.0f, 114.0f, 120.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(21.0f, 111.0f, msgSearch("msg_window_title_9"));
+			FontDrawEdgeOff();
+			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 167.0f, 114.0f, 85.0f, 28.0f, 8.0f);
+			FontDrawStart();
+			FontDrawEdge();
+			FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+			FontDrawString(177.0f, 111.0f, msgSearch("msg_window_title_10"));
+			FontDrawEdgeOff();
+			GXGetScissor(&sl, &st, &sw, &sh);
+			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
+			for (i = 0; i < 3; i++) {
+				char buf[32];
+				char help[16];
+				if (i == wp->field_0x4C) {
+					continue;
+				}
+				if (*mario_status_point_table[i] - mario_status_henka_table[i] > 0) {
+					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
+					lv = 0;
+					flag = 0;
+				} else {
+					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
+					lv = 1;
+					flag = 0x20;
+				}
+				{
+					ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, mario_status_icon_table[i], 0.5f);
+				}
+				FontDrawStart();
+				FontDrawColor(color);
+				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
+				ty = 80 - row * 24;
+				FontDrawString(36.0f, wp->scroll + ty, buf);
+				if (row == wp->cursor) {
+					if (lv == 0) {
+						sprintf(help, "help");
+					} else {
+						sprintf(help, "helperr");
+					}
+					sprintf(msgName, "%s_leveldown%s", help, mario_status_labelname_table[i]);
+					v = *mario_status_point_table[i] - mario_status_henka_table[i];
+					if (v > 0) {
+						sprintf(buf, "%3d", v);
+					} else {
+						sprintf(buf, "  \x81\x48", v);
+					}
+					FontDrawStart();
+					FontDrawString(206.0f, wp->scroll + ty, buf);
+				}
+				row++;
+			}
+			GXSetScissor(sl, st, sw, sh);
+			if (*(s8*)msgName) {
+				windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -240.0f, -130.0f, 480.0f, 70.0f, 20.0f);
+				FontDrawStart();
+				FontDrawMessage(-220, -138, msgSearch(msgName));
+			}
+			break;
+		}
+	}
+
+	if (wp->field_0x50 != 0 && wp->field_0x50 != 1) {
+		char text[136];
+		char* line1;
+		char* line2 = NULL;
+		s32 lines;
+		s32 k;
+		s8* p;
+		s32 w;
+		s32 w2;
+
+		switch (wp->field_0x50) {
+			case 0:
+			case 1:
+				break;
+			case 11:
+			case 14:
+			case 15:
+				strcpy(text, msgSearch("msg_window_select_6"));
+				break;
+			case 17:
+				strcpy(text, msgSearch("msg_window_select_8"));
+				break;
+			case 18:
+				strcpy(text, msgSearch("msg_window_select_7"));
+				break;
+			case 13:
+			case 16:
+				strcpy(text, msgSearch("msg_window_select_10"));
+				break;
+			case 2:
+			case 12:
+				strcpy(text, msgSearch("msg_window_select_2"));
+				break;
+			case 3:
+				strcpy(text, msgSearch("msg_window_select_3"));
+				break;
+			case 4:
+				strcpy(text, msgSearch("msg_window_select_4"));
+				break;
+			case 5:
+				strcpy(text, msgSearch("msg_window_select_11"));
+				break;
+			case 6:
+				strcpy(text, msgSearch("msg_window_select_11"));
+				break;
+			case 7:
+				strcpy(text, msgSearch("msg_window_select_12"));
+				break;
+			case 8:
+			case 9:
+				strcpy(text, msgSearch("msg_window_select_9"));
+				break;
+			case 10:
+				strcpy(text, msgSearch("msg_window_select_9_1"));
+				break;
+		}
+		line1 = text;
+		lines = 1;
+		for (p = (s8*)line1, k = 0; *p; p++, k++) {
+			if (*p == '\n') {
+				text[k] = 0;
+				lines = 2;
+				line2 = &text[k] + 1;
+				break;
+			}
+		}
+		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -280.0f, 100.0f, 240.0f, (lines - 1) * 24 + 45, 20.0f);
+		FontDrawStart();
+		w = line1 ? FontGetMessageWidth(line1) : 0;
+		if (line2) {
+			w2 = FontGetMessageWidth(line2);
+		} else {
+			w2 = 0;
+		}
+		if (w2 > w) {
+			w = w2;
+		}
+		if (w <= 228) {
+			w = (228 - w) / 2;
+		} else {
+			FontDrawScale(228.0f / w);
+			w = 0;
+		}
+		FontDrawString(w - 274, 90.0f, line1);
+		if (line2) {
+			FontDrawString(w - 274, 66.0f, line2);
+		}
+		iconFlagOff("yubicursor_2", 2);
+		iconSetPos("yubicursor_2", wp->cursorX, wp->cursorY, 0.0f);
+	} else {
+		iconFlagOn("yubicursor_2", 2);
+	}
+}
+
+
 USER_FUNC(set_new_goods_list) {
 	s32* args = event->args;
 	UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
@@ -450,7 +1454,7 @@ USER_FUNC(unitwin_setpartylank) {
 	PouchData* pouch = pouchGetPtr();
 	idx = evtGetValue(event, args[0]) * 14;
 	v = evtGetValue(event, args[1]);
-	PP->techLevel = PP->attackLevel = PP->HPLevel = v;
+	PP->HPLevel = PP->attackLevel = PP->techLevel = v;
 	pouchRevisePartyParam();
 	PP->currentHP = PP->maximumHP;
 	return EVT_RETURN_DONE;

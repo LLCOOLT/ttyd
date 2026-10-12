@@ -205,7 +205,7 @@ s32 battleAcMain_Shot(BattleWork* work) {
                     sw->speed = 100.0f;
                 }
                 if (SH_FLAGS(ac) & 1) {
-                    SH_OUT(ac)[1] = (s32)((sw->minV + sw->maxV) * 0.5f);
+                    SH_OUT(ac)[1] = (s32)((sw->minV + sw->maxV) / 2.0f);
                     SH_RECORD(ac, sw);
                     if (sw->idx >= SH_PARAMS(ac)->count) {
                         ac->mAcState = 1002;
@@ -402,9 +402,7 @@ static void _disp_target_mark_afterimage(CameraId cameraId, void* param) {
                 _draw_target_mark((GXColor){0x90, 0x80, 0xA0, 0xFF}, out.x, out.y, out.z, sw->spin[i]);
             } else {
                 u8 a = (u8)intplGetValue(0, (s32)(30.0f - sw->life[i]), 30, 255.0f, 0.0f);
-                GXColor c = {0x90, 0x80, 0xA0, 0};
-                c.a = a;
-                _draw_target_mark(c, out.x, out.y, out.z, sw->spin[i]);
+                _draw_target_mark((GXColor){0x90, 0x80, 0xA0, a}, out.x, out.y, out.z, sw->spin[i]);
             }
             if (sw->life[i] <= 0.0f) {
                 sw->ang[i] = -1.0f;

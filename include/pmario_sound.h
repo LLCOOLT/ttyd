@@ -44,21 +44,40 @@ typedef struct SoundEffectEntry {
     u16 field_0x12;        // 0x12
 } SoundEffectEntry;
 
+typedef struct PaperSoundFade {
+    u8 state;              // 0x0
+    u8 unk1;               // 0x1
+    s16 time;              // 0x2
+    s16 timeMax;           // 0x4
+    u8 unk6;               // 0x6
+    u8 unk7;               // 0x7
+    s16 unk8;              // 0x8
+    s16 unkA;              // 0xA
+} PaperSoundFade;
+
 typedef struct PaperSoundBGM {
-    s32 unk0;              // 0x0
+    u32 unk0;              // 0x0
     s32 streamId;          // 0x4, TODO verify re: seq_title
-    u8 unk8[0x20 - 0x8];   // 0x8
-    s8 unk20;              // 0x20
-    u8 unk21[0x38 - 0x21]; // 0x21
+    u32 unk8;              // 0x8, flags
+    u8 unkC[0x10 - 0xC];   // 0xC
+    u8 unk10;              // 0x10
+    u8 unk11[0x20 - 0x11]; // 0x11
+    PaperSoundFade fade;   // 0x20
+    u8 unk2C[0x30 - 0x2C]; // 0x2C
+    s64 unk30;             // 0x30
 } PaperSoundBGM;
 
 typedef struct PaperSoundEffect {
     s32 unk0;              // 0x0
-    u8 unk4[0x6 - 0x4];    // 0x4
-    s16 unk6;              // 0x6
-    u8 unk8[0x18 - 0x8];   // 0x8
-    s32 unk18;             // 0x0
-    u8 unk1C[0x28 - 0x1C]; // 0x1C
+    u16 unk4;              // 0x4
+    u16 unk6;              // 0x6
+    u8 unk8;               // 0x8
+    u8 unk9[0x12 - 0x9];   // 0x9
+    u16 unk12;             // 0x12
+    u16 unk14;             // 0x14
+    u8 unk16[0x18 - 0x16]; // 0x16
+    s32 unk18;             // 0x18
+    Vec unk1C;             // 0x1C
 } PaperSoundEffect;
 
 typedef struct PaperSoundEnv {
@@ -68,18 +87,20 @@ typedef struct PaperSoundEnv {
 } PaperSoundEnv;
 
 typedef struct PaperSoundWork {
-    s8 unk0;               // 0x0
-    u8 unk1[0xC - 0x1];    // 0x1
-    s8 unkC;               // 0xC
-    u8 unkD[0x18 - 0xD];   // 0xD
-    s16 unk18;             // 0x18
-    s16 unk1A;             // 0x1A
-    u8 unk1C[0x30 - 0x1C]; // 0x1C
+    PaperSoundFade fade[2]; // 0x0
+    u16 unk18[2];          // 0x18
+    u8 unk1C[0x20 - 0x1C]; // 0x1C
+    u16 unk20[2];          // 0x20
+    u8 unk24;              // 0x24
+    u8 unk25;              // 0x25
+    s16 unk26;             // 0x26
+    s16 unk28;             // 0x28
+    u8 unk2A[0x30 - 0x2A]; // 0x2A
     Vec position;          // 0x30
     f32 direction;         // 0x3C
     char unk40[0x10];      // 0x40
     s16 unk50;             // 0x50
-    u8 unk52[0x54 - 0x52]; // 0x52
+    s16 unk52;             // 0x52, reverb
     s16 unk54;             // 0x54
     u16 unk56;             // 0x56, verified u16
     s8 unk58;              // 0x58
@@ -106,7 +127,7 @@ void psndSFXAllOff(void);
 void psndSFXOn(const char* name);
 s32 psndSFXOn_3D(const char* name, Vec* position);
 
-BOOL psndBGMOff_f_d(s32 flags, u16 fadetime, BOOL someswitch);
+BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch);
 BOOL psndBGMStartCheck(s32 id);
 
 void psndSetFlag(s32 flag);

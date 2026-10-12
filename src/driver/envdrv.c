@@ -1,6 +1,7 @@
 #include "driver/envdrv.h"
 #include "driver/arcdrv.h"
 #include "driver/dispdrv.h"
+#include "driver/mapdrv.h"
 #include "mario/mariost.h"
 #include "manager/dvdmgr.h"
 #include "system.h"
@@ -63,11 +64,6 @@ EnvironmentGlare envGlare3 = {
 static EnvironmentWork work[2];
 
 //.sbss
-s32 v_count; //TODO: re-type all these
-s32 u2;
-s32 u1;
-s32 a;
-s32 frame_cnt;
 s32 tpl_ok;
 TEXPalette* env_tpl;
 
@@ -79,6 +75,7 @@ void envDisp(CameraId camId, void* param);
 void envDisp2(CameraId camId, void* param);
 void envDisp_DepthOfField(void);
 void envDisp_Blur(void);
+void envDisp_FF(void);
 
 //there is no function so we'll make a macro
 #define envGetWork() (gp->inBattle ? &work[1] : &work[0])
@@ -185,9 +182,9 @@ void envDisp(CameraId camId, void *param) {
 
     GXGetViewportv(vp);
     GXGetProjectionv(pm);
-    //envDisp_DepthOfField();
-    //envDisp_Blur();
-    //envDisp_FF();
+    envDisp_DepthOfField();
+    envDisp_Blur();
+    envDisp_FF();
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
     GXSetProjectionv(pm);
 }
@@ -467,8 +464,107 @@ void envDisp_DepthOfField(void) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
+typedef struct EnvBlurWork {
+    u16 flags; //0x0
+    u8 pad2[6]; //0x2
+    OSTime time; //0x8
+    s32 msec; //0x10
+    u8 pad14[4]; //0x14
+} EnvBlurWork;
+
+static inline GXColor envBlurColor(u8 a) {
+    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+    c.a = a;
+    return c;
+}
+
+void envDisp_Blur(void) {
+    EnvironmentWork* wp = envGetWork();
+    EnvBlurWork* blur = (EnvBlurWork*)&wp->unk98;
+    CameraEntry* cam;
+    s32 msec;
+    f32 t;
+    u8 alpha;
+
+    if ((wp->flags & 0x40000000) && (wp->flags & 8)) {
+        cam = camGetPtr(CAMERA_2D);
+        GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
+        GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
+        GXSetCurrentMtx(0);
+        GXSetNumChans(0);
+        GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        GXSetNumTevStages(1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_ZERO);
+        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        GXSetTevKColorSel(GX_TEVSTAGE0, GX_TEV_KCSEL_K0);
+        GXSetTevKAlphaSel(GX_TEVSTAGE0, GX_TEV_KASEL_K0_A);
+        msec = blur->msec;
+        if (msec) {
+            t = (f32)OSTicksToMilliseconds((u64)(gp->renderTime - blur->time)) / (f32)msec;
+            if (t > 1.0f) {
+                t = 1.0f;
+            }
+            if (blur->flags & 1) {
+                alpha = 255.0f * (1.0f - t);
+            }
+            else {
+                alpha = 120.0f * (1.0f - t) + 128.0f;
+            }
+            GXSetTevKColor(GX_KCOLOR0, envBlurColor(alpha));
+        }
+        else {
+            GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0xFF, 0xFF, 0xA0});
+        }
+        GXLoadTexObj(&wp->envBlurObj, GX_TEXMAP0);
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+        GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+        DOF_QUAD(gp, 2.0f);
+    }
+}
+
+void envBlurOn(s32 type, s32 msec) {
+    EnvironmentWork* wp = envGetWork();
+    EnvBlurWork* blur = (EnvBlurWork*)&wp->unk98;
+
+    wp->flags |= 0x40000000;
+    wp->flags |= 4;
+    wp->flags &= ~8;
+    memset(blur, 0, sizeof(EnvBlurWork));
+    blur->time = gp->renderTime;
+    blur->msec = msec;
+    if (type) {
+        blur->flags |= 1;
+    }
+    wp->envBlur = _mapAlloc(GXGetTexBufferSize(gp->fbWidth / 2,
+        gp->efbHeight / 2, GX_TF_RGB565, GX_FALSE, 0));
+}
+
+void envBlurOff(void) {
+    EnvironmentWork* wp = envGetWork();
+
+    wp->flags &= ~4;
+    wp->flags &= ~0x40000000;
+    _mapFree(wp->envBlur);
+}
+
+
 //almost 1:1, needs some regalloc work and type changes
 void envGlare(EnvironmentGlare* glare) {
+    static f32 frame_cnt;
     EnvironmentWork* var_r4 = envGetWork();
     EnvironmentGlareFilter* temp_r30;
     void* temp_r19;
@@ -605,4 +701,666 @@ void envGlare(EnvironmentGlare* glare) {
         GXPosition3s16((s16)temp_r26, (s16)temp_r30_2, 0);
         GXTexCoord2u16(0, 1);
     }
+}
+
+
+void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1) {
+    EnvironmentWork* wp = envGetWork();
+    EnvironmentGlareFilter* f = &wp->filter;
+    s16 sx1, sy1, sx0, sy0;
+
+    if (type == 0) {
+        f->type = 0;
+        f->x1 = 0;
+        f->y1 = 0;
+        f->x0 = 0;
+        f->y0 = 0;
+        wp->flags &= ~0x20000000;
+        return;
+    }
+    sx0 = x0 - (x0 & 1);
+    sy0 = y0 - (y0 & 1);
+    sx1 = x1 + (x1 & 1);
+    sy1 = y1 + (y1 & 1);
+    if (sx0 < 0) {
+        sx0 = 0;
+    }
+    if (sy0 < 0) {
+        sy0 = 0;
+    }
+    if (sx1 > gp->fbWidth) {
+        sx1 = gp->fbWidth;
+    }
+    if (sy1 > gp->efbHeight) {
+        sy1 = gp->efbHeight;
+    }
+    f->type = type;
+    f->y0 = sy0;
+    f->x0 = sx0;
+    f->y1 = sy1;
+    f->x1 = sx1;
+    f->zscale = 0.0f;
+    f->flags &= ~1;
+    wp->flags |= 0x20000000;
+}
+
+void envGlareFilterZ(f32 zscale) {
+    EnvironmentWork* wp = envGetWork();
+    EnvironmentGlareFilter* f = &wp->filter;
+
+    f->zscale = zscale;
+    f->flags |= 1;
+}
+
+extern int __float_nan[];
+int rand(void);
+static inline s32 env_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
+static inline f32 env_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * (0.5 * guess * (3.0 - guess * guess * x)); } else if (x < 0.0) { return *(f32*)__float_nan; } else if (env_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
+
+#pragma opt_propagation off
+#pragma opt_lifetimes off
+void envDisp_FF(void) {
+    EnvironmentWork* wp = envGetWork();
+    f32 r;
+    f32 angle;
+    f32 c;
+    f32 s;
+    f32 ofs;
+    s32 i;
+
+    if (wp->flags & 0x10000000) {
+        GXSetNumChans(0);
+        GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+        GXSetNumTexGens(1);
+        GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+        GXSetNumTevStages(1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
+        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        GXLoadTexObj(&wp->captureObj, GX_TEXMAP0);
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+        GXSetLineWidth(16, GX_TO_ZERO);
+        GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, 0);
+        GXSetCurrentMtx(0);
+        GXClearVtxDesc();
+        GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+        GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+        GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+        r = env_sqrtf(gp->fbWidth / 2 * gp->fbWidth / 2 + gp->efbHeight / 2 * gp->efbHeight / 2);
+        GXBegin(GX_LINES, GX_VTXFMT0, 2000);
+        for (i = 0; i < 1000; i++) {
+            angle = 6.2831855f * i / 1000.0f;
+            c = env_cos(angle);
+            s = env_sin(angle);
+            ofs = (rand() % 10) / 100.0f;
+            GXPosition3f32(s * r, c * r, 0.0f);
+            GXTexCoord2f32(s / 2.0f + 0.5f + ofs, -c / 2.0f + 0.5f + ofs);
+            GXPosition3f32(0.0f, 0.0f, 0.0f);
+            GXTexCoord2f32(0.5f, 0.5f);
+        }
+    }
+}
+
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset
+
+typedef struct EnvTexMtxWork {
+    MtxPtr view; //0x70
+    MtxPtr mtx; //0x74
+    MtxPtr model; //0x78
+    f32 scale; //0x7C
+    f32 rotY; //0x80
+    f32 rotX; //0x84
+} EnvTexMtxWork;
+#define tw ((EnvTexMtxWork*)wp->unk70)
+
+double sin(double);
+double cos(double);
+double acos(double);
+
+void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxType) {
+    static f32 a;
+    EnvironmentWork* wp = envGetWork();
+    Mtx m0, m2, m1, m3, m4, m5, m6, m7;
+    Mtx44 m9;
+    Mtx m10, m11, m8;
+    f32 s, dot;
+
+    switch (type) {
+        case 0:
+            PSMTXRotRad(m0, 'Y', 0.017453292f * tw->rotY);
+            PSMTXRotRad(m1, 'Z', 0.017453292f * -tw->rotX);
+            PSMTXConcat(m0, m1, m0);
+            PSMTXInvXpose(m0, m0);
+            PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
+            PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
+            PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
+            PSMTXScale(m2, 0.5f, 0.5f, 1.0f);
+            PSMTXConcat(m2, m0, m0);
+            PSMTXTrans(m2, 0.5f, 0.5f, 0.0f);
+            PSMTXConcat(m2, m0, m0);
+            GXLoadTexMtxImm(m0, id, mtxType);
+            break;
+        case 1:
+            PSMTXRotRad(m0, 'Y', -1.5707964f);
+            PSMTXConcat(m0, tw->model, m0);
+            PSMTXInvXpose(m0, m0);
+            PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
+            PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
+            PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
+            PSMTXScale(m3, 0.5f - 0.25f * tw->scale, 0.5f, 1.0f);
+            PSMTXConcat(m3, m0, m0);
+            PSMTXTrans(m3, 0.5f, 0.5f, 0.0f);
+            PSMTXConcat(m3, m0, m0);
+            GXLoadTexMtxImm(m0, id, mtxType);
+            break;
+        case 2: {
+            Vec v = {0.0f, 0.0f, -1.0f};
+            Vec light;
+            Vec half;
+            f32 ry2, rx2, s2;
+
+            ry2 = 3.1415927f * tw->rotY / 180.0f;
+            rx2 = 3.1415927f * tw->rotX / 180.0f;
+            light.x = -(f32)cos(rx2) * (f32)sin(ry2);
+            light.y = -(f32)sin(rx2);
+            light.z = -(f32)cos(rx2) * (f32)cos(ry2);
+            PSMTXMultVecSR(tw->view, &light, &light);
+            C_VECHalfAngle(&light, &v, &half);
+            PSMTXInvXpose(tw->model, m0);
+            PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
+            PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
+            PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
+            PSMTXIdentity(m4);
+            m4[0][0] = half.x;
+            m4[0][1] = half.y;
+            m4[0][2] = half.z;
+            PSMTXConcat(m4, m0, m0);
+            s2 = 20.0f * tw->scale;
+            PSMTXScale(m4, s2, 1.0f, 1.0f);
+            PSMTXConcat(m4, m0, m0);
+            PSMTXTrans(m4, 1.0f - s2, 0.0f, 0.0f);
+            PSMTXConcat(m4, m0, m0);
+            GXLoadTexMtxImm(m0, id, mtxType);
+            break;
+        }
+        case 3: {
+            Vec light2;
+            Vec h;
+            Vec axis;
+            Vec v2 = {0.0f, 0.0f, 1.0f};
+            f32 ry, rx;
+
+            ry = 3.1415927f * tw->rotY / 180.0f;
+            rx = 3.1415927f * tw->rotX / 180.0f;
+            light2.x = (f32)cos(rx) * (f32)sin(ry);
+            light2.y = (f32)sin(rx);
+            light2.z = (f32)cos(rx) * (f32)cos(ry);
+            PSMTXMultVecSR(tw->view, &light2, &light2);
+            dot = PSVECDotProduct(&light2, &v2);
+            if (dot == -1.0f) {
+                PSMTXScale(m0, 0.0f, 0.0f, 0.0f);
+                GXLoadTexMtxImm(m0, id, GX_MTX2x4);
+                break;
+            }
+            C_VECHalfAngle(&light2, &v2, &h);
+            h.x = -h.x;
+            h.y = -h.y;
+            h.z = -h.z;
+            PSMTXInvXpose(tw->model, m5);
+            PSVECNormalize((Vec*)m5[0], (Vec*)m5[0]);
+            PSVECNormalize((Vec*)m5[1], (Vec*)m5[1]);
+            PSVECNormalize((Vec*)m5[2], (Vec*)m5[2]);
+            if (dot == 1.0f) {
+                PSMTXIdentity(m6);
+            }
+            else {
+                PSVECCrossProduct(&h, &v2, &axis);
+                PSMTXRotAxisRad(m6, &axis, (f32)acos(PSVECDotProduct(&v2, &h)));
+            }
+            PSMTXConcat(m6, m5, m0);
+            PSMTXScale(m6, 2.0f * tw->scale, 2.0f * tw->scale, 1.0f);
+            PSMTXConcat(m6, m0, m0);
+            PSMTXTrans(m6, 0.5f, 0.5f, 0.0f);
+            PSMTXConcat(m6, m0, m0);
+            GXLoadTexMtxImm(m0, id, mtxType);
+            break;
+        }
+        case 4:
+            PSMTXInvXpose(tw->model, m0);
+            PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
+            PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
+            PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
+            GXLoadTexMtxImm(m0, id, GX_MTX2x4);
+            PSMTXScale(m7, 0.5f, 0.5f, 0.0f);
+            PSMTXTrans(m0, 0.5f, 0.5f, 1.0f);
+            PSMTXConcat(m0, m7, m0);
+            GXLoadTexMtxImm(m0, id2, mtxType);
+            break;
+        case 5: {
+            Vec camPos;
+            Vec target;
+            Vec up;
+
+            a += 0.0001f;
+            camPos = (Vec){10.0f * (f32)sin(a), 100.0f, 10.0f * (f32)cos(a)};
+            target = (Vec){10.0f * (f32)sin(a), 0.0f, 10.0f * (f32)cos(a)};
+            up = (Vec){0.0f, 0.0f, -1.0f};
+            C_MTXLookAt(m8, &camPos, &up, &target);
+            C_MTXLightFrustum((MtxPtr)m9, -32.0f, 32.0f, -32.0f, 32.0f, 300.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+            PSMTXInverse(tw->view, m10);
+            PSMTXConcat(m8, m10, m11);
+            PSMTXConcat((MtxPtr)m9, m11, m0);
+            GXLoadTexMtxImm(m0, id2, mtxType);
+            break;
+        }
+    }
+}
+
+
+static inline void envTexObj(TEXPalette* pal, GXTexObj* to, u32 id) {
+    GXBool mipMap;
+    TEXDescriptor* tdp;
+
+    tdp = TEXGet(pal, id);
+    if (tdp->textureHeader->minLOD == tdp->textureHeader->maxLOD) {
+        mipMap = GX_FALSE;
+    } else {
+        mipMap = GX_TRUE;
+    }
+    GXInitTexObj(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXTexFmt)tdp->textureHeader->format, tdp->textureHeader->wrapS, tdp->textureHeader->wrapT, mipMap);
+    GXInitTexObjLOD(to, tdp->textureHeader->minFilter, tdp->textureHeader->magFilter, tdp->textureHeader->minLOD, tdp->textureHeader->maxLOD, tdp->textureHeader->LODBias, GX_DISABLE, tdp->textureHeader->edgeLODEnable, GX_ANISO_1);
+}
+
+static inline void envTexObjCI(TEXPalette* pal, GXTexObj* to, GXTlutObj* tlo, GXTlut tluts, u32 id) {
+    GXBool mipMap;
+    TEXDescriptor* tdp;
+
+    tdp = TEXGet(pal, id);
+    if (tdp->textureHeader->minLOD == tdp->textureHeader->maxLOD) {
+        mipMap = GX_FALSE;
+    } else {
+        mipMap = GX_TRUE;
+    }
+    GXInitTlutObj(tlo, tdp->CLUTHeader->data, tdp->CLUTHeader->format, tdp->CLUTHeader->numEntries);
+    GXInitTexObjCI(to, tdp->textureHeader->data, tdp->textureHeader->width, tdp->textureHeader->height, (GXCITexFmt)tdp->textureHeader->format, tdp->textureHeader->wrapS, tdp->textureHeader->wrapT, mipMap, tluts);
+    GXInitTexObjLOD(to, tdp->textureHeader->minFilter, tdp->textureHeader->magFilter, tdp->textureHeader->minLOD, tdp->textureHeader->maxLOD, tdp->textureHeader->LODBias, GX_DISABLE, tdp->textureHeader->edgeLODEnable, GX_ANISO_1);
+}
+
+static inline void envLoadTex(u32 id, s32 map) {
+    GXTexObj obj;
+    GXTlutObj tlut;
+
+    if (TEXGet(env_tpl, id)->CLUTHeader) {
+        envTexObjCI(env_tpl, &obj, &tlut, GX_TLUT0, id);
+        GXLoadTlut(&tlut, GX_TLUT0);
+        GXLoadTexObj(&obj, (GXTexMapID)map);
+    } else {
+        envTexObj(env_tpl, &obj, id);
+        GXLoadTexObj(&obj, (GXTexMapID)map);
+    }
+}
+
+#define ENV_TEX_TAIL(t, mtxType, gentype, mtxsrc) \
+    GXSetTexCoordGen2((GXTexCoordID)coord, gentype, GX_TG_NRM, texmtx_tbl[map], GX_FALSE, mtxsrc); \
+    envTevLoadTexMtxImm(t, (GXTexMtx)texmtx_tbl[map], GX_PTTEXMTX0, mtxType)
+
+void envAddTev(s32 type, MapTevCallbackInfo* info) {
+    EnvironmentWork* wp = envGetWork();
+    s32 stage, map, coord, unk18;
+    Mtx mtx;
+
+    stage = info->tevStage;
+    map = info->texCoord;
+    coord = info->texMap;
+    unk18 = info->field_0x18;
+    if (type == 0) {
+        return;
+    }
+    PSMTXConcat(camGetCurPtr()->view, info->mtx, mtx);
+    tw->view = camGetCurPtr()->view;
+    tw->mtx = info->mtx;
+    tw->model = mtx;
+    GXSetTevOrder((GXTevStageID)stage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+    GXSetTevColorOp((GXTevStageID)stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp((GXTevStageID)stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevSwapMode((GXTevStageID)stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    switch (type) {
+        case 0:
+            break;
+        case 1:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->rotY = 10.0f;
+            tw->rotX = gp->retraceCount + 45;
+            tw->scale = 0.5f;
+            envLoadTex(6, map);
+            ENV_TEX_TAIL(0, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            coord++;
+            map++;
+            break;
+        case 2:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->rotY = 10.0f;
+            tw->rotX = gp->retraceCount + 45;
+            tw->scale = 0.5f;
+            envLoadTex(8, map);
+            ENV_TEX_TAIL(0, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 3:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.5f;
+            envLoadTex(0, map);
+            ENV_TEX_TAIL(1, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 4:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.5f;
+            tw->rotY = 45.0f;
+            tw->rotX = 45.0f;
+            envLoadTex(1, map);
+            ENV_TEX_TAIL(2, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 5:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.5f;
+            tw->rotY = 45.0f;
+            tw->rotX = 45.0f;
+            envLoadTex(2, map);
+            ENV_TEX_TAIL(3, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 6:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.15f;
+            tw->rotY = 0.0f;
+            tw->rotX = 90.0f;
+            envLoadTex(4, map);
+            ENV_TEX_TAIL(2, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 7:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.3f;
+            tw->rotY = 0.0f;
+            tw->rotX = 90.0f;
+            envLoadTex(5, map);
+            ENV_TEX_TAIL(3, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 8:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            tw->scale = 0.5f;
+            tw->rotY = 10.0f;
+            tw->rotX = 45.0f;
+            envLoadTex(10, map);
+            ENV_TEX_TAIL(0, GX_MTX2x4, GX_TG_MTX2x4, GX_PTIDENTITY);
+            stage++;
+            map++;
+            coord++;
+            break;
+        case 9:
+            break;
+        case 10:
+            GXSetTevColorIn((GXTevStageID)stage, GX_CC_CPREV, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
+            GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+            GXSetTevKColorSel((GXTevStageID)stage, GX_TEV_KCSEL_K1);
+            GXSetTevKColor(GX_KCOLOR1, (GXColor){0x7F, 0x7F, 0x7F, 0x00});
+            envLoadTex(9, map);
+            ENV_TEX_TAIL(4, GX_MTX3x4, GX_TG_MTX3x4, GX_PTTEXMTX0);
+            stage++;
+            map++;
+            coord++;
+            break;
+    }
+    info->tevStage = stage;
+    info->texMap = coord;
+    info->field_0x18 = unk18;
+    info->texCoord = map;
+}
+
+#undef ENV_TEX_TAIL
+
+#undef tw
+
+double tan(double);
+
+void envSetWater(MapTevCallbackInfo* info) {
+    s32 stage, map, coord, ind;
+    s32 x0, y0, x1, y1;
+    s32 w, h;
+    s32 hw, hh;
+    s32 i, j;
+    void* buf;
+    u8* buf2;
+    f32 scale;
+    f32 t;
+    MapObject* obj;
+    Mtx mtx;
+    GXTexObj obj1;
+    GXTexObj obj2;
+    f32 indMtx[2][3];
+    Vec pos;
+
+    obj = *(MapObject**)info->field_0x0;
+    stage = info->tevStage;
+    map = info->texCoord;
+    coord = info->texMap;
+    ind = info->field_0x18;
+    if (obj->flags & 0x20) {
+        while ((obj = obj->parent) != NULL) {
+            if (obj->flags & 0x10) {
+                if (!(obj->flags & 0x20000000)) {
+                    obj->flags |= 0x20000000;
+                    return;
+                }
+                x0 = obj->screenRect[0];
+                y0 = obj->screenRect[1];
+                x1 = obj->screenRect[2];
+                y1 = obj->screenRect[3];
+                break;
+            }
+        }
+    } else {
+        if (!(obj->flags & 0x20000000)) {
+            obj->flags |= 0x20000000;
+            return;
+        }
+        x0 = obj->screenRect[0];
+        y0 = obj->screenRect[1];
+        x1 = obj->screenRect[2];
+        y1 = obj->screenRect[3];
+    }
+    if (x0 == 0x3FF || y0 == 0x3FF || x1 == 0x3FF || y1 == 0x3FF) {
+        return;
+    }
+    if (x0 == 0 && y0 == 0 && x1 == 0 && y1 == 0) {
+        return;
+    }
+    x0 -= x0 & 1;
+    y0 -= y0 & 1;
+    x1 += x1 & 1;
+    y1 += y1 & 1;
+    if (x0 < 0) {
+        x0 = 0;
+    }
+    if (y0 < 0) {
+        y0 = 0;
+    }
+    if (x1 > gp->fbWidth) {
+        x1 = gp->fbWidth;
+    }
+    if (y1 > gp->efbHeight) {
+        y1 = gp->efbHeight;
+    }
+    w = x1 - x0;
+    h = y1 - y0;
+    hw = w / 2;
+    hh = h / 2;
+    buf = smartAlloc(GXGetTexBufferSize((u16)hw, (u16)hh, GX_TF_RGB565, GX_FALSE, 0), 3)->address;
+    GXSetTexCopySrc((u16)x0, (u16)y0, (u16)w, (u16)h);
+    GXSetTexCopyDst((u16)hw, (u16)hh, GX_TF_RGB565, GX_TRUE);
+    GXCopyTex(buf, GX_FALSE);
+    GXPixModeSync();
+    GXTexModeSync();
+    GXInitTexObj(&obj1, buf, (u16)hw, (u16)hh, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&obj1, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    PSMTXMultVec(info->mtx, &(*(MapObject**)info->field_0x0)->center, &pos);
+    scale = 1000.0f / PSVECDistance(&camGetCurPtr()->cameraPos, &pos);
+    if (scale < 0.0f) {
+        scale = 0.0f;
+    }
+    if (scale > 127.0f) {
+        scale = 127.0f;
+    }
+    buf2 = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 3)->address;
+    for (i = 0; i < 64; i++) {
+        for (j = 0; j < 64; j++) {
+            f32 s = sin((f32)gp->retraceCount / 10.0f + 18.849556f * j * 0.015625f);
+            s32 off = (i / 4) * 32 + (j / 4) * 512 + ((i % 4) + (j % 4) * 4) * 2;
+            buf2[off] = 0.6f + (scale * s + 128.0f);
+            buf2[off + 1] = 0x80;
+        }
+    }
+    DCFlushRange(buf2, 0x2000);
+    GXInitTexObj(&obj2, buf2, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+    GXInitTexObjLOD(&obj2, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    t = tan(6.2831855f * (camGetPtr(4)->fovY * 0.5f) / 360.0f);
+    C_MTXLightFrustum(mtx, gp->efbHeight / 2 - y1, gp->efbHeight / 2 - y0, x0 - gp->fbWidth / 2, x1 - gp->fbWidth / 2,
+                      gp->efbHeight * 0.5f / t, 0.5f, 0.5f, 0.5f, 0.5f);
+    PSMTXConcat(mtx, camGetCurPtr()->view, mtx);
+    PSMTXConcat(mtx, info->mtx, mtx);
+    GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+    GXLoadTexMtxImm(mtx, texmtx_tbl[map], GX_MTX3x4);
+    GXLoadTexObj(&obj1, (GXTexMapID)map);
+    GXLoadTexObj(&obj2, (GXTexMapID)(map + 1));
+    GXSetTevOrder((GXTevStageID)stage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+    GXSetTevColorOp((GXTevStageID)stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp((GXTevStageID)stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn((GXTevStageID)stage, GX_CC_TEXC, GX_CC_CPREV, GX_CC_APREV, GX_CC_ZERO);
+    GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode((GXTevStageID)stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    indMtx[0][0] = 0.5f;
+    indMtx[0][1] = 0.0f;
+    indMtx[0][2] = 0.0f;
+    indMtx[1][0] = 0.0f;
+    indMtx[1][1] = 0.5f;
+    indMtx[1][2] = 0.0f;
+    GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
+    GXSetIndTexOrder((GXIndTexStageID)ind, (GXTexCoordID)coord, (GXTexMapID)(map + 1));
+    GXSetIndTexCoordScale((GXIndTexStageID)ind, GX_ITS_1, GX_ITS_1);
+    GXSetTevIndWarp((GXTevStageID)stage, (GXIndTexStageID)ind, GX_TRUE, GX_FALSE, GX_ITM_0);
+    info->tevStage = stage + 1;
+    info->texMap = coord + 1;
+    info->field_0x18 = ind + 1;
+    info->texCoord = map + 2;
+}
+
+void envSetYamiView(Mtx view) {
+    EnvironmentWork* wp = envGetWork();
+
+    PSMTXCopy(view, (MtxPtr)((u8*)wp + 0xC0));
+}
+
+void envSetYami(MapTevCallbackInfo* info) {
+    static f32 u1;
+    static f32 u2;
+    static u32 v_count;
+    s32 unk18;
+    s32 coord;
+    s32 map;
+    s32 stage;
+    EnvironmentWork* wp;
+    GXTexObj obj;
+    Mtx mtx;
+    u32 rc;
+
+    wp = envGetWork();
+    rc = gp->retraceCount;
+    stage = info->tevStage;
+    map = info->texCoord;
+    coord = info->texMap;
+    unk18 = info->field_0x18;
+
+
+    if (v_count != rc) {
+        u1 += 0.004f;
+        u2 -= 0.004f;
+        v_count = rc;
+        if (u1 > 10.0f) {
+            u1 -= 10.0f;
+        }
+        if (u2 < 10.0f) {
+            u2 += 10.0f;
+        }
+    }
+    GXSetTevColorOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    GXSetTevAlphaOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+    C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u1, 0.5f);
+    PSMTXConcat(mtx, (MtxPtr)((u8*)wp + 0xC0), mtx);
+    PSMTXConcat(mtx, info->mtx, mtx);
+    GXLoadTexMtxImm(mtx, texmtx_tbl[map], GX_MTX3x4);
+    GXSetTexCoordGen2(coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+    C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u2, 0.5f);
+    PSMTXConcat(mtx, (MtxPtr)((u8*)wp + 0xC0), mtx);
+    PSMTXConcat(mtx, info->mtx, mtx);
+    GXLoadTexMtxImm(mtx, texmtx_tbl[map + 1], GX_MTX3x4);
+    GXSetTexCoordGen2(coord + 1, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map + 1], GX_FALSE, GX_PTIDENTITY);
+    TEXGetGXTexObjFromPalette(env_tpl, &obj, 9);
+    GXLoadTexObj(&obj, map);
+    TEXGetGXTexObjFromPalette(env_tpl, &obj, 10);
+    GXLoadTexObj(&obj, map + 1);
+
+    GXSetTevOrder(stage, coord, map, GX_COLOR_NULL);
+    GXSetTevColorOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+    GXSetTevAlphaIn(stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+    GXSetTevOrder(stage + 1, coord + 1, map + 1, GX_COLOR_NULL);
+    GXSetTevColorOp(stage + 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage + 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage + 1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXA, GX_CC_ZERO);
+    GXSetTevAlphaIn(stage + 1, GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
+    GXSetTevSwapMode(stage + 1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+    GXSetTevOrder(stage + 2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(stage + 2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(stage + 2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(stage + 2, GX_CC_C1, GX_CC_ZERO, GX_CC_APREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(stage + 2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    GXSetTevSwapMode(stage + 2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+
+    info->tevStage = stage + 3;
+    info->texMap = coord + 2;
+    info->field_0x18 = unk18;
+    info->texCoord = map + 2;
 }

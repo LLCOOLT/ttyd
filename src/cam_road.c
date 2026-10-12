@@ -141,8 +141,18 @@ extern int __float_nan[];
 static inline s32 cr_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 cr_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (cr_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
+static const Vec unk_vec0 = {0.0f, 1.0f, 0.0f};
+static const Vec unk_vec1 = {90.0f, 110.0f, 13.0f};
+static const Vec unk_vec2 = {-110.0f, -70.0f, -190.0f};
 static CamRoadWork work;
 static CamRoadWork* wp = &work;
+
+void OSReport(const char* msg, ...);
+
+static void camRoadDebugPrint(const char* pfx) {
+    OSReport("%scam = %d\n", pfx, wp->map->curveNum);
+    OSReport("%scurve = %d\n\0\0", pfx, wp->state);
+}
 
 void calcCurrentCamState(CamRoadOut* out);
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
@@ -342,7 +352,7 @@ s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist) {
         }
     }
     t = -nd / crVecDot(n, dir);
-    hit = crVecAdd(P, crVecScale(dir, t));
+    { Vec h2 = crVecAdd(P, crVecScale(dir, t)); hit = h2; }
     if (hit.y < *dist) {
         return 0;
     }
@@ -363,6 +373,8 @@ typedef struct CamRoadCC {
     s32 vtxNum;            // 0xa4
 } CamRoadCC;
 
+static inline void crCheck(BOOL b) {}
+
 static inline f32 crLen2(f32 x, f32 z) {
     f32 l = x * x + z * z;
     if (l != 0.0) {
@@ -372,22 +384,21 @@ static inline f32 crLen2(f32 x, f32 z) {
 }
 
 s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
-    f32 minDist;
+    f32 lx0;
+    f32 ang0, yA, yB, minDist, cx, side;
+    f32 dpx, dpz, sgn, s, limA, limB, x0, y0, z0, x1, z1, cz, r0, r1, rp, r0x, r0z, c1;
+    f32 u0x, u0z, u1x, u1z, t, c0, ang1, ratio, d, d0, yy, cross, n1x, n1z;
+    f32 r1x, r1z;
+    f32 lz0, px, pz, qx, qz, dx, dz, su1x, st, dist, dx2, dz2, cr;
     s32 ret;
     s32 i;
     s32 half;
     s32 idxA, idxB;
     s32 flag, isGrp;
     s32 fl;
-    f32 limA, limB;
-    f32 yA, yB;
+    s32 ok;
     Vec* pt;
     Vec* nrm;
-    f32 x0, y0, z0, x1, z1;
-    f32 u0x, u0z, u1x, u1z, t;
-    f32 cx, cz, r0x, r0z, dpx, dpz, r0, rp, r1, c0, c1, ang0, ang1, ratio, d, d0, yy, cross;
-    f32 sgn, side;
-    f32 dx, dz, qx, qz, s, dx2, dz2, dist, cr;
 
     minDist = 100000000.0f;
     ret = 0;
@@ -407,7 +418,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
         idxA = 0;
         idxB = 1;
         half = g->stripNum / 2;
-        limA = limB = 0.0f;
+        limB = limA = 0.0f;
         pt = &((Vec*)wp->map->f_f8)[g->stripOfs];
         nrm = &((Vec*)wp->map->f_f8)[g->stripOfs + half];
         flag = 0;
@@ -428,22 +439,24 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
         z0 = pt[i].z;
         x1 = pt[i + 1].x;
         z1 = pt[i + 1].z;
-        if (nrm[i].x * (pos.x - x0) + nrm[i].z * (pos.z - z0) < 0.0) {
+        n1x = -nrm[i + 1].x;
+        n1z = -nrm[i + 1].z;
+        if (nrm[i].x * (pos.x - x0) + nrm[i].z * (pos.z - z0) < 0.0f) {
             continue;
         }
-        if (-nrm[i + 1].x * (pos.x - x1) + -nrm[i + 1].z * (pos.z - z1) < 0.0) {
+        if (n1x * (pos.x - x1) + n1z * (pos.z - z1) < 0.0f) {
             continue;
         }
         u0x = -nrm[i].z;
         u0z = nrm[i].x;
-        u1x = -nrm[i + 1].z;
-        u1z = nrm[i + 1].x;
+        u1x = n1z;
+        u1z = -n1x;
         if (__fabs(u0x - u1x) < 0.01f && __fabs(u0z - u1z) < 0.01f) {
             u0x = u1x = 0.5f * (u0x + u1x);
             u0z = u1z = 0.5f * (u0z + u1z);
         }
         if (u0x != u1x || u0z != u1z) {
-            sgn = side = 1.0f;
+            side = sgn = 1.0f;
             if (u1x != 0.0) {
                 t = (u1z * ((x0 - x1) / u1x) + z1 - z0) / (u0z - u1z * (u0x / u1x));
             } else if (u1z != 0.0) {
@@ -455,13 +468,24 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
             cx = t * u0x + x0;
             r0z = z0 - cz;
             r0x = x0 - cx;
-            r0 = crLen2(r0x, r0z);
+            r0 = r0x * r0x + r0z * r0z;
+            if (r0 != 0.0) {
+                r0 = cr_sqrtf(r0);
+            }
             dpz = pos.z - cz;
             dpx = pos.x - cx;
-            rp = crLen2(dpx, dpz);
-            r1 = crLen2(x1 - cx, z1 - cz);
+            rp = dpx * dpx + dpz * dpz;
+            if (rp != 0.0) {
+                rp = cr_sqrtf(rp);
+            }
+            r1z = z1 - cz;
+            r1x = x1 - cx;
+            r1 = r1x * r1x + r1z * r1z;
+            if (r1 != 0.0) {
+                r1 = cr_sqrtf(r1);
+            }
             c0 = (r0x * dpx + r0z * dpz) / (r0 * rp);
-            c1 = ((x1 - cx) * dpx + (z1 - cz) * dpz) / (r1 * rp);
+            c1 = (r1x * dpx + r1z * dpz) / (r1 * rp);
             if (c0 < -1.0f) {
                 c0 = -1.0f;
             } else if (c0 > 1.0f) {
@@ -485,8 +509,8 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 continue;
             }
             minDist = d;
-            yy = ratio * (nrm[i + 1].y - nrm[i].y) + nrm[i].y;
             cross = r0x * -(z1 - z0) + r0z * (x1 - x0);
+            yy = ratio * (nrm[i + 1].y - nrm[i].y) + nrm[i].y;
             if (flag) {
                 if (yy < yA) {
                     if (cross > 0.0) {
@@ -506,7 +530,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     }
                     ret = 1;
                     hit->t = yA;
-                    hit->pos.x = d * nrm[idxA].z + pt[idxA].x;
+                    hit->pos.x = pt[idxA].x + d * nrm[idxA].z;
                     hit->pos.y = 0.0f;
                     hit->pos.z = pt[idxA].z - d * nrm[idxA].x;
                     hit->dir.x = nrm[idxA].x;
@@ -535,7 +559,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     }
                     ret = 1;
                     hit->t = yB;
-                    hit->pos.x = d * nrm[idxB].z + pt[idxB].x;
+                    hit->pos.x = pt[idxB].x + d * nrm[idxB].z;
                     hit->pos.y = 0.0f;
                     hit->pos.z = pt[idxB].z - d * nrm[idxB].x;
                     hit->dir.x = nrm[idxB].x;
@@ -578,7 +602,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                 }
             } else if (isGrp) {
                 if (cross > 0.0) {
-                    if (sgn >= 0.0f && d > 0.0f) {
+                    if (!(sgn < 0.0f) && d > 0.0f) {
                         dpx /= rp; dpz /= rp; fl = 3;
                         rp -= d;
                         dpx *= rp; dpz *= rp;
@@ -592,7 +616,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     side = -1.0f;
                 }
             } else {
-                if (cross <= 0.0) {
+                if (!(cross > 0.0)) {
                     side = -1.0f;
                 }
             }
@@ -614,27 +638,30 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
             hit->f_24 = i;
             hit->flags = fl;
         } else {
-            dz = z1 - z0;
-            dx = x1 - x0;
-            u1x = -dz;
-            if (__fabs(u1x) > __fabs(dx)) {
-                t = (dx * ((x0 - pos.x) / u1x) + pos.z - z0) / (dz - dx * (dx / u1x));
+            lz0 = pt[i].z;
+            dz = pt[i + 1].z - lz0;
+            lx0 = pt[i].x;
+            dx = pt[i + 1].x - lx0;
+            px = pos.x;
+            pz = pos.z;
+            su1x = -dz;
+            if (__fabs(su1x) > __fabs(dx)) {
+                st = (dx * ((lx0 - px) / su1x) + pz - lz0) / (dz - dx * (dx / su1x));
             } else if (dx != 0.0) {
-                t = (u1x * ((z0 - pos.z) / dx) + pos.x - x0) / (dx - u1x * (dz / dx));
+                st = (su1x * ((lz0 - pz) / dx) + px - lx0) / (dx - su1x * (dz / dx));
             } else {
-                t = 0.0f;
+                st = 0.0f;
             }
-            qx = t * dx + x0;
-            qz = t * dz + z0;
+            qx = st * dx + lx0;
+            qz = st * dz + lz0;
             if (__fabs(dx) > __fabs(dz)) {
-                s = (qx - x0) / dx;
-                if (s < -0.0000001 || s > 1.0000001) {
-                }
+                s = (qx - lx0) / dx;
+                ok = (s < -0.0000001 || s > 1.0000001);
             } else if (dz != 0.0) {
-                s = (qz - z0) / dz;
+                s = (qz - lz0) / dz;
             }
-            dz2 = pos.z - qz;
-            dx2 = pos.x - qx;
+            dz2 = pz - qz;
+            dx2 = px - qx;
             yy = s * (nrm[i + 1].y - nrm[i].y) + nrm[i].y;
             dist = dx2 * dx2 + dz2 * dz2;
             if (dist > 0.0) {
@@ -646,7 +673,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
             minDist = dist;
             if (flag) {
                 if (yy < yA) {
-                    cr = dx2 * u1x + dz2 * dx;
+                    cr = dx2 * su1x + dz2 * dx;
                     if (cr < 0.0f) {
                         if (dist > limA) { dist = limA; fl |= 2; }
                     } else {
@@ -655,7 +682,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     }
                     ret = 1;
                     hit->t = yA;
-                    hit->pos.x = dist * nrm[idxA].z + pt[idxA].x;
+                    hit->pos.x = pt[idxA].x + dist * nrm[idxA].z;
                     hit->pos.y = 0.0f;
                     hit->pos.z = pt[idxA].z - dist * nrm[idxA].x;
                     hit->dir.x = nrm[idxA].x;
@@ -667,7 +694,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     continue;
                 }
                 if (yy > yB) {
-                    cr = dx2 * u1x + dz2 * dx;
+                    cr = dx2 * su1x + dz2 * dx;
                     if (cr < 0.0f) {
                         if (dist > limA) { dist = limA; fl |= 2; }
                     } else {
@@ -676,7 +703,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     }
                     ret = 1;
                     hit->t = yB;
-                    hit->pos.x = dist * nrm[idxB].z + pt[idxB].x;
+                    hit->pos.x = pt[idxB].x + dist * nrm[idxB].z;
                     hit->pos.y = 0.0f;
                     hit->pos.z = pt[idxB].z - dist * nrm[idxB].x;
                     hit->dir.x = nrm[idxB].x;
@@ -687,7 +714,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
                     hit->flags = fl | 1;
                     continue;
                 }
-                cr = dx2 * u1x + dz2 * dx;
+                cr = dx2 * su1x + dz2 * dx;
                 if (cr < 0.0f) {
                     if (dist > limA) {
                         dx2 = limA * (dx2 / dist);
@@ -1052,6 +1079,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
 }
 #pragma dont_inline reset
 
+static inline f32 crSq(f32 x) { return x * x; }
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     u32 flags = 0;
     s32 d;
@@ -1066,10 +1094,11 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         if (__abs(d) <= 1) {
             return 0;
         }
-        if (__abs(d) >= a->cam->f_44 - a->cam->f_40 - 1) {
+        n = a->cam->f_44 - a->cam->f_40;
+        if (__abs(d) >= n - 1) {
             return 0;
         }
-        if (__abs(d) >= a->cam->f_44 - a->cam->f_40 - 2) {
+        if (__abs(d) >= n - 2) {
             flags |= 0x20;
         }
     }
@@ -1093,12 +1122,14 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     if (ang > 180.0f) {
         ang = 360.0f - ang;
     }
-    speed = 6.2831855f * a->dist * ang / 360.0f * wp->f_19c[6];
+    speed = 6.2831855f * a->dist * ang / 360.0f;
+    speed *= wp->f_19c[6];
     ang = __fabsf(a->angle - b->angle);
     if (ang > 180.0f) {
         ang = 360.0f - ang;
     }
-    t = 6.2831855f * a->dist * ang / 360.0f * wp->f_19c[7];
+    t = 6.2831855f * a->dist * ang / 360.0f;
+    t *= wp->f_19c[7];
     if (t > speed) {
         speed = t;
     }
@@ -1106,20 +1137,24 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     if (ang > 180.0f) {
         ang = 360.0f - ang;
     }
-    t = 6.2831855f * a->dist * ang / 360.0f * wp->f_19c[8];
+    t = 6.2831855f * a->dist * ang / 360.0f;
+    t *= wp->f_19c[8];
     if (t > speed) {
         speed = t;
     }
-    t = __fabsf(a->dist - b->dist) * wp->f_19c[9];
+    t = __fabsf(a->dist - b->dist);
+    t *= wp->f_19c[9];
     if (t > speed) {
         speed = t;
     }
     dx = a->pos.x - b->pos.x;
     dy = a->pos.y - b->pos.y;
     dz = a->pos.z - b->pos.z;
-    d2 = dx * dx + dy * dy + dz * dz;
-    if (d2) {
-        dist = cr_sqrtf(d2);
+    dist = crSq(dx);
+    dist += crSq(dy);
+    dist += crSq(dz);
+    if (dist) {
+        dist = cr_sqrtf(dist);
     } else {
         dist = 0.0f;
     }
@@ -1181,8 +1216,8 @@ void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadSta
         out->pos.z = to->pos.z;
     }
     a2 = (f32)atan2(from->dir.x, from->dir.z);
-    a1 = (f32)atan2(to->dir.x, to->dir.z);
     a0 = a2;
+    a1 = (f32)atan2(to->dir.x, to->dir.z);
     while (a0 - a1 > 3.1415927f) {
         a0 -= 6.2831855f;
     }

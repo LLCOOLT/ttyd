@@ -13,20 +13,98 @@
 #include <dolphin/pad.h>
 #include <demo/DEMOPad.h>
 #include <string.h>
+#include <stdarg.h>
+#include "driver/msgdrv.h"
+#include "mario/mario_pouch.h"
+#include "mario/mariost.h"
 
-extern ItemData* itemDataTable;
+extern ItemData itemDataTable[];
 extern int sprintf(char* str, const char* format, ...);
 
+static USER_FUNC(cam_r);
+USER_FUNC(evt_eff);
+USER_FUNC(evt_eff64);
+USER_FUNC(evt_env_blur_on);
+USER_FUNC(evt_fade_set_mapchange_type);
+USER_FUNC(evt_item_delete);
+USER_FUNC(evt_item_entry);
+USER_FUNC(evt_mario_adjust_dir);
+USER_FUNC(evt_mario_dispflag_onoff);
+USER_FUNC(evt_mario_get_party);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_normalize);
+USER_FUNC(evt_mario_set_normal_pose);
+USER_FUNC(evt_mario_set_pose);
+USER_FUNC(evt_msg_continue);
+USER_FUNC(evt_msg_print);
+USER_FUNC(evt_msg_print_add);
+USER_FUNC(evt_msg_select);
+USER_FUNC(evt_npc_check);
+USER_FUNC(evt_npc_entry);
+USER_FUNC(evt_npc_flag_onoff);
+USER_FUNC(evt_npc_set_anim);
+USER_FUNC(evt_npc_set_autotalkpose);
+USER_FUNC(evt_npc_set_color);
+USER_FUNC(evt_npc_set_position);
+USER_FUNC(evt_npc_set_tribe);
+USER_FUNC(evt_party_cont_onoff);
+USER_FUNC(evt_party_get_pos);
+USER_FUNC(evt_party_nokotaro_get_status);
+USER_FUNC(evt_party_set_breed_pose);
+USER_FUNC(evt_party_set_pose);
+USER_FUNC(evt_seq_set_seq);
+USER_FUNC(evt_snd_bgmoff);
+USER_FUNC(evt_snd_bgmoff_f);
+USER_FUNC(evt_snd_bgmon);
+USER_FUNC(evt_snd_sfxon);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_intpl_msec_get_value);
+USER_FUNC(evt_sub_intpl_msec_init);
+USER_FUNC(unk_80175e98);
+USER_FUNC(unk_80175eb0);
+USER_FUNC(unk_80177cf8);
+USER_FUNC(party_color);
+USER_FUNC(famicom_check);
+USER_FUNC(itemUseFunc2);
+s32 evt_lecture_msg[];
+s32 evt_item_use[];
+s32 evt_diary_read[];
+
 //.data
-EVT_BEGIN(evt_diary_read)
-EVT_END()
 
 //.sbss
 static WindowWork* wp;
 TEXPalette* winTexTpl;
-static s32 cnt;
 
 // local prototypes
+#include "driver/fadedrv.h"
+#include "driver/mobjdrv.h"
+#include "driver/npcdrv.h"
+#include "driver/animdrv.h"
+#include "driver/swdrv.h"
+#include "driver/effdrv.h"
+#include "manager/filemgr.h"
+#include "mario/mario_party.h"
+#include "pmario_sound.h"
+#include "statuswindow.h"
+typedef struct PartyData { const char* name; u8 pad[0x28 - 0x4]; } PartyData;
+extern PartyData partyDataTbl[];
+extern WindowPartyDt winPartyDt[];
+s32 winRootMain(WindowWork* wp);
+void winRootDisp(CameraId camId, WindowWork* wp);
+const char* winGetMapTplName(void);
+EffectEntry* effRecoveryEntry(f32 x, f32 y, f32 z, s32 type, s32 amount);
+s32 kpaGetStageViewType(void);
+void kpaPauseSE2(void);
+double sin(double);
+int vsprintf(char* buf, const char* fmt, va_list args);
+void FontDrawScaleVec(Vec scale);
+void FontDrawStringVecPitch(Vec* pos, const char* msg, f32 pitch);
+void FontDrawMessageMtx(Mtx mtx, const char* msg);
+void FontDrawEdge(void);
+void FontDrawEdgeOff(void);
+void winLectureKeyMask(void);
+void iconGetTexObj(GXTexObj* obj, u16 iconId);
 void winDisp(CameraId camId, void* param);
 void winDispKoopa(CameraId camId, void* param);
 
@@ -78,6 +156,7 @@ void winOpenDisable(void) {
 
 void winMain(void) {
     MarioWork* mario;
+    s32 i;
 
     mario = marioGetPtr();
     if (!(wp->flags & 1) && seqGetSeq() == SEQ_GAME && !seqCheckSeq()) {
@@ -116,17 +195,223 @@ void winMain(void) {
 
         switch (wp->menuState) {
             case 0:
+                if (!(wp->flags & 0x1000)) {
+                    if (marioStGetSystemLevel() != 0U) {
+                        break;
+                    }
+                    if (marioCheckMenuDisable()) {
+                        break;
+                    }
+                    if (mobjCheckExec()) {
+                        break;
+                    }
+                    if (!fadeIsFinish()) {
+                        break;
+                    }
+                    if (mario->characterId == 2) {
+                        if (!(wp->buttonTrg & PAD_BUTTON_START)) {
+                            break;
+                        }
+                        wp->menuSel = 0;
+                    } else if (wp->buttonTrg & PAD_BUTTON_START) {
+                        wp->menuSel = 0;
+                    } else {
+                        if (keyGetButton(0) & PAD_TRIGGER_Z) {
+                            break;
+                        }
+                        if (strcmp(gp->currentAreaName, "yuu") == 0) {
+                            break;
+                        }
+                        if ((wp->buttonTrg & PAD_BUTTON_LEFT) && (swByteGet(0) >= 7 || partyChkJoin(1))) {
+                            wp->menuSel = 1;
+                        } else if (wp->buttonTrg & PAD_BUTTON_UP) {
+                            wp->menuSel = 2;
+                        } else if ((wp->buttonTrg & PAD_BUTTON_RIGHT) && (swByteGet(0) >= 20 || pouchGetHaveBadgeCnt())) {
+                            wp->menuSel = 3;
+                        } else if (wp->buttonTrg & PAD_BUTTON_DOWN) {
+                            wp->menuSel = 4;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (keyGetButton(0) & PAD_TRIGGER_L) {
+                        break;
+                    }
+                } else {
+                    wp->menuSel = 0;
+                }
+                camGetPtr((CameraId)8)->flags |= 0x200;
+                if (gp->flags & 0x1000) {
+                    wp->menuSel = 1;
+                }
+                if (!(wp->flags & 0x1000)) {
+                    marioStSystemLevel(4);
+                } else {
+                    npcStopForEvent();
+                }
+                fbatChangeMode(7);
+                if (mario->characterId == 2) {
+                    if (!kpaGetStageViewType()) {
+                        marioCtrlOff();
+                    } else {
+                        marioCtrlOff2();
+                    }
+                } else {
+                    marioCtrlOff2();
+                }
+                ((void (*)(void))partyCtrlOff)();
+                psndSetFlag(0x80);
+                if (mario->characterId == 2) {
+                    kpaPauseSE2();
+                }
+                if (mario->flags & 0x80000000) {
+                    wp->flags |= 0x2000;
+                } else {
+                    wp->flags &= ~0x2000;
+                }
+                for (i = 0; i < 4; i++) {
+                    padRumbleHardOff(i);
+                }
+                fileAsyncf(4, 0, "%s/w/jp/mail.tpl", getMarioStDvdRoot());
+                {
+                    const char* name = winGetMapTplName();
+                    fileAsyncf(4, 0, "%s/w/jp/%s", getMarioStDvdRoot(), name);
+                }
+                wp->field_0x24_s32 = 0;
+                if (strncmp(gp->currentMapName, "yuu_", 4) == 0) {
+                    wp->menuState = 400;
+                } else {
+                    wp->menuState++;
+                }
                 break;
 
-			case 201:
+            case 1: {
+                const char* lang[2] = { "jp", "us" };
+                BOOL ok;
+
+                if (fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]) == 0U) {
+                    ok = FALSE;
+                } else {
+                    wp->res = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+                    ok = TRUE;
+                }
+                if (ok) {
+                    wp->menuState++;
+                }
+                break;
+            }
+
+            case 2:
+                if (!marioGetPtr()->characterId) {
+                    switch (winRootMain(wp)) {
+                        case -1:
+                            wp->menuState++;
+                            break;
+                        case -2:
+                            wp->menuState = 100;
+                            break;
+                        case -3:
+                            if (wp->itemId == 0x4E) {
+                                wp->menuState = 300;
+                            } else {
+                                wp->menuState = 200;
+                            }
+                            break;
+                    }
+                } else if (wp->buttonTrg & PAD_BUTTON_START) {
+                    kpaPauseSE2();
+                    wp->menuState = 3;
+                }
+                break;
+
+            case 3:
+                camGetPtr((CameraId)8)->flags &= ~0x200;
+                if (mario->characterId == 2) {
+                    if (!kpaGetStageViewType()) {
+                        marioCtrlOn();
+                    } else {
+                        marioCtrlOn2();
+                    }
+                } else {
+                    marioCtrlOn2();
+                }
+                ((void (*)(void))partyCtrlOn)();
+                fbatChangeMode(1);
+                psndClearFlag(0x80);
+                statusWinForceUpdate();
+                if (!(wp->flags & 0x1000)) {
+                    marioStSystemLevel(0);
+                } else {
+                    npcStartForEvent();
+                }
+                if (wp->res) {
+                    fileFree(wp->res);
+                }
+                wp->res = NULL;
+                wp->flags = 0;
+                wp->menuState = 0;
+                break;
+
+            case 100:
+                if (marioBgmodeChk()) {
+                    MarioWork* m = marioGetPtr();
+                    m->prevPartyMemberId[0] = wp->partyIds[wp->partySel];
+                    wp->menuState = 3;
+                } else if (animGroupBaseAsync(partyDataTbl[wp->partyIds[wp->partySel]].name, 2, 0)) {
+                    wp->menuState++;
+                }
+                break;
+
+            case 101:
+                marioPartyGoodbye();
+                wp->menuState++;
+                break;
+
+            case 102:
+                if (!marioGetParty()) {
+                    marioPartyHello(wp->partyIds[wp->partySel]);
+                    wp->menuState = 3;
+                }
+                break;
+
+            case 200: {
+                WindowPartyDt* list[7];
+                WindowPartyDt* p;
+                WindowPartyDt* base;
+                s32 partyId;
+                s32 n;
+
+                partyId = !marioBgmodeChk() ? marioGetParty() : marioGetPtr()->prevPartyMemberId[0];
+                base = winPartyDt;
+                n = 0;
+                for (i = 0, p = base; i < 7; i++, p++) {
+                    if (partyId == p->field_0x0) {
+                        list[n++] = p;
+                    }
+                }
+                for (i = 0; i < 7; i++, base++) {
+                    if (partyId != base->field_0x0) {
+                        list[n++] = base;
+                    }
+                }
+                wp->currentEvent = evtEntryType(evt_item_use, 0, 0, 0);
+                wp->currentEvent->lwData[10] = wp->itemId;
+                wp->currentEvent->lwData[11] = wp->itemTarget == 0 ? 0 : list[wp->itemTarget - 1]->field_0x0;
+                psndClearFlag(0x80);
+                wp->menuState++;
+                pouchRemoveItemIndex(wp->itemId, wp->itemIdx);
+                break;
+            }
+
+            case 201:
                 if (!evtCheckID(wp->currentEvent->eventId)) {
                     wp->menuState = 3;
                 }
                 break;
 
             case 300:
-                wp->currentEvent = evtEntryType(&evt_diary_read, 0, 0, 0);
-                wp->menuState += 1;
+                wp->currentEvent = evtEntryType(evt_diary_read, 0, 0, 0);
+                wp->menuState++;
                 break;
 
             case 301:
@@ -137,58 +422,438 @@ void winMain(void) {
 
             case 400:
                 evtYuuWindow();
-                wp->menuState += 1;
+                wp->menuState++;
                 break;
 
             case 401:
-                if (evtYuuWindowEndCheck()) {
+                if (evtYuuWindowEndChk()) {
                     wp->menuState = 3;
                 }
                 break;
         }
 
         if (wp->menuState == 2) {
-            s8 characterId = marioGetPtr()->characterId;
-            if (characterId < 1) {
-                if (characterId < 0) {
-                    return;
-                }
-                if (!(wp->flags & 0x1000)) {
-                    dispEntry(CAMERA_2D, 250.0f, 0, winDisp, NULL);
-                } else {
-                    dispEntry(CAMERA_2D, 500.0f, 0, winDisp, NULL);
-                }
-                return;
-            }
-            if (characterId < 3) {
-                dispEntry(CAMERA_2D, 250.0f, 0, winDispKoopa, NULL);
+            switch (marioGetPtr()->characterId) {
+                case 0:
+                    if (!(wp->flags & 0x1000)) {
+                        dispEntry(CAMERA_2D, 250.0f, 0, winDisp, NULL);
+                    } else {
+                        dispEntry(CAMERA_2D, 500.0f, 0, winDisp, NULL);
+                    }
+                    break;
+                case 2:
+                    dispEntry(CAMERA_2D, 250.0f, 0, winDispKoopa, NULL);
+                    break;
             }
         }
     }
 }
 
 void winDisp(CameraId camId, void* param) {
+    winRootDisp(camId, wp);
 }
 
 void winDispKoopa(CameraId camId, void* param) {
+    winTexInit(*((FileEntry*)wp->res)->data);
+    winTexSet(0xB7, (Vec){ 0.0f, 50.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 }
 
+EVT_BEGIN(kime_pose)
+    CALL(evt_party_nokotaro_get_status, 0, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(evt_party_set_pose, 0, STRING("PKR_I_1"))
+        CASE_EQUAL(2)
+        CALL(evt_party_set_pose, 0, STRING("PNK_I_1"))
+        CASE_EQUAL(3)
+        CALL(evt_party_set_pose, 0, STRING("I_1"))
+        CASE_EQUAL(4)
+        CALL(evt_party_set_pose, 0, STRING("PYS_I_1"))
+        CASE_EQUAL(5)
+        CALL(evt_party_set_pose, 0, STRING("PWD_I_1"))
+        CASE_EQUAL(6)
+        CALL(evt_party_set_pose, 0, STRING("PTR_I_1"))
+        CASE_EQUAL(7)
+        CALL(evt_party_set_pose, 0, STRING("PCH_I_1"))
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kime_pose2)
+    CALL(evt_party_nokotaro_get_status, 0, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(evt_party_set_pose, 0, STRING("PKR_Y_1"))
+        CASE_EQUAL(2)
+        CALL(evt_party_set_pose, 0, STRING("PNK_Y_1"))
+        CASE_EQUAL(3)
+        CALL(evt_party_set_pose, 0, STRING("Y_1"))
+        CASE_EQUAL(4)
+        CALL(evt_party_set_pose, 0, STRING("PYS_Y_1"))
+        CASE_EQUAL(5)
+        CALL(evt_party_set_pose, 0, STRING("PWD_Y_1"))
+        CASE_EQUAL(6)
+        CALL(evt_party_set_pose, 0, STRING("PTR_Y_1"))
+        CASE_EQUAL(7)
+        CALL(evt_party_set_pose, 0, STRING("PCH_Y_1"))
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(unk_evt_803757f0)
+    CALL(evt_party_nokotaro_get_status, 0, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_party_set_breed_pose, 0, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(kime_pose_famicom)
+    CALL(evt_party_nokotaro_get_status, 0, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    SWITCH(LW(0))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(evt_party_set_pose, 0, STRING("R_2"))
+        CASE_EQUAL(2)
+        CALL(evt_party_set_pose, 0, STRING("R_3"))
+        CASE_EQUAL(3)
+        CALL(evt_party_set_pose, 0, STRING("R_13"))
+        CASE_EQUAL(4)
+        CALL(party_color, LW(0))
+        SWITCH(LW(0))
+            CASE_EQUAL(0)
+            CALL(evt_party_set_pose, 0, STRING("R_5"))
+            CASE_EQUAL(1)
+            CALL(evt_party_set_pose, 0, STRING("R_6"))
+            CASE_EQUAL(2)
+            CALL(evt_party_set_pose, 0, STRING("R_7"))
+            CASE_EQUAL(3)
+            CALL(evt_party_set_pose, 0, STRING("R_8"))
+            CASE_EQUAL(4)
+            CALL(evt_party_set_pose, 0, STRING("R_9"))
+            CASE_EQUAL(5)
+            CALL(evt_party_set_pose, 0, STRING("R_10"))
+            CASE_EQUAL(6)
+            CALL(evt_party_set_pose, 0, STRING("R_11"))
+        END_SWITCH
+        CASE_EQUAL(5)
+        CALL(evt_party_set_pose, 0, STRING("R_4"))
+        CASE_EQUAL(6)
+        CALL(evt_party_set_pose, 0, STRING("R_12"))
+        CASE_EQUAL(7)
+        CALL(evt_party_set_pose, 0, STRING("R_15"))
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_item_use)
+    SET_TYPE(0)
+    CALL(evt_mario_normalize)
+    CALL(unk_80177cf8)
+    WAIT_FRAMES(1)
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL_CHILD(PTR(unk_evt_803757f0))
+    IF_INT_EQUAL(LW(11), 0)
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(1), 50)
+        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), 17, -1, 0)
+        ADD(LW(1), 10)
+        CALL(evt_eff, 0, STRING("itemget"), 10, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_MARIO_USE1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_mario_set_pose, STRING("M_I_1"))
+        WAIT_MS(1000)
+        CALL(evt_item_delete, STRING("menu_dummy"))
+        CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_RECOVERY_SHINE1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_eff64, 0, STRING("stardust2_n64"), 4, LW(0), LW(1), LW(2), 40, 40, 30, 120, 0, 0, 0, 0)
+        WAIT_MS(1400)
+        CALL(evt_mario_set_pose, STRING("M_V_2"))
+        CALL(itemUseFunc)
+        WAIT_MS(1500)
+        CALL(itemUseFunc2)
+        CALL(evt_mario_set_normal_pose)
+        RETURN
+    END_IF
+    CALL(evt_mario_get_party, LW(0))
+    IF_INT_EQUAL(LW(0), LW(11))
+        CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        ADD(LW(1), 50)
+        CALL(evt_item_entry, STRING("menu_dummy"), LW(10), LW(0), LW(1), LW(2), 17, -1, 0)
+        ADD(LW(1), 10)
+        CALL(evt_eff, 0, STRING("itemget"), 10, LW(0), LW(1), LW(2), 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_MARIO_USE1"), LW(0), LW(1), LW(2), 0)
+        CALL(famicom_check, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL_CHILD(PTR(kime_pose))
+            ELSE
+            CALL_CHILD(PTR(kime_pose_famicom))
+        END_IF
+        WAIT_MS(1000)
+        CALL(evt_item_delete, STRING("menu_dummy"))
+        CALL(evt_party_get_pos, 0, LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_ITEM_RECOVERY_SHINE1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_eff64, 0, STRING("stardust2_n64"), 4, LW(0), LW(1), LW(2), 40, 40, 30, 120, 0, 0, 0, 0)
+        WAIT_MS(1400)
+        CALL(famicom_check, LW(0))
+        IF_INT_EQUAL(LW(0), 0)
+            CALL_CHILD(PTR(kime_pose2))
+            ELSE
+            CALL_CHILD(PTR(kime_pose_famicom))
+        END_IF
+        CALL(itemUseFunc)
+        WAIT_MS(1500)
+        CALL(itemUseFunc2)
+        CALL_CHILD(PTR(unk_evt_803757f0))
+        CALL(evt_mario_set_normal_pose)
+        RETURN
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_diary_read)
+    SET_TYPE(0)
+    CALL(evt_party_cont_onoff, 0, 1)
+    WAIT_FRAMES(1)
+    CALL(evt_mario_normalize)
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_01"), 0, 0)
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_diary_01_yn"))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_continue)
+        CALL(evt_party_cont_onoff, 0, 0)
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("stg6_rsh_diary_02"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_diary_01_yn"))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_continue)
+        CALL(evt_party_cont_onoff, 0, 0)
+        RETURN
+    END_IF
+    CALL(evt_msg_print_add, 0, STRING("stg6_rsh_diary_03"))
+    CALL(evt_msg_select, 0, STRING("stg6_rsh_diary_01_yn"))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        CALL(evt_msg_continue)
+        CALL(evt_party_cont_onoff, 0, 0)
+        RETURN
+    END_IF
+    CALL(evt_msg_continue)
+    CALL(evt_snd_bgmoff_f, 512, 2000)
+    CALL(evt_mario_dispflag_onoff, 1, 2)
+    CALL(evt_mario_adjust_dir)
+    CALL(evt_mario_set_pose, STRING("M_L_2"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_04"), 0, 0)
+    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_npc_check, STRING("\202\344\202\244\202\352\202\242"), LW(0))
+    IF_INT_EQUAL(LW(0), 0)
+        CALL(evt_npc_entry, STRING("\202\344\202\244\202\352\202\242"), STRING("c_ghost_k"))
+        CALL(evt_npc_set_position, STRING("\202\344\202\244\202\352\202\242"), 0, -1000, 0)
+        CALL(evt_npc_set_tribe, STRING("\202\344\202\244\202\352\202\242"), STRING("\202\344\202\244\202\352\202\242"))
+        CALL(evt_npc_set_anim, STRING("\202\344\202\244\202\352\202\242"), STRING("O_1"))
+        CALL(evt_npc_set_autotalkpose, STRING("\202\344\202\244\202\352\202\242"), STRING("O_2"), STRING("T_2"))
+    END_IF
+    CALL(evt_npc_flag_onoff, 1, STRING("\202\344\202\244\202\352\202\242"), 262176)
+    BEGIN_INLINE_EVENT
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_init, 11, 180, 64, 1000)
+            LABEL(1)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_npc_set_color, STRING("\202\344\202\244\202\352\202\242"), 255, 255, 255, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(1)
+            END_IF
+            CALL(evt_sub_intpl_msec_init, 11, 64, 180, 1000)
+            LABEL(2)
+            CALL(evt_sub_intpl_msec_get_value)
+            CALL(evt_npc_set_color, STRING("\202\344\202\244\202\352\202\242"), 255, 255, 255, LW(0))
+            WAIT_FRAMES(1)
+            IF_INT_EQUAL(LW(1), 1)
+                GOTO(2)
+            END_IF
+        END_LOOP
+    END_INLINE_EVENT
+    CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_STG5_GHOST1"))
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    ADD(LW(1), 20)
+    ADD(LW(2), 20)
+    CALL(evt_npc_set_position, STRING("\202\344\202\244\202\352\202\242"), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, 132773, LW(0), LW(1), LW(2), 0)
+    WAIT_MS(200)
+    CALL(evt_mario_set_pose, STRING("M_I_O"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_diary_05"), 0, STRING("\202\344\202\244\202\352\202\242"))
+    WAIT_MS(300)
+    CALL(evt_snd_bgmoff, 512)
+    BEGIN_INLINE_EVENT
+        CALL(evt_env_blur_on, 0, 0)
+    END_INLINE_EVENT
+    CALL(evt_snd_sfxon, 132770, LW(3))
+    BEGIN_INLINE_EVENT
+        CALL(cam_r)
+    END_INLINE_EVENT
+    WAIT_MS(4000)
+    CALL(evt_fade_set_mapchange_type, 1, -1, 600, -1, -1)
+    CALL(evt_seq_set_seq, 5, 0, 0)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_lecture_msg)
+    WAIT_MS(1000)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_00"), 0, 0)
+    CALL(unk_80175eb0, 1)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_01"), 0, 0)
+    CALL(unk_80175eb0, 2)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_02"), 0, 0)
+    CALL(unk_80175eb0, 5)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_03"), 0, 0)
+    CALL(unk_80175eb0, 6)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_04"), 0, 0)
+    CALL(unk_80175eb0, 7)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_05"), 0, 0)
+    CALL(unk_80175eb0, 8)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_06"), 0, 0)
+    CALL(unk_80175eb0, 9)
+    CALL(evt_msg_continue)
+    CALL(evt_msg_print, 0, STRING("lecture_badge_07"), 0, 0)
+    CALL(unk_80175eb0, 10)
+    CALL(evt_msg_continue)
+    WAIT_MS(500)
+    CALL(unk_80175e98)
+    RETURN
+EVT_END()
+
+
 USER_FUNC(itemUseFunc) {
+    static s32 cnt;
     PartyEntry* party;
     MarioWork* mario;
     ItemData* item;
+    EffectEntry* eff;
 
     item = &itemDataTable[event->lwData[10]];
+    mario = marioGetPtr();
+    party = partyGetPtr(0);
     if (isFirstCall) {
         cnt = 0;
     }
-    /*switch (cnt) {
-
-    }*/
+    switch (cnt) {
+        case 0:
+            statusWinForceOpen();
+            if (event->lwData[11] == 0) {
+                ((void (*)(s32))pouchSetHP)(((s32 (*)(void))pouchGetHP)() + *(u8*)&item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + *(u8*)&item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + *(u8*)&item->sp_restored);
+            } else {
+                ((void (*)(s32, s32))pouchSetPartyHP)(event->lwData[11], ((s32 (*)(s32))pouchGetPartyHP)(event->lwData[11]) + *(u8*)&item->hp_restored);
+                ((void (*)(s32))pouchSetFP)(((s32 (*)(void))pouchGetFP)() + *(u8*)&item->fp_restored);
+                ((void (*)(s32))pouchSetAP)(((s32 (*)(void))pouchGetAP)() + *(u8*)&item->sp_restored);
+            }
+            cnt++;
+            break;
+        case 1:
+            if (event->lwData[11]) {
+                cnt = 200;
+                break;
+            }
+            if (!*(u8*)&item->hp_restored) {
+                cnt = 100;
+                break;
+            }
+            effRecoveryEntry(mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z, 0, *(u8*)&item->hp_restored);
+            cnt++;
+            break;
+        case 31:
+            cnt++;
+            break;
+        case 60:
+            cnt = 100;
+            break;
+        case 100:
+            if (!*(u8*)&item->fp_restored) {
+                cnt = 999;
+                break;
+            }
+            effRecoveryEntry(mario->position.x, mario->position.y + mario->wPlayerCollisionBox.y, mario->position.z, 1, *(u8*)&item->fp_restored);
+        case 130:
+            cnt = 999;
+            break;
+        case 200:
+            if (!*(u8*)&item->hp_restored) {
+                cnt = 300;
+                break;
+            }
+            eff = effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 0, *(u8*)&item->hp_restored);
+            ((f32*)eff->userdata)[0x10] = -party->field_F0 * 0.5f;
+            cnt++;
+            break;
+        case 230:
+            cnt++;
+            break;
+        case 260:
+            cnt = 300;
+            break;
+        case 300:
+            if (!*(u8*)&item->fp_restored) {
+                cnt = 999;
+                break;
+            }
+            effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 1, *(u8*)&item->fp_restored);
+            cnt++;
+            break;
+        case 330:
+            cnt = 999;
+            break;
+        case 999:
+        case 1000:
+            return EVT_RETURN_DONE;
+        default:
+            cnt++;
+            break;
+    }
+    return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(itemUseFunc2) {
     statusWinForceOff();
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(famicom_check) {
+    s32* args = event->args;
+
+    if (wp->flags & 0x2000) {
+        evtSetValue(event, args[0], 1);
+    } else {
+        evtSetValue(event, args[0], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(party_color) {
+    s32* args = event->args;
+
+    evtSetValue(event, args[0], pouchGetPartyColor(4));
     return EVT_RETURN_DONE;
 }
 
@@ -197,8 +862,102 @@ USER_FUNC(unk_80177cf8) {
     return EVT_RETURN_DONE;
 }
 
+static USER_FUNC(cam_r) {
+    CameraEntry* cam;
+    Vec v;
+    f32 s;
+
+    cam = camGetPtr(4);
+    cam->rollAngle += 3.0f;
+    s = (f32)sin((f32)gp->retraceCount / 10.0f);
+    PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
+    PSVECScale(&v, &v, 0.2f * s);
+    cam->viewOffset.x = v.x;
+    cam->viewOffset.y = v.y;
+    cam->viewOffset.z = v.z;
+    return EVT_RETURN_BLOCK;
+}
+
+BOOL winGhostDiaryChk(void) {
+    if (wp->menuState == 301) {
+        return TRUE;
+    }
+    return seqGetSeq() == 5;
+}
+
 void winFontInit(void) {
     FontDrawStart();
+}
+
+void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x400];
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    PSMTXTrans(trans, pos.x, pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawMessageMtx(trans, buf);
+}
+
+void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x400];
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    PSMTXTrans(trans, pos.x + scale.x * (f32)(FontGetMessageWidth("\202X\202X\202X") - FontGetMessageWidth(buf)), pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawStringMtx(trans, buf);
+}
+
+void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x400];
+    Mtx trans;
+    Mtx scl;
+    va_list args;
+
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    PSMTXTrans(trans, pos.x, pos.y, pos.z);
+    PSMTXScale(scl, scale.x, scale.y, scale.z);
+    PSMTXConcat(trans, scl, trans);
+    FontDrawColor(color);
+    FontDrawEdge();
+    FontDrawStringMtx(trans, buf);
+    FontDrawEdgeOff();
+}
+
+void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg) {
+    Mtx trans;
+    Mtx scl;
+
+    if (msg) {
+        PSMTXTrans(trans, pos.x, pos.y, pos.z);
+        PSMTXScale(scl, scale.x, scale.y, scale.z);
+        PSMTXConcat(trans, scl, trans);
+        FontDrawColor(color);
+        FontDrawMessageMtx(trans, msgSearch(msg));
+    }
+}
+
+void winFontSetPitch(f32 pitch, Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
+    char buf[0x400];
+    va_list args;
+
+    va_start(args, fmt);
+    vsprintf(buf, fmt, args);
+    FontDrawColor(color);
+    FontDrawScaleVec(scale);
+    FontDrawStringVecPitch(&pos, buf, pitch);
 }
 
 void winTexInit(TEXPalette* texture) {
@@ -224,4 +983,343 @@ void winTexInit(TEXPalette* texture) {
 }
 
 void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
+    Mtx trans;
+    Mtx scl;
+    Mtx m;
+    GXTexObj obj;
+    f32 sy;
+
+    if (color.a != 0xFF) {
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    } else {
+        GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_FALSE);
+        GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    }
+    TEXGetGXTexObjFromPalette(winTexTpl, &obj, textureId);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    GXSetTevColor(GX_TEVREG0, color);
+    PSMTXTrans(trans, translate.x, translate.y, translate.z);
+    sy = scale.y * GXGetTexObjHeight(&obj);
+    PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
+    PSMTXConcat(trans, scl, m);
+    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    GXLoadPosMtxImm(m, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+}
+
+void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color) {
+    Mtx trans;
+    Mtx scl;
+    Mtx m;
+    GXTexObj obj;
+    f32 sy;
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    TEXGetGXTexObjFromPalette(winTexTpl, &obj, textureId);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    GXSetTevColor(GX_TEVREG0, color);
+    PSMTXTrans(trans, translate.x, translate.y, translate.z);
+    sy = scale.y * GXGetTexObjHeight(&obj);
+    PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
+    PSMTXConcat(trans, scl, m);
+    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    GXLoadPosMtxImm(m, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+}
+
+void winTexSetRot(u32 textureId, Vec translate, Vec scale, GXColor color, f32 rot) {
+    Mtx trans;
+    Mtx scl;
+    Mtx r;
+    Mtx m;
+    GXTexObj obj;
+    f32 sy;
+
+    if (color.a != 0xFF) {
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    } else {
+        GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_FALSE);
+        GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    }
+    TEXGetGXTexObjFromPalette(winTexTpl, &obj, textureId);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    GXSetTevColor(GX_TEVREG0, color);
+    PSMTXTrans(trans, translate.x, translate.y, translate.z);
+    PSMTXRotRad(r, 'z', 0.017453292f * rot);
+    sy = scale.y * GXGetTexObjHeight(&obj);
+    PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
+    PSMTXConcat(trans, r, m);
+    PSMTXConcat(m, scl, m);
+    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    GXLoadPosMtxImm(m, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+}
+
+void winTexInit_x2(TEXPalette* texture) {
+    winTexInit(texture);
+    GXSetNumTexGens(2);
+    GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C);
+    GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 0x3C);
+    GXSetNumTevStages(2);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
+    GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+}
+
+void winTexSet_x2(u32 textureId1, u32 textureId2, Vec translate, Vec scale, GXColor color) {
+    Mtx trans;
+    Mtx scl;
+    Mtx m;
+    GXTexObj obj;
+    f32 sy;
+
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    TEXGetGXTexObjFromPalette(winTexTpl, &obj, textureId1);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    TEXGetGXTexObjFromPalette(winTexTpl, &obj, textureId2);
+    GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP1);
+    GXSetTevColor(GX_TEVREG0, color);
+    PSMTXTrans(trans, translate.x, translate.y, translate.z);
+    sy = scale.y * GXGetTexObjHeight(&obj);
+    PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
+    PSMTXConcat(trans, scl, m);
+    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    GXLoadPosMtxImm(m, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+}
+
+void winIconInit(void) {
+    winTexInit(NULL);}
+
+void winIconGrayInit(void) {
+    winTexInit(NULL);    GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_RED, GX_CH_RED, GX_CH_ALPHA);
+    GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_GREEN, GX_CH_GREEN, GX_CH_GREEN, GX_CH_ALPHA);
+    GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_BLUE, GX_CH_BLUE, GX_CH_BLUE, GX_CH_ALPHA);
+    GXSetTevColor(GX_TEVREG1, (GXColor){ 0x55, 0x55, 0x55, 0xFF });
+    GXSetNumTevStages(4);
+    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C1, GX_CC_TEXC, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP1);
+    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_TEXC, GX_CC_CPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
+    GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE2, GX_CC_ZERO, GX_CC_C1, GX_CC_TEXC, GX_CC_CPREV);
+    GXSetTevAlphaIn(GX_TEVSTAGE2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+    GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP3);
+    GXSetTevOrder(GX_TEVSTAGE3, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+    GXSetTevColorOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevAlphaOp(GX_TEVSTAGE3, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+    GXSetTevColorIn(GX_TEVSTAGE3, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE3, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
+    GXSetTevSwapMode(GX_TEVSTAGE3, GX_TEV_SWAP0, GX_TEV_SWAP0);
+}
+
+void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
+    Mtx trans;
+    Mtx scl;
+    Mtx m;
+    GXTexObj obj;
+    f32 sy;
+
+    if (iconId == 0x115) {
+        iconId = 0x114;
+    }
+    iconGetTexObj(&obj, iconId);
+    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    if (color.a != 0xFF) {
+        GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_TRUE);
+        GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    } else {
+        GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+        GXSetZCompLoc(GX_FALSE);
+        GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+        GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
+    }
+    GXSetTevColor(GX_TEVREG0, color);
+    PSMTXTrans(trans, translate.x, translate.y, translate.z);
+    sy = scale.y * GXGetTexObjHeight(&obj);
+    PSMTXScale(scl, scale.x * GXGetTexObjWidth(&obj), sy, scale.z);
+    PSMTXConcat(trans, scl, m);
+    PSMTXConcat(camGetPtr((CameraId)8)->view, m, m);
+    GXLoadPosMtxImm(m, 0);
+    GXSetCurrentMtx(0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3f32(-0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 1.0f);
+    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 1.0f);
+    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(1.0f, 0.0f);
+    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXTexCoord2f32(0.0f, 0.0f);
+    GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
+}
+
+USER_FUNC(unk_80175eb0) {
+    s32 n = evtGetValue(event, event->args[0]);
+
+    if (isFirstCall) {
+        wp->flags &= ~0x800;
+    }
+    if (wp->lectureStep < n) {
+        return EVT_RETURN_BLOCK;
+    }
+    wp->flags |= 0x800;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_80175e98) {
+    wp->flags &= ~0x800;
+    return EVT_RETURN_DONE;
+}
+
+void winLectureKeyMask(void) {
+    if (wp->flags & 0x1000) {
+        if (wp->flags & 0x800) {
+            wp->buttonTrg = 0;
+            wp->buttonRep = 0;
+            wp->dirTrg = 0;
+            wp->dirRep = 0;
+            return;
+        }
+        switch (wp->lectureStep) {
+            case 0:
+            case 1:
+                wp->buttonTrg = 0;
+                wp->buttonRep = 0;
+                wp->dirTrg = 0;
+                wp->dirRep = 0;
+                if (keyGetButtonTrg(0) & PAD_BUTTON_A) {
+                    wp->lectureStep++;
+                }
+                break;
+            case 2:
+            case 3:
+            case 4:
+                wp->buttonTrg = 0;
+                wp->buttonRep = 0;
+                wp->dirTrg &= 0x8000;
+                wp->dirRep &= 0x8000;
+                if (*(s32*)&wp->dirTrg || *(s32*)&wp->dirRep) {
+                    wp->lectureStep++;
+                }
+                break;
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+                wp->buttonTrg &= PAD_BUTTON_A;
+                wp->buttonRep &= PAD_BUTTON_A;
+                wp->dirTrg = 0;
+                wp->dirRep = 0;
+                if (*(s32*)&wp->buttonTrg || *(s32*)&wp->buttonRep) {
+                    wp->lectureStep++;
+                }
+                break;
+            case 9:
+                wp->buttonTrg &= PAD_BUTTON_START;
+                wp->buttonRep &= PAD_BUTTON_START;
+                wp->dirTrg = 0;
+                wp->dirRep = 0;
+                if (*(s32*)&wp->buttonTrg || *(s32*)&wp->buttonRep) {
+                    wp->lectureStep++;
+                }
+                break;
+        }
+    }
+}
+
+void winLectureOn(void) {
+    wp->flags |= 0x1000;
+    wp->flags |= 0x800;
+    wp->lectureStep = 0;
+    wp->lectureEvent = evtEntry(evt_lecture_msg, 0, 0);
+}
+
+BOOL winLectureCheck(void) {
+    if ((wp->flags & 0x1000) && evtCheckID(wp->lectureEvent->eventId)) {
+        return TRUE;
+    }
+    wp->flags &= ~0x1000;
+    return FALSE;
 }

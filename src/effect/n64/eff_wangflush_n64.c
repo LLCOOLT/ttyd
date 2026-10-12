@@ -23,10 +23,19 @@ typedef struct EffWangFlushN64Work {
 
 static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, -8, 0, 0, 1024, 0, 0, 0, 255},
-    {8, -8, 0, 1024, 1024, 0, 0, 0, 255},
-    {8, 8, 0, 1024, 0, 0, 0, 0, 255},
-    {-8, 8, 0, 0, 0, 0, 0, 0, 255},
+    {8, -8, 0, 2048, 1024, 0, 0, 0, 255},
+    {8, 8, 0, 2048, 3072, 0, 0, 0, 255},
+    {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
+
+static inline GXColor wfcol(u8 a, u8 r, u8 g, u8 b) {
+    GXColor c = {0};
+    c.a = a;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    return c;
+}
 
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
@@ -42,7 +51,7 @@ EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
     EffWangFlushN64Work* work;
 
     effect = effEntry();
-    effect->type = "WangflushN64";
+    effect->type = "WangflushN64\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffWangFlushN64Work));
     effect->userdata = work;
@@ -70,6 +79,7 @@ EffectEntry* effWangFlushN64Entry(s32 type, f32 x, f32 y, f32 z, s32 timer) {
 void effWangFlushMain(EffectEntry* effect) {
     s32 timer;
     s32 frame;
+    f32 sv;
     EffWangFlushN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
@@ -96,7 +106,8 @@ void effWangFlushMain(EffectEntry* effect) {
     work->scaleAdd += 0.29f;
     work->rotation += work->rotSpeed;
     work->rotSpeed *= 0.93f;
-    work->flashScale = 0.5f * (f32)sin((6.2831855f * (timer * 50)) / 360.0f) + 0.9f;
+    sv = (f32)sin((6.2831855f * (timer * 50)) / 360.0f);
+    work->flashScale = 0.5f * sv + 0.9f;
     work->flashAlpha = (s32)(144.0f + 64.0f * (f32)sin((6.2831855f * (timer * 40)) / 360.0f));
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effWangFlushDisp, effect);
 }
@@ -113,7 +124,6 @@ void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
-    GXColor color;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -144,13 +154,8 @@ void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, scaleMtx, scaleMtx);
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        color = (GXColor){0};
-        color.a = flashAlpha;
         idx = idx % 24;
-        color.r = color_rotation_data[idx];
-        color.g = color_rotation_data[idx + 1];
-        color.b = color_rotation_data[idx + 2];
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, wfcol(flashAlpha, color_rotation_data[idx], color_rotation_data[idx + 1], color_rotation_data[idx + 2]));
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }

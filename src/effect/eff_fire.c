@@ -178,7 +178,6 @@ EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale
             break;
     }
     work->delay = rand() % work->smokeInt;
-    work->unk38 = 0;
     work->keyIdx = 0;
     work->keyFrame = 0;
     work->unk44 = 0.0f;
@@ -282,10 +281,11 @@ void effFireMain(EffectEntry* effect) {
             work->unk1c++;
             if (work->unk1c > work->range) {
                 u8 offs[4] = { 5, 10, 10, 10 };
-                f32 pz = work->position.z - 5.0f;
-                f32 py = work->position.y + (f32)offs[type];
-                f32 sc = work->scale;
-                f32 px = work->position.x;
+                f32 px, py, pz, sc;
+                pz = work->position.z - 5.0f;
+                py = work->position.y + (f32)offs[type];
+                sc = work->scale;
+                px = work->position.x;
                 effFireSmokeEntry(px, py, pz, sc);
                 work->unk1c = 0;
                 work->range = rand() % 30 + 30;

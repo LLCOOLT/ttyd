@@ -180,6 +180,7 @@ static inline BOOL marioLandChk(f32 vy) {
     return FALSE;
 }
 
+void* effKemuriEntry(s32 type, f32 x, f32 y, f32 z, f32 w);
 void N_partyFollowCloseOn(PartyEntry* party);
 void N_partyFollowCloseOff(PartyEntry* party);
 void partyMoveBehindMario3(PartyEntry* party, s32 a, f32 dir);
@@ -1066,7 +1067,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 }
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x200000;
+                party->field_8 &= ~0x40000;
             }
             party = partyGetPtr(marioGetExtraPartyId());
             if (party) {
@@ -1078,7 +1079,7 @@ USER_FUNC(evt_mario_party_door_move) {
                 }
                 N_partyFollowCloseOff(party);
                 party->flags &= ~0x1000000;
-                party->field_8 &= ~0x200000;
+                party->field_8 &= ~0x40000;
             }
             ret = 2;
             break;
@@ -1327,6 +1328,198 @@ USER_FUNC(evt_mario_jump_pos) {
     return EVT_RETURN_BLOCK;
 }
 
+USER_FUNC(evt_mario_jump_jumpstand) {
+    s32* args = event->args;
+    MarioWork* mp = marioGetPtr();
+    f32 ty, tz, x2, y2, z2, h, tx, x1, y1, z1;
+    s32 mode;
+    s32 msec;
+    f32 t, dy, g;
+
+    evtGetFloat(event, args[0]);
+    h = evtGetFloat(event, args[1]);
+    evtGetFloat(event, args[2]);
+    x2 = evtGetFloat(event, args[3]);
+    y2 = evtGetFloat(event, args[4]);
+    z2 = evtGetFloat(event, args[5]);
+    x1 = evtGetFloat(event, args[6]);
+    y1 = evtGetFloat(event, args[7]);
+    z1 = evtGetFloat(event, args[8]);
+    msec = evtGetValue(event, args[9]);
+    mode = evtGetValue(event, args[10]);
+    if (isFirstCall) {
+        event->userdata[0] = 0;
+        event->userdata[3] = 0;
+        if (mode == 3) {
+            event->userdata[3] = 2;
+        } else if (FLD(mp, f32, 0xd8) < mp->position.y) {
+            event->userdata[3] = 2;
+        } else if (FLD(mp, f32, 0xd8) <= 1.5f * FLD(mp, f32, 0x1b8) + h) {
+            event->userdata[3] = 2;
+        } else {
+            event->userdata[3] = 1;
+        }
+        gp->systemLevelFlags |= 0x10;
+    }
+    if (event->userdata[3] & 1) {
+        tx = x1;
+        ty = y1;
+        tz = z1;
+    } else if (event->userdata[3] & 2) {
+        tx = x2;
+        ty = y2;
+        tz = z2;
+    }
+
+    switch (event->userdata[0]) {
+        case 0:
+            FLD(mp, u32, 0x4) |= 4;
+            if (marioChkSts(0x10)) {
+                effKemuriEntry(0, mp->position.x, mp->position.y, mp->position.z, 0.0f);
+            }
+            marioChgMot(8);
+            if (event->userdata[3] & 1) {
+                msec = 550;
+            }
+            event->userdata[1] = sysMsec2Frame(msec);
+            mp->baseSpeed = distABf(mp->position.x, mp->position.z, tx, tz) / (f32)event->userdata[1];
+            mp->directionView = angleABf(mp->position.x, mp->position.z, tx, tz);
+            mp->unk19C = mp->directionView;
+            dy = ty - mp->position.y;
+            t = 0.5f * (f32)event->userdata[1];
+            if (__fabsf(dy) < 1.0f) {
+                dy += 20.0f;
+            } else if (dy >= 0.0f) {
+                dy = 0.5f * FLD(mp, f32, 0x1b8) + dy;
+            } else {
+                dy = 20.0f;
+            }
+            g = (dy + dy) / (t * t - t);
+            FLD(mp, f32, 0x7c) = g * t;
+            FLD(mp, f32, 0x80) = -g;
+            FLD(mp, f32, 0x84) = 0.0f;
+            FLD(mp, f32, 0x88) = 0.0f;
+            if (event->userdata[3] & 2) {
+                event->userdata[0] = 10;
+            }
+            event->userdata[2] = 0.5f * (f32)event->userdata[1] + 0.5f;
+            if (event->userdata[0] == 10) {
+                break;
+            }
+            event->userdata[0] = 1;
+        case 1:
+            movePos(&mp->position.x, &mp->position.z, mp->baseSpeed, mp->directionView);
+            mp->position.y += FLD(mp, f32, 0x7c);
+            marioMakeJumpPara();
+            if (--event->userdata[2] > 0) {
+                break;
+            }
+            {
+                f32 t2 = 0.5f * (f32)event->userdata[1];
+                f32 dy2 = ty - mp->position.y;
+                FLD(mp, f32, 0x7c) = 0.0f;
+                FLD(mp, f32, 0x80) = (dy2 + dy2) / (t2 * t2 - t2);
+                FLD(mp, f32, 0x84) = 0.0f;
+                FLD(mp, f32, 0x88) = 0.0f;
+                event->userdata[2] = 0.5f * (f32)event->userdata[1] + 0.5f;
+            }
+            event->userdata[0] = 2;
+            if (!(mp->flags & 0x1000000)) {
+                marioChgPose("M_J_1C");
+            }
+            break;
+        case 2:
+            movePos(&mp->position.x, &mp->position.z, mp->baseSpeed, mp->directionView);
+            marioMakeJumpPara();
+            if (marioLandChk(FLD(mp, f32, 0x7c))) {
+                event->userdata[2] = 0;
+            } else {
+                mp->position.y += FLD(mp, f32, 0x7c);
+            }
+            if (--event->userdata[2] > 0) {
+                break;
+            }
+            event->userdata[0] = 20;
+            break;
+    }
+
+    switch (event->userdata[0]) {
+        case 10:
+            if (mp->position.y < y2) {
+                if (!(mode & 1)) {
+                    movePos(&mp->position.x, &mp->position.z, mp->baseSpeed, mp->directionView);
+                }
+                mp->position.y += FLD(mp, f32, 0x7c);
+                marioMakeJumpPara();
+                event->userdata[2]--;
+                break;
+            }
+            event->userdata[2] = 54;
+            event->userdata[1] = event->userdata[2] / 2;
+            camFollowYOff();
+            ty = y2;
+            mp->baseSpeed = distABf(mp->position.x, mp->position.z, x2, z2) / (f32)event->userdata[1];
+            mp->directionView = angleABf(mp->position.x, mp->position.z, x2, z2);
+            mp->unk19C = mp->directionView;
+            t = 0.5f * (f32)event->userdata[1];
+            g = 20.0f / (t * t - t);
+            FLD(mp, f32, 0x7c) = g * t;
+            FLD(mp, f32, 0x80) = -g;
+            FLD(mp, f32, 0x84) = 0.0f;
+            FLD(mp, f32, 0x88) = 0.0f;
+            event->userdata[2] = 0.5f * (f32)event->userdata[1] + 0.5f;
+            event->userdata[0] = 11;
+        case 11:
+            movePos(&mp->position.x, &mp->position.z, mp->baseSpeed, mp->directionView);
+            mp->position.y += FLD(mp, f32, 0x7c);
+            marioMakeJumpPara();
+            if (--event->userdata[2] > 0) {
+                break;
+            }
+            {
+                f32 t2 = 0.5f * (f32)event->userdata[1];
+                f32 dy2 = ty - mp->position.y;
+                FLD(mp, f32, 0x7c) = 0.0f;
+                FLD(mp, f32, 0x80) = (dy2 + dy2) / (t2 * t2 - t2);
+                FLD(mp, f32, 0x84) = 0.0f;
+                FLD(mp, f32, 0x88) = 0.0f;
+                event->userdata[2] = 0.5f * (f32)event->userdata[1] + 0.5f;
+            }
+            event->userdata[0] = 12;
+            marioChgPose("M_J_1C");
+            break;
+        case 12:
+            movePos(&mp->position.x, &mp->position.z, mp->baseSpeed, mp->directionView);
+            marioMakeJumpPara();
+            if (marioLandChk(FLD(mp, f32, 0x7c))) {
+                event->userdata[2] = 0;
+            } else {
+                mp->position.y += FLD(mp, f32, 0x7c);
+            }
+            if (--event->userdata[2] > 0) {
+                break;
+            }
+            event->userdata[0] = 20;
+            break;
+    }
+
+    if (event->userdata[0] == 20) {
+        FLD(mp, f32, 0x7c) = 0.0f;
+        FLD(mp, f32, 0x80) = 0.0f;
+        FLD(mp, f32, 0x84) = 0.0f;
+        FLD(mp, f32, 0x88) = 0.0f;
+        mp->baseSpeed = 0.0f;
+        mp->baseSpeed = 0.0f;
+        marioChgMot(0);
+        FLD(mp, u32, 0x4) &= ~4;
+        marioAdjustMoveDir();
+        camFollowYOn();
+        gp->systemLevelFlags &= ~0x10;
+        return EVT_RETURN_YIELD;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
 USER_FUNC(evt_mario_wait_landon) {
     if (marioGetPtr()->hitobjStandOn && marioChkLanding()) {
         return EVT_RETURN_DONE;
@@ -1472,10 +1665,10 @@ USER_FUNC(evt_mario_wait_movable) {
 }
 
 USER_FUNC(evt_mario_get_state) {
-    s32* args = event->args;
+    s32 id = (s32)event->args;
     MarioWork* mp = marioGetPtr();
-    s32 id = args[0];
     s32 v;
+    id = *(s32*)id;
     if (marioChkSlitThrouhEnd()) {
         evtSetValue(event, id, 2);
         return EVT_RETURN_DONE;

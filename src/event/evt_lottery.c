@@ -4,50 +4,269 @@
 #include <dolphin/os.h>
 
 extern GlobalWork* gp;
+extern int rand(void);
+
+typedef struct LotteryWork {
+	u16 flags; //0x0
+	u8 pad_0x2[0x6]; //0x2
+	OSTime lastTime; //0x8
+	s16 todayNum; //0x10
+	u8 pad_0x12[0x6]; //0x12
+	OSTime buyTime; //0x18
+	s16 number; //0x20
+	s16 days[4]; //0x22
+	u8 pad_0x2A[0x6]; //0x2A
+	OSTime times[2]; //0x30
+} LotteryWork;
 
 //.sbss
 BOOL dbg_lotteryinfo;
 
 //local prototypes
 USER_FUNC(evt_lottery);
+USER_FUNC(evt_lottery_buy);
+USER_FUNC(evt_lottery_flag);
+USER_FUNC(evt_lottery_todaynum);
+USER_FUNC(evt_lottery_error_check);
 
 lottery_info* lotteryGetPtr(void) {
 	return &gp->mLotteryInfo;
 }
 
 USER_FUNC(evt_lottery) {
-	lottery_info* LotteryInfo;
-
+	LotteryWork* lot;
+	OSCalendarTime a1, a2, b1, b2, c1, c2, d1, d2, e;
 	s32* args = event->args;
-	s32 arg1 = evtGetValue(event, args[0]); //r25
-	OSTime start = OSGetTime();
+	s32 idx = evtGetValue(event, args[0]);
+	OSTime now = OSGetTime();
+	s32 v;
+
 	dbg_lotteryinfo = TRUE;
+	lot = (LotteryWork*)&gp->mLotteryInfo;
 
-	LotteryInfo = &gp->mLotteryInfo;
+	lot->flags &= ~0x1000;
+	lot->flags &= ~0x2000;
+	lot->flags &= ~0x4000;
+	lot->flags &= ~0x8000;
 
-	LotteryInfo->mFlags &= ~0x1000;
-	LotteryInfo->mFlags &= ~0x2000;
-	LotteryInfo->mFlags &= ~0x4000;
-	LotteryInfo->mFlags &= ~0x8000;
-
-	if (LotteryInfo->mFlags & 8) {
-
+	if (lot->flags & 8) {
+		if (lot->buyTime < now) {
+			OSTicksToCalendarTime(lot->buyTime, &a1);
+			OSTicksToCalendarTime(now, &a2);
+			if (a1.year != a2.year || a1.mon != a2.mon || a1.mday != a2.mday) {
+				lot->flags &= ~4;
+				lot->flags &= ~8;
+			}
+		}
+		else {
+			lot->flags |= 4;
+			lot->flags &= ~8;
+		}
 	}
 
+	if (lot->flags & 2) {
+		if (lot->times[idx] < now) {
+			OSTicksToCalendarTime(lot->times[idx], &b1);
+			OSTicksToCalendarTime(now, &b2);
+			if (b1.year == b2.year && b1.mon == b2.mon && b1.mday == b2.mday) {
+				lot->flags &= ~0x10;
+			}
+			else {
+				if (!(lot->flags & 8)) {
+					lot->flags |= 0x10;
+				}
+				lot->times[idx] = now;
+			}
+		}
+		else {
+			OSTicksToCalendarTime(lot->times[idx], &c1);
+			OSTicksToCalendarTime(now, &c2);
+			if (c1.year == c2.year && c1.mon == c2.mon && c1.mday == c2.mday) {
+				lot->flags &= ~0x10;
+			}
+			else {
+				lot->flags |= 0x10;
+				lot->times[idx] = now;
+			}
+			lot->flags |= 4;
+		}
+	}
+	else {
+		lot->times[idx] = 0;
+	}
 
+	if (!(lot->flags & 1)) {
+		lot->flags |= 1;
+		lot->lastTime = now;
+		lot->todayNum = rand() % 10000;
+	}
+	else if (lot->lastTime < now) {
+		OSTicksToCalendarTime(lot->lastTime, &d1);
+		OSTicksToCalendarTime(now, &d2);
+		if (d1.year != d2.year || d1.mon != d2.mon || d1.mday != d2.mday) {
+			if (idx == 1) {
+				lot->lastTime = now;
+			}
+			if (!(lot->flags & 2)) {
+				lot->todayNum = rand() % 10000;
+			}
+			else if (!(now < lot->buyTime)) {
+				idx = (now - lot->buyTime) / OS_TIMER_CLOCK / 60 / 60 / 24;
+				v = lot->days[0];
+				if (idx > v) {
+					while (idx > v) {
+						v += 395 - rand() % 60;
+					}
+					lot->days[0] = v - idx;
+				}
+				v = lot->days[1];
+				if (idx > v) {
+					while (idx > v) {
+						v += 115 - rand() % 30;
+					}
+					lot->days[1] = v - idx;
+				}
+				v = lot->days[2];
+				if (idx > v) {
+					while (idx > v) {
+						v += 35 - rand() % 10;
+					}
+					lot->days[2] = v - idx;
+				}
+				v = lot->days[3];
+				if (idx > v) {
+					while (idx > v) {
+						v += 10 - rand() % 6;
+					}
+					lot->days[3] = v - idx;
+				}
+				if (idx == lot->days[0]) {
+					lot->todayNum = lot->number;
+					lot->flags |= 0x1000;
+				}
+				else if (idx == lot->days[1]) {
+					do {
+						lot->todayNum = lot->number % 1000 + rand() % 10 * 1000;
+					} while (lot->todayNum == lot->number);
+					lot->flags |= 0x2000;
+				}
+				else if (idx == lot->days[2]) {
+					do {
+						lot->todayNum = lot->number % 100 + rand() % 100 * 100;
+					} while (lot->todayNum == lot->number || lot->todayNum % 1000 == lot->number % 1000);
+					lot->flags |= 0x4000;
+				}
+				else if (idx == lot->days[3]) {
+					do {
+						lot->todayNum = lot->number % 10 + rand() % 1000 * 10;
+					} while (lot->todayNum == lot->number || lot->todayNum % 1000 == lot->number % 1000 ||
+						lot->todayNum % 100 == lot->number % 100);
+					lot->flags |= 0x8000;
+				}
+				else {
+					do {
+						lot->todayNum = rand() % 10000;
+					} while (lot->todayNum == lot->number || lot->number % 1000 == lot->todayNum % 1000 ||
+						lot->number % 100 == lot->todayNum % 100 || lot->number % 10 == lot->todayNum % 10);
+				}
+			}
+			else {
+				lot->flags |= 4;
+				lot->todayNum = -1;
+			}
+		}
+	}
+	else {
+		lot->flags |= 4;
+		lot->todayNum = -1;
+		lot->lastTime = now;
+	}
 
+	evtSetValue(event, args[1], lot->flags);
+	evtSetValue(event, args[2], lot->todayNum);
+	OSTicksToCalendarTime(now, &e);
+	if (lot->flags & 2) {
+		OSTicksToCalendarTime(lot->buyTime, &e);
+		OSTicksToCalendarTime(lot->buyTime + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[0], &e);
+		OSTicksToCalendarTime(lot->buyTime + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[1], &e);
+		OSTicksToCalendarTime(lot->buyTime + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[2], &e);
+		OSTicksToCalendarTime(lot->buyTime + (OSTime)OS_TIMER_CLOCK * 86400 * lot->days[3], &e);
+	}
+	return EVT_RETURN_DONE;
+}
 
+USER_FUNC(evt_lottery_buy) {
+	s32* args = event->args;
+	OSTime now = OSGetTime();
+	LotteryWork* lot = (LotteryWork*)&gp->mLotteryInfo;
 
+	do {
+		lot->number = rand() % 10000;
+	} while (lot->number == lot->todayNum || lot->number % 1000 == lot->todayNum % 1000 ||
+		lot->number % 100 == lot->todayNum % 100 || lot->number % 10 == lot->todayNum % 10);
+	lot->buyTime = now;
+	lot->days[0] = 395 - rand() % 60;
+	lot->days[1] = 115 - rand() % 30;
+	lot->days[2] = 35 - rand() % 10;
+	lot->days[3] = 10 - rand() % 6;
+	if (lot->flags & 4) {
+		lot->flags |= 8;
+		lot->lastTime = now;
+		lot->times[0] = now;
+		lot->times[1] = now;
+	}
+	if (lot->flags & 2) {
+		lot->flags |= 8;
+		lot->lastTime = now;
+		lot->times[0] = now;
+		lot->times[1] = now;
+	}
+	lot->flags |= 2;
+	evtSetValue(event, args[0], lot->number);
+	return EVT_RETURN_DONE;
+}
 
+USER_FUNC(evt_lottery_flag) {
+	evtSetValue(event, event->args[0], ((LotteryWork*)&gp->mLotteryInfo)->flags);
+	return EVT_RETURN_DONE;
+}
 
+USER_FUNC(evt_lottery_todaynum) {
+	evtSetValue(event, event->args[0], ((LotteryWork*)&gp->mLotteryInfo)->todayNum);
+	return EVT_RETURN_DONE;
+}
 
+USER_FUNC(evt_lottery_error_check) {
+	OSCalendarTime a, b;
+	GlobalWork* g = gp;
+	s32* args = event->args;
+	OSTime now = OSGetTime();
+	LotteryWork* lot = (LotteryWork*)&g->mLotteryInfo;
+	u16 flags = lot->flags;
+	BOOL err = FALSE;
 
-
-
-
-
-
-
-
+	if (flags & 4) {
+		err = TRUE;
+	}
+	if ((flags & 2) && now < lot->buyTime) {
+		err = TRUE;
+	}
+	if (now < lot->times[0]) {
+		err = TRUE;
+	}
+	if (now < lot->times[1]) {
+		err = TRUE;
+	}
+	if (now < lot->lastTime) {
+		err = TRUE;
+	}
+	if ((flags & 8) && lot->buyTime < now) {
+		OSTicksToCalendarTime(lot->buyTime, &a);
+		OSTicksToCalendarTime(now, &b);
+		if (a.year != b.year || a.mon != b.mon || a.mday != b.mday) {
+			err = FALSE;
+		}
+	}
+	evtSetValue(event, args[0], err);
 	return EVT_RETURN_DONE;
 }

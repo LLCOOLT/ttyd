@@ -55,7 +55,7 @@ EffectEntry* effRappaN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 pitch,
     if (num == 0) {
         return NULL;
     }
-    effect->type = "RappaN64";
+    effect->type = "RappaN64\0\0\0";
     effect->count = num + 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffRappaN64Work) * (num + 1));
     effect->userdata = work;
@@ -69,7 +69,7 @@ EffectEntry* effRappaN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 pitch,
     work->alpha = 255;
     work++;
     for (i = 1; i < num + 1; i++, work++) {
-        speed = (f32)(rand() % 10) * 0.25f + base;
+        speed = (f32)(rand() % 10) / 4.0f + base;
         work->type = type;
         work->position.x = x;
         work->position.y = y;
@@ -120,8 +120,16 @@ void effRappaMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effRappaDisp, effect);
 }
 
+static inline GXColor mkcol(u8 r, u8 g, u8 b, u8 a) {
+    GXColor c = unk_80423230;
+    c.r = r;
+    c.g = g;
+    c.b = b;
+    c.a = a;
+    return c;
+}
+
 void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
-    GXColor color;
     CameraEntry* camera;
     s32 j0, j1, j2;
     EffRappaN64Work* work;
@@ -157,12 +165,7 @@ void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
     j1 = idx + 4;
     j2 = idx + 5;
     for (i = 1; i < effect->count; j0 += 3, j1 += 3, j2 += 3, i++, work++) {
-        color = unk_80423230;
-        color.r = color_rotation_data[j0 % 36];
-        color.g = color_rotation_data[j1 % 36];
-        color.b = color_rotation_data[j2 % 36];
-        color.a = alpha;
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, mkcol(color_rotation_data[j0 % 36], color_rotation_data[j1 % 36], color_rotation_data[j2 % 36], alpha));
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
         PSMTXScale(scale, work->scaleOfs, work->scaleOfs, 1.0f);

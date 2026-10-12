@@ -64,10 +64,9 @@ void spline_maketable(s32 n, void* pts, f32* ts, void* tbl);
 #define EVT_FLOAT_OF(x) ((s32)(1024.0f * (x)) - 230000000)
 
 
-int sscanf(const char*, const char*, ...);
-static inline void evt_sub_unused_scanf(const char* s, f32* a, f32* b, f32* c) {
-	sscanf(s, "%f%f%f", a, b, c);
-}
+static const char coin_fmt[] = "%f%f%f";
+
+static const GXColor coin_black = {0x00, 0x00, 0x00, 0xFF};
 
 USER_FUNC(bgm_start_wait);
 USER_FUNC(evt_bero_mapchange);
@@ -1114,10 +1113,10 @@ USER_FUNC(evt_sub_intpl_init) {
 
 USER_FUNC(evt_sub_intpl_get_value) {
 	event->lwData[0] = intplGetValue(event->lwData[11], event->lwData[14], event->lwData[15], event->lwData[12], event->lwData[13]);
-	if (event->lwData[14] < event->lwData[15]) {
-		event->lwData[1] = 1;
-	} else {
+	if (event->lwData[14] >= event->lwData[15]) {
 		event->lwData[1] = 0;
+	} else {
+		event->lwData[1] = 1;
 	}
 	event->lwData[14]++;
 	return EVT_RETURN_DONE;
@@ -1412,9 +1411,11 @@ USER_FUNC(evt_sub_system_flag_onoff) {
 	return EVT_RETURN_DONE;
 }
 
-KEYFN(evt_key_get_buttontrg, keyGetButtonTrg)
-KEYFN(evt_key_get_button, keyGetButton)
 KEYFN(evt_key_get_dir, keyGetDir)
+
+KEYFN(evt_key_get_button, keyGetButton)
+
+KEYFN(evt_key_get_buttontrg, keyGetButtonTrg)
 
 USER_FUNC(evt_sub_get_mapname) {
 	evtSetValue(event, event->args[0], (s32)gp->currentMapName);
@@ -1540,7 +1541,7 @@ void coingetDisp(WinMgrEntry* entry) {
 	if (work[1]) {
 		sprintf(buf, msgSearch("msg_window_coin_get"), work[0]);
 		FontDrawStart();
-		FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+		FontDrawColor(coin_black);
 		FontDrawMessage(-(s32)FontGetMessageWidth(buf) / 2, entry->y - 8, buf);
 	}
 }
@@ -1559,12 +1560,15 @@ USER_FUNC(evt_sub_get_coin) {
 	MarioWork* mario = marioGetPtr();
 	Vec a = mario->position;
 	Vec b = a;
-	f32 rad = 6.2831855f * reviseAngle((100.0f * camGetPtr(4)->viewYaw + 5.0f) / 100.0f) / 360.0f;
-	f32 s = 10.0f * coin_sin(rad);
-	f32 c = 10.0f * coin_cos(rad);
+	f32 rad = reviseAngle((100.0f * camGetPtr(4)->viewYaw + 5.0f) / 100.0f);
+	f32 s;
+	f32 c;
 	s32 state;
 	EffectEntry* eff;
 	s32* work;
+	rad = 6.2831855f * rad / 360.0f;
+	s = 10.0f * coin_sin(rad);
+	c = 10.0f * coin_cos(rad);
 	a.x += s;
 	a.z -= c;
 	a.y += 62.0f;
@@ -1652,10 +1656,17 @@ USER_FUNC(stone_ry) {
 }
 
 USER_FUNC(stone_bg) {
-	char* name = (char*)evtGetValue(event, event->args[0]);
-	camGetPtr(8)->letterBoxCamId = 5;
-	((s32*)effNameToPtr("sub_bg")->userdata)[14] = 5;
-	*(s32*)(*(u8**)(*(u8**)((u8*)itemNameToPtr(name) + 0x1c) + 0xc) + 0x38) = 5;
+	char* name;
+	CameraEntry* cam;
+	EffectEntry* eff;
+	u8* item;
+	name = (char*)evtGetValue(event, event->args[0]);
+	cam = camGetPtr(8);
+	cam->letterBoxCamId = 5;
+	eff = effNameToPtr("sub_bg");
+	((s32*)eff->userdata)[14] = 5;
+	item = (u8*)itemNameToPtr(name);
+	*(s32*)(*(u8**)(*(u8**)(item + 0x1c) + 0xc) + 0x38) = 5;
 	if (npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49") != NULL && evtGetValue(event, GSW(0)) < 211) {
 		npcNameToPtr_NoAssert("\x82\xC9\x82\xB9\x83\x7D\x83\x8A\x83\x49")->cameraId = 5;
 	} else {

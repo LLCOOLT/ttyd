@@ -127,7 +127,7 @@ static void ext_moamoa_main(void) {
                 moa->flags |= 0x84;
                 moa->state = 48;
                 angle = (wp->breathDir + wp->angle) / 2;
-                moa->target = (Vec){0.0f, 0.0f, 0.0f};
+                { static const Vec z0 = {0.0f, 0.0f, 0.0f}; moa->target = z0; }
                 spd = randf(0.1f, 0.2f);
                 rad = 6.2831855f * angle / 360.0f;
                 moa->vy = spd * moa_sin(rad);
@@ -309,9 +309,7 @@ static void ext_moamoa_main(void) {
                 spd = randf(5.0f, 6.0f);
                 s = randf(0.2f, 0.3f);
                 if (!sndFlag) {
-                    Vec p;
-                    p = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-                    psndSFXOn_3D((const char*)0x6c3, &p);
+                    psndSFXOn_3D((const char*)0x6c3, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                     sndFlag = 1;
                 }
                 moamoa_jump(pose, moa, 49, 0, x, -100.0f, z, spd, s);

@@ -250,9 +250,9 @@ static void effMObjBrokenMain(EffectEntry* effect) {
         work->position.y += work->velY;
         work->velY -= work->gravity;
         if (type < 6) {
-            work->rotation += (20.0f - work->rotation) * 0.125f;
+            work->rotation += (20.0f - work->rotation) / 8.0f;
         } else {
-            work->rotation += (720.0f - work->rotation) * 0.03125f;
+            work->rotation += (720.0f - work->rotation) / 32.0f;
         }
         if (work->position.y < -100.0f) {
             done++;
