@@ -57,7 +57,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             } else {
                 data->counter++;
                 data->reberAngle += 4.0f;
-                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
             }
             break;
         case 3:
@@ -68,7 +68,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 } else {
                     data->reberAngle -= 10.0f;
                 }
-                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
                 data->counter++;
             }
             if (data->state[data->cursor] != 2 || (keyGetDirRep(0) & 0xC000)) {
@@ -94,7 +94,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                     }
                 }
             }
-            sfx = "SFX_EVT_GAME_SLOT_STOP1";
+            sfx = (0, "SFX_EVT_GAME_SLOT_STOP1");
             count = 0;
             for (i = 0; i < 3; i++) {
                 if (data->state[i] == 0) {

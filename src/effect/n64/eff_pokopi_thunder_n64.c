@@ -186,6 +186,8 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     return effect;
 }
 
+inline float inline_fn(s32 arg0, float arg1) { return ((f32)arg0) * arg1; }
+
 void effPokopiThunderMain(EffectEntry* effect) {
     EffPokopiThunderN64Work* work = effect->userdata;
     Vec position;
@@ -213,10 +215,10 @@ void effPokopiThunderMain(EffectEntry* effect) {
     frame = work->frame;
     if (type == 2) {
         if (frame >= 40) {
-            work->alpha = (s32)((f32)work->alpha * 0.5f);
+            work->alpha = (s32)inline_fn(work->alpha, 0.5f);
         }
     } else if (frame >= 11) {
-        work->alpha = (s32)((f32)work->alpha * 0.5f);
+        work->alpha = (s32)inline_fn(work->alpha, 0.5f);
     }
     dispEntry(work->cameraId, dispCalcZ(&position), 2, (DispCallback)effPokopiThunderDisp, effect);
 }

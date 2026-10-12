@@ -20,7 +20,7 @@
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // proto: USER_FUNC(evt_moamoa_target_off);
-USER_FUNC(evt_moamoa_target_off) {
+static USER_FUNC(evt_moamoa_target_off) {
     s32 i = evtGetValue(event, event->args[0]);
 
     wp->target[i] = wp->target[1 - i];

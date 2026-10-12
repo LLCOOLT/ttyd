@@ -9,9 +9,9 @@ USER_FUNC(evt_exchange_msg_set) {
     s32* args = event->args;
     s32 value = evtGetValue(event, args[0]);
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
-    ExchangeRyokin* tbl = RYOKIN_TBL[exchange_ret_tbl_no()];
+    s32 n = exchange_ret_tbl_no();
 
-    sprintf(exchange_msgp, msg, value, tbl[0].medal, tbl[0].ryokin, tbl[1].medal, tbl[1].ryokin, tbl[2].medal, tbl[2].ryokin);
+    sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
     evtSetValue(event, args[2], (s32)exchange_msgp);
     return EVT_RETURN_DONE;
 }

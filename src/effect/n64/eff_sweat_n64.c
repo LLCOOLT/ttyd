@@ -149,7 +149,6 @@ void effSweatMain(EffectEntry* effect) {
 void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSweatN64Work* work;
-    EffSweatN64Work* w;
     Mtx trans;
     Mtx rot;
     Mtx base;
@@ -189,23 +188,23 @@ void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     neg = -h;
-    w = work + 1;
-    for (i = 1; i < effect->count; i++, w++) {
-        if (w->delay != 0) {
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
+        if (work->delay != 0) {
             continue;
         }
         {
-            GXSetChanMatColor(GX_COLOR0A0, (GXColor){255, 255, 255, w->alpha});
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){255, 255, 255, work->alpha});
         }
-        PSMTXTrans(trans, w->position.x, w->position.y, w->position.z);
-        PSMTXRotRad(rot, 'z', 0.017453292f * w->rot);
+        PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
+        PSMTXRotRad(rot, 'z', 0.017453292f * work->rot);
         PSMTXConcat(trans, rot, trans);
         PSMTXConcat(base, trans, trans);
         GXLoadPosMtxImm(trans, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         size = 6.4f;
-        if (w->rot > 0.0f) {
+        if (work->rot > 0.0f) {
             size *= -1.0f;
         }
         yt = 4.8f;

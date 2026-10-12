@@ -1,3 +1,4 @@
+#pragma defer_codegen off
 #include "battle/ac/ac_timing_a.h"
 #include "battle/battle.h"
 #include "battle/battle_ac.h"
@@ -79,6 +80,7 @@ void battleAcDelete_TimingA(BattleWork* work) {
 void battleAcDisp_TimingA(CameraId cameraId, void* param) {
     BattleWork* work = (BattleWork*)param;
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)&work->actionCommands + 0x290);
+    int new_var;
     switch (work->actionCommands.mAcState) {
         case 99:
             disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
@@ -92,12 +94,13 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 1000:
         case 1001:
             if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+                new_var = 4;
+                disp->iconX = intplGetValue(new_var, *(s32*)&disp->field_0x1C[new_var] - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
             }
             actionCommandDisp(disp->iconX, disp->iconY);
-            if (*(s32*)&disp->field_0x1C[4] < 60) {
+            if (*(s32*)&disp->field_0x1C[new_var] < 60) {
                 (*(s32*)&disp->field_0x1C[4])++;
             }
             break;

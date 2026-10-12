@@ -2,6 +2,8 @@
 // include: driver/icondrv.h
 // include: dolphin/gx.h
 // include: dolphin/mtx.h
+// decl: typedef struct I3 { s32 v[3]; } I3;
+// decl: static const I3 disp_slot_icons = {{0x1F3, 0x1F3, 0x1F3}};
 // decl: typedef struct GoryuuWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } GoryuuWork;
 // decl: typedef struct SlotWork { u32 flags; s32 phase; f32 reberAngle; f32 angle[2][3]; f32 speed[3]; s8 state[3]; s8 face[2][3]; s8 stopCount[3]; s32 wait[3]; s32 extra[3]; s32 counter; s32 neonCount; s32 monteCount; s32 nowSlot; s32 caseId[2]; EventEntry* monteEvt; s32 sfxId; s16 cursor; } SlotWork;
 // decl: typedef struct SlotDrum { const char* drum[3]; const char* reber; const char* anim; const char* window[3][3]; const char* neon[3]; } SlotDrum;
@@ -10,7 +12,7 @@
 // proto: void goryuugijo_disp_slot(CameraId camera, void* param);
 void goryuugijo_disp_slot(CameraId camera, void* param) {
     SlotWork* data = ((GoryuuWork*)param)->data;
-    s32 icons[3] = {0x1F3, 0x1F3, 0x1F3};
+    I3 icons = disp_slot_icons;
     s32 i;
     Vec pos;
     f32 sx;
@@ -41,7 +43,7 @@ void goryuugijo_disp_slot(CameraId camera, void* param) {
             iconDispGx2(mtx, 0x10, 0x1F2);
             PSMTXTrans(trans, -304.0f + sx, 31.35f + (240.0f - sy), 0.0f);
             PSMTXConcat(trans, scale, mtx);
-            ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons[i]);
+            ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons.v[i]);
         }
     }
 }

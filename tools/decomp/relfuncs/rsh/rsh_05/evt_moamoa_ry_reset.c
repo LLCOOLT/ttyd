@@ -20,7 +20,7 @@
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // proto: USER_FUNC(evt_moamoa_ry_reset);
-USER_FUNC(evt_moamoa_ry_reset) {
+static USER_FUNC(evt_moamoa_ry_reset) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
 

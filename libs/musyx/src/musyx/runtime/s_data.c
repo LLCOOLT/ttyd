@@ -6,18 +6,35 @@
 #include "musyx/synth.h"
 #include "musyx/synthdata.h"
 
-static GSTACK gs[128];
-static s16 sp;
+typedef struct GSROOT {
+  struct GSROOT* next;
+  s32 id;
+  s16 sp;
+  GSTACK stack[128];
+  ARAMInfo aramInfo;
+} GSROOT;
 
-void dataInitStack(
-#if MUSY_VERSION >= MUSY_VERSION_CHECK(2, 0, 1)
-    unsigned long aramBase, unsigned long aramSize
-#endif
-) {
-  sp = 0;
+static GSROOT gsDefault;
+static s32 gsNextID;
+static GSROOT* gsCurrent;
+static GSROOT* gsRoot;
+
+void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
+  gsRoot = NULL;
+  gsDefault.id = -2;
+  gsDefault.sp = 0;
+  gsDefault.aramInfo.aramBase = aramBase;
+  gsDefault.aramInfo.aramWrite = aramBase;
+  gsDefault.aramInfo.aramTop = aramBase + aramSize;
+  gsDefault.next = NULL;
+  gsRoot = &gsDefault;
+  gsNextID = 0;
+  gsCurrent = &gsDefault;
 }
 
-static MEM_DATA* GetPoolAddr(u16 id, MEM_DATA* m) {
+ARAMInfo* dataARAMDefaultGetInfo() { return &gsDefault.aramInfo; }
+
+static inline MEM_DATA* GetPoolAddr(u16 id, MEM_DATA* m) {
   while (m->nextOff != 0xFFFFFFFF) {
     if (m->id == id) {
       return m;
@@ -28,21 +45,21 @@ static MEM_DATA* GetPoolAddr(u16 id, MEM_DATA* m) {
   return NULL;
 }
 
-static MEM_DATA* GetMacroAddr(u16 id, POOL_DATA* pool) {
+static inline MEM_DATA* GetMacroAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->macroOff));
 }
 
-static MEM_DATA* GetCurveAddr(u16 id, POOL_DATA* pool) {
+static inline MEM_DATA* GetCurveAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->curveOff));
 }
-static MEM_DATA* GetKeymapAddr(u16 id, POOL_DATA* pool) {
+static inline MEM_DATA* GetKeymapAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->keymapOff));
 }
-static MEM_DATA* GetLayerAddr(u16 id, POOL_DATA* pool) {
+static inline MEM_DATA* GetLayerAddr(u16 id, POOL_DATA* pool) {
   return pool == NULL ? NULL : GetPoolAddr(id, (MEM_DATA*)((u8*)pool + pool->layerOff));
 }
 
-static void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
+void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
   MEM_DATA* m; // r30
 
   switch (dataType) {
@@ -95,14 +112,14 @@ static void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
     break;
   case 1:
     if (!remove) {
-#if MUSY_VERSION <= MUSY_VERSION_CHECK(2, 0, 1)
-      dataAddSampleReference(id);
+#if 1
+      dataAddSampleReference(id, &gsCurrent->aramInfo);
 #else
       // TODO
 #endif
     } else {
-#if MUSY_VERSION <= MUSY_VERSION_CHECK(2, 0, 1)
-      dataRemoveSampleReference(id);
+#if 1
+      dataRemoveSampleReference(id, &gsCurrent->aramInfo);
 #else
       // TODO
 #endif
@@ -111,7 +128,7 @@ static void InsertData(u16 id, void* data, u8 dataType, u32 remove) {
   }
 }
 
-static void ScanIDList(u16* ref, void* data, u8 dataType, u32 remove) {
+static inline void ScanIDList(u16* ref, void* data, u8 dataType, u32 remove) {
   u16 id; // r30
 
   while (*ref != 0xFFFF) {
@@ -129,7 +146,7 @@ static void ScanIDList(u16* ref, void* data, u8 dataType, u32 remove) {
   }
 }
 
-static void ScanIDListReverse(u16* refBase, void* data, u8 dataType, u32 remove) {
+static inline void ScanIDListReverse(u16* refBase, void* data, u8 dataType, u32 remove) {
   s16 id;
   u16* ref;
 
@@ -161,37 +178,37 @@ static void ScanIDListReverse(u16* refBase, void* data, u8 dataType, u32 remove)
   }
 }
 
-static void InsertMacros(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 0, 0); }
+static inline void InsertMacros(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 0, 0); }
 
-static void InsertCurves(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 4, 0); }
+static inline void InsertCurves(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 4, 0); }
 
-static void InsertKeymaps(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 2, 0); }
+static inline void InsertKeymaps(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 2, 0); }
 
-static void InsertLayers(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 3, 0); }
+static inline void InsertLayers(unsigned short* ref, void* pool) { ScanIDList(ref, pool, 3, 0); }
 
-static void RemoveMacros(unsigned short* ref) { ScanIDList(ref, NULL, 0, 1); }
+static inline void RemoveMacros(unsigned short* ref) { ScanIDList(ref, NULL, 0, 1); }
 
-static void RemoveCurves(unsigned short* ref) { ScanIDList(ref, NULL, 4, 1); }
+static inline void RemoveCurves(unsigned short* ref) { ScanIDList(ref, NULL, 4, 1); }
 
-static void RemoveKeymaps(unsigned short* ref) { ScanIDList(ref, NULL, 2, 1); }
+static inline void RemoveKeymaps(unsigned short* ref) { ScanIDList(ref, NULL, 2, 1); }
 
-static void RemoveLayers(unsigned short* ref) { ScanIDList(ref, NULL, 3, 1); }
+static inline void RemoveLayers(unsigned short* ref) { ScanIDList(ref, NULL, 3, 1); }
 
-static void InsertSamples(u16* ref, void* samples, void* sdir) {
+static inline void InsertSamples(u16* ref, void* samples, void* sdir) {
   samples = hwTransAddr(samples);
   if (dataInsertSDir((SDIR_DATA*)sdir, samples)) {
     ScanIDList(ref, sdir, 1, 0);
   }
 }
 
-static void RemoveSamples(unsigned short* ref, void* sdir) {
+static inline void RemoveSamples(unsigned short* ref, void* sdir) {
   ScanIDListReverse(ref, NULL, 1, 1);
   dataRemoveSDir(sdir);
 }
 
-static void InsertFXTab(unsigned short gid, FX_DATA* fd) { dataInsertFX(gid, fd->fx, fd->num); }
+static inline void InsertFXTab(unsigned short gid, FX_DATA* fd) { dataInsertFX(gid, fd->fx, fd->num); }
 
-static void RemoveFXTab(unsigned short gid) { dataRemoveFX(gid); }
+static inline void RemoveFXTab(unsigned short gid) { dataRemoveFX(gid); }
 
 void sndSetSampleDataUploadCallback(void* (*callback)(u32, u32), u32 chunckSize) {
   hwSetSaveSampleCallback(callback, chunckSize);
@@ -202,14 +219,14 @@ bool sndPushGroup(void* prj_data, u16 gid, void* samples, void* sdir, void* pool
   MUSY_ASSERT_MSG(prj_data != NULL, "Project data pointer is NULL");
   MUSY_ASSERT_MSG(sdir != NULL, "Sample directory pointer is NULL");
 
-  if (sndActive && sp < 128) {
+  if (sndActive && gsCurrent->sp < 128) {
     g = prj_data;
 
     while (g->nextOff != 0xFFFFFFFF) {
       if (g->id == gid) {
-        gs[sp].gAddr = g;
-        gs[sp].prjAddr = prj_data;
-        gs[sp].sdirAddr = sdir;
+        gsCurrent->stack[gsCurrent->sp].gAddr = g;
+        gsCurrent->stack[gsCurrent->sp].prjAddr = prj_data;
+        gsCurrent->stack[gsCurrent->sp].sdirAddr = sdir;
         InsertSamples((u16*)((u8*)prj_data + g->sampleOff), samples, sdir);
         InsertMacros((u16*)((u8*)prj_data + g->macroOff), pool);
         InsertCurves((u16*)((u8*)prj_data + g->curveOff), pool);
@@ -219,7 +236,7 @@ bool sndPushGroup(void* prj_data, u16 gid, void* samples, void* sdir, void* pool
           InsertFXTab(gid, (FX_DATA*)((u8*)prj_data + g->data.song.normpageOff));
         }
         hwSyncSampleMem();
-        ++sp;
+        ++gsCurrent->sp;
         return TRUE;
       }
 
@@ -250,10 +267,10 @@ bool sndPopGroup() {
   FX_DATA* fd;
 
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
-  MUSY_ASSERT_MSG(sp != 0, "Soundstack is empty.");
-  g = gs[--sp].gAddr;
-  prj = gs[sp].prjAddr;
-  sdir = gs[sp].sdirAddr;
+  MUSY_ASSERT_MSG(gsCurrent->sp != 0, "Soundstack is empty.");
+  g = gsCurrent->stack[--gsCurrent->sp].gAddr;
+  prj = gsCurrent->stack[gsCurrent->sp].prjAddr;
+  sdir = gsCurrent->stack[gsCurrent->sp].sdirAddr;
   hwDisableIrq();
 
   if (g->type == 1) {
@@ -264,6 +281,7 @@ bool sndPopGroup() {
   }
 
   synthKillVoicesByMacroReferences((u16*)((u8*)prj + g->macroOff));
+  synthKillVoicesBySampleReferences((u16*)((u8*)prj + g->sampleOff));
   hwEnableIrq();
   RemoveSamples((u16*)((u8*)prj + g->sampleOff), sdir);
   RemoveMacros((u16*)((u8*)prj + g->macroOff));
@@ -297,18 +315,20 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   PAGE* norm;
   PAGE* drum;
   MIDISETUP* midiSetup;
+  GSROOT* root;
   u32 seqId;
   void* prj;
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
 
-  for (i = 0; i < sp; ++i) {
-    if (sgid != gs[i].gAddr->id) {
+  for (root = gsRoot; root != NULL; root = root->next) {
+  for (i = 0; i < root->sp; ++i) {
+    if (root->stack[i].gAddr->id != sgid) {
       continue;
     }
 
-    if (gs[i].gAddr->type == 0) {
-      g = gs[i].gAddr;
-      prj = gs[i].prjAddr;
+    if (root->stack[i].gAddr->type == 0) {
+      g = root->stack[i].gAddr;
+      prj = root->stack[i].prjAddr;
       norm = (PAGE*)((size_t)prj + g->data.song.normpageOff);
       drum = (PAGE*)((size_t)prj + g->data.song.drumpageOff);
       midiSetup = (MIDISETUP*)((size_t)prj + g->data.song.midiSetupOff);
@@ -334,11 +354,53 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
       return 0xffffffff;
     }
   }
+  }
 
   MUSY_DEBUG("Group ID=%d is not on soundstack.", sgid);
   return 0xffffffff;
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
-  return seqPlaySong(sgid, sid, arrfile, para, 0, studio);
+  u32 seqId;
+  int i;
+  GROUP_DATA* g;
+  MIDISETUP* midiSetup;
+  PAGE* drum;
+  PAGE* norm;
+  GSROOT* root;
+  void* prj;
+
+  for (root = gsRoot; root != NULL; root = root->next) {
+    for (i = 0; i < root->sp; ++i) {
+      if (root->stack[i].gAddr->id != sgid) {
+        continue;
+      }
+
+      if (root->stack[i].gAddr->type == 0) {
+        g = root->stack[i].gAddr;
+        prj = root->stack[i].prjAddr;
+        norm = (PAGE*)((size_t)prj + g->data.song.normpageOff);
+        drum = (PAGE*)((size_t)prj + g->data.song.drumpageOff);
+        midiSetup = (MIDISETUP*)((size_t)prj + g->data.song.midiSetupOff);
+        while (midiSetup->songId != 0xFFFF) {
+          if (midiSetup->songId == sid) {
+            hwDisableIrq();
+            seqId = seqStartPlay(norm, drum, midiSetup, arrfile, para, studio, sgid);
+            hwEnableIrq();
+            goto done;
+          }
+
+          ++midiSetup;
+        }
+        { seqId = 0xffffffff; goto done; }
+      } else {
+        { seqId = 0xffffffff; goto done; }
+      }
+    }
+  }
+
+  { seqId = 0xffffffff; goto done; }
+  seqId = 0xffffffff;
+done:
+  return seqId;
 }

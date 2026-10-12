@@ -20,7 +20,7 @@
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // proto: USER_FUNC(evt_moamoa_kind_onoff);
-USER_FUNC(evt_moamoa_kind_onoff) {
+static USER_FUNC(evt_moamoa_kind_onoff) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
@@ -47,7 +47,7 @@ USER_FUNC(evt_moamoa_kind_onoff) {
                 moa->flags &= ~0x800;
             }
         }
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change_i(moa, "c_n_moa_a", "S_1");
     }
     return EVT_RETURN_DONE;
 }

@@ -23,6 +23,7 @@
 // include: system.h
 // include: math.h
 // proto: static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
+// decl: #define fabs(x) __fabs(x)
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;

@@ -16,27 +16,26 @@
 // decl: int rand(void);
 // decl: static void monte_disp(CameraId camera, void* param);
 // decl: static BOOL get_monte_check(Vec* a, Vec* b);
-// decl: static const Vec fall_pos0 = {-113.0f, 70.0f, 0.0f}; /* @place "slot_mess_01" */
-// decl: static const Vec fall_vel0 = {0.0f, 10.0f, 0.0f}; /* @place "slot_mess_01" */
+// decl: static inline Vec fall_pos0(void) { Vec v = {-113.0f, 70.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
+// decl: static inline Vec fall_vel0(void) { Vec v = {0.0f, 10.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
 // proto: static USER_FUNC(fall_rtn);
 static USER_FUNC(fall_rtn) {
     Vec pos;
-    s32 done = 0;
     const char* sfx1;
     const char* sfx2;
     const char* sfx3;
     SlotWork* data;
-    GMonte* m;
     s32 i;
+    s32 done = 0;
 
     if (isFirstCall) {
-        data = ((GoryuuWork*)event->lwData[0])->data;
+        SlotWork* data = ((GoryuuWork*)event->lwData[0])->data;
         monte_p = _mapAlloc(data->monteCount * sizeof(GMonte));
         memset(monte_p, 0, data->monteCount * sizeof(GMonte));
         monte_p->owner = data;
         for (i = 0; i < monte_p->owner->monteCount; i++) {
             GMonteSub* sub = &monte_p[i].sub;
-            Vec pos = fall_pos0;
+            Vec pos = fall_pos0();
             f32 s;
             f32 c;
             f32 ofs;
@@ -46,11 +45,14 @@ static USER_FUNC(fall_rtn) {
             ofs = ((i & 1) * 2.0f - 1.0f) * ((rand() % 101) / 10.0f);
             sub->pos.z += ofs;
             sub->scale = 1.0f;
-            s = 0.0f;
-            c = 0.0f;
-            movePos(&s, &c, 2.0f + (rand() % 300) / 100.0f, 270.0f - 3.0f * ofs);
             {
-                Vec vel = fall_vel0;
+                f32 spd = 2.0f + (rand() % 300) / 100.0f;
+                c = 0.0f;
+                s = 0.0f;
+                movePos(&s, &c, spd, 270.0f - 3.0f * ofs);
+            }
+            {
+                Vec vel = fall_vel0();
 
                 vel.x = s;
                 vel.z = c;
@@ -59,11 +61,11 @@ static USER_FUNC(fall_rtn) {
             monte_p[i].wait = ((rand() % 700 + 100) * 60) / 1000;
         }
     }
-    sfx2 = "SFX_EVT_GAME_MONTE_COUNT1";
-    sfx1 = "SFX_EVT_GAME_MONTE_LEAPED1";
-    sfx3 = sfx2;
+    sfx1 = (0, "SFX_EVT_GAME_MONTE_LEAPED1");
+    sfx2 = (0, "SFX_EVT_GAME_MONTE_COUNT1");
+    sfx3 = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->owner->monteCount; i++) {
-        m = &monte_p[i];
+        GMonte* m = &monte_p[i];
         switch (m->state) {
             case 0:
                 if (m->wait != 0) {
@@ -74,7 +76,7 @@ static USER_FUNC(fall_rtn) {
                 break;
             case 1:
                 PSVECAdd(&m->sub.pos, &m->vel, &m->sub.pos);
-                m->vel.y -= 0.81667f;
+                m->vel.y -= 0.81666666f;
                 if (m->sub.pos.y <= 0.0f) {
                     m->sub.pos.y = 0.0f;
                     psndSFXOn_3D(sfx1, &m->sub.pos);
@@ -82,7 +84,8 @@ static USER_FUNC(fall_rtn) {
                         m->state++;
                         m->timer = 300;
                     } else {
-                        m->vel.y *= -(0.5f + (rand() % 21) / 100.0f);
+                        f32 r = (rand() % 21) / 100.0f;
+                        m->vel.y *= -(0.5f + r);
                         m->vel.x = 0.0f;
                         m->vel.z = 0.0f;
                     }

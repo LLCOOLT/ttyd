@@ -47,7 +47,8 @@ static void disp_proc(CameraId cameraId, void* param) {
         dt = fighterDt_re;
     }
     winW = 250.0f;
-    x = -winW * 0.5f;
+    x = 0.5f;
+    x = -winW * x;
     windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
     FontDrawStart();
     FontDrawScale(1.0f);

@@ -238,7 +238,6 @@ void effFireFlowerMain(EffectEntry* effect) {
 void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffFireFlowerN64Work* work;
-    EffFireFlowerN64Work* p;
     s32 i;
     s32 state;
     s32 stage;
@@ -284,17 +283,17 @@ void effFireFlowerDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
         PSMTXScale(scaleMtx, 0.0625f, 0.0625f, 0.0f);
         GXLoadTexMtxImm(scaleMtx, GX_TEXMTX0, GX_MTX2x4);
-        p = work + 1;
-        for (i = 1; i < effect->count; i++, p++) {
-            if (p->delay == 0) {
-                PSMTXRotRad(rot, 'z', 0.017453292f * p->rotY);
-                PSMTXTrans(mtx, p->position.x, p->position.y, p->position.z);
+        work++;
+        for (i = 1; i < effect->count; i++, work++) {
+            if (work->delay == 0) {
+                PSMTXRotRad(rot, 'z', 0.017453292f * work->rotY);
+                PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
                 PSMTXConcat(rot, mtx, mtx);
                 PSMTXConcat(pre, mtx, mtx);
                 PSMTXConcat(camera->view, mtx, mtx);
                 GXLoadPosMtxImm(mtx, GX_PNMTX0);
                 GXSetCurrentMtx(GX_PNMTX0);
-                if (p->type != 0) {
+                if (work->type != 0) {
                     effSetVtxDescN64(size16x16_tex16x16_vtx);
                 } else {
                     effSetVtxDescN64(size4x4_tex4x4_vtx);

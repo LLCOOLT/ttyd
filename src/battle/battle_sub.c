@@ -47,6 +47,7 @@ void btlMovePos(f32 speed, f32 angle, f32* x, f32* z) {
 
 f32 intpl_sub(s32 mode, s32 cur, s32 steps, f32 start, f32 end) {
 	f32 diff;
+	f32 new_var;
 	f32 c;
 
 	switch (mode) {
@@ -77,7 +78,8 @@ f32 intpl_sub(s32 mode, s32 cur, s32 steps, f32 start, f32 end) {
 			return (start + diff) - (diff * ((steps - cur) * ((steps - cur) * ((steps - cur) * (steps - cur))))) / (steps * (steps * (steps * steps)));
 		case 10:
 			c = cos(4.0f * (3.141592f * ((f32)(cur * cur) / (f32)steps)) / 40.0f);
-			c = ((f32)(steps - cur) * ((f32)(steps - cur) * c)) / ((f32)steps * (f32)steps);
+			new_var = (f32)(steps - cur);
+			c = ((f32)(steps - cur) * (new_var * c)) / ((f32)steps * (f32)steps);
 			if (c < 0.0f) {
 				c = -c;
 			}

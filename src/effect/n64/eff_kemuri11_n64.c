@@ -440,7 +440,7 @@ static void main_dl(EffectEntry* effect, Mtx camMtx) {
         GXSetCurrentMtx(GX_PNMTX0);
         PSMTXScale(scale, 0.015625f, 0.03125f, 1.0f);
         t = work->texS;
-        PSMTXTrans(m, 0.0f, -t * 0.25f, 0.0f);
+        PSMTXTrans(m, 0.0f, -t / 4.0f, 0.0f);
         PSMTXConcat(scale, m, scale);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
         PSMTXScale(scale, 0.125f, 0.125f, 1.0f);

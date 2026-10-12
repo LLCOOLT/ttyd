@@ -491,6 +491,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     s32 elapsed;
     s32 frame;
     f32 y;
+    f32 t;
 
     if (isFirstCall) {
         event->savedTime = gp->renderTime;
@@ -499,7 +500,8 @@ USER_FUNC(gor_npc_fuwafuwa) {
         base->z = npc->position.z;
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    frame = (0.5f + sysMsec2FrameFloat(elapsed)) * speed;
+    t = 0.5f + sysMsec2FrameFloat(elapsed);
+    frame = t * speed;
     y = base->y;
     y += table.v[(u32)frame % 40];
     npc->position.y = npc->prevPosition.y = y;
@@ -539,11 +541,13 @@ s32 exchange_ret_tbl_no(void) {
 
 USER_FUNC(exchange_ryokin_medal) {
     s32* args = event->args;
+    ExchangeRyokin (*new_var)[3];
     s32 idx = evtGetValue(event, args[0]);
     s32 no = exchange_ret_tbl_no();
 
     evtSetValue(event, args[1], RYOKIN_TBL[no][idx].ryokin);
-    evtSetValue(event, args[2], RYOKIN_TBL[no][idx].medal);
+    new_var = RYOKIN_TBL;
+    evtSetValue(event, args[2], new_var[no][idx].medal);
     return EVT_RETURN_DONE;
 }
 
@@ -566,9 +570,9 @@ USER_FUNC(evt_exchange_msg_set) {
     s32* args = event->args;
     s32 value = evtGetValue(event, args[0]);
     const char* msg = msgSearch((const char*)evtGetValue(event, args[1]));
-    ExchangeRyokin* tbl = RYOKIN_TBL[exchange_ret_tbl_no()];
+    s32 n = exchange_ret_tbl_no();
 
-    sprintf(exchange_msgp, msg, value, tbl[0].medal, tbl[0].ryokin, tbl[1].medal, tbl[1].ryokin, tbl[2].medal, tbl[2].ryokin);
+    sprintf(exchange_msgp, msg, value, exchange_ryokin_medal_tbl[n * 6 + 1], exchange_ryokin_medal_tbl[n * 6], exchange_ryokin_medal_tbl[n * 6 + 3], exchange_ryokin_medal_tbl[n * 6 + 2], exchange_ryokin_medal_tbl[n * 6 + 5], exchange_ryokin_medal_tbl[n * 6 + 4]);
     evtSetValue(event, args[2], (s32)exchange_msgp);
     return EVT_RETURN_DONE;
 }
@@ -2578,8 +2582,8 @@ __declspec(section ".data") EVT_BEGIN(slot_fall_monte)
     RETURN
 EVT_END()
 
-static const Vec fall_pos0 = {-113.0f, 70.0f, 0.0f}; /* @place "slot_mess_01" */
-static const Vec fall_vel0 = {0.0f, 10.0f, 0.0f}; /* @place "slot_mess_01" */
+static inline Vec fall_pos0(void) { Vec v = {-113.0f, 70.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
+static inline Vec fall_vel0(void) { Vec v = {0.0f, 10.0f, 0.0f}; return v; } /* @place "slot_mess_01" */
 
 EVT_BEGIN(slot_set)
     CALL(goryuugijo_get_dataadr, 1, LW(0))
@@ -2681,43 +2685,8 @@ s32 upsidegara[] = {
     1, 0, 0, 2, 0, 0, 1, 0,
 };
 
-void goryuugijo_disp_slot(CameraId camera, void* param) {
-    SlotWork* data = ((GoryuuWork*)param)->data;
-    s32 icons[3] = {0x1F3, 0x1F3, 0x1F3};
-    s32 i;
-    Vec pos;
-    f32 sx;
-    f32 sy;
-    f32 sz;
-    CameraEntry* cam;
-    f32 proj[7];
-    f32 vp[6];
-    Mtx trans;
-    Mtx scale;
-    Mtx mtx;
-
-    for (i = 0; i < 3; i++) {
-        if (data->state[i] == 2 && i == data->cursor) {
-            mapObjGetPos(DRUMNAME[data->nowSlot].drum[i], &pos);
-            pos.x -= 25.0f;
-            pos.y += 10.0f;
-            cam = camGetPtr(CAMERA_3D);
-            GXSetProjection(cam->projection, cam->projType);
-            GXGetProjectionv(proj);
-            GXGetViewportv(vp);
-            GXProject(pos.x, pos.y, pos.z, cam->view, proj, vp, &sx, &sy, &sz);
-            cam = camGetPtr(camera);
-            GXSetProjection(cam->projection, cam->projType);
-            PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
-            PSMTXTrans(trans, -304.0f + sx, 240.0f - sy, 0.0f);
-            PSMTXConcat(trans, scale, mtx);
-            iconDispGx2(mtx, 0x10, 0x1F2);
-            PSMTXTrans(trans, -304.0f + sx, 31.35f + (240.0f - sy), 0.0f);
-            PSMTXConcat(trans, scale, mtx);
-            ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons[i]);
-        }
-    }
-}
+typedef struct I3 { s32 v[3]; } I3;
+static const I3 disp_slot_icons = {{0x1F3, 0x1F3, 0x1F3}};
 
 EVT_BEGIN(ranking_set)
     CALL(evt_mario_key_onoff, 0)
@@ -4897,22 +4866,21 @@ EVT_END()
 
 static USER_FUNC(fall_rtn) {
     Vec pos;
-    s32 done = 0;
     const char* sfx1;
     const char* sfx2;
     const char* sfx3;
     SlotWork* data;
-    GMonte* m;
     s32 i;
+    s32 done = 0;
 
     if (isFirstCall) {
-        data = ((GoryuuWork*)event->lwData[0])->data;
+        SlotWork* data = ((GoryuuWork*)event->lwData[0])->data;
         monte_p = _mapAlloc(data->monteCount * sizeof(GMonte));
         memset(monte_p, 0, data->monteCount * sizeof(GMonte));
         monte_p->owner = data;
         for (i = 0; i < monte_p->owner->monteCount; i++) {
             GMonteSub* sub = &monte_p[i].sub;
-            Vec pos = fall_pos0;
+            Vec pos = fall_pos0();
             f32 s;
             f32 c;
             f32 ofs;
@@ -4922,11 +4890,14 @@ static USER_FUNC(fall_rtn) {
             ofs = ((i & 1) * 2.0f - 1.0f) * ((rand() % 101) / 10.0f);
             sub->pos.z += ofs;
             sub->scale = 1.0f;
-            s = 0.0f;
-            c = 0.0f;
-            movePos(&s, &c, 2.0f + (rand() % 300) / 100.0f, 270.0f - 3.0f * ofs);
             {
-                Vec vel = fall_vel0;
+                f32 spd = 2.0f + (rand() % 300) / 100.0f;
+                c = 0.0f;
+                s = 0.0f;
+                movePos(&s, &c, spd, 270.0f - 3.0f * ofs);
+            }
+            {
+                Vec vel = fall_vel0();
 
                 vel.x = s;
                 vel.z = c;
@@ -4935,11 +4906,11 @@ static USER_FUNC(fall_rtn) {
             monte_p[i].wait = ((rand() % 700 + 100) * 60) / 1000;
         }
     }
-    sfx2 = "SFX_EVT_GAME_MONTE_COUNT1";
-    sfx1 = "SFX_EVT_GAME_MONTE_LEAPED1";
-    sfx3 = sfx2;
+    sfx1 = (0, "SFX_EVT_GAME_MONTE_LEAPED1");
+    sfx2 = (0, "SFX_EVT_GAME_MONTE_COUNT1");
+    sfx3 = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->owner->monteCount; i++) {
-        m = &monte_p[i];
+        GMonte* m = &monte_p[i];
         switch (m->state) {
             case 0:
                 if (m->wait != 0) {
@@ -4950,7 +4921,7 @@ static USER_FUNC(fall_rtn) {
                 break;
             case 1:
                 PSVECAdd(&m->sub.pos, &m->vel, &m->sub.pos);
-                m->vel.y -= 0.81667f;
+                m->vel.y -= 0.81666666f;
                 if (m->sub.pos.y <= 0.0f) {
                     m->sub.pos.y = 0.0f;
                     psndSFXOn_3D(sfx1, &m->sub.pos);
@@ -4958,7 +4929,8 @@ static USER_FUNC(fall_rtn) {
                         m->state++;
                         m->timer = 300;
                     } else {
-                        m->vel.y *= -(0.5f + (rand() % 21) / 100.0f);
+                        f32 r = (rand() % 21) / 100.0f;
+                        m->vel.y *= -(0.5f + r);
                         m->vel.x = 0.0f;
                         m->vel.z = 0.0f;
                     }
@@ -5028,15 +5000,15 @@ USER_FUNC(goryuugijo_get_slot_phase) {
 }
 
 void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel) {
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][0], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][1], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][2], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[5], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[6], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[7], 1);
 }
 
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel) {
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][0], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][1], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][2], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[5], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[6], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[7], 1);
 }
 
 USER_FUNC(goryuugijo_door_init_slot) {
@@ -5125,13 +5097,13 @@ void slot_neon_sub(GoryuuWork* wp, SlotWork* data) {
     }
     if (data->flags & 2) {
         if (data->neonCount == 0 || data->neonCount == 12 || data->neonCount == 24) {
-            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
         }
         if (data->neonCount == 6 || data->neonCount == 18) {
-            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
         }
     } else if (data->neonCount == 24) {
-        mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+        mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
     }
     if (data->neonCount <= 78) {
         data->neonCount++;
@@ -5243,7 +5215,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             } else {
                 data->counter++;
                 data->reberAngle += 4.0f;
-                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
             }
             break;
         case 3:
@@ -5254,7 +5226,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 } else {
                     data->reberAngle -= 10.0f;
                 }
-                mapObjRotate(DRUMNAME[data->nowSlot].reber, 0.0f, 0.0f, data->reberAngle);
+                mapObjRotate((const char*)drumname[data->nowSlot * 17 + 3], 0.0f, 0.0f, data->reberAngle);
                 data->counter++;
             }
             if (data->state[data->cursor] != 2 || (keyGetDirRep(0) & 0xC000)) {
@@ -5280,7 +5252,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                     }
                 }
             }
-            sfx = "SFX_EVT_GAME_SLOT_STOP1";
+            sfx = (0, "SFX_EVT_GAME_SLOT_STOP1");
             count = 0;
             for (i = 0; i < 3; i++) {
                 if (data->state[i] == 0) {
@@ -5543,6 +5515,44 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
     }
 }
 
+void goryuugijo_disp_slot(CameraId camera, void* param) {
+    SlotWork* data = ((GoryuuWork*)param)->data;
+    I3 icons = disp_slot_icons;
+    s32 i;
+    Vec pos;
+    f32 sx;
+    f32 sy;
+    f32 sz;
+    CameraEntry* cam;
+    f32 proj[7];
+    f32 vp[6];
+    Mtx trans;
+    Mtx scale;
+    Mtx mtx;
+
+    for (i = 0; i < 3; i++) {
+        if (data->state[i] == 2 && i == data->cursor) {
+            mapObjGetPos(DRUMNAME[data->nowSlot].drum[i], &pos);
+            pos.x -= 25.0f;
+            pos.y += 10.0f;
+            cam = camGetPtr(CAMERA_3D);
+            GXSetProjection(cam->projection, cam->projType);
+            GXGetProjectionv(proj);
+            GXGetViewportv(vp);
+            GXProject(pos.x, pos.y, pos.z, cam->view, proj, vp, &sx, &sy, &sz);
+            cam = camGetPtr(camera);
+            GXSetProjection(cam->projection, cam->projType);
+            PSMTXScale(scale, 1.1f, 1.1f, 1.1f);
+            PSMTXTrans(trans, -304.0f + sx, 240.0f - sy, 0.0f);
+            PSMTXConcat(trans, scale, mtx);
+            iconDispGx2(mtx, 0x10, 0x1F2);
+            PSMTXTrans(trans, -304.0f + sx, 31.35f + (240.0f - sy), 0.0f);
+            PSMTXConcat(trans, scale, mtx);
+            ((void (*)(Mtx, s16, u16))iconDispGx2)(mtx, 0x10, icons.v[i]);
+        }
+    }
+}
+
 
 static USER_FUNC(mario_keyoff_wait) {
     switch (!marioChkKey()) {
@@ -5705,7 +5715,7 @@ USER_FUNC(kuzi_get_keihin) {
 USER_FUNC(kuzi_bomb_bomb_eff) {
     s32* args = event->args;
     s32 type = evtGetValue(event, args[0]);
-    s32 phase = evtGetValue(event, args[1]);
+    s32 phase = (0, evtGetValue(event, args[1]));
     NpcEntry* npc = npcNameToPtr("\203O\203\213\203\201\203{\203\200\225\272");
 
     if (type == 2 || type == 3) {

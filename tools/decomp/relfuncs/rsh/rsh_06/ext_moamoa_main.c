@@ -169,7 +169,8 @@ static void ext_moamoa_main(void) {
                 rad = 6.2831855f * randf(0.0f, 360.0f) / 360.0f;
                 x = 5.0f * moa_sin(rad) + pose->mtx[0][3];
                 z = pose->mtx[2][3] - 5.0f * moa_cos(rad);
-                moamoa_jump(pose, moa, moa->state, 0, x, 215.0f, z, randf(0.3f, 0.5f), randf(0.5f, 0.8f));
+                y = 215.0f;
+                moamoa_jump(pose, moa, moa->state, 0, x, y, z, randf(0.3f, 0.5f), randf(0.5f, 0.8f));
                 break;
             case 14:
             case 50:

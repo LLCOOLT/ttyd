@@ -74,7 +74,7 @@ void effBreakMain(EffectEntry* effect) {
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
-    scale = work->scale * 20.0f;
+    scale = work->scale;
     limit = work->timer;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
@@ -93,7 +93,7 @@ void effBreakMain(EffectEntry* effect) {
                     if (work->offsetY == 0.0f) {
                         effStardustN64SetDrawCam(effStardustN64Entry(1, position.x + work->position.x,
                                                                       position.y + work->position.y,
-                                                                      position.z + work->position.z, scale),
+                                                                      position.z + work->position.z, scale * 20.0f),
                                                  8);
                     }
                 } else {
@@ -170,9 +170,7 @@ void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    y1 = 24.0f;
     width = 48.0f;
-    x0 = -width * 0.5f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         effGetTexObj(texid_tbl[gp->language != 0][i - 1], &texObj);
@@ -185,6 +183,8 @@ void effBreakDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, scaleMtx, mtx);
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
+        x0 = -width / 2.0f;
+        y1 = width / 2.0f;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition3f32(x0, y1, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);

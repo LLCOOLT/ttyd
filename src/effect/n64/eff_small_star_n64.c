@@ -331,6 +331,10 @@ static u8 color_rotation_data[] = {
     0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
 
+static inline u8 color_rot_get(s32 idx) {
+    return color_rotation_data[idx % 36];
+}
+
 void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 a, b, c;
@@ -359,13 +363,14 @@ void effSmallStarDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetCullMode(GX_CULL_NONE);
     effSetVtxDescN64(size16x16_tex32x32_vtx);
-    t = (w->frame - 1) * 3 % 36;
+    t = (w->frame - 1) * 3;
+    t = t % 36;
     a = t;
     b = t + 1;
     c = t + 2;
     for (i = 0; i < effect->count; a += 3, b += 3, c += 3, i++, w++) {
         color = (GXColor){0, 0, 0, 0};
-        color.r = color_rotation_data[a % 36];
+        color.r = color_rot_get(a);
         color.g = color_rotation_data[b % 36];
         color.b = color_rotation_data[c % 36];
         color.a = w->alpha;

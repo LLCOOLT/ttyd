@@ -3,7 +3,7 @@
 // decl: #define DRUMNAME ((SlotDrum*)drumname)
 // proto: void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel);
 void goryuugijo_upsidewindow_disp_sub(s32 slot, s32 reel) {
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][0], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][1], 1);
-    mapGrpFlagOn(DRUMNAME[slot].window[reel][2], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[5], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[6], 1);
+    mapGrpFlagOn((const char*)(drumname + slot * 17 + reel * 3)[7], 1);
 }

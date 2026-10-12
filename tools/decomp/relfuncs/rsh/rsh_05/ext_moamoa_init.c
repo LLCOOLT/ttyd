@@ -47,7 +47,7 @@ static void ext_moamoa_init(void) {
         moa->flags = 0;
         moa->state = 0;
         moa->timer = 0;
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change_i(moa, "c_n_moa_a", "S_1");
         pose->flags |= 3;
         PSMTXIdentity(pose->mtx);
         pose->mtx[0][3] = randf(-290.0f, 240.0f);

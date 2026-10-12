@@ -135,8 +135,7 @@ USER_FUNC(evt_hit_damage_return_set) {
             n++;
         }
         size = n * sizeof(HitDamageReturn);
-        hitDmgretPtr = (HitDamageReturn*)_mapAlloc(size);
-        p = hitDmgretPtr;
+        p = (hitDmgretPtr = (HitDamageReturn*)_mapAlloc(size));
         memcpy(p, tbl, size);
         for (;;) {
             if (p->mapobjName == NULL) {

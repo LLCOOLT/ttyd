@@ -202,8 +202,8 @@ void effRecoverHeartMain(EffectEntry* effect) {
         work->rotZ = -30.0f * (f32)sin(ang);
         work->offX = 8.0f * (f32)cos(ang);
         if (lifetime < 20) {
-            work->offX *= fade;
-            work->rotZ *= fade;
+            work->offX *= 0.05f * lifetime;
+            work->rotZ *= 0.05f * lifetime;
         }
         if (lifetime < 10) {
             work->alpha = lifetime * 25;

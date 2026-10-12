@@ -3,6 +3,7 @@
 // include: dolphin/gx.h
 // decl: typedef struct GansWork { smartEntry* buf; GXTexObj tex; s32 onoff; s32 alpha; s32 ready; } GansWork;
 // decl: GansWork* gans_wp;
+// decl: static inline GXColor tou_mkcolor(u8 a) { GXColor c = {0xFF, 0xFF, 0xFF, 0x00}; c.a = a; return c; }
 // proto: void monitor_tev(MapTevCallbackInfo* info);
 void monitor_tev(MapTevCallbackInfo* info) {
     if (gans_wp->ready) {
@@ -21,12 +22,7 @@ void monitor_tev(MapTevCallbackInfo* info) {
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
         GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
         {
-            GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-            GXColor tmp;
-
-            color.a = gans_wp->alpha;
-            tmp = color;
-            GXSetTevColor(GX_TEVREG0, tmp);
+            GXSetTevColor(GX_TEVREG0, tou_mkcolor(gans_wp->alpha));
         }
         info->tevStage = 2;
         info->texMap = 2;

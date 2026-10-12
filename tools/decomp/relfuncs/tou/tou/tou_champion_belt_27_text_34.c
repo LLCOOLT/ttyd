@@ -9,11 +9,13 @@
 // decl: static s32 champion_belt_onoff;
 // proto: USER_FUNC(tou_champion_belt_27_text_34);
 USER_FUNC(tou_champion_belt_27_text_34) {
+    void** new_var2;
     EffectEntry* eff;
     s32 idx;
     Vec* positions;
     NpcEntry* npc;
     f32 angle;
+    float new_var;
     AnimationPose* pose;
 
     npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -28,23 +30,25 @@ USER_FUNC(tou_champion_belt_27_text_34) {
     idx = animPoseGetGroupIdx(npc->poseId, "locator8");
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
-    ((StarStoneWork*)eff->userdata)->pos.x = positions[idx].x;
-    ((StarStoneWork*)eff->userdata)->pos.y = positions[idx].y;
-    ((StarStoneWork*)eff->userdata)->pos.z = positions[idx].z;
-    if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
-        ((StarStoneWork*)eff->userdata)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+    new_var2 = &eff->userdata;
+    new_var = -90.0f;
+    ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
+    ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
+    ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
+    if ((angle > 90.0f && angle <= 270.0f) || (angle < new_var && angle >= -270.0f)) {
+        ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
-        ((StarStoneWork*)eff->userdata)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+        ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
     }
     if (npc->position.y <= -1000.0f) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
     }
     if (champion_belt_onoff) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
     }
     return EVT_RETURN_BLOCK;
 }

@@ -42,7 +42,6 @@ u8 poyon_scale[] = {0x64, 0x64, 0x69, 0x5E, 0x6E, 0x59, 0x75, 0x52, 0x7B, 0x4C, 
 EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     MiniGameWork* work;
-    MiniGameWork* p;
     s32 i;
     s32 n;
     s32 st;
@@ -75,62 +74,63 @@ EffectEntry* effMiniGameEntry(s32 type, f32 x, f32 y, f32 z) {
     work->rotB = 0.0f;
     work->delay = 0;
     work->pad2c = 0;
-    for (i = 1, p = work + 1; i < effect->count; i++, p++) {
-        p->state = type_tbl[type][i - 1];
-        p->rotB = 0.0f;
-        p->alpha = 255;
-        st = p->state;
+    for (i = 1, work = work + 1; i < effect->count; i++, work++) {
+        work->state = type_tbl[type][i - 1];
+        work->rotB = 0.0f;
+        work->alpha = 255;
+        st = work->state;
         switch (st) {
         case 0:
-            p->x = 0.0f;
-            p->delay = (i - 1) * gp->framerate;
-            p->y = 0.0f;
-            p->z = 0.0f;
-            p->scaleY = 0.0f;
-            p->scaleX = 0.0f;
-            p->rotA = 0.0f;
-            p->pad2c = 0;
-            p->alpha = 0;
+            work->x = 0.0f;
+            work->delay = (i - 1) * gp->framerate;
+            work->y = 0.0f;
+            work->z = 0.0f;
+            work->scaleY = 0.0f;
+            work->scaleX = 0.0f;
+            work->rotA = 0.0f;
+            work->pad2c = 0;
+            work->alpha = 0;
             break;
         case 30:
         case 40:
             if (st == 40) {
-                p->x = 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) / 2.0f;
-                p->delay = (i - 1) * 10;
-                p->state = 50;
+                work->x = 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) / 2.0f;
+                work->delay = (i - 1) * 10;
+                work->state = 50;
             } else {
-                p->x = 0.0f;
-                p->delay = (i - 1) * gp->framerate;
+                work->x = 0.0f;
+                st = i - 1;
+                work->delay = st * gp->framerate;
             }
-            p->y = 500.0f;
-            p->z = 0.0f;
-            p->scaleY = 1.0f;
-            p->scaleX = 1.0f;
-            p->rotA = 0.0f;
-            p->pad2c = 0;
-            p->vel = 0.0f;
-            p->acc = 1.0f;
+            work->y = 500.0f;
+            work->z = 0.0f;
+            work->scaleY = 1.0f;
+            work->scaleX = 1.0f;
+            work->rotA = 0.0f;
+            work->pad2c = 0;
+            work->vel = 0.0f;
+            work->acc = 1.0f;
             break;
         case 10:
         case 20:
-            p->x = 1000.0f;
-            p->y = 0.0f;
-            p->z = 0.0f;
-            p->scaleY = 1.0f;
-            p->scaleX = 1.0f;
-            p->rotA = 0.0f;
-            if (p->state == 10) {
-                p->delay = (i - 1) * 10;
+            work->x = 1000.0f;
+            work->y = 0.0f;
+            work->z = 0.0f;
+            work->scaleY = 1.0f;
+            work->scaleX = 1.0f;
+            work->rotA = 0.0f;
+            if (work->state == 10) {
+                work->delay = (i - 1) * 10;
             } else {
-                p->delay = gp->framerate * 3;
-                p->scaleY = 0.0f;
-                p->scaleX = 0.0f;
-                p->x = 26.0f * (f32)(i - 3) - 26.0f * (f32)(effect->count - 3) / 2.0f;
-                p->alpha = 0;
+                work->delay = gp->framerate * 3;
+                work->scaleY = 0.0f;
+                work->scaleX = 0.0f;
+                work->x = 26.0f * (f32)(i - 3) - 26.0f * (f32)(effect->count - 3) / 2.0f;
+                work->alpha = 0;
             }
-            p->pad2c = 0;
-            p->vel = 0.0f;
-            p->acc = 1.0f;
+            work->pad2c = 0;
+            work->vel = 0.0f;
+            work->acc = 1.0f;
             break;
         }
     }
@@ -161,9 +161,9 @@ void effMiniGameMain(EffectEntry* effect) {
             }
             break;
         case 1:
-            work->scaleX += 0.25f * (1.0f - work->scaleX);
-            work->scaleY += 0.25f * (1.0f - work->scaleY);
-            work->alpha += (s32)((f32)(255 - work->alpha) * 0.25f);
+            work->scaleX += (1.0f - work->scaleX) / 4.0f;
+            work->scaleY += (1.0f - work->scaleY) / 4.0f;
+            work->alpha += (s32)((f32)(255 - work->alpha) / 4.0f);
             if (work->alpha > 250) {
                 work->alpha = 255;
                 work->state++;
@@ -181,9 +181,9 @@ void effMiniGameMain(EffectEntry* effect) {
             }
             break;
         case 4:
-            work->scaleX += 0.25f * (1.0f - work->scaleX);
-            work->scaleY += 0.25f * (1.0f - work->scaleY);
-            work->alpha += (s32)((f32)(-work->alpha) * 0.25f);
+            work->scaleX += (10.0f - work->scaleX) / 4.0f;
+            work->scaleY += (10.0f - work->scaleY) / 4.0f;
+            work->alpha += (s32)((f32)(-work->alpha) / 4.0f);
             if (work->alpha < 5) {
                 work->alpha = 0;
                 work->state++;
@@ -202,8 +202,8 @@ void effMiniGameMain(EffectEntry* effect) {
         case 11:
             work->x += work->vel;
             work->vel -= work->acc;
-            if (work->x < 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) * 0.5f) {
-                work->x = 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) * 0.5f;
+            if (work->x < 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) / 2.0f) {
+                work->x = 26.0f * (f32)(i - 1) - 26.0f * (f32)(effect->count - 1) / 2.0f;
                 work->delay = 0;
                 work->state++;
             }
@@ -248,9 +248,9 @@ void effMiniGameMain(EffectEntry* effect) {
             }
             break;
         case 21:
-            work->scaleX += 0.25f * (1.0f - work->scaleX);
-            work->scaleY += 0.25f * (1.0f - work->scaleY);
-            work->alpha += (s32)((f32)(255 - work->alpha) * 0.25f);
+            work->scaleX += (1.0f - work->scaleX) / 4.0f;
+            work->scaleY += (1.0f - work->scaleY) / 4.0f;
+            work->alpha += (s32)((f32)(255 - work->alpha) / 4.0f);
             if (work->alpha > 250) {
                 work->alpha = 255;
                 work->state++;
@@ -490,3 +490,7 @@ void effMiniGameDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_minigame_sdata[2] = {0, 0};
+#pragma force_active reset

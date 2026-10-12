@@ -951,7 +951,8 @@ static void disp_proc(CameraId cameraId, void* param) {
         dt = fighterDt_re;
     }
     winW = 250.0f;
-    x = -winW * 0.5f;
+    x = 0.5f;
+    x = -winW * x;
     windowDispGX_System(0, 0xFF, x - 30.0f, 165.0f, 310.0f, 330.0f);
     FontDrawStart();
     FontDrawScale(1.0f);
@@ -1210,6 +1211,36 @@ EVT_BEGIN(evt_tou_locker_init)
     RETURN
 EVT_END()
 
+static USER_FUNC(evt_tou_print_ranking) {
+    s32 rank;
+    s32 i;
+
+    if (isFirstCall) {
+        memset(dwp, 0, sizeof(DispWork));
+        GET_RANK(rank, i);
+        dwp->page = rank / 11;
+        dwp->y = dwp->targetY = dwp->page * 220;
+        printRanking();
+        return EVT_RETURN_BLOCK;
+    }
+    if (keyGetButtonTrg(0) & 0x200) {
+        psndSFXOn((const char*)0x13);
+        return EVT_RETURN_YIELD;
+    }
+    if (dwp->page > 0 && (keyGetButtonTrg(0) & 0x40)) {
+        psndSFXOn((const char*)5);
+        dwp->page--;
+    }
+    if (dwp->page < 1 && (keyGetButtonTrg(0) & 0x20)) {
+        dwp->page++;
+        psndSFXOn((const char*)5);
+    }
+    dwp->targetY = dwp->page * 220;
+    dwp->y += (dwp->targetY - dwp->y) / 8.0f;
+    dispEntry(CAMERA_2D, 300.0f, 0, disp_proc, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
 void gans_tex(CameraId cameraId, void* param) {
     GansWork* wp = param;
     CameraEntry saved;
@@ -1263,6 +1294,11 @@ void gans_tex(CameraId cameraId, void* param) {
     wp->ready = 1;
 }
 
+static inline GXColor tou_mkcolor(u8 a) {
+    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+    c.a = a;
+    return c;
+}
 void monitor_tev(MapTevCallbackInfo* info) {
     if (gans_wp->ready) {
         GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
@@ -1280,12 +1316,7 @@ void monitor_tev(MapTevCallbackInfo* info) {
         GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
         GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
         {
-            GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-            GXColor tmp;
-
-            color.a = gans_wp->alpha;
-            tmp = color;
-            GXSetTevColor(GX_TEVREG0, tmp);
+            GXSetTevColor(GX_TEVREG0, tou_mkcolor(gans_wp->alpha));
         }
         info->tevStage = 2;
         info->texMap = 2;
@@ -3419,35 +3450,6 @@ EVT_BEGIN(evt_tou_match_after_default)
 EVT_END()
 
 
-static USER_FUNC(evt_tou_print_ranking) {
-    s32 rank;
-    s32 i;
-
-    if (isFirstCall) {
-        memset(dwp, 0, sizeof(DispWork));
-        GET_RANK(rank, i);
-        dwp->page = rank / 11;
-        dwp->y = dwp->targetY = dwp->page * 220;
-        printRanking();
-        return EVT_RETURN_BLOCK;
-    }
-    if (keyGetButtonTrg(0) & 0x200) {
-        psndSFXOn((const char*)0x13);
-        return EVT_RETURN_YIELD;
-    }
-    if (dwp->page > 0 && (keyGetButtonTrg(0) & 0x40)) {
-        psndSFXOn((const char*)5);
-        dwp->page--;
-    }
-    if (dwp->page < 1 && (keyGetButtonTrg(0) & 0x20)) {
-        dwp->page++;
-        psndSFXOn((const char*)5);
-    }
-    dwp->targetY = dwp->page * 220;
-    dwp->y += (dwp->targetY - dwp->y) / 8.0f;
-    dispEntry(CAMERA_2D, 300.0f, 0, disp_proc, NULL);
-    return EVT_RETURN_BLOCK;
-}
 
 
 USER_FUNC(make_monitor) {
@@ -3562,11 +3564,13 @@ static f32 camGetRy(void) {
 }
 
 USER_FUNC(tou_champion_belt_27_text_34) {
+    void** new_var2;
     EffectEntry* eff;
     s32 idx;
     Vec* positions;
     NpcEntry* npc;
     f32 angle;
+    float new_var;
     AnimationPose* pose;
 
     npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -3581,23 +3585,25 @@ USER_FUNC(tou_champion_belt_27_text_34) {
     idx = animPoseGetGroupIdx(npc->poseId, "locator8");
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
-    ((StarStoneWork*)eff->userdata)->pos.x = positions[idx].x;
-    ((StarStoneWork*)eff->userdata)->pos.y = positions[idx].y;
-    ((StarStoneWork*)eff->userdata)->pos.z = positions[idx].z;
-    if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
-        ((StarStoneWork*)eff->userdata)->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+    new_var2 = &eff->userdata;
+    new_var = -90.0f;
+    ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
+    ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
+    ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
+    if ((angle > 90.0f && angle <= 270.0f) || (angle < new_var && angle >= -270.0f)) {
+        ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
-        ((StarStoneWork*)eff->userdata)->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+        ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
     }
     if (npc->position.y <= -1000.0f) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
     }
     if (champion_belt_onoff) {
-        ((StarStoneWork*)eff->userdata)->pos.x = 0.0f;
-        ((StarStoneWork*)eff->userdata)->pos.y = -1000.0f;
-        ((StarStoneWork*)eff->userdata)->pos.z = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
     }
     return EVT_RETURN_BLOCK;
 }

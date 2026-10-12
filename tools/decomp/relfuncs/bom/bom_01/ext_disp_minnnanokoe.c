@@ -28,6 +28,7 @@
 // proto: void ext_disp_minnnanokoe(CameraId camera, void* param);
 void ext_disp_minnnanokoe(CameraId camera, void* param) {
     YamiParam yp;
+    YamiParam* p = &yp;
     ExtPose* pose = extGetPosePtr();
     s32 i;
 
@@ -41,7 +42,7 @@ void ext_disp_minnnanokoe(CameraId camera, void* param) {
         yp.numTexGens = 1;
         yp.numIndStages = 0;
         yp.mtx = pose->mtx;
-        envSetYami(&yp);
+        envSetYami(p);
         GXSetNumTexGens(yp.numTexGens);
         GXSetNumTevStages(yp.numTevStages);
         GXSetNumIndStages(yp.numIndStages);

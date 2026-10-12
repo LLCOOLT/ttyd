@@ -1,0 +1,253 @@
+#include "battle/battle.h"
+#include "battle/battle_ac.h"
+#include "battle/battle_pad.h"
+#include "battle/battle_unit.h"
+#include "driver/camdrv.h"
+#include "driver/icondrv.h"
+#include "system.h"
+#include <string.h>
+
+#pragma optimize_for_size on
+
+typedef struct PowerGaugeWork {
+    s32 counter;   // 0x0
+    f32 gauge;     // 0x4
+    s32 field_0x8; // 0x8
+    s32 limit;     // 0xC
+    s32 timer;     // 0x10
+} PowerGaugeWork;
+
+#define PG_WORK(ac) ((PowerGaugeWork*)((u8*)(ac) + 0x2BC))
+#define PG_DISP(ac) ((u8*)(ac) + 0x290)
+#define PG_F32(p, off) (*(f32*)((u8*)(p) + (off)))
+#define PG_S32(p, off) (*(s32*)((u8*)(p) + (off)))
+#define PG_THR(ac, i) (*(s32*)((u8*)(ac) + 0x40 + (i)*4))
+
+void BattleAcDrawGauge(s32 x, s32 y, s32 icon, f32 ratio, s32 a, s32 b, s32 c, s32 d, s32 e);
+
+s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    PowerGaugeWork* tw = PG_WORK(ac);
+    u8* disp = PG_DISP(ac);
+
+    switch (work->actionCommands.mAcState) {
+        case 99:
+            break;
+        case 0:
+            memset(disp, 0, 0x2C);
+            PG_F32(disp, 0x14) = -300.0f;
+            PG_F32(disp, 0x18) = 0.0f;
+            PG_S32(disp, 0x20) = 20;
+            PG_F32(disp, 0x28) = 0.0f;
+            *(GXColor*)((u8*)disp + 0xC) = (GXColor){255, 255, 255, 255};
+            tw->counter = 0;
+            work->actionCommands.outputParams[0] = 0;
+            work->actionCommands.mAcState = 99;
+            work->actionCommands.result = 1;
+            tw->limit = 100;
+            tw->gauge = 0.0f;
+            break;
+        case 100:
+            if ((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
+                if (irand(100) >= 0) {
+                    work->actionCommands.field_0x8 = 30;
+                    work->actionCommands.outputParams[0] = 0;
+                } else {
+                    work->actionCommands.outputParams[0] = irand(PG_S32(ac, 0x3C) - 1) + 1;
+                    work->actionCommands.field_0x8 = 30;
+                }
+                work->actionCommands.mAcState = 1001;
+                break;
+            }
+            work->actionCommands.mAcState = 1000;
+        case 1000:
+            tw->counter++;
+            if (tw->counter > tw->limit) {
+                work->actionCommands.outputParams[0] = 0;
+                work->actionCommands.result = 0;
+                tw->gauge = 101.0f;
+                return 0;
+            }
+            tw->gauge = intplGetValue(2, tw->counter, tw->limit, 0.0f, 100.0f);
+            if (BattlePadGetNow() == 0x60) {
+                if (tw->gauge < (f32)PG_THR(ac, 0)) {
+                    work->actionCommands.result = 0;
+                    work->actionCommands.result &= ~2;
+                } else {
+                    work->actionCommands.result = 2;
+                    work->actionCommands.mResultCount++;
+                    if (PG_S32(ac, 0x3C) <= 1) {
+                        work->actionCommands.outputParams[0] = 1;
+                    } else if (tw->gauge < (f32)PG_THR(ac, 1)) {
+                        work->actionCommands.outputParams[0] = 1;
+                    } else if (PG_S32(ac, 0x3C) <= 2) {
+                        work->actionCommands.outputParams[0] = 2;
+                    } else if (tw->gauge < (f32)PG_THR(ac, 2)) {
+                        work->actionCommands.outputParams[0] = 2;
+                    } else if (PG_S32(ac, 0x3C) <= 3) {
+                        work->actionCommands.outputParams[0] = 3;
+                    } else if (tw->gauge < (f32)PG_THR(ac, 3)) {
+                        work->actionCommands.outputParams[0] = 3;
+                    } else if (PG_S32(ac, 0x3C) <= 4) {
+                        work->actionCommands.outputParams[0] = 4;
+                    } else {
+                        work->actionCommands.outputParams[0] = 5;
+                    }
+                }
+                work->actionCommands.mAcState = 1002;
+            }
+            break;
+        case 1001:
+            work->actionCommands.field_0x8--;
+            if (work->actionCommands.field_0x8 < 0) {
+                if ((s32)work->actionCommands.outputParams[0] > 0) {
+                    work->actionCommands.result = 2;
+                    work->actionCommands.mResultCount++;
+                } else {
+                    work->actionCommands.result = 0;
+                }
+                return 0;
+            }
+            break;
+        case 1002:
+            work->actionCommands.mAcState = 1003;
+        case 1003:
+            work->actionCommands.field_0x30 |= 1;
+            tw->timer = 60;
+            work->actionCommands.mAcState = 1004;
+        case 1004:
+            tw->timer--;
+            if (tw->timer <= 0) {
+                work->actionCommands.mAcState = 1005;
+            }
+            break;
+        case 1005:
+            work->actionCommands.maincb = NULL;
+            work->actionCommands.dispcb = NULL;
+            work->actionCommands.resultcb = NULL;
+            work->actionCommands.deletecb = NULL;
+            return 0;
+    }
+    return 1;
+}
+
+s32 battleAcResult_PowerGaugeLv(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+
+static void actionCommandDisp(f32 x, f32 y);
+
+#pragma opt_propagation off
+void battleAcDisp_PowerGaugeLv(CameraId cameraId, void* param) {
+    BattleWork* work = (BattleWork*)param;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)&work->actionCommands + 0x290);
+    s32 i = 4;
+    switch (work->actionCommands.mAcState) {
+        case 99:
+            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[i], 20, -300.0f, 30.0f);
+        case 100:
+        case 1000:
+        case 1002:
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[i] > 0) {
+                (*(s32*)&disp->field_0x1C[i])--;
+            }
+            break;
+        case 1003:
+        case 1004:
+            if (*(s32*)&disp->field_0x1C[i] >= 40) {
+                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[i] - 40, 20, 30.0f, -300.0f);
+            } else {
+                disp->iconX = 30.0f;
+            }
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[i] < 60) {
+                (*(s32*)&disp->field_0x1C[i])++;
+            }
+            break;
+    }
+}
+
+#pragma opt_propagation reset
+void battleAcDelete_PowerGaugeLv(BattleWork* work) {
+    if (work->actionCommands.field_0x30 & 1) {
+        return;
+    }
+    work->actionCommands.mAcState = 1003;
+}
+
+#pragma dont_inline on
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    u8* disp = PG_DISP(ac);
+    PowerGaugeWork* tw;
+    f32 ratio;
+    camGetPtr(8);
+    tw = PG_WORK(ac);
+    {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -200.0f + x;
+        pos.y = 25.0f + y;
+        iconDispGx(&pos, 0x10, 0x8C, 1.0f);
+    }
+    ratio = tw->gauge / 100.0f;
+    if (ratio > 1.0f) {
+        ratio = 1.0f;
+    }
+    PG_F32(disp, 0x28) = ratio;
+    BattleAcDrawGauge((s32)x, (s32)y, 0xB2, PG_F32(disp, 0x28), PG_S32(&work->actionCommands, 0x3C), PG_S32(&work->actionCommands, 0x40),
+                                    PG_S32(&work->actionCommands, 0x44), PG_S32(&work->actionCommands, 0x48), 0);
+    switch (work->actionCommands.mAcState) {
+        case 99:
+        case 100:
+        case 1002:
+        case 1003:
+        case 1004: {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            x = -220.0f + x;
+            y = 70.0f + y;
+            pos.x = x;
+            pos.y = y;
+            iconDispGx(&pos, 0x10, 0x7E, 1.0f);
+            {
+Vec pos2 = {0.0f, 0.0f, 0.0f};
+            pos2.x = 56.0f + x;
+            pos2.y = y;
+            iconDispGx(&pos2, 0x10, 0x80, 1.0f);
+            }
+            break;
+        }
+        case 1000:
+            if (tw->gauge >= (f32)PG_THR(&work->actionCommands, 0) && tw->gauge <= 100.0f) {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                    x = -220.0f + x;
+                y = 70.0f + y;
+                pos.x = x;
+                pos.y = y;
+                iconDispGx(&pos, 0x10, 0x7F, 1.0f);
+                {
+Vec pos2 = {0.0f, 0.0f, 0.0f};
+                pos2.x = 56.0f + x;
+                pos2.y = y;
+                iconDispGx(&pos2, 0x10, 0x81, 1.0f);
+                }
+            } else {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                    x = -220.0f + x;
+                y = 70.0f + y;
+                pos.x = x;
+                pos.y = y;
+                iconDispGx(&pos, 0x10, 0x7E, 1.0f);
+                {
+Vec pos2 = {0.0f, 0.0f, 0.0f};
+                pos2.x = 56.0f + x;
+                pos2.y = y;
+                iconDispGx(&pos2, 0x10, 0x80, 1.0f);
+                }
+            }
+            break;
+    }
+}
+#pragma dont_inline reset

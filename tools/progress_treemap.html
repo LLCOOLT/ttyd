@@ -1,0 +1,231 @@
+<title>TTYD Decomp Progress</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: one column, summary bars on top, full-width treemap below, like decomp.dev */
+:root {
+  --bg: #f6f7f5; --panel: #ffffff; --fg: #1b1f1c; --muted: #5d665f; --line: #dde2dc;
+  --linked: #2f8f4e; --matched: #8fd19e; --track: #e6eae5; --accent: #2f8f4e;
+  --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121513; --panel: #1a1e1b; --fg: #e7ebe7; --muted: #9aa49c; --line: #2b322d;
+  --linked: #3fae63; --matched: #2a6a3c; --track: #262c27; --accent: #5cc77e; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #121513; --panel: #1a1e1b; --fg: #e7ebe7; --muted: #9aa49c; --line: #2b322d;
+  --linked: #3fae63; --matched: #2a6a3c; --track: #262c27; --accent: #5cc77e; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--sans); }
+.wrap { max-width: 1280px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 40px; display: grid; gap: 20px; }
+header { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 20px; }
+h1 { font-size: 1.5rem; font-weight: 600; margin: 0; text-wrap: balance; }
+.meta { color: var(--muted); font-family: var(--mono); font-size: 0.8rem; }
+.tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.tabs button { font: 500 0.85rem var(--sans); border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+.tabs button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.tabs button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px 28px; }
+.bar { display: grid; gap: 6px; min-width: 0; }
+.bar .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.bar .lbl { font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.bar .pct { font-family: var(--mono); font-size: 1.35rem; font-weight: 500; font-variant-numeric: tabular-nums; }
+.track { height: 10px; background: var(--track); border-radius: 3px; overflow: hidden; display: flex; }
+.track i { display: block; height: 100%; }
+.track .l { background: var(--linked); } .track .m { background: var(--matched); }
+.bar .sub { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.bar .sub b { color: var(--fg); font-weight: 500; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center; font-size: 0.8rem; color: var(--muted); }
+.legend .sw { display: inline-block; width: 12px; height: 12px; border-radius: 2px; vertical-align: -2px; margin-right: 6px; }
+.grad { width: 140px; height: 10px; border-radius: 2px; background: linear-gradient(90deg, hsl(0 62% 52%), hsl(30 75% 55%), hsl(55 70% 52%), hsl(85 50% 50%)); }
+#map { position: relative; width: 100%; height: 72vh; min-height: 420px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px; overflow: hidden; }
+.grp { position: absolute; box-sizing: border-box; border: 1px solid var(--bg); }
+.grp > span { position: absolute; left: 3px; top: 1px; font: 600 0.7rem var(--sans); color: #111; z-index: 2; pointer-events: none;
+  background: rgba(255,255,255,0.72); padding: 0 4px; border-radius: 2px; white-space: nowrap; max-width: calc(100% - 8px); overflow: hidden; text-overflow: ellipsis; }
+.cell { position: absolute; box-sizing: border-box; border: 1px solid rgba(0,0,0,0.25); overflow: hidden;
+  font: 0.65rem var(--mono); color: #111; padding: 1px 2px; line-height: 1.2; cursor: default; }
+.cell:hover { outline: 2px solid var(--fg); z-index: 3; }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--panel); color: var(--fg); border: 1px solid var(--line);
+  border-radius: 4px; padding: 8px 10px; font: 0.8rem var(--mono); box-shadow: 0 6px 18px rgba(0,0,0,0.18); max-width: min(360px, 90vw); }
+#tip b { font-family: var(--sans); font-weight: 600; word-break: break-all; }
+.groups { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.85rem; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 5px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; }
+th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 500; cursor: pointer; }
+td.mini { width: 30%; min-width: 120px; }
+.cmp { font-size: 0.85rem; color: var(--muted); }
+.cmp b { color: var(--fg); font-weight: 500; }
+@media (max-width: 600px) { #map { height: 60vh; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Paper Mario: The Thousand-Year Door</h1>
+    <div class="meta">G8MJ01 · commit __COMMIT__ · <span id="gen"></span></div>
+  </header>
+  <nav class="tabs" id="tabs" aria-label="Category"></nav>
+  <section class="bars" id="bars"></section>
+  <p class="cmp" id="cmp" hidden></p>
+  <div class="legend">
+    <span><span class="sw" style="background:hsl(140 55% 42%)"></span>fully linked</span>
+    <span><span class="sw" style="background:hsl(125 55% 62%)"></span>100% matched, not linked</span>
+    <span style="display:inline-flex;align-items:center;gap:8px">0% <span class="grad"></span> 99%</span>
+    <span>Cell size = code bytes. Hover a cell for details.</span>
+  </div>
+  <div id="map" role="img" aria-label="Treemap of units by code size and match percent"></div>
+  <div class="groups"><table id="gt"></table></div>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+const D = /*__DATA__*/null;
+const $ = s => document.querySelector(s);
+const fmtB = b => b >= 1048576 ? (b / 1048576).toFixed(2) + " MB" : b >= 1024 ? (b / 1024).toFixed(1) + " KB" : b + " B";
+const pct = (a, b) => b ? 100 * a / b : 0;
+let cat = "all";
+try { cat = localStorage.getItem("ttyd-cat") || "all"; } catch (e) {}
+if (cat !== "all" && !D.categories.some(c => c.id === cat)) cat = "all";
+
+function color(u) {
+  if (u.c) return "hsl(140 55% 42%)";
+  if (u.f >= 100) return "hsl(125 55% 62%)";
+  const t = Math.max(0, Math.min(99.99, u.f)) / 100;
+  const h = t * 85, s = 62 + 13 * Math.sin(t * Math.PI), l = 52 + 3 * Math.sin(t * Math.PI);
+  return `hsl(${h.toFixed(0)} ${s.toFixed(0)}% ${l.toFixed(0)}%)`;
+}
+
+function measuresFor(id) {
+  if (id === "all") return D.overall;
+  return (D.categories.find(c => c.id === id) || {}).m || D.overall;
+}
+
+function renderTabs() {
+  const t = $("#tabs"); t.innerHTML = "";
+  [{ id: "all", name: "All" }, ...D.categories].forEach(c => {
+    const b = document.createElement("button");
+    b.textContent = c.name; b.setAttribute("aria-pressed", c.id === cat);
+    b.onclick = () => { cat = c.id; try { localStorage.setItem("ttyd-cat", cat); } catch (e) {} renderAll(); };
+    t.appendChild(b);
+  });
+}
+
+function barHTML(label, matched, total, linked, unit, linkedLabel) {
+  const pm = pct(matched, total), pl = linked == null ? null : pct(linked, total);
+  const fmt = unit === "B" ? fmtB : (x => Math.round(x).toLocaleString());
+  return `<div class="bar"><div class="top"><span class="lbl">${label}</span><span class="pct">${pm.toFixed(2)}%</span></div>
+    <div class="track">${pl != null ? `<i class="l" style="width:${pl}%"></i><i class="m" style="width:${Math.max(0, pm - pl)}%"></i>` : `<i class="l" style="width:${pm}%"></i>`}</div>
+    <div class="sub"><b>${fmt(matched)}</b> / ${fmt(total)} matched${pl != null ? ` · <b>${pl.toFixed(2)}%</b> ${linkedLabel}` : ""}</div></div>`;
+}
+
+function renderBars() {
+  const m = measuresFor(cat);
+  $("#bars").innerHTML =
+    barHTML("Code", m.code[0], m.code[1], m.code[2], "B", "fully linked") +
+    barHTML("Data", m.data[0], m.data[1], m.data[2], "B", "fully linked") +
+    barHTML("Functions", m.funcs[0], m.funcs[1], null) +
+    barHTML("Files linked", m.units[0], m.units[1], null);
+  const cmp = $("#cmp");
+  if (D.baseline && cat === "all") {
+    const b = D.baseline.m;
+    cmp.hidden = false;
+    cmp.innerHTML = `Compared with ${D.baseline.label}: code <b>${pct(b.code[0], b.code[1]).toFixed(2)}% → ${pct(m.code[0], m.code[1]).toFixed(2)}%</b>, fully linked <b>${pct(b.code[2], b.code[1]).toFixed(2)}% → ${pct(m.code[2], m.code[1]).toFixed(2)}%</b>, data <b>${pct(b.data[0], b.data[1]).toFixed(2)}% → ${pct(m.data[0], m.data[1]).toFixed(2)}%</b>, functions <b>${b.funcs[0]} → ${m.funcs[0]}</b>.`;
+  } else cmp.hidden = true;
+}
+
+// Squarified treemap (Bruls et al.). items: [{v}], returns [{x,y,w,h,item}]
+function squarify(items, x, y, w, h) {
+  const out = [];
+  const total = items.reduce((a, b) => a + b.v, 0);
+  if (!total || w <= 0 || h <= 0) return out;
+  const scale = (w * h) / total;
+  const rest = items.map(i => ({ a: i.v * scale, item: i }));
+  let rx = x, ry = y, rw = w, rh = h;
+  const worst = (row, len) => {
+    const s = row.reduce((a, b) => a + b.a, 0); let mx = 0, mn = Infinity;
+    row.forEach(r => { mx = Math.max(mx, r.a); mn = Math.min(mn, r.a); });
+    return Math.max((len * len * mx) / (s * s), (s * s) / (len * len * mn));
+  };
+  let row = [];
+  while (rest.length) {
+    const len = Math.min(rw, rh), next = rest[0];
+    if (!row.length || worst(row.concat(next), len) <= worst(row, len)) { row.push(rest.shift()); continue; }
+    lay(); row = [];
+  }
+  if (row.length) lay();
+  function lay() {
+    const s = row.reduce((a, b) => a + b.a, 0);
+    if (rw >= rh) {
+      const cw = s / rh; let cy = ry;
+      row.forEach(r => { const ch = r.a / cw; out.push({ x: rx, y: cy, w: cw, h: ch, item: r.item }); cy += ch; });
+      rx += cw; rw -= cw;
+    } else {
+      const ch = s / rw; let cx = rx;
+      row.forEach(r => { const cw = r.a / ch; out.push({ x: cx, y: ry, w: cw, h: ch, item: r.item }); cx += cw; });
+      ry += ch; rh -= ch;
+    }
+  }
+  return out;
+}
+
+function visibleUnits() { return D.units.filter(u => cat === "all" || u.cat.includes(cat)); }
+
+function groups(units) {
+  const g = new Map();
+  units.forEach(u => {
+    const key = (u.k === "REL" ? "rel/" : "") + u.g;
+    if (!g.has(key)) g.set(key, { key, label: u.k === "REL" ? u.g + ".rel" : u.g, units: [], v: 0, m: 0, l: 0, f: [0, 0], done: 0 });
+    const e = g.get(key); e.units.push(u); e.v += u.s; e.m += u.s * u.mc / 100; e.l += u.c ? u.s : 0;
+    e.f[0] += u.fn[0]; e.f[1] += u.fn[1]; e.done += u.c ? 1 : 0;
+  });
+  return [...g.values()].sort((a, b) => b.v - a.v);
+}
+
+function renderMap() {
+  const map = $("#map"); map.innerHTML = "";
+  const W = map.clientWidth, H = map.clientHeight;
+  const gs = groups(visibleUnits());
+  const tip = $("#tip");
+  squarify(gs, 0, 0, W, H).forEach(gr => {
+    const g = gr.item, el = document.createElement("div");
+    el.className = "grp";
+    Object.assign(el.style, { left: gr.x + "px", top: gr.y + "px", width: gr.w + "px", height: gr.h + "px" });
+    if (gr.w > 40 && gr.h > 16) { const s = document.createElement("span"); s.textContent = `${g.label} ${pct(g.m, g.v).toFixed(0)}%`; el.appendChild(s); }
+    const us = g.units.slice().sort((a, b) => b.s - a.s).map(u => ({ v: u.s, u }));
+    squarify(us, 0, 0, gr.w - 2, gr.h - 2).forEach(c => {
+      const u = c.item.u, d = document.createElement("div");
+      d.className = "cell";
+      Object.assign(d.style, { left: c.x + "px", top: c.y + "px", width: c.w + "px", height: c.h + "px", background: color(u) });
+      if (c.w > 56 && c.h > 30) d.textContent = u.n.split("/").pop();
+      d.onmousemove = e => {
+        tip.hidden = false;
+        tip.innerHTML = `<b>${u.n}</b><br>${fmtB(u.s)} code<br>match ${u.f.toFixed(2)}% · code ${u.mc.toFixed(2)}%<br>functions ${u.fn[0]} / ${u.fn[1]}<br>${u.c ? "fully linked" : "not linked"}`;
+        const r = tip.getBoundingClientRect();
+        let x = e.clientX + 14, y = e.clientY + 14;
+        if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+        if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+        tip.style.left = Math.max(8, x) + "px"; tip.style.top = Math.max(8, y) + "px";
+      };
+      d.onmouseleave = () => { tip.hidden = true; };
+      el.appendChild(d);
+    });
+    map.appendChild(el);
+  });
+}
+
+let sortKey = "v";
+function renderTable() {
+  const gs = groups(visibleUnits());
+  const key = { v: g => g.v, name: g => g.label, code: g => pct(g.m, g.v), linked: g => pct(g.l, g.v), fn: g => pct(g.f[0], g.f[1]) }[sortKey];
+  gs.sort((a, b) => sortKey === "name" ? key(a).localeCompare(key(b)) : key(b) - key(a));
+  $("#gt").innerHTML = `<thead><tr><th data-k="name">Unit group</th><th data-k="v">Code size</th><th data-k="code">Code matched</th><th data-k="linked">Fully linked</th><th data-k="fn">Functions</th><th>Files linked</th><th></th></tr></thead><tbody>` +
+    gs.map(g => `<tr><td>${g.label}</td><td>${fmtB(g.v)}</td><td>${pct(g.m, g.v).toFixed(2)}%</td><td>${pct(g.l, g.v).toFixed(2)}%</td><td>${g.f[0]} / ${g.f[1]}</td><td>${g.done} / ${g.units.length}</td>
+      <td class="mini"><div class="track"><i class="l" style="width:${pct(g.l, g.v)}%"></i><i class="m" style="width:${Math.max(0, pct(g.m, g.v) - pct(g.l, g.v))}%"></i></div></td></tr>`).join("") + "</tbody>";
+  document.querySelectorAll("#gt th[data-k]").forEach(th => th.onclick = () => { sortKey = th.dataset.k; renderTable(); });
+}
+
+function renderAll() { renderTabs(); renderBars(); renderMap(); renderTable(); }
+$("#gen").textContent = "generated " + D.generated;
+renderAll();
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(renderMap, 120); });
+</script>

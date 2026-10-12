@@ -49,8 +49,6 @@ void effGlassMain(EffectEntry* effect);
 EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffGlassN64Work* work;
-    f32 f;
-    f32 g;
 
     effect = effEntry();
     effect->type = "GlassN64\0\0\0";
@@ -94,9 +92,7 @@ EffectEntry* effGlassN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
             break;
     }
     work->texV = 0.0f;
-    f = 0.25f * (f32)(rand() % 2 * 2 - 1);
-    g = 0.1f + 0.1f * (f32)(rand() % 5);
-    work->texVSpeed = g * f;
+    work->texVSpeed = (0.25f * (f32)(rand() % 2 * 2 - 1)) * (0.1f + 0.1f * (f32)(rand() % 5));
     work->rotZ = rand() % 360;
     work->vx = rand() % 11 - 5;
     work->vy = rand() % 11 - 5;

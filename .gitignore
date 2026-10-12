@@ -75,3 +75,6 @@ rustc-ice-*.txt
 
 # Compiler dependency files written to the repo root by tools that replay ninja compile commands
 /*.d
+
+# Personal coordination notes for the agent sessions (kept on disk, not in the repo)
+/docs/COORDINATION.md

@@ -238,7 +238,7 @@ void effKemuri10Main(EffectEntry* effect) {
             work->velocity.z *= 0.8f;
         }
         if (timer < 5) {
-            { f32 fa = work->alpha; fa *= 0.6f; work->alpha = (s32)fa; }
+            { f32 fa = work->alpha; work->alpha = (fa *= 0.6f); }
             work->velocity.x *= 0.7f;
             work->velocity.y *= 0.7f;
             work->velocity.z *= 0.7f;

@@ -44,6 +44,8 @@ void effKemuri8N64SetCamId(EffectEntry* effect, s32 camId) {
     ((EffKemuri8N64Work*)effect->userdata)->camId = camId;
 }
 
+inline float inline_fn(f32 arg0, f32 arg1) { return arg0 * (-arg1); }
+
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 EffectEntry* effKemuri8N64Entry(s32 type, f32 x, f32 y, f32 z) {
@@ -101,7 +103,7 @@ EffectEntry* effKemuri8N64Entry(s32 type, f32 x, f32 y, f32 z) {
         work->field_0x28 = 0.0f;
         work->field_0x2C = 0.0f;
         rad = 6.2831855f * (f32)(((i - 1) * 360) / (count - 1)) / 360.0f;
-        work->position.x = radius * -(f32)sin(rad);
+        work->position.x = inline_fn(radius, (f32)sin(rad));
         work->position.y = radius * -(f32)cos(rad);
         work->position.z = 0.0f;
         work->sinAngle = sin(rad);

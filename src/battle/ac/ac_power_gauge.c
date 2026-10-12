@@ -1,0 +1,458 @@
+#include "battle/battle.h"
+#include "battle/battle_ac.h"
+#include "battle/battle_pad.h"
+#include "battle/battle_unit.h"
+#include "driver/camdrv.h"
+#include "driver/icondrv.h"
+#include "system.h"
+#include <string.h>
+
+#pragma optimize_for_size on
+
+void BattleAcDrawGauge(s32 x, s32 y, s32 a, s32 b, s32 c, s32 d, s32 e, s32 f);
+void BattleAcGaugeSeInit(void);
+void BattleAcGaugeSeUpdate(f32 value);
+void BattleAcGaugeSeDelete(void);
+s32 BattleACGetButtonIcon(s32 button, s32 pressed);
+
+typedef struct PowerGaugeWork {
+    s32 frame;     // 0x0
+    f32 gauge;     // 0x4
+    s32 frame2;    // 0x8
+    s32 maxFrames; // 0xC
+    s8 autoFail;   // 0x10
+    s8 phase;      // 0x11
+    s8 mode;       // 0x12
+    u8 pad13;      // 0x13
+    u32 button;    // 0x14
+    s32 endTimer;  // 0x18
+} PowerGaugeWork;
+
+#define PG_WORK(ac) ((PowerGaugeWork*)((u8*)(ac) + 0x2BC))
+#define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
+
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    PowerGaugeWork* pw;
+    s32 a, b, c, d;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    f32 ratio;
+    u32 flags;
+
+    camGetPtr(8);
+    pw = PG_WORK(ac);
+    ratio = pw->gauge / 100.0f;
+    if (ratio > 1.0f) {
+        ratio = 1.0f;
+    }
+    ACW(disp, f32, 0x28) = ratio;
+
+    if (ACW(ac, u32, 0x34) & 2) {
+        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 1, 100, 100, 100, 0);
+    } else {
+        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 2, ACW(ac, s32, 0x48), 100, 100, 0);
+    }
+
+    flags = ACW(ac, u32, 0x34);
+    if (!(flags & 4)) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;
+        pos.y = 45.0f + y;
+        iconDispGx(&pos, 0x10, 0x96, 1.0f);
+    } else {
+        s32 icon;
+        if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+            icon = 0x95;
+        } else {
+            icon = 0x91;
+        }
+        if (flags & 8) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = 120.0f + (-200.0f + x) - 12.0f;
+            pos.y = 18.0f + y;
+            iconDispGx(&pos, 0x10, icon, 1.0f);
+        } else {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = 120.0f + (-200.0f + x);
+            pos.y = 18.0f + y;
+            iconDispGx(&pos, 0x10, icon, 1.0f);
+        }
+    }
+
+    switch (ACW(ac, s32, 0x38)) {
+        case 0:
+            a = 0x7F;
+            b = 0x7E;
+            c = 0x81;
+            d = 0x80;
+            break;
+        case 1:
+            a = BattleACGetButtonIcon(0x100, 1);
+            b = BattleACGetButtonIcon(0x100, 0);
+            c = 0;
+            d = 0;
+            break;
+        case 2:
+            a = BattleACGetButtonIcon(0x100, 1);
+            b = BattleACGetButtonIcon(0x100, 0);
+            c = 0;
+            d = 0;
+            break;
+        case 3:
+            a = BattleACGetButtonIcon(0x20, 1);
+            b = BattleACGetButtonIcon(0x20, 0);
+            c = 0;
+            d = 0;
+            break;
+    }
+
+    switch (ac->mAcState) {
+        case 99:
+        case 100:
+        case 1003:
+        case 1004:
+        case 1005:
+            if ((u16)c) {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                x = -225.0f + x;
+                y = 80.0f + y;
+                pos.x = x;
+                pos.y = y;
+                iconDispGx(&pos, 0x10, b, 1.0f);
+                {
+                    Vec pos2 = {0.0f, 0.0f, 0.0f};
+                    pos2.x = 56.0f + x;
+                    pos2.y = y;
+                    iconDispGx(&pos2, 0x10, d, 1.0f);
+                }
+            } else {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                pos.x = 28.0f + (-225.0f + x);
+                pos.y = 80.0f + y;
+                iconDispGx(&pos, 0x10, b, 1.0f);
+            }
+            break;
+        case 1000:
+        case 1001:
+            if (ACW(pw, s8, 0x12)) {
+                if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        x = -225.0f + x;
+                        y = 80.0f + y;
+                        pos.x = x;
+                        pos.y = y;
+                        iconDispGx(&pos, 0x10, a, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + x;
+                            pos2.y = y;
+                            iconDispGx(&pos2, 0x10, c, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        iconDispGx(&pos, 0x10, a, 1.0f);
+                    }
+                } else {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        x = -225.0f + x;
+                        y = 80.0f + y;
+                        pos.x = x;
+                        pos.y = y;
+                        iconDispGx(&pos, 0x10, b, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + x;
+                            pos2.y = y;
+                            iconDispGx(&pos2, 0x10, d, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        iconDispGx(&pos, 0x10, b, 1.0f);
+                    }
+                }
+            } else {
+                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || ac->outputParams[0] == 0) {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        x = -225.0f + x;
+                        y = 80.0f + y;
+                        pos.x = x;
+                        pos.y = y;
+                        iconDispGx(&pos, 0x10, b, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + x;
+                            pos2.y = y;
+                            iconDispGx(&pos2, 0x10, d, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        iconDispGx(&pos, 0x10, b, 1.0f);
+                    }
+                } else {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        x = -225.0f + x;
+                        y = 80.0f + y;
+                        pos.x = x;
+                        pos.y = y;
+                        iconDispGx(&pos, 0x10, a, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + x;
+                            pos2.y = y;
+                            iconDispGx(&pos2, 0x10, c, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        iconDispGx(&pos, 0x10, a, 1.0f);
+                    }
+                }
+            }
+            break;
+    }
+}
+
+s32 battleAcMain_PowerGauge(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    PowerGaugeWork* pw = PG_WORK(ac);
+    BOOL isAuto = FALSE;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+
+    if (ac->mAcUnit->badgesEquipped.AutoCommand) {
+        isAuto = TRUE;
+    }
+
+    switch (ac->mAcState) {
+        case 0:
+            memset(disp, 0, 0x2C);
+            disp->iconX = -300.0f;
+            disp->iconY = 0.0f;
+            *(s32*)&disp->field_0x1C[4] = 20;
+            ACW(disp, f32, 0x28) = 0.0f;
+            *(GXColor*)&disp->field_0x0[0xC] = (GXColor){255, 255, 255, 255};
+            pw->frame = 0;
+            pw->frame2 = 0;
+            ac->outputParams[0] = 0;
+            ac->mAcState = 99;
+            ac->result = 1;
+            pw->maxFrames = ACW(ac, s32, 0x3C) + ACW(ac, s32, 0x40);
+            pw->gauge = 0.0f;
+            switch (ACW(ac, s32, 0x38)) {
+                case 0:
+                    pw->mode = 1;
+                    pw->button = 0x60;
+                    pw->phase = 1;
+                    ac->outputParams[0] = 1;
+                    break;
+                case 1:
+                    pw->mode = 1;
+                    pw->button = 0x100;
+                    pw->phase = 1;
+                    ac->outputParams[0] = 1;
+                    break;
+                case 2:
+                    pw->mode = 0;
+                    pw->button = 0x100;
+                    pw->phase = 0;
+                    break;
+                case 3:
+                    pw->mode = 0;
+                    pw->button = 0x20;
+                    pw->phase = 0;
+                    break;
+                default:
+                    pw->mode = 1;
+                    pw->button = 0x100;
+                    pw->phase = 1;
+                    ac->outputParams[0] = 1;
+                    break;
+            }
+            break;
+        case 99:
+            break;
+        case 100:
+            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+                if (irand(100) >= 0) {
+                    ac->field_0x8 = 30;
+                    pw->autoFail = 0;
+                } else {
+                    pw->autoFail = 1;
+                    ac->field_0x8 = 30;
+                }
+                ac->outputParams[0] = 1;
+                ac->mAcState = 1002;
+                break;
+            }
+            if (pw->mode) {
+                ac->mAcState = 1001;
+            } else {
+                ac->mAcState = 1000;
+            }
+            if (pw->mode) {
+                BattleAcGaugeSeInit();
+            }
+        case 1000:
+        case 1001:
+            pw->frame++;
+            switch (pw->phase) {
+                case 0:
+                    if (!pw->mode) {
+                        if (pw->button == BattlePadGetNow() || isAuto) {
+                            pw->phase = 1;
+                            ac->mAcState = 1001;
+                            pw->frame = 0;
+                            ac->outputParams[0] = 1;
+                            BattleAcGaugeSeInit();
+                        }
+                    }
+                    break;
+                case 1:
+                    if (pw->mode) {
+                        if (pw->button == BattlePadGetNow()) {
+                            if (BattlePadCheckTrigger(pw->button)) {
+                                pw->phase = 2;
+                            }
+                        }
+                    } else {
+                        if (!((s32(*)(s32))BattlePadCheckNow)(pw->button)) {
+                            if (((s32(*)(s32))BattlePadCheckUp)(pw->button)) {
+                                pw->phase = 2;
+                            }
+                        }
+                    }
+                    break;
+            }
+            if (!(ACW(ac, u32, 0x34) & 1)) {
+                pw->frame2++;
+            } else if (pw->phase == 1) {
+                pw->frame2++;
+            }
+            if (ac->mAcState == 1000) {
+                if (pw->frame > 120) {
+                    pw->frame = 0;
+                    ac->result = 0;
+                    pw->gauge = 0.0f;
+                    ac->mAcState = 1003;
+                    ac->outputParams[0] = 2;
+                    break;
+                }
+            } else if (pw->frame > pw->maxFrames) {
+                pw->frame = 0;
+                ac->result = 0;
+                pw->gauge = 101.0f;
+                ac->mAcState = 1003;
+                break;
+            }
+            if (pw->frame <= ACW(ac, s32, 0x3C)) {
+                pw->gauge = ((f32(*)(s32, f32, f32, s32, s32))intplGetValue)(ACW(ac, s32, 0x44), 0.0f, 100.0f, pw->frame2, ACW(ac, s32, 0x3C));
+            } else {
+                pw->gauge = 100.0f;
+            }
+            BattleAcGaugeSeUpdate(pw->gauge);
+            if (isAuto) {
+                if (pw->gauge >= (f32)ACW(ac, s32, 0x48)) {
+                    pw->phase = 2;
+                } else {
+                    pw->phase = 1;
+                }
+            }
+            if (pw->phase == 2) {
+                if (pw->gauge < (f32)ACW(ac, s32, 0x48)) {
+                    ac->result = 0;
+                    ac->result &= ~2;
+                } else {
+                    ac->result = 2;
+                    ac->mResultCount++;
+                }
+                ac->mAcState = 1003;
+            }
+            break;
+        case 1002:
+            ac->field_0x8--;
+            if (ac->field_0x8 < 0) {
+                if (pw->autoFail) {
+                    ac->result = 2;
+                    ac->mResultCount++;
+                } else {
+                    ac->result = 0;
+                }
+                ac->field_0x30 |= 1;
+                pw->endTimer = 60;
+                ac->mAcState = 1005;
+                return 0;
+            }
+            break;
+        case 1003:
+            ac->mAcState = 1004;
+        case 1004:
+            ac->field_0x30 |= 1;
+            BattleAcGaugeSeDelete();
+            pw->endTimer = 60;
+            ac->mAcState = 1005;
+        case 1005:
+            pw->endTimer--;
+            if (pw->endTimer <= 0) {
+                ac->mAcState = 1006;
+            }
+            break;
+        case 1006:
+            ac->maincb = NULL;
+            ac->dispcb = NULL;
+            ac->resultcb = NULL;
+            ac->deletecb = NULL;
+            return 0;
+    }
+    return 1;
+}
+
+void battleAcDelete_PowerGauge(BattleWork* work) {
+    if (!(work->actionCommands.field_0x30 & 1)) {
+        work->actionCommands.mAcState = 1004;
+    }
+}
+
+void battleAcDisp_PowerGauge(CameraId cameraId, BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    switch (ac->mAcState) {
+        case 99:
+            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+        case 100:
+        case 1000:
+        case 1001:
+        case 1003:
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] > 0) {
+                (*(s32*)&disp->field_0x1C[4])--;
+            }
+            break;
+        case 1004:
+        case 1005:
+            if (*(s32*)&disp->field_0x1C[4] >= 40) {
+                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            } else {
+                disp->iconX = 30.0f;
+            }
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] < 60) {
+                (*(s32*)&disp->field_0x1C[4])++;
+            }
+            break;
+    }
+}
+
+s32 battleAcResult_PowerGauge(BattleWork* work) {
+    return work->actionCommands.result;
+}

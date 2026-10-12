@@ -906,7 +906,7 @@ static void ext_main(void) {
                     pose->mtx[1][3] = pose->mtx[1][3] - 2.0f;
                     pose->flags &= ~2;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
-                    MTXRotDeg(m2, 'z', 10.0f * (f32)sin((gp->retraceCount + i) / 100.0f));
+                    PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * (f32)sin((gp->retraceCount + i) / 100.0f)));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);
                     PSMTXConcat(m1, m2, m2);
                     PSMTXConcat(m2, m3, m3);
@@ -2079,6 +2079,344 @@ static s32 npcEnt[] = {
     0,
 };
 
+USER_FUNC(taihou_r) {
+    f32 c = cos(0.7853981852531433);
+    f32 s = sin(0.7853981852531433);
+    f32 x;
+    f32 y;
+    f32 rx;
+    f32 rz;
+
+    x = 100.0f * c;
+    y = 100.0f * s;
+    rx = -angleABf(0.0f, 0.0f, 0.0f, y);
+    rz = -angleABf(0.0f, 0.0f, x, y);
+
+    effKemuTestSetRxRz(effNameToPtr("kemuri"), rx, rz);
+    effRippleN64SetRxRz(effNameToPtr("ripple"), rx, rz);
+    return EVT_RETURN_DONE;
+}
+
+static inline f32 dd_sin(f32 x) {
+    f32 a = 0.00761f;
+    f32 b = 0.16605f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
+    }
+    return a;
+}
+
+static inline f32 dd_cos(f32 x) {
+    f32 a = 0.03705f;
+    f32 b = 0.4967f;
+    f32 c = 1.0f;
+    f32 y;
+    f32 x2;
+    if (x <= 3.1415927f) {
+        if (x <= 1.5707964f) {
+            x2 = x * x; a = a * x2 - b; a = a * x2 + c;
+        } else {
+            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+        }
+    } else if (x < 4.712389f) {
+        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
+    } else {
+        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c;
+    }
+    return a;
+}
+
+#pragma opt_propagation off
+#pragma opt_lifetimes off
+static void depthDisp(CameraId camera, void* param) {
+    f32 amp = evtGetValue(NULL, GW(5)) / 100.0f;
+    CameraEntry* cam = camGetPtr(camera);
+    smartEntry* buf = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_RGB565, GX_FALSE, 0), 3);
+    GXTexObj obj;
+    Mtx mtx;
+    f32 a;
+    f32 s;
+    f32 c;
+    s32 i;
+    BOOL first;
+    GXTevColorArg carg;
+
+    GXSetTexCopySrc(0, 0, 608, 480);
+    GXSetTexCopyDst(608, 480, GX_TF_RGB565, GX_FALSE);
+    GXCopyTex(buf->address, GX_FALSE);
+    GXPixModeSync();
+    GXInitTexObj(&obj, buf->address, 608, 480, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXLoadTexObj(&obj, GX_TEXMAP0);
+    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+    GXSetZCompLoc(GX_TRUE);
+    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
+    GXSetNumChans(0);
+    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+    GXSetNumTexGens(8);
+    GXSetNumTevStages(8);
+    for (i = 0; i < 8; i++) {
+        a = 6.2831855f * i / 8.0f;
+        s = dd_sin(a);
+        c = dd_cos(a);
+        MTXTrans(mtx, (amp * s) / 100.0f, (amp * c) / 100.0f, 0.0f);
+        GXLoadTexMtxImm(mtx, GX_TEXMTX0 + i * 3, GX_MTX2x4);
+        GXSetTexCoordGen2((GXTexCoordID)i, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0 + i * 3, GX_FALSE, GX_PTIDENTITY);
+        GXSetTevKColorSel((GXTevStageID)i, GX_TEV_KCSEL_1_8);
+        GXSetTevKAlphaSel((GXTevStageID)i, GX_TEV_KASEL_1_8);
+        GXSetTevOrder((GXTevStageID)i, (GXTexCoordID)i, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevColorOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        first = !i;
+        carg = first ? GX_CC_ZERO : GX_CC_CPREV;
+        GXSetTevColorIn((GXTevStageID)i, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, carg);
+        GXSetTevAlphaIn((GXTevStageID)i, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, first ? GX_CA_ZERO : GX_CA_APREV);
+        GXSetTevSwapMode((GXTevStageID)i, GX_TEV_SWAP0, GX_TEV_SWAP0);
+    }
+    GXLoadPosMtxImm(cam->view, GX_PNMTX0);
+    GXSetCurrentMtx(GX_PNMTX0);
+    GXSetCullMode(GX_CULL_BACK);
+    GXClearVtxDesc();
+    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
+    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+    GXPosition3s16(-304, 240, 0);
+    GXTexCoord2s16(0, 0);
+    GXPosition3s16(304, 240, 0);
+    GXTexCoord2s16(1, 0);
+    GXPosition3s16(304, -240, 0);
+    GXTexCoord2s16(1, 1);
+    GXPosition3s16(-304, -240, 0);
+    GXTexCoord2s16(0, 1);
+    GXEnd();
+    sysWaitDrawSync();
+}
+#pragma opt_propagation reset
+#pragma opt_lifetimes reset
+
+static USER_FUNC(depth) {
+    dispEntry(CAMERA_2D, 1000.0f, 0, depthDisp, NULL);
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(make_name) {
+    s32* args = event->args;
+    static char name[64];
+
+    sprintf(name, "S_hikari%d", evtGetValue(event, args[0]));
+    evtSetValue(event, args[1], (s32)name);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(make_ext_table_minnnanokoe) {
+    s32 i;
+
+    memset(ext_data, 0, sizeof(ext_data));
+    for (i = 0; i < 10; i++) {
+        EXT_DATA[i].file = "c_bom_sen";
+        EXT_DATA[i].name = "S_1";
+        EXT_DATA[i].time = 4.0f * i;
+    }
+    for (i = 0; i < 20; i++) {
+        EXT_DATA[10 + i].file = "c_bom_sen";
+        EXT_DATA[10 + i].name = "R_1";
+        EXT_DATA[10 + i].time = 2.0f * i;
+    }
+    EXT_DATA[30].file = NULL;
+    return EVT_RETURN_DONE;
+}
+
+void ext_init_minnnanokoe(void) {
+    s32 i;
+    BomWork* wp;
+    ExtPose* pose;
+    s32 x;
+    s32 z;
+
+    lp = smartAlloc(sizeof(BomWork), 1);
+    wp = lp->address;
+    memset(wp, 0, sizeof(BomWork));
+    wp->count = extGetPoseNum();
+    pose_init();
+
+    pose = extGetPosePtr();
+    for (i = 0; i < wp->count; i++, pose++) {
+        wp->bom[i].vy = 0.0f;
+        wp->bom[i].gravity = 0.0f;
+        wp->bom[i].state = 5;
+        pose->flags |= 3;
+        PSMTXIdentity(pose->mtx);
+        x = (i % 14) * 30 - 205 + rand() % 10;
+        z = 190 - (i / 14) * 20 + rand() % 20;
+        pose->mtx[0][3] = x;
+        pose->mtx[1][3] = 0.0f;
+        pose->mtx[2][3] = z;
+        pose->rot = 270.0f;
+        pose_change(i, "S_1");
+    }
+}
+
+void jump_minnnanokoe(s32 i, f32 h) {
+    BomWork* wp = lp->address;
+    ExtPose* pose = extGetPosePtr() + i;
+
+    wp->bom[i].target = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+    wp->bom[i].field_0x10 = 0.0f;
+    wp->bom[i].gravity = 0.1f;
+    wp->bom[i].timer = 20;
+    wp->bom[i].vy = wp->bom[i].gravity * wp->bom[i].timer / 2 + h / wp->bom[i].timer;
+    wp->bom[i].next = 5;
+    wp->bom[i].state = 100;
+    if (evtGetValue(NULL, GSW(0)) != 401 && i % 5 == 0) {
+        Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        psndSFXOn_3D("SFX_STG7_BOMB_TOGETHER2", &pos);
+    }
+}
+
+void ext_disp_minnnanokoe(CameraId camera, void* param) {
+    YamiParam yp;
+    YamiParam* p = &yp;
+    ExtPose* pose = extGetPosePtr();
+    s32 i;
+
+    extLoadRenderMode();
+    extLoadVertex();
+    extLoadTexture();
+    extLoadTev();
+    for (i = 0; i < extGetPoseNum(); i++, pose++) {
+        yp.numTevStages = 1;
+        yp.field_0x10 = 1;
+        yp.numTexGens = 1;
+        yp.numIndStages = 0;
+        yp.mtx = pose->mtx;
+        envSetYami(p);
+        GXSetNumTexGens(yp.numTexGens);
+        GXSetNumTevStages(yp.numTevStages);
+        GXSetNumIndStages(yp.numIndStages);
+        extPoseDraw(i);
+    }
+    extLoadTextureExit();
+}
+
+void ext_dispent_minnnanokoe(void) {
+    dispEntry(CAMERA_3D, 0.0f, 1, ext_disp_minnnanokoe, NULL);
+}
+
+USER_FUNC(bom1000_msg) {
+    s32* args = event->args;
+    s32 type = evtGetValue(event, args[0]);
+    s32 idx = evtGetValue(event, args[1]);
+    ExtPose* pose = extGetPosePtr();
+    ExtPose* p;
+    s32 row;
+    s32 flag;
+    s32 n;
+
+    if (type == 0) {
+        row = 3;
+        flag = 1;
+    } else {
+        row = 10;
+        flag = 0;
+    }
+    n = idx + row * 14;
+    idx += (rand() % 2 + 1) * 4;
+    idx %= 14;
+    p = &pose[n];
+    evtSetValue(event, args[0], flag);
+    evtSetValue(event, args[1], idx);
+    evtSetFloat(event, args[2], p->mtx[0][3]);
+    evtSetFloat(event, args[3], p->mtx[2][3]);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(bom1000_jump) {
+    BomWork* wp = lp->address;
+    s32 i = rand() % wp->count;
+
+    s32 state = wp->bom[i].state;
+
+    if (state != 100) {
+        jump_minnnanokoe(i, 10.0f);
+    }
+    return EVT_RETURN_DONE;
+}
+
+void envSetYamiView(Mtx mtx);
+
+static USER_FUNC(yami_view) {
+    f32 z = evtGetFloat(event, event->args[0]);
+    Mtx mtx;
+
+    C_MTXLookAt(mtx, &(Vec){0.0f, 100.0f, 100.0f + z}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){0.0f, 0.0f, z});
+    envSetYamiView(mtx);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(anim_tevcallback) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    s32 flag = evtGetValue(event, args[1]);
+    NpcEntry* npc = npcNameToPtr_NoAssert(name);
+
+    if (npc == NULL) {
+        return EVT_RETURN_DONE;
+    }
+    animPoseSetMaterialFlagOn(npc->poseId, (flag & 0xF) << 24);
+    return EVT_RETURN_DONE;
+}
+
+EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
+
+static USER_FUNC(starstone_entry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+
+    effSetName(effStarStoneEntry(6, x, y, z, 1.0f), name);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_set_pos) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 y = evtGetFloat(event, args[2]);
+    f32 z = evtGetFloat(event, args[3]);
+    EffectEntry* eff = effNameToPtr(name);
+
+    ((f32*)eff->userdata)[2] = x;
+    ((f32*)eff->userdata)[3] = y;
+    ((f32*)eff->userdata)[4] = z;
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(starstone_set_ry) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    f32 ry = evtGetFloat(event, args[1]);
+
+    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
+    return EVT_RETURN_DONE;
+}
+
+
 EVT_BEGIN(bom1000_minnnanokoe)
     CALL(make_ext_table_minnnanokoe)
     CALL(evt_npc_entry, STRING("dummy"), STRING("c_bom_sen"))
@@ -2302,340 +2640,4 @@ EVT_BEGIN(bom_01_init_evt)
     RETURN
 EVT_END()
 
-
-USER_FUNC(taihou_r) {
-    f32 c = cos(0.7853981852531433);
-    f32 s = sin(0.7853981852531433);
-    f32 x;
-    f32 y;
-    f32 rx;
-    f32 rz;
-
-    x = 100.0f * c;
-    y = 100.0f * s;
-    rx = -angleABf(0.0f, 0.0f, 0.0f, y);
-    rz = -angleABf(0.0f, 0.0f, x, y);
-
-    effKemuTestSetRxRz(effNameToPtr("kemuri"), rx, rz);
-    effRippleN64SetRxRz(effNameToPtr("ripple"), rx, rz);
-    return EVT_RETURN_DONE;
-}
-
-static inline f32 dd_sin(f32 x) {
-    f32 a = 0.00761f;
-    f32 b = 0.16605f;
-    f32 c = 1.0f;
-    f32 y;
-    f32 x2;
-    if (x <= 3.1415927f) {
-        if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x;
-        } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y;
-        }
-    } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
-    } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a;
-    }
-    return a;
-}
-
-static inline f32 dd_cos(f32 x) {
-    f32 a = 0.03705f;
-    f32 b = 0.4967f;
-    f32 c = 1.0f;
-    f32 y;
-    f32 x2;
-    if (x <= 3.1415927f) {
-        if (x <= 1.5707964f) {
-            x2 = x * x; a = a * x2 - b; a = a * x2 + c;
-        } else {
-            y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
-        }
-    } else if (x < 4.712389f) {
-        y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a;
-    } else {
-        y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c;
-    }
-    return a;
-}
-
-#pragma opt_propagation off
-#pragma opt_lifetimes off
-static void depthDisp(CameraId camera, void* param) {
-    f32 amp = evtGetValue(NULL, GW(5)) / 100.0f;
-    CameraEntry* cam = camGetPtr(camera);
-    smartEntry* buf = smartAlloc(GXGetTexBufferSize(608, 480, GX_TF_RGB565, GX_FALSE, 0), 3);
-    GXTexObj obj;
-    Mtx mtx;
-    f32 a;
-    f32 s;
-    f32 c;
-    s32 i;
-    BOOL first;
-    GXTevColorArg carg;
-
-    GXSetTexCopySrc(0, 0, 608, 480);
-    GXSetTexCopyDst(608, 480, GX_TF_RGB565, GX_FALSE);
-    GXCopyTex(buf->address, GX_FALSE);
-    GXPixModeSync();
-    GXInitTexObj(&obj, buf->address, 608, 480, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    GXLoadTexObj(&obj, GX_TEXMAP0);
-    GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
-    GXSetZCompLoc(GX_TRUE);
-    GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-    GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-    GXSetNumChans(0);
-    GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetNumTexGens(8);
-    GXSetNumTevStages(8);
-    for (i = 0; i < 8; i++) {
-        a = 6.2831855f * i / 8.0f;
-        s = dd_sin(a);
-        c = dd_cos(a);
-        MTXTrans(mtx, (amp * s) / 100.0f, (amp * c) / 100.0f, 0.0f);
-        GXLoadTexMtxImm(mtx, GX_TEXMTX0 + i * 3, GX_MTX2x4);
-        GXSetTexCoordGen2((GXTexCoordID)i, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0 + i * 3, GX_FALSE, GX_PTIDENTITY);
-        GXSetTevKColorSel((GXTevStageID)i, GX_TEV_KCSEL_1_8);
-        GXSetTevKAlphaSel((GXTevStageID)i, GX_TEV_KASEL_1_8);
-        GXSetTevOrder((GXTevStageID)i, (GXTexCoordID)i, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp((GXTevStageID)i, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        first = !i;
-        carg = first ? GX_CC_ZERO : GX_CC_CPREV;
-        GXSetTevColorIn((GXTevStageID)i, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, carg);
-        GXSetTevAlphaIn((GXTevStageID)i, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, first ? GX_CA_ZERO : GX_CA_APREV);
-        GXSetTevSwapMode((GXTevStageID)i, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    }
-    GXLoadPosMtxImm(cam->view, GX_PNMTX0);
-    GXSetCurrentMtx(GX_PNMTX0);
-    GXSetCullMode(GX_CULL_BACK);
-    GXClearVtxDesc();
-    GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-    GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
-    GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 0);
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3s16(-304, 240, 0);
-    GXTexCoord2s16(0, 0);
-    GXPosition3s16(304, 240, 0);
-    GXTexCoord2s16(1, 0);
-    GXPosition3s16(304, -240, 0);
-    GXTexCoord2s16(1, 1);
-    GXPosition3s16(-304, -240, 0);
-    GXTexCoord2s16(0, 1);
-    GXEnd();
-    sysWaitDrawSync();
-}
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
-
-static USER_FUNC(depth) {
-    dispEntry(CAMERA_2D, 1200.0f, 0, depthDisp, NULL);
-    return EVT_RETURN_BLOCK;
-}
-
-static USER_FUNC(make_name) {
-    s32* args = event->args;
-    static char name[64];
-
-    sprintf(name, "S_hikari%d", evtGetValue(event, args[0]));
-    evtSetValue(event, args[1], (s32)name);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(make_ext_table_minnnanokoe) {
-    s32 i;
-
-    memset(ext_data, 0, sizeof(ext_data));
-    for (i = 0; i < 10; i++) {
-        EXT_DATA[i].file = "c_bom_sen";
-        EXT_DATA[i].name = "S_1";
-        EXT_DATA[i].time = 4.0f * i;
-    }
-    for (i = 0; i < 20; i++) {
-        EXT_DATA[10 + i].file = "c_bom_sen";
-        EXT_DATA[10 + i].name = "R_1";
-        EXT_DATA[10 + i].time = 2.0f * i;
-    }
-    EXT_DATA[30].file = NULL;
-    return EVT_RETURN_DONE;
-}
-
-void ext_init_minnnanokoe(void) {
-    s32 i;
-    BomWork* wp;
-    ExtPose* pose;
-    s32 x;
-    s32 z;
-
-    lp = smartAlloc(sizeof(BomWork), 1);
-    wp = lp->address;
-    memset(wp, 0, sizeof(BomWork));
-    wp->count = extGetPoseNum();
-    pose_init();
-
-    pose = extGetPosePtr();
-    for (i = 0; i < wp->count; i++, pose++) {
-        wp->bom[i].vy = 0.0f;
-        wp->bom[i].gravity = 0.0f;
-        wp->bom[i].state = 5;
-        pose->flags |= 3;
-        PSMTXIdentity(pose->mtx);
-        x = (i % 14) * 30 - 205 + rand() % 10;
-        z = 190 - (i / 14) * 20 + rand() % 20;
-        pose->mtx[0][3] = x;
-        pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = z;
-        pose->rot = 270.0f;
-        pose_change(i, "S_1");
-    }
-}
-
-void jump_minnnanokoe(s32 i, f32 h) {
-    BomWork* wp = lp->address;
-    ExtPose* pose = extGetPosePtr() + i;
-
-    wp->bom[i].target = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-    wp->bom[i].field_0x10 = 0.0f;
-    wp->bom[i].gravity = 0.1f;
-    wp->bom[i].timer = 20;
-    wp->bom[i].vy = h / wp->bom[i].timer + wp->bom[i].gravity * wp->bom[i].timer / 2;
-    wp->bom[i].next = 5;
-    wp->bom[i].state = 100;
-    if (evtGetValue(NULL, GSW(0)) != 401 && i % 5 == 0) {
-        Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-        psndSFXOn_3D("SFX_STG7_BOMB_TOGETHER2", &pos);
-    }
-}
-
-void ext_disp_minnnanokoe(CameraId camera, void* param) {
-    YamiParam yp;
-    ExtPose* pose = extGetPosePtr();
-    s32 i;
-
-    extLoadRenderMode();
-    extLoadVertex();
-    extLoadTexture();
-    extLoadTev();
-    for (i = 0; i < extGetPoseNum(); i++, pose++) {
-        yp.numTevStages = 1;
-        yp.field_0x10 = 1;
-        yp.numTexGens = 1;
-        yp.numIndStages = 0;
-        yp.mtx = pose->mtx;
-        envSetYami(&yp);
-        GXSetNumTexGens(yp.numTexGens);
-        GXSetNumTevStages(yp.numTevStages);
-        GXSetNumIndStages(yp.numIndStages);
-        extPoseDraw(i);
-    }
-    extLoadTextureExit();
-}
-
-void ext_dispent_minnnanokoe(void) {
-    dispEntry(CAMERA_3D, 0.0f, 1, ext_disp_minnnanokoe, NULL);
-}
-
-USER_FUNC(bom1000_msg) {
-    s32* args = event->args;
-    s32 type = evtGetValue(event, args[0]);
-    s32 idx = evtGetValue(event, args[1]);
-    ExtPose* pose = extGetPosePtr();
-    ExtPose* p;
-    s32 row;
-    s32 flag;
-    s32 n;
-
-    if (type == 0) {
-        row = 3;
-        flag = 1;
-    } else {
-        row = 10;
-        flag = 0;
-    }
-    n = idx + row * 14;
-    idx += (rand() % 2 + 1) * 4;
-    idx %= 14;
-    p = &pose[n];
-    evtSetValue(event, args[0], flag);
-    evtSetValue(event, args[1], idx);
-    evtSetFloat(event, args[2], p->mtx[0][3]);
-    evtSetFloat(event, args[3], p->mtx[2][3]);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(bom1000_jump) {
-    BomWork* wp = lp->address;
-    s32 i = rand() % wp->count;
-
-    s32 state = wp->bom[i].state;
-
-    if (state != 100) {
-        jump_minnnanokoe(i, 10.0f);
-    }
-    return EVT_RETURN_DONE;
-}
-
-void envSetYamiView(Mtx mtx);
-
-static USER_FUNC(yami_view) {
-    f32 z = evtGetFloat(event, event->args[0]);
-    Mtx mtx;
-
-    C_MTXLookAt(mtx, &(Vec){0.0f, 100.0f, 100.0f + z}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){0.0f, 0.0f, z});
-    envSetYamiView(mtx);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(anim_tevcallback) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    s32 flag = evtGetValue(event, args[1]);
-    NpcEntry* npc = npcNameToPtr_NoAssert(name);
-
-    if (npc == NULL) {
-        return EVT_RETURN_DONE;
-    }
-    animPoseSetMaterialFlagOn(npc->poseId, (flag & 0xF) << 24);
-    return EVT_RETURN_DONE;
-}
-
-EffectEntry* effStarStoneEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-
-static USER_FUNC(starstone_entry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-
-    effSetName(effStarStoneEntry(6, x, y, z, 1.0f), name);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_set_pos) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 y = evtGetFloat(event, args[2]);
-    f32 z = evtGetFloat(event, args[3]);
-    EffectEntry* eff = effNameToPtr(name);
-
-    ((f32*)eff->userdata)[2] = x;
-    ((f32*)eff->userdata)[3] = y;
-    ((f32*)eff->userdata)[4] = z;
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(starstone_set_ry) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    f32 ry = evtGetFloat(event, args[1]);
-
-    ((f32*)effNameToPtr(name)->userdata)[7] = ry;
-    return EVT_RETURN_DONE;
-}
 

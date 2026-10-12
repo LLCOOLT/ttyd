@@ -65,13 +65,13 @@ void slot_neon_sub(GoryuuWork* wp, SlotWork* data) {
     }
     if (data->flags & 2) {
         if (data->neonCount == 0 || data->neonCount == 12 || data->neonCount == 24) {
-            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
         }
         if (data->neonCount == 6 || data->neonCount == 18) {
-            mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[1], 0, 0);
+            mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
         }
     } else if (data->neonCount == 24) {
-        mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[0], 0, 0);
+        mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 14], 0, 0);
     }
     if (data->neonCount <= 78) {
         data->neonCount++;

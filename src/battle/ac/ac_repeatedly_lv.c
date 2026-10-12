@@ -1,0 +1,503 @@
+#include "battle/battle.h"
+#include "battle/battle_ac.h"
+#include "battle/battle_pad.h"
+#include "battle/battle_unit.h"
+#include "driver/camdrv.h"
+#include "driver/icondrv.h"
+#include "system.h"
+#include <string.h>
+
+#pragma optimize_for_size on
+
+s32 BattleACGetButtonIcon(s32 button, s32 pressed);
+void BattleAcDrawGauge(f32 anim, s32 x, s32 y, u8 a, s32 n, s32 v0, s32 v1, s32 v2, s32 flags);
+void BattleAcGaugeSeInit(void);
+void BattleAcGaugeSeDelete(void);
+void BattleAcGaugeSeUpdate(f32 gauge);
+
+typedef struct RepeatedlyLvDisp {
+    u8 field_0x0[0xC];
+    GXColor color; // 0xC
+    s8 delta[4];   // 0x10
+    f32 iconX;     // 0x14
+    f32 iconY;     // 0x18
+    u8 field_0x1C[4];
+    s32 timer; // 0x20
+    u8 field_0x24[4];
+    f32 gaugeAnim; // 0x28
+} RepeatedlyLvDisp;
+
+typedef struct RepeatedlyLvWork {
+    u32 mask;    // 0x0
+    u32 maskA;   // 0x4
+    u32 maskB;   // 0x8
+    u32 maxMask; // 0xC
+    f32 rate;    // 0x10
+    f32 gauge;   // 0x14
+    s16 s18;     // 0x18
+    s16 s1a;     // 0x1A
+    s16 s1c;     // 0x1C
+    s16 s1e;     // 0x1E
+    s16 s20;     // 0x20
+    s16 s22;     // 0x22
+    u8 u24;      // 0x24
+    s8 state;    // 0x25
+    u8 u26;      // 0x26
+    u8 u27;      // 0x27
+    u8 pad[8];
+    s32 endTimer; // 0x30
+} RepeatedlyLvWork;
+
+#define RL_PadNow ((s32(*)(s32))BattlePadCheckNow)
+#define RL_PadUp ((s32(*)(s32))BattlePadCheckUp)
+#define RL_IconDisp ((void (*)(Vec*, s16, s32, f32))iconDispGx)
+#define RL_AC(ac, off, T) (*(T*)((u8*)(ac) + (off)))
+
+static void _init_param(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
+    s32 v;
+    p->maxMask = 0;
+    p->u27 = 1;
+    switch (RL_AC(ac, 0x38, s32)) {
+        case 2:
+            p->mask = p->maskA = p->maskB = 0x200;
+            break;
+        case 3:
+            p->mask = p->maskA = p->maskB = 0x400;
+            break;
+        case 4:
+            p->mask = p->maskA = p->maskB = 0x800;
+            break;
+        case 5:
+            p->mask = p->maskA = p->maskB = 0x20;
+            break;
+        case 8:
+            p->maxMask = 0x100;
+        case 7:
+            p->u27 = 0;
+        case 6:
+            p->mask = p->maskA = p->maskB = 0x40000;
+            break;
+        case 11:
+            p->mask = p->maskA = 0x100;
+            p->maskB = 0x200;
+            break;
+        case 12:
+            p->mask = p->maskA = 0x400;
+            p->maskB = 0x800;
+            break;
+        case 13:
+            p->mask = p->maskA = 0x10000;
+            p->maskB = 0x20000;
+            break;
+        case 14:
+            p->mask = p->maskA = 0x40000;
+            p->maskB = 0x80000;
+            break;
+        case 15:
+            p->mask = p->maskA = 0x40;
+            p->maskB = 0x20;
+            break;
+        default:
+            p->mask = p->maskA = p->maskB = 0x100;
+            break;
+    }
+    p->s22 = 0;
+    p->s1e = p->s20 = RL_AC(ac, 0x3C, s32);
+    p->s18 = 0;
+    p->gauge = 0.0f;
+    p->s1c = 0;
+    p->u24 = RL_AC(ac, 0x40, s32);
+    p->s1a = RL_AC(ac, 0x44, s32);
+    p->rate = 0.01f * (f32)RL_AC(ac, 0x48, s32);
+    p->u26 = RL_AC(ac, 0x4C, s32);
+    v = *(s16*)((u8*)work + 0x1D18);
+    if (v > 0) {
+        *(s16*)((u8*)work + 0x1D18) = v - 1;
+        p->state = 1;
+    } else {
+        p->state = 0;
+    }
+    RL_AC(ac, 0x60, s32) = 0;
+    RL_AC(ac, 0x58, s32) = 0;
+    RL_AC(ac, 0x5C, s32) = 0;
+}
+
+void battleAcDelete_RepeatedlyLv(BattleWork* work);
+
+s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
+    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)((u8*)ac + 0x290);
+    s32 hit = 0;
+    s32 autoCmd = 0;
+    s32 r;
+    s32 g;
+
+    if (ac->mAcUnit->badgesEquipped.AutoCommand) {
+        autoCmd = 1;
+    }
+    switch (ac->mAcState) {
+        case 0:
+            memset(disp, 0, sizeof(RepeatedlyLvDisp));
+            disp->iconX = -300.0f;
+            disp->iconY = 0.0f;
+            disp->timer = 20;
+            disp->color = (GXColor){255, 255, 255, 255};
+            disp->delta[0] = 0;
+            disp->delta[1] = -16;
+            disp->delta[2] = -16;
+            disp->delta[3] = 0;
+            disp->gaugeAnim = 0.0f;
+            ac->result = 1;
+            _init_param(work);
+            ac->mAcState = 99;
+            break;
+        case 99:
+            break;
+        case 100:
+            if (!((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction))) {
+                if (p->maxMask != 0 && !RL_PadNow(p->maxMask) && !autoCmd) {
+                    p->s22++;
+                    if (p->s22 < 150) {
+                        break;
+                    }
+                    RL_AC(ac, 0x60, s32) = 0;
+                    ac->result &= ~1;
+                    ac->result |= 2;
+                    ac->mAcState = 1002;
+                    break;
+                }
+            }
+            BattleAcGaugeSeInit();
+            RL_AC(ac, 0x58, s32) = 1;
+            ac->mAcState = 1000;
+        case 1000:
+            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+                if (ac->field_0x4 & 2) {
+                    ac->field_0x8--;
+                    if (ac->field_0x8 >= 0) {
+                        break;
+                    }
+                }
+                ac->result &= ~1;
+                ac->result |= 2;
+                r = irand(100);
+                p->s18 = 0;
+                while (r < 0) {
+                    r -= p->u26;
+                    if (r < 0) {
+                        break;
+                    }
+                    p->s18++;
+                }
+                RL_AC(ac, 0x60, s32) = p->s18;
+                ac->mResultCount++;
+                battleAcDelete_RepeatedlyLv(work);
+                return 0;
+            }
+            switch (RL_AC(ac, 0x38, s32)) {
+                case 11:
+                case 12:
+                case 13:
+                case 14:
+                case 15:
+                    if (p->s1c & 1) {
+                        p->mask = p->maskB;
+                    } else {
+                        p->mask = p->maskA;
+                    }
+                    break;
+            }
+            if (p->u27) {
+                if (RL_AC(ac, 0x34, u32) & 0x20) {
+                    if (RL_PadNow(p->mask)) {
+                        hit = 1;
+                        p->s1c++;
+                    }
+                } else {
+                    if (BattlePadCheckTrigger(p->mask)) {
+                        hit = 1;
+                        p->s1c++;
+                    }
+                }
+            } else {
+                if (RL_PadUp(p->mask)) {
+                    hit = 1;
+                    p->s1c++;
+                }
+            }
+            if (autoCmd && !hit) {
+                hit = 1;
+                p->s1c++;
+            }
+            if (p->state == 0) {
+                if (hit) {
+                    p->gauge = 0.4f * (f32)p->s1a + p->gauge;
+                }
+                if (p->gauge >= 100.0f) {
+                    p->gauge = 100.0f;
+                    p->state = 1;
+                    if (RL_AC(ac, 0x34, u32) & 0x20) {
+                        p->state = -1;
+                    }
+                } else {
+                    p->gauge = p->gauge - p->rate;
+                    if (p->gauge <= 0.0f) {
+                        p->gauge = 0.0f;
+                    }
+                }
+            } else if (p->state == -1) {
+                p->gauge = p->gauge - 1.5f * p->rate;
+                if (p->gauge <= 0.0f) {
+                    p->gauge = 0.0f;
+                    p->state = 0;
+                }
+            }
+            RL_AC(ac, 0x5C, s32) = (s32)p->gauge;
+            g = (s32)p->gauge;
+            if (p->u26 == 0) {
+                p->u26 = 100;
+            }
+            p->s18 = 0;
+            while (g > 0) {
+                g -= p->u26;
+                p->s18++;
+                if (g <= 0) {
+                    break;
+                }
+            }
+            if (p->s18 == 0 && (RL_AC(ac, 0x34, u32) & 0x40)) {
+                p->s18 = 1;
+            }
+            if (p->state && !(RL_AC(ac, 0x34, u32) & 1)) {
+                p->s18++;
+            }
+            RL_AC(ac, 0x60, s32) = p->s18;
+            if (p->maxMask != 0 && !RL_PadNow(p->maxMask)) {
+                p->s20 = 0;
+            }
+            BattleAcGaugeSeUpdate(p->gauge);
+            if (p->s20 > 0) {
+                p->s20--;
+                break;
+            }
+            ac->result &= ~1;
+            if (p->gauge >= (f32)RL_AC(ac, 0x50, s32)) {
+                ac->result |= 2;
+            } else {
+                ac->result &= ~2;
+            }
+            battleAcDelete_RepeatedlyLv(work);
+            ac->mAcState = 1002;
+            break;
+        case 1002:
+            p->endTimer = 60;
+            ac->mAcState = 1003;
+            break;
+        case 1003:
+            p->endTimer--;
+            if (p->endTimer <= 0) {
+                ac->mAcState = 1004;
+            }
+            break;
+        case 1004:
+            ac->maincb = NULL;
+            ac->dispcb = NULL;
+            ac->resultcb = NULL;
+            ac->deletecb = NULL;
+            break;
+    }
+    return 1;
+}
+
+s32 battleAcResult_RepeatedlyLv(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+static void actionCommandDisp(f32 x, f32 y);
+
+void battleAcDisp_RepeatedlyLv(CameraId cameraId, BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    switch (ac->mAcState) {
+        case 99:
+        case 100:
+        case 1000:
+        case 1001:
+            disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] > 0) {
+                (*(s32*)&disp->field_0x1C[4])--;
+            }
+            break;
+        case 1002:
+        case 1003:
+            if (*(s32*)&disp->field_0x1C[4] >= 40) {
+                disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+            } else {
+                disp->iconX = 30.0f;
+            }
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] < 60) {
+                (*(s32*)&disp->field_0x1C[4])++;
+            }
+            break;
+    }
+}
+
+void battleAcDelete_RepeatedlyLv(BattleWork* work) {
+    work->actionCommands.mAcState = 1002;
+    BattleAcGaugeSeDelete();
+}
+
+#pragma dont_inline on
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    RepeatedlyLvWork* p = (RepeatedlyLvWork*)((u8*)ac + 0x2BC);
+    RepeatedlyLvDisp* disp = (RepeatedlyLvDisp*)((u8*)ac + 0x290);
+    s32 arr[4];
+    s32 i, count, flags, phase;
+    f32 target;
+    camGetPtr(8);
+    {
+    s32 numIcons;
+    s32 pressedA, idleA, pressedB, idleB;
+    s32 off0, off1;
+    idleB = 0;
+    pressedB = 0;
+    numIcons = 1;
+    RL_AC(ac, 0x290, s32)++;
+    off1 = 0;
+    off0 = 0;
+    pressedA = BattleACGetButtonIcon(p->mask, 1);
+    idleA = BattleACGetButtonIcon(p->mask, 0);
+    switch (RL_AC(ac, 0x38, s32)) {
+        case 15:
+            off0 = -10;
+            off1 = 10;
+        case 11:
+        case 12:
+            pressedA = BattleACGetButtonIcon(p->maskA, 1);
+            idleA = BattleACGetButtonIcon(p->maskA, 0);
+            pressedB = BattleACGetButtonIcon(p->maskB, 1);
+            idleB = BattleACGetButtonIcon(p->maskB, 0);
+            numIcons = 2;
+            break;
+        case 13:
+            pressedA = 0x7C;
+            idleA = 0x76;
+            break;
+        case 14:
+            pressedA = 0x78;
+            idleA = 0x7A;
+            break;
+    }
+    phase = RL_AC(ac, 0x290, s32) / 7;
+    if (numIcons == 1) {
+        if ((phase & 1) == 1) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = -200.0f + x;
+            pos.y = 70.0f + y;
+            RL_IconDisp(&pos, 0x10, idleA, 1.0f);
+        } else {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = -200.0f + x;
+            pos.y = 70.0f + y;
+            RL_IconDisp(&pos, 0x10, pressedA, 1.0f);
+        }
+    } else {
+        if ((phase & 1) == 1) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = -225.0f + x + off0;
+            pos.y = 70.0f + y;
+            RL_IconDisp(&pos, 0x10, idleA, 1.0f);
+            {
+                Vec pos2 = {0.0f, 0.0f, 0.0f};
+                pos2.x = -175.0f + x + off1;
+                pos2.y = 70.0f + y;
+                RL_IconDisp(&pos2, 0x10, pressedB, 1.0f);
+            }
+        } else {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = -225.0f + x + off0;
+            pos.y = 70.0f + y;
+            RL_IconDisp(&pos, 0x10, pressedA, 1.0f);
+            {
+                Vec pos2 = {0.0f, 0.0f, 0.0f};
+                pos2.x = -175.0f + x + off1;
+                pos2.y = 70.0f + y;
+                RL_IconDisp(&pos2, 0x10, idleB, 1.0f);
+            }
+        }
+    }
+    }
+    target = p->gauge / 100.0f;
+    if (disp->gaugeAnim <= target) {
+        if (RL_AC(ac, 0x34, u32) & 8) {
+            disp->gaugeAnim += 0.02f;
+        } else {
+            disp->gaugeAnim += 0.01f;
+        }
+        if (RL_AC(ac, 0x34, u32) & 0x10) {
+            disp->gaugeAnim = target;
+        }
+        if (disp->gaugeAnim > target) {
+            disp->gaugeAnim = target;
+        }
+    } else {
+        if (RL_AC(ac, 0x34, u32) & 8) {
+            disp->gaugeAnim -= 0.02f;
+        } else {
+            disp->gaugeAnim -= 0.01f;
+        }
+        if (RL_AC(ac, 0x34, u32) & 0x10) {
+            disp->gaugeAnim = target;
+        }
+        if (disp->gaugeAnim < target) {
+            disp->gaugeAnim = target;
+        }
+    }
+    count = 0;
+    flags = 0;
+    if (p->state == 1 && disp->gaugeAnim >= 1.0f) {
+        flags |= 1;
+        disp->color.g += disp->delta[1];
+        disp->color.b += disp->delta[2];
+        if (disp->color.g <= 0x80 && disp->delta[1] < 0) {
+            disp->delta[1] = disp->delta[2] = 0x10;
+        }
+        if (disp->color.g >= 0xF5 && disp->delta[1] > 0) {
+            disp->delta[1] = disp->delta[2] = -0x10;
+        }
+    }
+    if ((s8)p->state == -1) {
+        flags |= 2;
+    }
+    for (i = 0; i < 4; i++) {
+        arr[i] = 100;
+    }
+    for (i = 0; i < 4; i++, count++) {
+        arr[i] = ((s32*)ac)[i + 0x1E];
+        if (i != 0 && arr[i] - arr[i - 1] <= 0) {
+            break;
+        }
+    }
+    BattleAcDrawGauge(disp->gaugeAnim, (s32)x, (s32)y, p->u24, count, arr[0], arr[1], arr[2], flags);
+    if (RL_AC(ac, 0x34, u32) & 2) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -288.0f + x + (f32)(RL_AC(ac, 0x50, s32) * 0xB0) / 100.0f;
+        pos.y = 45.0f + y;
+        RL_IconDisp(&pos, 0x10, 0x96, 1.0f);
+    }
+    if (RL_AC(ac, 0x34, u32) & 4) {
+        Mtx m3, m1, m2;
+        s32 number = RL_AC(ac, 0x60, s32) + RL_AC(ac, 0x54, s32);
+        { f32 w = 108.0f; PSMTXTrans(m1, -200.0f + x + w, 25.0f + y, 0.0f); }
+        PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
+        PSMTXConcat(m1, m2, m3);
+        iconNumberDispGx(m3, number, FALSE, (GXColor){255, 255, 255, 255});
+    }
+}

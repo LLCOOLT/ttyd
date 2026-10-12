@@ -1,0 +1,951 @@
+#include "driver/camdrv.h"
+#include "driver/hitdrv.h"
+#include "evt/evt_cmd.h"
+#include "evt/evt_npc.h"
+#include "mario/mario.h"
+#include "mario/mariost.h"
+#include "manager/evtmgr.h"
+#include "manager/evtmgr_cmd.h"
+#include "party.h"
+#include "system.h"
+
+#define PF(p, off) (*(f32*)((u8*)(p) + (off)))
+#define PS(p, off) (*(s32*)((u8*)(p) + (off)))
+#define PU(p, off) (*(u32*)((u8*)(p) + (off)))
+#define GETPARTY(args) partyGetPtr((args)[0] == 0 ? partyCtrlNo : 1)
+#define PARTY_ID(args) ((args)[0] == 0 ? partyCtrlNo : 1)
+
+extern s32 partyCtrlNo;
+extern f32 revise360(f32);
+extern f32 toMovedirSimple(f32);
+extern void partyChgRunMode(PartyEntry* party, s32 mode);
+extern void partyChgMot(PartyEntry* party, s32 mot);
+extern void partyChgPose();
+extern void partyChgPoseId();
+extern void partySetForceMove();
+extern void partyMoveBesideMario();
+extern void partyMoveBehindMario();
+extern void partyRun(PartyEntry* party);
+extern void partyStop(PartyEntry* party);
+extern void partySetCamId();
+extern void partyInitCamId(PartyEntry* party);
+extern void partyClearFootmark(void);
+extern void* partySearchGround();
+extern void* partyHitCheck();
+extern void* searchUnder2();
+extern void unk_800ba2dc(PartyEntry* party);
+extern s32 nokonokoGetStatus();
+extern void nokotaro_hold_cancel(PartyEntry* party);
+extern s32 yoshiGetStatus();
+extern s32 bomheiGetStatus();
+extern s32 vivianGetStatus();
+extern void vivianUnhold(PartyEntry* party);
+extern void L_partyVivianTailStart();
+extern void L_partyVivianTailStop();
+extern void marioGetoffYoshi();
+extern void evt_set_yoshi_spd();
+extern void evt_set_yoshi_frm();
+extern s32 evt_get_yoshi_frm();
+extern s32 cloudGetStatus();
+
+USER_FUNC(evt_party_flg_onoff) {
+	PartyEntry* p;
+	u32 mask;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	mask = args[1];
+	if (evtGetValue(event, args[2])) {
+		p->flags |= mask;
+	} else {
+		p->flags &= ~mask;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_dispflg_onoff) {
+	PartyEntry* p;
+	u32 mask;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	mask = args[1];
+	if (evtGetValue(event, args[2])) {
+		p->flags2 |= mask;
+	} else {
+		p->flags2 &= ~mask;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_800e71bc) {
+	PartyEntry* p;
+	u32 mask;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	mask = args[1];
+	if (evtGetValue(event, args[2])) {
+		p->field_8 |= mask;
+	} else {
+		p->field_8 &= ~mask;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_cont_onoff) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (evtGetValue(event, args[1]) == 0) {
+		((void (*)())partyCtrlOff)();
+	} else {
+		((void (*)())partyCtrlOn)();
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_init_camid) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	partyInitCamId(p);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_camid) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	partySetCamId(p, evtGetValue(event, args[1]));
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_force_reset_outofscreen) {
+	void* mw;
+	PartyEntry* p = GETPARTY(event->args);
+	Vec from;
+	Vec dir;
+	Vec out1;
+	Vec out2;
+	Vec pos;
+	Vec pos2;
+	f32 sx, sy, sz;
+	f32 h;
+	f32 ang;
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	pos = p->position;
+	marioGetScreenPos(pos, &sx, &sy, &sz);
+	if (marioChkInScreen((s32)sx, (s32)sy)) {
+		return EVT_RETURN_DONE;
+	}
+	partyClearFootmark();
+	mw = p->playerPtr;
+	dir = (Vec){0.0f, -1.0f, 0.0f};
+	while (1) {
+		pos2 = p->position;
+		marioGetScreenPos(pos2, &sx, &sy, &sz);
+		if (marioChkInScreen((s32)sx, (s32)sy)) {
+			break;
+		}
+		ang = angleABf(PF(p, 0x58), PF(p, 0x60), PF(mw, 0x8C), PF(mw, 0x94));
+		movePos(&p->position.x, &p->position.z, 1.0f, ang);
+		h = 100.0f;
+		from = p->position;
+		from.y += 50.0f;
+		if (partyHitCheck(p, &from, &dir, &out1, &out2, &h) != NULL) {
+			PF(p, 0x5C) = out1.y;
+		} else {
+			PF(p, 0x5C) = PF(mw, 0x90);
+		}
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_outofscreen) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	evtSetFloat(event, args[1], (f32)(s32)(((p->flags2 >> 23) & 1) ^ 1));
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_pos) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	PF(p, 0x58) = evtGetFloat(event, args[1]);
+	PF(p, 0x5C) = evtGetFloat(event, args[2]);
+	PF(p, 0x60) = evtGetFloat(event, args[3]);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_hosei_xyz) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	PF(p, 0xAC) = evtGetFloat(event, args[1]);
+	PF(p, 0xB0) = evtGetFloat(event, args[2]);
+	PF(p, 0xB4) = evtGetFloat(event, args[3]);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_get_pos) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		evtSetFloat(event, args[1], -5000.0f);
+		evtSetFloat(event, args[2], -5000.0f);
+		evtSetFloat(event, args[3], -5000.0f);
+		return EVT_RETURN_DONE;
+	}
+	evtSetFloat(event, args[1], PF(p, 0x58));
+	evtSetFloat(event, args[2], PF(p, 0x5C));
+	evtSetFloat(event, args[3], PF(p, 0x60));
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_dir) {
+	s32* args = event->args;
+	PartyEntry* p;
+	f32 ang, t, st;
+	s32 fr, v, c;
+	if (isFirstCall) {
+		s32 id = (*args++ == 0) ? partyCtrlNo : 1;
+		event->userdata[0] = id;
+		p = partyGetPtr(event->userdata[0]);
+		if (p == NULL) {
+			return EVT_RETURN_DONE;
+		}
+		event->userdata[2] = 0;
+		event->userdataf[1] = PF(p, 0x10C);
+	} else {
+		args++;
+	}
+	ang = evtGetFloat(event, args[0]);
+	v = evtGetValue(event, args[1]);
+	if (v >= 0) {
+		fr = sysMsec2Frame(v);
+	} else {
+		fr = v;
+	}
+	p = partyGetPtr(event->userdata[0]);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (fr > 0) {
+		t = revise360(270.0f - ang);
+		st = event->userdataf[1];
+		PF(p, 0x10C) = revise360(st + (t - st) * ((f32)event->userdata[2] / (f32)fr));
+		PF(p, 0x110) = PF(p, 0x10C);
+		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+		c = event->userdata[2] + 1;
+		event->userdata[2] = c;
+		return c > fr;
+	} else if (fr < 0) {
+		PF(p, 0x110) = revise360(270.0f - ang);
+		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+	} else if (fr == 0) {
+		PF(p, 0x10C) = revise360(270.0f - ang);
+		PF(p, 0x110) = PF(p, 0x10C);
+		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_dir_npc) {
+	s32* args = event->args;
+	PartyEntry* p = partyGetPtr(args[0]);
+	NpcEntry* npc;
+	s32 nm;
+	f32 x, z, camYaw, a;
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		nm = evtGetValue(event, args[1]);
+		npc = evtNpcNameToPtr(event, (const char*)nm);
+		if (npc == NULL) {
+			return EVT_RETURN_DONE;
+		}
+		x = PF(npc, 0x8C);
+		z = PF(npc, 0x94);
+		camYaw = PF(camGetPtr(4), 0x114);
+		a = revise360(angleABf(PF(p, 0x58), PF(p, 0x60), x, z) - camYaw);
+		PF(p, 0x110) = (a < 180.0f) ? 180.0f : 0.0f;
+		PF(p, 0x100) = a;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_dir_pos) {
+	s32* args = event->args;
+	PartyEntry* p = partyGetPtr(args[0]);
+	f32 x, z, camYaw, a;
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	x = evtGetValue(event, args[1]);
+	z = evtGetValue(event, args[2]);
+	camYaw = PF(camGetPtr(4), 0x114);
+	a = revise360(angleABf(PF(p, 0x58), PF(p, 0x60), x, z) - camYaw);
+	PF(p, 0x110) = (a < 180.0f) ? 180.0f : 0.0f;
+	PF(p, 0x100) = a;
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_get_dispdir) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		evtSetFloat(event, args[1], 0.0f);
+	} else {
+		evtSetFloat(event, args[1], PF(p, 0x10C));
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_dispdir) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	PF(p, 0x110) = reviseAngle(evtGetFloat(event, args[1]));
+	PF(p, 0x10C) = PF(p, 0x110);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_stop) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p != NULL) {
+		partyStop(p);
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_run) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p != NULL) {
+		partyRun(p);
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_move_pos) {
+	PartyEntry* p;
+	s32* args = event->args;
+	f32 x, z, spd;
+	if (isFirstCall) {
+		event->userdata[2] = 0;
+	}
+	event->userdata[0] = PARTY_ID(args);
+	p = partyGetPtr(event->userdata[0]);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (event->userdata[2] == 0) {
+		u8 t = p->field_34;
+		if (t != 0 && (u8)(t - 1) > 1) {
+			return EVT_RETURN_BLOCK;
+		}
+		event->userdata[2] = 1;
+		x = evtGetFloat(event, args[1]);
+		z = evtGetFloat(event, args[2]);
+		event->userdata[1] = sysMsec2Frame(evtGetValue(event, args[3]));
+		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		if (event->userdata[1] == 0) {
+			event->userdata[1] = (s32)(distABf(PF(p, 0x58), PF(p, 0x60), x, z) / PF(p, 0x104));
+			spd = PF(p, 0x104);
+		} else {
+			spd = distABf(PF(p, 0x58), PF(p, 0x60), x, z) / event->userdata[1];
+		}
+		partySetForceMove(p, event->userdata[1], PF(p, 0x100), spd);
+	}
+	if (--event->userdata[1] < 0) {
+		return EVT_RETURN_YIELD;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_party_move_pos2) {
+	PartyEntry* p;
+	s32* args = event->args;
+	f32 x, z, spd, dist, q, a2;
+	if (isFirstCall) {
+		event->userdata[2] = 0;
+	}
+	event->userdata[0] = PARTY_ID(args);
+	p = partyGetPtr(event->userdata[0]);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (event->userdata[2] == 0) {
+		u8 t = p->field_34;
+		if (t != 0 && (u8)(t - 1) > 1) {
+			return EVT_RETURN_BLOCK;
+		}
+		event->userdata[2] = 1;
+		x = evtGetFloat(event, args[1]);
+		z = evtGetFloat(event, args[2]);
+		spd = evtGetFloat(event, args[3]);
+		dist = distABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		q = dist / spd;
+		partySetForceMove(p, (s32)(gp->framerate * q), PF(p, 0x100), spd / gp->framerate, q);
+	}
+	if (p->field_28 == 0) {
+		return EVT_RETURN_DONE;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_party_wait_landon) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	return ((p->flags >> 1) & 1) ? 2 : 0;
+}
+
+USER_FUNC(evt_party_jump_pos) {
+	PartyEntry* p;
+	s32* args = event->args;
+	f32 y, ff, half, dy, x, z, hgt, g;
+	s32 ms, mode;
+	f32 tmp[2];
+	if (isFirstCall) {
+		PartyEntry* q;
+		s32 id = (*args++ == 0) ? partyCtrlNo : 1;
+		event->userdata[0] = id;
+		q = partyGetPtr(event->userdata[0]);
+		if (q == NULL) {
+			return EVT_RETURN_DONE;
+		}
+		if (q->field_34 == 0xB) {
+			return EVT_RETURN_DONE;
+		}
+		event->field_84 = 0;
+		partyChgMot(q, 8);
+		partyChgRunMode(q, 9);
+	} else {
+		args++;
+	}
+	p = partyGetPtr(event->userdata[0]);
+	x = evtGetFloat(event, args[0]);
+	y = evtGetFloat(event, args[1]);
+	z = evtGetFloat(event, args[2]);
+	ms = evtGetValue(event, args[3]);
+	mode = evtGetValue(event, args[4]);
+	hgt = evtGetFloat(event, args[5]);
+	if (hgt <= -1000.0f) {
+		hgt = 20.0f;
+	}
+	ff = sysMsec2Frame(ms);
+	switch (event->field_84) {
+	case 0:
+		PU(p, 0x13C) = PU(p, 0x138);
+		PU(p, 0x138) = 0;
+		PF(p, 0x104) = distABf(PF(p, 0x58), PF(p, 0x60), x, z) / ff;
+		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		if (mode == 0) {
+			PF(p, 0xFC) = PF(p, 0x100);
+		}
+		partyChgPoseId(p, 4);
+		dy = y - PF(p, 0x5C);
+		half = 0.5f * ff;
+		if (__fabsf(dy) < 1.0f) {
+			dy = hgt;
+		} else if (dy >= 0.0f) {
+			dy += 37.0f;
+		} else if (searchUnder2(tmp, x, y, z) != NULL) {
+			dy = hgt;
+		}
+		g = (dy + dy) / (half * half - half);
+		PF(p, 0x114) = g * half;
+		PF(p, 0x174) = -g;
+		event->userdata[2] = (s32)(0.5f + half);
+		event->field_84 = 1;
+	case 1:
+		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), PF(p, 0x104), PF(p, 0x100));
+		PF(p, 0x5C) += PF(p, 0x114);
+		PF(p, 0x114) += PF(p, 0x174);
+		if (--event->userdata[2] <= 0) {
+			half = 0.5f * ff;
+			PF(p, 0x114) = 0.0f;
+			PF(p, 0x174) = ((y - PF(p, 0x5C)) + (y - PF(p, 0x5C))) / (half * half - half);
+			PF(p, 0x11C) = 0.0f;
+			event->userdata[2] = (s32)(0.5f + half);
+			event->field_84 = 2;
+		}
+		break;
+	case 2:
+		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), PF(p, 0x104), PF(p, 0x100));
+		PF(p, 0x114) += PF(p, 0x174);
+		mode = 0;
+		ff = PF(p, 0x114);
+		{
+			void* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
+			if (hit != NULL && PF(p, 0x5C) + ff <= PF(p, 0xE4)) {
+				PU(p, 0x138) = (u32)hit;
+				mode = 1;
+				PF(p, 0x5C) = PF(p, 0xE4);
+				p->flags &= ~0x70;
+			}
+		}
+		if (mode) {
+			event->userdata[2] = 0;
+		} else {
+			PF(p, 0x5C) += PF(p, 0x114);
+		}
+		if (--event->userdata[2] <= 0) {
+			partyChgPoseId(p, 1);
+			PF(p, 0x11C) = 0.0f;
+			PF(p, 0x174) = 0.0f;
+			PF(p, 0x104) = 0.0f;
+			unk_800ba2dc(p);
+			return EVT_RETURN_YIELD;
+		}
+		break;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_party_move_behind_mario) {
+	PartyEntry* p;
+	s32* args = event->args;
+	s32 v;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	v = evtGetValue(event, args[1]);
+	partyMoveBehindMario(p, v);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_move_beside_mario) {
+	PartyEntry* p;
+	s32* args = event->args;
+	s32 v;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	v = evtGetValue(event, args[1]);
+	partyMoveBesideMario(p, v);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_homing_dist) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	PF(p, 0x40) = evtGetValue(event, args[1]);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_pose) {
+	PartyEntry* p;
+	s32* args = event->args;
+	s32 v;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	v = evtGetValue(event, args[1]);
+	partyChgPose(p, v);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_sleep_on) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p != NULL) {
+		partyChgPoseId(p, 6);
+		p->flags |= 0x400000;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_sleep_off) {
+	PartyEntry* p = GETPARTY(event->args);
+	if (p != NULL) {
+		partyChgPoseId(p, 1);
+		p->flags &= ~0x400000;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_set_breed_pose) {
+	PartyEntry* p;
+	s32* args = event->args;
+	s32 v;
+	p = GETPARTY(args);
+	if (p != NULL) {
+		v = evtGetValue(event, args[1]);
+	partyChgPoseId(p, v);
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(L_evt_party_dokan) {
+	PartyEntry* p;
+	s32 dst, v;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	dst = args[1];
+	if (p->field_34 == 0xB || p->field_34 == 0xC) {
+		v = 0;
+	} else {
+		v = 1;
+	}
+	evtSetValue(event, dst, v);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_get_status) {
+	s32* args = event->args;
+	s32 id = args[0];
+	s32 dst = args[1];
+	s32 st;
+	switch (id) {
+	case 6:
+		st = vivianGetStatus();
+		evtSetValue(event, dst, st);
+		break;
+	case 3:
+		evtSetValue(event, dst, bomheiGetStatus());
+		break;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_get_name_hitobj_head) {
+	PartyEntry* p;
+	s32* args;
+	const char* name = NULL;
+	s32 dst;
+	args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	dst = args[1];
+	if (PU(p, 0x140) != 0) {
+		name = hitGetName((HitEntry*)PU(p, 0x140));
+	}
+	evtSetValue(event, dst, (s32)name);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_get_name_hitobj_ride) {
+	PartyEntry* p;
+	s32* args;
+	const char* name = NULL;
+	s32 dst;
+	args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	dst = args[1];
+	if (PU(p, 0x138) != 0) {
+		name = hitGetName((HitEntry*)PU(p, 0x138));
+	}
+	evtSetValue(event, dst, (s32)name);
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_thunders_use) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (bomheiGetStatus() != 0) {
+			return EVT_RETURN_DONE;
+		}
+		p->flags |= 0x80000000;
+		p->flags |= 0x100;
+		partyChgRunMode(p, 3);
+	}
+	if (bomheiGetStatus() != 0) {
+		return EVT_RETURN_BLOCK;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_vivian_hold) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (vivianGetStatus() != 0) {
+			return EVT_RETURN_DONE;
+		}
+		p->flags |= 0x80000000;
+		p->flags |= 0x100;
+		partyChgRunMode(p, 3);
+	}
+	if (vivianGetStatus() != 2) {
+		return EVT_RETURN_BLOCK;
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_vivian_unhold) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (vivianGetStatus() == 2) {
+			vivianUnhold(p);
+		}
+	}
+	return vivianGetStatus() == 0 ? 2 : 0;
+}
+
+USER_FUNC(L_evt_party_vivian_tail) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (args[1] == 0) {
+		L_partyVivianTailStop();
+	} else {
+		L_partyVivianTailStart();
+	}
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_yoshi_ride) {
+	s32* args = event->args;
+	PartyEntry* p;
+	s32 ride;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	ride = args[1];
+	if (isFirstCall) {
+		if (ride) {
+			if (yoshiGetStatus() != 0) {
+				return EVT_RETURN_DONE;
+			}
+			p->flags |= 0x80000000;
+			p->flags |= 0x100;
+			partyChgRunMode(p, 3);
+		} else {
+			marioGetoffYoshi();
+		}
+	}
+	if (ride) {
+		if (yoshiGetStatus() == 1) {
+			p->flags &= 0x7FFFFFFF;
+			return EVT_RETURN_DONE;
+		}
+	} else {
+		if (yoshiGetStatus() == 0) {
+			p->flags &= 0x7FFFFFFF;
+			return EVT_RETURN_DONE;
+		}
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_party_yoshi_fly) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (yoshiGetStatus() != 1) {
+			return EVT_RETURN_DONE;
+		}
+		p->flags |= 0x80000000;
+		evt_set_yoshi_spd(evtGetFloat(event, args[1]));
+		evt_set_yoshi_frm(sysMsec2Frame(evtGetValue(event, args[2])));
+	}
+	if (evt_get_yoshi_frm() >= 0) {
+		return EVT_RETURN_BLOCK;
+	}
+	p->flags &= 0x7FFFFFFF;
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_nokotaro_kick) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (p->currentMemberId != 2) {
+			return EVT_RETURN_DONE;
+		}
+		if (p->flags & 0x100) {
+			return EVT_RETURN_DONE;
+		}
+		p->unk16C = 0;
+		p->flags |= 0x80000000;
+		p->flags |= 0x100;
+		partyChgRunMode(p, 3);
+	}
+	if (nokonokoGetStatus(p) == 0) {
+		p->flags &= 0x7FFFFFFF;
+		return EVT_RETURN_DONE;
+	}
+	return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_party_nokotaro_kick_hold) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (p->currentMemberId != 2) {
+			return EVT_RETURN_DONE;
+		}
+		if (p->flags & 0x100) {
+			return EVT_RETURN_DONE;
+		}
+		p->unk16C = 5000;
+		p->flags |= 0x80000000;
+		p->flags |= 0x100;
+		partyChgRunMode(p, 3);
+	}
+	if (nokonokoGetStatus(p) == 0) {
+		p->flags &= 0x7FFFFFFF;
+		return EVT_RETURN_DONE;
+	}
+	return nokonokoGetStatus(p) == 3 ? 2 : 0;
+}
+
+USER_FUNC(evt_party_nokotaro_hold_cancel) {
+	PartyEntry* p;
+	s32 ret = 0;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (p->currentMemberId != 2) {
+			return EVT_RETURN_DONE;
+		}
+		if (nokonokoGetStatus() == 0) {
+			return EVT_RETURN_DONE;
+		}
+		event->userdata[0] = 0;
+	}
+	switch (event->userdata[0]) {
+	case 0:
+		if (nokonokoGetStatus(p) != 3) {
+			ret = 0;
+			break;
+		}
+		nokotaro_hold_cancel(p);
+		event->userdata[0] = 1;
+		break;
+	case 1:
+		if (nokonokoGetStatus(p) != 0) {
+			ret = 0;
+			break;
+		}
+		ret = 2;
+		p->flags &= 0x7FFFFFFF;
+		break;
+	}
+	return ret;
+}
+
+USER_FUNC(evt_party_nokotaro_get_status) {
+	s32 dst;
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (p->currentMemberId != 2) {
+		return EVT_RETURN_DONE;
+	}
+	dst = args[1];
+	evtSetValue(event, dst, nokonokoGetStatus());
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_party_cloud_breathout) {
+	PartyEntry* p;
+	s32* args = event->args;
+	p = GETPARTY(args);
+	if (p == NULL) {
+		return EVT_RETURN_DONE;
+	}
+	if (isFirstCall) {
+		if (p->currentMemberId != 5) {
+			return EVT_RETURN_DONE;
+		}
+		if (p->flags & 0x100) {
+			return EVT_RETURN_DONE;
+		}
+		p->unk16C = args[1];
+		p->flags |= 0x80000000;
+		p->flags |= 0x100;
+		partyChgRunMode(p, 3);
+	}
+	if (cloudGetStatus() == 0) {
+		p->flags &= 0x7FFFFFFF;
+		return EVT_RETURN_DONE;
+	}
+	return EVT_RETURN_BLOCK;
+}

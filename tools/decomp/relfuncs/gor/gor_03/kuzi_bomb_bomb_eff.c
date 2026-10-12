@@ -4,7 +4,7 @@
 USER_FUNC(kuzi_bomb_bomb_eff) {
     s32* args = event->args;
     s32 type = evtGetValue(event, args[0]);
-    s32 phase = evtGetValue(event, args[1]);
+    s32 phase = (0, evtGetValue(event, args[1]));
     NpcEntry* npc = npcNameToPtr("\203O\203\213\203\201\203{\203\200\225\272");
 
     if (type == 2 || type == 3) {

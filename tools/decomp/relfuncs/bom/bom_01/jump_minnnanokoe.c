@@ -24,7 +24,7 @@ void jump_minnnanokoe(s32 i, f32 h) {
     wp->bom[i].field_0x10 = 0.0f;
     wp->bom[i].gravity = 0.1f;
     wp->bom[i].timer = 20;
-    wp->bom[i].vy = h / wp->bom[i].timer + wp->bom[i].gravity * wp->bom[i].timer / 2;
+    wp->bom[i].vy = wp->bom[i].gravity * wp->bom[i].timer / 2 + h / wp->bom[i].timer;
     wp->bom[i].next = 5;
     wp->bom[i].state = 100;
     if (evtGetValue(NULL, GSW(0)) != 401 && i % 5 == 0) {

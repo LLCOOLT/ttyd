@@ -20,20 +20,8 @@
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // proto: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
+// decl: static const char* group_tbl[][2] = { {"c_n_moa_a", "S_1"}, {"c_n_moa_b", "S_1"}, {"c_kinodebu", "G_1"}, {"c_puku_c", "U_1"}, {"c_powan", "O_1"}, {"c_smoko", "T_2"}, {"c_rose", "G_1"}, {"c_papab", "G_1"}, {"c_mamab", "G_1"}, {"c_konari", "G_1"}, {"c_n_moa_a", "S_1"}, };
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
-    static const char* group_tbl[][2] = {
-        {"c_n_moa_a", "S_1"},
-        {"c_n_moa_b", "S_1"},
-        {"c_kinodebu", "G_1"},
-        {"c_puku_c", "U_1"},
-        {"c_powan", "O_1"},
-        {"c_smoko", "T_2"},
-        {"c_rose", "G_1"},
-        {"c_papab", "G_1"},
-        {"c_mamab", "G_1"},
-        {"c_konari", "G_1"},
-        {"c_n_moa_a", "S_1"},
-    };
     MoamoaPoseDef* def = wp->defs;
     s32 i;
 

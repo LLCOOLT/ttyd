@@ -20,7 +20,7 @@
 // decl: static void moamoa_pose_main(void);
 // decl: static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 // proto: USER_FUNC(evt_moamoa_fusion);
-USER_FUNC(evt_moamoa_fusion) {
+static USER_FUNC(evt_moamoa_fusion) {
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -55,7 +55,7 @@ USER_FUNC(evt_moamoa_fusion) {
         pose->flags |= 4;
         moa->flags |= 0x400;
         moa->state = 61;
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change_i(moa, "c_n_moa_a", "S_1");
     }
     return EVT_RETURN_DONE;
 }

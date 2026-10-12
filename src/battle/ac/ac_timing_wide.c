@@ -1,0 +1,323 @@
+#include "battle/ac/ac_table.h"
+#include "battle/battle.h"
+#include "battle/battle_ac.h"
+#include "battle/battle_pad.h"
+#include "battle/battle_unit.h"
+#include "driver/camdrv.h"
+#include "driver/icondrv.h"
+#include "system.h"
+#include <string.h>
+
+#pragma optimize_for_size on
+
+typedef struct TimingWideWork {
+    s32 button;   // 0x0
+    s8 mode;      // 0x4
+    s32 frame;    // 0x8
+    s32 state;    // 0xC
+    s32 endTimer; // 0x10
+} TimingWideWork;
+
+#define TW_WORK(ac) ((TimingWideWork*)((u8*)(ac) + 0x2BC))
+#define AC_S32(ac, off) (*(s32*)((u8*)(ac) + (off)))
+
+static void actionCommandDisp(f32 x, f32 y);
+
+s32 battleAcMain_TimingWide(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    TimingWideWork* tw = TW_WORK(ac);
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    s32 autoCmd = 0;
+    s32 pressed;
+
+    if (ac->mAcUnit->badgesEquipped.AutoCommand) {
+        autoCmd = 1;
+    }
+
+    switch (ac->mAcState) {
+        case 0:
+            memset(disp, 0, sizeof(BattleACDispParams));
+            disp->iconX = -300.0f;
+            disp->iconY = 0.0f;
+            *(s32*)&disp->field_0x1C[4] = 20;
+            tw->state = 0;
+            tw->frame = 0;
+            switch (AC_S32(ac, 0x38)) {
+                case 5:
+                    tw->button = 0x100;
+                    tw->mode = 1;
+                    break;
+                case 0:
+                    tw->button = 0x40000;
+                    tw->mode = 0;
+                    break;
+                case 1:
+                    tw->button = 0x80000;
+                    tw->mode = 0;
+                    break;
+                case 2:
+                    tw->button = 0x40000;
+                    tw->mode = -1;
+                    break;
+                case 3:
+                    tw->button = 0x80000;
+                    tw->mode = -1;
+                    break;
+                default:
+                    tw->button = 0x40000;
+                    tw->mode = 0;
+                    break;
+            }
+            ac->outputParams[0] = 0;
+            ac->outputParams[1] = 0;
+            ac->outputParams[2] = 0;
+            ac->mAcState = 99;
+            ac->result = 1;
+            break;
+        case 100:
+            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+                if (irand(100) >= 0) {
+                    ac->field_0x8 = 0;
+                    if (AC_S32(ac, 0x40) > 0) {
+                        ac->field_0x8 = irand(AC_S32(ac, 0x40));
+                    }
+                    if (ac->field_0x8 <= 0) {
+                        ac->field_0x8 = AC_S32(ac, 0x3C) + 2;
+                    }
+                } else {
+                    ac->field_0x8 = *(s32*)&ac->field_34[0xC] + irand(*(s32*)&ac->field_34[0x10] - *(s32*)&ac->field_34[0xC]);
+                }
+                ac->mAcState = 0x3EA;
+                tw->state = 2;
+            } else {
+                if (AC_S32(ac, 0x38) == 4) {
+                    ac->mAcState = 0x3E8;
+                } else {
+                    ac->mAcState = 0x3E9;
+                }
+                tw->state = 1;
+            }
+            break;
+        case 0x3E8:
+            if (BattlePadCheckTrigger(tw->button)) {
+                ac->outputParams[1] = 1;
+                ac->mAcState = 0x3E9;
+            }
+            break;
+        case 0x3E9:
+            tw->frame++;
+            if (tw->frame > AC_S32(ac, 0x3C)) {
+                ac->result = 0;
+                ac->mAcState = 0x3EC;
+                tw->state = 4;
+                if (AC_S32(ac, 0x34) & 8) {
+                    ac->mAcState = 0x3EB;
+                    tw->state = 3;
+                }
+            } else {
+                pressed = 0;
+                switch (tw->mode) {
+                    case 1:
+                        if (BattlePadCheckTrigger(tw->button)) {
+                            pressed = 1;
+                        }
+                        break;
+                    case -1:
+                        if (((s32(*)(s32))BattlePadCheckUp)(tw->button)) {
+                            pressed = 1;
+                        }
+                        break;
+                    case 0:
+                    default:
+                        if (!((s32(*)(s32))BattlePadCheckNow)(tw->button)) {
+                            pressed = 1;
+                        }
+                        break;
+                }
+                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                    ac->outputParams[2] = 1;
+                } else {
+                    ac->outputParams[2] = 0;
+                }
+                if (autoCmd) {
+                    if (AC_S32(ac, 0x60)) {
+                        pressed = 1;
+                    } else {
+                        pressed = 0;
+                    }
+                }
+                if (pressed) {
+                    if (AC_S32(ac, 0x60)) {
+                        ac->result = 2;
+                        ac->mResultCount++;
+                        ac->outputParams[0] = 1;
+                    } else {
+                        ac->result = 0;
+                        ac->outputParams[0] = -1;
+                    }
+                    ac->mAcState = 0x3EC;
+                    tw->state = 4;
+                    if (AC_S32(ac, 0x34) & 8) {
+                        ac->mAcState = 0x3EB;
+                        tw->state = 3;
+                    }
+                }
+            }
+            break;
+        case 0x3EA:
+            tw->frame++;
+            ac->field_0x8--;
+            if (tw->frame > AC_S32(ac, 0x3C)) {
+                ac->result = 0;
+                return 0;
+            }
+            if (ac->field_0x8 < 0) {
+                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                    ac->result = 2;
+                    ac->mResultCount++;
+                    ac->outputParams[0] = 1;
+                } else {
+                    ac->result = 0;
+                    ac->outputParams[0] = -1;
+                }
+                return 0;
+            }
+            break;
+        case 0x3EB:
+            break;
+        case 0x3EC:
+            tw->endTimer = 60;
+            ac->mAcState = 0x3ED;
+            tw->state = 5;
+        case 0x3ED:
+            tw->endTimer--;
+            if (tw->endTimer <= 0) {
+                ac->mAcState = 0x3EE;
+                tw->state = 6;
+            }
+            break;
+        case 0x3EE:
+            ac->maincb = NULL;
+            ac->dispcb = NULL;
+            ac->resultcb = NULL;
+            ac->deletecb = NULL;
+            return 0;
+    }
+    return 1;
+}
+
+s32 battleAcResult_TimingWide(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+void battleAcDisp_TimingWide(CameraId cameraId, void* param) {
+    BattleWork* work = (BattleWork*)param;
+    BattleActions* ac = &work->actionCommands;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    s32 show;
+    switch (TW_WORK(ac)->state) {
+        case 0:
+        case 1:
+        case 2:
+            if (AC_S32(ac, 0x34) & 1) {
+                disp->iconX = 30.0f;
+            } else {
+                disp->iconX = intplGetValue(4, 20 - *(s32*)&disp->field_0x1C[4], 20, -300.0f, 30.0f);
+            }
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] > 0) {
+                (*(s32*)&disp->field_0x1C[4])--;
+            }
+            break;
+        case 3:
+            actionCommandDisp(disp->iconX, disp->iconY);
+            break;
+        case 4:
+        case 5:
+            show = 1;
+            if ((AC_S32(ac, 0x34) & 2) && (ac->result & 2)) {
+                show = 0;
+            }
+            if ((AC_S32(ac, 0x34) & 4) && !(ac->result & 2)) {
+                show = 0;
+            }
+            if (*(s32*)&disp->field_0x1C[4] >= 40) {
+                if (show) {
+                    disp->iconX = intplGetValue(4, *(s32*)&disp->field_0x1C[4] - 40, 20, 30.0f, -300.0f);
+                } else {
+                    disp->iconX = 30.0f;
+                }
+            } else {
+                disp->iconX = 30.0f;
+            }
+            actionCommandDisp(disp->iconX, disp->iconY);
+            if (*(s32*)&disp->field_0x1C[4] < 60) {
+                (*(s32*)&disp->field_0x1C[4])++;
+            }
+            break;
+    }
+}
+
+void battleAcDelete_TimingWide(BattleWork* work) {
+    work->actionCommands.mAcState = 0x3EC;
+}
+
+#pragma dont_inline on
+#define ICON(id)                            \
+    {                                       \
+        Vec pos = {0.0f, 0.0f, 0.0f};       \
+        pos.x = -200.0f + x;                \
+        pos.y = 50.0f + y;                  \
+        iconDispGx(&pos, 0x10, (id), 1.0f); \
+    }
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    s32* frame = (s32*)((u8*)ac + 0x290);
+    TimingWideWork* tw;
+    u16 a;
+    u16 b;
+    camGetPtr(8);
+    tw = TW_WORK(ac);
+    switch (tw->button) {
+        case 0x100: b = 0x65; a = 0x64; break;
+        case 0x200: b = 0x67; a = 0x66; break;
+        case 0x400: b = 0x69; a = 0x68; break;
+        case 0x800: b = 0x6B; a = 0x6A; break;
+        case 0x40000: b = 0x78; a = 0x79; break;
+        case 0x80000: b = 0x7A; a = 0x79; break;
+        default: b = 0x78; a = 0x79; break;
+    }
+    switch (tw->state) {
+        case 0:
+            if (tw->mode > 0) ICON(a) else ICON(b)
+            break;
+        case 2:
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            if (!(AC_S32(ac, 0x34) & 0x10)) {
+                if (tw->mode > 0) ICON(a) else ICON(b)
+            } else {
+                if (tw->mode > 0) ICON(b) else ICON(a)
+            }
+            break;
+        case 1:
+            if (tw->mode != -1) {
+                if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
+                    if (tw->mode > 0) ICON(b) else ICON(a)
+                } else {
+                    if (tw->mode > 0) ICON(a) else ICON(b)
+                }
+            } else {
+                if (tw->frame >= AC_S32(ac, 0x40)) {
+                    ICON(a)
+                } else {
+                    ICON(b)
+                }
+            }
+            break;
+    }
+    (*frame)++;
+}

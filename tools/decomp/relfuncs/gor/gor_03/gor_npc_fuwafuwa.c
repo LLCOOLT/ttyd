@@ -16,6 +16,7 @@ USER_FUNC(gor_npc_fuwafuwa) {
     s32 elapsed;
     s32 frame;
     f32 y;
+    f32 t;
 
     if (isFirstCall) {
         event->savedTime = gp->renderTime;
@@ -24,7 +25,8 @@ USER_FUNC(gor_npc_fuwafuwa) {
         base->z = npc->position.z;
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
-    frame = (0.5f + sysMsec2FrameFloat(elapsed)) * speed;
+    t = 0.5f + sysMsec2FrameFloat(elapsed);
+    frame = t * speed;
     y = base->y;
     y += table.v[(u32)frame % 40];
     npc->position.y = npc->prevPosition.y = y;

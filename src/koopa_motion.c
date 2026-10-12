@@ -1,0 +1,980 @@
+#include "mario/mario.h"
+#include "mario/mario_motion.h"
+#include "manager/evtmgr.h"
+#include "pmario_sound.h"
+#include "system.h"
+#include <dolphin/types.h>
+
+extern s32 evt_cam_shake[];
+extern s32 kpaGetLevel(void);
+extern s32 kpaGetStageType(void);
+extern s32 kpaGetBodyStatus(void);
+extern f32 kpaGetWidth(s32 level);
+extern void kpaCancelAttackMode(void);
+extern void kpaMSetMutekiTimer(void);
+extern void kpaMutekiOn(void);
+extern s32 kpaFireAttackCheck(void);
+extern void kpaChgPose(const char* a, const char* b);
+extern void kpaClearHitobjRide(void);
+extern void kpaCamFollow(void);
+extern void kpaSetFallPara(void);
+extern void camFollowYOn(void);
+extern void camFollowYOff(void);
+extern void marioPreJump(void);
+extern f32 marioMakeJumpPara(void);
+extern void marioSetPeakYpos(void);
+extern void marioChgMot2(s32 id);
+extern void marioChgPose(const char* name);
+extern s32 kpaGetAttackMode(void);
+extern s32 kpaGetStageViewType(void);
+extern void kpaAttackStart(void);
+extern void marioAdjustMoveDir(void);
+extern f32 marioGetFallSpd(void);
+extern void* marioChkLandon(f32* outY, f32 y);
+extern void marioChgMotSub(s32 a, s32 b);
+f32 kpaStickSpd(s32 dash);
+
+#define MF(m, off) (*(f32*)((u8*)(m) + (off)))
+#define MI(m, off) (*(s32*)((u8*)(m) + (off)))
+#define MS16(m, off) (*(s16*)((u8*)(m) + (off)))
+#define MS8(m, off) (*(s8*)((u8*)(m) + (off)))
+#define MU(m, off) (*(u32*)((u8*)(m) + (off)))
+#define MU16(m, off) (*(u16*)((u8*)(m) + (off)))
+#define MU8(m, off) (*(u8*)((u8*)(m) + (off)))
+#define MV(m, off) (*(Vec*)((u8*)(m) + (off)))
+typedef struct V3 {
+    s32 a, b, c;
+} V3;
+#define KPW(m) (*(s32**)((u8*)(m) + 0x28C))
+
+f32 _walkSpdTbl[4] = {0.6f, 1.4f, 1.4f, 1.4f};
+f32 _dashSpdTbl[4] = {1.2f, 2.0f, 2.0f, 2.0f};
+s32 _rateTbl[4] = {0, 0, 0, 0};
+s32 _rateTbl2[4] = {0, 0, 0, 0};
+f32 scaleDt[9] = {1.0f, 0.0f, 2.0f, 1.0f, 3.0f, 2.0f, 4.0f, 3.0f, 5.0f};
+
+s32 quake_kpaLandOn_evt[] = {
+    0x0005005B, (s32)evt_cam_shake, 4, -230000000, -229999990, 30, 2, 1,
+};
+
+s32 quake_kpaHipAttack_evt[] = {
+    0x0005005B, (s32)evt_cam_shake, 4, -230000000, -229999980, 60, 2, 1,
+};
+
+extern void animPoseSetLocalTime(s32 poseId, f32 time);
+extern s32 marioAnimeId(void);
+extern s32 marioKeyOffChk(void);
+extern void marioCamZoomOffReq(void);
+extern void* effMizutamaEntry(s32 type, f32 x, f32 y, f32 z, f32 angle);
+extern s32 irand(s32 scalar);
+extern void* kpaGetHitobjHead2(void);
+extern void* kpaChkHitobjRide(void);
+extern BOOL marioBgmodeChk(void);
+extern void kpaAttackStart2(void);
+extern void kpaSwimMove(void);
+extern f32 kpaGetBaseScale(s32 level);
+extern void kpaMutekiOff(void);
+extern void marioResetCamShiftRate(void);
+void kpaSetSpec(void);
+
+static inline void kpa_hip_launch(MarioWork* m) {
+    MI(m, 0x44) = 0x14;
+    MF(m, 0x80) = -0.4744f;
+    MF(m, 0x84) = 0.4704f;
+    MF(m, 0x88) = -0.1904f;
+    MF(m, 0x7C) = MF(m, 0x80);
+}
+
+static inline s32 kpa_stay_chk(void) {
+    MarioWork* m2 = marioGetPtr();
+    if (kpaGetStageViewType() == 1) {
+        return 0;
+    }
+    if (!(MU16(m2, 0x248) & 0x100)) {
+        return 0;
+    }
+    if (kpaGetBodyStatus() == 2) {
+        marioChgMot(0x25);
+        return 1;
+    }
+    marioChgMot(3);
+    return 1;
+}
+
+static inline void kpa_swim_splash(void) {
+    MarioWork* m = marioGetPtr();
+    s32 st;
+    s32 lim;
+    KPW(m)[0x150 / 4]++;
+    st = MI(m, 0x44);
+    if (st == 0x1E || st == 0x1F) {
+        if (KPW(m)[0x150 / 4] > 0) {
+            f32 rx;
+            f32 rz;
+            KPW(m)[0x150 / 4] = 0;
+            rx = (f32)(irand(40) - 20);
+            rz = (f32)(irand(40) - 20);
+            effMizutamaEntry(0, MF(m, 0x8C) + rx, 0.6f * MF(m, 0x1B8) + (MF(m, 0x90) + rz), MF(m, 0x94),
+                             MF(m, 0x1A0) < 180.0f ? 225.0f : 135.0f);
+        }
+    } else {
+        s32 in = FALSE;
+        if (st >= 0 && st < 0x14) {
+            in = TRUE;
+        }
+        lim = in ? 10 : 30;
+        if (KPW(m)[0x150 / 4] > lim) {
+            KPW(m)[0x150 / 4] = 0;
+            effMizutamaEntry(0, MF(m, 0x8C), MF(m, 0x90) + MF(m, 0x1B8) / 3.0f, MF(m, 0x94),
+                             MF(m, 0x1A0) < 180.0f ? 225.0f : 135.0f);
+        }
+    }
+}
+
+BOOL kpaHipAttackOk(void) {
+    MarioWork* m = marioGetPtr();
+    if (m->currMotionId == 0x10) {
+        return FALSE;
+    }
+    return ((*(u32*)KPW(m) >> 4) & 1) ^ 1;
+}
+
+f32 kpaStickSpd(s32 dash) {
+    MarioWork* m = marioGetPtr();
+    f32 stick = MS8(m, 0x24E);
+    f32 spd;
+    f32 max;
+    f32 lim = 70.0f;
+    f32 k;
+    if (stick >= lim) {
+        stick = lim;
+    }
+    lim = 70.0f;
+    if (stick <= -lim) {
+        stick = -lim;
+    }
+    spd = MF(m, 0x2C4);
+    if (!stick) {
+        k = -0.2f;
+        if (*(u32*)((u8*)m + 0x1F0)) {
+            k = -0.7f;
+        }
+        spd += spd * k;
+        if (__fabsf(spd) < 0.01f) {
+            spd = 0.0f;
+        }
+    } else {
+        if (dash == 0) {
+            max = kpaGetBodyStatus() == 2 ? 0.2f : 1.3f;
+        } else {
+            max = kpaGetBodyStatus() == 2 ? 0.633f : 2.3f;
+        }
+        if (stick * spd > 0.0f) {
+            spd += 0.002f * stick;
+            if (spd >= max) {
+                spd = max;
+            }
+            if (spd <= -max) {
+                spd = -max;
+            }
+        } else {
+            spd += 0.002f * stick;
+            if (spd >= max) {
+                spd = max;
+            }
+            if (spd <= -max) {
+                spd = -max;
+            }
+        }
+    }
+    MF(m, 0x2C4) = spd;
+    MF(m, 0x180) = __fabsf(spd);
+    {
+        f32 a = angleABf(0.0f, 0.0f, spd, 0.0f);
+        if (MF(m, 0x180)) {
+            MF(m, 0x1A0) = a;
+        }
+    }
+    return MF(m, 0x180);
+}
+
+void kpa_stay(void) {
+    MarioWork* m = marioGetPtr();
+    f32 spd;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        MS16(m, 0x50) = 0;
+        MI(m, 0x48) = 0;
+        MI(m, 0x44) = 0;
+        if (kpaGetAttackMode() == 0) {
+            if (!(*(u32*)KPW(m) & 0x1000000)) {
+                kpaChgPose("KPA_S_1", "KPA2_S_1");
+            } else {
+                kpaChgPose("KPA_S_2", "KPA2_S_1");
+            }
+        }
+        if (!(MU(m, 0) & 0x20)) {
+            MF(m, 0x180) = 0.0f;
+        }
+    }
+    if (kpaGetAttackMode() == 0) {
+        s32 r = kpa_stay_chk();
+        if (r == 0) {
+            if (MU16(m, 0x248) & 0x200) {
+                kpaAttackStart();
+            } else {
+                if (MS16(m, 0x4E) == 0) {
+                    spd = kpaStickSpd(0);
+                } else {
+                    spd = MF(m, 0x180);
+                }
+                if (kpaGetStageViewType() == 0) {
+                    MF(m, 0x180) = spd;
+                    if (MF(m, 0x180) > 0.0f) {
+                        marioChgMot(1);
+                    }
+                } else if (MF(m, 0x190) > 0.0f) {
+                    marioChgMot(1);
+                }
+            }
+        }
+    }
+}
+
+void kpa_walk(void) {
+    MarioWork* m = marioGetPtr();
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        MI(m, 0x44) = 0;
+        MI(m, 0x48) = 0;
+        if (!(*(u32*)KPW(m) & 0x1000000)) {
+            kpaChgPose("KPA_W_1", "KPA2_W_1");
+        } else {
+            kpaChgPose("KPA_W_2", "KPA2_W_1");
+        }
+        MS16(m, 0x2A0) = 0;
+        MS16(m, 0x2A2) = 0;
+        MF(KPW(m), 0x10) = 0.02f;
+        MF(KPW(m), 0x14) = -0.02f;
+    }
+    if (!kpa_stay_chk()) {
+        if (MU16(m, 0x248) & 0x200) {
+            kpaAttackStart();
+            marioChgMot(0);
+            return;
+        }
+        if (kpaGetBodyStatus() == 2) {
+            MU16(m, 0x2A0)++;
+            if (MU16(m, 0x2A0) > 0x50) {
+                MU16(m, 0x2A0) = 0;
+            }
+            MU16(m, 0x28) = MU16(m, 0x2A0) / 2;
+            animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], (f32)MU16(m, 0x28));
+            if (kpaGetBodyStatus() == 0) {
+                if (MI(m, 0x48) % 40 == 0) {
+                    psndSFXOn_3D((const char*)0x819, &MV(m, 0x8C));
+                } else if (MI(m, 0x48) % 20 == 0) {
+                    psndSFXOn_3D((const char*)0x818, &MV(m, 0x8C));
+                }
+                MI(m, 0x48)++;
+            }
+        } else if (kpaGetBodyStatus() == 0) {
+            if (MI(m, 0x48) % 40 == 0) {
+                psndSFXOn_3D((const char*)0x819, &MV(m, 0x8C));
+            } else if (MI(m, 0x48) % 20 == 0) {
+                psndSFXOn_3D((const char*)0x818, &MV(m, 0x8C));
+            }
+            MI(m, 0x48)++;
+        }
+    if (MS16(m, 0x4E) == 0) {
+        if (kpaGetStageViewType() == 0) {
+            MF(m, 0x180) = kpaStickSpd(0);
+        } else {
+            MarioWork* mm = marioGetPtr();
+            s32 lv = kpaGetLevel();
+            f32 sp = _walkSpdTbl[lv];
+            s32 rt = _rateTbl[lv];
+            *(s32*)((u8*)KPW(mm) + 0xD0) = rt;
+            MF(m, 0x180) = sp;
+        }
+    }
+    if (kpaGetStageViewType() == 0) {
+        if (!MF(m, 0x180) && !(MU(m, 0) & 0x20)) {
+            marioChgMot(0);
+            return;
+        }
+    } else {
+        if (!MF(m, 0x190) && !(MU(m, 0) & 0x20)) {
+            marioChgMot(0);
+            return;
+        }
+    }
+    if (!marioKeyOffChk()) {
+        marioCamZoomOffReq();
+        if (kpaGetStageViewType() == 1) {
+            MF(m, 0x1A0) = MF(m, 0x194);
+        }
+        if (MS8(m, 0x24E) * MS8(m, 0x24E) + MS8(m, 0x24F) * MS8(m, 0x24F) > 3025) {
+            marioChgMot(2);
+        }
+    }
+    }
+}
+
+void kpa_dash(void) {
+    MarioWork* m = marioGetPtr();
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        kpaChgPose("KPA_R_1", "KPA2_R_1");
+        MI(m, 0x44) = 0;
+        MI(m, 0x48) = 0;
+        MS16(m, 0x2A0) = 0;
+    }
+    if (!kpa_stay_chk()) {
+        if (MU16(m, 0x248) & 0x200) {
+            kpaAttackStart();
+            marioChgMot(0);
+            return;
+        }
+        if (kpaGetBodyStatus() == 2) {
+            MU16(m, 0x2A0)++;
+            if (MU16(m, 0x2A0) > 0x50) {
+                MU16(m, 0x2A0) = 0;
+            }
+            MU16(m, 0x28) = MU16(m, 0x2A0) / 2;
+            animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], (f32)MU16(m, 0x28));
+        }
+        if (kpaGetBodyStatus() == 0) {
+            if (MI(m, 0x48) % 30 == 0) {
+                psndSFXOn_3D((const char*)0x819, &MV(m, 0x8C));
+            } else if (MI(m, 0x48) % 15 == 0) {
+                psndSFXOn_3D((const char*)0x818, &MV(m, 0x8C));
+            }
+            MI(m, 0x48)++;
+        }
+    if (MS16(m, 0x4E) == 0) {
+        if (kpaGetStageViewType() == 0) {
+            MF(m, 0x180) = kpaStickSpd(1);
+        } else {
+            MarioWork* mm = marioGetPtr();
+            s32 lv = kpaGetLevel();
+            f32 sp = _dashSpdTbl[lv];
+            s32 rt = _rateTbl2[lv];
+            *(s32*)((u8*)KPW(mm) + 0xD0) = rt;
+            MF(m, 0x180) = sp;
+        }
+    }
+    if (kpaGetStageViewType() == 0) {
+        if (!MF(m, 0x180) && !(MU(m, 0) & 0x20)) {
+            marioChgMot(0);
+            return;
+        }
+    } else {
+        if (!MF(m, 0x190) && !(MU(m, 0) & 0x20)) {
+            marioChgMot(0);
+            return;
+        }
+    }
+    if (!marioKeyOffChk()) {
+        marioCamZoomOffReq();
+        if (kpaGetStageViewType() == 1) {
+            MF(m, 0x1A0) = MF(m, 0x194);
+        }
+        if (MS8(m, 0x24E) * MS8(m, 0x24E) + MS8(m, 0x24F) * MS8(m, 0x24F) <= 3025) {
+            marioChgMot(1);
+        }
+    }
+    }
+}
+
+void kpa_jump(void) {
+    MarioWork* m = marioGetPtr();
+    f32 prevVy;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) |= 0x80000;
+        MI(m, 0x48) = 2;
+        MI(m, 0x44) = 0;
+        marioPreJump();
+        if (m->currMotionId != 8) {
+            camFollowYOff();
+        }
+        kpaChgPose("KPA_J_1A", "KPA2_J_1A");
+        psndSFXOn_3D((const char*)0x81E, &MV(m, 0x8C));
+        if (MS16(m, 0x50) == 0) {
+            {
+                s32 va = MI(m, 0x8C);
+                s32 vb = MI(m, 0x90);
+                MI(m, 0xD4) = va;
+                MI(m, 0xD8) = vb;
+                MI(m, 0xDC) = MI(m, 0x94);
+            }
+        }
+        MS16(m, 0x2A0) = 0;
+    }
+    MS16(m, 0x50)++;
+    if (m->currMotionId != 8) {
+        prevVy = MF(m, 0x7C);
+        marioMakeJumpPara();
+        if (MF(m, 0x7C) > 0.0f && MS16(m, 0x50) >= 4 && !(MU16(m, 0x246) & 0x100)) {
+            MF(m, 0x7C) += -0.526f;
+        }
+        if (MF(m, 0x7C) <= 0.0f) {
+            if (prevVy > 0.0f) {
+                MS16(m, 0x52) = MS16(m, 0x50);
+            }
+            marioSetPeakYpos();
+            kpaSetFallPara();
+            marioMakeJumpPara();
+            marioChgMot(10);
+        }
+        MF(m, 0x90) += MF(m, 0x7C);
+    }
+}
+
+void kpa_fall_80213C38(void) {
+    MarioWork* m = marioGetPtr();
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0x10000;
+        MU(m, 0) |= 0x20000;
+        MI(m, 0x44) = 0;
+        if (m->currMotionId != 0xB) {
+            if ((s32)MU8(m, 0x3C) == 2) {
+                if (!kpaFireAttackCheck()) {
+                    kpaChgPose("KPA_J_1B", "KPA2_J_1B");
+                }
+            } else if (!(MU(m, 0) & 0x2000)) {
+                marioChgPose("M_J_1C");
+            }
+        } else {
+            MU(m, 0) |= 0x80;
+        }
+        if (MS16(m, 0x50) == 0) {
+            MV(m, 0xD4) = MV(m, 0x8C);
+        }
+    }
+    switch (MI(m, 0x44)) {
+    case 0:
+        if (MF(m, 0x90) <= MF(m, 0x120)) {
+            if (MF(m, 0x90) <= 75.0f) {
+                if ((MU(m, 4) |= 0x20000) != 0) {
+                    camFollowYOn();
+                }
+            }
+            kpaCamFollow();
+            MI(m, 0x44) = 10;
+        }
+        break;
+    }
+    MS16(m, 0x50)++;
+    if (kpaGetStageType() == 1 && kpaGetBodyStatus() <= 1) {
+        KPW(m)[0] |= 0x100;
+    }
+    if (kpaGetBodyStatus() == 2) {
+        m = marioGetPtr();
+        if (m->currMotionId != 0x25) {
+            marioChgMot2(0x25);
+        }
+        kpaClearHitobjRide();
+        MU(m, 0) &= ~0x10000;
+        MU(m, 0) |= 0x20000;
+        MI(m, 0x44) = 0x1E;
+        MS16(m, 0x50) = 0;
+        MI(m, 0x48) = 0;
+        MF(m, 0x180) = 0.0f;
+        MF(m, 0x2C4) = 0.0f;
+    }
+}
+
+void kpa_hip(void) {
+    MarioWork* m = marioGetPtr();
+    f32 fall;
+    f32 y;
+    void* hit;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0x80000;
+        psndSFXOn_3D((const char*)0x81F, &MV(m, 0x8C));
+        marioAdjustMoveDir();
+        MI(m, 0x44) = 10;
+        MI(m, 0x48) = 6;
+        MF(m, 0x7C) = 0.0f;
+        MF(m, 0x80) = 0.0f;
+        MF(m, 0x84) = 0.0f;
+        MF(m, 0x88) = 0.0f;
+        MF(m, 0x180) = 0.0f;
+        marioChgPose("KPA2_J_1C");
+    }
+    if (MF(m, 0xD8) >= MF(m, 0x90) && (MU(m, 4) & 0x20000)) {
+        camFollowYOn();
+    }
+    switch (MI(m, 0x44)) {
+    case 10:
+        marioChkLandon(&y, 0.0f);
+        if (--MI(m, 0x48) <= 0) {
+            kpa_hip_launch(m);
+        } else {
+            break;
+        }
+    case 20:
+        fall = marioGetFallSpd();
+        hit = marioChkLandon(&y, fall);
+        if (fall < -100.0f) {
+            fall = -100.0f;
+            MF(m, 0x80) = MF(m, 0x84) = MF(m, 0x88) = 0.0f;
+            MF(m, 0x7C) = fall;
+        }
+        if (hit) {
+            MI(m, 0x1E4) = (s32)hit;
+            MI(m, 0x1E8) = 0;
+            m->currMotionId = 0x11;
+            MI(m, 0x44) = 0x15;
+            MI(m, 0x48) = 0x14;
+            MF(m, 0x90) = y;
+            psndSFXOn_3D((const char*)0x820, &MV(m, 0x8C));
+            evtEntry(quake_kpaHipAttack_evt, 0, 0);
+            MS16(m, 0x50) = 0;
+            MS16(m, 0x52) = 0;
+        } else {
+            MF(m, 0x90) += fall;
+        }
+        break;
+    case 21:
+        if (--MI(m, 0x48) <= 0) {
+            if (MF(m, 0x90) > 75.0f) {
+                camFollowYOn();
+            }
+            if ((MU16(m, 0x246) & 0x100) && !*(u32*)((u8*)m + 0x1E4)) {
+                kpa_hip_launch(m);
+            } else {
+                MU(m, 0) &= ~0x80;
+                marioChgMotSub(0, 0);
+            }
+        }
+        break;
+    }
+}
+
+BOOL kpaPowUp(void) {
+    MarioWork* m = marioGetPtr();
+    if (kpaGetLevel() < 3) {
+        KPW(m)[1]++;
+        kpaCancelAttackMode();
+        marioChgMot(0x26);
+        return TRUE;
+    }
+    kpaMSetMutekiTimer();
+    kpaMutekiOn();
+    return FALSE;
+}
+
+BOOL kpaPowDown(void) {
+    MarioWork* m = marioGetPtr();
+    kpaCancelAttackMode();
+    if (kpaGetLevel() > 0) {
+        KPW(m)[1]--;
+        MS16(m, 0x78) = sysMsec2Frame(3000);
+        marioChgMot(0x27);
+        return TRUE;
+    }
+    KPW(m)[0] |= 0x10000000;
+    return FALSE;
+}
+
+void kpaSetSpec(void) {
+    MarioWork* m = marioGetPtr();
+    s32 lv;
+    MF(m, 0x1B4) = kpaGetWidth(KPW(m)[1]);
+    lv = KPW(m)[1];
+    if (lv == 0) {
+        MF(m, 0x1B8) = 24.0f;
+    } else if (lv == 1) {
+        MF(m, 0x1B8) = 74.0f;
+    } else if (lv == 2) {
+        MF(m, 0x1B8) = 103.6f;
+    } else if (lv == 3) {
+        MF(m, 0x1B8) = 222.0f;
+    }
+}
+
+void kpa_powup(void) {
+    MarioWork* m = marioGetPtr();
+    MarioWork* m2;
+    f32 step;
+    f32 base;
+    s32 lv;
+    f32 k;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        MS16(m, 0x50) = 0;
+        MI(m, 0x48) = 0;
+        kpaChgPose("KPA_Y_1", "KPA2_Y_1");
+        MI(m, 0x44) = 0;
+        if (!(MU(m, 0) & 0x20)) {
+            MF(m, 0x180) = 0.0f;
+        }
+        MU(m, 0) |= 0x10000000;
+        psndSFXOn_3D((const char*)0x111, &MV(m, 0x8C));
+    }
+    lv = kpaGetLevel();
+    if (lv <= 3) {
+        base = kpaGetBaseScale(lv - 1);
+        step = (kpaGetBaseScale(lv) - base) / 5.0f;
+    } else {
+        marioChgMot(0);
+        return;
+    }
+    switch (MI(m, 0x44)) {
+    case 0:
+        MI(m, 0x48) = 5;
+        MI(m, 0x44) = 1;
+        psndSFXOn_3D((const char*)0x823, &MV(m, 0x8C));
+        break;
+    default:
+        if (--MI(m, 0x48) > 0) {
+            break;
+        }
+        k = (scaleDt - 1)[MI(m, 0x44)];
+        MI(m, 0x48) = 5;
+        MF(m, 0xC8) = step * k + base;
+        MF(m, 0xCC) = MF(m, 0xC8);
+        MI(m, 0x44)++;
+        if (5.0f == k) {
+            m2 = marioGetPtr();
+            if (KPW(m2)[1] == 3) {
+                kpaMSetMutekiTimer();
+                kpaMutekiOn();
+            }
+            kpaSetSpec();
+            marioResetCamShiftRate();
+            MF(m2, 0x138) = 20.0f * (f32)(-KPW(m2)[1]);
+            MU(m, 0) &= ~0x10000000;
+            marioChgMot(0);
+            MS16(m, 0x4C) = 0;
+        }
+    }
+}
+
+void kpa_powdown(void) {
+    MarioWork* m = marioGetPtr();
+    MarioWork* m2;
+    f32 step;
+    f32 base;
+    s32 lv;
+    f32 k;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        MS16(m, 0x50) = 0;
+        MI(m, 0x48) = 0;
+        kpaChgPose("KPA_D_1", "KPA2_D_1");
+        MI(m, 0x44) = 0;
+        if (!(MU(m, 0) & 0x20)) {
+            MF(m, 0x180) = 0.0f;
+        }
+        MU(m, 0) |= 0x10000000;
+        psndSFXOn_3D((const char*)0x11D, &MV(m, 0x8C));
+    }
+    lv = kpaGetLevel();
+    if (lv >= 0) {
+        base = kpaGetBaseScale(lv + 1);
+        step = (base - kpaGetBaseScale(lv)) / 5.0f;
+    } else {
+        marioChgMot(0);
+        return;
+    }
+    switch (MI(m, 0x44)) {
+    case 0:
+        MI(m, 0x48) = 5;
+        MI(m, 0x44) = 1;
+        psndSFXOn_3D((const char*)0x824, &MV(m, 0x8C));
+        break;
+    default:
+        if (--MI(m, 0x48) > 0) {
+            break;
+        }
+        k = (scaleDt - 1)[MI(m, 0x44)];
+        MI(m, 0x48) = 5;
+        MF(m, 0xC8) = base - step * k;
+        MF(m, 0xCC) = MF(m, 0xC8);
+        MI(m, 0x44)++;
+        if (5.0f == k) {
+            m2 = marioGetPtr();
+            kpaMutekiOff();
+            kpaSetSpec();
+            marioResetCamShiftRate();
+            MF(m2, 0x138) = 20.0f * (f32)(-KPW(m2)[1]);
+            MU(m, 0) &= ~0x10000000;
+            marioChgMot(0);
+        }
+    }
+}
+
+#pragma dont_inline on
+void kpaSwimMove(void) {
+    MarioWork* m = marioGetPtr();
+    f32 stick = MS8(m, 0x24E);
+    f32 spd = MF(m, 0x2C4);
+    f32 f31;
+    f32 lim = 40.0f;
+    if (stick) {
+        if (stick * spd < 0.0f) {
+            spd = 0.0f;
+        }
+        if (spd * spd <= 1225.0f) {
+            spd += stick * 0.01f;
+        } else {
+            spd += stick * 0.01f;
+            if (spd < -lim) {
+                spd = -lim;
+            }
+            lim = 40.0f;
+            if (spd > lim) {
+                spd = lim;
+            }
+        }
+    }
+    MF(m, 0x2C4) = spd;
+    f31 = 0.06f * __fabsf(spd);
+    if (f31 >= 2.0f) {
+        f31 = 2.0f;
+    }
+    {
+        f32 a = angleABf(0.0f, 0.0f, spd, 0.0f);
+        if (f31 < 0.01f) {
+            f31 = 0.0f;
+        }
+        MF(m, 0x180) = f31;
+        if (f31) {
+            MF(m, 0x1A0) = a;
+        }
+    }
+    MF(m, 0x18C) = f31;
+}
+
+#pragma dont_inline reset
+
+void kpa_swim(void) {
+    MarioWork* m = marioGetPtr();
+    f32 v;
+    if (MU(m, 0xC) & 1) {
+        MU(m, 0xC) &= ~1;
+        MU(m, 0) &= ~0xF0000;
+        MS16(m, 0x50) = 0;
+        MI(m, 0x48) = 0;
+        MI(m, 0x44) = 0;
+        MF(m, 0x180) = 0.0f;
+        MF(m, 0x2C4) = 0.0f;
+        KPW(marioGetPtr())[0] |= 0x10;
+    }
+    if (MU16(m, 0x248) & 0x200) {
+        kpaAttackStart2();
+    }
+    if (kpaFireAttackCheck() == 1) {
+        MS8(m, 0x24E) = 0;
+        MS8(m, 0x24F) = 0;
+    } else if (kpaGetBodyStatus() == 2 && (MU16(m, 0x248) & 0x100)) {
+        s32 st = MI(m, 0x44);
+        if (st >= 0 && st <= 1 && MF(m, 0x90) < 280.0f) {
+            MI(m, 0x44) = 0;
+        } else if (st >= 0x1E && st <= 0x20) {
+            MI(m, 0x44) = 0;
+        }
+    }
+    kpaSwimMove();
+    kpa_swim_splash();
+    switch (MI(m, 0x44)) {
+    case 0:
+        if (*(u32*)((u8*)m + 0x1E4) != 0) {
+            MF(m, 0x7C) = 1.0f;
+            MF(m, 0x80) = 0.0f;
+            MF(m, 0x84) = 0.0f;
+            MF(m, 0x88) = -0.0001f;
+        } else {
+            MF(m, 0x7C) = 1.52f;
+            MF(m, 0x80) = 0.005f;
+            MF(m, 0x84) = 0.006f;
+            MF(m, 0x88) = -0.0008f;
+        }
+        kpaClearHitobjRide();
+        MI(m, 0x44) = 1;
+        MU(m, 0) &= ~0x20000;
+        MU(m, 0) |= 0x10000;
+        psndSFXOn_3D((const char*)"SFX_KUPPA_SWIM1", &MV(m, 0x8C));
+        if (kpaGetAttackMode() == 0) {
+            kpaChgPose("KPA_W_1", "KPA2_W_2");
+        }
+    case 1:
+        if (kpaGetHitobjHead2()) {
+            MI(m, 0x44) = 0x1E;
+            MF(m, 0x7C) += 0.02f * (-2.0f - MF(m, 0x7C));
+            MF(m, 0x80) = 0.0f;
+            MF(m, 0x84) = 0.0f;
+            MF(m, 0x88) = 0.0f;
+            break;
+        }
+        v = marioMakeJumpPara();
+        MF(m, 0x90) += v;
+        if (MF(m, 0x90) + MF(m, 0x1B8) >= 370.0f) {
+            if (v < 0.0f) {
+                MI(m, 0x44) = 0x28;
+            }
+            MF(m, 0x7C) += 0.02f * (-2.0f - MF(m, 0x7C));
+            MF(m, 0x80) = 0.0f;
+            MF(m, 0x84) = 0.0f;
+            MF(m, 0x88) = 0.0f;
+        } else if (v < 0.0f) {
+            MI(m, 0x44) = 0x1E;
+        }
+        break;
+    case 10:
+        kpaClearHitobjRide();
+        MF(m, 0x7C) = 2.0f;
+        MF(m, 0x80) = -0.03f;
+        MF(m, 0x84) = 0.0f;
+        MF(m, 0x88) = 0.0f;
+        MI(m, 0x44) = 0xB;
+        MU(m, 0) &= ~0x20000;
+        MU(m, 0) |= 0x10000;
+        if (kpaGetAttackMode() == 0) {
+            kpaChgPose("KPA_W_1", "KPA2_W_2");
+        }
+    case 11:
+        v = marioMakeJumpPara();
+        MF(m, 0x90) += v;
+        if (kpaGetBodyStatus() == 1) {
+            MF(m, 0x7C) += 0.06f * (-2.0f - MF(m, 0x7C));
+            MF(m, 0x80) = 0.0f;
+            MF(m, 0x84) = 0.0f;
+            MF(m, 0x88) = 0.0f;
+            if (v < 0.0f) {
+                MI(m, 0x44) = 0x28;
+            }
+        } else if (v < 0.0f) {
+            MI(m, 0x44) = 0x1E;
+        }
+        break;
+    case 20:
+        KPW(m)[0] |= 0x100;
+        MU(m, 0) &= ~0x20000;
+        MU(m, 0) |= 0x10000;
+        kpaChgPose("KPA_J_1A", "KPA2_J_1A");
+        psndSFXOn_3D((const char*)"SFX_KUPPA_WATER_UP1", &MV(m, 0x8C));
+        MF(m, 0x7C) = 5.0f;
+        MF(m, 0x80) = -0.13f;
+        MF(m, 0x84) = 0.0f;
+        MF(m, 0x88) = -0.001f;
+        MI(m, 0x44) = 0x15;
+    case 21:
+        v = marioMakeJumpPara();
+        MF(m, 0x90) += v;
+        if (v <= 0.5f) {
+            MU(m, 0) &= ~0xF0000;
+            kpaSetFallPara();
+            marioMakeJumpPara();
+            marioChgMot(10);
+            return;
+        }
+        break;
+    case 22:
+        break;
+    }
+    switch (MI(m, 0x44)) {
+    case 0x1E:
+        if (KPW(m)[0] & 0x100) {
+            KPW(m)[0] &= ~0x100;
+            psndSFXOn_3D((const char*)0x827, &MV(m, 0x8C));
+        }
+        if (kpaGetAttackMode() == 0) {
+            kpaChgPose("KPA_W_1", "KPA2_Z_2");
+        }
+        MU(m, 0) &= ~0x10000;
+        MU(m, 0) |= 0x20000;
+        if (MF(m, 0x7C) < 0.0f) {
+            MI(m, 0x44) = 0x1F;
+        } else {
+            MF(m, 0x7C) = -0.08f;
+            MF(m, 0x80) = -0.03f;
+            MF(m, 0x84) = 0.009f;
+            MF(m, 0x88) = 0.0f;
+            MI(m, 0x44) = 0x20;
+        }
+        kpa_swim_splash();
+        if (marioBgmodeChk() != 1) {
+            camFollowYOn();
+        }
+        break;
+    case 0x1F: {
+        f32 d = (2.0f - MF(m, 0x7C)) * (f32)(kpaGetBodyStatus() == 2);
+        if (d) {
+            d = 2.6f;
+        } else {
+            d = 0.21f;
+        }
+        MF(m, 0x7C) += d;
+        MF(m, 0x80) = 0.0f;
+        MF(m, 0x84) = 0.0f;
+        MF(m, 0x88) = 0.0f;
+        if (MF(m, 0x7C) >= 0.0f) {
+            MF(m, 0x7C) = -0.08f;
+            MF(m, 0x80) = -0.03f;
+            MF(m, 0x84) = 0.009f;
+            MF(m, 0x88) = 0.0f;
+            MI(m, 0x44) = 0x20;
+        }
+        if (kpaChkHitobjRide()) {
+            MF(m, 0x2C4) = 0.0f;
+            MF(m, 0x180) = 0.0f;
+        }
+        kpa_swim_splash();
+        break;
+    }
+    case 0x20:
+        if (kpaChkHitobjRide()) {
+            MF(m, 0x2C4) = 0.0f;
+            MF(m, 0x180) = 0.0f;
+        }
+        break;
+    case 0x28:
+        if (kpaGetAttackMode() == 0) {
+            kpaChgPose("KPA_W_1", "KPA2_Z_2");
+        }
+        MU(m, 0) &= ~0x10000;
+        MU(m, 0) |= 0x20000;
+        MF(m, 0x7C) = -0.283f;
+        MF(m, 0x80) = -0.023f;
+        MF(m, 0x84) = 0.01f;
+        MF(m, 0x88) = -0.001f;
+        MI(m, 0x44) = 0x29;
+        MI(m, 0x48) = 0x18;
+    case 0x29:
+        if ((MU16(m, 0x248) & 0x100) && !kpaFireAttackCheck()) {
+            MI(m, 0x44) = 0x14;
+        } else {
+            MI(m, 0x48) = MI(m, 0x48) - 1;
+            if (MI(m, 0x48) <= 0) {
+                MI(m, 0x44) = 0x1E;
+            }
+        }
+        break;
+    }
+}
+
+void quake_kpaLandOn(void) {
+    MarioWork* m = marioGetPtr();
+    if (kpaGetStageType() != 1) {
+        psndSFXOn_3D((const char*)0x81D, (Vec*)((u8*)m + 0x8C));
+        if (kpaGetLevel() >= 2) {
+            evtEntry(quake_kpaLandOn_evt, 0, 0);
+        }
+    }
+}
+
+void quake_kpaHipAttack(void) {
+    evtEntry(quake_kpaHipAttack_evt, 0, 0);
+}
