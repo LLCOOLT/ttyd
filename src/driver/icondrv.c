@@ -390,10 +390,10 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     MTXConcat(transmtx, rotmtx, mtx);
     MTXConcat(mtx, scalemtx, mtx);
     MTXConcat(camera->view, mtx, mtx);
-    entry.uflags = flags;
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, alpha };
+    entry.uflags = flags;
     entry.iconId = iconId;
-    data = iconGetBinData(iconId);
+    data = iconGetBinData((u16)entry.iconId);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
@@ -617,7 +617,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         w = entry->width;
         h = entry->height;
     }
-    x = -w * 0.5f;
+    x = -w / 2.0f;
     y = h;
     hn = -h;
     if (!(entry->uflags & 0x10)) {

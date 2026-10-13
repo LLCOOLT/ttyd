@@ -331,20 +331,21 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     break;
                 }
                 if (hex_digits < 17) {
-                    int dig;
+                    unsigned char t = buf[hex_digits / 2];
+                    unsigned char dig;
+                    int u;
                     hex_dig_count++;
-                    dig = toupper(c);
-                    dig = (dig >= 'A') ? dig - 'A' + 10 : dig - '0';
-                    {
-                        unsigned char t = buf[hex_digits / 2];
-                        if (hex_digits % 2 == 0) {
-                            t = t | (dig << 4);
-                        } else {
-                            t = t | dig;
-                        }
-                        buf[hex_digits / 2] = t;
+                    u = toupper(c);
+                    dig = (u < 'A') ? u - '0' : u - 'A' + 10;
+                    if (hex_digits % 2) {
+                        t |= dig;
+                    } else {
+                        t |= dig << 4;
                     }
+                    buf[hex_digits / 2] = t;
                     hex_digits++;
+                    c = fetch();
+                    break;
                 }
                 c = fetch();
                 break;
@@ -354,19 +355,20 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     break;
                 }
                 if (hex_digits < 17) {
-                    int dig;
-                    dig = toupper(c);
-                    dig = (dig >= 'A') ? dig - 'A' + 10 : dig - '0';
-                    {
-                        unsigned char t = buf[hex_digits / 2];
-                        if (hex_digits % 2 == 0) {
-                            t = t | (dig << 4);
-                        } else {
-                            t = t | dig;
-                        }
-                        buf[hex_digits / 2] = t;
+                    unsigned char t = buf[hex_digits / 2];
+                    unsigned char dig;
+                    int u;
+                    u = toupper(c);
+                    dig = (u < 'A') ? u - '0' : u - 'A' + 10;
+                    if (hex_digits % 2) {
+                        t |= dig;
+                    } else {
+                        t |= dig << 4;
                     }
+                    buf[hex_digits / 2] = t;
                     hex_digits++;
+                    c = fetch();
+                    break;
                 }
                 c = fetch();
                 break;

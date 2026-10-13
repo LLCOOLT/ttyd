@@ -409,20 +409,22 @@ s32 nameMain(void) {
 void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXColor white = unused;
-	GXColor white2 = white;
-	s32 i, j;
+	GXColor white2;
+	s32 i;
+	const char* str;
+	s32 j;
 	CameraEntry saved;
 	f32 proj[7];
 	f32 vp[6];
 	char buf[16];
 	CameraEntry* cam;
-	const char* str;
 	const char* ok;
 	const char* yes;
 	const char* no;
 	u16 width;
 	f32 w;
 
+	white2 = white;
 	saved = *camGetCurPtr();
 	GXGetProjectionv(proj);
 	GXGetViewportv(vp);

@@ -30,120 +30,7 @@ typedef struct LstRcDisp {
 s32 ac_lstrckeep_ok_frame[] = {0x50, 0x46, 0x3C, 0x28, 0x14, 0x0A, 0x05};
 const char* ac_lstrckeep_iconname[] = {"_AcSkl1", "_AcSkl2", "_AcSkl3", "_AcSkl4"};
 
-#pragma dont_inline on
-static void actionCommandDisp(f32 x, f32 y, s32 n) {
-    s32 off;
-    s32 i;
-    camGetPtr(8);
-    if (n < 3) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -168.0f + x;
-        pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, 0x71, 1.0f);
-    } else {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -168.0f + x;
-        pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, 0x70, 1.0f);
-    }
-    if (n < 3) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -232.0f + x;
-        pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, 0x78, 1.0f);
-    } else {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -232.0f + x;
-        pos.y = 70.0f + y;
-        iconDispGx(&pos, 0x10, 0x79, 1.0f);
-    }
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -200.0f + x;
-        y = 25.0f + y;
-        pos.y = y;
-        iconDispGx(&pos, 0x10, 0x8E, 1.0f);
-    }
-    i = 0;
-    off = 0;
-    for (; i < 3; i++, off += 0x21) {
-        if (i <= n) {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = x + (f32)(off - 0x102);
-            pos.y = y;
-            iconDispGx(&pos, 0x10, 0x92 + i, 1.0f);
-        } else {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = x + (f32)(off - 0x102);
-            pos.y = y;
-            iconDispGx(&pos, 0x10, 0x91, 0.5f);
-        }
-    }
-    if (n < 3) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -151.0f + x;
-        pos.y = y;
-        iconDispGx(&pos, 0x10, 0x91, 1.0f);
-    } else {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -151.0f + x;
-        pos.y = y;
-        iconDispGx(&pos, 0x10, 0x95, 1.0f);
-    }
-}
-#pragma dont_inline reset
-
-void battleAcDelete_LstRcKeep(BattleWork* work) {
-    work->actionCommands.mAcState = 1005;
-}
-
-void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
-    BattleWork* work = (BattleWork*)param;
-    BattleActions* ac = &work->actionCommands;
-    LstRcDisp* disp = (LstRcDisp*)((u8*)ac + 0x290);
-    LstRcWork* lw = (LstRcWork*)((u8*)ac + 0x2BC);
-    switch (ac->mAcState) {
-        case 99:
-        case 100:
-        case 1000:
-            disp->count = -1;
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer > 0) {
-                (disp->timer)--;
-            }
-            break;
-        case 1001:
-            disp->count = lw->count - 1;
-            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer > 0) {
-                (disp->timer)--;
-            }
-            break;
-        case 1002:
-        case 1003:
-        case 1004:
-            actionCommandDisp(30.0f, 0.0f, disp->count);
-            break;
-        case 1005:
-        case 1006:
-            if (disp->timer >= 40) {
-                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
-            } else {
-                disp->iconX = 30.0f;
-            }
-            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
-            if (disp->timer < 60) {
-                (disp->timer)++;
-            }
-            break;
-    }
-}
-
-s32 battleAcResult_LstRcKeep(BattleWork* work) {
-    return work->actionCommands.result;
-}
+static void actionCommandDisp(f32 x, f32 y, s32 n);
 
 s32 battleAcMain_LstRcKeep(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
@@ -156,6 +43,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
     s32 i;
     s32 tm;
     s32 n;
+    s32 off;
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCmd = 1;
     }
@@ -214,7 +102,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                         lw->held1 = 0;
                     }
                 }
-                if (lw->held0 != 0 || lw->held1 != 0 || *(s16*)((u8*)ac + 0x88) > 0 || autoCmd) {
+                if ((lw->held0 != 0 && lw->held1 != 0) || *(s16*)((u8*)ac + 0x88) > 0 || autoCmd) {
                     ac->mAcState = 1001;
                     lw->timer = *(s32*)((u8*)ac + 0x38);
                     lw->count = 0;
@@ -299,9 +187,9 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 ac->mAcState = 1003;
                 break;
             case 1003:
-                n = lw->count - 1; if (n >= 0) { u8* tbl = (u8*)ac_lstrckeep_iconname; s32 off = 0;
-                for (i = 0; i <= n; i++, off += 4) {
-                    iconDelete(*(const char**)(tbl + off));
+                n = lw->count - 1; if (n >= 0) { u8* tbl; off = 0; tbl = (u8*)ac_lstrckeep_iconname;
+                for (i = 0; i <= n; i++) {
+                    iconDelete(*(const char**)(tbl + off)); off += 4;
                 } }
                 ac->mAcState = 1004;
             case 1004:
@@ -325,3 +213,121 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
     } while (loop);
     return 1;
 }
+
+s32 battleAcResult_LstRcKeep(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+void battleAcDisp_LstRcKeep(CameraId cameraId, void* param) {
+    BattleWork* work = (BattleWork*)param;
+    BattleActions* ac = &work->actionCommands;
+    LstRcDisp* disp = (LstRcDisp*)((u8*)ac + 0x290);
+    LstRcWork* lw = (LstRcWork*)((u8*)ac + 0x2BC);
+    switch (ac->mAcState) {
+        case 99:
+        case 100:
+        case 1000:
+            disp->count = -1;
+            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
+            if (disp->timer > 0) {
+                (disp->timer)--;
+            }
+            break;
+        case 1001:
+            disp->count = lw->count - 1;
+            disp->iconX = intplGetValue(4, 20 - disp->timer, 20, -300.0f, 30.0f);
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
+            if (disp->timer > 0) {
+                (disp->timer)--;
+            }
+            break;
+        case 1002:
+        case 1003:
+        case 1004:
+            actionCommandDisp(30.0f, 0.0f, disp->count);
+            break;
+        case 1005:
+        case 1006:
+            if (disp->timer >= 40) {
+                disp->iconX = intplGetValue(4, disp->timer - 40, 20, 30.0f, -300.0f);
+            } else {
+                disp->iconX = 30.0f;
+            }
+            actionCommandDisp(disp->iconX, disp->iconY, disp->count);
+            if (disp->timer < 60) {
+                (disp->timer)++;
+            }
+            break;
+    }
+}
+
+void battleAcDelete_LstRcKeep(BattleWork* work) {
+    work->actionCommands.mAcState = 1005;
+}
+
+#pragma dont_inline on
+#pragma optimize_for_size on
+static void actionCommandDisp(f32 x, f32 y, s32 n) {
+    s32 off;
+    s32 i;
+    camGetPtr(8);
+    if (n < 3) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -168.0f + x;
+        pos.y = 70.0f + y;
+        iconDispGx(&pos, 0x10, 0x71, 1.0f);
+    } else {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -168.0f + x;
+        pos.y = 70.0f + y;
+        iconDispGx(&pos, 0x10, 0x70, 1.0f);
+    }
+    if (n < 3) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -232.0f + x;
+        pos.y = 70.0f + y;
+        iconDispGx(&pos, 0x10, 0x78, 1.0f);
+    } else {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -232.0f + x;
+        pos.y = 70.0f + y;
+        iconDispGx(&pos, 0x10, 0x79, 1.0f);
+    }
+    {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -200.0f + x;
+        y = 25.0f + y;
+        pos.y = y;
+        iconDispGx(&pos, 0x10, 0x8E, 1.0f);
+    }
+    i = 0;
+    off = 0;
+    for (; i < 3; i++, off += 0x21) {
+        if (i <= n) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = x + (f32)(off - 0x102);
+            pos.y = y;
+            iconDispGx(&pos, 0x10, 0x92 + i, 1.0f);
+        } else {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = x + (f32)(off - 0x102);
+            pos.y = y;
+            iconDispGx(&pos, 0x10, 0x91, 0.5f);
+        }
+    }
+    if (n < 3) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -151.0f + x;
+        pos.y = y;
+        iconDispGx(&pos, 0x10, 0x91, 1.0f);
+    } else {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -151.0f + x;
+        pos.y = y;
+        iconDispGx(&pos, 0x10, 0x95, 1.0f);
+    }
+}
+#pragma optimize_for_size reset
+#pragma dont_inline reset
+

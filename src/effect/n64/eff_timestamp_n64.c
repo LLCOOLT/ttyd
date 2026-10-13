@@ -39,8 +39,6 @@ typedef struct EffTimestampN64Work {
     s32 delay[10];      // 0x14C
 } EffTimestampN64Work;
 
-static GXColor unk_804232b0;
-static GXColor unk_804232b4;
 
 static s32 pos_data[30] = {
     -50, -70, 5,  80, -90, 20, 20, -50, 45,  -80, 30,  10,  30,  0,   35,
@@ -164,16 +162,13 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx rot;
     Mtx mtx;
-    GXColor color2;
-    GXColor color;
-    effN64Vtx* p;
-    effN64Vtx* vtx;
     s32 frame;
     s32 bright;
     s32 i;
-    s32 n;
-    s32 yo;
+    effN64Vtx* vtx;
     s32 k;
+    s32 n;
+    effN64Vtx* p;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -206,30 +201,27 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     PSMTXScale(scale, 0.015625f, 0.015625f, 0.0f);
     GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-    color = unk_804232b0;
-    color.a = work->alpha;
-    GXSetTevColor(GX_TEVREG1, color);
-    p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
-    vtx = p;
-    yo = 0;
-    for (i = 0; i < 16; i++) {
+    GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, work->alpha});
+    vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+    for (i = 0, p = vtx; i < 16; i++, p += 2) {
+        s32 t = i * 128;
         f32 sc = work->scale2;
         f32 a1 = 6.2831855f * (f32)(frame * 10 + i * 60) / 360.0f;
         f32 a2 = 6.2831855f * (f32)(frame * 10 + i * 6) / 360.0f;
-        s32 sx = (s32)(sc * (500.0f * (f32)sin(a1)));
-        s32 sy = (s32)(sc * (200.0f * (f32)sin(a2)));
+        f32 s1 = sin(a1);
+        s32 sx = (s32)(sc * (500.0f * s1));
+        f32 s2 = sin(a2);
+        s32 sy = (s32)(sc * (200.0f * s2));
         p->x = sx - 3200;
-        p->y = sy + (yo - 3000);
+        p->y = sy + i * 400 - 3000;
         p->z = 0;
         p->s = 0;
-        p->t = i * 128;
+        p->t = t;
         p[1].x = sx + 3200;
-        p[1].y = sy + (yo - 3000);
+        p[1].y = sy + i * 400 - 3000;
         p[1].z = 0;
         p[1].s = 2048;
-        p[1].t = i * 128;
-        p += 2;
-        yo += 400;
+        p[1].t = t;
     }
     DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
     GXInvalidateVtxCache();
@@ -250,12 +242,7 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, trans, trans);
         GXLoadPosMtxImm(trans, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        color2 = unk_804232b4;
-        color2.r = colr[i];
-        color2.g = colg[i];
-        color2.b = colb[i];
-        color2.a = bright * work->digitAlpha[i] / 255;
-        GXSetTevColor(GX_TEVREG0, color2);
+        GXSetTevColor(GX_TEVREG0, (GXColor){colr[i], colg[i], colb[i], bright * work->digitAlpha[i] / 255});
         for (n = 0, k = 0; n < 15; n++, k += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);

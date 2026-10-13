@@ -399,15 +399,15 @@ void marioGetRubInit(void) {
 }
 
 s32 chkRevolveDir(s32* cw, s32* ccw) {
+    s32 i;
     RubWork* rw = &rubwork;
     s32 off = 0;
     s32 cwCount = 0;
-    s32 ccwCount = 0;
-    s32 i;
-    s32 j;
     s32 cur;
-    s32 prev;
+    s32 j;
+    s32 ccwCount = 0;
     s32 d;
+    s32 prev;
 
     for (i = 0; i < 10; i++) {
         j = rw->idx + off;
@@ -424,9 +424,9 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
         if (i == 0 && cur == prev) {
             continue;
         }
-        d = cur - prev;
-        if (__fabsf(d) > 180.0f) {
-            cur += d > 0 ? 360 : -360;
+        j = cur - prev;
+        if (__fabsf(j) > 180.0f) {
+            cur += j > 0 ? 360 : -360;
         }
         d = cur - prev;
         if (d > -90 && d < 0) {
@@ -455,12 +455,12 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
 }
 
 s32 checkOneRevolution(s32 dir) {
-    RubWork* rw = &rubwork;
     s32 i;
     s32 j;
-    s32 v;
     s32 cur;
+    s32 v;
     s32 start;
+    RubWork* rw = &rubwork;
     s32 idx;
     s32 ret = 0;
 
@@ -511,7 +511,7 @@ s32 checkOneRevolution(s32 dir) {
 }
 
 static inline void rubClearHist(s32 v) {
-    s32 i;
+    u32 i;
     s16* p = rubwork.hist;
     for (i = 0; i < 21; i++) {
         p[i] = v;
@@ -548,7 +548,7 @@ s32 marioGetRub(u32 btn, s32* dirOut, s32* countOut, f32* magOut) {
     }
     rw->idleTimer = 0;
     rw->hist[rw->idx] = a;
-    j = rubwork.idx + 1;
+    j = rubwork.idx; j++;
     while (j < 0) {
         j += 20;
     }

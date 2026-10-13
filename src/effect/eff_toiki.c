@@ -225,6 +225,7 @@ void effToikiMain(EffectEntry* effect) {
 }
 
 void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
+    u32 i;
     EffToikiWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     s32 type = work->type;
@@ -233,7 +234,6 @@ void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx rot;
     Mtx scale;
-    u32 i;
 
 
     effGetTexObj(0x5C, &texObj);

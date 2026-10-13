@@ -1,4 +1,8 @@
 #include "driver/mobjdrv.h"
+#include "driver/mapdrv.h"
+#include "driver/npcdrv.h"
+#include "mario/mario_party.h"
+#include "party.h"
 #include "dolphin/mtx.h"
 #include "dolphin/types.h"
 #include "driver/animdrv.h"
@@ -356,7 +360,128 @@ void mobjSetPosition(const char* name, f32 x, f32 y, f32 z) {
     entry->position.z = z;
 }
 
+s32 marioChkHipBump(void);
+
 void mobjMain(void) {
+    MapObjectWork* wp;
+    MapObjectEntry* entry;
+    MarioWork* mario;
+    void* party;
+    void* fbat;
+    s32 i;
+    s32 j;
+    Mtx mtx;
+
+    wp = mobjGetWork();
+    entry = wp->entries;
+    mario = marioGetPtr();
+    party = partyGetPtr(marioGetPartyId());
+    fbat = fbatGetPointer();
+    /* TODO: block at 0x68-0x22c: 5x hitGetName/strcmp ride/hit checks on mario & party */
+
+    for (i = 0; i < wp->count; i++, entry++) {
+        if (!(entry->flags & 1)) {
+            continue;
+        }
+        /* TODO: 0x23c-0x264 flag/type filter (else goto anim section 0xd0c) */
+        {
+            if (strcmp(entry->name, "") == 0 || strcmp(entry->name, "") == 0 ||
+                strcmp(entry->name, "") == 0 || strcmp(entry->name, "") == 0) {
+                /* TODO: 0x2bc-0x2d8 */
+            }
+            /* TODO: 0x2dc type == 2 branch */
+            if (entry->flags == 2) {
+                PSVECAdd(&entry->position, &entry->position, &entry->position);
+                PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
+                PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
+                PSMTXRotRad(mtx, 'x', 0.0f);
+                PSMTXRotRad(mtx, 'y', 0.0f);
+                PSMTXRotRad(mtx, 'z', 0.0f);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                for (j = 0; j < 2; j++) {
+                    if (entry->hitObj[j].hitObject != NULL) {
+                        hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
+                    }
+                }
+            } else {
+                PSVECAdd(&entry->position, &entry->position, &entry->position);
+                animPoseGetAnimBaseDataPtr(entry->poseId);
+                /* TODO: block at 0x3ec-0x4e8 joint search */
+                if (strncmp(entry->name, "", strlen("")) == 0) {
+                    /* TODO: 0x504-0x524 */
+                }
+                PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
+                PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
+                PSMTXRotRad(mtx, 'x', 0.0f);
+                PSMTXRotRad(mtx, 'y', 0.0f);
+                PSMTXRotRad(mtx, 'z', 0.0f);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                PSMTXConcat(mtx, mtx, mtx);
+                for (j = 0; j < 2; j++) {
+                    if (entry->hitObj[j].hitObject != NULL) {
+                        hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
+                    }
+                }
+            }
+        }
+        if (entry->flags & 0x10) {
+            /* TODO: block at 0x624-0x710 (hitCheckFilter) */
+            hitCheckFilter(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+            PSVECAdd(&entry->position, &entry->position, &entry->position);
+            animPoseGetAnimBaseDataPtr(entry->poseId);
+            /* TODO: block at 0x72c-0x828 */
+            if (strncmp(entry->name, "", strlen("")) == 0) {
+                /* TODO: 0x844-0x864 */
+            }
+            PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
+            PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
+            PSMTXRotRad(mtx, 'x', 0.0f);
+            PSMTXRotRad(mtx, 'y', 0.0f);
+            PSMTXRotRad(mtx, 'z', 0.0f);
+            PSMTXConcat(mtx, mtx, mtx);
+            PSMTXConcat(mtx, mtx, mtx);
+            PSMTXConcat(mtx, mtx, mtx);
+            PSMTXConcat(mtx, mtx, mtx);
+            for (j = 0; j < 2; j++) {
+                if (entry->hitObj[j].hitObject != NULL) {
+                    hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
+                }
+            }
+        }
+        /* TODO: block at 0x944-0xc88 attack checks: marioGetPtr, marioChkHipBump,
+           unk_8005bb80, PSVECDistance x2, kpaGetHitobjHead/Ride, kpaHipAttackCheck,
+           kpaGetHitobj, kpaGetLevel, kpaGetHitFlame */
+        marioStGetSystemLevel();
+        marioGetPtr();
+        /* TODO: 0xcd0-0xd08 callback (bctrl) */
+        /* TODO: 0xd0c-0xdfc shadow: mapGetWork, mapGetBlend, mapGetBlend2,
+           animPoseGetMaterialFlag x2, shadowEntry, shadowSetType, shadowSetSize */
+        animPoseMain(entry->poseId);
+        animPoseGetMaterialEvtColor(entry->poseId);
+        /* TODO: 0xe20-0xe8c camGetPtr, PSMTXMultVec, PSMTX44MultVec cull */
+        if (entry->flags & 0x20) {
+            if (animPoseGetMaterialFlag(entry->poseId) & 1) {
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+            } else {
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+            }
+        } else {
+            if (animPoseGetMaterialFlag(entry->poseId) & 1) {
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+            } else {
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+            }
+        }
+    }
 }
 
 MapObjectEntry* mobjNameToPtr(const char* name) {

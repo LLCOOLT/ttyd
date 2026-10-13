@@ -1189,21 +1189,8 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             break;
         case STATUS_DEFENSE_UP:
         case STATUS_DEFENSE_DOWN:
-            if (strength <= 0) {
-                if (!strength) {
-                    if ((s8)type == STATUS_DEFENSE_DOWN) {
-                        if (unit->mDefChangeStrength <= 0) {
-                            unit->mDefChangeTurns = 0;
-                            unit->mDefChangeStrength = 0;
-                        }
-                    }
-                    else if (unit->mDefChangeStrength >= 0) {
-                        unit->mDefChangeTurns = 0;
-                        unit->mDefChangeStrength = 0;
-                    }
-                    return FALSE;
-                }
-                if (unit->mDefChangeStrength > 0) {
+            if (strength > 0) {
+                if (unit->mDefChangeStrength < 0) {
                     unit->mDefChangeTurns = 0;
                     unit->mDefChangeStrength = 0;
                     return FALSE;
@@ -1211,8 +1198,21 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 unit->mDefChangeTurns = turns;
                 unit->mDefChangeStrength = strength;
             }
+            else if (strength == 0) {
+                if ((s8)type == STATUS_DEFENSE_DOWN) {
+                    if (unit->mDefChangeStrength <= 0) {
+                        unit->mDefChangeTurns = 0;
+                        unit->mDefChangeStrength = 0;
+                    }
+                }
+                else if (unit->mDefChangeStrength >= 0) {
+                    unit->mDefChangeTurns = 0;
+                    unit->mDefChangeStrength = 0;
+                }
+                return FALSE;
+            }
             else {
-                if (unit->mDefChangeStrength < 0) {
+                if (unit->mDefChangeStrength > 0) {
                     unit->mDefChangeTurns = 0;
                     unit->mDefChangeStrength = 0;
                     return FALSE;
@@ -1232,11 +1232,13 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             }
             break;
         case STATUS_ALLERGIC:
-            if (turns <= 0) {
+            if (turns > 0) {
+                unit->mAllergicTurns = turns;
+            }
+            else {
                 unit->mAllergicTurns = 0;
                 return FALSE;
             }
-            unit->mAllergicTurns = turns;
             break;
         case STATUS_FLIPPED:
             unit->flippedTurns = turns;
@@ -1245,20 +1247,19 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
             unit->mInvisibleTurns = turns;
             break;
         case STATUS_PAYBACK:
-            if (turns <= 0) {
+            if (turns > 0) {
+                unit->mPaybackTurns = turns;
+            }
+            else {
                 unit->mPaybackTurns = 0;
                 return FALSE;
             }
-            unit->mPaybackTurns = turns;
             break;
         case STATUS_HOLD_FAST:
             unit->mHoldFastTurns = turns;
             break;
         case STATUS_FAST:
-            if (unit->mSlowTurns <= 0) {
-                unit->mFastTurns = turns;
-            }
-            else {
+            if (unit->mSlowTurns > 0) {
                 if (turns > 0) {
                     unit->mSlowTurns = 0;
                     _CheckMoveCount(unit);
@@ -1266,18 +1267,21 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
                 }
                 unit->mFastTurns = turns;
             }
+            else {
+                unit->mFastTurns = turns;
+            }
             _CheckMoveCount(unit);
             break;
         case STATUS_SLOW:
-            if (unit->mFastTurns <= 0) {
-                unit->mSlowTurns = turns;
-            }
-            else {
+            if (unit->mFastTurns > 0) {
                 if (turns > 0) {
                     unit->mFastTurns = 0;
                     _CheckMoveCount(unit);
                     return FALSE;
                 }
+                unit->mSlowTurns = turns;
+            }
+            else {
                 unit->mSlowTurns = turns;
             }
             _CheckMoveCount(unit);
@@ -2168,7 +2172,7 @@ s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan) {
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pitch, Vec* pos) {
     s32 id;
     s8 turns, strength;
-    s32 pit = 0;
+    s16 pit = 0;
 
     if (BtlUnit_CheckStatus(unit, 0xB)) {
         BtlUnit_GetStatus(unit, 0xB, &turns, &strength);
@@ -2178,7 +2182,7 @@ s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pi
         BtlUnit_GetStatus(unit, 0xA, &turns, &strength);
         pit = (s16)((strength * 2 + 1) * -0x155);
     }
-    pit = (s16)(pitch + pit + irand(41) - 20);
+    pit = (s16)(pitch + (s32)pit + irand(41) - 20);
     id = psndSFXOn_3D(sfxName, pos);
     psndSFX_pit(id, pit);
     psndSFX_vol(id, volume == -250000000 ? psndSFX_get_vol(id) : (u8)volume);

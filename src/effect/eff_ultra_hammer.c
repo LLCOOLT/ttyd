@@ -711,7 +711,7 @@ inline Vec initializeVec(Vec* input) {
 
 
 void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
-    u32 j;
+    s32 j;
     CameraEntry *temp_r31;
     EffUltraHammerData *data; s32 i;
     s32 temp_r24;
@@ -781,7 +781,7 @@ void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_RGBA4, 13);
             GXSetArray(GX_VA_TEX0, &wakka_texcoord0_tbl, 4);
             for (j = 0; j < 20; j++) {
-                GXCallDisplayList(wakka_dl_0_tbl[j], wakka_dl_0_size_tbl[j] * 32);
+                GXCallDisplayList(wakka_dl_0_tbl[j], wakka_dl_0_size_tbl[j] << 5);
             }
         }
     }

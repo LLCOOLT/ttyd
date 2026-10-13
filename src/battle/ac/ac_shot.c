@@ -80,10 +80,13 @@ static void _ac_disp_init(BattleWork* work);
     SH_OUT(ac)[3]++
 
 s32 battleAcMain_Shot(BattleWork* work) {
-    const char* sfx = "SFX_AC_CURSOR_MOVE1";
-    BattleActions* ac = &work->actionCommands;
-    ShotWork* sw = SH_WORK(ac);
+    const char* sfx;
+    BattleActions* ac;
+    ShotWork* sw;
     s32 loop;
+    sfx = (0, "SFX_AC_CURSOR_MOVE1");
+    ac = &work->actionCommands;
+    sw = SH_WORK(ac);
     do {
         loop = 0;
         switch (ac->mAcState) {

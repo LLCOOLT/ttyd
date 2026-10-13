@@ -427,7 +427,8 @@ USER_FUNC(evt_party_move_pos2) {
 		dist = distABf(PF(p, 0x58), PF(p, 0x60), x, z);
 		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
 		q = dist / spd;
-		partySetForceMove(p, (s32)(gp->framerate * q), PF(p, 0x100), spd / gp->framerate, q);
+		a2 = spd / gp->framerate;
+		partySetForceMove(p, (s32)(gp->framerate * q), PF(p, 0x100), a2, q);
 	}
 	if (p->field_28 == 0) {
 		return EVT_RETURN_DONE;

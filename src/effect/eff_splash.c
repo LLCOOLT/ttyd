@@ -497,9 +497,9 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, geso_shibuki_texcoord0_tbl, 4);
-            { u32 j; for (j = 0; j < 5; j++) {
-                GXCallDisplayList(geso_shibuki_dl_0_tbl[j], geso_shibuki_dl_0_size_tbl[j] << 5);
-            } }
+            for (u = 0; u < 5; u++) {
+                GXCallDisplayList(geso_shibuki_dl_0_tbl[u], geso_shibuki_dl_0_size_tbl[u] << 5);
+            }
             break;
         }
     }
@@ -553,3 +553,5 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
         GXTexCoord2f32(0.0f, 1.0f);
     }
 }
+
+__declspec(section ".sdata") u32 gap_07_804161FC_sdata[1] = {0};

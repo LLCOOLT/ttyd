@@ -225,6 +225,10 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
     s32 state;
     Mtx44 ortho;
     Mtx view;
+    Vec t;
+    Vec target;
+    Vec pos;
+    Vec up;
     f32 proj[7];
     f32 ang;
     f32 sx;
@@ -296,7 +300,6 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
             z = work->pz[i];
         }
         {
-            Vec t;
             Vec pt = {0.0f, 0.0f, 0.0f};
             pt.x = x;
             pt.y = y;
@@ -307,9 +310,9 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
             sx = t.x * gp->fbWidth / 2.0f;
             sy = t.y * gp->efbHeight / 2.0f;
             {
-            Vec target = {0.0f, 0.0f, 0.0f};
-            Vec pos = {0.0f, 0.0f, 1000.0f};
-            Vec up = {0.0f, 1.0f, 0.0f};
+            target = (Vec){0.0f, 0.0f, 0.0f};
+            pos = (Vec){0.0f, 0.0f, 1000.0f};
+            up = (Vec){0.0f, 1.0f, 0.0f};
             GXGetProjectionv(proj);
             MTXOrtho(ortho, 480.0f, 0.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
             GXSetProjection(ortho, GX_ORTHOGRAPHIC);

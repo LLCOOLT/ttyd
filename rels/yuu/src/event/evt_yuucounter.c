@@ -149,12 +149,12 @@ USER_FUNC(evt_yuucounter_main_func) {
 void evt_yuucounter_disp_func(CameraId camera, void* param) {
     YuuCounterWork* wp = param;
     GXColor color = white;
-    s32 j;
     GXColor numColor;
     GXColor iconColor;
     f32 scale;
     f32 xOfs;
     s32 value;
+    s32 j;
     s32 secs;
     BOOL skip;
     BOOL skip2;

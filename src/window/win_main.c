@@ -154,6 +154,9 @@ void winOpenDisable(void) {
     }
 }
 
+typedef struct { const char* s[2]; } WinLangTbl;
+static const WinLangTbl winLangTbl;
+
 void winMain(void) {
     MarioWork* mario;
     s32 i;
@@ -286,13 +289,13 @@ void winMain(void) {
                 break;
 
             case 1: {
-                const char* lang[2] = { "jp", "us" };
+                WinLangTbl lang = winLangTbl;
                 BOOL ok;
 
-                if (fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]) == 0U) {
+                if (fileAsyncf(4, 0, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]) == 0U) {
                     ok = FALSE;
                 } else {
-                    wp->res = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+                    wp->res = fileAllocf(4, "%s/w/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
                     ok = TRUE;
                 }
                 if (ok) {
@@ -457,6 +460,8 @@ void winDispKoopa(CameraId camId, void* param) {
     winTexInit(*((FileEntry*)wp->res)->data);
     winTexSet(0xB7, (Vec){ 0.0f, 50.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
 }
+
+static const WinLangTbl winLangTbl = { { "jp", "us" } };
 
 EVT_BEGIN(kime_pose)
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
@@ -804,7 +809,7 @@ USER_FUNC(itemUseFunc) {
                 break;
             }
             eff = effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 0, *(u8*)&item->hp_restored);
-            ((f32*)eff->userdata)[0x10] = -party->field_F0 * 0.5f;
+            ((f32*)eff->userdata)[0x10] = -party->field_F0 / 2.0f;
             cnt++;
             break;
         case 230:
@@ -1114,7 +1119,7 @@ void winTexInit_x2(TEXPalette* texture) {
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C0, GX_CC_CPREV, GX_CC_ZERO);
-    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
+    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 }
 

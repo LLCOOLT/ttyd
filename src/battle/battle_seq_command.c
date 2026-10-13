@@ -2211,7 +2211,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 			} else {
 				name = msgSearch(part->partName);
 			}
-			{ f32 ww = 16.0f + FontGetMessageWidth(name); windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, ww, 32.0f, 10.0f); }
+			{ f32 ww = FontGetMessageWidth(name); windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, 16.0f + ww, 32.0f, 10.0f); }
 			FontDrawStart();
 			FontDrawString(-232.0f, 83.0f, name);
 		} else {
@@ -2225,7 +2225,7 @@ void BattleCommandDisplay_TargetSelectMenuDisp(CameraId camId, void* param) {
 			} else {
 				name = msgSearch(part->partName);
 			}
-			{ f32 ww = 16.0f + FontGetMessageWidth(name); windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, ww, 32.0f, 10.0f); }
+			{ f32 ww = FontGetMessageWidth(name); windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xCF}, -240.0f, 86.0f, 16.0f + ww, 32.0f, 10.0f); }
 			FontDrawStart();
 			FontDrawString(-232.0f, 83.0f, name);
 		}
@@ -2893,6 +2893,7 @@ USER_FUNC(_get_msg) {
 	switch (CMD_S32(wp, 0x1c80)) {
 		case 1:
 			msg = "btl_msg_cmderror_no_fp";
+			if (!event->args && !event->args) {}
 			break;
 		case 2:
 			msg = "btl_msg_cmderror_no_ap";

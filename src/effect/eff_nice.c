@@ -128,8 +128,111 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 	return effect;
 }
 
-void effNiceMain(EffectEntry* effect) {
+void effNiceDisp(CameraId cameraId, void* param);
+void acrobatMain(EffectEntry* effect);
 
+void effNiceMain(EffectEntry* effect) {
+	NiceEffectWork* wp = effect->userdata;
+	Vec pos;
+	Vec tmp = {0.0f, 0.0f, 0.0f};
+	s32 type;
+	AnimationPose* pose;
+	AnimData* data;
+	f32 start, len, t;
+
+	tmp.x = wp->position.x;
+	tmp.y = wp->position.y;
+	tmp.z = wp->position.z;
+	pos = tmp;
+	type = wp->type;
+	if (effect->flags & 4) {
+		effect->flags &= ~4;
+		if (wp->poseId != -1) {
+			animPoseRelease(wp->poseId);
+		}
+		effDelete(effect);
+		return;
+	}
+	if (wp->poseId != -1) {
+		pose = animPoseGetAnimPosePtr(wp->poseId);
+		data = animPoseGetAnimDataPtr(wp->poseId);
+		animPoseMain(wp->poseId);
+		switch (type) {
+		case 0:
+		case 1: {
+			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			start = ((u32)gp->language == 0) ? 32.0f : 34.0f;
+			if (pose->localFrame > start) {
+				t = 1.0f - (pose->localFrame - start) / (len - start);
+				if (t < 0.0f) t = 0.0f;
+				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
+				{
+				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+				color.a = 255.0f * t;
+				animPoseSetMaterialEvtColor(wp->poseId, color);
+				}
+			}
+			break;
+		}
+		case 2: {
+			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			start = ((u32)gp->language == 0) ? 35.0f : 37.0f;
+			if (pose->localFrame > start) {
+				t = 1.0f - (pose->localFrame - start) / (len - start);
+				if (t < 0.0f) t = 0.0f;
+				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
+				{
+				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+				color.a = 255.0f * t;
+				animPoseSetMaterialEvtColor(wp->poseId, color);
+				}
+			}
+			break;
+		}
+		case 3: {
+			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			start = ((u32)gp->language == 0) ? 45.0f : 40.0f;
+			if (pose->localFrame > start) {
+				t = 1.0f - (pose->localFrame - start) / (len - start);
+				if (t < 0.0f) t = 0.0f;
+				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
+				{
+				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+				color.a = 255.0f * t;
+				animPoseSetMaterialEvtColor(wp->poseId, color);
+				}
+			}
+			break;
+		}
+		case 4: {
+			len = *(f32*)((u8*)*(void**)((u8*)data + 0x24) + 8);
+			start = ((u32)gp->language == 0) ? 48.0f : 40.0f;
+			if (pose->localFrame > start) {
+				t = 1.0f - (pose->localFrame - start) / (len - start);
+				if (t < 0.0f) t = 0.0f;
+				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
+				{
+				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
+				color.a = 255.0f * t;
+				animPoseSetMaterialEvtColor(wp->poseId, color);
+				}
+			}
+			break;
+		}
+		case 6:
+			break;
+		}
+		if (animPoseGetLoopTimes(wp->poseId) >= 1.0f) {
+			animPoseRelease(wp->poseId);
+			effDelete(effect);
+			return;
+		}
+	}
+	if (type == 7) {
+		acrobatMain(effect);
+	} else {
+		dispEntry(CAMERA_3D, dispCalcZ(&pos), 8, effNiceDisp, effect);
+	}
 }
 
 void effNiceDisp(CameraId cameraId, void* param) {

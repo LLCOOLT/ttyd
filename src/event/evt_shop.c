@@ -793,7 +793,7 @@ void list_disp(WinMgrEntry* entry) {
 		else {
 			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
 		}
-		FontDrawMessage(entry->x - (10 - entry->width / 2), entry->y - 20 - y, msg);
+		FontDrawMessage(entry->x + (entry->width / 2 - 10), entry->y - 20 - y, msg);
 	}
 }
 

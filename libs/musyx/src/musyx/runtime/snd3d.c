@@ -14,6 +14,7 @@ static u8 snd_base_studio;
 static u8 snd_max_studios;
 static u8 s3dUseMaxVoices;
 u8 s3dUseLegacyLogic;
+void (*s3dOcclusionCallback)(struct SND_EMITTER*, SND_FVECTOR*, SND_FVECTOR*, void*, SND_FVECTOR*, SND_FVECTOR*, f32*, f32*);
 
 static void UpdateRoomDistances() {
   struct SND_ROOM* r;      // r30
@@ -344,8 +345,9 @@ bool sndRemoveDoor(SND_DOOR* door) {
 }
 
 static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPan, f32* yPan,
-                        f32* zPan) {
+                        f32* zPan, f32* occl) {
   SND_LISTENER* li; // r31
+  f32 v1, filt, occ, minFilt, minOcc;
   SND_FVECTOR d;    // r1+0x44
   SND_FVECTOR v;    // r1+0x38
   SND_FVECTOR p;    // r1+0x2C
@@ -360,7 +362,10 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
   *vol = 0.f;
   *doppler = 1.f;
 
-  pan.x = pan.y = pan.z = 0.f;
+  pan.z = 0.f;
+  minOcc = 1.f;
+  minFilt = 1.f;
+  pan.x = pan.y = 0.f;
 
   for (n = 0, li = s3dListenerRoot; li != NULL; li = li->next, ++n) {
     d.x = em->pos.x - (li->pos.x + li->heading.x * li->volPosOff);
@@ -373,14 +378,28 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
       vd = distance / em->maxDis;
 
       if (em->volPush >= 0.f) {
-        *vol +=
+        v1 =
             li->vol * (em->minVol + (em->maxVol - em->minVol) *
                                         (1.f - ((1.f - em->volPush) * vd + em->volPush * vd * vd)));
       } else {
-        *vol +=
+        v1 =
             li->vol * (em->minVol + (em->maxVol - em->minVol) *
                                         (1.f - ((em->volPush + 1.f) * vd -
                                                 em->volPush * (1.f - (1.f - vd) * (1.f - vd)))));
+      }
+
+      if ((em->flags & 0x180) && s3dOcclusionCallback != NULL) {
+        s3dOcclusionCallback(em, &li->pos, &li->heading, (u8*)li + 0x40, &em->pos, &em->dir, &occ,
+                             &filt);
+        v1 *= 1.f - occ;
+      } else {
+        filt = 0.f;
+      }
+
+      if (s3dUseLegacyLogic) {
+        *vol += v1;
+      } else if (*vol < v1) {
+        *vol = v1;
       }
 
       if (!(em->flags & 0x80000)) {
@@ -399,7 +418,11 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
             new_distance = sqrtf(d.x * d.x + d.y * d.y + d.z * d.z);
 
             if (new_distance < distance) {
-              *doppler = li->soundSpeed / (li->soundSpeed - relspeed);
+              if (li->soundSpeed - relspeed >= 1e-05f) {
+                *doppler = li->soundSpeed / (li->soundSpeed - relspeed);
+              } else {
+                *doppler = 1e05f * li->soundSpeed;
+              }
             } else {
               *doppler = li->soundSpeed / (li->soundSpeed + relspeed);
             }
@@ -421,6 +444,16 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
 
           pan.x += p.x;
           pan.y -= p.y;
+          if (em->flags & 0x80) {
+            if (minOcc > 0.f) {
+              minOcc = 0.f;
+            }
+          }
+          if (minFilt > filt) {
+            minFilt = filt;
+          }
+        } else {
+          *occl = 0.f;
         }
       }
     }
@@ -430,6 +463,18 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
     *xPan = pan.x / n;
     *yPan = pan.y / n;
     *zPan = pan.z / n;
+  }
+
+  if (em->flags & 0x80) {
+    if (em->flags & 0x100) {
+      *occl = minOcc < minFilt ? minFilt : minOcc;
+    } else {
+      *occl = minOcc;
+    }
+  } else if (em->flags & 0x100) {
+    *occl = minFilt;
+  } else {
+    *occl = 0.f;
   }
 }
 
@@ -495,32 +540,14 @@ static void EmitterShutdown(SND_EMITTER* em) {
 
 bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 maxVol,
                       SND_ROOM* room) {
-  u32 id; // r29
-
   if (sndActive) {
     hwDisableIrq();
 
-    em->pos = *pos;
-    em->dir = *dir;
-    em->maxVol = maxVol / 127.f;
-    if (em->minVol > em->maxVol) {
-      em->minVol = em->maxVol;
-    }
-
-    if (em->room != room) {
-      if (em->vid != -1) {
-        if (room->studio != 0xFF) {
-          if ((id = vidGetInternalId(em->vid)) != -1) {
-            hwChangeStudio(id & 0xFF, room->studio);
-          }
-        } else {
-          synthSendKeyOff(em->vid);
-          em->flags |= 0x80000;
-          em->vid = -1;
-        }
-      }
-
-      em->room = room;
+    *(SND_FVECTOR*)((u8*)em + 0x10) = *pos;
+    *(SND_FVECTOR*)((u8*)em + 0x1c) = *dir;
+    *(f32*)((u8*)em + 0x2c) = maxVol / 127.f;
+    if (*(f32*)((u8*)em + 0x30) > *(f32*)((u8*)em + 0x2c)) {
+      *(f32*)((u8*)em + 0x30) = *(f32*)((u8*)em + 0x2c);
     }
     hwEnableIrq();
     return TRUE;
@@ -544,6 +571,7 @@ static SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVEC
   f32 xPan;        // r1+0x3C
   f32 yPan;        // r1+0x38
   f32 zPan;        // r1+0x34
+  f32 occl;
   f32 cvol;        // r1+0x30
   f32 pitch;       // r1+0x2C
 
@@ -569,7 +597,7 @@ static SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVEC
       return -1;
     }
 
-    CalcEmitter(em, &cvol, &pitch, &xPan, &yPan, &zPan);
+    CalcEmitter(em, &cvol, &pitch, &xPan, &yPan, &zPan, &occl);
     if (cvol == 0.f) {
       hwEnableIrq();
       return -1;
@@ -775,18 +803,6 @@ bool sndUpdateListener(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND
 
     MakeListenerMatrix(li);
     li->vol = vol / 127.f;
-
-    if (room != li->room) {
-      if (li->room != NULL) {
-        RemoveListenerFromRoom(li->room);
-      }
-
-      li->room = room;
-      if (room != NULL) {
-        AddListener2Room(li->room);
-      }
-    }
-
     hwEnableIrq();
     return TRUE;
   }
@@ -861,13 +877,14 @@ bool sndRemoveListener(SND_LISTENER* li) {
 }
 
 typedef struct START_LIST {
-  // total size: 0x1C
+  // total size: 0x20
   struct START_LIST* next; // offset 0x0, size 0x4
   f32 vol;                 // offset 0x4, size 0x4
   f32 xPan;                // offset 0x8, size 0x4
   f32 yPan;                // offset 0xC, size 0x4
   f32 zPan;                // offset 0x10, size 0x4
   f32 pitch;               // offset 0x14, size 0x4
+  f32 occl;
   SND_EMITTER* em;         // offset 0x18, size 0x4
 } START_LIST;
 
@@ -990,12 +1007,14 @@ bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, 
   return TRUE;
 }
 
+int synthCheckFXRealloc(unsigned short fid);
 void StartContinousEmitters() {
   long i;          // r30
   START_LIST* sl;  // r29
   SND_EMITTER* em; // r31
   f32 dv;          // r63
 
+  if (s3dUseLegacyLogic) {
   for (i = 0; i < startGroupNum; ++i) {
 
     for (sl = startGroup[i].list; sl != NULL; sl = sl->next) {
@@ -1015,22 +1034,25 @@ void StartContinousEmitters() {
         }
       }
       em = sl->em;
-
-      if (em->room != NULL && em->room->studio == 0xFF) {
-        goto set_flags;
-      }
-      if (
-#if MUSY_VERSION <= MUSY_VERSION_CHECK(2, 0, 1)
-          (em->vid =
-               synthFXStart(em->fxid, 127, 64, em->room != NULL ? em->room->studio : em->studio,
-                            (em->flags & 0x10) != 0))
-#else
-          (em->vid =
-               synthFXStart(em->fxid, 5, 127, 64, em->room != NULL ? em->room->studio : em->studio,
-                            (em->flags & 0x10) != 0))
-#endif
+      {
+        u8 key;
+        if (em->paraInfo == NULL) {
+          key = 0xFF;
+        } else {
+          SND_PARAMETER* pp = em->paraInfo->paraArray;
+          u8 k;
+          for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
+            if (pp->ctrl == 0x8000) {
+              key = pp->paraData.value7;
+              goto key_done;
+            }
+          }
+          key = 0xFF;
+        key_done:;
+        }
+        if (
+          (em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0))
           == -1) {
-      set_flags:
         if (!(em->flags & 0x2)) {
           em->flags |= 0x40000;
           em->flags &= ~0x20000;
@@ -1049,7 +1071,70 @@ void StartContinousEmitters() {
           startGroup[i].running = startGroup[i].running->next;
         }
       }
+      }
     }
+  }
+  } else {
+  for (i = 0; i < startGroupNum; ++i) {
+    for (sl = startGroup[i].list; sl != NULL; sl = sl->next) {
+      if (startGroup[i].running != NULL) {
+        if (!(s3dUseMaxVoices != 0 && synthCheckFXRealloc(startGroup[i].list->em->fxid) == 0)) {
+          dv = sl->vol - (startGroup[i].running)->vol;
+          if (dv <= 0.08f) {
+            continue;
+          } else if (dv <= 0.15f) {
+            if (++sl->em->VolLevelCnt < 20) {
+              continue;
+            }
+          } else {
+            sl->em->VolLevelCnt = 0;
+          }
+          voiceKillSound(startGroup[i].running->em->vid);
+          startGroup[i].running = startGroup[i].running->next;
+          --startGroup[i].numRunning;
+        }
+      }
+      em = sl->em;
+      {
+        u8 key;
+        if (em->paraInfo == NULL) {
+          key = 0xFF;
+        } else {
+          SND_PARAMETER* pp = em->paraInfo->paraArray;
+          u8 k;
+          for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
+            if (pp->ctrl == 0x8000) {
+              key = pp->paraData.value7;
+              goto key_done2;
+            }
+          }
+          key = 0xFF;
+        key_done2:;
+        }
+      if ((em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0))
+          == -1) {
+      set_flags2:
+        if (!(em->flags & 0x2)) {
+          em->flags |= 0x40000;
+          em->flags &= ~0x20000;
+        }
+      } else {
+        if (!(em->flags & 0x20)) {
+          em->flags |= 0x100000;
+          em->fade = 0.f;
+        } else {
+          em->fade = 1.f;
+        }
+        SetFXParameters(em, sl->vol, sl->xPan, sl->yPan, sl->zPan, sl->pitch);
+        em->flags &= ~0x20000;
+        ++startGroup[i].numRunning;
+        if (startGroup[i].running != NULL) {
+          startGroup[i].running = startGroup[i].running->next;
+        }
+      }
+      }
+    }
+  }
   }
 }
 
@@ -1061,6 +1146,7 @@ void s3dHandle() {
   f32 yPan;         // r1+0x10
   f32 zPan;         // r1+0xC
   f32 pitch;        // r1+0x8
+  f32 occl;
 
   if (s3dCallCnt != 0) {
     --s3dCallCnt;
@@ -1076,7 +1162,7 @@ void s3dHandle() {
       continue;
     }
     if ((em->flags & 0x20001) != 0) {
-      CalcEmitter(em, &vol, &pitch, &xPan, &yPan, &zPan);
+      CalcEmitter(em, &vol, &pitch, &xPan, &yPan, &zPan, &occl);
     }
 
     if (!(em->flags & 0x80000)) {
@@ -1168,6 +1254,7 @@ void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f3
   f32 xPan;  // r1+0x34
   f32 yPan;  // r1+0x30
   f32 zPan;  // r1+0x2C
+  f32 occl;
   f32 cvol;  // r1+0x28
   f32 pitch; // r1+0x24
   static SND_EMITTER em;
@@ -1182,7 +1269,7 @@ void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f3
   em.volPush = comp;
   em.room = room;
 
-  CalcEmitter(&em, &cvol, &pitch, &xPan, &yPan, &zPan);
+  CalcEmitter(&em, &cvol, &pitch, &xPan, &yPan, &zPan, &occl);
   info->vol = clip127(cvol * 127.f);
   info->pan = clip127((xPan + 1.f) * 64.f);
   info->span = clip127((1.f - zPan) * 64.f);

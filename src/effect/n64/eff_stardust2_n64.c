@@ -81,6 +81,8 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
     f32 a, sn, cs, b, fy;
     s32 r;
     f32 tx, ty;
+    f32 bx, ax, by, ay;
+    f32 nm;
 
     effect = effEntry();
     effect->type = "Stardust2N64\0\0\0";
@@ -102,11 +104,14 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
     w->type = type;
     w->life = camera;
     w->camera = 4;
-    step = 360.0f / ((f32)n - 1.0f);
-    stepY = vy / ((f32)n - 1.0f);
+    nm = (f32)n - 1.0f;
+    bx = 0.1f * vx;
+    by = 0.1f * vy;
+    ax = 0.4f * vx;
+    ay = 0.4f * vy;
     p = w + 1;
     for (i = 1; i < n; i++, p++) {
-        f32 spread = step * (f32)i;
+        f32 spread = 360.0f / nm * (f32)i;
         if (type > 1) {
             r = rand() % 360;
         } else {
@@ -116,9 +121,9 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
         sn = (f32)sin(a);
         cs = (f32)cos(a);
         b = (f32)sin(6.2831855f * (10.0f * spread - 90.0f) / 360.0f);
-        fy = ((f32)i - 1.0f) * stepY;
-        tx = 0.4f * vx - 0.1f * vx * b;
-        ty = 0.4f * vy - 0.1f * vy * b;
+        fy = ((f32)i - 1.0f) * (vy / nm);
+        tx = ax - bx * b;
+        ty = ay - by * b;
         p->life = i + 30;
         p->frame = 0;
         p->scale = 1.0f;
@@ -145,7 +150,7 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
             p->velocity.y = 0.0f;
             p->velocity.x = 0.0f;
             p->velocity.z = 0.0f;
-            p->life = p->life + i + i;
+            p->life += i + i;
             break;
         default:
             p->velocity.x = sn * tx;
@@ -281,6 +286,7 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffStardust2N64Work* w;
     s32 type;
+    s32 i;
     s32 camera;
     s32 idx;
     effN64Vtx* vtx;
@@ -289,7 +295,6 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx rotY;
     Mtx mtx;
     GXTexObj texObj;
-    GXColor color;
     f32 fr, fg, fb;
     s32 r, g, b;
 
@@ -342,7 +347,7 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
         fb = fg;
         break;
     }
-    for (type = 0; type < effect->count - 1; type++, w++) {
+    for (i = 0; i < effect->count - 1; i++, w++) {
         camera = w->color;
         if (camera < 0) {
             continue;
@@ -369,11 +374,7 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
         if (b > 255) {
             b = 255;
         }
-        color = (GXColor){0, 0, 0, 255};
-        color.r = r;
-        color.g = g;
-        color.b = b;
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, 255});
         switch (camera & 7) {
         case 0:
             vtx = size8x8_tex22x22_vtx + 12;

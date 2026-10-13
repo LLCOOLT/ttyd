@@ -1605,9 +1605,9 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     u32 pattern;
     EffectEntry* eff;
     CounterWork cw;
+    Vec hit;
+    Vec hit2;
     CounterWork* cwp;
-    f32 x2, y2, z2;
-    f32 x, y, z;
     Vec pos;
     u32 result;
     s32 code;
@@ -1629,8 +1629,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     }
     damage = 0;
     if (!(weapon->special & 0x20000) && BtlUnit_GetACPossibility(target) && BattleActionCommandGetDefenceResult() == 5) {
-        BtlUnit_GetHitPos(target, part, &x, &y, &z);
-        eff = effNiceEntry(2, x - 60.0f, 45.0f + y, z - 10.0f);
+        BtlUnit_GetHitPos(target, part, &hit.x, &hit.y, &hit.z);
+        eff = effNiceEntry(2, hit.x - 60.0f, 45.0f + hit.y, hit.z - 10.0f);
         ((f32*)*(void**)((u8*)eff + 0xC))[7] = 0.75f;
         flags |= 0x80000;
         psndSFXOn("SFX_SYSTEM_GREAT1");
@@ -1684,8 +1684,8 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
         }
         if (!(weapon->special & 0x20000) && BtlUnit_GetACPossibility(target)) {
             if (BattleActionCommandGetDefenceResult() > 3) {
-                BtlUnit_GetHitPos(target, part, &x2, &y2, &z2);
-                eff = effNiceEntry(0, x2 - 60.0f, 45.0f + y2, z2 - 10.0f);
+                BtlUnit_GetHitPos(target, part, &hit2.x, &hit2.y, &hit2.z);
+                eff = effNiceEntry(0, hit2.x - 60.0f, 45.0f + hit2.y, hit2.z - 10.0f);
                 ((f32*)*(void**)((u8*)eff + 0xC))[7] = 0.75f;
                 flags |= 0x40000;
                 psndSFXOn("SFX_SYSTEM_NICE1");

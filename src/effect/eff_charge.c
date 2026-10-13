@@ -88,18 +88,7 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(camGetPtr(cameraId)->view, pmtx, vmtx);
             GXLoadPosMtxImm(vmtx, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
-            if (i & 1) {
-                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(-12.0f, -12.0f, 0.0f);
-                GXTexCoord2f32(0.0f, 0.0f);
-                GXPosition3f32(12.0f, -12.0f, 0.0f);
-                GXTexCoord2f32(1.0f, 0.0f);
-                GXPosition3f32(12.0f, -36.0f, 0.0f);
-                GXTexCoord2f32(1.0f, 1.0f);
-                GXPosition3f32(-12.0f, -36.0f, 0.0f);
-                GXTexCoord2f32(0.0f, 1.0f);
-            }
-            else {
+            if (!(i & 1)) {
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
                 GXPosition3f32(-8.0f, -8.0f, 0.0f);
                 GXTexCoord2f32(0.0f, 0.0f);
@@ -108,6 +97,17 @@ void effChargeDisp(CameraId cameraId, EffectEntry* effect) {
                 GXPosition3f32(8.0f, -24.0f, 0.0f);
                 GXTexCoord2f32(1.0f, 1.0f);
                 GXPosition3f32(-8.0f, -24.0f, 0.0f);
+                GXTexCoord2f32(0.0f, 1.0f);
+            }
+            else {
+                GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+                GXPosition3f32(-12.0f, -12.0f, 0.0f);
+                GXTexCoord2f32(0.0f, 0.0f);
+                GXPosition3f32(12.0f, -12.0f, 0.0f);
+                GXTexCoord2f32(1.0f, 0.0f);
+                GXPosition3f32(12.0f, -36.0f, 0.0f);
+                GXTexCoord2f32(1.0f, 1.0f);
+                GXPosition3f32(-12.0f, -36.0f, 0.0f);
                 GXTexCoord2f32(0.0f, 1.0f);
             }
         }
@@ -216,6 +216,7 @@ EffectEntry* effChargeEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 sca
             work->g1 = 20;
             work->b1 = 10;
             break;
+        case 2:
         default:
             work->r0 = 0;
             work->g0 = 0;

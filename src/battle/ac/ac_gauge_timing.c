@@ -219,7 +219,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
                         cw->inRange = 0;
                         goto done;
                     }
-                } else if (GAC(work)->opts & 2) {
+                } else if ((GAC(work)->opts & 2) || (GAC(work)->opts & 2)) {
                     if ((s32)cw->gauge <= 0) {
                         cw->hits++;
                         cw->gauge = 0.0f;
@@ -251,7 +251,7 @@ s32 battleAcMain_GaugeTiming(BattleWork* work) {
                 cw->gauge = (f32)GAC(work)->period / 100.0f * (f32)cw->cnt + 50.0f;
                 if (GAC(work)->opts & 1) {
                     s32 g = (s32)cw->gauge;
-                    if (GAC(work)->opts & 2) {
+                    if ((GAC(work)->opts & 2) || (GAC(work)->opts & 2)) {
                         s32 q = g / 100;
                         if (q > cw->hits) {
                             cw->hits = q;
@@ -377,12 +377,12 @@ static void actionCommandDisp(f32 x, f32 y) {
     GaugeAC* g;
     GaugeWork* cw;
     f32 ratio;
+    s32 i;
+    s32 n;
     u16 pressed;
     u16 unpressed;
     u16 pressed2;
     u16 unpressed2;
-    s32 i;
-    s32 n;
 
     camGetPtr(8);
     g = (GaugeAC*)ac;
@@ -421,8 +421,8 @@ static void actionCommandDisp(f32 x, f32 y) {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 0.0f, 100, 100, 100, 100, 0);
         if (cw->timer <= 0) {
             CameraEntry* cam = camGetPtr(8);
-            f32 qy;
             f32 qx;
+            f32 qy;
             qx = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
             qy = 49.0f + y;
             btlDispGXInit2DRasta();

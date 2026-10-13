@@ -45,7 +45,7 @@ typedef struct StickRotateWork {
 
 static void actionCommandDisp(f32 x, f32 y);
 void actionCommandDisp2(f32 x, f32 y);
-s32 _get_icon_id(s8 dir);
+u16 _get_icon_id(s8 dir);
 
 #pragma dont_inline on
 s32 _GetInputDir(void) {
@@ -371,7 +371,8 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
 #undef work
 }
 
-s32 _get_icon_id(s8 dir) {
+#pragma auto_inline off
+u16 _get_icon_id(s8 dir) {
     switch (dir) {
         case 1:
             return 0x7C;
@@ -402,9 +403,8 @@ s32 _get_icon_id(s8 dir) {
 
 static void actionCommandDisp(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
-    StickRotateWork* sw = AC_WORK(work);
+    StickRotateWork* sw = (StickRotateWork*)((u8*)work + 0x1f4c);
     Vec v0, v1, v2, v3, v4, v5;
-
     switch (work->actionCommands.mAcState) {
         case 99:
         case 100:
@@ -436,6 +436,7 @@ static void actionCommandDisp(f32 x, f32 y) {
 
 void actionCommandDisp2(f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
+    StickRotateParams* p = AC_PARAMS(work);
     StickRotateWork* sw = AC_WORK(work);
     Vec v0, v1, v2;
 
@@ -447,10 +448,10 @@ void actionCommandDisp2(f32 x, f32 y) {
         case 1000:
         case 1001:
             sw->iconTimer++;
-            if (sw->iconTimer >= (AC_PARAMS(work)->stepsA + AC_PARAMS(work)->stepsB) / 2) {
-                s32 step;
+            if (sw->iconTimer >= (p->stepsA + p->stepsB) / 2) {
+                int step;
                 sw->iconTimer = 0;
-                step = (s8)sw->roll;
+                step = *(s8*)&sw->roll;
                 if (step == 0) {
                     step = -1;
                 }
@@ -477,6 +478,7 @@ void actionCommandDisp2(f32 x, f32 y) {
     }
 }
 
+#pragma auto_inline reset
 void battleAcDelete_StickRotate(BattleWork* work) {
     work->actionCommands.mAcState = 1004;
 }

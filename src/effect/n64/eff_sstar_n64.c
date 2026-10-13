@@ -159,7 +159,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     EffSstarN64Work* w;
     f32 dx, dy, dz;
     f32 len, inv;
-    f32 ang, c, s, l2, dot;
+    f32 sq, ang, c, s, l2, dot;
     s32 i;
 
     effect = effEntry();
@@ -203,22 +203,22 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     c = -(f32)cos(ang);
     s = -(f32)sin(ang);
     l2 = c * w->velocity.x;
-    l2 = l2 * l2 + (s * w->velocity.z) * (s * w->velocity.z);
-    if (l2) {
-        l2 = sqrtf(l2);
+    sq = l2 * l2 + (s * w->velocity.z) * (s * w->velocity.z);
+    if (sq) {
+        sq = sqrtf(sq);
     }
     dot = c * w->velocity.x + s * w->velocity.z;
     if (dot < 0.0f) {
-        l2 = -l2;
+        sq = -sq;
         w->rotSpeed = -20.0f;
     } else {
         w->rotSpeed = 20.0f;
     }
-    l2 = -l2;
-    ang = angleABf(0.0f, 0.0f, -w->velocity.y, l2);
+    sq = -sq;
+    ang = angleABf(0.0f, 0.0f, -w->velocity.y, sq);
     w->rotZ2 = ang;
     w->rotZ = ang;
-    w->unk34 = l2;
+    w->unk34 = sq;
     w->life = (s32)(len / speed);
     for (i = 0; i < 8; i++) {
         PSMTXTrans(w->mtx[i], w->position.x, w->position.y, w->position.z);
@@ -288,15 +288,15 @@ void effSstarMain(EffectEntry* effect) {
 void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSstarN64Work* w;
-    s32 i, base, k;
+    s32 i;
     s32 c1, c2, c3;
+    s32 base, k;
     f32 scale;
     Mtx mtx;
     Mtx rot;
     Mtx sc;
     Mtx tmp;
     GXTexObj tex;
-    GXColor col0;
     Vec v0;
     Vec v1;
 
@@ -315,11 +315,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXRotRad(rot, 'z', 0.017453292f * w->rotZ2);
     PSMTXConcat(tmp, rot, tmp);
     GXSetCullMode(GX_CULL_NONE);
-    col0 = (GXColor){0, 0, 0, 255};
-    col0.r = c1;
-    col0.g = c2;
-    col0.b = c3;
-    GXSetTevColor(GX_TEVREG0, col0);
+    GXSetTevColor(GX_TEVREG0, (GXColor){c1, c2, c3, 255});
     GXSetTevColor(GX_TEVREG1, (GXColor){127, 127, 127, 127});
     GXSetTevColor(GX_TEVREG2, (GXColor){80, 80, 80, 80});
     GXSetNumChans(1);
@@ -404,12 +400,12 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
             OSf32tos16(&v0.z, &w->vtx[i * 2].z);
             memcpy(&w->vtx[i * 2 + 1], &shooting_dust_vtx[i * 2 + 1], sizeof(effN64Vtx));
             OSInitFastCast();
-            OSs16tof32(&w->vtx[i * 2 + 1].x, &v1.x);
-            OSs16tof32(&w->vtx[i * 2 + 1].y, &v1.y);
-            OSs16tof32(&w->vtx[i * 2 + 1].z, &v1.z);
+            OSs16tof32((s16*)&w->vtx[i * 2 + 1], &v1.x);
+            OSs16tof32((s16*)&w->vtx[i * 2 + 1] + 1, &v1.y);
+            OSs16tof32((s16*)&w->vtx[i * 2 + 1] + 2, &v1.z);
             PSMTXMultVec(w->mtx[(k - i + 8) % 8], &v1, &v1);
             OSInitFastCast();
-            OSf32tos16(&v1.x, &w->vtx[i * 2 + 1].x);
+            OSf32tos16(&v1.x, (s16*)&w->vtx[i * 2 + 1]);
             OSf32tos16(&v1.y, &w->vtx[i * 2 + 1].y);
             OSf32tos16(&v1.z, &w->vtx[i * 2 + 1].z);
         }
@@ -417,9 +413,9 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(w->vtx, 0x8C);
         effSetVtxDescN64(w->vtx);
         GXLoadPosMtxImm(camera->view, GX_PNMTX0);
-        for (i = 0, base = 0; i < 4; i++, base += 2) {
+        for (c1 = 0, c2 = 0; c1 < 4; c1++, c2 += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(base, base + 1, base + 2, base, base + 1, base + 3, base + 2, base + 1);
+            tri2(c2, c2 + 1, c2 + 2, c2, c2 + 1, c2 + 3, c2 + 2, c2 + 1);
         }
     }
 }

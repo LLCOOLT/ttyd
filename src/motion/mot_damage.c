@@ -269,7 +269,12 @@ void mot_damage(void) {
         if (spd <= -10.0f) {
             spd = -10.0f;
         }
-        baseY = mario->damageHit != NULL ? hitGetDamageReturnPos((HitEntry*)mario->damageHit)->y : mario->position.y;
+        if (mario->damageHit != NULL) {
+            Vec* p = hitGetDamageReturnPos((HitEntry*)mario->damageHit);
+            baseY = p->y;
+        } else {
+            baseY = mario->position.y;
+        }
         if (marioBgmodeChk() == 1 || mario->position.y - baseY <= 50.0f) {
             h = marioChkLandon(&landY, spd);
         } else {

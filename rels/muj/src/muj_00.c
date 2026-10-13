@@ -415,9 +415,9 @@ USER_FUNC(dai3_butai_main_func) {
     s32 d = b - a;
     s32 i;
     NanNpc* npc;
-    f32 r;
-    f32 rad;
     f32 s;
+    f32 rad;
+    f32 r;
     f32 c;
     NanNpcWork* wp = nanNPCWork;
 

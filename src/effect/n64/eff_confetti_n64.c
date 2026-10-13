@@ -74,9 +74,11 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     s32 k;
     s32 n;
     s32 base;
-    f32 speed;
-    f32 half;
+    s32 cnt;
+    f32 s1, c1, ang;
     f32 s2, c2;
+    f32 half;
+    f32 speed;
     f32 r;
 
     effect = effEntry();
@@ -119,8 +121,9 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
         break;
     }
     effect->type = "ConfettiN64";
-    effect->count = n + 1;
-    w = __memAlloc(HEAP_EFFECT, (n + 1) * sizeof(EffConfettiN64Work));
+    cnt = n + 1;
+    effect->count = cnt;
+    w = __memAlloc(HEAP_EFFECT, cnt * sizeof(EffConfettiN64Work));
     effect->userdata = w;
     effect->callback = effConfettiMain;
     w[0].position.x = x;
@@ -138,12 +141,12 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     half = half + half;
     for (k = 0; k < n; k++, w++) {
         r = speed * (0.01f * (f32)(rand() % 101));
-        x = (6.2831855f * ((f32)base + 360.0f * (f32)k / (f32)n)) / 360.0f;
+        ang = (6.2831855f * ((f32)base + 360.0f * (f32)k / (f32)n)) / 360.0f;
         w->type = type;
-        z = sin(x);
-        y = cos(x);
-        s2 = sin(x);
-        c2 = cos(x);
+        s1 = sin(ang);
+        c1 = cos(ang);
+        s2 = sin(ang);
+        c2 = cos(ang);
         if (mod == 3) {
             w->position.x = 0.1f * (f32)(rand() % 701) - 35.0f;
             w->position.y = 0.0f;
@@ -154,11 +157,11 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
             w->life = 120;
             w->delay = k * 3;
         } else {
-            w->position.x = c2 * (r * z);
-            w->position.y = c2 * (r * y);
+            w->position.x = c2 * (r * s1);
+            w->position.y = c2 * (r * c1);
             w->position.z = r * s2;
-            w->velocity.x = c2 * (half * z);
-            w->velocity.y = c2 * (half * y) + 1.0f;
+            w->velocity.x = c2 * (half * s1);
+            w->velocity.y = c2 * (half * c1) + 1.0f;
             w->velocity.z = half * s2;
             if (mod >= 4) {
                 w->accelY = -0.02f - 0.02f * (f32)((k + 1) % 3);
@@ -178,6 +181,7 @@ void effConfettiMain(EffectEntry* effect) {
     s32 type;
     s32 frame;
     s32 count;
+    s32 anm;
     s32 camId;
     Vec position;
 
@@ -259,10 +263,10 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 anm;
     s32 type;
     EffConfettiN64Work* w;
     s32 i;
-    s32 anm;
     s32 alpha;
     s32 count;
     CameraEntry* camera;

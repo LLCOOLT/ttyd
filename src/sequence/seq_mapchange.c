@@ -146,18 +146,73 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
     bgEntry(mapFile);
     if (gp->flags & 1) {
         MarioWork* mario;
-        s32 partyId;
         PartyEntry* party;
         // TODO: verify this is e.g. Flavio and the Egg from Glitzville and rename accordingly
-        s32 extraPartyId;
         PartyEntry* extraParty;
 
         mario = marioGetPtr();
-        partyId = marioGetPartyId();
-        party = partyGetPtr(partyId);
-        extraPartyId = marioGetExtraPartyId();
-        extraParty = partyGetPtr(extraPartyId);
+        party = partyGetPtr(marioGetPartyId());
+        extraParty = partyGetPtr(marioGetExtraPartyId());
         mario->field_EC = mario->position = gp->savePlayerPos;
+        camRoadReset();
+        camShiftReset();
+        if (party) {
+            party->position = gp->savePlayerPos;
+        }
+        if (extraParty) {
+            extraParty->position = gp->savePlayerPos;
+        }
+    } else {
+        Vec pos;
+        Vec hit;
+        Vec norm;
+        f32 dist;
+        f32 ang;
+        int i;
+        MarioWork* mw;
+        CameraEntry* cam;
+        static const char* dir_str[8] = {"n", "ne", "e", "se", "s", "sw", "w", "nw"};
+        if (beroName) {
+            dist = 100000.0f;
+            hitObjGetPos(beroName, &pos);
+            for (i = 0; i < 8; i++) {
+                if (!strncmp(dir_str[i], beroName, strlen(dir_str[i]))) {
+                    ang = 0.125f * (3.1416f * (2.0f * (f32)i));
+                    pos.x += -30.0f * (f32)cos(ang);
+                    pos.z += 30.0f * (f32)sin(ang);
+                    break;
+                }
+            }
+            if (i < 8) {
+                if (hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &dist, &norm.x, &norm.y, &norm.z, pos.x, 10.0f + pos.y, pos.z, 0.0f, -1.0f, 0.0f)) {
+                    Vec t;
+                    t.x = hit.x;
+                    t.y = hit.y;
+                    t.z = hit.z;
+                    marioGetPtr()->position = t;
+                } else {
+                    Vec t = {0.0f, 0.0f, 0.0f};
+                    marioGetPtr()->position = t;
+                }
+            } else {
+                Vec t = {0.0f, 0.0f, 0.0f};
+                marioGetPtr()->position = t;
+            }
+        } else {
+            Vec t = {0.0f, 0.0f, 0.0f};
+            marioGetPtr()->position = t;
+        }
+        mw = marioGetPtr();
+        cam = camGetPtr(4);
+        cam->marioPos.x = mw->position.x;
+        cam->marioPos.y = 0.01f + mw->position.y;
+        cam->marioPos.z = mw->position.z;
+        cam->marioAt.x = cam->marioPos.x;
+        cam->marioAt.y = cam->marioPos.y;
+        cam->marioAt.z = cam->marioPos.z;
+        mw->field_EC = mw->position;
+        camRoadReset();
+        camShiftReset();
     }
 }
 

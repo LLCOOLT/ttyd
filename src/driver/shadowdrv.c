@@ -186,7 +186,7 @@ GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
 };
 
-static void charShadowInit(void);
+static inline void charShadowInit(void);
 static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
@@ -196,13 +196,12 @@ void shadowInit(void) {
     u32 size16;
     u16* ramp16;
     u32 i;
-    u32 dummy;
 
     charShadowInit();
     depthShadowInit();
 
     bufferSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    ramp8 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0));
+    ramp8 = __memAlloc(HEAP_DEFAULT, bufferSize);
     for (i = 0; i < 256; i++) {
         ramp8[(((i & 0x3) * 8) + (((i & 0xC) * 16) + (((i & 0x80) / 4) + ((i & 0x70) / 16))))] = i;
     }
@@ -210,8 +209,8 @@ void shadowInit(void) {
     GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(ramp8, bufferSize);
 
-    size16 = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
-    ramp16 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
+    size16 = (int)GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
+    ramp16 = __memAlloc(HEAP_DEFAULT, size16);
     for (i = 0; i < 0x10000; i++) {
         ramp16[(((i & 0x3) * 4) + (((i & 0xFC) * 256) + (((i & 0xFC00) / 64) + ((i & 0x300) / 256))))] = i;
     }
@@ -263,8 +262,8 @@ static inline void shadowSetupPolygon(void) {
 }
 
 static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
-    ShadowConfig* cfg;
     f32 (*proj)[4];
+    ShadowConfig* cfg;
     u16 size;
     Vec pos;
 
@@ -359,7 +358,7 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
     return TRUE;
 }
 
-static void charShadowInit(void) {
+static inline void charShadowInit(void) {
     CharShadowWork* wp;
 
     cswp->unk0 = 0;
@@ -419,9 +418,9 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
 }
 
 void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
-    ShadowConfig* cfg = &shadowConfig[cswp->unk8];
+    ShadowConfig* cfg;
     CharShadowWork* wp = cswp;
-    ShadowEntry* entry = wp->entries;
+    ShadowEntry* entry;
     f32 (*view)[4];
     u8 alpha;
     s32 i;
@@ -429,6 +428,8 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     f32 w, h, fw, fh;
     f32 x0, x1, z0, z1, cx, cz;
 
+    cfg = &shadowConfig[wp->unk8];
+    entry = wp->entries;
     view = camGetCurPtr()->view;
     alpha = cswp->unk100.a;
     shadowSetupPolygon();
@@ -438,7 +439,8 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     if (gp->inBattle) {
-        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+        GXColor w = {0xFF, 0xFF, 0xFF, 0xFF};
+        GXSetChanMatColor(GX_COLOR0A0, w);
     } else {
         GXColor c = {0, 0, 0, 0xFF};
         c.r = alpha;

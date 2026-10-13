@@ -46,6 +46,7 @@ typedef struct DetWork {
 
 
 void _btlSamplingEnemy(DetWork* d) {
+    s32 i, j, k;
     s32 n = 0;
     DetTarget* t = d->t;
     BattleWork* wp = _battleWorkPointer;
@@ -55,13 +56,11 @@ void _btlSamplingEnemy(DetWork* d) {
         return;
     }
     {
-    s32 i;
     for (i = 0; i < 64; i++) {
         BattleUnit* unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
-            u8 np = unit->mKindParams->numParts;
             BattleUnitPart* part = unit->mParts;
-            s32 j;
+            u8 np = unit->mKindParams->numParts;
             for (j = 0; j < np; j++) {
                 BattleUnitKindPart* kp;
                 s32 dir;
@@ -111,9 +110,6 @@ void _btlSamplingEnemy(DetWork* d) {
     }
     }
     {
-        s32 i;
-        s32 j;
-        s32 k;
     d->curTarget = i = 0;
     d->numTargets = n;
     n = d->numTargets;
@@ -190,13 +186,13 @@ void _btlSamplingEnemy(DetWork* d) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x200000) {
+            if (flags & 0x100000) {
                 u32 a = part->attributes;
                 if (!((a & 1) || (a & 2)) || (a & 0x40000)) {
                     { ok = FALSE; break; }
                 }
             }
-            if (flags & 0x400000) {
+            if (flags & 0x200000) {
                 u32 a = part->attributes;
                 if (!((a & 1) || (a & 2) || (a & 4)) || (a & 0x40000)) {
                     { ok = FALSE; break; }
@@ -216,9 +212,6 @@ void _btlSamplingEnemy(DetWork* d) {
     }
 
     {
-        s32 i;
-        s32 j;
-        s32 k;
         for (i = 0; n > i; i++) {
             DetTarget* tg = &t[i];
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
@@ -305,9 +298,6 @@ void _btlSamplingEnemy(DetWork* d) {
 
     if (d->classFlags & 0x100000) {
         {
-            s32 i;
-            s32 j;
-            s32 k;
             for (i = 0; n > i; i++) {
                 DetTarget* tg = &t[i];
                 BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
@@ -335,9 +325,6 @@ void _btlSamplingEnemy(DetWork* d) {
     }
 
     {
-        s32 i;
-        s32 j;
-        s32 k;
         for (i = 0; n > i; i++) {
             DetTarget* tg = &t[i];
             BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
@@ -383,8 +370,6 @@ void _btlSamplingEnemy(DetWork* d) {
 
     d->numTargets = n;
     {
-    s32 i;
-    s32 j;
     s8* idx = d->idx;
     t = d->t;
     n = d->numTargets;
@@ -446,6 +431,7 @@ BOOL BattleSamplingEnemy(DetWork* d, BattleWeapon* weapon, s32 unitId, s8 belong
 }
 
 void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut) {
+    BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
     s32 w[74];
     s32 i;
@@ -464,7 +450,7 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
         w[d->idx[0]] += 10;
         for (i = 0; i < d->numTargets; i++) {
             s32 id = d->idx[i];
-            BattleUnit* unit = BattleGetUnitPtr(wp, d->t[id].unitIdx);
+            unit = BattleGetUnitPtr(wp, d->t[id].unitIdx);
             w[id] += 100;
             if ((flags & 1) && unit->currentKind == 0xDE) {
                 w[id] = 1.5f * w[id];
@@ -474,7 +460,7 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
             }
             if ((flags & 4)) {
                 f32 t = 0.4f * (d->numTargets - i);
-                w[id] = (0.1f + t) * w[id];
+                w[id] *= 0.1f + t;
             }
             if ((flags & 8)) {
                 f32 t = 0.4f * i;
@@ -508,6 +494,26 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
                 switch (d->weapon->itemId) {
                 case 0:
                     break;
+                case 0x8E:
+                    if (!BtlUnit_CanActStatus(unit) || BtlUnit_CheckStatus(unit, 10)) {
+                        w[id] = 1;
+                    }
+                    break;
+                case 0x92:
+                    if (BtlUnit_CheckStatus(unit, 0xB)) {
+                        w[id] = 1;
+                    }
+                    break;
+                case 0x93:
+                    if (BtlUnit_CheckStatus(unit, 0xF)) {
+                        w[id] = 1;
+                    }
+                    break;
+                case 0x8F:
+                    if (BtlUnit_CheckStatus(unit, 0xE)) {
+                        w[id] = 1;
+                    }
+                    break;
                 case 0x86:
                     if (BtlUnit_CheckStatus(unit, 0x12)) {
                         w[id] = 1;
@@ -528,26 +534,6 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
                         w[id] = 1;
                     }
                     break;
-                case 0x8E:
-                    if (!BtlUnit_CanActStatus(unit) || BtlUnit_CheckStatus(unit, 10)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x8F:
-                    if (BtlUnit_CheckStatus(unit, 0xE)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x92:
-                    if (BtlUnit_CheckStatus(unit, 0xB)) {
-                        w[id] = 1;
-                    }
-                    break;
-                case 0x93:
-                    if (BtlUnit_CheckStatus(unit, 0xF)) {
-                        w[id] = 1;
-                    }
-                    break;
                 case 0x99:
                     if (!BtlUnit_CheckStatus(unit, 1) && !BtlUnit_CheckStatus(unit, 2)
                         && !BtlUnit_CheckStatus(unit, 3) && !BtlUnit_CheckStatus(unit, 4)
@@ -558,13 +544,13 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
                     }
                     break;
                 default:
-                    if ((u8)itemDataTable[d->weapon->itemId].fp_restored) {
+                    if (*(u8*)&itemDataTable[d->weapon->itemId].fp_restored) {
                         s32 mx = BtlUnit_GetMaxFp(unit);
                         if (BtlUnit_GetFp(unit) < mx) {
                             mx = BtlUnit_GetMaxFp(unit);
                             w[id] = w[id] * (1.0f + 0.1f * (mx - BtlUnit_GetFp(unit)));
-                        } else if (!(u8)itemDataTable[d->weapon->itemId].hp_restored
-                                   && !(u8)itemDataTable[d->weapon->itemId].sp_restored) {
+                        } else if (!*(u8*)&itemDataTable[d->weapon->itemId].hp_restored
+                                   && !*(u8*)&itemDataTable[d->weapon->itemId].sp_restored) {
                             w[id] = 1;
                         }
                     }
@@ -586,11 +572,12 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
         } else {
             s32 sum = 0;
             s32 r;
-            s32 pick = 0;
+            s32 pick;
             for (i = 0; i < 74; i++) {
                 sum += w[i];
             }
             r = irand(sum);
+            pick = 0;
             for (i = 0; i < 74; i++) {
                 r -= w[i];
                 if (r <= 0) {

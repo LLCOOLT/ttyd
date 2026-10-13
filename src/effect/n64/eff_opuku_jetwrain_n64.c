@@ -54,6 +54,8 @@ static effN64Vtx opuku_jetwrain_vtx[16] = {
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
 void effOpukuJetwrainMain(EffectEntry* effect);
 
+inline int inline_fn(s32 arg0) { return arg0 < 13; }
+
 EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime) {
     EffectEntry* effect;
     EffOpukuJetwrainWork* work;
@@ -86,7 +88,7 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, 
     work->col2[1] = 220;
     work->col2[2] = 255;
     for (i = 0; i < 19; i++) {
-        for (j = 0; j < 13; j++) {
+        for (j = 0; inline_fn(j); j++) {
             work->h[i][j] = 0;
             work->v[i][j] = 0;
         }

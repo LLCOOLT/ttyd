@@ -247,8 +247,9 @@ void effFireMain(EffectEntry* effect) {
                     break;
             }
             while (1) {
-                idx = work->keyIdx;
-                if (work->keyFrame < tbl[idx].frame) {
+                s32 kf;
+                idx = work->keyIdx; kf = work->keyFrame;
+                if (kf < tbl[idx].frame) {
                     break;
                 }
                 work->keyIdx = idx + 1;
@@ -792,6 +793,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     }
     work->unk64 = 1;
 }
+
 
 static inline void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* smoke = effEntry();

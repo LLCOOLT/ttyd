@@ -246,7 +246,7 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     p = tmpl;
     for (k = 0; k < 16; k++) {
         p = &tmpl[k];
-        ang = 6.2831855f * (f32)(k * 360 / 15) / 360.0f;
+        ang = (6.2831855f * (f32)(k * 360 / 15)) / 360.0f;
         p->x = 100.0f * (f32)cos(ang);
         p->y = 0;
         p->z = 100.0f * (f32)sin(ang);
@@ -277,10 +277,10 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXScale(tex, s, scale, s);
         PSMTXConcat(mtx, tex, mtx);
-        ang = 6.2831855f * work->ang[i] / 360.0f;
         r = 10.0f * work->radius[i];
+        ang = 6.2831855f * work->ang[i] / 360.0f;
         s = (f32)sin(ang);
-        PSMTXTrans(tex, r * s, 0.0f, r * (f32)cos(ang));
+        PSMTXTrans(tex, r * s, 0, r * (f32)cos(ang));
         PSMTXConcat(mtx, tex, mtx);
         PSMTXConcat(base, mtx, mtx);
         for (j = 0; j < 16; j++) {

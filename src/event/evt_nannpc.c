@@ -110,7 +110,7 @@ static inline NanNPC* nanNPCSearch(char* name) {
 
 void nanNPCOption(void) {
     s32 clear;
-    NanNPCWork* w = nanNPCWork;
+    NanNPCWork* w;
     NanNPC* p;
     NanNPC* q;
     Vec diff;
@@ -128,6 +128,7 @@ void nanNPCOption(void) {
     f32 d20;
     f32 nz, ny, nx, hz, hy, hx;
 
+    w = nanNPCWork;
     for (p = w->npc; p < w->npc + w->num; p++) {
         if (p->flags & 4) {
             for (q = w->npc; q < w->npc + w->num; q++) {
@@ -196,7 +197,7 @@ void nanNPCOption(void) {
                         C_VECReflect(&v84, &n, &v54);
                         PSVECScale(&v54, &p->move, mag);
                         clear = 0;
-                        PSVECScale(&n, &n, PSVECDotProduct(&v84, &n) * -(mag - d20) + 0.1f);
+                        PSVECScale(&n, &n, -(mag - d20) * PSVECDotProduct(&v84, &n) + 0.1f);
                         PSVECAdd(&p->pos, &n, &p->pos);
                         PSVECSubtract(&p->pos, &v48, &v3c);
                         d20 = PSVECMag(&v3c);
@@ -207,7 +208,7 @@ void nanNPCOption(void) {
                                 NULL, &hx, &hy, &hz, &d20, &nx, &ny, &nz, v48.x, 1.0f + v48.y, v48.z,
                                 v3c.x, v3c.y, v3c.z);
                             if (p->hit1) {
-                                p->pos = v48;
+                                p->pos = v78;
                             }
                         }
                     }

@@ -767,7 +767,7 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                             data->result--;
                         }
                         data->index = i;
-                        marioSetSwirlPower(1000, 8.0f, hoko_tbl[data->index] - (45 - irand(91)));
+                        marioSetSwirlPower(1000, 8.0f, irand(91) + hoko_tbl[data->index] - 45);
                         mario->dispFlags |= 0x100;
                         break;
                     }
@@ -956,10 +956,10 @@ static USER_FUNC(re_fall_rtn) {
 }
 
 static USER_FUNC(fall_rtn) {
+    const char* sfx;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     BOOL exists = FALSE;
     FuneWork* data = wp->data;
-    const char* sfx;
     s32 total;
     s32 i;
     s32 t;

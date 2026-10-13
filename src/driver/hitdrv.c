@@ -501,9 +501,109 @@ void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     }
 }
 
+static inline f32 hitDequant(register s16* base, register s32 idx) {
+    register f32 r;
+    register s32 off = idx * 2;
+    asm { psq_lx r, base, off, 1, 5 }
+    return r;
+}
+
 #pragma dont_inline on
 s16 hitCalcVtxPosition(HitEntry* hit) {
-    // TODO
+    s32 count = 0;
+    s32 i, j, k;
+    MapFileJoint* joint;
+    MapFileMesh* mesh;
+    MapWork* wp;
+    HitVector* vec;
+    Vec* pos;
+    Vec a, b, c;
+
+    if (hit->vectors == NULL) {
+        return 0;
+    }
+    for (i = 0; i < hit->joint->partCount; i++) {
+        mesh = hit->joint->parts[i].mesh;
+        if (mesh == NULL) {
+            continue;
+        }
+        if (!mesh->isPackedDisplay) {
+            for (j = 0; j < mesh->displayListCount; j++) {
+                s32* list = (s32*)mesh->displayLists.normalLists[j];
+                for (k = 0; k < *list - 2; k++) {
+                    s16 i1, i2;
+                    BOOL even;
+                    s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
+                    pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
+                    vec = &hit->vectors[count++];
+                    i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
+                    i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
+                    MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);
+                    even = !(k & 1);
+                    MTXMultVec(hit->worldMtx, &pos[even ? i2 : i1], &vec->v1);
+                    MTXMultVec(hit->worldMtx, &pos[even ? i1 : i2], &vec->v2);
+                    PSVECSubtract(&vec->v2, &vec->v0, &vec->edge0);
+                    PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
+                    PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
+                    PSVECCrossProduct(&vec->edge0, &vec->edge1, &vec->normal);
+                }
+            }
+        } else {
+            u32 m;
+            s32 stride;
+            s32 bit;
+            wp = mapGetWork();
+            m = mesh->elementMask;
+            stride = 0;
+            for (bit = 0; bit < 12; bit++) {
+                stride += (m >> bit) & 1;
+            }
+            stride *= 2;
+            for (j = 0; j < mesh->displayListCount; j++) {
+                u8* list = (u8*)mesh->displayLists.packedLists[j].offset;
+                s32 n = *(u16*)(list + 1) - 2;
+                for (k = 0; k < n; k++) {
+                    u16 i0, i1, i2;
+                    s32 o0, o1, o2;
+                    BOOL even;
+                    s16* base;
+                    register u32 gqr;
+                    i0 = *(u16*)(list + k * stride + 3);
+                    even = !(k & 1);
+                    i1 = *(u16*)(list + stride * (k + 1) + 3);
+                    i2 = *(u16*)(list + stride * (k + 2) + 3);
+                    vec = &hit->vectors[count];
+                    base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
+                    o0 = i0 * 3;
+                    o1 = (u16)(even ? i2 : i1) * 3;
+                    o2 = (u16)(even ? i1 : i2) * 3;
+                    gqr = (*(s32*)(*(u8**)((u8*)&wp->entries[hit->mapIndex] + 0xA4) + 0x44) << 8) | 7;
+                    gqr |= gqr << 16;
+                    asm { mtspr GQR5, gqr }
+                    a.x = hitDequant(base, o0);
+                    a.y = hitDequant(base, o0 + 1);
+                    a.z = hitDequant(base, o0 + 2);
+                    b.x = hitDequant(base, o1);
+                    b.y = hitDequant(base, o1 + 1);
+                    b.z = hitDequant(base, o1 + 2);
+                    c.x = hitDequant(base, o2);
+                    c.y = hitDequant(base, o2 + 1);
+                    c.z = hitDequant(base, o2 + 2);
+                    MTXMultVec(hit->worldMtx, &a, &vec->v0);
+                    MTXMultVec(hit->worldMtx, &b, &vec->v1);
+                    MTXMultVec(hit->worldMtx, &c, &vec->v2);
+                    PSVECSubtract(&vec->v2, &vec->v0, &vec->edge0);
+                    PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
+                    PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
+                    PSVECCrossProduct(&vec->edge0, &vec->edge1, &vec->normal);
+                    if (vec->normal.x != 0.0f || vec->normal.y != 0.0f || vec->normal.z != 0.0f) {
+                        count++;
+                    }
+                }
+            }
+        }
+    }
+    return count;
 }
 #pragma dont_inline reset
 
@@ -1095,10 +1195,8 @@ void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion)
         PSVECAdd(position, &sp8, position);
         (*counter)++;
     }
-    if (recursion != 0) {
-        if (hit->sibling != NULL) {
-            hitObjGetPosSub(hit->sibling, position, counter, 1);
-        }
+    if (recursion != 0 && hit->sibling != NULL) {
+        hitObjGetPosSub(hit->sibling, position, counter, 1);
     }
 }
 

@@ -42,14 +42,12 @@ Vec pos_tbl[7] = {
 };
 
 static void callback(MapTevCallbackInfo* info) {
-    GXColor color = { 0xE8, 0x00, 0xE8, 0x00 };
     s32 tevStage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
     s32 field_0x18 = info->field_0x18;
 
-    color.a = mahojin_rate;
-    GXSetTevColor(GX_TEVREG0, color);
+    GXSetTevColor(GX_TEVREG0, (GXColor){ 0xE8, 0x00, 0xE8, mahojin_rate });
     GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -106,7 +104,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     p->arg = NULL;
     p->func = NULL;
 
-    for (p = work + 2, i = 2; i < effect->count; i++, p++) {
+    for (p = work + 2, n = 2; n < effect->count; n++, p++) {
         p->position.x = x;
         p->position.y = y;
         p->position.z = z;
@@ -121,11 +119,11 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
 }
 
 void effMahojinMain(EffectEntry* effect) {
-    EffMahojinWork* work = effect->userdata;
     EffMahojinWork* p;
+    s32 i;
+    EffMahojinWork* work = effect->userdata;
     s32 type;
     s32 inBattle;
-    s32 i;
     f32 loops;
     Vec position;
     Vec tmp = { 0.0f, 0.0f, 0.0f };
@@ -202,7 +200,7 @@ void effMahojinMain(EffectEntry* effect) {
                     {
                         EffMahojinWork* q = p;
                         s32 k;
-                        for (k = 0; k < effect->count; k++, q++) {
+                        for (k = 0; k < effect->count; q++, k++) {
                             animPoseSetMaterialFlagOn(q->poseId[0], 0xA000000);
                             animPoseSetMaterialFlagOn(q->poseId[1], 0xA000000);
                         }
@@ -230,12 +228,12 @@ void effMahojinMain(EffectEntry* effect) {
                     if (loops > 0.6f) {
                         p->poseId[0] = animPoseEntry("MOBJ_EFF_mahojin_omote", inBattle);
                         p->poseId[1] = animPoseEntry("MOBJ_EFF_mahojin_ura", inBattle);
-                        if (type == 7 || type == 8) {
-                            animPoseSetAnim(p->poseId[0], name_tbl[(i - 2) * 3 + 1], TRUE);
-                            animPoseSetAnim(p->poseId[1], name_tbl[(i - 2) * 3 + 1], TRUE);
-                        } else {
+                        if (type != 7 && type != 8) {
                             animPoseSetAnim(p->poseId[0], name_tbl[(i - 2) * 3 + 2], TRUE);
                             animPoseSetAnim(p->poseId[1], name_tbl[(i - 2) * 3 + 2], TRUE);
+                        } else {
+                            animPoseSetAnim(p->poseId[0], name_tbl[(i - 2) * 3 + 1], TRUE);
+                            animPoseSetAnim(p->poseId[1], name_tbl[(i - 2) * 3 + 1], TRUE);
                         }
                         p->alpha = 0;
                         p->state = 1;
@@ -273,22 +271,24 @@ void effMahojinMain(EffectEntry* effect) {
 
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     MapWork* map;
+    EffMahojinWork* p;
+    s32 i, j, k, n;
     EffMahojinWork* work = effect->userdata;
     s32 pass;
     s32 alpha;
     u16 flags;
-    s32 i, j, k, n;
-    EffMahojinWork* p;
+
     Mtx mtx;
+    f32* zp;
     f32 z[16];
     s32 idx[16];
-    f32* zp;
 
     camGetPtr(cameraId);
     alpha = work->alpha;
     map = mapGetWork();
     flags = map->entries[0].flags;
     zp = z;
+
     for (pass = 0; pass < 2; pass++) {
         n = 0;
         if (pass == 0) {
@@ -327,12 +327,9 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
                 p->func(cameraId, p->arg);
             }
             if (p->poseId[pass] != -1) {
-                GXColor color;
                 animPoseMain(p->poseId[pass]);
                 animPoseSetMaterialFlagOn(p->poseId[pass], 0x40);
-                color = (GXColor){ 0xFF, 0xFF, 0xFF, 0x00 };
-                color.a = p->alpha * alpha / 255;
-                animPoseSetMaterialEvtColor(p->poseId[pass], color);
+                animPoseSetMaterialEvtColor(p->poseId[pass], (GXColor){ 0xFF, 0xFF, 0xFF, p->alpha * alpha / 255 });
                 animPoseDrawMtx(p->poseId[pass], mtx, 3, 0.0f, 10.0f);
             }
         }

@@ -296,9 +296,9 @@ static void actionCommandDisp(f32 x, f32 y) {
 s32 _get_angle_rate(f32 angle) {
     s32 r;
     f32 a;
-    a = compAngle(0.0f, angle);
-    a += 45.0f;
-    a = a * 100.0f;
+    angle = compAngle(0.0f, angle);
+    angle += 45.0f;
+    a = 100.0f * angle;
     r = a / 90.0f;
 
     if (r < 0) {

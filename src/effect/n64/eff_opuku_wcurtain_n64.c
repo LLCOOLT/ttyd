@@ -144,6 +144,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 k;
     s32 j;
     s32 n;
+    s32 t;
     s32 frame;
 
     camera = camGetPtr(cameraId);
@@ -169,17 +170,17 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     vtx = p;
     for (i = 0; i < 12; i++) {
-        p->x = -300 + i * 50;
+        p->x = (i * 50) - 300;
         p->y = 600;
         p->z = 0;
         p->s = (frame + i * 4) << 5;
-        p->t = (s32)work->offset[i] << 5;
+        p->t = ((s32)work->offset[i]) << 5;
         p->r = 255;
         p->g = 255;
         p->b = 255;
         p->a = 255 - i * 20;
         p++;
-        p->x = -300 + i * 50;
+        p->x = (i * 50) - 300;
         p->y = (s32)(10.0f * (60.0f + work->offset[i]));
         p->z = 0;
         p->s = (frame + i * 4) << 5;

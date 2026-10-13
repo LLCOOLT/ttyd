@@ -512,8 +512,9 @@ static inline f32 partyUpdSpd(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 f;
     f32 target;
-    f32 cur = party->field_104;
+    f32 cur;
 
+    cur = party->field_104;
     if (mario->flags & 0x8000) {
         target = mario->baseSpeed;
     } else {
@@ -546,7 +547,8 @@ void unk_800c93d0(PartyEntry* party, f32 spd) {
 
 void unk_800c9398(PartyEntry* party, f32 spd) {
     f32 s = spd * party->playerPtr->playerGravity;
-    PF(party, 0x108) = s * ((party->flags & 0x80) ? 0.75f : 1.0f);
+    f32 m = (party->flags & 0x80) ? 0.75f : 1.0f;
+    PF(party, 0x108) = s * m;
     party->field_104 = PF(party, 0x108);
 }
 
@@ -644,9 +646,8 @@ void unk_800c8f24(PartyEntry* party, f32 spd) {
         unk_800c90d4(party, 1);
         return;
     }
-    g = party->playerPtr->playerGravity;
-    a = (1.0f == g) ? 1.65f : 2.0f;
-    b = (1.0f == g) ? 0.8f : 0.0f;
+    a = (1.0f == party->playerPtr->playerGravity) ? 1.65f : 2.0f;
+    b = (1.0f == party->playerPtr->playerGravity) ? 0.8f : 0.0f;
     if (a - b < spd && spd < spd + b) {
         if (N_marioGetMovementSpeed() == 1) {
             partyChgPoseId(party, 2);
@@ -1100,7 +1101,28 @@ void partyMoveWalk(PartyEntry* party) {
         partyWalkInit(party);
     }
     if (party->field_28 == 0 && PU8(party, 0x36) != 2 && PU8(party, 0x36) != 3 && PU8(party, 0x36) != 6) {
-        partyUpdSpd(party);
+        f32 f;
+        f32 target;
+        MarioWork* mario = party->playerPtr;
+        f32 cur = party->field_104;
+        if (mario->flags & 0x8000) {
+            target = mario->baseSpeed;
+        } else {
+            target = PF(party, 0x108) * mario->playerGravity * ((party->flags & 0x80) ? 0.75f : 1.0f);
+        }
+        if (target > 0.0f) {
+            f = cur + 0.05f * ((0.5f + target) - cur);
+            if (f >= target) {
+                f = target;
+            }
+            party->field_104 = f;
+        } else {
+            f = cur + 0.1f * (-1.0f - cur);
+            if (f <= 0.0f) {
+                f = 0.0f;
+            }
+            party->field_104 = f;
+        }
     }
     partyWalkMain(party);
 }
@@ -1915,10 +1937,10 @@ BOOL partyGetAppearPos4(PartyEntry* party, Vec* out) {
             out->y = mario->position.y;
         }
     }
-    n = 11;
-    if (party->field_8 & 0x200000) {
-        n = 13;
-    }
+    n = (party->field_8 & 0x200000) ? 13 : 11;
+
+
+
     for (i = 0; i <= n; i++) {
         if (i == 0) {
             query.targetDistance = dist;
@@ -1968,6 +1990,9 @@ BOOL partyGetAppearPos4(PartyEntry* party, Vec* out) {
     partyAppearAdjustY(party, mario, out);
     return FALSE;
 }
+
+const Vec vec3_802ce0ac = {0.0f, 0.0f, 0.0f};
+const Vec vec3_802ce0b8 = {0.0f, 0.0f, 0.0f};
 
 BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
     s32 angles[12] = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180};

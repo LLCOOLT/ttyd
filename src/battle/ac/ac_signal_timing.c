@@ -59,13 +59,13 @@ s32 _get_ok_frame_range(s32 difficulty) {
 
 #pragma dont_inline reset
 s32 battleAcMain_SignalTiming(BattleWork* work) {
-    s32 i;
-    s32 j;
-    BOOL unique;
     const char* sfxNg;
     const char* sfxOk;
     const char* sfxPone;
     const char* sfxPi;
+    s32 i;
+    s32 j;
+    BOOL unique;
     BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
@@ -79,7 +79,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
-    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0";
+    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0\0\0\0\0";
 
     do {
         loop = FALSE;
@@ -350,13 +350,14 @@ static void actionCommandDisp(f32 x, f32 y) {
     SignalTimingWork* w;
     s32 count;
     s32 next;
-    s32 n;
     s32 i;
+    s32 n;
     s32 num;
     s32 num2;
     f32 yb;
     f32 yd;
     f32 fx;
+    f32 yc;
     Mtx mOut;
     Mtx mTrans;
     Mtx mScale;
@@ -397,11 +398,10 @@ static void actionCommandDisp(f32 x, f32 y) {
             break;
     }
 
-    yb = 25.0f + y;
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x;
-        pos.y = yb;
+        pos.y = yb = 25.0f + y;
         iconDispGx(&pos, 0x10, 0x8F, 1.0f);
     }
     for (i = 1; i < n; i++) {
@@ -466,18 +466,17 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
             }
         }
     } else if (!(ST_FLAGS(work) & 2)) {
-        f32 yc = 15.0f + y;
+        yc = 15.0f + y;
         for (i = 0; i < count; i++) {
-            s32 idx = i + ST_LEAD(work);
             f32 scale = 0.8f;
-            if (w->next == idx && w->frame >= ST_STEP(work) * idx - 5 && w->frame < ST_STEP(work) * idx) {
+            if (w->next == (i + ST_LEAD(work)) && w->frame >= ST_STEP(work) * (i + ST_LEAD(work)) - 5 && w->frame < ST_STEP(work) * (i + ST_LEAD(work))) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yc;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 0), 0.8f);
             } else {
                 s32 dy;
-                if (w->next <= idx) {
+                if (w->next <= (i + ST_LEAD(work))) {
                     scale = 0.6f;
                     dy = -2;
                 } else {
@@ -492,15 +491,14 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
             }
         }
     } else {
-        f32 yc = 20.800001f + yb;
+        yc = 20.800001f + yb;
         for (i = 0; i < count; i++) {
-            s32 idx = i + ST_LEAD(work);
-            if (w->next == idx && w->frame >= ST_STEP(work) * idx - 20 && w->frame <= ST_STEP(work) * idx) {
+            if (w->next == (i + ST_LEAD(work)) && w->frame >= ST_STEP(work) * (i + ST_LEAD(work)) - 20 && w->frame <= ST_STEP(work) * (i + ST_LEAD(work))) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
                 pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 0), 0.8f);
-            } else if (w->next <= idx) {
+            } else if (w->next <= (i + ST_LEAD(work))) {
                 if (i >= count - 1) {
                     btlDispTexPlane(0x40, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yc, 0.0f, 0.8f, 0.8f);
                 }

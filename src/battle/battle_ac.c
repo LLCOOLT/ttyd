@@ -119,7 +119,7 @@ void BattleActionCommandStop(BattleWork* work) {
 
 #pragma dont_inline on
 s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
-	BattleWork* wp = _battleWorkPointer;
+	BattleWork* wp;
 	s32 i;
 	s32 count;
 	s32 done;
@@ -129,6 +129,7 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
 	u8 normal_frames[7] = {10, 9, 8, 8, 7, 6, 5};
 	u8 super_frames[7] = {5, 4, 3, 3, 2, 1, 1};
 
+	wp = _battleWorkPointer;
 	done = 0;
 	wp->actionCommands.mDefenseResult = 0;
 	diff = 3 + unit->badgesEquipped.Unsimplifier - unit->badgesEquipped.Simplifier;
@@ -141,7 +142,7 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
 	superguard = super_frames[diff];
 	normal = normal_frames[diff];
 
-	if ((u8)weapon->superguardsAllowed && unit->currentHp > 0) {
+	if (*(u8*)&weapon->superguardsAllowed && unit->currentHp > 0) {
 		if (AC_GUARD_TIMER(wp) > 0) {
 			AC_GUARD_TIMER(wp)--;
 			done = 1;
@@ -216,11 +217,10 @@ s32 BattleActionCommandCheckDefence(BattleUnit* unit, BattleWeapon* weapon) {
 	BtlPad_WorkInit(&wp->actionCommands.pad);
 	return wp->actionCommands.mDefenseResult;
 }
-#pragma dont_inline reset
-
 u32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask) {
 	return _battleWorkPointer->actionCommands.pad.mButtonsPressedHistory[chan] & mask;
 }
+#pragma dont_inline reset
 
 s32 BattleActionCommandGetDefenceResult(void) {
 	return _battleWorkPointer->actionCommands.mDefenseResult;
@@ -335,7 +335,7 @@ static inline void gaugeQuad(CameraEntry* cam, f32 x0, f32 y0, f32 x1, f32 y1, u
 
 void BattleAcDrawGauge(s32 x, s32 y, s32 width, f32 ratio, s32 level, s32 a, s32 b, s32 c, s32 flags) {
 	BattleWork* wp = _battleWorkPointer;
-	s32 max = gaugeMax();
+	volatile s32 max_ = 100; s32 max = max_;
 	Vec pos;
 	GXColor color = {0x00, 0xE4, 0x86, 0xFF};
 	CameraEntry* cam;

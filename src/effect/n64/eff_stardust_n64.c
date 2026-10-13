@@ -85,10 +85,11 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     s32 count;
     s32 i;
     EffStardustN64Work* work;
-    f32 radius;
     f32 angle;
-    f32 fb;
+    f32 sn;
+    f32 radius;
     f32 fa;
+    f32 fb;
     f32 ay;
 
     effect = effEntry();
@@ -131,8 +132,8 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     work->camera = 4;
     work->scale = 1.0f;
     i = 1;
-    randA = (s32)(1000.0f * a);
-    randB = (s32)(1000.0f * radius);
+    randA = (s32)(a * 1000.0f);
+    randB = (s32)(radius * 1000.0f);
     p = work + 1;
     lifeA = 0x20;
     lifeB = 0x14;
@@ -141,16 +142,15 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
         fb = (f32)(rand() % randB) / 1000.0f;
         switch (type) {
         case 0: {
-            f32 sn;
             f32 a1;
             f32 a2;
             p->ay = 0.0f;
             a1 = 6.2831855f * (1800.0f / (f32)count * (f32)i - 90.0f) / 360.0f;
             sn = (f32)sin(a1);
             a2 = 6.2831855f * (360.0f / (f32)count * (f32)i) / 360.0f;
-            p->vx = a * ((f32)sin(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f);
+            p->vx = ((f32)sin(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
             sn = (f32)sin(a1);
-            p->vy = a * ((f32)cos(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f);
+            p->vy = ((f32)cos(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
             p->position.z = 0.0f;
             p->sub = 0;
             break;
@@ -178,8 +178,8 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
         case 3:
         default:
             angle = 360.0f / (f32)count * (f32)i + (f32)(rand() % 360);
-            angle = 6.2831855f * angle / 360.0f;
             p->ay = -(0.05f + (f32)(rand() % 50 / 1000));
+            angle = 6.2831855f * angle / 360.0f;
             p->vx = 0.0f;
             p->vy = 0.0f;
             p->position.x = fa * (f32)sin(angle);

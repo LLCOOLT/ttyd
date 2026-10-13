@@ -32,198 +32,7 @@ typedef struct PowerGaugeWork {
 #define ACW(ac, T, off) (*(T*)((u8*)(ac) + (off)))
 
 #define ICONGX ((void (*)(Vec*, s32, s32, f32))iconDispGx)
-static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
-    PowerGaugeWork* pw;
-    s32 a, b, c, d;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
-    f32 ratio;
-    u32 flags;
-
-    camGetPtr(8);
-    pw = PG_WORK(ac);
-    ratio = pw->gauge / 100.0f;
-    if (ratio > 1.0f) {
-        ratio = 1.0f;
-    }
-    ACW(disp, f32, 0x28) = ratio;
-
-    if (ACW(ac, u32, 0x34) & 2) {
-        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);
-    } else {
-        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ACW(ac, s32, 0x48), 100, 100, 0);
-    }
-
-    flags = ACW(ac, u32, 0x34);
-    if (!(flags & 4)) {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-        pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;
-        pos.y = 45.0f + y;
-        ICONGX(&pos, 0x10, 0x96, 1.0f);
-    } else {
-        s32 icon;
-        if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
-            icon = 0x95;
-        } else {
-            icon = 0x91;
-        }
-        if (flags & 8) {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = 120.0f + (-200.0f + x) - 12.0f;
-            pos.y = 18.0f + y;
-            ICONGX(&pos, 0x10, icon, 1.0f);
-        } else {
-            Vec pos = {0.0f, 0.0f, 0.0f};
-            pos.x = 120.0f + (-200.0f + x);
-            pos.y = 18.0f + y;
-            ICONGX(&pos, 0x10, icon, 1.0f);
-        }
-    }
-
-    switch (ACW(ac, s32, 0x38)) {
-        case 0:
-            a = 0x7F;
-            b = 0x7E;
-            c = 0x81;
-            d = 0x80;
-            break;
-        case 1:
-            a = BattleACGetButtonIcon(0x100, 1);
-            b = BattleACGetButtonIcon(0x100, 0);
-            c = 0;
-            d = 0;
-            break;
-        case 2:
-            a = BattleACGetButtonIcon(0x100, 1);
-            b = BattleACGetButtonIcon(0x100, 0);
-            c = 0;
-            d = 0;
-            break;
-        case 3:
-            a = BattleACGetButtonIcon(0x20, 1);
-            b = BattleACGetButtonIcon(0x20, 0);
-            c = 0;
-            d = 0;
-            break;
-    }
-
-    switch (ac->mAcState) {
-        case 99:
-        case 100:
-        case 1003:
-        case 1004:
-        case 1005:
-            if ((u16)c) {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                x += -225.0f;
-                y = 80.0f + y;
-                pos.x = x;
-                pos.y = y;
-                ICONGX(&pos, 0x10, b, 1.0f);
-                {
-                    Vec pos2 = {0.0f, 0.0f, 0.0f};
-                    pos2.x = 56.0f + x;
-                    pos2.y = y;
-                    ICONGX(&pos2, 0x10, d, 1.0f);
-                }
-            } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = 28.0f + (-225.0f + x);
-                pos.y = 80.0f + y;
-                ICONGX(&pos, 0x10, b, 1.0f);
-            }
-            break;
-        case 1000:
-        case 1001:
-            if (ACW(pw, s8, 0x12)) {
-                if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        x += -225.0f;
-                        y = 80.0f + y;
-                        pos.x = x;
-                        pos.y = y;
-                        ICONGX(&pos, 0x10, a, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + x;
-                            pos2.y = y;
-                            ICONGX(&pos2, 0x10, c, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, 0x10, a, 1.0f);
-                    }
-                } else {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        x += -225.0f;
-                        y = 80.0f + y;
-                        pos.x = x;
-                        pos.y = y;
-                        ICONGX(&pos, 0x10, b, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + x;
-                            pos2.y = y;
-                            ICONGX(&pos2, 0x10, d, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, 0x10, b, 1.0f);
-                    }
-                }
-            } else {
-                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        x += -225.0f;
-                        y = 80.0f + y;
-                        pos.x = x;
-                        pos.y = y;
-                        ICONGX(&pos, 0x10, b, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + x;
-                            pos2.y = y;
-                            ICONGX(&pos2, 0x10, d, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, 0x10, b, 1.0f);
-                    }
-                } else {
-                    if ((u16)c) {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        x += -225.0f;
-                        y = 80.0f + y;
-                        pos.x = x;
-                        pos.y = y;
-                        ICONGX(&pos, 0x10, a, 1.0f);
-                        {
-                            Vec pos2 = {0.0f, 0.0f, 0.0f};
-                            pos2.x = 56.0f + x;
-                            pos2.y = y;
-                            ICONGX(&pos2, 0x10, c, 1.0f);
-                        }
-                    } else {
-                        Vec pos = {0.0f, 0.0f, 0.0f};
-                        pos.x = 28.0f + (-225.0f + x);
-                        pos.y = 80.0f + y;
-                        ICONGX(&pos, 0x10, a, 1.0f);
-                    }
-                }
-            }
-            break;
-    }
-}
+static void actionCommandDisp(f32 x, f32 y);
 
 s32 battleAcMain_PowerGauge(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
@@ -418,11 +227,10 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
     return 1;
 }
 
-void battleAcDelete_PowerGauge(BattleWork* work) {
-    if (!(work->actionCommands.field_0x30 & 1)) {
-        work->actionCommands.mAcState = 1004;
-    }
+s32 battleAcResult_PowerGauge(BattleWork* work) {
+    return work->actionCommands.result;
 }
+
 
 void battleAcDisp_PowerGauge(CameraId cameraId, BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
@@ -454,6 +262,201 @@ void battleAcDisp_PowerGauge(CameraId cameraId, BattleWork* work) {
     }
 }
 
-s32 battleAcResult_PowerGauge(BattleWork* work) {
-    return work->actionCommands.result;
+void battleAcDelete_PowerGauge(BattleWork* work) {
+    if (!(work->actionCommands.field_0x30 & 1)) {
+        work->actionCommands.mAcState = 1004;
+    }
+}
+
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    PowerGaugeWork* pw;
+    s32 a, b, c, d;
+    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    f32 ratio;
+    u32 flags;
+
+    camGetPtr(8);
+    pw = PG_WORK(ac);
+    ratio = pw->gauge / 100.0f;
+    if (ratio > 1.0f) {
+        ratio = 1.0f;
+    }
+    ACW(disp, f32, 0x28) = ratio;
+
+    if (ACW(ac, u32, 0x34) & 2) {
+        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);
+    } else {
+        BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ACW(ac, s32, 0x48), 100, 100, 0);
+    }
+
+    flags = *(u32*)(ac->field_34);
+    if (!(flags & 4)) {
+        Vec pos = {0.0f, 0.0f, 0.0f};
+        pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;
+        pos.y = 45.0f + y;
+        ICONGX(&pos, 0x10, 0x96, 1.0f);
+    } else {
+        s32 icon;
+        if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+            icon = 0x95;
+        } else {
+            icon = 0x91;
+        }
+        if (flags & 8) {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = 120.0f + (-200.0f + x) - 12.0f;
+            pos.y = 18.0f + y;
+            ICONGX(&pos, 0x10, icon, 1.0f);
+        } else {
+            Vec pos = {0.0f, 0.0f, 0.0f};
+            pos.x = 120.0f + (-200.0f + x);
+            pos.y = 18.0f + y;
+            ICONGX(&pos, 0x10, icon, 1.0f);
+        }
+    }
+
+    switch (ACW(ac, s32, 0x38)) {
+        case 0:
+            a = 0x7F;
+            b = 0x7E;
+            c = 0x81;
+            d = 0x80;
+            break;
+        case 1:
+            a = BattleACGetButtonIcon(0x100, 1);
+            b = BattleACGetButtonIcon(0x100, 0);
+            c = 0;
+            d = 0;
+            break;
+        case 2:
+            a = BattleACGetButtonIcon(0x100, 1);
+            b = BattleACGetButtonIcon(0x100, 0);
+            c = 0;
+            d = 0;
+            break;
+        case 3:
+            a = BattleACGetButtonIcon(0x20, 1);
+            b = BattleACGetButtonIcon(0x20, 0);
+            c = 0;
+            d = 0;
+            break;
+    }
+
+    switch (ac->mAcState) {
+        case 99:
+        case 100:
+        case 1003:
+        case 1004:
+        case 1005:
+            if ((u16)c) {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                f32 px = -225.0f + x;
+                f32 py = 80.0f + y;
+                pos.x = px;
+                pos.y = py;
+                ICONGX(&pos, 0x10, b, 1.0f);
+                {
+                    Vec pos2 = {0.0f, 0.0f, 0.0f};
+                    pos2.x = 56.0f + px;
+                    pos2.y = py;
+                    ICONGX(&pos2, 0x10, d, 1.0f);
+                }
+            } else {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                pos.x = 28.0f + (-225.0f + x);
+                pos.y = 80.0f + y;
+                ICONGX(&pos, 0x10, b, 1.0f);
+            }
+            break;
+        case 1000:
+        case 1001:
+            if (ACW(pw, s8, 0x12)) {
+                if (pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 px = -225.0f + x;
+                        f32 py = 80.0f + y;
+                        pos.x = px;
+                        pos.y = py;
+                        ICONGX(&pos, 0x10, a, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + px;
+                            pos2.y = py;
+                            ICONGX(&pos2, 0x10, c, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        ICONGX(&pos, 0x10, a, 1.0f);
+                    }
+                } else {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 px = -225.0f + x;
+                        f32 py = 80.0f + y;
+                        pos.x = px;
+                        pos.y = py;
+                        ICONGX(&pos, 0x10, b, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + px;
+                            pos2.y = py;
+                            ICONGX(&pos2, 0x10, d, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        ICONGX(&pos, 0x10, b, 1.0f);
+                    }
+                }
+            } else {
+                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 px = -225.0f + x;
+                        f32 py = 80.0f + y;
+                        pos.x = px;
+                        pos.y = py;
+                        ICONGX(&pos, 0x10, b, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + px;
+                            pos2.y = py;
+                            ICONGX(&pos2, 0x10, d, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        ICONGX(&pos, 0x10, b, 1.0f);
+                    }
+                } else {
+                    if ((u16)c) {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 px = -225.0f + x;
+                        f32 py = 80.0f + y;
+                        pos.x = px;
+                        pos.y = py;
+                        ICONGX(&pos, 0x10, a, 1.0f);
+                        {
+                            Vec pos2 = {0.0f, 0.0f, 0.0f};
+                            pos2.x = 56.0f + px;
+                            pos2.y = py;
+                            ICONGX(&pos2, 0x10, c, 1.0f);
+                        }
+                    } else {
+                        Vec pos = {0.0f, 0.0f, 0.0f};
+                        pos.x = 28.0f + (-225.0f + x);
+                        pos.y = 80.0f + y;
+                        ICONGX(&pos, 0x10, a, 1.0f);
+                    }
+                }
+            }
+            break;
+    }
 }

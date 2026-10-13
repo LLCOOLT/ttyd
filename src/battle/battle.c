@@ -20,6 +20,13 @@ typedef enum EquipFlags {
     EQUIP_PARTNER = 1 << 2, // 0x4, equip Partner (P) badges
 } EquipFlags;
 
+BattleWork* _battleWorkPointer;
+
+extern BattleUnitKind unitdata_Mario;
+extern BattleUnitKind unit_system;
+BattleUnitSetup entryunit_mario = { &unitdata_Mario, { 0,0,0,0, 4,0,0,2, 0xC2,0xC8,0,0, 0,0,0,0, 0xC0,0xA0,0,0 } };
+BattleUnitSetup entryunit_system = { &unit_system, { 0,0,0,0, 4,0,0,2 } };
+
 // forward declarations
 BOOL BattleMain(void);
 void BtlUnit_EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type);
@@ -143,8 +150,6 @@ void BattleEnd(void) {
     _battleWorkPointer = NULL;
 }
 
-extern BattleUnitSetup entryunit_system;
-extern BattleUnitSetup entryunit_mario;
 extern BattleUnitSetup entryunit_party[7];
 
 BOOL Btl_UnitSetup(BattleWork* wp) {
@@ -404,10 +409,10 @@ BattleUnitType BattleTransPartyIdToUnitKind(s32 partyId) {
     switch (partyId) {
     case 1: return 0xE0;
     case 2: return 0xE1;
-    case 3: return 0xE2;
-    case 4: return 0xE3;
-    case 5: return 0xE4;
-    case 6: return 0xE5;
+    case 4: return 0xE2;
+    case 5: return 0xE3;
+    case 6: return 0xE4;
+    case 3: return 0xE5;
     case 7: return 0xE6;
     default: return 0;
     }
@@ -773,9 +778,8 @@ void BattleAfterReactionQueueInit(void) {
     s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
     s32 i;
     for (i = 0; i < 64; i++) {
-        s32* q = (s32*)((u8*)base + i * 8);
-        q[0] = -1;
-        q[1] = 0;
+        base[i * 2] = -1;
+        base[i * 2 + 1] = 0;
     }
 }
 
@@ -799,9 +803,9 @@ void BattleAfterReactionEntry(s32 a, s32 b) {
 }
 
 void BattleAfterReactionRelease(s32 a, s32 b) {
-    s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
-    s32 j;
     s32 i;
+    s32 j;
+    s32* base = (s32*)((u8*)_battleWorkPointer + 0x16F40);
     for (i = 0; i < 64; i++) {
         if (base[i * 2] != -1 && a == base[i * 2] && b == base[i * 2 + 1]) {
             for (j = i; j < 63; j++) {

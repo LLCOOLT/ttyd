@@ -12,11 +12,13 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#include <dolphin/gx.h>
 
 #pragma optimize_for_size on
 #pragma dont_inline on
 
 extern BattleWork* _battleWorkPointer;
+extern s32 swGet(s32);
 extern int sprintf(char* str, const char* format, ...);
 extern s32 weaponGetPowerFromMarioHammerLv();
 extern s32 weaponGetPowerDefault();
@@ -69,7 +71,7 @@ void BattleAudienceDispAudience(CameraId camId, void* param);
 void BattleAudienceDispItem(CameraId camId, void* param);
 void BattleAudienceDispApSrc(CameraId camId, void* param);
 void BattleAudienceDispWin(CameraId camId, void* param);
-void BattleAudience_Entry_Sub(s32 index, u8 type, u8 status);
+void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status);
 BOOL BattleAudience_GetAnimEnd(s32 index);
 BOOL BattleAudience_GetFront(s32 index);
 BOOL BattleAudience_GetEscapeChangeOK(s32 index);
@@ -82,7 +84,12 @@ s32 BattleAudience_GetPPAudienceNum_R(void);
 s32 BattleAudience_GetPPAudienceNum_L(void);
 s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset);
 BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id);
-void BattleAudience_ApRecoveryBuild(void);
+void BattleAudience_ApRecoveryBuild(StarPowerInfo* info);
+double sqrt(double);
+s32 BattleBreakSlot_GetBreakTurn();
+void* BattleBreakSlotGetPtr();
+void BattleBreakSlot_PointInc();
+extern s32 audience_kind[];
 void BattleAudienceNumToTarget(void);
 s32 BattleAudienceNumToTargetSub(void);
 void BattleAudienceAddTargetNum(f32 value, f32 value2);
@@ -267,8 +274,10 @@ void BattleAudience_Init(void) {
 
 	audience = BattleAudienceBaseGetPtr();
 	window = BattleAudienceWinGetPtr();
+	if (1) {
 	pouchGetPtr(); //useless call
 	memset(audience, 0, sizeof(BattleAudience));
+	}
 	BattleAudienceSettingAudience();
 	audience->normalTex = tplRead("battle/audience/audience_normal.tpl");
 	BattleAudienceGuestTPLRead(0, AUDIENCE_LUIGI, "audience_luigi.tpl");
@@ -559,10 +568,12 @@ void BattleAudience_End(void) {
 		if (audience->mTargetAudienceCount < 0.0f) {
 			audience->mTargetAudienceCount = 0.0f;
 		}
+		if (1) {
 		if (audience->mTargetAudienceCount > (f32)audience->mMaxAudience) {
 			audience->mTargetAudienceCount = (f32)audience->mMaxAudience;
 		}
 		pouchSetAudienceNum(audience->mTargetAudienceCount);
+		}
 	}
 }
 
@@ -584,12 +595,154 @@ void BattleAudienceGuestTPLRead(s32 id, AudienceMemberType member, const char* p
 }
 
 //@@ BattleAudienceCtrlProcess
+extern void BattleAudienceCtrlProcessKinopio(s32 index);
+extern s32 irand(s32);
+
 void BattleAudienceCtrlProcess(void) {
-	//TODO: very long and terrible
+	s32 chance;
+	BattleWork* wp = _battleWorkPointer;
+	u32* bflags = (u32*)((u8*)wp + 0x19068);
+	BattleAudience* audience = BattleAudienceBaseGetPtr();
+	BattleAudienceMember* member;
+	s32 i, j, index;
+	u8 status;
+	s32 order[200];
+
+	audience->mCurrentAudienceIntCountLeft = 0;
+	audience->mCurrentAudienceIntCountRight = 0;
+	audience->mCurrentAudienceIntCount = 0;
+
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			index = (i * 20) + j + 10;
+			if (AUD_U8CALL(BattleAudience_GetExist, index) == TRUE) {
+				status = BattleAudienceGetPtr(index)->status;
+				if (status != 12 && status != 11) {
+					audience->mCurrentAudienceIntCountRight++;
+				}
+			}
+		}
+	}
+
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			index = (i * 20) + j;
+			if (AUD_U8CALL(BattleAudience_GetExist, index) == TRUE) {
+				status = BattleAudienceGetPtr(index)->status;
+				if (status != 12 && status != 11) {
+					audience->mCurrentAudienceIntCountLeft++;
+				}
+			}
+		}
+	}
+
+	audience->mCurrentAudienceIntCount = audience->mCurrentAudienceIntCountRight + audience->mCurrentAudienceIntCountLeft;
+
+	i = 0;
+	member = BattleAudienceGetPtr(0);
+	for (; i < 200; i++, member++) {
+		if (member->flags & 0x10) {
+			f32* f = (f32*)((u8*)member + 0xD0);
+			f[0] += f[3];
+			f[3] += f[5];
+			if (f[0] <= 0.0f) {
+				f[0] = 0.0f;
+				f[3] = 0.0f;
+				f[5] = 0.0f;
+			}
+		} else if (AUD_U8CALL(BattleAudience_GetExist, i)) {
+			switch (member->type) {
+			case 0: BattleAudienceCtrlProcessKinopio(i); break;
+			case 1: BattleAudienceCtrlProcessKinopio(i); break;
+			case 2: BattleAudienceCtrlProcessKinopio(i); break;
+			case 3: BattleAudienceCtrlProcessKinopio(i); break;
+			case 4: BattleAudienceCtrlProcessKinopio(i); break;
+			case 5: BattleAudienceCtrlProcessKinopio(i); break;
+			case 6: BattleAudienceCtrlProcessKinopio(i); break;
+			case 7: BattleAudienceCtrlProcessKinopio(i); break;
+			case 8: BattleAudienceCtrlProcessKinopio(i); break;
+			case 9: BattleAudienceCtrlProcessKinopio(i); break;
+			case 10: BattleAudienceCtrlProcessKinopio(i); break;
+			case 11: BattleAudienceCtrlProcessKinopio(i); break;
+			case 12: BattleAudienceCtrlProcessKinopio(i); break;
+			}
+		}
+	}
+
+	if (*bflags & 0x20000) {
+		*(s32*)&audience->field_137F0[4] = 10000;
+	}
+	if (wp->flags & 0x80) {
+		if (*(s32*)&audience->field_137F0[0] < *(s32*)&audience->field_137F0[4]) {
+			switch (*(s32*)&audience->field_137F0[0]) {
+			case 0: chance = 1800; break;
+			case 1: chance = 6000; break;
+			case 2: chance = 30000; break;
+			}
+			if (*bflags & 0x20000) {
+				chance = 60;
+			}
+			if (irand(chance) == 0) {
+				for (i = 0; i < 200; i++) {
+					order[i] = i;
+				}
+				for (i = 0; i < 1000; i++) {
+					s32 a = irand(200);
+					s32 b = irand(200);
+					s32 t = order[a];
+					order[a] = order[b];
+					order[b] = t;
+				}
+				for (i = 0; i < 200; i++) {
+					if (BattleAudienceItemOn(order[i], 0, 1) == TRUE) {
+						(*(s32*)&audience->field_137F0[0])++;
+						return;
+					}
+				}
+			}
+		}
+	}
 }
 
 //@@ BattleAudienceItemOn
 BOOL BattleAudienceItemOn(s32 index, u16 itemId, s32 numItems) {
+	BattleAudience* audience = BattleAudienceBaseGetPtr();
+	BattleAudienceMember* member = BattleAudienceGetPtr(index);
+	BattleAudienceItem* item;
+	s32 st;
+	u8 ust;
+
+	if (audience->flags & 0x40000) return FALSE;
+	if (*(s32*)audience_kind[member->type * 8 + 2] == 0) return FALSE;
+	if (itemId >= 0x79 && itemId < 0xEC && swGet(0xEB) == 0) return FALSE;
+	st = index % 20;
+	if (st < 4 || st > 15) return FALSE;
+	if (!AUD_U8CALL(BattleAudience_GetExist, index)) return FALSE;
+	ust = member->status;
+	if (ust == 7) return FALSE;
+	if (ust == 8) return FALSE;
+	if (ust == 13) return FALSE;
+	if (ust == 12) return FALSE;
+	if (ust == 11) return FALSE;
+	if (ust == 18) return FALSE;
+	if (ust == 17) return FALSE;
+	if (ust == 21) return FALSE;
+	if (ust == 10) return FALSE;
+	if (member->flags & 8) {
+		s32 i = 0;
+		item = BattleAudienceItemGetPtr(0);
+		for (; i < numItems; i++, item++) {
+			if (!(item->flags & 1)) {
+				item->flags |= 1;
+				item->state = 0;
+				*(s32*)((u8*)item + 0xC) = index;
+				item->mItemType = itemId;
+				BattleAudience_ChangeStatus(index, 7);
+				member->itemId = i;
+				return TRUE;
+			}
+		}
+	}
 	return FALSE;
 }
 
@@ -667,33 +820,636 @@ BattleUnit* BattleAudienceDetectTargetPlayer(void) {
 }
 
 //@@ BattleAudienceItemCtrlProcess
+typedef struct AudItemX {
+	u32 flags;
+	s32 state;
+	s32 timer;
+	s32 audId;
+	s32 itemType;
+	Vec pos;
+	f32 scale;
+	f32 rotZ;
+	Vec vel;
+	Vec acc;
+	BattleUnit* target;
+	s32 mode;
+} AudItemX;
+extern Vec vec3_802f972c[];
+extern Vec vec3_802f9738[];
+extern u8 lbl_80399940[];
+extern void BattleAudience_SetPresentItemType(s32);
+extern void BattleAudience_SetPresentTargetUnitId(s32);
+extern void BattleAudience_SetPresentItemNo(s32);
+extern s32 BattleAudience_GetPresentItemType(void);
+extern s32 BtlUnit_CheckShadowGuard(BattleUnit*);
+extern double __fabs(double);
+static inline double fabs(double x) { return __fabs(x); }
 void BattleAudienceItemCtrlProcess(void) {
+	BattleWork* wp = _battleWorkPointer;
+	u8* base = (u8*)BattleAudienceBaseGetPtr();
+	AudItemX* it;
+	s32 i;
+	u8* aud;
+	u8* kd;
+	u8* d = lbl_80399940;
+	s32 j;
 
+	it = (AudItemX*)BattleAudienceItemGetPtr(0);
+	for (i = 0; i < 100; i++, it++) {
+		if (!(it->flags & 1)) {
+			continue;
+		}
+		aud = (u8*)BattleAudienceGetPtr(it->audId);
+		kd = (u8*)audience_kind + aud[0x1b] * 32;
+		if (aud[0x19] == 13 || aud[0x19] == 19 || aud[0x19] == 21 || aud[0x19] == 12 ||
+		    !(u8)BattleAudience_GetExist(it->audId)) {
+			goto kill;
+		}
+		if ((u32)it->state > 7) {
+			continue;
+		}
+		switch (it->state) {
+		case 0: {
+			it->flags |= 2;
+			if (it->itemType == 0) {
+				s32* tbl = *(s32**)(kd + 8);
+				s32 cnt = 0;
+				s32 sum = 0;
+				s32 acc;
+				s32 r;
+				for (j = 0; tbl[j * 2] != 0; j++) {
+					cnt++;
+					sum += tbl[j * 2 + 1];
+				}
+				if (cnt == 0) {
+					goto done;
+				}
+				r = irand(sum);
+				acc = 0;
+				for (j = 0;; j++) {
+					if (r >= acc && r < acc + tbl[j * 2 + 1]) {
+						break;
+					}
+					acc += tbl[j * 2 + 1];
+				}
+				it->itemType = tbl[j * 2];
+			}
+			it->timer = i + 180;
+			it->scale = 1.0f;
+			it->rotZ = 0.0f;
+			{
+				Vec v = vec3_802f972c[0];
+				v.x = *(f32*)(aud + 0x48) + *(f32*)(kd + 0xc);
+				v.y = (*(f32*)(aud + 0x4c) + *(f32*)(kd + 0x10)) - 10.0f;
+				v.z = 1.0f + *(f32*)(aud + 0x50);
+				it->pos = v;
+			}
+			it->state++;
+		}
+		/* fallthrough */
+		case 1: {
+			if (it->timer <= 0) {
+				BattleUnit* t;
+				f32 hx, hy, hz, dx, n;
+				for (j = 0; j < 100; j++) {
+					if (j != i && (((AudItemX*)BattleAudienceItemGetPtr(j))->flags & 1) &&
+					    ((AudItemX*)BattleAudienceItemGetPtr(j))->state == 1) {
+						it->mode = 2;
+						break;
+					}
+				}
+				if (j == 100) {
+					it->mode = 1;
+				}
+				t = BattleAudienceDetectTargetPlayer();
+				if (t == NULL) {
+					goto done;
+				}
+				it->target = t;
+				BtlUnit_GetHitPos(t, BtlUnit_GetPartsPtr(t, BtlUnit_GetBodyPartsId(t)), &hx, &hy, &hz);
+				dx = hx - it->pos.x;
+				n = 30.0f + fabs(dx) / 15.0f;
+				it->vel.x = dx / n;
+				it->acc.x = 0.0f;
+				it->vel.y = 7.0f;
+				it->acc.y = 2.0f * ((hy - it->pos.y) - it->vel.y * n) / (n * n);
+				it->vel.z = (hz - it->pos.z) / n;
+				it->acc.z = 0.0f;
+				it->timer = (s32)n;
+				it->state++;
+			} else {
+				s32 k = 180 - it->timer;
+				Vec v = vec3_802f9738[0];
+				f32 ox;
+				if (k >= 5) {
+					k = 5;
+				}
+				v.x = *(f32*)(aud + 0xc0) + *(f32*)(kd + 0xc);
+				ox = intplGetValue(0, k, 5, -10.0f, 0.0f);
+				it->pos.x = v.x;
+				v.y = (*(f32*)(aud + 0xc4) + *(f32*)(kd + 0x10)) + ox;
+				v.z = 1.0f + *(f32*)(aud + 0xc8);
+				it->pos.y = v.y;
+				it->pos.z = v.z;
+			}
+			break;
+		}
+		case 2: {
+			if (!(*(u32*)((u8*)wp + 0xef4) & 0x80)) {
+				it->mode = 0;
+			}
+			if (it->timer == 20) {
+				BattleAudience_ChangeStatus(it->audId, 0);
+			}
+			if (it->timer == 0) {
+				it->state++;
+			}
+			if (it->timer > 0) {
+				it->pos.x += it->vel.x;
+				it->pos.y += it->vel.y;
+				it->pos.z += it->vel.z;
+				it->vel.x += it->acc.x;
+				it->vel.y += it->acc.y;
+				it->vel.z += it->acc.z;
+				if (it->itemType == 0xef) {
+					it->rotZ += 18.0f;
+				}
+				it->timer--;
+			}
+			break;
+		}
+		case 3: {
+			BattleUnit* t;
+			s8 a, b;
+			if (!(*(u32*)((u8*)wp + 0xef4) & 0x80)) {
+				it->mode = 0;
+			}
+			t = it->target;
+			BtlUnit_GetStatus(t, 0x12, &a, &b);
+			if (a >= 1 || BtlUnit_CheckShadowGuard(t)) {
+				it->mode = 0;
+			}
+			if (it->flags & 4) {
+				it->mode = 0;
+			}
+			if (it->itemType >= 0x80 && it->itemType < 0xec && pouchGetEmptyHaveItemCnt() <= 0) {
+				it->mode = 0;
+			}
+			if (it->mode != 0) {
+				s32* cnt = (s32*)(base + 0x137f8);
+				(*cnt)++;
+				if (*cnt > 3) {
+					*cnt = 3;
+				}
+				if (it->mode == 2) {
+					it->state = 4;
+					goto s4;
+				}
+				if (it->itemType >= 0x79 && it->itemType < 0xec) {
+					BattleAudience_SetPresentItemType(0);
+				} else if (it->itemType >= 0xec && it->itemType < 0xf0) {
+					BattleAudience_SetPresentItemType(1);
+				}
+				BattleAudience_SetPresentTargetUnitId(BtlUnit_GetUnitId(t));
+				switch (it->itemType) {
+				case 0xec:
+					memcpy(base + 0x137fc, d + 0x40, 0xc0);
+					*(s32*)(base + 0x1381c) = *cnt + *(s32*)(base + 0x1381c) - 1;
+					break;
+				case 0xed:
+					memcpy(base + 0x137fc, d + 0x100, 0xc0);
+					*(s32*)(base + 0x1381c) = *cnt + *(s32*)(base + 0x1381c) - 1;
+					break;
+				case 0xee:
+					memcpy(base + 0x137fc, d + 0x1c0, 0xc0);
+					*(s32*)(base + 0x1381c) = *cnt + *(s32*)(base + 0x1381c) - 1;
+					break;
+				case 0xef:
+					memcpy(base + 0x137fc, d + 0x280, 0xc0);
+					*(s32*)(base + 0x1381c) = *cnt + *(s32*)(base + 0x1381c) - 1;
+					break;
+				}
+				BattleAudience_SetPresentItemNo(it->itemType);
+				switch (BattleAudience_GetPresentItemType()) {
+				case 0:
+					it->flags &= ~2;
+					it->timer = 5;
+					it->state = 7;
+					break;
+				case 1:
+					BattleAudienceSoundStop(10);
+					BattleAudienceSoundStop(11);
+					if (it->vel.x < 0.0f) {
+						it->vel.x *= -0.2f;
+					}
+					it->vel.y = 1.5f;
+					it->vel.z = 0.0f;
+					it->state = 4;
+					break;
+				}
+				*cnt = 0;
+			} else {
+				it->state = 4;
+			}
+			if (it->state != 4) {
+				break;
+			}
+		}
+		/* fallthrough */
+		case 4:
+		s4: {
+			it->pos.x += it->vel.x;
+			it->pos.y += it->vel.y;
+			it->pos.z += it->vel.z;
+			it->vel.x += it->acc.x;
+			it->vel.y += it->acc.y;
+			it->vel.z += it->acc.z;
+			if (it->pos.y <= 0.0f) {
+				BattleAudienceSoundStop(10);
+				BattleAudienceSoundStop(11);
+				it->state = 5;
+				it->pos.y = 0.1f;
+				it->vel.y = 1.0f;
+				it->acc.y = 0.0f;
+			}
+			break;
+		}
+		case 5: {
+			it->pos.x += it->vel.x;
+			it->pos.y += it->vel.y;
+			it->pos.z += it->vel.z;
+			it->vel.x += it->acc.x;
+			it->vel.y += it->acc.y;
+			it->vel.z += it->acc.z;
+			if (it->pos.y <= 0.0f) {
+				it->timer = 60;
+				it->state = 6;
+				it->pos.y = 0.0f;
+			}
+			break;
+		}
+		case 6: {
+			if (it->timer <= 0) {
+				goto done;
+			}
+			if (it->timer < 30) {
+				if ((it->timer & 3) <= 1) {
+					it->flags |= 2;
+				} else {
+					it->flags &= ~2;
+				}
+			}
+			it->timer--;
+			break;
+		}
+		case 7: {
+			it->timer--;
+			if (it->timer > 0) {
+				break;
+			}
+		}
+		done:
+			BattleAudienceSoundStop(10);
+			BattleAudienceSoundStop(11);
+			if (it->audId != -1) {
+				BattleAudienceGetPtr(it->audId);
+				BattleAudience_ChangeStatus(it->audId, 0);
+			}
+		kill:
+			it->flags = 0;
+			it->timer = 0;
+			it->state = 0;
+			if (it->audId != -1) {
+				*(s16*)((u8*)BattleAudienceGetPtr(it->audId) + 0x1c) = -1;
+			}
+			break;
+		}
+	}
 }
 
 //@@ BattleAudienceApSrcCtrlProcess
+extern Vec vec3_802f9744[];
+extern double asin(double);
+extern double cos(double);
+extern double sin(double);
+extern void statusGetApPos(Vec* pos);
 void BattleAudienceApSrcCtrlProcess(void) {
+	BattleAudience* base = BattleAudienceBaseGetPtr();
+	AudApSrc* star;
+	s32 cnt;
+	s32 i;
+	s32 k;
+	f32 dy;
+	f32 dx;
+	Vec tmp;
+	Vec tmp2;
 
+	if (!(*(u32*)base & 2)) {
+		return;
+	}
+	cnt = 0;
+	star = (AudApSrc*)((u8*)base + 0x10E7C);
+	for (i = 0; i < 100; i++) {
+		if (*(u32*)((u8*)base + 0x10E7C + i * 0x60) & 1) {
+			cnt++;
+		}
+	}
+	if (psndSFXChk(((s32*)base)[2]) != -1) {
+		psndSFX_vol(((s32*)base)[2], 63.0f * cnt / 100.0f + 64.0f);
+	}
+	if (*(s32*)((u8*)base + 0x137C4) > 0) {
+		if (BattleAudienceApSrcEntry() == TRUE) {
+			(*(s32*)((u8*)base + 0x137C4))--;
+		}
+		if (cnt == 0 && psndSFXChk(((s32*)base)[2]) == -1) {
+			((s32*)base)[2] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_AUDIENCE_AP_FLOW1");
+		}
+	} else {
+		for (k = 0, i = 0; i < 100; i++) {
+			if (*(u32*)((u8*)base + 0x10E7C + i * 0x60) & 1) {
+				break;
+			}
+			k++;
+		}
+		if (k == 100) {
+			*(u32*)base &= ~2;
+			psndSFXOff(((s32*)base)[2]);
+			((s32*)base)[2] = 0;
+			*(s32*)((u8*)base + 0x137C4) = 0;
+			BattleStatusWindowAPRecoveryOff();
+			return;
+		}
+	}
+	for (i = 0; i < 100; i++) {
+		AudApSrc* s = (AudApSrc*)((u8*)base + 0x10E7C + i * 0x60);
+		u8* p = (u8*)s;
+		pouchGetPtr();
+		if (!(s->flags & 1)) {
+			continue;
+		}
+		switch (*(s32*)(p + 4)) {
+		case 0:
+			*(s32*)(p + 4) = 5;
+			*(Vec*)(p + 0x2C) = *(Vec*)(p + 0x8);
+			*(Vec*)(p + 0x20) = *(Vec*)(p + 0x2C);
+			*(f32*)(p + 0x2C) += 50.0f * rand() / 32767.0f - 25.0f;
+			*(f32*)(p + 0x30) += 25.0f;
+			*(s32*)(p + 0x44) = 0;
+			*(s32*)(p + 0x48) = 30;
+			/* fallthrough */
+		case 5:
+			(*(s32*)(p + 0x44))++;
+			s->x = intplGetValue(5, *(s32*)(p + 0x44), *(s32*)(p + 0x48), *(f32*)(p + 0x20), *(f32*)(p + 0x2C));
+			s->y = intplGetValue(5, *(s32*)(p + 0x44), *(s32*)(p + 0x48), *(f32*)(p + 0x24), *(f32*)(p + 0x30));
+			if (*(s32*)(p + 0x44) >= *(s32*)(p + 0x48) - 20) {
+				s->scale.y = intplGetValue(4, *(s32*)(p + 0x44) - (*(s32*)(p + 0x48) - 20), 10, 0.9f, 0.8f);
+			}
+			if (*(s32*)(p + 0x44) >= *(s32*)(p + 0x48)) {
+				*(s32*)(p + 4) = 10;
+				*(s32*)(p + 0x44) = 0;
+				*(s32*)(p + 0x48) = 15 + irand(10);
+				s->scale = vec3_802f9744[0];
+			}
+			break;
+		case 10:
+			(*(s32*)(p + 0x44))++;
+			if (*(s32*)(p + 0x44) >= *(s32*)(p + 0x48)) {
+				*(s32*)(p + 4) = 15;
+				*(s32*)(p + 0x44) = 0;
+				*(s32*)(p + 0x48) = 20 + irand(20);
+				*(Vec*)(p + 0x20) = *(Vec*)(p + 0x8);
+				statusGetApPos(&tmp);
+				*(Vec*)(p + 0x2C) = tmp;
+				dy = *(f32*)(p + 0x24) - *(f32*)(p + 0x30);
+				dx = *(f32*)(p + 0x20) - *(f32*)(p + 0x2C);
+				*(f32*)(p + 0x4C) = *(f32*)(p + 0x50) =
+				    sqrt(dx * dx + dy * dy);
+				*(f32*)(p + 0x54) = asin(dy / *(f32*)(p + 0x4C));
+				*(f32*)(p + 0x58) = 0.05f + 0.2f * rand() / 32767.0f;
+			}
+			break;
+		case 15:
+			(*(s32*)(p + 0x44))++;
+			*(f32*)(p + 0x4C) = intplGetValue(4, *(s32*)(p + 0x44), *(s32*)(p + 0x48), *(f32*)(p + 0x50), 0.0f);
+			*(f32*)(p + 0x54) += *(f32*)(p + 0x58);
+			if (*(f32*)(p + 0x54) < 0.0f) {
+				*(f32*)(p + 0x54) += 6.2832f;
+			}
+			s->x = *(f32*)(p + 0x4C) * (f32)cos(*(f32*)(p + 0x54)) + *(f32*)(p + 0x2C);
+			s->y = *(f32*)(p + 0x4C) * (f32)sin(*(f32*)(p + 0x54)) + *(f32*)(p + 0x30);
+			if (*(s32*)(p + 0x44) >= *(s32*)(p + 0x48)) {
+				*(s32*)(p + 4) = 20;
+				*(s32*)(p + 0x44) = 0;
+				*(s32*)(p + 0x48) = 15;
+				statusGetApPos(&tmp2);
+				*(Vec*)(p + 0x8) = tmp2;
+			}
+			break;
+		case 20:
+			(*(s32*)(p + 0x44))++;
+			s->alpha = intplGetValue(4, *(s32*)(p + 0x44), *(s32*)(p + 0x48), 128.0f, 0.0f);
+			if (*(s32*)(p + 0x44) >= *(s32*)(p + 0x48)) {
+				s->flags = 0;
+				pouchAddAP(1);
+			}
+			break;
+		}
+	}
 }
 
 //@@ BattleAudienceApSrcEntry
+extern Vec vec3_802f9750[];
+extern Vec vec3_802f975c[];
 BOOL BattleAudienceApSrcEntry(void) {
-	return FALSE;
+	AudApSrc* star;
+	CameraEntry* cam;
+	s32 list[200];
+	s32 i;
+	s32 count;
+	BattleAudience* base = BattleAudienceBaseGetPtr();
+	BattleAudienceMember* m;
+	star = (AudApSrc*)((u8*)base + 0x10E7C);
+	for (i = 0; i < 100; i++, star++) {
+		if (!(star->flags & 1)) {
+			break;
+		}
+	}
+	count = i;
+	if (count == 100) {
+		return FALSE;
+	}
+	count = 0;
+	BattleAudienceGetPtr(0);
+	for (i = 0; i < 200; i++) {
+		if ((u8)BattleAudience_GetExist(i) == 1) {
+			list[count++] = i;
+		}
+	}
+	if (count == 0) {
+		return TRUE;
+	}
+	star->flags = 1;
+	*(s32*)((u8*)star + 4) = 0;
+	*(s32*)((u8*)star + 0x44) = 0;
+	star->scale = vec3_802f9750[0];
+	star->alpha = 0x80;
+	m = BattleAudienceGetPtr(list[irand(count)]);
+	star->x = *(f32*)((u8*)m + 0x48);
+	star->y = 20.0f + *(f32*)((u8*)m + 0x4C);
+	*(f32*)((u8*)star + 0x10) = 1.0f + *(f32*)((u8*)m + 0x50);
+	cam = camGetPtr(CAMERA_3D);
+	PSMTXMultVec((void*)((u8*)cam + 0x11C), (Vec*)&star->x, (Vec*)&star->x);
+	PSMTX44MultVec((void*)((u8*)cam + 0x15C), (Vec*)&star->x, (Vec*)&star->x);
+	star->x *= 304.0f;
+	star->y *= 240.0f;
+	*(f32*)((u8*)star + 0x10) = 0.0f;
+	*(f32*)((u8*)star + 0x14) = 40.0f * rand() / 32767.0f - 20.0f;
+	*(f32*)((u8*)star + 0x18) = 10.0f * rand() / 32767.0f;
+	*(f32*)((u8*)star + 0x1C) = 0.0f;
+	*(Vec*)((u8*)star + 0x20) = *(Vec*)&star->x;
+	*(Vec*)((u8*)star + 0x2C) = vec3_802f975c[0];
+	return TRUE;
 }
 
 //@@ BattleAudienceWinCtrlProcess
 void BattleAudienceWinCtrlProcess(void) {
+	BattleAudience* base = BattleAudienceBaseGetPtr();
+	BattleAudienceWindow* win = BattleAudienceWinGetPtr();
+	f32 diff = (f32)base->mCurrentAudienceIntCount - win->count;
+	f32 step;
 
+	if (diff != 0.0f) {
+		if (diff > 0.0f) {
+			step = (0.1f * diff < 0.1f) ? 0.1f : 0.1f * diff;
+			win->count += step;
+			if ((f32)base->mCurrentAudienceIntCount - win->count < 0.0f) {
+				win->count = (f32)base->mCurrentAudienceIntCount;
+			}
+		} else {
+			step = (-0.1f < 0.1f * diff) ? 0.1f : -0.1f * diff;
+			win->count -= step;
+			if ((f32)base->mCurrentAudienceIntCount - win->count > 0.0f) {
+				win->count = (f32)base->mCurrentAudienceIntCount;
+			}
+		}
+	}
+
+	if (win->mActive) {
+		((s32*)win)[5]++;
+		if (((s32*)win)[5] > 15) {
+			((s32*)win)[5] = 15;
+		}
+	} else {
+		((s32*)win)[5]--;
+		if (((s32*)win)[5] < 0) {
+			((s32*)win)[5] = 0;
+		}
+	}
+	((f32*)win)[2] = intplGetValue(4, ((s32*)win)[5], 15, -500.0f, -280.0f);
+	((f32*)win)[3] = -160.0f;
+	((f32*)win)[4] = 0.0f;
 }
 
 //@@ BattleAudienceGXInit
 void BattleAudienceGXInit(void) {
-
+	BattleAudienceBaseGetPtr();
+	GXSetCullMode(GX_CULL_NONE);
+	GXClearVtxDesc();
+	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_CLR0, GX_DIRECT);
+	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+	GXSetNumChans(1);
+	GXSetChanCtrl(GX_COLOR0A0, GX_DISABLE, GX_SRC_VTX, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
+	GXSetNumTexGens(1);
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
+	GXSetNumTevStages(1);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_TEXC, GX_CC_ZERO);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 }
 
 //@@ BattleAudienceAnimProcess
 void BattleAudienceAnimProcess(void) {
+	typedef struct AudAnimMember {
+		s32 flags;
+		u8 pad0[0x1A - 4];
+		u8 v1A;
+		u8 pad1[0x24 - 0x1B];
+		s32* start;
+		s32* pc;
+		s32 wait;
+		s32 loop[4];
+		u8 depth;
+		u8 pad2[0x134 - 0x41];
+	} AudAnimMember;
+	AudAnimMember* m;
+	s32 i;
+	s32* pc;
+	s32 n;
+	s32 target;
 
+	BattleAudienceBaseGetPtr();
+	m = (AudAnimMember*)BattleAudienceGetPtr(0);
+	for (i = 0; i < 200; i++, m++) {
+		if (!(m->flags & 1)) continue;
+		if (!(m->flags & 4)) continue;
+		pc = m->pc;
+		if (m->wait > 0) {
+			m->wait--;
+			continue;
+		}
+		switch (pc[0]) {
+		case -2:
+			m->v1A = pc[1];
+			m->wait = pc[2];
+			m->pc += 3;
+			break;
+		case -3:
+			m->pc = m->start;
+			break;
+		case -4:
+			m->pc += 2;
+			break;
+		case -5:
+			target = pc[1];
+			m->pc = m->start;
+			while (!(m->pc[0] == -4 && m->pc[1] == target)) {
+				m->pc++;
+			}
+			break;
+		case -6:
+			m->loop[m->depth] = pc[1];
+			m->depth++;
+			m->pc += 2;
+			break;
+		case -7:
+			m->loop[m->depth - 1]--;
+			if (m->loop[m->depth - 1] <= 0) {
+				m->depth--;
+				m->pc += 1;
+			} else {
+				n = 1;
+				do {
+					m->pc--;
+					if (m->pc[0] == -6) n--;
+					if (m->pc[0] == -7) n++;
+				} while (n > 0);
+				m->pc += 2;
+			}
+			break;
+		case -8:
+			m->wait = pc[1];
+			m->pc += 2;
+			break;
+		case -1:
+			break;
+		}
+	}
 }
 
 //@@ BattleAudienceDispAudience
@@ -786,12 +1542,100 @@ void BattleAudienceDispWin(CameraId camId, void* param) {
 
 //@@ BattleAudience_Entry
 BOOL BattleAudience_Entry(s32 index, AudienceMemberType type, u8 status) {
-	return FALSE;
+	BattleAudienceMember* m;
+	f32 x;
+
+	BattleAudienceBaseGetPtr();
+	BattleStageGetPtr();
+	m = BattleAudienceGetPtr(index);
+	if (!(((u8*)audience_kind)[(type & 0xFF) * 32] & 1)) {
+		if (m->flags & 1) {
+			return FALSE;
+		}
+		if (m->flags & 0x100) {
+			return FALSE;
+		}
+		m->flags = 5;
+		x = (index % 20) * 25 + rand() * 10 / 0x7fff - 0xeb;
+		m->position.x = x;
+		m->mHomePosition.x = x;
+		BattleAudience_Entry_Sub(index, (u8)type, (u8)status);
+	} else {
+		if (index % 2 == 1) {
+			return FALSE;
+		}
+		if (m->flags & 1) {
+			return FALSE;
+		}
+		if (m->flags & 0x100) {
+			return FALSE;
+		}
+		m->flags = 0x85;
+		x = 12.5f + (f32)((index % 20) * 25 - 230) + (f32)(rand() * 10 / 0x7fff) - 5.0f;
+		m->position.x = x;
+		m->mHomePosition.x = x;
+		BattleAudience_Entry_Sub(index, (u8)type, (u8)status);
+		m[1].flags = 0x101;
+	}
+	return TRUE;
 }
 
 //@@ BattleAudience_Entry_Sub
-void BattleAudience_Entry_Sub(s32 index, u8 type, u8 status) {
+void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
+	static const Vec v0 = {0.0f, 0.0f, 0.0f};
+	static const Vec v1 = {0.0f, 0.0f, -1.0f};
+	static const Vec v2 = {0.0f, 0.0f, 0.0f};
+	static const Vec v3 = {0.0f, 0.0f, 0.0f};
+	static const Vec v4 = {1.0f, 1.0f, 1.0f};
+	static const Vec v5 = {1.0f, 1.0f, 1.0f};
+	static const Vec v6 = {0.0f, 0.0f, 0.0f};
+	BattleAudienceMember* m;
+	u8* stage;
+	s32 row;
+	f32 y, z;
 
+	BattleAudienceBaseGetPtr();
+	stage = (u8*)BattleStageGetPtr();
+	m = (BattleAudienceMember*)BattleAudienceGetPtr(index);
+	m->field_0x4 = 0;
+	m->field_0x8 = 0;
+	m->status = status;
+	m->type = type;
+	m->itemId = -1;
+	m->animTable = (s32**)audience_kind[type * 8 + 1];
+	m->field_0x30 = 0;
+	BattleAudience_SetAnim(index, 1, TRUE);
+	*((u8*)m + 0x40) = 0;
+	m->field_0x43 = 0;
+	m->field_0x42 = 0;
+	m->field_0x41 = 0;
+	m->field_0x44 = 255;
+	row = index / 20;
+	y = *(f32*)(stage + 0xB34);
+	m->position.y = y;
+	m->mHomePosition.y = y;
+	z = 0.1f * (f32)(index % 20) + (f32)(row * 30 + 0x73);
+	m->position.z = z;
+	m->mHomePosition.z = z;
+	if (m->type == 11) {
+		m->mHomePosition.z += 0.2f;
+		m->position.z += 0.2f;
+	}
+	if (m->status == 11) {
+		m->position.y = -2000.0f;
+	}
+	*(Vec*)m->field_0x84 = v0;
+	m->field_0x78 = *(Vec*)m->field_0x84;
+	m->field_0x90 = v1;
+	m->mRotation = v2;
+	m->mRotationOffset = v3;
+	*(Vec*)m->field_0x54 = v4;
+	m->field_0x60 = v5;
+	m->field_0x6C = v6;
+	m->field_0xE8 = 270.0f;
+	if ((index >= 4 && index <= 15) || (index >= 24 && index <= 35) || (index >= 44 && index <= 55)) {
+		m->flags |= 8;
+	}
 }
 
 //@@ BattleAudience_Delete
@@ -1304,7 +2148,61 @@ BOOL BattleAudience_GetPPAudienceNum_Sub(s32 id) {
 }
 
 //@@ BattleAudience_ApRecoveryBuild
-void BattleAudience_ApRecoveryBuild(void) {
+void BattleAudience_ApRecoveryBuild(StarPowerInfo* info) {
+	BattleWork* bw = _battleWorkPointer;
+	u8* base = (u8*)BattleAudienceBaseGetPtr();
+	BattleUnit* mario;
+	BattleUnit* party;
+	f32 pm, mm, root, b, a, cnt, sum;
+	s32 i, j;
+
+	if (*(void**)(base + 0x137C8) == NULL) {
+		*(void**)(base + 0x137C8) = BattleAlloc(0xC);
+	}
+	memcpy(*(void**)(base + 0x137C8), info, 0xC);
+	mario = BattleGetMarioPtr(bw);
+	party = BattleGetPartyPtr(bw);
+	sum = 0.0f;
+	for (i = 0, j = 0; i < 13; i++, j += 0x20) {
+		sum += *(f32*)((u8*)audience_kind + j + 0x14) * (f32)BattleAudience_GetPPAudienceNumKind(i);
+	}
+	root = sqrt(sum);
+	a = info->mSpAcSuccessMultiplier;
+	b = (f32)(u8)info->mStylishCommandMultiplier;
+	cnt = 0.0f;
+	if (a > 0.0f) {
+		cnt += 1.0f;
+	}
+	if (b > 0.0f) {
+		cnt += 1.0f;
+	}
+	if (*(u32*)((u8*)mario + 0x138) & 0x20000000) {
+		mm = 3.0f;
+	} else if (*(u32*)((u8*)mario + 0x138) & 0x10000000) {
+		mm = 2.0f;
+	} else {
+		mm = 1.0f;
+	}
+	if (party != NULL) {
+		if (*(u32*)((u8*)party + 0x138) & 0x20000000) {
+			pm = 2.0f;
+		} else if (*(u32*)((u8*)party + 0x138) & 0x10000000) {
+			pm = 1.5f;
+		} else {
+			pm = 1.0f;
+		}
+	} else {
+		pm = 1.0f;
+	}
+	if (BattleBreakSlot_GetBreakTurn() >= 1) {
+		f32* slot = (f32*)BattleBreakSlotGetPtr();
+		*(s32*)(base + 0x137C4) += (s32)(pm * (mm * (cnt * (1.0f * (f32)(f64)root * (a + b)))) * slot[5]);
+	} else {
+		*(s32*)(base + 0x137C4) += (s32)(pm * (mm * (cnt * (1.0f * (f32)(f64)root * (a + b)))));
+	}
+	if (irand(100) < ((u8*)info)[0xA]) {
+		BattleBreakSlot_PointInc();
+	}
 }
 
 //@@ BattleAudience_WinSetActive
@@ -1425,12 +2323,12 @@ void BattleAudienceAddTargetNumSub(f32 value) {
 
 //@@ BattleAudienceAddAudienceNum
 s32 BattleAudienceAddAudienceNum(s32 num) {
+	s32 total;
 	s32 list[200];
 	BattleWork* wp;
 	AudPhaseEvt* audience;
 	s32 i, j, r, sum, id, count;
 	u8 type;
-	s32 total;
 	s32 added;
 
 	wp = _battleWorkPointer;

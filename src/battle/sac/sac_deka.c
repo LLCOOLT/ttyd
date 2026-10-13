@@ -888,13 +888,13 @@ static void disp_2D(CameraId cam, void* param) {
     Mtx sc;
     Mtx tr;
     DekaWork* w = get_ptr();
-    GXColor col;
     f32 right;
     f32 left;
     f32 ratio;
     f32 x;
     s32 i;
     DekaTiming* t;
+    GXColor col;
 
     left = w->gaugePos.x - 0.5f * w->gaugeW - 8.0f;
     right = 8.0f + (w->gaugePos.x + 0.5f * w->gaugeW);
@@ -949,7 +949,15 @@ static void disp_2D(CameraId cam, void* param) {
                     PSMTXScale(sc, 0.75f, 0.75f, 0.75f);
                     PSMTXTrans(tr, x, w->offsetY + (w->gaugePos.y - 18.0f + t->off.y), w->gaugePos.z + t->off.z);
                     PSMTXConcat(tr, sc, m);
-                    iconDispGxCol(m, 0x10, w->cursor >= t->pos - 7.0f ? 0x95 : 0x91, col);
+                    {
+                        s32 id;
+                        if (w->cursor >= t->pos - 7.0f) {
+                            id = 0x95;
+                        } else {
+                            id = 0x91;
+                        }
+                        iconDispGxCol(m, 0x10, id, col);
+                    }
                 } else {
                     PSMTXScale(sc, 1.0f, 1.0f, 1.0f);
                     PSMTXTrans(tr, x, w->offsetY + (w->gaugePos.y + t->off.y), w->gaugePos.z + t->off.z);
@@ -961,6 +969,8 @@ static void disp_2D(CameraId cam, void* param) {
             PSMTXTrans(tr, x, w->gaugePos.y + t->off.y - 40.0f, w->gaugePos.z + t->off.z);
             PSMTXConcat(tr, sc, m);
             switch (t->hit) {
+            case 0:
+                break;
             case 1:
                 TEXPLANE(m, 0x3E, col);
                 break;

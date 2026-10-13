@@ -71,6 +71,7 @@ u32 size300x40_tex32x32[] = {
 };
 
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
+    s32 lf;
     EffectEntry* effect;
     EffRadiationN64Work* work;
     EffRadiationN64Work* p;
@@ -79,7 +80,6 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     s32 i;
     s32 k;
     s32 flag;
-    s32 lf;
 
     effect = effEntry();
     flag = 0;
@@ -164,6 +164,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 }
 
 void effRadiationMain(EffectEntry* effect) {
+    s32 lf;
     s32 base1;
     s32 base2;
     s32 base;
@@ -175,7 +176,6 @@ void effRadiationMain(EffectEntry* effect) {
     s32 life;
     s32 i;
     s32 k;
-    s32 lf;
 
     tmp.x = p->pos0.x;
     tmp.y = p->pos0.y;
@@ -228,8 +228,8 @@ void effRadiationMain(EffectEntry* effect) {
         }
         break;
     default:
-        p++;
         lf = 0x20;
+        p++;
         for (i = 1; i < effect->count; i++, lf += 2, p++) {
             p->scroll0 += p->scrollVel0;
             if (p->scroll0 > 256.0f) {

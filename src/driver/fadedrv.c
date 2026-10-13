@@ -1085,7 +1085,7 @@ void disp_maku(CameraId camId, void* param) {
 	}
 	if (entry->flags & 4) {
 		camera = camGetPtr(CAMERA_3D);
-		depth = 0.5f * camera->fovY; depth = tan(3.141592f * (depth / 180.0f));
+		depth = camera->fovY; depth = tan((depth *= 0.5f) / 180.0f * 3.141592f);
 		depth = 24.0f / depth;
 		PSVECSubtract(&camGetPtr(CAMERA_3D)->cameraPos, &entry->VirtualPos, &dist);
 		camera = camGetPtr(CAMERA_3D);

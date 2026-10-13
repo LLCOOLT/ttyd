@@ -39,7 +39,7 @@ void kpaFireAttack(void);
 void kpaFireMain(void);
 void kpaFall(void);
 void* kpaFlameHitCheck(f32, f32, f32, f32);
-static const f32 vec3_zero[3] = {0.0f, 0.0f, 0.0f};
+const f32 vec3_802fc920[3] = {0.0f, 0.0f, 0.0f};
 extern f32 marioJumpData[];
 void kpaClearHitobjRide(void);
 void* kpaChkHitobjRide(void);
@@ -60,6 +60,7 @@ s32 kpaPauseSeTable[28] = {0x10C, 0x10D, 0x10E, 0x10F, 0x111, 0x112, 0x113, 0x11
                            0x118, 0x119, 0x11B, 0x11E, 0x11F, 0x120, 0x122, 0x123, 0x124, 0x125,
                            0x127, 0x128, 0x129, 0x12A, 0x12C, 0x12D, 0x12E, 0x12F};
 static u8* fireefp;
+static u8* fireefp_pad;
 
 u8* getKoopaFireEfp(void) {
     return fireefp;
@@ -491,11 +492,10 @@ void kpaFall(void) {
         }
     } else {
         void* h;
-        if (mp->currMotionId == 0x10) {
-            return;
-        } else if (mp->currMotionId == 0x11) {
+        if (mp->currMotionId == 0x10 || mp->currMotionId == 0x11) {
             return;
         }
+        {
         if (!marioKeyOffChk() || !marioCtrlOffChk()) {
             if (!(mp->flags & 0x20)) {
                 f32 bs = mp->baseSpeed;
@@ -535,6 +535,7 @@ void kpaFall(void) {
             marioLandOn();
         }
     }
+    }
 }
 
 s32 kpaFireAttackCheck(void) {
@@ -570,7 +571,69 @@ u8* effGonbabaBreathEntry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 scale);
 
 static inline void kpaFireSEOn(void);
 static inline void kpaFireSEOff(void);
-static inline void kpaFireEntry(Vec pos);
+static inline void kpaFireEntry2(Vec pos) {
+    MarioWork* mp = marioGetPtr();
+    if (fireefp == NULL) {
+        s32 flag = 0;
+        s32 ang;
+        f32 dir;
+        f32 scale;
+        f32 x;
+        f32 y;
+        f32 z;
+        f32 sz;
+        s32 type;
+        u8* child;
+        s32 t;
+        if (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) {
+            flag = 1;
+        }
+        dir = flag ? 1.0f : -1.0f;
+        scale = kpaGetBaseScale(kpaGetLevel());
+        x = 40.0f * dir * scale + pos.x;
+        t = (MU32(marioGetPtr(), 0x14) & 1) ^ 1;
+        y = pos.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
+        z = pos.z;
+        type = 7;
+        sz = 0.4f;
+        switch (MU32(KPW(mp), 4)) {
+        case 0:
+            sz = 0.3f;
+            break;
+        case 1:
+            sz = 1.0f;
+            break;
+        case 2:
+            sz = 1.4f;
+            break;
+        case 3:
+            sz = 1.5f;
+            type = 0;
+            break;
+        }
+        fireefp = effGonbabaBreathEntry(type, 0, x, y, z, sz);
+        flag = 0;
+        if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
+            flag = 1;
+        }
+        ang = flag ? 180 : 0;
+        MF(*(u8**)(fireefp + 0xC), 0x48) = ang;
+        child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
+        if (child) {
+            flag = 0;
+            if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
+                flag = 1;
+            }
+            ang = flag ? 180 : 0;
+            MF(*(u8**)(child + 0xC), 0x48) = ang;
+        }
+    }
+}
+
+static inline void kpaFireEntry(Vec pos) {
+    MarioWork* mp = marioGetPtr();
+    kpaFireEntry2(pos);
+}
 
 void kpaFireAttack(void) {
     MarioWork* mp = marioGetPtr();
@@ -721,70 +784,6 @@ static inline void kpaFireSEOff(void) {
     }
 }
 
-static inline void kpaFireEntry2(Vec pos) {
-    MarioWork* mp = marioGetPtr();
-    if (fireefp == NULL) {
-        s32 flag = 0;
-        f32 dir;
-        f32 scale;
-        f32 x;
-        f32 y;
-        f32 z;
-        f32 sz;
-        s32 type;
-        u8* child;
-        s32 ang;
-        s32 t;
-        if (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) {
-            flag = 1;
-        }
-        dir = flag ? 1.0f : -1.0f;
-        scale = kpaGetBaseScale(kpaGetLevel());
-        x = 40.0f * dir * scale + pos.x;
-        t = (MU32(marioGetPtr(), 0x14) & 1) ^ 1;
-        y = pos.y + (20.0f * scale + (t == 1 ? 6.0f : 0.0f));
-        z = pos.z;
-        type = 7;
-        sz = 0.4f;
-        switch (MU32(KPW(mp), 4)) {
-        case 0:
-            sz = 0.3f;
-            break;
-        case 1:
-            sz = 1.0f;
-            break;
-        case 2:
-            sz = 1.4f;
-            break;
-        case 3:
-            sz = 1.5f;
-            type = 0;
-            break;
-        }
-        fireefp = effGonbabaBreathEntry(type, 0, x, y, z, sz);
-        flag = 0;
-        if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
-            flag = 1;
-        }
-        ang = flag ? 180 : 0;
-        MF(*(u8**)(fireefp + 0xC), 0x48) = ang;
-        child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
-        if (child) {
-            flag = 0;
-            if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
-                flag = 1;
-            }
-            ang = flag ? 180 : 0;
-            MF(*(u8**)(child + 0xC), 0x48) = ang;
-        }
-    }
-}
-
-static inline void kpaFireEntry(Vec pos) {
-    MarioWork* mp = marioGetPtr();
-    kpaFireEntry2(pos);
-}
-
 void kpaCancelAttackMode(void) {
     MarioWork* mp;
     u8* w = KPW(marioGetPtr());
@@ -883,7 +882,7 @@ void kpaFireMain(void) {
                         PSMTXScale(mb0, f31, f31, f31);
                         PSMTXConcat(m80, mb0, m80);
                         PSMTXConcat(m20, m80, m80);
-                        zero = *(Vec*)vec3_zero;
+                        zero = *(Vec*)vec3_802fc920;
                         PSMTXMultVec(m80, &zero, &out);
                         hit = kpaFlameHitCheck(out.x, out.y, out.z, f30);
                         if (hit) {

@@ -5401,19 +5401,19 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             data->counter++;
             break;
         case 5:
-            press = 0;
-            for (i = 0; i < 3; i++) {
-                if (data->state[i] == 0) {
-                    press++;
+{s32 n; s32 m;            n = 0;
+            for (m = 0; m < 3; m++) {
+                if (data->state[m] == 0) {
+                    n++;
                 } else {
-                    press += slot_rotate_sub(wp, data, i);
+                    n += slot_rotate_sub(wp, data, m);
                 }
             }
-            if (press == 3) {
+            if (n == 3) {
                 data->counter = 0;
                 data->phase++;
             }
-            break;
+            break;}
         case 6:
             for (i = 0; i < 3; i++) {
                 gara2[i] = SLOTGARA[data->nowSlot][i][(s32)(data->angle[data->nowSlot][i] / 45.0f)];
@@ -5436,7 +5436,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 caseDelete(data->caseId[0]);
                 caseDelete(data->caseId[1]);
                 data->flags |= 1;
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 1, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 1, 0);
                 data->flags |= 8;
             } else {
                 data->phase = 11;
@@ -5471,7 +5471,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             break;
         case 10:
             if (data->monteEvt == NULL || !evtCheckID(data->monteEvt->eventId)) {
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 2, 0);
                 data->flags &= ~8;
                 mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
                 data->counter = 0;
@@ -5495,19 +5495,21 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
             data->extra[0] = data->extra[1] = data->extra[2] = 0;
             if (data->flags & 1) {
                 data->flags &= ~1;
-                for (i = 0; i < 2; i++) {
-                    setup.activeConditionId = 0x8009;
-                    setup.hitObjName = DRUMNAME[i].anim;
-                    setup.swFlag = 0;
-                    setup.activeFunc = NULL;
-                    setup.evtCode = (void*)slotevttbl[i];
-                    setup.priority = 0;
-                    memcpy(setup.lwData, event->lwData, sizeof(setup.lwData));
-                    data->caseId[i] = caseEntry(&setup);
+                {s32 n; CaseSetup* s = &setup;
+                for (n = 0; n < 2; n++) {
+                    s->activeConditionId = 0x8009;
+                    s->hitObjName = DRUMNAME[n].anim;
+                    s->swFlag = 0;
+                    s->activeFunc = NULL;
+                    s->evtCode = (void*)slotevttbl[n];
+                    s->priority = 0;
+                    memcpy(s->lwData, event->lwData, sizeof(s->lwData));
+                    data->caseId[n] = caseEntry(s);
+                }
                 }
             }
             if (data->flags & 8) {
-                mapPlayAnimationLv(DRUMNAME[data->nowSlot].neon[2], 2, 0);
+                mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 16], 2, 0);
                 data->flags &= ~8;
                 mapPlayAnimationLv((const char*)drumname[data->nowSlot * 17 + 15], 0, 0);
             }
@@ -5772,4 +5774,5 @@ static USER_FUNC(enzan_lw_load) {
     }
     return EVT_RETURN_DONE;
 }
+
 

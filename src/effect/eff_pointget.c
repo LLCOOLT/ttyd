@@ -95,7 +95,6 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     f32 scale = work->scale;
     f32 wide;
     f32 y1;
-    f32 half;
     f32 width;
     f32 base;
     f32 x0;
@@ -135,8 +134,8 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     width = 48.0f;
     y1 = 24.0f;
     wide = 352.0f;
-    x0 = -width / 2.0f;
-    half = base * 0.5f;
+    x0 = -width;
+    x0 /= 2.0f;
     for (pass = 1; pass >= 0; pass--) {
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);
@@ -152,7 +151,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetChanMatColor(GX_COLOR0A0, c2);
         }
         for (i = 0; i < strlen(buf); i++) {
-            PSMTXTrans(mtx, ox + (32.0f * (f32)i + half), oy, 0.0f);
+            PSMTXTrans(mtx, ox + (32.0f * (f32)i + base / 2.0f), oy, 0.0f);
             PSMTXConcat(baseMtx, mtx, mtx);
             GXLoadPosMtxImm(mtx, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);

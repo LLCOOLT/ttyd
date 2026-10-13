@@ -148,6 +148,7 @@ void effMagicHoraoMain(EffectEntry* effect) {
 
 void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     f32 s;
+    effN64Vtx* vtx;
     CameraEntry* camera;
     EffMagicHoraoN64Work* work;
     s32 angle;
@@ -156,13 +157,12 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scale;
     GXTexObj texObj;
-    GXColor color2;
-    GXColor color;
-    effN64Vtx* vtx;
     f32 ang;
     s32 i;
     s32 x;
     s32 y;
+    GXColor color2;
+    GXColor color;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -236,8 +236,8 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
         }
         vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
         for (i = 0; i < 16; i++) {
-            x = (s32)(s * (500.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + 60 * i)) / 360.0f)));
-            y = (s32)(s * (200.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + 6 * i)) / 360.0f)));
+            x = (s32)(s * (500.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 60)) / 360.0f)));
+            y = (s32)(s * (200.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 6)) / 360.0f)));
             vtx[i * 2].x = x - 3200;
             vtx[i * 2].y = y + i * 400;
             vtx[i * 2].z = 0;

@@ -59,7 +59,7 @@ static s32 fontlenpitch(const char* str, s32 pitch) {
     if (pitch != 0) {
         p = (const s8*)str;
         n = 0;
-        while (*p != '\0') {
+        while (*p != 0) {
             if (_ismbblead(*p)) {
                 n++;
                 p++;
@@ -149,9 +149,9 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
     const char* scoreTitles[4] = {"menu_title_score", "menu_title_score", "menu_title_score", "menu_title_score"};
     const char* ranks[6] = {"\x81\x40\x82\x50", "\x81\x40\x82\x51", "\x81\x40\x82\x52", "\x81\x40\x82\x53", "\x81\x40\x82\x54", "menu_subtitle2_rankgai"};
     char buf[32];
-    const char* title;
     const char* str;
     const u8* rk;
+    const char* title;
     const char* msg;
     s32 score;
     s32 sec;
@@ -192,7 +192,7 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
                 if (wp->dispScore >= 0) {
                     sprintf(buf, "%3d%s%02d", wp->dispScore / 1000, msgSearch("menu_decimal_point"), (wp->dispScore % 1000) / 10);
                     msg = buf;
-                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(msg, 18)), 56.0f + wp->y, 18.0f, msg);
+                    FontDrawStringPitch(wp->x + (150.4f - fontlenpitch(buf, 18)), 56.0f + wp->y, 18.0f, msg);
                     if (wp->phase >= 4) {
                         FontDrawStart();
                         FontDrawScale(1.0f);

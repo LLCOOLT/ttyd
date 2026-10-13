@@ -201,24 +201,24 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     f32 a, b, d, w, h;
     s32 alpha;
     s32 i;
-    s32 pass;
-    s32 sh;
     s32 al;
+    s32 sh;
+    s32 pass;
 
     alpha = work->alpha;
-    scale = work->scale * work->size;
+    w = work->scale * work->size;
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXTrans(m19c, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(m13c, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
-    PSMTXScale(m16c, scale, scale, scale);
+    PSMTXScale(m16c, w, w, w);
     PSMTXConcat(m19c, m13c, m19c);
     PSMTXConcat(m19c, m16c, m7c);
-    k = (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
+    d = (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
     s = (f32)sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    PSMTXTrans(m19c, 2.0f * s, 0.0f, 2.0f * -k);
+    PSMTXTrans(m19c, 2.0f * s, 0.0f, 2.0f * -d);
     PSMTXConcat(m19c, m7c, m7c);
     GXSetTevColor(GX_TEVREG0, white);
     GXSetTevColor(GX_TEVREG1, color_tbl[work->type]);
@@ -257,10 +257,10 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     sh = alpha * 0x80 / 0xFF;
     al = alpha * 0xFF / 0xFF;
     w = 64.0f;
-    a = -w * 0.5f;
+    d = -w / 2.0f;
     b = 32.0f;
-    for (pass = 0; pass < 2; pass++) {
-        if (pass == 0) {
+    for (i = 0; i < 2; i++) {
+        if (i == 0) {
             PSMTXConcat(camera->view, m7c, m19c);
             PSMTXTrans(m13c, 2.0f, -2.0f, 0.0f);
             PSMTXConcat(m19c, m13c, m19c);
@@ -272,13 +272,13 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(m19c, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(a, b, 0.0f);
+        GXPosition3f32(d, b, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
         GXPosition3f32(b, b, 0.0f);
         GXTexCoord2f32(2.0f, 0.0f);
-        GXPosition3f32(b, a, 0.0f);
+        GXPosition3f32(b, d, 0.0f);
         GXTexCoord2f32(2.0f, 2.0f);
-        GXPosition3f32(a, a, 0.0f);
+        GXPosition3f32(d, d, 0.0f);
         GXTexCoord2f32(0.0f, 2.0f);
     }
     GXSetTevColor(GX_TEVREG0, color_tbl[work->type]);
@@ -287,8 +287,8 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     w = 10.666667f;
     h = 42.666668f;
-    a = -w * 0.5f;
     d = -h;
+    a = -w / 2.0f;
     b = 5.3333335f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {

@@ -19,14 +19,17 @@
 #include <string.h>
 
 extern GlobalWork* gp;
+extern GXRenderModeObj sRMObjHReso;
 extern GXRenderModeObj GXNtsc480ProgMarioSt;
 extern GXRenderModeObj GXNtsc480IntDfMarioSt;
+extern GXRenderModeObj sRMObjHReso_prog;
 
 //.sbss
 static LogoWork work;
 
 //.sdata
 static LogoWork* wp = &work;
+__declspec(section ".sdata") u32 gap_07_804103FC_sdata[1] = {0};
 
 #define OSIsRestart() ((OSGetResetCode() & 0x80000000) ? TRUE : FALSE)
 
@@ -34,6 +37,10 @@ static LogoWork* wp = &work;
 void logoDisp(CameraId camId, void* param);
 void dummy_draw(CameraId camId, void* param);
 void progDisp(CameraId camId, void* param);
+
+static inline s32 logoAsyncFirst(void) {
+	return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
+}
 
 void seq_logoInit(SequenceWork* work) {
 	memset(wp, 0, sizeof(LogoWork));
@@ -61,20 +68,20 @@ void seq_logoInit(SequenceWork* work) {
 	}
 	fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot()); //unused
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
-		VIConfigure(&GXNtsc480IntDfMarioSt);
+		VIConfigure(&sRMObjHReso);
 		VIFlush();
 		VIWaitForRetrace();
 	}
 	else {
 		switch (OSGetResetCode() & 1) {
 			case OS_RESET_RESTART:
-				VIConfigure(&GXNtsc480IntDfMarioSt);
+				VIConfigure(&sRMObjHReso);
 				VIFlush();
 				VIWaitForRetrace();
 				break;
 
 			case OS_RESET_HOTRESET:
-				VIConfigure(&GXNtsc480ProgMarioSt);
+				VIConfigure(&sRMObjHReso_prog);
 				VIFlush();
 				VIWaitForRetrace();
 				VIWaitForRetrace();
@@ -98,9 +105,9 @@ void seq_logoExit(SequenceWork* work) {
 
 void seq_logoMain(SequenceWork* work) {
 	static OSTime time; //time instance 1
+	u32 size;
 	u8* decode;
 	FileEntry* first;
-	u32 size;
 	s32 ret;
 	int ok;
 
@@ -196,7 +203,7 @@ void seq_logoMain(SequenceWork* work) {
 		case 10:
 			VISetBlack(FALSE);
 			VIWaitForRetrace();
-			ret = fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
+			ret = logoAsyncFirst();
 			if (ret == 0U) {
 				ok = 0;
 			}
@@ -211,24 +218,27 @@ void seq_logoMain(SequenceWork* work) {
 			}
 			first = fileAllocf(0, "%s/b/first", getMarioStDvdRoot());
 			if (first) {
-				size = *(u32*)first->data[0];
+				decode = *first->data;
+				size = *(u32*)decode;
 				size = ((size << 16) & 0xFF0000) | (size & 0xFF00) | ((size >> 16) & 0xFF);
-				decode = __memAlloc(HEAP_DEFAULT, size);
-				LZ77Decode(*first->data, decode);
+				LZ77Decode(*first->data, decode = __memAlloc(HEAP_DEFAULT, size));
 				arcEntry(0, decode, size);
 				fileFree(first);
 			}
 			if (!(gp->flags & 0x1000)) {
 				if (!wp->skipStory) { //play story demo
 					seqSetSeq(SEQ_MAP_CHANGE, "dmo_00", NULL);
+					return;
 				}
 				else { //continue to title screen
 					fadeEntry(FADE_OUT_WHITE, 500, (GXColor){0, 0, 0, 0xFF});
 					work->state++;
+					return;
 				}
 			}
 			else {
 				seqSetSeq(SEQ_E3, NULL, NULL);
+				return;
 			}
 			break;
 
@@ -248,7 +258,7 @@ void seq_logoMain(SequenceWork* work) {
 //param is unused
 void logoDisp(CameraId camId, void* param) {
 	GXRenderModeObj* rmode;
-	f32 width, x, height, y;
+	f32 width, height, x, y;
 
 	//stack variables
 	Mtx44 ortho; //stack + 0xAC
@@ -263,10 +273,10 @@ void logoDisp(CameraId camId, void* param) {
 		GXGetViewportv(viewport);
 		GXGetScissor(&sciLeft, &sciTop, &sciWidth, &sciHeight);
 		if (OSGetProgressiveMode() != 1) {
-			rmode = &GXNtsc480IntDfMarioSt;
+			rmode = &sRMObjHReso;
 		}
 		else {
-			rmode = &GXNtsc480ProgMarioSt;
+			rmode = &sRMObjHReso_prog;
 		}
 		GXSetPixelFmt(GX_PF_RGB8_Z24, GX_ZC_LINEAR);
 		GXSetDispCopySrc(0, 0, rmode->fbWidth, rmode->efbHeight);
@@ -354,9 +364,9 @@ void logoDisp(CameraId camId, void* param) {
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 				width = (f32)GXGetTexObjWidth(&texObj);
 				height = (f32)GXGetTexObjHeight(&texObj);
-				x = (608.0f - width) * 0.5f;
-				y = (448.0f - height) * 0.5f - 20.0f;
-				height += y;
+				x = (608.0f - width) / 2.0f;
+				y = (448.0f - height) / 2.0f - 20.0f;
+				height = y + height;
 
 				GXPosition3f32(x, y, 0.0f);
 				GXTexCoord2f32(0.0f, 0.0f);
@@ -486,7 +496,7 @@ void progDisp(CameraId camId, void* param) {
 				msg = romFontGetMessage(0); //Display Progressive Scan?
 				width = (f32)romFontGetWidth(msg);
 				romFontPrintGX(
-					-(0.7f * width) * 0.5f,
+					-(0.7f * width) / 2.0f,
 					-130.0f,
 					0.7f,
 					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
@@ -495,7 +505,7 @@ void progDisp(CameraId camId, void* param) {
 				msg = romFontGetMessage(1); //yes/no
 				width = (f32)romFontGetWidth(msg);
 				romFontPrintGX(
-					-(0.7f * width) * 0.5f,
+					-(0.7f * width) / 2.0f,
 					-160.0f,
 					0.7f,
 					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
@@ -504,7 +514,7 @@ void progDisp(CameraId camId, void* param) {
 				msg = romFontGetMessage(2); //selection box
 				width = (f32)romFontGetWidth(msg);
 				romFontPrintGX(
-					-(((0.7f * width) * 0.5f) - (f32)(75 * ((2 * wp->toggle) - 1))),
+					-(((0.7f * width) / 2.0f) - (f32)(75 * ((2 * wp->toggle) - 1))),
 					-160.0f,
 					0.7f,
 					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
@@ -522,7 +532,7 @@ void progDisp(CameraId camId, void* param) {
 				msg = romFontGetMessage(type);
 				width = (f32)romFontGetWidth(msg);
 				romFontPrintGX(
-					-(0.7f * (f32)width) * 0.5f,
+					-(0.7f * (f32)width) / 2.0f,
 					-145.0f,
 					0.7f,
 					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},
@@ -533,7 +543,7 @@ void progDisp(CameraId camId, void* param) {
 				if (!wp->toggle) {
 					VISetBlack(1);
 					OSSetProgressiveMode(1);
-					VIConfigure(&GXNtsc480ProgMarioSt);
+					VIConfigure(&sRMObjHReso_prog);
 					VIFlush();
 					VIWaitForRetrace();
 					VIWaitForRetrace();
@@ -551,7 +561,7 @@ void progDisp(CameraId camId, void* param) {
 
 			case 4:
 				if (OSTicksToMilliseconds(gp->renderTime - time) > 2000) {
-					VISetBlack(TRUE);
+					VISetBlack(FALSE);
 					wp->progressive = 0;
 				}
 				break;

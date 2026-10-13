@@ -175,7 +175,7 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
-        p->f10 = 0.5f * size;
+        p->f10 = size / 2;
         p->f14 = yaw;
         p->f34 = p->f10 + irand(2);
         p->f38 = 0.1f + irand(10) / 100.0f;
@@ -227,8 +227,8 @@ void effFunemizuMain(EffectEntry* effect) {
             work->f20 += (a - work->f20) / 10.0f;
             work->f24 += (b - work->f24) / 10.0f;
         } else {
-            work->f20 += 0.5f * (a - work->f20);
-            work->f24 += 0.5f * (b - work->f24);
+            work->f20 += (a - work->f20) / 2;
+            work->f24 += (b - work->f24) / 2;
         }
         work->f28 += 0.05f * work->f18;
         work->f2c += 0.1f * work->f1c;
@@ -282,7 +282,7 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     s32 type;
     s32 i;
-    s32 u;
+    u32 u;
     f32 z;
 
     cam = camGetPtr(cameraId);
@@ -417,8 +417,8 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
-    EffFunemizuWork* work = effect->userdata;
     GXColor color;
+    EffFunemizuWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;
     Mtx mtx;
@@ -429,7 +429,6 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     f32 nw;
     f32 h, p;
 
-    nw = -w;
     cam = camGetPtr(cameraId);
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
@@ -454,6 +453,7 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    nw = -w;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         if (work->delay == 0 && !(work->position.y < 0.0f)) {
@@ -465,15 +465,13 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadPosMtxImm(trans, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            h = nw * 0.5f;
-            p = w * 0.5f;
-            GXPosition3f32(h, p, 0.0f);
+            GXPosition3f32(nw / 2, w * 0.5f, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(p, p, 0.0f);
+            GXPosition3f32(w * 0.5f, w * 0.5f, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
-            GXPosition3f32(p, h, 0.0f);
+            GXPosition3f32(w * 0.5f, nw / 2, 0.0f);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(h, h, 0.0f);
+            GXPosition3f32(nw / 2, nw / 2, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }

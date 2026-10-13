@@ -3523,7 +3523,7 @@ void gundan1000tai_seq01(NanNpc* npc) {
             if (elapsed < npc->work6C) {
                 t = (f32)elapsed / (f32)npc->work6C;
                 npc->pos.x = intplGetValue(0, elapsed, npc->work6C, npc->posA.x, npc->posC.x);
-                npc->pos.z = intplGetValue(0, elapsed, npc->work6C, npc->posA.z, npc->posC.z);
+                npc->pos.z = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(0, npc->posA.z, npc->posC.z, elapsed, npc->work6C);
                 npc->pos.y = npc->posA.y + t * (npc->work78 * t + npc->work7C);
             } else {
                 npc->pos = npc->posC;
@@ -3579,11 +3579,11 @@ void gundan1000tai_seq01(NanNpc* npc) {
             break;
         case 100:
             dir = irand(180) + 120;
-            angle = 6.2831855f * irand(360) / 360.0f;
-            dist = sin(angle);
-            c = cos(angle);
-            npc->posC.x = 0.9f * (dir * dist) + 30.0f;
-            npc->posC.z = 0.5f * (dir * c) - 300.0f;
+            dist = 6.2831855f * irand(360) / 360.0f;
+            c = sin(dist);
+            s = cos(dist);
+            npc->posC.x = 0.9f * (dir * c) + 30.0f;
+            npc->posC.z = 0.5f * (dir * s) - 300.0f;
             dist = distABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
             dir = angleABf(npc->pos.x, npc->pos.z, npc->posA.x, npc->posA.z);
             speed = dist / 2.0f + (irand(180) + 180);

@@ -1259,9 +1259,9 @@ USER_FUNC(cam_mahojin_kaiten_main) {
         event->lwData[15] = 1;
         event->savedTime = gp->renderTime;
     }
+    {s32 lo = frames * 20 / 100; s32 hi = frames * 80 / 100;
     total = 0.0f;
     speed = total;
-    {s32 hi = frames * 80 / 100; s32 lo = frames * 20 / 100;
     for (i = 0; i < frames; i++) {
         if (i <= lo) {
             speed += 1.0f;

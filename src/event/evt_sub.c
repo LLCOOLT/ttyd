@@ -1493,10 +1493,10 @@ USER_FUNC(evt_sub_get_language) {
 USER_FUNC(evt_sub_animgroup_async) {
 	s32 group = evtGetValue(event, event->args[0]);
 	switch (animGroupBaseAsync((const char*)group, gp->inBattle != 0, NULL)) {
-	case 0:
-		break;
 	default:
 		return EVT_RETURN_DONE;
+	case 0:
+		break;
 	}
 	return EVT_RETURN_BLOCK;
 }

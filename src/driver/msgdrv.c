@@ -429,9 +429,240 @@ s32 msgMain(smartEntry* smart) {
 }
 
 
+typedef struct MsgDispChar {
+	u32 value; //0x0
+	u16 glyph; //0x4
+	s16 x; //0x6
+	s16 y; //0x8
+	s16 iconY; //0xA
+	u32 time; //0xC
+	f32 scale; //0x10
+	f32 rot; //0x14
+} MsgDispChar;
+
+double cos(double);
+double sin(double);
+void FontDrawNoise(void);
+void FontDrawNoiseOff(void);
+void FontDrawEdge(void);
+void FontDrawEdgeOff(void);
+void FontDrawRainbowColor(void);
+void FontDrawRainbowColorOff(void);
+void FontDrawColorIDX(s32 idx);
+void FontDrawColor_(void);
+GXColor FontGetDrawColor(void);
+void FontDrawScale(f32 scale);
+void FontDrawCode(f32 x, f32 y, u16 code);
+void FontDrawCodeMtx(Mtx mtx, u16 code);
+
 #pragma dont_inline on
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
+	s32 hide;
+	s32 al;
+	s32 w;
+	MsgWinData* data = smart->address;
+	MsgDispChar* c = (MsgDispChar*)data->entries;
+	s32 i;
+	BOOL ret = FALSE;
+	u8 a;
+	f32 sx, sy, hx, hy, t;
+	s32 page, py, d;
+	GXColor col, col2, col4;
+	Mtx m;
+	Mtx m2;
+	Vec pos;
 
+	FontDrawStart_alpha(alpha);
+	al = alpha;
+	for (i = 0; i < data->field_0x10; i++, c++) {
+		switch (c->glyph) {
+			case 0xFFFF:
+				return FALSE;
+			case 0xFFFE:
+				if (data->field_0x8 == c->x) {
+					ret = TRUE;
+				}
+				break;
+			case 0xFFF7:
+				FontDrawColor(*(GXColor*)&c->value);
+				break;
+			case 0xFFF6:
+				if (c->value) {
+					FontDrawNoise();
+				}
+				else {
+					FontDrawNoiseOff();
+				}
+				break;
+			case 0xFFF4:
+				col = FontGetDrawColor();
+				PSMTXIdentity(m);
+				if (c->rot >= 90.0f && c->rot <= 270.0f) {
+					PSMTXScaleApply(m, m, 1.0f, 1.0f, -1.0f);
+				}
+				PSMTXTransApply(m, m, x + c->x, c->y + (y + data->field_0x28) - 40.0f, 0.0f);
+				animPoseMain((s32)c->value);
+				animPoseDrawMtx((s32)c->value, m, 2, c->rot, c->scale);
+				FontDrawStart_alpha(alpha);
+				FontDrawColor(col);
+				break;
+			case 0xFFF5:
+			case 0xFFF9:
+			case 0xFFFA:
+			case 0xFFFB:
+			case 0xFFFC:
+			case 0xFFFD:
+				break;
+			default:
+				hide = 0;
+				a = 0xFF;
+				sx = x + c->x;
+				sy = c->y + (y + data->field_0x28);
+				if (data->flags & 0x40) {
+					page = data->page;
+					py = data->pageY[page];
+					if (data->field_0x28 == py) {
+						if (c->y + data->pageY[page + 1] <= 0) {
+							break;
+						}
+						hide = 1;
+					}
+					else if (data->field_0x28 < py) {
+						if (c->y + py > 0) {
+							hide = 1;
+						}
+						else {
+							d = py - data->field_0x28;
+							if (d > 100) {
+								d = 100;
+							}
+							a = (100 - d) * 255 / 100;
+							if (page != data->field_0x7840 - 1) {
+								if (c->y + data->pageY[page + 1] <= 0) {
+									break;
+								}
+								hide = 1;
+							}
+							else {
+								col2 = FontGetDrawColor();
+								col2.a = col2.a * a / 255;
+								GXSetTevColor(GX_TEVREG0, col2);
+							}
+						}
+					}
+					else {
+						if (c->y + data->pageY[page + 1] > 0) {
+							hide = 1;
+						}
+						else {
+							d = data->field_0x28 - py;
+							if (d > 100) {
+								d = 100;
+							}
+							a = d * 255 / 100;
+							if (page != data->field_0x7840 - 2) {
+								if (c->y + data->pageY[page + 2] <= 0) {
+									break;
+								}
+								hide = 1;
+							}
+							else {
+								col2 = FontGetDrawColor();
+								col2.a = col2.a * a / 255;
+								GXSetTevColor(GX_TEVREG0, col2);
+							}
+						}
+					}
+				}
+				if (c->glyph == 0xFFF8) {
+					col4 = FontGetDrawColor();
+					pos.x = 28.0f + (x + c->x);
+					pos.y = c->iconY + (c->y + (y + data->field_0x28) - 40.0f);
+					pos.z = 0.0f;
+					iconDispGxAlpha(&pos, 0x10, (u16)c->value, a * al / 255, c->scale);
+					FontDrawStart_alpha(alpha);
+					FontDrawColor(col4);
+					break;
+				}
+				if ((f32)(c->y + data->field_0x28) >= 32.0f * c->scale - 10.0f) {
+					break;
+				}
+				if (hide) {
+					GXColor gray = {0x50, 0x50, 0x50, 0xFF};
+					switch (data->window->type) {
+						case 3:
+						case 8:
+						case 9: {
+							GXColor gray2 = {0x6E, 0x6E, 0x6E, 0xFF};
+							gray = gray2;
+							break;
+						}
+					}
+					gray.a = a;
+					GXSetTevColor(GX_TEVREG0, gray);
+					FontDrawScale(c->scale);
+					FontDrawCode(sx, sy, c->glyph);
+					FontDrawColor_();
+				}
+				else if (c->value & 1) {
+					w = kanjiGetWidth(c->glyph) / 2;
+					hx = sx;
+					hy = sy;
+					if (c->value & 2) {
+						hx = sx + irand(10000) % 3;
+						hy = sy + irand(10000) % 3;
+					}
+					PSMTXTrans(m2, -w, 12.0f, 0.0f);
+					PSMTXScaleApply(m2, m2, c->rot, c->rot, c->rot);
+					PSMTXTransApply(m2, m2, (u32)w, -12.0f, 0.0f);
+					PSMTXScaleApply(m2, m2, c->scale, c->scale, c->scale);
+					PSMTXTransApply(m2, m2, hx, hy, 0.0f);
+					FontDrawCodeMtx(m2, c->glyph);
+					c->rot = 1.0f + 0.5f * (c->rot - 1.0f);
+				}
+				else if (c->value & 2) {
+					hy = sx + irand(10000) % 3;
+					hx = sy + irand(10000) % 3;
+					FontDrawScale(c->scale);
+					FontDrawCode(hy, hx, c->glyph);
+				}
+				else if (c->value & 4) {
+					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					hx = cos(t);
+					hy = sin(t);
+					FontDrawScale(c->scale);
+					FontDrawCode(sx + 3.2f * hx, sy - 3.2f * hy, c->glyph);
+				}
+				else if (c->value & (0x100 << data->sel)) {
+					f32 hx2;
+					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					hx2 = sx + 3.2f * (f32)cos(t);
+					hy = sy - 3.2f * (f32)sin(t);
+					FontDrawScale(c->scale);
+					{
+						GXColor shadow = {0x00, 0x00, 0x00, 0x50};
+						FontDrawColor(shadow);
+					}
+					FontDrawCode(hx2, hy, c->glyph);
+					FontDrawEdge();
+					FontDrawRainbowColor();
+					{
+						GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+						FontDrawColor(white);
+					}
+					FontDrawCode(hx2 - 4.0f, 4.0f + hy, c->glyph);
+					FontDrawEdgeOff();
+					FontDrawRainbowColorOff();
+					FontDrawColorIDX(0);
+				}
+				else {
+					FontDrawScale(c->scale);
+					FontDrawCode(sx, sy, c->glyph);
+				}
+				break;
+		}
+	}
+	return ret;
 }
 #pragma dont_inline reset
 
@@ -445,64 +676,196 @@ void msgDispKeyWait_render(s32 wXluStage) {
 	wp->currDispMode = wXluStage;
 }
 
+char* msgGetCommand(char* msg, char* cmd, char* arg);
 void msgAnalize(smartEntry* smart, char* msg) {
 	MessageData* data;
 	MsgDataEntry* entry;
 	WindowEntry* window;
 	s32 smth_7A30;
-	char check;
+	u8 check;
 	BOOL checkkanji;
 	u16 glyph, width;
 	u32 r23;
+	s32 i, inArgs;
+	char* p;
+	char tag[0x80];
+	char args[0x80];
+	char name[0x40];
+	s32 iv[5];
+	f32 fv, fa, fb, fc;
 
 	data = smart->address;
 	window = data->window;
 	r23 = 0;
-	//r1+0x50 = 1.0f;
 	entry = &data->entries[data->entryId];
 	if (window->type < 0) {
 		window->type = 0;
 	}
 	smth_7A30 = data->field_0x7A30;
-	//s16 r1+0x234 = 0;
-	//s16 r1+0x232 = 0;
-	//s16 r1+0x230 = 0;
-	//s32 r1+0x54 = 0;
 	switch (window->type) {
 	case 3:
 	case 8:
 		switch (window->type) {
 		case 3:
-			entry->field_0x0 = 0xDCC8DCFF; //(GXColor){0xDC, 0xC8, 0xDC, 0xFF};
+			entry->field_0x0 = 0xDCC8DCFF;
 			break;
 		case 8:
-			entry->field_0x0 = 0x00D914FF;//(GXColor){0x00, 0xD9, 0x14, 0xFF};
+			entry->field_0x0 = 0x00D914FF;
 			break;
 		}
 		entry->glyph = 0xFFF7;
 		entry->field_0xC = smth_7A30;
-		entry++; //next entry
-		data->entryId++; //next entry
+		entry++;
+		data->entryId++;
 		break;
-
 	default:
 		break;
 	}
 
-	check = *msg;
-	if ((check < 0x81 && check <= 0x9F) || (check < 0xE0 && check > 0xFC)) {
-		checkkanji = TRUE;
-	}
-	else {
-		checkkanji = FALSE;
-	}
-	if (checkkanji) {
-		glyph = kanjiSearch(*(u16*)msg);
-		width = kanjiGetWidth(glyph);
-		entry->glyph = glyph;
-
-
-		entry->field_0x0 = r23;
+	while (TRUE) {
+		check = *msg;
+		if ((check >= 0x81 && check <= 0x9F) || (check >= 0xE0 && check <= 0xFC)) {
+			checkkanji = TRUE;
+		} else {
+			checkkanji = FALSE;
+		}
+		if (checkkanji) {
+			glyph = kanjiSearch(*(u16*)msg);
+			width = kanjiGetWidth(glyph);
+			entry->glyph = glyph;
+			/* TODO: block at 0xb8-0x27c (sjis glyph store, 0x8145/0x8140/0x8151 checks, width) */
+			msg += 2;
+			continue;
+		}
+		switch ((s8)*msg) {
+		case 0:
+			/* TODO: block at 0x28c-0x2b8 (terminator entry, store field_0x7A30..7A3A) */
+			entry->glyph = 0xFFFF;
+			return;
+		case '\n':
+			/* TODO: block at 0x2bc-0x390 (newline entry, line counters, 0x7a40) */
+			entry->glyph = 0xFFFB;
+			msg++;
+			continue;
+		case '<':
+			msg = msgGetCommand(msg + 1, tag, args);
+			if (strcmp(tag, "k") == 0 || strcmp(tag, "key") == 0) {
+				/* TODO: block at 0x428-0x460 */
+			} else if (strcmp(tag, "keyxon") == 0) {
+				/* TODO */
+			} else if (strcmp(tag, "p") == 0 || strcmp(tag, "scrl_auto") == 0) {
+				/* TODO: block at 0x4b0-0x504 */
+			} else if (strcmp(tag, "o") == 0 || strcmp(tag, "once_stop") == 0) {
+				/* TODO */
+			} else if (strcmp(tag, "pos") == 0) {
+				if (sscanf(args, "%d%d", &iv[0], &iv[1]) == 999) {
+				}
+				/* TODO */
+			} else if (strcmp(tag, "scale") == 0) {
+				sscanf(args, "%f", &fv);
+			} else if (strcmp(tag, "/scale") == 0) {
+				/* TODO */
+			} else if (strcmp(tag, "wait") == 0) {
+				sscanf(args, "%d", &iv[0]);
+			} else if (strcmp(tag, "speed") == 0) {
+				sscanf(args, "%d", &iv[0]);
+			} else if (strcmp(tag, "/speed") == 0) {
+			} else if (strcmp(tag, "dynamic") == 0) {
+				sscanf(args, "%f", &fv);
+			} else if (strcmp(tag, "/dynamic") == 0) {
+			} else if (strcmp(tag, "shake") == 0) {
+			} else if (strcmp(tag, "/shake") == 0) {
+			} else if (strcmp(tag, "wave") == 0) {
+			} else if (strcmp(tag, "/wave") == 0) {
+			} else if (strcmp(tag, "col") == 0) {
+				sscanf(args, "%x", &iv[0]);
+				/* TODO */
+			} else if (strcmp(tag, "/col") == 0) {
+			} else if (strcmp(tag, "noise") == 0) {
+			} else if (strcmp(tag, "/noise") == 0) {
+			} else if (strcmp(tag, "dkey") == 0) {
+			} else if (strcmp(tag, "/dkey") == 0) {
+			} else if (strcmp(tag, "plate") == 0) {
+			} else if (strcmp(tag, "system") == 0) {
+			} else if (strcmp(tag, "tec") == 0) {
+			} else if (strcmp(tag, "majo") == 0) {
+			} else if (strcmp(tag, "diary") == 0) {
+			} else if (strcmp(tag, "housou") == 0) {
+			} else if (strcmp(tag, "boss") == 0) {
+			} else if (strcmp(tag, "kanban") == 0) {
+			} else if (strcmp(tag, "small") == 0) {
+			} else if (strcmp(tag, "clear") == 0) {
+			} else if (strcmp(tag, "wpos") == 0) {
+				sscanf(args, "%hd%hd%hd%hd", &iv[0], &iv[1], &iv[2], &iv[3]);
+				/* TODO: block at 0xb30-0xb2c */
+			} else if (strcmp(tag, "select") == 0) {
+				sscanf(args, "%hd%hd%hd%hd%hd", &iv[0], &iv[1], &iv[2], &iv[3], &iv[4]);
+			} else if (strcmp(tag, "se") == 0) {
+				sscanf(args, "%d", &iv[0]);
+			} else if (strcmp(tag, "vol") == 0) {
+				sscanf(args, "%d", &iv[0]);
+			} else if (strcmp(tag, "nowinse") == 0) {
+			} else if (strcmp(tag, "icon") == 0) {
+				if (args[0] >= '0' && args[0] <= '9') {
+					sscanf(args, "%d%f%d%d%d", &iv[0], &fv, &iv[1], &iv[2], &iv[3]);
+				} else {
+					sscanf(args, "%s%f%d%d%d", name, &fv, &iv[1], &iv[2], &iv[3]);
+					if (strcmp(name, "HM") == 0) {
+					}
+					for (i = 0; i < 0x12; i++) {
+						if (strcmp(name, "") == 0) { /* TODO: icon name table */
+							break;
+						}
+					}
+				}
+				if (iv[0] == 0) {
+					iconGetWidthHight(0, 0, 0);
+					/* TODO: block at 0xe30-0xf28 */
+				} else {
+					glyph = kanjiSearch(0);
+					width = kanjiGetWidth(glyph);
+					/* TODO: block at 0xf30-0xf3c */
+				}
+			} else if (strcmp(tag, "anim") == 0) {
+				sscanf(args, "%s%s%d%d%f%d", name, name, &iv[0], &iv[1], &fv, &iv[2]);
+				iv[3] = animPoseEntry(name, 0);
+				animPoseSetAnim(iv[3], name, 1);
+				animPoseSetMaterialFlagOn(iv[3], 0);
+				animPoseSetMaterialFlagOff(iv[3], 0);
+				animPoseSetGXFunc(iv[3], 0, 0);
+				/* TODO: block at 0xfe8-0x1028 */
+			} else if (strcmp(tag, "paper") == 0) {
+				sscanf(args, "%s%d", name, &iv[0]);
+				if (strcmp(name, "me") != 0) {
+					npcNameToPtr(name);
+				}
+			} else if (strcmp(tag, "/paper") == 0) {
+				sscanf(args, "%s", name);
+				if (strcmp(name, "me") != 0) {
+					npcNameToPtr(name);
+				}
+			} else if (strcmp(tag, "r") == 0) {
+				/* TODO: ruby */
+			} else if (tag[0] == 'R' || (tag[0] == '/' && *(u16*)tag == 0x2F72)) {
+				/* TODO: block at 0x1170-0x1370 (ruby text, strlen + kanji loops) */
+				strlen(tag);
+				continue;
+			}
+			if (*msg == '\n') {
+				msg++;
+			}
+			continue;
+		default:
+			if (*msg == 0) {
+				glyph = kanjiSearch(0);
+			} else {
+				glyph = hankakuSearch(*msg);
+			}
+			width = kanjiGetWidth(glyph);
+			/* TODO: block at 0x13c0-0x14ac (single-byte glyph entry) */
+			msg++;
+			continue;
+		}
 	}
 }
 
@@ -1029,22 +1392,100 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
-	WindowEntry* window = param; //cast to correct type
+	WindowEntry* window = param;
 	CameraEntry* camera = camGetCurPtr();
-	s32 type;
+	BOOL ret = FALSE;
+	Vec pos;
+	f32 x, y, w, h;
+	s32 sy;
 
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
-	type = window->type;
 
-	switch (type) {
+	switch (window->type) {
 	case 0:
 	case 1:
 	case 6:
 	case 8:
 	case 9:
+		if (window->field_0x2C != 0) {
+			if (window->field_0x2C & 0x10) {
+				pos = *(Vec*)((u8*)window + 0x30);
+			} else {
+				getScreenPoint((Vec*)((u8*)window + 0x30), &pos);
+			}
+			switch (window->type) {
+			case 0:
+			case 6:
+			case 8:
+			case 9:
+				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height * 0.5f);
+				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width * 0.5f);
+				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
+				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w * 0.5f, y + h * 0.5f, w, h, pos.x, pos.y);
+				if (window->alpha == 255) {
+					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
+					ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+				}
+				break;
+			case 1:
+				window->x = pos.x - 0.5f * window->height;
+				if (window->field_0x2C & 8) {
+					window->y = pos.y - 80.0f;
+				} else {
+					window->y = 60.0f + pos.y;
+				}
+				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height * 0.5f);
+				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width * 0.5f);
+				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
+				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w * 0.5f, y + h * 0.5f, w, h, pos.x, pos.y);
+				if (window->alpha == 255) {
+					sy = 240 - ((s32)window->y - 10);
+					if (sy < 0) sy = 0;
+					if (sy > 480) sy = 480;
+					GXSetScissor(camera->scissor[0], sy, camera->scissor[2], 0x7E);
+					ret = msgDisp(window->userdata, window->alpha, 28.0f + window->x, window->y - 6.0f);
+				}
+				break;
+			}
+		} else {
+			windowDispGX_Message(window->type, 0, window->alpha, window->x, window->y, window->height, window->width, 0.0f, 0.0f);
+			GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], 0x7E);
+			ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		}
+		break;
+	case 2:
+	case 4:
+		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
+		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 2.0f, camera->scissor[2], 0x68);
+		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		break;
+	case 7:
+		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
+		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], 0x7E);
+		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		break;
+	case 3:
+		windowDispGX_System(window->type, window->alpha, window->x, window->y, window->height, window->width);
+		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		break;
+	case 10:
+		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		break;
+	case 5:
+	case 11:
 		break;
 	}
 
+	GXSetScissor(camera->scissor[0], camera->scissor[1], camera->scissor[2], camera->scissor[3]);
+	if (ret) {
+		if (active == 0) active = 1;
+		animPoseMain(msgw->poseId);
+		animPoseDraw(msgw->poseId, window->x + window->height - 52.0f, 31.0f + (window->y - window->width), 0.0f, 180.0f, 5.0f, 2);
+	}
 }
 
 void selectWindow_Main(WindowEntry* window) {

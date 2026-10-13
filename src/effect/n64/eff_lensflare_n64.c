@@ -67,7 +67,7 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     s32 i;
 
     effect = effEntry();
-    effect->type = "LensflareN64\0\0";
+    effect->type = "LensflareN64\0\0\0";
     effect->count = 6;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffLensflareN64Work));
     effect->userdata = work;
@@ -95,14 +95,14 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
 }
 
 void effLensflareMain(EffectEntry* effect) {
-    Vec position;
-    Vec tmp = {0.0f, 0.0f, 0.0f};
     EffLensflareN64Work* work;
     EffLensflareN64Elem* e;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
     f32 cs;
-
     work = effect->userdata;
+
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;
@@ -130,7 +130,7 @@ void effLensflareMain(EffectEntry* effect) {
         e->alpha = (s32)(255.0f * cs);
         e->offset += e->speed;
         if (e->offset > 80.0f) {
-            e->offset = -60.0f;
+            e->offset = 60.0f;
             e->scale = 0.1f * (f32)(rand() % 16) + 0.4f;
             e->speed = 0.1f * (f32)(rand() % 11) + 0.1f;
             e->angle = (f32)(rand() % 360);
@@ -195,13 +195,9 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(D, 0.03125f, 0.0078125f, 0.0f);
     GXLoadTexMtxImm(D, GX_TEXMTX0, GX_MTX2x4);
     effSetVtxDescN64(size10x10_tex32x32_vtx);
-    i = 1;
-    ang1 = 10;
-    ang2 = 35;
-    e = work->elem;
-    for (; i < effect->count; ang1 += 10, ang2 += 35, i++, e++) {
+    for (i = 1, ang1 = 10, ang2 = 35, e = work->elem; i < effect->count; ang1 += 10, ang2 += 35, i++, e++) {
         f32 scale = e->scale;
-        if (0.0f == scale) {
+        if (!scale) {
             continue;
         }
         GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, (e->alpha * alpha) >> 8});

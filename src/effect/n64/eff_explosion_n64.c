@@ -93,9 +93,6 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx rot;
     Mtx world;
-    static GXColor color1;
-    static GXColor color2;
-    static GXColor color3;
     f32 f;
     f32 g;
 
@@ -126,31 +123,9 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
         } else {
             g = 1.0f;
         }
-        {
-        GXColor c1;
-        c1 = color1;
-        c1.r = 255.0f * g;
-        c1.g = 18.0f * g;
-        c1.b = 59.0f * g;
-        GXSetTevColor(GX_TEVREG0, c1);
-        }
-        {
-        GXColor c2;
-        c2 = color2;
-        c2.r = 255.0f * g;
-        c2.g = 53.0f * g;
-        c2.b = 24.0f * g;
-        c2.a = alpha;
-        GXSetTevColor(GX_TEVREG1, c2);
-        }
-        {
-        GXColor c3;
-        c3 = color3;
-        c3.r = 211.0f * g;
-        c3.g = 255.0f * g;
-        c3.b = 216.0f * g;
-        GXSetTevKColor(GX_KCOLOR0, c3);
-        }
+        GXSetTevColor(GX_TEVREG0, (GXColor){255.0f * g, 18.0f * g, 59.0f * g, 0});
+        GXSetTevColor(GX_TEVREG1, (GXColor){255.0f * g, 53.0f * g, 24.0f * g, alpha});
+        GXSetTevKColor(GX_KCOLOR0, (GXColor){211.0f * g, 255.0f * g, 216.0f * g, 0});
         GXSetNumTevStages(4);
         GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
         GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);

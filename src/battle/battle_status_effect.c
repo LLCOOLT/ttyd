@@ -7,6 +7,8 @@
 #include "driver/dispdrv.h"
 #include "driver/msgdrv.h"
 #include <stdio.h>
+#include <string.h>
+#include "driver/icondrv.h"
 
 extern BattleWork* _battleWorkPointer;
 
@@ -110,44 +112,198 @@ void BattleStatusEffectDelete(BattleUnit* unit) {
 	BSE_KagegakureDelete(unit);
 }
 
-void BSE_Sleep(BattleUnit* unit) {
+#include "driver/effdrv.h"
+EffectEntry* effSparkEntry(s32, s32, f32, f32, f32, f32);
+EffectEntry* effSleepEntry(s32, s32, f32, f32, f32, f32, f32);
+#define EFF_SLEEP(u) (*(EffectEntry**)((u8*)(u) + 0x320))
+#define EFF_SPARK(u) (*(EffectEntry**)((u8*)(u) + 0x32C))
 
+#pragma optimize_for_size on
+void BSE_Sleep(BattleUnit* unit) {
+	f32 x, y, z;
+	f32* wk;
+	f32 dx, dy;
+	BOOL on = FALSE;
+
+	if (BtlUnit_CheckStatus(unit, 1)) {
+		on = TRUE;
+	}
+	if (on) {
+		if (EFF_SLEEP(unit) == NULL) {
+			EFF_SLEEP(unit) = effSleepEntry(0, 0, -1000.0f, -1000.0f, -1000.0f, 1.0f, 60.0f);
+		}
+		wk = (f32*)EFF_SLEEP(unit)->userdata;
+		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
+		dx = 0.5f * (unit->mSizeMultiplier * BtlUnit_GetWidth(unit));
+		dy = 0.95f * (unit->mSizeMultiplier * BtlUnit_GetHeight(unit));
+		if (*(u32*)&unit->mAttributeFlags & 2) {
+			dy = 0.0f;
+		}
+		x += dx;
+		y += dy;
+		wk[1] = x;
+		wk[2] = y;
+		wk[3] = z;
+	}
+	else {
+		BSE_SleepDelete(unit);
+	}
 }
 
 void BSE_SleepDelete(BattleUnit* unit) {
-
+	if (EFF_SLEEP(unit) != NULL) {
+		effDelete(EFF_SLEEP(unit));
+		EFF_SLEEP(unit) = NULL;
+	}
 }
 
 void BSE_Biribiri(BattleUnit* unit) {
+	f32 x, y, z;
+	f32* wk;
+	f32 dy;
+	BOOL on = FALSE;
 
+	if (BtlUnit_CheckStatus(unit, 6)) {
+		on = TRUE;
+	}
+	if (on) {
+		if (EFF_SPARK(unit) == NULL) {
+			EFF_SPARK(unit) = effSparkEntry(0, 10, -1000.0f, -1000.0f, -1000.0f, BtlUnit_GetWidth(unit) / 2);
+		}
+		wk = (f32*)EFF_SPARK(unit)->userdata;
+		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
+		dy = unit->mSizeMultiplier * (BtlUnit_GetHeight(unit) / 2);
+		if (*(u32*)&unit->mAttributeFlags & 2) {
+			dy = 0.0f;
+		}
+		y += dy;
+		wk[1] = x;
+		wk[2] = y;
+		wk[3] = 10.0f + z;
+	}
+	else {
+		BSE_BiribiriDelete(unit);
+	}
 }
 
 void BSE_BiribiriDelete(BattleUnit* unit) {
-
+	if (EFF_SPARK(unit) != NULL) {
+		effDelete(EFF_SPARK(unit));
+		EFF_SPARK(unit) = NULL;
+	}
 }
+#pragma optimize_for_size reset
 
+EffectEntry* effFireEntry(s32, s32, f32, f32, f32, f32);
+EffectEntry* effIceEntry(s32, s32, f32, f32, f32, f32);
+#define EFF_FIRE(u) (*(EffectEntry**)((u8*)(u) + 0x324))
+#define EFF_ICE(u) (*(EffectEntry**)((u8*)(u) + 0x328))
+#define KIND_F(u, o) (*(f32*)((u8*)(u)->mKindParams + (o)))
+
+#pragma optimize_for_size on
 void BSE_Fire(BattleUnit* unit) {
+	f32 x, y, z;
+	f32* wk;
+	BOOL on = FALSE;
 
+	if (BtlUnit_CheckStatus(unit, 8)) {
+		on = TRUE;
+	}
+	if (on) {
+		if (EFF_FIRE(unit) == NULL) {
+			EFF_FIRE(unit) = effFireEntry(0, 0, -1000.0f, -1000.0f, -1000.0f, 1.0f);
+		}
+		wk = (f32*)EFF_FIRE(unit)->userdata;
+		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
+		x += unit->mSizeMultiplier * (KIND_F(unit, 0x48) * (unit->faceDirection >= 0 ? 1.0f : -1.0f));
+		y += KIND_F(unit, 0x4C) * unit->mSizeMultiplier;
+		z += KIND_F(unit, 0x50) * unit->mSizeMultiplier;
+		wk[1] = x;
+		wk[2] = y;
+		wk[3] = z + 5.0f;
+	}
+	else {
+		BSE_FireDelete(unit);
+	}
 }
 
 void BSE_FireDelete(BattleUnit* unit) {
-
+	if (EFF_FIRE(unit) != NULL) {
+		effDelete(EFF_FIRE(unit));
+		EFF_FIRE(unit) = NULL;
+	}
 }
 
 void BSE_Freeze(BattleUnit* unit) {
+	f32 x, y, z;
+	f32* wk;
+	f32 a, b, sc;
+	BOOL on = FALSE;
 
+	if (BtlUnit_CheckStatus(unit, 9)) {
+		on = TRUE;
+	}
+	if (on) {
+		if (EFF_ICE(unit) == NULL) {
+			EFF_ICE(unit) = effIceEntry(0, -1, -1000.0f, -1000.0f, -1000.0f, 1.0f);
+		}
+		wk = (f32*)EFF_ICE(unit)->userdata;
+		{
+			BattleUnitPart* parts = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
+			a = unit->mWidth / 20.0f;
+			b = unit->mHeight / 36.0f;
+			sc = a <= b ? a : b;
+			sc *= unit->mSizeMultiplier;
+			wk[4] = sc;
+			BtlUnit_GetPartsWorldPos(parts, &x, &y, &z);
+		}
+		wk[1] = x;
+		wk[2] = 20.0f * sc + y;
+		wk[3] = 10.0f + z;
+	}
+	else {
+		BSE_FreezeDelete(unit);
+	}
 }
 
 void BSE_FreezeDelete(BattleUnit* unit) {
-
+	if (EFF_ICE(unit) != NULL) {
+		effSoftDelete(EFF_ICE(unit));
+		EFF_ICE(unit) = NULL;
+	}
 }
 
-void BSE_Kagegakure(BattleUnit* unit) {
+#pragma optimize_for_size reset
 
+#define KAGE_ICON(u) (*(u8**)((u8*)(u) + 0x330))
+
+void BSE_Kagegakure(BattleUnit* unit) {
+	char name[0x10];
+	f32 x, y, z;
+	BOOL on = FALSE;
+
+	if ((_battleWorkPointer->dispFlags & 1) && (unit->mAttributeFlags & 0x10)) {
+		on = TRUE;
+	}
+	if (on) {
+		if (KAGE_ICON(unit) == NULL) {
+			sprintf(name, "_biK_%02x", *(s32*)unit);
+			iconEntry(name, 0x99);
+			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
+		}
+		BtlUnit_GetPartsWorldPos(BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit)), &x, &y, &z);
+		iconSetPos((char*)KAGE_ICON(unit) + 0x18, x, y, z + 5.0f);
+	}
+	else {
+		BSE_KagegakureDelete(unit);
+	}
 }
 
 void BSE_KagegakureDelete(BattleUnit* unit) {
-
+	if (KAGE_ICON(unit) != NULL) {
+		iconDelete((char*)KAGE_ICON(unit) + 0x18);
+		KAGE_ICON(unit) = NULL;
+	}
 }
 
 void BSE_TurnFirstProcessEffectEntry(BattleUnit* unit, s16 active) {
@@ -155,26 +311,76 @@ void BSE_TurnFirstProcessEffectEntry(BattleUnit* unit, s16 active) {
 	unit->mbBurnDamageFlameActive = active;
 }
 
+void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag);
+BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);
+f32 sinfd(f32 degrees);
+
 BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 	BattleUnitPart* part;
+	f32 x, y, z;
+	f32* work;
+	u16 st;
+	u16 ac;
 
 	part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
-	if (!unit->mBurnDamageFlameState) {
+	st = *(u16*)&unit->mBurnDamageFlameState;
+	if (st == 0) {
 		return FALSE;
 	}
-	if (!unit->mbBurnDamageFlameActive) {
+	ac = *(u16*)&unit->mbBurnDamageFlameActive;
+	if (ac == 0) {
 		return FALSE;
 	}
-	if (unit->mbBurnDamageFlameActive != 1) {
+	if ((s32)ac != 1) {
 		return FALSE;
 	}
-	//TODO: finish
+	switch (unit->mBurnDamageFlameState) {
+	case 0:
+		return FALSE;
+	case 1:
+		unit->mBurnDamageFlameState++;
+		unit->mBurnDamageFlameScale = 1.0f;
+		BtlUnit_GetPartsWorldPos(part, &x, &y, &z);
+		z += 5.0f;
+		unit->mBurnDamageFlameEff = effFireEntry(0, 0, x, y, z, unit->mBurnDamageFlameScale);
+		unit->mBurnDamageFlameAnimTimer = 0;
+		return TRUE;
+	case 2:
+		work = (f32*)unit->mBurnDamageFlameEff->userdata;
+		unit->mBurnDamageFlameAnimTimer++;
+		unit->mBurnDamageFlameScale = 1.6f * sinfd(unit->mBurnDamageFlameAnimTimer * 3) + 0.4f;
+		work[9] = unit->mBurnDamageFlameScale;
+		if (unit->mBurnDamageFlameAnimTimer >= 60) {
+			unit->mBurnDamageFlameState++;
+		}
+		return TRUE;
+	case 3:
+		effDelete(unit->mBurnDamageFlameEff);
+		unit->mBurnDamageFlameEff = NULL;
+		unit->mBurnDamageFlameState = 0;
+		if (!BtlUnit_CheckShadowGuard(unit)) {
+			BattleDamageDirect(-5, unit, NULL, 1, 0, 0x118, 0, 1);
+		}
+		return FALSE;
+	}
 	return FALSE;
 }
 
+#pragma optimize_for_size on
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
+	s32 i;
+	StChgInfo* e = (StChgInfo*)((u8*)unit + 0xAE4);
 
+	for (i = 0; i < 6; i++) {
+		StChgInfo* p = &e[i];
+		p->type = -1;
+		p->field_0x1 = 0;
+		p->field_0x2 = 0;
+		p->field_0x3 = 0;
+		p->field_0x4 = 0;
+	}
 }
+#pragma optimize_for_size reset
 
 #pragma dont_inline on
 //should be StatusEffectType, TODO fix for s8
@@ -260,9 +466,17 @@ BOOL BattleStatusChangeAnnouceMain_Unit(BattleUnit* unit) {
 #pragma optimize_for_size reset
 #pragma dont_inline reset
 
+#pragma optimize_for_size on
 void BattleStatusChangeMsgWorkInit(void) {
+	StChgMsg* msg = ST_CHG_MSG(0);
+	s32 i;
 
+	memset(msg, 0, 0x258);
+	for (i = 0; i < 28; i++) {
+		msg[i].type = -1;
+	}
 }
+#pragma optimize_for_size reset
 
 void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2) {
 	StChgMsg* msg = ST_CHG_MSG(index);

@@ -3,6 +3,11 @@
 #include "mario/mario.h"
 #include "mario/mario_sbr.h"
 #include "memory.h"
+#include "driver/camdrv.h"
+#include "driver/effdrv.h"
+#include "mario/mario_cam.h"
+#include "mario/mario_motion.h"
+#include "manager/evtmgr.h"
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
@@ -66,6 +71,116 @@ BOOL checkHarbor(Vec* out) {
 void allPartyRideOff(void);
 void allPartyForceRideOn(void);
 void* effFunemizuEntry(s32, f32, f32, f32, f32, f32);
+
+void marioPreJump(void);
+void marioMakeJumpPara(f32, f32, f32, f32);
+void allPartyRideShip(void);
+s32 marioChkLandon(void);
+void marioSetFallPara(void);
+void marioClearJumpPara(void);
+void N_marioSetBottomlessRespawnPosOnBeroEntry(void);
+void N_marioReloadMapOnBottomlessOff(void);
+
+void mot_ship(void) {
+	MarioWork* m = marioGetPtr();
+	s32 r27;
+
+	if (m->trigFlags & 1) {
+		m->trigFlags &= ~1;
+		/* TODO: init block 0x20-0xbc (memAlloc 0x48, memset, field init) */
+		m->motStruct = __memAlloc(0, 0x48);
+		memset(marioGetPtr()->motStruct, 0, 0x48);
+		m->currSubMotionId = 0;
+		if (!(m->trigFlags & 4)) {
+			/* TODO: camGetPtr(8)->flags |= 0x200 */
+		}
+	}
+	switch (m->currSubMotionId) {
+	case 0:
+		psndSFXOn_3D(NULL, &m->position);
+		psndSFXOn_3D(NULL, &m->position);
+		marioCamZoomUp();
+		marioPreJump();
+		marioChgPose(NULL);
+		camFollowYOff();
+		N_marioSetBottomlessRespawnPosOnBeroEntry();
+		/* TODO: harbor angle 0x180-0x260 (hitGetAttr/hitObjGetPos/angleABf/revise360) */
+		marioMakeJumpPara(0.0f, 0.0f, 0.0f, 0.0f);
+		/* TODO: block at 0xd8-0x33c (sfx, jump start, harbor angle) */
+		break;
+	case 1:
+		marioPaperOn(paper_ship[marioGetColor()]);
+		marioChgPaper("PM_H_1B");
+		marioChgPose(s_MJ1B);
+		evtEntry(NULL, 0, 0);
+		/* TODO: block at 0x33c-0x550 (jump para, paper on, evtEntry) */
+		break;
+	case 2:
+		/* TODO: block at 0x550-0x628 */
+		break;
+	case 3:
+		allPartyRideShip();
+		marioCamZoomOffReq2(0);
+		camFollowYOn();
+		/* TODO: block at 0x628-0x698 (allPartyRideShip, camFollowYOn) */
+		break;
+	case 4:
+		/* TODO: block at 0x698-0x7bc */
+		break;
+	case 10:
+		/* TODO: block at 0x7bc-0xacc (harbor pos, kind switch, distABf/angleABf) */
+		break;
+	case 11:
+		/* TODO: movePos/marioMakeJumpPara/marioChkLandon/distABf/camFollowYOn/revise360/toMovedir/psndSFXOn_3D/effFunemizuEntry */
+		marioChkLandon();
+		/* TODO: block at 0xacc-0xcc0 (movePos, landon, effFunemizuEntry) */
+		break;
+	case 30:
+		/* TODO: block at 0xcc0-0xce8 */
+		break;
+	case 31:
+		/* TODO: block at 0xce8-0xda8 */
+		break;
+	case 32:
+		/* TODO: block at 0xda8-0xdc0 */
+		break;
+	case 40:
+		/* TODO: block at 0xdc0-0xf80 (psndSFXOff, angleABf, effDelete) */
+		break;
+	case 41:
+		marioChgPaper(NULL);
+		marioChgPose(NULL);
+		marioSetPaperAnimeLocalTime(0);
+		evtEntry(NULL, 0, 0);
+		/* TODO: block at 0xf80-0x10ac (movePos, chgPaper, evtEntry) */
+		break;
+	case 43:
+		/* TODO: block at 0x10ac-0x11cc */
+		break;
+	case 44:
+		/* TODO: block at 0x11cc-0x126c */
+		break;
+	case 45:
+		/* TODO: block at 0x126c-0x1334 */
+		break;
+	case 46:
+		marioPaperOff();
+		marioChgPose(NULL);
+		/* TODO: block at 0x1334-0x14a8 (paper off, chgPose) */
+		break;
+	case 47:
+		/* TODO: block at 0x14a8-0x165c */
+		r27 = 0;
+		break;
+	case 50:
+		/* TODO: block at 0x165c-0x1664 */
+		break;
+	case 52:
+		/* TODO: block at 0x1664-0x1b50 */
+		break;
+	}
+	/* TODO: common tail at 0x1b50-end (marioChgMot/marioSetFallPara/allPartyRideOff/__memFree, shipMove, marioCheckWallShip, checkHarbor) */
+}
 
 void mot_ship_post(void) {
 	MarioWork* m = marioGetPtr();

@@ -267,12 +267,12 @@ void effCloudMain(EffectEntry* effect) {
 }
 
 void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 i;
-    s32 idx;
-    effN64Vtx* v;
     EffCloudN64Work* work;
     s32 frame;
     s32 type;
+    s32 i;
+    s32 idx;
+    effN64Vtx* v;
     effN64Vtx* vtx;
     s32 first;
     s32 uo;

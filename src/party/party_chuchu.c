@@ -173,7 +173,8 @@ USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
-static inline int chuchu_findTreasure2(MarioWork* player2, f32 range, Vec* bestPos) {
+static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
+    MarioWork* player2;
     int found;
     u32 i;
     ChuchuTreasure* tbl;
@@ -181,7 +182,7 @@ static inline int chuchu_findTreasure2(MarioWork* player2, f32 range, Vec* bestP
 
     found = 0;
     minDist = 10000.0f;
-    for (i = 0, tbl = unk_8038bb34; i < 40; i++, tbl++) {
+    for (tbl = unk_8038bb34, i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
             Vec p = vecB;
@@ -190,7 +191,7 @@ static inline int chuchu_findTreasure2(MarioWork* player2, f32 range, Vec* bestP
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&player2->position, &pos);
+            d = PSVECDistance(&pl->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -303,7 +304,8 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
-static inline int chuchu_findTreasure(MarioWork* player2, f32 range) {
+static inline int chuchu_findTreasure(MarioWork* pl, f32 range) {
+    MarioWork* player2;
     int found;
     u32 i;
     ChuchuTreasure* tbl;
@@ -311,7 +313,7 @@ static inline int chuchu_findTreasure(MarioWork* player2, f32 range) {
 
     found = 0;
     minDist = 10000.0f;
-    for (i = 0, tbl = unk_8038bb34; i < 40; i++, tbl++) {
+    for (tbl = unk_8038bb34, i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
             Vec p = vecB;
@@ -320,7 +322,7 @@ static inline int chuchu_findTreasure(MarioWork* player2, f32 range) {
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&player2->position, &pos);
+            d = PSVECDistance(&pl->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;

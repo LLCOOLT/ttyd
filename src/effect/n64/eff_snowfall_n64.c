@@ -78,8 +78,8 @@ void cam_clip_chk(EffSnowfallParticle* p, s32 w, s32 h, s32 life) {
     s32 d;
 
     cx = cam->cameraAt.x;
-    cy = (cam->cameraAt.y + cam->cameraPos.y) * 0.5f;
-    cz = (cam->cameraAt.z + cam->viewDistance) * 0.5f;
+    cy = (cam->cameraAt.y + cam->cameraPos.y) / 2.0f;
+    cz = (cam->cameraAt.z + cam->viewDistance) / 2.0f;
     d = (s32)(p->position.x - cx);
     py = p->position.y;
     pz = p->position.z;
@@ -157,13 +157,14 @@ EffectEntry* effSnowfallN64Entry(s32 arg, s32 count) {
 }
 
 void effSnowfallMain(EffectEntry* effect) {
+    EffSnowfallWork* work;
     EffSnowfallParticle* p;
-    EffSnowfallWork* work = effect->userdata;
     s32 i, life, count, h;
     f32 hf;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
 
+    work = effect->userdata;
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;
@@ -182,9 +183,11 @@ void effSnowfallMain(EffectEntry* effect) {
     if (life < 10) {
         work->alpha = life * 25;
     }
+    i = 0;
+    p = work->p;
     hf = 166.0f;
     h = hf;
-    for (p = &work->p[0], i = 0; i < count; i++, p++) {
+    for (; i < count; i++, p++) {
         if (p->timer > 0) {
             p->timer--;
             if (p->timer > 0) {
@@ -253,7 +256,7 @@ void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     effSetVtxDescN64(eff_snowfall_v);
     PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(cam->view, rot, rot);
-    p = &work->p[0]; for (i = 0; i < count; i++, p++) {
+    for (i = 0, p = work->p; i < count; i++, p++) {
         if (p->timer > 0 || p->alpha == 0) {
             continue;
         }

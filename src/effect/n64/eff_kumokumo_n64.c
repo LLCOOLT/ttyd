@@ -299,7 +299,7 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y = work->y + tmp2 * work->s1;
+                work->y += tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -356,7 +356,7 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y = work->y + tmp2 * work->s1;
+                work->y += tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -510,16 +510,17 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    for (k = 1, p = work + 1; k < effect->count; k++, p++) {
-        if (p->delay == 0) {
+    work++;
+    for (k = 1; k < effect->count; k++, work++) {
+        if (work->delay == 0) {
             if (type != 3 && type != 4) {
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xDB, 0xDF, 0xE7, p->alpha * alpha / 255});
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xDB, 0xDF, 0xE7, work->alpha * alpha / 255});
             } else {
-                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, p->alpha * alpha / 255});
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha * alpha / 255});
             }
-            PSMTXTrans(mtx, p->x, p->y, p->z);
-            PSMTXRotRad(rot, 'z', 0.017453292f * p->rot);
-            PSMTXScale(scl, p->scale, p->scale, p->scale);
+            PSMTXTrans(mtx, work->x, work->y, work->z);
+            PSMTXRotRad(rot, 'z', 0.017453292f * work->rot);
+            PSMTXScale(scl, work->scale, work->scale, work->scale);
             PSMTXConcat(mtx2, mtx, mtx);
             PSMTXConcat(mtx, rot, mtx);
             PSMTXConcat(mtx, scl, mtx);
@@ -532,13 +533,13 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
             if (type == 3 || type == 4) {
                 tmax = 2.0f;
             }
-            GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+            GXPosition3f32(-w / 2.0f, h / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+            GXPosition3f32(w / 2.0f, h / 2.0f, 0.0f);
             GXTexCoord2f32(tmax, 0.0f);
-            GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+            GXPosition3f32(w / 2.0f, -h / 2.0f, 0.0f);
             GXTexCoord2f32(tmax, tmax);
-            GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+            GXPosition3f32(-w / 2.0f, -h / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, tmax);
         }
     }

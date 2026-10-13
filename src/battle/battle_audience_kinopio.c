@@ -896,6 +896,8 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     f32 dx;
     f32 dz;
     f32 d;
+    f32 tx;
+    f32 tz;
     BattleAudienceBaseGetPtr();
     m = BattleAudienceGetPtr(index);
     pouch = pouchGetPtr();
@@ -917,9 +919,10 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         break;
     case 3:
         m->field_0x4 = 5;
-        dx = 25.0f * m->field_0xC;
-        dz = 110.0f - m->position.z;
-        dx = dx - m->position.x;
+        tx = 25.0f * m->field_0xC;
+        tz = 110.0f;
+        dx = tx - m->position.x;
+        dz = tz - m->position.z;
         d = (f32)sqrt(dx * dx + dz * dz);
         m->field_0x78.x = 5.0f * (dx / d);
         m->field_0x78.y = 0.0f;
@@ -943,9 +946,10 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
             m->position.y = 0.0f;
             m->field_0x78.y = 0.0f;
             AM_F32(m, 0x88) = 0.0f;
-            dx = 300.0f * m->field_0xC;
-            dz = 0.0f - m->position.z;
-            dx = dx - m->position.x;
+            tx = 300.0f * m->field_0xC;
+            tz = 0.0f;
+            dx = tx - m->position.x;
+            dz = tz - m->position.z;
             d = (f32)sqrt(dx * dx + dz * dz);
             m->field_0x78.x = 5.0f * (dx / d);
             m->field_0x78.y = 0.0f;
@@ -1003,9 +1007,10 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         break;
     case 50:
         m->field_0x4 = 55;
-        dx = 25.0f * m->field_0xC;
-        dz = 110.0f - m->position.z;
-        dx = dx - m->position.x;
+        tx = 25.0f * m->field_0xC;
+        tz = 110.0f;
+        dx = tx - m->position.x;
+        dz = tz - m->position.z;
         d = (f32)sqrt(dx * dx + dz * dz);
         m->field_0x78.x = 5.0f * (dx / d);
         m->field_0x78.y = 0.0f;
@@ -1026,13 +1031,13 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     case 60:
         if (m->field_0x78.y <= 0.0f && m->position.y <= 0.0f) {
             m->field_0x4 = 65;
-            intrudeSound = ((s32 (*)(const char*))psndSFXOn)("SFX_AUDIENCE_HEIHO_MOVE1");
             m->field_0x8 = 0;
             m->position.y = 0.0f;
             m->field_0x78.x = 0.0f;
             m->field_0x78.y = 0.0f;
             AM_F32(m, 0x88) = 0.0f;
             m->field_0x78.z = 0.0f;
+            intrudeSound = ((s32 (*)(const char*))psndSFXOn)("SFX_AUDIENCE_HEIHO_MOVE1");
         }
         break;
     case 65:
@@ -1063,9 +1068,10 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         BattleStage_NozzleWorkCheck(1);
         AM_S32(m, 0x12C) = AM_S32(bw, 0x18298);
         m->field_0x4 = 75;
-        dx = 300.0f * m->field_0xC;
-        dz = 0.0f - m->position.z;
-        dx = dx - m->position.x;
+        tx = 300.0f * m->field_0xC;
+        tz = 0.0f;
+        dx = tx - m->position.x;
+        dz = tz - m->position.z;
         d = (f32)sqrt(dx * dx + dz * dz);
         m->field_0x78.x = 5.0f * (dx / d);
         m->field_0x78.y = 0.0f;

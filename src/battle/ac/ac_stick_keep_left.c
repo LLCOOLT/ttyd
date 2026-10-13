@@ -49,8 +49,8 @@ s32 ac_stickkeepleft_ok_frame[7] = {80, 70, 60, 40, 20, 10, 5};
 static void actionCommandDisp(f32 x, f32 y, s32 unused);
 
 s32 battleAcMain_StickKeepLeft(BattleWork* work) {
-    char* sfxPi;
-    char* sfxPone;
+    const char* sfxPi;
+    const char* sfxPone;
     SklWork* cw;
     SklDisp* disp;
     s32 loop;
@@ -212,7 +212,7 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
             case 1003:
                 {
                     s32 k;
-                    for (k = 0; k <= cw->idx - 2; k++) {
+                    j = cw->idx - 2; if (j >= 0) for (k = 0; k <= j; k++) {
                     }
                 }
                 work->actionCommands.mAcState = 1004;
@@ -294,24 +294,23 @@ void battleAcDelete_StickKeepLeft(BattleWork* work) {
 #pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y, s32 unused) {
     BattleWork* work = _battleWorkPointer;
-    SklWork* cw = SKL_W(work);
-    s32 idx;
     s32 count;
-    s32 n;
+    s32 idx;
     s32 i;
+    s32 n;
+    s32 m;
     f32 spacing;
     f32 yy;
+    f32 sp2;
 
-    {
-        char n1[8] = "_AcSkl1";
-        char n2[8] = "_AcSkl2";
-        char n3[8] = "_AcSkl3";
-        char n4[8] = "_AcSkl4";
-        char n5[8] = "_AcSkl5";
-    }
+    char n1[8] = "_AcSkl1";
+    char n2[8] = "_AcSkl2";
+    char n3[8] = "_AcSkl3";
+    char n4[8] = "_AcSkl4";
+    char n5[8] = "_AcSkl5";
     camGetPtr(8);
     count = SKL_P(work)->count;
-    idx = cw->idx - 1;
+    idx = SKL_W(work)->idx - 1;
     switch (work->actionCommands.mAcState) {
         case 0:
         case 0x63:
@@ -380,39 +379,39 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
         p.y = yy;
         iconDispGx(&p, 0x10, 0x90, 1.0f);
     }
-    spacing = 33.0f;
+    sp2 = 33.0f;
     if (SKL_P(work)->flags & 1) {
-        spacing = 24.75f;
+        sp2 = 24.75f;
     }
-    n = count - 1;
-    for (i = 0; i < n; i++) {
+    m = count - 1;
+    for (i = 0; i < m; i++) {
         if (i < idx) {
             if (i < 3) {
                 Vec p = {0.0f, 0.0f, 0.0f};
-                p.x = x + (spacing * (f32)i + -258.0f);
+                p.x = x + (sp2 * (f32)i + -258.0f);
                 p.y = yy;
                 iconDispGx(&p, 0x10, (u16)(0x92 + i), 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
-                p.x = x + (spacing * (f32)i + -258.0f);
+                p.x = x + (sp2 * (f32)i + -258.0f);
                 p.y = yy;
                 iconDispGx(&p, 0x10, 0x94, 1.0f);
             }
         } else {
             Vec p = {0.0f, 0.0f, 0.0f};
-            p.x = x + (spacing * (f32)i + -258.0f);
+            p.x = x + (sp2 * (f32)i + -258.0f);
             p.y = yy;
             iconDispGx(&p, 0x10, 0x91, 0.5f);
         }
     }
     if (idx < count) {
         Vec p = {0.0f, 0.0f, 0.0f};
-        p.x = x + (spacing * (f32)n + -250.0f);
+        p.x = x + (sp2 * (f32)m + -250.0f);
         p.y = yy;
         iconDispGx(&p, 0x10, 0x91, 1.0f);
     } else {
         Vec p = {0.0f, 0.0f, 0.0f};
-        p.x = x + (spacing * (f32)n + -250.0f);
+        p.x = x + (sp2 * (f32)m + -250.0f);
         p.y = yy;
         iconDispGx(&p, 0x10, 0x95, 1.0f);
     }

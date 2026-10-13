@@ -290,10 +290,8 @@ void peach_stay(void) {
         marioChgMot(1);
     }
     if (!(mp->flags & 8)) {
-        if (mp->dispFlags & 0x40000000) {
-            return;
-        }
-        if (!(mp->peachFlags & 0x27F0)) {
+    switch (mp->dispFlags & 0x40000000) { case 0:
+    { if (!(mp->peachFlags & 0x27F0)) {
         switch (mp->currSubMotionId) {
         case 0:
             if (++MT >= sysMsec2Frame(50000)) {
@@ -334,6 +332,7 @@ void peach_stay(void) {
         }
         }
     }
+    break; } }
 #undef MT
 }
 

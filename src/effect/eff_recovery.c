@@ -169,8 +169,6 @@ u32 recovery_effAnimRST[] = {
 u32 recovery_effAnimRSTDt[] = { 0x1, (u32)recovery_effAnimRST };
 MayaAnimData recovery_effAnimDt = { { 0 }, 79.0f, (MayaKeyList*)recovery_effAnimRSTDt };
 
-GXColor unk_80423040;
-GXColor unk_80423044;
 
 void effRecoveryMain(EffectEntry* effect);
 void effRecoveryMain2(EffectEntry* effect);
@@ -322,12 +320,12 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
 void effRecoveryMain(EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     RecoveryWork* p;
+    s32 i;
+    s32 go = 0;
+    s32 amount;
+    s32 done = 0;
     s32 type = work->type;
     u32 n = 0;
-    s32 go = 0;
-    s32 done = 0;
-    s32 i;
-    s32 amount;
     f32 x, y, z;
     f32 baseY = work->baseY;
     f32 a, d;
@@ -362,7 +360,8 @@ void effRecoveryMain(EffectEntry* effect) {
                     a = 6.2831855f * (90.0f + 360.0f * (f32)(i - 1) / (f32)amount) / 360.0f;
                     p->velocity.x = 12.0f * (f32)sin(a);
                     p->velocity.y = 0.0f;
-                    p->velocity.z = 12.0f * -(f32)cos(a);
+                    a = cos(a);
+                    p->velocity.z = 12.0f * -a;
                     p->timer = 0;
                     p->state++;
                 }
@@ -391,7 +390,8 @@ void effRecoveryMain(EffectEntry* effect) {
             case 3:
                 if (p->timer < 40) {
                     a = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 360.0f, 11, ++p->timer, 40);
-                    d = distABf(0.0f, 0.0f, p->position.x, p->position.z) * 0.99f;
+                    d = distABf(0.0f, 0.0f, p->position.x, p->position.z);
+                    d *= 0.99f;
                     a = 6.2831855f * (90.0f + (a + 360.0f * (f32)(i - 2) / (f32)amount)) / 360.0f;
                     p->position.x = d * (f32)sin(a);
                     p->position.z = d * -(f32)cos(a);
@@ -635,11 +635,7 @@ void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
         for (i = 1; i < effect->count; i++, p++) {
             c = &color_rotation_data[((i + gp->retraceCount) % 12) * 3];
-            color = unk_80423040;
-            color.r = c[0];
-            color.g = c[1];
-            color.b = c[2];
-            color.a = p->alpha;
+            color = (GXColor){ c[0], c[1], c[2], p->alpha };
             GXSetTevColor(GX_TEVREG0, color);
             PSMTXTrans(transMtx, p->position.x, p->position.y, p->position.z);
             PSMTXScale(scaleMtx, p->scale.x, p->scale.y, p->scale.z);
@@ -820,15 +816,10 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
             if (i == 1) {
                 effGetTexObj(18, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
-                color = (GXColor){ 0xFF, 0xFF, 0xFF, alpha * work->alpha / 255 };
-                GXSetChanMatColor(GX_COLOR0A0, color);
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, alpha * work->alpha / 255 });
             } else {
-                color = unk_80423044;
                 c = &color_rotation_data[((i + gp->retraceCount) % 12) * 3];
-                color.r = c[0];
-                color.g = c[1];
-                color.b = c[2];
-                color.a = alpha * work->alpha / 255;
+                color = (GXColor){ c[0], c[1], c[2], alpha * work->alpha / 255 };
                 effGetTexObj(20, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 GXSetChanMatColor(GX_COLOR0A0, color);

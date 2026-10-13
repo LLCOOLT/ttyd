@@ -21,6 +21,7 @@ typedef struct LotteryWork {
 
 //.sbss
 BOOL dbg_lotteryinfo;
+static s32 lotteryUnused;
 
 //local prototypes
 USER_FUNC(evt_lottery);
@@ -38,8 +39,8 @@ USER_FUNC(evt_lottery) {
 	OSCalendarTime a1, a2, b1, b2, c1, c2, d1, d2, e;
 	s32* args = event->args;
 	s32 idx = evtGetValue(event, args[0]);
-	OSTime now = OSGetTime();
 	s32 v;
+	OSTime now = OSGetTime();
 
 	dbg_lotteryinfo = TRUE;
 	lot = (LotteryWork*)&gp->mLotteryInfo;

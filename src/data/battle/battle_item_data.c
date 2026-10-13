@@ -2252,15 +2252,15 @@ typedef struct ThrowWork {
 
 USER_FUNC(_sampling_random_target) {
     BattleWorkWeaponTargets targets;
-    BattleWorkWeaponTargets* t;
-    s32 outUnit;
-    s32 outPart;
-    s32 idx;
-    s32* args;
-    s32 r;
     BattleWork* wp;
     BattleWeapon* weapon;
+    s32* args;
     s8 belong;
+    s32 outUnit;
+    s32 outPart;
+    BattleWorkWeaponTargets* t;
+    s32 idx;
+    s32 r;
     wp = _battleWorkPointer;
     args = event->args;
     weapon = (BattleWeapon*)evtGetValue(event, args[0]);

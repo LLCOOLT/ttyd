@@ -303,24 +303,25 @@ USER_FUNC(bakuGameDecideWeapon) {
     s32 v;
     BakuWork* w;
     u8* p;
+    u8* q;
 
     evtGetFloat(event, args[0]);
     v = evtGetValue(event, args[1]);
     w = GetBakuGamePtr();
     p = w->weapon;
     memcpy(p, weapon, 0xC0);
-    p += 0x80;
-    p[2] = 100;
+    q = p + 0x80;
+    q[2] = 100;
     if (v != -1) {
         if (w->gauge >= 100.0f) {
-            p[2] = 127;
+            q[2] = 127;
         } else {
-            p[2] = 100;
+            q[2] = 100;
         }
-        p[3] = v - 1;
+        q[3] = v - 1;
     } else {
-        p[2] = 0;
-        p[3] = 0;
+        q[2] = 0;
+        q[3] = 0;
     }
     evtSetValue(event, args[2], (s32)w->weapon);
     return 2;

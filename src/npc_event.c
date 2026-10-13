@@ -103,9 +103,9 @@ USER_FUNC(_2d_dead_jump) {
         npc->jumpStartPos = npc->position;
         PSVECSubtract(&npc->jumpTargetPos, &npc->jumpStartPos, &d);
         if (d.x * d.x + d.z * d.z > 0.0f) {
-            d.x = d.x;
+            d.y = d.y;
         } else {
-            d.x = d.x;
+            d.y = d.y;
         }
         npc->moveDir = angleABf(0.0f, 0.0f, d.x, d.z);
         if (t > 0.0f) {
@@ -164,21 +164,22 @@ USER_FUNC(_2d_dead_jump) {
 
 USER_FUNC(_2d_get_dead_jump_offset) {
     s32* args = event->args;
+    f32 d;
+    f32 k;
     const char* nm = (const char*)evtGetValue(event, args[0]);
     NpcEntry* npc = evtNpcNameToPtr(event, nm);
     s32 out = args[1];
     MarioWork* mario = marioGetPtr();
-    f32 mx = mario->position.x;
-    f32 d;
-    if (mx == npc->position.x) {
+    if (mario->position.x == npc->position.x) {
         d = 0.0f;
-    } else if (mx > npc->position.x) {
+    } else if (mario->position.x > npc->position.x) {
         d = -1.0f;
     } else {
         d = 1.0f;
     }
-    d *= 20.0f;
-    evtSetValue(event, out, (s32)d);
+    k = 20.0f;
+    k *= d;
+    evtSetValue(event, out, (s32)k);
     return EVT_RETURN_DONE;
 }
 
@@ -3454,7 +3455,7 @@ USER_FUNC(chain_main) {
     dx = me->position.x - end->position.x;
     dy = me->position.y - end->position.y;
     dz = me->position.z - end->position.z;
-    len = 0.25f * (f32)sqrt(dx * dx + dy * dy + dz * dz);
+    len = (f32)sqrt(dx * dx + dy * dy + dz * dz) / 4.0f;
     if (len < 10.0f) {
         len = 10.0f;
     }
@@ -3467,7 +3468,10 @@ USER_FUNC(chain_main) {
     dx = me->position.x - cx;
     dy = me->position.y - cy;
     dz = me->position.z - cz;
-    t = 1.0f - len / (f32)sqrt(dx * dx + dy * dy + dz * dz);
+    {
+    f32 dist = (f32)sqrt(dx * dx + dy * dy + dz * dz);
+    t = 1.0f - len / dist;
+    }
     cy = dy * t + cy;
     cx = dx * t + cx;
     cz = dz * t + cz;

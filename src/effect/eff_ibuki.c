@@ -203,6 +203,7 @@ void effIbukiMain(EffectEntry* effect) {
 }
 
 void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 i;
     EffIbukiWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;
@@ -212,7 +213,7 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     s32 alpha;
     s32 alpha2;
-    u32 i;
+    s32 a;
     f32 w = 16.0f;
     f32 h;
 
@@ -283,8 +284,8 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX1, GX_INDEX8);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_S16, 14);
     GXSetArray(GX_VA_TEX1, ibuki_texcoord1_tbl, 4);
-    for (i = 0; i < 4; i++) {
-        GXCallDisplayList(ibuki_dl_0_tbl[i], ibuki_dl_0_size_tbl[i] << 5);
+    for (i = 0; (u32)i < 4; i++) {
+        GXCallDisplayList(ibuki_dl_0_tbl[i], ibuki_dl_0_size_tbl[i] * 32);
     }
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -305,8 +306,8 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     work++;
     h = 8.0f;
-    for (i = 1; (s32)i < effect->count; i++, work++) {
-        s32 a = work->alpha * alpha / 255;
+    for (i = 1; i < effect->count; i++, work++) {
+        a = work->alpha * alpha / 255;
         if (work->delay == 0) {
             PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
             PSMTXRotRad(rot, 'x', MTXDegToRad(work->x2));

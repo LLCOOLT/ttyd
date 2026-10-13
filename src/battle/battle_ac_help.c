@@ -44,11 +44,11 @@ void _ac_help_disp(CameraId cameraId, void *param)
   const char *new_var3[2];
   BattleWork *wp = _battleWorkPointer;
   u16 lines;
-  GXColor col;
   s32 width;
   u8 alpha;
   f32 x;
   f32 y;
+  GXColor col;
   const char **help = &wp->acHelpMsg;
   alpha = 0xFF;
   if (wp->acHelpDispType == 1)

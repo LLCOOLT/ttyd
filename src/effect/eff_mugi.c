@@ -48,7 +48,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	s32 i;
 
 	effect = effEntry();
-	effect->type = "MugiKemuri";
+	effect->type = "MugiKemuri\0\0\0\0\0";
 	effect->count = 5;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effMugiKemuriData) * 5);
 	effect->userdata = data;
@@ -57,7 +57,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	effect->flags |= 2;
 	for (i = 0; i < 5; i++, data++) {
 		data->flag = 1;
-		data->field_0x30 = 0.3f;
+		data->field_0x30 = 0.29999998f;
 		data->field_0x34 = 0.0f;
 		data->field_0x38 = 0.0f;
 		data->pos.x = x;
@@ -69,7 +69,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 		data->alpha = 0xFF;
 		data->timer = 60;
 		data->rot.x = 0.0f;
-		data->rot.y = angle + (f32)(i * 72);
+		data->rot.y = angle + i * 72;
 		data->rot.z = 0.0f;
 		data->vy = 1.75f;
 		data->ay = -0.08f;
@@ -77,7 +77,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 		data->ky = 0.0f;
 		data->speed = -3.9f;
 		{
-			f32 rad = (6.2831855f * reviseAngle(data->rot.y)) / 360.0f;
+			f32 rad = 6.2831855f * reviseAngle(data->rot.y) / 360.0f;
 			data->dirX = (f32)sin(rad);
 			data->dirZ = (f32)cos(rad);
 		}
@@ -94,6 +94,7 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
 	EffectEntry* effect;
 	effMugiKemuriData* data;
 	s32 i;
+	Vec unused = {0.0f, 0.0f, 0.0f};
 
 	effect = effEntry();
 	effect->type = "MugiKemuri2";
@@ -137,11 +138,11 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
 }
 
 void effMugiKemuriMain(EffectEntry* effect) {
+	s32 group;
+	s32 alive;
 	effMugiKemuriData* data;
 	effMugiKemuriData* p;
 	s32 i;
-	s32 group;
-	s32 alive;
 	const char* name;
 	Vec pos2;
 	Vec pos = {0.0f, 0.0f, 0.0f};
@@ -154,10 +155,10 @@ void effMugiKemuriMain(EffectEntry* effect) {
 	group = gp->inBattle != 0;
 	if (effect->flags & 4) {
 		effect->flags &= ~4;
-		data = effect->userdata;
-		for (i = 0; i < effect->count; i++, data++) {
-			if (data->poseId != -1) {
-				animPoseRelease(data->poseId);
+		p = effect->userdata;
+		for (i = 0; i < effect->count; i++, p++) {
+			if (p->poseId != -1) {
+				animPoseRelease(p->poseId);
 			}
 		}
 		effDelete(effect);
@@ -166,10 +167,7 @@ void effMugiKemuriMain(EffectEntry* effect) {
 	p = data;
 	for (i = 0; i < effect->count; i++, p++) {
 		if (p->poseId == -1) {
-			name = "EFF_Mugi";
-			if (strncmp(gp->currentMapName, "win", 3) == 0) {
-				name = "EFF_Hana";
-			}
+			name = strncmp(gp->currentMapName, "win", 3) == 0 ? "EFF_Hana" : "EFF_Mugi";
 			if (!animGroupBaseAsync(name, group, NULL)) {
 				return;
 			}
@@ -217,16 +215,15 @@ void effMugiKemuriMain(EffectEntry* effect) {
 }
 
 void effMugiKemuri2Main(EffectEntry* effect) {
+	s32 i;
 	effMugiKemuriData* data;
 	effMugiKemuriData* p;
-	s32 i;
-	s32 group;
 	s32 alive;
+	s32 group;
 	s32 alive2;
 	const char* name;
 	MarioWork* mario;
 	Vec pos2;
-	Vec unused = {0.0f, 0.0f, 0.0f};
 	Vec pos = {0.0f, 0.0f, 0.0f};
 
 	data = effect->userdata;
@@ -237,10 +234,10 @@ void effMugiKemuri2Main(EffectEntry* effect) {
 	group = gp->inBattle != 0;
 	if (effect->flags & 4) {
 		effect->flags &= ~4;
-		data = effect->userdata;
-		for (i = 0; i < effect->count; i++, data++) {
-			if (data->poseId != -1) {
-				animPoseRelease(data->poseId);
+		p = effect->userdata;
+		for (i = 0; i < effect->count; i++, p++) {
+			if (p->poseId != -1) {
+				animPoseRelease(p->poseId);
 			}
 		}
 		effDelete(effect);
@@ -266,7 +263,7 @@ void effMugiKemuri2Main(EffectEntry* effect) {
 			} else {
 				alive = 1;
 				mario = marioGetPtr();
-				if (data->field_0x4 == 0 && 0.0f != data->field_0x34 && mario->currMotionId == 0) {
+				if (data->field_0x4 == 0 && data->field_0x34 && mario->currMotionId == 0) {
 					data->timer++;
 					continue;
 				}
@@ -314,11 +311,10 @@ void effMugiKemuriDisp(CameraId camId, void* param) {
 	effMugiKemuriData* data;
 	s32 i;
 	Mtx scale, trans, rx, ry, rz;
-	GXColor color;
 
 	data = effect->userdata;
 	for (i = 0; i < effect->count; i++, data++) {
-		if (data->flag && data->alpha > 0) {
+		if (data->flag || data->alpha != 0) {
 			PSMTXRotRad(rx, 'x', 0.017453292f * data->rot.x);
 			PSMTXRotRad(ry, 'y', 0.017453292f * data->rot.y);
 			PSMTXRotRad(rz, 'z', 0.017453292f * data->rot.z);
@@ -330,9 +326,7 @@ void effMugiKemuriDisp(CameraId camId, void* param) {
 			PSMTXConcat(trans, scale, trans);
 			if (data->poseId != -1) {
 				animPoseSetMaterialFlagOn(data->poseId, 0x40);
-				color = (GXColor){0xFF, 0xFF, 0xFF, 0x00};
-				color.a = (u8)data->alpha;
-				animPoseSetMaterialEvtColor(data->poseId, color);
+				animPoseSetMaterialEvtColor(data->poseId, (GXColor){0xFF, 0xFF, 0xFF, (u8)data->alpha});
 				animPoseMain(data->poseId);
 				animPoseDrawMtx(data->poseId, trans, 1, 0.0f, 15.0f);
 				animPoseDrawMtx(data->poseId, trans, 2, 0.0f, 15.0f);
@@ -341,16 +335,16 @@ void effMugiKemuriDisp(CameraId camId, void* param) {
 		}
 	}
 }
+
 void effMugiKemuri2Disp(CameraId camId, void* param) {
 	EffectEntry* effect = param;
 	effMugiKemuriData* data;
 	s32 i;
 	Mtx scale, trans, rx, ry, rz;
-	GXColor color;
 
 	data = effect->userdata;
 	for (i = 0; i < effect->count; i++, data++) {
-		if (data->flag && data->alpha > 0) {
+		if (data->flag || data->alpha != 0) {
 			PSMTXRotRad(rx, 'x', 0.017453292f * data->rot.x);
 			PSMTXRotRad(ry, 'y', 0.017453292f * data->rot.y);
 			PSMTXRotRad(rz, 'z', 0.017453292f * data->rot.z);
@@ -362,9 +356,7 @@ void effMugiKemuri2Disp(CameraId camId, void* param) {
 			PSMTXConcat(trans, scale, trans);
 			if (data->poseId != -1) {
 				animPoseSetMaterialFlagOn(data->poseId, 0x40);
-				color = (GXColor){0xFF, 0xFF, 0xFF, 0x00};
-				color.a = (u8)data->alpha;
-				animPoseSetMaterialEvtColor(data->poseId, color);
+				animPoseSetMaterialEvtColor(data->poseId, (GXColor){0xFF, 0xFF, 0xFF, (u8)data->alpha});
 				animPoseMain(data->poseId);
 				animPoseDrawMtx(data->poseId, trans, 1, 0.0f, 15.0f);
 				animPoseDrawMtx(data->poseId, trans, 2, 0.0f, 15.0f);
@@ -373,3 +365,5 @@ void effMugiKemuri2Disp(CameraId camId, void* param) {
 		}
 	}
 }
+
+const double effMugi_dbl = 0.005;

@@ -259,8 +259,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     PSMTXConcat(m, rot, out);
     PSMTXConcat(out, trn, out);
     PSMTXConcat(out, scl, out);
-    icon = *(u16*)&act->icon;
-    if (!icon) {
+    if (!(icon = *(u16*)&act->icon)) {
         icon = 0x18B;
     }
     if (act->enabled == 1) {
@@ -356,13 +355,13 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
         icon = 0x18B;
     }
     if (act->enabled == 1) {
-        GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
+        GXColor col = {0x00, 0x00, 0x00, 0xFF};
         col.r = c;
         col.g = c;
         col.b = c;
         iconDispGxCol(out, 0x10, icon, col);
     } else {
-        GXColor col2 = {0xFF, 0xFF, 0xFF, 0x00};
+        GXColor col2 = {0x00, 0x00, 0x00, 0xFF};
         col2.r = c;
         col2.g = c;
         col2.b = c;
@@ -468,7 +467,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, co
             c1.a = alpha;
             fc = c1;
         } else {
-            GXColor c2 = {0x40, 0x40, 0x40, 0x40};
+            GXColor c2 = {0x40, 0x40, 0x40, 0x00};
             c2.a = alpha;
             fc = c2;
         }
@@ -823,14 +822,14 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-        f32 x = 155.0f + v->x;
+f32 x = 155.0f + v->x;
         pos.y = 15.0f + v->y + bob;
         pos.x = x;
         pos.z = 0.0f;
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
-        f32 x = 155.0f + v->x;
+f32 x = 155.0f + v->x;
         pos.y = 20.0f + v->y - 164.0f - bob;
         pos.x = x;
         pos.z = 0.0f;
@@ -1310,8 +1309,9 @@ void DrawMainMenu(BattleWork* wp_) {
             break;
         case 1:
             menu->field_20[i] |= 1;
+            a = 0.0f;
+            a += 0.2f * menu->field_48[i];
             b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
-            a = 0.0f + 0.2f * menu->field_48[i];
             if (a >= b) {
                 a = b;
             }

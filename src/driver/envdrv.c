@@ -13,8 +13,17 @@ extern int sprintf(char* str, const char* format, ...);
 extern GlobalWork* gp;
 
 //.data
+// static data from an inlined header function
+__declspec(section ".data") s32 env_negone_one_374[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 lbl_80398970[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 env_one_negone_373[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 lbl_80398980[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 env_negone_one_360[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 lbl_80398990[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 env_one_negone_359[] = {1065353216, -1082130432};
+
 EnvironmentGlare envGlare0 = {
-    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_TEV_KCSEL_K1_A, GX_TEV_KCSEL_K0_A, 5.25f, 16,
+    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)0, 5.25f, 16,
     {
         {-1.0f, 0.0f}, {-3.0f, 0.0f}, {-5.0f, 0.0f}, {-7.0f, 0.0f},
     {1.0f, 0.0f}, {3.0f, 0.0f}, {5.0f, 0.0f}, {7.0f, 0.0f},
@@ -24,7 +33,7 @@ EnvironmentGlare envGlare0 = {
 };
 
 EnvironmentGlare envGlare1 = {
-    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_TEV_KCSEL_K1_A, GX_TEV_KCSEL_1, 3.5f, 8,
+    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)4, 3.5f, 8,
     {
         {-1.41419994831f, -1.41419994831f}, {0.0f, -1.0f}, {1.41419994831f, -1.41419994831f}, {-1.0f, 0.0f},
     {1.0f, 0.0f}, {-1.41419994831f, 1.41419994831f}, {0.0f, 1.0f}, {1.41419994831f, 1.41419994831f},
@@ -32,7 +41,7 @@ EnvironmentGlare envGlare1 = {
 };
 
 EnvironmentGlare envGlare2 = {
-    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_TEV_KCSEL_K1_A, GX_TEV_KCSEL_3_4, 3.5f, 52,
+    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)6, 3.5f, 52,
     {
         {0.0f, -5.0f}, {-1.0f, -4.0f}, {0.0f, -4.0f}, {1.0f, -4.0f},
     {-2.0f, -3.0f}, {-1.0f, -3.0f}, {0.0f, -3.0f}, {1.0f, -3.0f},
@@ -51,7 +60,7 @@ EnvironmentGlare envGlare2 = {
 };
 
 EnvironmentGlare envGlare3 = {
-    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_TEV_KCSEL_K1_A, GX_TEV_KCSEL_1, 3.5f, 16,
+    GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, (GXTevKColorSel)1, (GXTevKColorSel)4, 3.5f, 16,
     {
         {0.0f, -4.0f}, {-1.0f, -3.0f}, {1.0f, -3.0f}, {-2.0f, -2.0f},
     {2.0f, -2.0f}, {-3.0f, -1.0f}, {3.0f, -1.0f}, {-3.0f, 0.0f},
@@ -485,6 +494,7 @@ void envDisp_Blur(void) {
     s32 msec;
     f32 t;
     u8 alpha;
+    GXColor c;
 
     if ((wp->flags & 0x40000000) && (wp->flags & 8)) {
         cam = camGetPtr(CAMERA_2D);
@@ -516,7 +526,8 @@ void envDisp_Blur(void) {
             else {
                 alpha = 120.0f * (1.0f - t) + 128.0f;
             }
-            GXSetTevKColor(GX_KCOLOR0, envBlurColor(alpha));
+            c = envBlurColor(alpha);
+            GXSetTevKColor(GX_KCOLOR0, c);
         }
         else {
             GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0xFF, 0xFF, 0xA0});
@@ -1010,8 +1021,8 @@ static inline void envLoadTex(u32 id, s32 map) {
     envTevLoadTexMtxImm(t, (GXTexMtx)texmtx_tbl[map], GX_PTTEXMTX0, mtxType)
 
 void envAddTev(s32 type, MapTevCallbackInfo* info) {
-    s32 unk18, coord, map, stage;
     EnvironmentWork* wp = envGetWork();
+    s32 unk18, coord, map, stage;
     Mtx mtx;
 
     stage = info->tevStage;
@@ -1243,7 +1254,7 @@ void envSetWater(MapTevCallbackInfo* info) {
     buf2 = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 3)->address;
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
-            f32 s = sin((f32)gp->retraceCount / 10.0f + (18.849556f * j) / 64.0f);
+            f32 s = sin((f32)gp->retraceCount / 10.0f + (18.849552f * j) / 64.0f);
             u8* p = buf2 + ((i / 4) * 32 + (j / 4) * 512) + ((i % 4) + (j % 4) * 4) * 2;
             p[0] = 0.6f + (scale * s + 128.0f);
             p[1] = 0x80;

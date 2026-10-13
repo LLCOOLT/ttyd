@@ -25,6 +25,8 @@ typedef struct EffRippleN64Work {
 
 const GXColor unk_80423248;
 
+static const Vec vec3_802fb520 = {0.0f, 0.0f, 0.0f};
+
 effN64Vtx size16x16_tex32x32_0_vtx[] = {
     {-8, 0, -8, 0, 0, 0, 0, 0, 255},
     {8, 0, -8, 1024, 0, 0, 0, 0, 255},
@@ -105,11 +107,14 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 void effRippleMain(EffectEntry* effect) {
-    Vec position;
-    Vec tmp = {0.0f, 0.0f, 0.0f};
     EffRippleN64Work* work = effect->userdata;
-    s32 type;
+    EffectEntry* e;
+    EffRippleN64Work* w;
+    f32 rz;
     s32 lifetime;
+    s32 type;
+    Vec position;
+    Vec tmp = vec3_802fb520;
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -127,9 +132,9 @@ void effRippleMain(EffectEntry* effect) {
         work->alpha += 0.3f * (120 - work->alpha);
     }
     if ((type == 1 || type == 2 || type == 3) && lifetime == 15) {
-        EffectEntry* e = effRippleN64Entry(type * 10, work->position.x, work->position.y, work->position.z, 0.0f);
-        f32 rz = work->rz;
-        EffRippleN64Work* w = e->userdata;
+        e = effRippleN64Entry(type * 10, work->position.x, work->position.y, work->position.z, 0.0f);
+        rz = work->rz;
+        w = e->userdata;
         w->rx = work->rx;
         w->rz = rz;
     }

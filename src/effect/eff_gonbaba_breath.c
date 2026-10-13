@@ -52,6 +52,7 @@ static GXColor col_mini[] = {
     {0xAE, 0x69, 0xE0, 0xFF}, {0xBF, 0x7C, 0xF0, 0xFF}, {0xCD, 0x97, 0xF5, 0xFF}, {0xF3, 0xC0, 0xFA, 0xFF}, {0x81, 0x31, 0xBB, 0xFF},
 };
 static GXColor* col_tbl[] = {col_normal, col_poison, col_mega, col_cold, col_confu, col_sleep, col_mini, col_normal};
+static GXColor col_pad[5] = {{0,0,0,0}};
 
 // cheap polynomial approximations, valid for x in [0, 2pi]
 static inline f32 _sinf(f32 x) {
@@ -522,13 +523,13 @@ void effGonbabaBreathDisp(CameraId cameraId, EffectEntry *effect)
         col_tbl[type % 10][j].a = (work->alpha * alpha) / 255;
         GXSetChanMatColor(GX_COLOR0A0, col_tbl[type % 10][j]);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32((-(16.0f - (4.0f * j))) * 0.5f, (16.0f - (4.0f * j)) * 0.5f, 0.0f);
+        GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32((16.0f - (4.0f * j)) * 0.5f, (16.0f - (4.0f * j)) * 0.5f, 0.0f);
+        GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (16.0f - (4.0f * j)) / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32((16.0f - (4.0f * j)) * 0.5f, (-(16.0f - (4.0f * j))) * 0.5f, 0.0f);
+        GXPosition3f32((16.0f - (4.0f * j)) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32((-(16.0f - (4.0f * j))) * 0.5f, (-(16.0f - (4.0f * j))) * 0.5f, 0.0f);
+        GXPosition3f32((-(16.0f - (4.0f * j))) / 2.0f, (-(16.0f - (4.0f * j))) / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);
       }
 
@@ -558,13 +559,13 @@ void effGonbabaBreathDisp(CameraId cameraId, EffectEntry *effect)
         GXSetChanMatColor(GX_COLOR0A0, c);
         }
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32((-f4) * 0.5f, f4 * 0.5f, 0.0f);
+        GXPosition3f32((-f4 / 2.0f), f4 * 0.5f, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
         GXPosition3f32(f4 * 0.5f, f4 * 0.5f, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(f4 * 0.5f, (-f4) * 0.5f, 0.0f);
+        GXPosition3f32(f4 * 0.5f, (-f4 / 2.0f), 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32((-f4) * 0.5f, (-f4) * 0.5f, 0.0f);
+        GXPosition3f32((-f4 / 2.0f), (-f4 / 2.0f), 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);
         break;
 

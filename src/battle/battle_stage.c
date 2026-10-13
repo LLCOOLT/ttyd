@@ -465,7 +465,7 @@ void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
 		} else {
 			l->flags |= 2;
 			l->colorStart = (GXColor){l->color.r, l->color.g, l->color.b};
-			l->colorTarget = (GXColor){0, 0, 0};
+			{ GXColor z = {0, 0, 0}; l->colorTarget = z; }
 			l->colorTime = time;
 			l->colorMax = time;
 			l->colorMode = mode;
@@ -627,6 +627,7 @@ void BattleStageReturnAudDarkBase(s32 time, u8 mode) {
 	BattleStageSetDark(d, d->base, time, mode);
 }
 
+#pragma dont_inline on
 f32 getSpline(f32* a, f32* b, f32* c, f32* d, s32* t, s32 n, s32 x) {
 	s32 i;
 	f32 f;
@@ -639,6 +640,7 @@ f32 getSpline(f32* a, f32* b, f32* c, f32* d, s32* t, s32 n, s32 x) {
 	f = x - t[i];
 	return f * (f * (f * d[i] + c[i]) + b[i]) + a[i];
 }
+#pragma dont_inline reset
 BattleSpotWork* BatSpotGetPtr(void) {
     return wp;
 }
@@ -782,7 +784,9 @@ BattleSpotEntry* batSpotEntry(void) {
 
 #pragma dont_inline on
 static f32 randf(f32 min, f32 max) {
-	return (max - min) * ((f32)rand() / 32767.0f) + min;
+	f32 r = (f32)rand() / 32767.0f;
+	f32 d = max - min;
+	return r * d + min;
 }
 #pragma dont_inline reset
 

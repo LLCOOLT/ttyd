@@ -1189,14 +1189,15 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
     mx = 74.0f + (x + w->scrollX);
     my = 120.0f + (y + w->scrollY);
     if (w->file) {
-        GXSetScissor(((304.0f + x) - 230.0f) - 2.0f, (240.0f - (top = 120.0f + y)) - 2.0f, 0x1D0, 0xF4);
+        top = 120.0f + y;
+        GXSetScissor(((304.0f + x) - 230.0f) - 2.0f, (240.0f - top) - 2.0f, 0x1D0, 0xF4);
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winTexInit(w->res->tex->tpl);
         for (i = 0, t = tubuDt; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
-            if (swByteGet(0) < t->id || tubuCheck(t->type)) {
+            if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
                 if (w->fE14 == i) {
-                    winTexSet((tex = 0xBA, (gp->retraceCount & 0x10) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+                    winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
                 } else {
                     winTexSet(t->big ? 0xBA : 0xB8, (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
                 }
@@ -1250,10 +1251,10 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexSet(0xBF, (Vec){4.0f + (230.0f + x), y, 0.0f}, (Vec){1.0f, 32.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, 4.0f + top, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, (y - 120.0f) - 4.0f, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
-        s = sin(gp->retraceCount * 0.125f);
-        s = fabs(2.0f * s);
+        s = fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
         winTexInit(w->res->tex->tpl);
-        winTexSet(0xBD, (Vec){x, top + (-240.0f == w->scrollY ? 0.0f : s), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        o = -240.0f == w->scrollY ? 0.0f : s;
+        winTexSet(0xBD, (Vec){x, top + o, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         o = -148.0f == w->scrollX ? 0.0f : s;
         winTexInit(w->res->tex->tpl);
         winTexSet(0xBC, (Vec){(220.0f + x) + o, y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);

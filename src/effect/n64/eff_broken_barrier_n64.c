@@ -189,8 +189,8 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     f32 halfH;
     f32 width;
     f32 height;
-    f32 ca;
     f32 b;
+    f32 ca;
     f32 a;
     f32 t;
     Vec position;

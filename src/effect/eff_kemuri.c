@@ -148,8 +148,8 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	EffectEntry* entry;
 	effKemuri2Data* data;
-	f32 rot, rv, vy, zz, speed;
-	f32 angle, vz, vx;
+	f32 rv, rot, vy, speed, zz;
+	f32 rad, angle, vz, vx;
 	s32 ia;
 
 	entry = effEntry();
@@ -159,20 +159,18 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	entry->userdata = data;
 	memset(data, 0, sizeof(effKemuri2Data));
 	entry->callback = effKemuri2Main;
-	vx = 1000.0f * dx;
-	vz = 1000.0f * dz;
-	angle = 360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f;
+	angle = 360.0f * angleABf(0.0f, 0.0f, vx = 1000.0f * dx, vz = 1000.0f * dz) / 6.2831855f;
 	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + camGetPtr(4)->viewYaw);
 	ia = (s32)angle;
-	angle = 6.2831855f * ia / 360.0f;
+	rad = 6.2831855f * ia / 360.0f;
 	zz = 5.0f + z;
 	data->timer = 0;
 	speed = 1.0f;
 	vy = 0.7f;
 	rv = -20.0f;
 	rot = 0.0f;
-	data->dirX = sin(angle);
-	data->dirZ = cos(angle);
+	data->dirX = sin(rad);
+	data->dirZ = cos(rad);
 	data->x = x;
 	data->y = y;
 	data->z = zz;
@@ -243,17 +241,18 @@ void effKemuriMain(EffectEntry* effect) {
 	dispEntry(4, dispCalcZ(&pos2), 2, effKemuriDisp, effect);
 }
 
+#pragma opt_propagation off
 static void effKemuri2Main(EffectEntry* entry) {
 	effKemuri2Data* data;
-	effKemuri2Data* p;
+	effKemuri2Data* p = entry->userdata;
 	Vec pos2;
 	Vec pos = {0.0f, 0.0f, 0.0f};
 	f32 s;
 	s32 i;
-	data = entry->userdata;
-	pos.x = data->x;
-	pos.y = data->y;
-	pos.z = data->z;
+	pos.x = p->x;
+	pos.y = p->y;
+	pos.z = p->z;
+	data = p;
 	pos2 = pos;
 	s = sin(3.1415927f * data->timer / 30.0f);
 	data->timer++;
@@ -276,6 +275,7 @@ static void effKemuri2Main(EffectEntry* entry) {
 	}
 	dispEntry(4, dispCalcZ(&pos2), 2, effKemuri2Disp, entry);
 }
+#pragma opt_propagation reset
 
 void effKemuriDisp(CameraId camId, void* param) {
 	Mtx t, s, r, m, m2;
@@ -286,7 +286,6 @@ void effKemuriDisp(CameraId camId, void* param) {
 	s32 type = data->field_0x0;
 	CameraEntry* cam = camGetPtr(camId);
 	f32 w = 1.0f;
-	f32 h = 0.5f;
 
 	switch (type) {
 		case 0:
@@ -361,13 +360,13 @@ void effKemuriDisp(CameraId camId, void* param) {
 			PSMTXConcat(s, t, t);
 			GXLoadTexMtxImm(t, GX_TEXMTX1, GX_MTX2x4);
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(-w * h, w, 0.0f);
+			GXPosition3f32(-w / 2.0f, w, 0.0f);
 			GXTexCoord2f32(0.0f, 0.0f);
-			GXPosition3f32(w * h, w, 0.0f);
+			GXPosition3f32(w / 2.0f, w, 0.0f);
 			GXTexCoord2f32(1.0f, 0.0f);
-			GXPosition3f32(w * h, 0.0f, 0.0f);
+			GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
 			GXTexCoord2f32(1.0f, 1.0f);
-			GXPosition3f32(-w * h, 0.0f, 0.0f);
+			GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
 			GXTexCoord2f32(0.0f, 1.0f);
 		}
 	}
@@ -481,13 +480,13 @@ static void effKemuri2Disp(CameraId camId, void* param) {
 			GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
 		}
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(-w2 * 0.5f, w2 * 0.5f, 0.0f);
+		GXPosition3f32(-w2 / 2.0f, w2 / 2.0f, 0.0f);
 		GXTexCoord2f32(0.0f, 0.0f);
-		GXPosition3f32(w2 * 0.5f, w2 * 0.5f, 0.0f);
+		GXPosition3f32(w2 / 2.0f, w2 / 2.0f, 0.0f);
 		GXTexCoord2f32(1.0f, 0.0f);
-		GXPosition3f32(w2 * 0.5f, -w2 * 0.5f, 0.0f);
+		GXPosition3f32(w2 / 2.0f, -w2 / 2.0f, 0.0f);
 		GXTexCoord2f32(1.0f, 1.0f);
-		GXPosition3f32(-w2 * 0.5f, -w2 * 0.5f, 0.0f);
+		GXPosition3f32(-w2 / 2.0f, -w2 / 2.0f, 0.0f);
 		GXTexCoord2f32(0.0f, 1.0f);
 	}
 }

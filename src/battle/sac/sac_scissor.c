@@ -19,6 +19,7 @@ extern BattleWork* _battleWorkPointer;
 double sqrt(double);
 double fabs(double);
 double __fabs(double);
+static inline double my_fabsf(float x) { return __fabs(x); }
 void scissor_disp_control(CameraId camera, void* param);
 void* memset(void*, int, u32);
 
@@ -208,9 +209,9 @@ s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4,
     }
 
     if (f1 == 0 && f2 == 0) {
-        if (__fabs(dx1) > __fabs(dy1)) {
+        if (my_fabsf(dx1) > my_fabsf(dy1)) {
             a1 = dy1 / dx1;
-            if (__fabs(dx2) > __fabs(dy2)) {
+            if (my_fabsf(dx2) > my_fabsf(dy2)) {
                 a2 = dy2 / dx2;
                 if (a1 - a2 != 0.0f) {
                     d = a1 - a2;
@@ -231,7 +232,7 @@ s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4,
             }
         } else {
             a1 = dx1 / dy1;
-            if (__fabs(dx2) > __fabs(dy2)) {
+            if (my_fabsf(dx2) > my_fabsf(dy2)) {
                 a2 = dy2 / dx2;
                 if (a1 * a2 != 1.0f) {
                     d = 1.0f - a1 * a2;
@@ -881,8 +882,8 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
             p = &buf[i];
             if (scissor_intersection(p[0].x, p[0].y, p[1].x, p[1].y, buf[w->count - 2].x, buf[w->count - 2].y,
                                      buf[w->count - 1].x, buf[w->count - 1].y, &ox, &oy)) {
-                p->x = buf[w->count - 1].x = ox;
-                p->y = buf[w->count - 1].y = oy;
+                buf[i].x = buf[w->count - 1].x = ox;
+                buf[i].y = buf[w->count - 1].y = oy;
                 for (k = 0; k < i; k++) {
                     buf[k] = *p;
                 }

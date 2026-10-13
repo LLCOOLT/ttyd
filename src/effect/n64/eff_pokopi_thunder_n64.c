@@ -380,8 +380,8 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     DCFlushRange(vtx, 0x2a0);
     GXInvalidateVtxCache();
     effSetVtxDescN64(vtx);
-    n = 0;
-    for (k = 0; k < i - 1; k++) {
+    n = k = 0;
+    for (; k < i - 1; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);
         n += 2;

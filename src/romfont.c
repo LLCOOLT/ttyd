@@ -6,6 +6,7 @@
 
 //.sbss
 static RomFontWork work;
+static u32 romfont_sbss_pad;
 
 //.sdata
 static RomFontWork* wp = &work;
@@ -163,10 +164,11 @@ void romFontMake(void) {
 double tan(double);
 
 static inline RomFontChar* romFontFindChar(u16 code) {
-    RomFontChar* table = wp->unk0;
+    RomFontWork* w = wp;
+    RomFontChar* table = w->unk0;
     RomFontChar* cur = table;
     s32 n;
-    for (n = 0; n < wp->uniqueChars; n++, cur++) {
+    for (n = 0; n < w->uniqueChars; cur++, n++) {
         if (cur->code == code)
             return cur;
     }
@@ -192,7 +194,7 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
     // --- camera: place the eye so 1 unit == 1 px at the target plane ---
     target = (Vec){ 0.0f, 0.0f, 0.0f };
     up = (Vec){ 0.0f, 1.0f, 0.0f };
-    camPos = (Vec){ 0.0f, 0.0f, 240.0f / (f32)tan(0.2181661278009415) };
+    camPos = (Vec){ 0.0f, 0.0f, 240.0f / (f32)tan(0.21816612780094147) };
 
     // --- format the message (this is where the va_list lives) ---
     va_start(ap, msg);
@@ -277,8 +279,8 @@ s32 romFontGetWidth(const char* message) {
     RomFontChar* glyph;
 
     for (;;) {
-        u16 c16 = *(u16*)&message[i];
         u32 c = message[i];
+        u16 c16 = *(u16*)&message[i];
 
         if (c >= 0x20 && c < 0x80) {
             glyph = romFontFindChar(c & 0xFFFF);

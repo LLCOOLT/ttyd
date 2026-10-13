@@ -120,13 +120,13 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
     p = work + 1;
     for (i = 1; i < count; i++, p++) {
         r = rand();
+        p->rotZ = (f32)(i * 360 / n);
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
         p->vel10 = 0.0f;
         p->vel14 = 0.0f;
         p->pad20 = 0.0f;
-        p->rotZ = (f32)(i * 360 / n);
         p->type = 0;
         p->rotY = (f32)(r % 360);
         p->vel10 = 0.0f;
@@ -139,10 +139,10 @@ void effHitMain(EffectEntry* effect) {
     EffHitN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
-    s32 frame;
+    s32 i;
     s32 idx;
     EffHitN64Work* p;
-    s32 i;
+    s32 frame;
     s32 type;
 
     tmp.x = work->position.x;
@@ -158,7 +158,7 @@ void effHitMain(EffectEntry* effect) {
     }
     frame = work->frame;
     if (frame <= cnt_table[type]) {
-        work->progress = anim_data[frame - 1] * 0.00390625f;
+        work->progress = anim_data[frame - 1] / 256.0f;
     } else {
         work->progress = 1.0f;
     }

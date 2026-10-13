@@ -16,11 +16,9 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     CameraEntry* cam;
     s32 len;
     s32 half;
-    s32 pass;
     s32 offset;
+    s32 pass;
     s32 i;
-    f32 lo;
-    f32 hi;
 
     cam = camGetCurPtr();
     switch (type) {
@@ -76,12 +74,12 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    lo = -24.0f;
-    hi = 24.0f;
+    //-24.0f
+
     sprintf((char*)buf, "%d", number);
     len = strlen((char*)buf);
     half = len / 2;
-    for (pass = 0, offset = 0; pass < extra + 1; pass++, offset += 2) {
+    for (pass = 0, offset = 0; pass < extra + 1; offset += 2, pass++) {
         if (pass == 0) {
             effGetTexObj(1, &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -136,16 +134,16 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
                 GXLoadTexMtxImm(posMtx, GX_TEXMTX0, GX_MTX2x4);
             }
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(lo, hi, 0.0f);
+            GXPosition3f32(-24.0f, 24.0f, 0.0f);
             GXColor4u8(top.r, top.g, top.b, top.a);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(hi, hi, 0.0f);
+            GXPosition3f32(24.0f, 24.0f, 0.0f);
             GXColor4u8(top.r, top.g, top.b, top.a);
             GXTexCoord2f32(1.0f, 0.0f);
-            GXPosition3f32(hi, lo, 0.0f);
+            GXPosition3f32(24.0f, -24.0f, 0.0f);
             GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(lo, lo, 0.0f);
+            GXPosition3f32(-24.0f, -24.0f, 0.0f);
             GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
             GXTexCoord2f32(0.0f, 1.0f);
         }

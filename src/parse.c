@@ -99,8 +99,8 @@ BOOL parseGet1Next(s32 type, void* data) {
 	s32 i;
 	s32 end;
 	s8* p;
-	s32 stop;
 	s32 start;
+	s32 stop;
 	BOOL result = TRUE;
 	s32 state;
 	s8 c;
@@ -118,8 +118,8 @@ BOOL parseGet1Next(s32 type, void* data) {
 	state = 0;
 	p = (s8*)parse.ptr;
 	i = parse.pos[parse.depth];
-	posp = &parse.pos[parse.depth];
 	end = parse.end[parse.depth];
+	posp = parse.pos + parse.depth;
 	for (; i < end; i++) {
 		if (p[i] == '/' && p[i + 1] == '/') {
 			for (; i < end; i++) {

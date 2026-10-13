@@ -260,7 +260,7 @@ typedef struct ItemEffPos {
 
 static inline HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
 	HitEntry* hit;
-	f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
 	hitDist = 20.0 + __fabs(vy);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
@@ -279,8 +279,8 @@ void itemMain(void) {
 	BOOL active;
 	u16 mode;
 	int i;
-	f32 y, newY;
-	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+	f32 newY;
+	f32 y;
 	s32 dx, dy;
 
 	mario = marioGetPtr();
@@ -317,8 +317,7 @@ void itemMain(void) {
 				entry->flags2 &= ~0x100;
 			}
 			else {
-				y = OSTicksToMicroseconds(gp->renderTime - entry->field_0x68) / 1000.0f;
-				entry->timer -= y;
+				entry->timer -= (f32)OSTicksToMicroseconds(gp->renderTime - entry->field_0x68) / 1000.0f;
 				if (entry->timer <= 0) {
 					itemModeChange(entry, 9);
 				}
@@ -349,17 +348,11 @@ void itemMain(void) {
 					hit = NULL;
 					newY = y + -1.0f;
 				}
+				else if (hit = itemHitCheckY(entry->position.x, 20.0f + y, entry->position.z, -1.0f, -1.0f, &newY)) {
+				}
 				else {
-					hitDist = 20.0 + __fabs(-1.0);
-					hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
-						entry->position.x, 20.0f + y, entry->position.z, 0.0f, -1.0f, 0.0f);
-					if (hit) {
-						newY = hitY;
-					}
-					else {
-						hit = NULL;
-						newY = y + -1.0f;
-					}
+					hit = NULL;
+					newY = y + -1.0f;
 				}
 				if (!hit) {
 					itemModeChange(entry, 3);

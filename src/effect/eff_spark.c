@@ -203,15 +203,16 @@ void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    half = 8.0f;
-    size = 16.0f;
     PSMTXTrans(mtx, work->x, work->y, work->z);
     PSMTXScale(scale, work->scale, work->scale, work->scale);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     PSMTXConcat(mtx, rot, base);
     PSMTXConcat(base, scale, base);
+    p = work->part;
 
-    for (i = 1, p = work->part; i < effect->count; i++, p++) {
+    size = 16.0f; half = size / 2;
+
+    for (i = 1; i < effect->count; i++, p++) {
         if (p->seq < 0) {
             continue;
         }

@@ -54,8 +54,8 @@ typedef struct Anim40 {
 } Anim40;
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
-	TEXPalette* tpl;
 	u16 i;
+	TEXPalette* tpl;
 	TEXHeader* img;
 	CLUTHeader* pal;
 	s32 j, n;
@@ -240,9 +240,11 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
+	u16 i;
 	TEXPalette* tpl;
 	s32 j, n;
-	u16 i;
+	TEXHeader* img;
+	CLUTHeader* pal;
 	u8* q;
 	switch (type) {
 		case 1:
@@ -299,15 +301,17 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 			if ((u32)tpl->descriptorArray < (u32)tpl) {
 				*(u32*)&tpl->descriptorArray += (u32)tpl;
 				for (i = 0; i < tpl->numDescriptors; i++) {
-					if (tpl->descriptorArray[i].textureHeader) {
-						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)tpl->descriptorArray[i].textureHeader);
+					img = tpl->descriptorArray[i].textureHeader;
+					if (img) {
+						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)img);
 						if (!tpl->descriptorArray[i].textureHeader->unpacked) {
 							tpl->descriptorArray[i].textureHeader->data = (char*)((u32)tpl + (u32)tpl->descriptorArray[i].textureHeader->data);
 							tpl->descriptorArray[i].textureHeader->unpacked = TRUE;
 						}
 					}
-					if (tpl->descriptorArray[i].CLUTHeader) {
-						tpl->descriptorArray[i].CLUTHeader = (CLUTHeader*)((u32)tpl + (u32)tpl->descriptorArray[i].CLUTHeader);
+					pal = tpl->descriptorArray[i].CLUTHeader;
+					if (pal) {
+						tpl->descriptorArray[i].CLUTHeader = (CLUTHeader*)((u32)tpl + (u32)pal);
 						if (!tpl->descriptorArray[i].CLUTHeader->unpacked) {
 							tpl->descriptorArray[i].CLUTHeader->data = (char*)((u32)tpl + (u32)tpl->descriptorArray[i].CLUTHeader->data);
 							tpl->descriptorArray[i].CLUTHeader->unpacked = TRUE;

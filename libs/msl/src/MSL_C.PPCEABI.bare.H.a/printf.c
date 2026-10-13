@@ -587,7 +587,6 @@ static char* double2hex(long double num, char* buff, print_format format) {
     exp_format.field_width = 0;
     exp_format.precision = 1;
     exp_format.conversion_char = 'd';
-
     exp = (*(short*)&ld & 0x7FF0) >> 4;
     p = long2str(exp - 0x3FF, buff, exp_format);
 

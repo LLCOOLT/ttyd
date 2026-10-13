@@ -35,67 +35,15 @@ typedef struct MonosiriTargetWork {
 
 #define MT_PARAMS(work) ((MonosiriTargetParams*)&(work)->actionCommands)
 
+static void actionCommandDisp(f32 x, f32 y);
+
+s32 _frame_table[] = {240, 180, 120, 90, 70, 40, 20};
+
 #pragma dont_inline on
-static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
-    MonosiriTargetWork* cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
-    f32 alpha = 0.0f;
-    Vec screen;
-    Vec screen2;
-    s32 icon;
-    s32 pressedIcon;
-
-    btlGetScreenPoint(&cw->pos, &screen);
-    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
-    screen.x += 4.0f;
-    screen.y -= 4.0f;
-    screen.z -= 2.0f;
-    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
-
-    if (cw->inRange) {
-        s32 t = cw->inRangeCnt % 30;
-        if (t < 20) {
-            alpha = 0.01f * intplGetValue(5, t, 20, 100.0f, 0.0f);
-        }
-    }
-
-    btlGetScreenPoint(&cw->targetPos, &screen2);
-    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
-    if (alpha > 0.0f) {
-        btlDispTex4(0x41, screen2, (Vec){alpha, alpha, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
-    }
-    screen2.x += 4.0f;
-    screen2.y -= 4.0f;
-    screen2.z -= 2.0f;
-    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
-    cw->angle += 2.0f;
-
-    pressedIcon = BattleACGetButtonIcon(0x100, 1);
-    icon = BattleACGetButtonIcon(0x100, 0);
-    if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
-        icon = pressedIcon;
-    }
-    ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, 0x10, icon, 1.0f);
+s32 _getmaxcount(void) {
+    return _frame_table[((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(_battleWorkPointer)];
 }
 #pragma dont_inline reset
-
-void battleAcDelete_MonosiriTarget(BattleWork* work) {
-    work->actionCommands.mAcState = 1002;
-}
-
-void battleAcDisp_MonosiriTarget(CameraId cameraId, void* param) {
-    BattleWork* work = _battleWorkPointer;
-    switch (work->actionCommands.mAcState) {
-        case 1000:
-            actionCommandDisp(0.0f, 0.0f);
-            break;
-    }
-}
-
-s32 battleAcResult_MonosiriTarget(BattleWork* work) {
-    return work->actionCommands.result;
-}
 
 s32 battleAcMain_MonosiriTarget(BattleWork* work) {
     BattleActions* ac;
@@ -189,9 +137,65 @@ s32 battleAcMain_MonosiriTarget(BattleWork* work) {
     return 1;
 }
 
-s32 _frame_table[] = {240, 180, 120, 90, 70, 40, 20};
+s32 battleAcResult_MonosiriTarget(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+void battleAcDisp_MonosiriTarget(CameraId cameraId, void* param) {
+    BattleWork* work = _battleWorkPointer;
+    switch (work->actionCommands.mAcState) {
+        case 1000:
+            actionCommandDisp(0.0f, 0.0f);
+            break;
+    }
+}
+
+void battleAcDelete_MonosiriTarget(BattleWork* work) {
+    work->actionCommands.mAcState = 1002;
+}
 
 #pragma dont_inline on
-s32 _getmaxcount(void) {
-    return _frame_table[((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(_battleWorkPointer)];
+static void actionCommandDisp(f32 x, f32 y) {
+    BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
+    MonosiriTargetWork* cw = (MonosiriTargetWork*)((u8*)ac + 0x2BC);
+    f32 alpha = 0.0f;
+    Vec screen;
+    Vec screen2;
+    s32 icon;
+    s32 pressedIcon;
+
+    btlGetScreenPoint(&cw->pos, &screen);
+    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){255, 255, 255, 255});
+    screen.x += 4.0f;
+    screen.y -= 4.0f;
+    screen.z -= 2.0f;
+    btlDispTex4(0x42, screen, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, 0.0f}, (GXColor){128, 128, 128, 255});
+
+    if (cw->inRange) {
+        s32 t = cw->inRangeCnt % 30;
+        if (t < 20) {
+            alpha = 0.01f * intplGetValue(5, t, 20, 100.0f, 0.0f);
+        }
+    }
+
+    btlGetScreenPoint(&cw->targetPos, &screen2);
+    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
+    if (alpha > 0.0f) {
+        btlDispTex4(0x41, screen2, (Vec){alpha, alpha, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){255, 255, 255, 255});
+    }
+    screen2.x += 4.0f;
+    screen2.y -= 4.0f;
+    screen2.z -= 2.0f;
+    btlDispTex4(0x41, screen2, (Vec){1.0f, 1.0f, 1.0f}, (Vec){0.0f, 0.0f, cw->angle}, (GXColor){128, 128, 128, 255});
+    cw->angle += 2.0f;
+
+    pressedIcon = BattleACGetButtonIcon(0x100, 1);
+    icon = BattleACGetButtonIcon(0x100, 0);
+    if (__fabs(cw->pos.x - cw->targetPos.x) < 15.0) {
+        icon = pressedIcon;
+    }
+    ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&(Vec){-200.0f + x, 50.0f + y, 0.0f}, 0x10, icon, 1.0f);
 }
+#pragma dont_inline reset
+

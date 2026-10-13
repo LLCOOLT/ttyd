@@ -21,7 +21,7 @@ extern void partyChgRunMode(PartyEntry* party, s32 mode);
 #define PH(p, o) (*(s16*)((u8*)(p) + (o)))
 #define PW(p, o) (*(u32*)((u8*)(p) + (o)))
 
-extern s32 nokoSe;
+static s32 nokoSe;
 double sin(double);
 double cos(double);
 #include "driver/hitdrv.h"
@@ -55,6 +55,13 @@ extern s32 sysMsec2Frame(s32 msec);
 double sqrt(double);
 void nokonoko_finish(PartyEntry* party);
 HitEntry* ccwall(PartyEntry* party, s32 mode);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
+void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
 void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out);
 void lookupSafetyPos3(Vec pos, f32 height, Vec* out);
 void lookupSafetyPos2(Vec pos, f32 height, Vec* out);
@@ -1083,7 +1090,7 @@ u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
 }
 
 void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
-    f32 dist; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz; f32 x; f32 y; f32 z; f32 s; f32 c; f32 rad;
+    f32 s; f32 c; f32 rad; f32 x; f32 y; f32 z; f32 dist; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
     MarioWork* player = marioGetPtr();
     f32 w = player->wPlayerCollisionBox.x;
     rad = 1.5707964f;
@@ -1121,13 +1128,13 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     *out = pos; }
 
 void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
-    f32 dist; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz; f32 x; f32 y; f32 z; f32 s; f32 c; f32 rad;
+    f32 s; f32 c; f32 rad; f32 x; f32 y; f32 z; f32 dist; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
     MarioWork* player = marioGetPtr();
     f32 w = player->wPlayerCollisionBox.x;
     rad = 1.5707964f;
     s = (f32)sin(rad);
     c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; y = pos.y; z = pos.z + c; x = pos.x + s;
+    c = -c; s = w * s; c = w * c; x = s + pos.x; z = c + pos.z; y = pos.y;
     dist = 0.1f + height;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
         out->x = x; out->z = z; out->y = y; return;
@@ -1135,7 +1142,7 @@ void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
     rad = 4.712389f;
     s = (f32)sin(rad);
     c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; y = pos.y; z = pos.z + c; x = pos.x + s;
+    c = -c; s = w * s; c = w * c; x = s + pos.x; z = c + pos.z; y = pos.y;
     dist = 0.1f + height;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
         out->x = x; out->z = z; out->y = y; return;

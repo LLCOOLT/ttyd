@@ -192,8 +192,8 @@ void effOpukuWgunMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuWgunDisp, effect);
 }
 
+static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
 void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
-    static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
     CameraEntry* camera;
     EffOpukuWgunN64Work* work;
     Mtx scale;
@@ -221,6 +221,9 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     type = work->type;
     scl = work->scale;
     zero = 0.0f;
+    k = 0;
+
+
     GXSetTevColor(GX_TEVREG0, (GXColor){work->colorR, work->colorG, work->colorB, work->alpha});
     GXSetTevColor(GX_TEVREG1, (GXColor){work->color2R, work->color2G, work->color2B, 200});
     GXSetCullMode(GX_CULL_NONE);
@@ -331,9 +334,8 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         effGetTexObjN64(0x8E, &texObj);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
     }
-    k = 0;
     n = k;
-    for (; k < i - 1; k++) {
+    for (k = n; k < i - 1; k++) {
         if (k >= 0) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(n, n + 2, n + 1, n, n + 1, n + 2, n + 3, n);

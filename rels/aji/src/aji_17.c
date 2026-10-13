@@ -3411,22 +3411,22 @@ USER_FUNC(noise) {
 }
 
 void noiseDisp(CameraId cameraId, void* param) {
-    s32 ry;
     CameraEntry* cam;
+    s32 ry;
     s32 y;
     s32 x;
     Mtx mtx;
     s32 i;
     u8* buf;
+    u8 col;
     s32 n;
     s32 len;
     s32 start;
-    s32 by;
     s32 off;
-    u8 col;
     GXTexObj tex;
-
+    s32 by;
     cam = camGetPtr(cameraId);
+
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
         by = y / 4;

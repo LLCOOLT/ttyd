@@ -233,8 +233,8 @@ void npcDisp_xlu(CameraId cameraId, void* param) {
     }
 
     if (entry->flags & 0x800000) {
-        AnimTableEntry* anim;
         AnimationPose* animPose;
+        AnimTableEntry* anim;
         CameraEntry* camera;
         f32 dx, dz;
         f32 angle;
@@ -301,12 +301,12 @@ void npcDisp(CameraId camId, void* param) {
             }
 
             if (entry->flags & 0x800000) {
+                u32 i;
                 AnimTableEntry* anim;
                 AnimationPose* animPose;
                 CameraEntry* camera;
                 f32 dx, dz;
                 f32 angle;
-                u32 i;
 
                 animPoseGetCurrentAnim(entry->poseId);
                 animPose = animPoseGetAnimPosePtr(entry->poseId);
@@ -376,8 +376,8 @@ void npcDisp_offscreen_xlu(CameraId camId, void* param) {
     }
 
     if (entry->flags & 0x800000) {
-        AnimTableEntry* anim;
         AnimationPose* animPose;
+        AnimTableEntry* anim;
         CameraEntry* camera;
         f32 dx, dz;
         f32 angle;
@@ -450,12 +450,12 @@ void npcDisp_offscreen(CameraId camId, void* param) {
             }
 
             if (entry->flags & 0x800000) {
+                u32 i;
                 AnimTableEntry* anim;
                 AnimationPose* animPose;
                 CameraEntry* camera;
                 f32 dx, dz;
                 f32 angle;
-                u32 i;
 
                 animPoseGetCurrentAnim(entry->poseId);
                 animPose = animPoseGetAnimPosePtr(entry->poseId);
@@ -507,7 +507,37 @@ void npcDisp_offscreen(CameraId camId, void* param) {
 }
 
 void npcDisp_blur(CameraId camId, void* param) {
-    NpcEntry* entry = param; // cast to proper type
+    GXColor col;
+    s32 alpha;
+    NpcEntry* entry = param;
+    s32 i;
+    u32 matFlag;
+    f32 rotY;
+    f32 z;
+    f32 x;
+    Mtx mtx;
+
+    rotY = reviseAngle(-entry->direction);
+    matFlag = animPoseGetMaterialFlag(entry->poseId);
+    x = 2.0f * npc_sin((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
+    z = 2.0f * -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
+    animPoseMain(entry->poseId);
+    for (i = 4, alpha = 100; i > 0; i--, alpha -= 25) {
+        mtx_setup(entry, mtx, i);
+        MTXTransApply(mtx, mtx, x, 0.0f, z);
+        animPoseSetMaterialFlagOn(entry->poseId, 0x40);
+        {
+            GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+            c.a = 0x80 - alpha;
+            col = c;
+        }
+        animPoseSetMaterialEvtColor(entry->poseId, col);
+        animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
+        animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
+        animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
+    }
+    animPoseSetMaterialFlagOff(entry->poseId, 0x40);
+    animPoseSetMaterialFlagOn(entry->poseId, matFlag);
 }
 
 void npcInit(void) { // 1:1
@@ -676,18 +706,26 @@ void npcDeleteGroup(NpcEntry* entry) {
     _npcDeleteGroup(entry);
 }
 
+void _fbatFirstAttackAnnouceDisp(CameraId camId, void* param);
+void fbatEncountCheck(void);
+void fbatTalkMode(void);
+void fbatBattleMode(void);
+s32 kpaJumpChk(void);
+s32 kpaFireAttackCheck(void);
+
 void npcMain(void) {
     NpcWork* npcwork;
     NpcEntry* entry;
     int i;
+    int total;
 
     npcwork = gp->inBattle ? &work.battle : &work.field;
     // npcwork = npcGetWorkPtr();
     marioGetPtr()->field_0x1D8 = 0;
     npcMainCount++;
 
-    for (i = 0; i < npcwork->total; i++) {
-        entry = &npcwork->entries[i];
+    total = npcwork->total;
+    for (i = 0, entry = npcwork->entries; i < total; i++, entry++) {
         if (entry->flags & 1 && entry->flags & 2) {
             if (entry->flags & 0x8000) {
                 animPoseGetAnimPosePtr(entry->poseId)->flags |= 0x100;
@@ -702,7 +740,7 @@ void npcMain(void) {
                 entry->jumpFlags &= ~0x10;
             }
 
-            if (entry->wFbatHitCheckRelated) {
+            if ((u16)entry->wFbatHitCheckRelated) {
                 entry->wFbatHitCheckRelated--;
             }
 
@@ -726,7 +764,86 @@ void npcMain(void) {
             } else {
                 entry->field_198 = gp->renderTime;
             }
+
+            if (entry->flags & 2) {
+                /* TODO: block at 0x248-0x2b0 (strcmp/psndSFXOn_3D, 0x1d4 flags) */
+                if (!strcmp(gp->currentMapName, (char*)entry + 0x18c)) {
+                    psndSFXOn_3D(NULL, (Vec*)((u8*)entry + 0x8c));
+                }
+                /* TODO: block at 0x2b0-0x8a8 (move/hit side, npcMoveG, anim select, breath, mario/vivian checks) */
+                /* TODO: block at 0x8a8-0xc40 (angle tracking, npcCheckInterrupt, cam projection) */
+                /* TODO: block at 0xc40-0xfb0 (material color, dispEntry, shadow, hitCheckFilter, vivian) */
+                /* TODO: block at 0xfb0-0x1004 (copy position to prev, clear flag) */
+            }
         }
+    }
+
+    {
+        u8* fbat = *(u8**)((u8*)gp + 0x168);
+        u8* ann = fbat + 0x550;
+        if (*(s32*)ann) {
+            switch (*(s32*)(ann + 8)) {
+            case 2:
+                (*(s32*)(ann + 0xc))++;
+                if (*(s32*)(ann + 0xc) < 20) {
+                    *(f32*)(ann + 0x10) = intplGetValue(5, *(s32*)(ann + 0xc), 20, -600.0f, 0.0f);
+                } else if (*(s32*)(ann + 0xc) < 80) {
+                    *(f32*)(ann + 0x10) = 0.0f;
+                } else if (*(s32*)(ann + 0xc) < 100) {
+                    *(f32*)(ann + 0x10) = intplGetValue(1, *(s32*)(ann + 0xc) - 80, 20, 0.0f, 600.0f);
+                } else {
+                    *(s32*)(ann + 4) = 0;
+                    break;
+                }
+                *(f32*)(ann + 0x14) = 0.0f;
+                dispEntry((CameraId)9, 0.0f, 2, _fbatFirstAttackAnnouceDisp, ann);
+                break;
+            case 1:
+                (*(s32*)(ann + 0xc))++;
+                if (*(s32*)(ann + 0xc) > 60) {
+                    *(s32*)(ann + 4) = 0;
+                    break;
+                }
+                *(f32*)(ann + 0x10) = 0.0f;
+                *(f32*)(ann + 0x14) = 0.0f;
+                dispEntry((CameraId)9, 0.0f, 2, _fbatFirstAttackAnnouceDisp, ann);
+                break;
+            }
+        }
+        switch (*(s16*)fbat) {
+        case 1: {
+            u8* fb2;
+            MarioWork* mario;
+            s32 jump, fire;
+            fbatEncountCheck();
+            fb2 = *(u8**)((u8*)gp + 0x168);
+            mario = marioGetPtr();
+            jump = 0;
+            fire = 0;
+            if (*((u8*)mario + 0x3c) == 2) jump = kpaJumpChk();
+            if (*((u8*)mario + 0x3c) == 2) fire = kpaFireAttackCheck();
+            if (jump) {
+                if (*(s32*)(fb2 + 0x57c) > 0 && *(s32*)(fb2 + 0x578) >= 2) {
+                    Vec pos = *(Vec*)((u8*)mario + 0x8c);
+                    pos.y += 60.0f;
+                    kpaAddScorePos(*(s32*)(fb2 + 0x57c), &pos);
+                }
+                *(s32*)(fb2 + 0x578) = 0;
+                *(s32*)(fb2 + 0x57c) = 0;
+            } else if (!fire) {
+                *(s32*)(fb2 + 0x574) = 0;
+            }
+            break;
+        }
+        case 2:
+        case 3:
+            fbatTalkMode();
+            break;
+        case 5:
+            fbatBattleMode();
+            break;
+        }
+        *(fbat + 0x54d) = 0;
     }
 }
 
@@ -932,7 +1049,7 @@ void npcMoveG(NpcEntry* npc) {
             npc->position.y += dy;
         } else {
             h = 0.8f * npc->height;
-            dist = h + (f32)__fabs(dy);
+            dist = (f32)__fabs(dy) + h;
             if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x, npc->position.y + h, npc->position.z, 0.0f,
                                               -1.0f, 0.0f)) == NULL) {

@@ -616,10 +616,10 @@ void loadMain(SequenceWork* seq) {
             wp->flags |= 1;
             sound = wp->unk24;
             if (dir & 0x1000) {
-                wp->unk24 = sound - 1;
+                wp->unk24 = wp->unk24 - 1;
                 SFX(5);
             } else if (dir & 0x2000) {
-                wp->unk24 = sound + 1;
+                wp->unk24 = wp->unk24 + 1;
                 SFX(5);
             } else if (trg & 0x100) {
                 switch (sound) {

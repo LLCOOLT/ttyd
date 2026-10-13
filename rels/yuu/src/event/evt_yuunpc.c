@@ -1379,11 +1379,11 @@ void yuunpc_pose_minigame4_main(void) {
     ExtPose* ext;
     f32 right;
     f32 camX = camGetPtr(4)->cameraAt.x;
+    f32 y, z, x;
     YuuNpc* npc;
-    f32 x, y, z;
-    s32 c28 = 0;
-    s32 c27 = 0;
-    s32 c26 = 0;
+    s32 c28;
+    s32 c27;
+    s32 c26;
     YuuMg4Sub* mg;
     s32 kind;
     s16 h;
@@ -1401,6 +1401,7 @@ void yuunpc_pose_minigame4_main(void) {
     s32 n;
     u32 t;
 
+    c28 = c27 = c26 = 0;
     ext = extGetPosePtr();
     npc = yuunpc_wp->npcs;
     right = 500.0f + camX;
@@ -1855,8 +1856,8 @@ void yuunpc_pose_minigame4_main(void) {
                     }
                     if (npc->state >= 2 || (npc->state <= 1 && irand(36) == 0)) {
                         px = npc->pos.x;
-                        ha = yuunpc_hit_get(25.0f + px, &npc->pos.z);
                         hb = yuunpc_hit_get(75.0f + px, &npc->pos.z);
+                        ha = yuunpc_hit_get(25.0f + px, &npc->pos.z);
                         if (npc->state <= 3 && irand(2)) {
                             if (ha >= npc->pos.y) {
                                 YUU_WALK(npc);

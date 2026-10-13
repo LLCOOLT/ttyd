@@ -261,11 +261,114 @@ void mapBuildTexture(MapObject* obj, TEXPalette* texture, void* table) {
 
 #pragma dont_inline on
 MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
-	return NULL;
+	MapWork* wp = &mapWork[activeGroup];
+	MapObject* obj;
+	s32 i;
+	Mtx trans, scale, rotX, rotY, rotZ;
+	Vec a, b;
 
-
-
-
+	obj = wp->entries[index].objects;
+	for (i = wp->entries[index].numJoints; i > 0; i--, obj++) {
+		if (!obj->joints) break;
+	}
+	obj->flags = 0;
+	obj->joints = joint;
+	obj->groupIndex = (s16)index;
+	PSMTXTrans(trans, joint->translation.x, joint->translation.y, joint->translation.z);
+	PSMTXScale(scale, joint->scale.x, joint->scale.y, joint->scale.z);
+	PSMTXRotRad(rotX, 'x', 0.017453292f * joint->rotation.x);
+	PSMTXRotRad(rotY, 'y', 0.017453292f * joint->rotation.y);
+	PSMTXRotRad(rotZ, 'z', 0.017453292f * joint->rotation.z);
+	PSMTXConcat(trans, rotZ, trans);
+	PSMTXConcat(trans, rotY, trans);
+	PSMTXConcat(trans, rotX, trans);
+	PSMTXConcat(trans, scale, obj->localMtx);
+	PSMTXConcat(mtx, obj->localMtx, obj->modelWorldMtx);
+	PSMTXIdentity(obj->unkAC);
+	obj->flags |= 0x200;
+	obj->unk5 = 4;
+	obj->offscreenId = -1;
+	obj->parent = parent;
+	obj->next = NULL;
+	obj->child = NULL;
+	if (joint->drawMode) {
+		if (((u8*)joint->drawMode)[2] & 1) {
+			obj->flags |= 8;
+		}
+		switch (joint->drawMode->unk0[0]) {
+			case 0: {
+				MapFileJoint* j = obj->joints;
+				s32 n2 = 0, n1 = 0, k;
+				for (i = 0; i < j->partCount; i++) {
+					u8* mat = j->parts[i].material;
+					u8 t = mat[0xa];
+					if (t == 2) n2++;
+					else if (t == 1) n1++;
+					for (k = 0; k < 8; k++) {
+						u8* tex = ((u8**)((u8*)j->parts[i].material + 0xc))[k];
+						if (!tex) break;
+						t = tex[0xa];
+						if (t == 2) n2++;
+						else if (t == 1) n1++;
+					}
+				}
+				if (n2) obj->blendMode = 2;
+				else if (n1) obj->blendMode = 1;
+				else obj->blendMode = 0;
+				break;
+			}
+			case 1:
+				obj->blendMode = (obj->flags & 8) ? 3 : 0;
+				break;
+			case 2:
+				obj->blendMode = (obj->flags & 8) ? 4 : 1;
+				break;
+			case 3:
+				obj->blendMode = (obj->flags & 8) ? 5 : 2;
+				break;
+		}
+		if (((u8*)joint->drawMode)[2] & 2) {
+			obj->flags |= 0x10;
+			if (((u8*)joint->drawMode)[2] & 0x10) {
+				obj->flags |= 0x8000;
+			}
+			switch (joint->drawMode->unk0[0]) {
+				case 0: obj->blendMode = 2; break;
+				case 1: obj->blendMode = 0; break;
+				case 2: obj->blendMode = 1; break;
+				default: obj->blendMode = 2; break;
+			}
+		}
+		if (obj->flags & 0x10) {
+			if (parent && (parent->flags & 0x10 || parent->flags & 0x20)) {
+				obj->flags &= ~0x10;
+			}
+		} else if (parent && (parent->flags & 0x10 || parent->flags & 0x20)) {
+			obj->flags |= 0x20;
+			if (parent->flags & 0x8000) {
+				obj->flags |= 0x8000;
+			}
+		}
+		if (((u8*)joint->drawMode)[2] & 4) {
+			obj->flags |= 4;
+		}
+	} else {
+		OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
+	}
+	if (joint->partCount) {
+		PSVECAdd(&joint->bboxMin, &joint->bboxMax, &obj->center);
+		PSVECScale(&obj->center, &obj->center, 0.5f);
+	} else {
+		obj->center = joint->translation;
+	}
+	if (joint->partCount) {
+		PSMTXMultVec(obj->modelWorldMtx, &obj->center, &a);
+		PSMTXMultVec(obj->modelWorldMtx, &joint->bboxMax, &b);
+		if (PSVECSquareDistance(&a, &b) < 20000.0f) {
+			obj->flags |= 2;
+		}
+	}
+	return obj;
 }
 
 #pragma dont_inline reset
@@ -294,6 +397,9 @@ MapObject* mapEntry(MapFileJoint* joint, Mtx mtx, s32 index) {
 }
 
 s32 shadowGetCharShadowProjection(void);
+GXTexObj* shadowGetCharShadowTexObj(void);
+GXColor* shadowGetCharShadowColor(void);
+f32 (*shadowGetCharShadowProjTexMtx(void))[4];
 void mapSetMaterial(MapObject* obj, void* material);
 
 typedef struct MapObjectDL {
@@ -638,7 +744,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			for (i = 0; i < header->file.relCount; i++) {
 				r4 = (u32)entry->header.rel;
 				r7 = (u32)entry->header.data;
-				r4 = *(u32*)(r4 + i);
+				r4 = *(u32*)(r4 + i * 4);
 				r0 = *(u32*)(r7 + r4);
 				if (r0 <= 0x80000000) {
 					*(u32*)(r7 + r4) = (r0 + r7);
@@ -646,6 +752,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			}
 		}
 	}
+	MAPENT_FIELD(entry, void*, 0x78) = data;
 	info = NULL;
 	for (i = 0; i < header->file.chunkCount; i++) {
 		if (!strcmp(&header->strings[header->chunks[i].string], "information")) {
@@ -653,8 +760,13 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			break;
 		}
 	}
-
-
+#define FINDCHUNK(off, name) 	{ 		void* found = NULL; 		for (i = 0; i < header->file.chunkCount; i++) { 			if (!strcmp(&header->strings[header->chunks[i].string], name)) { 				found = &data[header->chunks[i].offset]; 				break; 			} 		} 		MAPENT_FIELD(entry, void*, off) = found; 	}
+	FINDCHUNK(0x94, "curve_table");
+	FINDCHUNK(0x98, "texture_table");
+	FINDCHUNK(0x9C, "light_table");
+	FINDCHUNK(0xA0, "fog_table");
+	FINDCHUNK(0xA4, "material_name_table");
+#undef FINDCHUNK
 }
 
 void hitReInit(void);
@@ -789,9 +901,9 @@ void bmapUnLoad(void) {
 	arcDelete(1);
 	arcDelete(2);
 	memset(wp, 0, sizeof(MapWork));
-	wp0 = mapWork;
+	wp = mapWork;
 	activeGroup = 0;
-	for (i = 0, entry = wp0->entries; i < wp0->entries[0].count; entry++, i++) {
+	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
 
 
 		if (MAPENT_FIELD(entry, void*, 0x170)) {
@@ -809,8 +921,8 @@ void bmapUnLoad(void) {
 		}
 		makeDisplayList(i);
 	}
-	if (MAPENT_FIELD(wp0->entries, void*, 0x8C)) {
-		arcEntry(1, MAPENT_FIELD(wp0->entries, void*, 0x8C), MAPENT_FIELD(wp0->entries, u32, 0x90));
+	if (MAPENT_FIELD(wp->entries, void*, 0x8C)) {
+		arcEntry(1, MAPENT_FIELD(wp->entries, void*, 0x8C), MAPENT_FIELD(wp->entries, u32, 0x90));
 
 	}
 }
@@ -1012,9 +1124,25 @@ void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
 }
 
 void mapMain(void) {
+	MapWork* wp = &mapWork[activeGroup];
+	MapEntry* entry;
+	MapEntryAnimData* anim;
+	Mtx scale;
+	s32 i, j;
 
-
-
+	entry = wp->entries;
+	for (i = 0; i < wp->entries[0].count; entry++, i++) {
+		anim = entry->animData;
+		for (j = 0; j < 1; j++) {
+			/* TODO: per-anim body 0x3c-0x1508: flag checks, timer (__div2i/__cvt),
+			   joint anims (strcmp/mapCalcAnimMatrix), material/texture anims (strcpy/strcat/strcmp x3),
+			   light anims (lightNameToPtr x2) */
+		}
+		if (entry->rootMapObj != NULL) {
+			PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
+			mapReCalcMatrix(entry->rootMapObj, scale, 0);
+		}
+	}
 }
 
 void _mapDispMapObj(CameraId cam, MapObject* obj);
@@ -1321,8 +1449,124 @@ void mapDispMapGrp_bbox(CameraId cam, MapObject* obj) {
 	GXReadBoundingBox(&obj->screenRect[0], &obj->screenRect[1], &obj->screenRect[2], &obj->screenRect[3]);
 }
 
-void mapDisp(void) {
+static inline BOOL mapClipTest(Vec* v) {
+	if (v->z > -1.0f && v->z < 0.0f && v->x >= -1.0f && v->x <= 1.0f && v->y >= -1.0f && v->y <= 1.0f) {
+		return TRUE;
+	}
+	return FALSE;
+}
 
+void dispEntry(CameraId camera, f32 order, s32 renderMode, void* callback, void* param);
+#define MAP_CLIP_IN(v) ((v).z > -1.0f && (v).z < 0.0f && (v).x >= -1.0f && (v).x <= 1.0f && (v).y >= -1.0f && (v).y <= 1.0f)
+#define MJF(j, off) (*(f32*)((u8*)(j) + (off)))
+
+void mapDisp(void) {
+	MapWork* wp = &mapWork[activeGroup];
+	CameraEntry* camera = camGetPtr(4);
+	MapEntry* entry;
+	MapObject* obj;
+	int j, i;
+	Mtx scale;
+	Mtx mtx;
+	Vec v;
+	Vec center;
+	f32 z;
+	s32 mode;
+	u8* joint;
+	BOOL clipped;
+
+	if (unk_80418458) {
+		return;
+	}
+	entry = wp->entries;
+	for (i = 0; i < wp->entries[0].count; entry++, i++) {
+		if (entry->rootMapObj != NULL) {
+			PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
+			mapReCalcMatrix(entry->rootMapObj, scale, 0);
+		}
+		obj = entry->objects;
+		for (j = 0; j < entry->numJoints; j++, obj++) {
+			if (obj->flags & 0x4000) continue;
+			if ((obj->flags & 1) && !(obj->flags & 0x80)) continue;
+			if ((obj->flags & 0x40) && obj->color.a == 0) continue;
+			if (obj->flags & 0x20000000) {
+				obj->screenRect[2] = 0;
+				obj->screenRect[3] = 0;
+				obj->screenRect[0] = 0;
+				obj->screenRect[1] = 0;
+			}
+			if (obj->flags & 0x20) continue;
+			if (!(obj->flags & 0x10) && *(s32*)((u8*)obj->joints + 0x5C) < 1) continue;
+			if (!(obj->flags & 0x800) && (entry->flags & 2) && entry->blend.a == 0) continue;
+			if (!(obj->flags & 0x1000) && (entry->flags & 4) && entry->blend2.a == 0) continue;
+			PSMTXConcat(camera->view, obj->modelWorldMtx, mtx);
+			if ((obj->flags & 2) && !mapClipOffFlag) {
+				joint = (u8*)obj->joints;
+				clipped = FALSE;
+				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x50);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x44);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x50);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x50);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x44);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x50);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x48); v.y = MJF(joint, 0x40); v.z = MJF(joint, 0x44);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				v.x = MJF(joint, 0x3C); v.y = MJF(joint, 0x4C); v.z = MJF(joint, 0x44);
+				PSMTXMultVec(mtx, &v, &v);
+				PSMTX44MultVec(camera->projection, &v, &v);
+				if (MAP_CLIP_IN(v)) goto vis;
+				clipped = TRUE;
+			vis:
+				if (clipped) continue;
+			}
+			PSMTXMultVec(mtx, &obj->center, &center);
+			PSMTX44MultVec(camera->projection, &center, &center);
+			z = 5000.0f * center.z + 5000.0f;
+			if (z < 0.0f) {
+				z = 0.0f;
+			} else if (z > 10000.0f) {
+				z = 10000.0f;
+			}
+			z *= -1.0f;
+			mode = obj->blendMode;
+			if (*(s32*)((u8*)obj->joints + 0x5C) > 0) {
+				if (mapObjIsTranslucent(obj->flags, obj->color,
+						*(GXColor*)(*(u8**)((u8*)obj->joints + 0x60) + 0x10C))) {
+					mode = 2;
+				}
+			}
+			if (obj->flags & 0x20000000) {
+				dispEntry((CameraId)1, 5000.0f, 3, !(obj->flags & 0x10) ? mapDispMapObj_bbox : mapDispMapGrp_bbox, obj);
+			}
+			if (obj->flags & 0x80) {
+				dispEntry((CameraId)1, z, mode, !(obj->flags & 0x10) ? mapDispMapObj_off : mapDispMapGrp_off, obj);
+			}
+			if (!(obj->flags & 1)) {
+				dispEntry(obj->unk5, z, mode, !(obj->flags & 0x10) ? mapDispMapObj : mapDispMapGrp, obj);
+			}
+		}
+	}
 }
 
 
@@ -1397,6 +1641,8 @@ s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 	GXTevStageID tevStage;
 	Mtx queen_mtx;
+	s32 map = texCount;
+	s32 coord = texCount;
 	
 	if (texCount > 0) {
 		switch (drawMode) {
@@ -1694,6 +1940,55 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 		GXSetTevSwapMode(tevStage++, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	}
 
+	if ((flags & 4) && shadowGetCharShadowProjection() && shadowGetCharShadowTexObj()) {
+		GXColor shColor = *shadowGetCharShadowColor();
+		Mtx shMtx;
+		PSMTXConcat(shadowGetCharShadowProjTexMtx(), mtx, shMtx);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXLoadTexMtxImm(shMtx, texmtx_tbl[map], GX_MTX3x4);
+		GXLoadTexObj(shadowGetCharShadowTexObj(), (GXTexMapID)map);
+		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
+		GXSetTevAlphaIn(tevStage, GX_CA_KONST, GX_CA_KONST, GX_CA_KONST, GX_CA_ZERO);
+		GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+		GXSetTevKColor(GX_KCOLOR1, shColor);
+		GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_K1);
+		tevStage++;
+		map++;
+		coord++;
+	}
+
+	if (flags & 0x400) {
+		Mtx pjMtx;
+		GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+		GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+		PSMTXConcat(projMtx, mtx, pjMtx);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXLoadTexMtxImm(pjMtx, texmtx_tbl[map], GX_MTX3x4);
+		GXLoadTexObj(smartTexObj(&projTexObj, projTexImgRef), (GXTexMapID)map);
+		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C1);
+		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+		GXSetTevSwapMode(tevStage, GX_TEV_SWAP3, GX_TEV_SWAP3);
+		GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_RED);
+		GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, 0});
+		GXSetTevOrder((GXTevStageID)(tevStage + 1), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+		GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn((GXTevStageID)(tevStage + 1), GX_CC_C0, GX_CC_CPREV, GX_CC_APREV, GX_CC_ZERO);
+		GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+		GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP0);
+		tevStage += 2;
+		map++;
+		coord++;
+	}
+
+	GXSetNumTexGens((u8)coord);
+	GXSetNumTevStages((u8)tevStage);
 }
 
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2) {

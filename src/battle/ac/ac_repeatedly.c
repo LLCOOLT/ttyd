@@ -341,15 +341,18 @@ void battleAcDelete_Repeatedly(BattleWork* work) {
 #pragma dont_inline reset
 
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    RepeatWork* r = RW(work);
-    RepeatDisp* d = RD(work);
+    RepeatWork* r;
+    RepeatDisp* d;
+    BattleWork* work;
     s32 odd;
     s32 i;
     u16 icon1, icon2;
     s32 flags;
     f32 target;
+    work = _battleWorkPointer;
     camGetPtr(8);
+    r = RW(work);
+    d = RD(work);
     if (ACP(work, 0x38, s32) != 16) {
         switch (r->btn0) {
             case 0x100:

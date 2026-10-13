@@ -109,9 +109,9 @@ void effKemuri12Main(EffectEntry* effect) {
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     u16 type;
     s32 last;
+    s32 idx;
     CameraEntry* camera;
     EffKemuri12N64Work* work;
-    s32 idx;
     s32 ofs;
     s32 alpha;
     effN64Vtx* vtx;

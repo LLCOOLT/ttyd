@@ -254,7 +254,7 @@ void winPartyInit(WinPartyWork* wp) {
     }
 
     wp->field_0x1FC = wp->cursor;
-    wp->angleTarget = wp->angle = 360.0f / wp->count * wp->cursor;
+    wp->angle = wp->angleTarget = 360.0f / wp->count * wp->cursor;
     wp->mode = 0;
     wp->wazaCount = pouchGetPartyAttackLv(winPartyDt[wp->dtIdx].partyId) + 2;
     switch (pouchGetPartyColor(4)) {
@@ -284,7 +284,7 @@ void winPartyInit(WinPartyWork* wp) {
 }
 
 void winPartyInit2(WinPartyWork* wp) {
-    wp->angleTarget = wp->angle = 360.0f / wp->count * wp->cursor;
+    wp->angle = wp->angleTarget = 360.0f / wp->count * wp->cursor;
     wp->mode = 0;
     wp->msgX = -200.0f;
     wp->msgY = 20.0f;
@@ -408,10 +408,10 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     GXColor white2 = winPartyWhiteC;
     GXColor black2 = winPartyBlackC;
     GXColor red[1];
-    GXColor white = winPartyWhiteC;
-    GXColor black = winPartyBlackC;
     GXColor white0 = winPartyWhiteC;
     GXColor black0 = winPartyBlackC;
+    GXColor white = winPartyWhiteC;
+    GXColor black = winPartyBlackC;
     PouchPartyData* pd;
     f32 scale;
     f32 tx;

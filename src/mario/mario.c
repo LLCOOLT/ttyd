@@ -1504,10 +1504,9 @@ s32 marioAnimeId(void) {
 }
 
 inline void marioChgPoseChk(const char* name) {
-	if (mp->dispFlags & 0x1000000) {
-		return;
+	if (!(mp->dispFlags & 0x1000000)) {
+		marioChgPose(name);
 	}
-	marioChgPose(name);
 }
 
 void unk_80058374(void) {
@@ -2101,10 +2100,10 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 void marioDispBlur(CameraId camId, void* param) {
 	MarioWork* wp = param;
 	s32 i;
-	u32 flag;
-	f32 angle;
-	s32 q;
 	Mtx mtx;
+	f32 angle;
+	u32 flag;
+	s32 q;
 
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 	angle = 6.2831855f * wp->targetYaw / 360.0f;

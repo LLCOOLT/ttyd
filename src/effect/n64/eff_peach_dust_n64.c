@@ -99,7 +99,6 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     s32 i;
     f32 ang;
     f32 r;
-    f32 r2;
 
     effect = effEntry();
     effect->type = "PeachDustN64";
@@ -117,6 +116,7 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     p = work->particles;
     base = data + type * 256;
     count = 1;
+
     for (i = 0; i < 16; i++) {
         row = base + (15 - i) * 16;
         for (j = 0; j < 16; j++, row++) {
@@ -125,8 +125,8 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
             }
             r = 0.1f * (rand() % 20 - 10) + (f32)((j - 8) * 2);
             p->position.x = r * (f32)cos(ang = x / 360.0f);
-            p->position.y = r2 = 0.1f * (rand() % 20 - 10) + (f32)k;
-            p->position.z = r2 * (f32)sin(ang);
+            p->position.y = 0.1f * (rand() % 20 - 10) + (f32)k;
+            p->position.z = r * (f32)sin(ang);
             p->velocity.x = 0.04f * p->position.x;
             p->velocity.y = 0.04f * p->position.y;
             p->velocity.z = 0.001f * (rand() % 10);
@@ -258,9 +258,9 @@ void effPeachDustDisp(CameraId cameraId, EffectEntry* effect) {
         if (off >= 36) {
             off = 0;
         }
-        r = 1.4f * color_rotation_data[off++];
-        g = 0.7f * color_rotation_data[off++];
-        b = 0.7f * color_rotation_data[off++];
+        { f32 k = 1.4f; f32 h = 0.7f; r = color_rotation_data[off++] * k;
+        g = color_rotation_data[off++] * h;
+        b = color_rotation_data[off++] * h; }
         if (r > 255) {
             r = 255;
         }

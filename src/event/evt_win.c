@@ -468,16 +468,14 @@ static inline s32 unitwin_party_icon(s32 icon) {
 #define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
 
 void evt_unitwin_disp_func(CameraId cameraId, void* param) {
+	PouchData* pouch = pouchGetPtr();
 	UnitWinWork* wp = (UnitWinWork*)param;
 	s32 mode;
-	PouchData* pouch = pouchGetPtr();
+	s32 i;
 
 	if (wp->flags & 1) {
 		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
-		s32 i;
-		s32 off4;
-		s32 off12;
 
 		windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, -150.0f, 120.0f, 300.0f, 50.0f, 20.0f);
 		FontDrawStart();

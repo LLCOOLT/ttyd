@@ -107,7 +107,6 @@ void effBombMain(EffectEntry* effect) {
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 type;
     s32 frame;
-    GXColor color2;
     s32 camId;
 
     tmp.x = work->position.x;

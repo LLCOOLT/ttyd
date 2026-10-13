@@ -15,6 +15,7 @@
 
 
 */
+#define _MATH_H_
 #include "dolphin/os/OSCache.h"
 #include "musyx/assert.h"
 #include "musyx/dspvoice.h"
@@ -958,7 +959,7 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
               } break;
               case 6:
                 loopAddr = (u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1;
-                endAddr = dsp_vptr->smp_info.loop + (dsp_vptr->smp_info.loopLength + base) - 1;
+                endAddr = dsp_vptr->smp_info.loop + dsp_vptr->smp_info.loopLength + base - 1;
                 dsp_vptr->vSampleInfo.inLoopBuffer = 0;
                 break;
               case 2:
@@ -1081,8 +1082,7 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
             }
           } else if (dsp_vptr->smp_info.compType == 6) {
             if ((dsp_vptr->vSampleInfo.inLoopBuffer == 0) && (pb->streamLoopCnt != 0)) {
-              tmp_addr = dsp_vptr->vSampleInfo.loopBufferLength +
-                         ((u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1);
+              tmp_addr = ((u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1) + dsp_vptr->vSampleInfo.loopBufferLength;
               dsp_vptr->smp_info.addr = dsp_vptr->vSampleInfo.loopBufferAddr;
               tmp_addr -= 1;
               pb->addr.endAddressHi = tmp_addr >> 16;

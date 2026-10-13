@@ -100,9 +100,9 @@ USER_FUNC(evt_win_other_select) {
 }
 
 USER_FUNC(evt_win_item_maketable) {
-	s32* t;
-	s32* item;
 	s32* src;
+	s32* item;
+	s32* t;
 	s32* args = event->args;
 	s32* table;
 	s32 count;
@@ -110,12 +110,12 @@ USER_FUNC(evt_win_item_maketable) {
 	s32 n;
 	t = (s32*)evtGetValue(event, args[0]);
 	count = 0;
-	src = t;
+	item = t;
 	for (;;) {
-		if (*src == -1) {
+		if (*item == -1) {
 			break;
 		}
-		src++;
+		item++;
 		count++;
 	}
 	if (count == 0) {

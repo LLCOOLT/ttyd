@@ -490,8 +490,8 @@ void chorogun_ext_main(void) {
     f32 d;
     f32 dz;
     f32 dx;
-    f32 tx;
     f32 tz;
+    f32 tx;
     f32 dz2;
     f32 dx2;
     f32 x, y, z;
@@ -915,3 +915,7 @@ USER_FUNC(chorogun_escape_all) {
     return 2;
 }
 
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_00010994_data[1] = {0};
+#pragma force_active reset

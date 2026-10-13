@@ -307,7 +307,7 @@ void _prolog(void) {
     relSetEvtAddr("tou_11", tou_11_init_evt);
     relSetEvtAddr("tou_12", tou_12_init_evt);
     relSetEvtAddr("tou_13", tou_13_init_evt);
-    relSetEvtAddr("tou_20", tou_20_init_evt);
+    relSetEvtAddr("tou_20\0", tou_20_init_evt);
     rankingInit();
 }
 
@@ -724,7 +724,6 @@ static USER_FUNC(evt_tou_set_ranking_win_lose) {
     s32 i;
     s16 min;
     s16 max;
-    s32 r;
 
     if (lose == 0) {
         for (i = 0; i < rank_wp->num; i++) {
@@ -747,7 +746,7 @@ static USER_FUNC(evt_tou_set_ranking_win_lose) {
     max = -1000;
     for (i = 0; i < rank_wp->num; i++) {
         if (!(rank_wp->entries[i].flags & 2)) {
-            r = rand() % 4 + rand() % 4;
+            s32 r = rand() % 4 + rand() % 4;
             rank_wp->entries[i].score += r - 3;
             if (rank_wp->entries[i].score < min) {
                 min = rank_wp->entries[i].score;

@@ -1084,9 +1084,8 @@ static inline void memcard_probe(void) {
     s32 memSize, sectorSize;
     s32 result;
     s32 i;
-    s32 timeout;
+    s32 timeout = 1000000;
     
-    timeout = 1000000;
     wp->flags |= 1;
 
     for (i = 0; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY;) {

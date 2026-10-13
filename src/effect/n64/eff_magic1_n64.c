@@ -114,29 +114,32 @@ void effMagic1Main(EffectEntry* effect) {
 }
 
 static void main_dl(EffectEntry* effect, Mtx base) {
+    u8* a;
+    f32 yr;
     EffMagic1N64Work* w = effect->userdata;
     s32 type = w->type;
     f32 scale = w->scale;
+    f32 ang;
+    f32 radius;
     s32 life = w->life;
     s32 alpha = w->alpha;
     f32 ox = w->offset.x;
     f32 oy = w->offset.y;
     f32 oz = w->offset.z;
-    f32 yaw;
-    f32 radius;
-    f32 ang;
     f32 c;
-    f32 yr;
+    f32 yaw;
+    f32 s;
     s32 i;
     s32 j;
-    u8* a;
     s16 sz;
+    GXColor c1;
+    GXColor c0;
     GXTexObj texObj;
-    Mtx m38;
-    Mtx m68;
-    Mtx m98;
-    Mtx mc8;
     Mtx mf8;
+    Mtx mc8;
+    Mtx m98;
+    Mtx m68;
+    Mtx m38;
 
     switch (type) {
         case 0:
@@ -166,7 +169,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    yr = 0.017453292f * yaw;
+    yr = yaw * 0.017453292f;
     for (i = 0; i < 3; i++) {
         if (i > 0) {
             switch (type) {
@@ -190,31 +193,30 @@ static void main_dl(EffectEntry* effect, Mtx base) {
         PSMTXRotRad(mc8, 'y', yr);
         PSMTXConcat(mc8, mf8, mf8);
         PSMTXConcat(mf8, m98, m68);
-        a = anime_data;
-        for (j = 0; j < 3; j++) {
-            GXColor c0;
-            GXColor c1;
-            yaw = 6.2831855f * ang / 360.0f;
-            c = (f32)cos(yaw);
-            PSMTXTrans(m38, radius * (f32)sin(yaw), radius * c, 0.0f);
+
+        for (j = 0, a = anime_data; j < 3; j++) {
+            f32 t = 6.2831855f * ang / 360.0f;
+            c = (f32)cos(t);
+            s = (f32)sin(t);
+            PSMTXTrans(m38, radius * s, radius * c, 0.0f);
             ang += 120.0f;
             PSMTXConcat(m68, m38, m38);
             PSMTXConcat(base, m38, m38);
             GXLoadPosMtxImm(m38, GX_PNMTX0);
             c0 = unk_804231a8;
-            c0.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
-            c0.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
-            c0.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
+            c0.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
+            c0.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
+            c0.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
             c0.a = alpha;
-            GXSetTevColor(GX_TEVREG1, c0);
+            GXSetTevColor(GX_TEVREG0, c0);
             c1 = (GXColor){0, 0, 0, 255};
             c1.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
             c1.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
             c1.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
-            GXSetTevColor(GX_TEVREG2, c1);
+            GXSetTevColor(GX_TEVREG1, c1);
             if (type == 0) sz = 15; else sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
-            PSMTXTrans(mf8, 0.0f, 64.0f * (f32)(3 - j) * 0.00390625f, 0.0f);
+            PSMTXTrans(mf8, 0.0f, (f32)(3 - j) * 64.0f / 256.0f, 0.0f);
             PSMTXConcat(mf8, m98, mf8);
             GXLoadTexMtxImm(mf8, GX_TEXMTX0, GX_MTX2x4);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -254,7 +256,7 @@ void effMagic1Disp(CameraId cameraId, EffectEntry* effect) {
             break;
     }
     PSMTXTrans(m98, w->position.x, w->position.y, w->position.z);
-    PSMTXRotRad(m68, 'y', 0.017453292f * yaw);
+    PSMTXRotRad(m68, 'y', yaw * 0.017453292f);
     PSMTXConcat(m98, m68, m38);
     PSMTXConcat(camera->view, m38, m38);
     switch (type) {

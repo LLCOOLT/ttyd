@@ -31,7 +31,6 @@ static void* yuunpc_wp;
 static Monte* monte_p;
 #define MONTETABLE ((MonteTable*)montetable)
 static void monte_disp(CameraId camera, void* param);
-static BOOL get_monte_check(Vec* a, Vec* b);
 void camShiftReset(void);
 
 USER_FUNC(eff_call_minigame);
@@ -90,7 +89,6 @@ void yuuminigame_disp_1hikoki(CameraId camera, void* param);
 void yuuminigame_main_1hikoki(EventEntry* event, BOOL isFirstCall);
 void yuuminigame_init_1hikoki(EventEntry* event, BOOL isFirstCall);
 static void monte_disp(CameraId camera, void* param);
-static BOOL get_monte_check(Vec* a, Vec* b);
 extern s32 evt_yuunpc_minigame1[];
 extern s32 moving_floor[];
 
@@ -629,9 +627,7 @@ static void monte_disp(CameraId camera, void* param) {
     }
 }
 
-static inline f32 randRange(f32 d) {
-    return irand(100.0f * d) / 100.0f;
-}
+#define randRange(d) (irand(100.0f * (d)) / 100.0f)
 
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
@@ -861,4 +857,3 @@ BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
     return FALSE;
 }
 #pragma dont_inline reset
-

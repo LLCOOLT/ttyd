@@ -271,10 +271,22 @@ void effNozleMain(EffectEntry* effect) {
     GXSetVtxAttrFmt(0, 14, 1, 3, tf);           \
     GXSetArray(14, t1, 4)
 
-#define CALLDL(n, tbl, sz)                           {                                            for (k = 0; k < n; k++) {                            GXCallDisplayList(tbl[k], sz[k] * 32);         }                                            }
+#define CALLDL(n, tbl, sz_, S, D) { for (k = 0, S = sz_, D = tbl; k < n; k++, S++, D++) { GXCallDisplayList(*D, *S * 32); } }
 
 void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
+    void** dl5;
+    u8* sz5;
+    u8* sz3;
+    void** dl3;
+    u8* sz4;
+    void** dl4;
+    u8* sz2;
+    void** dl2;
+    void** dl;
+    u8* sz;
     u32 k;
+    EffNozleWork* w;
+    s32 i;
     s32 alpha;
     EffNozleWork* work = effect->userdata;
     Mtx a;
@@ -342,34 +354,34 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     switch (work->type) {
         case 0:
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            { u32 j; u8* sz; void** dl; for (j = 0, sz = nozle_1_dl_0_size_tbl, dl = nozle_1_dl_0_tbl; j < 10; j++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
+            { for (k = 0, sz = nozle_1_dl_0_size_tbl, dl = nozle_1_dl_0_tbl; k < 10; k++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            { u32 j; u8* sz; void** dl; for (j = 0, sz = nozle_1_dl_1_size_tbl, dl = nozle_1_dl_1_tbl; j < 10; j++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
+            { for (k = 0, sz2 = nozle_1_dl_1_size_tbl, dl2 = nozle_1_dl_1_tbl; k < 10; k++, sz2++, dl2++) { GXCallDisplayList(*dl2, *sz2 * 32); } }
             break;
         case 2:
             SETUP(3, 7, 14, nozle_3_vertex_tbl, nozle_3_normal_tbl, nozle_3_color0_tbl, nozle_3_texcoord0_tbl, nozle_3_texcoord1_tbl);
-            CALLDL(17, nozle_3_dl_1_tbl, nozle_3_dl_1_size_tbl);
+            CALLDL(17, nozle_3_dl_1_tbl, nozle_3_dl_1_size_tbl, sz5, dl5);
             SETUP(3, 7, 14, nozle_3_vertex_tbl, nozle_3_normal_tbl, nozle_3_color0_tbl, nozle_3_texcoord0_tbl, nozle_3_texcoord1_tbl);
-            CALLDL(17, nozle_3_dl_0_tbl, nozle_3_dl_0_size_tbl);
+            CALLDL(17, nozle_3_dl_0_tbl, nozle_3_dl_0_size_tbl, sz3, dl3);
             break;
         case 3:
             GXSetTevAlphaIn(0, 7, 1, 4, 7);
             color = unk_80423300;
             color.a = alpha;
-            GXSetTevColor(1, color);
-            work = effect->userdata;
-            for (alpha = 1, work++; alpha < effect->count; alpha++, work++) {
-                PSMTXTrans(a, work->u0, -work->v0, 0.0f);
+            { GXColor tmp = color; GXSetTevColor(1, tmp); }
+            w = effect->userdata;
+            for (i = 1, w++; i < effect->count; i++, w++) {
+                PSMTXTrans(a, w->u0, -w->v0, 0.0f);
                 GXLoadTexMtxImm(a, 30, 1);
-                PSMTXTrans(a, work->u1, -work->v1, 0.0f);
+                PSMTXTrans(a, w->u1, -w->v1, 0.0f);
                 GXLoadTexMtxImm(a, 33, 1);
-                PSMTXTrans(a, work->position.x, work->position.y, work->position.z);
-                PSMTXScale(c, work->sx, work->sy, 1.0f);
+                PSMTXTrans(a, w->position.x, w->position.y, w->position.z);
+                PSMTXScale(c, w->sx, w->sy, 1.0f);
                 PSMTXConcat(a, c, c);
                 PSMTXConcat(d, c, c);
                 GXLoadPosMtxImm(c, 0);
                 SETUP(2, 6, 13, nozle_4_vertex_tbl, nozle_4_normal_tbl, nozle_4_color0_tbl, nozle_4_texcoord0_tbl, nozle_4_texcoord1_tbl);
-                CALLDL(8, nozle_4_dl_0_tbl, nozle_4_dl_0_size_tbl);
+                CALLDL(8, nozle_4_dl_0_tbl, nozle_4_dl_0_size_tbl, sz4, dl4);
             }
             break;
     }

@@ -21,7 +21,7 @@ double sin(double);
 void btlDispTexPlane2(Mtx, u32, GXColor);
 void btlDispTexPlane3(Mtx, u32, GXColor, GXColor, GXColor, GXColor);
 void btlDispGXInit2DRasta(void);
-void btlDispGXQuads2DRasta(f32 x0, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a);
+void btlDispGXQuads2DRasta(f32 x, f32 y0, f32 x1, f32 y1, u8 r, u8 g, u8 b, u8 a);
 void btlGetScreenPoint(Vec* in, Vec* out);
 void BtlUnit_SetAnim(BattleUnitPart* part, const char* anim);
 void BattleAudienceSoundHandBeat(void);
@@ -75,7 +75,7 @@ extern s32 sac_start_stardust[];
 extern s32 sac_wao[];
 
 typedef struct MukiObj { // 0x38
-    s32 kind;          // 0x0
+    s32 kind;          // 0x
     s32 timer;         // 0x4
     s32 type;          // 0x8
     Vec pos;           // 0xc
@@ -87,7 +87,7 @@ typedef struct MukiObj { // 0x38
 } MukiObj;
 
 typedef struct Muki3D { // 0x24
-    s32 kind;          // 0x0
+    s32 kind;          // 0x
     s32 timer;         // 0x4
     Vec pos;           // 0x8
     Vec scale;         // 0x14
@@ -95,7 +95,7 @@ typedef struct Muki3D { // 0x24
 } Muki3D;
 
 typedef struct MukiWork {
-    u32 flags;             // 0x0
+    u32 flags;             // 0x
     s32 state;             // 0x4
     s32 timer;             // 0x8
     s32 timeLeft;          // 0xc
@@ -148,6 +148,7 @@ typedef struct IconEffWork {
 } IconEffWork;
 
 static void disp_3D_alpha(CameraId cam, void* param);
+static void disp_3D(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
 static MukiWork* get_ptr(void);
@@ -486,7 +487,7 @@ void main_cursor(void) {
         psndSFXOn("SFX_BTL_SAC_BODY3\0\0");
     case 4:
         w->t3c++;
-        w->col74 = (GXColor){0x00, 0x00, 0xFF, 0xFF};
+        w->col74 = (GXColor){0x0, 0x0, 0xFF, 0xFF};
         if (!(w->flags & 1)) {
             w->cpos.x = INTPL(4, w->t3c, 5, w->cfrom.x, w->cto.x);
             w->cpos.y = INTPL(4, w->t3c, 5, w->cfrom.y, w->cto.y);
@@ -506,7 +507,7 @@ void main_cursor(void) {
         w->t3c = 0;
     case 6:
         w->t3c++;
-        w->col74 = (GXColor){0xFF, 0x00, 0x00, 0xFF};
+        w->col74 = (GXColor){0xFF, 0x0, 0x0, 0xFF};
         if (w->t3c >= 1) {
             w->kind38 = 2;
             w->t3c = 0;
@@ -738,6 +739,7 @@ USER_FUNC(end_muki) {
     return 2;
 }
 
+static inline f32 addf(f32 a, f32 b) { return a + b; }
 #define TEXPLANE2(m, id, c) ((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, id, c, 0)
 static void disp_2D(CameraId cam, void* param) {
     MukiWork* w = get_ptr();
@@ -768,7 +770,7 @@ static void disp_2D(CameraId cam, void* param) {
         PSMTXTransApply(m, m, x, y, 0.0f);
         TEXPLANE2(m, 0x44, c);
         PSMTXScale(m, -1.0f, 1.0f, 1.0f);
-        PSMTXTransApply(m, m, 8.0f + (32.0f + x), y, 0.0f);
+        PSMTXTransApply(m, m, 8.0f + addf(x, 32.0f), y, 0.0f);
         TEXPLANE2(m, 0x43, c);
         x = x - 32.0f - 8.0f;
         frac = w->f18 - (f32)(s32)w->f18;
@@ -780,7 +782,7 @@ static void disp_2D(CameraId cam, void* param) {
         } else {
             r = 0xF0; g = 0xA0; b = 0xA0; a = 0xFF;
         }
-        btlDispGXQuads2DRasta(x, 8.0f + y, x + 80.0f * frac, y - 8.0f, r, g, b, a);
+        btlDispGXQuads2DRasta(x, 8.0f + y, x + frac * 80.0f, y - 8.0f, r, g, b, a);
         t = w->t24 % 12;
         if (t >= 0 && t <= 5) {
             PSMTXScale(m, 0.5f, 0.5f, 0.5f);
@@ -814,7 +816,7 @@ static void disp_2D(CameraId cam, void* param) {
         PSMTXTransApply(m, m, x, y, 0.0f);
         TEXPLANE2(m, 0x44, c);
         PSMTXScale(m, -1.0f, 1.0f, 1.0f);
-        PSMTXTransApply(m, m, 8.0f + (32.0f + x), y, 0.0f);
+        PSMTXTransApply(m, m, 8.0f + addf(x, 32.0f), y, 0.0f);
         TEXPLANE2(m, 0x43, c);
         x = x - 32.0f - 8.0f;
         frac = w->f20 - (f32)(s32)w->f20;
@@ -825,7 +827,7 @@ static void disp_2D(CameraId cam, void* param) {
         } else {
             r = 0xA0; g = 0xA0; b = 0xF0; a = 0xFF;
         }
-        btlDispGXQuads2DRasta(x, 8.0f + y, x + 80.0f * frac, y - 8.0f, r, g, b, a);
+        btlDispGXQuads2DRasta(x, 8.0f + y, x + frac * 80.0f, y - 8.0f, r, g, b, a);
         t = w->t28 % 12;
         if (t >= 0 && t <= 5) {
             PSMTXScale(m, 0.5f, 0.5f, 0.5f);
@@ -881,57 +883,55 @@ static void disp_3D_alpha(CameraId cam, void* param) {
     for (i = 0; i < 9; i++) {
         o = &w->obj[i];
         if (o->kind >= 1 && o->kind <= 9) {
-            f32 a;
             f32 c;
+            f32 a;
             switch (o->type) {
             case 0:
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 2.0f * o->rot.y * 3.141592f / 360.0f;
+                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
-                GXColor ca = {0xE9, 0x4A, 0x3F, 0};
-                GXColor cb = {0xFE, 0xE6, 0x3E, 0};
-                ca.a = o->alpha;
-                cb.a = o->alpha;
-                col[0] = col[1] = ca;
-                col[2] = col[3] = cb;
+                col[0] = col[1] = (GXColor){0xE9, 0x4A, 0x3F, o->alpha};
+                col[2] = col[3] = (GXColor){0xFE, 0xE6, 0x3E, o->alpha};
                 ((void (*)(Mtx, u32, GXColor, GXColor, GXColor, GXColor, s32))btlDispTexPlane3)(m, 0x45, col[0], col[1], col[2], col[3], 0);
                 }
                 break;
-            case 1:
+            case 1: {
+                f32 a;
+                f32 c;
+
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 2.0f * o->rot.y * 3.141592f / 360.0f;
+                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
-                GXColor ca = {0x3F, 0x3F, 0xE9, 0};
-                GXColor cb = {0x74, 0xC9, 0xFF, 0};
-                ca.a = o->alpha;
-                cb.a = o->alpha;
-                col[0] = col[1] = ca;
-                col[2] = col[3] = cb;
+                col[0] = col[1] = (GXColor){0x3F, 0x3F, 0xE9, o->alpha};
+                col[2] = col[3] = (GXColor){0x74, 0xC9, 0xFF, o->alpha};
                 ((void (*)(Mtx, u32, GXColor, GXColor, GXColor, GXColor, s32))btlDispTexPlane3)(m, 0x45, col[0], col[1], col[2], col[3], 0);
                 }
-                break;
-            case 2:
+                }
+break;
+            case 2: {
+                f32 a;
+                f32 c;
+
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, o->scale.x, o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 2.0f * o->rot.y * 3.141592f / 360.0f;
+                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
-                GXColor ca = {0xFF, 0xFF, 0xFF, 0};
-                ca.a = o->alpha;
-                col[0] = ca;
+                col[0] = (GXColor){0xFF, 0xFF, 0xFF, o->alpha};
                 TEXPLANE2(m, 0x31, col[0]);
                 }
-                break;
+                }
+break;
             }
         }
     }

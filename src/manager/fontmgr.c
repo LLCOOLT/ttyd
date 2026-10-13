@@ -194,11 +194,11 @@ void FontDrawCodeMtx(Mtx mtx, u16 code) {
 }
 
 static inline void FontDrawStringVec(Vec pos, const s8* msg) {
+	f32 x;
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
-	f32 x;
 
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -225,11 +225,11 @@ void FontDrawString(f32 x, f32 y, const char* msg) {
 }
 
 static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
+	f32 x;
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
-	f32 x;
 
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -744,7 +744,7 @@ GXColor HSV2RGB(GXColor hsv) {
 
 	s = hsv.g / 255.0f;
 	v = hsv.b / 255.0f;
-	h = 360.0f * hsv.r * 0.00390625f / 60.0f;
+	h = (360.0f * hsv.r) / 256.0f / 60.0f;
 	i = floor(h);
 	f = h - i;
 	if (!(i & 1)) {
@@ -753,7 +753,7 @@ GXColor HSV2RGB(GXColor hsv) {
 	p = v * (1.0f - s);
 	q = v * (1.0f - s * f);
 	switch (i) {
-		case 0: r = v; g = q; b = p; break;
+		case 0: if (!v) {} r = v; g = q; b = p; break;
 		case 1: r = q; g = v; b = p; break;
 		case 2: r = p; g = v; b = q; break;
 		case 3: r = p; g = q; b = v; break;

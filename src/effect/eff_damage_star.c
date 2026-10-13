@@ -355,7 +355,6 @@ u32 damageStar_effAnimRST[] = {
 u32 damageStar_effAnimRSTDt[] = { 0x2, (u32)damageStar_effAnimRST };
 MayaAnimData damageStar_effAnimDt = { { 0 }, 65.0f, (MayaKeyList*)damageStar_effAnimRSTDt };
 
-GXColor unk_80423038;
 
 void effDamageStarMain(EffectEntry* effect);
 void effDamageStarDisp(CameraId cameraId, EffectEntry* effect);
@@ -488,11 +487,11 @@ void effDamageStarMain(EffectEntry* effect) {
 
 void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
+    GXColor color;
     DamageStarWork* work;
     s32 flip;
     DamageStarWork* part;
     GXTexObj texObj;
-    GXColor color;
     Mtx baseMtx;
     Mtx rotMtx;
     Mtx scaleMtx;
@@ -561,11 +560,10 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, GX_TEXMAP2);
     }
     for (i = 2; i < effect->count; i++, part++) {
-        color = unk_80423038;
-        color.r = color_rotation_data[((i + frame) % 12) * 3];
-        color.g = color_rotation_data[((i + frame) % 12) * 3 + 1];
-        color.b = color_rotation_data[((i + frame) % 12) * 3 + 2];
-        color.a = part->alpha;
+        color = (GXColor){ color_rotation_data[((i + frame) % 12) * 3],
+                                                  color_rotation_data[((i + frame) % 12) * 3 + 1],
+                                                  color_rotation_data[((i + frame) % 12) * 3 + 2],
+                                                  part->alpha };
         GXSetChanMatColor(GX_COLOR0A0, color);
         PSMTXIdentity(partMtx);
         PSMTXScaleApply(partMtx, partMtx, part->scale.x, part->scale.y, part->scale.z);

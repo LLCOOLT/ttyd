@@ -407,9 +407,9 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
     u32* var_r27;
     u32 temp_r28;
     u16 id;
-    u32 length;
     void* temp_r0_3;
     void* pointer;
+    u32 length;
     DVDEntry* entry;
 
     if (sound.slibId >= 8) {

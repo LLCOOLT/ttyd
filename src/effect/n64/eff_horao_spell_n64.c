@@ -176,11 +176,11 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     effN64Vtx* q;
     s32 frame;
     s32 alpha;
+    EffHoraoSpellN64Work* work;
     s32 i;
     s32 j;
     s32 k;
     s32 n;
-    EffHoraoSpellN64Work* work;
     static u8 colr[20] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
     static u8 colg[20] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
     static u8 colb[20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
@@ -188,6 +188,8 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     GXColor c2;
     GXColor c1;
     GXColor c3;
+    GXColor white;
+    f32 s;
 
 
     camera = camGetPtr(cameraId);
@@ -246,7 +248,7 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
 
         c3.a = work->alpha;
         GXSetTevColor(GX_TEVREG0, c3);
-        GXSetTevColor(GX_TEVREG1, (GXColor){255, 255, 255, 0});
+        white = (GXColor){255, 255, 255, 0}; GXSetTevColor(GX_TEVREG1, white);
         PSMTXScale(scale, 0.0078125f, 0.03125f, 0.0f);
         PSMTXTrans(mtx, (f32)(-frame * 2), 0.0f, 0.0f);
         PSMTXConcat(scale, mtx, scale);
@@ -254,7 +256,8 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXRotRad(rot, 'x', 0.34906584f);
         PSMTXTrans(mtx, 6.0f, 0.0f, 0.0f);
         PSMTXConcat(rot, mtx, mtx);
-        PSMTXRotRad(rot, 'y', 0.017453292f * (-30.0f * (f32)sin(6.2831855f * (78.75f + (f32)(frame * 8)) / 360.0f)));
+        s = sin(6.2831855f * (78.75f + (f32)(frame * 8)) / 360.0f);
+        PSMTXRotRad(rot, 'y', 0.017453292f * (-30.0f * s));
         PSMTXConcat(mtx, rot, mtx2);
         vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
         for (j = 0, n = 0; j < 16; j++, n += 2) {

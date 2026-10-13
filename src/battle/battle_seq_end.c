@@ -380,6 +380,156 @@ const char* BattleGetRankNameLabel(s32 level) {
     return found->rankUpName;
 }
 
+
+void _ExecAllUnitBattleEndEvent(void);
+void _check_audience_battle_end_exec(void);
+void _BattleMarioKouraDelete(void);
+void _audience_Whistle_control(void);
+void btlseqEnd_DispInit(BattleWork* wp);
+void btlseqEnd_DispMain(CameraId camId, void* param);
+
+void btlseqEnd(BattleWork* wp) {
+    SeqEndWork* work = *(SeqEndWork**)((u8*)wp + 0xF28);
+    FieldBattleInfo* info = *(FieldBattleInfo**)((u8*)wp + 0x2738);
+    PouchData* pouch = pouchGetPtr();
+    s32 marioBelong;
+    s32 enemyBelong;
+    u32 flags;
+
+    _audience_Whistle_control();
+    switch (BattleGetSeq(wp, (BattleSequence)7)) {
+    case 0x7000000:
+        btlsubResetMoveColorLvAll(wp);
+        { BattleUnit* mu = BattleGetMarioPtr(wp);
+        marioBelong = *(s8*)((u8*)mu + 0xC);
+        enemyBelong = BtlUnit_GetEnemyBelong(mu); }
+        flags = *(u32*)((u8*)wp + 0xEF4);
+        if (flags & 0x40) {
+            BattleInformationSetResult(info, 4);
+        } else if (flags & 0x20) {
+            BattleInformationSetResult(info, 5);
+        } else if (((s32*)((u8*)wp + marioBelong * 8))[3]) {
+            BattleInformationSetResult(info, 3);
+        } else if (((s32*)((u8*)wp + enemyBelong * 8))[3]) {
+            BattleInformationSetResult(info, 1);
+        } else if (flags & 0x10) {
+            BattleInformationSetResult(info, 4);
+        }
+        switch (BattleInformationGetResult(info)) {
+        case 1:
+            if (*(u32*)((u8*)fbatGetPointer() + 0x3C)) {
+                BattleSetSeq(wp, (BattleSequence)7, 0x7000003);
+                return;
+            }
+            _check_audience_battle_end_exec();
+            BattleSetSeq(wp, (BattleSequence)7, 0x7000005);
+            _BattleMarioKouraDelete();
+            break;
+        case 3:
+            BattleSetSeq(wp, (BattleSequence)7, 0x7000001);
+            break;
+        default:
+            _ExecAllUnitBattleEndEvent();
+            BattleSetSeq(wp, (BattleSequence)7, 0x700001D);
+            BattleAudienceSoundSetVolAll(0, 30);
+            break;
+        }
+        work = BattleAlloc(sizeof(SeqEndWork));
+        /* TODO: block at 0x1c0-0x1fc: memset/init, btlseqEnd_DispInit, irand */
+        btlseqEnd_DispInit(wp);
+        irand(0);
+        break;
+    case 0x7000001: /* TODO: 0x2cc-0x334 ExecAllUnitBattleEndEvent, camera, fadeEntry, psndBGMOff */
+        _ExecAllUnitBattleEndEvent();
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000002);
+        break;
+    case 0x7000002: /* TODO: 0x334-0x380 fadeIsFinish -> seqSetSeq / 0x700001F */
+        break;
+    case 0x7000003: /* TODO: 0x1fc-0x234 fbatGetPointer, evtEntry */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000004);
+        break;
+    case 0x7000004: /* TODO: 0x234-0x2cc evtCheckID, wait, set seq 1/5, alloc */
+        break;
+    case 0x7000005: /* TODO: 0x380-0x49c status cleanup, reserve item, evtEntry */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000006);
+        break;
+    case 0x7000006: /* TODO: 0x49c-0x54c clap, drop material, majinai */
+        break;
+    case 0x7000007: /* TODO: 0x54c-0x574 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000008);
+        break;
+    case 0x7000008: /* TODO: 0x574-0x6d4 fog stop, stock exp, _GetExpIcon_Init, camera, sounds */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000009);
+        break;
+    case 0x7000009: /* TODO: 0x6d4-0x704 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700000A);
+        break;
+    case 0x700000A: /* TODO: 0x704-0x818 unit evts, effPointGetEntry */
+        break;
+    case 0x700000B: /* TODO: 0x818-0x914 exp counting, pad, psndSFXOn */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700000C);
+        break;
+    case 0x700000C: /* TODO: 0x914-0x97c _GetExpIcon_End, effSoftDelete */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700000D);
+        break;
+    case 0x700000D: /* TODO: 0x97c-0x9b4 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700000E);
+        break;
+    case 0x700000E: /* TODO: 0x9b4-0xa1c evtEntry */
+        break;
+    case 0x700000F: /* TODO: 0xa1c-0xa68 */
+        break;
+    case 0x7000010: /* TODO: 0xa68-0xad8 WinSetActive, HideReel */
+        break;
+    case 0x7000011: /* TODO: 0xad8-0xb58 evtEntry, status window, BGM */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000012);
+        break;
+    case 0x7000012: /* TODO: 0xb58-0xd18 level-up select pad handling */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000014);
+        break;
+    case 0x7000013: /* TODO: 0xd18-0xe14 confirm pad handling */
+        break;
+    case 0x7000014: /* TODO: 0xe14-0xe44 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000015);
+        break;
+    case 0x7000015: /* TODO: 0xe44-0x105c apply level up params, recovery effects */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000016);
+        break;
+    case 0x7000016: /* TODO: 0x105c-0x10d8 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x7000017);
+        break;
+    case 0x7000017: /* TODO: 0x10d8-0x113c rank up */
+        break;
+    case 0x7000018: /* TODO: 0x113c-0x1164 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001C);
+        break;
+    case 0x7000019: /* TODO: 0x1164-0x1248 victory anim */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001A);
+        break;
+    case 0x700001A: /* TODO: 0x1248-0x12c4 */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001B);
+        break;
+    case 0x700001B:
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001C);
+        break;
+    case 0x700001C: /* TODO: 0x12dc-0x131c */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001D);
+        break;
+    case 0x700001D: /* TODO: 0x131c-0x1350 fadeEntry */
+        BattleSetSeq(wp, (BattleSequence)7, 0x700001E);
+        break;
+    case 0x700001E: /* TODO: 0x1350-0x1374 */
+        if (fadeIsFinish()) {
+            BattleSetSeq(wp, (BattleSequence)7, 0x700001F);
+        }
+        break;
+    case 0x700001F: /* TODO: 0x1374-0x1444 party trans, free, mario party */
+        BattleFree(work);
+        break;
+    }
+    btlseqEnd_DispMain((CameraId)8, wp);
+}
+
 void _ExecAllUnitBattleEndEvent(void) {
     BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
@@ -442,7 +592,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
     pos.z = 0.0f;
     if (work) {
         sprintf(buf, "%2d", work->expDisp);
-        width = 12.5f * (f32)strlen(buf) + 65.0f;
+        width = (f32)strlen(buf) * 12.5f + 65.0f;
         windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, 180.0f, -160.0f, width, 32.0f, 10.0f);
 
         iconDispGx(&pos, 0x10, 0x18C, 1.0f);
@@ -577,20 +727,20 @@ void _GetExpIcon_Main(BattleWork* wp) {
         work->counter[i] = 0;
     }
     ones = exp % 10;
-    for (tens = 10; tens - 10 < ones; tens++) {
-        iconFlagOff(work->icons[tens]->name, 2);
-        if (work->alpha[tens] <= 0) {
-            work->alpha[tens] = 0x40;
+    for (i = 10; i - 10 < ones; i++) {
+        iconFlagOff(work->icons[i]->name, 2);
+        if (work->alpha[i] <= 0) {
+            work->alpha[i] = 0x40;
         } else {
-            work->alpha[tens] += 0x40;
-            if (work->alpha[tens] > 0xFF) {
-                work->alpha[tens] = 0xFF;
+            work->alpha[i] += 0x40;
+            if (work->alpha[i] > 0xFF) {
+                work->alpha[i] = 0xFF;
             }
         }
     }
-    for (; tens < 19; tens++) {
-        iconFlagOn(work->icons[tens]->name, 2);
-        work->alpha[tens] = 0;
+    for (; i < 19; i++) {
+        iconFlagOn(work->icons[i]->name, 2);
+        work->alpha[i] = 0;
     }
     ofs = 0.0f;
     for (i = 0; i < 19; i++) {
@@ -673,9 +823,9 @@ USER_FUNC(_disable_enemy_unit_disp) {
 USER_FUNC(_set_confetti_control_evtid) {
     s32* args = event->args;
     SeqEndWork* work = SEW(_battleWorkPointer);
-
+    if (!_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork && !_battleWorkPointer->seqEndWork) {
+    }
     work->confettiEvtId = evtGetValue(event, args[0]);
-
 
     return 2;
 }
@@ -1003,6 +1153,7 @@ USER_FUNC(_lvup_select_object_init) {
     return 2;
 }
 
+#pragma dont_inline on
 s32 _keta_get(s32 n) {
 
     s32 k = 0;
@@ -1020,10 +1171,110 @@ s32 _keta_get(s32 n) {
     return k;
 }
 
+void btlDispTexPlane(u32 id, GXColor color, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
+void btlDispTexPlane2(Mtx mtx, u32 id, GXColor color);
+#define LVOBJ_TIMER(o) ((o)->field_0x29[0])
+#define LVOBJ_DISP(o) (*(s32*)&(o)->field_0x29[3])
+#define LVOBJ_PLANE(o, n)                                                              \
+    if (LVOBJ_DISP(o)) {                                                               \
+        PSMTXIdentity(m);                                                              \
+        PSMTXTrans(trans, (o)->pos.x, (o)->pos.y, (o)->pos.z);                         \
+        PSMTXScale(scale, (o)->scale.x, (o)->scale.y, (o)->scale.z);                   \
+        PSMTXRotRad(rotX, 'x', 0.017453292f * (o)->rot.x);                             \
+        PSMTXRotRad(rotY, 'y', 0.017453292f * (o)->rot.y);                             \
+        PSMTXRotRad(rotZ, 'z', 0.017453292f * (o)->rot.z);                             \
+        PSMTXConcat(rotZ, scale, m);                                                   \
+        PSMTXConcat(rotZ, m, m);                                                       \
+        PSMTXConcat(rotX, m, m);                                                       \
+        PSMTXConcat(rotY, m, m);                                                       \
+        PSMTXConcat(trans, m, m);                                                      \
+        ((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, 0x24 + n, (o)->color, 0); \
+        ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(        \
+            0x27 + n, (o)->color, 0, (o)->pos.x - 16.0f, 20.0f + (o)->pos.y,             \
+            2.0f + (o)->pos.z, (o)->scale.x, (o)->scale.y);                              \
+    }
+
 void _lvup_select_object_disp(CameraId camId, void* param) {
+    SeqEndWork* work = SEW(_battleWorkPointer);
+    SeqEndObj* obj;
+    s32 i;
+    Vec pos3;
+    Vec pos;
+    Vec pos2;
+    Mtx m, trans, scale, rotX, rotY, rotZ;
+    Mtx m1, m2, m3, ms;
 
+    for (i = 0; i < 3; i++) {
+        obj = &work->objs[i];
+        switch (obj->paramDisp) {
+        case 4:
+            obj->paramDisp = 5;
+            LVOBJ_TIMER(obj) = 1;
+        case 5:
+            LVOBJ_TIMER(obj)--;
+            if (LVOBJ_TIMER(obj) == 0) {
+                LVOBJ_TIMER(obj) = 8;
+                if (LVOBJ_DISP(obj)) {
+                    LVOBJ_DISP(obj) = 0;
+                } else {
+                    LVOBJ_DISP(obj) = 1;
+                }
+            }
+            break;
+        default:
+            LVOBJ_DISP(obj) = 1;
+            break;
+        }
+    }
+    LVOBJ_PLANE(&work->objs[0], 0)
+    LVOBJ_PLANE(&work->objs[1], 1)
+    LVOBJ_PLANE(&work->objs[2], 2)
+
+    for (i = 0; i < 3; i++) {
+        obj = &work->objs[i];
+        if (LVOBJ_DISP(obj)) {
+            if (obj->paramDisp == 1) {
+                if (obj->value != obj->nextValue) {
+                    pos = obj->pos;
+                    pos.x = pos.x - 8.0f - 6.0f;
+                    pos.y = pos.y - (96.0f * obj->scale.y + 2.0f);
+                    pos.z += 5.0f;
+                    PSMTXScale(ms, 0.8f, 0.8f, 1.0f);
+                    PSMTXTrans(m1, pos.x, pos.y, pos.z);
+                    PSMTXConcat(m1, ms, m1);
+                    iconNumberDispGx3D(m1, obj->value, 0, obj->color);
+
+                    pos2 = obj->pos;
+                    pos2.x = 1.2f * (_keta_get(obj->nextValue) * 8 + 6) + pos2.x;
+                    pos2.y = pos2.y - (96.0f * obj->scale.y + 3.0f);
+                    pos2.z += 5.0f;
+                    PSMTXTrans(m2, pos2.x, pos2.y, pos2.z);
+                    PSMTXScale(ms, 1.2f, 1.2f, 1.0f);
+                    PSMTXConcat(m2, ms, m2);
+                    iconNumberDispGx3D(m2, obj->nextValue, 0, obj->color);
+
+                    pos3 = obj->pos;
+                    pos3.y = pos3.y - 96.0f * obj->scale.y;
+                    pos3.z += 5.0f;
+                    PSMTXTrans(m3, pos3.x, pos3.y, pos3.z);
+                    PSMTXScale(ms, -0.6f, 0.6f, 1.0f);
+                    PSMTXConcat(m3, ms, m3);
+                    iconDispGxCol(m3, 0, 0x163, obj->color);
+                }
+            } else if (obj->paramDisp == 2 || obj->paramDisp == 5) {
+                pos2 = obj->pos;
+                pos2.x = pos2.x + ((_keta_get(obj->nextValue) * 8) / 2 - 4.0f);
+                pos2.y = pos2.y - (96.0f * obj->scale.y + 2.0f);
+                pos2.z += 5.0f;
+                PSMTXTrans(m2, pos2.x, pos2.y, pos2.z);
+                iconNumberDispGx3D(m2, obj->nextValue, 0, obj->color);
+            }
+        }
+    }
 }
-
+#pragma dont_inline reset
+#pragma auto_inline reset
+#pragma dont_inline on
 void _check_audience_battle_end_exec(void) {
     BattleWork* wp = _battleWorkPointer;
     SeqEndGroup* group = *(SeqEndGroup**)((u8*)wp->fbatInfo->setup + 0x18);
@@ -1092,6 +1343,7 @@ void _BattleMarioKouraDelete(void) {
 
     evt->unitId = mario->unitId;
 }
+#pragma dont_inline reset
 
 USER_FUNC(_check_guard_koura) {
     BattleWork* wp = _battleWorkPointer;

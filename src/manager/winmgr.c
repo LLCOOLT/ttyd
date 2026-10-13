@@ -533,7 +533,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     WinMgrSelectTbl* table;
     WinMgrDesc* d;
     u16 id;
-    s32 i, j, n;
+    s32 n, i, j;
     s32 cnt, over;
     u8* tbl;
     s32* list;
@@ -1486,6 +1486,7 @@ void select_disp_mario(WinMgrEntry* entry) {
 }
 
 void select_disp_luigi(WinMgrEntry* entry) {
+    WinMgrEntry* ent;
     WinMgrSelect* sel = entry->param;
     InformantWork* jdt = &_jdt;
     u32 left, top, wd, ht;
@@ -1504,14 +1505,15 @@ void select_disp_luigi(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
 
+    ent = entry;
     if (!(wp->mEntries[sel->descriptorId[0]].flags & 4)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
-        GXSetScissor(entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
+        GXSetScissor(ent->x + 304, 274 - ent->y, ent->width, ent->height - 50);
         info = jdt->info;
         for (i = 0; i < sel->numItems; i++, info++) {
-            py = sel->field_0x1C + (zero + (entry->y - 44 - i * 24));
-            if ((f32)entry->y < py - 32.0f || (f32)(entry->y - entry->height) > py + 32.0f) {
+            py = sel->field_0x1C + (zero + (ent->y - 44 - i * 24));
+            if ((f32)ent->y < py - 32.0f || (f32)(ent->y - ent->height) > py + 32.0f) {
                 continue;
             }
             winFontInit();
@@ -1521,7 +1523,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
             if (sel->items[i].flags & 1) {
                 col = &gray;
             }
-            winFontSet((Vec){entry->x + 25, sel->field_0x1C + (zero + (entry->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
+            winFontSet((Vec){ent->x + 25, sel->field_0x1C + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
             ((char*)info->initEndPos)[info->tagEndPos] = save;
             if (sel->type == 17 && !(sel->items[i].flags & 1)) {
                 sprintf(buf, "%3d", info->unkA);
@@ -1530,7 +1532,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
                 if (sel->items[i].flags & 1) {
                     col = &gray;
                 }
-                winFontSet((Vec){entry->x + 245, sel->field_0x1C + (zero + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
+                winFontSet((Vec){ent->x + 245, sel->field_0x1C + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
             }
         }
         GXSetScissor(left, top, wd, ht);
@@ -1543,25 +1545,25 @@ void select_disp_luigi(WinMgrEntry* entry) {
                 msg = msgSearch("msg_window_title_6");
                 break;
         }
-        w = (entry->width - FontGetMessageWidth(msg)) / 2;
+        w = (ent->width - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
+        winFontSetEdge((Vec){ent->x + w, ent->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
         switch (sel->type) {
             case 17:
-                PSMTXTrans(mtx, entry->x + 268, entry->y - 18, 0.0f);
+                PSMTXTrans(mtx, ent->x + 268, ent->y - 18, 0.0f);
                 PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
                 PSMTXConcat(mtx, scale, mtx);
                 iconDispGxCol(mtx, 16, 0x211, (GXColor){0xF0, 0xF0, 0xF0, 0xFF});
-                iconDispGx(&(Vec){entry->x + 268, entry->y - 12, 0.0f}, 16, 0x18B, 0.6f);
+                iconDispGx(&(Vec){ent->x + 268, ent->y - 12, 0.0f}, 16, 0x18B, 0.6f);
                 break;
         }
         iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
-                iconDispGx(&(Vec){entry->x + entry->width * 0.5f, entry->y - 36, 1.0f}, 16, 0x1B5, 0.6f);
+                iconDispGx(&(Vec){ent->x + ent->width * 0.5f, ent->y - 36, 1.0f}, 16, 0x1B5, 0.6f);
             }
             if (sel->scrollTop != sel->numItems - 8) {
-                iconDispGx(&(Vec){entry->x + entry->width * 0.5f, entry->y - entry->height - 12, 1.0f}, 16, 0x1B6, 0.6f);
+                iconDispGx(&(Vec){ent->x + ent->width * 0.5f, ent->y - ent->height - 12, 1.0f}, 16, 0x1B6, 0.6f);
             }
         }
     }

@@ -149,8 +149,10 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
-	int i, j, n;
+	int j, n;
+	s32 i;
 	u32 dobreak;
+	s32* p;
 	u32 k;
 	s16 count;
 
@@ -173,14 +175,16 @@ void badgeShop_bottakuruGeneration(void) {
 
 	qqsort(table, 0x11, 8, bottakuruComp);
 
-	for (i = 0; i < 4; i++) { //only 4 slots
-		for (k = 0; k < 0x11; k++) {
+	i = 0;
+	do { //only 4 slots
+		for (k = 0; k < 0x11u; k++) {
 			if (table[i][0] == badge_bottakuru_table[k]) {
 				evtSetValue(NULL, i + GSW(118), k);
 			}
 		}
-	}
+	} while (++i < 4);
 }
+
 
 void badgeShop_bteresaGeneration(void) {
 	s32* ptr;
@@ -294,16 +298,15 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	}
 
 	memset(table, 0, sizeof(table));
-	count2 = 0;
-	bdsw->field_0xF8[0] = count2;
-	bdsw->field_0xF8[1] = count2;
-	bdsw->field_0xF8[2] = count2;
-	bdsw->field_0xF8[3] = count2;
-	bdsw->field_0xF8[4] = count2;
-	bdsw->field_0x10C = count2;
-	bdsw->field_0x110 = count2;
-
 	v7 = 0;
+	bdsw->field_0xF8[0] = v7;
+	bdsw->field_0xF8[1] = v7;
+	bdsw->field_0xF8[2] = v7;
+	bdsw->field_0xF8[3] = v7;
+	bdsw->field_0xF8[4] = v7;
+	bdsw->field_0x10C = v7;
+	bdsw->field_0x110 = v7;
+
 	count = 0;
 	count2 = 0;
 	for (i = 0; i < 99; i++) {
@@ -318,12 +321,14 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 			count2++;
 		}
 	}
-	count3 = 5;
-	if (count2 <= 5) {
-		count3 = count2; //less than 5 needed
+	if (count2 > 5) {
+		count3 = 5;
+	} else {
+		count3 = count2;
 	}
 	irand(0x100); //unused
-	while ((v28 = bdsw->field_0x10C) + bdsw->field_0x110 < count3) {
+	while (bdsw->field_0x10C + bdsw->field_0x110 < count3) {
+		v28 = bdsw->field_0x10C;
 		if (v28 < 3 || !v7) {
 			stopcount = irand(count);
 			count4 = 0;

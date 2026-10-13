@@ -16,7 +16,9 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 	EffectEntry* effect;
 	s32 smth;
 	effSleepData* data;
+	s32 alpha;
 	f32 radians;
+	int i;
 	f32 r;
 
 	effect = effEntry();
@@ -54,8 +56,8 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 
 void effSleepMain(EffectEntry* effect) {
 	effSleepData* data = effect->userdata;
-	Vec position;
 	int i;
+	Vec position;
 
 	position = (Vec){ data->position.x, data->position.y, data->position.z };
 	if (effect->flags & 4) {
@@ -94,27 +96,26 @@ void effSleepMain(EffectEntry* effect) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 void effSleepDisp(CameraId camId, EffectEntry* effect) {
-	s32 j;
-	effSleepData* data;
-	s32 off;
-	s32 base;
 	int i;
-	CameraEntry* cam;
-	s32 alpha;
+	s32 off;
+	f32 half;
+	f32 k;
+	f32 one;
+	f32 tau;
+	f32 x0;
 	Mtx mtx;
 	Mtx scale;
 	Mtx rot;
 	Mtx res;
 	GXTexObj texObj;
 	f32 w;
-	f32 x0;
-	f32 tau;
-	f32 k;
-	f32 half;
-	f32 one;
+	CameraEntry* cam;
+	s32 base;
+	effSleepData* data;
+	s32 alpha;
+	s32 j;
 	f32 xh;
 	f32 s0, s1;
-	int i;
 
 	data = effect->userdata;
 	cam = camGetPtr(camId);

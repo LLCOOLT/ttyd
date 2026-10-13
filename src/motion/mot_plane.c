@@ -194,7 +194,7 @@ void mot_plane(void) {
 		SFX3D(0xaf, &mp->position);
 	case 1:
 		marioMakeJumpPara();
-		{ f32 r = 0.125f; f32 m = 30.0f; f32 d; f32 cur; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = m * d; cur = MW(mp, 0x2a4, f32); MW(mp, 0x2a4, f32) = cur + r * (d - cur); }
+		{ f32 d; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = 30.0f * d; MW(mp, 0x2a4, f32) += 0.125f * (d - MW(mp, 0x2a4, f32)); }
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -227,7 +227,7 @@ void mot_plane(void) {
 	case 2:
 		animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
 		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
-		{ f32 r = 0.125f; f32 m = 30.0f; f32 d; f32 cur; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = m * d; cur = MW(mp, 0x2a4, f32); MW(mp, 0x2a4, f32) = cur + r * (d - cur); }
+		{ f32 d; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = 30.0f * d; MW(mp, 0x2a4, f32) += 0.125f * (d - MW(mp, 0x2a4, f32)); }
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -786,9 +786,9 @@ BOOL chkCollision(f32* outY) {
 	sincosf(&s0, &c0, 90.0f + MD(4, f32));
 	sincosf(&s1, &c1, MD(8, f32));
 	{
-		v = (Vec){MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32)) + 4.0f * (s1 * c0),
-		         MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32)) + -s0 * 4.0f,
-		         MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32)) + 4.0f * (c1 * c0)};
+		x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32)); y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32)); z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
+		x += s1 * c0 * 4.0f; y += -s0 * 4.0f; z += c1 * c0 * 4.0f;
+		v = (Vec){x, y, z};
 	}
 	MD(0x3c, Vec) = v;
 	sincosf(&s2, &c2, MD(0xc, f32));
@@ -811,33 +811,45 @@ BOOL chkCollision(f32* outY) {
 		v2 = (Vec){x, y, z};
 	}
 	MD(0x30, Vec) = v2;
+	x = MD(0x30, f32) - 10.0f * s1;
+	y = MD(0x34, f32);
+	z = MD(0x38, f32) - 10.0f * c1;
 	dist = 10.0f + MW(mp, 0x180, f32);
-	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, MD(0x30, f32) - 10.0f * s1, MD(0x34, f32),
-	                    MD(0x38, f32) - 10.0f * c1, s1, 0.0f, c1);
+	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y,
+	                    z, s1, 0.0f, c1);
 	if (hit != NULL) {
 		MW(mp, 0x1e0, HitEntry*) = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
+	x = MD(0x3c, f32);
+	y = MD(0x40, f32);
+	z = MD(0x44, f32);
 	dist = MW(mp, 0x180, f32);
-	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, MD(0x3c, f32), MD(0x40, f32), MD(0x44, f32), s1, 0.0f, c1);
+	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, s1, 0.0f, c1);
 	if (hit != NULL) {
 		MW(mp, 0x1e0, HitEntry*) = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
+	x = MD(0x30, f32);
+	y = MD(0x34, f32);
+	z = MD(0x38, f32);
 	MW(mp, 0x1e4, HitEntry*) = NULL;
 	dist = 10.1f;
-	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, MD(0x30, f32), MD(0x34, f32) + 10.0f, MD(0x38, f32), 0.0f, -1.0f, 0.0f);
+	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + 10.0f, z, 0.0f, -1.0f, 0.0f);
 	if (hit != NULL) {
 		MW(mp, 0x1e4, HitEntry*) = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
 	if (!ret) {
+		x = MD(0x3c, f32);
+		y = MD(0x40, f32);
+		z = MD(0x44, f32);
 		MW(mp, 0x1e4, HitEntry*) = NULL;
 		dist = 10.1f;
-		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, MD(0x3c, f32), MD(0x40, f32) + 10.0f, MD(0x44, f32), 0.0f, -1.0f, 0.0f);
+		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + 10.0f, z, 0.0f, -1.0f, 0.0f);
 		if (hit != NULL) {
 			MW(mp, 0x1e4, HitEntry*) = hit;
 			ret = TRUE;
@@ -857,8 +869,11 @@ BOOL chkCollision(f32* outY) {
 	}
 	MW(mp, 0x1f4, HitEntry*) = NULL;
 	if (MW(mp, 0x1e4, HitEntry*) == NULL) {
+		x = MD(0x30, f32);
+		y = MD(0x34, f32);
+		z = MD(0x38, f32);
 		dist = 2.0f;
-		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, MD(0x30, f32), MD(0x34, f32), MD(0x38, f32), 0.0f, 1.0f, 0.0f);
+		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, 1.0f, 0.0f);
 		if (hit != NULL) {
 			MW(mp, 0x1f4, HitEntry*) = hit;
 			ret = TRUE;

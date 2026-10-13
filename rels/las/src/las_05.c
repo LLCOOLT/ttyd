@@ -52,7 +52,7 @@ f32 cloudGetBreathDist(void);
 double sqrt(double x);
 f32 marioGetAngleKaitenHammer(void);
 extern s32 move_check_list[];
-s32 party_hit_check(f32* dir, f32 x, f32 z);
+s32 party_hit_check(f32 x, f32 z, f32* dir);
 void calc_area(s32 i, f32 x, f32 z);
 void move_check(ExtPose* pose, s32 idx);
 static void senkaron_ext_disp(CameraId camera, void* param);
@@ -166,7 +166,7 @@ static void senkaron_ext_shadow_disp(CameraId camera, void* param);
 static void senkaron_ext_disp(CameraId camera, void* param);
 static void senkaron_ext_dispent(void);
 static void senkaron_ext_main(void);
-s32 party_hit_check(f32* dir, f32 x, f32 z);
+s32 party_hit_check(f32 x, f32 z, f32* dir);
 void calc_area(s32 i, f32 x, f32 z);
 void move_check(ExtPose* pose, s32 idx);
 static void senkaron_ext_init(void);
@@ -290,8 +290,8 @@ s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
 }
 
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
-    static s32 count;
     static s32 flag;
+    static s32 count;
     f32 angle;
 
     if (!(kurokaron_move_flag & 2)) {
@@ -555,7 +555,7 @@ void calc_area(s32 i, f32 x, f32 z) {
     skwp->sk[i].area = ix + iz * 29.5f;
 }
 
-s32 party_hit_check(f32* dir, f32 x, f32 z) {
+s32 party_hit_check(f32 x, f32 z, f32* dir) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     s32 hit = 0;
     s32 active = 0;
@@ -955,7 +955,7 @@ static void senkaron_ext_main(void) {
                 {
                     f32 dir = 0.0f;
 
-                    if (party_hit_check(&dir, ep->mtx[0][3], ep->mtx[2][3])) {
+                    if (party_hit_check(ep->mtx[0][3], ep->mtx[2][3], &dir)) {
                         hit = 2;
                         push = dir;
                     }
@@ -1562,7 +1562,7 @@ USER_FUNC(party_hit) {
     s32* args = event->args;
     f32 dir;
 
-    if (party_hit_check(&dir, npc->position.x, npc->position.z) &&
+    if (party_hit_check(npc->position.x, npc->position.z, &dir) &&
         (party->currentMemberId == 2 || party->currentMemberId == 3)) {
         evtSetValue(event, args[0], 1);
     } else {

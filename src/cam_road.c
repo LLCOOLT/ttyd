@@ -781,10 +781,10 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     f32 pz, qx, qz;
     f32 lim1, lim2, l1, l2;
     f32 s, t, sgn1, sgn2, len2, len;
-    u32 flags;
-    s32 found, found2;
-    s32 i, j, k, l;
     s32 n, m, cnt;
+    s32 i, j, k, l;
+    s32 found, found2;
+    u32 flags;
     CamRoadCurveX* curve;
     CamRoadGroup* grp;
     CamRoadStrip* strip;
@@ -1097,11 +1097,11 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         if (__abs(d) <= 1) {
             return 0;
         }
-        n = a->cam->f_44 - a->cam->f_40 - 1;
-        if (__abs(d) >= n) {
+        n = a->cam->f_44 - a->cam->f_40;
+        if (n - 1 <= __abs(d)) {
             return 0;
         }
-        if (__abs(d) >= n - 1) {
+        if (n - 2 <= __abs(d)) {
             flags |= 0x20;
         }
     }

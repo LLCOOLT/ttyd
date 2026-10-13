@@ -253,7 +253,7 @@ USER_FUNC(evt_bero_get_info_length) {
 			storeme = 60.0f;
 			break;
 		default:
-			storeme = 60.0f;
+			if (1) { storeme = 60.0f; }
 			break;
 	}
 	evtSetFloat(event, args[1], storeme);
@@ -328,7 +328,119 @@ USER_FUNC(evt_bero_get_info) {
 	return EVT_RETURN_DONE;
 }
 
-extern void bero_get_position_pipe_sub(s32 id, s32 a, s32 b, s32 kind, Vec* start, Vec* end);
+extern void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
+extern void N_marioReloadMapOnBottomlessOn(void);
+extern double sin(double);
+extern double cos(double);
+
+USER_FUNC(bero_get_position_normal) {
+	s32* args = event->args;
+	MarioWork* wp = marioGetPtr();
+	s32 dir = evtGetValue(event, args[0]);
+	f32 len = evtGetFloat(event, args[1]);
+	s32* pos = (s32*)event->lwData[6];
+	const char* name = (const char*)event->lwData[3];
+	s32 angle = event->lwData[5];
+	Vec start, end;
+
+	start.x = pos[0];
+	start.y = pos[1];
+	start.z = pos[2];
+	end.x = pos[0];
+	end.y = pos[1];
+	end.z = pos[2];
+	if (pos[0] == 100000) {
+		hitObjGetPos((const char*)name, &start);
+	}
+	if (len != 0.0f) {
+		Vec tmp2, tmp;
+		f32 nz, ny, nx, dist, hz, hy, hx;
+		f32 deg;
+		f32 rad;
+		hz = hy = hx = 0.0f;
+		dist = 1000000.0f;
+		deg = 360.0f * angle * 0.125f;
+		if (dir == 1) {
+			deg += 180.0f;
+		}
+		rad = 6.2832f * deg / 360.0f;
+		tmp.y = start.y;
+		tmp.x = start.x - 30.0f * (f32)sin(rad);
+		tmp.z = start.z - 30.0f * -(f32)cos(rad);
+		dist = 1000000.0f;
+		if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f)) {
+			tmp.y = hy;
+		}
+		tmp2 = tmp;
+		tmp2.x += (30.0f + len) * (f32)sin(rad);
+		tmp2.z += (30.0f + len) * -(f32)cos(rad);
+		start = tmp;
+		end = tmp2;
+	}
+	BeroSX = start.x;
+	BeroSY = start.y;
+	BeroSZ = start.z;
+	BeroEX = end.x;
+	BeroEY = end.y;
+	BeroEZ = end.z;
+	N_marioSetBottomlessRespawnPosOnBeroEntry(end.x, end.y, end.z);
+	if (wp->currMotionId == 0x19) {
+		N_marioReloadMapOnBottomlessOn();
+	}
+	return EVT_RETURN_DONE;
+}
+
+void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
+	f32 hx, hy, hz, dist, nx, ny, nz;
+	f32 ofs;
+	hz = hy = hx = 0.0f;
+	dist = 10000.0f;
+	ofs = 20.0f;
+	switch (kind) {
+	case 6:
+		a = -a;
+		ofs = -ofs;
+	case 2:
+		if (id == 0) {
+			hitObjGetPos((const char*)name, start);
+			start->x -= ofs;
+			end->x = start->x + a;
+			end->y = start->y;
+			end->z = start->z;
+			hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, end->x, end->y, end->z, 0.0f, -1.0f, 0.0f);
+		} else {
+			hitObjGetPos((const char*)name, end);
+			end->x -= ofs;
+			start->x = end->x + a;
+			start->y = end->y;
+			start->z = end->z;
+			hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, start->x, start->y, start->z, 0.0f, -1.0f, 0.0f);
+		}
+		end->y = start->y = hy;
+		break;
+	case 9:
+		a = -a;
+	case 8:
+		if (id == 0) {
+			hitObjGetPos((const char*)name, start);
+			end->x = start->x;
+			end->y = start->y + a;
+			end->z = start->z;
+		} else {
+			hitObjGetPos((const char*)name, end);
+			start->x = end->x;
+			start->y = end->y + a;
+			start->z = end->z;
+		}
+		break;
+	case 10000:
+	default:
+		hitObjGetPos((const char*)name, start);
+		hitObjGetPos((const char*)name, end);
+		break;
+	}
+}
+
 
 USER_FUNC(bero_get_position_pipe_pure) {
 	s32* args = event->args;
@@ -341,7 +453,9 @@ USER_FUNC(bero_get_position_pipe_pure) {
 	BeroSY = kind == 8 ? start.y - 37.5f : start.y;
 	BeroSZ = start.z;
 	BeroEX = end.x;
-	BeroEY = kind == 8 ? end.y - 37.5f : end.y;
+	f32 ey = end.y;
+	if (kind == 8) ey = end.y - 37.5f;
+	BeroEY = ey;
 	BeroEZ = end.z;
 	N_marioSetBottomlessRespawnPosOnBeroEntry(BeroEX, BeroEY, BeroEZ);
 	return EVT_RETURN_DONE;
@@ -523,8 +637,79 @@ USER_FUNC(evt_bero_disppos_load) {
 	return EVT_RETURN_DONE;
 }
 
-USER_FUNC(evt_bero_get_into_info) {
+extern BeroEntry bero_null;
+extern s32 default_entevt[1];
 
+static inline s32 bero_get_kind(BeroEntry* bero) {
+	const char* dirs[8] = {"n_", "ne_", "e_", "se_", "s_", "sw_", "w_", "nw_"};
+	u32 i;
+	s32 kind = bero->kinddirArg3;
+	switch (kind) {
+	case 20000:
+		if (kind == 10000) {
+			kind = 10000;
+		} else {
+		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+			case 0:
+			case 1:
+				for (i = 0; i < 8; i++) {
+					if (!strncmp(dirs[i], bero->hitName, strlen(dirs[i]))) {
+						break;
+					}
+				}
+				break;
+			default:
+				i = 10000;
+				break;
+		}
+		kind = i;
+		}
+		break;
+	}
+	return kind;
+}
+
+USER_FUNC(evt_bero_get_into_info) {
+	s32 i;
+	BeroEntry* bero;
+	s32* evt;
+	BeroEntry** table;
+
+	for (i = 0;; i++) {
+		bero = BeroINFOARR[i];
+		if (!bero || !strcmp(gp->beroEnterName, "")) {
+			i = 0;
+			bero = &bero_null;
+			break;
+		}
+		if (!strcmp(bero->hitName, gp->beroEnterName)) break;
+	}
+	if ((gp->flags & 2) && !strcmp(gp->beroEnterName, "")) {
+		bero = BeroINFOARR[0];
+		event->lwData[1] = 0;
+		event->lwData[2] = BeroNUM;
+		event->lwData[3] = (s32)bero->hitName;
+		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[5] = bero_get_kind(bero);
+		event->lwData[6] = (s32)&bero->field_0xC;
+		evt = bero->enterEvent;
+		if (!evt) evt = default_entevt;
+		event->lwData[7] = (s32)evt;
+		event->lwData[8] = 0xFFFF0000;
+		return EVT_RETURN_DONE;
+	} else {
+		event->lwData[1] = i;
+		event->lwData[2] = BeroNUM;
+		event->lwData[3] = (s32)gp->beroEnterName;
+		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[5] = bero_get_kind(bero);
+		event->lwData[6] = (s32)&bero->field_0xC;
+		evt = bero->enterEvent;
+		if (!evt) evt = default_entevt;
+		event->lwData[7] = (s32)evt;
+		event->lwData[8] = 0xFFFF0000;
+		return EVT_RETURN_DONE;
+	}
 }
 
 extern BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
@@ -555,7 +740,6 @@ USER_FUNC(evt_bero_id_filter) {
 }
 
 
-extern s32 default_entevt[1];
 extern s32 default_outevt[1];
 
 USER_FUNC(evt_bero_get_info_num) {

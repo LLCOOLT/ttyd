@@ -145,15 +145,15 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
 }
 
 HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
+    s32 n, i;
     MarioWork* m;
     MarioWork* m2;
     HitEntry* hit;
     HitEntry* best;
     Vec zero = {0.0f, 0.0f, 0.0f};
     f32 hx, hy, hz, dist, nx, ny, nz, nv;
-    f32 h, deg, rad, ox, oz, ex, ez, fx, fz;
-    f32 px, py, pz, r2, r2b, r3, ang;
-    s32 n, i;
+    f32 h, deg, ex, ez, fx, fz, ang;
+    f32 rad, r2b, r3, bd, yh, r2, px, py, pz, ox, oz;
 
     m = marioGetPtr();
     best = NULL;
@@ -190,16 +190,16 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     case 1:
     case 2:
         n = 3;
-        r2 = 0.6f * (0.5 * MF(m, 0x1B4));
+        r2 = 0.6 * (0.5 * MF(m, 0x1B4));
         break;
     case 3:
         n = 7;
         r2 = 0.6f * (0.5f * MF(m, 0x1B4) / 3.0f);
         break;
     }
-    r3 = 3.0f * r2 - 0.05f;
-    rad = 3.1415927f * deg;
     r2b = 2.0f * r2 - 0.05f;
+    rad = 3.1415927f * deg; bd = h + range; yh = py + h;
+    r3 = 3.0f * r2 - 0.05f;
     for (i = 0; i < n; i++) {
         switch (i) {
         case 0:
@@ -237,24 +237,26 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
             oz = r3 * -(f32)cos(ang);
             break;
         }
-        dist = h + range;
-        hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px + ox, py + h, pz + oz, 0.0f, -1.0f, 0.0f);
+        dist = bd;
+        hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px + ox, yh, pz + oz, 0.0f, -1.0f, 0.0f);
         if (hit) {
+            f32 ty = ny, tx = nx, tz = nz;
             m2 = marioGetPtr();
-            if (kpa_nrmSet(m2, nz, nv = ny, nx) >= 50.0f) {
+            if (kpa_nrmSet(m2, tz, ty, tx) >= 50.0f) {
                 hit = NULL;
             }
         }
         hy = (s32)(100.0f * hy + 0.5f) / 100.0f;
         if (hit) {
+            f32 tx = nx, ty = ny, tz = nz;
             m2 = marioGetPtr();
-            MF(m, 0x214) = kpa_nrmSet(m2, nz, nv, nx);
+            MF(m, 0x214) = kpa_nrmSet(m2, tz, ty, tx);
             if (hy < py && __fabsf(hy - py) >= 2.0f) {
                 *outDepth = py - hy;
                 *outAng = angleABf(px, pz, hx, hz);
                 hit = NULL;
             } else {
-                if (nx == 0 && nz == 0) {
+                if (!nx && !nz) {
                     hy = (s32)(100.0f * hy + 0.5f) / 100.0f;
                 }
                 *outY = hy;

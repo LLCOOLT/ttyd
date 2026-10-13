@@ -246,8 +246,8 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     nsx = -sx;
     baseY = party->position.y;
     nsz = -sz;
-    len = d + range;
     probeY = baseY + d;
+    len = d + range;
     {
     Vec dir = {0.0f, -1.0f, 0.0f};
     best = NULL;
@@ -434,10 +434,10 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     if (best) {
         Vec nn;
         f32 mx, mz, dot;
-        nn = bestNrm;
         mx = sn * dist;
         mz = cs * dist;
-        dot = mx * nn.x + mz * nn.z;
+        nn = bestNrm;
+        dot = nn.x * mx + nn.z * mz;
         v.x += 0.5f * (mx - dot * nn.x);
         v.z += 0.5f * (mz - dot * nn.z);
     }
@@ -535,7 +535,8 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
     f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
     f32 d3, nz3, ny3, nx3, hz3, hy3, hx3;
-    f32 ox, oz, lx, ly, lz;
+    f32 ox, oz;
+    Vec l;
     HitEntry* hit;
     f32 best;
 
@@ -546,12 +547,12 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     best = *dist;
     {
         Vec v0 = {0.0f, 0.0f, 0.0f};
-        lx = pos->x + oz;
-        ly = pos->y;
-        lz = pos->z + ox;
-        v0.x = lx;
-        v0.y = ly;
-        v0.z = lz;
+        l.x = pos->x + oz;
+        l.y = pos->y;
+        l.z = pos->z + ox;
+        v0.x = l.x;
+        v0.y = l.y;
+        v0.z = l.z;
         t = v0;
         d0 = best;
         hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
@@ -561,12 +562,12 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v1 = {0.0f, 0.0f, 0.0f};
-        lx = pos->x - oz;
-        ly = pos->y;
-        lz = pos->z - ox;
-        v1.x = lx;
-        v1.y = ly;
-        v1.z = lz;
+        l.x = pos->x - oz;
+        l.y = pos->y;
+        l.z = pos->z - ox;
+        v1.x = l.x;
+        v1.y = l.y;
+        v1.z = l.z;
         t = v1;
         d1 = best;
         hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
@@ -576,12 +577,12 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v2 = {0.0f, 0.0f, 0.0f};
-        lx = pos->x + ox;
-        ly = pos->y;
-        lz = pos->z + oz;
-        v2.x = lx;
-        v2.y = ly;
-        v2.z = lz;
+        l.x = pos->x + ox;
+        l.y = pos->y;
+        l.z = pos->z + oz;
+        v2.x = l.x;
+        v2.y = l.y;
+        v2.z = l.z;
         t = v2;
         d2 = best;
         hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
@@ -591,12 +592,12 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v3 = {0.0f, 0.0f, 0.0f};
-        lx = pos->x - ox;
-        ly = pos->y;
-        lz = pos->z - oz;
-        v3.x = lx;
-        v3.y = ly;
-        v3.z = lz;
+        l.x = pos->x - ox;
+        l.y = pos->y;
+        l.z = pos->z - oz;
+        v3.x = l.x;
+        v3.y = l.y;
+        v3.z = l.z;
         t = v3;
         d3 = best;
         hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
@@ -605,15 +606,15 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
         }
     }
     if (hit) {
-        pos->x = lx;
-        pos->y = ly;
-        pos->z = lz;
+        pos->x = l.x;
+        pos->y = l.y;
+        pos->z = l.z;
         *dist = best;
     }
     if (!hit) {
-        pos->x = lx;
-        pos->y = ly;
-        pos->z = lz;
+        pos->x = l.x;
+        pos->y = l.y;
+        pos->z = l.z;
         *dist = 0.0f;
     }
 }

@@ -812,15 +812,14 @@ static USER_FUNC(evt_tou_get_next_match) {
     s32* args = event->args;
     BOOL reverse = evtGetValue(event, GSWF(2443));
     s32 list[32];
-    s32 num;
-    s32 rank;
     s32 i;
+    s32 rank;
+    s32 num;
 
     num = 0;
     for (i = 0; i < rank_wp->count; i++) {
-        RankEntry* entry = &rank_wp->entries[i];
-        if (!(entry->flags & RANK_HIDDEN)) {
-            list[num++] = entry->id;
+        if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
+            list[num++] = rank_wp->entries[i].id;
         }
     }
     rank = 0;
@@ -869,14 +868,14 @@ static void rankingControll(void) {
     s32 above[32];
     s32 below[32];
     s32 nBelow;
+    s32 nAbove;
+    s32 j;
     s32 i;
     s32 tmp;
     s32 idx2;
     s32 idx;
 
     s32 rank;
-    s32 nAbove;
-    s32 j;
     RankEntry* entry;
     nAbove = 0;
     nBelow = 0;

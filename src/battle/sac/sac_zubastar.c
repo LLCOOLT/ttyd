@@ -264,7 +264,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			ZSObj* b = BattleAlloc(0x50);
 			for (j = 0; j < t->n; j++) {
 				if (j == idx[0]) {
-					a->n = t->n - (idx[1] - j) + 2;
+					a->n = (t->n - idx[1]) + (j + 2);
 					b->n = idx[1] - idx[0] + 2;
 				}
 			}
@@ -441,7 +441,7 @@ USER_FUNC(zubastar_main) {
 			w->lstart = (Vec){0.0f, -240.0f, 0.0f};
 			w->lend = (Vec){0.0f, 240.0f, 0.0f};
 		}
-		bot[0] = top[0] = -96.0f;
+		top[0] = bot[0] = -96.0f;
 		i = 0;
 		n = 1;
 		for (; i < 17; i++) {
@@ -854,18 +854,12 @@ void zubastar_disp_bomb(CameraId cam, void* param) {
 		GXLoadPosMtxImm(m, 0);
 		GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, t->n);
 		for (j = 0; j < t->n; j++) {
-			f32 x = t->v[j].x;
 			f32 y = t->v[j].y;
+			f32 x = t->v[j].x;
 			GXPosition3f32(x, y, 0.0f);
 			GXTexCoord2f32((x + 96.0f) / 400.0f, (240.0f - y) / 480.0f);
 		}
 	}
-}
-
-static inline GXColor mkA(u8 a) {
-	GXColor c = {0xff, 0xff, 0xff, 0};
-	c.a = a;
-	return c;
 }
 
 static inline GXColor mkG(u8 v) {
@@ -876,17 +870,23 @@ static inline GXColor mkG(u8 v) {
 	return c;
 }
 
+static inline GXColor mkA(u8 a) {
+	GXColor c = {0xff, 0xff, 0xff, 0};
+	c.a = a;
+	return c;
+}
+
 void zubastar_disp2D(CameraId cam, void* param) {
 	ZubaStarWork* w = GetZubaStarPtr();
 	ZSCursor* cur = &w->cursor;
 	ZSLine* l;
 	s32 i;
 	if (w->gaugeState >= 5) {
-		u16 icon = 0x65 - (w->fa1 <= 3U);
+		s32 icon = (w->fa1 <= 3U) ? 0x64 : 0x65;
 		Vec pos = {0.0f, 0.0f, 0.0f};
 		pos.x = w->gx - 200.0f;
 		pos.y = 60.0f + w->gy;
-		iconDispGx(&pos, 0x10, icon, 1.0f);
+		((void (*)(Vec*, s16, s32, f32))iconDispGx)(&pos, 0x10, icon, 1.0f);
 		BattleAcDrawGauge(w->gx, w->gy, 0xb1, 0.01f * w->gauge, 4, 0x1a, 0x34, 0x4e, 0);
 	}
 	GXSetCullMode(GX_CULL_NONE);
@@ -913,7 +913,8 @@ void zubastar_disp2D(CameraId cam, void* param) {
 			a = INTPL(0, l->timer - 30, 30, 255.0f, 128.0f);
 		}
 		if (l->state == 5) {
-			GXSetChanMatColor(GX_COLOR0A0, mkG(a));
+			GXColor col = mkG(a);
+			GXSetChanMatColor(GX_COLOR0A0, col);
 			GXBegin(GX_LINES, GX_VTXFMT0, 2);
 			GXPosition3f32(l->x0, l->y0, 0.0f);
 			GXPosition3f32(l->x1, l->y1, 0.0f);

@@ -47,7 +47,7 @@ void titleMain(SequenceWork* work);
 void disp1(CameraId cameraId, void* param);
 void disp2(CameraId cameraId, void* param);
 static void pressStartGX(s32 alpha, f32 x, f32 y);
-static inline void titleLoadDemo(void);
+static void titleLoadDemo(void);
 
 const char* DbgBtlSel_GetMsgDataPtr(void) {
 	return NULL;
@@ -121,6 +121,7 @@ void L_titleInit(SequenceWork* work) {
 	camGetPtr(CAMERA_2D)->flags &= ~0x100;
 	camGetPtr(CAMERA_2D)->flags |= 0x400;
 }
+
 
 void titleMain(SequenceWork* work) {
 	switch (wp2->field_0x8) {
@@ -422,7 +423,7 @@ static void pressStartGX(s32 alpha, f32 x, f32 y) {
 	GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
 }
 
-static inline void titleLoadDemo(void) {
+static void titleLoadDemo(void) {
 	fileAsyncf(4, 0, "%s/demo.tpl", getMarioStDvdRoot());
 	animGroupBaseAsync("c_peach", 0, 0);
 	animGroupBaseAsync("c_nazo", 0, 0);

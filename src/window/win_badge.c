@@ -178,6 +178,7 @@ s32 winBadgeMain(BWin* w) {
     s32 cnt;
     s32 pages;
     s32 tab;
+    s32 mode;
 
     switch (w->state) {
     case 0:
@@ -205,7 +206,7 @@ s32 winBadgeMain(BWin* w) {
             w->state = 10;
             break;
         } else if (w->trg & 0x10) {
-            s32 mode = 3;
+            mode = 3;
             if (w->tab == 0) {
                 mode = 2;
             }
@@ -282,7 +283,7 @@ s32 winBadgeMain(BWin* w) {
             w->sel[tab]++;
             psndSFXOn(0x20035);
         } else if (w->trg & 0x10) {
-            s32 mode = 3;
+            mode = 3;
             if (w->tab == 0) {
                 mode = 2;
             }

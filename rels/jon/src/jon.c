@@ -2566,7 +2566,7 @@ USER_FUNC(evt_raster) {
 }
 
 inline s32 ia8_ofs(s32 x, s32 y) {
-    s32 off = ((x / 4) << 9) + ((y / 4) << 5);
+    s32 off = ((y / 4) << 5) + ((x / 4) << 9);
     off += ((y % 4) + ((x % 4) << 2)) * 2;
     return off;
 }
@@ -2593,8 +2593,10 @@ void raster_disp(CameraId cameraId, void* param) {
     phase = 6.2831855f * phase;
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
-            f32 v = sin(j + (gp->retraceCount / 4.0f + phase));
-            u8* p = buf + ia8_ofs(j, i);
+            f32 v;
+            u8* p;
+            p = buf + ia8_ofs(j, i);
+            v = sin(j + (gp->retraceCount / 4.0f + phase));
 
             p[0] = amp * v + 128.0f;
             p[1] = 0x80;

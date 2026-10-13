@@ -99,7 +99,6 @@ static inline f32 _cosf(f32 x) {
         x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
-        a = -a;
     }
     return a;
 }
@@ -206,11 +205,13 @@ EffectEntry* effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z) {
 static void effMObjBrokenMain(EffectEntry* effect) {
     EffMObjBrokenWork* work = effect->userdata;
     s32 type;
+    EffMObjBrokenWork* w2;
     s32 done = 0;
     s32 i;
-    s32 inBattle;
     Vec pos2;
     Vec pos = {0.0f, 0.0f, 0.0f};
+    EffMObjBrokenWork* w;
+    s32 inBattle;
 
     pos.x = work->position.x;
     pos.y = work->position.y;
@@ -219,7 +220,7 @@ static void effMObjBrokenMain(EffectEntry* effect) {
     inBattle = gp->inBattle != 0;
     type = work->type;
     if (effect->flags & 4) {
-        EffMObjBrokenWork* w = work;
+        w = work;
         for (done = 0; done < effect->count; done++, w++) {
             if (w->poseId != -1) {
                 animPoseRelease(w->poseId);
@@ -246,7 +247,7 @@ static void effMObjBrokenMain(EffectEntry* effect) {
             break;
         }
         work->position.x += work->speed * _sinf(6.2831855f * work->angle / 360.0f);
-        work->position.z += work->speed * _cosf(6.2831855f * work->angle / 360.0f);
+        work->position.z += work->speed * -_cosf(6.2831855f * work->angle / 360.0f);
         work->position.y += work->velY;
         work->velY -= work->gravity;
         if (type < 6) {
@@ -259,10 +260,10 @@ static void effMObjBrokenMain(EffectEntry* effect) {
         }
     }
     if (done >= effect->count - 1) {
-        EffMObjBrokenWork* w = effect->userdata;
-        for (type = 0; type < effect->count; type++, w++) {
-            if (w->poseId != -1) {
-                animPoseRelease(w->poseId);
+        w2 = effect->userdata;
+        for (type = 0; type < effect->count; type++, w2++) {
+            if (w2->poseId != -1) {
+                animPoseRelease(w2->poseId);
             }
         }
         effDelete(effect);
@@ -374,22 +375,24 @@ static void rendermodeFunc(s32 arg) {
 }
 
 static void effMObjBrokenDisp2(CameraId cameraId, EffectEntry* effect) {
+    s32 off;
     EffMObjBrokenWork* work;
+    EffMObjBrokenWork* top;
     s32 i;
     s32 pass;
-    s32 off;
     Mtx mT, mS, mR, mBase;
     GXColor color;
 
-    work = effect->userdata;
+    top = effect->userdata;
     camGetPtr(cameraId);
-    PSMTXTrans(mT, work->position.x, work->position.y, work->position.z);
+    PSMTXTrans(mT, top->position.x, top->position.y, top->position.z);
     PSMTXRotRad(mR, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
-    PSMTXScale(mS, work->scale, work->scale, work->scale);
+    PSMTXScale(mS, top->scale, top->scale, top->scale);
     PSMTXConcat(mT, mR, mT);
     PSMTXConcat(mT, mS, mBase);
     for (pass = 0; pass < 2; pass++) {
-        work = (EffMObjBrokenWork*)effect->userdata + 1;
+        work = effect->userdata;
+        work++;
         off = (1 - pass) * 4;
         for (i = 1; i < effect->count; i++, work++) {
             if (work->poseId == -1) {

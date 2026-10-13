@@ -237,13 +237,13 @@ u8 diamond_4_color0_tbl[] = { 0xD7, 0x18, 0x35, 0xFF, 0x9F, 0x00, 0x2D, 0xFF, 0x
 u8 diamond_5_color0_tbl[] = { 0x4D, 0x71, 0xB4, 0xFF, 0x3B, 0x63, 0x9A, 0xFF, 0x6E, 0x8F, 0xC4, 0xFF, 0x43, 0x45, 0x88, 0xFF, 0x4D, 0x71, 0xB4, 0xFF, 0x3B, 0x63, 0x9A, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 u8 diamond_6_color0_tbl[] = { 0xF0, 0x76, 0x19, 0xFF, 0x7E, 0x2D, 0x15, 0xFF, 0xB5, 0x41, 0x1E, 0xFF, 0x98, 0x36, 0x19, 0xFF, 0xD1, 0x67, 0x16, 0xFF, 0xF0, 0x8A, 0x08, 0xFF };
 __declspec(section ".data") u64 lbl_803AC080 = 0xBF8000003F800000ULL;
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000ULL;
+__declspec(section ".data") static u64 negone_one_374 = 0xBF8000003F800000ULL;
 __declspec(section ".data") u64 lbl_803AC090 = 0x3F800000BF800000ULL;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000ULL;
+__declspec(section ".data") static u64 one_negone_373 = 0x3F800000BF800000ULL;
 __declspec(section ".data") u64 lbl_803AC0A0 = 0xBF8000003F800000ULL;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000ULL;
+__declspec(section ".data") static u64 negone_one_360 = 0xBF8000003F800000ULL;
 __declspec(section ".data") u64 lbl_803AC0B0 = 0x3F800000BF800000ULL;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000ULL;
+__declspec(section ".data") static u64 one_negone_359 = 0x3F800000BF800000ULL;
 s16 diamond_1_vertex_tbl[] = { 18386, 5751, 0, 7281, 9135, 0, 0, 19109, 0, -7281, 9135, 0, -18386, 5751, 0, -11781, -4714, 0, -11363, -15863, 0, 0, -13273, 0, 11363, -15863, 0, 11781, -4714, 0, 6676, 1460, -6799, 0, 6311, -6799, -6676, 1460, -6799, -4126, -6387, -6799, 4126, -6387, -6799, 6676, 1460, 6799, 0, 6311, 6799, -6676, 1460, 6799, -4126, -6387, 6799, 4126, -6387, 6799, 18629, 5827, 0, 7377, 9256, 0, 0, 19362, 0, -7377, 9256, 0, -18629, 5827, 0, -11937, -4776, 0, -11513, -16072, 0, 0, -13449, 0, 11513, -16072, 0, 11937, -4776, 0, 6764, 1479, -6889, 0, 6394, -6889, -6764, 1479, -6889, -4180, -6472, -6889, 4180, -6472, -6889, 6764, 1479, 6889, 0, 6394, 6889, -6764, 1479, 6889, -4180, -6472, 6889, 4180, -6472, 6889, 0, 0, 0, 0, 0, 0, 0, 0 };
 s8 diamond_1_normal_tbl[] = { 0, 28, 57, 25, 35, 47, 27, 9, 57, 0, 30, 56, -27, 9, 57, -25, 35, 47, -28, 10, 56, -17, -23, 57, -41, -12, 47, -19, -25, 55, 17, -23, 57, 0, -42, 47, 19, -25, 55, 41, -12, 47, 28, 10, 56, 27, 37, -44, 0, 28, -57, 26, 8, -57, 0, 30, -56, 34, 25, -47, -27, 37, -44, -26, 8, -57, -28, 10, -56, -12, 41, -47, -43, -14, -45, -16, -22, -57, -19, -25, -55, -42, -1, -47, 0, -44, -45, 16, -22, -57, 19, -25, -55, -9, -41, -47, 43, -14, -45, 28, 10, -56, 36, -22, -47, 42, -1, -47, 9, -41, -47, -36, -22, -47, -34, 25, -47, 12, 41, -47, 0, 0, 0, 0, 0, 0, 0, 0 };
 s16 diamond_1_texcoord0_tbl[] = { 4505, 2867, 3276, 4505, 3276, -1228, 4915, -409, 4915, 2457, 1228, 0, 1638, 1228, 8192, 1638, 3276, 4096, 7372, 2867, 7782, 0, 5324, 2457, 3276, 2048, 3276, 2867, 1638, 5734, 1228, 3276, 13107, 4096, 15974, 9011, 11059, 3686, 16384, 3276, 10649, 8192, 10649, 6445, 10649, 0, 8601, 1229, 8601, 8192, 8601, 0, 10240, 3276, 9420, 3276, 11468, 4096, 15155, 5734, 14336, 7782, 16384, 4096, 11878, 4096, 12288, 3276, 9420, 10649, 10649, 2457, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -543,9 +543,9 @@ void effStarStoneMain(EffectEntry* effect) {
             ((f32*)w->dust->userdata)[2] = -1000.0f;
             ((f32*)w->dust->userdata)[3] = 0.0f;
         }
-    }
-    if (w->state < 3 && cam == 4) {
-        U_shadowSetMode(shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale), w->a);
+        if (w->state < 3 && cam == 4) {
+            U_shadowSetMode(shadowEntry(w->position.x, w->position.y, w->position.z, 8.0f * w->scale), w->a);
+        }
     }
     if (!(w->flags & 0x20)) {
         switch (type) {
@@ -560,6 +560,7 @@ void effStarStoneMain(EffectEntry* effect) {
     }
 }
 
+#define LOOPK(tbl, sz, n) k = 0; dq = tbl; sq = sz; for (; k < n##U; k++, sq++, dq++) { GXCallDisplayList(*dq, *sq << 5); }
 void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     Mtx m;
     Mtx s;
@@ -571,6 +572,9 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     u8** dp;
     u8* sp;
     s32 i;
+    u8* sq;
+    u8** dq;
+    s32 k;
 
     DISP_START(w)
     PSMTXTrans(m, w->position.x, w->position.y, w->position.z);
@@ -613,20 +617,20 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     BLEND_STATE()
     if (type == 0) {
         VTX_SETUP(diamond_1_vertex_tbl, diamond_1_normal_tbl, CLR_ARRAY, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13)
-        LOOP1(diamond_1_dl_0_tbl, diamond_1_dl_0_size_tbl, 34)
+        LOOPK(diamond_1_dl_0_tbl, diamond_1_dl_0_size_tbl, 34)
     } else {
         VTX_SETUP(diamond_7_vertex_tbl, diamond_7_normal_tbl, CLR_ARRAY, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13)
-        LOOP1(diamond_7_dl_0_tbl, diamond_7_dl_0_size_tbl, 34)
+        LOOPK(diamond_7_dl_0_tbl, diamond_7_dl_0_size_tbl, 34)
     }
     effGetTexObj(0x2d, &tex);
     GXLoadTexObj(&tex, 0);
     BLEND_STATE()
     if (type == 0) {
         VTX_SETUP(diamond_1_vertex_tbl, diamond_1_normal_tbl, CLR_NONE, diamond_1_color0_tbl, diamond_1_texcoord0_tbl, 13)
-        LOOP1(diamond_1_dl_1_tbl, diamond_1_dl_1_size_tbl, 34)
+        LOOPK(diamond_1_dl_1_tbl, diamond_1_dl_1_size_tbl, 34)
     } else {
         VTX_SETUP(diamond_7_vertex_tbl, diamond_7_normal_tbl, CLR_ARRAY, diamond_7_color0_tbl, diamond_7_texcoord0_tbl, 13)
-        LOOP1(diamond_7_dl_1_tbl, diamond_7_dl_1_size_tbl, 33)
+        LOOPK(diamond_7_dl_1_tbl, diamond_7_dl_1_size_tbl, 33)
     }
 }
 
@@ -680,3 +684,8 @@ void effStarStoneDraw(CameraId cameraId, EffectEntry* effect) {
         break;
     }
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803ACB0C_data[1] = {0};
+__declspec(section ".sdata") u32 gap_07_804159B4_sdata[1] = {0};
+#pragma force_active reset
