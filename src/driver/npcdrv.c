@@ -1049,7 +1049,7 @@ void npcMoveG(NpcEntry* npc) {
             npc->position.y += dy;
         } else {
             h = 0.8f * npc->height;
-            dist = (f32)__fabs(dy) + h;
+            dist = h + (f32)__fabs(dy);
             if ((npc->field_0x300 = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &dist, &hitNX, &hitNY, &hitNZ,
                                               npc->position.x, npc->position.y + h, npc->position.z, 0.0f,
                                               -1.0f, 0.0f)) == NULL) {
@@ -2297,9 +2297,9 @@ BOOL npcCheckInterrupt(NpcEntry* npc) {
 }
 
 void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
+    s32 i;
     s32 num;
     NpcBattleInfo* info;
-    s32 i;
     NpcBattleSelect* select;
     BattleUnitSetup* unit;
     ItemDropData* table;
@@ -2315,7 +2315,8 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
             case 0:
             default:
                 for (i = 0; i < 16; i++) {
-                    info->field_B0[i] = (u8)setup->field_20[i][0] + irand(setup->field_20[i][1] - setup->field_20[i][0] + 1);
+                    s8* r = setup->field_20[i];
+                    info->field_B0[i] = (u8)r[0] + irand(r[1] - r[0] + 1);
                 }
                 break;
             case 1:

@@ -874,7 +874,7 @@ static USER_FUNC(cam_r) {
 
     cam = camGetPtr(4);
     cam->rollAngle += 3.0f;
-    s = (f32)sin((f32)gp->retraceCount / 10.0f);
+    s = (f32)sin((f32)(u32)gp->retraceCount / 10.0f);
     PSVECSubtract(&cam->cameraAt, &cam->cameraPos, &v);
     PSVECScale(&v, &v, 0.2f * s);
     cam->viewOffset.x = v.x;

@@ -746,10 +746,10 @@ static void disp_2D(CameraId cam, void* param) {
     Mtx m;
     Vec s;
     GXColor col[4];
+    f32 frac;
     f32 x;
     f32 y;
     f32 d;
-    f32 frac;
     u8 r, g, b, a;
 
     if (w->state >= 2 && w->state <= 7) {
@@ -782,7 +782,7 @@ static void disp_2D(CameraId cam, void* param) {
         } else {
             r = 0xF0; g = 0xA0; b = 0xA0; a = 0xFF;
         }
-        btlDispGXQuads2DRasta(x, 8.0f + y, x + frac * 80.0f, y - 8.0f, r, g, b, a);
+        btlDispGXQuads2DRasta(x, 8.0f + y, x + 80.0f * frac, y - 8.0f, r, g, b, a);
         t = w->t24 % 12;
         if (t >= 0 && t <= 5) {
             PSMTXScale(m, 0.5f, 0.5f, 0.5f);
@@ -827,7 +827,7 @@ static void disp_2D(CameraId cam, void* param) {
         } else {
             r = 0xA0; g = 0xA0; b = 0xF0; a = 0xFF;
         }
-        btlDispGXQuads2DRasta(x, 8.0f + y, x + frac * 80.0f, y - 8.0f, r, g, b, a);
+        btlDispGXQuads2DRasta(x, 8.0f + y, x + 80.0f * frac, y - 8.0f, r, g, b, a);
         t = w->t28 % 12;
         if (t >= 0 && t <= 5) {
             PSMTXScale(m, 0.5f, 0.5f, 0.5f);
@@ -883,14 +883,14 @@ static void disp_3D_alpha(CameraId cam, void* param) {
     for (i = 0; i < 9; i++) {
         o = &w->obj[i];
         if (o->kind >= 1 && o->kind <= 9) {
-            f32 c;
             f32 a;
+            f32 c;
             switch (o->type) {
             case 0:
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
+                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
@@ -906,7 +906,7 @@ static void disp_3D_alpha(CameraId cam, void* param) {
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
+                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
@@ -923,7 +923,7 @@ break;
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, o->scale.x, o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = o->rot.y * 2.0f * 3.141592f / 360.0f;
+                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {

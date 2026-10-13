@@ -49,8 +49,7 @@ s32 ac_stickkeepleft_ok_frame[7] = {80, 70, 60, 40, 20, 10, 5};
 static void actionCommandDisp(f32 x, f32 y, s32 unused);
 
 s32 battleAcMain_StickKeepLeft(BattleWork* work) {
-    const char* sfxPi;
-    const char* sfxPone;
+    const char* sfx[2];
     SklWork* cw;
     SklDisp* disp;
     s32 loop;
@@ -74,8 +73,8 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
             SKL_P(work)->endFlag = 0;
         }
     }
-    sfxPi = "SFX_AC_PI1";
-    sfxPone = "SFX_AC_PONE1\0\0\0";
+    sfx[0] = "SFX_AC_PI1";
+    sfx[1] = "SFX_AC_PONE1\0\0\0";
     do {
         loop = 0;
         if (SKL_P(work)->endFlag != 0) {
@@ -160,11 +159,11 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                     j = cw->idx - 2;
                     if (j < SKL_P(work)->count - 1) {
                         if (cw->sfx[j] == -1) {
-                            cw->sfx[j] = psndSFXOn(sfxPi);
+                            cw->sfx[j] = psndSFXOn(sfx[0]);
                         }
                     } else {
                         if (cw->sfx[j] == -1) {
-                            cw->sfx[j] = psndSFXOn(sfxPone);
+                            cw->sfx[j] = psndSFXOn(sfx[1]);
                             SKL_P(work)->sfxFlag = 1;
                         }
                     }
@@ -302,12 +301,12 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
     f32 spacing;
     f32 yy;
     f32 sp2;
-
     char n1[8] = "_AcSkl1";
     char n2[8] = "_AcSkl2";
     char n3[8] = "_AcSkl3";
     char n4[8] = "_AcSkl4";
     char n5[8] = "_AcSkl5";
+
     camGetPtr(8);
     count = SKL_P(work)->count;
     idx = SKL_W(work)->idx - 1;

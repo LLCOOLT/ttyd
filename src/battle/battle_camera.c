@@ -155,16 +155,16 @@ void battleCameraMain(void) {
     strcpy(name, "\202\251\202\337\202\347\201\100\202\251\202\361\202\253\202\341\202\255");
     break;
   case 7:
-    unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-    if (unit == NULL) {
+    unit2 = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
+    if (unit2 == NULL) {
       btl_camera_set_mode(0, 0);
       break;
     }
     BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
-    BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    ofs = (BtlUnit_GetHeight(unit) - 50.0f) / 2.0f;
+    BtlUnit_GetPos(unit2, &pos.x, &pos.y, &pos.z);
+    ofs = (BtlUnit_GetHeight(unit2) - 50.0f) / 2.0f;
     pos.y += ofs;
-    w = BtlUnit_GetWidth(unit) - 24.0f;
+    w = BtlUnit_GetWidth(unit2) - 24.0f;
     if (w < 0.0f) {
       w = 0.0f;
     }
@@ -172,7 +172,7 @@ void battleCameraMain(void) {
     zz -= 1.5f * w;
     ofs = -zz / 9.0f;
     y = pos.y;
-    if (y > 100.0f) {
+    if (pos.y > 100.0f) {
       y = 100.0f;
     }
     if (pos.y < 0.0f) {
@@ -280,7 +280,7 @@ void battleCameraMain(void) {
     zz -= 1.5f * w;
     ofs = -zz / 9.0f;
     y = pos.y;
-    if (y > 100.0f) {
+    if (pos.y > 100.0f) {
       y = 100.0f;
     }
     if (pos.y < 0.0f) {
@@ -785,7 +785,6 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
 
 USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   s32* args = event->args;
-  BattleUnitPart* part;
   BattleUnit* u;
   BattleWork* wp;
   s32 pri, unit, parts, unit2, parts2;

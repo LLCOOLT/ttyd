@@ -18,6 +18,9 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     s32 half;
     s32 offset;
     s32 pass;
+    f32 lo;
+    f32 hi;
+    f32 sp;
     s32 i;
 
     cam = camGetCurPtr();
@@ -74,8 +77,9 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    //-24.0f
-
+    sp = 32.0f;
+    lo = -24.0f;
+    hi = 24.0f;
     sprintf((char*)buf, "%d", number);
     len = strlen((char*)buf);
     half = len / 2;
@@ -117,33 +121,33 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
             GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         }
         for (i = 0; i < len; i++) {
-            PSMTXTrans(posMtx, 32.0f * (f32)(half - i) - (f32)offset, (f32)offset, 0.0f);
+            PSMTXTrans(posMtx, sp * (f32)(half - i) - (f32)offset, (f32)offset, 0.0f);
             PSMTXConcat(mtx, posMtx, posMtx);
             PSMTXConcat(cam->view, posMtx, posMtx);
             GXLoadPosMtxImm(posMtx, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
             if (buf[len - 1 - i] == '-') {
-                PSMTXScale(scaleMtx, 0.09090909f, 1.0f, 1.0f);
+                PSMTXScale(scaleMtx, 1.0f / 11.0f, 1.0f, 1.0f);
                 PSMTXTrans(posMtx, 10.0f, 0.0f, 0.0f);
                 PSMTXConcat(scaleMtx, posMtx, posMtx);
                 GXLoadTexMtxImm(posMtx, GX_TEXMTX0, GX_MTX2x4);
             } else {
-                PSMTXScale(scaleMtx, 0.09090909f, 1.0f, 1.0f);
+                PSMTXScale(scaleMtx, 1.0f / 11.0f, 1.0f, 1.0f);
                 PSMTXTrans(posMtx, (f32)(buf[len - 1 - i] - '0'), 0.0f, 0.0f);
                 PSMTXConcat(scaleMtx, posMtx, posMtx);
                 GXLoadTexMtxImm(posMtx, GX_TEXMTX0, GX_MTX2x4);
             }
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(-24.0f, 24.0f, 0.0f);
+            GXPosition3f32(lo, hi, 0.0f);
             GXColor4u8(top.r, top.g, top.b, top.a);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(24.0f, 24.0f, 0.0f);
+            GXPosition3f32(hi, hi, 0.0f);
             GXColor4u8(top.r, top.g, top.b, top.a);
             GXTexCoord2f32(1.0f, 0.0f);
-            GXPosition3f32(24.0f, -24.0f, 0.0f);
+            GXPosition3f32(hi, lo, 0.0f);
             GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(-24.0f, -24.0f, 0.0f);
+            GXPosition3f32(lo, lo, 0.0f);
             GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
             GXTexCoord2f32(0.0f, 1.0f);
         }

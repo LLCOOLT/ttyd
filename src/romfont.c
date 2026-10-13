@@ -258,14 +258,15 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
         GXLoadTexObj(&texObj, GX_TEXMAP0);
 
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3s16(curX, curY + 24, 0);
+        { s16 x2 = (s16)curX + 24; s16 y2 = (s16)curY + 24;
+        GXPosition3s16(curX, y2, 0);
         GXTexCoord2s16(0, 0);
-        GXPosition3s16((s16)curX + 24, curY + 24, 0);
+        GXPosition3s16(x2, y2, 0);
         GXTexCoord2s16(1, 0);
-        GXPosition3s16((s16)curX + 24, curY, 0);
+        GXPosition3s16(x2, curY, 0);
         GXTexCoord2s16(1, 1);
         GXPosition3s16(curX, curY, 0);
-        GXTexCoord2s16(0, 1);
+        GXTexCoord2s16(0, 1); }
         GXEnd();
 
         curX += glyph->width;
@@ -273,15 +274,15 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
 }
 
 s32 romFontGetWidth(const char* message) {
+    RomFontChar* glyph;
     s32 width = 0;
     s32 i = 0;
     s32 max = 0;
-    RomFontChar* glyph;
 
     for (;;) {
         u32 c = message[i];
-        u16 c16 = *(u16*)&message[i];
-
+        u32 c16 = *(u16*)&message[i];
+        
         if (c >= 0x20 && c < 0x80) {
             glyph = romFontFindChar(c & 0xFFFF);
             i += 1;

@@ -103,7 +103,10 @@ void effKemuri6Main(EffectEntry* effect) {
         }
         disp = TRUE;
         work->angle = reviseAngle(12.0f + work->angle);
-        work->scaleX = 0.1f * (f32)sin((6.2831855f * work->angle) / 360.0f) + work->baseX;
+        {
+            f32 s = (f32)sin((6.2831855f * work->angle) / 360.0f);
+            work->scaleX = 0.1f * s + work->baseX;
+        }
         work->scaleY = 0.1f * (f32)cos((6.2831855f * work->angle) / 360.0f) + work->baseY;
         if (work->type == 0 && work->timer > 4 && work->timer <= 5 && marioGetPtr()->currMotionId == 0) {
             work->timer++;

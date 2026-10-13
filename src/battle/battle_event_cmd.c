@@ -28,9 +28,8 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) { //TODO: regalloc
     s32* args = event->args;
-    s32 index;
+    s32 index = args[0];
     s32 flags = args[1];
-    index = args[0];
     if (flags & _battleWorkPointer->flags) {
         evtSetValue(event, index, TRUE);
     }
@@ -298,7 +297,7 @@ USER_FUNC(btlevtcmd_SetPos) {
     BattleUnit* unit;
     s32 btlId;
     f32 x, y, z, currX, currY, currZ;
-    s32 indexX, indexY, indexZ, id;
+    s32 id, indexZ, indexY, indexX;
 
     btlId = evtGetValue(event, args[0]);
 
@@ -2579,7 +2578,9 @@ USER_FUNC(btlevtcmd_OffToken) {
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    unit->mTokenFlags &= ~args[1];
+    {
+        unit->mTokenFlags = ~args[1] & unit->mTokenFlags;
+    }
     return EVT_RETURN_DONE;
 }
 
@@ -3334,7 +3335,7 @@ USER_FUNC(btlevtcmd_EllipseMovePosition) {
 /* movers end (half_B) */
 
 USER_FUNC(btlevtcmd_MoveDirectionAdd) {
-    s32 btlId, id, index, value, dir;
+    s32 btlId, id, value, dir, index;
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;

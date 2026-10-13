@@ -46,8 +46,8 @@ typedef struct DetWork {
 
 
 void _btlSamplingEnemy(DetWork* d) {
-    s32 i, j, k;
     s32 n = 0;
+    s32 j, k, i;
     DetTarget* t = d->t;
     BattleWork* wp = _battleWorkPointer;
 

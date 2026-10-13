@@ -225,7 +225,6 @@ void effToikiMain(EffectEntry* effect) {
 }
 
 void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
-    u32 i;
     EffToikiWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     s32 type = work->type;
@@ -234,7 +233,9 @@ void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx rot;
     Mtx scale;
-
+    u8* sz;
+    u8** dl;
+    u32 i;
 
     effGetTexObj(0x5C, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
@@ -276,7 +277,9 @@ void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
     GXSetArray(GX_VA_TEX0, queen_toiki_texcoord0_tbl, 4);
-    for (i = 0; i < 14; i++) {
-        GXCallDisplayList(queen_toiki_dl_0_tbl[i], queen_toiki_dl_0_size_tbl[i] << 5);
+    {
+        for (sz = queen_toiki_dl_0_size_tbl, dl = queen_toiki_dl_0_tbl, i = 0; i < 14; i++, sz++, dl++) {
+            GXCallDisplayList(*dl, *sz << 5);
+        }
     }
 }

@@ -330,9 +330,9 @@ void badge_disp(BWin* w, f32 xo, f32 yo);
 void winBadgeDisp(s32 camId, BWin* w, s32 n) {
     GXColor white = {255, 255, 255, 255};
     GXColor black = {0, 0, 0, 255};
-    PouchData* pouch = pouchGetPtr();
     s32 i;
     s32 off;
+    PouchData* pouch = pouchGetPtr();
     f32 c;
     f32 b;
     f32 a;

@@ -131,6 +131,8 @@ void marioHitCheckWidth(void) {
         v = MF(w, 0x1bc, f32);
         if (v > 6.0f) {
             f32 t = v - 1.0f;
+            if (1) {
+            }
             MF(w, 0x1bc, f32) = t;
             if (t < 6.0f) {
                 MF(w, 0x1bc, f32) = 6.0f;
@@ -1363,9 +1365,9 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     Vec outPos, outNrm;
     f32 dist;
     f32 hh;
-    f32 sx, sz;
-    f32 x, z;
     f32 a, ang;
+    f32 x, z;
+    f32 sx, sz;
     HitEntry* hit;
     s32 i;
     MarioWork* w = marioGetPtr();
@@ -1379,9 +1381,8 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * sx);
     sz = cos(a);
     sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -sz);
-    a = *h;
-    dd = a + dd;
-    hh = 0.5f * a;
+    dd = *h + dd;
+    hh = 0.5f * *h;
     *h = -1.0f;
     for (i = 0; i < 5; i++) {
         if (i == 0) {

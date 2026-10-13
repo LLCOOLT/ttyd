@@ -38,12 +38,12 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
     s32 loop;
     s32 autoCmd = 0;
-    s32 d;
     s32 ok;
-    s32 i;
+    s32 d;
+    s32 off;
     s32 tm;
     s32 n;
-    s32 off;
+    s32 i;
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCmd = 1;
     }
@@ -187,9 +187,9 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 ac->mAcState = 1003;
                 break;
             case 1003:
-                n = lw->count - 1; if (n >= 0) { u8* tbl; off = 0; tbl = (u8*)ac_lstrckeep_iconname;
-                for (i = 0; i <= n; i++) {
-                    iconDelete(*(const char**)(tbl + off)); off += 4;
+                n = lw->count - 1; if (n >= 0) {
+                for (off = 0, i = 0; i <= n; i++, off += 4) {
+                    iconDelete(ac_lstrckeep_iconname[off >> 2]);
                 } }
                 ac->mAcState = 1004;
             case 1004:

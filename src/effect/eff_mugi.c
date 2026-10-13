@@ -46,6 +46,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	EffectEntry* effect;
 	effMugiKemuriData* data;
 	s32 i;
+	f32 rad;
 
 	effect = effEntry();
 	effect->type = "MugiKemuri\0\0\0\0\0";
@@ -76,11 +77,9 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 		data->jy = 0.0f;
 		data->ky = 0.0f;
 		data->speed = -3.9f;
-		{
-			f32 rad = 6.2831855f * reviseAngle(data->rot.y) / 360.0f;
-			data->dirX = (f32)sin(rad);
-			data->dirZ = (f32)cos(rad);
-		}
+		rad = 6.2831855f * reviseAngle(data->rot.y) / 360.0f;
+		data->dirX = (f32)sin(rad);
+		data->dirZ = (f32)cos(rad);
 		data->poseId = -1;
 	}
 	return effect;
@@ -201,10 +200,10 @@ void effMugiKemuriMain(EffectEntry* effect) {
 		}
 	}
 	if (!alive) {
-		data = effect->userdata;
-		for (i = 0; i < effect->count; i++, data++) {
-			if (data->poseId != -1) {
-				animPoseRelease(data->poseId);
+		p = effect->userdata;
+		for (i = 0; i < effect->count; i++, p++) {
+			if (p->poseId != -1) {
+				animPoseRelease(p->poseId);
 			}
 		}
 		effDelete(effect);
@@ -365,5 +364,6 @@ void effMugiKemuri2Disp(CameraId camId, void* param) {
 		}
 	}
 }
+
 
 const double effMugi_dbl = 0.005;

@@ -271,17 +271,17 @@ void effMahojinMain(EffectEntry* effect) {
 
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     MapWork* map;
-    EffMahojinWork* p;
+    s32 alpha;
     s32 i, j, k, n;
     EffMahojinWork* work = effect->userdata;
     s32 pass;
-    s32 alpha;
-    u16 flags;
 
     Mtx mtx;
-    f32* zp;
     f32 z[16];
     s32 idx[16];
+    s32* ip;
+    f32* zp;
+    u16 flags;
 
     camGetPtr(cameraId);
     alpha = work->alpha;
@@ -322,7 +322,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         map->entries[0].flags &= ~1;
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         for (k = 0; k < effect->count; k++) {
-            p = &work[idx[k]];
+            EffMahojinWork* p = &work[idx[k]];
             if (pass == 1 && p->arg != NULL) {
                 p->func(cameraId, p->arg);
             }

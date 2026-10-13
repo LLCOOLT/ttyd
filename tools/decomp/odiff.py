@@ -131,6 +131,13 @@ if r.returncode or not os.path.exists(dj):
     cleanup()
     die('objdiff-cli failed:\n' + (r.stdout + r.stderr)[-3000:])
 D = json.load(open(dj, encoding='utf-8'))
+# second pass with the progress report's scoring (relocation targets ignored): 'report' per fn
+REP = {}
+r2 = subprocess.run([OBJDIFF, '--no-color', '-L', 'error', 'diff', '-1', target, '-2', ours, '-c', 'functionRelocDiffs=none',
+                     '-o', dj + '.rep'], capture_output=True, text=True, encoding='utf-8', errors='replace')
+if not r2.returncode and os.path.exists(dj + '.rep'):
+    REP = {s['name']: float(s.get('match_percent', 0.0)) for s in json.load(open(dj + '.rep', encoding='utf-8'))['left']['symbols']
+           if s.get('kind') == 'SYMBOL_FUNCTION' and s.get('target_symbol') is not None}
 cleanup()
 
 SIDES = ('left', 'right')   # left = target, right = ours
@@ -198,12 +205,25 @@ for name, d in secs.items():
 
 # ---- functions --------------------------------------------------------------------------------
 Lsyms, Rsyms = IDX['left'][0], IDX['right'][0]
+def exact_pct(L, R):
+    """% of instruction rows with no diff of any kind (args/relocs included); 100.0 only for a byte-exact fn."""
+    li, ri = L.get('instructions', []), R.get('instructions', [])
+    n = max(len(li), len(ri))
+    if not n:
+        return None
+    ok = sum(1 for k in range(n) if k < len(li) and k < len(ri)
+             and not li[k].get('diff_kind') and not ri[k].get('diff_kind'))
+    return round(100.0 * ok / n, 4)
+
+
 funcs = []
 for s in Lsyms:
     if s.get('kind') == 'SYMBOL_FUNCTION':
         t = s.get('target_symbol')
         funcs.append({'name': s['name'], 'size': i0(s.get('size')),
                       'match': float(s.get('match_percent', 0.0)) if t is not None else None,
+                      'exact': exact_pct(s, Rsyms[t]) if t is not None else None,
+                      'report': REP.get(s['name']) if t is not None else None,
                       'ours': Rsyms[t]['name'] if t is not None else None})
 unpaired = {'target': [], 'ours': []}
 for side, key in (('left', 'target'), ('right', 'ours')):

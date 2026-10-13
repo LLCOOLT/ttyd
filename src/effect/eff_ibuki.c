@@ -48,7 +48,7 @@ static u8 ibuki_dl_0_3[] = { 0x98, 0x00, 0x06, 0x0D, 0x00, 0x01, 0x0D, 0x0D, 0x0
 static s8 ibuki_normal_tbl[] = { 0, 0, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 static u8 ibuki_color0_tbl[] = { 0xFF, 0xFF, 0xFF, 0x00, 0xFF, 0xFF, 0xFF, 0x66, 0xFF, 0xFF, 0xFF, 0x4C, 0xFF, 0xFF, 0xFF, 0x7F };
 static u8* ibuki_dl_0_tbl[] = { ibuki_dl_0_0, ibuki_dl_0_1, ibuki_dl_0_2, ibuki_dl_0_3 };
-static u8 ibuki_dl_0_size_tbl[] = { 2, 2, 2, 2 };
+static u8 ibuki_dl_0_size_tbl[8] = { 2, 2, 2, 2 };
 
 EffectEntry* effIbukiEntry(s32 type, s32 life, f32 x, f32 y, f32 z) {
     s32 delay;
@@ -204,6 +204,7 @@ void effIbukiMain(EffectEntry* effect) {
 
 void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
+u8* sz; u8** dl;
     EffIbukiWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;
@@ -284,8 +285,8 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX1, GX_INDEX8);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_S16, 14);
     GXSetArray(GX_VA_TEX1, ibuki_texcoord1_tbl, 4);
-    for (i = 0; (u32)i < 4; i++) {
-        GXCallDisplayList(ibuki_dl_0_tbl[i], ibuki_dl_0_size_tbl[i] * 32);
+    for (i = 0, sz = ibuki_dl_0_size_tbl, dl = ibuki_dl_0_tbl; (u32)i < 4; i++, sz++, dl++) {
+        GXCallDisplayList(*dl, *sz * 32);
     }
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);

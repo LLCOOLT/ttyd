@@ -200,7 +200,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Vec v;
     f32 scl;
-    f32 zero;
+    f32 zero = 0.0f;
     f32 rad;
     f32 dx;
     f32 dy;
@@ -220,8 +220,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     work = effect->userdata;
     type = work->type;
     scl = work->scale;
-    zero = 0.0f;
-    k = 0;
+
 
 
     GXSetTevColor(GX_TEVREG0, (GXColor){work->colorR, work->colorG, work->colorB, work->alpha});
@@ -229,7 +228,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     vtx = p;
-    for (i = 0; i < 12; i++) {
+    for (k = 0, i = 0; i < 12; i++) {
         if (i == 0 || i == 0) {
             ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
         } else if (i != 11 && work->delay[i] == 0) {

@@ -91,7 +91,7 @@ extern BattleWeapon badgeWeapon_Charge;
 extern BattleWeapon badgeWeapon_ChargeP;
 extern BattleWeapon badgeWeapon_SuperCharge;
 extern BattleWeapon badgeWeapon_SuperChargeP;
-s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s8 rate, s32 levelDiff, s8 time, s8 strength);
+s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength);
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag);
 u32 BattleCheckPikkyoro(BattleWeapon* weapon, u32* flags);
 s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32* result, u32 flags);
@@ -1023,7 +1023,7 @@ void BattleStatusChangeMsgSetAnnouce(BattleUnit* unit, s32 type, s32 flag);
     ((u8*)(e)->userdata)[0x3C] = (f);                  \
     ((u8*)(e)->userdata)[0x3D] = (g)
 
-s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s8 rate, s32 levelDiff, s8 time, s8 strength) {
+s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u32 special, s32 type, s32 rate, s32 levelDiff, s8 time, s8 strength) {
     s32 ok;
     s32 announce;
     s32 chance;
@@ -1152,7 +1152,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
         if ((u32)type == 0x1b) {
             *result |= 0x10;
         }
-        ok = BtlUnit_SetStatus(unit, type, time, strength);
+        ok = ((BOOL (*)(BattleUnit*, s8, s8, s8))BtlUnit_SetStatus)(unit, type, time, strength);
     }
     switch (type) {
         case 6:
@@ -1330,7 +1330,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
 
     announce = 0;
     if (ok) {
-        BtlUnit_GetStatus(unit, type, &curTurns, &curStrength);
+        ((void (*)(BattleUnit*, s8, s8*, s8*))BtlUnit_GetStatus)(unit, type, &curTurns, &curStrength);
         switch (type) {
             case 0x10:
                 if (curStrength > 0) {
@@ -1463,8 +1463,8 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
 }
 
 s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, u32 flags) {
-    u32 i;
     s32 rate;
+    u32 i;
     s32 levelDiff;
     u32 result = 0;
     s8 time;
@@ -1497,7 +1497,7 @@ s32 BattleSetStatusDamageFromWeapon(BattleUnit* attacker, BattleUnit* target, Ba
                     }
                     break;
             }
-            if (BattleSetStatusDamage(&result, target, part, weapon->special, i, rate, levelDiff, time, strength) && i == 18) {
+            if (BattleSetStatusDamage(&result, target, part, weapon->special, i, (s8)rate, levelDiff, time, strength) && i == 18) {
                 btlDispPoseAnime(part);
             }
         }
@@ -1597,12 +1597,12 @@ s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
 }
 
 s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, s32 flags) {
+    u32 pattern;
     s32 pierce;
     s32 ret = -1;
     u32 status = 0;
     s32 damage;
     s32 fpDamage;
-    u32 pattern;
     EffectEntry* eff;
     CounterWork cw;
     Vec hit;

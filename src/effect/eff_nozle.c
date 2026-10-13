@@ -29,16 +29,17 @@ EffectEntry* effKemuTestEntry(s32, f32, f32, f32, f32);
 void effNozleMain(EffectEntry* effect);
 void effNozleDisp(CameraId cameraId, EffectEntry* effect);
 
-GXColor unk_80423300;
+
+__declspec(section ".sdata2") const u32 gap_10_80423304_sbss2;
 
 __declspec(section ".data") f32 lbl_803AE260[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 negone_one_374[] = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 negone_one_374[] = {-1.0f, 1.0f};
 __declspec(section ".data") f32 lbl_803AE270[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 one_negone_373[] = {1.0f, -1.0f};
+static __declspec(section ".data") f32 one_negone_373[] = {1.0f, -1.0f};
 __declspec(section ".data") f32 lbl_803AE280[] = {-1.0f, 1.0f};
-__declspec(section ".data") f32 negone_one_360[] = {-1.0f, 1.0f};
+static __declspec(section ".data") f32 negone_one_360[] = {-1.0f, 1.0f};
 __declspec(section ".data") f32 lbl_803AE290[] = {1.0f, -1.0f};
-__declspec(section ".data") f32 one_negone_359[] = {1.0f, -1.0f};
+static __declspec(section ".data") f32 one_negone_359[] = {1.0f, -1.0f};
 static u32 nozle_1_vertex_tbl[] __attribute__((aligned(32))) = {0xFCE40000, 0x0000031C, 0x00000000, 0xF9330854, 0x000006CD, 0x08540000, 0xF62E10AA, 0x000009D2, 0x10AA0000, 0xF30C18FF, 0x00000CF4, 0x18FF0000, 0xF0CD2154, 0x00000F33, 0x21540000, 0xEEDD29AA, 0x00001123, 0x29AA0000, 0xEBE631FF, 0x0000141A, 0x31FF0000, 0x00000000, 0x00000000, 0x08540000, 0x000010AA, 0x00000000, 0x18FF0000, 0x00002154, 0x00000000, 0x29AA0000, 0x0000397F, 0x0000FE72, 0x00000000, 0xFC9A0854, 0x0000FB17, 0x10AA0000, 0xF92818FF, 0x0000F809, 0x21540000, 0xF76F29AA, 0x0000F5F3, 0x377F0000, 0x018E0000, 0x00000366, 0x08540000, 0x04E910AA, 0x000006D8, 0x18FF0000, 0x07F72154, 0x00000891, 0x29AA0000, 0x0A0D377F, 0x0000FB01, 0x0000FD80, 0x04FF0000, 0xFD80F6A6, 0x0854FD80, 0x095A0854, 0xFD80F2E6, 0x10AAFD80, 0x0D1A10AA, 0xFD80EFC3, 0x18FFFD80, 0x103D18FF, 0xFD80ED85, 0x2154FD80, 0x127B2154, 0xFD80EB94, 0x29AAFD80, 0x146C29AA, 0xFD80E89E, 0x3BA7FD80, 0x17623BA7, 0xFD800000, 0x0000FD80, 0x00000854, 0xFD800000, 0x10AAFD80, 0x000018FF, 0xFD800000, 0x2154FD80, 0x000029AA, 0xFD800000, 0x4327FD80, 0xFD810000, 0xFD80FBA8, 0x0854FD80, 0xF9C810AA, 0xFD80F7D9, 0x18FFFD80, 0xF6B92154, 0xFD80F61F, 0x29AAFD80, 0xF4A44127, 0xFD80027F, 0x0000FD80, 0x04580854, 0xFD800638, 0x10AAFD80, 0x082718FF, 0xFD800947, 0x2154FD80, 0x09E129AA, 0xFD800B5C, 0x4127FD80, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_1_texcoord0_tbl[] __attribute__((aligned(32))) = {0x00003555, 0x10003555, 0x10004000, 0x00004000, 0x00002AAA, 0x10002AAA, 0x00002000, 0x10002000, 0x00001555, 0x10001555, 0x00000AAA, 0x10000AAA, 0x00000000, 0x10000000, 0x20003555, 0x30003555, 0x30004000, 0x20004000, 0x30002AAA, 0x20002AAA, 0x30002000, 0x20002000, 0x30001555, 0x20001555, 0x30000AAA, 0x20000AAA, 0x30000000, 0x20000000, 0x40003555, 0x40004000, 0x40002AAA, 0x40002000, 0x40001555, 0x40000AAA, 0x40000000, 0x0000F556, 0x1000F556, 0x0000EAAB, 0x1000EAAB, 0x0000E000, 0x1000E000, 0x3000F556, 0x2000F556, 0x3000EAAB, 0x2000EAAB, 0x3000E000, 0x2000E000, 0x4000F556, 0x4000EAAB, 0x4000E000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 static u32 nozle_1_texcoord1_tbl[] __attribute__((aligned(32))) = {0x00003555, 0x10003555, 0x10004000, 0x00004000, 0x00002AAA, 0x10002AAA, 0x00002000, 0x10002000, 0x00001555, 0x10001555, 0x00000AAA, 0x10000AAA, 0x00000000, 0x10000000, 0x20003555, 0x30003555, 0x30004000, 0x20004000, 0x30002AAA, 0x20002AAA, 0x30002000, 0x20002000, 0x30001555, 0x20001555, 0x30000AAA, 0x20000AAA, 0x30000000, 0x20000000, 0x40003555, 0x40004000, 0x40002AAA, 0x40002000, 0x40001555, 0x40000AAA, 0x40000000, 0x0000F556, 0x1000F556, 0x0000EAAB, 0x1000EAAB, 0x0000E000, 0x1000E000, 0x3000F556, 0x2000F556, 0x3000EAAB, 0x2000EAAB, 0x3000E000, 0x2000E000, 0x4000F556, 0x4000EAAB, 0x4000E000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
@@ -294,7 +295,6 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx c;
     Mtx d;
     GXTexObj texObj;
-    GXColor color;
     CameraEntry* cam;
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
@@ -366,9 +366,7 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
             break;
         case 3:
             GXSetTevAlphaIn(0, 7, 1, 4, 7);
-            color = unk_80423300;
-            color.a = alpha;
-            { GXColor tmp = color; GXSetTevColor(1, tmp); }
+            GXSetTevColor(1, (GXColor){0, 0, 0, alpha});
             w = effect->userdata;
             for (i = 1, w++; i < effect->count; i++, w++) {
                 PSMTXTrans(a, w->u0, -w->v0, 0.0f);

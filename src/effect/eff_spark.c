@@ -172,8 +172,7 @@ void effSparkMain(EffectEntry* effect) {
 }
 
 void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
-    EffSparkParticle* p;
-    EffSparkWork* work = effect->userdata;
+    EffSparkParticle* p = effect->userdata;
     CameraEntry* camera;
     GXTexObj texObj;
     Mtx mtx2;
@@ -183,10 +182,10 @@ void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx base;
     s32 i;
     s32 alpha;
-    f32 size, half;
+    f32 size;
 
     camera = camGetPtr(cameraId);
-    alpha = work->alpha;
+    alpha = p->alpha;
     effGetTexObj(0x1C, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);
@@ -203,16 +202,16 @@ void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    PSMTXTrans(mtx, work->x, work->y, work->z);
-    PSMTXScale(scale, work->scale, work->scale, work->scale);
+    PSMTXTrans(mtx, p->x, p->y, p->z);
+    PSMTXScale(scale, p->scale, p->scale, p->scale);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     PSMTXConcat(mtx, rot, base);
     PSMTXConcat(base, scale, base);
-    p = work->part;
 
-    size = 16.0f; half = size / 2;
 
-    for (i = 1; i < effect->count; i++, p++) {
+    size = 16.0f;
+
+    for (i = 1, p++; i < effect->count; i++, p++) {
         if (p->seq < 0) {
             continue;
         }
@@ -227,11 +226,11 @@ void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetCurrentMtx(GX_PNMTX0);
         GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, (alpha * p->alpha) >> 8 });
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(-size / 2, half, 0.0f);
+        GXPosition3f32(-size / 2, size / 2, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(half, half, 0.0f);
+        GXPosition3f32(size / 2, size / 2, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(half, -size / 2, 0.0f);
+        GXPosition3f32(size / 2, -size / 2, 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
         GXPosition3f32(-size / 2, -size / 2, 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);

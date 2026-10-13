@@ -341,7 +341,6 @@ void yoshi_init(PartyEntry* party) {
 }
 
 static inline void L_searchHead(PartyEntry* party);
-
 static inline f32 L_getOfs(PartyEntry* party) {
     MarioWork* p = party->playerPtr;
     f32 ofs = 0.0f;

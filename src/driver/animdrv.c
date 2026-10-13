@@ -1833,11 +1833,11 @@ void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
     const char* name;
     s32 animId;
     s32 n1, n2;
-    Mtx* m;
 
     pose = &wp->poses[poseId];
     if (pose->paperId != -1) {
         if (pose->flags & 0xC0) {
+            Mtx* m;
             data = animPoseGetBaseData(pose);
             m = (Mtx*)matrix;
             if (!(pose->flags & 8) && rotY != 0.0f) {

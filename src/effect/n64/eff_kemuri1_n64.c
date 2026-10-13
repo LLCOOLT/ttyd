@@ -63,7 +63,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 			break;
 	}
 
-	effect->type = "Kemuri1N64";
+	effect->type = "Kemuri1N64\0";
 	effect->count = effCount;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effKemuri1EWork) * effCount);
 	effect->userdata = data;
@@ -101,7 +101,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 		case 1:
 			for (i = 1; i < effCount; i++, data++) {
 				data->f10 = -3.0f;
-				data->f14 = 0.3f;
+				data->f14 = 0.29999998f;
 				data->f18 = 0.0f;
 				data->f1C = 0.0f;
 				data->f20 = 1.75f;
@@ -137,7 +137,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 						tmp = sin(angle); data->position.x = 25.0f * -tmp;
 						data->position.y = 4.0f;
 						tmp = cos(angle); data->position.z = 25.0f * -tmp;
-						data->f20 = 0.85f;
+						data->f20 = 0.84999996f;
 						data->f24 = -0.04f;
 						data->f28 = 0.94f;
 						break;
@@ -166,7 +166,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 				data->f10 = -3.0f;
 				data->f14 = 0.93f;
 				data->f20 = 0.0f;
-				data->f24 = 0.1f;
+				data->f24 = 0.099999994f;
 				data->f28 = 0.94f;
 				data->f2C = 0.94f;
 				angle2 = 6.2831855f * (a5 + (f32)(((i - 1) * 360) / (effCount - 1))) / 360.0f;
@@ -375,7 +375,7 @@ void effKemuri1Disp(CameraId cameraId, EffectEntry* effect) {
 				PSMTXConcat(view, mtx, mtx);
 				GXLoadPosMtxImm(mtx, GX_PNMTX0);
 			} else {
-				{ GXColor* c; GXSetChanMatColor(GX_COLOR0A0, *(c = &(GXColor){0xFF, 0xFF, 0xFF, 0xFF}, c->r = work->r, c->g = work->g, c->b = work->b, c->a = 0xFF, c)); }
+				{ GXColor* c; GXSetChanMatColor(GX_COLOR0A0, *(c = &(GXColor){0, 0, 0, 0}, c->r = work->r, c->g = work->g, c->b = work->b, c->a = 0xFF, c)); }
 				PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
 				PSMTXConcat(view, mtx, mtx);
 				GXLoadPosMtxImm(mtx, GX_PNMTX0);

@@ -194,11 +194,11 @@ void FontDrawCodeMtx(Mtx mtx, u16 code) {
 }
 
 static inline void FontDrawStringVec(Vec pos, const s8* msg) {
-	f32 x;
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
+	f32 x;
 
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -225,11 +225,11 @@ void FontDrawString(f32 x, f32 y, const char* msg) {
 }
 
 static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
-	f32 x;
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
+	f32 x;
 
 	camera = camGetCurPtr();
 	x = pos.x;

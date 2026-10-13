@@ -1837,7 +1837,7 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 	s32 tmp;
 
 	if (count <= 0) {
-		int n = 0;
+		count = 0;
 		for (i = 0; i < 64; i++) {
 			if (wp->movePriorityQueue[i] == -1) {
 				break;
@@ -1905,6 +1905,8 @@ void battleMakePhaseEvtTable(BattleWork* wp) {
 		for (j = 0; j < count - i - 1; j++) {
 			if (table[j].priority > table[j + 1].priority) {
 				tmp = table[j];
+				if (!i && !i && !i) {}
+				if (!i) {}
 				table[j] = table[j + 1];
 				table[j + 1] = tmp;
 			}

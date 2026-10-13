@@ -437,9 +437,9 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
         mx = sn * dist;
         mz = cs * dist;
         nn = bestNrm;
-        dot = nn.x * mx + nn.z * mz;
-        v.x += 0.5f * (mx - dot * nn.x);
-        v.z += 0.5f * (mz - dot * nn.z);
+        dot = mx * nn.x + mz * nn.z;
+        v.x += 0.5f * (mx - nn.x * dot);
+        v.z += 0.5f * (mz - nn.z * dot);
     }
     sincosf(&sn2, &cs2, ang + 45.0f);
     bestD = rd;

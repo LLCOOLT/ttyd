@@ -94,6 +94,9 @@ u16 party_icon[8] = { 0x1A4, 0x1A4, 0x1A5, 0x1A6, 0x1A7, 0x1AE, 0x1AF, 0x1B0 };
 u16 gauge_back[8] = { 0x1B7, 0x1B8, 0x1B9, 0x1BA, 0x1BB, 0x1BC, 0x1BD, 0x1BE };
 u16 gauge_wakka[16] = { 0x1C0, 0x1C1, 0x1C2, 0x1C3, 0x1C4, 0x1C5, 0x1C6, 0x1C7,
                         0x1C8, 0x1C9, 0x1CA, 0x1CB, 0x1CC, 0x1CD, 0x1CE, 0x1CF };
+#pragma force_active on
+__declspec(section ".sdata") u16 gap_07_804118FC_sdata[2] = { 0, 0 };
+#pragma force_active reset
 
 //.sbss
 static SWork* wp;
@@ -144,13 +147,17 @@ void statusWinReInit(void) {
 
 void statusWinMain(void) {
     MarioWork* mario;
-    f32 t, inv;
+    f32 t;
+    f32 one;
+    f32 inv;
+
+    one = 1.0f;
 
     mario = marioGetPtr();
     if (mario->characterId) {
         wp->flags = 2;
-        wp->duration = 1.0f;
-        wp->timer = 1.0f;
+        wp->duration = one;
+        wp->timer = one;
         wp->tEnd = 0.0f;
         wp->t = 0.0f;
         return;
@@ -234,7 +241,7 @@ void statusWinMain(void) {
         wp->flags &= ~0x40;
         wp->flags &= ~0x80;
     }
-    wp->timer += 1.0f;
+    wp->timer += one;
     if (wp->timer >= wp->duration) {
         wp->timer = wp->duration;
         wp->t = wp->tEnd;
@@ -243,7 +250,7 @@ void statusWinMain(void) {
         }
     } else {
         inv = (f32)cos(3.1415927f * wp->timer / wp->duration);
-        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (1.0f - inv) / 2.0f;
+        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (one - inv) / 2.0f;
     }
     t = wp->t;
     inv = 1.0f - t;

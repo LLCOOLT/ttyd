@@ -29,13 +29,13 @@ typedef struct EffHokoriN64Work {
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_8039D5D0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_8039D5E0 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_8039D5F0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_8039D600 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
 #endif
 
 effN64Vtx size16x32_tex32x64_vtx[] = {
@@ -71,7 +71,7 @@ EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
 
     effect = effEntry();
     count = 4 + (type <= 1);
-    effect->type = "HokoriN64\0\0";
+    effect->type = "HokoriN64\0\0\0\0\0\0";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffHokoriN64Work));
     effect->userdata = work;

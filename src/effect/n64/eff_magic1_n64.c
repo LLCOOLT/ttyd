@@ -116,6 +116,7 @@ void effMagic1Main(EffectEntry* effect) {
 static void main_dl(EffectEntry* effect, Mtx base) {
     u8* a;
     f32 yr;
+
     EffMagic1N64Work* w = effect->userdata;
     s32 type = w->type;
     f32 scale = w->scale;
@@ -169,7 +170,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    yr = yaw * 0.017453292f;
+        yr = yaw * 0.017453292f;
     for (i = 0; i < 3; i++) {
         if (i > 0) {
             switch (type) {

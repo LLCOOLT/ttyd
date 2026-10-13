@@ -12,6 +12,7 @@ s32 mobjCheckItemboxOpen(void* mobj);
 void partyChgPoseId(PartyEntry* party, s32 id);
 
 //.sbss
+u32 gap_08_804188C4_sbss;
 u32 msg_ep; //unknown since it only gets written to once and never used
 
 BOOL christineGetStatus(void) {
@@ -125,7 +126,7 @@ USER_FUNC(pre_kurio_use) {
             msg = "obj_hlp_yajirushi";
         } else if (!strcmp(name, "MOBJ_Lock")) {
             msg = "obj_hlp_lock";
-        } else if (!strcmp(name, "MOBJ_KururinFloor")) {
+        } else if (!strcmp(name, "MOBJ_KururinFloor\x00\x00")) {
             msg = "msg_kuri_map";
         } else {
             msg = "msg_kuri_map";
@@ -166,7 +167,18 @@ void kuribo_init_800C23B4(PartyEntry* party) {
     msg_ep = 0;
 }
 
-extern s32 kurio_msg_evt[];
+USER_FUNC(evt_msg_print);
+s32 kurio_msg_evt[] = {
+    0x0001005B, (s32)pre_kurio_use,
+    0x00020018, 0xFE363C80, 0x00000000,
+    0x0001005B, (s32)post_kurio_use,
+    0x00000002,
+    0x00000021,
+    0x0005005B, (s32)evt_msg_print, 0x00000000, 0xFE363C80, 0x00000000, (s32)"party",
+    0x0001005B, (s32)post_kurio_use,
+    0x00000002,
+    0x00000001,
+};
 void* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 angle);
 BOOL partyGetAppearPos3(PartyEntry* party, Vec* pos);
 s32 fbatNpcTalkCheck(void);
@@ -192,6 +204,11 @@ typedef struct KuriboParty {
 #define KTARGET(p) (((KuriboParty*)(p))->target)
 #define KEC(p) (((KuriboParty*)(p))->fieldEC)
 #define K114(p) (((KuriboParty*)(p))->field114)
+
+void kuribo_use_post(PartyEntry* party) {
+    party->flags &= ~0x04000000;
+    party->flags &= ~0x02000000;
+}
 
 void kuribo_use(PartyEntry* party) {
     MarioWork* player = party->playerPtr;
@@ -247,7 +264,7 @@ void kuribo_use(PartyEntry* party) {
         party->position.y += (KTARGET(party).y - party->position.y) / KTIMER(party);
         party->position.z += (KTARGET(party).z - party->position.z) / KTIMER(party);
         if (--KTIMER(party) > 0) {
-            break;
+            return;
         }
         partyChgPoseId(party, 1);
         party->field_104 = 0.0f;
@@ -279,11 +296,6 @@ void kuribo_use(PartyEntry* party) {
     partyChkGnd(party);
 }
 
-void kuribo_use_post(PartyEntry* party) {
-    party->flags &= ~0x04000000;
-    party->flags &= ~0x02000000;
-}
-
 void kuribo_bye(PartyEntry* party) {
     if (party->field_8 & 8) {
         party->field_8 &= ~8;
@@ -293,3 +305,4 @@ void kuribo_bye(PartyEntry* party) {
         partyChgRunMode(party, 14);
     }
 }
+

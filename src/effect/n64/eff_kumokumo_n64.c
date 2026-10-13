@@ -73,6 +73,7 @@ __declspec(section ".sdata") u32 batten_color0_tbl[] = {0xFFFFFF33, 0xFFFFFF66, 
 __declspec(section ".sdata") void* batten_dl_0_tbl[] = {batten_dl_0_0, batten_dl_0_1, batten_dl_0_2, batten_dl_0_3};
 __declspec(section ".sdata") u8 batten_dl_0_size_tbl[] = {0x03, 0x03, 0x03, 0x03};
 __declspec(section ".sdata") u8 rz_tbl[] = {0x00, 0x09, 0x12, 0x1C, 0x25, 0x2F, 0x39, 0x43, 0x4D, 0x57, 0x61, 0x6B, 0x74, 0x7D, 0x86, 0x8F, 0x97, 0x9F, 0xA6, 0xAD, 0xB4, 0xB8, 0xB9, 0xB9, 0xB6, 0xB4, 0xB1, 0xAE, 0xAE, 0xAF, 0xB4, 0x00};
+__declspec(section ".sdata") u8 gap_07_80413B4C_sdata[4] = {0};
 
 #define KK_ARRAYS(vtx, tex0, tex1, norm, clr)                                                              \
     GXClearVtxDesc();                                                                                      \
@@ -298,8 +299,8 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->scale += (1.5f - work->scale) / 30.0f;
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
-                tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += tmp2 * work->s1;
+                tmp2 = (f32)sin(6.2831855f * work->rot / 360.0f);
+                work->y += work->s1 * (2.0f * tmp2);
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -355,8 +356,8 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->scale += (1.0f - work->scale) / 30.0f;
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
-                tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += tmp2 * work->s1;
+                tmp2 = (f32)sin(6.2831855f * work->rot / 360.0f);
+                work->y += work->s1 * (2.0f * tmp2);
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -364,6 +365,14 @@ void effKumokumoMain(EffectEntry* effect) {
         work->frame++;
     }
     dispEntry(camera, dispCalcZ(&position), 2, (DispCallback)effKumokumoDisp, effect);
+}
+
+static inline void kkDraw(void* vtx, void* tex0, void* tex1, void* norm, void* clr, void** dl, u8* sz) {
+    u32 i;
+    KK_ARRAYS(vtx, tex0, tex1, norm, clr)
+    for (i = 0; i < 4; i++) {
+        GXCallDisplayList(dl[i], sz[i] << 5);
+    }
 }
 
 void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
@@ -446,16 +455,10 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     switch (type) {
     case 0:
     case 1:
-        KK_ARRAYS(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl)
-        for (i = 0; i < 4; i++) {
-            GXCallDisplayList(cloud_dl_0_tbl[i], cloud_dl_0_size_tbl[i] << 5);
-        }
+        kkDraw(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl, cloud_dl_0_tbl, cloud_dl_0_size_tbl);
         break;
     case 2:
-        KK_ARRAYS(batten_vertex_tbl, batten_texcoord0_tbl, batten_texcoord1_tbl, batten_normal_tbl, batten_color0_tbl)
-        for (i = 0; i < 4; i++) {
-            GXCallDisplayList(batten_dl_0_tbl[i], batten_dl_0_size_tbl[i] << 5);
-        }
+        kkDraw(batten_vertex_tbl, batten_texcoord0_tbl, batten_texcoord1_tbl, batten_normal_tbl, batten_color0_tbl, batten_dl_0_tbl, batten_dl_0_size_tbl);
         break;
     case 3:
         for (j = 0; j < 5; j++) {
@@ -463,18 +466,12 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(mtx2, rot, rot);
             GXLoadPosMtxImm(rot, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
-            KK_ARRAYS(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl)
-            for (i = 0; i < 4; i++) {
-                GXCallDisplayList(cloud_dl_0_tbl[i], cloud_dl_0_size_tbl[i] << 5);
-            }
+            kkDraw(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl, cloud_dl_0_tbl, cloud_dl_0_size_tbl);
         }
         break;
     case 4:
     default:
-        KK_ARRAYS(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl)
-        for (i = 0; i < 4; i++) {
-            GXCallDisplayList(cloud_dl_0_tbl[i], cloud_dl_0_size_tbl[i] << 5);
-        }
+        kkDraw(cloud_vertex_tbl, cloud_texcoord0_tbl, cloud_texcoord1_tbl, cloud_normal_tbl, cloud_color0_tbl, cloud_dl_0_tbl, cloud_dl_0_size_tbl);
         break;
     }
     GXSetNumChans(1);
@@ -544,4 +541,5 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
 

@@ -290,6 +290,7 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
 
     s32 alpha;
 
+
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;

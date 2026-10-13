@@ -453,9 +453,7 @@ USER_FUNC(bero_get_position_pipe_pure) {
 	BeroSY = kind == 8 ? start.y - 37.5f : start.y;
 	BeroSZ = start.z;
 	BeroEX = end.x;
-	f32 ey = end.y;
-	if (kind == 8) ey = end.y - 37.5f;
-	BeroEY = ey;
+	BeroEY = kind == 8 ? end.y - 37.5f : end.y;
 	BeroEZ = end.z;
 	N_marioSetBottomlessRespawnPosOnBeroEntry(BeroEX, BeroEY, BeroEZ);
 	return EVT_RETURN_DONE;
@@ -517,9 +515,9 @@ s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 }
 
 USER_FUNC(evt_bero_switch_on) {
-	s32* args = event->args;
-	BeroEntry** temp, **table = BeroINFOARR;
-	s32 id = evtGetValue(event, *args);
+	BeroEntry** table = BeroINFOARR;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, event->args[0]);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -550,9 +548,9 @@ USER_FUNC(evt_bero_switch_on) {
 }
 
 USER_FUNC(evt_bero_switch_off) {
-	s32* args = event->args;
-	BeroEntry** temp, **table = BeroINFOARR;
-	s32 id = evtGetValue(event, *args);
+	BeroEntry** table = BeroINFOARR;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, event->args[0]);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -583,9 +581,9 @@ USER_FUNC(evt_bero_switch_off) {
 }
 
 USER_FUNC(evt_bero_get_number) {
-	s32* args = event->args;
-	BeroEntry** temp, **table = BeroINFOARR;
-	s32 id = evtGetValue(event, *args);
+	BeroEntry** table = BeroINFOARR;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, event->args[0]);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {

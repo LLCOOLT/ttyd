@@ -866,7 +866,8 @@ HitEntry* check_front(PartyEntry* party) {
     HitEntry* hit;
     HitEntry* found = NULL;
     HitEntry* last = NULL;
-    f32 height = 0.8f * PF(party, 0xF0, f32);
+    PartyEntry* p = party;
+    f32 height = 0.8f * party->field_F0;
     f32 movedir = partyToMovedir(PF(party, 0x10C, f32));
     f32 ang;
     f32 lim;
@@ -875,7 +876,7 @@ HitEntry* check_front(PartyEntry* party) {
     for (i = 0; i < 8; i++) {
         sincosf(&q.targetDir.x, &q.targetDir.z, movedir + (f32)angles[i]);
         q.targetDir.y = 0.0f;
-        q.targetPos = party->position;
+        q.targetPos = p->position;
         q.targetPos.y = q.targetPos.y + height;
         q.targetDistance = 100.0f;
         hit = hitCheckVecFilter(&q, NULL);
@@ -893,7 +894,7 @@ HitEntry* check_front(PartyEntry* party) {
         }
     }
 
-    q.targetPos = party->position;
+    q.targetPos = p->position;
     q.targetDir = down;
     q.targetDistance = 2.0f + height;
     hit = hitCheckVecFilter(&q, NULL);
@@ -904,7 +905,7 @@ HitEntry* check_front(PartyEntry* party) {
         last = hit;
     }
 
-    hit = party->field_138;
+    hit = p->field_138;
     if (hit != NULL && isBombRock(hit)) {
         return hit;
     }

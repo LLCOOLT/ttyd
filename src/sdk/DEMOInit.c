@@ -6,22 +6,23 @@
 #include <dolphin/vi.h>
 #include <string.h>
 
-static GXRenderModeObj* rmode;
+char __GXErrorMessage[0x400];
 static GXRenderModeObj rmodeobj;
-static void* DefaultFifo;
-static GXFifoObj* DefaultFifoObj;
 void* DemoFrameBuffer1;
 void* DemoFrameBuffer2;
 void* DemoCurrentBuffer;
+static void* DefaultFifo;
+static GXFifoObj* DefaultFifoObj;
+static GXRenderModeObj* rmode;
+static vu32 FrameCount;
+static u32 FrameMissThreshold;
 static BOOL GPHangWorkaround = FALSE;
 extern u8 DemoStatEnable;
 static GXBool DemoFirstFrame = GX_TRUE;
 
-static u32 FrameMissThreshold;
-static vu32 FrameCount;
+
 static const char demo_file[] = "DEMOInit.c";
 static const char demo_msg[] = "DEMOInit: invalid TV format\n";
-char __GXErrorMessage[0x400];
 
 extern void DEMOPadInit(void); //easier to declare this way
 extern void DEMOUpdateStats(GXBool inc);

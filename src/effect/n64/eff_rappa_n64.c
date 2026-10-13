@@ -36,7 +36,7 @@ static u8 color_rotation_data[] = {
     0xB4, 0xFE, 0xB4, 0xD5, 0xFE, 0xB4, 0xFE, 0xFE, 0xB4, 0xFE, 0xD5, 0xAC,
 };
 
-GXColor unk_80423230;
+
 
 void effRappaMain(EffectEntry* effect);
 void effRappaDisp(CameraId cameraId, EffectEntry* effect);
@@ -121,7 +121,7 @@ void effRappaMain(EffectEntry* effect) {
 }
 
 static inline GXColor mkcol(u8 r, u8 g, u8 b, u8 a) {
-    GXColor c = unk_80423230;
+    GXColor c = {0};
     c.r = r;
     c.g = g;
     c.b = b;

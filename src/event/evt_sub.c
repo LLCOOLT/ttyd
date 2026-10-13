@@ -1496,9 +1496,8 @@ USER_FUNC(evt_sub_animgroup_async) {
 	default:
 		return EVT_RETURN_DONE;
 	case 0:
-		break;
+		return EVT_RETURN_BLOCK;
 	}
-	return EVT_RETURN_BLOCK;
 }
 
 USER_FUNC(evt_sub_countdown_start) {

@@ -711,7 +711,7 @@ inline Vec initializeVec(Vec* input) {
 
 
 void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
-    s32 j;
+    u32 j;
     CameraEntry *temp_r31;
     EffUltraHammerData *data; s32 i;
     s32 temp_r24;

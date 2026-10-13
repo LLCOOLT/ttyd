@@ -309,8 +309,8 @@ USER_FUNC(bakuGameDecideWeapon) {
     v = evtGetValue(event, args[1]);
     w = GetBakuGamePtr();
     p = w->weapon;
-    memcpy(p, weapon, 0xC0);
     q = p + 0x80;
+    memcpy(p, weapon, 0xC0);
     q[2] = 100;
     if (v != -1) {
         if (w->gauge >= 100.0f) {

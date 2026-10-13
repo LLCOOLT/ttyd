@@ -399,15 +399,15 @@ void marioGetRubInit(void) {
 }
 
 s32 chkRevolveDir(s32* cw, s32* ccw) {
+    s32 j;
     s32 i;
     RubWork* rw = &rubwork;
     s32 off = 0;
     s32 cwCount = 0;
     s32 cur;
-    s32 j;
     s32 ccwCount = 0;
-    s32 d;
     s32 prev;
+    s32 d;
 
     for (i = 0; i < 10; i++) {
         j = rw->idx + off;
@@ -415,7 +415,7 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
             j += 20;
         }
         cur = rw->hist[j];
-        j = rw->idx - 1 + off;
+        j = rw->idx + (off - 1);
         while (j < 0) {
             j += 20;
         }
@@ -455,21 +455,20 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
 }
 
 s32 checkOneRevolution(s32 dir) {
-    s32 i;
+    RubWork* rw = &rubwork;
+    s32 idx;
     s32 j;
     s32 cur;
     s32 v;
     s32 start;
-    RubWork* rw = &rubwork;
-    s32 idx;
+    s32 i;
     s32 ret = 0;
 
     if (rw->num < 2) {
         return -1;
     }
-    idx = rw->idx;
     start = rw->start;
-    cur = rw->hist[idx];
+    cur = rw->hist[idx = rw->idx];
     for (i = 1; i <= 20; i++) {
         j = idx - i;
         while (j < 0) {

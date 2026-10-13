@@ -85,9 +85,11 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     s32 count;
     s32 i;
     EffStardustN64Work* work;
-    f32 angle;
     f32 sn;
     f32 radius;
+    f32 angle;
+    f32 a1;
+    f32 a2;
     f32 fa;
     f32 fb;
     f32 ay;
@@ -137,13 +139,11 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     p = work + 1;
     lifeA = 0x20;
     lifeB = 0x14;
-    for (; i < count + 1; i++, lifeA += 2, lifeB += 2, p++) {
+    for (; i < count + 1; lifeA += 2, lifeB += 2, i++, p++) {
         fa = (f32)(rand() % randA) / 1000.0f;
         fb = (f32)(rand() % randB) / 1000.0f;
         switch (type) {
         case 0: {
-            f32 a1;
-            f32 a2;
             p->ay = 0.0f;
             a1 = 6.2831855f * (1800.0f / (f32)count * (f32)i - 90.0f) / 360.0f;
             sn = (f32)sin(a1);
@@ -167,8 +167,8 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
             angle = 6.2831855f * angle / 360.0f;
             p->vx = 0.0f;
             p->vy = 0.0f;
-            p->position.x = fa * (f32)sin(angle);
-            p->position.y = fb * (f32)cos(angle);
+            p->position.x = (f32)sin(angle) * fa;
+            p->position.y = (f32)cos(angle) * fb;
             p->position.z = 0.0f;
             p->sub = i % 3;
             p->scale = 1.0f;
@@ -176,14 +176,15 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
             p->frame = 0;
             break;
         case 3:
+        case 4:
         default:
             angle = 360.0f / (f32)count * (f32)i + (f32)(rand() % 360);
             p->ay = -(0.05f + (f32)(rand() % 50 / 1000));
             angle = 6.2831855f * angle / 360.0f;
             p->vx = 0.0f;
             p->vy = 0.0f;
-            p->position.x = fa * (f32)sin(angle);
-            p->position.y = fb * (f32)cos(angle);
+            p->position.x = (f32)sin(angle) * fa;
+            p->position.y = (f32)cos(angle) * fb;
             p->position.z = 0.0f;
             p->sub = i % 3;
             p->scale = 1.0f;

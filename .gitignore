@@ -84,3 +84,7 @@ rustc-ice-*.txt
 *.tmp
 *.bak
 *~
+
+# Orchestration docs and pipeline script copies: local only (L, 2026-10-13)
+/docs/ORCHESTRATION.md
+/tools/pipeline/

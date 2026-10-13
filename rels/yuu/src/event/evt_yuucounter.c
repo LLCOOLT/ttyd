@@ -154,15 +154,15 @@ void evt_yuucounter_disp_func(CameraId camera, void* param) {
     f32 scale;
     f32 xOfs;
     s32 value;
-    s32 j;
-    s32 secs;
+    s32 digit;
     BOOL skip;
     BOOL skip2;
     s32 k;
     s32 i;
     s32 msecs;
     s32 iconId;
-    s32 digit;
+    s32 j;
+    s32 secs;
     s32 digits[4];
     Mtx mtx;
     Mtx scaleMtx;

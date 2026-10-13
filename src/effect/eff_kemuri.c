@@ -94,7 +94,7 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 			numEffects = 2;
 			break;
 	}
-	entry->type = "Kemuri";
+	entry->type = "Kemuri\0";
 	entry->count = numEffects;
 	data = (effKemuriData*)__memAlloc(HEAP_EFFECT, sizeof(effKemuriData) * numEffects);
 	entry->userdata = data;
@@ -160,7 +160,8 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	memset(data, 0, sizeof(effKemuri2Data));
 	entry->callback = effKemuri2Main;
 	angle = 360.0f * angleABf(0.0f, 0.0f, vx = 1000.0f * dx, vz = 1000.0f * dz) / 6.2831855f;
-	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + camGetPtr(4)->viewYaw);
+	rot = camGetPtr(4)->viewYaw;
+	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + rot);
 	ia = (s32)angle;
 	rad = 6.2831855f * ia / 360.0f;
 	zz = 5.0f + z;

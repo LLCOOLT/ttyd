@@ -119,7 +119,7 @@ BOOL parseGet1Next(s32 type, void* data) {
 	p = (s8*)parse.ptr;
 	i = parse.pos[parse.depth];
 	end = parse.end[parse.depth];
-	posp = parse.pos + parse.depth;
+	posp = &parse.pos[parse.depth];
 	for (; i < end; i++) {
 		if (p[i] == '/' && p[i + 1] == '/') {
 			for (; i < end; i++) {

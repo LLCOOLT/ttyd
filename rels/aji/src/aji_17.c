@@ -3423,8 +3423,8 @@ void noiseDisp(CameraId cameraId, void* param) {
     s32 len;
     s32 start;
     s32 off;
-    GXTexObj tex;
     s32 by;
+    GXTexObj tex;
     cam = camGetPtr(cameraId);
 
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
@@ -3435,7 +3435,8 @@ void noiseDisp(CameraId cameraId, void* param) {
             off = (x / 8) * 32 + (by << 8);
             off += x % 8;
             off += (ry << 3);
-            buf[off] = (y & 1) ? 0xFF : 0;
+            col = (y & 1) ? 0xFF : 0;
+            buf[off] = col;
         }
         n = rand() % 100 + 100;
         for (i = 0; i < n; i++) {

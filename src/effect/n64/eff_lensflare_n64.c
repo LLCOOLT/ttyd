@@ -95,37 +95,34 @@ EffectEntry* effLensflareN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
 }
 
 void effLensflareMain(EffectEntry* effect) {
-    EffLensflareN64Work* work;
-    EffLensflareN64Elem* e;
+    EffLensflareN64Elem* e = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
     f32 cs;
-    work = effect->userdata;
 
-    tmp.x = work->position.x;
-    tmp.y = work->position.y;
-    tmp.z = work->position.z;
+    tmp.x = ((EffLensflareN64Work*)e)->position.x;
+    tmp.y = ((EffLensflareN64Work*)e)->position.y;
+    tmp.z = ((EffLensflareN64Work*)e)->position.z;
     position = tmp;
     if (effect->flags & 4) {
         effect->flags &= ~4;
-        work->lifetime = 30;
+        ((EffLensflareN64Work*)e)->lifetime = 30;
     }
-    if (work->lifetime < 100) {
-        work->lifetime--;
+    if (((EffLensflareN64Work*)e)->lifetime < 100) {
+        ((EffLensflareN64Work*)e)->lifetime--;
     }
-    work->frame++;
-    if (work->lifetime < 0) {
+    ((EffLensflareN64Work*)e)->frame++;
+    if (((EffLensflareN64Work*)e)->lifetime < 0) {
         effDelete(effect);
         return;
     }
-    if (work->frame <= 20) {
-        work->alpha = work->frame * 12;
-    } else if (work->lifetime < 20) {
-        work->alpha = work->lifetime * 12;
+    if (20 >= ((EffLensflareN64Work*)e)->frame) {
+        ((EffLensflareN64Work*)e)->alpha = ((EffLensflareN64Work*)e)->frame * 12;
+    } else if (20 > ((EffLensflareN64Work*)e)->lifetime) {
+        ((EffLensflareN64Work*)e)->alpha = ((EffLensflareN64Work*)e)->lifetime * 12;
     }
-    e = work->elem;
-    for (i = 1; i < effect->count; i++, e++) {
+    for (i = 1, e++; i < effect->count; i++, e++) {
         cs = (f32)cos(6.2831855f * (90.0f * (e->offset - 70.0f) / 10.0f) / 360.0f);
         e->alpha = (s32)(255.0f * cs);
         e->offset += e->speed;
@@ -144,7 +141,6 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
     s32 odd;
     s32 ang2;
     EffLensflareN64Elem* e;
-    EffLensflareN64Work* work;
     s32 frame;
     CameraEntry* camera;
     s32 i;
@@ -156,14 +152,14 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
 
     camera = camGetPtr(cameraId);
-    work = effect->userdata;
-    frame = work->frame;
-    alpha = work->alpha;
+    e = effect->userdata;
+    frame = ((EffLensflareN64Work*)e)->frame;
+    alpha = ((EffLensflareN64Work*)e)->alpha;
     odd = frame & 1;
     if (odd) {
         alpha = (s32)(0.95f * alpha);
     }
-    PSMTXTrans(A, work->position.x, work->position.y, work->position.z);
+    PSMTXTrans(A, ((EffLensflareN64Work*)e)->position.x, ((EffLensflareN64Work*)e)->position.y, ((EffLensflareN64Work*)e)->position.z);
     PSMTXRotRad(B, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(A, B, C);
     PSMTXConcat(camera->view, C, C);
@@ -195,7 +191,7 @@ void effLensflareDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(D, 0.03125f, 0.0078125f, 0.0f);
     GXLoadTexMtxImm(D, GX_TEXMTX0, GX_MTX2x4);
     effSetVtxDescN64(size10x10_tex32x32_vtx);
-    for (i = 1, ang1 = 10, ang2 = 35, e = work->elem; i < effect->count; ang1 += 10, ang2 += 35, i++, e++) {
+    for (i = 1, ang1 = 10, ang2 = 35, e++; i < effect->count; ang1 += 10, ang2 += 35, i++, e++) {
         f32 scale = e->scale;
         if (!scale) {
             continue;

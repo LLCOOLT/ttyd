@@ -869,8 +869,8 @@ static void rankingControll(void) {
     s32 below[32];
     s32 nBelow;
     s32 nAbove;
-    s32 j;
     s32 i;
+    s32 j;
     s32 tmp;
     s32 idx2;
     s32 idx;
@@ -1034,13 +1034,13 @@ static void rankingControll(void) {
                 }
             }
             if (idx < nBelow) {
-                for (idx2 = 0; idx2 < nBelow; idx2++) {
-                    if (fighterDt[rank_wp->entries[below[idx2]].id].flags & 2) {
+                for (tmp = idx, idx = 0; idx < nBelow; idx++) {
+                    if (fighterDt[rank_wp->entries[below[idx]].id].flags & 2) {
                         break;
                     }
                 }
-                if (idx2 < nBelow && idx2 > 0) {
-                    insert(below, nBelow, idx, idx2 - 1);
+                if (idx < nBelow && idx > 0) {
+                    insert(below, nBelow, tmp, idx - 1);
                 }
             }
         }

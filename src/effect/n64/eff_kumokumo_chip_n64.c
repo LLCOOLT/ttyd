@@ -197,3 +197,7 @@ void effKumokumoChipDisp(CameraId cameraId, EffectEntry* effect) {
     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
     tri2(0, 1, 2, 0, 0, 2, 3, 0);
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803A2270_data[4] = {0};
+#pragma force_active reset

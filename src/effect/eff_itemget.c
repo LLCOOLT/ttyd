@@ -285,8 +285,8 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-    w = 10.666667f;
     h = 42.666668f;
+    w = 10.666667f;
     d = -h;
     a = -w / 2.0f;
     b = 5.3333335f;

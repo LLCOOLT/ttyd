@@ -394,6 +394,7 @@ USER_FUNC(evt_eff64) {
 	f32 float2, float3, float4, float5, float6, float7, float8,
 		float9, float10, float11, float12, float13, float14;
 	EffectEntry* effect;
+	s32 u0a, u0b, u1a, u1b;
 	args = event->args;
 
 	effName = (const char*)evtGetValue(event, args[0]);
@@ -402,8 +403,8 @@ USER_FUNC(evt_eff64) {
 	evtGetValue(event, args[0]);
 	effSet = (const char*)evtGetValue(event, args[1]);
 	//these are probably storing different typecasts, s32 and u32
-	evtGetValue(event, args[1]);
-	evtGetValue(event, args[1]);
+	u1a = evtGetValue(event, args[1]);
+	u1b = evtGetValue(event, args[1]);
 
 	int2 = evtGetValue(event, args[2]);
 	int3 = evtGetValue(event, args[3]);

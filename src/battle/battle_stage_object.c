@@ -1350,9 +1350,9 @@ EVT_END()
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
 	const char* fall3;
-	BOOL busy = FALSE;
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	BOOL busy = FALSE;
 	BattleStageObject* obj;
 	s32 layer;
 	int i;
@@ -1528,7 +1528,6 @@ USER_FUNC(_bgset_kemuri_effect) {
 	int i;
 	BattleStageObject* obj;
 	f32 x, y, z;
-
 	layer = evtGetValue(event, event->args[0]);
 	sfxA1 = "SFX_BTL_STAGE_SET_DOWN1";
 	sfxA2 = "SFX_BTL_STAGE_SET_DOWN3";

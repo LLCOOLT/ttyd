@@ -185,7 +185,7 @@ BOOL marioChkJabara(void) {
 
 void unk_80130374(void);
 void mot_slit_post(void);
-void allPartyRideOn(void);
+void L_allPartyRideOn(void);
 f32 marioChkOverheadJabara(s32* a, s32* b);
 void marioChkOverhead(void);
 void* marioSearchHead(Vec* p, f32* h, f32 r);
@@ -197,10 +197,10 @@ f32 marioGetFallSpd(void);
 void* marioChkLandon(f32* outY, f32 y);
 double sin(double);
 double cos(double);
+#pragma opt_common_subs off
 static void jabaraSwingStart(s32 s);
 static void jabaraSwingWalk(void);
 
-#pragma opt_common_subs off
 void mot_jabara(void) {
 	MarioWork* mario = marioGetPtr();
 	Vec v74;
@@ -258,7 +258,7 @@ void mot_jabara(void) {
 			M(0x44, s32) = 0x64;
 			break;
 		}
-		allPartyRideOn();
+		L_allPartyRideOn();
 		SFX(0x182);
 		jabaraSetSpd(0.2f, 0.005f, 1.5f);
 		M(0x48, s32) = 8;

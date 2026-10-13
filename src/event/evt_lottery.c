@@ -36,10 +36,12 @@ lottery_info* lotteryGetPtr(void) {
 
 USER_FUNC(evt_lottery) {
 	LotteryWork* lot;
+	s32 day;
+	s32 v;
 	OSCalendarTime a1, a2, b1, b2, c1, c2, d1, d2, e;
 	s32* args = event->args;
 	s32 idx = evtGetValue(event, args[0]);
-	s32 v;
+
 	OSTime now = OSGetTime();
 
 	dbg_lotteryinfo = TRUE;
@@ -112,52 +114,52 @@ USER_FUNC(evt_lottery) {
 				lot->todayNum = rand() % 10000;
 			}
 			else if (!(now < lot->buyTime)) {
-				idx = (now - lot->buyTime) / OS_TIMER_CLOCK / 60 / 60 / 24;
+				day = (now - lot->buyTime) / OS_TIMER_CLOCK / 60 / 60 / 24;
 				v = lot->days[0];
-				if (idx > v) {
-					while (idx > v) {
+				if (day > v) {
+					while (day > v) {
 						v += 395 - rand() % 60;
 					}
-					lot->days[0] = v - idx;
+					lot->days[0] = v - day;
 				}
 				v = lot->days[1];
-				if (idx > v) {
-					while (idx > v) {
+				if (day > v) {
+					while (day > v) {
 						v += 115 - rand() % 30;
 					}
-					lot->days[1] = v - idx;
+					lot->days[1] = v - day;
 				}
 				v = lot->days[2];
-				if (idx > v) {
-					while (idx > v) {
+				if (day > v) {
+					while (day > v) {
 						v += 35 - rand() % 10;
 					}
-					lot->days[2] = v - idx;
+					lot->days[2] = v - day;
 				}
 				v = lot->days[3];
-				if (idx > v) {
-					while (idx > v) {
+				if (day > v) {
+					while (day > v) {
 						v += 10 - rand() % 6;
 					}
-					lot->days[3] = v - idx;
+					lot->days[3] = v - day;
 				}
-				if (idx == lot->days[0]) {
+				if (day == lot->days[0]) {
 					lot->todayNum = lot->number;
 					lot->flags |= 0x1000;
 				}
-				else if (idx == lot->days[1]) {
+				else if (day == lot->days[1]) {
 					do {
 						lot->todayNum = lot->number % 1000 + rand() % 10 * 1000;
 					} while (lot->todayNum == lot->number);
 					lot->flags |= 0x2000;
 				}
-				else if (idx == lot->days[2]) {
+				else if (day == lot->days[2]) {
 					do {
 						lot->todayNum = lot->number % 100 + rand() % 100 * 100;
 					} while (lot->todayNum == lot->number || lot->todayNum % 1000 == lot->number % 1000);
 					lot->flags |= 0x4000;
 				}
-				else if (idx == lot->days[3]) {
+				else if (day == lot->days[3]) {
 					do {
 						lot->todayNum = lot->number % 10 + rand() % 1000 * 10;
 					} while (lot->todayNum == lot->number || lot->todayNum % 1000 == lot->number % 1000 ||

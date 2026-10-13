@@ -326,9 +326,9 @@ void effFlameMain(EffectEntry* effect) {
 
 void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
+    s32 alpha;
     EffFlameN64Work* work;
     CameraEntry* camera;
-    s32 alpha;
     Mtx rot;
     Mtx scl;
     Mtx trn;

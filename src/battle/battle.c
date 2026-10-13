@@ -23,6 +23,7 @@ typedef enum EquipFlags {
 BattleWork* _battleWorkPointer;
 
 extern BattleUnitKind unitdata_Mario;
+f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
 extern BattleUnitKind unit_system;
 BattleUnitSetup entryunit_mario = { &unitdata_Mario, { 0,0,0,0, 4,0,0,2, 0xC2,0xC8,0,0, 0,0,0,0, 0xC0,0xA0,0,0 } };
 BattleUnitSetup entryunit_system = { &unit_system, { 0,0,0,0, 4,0,0,2 } };
@@ -356,25 +357,6 @@ void BattleSetUnitPtr(BattleWork* wp, s32 index, BattleUnit* unit) {
         wp->units[index] = unit;
     }
 }
-BattleUnit* BattleGetPartyPtr(BattleWork* wp) {
-    s32 i;
-    BattleUnit* unit;
-    for (i = 0; i < 64; i++) {
-        unit = BattleGetUnitPtr(wp, i);
-        if (unit != NULL && !(*(u32*)((u8*)unit + 0x1C) & 8) && *(s32*)((u8*)unit + 8) >= 0xE0 &&
-            *(s32*)((u8*)unit + 8) < 0xE7 && *(s8*)((u8*)unit + 0xC) == 0) {
-            return unit;
-        }
-    }
-    return NULL;
-}
-
-BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
-    if (*(s32*)((u8*)unit + 8) == 0xDE) {
-        return BattleGetPartyPtr(wp);
-    }
-    return BattleGetMarioPtr(wp);
-}
 
 BattleUnitPart* BattleGetUnitPartsPtr(s32 index, s32 partNum) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, index);
@@ -405,34 +387,34 @@ BattleUnit* BattleGetMarioPtr(BattleWork* wp) {
     return NULL;
 }
 
-BattleUnitType BattleTransPartyIdToUnitKind(s32 partyId) {
-    switch (partyId) {
-    case 1: return 0xE0;
-    case 2: return 0xE1;
-    case 4: return 0xE2;
-    case 5: return 0xE3;
-    case 6: return 0xE4;
-    case 3: return 0xE5;
-    case 7: return 0xE6;
-    default: return 0;
+BattleUnit* BattleGetPartyPtr(BattleWork* wp) {
+    s32 i;
+    BattleUnit* unit;
+    for (i = 0; i < 64; i++) {
+        unit = BattleGetUnitPtr(wp, i);
+        if (unit != NULL && !(*(u32*)((u8*)unit + 0x1C) & 8) && *(s32*)((u8*)unit + 8) >= 0xE0 &&
+            *(s32*)((u8*)unit + 8) < 0xE7 && *(s8*)((u8*)unit + 0xC) == 0) {
+            return unit;
+        }
     }
+    return NULL;
 }
 
-s32 BattleTransPartyId(BattleUnitType kind) {
-    switch (kind) {
-    case 0x50: case 0x89: case 0xE0: return 1;
-    case 0x51: case 0x8A: case 0xE1: return 2;
-    case 0x52: case 0x8B: case 0xE2: return 4;
-    case 0x53: case 0x8C: case 0xE3: return 5;
-    case 0x8D: case 0xE4: return 6;
-    case 0x8E: case 0xE5: return 3;
-    case 0x8F: case 0xE6: return 7;
-    case 0: return 0;
-    default: return 0;
+BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
+    if (*(s32*)((u8*)unit + 8) == 0xDE) {
+        return BattleGetPartyPtr(wp);
     }
+    return BattleGetMarioPtr(wp);
 }
 
-f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
+void BattlePartyAnimeLoad(s32 partyId) {
+    animEffectAsync(*(const char**)(*(u8**)((u8*)*(void**)&entryunit_party[partyId - 0xE0] + 0xB8) + 8), 1);
+}
+
+BOOL statusWinCheck(void);
+void statusWinOpen(void);
+void statusWinClose(void);
+
 BattleUnit* BattleChangeParty(BattleWork* wp) {
     s32 kind = *(s32*)((u8*)wp + 0x1C68);
     BattleUnit* party = BattleGetPartyPtr(wp);
@@ -472,6 +454,35 @@ BattleUnit* BattleChangeParty(BattleWork* wp) {
     *((u8*)unit + 0x30D) = *((u8*)party + 0x30D);
     *((u8*)unit + 0x30E) = *((u8*)party + 0x30E);
     return unit;
+}
+
+s32 BattleTransPartyId(BattleUnitType kind) {
+    switch (kind) {
+    case 0x50: case 0x89: case 0xE0: return 1;
+    case 0x51: case 0x8A: case 0xE1: return 2;
+    case 0x52: case 0x8B: case 0xE2: return 4;
+    case 0x53: case 0x8C: case 0xE3: return 5;
+    case 0x8D: case 0xE4: return 6;
+    case 0x8E: case 0xE5: return 3;
+    case 0x8F: case 0xE6: return 7;
+    case 0: return 0;
+    default: return 0;
+    }
+}
+
+f32 BattleGetFloorHeight(f32 x, f32 y, f32 z);
+
+BattleUnitType BattleTransPartyIdToUnitKind(s32 partyId) {
+    switch (partyId) {
+    case 1: return 0xE0;
+    case 2: return 0xE1;
+    case 4: return 0xE2;
+    case 5: return 0xE3;
+    case 6: return 0xE4;
+    case 3: return 0xE5;
+    case 7: return 0xE6;
+    default: return 0;
+    }
 }
 
 void BtlUnit_EquipItem(BattleUnit* unit, EquipFlags flags, ItemType type) {
@@ -752,6 +763,16 @@ s32 BattleGetStockExp(BattleWork* wp) {
     return exp;
 }
 
+f32 BattleGetFloorHeight(f32 x, f32 y, f32 z) {
+    BattleStage* stage = BattleStageGetPtr();
+    if (z <= *(f32*)&stage->field_0xB2C) {
+        return 0.0f;
+    }
+    return stage->field_0xB34;
+}
+
+#include "driver/animdrv.h"
+
 void BattleCheckUnitBroken(BattleWork* wp) {
     s32 i;
 
@@ -761,17 +782,6 @@ void BattleCheckUnitBroken(BattleWork* wp) {
             BtlUnit_Delete(unit);
         }
     }
-}
-
-BOOL battleDisableHResetCheck(void) {
-    BattleWork* wp = _battleWorkPointer;
-    if (*(s32*)((u8*)gp + 0x14) == 0) {
-        return FALSE;
-    }
-    if (wp == NULL) {
-        return FALSE;
-    }
-    return (wp->flags >> 29) & 1;
 }
 
 void BattleAfterReactionQueueInit(void) {
@@ -821,6 +831,7 @@ void BattleAfterReactionRelease(s32 a, s32 b) {
 
 BOOL BattleCheckConcluded(BattleWork* wp);
 void BattleConsumeReserveItem(void);
+
 BOOL BattleAfterReactionMain(void) {
     s32 id;
     BattleWork* wp = _battleWorkPointer;
@@ -854,53 +865,15 @@ BOOL BattleAfterReactionMain(void) {
 
 BOOL BattleStatusWindowCheck(void);
 
-void BattleStatusWindowSystemOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 0;
-    BattleStatusWindowCheck();
-}
-
-void BattleStatusWindowEventOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 0;
-    BattleStatusWindowCheck();
-}
-
-void BattleStatusWindowSystemOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 1;
-    BattleStatusWindowCheck();
-}
-
-void BattleStatusWindowEventOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 1;
-    BattleStatusWindowCheck();
-}
-
-void BattleStatusWindowAPRecoveryOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 0;
-    BattleStatusWindowCheck();
-}
-
-void BattleStatusWindowAPRecoveryOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 1;
-    BattleStatusWindowCheck();
-}
-
-void BattleMajinaiEndCheck(void) {
+BOOL battleDisableHResetCheck(void) {
     BattleWork* wp = _battleWorkPointer;
-    if (pouchGetPtr()->mMerleeCurseUsesRemaining == 0) {
-        wp->flags |= 0x400000;
+    if (*(s32*)((u8*)gp + 0x14) == 0) {
+        return FALSE;
     }
-}
-
-void BattleMajinaiDone(void) {
-    PouchData* pouch = pouchGetPtr();
-    pouch->mMerleeCurseUsesRemaining--;
-    if (pouch->mMerleeCurseUsesRemaining != 0) {
-        *((s8*)pouch + 0x5B9) = -1;
-        *((u8*)pouch + 0x5BA) = 0;
-    } else {
-        *((s8*)pouch + 0x5B9) = -1;
-        *((u8*)pouch + 0x5BA) = 0;
+    if (wp == NULL) {
+        return FALSE;
     }
+    return (wp->flags >> 29) & 1;
 }
 
 u8 BattleMajinaiCheck(void) {
@@ -940,22 +913,55 @@ u8 BattleMajinaiCheck(void) {
 }
 
 #include "battle/battle_stage.h"
-f32 BattleGetFloorHeight(f32 x, f32 y, f32 z) {
-    BattleStage* stage = BattleStageGetPtr();
-    if (z <= *(f32*)&stage->field_0xB2C) {
-        return 0.0f;
+
+void BattleMajinaiDone(void) {
+    PouchData* pouch = pouchGetPtr();
+    pouch->mMerleeCurseUsesRemaining--;
+    if (pouch->mMerleeCurseUsesRemaining != 0) {
+        *((s8*)pouch + 0x5B9) = -1;
+        *((u8*)pouch + 0x5BA) = 0;
+    } else {
+        *((s8*)pouch + 0x5B9) = -1;
+        *((u8*)pouch + 0x5BA) = 0;
     }
-    return stage->field_0xB34;
 }
 
-#include "driver/animdrv.h"
-void BattlePartyAnimeLoad(s32 partyId) {
-    animEffectAsync(*(const char**)(*(u8**)((u8*)*(void**)&entryunit_party[partyId - 0xE0] + 0xB8) + 8), 1);
+void BattleMajinaiEndCheck(void) {
+    BattleWork* wp = _battleWorkPointer;
+    if (pouchGetPtr()->mMerleeCurseUsesRemaining == 0) {
+        wp->flags |= 0x400000;
+    }
 }
 
-BOOL statusWinCheck(void);
-void statusWinOpen(void);
-void statusWinClose(void);
+void BattleStatusWindowAPRecoveryOn(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 1;
+    BattleStatusWindowCheck();
+}
+
+void BattleStatusWindowAPRecoveryOff(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 0;
+    BattleStatusWindowCheck();
+}
+
+void BattleStatusWindowEventOn(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 1;
+    BattleStatusWindowCheck();
+}
+
+void BattleStatusWindowSystemOn(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 1;
+    BattleStatusWindowCheck();
+}
+
+void BattleStatusWindowEventOff(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 0;
+    BattleStatusWindowCheck();
+}
+
+void BattleStatusWindowSystemOff(void) {
+    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 0;
+    BattleStatusWindowCheck();
+}
 
 BOOL BattleStatusWindowCheck(void) {
     BattleWork* wp = _battleWorkPointer;

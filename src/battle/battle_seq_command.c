@@ -92,16 +92,7 @@ typedef struct BattleCheckPartyEntry {
 	const char* help;  // 0xC
 } BattleCheckPartyEntry;
 
-BattleCheckPartyEntry _checkPartyTable[8] = {
-	{0, NULL, 0, NULL},
-	{UNIT_GOOMBELLA, "btl_cmd_pt_christine", 0x155, "btl_hlp_cmd_operation_party1"},
-	{UNIT_KOOPS, "btl_cmd_pt_nokotarou", 0x156, "btl_hlp_cmd_operation_party2"},
-	{UNIT_FLURRIE, "btl_cmd_pt_clauda", 0x15F, "btl_hlp_cmd_operation_party3"},
-	{UNIT_YOSHI, "btl_cmd_pt_yoshi", 0x158, "btl_hlp_cmd_operation_party4"},
-	{UNIT_VIVIAN, "btl_cmd_pt_vivian", 0x160, "btl_hlp_cmd_operation_party5"},
-	{UNIT_BOBBERY, "btl_cmd_pt_sanders", 0x157, "btl_hlp_cmd_operation_party6"},
-	{UNIT_MS_MOWZ, "btl_cmd_pt_chuchurina", 0x161, "btl_hlp_cmd_operation_party7"},
-};
+extern BattleCheckPartyEntry _checkPartyTable[8];
 
 void _btlcmd_GetCursorPtr(BattleCommand* cmd, u32 type, BattleCursor** out);
 u16 _battleGetPartyIcon(s32 kind);
@@ -404,6 +395,7 @@ s32 _getHammerIconId(void) {
 #pragma dont_inline reset
 
 s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
+	s32 top;
 	BattleUnit* unit;
 	BattleCommand* cmd;
 	PouchData* pouch;
@@ -625,6 +617,7 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 			break;
 		case 4: {
 			u16 starPowers = *(u16*)&pouch->mStarPowersObtained;
+			s32 j;
 			for (j = 0; j < 16; j++) {
 				if ((starPowers & (1 << j)) && superActionTable[j]) {
 					cmd->weapon[num].index = -1;
@@ -653,10 +646,21 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 	if (cursor->field_0 >= cursor->unk8) {
 		cursor->field_0 = cursor->unk8 - 1;
 	}
-	while (cursor->unk8 < cursor->field_4 + 6) { if (cursor->field_4 <= 0) break; cursor->field_4--; }
+	while (cursor->unk8 < (top = cursor->field_4) + 6) { if (top <= 0) break; cursor->field_4--; }
 	_btlcmd_UpdateSelectWeaponTable(wp, type);
 	return num;
 }
+
+BattleCheckPartyEntry _checkPartyTable[8] = {
+	{0, NULL, 0, NULL},
+	{UNIT_GOOMBELLA, "btl_cmd_pt_christine", 0x155, "btl_hlp_cmd_operation_party1"},
+	{UNIT_KOOPS, "btl_cmd_pt_nokotarou", 0x156, "btl_hlp_cmd_operation_party2"},
+	{UNIT_FLURRIE, "btl_cmd_pt_clauda", 0x15F, "btl_hlp_cmd_operation_party3"},
+	{UNIT_YOSHI, "btl_cmd_pt_yoshi", 0x158, "btl_hlp_cmd_operation_party4"},
+	{UNIT_VIVIAN, "btl_cmd_pt_vivian", 0x160, "btl_hlp_cmd_operation_party5"},
+	{UNIT_BOBBERY, "btl_cmd_pt_sanders", 0x157, "btl_hlp_cmd_operation_party6"},
+	{UNIT_MS_MOWZ, "btl_cmd_pt_chuchurina", 0x161, "btl_hlp_cmd_operation_party7"},
+};
 
 void _btlcmd_UpdateSelectWeaponTable(BattleWork* wp, s32 type) {
 	BattleUnit* unit;

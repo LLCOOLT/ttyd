@@ -191,7 +191,7 @@ static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
-    u32 bufferSize;
+    int bufferSize;
     u8* ramp8;
     u32 size16;
     u16* ramp16;
@@ -201,7 +201,7 @@ void shadowInit(void) {
     depthShadowInit();
 
     bufferSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    ramp8 = __memAlloc(HEAP_DEFAULT, bufferSize);
+    ramp8 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0));
     for (i = 0; i < 256; i++) {
         ramp8[(((i & 0x3) * 8) + (((i & 0xC) * 16) + (((i & 0x80) / 4) + ((i & 0x70) / 16))))] = i;
     }
@@ -209,8 +209,8 @@ void shadowInit(void) {
     GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(ramp8, bufferSize);
 
-    size16 = (int)GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
-    ramp16 = __memAlloc(HEAP_DEFAULT, size16);
+    size16 = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
+    ramp16 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
     for (i = 0; i < 0x10000; i++) {
         ramp16[(((i & 0x3) * 4) + (((i & 0xFC) * 256) + (((i & 0xFC00) / 64) + ((i & 0x300) / 256))))] = i;
     }
@@ -418,8 +418,8 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
 }
 
 void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
-    ShadowConfig* cfg;
     CharShadowWork* wp = cswp;
+    ShadowConfig* cfg;
     ShadowEntry* entry;
     f32 (*view)[4];
     u8 alpha;

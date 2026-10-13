@@ -1,3 +1,5 @@
+#pragma defer_codegen on
+#pragma auto_inline on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -18,6 +20,7 @@ typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16
 typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static MoamoaWork* wp;
+static s32 wp_pad;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 int rand(void);
@@ -241,7 +244,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, "J", 1)) {
+        if (!strncmp(anim, "J\0\0", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -453,18 +456,18 @@ void moamoa_dispent(void) {
 }
 
 USER_FUNC(evt_moamoa_set_one) {
-    s32* args = event->args;
     ExtPose* pose;
-    s32 idx = evtGetValue(event, args[0]);
     Moamoa* moa;
+    s32* args = event->args;
+    s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
     Mtx m;
 
     pose = extGetPosePtr();
-    idx = idx;
-    (moa = &wp->moa[idx])->state = 3;
+    moa = &wp->moa[idx];
+    moa->state = 3;
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
 
@@ -475,8 +478,7 @@ USER_FUNC(evt_moamoa_set_one) {
     }
     if (!(moa->flags & 1)) {
         PSMTXRotRad(m, 'y', 1.5707964f);
-        pose += idx;
-        PSMTXConcat(pose->mtx, m, pose->mtx);
+        PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
         moa->flags |= 1;
     }
     return EVT_RETURN_DONE;

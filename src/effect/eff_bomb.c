@@ -121,8 +121,8 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     s32 i;
     f32 scale;
-    f32 one;
     f32 half;
+    f32 one;
     f32 left;
     Mtx mtx;
     Mtx scaleMtx;
@@ -175,6 +175,7 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCurrentMtx(GX_PNMTX0);
     scale = 30.0f * scale;
     one = 1.0f;
+    half = 0.5f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         PSMTXTrans(mtx, 0.0625f * work->offset, 0.0f, 0.0f);
@@ -184,7 +185,6 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXTrans(mtx, -0.05f, -0.05f, 0.0f);
         PSMTXConcat(texMtx, mtx, texMtx);
 
-        half = 0.5f;
         left = -one / 2.0f;
         GXLoadTexMtxImm(texMtx, GX_TEXMTX1, GX_MTX2x4);
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);

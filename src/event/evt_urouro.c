@@ -29,6 +29,35 @@ typedef struct UrouroWork {
     f32 radius;    // 0x28
 } UrouroWork;
 
+USER_FUNC(urouro_init_func) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    NpcEntry* npc = evtNpcNameToPtr(event, name);
+    f32 x = evtGetFloat(event, args[1]);
+    f32 z = evtGetFloat(event, args[2]);
+    f32 radius = evtGetFloat(event, args[3]);
+    f32 speed = evtGetFloat(event, args[4]);
+    s32 flags = evtGetValue(event, args[5]);
+    UrouroWork* work;
+
+    event->lwData[10] = (s32)_mapAlloc(sizeof(UrouroWork));
+    work = (UrouroWork*)event->lwData[10];
+    work->flags = flags;
+    work->state = 0;
+    work->timer = 0;
+    work->count = 0;
+    work->walkTime = sysMsec2Frame(6000);
+    work->waitTime = sysMsec2Frame(9000);
+    work->turnTime = sysMsec2Frame(1500);
+    work->x = x;
+    work->y = npc->position.y;
+    work->z = z;
+    work->radius = radius;
+    npc->moveSpeed = speed;
+    npc->flags |= 0x400000;
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(urouro_main_func) {
     const char* name = (const char*)evtGetValue(event, *event->args);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
@@ -146,31 +175,3 @@ USER_FUNC(urouro_main_func) {
     return EVT_RETURN_BLOCK;
 }
 
-USER_FUNC(urouro_init_func) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    NpcEntry* npc = evtNpcNameToPtr(event, name);
-    f32 x = evtGetFloat(event, args[1]);
-    f32 z = evtGetFloat(event, args[2]);
-    f32 radius = evtGetFloat(event, args[3]);
-    f32 speed = evtGetFloat(event, args[4]);
-    s32 flags = evtGetValue(event, args[5]);
-    UrouroWork* work;
-
-    event->lwData[10] = (s32)_mapAlloc(sizeof(UrouroWork));
-    work = (UrouroWork*)event->lwData[10];
-    work->flags = flags;
-    work->state = 0;
-    work->timer = 0;
-    work->count = 0;
-    work->walkTime = sysMsec2Frame(6000);
-    work->waitTime = sysMsec2Frame(9000);
-    work->turnTime = sysMsec2Frame(1500);
-    work->x = x;
-    work->y = npc->position.y;
-    work->z = z;
-    work->radius = radius;
-    npc->moveSpeed = speed;
-    npc->flags |= 0x400000;
-    return EVT_RETURN_DONE;
-}

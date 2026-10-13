@@ -407,7 +407,7 @@ void cardWrite(s32 slot) {
     }
 }
 
-#pragma opt_propagation on //needed for memcard_probe? TODO fix
+#pragma opt_propagation off //needed for memcard_probe? TODO fix
 void write_main(void) {
     if (wp->result) {
         wp->unkE0 = 8;
@@ -1084,11 +1084,12 @@ static inline void memcard_probe(void) {
     s32 memSize, sectorSize;
     s32 result;
     s32 i;
-    s32 timeout = 1000000;
+    s32 timeout;
+    
     
     wp->flags |= 1;
 
-    for (i = 0; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY;) {
+    for (i = 0, timeout = 1000000; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY;) {
         if (++i > timeout) {
             result = CARD_RESULT_FATAL_ERROR;
             break;

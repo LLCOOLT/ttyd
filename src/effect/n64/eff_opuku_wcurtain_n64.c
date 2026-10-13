@@ -170,11 +170,11 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     vtx = p;
     for (i = 0; i < 12; i++) {
-        p->x = (i * 50) - 300;
+        p->x = i * 50 - 300;
         p->y = 600;
         p->z = 0;
         p->s = (frame + i * 4) << 5;
-        p->t = ((s32)work->offset[i]) << 5;
+        t = (s32)work->offset[i]; p->t = t << 5;
         p->r = 255;
         p->g = 255;
         p->b = 255;
@@ -184,7 +184,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         p->y = (s32)(10.0f * (60.0f + work->offset[i]));
         p->z = 0;
         p->s = (frame + i * 4) << 5;
-        p->t = 1024;
+        p->t = 0x400;
         p->r = 255;
         p->g = 255;
         p->b = 255;
@@ -215,7 +215,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCurrentMtx(GX_PNMTX0);
     for (k = 0; k < i - 1; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        n = k << 1;
-        tri2(n, n + 2, n + 1, n, n + 1, n + 2, n + 3, n);
+        t = k << 1;
+        tri2(t, t + 2, t + 1, t, t + 1, t + 2, t + 3, t);
     }
 }

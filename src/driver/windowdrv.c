@@ -412,6 +412,7 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 
 //regalloc issues wrt f29/f28, stack swap in GXColor, some vert code (see comments), 99.8% 1:1
 void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width) {
+	GXColor color;
 	CameraEntry* camera;
 	f32 scroll;
 	Mtx mtx;
@@ -424,7 +425,6 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	Mtx trans4, scale4;
 	f32 x5;
 	static f32 scrl;
-	GXColor color;
 
 	camera = camGetCurPtr();
 	scrl += 0.005f;

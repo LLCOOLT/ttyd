@@ -22,7 +22,7 @@ extern void partyChgRunMode(PartyEntry* party, s32 mode);
 extern void partyChgMot(PartyEntry* party, s32 mot);
 extern void partyChgPose();
 extern void partyChgPoseId();
-extern void partySetForceMove();
+extern void partySetForceMove(PartyEntry* party, s32 a2, f32 a3, f32 a4);
 extern void partyMoveBesideMario();
 extern void partyMoveBehindMario();
 extern void partyRun(PartyEntry* party);
@@ -428,7 +428,7 @@ USER_FUNC(evt_party_move_pos2) {
 		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
 		q = dist / spd;
 		a2 = spd / gp->framerate;
-		partySetForceMove(p, (s32)(gp->framerate * q), PF(p, 0x100), a2, q);
+		partySetForceMove(p, gp->framerate * q, PF(p, 0x100), a2);
 	}
 	if (p->field_28 == 0) {
 		return EVT_RETURN_DONE;

@@ -17,6 +17,10 @@ FileManagerWork fileWork;
 
 //.sdata
 FileManagerWork* afp = &fileWork;
+#pragma push
+#pragma force_active on
+static __declspec(section ".sdata") u32 gap_07_804125DC_sdata[1] = {0};
+#pragma pop
 
 //local prototypes
 void fileGarbageDataAdrClear(FileEntry* entry);
@@ -240,8 +244,8 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
-	u16 i;
 	TEXPalette* tpl;
+	u16 i;
 	s32 j, n;
 	TEXHeader* img;
 	CLUTHeader* pal;

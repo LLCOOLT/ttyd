@@ -418,11 +418,11 @@ static void actionCommandDisp(f32 x, f32 y) {
         break;
     }
     default: {
+        f32 qx;
+        f32 qy;
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 0.0f, 100, 100, 100, 100, 0);
         if (cw->timer <= 0) {
             CameraEntry* cam = camGetPtr(8);
-            f32 qx;
-            f32 qy;
             qx = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
             qy = 49.0f + y;
             btlDispGXInit2DRasta();

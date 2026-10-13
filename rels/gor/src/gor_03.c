@@ -5309,7 +5309,8 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
         case 4:
             if (data->counter == 0) {
                 for (i = 0; i < 3; i++) {
-                    gara[i] = SLOTGARA[data->nowSlot][i][(s32)(data->angle[data->nowSlot][i] / 45.0f)];
+                    r = data->angle[data->nowSlot][i] / 45.0f;
+                    gara[i] = SLOTGARA[data->nowSlot][i][r];
                 }
                 if (gara[0] == gara[1] && gara[1] == gara[2]) {
                     data->phase = 6;
@@ -5774,5 +5775,4 @@ static USER_FUNC(enzan_lw_load) {
     }
     return EVT_RETURN_DONE;
 }
-
 

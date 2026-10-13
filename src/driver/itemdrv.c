@@ -348,7 +348,7 @@ void itemMain(void) {
 					hit = NULL;
 					newY = y + -1.0f;
 				}
-				else if (hit = itemHitCheckY(entry->position.x, 20.0f + y, entry->position.z, -1.0f, -1.0f, &newY)) {
+				else if (hit = itemHitCheckY(entry->position.x, entry->position.y + 20.0f, entry->position.z, -1.0f, -1.0f, &newY)) {
 				}
 				else {
 					hit = NULL;

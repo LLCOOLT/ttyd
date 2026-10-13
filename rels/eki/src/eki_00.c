@@ -764,7 +764,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (pose->mtx[1][3] > mario->position.y + mario->wPlayerCollisionBox.y) {
         return 0;
     }
-    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2
+    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
         && wp->field_0x558 < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
@@ -811,7 +811,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     e = (Vec){mario->position.x, pose->mtx[1][3], mario->position.z};
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-    range = (20.0f + mario->wPlayerCollisionBox.x) / 2;
+    range = (mario->wPlayerCollisionBox.x + 20.0f) / 2;
     if (PSVECDistance(&e, &f) < range) {
         pose->mtx[0][3] = moa->field_0x28;
         pose->mtx[2][3] = moa->field_0x2c;

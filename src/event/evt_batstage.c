@@ -30,7 +30,7 @@ USER_FUNC(evt_batstage_light_set_player_off) {
     if (idx != -1) {
         BattleStageLightRelease(idx, 30, 0);
     }
-    idx = BattleStageGetLightNumberByName("sys_activeUnit_3");
+    idx = BattleStageGetLightNumberByName("sys_activeUnit_3\0\0\0");
     if (idx != -1) {
         BattleStageLightRelease(idx, 30, 0);
     }
@@ -41,12 +41,12 @@ USER_FUNC(evt_batstage_light_set_player_on) {
     BattleWork* bw = _battleWorkPointer;
     s32 i;
     s32 idx;
-    s32 sel = evtGetValue(event, event->args[0]);
+    s32 sel = evtGetValue(event, *event->args);
     char names[3][32] = {"sys_activeUnit_1", "sys_activeUnit_2", "sys_activeUnit_3\0\0\0"};
     Vec pos[3] = {{100.0f, 250.0f, 70.0f}, {-300.0f, 250.0f, 70.0f}, {-120.0f, 250.0f, -70.0f}};
-    Vec tgt[3] = {{15.0f, 0.0f, 15.0f}, {-15.0f, 0.0f, 15.0f}, {0.0f, 0.0f, -15.0f}};
-    Vec tgtu[3] = {{0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}};
-    Vec up[3] = {{100.0f, 0.0f, -70.0f}, {-300.0f, 0.0f, -70.0f}, {-120.0f, 0.0f, -70.0f}};
+    Vec tg[3] = {{100.0f, 0.0f, -70.0f}, {-300.0f, 0.0f, -70.0f}, {-120.0f, 0.0f, -70.0f}};
+    Vec tu[3] = {{15.0f, 0.0f, 15.0f}, {-15.0f, 0.0f, 15.0f}, {0.0f, 0.0f, -15.0f}};
+    Vec upv[3] = {{0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}};
     u8 col[3][3] = {{120, 120, 120}, {120, 120, 120}, {120, 120, 120}};
     u8 en[3] = {0, 0, 0};
 
@@ -72,9 +72,9 @@ USER_FUNC(evt_batstage_light_set_player_on) {
             BattleStageLightSetLightColor(idx, col[i][0], col[i][1], col[i][2], 30, 0);
             BattleStageLightSetWidth(idx, 120, 1, 0);
             BattleStageLightSetPosition(idx, pos[i].x, pos[i].y, pos[i].z, 0, 0);
-            BattleStageLightSetUpVec(idx, up[i].x, up[i].y, up[i].z, 0, 0);
-            BattleStageLightSetTarget(idx, tgt[i].x, tgt[i].y, tgt[i].z, 0, 0);
-            BattleStageLightSetTargetByUnit(idx, bw->activeUnitId, tgtu[i].x, tgtu[i].y, tgtu[i].z, 30, 5);
+            BattleStageLightSetUpVec(idx, upv[i].x, upv[i].y, upv[i].z, 0, 0);
+            BattleStageLightSetTarget(idx, tg[i].x, tg[i].y, tg[i].z, 0, 0);
+            BattleStageLightSetTargetByUnit(idx, bw->activeUnitId, tu[i].x, tu[i].y, tu[i].z, 30, 5);
         }
     }
     BattleStageSetStgDark(140, 30, 0);

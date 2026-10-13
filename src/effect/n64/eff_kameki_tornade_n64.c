@@ -248,13 +248,13 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         p = &tmpl[k];
         ang = (6.2831855f * (f32)(k * 360 / 15)) / 360.0f;
         p->x = 100.0f * (f32)cos(ang);
-        p->y = 0;
+        p->y = 0.0f;
         p->z = 100.0f * (f32)sin(ang);
         p->s = k * 128;
         p->t = 0;
         q = &tmpl[k + 16];
         q->x = 100.0f * (f32)cos(ang);
-        q->y = 0;
+        q->y = 0.0f;
         q->z = 100.0f * (f32)sin(ang);
         q->s = k * 512;
         q->t = 1024;

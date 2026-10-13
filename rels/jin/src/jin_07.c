@@ -31,6 +31,7 @@ typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 field_0x1C; f32 field_0x20;
 static Teresa* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
+s32 jin_07_bss_pad_C;
 void computePosHermite(ExtPose* pose, Teresa* ter);
 f32 randf(f32 min, f32 max);
 int rand(void);
@@ -279,6 +280,8 @@ static s32 senteresa_ext_entry_data[] = {
     1077936128, (s32)"c_teresa", (s32)"W_1", 1082130432, 0, 0, 0,
 };
 
+
+
 static f32 randf(f32 min, f32 max) {
     f32 r = rand() / 32767.0f;
 
@@ -406,7 +409,6 @@ static void senteresa_ext_shadow_disp(void) {
         {0.0f, 10.0f, 0.0f, 0.1f},
         {0.0f, 0.0f, 10.0f, 0.0f},
     };
-
     extLoadShadowMtx(mt);
     extLoadShadowRenderMode();
     extLoadShadowVertex();
@@ -460,6 +462,7 @@ USER_FUNC(senteresa_okure_move) {
     npc->position = pos;
     return EVT_RETURN_DONE;
 }
+
 
 EVT_BEGIN(evt_teresa_box_open)
     CALL(evt_snd_bgmoff, 512)
@@ -691,6 +694,4 @@ EVT_BEGIN(jin_07_init_evt)
     CALL(evt_map_replace_mapobj, STRING("honou04"), 0)
     RETURN
 EVT_END()
-
-
 

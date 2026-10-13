@@ -492,8 +492,8 @@ void chorogun_ext_main(void) {
     f32 dx;
     f32 tz;
     f32 tx;
-    f32 dz2;
     f32 dx2;
+    f32 dz2;
     f32 x, y, z;
 
     wp = _battleWorkPointer;
@@ -574,10 +574,10 @@ void chorogun_ext_main(void) {
             c->state = 21;
             break;
         case 21:
-            tx = unit->mPosition.x - unit->mHomePosition.x + intplGetValue(0, n, 1000, c->pos.x, unit->mHomePosition.x);
+            d = unit->mPosition.x - unit->mHomePosition.x + intplGetValue(0, n, 1000, c->pos.x, unit->mHomePosition.x);
             tz = unit->mPosition.z - unit->mHomePosition.z + intplGetValue(0, n, 1000, c->pos.z, unit->mHomePosition.z);
             if (pose->mtx[1][3] <= unit->mPosition.y) {
-                dx2 = tx - pose->mtx[0][3];
+                dx2 = d - pose->mtx[0][3];
                 dz2 = tz - pose->mtx[2][3];
                 d = sqrt(dx2 * dx2 + dz2 * dz2);
                 if (i % 100 == 0) {

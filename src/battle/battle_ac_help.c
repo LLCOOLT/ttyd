@@ -48,7 +48,6 @@ void _ac_help_disp(CameraId cameraId, void *param)
   u8 alpha;
   f32 x;
   f32 y;
-  GXColor col;
   const char **help = &wp->acHelpMsg;
   alpha = 0xFF;
   if (wp->acHelpDispType == 1)
@@ -63,7 +62,7 @@ void _ac_help_disp(CameraId cameraId, void *param)
   new_var3[1] = new_var3[0];
   width = FontGetMessageWidthLine(new_var3[1], &lines);
   lines++;
-  col = color;
+  { GXColor col; col = color;
   col.a = alpha;
   y = 0.0f;
   x = y - (width / 2);
@@ -72,4 +71,5 @@ void _ac_help_disp(CameraId cameraId, void *param)
   windowDispGX_Waku_col(0, col, x - 20.0f, new_var, width + 40, (lines * 29) + 1, 10.0f);
   FontDrawStart_alpha(alpha);
   FontDrawMessage(x, ((s32) y) + ((lines - 1) * 29), new_var3[1]);
+}
 }

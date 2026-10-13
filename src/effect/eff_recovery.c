@@ -787,8 +787,8 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
     f32 l;
     f32 r;
     f32 v;
-    f32 off;
     f32 u;
+    f32 off;
 
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
@@ -846,13 +846,13 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
             if (i != 1) {
                 u = 2.0f;
             }
-            l = nw / 2.0f;
+            l = nw / 2.0f; v = l + off;
             r = 16.0f;
-            v = 1.0f;
+            w = 1.0f;
             GXPosition3f32(l, r + off, 0.0f); GXTexCoord2f32(0.0f, 0.0f);
             GXPosition3f32(r, r + off, 0.0f); GXTexCoord2f32(u, 0.0f);
-            GXPosition3f32(r, l + off, 0.0f); GXTexCoord2f32(u, v);
-            GXPosition3f32(l, l + off, 0.0f); GXTexCoord2f32(0.0f, v);
+            GXPosition3f32(r, v, 0.0f); GXTexCoord2f32(u, w);
+            GXPosition3f32(l, v, 0.0f); GXTexCoord2f32(0.0f, w);
         }
     }
 }

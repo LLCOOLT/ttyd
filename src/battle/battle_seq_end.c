@@ -632,7 +632,6 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     u16 lines;
     s32 width;
 
-    f32 x;
     f32 y;
     f32 zero = 0.0f;
 
@@ -659,11 +658,10 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     }
     width = FontGetMessageWidthLine(msg, &lines);
     lines++;
-    x = zero - width / 2;
-    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, x - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, (zero - width / 2) - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
     FontDrawStart_alpha(0xFF);
     y = -148.0f;
-    FontDrawMessage(x, (s32)y + (lines - 1) * 29, msg);
+    FontDrawMessage(zero - width / 2, (s32)y + (lines - 1) * 29, msg);
 }
 
 void _GetExpIcon_Init(SeqEndWork* work) {

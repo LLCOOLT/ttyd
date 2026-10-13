@@ -263,7 +263,6 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 anm;
     s32 type;
     EffConfettiN64Work* w;
     s32 i;
@@ -272,6 +271,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     u8* col;
     s32 off;
+    s32 anm;
     Mtx tmp;
     Mtx scale;
     Mtx rot;

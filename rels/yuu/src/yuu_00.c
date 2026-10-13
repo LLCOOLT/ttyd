@@ -607,14 +607,20 @@ USER_FUNC(unk_yuu_00004250) {
     return EVT_RETURN_DONE;
 }
 
-static BOOL get_monte_check(Vec* a, Vec* b) {
+static const char yuu00_gnd_02[] = "A_ground_02";
+static const char yuu00_gnd_05[] = "A_ground_05";
+static const char yuu00_gnd_03[] = "A_ground_03";
+static const char yuu00_gnd_06[] = "A_ground_06";
+static const char yuu00_gnd_04[] = "A_ground_04";
+
+static inline BOOL get_monte_check(Vec* a, Vec* b) {
     if (PSVECDistance(a, b) < 20.0f && __fabs(a->y - b->y) < 20.0) {
         return TRUE;
     }
     return FALSE;
 }
 
-static void monte_disp(CameraId camera, void* param) {
+static inline void monte_disp(CameraId camera, void* param) {
     Monte* monte = param;
     s32 i;
 
@@ -645,6 +651,7 @@ static USER_FUNC(fall_rtn) {
     Vec v;
     Monte* m;
 
+    (void)&get_monte_check;
     if (isFirstCall) {
         if (monte_p != NULL) {
             exists = TRUE;
@@ -834,19 +841,19 @@ BOOL yuuminigame1_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
         if (!strcmp("A_dai_05", hitGetName(mario->hitobjStandOn))) {
             data->result = 5;
         }
-        if (!strcmp("A_ground_02", hitGetName(mario->hitobjStandOn))) {
+        if (!strcmp(yuu00_gnd_02, hitGetName(mario->hitobjStandOn))) {
             data->result = -5;
         }
-        if (!strcmp("A_ground_05", hitGetName(mario->hitobjStandOn))) {
+        if (!strcmp(yuu00_gnd_05, hitGetName(mario->hitobjStandOn))) {
             data->result = -5;
         }
-        if (!strcmp("A_ground_03", hitGetName(mario->hitobjStandOn))) {
+        if (!strcmp(yuu00_gnd_03, hitGetName(mario->hitobjStandOn))) {
             data->result = -10;
         }
-        if (!strcmp("A_ground_06", hitGetName(mario->hitobjStandOn))) {
+        if (!strcmp(yuu00_gnd_06, hitGetName(mario->hitobjStandOn))) {
             data->result = -15;
         }
-        if (!strcmp("A_ground_04", hitGetName(mario->hitobjStandOn))) {
+        if (!strcmp(yuu00_gnd_04, hitGetName(mario->hitobjStandOn))) {
             data->result = -20;
         }
         marioKeyOff();

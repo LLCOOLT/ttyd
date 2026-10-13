@@ -119,12 +119,13 @@ static inline Vec effSandarsMakeVec(f32 x, f32 y, f32 z) {
 void effSandarsMain(EffectEntry* effect) {
     EffSandarsWork* work = effect->userdata;
     Vec pos2;
+    f32 bx, by, bz;
     s32 camId;
     s32 camera;
     s32 type;
     s32 i;
 
-    pos2 = effSandarsMakeVec(work->position.x, work->position.y, work->position.z);
+    pos2 = effSandarsMakeVec(bx = work->position.x, by = work->position.y, bz = work->position.z);
     type = work->type;
     camId = work->camId;
     camera = gp->inBattle != 0;
@@ -162,7 +163,7 @@ void effSandarsMain(EffectEntry* effect) {
     }
     switch (work->state) {
     case 0:
-        effBombN64SetCamId(((EffectEntry * (*)(s32))effBombN64Entry)(work->bombType), camId);
+        effBombN64SetCamId(effBombN64Entry(work->bombType, bx, by, bz), camId);
         work->frame = 0;
         work->state++;
         break;

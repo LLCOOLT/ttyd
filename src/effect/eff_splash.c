@@ -322,6 +322,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
     Mtx trans;
     Mtx scale;
+    u8** dl;
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
@@ -335,8 +336,10 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     f32 r0, g0, b0, r1, g1, b1;
     f32 ang, sn, cs;
     f32 w;
-    f32 nw;
     u32 u;
+    f32 nw;
+    u32 k2;
+    u8* sz;
 
     cam = camGetPtr(cameraId);
     type = work->type;
@@ -497,8 +500,13 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, geso_shibuki_texcoord0_tbl, 4);
-            for (u = 0; u < 5; u++) {
-                GXCallDisplayList(geso_shibuki_dl_0_tbl[u], geso_shibuki_dl_0_size_tbl[u] << 5);
+            {
+                k2 = 0;
+                sz = geso_shibuki_dl_0_size_tbl;
+                dl = geso_shibuki_dl_0_tbl;
+                for (; k2 < 5; k2++, sz++, dl++) {
+                    GXCallDisplayList(*dl, *sz << 5);
+                }
             }
             break;
         }

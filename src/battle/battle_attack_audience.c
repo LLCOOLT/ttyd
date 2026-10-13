@@ -40,7 +40,7 @@ extern s32 btlevtcmd_StartWaitEvent[];
 extern s32 btlevtcmd_StopWaitEvent[];
 extern s32 btlevtcmd_WaitEventEnd[];
 
-extern s32 btlataudevtDummy[];
+extern s32 btlataudevtDummy[16];
 extern s32 btlataudevtPresentItem_Damage[];
 extern s32 btlataudevtPresentItem_Get[];
 
@@ -149,8 +149,8 @@ s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
 
 void _get_item_announce_disp(s32 cameraId, void* param) {
     static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-    u16 lines;
     GXColor col;
+    u16 lines;
     const char* itemName;
     char buf[128];
     const char* msg;
@@ -165,10 +165,10 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     sprintf(buf, msg, itemName);
     width = FontGetMessageWidthLine(buf, &lines);
     lines++;
+    col = color;
     y = 0.0f;
     x = y - width / 2;
     y = 60.0f;
-    col = color;
     windowDispGX_Waku_col(0, col, x - 10.0f, 34.0f, width + 20, lines * 29 + 3, 10.0f);
     FontDrawStart();
     FontDrawMessage(x, (s32)y - 29, buf);
@@ -228,18 +228,20 @@ s32* btlataudGetMoveEventPtr(void) {
     }
 }
 
+
+s32* btlataudGetAttackEventPtr(s32 unitId) {
+    s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
+    if (p == NULL) {
+        p = (s32*)((u32)btlataudevtDummy + 4);
+    }
+    return p;
+}
+
 s32 btlataudevtDummy[] = {
     0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
     (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
 
-s32* btlataudGetAttackEventPtr(s32 unitId) {
-    s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
-    if (p == NULL) {
-        return &btlataudevtDummy[1];
-    }
-    return p;
-}
 
 
 EVT_BEGIN(btlataudevtPresentItem_Damage)

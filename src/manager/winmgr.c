@@ -1008,8 +1008,18 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
 }
 
 void winMgrSelectDelete(WinMgrSelect* sel) {
-    __memFree(HEAP_DEFAULT, sel->items);
-    __memFree(HEAP_DEFAULT, sel);
+    WinMgrSelectItem* items;
+    int heap;
+    WinMgrSelect* sel3;
+    WinMgrSelectItem* items2;
+    WinMgrSelectItem* items3;
+    WinMgrSelect* sel2;
+    items3 = (sel2 = (sel3 = sel))->items;
+    items2 = items3;
+    heap = (heap = HEAP_DEFAULT);
+    items = items2;
+    __memFree(HEAP_DEFAULT, items);
+    __memFree(heap, sel3);
 }
 
 s32 unk_80237448(WinMgrSelect* sel) {
@@ -1486,8 +1496,8 @@ void select_disp_mario(WinMgrEntry* entry) {
 }
 
 void select_disp_luigi(WinMgrEntry* entry) {
-    WinMgrEntry* ent;
-    WinMgrSelect* sel = entry->param;
+    WinMgrEntry* ent = entry;
+    WinMgrSelect* sel = ent->param;
     InformantWork* jdt = &_jdt;
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
@@ -1505,7 +1515,6 @@ void select_disp_luigi(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
 
-    ent = entry;
     if (!(wp->mEntries[sel->descriptorId[0]].flags & 4)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);

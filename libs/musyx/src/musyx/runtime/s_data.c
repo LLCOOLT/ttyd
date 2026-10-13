@@ -18,6 +18,7 @@ static GSROOT gsDefault;
 static s32 gsNextID;
 static GSROOT* gsCurrent;
 static GSROOT* gsRoot;
+static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsRoot = NULL;
@@ -262,8 +263,9 @@ bool sndPushGroup(void* prj_data, u16 gid, void* samples, void* sdir, void* pool
 */
 bool sndPopGroup() {
   GROUP_DATA* g;
-  SDIR_DATA* sdir;
   void* prj;
+  SDIR_DATA* sdir;
+  int i;
   FX_DATA* fd;
 
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
@@ -321,7 +323,7 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
 
   for (root = gsRoot; root != NULL; root = root->next) {
-  for (i = 0; i < root->sp; ++i) {
+    for (i = 0; i < root->sp; ++i) {
     if (root->stack[i].gAddr->id != sgid) {
       continue;
     }
@@ -362,13 +364,13 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
   u32 seqId;
-  int i;
   GROUP_DATA* g;
   MIDISETUP* midiSetup;
   PAGE* drum;
   PAGE* norm;
   GSROOT* root;
   void* prj;
+  int i;
 
   for (root = gsRoot; root != NULL; root = root->next) {
     for (i = 0; i < root->sp; ++i) {

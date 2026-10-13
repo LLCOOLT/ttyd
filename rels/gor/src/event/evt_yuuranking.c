@@ -53,8 +53,8 @@ __declspec(section ".data") s32 fd_evt_yuuranking_one_364[1];
 static __declspec(section ".data") s32 main_evt[4];
 
 static s32 fontlenpitch(const char* str, s32 pitch) {
-    s32 n;
     const s8* p;
+    s32 n;
 
     if (pitch != 0) {
         n = 0;

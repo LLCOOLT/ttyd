@@ -2355,6 +2355,8 @@ EVT_BEGIN(marioAttackEvent_HammerNageru_object)
     RETURN
 EVT_END()
 
+static const char battle_mario_nullstr[4] = "";
+
 s32 marioAttackEvent_FireNaguri[] = {
     131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2,
     196699, (s32)btlevtcmd_RunDataEventChild, -2, 7, 65630, (s32)marioAttackEvent_MajinaiPowerUpCheck, 131163, (s32)btlevtcmd_CommandGetWeaponActionLv,
@@ -2402,9 +2404,9 @@ s32 marioAttackEvent_FireNaguri[] = {
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"M_S_1", 112, 131163, (s32)btlevtcmd_WaitEventEnd,
     -29999986, 327771, (s32)btlevtcmd_SetPartsWork, -2, 3, 0, 0, 65627,
     (s32)evt_audience_ap_recovery, 65627, (s32)btlevtcmd_InviteApInfoReport, 393307, (s32)btlevtcmd_GetPartsPos, -2, 3, -30000000,
-    -29999999, -29999998, 983131, (s32)evt_eff64, (s32)"", (s32)"fire_spark_n64", 0, -30000000,
+    -29999999, -29999998, 983131, (s32)evt_eff64, (s32)(char*)battle_mario_nullstr, (s32)"fire_spark_n64", 0, -30000000,
     -29999999, -29999998, 30, 40, -229998976, 12, 100, -229998976,
-    -229998976, 0, 131125, -29999999, 5, 983131, (s32)evt_eff, (s32)"",
+    -229998976, 0, 131125, -29999999, 5, 983131, (s32)evt_eff, (s32)(char*)battle_mario_nullstr,
     (s32)"kemuri_test", 11, -30000000, -29999999, -29999998, -229998976, 0, 0,
     0, 0, 0, 0, 0, 196699, (s32)evt_btl_camera_set_mode, 0,
     1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0, 1, 196699, (s32)evt_btl_camera_set_zoom, 0,
@@ -2986,9 +2988,8 @@ USER_FUNC(_mario_fire_ball_controll) {
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, partId);
     EffectEntry* eff;
     if (isFirstCall) {
-        f32 s = (f32){1.0f};
-        event->userdata[0] = 0;
-        event->userdata[1] = (s32)effFireEntry(5, 0, 0, 0, s, 1000);
+        event->userdata[1] = (s32)effFireEntry(5, 0, 0, 0, (event->userdata[0] = 0, (f32){1.0f}), 1000);
+
     }
     eff = (EffectEntry*)event->userdata[1];
     if (*(s32*)((u8*)part + 0x130) == 0) {

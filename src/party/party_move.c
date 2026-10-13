@@ -546,8 +546,13 @@ void unk_800c93d0(PartyEntry* party, f32 spd) {
 }
 
 void unk_800c9398(PartyEntry* party, f32 spd) {
+    f32 m;
     f32 s = spd * party->playerPtr->playerGravity;
-    f32 m = (party->flags & 0x80) ? 0.75f : 1.0f;
+    if (party->flags & 0x80) {
+        m = 0.75f;
+    } else {
+        m = 1.0f;
+    }
     PF(party, 0x108) = s * m;
     party->field_104 = PF(party, 0x108);
 }

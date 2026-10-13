@@ -85,7 +85,7 @@ EffectEntry* effStampN64Entry(s32 type, f32 x, f32 y, f32 z) {
     work++;
     for (i = 1; i < 8; i++, work++) {
         angle = (f32)((i - 1) * 360 / 7);
-        rad = 6.2832f * (90.0f + angle) / 360.0f;
+        rad = 6.2831855f * (90.0f + angle) / 360.0f;
         work->position.x = one * (f32)cos(rad);
         work->position.y = one * (f32)sin(rad);
         work->position.z = 0.0f;
@@ -133,8 +133,8 @@ void effStampMain(EffectEntry* effect) {
             work->scaleX += 0.1f * (1.0f - work->scaleX);
             work->radius += 0.6f * (0.05f * (10.0f - work->radius));
         }
-        work->position.x = work->radius * (f32)cos(6.2832f * (90.0f + work->angle) / 360.0f);
-        work->position.y = work->radius * (f32)sin(6.2832f * (90.0f + work->angle) / 360.0f);
+        work->position.x = work->radius * (f32)cos(6.2831855f * (90.0f + work->angle) / 360.0f);
+        work->position.y = work->radius * (f32)sin(6.2831855f * (90.0f + work->angle) / 360.0f);
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effStampDisp, effect);
 }

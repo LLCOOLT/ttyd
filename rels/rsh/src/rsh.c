@@ -1470,7 +1470,6 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     s32 texMap = info->texCoord;
     s32 texCoord = info->texMap;
     s32 field_0x18 = info->field_0x18;
-    MapObject* obj = *(MapObject**)info->field_0x0;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1478,7 +1477,9 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
     Mtx mtx;
     f32 t;
+    MapObject* obj;
 
+    obj = *(MapObject**)info->field_0x0;
     if (obj->flags & 0x20) {
         while ((obj = obj->parent) != NULL) {
             if (obj->flags & 0x10) {
@@ -1548,9 +1549,9 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
     tevStage++;
-    info->tevStage = tevStage;
     texMap++;
     texCoord++;
+    info->tevStage = tevStage;
     info->texMap = texCoord;
     info->field_0x18 = field_0x18;
     info->texCoord = texMap;
