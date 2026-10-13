@@ -10,6 +10,7 @@ void tri2();
 #include <dolphin/mtx.h>
 
 
+f32 vaporUnused[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 static s8 dx_data[] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -8, -15, -21, -26, -30, -34, -37, -39, -40, -41, -42, -43, -44, -45, -46, -47, -48, -49, -50, -51, -52, -53, -54, -55, -56, -57, -58, -59, -60, -61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
@@ -47,7 +48,6 @@ static effN64Vtx size64x64_tex32x32_vtx[] = {
 };
 
 
-f32 vaporUnused[16] = {-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f, -1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, 1.0f, -1.0f};
 
 static const GXColor kColor1;
 static const GXColor kColor2;
@@ -138,15 +138,15 @@ void effVaporMain(EffectEntry* effect) {
     case 0:
     case 1:
         work->vel += 0.02f;
-        work->position.y += work->vel;
+        break;
+    }
+    work->position.y += work->vel;
         if (work->vel > 0.5f) {
             work->vel = 0.5f;
         }
         if (work->vel < -1.5f) {
             work->vel = -1.5f;
         }
-        break;
-    }
     work->anim += 1.0f;
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effVaporDisp, effect);
 }
@@ -158,15 +158,16 @@ void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
     s32 frame;
     CameraEntry* camera;
     s32 alpha;
-    s32 type;
     GXTexObj texObj;
     Mtx mtx;
-    Mtx rot;
     Mtx scale;
+    Mtx rot;
     Mtx viewMtx;
     s32 n;
+    s32 type;
     f32 s;
     f32 f;
+    s32 a2;
     s32 sub;
 
     camera = camGetPtr(cameraId);
@@ -240,9 +241,9 @@ void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
     if (n >= 30) {
         n = 29;
     }
-        s = 0.01f * scale_data[n + type * 30];
-    f = -(f32)rz_data[n + type * 30];
-    PSMTXTrans(mtx, (f32)dx_data[n + type * 30], 0.0f, 0.0f);
+        s = 0.01f * (scale_data + type * 30)[n];
+    f = -(f32)(rz_data + type * 30)[n];
+    PSMTXTrans(mtx, (f32)(dx_data + type * 30)[n], 0.0f, 0.0f);
     PSMTXRotRad(rot, 'z', 0.017453292f * f);
     PSMTXScale(scale, s, s, s);
     PSMTXConcat(mtx, rot, mtx);
@@ -250,10 +251,10 @@ void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(viewMtx, mtx, mtx);
     GXLoadPosMtxImm(mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    f = 5.0f * seq_data[n + type * 30];
+    f = 5.0f * (seq_data + type * 30)[n];
     f *= 0.00390625f;
     sub = (s32)f;
-    alpha = 256.0f * (f - sub);
+    a2 = 256.0f * (f - sub);
     PSMTXScale(scale, 0.032258064f, 0.007874016f, 0.0f);
     PSMTXTrans(mtx, 0.0f, 32.0f, 0.0f);
     PSMTXConcat(scale, mtx, scale);
@@ -266,7 +267,7 @@ void effVaporDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXScale(scale, 0.032258064f, 0.007874016f, 0.0f);
             GXLoadTexMtxImm(scale, GX_TEXMTX1, GX_MTX2x4);
         }
-        GXSetTevColor(GX_TEVREG1, (GXColor){work->r2, work->g2, work->b2, alpha});
+        GXSetTevColor(GX_TEVREG1, (GXColor){work->r2, work->g2, work->b2, a2});
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(sub * 4, sub * 4 + 1, sub * 4 + 2, 0, sub * 4, sub * 4 + 2, sub * 4 + 3, 0);
     }

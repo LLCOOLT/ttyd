@@ -108,7 +108,7 @@ static void effIceMain(EffectEntry* effect) {
     }
     work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
     idx = life + 20;
-    for (i = 1; i < effect->count; i++, idx += 20, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
+    for (i = 1; i < effect->count; idx += 20, i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
         p = (EffIceN64Piece*)work;
         s = (f32)sin(6.2831855f * (2.0f * ((EffIceN64Piece*)work)->rotZ) / 360.0f);
         p->velY += -0.05f;
@@ -118,14 +118,16 @@ static void effIceMain(EffectEntry* effect) {
         p->velX *= 0.92f;
         p->rotVel += (s32)effTblRandN64(50, idx) - 25;
         p->rotZ += 10.0f * (f32)sin(6.2831855f * p->rotVel / 360.0f);
-        p->rotY += 10.0f * (f32)cos(6.2831855f * (p->rotVel * 0.5f) / 360.0f);
+        p->rotY += 10.0f * (f32)cos(6.2831855f * (p->rotVel / 2.0f) / 360.0f);
         p->x += p->velX;
         p->y += p->velY;
     }
     dispEntry(CAMERA_3D, dispCalcZ(&calcPos), 2, (DispCallback)effIceDisp, effect);
 }
 
+#pragma opt_propagation reset
 static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
+
     EffIceN64Work* work;
     CameraEntry* cam;
     Mtx trans;
@@ -135,7 +137,6 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     s32 i;
     u32* vtx;
-    GXColor color = { 0x14, 0x64, 0x14, 0x00 };
 
     cam = camGetPtr(cameraId);
     work = effect->userdata;
@@ -153,8 +154,9 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(trans, rot, mtx);
     PSMTXConcat(cam->view, mtx, mtx);
-    color.a = work->alpha;
-    GXSetTevColor(GX_TEVREG0, color);
+    {
+        GXSetTevColor(GX_TEVREG0, (GXColor){ 0x14, 0x64, 0x14, work->alpha });
+    }
     work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
     for (i = 1; i < effect->count; i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
         if (i & 1) {
@@ -183,7 +185,7 @@ static void effIceDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, trans, trans);
         GXLoadPosMtxImm(trans, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        GXBegin(GX_QUADS, GX_VTXFMT0, 6);
+        GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
 }

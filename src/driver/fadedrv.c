@@ -1009,7 +1009,7 @@ static void zFill(void) {
 	Mtx mtx;
 
 	camera = camGetCurPtr();
-	y0 = (camera->near + camera->far) * 0.5f;
+	y0 = (camera->near + camera->far) / 2.0f;
 	y0 = y0 * (f32)tan(0.5f * ((6.2831855f * camera->fovY) / 360.0f));
 	x1 = y0 * camera->aspect;
 	y1 = -y0;

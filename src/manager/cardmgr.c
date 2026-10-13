@@ -1089,8 +1089,7 @@ static inline void memcard_probe(void) {
     timeout = 1000000;
     wp->flags |= 1;
 
-    i = 0;
-    while (result = CARDProbeEx(0, &memSize, &sectorSize), result == CARD_RESULT_BUSY) {
+    for (i = 0; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY;) {
         if (++i > timeout) {
             result = CARD_RESULT_FATAL_ERROR;
             break;

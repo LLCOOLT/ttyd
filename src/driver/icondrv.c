@@ -65,6 +65,24 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
         }                                                          \
     }
 
+#define ICON_ANIM_TPL_S(data, dst)                                   \
+    if ((data)->numIcons > 1) {                                    \
+        s32 total = 0;                                             \
+        s32 i;                                                     \
+        s32 t;                                                     \
+        for (i = 0; i < (data)->numIcons; i++) {                   \
+            total += (data)->frames[i].delay;                      \
+        }                                                          \
+        t = (s32)gp->retraceCount % total;                              \
+        for (i = 0; i < (data)->numIcons; i++) {                   \
+            if (t < (data)->frames[i].delay) {                     \
+                dst = (data)->frames[i].tplId;                     \
+                break;                                             \
+            }                                                      \
+            t -= (data)->frames[i].delay;                          \
+        }                                                          \
+    }
+
 static inline IconBinData* iconGetBinData(u16 iconId) {
     IconBinary* bin = icon_bin;
     if (!icon_tpl_ok || !icon_bin_ok) {
@@ -125,14 +143,16 @@ void iconInit(void) {
     char path[128];
     DVDEntry* entry;
     u32 size;
+    IconWork* wp;
 
     work[0].count = 32;
     work[0].entries = __memAlloc(HEAP_DEFAULT, sizeof(IconEntry) * work[0].count);
     memset(work[0].entries, 0, sizeof(IconEntry) * work[0].count);
+    wp = &work[1];
 
-    work[1].count = 32;
-    work[1].entries = __memAlloc(HEAP_DEFAULT, sizeof(IconEntry) * work[1].count);
-    memset(work[1].entries, 0, sizeof(IconEntry) * work[1].count);
+    wp->count = 32;
+    wp->entries = __memAlloc(HEAP_DEFAULT, sizeof(IconEntry) * wp->count);
+    memset(wp->entries, 0, sizeof(IconEntry) * wp->count);
     icon_tpl = NULL;
     icon_bin = NULL;
     icon_tpl_ok = FALSE;
@@ -170,16 +190,13 @@ s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
 
 void iconMain(void) {
     IconWork* wp;
-    IconEntry* entry;
     int i;
+    IconEntry* entry;
     IconBinData* data;
 
     wp = iconGetWork();
-    if (!icon_tpl_ok)
+    if (!icon_tpl_ok || !icon_bin_ok)
         return;
-    if (!icon_bin_ok) {
-        return;
-    }
     for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
         if (entry->uflags & 1) {
             if (entry->uflags & 0x2000) {
@@ -360,9 +377,10 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     Mtx transmtx, scalemtx, rotmtx, mtx;
     CameraEntry* camera;
     IconBinData* data;
-    IconEntry* ep = &entry;
+    IconEntry* ep;
 
     camera = camGetCurPtr();
+    ep = &entry;
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
@@ -380,7 +398,7 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
     entry.frameDelay = data->frames[0].delay;
-    ICON_ANIM_TPL(data, entry.tplId);
+    ICON_ANIM_TPL_S(data, entry.tplId);
     iconGX(mtx, ep);
 }
 
@@ -404,13 +422,13 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {
     id = iconId;
     entry.uflags = flags;
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-    entry.iconId = iconId;
-    data = iconGetBinData(id);
+    entry.iconId = id;
+    data = iconGetBinData(entry.iconId);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
     entry.frameDelay = data->frames[0].delay;
-    ICON_ANIM_TPL(data, entry.tplId);
+    ICON_ANIM_TPL_S(data, entry.tplId);
     MTXConcat(camera->view, mtx, m);
     iconGX(m, ep);
 }
@@ -420,21 +438,22 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     Mtx m;
     CameraEntry* camera;
     IconBinData* data;
-    IconEntry* ep = &entry;
+    IconEntry* ep;
 
     camera = camGetCurPtr();
+    ep = &entry;
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
     entry.uflags = flags;
     entry.color = color;
     entry.iconId = iconId;
-    data = iconGetBinData((u16)iconId);
+    data = iconGetBinData((u16)entry.iconId);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
     entry.frameDelay = data->frames[0].delay;
-    ICON_ANIM_TPL(data, entry.tplId);
+    ICON_ANIM_TPL_S(data, entry.tplId);
     MTXConcat(camera->view, pos, m);
     iconGX(m, ep);
 }
@@ -450,7 +469,7 @@ void iconGetTexObj(GXTexObj* texObj, s16 iconId) {
     }
     data = iconGetBinData((u16)iconId);
     tplId = data->frames[0].tplId;
-    ICON_ANIM_TPL(data, tplId);
+    ICON_ANIM_TPL_S(data, tplId);
     TEXGetGXTexObjFromPalette(icon_tpl, texObj, tplId);
     GXInitTexObjLOD(texObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 }
@@ -481,7 +500,7 @@ void iconGX(Mtx mtx, IconEntry* entry) {
     pos.x = mtx[0][3];
     pos.y = mtx[1][3];
     pos.z = mtx[2][3];
-    MTXScale(scalemtx, (entry->uflags & 8) ? -1.0f : 1.0f, (entry->uflags & 4) ? -1.0f : 1.0f, 1.0f);
+    MTXScale(scalemtx, (entry->uflags & 4) ? -1.0f : 1.0f, (entry->uflags & 8) ? -1.0f : 1.0f, 1.0f);
     MTXConcat(mtx, scalemtx, m);
     camera = camGetPtr(CAMERA_2D);
     if (camGetCurPtr() != camera && (entry->uflags & 0x10)) {
@@ -606,12 +625,12 @@ void iconGX(Mtx mtx, IconEntry* entry) {
         y *= 0.6f;
         w *= 0.6f;
         hn *= 0.6f;
-        if (entry->iconId == 0x18B) {
+        if (*(u16*)&entry->iconId == 0x18B) {
             x *= 0.8f;
             y *= 0.8f;
             w *= 0.8f;
             hn *= 0.8f;
-        } else if (entry->iconId == 0x18D) {
+        } else if (*(u16*)&entry->iconId == 0x18D) {
             x *= 0.9f;
             y *= 0.9f;
             w *= 0.9f;
@@ -697,11 +716,11 @@ s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     s32 digits[5];
     Mtx m;
     s32 n;
-    s32 count;
+    s32* dp;
     s32 i;
+    s32 count;
     s32 ret;
     f32 width;
-    s32* dp;
 
     width = !small ? 20.0f : 16.0f;
     ret = 0;
@@ -728,10 +747,10 @@ s32 iconNumberDispGx(Mtx mtx, s32 number, BOOL small, GXColor color) {
     } else {
         count = 1;
     }
-    for (dp = digits, i = 0; i < count; i++, dp++) {
+    for (dp = digits, i = 0; i < count; dp++, i++) {
         MTXTrans(m, (f32)-i * width, 0.0f, 0.0f);
         MTXConcat(mtx, m, m);
-        iconDispGxCol(m, 0x10, !small ? suuji[*dp] : suuji_s[*dp], color);
+        iconDispGxCol(m, 0x10, !small ? (s32)suuji[*dp] : (s32)suuji_s[*dp], color);
         ret += width;
     }
     return ret;
@@ -741,11 +760,11 @@ s32 iconNumberDispGx3D(Mtx mtx, s32 number, BOOL small, GXColor color) {
     s32 digits[4];
     Mtx m;
     s32 n;
-    s32 count;
+    s32* dp;
     s32 i;
+    s32 count;
     s32 ret;
     f32 width;
-    s32* dp;
 
     width = !small ? 10.0f : 8.0f;
     ret = 0;
@@ -772,10 +791,10 @@ s32 iconNumberDispGx3D(Mtx mtx, s32 number, BOOL small, GXColor color) {
     } else {
         count = 1;
     }
-    for (dp = digits, i = 0; i < count; i++, dp++) {
+    for (dp = digits, i = 0; i < count; dp++, i++) {
         MTXTrans(m, (f32)-i * width, 0.0f, 0.0f);
         MTXConcat(mtx, m, m);
-        iconDispGxCol(m, 0, !small ? suuji[*dp] : suuji_s[*dp], color);
+        iconDispGxCol(m, 0, !small ? (s32)suuji[*dp] : (s32)suuji_s[*dp], color);
         ret += width;
     }
     return ret;

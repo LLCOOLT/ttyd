@@ -139,13 +139,13 @@ void effPturnMain(EffectEntry* effect) {
     PturnElem* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
+    s32 i;
     s32 n2;
-    s32 t;
-    s32 type;
     s32 frame;
     s32 n1;
     s32 alpha;
     s32 life;
+    s32 type;
     f32 a;
     f32 b;
     f32 c;
@@ -173,8 +173,8 @@ void effPturnMain(EffectEntry* effect) {
     type = work->type;
     life = work->age;
     frame = work->frame;
-    n1 = work->n1;
     n2 = work->n2;
+    n1 = work->n1;
     scl = work->scale2;
     if (type == 0) {
         if (work->delay > 0) {
@@ -184,11 +184,11 @@ void effPturnMain(EffectEntry* effect) {
                 n2 = 0;
             }
             if (n2 > n1) {
-                t = 60;
+                alpha = 60;
                 if (type == 0) {
-                    t = 100;
+                    alpha = 100;
                 }
-                work->age = t;
+                work->age = alpha;
                 work->frame = 1;
                 work->n1++;
                 work[1].age = 0;
@@ -201,22 +201,14 @@ void effPturnMain(EffectEntry* effect) {
     }
     a = 6.2831855f * (f32)(frame * 12);
     b = 0.05f * (f32)life;
-    alpha = life * 25;
     work++;
-    for (frame = 1; frame < effect->count; frame++, work++) {
-        s32 flag = 0;
+    for (i = 1; i < effect->count; i++, work++) {
         s32 f2;
         s32 age = work->age;
         f32 y;
-        if (age >= 9 || type == 10) {
-            flag = 1;
-        }
-        work->scale = flag ? 1.0f : scale_dat[age];
+        work->scale = (age >= 9 || type == 10) ? 1.0f : scale_dat[age];
         work->scale = work->scale * scl;
-        f2 = 1;
-        if (!((u32)type <= 1U)) {
-            f2 = 0;
-        }
+        f2 = (type == 0 || type == 1);
         if (f2) {
             c = (f32)cos(a / 360.0f);
             y = 4.0f * c;
@@ -232,12 +224,12 @@ void effPturnMain(EffectEntry* effect) {
             work->vel.x = -2.0f;
         }
         if (life < 20) {
-            work->y20 = work->y20 * b;
-            work->vel.y = work->vel.y + -0.5f;
-            work->rot = work->rot + 10.0f;
+            work->y20 *= b;
+            work->vel.y += -0.5f;
+            work->rot += 10.0f;
         }
         if (life < 10) {
-            work->alpha = alpha;
+            work->alpha = life * 25;
         }
         work->age++;
     }

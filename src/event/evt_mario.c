@@ -1331,7 +1331,7 @@ USER_FUNC(evt_mario_jump_pos) {
 USER_FUNC(evt_mario_jump_jumpstand) {
     s32* args = event->args;
     MarioWork* mp = marioGetPtr();
-    f32 ty, tz, x2, y2, z2, h, tx, x1, y1, z1;
+    f32 tx, ty, tz, x2, y2, z2, h, x1, y1, z1;
     s32 mode;
     s32 msec;
     f32 t, dy, g;

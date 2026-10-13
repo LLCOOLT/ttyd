@@ -234,8 +234,8 @@ void nannpc_ext_disp() {
     NanNPCWork* w = nanNPCWork;
     s32 i;
     s32 idx;
-    GXColor fog;
     GXColor tc;
+    GXColor fog;
     NanNPCSort* sp;
     NanNPC* np;
     if (w->flags & 1) {

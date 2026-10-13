@@ -64,15 +64,16 @@ s32 BattleActionCommandResult(BattleWork* wp) {
 }
 
 void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, s32 result) {
+	StarPowerInfo* info = &work->impendingBonuses;
 	switch (result) {
 	case -1:
 		BattleAudience_Case_ActionCommandBad(weapon);
 		break;
 	default:
-		work->impendingBonuses.mWeapon = weapon;
-		work->impendingBonuses.mSpAcSuccessMultiplier = 0.25f * (f32)result + 0.5f;
-		work->impendingBonuses.field_0x9 = weapon->field_0x19;
-		work->impendingBonuses.mBingoSlotChance = weapon->mBingoSlotChance;
+		info->mWeapon = weapon;
+		info->mSpAcSuccessMultiplier = 0.25f * (f32)result + 0.5f;
+		info->field_0x9 = weapon->field_0x19;
+		info->mBingoSlotChance = weapon->mBingoSlotChance;
 		BattleAudience_Case_ActionCommandGood(weapon);
 		break;
 	}
@@ -81,6 +82,7 @@ void BattleActionCommandDeclareACResult(BattleWork* work, BattleWeapon* weapon, 
 void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 a4, s32 a5) {
 	ActionCommandEntry* entry; // r6
 
+	entry = ActionCommandList;
 	work->actionCommands.mAcUnit = unit;
 	work->actionCommands.field_0x4 = a4;
 	work->actionCommands.mAcState = 0;
@@ -92,7 +94,7 @@ void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 a4
 	work->actionCommands.deletecb = NULL;
 	work->actionCommands.field_0x8 = a5;
 	work->actionCommands.field_0x30 = 0;
-	for (entry = ActionCommandList; entry->id; entry++) {
+	for (; entry->id; entry++) {
 		if (entry->id == id) {
 			work->actionCommands.maincb = entry->main;
 			if (!(work->actionCommands.mAcUnit->mTokenFlags & 0x10)){
@@ -236,9 +238,12 @@ s8 BattleActionCommandGetDifficulty(BattleWork* work) {
 
 void BattleActionCommandSetDifficulty(BattleWork* work, BattleUnit* unit, s32 difficulty) {
 	s32 adjusted;
+	s32 simp;
 
 	work->actionCommands.mBaseAcDifficulty = difficulty;
-	adjusted = difficulty - unit->badgesEquipped.Simplifier + unit->badgesEquipped.Unsimplifier;
+	simp = unit->badgesEquipped.Simplifier;
+	adjusted = difficulty - simp;
+	adjusted += unit->badgesEquipped.Unsimplifier;
 	if (adjusted < 0) {
 		adjusted = 0;
 	}

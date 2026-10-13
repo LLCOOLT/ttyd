@@ -186,19 +186,19 @@ void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, G
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
 	GXPosition3f32(-x, y, 0.0f);
-	GXColor4u8(color0.r, color0.g, color0.b, color0.a);
+	GXWGFifo.u8 = color0.r; GXWGFifo.u8 = color0.g; GXWGFifo.u8 = color0.b; GXWGFifo.u8 = color0.a;
 	GXTexCoord2f32(0.0f, 0.0f);
 
 	GXPosition3f32(x, y, 0.0f);
-	GXColor4u8(color1.r, color1.g, color1.b, color1.a);
+	GXWGFifo.u8 = color1.r; GXWGFifo.u8 = color1.g; GXWGFifo.u8 = color1.b; GXWGFifo.u8 = color1.a;
 	GXTexCoord2f32(1.0f, 0.0f);
 
 	GXPosition3f32(x, -y, 0.0f);
-	GXColor4u8(color2.r, color2.g, color2.b, color2.a);
+	GXWGFifo.u8 = color2.r; GXWGFifo.u8 = color2.g; GXWGFifo.u8 = color2.b; GXWGFifo.u8 = color2.a;
 	GXTexCoord2f32(1.0f, 1.0f);
 
 	GXPosition3f32(-x, -y, 0.0f);
-	GXColor4u8(color3.r, color3.g, color3.b, color3.a);
+	GXWGFifo.u8 = color3.r; GXWGFifo.u8 = color3.g; GXWGFifo.u8 = color3.b; GXWGFifo.u8 = color3.a;
 	GXTexCoord2f32(0.0f, 1.0f);
 }
 
@@ -599,20 +599,18 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	Mtx pT;
 	Mtx pS;
 	Mtx mT5;
+	BattleUnit* unit = part->mOwner;
 	BattleWork* wp = _battleWorkPointer;
-	BattleUnit* unit;
 	CameraEntry* cam;
-	f32 zscale;
 	f32 angle;
 	f32 x, y, z;
 	f32 dir;
 	f32 camAngle;
 	f32 a;
 	f32 rotY;
+	f32 zscale;
 	GXColor* color;
-
 	zscale = 1.0f;
-	unit = part->mOwner;
 	if (part->poseId < 0) return;
 
 	MTX_TRANS_NEG(uTN, unit->mRotationOffset);
@@ -677,10 +675,11 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	}
 	else {
 		if (unit->faceDirection >= 0) angle = 90.0f;
-		if (part->faceDirection > 0.0f) {
+		dir = part->faceDirection;
+		if (dir > 0.0f) {
 			dir = 1.0f;
 		}
-		else if (part->faceDirection < 0.0f) {
+		else if (dir < 0.0f) {
 			dir = -1.0f;
 		}
 		else {
@@ -749,7 +748,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 				PSMTXConcat(uDisp, uMtx, uMtx);
 			}
 		}
-		PSMTXScale(pS, part->mBaseScale.x * part->mScale.x, part->mBaseScale.y * part->mScale.y, 1.0f * (part->mBaseScale.z * part->mScale.z));
+		PSMTXScale(pS, part->mBaseScale.x * part->mScale.x, part->mBaseScale.y * part->mScale.y, zscale * (part->mBaseScale.z * part->mScale.z));
 		PSMTXIdentity(uM);
 		PSMTXConcat(uMtx, uM, uM);
 		PSMTXConcat(pS, uM, uM);
@@ -864,16 +863,15 @@ void btlUnitItemDisp2(CameraId camId, BattleUnit* unit) {
 
 	if (kind >= 1 && kind < 0xD8) goto disp;
 	if (kind >= 0xDE && kind < 0xE0) goto disp;
-	if (kind >= 0xE0 && kind < 0xE7) {
-	disp:
-		if (wp->flags & 0x20000) {
-			btlUnitItemDisp(camId, unit);
-		}
-		else {
-			wp->flags |= 0x20000;
-			btlUnitItemDisp(camId, unit);
-			wp->flags &= ~0x20000;
-		}
+	if (kind < 0xE0 || kind >= 0xE7) return;
+disp:
+	if (wp->flags & 0x20000) {
+		btlUnitItemDisp(camId, unit);
+	}
+	else {
+		wp->flags |= 0x20000;
+		btlUnitItemDisp(camId, unit);
+		wp->flags &= ~0x20000;
 	}
 }
 #pragma dont_inline reset
@@ -1216,7 +1214,7 @@ void btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, GXColor color) {
 	u16 width, height;
 	f32 hw, hh;
 	Vec off;
-	Vec unused = {0.0f, 0.0f, 0.0f};
+	Vec unused; unused.x = 0.0f; unused.y = 0.0f; unused.z = 0.0f;
 
 	off.z = 0.0f;
 

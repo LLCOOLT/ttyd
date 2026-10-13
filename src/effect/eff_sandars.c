@@ -108,25 +108,23 @@ EffectEntry* effSandarsEntry(s32 type, f32 x, f32 y, f32 z, f32 radius) {
     return effect;
 }
 
-void effSandarsMain(EffectEntry* effect) {
-    EffSandarsWork* work;
-    Vec pos2;
+static inline Vec effSandarsMakeVec(f32 x, f32 y, f32 z) {
     Vec pos = { 0.0f, 0.0f, 0.0f };
+    pos.x = x;
+    pos.y = y;
+    pos.z = z;
+    return pos;
+}
+
+void effSandarsMain(EffectEntry* effect) {
+    EffSandarsWork* work = effect->userdata;
+    Vec pos2;
     s32 camId;
     s32 camera;
     s32 type;
     s32 i;
 
-    work = effect->userdata;
-    {
-        f32 x = work->position.x;
-        f32 y = work->position.y;
-        f32 z = work->position.z;
-        pos.x = x;
-        pos.y = y;
-        pos.z = z;
-    }
-    pos2 = pos;
+    pos2 = effSandarsMakeVec(work->position.x, work->position.y, work->position.z);
     type = work->type;
     camId = work->camId;
     camera = gp->inBattle != 0;

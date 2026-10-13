@@ -206,6 +206,8 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
             arg7 = 1;
             count = 2;
             break;
+        case 9:
+            break;
     }
     effect->type = "Fall";
     effect->count = count;
@@ -1120,7 +1122,6 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     GXColor color;
     CameraEntry* cam;
     EffFallWork* w;
-    EffFallWork* w2;
     f32 hw, hh, s;
 
     w = effect->userdata;
@@ -1153,8 +1154,10 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     effGetTexObj(0x35, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
-    hw = 64.0f * 0.5f;
-    hh = 704.0f * 0.5f;
+    hw = 64.0f;
+    hh = 704.0f;
+    hw *= 0.5f;
+    hh *= 0.5f;
     PSMTXTrans(trans, w->pos3.x, w->pos3.y, w->pos3.z);
     PSMTXScale(scl, 1.0f, hh / (f32)GXGetTexObjHeight(&tex), 1.0f);
     PSMTXConcat(trans, scl, trans);
@@ -1164,7 +1167,7 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(trans, scl, trans);
     PSMTXConcat(mtx, trans, trans);
     GXLoadPosMtxImm(trans, 0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){ 255, 255, 255, 255 });
+    { const GXColor c = { 255, 255, 255, 255 }; GXSetTevColor(GX_TEVREG0, c); }
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-hw * 0.5f, hh, 0.0f);
     GXColor4u8(255, 255, 255, 255);
@@ -1178,14 +1181,15 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     GXPosition3f32(-hw * 0.5f, 0.0f, 0.0f);
     GXColor4u8(255, 255, 255, 0);
     GXTexCoord2f32(0.0f, 1.0f);
-    w2 = effect->userdata;
+    {
+    EffFallWork* w2 = effect->userdata;
     if (w2->state > 0) {
         PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
         PSMTXScale(scl, 0.56f, 0.4f, 0.8f);
         PSMTXConcat(mtx, trans, trans);
         PSMTXConcat(trans, scl, trans);
         GXLoadPosMtxImm(trans, 0);
-        PSMTXTrans(trans, w2->pos3.y * 0.125f, 0.0f, 0.0f);
+        PSMTXTrans(trans, 0.125f * w2->pos3.y, 0.0f, 0.0f);
         GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
         color = (GXColor){ 255, 255, 255, 0 };
         color.a = w2->alpha;
@@ -1210,14 +1214,14 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
         GXCallDisplayList(shibuki_dl_1_2, 0x20);
         GXCallDisplayList(shibuki_dl_1_3, 0x20);
         PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
-        s = w2->scale * 0.8f;
+        s = 0.8f * w2->scale;
         PSMTXScale(scl, 0.7f * s, 0.5f * s, s);
         PSMTXConcat(mtx, trans, trans);
         PSMTXConcat(trans, scl, trans);
         GXLoadPosMtxImm(trans, 0);
         PSMTXTrans(trans, -w2->pos3.y * 0.25f, 0.0f, 0.0f);
         GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
-        GXSetTevColor(GX_TEVREG0, (GXColor){ 255, 255, 255, 255 });
+        { const GXColor c = { 255, 255, 255, 255 }; GXSetTevColor(GX_TEVREG0, c); }
         effGetTexObj(0x36, &tex);
         GXLoadTexObj(&tex, GX_TEXMAP0);
         GXClearVtxDesc();
@@ -1237,6 +1241,7 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
         GXCallDisplayList(shibuki_dl_0_1, 0x40);
         GXCallDisplayList(shibuki_dl_0_2, 0x40);
         GXCallDisplayList(shibuki_dl_0_3, 0x40);
+    }
     }
 }
 

@@ -42,11 +42,11 @@ Vec pos_tbl[7] = {
 };
 
 static void callback(MapTevCallbackInfo* info) {
+    GXColor color = { 0xE8, 0x00, 0xE8, 0x00 };
     s32 tevStage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
     s32 field_0x18 = info->field_0x18;
-    GXColor color = { 0xE8, 0x00, 0xE8, 0x00 };
 
     color.a = mahojin_rate;
     GXSetTevColor(GX_TEVREG0, color);
@@ -70,9 +70,8 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     s32 n;
 
     effect = effEntry();
-    n = type < 8 ? type : 7;
+    n = (type < 8 ? type : 7) + 2;
     effect->type = "Mahojin";
-    n += 2;
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, n * sizeof(EffMahojinWork));
     effect->userdata = work;
@@ -107,7 +106,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
     p->arg = NULL;
     p->func = NULL;
 
-    for (i = 2, p = work + 2; i < effect->count; i++, p++) {
+    for (p = work + 2, i = 2; i < effect->count; i++, p++) {
         p->position.x = x;
         p->position.y = y;
         p->position.z = z;

@@ -57,7 +57,8 @@ EffectEntry* effKumokumoChipN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 
     dx = tx - x;
     dy = ty - y;
     dz = tz - z;
-    dist = kk_sqrtf(dx * dx + dy * dy + dz * dz);
+    dist = dx * dx + dy * dy + dz * dz;
+    { f32 zero = 0.0f; if (dist != zero) { f32 r; if (dist > zero) { f64 guess = __frsqrte(dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); guess = 0.5 * guess * (3.0 - guess * guess * dist); r = dist * guess; } else if (dist < 0.0) { r = *(f32*)__float_nan; } else if (kk_fpclassifyf(dist) == 1) { r = *(f32*)__float_nan; } else { r = dist; } dist = r; } }
     if (speed > 0.0f) {
         lifetime = dist / speed;
     } else {

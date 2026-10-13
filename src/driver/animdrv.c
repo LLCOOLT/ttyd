@@ -207,11 +207,11 @@ void animPoseBattleInit(void) {
 }
 
 s32 animPoseEntry(const char* animName, s32 type) {
-    AnimationPose *pose, *temp;
-    AnimationPoseFile *file, *tempfile;
     AnimationTextureFile *texture, *temptex;
+    AnimationPoseFile *file, *tempfile;
+    AnimationPose *pose, *temp;
     AnimationPoseData* data;
-    s32 poseId, fileId, texId;
+    s32 texId, fileId, poseId;
     s32 check, i;
     char textureName[256];
 
@@ -244,7 +244,7 @@ label_1:
     check = wp->totalFiles;
     for (i = 0; i < check; i++) {
         file = &wp->files[i];
-        if (!file->active) {
+        if (file->active) {
             data = *file->handle->data;
             if (!strcmp(data->fileName, animName)) {
                 file->references++;
@@ -267,7 +267,7 @@ label_2:
     file->references++;
     file->handle = fileAllocf(5, "%s/%s", "a", animName);
 
-    if (file->handle) {
+    if (!file->handle) {
         fileId = -2;
         file->active = FALSE;
         file->references--;
@@ -807,7 +807,98 @@ void pushGXModelMtx_TransformNode__(AnimPoseNode* node) {
     }
     PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
 }
-// pushGXModelMtx_JointNode__
+void pushGXModelMtx_JointNode__(AnimPoseNode* node, f32 sx, f32 sy, f32 sz) {
+    Mtx trans, scale, iscale, rot, tmp;
+    MtxPtr p;
+    u32 flags;
+    f32 tx, ty, tz;
+    f32 nsx, nsy, nsz;
+    f32 r1x, r1y, r1z;
+    f32 r2x, r2y, r2z;
+
+    tx = node->mTranslation.x;
+    ty = node->mTranslation.y;
+    tz = node->mTranslation.z;
+    nsx = node->mScale.x;
+    nsy = node->mScale.y;
+    nsz = node->mScale.z;
+    r1x = 2.0f * node->mRot1.x;
+    r1y = 2.0f * node->mRot1.y;
+    r1z = 2.0f * node->mRot1.z;
+    r2x = node->mRot2.x;
+    r2y = node->mRot2.y;
+    r2z = node->mRot2.z;
+    flags = 0;
+
+    if (tx || ty || tz) {
+        PSMTXTrans(trans, tx, ty, tz);
+        flags |= 1;
+    }
+    if (1.0f != sx || 1.0f != sy || 1.0f == sz) {
+        if (sx && sy && sz) {
+            PSMTXScale(iscale, 1.0f / sx, 1.0f / sy, 1.0f / sz);
+        } else {
+            PSMTXScale(iscale, 1.0f, 1.0f, 1.0f);
+        }
+        flags |= 2;
+    }
+    if (1.0f != nsx || 1.0f != nsy || 1.0f == nsz) {
+        PSMTXScale(scale, nsx, nsy, nsz);
+        flags |= 4;
+    }
+    PSMTXIdentity(rot);
+    if (r2z) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * r2z);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    if (r2y) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * r2y);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    if (r2x) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * r2x);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    if (r1z) {
+        PSMTXRotRad(tmp, 'z', 0.017453292f * r1z);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    if (r1y) {
+        PSMTXRotRad(tmp, 'y', 0.017453292f * r1y);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    if (r1x) {
+        PSMTXRotRad(tmp, 'x', 0.017453292f * r1x);
+        PSMTXConcat(rot, tmp, rot);
+        flags |= 8;
+    }
+    g_modeling_mtx_lv++;
+    g_modeling_mtx = &g_modeling_mtx_stack[g_modeling_mtx_lv];
+    switch (flags) {
+        case 0: PSMTXIdentity(tmp); p = tmp; break;
+        case 1: p = trans; break;
+        case 2: p = iscale; break;
+        case 3: PSMTXConcat(trans, iscale, tmp); p = tmp; break;
+        case 4: p = scale; break;
+        case 5: PSMTXConcat(trans, scale, tmp); p = tmp; break;
+        case 6: PSMTXConcat(iscale, scale, tmp); p = tmp; break;
+        case 7: PSMTXConcat(trans, iscale, tmp); PSMTXConcat(tmp, scale, trans); p = trans; break;
+        case 8: p = rot; break;
+        case 9: PSMTXConcat(trans, rot, tmp); p = tmp; break;
+        case 10: PSMTXConcat(iscale, rot, tmp); p = tmp; break;
+        case 11: PSMTXConcat(trans, iscale, tmp); PSMTXConcat(tmp, rot, trans); p = trans; break;
+        case 12: PSMTXConcat(rot, scale, tmp); p = tmp; break;
+        case 13: PSMTXConcat(trans, rot, tmp); PSMTXConcat(tmp, scale, trans); p = trans; break;
+        case 14: PSMTXConcat(iscale, rot, tmp); PSMTXConcat(tmp, scale, trans); p = trans; break;
+        case 15: PSMTXConcat(trans, iscale, tmp); PSMTXConcat(tmp, rot, trans); PSMTXConcat(trans, scale, tmp); p = tmp; break;
+    }
+    PSMTXConcat(g_modeling_mtx_stack[g_modeling_mtx_lv - 1], p, g_modeling_mtx_stack[g_modeling_mtx_lv]);
+}
 
 asm void animSetMaterial_Texture(s32 texCount, s32* texIdRemap, AnimPoseTexEntry* pTexEntries, AnimTexMtx* animEntries,
                              s32 texBindsCapacity, AnimTexBind* texBinds, AnimationTextureFile* texFile) {
@@ -860,7 +951,105 @@ inline BOOL animSetMaterial_ChangeTexture(AnimationPoseData* data, AnimPoseShape
     return FALSE;
 }
 
-// materialProc
+void materialProc(s32 shapeId, s32 xluStage) {
+    int i;
+    s32 drawCount;
+    AnimPoseShapeDraw* draw;
+    CameraEntry* camera;
+    AnimPoseShape* shape;
+    AnimationPose* pose;
+    GXTexObj* texObj;
+    GXTexObj* currTexObj;
+    BOOL texChange1, check1;
+    s32 dispMode;
+    Mtx camMtx, invCamMtx;
+    Vec lightPos, lightPos2;
+
+    if (shapeId != -1) {
+        camera = camGetCurPtr();
+        MTXConcat(camera->view, *g_modeling_mtx, camMtx);
+        GXLoadPosMtxImm(camMtx, 0);
+        MTXInvXpose(camMtx, invCamMtx);
+        GXLoadNrmMtxImm(invCamMtx, 0);
+        GXSetCurrentMtx(0);
+
+        shape = &wp->mpCurPoseData->shapes[shapeId];
+        dispMode = shape->dispMode;
+        drawCount = shape->shapeDrawCount;
+        draw = &wp->mpCurPoseData->draws[shape->shapeDrawStart];
+
+        if ((dispMode == 0 && wp->currDispMode == 2) || dispMode == wp->currDispMode ||
+            wp->mpCurPose->materialColor.a != 0xFF || wp->mpCurPose->materialColor2.a != 0xFF) {
+            GXSetCullMode(tbl[shape->cullMode]);
+            for (i = 0; i < drawCount; i++, draw++) {
+                s32 texCount = draw->texCount;
+                if ((u32)wp->mpCurPose->disableDraw == 0) {
+                    lightPos = (Vec){ 0.0f, 0.0f, 0.0f };
+                    MTXMultVec(*g_modeling_mtx, &lightPos, &lightPos);
+                    lightPos2 = lightPos;
+                    mapSetMaterialLight(wp->mpCurPose->materialLightFlag, lightPos2);
+                    animSetMaterial_Texture(draw->texCount, draw->texDataIds, wp->mpCurPoseData->texData,
+                                            wp->mpCurPose->mpTexAnimEntries, wp->mpCurPoseData->texBindCount,
+                                            wp->mpCurPoseData->texBinds,
+                                            &wp->textures[wp->files[wp->mpCurPose->fileId].textureId]);
+                    mapSetMaterialLastStageBlend(wp->mpCurPose->materialFlag, wp->mpCurPose->materialColor,
+                                                 wp->mpCurPose->materialColor2);
+                    camera = camGetPtr(CAMERA_3D);
+                    if (camGetCurPtr() == camera) {
+                        mapSetMaterialFog();
+                    }
+                    mapSetMaterialTev(texCount, draw->drawMode, wp->mpCurPose->materialFlag, *g_modeling_mtx);
+                }
+                pose = wp->mpCurPose;
+                if ((u32)pose->typeFlags != 0) {
+                    texChange1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, *wp->paperMtxPtr[0],
+                                                               wp->mpTexDatas[0], wp->mpTexObjs[0], 1);
+                    check1 = texChange1;
+                    if (!texChange1) {
+                        check1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, *wp->paperMtxPtr[1],
+                                                               wp->mpTexDatas[1], wp->mpTexObjs[1], 2);
+                    }
+                    if (check1 && !draw->drawMode) {
+                        currTexObj = wp->mpCurTexObj;
+                        if (currTexObj) {
+                            smartTexObj(currTexObj, wp->mpCurTexData);
+                            if (wp->currDispMode != 3) {
+                                GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+                                GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+                                GXSetZCompLoc(GX_FALSE);
+                                GXSetAlphaCompare(GX_GEQUAL, 0x80u, GX_AOP_OR, GX_NEVER, 0);
+                            }
+                            texObj = wp->mpTexObjs[texChange1 == 0];
+                            if (texObj) {
+                                GXLoadTexObj(texObj, GX_TEXMAP0);
+                                GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE,
+                                                  GX_PTIDENTITY);
+                                GXLoadTexMtxImm(*wp->paperMtxPtr[texChange1 == 0], GX_TEXMTX0, GX_MTX2x4);
+                            }
+                            GXLoadTexObj(currTexObj, GX_TEXMAP1);
+                            GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE,
+                                              GX_PTIDENTITY);
+                            GXLoadTexMtxImm(*wp->paperMtxPtr[2], GX_TEXMTX1, GX_MTX2x4);
+                            mapSetMaterialTev(2, 12, wp->mpCurPose->materialFlag, *g_modeling_mtx);
+                        }
+                    }
+                }
+                pose = wp->mpCurPose;
+                if (pose->flags & 0x10) {
+                    texObj = wp->mpTexObjs[0];
+                    if (texObj) {
+                        Mtx* mtx = wp->paperMtxPtr[0];
+                        if (mtx) {
+                            animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, *mtx, wp->mpTexDatas[0],
+                                                          texObj, 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 
 // I'm so sorry, whoever gets tasked with matching this function
 // note: I detect at least 8 inlined functions here, good luck finding the separation
@@ -942,7 +1131,7 @@ void renderProc(s32 shapeId, s32 unused) {
 
             for (i = 0; i < drawCount; i++, draw++) {
                 texCount = draw->texCount;
-                if (!wp->mpCurPose->disableDraw) {
+                if ((u32)wp->mpCurPose->disableDraw == 0) {
                     lightPos = (Vec){ 0.0f, 0.0f, 0.0f };
                     MTXMultVec(*g_modeling_mtx, &lightPos, &lightPos);
                     lightPos2 = lightPos;
@@ -960,7 +1149,7 @@ void renderProc(s32 shapeId, s32 unused) {
                     mapSetMaterialTev(texCount, draw->drawMode, wp->mpCurPose->materialFlag, *g_modeling_mtx);
                 }
                 pose = wp->mpCurPose;
-                if (pose->typeFlags) {
+                if ((u32)pose->typeFlags != 0) {
                     texChange1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, *wp->paperMtxPtr[0],
                                                                wp->mpTexDatas[0], wp->mpTexObjs[0], 1);
                     check1 = texChange1;
@@ -973,7 +1162,7 @@ void renderProc(s32 shapeId, s32 unused) {
                         check2 = FALSE;
                     }
 
-                    if (check1 && (texChange1 && !wp->field_0xD8 || check2 && !wp->field_0xDC) && !draw->drawMode) {
+                    if (check1 && (texChange1 && (s32)wp->field_0xD8 == 0 || check2 && (s32)wp->field_0xDC == 0) && !draw->drawMode) {
                         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
                     }
                     if (check1 && !draw->drawMode) {
@@ -1025,7 +1214,7 @@ void renderProc(s32 shapeId, s32 unused) {
                 nrmFirstId = draw->firstIdNrm;
                 clr0FirstId = draw->firstIdClr0;
 
-                if (wp->mbUseFloatScratch) {
+                if ((s32)wp->mbUseFloatScratch != 0) {
                     nrmVtxPtr = (Vec*)((u8*)wp->vtxArrayNrm + nrmVtxSize);
                     posVtxPtr = (Vec*)((u8*)wp->vtxArrayPos + posVtxSize);
                 } else {
@@ -1120,9 +1309,10 @@ void dispProc(s32 parentId, s32 groupId, s32 xluStage, s32 arg3, f32 arg4) {
     if (groupId == -1) {
         return;
     }
+    pose = wp->mpCurPose;
     data = wp->mpCurPoseData;
     group = &data->groups[groupId];
-    if (*(s8*)&wp->mpCurPose->mpGroupVisibility[group->visibilityId]) {
+    if (*(s8*)&pose->mpGroupVisibility[group->visibilityId]) {
         pose = wp->mpCurPose;
         node = (AnimPoseNode*)((u32*)pose->mpNodes + group->nodeId);
         if (group->useSSC) {
@@ -1215,6 +1405,157 @@ void animPoseDraw(s32 poseId, f32 x, f32 y, f32 z, f32 rotY, f32 scale, s32 xluM
 }
 
 // _animPoseDrawMtx
+extern BOOL mapTestXLU(u32 flags, GXColor* color, GXColor* matColor);
+extern double atan2(double y, double x);
+void animPoseMainSub(AnimationPose* pose);
+
+static inline f32 _animClampAngle(f32 a) {
+    while (a < -360.0f) a += 360.0f;
+    while (a >= 360.0f) a -= 360.0f;
+    if (a < 0.0f) a += 360.0f;
+    return a;
+}
+
+static inline f32 _animClampAngle2(f32 a) {
+    while (a < -360.0f) a += 360.0f;
+    while (a >= 360.0f) a -= 360.0f;
+    return a;
+}
+
+static inline f32 _animCamAngle(void) {
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    return _animClampAngle(57.29578f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
+}
+
+void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
+    Mtx result;
+    Mtx tmp2;
+    Mtx tmp1;
+    Mtx tmp3;
+    GXColor col1;
+    GXColor col2;
+    AnimationPoseData* data;
+    AnimData* anim;
+    s32 arg3, arg4;
+    f32 argf;
+    f32 diff;
+    s32 mode;
+
+    data = animPoseGetBaseData(pose);
+    arg3 = *(s32*)((u8*)pose + 0x28);
+    arg4 = *(s32*)((u8*)pose + 0x2C);
+    argf = *(f32*)((u8*)pose + 0x30);
+    anim = data->mpAnims[pose->animId].data;
+    if (anim == NULL) {
+        return;
+    }
+    if (wp->inBattle && pose->type == 0) {
+        return;
+    }
+    if (!wp->inBattle && pose->type == 1) {
+        return;
+    }
+    if (!(xluMode == 2 && (data->flags & 1)) && !(data->flags & (1 << xluMode))) {
+        return;
+    }
+    mode = xluMode;
+    col2 = pose->materialColor2;
+    col1 = pose->materialColor;
+    if (mapTestXLU(pose->materialFlag, &col1, &col2)) {
+        mode = 3;
+    }
+    if (pose->gxCallback != NULL) {
+        pose->gxCallback(mode);
+    }
+    else {
+        switch (mode) {
+            case 1:
+                GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+                GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+                GXSetZCompLoc(GX_TRUE);
+                GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+                break;
+            case 0:
+            case 2:
+                GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+                GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+                GXSetZCompLoc(GX_FALSE);
+                GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+                break;
+            case 3:
+                GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
+                GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
+                GXSetZCompLoc(GX_TRUE);
+                GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+                break;
+        }
+        wp->currDispMode = mode;
+    }
+    if (pose->flags & 8) {
+        rotY += -90.0f;
+        pose->field_0x70 = rotY;
+        diff = _animClampAngle2(_animCamAngle() - pose->field_0x70);
+        if ((diff > 90.0f && diff <= 270.0f) || (diff < -90.0f && diff >= -270.0f)) {
+            pose->field_0x7C = _animClampAngle2(180.0f + _animCamAngle());
+        }
+        else {
+            pose->field_0x7C = _animCamAngle();
+        }
+        while (pose->field_0x7C - pose->rotationY > 180.0f) {
+            pose->rotationY += 360.0f;
+        }
+        while (pose->field_0x7C - pose->rotationY < -180.0f) {
+            pose->rotationY -= 360.0f;
+        }
+        if (pose->flags & 0x100) {
+            pose->rotationY = pose->field_0x7C;
+        }
+        else {
+            pose->rotationY += 0.1f * (pose->field_0x7C - pose->rotationY);
+        }
+        rotY = pose->rotationY;
+        if (rotY != 0.0f) {
+            PSMTXRotRad(tmp2, 'y', 0.017453292f * rotY);
+            PSMTXConcat(matrix, tmp2, result);
+            matrix = result;
+        }
+        if (pose->field_0x78 == -1.0f) {
+            PSMTXScale(tmp2, 1.0f, 1.0f, -1.0f);
+            PSMTXConcat(matrix, tmp2, result);
+            matrix = result;
+        }
+    }
+    else if (0.0f != rotY) {
+        PSMTXRotRad(tmp1, 'y', 0.017453292f * rotY);
+        PSMTXConcat(matrix, tmp1, result);
+        matrix = result;
+    }
+    if (scale != 1.0f) {
+        PSMTXScale(tmp3, scale, scale, scale);
+        PSMTXConcat(matrix, tmp3, result);
+        matrix = result;
+    }
+    if (pose->lastFrameZero == -1) {
+        animPoseMainSub(pose);
+    }
+    g_modeling_mtx_lv = 0;
+    g_modeling_mtx = &g_modeling_mtx_stack[0];
+    PSMTXCopy(matrix, *g_modeling_mtx);
+    wp->mpCurPose = pose;
+    wp->mpCurAnimData = anim;
+    wp->mpCurPoseData = data;
+    if ((s32)wp->mbUseFloatScratch != 0) {
+        DCFlushRange(wp->vtxArrayPos, animPoseGetBaseData(pose)->mBufferPosNum * sizeof(Vec));
+        DCFlushRange(wp->vtxArrayNrm, animPoseGetBaseData(pose)->mBufferNrmNum * sizeof(Vec));
+    }
+    else {
+        DCFlushRange(pose->mpVtxArrayPos, animPoseGetBaseData(pose)->mBufferPosNum * sizeof(Vec));
+        DCFlushRange(pose->mpVtxArrayNrm, animPoseGetBaseData(pose)->mBufferNrmNum * sizeof(Vec));
+    }
+    GXInvalidateVtxCache();
+    dispProc(-1, data->groupCount - 1, arg3, arg4, argf);
+}
+
 
 asm void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale) {
     nofralloc
@@ -1309,7 +1650,105 @@ asm void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
     blr
 }
 
-// animPoseDisp_MakeExtTexture
+void _animPoseDrawMtx(AnimationPose* pose, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
+#include "sdk/DEMOInit.h"
+
+void animPoseDisp_MakeExtTexture(const char* group, const char* anim, f32 frame, f32 scale, GXTexObj* obj,
+                                 smartEntry** image, s32* x0, s32* y0, s32* x1, s32* y1) {
+    AnimationPose* pose;
+    AnimationPose* pera;
+    AnimationPose backup;
+    Mtx m;
+    GXColor col1, col2;
+    u32 flags;
+    s32 matFlag;
+    u16 left, top, right, bottom;
+    u16 w, h;
+    f32 hw, hh;
+    s32 i;
+    s32 type = gp->inBattle != 0;
+
+    for (i = 0; i < wp->totalPoses; i++) {
+        pose = &wp->poses[i];
+        if (pose->flags & 1 && pose->type == type && !strcmp(animPoseGetBaseData(pose)->fileName, group)) {
+            break;
+        }
+    }
+    if (i == wp->totalPoses) {
+        i = -1;
+    }
+    if (i < 0) {
+        return;
+    }
+    pose = &wp->poses[i];
+    backup = *pose;
+    pose->paperId = -1;
+    animPoseSetAnim(i, anim, FALSE);
+    pose->localTime = animTimeGetTime(pose->type);
+    pose->lastFrameZero = -1;
+    pose->lastFrameTime = 0.0f;
+    pose->field_0x80 = 0;
+    pose->loopTime = 0.0f;
+    animPoseSetLocalTime(i, frame);
+    animPoseMain(i);
+
+    hw = 0.5f * DEMOGetRenderModeObj()->fbWidth;
+    hh = 0.75f * DEMOGetRenderModeObj()->efbHeight;
+    sysWaitDrawSync();
+    GXClearBoundingBox();
+    MTXTrans(m, 0.0f, 0.25f * -(f32)DEMOGetRenderModeObj()->efbHeight, 0.0f);
+    flags = pose->flags;
+    matFlag = pose->materialFlag;
+    col1 = pose->materialColor;
+    col2 = pose->materialColor2;
+    pose->flags = flags & ~8;
+    pose->materialFlag = 0;
+    pose->materialColor = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
+    pose->materialColor2 = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
+    _animPoseDrawMtx(pose, m, 1, 0.0f, scale);
+    _animPoseDrawMtx(pose, m, 2, 0.0f, scale);
+    _animPoseDrawMtx(pose, m, 3, 0.0f, scale);
+    pose->materialColor = col1;
+    pose->materialColor2 = col2;
+    pose->flags = flags;
+    pose->materialFlag = matFlag;
+    sysWaitDrawSync();
+    GXReadBoundingBox(&left, &top, &right, &bottom);
+    if (left > right) {
+        left = top = 0;
+        right = bottom = 16;
+    }
+    if (left < 2) {
+        left = 2;
+    }
+    if (top < 2) {
+        top = 2;
+    }
+    if (right > DEMOGetRenderModeObj()->fbWidth - 2) {
+        right = DEMOGetRenderModeObj()->fbWidth - 2;
+    }
+    if (bottom > DEMOGetRenderModeObj()->efbHeight - 2) {
+        bottom = DEMOGetRenderModeObj()->efbHeight - 2;
+    }
+    left -= left & 1;
+    top -= top & 1;
+    right += right & 1;
+    bottom += bottom & 1;
+    w = right - left;
+    h = bottom - top;
+    GXSetTexCopySrc(left, top, w, h);
+    GXSetTexCopyDst(w, h, GX_TF_RGB5A3, GX_FALSE);
+    anim_ext_tex_size += GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0);
+    *image = smartAlloc(GXGetTexBufferSize(w, h, GX_TF_RGB5A3, GX_FALSE, 0), 1);
+    GXCopyTex((*image)->address, GX_TRUE);
+    GXPixModeSync();
+    GXInitTexObj(obj, (*image)->address, w, h, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    *x0 = left - (s32)hw;
+    *y0 = top - (s32)hh;
+    *x1 = right - (s32)hw;
+    *y1 = bottom - (s32)hh;
+    *pose = backup;
+}
 
 void animSetPaperTexMtx(Mtx mtx1, Mtx mtx2, Mtx mtx3) {
     if (mtx1 == NULL) {
@@ -1397,9 +1836,10 @@ void evalProc(s32 parentId, s32 groupId) {
     if (groupId == -1) {
         return;
     }
+    pose = wp->mpCurPose;
     data = wp->mpCurPoseData;
     group = &data->groups[groupId];
-    if (*(s8*)&wp->mpCurPose->mpGroupVisibility[group->visibilityId]) {
+    if (*(s8*)&pose->mpGroupVisibility[group->visibilityId]) {
         pose = wp->mpCurPose;
         node = (AnimPoseNode*)((u32*)pose->mpNodes + group->nodeId);
         if (group->useSSC) {

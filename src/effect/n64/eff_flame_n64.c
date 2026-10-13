@@ -245,8 +245,8 @@ void effFlameMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 life;
-    s32 type;
     s32 frame;
+    s32 type;
 
     work = effect->userdata;
     tmp.x = work->position.x;

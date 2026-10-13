@@ -216,6 +216,244 @@ HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx) {
     return hitEntrySub(joint, NULL, mtx, TRUE, 0);
 }
 
+void mapCalcAnimMatrix(Mtx out, Mtx in, void* anim, void* joint);
+
+typedef struct HitAnimJointList {
+    s32 count;
+    void* joints[1];
+} HitAnimJointList;
+
+inline void hitPreCheck(void) {
+    MapWork* wp = mapGetWork();
+    MapEntry* entry;
+    HitEntry* prev = NULL;
+    HitEntry* hit;
+    s32 i, j;
+
+    lbl_80418408 = NULL;
+    entry = wp->entries;
+    for (i = 0; i < wp->entries->count; entry++, i++) {
+        hit = entry->hitEntries;
+        for (j = 0; j < entry->hitNumJoints; j++, hit++) {
+            if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
+                if (prev == NULL) {
+                    lbl_80418408 = hit;
+                    prev = hit;
+                } else {
+                    prev->siblingActive = hit;
+                    prev = hit;
+                }
+            }
+        }
+    }
+    if (prev != NULL) {
+        prev->siblingActive = NULL;
+    }
+}
+
+inline HitEntry* hitNameToPtrNoChk(const char* name) {
+    MapWork* wp = mapGetWork();
+    MapEntry* map;
+    HitEntry* hit;
+    s32 i, j;
+
+    map = wp->entries;
+    for (i = 0; i < wp->entries->count; map++, i++) {
+        hit = map->hitEntries;
+        for (j = 0; j < map->hitNumJoints; j++, hit++) {
+            if (!(hit->flags & 0x80) && !strcmp(hit->joint->name, name)) {
+                return hit;
+            }
+        }
+    }
+    return NULL;
+}
+
+void hitDelete(const char* name) {
+    MapWork* wp = mapGetWork();
+    MapEntry* map;
+    HitEntry* hit;
+    s32 i, j;
+
+    map = wp->entries;
+    for (i = 0; i < wp->entries->count; map++, i++) {
+        hit = map->hitEntries;
+        for (j = 0; j < map->hitNumJoints; j++, hit++) {
+            if (!(hit->flags & 0x80) && !strcmp(name, hit->joint->name)) {
+                hit->flags |= 0x80;
+                hitPreCheck();
+                return;
+            }
+        }
+    }
+}
+
+void hitMain(void) {
+    MapWork* wp = mapGetWork();
+    MapEntry* entry;
+    MapEntryAnimData* anim;
+    HitAnimJointList* list;
+    void** joints;
+    HitEntry* hit;
+    BOOL recalc;
+    s32 i, j, k;
+    Mtx mtx;
+
+    hitPreCheck();
+    entry = wp->entries;
+    for (i = 0; i < wp->entries->count; entry++, i++) {
+        anim = entry->animData;
+        recalc = FALSE;
+        for (j = 0; j < entry->numAnims; j++, anim++) {
+            list = *(HitAnimJointList**)(*(u8**)((u8*)anim + 0x18) + 0xC);
+            if (!(anim->flags & 1)) {
+                continue;
+            }
+            if ((anim->flags & 2) && (anim->flags & 0x1000)) {
+                continue;
+            }
+            if (list == NULL) {
+                continue;
+            }
+            joints = (void**)list;
+            for (k = 0; k < list->count; joints++, k++) {
+                hit = hitNameToPtr(*(const char**)joints[1]);
+                if (hit != NULL) {
+                    mapCalcAnimMatrix(hit->unk6C, hit->localMtx, anim, joints[1]);
+                    recalc = TRUE;
+                    hit->flags |= 0x10;
+                    hit->flags |= 0x40;
+                    anim->flags |= 0x1000;
+                }
+            }
+        }
+        if (recalc) {
+            PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
+            hitReCalcMatrix2(entry->rootHitObj, mtx, FALSE);
+        }
+    }
+}
+
+
+void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
+void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
+void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
+void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
+
+void hitGrpFlagOn(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hitFlgOn(hit, mask, 0);
+}
+
+void hitGrpFlagOff(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hitFlgOff(hit, mask, 0);
+}
+
+void hitObjFlagOn(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hit->flags |= mask;
+}
+
+void hitObjFlagOff(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hit->flags &= ~mask;
+}
+
+void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
+    hit->flags &= ~mask;
+    if (hit->child != NULL) {
+        hitFlgOff(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitFlgOff(hit->sibling, mask, 1);
+    }
+}
+
+void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
+    hit->flags |= mask;
+    if (hit->child != NULL) {
+        hitFlgOn(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitFlgOn(hit->sibling, mask, 1);
+    }
+}
+
+
+void hitObjAttrOn(const char* name, u32 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hit->attributes |= mask;
+}
+
+void hitObjAttrOff(const char* name, u32 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hit->attributes &= ~mask;
+}
+
+void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
+    hit->attributes &= ~mask;
+    if (hit->child != NULL) {
+        hitAtrOff(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitAtrOff(hit->sibling, mask, 1);
+    }
+}
+
+void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
+    hit->attributes |= mask;
+    if (hit->child != NULL) {
+        hitAtrOn(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitAtrOn(hit->sibling, mask, 1);
+    }
+}
+
+
+void hitGrpAttrOn(const char* name, u32 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hitAtrOn(hit, mask, 0);
+}
+
+void hitGrpAttrOff(const char* name, u32 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
+    }
+    hitAtrOff(hit, mask, 0);
+}
+
 void hitReCalcMatrix(HitEntry* hit, Mtx mtx) {
     Vec world;
 

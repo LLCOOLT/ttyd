@@ -109,6 +109,17 @@ void seq_mapChangeInit(SequenceWork* work) {
     }
 }
 
+void _relUnLoad(void) {
+    if (gp->relocationBase) {
+        (*(void (**)(void))((u8*)gp->relocationBase + 0x38))();
+        OSUnlink(gp->relocationBase);
+        if (gp->relocationBase != gp->mapAlloc) {
+            _mapFree(gp->relocationBase);
+        }
+        gp->relocationBase = NULL;
+    }
+}
+
 void _load(const char* prevMapName, const char* newMapName, const char* beroName) {
     MapData* map;
     char mapFile[64];
@@ -148,4 +159,48 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         extraParty = partyGetPtr(extraPartyId);
         mario->field_EC = mario->position = gp->savePlayerPos;
     }
+}
+
+void _unload(const char* prevMap, const char* nextMap, const char* bero) {
+    extern void* nanNPCWork;
+    BOOL swReinit = FALSE;
+    int i;
+
+    if (prevMap && nextMap && strncmp(prevMap, nextMap, 3)) {
+        swReinit = TRUE;
+    }
+    marioReInit();
+    marioInitCamId();
+    mapUnLoad();
+    npcReset(0);
+    extReset();
+    mobjReset(0);
+    offscreenReset(0);
+    imgAutoRelease(0);
+    effAutoRelease(0);
+    animPoseAutoRelease(0);
+    evtmgrReInit();
+    caseReInit();
+    itemReInit();
+    iconReInit();
+    windowReInit();
+    winReInit();
+    statusWinReInit();
+    bgReInit();
+    winMgrReInit();
+    if (seqGetPrevSeq() != 6 && seqGetPrevSeq() != 1 && strcmp(prevMap, "sys_00") &&
+        strcmp(prevMap, "sys_01") && strcmp(prevMap, "dig_00")) {
+        fadeReset(1);
+        gp->flags &= ~0x10;
+    }
+    for (i = 0; i < 4; i++) {
+        padRumbleHardOff(i);
+    }
+    if (swReinit) {
+        swReInit();
+    }
+    memClear(1);
+    memClear(2);
+    smartAutoFree(1);
+    nanNPCWork = NULL;
 }

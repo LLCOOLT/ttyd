@@ -50,6 +50,7 @@ typedef struct Kyaku { u16 flags; u8 pad_0x2[2]; Vec pos; s16 animIdx; u8 pad_0x
 typedef struct KyakuAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 start; s32 count; } KyakuAnim;
 typedef struct KyakuWork { s32 field_0x0; s32 num; Kyaku* kyakus; s32 animNum; KyakuAnim anim[32]; } KyakuWork;
 typedef struct KyakuData { const char* name; const char* anim; f32 rate; } KyakuData;
+static s32 tou_03_bss_0xC;
 KyakuWork* kyaku_wp;
 static ScreenWork* screen_wp;
 s32 gans_alpha;
@@ -2960,9 +2961,9 @@ void screen_tev(MapTevCallbackInfo* info) {
     Mtx mtx;
     Mtx scale;
     Mtx trans;
-    u8* buf;
     s32 i;
     s32 j;
+    u8* buf;
     s32 k;
     s32 n;
     s32 len;

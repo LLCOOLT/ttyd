@@ -38,14 +38,13 @@ void imgShadowDisp(CameraId camId, void* param);
 
 static void zFill(void) { //almost 1:1
 	CameraEntry* camera;
-	f32 x0, x1, y0, y1;
+	f32 y0, y1, x0, x1;
 	f32 zpos;
 	GXTexObj obj;
 	Mtx mtx;
 
 	camera = camGetCurPtr();
-	y0 = (camera->near + camera->far) * 0.5f;
-	y0 = y0 * tanf((0.5f * ((6.2831855f * camera->fovY) / 360.0f)));
+	{ extern double tan(double); f32 t = (6.2831855f * camera->fovY) / 360.0f; y0 = 0.5f * (camera->near + camera->far); y0 = y0 * (f32)tan(t * 0.5f); }
 	x1 = (y0 * camera->aspect);
 	y1 = -y0;
 	x0 = -x1;
@@ -200,7 +199,7 @@ void imgMain(void) { //1:1
 		if (entry->flags & 1 && entry->poseId != -1 && !(entry->flags & 2)) {
 			if (entry->type == 2 || entry->type == type) {
 				for (shadow = 0; shadow < 3; shadow++) {
-					if (!(entry->shadows[shadow].flags & 4)) break;
+					if (entry->shadows[shadow].flags & 4) break;
 				}
 				if (shadow != 3) {
 					dispEntry(entry->camId, entry->order, 1, imgDisp, entry);

@@ -109,9 +109,9 @@ s32 _CalcRollDir(void) {
 
 #pragma dont_inline reset
 s32 battleAcMain_StickRotate(BattleWork* work) {
+    BattleACDispParams* disp = AC_DISP(work);
+    StickRotateWork* sw = (StickRotateWork*)(disp + 1);
     BattleActions* ac = &work->actionCommands;
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
-    StickRotateWork* sw = (StickRotateWork*)((u8*)disp + 0x2C);
     BOOL restart;
 
     do {
@@ -329,12 +329,14 @@ s32 battleAcResult_StickRotate(BattleWork* work) {
 }
 
 void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
-    BattleWork* work = (BattleWork*)param;
-    BattleACDispParams* disp = AC_DISP(work);
-    void (*fn)(f32, f32) = actionCommandDisp2;
+    BattleACDispParams* disp = AC_DISP((BattleWork*)param);
+    void (*fn)(f32, f32);
+#define work ((BattleWork*)param)
 
     if (AC_PARAMS(work)->flags & 2) {
         fn = actionCommandDisp;
+    } else {
+        fn = actionCommandDisp2;
     }
     switch (work->actionCommands.mAcState) {
         case 99:
@@ -366,6 +368,7 @@ void battleAcDisp_StickRotate(CameraId cameraId, void* param) {
             fn(disp->iconX, disp->iconY);
             break;
     }
+#undef work
 }
 
 s32 _get_icon_id(s8 dir) {

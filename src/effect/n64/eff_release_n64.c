@@ -36,7 +36,6 @@ typedef struct AnimeEntry {
     u16 value;
 } AnimeEntry;
 
-static const GXColor black = {0, 0, 0, 0};
 
 void effReleaseMain(EffectEntry* effect);
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect);
@@ -283,7 +282,7 @@ void effReleaseMain(EffectEntry* effect) {
             v = 0.01f * (f32)anime_data[work->step].time + 0.3f * (f32)work->step;
             val = anime_data[work->step].value & 0xFF;
         } else {
-            v = 0.3f * (f32)work->step + 0.01f * (f32)anime_data[29].time;
+            v = 0.01f * (f32)anime_data[29].time + 0.3f * (f32)work->step;
             val = anime_data[29].value & 0xFF;
         }
         work->alpha[0] = 0;
@@ -309,11 +308,11 @@ void effReleaseMain(EffectEntry* effect) {
             work->alpha[3] = 0;
             break;
         }
-        e = &anime_data[work->step];
         v = 0.01f * (f32)anime_data[work->step].time;
+        val = anime_data[work->step].value & 0xFF;
         work->alpha[0] = 0;
-        work->alpha[1] = e->value & 0xFF;
-        work->alpha[2] = e->value & 0xFF;
+        work->alpha[1] = val;
+        work->alpha[2] = val;
         work->size[0] = 0.0f;
         work->size[1] = v;
         work->size[2] = 1.2f * v + 4.0f;
@@ -338,12 +337,13 @@ void effReleaseMain(EffectEntry* effect) {
             work->alpha[3] = 0;
             break;
         }
-        e = &anime_data_2[work->step];
+        v = 0.01f * (f32)anime_data_2[work->step].time;
+        val = anime_data_2[work->step].value & 0xFF;
         work->alpha[0] = 0;
         work->size[0] = 0.0f;
-        work->alpha[1] = e->value & 0xFF;
-        work->size[1] = 0.01f * (f32)e->time;
+        work->alpha[1] = val;
         work->alpha[2] = 0;
+        work->size[1] = v;
         work->size[2] = 0.0f;
         work->step++;
         if (work->step >= 30) {
@@ -351,6 +351,7 @@ void effReleaseMain(EffectEntry* effect) {
             work->state = 5;
         }
         break;
+    case 5:
     default:
         work->size[0] = 0.0f;
         work->size[1] = 0.0f;
@@ -379,6 +380,8 @@ void effReleaseMain(EffectEntry* effect) {
 }
 
 void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
+    GXColor c0;
+    GXColor c1;
     CameraEntry* camera;
     EffReleaseN64Work* work;
     GXTexObj texObj;
@@ -409,7 +412,11 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    GXSetTevColor(GX_TEVREG1, (GXColor){work->r2, work->g2, work->b2, work->a2});
+    {
+
+
+        GXSetTevColor(GX_TEVREG1, (GXColor){work->r2, work->g2, work->b2, work->a2});
+    }
     GXSetCullMode(GX_CULL_NONE);
     for (i = 0; i < 4; i++) {
         if (variant == 1 && i == 2) {
@@ -423,7 +430,11 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(camera->view, scale, scale);
         GXLoadPosMtxImm(scale, GX_PNMTX0);
         GXSetCurrentMtx(0);
-        GXSetTevColor(GX_TEVREG0, (GXColor){work->r, work->g, work->b, work->alpha[i]});
+        {
+
+
+            GXSetTevColor(GX_TEVREG0, (GXColor){work->r, work->g, work->b, work->alpha[i]});
+        }
         switch (i) {
         case 0:
             effGetTexObjN64(0x44, &texObj);
@@ -485,6 +496,8 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             tri2(0, 1, 2, 0, 0, 2, 3, 0);
             tri2(4, 5, 6, 4, 4, 6, 7, 4);
             break;
+        case 4:
+            break;
         }
     }
     if (variant == 2 || variant == 3) {
@@ -506,15 +519,13 @@ void effReleaseDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetNumChans(1);
             GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
             {
-                GXColor matColor = black;
-                matColor.a = alpha;
-                GXSetChanMatColor(GX_COLOR0A0, matColor);
+                GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xD0, 0xD0, 0xD0, alpha});
             }
             GXSetNumTevStages(1);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
             GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
             GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+            GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ONE);
             GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
             PSMTXIdentity(mtx);
             GXLoadPosMtxImm(mtx, GX_PNMTX0);

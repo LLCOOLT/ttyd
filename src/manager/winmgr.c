@@ -490,8 +490,8 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
             FontDrawMessage(-210, -144.0f + 28.0f * entry->scroll, entry->msg);
         }
         GXSetScissor(0, 0, 608, 480);
-        if (entry->lines > 2) {
-            if (entry->scroll == 0) {
+        if (entry->lines > 2) { s32 scroll = entry->scroll;
+            if (scroll == 0) {
                 if ((gp->retraceCount & 31) < 20) {
                     PSMTXTrans(mtx, entry->x + entry->width - 12, entry->y - entry->height - 4, 0.0f);
                     PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
@@ -499,7 +499,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
                     iconDispGx2(mtx, 16, 0x1B6);
                 }
             }
-            else if (entry->lines == entry->scroll + 2) {
+            else if (entry->scroll + 2 == entry->lines) {
                 if ((gp->retraceCount & 31) < 20) {
                     PSMTXTrans(mtx, entry->x + entry->width - 12, entry->y - entry->height + 44, 0.0f);
                     PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
@@ -1008,9 +1008,8 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
 }
 
 void winMgrSelectDelete(WinMgrSelect* sel) {
-    WinMgrSelect* s = sel;
-    __memFree(HEAP_DEFAULT, s->items);
-    __memFree(HEAP_DEFAULT, s);
+    __memFree(HEAP_DEFAULT, sel->items);
+    __memFree(HEAP_DEFAULT, sel);
 }
 
 s32 unk_80237448(WinMgrSelect* sel) {
@@ -1027,7 +1026,7 @@ void select_main(WinMgrEntry* entry) {
             for (i = 0; i < sel->numDescriptors; i++) {
                 winMgrOpen(sel->descriptorId[i]);
             }
-            if (sel->numDescriptors >= 3) {
+            if (3 <= sel->numDescriptors) {
                 winMgrHelpInit(winMgrGetPtr(sel->descriptorId[2]));
             }
             psndSFXOn((const char*)0x2002A);
@@ -1141,11 +1140,11 @@ void select_disp(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
 
-    ofs = 0.0f;
     if (!(wp->mEntries[sel->descriptorId[0]].flags & 4)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
         GXSetScissor(entry->x + 304, 274 - entry->y, entry->width, entry->height - 50);
+        ofs = 0.0f;
         for (i = 0; i < sel->numItems; i++) {
             f32 py;
             item = &itemDataTable[sel->items[i].id];
@@ -1154,6 +1153,7 @@ void select_disp(WinMgrEntry* entry) {
                 continue;
             }
             if (sel->field_0x38 == 0) {
+                ofs = ofs + 0.0f;
             }
             if (sel->items[i].flags & 1) {
                 winIconGrayInit();
@@ -1329,7 +1329,7 @@ static inline s32 select_party_icon(u16 id) {
 
 void select_disp_party(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
-    PouchData* pouch;
+    PouchData* pouch = pouchGetPtr();
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
@@ -1341,9 +1341,8 @@ void select_disp_party(WinMgrEntry* entry) {
     const char* msg;
     u16 w;
     f32 sx;
-    f32 ofs = 0.0f;
+    f32 ofs;
 
-    pouch = pouchGetPtr();
     if (!(wp->mEntries[sel->descriptorId[0]].flags & 4)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         GXGetScissor(&left, &top, &wd, &ht);
@@ -1355,6 +1354,7 @@ void select_disp_party(WinMgrEntry* entry) {
                 continue;
             }
             if (sel->field_0x38 == 0) {
+                ofs = ofs + 0.0f;
             }
             winFontInit();
             winFontSet((Vec){entry->x + 60, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f},
@@ -1402,8 +1402,7 @@ void select_disp_mario(WinMgrEntry* entry) {
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor iconcol = white;
+    GXColor iconcol = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor* col;
     s32 i;
     s32 id;
@@ -1411,7 +1410,6 @@ void select_disp_mario(WinMgrEntry* entry) {
     u16 w;
     char buf[4];
     f32 ofs = 0.0f;
-    GXColor white2 = white;
 
     if (!(wp->mEntries[sel->descriptorId[0]].flags & 4)) {
         GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -1470,11 +1468,11 @@ void select_disp_mario(WinMgrEntry* entry) {
         msg = msgSearch("msg_window_title_9");
         w = (120 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + ((entry->width * 3 / 5 - 120) * 2 / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
+        winFontSetEdge((Vec){entry->x + ((entry->width * 3 / 5 - 120) * 2 / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, iconcol, msg);
         msg = msgSearch("msg_window_title_10");
         w = (85 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
+        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, iconcol, msg);
         iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
@@ -1646,9 +1644,11 @@ void select_disp3_party(WinMgrEntry* entry) {
 
     pouch = pouchGetPtr();
     if (!(wp->mEntries[sel->descriptorId[2]].flags & 4)) {
-        help = "help";
         if (sel->items[sel->cursor].flags & 2) {
             help = "helperr";
+        }
+        else {
+            help = "help";
         }
         if (sel->type == 6 || sel->type == 7) {
             lank = "lankup";

@@ -3451,22 +3451,23 @@ USER_FUNC(chain_main) {
     NpcEntry* prev;
     f32 len, sag, cx, cy, cz, dx, dy, dz, t;
     s32 i;
-    dy = me->position.y - end->position.y;
     dx = me->position.x - end->position.x;
+    dy = me->position.y - end->position.y;
     dz = me->position.z - end->position.z;
-    len = 0.25f * (f32)sqrt(dy * dy + dx * dx + dz * dz);
+    len = 0.25f * (f32)sqrt(dx * dx + dy * dy + dz * dz);
     if (len < 10.0f) {
         len = 10.0f;
     }
     sag = 300.0f / (len * len);
     cur = me->slaves[0];
-    cy = cur->position.y - sag;
+    cy = cur->position.y;
+    cy -= sag;
     cx = cur->position.x;
     cz = cur->position.z;
     dx = me->position.x - cx;
-    dz = me->position.z - cz;
     dy = me->position.y - cy;
-    t = 1.0f - len / (f32)sqrt(dy * dy + dx * dx + dz * dz);
+    dz = me->position.z - cz;
+    t = 1.0f - len / (f32)sqrt(dx * dx + dy * dy + dz * dz);
     cy = dy * t + cy;
     cx = dx * t + cx;
     cz = dz * t + cz;
@@ -3483,13 +3484,14 @@ USER_FUNC(chain_main) {
     for (i = 0; i < 2; i++) {
         cur = me->slaves[i + 1];
         prev = me->slaves[i];
-        cy = cur->position.y - sag;
+        cy = cur->position.y;
+        cy -= sag;
         cx = cur->position.x;
         cz = cur->position.z;
-        dy = prev->position.y - cy;
         dx = prev->position.x - cx;
+        dy = prev->position.y - cy;
         dz = prev->position.z - cz;
-        t = 1.0f - len / (f32)sqrt(dy * dy + dx * dx + dz * dz);
+        t = 1.0f - len / (f32)sqrt(dx * dx + dy * dy + dz * dz);
         cy = dy * t + cy;
         cx = dx * t + cx;
         cz = dz * t + cz;
@@ -3507,13 +3509,14 @@ USER_FUNC(chain_main) {
     for (i = 3; i >= 1; i--) {
         cur = me->slaves[i - 1];
         prev = me->slaves[i];
-        cy = cur->position.y - sag;
+        cy = cur->position.y;
+        cy -= sag;
         cx = cur->position.x;
         cz = cur->position.z;
-        dy = prev->position.y - cy;
         dx = prev->position.x - cx;
+        dy = prev->position.y - cy;
         dz = prev->position.z - cz;
-        t = 1.0f - len / (f32)sqrt(dy * dy + dx * dx + dz * dz);
+        t = 1.0f - len / (f32)sqrt(dx * dx + dy * dy + dz * dz);
         cy = dy * t + cy;
         cx = dx * t + cx;
         cz = dz * t + cz;

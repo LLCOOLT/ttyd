@@ -235,6 +235,7 @@ void effToikiDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     u32 i;
 
+
     effGetTexObj(0x5C, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXSetNumChans(1);

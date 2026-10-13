@@ -211,9 +211,8 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                 break;
             case 1003:
                 {
-                    s32 k = cw->idx - 2;
-                    while (k >= 0) {
-                        k--;
+                    s32 k;
+                    for (k = 0; k <= cw->idx - 2; k++) {
                     }
                 }
                 work->actionCommands.mAcState = 1004;

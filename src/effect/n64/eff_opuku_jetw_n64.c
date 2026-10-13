@@ -169,16 +169,15 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     GXColor color;
     GXColor color2;
     GXColor color3;
-    s32 lifetime, alpha, r, g, b, n, m;
-    JetwEnt* tbl;
-    
-    EffOpukuJetwN64Work* work;
-    CameraEntry* camera;
     s32 frame;
+    CameraEntry* camera;
+    EffOpukuJetwN64Work* work;
+    JetwEnt* tbl;
+    s32 m, n, b, g, r, alpha, lifetime;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    lifetime = work->lifetime;
     frame = work->frame;
+    lifetime = work->lifetime;
     alpha = work->alpha;
     r = work->colorR;
     g = work->colorG;
@@ -249,8 +248,8 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
                 if (idx > f5) continue;
                 if (n - idx - 1 > lifetime) continue;
                 {
-                JetwEnt* e = tbl + j * n + idx;
                 JetwEnt* e2 = tbl + idx;
+                JetwEnt* e = e2 + j * n;
                     PSMTXTrans(mtx, (f32)e->x, 10.0f + (f32)e->y, 0.0f);
                     PSMTXScale(scale, 0.01f * (f32)e2->sx, 0.01f * (f32)e2->sy, 1.0f);
                     PSMTXConcat(mtx, scale, mtx);

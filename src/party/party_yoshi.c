@@ -1016,6 +1016,8 @@ void inertia(PartyEntry* party) {
     if (!sx) {
         k = -0.07f;
         if (mario->field_0x1F0) {
+            if (lim) {
+            }
             k = -0.5f;
         }
         vx = vx * k + vx;

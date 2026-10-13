@@ -75,7 +75,7 @@ EffectEntry* effSparkEntry(s32 type, f32 x, f32 y, f32 z) {
     work->scale = 0.9f;
     {
     EffSparkParticle* p = work->part;
-    f = max_seq_num[type] * 0.5f;
+    f = max_seq_num[type] / 2.0f;
     for (i = 1; i < 6; i++, p++) {
         p->seq = -1.0f - f * (i & 1);
     }
@@ -124,7 +124,7 @@ void effSparkMain(EffectEntry* effect) {
         b = a;
         break;
     }
-    for (i = 1, parity = counter & 1; i < effect->count; i++, p++) {
+    for (i = 1, parity; i < effect->count; i++, p++) {
         p->seq++;
         if (p->seq >= max_seq_num[type]) {
             p->seq = 0;
@@ -154,7 +154,7 @@ void effSparkMain(EffectEntry* effect) {
             p->scale = scale_data2[p->seq];
             break;
         }
-        if (parity == (i & 1)) {
+        if ((counter & 1) == (i & 1)) {
             p->x += p->velX;
             p->y += p->velY;
         } else {
@@ -172,8 +172,8 @@ void effSparkMain(EffectEntry* effect) {
 }
 
 void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
-    EffSparkWork* work = effect->userdata;
     EffSparkParticle* p;
+    EffSparkWork* work = effect->userdata;
     CameraEntry* camera;
     GXTexObj texObj;
     Mtx mtx2;
@@ -203,15 +203,15 @@ void effSparkDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
+    half = 8.0f;
+    size = 16.0f;
     PSMTXTrans(mtx, work->x, work->y, work->z);
     PSMTXScale(scale, work->scale, work->scale, work->scale);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     PSMTXConcat(mtx, rot, base);
     PSMTXConcat(base, scale, base);
 
-    size = 16.0f;
-    half = 8.0f;
-    for (i = 1, p = (EffSparkParticle*)work + 1; i < effect->count; i++, p++) {
+    for (i = 1, p = work->part; i < effect->count; i++, p++) {
         if (p->seq < 0) {
             continue;
         }

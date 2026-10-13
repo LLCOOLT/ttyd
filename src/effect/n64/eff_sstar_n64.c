@@ -205,8 +205,7 @@ EffectEntry* effSstarN64Entry(s32 type, f32 x, f32 y, f32 z, f32 tx, f32 ty, f32
     l2 = c * w->velocity.x;
     l2 = l2 * l2 + (s * w->velocity.z) * (s * w->velocity.z);
     if (l2) {
-        ang = sqrtf(l2);
-        l2 = ang;
+        l2 = sqrtf(l2);
     }
     dot = c * w->velocity.x + s * w->velocity.z;
     if (dot < 0.0f) {
@@ -289,7 +288,7 @@ void effSstarMain(EffectEntry* effect) {
 void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffSstarN64Work* w;
-    s32 i, base;
+    s32 i, base, k;
     s32 c1, c2, c3;
     f32 scale;
     Mtx mtx;
@@ -384,7 +383,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
         w->idx = 0;
     }
     if (w->bounce <= 1.0f) {
-        base = w->idx + 5;
+        k = w->idx + 5;
         PSMTXTrans(mtx, w->position.x, w->position.y, w->position.z);
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
         PSMTXConcat(mtx, rot, mtx);
@@ -398,7 +397,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
             OSs16tof32(&w->vtx[i * 2].x, &v0.x);
             OSs16tof32(&w->vtx[i * 2].y, &v0.y);
             OSs16tof32(&w->vtx[i * 2].z, &v0.z);
-            PSMTXMultVec(w->mtx[(base - i + 8) % 8], &v0, &v0);
+            PSMTXMultVec(w->mtx[(k - i + 8) % 8], &v0, &v0);
             OSInitFastCast();
             OSf32tos16(&v0.x, &w->vtx[i * 2].x);
             OSf32tos16(&v0.y, &w->vtx[i * 2].y);
@@ -408,7 +407,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
             OSs16tof32(&w->vtx[i * 2 + 1].x, &v1.x);
             OSs16tof32(&w->vtx[i * 2 + 1].y, &v1.y);
             OSs16tof32(&w->vtx[i * 2 + 1].z, &v1.z);
-            PSMTXMultVec(w->mtx[(base - i + 8) % 8], &v1, &v1);
+            PSMTXMultVec(w->mtx[(k - i + 8) % 8], &v1, &v1);
             OSInitFastCast();
             OSf32tos16(&v1.x, &w->vtx[i * 2 + 1].x);
             OSf32tos16(&v1.y, &w->vtx[i * 2 + 1].y);
@@ -418,9 +417,9 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(w->vtx, 0x8C);
         effSetVtxDescN64(w->vtx);
         GXLoadPosMtxImm(camera->view, GX_PNMTX0);
-        for (i = 0; i < 4; i++) {
+        for (i = 0, base = 0; i < 4; i++, base += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(i * 2, i * 2 + 1, i * 2 + 2, i * 2, i * 2 + 1, i * 2 + 3, i * 2 + 2, i * 2 + 1);
+            tri2(base, base + 1, base + 2, base, base + 1, base + 3, base + 2, base + 1);
         }
     }
 }

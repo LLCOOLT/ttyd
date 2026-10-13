@@ -55,9 +55,9 @@ typedef struct Anim40 {
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
 	TEXPalette* tpl;
+	u16 i;
 	TEXHeader* img;
 	CLUTHeader* pal;
-	u16 i;
 	s32 j, n;
 	Anim40* e;
 	u8* q;
@@ -241,8 +241,8 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
 	TEXPalette* tpl;
-	u16 i;
 	s32 j, n;
+	u16 i;
 	u8* q;
 	switch (type) {
 		case 1:
@@ -343,7 +343,8 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 				FLD(data, 0x1a4) += (u32)data;
 				FLD(data, 0x1a8) += (u32)data;
 				FLD(data, 0x1ac) += (u32)data;
-				for (j = 0; j < *(s32*)((u8*)data + 0x148); j++) {
+				n = *(s32*)((u8*)data + 0x148);
+				for (j = 0; j < n; j++) {
 					*(u32*)&(*(Anim40**)((u8*)data + 0x1ac))[j].p += (u32)data;
 					q = (*(Anim40**)((u8*)data + 0x1ac))[j].p;
 					if (FLD(q, 0x24) < (u32)q) {
@@ -477,7 +478,7 @@ void _fileGarbage(BOOL a1) {
 				}
 				else {
 					f->references--;
-					if ((s16)f->references < -1) {
+					if ((s16)f->references <= -2) {
 						f->state = 2;
 					}
 				}
@@ -530,10 +531,11 @@ FileEntry* fileAlloc(const char* filename, s32 type) {
 }
 
 FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry*)) {
+	void* handle;
+	FileEntry *search;
 	smartEntry* smart;
 	DVDEntry* entry;
-	FileEntry *search, *newentry, *temp;
-	void* handle;
+	FileEntry *newentry, *temp;
 	u32 size, test;
 
 	for (search = afp->firstused; search; search = search->next) {
@@ -655,8 +657,8 @@ void fileFree(FileEntry* handle) {
 }
 
 void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
-	FileEntry* f;
 	DVDEntry* entry;
+	FileEntry* f;
 
 	for (f = afp->firstused; f; f = f->next) {
 		if (&f->entry->info == info) {

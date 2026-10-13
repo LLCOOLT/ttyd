@@ -282,7 +282,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
                 }
             }
             if (fpDamage > 0 && BtlUnit_GetBelong(target) == 0) {
-                psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos)psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos)", &pos);
+                psndSFXOn_3D("SFX_MARIO_DAMAGE_FP1", &pos);
             }
         }
     }
@@ -504,7 +504,7 @@ s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPa
     if (fn) {
         damage = fn(attacker, weapon, target, part);
     }
-    if (*((u8*)wp + 0x18FE1) == 1 && (weapon->special & 2)) {
+    if (wp->majinaiState == 1 && (weapon->special & 2)) {
         damage += 3;
     }
     if (weapon->special & 1) {
@@ -549,7 +549,7 @@ s32 BattleCalculateDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPa
             damage = 0;
         }
     }
-    isJump = weapon->special & 1;
+    isJump = (weapon->special & 1) != 0;
     if (isJump) {
         damage -= attacker->badgesEquipped.PDownDUp;
     }
@@ -615,7 +615,7 @@ skip:
                 defense = 0;
             }
         }
-        if (*((u8*)wp + 0x18FE1) == 2 && target->currentKind == 0xDE) {
+        if (wp->majinaiState == 2 && target->currentKind == 0xDE) {
             defense += 3;
         }
         if (part->attributes & 0x20) {
@@ -674,7 +674,7 @@ skip:
     }
     if (defenseAttr == 3) {
         *result |= 0x2000;
-        return damage * -1;
+        return (u32)damage * -1;
     }
     if (damage <= 0) {
         *result = defaultResult;
@@ -1027,7 +1027,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     s32 ok;
     s32 announce;
     s32 chance;
-    u8 regist;
+    s32 regist;
     f32 x, y, z;
     EffectEntry* eff;
     Vec hitPos;
@@ -1036,9 +1036,9 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     s8 curStrength;
 
     ok = 0;
-    chance = rate;
     BtlUnit_GetStatus(unit, 0x10, NULL, &prevStrength);
     switch (type) {
+        case 0x16: case 0x17: case 0x18:
         case 0x13:
         case 0x14:
             if (time <= 0) {
@@ -1122,9 +1122,10 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
                 return 0;
         }
     }
-    if (type == 8 && unit->badgesEquipped.IcePower) {
+    if ((u32)type == 8 && unit->badgesEquipped.IcePower) {
         return 0;
     }
+    chance = rate;
     if (chance <= 0) {
         return 0;
     }
@@ -1140,18 +1141,18 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     }
 
     ok = 0;
-    if (type == 0x19) {
+    if ((u32)type == 0x19) {
         *result |= 4;
-    } else if (type == 0x1a) {
+    } else if ((u32)type == 0x1a) {
         *result |= 8;
     } else {
-        if (type == 1) {
+        if ((u32)type == 1) {
             *result |= 0x20;
         }
-        if (type == 0x1b) {
+        if ((u32)type == 0x1b) {
             *result |= 0x10;
         }
-        ok = BtlUnit_SetStatus(unit, (s8)type, time, strength);
+        ok = BtlUnit_SetStatus(unit, type, time, strength);
     }
     switch (type) {
         case 6:
@@ -1329,7 +1330,7 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
 
     announce = 0;
     if (ok) {
-        BtlUnit_GetStatus(unit, (s8)type, &curTurns, &curStrength);
+        BtlUnit_GetStatus(unit, type, &curTurns, &curStrength);
         switch (type) {
             case 0x10:
                 if (curStrength > 0) {
@@ -1596,18 +1597,17 @@ s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
 }
 
 s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, s32 flags) {
-    BattleWork* wp = _battleWorkPointer;
+    s32 pierce;
     s32 ret = -1;
     u32 status = 0;
-    s32 pierce = 0;
     s32 damage;
     s32 fpDamage;
     u32 pattern;
     EffectEntry* eff;
     CounterWork cw;
     CounterWork* cwp;
-    f32 x, y, z;
     f32 x2, y2, z2;
+    f32 x, y, z;
     Vec pos;
     u32 result;
     s32 code;
@@ -1616,7 +1616,9 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     u32 r2;
     u32 r3;
     u32 r4;
+    BattleWork* wp = _battleWorkPointer;
 
+    pierce = 0;
     cwp = &cw;
     BattleInitCounterPreCheckWork((s32*)cwp);
     if (!target) {

@@ -1187,8 +1187,8 @@ s32 _yoshig_tpl_no_tbl[] = {
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
-    BattleWork* wp = _battleWorkPointer;
     s32* args = event->args;
+    BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
     s32 id;

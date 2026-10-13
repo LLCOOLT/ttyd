@@ -117,13 +117,13 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
             cw->ang360 = (f32)(((cw->cur + cw->vel) % (PC_PARAMS(work)->period * 2)) * 360 /
                                (PC_PARAMS(work)->period * 2));
             cw->angle = reviseAngle(45.0f * sinfd(cw->ang360));
-            CALC_DIR(dir)
-            accel = 0.0f;
             stick = (u8*)_battleWorkPointer;
+            accel = 0.0f;
+            CALC_DIR(dir)
             if (*(u32*)((u8*)ac + 0x34) & 1) {
                 if (stick[0xF33] > 10 && stick[0xF32] < 10) {
                     if (dir < 0.0f) {
-                        mag = (f32)stick[0xF33] * 0.0078125f;
+                        mag = stick[0xF33] / 128.0f;
                         if (mag > 1.0f) {
                             mag = 1.0f;
                         }
@@ -132,7 +132,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
                 } else if (stick[0xF33] < 10) {
                     if (stick[0xF32] > 10) {
                         if (dir > 0.0f) {
-                            mag = (f32)stick[0xF32] * 0.0078125f;
+                            mag = stick[0xF32] / 128.0f;
                             if (mag > 1.0f) {
                                 mag = 1.0f;
                             }
@@ -167,7 +167,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
                 cw->zone = zone;
             }
             inRange = FALSE;
-            if (autoCommand && work->actionCommands.outputParams[1] >= _get_angle_hp(50)) {
+            if (autoCommand && (s32)work->actionCommands.outputParams[1] >= _get_angle_hp(50)) {
                 inRange = TRUE;
             }
             if (BattlePadCheckTrigger(cw->button) || inRange) {
@@ -185,7 +185,7 @@ s32 battleAcMain_PendulumCraneTiming(BattleWork* work) {
         case 1002:
             *(u32*)((u8*)ac + 0x30) |= 1;
             cw->endTimer = 60;
-            if (cw->sfxId != -1) {
+            if (cw->sfxId != 0xFFFFFFFF) {
                 psndSFXOff(cw->sfxId);
             }
             work->actionCommands.mAcState = 1003;
@@ -295,10 +295,12 @@ static void actionCommandDisp(f32 x, f32 y) {
 
 s32 _get_angle_rate(f32 angle) {
     s32 r;
-    f32 a = compAngle(0.0f, angle);
+    f32 a;
+    a = compAngle(0.0f, angle);
     a += 45.0f;
     a = a * 100.0f;
     r = a / 90.0f;
+
     if (r < 0) {
         r = 0;
     }

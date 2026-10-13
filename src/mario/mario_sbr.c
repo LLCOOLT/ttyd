@@ -280,6 +280,7 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
     mp->forceMoveTimer = time;
     mp->baseSpeed = speed;
     if (MW(mp, 0x2E, u16) == 0x19 || (MW(mp, 0x2E, u16) == 0x15 || MW(mp, 0x2E, u16) == 0x16) || MW(mp, 0x2E, u16) == 0x1A) {
+        return;
     } else {
             marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
             mp->unk19C = dir;
@@ -302,9 +303,7 @@ void marioUpdateKeyData(void) {
     MW(mp, 0x253, u8) = gp->triggerRight[0];
     MW(mp, 0x254, u8) = 0;
     MW(mp, 0x255, u8) = 0;
-    if (MW(mp, 0x284, u32)) {
-        mask = MW(mp, 0x284, u32);
-    }
+    mask = MW(mp, 0x284, u32) ? MW(mp, 0x284, u32) : 0xFFFFFFFF;
     MW(mp, 0x246, u16) = gp->button[0] & mask;
     MW(mp, 0x248, u16) = gp->buttonNew[0] & mask;
     MW(mp, 0x24A, u16) = gp->buttonRepeat[0] & mask;
@@ -364,11 +363,7 @@ void marioGetStick(f32* dir, f32* mag) {
         return;
     }
     x = MW(mp, 0x24E, s8);
-    y = 0;
-    if ((mp->flags & 0x02000000) || kpaGetStageViewType() == 0) {
-        y = 1;
-    }
-    y = y ? 0 : -MW(mp, 0x24F, s8);
+    y = ((mp->flags & 0x02000000) || kpaGetStageViewType() == 0) ? 0 : -MW(mp, 0x24F, s8);
     if (yoshiGetStatus() == 2) {
         y = 0;
     }
@@ -461,12 +456,12 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
 
 s32 checkOneRevolution(s32 dir) {
     RubWork* rw = &rubwork;
-    s32 idx;
-    s32 start;
-    s32 cur;
-    s32 v;
     s32 i;
     s32 j;
+    s32 v;
+    s32 cur;
+    s32 start;
+    s32 idx;
     s32 ret = 0;
 
     if (rw->num < 2) {

@@ -141,6 +141,7 @@ USER_FUNC(evt_sub_countdown_start);
 USER_FUNC(evt_sub_animgroup_async);
 USER_FUNC(evt_sub_get_language);
 USER_FUNC(evt_sub_load_progresstime);
+USER_FUNC(evt_sub_save_playtime);
 USER_FUNC(evt_sub_status_gauge_check_update);
 USER_FUNC(evt_sub_status_gauge_force_close);
 USER_FUNC(evt_sub_status_gauge_force_open);
@@ -1270,6 +1271,7 @@ USER_FUNC(evt_sub_spline_get_value_manual) {
 	SplineWork* w = (SplineWork*)event->lwData[15];
 	f32 t = evtGetValue(event, args[0]);
 	f32 v[3];
+	t = t;
 	t = t / (w->manual ? (f32)w->msec : (f32)w->steps);
 	spline_getvalue(v, t, w->n, w->pts, w->ts, w->tbl);
 	evtSetValue(event, args[1], EVT_FLOAT_OF(v[0]));
@@ -1490,11 +1492,11 @@ USER_FUNC(evt_sub_get_language) {
 
 USER_FUNC(evt_sub_animgroup_async) {
 	s32 group = evtGetValue(event, event->args[0]);
-	switch (((s32 (*)(const char*, s32, s32))animGroupBaseAsync)((const char*)group, gp->inBattle != 0, 0)) {
-	default:
-		return EVT_RETURN_DONE;
+	switch (animGroupBaseAsync((const char*)group, gp->inBattle != 0, NULL)) {
 	case 0:
 		break;
+	default:
+		return EVT_RETURN_DONE;
 	}
 	return EVT_RETURN_BLOCK;
 }
@@ -1703,6 +1705,7 @@ USER_FUNC(bgm_start_wait) {
 USER_FUNC(evt_sub_check_intersect) {
 	s32* args = event->args;
 	f32 a, b, c, d, e, f, g, h;
+	f32 t1, t2;
 	a = evtGetFloat(event, args[0]);
 	b = evtGetFloat(event, args[1]);
 	c = evtGetFloat(event, args[2]);
@@ -1733,11 +1736,15 @@ USER_FUNC(evt_sub_check_intersect) {
 			return EVT_RETURN_DONE;
 		}
 	}
-	if (((b - d) * (a - e) + (a - c) * (f - b)) * ((b - d) * (a - g) + (a - c) * (h - b)) > 0.0f) {
+	t1 = (a - c) * (f - b) + (b - d) * (a - e);
+	t2 = (a - c) * (h - b) + (b - d) * (a - g);
+	if (t1 * t2 > 0.0f) {
 		evtSetValue(event, args[8], 0);
 		return EVT_RETURN_DONE;
 	}
-	if (((f - h) * (e - a) + (e - g) * (b - f)) * ((f - h) * (e - c) + (e - g) * (d - f)) > 0.0f) {
+	t1 = (e - g) * (b - f) + (f - h) * (e - a);
+	t2 = (e - g) * (d - f) + (f - h) * (e - c);
+	if (t1 * t2 > 0.0f) {
 		evtSetValue(event, args[8], 0);
 		return EVT_RETURN_DONE;
 	}

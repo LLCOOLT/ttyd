@@ -602,18 +602,18 @@ void chorogun_ext_main(void) {
             c->target.z = z;
         case 31:
             if (pose->mtx[1][3] <= 0.0f) {
-                dx2 = c->target.x - pose->mtx[0][3];
-                dz2 = c->target.z - pose->mtx[2][3];
-                d = sqrt(dx2 * dx2 + dz2 * dz2);
+                dz2 = c->target.x - pose->mtx[0][3];
+                dx2 = c->target.z - pose->mtx[2][3];
+                d = sqrt(dz2 * dz2 + dx2 * dx2);
                 if (i % 100 == 0) {
                     BtlUnit_snd_se_pos(unit, "SFX_BOSS_TEAM_CHORO_MOVE1", 0x60, 0, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                 }
                 if (d <= 30.0f || c->timer >= 240) {
                     c->state = 40;
                 } else {
-                    c->vel.x = c->speed * (dx2 / d);
+                    c->vel.x = c->speed * (dz2 / d);
                     c->vel.y = c->speed;
-                    c->vel.z = c->speed * (dz2 / d);
+                    c->vel.z = c->speed * (dx2 / d);
                     pose->mtx[1][3] = 0.0f;
                     c->timer++;
                 }

@@ -6,6 +6,7 @@
 #include "system.h"
 #include <dolphin/os.h>
 
+ItemEntry* itemEntry(const char* name, s32 itemId, u16 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
 void itemForceGet(ItemEntry* entry);
 void itemFlagOn(ItemEntry* entry, u16 flags);
 void itemFlagOff(ItemEntry* entry, u16 flags);
@@ -27,7 +28,7 @@ USER_FUNC(evt_item_entry) {
 	s32 type = evtGetValue(event, args[5]);
 	s32 evtId = args[6];
 	s32 a5 = evtGetValue(event, args[7]);
-	itemEntry(name, itemId, (u16)type, evtId, a5, (f32)x, (f32)y, (f32)z);
+	itemEntry(name, itemId, type, evtId, a5, x, y, z);
 	return EVT_RETURN_DONE;
 }
 
@@ -238,8 +239,7 @@ USER_FUNC(evt_item_move_3d_position) {
 		event->userdataf[2] = item->position.y;
 		*z0 = item->position.z;
 	}
-	elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0]);
-	if ((s32)elapsed < ms) {
+	if ((s32)(elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0])) < ms) {
 		item->position.x = intplGetValue(mode, (s32)elapsed, ms, event->userdataf[1], x);
 		item->position.y = intplGetValue(mode, (s32)elapsed, ms, event->userdataf[2], y);
 		item->position.z = intplGetValue(mode, (s32)elapsed, ms, *z0, z);
@@ -258,16 +258,18 @@ USER_FUNC(evt_item_get_important_item) {
 	MarioWork* mario = marioGetPtr();
 	f32 mx, my, mz;
 	f32 tb;
-	f32 spd = 0.5f;
+	f32 spd;
 	f32 ta;
 	f32 rad, s, c;
 	mx = mario->position.x;
 	my = mario->position.y + mario->wPlayerCollisionBox.y;
 	mz = mario->position.z;
+	spd = 0.5f;
 	if (isFirstCall) {
 		f32 dist = distABf(mx, mz, item->position.x, item->position.z);
+		f32 dy = my - item->position.y;
 		ta = dist / spd;
-		tb = (my - item->position.y) / ta + (0.1f * ta) * 0.5f;
+		tb = dy / ta + (ta * 0.1f) / 2.0f;
 		event->userdata[0] = *(s32*)&ta;
 		event->userdata[1] = *(s32*)&tb;
 		event->userdata[2] = *(s32*)&spd;
@@ -282,16 +284,16 @@ USER_FUNC(evt_item_get_important_item) {
 	c = item_cos(rad);
 	item->position.z = item->position.z - spd * c;
 	item->position.y += tb;
-	ta = ta - 1.0f;
 	tb = tb - 0.1f;
+	ta = ta - 1.0f;
 	if (ta < 0.0f) {
 		item->position.x = mx;
 		item->position.y = my;
 		item->position.z = mz;
 		return EVT_RETURN_DONE;
 	}
-	event->userdataf[0] = ta;
-	event->userdataf[1] = tb;
+	event->userdata[0] = *(s32*)&ta;
+	event->userdata[1] = *(s32*)&tb;
 	return EVT_RETURN_BLOCK;
 }
 #pragma opt_propagation reset

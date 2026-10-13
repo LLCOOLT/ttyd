@@ -473,8 +473,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	PouchData* pouch = pouchGetPtr();
 
 	if (wp->flags & 1) {
-		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
 		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
+		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
 		s32 i;
 		s32 off4;
 		s32 off12;
@@ -614,7 +614,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 h;
 			u32 sl, st, sw, sh;
 
-			row = 0;
+			
 			desc = NULL;
 
 			h = (8 - pouchGetKeepItemCnt() > 0 ? 8 - pouchGetKeepItemCnt() : 0) * 24;
@@ -627,7 +627,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			FontDrawEdgeOff();
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (i = 0; i < 32; i++) {
+			for (row = i = 0; i < 32; i++) {
 				s32 id = pouchKeepItem(i);
 				ItemData* item = &itemDataTable[id];
 				if (id) {
@@ -666,7 +666,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 max;
 			u32 sl, st, sw, sh;
 
-			row = 0;
+			
 			desc = NULL;
 			if (mode == 2 || mode == 3) {
 				h = (8 - pouchGetHaveItemCnt() > 0 ? 8 - pouchGetHaveItemCnt() : 0) * 24;
@@ -731,7 +731,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			}
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (i = 0, tbl = badge_bottakuru100_table; i < max; i++) {
+			for (row = i = 0, tbl = badge_bottakuru100_table; i < max; i++) {
 				s32 flag = 0;
 				GXColor color = {0x00, 0x00, 0x00, 0xFF};
 				s32 id;

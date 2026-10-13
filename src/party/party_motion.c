@@ -477,8 +477,8 @@ void party_motion_stay(PartyEntry* party) {
     f32 d;
     f32 x, z;
     f32 dir, spd;
-    Vec p;
     Vec v;
+    Vec p;
 
     id = partyGetFootmarkId(party);
     if (party->flags3 & 2) {
@@ -607,6 +607,7 @@ void party_motion_stay(PartyEntry* party) {
             }
             party->unk39 = 0;
             break;
+        case 0:
         default:
             partyPoseA2(party);
             break;
@@ -850,9 +851,10 @@ void party_motion_homing_walk(PartyEntry* party) {
     Vec p2;
     Vec p3;
     Vec u;
-    f32 sp, dir;
+    f32 dir, sp;
+    f32 c4;
     f32 rx, ry, rz;
-    f32 c4, s4;
+    f32 s4;
     f32 fsb, fsa, fsy;
     f32 c, s;
     f32 c2, s2;
@@ -885,7 +887,7 @@ void party_motion_homing_walk(PartyEntry* party) {
     } else {
         lim2 = 35.0f;
     }
-    if (mario->unk3C == 2) {
+    if ((s32)mario->unk3C == 2) {
         lim2 = 70.0f;
     }
     if ((party->flags3 >> 17) & 1) {
@@ -951,7 +953,8 @@ void party_motion_homing_walk(PartyEntry* party) {
     do {
         fm = partyGetFootmarkPtr(id);
         t = fm->pos;
-        attr = partyGetFrontAttr(party, dir = angleABf(px, pz, t.x, t.z));
+        dir = angleABf(px, pz, t.x, t.z);
+        attr = partyGetFrontAttr(party, dir);
         if (!(attr & 0x800)) {
             goto found;
         }
@@ -1592,7 +1595,7 @@ void party_motion_behind_mario(PartyEntry* party) {
             {
             f32 t;
             if (!(party->flags3 & 0x10000)) {
-                t = revise360(partyGetFollowDir(party) + 180.0f);
+                t = revise360(180.0f + partyGetFollowDir(party));
             } else {
                 party->flags3 &= ~0x10000;
                 t = revise360(180.0f + angleABf(mario->position.x, mario->position.z, party->unk94.x, party->unk94.z));
@@ -1607,7 +1610,7 @@ void party_motion_behind_mario(PartyEntry* party) {
         }
     }
     if (!(party->flags3 & 0x100000) && marioKeyOffChk()) {
-        party->unk54 = revise360(partyGetFollowDir(party) + 180.0f);
+        party->unk54 = revise360(180.0f + partyGetFollowDir(party));
     }
     partyGetAppearPos4(party, &target);
     x = target.x;
@@ -1699,7 +1702,7 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     f32 thr;
     f32 x, z;
 
-    party->unk54 = revise360(partyGetFollowDir(party) + 180.0f);
+    party->unk54 = revise360(180.0f + partyGetFollowDir(party));
     if (party->flags3 & 2) {
         party->flags3 &= ~2;
         sp = 1.5f * mario->unk1B4;
@@ -1712,7 +1715,7 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
         }
     }
     if (marioKeyOffChk()) {
-        party->unk54 = revise360(partyGetFollowDir(party) + 180.0f);
+        party->unk54 = revise360(180.0f + partyGetFollowDir(party));
     }
     if (!(party->flags & 8)) {
         sp = 1.5f * mario->unk1B4;
@@ -1787,8 +1790,8 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
 void party_motion_behind_mario_fly(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
-    f32 spd;
     f32 thr;
+    f32 spd;
     f32 dist;
     Vec pos;
     f32 sp, dir;
@@ -1800,10 +1803,10 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
             {
             f32 t;
             if (!(party->flags3 & 0x10000)) {
-                t = revise360(partyGetFollowDir(party) + 180.0f);
+                t = revise360(180.0f + partyGetFollowDir(party));
             } else {
                 party->flags3 &= ~0x10000;
-                t = revise360(180.0f + angleABf(mario->position.x, mario->position.z, party->unk94.x, party->unk94.z));
+                t = revise360(angleABf(mario->position.x, mario->position.z, party->unk94.x, party->unk94.z) + 180.0f);
             }
             party->unk54 = t;
             }
@@ -1815,7 +1818,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         }
     }
     if (!(party->flags3 & 0x100000) && marioKeyOffChk()) {
-        party->unk54 = revise360(partyGetFollowDir(party) + 180.0f);
+        party->unk54 = revise360(180.0f + partyGetFollowDir(party));
     }
     angleABf(party->position.x, party->position.z, party->unk94.x, party->unk94.z);
     if (mario->unk180 > 1.0f) {
@@ -1849,7 +1852,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         }
         party->position.x = pos.x;
         party->position.z = pos.z;
-        party->position.y = party->position.y + 0.05f * (party->unk94.y - party->position.y);
+        party->position.y += 0.05f * (party->unk94.y - party->position.y);
         unk_800c8f24(party, party->unk104);
         return;
     }
@@ -1891,7 +1894,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         if (dist > party->unkF0) {
             hit = NULL;
         }
-        party->position.y = party->position.y + 0.05f * (party->unkE4 - party->position.y);
+        party->position.y += 0.05f * (party->unkE4 - party->position.y);
     }
     party->unk138 = hit;
 }
@@ -1989,8 +1992,8 @@ void party_motion_jump(PartyEntry* party) {
     s32 w;
     HitEntry* hit;
     f32 dir;
-    f32 lim;
     f32 dist;
+    f32 lim;
     f32 t, dy, g;
     Vec fl;
     Vec v;
@@ -2618,8 +2621,8 @@ BOOL party_slit(PartyEntry* party) {
 
 BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
-    f32 x;
     f32 d;
+    f32 x;
     f32 t;
 
     if (party->unk37 != 2) {
@@ -2673,18 +2676,16 @@ BOOL party_roll(PartyEntry* party) {
             party->unk24--;
             if (party->unk24 > 0) {
                 if (party->unk100 < 180.0f) {
-                    x = party->unk10C;
-                    d = 0.1f * (90.0f - x);
-                    x = d + x;
+                    x = 0.1f * (90.0f - party->unk10C);
+                    x += party->unk10C;
                     if (__fabsf(90.0f - x < 1.0f)) {
                         x = 90.0f;
                     }
                     party->unk10C = x;
                     party->unk110 = x;
                 } else {
-                    x = party->unk10C;
-                    d = 0.1f * (270.0f - x);
-                    x = d + x;
+                    x = 0.1f * (270.0f - party->unk10C);
+                    x += party->unk10C;
                     if (__fabsf(270.0f - x < 1.0f)) {
                         x = 270.0f;
                     }

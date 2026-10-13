@@ -268,24 +268,27 @@ void effCloudMain(EffectEntry* effect) {
 
 void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
+    s32 idx;
+    effN64Vtx* v;
     EffCloudN64Work* work;
     s32 frame;
     s32 type;
     effN64Vtx* vtx;
     s32 first;
     s32 uo;
-    s32 alpha;
     s32 u;
     s32 fade;
-    s32 idx;
     CameraEntry* camera;
     GXTexObj texObj;
     Mtx mtx;
     f32 scale;
+    s32 n;
     s32 count, j, k, next, prev;
-    effN64Vtx* v;
-    s32 c, g, b;
+
+    s32 g, b, c;
     f32 zero, ang, a1, a2, diff, x, y, z, w, sn, cs;
+
+    s32 alpha;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -339,17 +342,16 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     zero = 0.0f;
     count = 0;
     for (i = 0; i < 30; i++) {
-        j = i + 1;
-        if (work->active[(work->head + j) % 30] != 0) {
+        if (work->active[(1 + work->head + i) % 30] != 0) {
             count++;
         }
     }
     if (count - 1 > 0) {
         v = vtx;
+        n = 0;
         for (i = 0; i < 30; i++, v += 2) {
-            k = i + work->head;
-            idx = (k + 1) % 30;
-            sn = (f32)sin(6.2831855f * (f32)(i * 180 / (count - 1)) / 360.0f);
+            idx = (1 + work->head + i) % 30;
+            sn = (f32)sin(6.2831855f * (f32)(n * 180 / (count - 1)) / 360.0f);
             alpha = (s32)(255.0f * sn);
             if (alpha > 200) {
                 alpha = 200;
@@ -393,13 +395,12 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
                 } else {
                     u = (s32)(24.0f * work->len[idx]) + uo;
                 }
-                j = 255 - k * 100;
+                c = 255 - k * 100;
                 g = 255;
                 b = 255;
-                c = j;
                 if (c < 0) {
+                    b = (s32)(0.8f * (f32)c) + 255;
                     c = 0;
-                    b = (s32)(0.8f * (f32)j) + 255;
                     if (b < 0) {
                         g = (s32)(0.4f * (f32)b) + 255;
                         b = 0;
@@ -429,11 +430,12 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
                 v[1].g = b;
                 v[1].b = c;
                 v[1].a = alpha;
+                n++;
             }
         }
         DCFlushRange(vtx, 0x690);
         GXInvalidateVtxCache();
-        for (j = first, k = first * 2; j < 29; j++, k += 2) {
+        for (j = first, k = first * 2; j < 29; k += 2, j++) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             ((void (*)())tri2)(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
         }

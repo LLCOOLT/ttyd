@@ -284,7 +284,7 @@ void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
 
     w = 40.0f;
     oldScale = work->scale;
-    work->scale = oldScale * 1.5f;
+    work->scale *= 1.5f;
     PSMTXTrans(mT, work->screen.x, work->screen.y, work->screen.z);
     PSMTXRotRad(mR, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
     PSMTXScale(mS, work->scale, work->scale, work->scale);
@@ -324,7 +324,7 @@ void effNanigaDisp(CameraId cameraId, EffectEntry* effect) {
     GXPosition3f32(lo, lo, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
     for (i = 0; i < work->count + 5; i++) {
-        iconGetTexObj(&texObj, itemDataTable[work->list[i % work->count]].icon_id);
+        ((void (*)(GXTexObj*, s32))iconGetTexObj)(&texObj, itemDataTable[work->list[i % work->count]].icon_id);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXTrans(mT, 0.0f, -40.0f * (f32)i + work->offset, 0.0f);
         PSMTXScale(mS, 0.9f, 0.9f, 0.9f);

@@ -75,9 +75,9 @@ EffectEntry* effRappaN64Entry(s32 type, s32 num, f32 x, f32 y, f32 z, f32 pitch,
         work->position.y = y;
         work->position.z = z;
         radP = 6.2831855f * pitch / 360.0f;
-        sinA = (f32)sin(radP);
+        sinA = sin(radP);
         rad = 6.2831855f * (yaw + (f32)((i & 2) * (i / 2) * 4)) / 360.0f;
-        work->velocity.x = (f32)cos(rad) * sinA;
+        { f32 c = cos(rad); work->velocity.x = c * sinA; }
         work->velocity.y = (f32)sin(rad);
         work->velocity.z = (f32)cos(rad) * (f32)cos(radP);
         work->speed = speed;
@@ -143,7 +143,7 @@ void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    idx = ((work->frame - 1) * 3) % 36;
+    idx = (work->frame - 1) * 3; idx %= 36;
     alpha = work->alpha;
     GXSetNumChans(0);
     GXSetNumTexGens(1);
@@ -165,10 +165,10 @@ void effRappaDisp(CameraId cameraId, EffectEntry* effect) {
     j1 = idx + 4;
     j2 = idx + 5;
     for (i = 1; i < effect->count; j0 += 3, j1 += 3, j2 += 3, i++, work++) {
-        GXSetTevColor(GX_TEVREG0, mkcol(color_rotation_data[j0 % 36], color_rotation_data[j1 % 36], color_rotation_data[j2 % 36], alpha));
+        do { GXSetTevColor(GX_TEVREG0, mkcol(color_rotation_data[j0 % 36], color_rotation_data[j1 % 36], color_rotation_data[j2 % 36], alpha));
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
-        PSMTXScale(scale, work->scaleOfs, work->scaleOfs, 1.0f);
+        PSMTXScale(scale, work->scaleOfs, work->scaleOfs, 1.0f); } while (0);
         PSMTXConcat(mtx, rot, mtx);
         PSMTXConcat(mtx, scale, mtx);
         PSMTXConcat(camera->view, mtx, mtx);

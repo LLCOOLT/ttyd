@@ -37,34 +37,39 @@ void BattleAcHelpMain(void) {
 	}
 }
 
-void _ac_help_disp(CameraId cameraId, void* param) {
-	static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-	BattleWork* wp = _battleWorkPointer;
-	u16 lines;
-	GXColor col;
-	const char* msg;
-	s32 width;
-	u8 alpha;
-	f32 x;
-	f32 y;
-	const char** help = &wp->acHelpMsg;
-
-	alpha = 0xFF;
-	if (wp->acHelpDispType == 1) {
-		alpha = 0x80;
-	}
-	msg = msgSearch(*help);
-	if (!msg) {
-		msg = (0, "めっせーじがみつかりません");
-	}
-	width = FontGetMessageWidthLine(msg, &lines);
-	lines++;
-	col = color;
-	col.a = alpha;
-	y = 0.0f;
-	x = y - width / 2;
-	y = -148.0f;
-	windowDispGX_Waku_col(0, col, x - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
-	FontDrawStart_alpha(alpha);
-	FontDrawMessage(x, (s32)y + (lines - 1) * 29, msg);
+void _ac_help_disp(CameraId cameraId, void *param)
+{
+  static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+  float new_var;
+  const char *new_var3[2];
+  BattleWork *wp = _battleWorkPointer;
+  u16 lines;
+  GXColor col;
+  s32 width;
+  u8 alpha;
+  f32 x;
+  f32 y;
+  const char **help = &wp->acHelpMsg;
+  alpha = 0xFF;
+  if (wp->acHelpDispType == 1)
+  {
+    alpha = 0x80;
+  }
+  new_var3[0] = msgSearch(*help);
+  if (!new_var3[0])
+  {
+    new_var3[0] = (0, "めっせーじがみつかりません");
+  }
+  new_var3[1] = new_var3[0];
+  width = FontGetMessageWidthLine(new_var3[1], &lines);
+  lines++;
+  col = color;
+  col.a = alpha;
+  y = 0.0f;
+  x = y - (width / 2);
+  y = -148.0f;
+  new_var = (-145.0f) + ((lines - 1) * 29);
+  windowDispGX_Waku_col(0, col, x - 20.0f, new_var, width + 40, (lines * 29) + 1, 10.0f);
+  FontDrawStart_alpha(alpha);
+  FontDrawMessage(x, ((s32) y) + ((lines - 1) * 29), new_var3[1]);
 }

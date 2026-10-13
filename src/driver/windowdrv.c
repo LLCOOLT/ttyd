@@ -1299,8 +1299,9 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 		GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		GXSetCurrentMtx(0);
 		GXSetTevColor(GX_TEVREG0, color);
-		dVar9 = height * 0.5f;
-		dVar10 = 0.5f * -width;
+
+
+		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = dVar10 * 0.5f;
 		MTXTrans(mtx2, x - dVar10, y - dVar9, 0.0f);
 		MTXConcat(mtx2, mtx, mtx2);
 		MTXConcat(camera->view, mtx2, mtx2);

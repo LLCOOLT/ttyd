@@ -1148,7 +1148,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
         case STATUS_HUGE:
         case STATUS_TINY:
             if (!strength) {
-                if (type == STATUS_HUGE) {
+                if ((s8)type == STATUS_HUGE) {
                     if (unit->mSizeChangeStrength >= 0) {
                         unit->mSizeChangeTurns = 0;
                         unit->mSizeChangeStrength = 0;
@@ -1191,7 +1191,7 @@ BOOL BtlUnit_SetStatus(BattleUnit* unit, StatusEffectType type, s8 turns, s8 str
         case STATUS_DEFENSE_DOWN:
             if (strength <= 0) {
                 if (!strength) {
-                    if (type == STATUS_DEFENSE_DOWN) {
+                    if ((s8)type == STATUS_DEFENSE_DOWN) {
                         if (unit->mDefChangeStrength <= 0) {
                             unit->mDefChangeTurns = 0;
                             unit->mDefChangeStrength = 0;
@@ -2166,27 +2166,22 @@ s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan) {
 }
 
 s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pitch, Vec* pos) {
-    s16 pit = 0;
-    s8 turns, strength;
     s32 id;
+    s8 turns, strength;
+    s32 pit = 0;
 
     if (BtlUnit_CheckStatus(unit, 0xB)) {
         BtlUnit_GetStatus(unit, 0xB, &turns, &strength);
-        pit = (strength * 2 - 1) * -0x155;
+        pit = (s16)((strength * 2 - 1) * -0x155);
     }
     if (BtlUnit_CheckStatus(unit, 0xA)) {
         BtlUnit_GetStatus(unit, 0xA, &turns, &strength);
-        pit = (strength * 2 + 1) * -0x155;
+        pit = (s16)((strength * 2 + 1) * -0x155);
     }
-    pit = pitch + pit + irand(41) - 20;
+    pit = (s16)(pitch + pit + irand(41) - 20);
     id = psndSFXOn_3D(sfxName, pos);
     psndSFX_pit(id, pit);
-    if (volume == -250000000) {
-        psndSFX_vol(id, psndSFX_get_vol(id));
-    }
-    else {
-        psndSFX_vol(id, volume);
-    }
+    psndSFX_vol(id, volume == -250000000 ? psndSFX_get_vol(id) : (u8)volume);
     return id;
 }
 

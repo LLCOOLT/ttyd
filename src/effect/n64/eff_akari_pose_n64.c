@@ -57,11 +57,11 @@ void effAkariPoseMain(EffectEntry* effect);
 void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
+    f32 half;
     EffectEntry* effect;
     EffAkariPoseN64Work* work;
     EffAkariPoseN64Work* w;
     s32 i;
-    f32 half;
 
     effect = effEntry();
     effect->type = "AkariPoseN64\0\0\0";
@@ -82,8 +82,7 @@ EffectEntry* effAkariPoseN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     work->position.y = y;
     work->position.z = z;
     work->scale = scale;
-    half = max_seq_num[type];
-    half *= 0.5f;
+    half = max_seq_num[type] / 2.0f;
     w = work + 1;
     for (i = 1; i < count + 1; i++, w++) {
         w->seq = -1.0f - half * (i & 1);

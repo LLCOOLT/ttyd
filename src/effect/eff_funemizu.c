@@ -157,8 +157,8 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(EffFunemizuWork));
     effect->userdata = work;
     effect->callback = effFunemizuMain;
-    size *= 0.5f;
     work->type = type;
+
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
@@ -175,7 +175,7 @@ EffectEntry* effFunemizuEntry(s32 type, f32 x, f32 y, f32 z, f32 size, f32 yaw) 
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
-        p->f10 = size;
+        p->f10 = 0.5f * size;
         p->f14 = yaw;
         p->f34 = p->f10 + irand(2);
         p->f38 = 0.1f + irand(10) / 100.0f;
@@ -189,11 +189,11 @@ void effFunemizuMain(EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
     Vec position;
     Vec v = {0.0f, 0.0f, 0.0f};
-    s32 dead = 0;
     s32 i;
     s32 type;
     CameraId cam;
-    f32 a, b, s, c, t;
+    s32 dead = 0;
+    f32 a, b, s, c, t, f;
 
     v.x = work->position.x;
     v.y = work->position.y;
@@ -205,9 +205,10 @@ void effFunemizuMain(EffectEntry* effect) {
     if (work->timer > 1000) {
         work->timer -= 1000;
     }
-    if (type == 0 || type == 2) {
-        a = work->f10;
-        b = a - 1.0f;
+    if (work->type == 0 || work->type == 2) {
+        f = work->f10;
+        a = f;
+        b = f - 1.0f;
         if (a < 0.0f) {
             a = 0.0f;
         }
@@ -226,8 +227,8 @@ void effFunemizuMain(EffectEntry* effect) {
             work->f20 += (a - work->f20) / 10.0f;
             work->f24 += (b - work->f24) / 10.0f;
         } else {
-            work->f20 += (a - work->f20) * 0.5f;
-            work->f24 += (b - work->f24) * 0.5f;
+            work->f20 += 0.5f * (a - work->f20);
+            work->f24 += 0.5f * (b - work->f24);
         }
         work->f28 += 0.05f * work->f18;
         work->f2c += 0.1f * work->f1c;
@@ -240,21 +241,21 @@ void effFunemizuMain(EffectEntry* effect) {
     } else {
         EffFunemizuWork* p;
         work->f18 = 1.0f;
-        for (i = 1, p = work + 1; i < effect->count; i++, p++) {
-            if (p->position.y < 0.0f) {
+        for (i = 1, work++; i < effect->count; i++, work++) {
+            if (work->position.y < 0.0f) {
                 dead++;
-            } else if (p->delay) {
-                p->delay--;
+            } else if (work->delay) {
+                work->delay--;
             } else {
-                c = cos(6.2831855f * p->f14 / 360.0f);
-                p->position.x += p->f10 * c;
-                s = sin(6.2831855f * p->f14 / 360.0f);
-                p->position.z += p->f10 * -s;
-                p->position.y += p->f34;
-                p->f34 -= p->f38;
-                p->alpha -= 8;
-                if (p->alpha < 0) {
-                    p->alpha = 0;
+                c = cos(6.2831855f * work->f14 / 360.0f);
+                work->position.x += work->f10 * c;
+                s = sin(6.2831855f * work->f14 / 360.0f);
+                work->position.z += work->f10 * -s;
+                work->position.y += work->f34;
+                work->f34 -= work->f38;
+                work->alpha -= 8;
+                if (work->alpha < 0) {
+                    work->alpha = 0;
                 }
             }
         }
@@ -426,6 +427,7 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     f32 w = 3.0f;
     f32 nw;
+    f32 h, p;
 
     nw = -w;
     cam = camGetPtr(cameraId);
@@ -463,13 +465,15 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadPosMtxImm(trans, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(nw * 0.5f, 1.5f, 0.0f);
+            h = nw * 0.5f;
+            p = w * 0.5f;
+            GXPosition3f32(h, p, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(1.5f, 1.5f, 0.0f);
+            GXPosition3f32(p, p, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
-            GXPosition3f32(1.5f, nw * 0.5f, 0.0f);
+            GXPosition3f32(p, h, 0.0f);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(nw * 0.5f, nw * 0.5f, 0.0f);
+            GXPosition3f32(h, h, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }

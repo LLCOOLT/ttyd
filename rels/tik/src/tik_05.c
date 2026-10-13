@@ -1261,17 +1261,18 @@ USER_FUNC(cam_mahojin_kaiten_main) {
     }
     total = 0.0f;
     speed = total;
+    {s32 hi = frames * 80 / 100; s32 lo = frames * 20 / 100;
     for (i = 0; i < frames; i++) {
-        if (i <= frames * 20 / 100) {
+        if (i <= lo) {
             speed += 1.0f;
-        } else if (i >= frames * 80 / 100) {
+        } else if (i >= hi) {
             speed -= 1.0f;
         }
         total += speed;
         if (i == event->lwData[14]) {
             cur = total;
         }
-    }
+    }}
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - (u32)event->savedTime);
     if (elapsed > msec) {
         elapsed = msec;

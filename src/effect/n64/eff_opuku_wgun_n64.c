@@ -227,7 +227,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     vtx = p;
     for (i = 0; i < 12; i++) {
-        if (i == 0) {
+        if (i == 0 || i == 0) {
             ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
         } else if (i != 11 && work->delay[i] == 0) {
             ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);

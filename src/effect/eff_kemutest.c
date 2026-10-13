@@ -135,7 +135,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work->rx = 0.0f;
     work->rz = 0.0f;
     work++;
-    for (i = 1; i < (n = effect->count); i++, work++) {
+    for (i = 1; i < effect->count; i++, work++) {
         switch (type) {
         case 0:
         case 15:
@@ -282,7 +282,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
                 work->vel.x = spd * (f32)sin(a2);
                 work->vel.y = -spd * (f32)cos(a2);
                 work->scale = 1.0f;
-                work->delay = (i < (effect->count - 1) / 2 + 1) ? 8 : 0;
+                work->delay = (i < (effect->count - 1) / 2 + 1) ? 0 : 8;
                 if (type == 9) {
                     work->r = 0xf8;
                     work->g = 0xc0;

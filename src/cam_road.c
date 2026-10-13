@@ -746,7 +746,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
 }
 // CC_END
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
-    CamRoadState** pp = &prev;
+    CamRoadState** pp;
     f32 cs2;
     f32 angle;
     f32 rot;
@@ -799,9 +799,10 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     posB.x = d;
     posB.y = e;
     posB.z = f;
+    pp = &prev;
+    curve = (CamRoadCurveX*)wp->map->curves;
     best = -100000000.0f;
     hitCurve = NULL;
-    curve = (CamRoadCurveX*)wp->map->curves;
     for (i = 0; i < wp->map->curveNum; i++, curve++) {
         grp = &((CamRoadGroup*)wp->map->f_f0)[curve->grpOfs];
         n = curve->grpNum;
@@ -955,6 +956,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
                 qx = x;
                 qz = z;
             }
+            
             cs2 = (f32)cos(fov);
             sn = (f32)sin(fov);
             w = 0.01f * (g * (1.0f * (640.0f * (dist * sn / cs2) / 480.0f)));
@@ -1095,11 +1097,11 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         if (__abs(d) <= 1) {
             return 0;
         }
-        n = a->cam->f_44 - a->cam->f_40;
-        if (__abs(d) >= n - 1) {
+        n = a->cam->f_44 - a->cam->f_40 - 1;
+        if (__abs(d) >= n) {
             return 0;
         }
-        if (__abs(d) >= n - 2) {
+        if (__abs(d) >= n - 1) {
             flags |= 0x20;
         }
     }

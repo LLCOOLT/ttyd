@@ -199,20 +199,21 @@ BattleStageObject* BattleSearchObjectPtr(const char* name) {
 }
 
 void BattleStageObjectInit(void) {
-	s32 countA1 = 0;
-	s32 countA2 = 0;
-	s32 countB = 0;
-	s32 countC = 0;
-	BOOL hasIronFrame = FALSE;
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageData* stage = wp->fbatInfo->setup->stageData;
 	s32 numObjects = stage->mNumObjects;
 	BattleStageObjectData* data = stage->mObjects;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	s32 countA1 = 0;
+	s32 countA2 = 0;
+	s32 countB = 0;
+	s32 countC = 0;
+	BOOL hasIronFrame = FALSE;
 	s32 id;
 	BattleStageObject* obj;
 	BattleUnit* unit;
 	int i;
+	int j;
 
 	memset(wp->stageObjects, 0, sizeof(wp->stageObjects));
 	switch (pouchGetPtr()->rank) {
@@ -257,7 +258,7 @@ void BattleStageObjectInit(void) {
 
 	id = 1;
 	if (data) {
-		for (; numObjects != 0; numObjects--, data++, id++) {
+		for (; numObjects != 0; id++, numObjects--, data++) {
 			for (i = 0; i < 32; i++) {
 				obj = &wp->stageObjects[i];
 				if (obj->id <= 0) {
@@ -320,13 +321,15 @@ void BattleStageObjectInit(void) {
 					BtlUnit_SetPos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
 					BtlUnit_SetHomePos(unit, obj->mPosition.x, obj->mPosition.y, obj->mPosition.z);
 					break;
+				case 2:
+					break;
 			}
 		}
 	}
 
 	if (pouchGetPtr()->rank > 0) {
 		data = _object_nozzle_data;
-		for (numObjects = 0; numObjects < 3; numObjects++, data++, id++) {
+		for (j = 0; j < 3; j++, id++, data++) {
 			for (i = 0; i < 32; i++) {
 				obj = &wp->stageObjects[i];
 				if (obj->id <= 0) {
@@ -370,7 +373,12 @@ void BattleStageObjectInit(void) {
 	obj->mFlags |= 1;
 	id++;
 
-	for (data = _object_spot_light_data; data->name; data++, id++) {
+	j = 0;
+	while (TRUE) {
+		data = &_object_spot_light_data[j];
+		if (!data->name) {
+			break;
+		}
 		for (i = 0; i < 32; i++) {
 			obj = &wp->stageObjects[i];
 			if (obj->id <= 0) {
@@ -388,6 +396,8 @@ void BattleStageObjectInit(void) {
 		obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
 		mapGrpFlagOn(obj->data->name, 1);
 		obj->mFlags |= 1;
+		id++;
+		j++;
 	}
 
 	if (stage->initEvt) {
@@ -1338,9 +1348,11 @@ EVT_BEGIN(_nozzle_work_event_1)
     RETURN
 EVT_END()
 USER_FUNC(_set_mobj_rotate_x) {
+	const char* fall1;
+	const char* fall3;
+	BOOL busy = FALSE;
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
-	BOOL busy = FALSE;
 	BattleStageObject* obj;
 	s32 layer;
 	int i;
@@ -1368,6 +1380,8 @@ USER_FUNC(_set_mobj_rotate_x) {
 	switch (layer) {
 		case 0:
 		case 1:
+			fall1 = "SFX_BTL_STAGE_SET_FALL1";
+			fall3 = "SFX_BTL_STAGE_SET_FALL3";
 			for (i = 0; i < 32; i++) {
 				obj = &wp->stageObjects[i];
 				if (obj->id > 0 && obj->data->mLayer == layer) {
@@ -1379,10 +1393,10 @@ USER_FUNC(_set_mobj_rotate_x) {
 					else {
 						if (obj->mNumFramesFalling == 0) {
 							if (layer == 0) {
-								psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL1", &obj->mPosition);
+								psndSFXOn_3D(fall1, &obj->mPosition);
 							}
 							else {
-								psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL3", &obj->mPosition);
+								psndSFXOn_3D(fall3, &obj->mPosition);
 							}
 						}
 						obj->mNumFramesFalling++;
@@ -1777,9 +1791,10 @@ USER_FUNC(_announce_wall_message) {
 void _disp_escape_wall_message(CameraId camera, void* param) {
 	const char* msg = msgSearch("btl_msg_escape_wall_close2");
 	s32 width = FontGetMessageWidth(msg);
-	f32 x = 0.0f;
+	f32 x;
+	f32 zero = 0.0f;
 
-	x -= width / 2;
+	x = zero - width / 2;
 	windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, x - 20.0f, -117.0f, width + 40, 30.0f, 10.0f);
 	FontDrawStart();
 	FontDrawString(x, -120.0f, msg);
@@ -1963,9 +1978,9 @@ USER_FUNC(_nozzle_work_effect) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	s32* args = event->args;
+	const char* sfx;
 	s32 effType = 0;
 	BOOL started;
-	const char* sfx;
 	BattleStageObject* obj;
 	f32 angle, rot, z;
 	s32 fog;
@@ -2099,13 +2114,13 @@ USER_FUNC(_nozzle_work_effect) {
 	if (EVT_UW(event, 0) > 0) {
 		EVT_UW(event, 0)--;
 		if (EVT_UW(event, 0) <= 0) {
-			if (EVT_UW(event, 5) != -1) {
+			if ((u32)EVT_UW(event, 5) != 0xFFFFFFFF) {
 				psndSFXOff(EVT_UW(event, 5));
 			}
-			if (EVT_UW(event, 6) != -1) {
+			if ((u32)EVT_UW(event, 6) != 0xFFFFFFFF) {
 				psndSFXOff(EVT_UW(event, 6));
 			}
-			if (EVT_UW(event, 7) != -1) {
+			if ((u32)EVT_UW(event, 7) != 0xFFFFFFFF) {
 				psndSFXOff(EVT_UW(event, 7));
 			}
 		}

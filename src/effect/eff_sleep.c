@@ -14,11 +14,11 @@ void effSleepDisp(CameraId camId, EffectEntry* effect);
 
 EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 rotation) {
 	EffectEntry* effect;
+	s32 smth;
 	effSleepData* data;
 	f32 radians;
-	s32 smth;
-	int i;
-	
+	f32 r;
+
 	effect = effEntry();
 	effect->type = "Sleep";
 	effect->count = 4;
@@ -41,9 +41,9 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 	data->field_0x1C = 0;
 
 	radians = (6.2831855f * rotation) / 360.0f; //TODO: get radians to f26
-	for (data++, smth = 16, i = 1; i < effect->count; data++, smth += 16, i++) {
-		data->position.x = (16.0f * (f32)i) * (f32)cos(radians);
-		data->position.y = (16.0f * (f32)i) * (f32)sin(radians);
+	for (data++, i = 1, smth = 16; i < effect->count; i++, smth += 16, data++) {
+		data->position.x = (r = 16.0f * (f32)i) * (f32)cos(radians);
+		data->position.y = r * (f32)sin(radians);
 		data->position.z = 0.0f;
 		data->scale = (0.2f * (f32)i) + 1.0f;
 		data->field_0x14 = 0;
@@ -94,7 +94,11 @@ void effSleepMain(EffectEntry* effect) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 void effSleepDisp(CameraId camId, EffectEntry* effect) {
-	effSleepData* data = effect->userdata;
+	s32 j;
+	effSleepData* data;
+	s32 off;
+	s32 base;
+	int i;
 	CameraEntry* cam;
 	s32 alpha;
 	Mtx mtx;
@@ -108,12 +112,11 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	f32 k;
 	f32 half;
 	f32 one;
+	f32 xh;
 	f32 s0, s1;
-	s32 base;
-	s32 off;
-	s32 j;
 	int i;
 
+	data = effect->userdata;
 	cam = camGetPtr(camId);
 	alpha = data->field_0x14;
 
@@ -142,8 +145,8 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 
 	w = 8.0f;
 	x0 = -w;
-	base = 50;
-	for (i = 1, data++; i < effect->count; i++, data++, base += 50) {
+
+	for (i = 1, data++, base = 50; i < effect->count; base += 50, i++, data++) {
 		if (data->field_0x20 == 0) {
 			GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, data->field_0x14 * alpha / 255 });
 			PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
@@ -156,19 +159,20 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 			k = 0.015625f;
 			half = 0.5f;
 			one = 1.0f;
+			xh = x0 * half;
 			j = 0;
 			off = 0;
 			do {
-				s0 = half * (f32)sin((tau * (f32)(gp->retraceCount + (base + off))) * k);
-				s1 = half * (f32)sin((tau * (f32)(gp->retraceCount + (base + (j + 1) * 10))) * k);
+				s0 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + off)) * k);
+				s1 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + (j + 1) * 10)) * k);
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				GXPosition3f32(x0 * half + s1, one * (f32)(j + 1), 0.0f);
+				GXPosition3f32(xh + s1, one * (f32)(j + 1), 0.0f);
 				GXTexCoord2f32(0.0f, 0.125f * (f32)(7 - j));
 				GXPosition3f32(4.0f + s1, one * (f32)(j + 1), 0.0f);
 				GXTexCoord2f32(1.0f, 0.125f * (f32)(7 - j));
 				GXPosition3f32(4.0f + s0, one * (f32)j, 0.0f);
 				GXTexCoord2f32(1.0f, 0.125f * (f32)(8 - j));
-				GXPosition3f32(x0 * half + s0, one * (f32)j, 0.0f);
+				GXPosition3f32(xh + s0, one * (f32)j, 0.0f);
 				GXTexCoord2f32(0.0f, 0.125f * (f32)(8 - j));
 				j++;
 				off += 10;

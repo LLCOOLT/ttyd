@@ -343,7 +343,7 @@ static u8* color_tbl[] = { diamond_1_color0_tbl, diamond_2_color0_tbl, diamond_3
 #define LOOP2(w, tbl, sz, n)                                           for (i = 0; i < n##U; i++) {                                              if ((w->flags & 1) || i != 0) {                                        GXCallDisplayList(tbl[i], sz[i] << 5);                         }                                                              }
 
 #define LOOP1(tbl, sz, n)                          \
-    dp = tbl; i = 0; sp = sz;                           \
+    i = 0; dp = tbl; sp = sz;                           \
     for (; i < n##U; i++, sp++, dp++) {       \
         GXCallDisplayList(*dp, *sp << 5);          \
     }
@@ -568,9 +568,9 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
     EffStarStoneWork* w = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);
     s32 type = w->type;
-    s32 i;
-    u8* sp;
     u8** dp;
+    u8* sp;
+    s32 i;
 
     DISP_START(w)
     PSMTXTrans(m, w->position.x, w->position.y, w->position.z);
@@ -638,9 +638,9 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     EffStarStoneWork* w = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);
     s32 type = w->type;
-    s32 i;
-    u8* sp;
     u8** dp;
+    u8* sp;
+    s32 i;
 
     DISP_START(w)
     BLEND_STATE()

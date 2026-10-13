@@ -107,6 +107,7 @@ void effBombMain(EffectEntry* effect) {
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 type;
     s32 frame;
+    GXColor color2;
     s32 camId;
 
     tmp.x = work->position.x;
@@ -137,7 +138,7 @@ void effBombMain(EffectEntry* effect) {
         work->alpha = (s32)(0.6f * (255.0f - work->alpha));
     } else {
         work->f68 *= 0.6f;
-        work->alpha = (s32)(0.9f * work->alpha);
+        work->alpha *= 0.9f;
     }
     if (frame >= 3) {
         if (frame == 3) {
@@ -150,7 +151,7 @@ void effBombMain(EffectEntry* effect) {
             work->scaleAdd += 0.1f;
         } else {
             work->scaleAdd *= 0.5f;
-            work->alpha2 = (s32)(0.9f * work->alpha2);
+            work->alpha2 *= 0.9f;
         }
     }
     work->rot += work->rotAdd;
@@ -158,11 +159,10 @@ void effBombMain(EffectEntry* effect) {
 }
 
 void effBombDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 frame;
+    GXColor color2;
     CameraEntry* camera;
     EffBombN64Work* work;
-    GXColor color2;
-    GXColor color;
+
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -170,6 +170,8 @@ void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     u32 a;
     u32 b;
+    s32 frame;
+
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -194,9 +196,9 @@ void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     if (work->texId != -1) {
         effGetTexObjN64(0x18, &texObj);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
-        color = (GXColor){0xFF, 0xFF, 0xF0, 0x00};
-        color.a = work->alpha;
-        GXSetTevColor(GX_TEVREG0, color);
+        color2 = (GXColor){0xFF, 0xFF, 0xF0, 0x00};
+        color2.a = work->alpha;
+        GXSetTevColor(GX_TEVREG0, color2);
         PSMTXScale(scale, work->f64, work->f64, 1.0f);
         PSMTXConcat(base, scale, scale);
         GXLoadPosMtxImm(scale, GX_PNMTX0);

@@ -5580,11 +5580,11 @@ BOOL psndENVOff(u32 flags) {
 #pragma dont_inline on
 #pragma dont_inline on
 BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
-	s32 silent = silent_tbl[(flags >> 12) & 0xF];
 	u16* env = &psnd.unk18[flags & 0xF];
+	s32 silent = silent_tbl[(flags >> 12) & 0xF];
 	PaperSoundFade* fade;
 
-	if (*env == 0) {
+	if (psnd.unk18[flags & 0xF] == 0) {
 		return FALSE;
 	}
 	fade = &psnd.fade[flags & 0xF];

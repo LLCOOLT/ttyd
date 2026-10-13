@@ -100,12 +100,12 @@ s32 marioGetHammerLevel(void) {
 void mot_hammer(void) {
 	MarioWork* mario = marioGetPtr();
 	Vec* unused;
+	s32 snd;
 	s32 kind;
 	f32 px, pz;
 	s32 done;
 	s32 n;
 	s32 i;
-	s32 snd;
 	f32 py, ez;
 	s32 efType;
 	HitEntry* hit;
@@ -194,9 +194,9 @@ void mot_hammer(void) {
 	done = 0;
 	MF(0x1A0) = MF(0x19C);
 	if (mario->flags & 0x800) {
-		s32 lim = MI(0x2A0);
 		s32 t = MI(0x48);
-		n = lim < t ? lim : t;
+		s32 lim = MI(0x2A0);
+		n = t <= lim ? t : lim;
 		if (t == lim) {
 			done = 1;
 		}
@@ -687,115 +687,135 @@ void mot_ham2_post(void) {
 	marioAdjustMoveDir();
 }
 
-HitEntry* hitEstimate(s32* out) {
-	MarioWork* mario;
-	HitCheckQuery q;
-	Vec pos;
-	HitEntry* hit;
-	f32 s, c;
-	f32 cy;
-	f32 a, h;
-	s32 i;
+HitEntry *hitEstimate(s32 *out)
+{
+  MarioWork *mario;
+  HitCheckQuery q;
+  Vec pos;
+  HitEntry *hit;
+  f32 s;
+  f32 c;
+  f32 cy;
+  f32 a;
+  Vec new_var;
+  f32 h;
+  s32 i;
+  mario = marioGetPtr();
+  *out = 0;
+  a = mario->unk1A8;
+  {
+    f32 off = (!(marioGetPtr()->dispFlags & 0x80000000)) ? (0.0f) : (-20.0f);
+    if ((a >= 90.0f) && (a <= 270.0f))
+    {
+      a = toMovedir2(180.0f, off);
+    }
+    else
+    {
+      a = toMovedir2(0.0f, off);
+    }
+  }
+  sincosf(&s, &c, a);
+  h = *((f32 *) (((u8 *) mario) + 0x1B8));
+  cy = (f32) cos(3.14159265f);
+  {
+    Vec dir1 = {0.0f, 0.0f, 0.0f};
+    pos = mario->position;
+    pos.y = 4.0f + (mario->position.y + h);
+    dir1.x = s;
+    dir1.y = -cy;
+    dir1.z = c;
+    q.targetPos = pos;
+    q.targetDir = dir1;
+    q.targetDistance = 14.0f;
+    hit = hitCheckVecFilter(&q, NULL);
+    if (hit && (!(hitGetAttr(hit) & 0x800005)))
+    {
+      *out = 7;
+      return hit;
+    }
+  }
+  cy = (f32) cos(1.2217306f);
+  {
+    Vec dir2 = {0.0f, 0.0f, 0.0f};
+    dir2.x = s;
+    dir2.y = -cy;
+    dir2.z = c;
+    pos.x = (s * 5.0f) + mario->position.x;
+    pos.y = mario->position.y + h;
+    pos.z = (5.0f * c) + mario->position.z;
+    q.targetPos = pos;
+    q.targetDir = dir2;
+    q.targetDistance = 26.0f;
+    hit = hitCheckVecFilter(&q, NULL);
+    if (hit && (!(hitGetAttr(hit) & 0x800005)))
+    {
+      *out = ((q.hitPos.y - mario->position.y) > 30.0f) ? (4) : (5);
+      return hit;
+    }
+  }
+  cy = (f32) cos(0.78539816f);
+  {
+    Vec dir3 = {0.0f, 0.0f, 0.0f};
+    dir3.x = s;
+    dir3.y = -cy;
+    dir3.z = c;
+    pos.x = (s * 5.0f) + mario->position.x;
+    pos.y = mario->position.y + h;
+    pos.z = (5.0f * c) + mario->position.z;
+    q.targetPos = pos;
+    q.targetDir = dir3;
+    q.targetDistance = 30.0f;
+    hit = hitCheckVecFilter(&q, NULL);
+    if (hit && (!(hitGetAttr(hit) & 0x800005)))
+    {
+      *out = 5;
+      return hit;
+    }
+  }
+  cy = (f32) cos(0.0f);
+  {
+    Vec dir4 = {0.0f, 0.0f, 0.0f};
+    dir4.y = -cy;
+    new_var = dir4;
+    {
+      Vec dir4b = new_var;
+      for (i = 0; i < 2; i++)
+      {
+        f32 d;
+        f32 m;
+        if (i == 0)
+        {
+          d = 36.0f;
+          m = 20.0f;
+        }
+        else
+        {
+          d = 34.0f;
+          if (mario->dispFlags & 0x80000000)
+          {
+            m = 37.0f;
+          }
+          else
+          {
+            m = d;
+          }
+        }
+        pos.x = (s * m) + mario->position.x;
+        pos.y = mario->position.y + h;
+        pos.z = (c * m) + mario->position.z;
+        q.targetPos = pos;
+        q.targetDir = dir4b;
+        q.targetDistance = d;
+        hit = hitCheckVecFilter(&q, NULL);
+        if (hit && (!(hitGetAttr(hit) & 0x800005)))
+        {
+          *out = ((q.hitPos.y - mario->position.y) > 13.0f) ? (5) : (6);
+          return hit;
+        }
+      }
 
-	mario = marioGetPtr();
-	*out = 0;
-	a = mario->unk1A8;
-	{
-		f32 off = !(marioGetPtr()->dispFlags & 0x80000000) ? 0.0f : -20.0f;
-		if (a >= 90.0f && a <= 270.0f) {
-			a = toMovedir2(180.0f, off);
-		} else {
-			a = toMovedir2(0.0f, off);
-		}
-	}
-	sincosf(&s, &c, a);
-	h = MF(0x1B8);
-	cy = (f32)cos(3.14159265f);
-	{
-	Vec dir1 = {0.0f, 0.0f, 0.0f};
-	dir1.x = s;
-	dir1.y = -cy;
-	dir1.z = c;
-	pos = mario->position;
-	pos.y = 4.0f + (mario->position.y + h);
-	q.targetPos = pos;
-	q.targetDir = dir1;
-	q.targetDistance = 14.0f;
-	hit = hitCheckVecFilter(&q, NULL);
-	if (hit && !(hitGetAttr(hit) & 0x800005)) {
-		*out = 7;
-		return hit;
-	}
-	}
-	cy = (f32)cos(1.2217306f);
-	{
-	Vec dir2 = {0.0f, 0.0f, 0.0f};
-	dir2.x = s;
-	dir2.y = -cy;
-	dir2.z = c;
-	pos.x = s * 5.0f + mario->position.x;
-	pos.y = mario->position.y + h;
-	pos.z = 5.0f * c + mario->position.z;
-	q.targetPos = pos;
-	q.targetDir = dir2;
-	q.targetDistance = 26.0f;
-	hit = hitCheckVecFilter(&q, NULL);
-	if (hit && !(hitGetAttr(hit) & 0x800005)) {
-		*out = (q.hitPos.y - mario->position.y > 30.0f) ? 4 : 5;
-		return hit;
-	}
-	}
-	cy = (f32)cos(0.78539816f);
-	{
-	Vec dir3 = {0.0f, 0.0f, 0.0f};
-	dir3.x = s;
-	dir3.y = -cy;
-	dir3.z = c;
-	pos.x = s * 5.0f + mario->position.x;
-	pos.y = mario->position.y + h;
-	pos.z = 5.0f * c + mario->position.z;
-	q.targetPos = pos;
-	q.targetDir = dir3;
-	q.targetDistance = 30.0f;
-	hit = hitCheckVecFilter(&q, NULL);
-	if (hit && !(hitGetAttr(hit) & 0x800005)) {
-		*out = 5;
-		return hit;
-	}
-	}
-	cy = (f32)cos(0.0f);
-	{
-	Vec dir4 = {0.0f, 0.0f, 0.0f};
-	dir4.y = -cy;
-	{
-	Vec dir4b = dir4;
-	for (i = 0; i < 2; i++) {
-		f32 d, m;
-		if (i == 0) {
-			d = 36.0f;
-			m = 20.0f;
-		} else {
-			d = 34.0f;
-			if (mario->dispFlags & 0x80000000) {
-				m = 37.0f;
-			} else {
-				m = d;
-			}
-		}
-		pos.x = s * m + mario->position.x;
-		pos.y = mario->position.y + h;
-		pos.z = c * m + mario->position.z;
-		q.targetPos = pos;
-		q.targetDir = dir4b;
-		q.targetDistance = d;
-		hit = hitCheckVecFilter(&q, NULL);
-		if (hit && !(hitGetAttr(hit) & 0x800005)) {
-			*out = (q.hitPos.y - mario->position.y > 13.0f) ? 5 : 6;
-			return hit;
-		}
-	}
-	}
-	}
-	return hit;
+    }
+  }
+  return hit;
 }
 

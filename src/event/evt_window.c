@@ -38,6 +38,7 @@ typedef struct OneMsgWin {
 } OneMsgWin;
 
 s32 unk_80418b38;
+s32 unk_80418b3c;
 static void coin_disp(WinMgrEntry* entry);
 static void oneMessageDisp(WinMgrEntry* entry);
 
@@ -99,22 +100,22 @@ USER_FUNC(evt_win_other_select) {
 }
 
 USER_FUNC(evt_win_item_maketable) {
-	s32* src;
+	s32* t;
 	s32* item;
+	s32* src;
 	s32* args = event->args;
 	s32* table;
 	s32 count;
 	s32 i;
 	s32 n;
-	s32* t;
+	t = (s32*)evtGetValue(event, args[0]);
 	count = 0;
-	src = (s32*)evtGetValue(event, args[0]);
-	t = src;
+	src = t;
 	for (;;) {
-		if (*t == -1) {
+		if (*src == -1) {
 			break;
 		}
-		t++;
+		src++;
 		count++;
 	}
 	if (count == 0) {
@@ -122,15 +123,17 @@ USER_FUNC(evt_win_item_maketable) {
 		return EVT_RETURN_DONE;
 	}
 	table = _mapAlloc((count + 1) * 4);
-	item = src;
-	src = table;
+	item = t;
+	i = 0;
 	n = 0;
-	for (i = 0; i < count; i++, item++) {
+	src = table;
+	for (; i < count; i++) {
 		s32 has = pouchCheckItem(*item);
 		if (has) {
-			n++;
 			*src++ = *item;
+			n++;
 		}
+		item++;
 	}
 	table[n] = -1;
 	if (n == 0) {

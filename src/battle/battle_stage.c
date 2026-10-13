@@ -106,6 +106,8 @@ static BattleSpotWork work;
 static BattleSpotWork* wp = &work;
 
 
+static u8 inta_tex[32] = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
+
 USER_FUNC(screen_evt_func);
 
 static EVT_BEGIN(screen_evt)
@@ -778,9 +780,11 @@ BattleSpotEntry* batSpotEntry(void) {
 }
 #pragma dont_inline reset
 
+#pragma dont_inline on
 static f32 randf(f32 min, f32 max) {
 	return (max - min) * ((f32)rand() / 32767.0f) + min;
 }
+#pragma dont_inline reset
 
 static void screen_capture(CameraId camId, void* param) {
 	GXSetTexCopySrc(0, 0, 608, 480);
@@ -811,4 +815,100 @@ USER_FUNC(tou_gamen_screen_tev_init) {
 	}
 	evtEntry(screen_evt, 0, 0);
 	return 2;
+}
+
+typedef struct TevCbWork {
+	u8 pad_0[0xC];
+	s32 field_C;
+	s32 field_10;
+	s32 field_14;
+} TevCbWork;
+
+void tou_gamen_screen_tev(TevCbWork* p) {
+	GXTexObj obj;
+	Mtx m2;
+	Mtx m1;
+	Mtx m;
+	u8* tex;
+	s32 i, j, n, w, s, k, row, col;
+	u8 c;
+	f32 lim;
+	f32 x, y;
+
+	if (screen_wp->captured == 0) {
+		return;
+	}
+	if (screen_wp->field_24 != 0) {
+		tex = screen_wp->tex;
+		for (i = 0; i < 64; i++) {
+			row = i / 4;
+			col = i % 4;
+			for (j = 0; j < 64; j++) {
+				((u8(*)[8][4][8])tex)[row][j / 8][col][j % 8] = (i & 1) ? 0xFF : 0;
+			}
+			n = rand() % 100 + 100;
+			for (k = 0; k < n; k++) {
+				w = rand() % 4 + 2;
+				s = rand() % (65 - w);
+				c = rand() % 256;
+				for (j = s; j < s + w; j++) {
+					((u8(*)[8][4][8])tex)[row][j / 8][col][j % 8] = c;
+				}
+			}
+		}
+		DCFlushRange(tex, 0x1000);
+		GXInitTexObj(&obj, tex, 64, 64, GX_TF_I8, GX_REPEAT, GX_REPEAT, GX_FALSE);
+		GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+		GXLoadTexObj(&obj, GX_TEXMAP0);
+	} else {
+		GXInitTexObj(&obj, screen_wp->tex, 304, 240, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+		GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+	}
+	GXLoadTexObj(&obj, GX_TEXMAP0);
+	GXInitTexObj(&obj, inta_tex, 4, 8, GX_TF_I4, GX_REPEAT, GX_REPEAT, GX_FALSE);
+	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+	GXLoadTexObj(&obj, GX_TEXMAP1);
+	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+	GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+	GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+	GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_TEXC, GX_CC_CPREV, GX_CC_ZERO);
+	GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+	if (screen_wp->field_24 == 0) {
+		screen_wp->field_20++;
+		if (screen_wp->field_20 % 200 == 0) {
+			switch (rand() % 3) {
+				case 0:
+					screen_wp->field_14 = randf(0.0f, (1.0f - screen_wp->field_8) / screen_wp->field_8);
+					screen_wp->field_1C = randf(0.0f, (1.0f - screen_wp->field_8) / screen_wp->field_8);
+					break;
+				case 1:
+					screen_wp->field_C = randf(1.0f, 0.25f);
+					break;
+			}
+		}
+		screen_wp->field_8 += (screen_wp->field_C - screen_wp->field_8) / 60.0f;
+		screen_wp->field_10 += (screen_wp->field_14 - screen_wp->field_10) / 60.0f;
+		screen_wp->field_18 += (screen_wp->field_1C - screen_wp->field_18) / 60.0f;
+		PSMTXScale(m1, screen_wp->field_8, screen_wp->field_8, 1.0f);
+		lim = (1.0f - screen_wp->field_8) / screen_wp->field_8;
+		y = screen_wp->field_18 > lim ? lim : screen_wp->field_18;
+		x = screen_wp->field_10 > lim ? lim : screen_wp->field_10;
+		PSMTXTrans(m2, x, y, 0.0f);
+		PSMTXConcat(m1, m2, m);
+	} else {
+		PSMTXScale(m, 4.75f, 3.75f, 0.0f);
+	}
+	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
+	GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
+	PSMTXScale(m, 1.0f, 16.0f + 6.0f * ((100.0f - ((f32*)camGetPtr(CAMERA_2D))[5]) / 1000.0f), 1.0f);
+	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4);
+	p->field_C = 2;
+	p->field_14 = 2;
+	p->field_10 = 2;
 }

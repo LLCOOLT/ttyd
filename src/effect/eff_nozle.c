@@ -271,9 +271,10 @@ void effNozleMain(EffectEntry* effect) {
     GXSetVtxAttrFmt(0, 14, 1, 3, tf);           \
     GXSetArray(14, t1, 4)
 
-#define CALLDL(n, tbl, sz)                           {                                                    u32 k;                                           for (k = 0; k < n; k++) {                            GXCallDisplayList(tbl[k], sz[k] * 32);         }                                            }
+#define CALLDL(n, tbl, sz)                           {                                            for (k = 0; k < n; k++) {                            GXCallDisplayList(tbl[k], sz[k] * 32);         }                                            }
 
 void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
+    u32 k;
     s32 alpha;
     EffNozleWork* work = effect->userdata;
     Mtx a;
@@ -283,7 +284,6 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     GXColor color;
     CameraEntry* cam;
-
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
     GXSetBlendMode(1, 4, 5, 0);
@@ -342,9 +342,9 @@ void effNozleDisp(CameraId cameraId, EffectEntry* effect) {
     switch (work->type) {
         case 0:
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            CALLDL(10, nozle_1_dl_0_tbl, nozle_1_dl_0_size_tbl);
+            { u32 j; u8* sz; void** dl; for (j = 0, sz = nozle_1_dl_0_size_tbl, dl = nozle_1_dl_0_tbl; j < 10; j++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
             SETUP(2, 7, 14, nozle_1_vertex_tbl, nozle_1_normal_tbl, nozle_1_color0_tbl, nozle_1_texcoord0_tbl, nozle_1_texcoord1_tbl);
-            CALLDL(10, nozle_1_dl_1_tbl, nozle_1_dl_1_size_tbl);
+            { u32 j; u8* sz; void** dl; for (j = 0, sz = nozle_1_dl_1_size_tbl, dl = nozle_1_dl_1_tbl; j < 10; j++, sz++, dl++) { GXCallDisplayList(*dl, *sz * 32); } }
             break;
         case 2:
             SETUP(3, 7, 14, nozle_3_vertex_tbl, nozle_3_normal_tbl, nozle_3_color0_tbl, nozle_3_texcoord0_tbl, nozle_3_texcoord1_tbl);

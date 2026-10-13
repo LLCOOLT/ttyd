@@ -118,9 +118,9 @@ void winBadgeExit(void) {
 void mario_change(BWin* w, s32 unused) {
     s32 hasLeft = pouchEquipCheckBadge(0x147);
     s32 hasRight = pouchEquipCheckBadge(0x148);
+    const char* model;
     const char* animL;
     const char* animR;
-    const char* model;
 
     if (w->flags & 0x2000) {
         if (hasLeft && !hasRight) {
@@ -178,7 +178,6 @@ s32 winBadgeMain(BWin* w) {
     s32 cnt;
     s32 pages;
     s32 tab;
-    s32 idx;
 
     switch (w->state) {
     case 0:
@@ -229,7 +228,7 @@ s32 winBadgeMain(BWin* w) {
         tab = w->tab;
         if (w->trg & 0x100) {
             if (tab == 0) {
-                idx = w->sel[tab];
+                s32 idx = w->sel[tab];
                 if (pouchEquipCheckBadgeIndex(idx)) {
                     psndSFXOn(0x20039);
                     pouchUnEquipBadgeIndex(idx);
@@ -243,7 +242,7 @@ s32 winBadgeMain(BWin* w) {
                 pouchRevisePartyParam();
                 mario_change(w, pouchHaveBadge(idx));
             } else {
-                idx = w->list[w->sel[tab]].idx;
+                s32 idx = w->list[w->sel[tab]].idx;
                 if (w->list[w->sel[tab]].equipped) {
                     psndSFXOn(0x20039);
                     pouchUnEquipBadgeIndex(idx);
@@ -319,7 +318,7 @@ void winBadgeMain2(BWin* w) {
     s32 i;
     for (i = 0; i < 2; i++) {
         w->tgt[i] = 184.0f * w->page[i];
-        w->cur[i] += (w->tgt[i] - w->cur[i]) * 0.25f;
+        w->cur[i] += (w->tgt[i] - w->cur[i]) / 4.0f;
     }
 }
 
@@ -331,14 +330,14 @@ void winBadgeDisp(s32 camId, BWin* w, s32 n) {
     GXColor white = {255, 255, 255, 255};
     GXColor black = {0, 0, 0, 255};
     PouchData* pouch = pouchGetPtr();
-    f32 x = w->pos[n].x;
-    f32 y = w->pos[n].y;
     s32 i;
     s32 off;
-    f32 a;
-    f32 b;
     f32 c;
+    f32 b;
+    f32 a;
     f32 yy;
+    f32 x = w->pos[n].x;
+    f32 y = w->pos[n].y;
 
     winBgGX(w, 3, x, y);
     winKirinukiGX(w, 0, x - 100.0f, 20.0f + (120.0f + y), 365.0f, 210.0f);
@@ -379,25 +378,25 @@ void winBadgeDisp(s32 camId, BWin* w, s32 n) {
 static inline s32 badgeTexA(s32 e) { s32 t = 0x1D; if (e) t = 0x1C; return t; }
 static inline s32 badgeTexB(s32 e) { if (e) return 0x1C; return 0x1D; }
 void badge_disp(BWin* w, f32 xo, f32 yo) {
+    BWin* p0;
+    ItemData* item;
+    s8* cost;
     GXColor colA = {255, 255, 255, 255};
     GXColor colB;
     char buf[64];
     s32 cnt;
-    s32 i;
     s32 rowOff;
+    s32 i;
     s32 j;
     s32 jOff;
     s32 badge;
     s32 equipped;
     s32 gray;
-    f32 scroll;
-    f32 yBase;
     f32 y;
+    f32 yBase;
+    f32 scroll;
     f32 width;
-    ItemData* item;
-    s8* cost;
     s32 tw;
-    BWin* p0;
 
     if (w->tab == 0) {
         cnt = pouchGetHaveBadgeCnt();
@@ -448,7 +447,7 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         winFontInit();
         winFontSet((Vec){xo - 55.0f, scroll + (12.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, item->id);
         cost = &item->bp_cost;
-        sprintf(buf, "%s", winZenkakuStr(item->bp_cost));
+        sprintf(buf, "%s", winZenkakuStr(*cost));
         winFontSet((Vec){(142.0f + xo) - (f32)(FontGetMessageWidth(buf) / 2), scroll + (12.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, buf);
         winTexInit(w->res->tex->tpl);
         for (j = 0, jOff = 0; j < *cost; j++, jOff += 13) {

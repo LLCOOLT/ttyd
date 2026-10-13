@@ -222,7 +222,7 @@ USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
 		if (icon->jumpFrames == 0) {
 			return 2;
 		}
-		icon->jumpVelY = dy / icon->jumpFrames + icon->jumpFrames * icon->fallAccel * 0.5f;
+		icon->jumpVelY = dy / icon->jumpFrames + (icon->jumpFrames * 0.5f) * icon->fallAccel;
 		icon->jumpSpeed += icon->jumpDist / icon->jumpFrames;
 	}
 	icon->jumpPos.y += icon->jumpVelY;

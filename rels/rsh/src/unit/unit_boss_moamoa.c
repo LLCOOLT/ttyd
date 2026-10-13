@@ -1051,12 +1051,12 @@ static void ext_moamoa_main(void) {
     s32 i;
     Moamoa* elem;
     ExtPose* pose;
-    MoamoaGroup* grp;
+    s32 j;
     BattleUnit* unit;
     AnimationPose* ap;
     Vec* a;
     Vec* b;
-    s32 j;
+    MoamoaGroup* grp;
     s32 n;
     f32 t;
     f32 s;

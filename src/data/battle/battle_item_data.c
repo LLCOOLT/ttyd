@@ -2252,15 +2252,15 @@ typedef struct ThrowWork {
 
 USER_FUNC(_sampling_random_target) {
     BattleWorkWeaponTargets targets;
-    s32 idx;
-    s8 belong;
-    BattleWeapon* weapon;
-    BattleWork* wp;
     BattleWorkWeaponTargets* t;
-    s32* args;
     s32 outUnit;
     s32 outPart;
-
+    s32 idx;
+    s32* args;
+    s32 r;
+    BattleWork* wp;
+    BattleWeapon* weapon;
+    s8 belong;
     wp = _battleWorkPointer;
     args = event->args;
     weapon = (BattleWeapon*)evtGetValue(event, args[0]);
@@ -2270,11 +2270,12 @@ USER_FUNC(_sampling_random_target) {
     t = &targets;
     BattleSamplingEnemy(t, weapon, BattleTransID(event, -2), belong, weapon->targetClassFlags,
                         weapon->targetPropertyFlags, -wp->alliances[belong].attackDirection);
-    if (targets.numTargets <= 0) {
+    if (t->numTargets <= 0) {
         evtSetValue(event, outUnit, -1);
         evtSetValue(event, outPart, -1);
     } else {
-        idx = t->targetIndices[irand(targets.numTargets)];
+        r = irand(t->numTargets);
+        idx = t->targetIndices[r];
         evtSetValue(event, outUnit, t->targets[idx].unitIdx);
         evtSetValue(event, outPart, t->targets[idx].partIdx);
     }

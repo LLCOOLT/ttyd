@@ -41,15 +41,15 @@ EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z) {
     f32 zero;
     EffRotHammerFailN64Work* work;
 
+
     effect = effEntry();
     effect->type = "RotHammerFailN64\0\0\0";
     effect->count = 2;
-    work = __memAlloc(HEAP_EFFECT, sizeof(EffRotHammerFailN64Work) * 2);
+    effect->userdata = work = __memAlloc(HEAP_EFFECT, sizeof(EffRotHammerFailN64Work) * 2);
     zero = 0.0f;
-    effect->userdata = work;
     effect->callback = effRotHammerFailMain;
     work->lifetime = time;
-    child = work + 1;
+    child = work++; child = work; work--;
     work->frame = 0;
     work->total = time;
     work->progress = zero;
@@ -59,9 +59,9 @@ EffectEntry* effRotHammerFailN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z) {
     work->position.z = z;
     work->scaleY = 10.0f;
     work->scaleX = 30.0f;
-    child->position.x = zero;
-    child->position.y = zero;
-    child->position.z = zero;
+    work[1].position.x = zero;
+    work[1].position.y = zero;
+    work[1].position.z = zero;
     child->velocity.x = (f32)sin(zero);
     child->velocity.y = zero;
     child->velocity.z = (f32)cos(zero);
@@ -103,21 +103,23 @@ void effRotHammerFailMain(EffectEntry* effect) {
 void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRotHammerFailN64Work* work;
+    s32 isSix;
     s32 i;
     s32 idx;
+    s32 x;
     s32 alpha;
-    s32 isSix;
     Mtx mtx;
     Mtx scale;
     Mtx rot;
     Mtx viewMtx;
     GXTexObj texObj;
+    static const GXColor c0 = {0xE6, 0xDE, 0xDE, 0x82};
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     idx = work->progress;
-    isSix = idx == 6;
     alpha = 256.0f * (work->progress - (f32)idx);
+    isSix = idx == 6;
     GXSetNumChans(0);
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -147,21 +149,21 @@ void effRotHammerFailDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(mtx, rot, mtx);
     PSMTXConcat(camera->view, mtx, viewMtx);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0xE6, 0xDE, 0xDE, 0x82});
+    GXSetTevColor(GX_TEVREG0, c0);
     GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, alpha});
+    x = idx * 32;
     PSMTXScale(scale, 0.004464286f, 0.03125f, 0.0f);
-    idx *= 32;
-    PSMTXTrans(mtx, (f32)idx, 0.0f, 0.0f);
+    PSMTXTrans(mtx, (f32)x, 0.0f, 0.0f);
     PSMTXConcat(scale, mtx, mtx);
     GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
     if (isSix) {
         PSMTXScale(scale, 0.004464286f, 0.03125f, 0.0f);
-        PSMTXTrans(mtx, (f32)(idx + 32), 32.0f, 0.0f);
+        PSMTXTrans(mtx, (f32)(x + 32), 32.0f, 0.0f);
         PSMTXConcat(scale, mtx, mtx);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
     } else {
         PSMTXScale(scale, 0.004464286f, 0.03125f, 0.0f);
-        PSMTXTrans(mtx, (f32)(idx + 32), 0.0f, 0.0f);
+        PSMTXTrans(mtx, (f32)(x + 32), 0.0f, 0.0f);
         PSMTXConcat(scale, mtx, mtx);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
     }

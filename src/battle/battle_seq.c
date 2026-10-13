@@ -982,6 +982,7 @@ void btlseqPhase(BattleWork* wp) {
 }
 
 void btlseqMove(BattleWork* wp) {
+	int j;
 	BattleUnit* unit;
 	PouchData* pouch;
 	BattleUnit* mario;
@@ -991,7 +992,6 @@ void btlseqMove(BattleWork* wp) {
 	s32 state;
 	BOOL end;
 	int i;
-	int j;
 
 	do {
 		loop = FALSE;
@@ -1617,14 +1617,13 @@ void battleMakePhaseEvtTable(BattleWork* wp) {
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && !(unit->mAttributeFlags & 0x80000)) {
-			entry = &table[count];
-			entry->unitId = i;
+			table[count].unitId = i;
 			BtlUnit_GetHomePos(unit, &x, &y, &z);
 			if (x >= 0.0f) {
-				entry->priority = 1000.0f + x;
+				table[count].priority = 1000.0f + x;
 			}
 			else {
-				entry->priority = __fabs(x);
+				table[count].priority = __fabs(x);
 			}
 			count++;
 		}
@@ -1681,8 +1680,8 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 }
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
-	BattleUnit* unit;
 	int i;
+	BattleUnit* unit;
 	BOOL done = TRUE;
 
 	for (i = 0; i < 64; i++) {
@@ -1796,6 +1795,7 @@ void _mapobj_data_touch_scale(s32 layer) {
 	}
 }
 
+#pragma dont_inline on
 USER_FUNC(_set_haikei_entry_scale) {
 	BattleWork* wp = _battleWorkPointer;
 	BOOL busy = FALSE;

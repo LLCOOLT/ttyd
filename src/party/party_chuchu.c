@@ -173,6 +173,36 @@ USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
+static inline int chuchu_findTreasure2(MarioWork* player2, f32 range, Vec* bestPos) {
+    int found;
+    u32 i;
+    ChuchuTreasure* tbl;
+    f32 minDist;
+
+    found = 0;
+    minDist = 10000.0f;
+    for (i = 0, tbl = unk_8038bb34; i < 40; i++, tbl++) {
+        if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
+            Vec pos;
+            Vec p = vecB;
+            f32 d;
+            p.x = tbl->x;
+            p.y = tbl->y;
+            p.z = tbl->z;
+            pos = p;
+            d = PSVECDistance(&player2->position, &pos);
+            if (!(range < d) && minDist > d) {
+                minDist = d;
+                found = 1;
+                bestPos->x = pos.x;
+                bestPos->y = pos.y;
+                bestPos->z = pos.z;
+            }
+        }
+    }
+    return found;
+}
+
 USER_FUNC(set_msg) {
     MapObjectEntry* mobj;
     ItemEntry* item;
@@ -211,27 +241,7 @@ USER_FUNC(set_msg) {
         type = -1;
         item = itemNearDistCheck(player->position.x, player->position.y, player->position.z, range);
         mobj = mobjNearDistCheck2(player->position.x, player->position.y, player->position.z, range, mobj_list);
-        found = 0;
-        player2 = cp->player;
-        minDist = 10000.0f;
-        tbl = unk_8038bb34;
-        for (i = 0; i < 40; i++, tbl++) {
-            if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
-                p = vecB;
-                p.x = tbl->x;
-                p.y = tbl->y;
-                p.z = tbl->z;
-                pos = p;
-                d = PSVECDistance(&player2->position, &pos);
-                if (!(range < d) && minDist > d) {
-                    minDist = d;
-                    found = 1;
-                    bestPos.x = pos.x;
-                    bestPos.y = pos.y;
-                    bestPos.z = pos.z;
-                }
-            }
-        }
+        found = chuchu_findTreasure2(cp->player, range, &bestPos);
 
         minDist = 10000.0f;
         if (item) {
@@ -240,7 +250,7 @@ USER_FUNC(set_msg) {
             ip.y = item->position.y;
             ip.z = item->position.z;
             tmp = ip;
-            if (10000.0f > PSVECDistance(&tmp, &player->position)) {
+            if (minDist > PSVECDistance(&tmp, &player->position)) {
                 minDist = PSVECDistance(&tmp, &player->position);
                 angle = revise360(angleABf(cp->position.x, cp->position.z, item->position.x, item->position.z) - cp->field_F8);
                 type = 0;
@@ -293,6 +303,33 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
+static inline int chuchu_findTreasure(MarioWork* player2, f32 range) {
+    int found;
+    u32 i;
+    ChuchuTreasure* tbl;
+    f32 minDist;
+
+    found = 0;
+    minDist = 10000.0f;
+    for (i = 0, tbl = unk_8038bb34; i < 40; i++, tbl++) {
+        if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
+            Vec pos;
+            Vec p = vecB;
+            f32 d;
+            p.x = tbl->x;
+            p.y = tbl->y;
+            p.z = tbl->z;
+            pos = p;
+            d = PSVECDistance(&player2->position, &pos);
+            if (!(range < d) && minDist > d) {
+                minDist = d;
+                found = 1;
+            }
+        }
+    }
+    return found;
+}
+
 BOOL chuchu_searchObject(void) {
     ChuchuParty* cp = (ChuchuParty*)partyGetPtr(marioGetPartyId());
     MarioWork* player = cp->player;
@@ -308,28 +345,7 @@ BOOL chuchu_searchObject(void) {
     if (mobjNearDistCheck2(player->position.x, player->position.y, player->position.z, 150.0f, mobj_list)) {
         return TRUE;
     }
-    found = 0;
-    i = found;
-    player2 = cp->player;
-    tbl = unk_8038bb34;
-    minDist = 10000.0f;
-    for (; i < 40; i++, tbl++) {
-        if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
-            Vec p = vecB;
-            Vec pos;
-            f32 d;
-            p.x = tbl->x;
-            p.y = tbl->y;
-            p.z = tbl->z;
-            pos = p;
-            d = PSVECDistance(&player2->position, &pos);
-            if (!(150.0f < d) && minDist > d) {
-                minDist = d;
-                found = 1;
-            }
-        }
-    }
-    return found != 0;
+    return chuchu_findTreasure(cp->player, 150.0f) != 0;
 }
 
 void chuchu_init(PartyEntry* party) {

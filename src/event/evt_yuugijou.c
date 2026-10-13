@@ -156,10 +156,9 @@ void monteCountDisp(void) {
 	Mtx mtx;
 	GXColor c1, c2, c3, c4;
 	if (flags & 4) y = -0x78;
-	if (flags & 1) {
-		if (!(flags & 2)) {
-			return;
-		}
+	if (!(flags & 1)) return;
+	if (flags & 2) {
+		{
 		c1 = (GXColor){255, 255, 255, 153};
 		windowDispGX_Waku_col(0, c1, -288.0f, (f32)(y + 0x2C), 200.0f, 44.0f, 16.0f);
 		PSMTXTrans(mtx, -260.0f, (f32)(y + 2), 0.0f);
@@ -182,12 +181,15 @@ void monteCountDisp(void) {
 			if (y != 0) {
 				y = y / 10;
 				if (y == 0) {
-					y = ((s32)yuwp->tokens > (s32)yuwp->field_0x10) ? 1 : -1;
+					s32 sg;
+					if ((s32)yuwp->tokens > (s32)yuwp->field_0x10) sg = 1; else sg = -1;
+					y = sg;
 				}
 				yuwp->field_0x10 += y;
 			}
 		}
 		if (monte_snd_flag != 0) monte_snd_flag--;
+		}
 	}
 }
 

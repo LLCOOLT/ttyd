@@ -279,6 +279,7 @@ static void yuka_main(void) {
     s32 r;
     s32 i;
     s32 p;
+    s32 j;
 
     for (i = 0; i < 6; i++) {
         if (w->waveActive[i] == 1) {
@@ -305,32 +306,31 @@ static void yuka_main(void) {
     }
     memcpy_as4(m->prev, m->pos, sizeof(m->pos));
     for (r = 0; r < 2; r++) {
-        for (i = 0; i < 129; i++) {
+        for (j = 0; j < 129; j++) {
             Vec acc = {0.0f, 0.0f, 0.0f};
             Vec d;
             Vec n;
             Vec t;
-            Vec* p = &m->prev[r][i];
 
-            PSVECSubtract(p, &m->prev[r][i + 1], &d);
+            PSVECSubtract(&m->prev[r][j], &m->prev[r][j + 1], &d);
             PSVECNormalize(&d, &n);
             PSVECScale(&n, &n, 1.0f - PSVECMag(&d));
             PSVECAdd(&acc, &n, &acc);
-            PSVECSubtract(p, &m->prev[r][i - 1], &d);
+            PSVECSubtract(&m->prev[r][j], &m->prev[r][j - 1], &d);
             PSVECNormalize(&d, &n);
             PSVECScale(&n, &n, 1.0f - PSVECMag(&d));
             PSVECAdd(&acc, &n, &acc);
             acc.x = 0.0f;
             acc.z = 0.0f;
             PSVECScale(&acc, &acc, 0.01f);
-            PSVECAdd(&m->vel[r][i], &acc, &m->vel[r][i]);
-            PSVECScale(&m->vel[r][i], &t, 0.1f);
-            PSVECAdd(&m->pos[r][i], &t, &m->pos[r][i]);
-            m->pos[r][i].y += m->vel[r][i].y;
-            m->vel[r][i].y -= 2.0f;
-            if (m->pos[r][i].y <= 0.0f) {
-                m->pos[r][i].y = 0.0f;
-                m->vel[r][i].y = 0.0f;
+            PSVECAdd(&m->vel[r][j], &acc, &m->vel[r][j]);
+            PSVECScale(&m->vel[r][j], &t, 0.1f);
+            PSVECAdd(&m->pos[r][j], &t, &m->pos[r][j]);
+            m->pos[r][j].y += m->vel[r][j].y;
+            m->vel[r][j].y -= 2.0f;
+            if (m->pos[r][j].y <= 0.0f) {
+                m->pos[r][j].y = 0.0f;
+                m->vel[r][j].y = 0.0f;
             }
         }
     }
@@ -415,13 +415,16 @@ static void main_base(void) {
         }
         for (i = 0; i < 7; i++) {
             for (j = i + 1; j < 8; j++) {
-                if (pos[i] > pos[j]) {
-                    f32 tf = pos[i];
+                f32 pj;
+                f32 pi;
+                pi = pos[i];
+                pj = pos[j];
+                if (pi > pj) {
                     s32 ti = idx[i];
-                    pos[i] = pos[j];
+                    pos[i] = pj;
                     idx[i] = idx[j];
                     idx[j] = ti;
-                    pos[j] = tf;
+                    pos[j] = pi;
                 }
             }
         }
@@ -450,7 +453,7 @@ static void main_base(void) {
             if (i == 8) {
                 found = 0;
                 for (j = 0; j < 8; j++) {
-                    t = &w->timing[idx[j]];
+                    DekaTiming* t2 = &w->timing[idx[j]]; t = t2;
                     if (t->state == 2 && t->type == 1) {
                         w->state = 5;
                         w->gaugeState = 4;
@@ -989,7 +992,7 @@ void yuka_capture(CameraId cam, void* param) {
     camera->cameraUp = (Vec){0.0f, 0.0f, -1.0f};
     camera->cameraPos = c;
     camera->cameraAt = camera->cameraPos;
-    camera->cameraPos.y += w->h0 / 2.0f / (f32)tan(0.21816616f);
+    { f32 t = tan(0.21816616f); f32 h = w->h0; camera->cameraPos.y += (f32)w->h0 / 2 / t; }
     C_MTXLookAt(camera->view, &camera->cameraPos, &camera->cameraUp, &camera->cameraAt);
     C_MTXPerspective(camera->projection, 25.0f, (f32)w->w0 / (f32)w->h0, 1.0f, 32767.0f);
     camera->projType = 0;
@@ -1148,13 +1151,13 @@ static DekaWork* get_ptr(void) {
 
 void create_timing(void) {
     DekaWork* w = get_ptr();
+    DekaTiming* ta;
     DekaTiming* t;
     s32 i;
     s32 j;
     s32 n;
     s32 cnt;
     f32 f;
-    DekaTiming* ta;
     s32 idx[8];
     f32 pos[8];
 
@@ -1213,13 +1216,16 @@ restart:
     }
     for (i = 0; i < n - 1; i++) {
         for (j = i + 1; j < n; j++) {
-            if (pos[i] > pos[j]) {
-                f32 tf = pos[i];
+            f32 pj;
+            f32 pi;
+            pi = pos[i];
+            pj = pos[j];
+            if (pi > pj) {
                 s32 ti = idx[i];
-                pos[i] = pos[j];
+                pos[i] = pj;
                 idx[i] = idx[j];
                 idx[j] = ti;
-                pos[j] = tf;
+                pos[j] = pi;
             }
         }
     }
@@ -1256,13 +1262,13 @@ static USER_FUNC(star_stone_appear) {
 USER_FUNC(get_ride_pos) {
     DekaWork* w = get_ptr();
     s32* args = event->args;
-
+    f32 k = 64.0f;
     if (evtGetValue(event, *args++) == 0) {
-        evtSetFloat(event, *args++, 0.5f * (0.25f * (w->scale.x * 64.0f)) + w->starPos.x);
+        evtSetFloat(event, *args++, 0.5f * (0.25f * (w->scale.x * k)) + w->starPos.x);
     } else {
-        evtSetFloat(event, *args++, w->starPos.x - 0.5f * (0.25f * (w->scale.x * 64.0f)));
+        evtSetFloat(event, *args++, w->starPos.x - 0.5f * (0.25f * (w->scale.x * k)));
     }
-    evtSetFloat(event, *args++, 0.25f * (0.25f * (w->scale.y * 64.0f)) + w->starPos.y);
+    evtSetFloat(event, *args++, 0.25f * (0.25f * (w->scale.y * k)) + w->starPos.y);
     evtSetFloat(event, *args++, 5.0f + w->starPos.z + 4.0f * w->scale.z);
     return 2;
 }

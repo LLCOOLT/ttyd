@@ -443,11 +443,11 @@ void N_setupErrorHandler(void) {
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 	//registers
 	char* textBase;
+	int i;
 	OSFontHeader* fontHeader;
 	s8* loop_newline;
 	s8* loop_zero;
 	int width2, height2;
-	int i;
 	u32 count, stack;
 	s16 w1, w2, h1, h2, x2, y2;
 	int x1, y1;
@@ -713,7 +713,7 @@ inline Vec initializeVec(Vec* input) {
 void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
     u32 j;
     CameraEntry *temp_r31;
-    EffUltraHammerData *data;
+    EffUltraHammerData *data; s32 i;
     s32 temp_r24;
     EffectEntry *effect;
     Mtx spC0;
@@ -752,7 +752,7 @@ void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
     GXSetCullMode(GX_CULL_NONE);
     GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
     data++;
-    for (camId = 1; camId < effect->count; camId++, data++) {
+    for (i = 1; i < effect->count; i++, data++) {
         if (data->update == 0) {
             PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
             PSMTXScale(sp60, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);

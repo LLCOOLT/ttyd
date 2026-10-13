@@ -296,7 +296,7 @@ s32 winItemMain(ItemWork* w) {
     WinMgrEntry* entry;
     MarioWork* mp;
     MailData* mail;
-    WinPartyDt* list[8];
+    WinPartyDt* list[10];
     s32 party;
     s32 n;
     s32 i;
@@ -842,9 +842,9 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
 }
 
 void itemUseDisp(WinMgrEntry* entry) {
+    ItemWork* w = (ItemWork*)winGetPtr();
     GXColor black = {0, 0, 0, 255};
     GXColor white = {255, 255, 255, 255};
-    ItemWork* w = (ItemWork*)winGetPtr();
     WinPartyDt* list[8];
     s32 party;
     s32 n;

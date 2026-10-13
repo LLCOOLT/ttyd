@@ -1589,10 +1589,12 @@ void door_position_sub(s32 type, const char* map, const char* hitIn, const char*
         PSMTXMultVec(m, &obj->joints->bboxMax, &max);
         PSVECSubtract(&max, &min, &d);
         if (d.x) {
-            t = d.x / (f32)cos((f32)atan(d.z / d.x)); t /= 2.0f;
+            t = d.x / (f32)cos((f32)atan(d.z / d.x));
+            w = t / 2.0f;
         } else {
-            t = d.z / 2.0f;
+            w = d.z / 2.0f;
         }
+        t = w;
         w = t;
     }
     switch (type) {
@@ -1793,10 +1795,11 @@ USER_FUNC(npc_hide_onoff) {
     s32* args = event->args;
     DoorData* d = (DoorData*)evtGetValue(event, args[0]);
     BOOL on = evtGetValue(event, args[1]);
-    const char** list;
+    const char** list = d->npcs;
+    s32 i;
 
-    for (list = d->npcs; *list; list++) {
-        NpcEntry* npc = npcNameToPtr_NoAssert(*list);
+    for (i = 0; list[i]; i++) {
+        NpcEntry* npc = npcNameToPtr_NoAssert(list[i]);
         if (npc) {
             if (on) {
                 npc->flags |= 0x800;

@@ -1466,11 +1466,11 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 }
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
+    MapObject* obj = *(MapObject**)info->field_0x0;
     s32 tevStage = info->tevStage;
     s32 texMap = info->texCoord;
     s32 texCoord = info->texMap;
     s32 field_0x18 = info->field_0x18;
-    MapObject* obj = *(MapObject**)info->field_0x0;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;

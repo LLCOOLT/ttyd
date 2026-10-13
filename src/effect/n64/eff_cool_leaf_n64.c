@@ -119,6 +119,7 @@ void effCoolLeafMain(EffectEntry* effect) {
     s32 i;
     s32 type;
     s32 lifetime;
+    f32 new_var;
     s32 frame;
     f32 s;
     f32 s2;
@@ -247,7 +248,7 @@ void effCoolLeafMain(EffectEntry* effect) {
             for (i = 1; i < effect->count; i++, work++) {
                 work->spin += (f32)((s32)effTblRandN64(50, frame + i * 20) - 25);
                 work->angleZ += 10.0f * (f32)sin(6.2831855f * work->spin / 360.0f);
-                work->angleY += 10.0f * (f32)cos(6.2831855f * (0.5f * work->spin) / 360.0f);
+                new_var = (f32)cos(6.2831855f * (0.5f * work->spin) / 360.0f); work->angleY += 10.0f * new_var;
                 work->position.x += work->vx;
                 work->position.y += work->vy;
             }

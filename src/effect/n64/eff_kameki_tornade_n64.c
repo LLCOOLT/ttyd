@@ -77,6 +77,7 @@ EffectEntry* effKamekiTornadeN64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f
     EffectEntry* effect;
     EffKamekiTornadeN64Work* work;
     s32 i;
+    s32 k;
 
     effect = effEntry();
     effect->type = "KamekiTornadeN64\0\0\0";
@@ -126,6 +127,7 @@ void effKamekiTornadeMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
+    s32 k;
     s32 life;
     s32 frame;
     f32 scale;
@@ -186,6 +188,7 @@ void effKamekiTornadeMain(EffectEntry* effect) {
 
 void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
+    s32 k;
     EffKamekiTornadeN64Work* work;
     s32 life;
     effN64Vtx* tmpl;
@@ -241,19 +244,19 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     tmpl = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     p = tmpl;
-    for (j = 0; j < 16; j++) {
-        p = &tmpl[j];
-        ang = 6.2831855f * (f32)(j * 360 / 15) / 360.0f;
+    for (k = 0; k < 16; k++) {
+        p = &tmpl[k];
+        ang = 6.2831855f * (f32)(k * 360 / 15) / 360.0f;
         p->x = 100.0f * (f32)cos(ang);
         p->y = 0;
         p->z = 100.0f * (f32)sin(ang);
-        p->s = j * 128;
+        p->s = k * 128;
         p->t = 0;
-        q = &tmpl[j + 16];
+        q = &tmpl[k + 16];
         q->x = 100.0f * (f32)cos(ang);
         q->y = 0;
         q->z = 100.0f * (f32)sin(ang);
-        q->s = j * 512;
+        q->s = k * 512;
         q->t = 1024;
     }
     PSMTXRotRad(rot, 'z', 0.017453292f * work->unk144);

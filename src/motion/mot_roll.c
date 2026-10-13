@@ -186,7 +186,7 @@ static inline Vec makeVec(f32 x, f32 y, f32 z) {
             MB(0x43) = (MB(0x43) + 1) & 1;                                                        \
         }                                                                                         \
     }                                                                                             \
-    MF(0x1a8) = revise360(270.0f + MF(0x198) - b + (MB(0x43) ? -180.0f : 0.0f));                  \
+    { f32 t_ = 270.0f + MF(0x198) - b; MF(0x1a8) = revise360(t_ + (MB(0x43) ? -180.0f : 0.0f)); } \
     if (MF(0x1a8) >= 200.0f) {                                                                    \
         MF(0x1a8) = revise360(270.0f + MF(0x198) - b + (MB(0x43) ? -180.0f : 0.0f));              \
     }                                                                                             \
@@ -700,7 +700,7 @@ void mot_roll(void) {
     switch (RW()->scaleState) {
     case 1:
         if (v26 < 1.4f) {
-            v26 = 1.0f * (1.45f - v26) + v26;
+            { f32 k = 1.0f; v26 = k * (1.45f - v26) + v26; }
             if (v26 >= 1.4f) {
                 v26 = 1.4f;
             }

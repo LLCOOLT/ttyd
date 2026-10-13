@@ -37,3 +37,158 @@ USER_FUNC(pre_kurio_use) {
 
     
 }
+
+void marioStSystemLevel(s32 level);
+void partyGoodbyeInit(PartyEntry* party);
+BOOL partyGoodbyeMain(PartyEntry* party);
+void partyChgRunMode(PartyEntry* party, s32 mode);
+
+USER_FUNC(post_kurio_use) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+
+    if (!party) {
+        return EVT_RETURN_DONE;
+    }
+    party->useMotionId = 20;
+    marioStSystemLevel(0);
+    psndClearFlag(0x80);
+    party->flags &= ~0x04000000;
+    party->flags &= ~0x02000000;
+    return EVT_RETURN_DONE;
+}
+
+void kuribo_init_800C23B4(PartyEntry* party) {
+    party->field_32[1] = 1;
+    party->field_32[0] = 0;
+    party->field_F0 = 24.0f;
+    party->width = 26.0f;
+    msg_ep = 0;
+}
+
+extern s32 kurio_msg_evt[];
+void* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 angle);
+BOOL partyGetAppearPos3(PartyEntry* party, Vec* pos);
+s32 fbatNpcTalkCheck(void);
+void partyChgMoveMode(PartyEntry* party, s32 mode);
+void partyChgMot(PartyEntry* party, s32 mot);
+void partyChgPoseId(PartyEntry* party, s32 id);
+void partyChkGnd(PartyEntry* party);
+f32 angleABf(f32, f32, f32, f32);
+f32 distABf(f32, f32, f32, f32);
+f32 PSVECDistance(const Vec*, const Vec*);
+
+typedef struct KuriboParty {
+    u8 pad0[0x24];
+    s32 timer;          // 0x24
+    u8 pad28[0x94 - 0x28];
+    Vec target;         // 0x94
+    u8 padA0[0xEC - 0xA0];
+    f32 fieldEC;        // 0xEC
+    u8 padF0[0x114 - 0xF0];
+    f32 field114;       // 0x114
+} KuriboParty;
+#define KTIMER(p) (((KuriboParty*)(p))->timer)
+#define KTARGET(p) (((KuriboParty*)(p))->target)
+#define KEC(p) (((KuriboParty*)(p))->fieldEC)
+#define K114(p) (((KuriboParty*)(p))->field114)
+
+void kuribo_use(PartyEntry* party) {
+    MarioWork* player = party->playerPtr;
+    void* wall;
+    Vec pos;
+    EventEntry* evt;
+
+    if (party->field_8 & 8) {
+        party->field_8 &= ~8;
+        if (PSVECDistance(&player->position, &party->position) > 125.0f) {
+            party->useMotionId = 0;
+        } else {
+            pos = party->position;
+            wall = partySearchFrontWall(party, &pos, 150.0f,
+                angleABf(party->position.x, party->position.z, player->position.x, player->position.z));
+            if (wall) {
+                if (KEC(party) < distABf(party->position.x, party->position.z, player->position.x, player->position.z)) {
+                    party->useMotionId = 0;
+                } else {
+                    wall = NULL;
+                }
+            }
+            if (!wall) {
+                partyChgPoseId(party, 1);
+                party->field_104 = 0.0f;
+                KTIMER(party) = 100;
+                party->useMotionId = 10;
+            }
+        }
+    }
+
+    switch (party->useMotionId) {
+    case 0:
+        if (!partyGetAppearPos3(party, (Vec*)((u8*)party + 0x94))) {
+            party->flags |= 0x04000000;
+            party->flags |= 0x02000000;
+        }
+        KTIMER(party) = 4;
+        party->field_FC = angleABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z);
+        party->field_100 = party->field_FC;
+        party->field_10C = player->unk1A8;
+        party->field_110 = player->unk1A8;
+        party->field_104 = distABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z) / KTIMER(party);
+        K114(party) = 0.0f;
+        party->useMotionId = 1;
+        break;
+    case 1:
+        if (!partyGetAppearPos3(party, (Vec*)((u8*)party + 0x94))) {
+            party->flags |= 0x04000000;
+            party->flags |= 0x02000000;
+        }
+        party->position.x += (KTARGET(party).x - party->position.x) / KTIMER(party);
+        party->position.y += (KTARGET(party).y - party->position.y) / KTIMER(party);
+        party->position.z += (KTARGET(party).z - party->position.z) / KTIMER(party);
+        if (--KTIMER(party) > 0) {
+            break;
+        }
+        partyChgPoseId(party, 1);
+        party->field_104 = 0.0f;
+        KTIMER(party) = 100;
+        party->useMotionId = 10;
+        break;
+    case 10:
+        evt = evtEntryType(kurio_msg_evt, 0, 0, 26);
+        marioStSystemLevel(1);
+        evt->lwData[0] = fbatNpcTalkCheck();
+        party->useMotionId = 15;
+        break;
+    case 20:
+        KTIMER(party) = 5;
+        party->useMotionId = 21;
+    case 21:
+        if (--KTIMER(party) > 0) {
+            break;
+        }
+        partyChgRunMode(party, 2);
+        partyChgMoveMode(party, 0);
+        partyChgMot(party, 0);
+        partyChgPoseId(party, 1);
+        party->flags &= ~0x100;
+        party->flags &= ~0x04000000;
+        party->flags &= ~0x02000000;
+        break;
+    }
+    partyChkGnd(party);
+}
+
+void kuribo_use_post(PartyEntry* party) {
+    party->flags &= ~0x04000000;
+    party->flags &= ~0x02000000;
+}
+
+void kuribo_bye(PartyEntry* party) {
+    if (party->field_8 & 8) {
+        party->field_8 &= ~8;
+        partyGoodbyeInit(party);
+    }
+    if (partyGoodbyeMain(party)) {
+        partyChgRunMode(party, 14);
+    }
+}

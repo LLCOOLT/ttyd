@@ -28,15 +28,6 @@ static effN64Vtx size16x16_tex64x64_vtx[] = {
     {-8, 8, 0, 0, 3072, 0, 0, 0, 255},
 };
 
-static inline GXColor wfcol(u8 a, u8 r, u8 g, u8 b) {
-    GXColor c = {0};
-    c.a = a;
-    c.r = r;
-    c.g = g;
-    c.b = b;
-    return c;
-}
-
 static u8 color_rotation_data[] = {
     0xFF, 0xFF, 0x52, 0xFF, 0xFF, 0x52, 0xB5, 0x94,
     0x00, 0xB5, 0x94, 0x00, 0xFF, 0xFF, 0xD6, 0xFF,
@@ -155,7 +146,7 @@ void effWangFlushDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(scaleMtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         idx = idx % 24;
-        GXSetTevColor(GX_TEVREG0, wfcol(flashAlpha, color_rotation_data[idx], color_rotation_data[idx + 1], color_rotation_data[idx + 2]));
+        GXSetTevColor(GX_TEVREG0, (GXColor){color_rotation_data[idx], color_rotation_data[idx + 1], color_rotation_data[idx + 2], flashAlpha});
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }

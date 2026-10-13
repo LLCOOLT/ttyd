@@ -131,6 +131,8 @@ void effItemGetMain(EffectEntry* effect) {
         work->timer = 1000;
     }
     switch (work->state) {
+    case 0:
+        break;
     case 1:
         if (work->scale < 100.0f) {
             work->scale *= 1.1f;
@@ -373,9 +375,9 @@ void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     w = 21.333334f;
     h = 42.666668f;
-    a = -w / 2.0f;
-    d = -h;
-    b = 10.666667f;
+
+
+
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         for (pass = 0; pass < 2; pass++) {
@@ -395,13 +397,13 @@ void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadPosMtxImm(mc8, GX_PNMTX0);
             GXSetCurrentMtx(GX_PNMTX0);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(a, 0.0f, 0.0f);
+            GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(b, 0.0f, 0.0f);
+            GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(2.0f, 0.0f);
-            GXPosition3f32(b, d, 0.0f);
+            GXPosition3f32(w / 2.0f, -h, 0.0f);
             GXTexCoord2f32(2.0f, 1.0f);
-            GXPosition3f32(a, d, 0.0f);
+            GXPosition3f32(-w / 2.0f, -h, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }

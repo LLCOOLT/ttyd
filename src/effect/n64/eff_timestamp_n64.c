@@ -87,14 +87,14 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     work->scale2 = 1.0f;
     p = pos_data;
     for (i = 0; i < 10; i++) {
-        work->posX[i] = p[0];
-        work->posY[i] = p[1];
+        work->posX[i] = pos_data[i*3];
+        work->posY[i] = pos_data[i*3+1];
         work->posZ[i] = 0.0f;
         work->rotX[i] = 0.0f;
         work->rotY[i] = 0.0f;
         work->rotZ[i] = 0.0f;
         work->digitAlpha[i] = 0;
-        work->delay[i] = p[2];
+        work->delay[i] = pos_data[i*3+2];
         p += 3;
     }
     return effect;
@@ -145,17 +145,11 @@ void effTimestampMain(EffectEntry* effect) {
     if (frame < 16) {
         work->bright = (frame << 4) + 15;
     }
-    for (i = 0; i < 5; i++) {
-        if (work->delay[i * 2] == 0 || (work->delay[i * 2] -= 1, work->delay[i * 2] == 0)) {
-            work->digitAlpha[i * 2] += 8;
-            if (work->digitAlpha[i * 2] > 255) {
-                work->digitAlpha[i * 2] = 255;
-            }
-        }
-        if (work->delay[i * 2 + 1] == 0 || (work->delay[i * 2 + 1] -= 1, work->delay[i * 2 + 1] == 0)) {
-            work->digitAlpha[i * 2 + 1] += 8;
-            if (work->digitAlpha[i * 2 + 1] > 255) {
-                work->digitAlpha[i * 2 + 1] = 255;
+    for (i = 0; i < 10; i++) {
+        if (work->delay[i] == 0 || (work->delay[i] -= 1, work->delay[i] == 0)) {
+            work->digitAlpha[i] += 8;
+            if (work->digitAlpha[i] > 255) {
+                work->digitAlpha[i] = 255;
             }
         }
     }
@@ -170,8 +164,8 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx rot;
     Mtx mtx;
-    GXColor color;
     GXColor color2;
+    GXColor color;
     effN64Vtx* p;
     effN64Vtx* vtx;
     s32 frame;
@@ -179,6 +173,7 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     s32 n;
     s32 yo;
+    s32 k;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -259,11 +254,11 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
         color2.r = colr[i];
         color2.g = colg[i];
         color2.b = colb[i];
-        color2.a = work->digitAlpha[i] * bright / 255;
+        color2.a = bright * work->digitAlpha[i] / 255;
         GXSetTevColor(GX_TEVREG0, color2);
-        for (n = 0; n < 15; n++) {
+        for (n = 0, k = 0; n < 15; n++, k += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(n * 2, n * 2 + 2, n * 2 + 1, n * 2, n * 2 + 1, n * 2 + 2, n * 2 + 3, n * 2);
+            tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
         }
     }
 }

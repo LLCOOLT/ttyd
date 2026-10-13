@@ -377,10 +377,10 @@ void envDisp_DepthOfField(void) {
             tbl = texmtx_tbl;
             coord = 0;
             stage = 0;
-            for (i = 0; i < 4; i++, tbl++, stage++, coord++) {
+            for (i = 0; i < 4; i++, stage++, coord++) {
                 PSMTXTrans(mtx, dof->unk4 * env_sin(6.2831855f * i / 4) / 100.0f, dof->unk4 * env_cos(6.2831855f * i / 4) / 100.0f, 0.0f);
-                GXLoadTexMtxImm(mtx, *tbl, GX_MTX2x4);
-                GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, *tbl, GX_FALSE, GX_PTIDENTITY);
+                GXLoadTexMtxImm(mtx, texmtx_tbl[i], GX_MTX2x4);
+                GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i], GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage, GX_TEV_KCSEL_1_4);
                 GXSetTevKAlphaSel((GXTevStageID)stage, GX_TEV_KASEL_1_4);
                 GXSetTevOrder((GXTevStageID)stage, (GXTexCoordID)coord, GX_TEXMAP0, GX_COLOR_NULL);
@@ -418,8 +418,8 @@ void envDisp_DepthOfField(void) {
             tbl2 = texmtx_tbl;
             for (; i2 < 4; i2++, tbl2++, stage2++, coord2++) {
                 PSMTXTrans(mtx2, dof->unk8 * env_sin(6.2831855f * i2 / 4) / 100.0f, dof->unk8 * env_cos(6.2831855f * i2 / 4) / 100.0f, 0.0f);
-                GXLoadTexMtxImm(mtx2, *tbl2, GX_MTX2x4);
-                GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, *tbl2, GX_FALSE, GX_PTIDENTITY);
+                GXLoadTexMtxImm(mtx2, texmtx_tbl[i2], GX_MTX2x4);
+                GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i2], GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage2, GX_TEV_KCSEL_1_4);
                 GXSetTevKAlphaSel((GXTevStageID)stage2, GX_TEV_KASEL_1_4);
                 GXSetTevOrder((GXTevStageID)stage2, (GXTexCoordID)coord2, GX_TEXMAP0, GX_COLOR_NULL);
@@ -577,8 +577,8 @@ void envGlare(EnvironmentGlare* glare) {
     s32 temp_r31;
     s32 temp_r30_2;
 
-    s32 temp_r20_2;
-    s32 temp_r21_2;
+
+
     s32 temp_r29;
     s32 var_r22;
     u32 var_r22_2;
@@ -601,10 +601,10 @@ void envGlare(EnvironmentGlare* glare) {
     temp_r30 = &var_r4->filter;
     temp_r27 = var_r4->filter.y0;
     temp_r26 = var_r4->filter.x0;
-    temp_r0 = (u16)(var_r4->filter.y1 - temp_r27);
     temp_r8 = (u16)(var_r4->filter.x1 - temp_r26);
-    temp_r20 = ((u32)temp_r0 & 0xFFFF) / 2;
-    temp_r21 = ((u32)temp_r8 & 0xFFFF) / 2;
+    temp_r0 = (u16)(var_r4->filter.y1 - temp_r27);
+    temp_r20 = temp_r0 >> 1;
+    temp_r21 = temp_r8 >> 1;
     size = GXGetTexBufferSize((u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_FALSE, 0);
     temp_r19 = smartAlloc(size, 3)->address;
     GXSetTexCopySrc(temp_r26, temp_r27, temp_r8, temp_r0);
@@ -616,17 +616,17 @@ void envGlare(EnvironmentGlare* glare) {
     GXLoadTexObj(&sp8, GX_TEXMAP0);
     temp_r29 = glare->count;
     var_r28 = 0;
-    temp_r20_2 = glare->unkC;
-    temp_r21_2 = glare->unk10;
+    temp_r20 = glare->unkC;
+    temp_r21 = glare->unk10;
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_KONST, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    GXSetTevKColorSel(GX_TEVSTAGE0, temp_r20_2);
+    GXSetTevKColorSel(GX_TEVSTAGE0, temp_r20);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_KONST, GX_CC_ZERO);
-    GXSetTevKColorSel(GX_TEVSTAGE1, temp_r21_2);
+    GXSetTevKColorSel(GX_TEVSTAGE1, temp_r21);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     i = 0;
@@ -636,12 +636,12 @@ void envGlare(EnvironmentGlare* glare) {
         GXSetTevOrder(var_r23, i + 1, 0, 0xFF);
         GXSetTevColorOp(var_r23, 1, 0, 0, 1, 2);
         GXSetTevColorIn(var_r23, 0xE, 0xF, 0xF, 8);
-        GXSetTevKColorSel(var_r23, temp_r20_2);
+        GXSetTevKColorSel(var_r23, temp_r20);
         GXSetTevSwapMode(var_r23, 0, 0);
         GXSetTevOrder(var_r22, 0xFF, 0xFF, 0xFF);
         GXSetTevColorOp(var_r22, 0, 0, 0, 1, 0);
         GXSetTevColorIn(var_r22, 0xF, 4, 0xE, 0);
-        GXSetTevKColorSel(var_r22, temp_r21_2);
+        GXSetTevKColorSel(var_r22, temp_r21);
         GXSetTevSwapMode(var_r22, 0, 0);
         var_r22 += 2;
         var_r23 += 2;
@@ -1154,7 +1154,7 @@ double tan(double);
 
 void envSetWater(MapTevCallbackInfo* info) {
     s32 stage, map, coord, ind;
-    s32 x0, y0, x1, y1;
+    s32 y1, x1, y0, x0;
     s32 w, h;
     s32 hw, hh;
     s32 i, j;
@@ -1243,8 +1243,8 @@ void envSetWater(MapTevCallbackInfo* info) {
     buf2 = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 3)->address;
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
-            f32 s = sin((f32)gp->retraceCount / 10.0f + 18.849556f * j * 0.015625f);
-            u8* p = &buf2[(i / 4) * 32 + (j / 4) * 512 + ((i % 4) + (j % 4) * 4) * 2];
+            f32 s = sin((f32)gp->retraceCount / 10.0f + (18.849556f * j) / 64.0f);
+            u8* p = buf2 + ((i / 4) * 32 + (j / 4) * 512) + ((i % 4) + (j % 4) * 4) * 2;
             p[0] = 0.6f + (scale * s + 128.0f);
             p[1] = 0x80;
         }
@@ -1303,14 +1303,13 @@ void envSetYami(MapTevCallbackInfo* info) {
     u32 rc;
 
     wp = envGetWork();
-    rc = gp->retraceCount;
     stage = info->tevStage;
     map = info->texCoord;
     coord = info->texMap;
     unk18 = info->field_0x18;
 
 
-    if (v_count != rc) {
+    if (v_count != (rc = gp->retraceCount)) {
         u1 += 0.004f;
         u2 -= 0.004f;
         v_count = rc;
@@ -1355,12 +1354,15 @@ void envSetYami(MapTevCallbackInfo* info) {
     GXSetTevOrder(stage + 2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(stage + 2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(stage + 2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(stage + 2, GX_CC_C1, GX_CC_ZERO, GX_CC_APREV, GX_CC_ZERO);
-    GXSetTevAlphaIn(stage + 2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+    GXSetTevColorIn(stage + 2, GX_CC_C0, GX_CC_ZERO, GX_CC_APREV, GX_CC_ZERO);
+    GXSetTevAlphaIn(stage + 2, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
     GXSetTevSwapMode(stage + 2, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    info->tevStage = stage + 3;
-    info->texMap = coord + 2;
+    stage += 3;
+    coord += 2;
+    map += 2;
+    info->tevStage = stage;
+    info->texMap = coord;
     info->field_0x18 = unk18;
-    info->texCoord = map + 2;
+    info->texCoord = map;
 }

@@ -208,9 +208,9 @@ s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4,
     }
 
     if (f1 == 0 && f2 == 0) {
-        if (__fabs(dy1) < __fabs(dx1)) {
+        if (__fabs(dx1) > __fabs(dy1)) {
             a1 = dy1 / dx1;
-            if (__fabs(dy2) < __fabs(dx2)) {
+            if (__fabs(dx2) > __fabs(dy2)) {
                 a2 = dy2 / dx2;
                 if (a1 - a2 != 0.0f) {
                     d = a1 - a2;
@@ -231,7 +231,7 @@ s32 scissor_intersection(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4,
             }
         } else {
             a1 = dx1 / dy1;
-            if (__fabs(dy2) < __fabs(dx2)) {
+            if (__fabs(dx2) > __fabs(dy2)) {
                 a2 = dy2 / dx2;
                 if (a1 * a2 != 1.0f) {
                     d = 1.0f - a1 * a2;
@@ -409,12 +409,15 @@ s32 scissor_intersection4(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4
 s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     f32 xs[512];
     f32 ys[512];
+    Pt* cur;
+    Pt* next;
     f32 ox, oy, tx, ty;
-    s32 cnt, i, j, k, found;
     Pt* last;
+    s32 i, j, k, found;
+    s32 cnt;
     f32 mid;
-    for (i = 0; i < n; i++) {
-        if (scissor_intersection2(a->x, a->y, b->x, b->y, pts[i].x, pts[i].y, pts[(i + 1) % n].x, pts[(i + 1) % n].y, &ox, &oy)) {
+    for (k = 0; k < n; k++) {
+        if (scissor_intersection2(a->x, a->y, b->x, b->y, pts[k].x, pts[k].y, pts[(k + 1) % n].x, pts[(k + 1) % n].y, &ox, &oy)) {
             return 0;
         }
     }
@@ -423,8 +426,8 @@ s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
     last = &pts[n - 1];
     cnt = 1;
     for (i = 0; i < n; i++) {
-        Pt* cur = &pts[i];
-        Pt* next = &pts[(i + 1) % n];
+        cur = &pts[i];
+        next = &pts[(i + 1) % n];
         if (scissor_intersection4(1.0f + a->x, a->y, 1.0f + b->x, b->y, cur->x, cur->y, next->x, next->y, &ox, &oy)) {
             found = 0;
             if (cur->x == ox && cur->y == oy) {
@@ -481,12 +484,12 @@ s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n) {
         for (i = 0; i < cnt; i++) {
             for (j = i + 1; j < cnt + 1; j++) {
                 if (ys[i] > ys[j]) {
-                    f32 t0 = ys[i];
-                    f32 t1 = xs[i];
-                    ys[i] = ys[j];
+                    f32 t0 = xs[i];
+                    f32 t1 = ys[i];
                     xs[i] = xs[j];
-                    ys[j] = t0;
-                    xs[j] = t1;
+                    ys[i] = ys[j];
+                    xs[j] = t0;
+                    ys[j] = t1;
                 }
             }
         }
@@ -514,6 +517,7 @@ s32 scissor_cross(Pt* a, Pt* b, Pt* pts, s32 n);
 void tess(Pt* pts, s32 n) {
     ScissorWork* w = GetScissorPtr();
     s32 i, j, k;
+    s32 n1, n2;
     Pt* a;
     Pt* b;
     if (n == 3) {
@@ -529,8 +533,7 @@ void tess(Pt* pts, s32 n) {
     for (i = 0; i < n; i++) {
         for (j = 2; j < n - 1; j++) {
             if (scissor_cross(&pts[i], &pts[(i + j) % n], pts, n) == 1) {
-                s32 n1 = j + 1;
-                s32 n2;
+                n1 = j + 1;
                 a = BattleAlloc(n1 * 8);
                 for (k = 0; k < n1; k++) {
                     a[k] = pts[(i + k) % n];
@@ -878,11 +881,8 @@ s32 scissor_control(EventEntry* evt, BOOL first) {
             p = &buf[i];
             if (scissor_intersection(p[0].x, p[0].y, p[1].x, p[1].y, buf[w->count - 2].x, buf[w->count - 2].y,
                                      buf[w->count - 1].x, buf[w->count - 1].y, &ox, &oy)) {
-                f32 nx = ox;
-                buf[w->count - 1].x = nx;
-                p->x = nx;
-                buf[w->count - 1].y = oy;
-                p->y = oy;
+                p->x = buf[w->count - 1].x = ox;
+                p->y = buf[w->count - 1].y = oy;
                 for (k = 0; k < i; k++) {
                     buf[k] = *p;
                 }
@@ -907,13 +907,14 @@ void BattleAudienceSoundSetVol(s32 kind, s32 vol, s32 frames);
 #include "battle/battle_audience.h"
 
 s32 scissor_damage(EventEntry* evt, BOOL first) {
-    s32* args;
-    s32 n, ok, aud;
-    ScissorWork* w;
-    BattleUnit* unit;
     BattleWork* wp;
     BattleUnit* mario;
+    BattleUnit* unit;
+    ScissorWork* w;
+    s32 aud;
     s32 i, hit;
+    s32* args;
+    s32 n, ok;
     args = evt->args;
     wp = _battleWorkPointer;
     mario = BattleGetMarioPtr(wp);
@@ -1005,9 +1006,9 @@ void scissor_damage_sub(BattleUnit* unit, s32* out) {
     hh = 0.5f * -h;
     hw = 0.5f * w;
     for (i = 0; i < 10; i++) {
-        f32 fx = ((f32)i * w) / 9.0f;
+        f32 fx;
         for (j = 0; j < 10; j++) {
-            p.x = pos.x - hw + fx;
+            p.x = pos.x - hw + ((f32)i * w) / 9.0f;
             p.y = sign * (hh + ((f32)j * h) / 9.0f) + pos.y;
             p.z = pos.z;
             btlGetScreenPoint(&p, &p);
@@ -1033,15 +1034,17 @@ void scissor_damage_sub(BattleUnit* unit, s32* out) {
 s32 scissor_damage_sub2(Vec pt) {
     ScissorWork* w = GetScissorPtr();
     s32 n = w->unk_14;
-    f32 px = pt.x;
-    f32 py = pt.y;
+    f32 y0, x0;
+    f32* q;
     f32 c[3];
     s32 i, j;
     for (i = 0; i < n; i++) {
         f32* t = (f32*)((u8*)w->buf118 + i * 0x18);
         for (j = 0; j < 3; j++) {
             s32 k = (j + 1) % 3;
-            c[j] = (px - t[j]) * (t[3 + k] - t[3 + j]) - (py - t[3 + j]) * (t[k] - t[j]);
+            q = t + j; y0 = q[3];
+            x0 = q[0];
+            c[j] = (pt.x - x0) * (t[3 + k] - y0) - (pt.y - y0) * (t[k] - x0);
         }
         if ((c[0] > 0.0f && c[1] > 0.0f && c[2] > 0.0f) || (c[0] < 0.0f && c[1] < 0.0f && c[2] < 0.0f)) {
             return 1;
@@ -1119,7 +1122,7 @@ void scissor_disp_region(CameraId camera, void* param) {
     ScissorWork* w = GetScissorPtr();
     GXTexObj texObj;
     Mtx mtx;
-    u16 bottom, right, top, left;
+    u16 left, top, right, bottom;
     s32 i;
     f32* t;
     sysWaitDrawSync();

@@ -123,10 +123,10 @@ void marioHitCheckWidth(void) {
     f32 v;
     if (!(w->flags & 0x100000)) {
         f32 lim = !(w->flags & 0x1000000) ? MF(w, 0x1b4, f32) : 18.0f;
-        f32 c = MF(w, 0x1bc, f32);
-        f32 s = c + 1.0f;
+        f32 s = MF(w, 0x1bc, f32) + 1.0f;
         MF(w, 0x1bc, f32) = s;
         if (s > lim) {
+            MF(w, 0x1bc, f32) = lim;
         }
     } else {
         v = MF(w, 0x1bc, f32);
@@ -394,14 +394,10 @@ void marioSearchUnder(void) {
     pos = w->position;
     pos.y = pos.y + h;
     {
-    Vec dir = {0.0f, 0.0f, 0.0f};
+    Vec dir = {0.0f, -1.0f, 0.0f};
     hit = marioHitCheckVecInl(&pos, &dir, &outPos, &outNrm, &d);
     }
-    if (hit) {
-        MF(w, 0x1c0, f32) = outPos.y;
-    } else {
-        MF(w, 0x1c0, f32) = -3000.0f;
-    }
+    MF(w, 0x1c0, f32) = hit ? outPos.y : -3000.0f;
 }
 
 HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
@@ -418,11 +414,7 @@ HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
     Vec dir = {0.0f, -1.0f, 0.0f};
     hit = marioHitCheckVecInl(&pos2, &dir, &outPos, &outNrm, &d);
     }
-    if (hit) {
-        *out = outPos.y;
-    } else {
-        *out = -1.0f;
-    }
+    *out = hit ? outPos.y : -1.0f;
     return hit;
 }
 
@@ -1122,6 +1114,7 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
 }
 
 HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
+    Vec dir;
     Vec outPos;
     Vec outNrm;
     f32 dist;
@@ -1157,7 +1150,7 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     x0 = w->position.x;
     z0 = w->position.z;
     {
-    Vec dir = {0.0f, -1.0f, 0.0f};
+    dir = (Vec){0.0f, -1.0f, 0.0f};
     for (i = 0; i < 5; i++) {
         if (i == 0) {
             z = x = 0.0f;
@@ -1339,8 +1332,7 @@ f32 marioChkOverheadJabara(HitEntry** hitOut, f32* distOut) {
         h += 5.0f;
         MF(w, 0x1f4, HitEntry*) = marioSearchHead_jabara(&pos, &h, hitOut, 0.0f);
         if (!MF(w, 0x1f4, HitEntry*)) {
-            h = MF(w, 0x1b8, f32);
-            h += 5.0f;
+            { f32 t = MF(w, 0x1b8, f32); h = t + 5.0f; }
             MF(w, 0x1f4, HitEntry*) = marioSearchHead(&pos, &h, 0.0f);
         }
     }
@@ -1382,9 +1374,11 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
         ang = toMovedir(MF(w, 0x1a8, f32));
     }
     a = (3.1415927f * ang) / 180.0f;
-    sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * (f32)sin(a));
-    sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -(f32)cos(a));
+    sx = sin(a);
+    sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * sx);
+    sz = cos(a);
     a = *h;
+    sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -sz);
     dd = a + dd;
     hh = 0.5f * a;
     *h = -1.0f;
@@ -1452,11 +1446,16 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     return NULL;
 }
 
+inline f32 marioSearchHead_roll_cos(f32 a) {
+    return (f32)cos(a);
+}
+
 HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
     Vec outPos, outNrm;
     f32 x, z;
     f32 dist;
     f32 base, top;
+    Vec* pdir;
     f32 a;
     s32 i;
     HitEntry* hit;
@@ -1473,25 +1472,25 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
         case 1:
             a = (3.1415927f * (90.0f + MF(w, 0x1a0, f32))) / 180.0f;
             x = 9.0f * (f32)sin(a);
-            z = 9.0f * -(f32)cos(a);
+            z = 9.0f * -marioSearchHead_roll_cos(a);
             movePos(&x, &z, 3.0f, MF(w, 0x1a0, f32));
             break;
         case 2:
             a = (3.1415927f * (MF(w, 0x1a0, f32) - 90.0f)) / 180.0f;
             x = 9.0f * (f32)sin(a);
-            z = 9.0f * -(f32)cos(a);
+            z = 9.0f * -marioSearchHead_roll_cos(a);
             movePos(&x, &z, 3.0f, MF(w, 0x1a0, f32));
             break;
         case 3:
             a = (3.1415927f * (90.0f + MF(w, 0x1a0, f32))) / 180.0f;
             x = 9.0f * (f32)sin(a);
-            z = 9.0f * -(f32)cos(a);
+            z = 9.0f * -marioSearchHead_roll_cos(a);
             movePos(&x, &z, 3.0f, 180.0f + MF(w, 0x1a0, f32));
             break;
         case 4:
             a = (3.1415927f * (MF(w, 0x1a0, f32) - 90.0f)) / 180.0f;
             x = 9.0f * (f32)sin(a);
-            z = 9.0f * -(f32)cos(a);
+            z = 9.0f * -marioSearchHead_roll_cos(a);
             movePos(&x, &z, 3.0f, 180.0f + MF(w, 0x1a0, f32));
             break;
         }
@@ -1499,10 +1498,11 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
             Vec v = {0.0f, 0.0f, 0.0f};
             Vec dir = {0.0f, 1.0f, 0.0f};
             v.x = pos->x + x;
+            pdir = &dir;
             v.y = 1.0f + pos->y;
             v.z = pos->z + z;
             dist = top;
-            hit = marioHitCheckVecInl(&v, &dir, &outPos, &outNrm, &dist);
+            hit = marioHitCheckVecInl(&v, pdir, &outPos, &outNrm, &dist);
         }
         if (hit) {
             if (pos->y + base >= outPos.y) {
@@ -1524,11 +1524,11 @@ HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
 }
 
 HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
-    Vec v, outPos, outNrm;
+    Vec v, dir, outPos, outNrm;
     f32 dist;
     f32 base, top, off;
-    s32 i;
     HitEntry* hit;
+    s32 i;
     MarioWork* w = marioGetPtr();
     *out = NULL;
     i = 0;
@@ -1537,7 +1537,7 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
     *h = -1.0f;
     top = base + d;
     {
-    Vec dir = {0.0f, 0.0f, 0.0f};
+    dir = (Vec){0.0f, 0.0f, 0.0f};
     for (; i < 8; i++, off += 5.8f) {
         dist = top;
         v.x = pos->x + off * (f32)sin((3.1415927f * MF(w, 0x198, f32)) / 180.0f);
@@ -1549,11 +1549,7 @@ HitEntry* marioSearchHead_jabara(Vec* pos, f32* h, HitEntry** out, f32 d) {
                 if (pos->y + base >= outPos.y) {
                     pos->y = outPos.y;
                     *h = 0.0f;
-                    if (v.z - pos->z < 0.0f) {
-                        *out = (HitEntry*)-1;
-                    } else {
-                        *out = (HitEntry*)1;
-                    }
+                    *out = (v.z - pos->z < 0.0f) ? (HitEntry*)-1 : (HitEntry*)1;
                     return hit;
                 }
                 *h = outPos.y - pos->y - base;
@@ -1619,7 +1615,7 @@ void marioCheckWall(f32 dx, f32 dz) {
             MF(w, 0x1f0, HitEntry*) = hit;
             if (++MF(w, 0x3f, s8) >= 20) {
                 MF(w, 0x3f, s8) = 20;
-                if (marioChkBeroSub(hitGetAttr(hit))) {
+                if (marioChkBeroSub4(hitGetAttr(hit))) {
                     MF(w, 0x1ec, HitEntry*) = hit;
                 }
             }
@@ -1629,7 +1625,7 @@ void marioCheckWall(f32 dx, f32 dz) {
         w->position = pos;
     }
     marioChkWallAround(&w->position, NULL, dx, dz, MF(w, 0x1bc, f32), MF(w, 0x1b8, f32));
-    dou10_yoko_yari(&MF(w, 0x210, f32));
+    dou10_yoko_yari((f32*)((u32)w + 0x210));
 }
 
 void marioSearchFrontWall_staying(f32 dz) {
@@ -1744,6 +1740,7 @@ void marioCheckWall_roll(f32 dx, f32 dz) {
         if (marioChkBeroInl(hit)) {
             if (dx) {
                 MF(w, 0x1ec, HitEntry*) = hit;
+                do { } while (0);
                 MF(w, 0x1f0, HitEntry*) = hit;
             }
             movePos(&w->position.x, &w->position.z, dx, dz);
@@ -1752,7 +1749,7 @@ void marioCheckWall_roll(f32 dx, f32 dz) {
             MF(w, 0x1f0, HitEntry*) = hit;
             if (++MF(w, 0x3f, s8) >= 20) {
                 MF(w, 0x3f, s8) = 20;
-                if (marioChkBeroSub4(hitGetAttr(hit))) {
+                if (!(hitGetAttr(hit) & 0x80) ? 1 : marioGetPtr()->currMotionId == 0x19) {
                     MF(w, 0x1ec, HitEntry*) = hit;
                 }
             }
@@ -2122,10 +2119,10 @@ HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
         r = 0.265f * MF(w, 0x1b4, f32);
     }
     a = (3.1415927f * a) / 180.0f;
-    s = (f32)sin(a);
-    a = (f32)cos(a);
+    {f32 c; s = (f32)sin(a);
+    c = (f32)cos(a);
     s = r * s;
-    a = r * -a;
+    a = r * -c;}
     y0 = MF(w, 0x90, f32);
     x0 = MF(w, 0x8c, f32);
     z0 = MF(w, 0x94, f32);
@@ -2315,7 +2312,7 @@ BOOL marioSlitChkWallAround(void) {
             flags[i] = 1;
         }
     }
-    pos.y = w->position.y + 5.0f;
+    { f32 k = 5.0f; pos.y = w->position.y + k; }
     for (i = 0, a = 0.0f; i < 8; i++, a += 45.0f) {
         if (flags[i] != 1) {
             Vec dir;
@@ -2403,10 +2400,12 @@ void marioCheckWallShip(f32 dx, f32 dz) {
             MF(w, 0x210, f32) = h;
             MF(w, 0x1f0, HitEntry*) = hit;
             if (++MF(w, 0x3f, s8) >= 20) {
+                s32 attr;
+                BOOL r;
                 MF(w, 0x3f, s8) = 20;
-                if (marioChkBeroSub4(hitGetAttr(hit))) {
-                    MF(w, 0x1ec, HitEntry*) = hit;
-                }
+                attr = hitGetAttr(hit);
+                r = !(attr & 0x80) ? TRUE : marioGetPtr()->currMotionId == 0x19;
+                if (r) MF(w, 0x1ec, HitEntry*) = hit;
             }
         }
         w->position = pos;

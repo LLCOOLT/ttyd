@@ -154,7 +154,7 @@ void mot_jumpSw(void) {
 	void* mobj;
 	f32 dir;
 	f32 x, z;
-	f32 c, s;
+	f32 s, c;
 	if (mario->trigFlags & 1) {
 		mario->trigFlags &= ~1;
 		marioResetCamFollowRate();
@@ -170,13 +170,13 @@ void mot_jumpSw(void) {
 				{
 				Vec v;
 				Vec t = {0.0f, 0.0f, 0.0f};
-				Vec out;
+				f32 out;
 				t.x = MO(mobj, 0x38);
 				t.y = 0.5f * MF(0x1B8) + MO(mobj, 0x3C);
 				t.z = MO(mobj, 0x40);
 				v = t;
-				if (marioChkFront(&out, &v, MF(0x1A0), 5.0f * MF(0x1B4)) != NULL && out.x >= 0.0f &&
-				    out.x <= 0.5f * MF(0x1B4) + 30.0f) {
+				if (marioChkFront((Vec*)&out, &v, MF(0x1A0), 5.0f * MF(0x1B4)) != NULL && out >= 0.0f &&
+				    out <= 0.5f * MF(0x1B4) + 30.0f) {
 					MF(0x19C) = MF(0x1A0) = revise360(180.0f + MF(0x1A0));
 				}
 				}
@@ -229,10 +229,10 @@ void mot_jumpSw(void) {
 
 void mot_jumpNpc(void) {
 	MarioWork* mario = marioGetPtr();
+	f32 s, c;
 	void* mobj;
 	f32 dir;
 	f32 x, z;
-	f32 c, s;
 	if (mario->characterId == 2) {
 		kpa_jumpNpc();
 		return;
@@ -274,11 +274,12 @@ void mot_jumpNpc(void) {
 				    out.x <= 0.5f * MF(0x1B4) + 30.0f) {
 					MF(0x19C) = MF(0x1A0) = revise360(180.0f + MF(0x1A0));
 				}
-				}
-				{
-				sincosf(&s, &c, MF(0x1A0));
-				x = 30.0f * s + MO(mobj, 0x38);
-				z = 30.0f * c + MO(mobj, 0x40);
+				
+				
+				
+				sincosf(&out.z, &out.y, MF(0x1A0));
+				x = 30.0f * out.z + MO(mobj, 0x38);
+				z = 30.0f * out.y + MO(mobj, 0x40);
 				MI(0x48) = 20;
 				MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
 				}

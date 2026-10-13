@@ -2,8 +2,11 @@
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
 #include "memory.h"
+#include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+
+double sin(double);
 
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
@@ -11,55 +14,56 @@ typedef struct effN64Vtx {
     u8 r, g, b, a; // 0xA
 } effN64Vtx;
 
+void effGetTexObjN64(u32 id, GXTexObj* obj);
 void effSetVtxDescN64(effN64Vtx* vtx);
 void tri2();
-double sin(double);
-void sysWaitDrawSync(void);
 
-typedef struct EffOpukuJetwrainN64Work {
-    s32 type;        // 0x0
-    Vec position;    // 0x4
-    s32 lifetime;    // 0x10
-    s32 frame;       // 0x14
-    f32 scale;       // 0x18
-    u8 color[3];     // 0x1C
-    u8 alpha;        // 0x1F
-    u8 color2[3];    // 0x20
-    s8 grid[19][13]; // 0x23
-    s16 vel[19][13]; // 0x11A
-} EffOpukuJetwrainN64Work;
+typedef struct EffOpukuJetwrainWork {
+    s32 type;      // 0x0
+    Vec position;  // 0x4
+    s32 lifetime;  // 0x10
+    s32 frame;     // 0x14
+    f32 scale;     // 0x18
+    u8 col[3];     // 0x1C
+    u8 alpha;      // 0x1F
+    u8 col2[3];    // 0x20
+    s8 h[19][13];  // 0x23
+    s16 v[19][13]; // 0x11A
+} EffOpukuJetwrainWork;
 
-effN64Vtx opuku_jetwrain_vtx[] = {
+
+static effN64Vtx opuku_jetwrain_vtx[16] = {
     {-160, -120, -320, 0, 0, 0, 0, 0, 255},
-    {-144, -120, -320, 512, 0, 0, 0, 0, 255},
-    {-160, -104, -320, 0, 512, 0, 0, 0, 255},
-    {-144, -104, -320, 512, 512, 0, 0, 0, 255},
+    {-144, -120, -320, 0x200, 0, 0, 0, 0, 255},
+    {-160, -104, -320, 0, 0x200, 0, 0, 0, 255},
+    {-144, -104, -320, 0x200, 0x200, 0, 0, 0, 255},
     {-160, -120, -320, 0, 0, 0, 0, 0, 255},
-    {-144, -120, -320, 640, 0, 0, 0, 0, 255},
-    {-160, -104, -320, 0, 512, 0, 0, 0, 255},
-    {-144, -104, -320, 640, 512, 0, 0, 0, 255},
+    {-144, -120, -320, 0x280, 0, 0, 0, 0, 255},
+    {-160, -104, -320, 0, 0x200, 0, 0, 0, 255},
+    {-144, -104, -320, 0x280, 0x200, 0, 0, 0, 255},
     {-160, -120, -320, 0, 0, 0, 0, 0, 255},
-    {-144, -120, -320, 512, 0, 0, 0, 0, 255},
-    {-160, -104, -320, 0, 640, 0, 0, 0, 255},
-    {-144, -104, -320, 512, 640, 0, 0, 0, 255},
+    {-144, -120, -320, 0x200, 0, 0, 0, 0, 255},
+    {-160, -104, -320, 0, 0x280, 0, 0, 0, 255},
+    {-144, -104, -320, 0x200, 0x280, 0, 0, 0, 255},
     {-160, -120, -320, 0, 0, 0, 0, 0, 255},
-    {-144, -120, -320, 640, 0, 0, 0, 0, 255},
-    {-160, -104, -320, 0, 640, 0, 0, 0, 255},
-    {-144, -104, -320, 640, 640, 0, 0, 0, 255},
+    {-144, -120, -320, 0x280, 0, 0, 0, 0, 255},
+    {-160, -104, -320, 0, 0x280, 0, 0, 0, 255},
+    {-144, -104, -320, 0x280, 0x280, 0, 0, 0, 255},
 };
 
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
 void effOpukuJetwrainMain(EffectEntry* effect);
 
-EffectEntry* effOpukuJetwrainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
+EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime) {
     EffectEntry* effect;
-    EffOpukuJetwrainN64Work* work;
-    s32 i, j;
+    EffOpukuJetwrainWork* work;
+    s32 i;
+    s32 j;
 
     effect = effEntry();
-    effect->type = "OpukuJetwrainN64\0\0\0";
+    effect->type = "OpukuJetwrainN64";
     effect->count = 1;
-    work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwrainN64Work));
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwrainWork));
     effect->userdata = work;
     effect->callback = effOpukuJetwrainMain;
     effect->flags |= 2;
@@ -75,31 +79,31 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work->position.y = y;
     work->position.z = z;
     work->scale = scale;
-    work->color[0] = 10;
-    work->color[1] = 110;
-    work->color[2] = 255;
-    work->color2[0] = 190;
-    work->color2[1] = 220;
-    work->color2[2] = 255;
+    work->col[0] = 10;
+    work->col[1] = 110;
+    work->col[2] = 255;
+    work->col2[0] = 190;
+    work->col2[1] = 220;
+    work->col2[2] = 255;
     for (i = 0; i < 19; i++) {
         for (j = 0; j < 13; j++) {
-            work->grid[i][j] = 0;
-            work->vel[i][j] = 0;
+            work->h[i][j] = 0;
+            work->v[i][j] = 0;
         }
     }
     return effect;
 }
 
 void effOpukuJetwrainMain(EffectEntry* effect) {
-    s32 lifetime;
-    EffOpukuJetwrainN64Work* work = effect->userdata;
+    EffOpukuJetwrainWork* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
-    s32 i, j;
+    s32 i;
+    s32 j;
+    s32 life;
     s32 frame;
     s32 alpha;
-    f32 fa;
-    f32 g4, cs, sd;
+    f32 a;
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -113,63 +117,65 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
         work->lifetime--;
     }
     work->frame++;
-    lifetime = work->lifetime;
-    if (lifetime < 0) {
+    life = work->lifetime;
+    if (life < 0) {
         effDelete(effect);
         return;
     }
     frame = work->frame;
     alpha = 255;
-    if (lifetime < 32) {
-        alpha = lifetime * 8;
+    if (life < 32) {
+        alpha = life * 8;
     }
     if (frame < 16) {
         alpha = frame * 16 + 15;
     }
     work->alpha = alpha;
-    fa = (f32)alpha / 255.0f;
+    a = (f32)alpha / 255.0f;
     for (i = 1; i < 18; i++) {
-        f32 s = (f32)sin(6.2831855f * (f32)((i - frame) * -20) / 360.0f);
-        work->grid[i][6] = (s8)(fa * (-64.0f * s));
+        work->h[i][6] = a * (-64.0f * (f32)sin(6.2831855f * (f32)((frame - i) * -20) / 360.0f));
     }
     for (i = 1; i < 18; i++) {
         for (j = 1; j < 12; j++) {
-            g4 = 4.0f * (f32)work->grid[i][j];
-            cs = (f32)work->grid[i+1][j+1] + (f32)work->grid[i-1][j+1] + (f32)work->grid[i+1][j-1] + (f32)work->grid[i-1][j-1];
-            sd = (f32)work->grid[i+1][j] + (f32)work->grid[i-1][j] + (f32)work->grid[i][j+1] + (f32)work->grid[i][j-1];
-            cs *= 0.5f;
-            work->vel[i][j] = (s16)((f32)work->vel[i][j] + (cs + (sd - g4) - 0.7f * g4));
-            work->vel[i][j] = (s16)((f32)work->vel[i][j] * 0.98f);
-            if (lifetime < 32) {
-                work->grid[i][j] = (s8)((f32)work->grid[i][j] * fa);
+            f32 c4 = 4.0f * (f32)work->h[i][j];
+            f32 corners = (f32)work->h[i - 1][j - 1] + ((f32)work->h[i + 1][j - 1] + ((f32)work->h[i + 1][j + 1] + (f32)work->h[i - 1][j + 1]));
+            f32 edges = (f32)work->h[i][j - 1] + ((f32)work->h[i][j + 1] + ((f32)work->h[i + 1][j] + (f32)work->h[i - 1][j]));
+            work->v[i][j] = (f32)work->v[i][j] + ((0.5f * corners + (edges - c4)) - 0.7f * c4);
+            work->v[i][j] = work->v[i][j] * 0.98f;
+            if (life < 32) {
+                work->h[i][j] = work->h[i][j] * a;
             }
         }
     }
     for (i = 1; i < 18; i++) {
         for (j = 1; j < 12; j++) {
-            work->grid[i][j] = (s8)((f32)work->grid[i][j] + 0.02f * (f32)work->vel[i][j]);
+            work->h[i][j] = 0.02f * work->v[i][j] + work->h[i][j];
         }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwrainDisp, effect);
 }
 
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
-    Mtx trans;
-    Mtx scale;
+    EffOpukuJetwrainWork* work;
+    s32 alpha;
+    f32 proj[7];
     Mtx44 ortho;
     Mtx view;
+    Mtx texMtx;
+    Mtx trans;
     GXTexObj texObj;
-    f32 proj[7];
-    EffOpukuJetwrainN64Work* work;
-    s32 alpha;
-    s32 row, col;
-    u8* buf;
+    void* buf;
+    s32 i, j;
+    s32 x0, x1, y0, y1;
+    s32 edgeX, edgeY;
+    s32 k;
+    s32 px;
 
     camGetPtr(cameraId);
     work = effect->userdata;
     alpha = work->alpha;
     GXGetProjectionv(proj);
-    MTXOrtho(ortho, 0.0f, 480.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
+    C_MTXOrtho(ortho, 0.0f, 480.0f, 0.0f, 608.0f, 1.0f, 32768.0f);
     GXSetProjection(ortho, GX_ORTHOGRAPHIC);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
     buf = smartAlloc(GXGetTexBufferSize(304, 240, GX_TF_RGB565, GX_FALSE, 0), 3)->address;
@@ -188,7 +194,7 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_A0, GX_CC_TEXC);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_RASA);
-    GXSetTevColor(GX_TEVREG0, (GXColor){work->color[0], work->color[1], work->color[2], alpha >> 1});
+    GXSetTevColor(GX_TEVREG0, (GXColor){work->col[0], work->col[1], work->col[2], alpha >> 1});
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetCullMode(GX_CULL_NONE);
@@ -196,70 +202,65 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     {
         Vec up = {0.0f, 1.0f, 0.0f};
         Vec target = {304.0f, 240.0f, 0.0f};
-        Vec pos = {304.0f, 240.0f, 100.0f};
-        MTXLookAt(view, &pos, &up, &target);
+        Vec cam = {304.0f, 240.0f, 100.0f};
+        C_MTXLookAt(view, &cam, &up, &target);
     }
-    GXLoadPosMtxImm(view, GX_PNMTX0);
+    GXLoadPosMtxImm(view, 0);
     GXSetCurrentMtx(0);
-    for (row = 0; row < 12; row++) {
-        s32 rflag = 0, yo0, yo1, y0, y1, yb;
-        if (row == 0) {
-            yo0 = -4;
-            rflag = 1;
+    for (i = 0; i < 12; i++) {
+        edgeY = 0;
+        if (i == 0) {
+            y0 = -4;
+            edgeY = 1;
         } else {
-            yo0 = 0;
+            y0 = 0;
         }
-        if (row == 11) {
-            yo1 = 4;
-            rflag = 1;
+        if (i == 11) {
+            y1 = 4;
+            edgeY = 1;
         } else {
-            yo1 = 0;
+            y1 = 0;
         }
-        yb = row * 16 + 24;
-        y0 = yb + yo0;
-        y1 = yb + (yo1 + 16);
-        for (col = 0; col < 18; col++) {
-            s32 cflag = 0, x0, x1, v;
-            s32 xo0, xo1;
-            if (col == 0) {
-                xo0 = -4;
-                cflag = 1;
+        for (j = 0; j < 18; j++) {
+            edgeX = 0;
+            if (j == 0) {
+                x0 = -4;
+                edgeX = 1;
             } else {
-                xo0 = 0;
+                x0 = 0;
             }
-            if (col == 17) {
-                xo1 = 4;
-                cflag = 1;
+            if (j == 17) {
+                x1 = 4;
+                edgeX = 1;
             } else {
-                xo1 = 0;
+                x1 = 0;
             }
-            PSMTXScale(scale, 0.00390625f, 0.00390625f, 1.0f);
-            x0 = col * 16 + 16 + xo0;
-            x1 = col * 16 + 16 + 16 + xo1;
-            PSMTXTrans(trans, (f32)x0, (f32)y0, 0.0f);
-            PSMTXConcat(scale, trans, scale);
-            GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-            if (cflag && rflag) {
-                v = 12;
-            } else if (cflag) {
-                v = 4;
-            } else if (rflag) {
-                v = 8;
+            PSMTXScale(texMtx, 0.00390625f, 0.00390625f, 1.0f);
+            px = j * 16 + 16 + x0;
+            PSMTXTrans(trans, px, i * 16 + 24 + y0, 0.0f);
+            PSMTXConcat(texMtx, trans, texMtx);
+            GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
+            if (edgeX && edgeY) {
+                k = 12;
+            } else if (edgeX) {
+                k = 4;
+            } else if (edgeY) {
+                k = 8;
             } else {
-                v = 0;
+                k = 0;
             }
-            opuku_jetwrain_vtx[v].x = x0 * 4;
-            opuku_jetwrain_vtx[v].y = work->grid[col][row] + y0 * 4;
-            opuku_jetwrain_vtx[v + 1].x = x1 * 4;
-            opuku_jetwrain_vtx[v + 1].y = work->grid[col + 1][row] + y0 * 4;
-            opuku_jetwrain_vtx[v + 2].x = x0 * 4;
-            opuku_jetwrain_vtx[v + 2].y = work->grid[col][row + 1] + y1 * 4;
-            opuku_jetwrain_vtx[v + 3].x = x1 * 4;
-            opuku_jetwrain_vtx[v + 3].y = work->grid[col + 1][row + 1] + y1 * 4;
+            opuku_jetwrain_vtx[k].x = px * 4;
+            opuku_jetwrain_vtx[k].y = work->h[j][i] + (i * 16 + 24 + y0) * 4;
+            opuku_jetwrain_vtx[k + 1].x = (j * 16 + 16 + (x1 + 16)) * 4;
+            opuku_jetwrain_vtx[k + 1].y = work->h[j + 1][i] + (i * 16 + 24 + y0) * 4;
+            opuku_jetwrain_vtx[k + 2].x = px * 4;
+            opuku_jetwrain_vtx[k + 2].y = work->h[j][i + 1] + (i * 16 + 24 + (y1 + 16)) * 4;
+            opuku_jetwrain_vtx[k + 3].x = (j * 16 + 16 + (x1 + 16)) * 4;
+            opuku_jetwrain_vtx[k + 3].y = work->h[j + 1][i + 1] + (i * 16 + 24 + (y1 + 16)) * 4;
             DCFlushRange(opuku_jetwrain_vtx, sizeof(opuku_jetwrain_vtx));
             GXInvalidateVtxCache();
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(v, v + 3, v + 1, 0, v, v + 2, v + 3, 0);
+            tri2(k, k + 3, k + 1, 0, k, k + 2, k + 3, 0);
             sysWaitDrawSync();
         }
     }

@@ -176,9 +176,10 @@ void effBattenMain(EffectEntry* effect) {
 }
 
 void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 alpha;
-    CameraEntry* camera;
     EffBattenWork* work;
+    s32 i;
+    CameraEntry* camera;
+    s32 alpha;
     f32 neg;
     f32 w;
     f32 half;
@@ -217,7 +218,7 @@ void effBattenDisp(CameraId cameraId, EffectEntry* effect) {
     half = 0.5f;
     neg = -w * half;
     pos = 16.0f;
-    for (cameraId = 1, work++; cameraId < effect->count; cameraId++, work++) {
+    for (i = 1, work++; i < effect->count; i++, work++) {
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXScale(scale, work->scale, work->scale, work->scale);
         PSMTXConcat(mtx, scale, scale);

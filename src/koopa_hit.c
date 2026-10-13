@@ -123,7 +123,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     dh = 0.5f * (MF(m, 0x1B8) + h);
     dw = 0.5f * (MF(m, 0x1B4) + w);
     dx = __fabsf(MF(m, 0x8C) - x);
-    dy = __fabsf(0.5f * MF(m, 0x1B8) + MF(m, 0x90) - y - 0.5f * h);
+    dy = __fabsf(MF(m, 0x90) + 0.5f * MF(m, 0x1B8) - y - 0.5f * h);
     if (dy <= dh && dx <= dw) {
         if ((m->flags & 0x20000) && MF(m, 0x90) > y) {
             if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && MS16(m, 0x4C) == 0 && z < 50.0f) {
@@ -150,7 +150,7 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     HitEntry* hit;
     HitEntry* best;
     Vec zero = {0.0f, 0.0f, 0.0f};
-    f32 hx, hy, hz, dist, nx, ny, nz;
+    f32 hx, hy, hz, dist, nx, ny, nz, nv;
     f32 h, deg, rad, ox, oz, ex, ez, fx, fz;
     f32 px, py, pz, r2, r2b, r3, ang;
     s32 n, i;
@@ -241,14 +241,14 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px + ox, py + h, pz + oz, 0.0f, -1.0f, 0.0f);
         if (hit) {
             m2 = marioGetPtr();
-            if (kpa_nrmSet(m2, nz, ny, nx) >= 50.0f) {
+            if (kpa_nrmSet(m2, nz, nv = ny, nx) >= 50.0f) {
                 hit = NULL;
             }
         }
         hy = (s32)(100.0f * hy + 0.5f) / 100.0f;
         if (hit) {
             m2 = marioGetPtr();
-            MF(m, 0x214) = kpa_nrmSet(m2, nz, ny, nx);
+            MF(m, 0x214) = kpa_nrmSet(m2, nz, nv, nx);
             if (hy < py && __fabsf(hy - py) >= 2.0f) {
                 *outDepth = py - hy;
                 *outAng = angleABf(px, pz, hx, hz);
@@ -475,13 +475,15 @@ HitEntry* kpaHitCheck(void) {
     }
     p = head_sphere_data[kpaGetLevel()];
     n = *p++;
-    for (j = 0; j < n; j++, p += 4) {
+    for (j = 0; j < n; j++) {
         sn = (f32)sin(3.1415927f * m->directionView / 180.0f);
         x = MF(m, 0x8C) + p[0] * sn;
         z = MF(m, 0x94) - p[0] * (f32)cos(3.1415927f * m->directionView / 180.0f);
         y = MF(m, 0x90) + p[1];
         r = p[2];
-        switch (p[3]) {
+        i = p[3];
+        p += 4;
+        switch (i) {
         case 1:
             if (!(m->flags & 0x10000)) {
                 continue;
@@ -506,7 +508,7 @@ HitEntry* kpaHitCheck(void) {
             best = hit;
         }
     }
-    KPW->obj = best;
+    (*(KpaHitWork**)((u8*)m + 0x28C))->obj = best;
     return best;
 }
 

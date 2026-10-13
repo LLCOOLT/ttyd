@@ -1170,14 +1170,13 @@ s32 BattleAudience_HaitiRandForFallObject(void) {
 
 //@@ BattleAudience_NoUsedHaitiRand
 s32 BattleAudience_NoUsedHaitiRand(void) {
-	s32 list[200];
-	s32 count;
-	s32 i;
 	s32* haiti;
 	s32 id;
 	s32 j;
 	s32 k;
-
+	s32 count;
+	s32 i;
+	s32 list[200];
 	BattleAudienceBaseGetPtr();
 	haiti = haiti_data[pouchGetPtr()->rank];
 	count = 0;
@@ -1278,7 +1277,7 @@ s32 BattleAudience_GetPPAudienceNum_RL_Sub(s32 offset) {
 	count = 0;
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
-			index = ((i * 20) + offset) + j;
+			index = offset + ((i * 20) + j);
 			if (BattleAudience_GetPPAudienceNum_Sub(index) == TRUE) {
 				count++;
 			}
@@ -1427,12 +1426,12 @@ void BattleAudienceAddTargetNumSub(f32 value) {
 //@@ BattleAudienceAddAudienceNum
 s32 BattleAudienceAddAudienceNum(s32 num) {
 	s32 list[200];
-	s32 total;
-	u8 type;
-	s32 added;
-	AudPhaseEvt* audience;
 	BattleWork* wp;
+	AudPhaseEvt* audience;
 	s32 i, j, r, sum, id, count;
+	u8 type;
+	s32 total;
+	s32 added;
 
 	wp = _battleWorkPointer;
 	audience = (AudPhaseEvt*)BattleAudienceBaseGetPtr();
@@ -1630,7 +1629,7 @@ void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
 
 	BattleAudienceBaseGetPtr();
 	total = b + c;
-	total = a + total;
+	total += a;
 	for (i = 0, member = BattleAudienceGetPtr(0); i < 200; i++, member++) {
 		if (!AUD_U8CALL(BattleAudience_GetWaiting, i)) {
 			continue;
@@ -1940,10 +1939,10 @@ void BattleAudienceSoundWhistle(void) {
 //@@ BattleAudienceSoundWhistleKind
 void BattleAudienceSoundWhistleKind(s32 kind) {
 	Vec pos;
+	s32 id, idx;
 	s32 list[200];
-	s32 count;
 	s32 i;
-	s32 id;
+	s32 count;
 	AudSound* sound;
 
 	count = 0;
@@ -1954,8 +1953,8 @@ void BattleAudienceSoundWhistleKind(s32 kind) {
 		}
 	}
 	if (count != 0) {
-		i = list[irand(count)];
-		BattleAudienceSoundGetInfo2(i, &pos);
+		idx = list[irand(count)];
+		BattleAudienceSoundGetInfo2(idx, &pos);
 		if (pos.x <= 0.0f) {
 			id = 6;
 		}
@@ -1966,13 +1965,13 @@ void BattleAudienceSoundWhistleKind(s32 kind) {
 		BattleAudienceSoundStop(id);
 		switch (kind) {
 			case 1:
-				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE1", i);
+				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE1", idx);
 				break;
 			case 2:
-				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE2", i);
+				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE2", idx);
 				break;
 			case 3:
-				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE3", i);
+				sound->sfxId = BattleAudienceSound2("SFX_AUDIENCE_WHISTLE3", idx);
 				break;
 		}
 		AUD_SOUND_START(sound, -1, 0);
@@ -2002,11 +2001,10 @@ void BattleAudienceSoundCallKind(s32 kind) {
 
 //@@ BattleAudienceSoundHandBeat
 void BattleAudienceSoundHandBeat(void) {
-	AudSound* sound;
 	s32 right;
+	AudSound* sound;
 	s32 left;
 	s32 sum;
-	s32 vol;
 
 	BattleAudienceBaseGetPtr();
 	sound = AudSoundGetPtr(9);
@@ -2018,18 +2016,19 @@ void BattleAudienceSoundHandBeat(void) {
 	if (sound->sfxId != -1) {
 		sound->flags |= 1;
 		sound->duration = -1;
-		vol = 0;
-		sound->mFadeoutTime = 0;
-		sound->mForceFadeLength = 0;
-		sound->mForceFadeTimer = 0;
+		right = 0;
+		sound->mFadeoutTime = right;
+		sound->mForceFadeLength = right;
+		sound->mForceFadeTimer = right;
 		if (sum == 0) {
+			right = 0;
 		}
 		else {
-			vol = 75.0f + sum * (26.0f + irand(26)) / 200.0f;
+			right = 75.0f + sum * (26.0f + irand(26)) / 200.0f;
 		}
-		psndSFX_vol(sound->sfxId, vol);
-		sound->mCurrentBaseSfxVolume = vol;
-		sound->mBaseSfxVolume = vol;
+		psndSFX_vol(sound->sfxId, right);
+		sound->mCurrentBaseSfxVolume = right;
+		sound->mBaseSfxVolume = right;
 		sound->mVolumeMultiplier = 100;
 	}
 }

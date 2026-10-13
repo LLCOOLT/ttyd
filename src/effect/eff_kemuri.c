@@ -77,6 +77,7 @@ u8 heavy_scale[30][2] = {
 
 
 EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
+	effKemuriData* d;
 	effKemuriData* data;
 	s32 numEffects, i;
 	
@@ -109,34 +110,34 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 	data->field_0x44 = 1.0f;
 	data->field_0x48 = 1.0f;
 	data->field_0x74 = 1.0f;
-	for (i = 1; i < entry->count; i++) {
-		data[i].field_0x4 = 0.0f;
-		data[i].field_0x8 = 0.0f;
-		data[i].field_0xC = 0.0f;
+	for (i = 1, d = data + 1; i < entry->count; i++, d++) {
+		d->field_0x4 = 0.0f;
+		d->field_0x8 = 0.0f;
+		d->field_0xC = 0.0f;
 
-		data[i].field_0x44 = 1.0f;
-		data[i].field_0x48 = 1.0f;
-		data[i].field_0x74 = 1.0f;
+		d->field_0x44 = 1.0f;
+		d->field_0x48 = 1.0f;
+		d->field_0x74 = 1.0f;
 
-		data[i].field_0x58 = 0.0f;
-		data[i].field_0x5C = 0.0f;
+		d->field_0x58 = 0.0f;
+		d->field_0x5C = 0.0f;
 
-		data[i].field_0x40 = 0;
-		data[i].field_0x80 = 0;
-		data[i].field_0x84 = 0;
+		d->field_0x40 = 0;
+		d->field_0x80 = 0;
+		d->field_0x84 = 0;
 
 		switch (int2) {
 			case 0:
-				data[i].field_0x4C = i & 1 ? 3.0f : -3.0f;
-				data[i].field_0x88 = 32;
+				d->field_0x4C = i & 1 ? 3.0f : -3.0f;
+				d->field_0x88 = 32;
 				break;
 			case 1:
-				data[i].field_0x4C = 0.0f;
-				data[i].field_0x88 = 32;
+				d->field_0x4C = 0.0f;
+				d->field_0x88 = 32;
 				break;
 			case 2:
-				data[i].field_0x4C = 0.0f;
-				data[i].field_0x88 = 64;
+				d->field_0x4C = 0.0f;
+				d->field_0x88 = 64;
 				break;
 		}
 	}
@@ -147,8 +148,8 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	EffectEntry* entry;
 	effKemuri2Data* data;
-	f32 vx, vz, angle;
-	f32 speed, vy, rv, rot, zz;
+	f32 rot, rv, vy, zz, speed;
+	f32 angle, vz, vx;
 	s32 ia;
 
 	entry = effEntry();
@@ -163,13 +164,13 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	angle = 360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f;
 	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + camGetPtr(4)->viewYaw);
 	ia = (s32)angle;
+	angle = 6.2831855f * ia / 360.0f;
 	zz = 5.0f + z;
 	data->timer = 0;
 	speed = 1.0f;
 	vy = 0.7f;
 	rv = -20.0f;
 	rot = 0.0f;
-	angle = 6.2831855f * ia / 360.0f;
 	data->dirX = sin(angle);
 	data->dirZ = cos(angle);
 	data->x = x;
@@ -208,8 +209,8 @@ void effKemuriMain(EffectEntry* effect) {
 		switch (type) {
 			case 0:
 				if ((u32)data->field_0x40 < 30) {
-					data->field_0x44 = touchdown_scale[data->field_0x40][0] * 0.0078125f;
-					data->field_0x48 = touchdown_scale[data->field_0x40][1] * 0.0078125f;
+					data->field_0x44 = touchdown_scale[data->field_0x40][0] / 128.0f;
+					data->field_0x48 = touchdown_scale[data->field_0x40][1] / 128.0f;
 				}
 				else {
 					data->field_0x44 = 1.5f;
@@ -224,8 +225,8 @@ void effKemuriMain(EffectEntry* effect) {
 				break;
 			case 2:
 				if ((u32)data->field_0x40 < 30) {
-					data->field_0x44 = heavy_scale[data->field_0x40][0] * 0.0078125f;
-					data->field_0x48 = heavy_scale[data->field_0x40][1] * 0.0078125f;
+					data->field_0x44 = heavy_scale[data->field_0x40][0] / 128.0f;
+					data->field_0x48 = heavy_scale[data->field_0x40][1] / 128.0f;
 				}
 				else {
 					data->field_0x44 = 2.0f;
@@ -243,12 +244,13 @@ void effKemuriMain(EffectEntry* effect) {
 }
 
 static void effKemuri2Main(EffectEntry* entry) {
-	effKemuri2Data* data = entry->userdata;
+	effKemuri2Data* data;
+	effKemuri2Data* p;
 	Vec pos2;
 	Vec pos = {0.0f, 0.0f, 0.0f};
 	f32 s;
 	s32 i;
-
+	data = entry->userdata;
 	pos.x = data->x;
 	pos.y = data->y;
 	pos.z = data->z;
@@ -260,15 +262,16 @@ static void effKemuri2Main(EffectEntry* entry) {
 		return;
 	}
 	for (i = 0; i < entry->count; i++, data++) {
-		data->x += data->speed * data->dirX;
-		data->z += data->speed * data->dirZ;
-		data->vy *= 0.9f;
-		data->y += data->vy;
-		data->rotVel *= 0.95f;
-		data->rot += data->rotVel;
-		data->scale = s;
+		p = data;
+		p->x += p->speed * p->dirX;
+		p->z += p->speed * p->dirZ;
+		p->vy *= 0.9f;
+		p->y += p->vy;
+		p->rotVel *= 0.95f;
+		p->rot += p->rotVel;
+		p->scale = s;
 		if (data->timer > 15) {
-			data->alpha *= 0.8f;
+			p->alpha *= 0.8f;
 		}
 	}
 	dispEntry(4, dispCalcZ(&pos2), 2, effKemuri2Disp, entry);
@@ -277,12 +280,13 @@ static void effKemuri2Main(EffectEntry* entry) {
 void effKemuriDisp(CameraId camId, void* param) {
 	Mtx t, s, r, m, m2;
 	GXTexObj tex;
+	s32 i, j, off;
 	EffectEntry* entry = param;
 	effKemuriData* data = entry->userdata;
 	s32 type = data->field_0x0;
 	CameraEntry* cam = camGetPtr(camId);
-	s32 i, j, off;
 	f32 w = 1.0f;
+	f32 h = 0.5f;
 
 	switch (type) {
 		case 0:
@@ -357,13 +361,13 @@ void effKemuriDisp(CameraId camId, void* param) {
 			PSMTXConcat(s, t, t);
 			GXLoadTexMtxImm(t, GX_TEXMTX1, GX_MTX2x4);
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(-w * 0.5f, w, 0.0f);
+			GXPosition3f32(-w * h, w, 0.0f);
 			GXTexCoord2f32(0.0f, 0.0f);
-			GXPosition3f32(w * 0.5f, w, 0.0f);
+			GXPosition3f32(w * h, w, 0.0f);
 			GXTexCoord2f32(1.0f, 0.0f);
-			GXPosition3f32(w * 0.5f, 0.0f, 0.0f);
+			GXPosition3f32(w * h, 0.0f, 0.0f);
 			GXTexCoord2f32(1.0f, 1.0f);
-			GXPosition3f32(-w * 0.5f, 0.0f, 0.0f);
+			GXPosition3f32(-w * h, 0.0f, 0.0f);
 			GXTexCoord2f32(0.0f, 1.0f);
 		}
 	}
@@ -376,9 +380,9 @@ static void effKemuri2Disp(CameraId camId, void* param) {
 	effKemuri2Data* data = entry->userdata;
 	CameraEntry* cam = camGetPtr(camId);
 	s32 i, off;
+	f32 w2 = 12.8f;
 	f32 w = 12.0f;
 	f32 h = 8.0f;
-	f32 w2 = 12.8f;
 
 	GXSetNumChans(0);
 	GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -435,14 +439,15 @@ static void effKemuri2Disp(CameraId camId, void* param) {
 				GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
 			}
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-			GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+			{ f32 nw = -w / 2.0f; f32 nh = -h / 2.0f;
+			GXPosition3f32(nw, h * 0.5f, 0.0f);
 			GXTexCoord2f32(0.0f, 0.0f);
 			GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
 			GXTexCoord2f32(1.0f, 0.0f);
-			GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+			GXPosition3f32(w * 0.5f, nh, 0.0f);
 			GXTexCoord2f32(1.0f, 1.0f);
-			GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
-			GXTexCoord2f32(0.0f, 1.0f);
+			GXPosition3f32(nw, nh, 0.0f);
+			GXTexCoord2f32(0.0f, 1.0f); }
 		}
 		off = 1 - i;
 		PSMTXTrans(t, data->x + off, data->y - off, data->z);

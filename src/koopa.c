@@ -443,7 +443,7 @@ void kpa_jumpNpc(void) {
         mp->flags |= 0x10000;
         mp->currSubMotionId = 0;
     }
-    if (mp->currSubMotionId == 0) {
+    switch ((s32)mp->currSubMotionId) { case 0: {
         marioMakeJumpPara();
         if (JP(mp, 0) <= 0.0f) {
             if (!(mp->flags & 0x2000) && mp->characterId == 0) {
@@ -456,7 +456,7 @@ void kpa_jumpNpc(void) {
             mp->flags &= ~0x10000;
             mp->flags |= 0x20000;
         }
-    }
+    } break; }
     mp->position.y += JP(mp, 0);
     mp->airTimer++;
 }

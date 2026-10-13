@@ -71,7 +71,7 @@ u32 vsSampleStartNotify(unsigned long vid) {
 
   voice = v1 & 0xFF;
   for (i = 0; i < vs.numBuffers; ++i) {
-    if (vs.streamBuffer[i].state != 0 && vs.streamBuffer[i].voice == v1) {
+    if (vs.streamBuffer[i].state != 0 && vs.streamBuffer[i].voice == voice) {
       vsFreeBuffer(i);
     }
   }

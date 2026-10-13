@@ -1535,8 +1535,8 @@ void ext_fan_main(void) {
     }
 
     {
-        const char* sfx1;
         const char* sfx2;
+        const char* sfx1;
         f32 angle;
         f32 dist;
         f32 dy;

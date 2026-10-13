@@ -14,6 +14,13 @@
 #include "system.h"
 #include <string.h>
 
+
+extern u8 cubeDJ[0x68];
+extern u8 headDJ[0x68];
+extern u8 frontDJ[0x68];
+extern u8 front2DJ[0x68];
+HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx);
+
 #define MAX_MOBJ_WORK 3
 
 extern GlobalWork* gp;
@@ -168,14 +175,104 @@ void mobjReset(BOOL inBattle) {
     koopaRunFlag = FALSE;
 }
 
-// void mobjHitEntry(MapObjectEntry* entry, s32 type) {
-//     AnimationPoseData* pose;
-//     Vec bboxMin, bboxMax;
+void mobjHitEntry(MapObjectEntry* entry, s32 type) {
+    AnimationPoseData* pose;
+    Mtx mtx;
+    Vec min;
+    Vec max;
+    Vec position;
+    s32 i;
 
-//     pose = animPoseGetAnimBaseDataPtr(entry->poseId);
-//     bboxMin = pose->bboxMin;
-//     bboxMax = pose->bboxMax;
-// }
+    pose = animPoseGetAnimBaseDataPtr(entry->poseId);
+    min = (Vec){pose->bboxMin.x, pose->bboxMin.y, pose->bboxMin.z};
+    max = (Vec){pose->bboxMax.x, pose->bboxMax.y, pose->bboxMax.z};
+    for (i = 0; i < 2; i++) {
+        if (entry->hitObj[i].hitObject != NULL)
+            hitDelete(entry->hitObj[i].name);
+    }
+    PSVECAdd(&max, &min, &entry->translation);
+    PSVECScale(&entry->translation, &entry->translation, 0.5f);
+    PSVECScale(&entry->translation, &entry->translation, 10.0f);
+    entry->translation.y = 0.0f;
+    entry->scale2.x = 10.0f * (entry->scale.x * (f32)__fabs(max.x - min.x));
+    entry->scale2.y = 10.0f * (entry->scale.y * (f32)__fabs(max.y));
+    entry->scale2.z = 10.0f * (entry->scale.z * (f32)__fabs(max.z - min.z));
+    if (strncmp(pose->fileName, "HOBJ_", strlen("HOBJ_")) == 0) {
+        entry->translation.z = 0.0f;
+        entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
+    }
+    switch (type) {
+        case 0:
+            PSVECAdd(&entry->position, &entry->translation, &position);
+            {
+                Mtx trans, scale, xrot, yrot, zrot;
+                MTXTrans(trans, position.x, position.y, position.z);
+                MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
+                MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
+                MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
+                MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
+                MTXConcat(trans, zrot, trans);
+                MTXConcat(trans, yrot, trans);
+                MTXConcat(trans, xrot, trans);
+                MTXConcat(trans, scale, mtx);
+            }
+            memcpy((u8*)&entry->hitObj[0] + 0x1C, cubeDJ, 0x68);
+            strcpy(entry->hitObj[0].name, "MOBJ_");
+            strcat(entry->hitObj[0].name, entry->name);
+            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
+            break;
+        case 1:
+            PSVECAdd(&entry->position, &entry->translation, &position);
+            {
+                Mtx trans, scale, xrot, yrot, zrot;
+                MTXTrans(trans, position.x, position.y, position.z);
+                MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
+                MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
+                MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
+                MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
+                MTXConcat(trans, zrot, trans);
+                MTXConcat(trans, yrot, trans);
+                MTXConcat(trans, xrot, trans);
+                MTXConcat(trans, scale, mtx);
+            }
+            memcpy((u8*)&entry->hitObj[0] + 0x1C, headDJ, 0x68);
+            strcpy(entry->hitObj[0].name, "MOBJ_");
+            strcat(entry->hitObj[0].name, entry->name);
+            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
+            break;
+        case 2:
+            PSVECAdd(&entry->position, &entry->translation, &position);
+            {
+                Mtx trans, scale, xrot, yrot, zrot;
+                MTXTrans(trans, position.x, position.y, position.z);
+                MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
+                MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
+                MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
+                MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
+                MTXConcat(trans, zrot, trans);
+                MTXConcat(trans, yrot, trans);
+                MTXConcat(trans, xrot, trans);
+                MTXConcat(trans, scale, mtx);
+            }
+            memcpy((u8*)&entry->hitObj[0] + 0x1C, frontDJ, 0x68);
+            strcpy(entry->hitObj[0].name, "MOBJ_");
+            strcat(entry->hitObj[0].name, entry->name);
+            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
+            memcpy((u8*)&entry->hitObj[1] + 0x1C, front2DJ, 0x68);
+            strcpy(entry->hitObj[1].name, "MOBJ~");
+            strcat(entry->hitObj[1].name, entry->name);
+            *(char**)((u8*)&entry->hitObj[1] + 0x1C) = entry->hitObj[1].name;
+            entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[1] + 0x1C), mtx);
+            *(MapObjectEntry**)((u8*)entry->hitObj[1].hitObject + 0xD0) = entry;
+            break;
+    }
+}
 
 s32 mobjEntry(const char* name, const char* animPoseName) {
     MapObjectWork* wp = mobjGetWork();
@@ -324,6 +421,44 @@ EventEntry* mobjRunEvent(MapObjectEntry* entry, s32* eventCode) {
     entry->eventId = event->eventId;
 
     return event;
+}
+
+void mobjCalcMtx(MapObjectEntry* entry) {
+    AnimationPoseData* pose;
+    Mtx mtx;
+    Mtx trans, scale, xrot, yrot, zrot;
+    Vec position;
+    Vec min;
+    Vec max;
+    s32 i;
+
+    PSVECAdd(&entry->position, &entry->translation, &position);
+    pose = animPoseGetAnimBaseDataPtr(entry->poseId);
+    min = (Vec){pose->bboxMin.x, pose->bboxMin.y, pose->bboxMin.z};
+    max = (Vec){pose->bboxMax.x, pose->bboxMax.y, pose->bboxMax.z};
+    entry->scale2.x = 10.0f * (entry->scale.x * (f32)__fabs(max.x - min.x));
+    entry->scale2.y = 10.0f * (entry->scale.y * (f32)__fabs(max.y));
+    entry->scale2.z = 10.0f * (entry->scale.z * (f32)__fabs(max.z - min.z));
+    if (strncmp(pose->fileName, "HOBJ_", strlen("HOBJ_")) == 0) {
+        entry->translation.z = 0.0f;
+        entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
+    }
+    {
+                Mtx trans, scale, xrot, yrot, zrot;
+                MTXTrans(trans, position.x, position.y, position.z);
+                MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
+                MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
+                MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
+                MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
+                MTXConcat(trans, zrot, trans);
+                MTXConcat(trans, yrot, trans);
+                MTXConcat(trans, xrot, trans);
+                MTXConcat(trans, scale, mtx);
+            }
+    for (i = 0; i < 2; i++) {
+        if (entry->hitObj[i].hitObject != NULL)
+            hitReCalcMatrix(entry->hitObj[i].hitObject, mtx);
+    }
 }
 
 void mobjCalcMtx2(MapObjectEntry* entry) {

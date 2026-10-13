@@ -97,9 +97,9 @@ void telop(CameraId cameraId, void* param) {
 	f32 texW, texH;
 	f32 y, x, scale;
 	s32 alpha, a;
-	const char* msg;
 	s32 k, i;
 	u16 width;
+	const char* msg;
 
 	camera = camGetPtr(cameraId);
 	effGetTexObj(0x81, &texObj);
@@ -186,17 +186,13 @@ void telop(CameraId cameraId, void* param) {
 	width = FontGetMessageWidth(msg);
 	scale = 1.0f;
 	if ((u32)gp->language != 0U) {
-		if ((f32)width / (texW - 100.0f) < scale) {
-		} else {
-			scale = (texW - 100.0f) / (f32)width;
-		}
+		scale = ((f32)width / (texW - 100.0f) < scale) ? scale : (texW - 100.0f) / (f32)width;
 	}
 	a = wp->alpha;
 	alpha = (a < 0) ? 0 : ((a > 255) ? 255 : a);
 	FontDrawStart();
 	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, alpha});
-	width = FontGetMessageWidth(msg);
-	PSMTXTrans(mtx2, (texW - scale * (f32)width) * 0.5f + -15.0f, -105.0f - (texH - 24.0f) * 0.5f, 0.0f);
+	PSMTXTrans(mtx2, (texW - (f32)FontGetMessageWidth(msg) * scale) * 0.5f + -15.0f, -105.0f - (texH - 24.0f) * 0.5f, 0.0f);
 	PSMTXScale(scaleMtx2, scale, 1.0f, 1.0f);
 	PSMTXConcat(mtx2, scaleMtx2, mtx2);
 	FontDrawStringMtx(mtx2, msg);

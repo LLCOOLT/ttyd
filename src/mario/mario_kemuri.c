@@ -42,6 +42,7 @@ static void mario_kemuri_80130474(void) {
         if (mario->currMotionId == 0x1D) {
             return;
         }
+        {
         if (mario->currMotionId != 3) {
             if (mario->hitobjStandOn != NULL) {
                 attr = hitGetAttr(mario->hitobjStandOn);
@@ -75,11 +76,10 @@ static void mario_kemuri_80130474(void) {
             }
         }
         else if (!(mario->flags & 0x01000000)) {
-            if (kpaGetBodyStatus() <= 0) {
-                if (mario->characterId != 1) {
-                    kemuri();
-                }
+            if (kpaGetBodyStatus() <= 0 && mario->characterId != 1) {
+                kemuri();
             }
+        }
         }
     }
 }
@@ -230,8 +230,8 @@ void kemuri(void) {
         if (ct++ > 6) {
             ct = 0;
             sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
-            eff = effKemuri2Entry(0, mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s), 1.5f + mario->position.y,
-                                  mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c));
+            eff = effKemuri2Entry(0, mario->position.x + 0.2f * (s * mario->wPlayerCollisionBox.x), mario->position.y + 1.5f,
+                                  mario->position.z + 0.2f * (c * mario->wPlayerCollisionBox.x));
             if (mario->flags & 0x02000000) {
                 MF(eff->userdata, 0x74) = 0.6f;
             }

@@ -67,12 +67,12 @@ USER_FUNC(evt_cam_get_at) {
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
     s32* args = event->args;
+    u64 now;
+    u64 last;
+    s64 mask = -1;
     CameraId id;
     f32 x, y;
     s32 msec;
-    s64 mask = -1;
-    u64 now;
-    u64 last;
     f32 len;
     s32 onTime, offTime;
 

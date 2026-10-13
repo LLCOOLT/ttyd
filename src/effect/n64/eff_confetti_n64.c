@@ -71,6 +71,7 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     s32 mod;
     EffectEntry* effect;
     EffConfettiN64Work* w;
+    s32 k;
     s32 n;
     s32 base;
     f32 speed;
@@ -112,6 +113,7 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     case 5:
         speed = 4.0f;
         break;
+    case 6:
     default:
         speed = 5.0f;
         break;
@@ -134,14 +136,14 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
     base = rand() % 360;
     half = 0.5f * speed;
     half = half + half;
-    for (arg1 = 0; arg1 < n; arg1++, w++) {
+    for (k = 0; k < n; k++, w++) {
         r = speed * (0.01f * (f32)(rand() % 101));
-        z = (6.2831855f * ((f32)base + 360.0f * (f32)arg1 / (f32)n)) / 360.0f;
+        x = (6.2831855f * ((f32)base + 360.0f * (f32)k / (f32)n)) / 360.0f;
         w->type = type;
-        x = sin(z);
-        y = cos(z);
-        s2 = sin(z);
-        c2 = cos(z);
+        z = sin(x);
+        y = cos(x);
+        s2 = sin(x);
+        c2 = cos(x);
         if (mod == 3) {
             w->position.x = 0.1f * (f32)(rand() % 701) - 35.0f;
             w->position.y = 0.0f;
@@ -150,20 +152,20 @@ EffectEntry* effConfettiN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 sc
             w->velocity.y = -1.7f - 0.01f * (0.1f * (f32)(rand() % 801));
             w->velocity.z = 0.05f * (0.1f * (f32)(rand() % 201) - 10.0f);
             w->life = 120;
-            w->delay = arg1 * 3;
+            w->delay = k * 3;
         } else {
-            w->position.x = c2 * (r * x);
+            w->position.x = c2 * (r * z);
             w->position.y = c2 * (r * y);
             w->position.z = r * s2;
-            w->velocity.x = c2 * (half * x);
+            w->velocity.x = c2 * (half * z);
             w->velocity.y = c2 * (half * y) + 1.0f;
             w->velocity.z = half * s2;
             if (mod >= 4) {
-                w->accelY = -0.02f - 0.02f * (f32)((arg1 + 1) % 3);
+                w->accelY = -0.02f - 0.02f * (f32)((k + 1) % 3);
             } else {
                 w->accelY = 0.0f;
             }
-            w->delay = arg1 & 3;
+            w->delay = k & 3;
         }
     }
     return effect;
@@ -274,7 +276,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     w = effect->userdata;
-    i = w->frame;
+    anm = w->frame;
     type = w->type;
     count = w->count;
     alpha = w->alpha;
@@ -295,7 +297,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    anm = (i >> 1) % 6;
+    anm = (anm >> 1) % 6;
     type = type % 10;
     for (i = 0; i < count; i++, w++) {
         col = &color_table[(i % 12) * 3];

@@ -23,10 +23,9 @@ BOOL parsePush(const char* tag) {
 	s32 newStart;
 	s32 newEnd;
 	s32 depth;
-	s8 c;
 	s32 n;
-	char* q;
 	s32 j;
+	s8 c;
 
 	depth = 0;
 	state = 0;
@@ -51,12 +50,11 @@ BOOL parsePush(const char* tag) {
 			}
 			else {
 				if (state == 0 && depth == 0) {
-					q = buf;
 					n = 0;
 					for (j = i; j < end; j++) {
 						c = p[j];
 						if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
-							*q++ = c;
+							buf[n] = c;
 							n++;
 						}
 						if (n >= 127 || p[j] == '>') {
@@ -97,10 +95,10 @@ void parsePopNext(void) {
 }
 
 BOOL parseGet1Next(s32 type, void* data) {
-	s8* p;
+	s32* posp;
 	s32 i;
 	s32 end;
-	s32* posp;
+	s8* p;
 	s32 stop;
 	s32 start;
 	BOOL result = TRUE;
@@ -118,9 +116,9 @@ BOOL parseGet1Next(s32 type, void* data) {
 	}
 
 	state = 0;
-	posp = &parse.pos[parse.depth];
 	p = (s8*)parse.ptr;
 	i = parse.pos[parse.depth];
+	posp = &parse.pos[parse.depth];
 	end = parse.end[parse.depth];
 	for (; i < end; i++) {
 		if (p[i] == '/' && p[i + 1] == '/') {
@@ -156,7 +154,8 @@ BOOL parseGet1Next(s32 type, void* data) {
 					if (p[i] == '"') {
 						break;
 					}
-					((char*)data)[n++] = p[i];
+					((char*)data)[n] = p[i];
+					n++;
 				}
 			}
 		}
@@ -185,3 +184,4 @@ BOOL parseTagGet1(const char* tag, s32 type, void* data) {
 	}
 	return FALSE;
 }
+

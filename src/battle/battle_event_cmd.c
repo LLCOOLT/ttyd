@@ -28,8 +28,10 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) { //TODO: regalloc
     s32* args = event->args;
-    s32 index = args[0];
-    if (_battleWorkPointer->flags & args[1]) {
+    s32 index;
+    s32 flags = args[1];
+    index = args[0];
+    if (flags & _battleWorkPointer->flags) {
         evtSetValue(event, index, TRUE);
     }
     else {
@@ -42,13 +44,13 @@ USER_FUNC(btlevtcmd_check_battleflag) { //TODO: regalloc
 USER_FUNC(btlevtcmd_onoff_battleflag) {
     s32* args = event->args;
     BOOL val = evtGetValue(event, args[0]);
-    s32 flags = args[1];
+    u32 flags = args[1];
     BattleWork* wp = _battleWorkPointer;
     if (val == TRUE) {
         wp->flags |= flags;
     }
     else {
-        wp->flags = wp->flags & ~flags;
+        wp->flags &= ~flags;
     }
     return EVT_RETURN_DONE;
 }
@@ -75,12 +77,12 @@ USER_FUNC(btlevtcmd_reset_move_color_lv_all) {
 USER_FUNC(btlevtcmd_CheckPhase) {
     s32* args = event->args;
     s32 index = args[0];
-    s32 seq = args[1];
-    if (seq == BattleGetSeq(_battleWorkPointer, SEQ_PHASE)) {
-        evtSetValue(event, index, TRUE);
+    u32 seq = args[1];
+    if (seq != BattleGetSeq(_battleWorkPointer, SEQ_PHASE)) {
+        evtSetValue(event, index, FALSE);
     }
     else {
-        evtSetValue(event, index, FALSE);
+        evtSetValue(event, index, TRUE);
     }
     return EVT_RETURN_DONE;
 }
@@ -159,24 +161,23 @@ USER_FUNC(btlevtcmd_GetRandomValue) {
 //s32 retIndex, s32 countIndex, s32 sizeIndex[]
 USER_FUNC(btlevtcmd_DrawLots) {
     s32* args = event->args;
-    s32 *alloc, *args2;
-    s32 i, index, countId, count, max;
+    s32 index = args[0];
+    s32 *alloc;
+    s32 i, count, max;
     s32 ceiling, ceilcount, retcount;
 
     index = args[0];
-    countId = args[1];
-    args2 = &args[2];
-    count = evtGetValue(event, countId);
-    max = 0;
+    args += 2;
+    count = evtGetValue(event, args[-1]);
     alloc = BattleAlloc(sizeof(s32) * count);
+    max = 0;
     for (i = 0; i < count; i++) {
-        alloc[i] = evtGetValue(event, (*args2)++);
+        alloc[i] = evtGetValue(event, *args++);
         max += alloc[i];
     }
     ceiling = irand(max);
-    ceilcount = 0;
     retcount = 0;
-    for (i = 0; i < count; i++) {
+    for (i = 0, ceilcount = retcount; i < count; i++) {
         ceilcount += alloc[i];
         if (ceiling < ceilcount) {
             break;
@@ -261,7 +262,9 @@ USER_FUNC(btlevtcmd_ReplaceParts) {
         part->counterAttributes = part->mKindPartParams->counterAttributes;
         part->defense = part->mKindPartParams->defense;
         part->defenseAttr = part->mKindPartParams->defenseAttr;
-        part->mPositionOffset = part->mKindPartParams->positionOffset;
+        part->mPositionOffset.x = part->mKindPartParams->positionOffset.x;
+        part->mPositionOffset.y = part->mKindPartParams->positionOffset.y;
+        part->mPositionOffset.z = part->mKindPartParams->positionOffset.z;
         BtlUnit_SetPartsRotate(part, 0.0f, 0.0f, 0.0f);
         BtlUnit_SetPartsRotateOffset(part, 0.0f, 0.0f, 0.0f);
         part->mHitBaseOffset.x = part->mKindPartParams->hitBaseOffset.x;
@@ -277,7 +280,7 @@ USER_FUNC(btlevtcmd_ReplaceParts) {
 //s32 retIndex
 USER_FUNC(btlevtcmd_ChangeParty) {
     BattleUnit* unit;
-    s32 value, index;
+    s32 index, value;
 
     value = -1;
     index = *event->args;
@@ -291,11 +294,11 @@ USER_FUNC(btlevtcmd_ChangeParty) {
 
 //s32* battleId, f32* x, f32* y, f32* z (can be EVTDAT_POINTER_MAX to set current)
 USER_FUNC(btlevtcmd_SetPos) {
-    s32 btlId;
-    f32 x, y, z, currX, currY, currZ;
-    s32 indexX, indexY, indexZ, id;
     s32* args = event->args;
     BattleUnit* unit;
+    s32 btlId;
+    f32 x, y, z, currX, currY, currZ;
+    s32 id, indexZ, indexY, indexX;
 
     btlId = evtGetValue(event, args[0]);
 
@@ -377,8 +380,8 @@ USER_FUNC(btlevtcmd_SetPartsPos) {
     s32* args = event->args;
     s32 btlId;
     f32 x, y, z, currX, currY, currZ;
-    BattleUnitPart* part;
     BattleUnit* unit;
+    BattleUnitPart* part;
     s32 id, partId;
 
     id = evtGetValue(event, args[0]);
@@ -395,7 +398,8 @@ USER_FUNC(btlevtcmd_SetPartsPos) {
     }
     else {
         BtlUnit_GetPos(unit, &currX, &currY, &currZ);
-        BtlUnit_SetPartsOffsetPos(part, x - currX, y - currY, z - currZ);
+        x -= currX; y -= currY; z -= currZ;
+        BtlUnit_SetPartsOffsetPos(part, x, y, z);
     }
     return EVT_RETURN_DONE;
 }
@@ -681,8 +685,7 @@ USER_FUNC(btlevtcmd_GetWidth) {
 
     id = evtGetValue(event, args[0]);
     index = args[1];
-    id = BattleTransID(event, id);
-    unit = BattleGetUnitPtr(wp, id);
+    unit = BattleGetUnitPtr(wp, BattleTransID(event, id));
     width = BtlUnit_GetWidth(unit);
     evtSetValue(event, index, width);
     return EVT_RETURN_DONE;
@@ -780,8 +783,8 @@ USER_FUNC(btlevtcmd_SetHpGaugeOffset) {
 //s32* battleId, s32 retX, s32 retY
 USER_FUNC(btlevtcmd_GetHpGaugeOffset) {
     s32* args = event->args;
-    s32 btlId, indexX, indexY;
     BattleWork* wp = _battleWorkPointer;
+    s32 btlId, indexX, indexY;
     BattleUnit* unit;
     s32 x, y;
 
@@ -803,34 +806,36 @@ USER_FUNC(btlevtcmd_GetHpGaugeOffset) {
 //s32* battleId, s32* partId, u8* alpha
 USER_FUNC(btlevtcmd_SetAlpha) {
     s32* args = event->args;
-    u8 alpha;
+    BattleUnitPart* part;
     s32 id, btlId, partId;
+    s32 alpha;
 
     btlId = evtGetValue(event, args[0]);
     partId = evtGetValue(event, args[1]);
-    alpha = (u8)evtGetValue(event, args[2]);
+    alpha = evtGetValue(event, args[2]);
     id = BattleTransID(event, btlId);
-    BattleGetUnitPartsPtr(id, partId)->color.a = alpha;
+    part = BattleGetUnitPartsPtr(id, partId);
+    part->color.a = alpha;
     return EVT_RETURN_DONE;
 }
 
 //s32* battleId, s32* partId, u8* redIndex, u8* greenIndex, u8* blueIndex
 USER_FUNC(btlevtcmd_GetRGB) {
     s32* args = event->args;
-    s32 id, btlId, partId;
+    s32 id, partId;
     BattleUnitPart* part;
     s32 indexR, indexG, indexB;
 
-    btlId = evtGetValue(event, args[0]);
+    id = evtGetValue(event, args[0]);
     partId = evtGetValue(event, args[1]);
-    id = BattleTransID(event, btlId);
+    id = BattleTransID(event, id);
     part = BattleGetUnitPartsPtr(id, partId);
     indexR = args[2];
     indexG = args[3];
-    indexB = args[4];
+    args = (s32*)args[4];
     evtSetValue(event, indexR, part->color.r);
     evtSetValue(event, indexG, part->color.g);
-    evtSetValue(event, indexB, part->color.b);
+    evtSetValue(event, (s32)args, part->color.b);
     return EVT_RETURN_DONE;
 }
 
@@ -1192,32 +1197,30 @@ USER_FUNC(btlevtcmd_SetKissHitOffset) {
 
 //s32* battleId, f32* value
 USER_FUNC(btlevtcmd_SetCutWidth) {
-    s32* args = event->args;
     s32 btlId;
     s32 value;
     s32 id;
     BattleUnit* unit;
+    s32* args = event->args;
 
-    btlId = evtGetValue(event, args[0]);
-
-    id = BattleTransID(event, btlId);
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
     value = evtGetValue(event, args[1]);
-    unit =BattleGetUnitPtr(_battleWorkPointer, id);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
     unit->cutWidth = value;
     return EVT_RETURN_DONE;
 }
 
 //s32* battleId, f32* value
 USER_FUNC(btlevtcmd_SetCutHeight) {
-    s32* args = event->args;
     s32 btlId;
     s32 value;
     s32 id;
     BattleUnit* unit;
+    s32* args = event->args;
 
-    btlId = evtGetValue(event, args[0]);
-
-    id = BattleTransID(event, btlId);
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
     value = evtGetValue(event, args[1]);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     unit->cutHeight = value;
@@ -1290,8 +1293,10 @@ USER_FUNC(btlevtcmd_SetPartsBaseScale) {
     id = evtGetValue(event, args[0]);
 
     id = BattleTransID(event, id);
-    if (id != -1) { //TODO: un-hardcode?
-        part = BattleGetUnitPartsPtr(id, evtGetValue(event, args[1]));
+    if (id == -1) return EVT_RETURN_DONE;
+    {
+        btlId = evtGetValue(event, args[1]);
+        part = BattleGetUnitPartsPtr(id, btlId);
         x = evtGetFloat(event, args[2]);
         y = evtGetFloat(event, args[3]);
         z = evtGetFloat(event, args[4]);
@@ -1344,7 +1349,8 @@ USER_FUNC(btlevtcmd_SetScale) {
     btlId = evtGetValue(event, args[0]);
 
     id = BattleTransID(event, btlId);
-    if (id != -1) { //TODO: un-hardcode?
+    if (id == -1) return EVT_RETURN_DONE;
+    {
         unit = BattleGetUnitPtr(wp, id);
         x = evtGetFloat(event, args[1]);
         y = evtGetFloat(event, args[2]);
@@ -1366,7 +1372,8 @@ USER_FUNC(btlevtcmd_AddScale) {
     btlId = evtGetValue(event, args[0]);
 
     id = BattleTransID(event, btlId);
-    if (id != -1) { //TODO: un-hardcode?
+    if (id == -1) return EVT_RETURN_DONE;
+    {
         unit = BattleGetUnitPtr(wp, id);
         x = evtGetFloat(event, args[1]);
         y = evtGetFloat(event, args[2]);
@@ -1387,7 +1394,10 @@ USER_FUNC(btlevtcmd_SetPartsScale) {
     id = evtGetValue(event, args[0]);
 
     id = BattleTransID(event, id);
-    if (id != -1) { //TODO: un-hardcode?
+    if (id == -1) {
+        return EVT_RETURN_DONE;
+    }
+    { //TODO: un-hardcode?
         partId = evtGetValue(event, args[1]);
         part = BattleGetUnitPartsPtr(id, partId);
         x = evtGetFloat(event, args[2]);
@@ -1409,7 +1419,10 @@ USER_FUNC(btlevtcmd_AddPartsScale) {
     id = evtGetValue(event, args[0]);
 
     id = BattleTransID(event, id);
-    if (id != -1) { //TODO: un-hardcode?
+    if (id == -1) {
+        return EVT_RETURN_DONE;
+    }
+    { //TODO: un-hardcode?
         partId = evtGetValue(event, args[1]);
         part = BattleGetUnitPartsPtr(id, partId);
         x = evtGetFloat(event, args[2]);
@@ -1550,12 +1563,12 @@ USER_FUNC(btlevtcmd_SetSwallowParam) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 btlId, id;
-    s8 value;
+    s32 value;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    value = (s8)evtGetValue(event, args[1]);
+    value = evtGetValue(event, args[1]);
     if (unit) {
         unit->swallowRate = value;
     }
@@ -1567,12 +1580,12 @@ USER_FUNC(btlevtcmd_SetSwallowAttribute) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 btlId, id;
-    s8 value;
+    s32 value;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    value = (s8)evtGetValue(event, args[1]);
+    value = (u8)evtGetValue(event, args[1]);
     if (unit) {
         unit->swallowAttribute = value;
     }
@@ -1592,10 +1605,9 @@ USER_FUNC(btlevtcmd_SetMaxMoveCount) {
         return EVT_RETURN_DONE;
     }
     unit = BattleGetUnitPtr(wp, id);
-    unit->maxMoveCount = (s8)evtGetValue(event, args[1]);
-    max = unit->maxMoveCount;
-    if (unit->movesRemaining > max) {
-        unit->movesRemaining = max;
+    unit->maxMoveCount = (u8)evtGetValue(event, args[1]);
+    if (unit->movesRemaining > (s8)unit->maxMoveCount) {
+        unit->movesRemaining = unit->maxMoveCount;
     }
     return EVT_RETURN_DONE;
 }
@@ -1724,14 +1736,15 @@ USER_FUNC(btlevtcmd_GetOverTurnCount) {
 }
 
 USER_FUNC(btlevtcmd_SetOverTurnCount) {
+    s32 id;
     s32* args = event->args;
-    s32 btlId, id;
-    s8 value;
+    s32 btlId;
+    s32 value;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
-    value = (s8)evtGetValue(event, args[1]);
-    BattleGetUnitPtr(_battleWorkPointer, id)->flippedTurns = value;
+    value = evtGetValue(event, args[1]);
+    { BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id); unit->flippedTurns = value; }
     return EVT_RETURN_DONE;
 }
 
@@ -1758,8 +1771,8 @@ USER_FUNC(btlevtcmd_SetUnitWork) {
     index = evtGetValue(event, args[1]);
     value = evtGetValue(event, args[2]);
     {
-        BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
-        ((BattleUnit*)((s32*)unit + index))->work[0] = value;
+        s32* p = (s32*)BattleGetUnitPtr(_battleWorkPointer, id) + index;
+        p[0x214/4] = value;
     }
     return EVT_RETURN_DONE;
 }
@@ -1773,8 +1786,8 @@ USER_FUNC(btlevtcmd_AddUnitWork) {
     index = evtGetValue(event, args[1]);
     value = evtGetValue(event, args[2]);
     {
-        s32* p = &BattleGetUnitPtr(_battleWorkPointer, id)->work[index];
-        *p += value;
+        s32* p = (s32*)BattleGetUnitPtr(_battleWorkPointer, id) + index;
+        p[0x214/4] += value;
     }
     return EVT_RETURN_DONE;
 }
@@ -1802,7 +1815,7 @@ USER_FUNC(btlevtcmd_SetUnitWorkFloat) {
     id = BattleTransID(event, btlId);
     index = evtGetValue(event, args[1]);
     value = evtGetFloat(event, args[2]);
-    BattleGetUnitPtr(_battleWorkPointer, id)->work[index] = (s32)value;
+    *(f32*)&BattleGetUnitPtr(_battleWorkPointer, id)->work[index] = value;
     return EVT_RETURN_DONE;
 }
 
@@ -1834,7 +1847,10 @@ USER_FUNC(btlevtcmd_SetPartsWork) {
     index = evtGetValue(event, args[2]);
     value = evtGetValue(event, args[3]);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    ((s32*)((u8*)BtlUnit_GetPartsPtr(unit, partId) + index * 4))[0x130 / 4] = value;
+    {
+        u8* p = (u8*)BtlUnit_GetPartsPtr(unit, partId) + index * 4;
+        *(s32*)(p + 0x130) = value;
+    }
     return EVT_RETURN_DONE;
 }
 
@@ -1848,8 +1864,7 @@ USER_FUNC(btlevtcmd_GetDamage) {
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     index = args[1];
     if (unit) {
-        value = BtlUnit_GetHitDamage(unit);
-        evtSetValue(event, index, value);
+        evtSetValue(event, index, BtlUnit_GetHitDamage(unit));
     }
     return EVT_RETURN_DONE;
 }
@@ -1864,8 +1879,7 @@ USER_FUNC(btlevtcmd_GetTotalDamage) {
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     index = args[1];
     if (unit) {
-        value = BtlUnit_GetTotalHitDamage(unit);
-        evtSetValue(event, index, value);
+        evtSetValue(event, index, BtlUnit_GetTotalHitDamage(unit));
     }
     return EVT_RETURN_DONE;
 }
@@ -1885,13 +1899,13 @@ USER_FUNC(btlevtcmd_GetDamageCode) {
 
 USER_FUNC(btlevtcmd_CheckDamageCode) {
     s32* args = event->args;
-    s32 btlId, id, mask, index;
+    s32 btlId, id, mask, index; BattleUnit* unit;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     mask = args[1];
     index = args[2];
-    if ((BattleGetUnitPtr(_battleWorkPointer, id)->damageCode & mask)) {
+    unit = BattleGetUnitPtr(_battleWorkPointer, id); if (unit->damageCode & mask) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -1903,25 +1917,25 @@ USER_FUNC(btlevtcmd_CheckDamageCode) {
 USER_FUNC(btlevtcmd_StartAvoid) {
     s32* args = event->args;
     s32 btlId, id, damageCode;
-    NiceEffectWork* effect;
+    EffectEntry* entry;
     BattleUnit* unit;
-    f32 x, y, z;
+    Vec pos;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     damageCode = args[1] | 0x100;
-    if (damageCode == 0x26) {
-        BtlUnit_GetPos(unit, &x, &y, &z);
-        if (y >= 85.0f) {
-            y += -50.0f;
+    if ((u8)damageCode == 0x26) {
+        BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+        if (pos.y < 85.0f) {
+            pos.y += 50.0f;
         }
         else {
-            y += 50.0f;
+            pos.y += -50.0f;
         }
-        x -= 45.0f;
-        effect = effNiceEntry(6, x, y, z)->userdata;
-        effect->field_0x1C = 0.75f;
+        pos.x -= 45.0f;
+        entry = effNiceEntry(6, pos.x, pos.y, pos.z);
+        ((NiceEffectWork*)entry->userdata)->field_0x1C = 0.75f;
     }
     unit->damagePattern = 0;
     BattleRunHitEvent(unit, damageCode);
@@ -1946,13 +1960,15 @@ USER_FUNC(btlevtcmd_RunHitEventDirect) {
 
 USER_FUNC(btlevtcmd_CheckDamagePattern) {
     s32* args = event->args;
-    s32 btlId, id, pattern, index;
+    s32 btlId, id, index;
+    u32 pattern, dp;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     pattern = args[1];
     index = args[2];
-    if (BattleGetUnitPtr(_battleWorkPointer, id)->damagePattern == pattern) {
+    dp = BattleGetUnitPtr(_battleWorkPointer, id)->damagePattern;
+    if (dp == pattern) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -1969,6 +1985,7 @@ USER_FUNC(btlevtcmd_CheckSpace) { //TODO: probably wrong
     BattleUnit* unit;
     s32 index, i;
     f32 x, y, z;
+    s32 ix, iy, iz;
     BOOL found;
 
     index = args[0];
@@ -1983,18 +2000,19 @@ USER_FUNC(btlevtcmd_CheckSpace) { //TODO: probably wrong
         unit = BattleGetUnitPtr(wp, i);
         if (unit && UNIT_ALLIANCE_PARTY) {
             BtlUnit_GetHomePos(unit, &x, &y, &z);
+            ix = x; iy = y; iz = z;
             if (boundX) {
-                if (abs((s32)x - baseX) < boundX) {
+                if (abs(ix - baseX) < boundX) {
                     found = TRUE;
                 }
             }
             if (boundY) {
-                if (abs((s32)y - baseY) < boundY) {
+                if (abs(iy - baseY) < boundY) {
                     found = TRUE;
                 }
             }
             if (boundZ) {
-                if (abs((s32)z - baseZ) < boundZ) {
+                if (abs(iz - baseZ) < boundZ) {
                     found = TRUE;
                 }
             }
@@ -2098,11 +2116,11 @@ USER_FUNC(btlevtcmd_GetMarioId) {
             break;
         }
     }
-    if (i < 64) {
-        evtSetValue(event, index, unit->unitId);
+    if (i >= 64) {
+        evtSetValue(event, index, -1);
     }
     else {
-        evtSetValue(event, index, -1);
+        evtSetValue(event, index, unit->unitId);
     }
     return EVT_RETURN_DONE;
 }
@@ -2122,16 +2140,16 @@ USER_FUNC(btlevtcmd_GetPartyId) {
         unit = BattleGetUnitPtr(wp, i);
         if (unit && unit->mAlliance == alliance) {
             kind = unit->currentKind;
-            if (kind >= TYPE_PARTNER_MIN && kind < TYPE_PARTNER_MIN) {
+            if (kind >= TYPE_PARTNER_MIN && kind < TYPE_PARTNER_MAX) {
                 break;
             }
         }
     }
-    if (i < 64) {
-        evtSetValue(event, index, unit->unitId);
+    if (i >= 64) {
+        evtSetValue(event, index, -1);
     }
     else {
-        evtSetValue(event, index, -1);
+        evtSetValue(event, index, unit->unitId);
     }
     return EVT_RETURN_DONE;
 }
@@ -2161,7 +2179,7 @@ USER_FUNC(btlevtcmd_GetUnitId) {
     id = BattleTransID(event, btlId);
     index = args[1];
     unit = BattleGetUnitPtr(wp, id);
-    if (unit && unit->flags < 0) {
+    if (unit && (unit->flags & 0x80000000)) {
         unit = NULL;
     }
     if (unit) {
@@ -2178,6 +2196,7 @@ USER_FUNC(btlevtcmd_GetPartyTechLv) {
     BattleWork* wp = _battleWorkPointer;
     s32 btlId, id, index, value, i;
     BattleUnitType kind;
+    PouchPartyData* party;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
@@ -2186,38 +2205,40 @@ USER_FUNC(btlevtcmd_GetPartyTechLv) {
     value = 0;
     if (kind >= TYPE_PARTNER_MIN && kind < TYPE_PARTNER_MAX) {
         i = BattleTransPartyId(kind);
-        value = pouchGetPtr()->partyData[i].techLevel;
+        party = &pouchGetPtr()->partyData[i];
+        value = party->techLevel;
     }
     evtSetValue(event, index, value);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_CalculateFaceDirection) {
+    BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
+    f32 thisX, thisY, thisZ;
+    f32 targetX, targetY, targetZ;
+    f32 offsetX, offsetY, offsetZ;
+    f32 localX, localY, localZ;
+    f32 thisOffsetX, thisOffsetY, thisOffsetZ;
+    f32 calculate;
+    BattleUnit *thisUnit, *targetUnit;
+    s32 thisId, thisPartId;
+    s32 targetId, targetPartId;
+    s32 btlId, flags, index, value, tid;
     BattleUnitPart* thisPart = NULL;
     BattleUnitPart* targetPart = NULL;
-    s32* args = event->args;
-    BattleWork* wp = _battleWorkPointer;
-    f32 thisOffsetX, thisOffsetY, thisOffsetZ;
-    f32 localX, localY, localZ;
-    f32 offsetX, offsetY, offsetZ;
-    f32 targetX, targetY, targetZ;
-    f32 thisX, thisY, thisZ;
-    f32 calculate;
-    BattleUnit *targetUnit, *thisUnit;
-    s32 targetId, targetPartId;
-    s32 thisId, thisPartId;
-    s32 btlId, flags, index, value;
 
     btlId = evtGetValue(event, args[0]);
     thisId = BattleTransID(event, btlId);
     thisPartId = evtGetValue(event, args[1]);
     targetId = evtGetValue(event, args[2]);
+    tid = targetId;
     targetPartId = evtGetValue(event, args[3]);
     flags = args[4];
     index = args[5];
 
     if (!(flags & 9)) {
-        targetId = BattleTransID(event, targetId);
+        tid = BattleTransID(event, targetId);
     }
 
     thisUnit = BattleGetUnitPtr(_battleWorkPointer, thisId);
@@ -2226,7 +2247,7 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     }
 
     if (flags & 0x10) {
-        targetUnit = BattleGetUnitPtr(_battleWorkPointer, targetId);
+        targetUnit = BattleGetUnitPtr(_battleWorkPointer, tid);
         if (targetPartId != -1) {
             targetPart = BtlUnit_GetPartsPtr(targetUnit, targetPartId);
         }
@@ -2272,13 +2293,11 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
         }
 
         calculate = targetX - thisX;
-        if (calculate <= 0.0f) {
-            if (calculate < 0.0f) {
-                value = -1;
-            }
-        }
-        else {
+        if (calculate > 0.0f) {
             value = 1;
+        }
+        else if (calculate < 0.0f) {
+            value = -1;
         }
     }
 
@@ -2294,17 +2313,15 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
             }
         }
         calculate = (f32)targetId - localX;
-        if (calculate <= 0.0f) {
-            if (calculate < 0.0f) {
-                value = -1;
-            }
-        }
-        else {
+        if (calculate > 0.0f) {
             value = 1;
+        }
+        else if (calculate < 0.0f) {
+            value = -1;
         }
     }
     if (flags & 0x100) {
-        value = -value;
+        value *= -1;
     }
     evtSetValue(event, index, value);
     return EVT_RETURN_DONE;
@@ -2324,27 +2341,30 @@ USER_FUNC(btlevtcmd_GetFaceDirection) {
 }
 
 USER_FUNC(btlevtcmd_ChangeFaceDirection) {
+    s32 id;
     s32* args = event->args;
-    s32 btlId, id;
-    s8 value;
+    s32 btlId;
+    s32 value;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
-    value = (s8)evtGetValue(event, args[1]);
-    BattleGetUnitPtr(_battleWorkPointer, id)->faceDirection = value;
+    value = evtGetValue(event, args[1]);
+    { BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id); unit->faceDirection = value; }
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_ChangePartsFaceDirection) {
     s32* args = event->args;
-    s8 value;
     s32 btlId, id, partId;
+    s32 value;
+    BattleUnitPart* part;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     partId = evtGetValue(event, args[1]);
-    value = (s8)evtGetValue(event, args[2]);
-    BattleGetUnitPartsPtr(id, partId)->faceDirection = value;
+    value = evtGetValue(event, args[2]);
+    part = BattleGetUnitPartsPtr(id, partId);
+    part->faceDirection = value;
     return EVT_RETURN_DONE;
 }
 
@@ -2354,21 +2374,20 @@ USER_FUNC(btlevtcmd_ResetFaceDirection) {
     s32 btlId, id;
 
     btlId = evtGetValue(event, *event->args);
-    id = BattleTransID(event, btlId);
-    unit = BattleGetUnitPtr(wp, id);
+    unit = BattleGetUnitPtr(wp, BattleTransID(event, btlId));
     unit->faceDirection = wp->alliances[unit->mAlliance].attackDirection;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_CheckAttribute) {
     s32* args = event->args;
-    s32 btlId, id, mask, index;
+    s32 btlId, id, mask, index; BattleUnit* unit;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
     mask = args[1];
     index = args[2];
-    if (BattleGetUnitPtr(_battleWorkPointer, id)->mAttributeFlags & mask) {
+    unit = BattleGetUnitPtr(_battleWorkPointer, id); if (unit->mAttributeFlags & mask) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -2399,14 +2418,15 @@ USER_FUNC(btlevtcmd_OffAttribute) {
     id = BattleTransID(event, btlId);
     mask = args[1];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    unit->mAttributeFlags &= ~mask;
+    unit->mAttributeFlags = unit->mAttributeFlags & ~mask;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_CheckPartsAttribute) {
     s32* args = event->args;
-    s32 btlId, id, partId, mask, index;
+    s32 btlId, id, partId, index, mask;
     BattleUnit* unit;
+    BattleUnitPart* part;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -2414,7 +2434,8 @@ USER_FUNC(btlevtcmd_CheckPartsAttribute) {
     mask = args[2];
     index = args[3];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    if (BtlUnit_GetPartsPtr(unit, partId)->attributes & mask) {
+    part = BtlUnit_GetPartsPtr(unit, partId);
+    if (part->attributes & mask) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -2451,13 +2472,13 @@ USER_FUNC(btlevtcmd_OffPartsAttribute) {
     mask = args[2];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     part = BtlUnit_GetPartsPtr(unit, partId);
-    part->attributes &= ~mask;
+    part->attributes = ~mask & part->attributes;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_CheckPartsCounterAttribute) {
     s32* args = event->args;
-    s32 btlId, id, partId, mask, index;
+    s32 btlId, id, partId, index, mask;
     BattleUnit* unit;
 
     id = evtGetValue(event, args[0]);
@@ -2466,7 +2487,7 @@ USER_FUNC(btlevtcmd_CheckPartsCounterAttribute) {
     mask = args[2];
     index = args[3];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    if (BtlUnit_GetPartsPtr(unit, partId)->counterAttributes & mask) {
+    if (mask & BtlUnit_GetPartsPtr(unit, partId)->counterAttributes) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -2503,29 +2524,28 @@ USER_FUNC(btlevtcmd_OffPartsCounterAttribute) {
     mask = args[2];
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     part = BtlUnit_GetPartsPtr(unit, partId);
-    part->counterAttributes &= ~mask;
+    part->counterAttributes = part->counterAttributes & ~mask;
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_SetPartsBlur) {
     s32* args = event->args;
     s32 btlId, id, partId;
-    s8 color4, color5, color6, color7;
-    s8 color0, color1, color2, color3;
+    u8 color0, color1, color2, color3, color4, color5, color6, color7;
     BattleUnit* unit;
     BattleUnitPart* part;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     partId = evtGetValue(event, args[1]);
-    color0 = (s8)evtGetValue(event, args[2]);
-    color1 = (s8)evtGetValue(event, args[3]);
-    color2 = (s8)evtGetValue(event, args[4]);
-    color3 = (s8)evtGetValue(event, args[5]);
-    color4 = (s8)evtGetValue(event, args[6]);
-    color5 = (s8)evtGetValue(event, args[7]);
-    color6 = (s8)evtGetValue(event, args[8]);
-    color7 = (s8)evtGetValue(event, args[9]);
+    color0 = (u8)evtGetValue(event, args[2]);
+    color1 = (u8)evtGetValue(event, args[3]);
+    color2 = (u8)evtGetValue(event, args[4]);
+    color3 = (u8)evtGetValue(event, args[5]);
+    color4 = (u8)evtGetValue(event, args[6]);
+    color5 = (u8)evtGetValue(event, args[7]);
+    color6 = (u8)evtGetValue(event, args[8]);
+    color7 = (u8)evtGetValue(event, args[9]);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     part = BtlUnit_GetPartsPtr(unit, partId);
     part->blurWork.color[0] = color0;
@@ -2547,7 +2567,7 @@ USER_FUNC(btlevtcmd_OnToken) {
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    unit->mTokenFlags |= args[1];
+    unit->mTokenFlags = args[1] | unit->mTokenFlags;
     return EVT_RETURN_DONE;
 }
 
@@ -2572,7 +2592,7 @@ USER_FUNC(btlevtcmd_CheckToken) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     index = args[2];
-    if (unit->mTokenFlags & args[1]) {
+    if (args[1] & unit->mTokenFlags) {
         evtSetValue(event, index, 1);
     }
     else {
@@ -2848,7 +2868,7 @@ USER_FUNC(btlevtcmd_JumpPosition) {
         if (BEC_MVFRAME(unit) == 0) {
             return EVT_RETURN_DONE;
         }
-        unit->mMoveSpeedY = y / BEC_MVFRAME(unit) + 0.5f * (unit->mFallAccel * BEC_MVFRAME(unit));
+        unit->mMoveSpeedY = y / BEC_MVFRAME(unit) + (unit->mFallAccel * BEC_MVFRAME(unit)) / 2.0f;
         unit->mMoveSpeedXZ = unit->mMoveSpeedXZ + BEC_MVDIST(unit) / BEC_MVFRAME(unit);
         BtlUnit_LoadSeMode(2, kind, (u8*)unit + 0x1C0, (u8*)unit + 0x188);
         if (BEC_SNDNAME(unit, 0x188)) {
@@ -2944,7 +2964,7 @@ USER_FUNC(btlevtcmd_FallPosition) {
             unit->mMoveSpeedXZ = BEC_MVDIST(unit) / BEC_MVFRAME(unit);
         }
         unit->mMoveSpeedY = 0.0f;
-        unit->mFallAccel = (y / BEC_MVFRAME(unit) - unit->mMoveSpeedY) / (0.5f * -BEC_MVFRAME(unit));
+        unit->mFallAccel = (y / BEC_MVFRAME(unit) - unit->mMoveSpeedY) / (-BEC_MVFRAME(unit) / 2.0f);
     }
     unit->mMoveCurrentPos.y += unit->mMoveSpeedY;
     unit->mMoveSpeedY -= unit->mFallAccel;
@@ -3121,7 +3141,13 @@ USER_FUNC(btlevtcmd_EllipseMovePosition) {
         BtlUnit_SetMoveStartPos(unit, x, y, z);
         BtlUnit_SetMoveCurrentPos(unit, x, y, z);
         BtlUnit_SetMoveTargetPos(unit, tx, ty, tz);
-        BEC_MVDIST(unit) = bec_sqrtf((x - tx) * (x - tx) + (y - ty) * (y - ty) + (z - tz) * (z - tz));
+        {
+            f32 dx = x - tx, dy = y - ty, dz = z - tz;
+            dx = dx * dx;
+            dy = dy * dy;
+            dz = dz * dz;
+            BEC_MVDIST(unit) = bec_sqrtf(dx + dy + dz);
+        }
         if (BEC_MVFRAME(unit) == 0) {
             BEC_MVFRAME(unit) = BEC_MVDIST(unit) / unit->mMoveSpeedXZ;
         }
@@ -3142,8 +3168,12 @@ USER_FUNC(btlevtcmd_EllipseMovePosition) {
     }
     cx = (unit->mMoveStartPos.x + unit->mMoveTargetPos.x) * 0.5f;
     cz = (unit->mMoveStartPos.z + unit->mMoveTargetPos.z) * 0.5f;
-    r = 0.5f * bec_sqrtf((unit->mMoveTargetPos.x - unit->mMoveStartPos.x) * (unit->mMoveTargetPos.x - unit->mMoveStartPos.x) +
-                         (unit->mMoveTargetPos.z - unit->mMoveStartPos.z) * (unit->mMoveTargetPos.z - unit->mMoveStartPos.z));
+    {
+        f32 dx = unit->mMoveTargetPos.x - unit->mMoveStartPos.x, dz = unit->mMoveTargetPos.z - unit->mMoveStartPos.z;
+        dx = dx * dx;
+        dz = dz * dz;
+        r = 0.5f * bec_sqrtf(dx + dz);
+    }
     w = (f32)width;
     ang = angleABf(cx, cz, unit->mMoveStartPos.x, unit->mMoveStartPos.z);
     t = intpl_sub(mode, 180.0f, 0.0f, (s32)BEC_MVCNT(unit), BEC_MVFRAME(unit));
@@ -3173,17 +3203,18 @@ USER_FUNC(btlevtcmd_MoveDirectionAdd) {
     if (unit->moveDirection) {
         dir = value * unit->moveDirection;
     } else {
-        dir = value * unit->faceDirection;
+        dir = unit->faceDirection * value;
     }
-    evtSetValue(event, index, dir + evtGetValue(event, index));
+    evtSetValue(event, index, evtGetValue(event, index) + dir);
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_FaceDirectionAdd) {
-    s32 btlId, id, index, value, dir;
+    s32 btlId, id, value;
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
+    s32 index, dir;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
@@ -3191,7 +3222,9 @@ USER_FUNC(btlevtcmd_FaceDirectionAdd) {
     value = evtGetValue(event, args[2]);
     unit = BattleGetUnitPtr(wp, id);
     dir = value * unit->faceDirection;
-    evtSetValue(event, index, evtGetValue(event, index) + dir);
+    value = evtGetValue(event, index);
+    value += dir;
+    evtSetValue(event, index, value);
     return EVT_RETURN_DONE;
 }
 
@@ -3217,8 +3250,8 @@ USER_FUNC(btlevtcmd_PartsFaceDirectionSub) {
     BattleUnit* unit;
     s32 btlId, id, partId, index, value, dir;
 
-    btlId = evtGetValue(event, args[0]);
-    id = BattleTransID(event, btlId);
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
     partId = evtGetValue(event, args[1]);
     index = args[2];
     value = evtGetValue(event, args[3]);
@@ -3363,13 +3396,13 @@ typedef struct BecCmd {
 s16 pouchAddCoin(s16 coins);
 static inline void bec_coin(BattleUnit* unit, s32 item) {
     s32 coins;
-    f32 x, y, z;
+    Vec pos;
     if (BEC_FIELD(unit, 0x2F7, u8)) {
         coins = (s32)((f32)(BEC_FIELD(unit, 0x2F7, u8) * 5 + 70) * (f32)itemDataTable[item].sell_price / 100.0f);
         if (coins > 0) {
             ((void (*)(s32))pouchAddCoin)(coins);
-            BtlUnit_GetPos(unit, &x, &y, &z);
-            ((void (*)(s32, s32, f32, f32, f32, f32))effCoinN64Entry)(0, 0, x, y, z, 1.0f);
+            BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+            ((void (*)(s32, s32, f32, f32, f32, f32))effCoinN64Entry)(0, 0, pos.x, pos.y, pos.z, 1.0f);
         }
     }
 }
@@ -3452,8 +3485,8 @@ USER_FUNC(btlevtcmd_GetSelectNextEnemy) {
 
 USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
     s32* args = event->args;
-    BattleUnit* unit;
     s32 part;
+    BattleUnit* unit;
     s32 a = args[0];
     s32 b = args[1];
     s32 body;
@@ -3467,9 +3500,8 @@ USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
 
 USER_FUNC(btlevtcmd_GetConsumeItem) {
     BattleWork* wp = _battleWorkPointer;
-    BattleCommand* cmd = &wp->commandMenu;
-    BattleCommandWeapon* w = (BattleCommandWeapon*)cmd;
-    w += wp->commandMenu.cursor[11].field_0;
+    BattleCommandWeapon* w = (BattleCommandWeapon*)&wp->commandMenu;
+    w = &w[wp->commandMenu.cursor[11].field_0];
     evtSetValue(event, event->args[0], ((BattleCommand*)w)->weapon[0].itemId);
     return EVT_RETURN_DONE;
 }
@@ -3497,6 +3529,59 @@ USER_FUNC(btlevtcmd_DispItemIcon) {
     return EVT_RETURN_DONE;
 }
 
+void effItemGetEntry(s32 type, f32 x, f32 y, f32 z);
+
+USER_FUNC(btlevtcmd_CommandFlyItem) {
+    s32* args = event->args;
+    s32 id, time;
+    BecCmd* cmd;
+    BattleUnit* unit;
+    s32 kind;
+    s32 item;
+    BattleWork* wp;
+    Vec pos;
+
+    id = evtGetValue(event, args[0]);
+    time = evtGetValue(event, args[1]);
+    id = BattleTransID(event, id);
+    if (isFirstCall) {
+        wp = _battleWorkPointer;
+        cmd = (BecCmd*)&wp->commandMenu;
+        unit = BattleGetUnitPtr(wp, id);
+        kind = unit->currentKind;
+        if (kind == 0xDE || (kind >= 0xE0 && kind < 0xE7)) {
+            item = cmd->items[BEC_FIELD(cmd, 0x1C38 - 0x171C, s32)].id;
+        } else {
+            item = unit->heldItem;
+        }
+        event->userdata[0] = time;
+        BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+        pos.y += 10.0f;
+        if (!(unit->mAttributeFlags & 0x10)) {
+            if (unit->mAttributeFlags & 2) {
+                pos.y -= 5.0f;
+            } else {
+                pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit);
+            }
+        }
+        event->userdatap[1] = itemEntry(NULL, item, 0x11, -1, 0, pos.x, pos.y, pos.z);
+        effItemGetEntry(10, pos.x, 12.0f + pos.y, pos.z - 5.0f);
+        if (kind == 0xDE) {
+            psndSFXOn_3D("SFX_ITEM_MARIO_USE1", &pos);
+        } else if (kind >= 0xE0 && kind < 0xE7) {
+            psndSFXOn_3D("SFX_ITEM_PARTY_USE1", &pos);
+        } else {
+            psndSFXOn_3D("SFX_ENM_ITEM_USE1", &pos);
+        }
+        return EVT_RETURN_BLOCK;
+    }
+    if (--event->userdata[0] > 0) {
+        return EVT_RETURN_BLOCK;
+    }
+    itemDelete((char*)event->userdatap[1] + 0xC);
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(btlevtcmd_ConsumeItem) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
@@ -3509,9 +3594,9 @@ USER_FUNC(btlevtcmd_ConsumeItem) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     if (unit->currentKind == 0xDE || (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7)) {
-        ci = &((BecCmd*)&wp->commandMenu)->items[BEC_FIELD(wp, 0x1C38, s32)];
-        item = ci->id;
-        idx = ci->index;
+        BecCmd* cmd = (BecCmd*)&wp->commandMenu;
+        item = cmd->items[BEC_FIELD(cmd, 0x1C38 - 0x171C, s32)].id;
+        idx = cmd->items[BEC_FIELD(cmd, 0x1C38 - 0x171C, s32)].index;
         if (BEC_FIELD(&itemDataTable[item], 0x10, u16) & 1) {
             pouchRemoveItemIndex(item, idx);
         }
@@ -3529,6 +3614,8 @@ USER_FUNC(btlevtcmd_ConsumeItemReserve) {
     s32* args = event->args;
     s32 item;
     s32 i;
+    s32 coins;
+    Vec pos;
 
     id = evtGetValue(event, args[0]);
     item = evtGetValue(event, args[1]);
@@ -3540,13 +3627,20 @@ USER_FUNC(btlevtcmd_ConsumeItemReserve) {
                 if ((s32)wp->reserveItems[i] == item) {
                     break;
                 }
-                if (!(s32)wp->reserveItems[i]) {
+                if ((s32)wp->reserveItems[i] == 0) {
                     wp->reserveItems[i] = item;
                     break;
                 }
             }
         }
-        bec_coin(unit, item);
+        if (BEC_FIELD(unit, 0x2F7, u8)) {
+            coins = (s32)((f32)(BEC_FIELD(unit, 0x2F7, u8) * 5 + 70) * (f32)itemDataTable[item].sell_price / 100.0f);
+            if (coins > 0) {
+                ((void (*)(s32))pouchAddCoin)(coins);
+                BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+                ((void (*)(s32, s32, f32, f32, f32, f32))effCoinN64Entry)(0, 0, pos.x, pos.y, pos.z, 1.0f);
+            }
+        }
     } else if (unit->heldItem == 0x97) {
         unit->heldItem = 0;
     }
@@ -3605,9 +3699,8 @@ USER_FUNC(btlevtcmd_PreCheckDamage) {
     pno = evtGetValue(event, args[2]);
     part = BtlUnit_GetPartsPtr(target, pno);
     weapon = (BattleWeapon*)evtGetValue(event, args[3]);
-    flags = args[4];
     out = args[5];
-    res = BattlePreCheckDamage(attacker, target, part, weapon, flags);
+    res = BattlePreCheckDamage(attacker, target, part, weapon, args[4]);
     if (res < 0) {
         return EVT_RETURN_FINISH;
     }
@@ -3733,7 +3826,6 @@ USER_FUNC(btlevtcmd_CheckDamage) {
     s32 id2;
     s32 pno;
     s32 flags;
-    s32 out;
     s32 res;
 
     id = evtGetValue(event, args[0]);
@@ -3746,12 +3838,12 @@ USER_FUNC(btlevtcmd_CheckDamage) {
     part = BtlUnit_GetPartsPtr(target, pno);
     weapon = (BattleWeapon*)evtGetValue(event, args[3]);
     flags = args[4];
-    out = args[5];
+    args = (s32*)args[5];
     res = BattleCheckDamage(attacker, target, part, weapon, flags);
     if (res < 0) {
         return EVT_RETURN_FINISH;
     }
-    evtSetValue(event, out, res);
+    evtSetValue(event, (s32)args, res);
     if (!evtCheckID(event->eventId)) {
         return EVT_RETURN_FINISH;
     }
@@ -3807,7 +3899,8 @@ USER_FUNC(btlevtcmd_DamageDirect) {
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    part = BtlUnit_GetPartsPtr(unit, evtGetValue(event, args[1]));
+    pattern = evtGetValue(event, args[1]);
+    part = BtlUnit_GetPartsPtr(unit, pattern);
     damage = evtGetValue(event, args[2]);
     result = args[3];
     pattern = evtGetValue(event, args[4]);
@@ -4068,6 +4161,67 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
     return EVT_RETURN_DONE;
 }
 
+void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* targets, s32 n, s32* id, s32* pno);
+
+USER_FUNC(btlevtcmd_GetTakeoffPosition) {
+    s32* args = event->args;
+    BattleWork* wp = _battleWorkPointer;
+    s32 id, id2, pno, ox, oy, oz;
+    BattleUnit* unit;
+    BattleUnit* target;
+    BattleUnitPart* part;
+    BattleUnit* u2;
+    BattleUnitPart* p2;
+    s32 belong, back;
+    BattleAlliance* al;
+    BattleWorkWeaponTargets targets;
+    f32 hx, hy, hz, y, x, tx;
+    s32 cid, cpno;
+
+    id = evtGetValue(event, args[0]);
+    id2 = evtGetValue(event, args[1]);
+    pno = evtGetValue(event, args[2]);
+    ox = args[3];
+    oy = args[4];
+    oz = args[5];
+    id = BattleTransID(event, id);
+    unit = BattleGetUnitPtr(wp, id);
+    BtlUnit_GetPos(unit, &x, &y, &y);
+    target = BattleGetUnitPtr(wp, BattleTransID(event, id2));
+    part = BtlUnit_GetPartsPtr(target, pno);
+    BtlUnit_GetHomePos(unit, &hx, &hy, &hz);
+    BtlUnit_GetHitPos(target, part, &hx, &y, &hz);
+    belong = (s8)BtlUnit_GetEnemyBelong(unit);
+    al = (BattleAlliance*)((u8*)wp + belong * 8 + 8);
+    back = ((s32 (*)(BattleWorkWeaponTargets*, BattleWeapon*, s32, s8, u32, u32, s8))BattleSamplingEnemy)(
+        &targets, NULL, id, belong, 0x1001240, 0x1000000, -al->attackDirection);
+    BattleChoiceSamplingEnemy(&targets, 4, &cid, &cpno);
+    if (targets.numTargets > 0) {
+        cid = BattleTransID(event, cid);
+        u2 = BattleGetUnitPtr(wp, cid);
+        p2 = BtlUnit_GetPartsPtr(u2, cpno);
+        BtlUnit_GetHitPos(u2, p2, &tx, &y, &y);
+        if (__fabs(x - hx) > __fabs(x - tx)) {
+            hx = tx;
+        }
+        if (part == p2) {
+            if (back) hx += al->attackDirection * -60;
+            else hx += al->attackDirection * 60;
+        }
+        else {
+            if (back) hx += al->attackDirection * -30;
+            else hx += al->attackDirection * 30;
+        }
+    }
+    else {
+        hx += al->attackDirection * 60;
+    }
+    evtSetValue(event, ox, (s32)hx);
+    evtSetValue(event, oy, (s32)hy);
+    evtSetValue(event, oz, (s32)hz);
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(btlevtcmd_SetPartsMoveSpeed) {
     s32* args = event->args;
     s32 id, pno;
@@ -4115,6 +4269,63 @@ USER_FUNC(btlevtcmd_JumpPartsSetting) {
     return EVT_RETURN_DONE;
 }
 
+USER_FUNC(btlevtcmd_FallPartsPosition) {
+    s32 id, pno, frames;
+    s32* args = event->args;
+    BattleUnitPart* part;
+    f32 tx, ty, tz;
+    f32 x, y, z;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    pno = evtGetValue(event, args[1]);
+    tx = (f32)evtGetValue(event, args[2]);
+    ty = (f32)evtGetValue(event, args[3]);
+    tz = (f32)evtGetValue(event, args[4]);
+    frames = evtGetValue(event, args[5]);
+    part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, id), pno);
+    if (isFirstCall) {
+        event->blocked = 1;
+        BEC_FIELD(part, 0xA0, s32) = frames;
+        BtlUnit_GetPartsPos(part, &x, &y, &z);
+        BtlUnit_SetPartsMoveCurrentPos(part, x, y, z);
+        BtlUnit_SetPartsMoveTargetPos(part, tx, ty, tz);
+        BEC_FIELD(part, 0xB0, f32) = angleABf(x, z, tx, tz);
+        BEC_FIELD(part, 0xB4, f32) = distABf(x, z, tx, tz);
+        if (tx - x > 0.0f) {
+            BEC_FIELD(part, 0xBC, s8) = 1;
+        }
+        else if (tx - x < 0.0f) {
+            BEC_FIELD(part, 0xBC, s8) = -1;
+        }
+        y = ty - y;
+        if (BEC_FIELD(part, 0xA0, s32) == 0) {
+            if (BEC_FIELD(part, 0xA4, f32) == 0.0f) {
+                BEC_FIELD(part, 0xA4, f32) = 1.0f;
+            }
+            BEC_FIELD(part, 0xA0, s32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA4, f32);
+            if (BEC_FIELD(part, 0xA0, s32) == 0) {
+                BEC_FIELD(part, 0xA0, s32) = 1;
+            }
+        }
+        else {
+            BEC_FIELD(part, 0xA4, f32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA0, s32);
+        }
+        BEC_FIELD(part, 0xAC, f32) = 0.0f;
+        BEC_FIELD(part, 0xA8, f32) = (y / BEC_FIELD(part, 0xA0, s32) - BEC_FIELD(part, 0xAC, f32)) / (-BEC_FIELD(part, 0xA0, s32) / 2.0f);
+    }
+    part->mMoveCurrentPos.y += BEC_FIELD(part, 0xAC, f32);
+    BEC_FIELD(part, 0xAC, f32) -= BEC_FIELD(part, 0xA8, f32);
+    btlMovePos(BEC_FIELD(part, 0xA4, f32), BEC_FIELD(part, 0xB0, f32), &part->mMoveCurrentPos.x, &part->mMoveCurrentPos.z);
+    BtlUnit_SetPartsPos(part, part->mMoveCurrentPos.x, part->mMoveCurrentPos.y, part->mMoveCurrentPos.z);
+    BEC_FIELD(part, 0xA0, s32)--;
+    if (BEC_FIELD(part, 0xA0, s32) <= 0) {
+        BtlUnit_SetPartsPos(part, part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
+        return EVT_RETURN_YIELD;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
 USER_FUNC(btlevtcmd_JumpPartsContinue) {
     s32* args = event->args;
     s32 id, pno;
@@ -4145,8 +4356,8 @@ USER_FUNC(btlevtcmd_JumpPartsContinue) {
 }
 
 USER_FUNC(btlevtcmd_AcSetDifficulty) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnit* unit;
     s32 id, diff;
 
@@ -4159,7 +4370,7 @@ USER_FUNC(btlevtcmd_AcSetDifficulty) {
 
 USER_FUNC(btlevtcmd_AcGetDifficulty) {
     s32 index = event->args[0];
-    evtSetValue(event, index, BattleActionCommandGetDifficulty(_battleWorkPointer));
+    evtSetValue(event, index, ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(_battleWorkPointer));
     return EVT_RETURN_DONE;
 }
 
@@ -4191,8 +4402,8 @@ USER_FUNC(btlevtcmd_AcSetParam) {
 }
 
 USER_FUNC(btlevtcmd_AcGetParam) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 i = evtGetValue(event, args[0]);
     s32 index = args[1];
     s32 value = ((s32*)((u8*)wp + 0x1CC8))[i];
@@ -4203,8 +4414,8 @@ USER_FUNC(btlevtcmd_AcGetParam) {
 }
 
 USER_FUNC(btlevtcmd_AcSetGaugeParam) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BEC_FIELD(wp, 0x1D08, s32) = evtGetValue(event, args[0]);
     BEC_FIELD(wp, 0x1D0C, s32) = evtGetValue(event, args[1]);
     BEC_FIELD(wp, 0x1D10, s32) = evtGetValue(event, args[2]);
@@ -4213,8 +4424,8 @@ USER_FUNC(btlevtcmd_AcSetGaugeParam) {
 }
 
 USER_FUNC(btlevtcmd_AcGetOutputParam) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     s32 i = evtGetValue(event, args[0]);
     s32 index = args[1];
     s32 value = ((s32*)((u8*)wp + 0x1CE8))[i];
@@ -4233,8 +4444,8 @@ USER_FUNC(btlevtcmd_AcSetOutputParam) {
 }
 
 USER_FUNC(btlevtcmd_SetupAC) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnit* unit;
     s32 id, a, b, c;
 
@@ -4294,8 +4505,8 @@ USER_FUNC(btlevtcmd_GetResultAC) {
 }
 
 USER_FUNC(btlevtcmd_GetResultPrizeLv) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnit* unit = NULL;
     s32 id, value, index;
 
@@ -4315,6 +4526,40 @@ USER_FUNC(btlevtcmd_GetResultACDefence) {
     return EVT_RETURN_DONE;
 }
 
+USER_FUNC(btlevtcmd_MarioJumpParam) {
+    s32* args = event->args;
+    s32 id, frames, n, out;
+    f32 tx, tz, dist;
+    f32 x, y, z;
+    BattleUnit* unit;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    tx = evtGetValue(event, args[1]);
+    evtGetValue(event, args[2]);
+    tz = evtGetValue(event, args[3]);
+    out = args[4];
+    frames = evtGetValue(event, out);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BtlUnit_GetPos(unit, &x, &y, &z);
+    dist = distABf(x, z, tx, tz);
+    if (frames != 0) {
+        n = frames;
+    } else {
+        n = dist / unit->mMoveSpeedXZ;
+    }
+    if (dist > 60.0f) {
+        n += (s32)(0.15f * (dist - 60.0f));
+    }
+    if (frames == 0 || n > frames) {
+        frames = n;
+    }
+    if (frames != -250000000) {
+        evtSetValue(event, out, frames);
+    }
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(btlevtcmd_GetResultCountAC) {
     evtSetValue(event, event->args[0], BEC_FIELD(_battleWorkPointer, 0x1CB4, s32));
     return EVT_RETURN_DONE;
@@ -4325,17 +4570,18 @@ USER_FUNC(btlevtcmd_AudienceDeclareACResult) {
     s32* args = event->args;
     BattleWeapon* weapon;
     s32 result;
-
+    u8* ac;
     weapon = (BattleWeapon*)evtGetValue(event, args[0]);
     result = evtGetValue(event, args[1]);
+    ac = &wp->marioAcSuccess;
     if (result != -1) {
-        if (wp->marioAcSuccess < 200) {
-            wp->marioAcSuccess++;
+        if (ac[0] < 200) {
+            ac[0]++;
         }
         wp->field_19064[0] = 1;
     } else {
-        if (wp->marioAcFailed < 200) {
-            wp->marioAcFailed++;
+        if (ac[1] < 200) {
+            ac[1]++;
         }
         wp->field_19064[0] = 0;
     }
@@ -4343,11 +4589,94 @@ USER_FUNC(btlevtcmd_AudienceDeclareACResult) {
     return EVT_RETURN_DONE;
 }
 
+void BattleAudience_Case_AcrobatGood(void);
+void BattleAudience_Case_AcrobatBad(void);
+
+USER_FUNC(btlevtcmd_AudienceDeclareAcrobatResult) {
+    s32* args = event->args;
+    u8* res;
+    s32 good;
+    u8* aud;
+    BattleWork* wp;
+    BattleUnit* unit;
+    f32 x, y, z;
+    Vec pos;
+
+    res = (u8*)evtGetValue(event, args[0]);
+    good = evtGetValue(event, args[1]);
+    wp = _battleWorkPointer;
+    unit = BattleGetUnitPtr(wp, BEC_FIELD(event, 0x160, s32));
+    aud = (u8*)wp + 0x18FEC;
+    x = evtGetFloat(event, args[2]);
+    y = evtGetFloat(event, args[3]);
+    z = evtGetFloat(event, args[4]);
+    BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
+    if (good) {
+        EffectEntry* eff;
+        aud[0] = res[0x18];
+        aud[3] = res[0x1B];
+        BattleAudience_Case_AcrobatGood();
+        pos.y += BtlUnit_GetHeight(unit);
+        pos.x += BtlUnit_GetWidth(unit) / 2;
+        if (pos.x > 150.0f) {
+            pos.x = 150.0f;
+        }
+        eff = effNiceEntry(7, pos.x + x, pos.y + y, pos.z + z);
+        BEC_FIELD(eff->userdata, 0x1C, f32) = 0.75f;
+    } else {
+        BattleAudience_Case_AcrobatBad();
+        psndSFXOn_3D("SFX_BTL_ACROBAT_MISS1", &pos);
+    }
+    return EVT_RETURN_DONE;
+}
+
+extern void psndSFX_pit(s32 id, s32 pitch);
+
+USER_FUNC(btlevtcmd_ACSuccessEffect) {
+    s32* args = event->args;
+    s32 type;
+    f32 scale = 0.75f;
+    f32 w, h;
+    Vec pos;
+    const char* name;
+    s32 eff;
+    EffectEntry* entry;
+
+    type = evtGetValue(event, args[0]);
+    pos.x = (f32)evtGetValue(event, args[1]);
+    pos.y = (f32)evtGetValue(event, args[2]);
+    pos.z = (f32)evtGetValue(event, args[3]);
+    switch (type) {
+        case 0: scale *= 0.3f; name = "SFX_SYSTEM_NICE_25PERCENT1"; w = 90.0f; eff = 0; break;
+        case 1: scale *= 0.6f; name = "SFX_SYSTEM_NICE_50PERCENT1"; w = 90.0f; eff = 0; break;
+        case 2: scale *= 1.2f; name = "SFX_SYSTEM_NICE1"; w = 90.0f; eff = 0; break;
+        case 3: scale *= 1.2f; name = "SFX_SYSTEM_GOOD1"; w = 90.0f; eff = 1; break;
+        case 4: scale *= 1.2f; name = "SFX_SYSTEM_GREAT1"; w = 120.0f; eff = 2; break;
+        case 5: name = "SFX_SYSTEM_WONDERFUL1"; w = 150.0f; eff = 3; break;
+        case 6: name = "SFX_SYSTEM_EXCELLENT1"; w = 180.0f; eff = 4; break;
+        default: return EVT_RETURN_DONE;
+    }
+    h = w * scale * 0.5f;
+    if (pos.x + h > 160.0f) {
+        pos.x = 160.0f - h;
+    }
+    if (pos.y < 80.0f) {
+        entry = effNiceEntry(eff, pos.x - h, 50.0f + pos.y, pos.z);
+    }
+    else {
+        entry = effNiceEntry(eff, pos.x - h, pos.y - 50.0f, pos.z);
+    }
+    ((NiceEffectWork*)entry->userdata)->field_0x1C = scale;
+    psndSFX_pit(psndSFXOn_3D(name, &pos), 0);
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(btlevtcmd_ac_timing_flag_onoff) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
+    BattleWork* wp;
     u32 flags = args[1];
-    BattleWork* wp = _battleWorkPointer;
+    wp = _battleWorkPointer;
     if (on) {
         BEC_FIELD(wp, 0x1F50, u32) |= flags;
     }
@@ -4379,7 +4708,8 @@ USER_FUNC(btlevtcmd_ACRStart) {
     s32 id, windowStartFrame, windowEndFrame, endFrame, earlyFrames;
 
     if (isFirstCall) {
-        id = BattleTransID(event, evtGetValue(event, args[0]));
+        id = evtGetValue(event, args[0]);
+        id = BattleTransID(event, id);
         windowStartFrame = evtGetValue(event, args[1]);
         windowEndFrame = evtGetValue(event, args[2]);
         endFrame = evtGetValue(event, args[3]);
@@ -4392,7 +4722,7 @@ USER_FUNC(btlevtcmd_ACRStart) {
 //s32 resultRetIndex, s32 frameRetIndex (can be EVTDAT_POINTER_MAX to skip)
 USER_FUNC(btlevtcmd_ACRGetResult) {
     s32* args = event->args;
-    s32 index1, index2, frame, result;
+    s32 index1, index2, result, frame;
 
     index1 = args[0];
     index2 = args[1];
@@ -4463,9 +4793,9 @@ USER_FUNC(btlevtcmd_AnimeChangePose) {
 
 USER_FUNC(btlevtcmd_AnimeChangePoseType) {
     s32* args = event->args;
+    s32 type;
     BattleUnitPart* part;
     s32 id, pno;
-    s32 type;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -4478,8 +4808,8 @@ USER_FUNC(btlevtcmd_AnimeChangePoseType) {
 }
 
 USER_FUNC(btlevtcmd_AnimeChangePoseDirect) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnit* unit;
     BattleUnitPart* part;
     s32 id, pno;
@@ -4620,9 +4950,10 @@ USER_FUNC(btlevtcmd_SetStayPoseType) {
 
 USER_FUNC(btlevtcmd_AnimeCmpPoseType) {
     s32* args = event->args;
-    BattleUnitPart* part;
     s32 id, pno;
-    s32 t1, t2, index;
+    s32 t1, t2;
+    BattleUnitPart* part;
+    s32 index;
     char* n1;
     char* n2;
 
@@ -4681,9 +5012,9 @@ USER_FUNC(btlevtcmd_AnimeSetPoseSoundTable) {
 
 USER_FUNC(btlevtcmd_CheckDefinePosetype) {
     s32* args = event->args;
+    s32 type;
     BattleUnitPart* part;
     s32 id, pno;
-    s32 type;
     s32 out;
     s32* table;
     s32 res;
@@ -4774,14 +5105,15 @@ USER_FUNC(btlevtcmd_AnimeFlagOnOff) {
     s32* args = event->args;
     BattleUnitPart* part;
     s32 id, pno;
-    u32 flags;
+    u32 flags, on;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     pno = evtGetValue(event, args[1]);
     part = BattleGetUnitPartsPtr(id, pno);
     flags = args[2];
-    if ((u32)evtGetValue(event, args[3])) {
+    on = evtGetValue(event, args[3]);
+    if (on) {
         BEC_FIELD(part, 0x204, u32) |= flags;
     }
     else {
@@ -4792,9 +5124,9 @@ USER_FUNC(btlevtcmd_AnimeFlagOnOff) {
 
 USER_FUNC(btlevtcmd_CheckGuardMotionEnable) {
     s32* args = event->args;
-    BattleUnit* unit;
     s32 id, index;
     BOOL enable;
+    BattleUnit* unit;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -4913,14 +5245,16 @@ USER_FUNC(btlevtcmd_GetACPossibility) {
 
 USER_FUNC(btlevtcmd_CheckUnitFlag) {
     s32* args = event->args;
+    BattleUnit* unit;
     s32 id, index;
-    u32 flags;
+    s32 flags;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     flags = args[1];
     index = args[2];
-    if (BtlUnit_CheckUnitFlag(BattleGetUnitPtr(_battleWorkPointer, id), flags)) {
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    if (BtlUnit_CheckUnitFlag(unit, flags)) {
         evtSetValue(event, index, TRUE);
     }
     else {
@@ -4932,7 +5266,7 @@ USER_FUNC(btlevtcmd_CheckUnitFlag) {
 USER_FUNC(btlevtcmd_OnUnitFlag) {
     s32* args = event->args;
     s32 id;
-    u32 flags;
+    s32 flags;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -4944,7 +5278,7 @@ USER_FUNC(btlevtcmd_OnUnitFlag) {
 USER_FUNC(btlevtcmd_OffUnitFlag) {
     s32* args = event->args;
     s32 id;
-    u32 flags;
+    s32 flags;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -4993,12 +5327,14 @@ USER_FUNC(btlevtcmd_PayWeaponCost) {
 USER_FUNC(btlevtcmd_CommandPayWeaponCost) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
+    void* weapon;
     s32 id;
 
     id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    BtlUnit_PayWeaponCost(unit, BattleGetSelectWeapon(wp));
+    weapon = BattleGetSelectWeapon(wp);
+    BtlUnit_PayWeaponCost(unit, weapon);
     return EVT_RETURN_DONE;
 }
 
@@ -5017,8 +5353,8 @@ USER_FUNC(btlevtcmd_CommandGetWeaponActionLv) {
 }
 
 USER_FUNC(btlevtcmd_CommandGetWeaponAddress) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32* args = event->args;
     BattleUnit* unit;
     s32 id, index, kind;
     void* weapon;
@@ -5031,7 +5367,7 @@ USER_FUNC(btlevtcmd_CommandGetWeaponAddress) {
         weapon = BattleGetSelectWeapon(wp);
     }
     else {
-        weapon = BEC_FIELD(&itemDataTable[BEC_FIELD(unit, 0x304, s32)], 0x24, void*);
+        weapon = itemDataTable[BEC_FIELD(unit, 0x304, s32)].battle_params;
     }
     evtSetValue(event, index, (s32)weapon);
     return EVT_RETURN_DONE;
@@ -5067,17 +5403,76 @@ USER_FUNC(btlevtcmd_GetItemRecoverParam) {
     return EVT_RETURN_DONE;
 }
 
+void BattleStage_DestroyA1(void);
+void BattleStage_DestroyA2(void);
+void BattleStage_DestroyB(void);
+void BattleStage_NozzleDirChangeCheck(void);
+void BattleStage_NozzleWorkCheck(s32);
+void BattleStage_IronFrameFallCheck(void);
+void BattleStage_ObjectFallCheck(void);
+
+USER_FUNC(btlevtcmd_WeaponAftereffect) {
+    BattleWork* wp = _battleWorkPointer;
+    u8* w = (u8*)evtGetValue(event, event->args[0]);
+    s32 a1, a2, b;
+    s32 r;
+    u32 flags;
+    u8 st;
+
+    b = 0;
+    a2 = 0;
+    a1 = 0;
+    r = irand(w[0xB4] + w[0xB5] + w[0xB6] + w[0xB7]);
+    flags = BEC_FIELD(wp, 0x19068, u32);
+    if (flags & 0x10) a1 = 1;
+    if (flags & 0x20) a2 = 1;
+    if ((r -= w[0xB4]) < 0) {
+        a2 = 1;
+        a1 = 1;
+    }
+    else if ((r -= w[0xB5]) < 0) {
+        a1 = 1;
+    }
+    else if ((r -= w[0xB6]) < 0) {
+        a2 = 1;
+    }
+    st = wp->field_180DC;
+    if (st & 4) a2 = 0;
+    if (st & 2) a1 = 0;
+    if ((st & 2) && !(st & 8)) {
+        if (irand(100) < w[0xB8] || (BEC_FIELD(wp, 0x19068, u32) & 0x40)) {
+            b = 1;
+            if (!(wp->field_180DC & 4)) a2 = 1;
+        }
+    }
+    if (a1) BattleStage_DestroyA1();
+    if (a2) BattleStage_DestroyA2();
+    if (b) BattleStage_DestroyB();
+    if (irand(100) < w[0xB9] || (BEC_FIELD(wp, 0x19068, u32) & 0x200)) BattleStage_NozzleDirChangeCheck();
+    if (irand(100) < w[0xBA] || (BEC_FIELD(wp, 0x19068, u32) & 0x100)) BattleStage_NozzleWorkCheck(1);
+    if (irand(100) < w[0xBB] || (BEC_FIELD(wp, 0x19068, u32) & 0x80)) BattleStage_IronFrameFallCheck();
+    if (wp->field_180DC & 0x20) {
+        if (BEC_FIELD(wp, 0x19068, u32) & 1) {
+            BattleStage_ObjectFallCheck();
+        }
+        else if (irand(100) < w[0xBC]) {
+            BattleStage_ObjectFallCheck();
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(btlevtcmd_SetGuard) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
-    s32 id;
+    s32 id, btlId;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
-    id = evtGetValue(event, args[1]);
-    BEC_FIELD(unit, 0x13C, s32) = BattleTransID(event, id);
+    btlId = evtGetValue(event, args[1]);
+    BEC_FIELD(unit, 0x13C, s32) = BattleTransID(event, btlId);
     return EVT_RETURN_DONE;
 }
 
@@ -5380,18 +5775,18 @@ void _PartsMoveSoundControl(BattleUnitPart* part) {
 }
 
 void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z) {
-    Vec tmp = {0.0f, 0.0f, 0.0f};
-    Vec cur;
     Vec pos;
+    Vec cur;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
     const char* name;
 
     tmp.x = x;
     tmp.y = y;
     tmp.z = z;
     pos = tmp;
-    if (work->name0 || work->name1) {
-        if (work->name0 && !work->name1) {
-            if (work->sfxId == -1) {
+    if ((s32)work->name0 || (s32)work->name1) {
+        if ((s32)work->name0 && !(s32)work->name1) {
+            if (work->sfxId == 0xFFFFFFFF) {
                 work->sfxId = BtlUnit_snd_se_pos(unit, work->name0, EVTDAT_POINTER_MAX, 0, &pos);
             }
             if (part) {
@@ -5414,7 +5809,7 @@ void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* p
                     name = work->name1;
                     work->timer = work->period1;
                 }
-                if (name) {
+                if ((s32)name) {
                     BtlUnit_snd_se_pos(unit, name, EVTDAT_POINTER_MAX, 0, &pos);
                 }
             }
@@ -5441,10 +5836,12 @@ void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
 USER_FUNC(btlevtcmd_snd_se) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit;
-    s32 id;
     const char* name;
-    s32 volume, pitch, index, ret;
+    s32 volume;
+    BattleUnit* unit;
+    s32 index, ret;
+    s16 pitch;
+    s32 id;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -5453,8 +5850,8 @@ USER_FUNC(btlevtcmd_snd_se) {
     volume = evtGetValue(event, args[2]);
     pitch = evtGetValue(event, args[3]);
     index = args[4];
-    ret = BtlUnit_snd_se(unit, name, volume, (s16)pitch);
-    if (index != EVTDAT_POINTER_MAX) {
+    ret = BtlUnit_snd_se(unit, name, volume, pitch);
+    if ((index) != EVTDAT_POINTER_MAX) {
         evtSetValue(event, index, ret);
     }
     return EVT_RETURN_DONE;
@@ -5463,10 +5860,11 @@ USER_FUNC(btlevtcmd_snd_se) {
 USER_FUNC(btlevtcmd_snd_se_offset) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit;
     s32 id;
+    s32 index;
     const char* name;
-    s32 volume, index, ret;
+    s32 volume, ret;
+    BattleUnit* unit;
     s16 pitch;
     Vec pos;
 
@@ -5491,8 +5889,8 @@ USER_FUNC(btlevtcmd_snd_se_offset) {
 USER_FUNC(btlevtcmd_snd_voice) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    BattleUnit* unit;
     s32 id, type;
+    BattleUnit* unit;
 
     id = evtGetValue(event, args[0]);
     type = evtGetValue(event, args[1]);
@@ -5525,26 +5923,26 @@ USER_FUNC(btlevtcmd_PadCheckTrigger) {
     s32* args = event->args;
     s32 chan = evtGetValue(event, args[0]);
     s32 mask = args[1];
-    s32 index = args[2];
+    args = (s32*)args[2];
     if (BattlePadMultiCheckTrigger(chan, mask)) {
-        evtSetValue(event, index, TRUE);
+        evtSetValue(event, (s32)args, TRUE);
     }
     else {
-        evtSetValue(event, index, FALSE);
+        evtSetValue(event, (s32)args, FALSE);
     }
     return EVT_RETURN_DONE;
 }
 
 USER_FUNC(btlevtcmd_PadCheckNow) {
     s32* args = event->args;
-    s32 chan, index;
-    chan = evtGetValue(event, args[0]);
-    index = args[2];
-    if (BattlePadMultiCheckNow(chan, args[1])) {
-        evtSetValue(event, index, TRUE);
+    s32 chan = evtGetValue(event, args[0]);
+    s32 mask = args[1];
+    args = (s32*)args[2];
+    if (BattlePadMultiCheckNow(chan, mask)) {
+        evtSetValue(event, (s32)args, TRUE);
     }
     else {
-        evtSetValue(event, index, FALSE);
+        evtSetValue(event, (s32)args, FALSE);
     }
     return EVT_RETURN_DONE;
 }
@@ -5558,15 +5956,18 @@ USER_FUNC(btlevtcmd_InviteApInfoReport) {
 
 USER_FUNC(btlevtcmd_SacBgsetMove) {
     BattleWork* wp = _battleWorkPointer;
-    s32 on, mode, i;
+    s32 on, i;
     BattleStageObject* obj;
+    s32 mode;
     f32 val;
+    s32 cnt;
 
     on = evtGetValue(event, event->args[0]);
     if (isFirstCall) {
         event->userdata[0] = 0;
     }
-    event->userdata[0]++;
+    cnt = event->userdata[0] + 1;
+    event->userdata[0] = cnt;
     mode = on ? 5 : 2;
     for (i = 0; i < 32; i++) {
         obj = &wp->stageObjects[i];
@@ -5576,28 +5977,28 @@ USER_FUNC(btlevtcmd_SacBgsetMove) {
                 case 1:
                     if (on) {
                         if (obj->mPosition.x >= 0.0f) {
-                            val = intplGetValue(mode, event->userdata[0], 45, 450.0f, 0.0f);
+                            val = intplGetValue(mode, cnt, 45, 450.0f, 0.0f);
                         }
                         else {
-                            val = -intplGetValue(mode, event->userdata[0], 45, 450.0f, 0.0f);
+                            val = -intplGetValue(mode, cnt, 45, 450.0f, 0.0f);
                         }
                     }
                     else {
                         if (obj->mPosition.x >= 0.0f) {
-                            val = intplGetValue(mode, event->userdata[0], 45, 0.0f, 450.0f);
+                            val = intplGetValue(mode, cnt, 45, 0.0f, 450.0f);
                         }
                         else {
-                            val = -intplGetValue(mode, event->userdata[0], 45, 0.0f, 450.0f);
+                            val = -intplGetValue(mode, cnt, 45, 0.0f, 450.0f);
                         }
                     }
                     obj->field_0x28.x = val;
                     break;
                 case 2:
                     if (on) {
-                        val = intplGetValue(mode, event->userdata[0], 45, 260.0f, 0.0f);
+                        val = intplGetValue(mode, cnt, 45, 260.0f, 0.0f);
                     }
                     else {
-                        val = intplGetValue(mode, event->userdata[0], 45, 0.0f, 260.0f);
+                        val = intplGetValue(mode, cnt, 45, 0.0f, 260.0f);
                     }
                     obj->field_0x28.y = val;
                     break;
@@ -5614,7 +6015,7 @@ USER_FUNC(btlevtcmd_BtlStageObjFlagOnOff) {
     BattleStageObject* obj;
     s32 onoff;
     const char* name;
-    u32 flags;
+    s32 flags;
 
     name = (const char*)evtGetValue(event, args[0]);
     flags = args[1];
@@ -5636,9 +6037,10 @@ USER_FUNC(btlevtcmd_BtlStageObjFlagOnOff) {
 USER_FUNC(btlevtcmd_BtlStageObjSetRotate) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    const char* name;
-    s32 xa, ya, za, x, y, z, i;
+    s32 i;
     BattleStageObject* obj;
+    const char* name;
+    s32 xa, y, z, x, ya, za;
 
     name = (const char*)evtGetValue(event, args[0]);
     xa = args[1];
@@ -5668,9 +6070,10 @@ USER_FUNC(btlevtcmd_BtlStageObjSetRotate) {
 USER_FUNC(btlevtcmd_BtlStageObjGetRotate) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    const char* name;
-    s32 x, y, z, i;
+    s32 i;
     BattleStageObject* obj;
+    const char* name;
+    s32 x, y, z;
 
     name = (const char*)evtGetValue(event, args[0]);
     x = args[1];
@@ -5697,14 +6100,14 @@ USER_FUNC(btlevtcmd_BtlStageObjGetRotate) {
 USER_FUNC(btlevtcmd_StatusWindowOnOff) {
     BattleWork* wp = _battleWorkPointer;
     switch (evtGetValue(event, event->args[0])) {
-        case 0:
-            BEC_FIELD(wp, 0x2748, s32) = 0;
+        case 2:
+            BEC_FIELD(wp, 0x2744, s32) = 1;
             break;
         case 1:
             BEC_FIELD(wp, 0x2748, s32) = 1;
             break;
-        case 2:
-            BEC_FIELD(wp, 0x2744, s32) = 1;
+        case 0:
+            BEC_FIELD(wp, 0x2748, s32) = 0;
             break;
     }
     BattleStatusWindowCheck();
@@ -5729,11 +6132,11 @@ USER_FUNC(btlevtcmd_ftomsec) {
 
 USER_FUNC(btlevtcmd_ftof) {
     s32* args = event->args;
-    s32 index, value;
+    s32 index, value, frames;
     value = evtGetValue(event, args[0]);
     index = args[1];
-    value = sysMsec2Frame(value * 1000 / 60);
-    evtSetValue(event, index, value);
+    frames = sysMsec2Frame(value * 1000 / 60);
+    evtSetValue(event, index, frames);
     return EVT_RETURN_DONE;
 }
 /* half_A end POST */

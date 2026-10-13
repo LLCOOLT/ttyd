@@ -80,7 +80,7 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
     work->confetti = irand(5) + 1;
     work->done = 0;
     for (i = 1, p = work + 1; i < effect->count; i++, p++) {
-        p->position.x = (f32)((effect->count - 1) * 38 / 2 - (i - 1) * 38 + 20);
+        p->position.x = (f32)((i - 1) * 38 - (effect->count - 1) * 38 / 2 + 20);
         p->position.y = 0.0f;
         p->position.z = 0.0f;
         p->scale = 0.0f;

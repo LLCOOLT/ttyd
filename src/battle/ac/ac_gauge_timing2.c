@@ -58,13 +58,13 @@ typedef struct GT2Work {
 static void actionCommandDisp(f32 x, f32 y);
 
 s32 battleAcMain_GaugeTiming2(BattleWork* work) {
+    s32 i;
+    BOOL found;
+    BOOL allDone;
+    BOOL pressed;
+    BOOL autoCommand = FALSE;
     GT2Work* gw = GT_WORK(work);
     GT2Disp* disp = GT_DISP(work);
-    BOOL autoCommand = FALSE;
-    BOOL pressed;
-    BOOL allDone;
-    BOOL found;
-    s32 i;
 
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;

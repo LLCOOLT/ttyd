@@ -196,7 +196,7 @@ void partyChkGnd(PartyEntry* party) {
             partyChkFrontStep(party, 11.0f, &a, &b, &c);
             if (a - party->position.y >= 5.0f && PF(party, 0xE0) <= 30.0f) {
                 PF(party, 0x120) = a;
-                if (PF(party, 0x104) != 0.0f) {
+                if (PF(party, 0x104)) {
                     partyChgMot(party, 6);
                 }
             }
@@ -215,7 +215,7 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     HitEntry* hit;
     HitEntry* best;
     s32 i;
-    f32 ox, oz, gy, nsz, nsx, len, bestY, sx, sz, px, baseY, pz, probeY, rad, d;
+    f32 probeY, pz, baseY, px, sz, sx, bestY, len, nsx, nsz, gy, oz, ox, rad, d;
     Vec pos, outPos, outNrm;
     f32 dist;
 
@@ -226,8 +226,8 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
         Vec zero = {0.0f, 0.0f, 0.0f};
         *(Vec*)((u8*)party + 0xC4) = zero;
     }
-    range = __fabsf(range) + 0.1f;
     PF(party, 0xE0) = 0.0f;
+    range = __fabsf(range); range += 0.1f;
     if (marioGetPtr()->currMotionId == 0x1A) {
         d = 5.0f;
     } else {
@@ -242,12 +242,12 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     rad = 3.1415927f * rad / 180.0f;
     sx = 0.375f * (party->width * (f32)sin(rad));
-    nsx = -sx;
     sz = 0.375f * (party->width * -(f32)cos(rad));
+    nsx = -sx;
     baseY = party->position.y;
     nsz = -sz;
-    probeY = baseY + d;
     len = d + range;
+    probeY = baseY + d;
     {
     Vec dir = {0.0f, -1.0f, 0.0f};
     best = NULL;
@@ -310,9 +310,9 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
 
 HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng) {
     HitEntry* hit;
-    f32 h, ang, sn, cs, ox, oy, oz, dx, gy;
+    f32 dx, sn, cs, h, ang, ox, oy, oz, gy;
     Vec pos, outPos, outNrm;
-    f32 dist;
+    f32 dist, rad;
 
     range += 0.01f;
     {
@@ -323,16 +323,16 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     h = partyGetHeight(party);
     *outY = party->position.y;
     *outDist = -1.0f;
-    if (PF(party, 0x104) != 0.0f) {
+    if (PF(party, 0x104)) {
         ang = PF(party, 0x100);
     } else {
         ang = toMovedir(PF(party, 0x10C));
     }
     ang = revise360((s32)(0.5f + ang));
-    ang = 3.1415927f * ang / 180.0f;
     dx = 0.265f * party->width;
-    sn = (f32)sin(ang);
-    cs = (f32)cos(ang);
+    rad = 3.1415927f * ang / 180.0f;
+    sn = (f32)sin(rad);
+    cs = (f32)cos(rad);
     oy = party->position.y;
     ox = party->position.x;
     oz = party->position.z;
@@ -351,17 +351,21 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
         hit = partyHitCheckInl(party, &pos, &dir, &outPos, &outNrm, &dist);
     }
     if (hit) {
-        PF(party, 0xE0) = partyNrmSet(party, outNrm);
+        Vec n = outNrm;
+        PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
+        PF(party, 0xC8) = 0.0f;
+        PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
+        PF(party, 0xE0) = angleABf(0.0f, 0.0f, party_sqrtf(n.x * n.x + n.z * n.z), -n.y);
         gy = outPos.y;
         if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
             *outDist = oy - gy;
             *outAng = angleABf(ox, oz, outPos.x, outPos.z);
-            return NULL;
+        } else {
+            *outY = gy;
+            *outDist = 0.0f;
+            *outAng = angleABf(ox, oz, outNrm.x, outNrm.z);
+            return hit;
         }
-        *outY = gy;
-        *outDist = 0.0f;
-        *outAng = angleABf(ox, oz, outNrm.x, outNrm.z);
-        return hit;
     }
     return NULL;
 }
@@ -402,11 +406,11 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     best = NULL;
     maxD = rd + dist;
     bestD = maxD;
+    qpos = *pos;
     {
     Vec dir1 = {0.0f, 0.0f, 0.0f};
     dir1.x = sn;
     dir1.z = cs;
-    qpos = *pos;
     qdir = dir1;
     }
     for (i = 0; i < 3; i++) {
@@ -439,11 +443,11 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     }
     sincosf(&sn2, &cs2, ang + 45.0f);
     bestD = rd;
+    qpos = *pos;
     {
     Vec dir2 = {0.0f, 0.0f, 0.0f};
     dir2.x = sn2;
     dir2.z = cs2;
-    qpos = *pos;
     qdir = dir2;
     }
     for (i = 0; i < 3; i++) {
@@ -511,7 +515,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     p.y += dy;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        if (partyNrmToAngle(&nrm) >= 45.0f) {
+        if (angleABf(0.0f, 0.0f, party_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z), -nrm.y) >= 45.0f) {
             PF(party, 0xEC) = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
@@ -527,7 +531,6 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     Vec t;
     f32 s, c;
-    Vec base;
     f32 d0, nz0, ny0, nx0, hz0, hy0, hx0;
     f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
     f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
@@ -538,15 +541,14 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
 
     oz = 0.3f * party->width;
     sincosf(&s, &c, angle);
-    base = *pos;
     ox = -oz * c;
     oz = oz * s;
     best = *dist;
     {
         Vec v0 = {0.0f, 0.0f, 0.0f};
-        lx = base.x + oz;
-        ly = base.y;
-        lz = base.z + ox;
+        lx = pos->x + oz;
+        ly = pos->y;
+        lz = pos->z + ox;
         v0.x = lx;
         v0.y = ly;
         v0.z = lz;
@@ -559,9 +561,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v1 = {0.0f, 0.0f, 0.0f};
-        lx = base.x - oz;
-        ly = base.y;
-        lz = base.z - ox;
+        lx = pos->x - oz;
+        ly = pos->y;
+        lz = pos->z - ox;
         v1.x = lx;
         v1.y = ly;
         v1.z = lz;
@@ -574,9 +576,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v2 = {0.0f, 0.0f, 0.0f};
-        lx = base.x + ox;
-        ly = base.y;
-        lz = base.z + oz;
+        lx = pos->x + ox;
+        ly = pos->y;
+        lz = pos->z + oz;
         v2.x = lx;
         v2.y = ly;
         v2.z = lz;
@@ -589,9 +591,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v3 = {0.0f, 0.0f, 0.0f};
-        lx = base.x - ox;
-        ly = base.y;
-        lz = base.z - oz;
+        lx = pos->x - ox;
+        ly = pos->y;
+        lz = pos->z - oz;
         v3.x = lx;
         v3.y = ly;
         v3.z = lz;

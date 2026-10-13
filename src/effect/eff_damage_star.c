@@ -378,9 +378,8 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
         number = 20;
     }
     effect->type = "DamageStar\0";
-    size = (number + 2) * sizeof(DamageStarWork);
     effect->count = number + 2;
-    work = __memAlloc(HEAP_EFFECT, size);
+    work = __memAlloc(HEAP_EFFECT, size = (number + 2) * sizeof(DamageStarWork));
     effect->userdata = work;
     memset(work, 0, size);
     effect->callback = effDamageStarMain;
@@ -401,10 +400,10 @@ EffectEntry* effDamageStarEntry(s32 type, s32 number, f32 x, f32 y, f32 z, f32 s
     for (i = 1; i < number + 2; i++, work++) {
         ang = base * (f32)(i * ((i % 2) * 2 - 1) / 2) + angle;
         work->angle = ang;
-        a = 6.2831855f * ang / 360.0f;
         work->position.x = 0.0f;
         work->position.y = 0.0f;
         work->position.z = 0.0f;
+        a = 6.2831855f * ang / 360.0f;
         work->velocity.x = 1.5f * (scale * -_sinf(a));
         work->velocity.y = 1.5f * (scale * _cosf(a));
         work->velocity.z = 0.0f;
@@ -563,10 +562,10 @@ void effDamageStarDisp(CameraId cameraId, EffectEntry* effect) {
     }
     for (i = 2; i < effect->count; i++, part++) {
         color = unk_80423038;
-        color.a = part->alpha;
         color.r = color_rotation_data[((i + frame) % 12) * 3];
         color.g = color_rotation_data[((i + frame) % 12) * 3 + 1];
         color.b = color_rotation_data[((i + frame) % 12) * 3 + 2];
+        color.a = part->alpha;
         GXSetChanMatColor(GX_COLOR0A0, color);
         PSMTXIdentity(partMtx);
         PSMTXScaleApply(partMtx, partMtx, part->scale.x, part->scale.y, part->scale.z);

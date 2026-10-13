@@ -24,7 +24,7 @@ double cos(double x);
 typedef struct OrbitData { f32 angle; f32 dist; } OrbitData;
 OrbitData* _op;
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
-#define ORBIT(i, pos) { f32 rad; f32 r; f32 x; f32 z; op[i].angle += d; rad = 3.141592f * op[i].angle / 180.0f; r = op[i].dist; x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; (pos).x = x; (pos).z = z; }
+#define ORBIT(i, pos) { f32 rad; f32 r; f32 x; f32 z; op[i].angle += d; rad = op[i].angle; rad = 3.141592f * rad / 180.0f; r = op[i].dist; x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; (pos).x = x; (pos).z = z; }
 NanNpc* random_choice_target(s32 type);
 void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 TobiWork* Tobidat;

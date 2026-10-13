@@ -225,9 +225,9 @@ void effBrokenBarrierMain(EffectEntry* effect) {
         height *= 4.0f;
         break;
     }
+    w = (s32)width;
     halfW = 0.5f * width;
     halfH = 0.5f * height;
-    w = (s32)width;
     h = (s32)height;
     work++;
     for (i = 1; i < effect->count; i++, work++) {

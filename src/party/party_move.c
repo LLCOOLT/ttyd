@@ -456,8 +456,8 @@ static inline BOOL partyChkOtherFlag(PartyEntry* other) {
 }
 
 void partyRecordFootmark(PartyEntry* party) {
-    u32 flags = 0;
     MarioWork* mario = party->playerPtr;
+    u32 flags = 0;
     PartyEntry* other;
     BOOL far;
 
@@ -878,8 +878,8 @@ void partyMoveBesideMario(PartyEntry* party, s32 arg) {
 }
 
 void partyMoveCheckWall(PartyEntry* party) {
-    f32 dir;
     f32 spd;
+    f32 dir;
     Vec pos;
     HitEntry* hit;
 
@@ -1013,7 +1013,7 @@ s16 partyMarioHosei(PartyEntry* party) {
         if (mario->baseSpeed > 1.0f) {
             scale = 0.8f * mario->baseSpeed;
         }
-        a = (3.1416f * dir) / 180.0f;
+        a = (3.14159265f * dir) / 180.0f;
         PF(party, 0xA0) = scale * (f32)sin(a);
         PF(party, 0xA8) = scale * -(f32)cos(a);
     } else if (PS16(party, 0x52) > 0) {
@@ -1023,8 +1023,8 @@ s16 partyMarioHosei(PartyEntry* party) {
 }
 
 void partyChkWall(PartyEntry* party) {
-    f32 dir;
     f32 spd;
+    f32 dir;
     Vec pos;
     HitEntry* hit;
 
@@ -1106,9 +1106,9 @@ void partyMoveWalk(PartyEntry* party) {
 }
 
 void partyWalkMain(PartyEntry* party) {
+    PartyEntry* other;
     u32 flags = 0;
     MarioWork* mario = party->playerPtr;
-    PartyEntry* other;
 
     if (party->currentSlotId == 0) {
         if (partyChkMarioJumpFlag()) {

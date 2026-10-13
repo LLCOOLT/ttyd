@@ -261,12 +261,12 @@ void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
 }
 
 void FontDrawStringVecPitch(Vec pos, f32 pitch, const char* str) {
-	const s8* msg = (const s8*)str;
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
 	f32 x;
+	const s8* msg = (const s8*)str;
 
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -397,7 +397,21 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 		else {
 			code = JUTFont_CodeToGlyph(*msg++);
 		}
-		fontDrawCodeEdgeX(code, x);
+		{
+			if (fontEdge) {
+				GXColor save = fontColor;
+				FontDrawColorIDX(0);
+				_JUTFont_DrawPos(code, (s16)x - 2, 0);
+				_JUTFont_DrawPos(code, (s16)x + 2, 0);
+				{
+				s32 ix = (s16)x;
+				_JUTFont_DrawPos(code, ix, -2);
+				_JUTFont_DrawPos(code, ix, 2);
+				}
+				FontDrawColor(save);
+			}
+			_JUTFont_DrawPos(code, x, 0);
+		}
 		x += fontGetWidth(code)->width + charspace[gp->language];
 	}
 }
@@ -545,6 +559,93 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 }
 
 
+void FontDrawMessageMtx(Mtx mtx, const char* msg) {
+	CameraEntry* camera;
+	u16 code;
+	s32 cx;
+	s32 cy;
+	f32 x;
+	s8 tag[0x80];
+	s8 value[0x80];
+	Mtx m2;
+	Mtx m;
+	char name[0x20];
+	Vec pos;
+	s32 id;
+	s32 d1, d2, d3;
+	f32 scale;
+	u16 w, h;
+
+	camera = camGetCurPtr();
+	cx = 0;
+	cy = 0;
+	x = 0.0f;
+	while (*(const s8*)msg) {
+		code = 0xFFFF;
+		if (_ismbblead(*(const s8*)msg)) {
+			code = JUTFont_CodeToGlyph(*(u16*)msg);
+			msg += 2;
+		}
+		else {
+			switch (*(const s8*)msg) {
+				case '\n':
+					cx = x;
+					cy -= 28;
+					msg++;
+					break;
+				case '<':
+					msg = msgGetCommand((char*)msg + 1, (char*)tag, (char*)value);
+					if (!strcmp((char*)tag, "red")) {
+						FontDrawColor((GXColor){0xE0, 0x00, 0x00, 0xFF});
+					}
+					else if (!strcmp((char*)tag, "/red")) {
+						FontDrawColorIDX(0);
+					}
+					else if (!strcmp((char*)tag, "icon")) {
+						camGetCurPtr();
+						if (value[0] >= '0' && value[0] <= '9') {
+							sscanf((char*)value, "%d%f%d%d%d", &id, &scale, &d1, &d2, &d3);
+						}
+						else {
+							sscanf((char*)value, "%s%f%d%d%d", name, &scale, &d1, &d2, &d3);
+							id = msgIconStr2ID(name);
+							if (id < 0) {
+								id = 0;
+							}
+						}
+						iconGetWidthHight(&w, &h, id);
+						pos.x = d1 + (cx + 0.5f * w * scale);
+						pos.y = d2 + (cy - h * scale);
+						pos.z = 0.0f;
+						PSMTXMultVec(mtx, &pos, &pos);
+						iconDispGxAlpha(&pos, 0x10, id, fontAlpha, scale);
+						FontDrawStart_alpha(fontAlpha);
+						FontDrawColor_();
+						cx += w * scale + d3;
+					}
+					else if (tag[0] == 'R' || (tag[0] == '/' && tag[0] == (u32)'/r')) {
+						break;
+					}
+					if (*(const s8*)msg == '\n') {
+						msg++;
+					}
+					break;
+				default:
+					code = JUTFont_CodeToGlyph(*((const s8*)msg)++);
+					break;
+			}
+		}
+		if (code != 0xFFFF) {
+			PSMTXTrans(m, cx, cy, 0.0f);
+			PSMTXConcat(camera->view, mtx, m2);
+			PSMTXConcat(m2, m, m2);
+			GXLoadPosMtxImm(m2, 0);
+			fontDrawCodeEdge(code);
+			cx += fontGetWidth(code)->width + charspace[gp->language];
+		}
+	}
+}
+
 void hankakuSearch(s8 c) {
 	JUTFont_CodeToGlyph(c);
 }
@@ -667,8 +768,8 @@ GXColor HSV2RGB(GXColor hsv) {
 }
 
 void JUTFontSetup(u16 font) {
-	DVDEntry* dvd;
 	u32 size;
+	DVDEntry* dvd;
 	BinaryFontBlock* ptr;
 	char path[128];
 	u32 i;
@@ -676,8 +777,8 @@ void JUTFontSetup(u16 font) {
 	if (!pfh) {
 		sprintf(path, "%s/f/%s.bfn", getMarioStDvdRoot(), fontname[font]);
 		dvd = DVDMgrOpen(path, 2, 0);
-		size = OSRoundUp32B(DVDMgrGetLength(dvd));
-		pfh = __memAlloc(HEAP_DEFAULT, size);
+		size = DVDMgrGetLength(dvd);
+		pfh = __memAlloc(HEAP_DEFAULT, size = OSRoundUp32B(size));
 		DVDMgrRead(dvd, pfh, size, 0);
 		DVDMgrClose(dvd);
 		ptr = (BinaryFontBlock*)(pfh + 1);
@@ -831,37 +932,41 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	s16 x0, y0, x1, y1;
 	u16 u0, u1, v0, v1;
 	u8 t0, t1;
-	GXColor hsv = {0x00, 0xAA, 0xFF, 0xFF};
+	GXColor hsv;
+	f32 tv;
 	GXColor c;
-	f32 scale = 1.0f;
+	static f32 scale = 1.0f;
 
 	entry = fontGetWidth(code);
 	glyph = blockGlyph;
 	idx = code - glyph->firstcode;
 	cell = idx / glyph->sheetrows;
-	col = idx % glyph->sheetrows;
-	row = cell % glyph->sheetcolumns;
-	cellh = glyph->cellheight;
+	col = idx - cell * glyph->sheetrows;
+	row = cell - (cell / glyph->sheetcolumns) * glyph->sheetcolumns;
 	cellw = glyph->cellwidth;
+	cellh = glyph->cellheight;
 	h = cellh * scale;
 	tu = col * cellw + entry->kerning;
 	w = entry->width * scale;
 	tw = entry->width;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	n0 = irand(64);
-	n1 = irand(64);
 	x0 = x;
 	y0 = y - 1;
-	v0 = scale + row * cellh;
+	n0 = irand(64);
+	n1 = irand(64);
+	tv = row * cellh;
 	x1 = x0 + w;
 	hue = x0 - (u8)gp->retraceCount * 2;
 
-	GXPosition3s16(x, y - 1, 0);
+	v0 = scale + tv;
+	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
+	GXPosition3s16(x0, y0, 0);
 	hsv.r = x0 + hue;
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
 	u0 = tu;
+	u1 = tu + tw;
 	GXTexCoord2u16(u0, v0);
 	GXTexCoord2u8(n0, n1);
 
@@ -869,7 +974,6 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	hsv.r = x1 + hue;
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	u1 = tu + tw;
 	t0 = n0 + w;
 	GXTexCoord2u16(u1, v0);
 	GXTexCoord2u8(t0, n1);

@@ -133,16 +133,19 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     EffPokopiThunderN64Work* work;
     s32 cam;
     f32 len;
-    f32 dx, dy, dz;
+    f32 dx;
+    f32 nv;
+    f32 dy;
+    f32 dz;
 
     effect = effEntry();
     cam = 4;
     if (type >= 10) {
         cam = 8;
     }
+    type = type % 10;
     effect->type = "PokopiThunderN64";
     effect->count = 1;
-    type = type % 10;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPokopiThunderN64Work));
     effect->userdata = work;
     effect->callback = effPokopiThunderMain;
@@ -168,9 +171,10 @@ EffectEntry* effPokopiThunderN64Entry(s32 type, s32 duration, f32 x, f32 y, f32 
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
+    nv = 0.0f;
     work->scale = scale;
     work->cameraId = cam;
-    if (len != 0.0f) {
+    if (len != nv) {
         work->length = sqrtf(len);
     } else {
         return NULL;
@@ -223,6 +227,8 @@ void effPokopiThunderMain(EffectEntry* effect) {
     dispEntry(work->cameraId, dispCalcZ(&position), 2, (DispCallback)effPokopiThunderDisp, effect);
 }
 
+inline float pt_dy(EffPokopiThunderN64Work* a, EffPokopiThunderN64Work* b) { return a->end.y - b->start.y; }
+
 void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     s32 alpha;
@@ -234,9 +240,9 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     s32 i;
     s32 n;
-    u8* data;
     effN64Vtx* vtx;
     effN64Vtx* v;
+    u8* data;
     s32 u;
     s32 k;
     GXTexObj texObj;
@@ -313,21 +319,22 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
         f32 w, dx, dy, a, s, c, off;
         w = (f32)data[i];
         dx = 0.09090909f * (work->end.x - work->start.x);
-        dy = 0.09090909f * (work->end.y - work->start.y);
+        dy = 0.09090909f * pt_dy(work, work);
         a = 6.2831855f * (f32)((work->seed + (i - frame) * 10) % 120 - 60) / 360.0f;
         s = (f32)sin(a);
         off = 0.04f * (w * s);
+        s = dy * off;
         c = (f32)cos(a);
         c = 0.04f * (w * c);
-        work->x[i] = (dx * c - dy * off) + (0.09090909f * ((f32)i * (work->end.x - work->start.x)) + work->start.x);
-        work->y[i] = (dx * off + dy * c) + (0.09090909f * ((f32)i * (work->end.y - work->start.y)) + work->start.y);
+        work->x[i] = (dx * c - s) + (0.09090909f * ((f32)i * (work->end.x - work->start.x)) + work->start.x);
+        work->y[i] = (dx * off + dy * c) + (0.09090909f * ((f32)i * pt_dy(work, work)) + work->start.y);
         work->z[i] = zero + (0.09090909f * ((f32)i * (work->end.z - work->start.z)) + work->start.z);
         work->w[i] = 0.1f * (f32)data[i + 12];
     }
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     v = vtx;
     for (i = 0; i < 12; i++) {
-        f32 ang, ang2, r, a, ox, oy;
+        f32 ox, oy, a, r, ang, ang2;
         if (i == 0) {
             r = 8.0f;
             ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
@@ -339,19 +346,17 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
                 f32 d;
                 ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
                 ang2 = -angleABf(work->y[i], -work->x[i], work->y[i - 1], -work->x[i - 1]);
-                d = ang2 - ang;
-                if (d > 180.0f) {
+                if (ang2 - ang > 180.0f) {
                     ang += 360.0f;
-                } else if (d < -180.0f) {
-                    ang2 += 360.0f;
+                } else if (ang2 - ang < -180.0f) {
+                    do { ang2 += 360.0f; } while (0);
                 }
-                ang = (ang + ang2) * 0.5f;
+                ang2 = ang + ang2; ang = 0.5f * ang2;
             }
         }
-        a = 6.2831855f * ang;
         r = r * (scale * work->w[i]);
+        a = 6.2831855f * ang / 360.0f;
         u = (0x80 - i * 12) << 5;
-        a = a / 360.0f;
         ox = r * (f32)sin(a);
         oy = r * (f32)cos(a);
         v->x = (s16)(10.0f * (work->x[i] + ox));
@@ -375,8 +380,7 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     DCFlushRange(vtx, 0x2a0);
     GXInvalidateVtxCache();
     effSetVtxDescN64(vtx);
-    k = 0;
-    n = k;
+    n = 0;
     for (k = 0; k < i - 1; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);

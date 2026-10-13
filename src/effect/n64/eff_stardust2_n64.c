@@ -72,11 +72,11 @@ static u8 speed_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 
 static u8 scale_data[] = {0x1E, 0x3C, 0x5A, 0x64, 0x68, 0x6A, 0x6C, 0x6E, 0x70, 0x71, 0x71, 0x6E, 0x6B, 0x67, 0, 0};
 
 EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y, f32 z, f32 vx, f32 vy) {
+    s32 n;
     EffectEntry* effect;
     EffStardust2N64Work* w;
     EffStardust2N64Work* p;
     s32 i;
-    s32 n;
     f32 step, stepY;
     f32 a, sn, cs, b, fy;
     s32 r;
@@ -119,9 +119,9 @@ EffectEntry* effStardust2N64Entry(s32 type, s32 count, s32 camera, f32 x, f32 y,
         fy = ((f32)i - 1.0f) * stepY;
         tx = 0.4f * vx - 0.1f * vx * b;
         ty = 0.4f * vy - 0.1f * vy * b;
-        p->scale = 1.0f;
-        p->frame = 0;
         p->life = i + 30;
+        p->frame = 0;
+        p->scale = 1.0f;
         switch (type) {
         case 0:
         case 1:
@@ -278,6 +278,7 @@ void effStardust2Main(EffectEntry* effect) {
 
 #pragma opt_propagation reset
 void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
+    CameraEntry* cam;
     EffStardust2N64Work* w;
     s32 type;
     s32 camera;
@@ -292,14 +293,14 @@ void effStardust2Disp(CameraId cameraId, EffectEntry* effect) {
     f32 fr, fg, fb;
     s32 r, g, b;
 
-    camera = (s32)camGetPtr(cameraId);
+    cam = camGetPtr(cameraId);
     w = effect->userdata;
     type = w->type;
     idx = (w->frame - 1) * 3;
     PSMTXTrans(mtx2, w->position.x, w->position.y, w->position.z);
     PSMTXRotRad(rotY, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     PSMTXConcat(mtx2, rotY, mtx);
-    PSMTXConcat(((CameraEntry*)camera)->view, mtx, mtx);
+    PSMTXConcat(cam->view, mtx, mtx);
     w++;
     GXSetNumChans(0);
     GXSetNumTexGens(1);

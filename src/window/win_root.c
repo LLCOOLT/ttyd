@@ -1418,7 +1418,7 @@ typedef struct WinHakoList {
     s32 page;    // 0x8
     f32 scroll;  // 0xC
     u8 pad_10[0x14];
-    s16 ids[110]; // 0x24
+    s16 ids[108]; // 0x24
 } WinHakoList;
 
 typedef struct WinHakoWork {
@@ -1427,10 +1427,10 @@ typedef struct WinHakoWork {
 } WinHakoWork;
 
 void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
+    s32 ofs;
     s32 num;
     s32 page;
     f32 scroll;
-    s32 ofs;
     s32 npages;
     s32 p;
     s32 py;

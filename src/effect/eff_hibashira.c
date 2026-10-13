@@ -84,10 +84,10 @@ EffectEntry* effHibashiraEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, 
 }
 
 void effHibashiraMain(EffectEntry* effect) {
+    BOOL inBattle;
     EffHibashiraWork* work = effect->userdata;
     EffHibashiraWork* pillar;
     Vec position;
-    BOOL inBattle;
     s32 type, i, j;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };

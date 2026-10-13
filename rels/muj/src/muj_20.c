@@ -297,6 +297,7 @@ EVT_BEGIN(yoru_hiru_event)
 EVT_END()
 
 USER_FUNC(urouro_func) {
+    int t;
     s32* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 sx = evtGetValue(event, args[1]);
@@ -307,7 +308,6 @@ USER_FUNC(urouro_func) {
     s32 duration = evtGetValue(event, args[6]);
     s32 mode = evtGetValue(event, args[7]);
     NpcEntry* npc = evtNpcNameToPtr(event, name);
-    s32 t;
 
     if (isFirstCall) {
         event->savedTime = gp->renderTime;

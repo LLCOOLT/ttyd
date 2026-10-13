@@ -160,7 +160,7 @@ static inline void planeRoll1(MarioWork* mp, f32 rate, f32 max) {
 }
 
 static inline void planeRoll2(MarioWork* mp, f32 rate, f32 max) {
-	MW(mp, 0x2a4, f32) += rate * (max * DIRF(mp) - MW(mp, 0x2a4, f32));
+	f32 r = rate; f32 m = max; f32 cur; f32 d = DIRF(mp); f32 t; t = m * d; cur = MW(mp, 0x2a4, f32); t = t - cur; MW(mp, 0x2a4, f32) = cur + r * t;
 }
 
 void mot_plane(void) {
@@ -174,7 +174,7 @@ void mot_plane(void) {
 		mp->trigFlags &= ~1;
 		mp->motStruct = __memAlloc(HEAP_DEFAULT, 0x48);
 		memset(mp->motStruct, 0, 0x48);
-		MS(0x28, s32) = -1;
+		{ MarioWork* m2 = marioGetPtr(); MW(m2->motStruct, 0x28, s32) = -1; }
 		mp->currSubMotionId = 0;
 	}
 	switch (mp->currSubMotionId) {
@@ -194,7 +194,7 @@ void mot_plane(void) {
 		SFX3D(0xaf, &mp->position);
 	case 1:
 		marioMakeJumpPara();
-		planeRoll1(mp, 0.125f, 30.0f);
+		{ f32 r = 0.125f; f32 m = 30.0f; f32 d; f32 cur; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = m * d; cur = MW(mp, 0x2a4, f32); MW(mp, 0x2a4, f32) = cur + r * (d - cur); }
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -214,7 +214,7 @@ void mot_plane(void) {
 			marioChgPose("M_Z_1");
 			MW(mp, 4, u32) |= 8;
 			animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
-			animPoseSetLocalTime(MW(mp, 0x228 + marioAnimeId() * 4, s32), 0.0f);
+			animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
 			evt = evtEntry(sound_evt, 0, 0);
 			MW(evt, 0x9c, s32) = (s32)(1024.0f * MW(mp, 0x8c, f32)) + -230000000;
 			MW(evt, 0xa0, s32) = (s32)(1024.0f * MW(mp, 0x90, f32)) + -230000000;
@@ -226,8 +226,8 @@ void mot_plane(void) {
 		break;
 	case 2:
 		animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
-		animPoseSetLocalTime(MW(mp, 0x228 + marioAnimeId() * 4, s32), 0.0f);
-		planeRoll1(mp, 0.125f, 30.0f);
+		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
+		{ f32 r = 0.125f; f32 m = 30.0f; f32 d; f32 cur; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = m * d; cur = MW(mp, 0x2a4, f32); MW(mp, 0x2a4, f32) = cur + r * (d - cur); }
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -592,7 +592,7 @@ static void flyMain(void) {
 			if (t <= 0.0f) {
 				t = 0.0f;
 			}
-			t = planeData[27] * (f32)sin(PI * (t * (90.0f / planeData[0])) / 180.0f);
+			t *= 90.0f / planeData[0]; t = planeData[27] * (f32)sin(PI * t / 180.0f);
 			if (t <= planeData[28]) {
 				t = planeData[28];
 			}
@@ -617,8 +617,8 @@ static void flyMain(void) {
 	SPD += SPD * planeData[1];
 	if (D(4) >= 0.0f) {
 		MD(0, u32) |= 0x10;
-		a = SPD * (planeData[8] * (f32)sin(PI * (D(4) * planeData[7]) / 180.0f));
-		SPD = SPD + a;
+		a = (f32)sin(PI * (D(4) * planeData[7]) / 180.0f);
+		a = SPD * (planeData[8] * a); SPD = SPD + a;
 		if (STICK != 0 && D(4) >= planeData[3]) {
 			SPD += planeData[2];
 		}
@@ -659,7 +659,7 @@ static void flyMain(void) {
 				D(0x18) = planeData[19];
 			}
 		} else {
-			v = D(0x18) += 0.1f * (0.0f - D(0x18));
+			v = D(0x18) + 0.1f * (0.0f - D(0x18)); D(0x18) = v;
 		}
 		D(4) += v;
 	} else if (D(4) >= -80.0f) {
@@ -670,7 +670,7 @@ static void flyMain(void) {
 		SPD += D(0x10);
 		a = (D(4) > 0.0f) ? 0.0f : __fabsf(D(4));
 		t = (f32)sin(PI * (planeData[12] * a) / 180.0f);
-		a = planeData[13] * ((f32)sin(PI * (SPD * planeData[11]) / 180.0f) * t);
+		{ f32 s = (f32)sin(PI * (SPD * planeData[11]) / 180.0f); a = planeData[13] * (s * t); }
 		D(0x14) = D(0x14) + a;
 		if (STICK != 0) {
 			if (MD(0, u32) & 1) {
@@ -698,7 +698,7 @@ static void flyMain(void) {
 		if (D(4) <= D(0x24)) {
 			D(4) = D(0x24);
 		}
-		D(0x18) += 0.1f * (0.0f - D(0x18));
+		D(0x18) = D(0x18) + 0.1f * (0.0f - D(0x18));
 	}
 	if (SPD >= planeData[0]) {
 		SPD = planeData[0];

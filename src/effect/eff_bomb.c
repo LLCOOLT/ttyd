@@ -183,6 +183,7 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
         PSMTXTrans(mtx, -0.05f, -0.05f, 0.0f);
         PSMTXConcat(texMtx, mtx, texMtx);
+
         half = 0.5f;
         left = -one / 2.0f;
         GXLoadTexMtxImm(texMtx, GX_TEXMTX1, GX_MTX2x4);

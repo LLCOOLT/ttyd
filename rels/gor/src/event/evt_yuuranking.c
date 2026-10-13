@@ -149,8 +149,8 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
     const char* scoreTitles[4] = {"menu_title_score", "menu_title_score", "menu_title_score", "menu_title_score"};
     const char* ranks[6] = {"\x81\x40\x82\x50", "\x81\x40\x82\x51", "\x81\x40\x82\x52", "\x81\x40\x82\x53", "\x81\x40\x82\x54", "menu_subtitle2_rankgai"};
     char buf[32];
-    const char* title;
     const char* str;
+    const char* title;
     const u8* rk;
     const char* msg;
     s32 score;

@@ -141,8 +141,8 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     effN64Vtx* vtx;
     effN64Vtx* q;
-    s32 j;
     s32 k;
+    s32 j;
     s32 n;
     s32 frame;
 
@@ -172,7 +172,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = -300 + i * 50;
         p->y = 600;
         p->z = 0;
-        p->s = frame << 5;
+        p->s = (frame + i * 4) << 5;
         p->t = (s32)work->offset[i] << 5;
         p->r = 255;
         p->g = 255;
@@ -182,21 +182,20 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = -300 + i * 50;
         p->y = (s32)(10.0f * (60.0f + work->offset[i]));
         p->z = 0;
-        p->s = frame << 5;
+        p->s = (frame + i * 4) << 5;
         p->t = 1024;
         p->r = 255;
         p->g = 255;
         p->b = 255;
         p->a = 255 - i * 20;
         p++;
-        frame += 4;
     }
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXScale(scale, s, s, s);
     PSMTXConcat(mtx, scale, mtx);
     q = vtx;
-    n = i * 2;
-    for (j = 0; j < n; j++) {
+    k = i * 2;
+    for (j = 0; j < k; j++) {
         OSInitFastCast();
         OSs16tof32(&q->x, &v.x);
         OSs16tof32(&q->y, &v.y);
@@ -213,11 +212,9 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     effSetVtxDescN64(vtx);
     GXLoadPosMtxImm(camera->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    n = 0;
-    k = 0;
-    for (; k < i - 1; k++) {
+    for (k = 0; k < i - 1; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
+        n = k << 1;
         tri2(n, n + 2, n + 1, n, n + 1, n + 2, n + 3, n);
-        n += 2;
     }
 }

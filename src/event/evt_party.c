@@ -50,7 +50,7 @@ extern s32 cloudGetStatus();
 
 USER_FUNC(evt_party_flg_onoff) {
 	PartyEntry* p;
-	u32 mask;
+	int mask;
 	s32* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -67,7 +67,7 @@ USER_FUNC(evt_party_flg_onoff) {
 
 USER_FUNC(evt_party_dispflg_onoff) {
 	PartyEntry* p;
-	u32 mask;
+	int mask;
 	s32* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -84,7 +84,7 @@ USER_FUNC(evt_party_dispflg_onoff) {
 
 USER_FUNC(unk_800e71bc) {
 	PartyEntry* p;
-	u32 mask;
+	int mask;
 	s32* args = event->args;
 	p = GETPARTY(args);
 	if (p == NULL) {
@@ -507,8 +507,9 @@ USER_FUNC(evt_party_jump_pos) {
 		PF(p, 0x114) += PF(p, 0x174);
 		if (--event->userdata[2] <= 0) {
 			half = 0.5f * ff;
+			dy = y - PF(p, 0x5C);
 			PF(p, 0x114) = 0.0f;
-			PF(p, 0x174) = ((y - PF(p, 0x5C)) + (y - PF(p, 0x5C))) / (half * half - half);
+			PF(p, 0x174) = (dy + dy) / (half * half - half);
 			PF(p, 0x11C) = 0.0f;
 			event->userdata[2] = (s32)(0.5f + half);
 			event->field_84 = 2;

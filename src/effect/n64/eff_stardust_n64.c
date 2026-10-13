@@ -119,8 +119,6 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffStardustN64Work) * (count + 1));
     effect->userdata = work;
     effect->callback = effStardustMain;
-    randA = (s32)(1000.0f * a);
-    randB = (s32)(1000.0f * radius);
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
@@ -132,10 +130,13 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     work->cb = 1.0f;
     work->camera = 4;
     work->scale = 1.0f;
+    i = 1;
+    randA = (s32)(1000.0f * a);
+    randB = (s32)(1000.0f * radius);
     p = work + 1;
     lifeA = 0x20;
     lifeB = 0x14;
-    for (i = 1; i < count + 1; i++, lifeA += 2, lifeB += 2, p++) {
+    for (; i < count + 1; i++, lifeA += 2, lifeB += 2, p++) {
         fa = (f32)(rand() % randA) / 1000.0f;
         fb = (f32)(rand() % randB) / 1000.0f;
         switch (type) {
@@ -174,6 +175,7 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
             p->lifetime = lifeA;
             p->frame = 0;
             break;
+        case 3:
         default:
             angle = 360.0f / (f32)count * (f32)i + (f32)(rand() % 360);
             angle = 6.2831855f * angle / 360.0f;

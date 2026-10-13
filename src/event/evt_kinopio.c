@@ -221,7 +221,7 @@ USER_FUNC(get_from_bed_evt) {
 
 static USER_FUNC(paper_on) {
 	s32* args = event->args;
-	f32 amount = evtGetFloat(event, args[0]);
+	f32 amount = evtGetFloat(event, *args++);
 	MarioWork* mario = marioGetPtr();
 	if (isFirstCall) {
 		marioPaperOn("p_slit");

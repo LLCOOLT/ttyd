@@ -251,7 +251,7 @@ void statusWinMain(void) {
     wp->y = wp->openY * t + wp->closeY * inv;
     valueUpdate();
     if (!(wp->flags & 0x1000)) {
-        dispEntry(CAMERA_2D, 0, 500.0f, statusWinDisp, NULL);
+        dispEntry(CAMERA_2D, 500.0f, 0, statusWinDisp, NULL);
     }
 }
 
@@ -451,11 +451,7 @@ void statusGetValue(SVal* values) {
         values->maxAp = pouchGetMaxAP();
         values->starPoints = pouchGetStarPoint();
         values->coins = pouchGetCoin();
-        if (!marioBgmodeChk()) {
-            values->party = ((s16 (*)(void))marioGetParty)();
-        } else {
-            values->party = marioGetPtr()->prevPartyMemberId[0];
-        }
+        values->party = !marioBgmodeChk() ? (s16)marioGetParty() : marioGetPtr()->prevPartyMemberId[0];
         values->partyHp = pouchGetPtr()->partyData[values->party].currentHP;
         values->partyMaxHp = pouchGetPtr()->partyData[values->party].maximumHP;
     } else {

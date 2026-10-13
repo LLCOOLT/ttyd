@@ -191,10 +191,12 @@ static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
+    u32 bufferSize;
     u8* ramp8;
+    u32 size16;
     u16* ramp16;
     u32 i;
-    u32 bufferSize;
+    u32 dummy;
 
     charShadowInit();
     depthShadowInit();
@@ -208,14 +210,14 @@ void shadowInit(void) {
     GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(ramp8, bufferSize);
 
-    bufferSize = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
+    size16 = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
     ramp16 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
     for (i = 0; i < 0x10000; i++) {
         ramp16[(((i & 0x3) * 4) + (((i & 0xFC) * 256) + (((i & 0xFC00) / 64) + ((i & 0x300) / 256))))] = i;
     }
     GXInitTexObj(&rampTex16, ramp16, 0x100, 0x100, GX_TF_IA8, GX_CLAMP, GX_REPEAT, GX_FALSE);
     GXInitTexObjLOD(&rampTex16, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    DCFlushRange(ramp16, bufferSize);
+    DCFlushRange(ramp16, size16);
     projShadowInit();
 
 }
@@ -261,9 +263,9 @@ static inline void shadowSetupPolygon(void) {
 }
 
 static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
+    ShadowConfig* cfg;
     f32 (*proj)[4];
     u16 size;
-    ShadowConfig* cfg;
     Vec pos;
 
     GXInvalidateTexAll();
@@ -291,9 +293,10 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
 
 
 void shadowDisp(CameraId cameraId, void* param) {
-    DispEntry* disp = dispGetCurWork();
-    ShadowConfig* cfg;
+    DispEntry* disp;
     CameraEntry* cam;
+
+    disp = dispGetCurWork();
 
     if (cameraId == CAMERA_OFFSCREEN2 || (u32)(cameraId - CAMERA_3D) <= 1 || cameraId == CAMERA_3D_EFFECTB) {
         shadowCharShadowDisp_Polygon(cameraId, param);
@@ -314,7 +317,8 @@ void shadowDisp(CameraId cameraId, void* param) {
         shadowCharShadowDisp_Texture(cameraId, param);
     } else if (cameraId == CAMERA_SHADOW) {
         switch (disp->renderMode) {
-            case 5:
+            case 5: {
+                ShadowConfig* cfg;
                 shadowCharShadowDisp_Collision(cameraId, param);
                 cfg = &shadowConfig[cswp->unk8];
                 if (cfg->follow == 1) {
@@ -333,6 +337,7 @@ void shadowDisp(CameraId cameraId, void* param) {
                 shadowCharShadowDisp_Projection(cameraId, param);
                 projShadowEnd(cameraId, cswp);
                 break;
+            }
             case 0:
                 shadowBegin(pswp, FALSE);
                 break;

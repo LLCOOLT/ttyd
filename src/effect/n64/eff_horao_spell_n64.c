@@ -148,18 +148,21 @@ void effHoraoSpellMain(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
+    {
+    int frame;
+    frame = work->frame;
     if (work->lifetime < 16) {
         work->alpha = work->lifetime * 16;
     }
-    if (work->frame < 16) {
-        work->alpha = work->frame * 16 + 15;
+    if (frame < 16) {
+        work->alpha = frame * 16 + 15;
+    }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHoraoSpellDisp, effect);
 }
 
 void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
-    EffHoraoSpellN64Work* work;
     GXTexObj texObj;
     Mtx mtx;
     Mtx scale;
@@ -177,13 +180,15 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     s32 j;
     s32 k;
     s32 n;
+    EffHoraoSpellN64Work* work;
     static u8 colr[20] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
     static u8 colg[20] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
     static u8 colb[20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
-    GXColor c1;
     GXColor c2;
+    GXColor c1;
     GXColor c3;
+
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;

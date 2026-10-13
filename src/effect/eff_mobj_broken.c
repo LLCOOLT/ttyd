@@ -181,14 +181,14 @@ EffectEntry* effMObjBrokenEntry(s32 type, f32 x, f32 y, f32 z) {
             depth = 0;
             break;
         }
-        work->position.x = col * s - 0.5f * s;
-        work->position.y = row * s + 0.5f * s;
-        work->position.z = depth * s - 0.5f * s;
+        work->position.x = col * s - s / 2.0f;
+        work->position.y = row * s + s / 2.0f;
+        work->position.z = depth * s - s / 2.0f;
         work->scale = s;
         work->alpha = 255;
         work->rotation = 0.0f;
         work->poseId = -1;
-        work->speed = 0.0625f * (irand(10) + 10);
+        work->speed = (f32)(irand(10) + 10) / 16.0f;
         work->angle = angleABf(0.0f, 0.0f, work->position.x, work->position.z);
         work->velY = irand(3) + 3;
         work->gravity = (irand(5) + 2) / 5.0f;

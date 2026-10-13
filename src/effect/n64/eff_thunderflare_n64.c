@@ -34,8 +34,6 @@ static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-12, 12, 0, 512, 1536, 250, 0, 0, 255},
 };
 
-GXColor unk_804232a8;
-GXColor unk_804232ac;
 
 void effThunderflareMain(EffectEntry* effect);
 void effThunderflareDisp(CameraId cameraId, EffectEntry* effect);
@@ -98,7 +96,8 @@ void effThunderflareMain(EffectEntry* effect) {
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 odd;
     s32 i;
-    f32 sa, ca, sb, cb, d, a, b;
+    f32 sa, ca, sb, cb, d, a, ta, tb, b;
+    s32 frame;
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -112,12 +111,13 @@ void effThunderflareMain(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
-    if (work->frame <= 20) {
-        work->alpha = work->frame * 12;
+    frame = work->frame;
+    if (frame <= 20) {
+        work->alpha = frame * 12;
     } else {
         work->alpha = 255;
     }
-    if (work->frame & 1) {
+    if (frame & 1) {
         work->alpha = 0.5f * work->alpha;
     }
     odd = work->frame & 1;
@@ -126,10 +126,12 @@ void effThunderflareMain(EffectEntry* effect) {
         a = work->rotA;
         d = work->dist;
         b = work->rotB;
-        sa = sin(6.2831855f * a / 360.0f);
-        ca = cos(6.2831855f * a / 360.0f);
-        sb = sin(6.2831855f * b / 360.0f);
-        cb = cos(6.2831855f * b / 360.0f);
+        ta = 6.2831855f * a / 360.0f;
+        sa = sin(ta);
+        ca = cos(ta);
+        tb = 6.2831855f * b / 360.0f;
+        sb = sin(tb);
+        cb = cos(tb);
         work->position.x = cb * (d * sa);
         work->position.y = cb * (d * ca);
         work->position.z = d * sb;
@@ -146,7 +148,7 @@ void effThunderflareMain(EffectEntry* effect) {
         work->rotA += odd ? 5 : 2;
         work->rotB += odd ? 2 : 5;
     }
-    dispEntry(CAMERA_3D, 2, dispCalcZ(&position), (DispCallback)effThunderflareDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effThunderflareDisp, effect);
 }
 
 void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
@@ -157,8 +159,6 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     s32 a;
     s32 i;
     GXTexObj tex;
-    GXColor c0;
-    GXColor c1;
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -185,11 +185,7 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_C0, GX_CC_C1, GX_CC_CPREV, GX_CC_ZERO);
     GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_A0, GX_CA_APREV, GX_CA_ZERO);
-    c1 = unk_804232a8;
-    c1.r = work->color[3];
-    c1.g = work->color[4];
-    c1.b = work->color[5];
-    GXSetTevColor(GX_TEVREG1, c1);
+    GXSetTevColor(GX_TEVREG1, (GXColor){work->color[3], work->color[4], work->color[5]});
     work++;
     effGetTexObjN64(0x55, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
@@ -202,12 +198,7 @@ void effThunderflareDisp(CameraId cameraId, EffectEntry* effect) {
     for (i = 1; i < effect->count; i++, work++) {
         sc = work->scale;
         if (sc) {
-            c0 = unk_804232ac;
-            c0.r = cr;
-            c0.g = cg;
-            c0.b = cb;
-            c0.a = work->alpha;
-            GXSetTevColor(GX_TEVREG0, c0);
+            GXSetTevColor(GX_TEVREG0, (GXColor){cr, cg, cb, work->alpha});
             PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
             PSMTXScale(scale, sc, sc, sc);
             PSMTXConcat(mtx, scale, mtx);

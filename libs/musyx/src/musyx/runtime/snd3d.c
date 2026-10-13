@@ -13,6 +13,7 @@ static u32 snd_used_studios;
 static u8 snd_base_studio;
 static u8 snd_max_studios;
 static u8 s3dUseMaxVoices;
+u8 s3dUseLegacyLogic;
 
 static void UpdateRoomDistances() {
   struct SND_ROOM* r;      // r30
@@ -530,7 +531,7 @@ bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 ma
 
 bool sndCheckEmitter(SND_EMITTER* em) {
   if (sndActive) {
-    return (em->flags & 0x10000) != 0;
+    return (*(u32*)((u8*)em + 0xc) & 0x10000) != 0;
   }
   return FALSE;
 }
@@ -1193,13 +1194,12 @@ void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f3
 void s3dInit(u32 flags) {
   s3dEmitterRoot = 0;
   s3dListenerRoot = 0;
-  s3dRoomRoot = 0;
-  s3dDoorRoot = 0;
   snd_used_studios = 0;
   snd_base_studio = 1;
   snd_max_studios = 3;
   s3dCallCnt = 0;
   s3dUseMaxVoices = ((flags & 2) != 0);
+  s3dUseLegacyLogic = ((flags & 4) != 0);
 }
 
 void s3dExit() {}

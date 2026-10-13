@@ -282,7 +282,7 @@ f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
 
     if (!(ext->flags & 2)) {
         f32 c, s;
-        a = 450.0f - ext->rot;
+        a = ext->rot; a = 450.0f - a;
         if (a >= 360.0f) {
             a -= 360.0f;
         }
@@ -1498,12 +1498,13 @@ void yuunpc_pose_minigame4_main(void) {
                 case 1:
                     npc->dest = npc->goal;
                     if (npc->pos.x < 1500.0f) {
-                        d = npc->pos.z - npc->dest.z;
-                        if (d < 0.0f) {
-                            d = -d;
+                        f32 dd = npc->pos.z - npc->dest.z;
+                        if (dd < 0.0f) {
+                            dd = -dd;
                         }
-                        if (d > 16.666666f) {
-                            npc->dest.x = npc->pos.x + 300.0f * (1.0f - d / 300.0f) * 0.5f;
+                        if (dd > 16.666666f) {
+                            dd = 300.0f * (1.0f - dd / 300.0f);
+                            npc->dest.x = npc->pos.x + dd * 0.5f;
                         }
                     }
                     break;

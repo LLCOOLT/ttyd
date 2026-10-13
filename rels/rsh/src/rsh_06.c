@@ -781,7 +781,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         cam = camGetPtr(CAMERA_3D);
-        rad = 6.2831855f * reviseAngle(mario->unk1A8 - 90.0f + cam->viewYaw) / 360.0f;
+        rad = 6.2831855f * reviseAngle(cam->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
         angle = 35.0f * moa_sin(rad) + mario->position.x;
         dist = mario->position.z - 35.0f * moa_cos(rad);
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], angle, dist) < 35.0f) {
@@ -842,8 +842,8 @@ static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
-    f32 cnt = 0.0f;
     s32 hit = 0;
+    f32 cnt = 0.0f;
     const char* sfx;
     s32 sndFlag;
     s32 i;

@@ -179,7 +179,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                     }
                 }
             } else {
-                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || ac->outputParams[0] == 0) {
+                if ((pw->gauge >= (f32)ACW(ac, s32, 0x48) && pw->gauge <= 100.0f) || (s32)ac->outputParams[0] == 0) {
                     if ((u16)c) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
                         x += -225.0f;

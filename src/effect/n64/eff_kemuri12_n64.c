@@ -108,10 +108,11 @@ void effKemuri12Main(EffectEntry* effect) {
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     u16 type;
+    s32 last;
     CameraEntry* camera;
     EffKemuri12N64Work* work;
     s32 idx;
-    s32 last;
+    s32 ofs;
     s32 alpha;
     effN64Vtx* vtx;
     Mtx mtx;
@@ -160,19 +161,19 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
+    ofs = idx * 32;
     PSMTXScale(scaleMtx, 0.00390625f, 0.03125f, 0.0f);
-    idx *= 32;
-    PSMTXTrans(mtx, idx, 0.0f, 0.0f);
+    PSMTXTrans(mtx, ofs, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, mtx, scaleMtx);
     GXLoadTexMtxImm(scaleMtx, GX_TEXMTX0, GX_MTX2x4);
     if (last) {
         PSMTXScale(scaleMtx, 0.00390625f, 0.03125f, 0.0f);
-        PSMTXTrans(mtx, idx + 32, 32.0f, 0.0f);
+        PSMTXTrans(mtx, ofs + 32, 32.0f, 0.0f);
         PSMTXConcat(scaleMtx, mtx, scaleMtx);
         GXLoadTexMtxImm(scaleMtx, GX_TEXMTX1, GX_MTX2x4);
     } else {
         PSMTXScale(scaleMtx, 0.00390625f, 0.03125f, 0.0f);
-        PSMTXTrans(mtx, idx + 32, 0.0f, 0.0f);
+        PSMTXTrans(mtx, ofs + 32, 0.0f, 0.0f);
         PSMTXConcat(scaleMtx, mtx, scaleMtx);
         GXLoadTexMtxImm(scaleMtx, GX_TEXMTX1, GX_MTX2x4);
     }

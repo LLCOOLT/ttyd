@@ -1189,8 +1189,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
     mx = 74.0f + (x + w->scrollX);
     my = 120.0f + (y + w->scrollY);
     if (w->file) {
-        top = 120.0f + y;
-        GXSetScissor(((304.0f + x) - 230.0f) - 2.0f, (240.0f - top) - 2.0f, 0x1D0, 0xF4);
+        GXSetScissor(((304.0f + x) - 230.0f) - 2.0f, (240.0f - (top = 120.0f + y)) - 2.0f, 0x1D0, 0xF4);
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winTexInit(w->res->tex->tpl);
@@ -1276,9 +1275,9 @@ u16 FontGetMessageWidth(const char* msg);
 int sprintf(char* buf, const char* fmt, ...);
 
 void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor k0 = {0x00, 0x00, 0x00, 0xFF};
     GXColor k2;
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor k1 = (k2 = k0);
     char buf[256];
     char num[32];
@@ -1359,13 +1358,11 @@ MonosiriWork* monosiriInit(s32 id, f32 x, f32 y) {
 }
 
 void monosiriMain(MonosiriWork* m) {
+    s32 group = gp->inBattle ? 1 : 0;
     const char* lang[2] = {"jp", "us"};
-    u16 h;
-    s32 group;
+    
     GXTexObj tex;
     TattleEntry* t;
-    group = gp->inBattle != 0;
-
     if (!m) return;
     switch (m->state) {
     case 0:
@@ -1375,8 +1372,7 @@ void monosiriMain(MonosiriWork* m) {
         m->file2 = fileAllocf(0, "%s/w/jp/mono.dat", getMarioStDvdRoot());
         m->state++;
         TEXGetGXTexObjFromPalette(*(TEXPalette**)m->file1->data, &tex, 0x37);
-        h = GXGetTexObjHeight(&tex);
-        m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), h, 5, 0, 0), 0);
+        m->smart = smartAlloc(GXGetTexBufferSize(GXGetTexObjWidth(&tex), GXGetTexObjHeight(&tex), 5, 0, 0), 0);
         break;
     case 1:
         t = battleGetUnitMonosiriPtr(m->id);
@@ -1489,10 +1485,10 @@ void capture(CameraId camera, void* param) {
     GXTexObj tex;
     f32 vp[6];
     f32 proj[7];
-    Vec max;
     Vec min;
-    Vec v1;
+    Vec max;
     Vec v2;
+    Vec v1;
     u16 bb0, bb1, bb2, bb3;
     u32 sx, sy, sw, sh;
     f32 cx;

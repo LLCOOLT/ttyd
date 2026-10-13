@@ -212,9 +212,9 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     s32 alpha;
     s32 alpha2;
-    s32 i;
+    u32 i;
     f32 w = 16.0f;
-    u32 u;
+    f32 h;
 
     cam = camGetPtr(cameraId);
     alpha = work->alpha;
@@ -283,8 +283,8 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX1, GX_INDEX8);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX1, GX_TEX_ST, GX_S16, 14);
     GXSetArray(GX_VA_TEX1, ibuki_texcoord1_tbl, 4);
-    for (u = 0; u < 4; u++) {
-        GXCallDisplayList(ibuki_dl_0_tbl[u], ibuki_dl_0_size_tbl[u] << 5);
+    for (i = 0; i < 4; i++) {
+        GXCallDisplayList(ibuki_dl_0_tbl[i], ibuki_dl_0_size_tbl[i] << 5);
     }
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -304,7 +304,8 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
     effGetTexObj(0x63, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     work++;
-    for (i = 1; i < effect->count; i++, work++) {
+    h = 8.0f;
+    for (i = 1; (s32)i < effect->count; i++, work++) {
         s32 a = work->alpha * alpha / 255;
         if (work->delay == 0) {
             PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
@@ -319,11 +320,11 @@ void effIbukiDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetCurrentMtx(GX_PNMTX0);
             GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 255, 255, 255, a });
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(-w / 2.0f, 8.0f, 0.0f);
+            GXPosition3f32(-w / 2.0f, h, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(8.0f, 8.0f, 0.0f);
+            GXPosition3f32(h, h, 0.0f);
             GXTexCoord2f32(2.0f, 0.0f);
-            GXPosition3f32(8.0f, -w / 2.0f, 0.0f);
+            GXPosition3f32(h, -w / 2.0f, 0.0f);
             GXTexCoord2f32(2.0f, 2.0f);
             GXPosition3f32(-w / 2.0f, -w / 2.0f, 0.0f);
             GXTexCoord2f32(0.0f, 2.0f);

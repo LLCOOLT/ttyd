@@ -154,11 +154,11 @@ void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx base;
     GXTexObj texObj;
     s32 i;
-    f32 size;
+    f32 x2;
     f32 nsize;
     f32 x1;
-    f32 x2;
     f32 yt;
+    f32 size;
     f32 yb;
     f32 h = 9.6f;
     f32 neg;
@@ -208,9 +208,10 @@ void effSweatDisp(CameraId cameraId, EffectEntry* effect) {
             size *= -1.0f;
         }
         yt = 4.8f;
-        x2 = size * 0.5f;
-        x1 = -size * 0.5f;
-        yb = neg * 0.5f;
+        nsize = 0.5f;
+        x1 = -size * nsize;
+        x2 = size * nsize;
+        yb = neg * nsize;
         GXPosition3f32(x1, yt, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
         GXPosition3f32(x2, yt, 0.0f);

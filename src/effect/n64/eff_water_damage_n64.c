@@ -188,7 +188,6 @@ void effWaterDamageMain(EffectEntry* effect) {
     s32 i;
     s32 type;
     s32 variant;
-    EffWaterDamageN64Work* p;
 
     pos.x = work->position.x;
     pos.y = work->position.y;
@@ -211,22 +210,22 @@ void effWaterDamageMain(EffectEntry* effect) {
     if (work->lifetime < 4) {
         work->alpha = work->lifetime << 6;
     }
-    for (i = 1, p = work + 1; i < effect->count; i++, p++) {
-        p->position.x += p->velX;
-        p->position.y += p->velY;
-        p->position.z += p->velZ;
-        p->alpha *= 0.98f;
+    for (i = 1, work++; i < effect->count; i++, work++) {
+        work->position.x += work->velX;
+        work->position.y += work->velY;
+        work->position.z += work->velZ;
+        work->alpha *= 0.98f;
         if (type == 2) {
-            p->velY += -0.8f;
+            work->velY += -0.8f;
         }
-        p->velY += -0.1f;
-        p->velX *= 0.98f;
-        p->velY *= 0.98f;
-        p->velZ *= 0.98f;
+        work->velY += -0.1f;
+        work->velX *= 0.98f;
+        work->velY *= 0.98f;
+        work->velZ *= 0.98f;
         if (type == 3) {
-            p->scale *= 1.2f;
+            work->scale *= 1.2f;
         } else {
-            p->scale *= 0.9f;
+            work->scale *= 0.9f;
         }
     }
     if (variant == 0) {

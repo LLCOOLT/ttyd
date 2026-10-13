@@ -39,11 +39,12 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
     EffKemuri9N64Work* p;
     s32 i;
     s32 ir;
-    f32 zero;
     f32 twoPi;
+    f32 zero;
+    f32 ang;
 
     effect = effEntry();
-    effect->type = "Kemuri9N64\0";
+    effect->type = "Kemuri9N64\0\0\0\0\0";
     effect->count = count + 1;
     work = __memAlloc(HEAP_EFFECT, (count + 1) * sizeof(EffKemuri9N64Work));
     effect->userdata = work;
@@ -71,10 +72,10 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
         p->position.x = zero;
         p->position.y = zero;
         p->position.z = zero;
-        radiusEnd = twoPi * (angle + (f32)((i - 1) * 360 / count)) / 360.0f;
-        p->dirX = sin(radiusEnd);
+        ang = twoPi * (angle + (f32)((i - 1) * 360 / count)) / 360.0f;
+        p->dirX = sin(ang);
         p->velY = zero;
-        p->dirZ = cos(radiusEnd);
+        p->dirZ = cos(ang);
     }
     return effect;
 }
@@ -82,27 +83,20 @@ EffectEntry* effKemuri9N64Entry(s32 type, s32 count, s32 life, f32 x, f32 y, f32
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 void effKemuri9Main(EffectEntry* effect) {
+    EffKemuri9N64Work* work = effect->userdata;
     s32 i;
     s32 ir;
 
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
-    EffKemuri9N64Work* work;
 
-    work = effect->userdata;
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;
     position = tmp;
     {
-        s32 cur = work->frame;
-        s32 next = cur + 1;
-        s32 max = work->frameMax;
-        s32 u;
-        s32 v;
-        work->frame = next;
-        v = (s32)(16.0f * (f32)cur / (f32)max);
-        u = (s32)(16.0f * (f32)next / (f32)max);
+        s32 v = (s32)(16.0f * (f32)work->frame / (f32)work->frameMax);
+        s32 u = (s32)(16.0f * (f32)++work->frame / (f32)work->frameMax);
         if (u > 15) {
             u = 15;
         }
@@ -118,7 +112,7 @@ void effKemuri9Main(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
-    work->radius = work->radius + 0.1f * (work->radiusEnd - work->radius);
+    work->radius += 0.1f * (work->radiusEnd - work->radius);
     ir = (s32)work->radius;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
@@ -134,10 +128,10 @@ void effKemuri9Main(EffectEntry* effect) {
 void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     EffKemuri9N64Work* work = effect->userdata;
+    s32 i;
     s32 u;
     u16 type;
     s32 v;
-    s32 i;
     GXColor color;
     GXTexObj texObj;
     Mtx mtx;
@@ -145,6 +139,7 @@ void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx view;
     f32 w;
+    f32 half = 0.5f;
     f32 h;
 
     u = work->texU;
@@ -203,19 +198,19 @@ void effKemuri9Disp(CameraId cameraId, EffectEntry* effect) {
         GXSetCurrentMtx(GX_PNMTX0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         if ((s32)type != 0) {
-            w = 16.0f;
-            h = w;
+            h = 16.0f;
+            w = h;
         } else {
-            w = 32.0f;
-            h = w;
+            h = 32.0f;
+            w = h;
         }
-        GXPosition3f32(-w * 0.5f, h * 0.5f, 0.0f);
+        GXPosition3f32(-w * half, h * half, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, h * 0.5f, 0.0f);
+        GXPosition3f32(w * half, h * half, 0.0f);
         GXTexCoord2f32(1.0f, 0.0f);
-        GXPosition3f32(w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(w * half, -h * half, 0.0f);
         GXTexCoord2f32(1.0f, 1.0f);
-        GXPosition3f32(-w * 0.5f, -h * 0.5f, 0.0f);
+        GXPosition3f32(-w * half, -h * half, 0.0f);
         GXTexCoord2f32(0.0f, 1.0f);
     }
 }

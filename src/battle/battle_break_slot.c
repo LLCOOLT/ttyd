@@ -253,9 +253,10 @@ void BattleBreakSlot_Init(void) {
 	s32 i;
 
 	memset(wp, 0, sizeof(BreakSlotWork));
+	i = 0;
 	wp->phase = 0;
 	reel = BattleBreakSlotReelGetPtr(0);
-	for (i = 0; i < 3; i++, reel++) {
+	for (; i < 3; i++, reel++) {
 		reel->kind = i;
 		reel->state = 0;
 	}
@@ -322,8 +323,8 @@ void BattleBreakSlot_Main(void) {
 				}
 			}
 			if (count == 2) {
-				item = BattleBreakSlotReelGetPtr(1)->item;
-				if (item != BattleBreakSlotReelGetPtr(0)->item) {
+
+				if (BattleBreakSlotReelGetPtr(0)->item != BattleBreakSlotReelGetPtr(1)->item) {
 					slot->phase = 1;
 					slot->field_8 = 0;
 				}
@@ -332,7 +333,7 @@ void BattleBreakSlot_Main(void) {
 		case 1:
 			if (slot->field_8 == 60) {
 				reel = BattleBreakSlotReelGetPtr(0);
-				for (i = 0; i < 2; i++, reel++) {
+				for (i = 2; i != 0; i--, reel++) {
 					reel->state = 3;
 					reel->counter = 0;
 				}
@@ -409,7 +410,7 @@ void BattleBreakSlot_Main(void) {
 					slot->phase = 5;
 					SFX_ON("SFX_BTL_SLOT_SUCCESS1");
 					reel = BattleBreakSlotReelGetPtr(0);
-					for (i = 0; i < 3; i++, reel++) {
+					for (i = 3; i != 0; i--, reel++) {
 						reel->state = 11;
 						reel->counter = 0;
 					}
@@ -417,7 +418,7 @@ void BattleBreakSlot_Main(void) {
 					slot->phase = 7;
 					SFX_ON("SFX_BTL_SYS_BREAK_FAILRE1");
 					reel = BattleBreakSlotReelGetPtr(0);
-					for (i = 0; i < 3; i++, reel++) {
+					for (i = 3; i != 0; i--, reel++) {
 						reel->state = 12;
 						reel->counter = 0;
 					}
@@ -754,7 +755,7 @@ void BattleBreakSlot_Main(void) {
 				if (i == 2) {
 					rr->counter++;
 					rr->field_50 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(rr->field_50, 0.0f, 0, rr->counter, 20);
-					rr->pos.y = rr->field_50 * (f32)sin(3.141592f * (2.0f * rr->counter) * 0.125f);
+					rr->pos.y = rr->field_50 * (f32)sin(3.141592f * (2.0f * rr->counter) / 8.0f);
 				}
 				break;
 			case 11:
@@ -793,12 +794,6 @@ void BattleBreakSlot_Disp(void) {
 	dispEntry(CAMERA_2D, 490.0f, 0, BattleBreakSlotDispReel, NULL);
 }
 
-static inline GXColor slotColor(u8 a) {
-	GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
-	c.a = a;
-	return c;
-}
-
 void BattleBreakSlotDispReel(CameraId camId, void* param) {
 	Mtx trans;
 	Mtx scale;
@@ -809,9 +804,9 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 	Mtx ry;
 	Mtx rz;
 	Mtx m;
-	s32 j;
 	s32 idx;
 	u16 next;
+	s32 j;
 	BreakSlotReel* reel;
 	u16* tex;
 	s32 i;
@@ -836,9 +831,9 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 		}
 	}
 
-	j = 0;
+	i = 0;
 	reel = BattleBreakSlotReelGetPtr(0);
-	for (; j < 3; j++, reel++) {
+	for (; i < 3; i++, reel++) {
 		if (!(reel->flags & 1)) {
 			continue;
 		}
@@ -859,7 +854,8 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 		PSMTXConcat(negPivot, m, m);
 		PSMTXConcat(scale, m, m);
 		PSMTXConcat(trans, m, m);
-		((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, tex[reel->item], slotColor(reel->alpha), 0);
+		next = tex[reel->item];
+		((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, next, (GXColor){0xFF, 0xFF, 0xFF, reel->alpha}, 0);
 		if (reel->state <= 10 && reel->state != 3 && reel->state != 4) {
 			idx = reel->index + 1;
 			if (idx >= reel->numCards) {
@@ -872,7 +868,7 @@ void BattleBreakSlotDispReel(CameraId camId, void* param) {
 				PSMTXTrans(trans, 0.0f, -128.0f, 0.0f);
 			}
 			PSMTXConcat(trans, m, m);
-			((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, next, slotColor(reel->alpha), 0);
+			((void (*)(Mtx, u32, GXColor, s32))btlDispTexPlane2)(m, next, (GXColor){0xFF, 0xFF, 0xFF, reel->alpha}, 0);
 		}
 	}
 	GXSetScissor(0, 0, gp->fbWidth, gp->efbHeight);

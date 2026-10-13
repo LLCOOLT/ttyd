@@ -912,7 +912,7 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
 
     va_start(args, fmt);
     vsprintf(buf, fmt, args);
-    PSMTXTrans(trans, pos.x + scale.x * (f32)(FontGetMessageWidth("\202X\202X\202X") - FontGetMessageWidth(buf)), pos.y, pos.z);
+    { s32 w = FontGetMessageWidth("\202X\202X\202X") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);

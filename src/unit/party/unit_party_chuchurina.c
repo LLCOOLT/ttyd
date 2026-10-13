@@ -1243,6 +1243,7 @@ USER_FUNC(_get_itemsteal_param) {
 }
 
 USER_FUNC(_chuchu_item_steal) {
+    ItemDropData* table;
     BattleWork* wp;
     s32 flag;
     s32 out;
@@ -1259,7 +1260,6 @@ USER_FUNC(_chuchu_item_steal) {
     unit = BattleGetUnitPtr(_battleWorkPointer, BattleTransID(event, id));
     item = unit->heldItem;
     if (item == 0) {
-        ItemDropData* table;
         s32 total, r;
         u32 pick;
         if (unit->dropTable != NULL) {
@@ -1270,23 +1270,26 @@ USER_FUNC(_chuchu_item_steal) {
             pick = 0;
         } else {
             ItemDropData* p;
-            total = 0;
-            for (p = table; p->holdWeight > 0 || p->type != 0; p++) {
-                total += p->holdWeight;
-            }
-            if (total > 0) {
-                r = irand(total);
-                for (p = table;; p++) {
-                    r -= p->holdWeight;
-                    if (r < 0) {
-                        pick = p->type;
-                        break;
+            if (table != NULL) {
+                s32 i;
+                total = 0;
+                for (i = 0; table[i].holdWeight > 0 || table[i].type != 0; i++) {
+                    total += table[i].holdWeight;
+                }
+                if (total > 0) {
+                    r = irand(total);
+                    for (;; table++) {
+                        r -= table->holdWeight;
+                        if (r < 0) {
+                            pick = table->type;
+                            goto done;
+                        }
                     }
                 }
-            } else {
-                pick = 0;
             }
+            pick = 0;
         }
+    done:
         item = pick;
         if (item == 0) {
             item = 0x79;
@@ -1312,7 +1315,7 @@ USER_FUNC(_chuchu_item_steal) {
         s32* arr = *(s32**)((u8*)wp->fbatInfo + 0xC);
         arr[unit->groupSetupId + 7] = 0;
     }
-    if ((u16)item >= 0xF0 && (u16)item < 0x153) {
+    if ((u16)(s32)item >= 0xF0 && (u16)(s32)item < 0x153) {
         if (unit->currentKind == 0xDE) {
             BtlUnit_EquipItem(unit, 3, 0);
         } else if (unit->currentKind >= 0xE0 && unit->currentKind < 0xE7) {

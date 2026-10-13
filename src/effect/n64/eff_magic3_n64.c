@@ -156,6 +156,8 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
 }
 
 #pragma opt_propagation reset
+inline f32 magic3_scale(f32 a, f32 b) { return 3.0f * a + b; }
+
 void effMagic3Main(EffectEntry* effect) {
     s32 life;
     EffMagic3N64Work* work = effect->userdata;
@@ -190,7 +192,7 @@ void effMagic3Main(EffectEntry* effect) {
             work->velocity.y *= 0.7f;
             work->velocity.z *= 0.7f;
             work->scale = (f32)(255 - work->alpha) / 30.0f +
-                          (3.0f * (f32)sin(6.2831855f * (f32)(work->alpha / 2) / 360.0f) + (f32)sin(t / 360.0f));
+                          magic3_scale((f32)sin(6.2831855f * (f32)(work->alpha / 2) / 360.0f), (f32)sin(t / 360.0f));
         }
         work->position.x += work->velocity.x;
         work->position.y += work->velocity.y;

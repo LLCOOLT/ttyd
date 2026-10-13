@@ -72,6 +72,7 @@ static s32 ruleDt_1bu_raw[70];
 #define ruleDt_1bu ((RuleData*)ruleDt_1bu_raw)
 static s32 ruleDt_re_raw[70];
 #define ruleDt_re ((RuleData*)ruleDt_re_raw)
+static s32 tou_bss_1C;
 static RankWork rank_work;
 static DispWork disp_work;
 static __declspec(section ".data") const char* suuji[10];

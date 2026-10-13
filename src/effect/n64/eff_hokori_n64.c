@@ -70,8 +70,8 @@ EffectEntry* effHokoriN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z) {
     s32 i;
 
     effect = effEntry();
-    effect->type = "HokoriN64\0\0";
     count = 4 + (type <= 1);
+    effect->type = "HokoriN64\0\0";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffHokoriN64Work));
     effect->userdata = work;
@@ -167,6 +167,7 @@ void effHokoriDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scale;
     Mtx rot;
     Mtx base;
+    void* vtx;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -212,7 +213,8 @@ void effHokoriDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(base, mtx, mtx);
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
-        effSetVtxDescN64(type <= 1 ? (!(i & 1) ? size16x16_tex32x32_vtx : size16x32_tex32x64_vtx) : size8x8_tex32x32_vtx);
+        if (type <= 1) { if (i & 1) vtx = size16x32_tex32x64_vtx; else vtx = size16x16_tex32x32_vtx; } else vtx = size8x8_tex32x32_vtx;
+ effSetVtxDescN64(vtx);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }

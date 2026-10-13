@@ -444,17 +444,17 @@ static void actionCommandDisp(f32 x, f32 y) {
         ((u8*)&d->color)[1] += d->delta[1];
         ((u8*)&d->color)[2] += d->delta[2];
         if (((u8*)&d->color)[1] <= 0x80 && d->delta[1] < 0) {
-            d->delta[2] = d->delta[1] = 0x10;
+            d->delta[1] = d->delta[2] = 0x10;
         }
         if (((u8*)&d->color)[1] >= 0xF5 && d->delta[1] > 0) {
-            d->delta[2] = d->delta[1] = -0x10;
+            d->delta[1] = d->delta[2] = -0x10;
         }
     }
     if (r->done == -1) {
         flags |= 2;
     }
     BattleAcDrawGauge((s32)x, (s32)y, d->gauge, r->iconParam, 2,
-                      (work->actionCommands.field_0x30 & 2) ? 100 : (s32)r->pos, 100, 100, flags);
+                      (ACP(work, 0x34, s32) & 2) ? 100 : (s32)r->pos, 100, 100, flags);
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;

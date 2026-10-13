@@ -294,10 +294,10 @@ s32 msgMain(smartEntry* smart) {
 		msgAddPage(smart, 0);
 	}
 	if (data->field_0x24 > data->field_0x28) {
-		data->field_0x28 = data->field_0x28 + 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+		data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		msgCheckSkip(smart, data);
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
-			data->field_0x28 = data->field_0x28 + 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+			data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		}
 		if (data->field_0x24 < data->field_0x28) {
 			data->field_0x28 = data->field_0x24;
@@ -604,8 +604,8 @@ s32 msgIconStr2ID(const char* str) {
 	MsgIcon* icon;
 	u32 i;
 
-	for (i = 0, icon = msgIcon; i < 18; i++, icon++) {
-		if (!strcmp(icon->name, str)) {
+	for (i = 0; i < 18; i++) {
+		if (!strcmp(msgIcon[i].name, str)) {
 			return msgIcon[i].value;
 		}
 	}

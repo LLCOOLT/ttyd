@@ -78,10 +78,10 @@ void effUpdownMain(EffectEntry* effect) {
             work->scaleY = scale_data[work->frame * 2 + 1] / 100.0f;
         }
         else {
-            f32 arg = 0.25f * (s32)(work->frame - 15);
+            f32 arg = (s32)(work->frame - 15);
             f32 sv;
             work->scaleX = 1.0f;
-            sv = (f32)sin(arg);
+            sv = (f32)sin(arg *= 0.25f);
             work->scaleY = 1.0f - 0.1f * sv;
         }
     }
@@ -89,13 +89,14 @@ void effUpdownMain(EffectEntry* effect) {
     mode = 1;
     {
     Vec position = { 0.0f, 0.0f, 0.0f };
-    position.x = work->position.x;
-    position.y = work->position.y;
-    position.z = work->position.z;
+    Vec* p = &position;
+    p->x = work->position.x;
+    p->y = work->position.y;
+    p->z = work->position.z;
     if (work->alpha != 0xFF) {
         mode = 2;
     }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), mode, (DispCallback)effUpdownDisp, effect);
+    dispEntry(CAMERA_3D, dispCalcZ(p), mode, (DispCallback)effUpdownDisp, effect);
     }
 }
 

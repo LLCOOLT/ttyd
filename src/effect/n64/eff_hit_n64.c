@@ -139,11 +139,11 @@ void effHitMain(EffectEntry* effect) {
     EffHitN64Work* work = effect->userdata;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
-    s32 type;
-    s32 i;
-    EffHitN64Work* p;
-    s32 idx;
     s32 frame;
+    s32 idx;
+    EffHitN64Work* p;
+    s32 i;
+    s32 type;
 
     tmp.x = work->position.x;
     tmp.y = work->position.y;
@@ -158,7 +158,7 @@ void effHitMain(EffectEntry* effect) {
     }
     frame = work->frame;
     if (frame <= cnt_table[type]) {
-        work->progress = 0.00390625f * anim_data[frame - 1];
+        work->progress = anim_data[frame - 1] * 0.00390625f;
     } else {
         work->progress = 1.0f;
     }
@@ -284,16 +284,16 @@ void effHitDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 static void main_dl(EffectEntry* effect, Mtx mtx) {
+    Mtx texTrans;
+    Mtx texMtx;
+    Mtx trans;
+    Mtx rotZ;
+    Mtx rotY;
     EffHitN64Work* work = effect->userdata;
     EffHitN64Work* p;
     effN64Vtx* vtx;
-    Mtx rotY;
-    Mtx rotZ;
-    Mtx trans;
-    Mtx texMtx;
-    Mtx texTrans;
-    s32 idx;
     s32 flag;
+    s32 idx;
     s32 i;
     f32 f;
 

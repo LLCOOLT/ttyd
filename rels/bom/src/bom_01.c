@@ -420,7 +420,7 @@ void disp_sight(CameraId camera, void* param) {
     for (i = 0; i < 4; i++) {
         on = (gp->retraceCount % 20 > 6 && i == sight_wp->dir) ? 1 : 0;
         id = 7;
-        if (on) {
+        if (on != 0) {
             id = 6;
         }
         if (sight_wp->dir == 4) {

@@ -23,6 +23,7 @@ typedef struct DanceData { u16 flags; u8 step; u8 movePos; f32 cx; f32 cy; f32 r
 double sin(double x);
 double cos(double x);
 typedef struct HorogramWork { void* buf0; void* buf1; GXTexObj tex0; GXTexObj tex1; u16 ready; u16 flags; } HorogramWork;
+s32 aji_17_bss_pad;
 HorogramWork* horogram_wp;
 DanceData dance_dt;
 void peach_capture(CameraId cameraId, void* param);
@@ -2953,6 +2954,8 @@ EVT_BEGIN(aji_17_init_evt)
     RETURN
 EVT_END()
 
+static __declspec(section ".rodata") const char horogram_pose_suffix[] = "R";
+
 USER_FUNC(horogram_set_pose) {
     char name[24];
     const char* pose = (const char*)evtGetValue(event, event->args[0]);
@@ -2962,7 +2965,7 @@ USER_FUNC(horogram_set_pose) {
 
     animPoseSetAnim(npc->poseId, pose, TRUE);
     strcpy(name, pose);
-    strcat(name, "R");
+    strcat(name, horogram_pose_suffix);
     animPoseSetAnim(npc2->poseId, name, TRUE);
     return EVT_RETURN_DONE;
 }
@@ -3511,3 +3514,7 @@ static USER_FUNC(viewport) {
     return EVT_RETURN_DONE;
 }
 
+
+#pragma explicit_zero_data on
+static __declspec(section ".data") s32 aji_17_data_pad = 0;
+#pragma explicit_zero_data reset

@@ -5,6 +5,8 @@
 #include "evt/evt_cmd.h"
 #include <string.h>
 
+extern f32 evtGetFloat(EventEntry* entry, s32 index);
+
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
 	EffectEntry* entry = NULL;
@@ -156,5 +158,71 @@ USER_FUNC(evt_eff_softdelete_ptr) {
 
 USER_FUNC(evt_eff_delete_ptr) {
 	effDelete((EffectEntry*)evtGetValue(event, *event->args));
+	return EVT_RETURN_DONE;
+}
+
+extern void* marioGetPtr(void);
+extern s32 marioGetPartyId(void);
+extern s32 marioGetExtraPartyId(void);
+extern void* partyGetPtr(s32 id);
+extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
+
+USER_FUNC(evt_eff_fukidashi) {
+	s32* args = event->args;
+	s32 mode = evtGetValue(event, args[0]);
+	const char* effName = (const char*)evtGetValue(event, args[1]);
+	const char* npcName = (const char*)evtGetValue(event, args[2]);
+	s32 a = evtGetValue(event, args[3]);
+	s32 b = evtGetValue(event, args[4]);
+	f32 x = evtGetFloat(event, args[5]);
+	f32 y = evtGetFloat(event, args[6]);
+	f32 z = evtGetFloat(event, args[7]);
+	f32 w = evtGetFloat(event, args[8]);
+	f32 e = evtGetFloat(event, args[9]);
+	s32 d = evtGetValue(event, args[10]);
+	EffectEntry* entry = NULL;
+	void* p;
+	f32 h;
+
+	switch (mode) {
+		case 0:
+			h = *(f32*)((u8*)marioGetPtr() + 0x1b8);
+			y = 2.0f * h / 3.0f;
+			w = h / 3.0f;
+			entry = effFukidashiEntry(a, b, -1, d, 0.0f, y, 0.0f, w, e);
+			break;
+		case 1:
+			p = !strcmp(npcName, "me") ? (void*)event->ownerNPC : (void*)npcNameToPtr(npcName);
+			h = *(f32*)((u8*)p + 0x150);
+			y = 2.0f * h / 3.0f;
+			w = h / 3.0f;
+			entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, y, 0.0f, w, e);
+			break;
+		case 2:
+			entry = effFukidashiEntry(a, b, 0, d, x, y, z, w, e);
+			break;
+		case 3:
+			p = partyGetPtr(marioGetPartyId());
+			if (p) {
+				h = *(f32*)((u8*)p + 0xf0);
+				y = 2.0f * h / 3.0f;
+			w = h / 3.0f;
+			entry = effFukidashiEntry(a, b, -2, d, 0.0f, y, 0.0f, w, e);
+			}
+			break;
+		case 4:
+			p = partyGetPtr(marioGetExtraPartyId());
+			if (p) {
+				h = *(f32*)((u8*)p + 0xf0);
+				y = 2.0f * h / 3.0f;
+			w = h / 3.0f;
+			entry = effFukidashiEntry(a, b, -3, d, 0.0f, y, 0.0f, w, e);
+			}
+			break;
+	}
+
+	if (effName && strcmp(effName, "") && entry) {
+		effSetName(entry, effName);
+	}
 	return EVT_RETURN_DONE;
 }

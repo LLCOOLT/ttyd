@@ -73,7 +73,7 @@ USER_FUNC(evt_eff);
 USER_FUNC(evt_snd_sfxon_3d);
 USER_FUNC(_disp_heart_entry_stop_check);
 USER_FUNC(_disp_heart_entry_stop);
-void _disp_heart(CameraId camera, HeartWork* w);
+void _disp_heart(CameraId camera, void* param);
 USER_FUNC(_disp_heart_entry);
 USER_FUNC(_make_kagenuke_weapon);
 USER_FUNC(unk_8017d03c);
@@ -1067,8 +1067,8 @@ USER_FUNC(unk_8017d03c) {
     s32 targetId, x, y, z;
     s32 i1, i2, i3;
     s32 ix, iy;
-    f32 sx, sy, sz;
     f32 floor;
+    f32 sx, sy, sz;
 
     targetId = evtGetValue(event, args[0]);
     i1 = args[1];
@@ -1082,9 +1082,11 @@ USER_FUNC(unk_8017d03c) {
     BtlUnit_GetScale(target, &sx, &sy, &sz);
     ix = (s32)((f32)target->faceDirection * (target->mKindParams->field_0x54 * sx));
     iy = (s32)(target->mKindParams->field_0x58 * sz);
-    x = (s32)(x + (-30.0f * self->mSizeMultiplier * (f32)self->faceDirection + ix));
-    y = (s32)(y - 20.0f * self->mSizeMultiplier);
-    z = z + iy;
+    {
+        x += -30.0f * self->mSizeMultiplier * (f32)self->faceDirection + ix;
+        z = z + iy;
+        y -= 20.0f * self->mSizeMultiplier;
+    }
     floor = BattleGetFloorHeight(wp, x, y, z);
     if (floor > y) {
         y = (s32)floor;
@@ -1143,14 +1145,16 @@ USER_FUNC(_disp_heart_entry) {
     return ((HeartWork*)event)->cur < ((HeartWork*)event)->total ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 
-void _disp_heart(CameraId camera, HeartWork* w) {
+void _disp_heart(CameraId camera, void* param) {
+    HeartWork* w;
     f32 scale;
     Vec p, b, a, c;
     BattleUnit* unit;
 
-    if (w == NULL) {
+    if (param == NULL) {
         return;
     }
+    w = param;
     if (w->unit != NULL) {
         {
             if (w->cur <= w->start) {
@@ -1184,3 +1188,6 @@ USER_FUNC(_disp_heart_entry_stop_check) {
     evtSetValue(event, *event->args, *(s32*)((u8*)event + 0x8c));
     return EVT_RETURN_DONE;
 }
+
+__declspec(section ".data") u32 gap_05_8038BA04_data[1] = {0};
+__declspec(section ".sdata") u32 gap_07_80412488_sdata[6] = {0};

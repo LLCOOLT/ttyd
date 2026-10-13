@@ -641,8 +641,8 @@ void name_disp(WinMgrEntry* entry) {
 	const char* name;
 	s32 i;
 	Vec pos;
-	char buf[64];
 	Mtx m;
+	char buf[64];
 
 	name = msgSearch(itemDataTable[wp->items[wp->cur].id].name);
 	if (!winMgrAction(wp->win[0])) {
@@ -660,8 +660,8 @@ void name_disp(WinMgrEntry* entry) {
 		pos.y += 30.0f;
 		PSMTXMultVec(camGetPtr(CAMERA_3D)->view, &pos, &pos);
 		PSMTX44MultVec(camGetPtr(CAMERA_3D)->projection, &pos, &pos);
-		pos.x *= gp->fbWidth * 0.5f;
-		pos.y *= gp->efbHeight * 0.5f;
+		pos.x *= gp->fbWidth / 2.0f;
+		pos.y *= gp->efbHeight / 2.0f;
 		sprintf(buf, "%d", wp->items[i].price);
 		PSMTXTrans(m, 12.0f * (strlen(buf) - 1) + pos.x, pos.y, pos.z);
 		iconNumberDispGx(m, wp->items[i].price, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -734,8 +734,8 @@ void list_disp(WinMgrEntry* entry) {
 	PouchData* pouch;
 	const char* msg;
 	s32 i;
-	s32 y;
 	u32 mask;
+	s32 y;
 	ItemData* item;
 	u16 w;
 	char buf[256];
@@ -757,14 +757,13 @@ void list_disp(WinMgrEntry* entry) {
 	FontDrawStart();
 	FontDrawEdge();
 	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-	FontDrawMessage(entry->x - 10 + entry->width / 2 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
+	FontDrawMessage(entry->x + entry->width / 2 - 10 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
 	FontDrawEdgeOff();
 	FontDrawStart();
 	for (y = 0; shopPointList[i].pts != -1; i++, y += 26) {
 		item = &itemDataTable[shopPointList[i].item];
 		FontDrawStart();
-		mask = 1 << i;
-		if (pouch->field_0x5B4 & mask) {
+		if (pouch->field_0x5B4 & (mask = 1 << i)) {
 			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
 		}
 		else {
@@ -772,7 +771,7 @@ void list_disp(WinMgrEntry* entry) {
 		}
 		sprintf(buf, "%s", winZenkakuStr(shopPointList[i].pts));
 		w = FontGetMessageWidth(buf);
-		FontDrawMessage(entry->x + (entry->width / 2 - w - 90), entry->y - 20 - y, buf);
+		FontDrawMessage(entry->x - (90 - (entry->width / 2 - (s32)w)), entry->y - 20 - y, buf);
 		FontDrawStart();
 		if (pouch->field_0x5B4 & mask) {
 			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
@@ -794,7 +793,7 @@ void list_disp(WinMgrEntry* entry) {
 		else {
 			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
 		}
-		FontDrawMessage(entry->x + (entry->width / 2 - 10), entry->y - 20 - y, msg);
+		FontDrawMessage(entry->x - (10 - entry->width / 2), entry->y - 20 - y, msg);
 	}
 }
 
@@ -819,13 +818,13 @@ USER_FUNC(disp_list) {
 }
 
 USER_FUNC(evt_shop_setup) {
+	s32 i;
 	ShopWork* wp;
 	s32* args = event->args;
 	ShopObj* objs = (ShopObj*)evtGetValue(event, args[0]);
 	ShopItem* items = (ShopItem*)evtGetValue(event, args[1]);
 	ShopperData* shopper = (ShopperData*)evtGetValue(event, args[2]);
 	ShopDb* db = (ShopDb*)evtGetValue(event, args[3]);
-	s32 i;
 	Vec pos;
 	char buf[32];
 
@@ -1119,9 +1118,9 @@ USER_FUNC(evt_shop_main_func) {
 	ShopWork* wp;
 	MarioWork* mario;
 	PartyEntry* party;
+	BOOL found;
 	HitEntry* hit;
 	u32 trg;
-	BOOL found;
 	s32 i;
 	MapObject* mobj;
 	char buf[32];
@@ -1133,7 +1132,7 @@ USER_FUNC(evt_shop_main_func) {
 	hit = mario->hitobjStandOn;
 	wp->flags &= ~1;
 	trg = keyGetButtonTrg(0);
-	if (!marioChkCtrl() || !marioChkKey()) {
+	if ((BOOL)(!marioChkCtrl() & 0x7ffffff) || (BOOL)(!marioChkKey() & 0x7ffffff)) {
 		trg = 0;
 	}
 	if (!strncmp(gp->currentMapName, "rsh_03", strlen("rsh_03")) &&

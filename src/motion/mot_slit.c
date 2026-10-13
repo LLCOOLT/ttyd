@@ -147,6 +147,7 @@ BOOL marioCreviceWallChk(Vec* p) {
 	angB = angA;
 	sincosf(&s, &c, toMovedirSimple(180.0f));
 	pos = *p;
+	dist = 20.0f;
 	{
 		Vec t1 = {0, 0, 0};
 		t1.x = s;
@@ -154,7 +155,6 @@ BOOL marioCreviceWallChk(Vec* p) {
 		dir = t1;
 	}
 	pos.y += 10.0f;
-	dist = 20.0f;
 	hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitA) {
 		angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
@@ -164,8 +164,8 @@ BOOL marioCreviceWallChk(Vec* p) {
 		t2.x = p->x + offX;
 		t2.y = p->y + 10.0f;
 		t2.z = p->z + offZ;
-		pos = t2;
 		dist = 20.0f;
+		pos = t2;
 		hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitA) {
 			angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
@@ -176,8 +176,8 @@ BOOL marioCreviceWallChk(Vec* p) {
 		t3.x = p->x - offX;
 		t3.y = p->y + 10.0f;
 		t3.z = p->z - offZ;
-		pos = t3;
 		dist = 20.0f;
+		pos = t3;
 		hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitA) {
 			angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
@@ -185,6 +185,7 @@ BOOL marioCreviceWallChk(Vec* p) {
 	}
 	sincosf(&s, &c, toMovedirSimple(0.0f));
 	pos = *p;
+	dist = 20.0f;
 	{
 		Vec u1 = {0, 0, 0};
 		u1.x = s;
@@ -192,7 +193,6 @@ BOOL marioCreviceWallChk(Vec* p) {
 		dir = u1;
 	}
 	pos.y += 10.0f;
-	dist = 20.0f;
 	hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitB) {
 		angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
@@ -202,8 +202,8 @@ BOOL marioCreviceWallChk(Vec* p) {
 		u2.x = p->x + offX;
 		u2.y = p->y + 10.0f;
 		u2.z = p->z + offZ;
-		pos = u2;
 		dist = 20.0f;
+		pos = u2;
 		hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitB) {
 			angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
@@ -214,14 +214,14 @@ BOOL marioCreviceWallChk(Vec* p) {
 		u3.x = p->x - offX;
 		u3.y = p->y + 10.0f;
 		u3.z = p->z - offZ;
-		pos = u3;
 		dist = 20.0f;
+		pos = u3;
 		hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitB) {
 			angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
 		}
 	}
-	if (hitA && hitB && (f32)fabs(180.0f - 0.5f * (angA + angB)) <= 10.0f) {
+	if (hitA && hitB && __fabsf(180.0f - 0.5f * (angA + angB)) <= 10.0f) {
 		return TRUE;
 	}
 	return FALSE;
@@ -430,9 +430,9 @@ static inline void slitInit(void) {
 	m->dispFlags |= 4;
 	m->dispFlags |= 0x1000000;
 	if (m->paperPoseId == -1) {
-		GXColor col = {0, 0, 0, 255};
-		col.r = col.g = col.b = 0xa8;
-		mapSetPaperAmbColor(col);
+		GXColor tmp; GXColor col = {0, 0, 0, 255};
+		col.r = 0xa8; col.g = 0xa8; col.b = 0xa8;
+		tmp = col; ((void (*)(GXColor*))mapSetPaperAmbColor)(&tmp);
 		marioPaperOn("p_slit");
 	}
 	if (!m->controlStickSensitivity) {
@@ -488,13 +488,12 @@ static inline f32 slitWalkSpeed(void) {
 	MarioWork* p = marioGetPtr();
 	f32 spd = p->mBaseWalkSpeed;
 	if (p->flags & 0x100000) {
-		if (MW(p, 0x2b4, s16) != 0) {
-		} else {
-			s8 a = p->wStickDir1;
-			s8 b = p->wStickDir2;
+		if (MW(p, 0x2b4, s16) != 0) return spd; {
+			int a = MW(p, 0x24e, s8); int b = MW(p, 0x24f, s8);
 			if (a * a + b * b <= 0xbd1) {
 				spd *= 0.5f;
 			}
+
 		}
 	} else if (p->flags & 0x2000000) {
 		spd *= 0.5f;
@@ -731,8 +730,8 @@ void mot_slit(void) {
 			if (m->hitobjStandOn != NULL && m->currMotionId == 0x15) {
 				if (hitGetAttr(m->hitobjPush) & 0x2000) {
 					HitCheckQuery q;
+					HitCheckQuery* qp;
 					f32 sn, cs;
-					Vec tmp = {0, 0, 0};
 					d = revise360(m->controlStickAngle - m->targetYaw);
 					if (d > 90.0f && d < 270.0f) {
 						MW(m, 0x2a8, f32) = 180.0f;
@@ -740,27 +739,28 @@ void mot_slit(void) {
 						MW(m, 0x2a8, f32) = 0.0f;
 					}
 					if (++MW(m, 0x2a4, s32) >= sysMsec2Frame(50)) {
-						m->directionView = revise360(MW(m, 0x2a8, f32) + m->targetYaw);
+						qp = &q; m->directionView = revise360(MW(m, 0x2a8, f32) + m->targetYaw);
 						MW(m, 0x2a4, s32) = 0;
 						sincosf(&sn, &cs, m->directionView);
+						{ Vec tmp = {0, 0, 0};
 						q.targetPos.x = m->position.x;
 						q.targetPos.y = 11.0f + m->position.y;
 						q.targetPos.z = m->position.z;
 						tmp.x = sn;
 						tmp.z = cs;
-						q.targetDir = tmp;
+						q.targetDir = tmp; }
 						q.targetDistance = 20.0f;
-						if (hitCheckVecHitObjXZ(&q, m->hitobjPush)) {
+						if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
 							q.targetPos.x = m->position.x;
 							q.targetPos.z = m->position.z;
 							q.targetDistance = 20.0f;
-							movePos(&q.targetPos.x, &q.targetPos.z, 1.0f, reviseAngle(90.0f + m->unk19C));
-							if (hitCheckVecHitObjXZ(&q, m->hitobjPush)) {
+							movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(90.0f + m->unk19C));
+							if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
 								q.targetPos.x = m->position.x;
 								q.targetPos.z = m->position.z;
 								q.targetDistance = 20.0f;
-								movePos(&q.targetPos.x, &q.targetPos.z, 1.0f, reviseAngle(m->unk19C - 90.0f));
-								if (hitCheckVecHitObjXZ(&q, m->hitobjPush)) {
+								movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(m->unk19C - 90.0f));
+								if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
 									MW(m, 0x2d8, s16) = 0x50;
 								}
 							}
@@ -791,7 +791,7 @@ void mot_slit(void) {
 		camGetPtr(8)->flags |= 0x200;
 		CAMFIX(m)
 		m->flags |= 0x10000000;
-		if (!MW(m, 0x2a8, f32)) {
+		if (0.0f == MW(m, 0x2a8, f32)) {
 			marioChgPaper("PM_S_1F");
 		} else {
 			marioChgPaper("PM_S_1G");
@@ -821,14 +821,13 @@ void mot_slit(void) {
 		m->flags |= 0x10000000;
 		marioChgPaper("PM_S_1H");
 		MW(m, 0x2dc, s32) = sysMsec2Frame(500);
-		MW(m, 0x2d8, s16) = 0x5b;
 		m->baseSpeed = 0.0f;
+		MW(m, 0x2d8, s16) = 0x5b;
 		{
 			MarioWork* p = marioGetPtr();
 			MW(p, 0x268, s32) = 1;
-			MW(p, 0x26c, s32) = MW(p, 0x8c, s32);
-			MW(p, 0x270, s32) = MW(p, 0x90, s32);
-			MW(p, 0x274, s32) = MW(p, 0x94, s32);
+			// copy
+			MW(p, 0x26c, Vec) = MW(p, 0x8c, Vec);
 		}
 	case 0x5b:
 		MW(m, 0x2dc, s32) = 15;
@@ -862,7 +861,7 @@ void mot_slit(void) {
 		MW(m, 0x2da, s16) = 0;
 		m->flags &= ~0x100000;
 		MW(m, 0x1b4, f32) = 20.0f;
-		if (!m->baseSpeed) {
+		if (m->baseSpeed == 0.0f) {
 			marioChgPose("M_S_1");
 		}
 		marioChgPaper("PM_S_1C");
@@ -897,7 +896,7 @@ void mot_slit(void) {
 			m->baseSpeed = 0.0f;
 			marioChgPose("M_S_1");
 		}
-		CLR_SLITFLAGS(m)
+		m->flags &= ~0x400000; m->flags &= ~0x200000; m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;
@@ -938,7 +937,7 @@ void mot_slit(void) {
 		MW(m, 0x2d8, s16) = 0x70;
 		break;
 	case 0x70:
-		CLR_SLITFLAGS(m)
+		m->flags &= ~0x400000; m->flags &= ~0x200000; m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
 		m->dispFlags &= ~4;

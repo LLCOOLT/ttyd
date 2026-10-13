@@ -85,6 +85,7 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     s32 s;
     CameraEntry* camera;
     EffExplosionN64Work* work;
+    s32 x;
     s32 type;
     s32 alpha;
     GXTexObj texObj;
@@ -97,7 +98,6 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     static GXColor color3;
     f32 f;
     f32 g;
-    s32 x;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -117,9 +117,6 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&texObj, GX_TEXMAP0);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     if (type == 0) {
-        GXColor c1;
-        GXColor c2;
-        GXColor c3;
         f = work->progress;
         if (f > 5.0f) {
             g = 1.0f - (f - 5.0f);
@@ -129,22 +126,31 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
         } else {
             g = 1.0f;
         }
+        {
+        GXColor c1;
         c1 = color1;
         c1.r = 255.0f * g;
         c1.g = 18.0f * g;
         c1.b = 59.0f * g;
         GXSetTevColor(GX_TEVREG0, c1);
+        }
+        {
+        GXColor c2;
         c2 = color2;
         c2.r = 255.0f * g;
         c2.g = 53.0f * g;
         c2.b = 24.0f * g;
         c2.a = alpha;
         GXSetTevColor(GX_TEVREG1, c2);
+        }
+        {
+        GXColor c3;
         c3 = color3;
         c3.r = 211.0f * g;
         c3.g = 255.0f * g;
         c3.b = 216.0f * g;
         GXSetTevKColor(GX_KCOLOR0, c3);
+        }
         GXSetNumTevStages(4);
         GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
         GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -191,8 +197,8 @@ void effExplosionDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
-    PSMTXScale(scale, 0.00390625f, 0.03125f, 0.0f);
     x = s * 32;
+    PSMTXScale(scale, 0.00390625f, 0.03125f, 0.0f);
     PSMTXTrans(mtx, x, 0.0f, 0.0f);
     PSMTXConcat(scale, mtx, scale);
     GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);

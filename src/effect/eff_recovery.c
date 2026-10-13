@@ -185,12 +185,12 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect);
 EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
     RecoveryWork* work;
-    s32 i;
+    s32 delay;
     RecoveryWork* pp;
     s32 size;
     f32 ang;
     f32 zero;
-    s32 delay;
+    s32 i;
 
     effect = effEntry();
     switch (type) {
@@ -273,9 +273,8 @@ EffectEntry* effRecoveryEntry(s32 type, s32 amount, f32 x, f32 y, f32 z) {
         break;
     }
     zero = 0.0f;
-    delay = 8;
     pp = work + 1;
-    for (i = 1; i < effect->count; i++, pp++, delay += 8) {
+    for (i = 1, delay = 8; i < effect->count; delay += 8, i++, pp++) {
         work = pp;
         work->position.x = zero;
         switch (type) {
@@ -324,15 +323,17 @@ void effRecoveryMain(EffectEntry* effect) {
     RecoveryWork* work = effect->userdata;
     RecoveryWork* p;
     s32 type = work->type;
-    s32 done = 0;
-    s32 go = 0;
     u32 n = 0;
+    s32 go = 0;
+    s32 done = 0;
     s32 i;
     s32 amount;
-    f32 baseY = work->baseY;
     f32 x, y, z;
+    f32 baseY = work->baseY;
     f32 a, d;
 
+    work = effect->userdata;
+    type = work->type;
     effCalcMayaAnim(work->anim);
     if (gp->retraceCount > work->tick) {
         n = gp->retraceCount - work->tick;
@@ -341,7 +342,7 @@ void effRecoveryMain(EffectEntry* effect) {
         n = 1;
     }
     while (n-- != 0) {
-        p = work = effect->userdata;
+        work = p = effect->userdata;
         amount = work->amount;
         x = work->position.x;
         y = work->position.y;
@@ -617,7 +618,10 @@ void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     QUAD(-16.0f, 16.0f, 16.0f, -16.0f, 1.0f)
-    if (type != 2 && type != 3) {
+    if (type == 2 || type == 3) {
+        return;
+    }
+    {
         p++;
         GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
         GXSetZCompLoc(GX_FALSE);
@@ -630,12 +634,12 @@ void effRecoveryDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, GX_CC_TEXC, GX_CC_ZERO);
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
         for (i = 1; i < effect->count; i++, p++) {
+            c = &color_rotation_data[((i + gp->retraceCount) % 12) * 3];
             color = unk_80423040;
-            color.a = p->alpha;
-            c = &color_rotation_data[((gp->retraceCount + i) % 12) * 3];
             color.r = c[0];
             color.g = c[1];
             color.b = c[2];
+            color.a = p->alpha;
             GXSetTevColor(GX_TEVREG0, color);
             PSMTXTrans(transMtx, p->position.x, p->position.y, p->position.z);
             PSMTXScale(scaleMtx, p->scale.x, p->scale.y, p->scale.z);
@@ -776,8 +780,6 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     s32 alpha;
     GXColor color;
-    GXColor color2;
-    GXColor color3;
     Mtx mtx;
     Mtx rotMtx;
     Mtx scaleMtx;
@@ -818,19 +820,18 @@ void effRecoveryDisp4(CameraId cameraId, EffectEntry* effect) {
             if (i == 1) {
                 effGetTexObj(18, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
-                color = (GXColor){ 0xFF, 0xFF, 0xFF, 0x00 };
-                color.a = alpha * work->alpha / 255;
+                color = (GXColor){ 0xFF, 0xFF, 0xFF, alpha * work->alpha / 255 };
                 GXSetChanMatColor(GX_COLOR0A0, color);
             } else {
-                color2 = unk_80423044;
-                c = &color_rotation_data[((gp->retraceCount + i) % 12) * 3];
-                color2.r = c[0];
-                color2.g = c[1];
-                color2.b = c[2];
-                color2.a = alpha * work->alpha / 255;
+                color = unk_80423044;
+                c = &color_rotation_data[((i + gp->retraceCount) % 12) * 3];
+                color.r = c[0];
+                color.g = c[1];
+                color.b = c[2];
+                color.a = alpha * work->alpha / 255;
                 effGetTexObj(20, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
-                GXSetChanMatColor(GX_COLOR0A0, color2);
+                GXSetChanMatColor(GX_COLOR0A0, color);
             }
             PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
             PSMTXScale(scaleMtx, work->scale.x, work->scale.y, work->scale.z);

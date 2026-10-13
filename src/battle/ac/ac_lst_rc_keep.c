@@ -200,7 +200,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                     }
                 } else {
                     lw->held0++;
-                    if (!(s32)BattlePadCheckNow(0x40000)) {
+                    if (((s32)BattlePadCheckNow(0x40000) == 0)) {
                         lw->held0 = 0;
                     }
                 }
@@ -210,7 +210,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                     }
                 } else {
                     lw->held1++;
-                    if (!(s32)BattlePadCheckNow(0x800000)) {
+                    if (((s32)BattlePadCheckNow(0x800000) == 0)) {
                         lw->held1 = 0;
                     }
                 }
@@ -239,12 +239,12 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 lw->timer--;
                 if (lw->held0 > 0) {
                     lw->held0++;
-                } else if (!(s32)BattlePadCheckNow(0x40000)) {
+                } else if (((s32)BattlePadCheckNow(0x40000) == 0)) {
                     lw->held0 = 1;
                 }
                 if (lw->held1 > 0) {
                     lw->held1++;
-                } else if (!(s32)BattlePadCheckNow(0x800000)) {
+                } else if (((s32)BattlePadCheckNow(0x800000) == 0)) {
                     lw->held1 = 1;
                 }
                 if (!autoCmd) {
@@ -299,10 +299,10 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 ac->mAcState = 1003;
                 break;
             case 1003:
-                n = lw->count;
-                for (i = 0; i < n; i++) {
-                    iconDelete(ac_lstrckeep_iconname[i]);
-                }
+                n = lw->count - 1; if (n >= 0) { u8* tbl = (u8*)ac_lstrckeep_iconname; s32 off = 0;
+                for (i = 0; i <= n; i++, off += 4) {
+                    iconDelete(*(const char**)(tbl + off));
+                } }
                 ac->mAcState = 1004;
             case 1004:
             case 1005:

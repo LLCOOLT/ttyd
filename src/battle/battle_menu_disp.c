@@ -62,6 +62,7 @@ void DrawChangePartyWin(void);
 void DrawOperationWin(void);
 void DrawWeaponWin(void);
 void DrawMainMenu(BattleWork* wp);
+void DrawMenuPinchMark(void);
 #include "battle/battle_audience.h"
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
@@ -163,7 +164,7 @@ void GetRingOffset(f32 angle, f32* x, f32* y) {
 
 void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, void* a, void* b, void* c) {
     s32 order[5];
-    f32 z[5];
+    f32 z[6];
     BattleWork* wp = _battleWorkPointer;
     BattleCursor* cursor;
     f32 tf;
@@ -215,7 +216,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     const char* name;
-    u16 icon;
+    s16 icon;
     f32 rad;
     f32 ofs;
 
@@ -224,7 +225,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     GXSetTevColor(GX_TEVREG0, (GXColor){0xE1, 0xE1, 0xE1, 0xFF});
     GXSetNumTevStages(1);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C1, GX_CC_ZERO);
+    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);
     GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -379,12 +380,224 @@ void DrawSubIcon(BattleSubMenu* menu, void* a, s32* enabled, s16* icons, const c
 
     BattleGetUnitPtr(wp, wp->activeUnitId);
     cursor = menu->cursor;
-    ofs = 24.0f * (menu->field_98 - (f32)(s32)menu->field_98);
+    ofs = menu->field_98 - (f32)(s32)menu->field_98; ofs = 24.0f * ofs;
     for (i = 0; i < 7; i++) {
         if ((s32)menu->field_98 + i < cursor->unk8 && (menu->field_A4[i] & 1)) {
             PSMTXTrans(m, 100.0f, 35.0f - 24.0f * i + ofs, 0.0f);
             PSMTXConcat(m, ((Mtx*)a)[i], out[i]);
-            DrawSubIconSub(menu, i, out[i], enabled[i], icons[i], names[i], costs[i], p34[i], party, y);
+            DrawSubIconSub(menu, i, out[i], enabled[i], ((u16*)icons)[i], names[i], costs[i], p34[i], party, y);
+        }
+    }
+}
+
+void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
+    BattleWork* wp = _battleWorkPointer;
+    CameraEntry* cam;
+    BattleCursor* cursor = menu->cursor;
+    f32 frac;
+    s32 alpha;
+    u8 r, g, b, a;
+    Mtx scl;
+    Mtx trn;
+    Mtx out;
+    GXTexObj texobj;
+    s32 d1[3];
+    s32 o1[3];
+    s32 d2[3];
+    s32 o2[3];
+    s32 d3[3];
+    s32 o3[3];
+    char buf1[2];
+    char buf2[2];
+    char buf3[2];
+    s32 n;
+    s32 j;
+    s32 hp, maxhp;
+
+    cam = camGetPtr(8);
+    frac = menu->field_98 - (s32)menu->field_98;
+    alpha = 0xFF;
+    if (i == 0) {
+        alpha = 255.0f * (1.0f - frac);
+    }
+    if (i == 6) {
+        alpha = 255.0f * frac;
+    }
+    if ((s32)menu->field_98 + i == cursor->field_0) {
+        r = seleItemCoordCol.r;
+        g = seleItemCoordCol.g;
+        b = seleItemCoordCol.b;
+        a = alpha;
+    } else {
+        b = 0xFF;
+        g = 0xFF;
+        r = 0xFF;
+        a = 144.0f * (u8)alpha / 255.0f;
+    }
+    btlDispGXInit2D();
+    PSMTXConcat(cam->view, m, out);
+    GXLoadPosMtxImm(out, 0);
+    TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, 2);
+    GXLoadTexObj(&texobj, GX_TEXMAP0);
+    btlDispGXQuads2D(-152.0f, 24.0f, -136.0f, 0.0f, r, g, b, a);
+    btlDispGXQuads2D(152.0f, 24.0f, 136.0f, 0.0f, r, g, b, a);
+    TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, 3);
+    GXLoadTexObj(&texobj, GX_TEXMAP0);
+    btlDispGXQuads2D(-136.0f, 24.0f, 136.0f, 0.0f, r, g, b, a);
+    PSMTXTrans(trn, -119.0f, 2.0f, 0.0f);
+    PSMTXScale(scl, 0.5f, 0.5f, 1.0f);
+    PSMTXConcat(m, trn, out);
+    PSMTXConcat(out, scl, out);
+    if (!icon) {
+        icon = 0x18B;
+    }
+    if (enabled == 1) {
+        GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
+        col.a = alpha;
+        iconDispGxCol(out, 0x10, icon, col);
+    } else {
+        GXColor col2 = {0xFF, 0xFF, 0xFF, 0x00};
+        col2.a = alpha;
+        iconDispGxCol(out, 0x30, icon, col2);
+    }
+    FontDrawStart();
+    {
+        GXColor fc;
+        if (enabled == 1) {
+            GXColor c1 = {0x00, 0x00, 0x00, 0x00};
+            c1.a = alpha;
+            fc = c1;
+        } else {
+            GXColor c2 = {0x40, 0x40, 0x40, 0x40};
+            c2.a = alpha;
+            fc = c2;
+        }
+        FontDrawColor(fc);
+    }
+    PSMTXTrans(trn, -104.0f, 22.0f, 0.0f);
+    if (y == 1) {
+        PSMTXScale(scl, FontGetMessageWidth(name) > 150 ? 120.0f / FontGetMessageWidth(name) : 0.8f, 0.8f, 0.8f);
+    } else {
+        PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
+    }
+    PSMTXConcat(m, trn, out);
+    PSMTXConcat(out, scl, out);
+    FontDrawStringMtx(out, name);
+    if (cost != 0) {
+        d1[2] = cost / 100;
+        d1[1] = (cost % 100) / 10;
+        d1[0] = (cost % 100) % 10;
+        if (d1[2] > 0) {
+            o1[0] = 28; o1[1] = 14; o1[2] = 0; n = 3;
+        } else if (d1[1] > 0) {
+            o1[0] = 21; o1[1] = 7; o1[2] = 0; n = 2;
+        } else {
+            o1[0] = 14; o1[1] = 0; o1[2] = 0; n = 1;
+        }
+        PSMTXScale(scl, 1.0f, 1.0f, 1.0f);
+        for (j = 0; j < n; j++) {
+            buf1[0] = d1[j] + '0';
+            buf1[1] = 0;
+            PSMTXTrans(trn, 4.0f + (72.0f + o1[j]), 25.0f, 0.0f);
+            PSMTXConcat(m, trn, out);
+            PSMTXConcat(out, scl, out);
+            FontDrawStringMtx(out, buf1);
+        }
+        PSMTXTrans(trn, 120.0f, 22.0f, 0.0f);
+        PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
+        PSMTXConcat(m, trn, out);
+        PSMTXConcat(out, scl, out);
+        FontDrawStringMtx(out, msgSearch("btl_cost_disp_FP"));
+    }
+    if (p34 != 0) {
+        d2[2] = p34 / 100;
+        d2[1] = (p34 % 100) / 10;
+        d2[0] = (p34 % 100) % 10;
+        if (d2[2] > 0) {
+            o2[0] = 28; o2[1] = 14; o2[2] = 0; n = 3;
+        } else if (d2[1] > 0) {
+            o2[0] = 21; o2[1] = 7; o2[2] = 0; n = 2;
+        } else {
+            o2[0] = 14; o2[1] = 0; o2[2] = 0; n = 1;
+        }
+        PSMTXScale(scl, 1.0f, 1.0f, 1.0f);
+        for (j = 0; j < n; j++) {
+            buf2[0] = d2[j] + '0';
+            buf2[1] = 0;
+            PSMTXTrans(trn, 4.0f + (72.0f + o2[j]), 25.0f, 0.0f);
+            PSMTXConcat(m, trn, out);
+            PSMTXConcat(out, scl, out);
+            FontDrawStringMtx(out, buf2);
+        }
+        PSMTXTrans(trn, 120.0f, 22.0f, 0.0f);
+        PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
+        PSMTXConcat(m, trn, out);
+        PSMTXConcat(out, scl, out);
+        FontDrawStringMtx(out, msgSearch("btl_cost_disp_AP"));
+    }
+    if (party != NULL) {
+        s16* p = (s16*)((u8*)party + (i + (s32)menu->field_98) * 0x18);
+        hp = p[10];
+        maxhp = p[11];
+        PSMTXTrans(trn, 30.0f, 22.0f, 0.0f);
+        PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
+        PSMTXConcat(m, trn, out);
+        PSMTXConcat(out, scl, out);
+        FontDrawStringMtx(out, msgSearch("btl_disp_HP"));
+        d3[2] = hp / 100;
+        d3[1] = (hp % 100) / 10;
+        d3[0] = (hp % 100) % 10;
+        if (d3[2] > 0) {
+            o3[0] = 28; o3[1] = 14; o3[2] = 0; n = 3;
+        } else if (d3[1] > 0) {
+            o3[0] = 21; o3[1] = 7; o3[2] = 0; n = 2;
+        } else {
+            o3[0] = 14; o3[1] = 0; o3[2] = 0; n = 1;
+        }
+        PSMTXScale(scl, 1.0f, 1.0f, 1.0f);
+        for (j = 0; j < n; j++) {
+            buf3[0] = d3[j] + '0';
+            buf3[1] = 0;
+            if (gp->language == 0) {
+                PSMTXTrans(trn, 26.0f + (30.0f + o3[j]), 25.0f, 0.0f);
+            } else {
+                PSMTXTrans(trn, 28.0f + (30.0f + o3[j]), 25.0f, 0.0f);
+            }
+            PSMTXConcat(m, trn, out);
+            PSMTXConcat(out, scl, out);
+            FontDrawStringMtx(out, buf3);
+        }
+        if (gp->language == 0) {
+            PSMTXTrans(trn, 92.0f, 22.0f, 0.0f);
+        } else {
+            PSMTXTrans(trn, 100.0f, 22.0f, 0.0f);
+        }
+        PSMTXScale(scl, 0.8f, 0.8f, 0.8f);
+        PSMTXConcat(m, trn, out);
+        PSMTXConcat(out, scl, out);
+        FontDrawStringMtx(out, msgSearch("btl_disp_slash"));
+        d3[2] = maxhp / 100;
+        d3[1] = (maxhp % 100) / 10;
+        d3[0] = (maxhp % 100) % 10;
+        if (d3[2] > 0) {
+            o3[0] = 28; o3[1] = 14; o3[2] = 0; n = 3;
+        } else if (d3[1] > 0) {
+            o3[0] = 21; o3[1] = 7; o3[2] = 0; n = 2;
+        } else {
+            o3[0] = 14; o3[1] = 0; o3[2] = 0; n = 1;
+        }
+        PSMTXScale(scl, 1.0f, 1.0f, 1.0f);
+        for (j = 0; j < n; j++) {
+            buf3[0] = d3[j] + '0';
+            buf3[1] = 0;
+            if (gp->language == 0) {
+                PSMTXTrans(trn, 76.0f + (30.0f + o3[j]), 25.0f, 0.0f);
+            } else {
+                PSMTXTrans(trn, 78.0f + (30.0f + o3[j]), 25.0f, 0.0f);
+            }
+            PSMTXConcat(m, trn, out);
+            PSMTXConcat(out, scl, out);
+            FontDrawStringMtx(out, buf3);
         }
     }
 }
@@ -424,8 +637,9 @@ void DrawMenuPartyChangeButton(void) {
     } else {
         btlGetScreenPoint((Vec*)((u8*)mario + 0x3C), &p);
         btlGetScreenPoint((Vec*)((u8*)party + 0x3C), &q);
-        x = (p.x + q.x) * 0.5f;
+        x = p.x + q.x;
         y = p.y;
+        x *= 0.5f;
         BattleAudience_GetItemOn(&id, &ix, &iy, &iz, NULL);
         if (id != -1) {
             if (menu->field_120 == 90.0f) {
@@ -463,10 +677,10 @@ void DrawMenuPinchMark(void) {
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     BattleUnit* unit;
-    u8 a;
-    u8 b;
-    u8 g;
     u8 r;
+    u8 g;
+    u8 b;
+    u8 a;
     u32 id;
 
     cam = camGetPtr(8);
@@ -474,7 +688,7 @@ void DrawMenuPinchMark(void) {
     unit = BattleGetMarioPtr(wp);
     if (unit->currentHp > 0 && unit->currentHp < unit->maxHp && unit->currentHp <= 5) {
         if (unit->currentHp == 1) {
-            id = gp->language ? 9 : 8;
+            id = (gp->language ? 0 : -1) + 9;
             if (gp->retraceCount % 50 <= 24) {
                 r = 0xFF;
                 g = 0xE9;
@@ -487,11 +701,11 @@ void DrawMenuPinchMark(void) {
                 a = 0xFF;
             }
         } else {
+            id = gp->language == 0 ? 6 : 7;
             r = 0xFF;
             g = 0xE9;
             b = 0x40;
             a = 0xFF;
-            id = gp->language ? 7 : 6;
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
@@ -504,7 +718,7 @@ void DrawMenuPinchMark(void) {
     unit = BattleGetPartyPtr(wp);
     if (unit && unit->currentHp > 0 && unit->currentHp < unit->maxHp && unit->currentHp <= 5) {
         if (unit->currentHp == 1) {
-            id = gp->language ? 9 : 8;
+            id = (gp->language ? 0 : -1) + 9;
             if (gp->retraceCount % 50 <= 24) {
                 r = 0xFF;
                 g = 0xE9;
@@ -521,7 +735,7 @@ void DrawMenuPinchMark(void) {
             g = 0xE9;
             b = 0x40;
             a = 0xFF;
-            id = gp->language ? 7 : 6;
+            id = (gp->language ? 0 : -1) + 7;
         }
         TEXGetGXTexObjFromPalette(*wp->menuTex->data, &texobj, id);
         GXLoadTexObj(&texobj, GX_TEXMAP0);
@@ -1003,6 +1217,243 @@ void BattleMenuDisp_ActSelect_End(BattleWork* wp) {
     }
 }
 
+void DrawMainMenu(BattleWork* wp_) {
+    Mtx mtx[5];
+    Vec pos[5];
+    Mtx trans;
+    Mtx rot;
+    Mtx scale;
+    f32 z[5];
+    f32 ox;
+    f32 oy;
+    BattleWork* wp = _battleWorkPointer;
+    BattleSubMenu* menu = WP_SUBMENU(wp);
+    BattleCursor* cursor = menu->cursor;
+    Vec* p;
+    f32 a;
+    f32 b;
+    f32 c;
+    s32 i;
+    s32 n;
+    s32 diff;
+
+    camGetPtr(CAMERA_2D);
+    switch (menu->field_C) {
+    case 0:
+        n = 0;
+        for (i = 0; i < cursor->unk8; i++) {
+            if (menu->field_34[i] == 3) {
+                n++;
+            }
+        }
+        if (n == cursor->unk8) {
+            menu->field_C = 1;
+        }
+        break;
+    case 1:
+        menu->field_14 = 1;
+        diff = menu->cursor->field_0 - menu->field_18;
+        if (diff == 1 || -(menu->cursor->unk8 - 1) == diff) {
+            menu->field_C = 2;
+            menu->field_14 = 0;
+            menu->field_18 = menu->cursor->field_0;
+            for (i = 0; i < cursor->unk8; i++) {
+                menu->field_34[i] = 4;
+                menu->field_48[i] = 0;
+                menu->field_48[i + 10] = menu->field_84[i];
+                menu->field_84[i]--;
+                if (menu->field_84[i] == -1) {
+                    menu->field_84[i] = cursor->unk8 - 1;
+                }
+            }
+        } else if (diff == -1 || menu->cursor->unk8 - 1 == diff) {
+            menu->field_C = 2;
+            menu->field_14 = 0;
+            menu->field_18 = menu->cursor->field_0;
+            for (i = 0; i < cursor->unk8; i++) {
+                menu->field_34[i] = 5;
+                menu->field_48[i] = 0;
+                menu->field_48[i + 10] = menu->field_84[i];
+                menu->field_84[i]++;
+                if (menu->field_84[i] == cursor->unk8) {
+                    menu->field_84[i] = 0;
+                }
+            }
+        }
+        break;
+    case 2:
+        n = 0;
+        for (i = 0; i < cursor->unk8; i++) {
+            if (menu->field_34[i] == 3) {
+                n++;
+            }
+        }
+        if (n == cursor->unk8) {
+            menu->field_C = 1;
+        }
+        break;
+    case 10:
+        menu->field_C = 1;
+        menu->field_14 = 1;
+        break;
+    }
+
+    menu->field_1C = 0;
+    for (i = 0; i < cursor->unk8; i++) {
+        switch (menu->field_34[i]) {
+        case 0:
+            menu->field_48[i]--;
+            if (menu->field_48[i] <= 0) {
+                menu->field_34[i] = 1;
+                menu->field_48[i] = 0;
+            }
+            break;
+        case 1:
+            menu->field_20[i] |= 1;
+            b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
+            a = 0.0f + 0.2f * menu->field_48[i];
+            if (a >= b) {
+                a = b;
+            }
+            p = &pos[i];
+            GetRingCenter(p);
+            GetRingOffset(a, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            if (i == cursor->field_0) {
+                c = 270.0f + 90.0f * menu->field_48[i] / 10.0f;
+                if (c >= 360.0f) {
+                    c = 0.0f;
+                }
+                PSMTXRotRad(rot, 'x', 0.017453292f * c);
+                PSMTXTrans(trans, 20.0f + p->x, p->y, p->z);
+                PSMTXConcat(trans, rot, mtx[i]);
+                menu->field_20[i] |= 2;
+            } else {
+                c = 270.0f + 90.0f * menu->field_48[i] / 10.0f;
+                if (c >= 360.0f) {
+                    c = 0.0f;
+                }
+                PSMTXRotRad(rot, 'x', 0.017453292f * c);
+                PSMTXTrans(trans, p->x, p->y, p->z);
+                PSMTXConcat(trans, rot, mtx[i]);
+            }
+            z[i] = 0.0f;
+            if (a >= b && menu->field_48[i] >= 10) {
+                menu->field_34[i] = 3;
+                menu->field_48[i] = -1;
+            }
+            menu->field_48[i]++;
+            break;
+        case 3:
+            a = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
+            p = &pos[i];
+            GetRingCenter(p);
+            GetRingOffset(a, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            if (i == cursor->field_0) {
+                PSMTXTrans(mtx[i], 20.0f + p->x, p->y, p->z);
+                menu->field_20[i] |= 2;
+            } else {
+                PSMTXTrans(mtx[i], p->x, p->y, p->z);
+            }
+            z[i] = 0.0f;
+            break;
+        case 4:
+            b = kakutable[cursor->unk8 - 3][menu->field_84[i]];
+            c = kakutable[cursor->unk8 - 3][menu->field_48[i + 10]];
+            if (0.0f == b) {
+                b = 360.0f;
+            }
+            a = 3.1415927f * c / 180.0f + 0.2f * menu->field_48[i];
+            b = 3.1415927f * b / 180.0f;
+            if (a >= b) {
+                a = b;
+                menu->field_34[i] = 3;
+                menu->field_48[i] = -1;
+            }
+            p = &pos[i];
+            GetRingCenter(p);
+            GetRingOffset(a, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            PSMTXTrans(mtx[i], p->x, p->y, p->z);
+            z[i] = 0.0f;
+            menu->field_20[i] &= ~2;
+            menu->field_48[i]++;
+            break;
+        case 5:
+            c = kakutable[cursor->unk8 - 3][menu->field_48[i + 10]];
+            if (0.0f == c) {
+                c = 360.0f;
+            }
+            a = 3.1415927f * c / 180.0f - 0.2f * menu->field_48[i];
+            b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
+            if (a <= b) {
+                a = b;
+                menu->field_34[i] = 3;
+                menu->field_48[i] = -1;
+            }
+            p = &pos[i];
+            GetRingCenter(p);
+            GetRingOffset(a, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            PSMTXTrans(mtx[i], p->x, p->y, p->z);
+            z[i] = 0.0f;
+            menu->field_20[i] &= ~2;
+            menu->field_48[i]++;
+            break;
+        case 10:
+            menu->field_20[i] |= 1;
+            p = &pos[i];
+            menu->field_20[i] |= 2;
+            GetRingCenter(p);
+            GetRingOffset(0.0f, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            p->x = intplGetValue(4, menu->field_48[i], 12, -60.0f, p->x);
+            p->y = intplGetValue(4, menu->field_48[i], 12, 55.0f, p->y);
+            PSMTXTrans(mtx[i], 20.0f + p->x, p->y, p->z);
+            z[i] = intplGetValue(0, menu->field_48[i], 12, 360.0f, 0.0f);
+            menu->field_48[i]++;
+            if (menu->field_48[i] > 12) {
+                menu->field_34[i] = 3;
+            }
+            break;
+        case 11:
+            menu->field_20[i] |= 1;
+            p = &pos[i];
+            menu->field_20[i] &= ~2;
+            a = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
+            GetRingCenter(p);
+            GetRingOffset(a, &ox, &oy);
+            p->x += ox;
+            p->y += oy;
+            p->z = oy;
+            a = 0.1f * menu->field_48[i];
+            if (a >= 1.0f) {
+                menu->field_34[i] = 3;
+            }
+            PSMTXScale(scale, a, a, 1.0f);
+            PSMTXTrans(trans, p->x, p->y, p->z);
+            PSMTXConcat(trans, scale, mtx[i]);
+            z[i] = 0.0f;
+            menu->field_48[i]++;
+            break;
+        }
+    }
+    DrawMainIcon(menu, menu->acts, mtx, pos, z);
+    DrawMenuPartyChangeButton();
+    DrawMenuPinchMark();
+}
+
 void BattleMenuDisp_WeaponSelect_Init(BattleWork* wp, BattleCursor* cursor, BattleCommandWeapon* weapons, BOOL flag) {
     BattleSubMenu* menu = NULL;
     BattleCursor* mainCursor = NULL;
@@ -1055,8 +1506,8 @@ void DrawWeaponWin(void) {
 
     menu = WP_SUBMENU(wp);
     cursor = menu->cursor;
-    cmd = &wp->commandMenu;
     unit = BattleGetUnitPtr(wp, wp->activeUnitId);
+    cmd = &wp->commandMenu;
     weapon = menu->weapons[cursor->field_0].weapon;
     DrawSubMenuCommonProcess(&x, &y, bufF4, bufB8, bufA4, buf1E4);
     for (i = 0; i < 7; i++) {

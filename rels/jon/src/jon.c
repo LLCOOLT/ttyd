@@ -2566,7 +2566,7 @@ USER_FUNC(evt_raster) {
 }
 
 inline s32 ia8_ofs(s32 x, s32 y) {
-    s32 off = ((y / 4) << 5) + ((x / 4) << 9);
+    s32 off = ((x / 4) << 9) + ((y / 4) << 5);
     off += ((y % 4) + ((x % 4) << 2)) * 2;
     return off;
 }

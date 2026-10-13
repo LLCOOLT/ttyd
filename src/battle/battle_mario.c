@@ -2986,8 +2986,9 @@ USER_FUNC(_mario_fire_ball_controll) {
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, partId);
     EffectEntry* eff;
     if (isFirstCall) {
+        f32 s = (f32){1.0f};
         event->userdata[0] = 0;
-        event->userdata[1] = (s32)effFireEntry(5, 0, 0, 0, (f32){1.0f}, 1000);
+        event->userdata[1] = (s32)effFireEntry(5, 0, 0, 0, s, 1000);
     }
     eff = (EffectEntry*)event->userdata[1];
     if (*(s32*)((u8*)part + 0x130) == 0) {

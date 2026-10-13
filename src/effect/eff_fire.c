@@ -68,8 +68,9 @@ static u8 scale_dt[] = {
 };
 
 void effFireMain(EffectEntry* effect);
-static inline void effFireQuad(f32 w, f32 h) {
-    GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+static inline void effFireQuad(s32 iw, s32 ih) {
+    f32 w, h;
+    GXBegin(GX_QUADS, GX_VTXFMT0, 4); w = iw; h = ih;
     GXPosition3f32(-w * 0.5f, h, 0.0f);
     GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
     GXTexCoord2f32(0.0f, 0.0f);
@@ -83,7 +84,6 @@ static inline void effFireQuad(f32 w, f32 h) {
     GXColor4u8(0x00, 0x00, 0x00, 0xFF);
     GXTexCoord2f32(0.0f, 1.0f);
 }
-
 void effFireDisp(CameraId cameraId, EffectEntry* effect);
 void effFireDisp2(CameraId cameraId, EffectEntry* effect);
 void effFireDisp3(CameraId cameraId, EffectEntry* effect);
@@ -362,7 +362,7 @@ void effFireDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     {
-        f32 s = 20.0f * work->scale * 0.03125f;
+        f32 s = 20.0f * work->scale; s *= 0.03125f;
         PSMTXScale(scaleMtx, s * work->unk78, s * work->unk7c, s);
     }
     PSMTXConcat(trans, rot, m6c);
@@ -842,9 +842,9 @@ void effFireSmokeMain(EffectEntry* effect) {
     work->position.y += work->velocity.y;
     work->position.z += work->velocity.z;
     work->rotation += work->rotSpeed;
-    work->color[0] = work->color[0] * 0.99f;
-    work->color[1] = work->color[1] * 0.99f;
-    work->color[2] = work->color[2] * 0.99f;
+    work->color[0] *= 0.99f;
+    work->color[1] *= 0.99f;
+    work->color[2] *= 0.99f;
     dispEntry(CAMERA_3D, dispCalcZ(&work->position), 2, (DispCallback)effFireSmokeDisp, effect);
 }
 

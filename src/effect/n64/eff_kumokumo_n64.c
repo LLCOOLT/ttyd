@@ -299,7 +299,7 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += tmp2 * work->s1;
+                work->y = work->y + tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -356,7 +356,7 @@ void effKumokumoMain(EffectEntry* effect) {
                 work->rot += (30.0f - work->rot) / 30.0f;
                 work->x += work->s1 * (f32)cos(6.2831855f * work->rot / 360.0f);
                 tmp2 = 2.0f * (f32)sin(6.2831855f * work->rot / 360.0f);
-                work->y += tmp2 * work->s1;
+                work->y = work->y + tmp2 * work->s1;
                 work->s1 += (2.0f - work->s1) / 30.0f;
             }
             break;
@@ -373,6 +373,7 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffKumokumoN64Particle* p;
     u32 i;
+    s32 k;
     s32 j;
     f32 w;
     f32 h;
@@ -509,7 +510,7 @@ void effKumokumoDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    for (i = 1, p = work + 1; i < effect->count; i++, p++) {
+    for (k = 1, p = work + 1; k < effect->count; k++, p++) {
         if (p->delay == 0) {
             if (type != 3 && type != 4) {
                 GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xDB, 0xDF, 0xE7, p->alpha * alpha / 255});

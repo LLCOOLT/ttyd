@@ -50,10 +50,10 @@ EffectEntry* effMagic1N64Entry(s32 type, s32 life, f32 x, f32 y, f32 z, f32 tx, 
     switch (type) {
     case 0: {
         f32 inv;
+        inv = 1.0f / (f32)life;
         w->offset.x = 0.0f;
         w->offset.y = 0.0f;
         w->offset.z = 0.0f;
-        inv = 1.0f / (f32)life;
         w->velocity.x = inv * (tx - x);
         w->velocity.y = inv * (ty - y);
         w->velocity.z = inv * (tz - z);
@@ -83,7 +83,7 @@ void effMagic1Main(EffectEntry* effect) {
     tmp.y = work->offset.y;
     tmp.z = work->offset.z;
     position = tmp;
-    if (marioStGetSystemLevel() != 0) {
+    if ((u32)marioStGetSystemLevel() != 0) {
         dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effMagic1Disp, effect);
         return;
     }
@@ -105,7 +105,7 @@ void effMagic1Main(EffectEntry* effect) {
     }
     if (type == 1) {
         work->velocity.x *= 0.83f;
-        work->alpha = (s32)((f32)work->alpha * 0.9f);
+        work->alpha *= 0.9f;
     }
     work->offset.x += work->velocity.x;
     work->offset.y += work->velocity.y;
@@ -169,14 +169,17 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     yr = 0.017453292f * yaw;
     for (i = 0; i < 3; i++) {
         if (i > 0) {
-            if (type == 0) {
+            switch (type) {
+                case 0:
                 ang -= 70.0f;
                 ox -= 2.0f * w->velocity.x;
                 oy -= 2.0f * w->velocity.y;
                 oz -= 2.0f * w->velocity.z;
-            } else {
+                break;
+                default:
                 ang -= 50.0f;
                 ox -= 2.0f * (1.2048193f * w->velocity.x);
+                break;
             }
             alpha = (s32)(100.0f * (f32)w->alpha / 255.0f);
         }
@@ -199,17 +202,17 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             PSMTXConcat(base, m38, m38);
             GXLoadPosMtxImm(m38, GX_PNMTX0);
             c0 = unk_804231a8;
-            c0.r = (u8)((f32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
-            c0.g = (u8)((f32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
-            c0.b = (u8)((f32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0] + 180) / 360.0f))));
+            c0.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
+            c0.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
+            c0.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + 180 + a[0]) / 360.0f))));
             c0.a = alpha;
             GXSetTevColor(GX_TEVREG1, c0);
             c1 = (GXColor){0, 0, 0, 255};
-            c1.r = (u8)((f32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
-            c1.g = (u8)((f32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
-            c1.b = (u8)((f32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
             GXSetTevColor(GX_TEVREG2, c1);
-            sz = (type == 0) ? 15 : 10;
+            if (type == 0) sz = 15; else sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
             PSMTXTrans(mf8, 0.0f, 64.0f * (f32)(3 - j) * 0.00390625f, 0.0f);
             PSMTXConcat(mf8, m98, mf8);

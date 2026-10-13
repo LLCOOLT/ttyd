@@ -149,7 +149,7 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
-	int i, j;
+	int i, j, n;
 	u32 dobreak;
 	u32 k;
 	s16 count;
@@ -164,7 +164,7 @@ void badgeShop_bottakuruGeneration(void) {
 		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
 		for (j = 0; j < count; j++) {
 			table[dobreak][1] = irand(100);
-			table[dobreak][0] = i + 1;
+			((s32*)table)[dobreak*2] = i + 1;
 			dobreak++;
 			if (dobreak >= 0x10) break;
 		}
@@ -231,7 +231,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	s16 stopcount;
 	u8 table[0x19];
 	s16 has;
-	s16 badge;
+	s32 badge;
 	s16 value;
 	int i;
 	s32 item;
@@ -294,13 +294,14 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	}
 
 	memset(table, 0, sizeof(table));
-	bdsw->field_0xF8[0] = ITEM_NULL;
-	bdsw->field_0xF8[1] = ITEM_NULL;
-	bdsw->field_0xF8[2] = ITEM_NULL;
-	bdsw->field_0xF8[3] = ITEM_NULL;
-	bdsw->field_0xF8[4] = ITEM_NULL;
-	bdsw->field_0x10C = 0;
-	bdsw->field_0x110 = 0;
+	count2 = 0;
+	bdsw->field_0xF8[0] = count2;
+	bdsw->field_0xF8[1] = count2;
+	bdsw->field_0xF8[2] = count2;
+	bdsw->field_0xF8[3] = count2;
+	bdsw->field_0xF8[4] = count2;
+	bdsw->field_0x10C = count2;
+	bdsw->field_0x110 = count2;
 
 	v7 = 0;
 	count = 0;
@@ -313,7 +314,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 			value |= 1;
 		}
 		if (value) {
-			badgeShop_set(table, (s16)(i + BADGE_MIN), (s16)value);
+			badgeShop_set(table, (s16)(i + BADGE_MIN), value);
 			count2++;
 		}
 	}
@@ -339,10 +340,10 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 				bdsw->field_0xF8[bdsw->field_0x10C] = i + BADGE_MIN;
 				bdsw->field_0x10C++;
 				badgeShop_set(table, (s16)(i + BADGE_MIN), 0);
-				if (badge & 1) {
+				if ((s16)badge & 1) {
 					count--;
 				}
-				if (badge & 2) {
+				if ((s16)badge & 2) {
 					v7--;
 				}
 			}

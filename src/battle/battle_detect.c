@@ -46,9 +46,9 @@ typedef struct DetWork {
 
 
 void _btlSamplingEnemy(DetWork* d) {
-    BattleWork* wp = _battleWorkPointer;
-    DetTarget* t = d->t;
     s32 n = 0;
+    DetTarget* t = d->t;
+    BattleWork* wp = _battleWorkPointer;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -110,16 +110,15 @@ void _btlSamplingEnemy(DetWork* d) {
         }
     }
     }
-    d->curTarget = 0;
-    d->numTargets = n;
-    n = d->numTargets;
-    t = d->t;
-
     {
         s32 i;
         s32 j;
         s32 k;
-        for (i = 0; n > i; i++) {
+    d->curTarget = i = 0;
+    d->numTargets = n;
+    n = d->numTargets;
+    t = d->t;
+        for (; n > i; i++) {
             DetTarget* tg = &t[i];
             BattleUnit* unit = BattleGetUnitPtr(wp, tg->unitIdx);
             BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, tg->partIdx);
@@ -367,10 +366,11 @@ void _btlSamplingEnemy(DetWork* d) {
                         }
                     }
                 }
-                if (!ok) { keep = FALSE; } else { keep = TRUE; }
-            } else {
-                keep = TRUE;
+                if (!ok) { keep = FALSE; goto done; }
             }
+            keep = TRUE;
+        done:
+
             if (!keep) {
                 for (k = i; k < n - 1; k++) {
                     d->t[k] = d->t[k + 1];
@@ -473,10 +473,12 @@ void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut
                 w[id] = 1.5f * w[id];
             }
             if ((flags & 4)) {
-                w[id] = (0.1f + 0.4f * (d->numTargets - i)) * w[id];
+                f32 t = 0.4f * (d->numTargets - i);
+                w[id] = (0.1f + t) * w[id];
             }
             if ((flags & 8)) {
-                w[id] = (0.5f + 0.4f * i) * w[id];
+                f32 t = 0.4f * i;
+                w[id] = (0.5f + t) * w[id];
             }
             if ((flags & 0x10) && active->mAlliance == unit->mAlliance) {
                 w[id] = 1.5f * w[id];

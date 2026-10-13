@@ -131,18 +131,14 @@ void effSunlightMain(EffectEntry* effect) {
 }
 
 void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
-    static const GXColor color1;
-    static const GXColor color2;
-    GXColor c2;
-    GXColor c1;
     CameraEntry* camera = camGetPtr(cameraId);
     EffSunlightN64Work* work = effect->userdata;
-    Vec up = {0.0f, 1.0f, 0.0f};
-    Vec pos = {0.0f, 0.0f, 100.0f};
-    Vec target = {0.0f, 0.0f, 0.0f};
-    Mtx trans;
     s32 alpha = work->alpha;
     s32 type = work->type;
+    Vec target = {0.0f, 0.0f, 0.0f};
+    Vec pos = {0.0f, 0.0f, 100.0f};
+    Vec up = {0.0f, 1.0f, 0.0f};
+    Mtx trans;
     Mtx scale;
     Mtx44 ortho;
     Mtx view;
@@ -163,18 +159,8 @@ void effSunlightDisp(CameraId cameraId, EffectEntry* effect) {
     MTXLookAt(view, &pos, &up, &target);
     GXLoadPosMtxImm(view, GX_PNMTX0);
     GXSetCurrentMtx(0);
-    c1 = color1;
-    c1.r = work->color[0];
-    c1.g = work->color[1];
-    c1.b = work->color[2];
-    c1.a = alpha >> 1;
-    GXSetTevColor(GX_TEVREG0, c1);
-    c2 = color2;
-    c2.r = work->color[3];
-    c2.g = work->color[4];
-    c2.b = work->color[5];
-    c2.a = work->color[6];
-    GXSetTevColor(GX_TEVREG1, c2);
+    GXSetTevColor(GX_TEVREG0, (GXColor){work->color[0], work->color[1], work->color[2], alpha >> 1});
+    GXSetTevColor(GX_TEVREG1, (GXColor){work->color[3], work->color[4], work->color[5], work->color[6]});
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(3);

@@ -51,6 +51,7 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     f32 twoPi;
     f32 ofs;
     f32 dist;
+    f32 ang;
     f32 sideAngle;
     f32 rad;
 
@@ -76,16 +77,16 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     work->rotation.x = 0.0f;
     work->rotation.y = 30.0f * side + angle - 15.0f;
     work->rotation.z = 0.0f;
+    sideAngle = 180.0f * side;
     twoPi = 6.2831855f;
     full = 360.0f;
     ofs = 45.0f;
     dist = 5.0f;
-    sideAngle = 180.0f * side;
-    z = reviseAngle(angle);
-    rad = twoPi * z / full;
+    ang = reviseAngle(angle);
+    rad = twoPi * ang / full;
     work->sinAngle = sin(rad);
     work->cosAngle = cos(rad);
-    rad = twoPi * (ofs + z - sideAngle) / full;
+    rad = twoPi * (ang + ofs - sideAngle) / full;
     work->position.x += dist * (f32)sin(rad);
     work->position.z += dist * (f32)cos(rad);
     work->alpha = 255;

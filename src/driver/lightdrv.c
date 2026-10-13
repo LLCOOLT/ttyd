@@ -23,12 +23,14 @@ static s32 _sort(const void* a, const void* b);
 
 void lightInit(void) {
 	Mtx scale;
+	LightWork* wp;
 
 	work[0].count = LIGHT_ENTRY_COUNT;
 	work[0].entries = __memAlloc(HEAP_DEFAULT, work[0].count * sizeof(LightEntry));
 
-	work[1].count = LIGHT_ENTRY_COUNT;
-	work[1].entries = __memAlloc(HEAP_DEFAULT, work[1].count * sizeof(LightEntry));
+	wp = &work[1];
+	wp->count = LIGHT_ENTRY_COUNT;
+	wp->entries = __memAlloc(HEAP_DEFAULT, wp->count * sizeof(LightEntry));
 
 	paperLight3D.flags = LIGHT_NO_DIST_ATTEN | LIGHT_POINT;
 	strcpy(paperLight3D.name, "PAPER");
@@ -149,7 +151,7 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	strcpy(entry->name, name);
 	entry->position = position;
 	entry->rotation = rotation;
-	entry->field_0x3C = entry->position;
+	entry->field_0x3C = entry->position = position;
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;
@@ -245,13 +247,13 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 		}
 	}
 
-	found = 0;
 	op = out;
+	found = 0;
 	tp = tmp;
 	for (i = 0; i < n; i++, tp++) {
-		entry = tp->entry;
-		if (!(entry->flags & LIGHT_AMBIENT) && (flags == 0 || (flags & entry->flags))) {
-			*op++ = entry;
+		LightEntry* e = tp->entry;
+		if (!(e->flags & LIGHT_AMBIENT) && (flags == 0 || (flags & e->flags))) {
+			*op++ = e;
 			found++;
 			if (found >= count) {
 				break;

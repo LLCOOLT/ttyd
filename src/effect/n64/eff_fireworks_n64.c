@@ -151,6 +151,8 @@ void effFireworksMain(EffectEntry* effect) {
     s32 idx;
     f32 s;
 
+
+
     position.x = work->position.x;
     position.y = work->position.y;
     position.z = work->position.z;
@@ -189,20 +191,13 @@ void effFireworksMain(EffectEntry* effect) {
         work->vx[idx] = 0.1f * (f32)(rand() % 11 - 5);
         work->vy[idx] = 0.1f * (f32)(rand() % 11 - 5);
         work->vz[idx] = 0.1f * (f32)(rand() % 11 - 5);
-        if (frame >= 27) {
-            for (i = 0; i < 4; i++) {
-                work->px[i] += work->vx[i];
-                work->py[i] += work->vy[i];
-                work->pz[i] += work->vz[i];
-                work->vy[i] -= 0.15f;
+        for (i = 0; i < 4; i++) {
+            work->px[i] += work->vx[i];
+            work->py[i] += work->vy[i];
+            work->pz[i] += work->vz[i];
+            work->vy[i] -= 0.15f;
+            if (frame >= 27) {
                 work->py[i] = -1000.0f;
-            }
-        } else {
-            for (i = 0; i < 4; i++) {
-                work->px[i] += work->vx[i];
-                work->py[i] += work->vy[i];
-                work->pz[i] += work->vz[i];
-                work->vy[i] -= 0.15f;
             }
         }
         if (frame >= 32) {
@@ -224,19 +219,19 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
     f32 c;
     s32 i;
     s32 type;
-    s32 count;
     s8* v;
+    s32 count;
     s32 alpha;
     s32 state;
-    Mtx view;
     Mtx44 ortho;
+    Mtx view;
     f32 proj[7];
+    f32 ang;
     f32 sx;
     f32 sy;
     f32 x;
     f32 y;
     f32 z;
-    f32 ang;
     f32 ox;
     f32 oy;
     f32 oz;
@@ -287,22 +282,22 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
         v = 0;
         count = 4;
     }
-    for (i = 0; i < count; i++) {
+    for (i = 0; i < count; i++, v += 3) {
         if (state == 1) {
             if (rand() % 17 < 6) {
                 continue;
             }
-            x = ox + sc * (v[i * 3 + 2] * s + v[i * 3] * c);
-            y = oy + sc * v[i * 3 + 1];
-            z = oz + sc * (-v[i * 3] * s + v[i * 3 + 2] * c);
+            x = ox + sc * (v[0] * c + v[2] * s);
+            y = oy + v[1] * sc;
+            z = oz + sc * (-v[0] * s + v[2] * c);
         } else {
             x = work->px[i];
             y = work->py[i];
             z = work->pz[i];
         }
         {
-            Vec pt = {0.0f, 0.0f, 0.0f};
             Vec t;
+            Vec pt = {0.0f, 0.0f, 0.0f};
             pt.x = x;
             pt.y = y;
             pt.z = z;
@@ -335,3 +330,11 @@ void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
+
+
+
+
+
+
+

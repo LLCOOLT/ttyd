@@ -784,8 +784,8 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
 }
 
 USER_FUNC(evt_btl_camera_set_homing_unitparts) {
-  BattleWork* wp;
   s32* args = event->args;
+  BattleWork* wp;
   BattleUnit* u;
   s32 pri, unit, parts, unit2, parts2;
   BattleUnitPart* part;
@@ -797,14 +797,13 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   parts = evtGetValue(event, args[2]);
   unit2 = evtGetValue(event, args[3]);
   parts2 = evtGetValue(event, args[4]);
-  wp = _battleWorkPointer;
-  if (pri < wp->cameraWork.priLimit) {
+  if (pri < (wp = _battleWorkPointer)->cameraWork.priLimit) {
     return 2;
   }
   wp->cameraWork.unitId = BattleTransID(event, unit);
   wp->cameraWork.partsId = parts;
   u = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-  part = BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+  BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
   BtlUnit_GetHomePos(u, &pos.x, &pos.y, &pos.z);
   wp->cameraWork.homingOffset = (Vec){pos.x, pos.y, pos.z};
   if (unit2 != -1) {
@@ -817,6 +816,7 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   }
   return 2;
 }
+
 
 USER_FUNC(evt_btl_camera_set_homing_unit_audience) {
   s32 audId;

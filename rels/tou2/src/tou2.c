@@ -595,8 +595,8 @@ USER_FUNC(evt_tou_set_ranking_win_lose_28_text_35C0) {
     max = -1000;
     for (i = 0; i < rank_wp->count; i++) {
         if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
-            s32 a = rand() % 4;
-            s32 b = a + rand() % 4;
+            s32 b = rand() % 4 + rand() % 4;
+
             rank_wp->entries[i].points.total += b - 3;
             if (rank_wp->entries[i].points.total < min) {
                 min = rank_wp->entries[i].points.total;

@@ -388,7 +388,7 @@ void puniModeALLEndCheck(void) {
 }
 
 void puniMoveSimple(PuniData* p) {
-    if (PSVECMag(&p->vel) != 0.0f) {
+    if (PSVECMag(&p->vel)) {
         PSVECAdd(&p->pos, &p->vel, &p->pos);
     }
 }
@@ -752,8 +752,11 @@ void puniParaRecover(PuniData* p) {
         old = p->hp;
         if (old < p->maxHp) {
             p->hp = old + p->regen;
-            if (p->hp > p->maxHp) {
-                p->hp = p->maxHp;
+            {
+                s16 m;
+                if (p->hp > (m = p->maxHp)) {
+                    p->hp = m;
+                }
             }
             if (p->hp > old) {
                 p->unk8 |= 1;
@@ -793,10 +796,11 @@ BOOL searchParent(PuniData* p) {
 
 PuniData* puniSearchRandom_Mikata(void) {
     s32 idx = qrnd(101) + 1;
-    s32 i = 0;
+    s32 i;
     PuniData* p;
+    u32 f;
 
-    while (TRUE) {
+    for (i = 0; ; i++) {
         if (i == 102) {
             return NULL;
         }
@@ -804,20 +808,21 @@ PuniData* puniSearchRandom_Mikata(void) {
             idx = 1;
         }
         p = &Punidat[idx];
-        if ((p->unk4 & 0x400) && !(p->unk4 & 0x4000)) {
+        f = p->unk4;
+        if ((f & 0x400) && !(f & 0x4000)) {
             return p;
         }
         idx++;
-        i++;
     }
 }
 
 PuniData* puniSearchRandom_Teki(void) {
     s32 idx = qrnd(99) + 110;
-    s32 i = 0;
+    s32 i;
     PuniData* p;
+    u32 f;
 
-    while (TRUE) {
+    for (i = 0; ; i++) {
         if (i == 100) {
             return NULL;
         }
@@ -825,19 +830,19 @@ PuniData* puniSearchRandom_Teki(void) {
             idx = 110;
         }
         p = &Punidat[idx];
-        if ((p->unk4 & 0x400) && !(p->unk4 & 0x4000)) {
+        f = p->unk4;
+        if ((f & 0x400) && !(f & 0x4000)) {
             return p;
         }
         idx++;
-        i++;
     }
 }
 
 PuniData* searchMikata(PuniData* self) {
     f32 minDist = 1000000.0f;
     PuniData* found = NULL;
-    s32 i;
     PuniData* q = &Punidat[1];
+    s32 i;
 
     for (i = 1; i < 103; i++, q++) {
         if ((q->unk4 & 0x400) && !(q->unk4 & 0x4000) && q->unkC != 9 && q->unkC != 13) {
@@ -921,8 +926,8 @@ void puniMapDataSet(s32 w, s32 h, void* src, f32 x, f32 z) {
 PuniData* searchBattleMikata(PuniData* self) {
     f32 minDist = 1000000.0f;
     PuniData* found = NULL;
-    s32 i;
     PuniData* q = &Punidat[1];
+    s32 i;
 
     for (i = 1; i < 103; i++, q++) {
         if ((q->unk4 & 0x400) && !(q->unk4 & 0x4000) && q->unkC != 9 && q->unkC != 13) {
@@ -942,8 +947,8 @@ PuniData* searchBattleMikata(PuniData* self) {
 PuniData* searchBattleTeki(PuniData* self) {
     f32 minDist = 1000000.0f;
     PuniData* found = NULL;
-    s32 i;
     PuniData* q = &Punidat[110];
+    s32 i;
 
     for (i = 110; i < 210; i++, q++) {
         if ((q->unk4 & 0x400) && !(q->unk4 & 0x4000) && q->unkC != 9 && q->unkC != 13) {
@@ -1014,16 +1019,16 @@ void puniModeChangeAway(void) {
 
 void puniswSetindex(s32 base, s32 idx, s32* val, Vec* pos) {
     s32 off = base + idx * 7;
-    s32 x = pos->x;
-    s32 y = pos->y;
     s32 z = pos->z;
+    s32 y = pos->y;
+    s32 x = pos->x;
     _swByteSet(off + 150000000, *val);
     _swByteSet(off + 150000001, x & 0xFF);
-    _swByteSet(off + 150000002, (x >> 8) & 0xFF);
+    _swByteSet(off + 150000002, (x & 0xFF00) >> 8);
     _swByteSet(off + 150000003, y & 0xFF);
-    _swByteSet(off + 150000004, (y >> 8) & 0xFF);
+    _swByteSet(off + 150000004, (y & 0xFF00) >> 8);
     _swByteSet(off + 150000005, z & 0xFF);
-    _swByteSet(off + 150000006, (z >> 8) & 0xFF);
+    _swByteSet(off + 150000006, (z & 0xFF00) >> 8);
 }
 
 USER_FUNC(evt_puni_zenmetsu_check) {
@@ -1055,17 +1060,20 @@ USER_FUNC(evt_puni_zenmetsu_check) {
 }
 
 void puniswGetindex(s32 base, s32 idx, s32* val, Vec* pos) {
-    s32 off = base + idx * 7;
-    u8 b0 = _swByteGet(off + 150000000);
-    u8 b1 = _swByteGet(off + 150000001);
-    u8 b2 = _swByteGet(off + 150000002);
-    u8 b3 = _swByteGet(off + 150000003);
-    u8 b4 = _swByteGet(off + 150000004);
-    u8 b5 = _swByteGet(off + 150000005);
-    u8 b6 = _swByteGet(off + 150000006);
+    u8 b0, b1, b2, b3, b4, b5, b6;
+    s32 off;
     s32 x;
     s32 y;
     s32 z;
+
+    off = base + idx * 7;
+    b0 = _swByteGet(off + 150000000);
+    b1 = _swByteGet(off + 150000001);
+    b2 = _swByteGet(off + 150000002);
+    b3 = _swByteGet(off + 150000003);
+    b4 = _swByteGet(off + 150000004);
+    b5 = _swByteGet(off + 150000005);
+    b6 = _swByteGet(off + 150000006);
 
     *val = b0;
     x = b1 + (b2 << 8);
@@ -1152,7 +1160,8 @@ USER_FUNC(evt_puni_landon_check) {
 
 USER_FUNC(evt_target_set_position) {
     s32* args = event->args;
-    PuniTarget* t = &Punigp->targets[evtGetValue(event, args[0])];
+    s32 i = evtGetValue(event, args[0]);
+    PuniTarget* t = &Punigp->targets[i];
     t->pos.x = evtGetValue(event, args[1]);
     t->pos.y = evtGetValue(event, args[2]);
     t->pos.z = evtGetValue(event, args[3]);
@@ -1162,8 +1171,8 @@ USER_FUNC(evt_target_set_position) {
 void puniAnimationInit(s16** a, s16** b) {
     PuniAnimSet* s0 = &Punigp->anim[0];
     PuniAnimSet* s1 = &Punigp->anim[1];
-    s32 i;
     s32 j;
+    s32 i;
     s16 v;
 
     for (i = 0; i < 10; i++) {
@@ -1197,11 +1206,12 @@ void puniAnimationInit(s16** a, s16** b) {
 }
 
 PuniData* searchBattle(PuniData* self, s32 start, s32 count, f32 maxDist) {
+    s32 i;
+    PuniData* q;
     f32 minDist = 1000000.0f;
     PuniData* found = NULL;
-    s32 i;
-    PuniData* q = &Punidat[start];
 
+    q = &Punidat[start];
     for (i = start; i < start + count; i++, q++) {
         if ((q->unk4 & 0x400) && !(q->unk4 & 0x4000) && q->unkC != 9 && q->unkC != 13) {
             f32 d = PSVECSquareDistance(&self->pos, &q->pos);
@@ -1224,7 +1234,7 @@ void puniModeDodai(PuniData* p) {
         case 0:
             PSVECSubtract(&p->pos, &p->unk1F8, &v);
             if (PSVECMag(&v) < 10.0f) {
-                static const Vec zero = {0.0f, 0.0f, 0.0f};
+                static Vec zero = {0.0f, 0.0f, 0.0f};
                 p->vel = zero;
                 p->unkC = 16;
                 p->unk114 = 0;
@@ -1307,7 +1317,7 @@ void puniModeParentpre(PuniData* p) {
     s32 i;
     Vec v;
 
-    for (i = 0; i < 211; i++, q++) {
+    for (i = 211; i != 0; i--, q++) {
         if (!(q->unk4 & 0x80000)) {
             continue;
         }
@@ -1440,7 +1450,10 @@ BOOL _puniVAtari(PuniData* p, Vec* from, Vec* to) {
 
 void puni_puni_disp(CameraId camId, void* param) {
     MapTevCallbackInfo info;
+    s32 off;
+    MapTevCallbackInfo* ip;
     s32 i;
+    PunidrvPose* pose;
 
     puniLoadRenderMode();
     puniLoadVertex();
@@ -1449,17 +1462,17 @@ void puni_puni_disp(CameraId camId, void* param) {
     if (!_swGet(3)) {
         puniDraw();
     } else {
-        for (i = 0; i < puniGetPoseNum(); i++) {
-            PunidrvPose* pose = &puniGetPosePtr()[i];
-            info.tevStage = 1;
-            info.texCoord = 1;
-            info.texMap = 1;
-            info.field_0x18 = 0;
-            info.mtx = *pose->mtx;
-            envSetYami(&info);
-            GXSetNumTexGens(info.texMap);
-            GXSetNumTevStages(info.texMap);
-            GXSetNumIndStages(info.field_0x18);
+        for (ip = &info, i = 0, off = 0; i < puniGetPoseNum(); i++, off += sizeof(PunidrvPose)) {
+            pose = (PunidrvPose*)((u8*)puniGetPosePtr() + off);
+            ip->tevStage = 1;
+            ip->texCoord = 1;
+            ip->texMap = 1;
+            ip->field_0x18 = 0;
+            ip->mtx = *pose->mtx;
+            envSetYami(ip);
+            GXSetNumTexGens(ip->texMap);
+            GXSetNumTevStages(ip->tevStage);
+            GXSetNumIndStages(ip->field_0x18);
             puniPoseDraw(i);
         }
     }
@@ -1501,8 +1514,8 @@ void puniModeChangeFallCheck(void) {
 }
 
 USER_FUNC(evt_puni_all_fall_check) {
-    PuniData* p = &Punidat[1];
     s32 i;
+    PuniData* p = &Punidat[1];
     Vec hit;
     Vec nrm;
     Vec pos;

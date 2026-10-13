@@ -148,14 +148,16 @@ void effChargeMain(EffectEntry* effect) {
     odd = work->frame & 1;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
+        f32 sa, ca, sb, cb, b;
+        f32 pt;
         f32 a = 6.2831855f * work->yaw / 360.0f;
         f32 d = work->dist;
-        f32 pt = work->pitch;
-        f32 sa = sin(a);
-        f32 ca = cos(a);
-        f32 b = 6.2831855f * pt / 360.0f;
-        f32 sb = sin(b);
-        f32 cb = cos(b);
+        pt = work->pitch;
+        sa = sin(a);
+        ca = cos(a);
+        b = 6.2831855f * pt / 360.0f;
+        sb = sin(b);
+        cb = cos(b);
 
         work->position.x = cb * (d * sa);
         work->position.y = cb * (d * ca);

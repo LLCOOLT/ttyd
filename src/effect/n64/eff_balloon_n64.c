@@ -110,12 +110,13 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
 }
 
 void effBalloonMain(EffectEntry* effect) {
+    s32 lifetime;
     EffBalloonN64Work* work = effect->userdata;
     EffBalloonN64Point* pt = work->points;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     f32 scale;
-    s32 lifetime;
+    f32 sp;
     s32 i;
     s32 frame;
 
@@ -144,11 +145,14 @@ void effBalloonMain(EffectEntry* effect) {
     scale = work->scale;
     scale = scale + 0.1f * (scale * (f32)sin(6.2831855f * (f32)(frame * 3) / 360.0f));
     for (i = 0; i < 20; i++, pt++) {
-        f32 ang = 6.2831855f * (17.0f + 360.0f * (f32)i / 21.0f) / 360.0f;
-        pt->x = scale * (f32)sin(ang);
-        pt->y = -scale * (f32)cos(ang);
-        pt->x += 1.5f * (f32)sin(6.2831855f * (30.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)sin(6.2831855f * (f32)(i * 53) / 360.0f))) / 360.0f);
-        pt->y += 1.5f * (f32)cos(6.2831855f * (50.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * (f32)cos(6.2831855f * (f32)(i * 36) / 360.0f))) / 360.0f);
+        pt->x = scale * (f32)sin(6.2831855f * (17.0f + 360.0f * (f32)i / 21.0f) / 360.0f);
+        pt->y = -scale * (f32)cos(6.2831855f * (17.0f + 360.0f * (f32)i / 21.0f) / 360.0f);
+        sp = (f32)sin(6.2831855f * (f32)(i * 53) / 360.0f);
+        sp = (f32)sin(6.2831855f * (30.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * sp)) / 360.0f);
+        pt->x += 1.5f * sp;
+        sp = (f32)cos(6.2831855f * (f32)(i * 36) / 360.0f);
+        sp = (f32)cos(6.2831855f * (50.0f * (5.0f + (f32)i) + (f32)frame * (2.0f + 0.1f * sp)) / 360.0f);
+        pt->y += 1.5f * sp;
     }
     work->offsetX = 0.0f;
     if (lifetime < 100) {
@@ -160,10 +164,10 @@ void effBalloonMain(EffectEntry* effect) {
 }
 
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
-    EffBalloonN64Work* work;
     CameraEntry* camera;
-    effN64Vtx* vtx;
     s32 type;
+    EffBalloonN64Work* work;
+    effN64Vtx* vtx;
     s32 i;
     Vec v0;
     Vec v1;
@@ -237,7 +241,7 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
         OSs16tof32(&vtx[i + 2].z, &v2.z);
         PSMTXMultVec(mtx, &v2, &v2);
         OSInitFastCast();
-        OSf32tos16(&v2.x, &vtx[i + 2].x);
+        OSf32tos16(&v2.x, (s16*)&vtx[i + 2]);
         OSf32tos16(&v2.y, &vtx[i + 2].y);
         OSf32tos16(&v2.z, &vtx[i + 2].z);
     }

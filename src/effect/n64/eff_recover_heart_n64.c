@@ -217,7 +217,6 @@ void effRecoverHeartMain(EffectEntry* effect) {
 void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffRecoverHeartN64Work* work;
-    EffRecoverHeartN64Work* e;
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -243,7 +242,7 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, rot, m90);
     type = work->type;
     count = work->count;
-    e = work + 1;
+    work = work + 1;
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTexGens(1);
@@ -252,14 +251,14 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     ty = 0x160 - count * 32;
     tens = count / 10;
     ones = count % 10;
-    for (i = 1; i < effect->count; i++, e++) {
-        if (e->delay > 0) {
+    for (i = 1; i < effect->count; i++, work++) {
+        if (work->delay > 0) {
             continue;
         }
         color = unk_80423238;
-        color.a = e->alpha;
+        color.a = work->alpha;
         GXSetTevColor(GX_TEVREG0, color);
-        if (e->alpha == 255) {
+        if (work->alpha == 255) {
             GXSetNumTevStages(1);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
             GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -282,11 +281,11 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-        PSMTXTrans(mtx, e->position.x + e->offX, e->position.y, e->position.z);
-        PSMTXScale(scale, e->scaleW, e->scaleH, 1.0f);
+        PSMTXTrans(mtx, work->position.x + work->offX, work->position.y, work->position.z);
+        PSMTXScale(scale, work->scaleW, work->scaleH, 1.0f);
         PSMTXConcat(mtx, scale, mtx);
         PSMTXConcat(m90, mtx, m60);
-        PSMTXRotRad(rot, 'z', 0.017453292f * e->rotZ);
+        PSMTXRotRad(rot, 'z', 0.017453292f * work->rotZ);
         PSMTXConcat(m60, rot, m30);
         if (i == 1 && type != 2) {
             effSetVtxDescN64(size32x32_tex32x32_heart_vtx);

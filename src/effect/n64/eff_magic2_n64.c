@@ -33,8 +33,6 @@ typedef struct EffMagic2N64Work {
     f32 f5c;
 } EffMagic2N64Work;
 
-GXColor unk_804231b0;
-GXColor unk_804231b4;
 
 static u8 color_rotation_data[24] = {0xFF, 0xC5, 0x9C, 0xFF, 0x9C, 0xFF, 0xFF, 0x73, 0xD6, 0xFF, 0x9C, 0xFF,
                                      0xFF, 0xC5, 0x7B, 0xFF, 0xB4, 0xFF, 0xDE, 0x73, 0xFF, 0xFF, 0x94, 0x9C};
@@ -303,12 +301,14 @@ void effMagic2Main(EffectEntry* effect) {
     if (w->type == 1) {
         {
             f32 sn = (f32)sin(6.2831855f * (f32)(life * 10) / 360.0f);
-            w->scale = 0.4f * ((w->scaleTarget * (0.1f * sn) + w->scaleTarget) - w->scale) + w->scale;
+            f32 st = w->scaleTarget;
+            w->scale = 0.4f * ((st * (0.1f * sn) + st) - w->scale) + w->scale;
         }
     } else {
         {
             f32 sn = (f32)sin(6.2831855f * (f32)(life * 10) / 360.0f);
-            w->scale = 0.3f * ((w->scaleTarget * (0.1f * sn) + w->scaleTarget) - w->scale) + w->scale;
+            f32 st = w->scaleTarget;
+            w->scale = 0.3f * ((st * (0.1f * sn) + st) - w->scale) + w->scale;
         }
     }
     {
@@ -356,8 +356,6 @@ void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx44 m4c;
     f32 proj[7];
     f32 vp[6];
-    GXColor c1;
-    GXColor c0;
 
     camGetPtr(cameraId);
     w = effect->userdata;
@@ -391,16 +389,10 @@ void effMagic2Disp(CameraId cameraId, EffectEntry* effect) {
         s32 b38;
         s32 b48;
         idx += 30;
-        c0 = unk_804231b0;
-        c0.a = alpha;
         idx = idx % 24;
         d = color_rotation_data + idx;
-        c0.r = d[0];
-        c0.b = d[2];
-        GXSetTevColor(GX_TEVREG0, c0);
-        c1 = unk_804231b4;
-        c1.a = half;
-        GXSetTevColor(GX_TEVREG1, c1);
+        GXSetTevColor(GX_TEVREG0, (GXColor){d[0], 0, d[2], alpha});
+        GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, half});
         b30 = w->a30;
         b40 = w->a40;
         b38 = w->a38;

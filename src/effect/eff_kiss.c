@@ -104,9 +104,9 @@ EffectEntry* effKissEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
         switch (type) {
         case 0:
         case 3:
-            rad = deg / 360.0f;
             p->scaleY = 1.0f;
             p->scaleX = 1.0f;
+            rad = deg / 360.0f;
             p->vx = 3.0f * (f32)sin(rad);
             p->vy = 3.0f * (f32)cos(rad);
             break;
@@ -128,7 +128,7 @@ EffectEntry* effKissEntry(s32 type, f32 x, f32 y, f32 z, f32 angle) {
             p->rotation = (360.0f * (f32)i) / (f32)(effect->count - 1);
             p->vx = 3.0f * (f32)sin(6.2831855f * p->rotation / 360.0f);
             p->vy = 3.0f * (f32)cos(6.2831855f * p->rotation / 360.0f);
-            p->rotation = p->rotation * -1.0f;
+            p->rotation *= -1.0f;
             break;
         }
     }
@@ -181,11 +181,12 @@ void effKissMain(EffectEntry* effect) {
         for (i = 1; i < effect->count; i++, work++) {
             if ((u32)work->frame < 24) {
                 rad = ang / 360.0f;
-                a = kuri_kiss[work->frame * 3] * 0.03125f * 1.2f;
+                a = kuri_kiss[work->frame * 3] / 32.0f;
+                a *= 1.2f;
                 work->position.x = a * (f32)sin(rad);
                 work->position.y = a * (f32)cos(rad);
-                work->scaleX = kuri_kiss[work->frame * 3 + 1] * 0.03125f;
-                work->scaleY = kuri_kiss[work->frame * 3 + 2] * 0.03125f;
+                work->scaleX = kuri_kiss[work->frame * 3 + 1] / 32.0f;
+                work->scaleY = kuri_kiss[work->frame * 3 + 2] / 32.0f;
                 work->rotation = kuri_kiss_r[work->frame];
                 work->frame++;
             }
@@ -196,18 +197,19 @@ void effKissMain(EffectEntry* effect) {
         for (i = 1; i < effect->count; i++, work++) {
             if ((u32)work->frame < 39) {
                 rad = ang / 360.0f;
-                a = kura_kiss[work->frame * 3] * 0.03125f * 1.2f;
+                a = kura_kiss[work->frame * 3] / 32.0f;
+                a *= 1.2f;
                 work->position.x = a * (f32)sin(rad);
                 work->position.y = a * (f32)cos(rad);
-                work->scaleX = kura_kiss[work->frame * 3 + 1] * 0.03125f;
-                work->scaleY = kura_kiss[work->frame * 3 + 2] * 0.03125f;
+                work->scaleX = kura_kiss[work->frame * 3 + 1] / 32.0f;
+                work->scaleY = kura_kiss[work->frame * 3 + 2] / 32.0f;
                 work->frame++;
             }
         }
         break;
     case 4:
         work->position.x += 0.2f;
-        work->position.y = 2.0f * (f32)fabs((f32)sin(9.424778f * (f32)work->frame / 60.0f));
+        { f32 s = sin(9.424778f * (f32)work->frame / 60.0f); work->position.y = 2.0f * __fabsf(s); }
         work->rotation = 12.0f * (f32)sin(9.424778f * (f32)work->frame / 60.0f);
         work->frame++;
         break;
@@ -249,12 +251,10 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
     KissWork* work = effect->userdata;
     CameraEntry* cam;
     KissWork* q;
-    Mtx mBase, mS, mR, mT;
+    Mtx mT, mS, mR, mBase;
     GXTexObj texObj;
-    s32 type;
-    s32 alpha;
-    s32 half;
     s32 frame3;
+    s32 half;
     s32 pass;
     s32 i;
     f32 ang;
@@ -262,24 +262,26 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
     f32 deg2rad;
     f32 w, h, tu, tv, off;
     f32 hw, hh, nhw, nhh;
+    s32 alpha;
+    s32 type;
 
     cam = camGetPtr(cameraId);
-    type = work->type;
-    i = work->alpha;
+    alpha = work->alpha;
     frame3 = work->frame * 3;
     ang = work->angle;
+    type = work->type;
     PSMTXTrans(mT, work->position.x, work->position.y, work->position.z);
     PSMTXScale(mS, work->scaleX, work->scaleY, work->scaleY);
     PSMTXRotRad(mR, 'y', 0.017453292f * -camGetPtr(4)->viewYaw);
     PSMTXConcat(mT, mR, mT);
     PSMTXConcat(mT, mS, mBase);
     GX_SETUP();
-    deg2rad = 0.017453292f;
-    angR = deg2rad * ang;
-    ang = deg2rad * -ang;
-    half = (alpha + ((u32)alpha >> 31)) >> 1;
+
+    angR = 0.017453292f * ang;
+    ang = 0.017453292f * -ang;
+    half = alpha / 2;
     for (pass = 0; pass < 2; pass++) {
-        q = work + 1;
+        q = (KissWork*)effect->userdata + 1;
         for (i = 1; i < effect->count; i++, q++) {
             off = 0.0f;
             switch (type) {
@@ -289,8 +291,8 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
                 effGetTexObj(20, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 if (pass == 0) {
-                    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, half});
                     off = 1.5f;
+                    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, half});
                 } else {
                     kiss_col[type].a = alpha;
                     GXSetChanMatColor(GX_COLOR0A0, kiss_col[type]);
@@ -316,7 +318,7 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
                 }
                 h *= 0.5f;
                 tu = 1.0f;
-                tv = h;
+                tv = tu;
                 w *= 0.5f;
                 break;
             }
@@ -374,10 +376,15 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
     case 0:
     case 1:
     case 3:
+        break;
+    default:
+        return;
+    }
+    {
         deg2rad = 1.15f;
         for (i = 0; i < 2; i++) {
             off = 0.0f;
-            q = work;
+            q = effect->userdata;
             switch (type) {
             case 0:
             case 1:
@@ -385,8 +392,8 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
                 effGetTexObj(66, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 if (i == 0) {
-                    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, half});
                     off = 1.5f;
+                    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, half});
                 } else {
                     kiss_col[type].a = alpha;
                     GXSetChanMatColor(GX_COLOR0A0, kiss_col[type]);
@@ -414,7 +421,7 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             tv = deg2rad * q[1].position.y;
             w = 1.0f;
-            if (type != 3 && i != 0) {
+            if (type == 3 && i == 0) {
                 w = 2.0f;
             }
             nhw = -w;
@@ -429,21 +436,20 @@ void effKissDisp(CameraId cameraId, EffectEntry* effect) {
             GXPosition3f32(nhw, 0.0f, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
-        break;
     }
 }
 
 void effKissDisp2(CameraId cameraId, EffectEntry* effect) {
     KissWork* work = effect->userdata;
     CameraEntry* cam;
-    KissWork* q;
     Mtx mT, mS, mR, mBase;
     GXTexObj texObj;
     s32 i;
+    s32 alpha;
     f32 w, nw, hw, deg2rad;
 
     cam = camGetPtr(cameraId);
-    i = work->alpha;
+    alpha = work->alpha;
     PSMTXTrans(mT, work->position.x, work->position.y, work->position.z);
     PSMTXScale(mS, work->scaleX, work->scaleY, work->scaleY);
     PSMTXRotRad(mR, 'y', 0.017453292f * -camGetPtr(4)->viewYaw);
@@ -452,16 +458,16 @@ void effKissDisp2(CameraId cameraId, EffectEntry* effect) {
     GX_SETUP();
     effGetTexObj(20, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP0);
-    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xB5, 0xDA, i});
-    w = 8.0f;
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xB5, 0xDA, alpha});
     deg2rad = 0.017453292f;
-    nw = -w * 0.5f;
+    w = 8.0f;
+    nw = -w * (hw = 0.5f); 
     hw = 4.0f;
-    q = work + 1;
-    for (i = 1; i < effect->count; i++, q++) {
-        PSMTXTrans(mT, q->position.x, q->position.y, q->position.z);
-        PSMTXScale(mS, q->scaleX, q->scaleY, 1.0f);
-        PSMTXRotRad(mR, 'z', deg2rad * q->rotation);
+
+    for (i = 1, work++; i < effect->count; i++, work++) {
+        PSMTXTrans(mT, work->position.x, work->position.y, work->position.z);
+        PSMTXScale(mS, work->scaleX, work->scaleY, 1.0f);
+        PSMTXRotRad(mR, 'z', deg2rad * work->rotation);
         PSMTXConcat(mT, mS, mT);
         PSMTXConcat(mT, mR, mT);
         PSMTXConcat(mBase, mT, mT);

@@ -403,15 +403,13 @@ void kpa_jump(void) {
             camFollowYOff();
         }
         kpaChgPose("KPA_J_1A", "KPA2_J_1A");
-        psndSFXOn_3D((const char*)0x81E, &MV(m, 0x8C));
+        {
+        psndSFXOn_3D((const char*)0x81E, &m->position);
         if (MS16(m, 0x50) == 0) {
             {
-                s32 va = MI(m, 0x8C);
-                s32 vb = MI(m, 0x90);
-                MI(m, 0xD4) = va;
-                MI(m, 0xD8) = vb;
-                MI(m, 0xDC) = MI(m, 0x94);
+                MV(m, 0xD4) = MV(m, 0x8C);
             }
+        }
         }
         MS16(m, 0x2A0) = 0;
     }
@@ -718,18 +716,19 @@ void kpa_powdown(void) {
 #pragma dont_inline on
 void kpaSwimMove(void) {
     MarioWork* m = marioGetPtr();
-    f32 stick = MS8(m, 0x24E);
     f32 spd = MF(m, 0x2C4);
+    f32 stick = MS8(m, 0x24E);
     f32 f31;
     f32 lim = 40.0f;
+    f32 rate = 0.01f;
     if (stick) {
         if (stick * spd < 0.0f) {
             spd = 0.0f;
         }
         if (spd * spd <= 1225.0f) {
-            spd += stick * 0.01f;
+            spd += stick * rate;
         } else {
-            spd += stick * 0.01f;
+            spd += stick * rate;
             if (spd < -lim) {
                 spd = -lim;
             }

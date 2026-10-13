@@ -127,7 +127,7 @@ USER_FUNC(status_on);
 USER_FUNC(get_score);
 USER_FUNC(object_get_num);
 USER_FUNC(object_entry);
-USER_FUNC(weapon_entry);
+void weapon_entry(void);
 USER_FUNC(main_genki);
 USER_FUNC(end_genki);
 static USER_FUNC(star_stone_appear);
@@ -1316,15 +1316,13 @@ static GenkiWork* get_ptr(void) {
 }
 #pragma dont_inline reset
 
-USER_FUNC(weapon_entry) {
-    BattleUnit* mario;
-    BattleUnitPart* part;
+void weapon_entry(void) {
     GenkiWork* w = get_ptr();
     s32 cnt = 0;
     s32 idx[7];
     s32 i;
-    mario = BattleGetMarioPtr(_battleWorkPointer);
-    part = BtlUnit_GetPartsPtr(mario, BtlUnit_GetBodyPartsId(mario));
+    BattleUnit* mario = BattleGetMarioPtr(_battleWorkPointer);
+    BattleUnitPart* part = BtlUnit_GetPartsPtr(mario, BtlUnit_GetBodyPartsId(mario));
     for (i = 0; i < w->weaponNum; i++) {
         if (w->weapon[i].state == 0) {
             idx[cnt] = i;
@@ -1332,9 +1330,12 @@ USER_FUNC(weapon_entry) {
         }
     }
     if (cnt >= 1) {
-        GenkiWeapon* wp = &w->weapon[idx[irand(cnt)]];
-        wp->state = 1;
-        wp->timer = 7;
+        i = idx[irand(cnt)];
+        {
+            GenkiWeapon* wp = &w->weapon[i];
+            wp->state = 1;
+            wp->timer = 7;
+        }
         BtlUnit_SetAnim(part, "M_C_2C");
     }
 }

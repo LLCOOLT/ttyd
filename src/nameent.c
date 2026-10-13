@@ -112,7 +112,7 @@ void nameEntOn(s32 type) {
 	wp->field_0x18 = 0;
 	wp->field_0x10 = 0;
 	wp->field_0x14 = 0;
-	wp->x1 = wp->x2 = (f32)(wp->field_0x10 * 24 + (wp->field_0x10 / 5) * 30 - 190);
+	wp->x1 = wp->x2 = (f32)(wp->field_0x10 * 24 - 190 + (wp->field_0x10 / 5) * 30);
 	wp->y1 = wp->y2 = (f32)(112 - wp->field_0x14 * 28);
 	wp->field_0x2C = wp->field_0x34 = -106.0f;
 	wp->field_0x30 = wp->field_0x38 = 135.0f;
@@ -206,7 +206,8 @@ s32 nameMain(void) {
 		case 0:
 			if ((wp->field_0x0 & 1) && gp->unk8 == 0) {
 				if (keyGetButtonTrg(0) & 0x100) {
-					if (wp->field_0x10 >= 10 && wp->field_0x14 >= 4) {
+					off = wp->field_0x10;
+					if (off >= 10 && wp->field_0x14 >= 4) {
 						switch (wp->field_0x14) {
 							case 4:
 								wp->field_0x50 = hiragana_tbl;
@@ -243,7 +244,7 @@ s32 nameMain(void) {
 								break;
 						}
 					} else if (wp->field_0x18 < 8) {
-						((u16*)wp->field_0x3C)[wp->field_0x18] = *(u16*)wp->field_0x50[wp->field_0x14 * 14 + wp->field_0x10];
+						((u16*)wp->field_0x3C)[wp->field_0x18] = *(u16*)wp->field_0x50[wp->field_0x14 * 14 + off];
 						wp->field_0x18++;
 						if (wp->field_0x18 >= 8) {
 							wp->field_0x18 = 7;
@@ -349,13 +350,14 @@ s32 nameMain(void) {
 					}
 				}
 			}
-			if (wp->field_0x10 > 9 && wp->field_0x14 > 3) {
+			idx = wp->field_0x10;
+			if (idx > 9 && wp->field_0x14 > 3) {
 				wp->x2 = 100.0f;
 				wp->y2 = (f32)(-20 - (wp->field_0x14 - 4) * 34);
 				wp->x2 -= 6.0f;
 				wp->y2 += 6.0f;
 			} else {
-				wp->x2 = (f32)(wp->field_0x10 * 24 + (wp->field_0x10 / 5) * 30 - 190);
+				wp->x2 = (f32)(idx * 24 - 190 + (idx / 5) * 30);
 				wp->y2 = (f32)(112 - wp->field_0x14 * 28);
 				wp->x2 -= 16.0f;
 				wp->y2 -= 12.0f;
@@ -389,25 +391,26 @@ s32 nameMain(void) {
 			}
 			break;
 	}
-	wp->x1 = (wp->x2 - wp->x1) * 0.25f + wp->x1;
-	wp->y1 = (wp->y2 - wp->y1) * 0.25f + wp->y1;
-	wp->x1 = wp->x1 + __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+	wp->x1 += (wp->x2 - wp->x1) * 0.25f;
+	wp->y1 += (wp->y2 - wp->y1) * 0.25f;
+	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
 	idx = wp->field_0x18;
 	if (idx >= 8) {
 		idx--;
 	}
-	wp->field_0x34 = (f32)(idx * 32 - 106);
+	wp->field_0x34 = idx * 32 - 106;
 	wp->field_0x38 = 135.0f;
-	wp->field_0x2C = (wp->field_0x34 - wp->field_0x2C) * 0.25f + wp->field_0x2C;
-	wp->field_0x30 = (wp->field_0x38 - wp->field_0x30) * 0.25f + wp->field_0x30;
-	wp->field_0x30 = wp->field_0x30 + __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+	wp->field_0x2C += (wp->field_0x34 - wp->field_0x2C) * 0.25f;
+	wp->field_0x30 += (wp->field_0x38 - wp->field_0x30) * 0.25f;
+	wp->field_0x30 += __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
 	return 0;
 }
 
 void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
-	GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-	GXColor white2 = {0xFF, 0xFF, 0xFF, 0xFF};
+	GXColor white = unused;
+	GXColor white2 = white;
+	s32 i, j;
 	CameraEntry saved;
 	f32 proj[7];
 	f32 vp[6];
@@ -417,7 +420,6 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	const char* ok;
 	const char* yes;
 	const char* no;
-	s32 i, j;
 	u16 width;
 	f32 w;
 
@@ -442,7 +444,7 @@ void nameEntDisp(CameraId cameraId, void* param) {
 			str = wp->field_0x50[j * 14 + i];
 			if (str) {
 				width = FontGetMessageWidth(str);
-				FontDrawString((f32)(i * 24 - 190 + ((i / 5) * 30 + (24 - width) / 2)), (f32)(112 - j * 28), str);
+				FontDrawString((f32)(i * 24 - 190 + (i / 5) * 30 + (24 - width) / 2), (f32)(112 - j * 28), str);
 			}
 		}
 	}
@@ -715,10 +717,9 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
 	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj, GX_TEXMAP2);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
-	ah = __fabs(h);
-	aw = __fabs(w);
-	PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
-	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4);
+	{ double ah2 = __fabs(h); double aw2 = __fabs(w);
+	PSMTXScale(m, (f32)aw2 / GXGetTexObjWidth(&obj), (f32)ah2 / GXGetTexObjHeight(&obj), 1.0f);
+	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4); }
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x, y, 0.0f);
 	GXTexCoord2f32(0.0f, 0.0f);

@@ -74,16 +74,16 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffRadiationN64Work* work;
     EffRadiationN64Work* p;
-    s32 flag;
     s32 count;
     s32 camera;
     s32 i;
     s32 k;
+    s32 flag;
     s32 lf;
 
     effect = effEntry();
     flag = 0;
-    if (type > 9) {
+    if (type >= 10) {
         flag = 1;
         type = type % 10;
     }
@@ -230,7 +230,7 @@ void effRadiationMain(EffectEntry* effect) {
     default:
         p++;
         lf = 0x20;
-        for (i = 1; i < effect->count; lf += 2, i++, p++) {
+        for (i = 1; i < effect->count; i++, lf += 2, p++) {
             p->scroll0 += p->scrollVel0;
             if (p->scroll0 > 256.0f) {
                 p->scroll0 -= 256.0f;
@@ -368,7 +368,7 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     PSMTXTrans(mtx, p->position.x, p->position.y, p->position.z);
     p++;
-    for (i = 1; i < effect->count; i++) {
+    for (i = 1; i < effect->count; i++, p++) {
         a = (f32)p->alpha / 255.0f;
         PSMTXRotRad(rot, 'x', 0.017453292f * p->rotX);
         PSMTXConcat(mtx, rot, tmp);
@@ -379,8 +379,8 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(tmp, rot, tmp);
             PSMTXTrans(trans, p->y, 0.0f, 0.0f);
             PSMTXConcat(tmp, trans, tmp);
-            sz = 0.25f * (3.0f + a);
-            sx = sz;
+            sx = sz = 0.25f * (3.0f + a);
+
             switch (i & 3) {
             case 0:
                 sy = 0.3f * a;
@@ -431,6 +431,6 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
             tri1(0, 1, 2, 0);
             break;
         }
-        p++;
+
     }
 }

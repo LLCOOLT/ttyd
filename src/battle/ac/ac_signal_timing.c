@@ -9,7 +9,7 @@
 #include "system.h"
 #include <string.h>
 
-s32 BattleACGetButtonIcon(s32 button, s32 pressed);
+u16 BattleACGetButtonIcon(s32 button, s32 pressed);
 void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
 
 typedef struct SignalTimingWork {
@@ -59,10 +59,13 @@ s32 _get_ok_frame_range(s32 difficulty) {
 
 #pragma dont_inline reset
 s32 battleAcMain_SignalTiming(BattleWork* work) {
-    const char* sfxPi = "SFX_AC_PI1";
-    const char* sfxPone = "SFX_AC_PONE1";
-    const char* sfxOk = "SFX_AC_COMMAND_OK1";
-    const char* sfxNg = "SFX_AC_COMMAND_NG1\0";
+    s32 i;
+    s32 j;
+    BOOL unique;
+    const char* sfxNg;
+    const char* sfxOk;
+    const char* sfxPone;
+    const char* sfxPi;
     BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
@@ -70,15 +73,13 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
     BOOL autoCommand = FALSE;
     BOOL got;
     BOOL good;
-    BOOL unique;
     BOOL done;
     u32 btn;
-    s32 i;
-    s32 j;
 
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
+    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0";
 
     do {
         loop = FALSE;
@@ -101,7 +102,9 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 for (i = 0; i < 5; i++) {
                     w->results[i] = 0;
                 }
-                if (W32(work, 0x1CD8) < 3 && W32(work, 0x1CD8) >= 1) {
+                switch (W32(work, 0x1CD8)) {
+                case 1:
+                case 2:
                     for (i = 0; i < ST_COUNT(work); i++) {
                         done = FALSE;
                         while (!done) {
@@ -123,7 +126,8 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                         w->buttons[i] = btn;
                     }
                     w->button = w->buttons[0];
-                } else {
+                    break;
+                default:
                     w->button = 0x100;
                     for (i = 0; i < ST_COUNT(work); i++) {
                         w->buttons[i] = 0x100;
@@ -353,9 +357,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     f32 yb;
     f32 yd;
     f32 fx;
+    Mtx mOut;
     Mtx mTrans;
     Mtx mScale;
-    Mtx mOut;
 
     camGetPtr(8);
     count = ST_COUNT(work);
@@ -416,12 +420,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     if (!(ST_FLAGS(work) & 4)) {
         fx = -200.0f + x;
         num = w->hits + W32(work, 0x1CDC);
-        if (ST_FLAGS(work) & 1) {
-            num2 = count * 0x30 + ST_LEAD(work) * 32 - 26;
-        } else {
-            num2 = count * 0x30 + ST_LEAD(work) * 32;
-        }
-        PSMTXTrans(mTrans, fx + (f32)num2, yb, 0.0f);
+PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD(work) * 32 : count * 0x30 - 26 + ST_LEAD(work) * 32), yb, 0.0f);
         if (ST_FLAGS(work) & 8) {
             PSMTXScale(mScale, 1.5f, 1.5f, 1.5f);
         } else {
@@ -456,12 +455,12 @@ static void actionCommandDisp(f32 x, f32 y) {
         for (i = 0; i < count; i++) {
             if (i + ST_LEAD(work) < next) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
                 iconDispGx(&pos, 0x10, 0x95, 1.0f);
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
                 iconDispGx(&pos, 0x10, 0x91, 1.0f);
             }
@@ -473,11 +472,10 @@ static void actionCommandDisp(f32 x, f32 y) {
             f32 scale = 0.8f;
             if (w->next == idx && w->frame >= ST_STEP(work) * idx - 5 && w->frame < ST_STEP(work) * idx) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yc;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 0), 0.8f);
             } else {
-                Vec pos = {0.0f, 0.0f, 0.0f};
                 s32 dy;
                 if (w->next <= idx) {
                     scale = 0.6f;
@@ -485,9 +483,12 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     dy = -10;
                 }
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                {
+                Vec pos = {0.0f, 0.0f, 0.0f};
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = (f32)(dy + 25) + y;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 1), scale);
+                }
             }
         }
     } else {
@@ -496,16 +497,16 @@ static void actionCommandDisp(f32 x, f32 y) {
             s32 idx = i + ST_LEAD(work);
             if (w->next == idx && w->frame >= ST_STEP(work) * idx - 20 && w->frame <= ST_STEP(work) * idx) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 0), 0.8f);
             } else if (w->next <= idx) {
                 if (i >= count - 1) {
-                    btlDispTexPlane(0x40, (GXColor){255, 255, 255, 255}, 0, x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250), yc, 0.0f, 0.8f, 0.8f);
+                    btlDispTexPlane(0x40, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yc, 0.0f, 0.8f, 0.8f);
                 }
             } else {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250);
+                pos.x = x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250));
                 pos.y = yb;
                 iconDispGx(&pos, 0x10, BattleACGetButtonIcon(w->buttons[i], 1), 0.8f);
             }
@@ -515,9 +516,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     yd = yb - 25.0f;
     for (i = 0; i < count; i++) {
         if (w->results[i] == 1) {
-            btlDispTexPlane(0x3E, (GXColor){255, 255, 255, 255}, 0, x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250), yd, 0.0f, 1.0f, 1.0f);
+            btlDispTexPlane(0x3E, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
         } else if (w->results[i] == -1) {
-            btlDispTexPlane(0x3F, (GXColor){255, 255, 255, 255}, 0, x + (f32)(ST_LEAD(work) * 33 + i * 48 - 250), yd, 0.0f, 1.0f, 1.0f);
+            btlDispTexPlane(0x3F, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
         }
     }
 }

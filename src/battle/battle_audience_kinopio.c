@@ -677,9 +677,9 @@ void BattleAudienceCtrlProcessKinopioEnter(s32 index) {
         case 1:
             m->field_0x8--;
             if (m->field_0x8 <= 0) {
+                dx = m->mHomePosition.x - m->position.x;
                 dz = m->mHomePosition.z - m->position.z;
-                dx = m->mHomePosition.x;
-                dx -= m->position.x;
+
                 {
                     f32 d = (f32)sqrt(dx * dx + dz * dz);
                     m->field_0x78.x = 10.0f * (dx / d);
@@ -831,8 +831,8 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
     BattleUnit* unit;
     BattleUnitPart* parts;
     s32 partsId;
-    s8 st0;
     s8 st1;
+    s8 st0;
     switch (m->field_0x4) {
     case 0:
         BattleAudience_SetAnim(index, 1, FALSE);
@@ -842,8 +842,8 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
         m->field_0x4 = 5;
     case 5:
         unit = (BattleUnit*)AM_S32(m, 0xEC);
-        partsId = BtlUnit_GetBodyPartsId(unit);
-        parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), partsId);
+        parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
+
         m->field_0x8++;
         m->position.x = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(m->mHomePosition.x, 0.0f, 5, m->field_0x8, 60);
         m->position.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(m->mHomePosition.y, 80.0f, 5, m->field_0x8, 60);
@@ -859,8 +859,7 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
             m->field_0x4 = 10;
             m->field_0x8 = 0;
             unit = (BattleUnit*)AM_S32(m, 0xEC);
-            partsId = BtlUnit_GetBodyPartsId(unit);
-            parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), partsId);
+            parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
             BtlUnit_GetHitPos(unit, parts, &x, &y, &z);
             psndSFXOn_3D("SFX_AUDIENCE_TELESA_MOVE1", &m->position);
         }
@@ -872,8 +871,7 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
         m->position.z = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(100.0f, z, 0, m->field_0x8, 30);
         if (m->field_0x8 == 30) {
             unit = (BattleUnit*)AM_S32(m, 0xEC);
-            partsId = BtlUnit_GetBodyPartsId(unit);
-            parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), partsId);
+            parts = BattleGetUnitPartsPtr(BtlUnit_GetUnitId(unit), BtlUnit_GetBodyPartsId(unit));
             BtlUnit_GetStatus(unit, 0x12, &st1, &st0);
             if (st1 < 1 && !BtlUnit_CheckShadowGuard(unit)) {
                 BattleCheckDamage(BattleGetSystemPtr(bw), unit, (struct BattleWorkUnitPart*)parts,
@@ -1296,6 +1294,8 @@ void BattleAudienceCtrlProcessKinopioFireSub(s32 index) {
         if (m->type == 9) {
             if (m->status != 19) {
                 BattleAudience_ChangeStatus(index, 19);
+            } else {
+                return;
             }
         } else if (m->status != 17) {
             BattleAudience_Delete(index);
@@ -1409,13 +1409,13 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
     case 9:
         if (m->position.y <= -100.0f) {
             k = AM_S32(m, 0x12C);
-            px = (f32)(rand() * 10 / 32767 + k % 20 * 25 - 235);
+            px = (f32)((rand() * 10 / 32767) + (k % 20 * 25 - 235));
             pz = 0.1f * (f32)(k % 20) + (f32)(k / 20 * 30 + 115);
             m->position.x = px;
             m->mHomePosition.x = px;
             m->mHomePosition.y = AM_F32(stage, 0xB34);
-            m->position.z = pz;
-            m->mHomePosition.z = pz;
+            m->mHomePosition.z = m->position.z = pz;
+
             m->field_0x4++;
         }
         break;
@@ -1427,8 +1427,7 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
         break;
     case 11:
         if (m->position.y >= AM_F32(stage, 0xB34)) {
-            m->mHomePosition.y = AM_F32(stage, 0xB34);
-            m->position.y = AM_F32(stage, 0xB34);
+            m->position.y = m->mHomePosition.y = AM_F32(stage, 0xB34);
             m->field_0x78.y = 0.0f;
             m->field_0x4 = 99;
             m->field_0x8 = 10;

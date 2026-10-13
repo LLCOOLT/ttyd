@@ -42,11 +42,12 @@ static inline s32 harborKind(HitEntry* hit) {
 	return k;
 }
 
-#define HARBOR_PROBE(ANG, POS)                                                                                     	sincosf(&sn, &cs, toMovedir(ANG));                                                                             	dist = 40.0f;                                                                                                  	hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, dist * sn + m->position.x,                      	                     20.0f + m->position.y, dist * cs + m->position.z, 0.0f, -1.0f, 0.0f);                     	if (hit != NULL && harborKind(hit) != 0) {                                                                     		hitObjGetPos(hitGetName(hit), &POS);                                                                       		ix = (s32)((100.0f * POS.x + 0.5f) / 100.0f);                                                              		iy = (s32)((100.0f * POS.y + 0.5f) / 100.0f);                                                              		iz = (s32)((100.0f * POS.z + 0.5f) / 100.0f);                                                              		out->x = ix;                                                                                               		out->y = iy;                                                                                               		out->z = iz;                                                                                               		return TRUE;                                                                                               	}
+#define HARBOR_PROBE(ANG, POS)                                                                                     	sincosf(&sn, &cs, toMovedir(ANG));                                                                             	tz = 40.0f * cs + m->position.z; dist = 40.0f; hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, 40.0f * sn + m->position.x,                      	                     20.0f + m->position.y, tz, 0.0f, -1.0f, 0.0f);                     	if (hit != NULL && harborKind(hit) != 0) {                                                                     		hitObjGetPos(hitGetName(hit), &POS);                                                                       		ix = (s32)((100.0f * POS.x + 0.5f) / 100.0f);                                                              		iy = (s32)((100.0f * POS.y + 0.5f) / 100.0f);                                                              		iz = (s32)((100.0f * POS.z + 0.5f) / 100.0f);                                                              		out->x = ix;                                                                                               		out->y = iy;                                                                                               		out->z = iz;                                                                                               		return TRUE;                                                                                               	}
 
+__declspec(section ".sdata2") static const char s_MJ1B[] = "M_J_1B";
 BOOL checkHarbor(Vec* out) {
 	s32 ix, iy, iz;
-	f32 sn, cs, hx, hy, hz, dist, nx, ny, nz;
+	f32 tx, tz, sn, cs, hx, hy, hz, dist, nx, ny, nz;
 	Vec p1, p2, p3;
 	HitEntry* hit;
 	MarioWork* m = marioGetPtr();
@@ -110,7 +111,7 @@ void marioReInit_ship(void) {
 	MSF(m, 0x1B8) = 40.0f;
 	marioPaperOn(paper_ship[marioGetColor()]);
 	marioChgPaper("PM_H_1B");
-	marioChgPose("M_J_1B");
+	marioChgPose(s_MJ1B);
 	m->dispFlags |= 8;
 	MSI(m, 0x2A4) = 0x58;
 	marioSetPaperAnimeLocalTime(MSI(m, 0x2A4));
@@ -152,7 +153,7 @@ s32 marioShipChanging(void) {
 	if (m->currMotionId != MARIO_MOTION_SHIP) {
 		return 0;
 	}
-	if (m->currSubMotionId == 10) {
+	if ((s32)m->currSubMotionId == 10) {
 		return 2;
 	}
 	if ((s32)m->currSubMotionId >= 0 && (s32)m->currSubMotionId <= 12 || (s32)m->currSubMotionId >= 30 && (s32)m->currSubMotionId <= 48) {
@@ -206,7 +207,7 @@ void marioForceShipAnime(void) {
 	marioChgPaper(NULL);
 	marioPaperOn(paper_ship[marioGetColor()]);
 	marioChgPaper("PM_H_1B");
-	marioChgPose("M_J_1B");
+	marioChgPose(s_MJ1B);
 	m->dispFlags |= 8;
 }
 
@@ -230,4 +231,104 @@ BOOL marioChkShipMoveMode(void) {
 		return TRUE;
 	}
 	return FALSE;
+}
+
+f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
+f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
+void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
+double sin(double);
+double cos(double);
+
+void shipMove(void) {
+	MarioWork* m = marioGetPtr();
+	f32 spd = MSF(m, 0x190);
+	f32 dx, dz, vx, vz, tx, tz, max, len, fr;
+	s32 snd;
+	dx = 0.0f;
+	dx = 0.0f;
+	if (((ShipWork*)marioGetPtr()->motStruct)->swirlTime != 0) {
+		((ShipWork*)marioGetPtr()->motStruct)->swirlTime--;
+		movePos(&dx, &dz, ((ShipWork*)marioGetPtr()->motStruct)->swirlX, ((ShipWork*)marioGetPtr()->motStruct)->swirlY);
+		((ShipDir*)marioGetPtr()->motStruct)->dispX += dx;
+		((ShipDir*)marioGetPtr()->motStruct)->dispY += dz;
+		if (((ShipDir*)marioGetPtr()->motStruct)->dispX > shipData[4]) {
+			((ShipDir*)marioGetPtr()->motStruct)->dispX = shipData[4];
+		}
+		if (((ShipDir*)marioGetPtr()->motStruct)->dispX < -shipData[4]) {
+			((ShipDir*)marioGetPtr()->motStruct)->dispX = -shipData[4];
+		}
+		if (((ShipDir*)marioGetPtr()->motStruct)->dispY > shipData[4]) {
+			((ShipDir*)marioGetPtr()->motStruct)->dispY = shipData[4];
+		}
+		if (((ShipDir*)marioGetPtr()->motStruct)->dispY < -shipData[4]) {
+			((ShipDir*)marioGetPtr()->motStruct)->dispY = -shipData[4];
+		}
+	}
+	vx = ((ShipDir*)marioGetPtr()->motStruct)->dispX;
+	vz = ((ShipDir*)marioGetPtr()->motStruct)->dispY;
+	if (MSF(m, 0x190) != 0.0f) {
+		tx = spd * (f32)sin(3.1416f * MSF(m, 0x194) / 180.0f);
+		tz = spd * -(f32)cos(3.1416f * MSF(m, 0x194) / 180.0f);
+	} else {
+		tx = vx;
+		tz = vz;
+	}
+	max = shipData[4];
+	if (spd != 0.0f || ((ShipWork*)marioGetPtr()->motStruct)->swirlTime != 0) {
+		if (tx > vx) {
+			vx += (1.0f + tx - vx) * shipData[3];
+			if (vx >= max) vx = max;
+		} else {
+			vx += (tx - 1.0f - vx) * shipData[3];
+			if (vx <= -max) vx = -max;
+		}
+		if (tz > vz) {
+			vz += (1.0f + tz - vz) * shipData[3];
+			if (vz >= max) vz = max;
+		} else {
+			vz += (tz - 1.0f - vz) * shipData[3];
+			if (vz <= -max) vz = -max;
+		}
+	}
+	if (spd == 0.0f) {
+		fr = shipData[0];
+		if (MSI(m, 0x1F0) != 0) fr = shipData[1];
+		fr = __fabs(fr);
+		vx += -vx * fr;
+		vz += -vz * fr;
+		if (__fabs(vx) < 0.01f) vx = 0.0f;
+		if (__fabs(vz) < 0.01f) vz = 0.0f;
+	}
+	((ShipDir*)marioGetPtr()->motStruct)->dispX = vx;
+	((ShipDir*)marioGetPtr()->motStruct)->dispY = vz;
+	len = distABf(0.0f, 0.0f, vx, vz);
+	if (spd != 0.0f) {
+		if (len >= max) len = max;
+	} else if (len < shipData[5]) {
+		len = 0.0f;
+		((ShipDir*)marioGetPtr()->motStruct)->dispX = 0.0f;
+		((ShipDir*)marioGetPtr()->motStruct)->dispY = 0.0f;
+	}
+	MSF(m, 0x180) = len;
+	if (len != 0.0f) {
+		MSF(m, 0x1A0) = angleABf(0.0f, 0.0f, ((ShipDir*)marioGetPtr()->motStruct)->dispX, ((ShipDir*)marioGetPtr()->motStruct)->dispY);
+	}
+	if (len >= 1.0f) {
+		MarioWork* mm = marioGetPtr();
+		if (marioGetPtr()->motStruct != NULL && (u32)MSO(0x38) == 0xFFFFFFFFU) {
+			snd = psndSFXOn_3D((const char*)0x190, (Vec*)((u8*)mm + 0x8C));
+			MSO(0x38) = snd;
+		}
+	} else if (len <= 0.2f) {
+		marioGetPtr();
+		if (marioGetPtr()->motStruct != NULL && (u32)MSO(0x38) != 0xFFFFFFFFU) {
+			psndSFXOff(MSO(0x38));
+			snd = -1;
+			MSO(0x38) = snd;
+		}
+	}
+	if ((u32)MSO(0x38) != 0xFFFFFFFFU) {
+		psndSFX_pos(MSO(0x38), (Vec*)((u8*)m + 0x8C));
+	}
+	MSF(m, 0x18C) = len;
 }

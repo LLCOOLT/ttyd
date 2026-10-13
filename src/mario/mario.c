@@ -974,7 +974,7 @@ void marioMain(void) {
 	MarioWork* p;
 	u32 flags;
 	f32 y;
-	f32 a, b, c;
+	f32 c, b, a;
 
 	if (!(wp->flags & 1)) {
 		return;
@@ -1637,11 +1637,9 @@ inline void marioPaperRelease(void) {
 BOOL marioPaperOn(const char* name) {
 	MarioWork* wp = mp;
 	BOOL flag;
-	s32 poseId;
 
-	poseId = wp->paperPoseId;
-	if (poseId >= 0) {
-		animPaperPoseRelease(poseId);
+	if (wp->paperPoseId >= 0) {
+		animPaperPoseRelease(wp->paperPoseId);
 		wp->paperPoseId = -1;
 	}
 	wp->dispFlags |= 0x40000000; //paper on
@@ -2118,7 +2116,7 @@ void marioDispBlur(CameraId camId, void* param) {
 			q = 1;
 		}
 	}
-	else if (angle <= 4.712389f) {
+	else if (angle < 4.712389f) {
 		q = 2;
 	}
 	else {
@@ -2132,7 +2130,7 @@ void marioDispBlur(CameraId camId, void* param) {
 			q = 1;
 		}
 	}
-	else if (angle <= 4.712389f) {
+	else if (angle < 4.712389f) {
 		q = 2;
 	}
 	else {

@@ -442,7 +442,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
     pos.z = 0.0f;
     if (work) {
         sprintf(buf, "%2d", work->expDisp);
-        width = 12.5f * strlen(buf) + 65.0f;
+        width = 12.5f * (f32)strlen(buf) + 65.0f;
         windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, 180.0f, -160.0f, width, 32.0f, 10.0f);
 
         iconDispGx(&pos, 0x10, 0x18C, 1.0f);
@@ -452,11 +452,12 @@ void _MarioExpDisp(CameraId camId, void* param) {
 }
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
+    SeqEndWork* work = SEW((BattleWork*)param);
     Vec pos;
     char buf[0x14];
     f32 w;
     u32 len;
-    SeqEndWork* work = SEW((BattleWork*)param);
+    f32 zero = 0.0f;
 
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
@@ -465,7 +466,7 @@ void _LvupParamConfirmDisp(CameraId camId, void* param) {
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - w, 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f);
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
     FontDrawStart();
-    FontDrawString(0.0f - w, 27.0f, buf);
+    FontDrawString(zero - w, 27.0f, buf);
     FontDrawString(-20.0f, -13.0f, msgSearch("btl_msg_lvup_yes"));
     FontDrawString(-20.0f, -38.0f, msgSearch("btl_msg_lvup_no"));
     pos.x = -40.0f;
@@ -483,6 +484,7 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
 
     f32 x;
     f32 y;
+    f32 zero = 0.0f;
 
     pouch = pouchGetPtr();
     switch (work->selected) {
@@ -507,7 +509,7 @@ void L__LvupParamHelpMsgDisp(CameraId camId, void* param) {
     }
     width = FontGetMessageWidthLine(msg, &lines);
     lines++;
-    x = 0.0f - width / 2;
+    x = zero - width / 2;
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, x - 20.0f, -145.0f + (lines - 1) * 29, width + 40, lines * 29 + 1, 10.0f);
     FontDrawStart_alpha(0xFF);
     y = -148.0f;
@@ -669,9 +671,8 @@ USER_FUNC(_disable_enemy_unit_disp) {
 }
 
 USER_FUNC(_set_confetti_control_evtid) {
-    BattleWork* wp = _battleWorkPointer;
     s32* args = event->args;
-    SeqEndWork* work = SEW(wp);
+    SeqEndWork* work = SEW(_battleWorkPointer);
 
     work->confettiEvtId = evtGetValue(event, args[0]);
 
@@ -769,6 +770,80 @@ USER_FUNC(_lvup_spot_on) {
     e->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
     e->flags |= 2;
     return 2;
+}
+
+f32 sinfd(f32);
+
+USER_FUNC(_lvup_spot_move) {
+    BattleSpotWork* spot = BatSpotGetPtr();
+    s32 n = evtGetValue(event, event->args[0]);
+    SeqEndSpot* e = (SeqEndSpot*)spot->entries + n;
+    f32 s;
+
+    if (isFirstCall) {
+        event->userdata[0] = 0;
+        event->userdata[1] = 0;
+        event->userdata[2] = e->pos.x;
+        event->userdata[3] = e->pos.y;
+        event->userdata[4] = 0;
+    }
+    event->userdata[0]++;
+    switch (event->userdata[1]) {
+    case 0:
+        event->userdata[0] = 1;
+        event->userdata[1]++;
+    case 1:
+        switch (n) {
+        case 0:
+            e->pos.x = 0.5f * *(f32*)((u8*)BattleGetMarioPtr(_battleWorkPointer) + 0x3C);
+            e->pos.y = -20.0f;
+            break;
+        case 1:
+            s = sinfd(reviseAngle(1.1f * (3.0f * event->userdata[0])));
+            e->pos.x = 50.0f * s + event->userdata[2];
+            s = sinfd(reviseAngle(1.1f * (2.5f * event->userdata[0]) + 90.0f));
+            e->pos.y = -(25.0f * s - (event->userdata[3] + 25));
+            break;
+        case 2:
+            s = sinfd(reviseAngle(1.1f * (2.5f * event->userdata[0]) + 180.0f));
+            e->pos.x = 65.0f * s + event->userdata[2];
+            s = sinfd(reviseAngle(1.1f * (7.5f * event->userdata[0]) + 90.0f));
+            e->pos.y = 25.0f * s + (event->userdata[3] - 25);
+            break;
+        case 3:
+            s = sinfd(reviseAngle(1.1f * (4.0f * event->userdata[0])));
+            e->pos.x = -(50.0f * s - event->userdata[2]);
+            s = sinfd(reviseAngle(1.1f * (2.5f * event->userdata[0]) + 90.0f));
+            e->pos.y = -(25.0f * s - (event->userdata[3] + 25));
+            break;
+        case 4:
+            s = sinfd(reviseAngle(1.1f * (3.0f * event->userdata[0]) + 270.0f));
+            e->pos.x = -(50.0f * s - (event->userdata[2] - 50));
+            s = sinfd(reviseAngle(1.1f * (4.5f * event->userdata[0]) + 90.0f));
+            e->pos.y = 25.0f * s + (event->userdata[3] - 25);
+            break;
+        }
+        break;
+    case 2:
+        event->userdata[4] = 20;
+        event->userdata[2] = e->pos.x;
+        event->userdata[3] = e->pos.y;
+        event->userdata[1]++;
+    case 3:
+        event->userdata[4]--;
+        e->pos.x = intplGetValue(2, event->userdata[4], 21, 0.0f, event->userdata[2]);
+        e->pos.y = intplGetValue(2, event->userdata[4], 21, -25.0f, event->userdata[3]);
+        {
+            GXColor c = {0xFF, 0xFF, 0xFF, 0xFF};
+            c.a = intplGetValue(0, event->userdata[4], 21, 255.0f, 128.0f);
+            e->color = c;
+        }
+        if (event->userdata[4] <= 0) {
+            event->userdata[1]++;
+        }
+        break;
+    }
+    return event->userdata[1] < 4 ? 0 : 2;
 }
 
 USER_FUNC(_lvup_spot_off) {

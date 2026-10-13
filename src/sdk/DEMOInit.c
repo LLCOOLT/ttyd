@@ -19,6 +19,8 @@ static GXBool DemoFirstFrame = GX_TRUE;
 
 static u32 FrameMissThreshold;
 static vu32 FrameCount;
+static const char demo_file[] = "DEMOInit.c";
+static const char demo_msg[] = "DEMOInit: invalid TV format\n";
 char __GXErrorMessage[0x400];
 
 extern void DEMOPadInit(void); //easier to declare this way
@@ -341,7 +343,7 @@ static inline void __DEMOInitRenderMode(GXRenderModeObj* mode) {
 				rmode = &GXMpal480IntDf;
 				break;
 			default:
-				OSPanic("DEMOInit.c", 0x206, "DEMOInit: invalid TV format\n");
+				OSPanic(demo_file, 0x206, demo_msg);
 				break;
 		}
 		GXAdjustForOverscan(rmode, &rmodeobj, 0, 16);
