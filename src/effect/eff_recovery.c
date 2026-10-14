@@ -744,10 +744,11 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     w = 108.0f;
-    left = -w; left = left * 0.5f;
-    right = left + w;
-    top = 20.0f;
     bot = -20.0f;
+    top = 20.0f;
+    left = -w;
+    left = left * 0.5f;
+    right = left + w;
     for (i = 0; i < 2; i++) {
         if (i == 0) {
             effGetTexObj(0x8B, &texObj);

@@ -666,10 +666,10 @@ USER_FUNC(_set_effect_luck) {
 	NiceEffectWork* effect;
 	int i;
 
+	sfx = (0, "SFX_SYSTEM_LUCKY1");
 	pw = &weapon;
 	pz = &z;
 	py = &y;
-	sfx = (0, "SFX_SYSTEM_LUCKY1");
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && unit->badgesEquipped.LuckyStart && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
@@ -1862,19 +1862,18 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 	f32 x1, y1, z1;
 	f32 x2, y2, z2;
 	s32 tmp;
-	int n = count;
 
-	if (n <= 0) {
-		n = 0;
+	if (count <= 0) {
+		count = 0;
 		for (i = 0; i < 64; i++) {
 			if (wp->movePriorityQueue[i] == -1) {
 				break;
 			}
-			n = n + 1;
+			count = count + 1;
 		}
 	}
-	for (i = 0; i < n - 1; i++) {
-		for (j = 0; j < n - i - 1; j++) {
+	for (i = 0; i < count - 1; i++) {
+		for (j = 0; j < count - i - 1; j++) {
 			unit1 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j]);
 			unit2 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j + 1]);
 			BtlUnit_GetHomePos(unit1, &x1, &y1, &z1);
@@ -1886,8 +1885,8 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 			}
 		}
 	}
-	for (i = 0; i < n - 1; i++) {
-		for (j = 0; j < n - i - 1; j++) {
+	for (i = 0; i < count - 1; i++) {
+		for (j = 0; j < count - i - 1; j++) {
 			unit1 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j]);
 			unit2 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j + 1]);
 			if (unit1->movePriority < unit2->movePriority) {
@@ -1986,7 +1985,6 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 	int i;
 	BattleUnit* unit;
 	BOOL done = TRUE;
-
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {
@@ -2023,7 +2021,7 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 				break;
 			}
 		}
-		}
+	}
 	if (!done) {
 		return done;
 	}

@@ -123,12 +123,10 @@ void effFreezeMain(EffectEntry* effect) {
     if (lifetime < 0) {
         for (i = 0; i < 10; i++) {
             EffectEntry* glass;
-            f32 py;
-            f32 s = 0.1f * (0.7f * (rand() % 10)) + 0.3f;
-            s = work->scale * s;
-            py = freezeY(work, work);
-            glass = effGlassN64Entry(i % 2 + 2, i + 30, work->position.x + (f32)(rand() % 20) - 10.0f, py,
-                                     3.0f + work->position.z, s);
+            glass = effGlassN64Entry(i % 2 + 2, i + 30, work->position.x + (f32)(rand() % 20) - 10.0f,
+                                     work->scale * (f32)(rand() % 40) + work->position.y, 3.0f + work->position.z,
+                                     work->scale * (0.1f * (0.7f * (rand() % 10)) + 0.3f));
+
             ((EffFreezeGlassWork*)glass->userdata)->f44 = 0.1f * (f32)(rand() % 10);
             ((EffFreezeGlassWork*)glass->userdata)->f48 = 0.01f * (f32)(rand() % 30) + 0.1f;
             ((EffFreezeGlassWork*)glass->userdata)->f3C = rand() % 360;

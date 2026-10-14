@@ -1188,11 +1188,12 @@ s32 _yoshig_tpl_no_tbl[] = {
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
-    BattleWork* wp = _battleWorkPointer;
+    BattleWork* wp;
+    const char* name;
     s32 id;
     BattleUnitPart* part;
-    const char* name;
 
+    wp = _battleWorkPointer;
     id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
@@ -1266,11 +1267,11 @@ static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count) {
 
 USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
     BattleUnit* unit;
     s32 id, outSpeed, outFrames;
     f32 tx, ty, tz, speed;
     f32 x, y, z;
+    s32* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -1332,6 +1333,8 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
     if (unit->mMoveCurrentPos.x != unit->mMoveTargetPos.x) {
         if (__fabs(unit->mMoveTargetPos.x - unit->mMoveCurrentPos.x) < unit->mMoveSpeedXZ) {
             unit->mMoveCurrentPos.x = unit->mMoveTargetPos.x;
+            if (!unit->mMoveCurrentPos.z) {
+            }
         } else {
             unit->mMoveCurrentPos.x += unit->mMoveSpeedXZ * unit->moveDirection;
         }
@@ -1411,10 +1414,10 @@ USER_FUNC(_get_nomikomi_hit_position) {
 
 USER_FUNC(_get_swallow_param) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
     BattleUnit* unit;
     s32 id;
     s32 out;
+    s32* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -1426,10 +1429,10 @@ USER_FUNC(_get_swallow_param) {
 
 USER_FUNC(_check_swallow_attribute) {
     BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
     BattleUnit* unit;
     s32 id, out;
     u16 mask;
+    s32* args = event->args;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -1589,13 +1592,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     return EVT_RETURN_BLOCK;
 }
 void _btlYoshiDisp(CameraId camera, f32* p) {
-    f32* q;
-    f32 s;
-
-    if (p[3] < 0.0f) {
-        s = 0.4f;
-    } else {
-        s = -0.4f;
-    }
+    f32 s; f32* q;
+    s = (p[3] < 0.0f) ? 0.4f : -0.4f;
     ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
 }

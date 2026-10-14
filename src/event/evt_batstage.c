@@ -40,7 +40,8 @@ USER_FUNC(evt_batstage_light_set_player_off) {
 USER_FUNC(evt_batstage_light_set_player_on) {
     BattleWork* bw = _battleWorkPointer;
     s32 i;
-    s32 sel = evtGetValue(event, event->args[0]);
+    s32* args = event->args;
+    s32 sel = evtGetValue(event, args[0]);
     s32 idx;
     char names[3][32] = {"sys_activeUnit_1", "sys_activeUnit_2", "sys_activeUnit_3\0\0\0"};
     Vec pos[3] = {{100.0f, 250.0f, 70.0f}, {-300.0f, 250.0f, 70.0f}, {-120.0f, 250.0f, -70.0f}};
@@ -49,6 +50,7 @@ USER_FUNC(evt_batstage_light_set_player_on) {
     Vec upv[3] = {{0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}, {0.0f, 0.0f, -1.0f}};
     u8 col[3][3] = {{120, 120, 120}, {120, 120, 120}, {120, 120, 120}};
     u8 en[3] = {0, 0, 0};
+    u8 en2[4] = {0, 0, 0, 0};
 
     switch (sel) {
     case 1:

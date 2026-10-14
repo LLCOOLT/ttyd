@@ -100,6 +100,7 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
 	s32 i;
 	Vec unused = {0.0f, 0.0f, 0.0f};
 
+	__fabs(x * 0.005);
 	effect = effEntry();
 
 	effect->type = "MugiKemuri2";

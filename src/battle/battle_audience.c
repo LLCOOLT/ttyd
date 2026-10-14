@@ -2238,7 +2238,6 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 	Mtx scale;
 	Mtx trans;
 	Mtx mtx;
-	GXColor arg;
 
 	star = (AudApSrc*)BattleAudienceBaseGetPtr();
 	camGetPtr(CAMERA_2D);
@@ -2257,10 +2256,11 @@ void BattleAudienceDispApSrc(CameraId camId, void* param) {
 			PSMTXConcat(trans, mtx, mtx);
 			{
 				GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
+				GXColor arg;
 				col.a = star->alpha;
 				arg = col;
+				iconDispGxCol(mtx, 0x10, 0x1B2, arg);
 			}
-			iconDispGxCol(mtx, 0x10, 0x1B2, arg);
 		}
 	}
 }

@@ -89,7 +89,7 @@ void pouchInit(void) {
 			party->techLevel = 0;
 		}
 	}
-	strcpy(mpp->yoshiName, "チビヨッシー"); //TODO: US
+	strcpy(mpp->yoshiName, "チビヨッシー\0\0\0"); //TODO: US
 }
 
 ItemType pouchKeyItem(s32 id) {
@@ -180,7 +180,6 @@ BOOL pouchGetItem(ItemType type) {
 	s16* list;
 	s16* equip;
 	s32 size;
-	s32 id;
 	BOOL ok;
 	s32 i, j;
 
@@ -197,13 +196,13 @@ BOOL pouchGetItem(ItemType type) {
 		return TRUE;
 	}
 	if (type == ITEM_HEART) {
-		id = marioGetParty();
+		size = marioGetParty();
 		if (mpp->currentHP < mpp->maximumHP) {
 			mpp->currentHP++;
 		}
-		if (id != 0) {
-			if (mpp->partyData[id].currentHP < mpp->partyData[id].maximumHP) {
-				mpp->partyData[id].currentHP++;
+		if (size != 0) {
+			if (mpp->partyData[size].currentHP < mpp->partyData[size].maximumHP) {
+				mpp->partyData[size].currentHP++;
 			}
 		}
 		return TRUE;
@@ -243,9 +242,7 @@ BOOL pouchGetItem(ItemType type) {
 		swSet(type - 0x70);
 	}
 
-	size = 0;
-	list = NULL;
-	equip = NULL;
+	list = equip = (s16*)(size = 0);
 	if (type >= 0x79 && type < 0xEC) {
 		list = mpp->heldItems;
 		size = CHECK_ITEM(1) ? 20 : 10;
@@ -328,18 +325,12 @@ void pouchOpenMail(s32 mailId) {
 }
 
 void pouchReceiveMail(s32 mailId) {
-	int i;
 	s32 count;
 	s32 index, shift;
 
 	index = mailId / 32;
 	shift = mailId % 32;
-	count = 0;
-	for (i = count; i < 99; i++) {
-		if (mpp->mEmailReceivedFlags[i / 32] & (1 << (i % 32))) {
-			count++;
-		}
-	}
+	count = pouchReceiveMailCount();
 	mpp->mEmailReceivedFlags[index] |= (1 << shift);
 	mpp->mEmailIds[count] = (u8)mailId;
 }
@@ -473,16 +464,11 @@ s16 pouchGetStarPoint(void) {
 }
 
 #pragma push
-#pragma opt_lifetimes off
 void pouchRevisePartyParam(void) {
 	PouchPartyData* party;
-	int i, count;
+	int count, i;
 
-	for (i = 0, count = 0; i < 200; i++) {
-		if (mpp->equippedBadges[i] == ITEM_HP_PLUS_P) {
-			count++;
-		}
-	}
+	count = pouchEquipCheckBadge(ITEM_HP_PLUS_P);
 
 	for (i = 0; i < 8; i++) { //TODO: NUM_PARTNERS macro
 		if (i != PARTNER_NONE) {
@@ -751,44 +737,44 @@ s32 comp_aiueo_r(s16* a, s16* b);
 s32 comp_kind_r(s16* a, s16* b);
 
 void pouchSortItem(s32 mode) {
-	PouchData* pouch = mpp;
 	s16 items[20];
 	s16 keys[121];
-	s16 equipped[200];
 	s16 badges[200];
-	s32 i, j, n;
+	s16 equipped[200];
+	PouchData* pouch = mpp;
+	s32 n, i, j;
 	BOOL swap;
 
 	if ((u32)mode <= 1 || mode == 7 || mode == 8) {
 		n = 0;
-		for (i = 0; i < 20; i++) {
-			if (pouch->heldItems[i] != 0) {
-				items[n++] = pouch->heldItems[i];
+		for (j = 0; j < 20; j++) {
+			if (pouch->heldItems[j] != 0) {
+				items[n++] = pouch->heldItems[j];
 			}
 		}
 		for (; n < 20; n++) {
 			items[n] = 0;
 		}
-		if (mode == 0) qqsort(items, 20, 2, comp_aiueo);
-		else if (mode == 1) qqsort(items, 20, 2, comp_kind);
-		else if (mode == 7) qqsort(items, 20, 2, comp_aiueo_r);
-		else if (mode == 8) qqsort(items, 20, 2, comp_kind_r);
+		if (mode == 0) qqsort(items, n, 2, comp_aiueo);
+		else if (mode == 1) qqsort(items, n, 2, comp_kind);
+		else if (mode == 7) qqsort(items, n, 2, comp_aiueo_r);
+		else if (mode == 8) qqsort(items, n, 2, comp_kind_r);
 		memcpy(pouch->heldItems, items, sizeof(items));
 	}
 	if ((u32)(mode - 2) <= 1 || mode == 9 || mode == 10) {
 		n = 0;
-		for (i = 0; i < 121; i++) {
-			if (pouch->keyItems[i] != 0) {
-				keys[n++] = pouch->keyItems[i];
+		for (j = 0; j < 121; j++) {
+			if (pouch->keyItems[j] != 0) {
+				keys[n++] = pouch->keyItems[j];
 			}
 		}
 		for (; n < 121; n++) {
 			keys[n] = 0;
 		}
-		if (mode == 2) qqsort(keys, 121, 2, comp_aiueo);
-		else if (mode == 3) qqsort(keys, 121, 2, comp_kind);
-		else if (mode == 9) qqsort(keys, 121, 2, comp_aiueo_r);
-		else if (mode == 10) qqsort(keys, 121, 2, comp_kind_r);
+		if (mode == 2) qqsort(keys, n, 2, comp_aiueo);
+		else if (mode == 3) qqsort(keys, n, 2, comp_kind);
+		else if (mode == 9) qqsort(keys, n, 2, comp_aiueo_r);
+		else if (mode == 10) qqsort(keys, n, 2, comp_kind_r);
 		memcpy(pouch->keyItems, keys, sizeof(keys));
 	}
 	if ((u32)(mode - 4) <= 2 || (u32)(mode - 11) <= 1 || mode == 13) {
@@ -810,11 +796,13 @@ void pouchSortItem(s32 mode) {
 				ItemData* b = &itemDataTable[badges[j]];
 				s32 ca = a->bp_cost;
 				s32 cb = b->bp_cost;
+				const char* ida = a->id;
+				const char* idb = b->id;
 				swap = FALSE;
 				if (mode == 4) {
-					if (strcmp(a->id, b->id) > 0) swap = TRUE;
+					if (strcmp(ida, idb) > 0) swap = TRUE;
 				} else if (mode == 11) {
-					if (strcmp(a->id, b->id) < 0) swap = TRUE;
+					if (strcmp(ida, idb) < 0) swap = TRUE;
 				} else if (mode == 5) {
 					if (a->type_sort_order > b->type_sort_order) swap = TRUE;
 				} else if (mode == 12) {
@@ -842,12 +830,13 @@ void pouchSortItem(s32 mode) {
 }
 
 void unk_800d06b4(const char* src, char* dst) {
-	s32 i;
+	u16 c;
 	s32 len = strlen(src) / 2;
 	u16* s = (u16*)src;
 	u16* d = (u16*)dst;
+	s32 i;
 	for (i = 0; i < len; i++) {
-		u16 c = *s;
+		c = *s;
 		if (c >= 0x829F && c < 0x82DE) {
 			c += 0xA1;
 		}
@@ -864,7 +853,7 @@ void unk_800d06b4(const char* src, char* dst) {
 s32 comp_aiueo(s16* a, s16* b) {
 	char bufA[0x80];
 	char bufB[0x80];
-	s32 ib = *b;
+	s16 ib = *b;
 	unk_800d06b4(msgSearch(itemDataTable[*a].name), bufA);
 	unk_800d06b4(msgSearch(itemDataTable[ib].name), bufB);
 	return strcmp(bufA, bufB);
@@ -880,7 +869,7 @@ s32 comp_kind(s16* a, s16* b) {
 s32 comp_aiueo_r(s16* a, s16* b) {
 	char bufA[0x80];
 	char bufB[0x80];
-	s32 ib = *b;
+	s16 ib = *b;
 	unk_800d06b4(msgSearch(itemDataTable[*a].name), bufA);
 	unk_800d06b4(msgSearch(itemDataTable[ib].name), bufB);
 	return strcmp(bufB, bufA);
@@ -934,25 +923,19 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	if (type != *p) {
 		return FALSE;
 	}
-	for (i = index; i < maximum; i++, p++) {
+	for (i = index; i < maximum; p++, i++) {
 		if (type == *p) {
 			table1[i] = ITEM_NULL;
 			if (table2 != 0) {
 				table2[i] = ITEM_NULL;
 			}
 			temp = maximum - 1;
-			if (table2) {
-				for (j = i; j < temp; j++) {
-					table1[j] = table1[j + 1];
-					table1[j + 1] = ITEM_NULL;
+			for (j = i; j < temp; j++) {
+				table1[j] = table1[j + 1];
+				table1[j + 1] = ITEM_NULL;
+				if (table2) {
 					table2[j] = table2[j + 1];
 					table2[j + 1] = ITEM_NULL;
-				}
-			}
-			else {
-				for (j = i; j < temp; j++) {
-					table1[j] = table1[j + 1];
-					table1[j + 1] = ITEM_NULL;
 				}
 			}
 			return TRUE;
@@ -1001,18 +984,12 @@ BOOL pouchRemoveItem(ItemType type) {
 				table2[i] = ITEM_NULL;
 			}
 			temp = maximum - 1;
-			if (table2) {
-				for (j = i; j < temp; j++) {
-					table1[j] = table1[j + 1];
-					table1[j + 1] = ITEM_NULL;
+			for (j = i; j < temp; j++) {
+				table1[j] = table1[j + 1];
+				table1[j + 1] = ITEM_NULL;
+				if (table2) {
 					table2[j] = table2[j + 1];
 					table2[j + 1] = ITEM_NULL;
-				}
-			}
-			else {
-				for (j = i; j < temp; j++) {
-					table1[j] = table1[j + 1];
-					table1[j + 1] = ITEM_NULL;
 				}
 			}
 			return TRUE;
@@ -1062,3 +1039,7 @@ u32 pouchCheckItem(u32 itemId) {
 	}
 	return 0;
 }
+
+
+
+

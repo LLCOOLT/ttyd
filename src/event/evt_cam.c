@@ -67,9 +67,9 @@ USER_FUNC(evt_cam_get_at) {
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
     s32* args = event->args;
+    u64 mask = -1;
     u64 now;
     u64 last;
-    u64 mask = -1;
     CameraId id;
     f32 x, y;
     s32 msec;
@@ -341,7 +341,7 @@ USER_FUNC(evt_cam3d_evt_set_rel_dir) {
 }
 
 // unused (dead-stripped): only its string and 100.0f survive
-static void evt_cam_debug_print(f32 a) {
+static void evt_cam_debug_print(f32 a) /* restore */ {
     OSReport("%f%f%f%f%f%f%d%s", a / 100.0f);
 }
 
@@ -603,3 +603,5 @@ USER_FUNC(evt_cam_letter_box_camid) {
     camGetPtr(CAMERA_2D)->letterBoxCamId = id;
     return EVT_RETURN_DONE;
 }
+
+

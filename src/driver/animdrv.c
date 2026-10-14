@@ -361,8 +361,8 @@ label_5:
 }
 
 s32 animPaperPoseEntry(const char* animName, s32 group) {
-    AnimationPose* pose;
     s32 i;
+    AnimationPose* pose;
 
     for (i = 0; i < wp->totalPoses; i++) {
         pose = animPoseGetAnimPosePtr(i);
@@ -417,8 +417,9 @@ BOOL animEffectAsync(const char* animName, u32 group) {
     }
     if ((u32)anim == 0) {
         return FALSE;
+    } else {
+        return TRUE;
     }
-    return TRUE;
 }
 
 void animPosePeraOn(s32 poseId) {
@@ -563,9 +564,9 @@ void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
 }
 
 void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
-    AnimationPose* pose = &wp->poses[poseId];
     AnimationPose* paper;
     s32 id;
+    AnimationPose* pose = &wp->poses[poseId];
 
     if (pose->paperId != -1) {
         if (animName && !strcmp(animPoseGetAnimBaseDataPtr(pose->paperId)->fileName, animName) &&

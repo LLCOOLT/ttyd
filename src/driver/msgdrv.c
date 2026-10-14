@@ -15,6 +15,7 @@
 
 extern GlobalWork* gp;
 extern int sprintf(char* str, const char* format, ...);
+extern int sscanf(const char* str, const char* format, ...);
 
 #define WIN_STATE(w) (*(u16*)(w)->field_0x0)
 
@@ -101,6 +102,8 @@ typedef struct MsgIcon {
 	s32 value; //0x4
 } MsgIcon;
 
+const char R_no_messages_JP[] = "<col ff0000ff>\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x82\xAA\x82\xA0\x82\xE8\x82\xDC\x82\xB9\x82\xF1</col>\n<key>";
+const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 //.data
 MsgIcon msgIcon[] = {
 	{"PAD_A", 0x64},
@@ -130,17 +133,13 @@ s32 msgWindowOpen_SE_Data[] = {
 };
 
 //.sbss
-u16 active; //TODO: re-type
 void* msgSortDvdData; //TODO: re-type
 BOOL msgSEflag; //msgSEInit and related functions are unused
 MessageWork msgWork;
 
 //.sdata
 MessageWork* msgw = &msgWork;
-const char* ErrMessage[2] = {
-	"<col ff0000ff>\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x82\xAA\x82\xA0\x82\xE8\x82\xDC\x82\xB9\x82\xF1</col>\n<key>", /*"メッセージがありません"*/
-	"<col ff0000ff>No messages.<col>\n<key>"
-};
+const char* ErrMessage[2] = {R_no_messages_JP, R_no_messages_US};
 const char* paperPoseTbl[6] = {
 	"PM_Y_1B", "PM_Y_2B", "PM_F_1B",
 	"PM_F_3B", "PM_C_1B", "PM_C_2B"
@@ -165,14 +164,14 @@ void msgInit(void) {
 	msgw->entries[0].lookup = NULL;
 	msgw->entries[1].address = NULL;
 	msgw->entries[1].lookup = NULL;
-	msgLoad("global", 1);
+	msgLoad("global\0", 1);
 }
 
 void msgLoad(const char* filename, s32 index) {
 	MessageEntry* entry;
 	u32 r30;
 	MsgLookupEntry* lookup;
-	char* msgptr;
+	u32 msgptr;
 	int i;
 	DVDEntry* dvd;
 	s32 msgcount;
@@ -214,12 +213,11 @@ void msgLoad(const char* filename, s32 index) {
 		entry->count = 0;
 	}
 	else {
-		msgptr = entry->address;
+		msgptr = (u32)entry->address;
 		msgcount = 0;
 		while (*(s8*)msgptr) {
-			msgptr = strlen(msgptr) + msgptr;
+			msgptr += strlen((const char*)msgptr) + 1;
 			msgcount++;
-			msgptr++;
 		}
 		entry->count = (u32)(msgcount / 2); //tag, message
 	}
@@ -258,13 +256,14 @@ static inline void msgAddPage(smartEntry* smart, s32 y) {
 }
 
 static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
-	s32 btn;
+	s32 btn, trgv;
 	if (!(data->flags & 0x80)) {
 		btn = 0x100;
 		if (((MsgWinData*)smart->address)->flags & 0x100) {
 			btn = 0x500;
 		}
-		if (keyGetButtonTrg(0) & (btn | 0x200)) {
+		trgv = keyGetButtonTrg(0);
+		if (trgv & (btn | 0x200)) {
 			data->flags |= 4;
 		}
 	}
@@ -575,7 +574,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				if (c->glyph == 0xFFF8) {
 					col4 = FontGetDrawColor();
-					pos.x = 28.0f + (x + c->x);
+					pos.x = 20.0f + (x + c->x);
 					pos.y = c->iconY + (c->y + (y + data->field_0x28) - 40.0f);
 					pos.z = 0.0f;
 					iconDispGxAlpha(&pos, 0x10, (u16)c->value, a * al / 255, c->scale);
@@ -676,46 +675,112 @@ void msgDispKeyWait_render(s32 wXluStage) {
 }
 
 char* msgGetCommand(char* msg, char* cmd, char* arg);
+s32 msgIconStr2ID(const char* str);
+
+typedef struct MsgAChar {
+	u32 value; //0x0
+	u16 glyph; //0x4
+	s16 x; //0x6
+	s16 y; //0x8
+	s16 extra; //0xA
+	s32 time; //0xC
+	f32 scale; //0x10
+	f32 dyn; //0x14
+} MsgAChar;
+
 void msgAnalize(smartEntry* smart, char* msg) {
-	MessageData* data;
-	MsgDataEntry* entry;
+	s16 s230;
+	s16 s232;
+	s16 s234;
+	MsgWinData* data;
 	WindowEntry* window;
-	s32 smth_7A30;
-	u8 check;
-	BOOL checkkanji;
-	u16 glyph, width;
-	u32 r23;
-	s32 i, inArgs;
-	char* p;
+	MsgAChar* entry;
+	s8 check;
+	u16 glyph;
+	u16 width;
+	u32 flags;
+	s16 x;
+	s16 y;
+	s32 time;
+	s16 rubyX;
 	char tag[0x80];
 	char args[0x80];
-	char name[0x40];
-	s32 iv[5];
-	f32 fv, fa, fb, fc;
+	char name[0x20];
+	char anim1[0x20];
+	char anim2[0x20];
+	char paper[0x20];
+	char paper2[0x20];
+	s32 step;
+	f32 scale;
+	f32 fv;
+	s32 v48;
+	s32 v44;
+	s32 v40;
+	s32 iconId;
+	s32 i38;
+	s32 i34;
+	s32 i30;
+	f32 iconScale;
+	s32 i28;
+	s32 i24;
+	s32 i20;
+	f32 f1c;
+	s32 i18;
+	s16 w16;
+	s16 w14;
+	s16 w12;
+	s16 w10;
+	s16 sel0;
+	s16 sel1;
+	u16 iw;
+	u16 ih;
+	f32 maxScale;
+	char* next;
+	BOOL isHM;
+	s32 i;
+	s32 k;
+	s32 half;
+	s32 j;
+	s32 total;
+	u16 rubyW;
+	char* p;
+	s32 ww;
 
 	data = smart->address;
 	window = data->window;
-	r23 = 0;
-	entry = &data->entries[data->entryId];
+	entry = (MsgAChar*)&data->entries[data->count];
+	flags = 0;
+	maxScale = 0.0f;
+	scale = 1.0f;
 	if (window->type < 0) {
 		window->type = 0;
 	}
-	smth_7A30 = data->field_0x7A30;
+	time = data->field_0x7A30;
+	s234 = 0;
+	x = data->field_0x7A34;
+	s232 = data->field_0x7A38;
+	y = data->field_0x7A36;
+	s230 = data->field_0x7A3A;
+	step = data->field_0x7A3C;
 	switch (window->type) {
 	case 3:
 	case 8:
 		switch (window->type) {
-		case 3:
-			entry->field_0x0 = 0xDCC8DCFF;
-			break;
-		case 8:
-			entry->field_0x0 = 0x00D914FF;
+		case 3: {
+			static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
+			entry->value = *(u32*)&c;
 			break;
 		}
+		case 8: {
+			static const GXColor c = {0x00, 0xD9, 0x14, 0xFF};
+			entry->value = *(u32*)&c;
+			break;
+		}
+		}
 		entry->glyph = 0xFFF7;
-		entry->field_0xC = smth_7A30;
+		entry->time = time;
 		entry++;
-		data->entryId++;
+		data->count++;
 		break;
 	default:
 		break;
@@ -723,146 +788,382 @@ void msgAnalize(smartEntry* smart, char* msg) {
 
 	while (TRUE) {
 		check = *msg;
-		if ((check >= 0x81 && check <= 0x9F) || (check >= 0xE0 && check <= 0xFC)) {
-			checkkanji = TRUE;
-		} else {
-			checkkanji = FALSE;
-		}
-		if (checkkanji) {
+		if (_ismbblead(check)) {
 			glyph = kanjiSearch(*(u16*)msg);
-			width = kanjiGetWidth(glyph);
+			width = kanjiGetWidth((u16)(glyph + 0));
 			entry->glyph = glyph;
-			/* TODO: block at 0xb8-0x27c (sjis glyph store, 0x8145/0x8140/0x8151 checks, width) */
+			entry->x = x;
+			ww = scale * (f32)(width + 4);
+			entry->y = y - (s32)(10.0f * scale);
+			entry->scale = scale;
+			entry->value = flags;
+			if (*(u16*)msg == 0x8145) {
+				entry->value |= 0x10;
+			} else if (*(u16*)msg != 0x8140 && *(u16*)msg != 0x8151) {
+				entry->value |= 8;
+			}
+			if (flags & 1) {
+				entry->dyn = fv;
+			}
+			if (maxScale < scale) {
+				maxScale = scale;
+			}
+			entry->time = time;
+			x += ww;
 			msg += 2;
+			data->count++;
+			entry++;
+			time += step;
 			continue;
 		}
-		switch ((s8)*msg) {
+		switch ((s8)check) {
 		case 0:
-			/* TODO: block at 0x28c-0x2b8 (terminator entry, store field_0x7A30..7A3A) */
 			entry->glyph = 0xFFFF;
+			entry->time = time;
+			data->field_0x7A30 = time;
+			data->field_0x7A34 = x;
+			data->field_0x7A36 = y;
+			data->field_0x7A38 = s232;
+			data->field_0x7A3A = s230;
 			return;
 		case '\n':
-			/* TODO: block at 0x2bc-0x390 (newline entry, line counters, 0x7a40) */
 			entry->glyph = 0xFFFB;
+			entry->time = time;
+			x = 0;
+			if (0.0f == maxScale) {
+				maxScale = 1.0f;
+			}
 			msg++;
+			entry++;
+			data->count++;
+			time += step;
+			{
+				f32 h = 32.0f * maxScale;
+				maxScale = 0.0f;
+				y -= h;
+				s230 -= h;
+			}
+			if (data->flags & 0x20) {
+				flags = (flags & ~0xFF00) | (0x100 << data->numSel);
+				data->numSel++;
+			}
 			continue;
 		case '<':
-			msg = msgGetCommand(msg + 1, tag, args);
+			next = msgGetCommand(msg + 1, tag, args);
+			msg = next;
 			if (strcmp(tag, "k") == 0 || strcmp(tag, "key") == 0) {
-				/* TODO: block at 0x428-0x460 */
+				entry->glyph = 0xFFFE;
+				entry->x = s232;
+				entry->time = time;
+				time += 100;
+				entry++;
+				data->count++;
+				s232++;
 			} else if (strcmp(tag, "keyxon") == 0) {
-				/* TODO */
+				data->flags |= 0x100;
 			} else if (strcmp(tag, "p") == 0 || strcmp(tag, "scrl_auto") == 0) {
-				/* TODO: block at 0x4b0-0x504 */
-			} else if (strcmp(tag, "o") == 0 || strcmp(tag, "once_stop") == 0) {
-				/* TODO */
-			} else if (strcmp(tag, "pos") == 0) {
-				if (sscanf(args, "%d%d", &iv[0], &iv[1]) == 999) {
+				if (s230 != 0) {
+					entry->glyph = 0xFFFD;
+					entry->y = s230 - 3;
+					s234 = y - 6;
+					y -= 3;
+					entry->time = time;
+					time += 0x32;
+					entry++;
+					s230 = 0;
+					data->count++;
 				}
-				/* TODO */
+			} else if (strcmp(tag, "o") == 0 || strcmp(tag, "once_stop") == 0) {
+				entry->glyph = 0xFFFC;
+				entry->time = time;
+				time += 0x32;
+				entry++;
+				data->count++;
+			} else if (strcmp(tag, "pos") == 0) {
+				sscanf(args, "%d%d", &v48, &v44);
+				x = v48;
+				if (v44 != 999) {
+					y = s234 - v44;
+				}
+				s230 = -v44;
 			} else if (strcmp(tag, "scale") == 0) {
-				sscanf(args, "%f", &fv);
+				sscanf(args, "%f", &scale);
 			} else if (strcmp(tag, "/scale") == 0) {
-				/* TODO */
+				scale = 1.0f;
 			} else if (strcmp(tag, "wait") == 0) {
-				sscanf(args, "%d", &iv[0]);
+				sscanf(args, "%d", &v40);
+				time += v40;
 			} else if (strcmp(tag, "speed") == 0) {
-				sscanf(args, "%d", &iv[0]);
+				sscanf(args, "%d", &step);
 			} else if (strcmp(tag, "/speed") == 0) {
+				step = data->field_0x7A3C;
 			} else if (strcmp(tag, "dynamic") == 0) {
 				sscanf(args, "%f", &fv);
+				flags |= 1;
 			} else if (strcmp(tag, "/dynamic") == 0) {
+				flags &= ~1;
 			} else if (strcmp(tag, "shake") == 0) {
+				flags |= 2;
 			} else if (strcmp(tag, "/shake") == 0) {
+				flags &= ~2;
 			} else if (strcmp(tag, "wave") == 0) {
+				flags |= 4;
 			} else if (strcmp(tag, "/wave") == 0) {
+				flags &= ~4;
 			} else if (strcmp(tag, "col") == 0) {
-				sscanf(args, "%x", &iv[0]);
-				/* TODO */
+				sscanf(args, "%x", &entry->value);
+				entry->glyph = 0xFFF7;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "/col") == 0) {
+				entry->value = 0xFF;
+				entry->glyph = 0xFFF7;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "noise") == 0) {
+				entry->value = 1;
+				entry->glyph = 0xFFF6;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "/noise") == 0) {
+				entry->value = 0;
+				entry->glyph = 0xFFF6;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "dkey") == 0) {
+				entry->value = 1;
+				entry->glyph = 0xFFF5;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "/dkey") == 0) {
+				entry->value = 0;
+				entry->glyph = 0xFFF5;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "plate") == 0) {
+				window->type = 2;
+				step = 0;
+				data->field_0x7A3C = 0;
 			} else if (strcmp(tag, "system") == 0) {
+				static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
+				window->type = 3;
+				entry->value = *(u32*)&c;
+				entry->glyph = 0xFFF7;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "tec") == 0) {
+				static const GXColor c = {0x00, 0xD9, 0x14, 0xFF};
+				window->type = 8;
+				entry->value = *(u32*)&c;
+				entry->glyph = 0xFFF7;
+				entry->time = time;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "majo") == 0) {
+				window->type = 9;
 			} else if (strcmp(tag, "diary") == 0) {
+				window->type = 7;
 			} else if (strcmp(tag, "housou") == 0) {
+				window->type = 10;
 			} else if (strcmp(tag, "boss") == 0) {
+				window->type = 6;
 			} else if (strcmp(tag, "kanban") == 0) {
+				window->type = 4;
+				step = 0;
+				data->field_0x7A3C = 0;
 			} else if (strcmp(tag, "small") == 0) {
+				window->type = 1;
+				data->flags |= 0x10;
 			} else if (strcmp(tag, "clear") == 0) {
+				window->type = 11;
 			} else if (strcmp(tag, "wpos") == 0) {
-				sscanf(args, "%hd%hd%hd%hd", &iv[0], &iv[1], &iv[2], &iv[3]);
-				/* TODO: block at 0xb30-0xb2c */
+				sscanf(args, "%hd%hd%hd%hd", &w16, &w14, &w12, &w10);
+				window->flags |= 4;
+				window->x = w16;
+				window->y = w14;
+				window->height = w12;
+				window->width = w10;
 			} else if (strcmp(tag, "select") == 0) {
-				sscanf(args, "%hd%hd%hd%hd%hd", &iv[0], &iv[1], &iv[2], &iv[3], &iv[4]);
+				window->type = 5;
+				data->flags |= 0x20;
+				sscanf(args, "%hd%hd%hd%hd%hd", &sel0, &sel1, &data->selWidth, &data->selY);
+				flags |= 0x100;
+				data->defSel = sel0;
+				data->cancel = sel1;
+				data->numSel = 1;
+				step = 0;
 			} else if (strcmp(tag, "se") == 0) {
-				sscanf(args, "%d", &iv[0]);
+				sscanf(args, "%d", &entry->value);
+				entry->glyph = 0xFFFA;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "vol") == 0) {
-				sscanf(args, "%d", &iv[0]);
+				sscanf(args, "%d", &entry->value);
+				entry->glyph = 0xFFF9;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "nowinse") == 0) {
+				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
-				if (args[0] >= '0' && args[0] <= '9') {
-					sscanf(args, "%d%f%d%d%d", &iv[0], &fv, &iv[1], &iv[2], &iv[3]);
+				isHM = FALSE;
+				if ((s8)args[0] >= '0' && (s8)args[0] <= '9') {
+					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
-					sscanf(args, "%s%f%d%d%d", name, &fv, &iv[1], &iv[2], &iv[3]);
+					sscanf(args, "%s%f%d%d%d", name, &iconScale, &i38, &i34, &i30);
 					if (strcmp(name, "HM") == 0) {
+						isHM = TRUE;
 					}
-					for (i = 0; i < 0x12; i++) {
-						if (strcmp(name, "") == 0) { /* TODO: icon name table */
-							break;
-						}
+					iconId = msgIconStr2ID(name);
+					if (iconId < 0) {
+						iconId = 0;
 					}
 				}
-				if (iv[0] == 0) {
-					iconGetWidthHight(0, 0, 0);
-					/* TODO: block at 0xe30-0xf28 */
+				if (!isHM) {
+					entry->value = iconId;
+					iconGetWidthHight(&iw, &ih, iconId);
+					entry->glyph = 0xFFF8;
+					x += 0x28;
+					entry->x = x + 0.5f * iw * iconScale + i38;
+					entry->y = y - ih * iconScale;
+					entry->extra = i34;
+					entry->scale = iconScale;
+					entry->time = time;
+					entry++;
+					data->count++;
+					time += step;
 				} else {
-					glyph = kanjiSearch(0);
-					width = kanjiGetWidth(glyph);
-					/* TODO: block at 0xf30-0xf3c */
+					glyph = kanjiSearch(0x94B5);
+					width = kanjiGetWidth((u16)(glyph + 0));
+					iw = scale * (f32)(width + 4);
+					entry->glyph = glyph;
+					entry->x = x;
+					entry->y = y - (s32)(10.0f * scale);
+					entry->scale = scale;
+					entry->value = flags;
+					entry->value |= 8;
+					if (flags & 1) {
+						entry->dyn = fv;
+					}
+					if (maxScale < scale) {
+						maxScale = scale;
+					}
+					entry->time = time;
+					entry++;
+					data->count++;
+					time += step;
+					x += iw;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
-				sscanf(args, "%s%s%d%d%f%d", name, name, &iv[0], &iv[1], &fv, &iv[2]);
-				iv[3] = animPoseEntry(name, 0);
-				animPoseSetAnim(iv[3], name, 1);
-				animPoseSetMaterialFlagOn(iv[3], 0);
-				animPoseSetMaterialFlagOff(iv[3], 0);
-				animPoseSetGXFunc(iv[3], 0, 0);
-				/* TODO: block at 0xfe8-0x1028 */
+				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
+				entry->value = animPoseEntry(anim1, 2);
+				animPoseSetAnim(entry->value, anim2, 1);
+				animPoseSetMaterialFlagOn(entry->value, 0x1800);
+				animPoseSetMaterialFlagOff(entry->value, 0x40);
+				animPoseSetGXFunc(msgw->poseId, msgDispKeyWait_render, 0);
+				entry->glyph = 0xFFF4;
+				entry->x = i28;
+				entry->y = s234 - i24;
+				entry->scale = f1c;
+				entry->dyn = (i20 != 0) ? 180.0f : 0.0f;
+				entry++;
+				data->count++;
+				time += step;
 			} else if (strcmp(tag, "paper") == 0) {
-				sscanf(args, "%s%d", name, &iv[0]);
-				if (strcmp(name, "me") != 0) {
-					npcNameToPtr(name);
-				}
+				sscanf(args, "%s%d", paper, &i18);
+				entry->value = (strcmp(paper, "me") != 0) ? (u32)npcNameToPtr(paper) : 0;
+				entry->glyph = 0xFFF3;
+				entry->time = i18;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "/paper") == 0) {
-				sscanf(args, "%s", name);
-				if (strcmp(name, "me") != 0) {
-					npcNameToPtr(name);
-				}
+				sscanf(args, "%s", paper2);
+				entry->value = (strcmp(paper2, "me") != 0) ? (u32)npcNameToPtr(paper2) : 0;
+				entry->glyph = 0xFFF2;
+				entry++;
+				data->count++;
 			} else if (strcmp(tag, "r") == 0) {
-				/* TODO: ruby */
-			} else if (tag[0] == 'R' || (tag[0] == '/' && *(u16*)tag == 0x2F72)) {
-				/* TODO: block at 0x1170-0x1370 (ruby text, strlen + kanji loops) */
-				strlen(tag);
+				if (data->window->type != 1) {
+					rubyX = x;
+				}
+			} else if (((s8*)tag)[0] == 'R' || (((s8*)tag)[0] == '/' && (u32)((s8*)tag)[0] == 0x2F72)) {
+				i = 1;
+				if (((s8*)tag)[0] != 'R') i = 2;
+				if (data->window->type == 1) {
+					continue;
+				}
+				half = (s32)strlen(tag + i) / 2;
+				total = 0;
+				j = i;
+				p = tag + i;
+				for (k = 0; k < half; k++) {
+					glyph = kanjiSearch(*(u16*)p);
+					width = kanjiGetWidth((u16)(glyph + 0));
+					total += (s32)(0.55f * (scale * (f32)(width + 4)));
+					p += 2;
+					j += 2;
+				}
+				rubyW = (u16)total - 0.55f * (4.0f * scale);
+				rubyX = ((f32)(rubyX + x) - 4.0f * scale - (f32)rubyW) * 0.5f;
+				p = tag + i;
+				for (k = 0; k < half; k++) {
+					glyph = kanjiSearch(*(u16*)p);
+					width = kanjiGetWidth((u16)(glyph + 0));
+					ww = 0.55f * (scale * (f32)(width + 4));
+					entry->glyph = glyph;
+					entry->x = rubyX;
+					entry->y = y;
+					entry->scale = 0.55f * scale;
+					entry->value = flags;
+					if (flags & 1) {
+						entry->dyn = fv;
+					}
+					entry->time = 0;
+					rubyX += ww;
+					p += 2;
+					i += 2;
+					data->count++;
+					entry++;
+				}
 				continue;
 			}
-			if (*msg == '\n') {
+			if (*(s8*)next == '\n') {
 				msg++;
 			}
 			continue;
 		default:
-			if (*msg == 0) {
-				glyph = kanjiSearch(0);
+			if ((u32)gp->language == 0 && (s8)check >= '0' && (s8)check <= '9') {
+				glyph = kanjiSearch((u16)(check + 0x821F));
 			} else {
-				glyph = hankakuSearch(*msg);
+				glyph = hankakuSearch(check);
 			}
-			width = kanjiGetWidth(glyph);
-			/* TODO: block at 0x13c0-0x14ac (single-byte glyph entry) */
+			width = kanjiGetWidth((u16)(glyph + 0));
+			entry->glyph = glyph;
+			entry->x = x;
+			ww = scale * (f32)(width + 2);
+			entry->y = y - (s32)(10.0f * scale);
+			entry->scale = scale;
+			entry->value = flags;
+			if (*(s8*)msg != ' ') {
+				entry->value |= 8;
+			}
+			if (flags & 1) {
+				entry->dyn = fv;
+			}
+			if (maxScale < scale) {
+				maxScale = scale;
+			}
+			entry->time = time;
+			x += ww;
 			msg++;
+			data->count++;
+			entry++;
+			time += step;
 			continue;
 		}
 	}
@@ -1391,12 +1692,14 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
-	WindowEntry* window = param;
 	CameraEntry* camera = camGetCurPtr();
 	BOOL ret = FALSE;
+	WindowEntry* window = param;
 	Vec pos;
 	f32 x, y, w, h;
+	f32 ex, ey;
 	s32 sy;
+	static u16 active;
 
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
 
@@ -1417,34 +1720,34 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			case 6:
 			case 8:
 			case 9:
-				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height * 0.5f);
-				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width * 0.5f);
+				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height / 2.0f);
+				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width / 2.0f);
 				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
 				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w * 0.5f, y + h * 0.5f, w, h, pos.x, pos.y);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
 					ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 				}
 				break;
 			case 1:
-				window->x = pos.x - 0.5f * window->height;
+				window->x = pos.x - window->height / 2.0f;
 				if (window->field_0x2C & 8) {
 					window->y = pos.y - 80.0f;
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height * 0.5f);
-				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width * 0.5f);
+				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height / 2.0f);
+				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width / 2.0f);
 				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
 				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w * 0.5f, y + h * 0.5f, w, h, pos.x, pos.y);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((s32)window->y - 10);
 					if (sy < 0) sy = 0;
 					if (sy > 480) sy = 480;
 					GXSetScissor(camera->scissor[0], sy, camera->scissor[2], 0x7E);
-					ret = msgDisp(window->userdata, window->alpha, 28.0f + window->x, window->y - 6.0f);
+					msgDisp(window->userdata, window->alpha, 20.0f + window->x, window->y - 7.0f);
 				}
 				break;
 			}
@@ -1456,6 +1759,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 		break;
 	case 2:
 	case 4:
+	case 10:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
 		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 2.0f, camera->scissor[2], 0x68);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
@@ -1470,12 +1774,11 @@ void msgWindow_Disp(CameraId camId, void* param) {
 		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
-	case 10:
+	case 11:
 		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
 	case 5:
-	case 11:
 		break;
 	}
 
@@ -1568,10 +1871,12 @@ void selectWindow_Main(WindowEntry* window) {
 void selectWindow_Disp(CameraId camId, void* param) {
 	WindowEntry* window = param; //cast to correct type
 	MsgWinData* data = window->userdata->address;
-	GXColor fog = {0, 0, 0, 0};
 	Vec pos;
 
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog);
+	{
+		GXColor fog = {0, 0, 0, 0};
+		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog);
+	}
 	{
 		GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
 		color.a = window->alpha;

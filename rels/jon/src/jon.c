@@ -2584,7 +2584,6 @@ void raster_disp(CameraId cameraId, void* param) {
     s32 j;
     f32 w;
     f32 h;
-
     if (amp > 127.0f) {
         amp = 127.0f;
     }
@@ -2594,10 +2593,10 @@ void raster_disp(CameraId cameraId, void* param) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 v = sin(j + (gp->retraceCount / 4.0f + phase));
-            u8* p = &buf[ia8_ofs(j, i)];
+            s32 o = ia8_ofs(j, i);
 
-            p[0] = amp * v + 128.0f;
-            p[1] = 0x80;
+            buf[o] = amp * v + 128.0f;
+            buf[o + 1] = 0x80;
         }
     }
     DCFlushRange(buf, 0x2000);

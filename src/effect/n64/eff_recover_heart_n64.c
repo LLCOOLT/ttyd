@@ -34,13 +34,13 @@ typedef struct EffRecoverHeartN64Work {
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_803A4A60 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_recover_heart_negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A4A70 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_recover_heart_one_negone_373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803A4A80 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_recover_heart_negone_one_360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A4A90 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_recover_heart_one_negone_359 = 0x3F800000BF800000;
 #endif
 
 effN64Vtx size32x32_tex32x32_heart_vtx[] = {
@@ -363,3 +363,5 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
+__declspec(section ".sdata2") const u32 gap_10_8042323C_sbss2;

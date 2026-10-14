@@ -152,7 +152,9 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 	pos = p->position;
 	marioGetScreenPos(pos, &sx, &sy, &sz);
 	if (marioChkInScreen((s32)sx, (s32)sy)) {
-		return EVT_RETURN_DONE;
+		if (1) {
+			return EVT_RETURN_DONE;
+		}
 	}
 	partyClearFootmark();
 	mw = p->playerPtr;

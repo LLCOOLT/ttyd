@@ -1025,6 +1025,8 @@ s16 partyMarioHosei(PartyEntry* party) {
         kz = 0.15f;
         ky = kx;
     }
+    if (&party->position) {
+    }
     if (mario->flags & 0x8000) {
         kx = 0.2f;
         kz = 0.15f;
@@ -1830,7 +1832,7 @@ BOOL partyGetAppearPos2(PartyEntry* party, Vec* out) {
             out->x = mario->position.x;
             out->y = mario->position.y;
             out->z = mario->position.z;
-            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? 20.0f : -20.0f));
+            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? -20.0f : 20.0f));
             query.targetDistance = 38.0f;
             query.targetPos = (Vec){out->x, 37.0f + out->y, out->z};
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
@@ -1847,7 +1849,7 @@ BOOL partyGetAppearPos2(PartyEntry* party, Vec* out) {
             out->x = mario->position.x;
             out->y = mario->position.y;
             out->z = mario->position.z;
-            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? -20.0f : 20.0f));
+            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? 20.0f : -20.0f));
             query.targetDistance = 38.0f;
             query.targetPos = (Vec){out->x, 37.0f + out->y, out->z};
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};

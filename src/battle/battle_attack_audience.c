@@ -236,22 +236,24 @@ s32 btlataudevtDummy[16] = {
     0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
     (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
-
-
-
-
-
-
-
-
-
-s32* btlataudGetAttackEventPtr(s32 unitId) {
-    s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
+void* btlataudGetAttackEventPtr(s32 unitId) {
+    BattleUnit* u = BattleGetUnitPtr(_battleWorkPointer, unitId);
+    void* p = BtlUnit_GetData(u, 6);
     if (p == NULL) {
-        return &btlataudevtDummy[1];
+        return (void*)((s32)btlataudevtDummy + 4);
     }
     return p;
 }
+
+
+
+
+
+
+
+
+
+
 
 EVT_BEGIN(btlataudevtPresentItem_Damage)
     CALL(_delete_present_item, LW(0))

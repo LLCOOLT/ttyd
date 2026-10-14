@@ -239,6 +239,7 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     EffPokopiThunderN64Work* work;
     s32 type;
     s32 i;
+    s32 lim;
     s32 n;
     s32 k;
     effN64Vtx* vtx;
@@ -335,7 +336,7 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     v = vtx;
     for (i = 0; i < 12; i++) {
-        f32 ox, oy, r, ang2, a;
+        f32 ox, a, oy, r, ang2;
         if (i == 0) {
             r = 8.0f;
             a = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
@@ -352,7 +353,8 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
                 } else if (d - ang2 < -180.0f) {
                     d += 360.0f;
                 }
-                a = (ang2 + d) / 2.0f;
+                a = ang2 + d;
+                a /= 2.0f;
             }
         }
         r = r * (scale * work->w[i]);
@@ -380,13 +382,9 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     }
     DCFlushRange(vtx, 0x2a0);
     GXInvalidateVtxCache();
-
     effSetVtxDescN64(vtx);
 
-
-    k = 0;
-    n = 0;
-    for (; k < i - 1; k++) {
+    for (k = 0, n = k, lim = i - 1; k < lim; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);
         n += 2;
@@ -396,3 +394,5 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
     }
 }
+
+__declspec(section ".sdata2") const u32 gap_10_80423224_sbss2;

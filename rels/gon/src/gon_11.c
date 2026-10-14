@@ -775,22 +775,23 @@ static void _mapclsofs_all(CloudWork* wp) {
 
 #pragma dont_inline on
 static USER_FUNC(evt_cloud_main) {
-    CloudWork* wp = (CloudWork*)event->lwData[0];
-    s32 group = gp->inBattle != 0;
-    HitEntry* hit;
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(0);
-    ImageEntry* img;
     HitEntry* hit0;
     HitEntry* hit1;
     HitEntry* hit2;
     HitEntry* hit3;
-    OffscreenEntry* os;
-
+    MarioWork* mario;
+    s32 group;
+    CloudWork* wp;
+    PartyEntry* party;
+    PartyEntry* tmp;
+    wp = (CloudWork*)event->lwData[0];
+    group = gp->inBattle != 0;
+    mario = marioGetPtr();
+    tmp = partyGetPtr(0);
     if (isFirstCall) {
         return EVT_RETURN_BLOCK;
     }
-    if (party == NULL) {
+    if (tmp == NULL) {
         return EVT_RETURN_BLOCK;
     }
     hit0 = (HitEntry*)cloudGetHitBreathout(0);
@@ -802,8 +803,8 @@ static USER_FUNC(evt_cloud_main) {
             if ((s32)cloud_once_flag == 1) {
                 break;
             }
-            hit = hitNameToPtr(wp->hitName);
-            if (hit0 == hit || hit1 == hit || hit2 == hit || hit3 == hit) {
+            tmp = (PartyEntry*)hitNameToPtr(wp->hitName);
+            if (hit0 == (HitEntry*)tmp || hit1 == (HitEntry*)tmp || hit2 == (HitEntry*)tmp || hit3 == (HitEntry*)tmp) {
                 wp->state++;
             }
             wp->counter = 0;
@@ -820,20 +821,20 @@ static USER_FUNC(evt_cloud_main) {
             cloud_once_flag = 1;
             animPaperPoseEntry(wp->animName, group);
             offscreenEntry(wp->offscreenName);
-            os = offscreenNameToPtr(wp->offscreenName);
-            os->unk3C = 4;
-            os->unk40 = 4;
+            tmp = (PartyEntry*)offscreenNameToPtr(wp->offscreenName);
+            ((OffscreenEntry*)tmp)->unk3C = 4;
+            ((OffscreenEntry*)tmp)->unk40 = 4;
             _mapsetofs_all(wp);
             wp->state++;
             break;
         case 2:
             imgEntry(wp->imgName, group);
-            img = imgNameToPtr(wp->imgName, group);
-            img->poseId = animPaperPoseGetId(wp->animName, group);
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
-            imgClearVirtualPoint(img);
-            imgSetShadow(img, 2);
-            img->flags |= 2;
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
+            ((ImageEntry*)tmp)->poseId = animPaperPoseGetId(wp->animName, group);
+            *(OSTime*)&((ImageEntry*)tmp)->field_0x10C[4] = animTimeGetTime(group);
+            imgClearVirtualPoint(((ImageEntry*)tmp));
+            imgSetShadow(((ImageEntry*)tmp), 2);
+            ((ImageEntry*)tmp)->flags |= 2;
             wp->state = 222;
             break;
         case 222:
@@ -844,30 +845,30 @@ static USER_FUNC(evt_cloud_main) {
             wp->state = 223;
             break;
         case 223:
-            img = imgNameToPtr(wp->imgName, group);
-            img->flags &= ~2;
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
+            ((ImageEntry*)tmp)->flags &= ~2;
             wp->state = 3;
         case 3:
-            img = imgNameToPtr(wp->imgName, group);
-            img->field_0x108 = (s32)"A_1";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
-            img->flags &= ~2;
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
+            ((ImageEntry*)tmp)->field_0x108 = (s32)"A_1";
+            *(OSTime*)&((ImageEntry*)tmp)->field_0x10C[4] = animTimeGetTime(group);
+            ((ImageEntry*)tmp)->flags &= ~2;
             wp->timer = 30;
             wp->lastFrame = 0.0f;
             wp->state++;
             break;
-        case 4:
-            img = imgNameToPtr(wp->imgName, group);
-            if (wp->lastFrame == 0.0f || wp->lastFrame + 1.0f < img->field_0x118) {
+        case 4: {
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
+            if (wp->lastFrame == 0.0f || wp->lastFrame + 1.0f < ((ImageEntry*)tmp)->field_0x118) {
                 psndSFXOn_3D("SFX_OFF_CLAUD_WIND2", &mario->position);
-                wp->lastFrame = img->field_0x118;
+                wp->lastFrame = ((ImageEntry*)tmp)->field_0x118;
             }
             if (mario->currMotionId != 27) {
                 wp->state = 10;
                 break;
             }
-            hit = hitNameToPtr(wp->hitName);
-            if (hit0 != hit && hit1 != hit && hit2 != hit && hit3 != hit) {
+            tmp = (PartyEntry*)hitNameToPtr(wp->hitName);
+            if (hit0 != (HitEntry*)tmp && hit1 != (HitEntry*)tmp && hit2 != (HitEntry*)tmp && hit3 != (HitEntry*)tmp) {
                 if (wp->timer == 0) {
                     wp->state = 10;
                 } else {
@@ -882,6 +883,7 @@ static USER_FUNC(evt_cloud_main) {
                 }
             }
             break;
+        }
         case 10:
             wp->state = 99;
             break;
@@ -890,9 +892,9 @@ static USER_FUNC(evt_cloud_main) {
             if (wp->endEvt != NULL) {
                 evtEntry(wp->endEvt, 0, 0);
             }
-            img = imgNameToPtr(wp->imgName, group);
-            img->field_0x108 = (s32)"A_2";
-            *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
+            ((ImageEntry*)tmp)->field_0x108 = (s32)"A_2";
+            *(OSTime*)&((ImageEntry*)tmp)->field_0x10C[4] = animTimeGetTime(group);
             wp->timer = 60;
             wp->state++;
             break;
@@ -907,12 +909,12 @@ static USER_FUNC(evt_cloud_main) {
             break;
         case 99:
         case 100:
-            img = imgNameToPtr(wp->imgName, group);
+            tmp = (PartyEntry*)imgNameToPtr(wp->imgName, group);
             _mapclsofs_all(wp);
-            animPaperPoseRelease(img->poseId);
-            imgFreeCapture(img, 0);
-            imgSetShadow(img, 0);
-            imgRelease(img, group);
+            animPaperPoseRelease(((ImageEntry*)tmp)->poseId);
+            imgFreeCapture(((ImageEntry*)tmp), 0);
+            imgSetShadow(((ImageEntry*)tmp), 0);
+            imgRelease(((ImageEntry*)tmp), group);
             offscreenDelete(wp->offscreenName);
             cloud_once_flag = 0;
             if (wp->state == 99) {
@@ -1061,7 +1063,4 @@ EVT_BEGIN(gon_11_init_evt)
     END_IF
     RETURN
 EVT_END()
-
-
-
 __declspec(section ".rodata") const u32 gap_03_00001D7C_rodata = 0;

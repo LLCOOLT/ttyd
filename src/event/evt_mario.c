@@ -220,9 +220,6 @@ USER_FUNC(evt_mario_dokan_prepare) {
     return EVT_RETURN_DONE;
 }
 
-static const char* dokan_anim_names[] = {
-    "DOKAN_TATE_DOWNIN", "DOKAN_TATE_UPIN", "DOKAN_TATE_DOWNOUT", "DOKAN_TATE_UPOUT", "DOKAN_YOKO_IN", "DOKAN_YOKO_OUT",
-};
 
 USER_FUNC(evt_mario_paper_pose_dokan) {
     s32* args = event->args;
@@ -230,6 +227,9 @@ USER_FUNC(evt_mario_paper_pose_dokan) {
     s32 type = evtGetValue(event, args[0]);
     PartyEntry* party;
     s32 ret;
+    {
+        static const char names[] = "DOKAN_TATE_DOWNIN\0\0\0DOKAN_TATE_UPIN\0DOKAN_TATE_DOWNOUT\0\0DOKAN_TATE_UPOUT\0\0\0\0DOKAN_YOKO_IN\0\0\0DOKAN_YOKO_OUT\0";
+    }
 
     if (isFirstCall) {
         event->userdata[1] = 0;
@@ -1015,7 +1015,7 @@ USER_FUNC(evt_mario_party_door_move) {
             if (mp->flags & 0x2000000) {
                 spd *= 0.4f;
             }
-            marioSetForceMove((f32)gp->framerate * (dist / spd), mp->directionView, spd / (f32)gp->framerate);
+            { s32 n = (f32)gp->framerate * (dist / spd); spd = spd / (f32)gp->framerate; marioSetForceMove(n, mp->directionView, spd); }
             event->userdata[0] = 2;
             break;
         case 2:
@@ -1137,7 +1137,7 @@ USER_FUNC(evt_mario_party_bero_move) {
             if (mp->flags & 0x2000000) {
                 spd *= 0.4f;
             }
-            marioSetForceMove((f32)gp->framerate * (dist / spd), mp->directionView, spd / (f32)gp->framerate);
+            { s32 n = (f32)gp->framerate * (dist / spd); spd = spd / (f32)gp->framerate; marioSetForceMove(n, mp->directionView, spd); }
             event->userdata[0] = 2;
             break;
         case 2:

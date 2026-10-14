@@ -30,14 +30,14 @@ typedef struct JetwEnt {
     u8 alpha, pad;
 } JetwEnt;
 
-__declspec(section ".data") u64 lbl_jetw_0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_jetw_negone_one_374 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_jetw_1 = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_jetw_one_negone_373 = 0x3F800000BF800000;
-__declspec(section ".data") u64 lbl_jetw_2 = 0xBF8000003F800000;
-__declspec(section ".data") u64 fd_jetw_negone_one_360 = 0xBF8000003F800000;
-__declspec(section ".data") u64 lbl_jetw_3 = 0x3F800000BF800000;
-__declspec(section ".data") u64 fd_jetw_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u64 lbl_803A33D8 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 fd_jetw_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803A33E8 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 fd_jetw_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 lbl_803A33F8 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 fd_jetw_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_803A3408 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 fd_jetw_one_negone_359 = 0x3F800000BF800000;
 
 static JetwEnt adata[] = {
     {0, 0, 30, 140, 0, 255, 0},
@@ -102,7 +102,10 @@ static JetwEnt adata[] = {
     {0, 50, 210, 140, 180, 10, 0},
 };
 
-static JetwEnt a2data[] = {
+static struct {
+    JetwEnt e[33];
+    s16 pad;
+} a2data = {{
     {0, 0, 30, 140, 0, 255, 0},
     {0, 6, 30, 120, 0, 240, 0},
     {1, 12, 30, 110, -5, 230, 0},
@@ -136,7 +139,7 @@ static JetwEnt a2data[] = {
     {0, 36, 100, 77, 70, 120, 0},
     {0, 39, 110, 65, 80, 80, 0},
     {0, 42, 120, 54, 90, 40, 0},
-};
+}, 0};
 
 static effN64Vtx size16x16_tex32x32_vtx[] = {
     {-8, -8, 0, 0, 0, 255, 255, 255, 255},
@@ -152,11 +155,9 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 22, 0, 0, 1024, 255, 255, 255, 255},
 };
 
-#pragma force_active on
-__declspec(section ".data") u32 gap_jetw[1] = {0};
-#pragma force_active reset
 
 static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
+__declspec(section ".data") u32 gap_05_803A382C_data[1] = {0};
 
 
 void effOpukuJetwMain(EffectEntry* effect);
@@ -167,7 +168,7 @@ EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f
     EffOpukuJetwN64Work* work;
 
     effect = effEntry();
-    effect->type = "OpukuJetwN64";
+    effect->type = "OpukuJetwN64\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwN64Work));
     effect->userdata = work;
@@ -224,17 +225,19 @@ void effOpukuJetwMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
 }
 
+#pragma opt_loop_invariants off
 void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scale;
     Mtx rot;
     Mtx mtx2;
     GXTexObj texObj;
-    JetwEnt* tbl;
-    s32 frame;
     CameraEntry* camera;
     EffOpukuJetwN64Work* work;
-    s32 lifetime, alpha, r, g, b, n, m;
+    s32 lifetime, j, i;
+    s32 frame, alpha, r, g, b;
+    s32 n, m;
+    JetwEnt* tbl;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
@@ -250,7 +253,7 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         m = 3;
         break;
     default:
-        tbl = a2data;
+        tbl = a2data.e;
         n = 11;
         m = 3;
         break;
@@ -289,30 +292,31 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
     {
-        s32 i, j, idx, f5, cur, rem;
+        s32 half;
+        s32 idx;
+        s32 f5;
+        JetwEnt* e;
+        s32 cur;
         JetwEnt* e2;
-        f5 = frame * 5;
         cur = frame;
-        frame = n / 2;
-        for (i = 0; i < frame; i++, cur += 2) {
+        f5 = frame * 5;
+        half = n / 2;
+        for (i = 0; i < half; cur += 2, i++) {
             idx = cur % n;
-            rem = n - idx - 1;
-            e2 = tbl + idx;
-
             for (j = 0; j < m; j++) {
-                if (idx > f5) continue;
-                if (rem > lifetime) continue;
-                {
-                JetwEnt* e = e2 + j * n;
+                JetwEnt* row = tbl + j * n;
+                if (idx <= f5 && n - 1 - idx <= lifetime) {
+                    e2 = tbl + idx;
+                    e = row + idx;
                     PSMTXTrans(mtx, (f32)e->x, 10.0f + (f32)e->y, 0.0f);
-                    PSMTXScale(scale, 0.01f * (f32)e2->sx, 0.01f * (f32)e2->sy, 1.0f);
+                    PSMTXScale(scale, 0.01f * (f32)tbl[idx].sx, 0.01f * (f32)tbl[idx].sy, 1.0f);
                     PSMTXConcat(mtx, scale, mtx);
                     PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)e->rot + (f32)dat_ry[(j + i) & 7]));
                     PSMTXConcat(mtx, rot, mtx);
                     PSMTXConcat(mtx2, mtx, mtx);
                     GXLoadPosMtxImm(mtx, GX_PNMTX0);
                     GXSetCurrentMtx(GX_PNMTX0);
-                    GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, (alpha * e2->alpha) >> 8});
+                    GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, (alpha * tbl[idx].alpha) >> 8});
                     effSetVtxDescN64(size16x16_tex32x32_vtx);
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                     tri2(0, 1, 2, 0, 0, 2, 3, 0);
@@ -321,3 +325,6 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+#pragma opt_loop_invariants reset
+
+__declspec(section ".sdata2") const u32 gap_10_804231D4_sbss2;

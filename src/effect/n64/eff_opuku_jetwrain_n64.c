@@ -8,6 +8,7 @@
 
 double sin(double);
 
+
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
     s16 s, t;      // 0x6
@@ -66,7 +67,7 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, 
     s32 j;
 
     effect = effEntry();
-    effect->type = "OpukuJetwrainN64";
+    effect->type = "OpukuJetwrainN64\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwrainWork));
     effect->userdata = work;
@@ -172,11 +173,11 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     f32 proj[7];
     void* buf;
-    s32 x0;
     s32 j, i;
     s32 edgeY;
-    s32 x1, y0, y1;
+    s32 x0, k, y0, y1, x1;
     s32 bx;
+    s32 px;
     s32 by;
 
     camGetPtr(cameraId);
@@ -231,9 +232,7 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
             y1 = 0;
         }
         for (j = 0; j < 18; j++) {
-
-            s32 px; s32 k;
-            bx = j * 16 + 16;
+                        bx = j * 16 + 16;
             k = 0;
             if (j == 0) {
                 k = 1;
@@ -278,3 +277,5 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     }
     GXSetProjectionv(proj);
 }
+
+

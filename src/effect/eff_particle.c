@@ -140,6 +140,7 @@ void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter
     PSMTXMultVec(emitter->mtx, &p->vel, &p->vel);
     PSVECScale(&p->vel, &p->pos, 2.5f);
     PSVECAdd(&emitter->pos, &p->pos, &p->pos);
+
 }
 
 void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter) {

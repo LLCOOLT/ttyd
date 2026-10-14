@@ -377,8 +377,8 @@ BattleUnit* BtlUnit_Spawn(BattleUnitSetup* setup, s32 flags) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 i;
-    s32 tmp;
     s32 id;
+    s32 tmp;
 
     unit = BtlUnit_Entry(setup);
     if (!unit) return unit;
@@ -2087,6 +2087,7 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
     f32 time;
     s32 id;
     u8 vol;
+    f64 dv;
 
     if (!part) {
         return;
@@ -2145,7 +2146,8 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
                 psndSFX_vol(id, vol = 0x7F);
                 state->count++;
                 if (part->mOwner->attackPhase != BattleGetSeq(wp, 4)) {
-                    psndSFX_vol(id, (f32)(u32)vol * 0.7);
+                    dv = (u32)vol;
+                    psndSFX_vol(id, 0.7 * dv);
                 }
             }
             else {

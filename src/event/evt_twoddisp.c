@@ -25,8 +25,8 @@ typedef struct TwodEntry {
     u8 pad[0x34 - 0x2C];
 } TwodEntry;
 
-s32 twodID;
 TwodEntry* twodPtr;
+s32 twodID;
 extern const GXColor unk_80423048;
 extern const GXColor unk_8042304c;
 USER_FUNC(twoddisp_main);
@@ -206,8 +206,8 @@ EVT_BEGIN(twoddisp_main_event)
     RETURN
 EVT_END()
 
-__declspec(section ".sdata2") const GXColor unk_80423048;
 __declspec(section ".sdata2") const GXColor unk_8042304c;
+__declspec(section ".sdata2") const GXColor unk_80423048;
 
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80411DDC_sdata[1] = {0};

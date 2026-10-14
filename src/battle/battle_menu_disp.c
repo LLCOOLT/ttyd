@@ -135,7 +135,7 @@ void battleMenuDispInit(void) {
     BattleWork* wp = _battleWorkPointer;
     char path[256];
 
-    sprintf(path, "%s/battle/common/battle_common.tpl", getMarioStDvdRoot());
+    sprintf(path, "%s/battle/common/battle_common.tpl\0", getMarioStDvdRoot());
     wp->menuTex = fileAlloc(path, 4);
 }
 
@@ -398,7 +398,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     CameraEntry* cam;
     BattleCursor* cursor = menu->cursor;
     f32 frac;
-    s32 alpha;
+    u8 alpha;
     u8 r, g, b, a;
     Mtx scl;
     Mtx trn;
@@ -413,9 +413,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     char buf1[2];
     char buf2[2];
     char buf3[2];
-    s32 n;
     s32 j;
-    s32 hp, maxhp;
+    s32 n;
 
     cam = camGetPtr(8);
     frac = menu->field_98 - (s32)menu->field_98;
@@ -451,7 +450,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     PSMTXScale(scl, 0.5f, 0.5f, 1.0f);
     PSMTXConcat(m, trn, out);
     PSMTXConcat(out, scl, out);
-    if (!icon) {
+    if (!(u16)icon) {
         icon = 0x18B;
     }
     if (enabled == 1) {
@@ -480,8 +479,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     FontDrawStringMtx(out, name);
     if (cost != 0) {
         d1[2] = cost / 100;
-        d1[1] = (cost % 100) / 10;
-        d1[0] = (cost % 100) % 10;
+        d1[1] = (cost - d1[2] * 100) / 10;
+        d1[0] = (cost - d1[2] * 100) - d1[1] * 10;
         if (d1[2] > 0) {
             o1[0] = 28; o1[1] = 14; o1[2] = 0; n = 3;
         } else if (d1[1] > 0) {
@@ -506,8 +505,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     }
     if (p34 != 0) {
         d2[2] = p34 / 100;
-        d2[1] = (p34 % 100) / 10;
-        d2[0] = (p34 % 100) % 10;
+        d2[1] = (p34 - d2[2] * 100) / 10;
+        d2[0] = (p34 - d2[2] * 100) - d2[1] * 10;
         if (d2[2] > 0) {
             o2[0] = 28; o2[1] = 14; o2[2] = 0; n = 3;
         } else if (d2[1] > 0) {
@@ -532,6 +531,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
     }
     if (party != NULL) {
         s16* p = (s16*)((u8*)party + (i + (s32)menu->field_98) * 0x18);
+        s32 n;
+        s32 hp, maxhp;
         hp = p[10];
         maxhp = p[11];
         PSMTXTrans(trn, 30.0f, 22.0f, 0.0f);
@@ -540,8 +541,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
         PSMTXConcat(out, scl, out);
         FontDrawStringMtx(out, msgSearch("btl_disp_HP"));
         d3[2] = hp / 100;
-        d3[1] = (hp % 100) / 10;
-        d3[0] = (hp % 100) % 10;
+        d3[1] = (hp - d3[2] * 100) / 10;
+        d3[0] = (hp - d3[2] * 100) - d3[1] * 10;
         if (d3[2] > 0) {
             o3[0] = 28; o3[1] = 14; o3[2] = 0; n = 3;
         } else if (d3[1] > 0) {
@@ -553,7 +554,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
         for (j = 0; j < n; j++) {
             buf3[0] = d3[j] + '0';
             buf3[1] = 0;
-            if (gp->language == 0) {
+            if ((u32)gp->language == 0) {
                 PSMTXTrans(trn, 26.0f + (30.0f + o3[j]), 25.0f, 0.0f);
             } else {
                 PSMTXTrans(trn, 28.0f + (30.0f + o3[j]), 25.0f, 0.0f);
@@ -562,7 +563,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
             PSMTXConcat(out, scl, out);
             FontDrawStringMtx(out, buf3);
         }
-        if (gp->language == 0) {
+        if ((u32)gp->language == 0) {
             PSMTXTrans(trn, 92.0f, 22.0f, 0.0f);
         } else {
             PSMTXTrans(trn, 100.0f, 22.0f, 0.0f);
@@ -572,8 +573,8 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
         PSMTXConcat(out, scl, out);
         FontDrawStringMtx(out, msgSearch("btl_disp_slash"));
         d3[2] = maxhp / 100;
-        d3[1] = (maxhp % 100) / 10;
-        d3[0] = (maxhp % 100) % 10;
+        d3[1] = (maxhp - d3[2] * 100) / 10;
+        d3[0] = (maxhp - d3[2] * 100) - d3[1] * 10;
         if (d3[2] > 0) {
             o3[0] = 28; o3[1] = 14; o3[2] = 0; n = 3;
         } else if (d3[1] > 0) {
@@ -585,7 +586,7 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, co
         for (j = 0; j < n; j++) {
             buf3[0] = d3[j] + '0';
             buf3[1] = 0;
-            if (gp->language == 0) {
+            if ((u32)gp->language == 0) {
                 PSMTXTrans(trn, 76.0f + (30.0f + o3[j]), 25.0f, 0.0f);
             } else {
                 PSMTXTrans(trn, 78.0f + (30.0f + o3[j]), 25.0f, 0.0f);
@@ -820,7 +821,7 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         pos.y = 15.0f + v->y;
         pos.z = 0.0f;
         pos.x = 155.0f + v->x;
-        pos.y += bob;
+        pos.y = pos.y + bob;
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
@@ -972,6 +973,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
     f32 s;
     s32 sw;
     s32 nn;
+    s32 nn2;
 
     if (BattleGetUnitPtr(wp, wp->activeUnitId)->currentKind == 0xDE) {
         mainCursor = &wp->commandMenu.cursor[0];
@@ -983,13 +985,14 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
         n = cursor->unk8;
     }
     prev = cursor->field_4;
+    nn2 = n;
     {
         s32 p = cursor->field_4;
-        s32 m = n;
+        s32 m = n - 1;
         if (cursor->field_0 <= p) {
             cursor->field_4 = cursor->field_0 - 1;
-        } else if (cursor->field_0 >= p + (m - 1)) {
-            cursor->field_4 = cursor->field_0 - m + 2;
+        } else if (cursor->field_0 >= p + m) {
+            cursor->field_4 = cursor->field_0 - n + 2;
         }
     }
     if (cursor->field_4 < 0) {
@@ -1019,12 +1022,12 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
             if (cnt == mainCursor->unk8 && cnt2 == 7) {
                 menu->field_C = 2;
             }
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
             break;
         case 2:
             menu->field_14 = 1;
             menu->field_98 = cursor->field_4;
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
             break;
         case 10:
         case 20:
@@ -1043,7 +1046,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                 menu->field_C = 2;
                 menu->field_98 = cursor->field_4;
             }
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
             break;
     }
     menu->field_1C = 0;
@@ -1053,8 +1056,13 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                 menu->field_20[i] |= 1;
                 menu->field_20[i] |= 2;
                 GetRingCenter(&((Vec*)b)[i]);
-                ((Vec*)b)[i].x = intplGetValue(4, menu->field_48[i], 12, ((Vec*)b)[i].x, -60.0f);
-                ((Vec*)b)[i].y = intplGetValue(4, menu->field_48[i], 12, ((Vec*)b)[i].y, 55.0f);
+                {
+                    f32 px = ((Vec*)b)[i].x;
+                    f32 py;
+                    ((Vec*)b)[i].x = intplGetValue(4, menu->field_48[i], 12, px, -60.0f);
+                    py = ((Vec*)b)[i].y;
+                    ((Vec*)b)[i].y = intplGetValue(4, menu->field_48[i], 12, py, 55.0f);
+                }
                 PSMTXTrans(((Mtx*)a)[i], 20.0f + ((Vec*)b)[i].x, ((Vec*)b)[i].y, ((Vec*)b)[i].z);
                 ((f32*)c)[i] = intplGetValue(0, menu->field_48[i], 12, 0.0f, 360.0f);
                 if (((f32*)c)[i] > 360.0f) {
@@ -1224,18 +1232,18 @@ void DrawMainMenu(BattleWork* wp_) {
     Mtx rot;
     Mtx scale;
     f32 z[5];
-    f32 ox;
-    f32 oy;
+    f32 a;
+    s32 i;
     BattleWork* wp = _battleWorkPointer;
     BattleSubMenu* menu = WP_SUBMENU(wp);
     BattleCursor* cursor = menu->cursor;
-    Vec* p;
-    f32 a;
-    f32 b;
     f32 c;
-    s32 i;
+    f32 ox;
+    f32 oy;
+    f32 b;
     s32 n;
     s32 diff;
+    BattleCursor* mc;
 
     camGetPtr(CAMERA_2D);
     switch (menu->field_C) {
@@ -1252,8 +1260,9 @@ void DrawMainMenu(BattleWork* wp_) {
         break;
     case 1:
         menu->field_14 = 1;
-        diff = menu->cursor->field_0 - menu->field_18;
-        if (diff == 1 || -(menu->cursor->unk8 - 1) == diff) {
+        mc = menu->cursor;
+        diff = mc->field_0 - menu->field_18;
+        if (diff == 1 || -(mc->unk8 - 1) == diff) {
             menu->field_C = 2;
             menu->field_14 = 0;
             menu->field_18 = menu->cursor->field_0;
@@ -1316,19 +1325,18 @@ void DrawMainMenu(BattleWork* wp_) {
             if (a >= b) {
                 a = b;
             }
-            p = &pos[i];
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(a, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
             if (i == cursor->field_0) {
                 c = 270.0f + 90.0f * menu->field_48[i] / 10.0f;
                 if (c >= 360.0f) {
                     c = 0.0f;
                 }
                 PSMTXRotRad(rot, 'x', 0.017453292f * c);
-                PSMTXTrans(trans, 20.0f + p->x, p->y, p->z);
+                PSMTXTrans(trans, 20.0f + pos[i].x, pos[i].y, pos[i].z);
                 PSMTXConcat(trans, rot, mtx[i]);
                 menu->field_20[i] |= 2;
             } else {
@@ -1337,7 +1345,7 @@ void DrawMainMenu(BattleWork* wp_) {
                     c = 0.0f;
                 }
                 PSMTXRotRad(rot, 'x', 0.017453292f * c);
-                PSMTXTrans(trans, p->x, p->y, p->z);
+                PSMTXTrans(trans, pos[i].x, pos[i].y, pos[i].z);
                 PSMTXConcat(trans, rot, mtx[i]);
             }
             z[i] = 0.0f;
@@ -1349,17 +1357,16 @@ void DrawMainMenu(BattleWork* wp_) {
             break;
         case 3:
             a = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
-            p = &pos[i];
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(a, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
             if (i == cursor->field_0) {
-                PSMTXTrans(mtx[i], 20.0f + p->x, p->y, p->z);
+                PSMTXTrans(mtx[i], 20.0f + pos[i].x, pos[i].y, pos[i].z);
                 menu->field_20[i] |= 2;
             } else {
-                PSMTXTrans(mtx[i], p->x, p->y, p->z);
+                PSMTXTrans(mtx[i], pos[i].x, pos[i].y, pos[i].z);
             }
             z[i] = 0.0f;
             break;
@@ -1376,13 +1383,12 @@ void DrawMainMenu(BattleWork* wp_) {
                 menu->field_34[i] = 3;
                 menu->field_48[i] = -1;
             }
-            p = &pos[i];
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(a, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
-            PSMTXTrans(mtx[i], p->x, p->y, p->z);
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
+            PSMTXTrans(mtx[i], pos[i].x, pos[i].y, pos[i].z);
             z[i] = 0.0f;
             menu->field_20[i] &= ~2;
             menu->field_48[i]++;
@@ -1399,29 +1405,27 @@ void DrawMainMenu(BattleWork* wp_) {
                 menu->field_34[i] = 3;
                 menu->field_48[i] = -1;
             }
-            p = &pos[i];
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(a, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
-            PSMTXTrans(mtx[i], p->x, p->y, p->z);
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
+            PSMTXTrans(mtx[i], pos[i].x, pos[i].y, pos[i].z);
             z[i] = 0.0f;
             menu->field_20[i] &= ~2;
             menu->field_48[i]++;
             break;
         case 10:
             menu->field_20[i] |= 1;
-            p = &pos[i];
             menu->field_20[i] |= 2;
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(0.0f, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
-            p->x = intplGetValue(4, menu->field_48[i], 12, -60.0f, p->x);
-            p->y = intplGetValue(4, menu->field_48[i], 12, 55.0f, p->y);
-            PSMTXTrans(mtx[i], 20.0f + p->x, p->y, p->z);
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
+            pos[i].x = intplGetValue(4, menu->field_48[i], 12, -60.0f, pos[i].x);
+            pos[i].y = intplGetValue(4, menu->field_48[i], 12, 55.0f, pos[i].y);
+            PSMTXTrans(mtx[i], 20.0f + pos[i].x, pos[i].y, pos[i].z);
             z[i] = intplGetValue(0, menu->field_48[i], 12, 360.0f, 0.0f);
             menu->field_48[i]++;
             if (menu->field_48[i] > 12) {
@@ -1430,20 +1434,19 @@ void DrawMainMenu(BattleWork* wp_) {
             break;
         case 11:
             menu->field_20[i] |= 1;
-            p = &pos[i];
             menu->field_20[i] &= ~2;
             a = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
-            GetRingCenter(p);
+            GetRingCenter(&pos[i]);
             GetRingOffset(a, &ox, &oy);
-            p->x += ox;
-            p->y += oy;
-            p->z = oy;
+            pos[i].x += ox;
+            pos[i].y += oy;
+            pos[i].z = oy;
             a = 0.1f * menu->field_48[i];
             if (a >= 1.0f) {
                 menu->field_34[i] = 3;
             }
             PSMTXScale(scale, a, a, 1.0f);
-            PSMTXTrans(trans, p->x, p->y, p->z);
+            PSMTXTrans(trans, pos[i].x, pos[i].y, pos[i].z);
             PSMTXConcat(trans, scale, mtx[i]);
             z[i] = 0.0f;
             menu->field_48[i]++;

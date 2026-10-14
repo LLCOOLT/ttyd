@@ -29,13 +29,13 @@ s32 size_table[6][2] = {
 static SmartWork* wp = &smartWork;
 
 //.sbss
-u16 count;
-BOOL g_bFirstSmartAlloc;
-u32 mapalloc_size;
-void* mapalloc_base_ptr;
-void* heapEnd[6];
-void* heapStart[6];
 OSHeapHandle heapHandle[6];
+void* heapStart[6];
+void* heapEnd[6];
+void* mapalloc_base_ptr;
+u32 mapalloc_size;
+BOOL g_bFirstSmartAlloc;
+u16 count;
 
 //local prototypes
 void smartGarbage(void);
@@ -89,7 +89,6 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
 void memClear(HEAP_TYPE heap) {
 	MapAllocEntry* entry;
 	u32 size;
-
 	OSDestroyHeap(heapHandle[heap]);
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
 	if (heap == HEAP_MALLOC) {

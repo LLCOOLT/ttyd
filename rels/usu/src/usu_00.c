@@ -22,6 +22,7 @@
 typedef struct UsuCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } UsuCbInfo;
 typedef struct KpaSen { s8 state; u8 field_0x1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
 KpaSen* kpaSen;
+static s32 kpaSen_pad;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -2229,7 +2230,9 @@ void kpaSen_ext_main(void) {
             case 1:
                 if (i < 100) {
                     pose->frame = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
-                    if (i % 10 != 0) break;
+                    if (i % 10 == 0) {
+                        kpaSen[i].t = kpaSen[i].t;
+                    }
                 } else {
                     pose->frame = calcPose(i - 100, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
                 }
@@ -2247,7 +2250,7 @@ void kpaSen_ext_main(void) {
                 if (i < 100) {
                     pose->frame = calcPose(i, kpaSen[i].pose99Lo, kpaSen[i].pose99Hi, 0);
                 } else {
-                    pose->frame = calcPose(i - 100, kpaSen[i].pose99Lo, kpaSen[i].pose99Hi, 0);
+                    { s32 lo = kpaSen[i].pose99Lo; s32 hi = kpaSen[i].pose99Hi; pose->frame = calcPose(i - 100, lo, hi, 0); }
                 }
                 break;
             case -1:

@@ -43,6 +43,10 @@ Vec pos_tbl[7] = {
     { -11.1931f, 0.0f, -9.0435f },
 };
 
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803AE248_data[6] = {0, 0, 0, 0, 0, 0};
+#pragma force_active reset
+
 
 static void callback(MapTevCallbackInfo* info) {
     s32 tevStage = info->tevStage;
@@ -273,17 +277,15 @@ void effMahojinMain(EffectEntry* effect) {
 }
 
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
+    Mtx mtx;
+    f32 z[16];
+    f32* zp;
+    s32 idx[16];
     MapWork* map;
-    s32 alpha;
     s32 i, j, k, n;
     EffMahojinWork* work = effect->userdata;
     s32 pass;
-
-    Mtx mtx;
-    f32 z[16];
-    s32 idx[16];
-    s32* ip;
-    f32* zp;
+    s32 alpha;
     u16 flags;
 
     camGetPtr(cameraId);
@@ -339,5 +341,6 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         map->entries[0].flags = flags;
     }
 }
+
 
 

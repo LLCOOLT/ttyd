@@ -70,16 +70,21 @@ u32 size300x40_tex32x32[] = {
     0xEBFFF500, 0x012CFFEC, 0x00000400, 0x0400EBFF, 0xF5000000,
 };
 
+#pragma force_active on
+__declspec(section ".sdata") u8 gap_07_80413CCC_sdata[4] = {0};
+#pragma force_active reset
+
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
-    s32 lf;
     EffectEntry* effect;
     EffRadiationN64Work* work;
     EffRadiationN64Work* p;
     s32 count;
     s32 camera;
+    u32 k;
+    s32 lf;
     s32 i;
-    s32 k;
     s32 flag;
+    s32 j;
 
     effect = effEntry();
     flag = 0;
@@ -108,10 +113,11 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work->flag = flag;
     camera = 4;
     work->camera = camera;
+    p = work;
     switch (type) {
     case 0:
     case 1:
-        p = work + 1;
+        p++;
         for (i = 1; i < effect->count; i++) {
             p->initY = (f32)((i - 1) * 30 / (count - 1) - 10);
             p->initLife = 50 - (i - 1) * 20 / (count - 1);
@@ -131,17 +137,14 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
         }
         break;
     default:
-        p = work + 1;
-        lf = 0x20;
-        for (i = 1; i < effect->count; i++) {
+        p++;
+        for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
             p->y = 0.0f;
-            k = (i - 1) * 5;
+            k = (j - 1) * 5;
             p->life = lf;
-            lf += 2;
             p->rotX = (f32)r_data[k++];
             p->rotY = (f32)r_data[k++];
-            p->rotZ = (f32)r_data[k];
-            k += 2;
+            p->rotZ = (f32)r_data[k++];
             p->alpha = 0;
             p->frame = 0;
             p->scroll2 = 0.0f;
@@ -156,7 +159,6 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             p->rotVelY = 0.0f;
             p->rotVelZ = 0.1f * (f32)r_data[k];
             p->delay = 0;
-            p++;
         }
         break;
     }
@@ -164,7 +166,6 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
 }
 
 void effRadiationMain(EffectEntry* effect) {
-    s32 lf;
     s32 base1;
     s32 base2;
     s32 base;
@@ -174,8 +175,10 @@ void effRadiationMain(EffectEntry* effect) {
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 type;
     s32 life;
+    u32 k;
     s32 i;
-    s32 k;
+    s32 lf;
+    s32 j;
 
     tmp.x = p->pos0.x;
     tmp.y = p->pos0.y;
@@ -195,10 +198,11 @@ void effRadiationMain(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
+    base1 = p->frame;
     switch (type) {
     case 0:
     case 1:
-        base = (p->frame * 10 + 1) * 3;
+        base = (base1 * 10 + 1) * 3;
         base1 = base + 1;
         base2 = base + 2;
         p++;
@@ -228,9 +232,8 @@ void effRadiationMain(EffectEntry* effect) {
         }
         break;
     default:
-        lf = 0x20;
         p++;
-        for (i = 1; i < effect->count; i++, lf += 2, p++) {
+        for (j = 1, lf = 0x20; j < effect->count; lf += 2, j++, p++) {
             p->scroll0 += p->scrollVel0;
             if (p->scroll0 > 256.0f) {
                 p->scroll0 -= 256.0f;
@@ -272,12 +275,11 @@ void effRadiationMain(EffectEntry* effect) {
             }
             if (p->life <= 0) {
                 p->y = 0.0f;
-                k = (i - 1) * 5;
+                k = (j - 1) * 5;
                 p->life = lf;
                 p->rotX = (f32)r_data[k++];
                 p->rotY = (f32)r_data[k++];
-                p->rotZ = (f32)r_data[k];
-                k += 2;
+                p->rotZ = (f32)r_data[k++];
                 p->alpha = 0;
                 p->frame = 0;
                 p->scroll2 = 0.0f;
@@ -320,7 +322,7 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     u32* vtx;
     s32 i;
-    s32 k;
+    u32 k;
     s32 lf;
     s32 type;
     f32 a;

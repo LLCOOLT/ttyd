@@ -180,6 +180,7 @@ static inline f32 fall_cosf(f32 x) {
     return a;
 }
 
+#pragma opt_propagation off
 EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
     const char* sfxName;
     EffectEntry* effect;
@@ -194,6 +195,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     count = arg7 + 1;
     switch (type) {
         case 0:
+            count = arg7 + 1;
             break;
         case 1:
         case 2:
@@ -206,8 +208,6 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
             arg7 = 1;
             count = 2;
             break;
-        case 9:
-            break;
     }
     effect->type = "Fall";
     effect->count = count;
@@ -215,6 +215,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     effect->userdata = w;
     effect->callback = effFallMain;
     effect->flags |= 2;
+    sfxName = "SFX_BTL_STAGE_FALL_WATER1\0\0";
     w->type = type;
     w->pos.x = x;
     w->pos.y = y;
@@ -228,7 +229,6 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     w->arg8 = arg8;
     w->pose0 = -1;
     w->pose1 = -1;
-    sfxName = "SFX_BTL_STAGE_FALL_WATER1\0\0";
     for (i = 1, e = w + 1; i < effect->count; i++, e++) {
         a = 3.1415927f * irand(360) / 180.0f;
         r = irand((s32)arg4);
@@ -239,7 +239,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
         e->scroll = 0;
         e->alpha = 255;
         e->rot2 = 0.0f;
-        e->rotY = irand(100) < 50 ? 0 : 180;
+        e->rotY = irand(100) > 50 ? 0 : 180;
         e->state = 0;
         e->pose0 = -1;
         e->pose1 = -1;
@@ -324,24 +324,23 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     return effect;
 }
 
-#pragma opt_propagation off
 void effFallMain(EffectEntry* effect) {
     Vec sndPos;
-    const char* bug1;
-    const char* fork1;
     const char* bug2;
-    const char* koopa1;
-    const char* meteor2;
-    const char* light1;
-    EffFallElem* w;
-    EffFallElem* e;
+    const char* fork1;
     s32 i;
+    const char* meteor1;
+    const char* light1;
+    const char* bug1;
+
+    EffFallElem* e;
+    const char* koopa1;
     s32 type;
     s32 arg8;
     s32 played;
     s32 done;
     s32 group;
-    const char* meteor1;
+    const char* meteor2;
     f32 y;
     f32 angle;
     f32 top;
@@ -351,20 +350,20 @@ void effFallMain(EffectEntry* effect) {
     s32 j;
     f32 rotY;
 
-    w = effect->userdata;
+    e = effect->userdata;
     {
         Vec v = { 0.0f, 0.0f, 0.0f };
-        v.x = w->pos.x;
-        v.y = y = w->pos.y;
-        v.z = w->pos.z;
+        v.x = e->pos.x;
+        v.y = y = e->pos.y;
+        v.z = e->pos.z;
         sndPos = v;
     }
     played = 0;
-    ground = y + w->arg5;
-    type = w->type;
-    arg4 = w->arg4;
-    rotY = w->rotY;
-    arg8 = w->arg8;
+    ground = y + e->arg5;
+    type = e->type;
+    arg4 = e->arg4;
+    rotY = e->rotY;
+    arg8 = e->arg8;
     group = gp->inBattle != 0;
     if (effect->flags & 4) {
         effect->flags &= ~4;
@@ -390,8 +389,7 @@ void effFallMain(EffectEntry* effect) {
     angle = 6.2831855f * rotY;
     top = 30.0f + y;
     done = 0;
-    for (i = 1; i < effect->count; i++) {
-        e = &w[i];
+    for (i = 1, e++; i < effect->count; i++, e++) {
         switch (type) {
             case 0:
             case 1:
@@ -481,7 +479,8 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 1:
-                        e->f44 = (60.0f - e->timer) * (f32)sin(62.831856f * e->timer / 60.0f) / 60.0f;
+                        a = (f32)sin(62.831856f * e->timer / 60.0f);
+                        e->f44 = (60.0f - e->timer) * a / 60.0f;
                         e->timer++;
                         if (e->timer > 60) {
                             e->state++;
@@ -881,7 +880,7 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     f32 angle;
     s32 j;
-    f32 hw, hh;
+    f32 hw, hh, s;
 
     e = effect->userdata;
     cam = camGetPtr(cameraId);
@@ -1113,6 +1112,7 @@ void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
 }
 
 #pragma opt_propagation off
+static const GXColor white255 = { 255, 255, 255, 255 };
 void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     Mtx scl;
@@ -1156,8 +1156,8 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexObj(&tex, GX_TEXMAP0);
     hw = 64.0f;
     hh = 704.0f;
-    hw *= 0.5f;
-    hh *= 0.5f;
+    hw /= 2.0f;
+    hh /= 2.0f;
     PSMTXTrans(trans, w->pos3.x, w->pos3.y, w->pos3.z);
     PSMTXScale(scl, 1.0f, hh / (f32)GXGetTexObjHeight(&tex), 1.0f);
     PSMTXConcat(trans, scl, trans);
@@ -1167,18 +1167,18 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(trans, scl, trans);
     PSMTXConcat(mtx, trans, trans);
     GXLoadPosMtxImm(trans, 0);
-    { const GXColor c = { 255, 255, 255, 255 }; GXSetTevColor(GX_TEVREG0, c); }
+    GXSetTevColor(GX_TEVREG0, white255);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32(-hw * 0.5f, hh, 0.0f);
+    GXPosition3f32(-hw / 2.0f, hh, 0.0f);
     GXColor4u8(255, 255, 255, 255);
     GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(hw * 0.5f, hh, 0.0f);
+    GXPosition3f32(hw / 2.0f, hh, 0.0f);
     GXColor4u8(255, 255, 255, 255);
     GXTexCoord2f32(2.0f, 0.0f);
-    GXPosition3f32(hw * 0.5f, 0.0f, 0.0f);
+    GXPosition3f32(hw / 2.0f, 0.0f, 0.0f);
     GXColor4u8(255, 255, 255, 0);
     GXTexCoord2f32(2.0f, 1.0f);
-    GXPosition3f32(-hw * 0.5f, 0.0f, 0.0f);
+    GXPosition3f32(-hw / 2.0f, 0.0f, 0.0f);
     GXColor4u8(255, 255, 255, 0);
     GXTexCoord2f32(0.0f, 1.0f);
     {
@@ -1189,11 +1189,10 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(mtx, trans, trans);
         PSMTXConcat(trans, scl, trans);
         GXLoadPosMtxImm(trans, 0);
-        PSMTXTrans(trans, 0.125f * w2->pos3.y, 0.0f, 0.0f);
+        s = w2->pos3.y;
+        PSMTXTrans(trans, s / 8.0f, 0.0f, 0.0f);
         GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
-        color = (GXColor){ 255, 255, 255, 0 };
-        color.a = w2->alpha;
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, (GXColor){ 255, 255, 255, w2->alpha });
         effGetTexObj(0x37, &tex);
         GXLoadTexObj(&tex, GX_TEXMAP0);
         GXClearVtxDesc();
@@ -1214,14 +1213,19 @@ void effFallDispWater(CameraId cameraId, EffectEntry* effect) {
         GXCallDisplayList(shibuki_dl_1_2, 0x20);
         GXCallDisplayList(shibuki_dl_1_3, 0x20);
         PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
-        s = 0.8f * w2->scale;
+        s = w2->scale;
+        s = s * 0.8f;
         PSMTXScale(scl, 0.7f * s, 0.5f * s, s);
         PSMTXConcat(mtx, trans, trans);
         PSMTXConcat(trans, scl, trans);
         GXLoadPosMtxImm(trans, 0);
-        PSMTXTrans(trans, -w2->pos3.y * 0.25f, 0.0f, 0.0f);
+        hw = w2->pos3.y;
+        PSMTXTrans(trans, 0.0f, -hw / 4.0f, 0.0f);
         GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
-        { const GXColor c = { 255, 255, 255, 255 }; GXSetTevColor(GX_TEVREG0, c); }
+        {
+        static const GXColor white255b = { 255, 255, 255, 255 };
+        GXSetTevColor(GX_TEVREG0, white255b);
+        }
         effGetTexObj(0x36, &tex);
         GXLoadTexObj(&tex, GX_TEXMAP0);
         GXClearVtxDesc();
@@ -1270,3 +1274,4 @@ s32 effFallCheckHit(EffectEntry* effect) {
     }
     return 0;
 }
+

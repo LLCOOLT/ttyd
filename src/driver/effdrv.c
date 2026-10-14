@@ -343,27 +343,26 @@ typedef struct MayaPoly {
 } MayaPoly;
 
 void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {
-	register u32 gqr = 0x06070607;
+	register u32 gqr;
 	f32 buf[22];
 	Mtx trans, scale, tmp2, pivot2, pivot2Inv, trans3, pivot1, pivot1Inv, trans2, rotX, rotY, rotZ, tmp;
 	s32 n = list->count;
 	s32 k;
 
+	gqr = 0x06070607;
 	for (k = 1; k < n; k++) {
-		f32 t;
 		MayaKey* prev;
 		f32 a;
+		f32 t;
 		s32 i;
 		register s8* pb;
 		f32* out;
 		register s8* pa;
-		f32 ct;
 		MayaKey* curr;
-		curr = &list->keys[k];
 		prev = &list->keys[k - 1];
+		curr = &list->keys[k];
 		asm { mtspr GQR5, gqr }
-		ct = curr->time;
-		if (anim->time <= ct) {
+		if (anim->time <= curr->time) {
 			t = anim->time;
 		}
 		else if (k == n - 1) {
@@ -377,17 +376,17 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		out = buf;
 		for (i = 0; i < 22; i++) {
 			f32 u, dt, s, s2, s3, div;
-			register f32 d0, v1, v0, m0, m1;
+			register f32 qd0, qv1, qv0, qm0, qm1;
 			asm {
-				psq_l v0, 2(pa), 1, 5
-				psq_l d0, 4(pa), 1, 5
-				psq_l m0, 6(pa), 1, 5
-				psq_l v1, 2(pb), 1, 5
-				psq_l m1, 4(pb), 1, 5
-				psq_l d0, 6(pb), 1, 5
+				psq_l qv0, 2(pa), 1, 5
+				psq_l qd0, 4(pa), 1, 5
+				psq_l qm0, 6(pa), 1, 5
+				psq_l qv1, 2(pb), 1, 5
+				psq_l qm1, 4(pb), 1, 5
+				psq_l qd0, 6(pb), 1, 5
 			}
 			if (pa[9] != 0) {
-				*out = v0;
+				*out = qv0;
 			}
 			else {
 				u = t - prev->time;
@@ -396,7 +395,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 				s = u / div;
 				s2 = s * s;
 				s3 = s2 * s;
-				*out = v0 * (1.0f + (2.0f * s3 - 3.0f * s2)) + m0 * (dt * (s + (s3 - 2.0f * s2))) + v1 * (-2.0f * s3 + 3.0f * s2) + m1 * (dt * (s3 - s2));
+				*out = qv0 * (1.0f + (2.0f * s3 - 3.0f * s2)) + qm0 * (dt * (s + (s3 - 2.0f * s2))) + qv1 * (-2.0f * s3 + 3.0f * s2) + qm1 * (dt * (s3 - s2));
 			}
 			pa += 8;
 			pb += 8;

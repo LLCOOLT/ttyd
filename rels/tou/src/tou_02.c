@@ -1545,8 +1545,7 @@ void ext_fan_main(void) {
         f32 x;
         f32 z;
         f32 dir2;
-
-        sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1"; sfx2 = sfx1;
+        sfx2 = sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1";
         for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++) {
             if (fan->state == 0) {
                 switch (check_hammer(fan)) {
@@ -1554,7 +1553,7 @@ void ext_fan_main(void) {
                         break;
                     case 1:
                         fan->state = 10;
-                        angle = 6.2831855f * randf(135.0f, 225.0f) / 360.0f;
+                        dist = 6.2831855f; angle = 6.2831855f * randf(135.0f, 225.0f) / 360.0f;
                         dist = randf(400.0f, 500.0f);
                         x = fan->pos.x + dist * fan_sin(angle);
                         z = fan->pos.z - dist * fan_cos(angle);
@@ -1599,15 +1598,16 @@ void ext_fan_main(void) {
     fan_wp->count = fan_wp->num;
 
     {
-        HitCheckQuery query;
         f32 angle;
         f32 dist;
         f32 h;
 
         pose = extGetPosePtr();
-        for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, pose++, fan++) {
+        fan = fan_wp->fans;
+        for (i = 0; i < fan_wp->num; i++, pose++, fan++) {
             switch (fan->state) {
-                case 0:
+                case 0: {
+                    HitCheckQuery query;
                     PSVECNormalize(&fan->vel, &fan->vel);
                     dist = PSVECMag(&fan->vel);
                     query.targetPos = fan->pos;
@@ -1615,7 +1615,7 @@ void ext_fan_main(void) {
                     query.targetDir = fan->vel;
                     query.targetDir.y = 0.0f;
                     query.targetDistance = 25.0f + dist;
-                    if (hitCheckVecFilter(&query, NULL) != NULL) {
+                    if (hitCheckVecFilter(&query, NULL)) {
                         C_VECReflect(&fan->vel, &query.hitNormal, &fan->vel);
                     } else {
                         fan->pos.x += fan->vel.x;
@@ -1633,6 +1633,7 @@ void ext_fan_main(void) {
                         fan->pos.z = h;
                     }
                     break;
+                }
                 case 10:
                     fan->pos.y += fan->param.x;
                     fan->param.x -= fan->param.z;

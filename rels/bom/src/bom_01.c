@@ -42,8 +42,8 @@ ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static void pose_change(s32 i, const char* name);
 static s32 ext_data[93];
-static inline f32 chb_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
-static inline f32 chb_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
+static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
+static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 static void pose_init(void);
 void extLoadRenderMode(void);
 void extLoadVertex(void);
@@ -758,6 +758,8 @@ static void ext_init(void) {
     BomWork* wp;
     ExtPose* pose;
     f32 angle;
+    f32 dist;
+    f32 sv;
 
     lp = smartAlloc(sizeof(BomWork), 1);
     wp = lp->address;
@@ -767,8 +769,6 @@ static void ext_init(void) {
 
     pose = extGetPosePtr();
     for (i = 0; i < wp->count; i++, pose++) {
-        f32 dist;
-
         wp->bom[i].vy = 0.0f;
         wp->bom[i].gravity = 0.0f;
         wp->bom[i].state = 0;
@@ -776,9 +776,11 @@ static void ext_init(void) {
         PSMTXIdentity(pose->mtx);
         angle = 6.2831855f * rand() / 32767.0f;
         dist = 500.0f + 400.0f * rand() / 32767.0f;
-        pose->mtx[0][3] = dist * chb_sin(angle);
+        sv = chb_sin(angle);
+        pose->mtx[0][3] = dist * sv;
         pose->mtx[1][3] = 0.0f;
-        pose->mtx[2][3] = dist * chb_cos(angle);
+        sv = chb_cos(angle);
+        pose->mtx[2][3] = dist * sv;
         pose_change(i, "R_1");
     }
 }
@@ -2087,8 +2089,8 @@ USER_FUNC(taihou_r) {
     f32 rx;
     f32 rz;
 
-    x = 100.0f * c;
     y = 100.0f * s;
+    x = 100.0f * c;
     rx = -angleABf(0.0f, 0.0f, 0.0f, y);
     rz = -angleABf(0.0f, 0.0f, x, y);
 

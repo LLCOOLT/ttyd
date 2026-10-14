@@ -17,10 +17,9 @@ FileManagerWork fileWork;
 
 //.sdata
 FileManagerWork* afp = &fileWork;
-#pragma push
 #pragma force_active on
-static __declspec(section ".sdata") u32 gap_07_804125DC_sdata[1] = {0};
-#pragma pop
+__declspec(section ".sdata") u32 gap_07_804125DC_sdata[1] = {0};
+#pragma force_active reset
 
 //local prototypes
 void fileGarbageDataAdrClear(FileEntry* entry);
@@ -58,9 +57,6 @@ typedef struct Anim40 {
 } Anim40;
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
-	u16 i;
-	TEXHeader* img;
-	CLUTHeader* pal;
 	TEXPalette* tpl;
 	s32 j, n;
 	Anim40* e;
@@ -119,6 +115,9 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 				OSPanic("filemgr.c", 147, "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray >= (u32)tpl) {
+					u16 i;
+					TEXHeader* img;
+					CLUTHeader* pal;
 				for (i = 0; i < tpl->numDescriptors; i++) {
 					img = tpl->descriptorArray[i].textureHeader;
 					if (img) {
@@ -301,10 +300,10 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 			}
 			if ((u32)tpl->descriptorArray < (u32)tpl) {
 				u16 i;
+				TEXHeader* img;
+				CLUTHeader* pal;
 				*(u32*)&tpl->descriptorArray += (u32)tpl;
 				for (i = 0; i < tpl->numDescriptors; i++) {
-					TEXHeader* img;
-					CLUTHeader* pal;
 					img = tpl->descriptorArray[i].textureHeader;
 					if (img) {
 						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)img);

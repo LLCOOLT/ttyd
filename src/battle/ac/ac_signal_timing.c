@@ -59,12 +59,13 @@ s32 _get_ok_frame_range(s32 difficulty) {
 
 #pragma dont_inline reset
 s32 battleAcMain_SignalTiming(BattleWork* work) {
-    const char* sfxNg;
-    const char* sfxOk;
-    const char* sfxPone;
     const char* sfxPi;
-    s32 i;
+    const char* sfxPone;
+    const char* sfxOk;
+    const char* sfxNg;
     s32 j;
+    s32 i;
+    s32 k;
     BOOL unique;
     BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
@@ -73,8 +74,8 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
     BOOL autoCommand = FALSE;
     BOOL got;
     BOOL good;
-    BOOL done;
     u32 btn;
+    BOOL done;
 
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
@@ -99,8 +100,8 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
                 w->difficulty = ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
                 w->okFlag = 0;
                 W32(work, 0x1CEC) = 0;
-                for (i = 0; i < 5; i++) {
-                    w->results[i] = 0;
+                for (k = 0; k < 5; k++) {
+                    w->results[k] = 0;
                 }
                 switch (W32(work, 0x1CD8)) {
                 case 1:
@@ -520,3 +521,4 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
         }
     }
 }
+

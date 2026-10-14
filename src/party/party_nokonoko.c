@@ -857,7 +857,6 @@ void nokotaro_hold_cancel(PartyEntry* party) {
 }
 
 HitEntry* ccwall(PartyEntry* party, s32 mode) {
-    f32 yofs;
     f32 s;
     f32 c;
     f32 dist;
@@ -874,14 +873,15 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
     f32 s3;
     f32 c3;
     HitEntry* hit;
-    f32 x;
-    f32 y;
-    f32 z;
-    f32 w;
     f32 py;
     f32 vx;
     f32 vz;
     f32 d;
+    f32 w;
+    f32 yofs;
+    f32 x;
+    f32 z;
+    f32 y;
 
     yofs = 10.0f;
     y = yofs + (party->position.y + party->field_F0);
@@ -1128,7 +1128,7 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     *out = pos; }
 
 void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
-    f32 s; f32 c; f32 rad; f32 x; f32 y; f32 z; f32 dist; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
+    f32 dist; f32 x; f32 y; f32 z; f32 s; f32 c; f32 rad; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
     MarioWork* player = marioGetPtr();
     f32 w = player->wPlayerCollisionBox.x;
     rad = 1.5707964f;

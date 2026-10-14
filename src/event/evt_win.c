@@ -81,9 +81,12 @@ typedef struct UnitWinWork {
 	s32 bought;            // 0xE4
 } UnitWinWork;
 
-static UnitWinWork* _wp;
-s32 unk_804189fc;
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_08_80418A0C_sbss[1];
+#pragma force_active reset
 static s16* mario_status_point_table[3];
+s32 unk_804189fc;
+static UnitWinWork* _wp;
 
 USER_FUNC(evt_unitwin_main_func);
 USER_FUNC(unk_80174e98);
@@ -146,9 +149,9 @@ void unk_8017599c(WinMgrEntry* entry) {
 	}
 }
 
-static void unitwin_make_name(char* buf, const char* name, s32 n) {
-	sprintf(buf, "%s_%04d", name, n);
-}
+
+#define UNITWIN_UNUSED_INLINE(fn) static void fn(char* buf, const char* name, s32 n) { sprintf(buf, "%s_%04d", name, n); }
+UNITWIN_UNUSED_INLINE(unitwin_fmt)
 
 void unk_8017597c(WinMgrEntry* entry) {
 	winMgrHelpMain(entry);
@@ -471,8 +474,11 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	PouchData* pouch = pouchGetPtr();
 	UnitWinWork* wp = (UnitWinWork*)param;
 	s32 mode;
+	s32 row;
 	s32 i;
+	char fbuf[64];
 
+	if (0) { sprintf(fbuf, "%s_%04d", "", 0); }
 	if (wp->flags & 1) {
 		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
@@ -589,7 +595,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	if ((wp->flags & 0x100) && (lotteryGetPtr()->mFlags & 2)) {
 		Mtx mtx;
 		char buf[32];
-		s32 i;
 
 		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -130.0f, 150.0f, 45.0f, 20.0f);
 		PSMTXTrans(mtx, -220.0f, -172.0f, 0.0f);
@@ -607,12 +612,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			break;
 		case 4: {
 			const char* desc;
-			s32 row;
-			s32 i;
 			s32 h;
 			u32 sl, st, sw, sh;
 
-			
+			row = 0;
 			desc = NULL;
 
 			h = (8 - pouchGetKeepItemCnt() > 0 ? 8 - pouchGetKeepItemCnt() : 0) * 24;
@@ -625,7 +628,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			FontDrawEdgeOff();
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (row = i = 0; i < 32; i++) {
+			for (i = 0; i < 32; i++) {
 				s32 id = pouchKeepItem(i);
 				ItemData* item = &itemDataTable[id];
 				if (id) {
@@ -659,12 +662,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			const char* title;
 			s32 titleX;
 			s32 i;
-			s32 row;
 			const char* desc;
 			s32 max;
+			s32 flag;
 			u32 sl, st, sw, sh;
 
-			
+			row = 0;
 			desc = NULL;
 			if (mode == 2 || mode == 3) {
 				h = (8 - pouchGetHaveItemCnt() > 0 ? 8 - pouchGetHaveItemCnt() : 0) * 24;
@@ -729,11 +732,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			}
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (row = i = 0, tbl = badge_bottakuru100_table; i < max; i++) {
-				s32 flag = 0;
+			for (tbl = badge_bottakuru100_table, i = 0; i < max; i++) {
+				
 				GXColor color = {0x00, 0x00, 0x00, 0xFF};
 				s32 id;
 				ItemData* item;
+				flag = 0;
 				switch (wp->field_0x50) {
 					case 2:
 					case 3:

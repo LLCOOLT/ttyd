@@ -384,7 +384,7 @@ BOOL unk_8005bb80(void) {
 
 static inline BOOL marioChkCtrl2(void) { return !mp->ctrlOffCount; }
 static inline BOOL marioCtrlDisable(void) {
-	return marioChkCtrl2() ^ 1;
+	return (marioChkCtrl2() ^ 1) & 0xFF;
 }
 
 static inline BOOL marioKeyDisable(void) {
@@ -1513,7 +1513,8 @@ s32 marioAnimeId(void) {
 }
 
 inline void marioChgPoseChk(const char* name) {
-	if (mp->dispFlags & 0x1000000) {
+	MarioWork* wp = mp;
+	if (wp->dispFlags & 0x1000000) {
 		return;
 	}
 	marioChgPose(name);
@@ -1524,9 +1525,7 @@ void unk_80058374(void) {
 	MarioMotion mot = wp->currMotionId;
 
 	if (mot != MARIO_MOTION_SHIP && mot != MARIO_MOTION_ROLL && mot != MARIO_MOTION_PLANE && mot != MARIO_MOTION_JABARA && mot != MARIO_MOTION_YOSHI) {
-		if (!(mp->dispFlags & 0x1000000)) {
-			marioChgPose("M_D_1");
-		}
+		marioChgPoseChk("M_D_1");
 	}
 }
 
@@ -1639,7 +1638,7 @@ inline void marioPaperRelease(void) {
 	s32 poseId;
 
 	poseId = wp->paperPoseId;
-	if (poseId >= 0) {
+	if (wp->paperPoseId >= 0) {
 		animPaperPoseRelease(poseId);
 		wp->paperPoseId = -1;
 	}
@@ -1647,9 +1646,8 @@ inline void marioPaperRelease(void) {
 
 BOOL marioPaperOn(const char* name) {
 	BOOL flag;
-	MarioWork* wp;
+	MarioWork* wp = mp;
 
-	wp = mp;
 	if (wp->paperPoseId >= 0) {
 		animPaperPoseRelease(wp->paperPoseId);
 		wp->paperPoseId = -1;
@@ -1662,10 +1660,13 @@ BOOL marioPaperOn(const char* name) {
 		|| !strcmp(name, "p_hune")
 		|| !strcmp(name, "p_jyabara")
 		|| !strcmp(name, "p_dokan_x")
-		|| !strcmp(name, "p_dokan_y")) flag = TRUE;
+		|| !strcmp(name, "p_dokan_y")) {
+		flag = TRUE;
+	}
 	animPoseSetPaperAnimGroup(wp->paperAnimGroupId[0], name, !flag);
 	return TRUE;
 }
+
 
 void marioPaperOff(void) { //1:1
 	MarioWork* wp = mp;

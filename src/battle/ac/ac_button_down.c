@@ -30,12 +30,12 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
     u8* disp = (u8*)work + 0x1f20;
-    s32 flag = 0;
-    s32 again;
     s32 i;
-    s32 allDone;
-    s32 k;
     s32 off;
+    s32 k;
+    s32 allDone;
+    s32 again;
+    s32 flag = 0;
 
     if (*((u8*)ac->mAcUnit + 0x303)) {
         flag = 1;
@@ -73,7 +73,7 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                                     cand = _button_table[irand(4)];
                                     ok = 1;
                                     for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4) {
-                                        if (BTNO(k) == cand) {
+                                        if (cand == BTNO(k)) {
                                             ok = 0;
                                         }
                                     }
@@ -93,7 +93,7 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                                 cand = _button_table[irand(7)];
                                 ok = 1;
                                 for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4) {
-                                    if (BTNO(k) == cand) {
+                                    if (cand == BTNO(k)) {
                                         ok = 0;
                                     }
                                 }

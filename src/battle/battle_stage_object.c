@@ -547,14 +547,14 @@ void BattleStage_DestroyA1(void) {
 	evtDeleteID(STAGE_WORK(wp)->bgEvtId[0]);
 	STAGE_WORK(wp)->bgEvtId[0] = 0;
 	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
-		evtDeleteID(STAGE_WORK(wp)->bgDestroyEvtId);
+		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
 	}
 	if (!evt) {
 		evt = _object_turn_event_A1;
 	}
 	entry = evtEntry(evt, 10, 0);
 	if (entry) {
-		STAGE_WORK(wp)->bgDestroyEvtId = entry->eventId;
+		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
 	}
 }
 
@@ -578,14 +578,14 @@ void BattleStage_DestroyB(void) {
 	evtDeleteID(STAGE_WORK(wp)->bgEvtId[2]);
 	STAGE_WORK(wp)->bgEvtId[2] = 0;
 	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
-		evtDeleteID(STAGE_WORK(wp)->bgDestroyEvtId);
+		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
 	}
 	if (!evt) {
 		evt = _object_turn_event_B;
 	}
 	entry = evtEntry(evt, 10, 0);
 	if (entry) {
-		STAGE_WORK(wp)->bgDestroyEvtId = entry->eventId;
+		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
 	}
 }
 
@@ -1350,12 +1350,13 @@ EVT_END()
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
 	const char* fall3;
-	BattleWork* wp = _battleWorkPointer;
-	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	BOOL busy = FALSE;
 	BattleStageObject* obj;
-	s32 layer;
 	int i;
+	s32 layer;
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObjectWork* sw = STAGE_WORK(wp);
+
 
 	layer = evtGetValue(event, event->args[0]);
 	if (isFirstCall) {
@@ -1520,15 +1521,17 @@ USER_FUNC(_get_bgset_attack_data) {
 }
 
 USER_FUNC(_bgset_kemuri_effect) {
+	s32* args = event->args;
 	s32 layer;
 	const char* sfxA1;
 	const char* sfxA2;
 	const char* sfxB;
-	BattleWork* wp = _battleWorkPointer;
+	BattleWork* wp;
 	int i;
 	BattleStageObject* obj;
 	f32 x, y, z;
-	layer = evtGetValue(event, event->args[0]);
+	wp = _battleWorkPointer;
+	layer = evtGetValue(event, args[0]);
 	sfxA1 = "SFX_BTL_STAGE_SET_DOWN1";
 	sfxA2 = "SFX_BTL_STAGE_SET_DOWN3";
 	sfxB = "SFX_BTL_STAGE_SET_DOWN2";
@@ -1981,7 +1984,7 @@ USER_FUNC(_nozzle_work_effect) {
 	s32 effType = 0;
 	BOOL started;
 	BattleStageObject* obj;
-	f32 angle, rot, z;
+	f32 z, rot, angle1, angle2, angle3;
 	s32 fog;
 	s32 out;
 
@@ -2013,7 +2016,7 @@ USER_FUNC(_nozzle_work_effect) {
 			case 2:
 			case 3:
 				obj = BattleSearchObjectPtr("nozzle_l");
-				angle = _get_nozzle_dir(0);
+				angle1 = _get_nozzle_dir(0);
 				if (sw->nozzleDir[0]) {
 					if (sfx) {
 						EVT_UW(event, 5) = psndSFXOn_3D(sfx, &obj->mPosition);
@@ -2021,9 +2024,9 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						EVT_UW(event, 5) = -1;
 					}
-					rot = reviseAngle(90.0f + angle);
-					z = 10.0f * sinfd(angle) + obj->mPosition.z;
-					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					rot = reviseAngle(90.0f + angle1);
+					z = 10.0f * sinfd(angle1) + obj->mPosition.z;
+					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
@@ -2038,7 +2041,7 @@ USER_FUNC(_nozzle_work_effect) {
 					}
 				}
 				obj = BattleSearchObjectPtr("nozzle_c");
-				angle = _get_nozzle_dir(1);
+				angle2 = _get_nozzle_dir(1);
 				if (sw->nozzleDir[1]) {
 					if (sfx) {
 						EVT_UW(event, 6) = psndSFXOn_3D(sfx, &obj->mPosition);
@@ -2046,9 +2049,9 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						EVT_UW(event, 6) = -1;
 					}
-					rot = reviseAngle(90.0f + angle);
-					z = 10.0f * sinfd(angle) + obj->mPosition.z;
-					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					rot = reviseAngle(90.0f + angle2);
+					z = 10.0f * sinfd(angle2) + obj->mPosition.z;
+					EVT_UW(event, 2) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle2), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
@@ -2063,7 +2066,7 @@ USER_FUNC(_nozzle_work_effect) {
 					}
 				}
 				obj = BattleSearchObjectPtr("nozzle_r");
-				angle = _get_nozzle_dir(2);
+				angle3 = _get_nozzle_dir(2);
 				if (sw->nozzleDir[2]) {
 					if (sfx) {
 						EVT_UW(event, 7) = psndSFXOn_3D(sfx, &obj->mPosition);
@@ -2071,9 +2074,9 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						EVT_UW(event, 7) = -1;
 					}
-					rot = reviseAngle(90.0f + angle);
-					z = 10.0f * sinfd(angle) + obj->mPosition.z;
-					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					rot = reviseAngle(90.0f + angle3);
+					z = 10.0f * sinfd(angle3) + obj->mPosition.z;
+					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
 				else {
 					if (sfx) {
@@ -2369,15 +2372,16 @@ USER_FUNC(_object_fall_attack) {
 	s32 arg0 = args[0];
 	BOOL found = FALSE;
 	FallObjectWork* w;
+	FallObjectWork* w2;
 	FallObjectEntry* e;
 	FallObjectEntry* o;
+	BattleUnit* unit2;
+	s32 k;
 	BattleWeapon* weapon;
 	BattleUnit* unit;
-	BattleUnitPart* part;
-	BattleUnit* unit2;
 	s32 i;
 	s32 j;
-	s32 k;
+	BattleUnitPart* part;
 	s32 sum;
 	s32 r;
 	u32 flags;
@@ -2518,10 +2522,10 @@ USER_FUNC(_object_fall_attack) {
 	sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
 	sfxRest = "SFX_REST_CONDITION1";
 	sfxTub2 = "SFX_BTL_STAGE_DAMAGE_TUB1";
-	w = (FallObjectWork*)EVT_UW(event, 0);
+	w2 = (FallObjectWork*)EVT_UW(event, 0);
 	done = TRUE;
-	for (i = 0; i < w->count; i++) {
-		e = &w->entries[i];
+	for (i = 0; i < w2->count; i++) {
+		e = &w2->entries[i];
 		if (e->index == -1) {
 			continue;
 		}

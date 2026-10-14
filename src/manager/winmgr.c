@@ -21,7 +21,8 @@
 
 typedef struct WinMgrSelectTbl {
     u16 numDescriptors; // 0x0
-    WinMgrDesc* descriptors; // 0x4
+    
+WinMgrDesc* descriptors; // 0x4
 } WinMgrSelectTbl;
 
 extern ItemData itemDataTable[];
@@ -46,6 +47,8 @@ void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
 // local prototypes
 void select_main(WinMgrEntry* entry);
 void select_disp(WinMgrEntry* entry);
+
+
 void select_disp_party(WinMgrEntry* entry);
 void select_disp_mario(WinMgrEntry* entry);
 void select_disp_luigi(WinMgrEntry* entry);
@@ -61,6 +64,7 @@ int unk_80237a2c(void* a, void* b);
 s32 unk_80237448(WinMgrSelect* sel);
 
 //.data
+
 WinMgrDesc select_desc[] = {
     {0, 1, 8, -24, 116, 300, 240, {0xFF, 0xFF, 0xFF, 0xFF}, select_main, select_disp},
     {2, 0, 8, -280, 120, 240, 45, {0xFF, 0xFF, 0xFF, 0xFF}, NULL, select_disp2},
@@ -115,6 +119,9 @@ WinMgrSelectTbl select_desc_tbl[] = {
 };
 
 //.sbss
+#pragma force_active on
+u32 gap_08_80418B74_sbss;
+#pragma force_active reset
 static WinMgrWork work;
 static s16* mario_status_point_table[3];
 
@@ -128,6 +135,9 @@ static const char* mario_status_labelname_table[] = {"_hp", "_fp", "_bp"};
 static const char* mario_status_name_table[] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
 static s32 mario_status_henka_table[] = {5, 5, 3};
 s32 mario_status_max_table[] = {200, 200, 99};
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_8041799C_sdata[1] = {0};
+#pragma force_active reset
 
 USER_FUNC(unk_80239b2c) {
     PouchData* pouch;
@@ -473,6 +483,7 @@ void winMgrHelpMain(WinMgrEntry* entry) {
     }
 }
 
+
 void winMgrHelpDraw(WinMgrEntry* entry) {
     Mtx mtx;
     Mtx scale;
@@ -533,6 +544,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     WinMgrSelectTbl* table;
     u16 id;
     s32 i, j, n;
+    s32 m;
     WinMgrDesc* d;
     s32 cnt, over;
     u8* tbl;
@@ -729,21 +741,21 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             memset(sel->items, 0, 0x18C);
             sel->numItems = 0;
             for (i = 0; i < 99; i++) {
-                n = (s16)badgeShop_get(bdsw->bargain_table, i + 240);
-                if (n - badgeShop_ThrowCheck(i + 240) > 0) {
+                m = (s16)badgeShop_get(bdsw->bargain_table, i + 240);
+                if (m - badgeShop_ThrowCheck(i + 240) > 0) {
                     sel->items[sel->numItems++].id = i + 240;
                 }
             }
             qqsort(sel->items, sel->numItems, 4, unk_802379e4);
             break;
         case 13:
-            n = getBadgeStarmaniacTableMaxCount();
-            sel->items = __memAlloc(HEAP_DEFAULT, n * 4);
-            memset(sel->items, 0, n * 4);
+            m = getBadgeStarmaniacTableMaxCount();
+            sel->items = __memAlloc(HEAP_DEFAULT, m * 4);
+            memset(sel->items, 0, m * 4);
             sel->numItems = 0;
             for (i = 0; i < 99; i++) {
-                n = (s16)badgeShop_get(bdsw->starmaniac_table, i + 240);
-                if (n - badgeShop_ThrowCheck(i + 240) > 0) {
+                m = (s16)badgeShop_get(bdsw->starmaniac_table, i + 240);
+                if (m - badgeShop_ThrowCheck(i + 240) > 0) {
                     sel->items[sel->numItems].id = i + 240;
                     if (itemDataTable[i + 240].star_piece_price > ((s32 (*)(void))pouchGetStarPiece)()) {
                         sel->items[sel->numItems].flags |= 3;
@@ -758,25 +770,25 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             memset(sel->items, 0, 0x10);
             sel->numItems = 0;
             for (i = 0; i < 4; i++) {
-                n = badge_bottakuru_table[evtGetValue(NULL, GSW(118) + i)];
-                if (n) {
-                    sel->items[sel->numItems++].id = n;
+                m = badge_bottakuru_table[evtGetValue(NULL, GSW(118) + i)];
+                if (m) {
+                    sel->items[sel->numItems++].id = m;
                 }
             }
             break;
         case 15:
-            n = getBadgeBottakuru100TableMaxCount();
-            sel->items = __memAlloc(HEAP_DEFAULT, n * 4);
-            memset(sel->items, 0, n * 4);
+            m = getBadgeBottakuru100TableMaxCount();
+            sel->items = __memAlloc(HEAP_DEFAULT, m * 4);
+            memset(sel->items, 0, m * 4);
             sel->numItems = 0;
-            for (i = 0; i < n; i++) {
+            for (i = 0; i < m; i++) {
                 sel->items[sel->numItems++].id = badge_bottakuru100_table[i];
             }
             break;
         case 16:
-            n = getBadgeBteresaTableMaxCount();
-            sel->items = __memAlloc(HEAP_DEFAULT, n * 4);
-            memset(sel->items, 0, n * 4);
+            m = getBadgeBteresaTableMaxCount();
+            sel->items = __memAlloc(HEAP_DEFAULT, m * 4);
+            memset(sel->items, 0, m * 4);
             sel->numItems = 0;
             for (i = 0; i < 338; i++) {
                 if ((s16)badgeShop_get(bdsw->bteresa_table, i + 1) > 0) {
@@ -804,11 +816,11 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             break;
         default:
             if (type < 0) {
-                n = 0;
-                while (((s32*)type)[n++] != -1) {
+                m = 0;
+                while (((s32*)type)[m++] != -1) {
                 }
-                sel->items = __memAlloc(HEAP_DEFAULT, (n + 1) * 4);
-                memset(sel->items, 0, (n + 1) * 4);
+                sel->items = __memAlloc(HEAP_DEFAULT, (m + 1) * 4);
+                memset(sel->items, 0, (m + 1) * 4);
                 sel->numItems = 0;
                 if (a2) {
                     sel->items[sel->numItems++].id = a2;
@@ -856,6 +868,7 @@ s32 winMgrSelect(WinMgrSelect* sel) {
     return 0;
 }
 
+
 s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
     InformantWork* jdt = &_jdt;
     s32 id;
@@ -894,6 +907,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                     name = msgSearch("name_party6");
                     break;
             }
+
             evt->lwData[3] = (s32)name;
             break;
         case 8:
@@ -921,6 +935,7 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
                     name = msgSearch("name_party6");
                     break;
             }
+
             evt->lwData[4] = (s32)name;
             break;
         case 9:
@@ -1134,19 +1149,19 @@ void select_disp(WinMgrEntry* entry) {
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
-    GXColor iconcol;
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor tmp;
-    ItemData* item;
-    s32 i;
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor iconcol;
     s32 k;
+    s32 i;
     s32 price;
+    ItemData* item;
     BOOL show;
     const char* msg;
     u16 w;
     f32 tw;
     f32 ofs;
-    char buf[0x40];
+    char buf[0x20];
     Mtx mtx;
     Mtx scale;
     tmp = white;
@@ -1210,7 +1225,7 @@ void select_disp(WinMgrEntry* entry) {
             sprintf(buf, "%d", price);
             tw = FontGetMessageWidth(buf);
             winFontInit();
-            winFontSet((Vec){entry->x + (entry->width - 10) - tw, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+            winFontSet((Vec){(entry->width - 10) + entry->x - tw, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & 1) ? &gray : &black), buf);
         }
         if (sel->field_0x38) {
@@ -1280,7 +1295,8 @@ void select_disp(WinMgrEntry* entry) {
     }
 }
 
-static inline s32 select_party_icon(u16 id) {
+
+static inline s32 select_party_icon(u16 id) /* */ {
     s32 icon = party_icon_table[id];
     if (icon == 0x158) {
         switch (pouchGetPartyColor(4)) {
@@ -1312,16 +1328,16 @@ static inline s32 select_party_icon(u16 id) {
 }
 
 
-static const char* select_party_name(u16 id);
 
+static const char* select_party_name(u16 id);
 void select_disp_party(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     PouchData* pouch = pouchGetPtr();
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
-    GXColor tmp;
     GXColor iconcol;
+    GXColor tmp;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor* col;
     s32 i;
@@ -1393,8 +1409,8 @@ void select_disp_mario(WinMgrEntry* entry) {
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
-    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor iconcol;
+    GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor tmp;
     GXColor white2 = white;
     GXColor* col;

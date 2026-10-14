@@ -57,7 +57,7 @@ BOOL parsePush(const char* tag) {
 							buf[n] = c;
 							n++;
 						}
-						if (n >= 127 || p[j] == '>') {
+						if (n >= 127 || p[j] == 0x3e) {
 							break;
 						}
 					}
@@ -102,6 +102,7 @@ BOOL parseGet1Next(s32 type, void* data) {
 	s32 start;
 	s32 stop;
 	BOOL result = TRUE;
+	s32* new_var;
 	s32 state;
 	s8 c;
 	char* dst;
@@ -115,11 +116,12 @@ BOOL parseGet1Next(s32 type, void* data) {
 		return result;
 	}
 
+	new_var = parse.pos;
 	state = 0;
 	p = (s8*)parse.ptr;
-	i = parse.pos[parse.depth];
+	i = new_var[parse.depth];
 	end = parse.end[parse.depth];
-	posp = &parse.pos[parse.depth];
+	posp = new_var + parse.depth;
 	for (; i < end; i++) {
 		if (p[i] == '/' && p[i + 1] == '/') {
 			for (; i < end; i++) {

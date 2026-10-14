@@ -89,8 +89,9 @@ void winFullDisp(WinMgrEntry* win);
 BOOL N_itemPickUpFromFieldCheck(void);
 
 ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
-HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY);
+HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 vy, f32* outY);
 HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy);
+
 
 HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle);
 void itemseq_GetItem(ItemEntry* entry);
@@ -581,7 +582,7 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 	default:
 		entry->effect = NULL;
 		iconEntry(entry->name, itemDataTable[itemId].icon_id);
-		iconSetPos(entry->name, x, y, z);
+		{ char* nm = ((ItemEntry*)entry)->name; iconSetPos(nm, x, y, z); }
 		iconSetScale(entry->name, entry->scale);
 		iconSetAlpha(entry->name, entry->alpha);
 		break;
@@ -713,7 +714,7 @@ ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range) {
 	found = NULL;
 	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
 		if (!(entry->flags & 1)) continue;
-		if (entry->flags & 2) continue;
+			if (entry->flags & 2) { do { } while (0); continue; }
 		if (entry->flags2 & 0x1000) continue;
 		if (entry->mode == 2) continue;
 		dx = x - entry->position.x; dy = y - entry->position.y;
@@ -753,14 +754,14 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
 	entry = wp->entries;
 	found = NULL;
 	i = 0;
-	pos = makeVecByValue(x, y, z);
+	pos = makeVecByValue2(x, y, z);
 	for (; i < wp->count; i++, entry++) {
 		if (!(entry->flags & 1)) continue;
 		if (entry->flags2 & 0x1000) continue;
 		if (entry->flags2 & 0x100000) continue;
 		if (entry->mode == 2) continue;
 		if (entry->flags2 & 0x2000000) continue;
-		{ f32 iz, iy, ix; ix = entry->position.x; iy = entry->position.y; iz = entry->position.z; itemPos = makeVecByValue2(ix, iy, iz); }
+		{ f32 iz, iy, ix; ix = entry->position.x; iy = entry->position.y; iz = entry->position.z; itemPos = makeVecByValue(ix, iy, iz); }
 		PSVECSubtract(&itemPos, &pos, &diff);
 		dist = PSVECMag(&diff);
 		if (dist < range) {
@@ -1381,7 +1382,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				entry->position.y += dy;
 			}
 			else { f32 hitY;
-			if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, -1.0f, dy, &hitY)) {
+			if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, dy, &hitY)) {
 				entry->position.y = hitY;
 			}
 			else {
@@ -1500,6 +1501,7 @@ void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z) {
 
 
 
+
 void itemGetSound(ItemEntry* entry) {
 	Vec pos;
 
@@ -1573,7 +1575,8 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 	return NULL;
 }
 
-HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy) {
+HitEntry*
+itemHitCheckUp(ItemEntry* entry, f32 vy) {
 	HitEntry* hit;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
@@ -1590,11 +1593,12 @@ HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy) {
 	return NULL;
 }
 
-HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
+HitEntry*
+itemHitCheckY(f32 x, f32 y, f32 z, f32 vy, f32* outY) {
 	f32 hitX, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
 	hitDist = 20.0f + __fabs(vy);
-	return hitCheckFilter(NULL, &hitX, outY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
+	return hitCheckFilter(NULL, &hitX, outY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f);
 }
 
 void itemForceGet(ItemEntry* entry) {
@@ -1647,6 +1651,7 @@ void itemPickUp(ItemEntry* entry) {
 	entry->timer = 0;
 	entry->flags2 &= ~0x100;
 }
+
 
 
 

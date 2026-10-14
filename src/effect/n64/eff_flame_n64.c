@@ -325,9 +325,9 @@ void effFlameMain(EffectEntry* effect) {
 }
 
 void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
+    CameraEntry* camera;
     s32 type;
     s32 alpha;
-    CameraEntry* camera;
     EffFlameN64Work* work;
     Mtx rot;
     Mtx scl;
@@ -337,8 +337,8 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    type = work->type;
     alpha = work->alpha;
+    type = work->type;
     GXSetNumChans(0);
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(0, 1, 4, 30, 0, 125);

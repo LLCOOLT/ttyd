@@ -109,13 +109,13 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
+    x = 6.2831855f * scale;
     work->frame = k = 0;
     work->type = type;
     work->lifetime = 80;
-    x = 6.2831855f * scale;
     p = work->particles;
-    base = data + type * 256;
     count = 1;
+    base = data + type * 256;
 
     for (i = 0; i < 16; i++) {
         row = base + (15 - i) * 16;

@@ -342,7 +342,10 @@ static u8* color_tbl[] = { diamond_1_color0_tbl, diamond_2_color0_tbl, diamond_3
 
 #define LOOP2(w, tbl, sz, n)                                           for (i = 0; i < n##U; i++) {                                              if ((w->flags & 1) || i != 0) {                                        GXCallDisplayList(tbl[i], sz[i] << 5);                         }                                                              }
 
-#define LOOP2V(i1, w, tbl, sz, n) for (i1 = 0; i1 < n##U; i1++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(tbl[i1], sz[i1] << 5); } }
+#define LOOP2V(i1, w, tbl, sz, n) { s32 i1; for (i1 = 0; i1 < n##U; i1++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(tbl[i1], sz[i1] << 5); } } }
+#define LOOP2X(i1, w, tbl, sz, n) dq = tbl; sq = sz; for (i1 = 0; i1 < n##U; i1++, sq++, dq++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(*dq, *sq << 5); } }
+#define LOOP2X(i1, w, tbl, sz, n) dq = tbl; sq = sz; for (i1 = 0; i1 < n##U; i1++, sq++, dq++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(*dq, *sq << 5); } }
+#define LOOP2W(i1, w, tbl, sz, n) for (i1 = 0; i1 < n##U; i1++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(tbl[i1], sz[i1] << 5); } }
 #define LOOP1(tbl, sz, n)                          \
     i = 0; dp = tbl; sp = sz; \
     for (; i < n##U; i++, sp++, dp++) {       \
@@ -641,20 +644,21 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     Mtx s;
     Mtx r;
     GXTexObj tex;
-    s32 i5, i4, i3, i2;
+    
     EffStarStoneWork* w = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);
     s32 type = w->type;
+    s32 q;
 
     DISP_START(w)
     BLEND_STATE()
     GXSetCullMode(2);
     XFORM(w, w->f48, w->f4c, 1.1f * w->scale, POS_ID, POS_ID)
     VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2V(i2, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
+    LOOP2W(q, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
     XFORM(w, w->f50, w->f54, 1.1f * w->scale, NEG, NEG)
     VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2V(i3, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
+    LOOP2W(q, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
     DISP_MID(w)
     if (type != 2) {
         effGetTexObj(0x29, &tex);
@@ -666,10 +670,10 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     BLEND_STATE()
     XFORM(w, w->f48, w->f4c, w->scale, POS_ID, POS_ID)
     VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2V(i4, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
+    LOOP2W(q, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
     XFORM(w, w->f50, w->f54, w->scale, NEG, NEG)
     VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2V(i5, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
+    LOOP2W(q, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
 }
 
 void effStarStoneDraw(CameraId cameraId, EffectEntry* effect) {

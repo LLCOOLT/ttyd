@@ -539,11 +539,11 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
 }
 
 static inline void _ssDropStop(void) {
-    SoundStream* stream;
-    u32 i;
     SoundSong* song;
     SoundEffect* effect;
     SoundDVD* dvd;
+    u32 i;
+    SoundStream* stream;
 
     for (i = 0; i < 4; i++) {
         song = &sound.songs[i];
@@ -602,12 +602,8 @@ static inline void _ssDropStop(void) {
 }
 
 BOOL SoundDropData(void) {
-    SoundSong* song;
-    SoundEffect* effect;
-    SoundDVD* dvd;
-    SoundStream* stream;
     SoundGroup *group, *temp;
-    u32 i, *j;
+    u32 i;
 
     group = sound.groups;
     _ssDropStop();
@@ -1154,10 +1150,10 @@ inline void SoundDVDSetPanCh(s32 chan, u8 pan) { // I think this is the correct 
 }
 
 void SoundDVDMain(void) {
+    u32 i;
     SoundDVD* dvd;
-    int i;
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; (int)i < 2; i++) {
         dvd = &sound.dvds[i];
         if (!(dvd->flags & 2)) {
             if (dvd->flags & 0x40) {
@@ -1512,6 +1508,7 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     u32 n;
     s32 j;
 
+    dst = buffer2;
     stream = &sound.streams[(u8)user];
     stream->samplePos = 0;
     if ((stream->flags & 0x8006) || sound.unk214) {
@@ -1526,10 +1523,14 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
             }
             return stream->samplePos;
         } else {
-            for (j = (s32)(len1 / 14 * 8) / 2; j != 0; j--) {
+            j = (s32)(len1 / 14 * 8);
+            j /= 2;
+            for (; j != 0; j--) {
                 *((s16*)buffer1)++ = 0;
             }
-            for (j = (s32)(len2 / 14 * 8) / 2; j != 0; j--) {
+            j = (s32)(len2 / 14 * 8);
+            j /= 2;
+            for (; j != 0; j--) {
                 *((s16*)buffer2)++ = 0;
             }
             return len1 + len2;
@@ -1970,11 +1971,11 @@ void SoundSSMuteOff(s32 chan) {
 }
 
 void SoundSSMain(void) {
+    u32 i;
     SoundStream* stream;
-    int i;
 
-    for (i = 0; i < 3; i++) {
-        stream = &sound.streams[i];
+    for (i = 0; (int)i < 3; i++) {
+        stream = sound.streams + i;
         if ((stream->flags & 8) && !(stream->flags & 2)) {
             if (stream->flags & 4) {
                 stream->flags &= ~4;

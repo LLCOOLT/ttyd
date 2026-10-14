@@ -213,11 +213,7 @@ void mot_hammer(void) {
 		}
 	} else {
 		s32 t = MI(0x48);
-		if (t <= 10) {
-			n = t;
-		} else {
-			n = 10;
-		}
+		n = t <= 10 ? t : 10;
 		if (t == 10) {
 			done = 1;
 		}
@@ -384,7 +380,7 @@ static const Vec v = {0.0f, 40.0f, 0.0f};
 		m->unk148 = a148;                                           \
 		*(f32*)((u8*)m + 0x158) = 0.005f;                           \
 		m->field_68 = a68;                                          \
-		marioGetPtr()->field_6C = v;                                           \
+		marioGetPtr()->field_6C = v; \
 		MS(0x2B4) |= 0x1000;                                        \
 	}
 
@@ -570,7 +566,7 @@ void mot_hammer2(void) {
 			} else if (MB(0x42) <= 1) {
 				MF(0x2A8) = 15.0f;
 			}
-			effUltraHammerEntry(MB(0x43) != 0, MI(0x48), MF(0x8C), 20.0f + MF(0x90), MF(0x94), 1.0f);
+			{ f32 y = 20.0f + MF(0x90); effUltraHammerEntry(MB(0x43) != 0, MI(0x48), MF(0x8C), y, MF(0x94), 1.0f); }
 		}
 		break;
 	case 20:

@@ -841,6 +841,7 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 	s32 item;
 	f32 height;
 	Vec pos;
+	f32 scale = 1.0f;
 
 	height = BtlUnit_GetHeight(unit);
 
@@ -856,7 +857,7 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 		pos.x += unit->heldItemOffset.x;
 		pos.y += unit->heldItemOffset.y;
 		pos.z += unit->heldItemOffset.z;
-		iconDispGx(&pos, 0, itemDataTable[item].icon_id, 1.0f);
+		iconDispGx(&pos, 0, itemDataTable[item].icon_id, scale);
 	}
 }
 #pragma pop
@@ -887,7 +888,7 @@ void btlUnitStolenItemDisp(CameraId camId, void* param) {
 	s32 item = unit->heldItem;
 
 	BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-	pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
+	pos.y += unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 5.0f;
 	iconDispGx(&pos, 0, itemDataTable[item].icon_id, 1.0f);
 }
 
@@ -1193,10 +1194,14 @@ void _pose_two_pattern(BattleUnitPart* part) {
 	}
 }
 
+#pragma push
+#pragma opt_dead_assignments off
 void btlDispAnimeSpeed(BattleUnitPart* part, f32 speed) {
+	f32 unusedOne = 1.0f;
 	PART_ANIMSPEED(part) = speed;
 	animPoseSetLocalTimeRate(part->poseId, PART_ANIMSPEED(part) * PART_ANIMSPEED2(part));
 }
+#pragma pop
 
 void btlGetScreenPoint(Vec* in, Vec* out) {
 	CameraEntry* camera = camGetPtr(CAMERA_3D);

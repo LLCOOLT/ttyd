@@ -263,7 +263,7 @@ void winItemInit(ItemWork* w) {
     w->winId1 = winMgrEntry(&window_desc[1]);
     winMgrSetPriority(w->winId0, -200);
     winMgrSetPriority(w->winId1, -100);
-    fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
+    fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
 }
 
 void winItemInit2(ItemWork* w) {
@@ -561,9 +561,9 @@ s32 winItemMain(ItemWork* w) {
     case 201:
         mail = mailGetPtr(w->mail[w->f258][1]);
         if (*(u16*)mail & 0x1000) {
-            w->mailTex = (FileEntry*)fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
+            w->mailTex = (FileEntry*)fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
             if (w->mailTex) {
-                w->mailTex = fileAllocf(4, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
+                w->mailTex = fileAllocf(4, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
                 w->state++;
             }
         } else {
@@ -764,25 +764,30 @@ void winItemDisp(s32 camId, void* param, s32 n) {
 
 void item_disp(ItemWork* w, f32 xo, f32 yo) {
     GXColor white = {255, 255, 255, 255};
+    GXColor white2;
     GXColor black = {0, 0, 0, 255};
     GXColor grayc = {0x80, 0x80, 0x80, 255};
-    GXColor white2 = white;
-    GXColor white3 = white2;
-    GXColor white4 = white3;
+    GXColor white3;
+    GXColor white4;
     s32 ok;
     f32 yBase;
+    s32 row;
+    ItemWork* p;
+    s32 col;
     ItemData* item;
     f32 y;
-    s32 row;
-    s32 col;
-    ItemWork* p;
     s32 i;
-    s32 gray;
+
     s32 id;
+    s32 gray;
     s32 cnt;
     f32 width;
+
     f32 scroll;
 
+    white4 = white;
+    white2 = white4;
+    white3 = white2;
     if (w->mode == 0) {
         cnt = pouchGetHaveItemCnt();
     } else {
@@ -801,21 +806,21 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
         scroll = (&w->curX)[w->mode];
         ok = w->mode != 0 || (*(u16*)&itemDataTable[id].usable_locations & 4);
         y = scroll + (20.0f + ((yBase = (100.0f + yo) - row * 38) - 10.0f));
-        row = ok == 0;
+        ok = ok == 0;
         if (y > 240.0f) {
             continue;
         }
         if (y < -240.0f) {
             break;
         }
-        if (row) {
+        if (ok) {
             winIconGrayInit();
         } else {
             winIconInit();
         }
         winIconSet(itemDataTable[id].icon_id, (Vec){(xo - 125.0f) + col * 204, y, 0.0f}, w->mode == 0 ? (Vec){0.8f, 0.8f, 0.8f} : (Vec){0.6666667f, 0.6666667f, 0.6666667f}, white3);
         winFontInit();
-        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + col * 204, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, row ? grayc : black, msgSearch(itemDataTable[id].name));
+        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + col * 204, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, ok ? grayc : black, msgSearch(itemDataTable[id].name));
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if ((&w->page[0])[w->mode] > 0) {
@@ -969,5 +974,6 @@ void itemUseDisp2(WinMgrEntry* entry) {
         winFontSet((Vec){(f32)entry->x + ((f32)entry->width - w) / 2.0f, 134.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, color, msg);
     }
 }
+
 
 __declspec(section ".data") u32 gap_05_80374D0C_data[1] = {0};

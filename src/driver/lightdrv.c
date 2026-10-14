@@ -59,7 +59,7 @@ void lightInit(void) {
 	MTXMultVec(scale, &paperCraft.position, &paperCraft.position);
 
 	booLight.flags = LIGHT_NO_DIST_ATTEN | LIGHT_POINT;
-	strcpy(booLight.name, "BooBoo");
+	strcpy(booLight.name, "BooBoo\0");
 	booLight.position = (Vec){0.0f, 0.0f, 0.0f};
 	booLight.rotation = (Vec){0.0f, 0.0f, 0.0f};
 	booLight.color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
@@ -151,7 +151,7 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	strcpy(entry->name, name);
 	entry->position = position;
 	entry->rotation = rotation;
-	entry->field_0x3C = entry->position = position;
+	entry->field_0x3C = entry->position;
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;
@@ -215,11 +215,12 @@ static s32 _sort(const void* a, const void* b) {
 void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
 	LightWork* wp = lightGetWork();
 	NearWork tmp[32];
+	LightEntry** op;
+	s32 found;
 	NearWork* tp;
 	LightEntry* entry;
 	u32 n;
-	s32 found, i;
-	LightEntry** op;
+	s32 i;
 
 	if (lightGetEntryNum() > 8) {
 		entry = wp->entries;
@@ -247,12 +248,11 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 		}
 	}
 
+	op = out; tp = tmp;
 	found = 0;
-	tp = tmp;
-	op = out;
-	for (i = 0; i < n; i++, tp++) {
-		LightEntry* e = tp->entry;
-		if (!(e->flags & LIGHT_AMBIENT) && (flags == 0 || (flags & e->flags))) {
+	for (i = 0; i < n; tp++, i++) {
+		u32 fl; LightEntry* e = tp->entry; fl = e->flags;
+		if (!(fl & LIGHT_AMBIENT) && (flags == 0 || (flags & fl))) {
 			*op++ = e;
 			found++;
 			if (found >= count) {

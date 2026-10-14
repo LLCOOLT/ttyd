@@ -556,8 +556,11 @@ void getHitBreatheout2(PartyEntry* party, f32 unk) {
         height = 8.0f;
     } else if (kind == 1) {
         height = 20.0f;
-    } else if (kind == 2) {
-        height = 40.0f;
+    } else {
+        if (kind == 2) {
+            height = 40.0f;
+        }
+        do { } while (0);
     }
     if (CLD_F(cl, 8) >= CLD_F(cl, 0xC)) {
         CLD_F(cl, 8) = CLD_F(cl, 0xC);

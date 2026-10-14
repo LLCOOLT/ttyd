@@ -284,7 +284,7 @@ s32 winBadgeMain(BWin* w) {
             psndSFXOn(0x20035);
         } else if (w->trg & 0x10) {
             s32 m = 3;
-            if (w->tab == 0) {
+            if (tab == 0) {
                 m = 2;
             }
             winSortEntry(w, m, -310.0f, 150.0f);
@@ -397,8 +397,8 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
     s32 badge;
     s32 equipped;
     s32 gray;
-    f32 yBase;
     f32 y;
+    f32 yBase;
     f32 scroll;
     f32 width;
     s32 tw;
@@ -422,7 +422,7 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         } else {
             equipped = p0->list[0].equipped;
         }
-        yBase = (yo + 110.0f) - rowOff;
+        yBase = (yo + 110.0f) - (f32)rowOff;
         y = scroll + yBase;
         if (y > 240.0f) {
             continue;

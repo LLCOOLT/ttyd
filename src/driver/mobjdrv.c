@@ -602,7 +602,7 @@ void mobjCalcMtx2(MapObjectEntry* entry) {
     // Matches fine here
     MTXTrans(trans, position.x, position.y, position.z);
     MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
-    MTXRotRad(xRot, 'x', MTXDegToRad(entry->rotation.x));
+    MTXRotRad(xRot, 'x', MTXDegToRad((0, entry->rotation.x)));
     MTXRotRad(yRot, 'y', MTXDegToRad(entry->rotation.y));
     MTXRotRad(zRot, 'z', MTXDegToRad(entry->rotation.z));
     MTXConcat(trans, zRot, trans);

@@ -21,7 +21,7 @@ double sin(double);
 double sqrt(double);
 double fabs(double);
 double __fabs(double);
-s32 intrudeSound;
+extern s32 intrudeSound;
 s32 rand();
 s32 BattleAudienceDetectPakkunEatTarget(s32 index);
 void BattleAudiencePuniAllEscape(void);
@@ -885,6 +885,8 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
         break;
     }
 }
+
+s32 intrudeSound;
 
 __declspec(section ".rodata") static Vec v0 = {0.0f, 0.0f, 0.0f};
 __declspec(section ".rodata") static Vec v1 = {0.0f, 0.0f, 0.0f};

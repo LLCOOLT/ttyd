@@ -158,15 +158,17 @@ static inline f32 planeDir(MarioWork* mp) {
 	return DIRF(mp);
 }
 
-static inline void planeRoll1(MarioWork* mp, f32 max, f32 rate) {
+static inline void
+planeRoll1(MarioWork* mp, f32 max, f32 rate) {
+	f32 cur = MW(mp, 0x2a4, f32);
 	max *= DIRF(mp);
-	rate *= max - MW(mp, 0x2a4, f32);
-	MW(mp, 0x2a4, f32) += rate;
+	max -= cur;
+	rate = rate * max + cur;
+	MW(mp, 0x2a4, f32) = rate;
 }
 
 static inline void planeRoll2(MarioWork* mp, f32 rate, f32 max) {
-	max *= DIRF(mp);
-	max -= MW(mp, 0x2a4, f32);
+	max = max * DIRF(mp) - MW(mp, 0x2a4, f32);
 	MW(mp, 0x2a4, f32) += rate * max;
 }
 

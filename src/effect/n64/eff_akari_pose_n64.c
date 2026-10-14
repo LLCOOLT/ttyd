@@ -53,6 +53,7 @@ static u8 a_data2[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
+__declspec(section ".sdata") u32 gap_07_80412D70_sdata[4] = {0};
 
 void effAkariPoseMain(EffectEntry* effect);
 void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);
@@ -180,8 +181,8 @@ void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffAkariPoseN64Work* work;
     s32 alpha;
-    s32 i;
     GXTexObj texObj;
+    s32 i;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rotMtx;
@@ -227,5 +228,4 @@ void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-__declspec(section ".sdata") u32 gap_07_80412D70_sdata[4] = {0};
 __declspec(section ".sdata2") const u32 gap_10_8042309C_sbss2;

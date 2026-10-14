@@ -869,16 +869,17 @@ USER_FUNC(evt_tou_get_ranking_28_text_4048) {
 static void rankingControll(void) {
     s32 above[32];
     s32 below[32];
-    s32 nBelow;
     s32 nAbove;
+    s32 nBelow;
     s32 i;
     s32 j;
-    s32 tmp;
     s32 idx2;
+    s32 tmp;
     s32 idx;
 
     s32 rank;
     RankEntry* entry;
+    RankEntry* buf;
     nAbove = 0;
     nBelow = 0;
     for (idx = 0, entry = rank_wp->entries; idx < rank_wp->count; idx++, entry++) {
@@ -1060,20 +1061,20 @@ static void rankingControll(void) {
         }
     }
 
-    entry = (RankEntry*)__memAlloc(0, sizeof(RankEntry) * rank_wp->count);
+    buf = (RankEntry*)__memAlloc(0, sizeof(RankEntry) * rank_wp->count);
     for (i = 0; i < nAbove; i++) {
-        entry[i] = rank_wp->entries[above[i]];
+        buf[i] = rank_wp->entries[above[i]];
     }
     // TODO: fixup
-    entry[nAbove].flags = RANK_PLAYER;
-    entry[nAbove].id = FIGHTER_PLAYER;
-    entry[nAbove].points.total = 0;
+    buf[nAbove].flags = RANK_PLAYER;
+    buf[nAbove].id = FIGHTER_PLAYER;
+    buf[nAbove].points.total = 0;
     for (i = 0; i < nBelow; i++) {
         j = nAbove + 1 + i;
-        entry[j] = rank_wp->entries[below[i]];
+        buf[j] = rank_wp->entries[below[i]];
     }
-    memcpy(rank_wp->entries, entry, sizeof(RankEntry) * rank_wp->count);
-    __memFree(0, entry);
+    memcpy(rank_wp->entries, buf, sizeof(RankEntry) * rank_wp->count);
+    __memFree(0, buf);
 
     // Calculate our current rank and store it in 580.
     rank = 0;

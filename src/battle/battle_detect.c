@@ -48,14 +48,14 @@ typedef struct DetWork {
 void _btlSamplingEnemy(DetWork* d) {
     BattleUnitKindPart* kp;
     s32 n = 0;
-    u8 np;
     DetTarget* t = d->t;
     s32 k;
-    BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     s32 i;
+    BattleUnit* unit;
     s32 j;
+    u8 np;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;

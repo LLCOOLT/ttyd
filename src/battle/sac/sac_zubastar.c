@@ -250,7 +250,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 				ix = ox;
 				iy = oy;
 				for (k = 0; k < nhit; k++) {
-					if (flags[k] == 1 && ix == (s32)hit[k].x && iy == (s32)hit[k].y) break;
+					if (flags[k] == 1 && (s32)hit[k].x == ix && (s32)hit[k].y == iy) break;
 				}
 				if (k == nhit) {
 					hit[k].x = ox;
@@ -313,12 +313,11 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 #pragma dont_inline on
 s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
 	f32 dx1 = x2 - x1;
-	f32 dx2;
-	f32 a, b, d, t, e2, e1;
-	if (dx1 == 0.0f && (dx2 = x4 - x3) == 0.0f) return 0;
+	f32 e2, dx2, e1, a, b, d, t;
+	if (dx1 == 0.0f && (x4 - x3) == 0.0f) return 0;
 	if (dx1 != 0.0f) e1 = dx1; else e1 = 1e-5f;
 	dx2 = x4 - x3;
-	e2 = dx2 != 0.0f ? dx2 : 1e-5f;
+	if (dx2 != 0.0f) e2 = dx2; else e2 = 1e-5f;
 	a = (y2 - y1) / e1;
 	b = (y4 - y3) / e2;
 	d = a - b;
@@ -867,18 +866,20 @@ void zubastar_disp_bomb(CameraId cam, void* param) {
 	}
 }
 
-static inline GXColor mkG(u8 v) {
-	GXColor c = {0, 0, 0, 0xff};
-	c.r = v;
-	c.g = v;
-	c.b = v;
-	return c;
+static inline void
+setG(u8 a) {
+	GXColor col = {0, 0, 0, 0xff};
+	col.r = a;
+	col.g = a;
+	col.b = a;
+	GXSetChanMatColor(GX_COLOR0A0, col);
 }
 
-static inline GXColor mkA(u8 a) {
-	GXColor c = {0xff, 0xff, 0xff, 0};
-	c.a = a;
-	return c;
+static inline void
+dispA(Mtx m, s32 i) {
+	GXColor ca = {0xff, 0xff, 0xff, 0};
+	ca.a = 0xff - (i + 1) * 50;
+	iconDispGxCol(m, 0x10, 0x19d, ca);
 }
 
 void zubastar_disp2D(CameraId cam, void* param) {
@@ -918,8 +919,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 			a = INTPL(0, l->timer - 30, 30, 255.0f, 128.0f);
 		}
 		if (l->state == 5) {
-			GXColor col = mkG(a);
-			GXSetChanMatColor(GX_COLOR0A0, col);
+			setG(a);
 			GXBegin(GX_LINES, GX_VTXFMT0, 2);
 			GXPosition3f32(l->x0, l->y0, 0.0f);
 			GXPosition3f32(l->x1, l->y1, 0.0f);
@@ -930,7 +930,7 @@ void zubastar_disp2D(CameraId cam, void* param) {
 		for (i = 0; i < 4; i++) {
 			Mtx m;
 			PSMTXTrans(m, cur->trail[i].x, cur->trail[i].y - 20.0f, 0.0f);
-			iconDispGxCol(m, 0x10, 0x19d, mkA(0xff - (i + 1) * 50));
+			dispA(m, i);
 		}
 	}
 }
@@ -994,3 +994,7 @@ s32 marioAttackEvent_ZubaStar[] = {
     65627, (s32)zubastar_end, 65539, 99, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2,
     1,
 };
+
+
+
+

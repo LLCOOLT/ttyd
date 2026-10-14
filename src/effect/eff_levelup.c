@@ -145,8 +145,8 @@ void effLevelupMain(EffectEntry* effect) {
 }
 
 void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
-    EffLevelupWork* work = effect->userdata;
     EffLevelupWork* w;
+    EffLevelupWork* work = effect->userdata;
     CameraEntry* cam;
     Mtx m0;
     Mtx rot;
@@ -181,10 +181,10 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    for (j = 1; j >= 0; j--) {
+    for (j = 1; j >= 0; j -= 1) {
         for (i = effect->count - 1; i >= 1; i--) {
             w = effect->userdata;
-            w += i;
+            w = w + i;
             dx = j * 4;
             dy = -j * 4;
             if (j != 0) {

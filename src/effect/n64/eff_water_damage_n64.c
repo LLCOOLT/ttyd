@@ -30,13 +30,13 @@ typedef struct EffWaterDamageN64Work {
 } EffWaterDamageN64Work;
 
 #ifdef __MWERKS__
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A8908 = 0xBF8000003F800000;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803A8918 = 0x3F800000BF800000;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A8928 = 0xBF8000003F800000;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803A8938 = 0x3F800000BF800000;
 #endif
 

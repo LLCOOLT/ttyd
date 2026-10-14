@@ -44,7 +44,6 @@ void effRippleN64SetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
 }
 
 void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
-    GXColor c;
     CameraEntry* camera;
     s32 type;
     EffRippleN64Work* work;
@@ -79,7 +78,7 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
     if (type == 1 || type == 10 || type == 3 || type == 30) {
-        c = unk_80423248;
+        GXColor c = unk_80423248;
         c.a = work->alpha;
         GXSetTevColor(GX_TEVREG0, c);
     } else {
@@ -116,8 +115,8 @@ void effRippleMain(EffectEntry* effect) {
     Vec position;
     Vec tmp;
 
-    tmp = vec3_802fb520;
     work = effect->userdata;
+    tmp = vec3_802fb520;
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;

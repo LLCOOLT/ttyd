@@ -56,7 +56,10 @@ void _ac_help_disp(CameraId cameraId, void *param)
   width = FontGetMessageWidthLine(new_var3[1], &lines);
   lines++;
   {
-  GXColor col = color; col.a = alpha; {
+  {
+  GXColor col = color;
+  col.a = alpha;
+
   y = 0.0f;
   x = y - (width / 2);
   y = -148.0f;

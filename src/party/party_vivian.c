@@ -50,6 +50,9 @@ extern void partyPaperOff(VivianParty* party);
 extern void partyChgRunMode(VivianParty* party, s32 mode);
 extern char* partyChgPoseId(VivianParty* party, s32 index);
 
+#pragma force_active on
+s32 gap_08_80418A34_sbss;
+#pragma force_active reset
 s32 vivian_cancel_req;
 
 void N_marioForceVivianAnime(void) {
@@ -299,12 +302,13 @@ static inline void vivianFollow(VivianParty* party) {
 
 #pragma opt_common_subs off
 void vivian_use(VivianParty* party) {
-    MarioWork* m = PF(MarioWork*, 0x160);
     f32 d;
-    Vec s;
     void* rip;
-
-    if (party->field_8 & 8) {
+    Vec s;
+    MarioWork* m;
+    u32 fl = party->field_8;
+    m = PF(MarioWork*, 0x160);
+    if (fl & 8) {
         party->field_8 &= ~8;
         party->useMotionId = 0;
         party->field_174 = 10.0f;
@@ -540,6 +544,3 @@ void vivian_use(VivianParty* party) {
 }
 #pragma opt_common_subs reset
 
-#pragma force_active on
-s32 gap_08_80418A34_sbss;
-#pragma force_active reset

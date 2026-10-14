@@ -37,6 +37,8 @@ static GXColor color_tbl[10] = {
     { 0x51, 0x75, 0x9D, 0xFF }, { 0xC8, 0xB2, 0x25, 0xFF },
 };
 u8 size_tbl[12] = { 0x32, 0x32, 0x32, 0x28, 0x0C, 0x0C, 0x0C, 0x0A, 0x0A, 0x0F, 0x00, 0x00 };
+__declspec(section ".sdata") u32 gap_07_804159FC_sdata[1] = {0};
+__declspec(section ".sdata2") const u32 gap_10_804232FC_sbss2;
 
 EffectEntry* effItemGetEntry(s32 type, f32 x, f32 y, f32 z) {
     EffectEntry* effect;
@@ -198,7 +200,7 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     Vec up = { 0.0f, 1.0f, 0.0f };
     Vec target = { 0.0f, 0.0f, 0.0f };
     f32 scale, s, k;
-    f32 a, b, h, w, d;
+    f32 d, a, b, w, h;
     s32 alpha;
     s32 i;
     s32 al;
@@ -285,11 +287,12 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
+    h = 10.666667f;
     w = 42.666668f;
     h = 10.666667f;
     d = -w;
-    a = -h / 2.0f;
     b = 5.3333335f;
+    a = -h / 2.0f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         for (pass = 0; pass < 2; pass++) {

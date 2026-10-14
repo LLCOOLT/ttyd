@@ -77,6 +77,7 @@ EffectEntry* effOpukuWgunN64Entry(s32 type, s32 lifetime, f32 x1, f32 y1, f32 z1
     EffectEntry* effect;
     EffOpukuWgunN64Work* work;
     s32 i;
+    s32 k;
 
     effect = effEntry();
     effect->type = "OpukuWgunN64\0\0\0";
@@ -203,7 +204,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Vec v;
     f32 scl;
-    f32 zero = 0.0f;
+    f32 zero;
     f32 rad;
     f32 dx;
     f32 dy;
@@ -230,6 +231,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     k = 0;
+    zero = 0.0f;
     vtx = p;
     for (i = 0; i < 12; i++) {
         if (i == 0 || i == 0) {

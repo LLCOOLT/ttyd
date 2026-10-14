@@ -921,14 +921,12 @@ void winMsgDisp(WinPauseWork* wp, f32 x, f32 y) {
         }
         m = msgSearch((const char*)wp->msgY);
         fw = FontGetMessageWidth(m);
-        ny = 8.0f + (16.0f + by);
-        winNameGX(wp, 1, (x - 120.0f) + ofs, ny, 240.0f, 32.0f);
+        winNameGX(wp, 1, (x - 120.0f) + ofs, ny = 8.0f + (16.0f + by), 240.0f, 32.0f);
         winFontInit();
         winFontSetEdge((Vec){ ofs + ((x - 120.0f) + (240.0f - fw) / 2.0f), ny - 4.0f, 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white, m);
     }
     if (wp->msg != NULL) {
-        by = by - 14.0f;
-        GXSetScissor(0, (u32)(240.0f - by), 0x260, 0x38);
+        GXSetScissor(0, (u32)(240.0f - (by -= 14.0f)), 0x260, 0x38);
         if (strcmp(wp->msg, "msg_lottery_number\0") == 0) {
             n = *(s16*)((u8*)lotteryGetPtr() + 0x20);
             sprintf(buf, msgSearch(wp->msg), n);
@@ -999,8 +997,7 @@ static inline void winRootTexQuad(WinPauseWork* wp, s32 id, f32 x, f32 y, f32 w,
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     ah = __fabs(h);
     aw = __fabs(w);
-    sy = (f32)ah / GXGetTexObjHeight(&obj);
-    PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), sy, 1.0f);
+    PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
     GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(x, y, 0.0f);
@@ -1016,6 +1013,8 @@ static inline void winRootTexQuad(WinPauseWork* wp, s32 id, f32 x, f32 y, f32 w,
 
 #pragma inline_max_total_size(100000)
 void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
+    f32 w74 = 74.0f;
+    f32 w66 = 66.0f;
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
@@ -1034,8 +1033,7 @@ void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXLoadPosMtxImm(camGetPtr((CameraId)8)->view, 0);
     GXSetCurrentMtx(0);
-    switch (type) {
-    case 0:
+    if (type == 0) {
         winRootTexQuad(wp, 0xB, x, y, 8, 8);
         winRootTexQuad(wp, 0x9, x + 8, y, w - 8 - 8, 8);
         winRootTexQuad(wp, 0xD, x + w - 8, y, 8, 8);
@@ -1044,8 +1042,7 @@ void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
         winRootTexQuad(wp, 0xC, x, y - (h - 8), 8, 8);
         winRootTexQuad(wp, 0x8, x + 8, y - (h - 8), w - 8 - 8, 8);
         winRootTexQuad(wp, 0xE, x + w - 8, y - (h - 8), 8, 8);
-        break;
-    default:
+    } else {
         winRootTexQuad(wp, 0xB, x, y, 8, 8);
         winRootTexQuad(wp, 0x9, x + 8, y, w - 8 - 8, 8);
         winRootTexQuad(wp, 0xD, x + w - 8, y, 8, 8);
@@ -1054,13 +1051,12 @@ void winKirinukiGX(WinPauseWork* wp, s32 type, f32 x, f32 y, f32 w, f32 h) {
         winRootTexQuad(wp, 0xC, x, y - (h - 8), 8, 8);
         winRootTexQuad(wp, 0x8, x + 8, y - (h - 8), w - 8, 8);
         winRootTexQuad(wp, 0xF, x + (w - 90), y - h, 16, 8);
-        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h, 90.0f - 16.0f, 8);
+        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h, w74, 8);
         winRootTexQuad(wp, 0xA, x + (w - 90) + 8, y - h - 8, 8, 8);
-        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h - 8, 90.0f - 16.0f, 8);
+        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h - 8, w74, 8);
         winRootTexQuad(wp, 0xC, x + (w - 90) + 8, y - h - 16, 8, 8);
-        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h - 16, 90.0f - 16.0f - 8.0f, 8);
+        winRootTexQuad(wp, 0x8, x + (w - 90) + 16, y - h - 16, w66, 8);
         winRootTexQuad(wp, 0xE, x + w - 8, y - h - 16, 8, 8);
-        break;
     }
 }
 
@@ -1553,7 +1549,7 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
         winBookTex((WinBookWork*)w, t81, 392.0f + x, y - 224.0f + scroll - py, 8.0f, 8.0f);
     }
 
-    ((void (*)(void))winTexInit)();
+    winTexInit(((WinPauseWork*)w)->res->tex->tpl);
     for (p = 0, py = 0, idx = 0; p < npages; py += 232, idx += 28, p++) {
         if (scroll + (y - py) - j * 56 > 400.0f || scroll + (y - py) - j * 56 < -400.0f) {
             continue;
@@ -1609,14 +1605,14 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
 
     GXSetScissor(0, 0, 608, 480);
     if (page > 0) {
-        ((void (*)(void))winTexInit)();
+        winTexInit(((WinPauseWork*)w)->res->tex->tpl);
         fx = 395.0f + x;
         winTexSet(0x17, (Vec){fx, 15.0f + y, 0.0f}, (Vec){-1.0f, -1.0f, -1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         winIconInit();
         winIconSet(0x7E, (Vec){fx, y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     }
     if (num > page * 28 + 28) {
-        ((void (*)(void))winTexInit)();
+        winTexInit(((WinPauseWork*)w)->res->tex->tpl);
         fx = 395.0f + x;
         winTexSet(0x17, (Vec){fx, y - 235.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
         winIconInit();
@@ -1927,10 +1923,10 @@ void sort_4_3_func(WinPauseWork* wp) {
                 db = &itemDataTable[(s16)wp->badgeList[j].id];
                 swap = FALSE;
 
-                if (da->bp_cost < db->bp_cost) {
+                if (da->bp_cost < (&itemDataTable[(s16)wp->badgeList[j].id])->bp_cost) {
                     swap = TRUE;
-                } else if (da->bp_cost == db->bp_cost) {
-                    if (da->type_sort_order < db->type_sort_order) {
+                } else if (da->bp_cost == (&itemDataTable[(s16)wp->badgeList[j].id])->bp_cost) {
+                    if (da->type_sort_order < (&itemDataTable[(s16)wp->badgeList[j].id])->type_sort_order) {
                         swap = TRUE;
                     }
                 }
@@ -2630,9 +2626,7 @@ void winMailDisp(WinPauseWork* wp) {
     s32 i;
     s32 id;
     s32 kind;
-    s32 t;
     GXColor col;
-    GXColor black;
     WinMailData* mail;
 
     if (WM_X < 320.0f && WM_Y > -240.0f) {
@@ -2640,6 +2634,8 @@ void winMailDisp(WinPauseWork* wp) {
         if (WM_MODE != 0xCA) {
             for (i = 0; i < wp->mailNum; i++) {
                 GXColor white;
+                GXColor black;
+                s32 t;
 
                 id = wp->mailList[i].id;
                 kind = wp->mailList[i].kind;

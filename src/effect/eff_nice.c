@@ -30,7 +30,7 @@ const char* anim_us[] = {
 	NULL,
 	"EFF_lucky_us"
 };
-const char** anim_tbl[2] = { anim_jp, anim_us };
+static const char** anim_tbl[2] = { anim_jp, anim_us };
 s32 acrobat_jp[] = {179, 180, 181, 182, 183, 184, 185};
 s32 acrobat_us[] = {183, 184, 185, 186, 187, 188}; //includes nonexistant textures
 s32* acrobat_tbl[2] = { acrobat_jp, acrobat_us };
@@ -255,7 +255,7 @@ void acrobatMain(EffectEntry* effect) {
 	pos = tmp;
 	wp++;
 	for (i = 1; i < effect->count; i++, wp++) {
-		char* sfx = "SFX_SYSTEM_ACROBAT1";
+		const char* sfx = "SFX_SYSTEM_ACROBAT1";
 		switch (wp->field_0x28) {
 		case 0:
 			wp->field_0x20 = i * 4;

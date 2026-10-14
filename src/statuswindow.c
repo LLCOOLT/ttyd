@@ -153,6 +153,7 @@ void statusWinMain(void) {
 
     one = 1.0f;
 
+
     mario = marioGetPtr();
     if (mario->characterId) {
         wp->flags = 2;

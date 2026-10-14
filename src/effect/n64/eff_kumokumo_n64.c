@@ -41,13 +41,13 @@ typedef struct EffKumokumoN64Particle {
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_803A2280 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_kumokumo_negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A2290 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_kumokumo_one_negone_373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803A22A0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 fd_kumokumo_negone_one_360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A22B0 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u64 fd_kumokumo_one_negone_359 = 0x3F800000BF800000;
 #endif
 
 __declspec(section ".data") u32 cloud_vertex_tbl[] = {0x61BF081C, 0x00006A40, 0x19CD0000, 0x6C5F3000, 0x0000670F, 0x406A0000, 0x60AF4515, 0x0000571F, 0xFDF60000, 0x571F0D58, 0x0000571F, 0x20150000, 0x571F32D2, 0x0000571F, 0x42350000, 0x4400F9C8, 0x00004400, 0x05DA0000, 0x440013D5, 0x00004400, 0x21D00000, 0x44002DE3, 0x00002FD0, 0xF8860000, 0x2FD00123, 0x00002FD0, 0x0A7F0000, 0x2FD013DC, 0x00002FD0, 0x1C7A0000, 0x1CB0F845, 0x00001CB0, 0xFDAA0000, 0x1CB00300, 0x00001CB0, 0x08560000, 0x1CB00DBB, 0x00000DCF, 0xF9E80000, 0x0DCFFD27, 0x00000DD0, 0x00000000, 0x0DD002D9, 0x00000DD0, 0x06180000, 0x0000FCEC, 0x00000000, 0xFEA10000, 0x00000000, 0x00000000, 0x015F0000, 0x00000314, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
@@ -68,6 +68,7 @@ __declspec(section ".sdata") u32 cloud_normal_tbl[] = {0x00004000, 0x00000000, 0
 __declspec(section ".sdata") u32 cloud_color0_tbl[] = {0xFFFFFF00, 0xFFFFFF33, 0xFFFFFF66, 0xFFFFFF7F, 0xFFFFFFCC};
 __declspec(section ".sdata") void* cloud_dl_0_tbl[] = {cloud_dl_0_0, cloud_dl_0_1, cloud_dl_0_2, cloud_dl_0_3};
 __declspec(section ".sdata") u8 cloud_dl_0_size_tbl[] = {0x03, 0x03, 0x03, 0x03};
+__declspec(section ".sdata") u8 gap_07_80413AC8_sdata[0x18] = {0};
 __declspec(section ".sdata") u32 batten_normal_tbl[] __attribute__((aligned(32))) = {0x00004000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000};
 __declspec(section ".sdata") u32 batten_color0_tbl[] = {0xFFFFFF33, 0xFFFFFF66, 0xFFFFFF00, 0xFFFFFF99, 0xFFFFFF7F, 0xFFFFFFCC};
 __declspec(section ".sdata") void* batten_dl_0_tbl[] = {batten_dl_0_0, batten_dl_0_1, batten_dl_0_2, batten_dl_0_3};
@@ -111,7 +112,7 @@ EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 ro
     if (type == 2) {
         rot = 0.0f;
     }
-    effect->type = "KumokumoN64";
+    effect->type = "KumokumoN64\0\0\0\0";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffKumokumoN64Particle));
     effect->userdata = work;

@@ -1862,7 +1862,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 
 	pouchGetPtr();
 	sprintf(buf, msgSearch("btl_msg_multi_item_cancel_check"));
-	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - (w = (f32)(len = strlen(buf)) * 6.25f), 30.0f, 12.5f * (f32)len + 65.0f, 32.0f, 10.0f);
+	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - (w = 6.25f * (f32)(len = strlen(buf))), 30.0f, 12.5f * (f32)len + 65.0f, 32.0f, 10.0f);
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
 	FontDrawStart();
 	x = 0.0f;

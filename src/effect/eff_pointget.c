@@ -30,7 +30,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     EffPointGetWork* work;
 
     effect = effEntry();
-    effect->type = "PointGet\0\0\0\0\0\0\0";
+    effect->type = "PointGet\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPointGetWork) * effect->count);
     effect->userdata = work;
@@ -93,11 +93,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;
-    f32 wide;
-    f32 y1;
     f32 width;
     f32 base;
     f32 x0;
+    f32 y1;
+    f32 wide;
     f32 ox;
     f32 oy;
     GXTexObj texObj;

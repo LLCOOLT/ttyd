@@ -77,9 +77,10 @@ const char* katakana_tbl[] = {
 };
 
 //.bss
-static NameEntryWork work;
+static NameEntryWork work __attribute__((aligned(8)));
 
 //.sdata
+static NameEntryWork* wp = &work;
 static const char* msg_tbl[] = {
 	"msg_nameent_1",
 	"msg_nameent_2",
@@ -87,7 +88,6 @@ static const char* msg_tbl[] = {
 	"msg_nameent_3",
 	"msg_nameent_4"
 };
-static NameEntryWork* wp = &work;
 
 void nameEntInit(void) {
 	memset(wp, 0, sizeof(NameEntryWork));
@@ -198,6 +198,7 @@ s32 nameMain(void) {
 	s32 len;
 	s32 i;
 	s32 off;
+	s32 o2;
 	s32 idx;
 	f32 dist;
 
@@ -221,26 +222,30 @@ s32 nameMain(void) {
 								if (wp->field_0x18 > 0) {
 									wp->field_0x18--;
 									psndSFXOn((const char*)0x2000B);
-								}
+															}
 								break;
-							case 7:
-								len = strlen(wp->field_0x3C) / 2;
-								for (i = 0; i < len; i++) {
-									if (strncmp(&wp->field_0x3C[i * 2], "\x81\x40", 2)) {
+							case 7: {
+								s32 n;
+								s32 k;
+								s32 o;
+								n = strlen(wp->field_0x3C) / 2;
+								for (k = 0, o = 0; k < n; o += 2, k++) {
+									if (strncmp(&wp->field_0x3C[o], "\x81\x40", 2)) {
 										break;
 									}
 								}
-								if (i < len || wp->field_0xC != 0) {
+								if (k < n || wp->field_0xC != 0) {
 									wp->field_0x5C = 1;
 									wp->field_0x8 = 100;
 									psndSFXOn((const char*)0x20012);
-									if (wp->field_0xC == 1 && i >= len) {
+									if (wp->field_0xC == 1 && k >= n) {
 										strcpy(wp->field_0x3C, msgSearch("name_party3"));
 										wp->field_0x18 = strlen(wp->field_0x3C) / 2;
 									}
 								} else {
 									psndSFXOn((const char*)0x20014);
 								}
+}
 								break;
 						}
 					} else if (wp->field_0x18 < 8) {
@@ -261,8 +266,8 @@ s32 nameMain(void) {
 					}
 				} else if (keyGetButtonTrg(0) & 0x1000) {
 					len = strlen(wp->field_0x3C) / 2;
-					for (i = 0; i < len; i++) {
-						if (strncmp(&wp->field_0x3C[i * 2], "\x81\x40", 2)) {
+					for (i = 0, off = 0; i < len; off += 2, i++) {
+						if (strncmp(&wp->field_0x3C[off], "\x81\x40", 2)) {
 							break;
 						}
 					}
@@ -391,28 +396,26 @@ s32 nameMain(void) {
 			}
 			break;
 	}
-	wp->x1 += (wp->x2 - wp->x1) * 0.25f;
-	wp->y1 += (wp->y2 - wp->y1) * 0.25f;
-	wp->x1 += __fabs(2.0f * (f32)sin(0.125f * gp->retraceCount));
-	idx = wp->field_0x18;
-	if (idx >= 8) {
-		idx--;
-	}
+	wp->x1 += (wp->x2 - wp->x1) / 4.0f;
+	wp->y1 += (wp->y2 - wp->y1) / 4.0f;
+	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
+	idx = wp->field_0x18 >= 8 ? wp->field_0x18 - 1 : wp->field_0x18;
 	wp->field_0x34 = idx * 32 - 106;
 	wp->field_0x38 = 135.0f;
-	wp->field_0x2C += (wp->field_0x34 - wp->field_0x2C) * 0.25f;
-	wp->field_0x30 += (wp->field_0x38 - wp->field_0x30) * 0.25f;
-	wp->field_0x30 += __fabs(2.0f * (f32)sin(0.125f * gp->retraceCount));
+	wp->field_0x2C += (wp->field_0x34 - wp->field_0x2C) / 4.0f;
+	wp->field_0x30 += (wp->field_0x38 - wp->field_0x30) / 4.0f;
+	wp->field_0x30 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
 	return 0;
 }
 
 void nameEntDisp(CameraId cameraId, void* param) {
-	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
-	GXColor white = unused;
 	GXColor white2;
-	s32 i;
+	GXColor white;
+	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
 	const char* str;
+	s32 k;
 	s32 j;
+	s32 i;
 	CameraEntry saved;
 	f32 proj[7];
 	f32 vp[6];
@@ -423,7 +426,9 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	const char* no;
 	u16 width;
 	f32 w;
+	s32 m;
 
+	white = unused;
 	white2 = white;
 	saved = *camGetCurPtr();
 	GXGetProjectionv(proj);
@@ -442,42 +447,40 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	nameKirinukiGX(-240.0f, 120.0f, 480.0f, 270.0f);
 	FontDrawStart();
 	for (j = 0; j < 9; j++) {
-		for (i = 0; i < 14; i++) {
-			str = wp->field_0x50[j * 14 + i];
+		for (k = 0; k < 14; k++) {
+			str = wp->field_0x50[j * 14 + k];
 			if (str) {
-				width = FontGetMessageWidth(str);
-				FontDrawString((f32)(i * 24 - 190 + (i / 5) * 30 + (24 - width) / 2), (f32)(112 - j * 28), str);
+				FontDrawString((f32)(k * 24 - 190 + (k / 5) * 30 + (24 - FontGetMessageWidth(str)) / 2), (f32)(112 - j * 28), str);
 			}
 		}
 	}
-	for (i = 0; i < 4; i++) {
-		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == i) {
+	for (m = 0; m < 4; m++) {
+		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == m) {
 			winTexInit(*wp->field_0x60->data);
-			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
+			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(i + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(m + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(i + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(m + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
 	winTexInit(*wp->field_0x60->data);
 	winTexSet(0x24, (Vec){2.0f + wp->field_0x2C, wp->field_0x30 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
 	winTexSet(0x24, (Vec){wp->field_0x2C, wp->field_0x30, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	FontDrawStart();
-	for (i = 0; i < 8; i++) {
+	for (j = 0; j < 8; j++) {
 		memset(buf, 0, sizeof(buf));
-		strncpy(buf, &wp->field_0x3C[i * 2], 2);
+		strncpy(buf, &wp->field_0x3C[j * 2], 2);
 		if (strlen(buf)) {
-			width = FontGetMessageWidth(buf);
-			FontDrawString((28.0f - width) * 0.5f + (f32)(i * 32 - 120), 171.0f, buf);
+			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(j * 32 - 120), 171.0f, buf);
 		}
 	}
 	str = msg_tbl[wp->field_0xC];
 	w = FontGetMessageWidth(msgSearch(str));
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -160.0f, 500.0f, 40.0f, 20.0f);
 	FontDrawStart();
-	FontDrawString((240.0f - w) * 0.5f + -120.0f, -168.0f, msgSearch(str));
+	FontDrawString((240.0f - w) / 2.0f + -120.0f, -168.0f, msgSearch(str));
 	nameMaskGX(wp->field_0x54);
 	if (wp->field_0x8 == 100) {
 		ok = msgSearch("msg_nameent_ok");
@@ -491,10 +494,10 @@ void nameEntDisp(CameraId cameraId, void* param) {
 		FontDrawStart();
 		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		FontDrawEdge();
-		FontDrawString(-(f32)FontGetMessageWidth(ok) * 0.5f, 110.0f, ok);
-		FontDrawString(-(f32)FontGetMessageWidth(wp->field_0x3C) * 0.5f, 70.0f, wp->field_0x3C);
-		FontDrawString(-(f32)FontGetMessageWidth(no) * 0.5f, -20.0f, yes);
-		FontDrawString(-(f32)FontGetMessageWidth(no) * 0.5f, -60.0f, no);
+		FontDrawString(-(f32)FontGetMessageWidth(ok) / 2.0f, 110.0f, ok);
+		FontDrawString(-(f32)FontGetMessageWidth(wp->field_0x3C) / 2.0f, 70.0f, wp->field_0x3C);
+		FontDrawString(-(f32)FontGetMessageWidth(no) / 2.0f, -20.0f, yes);
+		FontDrawString(-(f32)FontGetMessageWidth(no) / 2.0f, -60.0f, no);
 		FontDrawEdgeOff();
 	}
 	winTexInit(*wp->field_0x60->data);
@@ -595,9 +598,9 @@ void nameBG(void) {
 static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
 	GXTexObj obj;
 	Mtx m;
-	f32 sy;
-	double ah;
 	double aw;
+	double ah;
+	f32 sy;
 
 	TEXGetGXTexObjFromPalette(*wp->field_0x60->data, &obj, id);
 	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
@@ -606,8 +609,7 @@ static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	ah = __fabs(h);
 	aw = __fabs(w);
-	sy = (f32)ah / GXGetTexObjHeight(&obj);
-	PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), sy, 1.0f);
+	PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
 	GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x, y, 0.0f);
@@ -700,8 +702,10 @@ void nameMaskGX(f32 t) {
 static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 y, f32 w, f32 h) {
 	GXTexObj obj;
 	Mtx m;
-	double ah;
+	double aw2;
+	double ah2;
 	double aw;
+	double ah;
 
 	GXSetNumTexGens(2);
 	TEXGetGXTexObjFromPalette(tpl, &obj, a);
@@ -719,7 +723,7 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
 	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj, GX_TEXMAP2);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
-	{ double ah2 = __fabs(h); double aw2 = __fabs(w);
+	{ ah2 = __fabs(h); aw2 = __fabs(w);
 	PSMTXScale(m, (f32)aw2 / GXGetTexObjWidth(&obj), (f32)ah2 / GXGetTexObjHeight(&obj), 1.0f);
 	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4); }
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);

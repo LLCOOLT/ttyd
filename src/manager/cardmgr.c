@@ -407,6 +407,41 @@ void cardWrite(s32 slot) {
     }
 }
 
+#pragma opt_propagation off
+static inline void memcard_probe(void) {
+    s32 memSize, sectorSize;
+    s32 result;
+    s32 i;
+    s32 timeout;
+
+    timeout = 1000000;
+    wp->flags |= 1;
+    i = 0;
+    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
+        if (++i > timeout) {
+            result = CARD_RESULT_FATAL_ERROR;
+            break;
+        }
+    }
+
+    if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
+        result = CARD_RESULT_WRONGDEVICE;
+    }
+    if (result == CARD_RESULT_READY) {
+        wp->result = CARD_RESULT_READY;
+        wp->chan = 0;
+    }
+    else if (result == CARD_RESULT_WRONGDEVICE) {
+        wp->result = CARD_RESULT_WRONGDEVICE;
+        wp->chan = 0;
+    }
+    else {
+        wp->result = result;
+        wp->chan = -1;
+    }
+    wp->flags &= ~1;
+}
+#pragma opt_propagation on
 #pragma opt_propagation on //needed for memcard_probe? TODO fix
 void write_main(void) {
     if (wp->result) {
@@ -1047,7 +1082,7 @@ static inline void make_header(void) {
 	memset(metadata, 0, sizeof(metadata->data));
 	strcpy(metadata->data.fileName, "ペーパーマリオＲＰＧ");
 	OSTicksToCalendarTime(OSGetTime(), &td);
-	sprintf(metadata->data.dateString, "%2d月%2d日のセーブデータです", td.mon + 1, td.mday);
+	sprintf(metadata->data.dateString, "%2d月%2d日のセーブデータです\0\0\0", td.mon + 1, td.mday);
 	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
 	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
 	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
@@ -1082,41 +1117,6 @@ static inline void make_data(void) {
     }
 }
 
-#pragma opt_propagation off
-static inline void memcard_probe(void) {
-    s32 memSize, sectorSize;
-    s32 result;
-    s32 i;
-    s32 timeout;
-
-    timeout = 1000000;
-    wp->flags |= 1;
-    i = 0;
-    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
-        if (++i > timeout) {
-            result = CARD_RESULT_FATAL_ERROR;
-            break;
-        }
-    }
-
-    if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
-        result = CARD_RESULT_WRONGDEVICE;
-    }
-    if (result == CARD_RESULT_READY) {
-        wp->result = CARD_RESULT_READY;
-        wp->chan = 0;
-    }
-    else if (result == CARD_RESULT_WRONGDEVICE) {
-        wp->result = CARD_RESULT_WRONGDEVICE;
-        wp->chan = 0;
-    }
-    else {
-        wp->result = result;
-        wp->chan = -1;
-    }
-    wp->flags &= ~1;
-}
-#pragma opt_propagation on
 
 void mountDetachCallback(s32 chan, s32 result) {
 	; //stubbed in retail

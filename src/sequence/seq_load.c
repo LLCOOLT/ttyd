@@ -864,8 +864,8 @@ void loadDraw(CameraId camera, void* param) {
         s16 level = save->data.pouch.level;
         OSTime time = save->data.global.retraceLocalTime;
         u16 stars = *(u16*)&save->data.pouch.mStarPowersObtained;
-        char* name = (char*)save->data.global.field_0x11BC;
         s32 gsw0 = save->data.global.mGSW0;
+        char* name = (char*)save->data.global.field_0x11BC;
         const char* str;
         s32 hours;
         s32 mins;
@@ -904,8 +904,8 @@ void loadDraw(CameraId camera, void* param) {
                 hours = 99;
                 mins = 59;
             } else {
-                hours = sec / 3600;
-                mins = (sec % 3600) / 60;
+                hours = (u64)sec / 3600;
+                mins = ((u64)sec % 3600) / 60;
             }
             if (strlen(name) != 0) {
                 FontDrawString(win->x - FontGetMessageWidth(name) / 2, 70.0f + win->y, name);
@@ -1040,6 +1040,13 @@ __declspec(section ".sdata") s32 evt_continue[] = {
     0x0002005B, (s32)evt_sub_animgroup_async, (s32)"OFF_f_in_out_peach",
     0x00000002, 0x00000001,
 };
+#pragma force_active on
+__declspec(section ".data") static u32 gap_06_803DB834_bss;
+#pragma force_active reset
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
+#pragma force_active reset
+
 
 void continueGame(void) {
     cardCopy2Main(wp->slot);

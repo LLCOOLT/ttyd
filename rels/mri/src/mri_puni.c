@@ -18,6 +18,7 @@
 #include <dolphin/gx.h>
 extern int rand(void);
 void PuniDokuritsu(PuniData* p);
+void puniHagurePos(PuniData* p);
 void puniMapdata_MRI_06_getidx(f32 x, f32 z, s32* bx, s32* bz);
 void puniMapdata_MRI_09_getidx(f32 x, f32 z, s32* bx, s32* bz);
 void puniMapdata_MRI_16_getidx(f32 x, f32 z, s32* bx, s32* bz);
@@ -197,7 +198,7 @@ USER_FUNC(evt_puni_init) {
 
     if (isFirstCall) {
         puniInit();
-        return EVT_RETURN_BLOCK;
+        return EVT_RETURN_DONE;
     }
     a0 = &Punigp->anim[0];
     a1 = &Punigp->anim[1];
@@ -810,7 +811,7 @@ BOOL searchMario(PuniData* p) {
 
 USER_FUNC(evt_puni_main) {
     puniMain();
-    return EVT_RETURN_BLOCK;
+    return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_puni_fade_onoff) {
@@ -1094,6 +1095,254 @@ USER_FUNC(evt_puni_debug_info) {
         if (i == 1 && swGet(0xB14)) {
             sprintf(buf, "No%03d,\201\203mri_03\202\314\230S\211\256\202\311\221\330\215\335\202\265\202\304\202\242\202\334\202\267\201\204\n", i);
         }
+    }
+    return EVT_RETURN_DONE;
+}
+
+extern double fabs(double);
+USER_FUNC(evt_puni_setup) {
+    s32* args = event->args;
+    MarioWork* mario = marioGetPtr();
+    s32 a0 = evtGetValue(event, args[0]);
+    s32 a1 = evtGetValue(event, args[1]);
+    s32 i;
+    PuniData* p;
+    BeroEntry** bero;
+    s32 n;
+    evtGetValue(event, args[2]);
+
+    Punigp->unk43C = 0;
+    if (a0 == 2) {
+        Punigp->unk324 &= ~0xF;
+        switch (a1) {
+            case 6:
+                Punigp->unk324 |= 1;
+                break;
+            case 2:
+                Punigp->unk324 |= 2;
+                break;
+            case 8:
+                Punigp->unk324 |= 4;
+                break;
+            case 9:
+                Punigp->unk324 |= 8;
+                break;
+        }
+    }
+    if (Punigp->unk328 == 9 || Punigp->unk328 == 12) {
+        Punigp->unk324 |= 0x20;
+    }
+    if (swByteGet(0x299) == 1) {
+        return EVT_RETURN_DONE;
+    }
+    p = &Punidat[1];
+    for (i = 1; i <= 109; i++, p++) {
+        s32 b0, b1, b2, b3, b4, b5, b6;
+        s32 off;
+        s32 ix, iy, iz;
+        f32 fx, fy, fz;
+        s32 a;
+        f32 sx, sy, sz;
+        if (p->unk4 & 0x40000000) {
+            p->unk4 &= ~0x40000000;
+            continue;
+        }
+        if (i >= 103) {
+            p->unk8 |= 0x20;
+            continue;
+        }
+        off = (i - 1) * 7;
+        b0 = (u8)_swByteGet(off);
+        b1 = (u8)_swByteGet(off + 1);
+        b2 = (u8)_swByteGet(off + 2);
+        b3 = (u8)_swByteGet(off + 3);
+        b4 = (u8)_swByteGet(off + 4);
+        b5 = (u8)_swByteGet(off + 5);
+        b6 = (u8)_swByteGet(off + 6);
+        ix = b1 + (b2 << 8);
+        if (ix & 0x8000) ix |= 0xFFFF0000;
+        iy = b3 + (b4 << 8);
+        if (iy & 0x8000) iy |= 0xFFFF0000;
+        iz = b5 + (b6 << 8);
+        if (iz & 0x8000) iz |= 0xFFFF0000;
+        fx = ix;
+        fy = iy;
+        fz = iz;
+        if (b0 != 0 && b0 != Punigp->unk328) continue;
+        if (i >= 103) {
+            a = 0;
+        } else {
+            a = (swByteGet(i / 8 + 0x28C) >> (i % 8)) & 1;
+        }
+        if (a != 0) continue;
+        if (i == 1) {
+            if (!swGet(0xB3C)) continue;
+            if (swGet(0xB14)) continue;
+            *(PuniData**)((u8*)Punigp + 0x364) = p;
+            p->unk4 |= 0x20;
+        } else if (i == 2) {
+            if (!swGet(0xB3D)) continue;
+            *(PuniData**)((u8*)Punigp + 0x368) = p;
+            p->unk4 |= 0x40;
+        } else if (i == 4) {
+            if (!swGet(0xB3F)) continue;
+            *(PuniData**)((u8*)Punigp + 0x370) = p;
+            p->unk4 |= 0x100;
+        } else if (i == 3) {
+            if (!swGet(0xB3E)) continue;
+            *(PuniData**)((u8*)Punigp + 0x36C) = p;
+            p->unk4 |= 0x80;
+        } else {
+            if (swByteGet(0x28B) + 5 <= i) continue;
+            p->unk4 |= 8;
+        }
+        if (b0 == 0) {
+            if (gp->flags & 1) {
+                sx = randf(mario->position.x - 10.0f, mario->position.x + 10.0f);
+                sy = mario->position.y;
+                sz = randf(mario->position.z - 10.0f, mario->position.z + 10.0f);
+                p->unkC = 1;
+            } else {
+                f32 ex, ey, ez;
+                f32 d, e;
+                sx = bero_get_BeroSX();
+                sy = bero_get_BeroSY();
+                d = fabs(sy - Punigp->posY[0]);
+                e = fabs(sy - Punigp->posY[1]);
+                if (d > e) { d = e; sy = Punigp->posY[1]; } else { sy = Punigp->posY[0]; }
+                e = fabs(bero_get_BeroSY() - Punigp->posY[2]);
+                if (d > e) { d = e; sy = Punigp->posY[2]; }
+                e = fabs(bero_get_BeroSY() - Punigp->posY[3]);
+                if (d > e) { sy = Punigp->posY[3]; }
+                sz = bero_get_BeroSZ();
+                ex = bero_get_BeroEX();
+                ey = bero_get_BeroEY();
+                ez = bero_get_BeroEZ();
+                if (!(Punigp->unk324 & 8)) {
+                    sx = randf(sx - 10.0f, sx + 10.0f);
+                    sz = randf(sz - 10.0f, sz + 10.0f);
+                } else {
+                    ez += 60.0f;
+                }
+                p->unk1F8.x = randf(ex - 10.0f, ex + 10.0f);
+                p->unk1F8.y = ey;
+                p->unk1F8.z = randf(ez - 10.0f, ez + 10.0f);
+                p->unkC = 25;
+                p->unk4 &= ~0x1000;
+            }
+        } else {
+            sx = fx;
+            sy = fy;
+            sz = fz;
+            p->unkC = 15;
+            p->unk4 |= 0x8000;
+        }
+        p->unk114 = 0;
+        p->anim = 0;
+        p->unk11E = 1000;
+        p->pos.x = sx;
+        p->pos.y = sy;
+        p->pos.z = sz;
+        p->unk138 = p->pos;
+        p->unk190.x = 6.0f;
+        p->unk190.y = 2.0f;
+        p->unk190.z = 3.0f;
+        p->hp = 60;
+        p->maxHp = 60;
+        p->regen = 10;
+        p->regenTimer = 60;
+        p->regenInterval = 60;
+        p->unk57E = 20;
+        p->unk580 = 10;
+        p->unk582 = 10;
+        p->damage = 0;
+        p->unk586 = 0;
+        p->unk588 = 50;
+        p->unk58A = 70;
+        p->parent = NULL;
+        p->child1 = NULL;
+        p->child2 = NULL;
+        PuniDokuritsu(p);
+        p->unk4 |= 0x1401;
+    }
+    bero = bero_get_ptr();
+    n = bero_get_BeroNUM();
+    for (i = 0; i < n; i++) {
+        if (bero[i]->kinddirArg3 == 9) {
+            PuniData* q = &Punidat[i + 0x6D];
+            q->unk4 |= 0x100400;
+            q->unkE = 28;
+            q->unkC = 28;
+            q->alpha = 25.0f;
+            hitObjGetPos(bero[i]->hitName, &q->pos);
+            {
+                f32 y = q->pos.y;
+                f32 d = fabs(y - Punigp->posY[0]);
+                f32 b = Punigp->posY[0];
+                f32 e = fabs(y - Punigp->posY[1]);
+                if (d > e) { d = e; b = Punigp->posY[1]; }
+                e = fabs(y - Punigp->posY[2]);
+                if (d > e) { d = e; b = Punigp->posY[2]; }
+                e = fabs(y - Punigp->posY[3]);
+                if (d > e) { b = Punigp->posY[3]; }
+                q->pos.y = b;
+            }
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_toge_setup) {
+    s32* args = event->args;
+    s32 end = 1;
+    s32 kind = evtGetValue(event, args[0]);
+    f32 x = evtGetValue(event, args[1]);
+    f32 y = evtGetValue(event, args[2]);
+    f32 z = evtGetValue(event, args[3]);
+    s32 i;
+    PuniData* p;
+
+    switch (kind) {
+        case 0:
+            return EVT_RETURN_DONE;
+        case 1:
+            end = 210;
+            break;
+        case 2:
+            end = 120;
+            break;
+    }
+    for (i = 110; i < end; i++) {
+        f32 rx, rz;
+        p = &Punidat[i];
+        rx = randf(x - 50.0f, x + 50.0f);
+        rz = randf(z - 120.0f, z + 120.0f);
+        p->unk4 |= 0x10;
+        p->unkC = 0;
+        p->pos.x = rx;
+        p->pos.y = y;
+        p->pos.z = rz;
+        *(s16*)&p->unk116[0] = i;
+        p->anim = 0;
+        p->unk114 = 0;
+        p->unk11E = 1000;
+        p->unk138 = p->pos;
+        p->unk190.x = 6.0f;
+        p->unk190.y = 2.0f;
+        p->unk190.z = 3.0f;
+        p->hp = 60;
+        p->maxHp = 60;
+        p->regen = 10;
+        p->regenTimer = 60;
+        p->regenInterval = 60;
+        p->unk57E = 20;
+        p->unk580 = 10;
+        p->unk582 = 10;
+        p->damage = 0;
+        p->unk586 = 0;
+        p->unk588 = 50;
+        p->unk58A = 70;
+        p->unk4 |= 0x101402;
     }
     return EVT_RETURN_DONE;
 }
@@ -1676,6 +1925,48 @@ USER_FUNC(evt_puni_dokan_onoff) {
     return EVT_RETURN_DONE;
 }
 
+static const Vec puni_save_zero = { 0.0f, 0.0f, 0.0f };
+USER_FUNC(evt_puni_all_save) {
+    s32 i;
+    PuniData* p = Punidat + 1;
+    Vec v;
+    for (i = 1; i <= 102; i++, p++) {
+        if ((p->unk4 & 0x400) && !(p->unk4 & 0x800000)) {
+            if (p->unk4 & 0x8000) {
+                s32 x, y, z, off;
+                puniHagurePos(p);
+                v = p->pos;
+                x = v.x;
+                y = v.y;
+                z = v.z;
+                off = (*(s16*)((u8*)p + 0x116) - 1) * 7;
+                _swByteSet(off, Punigp->unk328 & 0xFF);
+                _swByteSet(off + 1, x & 0xFF);
+                _swByteSet(off + 2, (x & 0xFF00) >> 8);
+                _swByteSet(off + 3, y & 0xFF);
+                _swByteSet(off + 4, (y & 0xFF00) >> 8);
+                _swByteSet(off + 5, z & 0xFF);
+                _swByteSet(off + 6, (z & 0xFF00) >> 8);
+            } else {
+                s32 x, y, z, off;
+                v = puni_save_zero;
+                off = (*(s16*)((u8*)p + 0x116) - 1) * 7;
+                x = v.x;
+                y = v.y;
+                z = v.z;
+                _swByteSet(off, 0);
+                _swByteSet(off + 1, x & 0xFF);
+                _swByteSet(off + 2, (x & 0xFF00) >> 8);
+                _swByteSet(off + 3, y & 0xFF);
+                _swByteSet(off + 4, (y & 0xFF00) >> 8);
+                _swByteSet(off + 5, z & 0xFF);
+                _swByteSet(off + 6, (z & 0xFF00) >> 8);
+            }
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(evt_target_flag_onoff) {
     s32* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
@@ -1748,6 +2039,26 @@ USER_FUNC(evt_puni_count) {
         }
     }
     evtSetValue(event, args[1], count);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_puni_count_area) {
+    s32* args = event->args;
+    f32 x = evtGetValue(event, args[0]);
+    f32 y = evtGetValue(event, args[1]);
+    f32 z = evtGetValue(event, args[2]);
+    f32 r = evtGetValue(event, args[3]);
+    s32 count = 0;
+    s32 i;
+    for (i = 1; i < 103; i++) {
+        PuniData* p = &Punidat[i];
+        if ((p->unk4 & 0x400) && p->unkC != 16) {
+            if (!(10.0 < __fabs(y - p->pos.y)) && !(r < __fabs(x - p->pos.x)) && !(r < __fabs(z - p->pos.z))) {
+                count++;
+            }
+        }
+    }
+    evtSetValue(event, args[4], count);
     return EVT_RETURN_DONE;
 }
 
@@ -2331,6 +2642,43 @@ void puniswGetindex(s32 base, s32 idx, s32* val, Vec* pos) {
     pos->x = x;
     pos->y = y;
     pos->z = z;
+}
+
+USER_FUNC(evt_puni_get_lsw_index) {
+    s32* args = event->args;
+    s32 base = args[0];
+    s32 idx = evtGetValue(event, args[1]);
+    s32 val;
+    Vec pos;
+    base += idx * 7;
+    puniswGetindex(base, 0, &val, &pos);
+    evtSetValue(event, args[2], val);
+    evtSetValue(event, args[3], (s32)pos.x);
+    evtSetValue(event, args[4], (s32)pos.y);
+    evtSetValue(event, args[5], (s32)pos.z);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_puni_set_lsw_index) {
+    s32* args = event->args;
+    s32 base = args[0];
+    s32 idx = evtGetValue(event, args[1]);
+    s32 val = evtGetValue(event, args[2]);
+    f32 fx = evtGetValue(event, args[3]);
+    f32 fy = evtGetValue(event, args[4]);
+    f32 fz = evtGetValue(event, args[5]);
+    s32 x = fx;
+    s32 y = fy;
+    s32 z = fz;
+    s32 off = base + idx * 7;
+    _swByteSet(off + 150000000, val & 0xFF);
+    _swByteSet(off + 150000001, x & 0xFF);
+    _swByteSet(off + 150000002, (x & 0xFF00) >> 8);
+    _swByteSet(off + 150000003, y & 0xFF);
+    _swByteSet(off + 150000004, (y & 0xFF00) >> 8);
+    _swByteSet(off + 150000005, z & 0xFF);
+    _swByteSet(off + 150000006, (z & 0xFF00) >> 8);
+    return EVT_RETURN_DONE;
 }
 
 void puniMapFindbuff(Vec* pos) {
@@ -3130,7 +3478,7 @@ USER_FUNC(evt_puni_korokoro) {
                 }
             }
             p->spin += evtGetValue(event, args[1]);
-            return EVT_RETURN_BLOCK;
+            return EVT_RETURN_DONE;
         default:
             if (p->unk4 & 8) {
                 p->unk188 = 0.0f;
@@ -3140,6 +3488,118 @@ USER_FUNC(evt_puni_korokoro) {
             p->spin = evtGetValue(event, args[2]);
             return EVT_RETURN_DONE;
     }
+}
+
+typedef struct PuniMoveView {
+    u8 pad[0x1F8];
+    Vec a;
+    Vec b;
+} PuniMoveView;
+extern f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
+extern f32 sysFrame2SecFloat(f32 frame);
+extern f32 sysMsec2FrameFloat(f32 msec);
+USER_FUNC(evt_puni_move_position) {
+    s32* args = event->args;
+    PuniData* p = &Punidat[evtGetValue(event, args[0])];
+    f32 x = evtGetValue(event, args[1]);
+    f32 z = evtGetValue(event, args[2]);
+    s32 frames = evtGetValue(event, args[3]);
+    s32 t;
+
+    if (isFirstCall) {
+        event->savedTime = gp->renderTime;
+        p->unk1F8 = p->pos;
+        *(f32*)((u8*)p + 0x204) = x;
+        *(f32*)((u8*)p + 0x208) = p->pos.y;
+        *(f32*)((u8*)p + 0x20C) = z;
+    }
+    t = (u32)(((u32)gp->renderTime - (u32)event->savedTime) / (*(u32*)0x800000F8 / 4 / 1000));
+    if (t < frames) {
+        p->pos.x = intplGetValue(0, t, frames, p->unk1F8.x, *(f32*)((u8*)p + 0x204));
+        p->pos.z = intplGetValue(0, t, frames, p->unk1F8.z, *(f32*)((u8*)p + 0x20C));
+        p->unk138 = p->pos;
+        return EVT_RETURN_BLOCK;
+    }
+    p->pos = *(Vec*)((u8*)p + 0x204);
+    p->unk138 = p->pos;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_puni_move_position2) {
+    s32* args = event->args;
+    PuniData* p = &Punidat[evtGetValue(event, args[0])];
+    PuniMoveView* v = (PuniMoveView*)p;
+    f32 x = evtGetValue(event, args[1]);
+    f32 z = evtGetValue(event, args[2]);
+    f32 speed = evtGetFloat(event, args[3]);
+    f32 dist;
+    s32 t;
+    Vec dir;
+
+    if (isFirstCall) {
+        event->savedTime = gp->renderTime;
+        v->a = p->pos;
+        v->b.x = x;
+        v->b.y = p->pos.y;
+        v->b.z = z;
+    }
+    speed = sysFrame2SecFloat(speed);
+    dist = PSVECDistance(&v->a, &v->b);
+    t = (s32)(0.5f + sysMsec2FrameFloat((s32)(((u32)gp->renderTime - (u32)event->savedTime) / (*(u32*)0x800000F8 / 4 / 1000))));
+    PSVECSubtract(&v->b, &v->a, &dir);
+    PSVECNormalize(&dir, &dir);
+    if (t < (s32)(dist / speed)) {
+        PSVECScale(&dir, &dir, speed * t);
+        PSVECAdd(&v->a, &dir, &p->pos);
+        return EVT_RETURN_BLOCK;
+    }
+    p->pos = v->b;
+    p->unk138 = p->pos;
+    return EVT_RETURN_DONE;
+}
+
+typedef struct PuniJumpView {
+    u8 pad[0x1C8];
+    u64 time;
+    u8 pad2[0x1EC - 0x1D0];
+    f32 grav;
+    f32 c;
+    u8 pad3[4];
+    Vec a;
+} PuniJumpView;
+
+USER_FUNC(evt_puni_jump_position) {
+    s32* args = event->args;
+    PuniData* p = &Punidat[evtGetValue(event, args[0])];
+    PuniJumpView* v = (PuniJumpView*)p;
+    f32 x = evtGetValue(event, args[1]);
+    f32 y = evtGetValue(event, args[2]);
+    f32 z = evtGetValue(event, args[3]);
+    s32 frames = evtGetValue(event, args[4]);
+    f32 h = evtGetValue(event, args[5]);
+    s32 t;
+    f32 r;
+
+    if (isFirstCall) {
+        v->time = gp->renderTime;
+        v->a = p->pos;
+        v->grav = -4.0f * h;
+        v->c = (y - v->a.y) - v->grav;
+        psndSFXOn_3D("SFX_STG2_PUNI_JUMP1", &p->pos);
+    }
+    t = ((u32)gp->renderTime - (u32)v->time) / ((*(u32*)0x800000F8 / 4) / 1000);
+    if (t < frames) {
+        r = (f32)t / (f32)frames;
+        r = (f32)t / (f32)frames;
+        p->pos.x = intplGetValue(0, (s32)t, frames, v->a.x, x);
+        p->pos.z = intplGetValue(0, (s32)t, frames, v->a.z, z);
+        p->pos.y = r * (v->grav * r + v->c) + v->a.y;
+        return EVT_RETURN_BLOCK;
+    }
+    p->pos.x = x;
+    p->pos.y = y;
+    p->pos.z = z;
+    return EVT_RETURN_DONE;
 }
 
 #define F(p, o) (*(s32*)((u8*)(p) + (o)))
@@ -5851,3 +6311,302 @@ void puniModePoint(PuniData* p) {
             break;
     }
 }
+
+#define HAGURE_FLOOR(dst, v) do { (dst) = (s32)(v); if ((v) < 0.0f) { (dst)--; } } while (0)
+static const Vec hagure_off = {0.0f, -1000.0f, 0.0f};
+void puniHagurePos(PuniData* p) {
+    Vec cur;
+    Vec a;
+    Vec b;
+    Vec c;
+    Vec d;
+    s32 ix;
+    s32 iz;
+
+    switch (p->unkC) {
+        case 17:
+        case 18:
+        case 19:
+        case 21:
+        case 22:
+            p->pos = hagure_off;
+            return;
+        default:
+            break;
+    }
+    cur = p->pos;
+    HAGURE_FLOOR(ix, cur.x);
+    HAGURE_FLOOR(iz, cur.z);
+    a.x = ix;
+    a.y = cur.y;
+    a.z = iz;
+    b.x = ix + 1;
+    b.y = cur.y;
+    b.z = iz + 1;
+    c.x = ix + 1;
+    c.y = cur.y;
+    c.z = iz;
+    d.x = ix;
+    d.y = cur.y;
+    d.z = iz + 1;
+    if (_puniVAtari(p, &cur, &a)) return;
+    if (_puniVAtari(p, &cur, &c)) return;
+    if (_puniVAtari(p, &cur, &b)) return;
+    _puniVAtari(p, &cur, &d);
+}
+
+static const Vec exit_zero0 = {0.0f, 0.0f, 0.0f};
+static const Vec exit_zero1 = {0.0f, 0.0f, 0.0f};
+#define EXIT_SWSET(idx, v, pv) do { \
+    Vec t = (pv); \
+    s32 x = t.x; \
+    s32 y = t.y; \
+    s32 z = t.z; \
+    s32 o = ((idx) - 1) * 7; \
+    _swByteSet(o, (v)); \
+    _swByteSet(o + 1, x & 0xFF); \
+    _swByteSet(o + 2, (x & 0xFF00) >> 8); \
+    _swByteSet(o + 3, y & 0xFF); \
+    _swByteSet(o + 4, (y & 0xFF00) >> 8); \
+    _swByteSet(o + 5, z & 0xFF); \
+    _swByteSet(o + 6, (z & 0xFF00) >> 8); \
+} while (0)
+
+USER_FUNC(evt_puni_exit) {
+    s32* args = event->args;
+    s32 a0 = evtGetValue(event, args[0]);
+    s32 a1;
+    const char* name;
+    f32 sx, sy, sz, ex, ey, ez;
+    s32 notMri00;
+    s32 i;
+    PuniData* p;
+    evtGetValue(event, args[1]);
+    a1 = evtGetValue(event, args[2]);
+    name = (const char*)evtGetValue(event, args[3]);
+
+    Punigp->unk43C = 5;
+    if (a0 == 2) {
+        Punigp->unk324 &= ~0xF;
+        switch (a1) {
+            case 6:
+                Punigp->unk324 |= 1;
+                break;
+            case 2:
+                Punigp->unk324 |= 2;
+                break;
+            case 8:
+                Punigp->unk324 |= 4;
+                break;
+            case 9:
+                Punigp->unk324 |= 8;
+                break;
+        }
+    }
+    if (name == NULL) {
+        Punigp->unk324 |= 0x10;
+    } else {
+        Punigp->unk324 &= ~0x10;
+    }
+    if (!(Punigp->unk324 & 8)) {
+        f32 d, e, y, best;
+        sx = bero_get_BeroSX();
+        y = bero_get_BeroSY();
+        best = Punigp->posY[0];
+        d = __fabs(y - best);
+        e = __fabs(y - Punigp->posY[1]);
+        if (d > e) { d = e; best = Punigp->posY[1]; }
+        e = __fabs(y - Punigp->posY[2]);
+        if (d > e) { d = e; best = Punigp->posY[2]; }
+        e = __fabs(y - Punigp->posY[3]);
+        if (d > e) { best = Punigp->posY[3]; }
+        sy = best;
+        sz = bero_get_BeroSZ();
+        ex = bero_get_BeroEX();
+        y = bero_get_BeroEY();
+        best = Punigp->posY[0];
+        d = __fabs(y - best);
+        e = __fabs(y - Punigp->posY[1]);
+        if (d > e) { d = e; best = Punigp->posY[1]; }
+        e = __fabs(y - Punigp->posY[2]);
+        if (d > e) { d = e; best = Punigp->posY[2]; }
+        e = __fabs(y - Punigp->posY[3]);
+        if (d > e) { best = Punigp->posY[3]; }
+        ey = best;
+        ez = bero_get_BeroEZ();
+    } else {
+        f32 d, e, y, best;
+        sx = bero_get_BeroSX();
+        y = bero_get_BeroSY();
+        best = Punigp->posY[0];
+        d = __fabs(y - best);
+        e = __fabs(y - Punigp->posY[1]);
+        if (d > e) { d = e; best = Punigp->posY[1]; }
+        e = __fabs(y - Punigp->posY[2]);
+        if (d > e) { d = e; best = Punigp->posY[2]; }
+        e = __fabs(y - Punigp->posY[3]);
+        if (d > e) { best = Punigp->posY[3]; }
+        sy = best;
+        ez = bero_get_BeroSZ();
+        ey = sy;
+        ex = sx;
+        sz = ez + 60.0f;
+    }
+    *(s32*)((u8*)Punigp + 0x47C) = 2;
+    *(f32*)((u8*)Punigp + 0x480) = sx;
+    *(f32*)((u8*)Punigp + 0x484) = sy;
+    *(f32*)((u8*)Punigp + 0x488) = sz;
+    *(f32*)((u8*)Punigp + 0x4B0) = 100.0f;
+    *(f32*)((u8*)Punigp + 0x48C) = ex;
+    *(f32*)((u8*)Punigp + 0x490) = ey;
+    *(f32*)((u8*)Punigp + 0x494) = ez;
+    *(f32*)((u8*)Punigp + 0x4B4) = 100.0f;
+    if (name != NULL) {
+        notMri00 = strcmp(name, "mri_00");
+    } else {
+        notMri00 = 1;
+    }
+    p = &Punidat[1];
+    for (i = 1; i <= 102; i++, p++) {
+        if (!(p->unk4 & 0x400)) continue;
+        if (p->unk4 & 0x800000) continue;
+        if (p->unk4 & 0x8000) {
+            if (name == NULL) {
+                p->unk4 |= 0x40000000;
+            } else {
+                puniHagurePos(p);
+                EXIT_SWSET(*(s16*)((u8*)p + 0x116), (u8)Punigp->unk328, p->pos);
+            }
+        } else {
+            EXIT_SWSET(*(s16*)((u8*)p + 0x116), 0, exit_zero0);
+            PuniDokuritsu(p);
+            if (notMri00 == 0) {
+                p->unkC = 14;
+                p->unk114 = 0;
+                p->anim = 0;
+            } else {
+                p->unkC = 26;
+                p->unk114 = 0;
+                p->anim = 2;
+            }
+        }
+    }
+    if (name != NULL && strcmp(name, "mri_00") == 0) {
+        for (i = 1; i <= 102; i++) {
+            EXIT_SWSET(i, 0, exit_zero1);
+        }
+    }
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_puni_init_puni) {
+    s32* args = event->args;
+    s32 idx = evtGetValue(event, args[0]);
+    s32 type = evtGetValue(event, args[1]);
+    PuniData* p = &Punidat[idx];
+    f32 x = evtGetFloat(event, args[2]);
+    f32 y = evtGetFloat(event, args[3]);
+    f32 z = evtGetFloat(event, args[4]);
+    s32 chk = evtGetValue(event, args[5]);
+
+    if (idx == 1) {
+        if (chk != 0 && swGet(0xB3C) == 0) {
+            return EVT_RETURN_DONE;
+        }
+        if (chk != 0 && swGet(0xB14) != 0) {
+            return EVT_RETURN_DONE;
+        }
+        *(PuniData**)((u8*)Punigp + 0x364) = p;
+        p->unk4 |= 0x20;
+    } else if (idx == 2) {
+        if (chk != 0 && swGet(0xB3D) == 0) {
+            return EVT_RETURN_DONE;
+        }
+        *(PuniData**)((u8*)Punigp + 0x368) = p;
+        p->unk4 |= 0x40;
+    } else if (idx == 4) {
+        if (chk != 0 && swGet(0xB3F) == 0) {
+            return EVT_RETURN_DONE;
+        }
+        *(PuniData**)((u8*)Punigp + 0x370) = p;
+        p->unk4 |= 0x100;
+    } else if (idx == 3) {
+        if (chk != 0 && swGet(0xB3E) == 0) {
+            return EVT_RETURN_DONE;
+        }
+        *(PuniData**)((u8*)Punigp + 0x36C) = p;
+        p->unk4 |= 0x80;
+    } else {
+        if (chk != 0 && swByteGet(0x28B) + 5 <= idx) {
+            return EVT_RETURN_DONE;
+        }
+        p->unk4 |= 8;
+    }
+    p->unkC = type;
+    p->unk114 = 0;
+    p->anim = 0;
+    p->unk11E = 1000;
+    p->pos.x = x;
+    p->pos.y = y;
+    p->pos.z = z;
+    p->unk138 = p->pos;
+    p->unk190.x = 6.0f;
+    p->unk190.y = 2.0f;
+    p->unk190.z = 3.0f;
+    p->hp = 60;
+    p->maxHp = 60;
+    p->regen = 10;
+    p->regenTimer = 60;
+    p->regenInterval = 60;
+    p->unk57E = 20;
+    p->unk580 = 10;
+    p->unk582 = 10;
+    p->damage = 0;
+    p->unk586 = 0;
+    p->unk588 = 50;
+    p->unk58A = 70;
+    p->parent = NULL;
+    p->child1 = NULL;
+    p->child2 = NULL;
+    PuniDokuritsu(p);
+    p->unk4 |= 0x1401;
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_puni_init_teki) {
+    s32* args = event->args;
+    s32 idx = evtGetValue(event, args[0]);
+    s32 type = evtGetValue(event, args[1]);
+    PuniData* p = &Punidat[idx];
+    f32 x = evtGetFloat(event, args[2]);
+    f32 y = evtGetFloat(event, args[3]);
+    f32 z = evtGetFloat(event, args[4]);
+
+    p->unk4 |= 0x10;
+    p->unkC = type;
+    p->anim = 0;
+    p->unk114 = 0;
+    p->unk11E = 1000;
+    p->pos.x = x;
+    p->pos.y = y;
+    p->pos.z = z;
+    p->unk138 = p->pos;
+    p->unk190.x = 6.0f;
+    p->unk190.y = 2.0f;
+    p->unk190.z = 3.0f;
+    p->hp = 60;
+    p->maxHp = 60;
+    p->regen = 10;
+    p->regenTimer = 60;
+    p->regenInterval = 60;
+    p->unk57E = 20;
+    p->unk580 = 10;
+    p->unk582 = 10;
+    p->damage = 0;
+    p->unk586 = 0;
+    p->unk588 = 50;
+    p->unk58A = 70;
+    p->unk4 |= 0x101402;
+    return EVT_RETURN_DONE;
+}
+

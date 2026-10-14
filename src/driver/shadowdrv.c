@@ -153,6 +153,7 @@ static f32 vertex_tbl[180] ATTRIBUTE_ALIGN(32) = {
 
 
 //.bss
+__declspec(section ".data") u32 gap_06_803C63D4_bss;
 CharShadowWork char_shadow_work;
 ProjShadowWork proj_shadow_work;
 DepthShadowWork depth_shadow_work;
@@ -182,9 +183,12 @@ static GXColor color_tbl[3] ATTRIBUTE_ALIGN(32) = {
 GXColor color_tbl_nodecay[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E},
 };
-GXColor color_tbl_cube[4] ATTRIBUTE_ALIGN(32) = {
+GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
 };
+#pragma explicit_zero_data on
+u32 gap_07_8040F4AC_sdata = 0;
+#pragma explicit_zero_data reset
 
 static inline void charShadowInit(void) {
     CharShadowWork* wp;
@@ -207,10 +211,10 @@ static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
-    u32 i;
-    u32 bufferSize;
     u16* ramp16;
     u8* ramp8;
+    u32 bufferSize;
+    u32 i;
 
     charShadowInit();
     depthShadowInit();
@@ -308,6 +312,7 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
 
 void shadowDisp(CameraId cameraId, void* param) {
     DispEntry* disp;
+    ShadowConfig* cfg;
     CameraEntry* cam;
 
     disp = dispGetCurWork();
@@ -332,7 +337,6 @@ void shadowDisp(CameraId cameraId, void* param) {
     } else if (cameraId == CAMERA_SHADOW) {
         switch (disp->renderMode) {
             case 5: {
-                ShadowConfig* cfg;
                 shadowCharShadowDisp_Collision(cameraId, param);
                 cfg = &shadowConfig[cswp->unk8];
                 if (cfg->follow == 1) {
@@ -390,7 +394,7 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
             query.targetPos.y += 1.0f;
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
             query.targetDistance = 150.0f;
-            if (hitCheckVecFilter(&query, _filter) == NULL) continue;
+            if (!hitCheckVecFilter(&query, _filter)) continue;
             size = entry->size;
             sy = entry->sizeY;
             m[0][3] = query.hitPos.x + query.hitNormal.x;
@@ -423,9 +427,10 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     s32 i;
     Mtx m;
     f32 w, h, fw, fh;
-    f32 z1, z0, x1, x0, cx, cz;
+    f32 z1, z0, x1, x0
+, cx, cz;
 
-    cfg = &shadowConfig[cswp->unk8];
+    cfg = &shadowConfig[wp->unk8];
     entry = wp->entries;
     view = camGetCurPtr()->view;
     alpha = cswp->unk100.a;

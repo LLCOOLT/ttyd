@@ -423,14 +423,7 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
     entry.iconId = iconId;
     id = entry.iconId;
-    {
-        IconBinary* bin = icon_bin;
-        if (!icon_tpl_ok || !icon_bin_ok) {
-            data = NULL;
-        } else {
-            data = (IconBinData*)((u8*)bin + bin->offset[id]);
-        }
-    }
+    data = iconGetBinData(id);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;

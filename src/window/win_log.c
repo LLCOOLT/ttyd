@@ -1073,7 +1073,7 @@ void monoshiriGX(WinLogWork* w, f32 x, f32 y);
 
 void winLogDisp(CameraId cam, WinLogWork* w, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor c4 = kW;
+    GXColor c1 = kW;
     GXColor c3 = kW;
     GXColor c2 = kW;
     Mtx m1;
@@ -1090,11 +1090,8 @@ void winLogDisp(CameraId cam, WinLogWork* w, s32 idx) {
         mapGX(w, x + w->fE2C, y + w->fE34);
     }
     if (y + w->fE70 > -480.0f) {
-        GXColor col;
         winTexInit(w->res->tex->tpl);
-        col = (GXColor){0xFF, 0xFF, 0xFF, 0x00};
-        col.a = w->fE78;
-        winTexSet(0x24, (Vec){x + w->fE68, y + w->fE70, 0.0f}, (Vec){60.0f, 1.0f, 1.0f}, col);
+        winTexSet(0x24, (Vec){x + w->fE68, y + w->fE70, 0.0f}, (Vec){60.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, w->fE78});
         for (i = 0; i < 7; i++) {
             Vec v = {0.0f, 0.0f, 170.0f};
             PSMTXRotRad(m1, 'x', 0.43633232f);
@@ -1194,7 +1191,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winTexInit(w->res->tex->tpl);
-        for (t = tubuDt, i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
+        for (i = 0, t = tubuDt; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
                 if (w->fE14 == i) {
                     winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -1251,7 +1248,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexSet(0xBF, (Vec){4.0f + (230.0f + x), y, 0.0f}, (Vec){1.0f, 32.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, 4.0f + top, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
         winTexSet(0xBF, (Vec){x, (y - 120.0f) - 4.0f, 0.0f}, (Vec){59.5f, 1.0f, 1.0f}, white);
-        s = fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+        s = fabs(2.0f * (f32)sin((f32)gp->retraceCount / 8.0f));
         winTexInit(w->res->tex->tpl);
         o = -240.0f == w->scrollY ? 0.0f : s;
         winTexSet(0xBD, (Vec){x, top + o, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -1276,21 +1273,22 @@ u16 FontGetMessageWidth(const char* msg);
 int sprintf(char* buf, const char* fmt, ...);
 
 void monoshiriGX(WinLogWork* w, f32 x, f32 y) {
+    GXColor k1;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor k0 = {0x00, 0x00, 0x00, 0xFF};
     GXColor k2;
-    GXColor k1 = (k2 = k0);
     char buf[256];
     char num[32];
-    const char* msg;
-    const char* name;
-    TattleEntry* te;
     s32 i;
     s32 id;
     u16 tw;
+    const char* msg;
+    const char* name;
+    TattleEntry* te;
     f32 fw;
     f32 ix;
 
+    k1 = (GXColor){0x00, 0x00, 0x00, 0xFF};
+    k2 = k1;
     winBookGX(w, 1, x, y);
     winKirinukiGX(w, 0, x - 110.0f, y - 160.0f, 100.0f, 50.0f);
     msg = msgSearch("msg_menu_monosiri_kazu");
@@ -1490,6 +1488,10 @@ void capture(CameraId camera, void* param) {
     Vec max;
     Vec v2;
     Vec v1;
+    Vec vv;
+    Vec tgt;
+    Vec up;
+    Vec cam;
     u16 bb0, bb1, bb2, bb3;
     u32 sx, sy, sw, sh;
     f32 cx;
@@ -1513,8 +1515,8 @@ void capture(CameraId camera, void* param) {
     data = (AnimBBox*)animPoseGetAnimDataPtr(m->pose1);
     min = (Vec){data->minX, data->minY, data->minZ};
     max = (Vec){data->maxX, data->maxY, data->maxZ};
-    cx = (max.x + min.x) * 0.5f;
-    cy = (max.y + min.y) * 0.5f;
+    cx = (max.x + min.x) / 2.0f;
+    cy = (max.y + min.y) / 2.0f;
     GXGetViewportv(vp);
     GXGetProjectionv(proj);
     GXGetScissor(&sx, &sy, &sw, &sh);
@@ -1530,17 +1532,15 @@ void capture(CameraId camera, void* param) {
     } else {
         dist = ((608.0f * (max.y - cy)) / 480.0f) / (f32)tan(0.21816615760326385);
     }
-    {
-        Vec cam = {0.0f, 0.0f, 0.0f};
-        Vec up = {0.0f, 1.0f, 0.0f};
-        Vec tgt = {0.0f, 0.0f, 0.0f};
-        cam.x = cx;
-        cam.y = cy;
-        cam.z = dist;
-        tgt.x = cx;
-        tgt.y = cy;
-        C_MTXLookAt(view, &cam, &up, &tgt);
-    }
+    tgt = (Vec){0.0f, 0.0f, 0.0f};
+    up = (Vec){0.0f, 1.0f, 0.0f};
+    cam = (Vec){0.0f, 0.0f, 0.0f};
+    cam.x = cx;
+    cam.y = cy;
+    cam.z = dist;
+    tgt.x = cx;
+    tgt.y = cy;
+    C_MTXLookAt(view, &cam, &up, &tgt);
     e = ((MonoDat**)m->file2->data)[0];
     n = ((u32*)m->file2->data)[1] / sizeof(MonoDat);
     for (i = 0; i < n; i++, e++) {
@@ -1578,7 +1578,7 @@ void capture(CameraId camera, void* param) {
         cnt = smartAlloc(dat_80419a28 * 4, 3)->address;
         idx = smartAlloc(2000, 3)->address;
         memset(cnt, 0, dat_80419a28 * 4);
-        for (i = 0; i < 500; i++) {
+        for (i = 0; 500 > i; i++) {
             idx[i] = cnt[i % dat_80419a28]++;
         }
         animPoseSetMaterialFlagOn(m->pose2, 0x1800);
@@ -1633,13 +1633,15 @@ void monosiri_disp(CameraId camera, void* param) {
     f32 s;
     f32 w;
     f32 xx;
-    s32 id;
-    TattleEntry* te;
     s32 mtx;
     s32 i;
+    s32 id;
+    TattleEntry* te;
     u16 tw;
     u16 th;
     s32 d;
+    GXColor c0;
+    GXColor c;
 
     x = m->curX;
     y = m->curY;
@@ -1666,11 +1668,7 @@ void monosiri_disp(CameraId camera, void* param) {
             GXSetTexCoordGen2(i, GX_TG_MTX2x4, GX_TG_TEX0, mtx, GX_FALSE, GX_PTIDENTITY);
         }
         GXSetTevColor(GX_TEVREG0, (GXColor){0xCF, 0xBC, 0x9E, 0xFF});
-        {
-            GXColor c = {0x00, 0x00, 0x00, 0x00};
-            c.a = m->alpha;
-            GXSetTevColor(GX_TEVREG1, c);
-        }
+        GXSetTevColor(GX_TEVREG1, (GXColor){0x00, 0x00, 0x00, m->alpha});
         GXSetNumTevStages(12);
         for (i = 0; i < 8; i++) {
             GXSetTevOrder(i, i, GX_TEXMAP1, GX_COLOR_NULL);
@@ -1704,15 +1702,13 @@ void monosiri_disp(CameraId camera, void* param) {
         {
             f32 x1 = 32.0f + x;
             f32 y1 = y - 8.0f;
-            f32 x2 = x1 + 216.0f;
-            f32 y2 = y1 - 160.0f;
             GXPosition3f32(x1, y1, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(x1, y2, 0.0f);
+            GXPosition3f32(x1, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
-            GXPosition3f32(x2, y2, 0.0f);
+            GXPosition3f32(x1 + 216.0f, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(x2, y1, 0.0f);
+            GXPosition3f32(x1 + 216.0f, y1, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
         }
         id = m->id;
@@ -1728,9 +1724,9 @@ void monosiri_disp(CameraId camera, void* param) {
         }
         w = 0.75f * FontGetMessageWidth(buf);
         winFontInit();
-        winFontSet((Vec){(248.0f - w) * 0.5f + (16.0f + x), y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        winFontSet((Vec){(16.0f + x) + (248.0f - w) * 0.5f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
         sprintf(buf, "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
         w = 0.75f * FontGetMessageWidth(buf);
-        winFontSet((Vec){1.0f + ((248.0f - w) * 0.5f + (16.0f + x)), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) * 0.5f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
     }
 }

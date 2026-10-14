@@ -210,8 +210,8 @@ void effFireworksMain(EffectEntry* effect) {
 #pragma pop
 
 void effFireworksDisp(CameraId cameraId, EffectEntry* effect) {
-    static s32 sflag;
     static s32 salpha;
+    static s32 sflag;
     CameraEntry* camera;
     EffFireworksN64Work* work;
     GXTexObj texObj;

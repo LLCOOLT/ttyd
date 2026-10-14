@@ -45,6 +45,8 @@ static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1
 static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
 static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
+double sin(double x);
+double cos(double x);
 static void ext_moamoa_main(void);
 void extLoadRenderMode(void);
 void extLoadVertex(void);
@@ -272,7 +274,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, "J", 1)) {
+        if (!strncmp(anim, "J\0\0", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -317,6 +319,40 @@ static const char* group_tbl[][2] = {
     {"c_konari", "G_1"},
     {"c_n_moa_a", "S_1"},
 };
+static inline void /**/ moamoa_pose_change_i(Moamoa* moa, const char* model, const char* anim) {
+    MoamoaPoseDef* def = wp->defs;
+    s32 i;
+
+    if (moa->flags & 0x800) {
+        model = group_tbl[moa->kind][0];
+        if (moa->kind >= 2) {
+            anim = group_tbl[moa->kind][1];
+        }
+        if (moa->kind == 10) {
+            anim = "S_2";
+        }
+    }
+    for (i = 0; i < wp->numDefs; i++, def++) {
+        if (!strcmp(def->model, model) && !strcmp(def->anim, anim)) {
+            break;
+        }
+    }
+    if (i < wp->numDefs && moa->pose != i) {
+        if (moa->flags & 4) {
+            if (strncmp(anim, "D", 1)) {
+                return;
+            }
+        }
+        if (moa->flags & 0x10) {
+            if (strncmp(anim, "R", 1)) {
+                return;
+            }
+        }
+        moa->pose = i;
+        moa->startTime = gp->renderTime;
+    }
+}
+
 #pragma dont_inline on
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
     MoamoaPoseDef* def = wp->defs;
@@ -352,39 +388,6 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     }
 }
 #pragma dont_inline reset
-static inline void moamoa_pose_change_i(Moamoa* moa, const char* model, const char* anim) {
-    MoamoaPoseDef* def = wp->defs;
-    s32 i;
-
-    if (moa->flags & 0x800) {
-        model = group_tbl[moa->kind][0];
-        if (moa->kind >= 2) {
-            anim = group_tbl[moa->kind][1];
-        }
-        if (moa->kind == 10) {
-            anim = "S_2";
-        }
-    }
-    for (i = 0; i < wp->numDefs; i++, def++) {
-        if (!strcmp(def->model, model) && !strcmp(def->anim, anim)) {
-            break;
-        }
-    }
-    if (i < wp->numDefs && moa->pose != i) {
-        if (moa->flags & 4) {
-            if (strncmp(anim, "D", 1)) {
-                return;
-            }
-        }
-        if (moa->flags & 0x10) {
-            if (strncmp(anim, "R", 1)) {
-                return;
-            }
-        }
-        moa->pose = i;
-        moa->startTime = gp->renderTime;
-    }
-}
 
 static USER_FUNC(evt_moamoa_flag_onoff) {
     s32* args = event->args;
@@ -684,7 +687,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (pose->mtx[1][3] > mario->position.y + mario->wPlayerCollisionBox.y) {
         return 0;
     }
-    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) * 0.5f
+    if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2.0f
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
         && wp->field_0x558 < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
@@ -699,8 +702,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         cam = camGetPtr(CAMERA_3D);
         rad = 6.2831855f * reviseAngle(cam->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
-        dist = 35.0f * moa_sin(rad) + mario->position.x;
-        if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cos(rad)) < 35.0f) {
+        dist = 35.0f * moa_sinx(rad) + mario->position.x;
+        if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cosx(rad)) < 35.0f) {
             return 2;
         }
     }
@@ -730,7 +733,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     e = (Vec){mario->position.x, pose->mtx[1][3], mario->position.z};
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-    range = (20.0f + mario->wPlayerCollisionBox.x) * 0.5f;
+    range = (20.0f + mario->wPlayerCollisionBox.x) / 2.0f;
     if (PSVECDistance(&e, &f) < range) {
         pose->mtx[0][3] = moa->field_0x28;
         pose->mtx[2][3] = moa->field_0x2c;
@@ -739,11 +742,11 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         if (dist < range) {
             angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
             if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-                mario->unk174.x = -((range - dist) * moa_sin(6.2831855f * mario->directionView / 360.0f));
-                mario->unk174.z = (range - dist) * moa_cos(6.2831855f * mario->directionView / 360.0f);
+                mario->unk174.x = -((range - dist) * moa_sinx(6.2831855f * mario->directionView / 360.0f));
+                mario->unk174.z = (range - dist) * moa_cosx(6.2831855f * mario->directionView / 360.0f);
             } else {
-                mario->unk174.x = pose->mtx[0][3] - range * moa_sin(6.2831855f * angle / 360.0f) - mario->position.x;
-                mario->unk174.z = pose->mtx[2][3] + range * moa_cos(6.2831855f * angle / 360.0f) - mario->position.z;
+                mario->unk174.x = pose->mtx[0][3] - range * moa_sinx(6.2831855f * angle / 360.0f) - mario->position.x;
+                mario->unk174.z = pose->mtx[2][3] + range * moa_cosx(6.2831855f * angle / 360.0f) - mario->position.z;
             }
         }
     }
@@ -759,24 +762,25 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 static void ext_moamoa_main(void) {
     MarioWork* mario;
     PartyEntry* party;
-    s32 hit;
     const char* voice;
-    s32 sfx;
-    s32 i;
     ExtPose* pose;
     Moamoa* moa;
+    s32 i;
+    s32 hit;
+    s32 sfx;
     s32 ret;
-    s32 idx;
-    f32 a;
     f32 s;
-    f32 rad;
-    f32 d;
-    f32 x;
     f32 y;
-    f32 z;
+    f32 rad;
     f32 t;
+    f32 z;
+    f32 d;
+    f32 a;
     f32 r;
+    f32 x;
+    Mtx m1;
     Mtx m;
+    Vec sp2_;
     Vec v;
 
     mario = marioGetPtr();
@@ -847,9 +851,9 @@ static void ext_moamoa_main(void) {
     }
 
     pose = extGetPosePtr();
-    voice = "SFX_STG6_MOAMOA_VOICE1";
-    sfx = 0;
     moa = wp->moa;
+    sfx = 0;
+    voice = "SFX_STG6_MOAMOA_VOICE1";
     for (i = 0; i < wp->count; i++, pose++, moa++) {
         wp->angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
         wp->dist = distABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
@@ -858,40 +862,49 @@ static void ext_moamoa_main(void) {
             if (ret == 1) {
                 moa->flags |= 4;
                 moa->state = 0x24;
-                idx = i % 3;
+                {
+                s32 idx;
                 wp->field_0x38++;
+                idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
+                }
                 }
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 hit = 1;
             } else if (ret == 2 || ret == 4) {
                 moa->flags |= 0xc;
                 moa->state = 0x2f;
-                idx = i % 3;
+                {
+                s32 idx;
                 wp->field_0x38++;
+                idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
+                }
                 }
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 if (ret != 4) {
                     hit = 1;
                 }
             } else if (ret == 3) {
+                x = (wp->breathDir + wp->angle) * 0.5f;
                 moa->flags |= 0x84;
                 moa->state = 0x30;
-                a = (wp->breathDir + wp->angle) * 0.5f;
-                moa->target = (Vec){0.0f, 0.0f, 0.0f};
+                { static const Vec zv = {0.0f, 0.0f, 0.0f}; moa->target = zv; }
                 s = randf(0.1f, 0.2f);
-                rad = 6.2831855f * a / 360.0f;
+                rad = 6.2831855f * x / 360.0f;
                 moa->vy = s * moa_sinx(rad);
                 moa->speed = randf(0.03f, 0.06f);
                 moa->gravity = s * -moa_cosx(rad);
                 moa->jumpTimer = 120;
-                idx = i % 3;
+                {
+                s32 idx;
                 wp->field_0x38++;
+                idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
+                }
                 }
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 hit = 1;
@@ -905,33 +918,38 @@ static void ext_moamoa_main(void) {
             }
         }
         if ((wp->flags & 1) && !(moa->flags & 0x444) && i == gp->retraceCount % wp->count && irand(1000) < 200) {
-            psndSFXOn_3D(voice, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
+            sp2_ = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]}; psndSFXOn_3D(voice, &sp2_);
         }
         switch (moa->state) {
             case 0:
                 if (i % 133 < 100) {
+                    f32 x, y, z;
                     a = randf(0.0f, 6.2831855f);
                     d = randf(0.0f, 50.0f);
-                    x = wp->target[i % 3].x + d * moa_sinx(a);
-                    z = wp->target[i % 3].z - d * moa_cosx(a);
-                    rad = 6.2831855f * angleABf(pose->mtx[0][3], pose->mtx[2][3], x, z) / 360.0f;
+                    {
+                        f32 rad;
+                        f32 tx = wp->target[i % 3].x + d * moa_sinx(a);
+                        f32 tz = wp->target[i % 3].z - d * moa_cosx(a);
+                        rad = 6.2831855f * angleABf(pose->mtx[0][3], pose->mtx[2][3], tx, tz) / 360.0f;
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
-                    s = randf(1.5f, 3.0f);
-                    moamoa_jump(pose, moa, moa->state, 1, x, y, z, s, randf(0.8f, 2.0f));
+                    }
+                    { f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, r1 * (3.0f - 1.5f) + 1.5f, r2 * (2.0f - 0.8f) + 0.8f); }
                     moa->flags |= 1;
                 } else {
+                    f32 x, y, z;
                     d = distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
-                    a = angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
+                    { f32 a = angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
+                    f32 rad;
                     if (d < 200.0f) {
                         a = randf(0.0f, 360.0f);
                     }
                     rad = 6.2831855f * a / 360.0f;
                     x = pose->mtx[0][3] + 5.0f * moa_sinx(rad);
                     y = pose->mtx[1][3];
-                    z = pose->mtx[2][3] - 5.0f * moa_cosx(rad);
-                    moamoa_jump(pose, moa, moa->state, 1, x, y, z, randf(0.3f, 0.5f), randf(0.5f, 0.8f));
+                    z = pose->mtx[2][3] - 5.0f * moa_cosx(rad); }
+                    { f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, r1 * (0.5f - 0.3f) + 0.3f, r2 * (0.8f - 0.5f) + 0.5f); }
                     moa->flags &= ~1;
                 }
                 break;
@@ -947,6 +965,8 @@ static void ext_moamoa_main(void) {
                 moa->state++;
                 moa->timer = 0;
             case 52:
+                {
+                f32 x, y, z;
                 if (moa->timer < 200) {
                     t = 1.0f;
                 } else {
@@ -961,13 +981,18 @@ static void ext_moamoa_main(void) {
                 z = wp->target[i % 3].z;
                 x += t * (moa->gravity * (f32)sin((f32)(i + gp->retraceCount) * 0.25f));
                 y += moa->speed * t;
-                z += t * (-moa->gravity * (f32)cos((f32)(i + gp->retraceCount) * 0.25f));
+                a = (f32)cos((f32)(i + gp->retraceCount) * 0.25f);
+                z += t * (-moa->gravity * a);
                 pose->mtx[0][3] += (x - pose->mtx[0][3]) / 15.0f;
                 pose->mtx[1][3] += (y - pose->mtx[1][3]) / 15.0f;
                 pose->mtx[2][3] += (z - pose->mtx[2][3]) / 15.0f;
                 moa->timer++;
+                }
                 break;
             case 1:
+                {
+                f32 rad;
+                f32 x, y, z;
                 a = wp->angle + randf(-45.0f, 45.0f);
                 d = wp->dist;
                 rad = 6.2831855f * a / 360.0f;
@@ -975,22 +1000,27 @@ static void ext_moamoa_main(void) {
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
                 moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, randf(1.0f, 1.0f), randf(0.4f, 0.4f));
+                                }
                 break;
             case 2:
                 a = wp->angle + randf(-45.0f, 45.0f) + 180.0f;
                 d = wp->dist;
-                rad = 6.2831855f * a / 360.0f;
+                {
+                f32 rad = 6.2831855f * a / 360.0f;
                 x = pose->mtx[0][3] + 30.0f * moa_sinx(rad);
+                }
                 y = pose->mtx[1][3];
-                z = pose->mtx[2][3] - 30.0f * moa_cosx(rad);
+                z = pose->mtx[2][3];
                 moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, 2.0f * randf(1.0f, 1.0f), 2.0f * randf(0.4f, 0.4f));
                 break;
             case 3:
                 pose->mtx[1][3] += moa->vy;
                 moa->vy -= moa->gravity;
-                rad = 6.2831855f * angleABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z) / 360.0f;
-                pose->mtx[0][3] += moa->speed * moa_sinx(rad);
-                pose->mtx[2][3] += moa->speed * -moa_cosx(rad);
+                {
+                f32 rad = 6.2831855f * angleABf(pose->mtx[0][3], pose->mtx[2][3], moa->target.x, moa->target.z) / 360.0f;
+                pose->mtx[0][3] += moa->speed * moa_sin(rad);
+                pose->mtx[2][3] += moa->speed * -moa_cos(rad);
+                }
                 if (--moa->jumpTimer < 0) {
                     pose->mtx[0][3] = moa->target.x;
                     pose->mtx[1][3] = moa->target.y;
@@ -1017,10 +1047,12 @@ static void ext_moamoa_main(void) {
                     z = wp->target[i % 3].z;
                 }
                 r = randf(-45.0f, 45.0f);
-                rad = 6.2831855f * (angleABf(x, z, pose->mtx[0][3], pose->mtx[2][3]) + r) / 360.0f;
+                {
+                f32 rad = 6.2831855f * (angleABf(x, z, pose->mtx[0][3], pose->mtx[2][3]) + r) / 360.0f;
                 x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
+                }
                 moamoa_jump(pose, moa, moa->state + 1, 1, x, y, z, randf(1.0f, 1.0f), randf(1.0f, 1.0f));
                 break;
             case 39:
@@ -1074,8 +1106,8 @@ static void ext_moamoa_main(void) {
                 break;
             case 25:
                 if (moa->timer < 30) {
-                    PSMTXRotRad(m, 'y', 0.20943952f);
-                    PSMTXConcat(m, pose->mtx, pose->mtx);
+                    PSMTXRotRad(m1, 'y', 0.20943952f);
+                    PSMTXConcat(pose->mtx, m1, pose->mtx);
                     pose->flags &= ~2;
                     moa->timer++;
                 } else {
@@ -1095,7 +1127,7 @@ static void ext_moamoa_main(void) {
                 r = randf(-45.0f, 45.0f);
                 a = angleABf(pose->mtx[0][3], pose->mtx[2][3], -275.0f, -100.0f) + r;
                 if (d > 6.0f && (y = pose->mtx[1][3]) < 60.0f) {
-                    rad = 6.2831855f * a / 360.0f;
+                    f32 rad = 6.2831855f * a / 360.0f;
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                     z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
                     moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * randf(1.0f, 1.0f), randf(1.0f, 1.0f));
@@ -1105,6 +1137,7 @@ static void ext_moamoa_main(void) {
                 break;
             case 28:
                 if (pose->mtx[0][3] > -350.0f) {
+                    f32 rad;
                     r = randf(-45.0f, 45.0f);
                     rad = 6.2831855f * (angleABf(pose->mtx[0][3], pose->mtx[2][3], -350.0f, -100.0f) + r) / 360.0f;
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
@@ -1143,7 +1176,7 @@ static void ext_moamoa_main(void) {
                 pose->mtx[1][3] += moa->target.y;
                 pose->mtx[2][3] += moa->target.z;
                 PSMTXRotRad(m, 'y', 0.20943952f);
-                PSMTXConcat(m, pose->mtx, pose->mtx);
+                PSMTXConcat(pose->mtx, m, pose->mtx);
                 pose->flags &= ~2;
                 if (pose->mtx[0][3] < -1000.0f) {
                     moa->state = 0x3e;
@@ -1171,6 +1204,7 @@ static void ext_moamoa_main(void) {
     moamoa_pose_main();
     wp->mobjY = wp->mobj->modelWorldMtx[1][3];
     if (wp->flags & 0x10) {
+        static const Vec zv2 = {0.0f, 0.0f, 0.0f};
         mario->unk174.x = 0.0f;
         mario->unk174.y = 0.0f;
         mario->unk174.z = 0.0f;
@@ -1178,7 +1212,9 @@ static void ext_moamoa_main(void) {
         v = (Vec){mario->unk174.x, mario->unk174.y, mario->unk174.z};
         if (PSVECMag(&v) > 2.0f) {
             PSVECNormalize(&v, &v);
-            mario->unk174 = (Vec){2.0f * v.x, 2.0f * v.y, 2.0f * v.z};
+            mario->unk174.x = 2.0f * v.x;
+            mario->unk174.y = 2.0f * v.y;
+            mario->unk174.z = 2.0f * v.z;
         }
     }
 }
@@ -1233,8 +1269,8 @@ static USER_FUNC(npc_jump) {
     vy = event->userdataf[1];
     speed = event->userdataf[2];
     angle = 6.2831855f * angleABf(npc->position.x, npc->position.z, x, z) / 360.0f;
-    npc->position.x = speed * moa_sin(angle) + npc->position.x;
-    npc->position.z = npc->position.z - speed * moa_cos(angle);
+    npc->position.x = speed * moa_sinx(angle) + npc->position.x;
+    npc->position.z = npc->position.z - speed * moa_cosx(angle);
     npc->position.y += vy;
     vy -= gravity;
     t -= 1.0f;
@@ -1723,3 +1759,5 @@ EVT_BEGIN(rsh_05_a_init_evt_nidome)
     RETURN
 EVT_END()
 
+
+__declspec(section ".data") s32 fd_pad_data = 0;

@@ -540,7 +540,7 @@ USER_FUNC(mario_main_func) {
     NpcEntry* npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
     NpcEntry* npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
     f32 d = b - a;
-    f32 r, rad, x, z, t;
+    f32 r, x, rad, z, t;
 
     ORBIT(0, mario->position);
     ORBIT(1, party->position);
@@ -767,10 +767,10 @@ USER_FUNC(cam_test_func) {
     s32* args = event->args;
     f32 angle, dist, rad, s, c;
     Vec center;
-    s32* p0 = args;
+    s32* p0;
     s32 ix, iz;
     angle = evtGetFloat(event, args[2]);
-    args++;
+    p0 = args++;
     dist = evtGetFloat(event, args[2]);
     rad = 6.2831855f * angle / 360.0f;
     s = sinf_l(rad);
@@ -780,9 +780,9 @@ USER_FUNC(cam_test_func) {
     center.y = 110.0f;
     center.z = 0.0f;
     ix = center.x + dist * s;
-    evtSetValue(event, p0[0], ix);
+    evtSetValue(event, *p0, ix);
     iz = center.z - dist * c;
-    evtSetValue(event, args[0], iz);
+    evtSetValue(event, *args, iz);
     return EVT_RETURN_DONE;
 }
 

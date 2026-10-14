@@ -87,17 +87,17 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
 };
 
 //.bss
-BadgeShopWork badgeshopwork;
 #pragma force_active on
 __declspec(section ".data") u32 gap_06_803E1894_bss[1];
 #pragma force_active reset
+BadgeShopWork badgeshopwork;
 
 
 //.sbss
-BadgeShopWork* bdsw;
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_08_80418B1C_sbss[1];
 #pragma force_active reset
+BadgeShopWork* bdsw;
 
 //local prototypes
 s32 bottakuruComp(const void** sortA, const void** sortB);
@@ -159,10 +159,9 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
-	int j, n;
-	s32* p;
 	s32 i;
-	u32 dobreak;
+	s32* p;
+	int j;
 	u32 k;
 	s16 count;
 
@@ -171,16 +170,16 @@ void badgeShop_bottakuruGeneration(void) {
 		table[k][0] = 0;
 	}
 
-	dobreak = 0;
+	k = 0;
 	p = (s32*)table;
 	for (i = 0; i < BADGE_MAX - 1; i++) {
 		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
 		for (j = 0; j < count; j++) {
-			p[dobreak*2+1] = irand(100);
-			p[dobreak++*2] = i + 1;
-			if (dobreak >= 0x10) break;
+			p[k*2+1] = irand(100);
+			p[k++*2] = i + 1;
+			if (k >= 0x10) break;
 		}
-		if (dobreak >= 0x10) break;
+		if (k >= 0x10) break;
 	}
 
 	qqsort(table, 0x11, 8, bottakuruComp);
@@ -309,18 +308,16 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	}
 
 	memset(table, 0, sizeof(table));
-	count2 = 0;
-	bdsw->field_0xF8[0] = 0;
-	bdsw->field_0xF8[1] = 0;
-	bdsw->field_0xF8[2] = 0;
-	bdsw->field_0xF8[3] = 0;
-	bdsw->field_0xF8[4] = 0;
-	bdsw->field_0x10C = 0;
-	bdsw->field_0x110 = 0;
+	count2 = count = v7 = i = 0;
+	bdsw->field_0xF8[0] = count;
+	bdsw->field_0xF8[1] = count;
+	bdsw->field_0xF8[2] = count;
+	bdsw->field_0xF8[3] = count;
+	bdsw->field_0xF8[4] = count;
+	bdsw->field_0x10C = count;
+	bdsw->field_0x110 = count;
 
-	count = 0;
-
-	for (i = 0; i < 99; i++) {
+	for (; i < 99; i++) {
 		value = 0;
 		has = badgeShop_get(bdsw->special_table, (s16)(i + BADGE_MIN)); //inline
 		if (has) {

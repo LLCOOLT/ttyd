@@ -377,8 +377,10 @@ static void actionCommandDisp(f32 x, f32 y) {
     GaugeAC* g;
     GaugeWork* cw;
     f32 ratio;
+    f32 t;
+    f32 step;
+    f32 ry, ry2, rx2;
     f32 rx;
-    f32 ry;
     s32 i;
     s32 n;
     u16 pressed;
@@ -396,8 +398,8 @@ static void actionCommandDisp(f32 x, f32 y) {
     disp->ratio = ratio;
     switch (g->mode) {
     case 1: {
-        f32 t = 100.0f * disp->ratio / (f32)g->target;
         u16 icon;
+        t = 100.0f * disp->ratio / (f32)g->target;
         if (t > 100.0f) {
             t = 100.0f;
         }
@@ -427,12 +429,12 @@ static void actionCommandDisp(f32 x, f32 y) {
             ry = 49.0f + y;
             btlDispGXInit2DRasta();
             GXLoadPosMtxImm(cam->view, 0);
-            btlDispGXQuads2DRasta(rx, ry, 10.0f + rx, ry - 16.0f, 0, 255, 0, 255);
+            btlDispGXQuads2DRasta(rx, ry, rx + 10.0f, ry - 16.0f, 0, 255, 0, 255);
         }
         n = g->target;
         for (i = 0; i < n; i++) {
-            f32 step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
             u16 icon = 0x91;
+            f32 step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
             if (cw->inRange) {
                 icon = 0x95;
             }

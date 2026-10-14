@@ -462,8 +462,8 @@ USER_FUNC(evt_moamoa_set_one) {
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
     Mtx m;
-    Moamoa* moa;
     ExtPose* pose = extGetPosePtr();
+    Moamoa* moa;
 
     (moa = &wp->moa[idx])->state = 3;
     {
@@ -476,8 +476,7 @@ USER_FUNC(evt_moamoa_set_one) {
     }
     if (!(moa->flags & 1)) {
         PSMTXRotRad(m, 'y', 1.5707964f);
-        pose += idx;
-        PSMTXConcat(pose->mtx, m, pose->mtx);
+        PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
         moa->flags |= 1;
     }
     return EVT_RETURN_DONE;

@@ -565,14 +565,14 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 				loop_newline++;
 			}
 			else {
-				OSGetFontTexture(textBase + i, &image, &x, &y, &width);
+				OSGetFontTexture(&textBase[i], &image, &x, &y, &width);
 				GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
 					(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP0);
 				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
 				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				w1 = width2;
+				h1 = height2; w1 = width2;
 				w2 = w1 + fontHeader->cellWidth;
 				h1 = height2;
 				h2 = h1 + fontHeader->cellHeight;

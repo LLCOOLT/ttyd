@@ -697,15 +697,14 @@ void _GetExpIcon_Init(SeqEndWork* work) {
 }
 
 void _GetExpIcon_Main(BattleWork* wp) {
-    s32 tens;
+    s32 new_var[2];
     SeqEndWork* work = SEW(wp);
     s32 exp = work->expDisp;
-    s32 ones;
     s32 i;
     f32 ofs;
 
-    tens = exp / 10;
-    for (i = 0; i < tens; i++) {
+    new_var[1] = exp / 10;
+    for (i = 0; i < new_var[1]; i++) {
         iconFlagOff(work->icons[i]->name, 2);
         if (work->alpha[i] <= 0) {
             work->alpha[i] = 0x40;
@@ -725,8 +724,8 @@ void _GetExpIcon_Main(BattleWork* wp) {
         work->alpha[i] = 0;
         work->counter[i] = 0;
     }
-    ones = exp % 10;
-    for (i = 10; i - 10 < ones; i++) {
+    new_var[0] = exp % 10;
+    for (i = 10; i - 10 < new_var[0]; i++) {
         iconFlagOff(work->icons[i]->name, 2);
         if (work->alpha[i] <= 0) {
             work->alpha[i] = 0x40;
@@ -901,12 +900,13 @@ USER_FUNC(_lvup_spot_on) {
         e->pos = v;
         break;
     }
-    case 3: {
-        Vec v = {0.0f, -10.0f, -50.0f};
-        v.x = 25.0f * n + -50.0f;
-        e->pos = v;
-        break;
-    }
+    case 3:
+        if (1) {
+            Vec v = {0.0f, -10.0f, -50.0f};
+            v.x = 25.0f * n + -50.0f;
+            e->pos = v;
+            break;
+        }
     case 4: {
         Vec v = {0.0f, 25.0f, -50.0f};
         v.x = 25.0f * n + -50.0f;
@@ -1071,7 +1071,7 @@ USER_FUNC(_lvup_object_select_move) {
     if (event->userdata[0] < event->userdata[1]) {
         obj->pos.x = intplGetValue(5, event->userdata[0], event->userdata[1], event->userdata[2], event->userdata[4]);
         obj->pos.z = intplGetValue(5, event->userdata[0], event->userdata[1], event->userdata[3], event->userdata[5]);
-        obj->rot.y = reviseAngle(intplGetValue(5, event->userdata[0], event->userdata[1], 0.0f, 2160.0f));
+        { f32 ang = intplGetValue(5, event->userdata[0], event->userdata[1], 0.0f, 2160.0f); obj->rot.y = reviseAngle(ang); }
         return 0;
     }
     obj->pos.x = event->userdata[4];

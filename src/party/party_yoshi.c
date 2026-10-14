@@ -87,9 +87,12 @@ void unk_800b474c(PartyEntry* party);
 #define P_S32(p, off) (*(s32*)((u8*)(p) + (off)))
 #define P_F32(p, off) (*(f32*)((u8*)(p) + (off)))
 
-f32 jumpheight;
-s32 evt_yoshi_frm;
+#pragma force_active on
+u32 gap_08_804188AC_sbss;
+#pragma force_active reset
 f32 evt_yoshi_spd;
+s32 evt_yoshi_frm;
+f32 jumpheight;
 
 s32 yoshiGetStatus(void);
 void inertia(PartyEntry* party);
@@ -1320,6 +1323,3 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
     *speed = dist;
 }
 
-#pragma force_active on
-u32 gap_08_804188AC_sbss;
-#pragma force_active reset

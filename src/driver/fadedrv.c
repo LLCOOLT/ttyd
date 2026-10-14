@@ -20,6 +20,7 @@ s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 extern GlobalWork* gp;
 
 static FadeWork* wp;
+__declspec(section ".sdata") static u8 i4tex[0x20] = {0xFF};
 
 //local prototypes
 void _callback(s32 error, DVDFileInfo* info);
@@ -856,7 +857,6 @@ void disp_texture(CameraId camId, void* param) {
 	Mtx mtx4;
 	GXTexObj obj;
 	f32 proj[7];
-	static u8 i4tex = 0xFF;
 
 	camera = camGetPtr(CAMERA_2D);
 	work = wp;
@@ -943,7 +943,7 @@ void disp_texture(CameraId camId, void* param) {
 		case 15:
 			GXLoadPosMtxImm(camera->view, 0);
 			GXSetCurrentMtx(0);
-			GXInitTexObj(&obj, &i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+			GXInitTexObj(&obj, i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
 			GXLoadTexObj(&obj, GX_TEXMAP0);
 			PSMTXIdentity(work->entries[0].texMtx);
 			work->entries[0].color.a = 255.0f * work->entries[0].field_0x24;
@@ -951,7 +951,7 @@ void disp_texture(CameraId camId, void* param) {
 		case 13:
 			GXLoadPosMtxImm(camera->view, 0);
 			GXSetCurrentMtx(0);
-			GXInitTexObj(&obj, &i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+			GXInitTexObj(&obj, i4tex, 1, 1, GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
 			GXLoadTexObj(&obj, GX_TEXMAP0);
 			PSMTXIdentity(work->entries[0].texMtx);
 			break;
@@ -1056,7 +1056,7 @@ static inline f32 fadeMadd(f32 a, f32 b, f32 c) { return a * b + c; }
 void disp_maku(CameraId camId, void* param) {
 	FadeEntry* entry = param;
 	CameraEntry* camera;
-	f32 scale, depth, mag, sx;
+	f32 scale, depth, sx, mag = 3.141592f;
 	Mtx mtx;
 	Mtx mtx2;
 	Vec dist;
@@ -1277,3 +1277,4 @@ TEXPalette* fadeGetTpl(void) {
 void fadeSetNarrowFast(void) {
 	wp->entries[1].flags |= 8;
 }
+

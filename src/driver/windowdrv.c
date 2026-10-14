@@ -11,6 +11,9 @@
 extern int sprintf(char* str, const char* format, ...);
 
 //.sbss
+#pragma force_active on
+u32 gap_08_8041880C_sbss;
+#pragma force_active reset
 WindowEntry* WinObjects;
 GXTexObj* wakuTexObj;
 extern BOOL unk_804187fc;
@@ -82,7 +85,7 @@ void windowTexSetup(void) {
 	unk_804187fc = FALSE;
 	winTpl = arcOpen("font/msgWindow.tpl", NULL, NULL);
 	if (!winTpl) {
-		sprintf(path, "%s/f/msgWindow.tpl", getMarioStDvdRoot());
+		sprintf(path, "%s/f/msgWindow.tpl\0", getMarioStDvdRoot());
 		entry = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
 		winTpl = __memAlloc(HEAP_DEFAULT, size);
@@ -1448,6 +1451,7 @@ s32 windowCheckID(s32 id) {
 	return windowGetPointer(id)->flags & 2;
 }
 
+#pragma force_active on
 WindowEntry* windowGetPointer(s32 id) {
 	return &WinObjects[id];
 }

@@ -156,9 +156,7 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
 }
 
 f32 partyNrmToAngle(Vec* n) {
-    f32 d = n->x * n->x;
-    d = d + n->z * n->z;
-    return angleABf(0.0f, 0.0f, party_sqrtf(d), -n->y);
+    return angleABf(0.0f, 0.0f, party_sqrtf(n->x * n->x + n->z * n->z), -n->y);
 }
 
 void partyChkGnd(PartyEntry* party) {
@@ -242,8 +240,8 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     sx = 0.375f * (party->width * (f32)sin(rad));
     sz = 0.375f * (party->width * -(f32)cos(rad));
     nsx = -sx;
-    baseY = party->position.y;
     nsz = -sz;
+    baseY = party->position.y;
     probeY = baseY + d;
     len = d + range;
     {
@@ -353,7 +351,7 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
         PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
         PF(party, 0xC8) = 0.0f;
         PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
-        PF(party, 0xE0) = angleABf(0.0f, 0.0f, party_sqrtf(n.x * n.x + n.z * n.z), -n.y);
+        PF(party, 0xE0) = partyNrmToAngle(&n);
         gy = outPos.y;
         if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
             *outDist = oy - gy;
@@ -513,7 +511,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     p.y += dy;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        if (angleABf(0.0f, 0.0f, party_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z), -nrm.y) >= 45.0f) {
+        if (partyNrmToAngle(&nrm) >= 45.0f) {
             PF(party, 0xEC) = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
@@ -539,7 +537,7 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     f32 d3, nz3, ny3, nx3, hz3, hy3, hx3;
     HitEntry* hit;
 
-    oz = 0.3f * party->width;
+    oz = party->width * 0.3f;
     sincosf(&s, &c, angle);
     px = pos->x;
     ox = -oz * c;
@@ -548,59 +546,67 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     pz = pos->z;
     best = *dist;
     {
+                lx = px + oz;
+                ly = py;
+                lz = pz + ox;
+        {
         Vec v0 = {0.0f, 0.0f, 0.0f};
-        lx = px + oz;
-        ly = py;
-        lz = pz + ox;
         v0.y = ly;
         v0.z = lz;
         v0.x = lx;
         t = v0;
+        }
         d0 = best;
-        hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, 10.0f + t.y, t.z, 0.0f, 1.0f, 0.0f);
         if (hit && best >= d0) {
             best = d0;
         }
     }
     if (!hit) {
+                lx = px - oz;
+                ly = py;
+                lz = pz - ox;
+        {
         Vec v1 = {0.0f, 0.0f, 0.0f};
-        lx = px - oz;
-        ly = py;
-        lz = pz - ox;
         v1.y = ly;
         v1.z = lz;
         v1.x = lx;
         t = v1;
+        }
         d1 = best;
-        hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+        hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, 10.0f + t.y, t.z, 0.0f, 1.0f, 0.0f);
         if (hit && best >= d1) {
             best = d1;
         }
         if (!hit) {
-            Vec v2 = {0.0f, 0.0f, 0.0f};
-            lx = px + ox;
-            ly = py;
-            lz = pz + oz;
+                        lx = px + ox;
+                        ly = py;
+                        lz = pz + oz;
+        {
+        Vec v2 = {0.0f, 0.0f, 0.0f};
             v2.y = ly;
             v2.z = lz;
             v2.x = lx;
             t = v2;
+        }
             d2 = best;
-            hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+            hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, 10.0f + t.y, t.z, 0.0f, 1.0f, 0.0f);
             if (hit && best >= d2) {
                 best = d2;
             }
             if (!hit) {
-                Vec v3 = {0.0f, 0.0f, 0.0f};
-                lx = px - ox;
-                ly = py;
-                lz = pz - oz;
+                                lx = px - ox;
+                                ly = py;
+                                lz = pz - oz;
+        {
+        Vec v3 = {0.0f, 0.0f, 0.0f};
                 v3.y = ly;
                 v3.z = lz;
                 v3.x = lx;
                 t = v3;
+        }
                 d3 = best;
-                hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+                hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, 10.0f + t.y, t.z, 0.0f, 1.0f, 0.0f);
                 if (hit && best >= d3) {
                     best = d3;
                 }

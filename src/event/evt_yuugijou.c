@@ -68,6 +68,7 @@ static inline s32 MAX0(s32 x) {
 }
 
 void yuugijou_init(void) {
+	s32 t;
 	yuwp = &yuugijouwork;
 	memset(yuwp, 0, sizeof(PiantaParlorWork));
 
@@ -102,10 +103,14 @@ void yuugijou_init(void) {
 	yuwp->field_0x9C = 0x8A;
 
 	yuwp->field_0xEC = MAX0(((700 - (s32)yuwp->field_0x8C) * 15) / 700) + 1;
-	yuwp->field_0xF0 = MAX0(((700 - (s32)yuwp->field_0x90) * 15) / 700);
-	yuwp->field_0xF4 = MAX0(((700 - (s32)yuwp->field_0x94) * 15) / 700);
-	yuwp->field_0xF8 = MAX0(((700 - (s32)yuwp->field_0x98) * 15) / 700);
-	yuwp->field_0xFC = MAX0(((700 - (s32)yuwp->field_0x9C) * 15) / 700);
+	t = (700 - (s32)yuwp->field_0x90) * 15;
+	yuwp->field_0xF0 = MAX0(t / 700);
+	t = (700 - (s32)yuwp->field_0x94) * 15;
+	yuwp->field_0xF4 = MAX0(t / 700);
+	t = (700 - (s32)yuwp->field_0x98) * 15;
+	yuwp->field_0xF8 = MAX0(t / 700);
+	t = (700 - (s32)yuwp->field_0x9C) * 15;
+	yuwp->field_0xFC = MAX0(t / 700);
 
 	yuwp->field_0x44 = 1;
 	yuwp->field_0x48 = 1;
@@ -120,9 +125,11 @@ void yuugijou_init(void) {
 	yuwp->field_0xB4 = 0x1E3AC;
 
 	yuwp->field_0x104 = MAX0(((s32)yuwp->field_0xA4 - 109000) / 2000) + 7;
-	yuwp->field_0x108 = MAX0(((s32)yuwp->field_0xA8 - 109000) / 2000) + 6;
+	t = (s32)yuwp->field_0xA8 - 109000;
+	yuwp->field_0x108 = MAX0(t / 2000) + 6;
 	yuwp->field_0x10C = MAX0(((s32)yuwp->field_0xAC - 109000) / 2000) + 4;
-	yuwp->field_0x110 = MAX0(((s32)yuwp->field_0xB0 - 109000) / 2000) + 4;
+	t = (s32)yuwp->field_0xB0 - 109000;
+	yuwp->field_0x110 = MAX0(t / 2000) + 4;
 	yuwp->field_0x114 = MAX0(((s32)yuwp->field_0xB4 - 109000) / 2000) + 1;
 
 	yuwp->field_0x5C = 1;
@@ -137,10 +144,13 @@ void yuugijou_init(void) {
 	yuwp->field_0xC8 = 0x1627E;
 	yuwp->field_0xCC = 0x15950;
 
-	yuwp->field_0x11C = MAX0(((s32)yuwp->field_0xBC - 74000) / 2000) + 7;
-	yuwp->field_0x120 = MAX0(((s32)yuwp->field_0xC0 - 74000) / 2000) + 6;
+	t = (s32)yuwp->field_0xBC - 74000;
+	yuwp->field_0x11C = MAX0(t / 2000) + 7;
+	t = (s32)yuwp->field_0xC0 - 74000;
+	yuwp->field_0x120 = MAX0(t / 2000) + 6;
 	yuwp->field_0x124 = MAX0(((s32)yuwp->field_0xC4 - 74000) / 2000) + 4;
-	yuwp->field_0x128 = MAX0(((s32)yuwp->field_0xC8 - 74000) / 2000) + 3;
+	t = (s32)yuwp->field_0xC8 - 74000;
+	yuwp->field_0x128 = MAX0(t / 2000) + 3;
 	yuwp->field_0x12C = MAX0(((s32)yuwp->field_0xCC - 74000) / 2000) + 4;
 }
 static inline s32 cmpSign(s32 a, s32 b) {

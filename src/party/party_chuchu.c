@@ -174,16 +174,14 @@ USER_FUNC(search_result) {
 }
 
 static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
-    MarioWork* player2;
     int found;
     u32 i;
     ChuchuTreasure* tbl;
     f32 minDist;
 
-    player2 = pl;
     found = 0;
-    tbl = unk_8038bb34;
     minDist = 10000.0f;
+    tbl = unk_8038bb34;
     for (i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
@@ -193,7 +191,7 @@ static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&player2->position, &pos);
+            d = PSVECDistance(&pl->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -209,9 +207,6 @@ static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
 USER_FUNC(set_msg) {
     MapObjectEntry* mobj;
     ItemEntry* item;
-    ChuchuTreasure* tbl;
-    MarioWork* player2;
-    u32 i;
     int found;
     MarioWork* player;
     int pass;

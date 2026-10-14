@@ -59,7 +59,17 @@ extern GXColor unk_80422f60;
 double cos(double);
 double sin(double);
 
-static inline const char* getAreaName(void);
+static inline const char* getAreaName(void) {
+    const char* area_name = _next_area;
+    if (!strcmp(_next_area, "tou")) {
+        if (seqGetSeq() == 1) {
+            area_name = "tou2";
+        } else if (!strcmp(_next_map, "tou_03")) {
+            area_name = "tou2";
+        }
+    }
+    return area_name;
+}
 
 void seq_mapChangeInit(SequenceWork* work) {
     strcpy(_next_area, "");
@@ -93,6 +103,8 @@ void seq_mapChangeExit(SequenceWork* work) {
     dbg_lotteryinfo = FALSE;
 }
 
+typedef struct { const char* s[2]; } LangTbl;
+static const LangTbl lang_tbl = {{"jp", "us"}};
 void seq_mapChangeMain(SequenceWork* work) {
     BOOL newarea = strcmp(_next_area, gp->currentAreaName) != 0;
     const char* area_name;
@@ -239,8 +251,8 @@ void seq_mapChangeMain(SequenceWork* work) {
         if (strncmp(_next_map, "dmo", 3) && strncmp(_next_map, "dig", 3) && strncmp(_next_map, "end", 3) &&
             strncmp(_next_map, "sys", 3) && strncmp(_next_map, "gor_10", 6)) {
             {
-            const char* lang[2] = {"jp", "us"};
-            fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang[gp->language]);
+            LangTbl lang = lang_tbl;
+            fileAsyncf(4, 0, "%s/window/%s/win.tpl", getMarioStDvdRoot(), lang.s[gp->language]);
             }
             animGroupBaseAsync("p_jyabara", 0, 0);
             animGroupBaseAsync("p_kaiten_h", 0, 0);
@@ -286,7 +298,7 @@ void seq_mapChangeMain(SequenceWork* work) {
                 evtEntryType(key_off, 0, 0, 0);
                 break;
             default:
-                fadeEntry(0x1c, 0, unk_80422f60);
+                fadeEntry(0x1c, 0, (GXColor){0, 0, 0, 0});
                 break;
             }
             statusWinForceUpdate();
@@ -457,16 +469,4 @@ void _relUnLoad(void) {
         }
         gp->relocationBase = NULL;
     }
-}
-
-static inline const char* getAreaName(void) {
-    const char* area_name = _next_area;
-    if (!strcmp(_next_area, "tou")) {
-        if (seqGetSeq() == 1) {
-            area_name = "tou2";
-        } else if (!strcmp(_next_map, "tou_03")) {
-            area_name = "tou2";
-        }
-    }
-    return area_name;
 }

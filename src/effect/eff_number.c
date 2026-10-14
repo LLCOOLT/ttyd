@@ -5,22 +5,22 @@
 #include <stdio.h>
 #include <string.h>
 
+static const f32 padz = 0.0f;
+
 void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
-    GXColor top;
-    GXColor bottom;
+    CameraEntry* cam;
+    GXColor cols[2];
     GXColor tevColor;
     GXTexObj texObj;
     Mtx posMtx;
     Mtx scaleMtx;
     s8 buf[32];
-    CameraEntry* cam;
     s32 len;
-    s32 half;
     s32 offset;
     s32 pass;
     f32 lo;
     f32 hi;
-    f32 sp;
+    s32 half;
     s32 i;
 
     cam = camGetCurPtr();
@@ -30,8 +30,8 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
         GXColor cb = { 0xFF, 0xF0, 0xF1, 0 };
         ca.a = alpha;
         cb.a = alpha;
-        top = ca;
-        bottom = cb;
+        cols[1] = ca;
+        cols[0] = cb;
         break;
     }
     case 1: {
@@ -39,8 +39,8 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
         GXColor cb = { 0xEB, 0xFE, 0x6F, 0 };
         ca.a = alpha;
         cb.a = alpha;
-        top = ca;
-        bottom = cb;
+        cols[1] = ca;
+        cols[0] = cb;
         break;
     }
     case 2: {
@@ -48,8 +48,8 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
         GXColor cb = { 0xFF, 0xC5, 0x18, 0 };
         ca.a = alpha;
         cb.a = alpha;
-        top = ca;
-        bottom = cb;
+        cols[1] = ca;
+        cols[0] = cb;
         break;
     }
     case 3:
@@ -58,8 +58,8 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
         GXColor cb = { 0xFF, 0xFF, 0xFF, 0 };
         ca.a = alpha;
         cb.a = alpha;
-        top = ca;
-        bottom = cb;
+        cols[1] = ca;
+        cols[0] = cb;
         break;
     }
     }
@@ -77,7 +77,7 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 
-    sp = 32.0f;
+
     lo = -24.0f;
     hi = 24.0f;
     sprintf((char*)buf, "%d", number);
@@ -121,7 +121,7 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
             GXSetTevSwapMode(GX_TEVSTAGE2, GX_TEV_SWAP0, GX_TEV_SWAP0);
         }
         for (i = 0; i < len; i++) {
-            PSMTXTrans(posMtx, sp * (f32)(half - i) - (f32)offset, (f32)offset, 0.0f);
+            PSMTXTrans(posMtx, 32.0f * (f32)(half - i) - (f32)offset, (f32)offset, 0.0f);
             PSMTXConcat(mtx, posMtx, posMtx);
             PSMTXConcat(cam->view, posMtx, posMtx);
             GXLoadPosMtxImm(posMtx, GX_PNMTX0);
@@ -139,16 +139,16 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
             }
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             GXPosition3f32(lo, hi, 0.0f);
-            GXColor4u8(top.r, top.g, top.b, top.a);
+            GXColor4u8(cols[1].r, cols[1].g, cols[1].b, cols[1].a);
             GXTexCoord2f32(0.0f, 0.0f);
             GXPosition3f32(hi, hi, 0.0f);
-            GXColor4u8(top.r, top.g, top.b, top.a);
+            GXColor4u8(cols[1].r, cols[1].g, cols[1].b, cols[1].a);
             GXTexCoord2f32(1.0f, 0.0f);
             GXPosition3f32(hi, lo, 0.0f);
-            GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
+            GXColor4u8(cols[0].r, cols[0].g, cols[0].b, cols[0].a);
             GXTexCoord2f32(1.0f, 1.0f);
             GXPosition3f32(lo, lo, 0.0f);
-            GXColor4u8(bottom.r, bottom.g, bottom.b, bottom.a);
+            GXColor4u8(cols[0].r, cols[0].g, cols[0].b, cols[0].a);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }

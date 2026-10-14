@@ -165,11 +165,12 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     s32 frame;
     s32 bright;
     s32 i;
-    effN64Vtx* vtx;
-    s32 k;
-    effN64Vtx* p;
-    s32 n;
     s32 t;
+    effN64Vtx* vtx;
+    effN64Vtx* p;
+    s32 k;
+    s32 n;
+
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -204,7 +205,7 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
     GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, work->alpha});
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
-    for (i = 0, p = vtx; i < 16; i++, p += 2) {
+    for (p = vtx, i = 0; i < 16; i++, p += 2) {
         f32 sc;
         f32 a1;
         f32 a2;

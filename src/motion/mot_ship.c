@@ -205,6 +205,8 @@ void mot_ship_post(void) {
 	marioOfsRotReset();
 	if (marioGetPtr()->motStruct != NULL) {
 		__memFree(HEAP_DEFAULT, marioGetPtr()->motStruct);
+		if ((!m) && (!m)) {
+		}
 		t = 0;
 		marioGetPtr()->motStruct = (void*)t;
 	}

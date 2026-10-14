@@ -1334,5 +1334,6 @@ BOOL winLectureCheck(void) {
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
 s32 gap_08_80418A1C_sbss = 0;
-__declspec(section ".sdata2") const u32 gap_09_8041DCCC_sdata2[1] = {0};
+
+__declspec(section ".sdata2") const f32 float_0p5_8041dc98 = 0.5f;
 #pragma force_active reset

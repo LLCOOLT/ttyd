@@ -48,7 +48,7 @@ EffectEntry* effKemuri12N64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f3
     EffKemuri12N64Work* work;
 
     effect = effEntry();
-    effect->type = "Kemuri12N64";
+    effect->type = "Kemuri12N64\0\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri12N64Work));
     effect->userdata = work;
@@ -108,13 +108,13 @@ void effKemuri12Main(EffectEntry* effect) {
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     u16 type;
-    s32 idx;
     s32 last;
-    CameraEntry* camera;
+    s32 idx;
     EffKemuri12N64Work* work;
-    effN64Vtx* vtx;
+    CameraEntry* camera;
     s32 ofs;
     s32 alpha;
+    effN64Vtx* vtx;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rot;
@@ -122,10 +122,10 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    type = work->type;
     idx = work->progress;
-    alpha = (s32)(256.0f * (work->progress - idx));
+    alpha = (s32)(256.0f * (work->progress - (f32)idx));
     last = (idx == 7);
+    type = work->type;
     GXSetNumChans(0);
     GXSetNumTevStages(3);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
@@ -161,7 +161,7 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
-    ofs = idx * 32;
+    ofs = idx << 5;
     PSMTXScale(scaleMtx, 0.00390625f, 0.03125f, 0.0f);
     PSMTXTrans(mtx, ofs, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, mtx, scaleMtx);

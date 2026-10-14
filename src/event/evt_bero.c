@@ -62,10 +62,12 @@ USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry) {
 	s32* args = event->args;
 	s32 x, y, z;
 
-	x = evtGetValue(event, args[0]);
-	y = evtGetValue(event, args[1]);
-	z = evtGetValue(event, args[2]);
-	N_marioSetBottomlessRespawnPosOnBeroEntry((f32)x, (f32)y, (f32)z);
+	if (1) {
+		x = evtGetValue(event, args[0]);
+		y = evtGetValue(event, args[1]);
+		z = evtGetValue(event, args[2]);
+		N_marioSetBottomlessRespawnPosOnBeroEntry((f32)x, (f32)y, (f32)z);
+	}
 	return EVT_RETURN_DONE;
 }
 

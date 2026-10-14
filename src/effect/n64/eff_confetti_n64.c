@@ -264,7 +264,6 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 anm;
     s32 type;
     EffConfettiN64Work* w;
     s32 i;
@@ -272,7 +271,10 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     s32 count;
     CameraEntry* camera;
     u8* col;
+    u8* seq;
+    s32 frm;
     s32 off;
+    s32 anm;
     Mtx tmp;
     Mtx scale;
     Mtx rot;
@@ -304,8 +306,9 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     anm = (anm >> 1) % 6;
     type = type % 10;
+    seq = anm_seq;
     for (i = 0; i < count; i++, w++) {
-        col = color_table + (i % 12) * 3;
+        col = &color_table[(i % 12) * 3];
         if (w->delay > 0) {
             continue;
         }
@@ -315,7 +318,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetCurrentMtx(0);
         GXSetTevColor(GX_TEVREG0, (GXColor){col[0], col[1], col[2], alpha});
         GXSetTevColor(GX_TEVREG1, (GXColor){0x3C, 0x3C, 0x3C, 0});
-        off = ((i + anm_seq[anm]) & 0xF) << 6;
+        off = ((i + seq[anm]) & 0xF) << 6;
         PSMTXScale(scale, 0.0625f, 0.00390625f, 0.0f);
         PSMTXTrans(tmp, 0.0f, (f32)off, 0.0f);
         PSMTXConcat(scale, tmp, scale);

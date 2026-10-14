@@ -123,7 +123,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     dh = 0.5f * (MF(m, 0x1B8) + h);
     dw = 0.5f * (MF(m, 0x1B4) + w);
     dx = __fabsf(MF(m, 0x8C) - x);
-    dy = __fabsf(0.5f * MF(m, 0x1B8) + MF(m, 0x90) - y - 0.5f * h);
+    dy = __fabsf((MF(m, 0x90) + 0.5f * MF(m, 0x1B8)) - y - 0.5f * h);
     if (dy <= dh && dx <= dw) {
         if ((m->flags & 0x20000) && MF(m, 0x90) > y) {
             if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && MS16(m, 0x4C) == 0 && z < 50.0f) {

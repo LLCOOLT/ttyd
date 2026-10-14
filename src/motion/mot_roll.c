@@ -100,14 +100,18 @@ static inline f32 roll_sqrtf(f32 x) {
 }
 
 static inline f32 trunc10(f32 x) {
-    return (f32)(s32)(10.0f * x) / 10.0f;
+    s32 i = (s32)(10.0f * x);
+    f32 f = (f32)i;
+    return f / 10.0f;
 }
 
-static inline s32 angOutT(f32 c, f32 half, f32 x) {
+static inline s32 angOutT(f32 center, f32 half, f32 x) {
     s32 w = 0;
     s32 r = w;
-    f32 lo = c - half;
+    f32 c = trunc10(center);
+    f32 lo;
     f32 hi;
+    lo = c - half;
     if (lo < 0.0f) {
         w = 1;
         lo += 360.0f;
@@ -134,15 +138,42 @@ static inline s32 angOutT(f32 c, f32 half, f32 x) {
 }
 
 static inline s32 angOut(f32 center, f32 half, f32 x) {
-    return angOutT(trunc10(center), half, x);
+    return angOutT(center, half, x);
 }
 
-static inline Vec makeVec(f32 x, f32 y, f32 z) {
-    Vec v;
-    v.x = x;
-    v.y = y;
-    v.z = z;
-    return v;
+/* repurposed unused inline: angOut on the mario stick angle, with everything read inside */
+static inline s32 makeVec(f32 half) {
+    s32 w = 0;
+    s32 r = w;
+    MarioWork* m = marioGetPtr();
+    f32 c = trunc10(m->unk19C);
+    f32 x = angleABf(0.0f, 0.0f, (f32)(s32)*((s8*)m + 0x24e), (f32)(s32)*((s8*)m + 0x24f));
+    f32 lo;
+    f32 hi;
+    lo = c - half;
+    if (lo < 0.0f) {
+        w = 1;
+        lo += 360.0f;
+    }
+    hi = c + half;
+    if (hi > 360.0f) {
+        hi -= 360.0f;
+        w = 2;
+    }
+    if (w == 1) {
+        if (hi < x && x < lo) {
+            r = 1;
+        }
+    } else if (w == 2) {
+        if (hi < x && x < lo) {
+            r = 1;
+        }
+    } else if (w == 0) {
+        if (x < lo || hi < x) {
+            r = 1;
+        }
+    }
+    return r;
 }
 
 #define DISPDIR_BODY(a, b, m2)                                                                    \
@@ -150,7 +181,7 @@ static inline Vec makeVec(f32 x, f32 y, f32 z) {
         b = revise360(180.0f + b);                                                                \
     }                                                                                             \
     {                                                                                             \
-        f32 dd = revise360(trunc10(b) - trunc10((m2)->targetYaw));                                \
+        f32 ty_ = trunc10((m2)->targetYaw); f32 dd = revise360(-(ty_ - trunc10(b))); \
         s32 sgn = (dd < 180.0f) ? 0 : 1;                                                          \
         if (sgn == 0) {                                                                           \
             if (__fabsf(b - a) > 90.0f) {                                                            \
@@ -195,6 +226,10 @@ static inline Vec makeVec(f32 x, f32 y, f32 z) {
     }
 
 void roll_upstairs(void);
+static void marioRollCan(void);
+
+#pragma inline_max_size(20000)
+
 
 void marioRollFixOn(void) {
     MarioWork* mario = marioGetPtr();
@@ -382,7 +417,7 @@ void marioRollForceCancel(void) {
                 mario->unk1A8 = 0.0f;
                 mario->unk1AC = 0.0f;
                 mario->unk19C = 270.0f;
-                mario->directionView = 270.0f;
+                do { mario->directionView = 270.0f; } while (0);
             } else {
                 mario->unk1A8 = 180.0f;
                 mario->unk1AC = 180.0f;
@@ -472,6 +507,8 @@ void marioReInit_roll(void) {
 }
 
 
+
+
 static inline s32 rollChk(void) {
     s32 r;
     MarioWork* m = marioGetPtr();
@@ -489,9 +526,12 @@ static inline s32 rollChk(void) {
     return r;
 }
 
+
+
 void mot_roll(void) {
     MarioWork* mario = marioGetPtr();
     f32 v31, v30, v29, v28, v27, v26;
+    f32 tcA;
     if (mario->trigFlags & 1) {
         mario->trigFlags &= ~1;
         mario->flags &= ~0xF0000;
@@ -561,7 +601,7 @@ void mot_roll(void) {
         PF(m, 0x148) = 0.4f;
         PF(m, 0x158) = 0.01f;
         PF(m, 0x68) = 2.0f;
-        *(Vec*)((u8*)m + 0x6c) = rollOfs;
+        ((MarioWork*)m)->field_6C = rollOfs;
         RW()->state = z0;
         z1 = 0;
         RW()->scaleState = z1;
@@ -617,9 +657,9 @@ void mot_roll(void) {
             v31 = revise360(MF(0x1a0) - MF(0x198));
             if (v31 < 180.0f) {
                 f32 t = 90.0f;
-                f32 c = MF(0x1a8);
-                f32 d = 0.1f * (t - c);
-                f32 n = d + c;
+                f32 diff = t - MF(0x1a8);
+                f32 d = 0.1f * diff;
+                f32 n = d + MF(0x1a8);
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
@@ -627,9 +667,9 @@ void mot_roll(void) {
                 MF(0x1ac) = n;
             } else {
                 f32 t = 270.0f;
-                f32 c = MF(0x1a8);
-                f32 d = 0.1f * (t - c);
-                f32 n = d + c;
+                f32 diff = t - MF(0x1a8);
+                f32 d = 0.1f * diff;
+                f32 n = d + MF(0x1a8);
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
@@ -694,13 +734,13 @@ void mot_roll(void) {
         s32 one;
         RW()->state = z;
         one = 1;
-        v26 = 1.0f;
         RW()->scaleState = one;
+        v26 = 1.0f;
     }
     switch (RW()->scaleState) {
     case 1:
         if (v26 < 1.4f) {
-            { f32 k = 1.0f; v26 = k * (1.45f - v26) + v26; }
+            { f32 k = 1.0f; v26 = k * (1.4499999f - v26) + v26; }
             if (v26 >= 1.4f) {
                 v26 = 1.4f;
             }
@@ -725,8 +765,8 @@ void mot_roll(void) {
             v26 = 0.5f * (1.05f - v26) + v26;
             if (v26 >= 1.0f) {
                 s32 t = 0;
-                v26 = 1.0f;
                 RW()->scaleState = t;
+                v26 = 1.0f;
             }
         }
         break;
@@ -735,8 +775,8 @@ void mot_roll(void) {
     if (!mario->hitobjStandOn && mario->field_0x1E0 && !marioChkBero(mario->field_0x1E0)) {
         v26 = RW()->x;
         v27 = RW()->z;
-        v26 = 0.2f * -v26 + v26;
-        v27 = 0.2f * -v27 + v27;
+        v26 += 0.2f * -v26;
+        v27 += 0.2f * -v27;
         if (__fabsf(v26) < 1.0f) {
             v26 = 0.0f;
         }
@@ -791,21 +831,22 @@ void mot_roll(void) {
         mario->airTimer++;
     }
     v29 = RW()->x;
-    v30 = 0.0f;
-    v27 = v30;
     v28 = RW()->z;
+    v27 = 0.0f;
+    v30 = v27;
     if (!(mario->flags & 0x30000)) {
         f32 a26, a30;
-        a26 = (f32)(s32)mario->wStickDir1;
-        a30 = (f32)(s32)mario->wStickDir2;
-        v27 = distABf(0.0f, 0.0f, a26, a30);
+        a26 = (f32)(s32)(s8)mario->wStickDir1;
+        a30 = (f32)(s32)(s8)mario->wStickDir2;
+        v27 = distABf(v30, v30, a26, a30);
         v31 = angleABf(0.0f, 0.0f, a26, a30);
         v31 = revise360(MF(0x198) + v31);
         v26 = 3.1415927f * v31 / 180.0f;
         v30 = v27 * (f32)sin(v26);
         v27 = v27 * -(f32)cos(v26);
         v31 = angleABf(0.0f, 0.0f, v30, v27);
-        if (angOut(MF(0x1a0), 135.0f, v31) == 1) {
+        tcA = MF(0x1a0);
+        if (angOut(tcA, 135.0f, v31) == 1) {
             v27 = distABf(0.0f, 0.0f, v30, v27);
             v30 = -v27 * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
             v27 = v27 * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
@@ -852,7 +893,8 @@ void mot_roll(void) {
             }
         }
         v31 = angleABf(0.0f, 0.0f, v30, v27);
-        if (angOut(MF(0x1a0), 135.0f, v31) == 1) {
+        tcA = MF(0x1a0);
+        if (angOut(tcA, 135.0f, v31) == 1) {
             v27 = distABf(0.0f, 0.0f, v30, -v27);
             v30 = -v27 * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
             v27 = v27 * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
@@ -907,9 +949,7 @@ void mot_roll(void) {
             v28 = 0.0f;
         }
     } else if ((MI(0x2a4) & 0x10) && MF(0x220) == 0.0f) {
-        f32 tc = trunc10(PF(marioGetPtr(), 0x19c));
-        f32 an = angleABf(0.0f, 0.0f, (f32)(s32)MB(0x24e), (f32)(s32)MB(0x24f));
-        if (angOutT(tc, 135.0f, an) == 1) {
+        if (makeVec(135.0f) == 1) {
             v29 = 0.2f * -v29 + v29;
             v28 = 0.2f * -v28 + v28;
             if (__fabsf(v29) < 1.0f) {
@@ -990,8 +1030,8 @@ void mot_roll(void) {
         }
     }
     RW()->x = v29;
-    v31 = -v28;
     RW()->z = v28;
+    v31 = -v28;
     v30 = angleABf(0.0f, 0.0f, v29, v31);
     v27 = 3.1415927f * v30 / 180.0f;
     v26 = (f32)cos(v27);
@@ -1025,9 +1065,15 @@ void mot_roll(void) {
     }
     v28 = rollData[4];
     {
-        s32 flip = angOut(MF(0x1a0), 90.0f, toMovedir(MF(0x1a8)));
-        f32 sgn = (flip == 1) ? -1.0f : 1.0f;
-        MF(0xc4) = revise360(MF(0x180) * v28 * sgn + MF(0xc4));
+        s32 flip;
+        f32 sgn;
+        f32 mv = toMovedir(MF(0x1a8));
+        f32 pre;
+        tcA = MF(0x1a0);
+        flip = angOut(tcA, 90.0f, mv);
+        pre = MF(0x180) * v28;
+        sgn = (flip == 1) ? -1.0f : 1.0f;
+        MF(0xc4) = revise360(pre * sgn + MF(0xc4));
     }
     if (MH(0x4e) == 0 && !getRollEvtFlag() && v27) {
         v31 = MF(0x19c);
@@ -1051,44 +1097,7 @@ void mot_roll(void) {
         m->unk148 = 0.0f;
         m->unk150.z = 0.004f;
     }
-    mario = marioGetPtr();
-    {
-        f32 dist = 100.0f;
-        Vec pos = mario->position;
-        Vec dir = (Vec){0.0f, -1.0f, 0.0f};
-        Vec out;
-        Vec nrm;
-        pos.y = pos.y + MF(0x1b8);
-        if (marioHitCheckVec(&pos, &dir, &out, &nrm, &dist)) {
-            f32 s;
-            f32 c;
-            f32 sq = roll_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
-            f32 ang = angleABf(0.0f, 0.0f, sq, -nrm.y);
-            f32 r = (f32)(s32)(0.5f + ang);
-            if (__fabsf(ang) < 45.0) {
-                v26 = 3.1415927f * r / 180.0f;
-                s = (f32)sin(v26);
-                c = (f32)cos(v26);
-                {
-                    f32 t1 = 5.0f * s;
-                    f32 t2 = 5.0f * c;
-                    MF(0x98) = 6.0f + t1;
-                    MF(0x9c) = -4.0f + t2;
-                }
-            } else {
-                Vec d2;
-                sincosf(&s, &c, 90.0f);
-                dist = 100.0f;
-                pos = mario->position;
-                d2 = (Vec){0.0f, 0.0f, 0.0f};
-                d2.x = s;
-                d2.y = 0.0f;
-                d2.z = c;
-                dir = d2;
-                marioHitCheckVec(&pos, &dir, &out, &nrm, &dist);
-            }
-        }
-    }
+    marioRollCan();
 }
 
 void roll_upstairs_on(void) {
@@ -1116,6 +1125,7 @@ void roll_upstairs(void) {
 }
 
 #pragma dont_inline reset
+
 void mot_fall_roll(void) {
     MarioWork* mario = marioGetPtr();
     f32 spd = marioGetFallSpd();
@@ -1132,8 +1142,55 @@ void mot_fall_roll(void) {
     } else {
         mario->position.y += spd;
     }
-    if (mario->hitobjStandOn) {
-        marioLandOn();
-        roll_flyout_flag2 = 0;
+    if (1) {
+        if (mario->hitobjStandOn) {
+            marioLandOn();
+            roll_flyout_flag2 = 0;
+        }
+    }
+}
+
+static void marioRollCan(void) {
+    MarioWork* mario = marioGetPtr();
+    f32 v26;
+    {
+        Vec d2;
+        Vec nrm;
+        Vec out;
+        Vec dir;
+        Vec pos;
+        f32 dist;
+        f32 c;
+        f32 s;
+        dist = 100.0f;
+        pos = mario->position;
+        pos.y = pos.y + MF(0x1b8);
+        dir = (Vec){0.0f, -1.0f, 0.0f};
+        if (marioHitCheckVec(&pos, &dir, &out, &nrm, &dist)) {
+            f32 sq = roll_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
+            f32 ang = angleABf(0.0f, 0.0f, sq, -nrm.y);
+            f32 r = (f32)(s32)(0.5f + ang);
+            if (__fabsf(ang) < 45.0) {
+                v26 = 3.1415927f * r / 180.0f;
+                s = (f32)sin(v26);
+                c = (f32)cos(v26);
+                {
+                    f32 t1 = 5.0f * s;
+                    f32 t2 = 5.0f * c;
+                    MF(0x98) = 6.0f + t1;
+                    MF(0x9c) = -4.0f + t2;
+                }
+            } else {
+                sincosf(&s, &c, 90.0f);
+                dist = 100.0f;
+                pos = mario->position;
+                d2 = (Vec){0.0f, 0.0f, 0.0f};
+                d2.x = s;
+                d2.y = 0.0f;
+                d2.z = c;
+                dir = d2;
+                marioHitCheckVec(&pos, &dir, &out, &nrm, &dist);
+            }
+        }
     }
 }

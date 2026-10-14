@@ -142,10 +142,12 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     effN64Vtx* vtx;
     effN64Vtx* q;
     s32 k;
+    s32 u;
     s32 j;
-    s32 n;
+
     s32 frame;
     s32 t;
+    s32 t2;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -213,9 +215,12 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     effSetVtxDescN64(vtx);
     GXLoadPosMtxImm(camera->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    for (k = 0; k < i - 1; k++) {
+
+    for (j = 0; j < i - 1; j++) {
+        t = j << 1;
+        t2 = t + 2;
+
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        t = k << 1;
-        tri2(t, t + 2, t + 1, t, t + 1, t + 2, t + 3, t);
+        tri2(t, t2, t + 1, t, t + 1, t + 2, t + 3, t);
     }
 }

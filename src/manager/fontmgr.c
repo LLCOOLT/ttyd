@@ -260,13 +260,12 @@ void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
 	fontDrawStringVecPitch((Vec){x, y, 0.0f}, pitch, (const s8*)msg);
 }
 
-void FontDrawStringVecPitch(Vec pos, f32 pitch, const char* str) {
+void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
 	u16 code;
 	f32 x;
-	const s8* msg = (const s8*)str;
 
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -380,6 +379,7 @@ static inline void fontDrawCodeEdgeX(u16 code, f32 x) {
 }
 
 void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
+	GXColor save;
 	CameraEntry* camera;
 	Mtx m;
 	u16 code;
@@ -399,7 +399,7 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 		}
 		{
 			if (fontEdge) {
-				GXColor save = fontColor;
+				save = fontColor;
 				FontDrawColorIDX(0);
 				_JUTFont_DrawPos(code, (s16)x - 2, 0);
 				_JUTFont_DrawPos(code, (s16)x + 2, 0);
@@ -435,7 +435,7 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 		}
 		sx = x + fontScale.x * (irand(10000) % 3);
 		sy = y + fontScale.y * (irand(10000) % 3);
-		width = fontGetWidth(code)->width;
+		width = fontGetWidth(code)[0].width;
 		PSMTXTransApply(scale, trans, sx, sy, 0.0f);
 		PSMTXConcat(camera->view, trans, trans);
 		GXLoadPosMtxImm(trans, 0);
@@ -449,21 +449,21 @@ extern s32 msgIconStr2ID(const char* str);
 extern void iconGetWidthHight(u16* width, u16* height, u16 id);
 extern void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 
-static inline void fontDrawPairXI(u16 code, s32 x, s32 y) {
+static inline void fontDrawPairXI(u16 code, s16 x, s16 y) {
 	s16 ix = x;
 	s16 iy = y;
 	_JUTFont_DrawPos(code, ix - 2, iy);
 	_JUTFont_DrawPos(code, ix + 2, iy);
 }
 
-static inline void fontDrawPairYI(u16 code, s32 x, s32 y) {
+static inline void fontDrawPairYI(u16 code, s16 x, s16 y) {
 	s16 iy = y;
 	s16 ix = x;
 	_JUTFont_DrawPos(code, ix, iy - 2);
 	_JUTFont_DrawPos(code, ix, iy + 2);
 }
 
-static inline void fontDrawCodeEdgeI(u16 code, s32 x, s32 y) {
+static inline void fontDrawCodeEdgeI(u16 code, s16 x, s16 y) {
 	if (fontEdge) {
 		GXColor save = fontColor;
 		FontDrawColorIDX(0);
@@ -924,22 +924,26 @@ void JUTFont_DrawStart(GXColor color) {
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
 }
 
-#pragma opt_propagation off
+
+
+#pragma opt_common_subs off
+#pragma opt_lifetimes off
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	FontWidthEntry* entry;
 	BinaryFontGlyph* glyph;
 	s32 idx, cell, col, row;
 	f32 cellh, cellw, tu, w, h, tw;
-	u8 n0, n1, hue;
+	u8 n0, n1, hue, ew;
 	s16 x0, y0, x1, y1;
 	u16 u0, u1, v0, v1;
 	u8 t0, t1;
 	GXColor hsv;
 	f32 tv;
 	GXColor c;
-	static f32 scale = 1.0f;
+	f32 scale;
 
 	entry = fontGetWidth(code);
+	ew = entry->width;
 	glyph = blockGlyph;
 	idx = code - glyph->firstcode;
 	cell = idx / glyph->sheetrows;
@@ -947,22 +951,23 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	row = cell - (cell / glyph->sheetcolumns) * glyph->sheetcolumns;
 	cellw = glyph->cellwidth;
 	cellh = glyph->cellheight;
+	scale = 1.0f;
 	h = cellh * scale;
 	tu = col * cellw + entry->kerning;
-	w = entry->width * scale;
+	w = ew * scale;
 	tw = entry->width;
 
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-	x0 = x;
-	y0 = y - 1;
 	n0 = irand(64);
 	n1 = irand(64);
+	x0 = x + 0;
+	y0 = y; y0--;
 	tv = row * cellh;
 	x1 = x0 + w;
 	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
 	hue = x0 - (u8)gp->retraceCount * 2;
-	v0 = scale + tv;
-	GXPosition3s16(x0, y0, 0);
+	v0 = 1.0f + tv;
+	GXPosition3s16(x, y0, 0);
 	hsv.r = x0 + hue;
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
@@ -995,4 +1000,6 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	GXTexCoord2u16(u0, v1);
 	GXTexCoord2u8(n0, t1);
 }
-#pragma opt_propagation reset
+
+#pragma opt_lifetimes reset
+#pragma opt_common_subs reset

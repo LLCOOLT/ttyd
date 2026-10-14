@@ -44,8 +44,8 @@ void hitObjFlagOn(const char* name, u32 flags);
 void mapObjGetPos(const char* name, Vec* pos);
 
 static CloudWork cloud[16];
-static CloudWork* cloud_p;
 static u8 cloud_once_flag;
+static CloudWork* cloud_p;
 
 static USER_FUNC(evt_cloud_main);
 static EVT_BEGIN(evt_cloud_main_evt)

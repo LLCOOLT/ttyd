@@ -16,8 +16,8 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static GSROOT* gsRoot;
 static s32 gsNextID;
+static GSROOT* gsRoot;
 static GSROOT* gsCurrent;
 static s32 gsUnused;
 
@@ -363,18 +363,18 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
-  int i;
-  u32 seqId;
   GROUP_DATA* g;
+  u32 seqId;
   MIDISETUP* midiSetup;
   PAGE* drum;
   PAGE* norm;
-  GSROOT* root;
   void* prj;
+  s32 i;
+  GSROOT* root;
 
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; ++i) {
-      if (root->stack[i].gAddr->id == sgid) {
+    for (i = 0; i < root->sp; i++) {
+      if (root->stack[i].gAddr->id != sgid) { continue; }
       if (root->stack[i].gAddr->type == 0) {
         g = root->stack[i].gAddr;
         prj = root->stack[i].prjAddr;
@@ -395,7 +395,6 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
         { seqId = 0xffffffff; goto done; }
       } else {
         { seqId = 0xffffffff; goto done; }
-      }
       }
     }
   }

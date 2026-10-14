@@ -165,8 +165,7 @@ void mtx_setup(NpcEntry* entry, Mtx mtx, s32 history) {
     f32 rotationAngle;
     f32 scaleSign;
     CameraEntry* camera;
-    f32 targetAngle;
-    f32 positionAngle;
+    f32 new_var[2];
     f32 v15;
     Mtx mtxX, mtxY, mtxZ;
 
@@ -174,9 +173,9 @@ void mtx_setup(NpcEntry* entry, Mtx mtx, s32 history) {
     scaleSign = 1.0f;
     if (!(entry->flags & 0x2000000) && !(entry->flags & 0x8000000)) {
         camera = camGetCurPtr();
-        targetAngle = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
-        positionAngle = angleABf(camera->cameraPos.x, camera->cameraPos.z, entry->position.x, entry->position.z);
-        rotationAngle = reviseAngle(targetAngle - positionAngle);
+        new_var[1] = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
+        new_var[0] = angleABf(camera->cameraPos.x, camera->cameraPos.z, entry->position.x, entry->position.z);
+        rotationAngle = reviseAngle(new_var[1] - new_var[0]);
     }
     v15 = reviseAngle(reviseAngle(entry->rotation.y));
     if (v15 >= 90.0f && v15 <= 270.0f) {
@@ -233,14 +232,14 @@ void npcDisp_xlu(CameraId cameraId, void* param) {
     }
 
     if (entry->flags & 0x800000) {
+        u32 i;
         AnimationPose* animPose;
         AnimTableEntry* anim;
         CameraEntry* camera;
         f32 dx, dz;
         f32 angle;
-        u32 i;
 
-        animPoseGetCurrentAnim(entry->poseId);
+        anim = animPoseGetCurrentAnim(entry->poseId);
         animPose = animPoseGetAnimPosePtr(entry->poseId);
         anim = animPoseGetCurrentAnim(entry->poseId);
 
@@ -251,7 +250,8 @@ void npcDisp_xlu(CameraId cameraId, void* param) {
         if (angle < 0.0f) {
             angle += 360.0f;
         }
-        angle = reviseAngle((angle - animPose->rotationY));
+        angle = angle - animPose->rotationY;
+        angle = reviseAngle(angle);
 
         
         if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
@@ -386,7 +386,6 @@ void npcDisp_offscreen_xlu(CameraId camId, void* param) {
         animPoseGetCurrentAnim(entry->poseId);
         animPose = animPoseGetAnimPosePtr(entry->poseId);
         anim = animPoseGetCurrentAnim(entry->poseId);
-
         camera = camGetPtr(CAMERA_3D);
         dx = camera->cameraAt.x - camera->cameraPos.x;
         dz = camera->cameraAt.z - camera->cameraPos.z;
@@ -965,7 +964,8 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     marioPos.z = mario->position.z;
     marioPos.y = npc->position.y;
     dist = PSVECDistance(&marioPos, &npc->position);
-    range = (5.0f + (mario->wPlayerCollisionBox.x + npc->width)) * 0.5f;
+    range = 5.0f + (mario->wPlayerCollisionBox.x + npc->width);
+    range *= 0.5f;
     if (dist > range) {
         return FALSE;
     }
@@ -2447,6 +2447,8 @@ void npcStartForEvent(void) {
     wp = npcGetWorkPtrInline();
     total = wp->total;
     entry = wp->entries;
+    if (total) {
+    }
     for (i = 0; i < total; i++, entry++) {
         npcStartForOneEvent(entry);
     }

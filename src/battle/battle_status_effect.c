@@ -436,7 +436,8 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 	StChgInfo tmp, swap;
 	s8 pri = _get_pri(type);
 	s32 i, j, n;
-	u8 t;
+	s32 z;
+	u8 u, t;
 
 	for (i = 0; i < 6; i++) {
 		if (pri >= (s8)_get_pri((s8)*(u8*)&e[i].type)) break;
@@ -455,24 +456,26 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 			tmp = swap;
 		}
 	}
-	n = 0;
-	t = n;
+	j = 0;
+	n = j;
+	t = 0;
 	for (i = 0; i < 6; i++) {
 		if (e[i].type == -1) break;
 		e[i].field_0x2 = t;
-		e[i].field_0x4 = 0;
+		e[i].field_0x4 = j;
 		t += 10;
 		n++;
 	}
-if (t == 0) {
-		t = 0x3C;
-	} else {
-		t = 0x50;
-	}
+if (t == 0) goto L3;
+	u = 0x50;
+	goto Ld;
+L3:
+	u = 0x3C;
+Ld:;
 	for (j = n; j >= 0; j--) {
 		if (e[j].type != -1) {
-			e[j].field_0x3 = t;
-			t += 10;
+			e[j].field_0x3 = u;
+			u += 10;
 		}
 	}
 }
@@ -630,22 +633,23 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 	return ret;
 }
 
-static const GXColor _st_chg_msg_col = {0xFF, 0xFF, 0xFF, 0xFF};
 #pragma dont_inline reset
 
 
+static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 void _st_chg_msg_disp(void) {
 	u8* wp = (u8*)_battleWorkPointer + 0x20000;
 	u16 lines;
 	u16 width;
 	f32 x;
+	GXColor col;
 	f32 cx = 0.0f;
 	f32 ty = -120.0f;
-
 	width = FontGetMessageWidthLine((const char*)(wp - 0x7128), &lines);
 	lines++;
 	x = cx - (width / 2);
-	windowDispGX_Waku_col(0, _st_chg_msg_col, x - 20.0f, -117.0f + ((lines - 1) * 29), width + 40, lines * 29 + 1, 10.0f);
+	col = white;
+	windowDispGX_Waku_col(0, col, x - 20.0f, -117.0f + ((lines - 1) * 29), width + 40, lines * 29 + 1, 10.0f);
 	FontDrawStart();
 	FontDrawMessage(x, (s32)ty + (lines - 1) * 29, (const char*)(wp - 0x7128));
 }

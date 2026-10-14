@@ -32,7 +32,7 @@ void mario_kemuri_landon(void);
 #define MS16(p, off) (*(s16*)((u8*)(p) + (off)))
 #define MPTR(p, off) (*(void**)((u8*)(p) + (off)))
 
-static void mario_kemuri_80130474(void) {
+void mario_kemuri_80130474(void) {
     static s32 ct = 8;
     static s32 left_or_right;
     MarioWork* mario = marioGetPtr();
@@ -42,7 +42,6 @@ static void mario_kemuri_80130474(void) {
 
     if ((u32)marioStGetSystemLevel() == 0 && !(mario->flags & 0x01000000)) {
         if (mario->currMotionId == 0x1D) {
-            attr = 0;
         }
         else if (mario->currMotionId != 3) {
             if (mario->hitobjStandOn != NULL) {
