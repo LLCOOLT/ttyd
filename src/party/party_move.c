@@ -546,14 +546,10 @@ void unk_800c93d0(PartyEntry* party, f32 spd) {
 }
 
 void unk_800c9398(PartyEntry* party, f32 spd) {
-    f32 m;
-    f32 s = spd * party->playerPtr->playerGravity;
-    if (party->flags & 0x80) {
-        m = 0.75f;
-    } else {
-        m = 1.0f;
-    }
-    PF(party, 0x108) = s * m;
+    f32 v = spd * party->playerPtr->playerGravity;
+    f32 w;
+    w = v;
+    PF(party, 0x108) = w * ((party->flags & 0x80) ? 0.75f : 1.0f);
     party->field_104 = PF(party, 0x108);
 }
 
@@ -2029,8 +2025,8 @@ BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
         if (!partyHitCheck(party, &pos, &dir, &hitPos, &hitNrm, &dist)) {
             HitEntry* floor;
             dist = 150.0f;
-            pos.x = s * 50.0f + mobj->x;
-            pos.z = c * 50.0f + mobj->z;
+            pos.x = 50.0f * s + mobj->x;
+            pos.z = 50.0f * c + mobj->z;
             dir = (Vec){0.0f, -1.0f, 0.0f};
             floor = partyHitCheck(party, &pos, &dir, &hitPos, &hitNrm, &dist);
             if (!floor || !(hitGetAttr(floor) & 0x200)) {

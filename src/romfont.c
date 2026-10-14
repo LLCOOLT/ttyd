@@ -274,14 +274,16 @@ void romFontPrintGX(f32 x, f32 y, f32 scale, GXColor* color, const char* msg, ..
 }
 
 s32 romFontGetWidth(const char* message) {
+    u16 c16;
     RomFontChar* glyph;
+    u32 c;
     s32 width = 0;
     s32 i = 0;
     s32 max = 0;
 
     for (;;) {
-        u32 c = message[i];
-        u32 c16 = *(u16*)&message[i];
+        c16 = *(u16*)&message[i];
+        c = message[i];
         
         if (c >= 0x20 && c < 0x80) {
             glyph = romFontFindChar(c & 0xFFFF);

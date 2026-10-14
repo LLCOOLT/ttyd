@@ -3016,14 +3016,14 @@ void screen_tev(MapTevCallbackInfo* info) {
             screen_wp->count++;
             if (screen_wp->count % 200 == 0) {
                 switch (rand() % 3) {
-                    default:
-                        break;
                     case 0:
                         screen_wp->xTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
                         screen_wp->yTarget = randf(0.0f, (1.0f - screen_wp->scale) / screen_wp->scale);
                         break;
                     case 1:
                         screen_wp->scaleTarget = randf(1.0f, 0.25f);
+                        break;
+                    case 2:
                         break;
                 }
             }
@@ -3045,7 +3045,8 @@ void screen_tev(MapTevCallbackInfo* info) {
         }
         GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
-        x = 100.0f - camGetPtr(CAMERA_3D)->cameraPos.z;
+        y = camGetPtr(CAMERA_3D)->cameraPos.z;
+        x = 100.0f - y;
         PSMTXScale(mtx, 1.0f, 6.0f * (x / 1000.0f) + 16.0f, 1.0f);
         GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);

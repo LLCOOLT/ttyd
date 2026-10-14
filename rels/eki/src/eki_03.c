@@ -449,9 +449,7 @@ static void sun_tev(MapTevCallbackInfo* info) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
-            s32 off = ((i / 4) << 5) + ((j / 4) << 9);
-
-            off += ((i % 4) + ((j % 4) << 2)) * 2;
+            s32 off = ((i / 4) << 5) + ((j / 4) << 9) + ((i % 4) + ((j % 4) << 2)) * 2;
             buf[off] = 3.0f * v + 128.0f;
             buf[off + 1] = 0x80;
         }

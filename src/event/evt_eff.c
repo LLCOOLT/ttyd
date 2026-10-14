@@ -794,20 +794,17 @@ USER_FUNC(evt_eff_fukidashi) {
 	EffectEntry* entry = NULL;
 	void* p;
 	f32 h;
+	f32 zz;
 
 	switch (mode) {
 		case 0:
 			h = *(f32*)((u8*)marioGetPtr() + 0x1b8);
-			y = 2.0f * h / 3.0f;
-			w = h / 3.0f;
-			entry = effFukidashiEntry(a, b, -1, d, 0.0f, y, 0.0f, w, e);
+			entry = effFukidashiEntry(a, b, -1, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
 			break;
 		case 1:
 			p = !strcmp(npcName, "me") ? (void*)event->ownerNPC : (void*)npcNameToPtr(npcName);
 			h = *(f32*)((u8*)p + 0x150);
-			y = 2.0f * h / 3.0f;
-			w = h / 3.0f;
-			entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, y, 0.0f, w, e);
+			entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
 			break;
 		case 2:
 			entry = effFukidashiEntry(a, b, 0, d, x, y, z, w, e);
@@ -816,18 +813,14 @@ USER_FUNC(evt_eff_fukidashi) {
 			p = partyGetPtr(marioGetPartyId());
 			if (p) {
 				h = *(f32*)((u8*)p + 0xf0);
-				y = 2.0f * h / 3.0f;
-			w = h / 3.0f;
-			entry = effFukidashiEntry(a, b, -2, d, 0.0f, y, 0.0f, w, e);
+				entry = effFukidashiEntry(a, b, -2, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
 			}
 			break;
 		case 4:
 			p = partyGetPtr(marioGetExtraPartyId());
 			if (p) {
 				h = *(f32*)((u8*)p + 0xf0);
-				y = 2.0f * h / 3.0f;
-			w = h / 3.0f;
-			entry = effFukidashiEntry(a, b, -3, d, 0.0f, y, 0.0f, w, e);
+				entry = effFukidashiEntry(a, b, -3, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
 			}
 			break;
 	}

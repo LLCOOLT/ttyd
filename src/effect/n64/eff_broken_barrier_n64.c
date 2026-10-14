@@ -189,8 +189,8 @@ void effBrokenBarrierMain(EffectEntry* effect) {
     f32 halfH;
     f32 width;
     f32 height;
-    f32 b;
     f32 ca;
+    f32 b;
     f32 a;
     f32 t;
     Vec position;
@@ -247,9 +247,9 @@ void effBrokenBarrierMain(EffectEntry* effect) {
                 b = 6.2831855f * t / 360.0f;
                 ca = (f32)cos(b);
                 a = 6.2831855f * a / 360.0f;
-                work->position.x = width * (f32)sin(a) * ca;
+                work->position.x = ca * (width * (f32)sin(a));
                 ca = (f32)cos(b);
-                work->position.y = height * (f32)cos(a) * ca;
+                work->position.y = ca * (height * (f32)cos(a));
                 work->position.z = width * (f32)sin(b);
                 work->velocity.x = 0.4f * work->position.x;
                 work->velocity.y = 0.4f * work->position.y;
@@ -290,9 +290,9 @@ void effBrokenBarrierMain(EffectEntry* effect) {
                 a = 6.2831855f * t / 360.0f;
                 ca = (f32)cos(a);
                 b = 6.2831855f * b / 360.0f;
-                work->position.x = width * (f32)sin(b) * ca;
+                work->position.x = ca * (width * (f32)sin(b));
                 ca = (f32)cos(a);
-                work->position.y = height * (f32)cos(b) * ca;
+                work->position.y = ca * (height * (f32)cos(b));
                 work->position.z = width * (f32)sin(a);
             }
             break;

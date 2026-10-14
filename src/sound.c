@@ -846,7 +846,7 @@ inline void SoundEfxMuteCh(s32 chan) {
 
 inline s32 SoundEfxStopAll(u8 a1) {
     SoundEffect* sfx = sound.effects;
-    s32 chan = 0;
+    s32 chan;
 
     for (chan = 0; chan < 40; chan++, sfx++) {
         if (sfx->unk2 <= a1) {
@@ -1091,11 +1091,10 @@ void SoundEfxMain(void) {
     SoundEffect* effect;
     f32 x, y, z;
     f32 v6, v9, v10;
-    f32 z0, z1;
+    f32 z0 = 0.0f;
+    f32 z1 = z0;
     int i;
 
-    z0 = 0.0f;
-    z1 = z0;
     x = sound.prevPos.x;
     y = sound.prevPos.y;
     z = sound.prevPos.z;
@@ -1110,7 +1109,7 @@ void SoundEfxMain(void) {
     v10 = (f32)cos(v6);
     sound.heading.x = v9;
     sound.heading.y = z1;
-    sound.heading.z = -((1.0f * v10) - z0);
+    sound.heading.z = z1 - (1.0f * v10);
     sound.up.x = z1;
     sound.up.y = 1.0f;
     sound.up.z = z1;
@@ -1537,30 +1536,27 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     u8* src8;
     u32 i;
     u32 n;
+    s32 j;
 
     stream = &sound.streams[(u8)user];
     stream->samplePos = 0;
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
-            dst = buffer1;
             for (; len1 != 0; len1--) {
-                *dst++ = 0;
+                *((s16*)buffer1)++ = 0;
                 stream->samplePos++;
             }
-            dst = buffer2;
             for (; len2 != 0; len2--) {
-                *dst++ = 0;
+                *((s16*)buffer2)++ = 0;
                 stream->samplePos++;
             }
             return stream->samplePos;
         } else {
-            dst = buffer1;
-            for (i = 0; i < (s32)(len1 / 14 * 8) / 2; i++) {
-                *dst++ = 0;
+            for (j = (s32)(len1 / 14 * 8) / 2; j != 0; j--) {
+                *((s16*)buffer1)++ = 0;
             }
-            dst = buffer2;
-            for (i = 0; i < (s32)(len2 / 14 * 8) / 2; i++) {
-                *dst++ = 0;
+            for (j = (s32)(len2 / 14 * 8) / 2; j != 0; j--) {
+                *((s16*)buffer2)++ = 0;
             }
             return len1 + len2;
         }
@@ -1729,8 +1725,8 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     if (aram) {
         stream->flags |= 0x400;
     }
-    sprintf(str, "%s/%s%s", getMarioStDvdRoot(), name, ".stm");
     path = str;
+    sprintf(path, "%s/%s%s", getMarioStDvdRoot(), name, ".stm");
     if (!(stream->entries[0].dvd = DVDMgrOpen(path, 0, 0))) {
         stream->flags = 0;
         return;

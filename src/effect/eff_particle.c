@@ -112,7 +112,8 @@ void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter
             x2 = 2.0f * pt_frand() - 1.0f;
             w = x1 * x1 + x2 * x2;
         } while (w > 1.0f);
-        w = pt_sqrtf((-2.0f * (f32)log(w)) / w);
+        w = (-2.0f * (f32)log(w)) / w;
+        w = pt_sqrtf(w);
         y1 = x1 * w;
         y2 = x2 * w;
         use_last = 1;

@@ -132,6 +132,7 @@ void BattleAudience_Case_FinalAttack(void);
 
 void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s32 damage, s32 fpDamage, u32 result, u32 pattern, s32 flag) {
     BattleWork* wp = _battleWorkPointer;
+    s32 pierce;
     BattleUnit* attacker;
     Vec pos;
 
@@ -1597,8 +1598,8 @@ s32 _checkDamageCode_EmergencyRevival(BattleUnit* unit, u32* flags) {
 }
 
 s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* part, BattleWeapon* weapon, s32 flags) {
+    BattleWork* wp = _battleWorkPointer;
     u32 pattern;
-    s32 pierce;
     s32 ret = -1;
     u32 status = 0;
     s32 damage;
@@ -1616,7 +1617,7 @@ s32 BattleCheckDamage(BattleUnit* attacker, BattleUnit* target, BattleUnitPart* 
     u32 r2;
     u32 r3;
     u32 r4;
-    BattleWork* wp = _battleWorkPointer;
+    s32 pierce;
 
     pierce = 0;
     cwp = &cw;

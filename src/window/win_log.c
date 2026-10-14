@@ -1194,7 +1194,7 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winTexInit(w->res->tex->tpl);
-        for (i = 0, t = tubuDt; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
+        for (t = tubuDt, i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
                 if (w->fE14 == i) {
                     winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);

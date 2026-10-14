@@ -40,7 +40,6 @@ typedef struct ColorEntry {
 } ColorEntry;
 
 static const GXColor dat_80421468 = {0xFF, 0xFF, 0xFF, 0xFF};
-static const GXColor dat_8042146c = {0xFF, 0xFF, 0xFF, 0x00};
 
 __declspec(section ".data") u64 lbl_funemizu_0 = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_funemizu_negone_one_374 = 0xBF8000003F800000;
@@ -273,6 +272,7 @@ void effFunemizuMain(EffectEntry* effect) {
 
 void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
+    u32 u;
     Mtx trans;
     Mtx scale;
     Mtx rot;
@@ -282,7 +282,6 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     s32 type;
     s32 i;
-    u32 u;
     f32 z;
 
     cam = camGetPtr(cameraId);
@@ -417,7 +416,6 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
-    GXColor color;
     EffFunemizuWork* work = effect->userdata;
     Mtx trans;
     Mtx rot;
@@ -457,9 +455,7 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         if (work->delay == 0 && !(work->position.y < 0.0f)) {
-            color = dat_8042146c;
-            color.a = work->alpha;
-            GXSetChanMatColor(GX_COLOR0A0, color);
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
             PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
             PSMTXConcat(mtx, trans, trans);
             GXLoadPosMtxImm(trans, GX_PNMTX0);

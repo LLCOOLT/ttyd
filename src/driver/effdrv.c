@@ -348,15 +348,16 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 	register u32 gqr = 0x06070607;
 	s32 n = list->count;
 	s32 k;
+	f32 t;
 
 	for (k = 1; k < n; k++) {
 		MayaKey* prev;
 		f32 a;
 		s32 i;
 		register s8* pb;
-		register s8* pa;
 		f32* out;
-		f32 t, ct;
+		register s8* pa;
+		f32 ct;
 		MayaKey* curr;
 		curr = &list->keys[k];
 		prev = &list->keys[k - 1];
@@ -375,6 +376,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		pb = (s8*)curr;
 		out = buf;
 		for (i = 0; i < 22; i++) {
+			f32 u, dt, s, s2, s3, div;
 			register f32 d0, d1, v0, m0, v1, m1;
 			asm {
 				psq_l v0, 2(pa), 1, 5
@@ -388,10 +390,9 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 				*out = v0;
 			}
 			else {
-				f32 u = t - prev->time;
-				f32 dt = curr->time - prev->time;
-				f32 s, s2, s3;
-				f32 div = (!dt) ? 0.00000001f : dt;
+				u = t - prev->time;
+				dt = curr->time - prev->time;
+				div = (!dt) ? 0.00000001f : dt;
 				s = u / div;
 				s2 = s * s;
 				s3 = s2 * s;

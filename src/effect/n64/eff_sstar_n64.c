@@ -290,7 +290,7 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
     EffSstarN64Work* w;
     s32 i;
     s32 c1, c2, c3;
-    s32 base, k;
+    s32 k, base;
     f32 scale;
     Mtx mtx;
     Mtx rot;
@@ -413,9 +413,10 @@ void effSstarDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(w->vtx, 0x8C);
         effSetVtxDescN64(w->vtx);
         GXLoadPosMtxImm(camera->view, GX_PNMTX0);
-        for (c1 = 0, c2 = 0; c1 < 4; c1++, c2 += 2) {
+        for (c1 = 0; c1 < 4; c1++) {
+            k = c1 * 2;
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-            tri2(c2, c2 + 1, c2 + 2, c2, c2 + 1, c2 + 3, c2 + 2, c2 + 1);
+            tri2(k, k + 1, k + 2, k, k + 1, k + 3, k + 2, k + 1);
         }
     }
 }

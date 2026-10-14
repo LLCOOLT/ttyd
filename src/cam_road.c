@@ -149,9 +149,10 @@ static CamRoadWork* wp = &work;
 
 void OSReport(const char* msg, ...);
 
+
 static void camRoadDebugPrint(const char* pfx) {
     OSReport("%scam = %d\n", pfx, wp->map->curveNum);
-    OSReport("%scurve = %d\n\0\0", pfx, wp->state);
+    OSReport("%scurve = %d\n\0\0\0\0\0\0", pfx, wp->state);
 }
 
 void calcCurrentCamState(CamRoadOut* out);
@@ -206,7 +207,7 @@ s32 camRoadSetup(const char* name) {
         wp->map->f_104 = (void*)((u32)wp->map->f_104 + (u32)wp->map);
         wp->map->f_108 = (void*)((u32)wp->map->f_108 + (u32)wp->map);
     }
-    if (strcmp(wp->map->version, "1.01") == 0) {
+    if (strcmp(wp->map->version, "1.01\0\0\0") == 0) {
         wp->state = 0x65;
     } else {
         wp->state = 0x64;

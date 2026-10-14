@@ -636,10 +636,10 @@ static inline void monte_disp(CameraId camera, void* param) {
 #define randRange(d) (irand(100.0f * (d)) / 100.0f)
 
 static USER_FUNC(fall_rtn) {
+    const char* sfx;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     BOOL exists = FALSE;
     HikokiWork* data = wp->data;
-    const char* sfx;
     s32 total;
     s32 i;
     s32 t;

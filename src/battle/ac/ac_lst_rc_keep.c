@@ -36,11 +36,12 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
     BattleActions* ac = &work->actionCommands;
     LstRcWork* lw = LR_WORK(ac);
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
+    const char** p;
     s32 loop;
+    s32 off;
     s32 autoCmd = 0;
     s32 ok;
     s32 d;
-    s32 off;
     s32 tm;
     s32 n;
     s32 i;
@@ -105,9 +106,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 if ((lw->held0 != 0 && lw->held1 != 0) || *(s16*)((u8*)ac + 0x88) > 0 || autoCmd) {
                     ac->mAcState = 1001;
                     lw->timer = *(s32*)((u8*)ac + 0x38);
-                    lw->count = 0;
-                    lw->held0 = 0;
-                    lw->held1 = 0;
+                    lw->held1 = (lw->held0 = (lw->count = 0));
                     break;
                 }
                 lw->timer--;
@@ -188,8 +187,7 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 break;
             case 1003:
                 n = lw->count - 1; if (n >= 0) {
-                for (off = 0, i = 0; i <= n; i++, off += 4) {
-                    iconDelete(ac_lstrckeep_iconname[off >> 2]);
+                for (i = 0, off = 0; i <= n; i++, off += 4) { iconDelete(ac_lstrckeep_iconname[off >> 2]);
                 } }
                 ac->mAcState = 1004;
             case 1004:

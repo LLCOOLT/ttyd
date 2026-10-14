@@ -89,6 +89,8 @@ void winFontSet(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
 void winItemInit(ItemWork* w);
 void itemUseDisp(WinMgrEntry* entry);
 void itemUseDisp2(WinMgrEntry* entry);
+void itemUseDisp(WinMgrEntry* entry);
+void itemUseDisp2(WinMgrEntry* entry);
 void item_disp(ItemWork* w, f32 xo, f32 yo);
 void winBgGX(ItemWork* w, s32 a, f32 x, f32 y);
 void winKirinukiGX(ItemWork* w, s32 a, f32 x, f32 y, f32 w_, f32 h);
@@ -765,6 +767,7 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     GXColor black = {0, 0, 0, 255};
     GXColor grayc = {0x80, 0x80, 0x80, 255};
     GXColor white2 = white;
+    GXColor white3 = white;
     s32 cnt;
     s32 i;
     s32 col;
@@ -810,10 +813,9 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
         } else {
             winIconInit();
         }
-        item = &itemDataTable[id];
-        winIconSet(item->icon_id, (Vec){(xo - 125.0f) + col * 204, y, 0.0f}, w->mode == 0 ? (Vec){0.8f, 0.8f, 0.8f} : (Vec){0.6666667f, 0.6666667f, 0.6666667f}, white);
+        winIconSet(itemDataTable[id].icon_id, (Vec){(xo - 125.0f) + col * 204, y, 0.0f}, w->mode == 0 ? (Vec){0.8f, 0.8f, 0.8f} : (Vec){0.6666667f, 0.6666667f, 0.6666667f}, white);
         winFontInit();
-        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + col * 204, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, gray ? grayc : black, msgSearch(item->name));
+        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + col * 204, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, gray ? grayc : black, msgSearch(itemDataTable[id].name));
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if ((&w->page[0])[w->mode] > 0) {
@@ -826,16 +828,16 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     if (cnt > (&w->page[0])[w->mode] * 10 + 10) {
         winTexInit(w->res->tex->tpl);
         width = 250.0f + xo;
-        winTexSet(0x17, (Vec){width, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+        winTexSet(0x17, (Vec){width, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white3);
         winIconInit();
-        winIconSet(0x80, (Vec){width, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
+        winIconSet(0x80, (Vec){width, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white3);
     }
     width = 0.7f * (f32)(u32)FontGetMessageWidth(msgSearch("msg_menu_sort_narabikae"));
     winFontInit();
     width = xo + (220.0f - width);
     winFontSet((Vec){width, 20.0f + ((yo - 92.0f) - 10.0f), 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, msgSearch("msg_menu_sort_narabikae"));
     winIconInit();
-    winIconSet(0x217, (Vec){width - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
+    winIconSet(0x217, (Vec){width - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white3);
     if (w->box[0] < 320.0f && w->box[2] > -240.0f) {
         winBookGX(w, 0);
     }

@@ -865,25 +865,8 @@ USER_FUNC(end_deka) {
     return 2;
 }
 
-static inline GXColor mk(u8 a) {
-    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
-    c.a = a;
-    return c;
-}
-
-static inline GXColor mk2(u8 a) {
-    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
-    c.a = a;
-    return c;
-}
-
-static inline GXColor mk3(u8 a) {
-    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
-    c.a = a;
-    return c;
-}
-
 static void disp_2D(CameraId cam, void* param) {
+    GXColor col;
     Mtx m;
     Mtx sc;
     Mtx tr;
@@ -892,14 +875,17 @@ static void disp_2D(CameraId cam, void* param) {
     f32 left;
     f32 ratio;
     f32 x;
-    s32 i;
     DekaTiming* t;
-    GXColor col;
+    s32 i;
 
     left = w->gaugePos.x - 0.5f * w->gaugeW - 8.0f;
     right = 8.0f + (w->gaugePos.x + 0.5f * w->gaugeW);
     if (w->gaugeState >= 2 && w->gaugeState <= 5) {
-        col = mk(w->alpha);
+        {
+            GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+            c.a = w->alpha;
+            col = c;
+        }
         PSMTXTrans(m, w->gaugePos.x - 0.5f * w->gaugeW - 8.0f, w->gaugePos.y, w->gaugePos.z);
         TEXPLANE(m, 0x43, col);
         PSMTXScale(sc, w->gaugeW / 4.0f, 1.0f, 1.0f);
@@ -924,9 +910,13 @@ static void disp_2D(CameraId cam, void* param) {
         right = right - left;
         for (i = 0; i < 8; i++) {
             t = &w->timing2[i];
-            col = mk2(w->alpha);
+            {
+                GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+                c.a = w->alpha;
+                col = c;
+            }
             col.a *= t->alpha / 255.0f;
-            x = t->off.x + (t->pos / w->gaugeLen * right + left);
+            x = t->off.x + ((t->pos / w->gaugeLen) * right + left);
             if (t->type == 1) {
                 PSMTXScale(sc, 0.75f, 0.75f, 0.75f);
                 PSMTXTrans(tr, x, 40.0f + (w->offsetY + (w->gaugePos.y - 18.0f + t->off.y)), w->gaugePos.z + t->off.z);
@@ -941,9 +931,13 @@ static void disp_2D(CameraId cam, void* param) {
         }
         for (i = 0; i < 8; i++) {
             t = &w->timing[i];
-            x = t->off.x + (t->pos / w->gaugeLen * right + left);
+            x = t->off.x + ((t->pos / w->gaugeLen) * right + left);
             if (t->state >= 2 && t->state <= 5) {
-                col = mk3(w->alpha);
+                {
+                    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
+                    c.a = w->alpha;
+                    col = c;
+                }
                 col.a *= t->alpha / 255.0f;
                 if (t->type == 1) {
                     PSMTXScale(sc, 0.75f, 0.75f, 0.75f);
@@ -1116,8 +1110,9 @@ void yuka_disp(CameraId cam, void* param) {
     DekaWork* w = get_ptr();
     CameraEntry* camera = camGetPtr(cam);
     YukaMesh* m;
-    GXTexObj obj;
     s32 i;
+
+    GXTexObj obj;
 
     if (w->tex->address != NULL) {
         m = w->mesh->address;

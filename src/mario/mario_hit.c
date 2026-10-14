@@ -1884,7 +1884,7 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
         mz = 0.5f * (vz - dot * bestNrm.z);
     }
     hit2 = NULL;
-    sincosf(&s2, &c2, 45.0f + dz);
+    sincosf(&s2, &c2, dz + 45.0f);
     {
     Vec dir2;
     dir2 = (Vec){s2, 0.0f, c2};

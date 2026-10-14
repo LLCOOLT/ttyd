@@ -54,6 +54,16 @@ typedef struct EffFireSmokeWork {
 
 extern void mapGetBlend(GXColor* color);
 
+typedef struct FireScaleKey {
+    s32 frame;
+    f32 value;
+} FireScaleKey;
+
+FireScaleKey scale1[] = {
+    { 0, 1.0f },     { 20, 1.1f },    { 30, 1.0f },    { 45, 1.05f },   { 60, 0.95f },
+    { 70, 1.05f },   { 80, 1.025f },  { 100, 1.1f },   { 120, 1.0f },   { 130, 1.025f },
+    { 160, 0.95f },  { 180, 1.025f }, { 200, 1.0f },
+};
 static GXColor col_tbl[3][8] = {
     { { 0xAC, 0x2E, 0x00, 0xFF }, { 0xE0, 0x22, 0x00, 0xFF }, { 0xFD, 0x5F, 0x00, 0xFF }, { 0xFD, 0x5F, 0x04, 0xFF },
       { 0xFF, 0x69, 0x00, 0xFF }, { 0xFF, 0x8A, 0x00, 0xFF }, { 0xFF, 0xB7, 0x00, 0xFF }, { 0xFF, 0xD7, 0x00, 0xFF } },
@@ -71,16 +81,16 @@ void effFireMain(EffectEntry* effect);
 static inline void effFireQuad(s32 iw, s32 ih) {
     f32 w, h;
     GXBegin(GX_QUADS, GX_VTXFMT0, 4); w = iw; h = ih;
-    GXPosition3f32(-w * 0.5f, h, 0.0f);
+    GXPosition3f32(-w / 2.0f, h, 0.0f);
     GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
     GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(w * 0.5f, h, 0.0f);
+    GXPosition3f32(w / 2.0f, h, 0.0f);
     GXColor4u8(0xFF, 0xFF, 0xFF, 0xFF);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(w * 0.5f, 0.0f, 0.0f);
+    GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
     GXColor4u8(0x00, 0x00, 0x00, 0xFF);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(-w * 0.5f, 0.0f, 0.0f);
+    GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
     GXColor4u8(0x00, 0x00, 0x00, 0xFF);
     GXTexCoord2f32(0.0f, 1.0f);
 }
@@ -90,16 +100,6 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect);
 EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 y, f32 z, f32 rangeX,
                                   f32 rangeY, f32 a, f32 b, f32 c);
 
-typedef struct FireScaleKey {
-    s32 frame;
-    f32 value;
-} FireScaleKey;
-
-FireScaleKey scale1[] = {
-    { 0, 1.0f },     { 20, 1.1f },    { 30, 1.0f },    { 45, 1.05f },   { 60, 0.95f },
-    { 70, 1.05f },   { 80, 1.025f },  { 100, 1.1f },   { 120, 1.0f },   { 130, 1.025f },
-    { 160, 0.95f },  { 180, 1.025f }, { 200, 1.0f },
-};
 FireScaleKey scale2[] = {
     { 0, 1.0f },
     { 100, 1.2f },
@@ -109,7 +109,9 @@ FireScaleKey scale2[] = {
 
 void effFireSmokeDisp(CameraId cameraId, EffectEntry* effect);
 void effFireSmokeMain(EffectEntry* effect);
-static inline void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale);
+
+
+static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale);
 
 EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
@@ -235,6 +237,7 @@ void effFireMain(EffectEntry* effect) {
         case 4:
         case 8: {
             f32 t, v;
+            s32 kf;
             switch (type) {
                 case 3:
                 case 8:
@@ -247,7 +250,6 @@ void effFireMain(EffectEntry* effect) {
                     break;
             }
             while (1) {
-                s32 kf;
                 kf = work->keyFrame; idx = work->keyIdx;
                 if (kf < tbl[idx].frame) {
                     break;
@@ -258,11 +260,11 @@ void effFireMain(EffectEntry* effect) {
                     work->keyFrame = 0;
                 }
             }
-            t = (f32)(tbl[idx].frame - work->keyFrame) / (f32)(tbl[idx].frame - tbl[idx - 1].frame);
+            t = (f32)(tbl[idx].frame - kf) / (f32)(tbl[idx].frame - tbl[idx - 1].frame);
             v = (1.0f - t) * tbl[idx].value + t * tbl[idx - 1].value;
             work->unk44 = v;
-            work->unk44 = work->unk44 * 1.4f;
-            work->unk44 = work->unk44 * 1.2f;
+            work->unk44 *= 1.4f;
+            work->unk44 *= 1.2f;
             work->keyFrame++;
             break;
         }
@@ -797,7 +799,10 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
 
 
 
-static inline void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
+
+
+
+static void effFireSmokeEntry(f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* smoke = effEntry();
     EffFireSmokeWork* sw;
     smoke->type = "FireSmoke";

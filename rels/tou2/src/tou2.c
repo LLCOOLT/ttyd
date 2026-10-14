@@ -446,7 +446,7 @@ static void disp_proc(CameraId cameraId, void* param) {
     f32 y;
     Mtx scale;
     Mtx mtx;
-    char buf[0x100];
+    char entry[0x100];
 
     fighters = evtGetValue(NULL, GSW(0)) < 172 ? fighterDt : fighterDt_re;
     winW = 250.0f;
@@ -479,7 +479,7 @@ static void disp_proc(CameraId cameraId, void* param) {
         }
         PSMTXScale(scale, 0.8f, 0.8f, 0.8f);
         if (num != 0) {
-            sprintf(buf, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
+            sprintf(entry, "%s%s", num / 10 ? suuji[num / 10] : "", suuji[num % 10]);
             FontDrawStart();
             {
                 GXColor color = numberColor;
@@ -487,7 +487,7 @@ static void disp_proc(CameraId cameraId, void* param) {
             }
             PSMTXTrans(mtx, x, y, 0.0f);
             PSMTXConcat(mtx, scale, mtx);
-            FontDrawMessageMtx(mtx, buf);
+            FontDrawMessageMtx(mtx, entry);
         }
         FontDrawStart();
         if (rank_wp->entries[i].flags & RANK_PLAYER) {
@@ -595,7 +595,9 @@ USER_FUNC(evt_tou_set_ranking_win_lose_28_text_35C0) {
     max = -1000;
     for (i = 0; i < rank_wp->count; i++) {
         if (!(rank_wp->entries[i].flags & RANK_HIDDEN)) {
-            s32 b = rand() % 4 + rand() % 4;
+            s32 b = 0;
+            b += rand() % 4;
+            b += rand() % 4;
 
             rank_wp->entries[i].points.total += b - 3;
             if (rank_wp->entries[i].points.total < min) {
@@ -879,13 +881,13 @@ static void rankingControll(void) {
     RankEntry* entry;
     nAbove = 0;
     nBelow = 0;
-    for (i = 0, entry = rank_wp->entries; i < rank_wp->count; i++, entry++) {
+    for (idx = 0, entry = rank_wp->entries; idx < rank_wp->count; idx++, entry++) {
         if (!(entry->flags & RANK_PLAYER)) {
             if (entry->flags & RANK_BELOW) {
-                below[nBelow] = i;
+                below[nBelow] = idx;
                 nBelow++;
             } else {
-                above[nAbove] = i;
+                above[nAbove] = idx;
                 nAbove++;
             }
         }
@@ -903,13 +905,13 @@ static void rankingControll(void) {
         }
 
         for (i = 0; i < nAbove - 1; i++) {
-            for (j = i + 1; j < nAbove; j++) {
-                FighterData* fj = &fighterDt[rank_wp->entries[above[j]].id];
+            for (idx2 = i + 1; idx2 < nAbove; idx2++) {
+                FighterData* fj = &fighterDt[rank_wp->entries[above[idx2]].id];
                 FighterData* fi = &fighterDt[rank_wp->entries[above[i]].id];
                 if ((fj->flags & 5) && (fi->flags & 2)) {
                     tmp = above[i];
-                    above[i] = above[j];
-                    above[j] = tmp;
+                    above[i] = above[idx2];
+                    above[idx2] = tmp;
                 }
             }
         }
@@ -1005,13 +1007,13 @@ static void rankingControll(void) {
         }
 
         for (i = 0; i < nBelow - 1; i++) {
-            for (j = i + 1; j < nBelow; j++) {
-                FighterData* fj = &fighterDt[rank_wp->entries[below[j]].id];
+            for (idx2 = i + 1; idx2 < nBelow; idx2++) {
+                FighterData* fj = &fighterDt[rank_wp->entries[below[idx2]].id];
                 FighterData* fi = &fighterDt[rank_wp->entries[below[i]].id];
                 if ((fj->flags & 5) && (fi->flags & 2)) {
                     tmp = below[i];
-                    below[i] = below[j];
-                    below[j] = tmp;
+                    below[i] = below[idx2];
+                    below[idx2] = tmp;
                 }
             }
         }

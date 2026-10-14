@@ -2031,8 +2031,6 @@ void BtlUnit_LoadSeMode(s32 mode, s32 kind, BtlPoseSoundTable* table, BtlPoseSou
         case -2:
             work->field_0x12 = work->field_0xC;
             return;
-        default:
-            break;
     }
     work->name0 = NULL;
     work->name1 = NULL;
@@ -2142,11 +2140,10 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
                 else {
                     id = BtlUnit_snd_se(part->mOwner, entry->sfxName, -250000000, entry->pitch);
                 }
-                vol = 0x7F;
-                psndSFX_vol(id, vol);
+                psndSFX_vol(id, vol = 0x7F);
                 state->count++;
                 if (part->mOwner->attackPhase != BattleGetSeq(wp, 4)) {
-                    psndSFX_vol(id, vol * 0.7);
+                    psndSFX_vol(id, (f32)vol * 0.7);
                 }
             }
             else {
@@ -2225,14 +2222,12 @@ void BtlUnit_HpGaugeMain(BattleUnit* unit) {
             switch (gauge->mode) {
                 case 1:
                     gauge->field_0x14 = (f32)unit->currentHp / (f32)unit->maxHp;
-                    t = intplGetValue(2, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f);
-                    gauge->field_0x18 = gauge->field_0x14 + (f32)(gauge->field_0xC - gauge->field_0x10) * t / (f32)unit->maxHp;
+                    gauge->field_0x18 = gauge->field_0x14 + (f32)(gauge->field_0xC - gauge->field_0x10) * intplGetValue(2, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f) / (f32)unit->maxHp;
                     break;
                 default:
                     gauge->field_0x18 = 0.0f;
                     maxHp = unit->maxHp;
-                    t = intplGetValue(0, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f);
-                    gauge->field_0x14 = (f32)(gauge->field_0xC - gauge->field_0x10) * t / (f32)maxHp + (f32)unit->currentHp / (f32)maxHp;
+                    gauge->field_0x14 = (f32)(gauge->field_0xC - gauge->field_0x10) * intplGetValue(0, gauge->field_0x4, gauge->field_0x6, 0.0f, 1.0f) / (f32)maxHp + (f32)unit->currentHp / (f32)maxHp;
                     break;
             }
         }

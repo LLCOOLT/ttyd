@@ -69,7 +69,7 @@ USER_FUNC(evt_cam_shake) {
     s32* args = event->args;
     u64 now;
     u64 last;
-    s64 mask = -1;
+    u64 mask = -1;
     CameraId id;
     f32 x, y;
     s32 msec;

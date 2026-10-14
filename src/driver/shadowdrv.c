@@ -182,19 +182,34 @@ static GXColor color_tbl[3] ATTRIBUTE_ALIGN(32) = {
 GXColor color_tbl_nodecay[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E}, {0x00, 0x00, 0x00, 0x6E},
 };
-GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
+GXColor color_tbl_cube[4] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
 };
 
-static inline void charShadowInit(void);
+static inline void charShadowInit(void) {
+    CharShadowWork* wp;
+
+    cswp->unk0 = 0;
+    cswp->unk4 = 0;
+    cswp->unk8 = 1;
+    cswp->unk100 = (GXColor){0, 0, 0, 0x6E};
+    cswp->unk10C = 1;
+    cswp->unk110 = 2;
+    cswp->unk114 = 20.0f;
+    cswp->unk118 = 1;
+    cswp->unk104 = 0;
+    cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
+    memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
+    wp = cswp;
+    wp->unkFC = smartAlloc(GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0), 0);
+}
 static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
-    int bufferSize;
-    u8* ramp8;
-    u32 size16;
+    u32 bufferSize;
     u16* ramp16;
+    u8* ramp8;
     u32 i;
 
     charShadowInit();
@@ -209,14 +224,14 @@ void shadowInit(void) {
     GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     DCFlushRange(ramp8, bufferSize);
 
-    size16 = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
+    bufferSize = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
     ramp16 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
     for (i = 0; i < 0x10000; i++) {
         ramp16[(((i & 0x3) * 4) + (((i & 0xFC) * 256) + (((i & 0xFC00) / 64) + ((i & 0x300) / 256))))] = i;
     }
     GXInitTexObj(&rampTex16, ramp16, 0x100, 0x100, GX_TF_IA8, GX_CLAMP, GX_REPEAT, GX_FALSE);
     GXInitTexObjLOD(&rampTex16, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    DCFlushRange(ramp16, size16);
+    DCFlushRange(ramp16, bufferSize);
     projShadowInit();
 
 }
@@ -356,24 +371,6 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
         return FALSE;
     }
     return TRUE;
-}
-
-static inline void charShadowInit(void) {
-    CharShadowWork* wp;
-
-    cswp->unk0 = 0;
-    cswp->unk4 = 0;
-    cswp->unk8 = 1;
-    cswp->unk100 = (GXColor){0, 0, 0, 0x6E};
-    cswp->unk10C = 1;
-    cswp->unk110 = 2;
-    cswp->unk114 = 20.0f;
-    cswp->unk118 = 1;
-    cswp->unk104 = 0;
-    cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
-    memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
-    wp = cswp;
-    wp->unkFC = smartAlloc(GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0), 0);
 }
 
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
@@ -552,6 +549,10 @@ void shadowCharShadowDisp_Polygon(CameraId cameraId, void* param) {
     }
 }
 
+static inline void shadowSetMat(void) {
+    GXSetChanMatColor(GX_COLOR0A0, cswp->unk100);
+}
+
 void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     f32 (*view)[4];
@@ -564,7 +565,7 @@ void shadowCharShadowDisp_Texture(CameraId cameraId, void* param) {
     view = camGetCurPtr()->view;
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
-    GXSetChanMatColor(GX_COLOR0A0, cswp->unk100);
+    shadowSetMat();
     effGetTexObjN64(0x2C, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
     GXSetNumTexGens(1);
@@ -675,11 +676,16 @@ static inline void shadowDrawVolume(ShadowEntry* entry) {
     }
 }
 
-static inline GXColor shadowMkColor(u8 a) {
+static inline void shadowSetTev(u8 a) {
     GXColor c = {0, 0, 0, 0};
     c.a = a;
-    return c;
+    GXSetTevColor(GX_TEVREG0, c);
 }
+
+static inline void shadowSetMatZero(void) {
+    GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
+}
+
 
 void cylinderShadowDraw(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
@@ -700,7 +706,7 @@ void cylinderShadowDraw(CameraId cameraId, void* param) {
         }
         PSMTXConcat(view, entry->mtx, m);
         GXLoadPosMtxImm(m, GX_PNMTX0);
-        GXSetTevColor(GX_TEVREG0, shadowMkColor(entry->alpha));
+        shadowSetTev(entry->alpha);
         GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
         GXSetCullMode(GX_CULL_BACK);
         GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_LO_CLEAR);
@@ -714,14 +720,14 @@ void cylinderShadowDraw(CameraId cameraId, void* param) {
         GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
         GXSetAlphaUpdate(GX_TRUE);
         GXSetColorUpdate(GX_FALSE);
-        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0, 0, 0, 0});
+        shadowSetMatZero();
         GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_CLAMP, GX_AF_NONE);
         shadowDrawVolume(entry);
         GXSetCullMode(GX_CULL_BACK);
         GXSetBlendMode(GX_BM_BLEND, GX_BL_DSTALPHA, GX_BL_INVDSTALPHA, GX_LO_CLEAR);
         GXSetAlphaUpdate(GX_FALSE);
         GXSetColorUpdate(GX_TRUE);
-        GXSetChanMatColor(GX_COLOR0A0, cswp->unk100);
+        shadowSetMat();
         shadowDrawVolume(entry);
         if (cameraId == CAMERA_OFFSCREEN2) {
             sysWaitDrawSync();

@@ -1415,10 +1415,8 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
     case 9:
         if (m->position.y <= -100.0f) {
             k = AM_S32(m, 0x12C);
-            px = (f32)((rand() * 10 / 32767) + (k % 20 * 25 - 235));
             pz = 0.1f * (f32)(k % 20) + (f32)(k / 20 * 30 + 115);
-            m->position.x = px;
-            m->mHomePosition.x = px;
+            m->mHomePosition.x = m->position.x = (f32)((rand() * 10 / 32767) + (k % 20 * 25 - 235));
             m->mHomePosition.y = AM_F32(stage, 0xB34);
             m->mHomePosition.z = m->position.z = pz;
 

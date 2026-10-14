@@ -244,19 +244,19 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     tmpl = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     p = tmpl;
-    for (k = 0; k < 16; k++) {
-        p = &tmpl[k];
-        ang = (6.2831855f * (f32)(k * 360 / 15)) / 360.0f;
+    for (i = 0; i < 16; i++) {
+        p = &tmpl[i];
+        ang = (6.2831855f * (f32)(i * 360 / 15)) / 360.0f;
         p->x = 100.0f * (f32)cos(ang);
         p->y = 0.0f;
         p->z = 100.0f * (f32)sin(ang);
-        p->s = k * 128;
+        p->s = i * 128;
         p->t = 0;
-        q = &tmpl[k + 16];
+        q = &tmpl[i + 16];
         q->x = 100.0f * (f32)cos(ang);
         q->y = 0.0f;
         q->z = 100.0f * (f32)sin(ang);
-        q->s = k * 512;
+        q->s = i * 512;
         q->t = 1024;
     }
     PSMTXRotRad(rot, 'z', 0.017453292f * work->unk144);

@@ -292,7 +292,7 @@ void battleAcDelete_StickKeepLeft(BattleWork* work) {
 
 #pragma dont_inline on
 static void actionCommandDisp(f32 x, f32 y, s32 unused) {
-    BattleWork* work = _battleWorkPointer;
+    BattleWork* work;
     s32 count;
     s32 idx;
     s32 i;
@@ -307,6 +307,7 @@ static void actionCommandDisp(f32 x, f32 y, s32 unused) {
     char n4[8] = "_AcSkl4";
     char n5[8] = "_AcSkl5";
 
+    work = _battleWorkPointer;
     camGetPtr(8);
     count = SKL_P(work)->count;
     idx = SKL_W(work)->idx - 1;

@@ -130,10 +130,10 @@ void seq_battleMain(BattleSeqWork* work) {
             break;
         }
         case 1:
-            if (!loadTpl("battle/audience/audience_normal.tpl")) {
+            if ((u32)fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "battle/audience/audience_normal.tpl") == 0) {
                 break;
             }
-            if (!loadTpl("battle/audience/audience_luigi.tpl")) {
+            if ((u32)fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "battle/audience/audience_luigi.tpl") == 0) {
                 break;
             }
             work->counter++;

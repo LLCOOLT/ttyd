@@ -96,7 +96,7 @@ EffectEntry* effCloudN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 s
     EffCloudN64Work* work;
 
     effect = effEntry();
-    effect->type = "CloudN64\0\0\0";
+    effect->type = "CloudN64\0\0\0\0\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffCloudN64Work));
     effect->userdata = work;
@@ -268,27 +268,32 @@ void effCloudMain(EffectEntry* effect) {
 
 void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
     EffCloudN64Work* work;
+    f32 scale;
     s32 frame;
     s32 type;
-    s32 i;
-    s32 idx;
-    effN64Vtx* v;
-    effN64Vtx* vtx;
-    s32 first;
-    s32 uo;
-    s32 u;
+    s32 prev;
     s32 fade;
-    CameraEntry* camera;
+    effN64Vtx* vtx;
+    s32 i;
+    s32 first;
     GXTexObj texObj;
+    s32 u;
+    s32 alpha;
+    s32 uo;
+    s32 next;
+    CameraEntry* camera;
+    s32 b;
+    s32 k;
+    s32 count;
+    s32 g;
     Mtx mtx;
-    f32 scale;
     s32 n;
-    s32 count, j, k, next, prev;
-
-    s32 g, b, c;
+    s32 j;
+    effN64Vtx* v;
+    s32 c;
+    s32 idx;
     f32 zero, ang, a1, a2, diff, x, y, z, w, sn, cs;
 
-    s32 alpha;
 
 
     camera = camGetPtr(cameraId);
@@ -348,9 +353,10 @@ void effCloudDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
     if (count - 1 > 0) {
-        v = vtx;
+
         n = 0;
-        for (i = 0; i < 30; i++, v += 2) {
+        for (i = 0; i < 30; i++) {
+            v = &vtx[i * 2];
             idx = (1 + work->head + i) % 30;
             sn = (f32)sin(6.2831855f * (f32)(n * 180 / (count - 1)) / 360.0f);
             alpha = (s32)(255.0f * sn);

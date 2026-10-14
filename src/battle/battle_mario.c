@@ -2988,7 +2988,8 @@ USER_FUNC(_mario_fire_ball_controll) {
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, partId);
     EffectEntry* eff;
     if (isFirstCall) {
-        event->userdata[1] = (s32)effFireEntry(5, 0, 0, 0, (event->userdata[0] = 0, (f32){1.0f}), 1000);
+        event->userdata[0] = 0;
+        event->userdata[1] = (s32)effFireEntry(5, 0.0f, 0.0f, 0.0f, 1.0f, 1000);
 
     }
     eff = (EffectEntry*)event->userdata[1];
@@ -3002,7 +3003,6 @@ USER_FUNC(_mario_fire_ball_controll) {
     }
     return EVT_RETURN_BLOCK;
 }
-
 USER_FUNC(_fire_wave) {
     s32* args = event->args;
     f32 x = evtGetValue(event, args[0]);
@@ -3014,6 +3014,7 @@ USER_FUNC(_fire_wave) {
     }
     return EVT_RETURN_DONE;
 }
+
 
 USER_FUNC(_majinai_powerup_check) {
     BattleWork* wp = _battleWorkPointer;

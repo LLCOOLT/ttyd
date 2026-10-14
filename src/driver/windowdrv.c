@@ -33,6 +33,7 @@ static const GXColor fog_color = {0xFF, 0xFF, 0xFF, 0xFF};
 //local prototypes
 void unk_8007f204(s32 error, DVDFileInfo* info);
 void _windowDispGX_Message(s32 type, s32 a2, u8 alpha, BOOL dark, f32 x, f32 y, f32 height, f32 width, f32 a9, f32 a10);
+static inline void fogOff(void) { GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color); }
 
 void windowInit(void) {
 	WindowEntry* w;
@@ -412,8 +413,8 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 
 //regalloc issues wrt f29/f28, stack swap in GXColor, some vert code (see comments), 99.8% 1:1
 void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width) {
-	GXColor color;
 	CameraEntry* camera;
+	f32 x5;
 	f32 scroll;
 	Mtx mtx;
 	Mtx trans, scale;
@@ -423,7 +424,6 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	Mtx trans3, scale3;
 	f32 x3, x4;
 	Mtx trans4, scale4;
-	f32 x5;
 	static f32 scrl;
 
 	camera = camGetCurPtr();
@@ -436,7 +436,7 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);
 	GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color);
+	fogOff();;
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -455,8 +455,7 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetCurrentMtx(0);
 
-	color = (GXColor){0xFF, 0xFF, 0xFF, alpha};
-	GXSetTevColor(GX_TEVREG0, color);
+	GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, alpha});
 	GXSetNumTevStages(4);
 	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
 	GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -547,7 +546,7 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXLoadTexMtxImm(scale2, 0x21, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
-	y3 = 0.0f - (width - 32.0f);
+	y3 = -(width - 32.0f);
 	y4 = y3 - 32.0f; //not emitting correctly, some macro used?
 
 	GXPosition3f32(0.0f, y3, 0.0f); //f27 = y3, neg(width - 32.0f)
@@ -1101,7 +1100,7 @@ void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 widt
 		GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);
 		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color);
+		fogOff();;
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 		GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -1279,7 +1278,7 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 		GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 		GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);
 		GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color);
+		fogOff();;
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 		GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);

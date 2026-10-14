@@ -457,17 +457,16 @@ void moamoa_dispent(void) {
 
 USER_FUNC(evt_moamoa_set_one) {
     ExtPose* pose;
-    Moamoa* moa;
     s32* args = event->args;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
+    Moamoa* moa;
     Mtx m;
 
     pose = extGetPosePtr();
-    moa = &wp->moa[idx];
-    moa->state = 3;
+    (moa = &wp->moa[idx])->state = 3;
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
 

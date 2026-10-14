@@ -122,7 +122,7 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    idx = (s32)work->progress;
+    idx = work->progress;
     alpha = (s32)(256.0f * (work->progress - idx));
     last = (idx == 7);
     type = work->type;

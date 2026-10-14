@@ -423,9 +423,9 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     f32 v28;
     f32 v27;
     f32 v26;
-    f32 v25;
-    f32 v24;
     f32 v23;
+    f32 v24;
+    f32 v25;
     f32 v22;
     f32 v21;
     f32 v20;

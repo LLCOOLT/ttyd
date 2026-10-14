@@ -753,18 +753,22 @@ USER_FUNC(cam_test_init_func) {
 
 USER_FUNC(cam_test_func) {
     s32* args = event->args;
-    f32 angle = evtGetFloat(event, args[2]);
-    f32 dist = evtGetFloat(event, args[3]);
-    f32 rad = 6.2831855f * angle / 360.0f;
-    f32 s = sin(rad);
-    f32 c = cos(rad);
+    s32* p0;
+    f32 angle, dist, rad, s, c;
     Vec center;
+
+    angle = evtGetFloat(event, args[2]);
+    p0 = args++;
+    dist = evtGetFloat(event, args[2]);
+    rad = 6.2831855f * angle / 360.0f;
+    s = sin(rad);
+    c = cos(rad);
 
     center.x = 70.0f;
     center.y = 110.0f;
     center.z = 0.0f;
-    evtSetValue(event, *args++, center.x + dist * s);
-    evtSetValue(event, *args++, center.z - dist * c);
+    evtSetValue(event, *p0, center.x + dist * s);
+    evtSetValue(event, *args, center.z - dist * c);
     return EVT_RETURN_DONE;
 }
 

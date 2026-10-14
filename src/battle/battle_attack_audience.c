@@ -149,7 +149,6 @@ s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
 
 void _get_item_announce_disp(s32 cameraId, void* param) {
     static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor col;
     u16 lines;
     const char* itemName;
     char buf[128];
@@ -158,14 +157,15 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     s32 no;
     f32 x;
     f32 y;
+    GXColor col;
 
     no = BattleAudience_GetPresentItemNo();
     itemName = msgSearch(itemDataTable[no].name);
     msg = msgSearch("btl_msg_get_item");
     sprintf(buf, msg, itemName);
     width = FontGetMessageWidthLine(buf, &lines);
-    lines++;
     col = color;
+    lines++;
     y = 0.0f;
     x = y - width / 2;
     y = 60.0f;
@@ -229,18 +229,23 @@ s32* btlataudGetMoveEventPtr(void) {
 }
 
 
+
+
 s32* btlataudGetAttackEventPtr(s32 unitId) {
     s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
     if (p == NULL) {
-        p = (s32*)((u32)btlataudevtDummy + 4);
+        return &btlataudevtDummy[1];
     }
     return p;
 }
 
-s32 btlataudevtDummy[] = {
+s32 btlataudevtDummy[16] = {
     0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
     (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
 };
+
+
+
 
 
 

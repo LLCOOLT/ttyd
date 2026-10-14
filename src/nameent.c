@@ -391,8 +391,8 @@ s32 nameMain(void) {
 			}
 			break;
 	}
-	wp->x1 += (wp->x2 - wp->x1) * 0.25f;
-	wp->y1 += (wp->y2 - wp->y1) * 0.25f;
+	wp->x1 += 0.25f * (wp->x2 - wp->x1);
+	wp->y1 += 0.25f * (wp->y2 - wp->y1);
 	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
 	idx = wp->field_0x18;
 	if (idx >= 8) {

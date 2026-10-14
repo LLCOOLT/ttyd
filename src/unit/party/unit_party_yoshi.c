@@ -1187,13 +1187,12 @@ s32 _yoshig_tpl_no_tbl[] = {
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
     s32 id;
 
-    id = evtGetValue(event, args[0]);
+    id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
@@ -1597,5 +1596,5 @@ void _btlYoshiDisp(CameraId camera, f32* p) {
     } else {
         s = -0.4f;
     }
-    ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
+    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
 }

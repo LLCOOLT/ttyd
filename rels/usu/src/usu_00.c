@@ -2228,7 +2228,7 @@ void kpaSen_ext_main(void) {
                 break;
             case 1:
                 if (i < 100) {
-                    pose->frame = kpaSen[i].pose1Lo + ((gp->retraceCount + i * i) % ((kpaSen[i].pose1Hi - kpaSen[i].pose1Lo + 1) * 6)) / 6;
+                    pose->frame = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
                     if (i % 10 != 0) break;
                 } else {
                     pose->frame = calcPose(i - 100, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);

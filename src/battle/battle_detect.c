@@ -46,10 +46,16 @@ typedef struct DetWork {
 
 
 void _btlSamplingEnemy(DetWork* d) {
+    BattleUnitKindPart* kp;
     s32 n = 0;
-    s32 j, k, i;
+    u8 np;
     DetTarget* t = d->t;
+    s32 k;
+    BattleUnit* unit;
     BattleWork* wp = _battleWorkPointer;
+    BattleUnitPart* part;
+    s32 i;
+    s32 j;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -57,12 +63,11 @@ void _btlSamplingEnemy(DetWork* d) {
     }
     {
     for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(wp, i);
+        unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
-            BattleUnitPart* part = unit->mParts;
-            u8 np = unit->mKindParams->numParts;
+            part = unit->mParts;
+            np = unit->mKindParams->numParts;
             for (j = 0; j < np; j++) {
-                BattleUnitKindPart* kp;
                 s32 dir;
                 f32 x, y, z;
                 f32 ox, oy, oz;

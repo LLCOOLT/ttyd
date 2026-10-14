@@ -3786,8 +3786,12 @@ USER_FUNC(btlevtcmd_ConsumeItemReserve) {
                 ((void (*)(s32, s32, f32, f32, f32, f32))effCoinN64Entry)(0, 0, pos.x, pos.y, pos.z, 1.0f);
             }
         }
-    } else if (unit->heldItem == 0x97) {
-        unit->heldItem = 0;
+    } else {
+        if (unit->heldItem == 0x97) {
+            unit->heldItem = 0;
+        }
+        goto end;
+    end:;
     }
     return EVT_RETURN_DONE;
 }

@@ -1,3 +1,4 @@
+#define _MATH_H_
 
 #include "musyx/assert.h"
 #include "musyx/hardware.h"
@@ -15,9 +16,9 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static s32 gsNextID;
 static GSROOT* gsCurrent;
 static GSROOT* gsRoot;
+static s32 gsNextID;
 static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
@@ -263,9 +264,8 @@ bool sndPushGroup(void* prj_data, u16 gid, void* samples, void* sdir, void* pool
 */
 bool sndPopGroup() {
   GROUP_DATA* g;
-  void* prj;
   SDIR_DATA* sdir;
-  int i;
+  void* prj;
   FX_DATA* fd;
 
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
@@ -363,6 +363,7 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
+  int i;
   u32 seqId;
   GROUP_DATA* g;
   MIDISETUP* midiSetup;
@@ -370,7 +371,6 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
   PAGE* norm;
   GSROOT* root;
   void* prj;
-  int i;
 
   for (root = gsRoot; root != NULL; root = root->next) {
     for (i = 0; i < root->sp; ++i) {

@@ -706,11 +706,11 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx tmp;
     Mtx base;
-    f32 w;
     f32 left;
     f32 right;
     f32 top;
     f32 bot;
+    f32 w;
 
     cam = camGetPtr(cameraId);
     type = work->type;
@@ -744,7 +744,7 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     w = 108.0f;
-    left = -w * 0.5f;
+    left = -w; left = left * 0.5f;
     right = left + w;
     top = 20.0f;
     bot = -20.0f;

@@ -133,8 +133,6 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     s32 i;
     s32 j;
     s16 sz;
-    GXColor c1;
-    GXColor c0;
     GXTexObj texObj;
     Mtx mf8;
     Mtx mc8;
@@ -196,6 +194,8 @@ static void main_dl(EffectEntry* effect, Mtx base) {
         PSMTXConcat(mf8, m98, m68);
 
         for (j = 0, a = anime_data; j < 3; j++) {
+            GXColor c1;
+            GXColor c0;
             f32 t = 6.2831855f * ang / 360.0f;
             c = (f32)cos(t);
             s = (f32)sin(t);
@@ -211,6 +211,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             c0.a = alpha;
             GXSetTevColor(GX_TEVREG0, c0);
             c1 = (GXColor){0, 0, 0, 255};
+
             c1.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
             c1.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
             c1.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));

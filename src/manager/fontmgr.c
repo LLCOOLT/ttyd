@@ -725,6 +725,8 @@ u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 		maxWidth = width;
 	}
 	if (maxWidth) {
+		if (code && code) {
+		}
 		maxWidth -= charspace[gp->language];
 	}
 	if (lines) {

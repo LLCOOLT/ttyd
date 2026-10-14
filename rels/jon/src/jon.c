@@ -2684,3 +2684,7 @@ void _prolog(void) {
     relSetEvtAddr("jon_06", jon_init_evt);
     relSetBtlAddr("jon", btlsetup_jon_tbl, btl_jon_setup_no_tbl);
 }
+
+#pragma force_active on
+const u32 gap_03_00000984_rodata = 0;
+#pragma force_active reset

@@ -178,10 +178,10 @@ void effConfettiMain(EffectEntry* effect) {
     s32 mod;
     EffConfettiN64Work* w;
     s32 i;
+    s32 anm;
     s32 type;
     s32 frame;
     s32 count;
-    s32 anm;
     s32 camId;
     Vec position;
 
@@ -211,6 +211,7 @@ void effConfettiMain(EffectEntry* effect) {
     }
     mod = type % 10;
     w++;
+    anm = (frame >> 1) % 6;
     for (i = 0; i < count; i++, w++) {
         switch (mod) {
         case 3:

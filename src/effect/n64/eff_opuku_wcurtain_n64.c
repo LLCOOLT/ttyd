@@ -174,7 +174,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         p->y = 600;
         p->z = 0;
         p->s = (frame + i * 4) << 5;
-        t = (s32)work->offset[i]; p->t = t << 5;
+        p->t = (s32)work->offset[i] << 5;
         p->r = 255;
         p->g = 255;
         p->b = 255;

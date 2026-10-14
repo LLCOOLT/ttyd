@@ -96,6 +96,7 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
 	Vec unused = {0.0f, 0.0f, 0.0f};
 
 	effect = effEntry();
+
 	effect->type = "MugiKemuri2";
 	effect->count = 5;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effMugiKemuriData) * 5);
@@ -366,4 +367,3 @@ void effMugiKemuri2Disp(CameraId camId, void* param) {
 }
 
 
-const double effMugi_dbl = 0.005;

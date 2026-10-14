@@ -164,10 +164,10 @@ void effBalloonMain(EffectEntry* effect) {
 }
 
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
-    EffBalloonN64Work* work;
+    CameraEntry* camera = camGetPtr(cameraId);
+    EffBalloonN64Work* work = effect->userdata;
     effN64Vtx* vtx;
     s32 type;
-    CameraEntry* camera;
     s32 i;
     Vec v0;
     Vec v1;
@@ -179,8 +179,6 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx a;
     Mtx b;
 
-    camera = camGetPtr(cameraId);
-    work = effect->userdata;
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     type = work->lifetime;
     if (type == 0) {

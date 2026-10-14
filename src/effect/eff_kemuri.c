@@ -148,7 +148,7 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	EffectEntry* entry;
 	effKemuri2Data* data;
-	f32 rv, rot, vy, speed, zz;
+	f32 rv, vy, speed, rot, zz;
 	f32 rad, angle, vz, vx;
 	s32 ia;
 
@@ -161,7 +161,8 @@ EffectEntry* effKemuri2Entry(f32 x, f32 y, f32 z, f32 dx, f32 dz) {
 	entry->callback = effKemuri2Main;
 	angle = 360.0f * angleABf(0.0f, 0.0f, vx = 1000.0f * dx, vz = 1000.0f * dz) / 6.2831855f;
 	rot = camGetPtr(4)->viewYaw;
-	data->angle = reviseAngle(360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f + rot);
+	rv = 360.0f * angleABf(0.0f, 0.0f, vx, vz) / 6.2831855f;
+	data->angle = reviseAngle(rv + rot);
 	ia = (s32)angle;
 	rad = 6.2831855f * ia / 360.0f;
 	zz = 5.0f + z;

@@ -216,9 +216,9 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(m16c, w, w, w);
     PSMTXConcat(m19c, m13c, m19c);
     PSMTXConcat(m19c, m16c, m7c);
-    d = (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    s = (f32)sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    PSMTXTrans(m19c, 2.0f * s, 0.0f, 2.0f * -d);
+    w = (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
+    d = (f32)sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
+    PSMTXTrans(m19c, 2.0f * d, 0.0f, 2.0f * -w);
     PSMTXConcat(m19c, m7c, m7c);
     GXSetTevColor(GX_TEVREG0, white);
     GXSetTevColor(GX_TEVREG1, color_tbl[work->type]);
@@ -285,10 +285,10 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-    h = 42.666668f;
-    w = 10.666667f;
-    d = -h;
-    a = -w / 2.0f;
+    w = 42.666668f;
+    d = -w;
+    h = 10.666667f;
+    a = -h / 2.0f;
     b = 5.3333335f;
     work++;
     for (i = 1; i < effect->count; i++, work++) {

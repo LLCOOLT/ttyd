@@ -5,11 +5,9 @@
 #include "driver/msgdrv.h"
 #include "driver/windowdrv.h"
 #include "manager/fontmgr.h"
-
 void BattleAcHelpSetHelp(const char* msg) {
 	_battleWorkPointer->acHelpMsg = msg;
 }
-
 void BattleAcHelpSetDispType(s32 type) {
 	_battleWorkPointer->acHelpDispType = type;
 	switch (type) {
@@ -21,22 +19,17 @@ void BattleAcHelpSetDispType(s32 type) {
 			break;
 	}
 }
-
 void BattleAcHelpInit(void) {
 	//stubbed in retail
 }
-
 void _ac_help_disp(CameraId cameraId, void* param);
-
 void BattleAcHelpMain(void) {
 	BattleWork* wp = _battleWorkPointer;
 	s32* type = &wp->acHelpDispType;
-
 	if (wp->acHelpMsg && *type && !(wp->flags & 2)) {
 		dispEntry(CAMERA_2D, 498.0f, 1, _ac_help_disp, NULL);
 	}
 }
-
 void _ac_help_disp(CameraId cameraId, void *param)
 {
   static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
@@ -49,6 +42,7 @@ void _ac_help_disp(CameraId cameraId, void *param)
   f32 x;
   f32 y;
   const char **help = &wp->acHelpMsg;
+  GXColor col;
   alpha = 0xFF;
   if (wp->acHelpDispType == 1)
   {
@@ -62,8 +56,8 @@ void _ac_help_disp(CameraId cameraId, void *param)
   new_var3[1] = new_var3[0];
   width = FontGetMessageWidthLine(new_var3[1], &lines);
   lines++;
-  { GXColor col; col = color;
-  col.a = alpha;
+  {
+  col = color; col.a = alpha;
   y = 0.0f;
   x = y - (width / 2);
   y = -148.0f;

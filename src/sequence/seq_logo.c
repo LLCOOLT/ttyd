@@ -38,6 +38,7 @@ void logoDisp(CameraId camId, void* param);
 void dummy_draw(CameraId camId, void* param);
 void progDisp(CameraId camId, void* param);
 
+
 static inline s32 logoAsyncFirst(void) {
 	return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
 }
@@ -512,9 +513,9 @@ void progDisp(CameraId camId, void* param) {
 					msg);
 
 				msg = romFontGetMessage(2); //selection box
-				width = (f32)romFontGetWidth(msg);
+				width = 0.7f * (f32)romFontGetWidth(msg);
 				romFontPrintGX(
-					-(((0.7f * width) / 2.0f) - (f32)(75 * ((2 * wp->toggle) - 1))),
+					-((width) / 2.0f - (f32)(75 * ((2 * wp->toggle) - 1))),
 					-160.0f,
 					0.7f,
 					&(GXColor){0xFF, 0xFF, 0xFF, 0xFF},

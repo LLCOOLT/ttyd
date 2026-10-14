@@ -42,7 +42,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 	effKemuri1EWork* data;
 	s32 effCount;
 	s32 i;
-	f32 angle; f32 angle2; f32 tmp;
+	f32 angle; f32 tmp; f32 angle2;
 
 	effect = effEntry();
 	switch (type) {

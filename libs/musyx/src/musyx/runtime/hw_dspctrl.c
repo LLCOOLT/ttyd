@@ -959,7 +959,7 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
               } break;
               case 6:
                 loopAddr = (u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1;
-                endAddr = dsp_vptr->smp_info.loop + dsp_vptr->smp_info.loopLength + base - 1;
+                endAddr = base + (dsp_vptr->smp_info.loop + dsp_vptr->smp_info.loopLength) - 1;
                 dsp_vptr->vSampleInfo.inLoopBuffer = 0;
                 break;
               case 2:
@@ -1825,3 +1825,8 @@ void salHandleAuxProcessing() {
     }
   }
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803BA894_data[1] = {0};
+__declspec(section ".rodata") const u32 gap_04_80302924_rodata[1] = {0};
+#pragma force_active reset

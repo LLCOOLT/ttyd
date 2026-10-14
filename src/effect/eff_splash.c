@@ -320,9 +320,9 @@ void effSplashGetCol(CameraId cameraId, EffectEntry* effect) {
 
 void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     EffSplashWork* work = effect->userdata;
+    u8** dl;
     Mtx trans;
     Mtx scale;
-    u8** dl;
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;

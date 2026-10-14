@@ -371,6 +371,8 @@ void battleAcDelete_GaugeTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
+    f32 px;
+    f32 py;
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
@@ -418,16 +420,14 @@ static void actionCommandDisp(f32 x, f32 y) {
         break;
     }
     default: {
-        f32 qx;
-        f32 qy;
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 0.0f, 100, 100, 100, 100, 0);
         if (cw->timer <= 0) {
             CameraEntry* cam = camGetPtr(8);
-            qx = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
-            qy = 49.0f + y;
+            px = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
+            py = 49.0f + y;
             btlDispGXInit2DRasta();
             GXLoadPosMtxImm(cam->view, 0);
-            btlDispGXQuads2DRasta(qx, qy, 10.0f + qx, qy - 16.0f, 0, 255, 0, 255);
+            btlDispGXQuads2DRasta(px, py, 10.0f + px, py - 16.0f, 0, 255, 0, 255);
         }
         n = g->target;
         for (i = 0; i < n; i++) {
@@ -477,8 +477,8 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1005:
             if (pressed2) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                f32 px = -228.0f + x;
-                f32 py = 55.0f + y;
+                px = -228.0f + x;
+                py = 55.0f + y;
                 pos.x = px;
                 pos.y = py;
                 iconDispGx(&pos, 0x10, unpressed, 1.0f);
@@ -501,8 +501,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -228.0f + x;
-                        f32 py = 55.0f + y;
+                        px = -228.0f + x;
+                        py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);
@@ -521,8 +521,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -228.0f + x;
-                        f32 py = 55.0f + y;
+                        px = -228.0f + x;
+                        py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
@@ -543,8 +543,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -228.0f + x;
-                        f32 py = 55.0f + y;
+                        px = -228.0f + x;
+                        py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
@@ -563,8 +563,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        f32 px = -228.0f + x;
-                        f32 py = 55.0f + y;
+                        px = -228.0f + x;
+                        py = 55.0f + y;
                         pos.x = px;
                         pos.y = py;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);

@@ -836,9 +836,9 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 
 void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 	BattleWork* wp = _battleWorkPointer;
-	f32 height = BtlUnit_GetHeight(unit);
 	s32 item;
 	Vec pos;
+	f32 height = BtlUnit_GetHeight(unit);
 
 	item = BtlUnit_EnemyItemCanUseCheck(unit->heldItem);
 	if (wp->flags & 0x20000 && !item) {

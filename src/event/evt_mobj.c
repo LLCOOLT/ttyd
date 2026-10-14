@@ -903,6 +903,7 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
                 }
             } else if (!strcmp(mobj->animName, "MOBJ_RedJumpStand")) {
                 psndSFXOn((const char*)0x1eb);
+                do { } while (0);
             } else {
                 psndSFXOn((const char*)0x1ec);
             }

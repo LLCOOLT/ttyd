@@ -174,15 +174,17 @@ USER_FUNC(search_result) {
 }
 
 static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
-    MarioWork* player2;
     int found;
     u32 i;
     ChuchuTreasure* tbl;
+    MarioWork* player2;
     f32 minDist;
 
+    player2 = pl;
     found = 0;
+    tbl = unk_8038bb34;
     minDist = 10000.0f;
-    for (tbl = unk_8038bb34, i = 0; i < 40; i++, tbl++) {
+    for (i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
             Vec p = vecB;
@@ -191,7 +193,7 @@ static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&pl->position, &pos);
+            d = PSVECDistance(&player2->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -304,16 +306,18 @@ USER_FUNC(post_msg) {
     return EVT_RETURN_DONE;
 }
 
-static inline int chuchu_findTreasure(MarioWork* pl, f32 range) {
-    MarioWork* player2;
-    int found;
+static inline int chuchu_findTreasure(ChuchuParty* cpp, f32 range) {
     u32 i;
+    int found;
+    MarioWork* player2;
     ChuchuTreasure* tbl;
     f32 minDist;
 
     found = 0;
+    player2 = cpp->player;
+    tbl = unk_8038bb34;
     minDist = 10000.0f;
-    for (tbl = unk_8038bb34, i = 0; i < 40; i++, tbl++) {
+    for (i = 0; i < 40; i++, tbl++) {
         if (strcmp(gp->currentMapName, tbl->map) == 0 && evtGetValue(NULL, tbl->flag) == 0) {
             Vec pos;
             Vec p = vecB;
@@ -322,7 +326,7 @@ static inline int chuchu_findTreasure(MarioWork* pl, f32 range) {
             p.y = tbl->y;
             p.z = tbl->z;
             pos = p;
-            d = PSVECDistance(&pl->position, &pos);
+            d = PSVECDistance(&player2->position, &pos);
             if (!(range < d) && minDist > d) {
                 minDist = d;
                 found = 1;
@@ -347,7 +351,7 @@ BOOL chuchu_searchObject(void) {
     if (mobjNearDistCheck2(player->position.x, player->position.y, player->position.z, 150.0f, mobj_list)) {
         return TRUE;
     }
-    return chuchu_findTreasure(cp->player, 150.0f) != 0;
+    return chuchu_findTreasure(cp, 150.0f) != 0;
 }
 
 void chuchu_init(PartyEntry* party) {

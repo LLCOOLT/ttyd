@@ -105,14 +105,14 @@ void lightMain(void) {
 }
 
 
-const Vec decay_tbl[] = {
+
+s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
+	static const Vec decay_tbl[] = {
 	{1.0f, 0.0f, 0.0f},
 	{0.0f, 0.1f, 0.0f},
 	{0.0f, 0.0f, 0.01f}, 
 	{0.0f, 0.0f, 0.01f}
 };
-
-s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
 	LightWork* wp = lightGetWork();
 	LightEntry* entry;
 	s32 i, j, k, n;
@@ -218,7 +218,7 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 	NearWork* tp;
 	LightEntry* entry;
 	u32 n;
-	s32 i, found;
+	s32 found, i;
 	LightEntry** op;
 
 	if (lightGetEntryNum() > 8) {
@@ -247,9 +247,9 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 		}
 	}
 
-	op = out;
 	found = 0;
 	tp = tmp;
+	op = out;
 	for (i = 0; i < n; i++, tp++) {
 		LightEntry* e = tp->entry;
 		if (!(e->flags & LIGHT_AMBIENT) && (flags == 0 || (flags & e->flags))) {

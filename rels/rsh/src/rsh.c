@@ -1466,6 +1466,7 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 }
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
+    MapObject* obj;
     s32 tevStage = info->tevStage;
     s32 texMap = info->texCoord;
     s32 texCoord = info->texMap;
@@ -1477,7 +1478,6 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
     Mtx mtx;
     f32 t;
-    MapObject* obj;
 
     obj = *(MapObject**)info->field_0x0;
     if (obj->flags & 0x20) {
@@ -1548,13 +1548,10 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
-    tevStage++;
-    texMap++;
-    texCoord++;
-    info->tevStage = tevStage;
-    info->texMap = texCoord;
+    info->tevStage = ++tevStage;
+    info->texMap = ++texCoord;
     info->field_0x18 = field_0x18;
-    info->texCoord = texMap;
+    info->texCoord = ++texMap;
 }
 
 BOOL img_wait(void) {
@@ -1631,3 +1628,7 @@ void _prolog(void) {
     relSetBtlAddr("rsh", btlsetup_rsh_tbl, btl_rsh_setup_no_tbl);
 }
 
+
+#pragma force_active on
+__declspec(section ".rodata") const u32 gap_03_00000B74_rodata = 0;
+#pragma force_active reset

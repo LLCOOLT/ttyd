@@ -775,6 +775,7 @@ void loadDraw(CameraId camera, void* param) {
     WinDt* win;
     WinDt* win1;
     s32 i;
+    f32* py;
     s32 j;
     char buf[0x20];
     char buf2[0x100];
@@ -783,7 +784,6 @@ void loadDraw(CameraId camera, void* param) {
     f32 x;
     f32 y;
     f32 w;
-    f32* py;
 
     if (wp->unk18 >= 0x20 && wp->unk18 < 0x28) {
         return;

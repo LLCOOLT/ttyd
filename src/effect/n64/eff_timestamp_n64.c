@@ -60,7 +60,7 @@ EffectEntry* effTimestampN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 
     s32 i;
 
     effect = effEntry();
-    effect->type = "TimestampN64";
+    effect->type = "TimestampN64\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffTimestampN64Work));
     effect->userdata = work;
@@ -168,6 +168,7 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     effN64Vtx* vtx;
     s32 k;
     s32 n;
+    s32 t;
     effN64Vtx* p;
 
     camera = camGetPtr(cameraId);
@@ -204,14 +205,21 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, work->alpha});
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     for (i = 0, p = vtx; i < 16; i++, p += 2) {
-        s32 t = i * 128;
-        f32 sc = work->scale2;
-        f32 a1 = 6.2831855f * (f32)(frame * 10 + i * 60) / 360.0f;
-        f32 a2 = 6.2831855f * (f32)(frame * 10 + i * 6) / 360.0f;
-        f32 s1 = sin(a1);
-        s32 sx = (s32)(sc * (500.0f * s1));
-        f32 s2 = sin(a2);
-        s32 sy = (s32)(sc * (200.0f * s2));
+        f32 sc;
+        f32 a1;
+        f32 a2;
+        f32 s1;
+        s32 sx;
+        f32 s2;
+        s32 sy;
+        t = i * 128;
+        sc = work->scale2;
+        a1 = 6.2831855f * (f32)(frame * 10 + i * 60) / 360.0f;
+        a2 = 6.2831855f * (f32)(frame * 10 + i * 6) / 360.0f;
+        s1 = sin(a1);
+        sx = (s32)(sc * (500.0f * s1));
+        s2 = sin(a2);
+        sy = (s32)(sc * (200.0f * s2));
         p->x = sx - 3200;
         p->y = sy + i * 400 - 3000;
         p->z = 0;

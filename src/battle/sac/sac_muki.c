@@ -150,6 +150,8 @@ typedef struct IconEffWork {
 static void disp_3D_alpha(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
 static void disp_3D(CameraId cam, void* param);
+static void disp_3D(CameraId cam, void* param);
+static void disp_3D(CameraId cam, void* param);
 static void disp_2D(CameraId cam, void* param);
 static MukiWork* get_ptr(void);
 static void main_star(void);
@@ -890,7 +892,7 @@ static void disp_3D_alpha(CameraId cam, void* param) {
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
+                c = 2.0f * o->rot.y; a = c * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
@@ -906,7 +908,7 @@ static void disp_3D_alpha(CameraId cam, void* param) {
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, 2.0f * o->scale.x, 2.0f * o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
+                c = 2.0f * o->rot.y; a = c * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {
@@ -923,7 +925,7 @@ break;
                 PSMTXRotRad(m, 'y', 0.017453292f * o->rot.y);
                 PSMTXScaleApply(m, m, o->scale.x, o->scale.y, o->scale.z);
                 PSMTXTransApply(m, m, o->pos.x, o->pos.y, o->pos.z);
-                a = 3.141592f * (2.0f * o->rot.y) / 360.0f;
+                c = 2.0f * o->rot.y; a = c * 3.141592f / 360.0f;
                 c = (f32)cos(a);
                 PSMTXTransApply(m, m, 15.0f * (f32)sin(a), 0.0f, 15.0f * c);
                 {

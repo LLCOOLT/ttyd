@@ -85,6 +85,7 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     s32 count;
     s32 i;
     EffStardustN64Work* work;
+    f32 ay;
     f32 sn;
     f32 radius;
     f32 angle;
@@ -92,7 +93,6 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
     f32 a2;
     f32 fa;
     f32 fb;
-    f32 ay;
 
     effect = effEntry();
     switch (type) {
@@ -148,9 +148,11 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
             a1 = 6.2831855f * (1800.0f / (f32)count * (f32)i - 90.0f) / 360.0f;
             sn = (f32)sin(a1);
             a2 = 6.2831855f * (360.0f / (f32)count * (f32)i) / 360.0f;
-            p->vx = ((f32)sin(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
+            angle = (f32)sin(a2);
+            p->vx = (angle * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
             sn = (f32)sin(a1);
-            p->vy = ((f32)cos(a2) * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
+            angle = (f32)cos(a2);
+            p->vy = (angle * (85.0f - 15.0f * sn - (f32)((i & 1) * 5)) / 100.0f) * a;
             p->position.z = 0.0f;
             p->sub = 0;
             break;
@@ -164,9 +166,9 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
                 ay = 0.0f;
             }
             p->ay = ay;
-            angle = 6.2831855f * angle / 360.0f;
             p->vx = 0.0f;
             p->vy = 0.0f;
+            angle = 6.2831855f * angle / 360.0f;
             p->position.x = (f32)sin(angle) * fa;
             p->position.y = (f32)cos(angle) * fb;
             p->position.z = 0.0f;
@@ -179,8 +181,7 @@ EffectEntry* effStardustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 a) {
         case 4:
         default:
             angle = 360.0f / (f32)count * (f32)i + (f32)(rand() % 360);
-            p->ay = -(0.05f + (f32)(rand() % 50 / 1000));
-            angle = 6.2831855f * angle / 360.0f;
+            p->ay = -(0.05f + (f32)(rand() % 50 / 1000)), angle = 6.2831855f * angle / 360.0f;
             p->vx = 0.0f;
             p->vy = 0.0f;
             p->position.x = (f32)sin(angle) * fa;

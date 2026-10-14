@@ -381,12 +381,16 @@ BOOL unk_8005bb80(void) {
 	return TRUE;
 }
 
+static inline BOOL marioChkCtrl2(void) { return !mp->ctrlOffCount; }
 static inline BOOL marioCtrlDisable(void) {
-	return !marioChkCtrl();
+	return marioChkCtrl2() ^ 1;
 }
 
 static inline BOOL marioKeyDisable(void) {
-	return !marioChkKey();
+	if (!marioChkKey()) {
+		return TRUE;
+	}
+	return FALSE;
 }
 
 static inline BOOL marioChkYoshiKey(void) {
@@ -497,7 +501,7 @@ BOOL marioChkKey(void) {
 }
 
 BOOL marioChkCtrl(void) {
-	return mp->ctrlOffCount == 0;
+	return !mp->ctrlOffCount;
 }
 
 BOOL N_marioChkUseParty(void) {
@@ -1707,6 +1711,8 @@ void marioMakeDispDir(void) {
 	f32 diff;
 	f32 tgt;
 	f32 step;
+	f32 c30 = 30.0f;
+	f32 c20 = 20.0f;
 
 	if (wp->dispFlags & 0x1000000) {
 		return;
@@ -1773,11 +1779,11 @@ void marioMakeDispDir(void) {
 				step = 0.3f * (10.0f - wp->unk1A8);
 			}
 			else {
-				step = 0.125f * (-30.0f - wp->unk1A8);
+				step = 0.125f * (-c30 - wp->unk1A8);
 			}
 			wp->unk1A8 += step;
 			if (!(wp->trigFlags & 0x100)) {
-				if (wp->unk1A8 < -20.0f) {
+				if (wp->unk1A8 < -c20) {
 					wp->trigFlags |= 0x100;
 				}
 			}
@@ -1821,11 +1827,11 @@ void marioMakeDispDir(void) {
 				step = 0.3f * (10.0f - wp->unk1A8);
 			}
 			else {
-				step = 0.125f * (-30.0f - wp->unk1A8);
+				step = 0.125f * (-c30 - wp->unk1A8);
 			}
 			wp->unk1A8 += step;
 			if (!(wp->trigFlags & 0x100)) {
-				if (wp->unk1A8 < -20.0f) {
+				if (wp->unk1A8 < -c20) {
 					wp->trigFlags |= 0x100;
 				}
 			}
@@ -2343,7 +2349,7 @@ const char* toRearPose(const char* name) { //1:1
 			rear = "M_H_8R";
 		}
 		else if (!strcmp(name, "M_O_2")) {
-			rear = "M_O_1R";
+			rear = "M_O_2R";
 		}
 		else if (!strcmp(name, "M_I_2")) {
 			rear = "M_I_2R";

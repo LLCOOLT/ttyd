@@ -150,6 +150,21 @@ BOOL marioChkJabara(void) {
 	}
 }
 
+static inline void jabaraHitPos(HitEntry* hit, Vec* v) {
+	marioGetPtr();
+	hitObjGetPos(hitGetName(hit), v);
+}
+
+static inline void jabaraLand(f32 y_, void* h_) {
+	MarioWork* mp_ = marioGetPtr();
+	MW(mp_, 0x50, s16) = 0;
+	MW(mp_, 0x52, s16) = 0;
+	MW(mp_, 0x1e4, void*) = h_;
+	MW(mp_, 0x1e8, s32) = 0;
+	MW(mp_, 0x90, f32) = y_;
+	MW(mp_, 0, u32) &= ~0xF0000;
+}
+
 #define VC(m, off, src) MW(m, off, Vec) = src
 #define M(off, T) MW(mario, off, T)
 #define POS ((Vec*)((u8*)mario + 0x8c))
@@ -167,17 +182,7 @@ BOOL marioChkJabara(void) {
 #define MOTSUB_ marioChgMotSub(0, 0);
 #define JAB_LAND(HIT, Y) \
 	marioPaperOff(); \
-	{ \
-		void* h_ = (HIT); \
-		f32 y_ = (Y); \
-		MarioWork* mp_ = marioGetPtr(); \
-		MW(mp_, 0x50, s16) = 0; \
-		MW(mp_, 0x52, s16) = 0; \
-		MW(mp_, 0x1e4, void*) = h_; \
-		MW(mp_, 0x1e8, s32) = 0; \
-		MW(mp_, 0x90, f32) = y_; \
-		MW(mp_, 0, u32) &= ~0xF0000; \
-	} \
+	jabaraLand((Y), (HIT)); \
 	camFollowYOn(); \
 	marioGetPtr(); \
 	allPartyRideOff(); \
@@ -198,8 +203,8 @@ void* marioChkLandon(f32* outY, f32 y);
 double sin(double);
 double cos(double);
 #pragma opt_common_subs off
-static void jabaraSwingStart(s32 s);
-static void jabaraSwingWalk(void);
+void jabaraSwingStart(s32 s);
+void jabaraSwingWalk(void);
 
 void mot_jabara(void) {
 	MarioWork* mario = marioGetPtr();
@@ -375,7 +380,7 @@ void mot_jabara(void) {
 			break;
 		}
 		if ((f32)sp3c < M(0x120, f32)) {
-			JAB_LAND(M(0x1e4, void*), M(0x120, f32))
+			marioPaperOff(); { void* h = M(0x1e4, void*); jabaraLand(M(0x120, f32), h); } camFollowYOn(); marioGetPtr(); allPartyRideOff(); JAB_TAIL(MOTSUB_)
 			return;
 		}
 		M(0x90, f32) = sp3c;
@@ -390,9 +395,7 @@ void mot_jabara(void) {
 			M(0x48, s32) = 10;
 			M(0x2a8, s32) = (s32)(sp3c + M(0x1b8, f32));
 			{
-				HitEntry* hit = M(0x1f4, HitEntry*);
-				marioGetPtr();
-				hitObjGetPos(hitGetName(hit), &v50);
+				jabaraHitPos(M(0x1f4, HitEntry*), &v50);
 				M(0x94, f32) = (s32)((100.0f * v50.z + 0.5f) / 100.0f);
 				M(0x90, f32) = (f32)M(0x2a8, s32) - M(0x1b8, f32) - 3.5f;
 				M(0xb4, f32) = 9.0f + M(0x1b8, f32);
@@ -739,7 +742,7 @@ void mot_jabara_post(void) {
 	}
 }
 
-static void jabaraSwingStart(s32 s) {
+void jabaraSwingStart(s32 s) {
 	MarioWork* mp = marioGetPtr();
 	MW(mp, 0x2b8, s16) = 4;
 	MW(mp, 0x2b0, f32) = 24.0f;
@@ -753,16 +756,18 @@ static void jabaraSwingStart(s32 s) {
 	}
 }
 
-static void jabaraSwingWalk(void) {
+
+void jabaraSwingWalk(void) {
 	MarioWork* mp = marioGetPtr();
-	if (MW(mp, 0x2ba, s8) == 0) {
-		MW(mp, 0x2ba, s8) = 1;
-		MW(mp, 0x2b8, s16) = 10;
-		MW(mp, 0x2b0, f32) = 0.0f;
-		MS(4, f32) = 0.1f;
-		MS(8, f32) = -0.1f;
-		MS(0x10, f32) = 0.18f;
+	if (MW(mp, 0x2ba, s8) != 0) {
+	return;
 	}
+	MW(mp, 0x2ba, s8) = 1;
+	MW(mp, 0x2b8, s16) = 10;
+	MW(mp, 0x2b0, f32) = 0.0f;
+	MS(4, f32) = 0.1f;
+	MS(8, f32) = -0.1f;
+	MS(0x10, f32) = 0.18f;
 }
 
 void swingMain(void) {

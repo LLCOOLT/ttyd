@@ -3432,7 +3432,7 @@ void noiseDisp(CameraId cameraId, void* param) {
         by = y / 4;
         ry = y % 4;
         for (x = 0; x < 64; x++) {
-            off = (x / 8) * 32 + (by << 8);
+            off = (by << 8) + (x / 8) * 32;
             off += x % 8;
             off += (ry << 3);
             col = (y & 1) ? 0xFF : 0;

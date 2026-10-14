@@ -59,9 +59,9 @@ typedef struct Anim40 {
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
 	u16 i;
-	TEXPalette* tpl;
 	TEXHeader* img;
 	CLUTHeader* pal;
+	TEXPalette* tpl;
 	s32 j, n;
 	Anim40* e;
 	u8* q;
@@ -244,12 +244,10 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
-	TEXPalette* tpl;
 	u16 i;
-	s32 j, n;
-	TEXHeader* img;
-	CLUTHeader* pal;
 	u8* q;
+	s32 j, n;
+	TEXPalette* tpl;
 	switch (type) {
 		case 1:
 			if (FLD(data, 0x14c) < (u32)data) {
@@ -305,6 +303,8 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 			if ((u32)tpl->descriptorArray < (u32)tpl) {
 				*(u32*)&tpl->descriptorArray += (u32)tpl;
 				for (i = 0; i < tpl->numDescriptors; i++) {
+					TEXHeader* img;
+					CLUTHeader* pal;
 					img = tpl->descriptorArray[i].textureHeader;
 					if (img) {
 						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)img);

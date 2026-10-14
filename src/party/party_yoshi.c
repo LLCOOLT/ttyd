@@ -340,7 +340,7 @@ void yoshi_init(PartyEntry* party) {
     party->yoshiPsndSFXId = -1;
 }
 
-static inline void L_searchHead(PartyEntry* party);
+static void L_searchHead(PartyEntry* party);
 static inline f32 L_getOfs(PartyEntry* party) {
     MarioWork* p = party->playerPtr;
     f32 ofs = 0.0f;
@@ -1201,7 +1201,7 @@ void searchGround2(PartyEntry* party) {
     mario->flags &= ~0xF0000;
 }
 
-static inline void L_searchHead(PartyEntry* party) {
+static void L_searchHead(PartyEntry* party) {
     MarioWork* p = party->playerPtr;
     Vec pos = party->position;
     f32 height = partyGetHeight(party);
@@ -1319,3 +1319,7 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
     }
     *speed = dist;
 }
+
+#pragma force_active on
+u32 gap_08_804188AC_sbss;
+#pragma force_active reset
