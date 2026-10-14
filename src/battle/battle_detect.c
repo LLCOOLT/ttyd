@@ -386,7 +386,9 @@ void _btlSamplingEnemy(DetWork* d) {
             for (j = i + 1; j < n; j++) {
                 s8 a = idx[i];
                 s8 b = idx[j];
-                if (t[a].posX + t[a].score * 10 > t[b].posX + t[b].score * 10) {
+                DetTarget* ta = &t[a];
+                DetTarget* tb = &t[b];
+                if (ta->posX + ta->score * 10 > tb->posX + tb->score * 10) {
                     idx[i] = b;
                     idx[j] = a;
                 }
@@ -397,7 +399,9 @@ void _btlSamplingEnemy(DetWork* d) {
             for (j = i + 1; j < n; j++) {
                 s8 a = idx[i];
                 s8 b = idx[j];
-                if (t[a].posX + t[a].score * 10 <= t[b].posX + t[b].score * 10) {
+                DetTarget* ta = &t[a];
+                DetTarget* tb = &t[b];
+                if (ta->posX + ta->score * 10 <= tb->posX + tb->score * 10) {
                     idx[i] = b;
                     idx[j] = a;
                 }

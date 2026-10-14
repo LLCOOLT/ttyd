@@ -5591,7 +5591,7 @@ BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u16 fadetime, u16 fadeout, s32 r7)
 				}
 				if (flags & 0x100) {
 					fade->state = 1;
-					fade->time = fadetime / 16.667f;
+					fade->time = fadetime / 16.666666f;
 					fade->timeMax = 0;
 				}
 				else {
@@ -5601,7 +5601,7 @@ BOOL psndBGMOn_f_d(u32 flags, char* bgm_name, u16 fadetime, u16 fadeout, s32 r7)
 				}
 				if ((flags & 0x80) && fade->unk6 == 8) {
 					fade->unk6 = 0x10;
-					fade->unk8 = fadetime / 16.667f;
+					fade->unk8 = fadetime / 16.666666f;
 					fade->unkA = fade->unk8 * fade->unk7 / 100;
 					if (flags & 0x40) {
 						bgm->unk8 |= 0x40;
@@ -5705,7 +5705,7 @@ found:
 	}
 	if (flags & 0x100) {
 		fade->state = 1;
-		fade->time = fadetime / 16.667f;
+		fade->time = fadetime / 16.666666f;
 		fade->timeMax = 0;
 		fade->unk6 = 0;
 		fade->unk8 = 1;
@@ -5762,7 +5762,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 		}
 		else if (fade->state != 4) {
 			fade->state = 2;
-			fade->time = fadetime / 16.667f;
+			fade->time = fadetime / 16.666666f;
 			fade->timeMax = fade->time;
 		}
 		else {
@@ -5772,7 +5772,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 	else if (flags & 0x400) {
 		if (fade->state != 2 && fade->state != 4) {
 			fade->state = 4;
-			fade->time = fadetime / 16.667f;
+			fade->time = fadetime / 16.666666f;
 			fade->timeMax = fade->time;
 		}
 	}
@@ -5780,7 +5780,7 @@ BOOL psndBGMOff_f_d(s32 flags, u32 fadetime, u32 someswitch) {
 		if (fade->unk6 != 8) {
 			fade->unk6 = 8;
 			fade->unk7 = silent;
-			fade->unk8 = fadetime / 16.667f;
+			fade->unk8 = fadetime / 16.666666f;
 			fade->unkA = fade->unk8;
 			if ((flags & 0x40) || (gp->flags & 1)) {
 				bgm->unk8 |= 0x40;
@@ -6242,7 +6242,7 @@ s32 __psndSFXOn(const char* name, u8 vol, u8 pan, u16 pitch, Vec* pos, u32 r8, u
 	sfx->unk8 = vol;
 	sfx->unk9 = entry->field_0xC;
 	sfx->unkA = pan;
-	sfx->unkE = entry->field_0x11 + (pitch / 16.667f + delay);
+	sfx->unkE = entry->field_0x11 + (pitch / 16.666666f + delay);
 	sfx->unk10 = delay * 5;
 	sfx->unkB = entry->field_0xF;
 	sfx->unkC = entry->field_0x10;
@@ -6386,8 +6386,8 @@ s32 psndSFXChk(s32 id) {
 	if (id == 0xFFFFFFFF) {
 		return -1;
 	}
-	tag = (u32)id >> 8;
 	sfx = &pssfx[id & 0xFF];
+	tag = (u32)id >> 8;
 	if (tag != sfx->unk4) {
 		return -1;
 	}
@@ -6625,7 +6625,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 			if (flags & 0x20) {
 				if (flags & 0x100) {
 					fade->state = 1;
-					fade->time = fadetime / 16.667f;
+					fade->time = fadetime / 16.666666f;
 					fade->timeMax = 0;
 				}
 				else {
@@ -6636,7 +6636,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 				if (flags & 0x80) {
 					if (fade->unk6 == 8) {
 						fade->unk6 = 0x10;
-						fade->unk8 = fadetime / 16.667f;
+						fade->unk8 = fadetime / 16.666666f;
 						fade->unkA = fade->unk8 * fade->unk7 / 100;
 					}
 				}
@@ -6694,7 +6694,7 @@ found:
 	psnd.unk20[idx] = 0x7D00;
 	if (flags & 0x100) {
 		fade->state = 1;
-		fade->time = fadetime / 16.667f;
+		fade->time = fadetime / 16.666666f;
 		fade->timeMax = 0;
 		fade->unk8 = 1;
 		fade->unkA = 1;
@@ -6740,7 +6740,7 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 		}
 		else if (fade->state != 4) {
 			fade->state = 2;
-			fade->time = fadetime / 16.667f;
+			fade->time = fadetime / 16.666666f;
 			fade->timeMax = fade->time;
 		}
 		else {
@@ -6751,13 +6751,13 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 	else if (flags & 0x400) {
 		if (fade->state != 2 && fade->state != 4) {
 			fade->state = 4;
-			fade->time = fadetime / 16.667f;
+			fade->time = fadetime / 16.666666f;
 			fade->timeMax = fade->time;
 		}
 	}
 	else if (flags & 0x800) {
 		fade->unk6 = 8;
-		fade->unk8 = fadetime / 16.667f;
+		fade->unk8 = fadetime / 16.666666f;
 		fade->unkA = fade->unk8;
 		fade->unk7 = silent;
 	}

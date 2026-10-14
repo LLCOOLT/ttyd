@@ -108,13 +108,13 @@ void effKemuri12Main(EffectEntry* effect) {
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     u16 type;
-    s32 last;
     s32 idx;
+    s32 last;
     CameraEntry* camera;
     EffKemuri12N64Work* work;
+    effN64Vtx* vtx;
     s32 ofs;
     s32 alpha;
-    effN64Vtx* vtx;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rot;
@@ -122,10 +122,10 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
+    type = work->type;
     idx = work->progress;
     alpha = (s32)(256.0f * (work->progress - idx));
     last = (idx == 7);
-    type = work->type;
     GXSetNumChans(0);
     GXSetNumTevStages(3);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

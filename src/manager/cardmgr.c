@@ -777,6 +777,8 @@ void cardCreate(void) {
 }
 
 #pragma opt_propagation on //needed for memcard_probe? TODO fix
+#pragma push
+#pragma opt_dead_code off
 void create_main(void) {
     if (wp->result) {
         wp->unkE0 = 8;
@@ -848,6 +850,7 @@ void create_main(void) {
     }
 }
 #pragma opt_propagation on
+#pragma pop
 
 void cardFormat(void) {
     if (!(wp->flags & 2)) {
@@ -1087,8 +1090,8 @@ static inline void memcard_probe(void) {
     s32 timeout;
 
     timeout = 1000000;
-    i = 0;
     wp->flags |= 1;
+    i = 0;
     while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
         if (++i > timeout) {
             result = CARD_RESULT_FATAL_ERROR;

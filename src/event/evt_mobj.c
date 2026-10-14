@@ -1808,7 +1808,7 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
                 Vec b, a;
                 a = (Vec){FLD(f32, data, 0xd0), FLD(f32, data, 0xd4), FLD(f32, data, 0xd8)};
                 b = (Vec){FLD(f32, data, 0xdc), FLD(f32, data, 0xe0), FLD(f32, data, 0xe4)};
-                a.z = a.z - 0.2 * __fabs(b.y - a.y);
+                a.z = a.z - 0.2f * __fabs(b.y - a.y);
                 PSVECAdd(&a, &b, &mobj->translation);
                 PSVECScale(&mobj->translation, &mobj->translation, 0.5f);
                 PSVECScale(&mobj->translation, &mobj->translation, 10.0f);
@@ -1894,7 +1894,7 @@ USER_FUNC(evt_mobj_itembox) {
         Vec a, b;
         a = (Vec){FLD(f32, data, 0xd0), FLD(f32, data, 0xd4), FLD(f32, data, 0xd8)};
         b = (Vec){FLD(f32, data, 0xdc), FLD(f32, data, 0xe0), FLD(f32, data, 0xe4)};
-        a.z = a.z - 0.2 * __fabs(b.y - a.y);
+        a.z = a.z - 0.2f * __fabs(b.y - a.y);
         PSVECAdd(&a, &b, &mobj->translation);
         PSVECScale(&mobj->translation, &mobj->translation, 0.5f);
         PSVECScale(&mobj->translation, &mobj->translation, 10.0f);
@@ -2945,10 +2945,10 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
                 mode = 1;
             }
         }
-        if (itemHitCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.42f)) {
+        if (itemHitCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.420002f)) {
             mode = 1;
         }
-        if (npcNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.42f)) {
+        if (npcNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.420002f)) {
             mode = 1;
         }
         if (mode == 0) {
@@ -3019,13 +3019,13 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             u8* npc = (u8*)wp->entries;
             for (i = 0; i < wp->total; i++, npc += 0x340) {
                 if (FLD(u32, npc, 0) & 1) {
-                    if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, npc, 0x8c), FLD(f32, npc, 0x94), 42.42f)) {
+                    if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, npc, 0x8c), FLD(f32, npc, 0x94), 42.420002f)) {
                         FLD(f32, npc, 0x90) = FLD(f32, party, 0x10);
                     }
                 }
             }
         }
-        p = itemNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.42f);
+        p = itemNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.420002f);
         if (p) {
             FLD(f32, p, 0x40) = FLD(f32, party, 0x10);
         }
@@ -3468,6 +3468,7 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     s32 item;
     s32* args = event->args;
     s32 arg6;
+    int new_var;
     const char* name;
     MapObjectEntry* mobj;
     const char* anim;
@@ -3478,9 +3479,11 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     z = evtGetFloat(event, args[3]);
     item = evtGetValue(event, args[4]);
     val = evtGetValue(event, args[5]);
+    new_var = gp->inBattle;
+    new_var = new_var != 0;
     arg6 = args[6];
     anim = "MOBJ_HatenaBlock";
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    if (animGroupBaseAsync(anim, new_var, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
     mobjEntry(name, anim);

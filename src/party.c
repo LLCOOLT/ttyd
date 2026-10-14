@@ -26,9 +26,7 @@ typedef struct PartyData {
 
 extern PartyData partyDataTbl[];
 
-char* yoshigroup[7] = {
-    "c_babyyoshi", "c_babyyoshi2", "c_babyyoshi3", "c_babyyoshi4", "c_babyyoshi5", "c_babyyoshi6", "c_babyyoshi7",
-};
+extern char* yoshigroup[7];
 
 extern char* partyPoseTbl[20][15];
 extern char* partyDotPoseTbl[8][15];
@@ -578,6 +576,15 @@ static inline s32 partyGetFreeSlot2(void) {
     return -1;
 }
 
+char* yoshigroup[7] = {
+        "c_babyyoshi",
+        "c_babyyoshi2",
+        "c_babyyoshi3",
+        "c_babyyoshi4",
+        "c_babyyoshi5",
+        "c_babyyoshi6",
+        "c_babyyoshi7"
+};
 s32 partyEntryMain(s32 memberId) {
     MarioWork* player;
     s32 slot;
@@ -773,10 +780,8 @@ static inline void partyReInitClear(PartyEntry* party) {
 }
 
 void partyReInit(void) {
-    static const Vec extraScale = {1.0f, 1.0f, 1.0f};
-    static const Vec partyScale = {1.0f, 1.0f, 1.0f};
     PartyEntry* party;
-    BOOL dotted;
+    u32 dotted;
 
     party = partyGetPtr(marioGetExtraPartyId());
     if (party) {
@@ -784,7 +789,15 @@ void partyReInit(void) {
         party->flags2 = 0;
         partyReInitClear(party);
         party->field_37 = 0;
-        partyPaperOff(party);
+        if (party->field_1C) {
+            animPoseSetPaperAnimGroup(party->paperAnimGroup, NULL, FALSE);
+            party->field_1C = 0;
+            party->flags2 &= ~0x4000000;
+            if (party->paperPoseId >= 0) {
+                animPaperPoseRelease(party->paperPoseId);
+                party->paperPoseId = -1;
+            }
+        }
         *(s32*)((u8*)party + 0x130) = 0;
         *(s32*)((u8*)party + 0x12C) = 0;
         *(s32*)((u8*)party + 0x148) = 0;
@@ -797,7 +810,7 @@ void partyReInit(void) {
         partyChgRunMode(party, 2);
         partyChgMot(party, 0);
         party->yoshiPsndSFXId = -1;
-        party->scale = extraScale;
+        party->scale = (Vec){1.0f, 1.0f, 1.0f};
     }
     party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -808,7 +821,15 @@ void partyReInit(void) {
         party->camId = marioGetCamId();
         if (party) {
             partyReInitClear(party);
-            partyPaperOff(party);
+            if (party->field_1C) {
+            animPoseSetPaperAnimGroup(party->paperAnimGroup, NULL, FALSE);
+            party->field_1C = 0;
+            party->flags2 &= ~0x4000000;
+            if (party->paperPoseId >= 0) {
+                animPaperPoseRelease(party->paperPoseId);
+                party->paperPoseId = -1;
+            }
+        }
             *(s32*)((u8*)party + 0x130) = 0;
             *(s32*)((u8*)party + 0x12C) = 0;
             *(s32*)((u8*)party + 0x148) = 0;
@@ -817,7 +838,7 @@ void partyReInit(void) {
             *(s32*)((u8*)party + 0x134) = 0;
             *(s32*)((u8*)party + 0x140) = 0;
             *(s32*)((u8*)party + 0x144) = 0;
-            party->scale = partyScale;
+            party->scale = (Vec){1.0f, 1.0f, 1.0f};
         }
         partyClearFootmark();
         if (dotted) {
@@ -854,6 +875,8 @@ void partyUsePost(PartyEntry* party) {
 }
 
 
+static inline void partyChgRunM(PartyEntry* party);
+static inline void partyChgRunMo(PartyEntry* party);
 void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
     MarioWork* mario;
     PartyFunc func;
@@ -862,8 +885,7 @@ void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
     case 11:
         if (mode != 8) {
             mario = party->playerPtr;
-            party->scale = (Vec){1.0f, 1.0f, 1.0f};
-            *(Vec*)((u8*)party + 0x7C) = (Vec){0.0f, 0.0f, 0.0f};
+            partyChgRunMo(party);
             party->field_FC = mario->unk19C;
             party->field_100 = mario->directionView;
             party->field_110 = mario->unk1AC;
@@ -877,7 +899,7 @@ void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
         break;
     case 4:
         mario = party->playerPtr;
-        party->scale = (Vec){1.0f, 1.0f, 1.0f};
+        partyChgRunM(party);
         party->flags2 &= ~0x10;
         party->field_FC = mario->unk19C;
         party->field_100 = mario->directionView;
@@ -936,7 +958,7 @@ void unk_800ba2dc(PartyEntry* party) {
     }
     if (party->field_34 == 4) {
         mario = party->playerPtr;
-        party->scale = (Vec){1.0f, 1.0f, 1.0f};
+        partyChgRunM(party);
         party->flags2 &= ~0x10;
         PF32(party, 0xFC) = PF32(mario, 0x19C);
         PF32(party, 0x100) = PF32(mario, 0x1A0);
@@ -950,8 +972,7 @@ void unk_800ba2dc(PartyEntry* party) {
         partyChgMot(party, 0);
     } else if (party->field_34 == 11) {
         mario = party->playerPtr;
-        party->scale = (Vec){1.0f, 1.0f, 1.0f};
-        *(Vec*)((u8*)party + 0x7C) = (Vec){0.0f, 0.0f, 0.0f};
+        partyChgRunMo(party);
         PF32(party, 0xFC) = PF32(mario, 0x19C);
         PF32(party, 0x100) = PF32(mario, 0x1A0);
         PF32(party, 0x110) = PF32(mario, 0x1AC);
@@ -1016,39 +1037,7 @@ void party_damage_return(PartyEntry* party);
 void partyDokanInit(PartyEntry* party);
 s32 partyDokanMain(PartyEntry* party);
 
-static inline void partyHello_inl(PartyEntry* party) {
-    MarioWork* mario;
-
-    if (party->field_8 & 8) {
-        party->field_8 &= ~8;
-        mario = party->playerPtr;
-        if (mario->currMotionId == 0x16 || mario->currMotionId == 0x18 || mario->currMotionId == 0x19) {
-            party->field_38 = 30;
-        } else if (party->field_34 == 4 || party->field_34 == 5) {
-            party->flags2 |= 0x10;
-            party->scale = (Vec){0.0f, 0.0f, 0.0f};
-            party->field_38 = 0;
-            party->field_110 = mario->unk1A8;
-            party->field_10C = mario->unk1A8;
-            party->position = mario->position;
-            party->field_B8 = party->position;
-        } else if (party->field_34 == 7) {
-            party->scale = (Vec){1.0f, 1.0f, 1.0f};
-            party->field_38 = 20;
-            party->field_110 = mario->unk1A8;
-            party->field_10C = mario->unk1A8;
-        } else {
-            party->scale = (Vec){1.0f, 1.0f, 1.0f};
-            party->field_38 = 10;
-            party->field_110 = mario->unk1A8;
-            party->field_10C = mario->unk1A8;
-            party->position = mario->position;
-            party->field_B8 = party->position;
-        }
-        party->flags &= ~0x100;
-    }
-    partyHelloMain(party);
-}
+static inline void partyHello_inl(PartyEntry* party);
 
 void driveParty(PartyEntry* party) {
     MarioWork* mario;
@@ -1177,24 +1166,7 @@ void driveParty(PartyEntry* party) {
     *(Vec*)((u8*)party + 0xAC) = (Vec){0.0f, 0.0f, 0.0f};
     partyPreDisp(party);
 }
-
-
-
-BOOL partyDoWork(void) {
-    PartyEntry* party = partyGetPtr(marioGetPtr()->currPartySlotId[0]);
-    if (!party) {
-        return FALSE;
-    }
-    if (party->field_34 != 0 && party->field_34 != 1 && party->field_34 != 2) {
-        return FALSE;
-    }
-    marioGetPtr()->baseSpeed = 0.0f;
-    partyChgRunMode(party, 3);
-    return TRUE;
-}
-
-
-void partyHello(PartyEntry* party) {
+static inline void partyHello_inl(PartyEntry* party) {
     MarioWork* mario;
 
     if (party->field_8 & 8) {
@@ -1226,6 +1198,26 @@ void partyHello(PartyEntry* party) {
         party->flags &= ~0x100;
     }
     partyHelloMain(party);
+}
+
+
+
+BOOL partyDoWork(void) {
+    PartyEntry* party = partyGetPtr(marioGetPtr()->currPartySlotId[0]);
+    if (!party) {
+        return FALSE;
+    }
+    if (party->field_34 != 0 && party->field_34 != 1 && party->field_34 != 2) {
+        return FALSE;
+    }
+    marioGetPtr()->baseSpeed = 0.0f;
+    partyChgRunMode(party, 3);
+    return TRUE;
+}
+
+
+void partyHello(PartyEntry* party) {
+    partyHello_inl(party);
 }
 
 /* @@HELLO@@ */
@@ -1456,6 +1448,9 @@ static inline void partyPaperOn_inl(PartyEntry* party, const char* animGroup) {
     animPoseSetPaperAnimGroup(party->paperAnimGroup, animGroup, v5);
 }
 
+static inline void partyChgRunM(PartyEntry* party) {
+    party->scale = (Vec){1.0f, 1.0f, 1.0f};
+}
 void partyDokanInit(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
 
@@ -1700,6 +1695,7 @@ void getRidePos(PartyEntry* party, Vec* pos) {
 }
 
 
+#pragma dont_inline on
 void allPartyForceRideOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -1714,6 +1710,7 @@ void allPartyForceRideOn(void) {
         partyShadowOff(party);
     }
 }
+#pragma dont_inline reset
 
 void L_allPartyRideOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
@@ -1767,8 +1764,6 @@ s32 partyRideChk(PartyEntry* party) {
 
 f32 toMovedir(f32 a);
 
-static const Vec rideScale1 = {1.0f, 1.0f, 1.0f};
-static const Vec rideScale2 = {1.0f, 1.0f, 1.0f};
 
 s32 partyRideMain(PartyEntry* party) {
     Vec pos;
@@ -1817,7 +1812,7 @@ s32 partyRideMain(PartyEntry* party) {
         partyChgPoseId_inl(party, 1);
         PF32(party, 0x114) = 0.0f;
         party->position.y = PF32(party, 0x98);
-        party->scale = rideScale1;
+        party->scale = (Vec){0.0f, 0.0f, 0.0f};
         party->flags2 |= 1;
         partyShadowOff(party);
         party->field_38 = 10;
@@ -1833,7 +1828,7 @@ s32 partyRideMain(PartyEntry* party) {
         party->flags2 |= 1;
         partyShadowOff(party);
         getRidePos(party, &pos);
-        party->scale = rideScale2;
+        party->scale = (Vec){0.0f, 0.0f, 0.0f};
         party->position = pos;
         PF32(party, 0x114) = 0.0f;
         PF32(party, 0x110) = PF32(mario, 0x1AC);
@@ -1948,6 +1943,10 @@ s32 partyRideMain(PartyEntry* party) {
     }
     }
     party->field_B8 = party->position;
+}
+static inline void partyChgRunMo(PartyEntry* party) {
+    party->scale = (Vec){1.0f, 1.0f, 1.0f};
+    *(Vec*)((u8*)party + 0x7C) = (Vec){0.0f, 0.0f, 0.0f};
 }
 
 
@@ -2274,15 +2273,6 @@ s32 partyEntryMain(s32 memberId);
 void partyGetAppearPos2(PartyEntry* party, Vec* pos);
 
 //.sdata
-char* yoshigroup[7] = {
-        "c_babyyoshi",
-        "c_babyyoshi2",
-        "c_babyyoshi3",
-        "c_babyyoshi4",
-        "c_babyyoshi5",
-        "c_babyyoshi6",
-        "c_babyyoshi7"
-};
 
 PartyEntry* partyGetPtr(s32 id) {
         if (id >= 0) {
@@ -2301,7 +2291,7 @@ PartyEntry* anotherPartyGetPtr(s32 id) {
 }
 
 BOOL partyPaperOn(PartyEntry* entry, char* anim) {
-        BOOL v5, v6;
+        BOOL v5;
 
         if (entry->field_0x14 >= 0) {
                 animPaperPoseRelease(entry->field_0x14);
@@ -2316,11 +2306,11 @@ BOOL partyPaperOn(PartyEntry* entry, char* anim) {
                 !strcmp(anim, "p_dokan_y")) {
                 v5 = TRUE;
         }
-        v6 = !v5;
+        v5 = !v5;
         if (!strcmp(anim, "p_slit")) {
-                v6 = entry->currentMemberId == PARTY_FLURRIE;
+                v5 = entry->currentMemberId == PARTY_FLURRIE;
         }
-        animPoseSetPaperAnimGroup(entry->field_0xC, anim, v6);
+        animPoseSetPaperAnimGroup(entry->field_0xC, anim, v5);
         return TRUE;
 }
 
@@ -2531,7 +2521,7 @@ void partyPreDisp(PartyEntry* party) {
         dispEntry((CameraId)party->camId, z, 1, partyDisp, party);
     }
     mode = 2;
-    size = 13.333f;
+    size = 13.333333f;
     if ((s8)PU8(party, 0x31) != 6) {
         party->field_B8 = party->position;
     } else {

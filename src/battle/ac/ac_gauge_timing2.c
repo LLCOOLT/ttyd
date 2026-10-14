@@ -58,13 +58,13 @@ typedef struct GT2Work {
 static void actionCommandDisp(f32 x, f32 y);
 
 s32 battleAcMain_GaugeTiming2(BattleWork* work) {
-    s32 i;
+    BOOL pressed;
     BOOL found;
     BOOL allDone;
-    BOOL pressed;
     BOOL autoCommand = FALSE;
     GT2Work* gw = GT_WORK(work);
     GT2Disp* disp = GT_DISP(work);
+    s32 i;
 
     if (work->actionCommands.mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
@@ -160,25 +160,26 @@ s32 battleAcMain_GaugeTiming2(BattleWork* work) {
                 }
             }
             if (autoCommand) {
-                autoCommand = FALSE;
-                found = FALSE;
-                for (i = 0; i < GT_PARAMS(work)->count; i++) {
-                    if (!gw->state[i] && __fabs(gw->cursor - gw->targets[i]) <= 6.0) {
-                        found = TRUE;
+                BOOL hit2 = FALSE;
+                s32 j;
+                for (j = 0; j < GT_PARAMS(work)->count; j++) {
+                    if (!gw->state[j] && __fabs(gw->cursor - gw->targets[j]) <= 6.0) {
+                        hit2 = TRUE;
                         break;
                     }
                 }
-                if (found) {
+                autoCommand = FALSE;
+                if (hit2) {
                     autoCommand = TRUE;
                 }
             }
             if (pressed || autoCommand) {
-                const char* sfxNg = "SFX_AC_COMMAND_NG1";
                 const char* sfxOk = "SFX_AC_COMMAND_OK1\0";
+                const char* sfxNg = "SFX_AC_COMMAND_NG1";
                 found = FALSE;
                 for (i = 0; i < GT_PARAMS(work)->count; i++) {
                     if (!gw->state[i] && !found) {
-                        f32 d = __fabs(gw->cursor - gw->targets[i]);
+                        f64 d = __fabs(gw->cursor - gw->targets[i]);
                         if (d <= 6.0) {
                             if (!autoCommand && gw->flag[i]) {
                                 gw->state[i] = -1;
@@ -186,8 +187,8 @@ s32 battleAcMain_GaugeTiming2(BattleWork* work) {
                                 found = TRUE;
                             } else {
                                 gw->state[i] = 1;
-                                psndSFXOn("SFX_AC_COMMAND_OK1\0");
                                 work->actionCommands.outputParams[0]++;
+                                psndSFXOn(sfxOk);
                                 found = TRUE;
                             }
                         } else if (d < __fabs(gw->targets[1] - gw->targets[0])) {
@@ -284,15 +285,19 @@ void battleAcDelete_GaugeTiming2(BattleWork* work) {
 #pragma dont_inline on
 #pragma opt_loop_invariants off
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    GT2Disp* disp = GT_DISP(work);
-    GT2Work* gw = GT_WORK(work);
+    BattleWork* work;
+    GT2Disp* disp;
+    GT2Work* gw;
     CameraEntry* cam;
     f32 x0, y0, y1, x1, y2, y3, ratio, t;
-    s32 cnt, q, r, v, i, icon, pressedIcon, id;
+    s32 q, r, v, i, icon, pressedIcon, id;
+    s32 cnt;
     Vec pos;
     Vec d0, d1;
 
+    work = _battleWorkPointer;
+    disp = GT_DISP(work);
+    gw = GT_WORK(work);
     camGetPtr(8);
     cam = camGetPtr(8);
     x0 = -288.0f + x;
@@ -345,8 +350,8 @@ static void actionCommandDisp(f32 x, f32 y) {
         pos = (Vec){0.0f, 0.0f, 0.0f};
         d0 = (Vec){0.0f, 0.0f, 0.0f};
         d1 = (Vec){0.0f, 0.0f, 0.0f};
-        pos.y = y3;
         pos.x = x0 + ((f32)gw->width * target) / 100.0f;
+        pos.y = y3;
         ICON(&pos, 0x10, id, 0.75f);
     }
 
@@ -384,7 +389,8 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     y1 = 25.0f + y;
-    y2 = y1 - 25.0f;
+    {
+    f32 y4 = y1 - 25.0f;
     for (i = 0; i < GT_PARAMS(work)->count; i++) {
         switch (gw->state[i]) {
             case 1:
@@ -398,8 +404,9 @@ static void actionCommandDisp(f32 x, f32 y) {
                 break;
         }
         if ((u16)id != 0x45) {
-            TEXPLANE((u16)id, (GXColor){255, 255, 255, 255}, 0, x0 + ((f32)gw->width * gw->targets[i]) / 100.0f, y2, 0.0f, 1.0f, 1.0f);
+            TEXPLANE((u16)id, (GXColor){255, 255, 255, 255}, 0, x0 + ((f32)gw->width * gw->targets[i]) / 100.0f, y4, 0.0f, 1.0f, 1.0f);
         }
+    }
     }
 
     {

@@ -646,7 +646,7 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 	if (cursor->field_0 >= cursor->unk8) {
 		cursor->field_0 = cursor->unk8 - 1;
 	}
-	while (cursor->unk8 < (top = cursor->field_4) + 6) { if (top <= 0) break; cursor->field_4--; }
+	while (cursor->unk8 < cursor->field_4 + 6) { if ((top = cursor->field_4) <= 0) break; cursor->field_4--; }
 	_btlcmd_UpdateSelectWeaponTable(wp, type);
 	return num;
 }
@@ -1269,7 +1269,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = 0;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxB);
+						psndSFXOn(sfxA);
 					}
 				}
 				if (PADREP(0x40000)) {
@@ -1278,7 +1278,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = targets->numTargets - 1;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxA);
+						psndSFXOn(sfxB);
 					}
 				}
 			}
@@ -1862,7 +1862,7 @@ void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* p
 
 	pouchGetPtr();
 	sprintf(buf, msgSearch("btl_msg_multi_item_cancel_check"));
-	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - (w = 6.25f * (len = strlen(buf))), 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f);
+	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - (w = (f32)(len = strlen(buf)) * 6.25f), 30.0f, 12.5f * (f32)len + 65.0f, 32.0f, 10.0f);
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
 	FontDrawStart();
 	x = 0.0f;

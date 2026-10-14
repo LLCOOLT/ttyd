@@ -2462,8 +2462,8 @@ battle/ac/ac_gauge_timing2.c:
 
 effect/eff_naniga.c:
 	.text       start:0x8023AA24 end:0x8023BAC0
-	.rodata     start:0x803000A8 end:0x80300138
-	.data       start:0x803B2EE0 end:0x803B2FA0
+	.rodata     start:0x803000A8 end:0x80300134
+	.data       start:0x803B2EE0 end:0x803B2F84
 	.sdata2     start:0x80421B48 end:0x80421B98
 
 effect/eff_sandars.c:

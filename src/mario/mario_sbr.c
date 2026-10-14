@@ -457,24 +457,23 @@ s32 chkRevolveDir(s32* cw, s32* ccw) {
 }
 
 s32 checkOneRevolution(s32 dir) {
-    RubWork* rw = &rubwork;
+    RubWork* rw;
     s32 idx;
-    s32 v;
     s32 j;
     s32 cur;
-    s32 i;
+    s32 v;
     s32 start;
+    s32 i;
     s32 ret = 0;
 
+    rw = &rubwork;
     if (rw->num < 2) {
         return -1;
     }
-
-    idx = rw->idx;
     start = rw->start;
-    cur = rw->hist[idx];
+    cur = rw->hist[rw->idx];
     for (i = 1; i <= 20; i++) {
-        j = idx - i;
+        j = rubwork.idx - i;
         while (j < 0) {
             j += 20;
         }

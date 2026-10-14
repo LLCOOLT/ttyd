@@ -1199,8 +1199,7 @@ f32 _intplGetFloat(s32 mode, f32 t) {
             u = 1.0f - c;
             return u * v;
         case 12:
-            t = sin(1.5707964f * t);
-            return t;
+            {t = (f32)sin(1.5707964f * t); c = t; return c;}
         case 13:
             return 1.0f - (f32)cos(1.5707964f * t);
         default:

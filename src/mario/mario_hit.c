@@ -37,10 +37,14 @@ extern HitEntry* dou10_yoko_yari(f32* p);
 extern BOOL marioChkWallAround(Vec* pos, void* p, f32 dx, f32 dz, f32 w, f32 h);
 
 static inline BOOL marioChkBeroSub(s32 attr) {
-    if (!(attr & 0x80)) {
-        return TRUE;
+    BOOL r = TRUE;
+    if (attr & 0x80) {
+        r = FALSE;
+        if (marioGetPtr()->currMotionId == 0x19) {
+            r = TRUE;
+        }
     }
-    return marioGetPtr()->currMotionId == 0x19;
+    return r;
 }
 extern HitEntry* marioHitCheck2(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 
@@ -57,13 +61,10 @@ static inline BOOL marioChkBeroInl(HitEntry* hit) {
 }
 
 static inline BOOL marioChkBeroSub2(s32 attr) {
-    BOOL r;
     if (!(attr & 0x80)) {
-        r = TRUE;
-    } else {
-        r = marioGetPtr()->currMotionId == 0x19;
+        return TRUE;
     }
-    return r;
+    return marioGetPtr()->currMotionId == 0x19;
 }
 
 static inline BOOL marioChkBeroSub3(s32 attr) {
@@ -1617,7 +1618,7 @@ void marioCheckWall(f32 dx, f32 dz) {
             MF(w, 0x1f0, HitEntry*) = hit;
             if (++MF(w, 0x3f, s8) >= 20) {
                 MF(w, 0x3f, s8) = 20;
-                if (marioChkBeroSub4(hitGetAttr(hit))) {
+                if (!(hitGetAttr(hit) & 0x80) ? TRUE : marioGetPtr()->currMotionId == 0x19) {
                     MF(w, 0x1ec, HitEntry*) = hit;
                 }
             }

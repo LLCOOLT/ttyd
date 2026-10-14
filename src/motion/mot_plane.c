@@ -154,13 +154,20 @@ void marioForcePlaneAnime(void) {
 
 #define DIRF(mp) ((MD(0, u32) & 1) ? 1.0f : -1.0f)
 
-static inline void planeRoll1(MarioWork* mp, f32 rate, f32 max) {
-	f32 tg = max * DIRF(mp);
-	MW(mp, 0x2a4, f32) += rate * (tg - MW(mp, 0x2a4, f32));
+static inline f32 planeDir(MarioWork* mp) {
+	return DIRF(mp);
+}
+
+static inline void planeRoll1(MarioWork* mp, f32 max, f32 rate) {
+	max *= DIRF(mp);
+	rate *= max - MW(mp, 0x2a4, f32);
+	MW(mp, 0x2a4, f32) += rate;
 }
 
 static inline void planeRoll2(MarioWork* mp, f32 rate, f32 max) {
-	f32 r = rate; f32 m = max; f32 cur; f32 d = DIRF(mp); f32 t; t = m * d; cur = MW(mp, 0x2a4, f32); t = t - cur; MW(mp, 0x2a4, f32) = cur + r * t;
+	max *= DIRF(mp);
+	max -= MW(mp, 0x2a4, f32);
+	MW(mp, 0x2a4, f32) += rate * max;
 }
 
 void mot_plane(void) {
@@ -194,7 +201,7 @@ void mot_plane(void) {
 		SFX3D(0xaf, &mp->position);
 	case 1:
 		marioMakeJumpPara();
-		{ f32 d; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = 30.0f * d; MW(mp, 0x2a4, f32) += 0.125f * (d - MW(mp, 0x2a4, f32)); }
+		planeRoll1(mp, 30.0f, 0.125f);
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -227,7 +234,7 @@ void mot_plane(void) {
 	case 2:
 		animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
 		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
-		{ f32 d; if (MD(0, u32) & 1) d = 1.0f; else d = -1.0f; d = 30.0f * d; MW(mp, 0x2a4, f32) += 0.125f * (d - MW(mp, 0x2a4, f32)); }
+		planeRoll1(mp, 30.0f, 0.125f);
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -372,7 +379,7 @@ void mot_plane(void) {
 		SFX3D(0x180, &MW(mp, 0x8c, Vec));
 		allPartyRideOff2();
 	case 80:
-		planeRoll2(mp, 0.3f, 28.0f);
+		planeRoll1(mp, 28.0f, 0.3f);
 		MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 		marioMakeJumpPara();
 		MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
@@ -390,7 +397,7 @@ void mot_plane(void) {
 		break;
 	case 90:
 		if (MW(mp, 0x48, s32) > 0) {
-			planeRoll2(mp, 0.3f, 28.0f);
+			planeRoll1(mp, 28.0f, 0.3f);
 			MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 			if (--MW(mp, 0x48, s32) <= 0) {
 				MW(mp, 4, u32) &= ~0x100;
@@ -781,13 +788,14 @@ BOOL chkCollision(f32* outY) {
 	BOOL ret;
 	MarioWork* mp;
 
+	r = 4.0f;
 	ret = FALSE;
 	mp = marioGetPtr();
 	sincosf(&s0, &c0, 90.0f + MD(4, f32));
 	sincosf(&s1, &c1, MD(8, f32));
 	{
 		x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32)); y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32)); z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
-		x += s1 * c0 * 4.0f; y += -s0 * 4.0f; z += c1 * c0 * 4.0f;
+		x += s1 * c0 * r; y += -s0 * r; z += c1 * c0 * r;
 		v = (Vec){x, y, z};
 	}
 	MD(0x3c, Vec) = v;
@@ -800,13 +808,13 @@ BOOL chkCollision(f32* outY) {
 	y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32));
 	z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
 	x += r * (s1 * -c0);
-	y += s0 * r;
 	z += r * (c1 * -c0);
+	y += s0 * r;
 	sincosf(&s0, &c0, MD(4, f32) - 90.0f);
 	r = planeData[39];
 	x += r * (c0 * s1) - r * (s2 * c1);
 	y += r * (s0 * c2);
-	z += r * (c0 * c1) - r * (s2 * s1);
+	z += r * (c1 * c0) - r * (s2 * s1);
 	{
 		v2 = (Vec){x, y, z};
 	}

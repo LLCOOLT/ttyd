@@ -917,7 +917,7 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
                 pb->adpcm.a[i][0] = 0;
                 pb->adpcm.a[i][1] = 0;
               }
-              addr = dsp_vptr->smp_info.offset + (base = (u32)dsp_vptr->smp_info.addr >> 1);
+              addr = (base = (u32)dsp_vptr->smp_info.addr >> 1) + dsp_vptr->smp_info.offset;
               dsp_vptr->playInfo.posHi = dsp_vptr->smp_info.offset;
               dsp_vptr->playInfo.posLo = 0;
               if (dsp_vptr->smp_info.compType == 6) {

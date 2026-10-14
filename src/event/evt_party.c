@@ -406,7 +406,7 @@ USER_FUNC(evt_party_move_pos) {
 USER_FUNC(evt_party_move_pos2) {
 	PartyEntry* p;
 	s32* args = event->args;
-	f32 x, z, spd, dist, q, a2;
+	f32 x, z, spd, dist;
 	if (isFirstCall) {
 		event->userdata[2] = 0;
 	}
@@ -426,8 +426,7 @@ USER_FUNC(evt_party_move_pos2) {
 		spd = evtGetFloat(event, args[3]);
 		dist = distABf(PF(p, 0x58), PF(p, 0x60), x, z);
 		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
-		q = dist / spd;
-		q = gp->framerate * q; partySetForceMove(p, q, PF(p, 0x100), spd / gp->framerate);
+		dist = gp->framerate * (dist / spd); spd = spd / gp->framerate; partySetForceMove(p, dist, PF(p, 0x100), spd);
 	}
 	if (p->field_28 == 0) {
 		return EVT_RETURN_DONE;

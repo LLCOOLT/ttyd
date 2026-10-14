@@ -1,3 +1,9 @@
+#define _MATH_H_
+double fabs(double x);
+double sin(double x);
+double cos(double x);
+#define fabs(x) __fabs(x)
+#define fabsf(x) __fabsf(x)
 #include "party/party_cloud.h"
 #include "dolphin/types.h"
 #include "musyx/musyx.h"
@@ -7,28 +13,69 @@
 #include "mario/mario_party.h"
 #include "mario/mario_cam.h"
 #include "system.h"
-#include <math.h>
 
 Vec cloud_at;
 
-void cloudGetAt(Vec* position) {
-    MarioWork* mario = marioGetPtr();
-    u32 partyId = marioGetPartyId();
-    PartyEntry* party = partyGetPtr(partyId);
 
-    if (party == NULL || (party->currentMemberId == PARTY_MEMBER_FLURRIE && (party->flags & PARTY_FLAG_IS_BEING_USED) == 0)) {
-        return;
+#define CLD_F(p, off) (*(f32*)((u8*)(p) + (off)))
+#define CLD_S(p, off) (*(s32*)((u8*)(p) + (off)))
+#define CLD_B(p, off) (*(u8*)((u8*)(p) + (off)))
+void partyMoveFlyInit(PartyEntry* party, s32 arg);
+void partyFlyMain(PartyEntry* party);
+
+#include "driver/hitdrv.h"
+#include "driver/effdrv.h"
+#include "memory.h"
+#include "pmario_sound.h"
+#include "mario/mario_motion.h"
+void N__cloud_use(PartyEntry* party);
+void getHitBreatheout2(PartyEntry* party, f32 unk);
+void partyChgRunMode(PartyEntry* party, s32 mode);
+s32 partyChgPoseId(PartyEntry* party, s32 id);
+void partyChgPose(PartyEntry* party, s32 pose);
+void partyChgMot(PartyEntry* party, s32 mot);
+
+#define CLD_P(p, off) (*(void**)((u8*)(p) + (off)))
+#define CLD_H(p, off) (*(u16*)((u8*)(p) + (off)))
+#define CLD_U(p, off) (*(u32*)((u8*)(p) + (off)))
+
+static inline void cloudSweep(PartyEntry* party, f32 sign, s32 off) {
+    u8* cl = CLD_P(party, 0x170);
+    if (CLD_S(cl, off + 4) == 0) {
+        CLD_F(cl, off) += 1.0f;
+        cl = CLD_P(party, 0x170);
+        if (CLD_F(cl, off) >= 20.0f) {
+            CLD_F(cl, off) = 20.0f;
+            CLD_S(CLD_P(party, 0x170), off + 4) = 1;
+        }
+    } else {
+        CLD_F(cl, off) -= 1.0f;
+        cl = CLD_P(party, 0x170);
+        if (CLD_F(cl, off) <= -20.0f) {
+            CLD_F(cl, off) = -20.0f;
+            CLD_S(CLD_P(party, 0x170), off + 4) = 0;
+        }
     }
+}
 
-    if ((mario->dispFlags & (1 << 20)) == 0) {
-        CameraEntry* camera = camGetPtr(CAMERA_3D);
+void* effKumokumoN64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 w, f32 s, f32 t);
+void partyChgMoveMode(PartyEntry* party, s32 mode);
+void partyUpdateKeyData(PartyEntry* party);
+void* memset(void*, int, unsigned long);
 
-        if(camera->stateA == 0) {
-            cloud_at = *position;
-        }
-        else {
-            *position = cloud_at;
-        }
+
+
+#define cloudCalcPos(party) {                                                          u8* m_ = CLD_P(party, 0x160);                                                         f32 dir_;                                                                                                                                                                   *(Vec*)&CLD_F(party, 0x94) = *(Vec*)&CLD_F(m_, 0x8C);                                 dir_ = CLD_F(m_, 0x1AC);                                                              movePos((f32*)((u32)party + 0x94), (f32*)((u32)party + 0x9C), 3.3f,                           toMovedir(dir_ + ((dir_ < 90.0f || dir_ >= 270.0f) ? -90.0f : 90.0f)));       CLD_F(party, 0x98) += 10.0f;                                                      }
+
+void mot_cloud() {
+    MarioWork* mario = marioGetPtr();
+    
+    if((mario->trigFlags & 0x1) != 0) {
+        mario->trigFlags &= ~0x1;
+        mario->flags &= ~(MARIO_FLAG_HAS_INPUT_JUMP|MARIO_FLAG_IS_STEPPING|MARIO_FLAG_IS_FALLING|MARIO_FLAG_IS_JUMPING);
+        mario->multiTimer = 0;
+        mario->airTimer = 0;
+        mario->currSubMotionId = 0;
     }
 }
 
@@ -68,18 +115,6 @@ u8 cloudGetStatus() {
     return status;
 }
 
-void mot_cloud() {
-    MarioWork* mario = marioGetPtr();
-    
-    if((mario->trigFlags & 0x1) != 0) {
-        mario->trigFlags &= ~0x1;
-        mario->flags &= ~(MARIO_FLAG_HAS_INPUT_JUMP|MARIO_FLAG_IS_STEPPING|MARIO_FLAG_IS_FALLING|MARIO_FLAG_IS_JUMPING);
-        mario->multiTimer = 0;
-        mario->airTimer = 0;
-        mario->currSubMotionId = 0;
-    }
-}
-
 f32 cloudGetBreathDir() {
     PartyEntry* party = partyGetPtr(PARTY_SLOT_PARTY);
     f32 breathDir;
@@ -100,27 +135,6 @@ f32 cloudGetBreathDir() {
     }
     
     return breathDir;
-}
-
-f32 cloudGetBreathDist() {
-    u32 partyId = marioGetPartyId();
-    PartyEntry* party = partyGetPtr(partyId);
-    f32 breathDist;
-
-    if (party == NULL) {
-        breathDist = 0.0f;
-        return breathDist;
-    }
-
-    if ((party->currentMemberId != PARTY_MEMBER_FLURRIE || (party->flags & PARTY_FLAG_IS_BEING_USED) == 0) || party->useMotionId < MARIO_MOTION_FALL) {
-        breathDist = 0.0f;
-    }
-    else {
-        PartyCloud* cloud = (PartyCloud*)party->useStruct;
-        breathDist = cloud->unk8;
-    }
-
-    return breathDist;
 }
 
 f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
@@ -162,12 +176,60 @@ f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
     return breathPower;
 }
 
+s32 cloudGetHitBreathout(s32 param_1) {
+    u32 partyId = marioGetPartyId();
+    PartyEntry* party = partyGetPtr(partyId);
+    s32 hitBreathout;
 
-#define CLD_F(p, off) (*(f32*)((u8*)(p) + (off)))
-#define CLD_S(p, off) (*(s32*)((u8*)(p) + (off)))
-#define CLD_B(p, off) (*(u8*)((u8*)(p) + (off)))
-void partyMoveFlyInit(PartyEntry* party, s32 arg);
-void partyFlyMain(PartyEntry* party);
+    if (party == NULL) {
+        return 0;
+    }
+
+    if (
+        party->currentMemberId != PARTY_MEMBER_FLURRIE 
+        || (party->flags & PARTY_FLAG_IS_BEING_USED) == 0
+        || party->useMotionId < MARIO_MOTION_FALL
+    ){
+            return 0;
+    }
+
+    hitBreathout = 0;
+    if (param_1 == 0) {
+        hitBreathout = ((PartyCloud*)party->useStruct)->unk20;
+    }
+    else if (param_1 == 1) { 
+        hitBreathout = ((PartyCloud*)party->useStruct)->unk24;
+    }
+    else if (param_1 == 2) {
+        hitBreathout = ((PartyCloud*)party->useStruct)->unk28;
+    }
+    else if (param_1 == 3) { 
+        hitBreathout = ((PartyCloud*)party->useStruct)->unk2C;
+    }
+    
+    return hitBreathout;
+}
+
+f32 cloudGetBreathDist() {
+    u32 partyId = marioGetPartyId();
+    PartyEntry* party = partyGetPtr(partyId);
+    f32 breathDist;
+
+    if (party == NULL) {
+        breathDist = 0.0f;
+        return breathDist;
+    }
+
+    if ((party->currentMemberId != PARTY_MEMBER_FLURRIE || (party->flags & PARTY_FLAG_IS_BEING_USED) == 0) || party->useMotionId < MARIO_MOTION_FALL) {
+        breathDist = 0.0f;
+    }
+    else {
+        PartyCloud* cloud = (PartyCloud*)party->useStruct;
+        breathDist = cloud->unk8;
+    }
+
+    return breathDist;
+}
 
 void unk_801820d0(PartyEntry* party) {
     CLD_F(party, 0x17C) = 0.0f;
@@ -175,8 +237,10 @@ void unk_801820d0(PartyEntry* party) {
 }
 
 void unk_8018206c(PartyEntry* party) {
+    f32 a;
     CLD_F(party, 0x17C) = revise360(CLD_F(party, 0x17C) - CLD_F(party, 0x180));
-    CLD_F(party, 0x80) = 3.0f + 3.0f * (f32)sin((3.1415927f * CLD_F(party, 0x17C)) / 180.0f);
+    a = sin((3.1415927f * CLD_F(party, 0x17C)) / 180.0f);
+    CLD_F(party, 0x80) = 3.0f + 3.0f * a;
 }
 
 void cloud_move(PartyEntry* party) {
@@ -205,122 +269,19 @@ void cloud_init(PartyEntry* party) {
     CLD_S(party, 0x178) = 0;
 }
 
-#include "driver/hitdrv.h"
-#include "driver/effdrv.h"
-#include "memory.h"
-#include "pmario_sound.h"
-#include "mario/mario_motion.h"
-void N__cloud_use(PartyEntry* party);
-void partyChgRunMode(PartyEntry* party, s32 mode);
-s32 partyChgPoseId(PartyEntry* party, s32 id);
-void partyChgPose(PartyEntry* party, s32 pose);
-void partyChgMot(PartyEntry* party, s32 mot);
-
-#define CLD_P(p, off) (*(void**)((u8*)(p) + (off)))
-#define CLD_H(p, off) (*(u16*)((u8*)(p) + (off)))
-#define CLD_U(p, off) (*(u32*)((u8*)(p) + (off)))
-
-static inline void cloudSweep(PartyEntry* party, f32 sign, s32 off) {
-    u8* cl = CLD_P(party, 0x170);
-    if (CLD_S(cl, off + 4) == 0) {
-        CLD_F(cl, off) += 1.0f;
-        cl = CLD_P(party, 0x170);
-        if (CLD_F(cl, off) >= 20.0f) {
-            CLD_F(cl, off) = 20.0f;
-            CLD_S(CLD_P(party, 0x170), off + 4) = 1;
-        }
-    } else {
-        CLD_F(cl, off) -= 1.0f;
-        cl = CLD_P(party, 0x170);
-        if (CLD_F(cl, off) <= -20.0f) {
-            CLD_F(cl, off) = -20.0f;
-            CLD_S(CLD_P(party, 0x170), off + 4) = 0;
-        }
-    }
-}
-
-void getHitBreatheout2(PartyEntry* party) {
-    f32 dirSin, dirCos, ys, yc, unk;
-    f32 hx, hy, hz, dist, nx, ny, nz;
-    f32 ofsZ, ofsX;
-    f32 dir, sign, height;
-    HitEntry* hit;
-    u8* cl = CLD_P(party, 0x170);
+void cloud_use(PartyEntry* party) {
     u8* mario = CLD_P(party, 0x160);
-    s16 kind = *(s16*)(cl + 0x38);
+    u16 mot;
+    s32 flag;
+    f32 dir;
+    u8* m;
 
-    if (kind == 0) {
-        height = 8.0f;
-    } else if (kind == 1) {
-        height = 20.0f;
-    } else if (kind == 2) {
-        height = 40.0f;
+    N__cloud_use(party);
+    mot = CLD_H(mario, 0x2E);
+    if (mot == 0x1B || mot <= 1 || mot == 2) {
+        return;
     }
-    if (CLD_F(cl, 8) >= CLD_F(cl, 0xC)) {
-        CLD_F(cl, 8) = CLD_F(cl, 0xC);
-    }
-    sincosf(&ys, &yc, unk);
-    dir = toMovedir(CLD_F(CLD_P(party, 0x170), 4));
-    sincosf(&dirSin, &dirCos, dir);
-    dist = CLD_F(CLD_P(party, 0x170), 8);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
-                         dirSin, ys, dirCos);
-    if (hit != NULL && (hitGetAttr(hit) & 4)) {
-        hit = NULL;
-    }
-    CLD_P(CLD_P(party, 0x170), 0x20) = hit;
-    ofsX = 0.0f;
-    ofsZ = 0.0f;
-    if (CLD_P(party, 0x178) != NULL) {
-        movePos(&ofsX, &ofsZ, 24.0f, dir);
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 4) = CLD_F(party, 0x58) + ofsX;
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 8) = 18.0f + CLD_F(party, 0x5C);
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0xC) = CLD_F(party, 0x60) + ofsZ;
-        cl = CLD_P(party, 0x170);
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x5C) = 0.6f * (CLD_F(cl, 8) / CLD_F(cl, 0xC));
-        cl = CLD_P(party, 0x170);
-        if (CLD_F(cl, 4) >= 90.0f && CLD_F(cl, 4) <= 270.0f) {
-            CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x58) = -25.0f;
-        } else {
-            CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x58) = 205.0f;
-        }
-    }
-    cl = CLD_P(party, 0x170);
-    if (CLD_F(cl, 4) >= 90.0f && CLD_F(cl, 4) <= 270.0f) {
-        sign = 1.0f;
-    } else {
-        sign = -1.0f;
-    }
-
-    cloudSweep(party, sign, 0x10);
-    cl = CLD_P(party, 0x170);
-    sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x10) * sign + CLD_F(cl, 4)));
-    dist = CLD_F(CLD_P(party, 0x170), 8);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
-                         dirSin, ys, dirCos);
-    if (hit != NULL && (hitGetAttr(hit) & 4)) {
-        hit = NULL;
-    }
-    CLD_P(CLD_P(party, 0x170), 0x28) = hit;
-
-    cloudSweep(party, sign, 0x18);
-    cl = CLD_P(party, 0x170);
-    sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x18) * sign + CLD_F(cl, 4)));
-    dist = CLD_F(CLD_P(party, 0x170), 8);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
-                         dirSin, ys, dirCos);
-    if (hit != NULL && (hitGetAttr(hit) & 4)) {
-        hit = NULL;
-    }
-    CLD_P(CLD_P(party, 0x170), 0x2C) = hit;
-}
-
-void cloud_exit(PartyEntry* party) {
-    u8* mario = CLD_P(party, 0x160);
-
+    CLD_U(party, 0) &= ~0x100;
     if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) != 0xFFFFFFFF) {
         psndSFXOff(CLD_S(CLD_P(party, 0x170), 0x34));
         CLD_S(CLD_P(party, 0x170), 0x34) = -1;
@@ -329,46 +290,29 @@ void cloud_exit(PartyEntry* party) {
         effSoftDelete(CLD_P(party, 0x178));
         CLD_P(party, 0x178) = NULL;
     }
+    cloudCalcPos(party);
+    party->position = *(Vec*)&CLD_F(party, 0x94);
+    CLD_U(party, 4) |= 0x10;
+    CLD_U(party, 0) &= ~0x80000000;
     if (CLD_P(party, 0x170) != NULL) {
         __memFree(HEAP_DEFAULT, CLD_P(party, 0x170));
         CLD_P(party, 0x170) = NULL;
     }
-    CLD_U(mario, 4) &= ~0x100;
-    CLD_U(mario, 4) &= ~4;
-    marioAdjustMoveDir();
-    marioChgMot(0);
-    CLD_F(mario, 0x150) = 0.01f;
-    CLD_F(mario, 0x138) = 0.0f;
-}
-
-void* effKumokumoN64Entry(s32 a, s32 b, f32 x, f32 y, f32 z, f32 w, f32 s, f32 t);
-void partyChgMoveMode(PartyEntry* party, s32 mode);
-void partyUpdateKeyData(PartyEntry* party);
-void* memset(void*, int, unsigned long);
-
-const Vec vec3_802f8120 = {0.0f, 0.0f, 0.0f};
-
-static inline void cloudCalcPos(PartyEntry* party) {
-    u8* m = CLD_P(party, 0x160);
-    s32 flag;
-    f32 dir;
-
-    *(Vec*)&CLD_F(party, 0x94) = *(Vec*)&CLD_F(m, 0x8C);
-    flag = 0;
-    dir = CLD_F(m, 0x1AC);
-    if (dir < 90.0f || dir >= 270.0f) {
-        flag = 1;
+    mot = CLD_H(mario, 0x2E);
+    if (mot == 0x1F || mot == 0x20) {
+        partyChgRunMode(party, 13);
+    } else {
+        partyChgPose(party, partyChgPoseId(party, 1));
+        partyChgRunMode(party, 2);
+        partyChgMot(party, 0);
     }
-    movePos(&CLD_F(party, 0x94), &CLD_F(party, 0x9C), 3.3f,
-            toMovedir(dir + (flag ? -90.0f : 90.0f)));
-    CLD_F(party, 0x98) += 10.0f;
 }
 
 void N__cloud_use(PartyEntry* party) {
     u8* mario = CLD_P(party, 0x160);
-    f32 dirSin, dirCos, ys, yc;
-    f32 hx, hy, hz, dist, nx, ny, nz;
-    f32 ofsZ, ofsX;
+    f32 ofsX, ofsZ;
+    f32 nz, ny, nx, dist, hz, hy, hx;
+    f32 yc, ys, dirCos, dirSin;
     HitEntry* hit;
     s32 flag;
     f32 dir;
@@ -472,7 +416,10 @@ void N__cloud_use(PartyEntry* party) {
         CLD_F(party, 0x58) = ofsX;
         CLD_F(party, 0x60) = ofsZ;
         CLD_F(party, 0x5C) = 10.0f + CLD_F(mario, 0x90);
-        *(Vec*)&CLD_F(party, 0x7C) = vec3_802f8120;
+        {
+            Vec zero = {0.0f, 0.0f, 0.0f};
+            *(Vec*)&CLD_F(party, 0x7C) = zero;
+        }
         CLD_F(CLD_P(party, 0x170), 8) += 2.0f;
         cl = CLD_P(party, 0x170);
         mario = CLD_P(party, 0x160);
@@ -489,7 +436,7 @@ void N__cloud_use(PartyEntry* party) {
             hit = NULL;
         }
         CLD_P(CLD_P(party, 0x170), 0x24) = hit;
-        ((void (*)(PartyEntry*, f32))getHitBreatheout2)(party, 0.0f);
+        getHitBreatheout2(party, 0.0f);
         if (++*(s16*)((u8*)CLD_P(party, 0x170) + 0x38) > 2) {
             *(s16*)((u8*)CLD_P(party, 0x170) + 0x38) = 0;
         }
@@ -570,19 +517,9 @@ void N__cloud_use(PartyEntry* party) {
     }
 }
 
-void cloud_use(PartyEntry* party) {
+void cloud_exit(PartyEntry* party) {
     u8* mario = CLD_P(party, 0x160);
-    u16 mot;
-    s32 flag;
-    f32 dir;
-    u8* m;
 
-    N__cloud_use(party);
-    mot = CLD_H(mario, 0x2E);
-    if (mot == 0x1B || mot <= 1 || mot == 2) {
-        return;
-    }
-    CLD_U(party, 0) &= ~0x100;
     if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) != 0xFFFFFFFF) {
         psndSFXOff(CLD_S(CLD_P(party, 0x170), 0x34));
         CLD_S(CLD_P(party, 0x170), 0x34) = -1;
@@ -591,63 +528,116 @@ void cloud_use(PartyEntry* party) {
         effSoftDelete(CLD_P(party, 0x178));
         CLD_P(party, 0x178) = NULL;
     }
-    m = CLD_P(party, 0x160);
-    *(Vec*)&CLD_F(party, 0x94) = ((MarioWork*)m)->position;
-    flag = 0;
-    dir = CLD_F(m, 0x1AC);
-    if (dir < 90.0f || dir >= 270.0f) {
-        flag = 1;
-    }
-    movePos(&CLD_F(party, 0x94), &CLD_F(party, 0x9C), 3.3f,
-            toMovedir(dir + (flag ? -90.0f : 90.0f)));
-    CLD_F(party, 0x98) += 10.0f;
-    party->position = *(Vec*)&CLD_F(party, 0x94);
-    CLD_U(party, 4) |= 0x10;
-    CLD_U(party, 0) &= ~0x80000000;
     if (CLD_P(party, 0x170) != NULL) {
         __memFree(HEAP_DEFAULT, CLD_P(party, 0x170));
         CLD_P(party, 0x170) = NULL;
     }
-    mot = CLD_H(mario, 0x2E);
-    if (mot == 0x1F || mot == 0x20) {
-        partyChgRunMode(party, 13);
-    } else {
-        partyChgPose(party, partyChgPoseId(party, 1));
-        partyChgRunMode(party, 2);
-        partyChgMot(party, 0);
-    }
+    CLD_U(mario, 4) &= ~0x100;
+    CLD_U(mario, 4) &= ~4;
+    marioAdjustMoveDir();
+    marioChgMot(0);
+    CLD_F(mario, 0x150) = 0.01f;
+    CLD_F(mario, 0x138) = 0.0f;
 }
 
-s32 cloudGetHitBreathout(s32 param_1) {
+void getHitBreatheout2(PartyEntry* party, f32 unk) {
+    f32 dirSin, dirCos, ys, yc;
+    f32 hx, hy, hz, dist, nx, ny, nz;
+    f32 ofsZ, ofsX;
+    f32 dir, sign, height;
+    s16 kind;
+    HitEntry* hit;
+    u8* cl = CLD_P(party, 0x170);
+    u8* mario = CLD_P(party, 0x160);
+
+    kind = *(s16*)(cl + 0x38);
+
+    if (kind == 0) {
+        height = 8.0f;
+    } else if (kind == 1) {
+        height = 20.0f;
+    } else if (kind == 2) {
+        height = 40.0f;
+    }
+    if (CLD_F(cl, 8) >= CLD_F(cl, 0xC)) {
+        CLD_F(cl, 8) = CLD_F(cl, 0xC);
+    }
+    sincosf(&ys, &yc, unk);
+    dir = toMovedir(CLD_F(CLD_P(party, 0x170), 4));
+    sincosf(&dirSin, &dirCos, dir);
+    dist = CLD_F(CLD_P(party, 0x170), 8);
+    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
+                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         dirSin, ys, dirCos);
+    if (hit != NULL && (hitGetAttr(hit) & 4)) {
+        hit = NULL;
+    }
+    CLD_P(CLD_P(party, 0x170), 0x20) = hit;
+    ofsX = 0.0f;
+    ofsZ = 0.0f;
+    if (CLD_P(party, 0x178) != NULL) {
+        movePos(&ofsX, &ofsZ, 24.0f, dir);
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 4) = CLD_F(party, 0x58) + ofsX;
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 8) = 18.0f + CLD_F(party, 0x5C);
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0xC) = CLD_F(party, 0x60) + ofsZ;
+        cl = CLD_P(party, 0x170);
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x5C) = 0.6f * (CLD_F(cl, 8) / CLD_F(cl, 0xC));
+        cl = CLD_P(party, 0x170);
+        if (CLD_F(cl, 4) >= 90.0f && CLD_F(cl, 4) <= 270.0f) {
+            CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x58) = -25.0f;
+        } else {
+            CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x58) = 205.0f;
+        }
+    }
+    cl = CLD_P(party, 0x170);
+    if (CLD_F(cl, 4) >= 90.0f && CLD_F(cl, 4) <= 270.0f) {
+        sign = 1.0f;
+    } else {
+        sign = -1.0f;
+    }
+
+    cloudSweep(party, sign, 0x10);
+    cl = CLD_P(party, 0x170);
+    sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x10) * sign + CLD_F(cl, 4)));
+    dist = CLD_F(CLD_P(party, 0x170), 8);
+    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
+                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         dirSin, ys, dirCos);
+    if (hit != NULL && (hitGetAttr(hit) & 4)) {
+        hit = NULL;
+    }
+    CLD_P(CLD_P(party, 0x170), 0x28) = hit;
+
+    cloudSweep(party, sign, 0x18);
+    cl = CLD_P(party, 0x170);
+    sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x18) * sign + CLD_F(cl, 4)));
+    dist = CLD_F(CLD_P(party, 0x170), 8);
+    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
+                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         dirSin, ys, dirCos);
+    if (hit != NULL && (hitGetAttr(hit) & 4)) {
+        hit = NULL;
+    }
+    CLD_P(CLD_P(party, 0x170), 0x2C) = hit;
+}
+
+void cloudGetAt(Vec* position) {
+    MarioWork* mario = marioGetPtr();
     u32 partyId = marioGetPartyId();
     PartyEntry* party = partyGetPtr(partyId);
-    s32 hitBreathout;
 
-    if (party == NULL) {
-        return 0;
-    }
-
-    if (
-        party->currentMemberId != PARTY_MEMBER_FLURRIE 
-        || (party->flags & PARTY_FLAG_IS_BEING_USED) == 0
-        || party->useMotionId < MARIO_MOTION_FALL
-    ){
-            return 0;
+    if (party == NULL || (party->currentMemberId == PARTY_MEMBER_FLURRIE && (party->flags & PARTY_FLAG_IS_BEING_USED) == 0)) {
+        return;
     }
 
-    hitBreathout = 0;
-    if (param_1 == 0) {
-        hitBreathout = ((PartyCloud*)party->useStruct)->unk20;
+    if ((mario->dispFlags & (1 << 20)) == 0) {
+        CameraEntry* camera = camGetPtr(CAMERA_3D);
+
+        if(camera->stateA == 0) {
+            cloud_at = *position;
+        }
+        else {
+            *position = cloud_at;
+        }
     }
-    else if (param_1 == 1) { 
-        hitBreathout = ((PartyCloud*)party->useStruct)->unk24;
-    }
-    else if (param_1 == 2) {
-        hitBreathout = ((PartyCloud*)party->useStruct)->unk28;
-    }
-    else if (param_1 == 3) { 
-        hitBreathout = ((PartyCloud*)party->useStruct)->unk2C;
-    }
-    
-    return hitBreathout;
 }

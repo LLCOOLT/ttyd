@@ -187,21 +187,21 @@ void effKamekiTornadeMain(EffectEntry* effect) {
 }
 
 void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
+    f32 scale;
     s32 i;
-    s32 k;
     EffKamekiTornadeN64Work* work;
     s32 life;
     effN64Vtx* tmpl;
     effN64Vtx* vtx;
     effN64Vtx* p;
     effN64Vtx* q;
+    s32 k;
     s32 j;
     CameraEntry* camera;
     s32 a;
-    f32 scale;
-    f32 ang;
     f32 s;
     f32 r;
+    f32 ang;
     Mtx mtx;
     Mtx tex;
     Mtx rot;
@@ -244,18 +244,18 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     tmpl = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     p = tmpl;
-    for (i = 0; i < 16; i++) {
+    for (i = 0, k = 0; i < 16; i++, k += 128) {
         p = &tmpl[i];
-        ang = (6.2831855f * (f32)(i * 360 / 15)) / 360.0f;
-        p->x = 100.0f * (f32)cos(ang);
+        r = (6.2831855f * (f32)(i * 360 / 15)) / 360.0f;
+        p->x = 100.0f * (f32)cos(r);
         p->y = 0.0f;
-        p->z = 100.0f * (f32)sin(ang);
-        p->s = i * 128;
+        p->z = 100.0f * (f32)sin(r);
+        p->s = k;
         p->t = 0;
         q = &tmpl[i + 16];
-        q->x = 100.0f * (f32)cos(ang);
+        q->x = 100.0f * (f32)cos(r);
         q->y = 0.0f;
-        q->z = 100.0f * (f32)sin(ang);
+        q->z = 100.0f * (f32)sin(r);
         q->s = i * 512;
         q->t = 1024;
     }
@@ -277,10 +277,10 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXScale(tex, s, scale, s);
         PSMTXConcat(mtx, tex, mtx);
-        r = 10.0f * work->radius[i];
-        ang = 6.2831855f * work->ang[i] / 360.0f;
-        s = (f32)sin(ang);
-        PSMTXTrans(tex, r * s, 0, r * (f32)cos(ang));
+        ang = 10.0f * work->radius[i];
+        s = 6.2831855f * work->ang[i] / 360.0f;
+        r = (f32)sin(s);
+        PSMTXTrans(tex, ang * r, 0, ang * (f32)cos(s));
         PSMTXConcat(mtx, tex, mtx);
         PSMTXConcat(base, mtx, mtx);
         for (j = 0; j < 16; j++) {

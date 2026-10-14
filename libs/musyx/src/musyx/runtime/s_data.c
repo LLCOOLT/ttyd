@@ -16,9 +16,9 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static GSROOT* gsCurrent;
 static GSROOT* gsRoot;
 static s32 gsNextID;
+static GSROOT* gsCurrent;
 static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
@@ -312,7 +312,7 @@ bool sndPopGroup() {
 */
 
 u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_call, u8 studio) {
-  int i;
+  s32 i;
   GROUP_DATA* g;
   PAGE* norm;
   PAGE* drum;
@@ -374,10 +374,7 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
 
   for (root = gsRoot; root != NULL; root = root->next) {
     for (i = 0; i < root->sp; ++i) {
-      if (root->stack[i].gAddr->id != sgid) {
-        continue;
-      }
-
+      if (root->stack[i].gAddr->id == sgid) {
       if (root->stack[i].gAddr->type == 0) {
         g = root->stack[i].gAddr;
         prj = root->stack[i].prjAddr;
@@ -394,9 +391,11 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
 
           ++midiSetup;
         }
+
         { seqId = 0xffffffff; goto done; }
       } else {
         { seqId = 0xffffffff; goto done; }
+      }
       }
     }
   }

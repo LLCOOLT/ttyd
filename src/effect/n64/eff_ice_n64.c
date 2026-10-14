@@ -86,8 +86,6 @@ static void effIceMain(EffectEntry* effect) {
     s32 i;
     s32 life;
     EffIceN64Piece* p;
-    f32 t;
-    f32 s;
 
     pos.x = work->position.x;
     pos.y = work->position.y;
@@ -110,8 +108,10 @@ static void effIceMain(EffectEntry* effect) {
     work = (EffIceN64Work*)((EffIceN64Piece*)work + 1);
     idx = life + 20;
     for (i = 1; i < effect->count; idx += 20, i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
+        f32 t;
+        f32 s;
         p = (EffIceN64Piece*)work;
-        s = (f32)sin(6.2831855f * (2.0f * ((EffIceN64Piece*)work)->rotZ) / 360.0f);
+        s = sin(6.2831855f * (2.0f * p->rotZ) / 360.0f);
         p->velY += -0.05f;
         t = 0.2f * s;
         p->velX = t + p->velX;

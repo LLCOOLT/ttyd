@@ -24,6 +24,8 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z);
 void effMahojinMain(EffectEntry* effect);
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect);
 
+
+s32 gap_08_80418B4C_sbss;
 s32 mahojin_rate;
 
 static const char* name_tbl[] = {
@@ -40,6 +42,7 @@ Vec pos_tbl[7] = {
     { -13.8747f, 0.0f, 3.0951f },
     { -11.1931f, 0.0f, -9.0435f },
 };
+
 
 static void callback(MapTevCallbackInfo* info) {
     s32 tevStage = info->tevStage;
@@ -69,7 +72,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
 
     effect = effEntry();
     n = (type < 8 ? type : 7) + 2;
-    effect->type = "Mahojin";
+    effect->type = "Mahojin\0\0\0\0";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, n * sizeof(EffMahojinWork));
     effect->userdata = work;
@@ -336,3 +339,5 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         map->entries[0].flags = flags;
     }
 }
+
+

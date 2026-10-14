@@ -152,13 +152,77 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
     {-3, 22, 0, 0, 1024, 255, 255, 255, 255},
 };
 
-__declspec(section ".data") u32 gap_jetw = 0;
+#pragma force_active on
+__declspec(section ".data") u32 gap_jetw[1] = {0};
+#pragma force_active reset
 
 static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
 
-const GXColor jetw_col_a;
-const GXColor jetw_col_b;
-const GXColor jetw_col_c;
+
+void effOpukuJetwMain(EffectEntry* effect);
+void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect);
+
+EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
+    EffectEntry* effect;
+    EffOpukuJetwN64Work* work;
+
+    effect = effEntry();
+    effect->type = "OpukuJetwN64";
+    effect->count = 1;
+    work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwN64Work));
+    effect->userdata = work;
+    effect->callback = effOpukuJetwMain;
+    effect->flags |= 2;
+    work->type = type;
+    work->frame = 0;
+    if (lifetime <= 0) {
+        work->lifetime = 1000;
+    } else {
+        work->lifetime = lifetime;
+    }
+    work->alpha = 255;
+    work->position.x = x;
+    work->position.y = y;
+    work->position.z = z;
+    work->scale = scale;
+    work->colorR = 70;
+    work->colorG = 180;
+    work->colorB = 255;
+    work->color2R = 255;
+    work->color2G = 255;
+    work->color2B = 255;
+    work->rotZ = 0.0f;
+    work->scaleX = 1.0f;
+    work->scaleY = 1.0f;
+    return effect;
+}
+
+void effOpukuJetwMain(EffectEntry* effect) {
+    EffOpukuJetwN64Work* work = effect->userdata;
+    Vec position;
+    Vec tmp = {0.0f, 0.0f, 0.0f};
+
+    tmp.x = work->position.x;
+    tmp.y = work->position.y;
+    tmp.z = work->position.z;
+    position = tmp;
+    if (effect->flags & 4) {
+        effect->flags &= ~4;
+        work->lifetime = 16;
+    }
+    if (work->lifetime < 1000) {
+        work->lifetime--;
+    }
+    work->frame++;
+    if (work->lifetime < 0) {
+        effDelete(effect);
+        return;
+    }
+    if (work->frame < 8) {
+        work->alpha = (work->frame << 5) + 31;
+    }
+    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
+}
 
 void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
@@ -166,9 +230,6 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx2;
     GXTexObj texObj;
-    GXColor color;
-    GXColor color2;
-    GXColor color3;
     JetwEnt* tbl;
     s32 frame;
     CameraEntry* camera;
@@ -218,19 +279,9 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(scale, work->scaleX, work->scaleY, 1.0f);
     PSMTXConcat(rot, scale, scale);
     PSMTXConcat(mtx2, scale, mtx2);
-    color = jetw_col_a;
-    color.r = work->color2R;
-    color.g = work->color2G;
-    color.b = work->color2B;
-    color.a = alpha;
-    GXSetTevColor(GX_TEVREG1, color);
+    GXSetTevColor(GX_TEVREG1, (GXColor){work->color2R, work->color2G, work->color2B, alpha});
     if (n - 1 <= lifetime) {
-        color2 = jetw_col_b;
-        color2.r = r;
-        color2.g = g;
-        color2.b = b;
-        color2.a = alpha;
-        GXSetTevColor(GX_TEVREG0, color2);
+        GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, alpha});
         GXLoadPosMtxImm(mtx2, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         effSetVtxDescN64(size16x16_tex32x32_vtx);
@@ -238,15 +289,16 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
     {
-        s32 i, j, idx, f5, cur, half, rem;
+        s32 i, j, idx, f5, cur, rem;
         JetwEnt* e2;
         f5 = frame * 5;
         cur = frame;
-        half = n / 2;
-        for (i = 0; i < half; i++, cur += 2) {
+        frame = n / 2;
+        for (i = 0; i < frame; i++, cur += 2) {
             idx = cur % n;
-            e2 = tbl + idx;
             rem = n - idx - 1;
+            e2 = tbl + idx;
+
             for (j = 0; j < m; j++) {
                 if (idx > f5) continue;
                 if (rem > lifetime) continue;
@@ -260,12 +312,7 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
                     PSMTXConcat(mtx2, mtx, mtx);
                     GXLoadPosMtxImm(mtx, GX_PNMTX0);
                     GXSetCurrentMtx(GX_PNMTX0);
-                    color3 = jetw_col_c;
-                    color3.r = r;
-                    color3.g = g;
-                    color3.b = b;
-                    color3.a = (alpha * e2->alpha) >> 8;
-                    GXSetTevColor(GX_TEVREG0, color3);
+                    GXSetTevColor(GX_TEVREG0, (GXColor){r, g, b, (alpha * e2->alpha) >> 8});
                     effSetVtxDescN64(size16x16_tex32x32_vtx);
                     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                     tri2(0, 1, 2, 0, 0, 2, 3, 0);
@@ -273,66 +320,4 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
             }
         }
     }
-}
-
-void effOpukuJetwMain(EffectEntry* effect) {
-    EffOpukuJetwN64Work* work = effect->userdata;
-    Vec position;
-    Vec tmp = {0.0f, 0.0f, 0.0f};
-
-    tmp.x = work->position.x;
-    tmp.y = work->position.y;
-    tmp.z = work->position.z;
-    position = tmp;
-    if (effect->flags & 4) {
-        effect->flags &= ~4;
-        work->lifetime = 16;
-    }
-    if (work->lifetime < 1000) {
-        work->lifetime--;
-    }
-    work->frame++;
-    if (work->lifetime < 0) {
-        effDelete(effect);
-        return;
-    }
-    if (work->frame < 8) {
-        work->alpha = (work->frame << 5) + 31;
-    }
-    dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
-}
-
-EffectEntry* effOpukuJetwN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 z, f32 scale) {
-    EffectEntry* effect;
-    EffOpukuJetwN64Work* work;
-
-    effect = effEntry();
-    effect->type = "OpukuJetwN64";
-    effect->count = 1;
-    work = __memAlloc(HEAP_EFFECT, sizeof(EffOpukuJetwN64Work));
-    effect->userdata = work;
-    effect->callback = effOpukuJetwMain;
-    effect->flags |= 2;
-    work->type = type;
-    work->frame = 0;
-    if (lifetime <= 0) {
-        work->lifetime = 1000;
-    } else {
-        work->lifetime = lifetime;
-    }
-    work->alpha = 255;
-    work->position.x = x;
-    work->position.y = y;
-    work->position.z = z;
-    work->scale = scale;
-    work->colorR = 70;
-    work->colorG = 180;
-    work->colorB = 255;
-    work->color2R = 255;
-    work->color2G = 255;
-    work->color2B = 255;
-    work->rotZ = 0.0f;
-    work->scaleX = 1.0f;
-    work->scaleY = 1.0f;
-    return effect;
 }

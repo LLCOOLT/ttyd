@@ -74,13 +74,12 @@ void mobjReset(BOOL inBattle);
 void animPoseAutoRelease(BOOL inBattle);
 
 s32 debug_battle_flag;
+s32 seq_battle_unk_8041874c;
 
-const Vec vec3_802c4820 = {-200.0f, 100.0f, 100.0f};
 
 static inline BOOL loadTpl(const char* path) {
     return (u32)fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), path) != 0;
 }
-
 #define GSW0 (-170000000)
 
 void seq_battleInit(BattleSeqWork* work) {
@@ -116,6 +115,12 @@ void seq_battleExit(BattleSeqWork* work) {
     battle_exit();
 }
 
+static const char gon11[7];
+static const char bti01[7];
+static const char bti02[7];
+static const char bti03[7];
+static const char bti04[7];
+
 void seq_battleMain(BattleSeqWork* work) {
     FBatView* fbat;
     BattleStageData* stage;
@@ -130,10 +135,10 @@ void seq_battleMain(BattleSeqWork* work) {
             break;
         }
         case 1:
-            if ((u32)fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "battle/audience/audience_normal.tpl") == 0) {
+            if (!loadTpl("battle/audience/audience_normal.tpl")) {
                 break;
             }
-            if ((u32)fileAsyncf(4, NULL, "%s/%s", getMarioStDvdRoot(), "battle/audience/audience_luigi.tpl") == 0) {
+            if (!loadTpl("battle/audience/audience_luigi.tpl\0")) {
                 break;
             }
             work->counter++;
@@ -187,17 +192,17 @@ void seq_battleMain(BattleSeqWork* work) {
             }
             switch (pouch->rank) {
                 case 0:
-                    bmapLoad("bti_01", stage->mSpecificStageDataDir);
+                    bmapLoad(bti01, stage->mSpecificStageDataDir);
                     break;
                 case 1:
-                    bmapLoad("bti_02", stage->mSpecificStageDataDir);
+                    bmapLoad(bti02, stage->mSpecificStageDataDir);
                     break;
                 case 2:
-                    bmapLoad("bti_03", stage->mSpecificStageDataDir);
+                    bmapLoad(bti03, stage->mSpecificStageDataDir);
                     break;
                 case 3:
                 default:
-                    bmapLoad("bti_04", stage->mSpecificStageDataDir);
+                    bmapLoad(bti04, stage->mSpecificStageDataDir);
                     break;
             }
             wait = FALSE;
@@ -272,7 +277,7 @@ BOOL battle_init(void) {
         if (msg) {
             msgLoad(msg, 0);
         } else {
-            msgLoad("gon_11", 0);
+            msgLoad(gon11, 0);
         }
     }
     memClear(4);
@@ -371,7 +376,7 @@ void battle_exit(void) {
     L_psndBGM_stop();
     psndClearFlag(0x80);
     light = lightGetPaperCraft();
-    light->pos = vec3_802c4820;
+    { Vec v = {-200.0f, 100.0f, 100.0f}; light->pos = v; }
     PSMTXScale(mtx, 3.0f, 3.0f, 3.0f);
     PSMTXMultVec(mtx, &light->pos, &light->pos);
     if (evtGetValue(NULL, GSW0) >= 109 && evtGetValue(NULL, GSW0) < 111) {
@@ -381,3 +386,9 @@ void battle_exit(void) {
         psndENVOn(0x120, NULL);
     }
 }
+
+static const char gon11[] = "gon_11";
+static const char bti01[] = "bti_01";
+static const char bti02[] = "bti_02";
+static const char bti03[] = "bti_03";
+static const char bti04[] = "bti_04";

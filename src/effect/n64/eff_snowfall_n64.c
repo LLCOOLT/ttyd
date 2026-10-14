@@ -138,8 +138,7 @@ EffectEntry* effSnowfallN64Entry(s32 arg, s32 count) {
     work->count = count;
     work->alpha = 255;
     work->active = 1;
-    p = work->p;
-    for (i = 0; i < count; i++, p++) {
+    for (i = 0, p = work->p; i < count; i++, p++) {
         cam = camGetPtr(CAMERA_3D);
         p->position.x = cam->cameraPos.x + (rand() % 2000) - 1000.0f;
         p->position.y = cam->cameraPos.y + (rand() % 2000) - 1000.0f;
@@ -157,8 +156,8 @@ EffectEntry* effSnowfallN64Entry(s32 arg, s32 count) {
 }
 
 void effSnowfallMain(EffectEntry* effect) {
-    EffSnowfallWork* work = effect->userdata;
     EffSnowfallParticle* p;
+    EffSnowfallWork* work = effect->userdata;
     s32 i, life, count, h;
     f32 hf;
     Vec position;
@@ -203,7 +202,6 @@ void effSnowfallMain(EffectEntry* effect) {
 void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* cam;
     EffSnowfallWork* work;
-    EffSnowfallParticle* p;
     Mtx trans;
     Mtx scale;
     Mtx rot;
@@ -213,6 +211,7 @@ void effSnowfallDisp(CameraId cameraId, EffectEntry* effect) {
     s32 count;
     u32 dataA;
     s32 i;
+    EffSnowfallParticle* p;
     s32 alpha;
     u32 dataB;
     int j;

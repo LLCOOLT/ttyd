@@ -775,16 +775,16 @@ static void _mapclsofs_all(CloudWork* wp) {
 
 #pragma dont_inline on
 static USER_FUNC(evt_cloud_main) {
+    CloudWork* wp = (CloudWork*)event->lwData[0];
+    s32 group = gp->inBattle != 0;
+    HitEntry* hit;
+    MarioWork* mario = marioGetPtr();
+    PartyEntry* party = partyGetPtr(0);
+    ImageEntry* img;
     HitEntry* hit0;
     HitEntry* hit1;
     HitEntry* hit2;
     HitEntry* hit3;
-    CloudWork* wp = (CloudWork*)event->lwData[0];
-    s32 group = gp->inBattle != 0;
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(0);
-    HitEntry* hit;
-    ImageEntry* img;
     OffscreenEntry* os;
 
     if (isFirstCall) {
@@ -1038,7 +1038,7 @@ EVT_BEGIN(gon_11_init_evt)
         CASE_DEFAULT
         CALL(evt_snd_bgmon, 512, STRING("BGM_STG1_GON1"))
     END_SWITCH
-    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON4\0\0\0\0\0\0"))
+    CALL(evt_snd_envon, 272, STRING("ENV_STG1_GON4\0\0"))
     CALL(evt_snd_set_rev_mode, 2)
     CALL(evt_npc_flag_onoff, 1, STRING("ノコタロウ父"), 1536)
     CALL(evt_npc_change_fbat_mode, 1)
@@ -1063,3 +1063,5 @@ EVT_BEGIN(gon_11_init_evt)
 EVT_END()
 
 
+
+__declspec(section ".rodata") const u32 gap_03_00001D7C_rodata = 0;

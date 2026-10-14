@@ -634,7 +634,6 @@ static inline void kpaFireEntry(Vec pos) {
     MarioWork* mp = marioGetPtr();
     kpaFireEntry2(pos);
 }
-
 void kpaFireAttack(void) {
     MarioWork* mp = marioGetPtr();
     switch (*(s32*)(KPW(mp) + 0x13C)) {
@@ -767,6 +766,7 @@ void kpaFireAttack(void) {
         break;
     }
 }
+
 
 static inline void kpaFireSEOn(void) {
     MarioWork* mp = marioGetPtr();

@@ -1804,7 +1804,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
             {
             f32 t;
             if (!(party->flags3 & 0x10000)) {
-                t = revise360(180.0f + partyGetFollowDir(party));
+                t = partyGetFollowDir(party); t += 180.0f; t = revise360(t);
             } else {
                 party->flags3 &= ~0x10000;
                 t = revise360(angleABf(mario->position.x, mario->position.z, party->unk94.x, party->unk94.z) + 180.0f);
@@ -1819,7 +1819,7 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
         }
     }
     if (!(party->flags3 & 0x100000) && marioKeyOffChk()) {
-        party->unk54 = revise360(180.0f + partyGetFollowDir(party));
+        f32 t2 = partyGetFollowDir(party); t2 += 180.0f; party->unk54 = revise360(t2);
     }
     angleABf(party->position.x, party->position.z, party->unk94.x, party->unk94.z);
     if (mario->unk180 > 1.0f) {

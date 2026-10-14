@@ -298,6 +298,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part);
 StatusEffectType _GetStatusPoseType(BattleUnit* unit);
 
 void btlDispMain(void) {
+	s32 xlu;
 	BattleUnit* unit;
 	BattleUnitPart* part;
 	BattleWork* wp = _battleWorkPointer;
@@ -435,7 +436,7 @@ next:
 				btlDispAnimeSpeed(part, 1.0f);
 			}
 			if (PART_ANIMFLAGS(part) & 1) {
-				loop = 0;
+				xlu = 0;
 				PART_ANIMFLAGS(part) &= ~1;
 				if (PART_ANIMFLAGS(part) &= ~0x200) {
 					animPoseSetAnim(part->poseId, poseName, TRUE);
@@ -451,29 +452,29 @@ next:
 					PART_POSETYPE(part) = 1;
 					if (BtlUnit_CheckStatus(unit, 0x12) || part->color.a != 0xFF) {
 						PART_POSETYPE(part) = 7;
-						loop = 1;
+						xlu = 1;
 					}
 				}
 				if (!(PART_ANIMFLAGS(part) & 2) || (PART_ANIMFLAGS(part) & 8) || (PART_ANIMFLAGS(part) & 0x80)) {
 					PART_POSETYPE(part) = 1;
 					if (BtlUnit_CheckStatus(unit, 0x12) || part->color.a != 0xFF) {
 						PART_POSETYPE(part) = 7;
-						loop = 1;
+						xlu = 1;
 					}
 					if (BtlUnit_CheckStatus(unit, 7)) {
 						PART_POSETYPE(part) = 4;
-						loop = 1;
+						xlu = 1;
 					}
 				}
-				if (loop && (part->attributes & 0x8000)) {
-					loop = 0;
+				if (xlu && (part->attributes & 0x8000)) {
+					xlu = 0;
 					PART_POSETYPE(part) = 0;
 				}
 				if (!(PART_ANIMFLAGS(part) & 4)) {
-					if (loop && !(PART_ANIMFLAGS(part) & 0x40)) {
+					if (xlu && !(PART_ANIMFLAGS(part) & 0x40)) {
 						PART_ANIMFLAGS(part) |= 0x40;
 					}
-					else if (!loop && (PART_ANIMFLAGS(part) & 0x40)) {
+					else if (!xlu && (PART_ANIMFLAGS(part) & 0x40)) {
 						PART_ANIMFLAGS(part) &= ~0x40;
 					}
 				}
@@ -602,15 +603,14 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	BattleUnit* unit = part->mOwner;
 	BattleWork* wp = _battleWorkPointer;
 	CameraEntry* cam;
-	f32 angle;
 	f32 x, y, z;
+	f32 angle;
 	f32 dir;
 	f32 camAngle;
 	f32 a;
 	f32 rotY;
-	f32 zscale;
+	f32 zscale = 1.0f;
 	GXColor* color;
-	zscale = 1.0f;
 	if (part->poseId < 0) return;
 
 	MTX_TRANS_NEG(uTN, unit->mRotationOffset);
@@ -834,11 +834,15 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	btlUnitPartsBlurControl(part, 0, blurMtx, *color, rotY);
 }
 
+#pragma push
+#pragma opt_dead_assignments off
 void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 	BattleWork* wp = _battleWorkPointer;
 	s32 item;
+	f32 height;
 	Vec pos;
-	f32 height = BtlUnit_GetHeight(unit);
+
+	height = BtlUnit_GetHeight(unit);
 
 	item = BtlUnit_EnemyItemCanUseCheck(unit->heldItem);
 	if (wp->flags & 0x20000 && !item) {
@@ -855,6 +859,7 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 		iconDispGx(&pos, 0, itemDataTable[item].icon_id, 1.0f);
 	}
 }
+#pragma pop
 
 #pragma dont_inline on
 void btlUnitItemDisp2(CameraId camId, BattleUnit* unit) {
@@ -878,10 +883,9 @@ disp:
 
 void btlUnitStolenItemDisp(CameraId camId, void* param) {
 	BattleUnit* unit = param;
-	s32 item;
 	Vec pos;
+	s32 item = unit->heldItem;
 
-	item = unit->heldItem;
 	BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
 	pos.y += unit->mSizeMultiplier * BtlUnit_GetHeight(unit) + 5.0f;
 	iconDispGx(&pos, 0, itemDataTable[item].icon_id, 1.0f);

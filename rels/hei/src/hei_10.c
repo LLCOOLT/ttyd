@@ -107,6 +107,10 @@ s32 hei_10_init_evt[80];
 
 int rand(void);
 
+static inline f32 rand01(void) {
+    return rand() / 32767.0f;
+}
+
 static inline f32 randf_scale(f32 r, f32 min, f32 max) {
     return r * (max - min) + min;
 }
@@ -259,48 +263,50 @@ static void ext_main(void) {
     s32 i;
     ExtPose* pose;
     Chorobon* chb;
-    f32 angle;
     f32 dist;
-    f32 rad;
-    f32 x;
-    f32 y;
-    f32 z;
     f32 speed;
+    f32 x;
+    f32 z;
     f32 gravity;
+    f32 angle;
+    f32 y;
     Vec pos;
 
     pose = extGetPosePtr();
-    sfx = "SFX_STG1_CHORO_ESCAPE1";
     chb = wp->chb;
+    sfx = "SFX_STG1_CHORO_ESCAPE1";
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         switch (chb->state) {
-            case 0:
-                angle = rand() / 32767.0f;
+            case 0: {
+                f32 dist, x, y, z, speed, gravity;
+                x = rand() / 32767.0f;
                 dist = randf(4.0f, 7.0f);
-                rad = 3.1415927f * randf_scale(angle, 0.0f, 360.0f) / 180.0f;
-                x = pose->mtx[0][3] + dist * chb_sin(rad);
-                y = pose->mtx[1][3];
-                z = pose->mtx[2][3] - dist * chb_cos(rad);
-                speed = rand() / 32767.0f;
-                gravity = rand() / 32767.0f;
-                chb_jump(pose, chb, chb->state, x, y, z, randf_scale(speed, 0.3f, 0.5f), randf_scale(gravity, 0.5f, 0.8f));
-                break;
-            case 1:
-                if (distABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]) < 800.0f) {
-                    rad = rand() / 32767.0f;
-                    angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
-                    angle = angle + randf_scale(rad, -45.0f, 45.0f);
-                    dist = rand() / 32767.0f;
-                    rad = 3.1415927f * angle / 180.0f;
-                    dist = randf_scale(dist, 15.0f, 20.0f);
+                {
+                    f32 rad = 3.1415927f * randf_scale(x, 0.0f, 360.0f) / 180.0f;
                     x = pose->mtx[0][3] + dist * chb_sin(rad);
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - dist * chb_cos(rad);
+                }
+                speed = rand() / 32767.0f;
+                gravity = rand01();
+                chb_jump(pose, chb, chb->state, x, y, z, (0.5f - 0.3f) * speed + 0.3f, (0.8f - 0.5f) * gravity + 0.5f);
+                break;
+            }
+            case 1:
+                if (distABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]) < 800.0f) {
                     speed = rand() / 32767.0f;
-                    gravity = rand() / 32767.0f;
-                    speed = 2.0f * randf_scale(speed, 1.0f, 1.2f);
-                    gravity = randf_scale(gravity, 0.8f, 0.8f);
-                    chb_jump(pose, chb, chb->state, x, y, z, speed, gravity);
+                    z = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
+                    z = z + randf_scale(speed, -45.0f, 45.0f);
+                    dist = randf(15.0f, 20.0f);
+                    {
+                        f32 rad = 3.1415927f * z / 180.0f;
+                        x = pose->mtx[0][3] + dist * chb_sin(rad);
+                        y = pose->mtx[1][3];
+                        z = pose->mtx[2][3] - dist * chb_cos(rad);
+                    }
+                    speed = rand() / 32767.0f;
+                    gravity = rand01();
+                    chb_jump(pose, chb, chb->state, x, y, z, 2.0f * (speed * (1.2f - 1.0f) + 1.0f), randf_scale(gravity, 0.8f, 0.8f));
                     if (rand() % 150 == 0) {
                         pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
                         psndSFXOn_3D(sfx, &pos);
@@ -315,9 +321,11 @@ static void ext_main(void) {
                 pose->mtx[1][3] += chb->vy;
                 chb->vy -= chb->gravity;
                 angle = angleABf(pose->mtx[0][3], pose->mtx[2][3], chb->target.x, chb->target.z);
-                rad = 3.1415927f * angle / 180.0f;
-                pose->mtx[0][3] += chb->speed * chb_sin(rad);
-                pose->mtx[2][3] += chb->speed * -chb_cos(rad);
+                {
+                    f32 rad = 3.1415927f * angle / 180.0f;
+                    pose->mtx[0][3] += chb->speed * chb_sin(rad);
+                    pose->mtx[2][3] += chb->speed * -chb_cos(rad);
+                }
                 if (--chb->timer < 0) {
                     pose->mtx[0][3] = chb->target.x;
                     pose->mtx[1][3] = chb->target.y;
@@ -417,7 +425,7 @@ static USER_FUNC(npc_jump) {
         } else {
             speed = dist / t;
         }
-        vy = dy / t + gravity * t * 0.5f;
+        vy = dy / t + gravity * t / 2.0f;
         event->userdata[0] = *(s32*)&t;
         event->userdata[1] = *(s32*)&vy;
         event->userdata[2] = *(s32*)&speed;

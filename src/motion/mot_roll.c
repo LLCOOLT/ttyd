@@ -57,9 +57,9 @@ typedef struct RollWork {
 
 static const Vec rollOfs = {0.0f, 40.0f, 0.0f};
 
-s32 roll_flyout_flag2;
-f32 roll_grz;
 f32 roll_grx;
+f32 roll_grz;
+s32 roll_flyout_flag2;
 
 f32 rollData[] = {3.0f, -0.05f, -0.5f, 0.5f, 7.0f, 180.0f, 140.0f, 10.0f, 1.2f, 2.0f, 0.8f};
 
@@ -138,7 +138,7 @@ static inline s32 angOut(f32 center, f32 half, f32 x) {
 }
 
 static inline Vec makeVec(f32 x, f32 y, f32 z) {
-    Vec v = (Vec){0.0f, 0.0f, 0.0f};
+    Vec v;
     v.x = x;
     v.y = y;
     v.z = z;
@@ -1080,7 +1080,10 @@ void mot_roll(void) {
                 sincosf(&s, &c, 90.0f);
                 dist = 100.0f;
                 pos = mario->position;
-                d2 = makeVec(s, 0.0f, c);
+                d2 = (Vec){0.0f, 0.0f, 0.0f};
+                d2.x = s;
+                d2.y = 0.0f;
+                d2.z = c;
                 dir = d2;
                 marioHitCheckVec(&pos, &dir, &out, &nrm, &dist);
             }

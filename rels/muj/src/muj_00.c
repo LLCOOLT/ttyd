@@ -24,12 +24,21 @@ double cos(double x);
 typedef struct OrbitData { f32 angle; f32 dist; } OrbitData;
 OrbitData* _op;
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
-#define ORBIT(i, pos) { f32 rad; f32 r; f32 x; f32 z; op[i].angle += d; rad = op[i].angle; rad = 3.141592f * rad / 180.0f; r = op[i].dist; x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; (pos).x = x; (pos).z = z; }
+#define ORBIT(i, p) op[i].angle += d; t = op[i].angle; rad = 3.141592f * t / 180.0f; r = op[i].dist; x = r * sinf_l(rad) + cx; z = r * cosf_l(rad) + cz; p.x = x; p.z = z; (void)0
 NanNpc* random_choice_target(s32 type);
 void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 TobiWork* Tobidat;
+static u8 muj_00_bss_0C[4];
 void tobikakari_seq00(NanNpc* npc);
 double atan2(double y, double x);
+static inline f32 sinf_l(f32 x) { return sin(x); }
+static inline f32 cosf_l(f32 x) { return cos(x); }
+static inline void orbit_update(OrbitData* o, Vec* pos, f32 d, f32 cx, f32 cz) {
+    f32 rad; f32 r; f32 x; f32 z;
+    o->angle += d; rad = o->angle; rad = 3.141592f * rad / 180.0f; r = o->dist;
+    x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; pos->x = x; pos->z = z;
+}
+
 
 USER_FUNC(L_evt_mario_keyon_wait);
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos);
@@ -407,12 +416,12 @@ void suifu_kyorokyoro_init(NanNpc* npc) {
 }
 
 USER_FUNC(dai3_butai_main_func) {
+    s32 d;
     s32* args = event->args;
     f32 a = evtGetValue(event, args[0]);
     f32 b = evtGetValue(event, args[1]);
     f32 cx = evtGetValue(event, args[2]);
     f32 cz = evtGetValue(event, args[3]);
-    s32 d = b - a;
     s32 i;
     NanNpc* npc;
     f32 s;
@@ -421,14 +430,16 @@ USER_FUNC(dai3_butai_main_func) {
     f32 c;
     NanNpcWork* wp = nanNPCWork;
 
+    d = b - a;
+
     for (i = 0; i < 100; i++) {
         npc = &wp->entries[i + 205];
         npc->angle += d;
         r = npc->radius;
         rad = npc->angle;
         rad = 3.141592f * rad / 180.0f;
-        s = sin(rad);
-        c = cos(rad);
+        s = sinf_l(rad);
+        c = cosf_l(rad);
         npc->pos.x = r * s + cx;
         npc->pos.z = r * c + cz;
     }
@@ -529,6 +540,7 @@ USER_FUNC(mario_main_func) {
     NpcEntry* npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
     NpcEntry* npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
     f32 d = b - a;
+    f32 r, rad, x, z, t;
 
     ORBIT(0, mario->position);
     ORBIT(1, party->position);
@@ -753,22 +765,24 @@ USER_FUNC(cam_test_init_func) {
 
 USER_FUNC(cam_test_func) {
     s32* args = event->args;
-    s32* p0;
     f32 angle, dist, rad, s, c;
     Vec center;
-
+    s32* p0 = args;
+    s32 ix, iz;
     angle = evtGetFloat(event, args[2]);
-    p0 = args++;
+    args++;
     dist = evtGetFloat(event, args[2]);
     rad = 6.2831855f * angle / 360.0f;
-    s = sin(rad);
-    c = cos(rad);
+    s = sinf_l(rad);
+    c = cosf_l(rad);
 
     center.x = 70.0f;
     center.y = 110.0f;
     center.z = 0.0f;
-    evtSetValue(event, *p0, center.x + dist * s);
-    evtSetValue(event, *args, center.z - dist * c);
+    ix = center.x + dist * s;
+    evtSetValue(event, p0[0], ix);
+    iz = center.z - dist * c;
+    evtSetValue(event, args[0], iz);
     return EVT_RETURN_DONE;
 }
 

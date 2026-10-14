@@ -335,7 +335,7 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     v = vtx;
     for (i = 0; i < 12; i++) {
-        f32 ox, oy, a, r, ang2;
+        f32 ox, oy, r, ang2, a;
         if (i == 0) {
             r = 8.0f;
             a = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
@@ -345,14 +345,14 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
                 a = -90.0f;
             } else {
                 f32 d;
-                a = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
-                ang2 = -angleABf(work->y[i], -work->x[i], work->y[i - 1], -work->x[i - 1]);
-                if (ang2 - a > 180.0f) {
-                    a += 360.0f;
-                } else if (ang2 - a < -180.0f) {
-                    do { ang2 += 360.0f; } while (0);
+                ang2 = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
+                d = -angleABf(work->y[i], -work->x[i], work->y[i - 1], -work->x[i - 1]);
+                if (d - ang2 > 180.0f) {
+                    ang2 += 360.0f;
+                } else if (d - ang2 < -180.0f) {
+                    d += 360.0f;
                 }
-                a = (a + ang2) / 2.0f;
+                a = (ang2 + d) / 2.0f;
             }
         }
         r = r * (scale * work->w[i]);
@@ -384,7 +384,9 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     effSetVtxDescN64(vtx);
 
 
-    for (k = 0, n = 0; k < i - 1; k++) {
+    k = 0;
+    n = 0;
+    for (; k < i - 1; k++) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);
         n += 2;

@@ -96,12 +96,10 @@ void effParticleMain(EffectEntry* effect);
 void EmitterEmit(EffectEntry* effect, ParticleEmitter* emitter);
 void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter);
 
-void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {
+static inline f32 pt_gauss(void) {
     static f32 y2;
     static s32 use_last;
-    ParticleWork* work = effect->userdata;
-    f32 x2, x1, w, y1;
-    f32 r;
+    f32 x1, x2, w, y1;
 
     if (use_last) {
         y1 = y2;
@@ -118,7 +116,15 @@ void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter
         y2 = x2 * w;
         use_last = 1;
     }
-    p->life = (s32)(emitter->lifeStd * y1 + emitter->lifeMean);
+    return y1;
+}
+
+void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {
+    ParticleWork* work = effect->userdata;
+    f32 w;
+    f32 r;
+
+    p->life = (s32)(emitter->lifeStd * pt_gauss() + emitter->lifeMean);
     do {
         r = 2.0f * pt_frand();
         p->vel.x = r - 1.0f;

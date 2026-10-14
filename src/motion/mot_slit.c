@@ -34,7 +34,7 @@ f32 toMovedirSimple(f32);
 f32 revise360(f32);
 HitEntry* marioHitCheckVec(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 double fabs(double);
-BOOL marioCreviceWallChk(Vec* p);
+BOOL marioCreviceWallChk(const Vec* p);
 CameraEntry* camGetPtr(CameraId);
 
 int __abs(int);
@@ -124,7 +124,7 @@ BOOL U_marioSlitContinueChk(void) {
 	return marioCreviceWallChk(&pos) != 0;
 }
 
-BOOL marioCreviceWallChk(Vec* p) {
+BOOL marioCreviceWallChk(const Vec* p) {
 	f32 offX;
 	f32 offZ;
 	f32 angA;
@@ -134,6 +134,7 @@ BOOL marioCreviceWallChk(Vec* p) {
 	f32 s;
 	f32 c;
 	f32 dist;
+	f32 h = 10.0f;
 	Vec pos;
 	Vec dir;
 	Vec outPos;
@@ -146,25 +147,25 @@ BOOL marioCreviceWallChk(Vec* p) {
 	angA = 0.0f;
 	angB = angA;
 	sincosf(&s, &c, toMovedirSimple(180.0f));
-	pos = *p;
 	dist = 20.0f;
+	pos = *p;
+	pos.y += 10.0f;
 	{
 		Vec t1 = {0, 0, 0};
 		t1.x = s;
 		t1.z = c;
 		dir = t1;
 	}
-	pos.y += 10.0f;
 	hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitA) {
 		angA = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
 	}
 	if (!hitA) {
 		Vec t2 = {0, 0, 0};
-		t2.x = p->x + offX;
-		t2.y = p->y + 10.0f;
-		t2.z = p->z + offZ;
 		dist = 20.0f;
+		t2.x = p->x + offX;
+		t2.y = p->y + h;
+		t2.z = p->z + offZ;
 		pos = t2;
 		hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitA) {
@@ -173,10 +174,10 @@ BOOL marioCreviceWallChk(Vec* p) {
 	}
 	if (!hitA) {
 		Vec t3 = {0, 0, 0};
-		t3.x = p->x - offX;
-		t3.y = p->y + 10.0f;
-		t3.z = p->z - offZ;
 		dist = 20.0f;
+		t3.x = p->x - offX;
+		t3.y = p->y + h;
+		t3.z = p->z - offZ;
 		pos = t3;
 		hitA = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitA) {
@@ -184,25 +185,25 @@ BOOL marioCreviceWallChk(Vec* p) {
 		}
 	}
 	sincosf(&s, &c, toMovedirSimple(0.0f));
-	pos = *p;
 	dist = 20.0f;
+	pos = *p;
+	pos.y += 10.0f;
 	{
 		Vec u1 = {0, 0, 0};
 		u1.x = s;
 		u1.z = c;
 		dir = u1;
 	}
-	pos.y += 10.0f;
 	hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 	if (hitB) {
 		angB = angleABf(0.0f, 0.0f, outNrm.x, outNrm.z);
 	}
 	if (!hitB) {
 		Vec u2 = {0, 0, 0};
-		u2.x = p->x + offX;
-		u2.y = p->y + 10.0f;
-		u2.z = p->z + offZ;
 		dist = 20.0f;
+		u2.x = p->x + offX;
+		u2.y = p->y + h;
+		u2.z = p->z + offZ;
 		pos = u2;
 		hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitB) {
@@ -211,10 +212,10 @@ BOOL marioCreviceWallChk(Vec* p) {
 	}
 	if (!hitB) {
 		Vec u3 = {0, 0, 0};
-		u3.x = p->x - offX;
-		u3.y = p->y + 10.0f;
-		u3.z = p->z - offZ;
 		dist = 20.0f;
+		u3.x = p->x - offX;
+		u3.y = p->y + h;
+		u3.z = p->z - offZ;
 		pos = u3;
 		hitB = marioHitCheckVec(&pos, &dir, &outPos, &outNrm, &dist);
 		if (hitB) {

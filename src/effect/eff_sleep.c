@@ -105,12 +105,12 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	f32 x0;
 	Mtx mtx;
 	Mtx scale;
+	s32 base;
 	Mtx rot;
 	Mtx res;
 	GXTexObj texObj;
 	f32 w;
 	CameraEntry* cam;
-	s32 base;
 	effSleepData* data;
 	s32 alpha;
 	s32 j;

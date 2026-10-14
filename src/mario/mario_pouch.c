@@ -22,6 +22,7 @@ extern BadgeShopWork* bdsw;
 extern ItemData itemDataTable[];
 
 static PouchData* mpp;
+PouchData* mpp_gap;
 
 
 //.data
@@ -176,8 +177,8 @@ s32 pouchGetEmptyKeepItemCnt(void) {
 
 //we have obtained an item, update the appropriate data
 BOOL pouchGetItem(ItemType type) {
-	s16* equip;
 	s16* list;
+	s16* equip;
 	s32 size;
 	s32 id;
 	BOOL ok;
@@ -331,10 +332,8 @@ void pouchReceiveMail(s32 mailId) {
 	s32 count;
 	s32 index, shift;
 
-	shift = mailId % 32;
 	index = mailId / 32;
-
-	//increment through known IDs to add to mEmailIds
+	shift = mailId % 32;
 	count = 0;
 	for (i = count; i < 99; i++) {
 		if (mpp->mEmailReceivedFlags[i / 32] & (1 << (i % 32))) {
@@ -473,6 +472,8 @@ s16 pouchGetStarPoint(void) {
 	return mpp->mStarPoints;
 }
 
+#pragma push
+#pragma opt_lifetimes off
 void pouchRevisePartyParam(void) {
 	PouchPartyData* party;
 	int i, count;
@@ -494,6 +495,8 @@ void pouchRevisePartyParam(void) {
 		}
 	}
 }
+
+#pragma pop
 
 void pouchReviseMarioParam(void) {
 	int i;
@@ -839,8 +842,8 @@ void pouchSortItem(s32 mode) {
 }
 
 void unk_800d06b4(const char* src, char* dst) {
-	s32 len = strlen(src) / 2;
 	s32 i;
+	s32 len = strlen(src) / 2;
 	u16* s = (u16*)src;
 	u16* d = (u16*)dst;
 	for (i = 0; i < len; i++) {

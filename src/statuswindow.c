@@ -292,6 +292,7 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         pos.x = x + (f32)(full * 32);
         pos.y = y;
         pos.z = 0.0f;
+
         iconDispGx(&pos, 0x10, gauge_wakka[part], 1.0f);
     }
     y = 12.0f + y;

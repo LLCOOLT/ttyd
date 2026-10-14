@@ -772,11 +772,6 @@ void loadDraw(CameraId camera, void* param) {
     f32 vp[6];
     f32 proj[7];
     CameraEntry saved;
-    WinDt* win;
-    WinDt* win1;
-    s32 i;
-    f32* py;
-    s32 j;
     char buf[0x20];
     char buf2[0x100];
     Mtx m;
@@ -784,6 +779,11 @@ void loadDraw(CameraId camera, void* param) {
     f32 x;
     f32 y;
     f32 w;
+    f32* py;
+    WinDt* win;
+    s32 i;
+    s32 j;
+    u64 sec;
 
     if (wp->unk18 >= 0x20 && wp->unk18 < 0x28) {
         return;
@@ -816,7 +816,8 @@ void loadDraw(CameraId camera, void* param) {
     loadDrawBg(0x36, 272.0f, 240.0f, 304.0f, -240.0f);
 
     win = win_dt;
-    for (i = 0, win1 = win; i < 9; i++, win1++) {
+    for (i = 0; i < 9; i++) {
+        WinDt* win1 = &win_dt[i];
         GXColor col = gray;
         if (i == wp->slot) {
             col = white;
@@ -860,10 +861,10 @@ void loadDraw(CameraId camera, void* param) {
     for (i = 0; i < 4; i++, win++) {
         CardSaveSlot* save = &cardGetFilePtr()->saves[i];
         u16 flags = save->data.flags;
-        char* name = (char*)save->data.global.field_0x11BC;
         s16 level = save->data.pouch.level;
         OSTime time = save->data.global.retraceLocalTime;
         u16 stars = *(u16*)&save->data.pouch.mStarPowersObtained;
+        char* name = (char*)save->data.global.field_0x11BC;
         s32 gsw0 = save->data.global.mGSW0;
         const char* str;
         s32 hours;
@@ -897,7 +898,6 @@ void loadDraw(CameraId camera, void* param) {
                 FontDrawString(win->x - FontGetMessageWidth(name) / 2, 70.0f + win->y, name);
             }
         } else {
-            u64 sec;
             FontGetMessageWidth("\x82\x57\x82\x57");
             sec = OSTicksToSeconds(time);
             if (sec > 359999) {
@@ -994,9 +994,9 @@ void loadDraw(CameraId camera, void* param) {
         f32 cx;
         f32 cy;
         if (!(f32)fmod(angle[wp->unk30][wp->unk34], 90.0)) {
+            f32 c0 = wp->unk30 % 2;
             f32 r0 = wp->unk30 / 2;
             f32 r1 = wp->unk34 / 2;
-            f32 c0 = wp->unk30 % 2;
             if (r0 == r1) {
                 cx = 0.0f;
                 cy = 120.0f - 140.0f * r0;

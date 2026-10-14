@@ -285,6 +285,8 @@ void npcDisp(CameraId camId, void* param) {
     Mtx mtx;
     GXColor color;
     f32 rotY;
+    u32 i;
+    AnimTableEntry* anim;
 
     rotY = reviseAngle(-entry->direction);
     mtx_setup(entry, mtx, -1);
@@ -301,8 +303,6 @@ void npcDisp(CameraId camId, void* param) {
             }
 
             if (entry->flags & 0x800000) {
-                u32 i;
-                AnimTableEntry* anim;
                 AnimationPose* animPose;
                 CameraEntry* camera;
                 f32 dx, dz;
@@ -890,10 +890,11 @@ void npcSetMarioAutoTalkPose(const char* stayPose, const char* talkPose) {
 }
 
 void npcSetTalkPose(const char* name) {
-    NpcEntry* npc;
     PartyEntry* party;
+    NpcEntry* npc;
 
-    if (*(s8*)name != 0 && strcmp(name, "(^x^)party") != 0) {
+    if (*(s8*)name == 0) return;
+    if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
         if (party) {
@@ -912,14 +913,14 @@ void npcSetTalkPose(const char* name) {
             animPoseSetAnim(npc->poseId, npc->talkAnim, TRUE);
         }
     }
-    }
 }
 
 void npcSetStayPose(const char* name) {
-    NpcEntry* npc;
     PartyEntry* party;
+    NpcEntry* npc;
 
-    if (*(s8*)name != 0 && strcmp(name, "(^x^)party") != 0) {
+    if (*(s8*)name == 0) return;
+    if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
         if (party) {
@@ -937,7 +938,6 @@ void npcSetStayPose(const char* name) {
         if (npc->flags & 0x200) {
             animPoseSetAnim(npc->poseId, npc->stayAnim, TRUE);
         }
-    }
     }
 }
 
@@ -2315,8 +2315,8 @@ void npcSetupBattleInfo(NpcEntry* npc, NpcSetupBattleInfo* setup) {
             case 0:
             default:
                 for (i = 0; i < 16; i++) {
-                    s8* r = setup->field_20[i];
-                    info->field_B0[i] = (u8)r[0] + irand(r[1] - r[0] + 1);
+                    info->field_B0[i] = (u8)setup->field_20[i][0] + irand(setup->field_20[i][1] - setup->field_20[i][0] + 1);
+                    ;
                 }
                 break;
             case 1:

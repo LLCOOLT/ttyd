@@ -70,6 +70,8 @@ void seq_logoInit(SequenceWork* work) {
 	fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot()); //unused
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
 		VIConfigure(&sRMObjHReso);
+		if (!wp && !wp && !wp) {
+		}
 		VIFlush();
 		VIWaitForRetrace();
 	}

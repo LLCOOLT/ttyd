@@ -453,7 +453,7 @@ USER_FUNC(bero_get_position_pipe_pure) {
 	BeroSY = kind == 8 ? start.y - 37.5f : start.y;
 	BeroSZ = start.z;
 	BeroEX = end.x;
-	BeroEY = kind == 8 ? end.y - 37.5f : end.y;
+	BeroEY = (f32)(kind == 8 ? end.y - 37.5f : end.y);
 	BeroEZ = end.z;
 	N_marioSetBottomlessRespawnPosOnBeroEntry(BeroEX, BeroEY, BeroEZ);
 	return EVT_RETURN_DONE;

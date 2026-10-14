@@ -244,13 +244,14 @@ void effBrokenBarrierMain(EffectEntry* effect) {
             switch (type) {
             case 0:
             case 2:
-                b = 6.2831855f * t / 360.0f;
-                ca = (f32)cos(b);
-                a = 6.2831855f * a / 360.0f;
-                work->position.x = ca * (width * (f32)sin(a));
-                ca = (f32)cos(b);
-                work->position.y = ca * (height * (f32)cos(a));
-                work->position.z = width * (f32)sin(b);
+                {
+                    f32 lat = 6.2831855f * t / 360.0f;
+                    f32 lon;
+                    f32 c;
+                    work->position.x = width * (f32)sin(lon = 6.2831855f * a / 360.0f) * (c = (f32)cos(lat));
+                    work->position.y = height * (f32)cos(lon) * (c = (f32)cos(lat));
+                    work->position.z = width * (f32)sin(lat);
+                }
                 work->velocity.x = 0.4f * work->position.x;
                 work->velocity.y = 0.4f * work->position.y;
                 work->velocity.z = 0.4f * work->position.z;
@@ -285,15 +286,12 @@ void effBrokenBarrierMain(EffectEntry* effect) {
             work->velocity.z = 0.05f * -work->position.z;
             if (sqrtf(work->velocity.x * work->velocity.x + work->velocity.y * work->velocity.y +
                       work->velocity.z * work->velocity.z) < 1.0f) {
-                b = (f32)(rand() % 360);
+                a = (f32)(rand() % 360);
                 t = (f32)(rand() % 360);
-                a = 6.2831855f * t / 360.0f;
-                ca = (f32)cos(a);
-                b = 6.2831855f * b / 360.0f;
-                work->position.x = ca * (width * (f32)sin(b));
-                ca = (f32)cos(a);
-                work->position.y = ca * (height * (f32)cos(b));
-                work->position.z = width * (f32)sin(a);
+                b = 6.2831855f * t / 360.0f;
+                work->position.x = width * (f32)sin(a = 6.2831855f * a / 360.0f) * (ca = (f32)cos(b));
+                work->position.y = height * (f32)cos(a) * (ca = (f32)cos(b));
+                work->position.z = width * (f32)sin(b);
             }
             break;
         }

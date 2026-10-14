@@ -244,7 +244,6 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
-	u16 i;
 	u8* q;
 	s32 j, n;
 	TEXPalette* tpl;
@@ -301,6 +300,7 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 				OSPanic("filemgr.c", 106, "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray < (u32)tpl) {
+				u16 i;
 				*(u32*)&tpl->descriptorArray += (u32)tpl;
 				for (i = 0; i < tpl->numDescriptors; i++) {
 					TEXHeader* img;

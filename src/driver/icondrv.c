@@ -67,9 +67,9 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color);
 
 #define ICON_ANIM_TPL_S(data, dst)                                   \
     if ((data)->numIcons > 1) {                                    \
-        s32 total = 0;                                             \
         s32 i;                                                     \
         s32 t;                                                     \
+        s32 total = 0;                                             \
         for (i = 0; i < (data)->numIcons; i++) {                   \
             total += (data)->frames[i].delay;                      \
         }                                                          \
@@ -393,7 +393,7 @@ void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) 
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, alpha };
     entry.uflags = flags;
     entry.iconId = iconId;
-    data = iconGetBinData((u16)entry.iconId);
+    data = iconGetBinData(iconId);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
@@ -419,11 +419,18 @@ void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
-    id = iconId;
     entry.uflags = flags;
     entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-    entry.iconId = id;
-    data = iconGetBinData(entry.iconId);
+    entry.iconId = iconId;
+    id = entry.iconId;
+    {
+        IconBinary* bin = icon_bin;
+        if (!icon_tpl_ok || !icon_bin_ok) {
+            data = NULL;
+        } else {
+            data = (IconBinData*)((u8*)bin + bin->offset[id]);
+        }
+    }
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;
@@ -439,16 +446,18 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     CameraEntry* camera;
     IconBinData* data;
     IconEntry* ep;
+    u16 id;
 
     camera = camGetCurPtr();
     ep = &entry;
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
+    id = (u16)(s16)iconId;
     entry.uflags = flags;
     entry.color = color;
     entry.iconId = iconId;
-    data = iconGetBinData((u16)entry.iconId);
+    data = iconGetBinData(id);
     entry.width = data->width;
     entry.height = data->height;
     entry.tplId = data->frames[0].tplId;

@@ -17,6 +17,29 @@
 #pragma optimize_for_size on
 #pragma dont_inline on
 
+
+#include "evt/evt_cmd.h"
+USER_FUNC(btlevtcmd_AnnounceMessage);
+EVT_BEGIN(msg_puni_all_escape)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -225, STRING("btl_msg_audience_puni_escape"), 120)
+    RETURN
+EVT_END()
+EVT_BEGIN(msg_puni_all_enter)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -225, STRING("btl_msg_audience_puni_meeting"), 120)
+    RETURN
+EVT_END()
+EVT_BEGIN(msg_pansy_sing)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -225, STRING("btl_msg_audience_pansy_sleep"), 120)
+    RETURN
+EVT_END()
+EVT_BEGIN(msg_heavy_bomb_fire)
+    CALL(btlevtcmd_AnnounceMessage, 0, 0, -225, STRING("btl_msg_audience_heavybomb_dynamite"), 120)
+    RETURN
+EVT_END()
+typedef struct { f32 v[65]; } AudDeltaArr;
+typedef struct { s32 v[11]; } AudWArr;
+const AudDeltaArr R_audience_delta_multiplier = {{8.0f,11.0f,14.0f,17.0f,20.0f,23.0f,26.0f,29.0f,32.0f,35.0f,38.0f,41.0f,44.0f,47.0f,50.0f,53.0f,56.0f,59.0f,62.0f,65.0f,68.0f,71.0f,74.0f,77.0f,80.0f,83.0f,86.0f,89.0f,92.0f,95.0f,98.0f,101.0f,104.0f,107.0f,110.0f,113.0f,116.0f,119.0f,122.0f,125.0f,128.0f,131.0f,134.0f,137.0f,140.0f,143.0f,146.0f,149.0f,152.0f,155.0f,158.0f,161.0f,164.0f,167.0f,170.0f,173.0f,176.0f,179.0f,182.0f,185.0f,188.0f,191.0f,194.0f,197.0f,200.0f}};
+const AudWArr R_num_audience_type_weights = {{20,40,20,5,3,2,1,1,1,1,1}};
 extern BattleWork* _battleWorkPointer;
 extern s32 swGet(s32);
 extern int sprintf(char* str, const char* format, ...);
@@ -303,7 +326,7 @@ void BattleAudience_Init(void) {
 
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
-			index = (i * 20) + j;
+			index = j + (i * 20);
 			if (AUD_U8CALL(BattleAudience_GetExist, index) == TRUE) {
 				status = BattleAudienceGetPtr(index)->status;
 				if (status != 12 && status != 11) { //TODO: add status enum
@@ -362,7 +385,6 @@ typedef struct PerActBonus { u8 pad0[4]; f32 mult; u8 count; } PerActBonus;
 #define PA_BONUS(a) (*(PerActBonus**)((u8*)(a) + 0x137C8))
 #define PA_GOOD(a) (*(s32*)((u8*)(a) + 0x137CC))
 #define PA_BAD(a) (*(s32*)((u8*)(a) + 0x137D0))
-extern s32 msg_puni_all_escape;
 void BattleAudience_PerAct(void) {
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
 	f32 total;
@@ -511,10 +533,6 @@ void BattleAudience_PerPhase(u32 value) {
 	}
 }
 
-extern s32 msg_heavy_bomb_fire;
-extern s32 msg_puni_all_escape;
-extern s32 msg_puni_all_enter;
-extern s32 msg_pansy_sing;
 extern s32 irand(s32);
 extern void* memcpy(void*, const void*, unsigned long);
 extern void BattleBreakSlot_DecBreakTurn(void);
@@ -939,10 +957,6 @@ void BattleAudience_End(void) {
 }
 
 //@@ BattleAudienceSettingAudience
-typedef struct { f32 v[65]; } AudDeltaArr;
-typedef struct { s32 v[11]; } AudWArr;
-extern AudDeltaArr R_audience_delta_multiplier;
-extern AudWArr R_num_audience_type_weights;
 extern s32 irand(s32);
 extern void* memset(void*, int, unsigned long);
 extern void* memcpy(void*, const void*, unsigned long);
@@ -1427,8 +1441,8 @@ typedef struct AudItemX {
 	BattleUnit* target;
 	s32 mode;
 } AudItemX;
-extern Vec vec3_802f972c[];
-extern Vec vec3_802f9738[];
+static const Vec vec3_802f972c[1] = {{0.0f,0.0f,0.0f}};
+static const Vec vec3_802f9738[1] = {{0.0f,0.0f,0.0f}};
 extern u8 lbl_80399940[];
 extern void BattleAudience_SetPresentItemType(s32);
 extern void BattleAudience_SetPresentTargetUnitId(s32);
@@ -1436,7 +1450,6 @@ extern void BattleAudience_SetPresentItemNo(s32);
 extern s32 BattleAudience_GetPresentItemType(void);
 extern s32 BtlUnit_CheckShadowGuard(BattleUnit*);
 extern double __fabs(double);
-static inline double fabs(double x) { return __fabs(x); }
 void BattleAudienceItemCtrlProcess(void) {
 	BattleWork* wp = _battleWorkPointer;
 	u8* base = (u8*)BattleAudienceBaseGetPtr();
@@ -1521,7 +1534,7 @@ void BattleAudienceItemCtrlProcess(void) {
 				it->target = t;
 				BtlUnit_GetHitPos(t, BtlUnit_GetPartsPtr(t, BtlUnit_GetBodyPartsId(t)), &hx, &hy, &hz);
 				dx = hx - it->pos.x;
-				n = 30.0f + fabs(dx) / 15.0f;
+				n = 30.0f + __fabs(dx) / 15.0f;
 				it->vel.x = dx / n;
 				it->acc.x = 0.0f;
 				it->vel.y = 7.0f;
@@ -1721,7 +1734,7 @@ void BattleAudienceItemCtrlProcess(void) {
 }
 
 //@@ BattleAudienceApSrcCtrlProcess
-extern Vec vec3_802f9744[];
+static const Vec vec3_802f9744[1] = {{0.9f,0.9f,0.9f}};
 extern double asin(double);
 extern double cos(double);
 extern double sin(double);
@@ -1755,7 +1768,7 @@ void BattleAudienceApSrcCtrlProcess(void) {
 			(*(s32*)((u8*)base + 0x137C4))--;
 		}
 		if (cnt == 0 && psndSFXChk(((s32*)base)[2]) == -1) {
-			((s32*)base)[2] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_AUDIENCE_AP_FLOW1");
+			((s32*)base)[2] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_SYS_AP_STAR1");
 		}
 	} else {
 		for (k = 0, i = 0; i < 100; i++) {
@@ -1851,8 +1864,8 @@ void BattleAudienceApSrcCtrlProcess(void) {
 }
 
 //@@ BattleAudienceApSrcEntry
-extern Vec vec3_802f9750[];
-extern Vec vec3_802f975c[];
+static const Vec vec3_802f9750[1] = {{0.75f,0.75f,0.75f}};
+static const Vec vec3_802f975c[1] = {{-96.0f,106.0f,0.0f}};
 BOOL BattleAudienceApSrcEntry(void) {
 	AudApSrc* star;
 	CameraEntry* cam;

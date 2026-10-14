@@ -13,6 +13,7 @@
 #include "evt/evt_cmd.h"
 #include "battle/battle_disp.h"
 
+
 void _btlYoshiDisp(CameraId camera, f32* p);
 void _yoshi_slide_move_sound(void* w, void* s);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
@@ -1188,9 +1189,9 @@ s32 _yoshig_tpl_no_tbl[] = {
 
 USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
+    s32 id;
     BattleUnitPart* part;
     const char* name;
-    s32 id;
 
     id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
@@ -1588,8 +1589,8 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     return EVT_RETURN_BLOCK;
 }
 void _btlYoshiDisp(CameraId camera, f32* p) {
-    f32 s;
     f32* q;
+    f32 s;
 
     if (p[3] < 0.0f) {
         s = 0.4f;

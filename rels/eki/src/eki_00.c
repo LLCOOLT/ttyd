@@ -630,7 +630,7 @@ static void ext_moamoa_init(void) {
     static Vec t0 = {10.0f, 215.0f, 10.0f};
     static Vec t1 = {10.0f, 215.0f, 10.0f};
     static Vec t2 = {10.0f, 215.0f, 10.0f};
-    s32 i;
+    s32 i, j;
     ExtPose* pose;
     Moamoa* moa;
     f32 rad;
@@ -656,7 +656,7 @@ static void ext_moamoa_init(void) {
         dist = randf(0.0f, 100.0f);
         pose->flags |= 0x13;
         PSMTXIdentity(pose->mtx);
-        pose->mtx[2][3] = wp->target[0].x + dist * moa_sin(rad);
+        pose->mtx[0][3] = wp->target[0].x + dist * moa_sin(rad);
         pose->mtx[1][3] = 0.0f;
         pose->mtx[0][3] = wp->target[0].z - dist * moa_cos(rad);
         hitX = hitY = hitZ = 0.0f;
@@ -665,7 +665,7 @@ static void ext_moamoa_init(void) {
             pose->mtx[1][3] = hitY;
         }
     }
-    for (i = 0; i < 600; i++) {
+    for (j = 0; j < 600; j++) {
         ext_moamoa_main();
     }
 }
@@ -778,7 +778,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         f32 r2; cam = camGetPtr(CAMERA_3D);
-        r2 = 6.2831855f * reviseAngle(cam->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
+        r2 = 6.2831855f * reviseAngle(cam->viewYaw + (f32)(mario->unk1A8 - 90.0f)) / 360.0f;
         angle = 35.0f * moa_sin(r2) + mario->position.x;
         dist = mario->position.z - 35.0f * moa_cos(r2);
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], angle, dist) < 35.0f) {
@@ -839,7 +839,6 @@ static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
-    s32 hit = 0;
     const char* sfx;
     s32 sndFlag;
     s32 i;
@@ -860,7 +859,9 @@ static void ext_moamoa_main(void) {
     Vec pv;
     Vec sp;
     Mtx rot;
+    s32 hit;
 
+    hit = 0;
     if (mario->currMotionId == 0x12) {
         wp->field_0x40++;
     } else {

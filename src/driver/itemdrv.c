@@ -35,6 +35,14 @@ inline Vec unknownVec0(void) {
     return (Vec){ 0.0f, 0.0f, 0.0f };
 }
 
+inline Vec makeVecByValue2(f32 x, f32 y, f32 z) {
+    Vec v = (Vec){ 0.0f, 0.0f, 0.0f };
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
 inline Vec makeVecByValue(f32 x, f32 y, f32 z) {
     Vec v = (Vec){ 0.0f, 0.0f, 0.0f };
     v.x = x;
@@ -79,8 +87,11 @@ void winHelpMain(WinMgrEntry* win);
 void winHelpDisp(WinMgrEntry* win);
 void winFullDisp(WinMgrEntry* win);
 BOOL N_itemPickUpFromFieldCheck(void);
+
 ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
-void itemseq_Bound(ItemEntry* entry);
+HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY);
+HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy);
+
 HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle);
 void itemseq_GetItem(ItemEntry* entry);
 void itemDelete(const char* name);
@@ -89,6 +100,8 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 
 //.bss
 static ItemWork work[2];
+
+
 
 //.data
 WinMgrDesc itemdrv_window_desc[4] = {
@@ -110,6 +123,43 @@ inline void itemCheckBadge(ItemEntry* entry) {
         }
     }
 }
+
+void itemseq_Bound(ItemEntry* entry);
+static inline BOOL itemGetPouch(ItemEntry* entry) {
+	EventEntry* evt;
+
+	if (!pouchGetItem(entry->itemId)) {
+		return FALSE;
+	}
+	if (entry->flags & 0x20) {
+		swSet(entry->evtId);
+	}
+	else if (entry->flags & 0x40) {
+		_swSet(entry->evtId);
+	}
+	if ((u32)entry->field_0x20 != 0) {
+		evt = evtEntry((void*)entry->field_0x20, 0, 0x20);
+		evt->lwData[0] = FLOAT(entry->position.x);
+		evt->lwData[1] = FLOAT(entry->position.y);
+		evt->lwData[2] = FLOAT(entry->position.z);
+	}
+	entry->flags2 |= 1;
+	return TRUE;
+}
+
+static inline void itemGetEnd(ItemEntry* entry) {
+	marioStSystemLevel(0);
+	psndClearFlag(0x80);
+	if (entry->flags2 & 0x1000000) {
+		entry->flags2 &= ~0x1000000;
+		marioCtrlOn();
+	}
+	marioKeyOn();
+	marioChgStayMotion();
+	camGetPtr(8)->flags &= ~0x200;
+}
+
+void itemGetSound(ItemEntry* entry);
 
 void itemInit(void) { // 1:1
     ItemWork* wp;
@@ -258,17 +308,6 @@ typedef struct ItemEffPos {
 	Vec position;
 } ItemEffPos;
 
-static inline HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
-	HitEntry* hit;
-	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
-
-	hitDist = 20.0 + __fabs(vy);
-	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
-	if (hit) {
-		*outY = hitY;
-	}
-	return hit;
-}
 
 void itemMain(void) {
 	ItemWork* wp = itemGetWork();
@@ -343,17 +382,24 @@ void itemMain(void) {
 				itemseq_Bound(entry);
 				break;
 			case 1:
-				y = entry->position.y;
+				y = entry->position.y; { f32 dirY = -1.0f;
 				if (entry->flags2 & 0x100000) {
 					hit = NULL;
-					newY = y + -1.0f;
-				}
-				else if (hit = itemHitCheckY(entry->position.x, entry->position.y + 20.0f, entry->position.z, -1.0f, -1.0f, &newY)) {
+					newY = y + dirY;
 				}
 				else {
-					hit = NULL;
-					newY = y + -1.0f;
-				}
+					f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
+					f32 px = entry->position.x, py = entry->position.y + 20.0f, pz = entry->position.z;
+					{ f64 d = __fabs(-1.0); hitDist = 20.0 + d; }
+					hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, px, py, pz, 0.0f, -1.0f, 0.0f);
+					if (hit) {
+						newY = hitY;
+					}
+					else {
+						hit = NULL;
+						newY = y + dirY;
+					}
+				} }
 				if (!hit) {
 					itemModeChange(entry, 3);
 				}
@@ -383,27 +429,29 @@ void itemMain(void) {
 		}
 
 		if (entry->flags & 1) {
-			if (entry->itemId < 0x79 && entry->itemId >= 0x72) {
-				if (!(entry->flags2 & 0x100)) {
-					((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
-					((ItemEffPos*)entry->effect->userdata)->position.y = 16.0f + entry->position.y;
-					((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
-				}
-				else {
-					((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
-					((ItemEffPos*)entry->effect->userdata)->position.y = -1000.0f;
-					((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
-				}
-			}
-			else {
-				if (!(entry->flags2 & 0x100)) {
-					iconSetPos(entry->name, entry->position.x, entry->position.y, entry->position.z);
-					iconSetScale(entry->name, entry->scale);
-					iconSetAlpha(entry->name, entry->alpha);
-				}
-				else {
-					iconSetPos(entry->name, entry->position.x, -1000.0f, entry->position.z);
-				}
+			switch (entry->itemId) {
+				case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77: case 0x78:
+					if (!(entry->flags2 & 0x100)) {
+						((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
+						((ItemEffPos*)entry->effect->userdata)->position.y = 16.0f + entry->position.y;
+						((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
+					}
+					else {
+						((ItemEffPos*)entry->effect->userdata)->position.x = entry->position.x;
+						((ItemEffPos*)entry->effect->userdata)->position.y = -1000.0f;
+						((ItemEffPos*)entry->effect->userdata)->position.z = entry->position.z;
+					}
+					break;
+				default:
+					if (!(entry->flags2 & 0x100)) {
+						iconSetPos(entry->name, entry->position.x, entry->position.y, entry->position.z);
+						iconSetScale(entry->name, entry->scale);
+						iconSetAlpha(entry->name, entry->alpha);
+					}
+					else {
+						iconSetPos(entry->name, entry->position.x, -1000.0f, entry->position.z);
+					}
+					break;
 			}
 			entry->field_0x68 = gp->renderTime;
 			if (entry->itemId == 0x79 || entry->itemId == 0x7A) {
@@ -712,7 +760,7 @@ ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range) {
 		if (entry->flags2 & 0x100000) continue;
 		if (entry->mode == 2) continue;
 		if (entry->flags2 & 0x2000000) continue;
-		{ f32 iz, iy, ix; ix = entry->position.x; iy = entry->position.y; iz = entry->position.z; itemPos = makeVecByValue(ix, iy, iz); }
+		{ f32 iz, iy, ix; ix = entry->position.x; iy = entry->position.y; iz = entry->position.z; itemPos = makeVecByValue2(ix, iy, iz); }
 		PSVECSubtract(&itemPos, &pos, &diff);
 		dist = PSVECMag(&diff);
 		if (dist < range) {
@@ -806,63 +854,6 @@ void winFullDisp(WinMgrEntry* win) {
 	}
 }
 
-static inline BOOL itemGetPouch(ItemEntry* entry) {
-	EventEntry* evt;
-
-	if (!pouchGetItem(entry->itemId)) {
-		return FALSE;
-	}
-	if (entry->flags & 0x20) {
-		swSet(entry->evtId);
-	}
-	else if (entry->flags & 0x40) {
-		_swSet(entry->evtId);
-	}
-	if ((u32)entry->field_0x20 != 0) {
-		evt = evtEntry((void*)entry->field_0x20, 0, 0x20);
-		evt->lwData[0] = FLOAT(entry->position.x);
-		evt->lwData[1] = FLOAT(entry->position.y);
-		evt->lwData[2] = FLOAT(entry->position.z);
-	}
-	entry->flags2 |= 1;
-	return TRUE;
-}
-
-static inline void itemGetSound(ItemEntry* entry) {
-	Vec pos;
-
-	pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
-	switch (entry->itemId) {
-		case 0x79:
-			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
-			psndSFXOn_3D("SFX_COIN_GET1", &pos);
-			break;
-		case 0x7A:
-			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
-			psndSFXOn_3D("SFX_EVT_GAME_MONTE_COUNT1", &pos);
-			break;
-		case 0x7B:
-			psndSFXOn_3D("SFX_HEART_GET1", &pos);
-			break;
-		case 0x7C:
-			psndSFXOn_3D("SFX_FLOWER_GET1", &pos);
-			break;
-		case 0x7D:
-			break;
-	}
-}
-
-static inline void itemGetEnd(ItemEntry* entry) {
-	marioStSystemLevel(0);
-	psndClearFlag(0x80);
-	if (entry->flags2 & 0x1000000) {
-		entry->flags2 &= ~0x1000000;
-		marioCtrlOn();
-	}
-	marioKeyOn();
-	marioChgStayMotion();
-	camGetPtr(8)->flags &= ~0x200;
-}
 
 void itemseq_GetItem(ItemEntry* entry) {
 	ItemWork* wp = itemGetWork();
@@ -918,9 +909,12 @@ void itemseq_GetItem(ItemEntry* entry) {
 			}
 			entry->field_0x26 = 2;
 			marioChgGetItemMotion();
-			entry->position.x = mario->position.x;
-			entry->position.y = 50.0f + mario->position.y;
-			entry->position.z = mario->position.z;
+			{
+				f32 y = 50.0f + mario->position.y, z = mario->position.z;
+				entry->position.x = mario->position.x;
+				entry->position.y = y;
+				entry->position.z = z;
+			}
 			type = 7;
 			bgm = -1;
 			if (entry->itemId == 0x57) {
@@ -1004,7 +998,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 			if (type == 8) {
 				evtSetValue(NULL, 0xF5DE01A2, evtGetValue(NULL, 0xF5DE01A2) + 1);
 			}
-			entry->flags &= ~0x4000;
+			entry->flags &= ~0x2000;
 			itemGetSound(entry);
 			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[0]);
 			winMgrOpen(entry->winId[0]);
@@ -1023,7 +1017,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				iconChange(entry->name, 0x114);
 			}
 			if (!entry->effect) {
-				iconNameToPtr(entry->name)->flags |= 0x80;
+				iconNameToPtr(entry->name)->uflags |= 0x80;
 			}
 			break;
 		case 2:
@@ -1075,7 +1069,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				iconChange(entry->name, 0x115);
 			}
 			if (!entry->effect) {
-				iconNameToPtr(entry->name)->flags &= ~0x80;
+				iconNameToPtr(entry->name)->uflags &= ~0x80;
 			}
 			if (entry->flags2 & 1) {
 				itemGetEnd(entry);
@@ -1086,11 +1080,14 @@ void itemseq_GetItem(ItemEntry* entry) {
 			winMgrCloseAutoDelete(entry->winId[2]);
 			marioChgStayMotion();
 			iconFlagOn(entry->name, 2);
-			if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
-				wp->select = winMgrSelectEntry(2, entry->itemId, 1);
-			}
-			else {
-				wp->select = winMgrSelectEntry(1, entry->itemId, 1);
+			{
+				s32 id = entry->itemId;
+				if (id >= 0xF0 && id < 0x153) {
+					wp->select = winMgrSelectEntry(2, id, 1);
+				}
+				else {
+					wp->select = winMgrSelectEntry(1, id, 1);
+				}
 			}
 			break;
 		case 4:
@@ -1223,8 +1220,8 @@ void itemseq_Bound(ItemEntry* entry) {
 	MapObjectEntry* mobj;
 	BOOL isFloor, bounce;
 	s64 delta;
-	f32 t2sq, dt, dy, t2, dx;
-	f32 dz, v, peak, height, hitY;
+	f32 dt, dy, t2sq, t2, dx;
+	f32 dz, v, peak, height;
 	f32 newX, newZ;
 	s32 newDir;
 	s32 itemId;
@@ -1346,14 +1343,8 @@ void itemseq_Bound(ItemEntry* entry) {
 				if (dy <= 0.0f) {
 					hit = NULL;
 				}
-				else if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, 1.0f, dy, &hitY)) {
-					entry->position.y = hitY - 20.0f - 4.0f;
-				}
-				else if (hit = itemHitCheckY(entry->position.x, entry->position.y, entry->position.z, 1.0f, dy, &hitY)) {
-					entry->position.y = hitY - 20.0f;
-				}
 				else {
-					hit = NULL;
+					hit = itemHitCheckUp(entry, dy);
 				}
 				if (hit) {
 					entry->velocityY = -entry->velocityY * 0.25f;
@@ -1389,13 +1380,14 @@ void itemseq_Bound(ItemEntry* entry) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
-			else if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, -1.0f, dy, &hitY)) {
+			else { f32 hitY;
+			if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, -1.0f, dy, &hitY)) {
 				entry->position.y = hitY;
 			}
 			else {
 				hit = NULL;
 				entry->position.y += dy;
-			}
+			} }
 			if (hit) {
 				if (hitGetAttr(hit) & 0x600) {
 					entry->flags2 |= 0x100000;
@@ -1505,9 +1497,36 @@ void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z) {
 	entry->position.z = z;
 }
 
+
+
+
+void itemGetSound(ItemEntry* entry) {
+	Vec pos;
+
+	pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
+	switch (entry->itemId) {
+		case 0x79:
+			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
+			psndSFXOn_3D("SFX_COIN_GET1", &pos);
+			break;
+		case 0x7A:
+			effStardustEntry(1, 3, 30, entry->position.x, 35.0f + entry->position.y, entry->position.z, 16.0f, 16.0f);
+			psndSFXOn_3D("SFX_EVT_GAME_MONTE_COUNT1", &pos);
+			break;
+		case 0x7B:
+			psndSFXOn_3D("SFX_HEART_GET1", &pos);
+			break;
+		case 0x7C:
+			psndSFXOn_3D("SFX_FLOWER_GET1", &pos);
+			break;
+		case 0x7D:
+			break;
+	}
+}
+
 HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle) {
 	HitEntry* hit;
-	f32 lenSq, len, a, b;
+	f32 len, lenSq, a, b;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 	f32 sin, cos;
 	f32 dot, ox, oz;
@@ -1519,7 +1538,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 	}
 	sincosf(&sin, &cos, angleABf(0.0f, 0.0f, dx, dz));
 	lenSq = dx * dx + dz * dz;
-	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); len = lenSq * g; } else if (lenSq < 0.0) { len = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { len = *(f32*)__float_nan; } else { len = lenSq; }
+	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); len = (f32)(lenSq * g); } else if (lenSq < 0.0) { len = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { len = *(f32*)__float_nan; } else { len = lenSq; }
 	hitDist = 10.0f + len;
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 		entry->position.x, entry->position.y + 15.0f, entry->position.z, sin, 0.0f, cos);
@@ -1552,6 +1571,30 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 	*outX += dx;
 	*outZ += dz;
 	return NULL;
+}
+
+HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy) {
+	HitEntry* hit;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+
+	hitDist = 20.0f + __fabs(vy);
+	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, entry->position.x, 20.0f + entry->position.y, entry->position.z, 0.0f, 1.0f, 0.0f)) {
+		entry->position.y = hitY - 20.0f - 4.0f;
+		return hit;
+	}
+	hitDist = 20.0f + __fabs(vy);
+	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, entry->position.x, entry->position.y, entry->position.z, 0.0f, 1.0f, 0.0f)) {
+		entry->position.y = hitY - 20.0f;
+		return hit;
+	}
+	return NULL;
+}
+
+HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 dirY, f32 vy, f32* outY) {
+	f32 hitX, hitZ, hitDist, hitNX, hitNY, hitNZ;
+
+	hitDist = 20.0f + __fabs(vy);
+	return hitCheckFilter(NULL, &hitX, outY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, dirY, 0.0f);
 }
 
 void itemForceGet(ItemEntry* entry) {
@@ -1604,3 +1647,6 @@ void itemPickUp(ItemEntry* entry) {
 	entry->timer = 0;
 	entry->flags2 &= ~0x100;
 }
+
+
+

@@ -34,6 +34,10 @@ const char** anim_tbl[2] = { anim_jp, anim_us };
 s32 acrobat_jp[] = {179, 180, 181, 182, 183, 184, 185};
 s32 acrobat_us[] = {183, 184, 185, 186, 187, 188}; //includes nonexistant textures
 s32* acrobat_tbl[2] = { acrobat_jp, acrobat_us };
+#pragma explicit_zero_data on
+s32 gap_07_80411CDC_sdata[1] = {0};
+#pragma explicit_zero_data reset
+ // unreferenced zero word in target
 
 //forward declarations
 static void rendermodeFunc(s32 wXluStage);
@@ -166,11 +170,7 @@ void effNiceMain(EffectEntry* effect) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
 				if (t < 0.0f) t = 0.0f;
 				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
-				{
-				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-				color.a = 255.0f * t;
-				animPoseSetMaterialEvtColor(wp->poseId, color);
-				}
+				animPoseSetMaterialEvtColor(wp->poseId, (GXColor){0xFF, 0xFF, 0xFF, 255.0f * t});
 			}
 			break;
 		}
@@ -181,11 +181,7 @@ void effNiceMain(EffectEntry* effect) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
 				if (t < 0.0f) t = 0.0f;
 				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
-				{
-				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-				color.a = 255.0f * t;
-				animPoseSetMaterialEvtColor(wp->poseId, color);
-				}
+				animPoseSetMaterialEvtColor(wp->poseId, (GXColor){0xFF, 0xFF, 0xFF, 255.0f * t});
 			}
 			break;
 		}
@@ -196,11 +192,7 @@ void effNiceMain(EffectEntry* effect) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
 				if (t < 0.0f) t = 0.0f;
 				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
-				{
-				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-				color.a = 255.0f * t;
-				animPoseSetMaterialEvtColor(wp->poseId, color);
-				}
+				animPoseSetMaterialEvtColor(wp->poseId, (GXColor){0xFF, 0xFF, 0xFF, 255.0f * t});
 			}
 			break;
 		}
@@ -211,11 +203,7 @@ void effNiceMain(EffectEntry* effect) {
 				t = 1.0f - (pose->localFrame - start) / (len - start);
 				if (t < 0.0f) t = 0.0f;
 				animPoseSetMaterialFlagOn(wp->poseId, 0x40);
-				{
-				GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-				color.a = 255.0f * t;
-				animPoseSetMaterialEvtColor(wp->poseId, color);
-				}
+				animPoseSetMaterialEvtColor(wp->poseId, (GXColor){0xFF, 0xFF, 0xFF, 255.0f * t});
 			}
 			break;
 		}
@@ -256,10 +244,10 @@ void effAcrobatDisp(CameraId cameraId, void* param);
 
 void acrobatMain(EffectEntry* effect) {
 	NiceEffectWork* wp = effect->userdata;
+	int i;
 	int done = 0;
 	Vec pos;
 	Vec tmp = {0.0f, 0.0f, 0.0f};
-	int i;
 
 	tmp.x = wp->position.x;
 	tmp.y = wp->position.y;
@@ -267,12 +255,13 @@ void acrobatMain(EffectEntry* effect) {
 	pos = tmp;
 	wp++;
 	for (i = 1; i < effect->count; i++, wp++) {
+		char* sfx = "SFX_SYSTEM_ACROBAT1";
 		switch (wp->field_0x28) {
 		case 0:
 			wp->field_0x20 = i * 4;
 			wp->field_0x28++;
 			if (i == 1) {
-				psndSFXOn("SFX_SYSTEM_ACROBAT1");
+				psndSFXOn(sfx);
 			}
 			break;
 		case 1:
@@ -293,7 +282,7 @@ void acrobatMain(EffectEntry* effect) {
 		case 3:
 			wp->field_0x20++;
 			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 8, 1.0f, 0.4f);
-			wp->field_0x14 = intplGetValue(12, wp->field_0x20, 8, 1.0f, 1.5f);
+			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 1.5f, wp->field_0x20, 8);
 			if (wp->field_0x20 >= 8) {
 				wp->field_0x20 = 0;
 				wp->field_0x28++;
@@ -309,8 +298,8 @@ void acrobatMain(EffectEntry* effect) {
 		case 5:
 			wp->field_0x20++;
 			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i * 4, i * 12);
-			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 30, 0.2f, 1.0f);
-			wp->field_0x14 = intplGetValue(12, wp->field_0x20, 30, 1.5f, 1.0f);
+			wp->field_0x10 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.2f, 1.0f, wp->field_0x20, 30);
+			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.5f, 1.0f, wp->field_0x20, 30);
 			if (wp->field_0x20 >= 30) {
 				wp->field_0x20 = 0;
 				wp->field_0x28++;
@@ -326,7 +315,7 @@ void acrobatMain(EffectEntry* effect) {
 		case 7:
 			wp->field_0x20++;
 			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 15, 1.0f, 1.5f);
-			wp->field_0x14 = intplGetValue(12, wp->field_0x20, 15, 1.0f, 0.1f);
+			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 0.1f, wp->field_0x20, 15);
 			if (wp->field_0x20 >= 15) {
 				wp->field_0x20 = 0;
 				wp->field_0x28++;
@@ -335,7 +324,7 @@ void acrobatMain(EffectEntry* effect) {
 		case 8:
 			wp->field_0x20++;
 			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 15, 1.5f, 0.1f);
-			wp->field_0x14 = intplGetValue(12, wp->field_0x20, 15, 0.1f, 2.0f);
+			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.1f, 2.0f, wp->field_0x20, 15);
 			if (wp->field_0x20 >= 15) {
 				wp->field_0x20 = 0;
 				wp->field_0x28++;
@@ -360,7 +349,7 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 	CameraEntry* camera = camGetPtr(cameraId);
 	Mtx trans, rot, scale, mtx;
 	GXTexObj tex;
-	f32 size, half, ofsX, ofsY;
+	f32 size, half, ofsX, ofsY, ten;
 	int i;
 
 	PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
@@ -390,16 +379,17 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
 	size = 20.0f;
+	ten = 10.0f;
 	size = -size;
-	half = size * 0.5f;
+	half = size; half *= 0.5f;
 	wp++;
 	for (i = 1; i < effect->count; i++, wp++) {
 		if (wp->field_0x28 < 6) {
-			ofsX = size * 0.5f;
+			ofsX = size / 2.0f;
 			ofsY = 0.0f;
 		} else {
 			ofsX = 0.0f;
-			ofsY = size * 0.5f;
+			ofsY = size / 2.0f;
 		}
 		PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
 		PSMTXTrans(rot, ofsX, ofsY, 0.0f);
@@ -415,11 +405,11 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 		effGetTexObj(acrobat_tbl[gp->language][i - 1], &tex);
 		GXLoadTexObj(&tex, GX_TEXMAP0);
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		GXPosition3f32(half, 10.0f, 0.0f);
+		GXPosition3f32(half, ten, 0.0f);
 		GXTexCoord2f32(0.0f, 0.0f);
-		GXPosition3f32(10.0f, 10.0f, 0.0f);
+		GXPosition3f32(ten, ten, 0.0f);
 		GXTexCoord2f32(1.0f, 0.0f);
-		GXPosition3f32(10.0f, half, 0.0f);
+		GXPosition3f32(ten, half, 0.0f);
 		GXTexCoord2f32(1.0f, 1.0f);
 		GXPosition3f32(half, half, 0.0f);
 		GXTexCoord2f32(0.0f, 1.0f);

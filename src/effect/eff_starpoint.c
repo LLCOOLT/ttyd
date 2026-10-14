@@ -110,6 +110,7 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 i;
     f32 r;
     f32 angle;
+    f32 speed;
 
     effect = effEntry();
     effect->type = "StarPoint";
@@ -130,10 +131,10 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
         work->position.y = 0.0f;
         work->position.z = 0.0f;
         angle = r * 6.2831855f / 360.0f;
-        work->velX = 2.0f * _sinf(angle);
-        work->velZ = 2.0f * _cosf(angle);
-        work->gravity = 2.0f;
+        work->velX = (speed = 2.0f) * _sinf(angle);
+        work->velZ = speed * _cosf(angle);
         work->velY = 14.0f;
+        work->gravity = speed;
         work->alpha = 0;
         work->delay = delay;
     }

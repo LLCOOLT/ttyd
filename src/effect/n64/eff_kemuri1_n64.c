@@ -170,9 +170,9 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 				data->f28 = 0.94f;
 				data->f2C = 0.94f;
 				angle2 = 6.2831855f * (a5 + (f32)(((i - 1) * 360) / (effCount - 1))) / 360.0f;
-				data->position.x = -(f32)sin(angle2) * 10.0f;
+				data->position.x = 10.0f * -(f32)sin(angle2);
 				data->position.y = 0.0f;
-				data->position.z = -(f32)cos(angle2) * 10.0f;
+				data->position.z = 10.0f * -(f32)cos(angle2);
 				data->f30 = sin(angle2);
 				data->f34 = cos(angle2);
 				switch (type) {

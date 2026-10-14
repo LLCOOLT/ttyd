@@ -95,6 +95,13 @@ BOOL chkfilterNokotaro(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
+static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
+
+#pragma fp_contract off
+static inline f32 party_sumsq(f32 x, f32 z) { return x * x + z * z; }
+#pragma fp_contract reset
+
 static inline HitEntry* partyHitCheckInl(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist) {
     HitCheckQuery query;
     Vec d = *dir;
@@ -148,19 +155,10 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
     return partyHitCheckInl(party, pos, dir, outPos, outNrm, dist);
 }
 
-static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
-#pragma fp_contract off
-static inline f32 party_sumsq(f32 x, f32 z) { return x * x + z * z; }
-#pragma fp_contract reset
-
 f32 partyNrmToAngle(Vec* n) {
-    f32 x = n->x;
-    f32 z = n->z;
-    x = x * x;
-    z = z * z;
-    return angleABf(0.0f, 0.0f, party_sqrtf(x + z), -n->y);
+    f32 d = n->x * n->x;
+    d = d + n->z * n->z;
+    return angleABf(0.0f, 0.0f, party_sqrtf(d), -n->y);
 }
 
 void partyChkGnd(PartyEntry* party) {
@@ -529,30 +527,34 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
 }
 
 void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
+    f32 lx, ly, lz;
+    f32 best;
+    f32 oz, ox;
     Vec t;
     f32 s, c;
+    volatile f32 px, py, pz;
     f32 d0, nz0, ny0, nx0, hz0, hy0, hx0;
     f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
     f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
     f32 d3, nz3, ny3, nx3, hz3, hy3, hx3;
-    f32 ox, oz;
-    Vec l;
     HitEntry* hit;
-    f32 best;
 
     oz = 0.3f * party->width;
     sincosf(&s, &c, angle);
+    px = pos->x;
     ox = -oz * c;
     oz = oz * s;
+    py = pos->y;
+    pz = pos->z;
     best = *dist;
     {
         Vec v0 = {0.0f, 0.0f, 0.0f};
-        l.x = pos->x + oz;
-        l.y = pos->y;
-        l.z = pos->z + ox;
-        v0.x = l.x;
-        v0.y = l.y;
-        v0.z = l.z;
+        lx = px + oz;
+        ly = py;
+        lz = pz + ox;
+        v0.y = ly;
+        v0.z = lz;
+        v0.x = lx;
         t = v0;
         d0 = best;
         hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
@@ -562,59 +564,59 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     }
     if (!hit) {
         Vec v1 = {0.0f, 0.0f, 0.0f};
-        l.x = pos->x - oz;
-        l.y = pos->y;
-        l.z = pos->z - ox;
-        v1.x = l.x;
-        v1.y = l.y;
-        v1.z = l.z;
+        lx = px - oz;
+        ly = py;
+        lz = pz - ox;
+        v1.y = ly;
+        v1.z = lz;
+        v1.x = lx;
         t = v1;
         d1 = best;
         hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
         if (hit && best >= d1) {
             best = d1;
         }
-    }
-    if (!hit) {
-        Vec v2 = {0.0f, 0.0f, 0.0f};
-        l.x = pos->x + ox;
-        l.y = pos->y;
-        l.z = pos->z + oz;
-        v2.x = l.x;
-        v2.y = l.y;
-        v2.z = l.z;
-        t = v2;
-        d2 = best;
-        hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
-        if (hit && best >= d2) {
-            best = d2;
-        }
-    }
-    if (!hit) {
-        Vec v3 = {0.0f, 0.0f, 0.0f};
-        l.x = pos->x - ox;
-        l.y = pos->y;
-        l.z = pos->z - oz;
-        v3.x = l.x;
-        v3.y = l.y;
-        v3.z = l.z;
-        t = v3;
-        d3 = best;
-        hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
-        if (hit && best >= d3) {
-            best = d3;
+        if (!hit) {
+            Vec v2 = {0.0f, 0.0f, 0.0f};
+            lx = px + ox;
+            ly = py;
+            lz = pz + oz;
+            v2.y = ly;
+            v2.z = lz;
+            v2.x = lx;
+            t = v2;
+            d2 = best;
+            hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+            if (hit && best >= d2) {
+                best = d2;
+            }
+            if (!hit) {
+                Vec v3 = {0.0f, 0.0f, 0.0f};
+                lx = px - ox;
+                ly = py;
+                lz = pz - oz;
+                v3.y = ly;
+                v3.z = lz;
+                v3.x = lx;
+                t = v3;
+                d3 = best;
+                hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, 0.0f, 1.0f, 0.0f);
+                if (hit && best >= d3) {
+                    best = d3;
+                }
+            }
         }
     }
     if (hit) {
-        pos->x = l.x;
-        pos->y = l.y;
-        pos->z = l.z;
+        pos->x = lx;
+        pos->y = ly;
+        pos->z = lz;
         *dist = best;
     }
     if (!hit) {
-        pos->x = l.x;
-        pos->y = l.y;
-        pos->z = l.z;
+        pos->x = lx;
+        pos->y = ly;
+        pos->z = lz;
         *dist = 0.0f;
     }
 }

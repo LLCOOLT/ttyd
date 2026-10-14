@@ -18,9 +18,238 @@ typedef struct BDWork {
 #define NN (*(s32*)((u8*)work + 0x1cd0))
 #define OUT (*(s32*)&ac->outputParams[0])
 #define BTN(i) (*(u32*)((u8*)p + 8 + (i) * 4))
+#define BTNO(o) (*(u32*)((u8*)p + ((o) + 8)))
+#define PRSO(o) (*(s32*)((u8*)p + ((o) + 0x3c)))
 #define PRS(i) (*(s32*)((u8*)p + 0x3c + (i) * 4))
 
 static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
+
+static void actionCommandDisp(s32 unused, f32 x, f32 y);
+
+s32 battleAcMain_ButtonDown(BattleWork* work) {
+    BattleActions* ac = &work->actionCommands;
+    BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
+    u8* disp = (u8*)work + 0x1f20;
+    s32 flag = 0;
+    s32 again;
+    s32 i;
+    s32 allDone;
+    s32 k;
+    s32 off;
+
+    if (*((u8*)ac->mAcUnit + 0x303)) {
+        flag = 1;
+    }
+    do {
+        again = 0;
+        switch (ac->mAcState) {
+            case 0: {
+                ac->result = 1;
+                memset(disp, 0, 0x2c);
+                ((f32*)disp)[5] = -300.0f;
+                ((f32*)disp)[6] = 0.0f;
+                ((s32*)disp)[8] = 20;
+                memset(p->button, 0, 0x34);
+                memset(p->pressed, 1, 0x34);
+                for (i = 0, off = 0; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
+                    switch (*(s32*)((u8*)work + 0x1cd4)) {
+                        case -2:
+                            BTNO(off) = irand(100) < 50 ? 0x100 : 0x200;
+                            PRSO(off) = 0;
+                            break;
+                        case -4:
+                            BTNO(off) = irand(100) < 50 ? 0x200 : 0x400;
+                            PRSO(off) = 0;
+                            break;
+                        case -3:
+                            if (*(u32*)((u8*)work + 0x1cc4) & 4) {
+                                BTNO(off) = _button_table[irand(4)];
+                                PRSO(off) = 0;
+                            } else {
+                                s32 found = 0;
+                                u32 cand;
+                                while (!found) {
+                                    s32 j, ok;
+                                    cand = _button_table[irand(4)];
+                                    ok = 1;
+                                    for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4) {
+                                        if (BTNO(k) == cand) {
+                                            ok = 0;
+                                        }
+                                    }
+                                    if (ok) {
+                                        found = 1;
+                                    }
+                                }
+                                BTNO(off) = cand;
+                                PRSO(off) = 0;
+                            }
+                            break;
+                        default: {
+                            s32 found = 0;
+                            u32 cand;
+                            while (!found) {
+                                s32 j, ok;
+                                cand = _button_table[irand(7)];
+                                ok = 1;
+                                for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4) {
+                                    if (BTNO(k) == cand) {
+                                        ok = 0;
+                                    }
+                                }
+                                if (ok) {
+                                    found = 1;
+                                }
+                            }
+                            BTNO(off) = cand;
+                            PRSO(off) = 0;
+                            break;
+                        }
+                    }
+                }
+                ac->mAcState = 99;
+                break;
+            }
+            case 99:
+                break;
+            case 100:
+                ac->mAcState = 1000;
+                p->sndCount = 0;
+                p->timer = *(s32*)((u8*)work + 0x1cc8);
+            case 1000:
+                if ((ac->field_0x4 & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+                    if (ac->field_0x4 & 2) {
+                        ac->field_0x8--;
+                        if (ac->field_0x8 >= 0) {
+                            break;
+                        }
+                    }
+                    if (irand(100) >= 0) {
+                        ac->result = 0;
+                    } else {
+                        ac->result = 2;
+                        ac->mResultCount++;
+                    }
+                    return 0;
+                }
+                if (*(s16*)((u8*)work + 0x1d18) > 0) {
+                    (*(s16*)((u8*)work + 0x1d18))--;
+                    ac->result = 2;
+                    again = 1;
+                    ac->mAcState = 1001;
+                    break;
+                }
+                OUT = 0;
+                allDone = 1;
+                for (i = 0, off = 0; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
+                    if (BTNO(off)) {
+                        if (PRSO(off)) {
+                            OUT++;
+                        } else if (BTNO(off) == BattlePadGetTrigger() || flag) {
+                            PRSO(off) = 1;
+                            OUT++;
+                            if (*(s32*)((u8*)work + 0x1ccc) == 1) {
+                                if (i + 1 < *(s32*)((u8*)work + 0x1cd0)) {
+                                    allDone = 0;
+                                }
+                                break;
+                            }
+                        } else if (BattlePadGetTrigger()) {
+                            ac->result = 0;
+                            ac->mAcState = 1001;
+                            if ((*(u32*)((u8*)work + 0x1cc4) & 2) && OUT > 0) {
+                                again = 1;
+                                ac->result |= 2;
+                                ac->result &= ~1;
+                                ac->mAcState = 1001;
+                                break;
+                            }
+                            return 1;
+                        } else {
+                            allDone = 0;
+                            if (*(s32*)((u8*)work + 0x1ccc) == 1) {
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (p->sndCount != OUT) {
+                    psndSFXOn("SFX_AC_BUTTON_PUSH1");
+                    p->sndCount = OUT;
+                }
+                if (allDone) {
+                    ac->result |= 2;
+                    again = 1;
+                    ac->result &= ~1;
+                    ac->mAcState = 1001;
+                    break;
+                }
+                p->timer--;
+                if (p->timer < 0) {
+                    ac->result = 0;
+                    again = 1;
+                    ac->mAcState = 1001;
+                    if ((*(u32*)((u8*)work + 0x1cc4) & 2) && OUT > 0) {
+                        ac->result |= 2;
+                        ac->result &= ~1;
+                        ac->mAcState = 1001;
+                    }
+                }
+                break;
+            case 1001:
+                ac->mAcState = 1002;
+            case 1002:
+                return 0;
+            case 1003:
+                p->endTimer = 60;
+                ac->mAcState = 1004;
+                break;
+            case 1004:
+                p->endTimer--;
+                if (p->endTimer <= 0) {
+                    ac->mAcState = 1005;
+                }
+                break;
+            case 1005:
+                ac->maincb = NULL;
+                ac->dispcb = NULL;
+                ac->resultcb = NULL;
+                ac->deletecb = NULL;
+                break;
+        }
+    } while (again);
+    return 1;
+}
+
+s32 battleAcResult_ButtonDown(BattleWork* work) {
+    return work->actionCommands.result;
+}
+
+void battleAcDisp_ButtonDown(CameraId cameraId, void* param) {
+    BattleWork* work = (BattleWork*)param;
+    BattleActions* ac = &work->actionCommands;
+    s32* disp;
+    f32 x, y;
+    disp = (s32*)((u8*)ac + 0x290);
+    switch (ac->mAcState) {
+        case 99:
+        case 0:
+            if (disp[8] > 0) {
+                disp[8]--;
+            }
+            x = intplGetValue(4, 20 - disp[8], 20, -300.0f, 0.0f);
+            y = 0.0f;
+            break;
+        default:
+            x = y = 0.0f;
+            break;
+    }
+    actionCommandDisp(0, x, y);
+}
+
+void battleAcDelete_ButtonDown(BattleWork* work) {
+    work->actionCommands.mAcState = 1003;
+}
 
 static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
@@ -121,227 +350,4 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
             ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&pos5, 16, b, 1.0f);
         }
     }
-}
-
-void battleAcDelete_ButtonDown(BattleWork* work) {
-    work->actionCommands.mAcState = 1003;
-}
-
-void battleAcDisp_ButtonDown(CameraId cameraId, void* param) {
-    BattleWork* work = (BattleWork*)param;
-    BattleActions* ac = &work->actionCommands;
-    s32* disp;
-    f32 x, y;
-    disp = (s32*)((u8*)ac + 0x290);
-    switch (ac->mAcState) {
-        case 99:
-        case 0:
-            if (disp[8] > 0) {
-                disp[8]--;
-            }
-            x = intplGetValue(4, 20 - disp[8], 20, -300.0f, 0.0f);
-            y = 0.0f;
-            break;
-        default:
-            x = y = 0.0f;
-            break;
-    }
-    actionCommandDisp(0, x, y);
-}
-
-s32 battleAcResult_ButtonDown(BattleWork* work) {
-    return work->actionCommands.result;
-}
-
-s32 battleAcMain_ButtonDown(BattleWork* work) {
-    BattleActions* ac = &work->actionCommands;
-    BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
-    u8* disp = (u8*)work + 0x1f20;
-    s32 flag = 0;
-    s32 again;
-    s32 i;
-    s32 allDone;
-
-    if (*((u8*)ac->mAcUnit + 0x303)) {
-        flag = 1;
-    }
-    do {
-        again = 0;
-        switch (ac->mAcState) {
-            case 0: {
-                ac->result = 1;
-                memset(disp, 0, 0x2c);
-                ((f32*)disp)[5] = -300.0f;
-                ((f32*)disp)[6] = 0.0f;
-                ((s32*)disp)[8] = 20;
-                memset(p->button, 0, 0x34);
-                memset(p->pressed, 1, 0x34);
-                for (i = 0; i < *(s32*)((u8*)work + 0x1cd0); i++) {
-                    switch (*(s32*)((u8*)work + 0x1cd4)) {
-                        case -2:
-                            BTN(i) = irand(100) < 50 ? 0x100 : 0x200;
-                            PRS(i) = 0;
-                            break;
-                        case -4:
-                            BTN(i) = irand(100) < 50 ? 0x200 : 0x400;
-                            PRS(i) = 0;
-                            break;
-                        case -3:
-                            if (*(u32*)((u8*)work + 0x1cc4) & 4) {
-                                BTN(i) = _button_table[irand(4)];
-                                PRS(i) = 0;
-                            } else {
-                                s32 found = 0;
-                                u32 cand;
-                                while (!found) {
-                                    s32 j, ok;
-                                    cand = _button_table[irand(4)];
-                                    ok = 1;
-                                    for (j = i - 1; j >= 0; j--) {
-                                        if (BTN(j) == cand) {
-                                            ok = 0;
-                                        }
-                                    }
-                                    if (ok) {
-                                        found = 1;
-                                    }
-                                }
-                                BTN(i) = cand;
-                                PRS(i) = 0;
-                            }
-                            break;
-                        default: {
-                            s32 found = 0;
-                            u32 cand;
-                            while (!found) {
-                                s32 j, ok;
-                                cand = _button_table[irand(7)];
-                                ok = 1;
-                                for (j = i - 1; j >= 0; j--) {
-                                    if (BTN(j) == cand) {
-                                        ok = 0;
-                                    }
-                                }
-                                if (ok) {
-                                    found = 1;
-                                }
-                            }
-                            BTN(i) = cand;
-                            PRS(i) = 0;
-                            break;
-                        }
-                    }
-                }
-                ac->mAcState = 99;
-                break;
-            }
-            case 99:
-                break;
-            case 100:
-                ac->mAcState = 1000;
-                p->sndCount = 0;
-                p->timer = *(s32*)((u8*)work + 0x1cc8);
-            case 1000:
-                if ((ac->field_0x4 & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8--;
-                        if (ac->field_0x8 >= 0) {
-                            break;
-                        }
-                    }
-                    if (irand(100) >= 0) {
-                        ac->result = 0;
-                    } else {
-                        ac->result = 2;
-                        ac->mResultCount++;
-                    }
-                    return 0;
-                }
-                if (*(s16*)((u8*)work + 0x1d18) > 0) {
-                    (*(s16*)((u8*)work + 0x1d18))--;
-                    ac->result = 2;
-                    again = 1;
-                    ac->mAcState = 1001;
-                    break;
-                }
-                OUT = 0;
-                allDone = 1;
-                for (i = 0; i < *(s32*)((u8*)work + 0x1cd0); i++) {
-                    if (BTN(i)) {
-                        if (PRS(i)) {
-                            OUT++;
-                        } else if (BTN(i) == BattlePadGetTrigger() || flag) {
-                            PRS(i) = 1;
-                            OUT++;
-                            if (*(s32*)((u8*)work + 0x1ccc) == 1) {
-                                if (i + 1 < *(s32*)((u8*)work + 0x1cd0)) {
-                                    allDone = 0;
-                                }
-                                break;
-                            }
-                        } else if (BattlePadGetTrigger()) {
-                            ac->result = 0;
-                            ac->mAcState = 1001;
-                            if ((*(u32*)((u8*)work + 0x1cc4) & 2) && OUT > 0) {
-                                again = 1;
-                                ac->result |= 2;
-                                ac->result &= ~1;
-                                ac->mAcState = 1001;
-                                break;
-                            }
-                            return 1;
-                        } else {
-                            allDone = 0;
-                            if (*(s32*)((u8*)work + 0x1ccc) == 1) {
-                                break;
-                            }
-                        }
-                    }
-                }
-                if (p->sndCount != OUT) {
-                    psndSFXOn("SFX_AC_BUTTON_PUSH1");
-                    p->sndCount = OUT;
-                }
-                if (allDone) {
-                    ac->result |= 2;
-                    again = 1;
-                    ac->result &= ~1;
-                    ac->mAcState = 1001;
-                    break;
-                }
-                p->timer--;
-                if (p->timer < 0) {
-                    ac->result = 0;
-                    again = 1;
-                    ac->mAcState = 1001;
-                    if ((*(u32*)((u8*)work + 0x1cc4) & 2) && OUT > 0) {
-                        ac->result |= 2;
-                        ac->result &= ~1;
-                        ac->mAcState = 1001;
-                    }
-                }
-                break;
-            case 1001:
-                ac->mAcState = 1002;
-            case 1002:
-                return 0;
-            case 1003:
-                p->endTimer = 60;
-                ac->mAcState = 1004;
-                break;
-            case 1004:
-                p->endTimer--;
-                if (p->endTimer <= 0) {
-                    ac->mAcState = 1005;
-                }
-                break;
-            case 1005:
-                ac->maincb = NULL;
-                ac->dispcb = NULL;
-                ac->resultcb = NULL;
-                ac->deletecb = NULL;
-                break;
-        }
-    } while (again);
-    return 1;
 }

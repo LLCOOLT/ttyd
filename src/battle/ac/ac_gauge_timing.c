@@ -371,14 +371,14 @@ void battleAcDelete_GaugeTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
-    f32 px;
-    f32 py;
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
     GaugeAC* g;
     GaugeWork* cw;
     f32 ratio;
+    f32 rx;
+    f32 ry;
     s32 i;
     s32 n;
     u16 pressed;
@@ -423,11 +423,11 @@ static void actionCommandDisp(f32 x, f32 y) {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, 0.0f, 100, 100, 100, 100, 0);
         if (cw->timer <= 0) {
             CameraEntry* cam = camGetPtr(8);
-            px = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
-            py = 49.0f + y;
+            rx = (-200.0f + x - 88.0f) + 173.0f * cw->gauge / 100.0f;
+            ry = 49.0f + y;
             btlDispGXInit2DRasta();
             GXLoadPosMtxImm(cam->view, 0);
-            btlDispGXQuads2DRasta(px, py, 10.0f + px, py - 16.0f, 0, 255, 0, 255);
+            btlDispGXQuads2DRasta(rx, ry, 10.0f + rx, ry - 16.0f, 0, 255, 0, 255);
         }
         n = g->target;
         for (i = 0; i < n; i++) {
@@ -477,15 +477,15 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1005:
             if (pressed2) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                px = -228.0f + x;
-                py = 55.0f + y;
-                pos.x = px;
-                pos.y = py;
+                rx = -228.0f + x;
+                ry = 55.0f + y;
+                pos.x = rx;
+                pos.y = ry;
                 iconDispGx(&pos, 0x10, unpressed, 1.0f);
                 {
                 Vec pos2 = {0.0f, 0.0f, 0.0f};
-                pos2.x = 56.0f + px;
-                pos2.y = py;
+                pos2.x = 56.0f + rx;
+                pos2.y = ry;
                 iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
                 }
             } else {
@@ -501,15 +501,15 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        px = -228.0f + x;
-                        py = 55.0f + y;
-                        pos.x = px;
-                        pos.y = py;
+                        rx = -228.0f + x;
+                        ry = 55.0f + y;
+                        pos.x = rx;
+                        pos.y = ry;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);
                         {
                         Vec pos2 = {0.0f, 0.0f, 0.0f};
-                        pos2.x = 56.0f + px;
-                        pos2.y = py;
+                        pos2.x = 56.0f + rx;
+                        pos2.y = ry;
                         iconDispGx(&pos2, 0x10, pressed2, 1.0f);
                         }
                     } else {
@@ -521,15 +521,15 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        px = -228.0f + x;
-                        py = 55.0f + y;
-                        pos.x = px;
-                        pos.y = py;
+                        rx = -228.0f + x;
+                        ry = 55.0f + y;
+                        pos.x = rx;
+                        pos.y = ry;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
                         {
                         Vec pos2 = {0.0f, 0.0f, 0.0f};
-                        pos2.x = 56.0f + px;
-                        pos2.y = py;
+                        pos2.x = 56.0f + rx;
+                        pos2.y = ry;
                         iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
                         }
                     } else {
@@ -543,15 +543,15 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        px = -228.0f + x;
-                        py = 55.0f + y;
-                        pos.x = px;
-                        pos.y = py;
+                        rx = -228.0f + x;
+                        ry = 55.0f + y;
+                        pos.x = rx;
+                        pos.y = ry;
                         iconDispGx(&pos, 0x10, unpressed, 1.0f);
                         {
                         Vec pos2 = {0.0f, 0.0f, 0.0f};
-                        pos2.x = 56.0f + px;
-                        pos2.y = py;
+                        pos2.x = 56.0f + rx;
+                        pos2.y = ry;
                         iconDispGx(&pos2, 0x10, unpressed2, 1.0f);
                         }
                     } else {
@@ -563,15 +563,15 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
-                        px = -228.0f + x;
-                        py = 55.0f + y;
-                        pos.x = px;
-                        pos.y = py;
+                        rx = -228.0f + x;
+                        ry = 55.0f + y;
+                        pos.x = rx;
+                        pos.y = ry;
                         iconDispGx(&pos, 0x10, pressed, 1.0f);
                         {
                         Vec pos2 = {0.0f, 0.0f, 0.0f};
-                        pos2.x = 56.0f + px;
-                        pos2.y = py;
+                        pos2.x = 56.0f + rx;
+                        pos2.y = ry;
                         iconDispGx(&pos2, 0x10, pressed2, 1.0f);
                         }
                     } else {

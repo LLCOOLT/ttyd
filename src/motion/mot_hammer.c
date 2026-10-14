@@ -67,12 +67,23 @@ static inline s32 hamLv(void) {
 
 typedef struct { u8 pad[0x15]; char name[0x10]; } HamMobj;
 
-static s32 isS1(char* n);
-static s32 isB1(char* n);
-static s32 isS2(char* n);
-static s32 isB2(char* n);
-static s32 isS3(char* n);
-static s32 isB3(char* n);
+static const char isS1_str[14];
+static const char isB1_str[17];
+static const char isS2_str[14];
+static const char isB2_str[17];
+static const char isS3_str[14];
+static const char isB3_str[17];
+#define isB3(n) (strcmp((n), isB3_str) == 0)
+
+#define isS3(n) (strcmp((n), isS3_str) == 0)
+
+#define isB2(n) (strcmp((n), isB2_str) == 0)
+
+#define isS2(n) (strcmp((n), isS2_str) == 0)
+
+#define isB1(n) (strcmp((n), isB1_str) == 0)
+
+#define isS1(n) (strcmp((n), isS1_str) == 0)
 
 static inline s32 chkBlock(HamMobj* obj) {
 	s32 ok = 0;
@@ -104,11 +115,11 @@ void mot_hammer(void) {
 	s32 kind;
 	f32 px, pz;
 	s32 done;
-	s32 n;
 	s32 i;
 	f32 py, ez;
 	s32 efType;
 	HitEntry* hit;
+	s32 n;
 
 	if (MI(0xC) & 1) {
 		MI(0xC) &= ~1;
@@ -202,10 +213,10 @@ void mot_hammer(void) {
 		}
 	} else {
 		s32 t = MI(0x48);
-		if (t > 10) {
-			n = 10;
-		} else {
+		if (t <= 10) {
 			n = t;
+		} else {
+			n = 10;
 		}
 		if (t == 10) {
 			done = 1;
@@ -373,7 +384,7 @@ static const Vec v = {0.0f, 40.0f, 0.0f};
 		m->unk148 = a148;                                           \
 		*(f32*)((u8*)m + 0x158) = 0.005f;                           \
 		m->field_68 = a68;                                          \
-		m->field_6C = v;                                            \
+		marioGetPtr()->field_6C = v;                                           \
 		MS(0x2B4) |= 0x1000;                                        \
 	}
 
@@ -414,10 +425,9 @@ void mot_hammer2(void) {
 	s32 b, a;
 	f32 c;
 	HitEntry* hit;
-	f32 ang, ang2;
-	f32 s, co;
-	f32 len;
-	f32 hx, hy, hz, nx, ny, nz;
+	f32 ang2, ang;
+	f32 nz, ny, nx, len, hz, hy, hx;
+	f32 co, s;
 
 	if (MI(0xC) & 1) {
 		MI(0xC) &= ~1;
@@ -474,7 +484,7 @@ void mot_hammer2(void) {
 		MI(0x2B8) = psndSFXOn_3D(0x162, (Vec*)&MF(0x8C));
 		MF(0x2B0) = 0.0f;
 		MS(0x28) = 0;
-		animPoseSetLocalTime(MI(0x228 + marioAnimeId() * 4), MF(0x2B0));
+		animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], MF(0x2B0));
 		MI(0x44) = 10;
 		MI(0x48) = 30;
 	case 10:
@@ -519,7 +529,7 @@ void mot_hammer2(void) {
 			}
 		}
 		if (strcmp(mario->paperAnimName, "P_H_1A") == 0) {
-			animPoseSetLocalTime(MI(0x228 + marioAnimeId() * 4), MF(0x2B0) / 6.0f);
+			animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], MF(0x2B0) / 6.0f);
 		}
 	case 11:
 		if (!(MH(0x246) & 0x200)) {
@@ -571,8 +581,8 @@ void mot_hammer2(void) {
 		{
 			MarioWork* m = marioGetPtr();
 			sincosf(&s, &co, ang2);
-			len = (f32){2.0f} * MF(0x1B4);
-			hit = hitCheckFilter(0, &hx, &hy, &hz, &len, &nx, &ny, &nz, m->position.x, (f32){0.5f} * MF(0x1B8) + m->position.y, m->position.z, s, 0.0f, co);
+			len = 2.0f * *(f32*)((u8*)m + 0x1B4);
+			hit = hitCheckFilter(0, &hx, &hy, &hz, &len, &nx, &ny, &nz, m->position.x, 0.5f * *(f32*)((u8*)m + 0x1B8) + m->position.y, m->position.z, s, 0.0f, co);
 		}
 		if (hit && (hitGetAttr(hit) & 0x800005)) {
 			ang = ang;
@@ -631,30 +641,6 @@ void mot_hammer2(void) {
 }
 
 
-static s32 isB3(char* n) {
-	return strcmp(n, "MOBJ_Lv3BigBlock") == 0;
-}
-
-static s32 isS3(char* n) {
-	return strcmp(n, "MOBJ_Lv3Block") == 0;
-}
-
-static s32 isB2(char* n) {
-	return strcmp(n, "MOBJ_Lv2BigBlock") == 0;
-}
-
-static s32 isS2(char* n) {
-	return strcmp(n, "MOBJ_Lv2Block") == 0;
-}
-
-static s32 isB1(char* n) {
-	return strcmp(n, "MOBJ_Lv1BigBlock") == 0;
-}
-
-static s32 isS1(char* n) {
-	return strcmp(n, "MOBJ_Lv1Block") == 0;
-}
-
 f32 marioGetAngleKaitenHammer(void) {
 	MarioWork* mario = marioGetPtr();
 	if (mario->currMotionId != 0x13) {
@@ -700,11 +686,12 @@ HitEntry *hitEstimate(s32 *out)
   Vec new_var;
   f32 h;
   s32 i;
+  f32 k5 = 5.0f;
   mario = marioGetPtr();
   *out = 0;
   a = mario->unk1A8;
   {
-    f32 off = (!(marioGetPtr()->dispFlags & 0x80000000)) ? (0.0f) : (-20.0f);
+    f32 off = (marioGetPtr()->dispFlags & 0x80000000) ? (-20.0f) : (0.0f);
     if ((a >= 90.0f) && (a <= 270.0f))
     {
       a = toMovedir2(180.0f, off);
@@ -717,9 +704,9 @@ HitEntry *hitEstimate(s32 *out)
   sincosf(&s, &c, a);
   h = *((f32 *) (((u8 *) mario) + 0x1B8));
   cy = (f32) cos(3.14159265f);
+  pos = mario->position;
   {
     Vec dir1 = {0.0f, 0.0f, 0.0f};
-    pos = mario->position;
     pos.y = 4.0f + (mario->position.y + h);
     dir1.x = s;
     dir1.y = -cy;
@@ -737,12 +724,12 @@ HitEntry *hitEstimate(s32 *out)
   cy = (f32) cos(1.2217306f);
   {
     Vec dir2 = {0.0f, 0.0f, 0.0f};
+    pos.x = (s * k5) + mario->position.x;
+    pos.z = (c * k5) + mario->position.z;
+    pos.y = mario->position.y + h;
     dir2.x = s;
     dir2.y = -cy;
     dir2.z = c;
-    pos.x = (s * 5.0f) + mario->position.x;
-    pos.y = mario->position.y + h;
-    pos.z = (5.0f * c) + mario->position.z;
     q.targetPos = pos;
     q.targetDir = dir2;
     q.targetDistance = 26.0f;
@@ -756,12 +743,12 @@ HitEntry *hitEstimate(s32 *out)
   cy = (f32) cos(0.78539816f);
   {
     Vec dir3 = {0.0f, 0.0f, 0.0f};
+    pos.x = (s * k5) + mario->position.x;
+    pos.z = (c * k5) + mario->position.z;
+    pos.y = mario->position.y + h;
     dir3.x = s;
     dir3.y = -cy;
     dir3.z = c;
-    pos.x = (s * 5.0f) + mario->position.x;
-    pos.y = mario->position.y + h;
-    pos.z = (5.0f * c) + mario->position.z;
     q.targetPos = pos;
     q.targetDir = dir3;
     q.targetDistance = 30.0f;
@@ -781,8 +768,8 @@ HitEntry *hitEstimate(s32 *out)
       Vec dir4b = new_var;
       for (i = 0; i < 2; i++)
       {
-        f32 d;
         f32 m;
+        f32 d;
         if (i == 0)
         {
           d = 36.0f;
@@ -801,8 +788,8 @@ HitEntry *hitEstimate(s32 *out)
           }
         }
         pos.x = (s * m) + mario->position.x;
-        pos.y = mario->position.y + h;
         pos.z = (c * m) + mario->position.z;
+        pos.y = mario->position.y + h;
         q.targetPos = pos;
         q.targetDir = dir4b;
         q.targetDistance = d;
@@ -819,3 +806,9 @@ HitEntry *hitEstimate(s32 *out)
   return hit;
 }
 
+static const char isS1_str[] = "MOBJ_Lv1Block";
+static const char isB1_str[] = "MOBJ_Lv1BigBlock";
+static const char isS2_str[] = "MOBJ_Lv2Block";
+static const char isB2_str[] = "MOBJ_Lv2BigBlock";
+static const char isS3_str[] = "MOBJ_Lv3Block";
+static const char isB3_str[] = "MOBJ_Lv3BigBlock";

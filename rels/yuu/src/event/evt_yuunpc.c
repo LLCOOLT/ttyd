@@ -107,227 +107,6 @@ s32 evt_yuunpc_minigame2[69];
 s32 evt_yuunpc_minigame3[69];
 s32 evt_yuunpc_minigame4[167];
 
-void yuunpc_pose_init(YuuNpcData* data) {
-    char name[32];
-    char anim[32];
-    s32 n = 0;
-    s32 start;
-    s32 i;
-
-    strcpy(name, "");
-    strcpy(anim, "");
-    yuunpc_wp->numPoses = -1;
-    do {
-        if (strcmp(data->name, name) != 0) {
-            strcpy(name, data->name);
-            strcpy(anim, "");
-        }
-        if (strcmp(data->anim, anim) != 0) {
-            strcpy(anim, data->anim);
-            start = n;
-            yuunpc_wp->numPoses++;
-        }
-        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].name, name);
-        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].anim, anim);
-        yuunpc_wp->pose[yuunpc_wp->numPoses].start = start;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].count = n - start + 1;
-        n++;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].frames += 1.0f;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x18 = 1;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].jump = 0.0f;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x30 = 2.0f;
-        data++;
-    } while (data->name != NULL);
-    data++;
-    yuunpc_wp->numPoses++;
-    yuunpc_wp->basePoseNum = yuunpc_wp->numPoses;
-    while (data->name != NULL) {
-        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].name, data->name);
-        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].anim, data->anim);
-        yuunpc_wp->pose[yuunpc_wp->numPoses].start = start;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].count = 1;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].frames = data->frames;
-        data++;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x18 = 1;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].jump = 0.0f;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x30 = 1.0f;
-        yuunpc_wp->pose[yuunpc_wp->numPoses].flags |= 1;
-        yuunpc_wp->numPoses++;
-    }
-    for (i = 0; i < yuunpc_wp->basePoseNum; i++) {
-        if (strcmp(yuunpc_wp->pose[i].name, "c_tyusan") == 0 && strcmp(yuunpc_wp->pose[i].anim, "CHU_S_1") == 0) {
-            yuunpc_wp->chusanPose = i;
-            yuunpc_wp->pose[i].frames = 224.0f;
-        }
-    }
-}
-
-s32 yuunpc_pose_check(const char* name, const char* anim) {
-    YuuNpcPose* pose = yuunpc_wp->pose;
-    s32 i;
-
-    for (i = 0; i < yuunpc_wp->numPoses; i++, pose++) {
-        if (strcmp(pose->name, name) == 0 && strcmp(pose->anim, anim) == 0) {
-            break;
-        }
-    }
-    if (i >= yuunpc_wp->numPoses) {
-        return -1;
-    }
-    return i;
-}
-
-static inline void pose_change_inl(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
-    YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
-    YuuNpcPose* pose = &yuunpc_wp->pose[id];
-
-    if (speed <= 0.0f) {
-        npc->flags |= 4;
-        npc->poseId = id;
-        npc->animSpeed = 1.0f;
-        npc->time = OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
-    } else {
-        u16 flags = npc->flags;
-        npc->flags = flags & ~4;
-        if (npc->poseId == id) {
-            f32 old = npc->animSpeed;
-            if (old != speed) {
-                if (flags & 4) {
-                    frame = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
-                    frame /= pose->frames * old;
-                } else {
-                    frame = 60.0f * OSTicksToMilliseconds(gp->renderTime - npc->time) / 1000.0f;
-                    frame /= cur->frames * old;
-                }
-            } else {
-                return;
-            }
-        } else {
-            npc->poseId = id;
-        }
-        npc->animSpeed = speed;
-        npc->time = gp->renderTime - OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
-    }
-    switch (npc->flags & 0x300) {
-        case 0:
-            break;
-        case 0x100:
-        case 0x200:
-        case 0x300:
-            animPoseSetAnim(npc->npc->poseId, pose->anim, TRUE);
-            animPoseMain(npc->npc->poseId);
-            break;
-    }
-}
-
-void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
-    YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
-    YuuNpcPose* pose = &yuunpc_wp->pose[id];
-
-    if (speed <= 0.0f) {
-        npc->flags |= 4;
-        npc->poseId = id;
-        npc->animSpeed = 1.0f;
-        npc->time = OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
-    } else {
-        u16 flags = npc->flags;
-        npc->flags = flags & ~4;
-        if (npc->poseId == id) {
-            f32 old = npc->animSpeed;
-            if (old != speed) {
-                if (flags & 4) {
-                    frame = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
-                    frame /= pose->frames * old;
-                } else {
-                    frame = 60.0f * OSTicksToMilliseconds(gp->renderTime - npc->time) / 1000.0f;
-                    frame /= cur->frames * old;
-                }
-            } else {
-                return;
-            }
-        } else {
-            npc->poseId = id;
-        }
-        npc->animSpeed = speed;
-        npc->time = gp->renderTime - OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
-    }
-    switch (npc->flags & 0x300) {
-        case 0:
-            break;
-        case 0x100:
-        case 0x200:
-        case 0x300:
-            animPoseSetAnim(npc->npc->poseId, pose->anim, TRUE);
-            animPoseMain(npc->npc->poseId);
-            break;
-    }
-}
-
-void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed) {
-    pose_change_inl(npc, yuunpc_pose_check(name, anim), speed, rand() / 32767.0f);
-}
-
-void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
-    s32 id = yuunpc_pose_check(name, anim);
-
-    if (id >= 0) {
-        yuunpc_wp->pose[id].jump = jump;
-    }
-}
-
-f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
-    YuuNpcPose* pose = &yuunpc_wp->pose[npc->poseId];
-    f32 t;
-    f32 a;
-
-    if (!(ext->flags & 2)) {
-        f32 c, s;
-        a = ext->rot; a = 450.0f - a;
-        if (a >= 360.0f) {
-            a -= 360.0f;
-        }
-        s = yuusintbl[(s32)a];
-        c = yuusintbl[(s32)a + 90];
-        ext->mtx[0][0] = c;
-        ext->mtx[2][2] = c;
-        ext->mtx[0][2] = s;
-        ext->mtx[2][0] = -s;
-    }
-    if (npc->flags & 4) {
-        t = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
-        t /= pose->frames * npc->animSpeed;
-    } else {
-        OSTime now = gp->renderTime;
-        t = 0.5f + 60.0f * OSTicksToMilliseconds(now - npc->time) / 1000.0f;
-        t /= pose->frames * npc->animSpeed;
-        if (t >= 1.0f) {
-            npc->time = now;
-            t = 0.0f;
-        }
-    }
-    switch (npc->flags & 0x300) {
-        case 0x100:
-        case 0x200:
-        case 0x300: {
-            f32 rot;
-            animPoseSetLocalTime(npc->npc->poseId, (s32)(pose->frames * t));
-            rot = 3600.0f + (90.0f - ext->rot);
-            npc->npc->rotation.y = rot - (s32)(rot / 360.0f) * 360;
-            npc->npc->position = npc->pos;
-            break;
-        }
-        case 0:
-            if (npc->poseId != yuunpc_wp->chusanPose) {
-                ext->frame = pose->start + (s32)(pose->count * t);
-            } else {
-                s32 k = 224.0f * t;
-                ext->frame = pose->start + (chusan_mov_tbl[k >> 3] ? chusan_act_tbl[k & 7] : 0);
-            }
-            break;
-    }
-    return t;
-}
-
 __declspec(section ".data") u64 fd_evt_yuunpc_negone_one_374 = 0xBF8000003F800000;
 
 __declspec(section ".data") s32 fd_evt_yuunpc_neg_one_382[] = {
@@ -499,6 +278,227 @@ s32 chusan_mov_tbl[] = {
 __declspec(section ".data") s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
+
+void yuunpc_pose_init(YuuNpcData* data) {
+    char name[32];
+    char anim[32];
+    s32 n = 0;
+    s32 start;
+    s32 i;
+
+    strcpy(name, "");
+    strcpy(anim, "");
+    yuunpc_wp->numPoses = -1;
+    do {
+        if (strcmp(data->name, name) != 0) {
+            strcpy(name, data->name);
+            strcpy(anim, "");
+        }
+        if (strcmp(data->anim, anim) != 0) {
+            strcpy(anim, data->anim);
+            start = n;
+            yuunpc_wp->numPoses++;
+        }
+        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].name, name);
+        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].anim, anim);
+        yuunpc_wp->pose[yuunpc_wp->numPoses].start = start;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].count = n - start + 1;
+        n++;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].frames += 1.0f;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x18 = 1;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].jump = 0.0f;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x30 = 2.0f;
+        data++;
+    } while (data->name != NULL);
+    data++;
+    yuunpc_wp->numPoses++;
+    yuunpc_wp->basePoseNum = yuunpc_wp->numPoses;
+    while (data->name != NULL) {
+        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].name, data->name);
+        strcpy(yuunpc_wp->pose[yuunpc_wp->numPoses].anim, data->anim);
+        yuunpc_wp->pose[yuunpc_wp->numPoses].start = start;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].count = 1;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].frames = data->frames;
+        data++;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x18 = 1;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].jump = 0.0f;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].field_0x30 = 1.0f;
+        yuunpc_wp->pose[yuunpc_wp->numPoses].flags |= 1;
+        yuunpc_wp->numPoses++;
+    }
+    for (i = 0; i < yuunpc_wp->basePoseNum; i++) {
+        if (strcmp(yuunpc_wp->pose[i].name, "c_tyusan") == 0 && strcmp(yuunpc_wp->pose[i].anim, "CHU_S_1") == 0) {
+            yuunpc_wp->chusanPose = i;
+            yuunpc_wp->pose[i].frames = 224.0f;
+        }
+    }
+}
+
+s32 yuunpc_pose_check(const char* name, const char* anim) {
+    YuuNpcPose* pose = yuunpc_wp->pose;
+    s32 i;
+
+    for (i = 0; i < yuunpc_wp->numPoses; i++, pose++) {
+        if (strcmp(pose->name, name) == 0 && strcmp(pose->anim, anim) == 0) {
+            break;
+        }
+    }
+    if (i >= yuunpc_wp->numPoses) {
+        return -1;
+    }
+    return i;
+}
+
+static inline void pose_change_inl(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
+    YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
+    YuuNpcPose* pose = &yuunpc_wp->pose[id];
+
+    if (speed <= 0.0f) {
+        npc->flags |= 4;
+        npc->poseId = id;
+        npc->animSpeed = 1.0f;
+        npc->time = OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
+    } else {
+        u16 flags = npc->flags;
+        npc->flags &= ~4;
+        if (npc->poseId == id) {
+            f32 old = npc->animSpeed;
+            if (old != speed) {
+                if (flags & 4) {
+                    frame = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
+                    frame /= pose->frames * old;
+                } else {
+                    frame = 60.0f * OSTicksToMilliseconds(gp->renderTime - npc->time) / 1000.0f;
+                    frame /= cur->frames * old;
+                }
+            } else {
+                return;
+            }
+        } else {
+            npc->poseId = id;
+        }
+        npc->animSpeed = speed;
+        npc->time = gp->renderTime - OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
+    }
+    switch (npc->flags & 0x300) {
+        case 0:
+            break;
+        case 0x100:
+        case 0x200:
+        case 0x300:
+            animPoseSetAnim(npc->npc->poseId, pose->anim, TRUE);
+            animPoseMain(npc->npc->poseId);
+            break;
+    }
+}
+
+void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame) {
+    YuuNpcPose* cur = &yuunpc_wp->pose[npc->poseId];
+    YuuNpcPose* pose = &yuunpc_wp->pose[id];
+
+    if (speed <= 0.0f) {
+        npc->flags |= 4;
+        npc->poseId = id;
+        npc->animSpeed = 1.0f;
+        npc->time = OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
+    } else {
+        u16 flags = npc->flags;
+        npc->flags = flags & ~4;
+        if (npc->poseId == id) {
+            f32 old = npc->animSpeed;
+            if (old != speed) {
+                if (flags & 4) {
+                    frame = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
+                    frame /= pose->frames * old;
+                } else {
+                    frame = 60.0f * OSTicksToMilliseconds(gp->renderTime - npc->time) / 1000.0f;
+                    frame /= cur->frames * old;
+                }
+            } else {
+                return;
+            }
+        } else {
+            npc->poseId = id;
+        }
+        npc->animSpeed = speed;
+        npc->time = gp->renderTime - OSMillisecondsToTicks(1000.0f * (frame * (pose->frames * npc->animSpeed)) / 60.0f);
+    }
+    switch (npc->flags & 0x300) {
+        case 0:
+            break;
+        case 0x100:
+        case 0x200:
+        case 0x300:
+            animPoseSetAnim(npc->npc->poseId, pose->anim, TRUE);
+            animPoseMain(npc->npc->poseId);
+            break;
+    }
+}
+
+void yuunpc_pose_change2(YuuNpc* npc, const char* name, const char* anim, f32 speed) {
+    pose_change_inl(npc, yuunpc_pose_check(name, anim), speed, rand() / 32767.0f);
+}
+
+void yuunpc_set_jump_pose(const char* name, const char* anim, f32 jump) {
+    s32 id = yuunpc_pose_check(name, anim);
+
+    if (id >= 0) {
+        yuunpc_wp->pose[id].jump = jump;
+    }
+}
+
+f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
+    YuuNpcPose* pose = &yuunpc_wp->pose[npc->poseId];
+    f32 t;
+    f32 a;
+
+    if (!(ext->flags & 2)) {
+        f32 c, s;
+        a = ext->rot; a = 450.0f - a;
+        if (a >= 360.0f) {
+            a -= 360.0f;
+        }
+        s = yuusintbl[(s32)a];
+        c = yuusintbl[(s32)a + 90];
+        ext->mtx[0][0] = c;
+        ext->mtx[2][2] = c;
+        ext->mtx[0][2] = s;
+        ext->mtx[2][0] = -s;
+    }
+    if (npc->flags & 4) {
+        t = 60.0f * OSTicksToMilliseconds(npc->time) / 1000.0f;
+        t /= pose->frames * npc->animSpeed;
+    } else {
+        OSTime now = gp->renderTime;
+        t = 0.5f + 60.0f * OSTicksToMilliseconds(now - npc->time) / 1000.0f;
+        t /= pose->frames * npc->animSpeed;
+        if (t >= 1.0f) {
+            npc->time = now;
+            t = 0.0f;
+        }
+    }
+    switch (npc->flags & 0x300) {
+        case 0x100:
+        case 0x200:
+        case 0x300: {
+            f32 rot;
+            animPoseSetLocalTime(npc->npc->poseId, (s32)(pose->frames * t));
+            rot = 3600.0f + (90.0f - ext->rot);
+            npc->npc->rotation.y = rot - (s32)(rot / 360.0f) * 360;
+            npc->npc->position = npc->pos;
+            break;
+        }
+        case 0:
+            if (npc->poseId != yuunpc_wp->chusanPose) {
+                ext->frame = pose->start + (s32)(pose->count * t);
+            } else {
+                s32 k = 224.0f * t;
+                ext->frame = pose->start + (chusan_mov_tbl[k >> 3] ? chusan_act_tbl[k & 7] : 0);
+            }
+            break;
+    }
+    return t;
+}
 
 void yuunpc_maphit_init(void) {
     signed char key[3] = "\x81\xA1";
@@ -837,7 +837,7 @@ void yuunpc_pose_minigame3_main(void) {
             z = ext->mtx[2][3];
             if (z < -570.0f) {
                 y = ext->mtx[1][3];
-                if ((x >= -5000.0f && x <= -1600.0f) || (x >= 1700.0f && x <= 5000.0f) || (x >= 6000.0f && x <= 7000.0f)) {
+                if ((x >= -1700.0f && x <= -1600.0f) || (x >= -50.0f && x <= 50.0f) || (x >= 1600.0f && x <= 1700.0f)) {
                     if (y > -500.0f) {
                         y += -1000.0f;
                         ext->mtx[1][3] = y;
@@ -1048,11 +1048,14 @@ void ext_yuunpc_minigame4_init_sub(void) {
     f32 ytbl[4] = {45.0f, 5.0f, -34.0f, -74.0f};
     f32 ztbl[8] = {-7.0f, -1.0f, 5.0f, -5.0f, 1.0f, 7.0f, -3.0f, 3.0f};
     s32 cnt[9] = {0, 0, 0, 0, 1, 1, 1, 2, 2};
+    Vec p0;
+    Vec p1;
+    Vec p2;
     s32 i;
     ExtPose* ext;
     YuuNpc* npc;
-    s32 n;
     s32 j;
+    s32 n;
     s32 k;
     s32 flag;
     s32 s;
@@ -1075,9 +1078,12 @@ void ext_yuunpc_minigame4_init_sub(void) {
     yuunpc_wp->flags |= 1;
     ext = extGetPosePtr();
     yuunpc_wp->slot[0] = yuunpc_wp->slot[1] = yuunpc_wp->slot[2] = -1;
-    npcNameToPtr("yuusp0")->position = (Vec){0.0f, -1000.0f, 0.0f};
-    npcNameToPtr("yuusp1")->position = (Vec){0.0f, -1000.0f, 0.0f};
-    npcNameToPtr("yuusp2")->position = (Vec){0.0f, -1000.0f, 0.0f};
+    p0 = (Vec){0.0f, -1000.0f, 0.0f};
+    npcNameToPtr("yuusp0")->position = p0;
+    p1 = (Vec){0.0f, -1000.0f, 0.0f};
+    npcNameToPtr("yuusp1")->position = p1;
+    p2 = (Vec){0.0f, -1000.0f, 0.0f};
+    npcNameToPtr("yuusp2")->position = p2;
     n = cnt[irand(9)];
     if (irand(10) == 0) {
         k = irand(3);
@@ -1146,15 +1152,16 @@ void ext_yuunpc_minigame4_init_sub(void) {
             s32 col;
             s32 m;
             f32 step;
+            s32 j2;
 
             npc->flags |= 2;
             m = i - 200;
             cols = yuu_sqrtf(700.0f);
             row = m / cols;
             col = m % cols;
-            for (j = 0; j < 3; j++) {
-                if (yuunpc_wp->slot[j] == i) {
-                    switch (j) {
+            for (j2 = 0; j2 < 3; j2++) {
+                if (yuunpc_wp->slot[j2] == i) {
+                    switch (j2) {
                         case 0:
                             npc->flags |= 0x100;
                             break;
@@ -1182,25 +1189,11 @@ void ext_yuunpc_minigame4_init_sub(void) {
             ext->mtx[0][3] = -(f32)row * step + -1520.0f - step * 0.5f * (col & 1);
             ext->mtx[1][3] = 0.0f;
             ext->mtx[2][3] = col * step - 120.0f + ztbl[row % 8] + 10.0f * ((npc->id % 101 - 50) / 50.0f);
-            {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-
-                pos.x = 3300.0f + ext->mtx[0][3];
-                pos.y = ext->mtx[1][3];
-                pos.z = ext->mtx[2][3];
-                npc->dest = pos;
-                npc->goal = npc->dest;
-            }
+            npc->dest = (Vec){3300.0f + ext->mtx[0][3], ext->mtx[1][3], ext->mtx[2][3]};
+            npc->goal = npc->dest;
             ext->rot = 270.0f;
             npc->animSpeed = 1.0f;
-            {
-                Vec pos = {0.0f, 0.0f, 0.0f};
-
-                pos.x = ext->mtx[0][3];
-                pos.y = ext->mtx[1][3];
-                pos.z = ext->mtx[2][3];
-                npc->pos = pos;
-            }
+            npc->pos = (Vec){ext->mtx[0][3], ext->mtx[1][3], ext->mtx[2][3]};
             switch (npc->flags & 0x300) {
                 case 0x100: {
                     f32 rot;
@@ -1505,7 +1498,7 @@ void yuunpc_pose_minigame4_main(void) {
                         }
                         if (dd > 16.666666f) {
                             dd = 300.0f * (1.0f - dd / 300.0f);
-                            npc->dest.x = npc->pos.x + dd * 0.5f;
+                            npc->dest.x = npc->pos.x + dd / 2.0f;
                         }
                     }
                     break;
@@ -1528,8 +1521,8 @@ void yuunpc_pose_minigame4_main(void) {
                     }
                     npc->dest.x = ((s32)((3600.0f + (px + off)) / 50.0f) + 1) * 50.0f - 3600.0f;
                     {
-                        f32 sp = ((npc->id % 101 - 50) / 50.0f) * (50.0f * (kind - 1) * 0.5f + 10.0f);
-                        npc->dest.z = npc->pos.z >= 0.0f ? 150.0f - 50.0f * kind * 0.5f + sp : -150.0f + 50.0f * kind * 0.5f + sp;
+                        f32 sp = ((npc->id % 101 - 50) / 50.0f) * (50.0f * (kind - 1) / 2.0f + 10.0f);
+                        npc->dest.z = npc->pos.z >= 0.0f ? 150.0f - 50.0f * kind / 2.0f + sp : -150.0f + 50.0f * kind / 2.0f + sp;
                     }
                     npc->dest.y = npc->pos.y;
                     break;

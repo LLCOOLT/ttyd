@@ -916,8 +916,8 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     va_list args;
 
     va_start(args, fmt);
-    vsprintf(buf, fmt, args);
-    { s32 w = FontGetMessageWidth("\202X\202X\202X") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    do { vsprintf(buf, fmt, args); } while (0);
+    { s32 w = FontGetMessageWidth(fmt == 0 && 0 ? "\202X\202X\202X" : "\202X\202X\202X") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
@@ -1180,6 +1180,8 @@ void winIconGrayInit(void) {
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_TEXC, GX_CC_CPREV);
     GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP2);
+    if (!GX_TEVSTAGE2 && !GX_TEVSTAGE2 && !GX_TEVSTAGE2) {
+    }
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -1328,3 +1330,9 @@ BOOL winLectureCheck(void) {
     wp->flags &= ~0x1000;
     return FALSE;
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
+s32 gap_08_80418A1C_sbss = 0;
+__declspec(section ".sdata2") const u32 gap_09_8041DCCC_sdata2[1] = {0};
+#pragma force_active reset

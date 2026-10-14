@@ -135,8 +135,7 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     y1 = 24.0f;
     wide = 352.0f;
     x0 = -width;
-    x0 /= 2.0f;
-
+    x0 *= 0.5f;
     for (pass = 1; pass >= 0; pass--) {
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);

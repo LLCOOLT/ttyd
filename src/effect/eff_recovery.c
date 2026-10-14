@@ -706,11 +706,11 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx tmp;
     Mtx base;
+    f32 w;
     f32 left;
     f32 right;
     f32 top;
     f32 bot;
-    f32 w;
 
     cam = camGetPtr(cameraId);
     type = work->type;

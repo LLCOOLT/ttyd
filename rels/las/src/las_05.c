@@ -961,8 +961,8 @@ static void senkaron_ext_main(void) {
                     }
                 }
                 if (hit != 0) {
-                    dist = k_sqrtf(adx * adx + adz * adz);
-                    s->vx = push + 3.0f * dx / dist;
+                    f32 d = k_sqrtf(adx * adx + adz * adz);
+                    s->vx = push + 3.0f * dx / d;
                     s->vy = randf(5.0f, 10.0f);
                     s->vz = randf(-5.0f, 10.0f);
                     s->state = 0x61;

@@ -79,6 +79,7 @@ void effLevelupMain(EffectEntry* effect) {
     Vec position = { 0.0f, 0.0f, 0.0f };
     s32 limit;
     s32 i;
+    EffLevelupWork* w;
     s32 done = 0;
 
     position.x = work->x;
@@ -145,6 +146,7 @@ void effLevelupMain(EffectEntry* effect) {
 
 void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     EffLevelupWork* work = effect->userdata;
+    EffLevelupWork* w;
     CameraEntry* cam;
     Mtx m0;
     Mtx rot;
@@ -152,7 +154,6 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx viewMtx;
     GXTexObj texObj;
     GXColor color;
-    EffLevelupWork* w;
     f32 dx;
     f32 dy;
     f32 halfScale = 0.5f;

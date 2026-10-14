@@ -28,7 +28,9 @@ typedef struct EffRecoverHeartN64Work {
     s32 flag;     // 0x44
 } EffRecoverHeartN64Work;
 
-const GXColor unk_80423238;
+
+#ifdef __MWERKS__
+#endif
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_803A4A60 = 0xBF8000003F800000;
@@ -110,6 +112,7 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 i;
     s32 k;
 
+
     effect = effEntry();
     effect->type = "RecoverHeartN64";
     effect->count = 2;
@@ -130,7 +133,9 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     }
     work->count = count;
     k = 0;
+
     for (i = 1; i < 2; i++) {
+
         p = &work[i];
         p->position.x = 0.0f;
         p->position.y = 0.0f;
@@ -147,7 +152,8 @@ EffectEntry* effRecoverHeartN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z) {
             p->scaleH = 0.0f;
             p->velY = 1.4f;
         } else {
-            p->position.x = ((i & 1) * 2 - 1) * (i / 2) * 4;
+            k = (i & 1) * 2 - 1;
+            p->position.x = k * ((i - 1) >> 1) * 4;
             p->velY = 1.4f;
             p->delay = 11;
             p->scaleW = 0.0f;
@@ -165,6 +171,7 @@ void effRecoverHeartMain(EffectEntry* effect) {
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
+    s32 k;
     f32 ang;
     f32 fade;
 
@@ -215,8 +222,15 @@ void effRecoverHeartMain(EffectEntry* effect) {
 }
 
 void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 j;
     CameraEntry* camera;
     EffRecoverHeartN64Work* work;
+    s32 i;
+    s32 count;
+    s32 type;
+    s32 flag;
+    s32 k;
+    s32 tex;
     Mtx mtx;
     Mtx scale;
     Mtx rot;
@@ -224,15 +238,6 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx m60;
     Mtx m30;
     GXTexObj texObj;
-    s32 flag;
-    s32 type;
-    s32 count;
-    s32 i;
-    s32 tens;
-    s32 ones;
-    s32 ty;
-    s32 j;
-    GXColor color;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -248,16 +253,11 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetCullMode(GX_CULL_NONE);
-    ty = 0x160 - count * 32;
-    tens = count / 10;
-    ones = count % 10;
     for (i = 1; i < effect->count; i++, work++) {
         if (work->delay > 0) {
             continue;
         }
-        color = unk_80423238;
-        color.a = work->alpha;
-        GXSetTevColor(GX_TEVREG0, color);
+        GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, work->alpha});
         if (work->alpha == 255) {
             GXSetNumTevStages(1);
             GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
@@ -273,11 +273,16 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_TEXC, GX_CC_RASC, GX_CC_ZERO);
             GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
         }
-        if (type == 0 || type == 2) {
-            effGetTexObjN64(flag != 0 ? 0x51 : 0x50, &texObj);
+        tex = (type == 0 || type == 2);
+        if (tex) {
+            tex = 0x51;
+            if (flag == 0) {
+                tex = 0x50;
+            }
         } else {
-            effGetTexObjN64(0x52, &texObj);
+            tex = 0x52;
         }
+        effGetTexObjN64(tex, &texObj);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         PSMTXScale(scale, 0.03125f, 0.03125f, 0.0f);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
@@ -304,7 +309,7 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
                 effGetTexObjN64(0x53, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 PSMTXScale(scale, 0.03125f, 0.0026041667f, 0.0f);
-                PSMTXTrans(mtx, 0.0f, (f32)ty, 0.0f);
+                PSMTXTrans(mtx, 0.0f, (f32)(0x160 - count * 32), 0.0f);
                 PSMTXConcat(scale, mtx, scale);
                 GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
                 if (type == 0) {
@@ -318,14 +323,12 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
                 GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
                 tri2(0, 1, 2, 0, 0, 2, 3, 0);
             } else {
-                j = 10;
-                if (flag == 0) {
-                    j = tens;
-                }
+                k = count % 10;
+                j = (flag == 0) ? count / 10 : 10;
                 effGetTexObjN64(0x53, &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 PSMTXScale(scale, 0.03125f, 0.0026041667f, 0.0f);
-                PSMTXTrans(mtx, 0.0f, (f32)(0x160 - ones * 32), 0.0f);
+                PSMTXTrans(mtx, 0.0f, (f32)(0x160 - k * 32), 0.0f);
                 PSMTXConcat(scale, mtx, scale);
                 GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
                 if (type == 0) {

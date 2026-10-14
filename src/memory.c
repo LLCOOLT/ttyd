@@ -82,28 +82,13 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
     }
     OSSetArenaLo((void* ) arenaHi);
     for (i = 0; i < 6; i++) {
-        OSDestroyHeap(heapHandle[i]);
-        OSCreateHeap(heapStart[i], heapEnd[i]);
-        if (i == 1) {
-            size = ((u32)heapEnd[1] - (u32)heapStart[1]) - 0x20;
-            entry = OSAllocFromHeap(heapHandle[1], size);
-            if (entry) {
-                memset(entry, 0, size);
-                DCFlushRange(entry, size);
-            }
-            entry->next = 0;
-            entry->size = size - 0x20;
-            entry->inuse = 0;
-            mapalloc_base_ptr = entry;
-            mapalloc_size = size;
-            count = 0;
-        }
+        memClear(i);
     }
 }
 
 void memClear(HEAP_TYPE heap) {
-	u32 size;
 	MapAllocEntry* entry;
+	u32 size;
 
 	OSDestroyHeap(heapHandle[heap]);
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
@@ -402,6 +387,7 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 	smartEntry* entry1;
 	smartEntry* entry2;
 	int i;
+	u32 sz = size;
 
 	if (!g_bFirstSmartAlloc) {
 		g_bFirstSmartAlloc = TRUE;
@@ -435,17 +421,17 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		entry2->next->prev = entry2->prev;
 	}
 
-	if (size & 31) {
-		size += 32 - (size & 31);
+	if (sz & 31) {
+		sz += 32 - (sz & 31);
 	}
 
 	entry2->field_0xC = 1;
 	entry2->type = type;
-	entry2->size = size;
+	entry2->size = sz;
 	entry2->field_0x8 = 0;
-	if (wp->bytesLeft >= size) {
+	if (wp->bytesLeft >= sz) {
 		entry2->address = wp->ptr;
-		entry2->field_0x10 = wp->bytesLeft - size;
+		entry2->field_0x10 = wp->bytesLeft - sz;
 		entry2->next = wp->field_0xE008;
 		entry2->prev = NULL;
 		wp->bytesLeft = 0;
@@ -454,16 +440,16 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 		}
 		wp->field_0xE008 = entry2;
 		if (!entry2->next) {
-			entry2->field_0x10 = (u32)wp->ptr + (u32)heapEnd[5] - (u32)heapStart[5] - 32 - (u32)entry2->address - entry2->size;
+			entry2->field_0x10 = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
 			wp->field_0xE00C = entry2;
 		}
 		return entry2;
 	}
 	else {
 		for (entry1 = wp->field_0xE008; entry1; entry1 = entry1->next) {
-			if (entry1->field_0x10 >= size) {
+			if (entry1->field_0x10 >= sz) {
 				entry2->address = (void*)((u32)entry1->address + entry1->size);
-				entry2->field_0x10 = entry1->field_0x10 - size;
+				entry2->field_0x10 = entry1->field_0x10 - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
 				entry1->field_0x10 = 0;
@@ -490,9 +476,9 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 			}
 			smartGarbage();
 			entry1 = wp->field_0xE00C;
-			if (entry1->field_0x10 >= size) {
+			if (entry1->field_0x10 >= sz) {
 				entry2->address = (void*)((u32)entry1->address + entry1->size);
-				entry2->field_0x10 = entry1->field_0x10 - size;
+				entry2->field_0x10 = entry1->field_0x10 - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
 				entry1->field_0x10 = 0;
@@ -553,7 +539,7 @@ void smartGarbage(void) {
 	}
 	entry = wp->field_0xE00C;
 	if (entry) {
-		entry->field_0x10 = (u32)(((u8*)heapEnd[5] - (u8*)heapStart[5]) + (u8*)wp->ptr - 32) - (u32)entry->address - entry->size;
+		entry->field_0x10 = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
 	}
 	DCFlushRange(wp->ptr, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 }

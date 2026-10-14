@@ -167,9 +167,9 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     effN64Vtx* vtx;
     s32 k;
+    effN64Vtx* p;
     s32 n;
     s32 t;
-    effN64Vtx* p;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;

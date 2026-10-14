@@ -205,16 +205,16 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             PSMTXConcat(base, m38, m38);
             GXLoadPosMtxImm(m38, GX_PNMTX0);
             c0 = unk_804231a8;
-            c0.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
-            c0.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
-            c0.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
+            c0.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)-(s32)a[1] * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f) + 1.0f)));
+            c0.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)-(s32)a[2] * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f) + 1.0f)));
+            c0.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)-(s32)a[3] * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f) + 1.0f)));
             c0.a = alpha;
             GXSetTevColor(GX_TEVREG0, c0);
             c1 = (GXColor){0, 0, 0, 255};
 
-            c1.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
-            c1.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
-            c1.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(gp->retraceCount * 32 + a[0]) / 360.0f))));
+            c1.r = (u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f) + 1.0f)));
+            c1.g = (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f) + 1.0f)));
+            c1.b = (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * ((f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f) + 1.0f)));
             GXSetTevColor(GX_TEVREG1, c1);
             if (type == 0) sz = 15; else sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);

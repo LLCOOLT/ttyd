@@ -24,6 +24,7 @@ typedef struct FanAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 st
 typedef struct FanWork { s32 num; Fan* fans; s32 animNum; FanAnim anim[32]; s32 hammerTimer; s32 count; s32 sfxId; u8 vol; } FanWork;
 typedef struct FanData { const char* name; const char* anim; f32 rate; } FanData;
 FanWork* fan_wp;
+static s32 fan_bss_pad;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 static void pose_init(void);
@@ -1429,7 +1430,7 @@ void ext_fan_init(void) {
             fan->vel = (Vec){0.0f, 0.0f, 0.0f};
         }
     }
-    fan_wp->sfxId = psndSFXOn_3D("SFX_STG3_AUDIENCE_FAN1", &(Vec){0.0f, 0.0f, 0.0f});
+    fan_wp->sfxId = psndSFXOn_3D("SFX_STG3_AUDIENCE_FAN1\0", &(Vec){0.0f, 0.0f, 0.0f});
     fan_wp->vol = psndSFX_get_vol(fan_wp->sfxId);
 }
 
@@ -1545,8 +1546,7 @@ void ext_fan_main(void) {
         f32 z;
         f32 dir2;
 
-        sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1";
-        sfx2 = sfx1;
+        sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1"; sfx2 = sfx1;
         for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++) {
             if (fan->state == 0) {
                 switch (check_hammer(fan)) {
@@ -1572,7 +1572,7 @@ void ext_fan_main(void) {
                         dist = distABf(fan->pos.x, fan->pos.z, fan->target.x, fan->target.z);
                         angleABf(fan->pos.x, fan->pos.z, fan->target.x, fan->target.z);
                         fan->timer = dist / fan->param.y;
-                        fan->param.x = dy / fan->timer + fan->param.z * fan->timer * 0.5f;
+                        fan->param.x = dy / fan->timer + fan->param.z * fan->timer / 2.0f;
                         psndSFXOn_3D(sfx1, &fan->pos);
                         break;
                     case 2: {
@@ -1580,9 +1580,9 @@ void ext_fan_main(void) {
 
                         angle = angleABf(mario->position.x, mario->position.z, fan->pos.x, fan->pos.z);
                         dir2 = cloudGetBreathDir();
-                        angle = (angle + dir2) * 0.5f;
                         fan->state = 20;
                         fan->target = zero;
+                        angle = (angle + dir2) / 2.0f;
                         spd = randf(0.1f, 0.2f);
                         angle = 6.2831855f * angle / 360.0f;
                         fan->param.x = spd * fan_sin(angle);
@@ -1605,7 +1605,7 @@ void ext_fan_main(void) {
         f32 h;
 
         pose = extGetPosePtr();
-        for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++, pose++) {
+        for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, pose++, fan++) {
             switch (fan->state) {
                 case 0:
                     PSVECNormalize(&fan->vel, &fan->vel);

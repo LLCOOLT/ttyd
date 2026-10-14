@@ -934,9 +934,9 @@ void bmapLoad(const char* map, const char* map2) {
 	int i;
 
 	sysWaitDrawSync();
-	wp = mapWork;
+	wp = &mapWork[0];
 	activeGroup = 0;
-	for (i = 0, entry = wp->entries; i < wp->entries[0].count; i++, entry++) {
+	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
 		e = &mapWork[activeGroup].entries[i];
 		if (MAPENT_FIELD(e, void*, 0x16C)) {
 			_mapFree(MAPENT_FIELD(e, void*, 0x16C));
@@ -2607,8 +2607,8 @@ MapFileJoint* mapSearchDmdJoint(MapFileJoint* joint, const char* name) {
 }
 
 MapObject* mapGetMapObj(const char *name) { // 1:1
-    MapEntry* entry;
     MapWork *wp;
+    MapEntry* entry;
     int j;
     int i;
     MapObject *object;

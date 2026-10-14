@@ -2963,12 +2963,12 @@ void screen_tev(MapTevCallbackInfo* info) {
     Mtx trans;
     s32 i;
     s32 j;
-    u8* buf;
     s32 k;
     s32 n;
     s32 len;
     s32 start;
     u8 col;
+    u8* buf;
     f32 lim;
     f32 x;
     f32 y;
@@ -3045,8 +3045,7 @@ void screen_tev(MapTevCallbackInfo* info) {
         }
         GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
         GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
-        y = camGetPtr(CAMERA_3D)->cameraPos.z;
-        x = 100.0f - y;
+        x = 100.0f - camGetPtr(CAMERA_3D)->cameraPos.z;
         PSMTXScale(mtx, 1.0f, 6.0f * (x / 1000.0f) + 16.0f, 1.0f);
         GXSetTexCoordGen(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1);
         GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);

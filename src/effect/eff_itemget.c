@@ -198,7 +198,7 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     Vec up = { 0.0f, 1.0f, 0.0f };
     Vec target = { 0.0f, 0.0f, 0.0f };
     f32 scale, s, k;
-    f32 a, b, d, w, h;
+    f32 a, b, h, w, d;
     s32 alpha;
     s32 i;
     s32 al;
@@ -286,8 +286,8 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
     w = 42.666668f;
-    d = -w;
     h = 10.666667f;
+    d = -w;
     a = -h / 2.0f;
     b = 5.3333335f;
     work++;

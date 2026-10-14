@@ -294,8 +294,8 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const char* str) {
 }
 extern char* msgGetCommand(char* msg, char* cmd, char* arg);
 static inline void fontDrawPairX(u16 code, f32 x, f32 y) {
-	s16 ix = x;
 	s16 iy = y;
+	s16 ix = x;
 	_JUTFont_DrawPos(code, ix - 2, iy);
 	_JUTFont_DrawPos(code, ix + 2, iy);
 }
@@ -929,7 +929,7 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	FontWidthEntry* entry;
 	BinaryFontGlyph* glyph;
 	s32 idx, cell, col, row;
-	f32 cellh, cellw, h, tu, w, tw;
+	f32 cellh, cellw, tu, w, h, tw;
 	u8 n0, n1, hue;
 	s16 x0, y0, x1, y1;
 	u16 u0, u1, v0, v1;
@@ -959,10 +959,9 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	n1 = irand(64);
 	tv = row * cellh;
 	x1 = x0 + w;
-	hue = x0 - (u8)gp->retraceCount * 2;
-
-	v0 = scale + tv;
 	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
+	hue = x0 - (u8)gp->retraceCount * 2;
+	v0 = scale + tv;
 	GXPosition3s16(x0, y0, 0);
 	hsv.r = x0 + hue;
 	c = HSV2RGB(hsv);

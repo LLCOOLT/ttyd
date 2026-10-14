@@ -25,6 +25,9 @@ s32 badge_bottakuru_table[] = { //Charlieton Rogueport
 	ITEM_DOUBLE_PAIN, ITEM_JUMPMAN, ITEM_HAMMERMAN, ITEM_ATTACK_FX_G,
 	ITEM_SLOW_GO, ITEM_MEGA_RUSH, ITEM_TIMING_TUTOR, ITEM_W_EMBLEM, ITEM_NULL
 };
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803AA21C_data[1] = {0};
+#pragma force_active reset
 
 //.sdata
 s32 badge_special_table[] = { //Lovely Howz of Badges
@@ -85,9 +88,16 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
 
 //.bss
 BadgeShopWork badgeshopwork;
+#pragma force_active on
+__declspec(section ".data") u32 gap_06_803E1894_bss[1];
+#pragma force_active reset
+
 
 //.sbss
 BadgeShopWork* bdsw;
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_08_80418B1C_sbss[1];
+#pragma force_active reset
 
 //local prototypes
 s32 bottakuruComp(const void** sortA, const void** sortB);
@@ -150,9 +160,9 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
 	int j, n;
+	s32* p;
 	s32 i;
 	u32 dobreak;
-	s32* p;
 	u32 k;
 	s16 count;
 
@@ -162,12 +172,12 @@ void badgeShop_bottakuruGeneration(void) {
 	}
 
 	dobreak = 0;
+	p = (s32*)table;
 	for (i = 0; i < BADGE_MAX - 1; i++) {
 		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
 		for (j = 0; j < count; j++) {
-			table[dobreak][1] = irand(100);
-			((s32*)table)[dobreak*2] = i + 1;
-			dobreak++;
+			p[dobreak*2+1] = irand(100);
+			p[dobreak++*2] = i + 1;
 			if (dobreak >= 0x10) break;
 		}
 		if (dobreak >= 0x10) break;
@@ -178,10 +188,11 @@ void badgeShop_bottakuruGeneration(void) {
 	i = 0;
 	do { //only 4 slots
 		for (k = 0; k < 0x11u; k++) {
-			if (table[i][0] == badge_bottakuru_table[k]) {
+			if (p[0] == badge_bottakuru_table[k]) {
 				evtSetValue(NULL, i + GSW(118), k);
 			}
 		}
+		p += 2;
 	} while (++i < 4);
 }
 
@@ -298,17 +309,17 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 	}
 
 	memset(table, 0, sizeof(table));
-	v7 = 0;
-	bdsw->field_0xF8[0] = v7;
-	bdsw->field_0xF8[1] = v7;
-	bdsw->field_0xF8[2] = v7;
-	bdsw->field_0xF8[3] = v7;
-	bdsw->field_0xF8[4] = v7;
-	bdsw->field_0x10C = v7;
-	bdsw->field_0x110 = v7;
+	count2 = 0;
+	bdsw->field_0xF8[0] = 0;
+	bdsw->field_0xF8[1] = 0;
+	bdsw->field_0xF8[2] = 0;
+	bdsw->field_0xF8[3] = 0;
+	bdsw->field_0xF8[4] = 0;
+	bdsw->field_0x10C = 0;
+	bdsw->field_0x110 = 0;
 
 	count = 0;
-	count2 = 0;
+
 	for (i = 0; i < 99; i++) {
 		value = 0;
 		has = badgeShop_get(bdsw->special_table, (s16)(i + BADGE_MIN)); //inline

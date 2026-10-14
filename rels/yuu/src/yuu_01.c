@@ -957,6 +957,7 @@ static USER_FUNC(re_fall_rtn) {
 
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
+    const char* sfx;
     BOOL exists = FALSE;
     FuneWork* data = wp->data;
     s32 total;
@@ -969,7 +970,6 @@ static USER_FUNC(fall_rtn) {
     f32 hi;
     Vec v;
     Monte* m;
-    const char* sfx;
 
     if (isFirstCall) {
         if (monte_p != NULL) {

@@ -405,13 +405,13 @@ void winPartyMain2(WinPartyWork* wp) {
 static const GXColor winPartyWhiteC = {0xFF, 0xFF, 0xFF, 0xFF};
 static const GXColor winPartyBlackC = {0x00, 0x00, 0x00, 0xFF};
 void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
-    GXColor white2 = winPartyWhiteC;
-    GXColor black2 = winPartyBlackC;
+    GXColor white2;
+    GXColor black2;
     GXColor red[1];
-    GXColor white0 = winPartyWhiteC;
-    GXColor black0 = winPartyBlackC;
-    GXColor white = winPartyWhiteC;
-    GXColor black = winPartyBlackC;
+    GXColor white0;
+    GXColor black0;
+    GXColor white;
+    GXColor black;
     PouchPartyData* pd;
     f32 scale;
     f32 tx;
@@ -430,6 +430,12 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     const char* animName;
     const char* name;
 
+    white2 = winPartyWhiteC;
+    white = winPartyWhiteC;
+    white0 = winPartyWhiteC;
+    black2 = winPartyBlackC;
+    black = winPartyBlackC;
+    black0 = winPartyBlackC;
     x = wp->pos[idx].x;
     y = wp->pos[idx].y;
     winBgGX(wp, 1, x, y);
@@ -495,7 +501,7 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
         PSMTXRotRad(ry, 'y', 0.017453292f * (360.0f / wp->count * i - wp->angle));
         PSMTXMultVec(ry, &v, &v);
         PSMTXMultVec(rx, &v, &v);
-        winKageGX(wp, (GXColor){0x00, 0x00, 0x00, 0x80}, (x - 140.0f) + v.x, 20.0f + (y + v.y), v.z, (i != wp->cursor) ? 0.6f : 0.8f);
+        winKageGX(wp, (GXColor){0x00, 0x00, 0x00, 0x80}, (x - 140.0f) + v.x, 20.0f + (y + v.y), v.z, (i == wp->cursor) ? 0.8f : 0.6f);
     }
 
     for (i = 0; i < wp->count; i++) {

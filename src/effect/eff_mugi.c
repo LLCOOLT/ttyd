@@ -17,6 +17,7 @@ double cos(double);
 
 extern GlobalWork* gp;
 
+
 typedef struct effMugiKemuriData {
 	s32 flag; //0x0
 	s32 field_0x4; //0x4
@@ -41,6 +42,10 @@ typedef struct effMugiKemuriData {
 
 void effMugiKemuriMain(EffectEntry* effect);
 void effMugiKemuriDisp(CameraId camId, void* param);
+
+inline f32 inline_fn(effMugiKemuriData *arg0) {
+	return 6.2831855f * reviseAngle(arg0->rot.y);
+}
 
 EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	EffectEntry* effect;
@@ -77,7 +82,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 		data->jy = 0.0f;
 		data->ky = 0.0f;
 		data->speed = -3.9f;
-		rad = 6.2831855f * reviseAngle(data->rot.y) / 360.0f;
+		rad = inline_fn(data) / 360.0f;
 		data->dirX = (f32)sin(rad);
 		data->dirZ = (f32)cos(rad);
 		data->poseId = -1;
@@ -138,11 +143,11 @@ EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 angle, f32 d
 }
 
 void effMugiKemuriMain(EffectEntry* effect) {
-	s32 group;
-	s32 alive;
+	s32 i;
 	effMugiKemuriData* data;
 	effMugiKemuriData* p;
-	s32 i;
+	s32 alive;
+	s32 group;
 	const char* name;
 	Vec pos2;
 	Vec pos = {0.0f, 0.0f, 0.0f};
@@ -213,6 +218,7 @@ void effMugiKemuriMain(EffectEntry* effect) {
 
 	dispEntry(CAMERA_3D, dispCalcZ(&pos2), 2, effMugiKemuriDisp, effect);
 }
+
 
 void effMugiKemuri2Main(EffectEntry* effect) {
 	s32 i;

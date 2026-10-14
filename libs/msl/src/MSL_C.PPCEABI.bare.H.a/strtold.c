@@ -23,9 +23,9 @@ extern unsigned char __ctype_map[];
 extern unsigned char __upper_map[];
 extern float __float_huge[];
 extern float __float_nan[];
-extern double __double_huge;
-extern double __extended_min;
-extern double __extended_max;
+extern double __double_huge[];
+extern double __extended_min[];
+extern double __extended_max[];
 extern double __dec2num(const decimal*);
 
 #define __control_char 0x01
@@ -85,36 +85,35 @@ enum hex_scan_states {
 #define unfetch(c) (*ReadProc)(ReadProcArg, c, __UngetAChar)
 
 long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* ReadProcArg, int* chars_scanned, int* overflow) {
-    int dec_exp = 0;
+    decimal d = {0, 0, 0, {0, ""}};
+    char* ip;
+    int scan_state = start;
+    int hex_digits = 0;
+    int nan_index;
     int hex_exp_digits = 0;
-    int spaces = 0;
-    short hex_exp = 0;
     union {
-        double v;
+        long double v;
         unsigned char b[8];
         short s;
         unsigned long long u;
     } r;
     unsigned char* buf = r.b;
-    int hex_digits = 0;
-    int exp_value = 0;
-    decimal d = {0};
-    int radix = *(unsigned char*)__lconv.decimal_point;
-    int hex_dig_count = 0;
+    int exp_negative = 0;
+    int hex_dig_count;
     int c;
-    int inf_index;
-    int nan_index;
     int n_index;
-    char* ip;
     char* np;
-    int scan_state = start;
     int sign = 0;
     int hex_scan_state = not_hex;
-    int exp_negative = 0;
     int sign_detected = 0;
     int hex_exp_negative = 0;
     int count = 0;
-
+    int spaces = 0;
+    int exp_value = 0;
+    int dec_exp = 0;
+    short hex_exp = 0;
+    int radix = *(unsigned char*)__lconv.decimal_point;
+    int inf_index;
     *overflow = 0;
     c = fetch();
 
@@ -176,8 +175,8 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
             if (nan_index == 3 || nan_index == 4) {
                 if (nan_index == 4) {
                     while (n_index < 32 && (isdigit(c) || isalpha(c))) {
-                        c = fetch();
                         n_index++;
+                        c = fetch();
                     }
                     if (c != ')') {
                         scan_state = failure;
@@ -186,7 +185,7 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     n_index++;
                 }
                 r.v = sign ? -__float_nan[0] : __float_nan[0];
-                *chars_scanned = spaces + (nan_index + n_index + sign_detected);
+                *chars_scanned = spaces + nan_index + n_index + sign_detected;
                 return r.v;
             }
             scan_state = failure;
@@ -299,7 +298,7 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                 scan_state = finished;
                 break;
             }
-            exp_value = exp_value * 10 + c - '0';
+            exp_value = exp_value * 10 + (c - '0');
             if (exp_value > 0x7fff) {
                 *overflow = 1;
             }
@@ -308,7 +307,7 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
         case hex_state:
             switch (hex_scan_state) {
             case hex_start:
-                r.b[0] = r.b[1] = r.b[2] = r.b[3] = r.b[4] = r.b[5] = r.b[6] = r.b[7] = 0;
+                r.b[0] = 0; r.b[1] = 0; r.b[2] = 0; r.b[3] = 0; r.b[4] = 0; r.b[5] = 0; r.b[6] = 0; r.b[7] = 0;
                 hex_digits = 2;
                 hex_scan_state = leading_hex_zeroes;
                 c = fetch();
@@ -336,14 +335,14 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     int u;
                     hex_dig_count++;
                     u = toupper(c);
-                    dig = (u < 'A') ? u - '0' : u - 'A' + 10;
+                    if (u >= 'A') u = u - 'A' + 10; else u -= '0';
+                    dig = u;
                     if (hex_digits % 2) {
                         t |= dig;
                     } else {
                         t |= dig << 4;
                     }
-                    buf[hex_digits / 2] = t;
-                    hex_digits++;
+                    buf[hex_digits++ / 2] = t;
                     c = fetch();
                     break;
                 }
@@ -359,14 +358,14 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     unsigned char dig;
                     int u;
                     u = toupper(c);
-                    dig = (u < 'A') ? u - '0' : u - 'A' + 10;
+                    if (u >= 'A') u = u - 'A' + 10; else u -= '0';
+                    dig = u;
                     if (hex_digits % 2) {
                         t |= dig;
                     } else {
                         t |= dig << 4;
                     }
-                    buf[hex_digits / 2] = t;
-                    hex_digits++;
+                    buf[hex_digits++ / 2] = t;
                     c = fetch();
                     break;
                 }
@@ -399,8 +398,8 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                 }
                 if (c == '0') {
                     hex_scan_state = 0x80;
-                    c = fetch();
                     hex_exp_digits++;
+                    c = fetch();
                 } else {
                     hex_scan_state = p_exp_digit_loop;
                 }
@@ -410,12 +409,12 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                     scan_state = finished;
                     break;
                 }
-                hex_exp = hex_exp * 10 + c - '0';
+                hex_exp = hex_exp * 10 + (c - '0');
                 if (exp_value > 0x7fff) {
                     *overflow = 1;
                 }
-                c = fetch();
                 hex_exp_digits++;
+                c = fetch();
                 break;
             }
             break;
@@ -425,7 +424,7 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     if (!success(scan_state)) {
         *chars_scanned = 0;
     } else {
-        *chars_scanned = count + spaces - 1;
+        *chars_scanned = count - 1 + spaces;
     }
     unfetch(c);
 
@@ -453,17 +452,17 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
                 return 0.0;
             }
             if (sign) {
-                return -__double_huge;
+                return -__double_huge[0];
             }
-            return __double_huge;
+            return __double_huge[0];
         }
         d.exp = exp_value;
         r.v = __dec2num(&d);
-        if (r.v != 0.0 && r.v < __extended_min) {
+        if (r.v != 0.0 && r.v < __extended_min[0]) {
             *overflow = 1;
-        } else if (r.v > __extended_max) {
+        } else if (r.v > __extended_max[0]) {
             *overflow = 1;
-            r.v = __double_huge;
+            r.v = __double_huge[0];
         }
         if (sign && scan_state) {
             r.v = -r.v;
@@ -471,24 +470,24 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
         return r.v;
     }
 
-    if (r.v != 0.0) {
+    if (r.v) {
         if (hex_exp_negative) {
             hex_exp = -hex_exp;
         }
-        while ((r.s & 0xf0) != 0x10) {
+        while ((*(short*)buf & 0xf0) != 0x10) {
             hex_exp++;
             r.u >>= 1;
         }
         r.s &= 0xf;
         hex_exp += (hex_dig_count - 1) * 4;
         r.s |= (hex_exp + 0x3ff) << 4;
-        *chars_scanned = spaces + (sign_detected + hex_digits + 1 + hex_exp_digits);
-        if (0.0 != r.v && r.v < __extended_min) {
+        *chars_scanned = spaces + sign_detected + hex_digits + 1 + hex_exp_digits;
+        if (0.0 != r.v && r.v < __extended_min[0]) {
             r.v = 0.0;
             *overflow = 1;
-        } else if (r.v > __extended_max) {
+        } else if (r.v > __extended_max[0]) {
             *overflow = 1;
-            r.v = __double_huge;
+            r.v = __double_huge[0];
         }
         if (sign) {
             r.s |= 0x8000;

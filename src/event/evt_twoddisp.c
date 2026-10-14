@@ -208,3 +208,7 @@ EVT_END()
 
 __declspec(section ".sdata2") const GXColor unk_80423048;
 __declspec(section ".sdata2") const GXColor unk_8042304c;
+
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80411DDC_sdata[1] = {0};
+#pragma force_active reset

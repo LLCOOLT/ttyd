@@ -39,8 +39,8 @@ typedef struct KemuTestWork {
 } KemuTestWork;
 
 
-static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
 static f32 bom_spd[10] = { 2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f };
+static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
 
 static void effKemuTestMain(EffectEntry* effect);
 void effKemuTestDisp(CameraId cameraId, void* param);
@@ -135,7 +135,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     work->rx = 0.0f;
     work->rz = 0.0f;
     work++;
-    for (i = 1; i < effect->count; i++, work++) {
+    for (i = 1; i < (count = effect->count); i++, work++) {
         switch (type) {
         case 0:
         case 15:
@@ -178,7 +178,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
                 work->pos.x = a[i - 1];
                 work->pos.y = b[i - 1];
                 work->scale = c[i - 1];
-                work->delay = 4;
+                work->delay = i * 4;
                 work->r = 0x78;
                 work->g = 0x78;
                 work->b = 0x78;
@@ -237,9 +237,10 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             work->b = 0xff;
             work->delay = 0;
             if (type == 4 || type == 13) {
-                f32 ang, spd;
-                ang = 6.2831855f * (90.0f + bom_dir[i - 1]) / 360.0f;
+                f32 ang;
+                f32 spd;
                 spd = 2.0f * bom_spd[i - 1];
+                ang = 6.2831855f * (90.0f + bom_dir[i - 1]) / 360.0f;
                 work->vel.x = spd * (f32)sin(ang);
                 work->vel.y = -spd * (f32)cos(ang);
                 work->scale = 1.0f;
@@ -271,8 +272,8 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
                 work->scale = 0.5f;
             } else if (type == 9 || type == 17 || type == 20) {
                 f32 ang = (f32)irand(0x168);
-                f32 spd;
                 f32 a2;
+                f32 spd;
                 if (i < (effect->count - 1) / 2 + 1) {
                     spd = 4.5f;
                 } else {
@@ -332,12 +333,12 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
         case 7: {
             f32 a, s;
             s = 1.0f + (f32)irand(0x28) / 10.0f;
-            a = 6.2831855f * (135.0f - 90.0f * ((f32)(i - 1) / (f32)(n - 2))) / 360.0f;
             work->pos.x = 0.0f;
             work->pos.y = 0.0f;
             work->pos.z = 0.0f;
             work->life = 0x3c;
             work->frame = 0;
+            a = 6.2831855f * (135.0f - 90.0f * ((f32)(i - 1) / (f32)(count - 2))) / 360.0f;
             work->vel.x = s * (f32)cos(a);
             work->vel.y = s * (f32)sin(a);
             work->delay = irand(0x10);
@@ -349,8 +350,10 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
         }
         case 8: {
             f32 ang = (f32)irand(0x168);
-            f32 s = 2.0f * ((f32)irand(0x28) / 10.0f) + 1.0f;
-            f32 a = 6.2831855f * ang / 360.0f;
+            f32 a;
+            f32 s;
+            s = 2.0f * ((f32)irand(0x28) / 10.0f) + 1.0f;
+            a = 6.2831855f * ang / 360.0f;
             work->pos.x = 0.0f;
             work->pos.y = 0.0f;
             work->pos.z = 0.0f;
@@ -366,7 +369,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             break;
         }
         case 11: {
-            f32 a = 6.2831855f * (360.0f * (f32)(i - 1) / (f32)(n - 2)) / 360.0f;
+            f32 a = 6.2831855f * (360.0f * (f32)(i - 1) / (f32)(count - 2)) / 360.0f;
             work->pos.x = 0.0f;
             work->pos.y = 0.0f;
             work->pos.z = 0.0f;

@@ -67,7 +67,7 @@ void DrawMenuPinchMark(void);
 #include "driver/camdrv.h"
 #include "driver/icondrv.h"
 #include "pmario_sound.h"
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
+void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, const char* name, s32 cost, s32 p34, void* party, s32 y);
 void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s);
 void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s);
 BOOL BattleCommandCheckChangePositionEnable(BattleWork* wp);
@@ -216,7 +216,7 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     const char* name;
-    s16 icon;
+    u16 icon;
     f32 rad;
     f32 ofs;
 
@@ -259,13 +259,14 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
     PSMTXConcat(m, rot, out);
     PSMTXConcat(out, trn, out);
     PSMTXConcat(out, scl, out);
-    if (!(icon = *(u16*)&act->icon)) {
+    icon = *(u16*)&act->icon;
+    if (!icon) {
         icon = 0x18B;
     }
     if (act->enabled == 1) {
-        iconDispGx2(out, 0x10, icon);
+        ((void (*)(Mtx, s16, u16))iconDispGx2)(out, 0x10, icon);
     } else {
-        iconDispGx2(out, 0x30, icon);
+        ((void (*)(Mtx, s16, u16))iconDispGx2)(out, 0x30, icon);
     }
     name = act->name;
     PSMTXTrans(trn, 0.0f, 52.5f, 0.0f);
@@ -285,6 +286,8 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
 }
 
 void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s) {
+    GXColor tev;
+    GXColor col;
     Mtx rot;
     Mtx scl;
     Mtx trn;
@@ -303,7 +306,8 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
     cam = camGetPtr(8);
     c = 0xC0 - (s32)(1.5f * v.z);
     btlDispGXInit2D();
-    GXSetTevColor(GX_TEVREG0, (GXColor){0xE1, 0xE1, 0xE1, 0xFF});
+    tev = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
+    GXSetTevColor(GX_TEVREG0, tev);
     GXSetNumTevStages(1);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);
@@ -355,17 +359,17 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
         icon = 0x18B;
     }
     if (act->enabled == 1) {
-        GXColor col = {0x00, 0x00, 0x00, 0xFF};
+        col = (GXColor){0x00, 0x00, 0x00, 0xFF};
         col.r = c;
         col.g = c;
         col.b = c;
         iconDispGxCol(out, 0x10, icon, col);
     } else {
-        GXColor col2 = {0x00, 0x00, 0x00, 0xFF};
-        col2.r = c;
-        col2.g = c;
-        col2.b = c;
-        iconDispGxCol(out, 0x30, icon, col2);
+        col = (GXColor){0x00, 0x00, 0x00, 0xFF};
+        col.r = c;
+        col.g = c;
+        col.b = c;
+        iconDispGxCol(out, 0x30, icon, col);
     }
 }
 
@@ -389,7 +393,7 @@ void DrawSubIcon(BattleSubMenu* menu, void* a, s32* enabled, s16* icons, const c
     }
 }
 
-void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
+void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, s32 icon, const char* name, s32 cost, s32 p34, void* party, s32 y) {
     BattleWork* wp = _battleWorkPointer;
     CameraEntry* cam;
     BattleCursor* cursor = menu->cursor;
@@ -451,25 +455,17 @@ void DrawSubIconSub(BattleSubMenu* menu, s32 i, Mtx m, s32 enabled, u16 icon, co
         icon = 0x18B;
     }
     if (enabled == 1) {
-        GXColor col = {0xFF, 0xFF, 0xFF, 0x00};
-        col.a = alpha;
-        iconDispGxCol(out, 0x10, icon, col);
+        iconDispGxCol(out, 0x10, icon, (GXColor){0xFF, 0xFF, 0xFF, alpha});
     } else {
-        GXColor col2 = {0xFF, 0xFF, 0xFF, 0x00};
-        col2.a = alpha;
-        iconDispGxCol(out, 0x30, icon, col2);
+        iconDispGxCol(out, 0x30, icon, (GXColor){0xFF, 0xFF, 0xFF, alpha});
     }
     FontDrawStart();
     {
         GXColor fc;
         if (enabled == 1) {
-            GXColor c1 = {0x00, 0x00, 0x00, 0x00};
-            c1.a = alpha;
-            fc = c1;
+            fc = (GXColor){0x00, 0x00, 0x00, alpha};
         } else {
-            GXColor c2 = {0x40, 0x40, 0x40, 0x00};
-            c2.a = alpha;
-            fc = c2;
+            fc = (GXColor){0x40, 0x40, 0x40, alpha};
         }
         FontDrawColor(fc);
     }
@@ -636,9 +632,8 @@ void DrawMenuPartyChangeButton(void) {
     } else {
         btlGetScreenPoint((Vec*)((u8*)mario + 0x3C), &p);
         btlGetScreenPoint((Vec*)((u8*)party + 0x3C), &q);
-        x = p.x + q.x;
+        x = (p.x + q.x) / 2.0f;
         y = p.y;
-        x *= 0.5f;
         BattleAudience_GetItemOn(&id, &ix, &iy, &iz, NULL);
         if (id != -1) {
             if (menu->field_120 == 90.0f) {
@@ -822,14 +817,14 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-f32 x = 155.0f + v->x;
-        pos.y = 15.0f + v->y + bob;
-        pos.x = x;
+        pos.y = 15.0f + v->y;
         pos.z = 0.0f;
+        pos.x = 155.0f + v->x;
+        pos.y += bob;
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
-f32 x = 155.0f + v->x;
+        f32 x = 155.0f + v->x;
         pos.y = 20.0f + v->y - 164.0f - bob;
         pos.x = x;
         pos.z = 0.0f;
@@ -842,8 +837,8 @@ f32 x = 155.0f + v->x;
     if (n >= 6) {
         n = 5;
     }
-    pos.y = v->y - (f32)n * 24.0f;
     pos.x = v->x;
+    pos.y = v->y - (f32)n * 24.0f;
     pos.z = 0.0f;
     iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
 }
@@ -975,6 +970,8 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
     s32 i;
     f32 ang;
     f32 s;
+    s32 sw;
+    s32 nn;
 
     if (BattleGetUnitPtr(wp, wp->activeUnitId)->currentKind == 0xDE) {
         mainCursor = &wp->commandMenu.cursor[0];
@@ -986,10 +983,14 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
         n = cursor->unk8;
     }
     prev = cursor->field_4;
-    if (cursor->field_0 <= prev) {
-        cursor->field_4 = cursor->field_0 - 1;
-    } else if (cursor->field_0 >= prev + (n - 1)) {
-        cursor->field_4 = cursor->field_0 - n + 2;
+    {
+        s32 p = cursor->field_4;
+        s32 m = n;
+        if (cursor->field_0 <= p) {
+            cursor->field_4 = cursor->field_0 - 1;
+        } else if (cursor->field_0 >= p + (m - 1)) {
+            cursor->field_4 = cursor->field_0 - m + 2;
+        }
     }
     if (cursor->field_4 < 0) {
         cursor->field_4 = 0;
@@ -999,7 +1000,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
     }
     *x = -200.0f;
     *y = -100.0f;
-    switch (menu->field_C) {
+    switch (sw = menu->field_C) {
         case 0:
             menu->field_14 = 1;
             menu->field_98 = cursor->field_4;
@@ -1029,7 +1030,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
         case 20:
         case 30:
         case 40:
-            if (menu->field_C == 10 || menu->field_C == 20) {
+            if (sw == 10 || sw == 20) {
                 menu->field_14 = 1;
             }
             cnt = 0;
@@ -1099,7 +1100,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
         }
     }
     for (i = 0; i < 7; i++) {
-        switch (menu->field_C0[i]) {
+        switch (sw = menu->field_C0[i]) {
             case 0:
                 menu->field_A4[i] &= ~1;
                 menu->field_114[i] = 0xFF;
@@ -1130,10 +1131,10 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
             case 20:
             case 30:
             case 40:
-                if (menu->field_C0[i] == 10 || menu->field_C0[i] == 20) {
+                if (sw == 10 || sw == 20) {
                     steps = 12;
                 }
-                if (menu->field_C0[i] == 30 || menu->field_C0[i] == 40) {
+                if (sw == 30 || sw == 40) {
                     steps = (cursor->unk8 - 6) / 2 + 12;
                 }
                 menu->field_A4[i] |= 1;

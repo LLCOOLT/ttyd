@@ -264,6 +264,7 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 anm;
     s32 type;
     EffConfettiN64Work* w;
     s32 i;
@@ -272,7 +273,6 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     u8* col;
     s32 off;
-    s32 anm;
     Mtx tmp;
     Mtx scale;
     Mtx rot;
@@ -305,7 +305,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     anm = (anm >> 1) % 6;
     type = type % 10;
     for (i = 0; i < count; i++, w++) {
-        col = &color_table[(i % 12) * 3];
+        col = color_table + (i % 12) * 3;
         if (w->delay > 0) {
             continue;
         }

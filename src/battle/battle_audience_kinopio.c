@@ -886,11 +886,11 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
     }
 }
 
+__declspec(section ".rodata") static Vec v0 = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") static Vec v1 = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") static Vec v2 = {0.0f, 0.0f, 0.0f};
 void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     BattleWork* bw = _battleWorkPointer;
-    static const Vec v0 = {0.0f, 0.0f, 0.0f};
-    static const Vec v1 = {0.0f, 0.0f, 0.0f};
-    static const Vec v2 = {0.0f, 0.0f, 0.0f};
     BattleAudienceMember* m;
     void* pouch;
     f32 dx;

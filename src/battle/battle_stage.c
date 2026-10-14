@@ -106,16 +106,19 @@ static BattleSpotWork work;
 static BattleSpotWork* wp = &work;
 
 
+__declspec(section ".sdata") u32 gap_07_804117E4_sdata[7] = {0};
 static u8 inta_tex[32] = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
 
 USER_FUNC(screen_evt_func);
 
-static EVT_BEGIN(screen_evt)
+__declspec(section ".sdata") EVT_BEGIN(screen_evt)
 	BEGIN_INLINE_EVENT
 		CALL(screen_evt_func, LW(0))
 	END_INLINE_EVENT
 	RETURN
 EVT_END()
+
+__declspec(section ".sdata") u32 gap_07_8041183C_sdata[1] = {0};
 
 // forward declarations
 void batSpotDisp(CameraId camId, void* param);
@@ -180,11 +183,10 @@ typedef struct LightSpline {
 } LightSpline;
 
 void BattleStageMain(void) {
-	StageWork* s = STG;
-	s32 i;
 	StageLight* l;
+	s32 i;
 	LightSpline* sp;
-	StageDark* d;
+	StageWork* s = STG;
 
 	batSpotMain();
 	for (i = 0; i < 12; i++) {
@@ -192,9 +194,9 @@ void BattleStageMain(void) {
 		if (l->flags & 1) {
 			if (l->colorTime > 0) {
 				l->colorTime--;
-				l->color.r = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.r, l->colorTarget.r);
-				l->color.g = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.g, l->colorTarget.g);
-				l->color.b = intplGetValue((s8)l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.b, l->colorTarget.b);
+				l->color.r = intplGetValue(*(s8*)&l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.r, l->colorTarget.r);
+				l->color.g = intplGetValue(*(s8*)&l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.g, l->colorTarget.g);
+				l->color.b = intplGetValue(*(s8*)&l->colorMode, l->colorMax - l->colorTime, l->colorMax, l->colorStart.b, l->colorTarget.b);
 				if ((l->flags & 2) && l->color.r == 0 && l->color.g == 0 && l->color.b == 0) {
 					l->flags = 0;
 					continue;
@@ -202,13 +204,13 @@ void BattleStageMain(void) {
 			}
 			if (l->widthTime > 0) {
 				l->widthTime--;
-				l->width = intplGetValue((s8)l->widthMode, l->widthMax - l->widthTime, l->widthMax, l->widthStart, l->widthTarget);
+				l->width = intplGetValue(*(s8*)&l->widthMode, l->widthMax - l->widthTime, l->widthMax, l->widthStart, l->widthTarget);
 			}
 			if (l->posTime > 0) {
 				l->posTime--;
-				l->pos.x = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.x, l->posTarget.x);
-				l->pos.y = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.y, l->posTarget.y);
-				l->pos.z = intplGetValue((s8)l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.z, l->posTarget.z);
+				l->pos.x = intplGetValue(*(s8*)&l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.x, l->posTarget.x);
+				l->pos.y = intplGetValue(*(s8*)&l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.y, l->posTarget.y);
+				l->pos.z = intplGetValue(*(s8*)&l->posMode, l->posMax - l->posTime, l->posMax, l->posStart.z, l->posTarget.z);
 			}
 			if (l->flags & 4) {
 				sp = l->data;
@@ -226,9 +228,9 @@ void BattleStageMain(void) {
 			} else {
 				if (l->targetTime > 0) {
 					l->targetTime--;
-					l->target.x = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.x, l->targetTarget.x);
-					l->target.y = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.y, l->targetTarget.y);
-					l->target.z = intplGetValue((s8)l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.z, l->targetTarget.z);
+					l->target.x = intplGetValue(*(s8*)&l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.x, l->targetTarget.x);
+					l->target.y = intplGetValue(*(s8*)&l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.y, l->targetTarget.y);
+					l->target.z = intplGetValue(*(s8*)&l->targetMode, l->targetMax - l->targetTime, l->targetMax, l->targetStart.z, l->targetTarget.z);
 				}
 				if (l->data != NULL) {
 					__memFree(HEAP_BATTLE, l->data);
@@ -237,9 +239,9 @@ void BattleStageMain(void) {
 			}
 			if (l->upTime > 0) {
 				l->upTime--;
-				l->up.x = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.x, l->upTarget.x);
-				l->up.y = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.y, l->upTarget.y);
-				l->up.z = intplGetValue((s8)l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.z, l->upTarget.z);
+				l->up.x = intplGetValue(*(s8*)&l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.x, l->upTarget.x);
+				l->up.y = intplGetValue(*(s8*)&l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.y, l->upTarget.y);
+				l->up.z = intplGetValue(*(s8*)&l->upMode, l->upMax - l->upTime, l->upMax, l->upStart.z, l->upTarget.z);
 			}
 		} else {
 			if (l->data != NULL) {
@@ -250,19 +252,19 @@ void BattleStageMain(void) {
 	}
 	if (s->stgDark.time > 0) {
 		s->stgDark.time--;
-		s->stgDark.cur = intplGetValue((s8)s->stgDark.mode, s->stgDark.max - s->stgDark.time, s->stgDark.max, s->stgDark.start, s->stgDark.target);
+		s->stgDark.cur = intplGetValue(*(s8*)&s->stgDark.mode, s->stgDark.max - s->stgDark.time, s->stgDark.max, s->stgDark.start, s->stgDark.target);
 	}
 	if (s->stgDark.baseTime > 0) {
 		s->stgDark.baseTime--;
-		s->stgDark.base = intplGetValue((s8)s->stgDark.baseMode, s->stgDark.baseMax - s->stgDark.baseTime, s->stgDark.baseMax, s->stgDark.baseStart, s->stgDark.baseTarget);
+		s->stgDark.base = intplGetValue(*(s8*)&s->stgDark.baseMode, s->stgDark.baseMax - s->stgDark.baseTime, s->stgDark.baseMax, s->stgDark.baseStart, s->stgDark.baseTarget);
 	}
 	if (s->audDark.time > 0) {
 		s->audDark.time--;
-		s->audDark.cur = intplGetValue((s8)s->audDark.mode, s->audDark.max - s->audDark.time, s->audDark.max, s->audDark.start, s->audDark.target);
+		s->audDark.cur = intplGetValue(*(s8*)&s->audDark.mode, s->audDark.max - s->audDark.time, s->audDark.max, s->audDark.start, s->audDark.target);
 	}
 	if (s->audDark.baseTime > 0) {
 		s->audDark.baseTime--;
-		s->audDark.base = intplGetValue((s8)s->audDark.baseMode, s->audDark.baseMax - s->audDark.baseTime, s->audDark.baseMax, s->audDark.baseStart, s->audDark.baseTarget);
+		s->audDark.base = intplGetValue(*(s8*)&s->audDark.baseMode, s->audDark.baseMax - s->audDark.baseTime, s->audDark.baseMax, s->audDark.baseStart, s->audDark.baseTarget);
 	}
 }
 
@@ -830,14 +832,15 @@ typedef struct TevCbWork {
 
 void tou_gamen_screen_tev(TevCbWork* p) {
 	GXTexObj obj;
-	Mtx m2;
-	Mtx m1;
 	Mtx m;
+	Mtx m1;
+	Mtx m2;
 	u8* tex;
 	s32 i, j, n, w, s, k, row, col;
 	u8 c;
 	f32 lim;
 	f32 x, y;
+	f32* camf;
 
 	if (screen_wp->captured == 0) {
 		return;
@@ -848,7 +851,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 			row = i / 4;
 			col = i % 4;
 			for (j = 0; j < 64; j++) {
-				((u8(*)[8][4][8])tex)[row][j / 8][col][j % 8] = (i & 1) ? 0xFF : 0;
+				tex[(j / 8) * 32 + row * 256 + (j % 8) + col * 8] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
 			for (k = 0; k < n; k++) {
@@ -856,7 +859,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					((u8(*)[8][4][8])tex)[row][j / 8][col][j % 8] = c;
+					((u8(*)[4][8])tex)[row * 8 + j / 8][col][j % 8] = c;
 				}
 			}
 		}
@@ -893,6 +896,8 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 				case 1:
 					screen_wp->field_C = randf(1.0f, 0.25f);
 					break;
+				case 2:
+					break;
 			}
 		}
 		screen_wp->field_8 += (screen_wp->field_C - screen_wp->field_8) / 60.0f;
@@ -901,7 +906,11 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 		PSMTXScale(m1, screen_wp->field_8, screen_wp->field_8, 1.0f);
 		lim = (1.0f - screen_wp->field_8) / screen_wp->field_8;
 		y = screen_wp->field_18 > lim ? lim : screen_wp->field_18;
-		x = screen_wp->field_10 > lim ? lim : screen_wp->field_10;
+		if (screen_wp->field_10 > lim) {
+			x = lim;
+		} else {
+			x = screen_wp->field_10;
+		}
 		PSMTXTrans(m2, x, y, 0.0f);
 		PSMTXConcat(m1, m2, m);
 	} else {
@@ -909,7 +918,8 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	}
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
-	PSMTXScale(m, 1.0f, 16.0f + 6.0f * ((100.0f - ((f32*)camGetPtr(CAMERA_2D))[5]) / 1000.0f), 1.0f);
+	camf = (f32*)camGetPtr(CAMERA_3D);
+	PSMTXScale(m, 1.0f, 16.0f + 6.0f * ((100.0f - camf[5]) / 1000.0f), 1.0f);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4);
 	p->field_C = 2;

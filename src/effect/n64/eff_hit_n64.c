@@ -63,12 +63,11 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
     EffHitN64Work* p;
     s32 i;
     s32 count;
-    s32 n;
-    s32 r;
+    f32 r;
 
     effect = effEntry();
-    effect->type = "HitN64\0";
     count = (arg1 * 5 + 20) / 3 + 1;
+    effect->type = "HitN64\0";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffHitN64Work));
     effect->userdata = work;
@@ -116,11 +115,9 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
         break;
     }
     work->scale = arg5;
-    n = count - 1;
     p = work + 1;
     for (i = 1; i < count; i++, p++) {
-        r = rand();
-        p->rotZ = (f32)(i * 360 / n);
+        r = rand() % 360;
         p->position.x = 0.0f;
         p->position.y = 0.0f;
         p->position.z = 0.0f;
@@ -128,7 +125,8 @@ EffectEntry* effHitN64Entry(s32 type, s32 arg1, f32 x, f32 y, f32 z, f32 arg5) {
         p->vel14 = 0.0f;
         p->pad20 = 0.0f;
         p->type = 0;
-        p->rotY = (f32)(r % 360);
+        p->rotZ = (f32)(i * 360 / (count - 1));
+        p->rotY = r;
         p->vel10 = 0.0f;
         p->alpha = 255;
     }
@@ -290,16 +288,20 @@ static void main_dl(EffectEntry* effect, Mtx mtx) {
     Mtx rotZ;
     Mtx rotY;
     EffHitN64Work* work = effect->userdata;
-    EffHitN64Work* p;
     effN64Vtx* vtx;
-    s32 flag;
     s32 idx;
+    EffHitN64Work* p;
+    s32 flag;
     s32 i;
     f32 f;
 
     f = 5.0f * work->progress;
     idx = (s32)f;
-    flag = f >= 4.0f ? TRUE : FALSE;
+    if (f >= 4.0f) {
+        flag = TRUE;
+    } else {
+        flag = FALSE;
+    }
     PSMTXScale(texMtx, 0.03125f, 0.0078125f, 0.0f);
     PSMTXTrans(texTrans, 0.0f, 96.0f, 0.0f);
     PSMTXConcat(texMtx, texTrans, texMtx);

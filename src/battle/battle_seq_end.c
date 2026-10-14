@@ -602,18 +602,19 @@ void _MarioExpDisp(CameraId camId, void* param) {
 }
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
-    SeqEndWork* work = SEW((BattleWork*)param);
     Vec pos;
     char buf[0x14];
     f32 w;
     u32 len;
     f32 zero = 0.0f;
-
+    f32 w2;
+    SeqEndWork* work = SEW((BattleWork*)param);
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
     len = strlen(buf);
+    w2 = 12.5f * len;
     w = 6.25f * len;
-    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - w, 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f);
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -30.0f - w, 30.0f, w2 + 65.0f, 32.0f, 10.0f);
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -70.0f, -10.0f, 130.0f, 60.0f, 10.0f);
     FontDrawStart();
     FontDrawString(zero - w, 27.0f, buf);

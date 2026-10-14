@@ -227,5 +227,5 @@ void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-__declspec(section ".sdata") u8 gap_07_80412D70_sdata[0x10] = {0};
+__declspec(section ".sdata") u32 gap_07_80412D70_sdata[4] = {0};
 __declspec(section ".sdata2") const u32 gap_10_8042309C_sbss2;

@@ -289,6 +289,8 @@ f32 partyGetTargetDistY(s32 id) {
 
     if (id == 0) {
         if (mario->baseSpeed > 0.0f) {
+            if (1) {
+            }
             return mario->baseSpeed;
         }
         return mario->mBaseDashSpeed;
@@ -337,7 +339,7 @@ f32 partyGetTargetMovespd2(PartyEntry* party) {
         }
     }
     if (other && !far) {
-        return other->field_104;
+        do { return other->field_104; } while (0);
     }
     if (mario->baseSpeed > 0.0f) {
         return mario->baseSpeed;
@@ -508,6 +510,10 @@ void partyClearJumpPara(PartyEntry* party) {
     PF(party, 0x11C) = 0.0f;
 }
 
+static inline f32 partySpdRate(PartyEntry* party) {
+    return (party->flags & 0x80) ? 0.75f : 1.0f;
+}
+
 static inline f32 partyUpdSpd(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 f;
@@ -518,7 +524,7 @@ static inline f32 partyUpdSpd(PartyEntry* party) {
     if (mario->flags & 0x8000) {
         target = mario->baseSpeed;
     } else {
-        target = PF(party, 0x108) * mario->playerGravity * ((party->flags & 0x80) ? 0.75f : 1.0f);
+        target = PF(party, 0x108) * mario->playerGravity * partySpdRate(party);
     }
     if (target > 0.0f) {
         f = cur + 0.05f * ((0.5f + target) - cur);
@@ -536,21 +542,58 @@ static inline f32 partyUpdSpd(PartyEntry* party) {
     return f;
 }
 
-void unk_800c93d0(PartyEntry* party, f32 spd) {
-    if (spd) {
-        PF(party, 0x108) = spd;
-        unk_800c92c4(party, spd);
-        return;
+static inline f32 partyUpdSpd2(PartyEntry* party) {
+    MarioWork* mario = party->playerPtr;
+    f32 f;
+    f32 cur;
+    f32 target;
+
+    cur = party->field_104;
+    if (mario->flags & 0x8000) {
+        target = mario->baseSpeed;
+    } else {
+        target = PF(party, 0x108) * mario->playerGravity * partySpdRate(party);
     }
-    PF(party, 0x108) = 0.0f;
+    if (target > 0.0f) {
+        f = cur + 0.05f * ((0.5f + target) - cur);
+        if (f >= target) {
+            f = target;
+        }
+        party->field_104 = f;
+        return f;
+    }
+    f = cur + 0.1f * (-1.0f - cur);
+    if (f <= 0.0f) {
+        f = 0.0f;
+    }
+    party->field_104 = f;
+    return f;
 }
 
-void unk_800c9398(PartyEntry* party, f32 spd) {
-    f32 v = spd * party->playerPtr->playerGravity;
-    f32 w;
-    w = v;
-    PF(party, 0x108) = w * ((party->flags & 0x80) ? 0.75f : 1.0f);
+static inline f32 partyChkUpdSpd(PartyEntry* party) {
+    if (party->field_28 != 0 || PU8(party, 0x36) == 2 || PU8(party, 0x36) == 3 || PU8(party, 0x36) == 6) {
+        return party->field_104;
+    }
+    return partyUpdSpd2(party);
+}
+
+f32 unk_800c93d0(PartyEntry* party, f32 spd) {
+    if (spd) {
+        PF(party, 0x108) = spd;
+        partyChkUpdSpd(party);
+        return spd;
+    }
+    PF(party, 0x108) = 0.0f;
+    if (spd) {
+    }
+    return spd;
+}
+
+f32 unk_800c9398(PartyEntry* party, f32 spd) {
+    f32 t = spd * party->playerPtr->playerGravity;
+    PF(party, 0x108) = t * partySpdRate(party);
     party->field_104 = PF(party, 0x108);
+    return spd;
 }
 
 f32 unk_800c92c4(PartyEntry* party, f32 spd) {
@@ -639,6 +682,7 @@ void unk_800c9044(PartyEntry* party) {
 
 void unk_800c8f24(PartyEntry* party, f32 spd) {
     f32 g;
+    PartyEntry* new_var;
     f32 a;
     f32 b;
 
@@ -647,19 +691,20 @@ void unk_800c8f24(PartyEntry* party, f32 spd) {
         unk_800c90d4(party, 1);
         return;
     }
-    a = (1.0f == party->playerPtr->playerGravity) ? 1.65f : 2.0f;
+    new_var = party;
+    a = (1.0f == new_var->playerPtr->playerGravity) ? 1.65f : 2.0f;
     b = (1.0f == party->playerPtr->playerGravity) ? 0.8f : 0.0f;
     if (a - b < spd && spd < spd + b) {
         if (N_marioGetMovementSpeed() == 1) {
-            partyChgPoseId(party, 2);
+            partyChgPoseId(new_var, 2);
             unk_800c90d4(party, 0);
         } else {
             partyChgPoseId(party, 3);
-            unk_800c90d4(party, 1);
+            unk_800c90d4(new_var, 1);
         }
     } else if (spd >= a) {
         partyChgPoseId(party, 3);
-        unk_800c90d4(party, 1);
+        unk_800c90d4(new_var, 1);
     } else {
         partyChgPoseId(party, 2);
         unk_800c90d4(party, 0);
@@ -913,6 +958,7 @@ void partyMoveCheckWall(PartyEntry* party) {
 
 extern int __float_nan[];
 s16 partyMarioHosei(PartyEntry* party);
+
 static inline s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (pm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
@@ -1074,6 +1120,7 @@ void unk_800c7c98(PartyEntry* party) {
 }
 
 void partyWalkInit(PartyEntry* party) {
+    u8* p114;
     MarioWork* mario = party->playerPtr;
 
     party->flags |= 2;
@@ -1085,9 +1132,10 @@ void partyWalkInit(PartyEntry* party) {
     PU8(party, 0x3D) = 0;
     PU32(party, 0x44) = 0x10;
     PF(party, 0x40) = 50.0f;
+    p114 = (u8*)party + 0x114;
     PU8(party, 0x3E) = 0;
     PF(party, 0x118) = 1.8f;
-    PF(party, 0x114) = 0.0f;
+    *(f32*)p114 = 0.0f;
     if (!(mario->flags & 0x400000)) {
         partyChgPoseId(party, 1);
         partyChgMoveMode(party, 1);
@@ -1109,7 +1157,7 @@ void partyMoveWalk(PartyEntry* party) {
         if (mario->flags & 0x8000) {
             target = mario->baseSpeed;
         } else {
-            target = PF(party, 0x108) * mario->playerGravity * ((party->flags & 0x80) ? 0.75f : 1.0f);
+            target = PF(party, 0x108) * mario->playerGravity * partySpdRate(party);
         }
         if (target > 0.0f) {
             f = cur + 0.05f * ((0.5f + target) - cur);
@@ -2024,9 +2072,11 @@ BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
         dir = (Vec){s, 0.0f, c};
         if (!partyHitCheck(party, &pos, &dir, &hitPos, &hitNrm, &dist)) {
             HitEntry* floor;
+            f32 r;
             dist = 150.0f;
-            pos.x = 50.0f * s + mobj->x;
-            pos.z = 50.0f * c + mobj->z;
+            r = 50.0f;
+            pos.x = s * r + mobj->x;
+            pos.z = c * r + mobj->z;
             dir = (Vec){0.0f, -1.0f, 0.0f};
             floor = partyHitCheck(party, &pos, &dir, &hitPos, &hitNrm, &dist);
             if (!floor || !(hitGetAttr(floor) & 0x200)) {

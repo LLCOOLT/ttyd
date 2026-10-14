@@ -147,8 +147,8 @@ void effMagicHoraoMain(EffectEntry* effect) {
 }
 
 void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
-    f32 s;
     effN64Vtx* vtx;
+    effN64Vtx* v;
     CameraEntry* camera;
     EffMagicHoraoN64Work* work;
     s32 angle;
@@ -161,8 +161,7 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     s32 x;
     s32 y;
-    GXColor color2;
-    GXColor color;
+    f32 s;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -178,12 +177,7 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(camera->view, mtx, mtx);
     GXLoadPosMtxImm(mtx, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    color = (GXColor){0, 0, 0xFF, 0};
-    ang = 6.2831855f * (f32)(frame * 30) / 360.0f;
-    color.r = 225.0f + 25.0f * (f32)sin(ang);
-    color.g = 225.0f + 25.0f * (f32)sin(ang);
-    color.a = alpha;
-    GXSetTevColor(GX_TEVREG0, color);
+    GXSetTevColor(GX_TEVREG0, (GXColor){(ang = 6.2831855f * (f32)(frame * 30) / 360.0f, 225.0f + 25.0f * (f32)sin(ang)), 225.0f + 25.0f * (f32)sin(ang), 0xFF, alpha});
     GXSetNumChans(0);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
@@ -201,9 +195,7 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, GX_TEXMAP0);
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
-        color2 = (GXColor){0, 0, 0, 0};
-        color2.a = (30 - work->timer) * 255 / 30;
-        GXSetTevColor(GX_TEVREG0, color2);
+        GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, (30 - work->timer) * 255 / 30});
         GXSetNumTevStages(1);
         GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
         GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -235,19 +227,21 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
             GXLoadTexObj(&texObj, GX_TEXMAP0);
         }
         vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+        v = vtx;
         for (i = 0; i < 16; i++) {
             x = (s32)(s * (500.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 60)) / 360.0f)));
             y = (s32)(s * (200.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 6)) / 360.0f)));
-            vtx[i * 2].x = x - 3200;
-            vtx[i * 2].y = y + i * 400;
-            vtx[i * 2].z = 0;
-            vtx[i * 2].s = 0;
-            vtx[i * 2].t = i * 128;
-            vtx[i * 2 + 1].x = x + 3200;
-            vtx[i * 2 + 1].y = y + i * 400;
-            vtx[i * 2 + 1].z = 0;
-            vtx[i * 2 + 1].s = 2048;
-            vtx[i * 2 + 1].t = i * 128;
+            v[0].x = x - 3200;
+            v[0].y = y + i * 400;
+            v[0].z = 0;
+            v[0].s = 0;
+            v[0].t = i * 128;
+            v[1].x = x + 3200;
+            v[1].y = y + i * 400;
+            v[1].z = 0;
+            v[1].s = 2048;
+            v[1].t = i * 128;
+            v += 2;
         }
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
         GXInvalidateVtxCache();

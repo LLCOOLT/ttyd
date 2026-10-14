@@ -414,8 +414,8 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 //regalloc issues wrt f29/f28, stack swap in GXColor, some vert code (see comments), 99.8% 1:1
 void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width) {
 	CameraEntry* camera;
-	f32 x5;
-	f32 scroll;
+	f32 x5, scroll;
+
 	Mtx mtx;
 	Mtx trans, scale;
 	f32 x2, y2;
@@ -510,11 +510,10 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXLoadTexMtxImm(scale, 0x21, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
-	x5 = 0.0f;
-	y2 = x5 - (width - 32.0f);
-	x2 = x5 + (height - 32.0f);
-
 	GXPosition3f32(0.0f, 0.0f, 0.0f);
+	x5 = 0.0f;
+	x2 = x5 + (height - 32.0f);
+	y2 = x5 - (width - 32.0f);
 	GXTexCoord2f32(0.0f, 0.0f);
 
 	GXPosition3f32(x2, 0.0f, 0.0f); //f29 = x2, 0.0f + (height - 32.0f)
@@ -546,8 +545,9 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXLoadTexMtxImm(scale2, 0x21, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
-	y3 = -(width - 32.0f);
-	y4 = y3 - 32.0f; //not emitting correctly, some macro used?
+	x5 = width - 32.0f;
+	y3 = -x5;
+	y4 = y3 - 32.0f;
 
 	GXPosition3f32(0.0f, y3, 0.0f); //f27 = y3, neg(width - 32.0f)
 	GXTexCoord2f32(0.0f, 0.0f);
@@ -1265,7 +1265,7 @@ void windowDispGX_Waku_col(u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 widt
 void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y, f32 width, f32 height, f32 curve) {
 	CameraEntry* camera = camGetCurPtr();
 	Mtx mtx2;
-	f32 dVar10, dVar9;
+	f32 dVar9, dVar10;
 	f32 twothirds, third;
 	f32 fVar1, fVar4, fVar2, fVar6, fVar5, fVar3; //TODO: rename
 
@@ -1297,8 +1297,8 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 		GXSetCurrentMtx(0);
 		GXSetTevColor(GX_TEVREG0, color);
 
-
-		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = dVar10 * 0.5f;
+		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = (f32)0.5 * dVar10;
+		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = (f32)0.5 * dVar10;
 		MTXTrans(mtx2, x - dVar10, y - dVar9, 0.0f);
 		MTXConcat(mtx2, mtx, mtx2);
 		MTXConcat(camera->view, mtx2, mtx2);

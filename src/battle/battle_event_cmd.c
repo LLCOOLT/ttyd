@@ -28,9 +28,10 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) { //TODO: regalloc
     s32* args = event->args;
-    s32 index = args[0];
+    BattleWork* wp = _battleWorkPointer;
     s32 flags = args[1];
-    if (flags & _battleWorkPointer->flags) {
+    s32 index = args[0];
+    if (flags & wp->flags) {
         evtSetValue(event, index, TRUE);
     }
     else {
@@ -175,8 +176,8 @@ USER_FUNC(btlevtcmd_DrawLots) {
         max += alloc[i];
     }
     ceiling = irand(max);
-    retcount = 0;
-    for (i = 0, ceilcount = retcount; i < count; i++) {
+    ceilcount = 0;
+    for (i = 0, retcount = ceilcount; i < count; i++) {
         ceilcount += alloc[i];
         if (ceiling < ceilcount) {
             break;
@@ -2579,7 +2580,7 @@ USER_FUNC(btlevtcmd_OffToken) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
     {
-        unit->mTokenFlags = ~args[1] & unit->mTokenFlags;
+        unit->mTokenFlags &= ~args[1];
     }
     return EVT_RETURN_DONE;
 }
@@ -2818,6 +2819,30 @@ static inline Vec becMvVecA(f32 x, f32 y, f32 z) {
 }
 
 static inline Vec becMvVecB(f32 x, f32 y, f32 z) {
+    Vec v = {0.0f, 0.0f, 0.0f};
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
+static inline Vec becMvVecC(f32 x, f32 y, f32 z) {
+    Vec v = {0.0f, 0.0f, 0.0f};
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
+static inline Vec becMvVecD(f32 x, f32 y, f32 z) {
+    Vec v = {0.0f, 0.0f, 0.0f};
+    v.x = x;
+    v.y = y;
+    v.z = z;
+    return v;
+}
+
+static inline Vec becMvVecE(f32 x, f32 y, f32 z) {
     Vec v = {0.0f, 0.0f, 0.0f};
     v.x = x;
     v.y = y;
@@ -3137,8 +3162,8 @@ USER_FUNC(btlevtcmd_DivePosition) {
     mode = evtGetValue(event, args[6]);
     type = evtGetValue(event, args[7]);
     kind = evtGetValue(event, args[8]);
-    unit = BattleGetUnitPtr(_battleWorkPointer, id);
     floor = 0;
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
     if (mode >= 100) {
         floor = 1;
         mode -= 100;
@@ -3152,10 +3177,7 @@ USER_FUNC(btlevtcmd_DivePosition) {
         BtlUnit_SetMoveTargetPos(unit, tx, ty, tz);
         {
             f32 dx = x - tx, dy = y - ty, dz = z - tz;
-            dx = dx * dx;
-            dy = dy * dy;
-            dz = dz * dz;
-            BEC_MVDIST(unit) = bec_sqrtf(dx + dy + dz);
+            BEC_MVDIST(unit) = bec_sqrtf(dx * dx + dy * dy + dz * dz);
         }
         if (BEC_MVFRAME(unit) == 0) {
             BEC_MVFRAME(unit) = BEC_MVDIST(unit) / unit->mMoveSpeedXZ;
@@ -3194,10 +3216,7 @@ USER_FUNC(btlevtcmd_DivePosition) {
     }
     if (type == 0) {
         f32 dx = unit->mMoveTargetPos.x - unit->mMoveCurrentPos.x, dy = unit->mMoveTargetPos.y - unit->mMoveCurrentPos.y, dz = unit->mMoveTargetPos.z - unit->mMoveCurrentPos.z;
-        dy = dy * dy;
-        dx = dx * dx;
-        dz = dz * dz;
-        d = bec_sqrtf(dx + dy + dz);
+        d = bec_sqrtf(dx * dx + dy * dy + dz * dz);
         if (d == 0.0f) {
             d = 1.0f;
         }
@@ -3219,10 +3238,7 @@ USER_FUNC(btlevtcmd_DivePosition) {
     else {
         f32 dx = unit->mMoveTargetPos.x - unit->mMoveCurrentPos.x, dy = unit->mMoveTargetPos.y - unit->mMoveCurrentPos.y, dz = unit->mMoveTargetPos.z - unit->mMoveCurrentPos.z;
         s32 neg;
-        dy = dy * dy;
-        dx = dx * dx;
-        dz = dz * dz;
-        d = bec_sqrtf(dx + dy + dz);
+        d = bec_sqrtf(dx * dx + dy * dy + dz * dz);
         if (unit->mMoveTargetPos.x - unit->mMoveStartPos.x > 0.0f) {
             neg = 1;
         }
@@ -3230,7 +3246,12 @@ USER_FUNC(btlevtcmd_DivePosition) {
             neg = 0;
         }
         else {
-            neg = unit->mMoveTargetPos.z - unit->mMoveStartPos.z >= 0.0f;
+            if (unit->mMoveTargetPos.y - unit->mMoveStartPos.y < 0.0f) {
+                neg = 0;
+            }
+            else {
+                neg = 1;
+            }
         }
         if (d == 0.0f) {
             d = 1.0f;
@@ -3240,10 +3261,10 @@ USER_FUNC(btlevtcmd_DivePosition) {
         }
         h = sinfd(180.0f * (1.0f - d / BEC_MVDIST(unit)));
         if (neg) {
-            a = 360.0f * atan2f_safety(unit->mMoveTargetPos.x - unit->mMoveStartPos.x, unit->mMoveTargetPos.z - unit->mMoveStartPos.z) / 6.2832f;
+            a = 360.0f * atan2f_safety(unit->mMoveTargetPos.x - unit->mMoveStartPos.x, unit->mMoveTargetPos.y - unit->mMoveStartPos.y) / 6.2831855f;
         }
         else {
-            a = 180.0f + 360.0f * atan2f_safety(unit->mMoveTargetPos.x - unit->mMoveStartPos.x, unit->mMoveTargetPos.z - unit->mMoveStartPos.z) / 6.2832f;
+            a = 180.0f + 360.0f * atan2f_safety(unit->mMoveTargetPos.x - unit->mMoveStartPos.x, unit->mMoveTargetPos.y - unit->mMoveStartPos.y) / 6.2831855f;
         }
         sx = h * sinfd(a);
         sz = h * cosfd(180.0f + a);
@@ -3335,10 +3356,11 @@ USER_FUNC(btlevtcmd_EllipseMovePosition) {
 /* movers end (half_B) */
 
 USER_FUNC(btlevtcmd_MoveDirectionAdd) {
-    s32 btlId, id, value, dir, index;
+    s32 btlId, id, value;
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
+    s32 index, dir;
 
     btlId = evtGetValue(event, args[0]);
     id = BattleTransID(event, btlId);
@@ -3348,9 +3370,11 @@ USER_FUNC(btlevtcmd_MoveDirectionAdd) {
     if (unit->moveDirection) {
         dir = value * unit->moveDirection;
     } else {
-        dir = unit->faceDirection * value;
+        dir = value * unit->faceDirection;
     }
-    evtSetValue(event, index, evtGetValue(event, index) + dir);
+    value = evtGetValue(event, index);
+    value += dir;
+    evtSetValue(event, index, value);
     return EVT_RETURN_DONE;
 }
 
@@ -3374,9 +3398,10 @@ USER_FUNC(btlevtcmd_FaceDirectionAdd) {
 }
 
 USER_FUNC(btlevtcmd_FaceDirectionSub) {
-    s32 btlId, id, index, value, dir;
-    s32* args = event->args;
+    s32 btlId, id;
     BattleWork* wp = _battleWorkPointer;
+    s32 index, value, dir;
+    s32* args = event->args;
     BattleUnit* unit;
 
     btlId = evtGetValue(event, args[0]);
@@ -3505,16 +3530,6 @@ void BtlUnit_SetSeMode(void* work, const char* name0, const char* name1, s16 c, 
 void psndSFX_pos(s32 id, Vec* pos);
 void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work);
 void _MoveSoundControlCore(BattleUnit* unit, BecSndWork* work, BattleUnitPart* part, f32 x, f32 y, f32 z);
-const char* _mario_acrobat_voice_table[5] = {
-    "SFX_VOICE_MARIO_AC3_1", "SFX_VOICE_MARIO_AC3_2", "SFX_VOICE_MARIO_AC3_3",
-    "SFX_VOICE_MARIO_AC3_4", "SFX_VOICE_MARIO_AC3_5",
-};
-const char* _mario_attack_voice_table[10] = {
-    "SFX_VOICE_MARIO_AC1_1", "SFX_VOICE_MARIO_AC1_2", "SFX_VOICE_MARIO_AC1_3",
-    "SFX_VOICE_MARIO_AC1_4", "SFX_VOICE_MARIO_AC1_5", "SFX_VOICE_MARIO_AC2_1",
-    "SFX_VOICE_MARIO_AC2_2", "SFX_VOICE_MARIO_AC2_3", "SFX_VOICE_MARIO_AC2_4",
-    "SFX_VOICE_MARIO_AC2_5",
-};
 void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit);
 extern s32 subsetevt_confuse_flustered[];
 void BattleSamplingEnemy(BattleWorkWeaponTargets* targets, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags, s8 direction);
@@ -3644,10 +3659,11 @@ USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
 }
 
 USER_FUNC(btlevtcmd_GetConsumeItem) {
-    BattleWork* wp = _battleWorkPointer;
-    BattleCommandWeapon* w = (BattleCommandWeapon*)&wp->commandMenu;
-    w = &w[wp->commandMenu.cursor[11].field_0];
-    evtSetValue(event, event->args[0], ((BattleCommand*)w)->weapon[0].itemId);
+    BattleCommandWeapon* w;
+    s32* args = event->args;
+    w = (BattleCommandWeapon*)&_battleWorkPointer->commandMenu;
+    w = &w[_battleWorkPointer->commandMenu.cursor[11].field_0];
+    evtSetValue(event, args[0], ((BattleCommand*)w)->weapon[0].itemId);
     return EVT_RETURN_DONE;
 }
 
@@ -3836,8 +3852,8 @@ USER_FUNC(btlevtcmd_PreCheckDamage) {
     s32 id2;
     s32 pno;
     s32 flags;
-    s32 out;
     s32 res;
+    s32 out;
 
     id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
@@ -4312,6 +4328,201 @@ USER_FUNC(btlevtcmd_GetConfuseActEvent) {
 
 void BattleChoiceSamplingEnemy(BattleWorkWeaponTargets* targets, s32 n, s32* id, s32* pno);
 
+USER_FUNC(btlevtcmd_MarioJumpParam) {
+    s32* args = event->args;
+    s32 id, frames, n, out;
+    f32 tx, tz, dist;
+    f32 x, y, z;
+    BattleUnit* unit;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    tx = evtGetValue(event, args[1]);
+    evtGetValue(event, args[2]);
+    tz = evtGetValue(event, args[3]);
+    out = args[4];
+    frames = evtGetValue(event, out);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    BtlUnit_GetPos(unit, &x, &y, &z);
+    dist = distABf(x, z, tx, tz);
+    if (frames != 0) {
+        n = frames;
+    } else {
+        n = dist / unit->mMoveSpeedXZ;
+    }
+    if (dist > 60.0f) {
+        n += (s32)(0.15f * (dist - 60.0f));
+    }
+    if (frames == 0 || n > frames) {
+        frames = n;
+    }
+    if (frames != -250000000) {
+        evtSetValue(event, out, frames);
+    }
+    return EVT_RETURN_DONE;
+}
+
+extern double sin(double);
+f32 reviseAngle(f32 a);
+#define MJ_F(u, off) BEC_FIELD(u, off, f32)
+USER_FUNC(btlevtcmd_MarioJumpPosition) {
+    BattleUnit* unit;
+    s32 id, frames, type, kind;
+    s32* args;
+    f32 tx, ty, tz;
+    f32 x, y, z;
+    f32 rem, sn, t;
+
+    args = event->args;
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    tx = (f32)evtGetValue(event, args[1]);
+    ty = (f32)evtGetValue(event, args[2]);
+    tz = (f32)evtGetValue(event, args[3]);
+    frames = evtGetValue(event, args[4]);
+    type = evtGetValue(event, args[5]);
+    kind = evtGetValue(event, args[6]);
+    unit = BattleGetUnitPtr(_battleWorkPointer, id);
+    if (isFirstCall) {
+        event->blocked = 1;
+        if (type == 1) {
+            event->blocked = 2;
+        }
+        else {
+            BtlUnit_SetMoveTargetPos(unit, tx, ty, tz);
+            BtlUnit_GetPos(unit, &x, &y, &z);
+            BtlUnit_SetMoveCurrentPos(unit, x, y, z);
+            unit->mMoveDirection = angleABf(x, z, tx, tz);
+            BEC_MVDIST(unit) = distABf(x, z, tx, tz);
+            if (tx - x > 0.0f) {
+                unit->moveDirection = 1;
+            }
+            else if (tx - x < 0.0f) {
+                unit->moveDirection = -1;
+            }
+            BEC_MVFRAME(unit) = frames;
+            if (BEC_MVFRAME(unit) == 0) {
+                BEC_MVFRAME(unit) = BEC_MVDIST(unit) / unit->mMoveSpeedXZ;
+                rem = BEC_MVDIST(unit) - BEC_MVFRAME(unit) * unit->mMoveSpeedXZ;
+            }
+            else {
+                unit->mMoveSpeedXZ = BEC_MVDIST(unit) / BEC_MVFRAME(unit);
+                rem = BEC_MVDIST(unit) - BEC_MVFRAME(unit) * unit->mMoveSpeedXZ;
+            }
+            if (BEC_MVFRAME(unit) == 0) {
+                return EVT_RETURN_DONE;
+            }
+            MJ_F(unit, 0x1A4) = (MJ_F(unit, 0x15C) - MJ_F(unit, 0x150)) / BEC_MVFRAME(unit);
+            MJ_F(unit, 0x1A8) = (MJ_F(unit, 0x160) - MJ_F(unit, 0x154)) / BEC_MVFRAME(unit);
+            MJ_F(unit, 0x1AC) = (MJ_F(unit, 0x164) - MJ_F(unit, 0x158)) / BEC_MVFRAME(unit);
+            unit->mMoveSpeedY = 0.0f;
+            unit->mFallAccel = 3.14159265f / BEC_MVFRAME(unit);
+            unit->mMoveSpeedXZ = unit->mMoveSpeedXZ + rem / BEC_MVFRAME(unit);
+            if (type < 3) {
+                MJ_F(unit, 0x1B0) = 90.0f;
+                MJ_F(unit, 0x1B4) = 360.0f / BEC_MVFRAME(unit);
+                t = BEC_MVDIST(unit) - 20.0;
+                t = t / 6.0;
+                t = t + 47.0;
+                MJ_F(unit, 0x180) = t;
+                if (type == 2) {
+                    t = MJ_F(unit, 0x180) * 1.12;
+                    MJ_F(unit, 0x180) = t;
+                }
+                MJ_F(unit, 0x1B8) = 0.0f;
+                MJ_F(unit, 0x1B8) = 0.0f;
+                sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.53 * sn + 1.0);
+            }
+            else {
+                MJ_F(unit, 0x1B0) = 90.0f;
+                MJ_F(unit, 0x1B4) = (f32)(360 / BEC_MVFRAME(unit));
+                t = BEC_MVDIST(unit) - 20.0;
+                t = t / 6.0;
+                t = t + 47.0;
+                MJ_F(unit, 0x180) = t;
+                if (type == 4) {
+                    t = MJ_F(unit, 0x180) * 1.25;
+                    MJ_F(unit, 0x180) = t;
+                }
+                MJ_F(unit, 0x1B8) = 0.0f;
+                MJ_F(unit, 0x1B8) = 0.0f;
+                sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.8 * sn + 1.0);
+            }
+            BtlUnit_LoadSeMode(2, kind, (u8*)unit + 0x1C0, (u8*)unit + 0x188);
+            if (BEC_SNDNAME(unit, 0x188)) {
+                Vec pos = becMvVecC(unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y, unit->mMoveCurrentPos.z);
+                psndSFXOn_3D((const char*)BEC_SNDNAME(unit, 0x188), &pos);
+            }
+        }
+    }
+    switch ((s8)event->blocked) {
+    case 1:
+        unit->mMoveCurrentPos.x += MJ_F(unit, 0x1A4);
+        unit->mMoveCurrentPos.y += MJ_F(unit, 0x1A8);
+        unit->mMoveCurrentPos.z += MJ_F(unit, 0x1AC);
+        BtlUnit_GetPos(unit, &x, &y, &z);
+        MJ_F(unit, 0x1B8) = y;
+        x = unit->mMoveCurrentPos.x;
+        sn = sin(unit->mMoveSpeedY);
+        y = MJ_F(unit, 0x180) * sn + unit->mMoveCurrentPos.y;
+        z = unit->mMoveCurrentPos.z;
+        BtlUnit_SetPos(unit, x, y, z);
+        if (MJ_F(unit, 0x160) > y && BEC_MVFRAME(unit) < 3) {
+            y = MJ_F(unit, 0x160);
+            BtlUnit_SetPos(unit, x, y, z);
+        }
+        MJ_F(unit, 0x1B8) = y;
+        if (type < 3) {
+            sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.53 * sn + 1.0);
+        }
+        else {
+            sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+                unit->mMoveSpeedY = unit->mMoveSpeedY + unit->mFallAccel * (0.8 * sn + 1.0);
+        }
+        MJ_F(unit, 0x1B0) = MJ_F(unit, 0x1B0) + MJ_F(unit, 0x1B4);
+        MJ_F(unit, 0x1B0) = reviseAngle(MJ_F(unit, 0x1B0));
+        BEC_MVFRAME(unit)--;
+        if (BEC_MVFRAME(unit) == 0) {
+            y = MJ_F(unit, 0x160);
+            BtlUnit_SetPos(unit, x, y, z);
+            unit->mMoveSpeedY = -(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8));
+            unit->mFallAccel = 1.8f;
+            return EVT_RETURN_YIELD;
+        }
+        break;
+    case 2:
+        if (!BtlUnit_GetACPossibility(unit)) {
+            return EVT_RETURN_DONE;
+        }
+        unit->mMoveSpeedY = -(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8));
+        unit->mFallAccel = 1.8f;
+        BEC_MVFRAME(unit) = 1;
+        MJ_F(unit, 0x1B0) = 90.0f;
+        MJ_F(unit, 0x1B4) = (f32)(360 / BEC_MVFRAME(unit));
+        MJ_F(unit, 0x180) = __fabs(MJ_F(unit, 0x1B8) - MJ_F(unit, 0x1B8)) / 16.5;
+        BtlUnit_GetPos(unit, &unit->mMoveCurrentPos.x, &unit->mMoveCurrentPos.y, &unit->mMoveCurrentPos.z);
+        event->blocked = 3;
+        break;
+    case 3:
+        sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+        unit->mMoveCurrentPos.x = unit->mMoveCurrentPos.x + MJ_F(unit, 0x180) * sn / 33.0;
+        sn = sin(6.28318531f * MJ_F(unit, 0x1B0) / 360.0f);
+        unit->mMoveCurrentPos.y = unit->mMoveCurrentPos.y - MJ_F(unit, 0x180) * sn;
+        MJ_F(unit, 0x1B0) = MJ_F(unit, 0x1B0) + MJ_F(unit, 0x1B4);
+        MJ_F(unit, 0x1B0) = reviseAngle(MJ_F(unit, 0x1B0));
+        BtlUnit_SetPos(unit, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y, unit->mMoveCurrentPos.z);
+        BEC_MVFRAME(unit)--;
+        if (BEC_MVFRAME(unit) == 0) {
+            return EVT_RETURN_YIELD;
+        }
+        break;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
 USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
@@ -4401,7 +4612,7 @@ USER_FUNC(btlevtcmd_JumpPartsPosition) {
     s32 id, pno;
     s32* args = event->args;
     BattleUnitPart* part;
-    s32 kind, frames;
+    s32 frames, kind;
     f32 tx, ty, tz;
     f32 x, y, z;
 
@@ -4442,11 +4653,11 @@ USER_FUNC(btlevtcmd_JumpPartsPosition) {
         if (BEC_FIELD(part, 0xA0, s32) == 0) {
             return EVT_RETURN_DONE;
         }
-        BEC_FIELD(part, 0xAC, f32) = y / BEC_FIELD(part, 0xA0, s32) + (BEC_FIELD(part, 0xA8, f32) * BEC_FIELD(part, 0xA0, s32)) / 2.0f;
+        BEC_FIELD(part, 0xAC, f32) = y / BEC_FIELD(part, 0xA0, s32) + (BEC_FIELD(part, 0xA8, f32) * BEC_FIELD(part, 0xA0, s32)) * 0.5f;
         BEC_FIELD(part, 0xA4, f32) = BEC_FIELD(part, 0xA4, f32) + BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA0, s32);
-        BtlUnit_LoadSeMode(2, kind, (u8*)part + 0xF8, (u8*)part + 0xC0);
+        BtlUnit_LoadSeMode(2, kind, &part->field_0xBE[0x3A], &part->field_0xBE[2]);
         if (BEC_FIELD(part, 0xC0, s32)) {
-            Vec pos = becMvVecA(part->mMoveCurrentPos.x, part->mMoveCurrentPos.y, part->mMoveCurrentPos.z);
+            Vec pos = becMvVecD(part->mMoveCurrentPos.x, part->mMoveCurrentPos.y, part->mMoveCurrentPos.z);
             psndSFXOn_3D((const char*)BEC_FIELD(part, 0xC0, s32), &pos);
         }
     }
@@ -4461,7 +4672,7 @@ USER_FUNC(btlevtcmd_JumpPartsPosition) {
     if (BEC_FIELD(part, 0xA0, s32) <= 0) {
         BtlUnit_SetPartsPos(part, part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
         if (BEC_FIELD(part, 0xC4, s32)) {
-            Vec pos = becMvVecB(part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
+            Vec pos = becMvVecE(part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
             psndSFXOn_3D((const char*)BEC_FIELD(part, 0xC4, s32), &pos);
         }
         return EVT_RETURN_YIELD;
@@ -4492,6 +4703,63 @@ USER_FUNC(btlevtcmd_JumpPartsSetting) {
 
 void _PartsMoveSoundControl(BattleUnitPart* part);
 void _PartsMoveSoundControlEnd(BattleUnitPart* part);
+
+USER_FUNC(btlevtcmd_FallPartsPosition) {
+    s32 id, pno, frames;
+    s32* args = event->args;
+    BattleUnitPart* part;
+    f32 tx, ty, tz;
+    f32 x, y, z;
+
+    id = evtGetValue(event, args[0]);
+    id = BattleTransID(event, id);
+    pno = evtGetValue(event, args[1]);
+    tx = (f32)evtGetValue(event, args[2]);
+    ty = (f32)evtGetValue(event, args[3]);
+    tz = (f32)evtGetValue(event, args[4]);
+    frames = evtGetValue(event, args[5]);
+    part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, id), pno);
+    if (isFirstCall) {
+        event->blocked = 1;
+        BEC_FIELD(part, 0xA0, s32) = frames;
+        BtlUnit_GetPartsPos(part, &x, &y, &z);
+        BtlUnit_SetPartsMoveCurrentPos(part, x, y, z);
+        BtlUnit_SetPartsMoveTargetPos(part, tx, ty, tz);
+        BEC_FIELD(part, 0xB0, f32) = angleABf(x, z, tx, tz);
+        BEC_FIELD(part, 0xB4, f32) = distABf(x, z, tx, tz);
+        if (tx - x > 0.0f) {
+            BEC_FIELD(part, 0xBC, s8) = 1;
+        }
+        else if (tx - x < 0.0f) {
+            BEC_FIELD(part, 0xBC, s8) = -1;
+        }
+        y = ty - y;
+        if (BEC_FIELD(part, 0xA0, s32) == 0) {
+            if (BEC_FIELD(part, 0xA4, f32) == 0.0f) {
+                BEC_FIELD(part, 0xA4, f32) = 1.0f;
+            }
+            BEC_FIELD(part, 0xA0, s32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA4, f32);
+            if (BEC_FIELD(part, 0xA0, s32) == 0) {
+                BEC_FIELD(part, 0xA0, s32) = 1;
+            }
+        }
+        else {
+            BEC_FIELD(part, 0xA4, f32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA0, s32);
+        }
+        BEC_FIELD(part, 0xAC, f32) = 0.0f;
+        BEC_FIELD(part, 0xA8, f32) = (y / BEC_FIELD(part, 0xA0, s32) - BEC_FIELD(part, 0xAC, f32)) / (-BEC_FIELD(part, 0xA0, s32) / 2.0f);
+    }
+    part->mMoveCurrentPos.y += BEC_FIELD(part, 0xAC, f32);
+    BEC_FIELD(part, 0xAC, f32) -= BEC_FIELD(part, 0xA8, f32);
+    btlMovePos(BEC_FIELD(part, 0xA4, f32), BEC_FIELD(part, 0xB0, f32), &part->mMoveCurrentPos.x, &part->mMoveCurrentPos.z);
+    BtlUnit_SetPartsPos(part, part->mMoveCurrentPos.x, part->mMoveCurrentPos.y, part->mMoveCurrentPos.z);
+    BEC_FIELD(part, 0xA0, s32)--;
+    if (BEC_FIELD(part, 0xA0, s32) <= 0) {
+        BtlUnit_SetPartsPos(part, part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
+        return EVT_RETURN_YIELD;
+    }
+    return EVT_RETURN_BLOCK;
+}
 
 USER_FUNC(btlevtcmd_DivePartsPosition) {
     s32 id, pno, frames, height, mode, type, kind;
@@ -4625,63 +4893,6 @@ USER_FUNC(btlevtcmd_DivePartsPosition) {
         BtlUnit_SetPartsPos(unit, unit->mMoveCurrentPos.x + sz, unit->mMoveCurrentPos.y + sx, unit->mMoveCurrentPos.z);
     }
     _PartsMoveSoundControl(unit);
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(btlevtcmd_FallPartsPosition) {
-    s32 id, pno, frames;
-    s32* args = event->args;
-    BattleUnitPart* part;
-    f32 tx, ty, tz;
-    f32 x, y, z;
-
-    id = evtGetValue(event, args[0]);
-    id = BattleTransID(event, id);
-    pno = evtGetValue(event, args[1]);
-    tx = (f32)evtGetValue(event, args[2]);
-    ty = (f32)evtGetValue(event, args[3]);
-    tz = (f32)evtGetValue(event, args[4]);
-    frames = evtGetValue(event, args[5]);
-    part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(_battleWorkPointer, id), pno);
-    if (isFirstCall) {
-        event->blocked = 1;
-        BEC_FIELD(part, 0xA0, s32) = frames;
-        BtlUnit_GetPartsPos(part, &x, &y, &z);
-        BtlUnit_SetPartsMoveCurrentPos(part, x, y, z);
-        BtlUnit_SetPartsMoveTargetPos(part, tx, ty, tz);
-        BEC_FIELD(part, 0xB0, f32) = angleABf(x, z, tx, tz);
-        BEC_FIELD(part, 0xB4, f32) = distABf(x, z, tx, tz);
-        if (tx - x > 0.0f) {
-            BEC_FIELD(part, 0xBC, s8) = 1;
-        }
-        else if (tx - x < 0.0f) {
-            BEC_FIELD(part, 0xBC, s8) = -1;
-        }
-        y = ty - y;
-        if (BEC_FIELD(part, 0xA0, s32) == 0) {
-            if (BEC_FIELD(part, 0xA4, f32) == 0.0f) {
-                BEC_FIELD(part, 0xA4, f32) = 1.0f;
-            }
-            BEC_FIELD(part, 0xA0, s32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA4, f32);
-            if (BEC_FIELD(part, 0xA0, s32) == 0) {
-                BEC_FIELD(part, 0xA0, s32) = 1;
-            }
-        }
-        else {
-            BEC_FIELD(part, 0xA4, f32) = BEC_FIELD(part, 0xB4, f32) / BEC_FIELD(part, 0xA0, s32);
-        }
-        BEC_FIELD(part, 0xAC, f32) = 0.0f;
-        BEC_FIELD(part, 0xA8, f32) = (y / BEC_FIELD(part, 0xA0, s32) - BEC_FIELD(part, 0xAC, f32)) / (-BEC_FIELD(part, 0xA0, s32) / 2.0f);
-    }
-    part->mMoveCurrentPos.y += BEC_FIELD(part, 0xAC, f32);
-    BEC_FIELD(part, 0xAC, f32) -= BEC_FIELD(part, 0xA8, f32);
-    btlMovePos(BEC_FIELD(part, 0xA4, f32), BEC_FIELD(part, 0xB0, f32), &part->mMoveCurrentPos.x, &part->mMoveCurrentPos.z);
-    BtlUnit_SetPartsPos(part, part->mMoveCurrentPos.x, part->mMoveCurrentPos.y, part->mMoveCurrentPos.z);
-    BEC_FIELD(part, 0xA0, s32)--;
-    if (BEC_FIELD(part, 0xA0, s32) <= 0) {
-        BtlUnit_SetPartsPos(part, part->mMoveTargetPos.x, part->mMoveTargetPos.y, part->mMoveTargetPos.z);
-        return EVT_RETURN_YIELD;
-    }
     return EVT_RETURN_BLOCK;
 }
 
@@ -4882,40 +5093,6 @@ USER_FUNC(btlevtcmd_GetResultPrizeLv) {
 USER_FUNC(btlevtcmd_GetResultACDefence) {
     s32 index = event->args[0];
     evtSetValue(event, index, BattleActionCommandGetDefenceResult());
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(btlevtcmd_MarioJumpParam) {
-    s32* args = event->args;
-    s32 id, frames, n, out;
-    f32 tx, tz, dist;
-    f32 x, y, z;
-    BattleUnit* unit;
-
-    id = evtGetValue(event, args[0]);
-    id = BattleTransID(event, id);
-    tx = evtGetValue(event, args[1]);
-    evtGetValue(event, args[2]);
-    tz = evtGetValue(event, args[3]);
-    out = args[4];
-    frames = evtGetValue(event, out);
-    unit = BattleGetUnitPtr(_battleWorkPointer, id);
-    BtlUnit_GetPos(unit, &x, &y, &z);
-    dist = distABf(x, z, tx, tz);
-    if (frames != 0) {
-        n = frames;
-    } else {
-        n = dist / unit->mMoveSpeedXZ;
-    }
-    if (dist > 60.0f) {
-        n += (s32)(0.15f * (dist - 60.0f));
-    }
-    if (frames == 0 || n > frames) {
-        frames = n;
-    }
-    if (frames != -250000000) {
-        evtSetValue(event, out, frames);
-    }
     return EVT_RETURN_DONE;
 }
 
@@ -5228,7 +5405,7 @@ USER_FUNC(btlevtcmd_AnimeWaitPlayLoopTiming) {
         event->userdata[1] = 0;
         event->userdata[2] = 0;
     }
-    if (__fabs(BEC_FIELD(animPoseGetAnimPosePtr(BEC_FIELD(part, 0x1C0, s32)), 0x44, f32)) < 0.01) {
+    if (__fabs(BEC_FIELD(animPoseGetAnimPosePtr(BEC_FIELD(part, 0x1C0, s32)), 0x44, f32)) < (double)0.01f) {
         return EVT_RETURN_DONE;
     }
     loop = animPoseGetLoopTimes(BEC_FIELD(part, 0x1C0, s32));
@@ -5775,31 +5952,34 @@ USER_FUNC(btlevtcmd_WeaponAftereffect) {
     u8* w = (u8*)evtGetValue(event, event->args[0]);
     s32 a1, a2, b;
     s32 r;
-    u32 flags;
-    u8 st;
 
     b = 0;
     a2 = 0;
     a1 = 0;
     r = irand(w[0xB4] + w[0xB5] + w[0xB6] + w[0xB7]);
-    flags = BEC_FIELD(wp, 0x19068, u32);
-    if (flags & 0x10) a1 = 1;
-    if (flags & 0x20) a2 = 1;
-    if ((r -= w[0xB4]) < 0) {
+    if (*(u32*)&wp->field_19064[4] & 0x10) a1 = 1;
+    if (*(u32*)&wp->field_19064[4] & 0x20) a2 = 1;
+    r -= w[0xB4];
+    if (r < 0) {
         a2 = 1;
         a1 = 1;
     }
-    else if ((r -= w[0xB5]) < 0) {
-        a1 = 1;
+    else {
+        r -= w[0xB5];
+        if (r < 0) {
+            a1 = 1;
+        }
+        else {
+            r -= w[0xB6];
+            if (r < 0) {
+                a2 = 1;
+            }
+        }
     }
-    else if ((r -= w[0xB6]) < 0) {
-        a2 = 1;
-    }
-    st = wp->field_180DC;
-    if (st & 4) a2 = 0;
-    if (st & 2) a1 = 0;
-    if ((st & 2) && !(st & 8)) {
-        if (irand(100) < w[0xB8] || (BEC_FIELD(wp, 0x19068, u32) & 0x40)) {
+    if (wp->field_180DC & 4) a2 = 0;
+    if (wp->field_180DC & 2) a1 = 0;
+    if ((wp->field_180DC & 2) && !(wp->field_180DC & 8)) {
+        if (irand(100) < w[0xB8] || (*(u32*)&wp->field_19064[4] & 0x40)) {
             b = 1;
             if (!(wp->field_180DC & 4)) a2 = 1;
         }
@@ -5807,11 +5987,11 @@ USER_FUNC(btlevtcmd_WeaponAftereffect) {
     if (a1) BattleStage_DestroyA1();
     if (a2) BattleStage_DestroyA2();
     if (b) BattleStage_DestroyB();
-    if (irand(100) < w[0xB9] || (BEC_FIELD(wp, 0x19068, u32) & 0x200)) BattleStage_NozzleDirChangeCheck();
-    if (irand(100) < w[0xBA] || (BEC_FIELD(wp, 0x19068, u32) & 0x100)) BattleStage_NozzleWorkCheck(1);
-    if (irand(100) < w[0xBB] || (BEC_FIELD(wp, 0x19068, u32) & 0x80)) BattleStage_IronFrameFallCheck();
+    if (irand(100) < w[0xB9] || (*(u32*)&wp->field_19064[4] & 0x200)) BattleStage_NozzleDirChangeCheck();
+    if (irand(100) < w[0xBA] || (*(u32*)&wp->field_19064[4] & 0x100)) BattleStage_NozzleWorkCheck(1);
+    if (irand(100) < w[0xBB] || (*(u32*)&wp->field_19064[4] & 0x80)) BattleStage_IronFrameFallCheck();
     if (wp->field_180DC & 0x20) {
-        if (BEC_FIELD(wp, 0x19068, u32) & 1) {
+        if (*(u32*)&wp->field_19064[4] & 1) {
             BattleStage_ObjectFallCheck();
         }
         else if (irand(100) < w[0xBC]) {
@@ -6184,6 +6364,16 @@ void _PartsMoveSoundControlEnd(BattleUnitPart* part) {
     _MoveSoundControlEndCore(part->mOwner, (BecSndWork*)((u8*)part + 0xC0));
 }
 
+const char* _mario_acrobat_voice_table[5] = {
+    "SFX_VOICE_MARIO_AC3_1", "SFX_VOICE_MARIO_AC3_2", "SFX_VOICE_MARIO_AC3_3",
+    "SFX_VOICE_MARIO_AC3_4", "SFX_VOICE_MARIO_AC3_5",
+};
+const char* _mario_attack_voice_table[10] = {
+    "SFX_VOICE_MARIO_AC1_1", "SFX_VOICE_MARIO_AC1_2", "SFX_VOICE_MARIO_AC1_3",
+    "SFX_VOICE_MARIO_AC1_4", "SFX_VOICE_MARIO_AC1_5", "SFX_VOICE_MARIO_AC2_1",
+    "SFX_VOICE_MARIO_AC2_2", "SFX_VOICE_MARIO_AC2_3", "SFX_VOICE_MARIO_AC2_4",
+    "SFX_VOICE_MARIO_AC2_5",
+};
 void _MoveSoundControlEndCore(BattleUnit* unit, BecSndWork* work) {
     if ((u32)work->sfxId != 0xFFFFFFFF) {
         psndSFXOff(work->sfxId);

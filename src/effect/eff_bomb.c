@@ -122,9 +122,9 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     f32 scale;
     f32 one;
-    f32 deg;
-    f32 half;
     f32 left;
+    f32 half;
+    f32 deg;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rot;
@@ -174,8 +174,8 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXConcat(mtx, rot, base);
     PSMTXConcat(camera->view, base, base);
     GXSetCurrentMtx(GX_PNMTX0);
-    scale = 30.0f * scale;
     deg = 0.017453292f;
+    scale = 30.0f * scale;
     half = 0.5f;
     one = 1.0f;
 
@@ -189,7 +189,6 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXTrans(mtx, -0.05f, -0.05f, 0.0f);
         PSMTXConcat(texMtx, mtx, texMtx);
 
-        left = -one / 2.0f;
         GXLoadTexMtxImm(texMtx, GX_TEXMTX1, GX_MTX2x4);
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         PSMTXRotRad(rot, 'z', deg * -work->angle);
@@ -198,6 +197,7 @@ static void effBombDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(texMtx, scaleMtx, texMtx);
         PSMTXConcat(base, texMtx, texMtx);
         GXLoadPosMtxImm(texMtx, GX_PNMTX0);
+        left = -one / 2.0f;
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
         GXPosition3f32(left, one, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);

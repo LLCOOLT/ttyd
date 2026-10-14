@@ -81,8 +81,8 @@ typedef struct NanNPCWork {
     void (*func1c)();  // 0x1C
 } NanNPCWork;
 
-char makestring[16];
 NanNPCWork* nanNPCWork;
+char makestring[16];
 
 void nannpc_ext_disp();
 void nannpc_ext_shadow_disp();

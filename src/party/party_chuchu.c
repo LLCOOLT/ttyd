@@ -174,10 +174,10 @@ USER_FUNC(search_result) {
 }
 
 static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
+    MarioWork* player2;
     int found;
     u32 i;
     ChuchuTreasure* tbl;
-    MarioWork* player2;
     f32 minDist;
 
     player2 = pl;
@@ -211,8 +211,8 @@ USER_FUNC(set_msg) {
     ItemEntry* item;
     ChuchuTreasure* tbl;
     MarioWork* player2;
-    int found;
     u32 i;
+    int found;
     MarioWork* player;
     int pass;
     int type;

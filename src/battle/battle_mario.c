@@ -2356,6 +2356,7 @@ EVT_BEGIN(marioAttackEvent_HammerNageru_object)
 EVT_END()
 
 static const char battle_mario_nullstr[4] = "";
+extern const f32 battle_mario_one;
 
 s32 marioAttackEvent_FireNaguri[] = {
     131163, (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 131163, (s32)btlevtcmd_CommandPayWeaponCost, -2,
@@ -2989,7 +2990,7 @@ USER_FUNC(_mario_fire_ball_controll) {
     EffectEntry* eff;
     if (isFirstCall) {
         event->userdata[0] = 0;
-        event->userdata[1] = (s32)effFireEntry(5, 0.0f, 0.0f, 0.0f, 1.0f, 1000);
+        event->userdata[1] = (s32)effFireEntry(5, 0.0f, 0.0f, 0.0f, battle_mario_one, 1000);
 
     }
     eff = (EffectEntry*)event->userdata[1];
@@ -3052,3 +3053,5 @@ USER_FUNC(_paper_light_off) {
     animPoseSetMaterialLightFlagOff(BattleGetUnitPartsPtr(id, part)->poseId, 1);
     return EVT_RETURN_DONE;
 }
+
+const f32 battle_mario_one = 1.0f;

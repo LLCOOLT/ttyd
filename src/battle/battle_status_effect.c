@@ -45,7 +45,33 @@ typedef struct StChgMsgData {
 	const char* msg0;
 } StChgMsgData;
 
-extern StChgMsgData _st_chg_msg_data[];
+StChgMsgData _st_chg_msg_data[] = {
+	{ 4, "\202\307\202\255", "msg_st_chg_poison", "msg_st_chg_poison" },
+	{ 16, "\203`\203\203\201[\203W", "msg_st_chg_charge", "msg_st_chg_charge3" },
+	{ 1, "\202\313\202\336\202\350", "msg_st_chg_sleep", "msg_st_chg_sleep" },
+	{ 2, "\203X\203g\203b\203v", "msg_st_chg_stan", "msg_st_chg_stan" },
+	{ 3, "\203O\203\213\203O\203\213", "msg_st_chg_guruguru", "msg_st_chg_guruguru" },
+	{ 5, "\202\261\202\361\202\347\202\361", "msg_st_chg_confusion", "msg_st_chg_confusion" },
+	{ 6, "\203r\203\212\203r\203\212", "msg_st_chg_biribiri", "msg_st_chg_biribiri" },
+	{ 7, "\203\210\203P\203\210\203P", "msg_st_chg_dodge", "msg_st_chg_dodge" },
+	{ 8, "\202\320\202\276\202\351\202\334", "msg_st_chg_fire", "msg_st_chg_fire" },
+	{ 9, "\202\261\202\250\202\350\202\303\202\257", "msg_st_chg_freeze", "msg_st_chg_freeze" },
+	{ 10, "\203f\203J\203f\203J", "msg_st_chg_big", "msg_st_chg_big" },
+	{ 11, "\203~\203j\203~\203j", "msg_st_chg_small", "msg_st_chg_small" },
+	{ 12, "\202\302\202\346\202\302\202\346", "msg_st_chg_tuyotuyo", "msg_st_chg_tuyotuyo" },
+	{ 13, "\202\346\202\355\202\346\202\355", "msg_st_chg_yowayowa", "msg_st_chg_yowayowa" },
+	{ 14, "\203J\203`\203J\203`", "msg_st_chg_hard", "msg_st_chg_hard" },
+	{ 15, "\203t\203j\203\203\203t\203j\203\203", "msg_st_chg_soft", "msg_st_chg_soft" },
+	{ 0, "\203A\203\214\203\213\203M\201[", "msg_st_chg_allergy", "msg_st_chg_allergy" },
+	{ 18, "\202\306\202\244\202\337\202\242", "msg_st_chg_trans", "msg_st_chg_trans" },
+	{ 19, "\202\315\202\342\202\242", "msg_st_chg_quick", "msg_st_chg_quick" },
+	{ 20, "\202\314\202\353\202\242", "msg_st_chg_slow", "msg_st_chg_slow" },
+	{ 21, "\202\265\202\251\202\246\202\265", "msg_st_chg_counter", "msg_st_chg_counter" },
+	{ 22, "\203{\203\200\203J\203E\203\223\203^\201[", "msg_st_chg_bombcounter", "msg_st_chg_bombcounter" },
+	{ 23, "\202\266\202\355\202\266\202\355\202g\202o", "msg_st_chg_reg_hp", "msg_st_chg_reg_hp" },
+	{ 24, "\202\266\202\355\202\266\202\355\202e\202o", "msg_st_chg_reg_fp", "msg_st_chg_reg_fp" },
+	{ -1, "", "", "" },
+};
 extern s8 _st_pri_data[];
 
 
@@ -76,7 +102,7 @@ s8 _st_pri_data[] = {
 	STATUS_HOLD_FAST,
 	STATUS_HP_REGEN,
 	STATUS_FP_REGEN,
-	-1
+	-1, 0, 0, 0
 };
 
 //local prototypes
@@ -287,7 +313,7 @@ void BSE_Kagegakure(BattleUnit* unit) {
 	}
 	if (on) {
 		if (KAGE_ICON(unit) == NULL) {
-			sprintf(name, "_biK_%02x", *(s32*)unit);
+			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
 			iconEntry(name, 0x99);
 			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
 		}
@@ -315,12 +341,13 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
 BOOL BtlUnit_CheckShadowGuard(BattleUnit* unit);
 f32 sinfd(f32 degrees);
 
+#pragma optimize_for_size on
 BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 	BattleUnitPart* part;
 	f32 x, y, z;
 	f32* work;
-	u16 st;
 	u16 ac;
+	u16 st;
 
 	part = BtlUnit_GetPartsPtr(unit, BtlUnit_GetBodyPartsId(unit));
 	st = *(u16*)&unit->mBurnDamageFlameState;
@@ -331,29 +358,26 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 	if (ac == 0) {
 		return FALSE;
 	}
-	if ((s32)ac != 1) {
-		return FALSE;
-	}
-	switch (unit->mBurnDamageFlameState) {
-	case 0:
-		return FALSE;
+	switch (ac) {
 	case 1:
-		unit->mBurnDamageFlameState++;
+	switch (st) {
+	case 1:
+		unit->mBurnDamageFlameState = st + 1;
 		unit->mBurnDamageFlameScale = 1.0f;
 		BtlUnit_GetPartsWorldPos(part, &x, &y, &z);
 		z += 5.0f;
 		unit->mBurnDamageFlameEff = effFireEntry(0, 0, x, y, z, unit->mBurnDamageFlameScale);
 		unit->mBurnDamageFlameAnimTimer = 0;
-		return TRUE;
+		break;
 	case 2:
 		work = (f32*)unit->mBurnDamageFlameEff->userdata;
 		unit->mBurnDamageFlameAnimTimer++;
 		unit->mBurnDamageFlameScale = 1.6f * sinfd(unit->mBurnDamageFlameAnimTimer * 3) + 0.4f;
 		work[9] = unit->mBurnDamageFlameScale;
 		if (unit->mBurnDamageFlameAnimTimer >= 60) {
-			unit->mBurnDamageFlameState++;
+			(*(u16*)&unit->mBurnDamageFlameState)++;
 		}
-		return TRUE;
+		break;
 	case 3:
 		effDelete(unit->mBurnDamageFlameEff);
 		unit->mBurnDamageFlameEff = NULL;
@@ -361,10 +385,17 @@ BOOL BSE_TurnFirstProcessEffectMain(BattleUnit* unit) {
 		if (!BtlUnit_CheckShadowGuard(unit)) {
 			BattleDamageDirect(-5, unit, NULL, 1, 0, 0x118, 0, 1);
 		}
+	case 0:
+	default:
 		return FALSE;
 	}
-	return FALSE;
+	break;
+	default:
+		return FALSE;
+	}
+	return TRUE;
 }
+#pragma optimize_for_size reset
 
 #pragma optimize_for_size on
 void BattleStatusChangeInfoWorkInit(BattleUnit* unit) {
@@ -400,15 +431,15 @@ s32 _get_pri(s8 type) {
 }
 
 #pragma optimize_for_size on
-void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s8 type, s8 arg2, s32 arg3) {
+void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 arg3) {
 	StChgInfo* e = (StChgInfo*)((u8*)unit + 0xAE4);
 	StChgInfo tmp, swap;
 	s8 pri = _get_pri(type);
 	s32 i, j, n;
-	u8 t, v;
+	u8 t;
 
 	for (i = 0; i < 6; i++) {
-		if (pri >= (s8)_get_pri(e[i].type)) break;
+		if (pri >= (s8)_get_pri((s8)*(u8*)&e[i].type)) break;
 	}
 	if (i >= 6) return;
 	tmp.type = type;
@@ -425,19 +456,23 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s8 type, s8 arg2, s32 ar
 		}
 	}
 	n = 0;
-	t = 0;
-	for (j = 0; j < 6; j++) {
-		if (e[j].type == -1) break;
-		e[j].field_0x2 = t;
+	t = n;
+	for (i = 0; i < 6; i++) {
+		if (e[i].type == -1) break;
+		e[i].field_0x2 = t;
+		e[i].field_0x4 = 0;
 		t += 10;
-		e[j].field_0x4 = 0;
 		n++;
 	}
-	v = t ? 0x50 : 0x3C;
+if (t == 0) {
+		t = 0x3C;
+	} else {
+		t = 0x50;
+	}
 	for (j = n; j >= 0; j--) {
 		if (e[j].type != -1) {
-			e[j].field_0x3 = v;
-			v += 10;
+			e[j].field_0x3 = t;
+			t += 10;
 		}
 	}
 }
@@ -498,18 +533,24 @@ void BattleStatusChangeMsgSetAnnouce(s32* data, s32 index, s32 arg2) {
 	}
 }
 
+typedef struct StChgWorkLocal { StChgMsg msg[28]; char text[0x100]; s64 mask; } StChgWorkLocal;
 #pragma dont_inline on
 #pragma optimize_for_size on
 void BattleStatusChangeMsgAdjust(BattleWork* wp) {
-	StChgMsg* base = (StChgMsg*)((u8*)wp + 0x18D88);
-	StChgMsg* msg;
-	BattleUnit* unit;
-	StChgInfo* e;
+	s32 t;
+	StChgWorkLocal* base;
 	s8 i;
-	s32 j, n, k, found;
+	StChgMsg* msg;
+	s32 j;
+	BattleUnit* unit;
+	s32 n, found, k;
+	StChgInfo* e;
+
+	base = (StChgWorkLocal*)((u8*)wp + 0x18D88);
 
 	for (i = 0; i < 28; i++) {
-		msg = &base[i];
+		t = i;
+		msg = &base->msg[t];
 		if (msg->type == -1) continue;
 		msg->flags = 0;
 		for (j = 0; j < 64; j++) {
@@ -526,7 +567,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 					k++;
 				}
 				if (found) {
-					BattleStatusChangeMsgSetAnnouce((s32*)unit, i, e[k].field_0x8);
+					BattleStatusChangeMsgSetAnnouce((s32*)unit, t, e[k].field_0x8);
 				}
 			}
 		}
@@ -534,7 +575,7 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 			msg->unitId = -1;
 			msg->type = -1;
 		}
-		else if (*(u64*)((u8*)base + 0x250) & (1ULL << i)) {
+		else if (base->mask & (s64)(1 << t)) {
 			msg->unitId = -1;
 			msg->type = -1;
 		}
@@ -542,14 +583,14 @@ void BattleStatusChangeMsgAdjust(BattleWork* wp) {
 }
 
 BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
-	StChgMsg* base = (StChgMsg*)((u8*)wp + 0x18D88);
+	StChgWorkLocal* base = (StChgWorkLocal*)((u8*)wp + 0x18D88);
 	StChgMsg* msg;
-	BOOL ret = FALSE;
 	s8* p;
+	BOOL ret = FALSE;
 	s32 i;
 
-	for (p = _st_pri_data; *p != -1; p++) {
-		msg = &base[*p];
+	for (i = 0; _st_pri_data[i] != -1; i++) {
+		msg = &base->msg[_st_pri_data[i]];
 		if (msg->type == -1) continue;
 		ret = TRUE;
 		BattleGetUnitPtr(wp, msg->unitId);
@@ -563,21 +604,21 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 			}
 		}
 		else {
-			sprintf((char*)base + 0x150, "");
+			sprintf(base->text, "");
 			for (i = 0; i < 28; i++) {
 				if (msg->type == _st_chg_msg_data[i].type || _st_chg_msg_data[i].type == -1) {
 					if (msg->field_0x8) {
-						sprintf((char*)base + 0x150, msgSearch(_st_chg_msg_data[i].msg1));
+						sprintf(base->text, msgSearch(_st_chg_msg_data[i].msg1));
 					}
 					else {
-						sprintf((char*)base + 0x150, msgSearch(_st_chg_msg_data[i].msg0));
+						sprintf(base->text, msgSearch(_st_chg_msg_data[i].msg0));
 					}
 					break;
 				}
 			}
 			msg->field_0x2 = 90;
 		}
-		dispEntry(8, 1, 900.0f, (DispCallback)_st_chg_msg_disp, 0);
+		dispEntry(8, 900.0f, 1, (DispCallback)_st_chg_msg_disp, 0);
 		break;
 	}
 	if (ret) {

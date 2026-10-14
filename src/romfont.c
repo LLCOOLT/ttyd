@@ -166,7 +166,7 @@ double tan(double);
 static inline RomFontChar* romFontFindChar(u16 code) {
     RomFontWork* w = wp;
     RomFontChar* table = w->unk0;
-    RomFontChar* cur = table;
+    RomFontChar* cur = w->unk0;
     s32 n;
     for (n = 0; n < w->uniqueChars; cur++, n++) {
         if (cur->code == code)
@@ -282,8 +282,8 @@ s32 romFontGetWidth(const char* message) {
     s32 max = 0;
 
     for (;;) {
-        c16 = *(u16*)&message[i];
         c = message[i];
+        c16 = *(u16*)&message[i];
         
         if (c >= 0x20 && c < 0x80) {
             glyph = romFontFindChar(c & 0xFFFF);

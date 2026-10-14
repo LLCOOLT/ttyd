@@ -144,8 +144,8 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 k;
     s32 j;
     s32 n;
-    s32 t;
     s32 frame;
+    s32 t;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -180,7 +180,7 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         p->b = 255;
         p->a = 255 - i * 20;
         p++;
-        p->x = (i * 50) - 300;
+        p->x = i * 50 - 300;
         p->y = (s32)(10.0f * (60.0f + work->offset[i]));
         p->z = 0;
         p->s = (frame + i * 4) << 5;

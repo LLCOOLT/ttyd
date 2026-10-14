@@ -224,18 +224,21 @@ void zubastar_create_takaku(s32 n, Vec* pts) {
 
 void zubastar_bunkatu(Vec* p0, Vec* p1) {
 	ZubaStarWork* w = GetZubaStarPtr();
-	s32 count = w->count;
+	ZSObj* t;
 	s32 i;
+	Vec hit[2];
+	s32 flags[2];
+	s32 idx[2];
+	f32 ox;
+	f32 oy;
+	s32 nhit;
+	s32 j;
+	s32 iy;
+	s32 ix;
+	s32 k;
+	s32 count = w->count;
 	for (i = 0; i < count; i++) {
-		ZSObj* t = w->ptrs[i];
-		Vec hit[2];
-		s32 flags[2];
-		s32 idx[2];
-		f32 ox;
-		f32 oy;
-		s32 nhit;
-		s32 j;
-		s32 k;
+		t = w->ptrs[i];
 		nhit = 0;
 		for (j = 0; j < 2; j++) {
 			flags[j] = 0;
@@ -244,8 +247,8 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			if (nhit == 2) break;
 			if (zubastar_get_kouten(p0->x, p0->y, p1->x, p1->y, t->v[j].x, t->v[j].y,
 			                        t->v[(j + 1) % t->n].x, t->v[(j + 1) % t->n].y, &ox, &oy)) {
-				s32 ix = ox;
-				s32 iy = oy;
+				ix = ox;
+				iy = oy;
 				for (k = 0; k < nhit; k++) {
 					if (flags[k] == 1 && ix == (s32)hit[k].x && iy == (s32)hit[k].y) break;
 				}
@@ -264,7 +267,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			ZSObj* b = BattleAlloc(0x50);
 			for (j = 0; j < t->n; j++) {
 				if (j == idx[0]) {
-					a->n = (t->n - idx[1]) + (j + 2);
+					a->n = (t->n - idx[1]) + 2 + j;
 					b->n = idx[1] - idx[0] + 2;
 				}
 			}
@@ -274,8 +277,10 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			for (j = 0; j <= idx[0]; j++) {
 				a->v[k++] = t->v[j];
 			}
-			a->v[k++] = hit[0];
-			a->v[k++] = hit[1];
+			a->v[k] = hit[0];
+			k++;
+			a->v[k] = hit[1];
+			k++;
 			for (j = idx[1] + 1; j < t->n; j++) {
 				a->v[k++] = t->v[j];
 			}
@@ -309,7 +314,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
 	f32 dx1 = x2 - x1;
 	f32 dx2;
-	f32 a, b, d, t, e1, e2;
+	f32 a, b, d, t, e2, e1;
 	if (dx1 == 0.0f && (dx2 = x4 - x3) == 0.0f) return 0;
 	if (dx1 != 0.0f) e1 = dx1; else e1 = 1e-5f;
 	dx2 = x4 - x3;
@@ -854,10 +859,10 @@ void zubastar_disp_bomb(CameraId cam, void* param) {
 		GXLoadPosMtxImm(m, 0);
 		GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, t->n);
 		for (j = 0; j < t->n; j++) {
-			f32 y = t->v[j].y;
-			f32 x = t->v[j].x;
-			GXPosition3f32(x, y, 0.0f);
-			GXTexCoord2f32((x + 96.0f) / 400.0f, (240.0f - y) / 480.0f);
+			f32 u = (t->v[j].x + 96.0f) / 400.0f;
+			f32 v = (240.0f - t->v[j].y) / 480.0f;
+			GXPosition3f32(t->v[j].x, t->v[j].y, 0.0f);
+			GXTexCoord2f32(u, v);
 		}
 	}
 }

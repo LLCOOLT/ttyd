@@ -85,15 +85,16 @@ EffectEntry* effHibashiraEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, 
 
 void effHibashiraMain(EffectEntry* effect) {
     EffHibashiraWork* work = effect->userdata;
-    BOOL inBattle;
     EffHibashiraWork* pillar;
     Vec position;
-    s32 type, j;
+    BOOL inBattle;
+    s32 type;
+    s32 k;
     s32 i;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
-    type = work->type;
     inBattle = gp->inBattle ? TRUE : FALSE;
+    type = work->type;
 
     // soft delete: start fading out
     if (effect->flags & 4) {
@@ -123,7 +124,7 @@ void effHibashiraMain(EffectEntry* effect) {
         work->alpha = work->timer * 16;
     }
     if (work->timer < 0) {
-        for (j = 0, pillar = work; j < effect->count; pillar++, j++) {
+        for (k = 0, pillar = work; k < effect->count; pillar++, k++) {
             if (pillar->poseId != -1) {
                 animPoseRelease(pillar->poseId);
             }
@@ -132,8 +133,8 @@ void effHibashiraMain(EffectEntry* effect) {
         return;
     }
 
-    work++;
-    for (i = 1; i < effect->count; i++, work++) {
+    {
+    for (i = 1, work++; i < effect->count; i++, work++) {
         if (work->delay) {
             work->delay--;
             continue;
@@ -167,6 +168,7 @@ void effHibashiraMain(EffectEntry* effect) {
         if (work->alpha < 0) {
             work->alpha = 0;
         }
+    }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effHibashiraDisp, effect);
 }

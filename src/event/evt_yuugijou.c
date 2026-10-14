@@ -28,6 +28,7 @@ PiantaParlorWork yuugijouwork;
 //.sbss
 s32 unk_80418b54;
 PiantaParlorWork* yuwp;
+s32 gap_08_80418B5C_sbss;
 
 s32 minigame_end[] = {
 	0x00020032, 0xFD050F80, 0x00000002,
@@ -156,8 +157,8 @@ void monteCountDisp(void) {
 	Mtx mtx;
 	GXColor c1, c2, c3, c4;
 	if (flags & 4) y = -0x78;
-	if (!(flags & 1)) return;
-	if (flags & 2) {
+	if (!(flags & 1) || !(flags & 2)) return;
+	{
 		{
 		c1 = (GXColor){255, 255, 255, 153};
 		windowDispGX_Waku_col(0, c1, -288.0f, (f32)(y + 0x2C), 200.0f, 44.0f, 16.0f);

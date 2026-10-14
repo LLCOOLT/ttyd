@@ -47,11 +47,11 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
 }
 
 void _disp(CameraId cameraId, void* param) {
-    BattleAnnounce* announce = &_battleWorkPointer->announce;
-    u16 width;
-    u16 lines;
-    f32 x, y;
     static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+    BattleAnnounce* announce = &_battleWorkPointer->announce;
+    u16 lines;
+    u16 width;
+    f32 x, y;
 
     x = announce->x;
     y = announce->y + 120;

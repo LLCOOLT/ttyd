@@ -391,9 +391,9 @@ s32 nameMain(void) {
 			}
 			break;
 	}
-	wp->x1 += 0.25f * (wp->x2 - wp->x1);
-	wp->y1 += 0.25f * (wp->y2 - wp->y1);
-	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+	wp->x1 += (wp->x2 - wp->x1) * 0.25f;
+	wp->y1 += (wp->y2 - wp->y1) * 0.25f;
+	wp->x1 += __fabs(2.0f * (f32)sin(0.125f * gp->retraceCount));
 	idx = wp->field_0x18;
 	if (idx >= 8) {
 		idx--;
@@ -402,7 +402,7 @@ s32 nameMain(void) {
 	wp->field_0x38 = 135.0f;
 	wp->field_0x2C += (wp->field_0x34 - wp->field_0x2C) * 0.25f;
 	wp->field_0x30 += (wp->field_0x38 - wp->field_0x30) * 0.25f;
-	wp->field_0x30 += __fabs(2.0f * (f32)sin(gp->retraceCount * 0.125f));
+	wp->field_0x30 += __fabs(2.0f * (f32)sin(0.125f * gp->retraceCount));
 	return 0;
 }
 

@@ -217,7 +217,7 @@ void msgLoad(const char* filename, s32 index) {
 		msgptr = entry->address;
 		msgcount = 0;
 		while (*(s8*)msgptr) {
-			msgptr += strlen(msgptr);
+			msgptr = strlen(msgptr) + msgptr;
 			msgcount++;
 			msgptr++;
 		}
@@ -258,7 +258,7 @@ static inline void msgAddPage(smartEntry* smart, s32 y) {
 }
 
 static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
-	u32 btn;
+	s32 btn;
 	if (!(data->flags & 0x80)) {
 		btn = 0x100;
 		if (((MsgWinData*)smart->address)->flags & 0x100) {
@@ -328,9 +328,8 @@ s32 msgMain(smartEntry* smart) {
 		break;
 	}
 	data->time30 = gp->renderTime;
-	i = data->field_0x10;
-	entry = &data->entries[i];
-	for (; i < 0x500; i++, entry++) {
+	entry = &data->entries[data->field_0x10];
+	for (i = data->field_0x10; i < 0x500; i++, entry++) {
 		if (entry->time > data->field_0x20) {
 			break;
 		}
@@ -1569,9 +1568,10 @@ void selectWindow_Main(WindowEntry* window) {
 void selectWindow_Disp(CameraId camId, void* param) {
 	WindowEntry* window = param; //cast to correct type
 	MsgWinData* data = window->userdata->address;
+	GXColor fog = {0, 0, 0, 0};
 	Vec pos;
 
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
+	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog);
 	{
 		GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
 		color.a = window->alpha;

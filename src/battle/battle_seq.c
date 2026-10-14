@@ -122,25 +122,25 @@ void btlseqEnd(BattleWork* wp);
 __declspec(section ".data") s32 lbl_80360FE0[] = {
 	-1082130432, 1065353216,
 };
-__declspec(section ".data") s32 seq_negone_one_374[] = {
+static __declspec(section ".data") s32 seq_negone_one_374[] = {
 	-1082130432, 1065353216,
 };
 __declspec(section ".data") s32 lbl_80360FF0[] = {
 	1065353216, -1082130432,
 };
-__declspec(section ".data") s32 seq_one_negone_373[] = {
+static __declspec(section ".data") s32 seq_one_negone_373[] = {
 	1065353216, -1082130432,
 };
 __declspec(section ".data") s32 lbl_80361000[] = {
 	-1082130432, 1065353216,
 };
-__declspec(section ".data") s32 seq_negone_one_360[] = {
+static __declspec(section ".data") s32 seq_negone_one_360[] = {
 	-1082130432, 1065353216,
 };
 __declspec(section ".data") s32 lbl_80361010[] = {
 	1065353216, -1082130432,
 };
-__declspec(section ".data") s32 seq_one_negone_359[] = {
+static __declspec(section ".data") s32 seq_one_negone_359[] = {
 	1065353216, -1082130432,
 };
 
@@ -152,6 +152,9 @@ const s32 N_weapon_lucky_start[48] = {
 	0x00000000, 0x00000000, 0x00000064, 0x03640300, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
 	0x00000000, 0x00000000, 0x00000302, 0x03020000, 0x00000000, 0x00000064, 0x00000000, 0x00000000,
 };
+
+static const GXColor c = {0, 0, 0, 0xFF};
+static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 
 const char* _rule_msg_table_2bu[] = {
 	"a", "stg3_tou_cp_001", "a", "stg3_tou_cp_002", "a", "stg3_tou_cp_004", "stg3_tou_cp_008", "a",
@@ -278,7 +281,7 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 			if (wp->alertTick <= 0) {
 				wp->alertTick = 60;
 				if (wp->commandMenu.field_4 & 1) {
-					psndSFXOn("SFX_BTL_PINCH1");
+					psndSFXOn("SFX_BTL_PINCH1\0");
 				}
 			}
 		}
@@ -378,13 +381,14 @@ BOOL fadeIsFinish(void);
 
 void btlseqFirstAct(BattleWork* wp) {
 	s32 type;
-	s32 flag;
 	int i;
 	BattleUnit* unit;
 	BattleUnit* a;
 	BattleUnit* b;
 	EventEntry* evt;
 	int found;
+	s32 flag;
+	int k;
 	u8* fb = (u8*)wp->fbatInfo;
 	u8* info;
 	type = FIELD(fb, s32, 8);
@@ -483,16 +487,15 @@ void btlseqFirstAct(BattleWork* wp) {
 				break;
 			}
 			{
-				static const GXColor c = {0, 0, 0, 0xFF};
 				fadeEntry(0x17, 200, c);
 			}
-			FIELD(wp, s32, 0x19060) = ((s32 (*)(const char*))psndSFXOn)("SFX_OFF_BTL_START_CURTAIN_UP1");
+			wp->field_19060 = ((s32 (*)(const char*))psndSFXOn)("SFX_OFF_BTL_START_CURTAIN_UP1");
 			BattleSetSeq(wp, SEQ_FIRST_ACT, 0x2000002);
 
 		case 0x2000002:
-			if (fadeIsFinish() && (u32)FIELD(wp, s32, 0x19060) != 0xFFFFFFFFU) {
-				psndSFXOff(FIELD(wp, s32, 0x19060));
-				FIELD(wp, s32, 0x19060) = -1;
+			if (fadeIsFinish() && (u32)wp->field_19060 != 0xFFFFFFFFU) {
+				psndSFXOff(wp->field_19060);
+				wp->field_19060 = -1;
 			}
 			if (BattleWaitAllActiveEvtEnd(wp)) {
 				BattleStatusWindowEventOn();
@@ -520,8 +523,7 @@ void btlseqFirstAct(BattleWork* wp) {
 			if (!BattleWaitAllActiveEvtEnd(wp)) {
 				break;
 			}
-			flag = BattleStatusChangeMsgMain(wp);
-			if (flag | BattleStatusChangeAnnouceMain(wp)) {
+			if (BattleStatusChangeAnnouceMain(wp) | BattleStatusChangeMsgMain(wp)) {
 				break;
 			}
 			BattleIncSeq(wp, SEQ_FIRST_ACT);
@@ -545,8 +547,7 @@ void btlseqFirstAct(BattleWork* wp) {
 			BattleIncSeq(wp, SEQ_FIRST_ACT);
 
 		case 0x2000007:
-			flag = BattleStatusChangeMsgMain(wp);
-			if (flag | BattleStatusChangeAnnouceMain(wp)) {
+			if (BattleStatusChangeAnnouceMain(wp) | BattleStatusChangeMsgMain(wp)) {
 				break;
 			}
 			BattleIncSeq(wp, SEQ_FIRST_ACT);
@@ -565,32 +566,35 @@ void btlseqFirstAct(BattleWork* wp) {
 			break;
 
 		case 0x2000009:
-			if (FIELD(wp, s32, 0x182A4) != 0 && !evtCheckID(FIELD(wp, s32, 0x182A4))) {
-				FIELD(wp, s32, 0x182A4) = 0;
+		{
+			s32* id = &FIELD(wp, s32, 0x182A4);
+			if (*id != 0 && !evtCheckID(*id)) {
+				*id = 0;
 			}
-			if (FIELD(wp, s32, 0x182A4) == 0) {
+			if (*id == 0) {
 				BattleSetSeq(wp, SEQ_FIRST_ACT, 0x200000A);
 			}
+		}
 			break;
 
 		case 0x200000A:
-			FIELD(wp, s32, 0x1904C) = 0;
-			found = 0;
-			for (i = 0; i < 64; i++) {
-				unit = BattleGetUnitPtr(wp, i);
+			wp->luckEventId = 0;
+			flag = 0;
+			k = 0;
+			do {
+				unit = BattleGetUnitPtr(wp, k);
 				if (unit && FIELD(unit, u8, 0x300) && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
-					found = 1;
+					flag = 1;
 				}
-			}
-			if (found) {
+			} while (++k < 64);
+			if (flag) {
 				evt = evtEntry(nanika_luck_event, 10, 0);
 				evt->unitId = -5;
-				FIELD(wp, s32, 0x1904C) = evt->eventId;
-				FIELD(wp, s32, 0x18FDC) |= -1;
-				FIELD(wp, s32, 0x18FD8) |= -1;
+				wp->luckEventId = evt->eventId;
+				FIELD(wp, s64, 0x18FD8) |= -1;
 				BattleStatusChangeMsgAdjust(wp);
 				BattleSetSeq(wp, SEQ_FIRST_ACT, 0x200000B);
-				FIELD(wp, u16, 0x18FE2) = 0;
+				wp->luckTimer = 0;
 			}
 			else {
 				BattleSetSeq(wp, SEQ_FIRST_ACT, 0x200000C);
@@ -599,15 +603,15 @@ void btlseqFirstAct(BattleWork* wp) {
 
 		case 0x200000B:
 			found = 1;
-			if (FIELD(wp, u16, 0x18FE2) < 300) {
-				FIELD(wp, u16, 0x18FE2)++;
+			if (wp->luckTimer < 300) {
+				wp->luckTimer++;
 			}
-			if (FIELD(wp, s32, 0x1904C) != 0) {
-				if (evtCheckID(FIELD(wp, s32, 0x1904C))) {
+			if (wp->luckEventId != 0) {
+				if (evtCheckID(wp->luckEventId)) {
 					found = 0;
 				}
 				else {
-					FIELD(wp, s32, 0x1904C) = 0;
+					wp->luckEventId = 0;
 				}
 			}
 			if (!BattleWaitAllActiveEvtEnd(wp)) {
@@ -653,15 +657,19 @@ USER_FUNC(_set_effect_luck) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleWeapon weapon = *(BattleWeapon*)N_weapon_lucky_start;
 	f32 z, y, x;
+	const char* sfx;
+	f32* pz;
+	f32* py;
+	BattleWeapon* pw;
 	BattleUnit* unit;
 	BattleUnitPart* part;
 	NiceEffectWork* effect;
 	int i;
-	const char* sfx = "SFX_SYSTEM_LUCKY1";
-	BattleWeapon* pw = &weapon;
-	f32* pz = &z;
-	f32* py = &y;
 
+	pw = &weapon;
+	pz = &z;
+	py = &y;
+	sfx = (0, "SFX_SYSTEM_LUCKY1");
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && unit->badgesEquipped.LuckyStart && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
@@ -703,8 +711,11 @@ USER_FUNC(_set_effect_luck) {
 			BattleSetStatusDamageFromWeapon(BattleGetSystemPtr(wp), unit, part, pw, 0x100);
 			BtlUnit_GetPos(unit, &x, py, pz);
 			psndSFXOn(sfx);
-			effect = effNiceEntry(6, x - 45.0f, 60.0f + y, z)->userdata;
-			effect->field_0x1C = 0.75f;
+			{
+				EffectEntry* e = effNiceEntry(6, x - 45.0f, 60.0f + y, z);
+				effect = e->userdata;
+				effect->field_0x1C = 0.75f;
+			}
 		}
 	}
 	return EVT_RETURN_DONE;
@@ -918,7 +929,8 @@ void btlseqTurn(BattleWork* wp) {
 		case 0x300001E:
 			TURN_RECOVERY_CASE(wp, 8);
 		case 0x3000020: {
-			const char* sfxName = "SFX_CONDITION_BREAK_ICE1";
+			BattleUnit* unit;
+			const char* sfxName = (0, "SFX_CONDITION_BREAK_ICE1");
 			for (i = 0; i < 64; i++) {
 				unit = BattleGetUnitPtr(wp, i);
 				if (BtlUnit_CheckRecoveryStatus(unit, 9)) {
@@ -1220,13 +1232,12 @@ void btlseqTurn(BattleWork* wp) {
 
 
 void _rule_disp(CameraId cameraId, void* param) {
-	static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
 	FieldBattleInfo* info = _battleWorkPointer->fbatInfo;
 	char buf[256];
-	u16 lines;
-	u16 width;
 	f32 x;
 	f32 y;
+	u16 lines;
+	u16 width;
 
 	if (evtGetValue(NULL, GSW(0)) < 0xAC) {
 		if (evtGetValue(NULL, GSW(580)) < 11) {
@@ -1242,7 +1253,7 @@ void _rule_disp(CameraId cameraId, void* param) {
 	width = FontGetMessageWidthLine(buf, &lines);
 	lines++;
 	y = 0.0f;
-	x = y - width / 2;
+	x = y - (f32)(width / 2);
 	windowDispGX_Waku_col(0, color, x - 10.0f, 94.0f, (f32)(width + 20), (f32)(lines * 29 + 3), 10.0f);
 	FontDrawStart();
 	y = 120.0f;
@@ -1851,18 +1862,19 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 	f32 x1, y1, z1;
 	f32 x2, y2, z2;
 	s32 tmp;
+	int n = count;
 
-	if (count <= 0) {
-		count = 0;
+	if (n <= 0) {
+		n = 0;
 		for (i = 0; i < 64; i++) {
 			if (wp->movePriorityQueue[i] == -1) {
 				break;
 			}
-			count++;
+			n = n + 1;
 		}
 	}
-	for (i = 0; i < count - 1; i++) {
-		for (j = 0; j < count - i - 1; j++) {
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < n - i - 1; j++) {
 			unit1 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j]);
 			unit2 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j + 1]);
 			BtlUnit_GetHomePos(unit1, &x1, &y1, &z1);
@@ -1874,8 +1886,8 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 			}
 		}
 	}
-	for (i = 0; i < count - 1; i++) {
-		for (j = 0; j < count - i - 1; j++) {
+	for (i = 0; i < n - 1; i++) {
+		for (j = 0; j < n - i - 1; j++) {
 			unit1 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j]);
 			unit2 = BattleGetUnitPtr(wp, wp->movePriorityQueue[j + 1]);
 			if (unit1->movePriority < unit2->movePriority) {
@@ -1972,10 +1984,11 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 	int i;
+	BattleUnit* unit;
 	BOOL done = TRUE;
 
 	for (i = 0; i < 64; i++) {
-		BattleUnit* unit = BattleGetUnitPtr(wp, i);
+		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {
 			while (unit->phaseEventId) {
 				if (evtCheckID(unit->phaseEventId)) {
@@ -2010,7 +2023,7 @@ BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 				break;
 			}
 		}
-	}
+		}
 	if (!done) {
 		return done;
 	}

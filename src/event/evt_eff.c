@@ -163,6 +163,7 @@ extern EffectEntry* effMajinaiEntry(s32, f32, f32, f32);
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
 	s32* a2;
+	s32* f2;
 
 	EffectEntry* entry;
 	const char* effName;
@@ -176,39 +177,40 @@ USER_FUNC(evt_eff) {
 	//these are probably storing different typecasts, s32 and u32
 	evtGetValue(event, args[0]);
 	evtGetValue(event, args[0]);
-	effSet = (const char*)evtGetValue(event, args[1]);
-	//these are probably storing different typecasts, s32 and u32
-	evtGetValue(event, args[1]);
-	evtGetValue(event, args[1]);
 	a2 = args + 2;
-	int2 = evtGetValue(event, a2[0]);
-	int3 = evtGetValue(event, a2[1]); //unused
-	int4 = evtGetValue(event, a2[2]); //unused
-	int5 = evtGetValue(event, a2[3]); //unused
+	f2 = a2;
+	effSet = (const char*)evtGetValue(event, args[1]);
+	evtGetValue(event, args[1]);
 
-	int6 = evtGetValue(event, a2[4]);
-	int7 = evtGetValue(event, a2[5]);
-	int8 = evtGetValue(event, a2[6]);
-	int9 = evtGetValue(event, a2[7]);
-	int10 = evtGetValue(event, a2[8]);
-	int11 = evtGetValue(event, a2[9]);
-	int12 = evtGetValue(event, a2[10]); //unused
-	int13 = evtGetValue(event, a2[11]); //unused
-	int14 = evtGetValue(event, a2[12]); //unused
+	evtGetValue(event, args[1]);
+	int2 = evtGetValue(event, *a2++);
+	int3 = evtGetValue(event, *a2++); //unused
+	int4 = evtGetValue(event, *a2++); //unused
+	int5 = evtGetValue(event, *a2++); //unused
 
-	float2 = evtGetFloat(event, a2[0]); //unused
-	float3 = evtGetFloat(event, a2[1]);
-	float4 = evtGetFloat(event, a2[2]);
-	float5 = evtGetFloat(event, a2[3]);
-	float6 = evtGetFloat(event, a2[4]);
-	float7 = evtGetFloat(event, a2[5]);
-	float8 = evtGetFloat(event, a2[6]);
-	float9 = evtGetFloat(event, a2[7]);
-	float10 = evtGetFloat(event, a2[8]);
-	float11 = evtGetFloat(event, a2[9]);
-	float12 = evtGetFloat(event, a2[10]);
-	float13 = evtGetFloat(event, a2[11]);
-	float14 = evtGetFloat(event, a2[12]);
+	int6 = evtGetValue(event, *a2++);
+	int7 = evtGetValue(event, *a2++);
+	int8 = evtGetValue(event, *a2++);
+	int9 = evtGetValue(event, *a2++);
+	int10 = evtGetValue(event, *a2++);
+	int11 = evtGetValue(event, *a2++);
+	int12 = evtGetValue(event, *a2++); //unused
+	int13 = evtGetValue(event, *a2++); //unused
+	int14 = evtGetValue(event, *a2++); //unused
+
+	float2 = evtGetFloat(event, *f2++); //unused
+	float3 = evtGetFloat(event, *f2++);
+	float4 = evtGetFloat(event, *f2++);
+	float5 = evtGetFloat(event, *f2++);
+	float6 = evtGetFloat(event, *f2++);
+	float7 = evtGetFloat(event, *f2++);
+	float8 = evtGetFloat(event, *f2++);
+	float9 = evtGetFloat(event, *f2++);
+	float10 = evtGetFloat(event, *f2++);
+	float11 = evtGetFloat(event, *f2++);
+	float12 = evtGetFloat(event, *f2++);
+	float13 = evtGetFloat(event, *f2++);
+	float14 = evtGetFloat(event, *f2++);
 
 	entry = NULL;
 	switch (effGetSet(effSet)->id) {
@@ -385,8 +387,13 @@ USER_FUNC(evt_eff) {
 
 
 
+#pragma push
+#pragma optimization_level 2
 USER_FUNC(evt_eff64) {
 	s32* args;
+	s32* pi;
+	s32* pf;
+	s32* pr;
 	const char* effName;
 	const char* effSet;
 	s32 int2, int3, int4, int5, int6, int7, int8, int9,
@@ -401,39 +408,42 @@ USER_FUNC(evt_eff64) {
 	//these are probably storing different typecasts, s32 and u32
 	evtGetValue(event, args[0]);
 	evtGetValue(event, args[0]);
+	pi = args + 2;
 	effSet = (const char*)evtGetValue(event, args[1]);
+	pf = pi;
 	//these are probably storing different typecasts, s32 and u32
 	u1a = evtGetValue(event, args[1]);
+	pr = pi;
 	u1b = evtGetValue(event, args[1]);
 
-	int2 = evtGetValue(event, args[2]);
-	int3 = evtGetValue(event, args[3]);
-	int4 = evtGetValue(event, args[4]);
-	int5 = evtGetValue(event, args[5]);
-	int6 = evtGetValue(event, args[6]);
-	int7 = evtGetValue(event, args[7]);
-	int8 = evtGetValue(event, args[8]);
-	int9 = evtGetValue(event, args[9]);
-	int10 = evtGetValue(event, args[10]);
-	int11 = evtGetValue(event, args[11]);
-	int12 = evtGetValue(event, args[12]);
-	int13 = evtGetValue(event, args[13]);
-	int14 = evtGetValue(event, args[14]);
+	int2 = evtGetValue(event, *pi++);
+	int3 = evtGetValue(event, *pi++);
+	int4 = evtGetValue(event, *pi++);
+	int5 = evtGetValue(event, *pi++);
+	int6 = evtGetValue(event, *pi++);
+	int7 = evtGetValue(event, *pi++);
+	int8 = evtGetValue(event, *pi++);
+	int9 = evtGetValue(event, *pi++);
+	int10 = evtGetValue(event, *pi++);
+	int11 = evtGetValue(event, *pi++);
+	int12 = evtGetValue(event, *pi++);
+	int13 = evtGetValue(event, *pi++);
+	int14 = evtGetValue(event, *pi++);
 
-	float2 = evtGetFloat(event, args[2]); //unused
-	float3 = evtGetFloat(event, args[3]);
-	float4 = evtGetFloat(event, args[4]);
-	float5 = evtGetFloat(event, args[5]);
-	float6 = evtGetFloat(event, args[6]);
-	float7 = evtGetFloat(event, args[7]);
-	float8 = evtGetFloat(event, args[8]);
-	float9 = evtGetFloat(event, args[9]);
-	float10 = evtGetFloat(event, args[10]);
-	float11 = evtGetFloat(event, args[11]);
-	float12 = evtGetFloat(event, args[12]);
-	float13 = evtGetFloat(event, args[13]);
-	float14 = evtGetFloat(event, args[14]);
-	raw3 = args[3];
+	float2 = evtGetFloat(event, *pr++); //unused
+	float3 = evtGetFloat(event, *pr++);
+	float4 = evtGetFloat(event, *pr++);
+	float5 = evtGetFloat(event, *pr++);
+	float6 = evtGetFloat(event, *pr++);
+	float7 = evtGetFloat(event, *pr++);
+	float8 = evtGetFloat(event, *pr++);
+	float9 = evtGetFloat(event, *pr++);
+	float10 = evtGetFloat(event, *pr++);
+	float11 = evtGetFloat(event, *pr++);
+	float12 = evtGetFloat(event, *pr++);
+	float13 = evtGetFloat(event, *pr++);
+	float14 = evtGetFloat(event, *pr++);
+	raw3 = pf[1];
 	effect = NULL;
 	switch (effGetSetN64(effSet)->id) {
 		case 0:
@@ -623,7 +633,7 @@ USER_FUNC(evt_eff64) {
 			effect = effRubbleN64Entry(int2, int10, float3, float4, float5, float6, float7, float8, float9);
 			break;
 		case 63:
-			effect = effMagicHoraoN64Entry(int2, int7, int9, int11, float3, float4, float5, float6, float8, float10);
+			effMagicHoraoN64Entry(int2, int7, int9, int11, float3, float4, float5, float6, float8, float10);
 			break;
 		case 64:
 			effect = effLensflareN64Entry(int2, int7, float3, float4, float5, float6);
@@ -745,12 +755,14 @@ USER_FUNC(evt_eff64) {
 	}
 
 	if (effect && effName) {
-		if (strcmp(effName, "")) {
+		if (strcmp(effName, "\0\0\0")) {
 			effSetName(effect, effName);
 		}
 	}
 	return EVT_RETURN_DONE;
 }
+
+#pragma pop
 
 USER_FUNC(evt_eff_softdelete) {
 	effSoftDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));
@@ -778,6 +790,8 @@ extern s32 marioGetExtraPartyId(void);
 extern void* partyGetPtr(s32 id);
 extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, f32 z, f32 w, f32 e);
 
+#pragma push
+#pragma opt_propagation off
 USER_FUNC(evt_eff_fukidashi) {
 	s32* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
@@ -799,12 +813,11 @@ USER_FUNC(evt_eff_fukidashi) {
 	switch (mode) {
 		case 0:
 			h = *(f32*)((u8*)marioGetPtr() + 0x1b8);
-			entry = effFukidashiEntry(a, b, -1, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
+			{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -1, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 1:
 			p = !strcmp(npcName, "me") ? (void*)event->ownerNPC : (void*)npcNameToPtr(npcName);
-			h = *(f32*)((u8*)p + 0x150);
-			entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
+			{ f32 yy = 2.0f * *(f32*)((u8*)p + 0x150) / 3.0f; f32 ww = *(f32*)((u8*)p + 0x150) / 3.0f; entry = effFukidashiEntry(a, b, (s32)p, d, 0.0f, yy, 0.0f, ww, e); }
 			break;
 		case 2:
 			entry = effFukidashiEntry(a, b, 0, d, x, y, z, w, e);
@@ -813,14 +826,14 @@ USER_FUNC(evt_eff_fukidashi) {
 			p = partyGetPtr(marioGetPartyId());
 			if (p) {
 				h = *(f32*)((u8*)p + 0xf0);
-				entry = effFukidashiEntry(a, b, -2, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
+				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -2, d, 0.0f, yy, 0.0f, ww, e); }
 			}
 			break;
 		case 4:
 			p = partyGetPtr(marioGetExtraPartyId());
 			if (p) {
 				h = *(f32*)((u8*)p + 0xf0);
-				entry = effFukidashiEntry(a, b, -3, d, 0.0f, 2.0f * h / 3.0f, 0.0f, h / 3.0f, e);
+				{ f32 yy = 2.0f * h / 3.0f; f32 ww = h / 3.0f; entry = effFukidashiEntry(a, b, -3, d, 0.0f, yy, 0.0f, ww, e); }
 			}
 			break;
 	}
@@ -830,3 +843,4 @@ USER_FUNC(evt_eff_fukidashi) {
 	}
 	return EVT_RETURN_DONE;
 }
+#pragma pop

@@ -40,6 +40,7 @@ static inline void OSs16tof32(s16* in, f32* out) {
 double sin(double);
 double cos(double);
 
+static inline f32 dsin(f32 a) { return sin(6.2831855f * a / 360.0f); }
 typedef struct EffOpukuWgunN64Work {
     s32 type;        // 0x0
     Vec position;    // 0x4
@@ -184,7 +185,8 @@ void effOpukuWgunMain(EffectEntry* effect) {
             work->z[i] = work->start.z + t * (work->end.z - work->start.z);
         } else {
             work->x[i] = work->start.x + t * (work->end.x - work->start.x);
-            work->y[i] = 120.0f * (f32)sin(6.2831855f * (180.0f * t) / 360.0f) + (work->start.y + t * (work->end.y - work->start.y));
+
+            work->y[i] = 120.0f * dsin(180.0f * t) + (work->start.y + t * (work->end.y - work->start.y));
             work->z[i] = work->start.z + t * (work->end.z - work->start.z);
             work->alphas[i] = (u8)(255.0f - 255.0f * t);
         }
@@ -194,6 +196,7 @@ void effOpukuWgunMain(EffectEntry* effect) {
 
 static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
 void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 k;
     CameraEntry* camera;
     EffOpukuWgunN64Work* work;
     Mtx scale;
@@ -213,7 +216,6 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     effN64Vtx* q;
     s32 n;
     s32 j;
-    s32 k;
     s32 a;
 
     camera = camGetPtr(cameraId);
@@ -227,8 +229,9 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, (GXColor){work->color2R, work->color2G, work->color2B, 200});
     GXSetCullMode(GX_CULL_NONE);
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
+    k = 0;
     vtx = p;
-    for (k = 0, i = 0; i < 12; i++) {
+    for (i = 0; i < 12; i++) {
         if (i == 0 || i == 0) {
             ang = -angleABf(work->y[i + 1], -work->x[i + 1], work->y[i], -work->x[i]);
         } else if (i != 11 && work->delay[i] == 0) {
@@ -254,7 +257,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] + dx);
         p->y = 20.0f * (work->y[i] + dy);
         p->z = 20.0f * (work->z[i] + zero);
-        p->s = i * 320;
+        p->s = k;
         p->t = 0;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;
@@ -264,13 +267,14 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] - dx);
         p->y = 20.0f * (work->y[i] - dy);
         p->z = 20.0f * (work->z[i] + zero);
-        p->s = i * 320;
+        p->s = k;
         p->t = 1024;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;
         p->b = ((i >> 2) & 1) * 255;
         p->a = a;
         p++;
+        k += 320;
     }
     PSMTXScale(scale, 0.05f, 0.05f, 0.05f);
     q = vtx;
@@ -333,9 +337,11 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         effGetTexObjN64(0x8E, &texObj);
         GXLoadTexObj(&texObj, GX_TEXMAP0);
     }
-    n = k;
-    for (k = n; k < i - 1; k++) {
-        if (k >= 0) {
+    a = i - 1;
+    j = 0;
+    n = j;
+    for (; j < a; j++) {
+        if (j >= 0) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(n, n + 2, n + 1, n, n + 1, n + 2, n + 3, n);
         }

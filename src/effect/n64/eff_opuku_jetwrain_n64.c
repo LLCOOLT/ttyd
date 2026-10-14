@@ -54,6 +54,9 @@ static effN64Vtx opuku_jetwrain_vtx[16] = {
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect);
 void effOpukuJetwrainMain(EffectEntry* effect);
 
+inline f32 sind(f32 deg) { return sin(6.2831855f * deg / 360.0f); }
+
+inline int inline_fn2(s32 a) { return a < 12; }
 inline int inline_fn(s32 arg0) { return arg0 < 13; }
 
 EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, s32 lifetime) {
@@ -97,16 +100,17 @@ EffectEntry* effOpukuJetwrainN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale, 
 }
 
 void effOpukuJetwrainMain(EffectEntry* effect) {
-    EffOpukuJetwrainWork* work = effect->userdata;
+    s32 life;
+    EffOpukuJetwrainWork* work;
     Vec position;
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
     s32 j;
-    s32 life;
     s32 frame;
     s32 alpha;
     f32 a;
 
+    work = effect->userdata;
     tmp.x = work->position.x;
     tmp.y = work->position.y;
     tmp.z = work->position.z;
@@ -135,23 +139,24 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
     work->alpha = alpha;
     a = (f32)alpha / 255.0f;
     for (i = 1; i < 18; i++) {
-        work->h[i][6] = a * (-64.0f * (f32)sin(6.2831855f * (f32)((frame - i) * -20) / 360.0f));
+        work->h[i][6] = a * (-64.0f * sind((f32)((frame - i) * -20)));
     }
     for (i = 1; i < 18; i++) {
         for (j = 1; j < 12; j++) {
             f32 c4 = 4.0f * (f32)work->h[i][j];
             f32 corners = (f32)work->h[i - 1][j - 1] + ((f32)work->h[i + 1][j - 1] + ((f32)work->h[i + 1][j + 1] + (f32)work->h[i - 1][j + 1]));
             f32 edges = (f32)work->h[i][j - 1] + ((f32)work->h[i][j + 1] + ((f32)work->h[i + 1][j] + (f32)work->h[i - 1][j]));
-            work->v[i][j] = (f32)work->v[i][j] + ((0.5f * corners + (edges - c4)) - 0.7f * c4);
-            work->v[i][j] = work->v[i][j] * 0.98f;
+            f32 half = 0.5f * corners;
+            work->v[i][j] += (half + (edges - c4)) - 0.7f * c4;
+            work->v[i][j] *= 0.98f;
             if (life < 32) {
-                work->h[i][j] = work->h[i][j] * a;
+                work->h[i][j] *= a;
             }
         }
     }
     for (i = 1; i < 18; i++) {
-        for (j = 1; j < 12; j++) {
-            work->h[i][j] = 0.02f * work->v[i][j] + work->h[i][j];
+        for (j = 1; inline_fn2(j); j++) {
+            work->h[i][j] += 0.02f * work->v[i][j];
         }
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwrainDisp, effect);
@@ -160,18 +165,19 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     EffOpukuJetwrainWork* work;
     s32 alpha;
-    f32 proj[7];
+    Mtx trans;
+    Mtx texMtx;
     Mtx44 ortho;
     Mtx view;
-    Mtx texMtx;
-    Mtx trans;
     GXTexObj texObj;
+    f32 proj[7];
     void* buf;
-    s32 i, j;
-    s32 x0, x1, y0, y1;
-    s32 edgeX, edgeY;
-    s32 k;
-    s32 px;
+    s32 x0;
+    s32 j, i;
+    s32 edgeY;
+    s32 x1, y0, y1;
+    s32 bx;
+    s32 by;
 
     camGetPtr(cameraId);
     work = effect->userdata;
@@ -210,6 +216,7 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     GXLoadPosMtxImm(view, 0);
     GXSetCurrentMtx(0);
     for (i = 0; i < 12; i++) {
+        by = i * 16 + 24;
         edgeY = 0;
         if (i == 0) {
             y0 = -4;
@@ -224,27 +231,30 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
             y1 = 0;
         }
         for (j = 0; j < 18; j++) {
-            edgeX = 0;
+
+            s32 px; s32 k;
+            bx = j * 16 + 16;
+            k = 0;
             if (j == 0) {
+                k = 1;
                 x0 = -4;
-                edgeX = 1;
             } else {
                 x0 = 0;
             }
             if (j == 17) {
                 x1 = 4;
-                edgeX = 1;
+                k = 1;
             } else {
                 x1 = 0;
             }
             PSMTXScale(texMtx, 0.00390625f, 0.00390625f, 1.0f);
-            px = j * 16 + 16 + x0;
-            PSMTXTrans(trans, px, i * 16 + 24 + y0, 0.0f);
+            px = bx + x0;
+            PSMTXTrans(trans, px, by + y0, 0.0f);
             PSMTXConcat(texMtx, trans, texMtx);
             GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-            if (edgeX && edgeY) {
+            if (k != 0 && edgeY != 0) {
                 k = 12;
-            } else if (edgeX) {
+            } else if (k != 0) {
                 k = 4;
             } else if (edgeY) {
                 k = 8;
@@ -252,13 +262,13 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
                 k = 0;
             }
             opuku_jetwrain_vtx[k].x = px * 4;
-            opuku_jetwrain_vtx[k].y = work->h[j][i] + (i * 16 + 24 + y0) * 4;
-            opuku_jetwrain_vtx[k + 1].x = (j * 16 + 16 + (x1 + 16)) * 4;
-            opuku_jetwrain_vtx[k + 1].y = work->h[j + 1][i] + (i * 16 + 24 + y0) * 4;
+            opuku_jetwrain_vtx[k].y = work->h[j][i] + (by + y0) * 4;
+            opuku_jetwrain_vtx[k + 1].x = (bx + x1 + 16) * 4;
+            opuku_jetwrain_vtx[k + 1].y = work->h[j + 1][i] + (by + y0) * 4;
             opuku_jetwrain_vtx[k + 2].x = px * 4;
-            opuku_jetwrain_vtx[k + 2].y = work->h[j][i + 1] + (i * 16 + 24 + (y1 + 16)) * 4;
-            opuku_jetwrain_vtx[k + 3].x = (j * 16 + 16 + (x1 + 16)) * 4;
-            opuku_jetwrain_vtx[k + 3].y = work->h[j + 1][i + 1] + (i * 16 + 24 + (y1 + 16)) * 4;
+            opuku_jetwrain_vtx[k + 2].y = work->h[j][i + 1] + (by + y1 + 16) * 4;
+            opuku_jetwrain_vtx[k + 3].x = (bx + x1 + 16) * 4;
+            opuku_jetwrain_vtx[k + 3].y = work->h[j + 1][i + 1] + (by + y1 + 16) * 4;
             DCFlushRange(opuku_jetwrain_vtx, sizeof(opuku_jetwrain_vtx));
             GXInvalidateVtxCache();
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);

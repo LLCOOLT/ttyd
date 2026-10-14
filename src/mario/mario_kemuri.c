@@ -15,7 +15,7 @@ extern s32 kpaGetStageViewType(void);
 extern s32 kpaGetBodyStatus(void);
 extern f32 toMovedirSimple(f32 angle);
 extern int rand(void);
-extern EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z);
+extern EffectEntry* effKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 s, f32 c);
 extern EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 dir);
 extern EffectEntry* effMugiKemuri2Entry(s32 type, f32 x, f32 y, f32 z, f32 dir, f32 side);
 extern EffectEntry* effWaterDamageN64Entry(s32 type, s32 count, f32 x, f32 y, f32 z, f32 scale);
@@ -36,50 +36,50 @@ static void mario_kemuri_80130474(void) {
     static s32 ct = 8;
     static s32 left_or_right;
     MarioWork* mario = marioGetPtr();
-    u32 attr = 0;
+    u32 attr;
+
+    attr = 0;
 
     if ((u32)marioStGetSystemLevel() == 0 && !(mario->flags & 0x01000000)) {
         if (mario->currMotionId == 0x1D) {
-            return;
+            attr = 0;
         }
-        {
-        if (mario->currMotionId != 3) {
+        else if (mario->currMotionId != 3) {
             if (mario->hitobjStandOn != NULL) {
                 attr = hitGetAttr(mario->hitobjStandOn);
             }
         }
-        else {
-            if (mario->hitobjJumpFrom != NULL) {
-                attr = hitGetAttr(mario->hitobjJumpFrom);
+        else if (mario->hitobjJumpFrom != NULL) {
+            attr = hitGetAttr(mario->hitobjJumpFrom);
+        }
+        {
+            if (attr & 0x1000) {
+                kemuri_mugi();
             }
-        }
-        if (attr & 0x1000) {
-            kemuri_mugi();
-        }
-        else if (attr & 0x100) {
-            mario_kemuri_landon();
-        }
-        else if (attr & 0x100000) {
-            f32 c, s;
-            mario = marioGetPtr();
-            if (mario->currMotionId != 2 && mario->currMotionId != 1) {
-                ct = 8;
+            else if (attr & 0x100) {
+                mario_kemuri_landon();
             }
-            else if (ct++ > 8) {
-                ct = 0;
-                sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
-                effKemuri7N64Entry(mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s),
-                                   0.5f + mario->position.y,
-                                   mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c),
-                                   -mario->directionView, (f32)left_or_right);
-                left_or_right = left_or_right == 0;
+            else if (attr & 0x100000) {
+                f32 c, s;
+                mario = marioGetPtr();
+                if (mario->currMotionId != 2 && mario->currMotionId != 1) {
+                    ct = 8;
+                }
+                else if (ct++ > 8) {
+                    ct = 0;
+                    sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
+                    effKemuri7N64Entry(mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s),
+                                       0.5f + mario->position.y,
+                                       mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c),
+                                       -mario->directionView, (f32)left_or_right);
+                    left_or_right = left_or_right == 0;
+                }
             }
-        }
-        else if (!(mario->flags & 0x01000000)) {
-            if (kpaGetBodyStatus() <= 0 && mario->characterId != 1) {
-                kemuri();
+            else if (!(mario->flags & 0x01000000)) {
+                if (kpaGetBodyStatus() <= 0 && mario->characterId != 1) {
+                    kemuri();
+                }
             }
-        }
         }
     }
 }
@@ -205,15 +205,16 @@ void kemuri(void) {
     MarioWork* mario = marioGetPtr();
     EffectEntry* eff;
     f32 s, c;
+    f32 x, y, z;
 
     if (MS16(mario, 0x54) != 0 && MPTR(mario, 0x208) == NULL && mario->hitobjStandOn != NULL) {
         if (mario->trigFlags & 0x20000) {
             mario->trigFlags &= ~0x20000;
         }
         else {
-            f32 x = mario->position.x;
-            f32 y = mario->position.y;
-            f32 z = mario->position.z;
+            x = mario->position.x;
+            y = mario->position.y;
+            z = mario->position.z;
             if (mario->characterId == 2) {
                 eff = kemuriEntry(0, x, y, 10.0f + z, 0.0f);
                 MF(eff->userdata, 0x74) = kpaGetBaseScale(kpaGetLevel());
@@ -230,8 +231,12 @@ void kemuri(void) {
         if (ct++ > 6) {
             ct = 0;
             sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
-            eff = effKemuri2Entry(0, mario->position.x + 0.2f * (s * mario->wPlayerCollisionBox.x), mario->position.y + 1.5f,
-                                  mario->position.z + 0.2f * (c * mario->wPlayerCollisionBox.x));
+            {
+            x = mario->position.x + 0.2f * (mario->wPlayerCollisionBox.x * s);
+            y = 1.5f + mario->position.y;
+            z = mario->position.z + 0.2f * (mario->wPlayerCollisionBox.x * c);
+            eff = effKemuri2Entry(0, x, y, z, s, c);
+            }
             if (mario->flags & 0x02000000) {
                 MF(eff->userdata, 0x74) = 0.6f;
             }
@@ -263,7 +268,10 @@ void kemuri(void) {
             scale = 4.0f;
             break;
         }
-        eff = effKemuri2Entry(0, mario->position.x + dist * s, 1.5f + mario->position.y, mario->position.z + dist * c);
+        x = mario->position.x + dist * s;
+        y = 1.5f + mario->position.y;
+        z = mario->position.z + dist * c;
+        eff = effKemuri2Entry(0, x, y, z, s, c);
         MF(eff->userdata, 0x74) = scale;
     }
 }
@@ -278,10 +286,10 @@ void party_kemuri(PartyEntry* party) {
                 }
                 else if (MS8(party, 0x2c)++ > 6) {
                     f32 c, s;
+                    f32 x, y, z;
                     MS8(party, 0x2c) = 0;
                     sincosf(&s, &c, 6.2831855f * reviseAngle(-MF(party, 0x100)) / 360.0f);
-                    effKemuri2Entry(0, 0.2f * (MF(party, 0xF4) * s) + MF(party, 0x58), 1.5f + MF(party, 0x5C),
-                                    0.2f * (MF(party, 0xF4) * c) + MF(party, 0x60));
+                    effKemuri2Entry(0, MF(party, 0x58) + 0.2f * (MF(party, 0xF4) * s), 1.5f + MF(party, 0x5C), MF(party, 0x60) + 0.2f * (MF(party, 0xF4) * c), s, c);
                 }
             }
             else {
@@ -295,10 +303,10 @@ void party_kemuri(PartyEntry* party) {
                 }
                 else if (MS8(party, 0x2c)++ > 6) {
                     f32 c, s;
+                    f32 x, y, z;
                     MS8(party, 0x2c) = 0;
                     sincosf(&s, &c, 6.2831855f * reviseAngle(-MF(party, 0x100)) / 360.0f);
-                    effKemuri2Entry(0, 0.2f * (MF(party, 0xF4) * s) + MF(party, 0x58), 1.5f + MF(party, 0x5C),
-                                    0.2f * (MF(party, 0xF4) * c) + MF(party, 0x60));
+                    effKemuri2Entry(0, MF(party, 0x58) + 0.2f * (MF(party, 0xF4) * s), 1.5f + MF(party, 0x5C), MF(party, 0x60) + 0.2f * (MF(party, 0xF4) * c), s, c);
                 }
             }
             else {

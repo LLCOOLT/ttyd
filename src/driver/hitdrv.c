@@ -58,11 +58,12 @@
     0000dd7c 005e1c 8001335c  1 .text 	hitdrv.o
 */
 
-HitEntry* lbl_80418408; // TODO: proper name
+HitEntry* unk_80418408; // TODO: proper name
+s32 unk_8041840C;
 
 // local prototypes
 void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion);
-s16 hitCalcVtxPosition(HitEntry* hit);
+s32 hitCalcVtxPosition(HitEntry* hit);
 
 inline BOOL tempfunc(HitCheckQuery* query, HitVector* vector);
 inline BOOL tempfunc2(HitCheckQuery* query, HitVector* vector);
@@ -170,7 +171,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
 
             if (!mesh->isPackedDisplay) {
                 for (j = 0; j < mesh->displayListCount; j++) {
-                    numVectors += *mesh->displayLists.normalLists[j] - 2;
+                    numVectors += *(s32*)mesh->displayLists.normalLists[j] - 2;
                 }
             } else {
                 for (k = 0; k < mesh->displayListCount; k++) {
@@ -224,20 +225,21 @@ typedef struct HitAnimJointList {
 } HitAnimJointList;
 
 inline void hitPreCheck(void) {
-    MapWork* wp = mapGetWork();
     MapEntry* entry;
-    HitEntry* prev = NULL;
+    s32 i;
+    s32 j;
+    MapWork* wp = mapGetWork();
     HitEntry* hit;
-    s32 i, j;
+    HitEntry* prev;
 
-    lbl_80418408 = NULL;
+    unk_80418408 = NULL;
     entry = wp->entries;
-    for (i = 0; i < wp->entries->count; entry++, i++) {
+    for (i = 0, prev = NULL; i < wp->entries->count; entry++, i++) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
             if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
                 if (prev == NULL) {
-                    lbl_80418408 = hit;
+                    unk_80418408 = hit;
                     prev = hit;
                 } else {
                     prev->siblingActive = hit;
@@ -250,7 +252,6 @@ inline void hitPreCheck(void) {
         prev->siblingActive = NULL;
     }
 }
-
 inline HitEntry* hitNameToPtrNoChk(const char* name) {
     MapWork* wp = mapGetWork();
     MapEntry* map;
@@ -270,10 +271,11 @@ inline HitEntry* hitNameToPtrNoChk(const char* name) {
 }
 
 void hitDelete(const char* name) {
-    MapWork* wp = mapGetWork();
     MapEntry* map;
+    MapWork* wp = mapGetWork();
+    s32 j;
+    s32 i;
     HitEntry* hit;
-    s32 i, j;
 
     map = wp->entries;
     for (i = 0; i < wp->entries->count; map++, i++) {
@@ -289,22 +291,23 @@ void hitDelete(const char* name) {
 }
 
 void hitMain(void) {
-    MapWork* wp = mapGetWork();
-    MapEntry* entry;
-    MapEntryAnimData* anim;
-    HitAnimJointList* list;
     void** joints;
-    HitEntry* hit;
+    MapEntry* entry;
+    MapWork* wp = mapGetWork();
+    s32 j;
+    s32 k;
+    s32 i;
+    MapEntryAnimData* anim;
     BOOL recalc;
-    s32 i, j, k;
+    HitAnimJointList* list;
+    HitEntry* hit;
     Mtx mtx;
 
     hitPreCheck();
     entry = wp->entries;
     for (i = 0; i < wp->entries->count; entry++, i++) {
         anim = entry->animData;
-        recalc = FALSE;
-        for (j = 0; j < entry->numAnims; j++, anim++) {
+        for (j = 0, recalc = FALSE; j < entry->numAnims; j++, anim++) {
             list = *(HitAnimJointList**)(*(u8**)((u8*)anim + 0x18) + 0xC);
             if (!(anim->flags & 1)) {
                 continue;
@@ -328,7 +331,7 @@ void hitMain(void) {
             }
         }
         if (recalc) {
-            PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
+            PSMTXScale(mtx, 10.0f, 10.0f, 10.0f);
             hitReCalcMatrix2(entry->rootHitObj, mtx, FALSE);
         }
     }
@@ -339,24 +342,6 @@ void hitFlgOn(HitEntry* hit, u16 mask, s32 r);
 void hitFlgOff(HitEntry* hit, u16 mask, s32 r);
 void hitAtrOn(HitEntry* hit, u32 mask, s32 r);
 void hitAtrOff(HitEntry* hit, u32 mask, s32 r);
-
-void hitGrpFlagOn(const char* name, u16 mask) {
-    HitEntry* hit = hitNameToPtr(name);
-    if (hit == NULL) {
-        mapErrorEntry(1, name);
-        return;
-    }
-    hitFlgOn(hit, mask, 0);
-}
-
-void hitGrpFlagOff(const char* name, u16 mask) {
-    HitEntry* hit = hitNameToPtr(name);
-    if (hit == NULL) {
-        mapErrorEntry(1, name);
-        return;
-    }
-    hitFlgOff(hit, mask, 0);
-}
 
 void hitObjFlagOn(const char* name, u16 mask) {
     HitEntry* hit = hitNameToPtr(name);
@@ -376,6 +361,16 @@ void hitObjFlagOff(const char* name, u16 mask) {
     hit->flags &= ~mask;
 }
 
+void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
+    hit->flags |= mask;
+    if (hit->child != NULL) {
+        hitFlgOn(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitFlgOn(hit->sibling, mask, 1);
+    }
+}
+
 void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
     hit->flags &= ~mask;
     if (hit->child != NULL) {
@@ -386,14 +381,22 @@ void hitFlgOff(HitEntry* hit, u16 mask, s32 r) {
     }
 }
 
-void hitFlgOn(HitEntry* hit, u16 mask, s32 r) {
-    hit->flags |= mask;
-    if (hit->child != NULL) {
-        hitFlgOn(hit->child, mask, 1);
+void hitGrpFlagOn(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
     }
-    if (r != 0 && hit->sibling != NULL) {
-        hitFlgOn(hit->sibling, mask, 1);
+    hitFlgOn(hit, mask, 0);
+}
+
+void hitGrpFlagOff(const char* name, u16 mask) {
+    HitEntry* hit = hitNameToPtr(name);
+    if (hit == NULL) {
+        mapErrorEntry(1, name);
+        return;
     }
+    hitFlgOff(hit, mask, 0);
 }
 
 
@@ -415,16 +418,6 @@ void hitObjAttrOff(const char* name, u32 mask) {
     hit->attributes &= ~mask;
 }
 
-void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
-    hit->attributes &= ~mask;
-    if (hit->child != NULL) {
-        hitAtrOff(hit->child, mask, 1);
-    }
-    if (r != 0 && hit->sibling != NULL) {
-        hitAtrOff(hit->sibling, mask, 1);
-    }
-}
-
 void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     hit->attributes |= mask;
     if (hit->child != NULL) {
@@ -432,6 +425,16 @@ void hitAtrOn(HitEntry* hit, u32 mask, s32 r) {
     }
     if (r != 0 && hit->sibling != NULL) {
         hitAtrOn(hit->sibling, mask, 1);
+    }
+}
+
+void hitAtrOff(HitEntry* hit, u32 mask, s32 r) {
+    hit->attributes &= ~mask;
+    if (hit->child != NULL) {
+        hitAtrOff(hit->child, mask, 1);
+    }
+    if (r != 0 && hit->sibling != NULL) {
+        hitAtrOff(hit->sibling, mask, 1);
     }
 }
 
@@ -509,10 +512,9 @@ static inline f32 hitDequant(register s16* base, register s32 idx) {
 }
 
 #pragma dont_inline on
-s16 hitCalcVtxPosition(HitEntry* hit) {
+s32 hitCalcVtxPosition(HitEntry* hit) {
+    s32 k, j, i;
     s32 count = 0;
-    s32 i, j, k;
-    MapFileJoint* joint;
     MapFileMesh* mesh;
     MapWork* wp;
     HitVector* vec;
@@ -531,13 +533,13 @@ s16 hitCalcVtxPosition(HitEntry* hit) {
             for (j = 0; j < mesh->displayListCount; j++) {
                 s32* list = (s32*)mesh->displayLists.normalLists[j];
                 for (k = 0; k < *list - 2; k++) {
-                    s16 i1, i2;
                     BOOL even;
+                    s16 i1, i2;
                     s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
-                    pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
-                    vec = &hit->vectors[count++];
                     i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
                     i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
+                    vec = &hit->vectors[count++];
+                    pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
                     MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);
                     even = !(k & 1);
                     MTXMultVec(hit->worldMtx, &pos[even ? i2 : i1], &vec->v1);
@@ -551,12 +553,11 @@ s16 hitCalcVtxPosition(HitEntry* hit) {
         } else {
             u32 m;
             s32 stride;
-            s32 bit;
+            u32 bit;
             wp = mapGetWork();
-            m = mesh->elementMask;
             stride = 0;
             for (bit = 0; bit < 12; bit++) {
-                stride += (m >> bit) & 1;
+                stride += (mesh->elementMask >> bit) & 1;
             }
             stride *= 2;
             for (j = 0; j < mesh->displayListCount; j++) {
@@ -568,10 +569,10 @@ s16 hitCalcVtxPosition(HitEntry* hit) {
                     BOOL even;
                     s16* base;
                     register u32 gqr;
-                    i0 = *(u16*)(list + k * stride + 3);
+                    i0 = *(u16*)&list[k * stride + 3];
                     even = !(k & 1);
-                    i1 = *(u16*)(list + stride * (k + 1) + 3);
-                    i2 = *(u16*)(list + stride * (k + 2) + 3);
+                    i1 = *(u16*)&list[stride * (k + 1) + 3];
+                    i2 = *(u16*)&list[stride * (k + 2) + 3];
                     vec = &hit->vectors[count];
                     base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     o0 = i0 * 3;
@@ -596,7 +597,7 @@ s16 hitCalcVtxPosition(HitEntry* hit) {
                     PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
                     PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
                     PSVECCrossProduct(&vec->edge0, &vec->edge1, &vec->normal);
-                    if (vec->normal.x != 0.0f || vec->normal.y != 0.0f || vec->normal.z != 0.0f) {
+                    if (!(vec->normal.x == 0.0f && vec->normal.y == 0.0f && vec->normal.z == 0.0f)) {
                         count++;
                     }
                 }
@@ -811,7 +812,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
     temp_f28 = query->targetDistance * temp;
     PSVECScale(&query->targetDir, &spA4, temp_f28);
     PSVECAdd(&query->targetPos, &spA4, &spA4);
-    var_r29 = lbl_80418408;
+    var_r29 = unk_80418408;
     if (query->targetDir.y == 0.0f) {
         while (var_r29 != NULL) {
             if (callback == NULL || callback(query, var_r29)) {
@@ -1100,7 +1101,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     objectId = -1;
     query = &temp;
     sp68 = (Vec){ x, y, z };
-    for (i = 0; i < var_r31->count; var_r31++, i++) {
+    for (i = 0; i < wp->entries->count; var_r31++, i++) {
         var_r23 = var_r31->hitEntries;
         for (j = 0; j < var_r31->hitNumJoints; j++, var_r23++) {
             if ((var_r23->attributes & 0x80000000) && (var_r23->joint->partCount != 0)) {
@@ -1112,8 +1113,8 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
                             if (var_f28 < 0.0f || var_f28 > temp_f1) {
                                 var_f28 = temp_f1;
                                 var_f31 = var_r23->radius;
-                                objectId = j;
                                 entryId = i;
+                                objectId = j;
                             }
                         }
                     }
@@ -1195,8 +1196,10 @@ void hitObjGetPosSub(HitEntry* hit, Vec* position, s32* counter, BOOL recursion)
         PSVECAdd(position, &sp8, position);
         (*counter)++;
     }
-    if (recursion != 0 && hit->sibling != NULL) {
-        hitObjGetPosSub(hit->sibling, position, counter, 1);
+    if (recursion) {
+        if (hit->sibling != NULL) {
+            hitObjGetPosSub(hit->sibling, position, counter, 1);
+        }
     }
 }
 

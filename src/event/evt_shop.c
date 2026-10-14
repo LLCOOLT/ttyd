@@ -85,8 +85,9 @@ BOOL N_itemPickUpFromFieldCheck(void);
 BOOL winGhostDiaryChk(void);
 
 //.sbss
-char mapname[16];
+static s32 gap_08_80418944_sbss;
 static ShopWork* _wp;
+char mapname[16];
 
 void list_disp(WinMgrEntry* entry);
 void title_disp(WinMgrEntry* entry);
@@ -144,6 +145,19 @@ USER_FUNC(shop_flag_onoff);
 USER_FUNC(shop_point_item);
 USER_FUNC(shopper_name);
 USER_FUNC(unkeep_pouchcheck_func);
+
+static const GXColor dat_8041bbe0 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbe4 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbe8 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbec = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbf0 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbf4 = {0xFF, 0xFF, 0xFF, 0xFF};
+static const GXColor dat_8041bbf8 = {0xF0, 0x00, 0x00, 0xFF};
+static const GXColor dat_8041bbfc = {0x00, 0x00, 0x00, 0xFF};
+static const GXColor dat_8041bc00 = {0xF0, 0x00, 0x00, 0xFF};
+static const GXColor dat_8041bc04 = {0x00, 0x00, 0x00, 0xFF};
+static const GXColor dat_8041bc08 = {0xF0, 0x00, 0x00, 0xFF};
+static const GXColor dat_8041bc0c = {0x00, 0x00, 0x00, 0xFF};
 
 static s32 window_desc[30];
 ShopPoint shopPointList[11];
@@ -648,7 +662,7 @@ void name_disp(WinMgrEntry* entry) {
 	if (!winMgrAction(wp->win[0])) {
 		FontDrawStart();
 		FontDrawEdge();
-		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		FontDrawColor(dat_8041bbe0);
 		FontDrawString(-FontGetMessageWidth(name) / 2, 108.0f, name);
 		FontDrawEdgeOff();
 	}
@@ -664,7 +678,7 @@ void name_disp(WinMgrEntry* entry) {
 		pos.y *= gp->efbHeight / 2.0f;
 		sprintf(buf, "%d", wp->items[i].price);
 		PSMTXTrans(m, 12.0f * (strlen(buf) - 1) + pos.x, pos.y, pos.z);
-		iconNumberDispGx(m, wp->items[i].price, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+		iconNumberDispGx(m, wp->items[i].price, FALSE, dat_8041bbe4);
 	}
 }
 
@@ -705,7 +719,7 @@ void point_disp(WinMgrEntry* entry) {
 		iconDispGx2(m, 0x10, 0x20A);
 	}
 	PSMTXTrans(m, 124.0f + entry->x, entry->y - 38.0f, 0.0f);
-	iconNumberDispGx(m, wp->points, FALSE, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	iconNumberDispGx(m, wp->points, FALSE, dat_8041bbe8);
 	diff = SHOP_PTS(pouch) - wp->points;
 	if (diff) {
 		diff /= 10;
@@ -722,10 +736,10 @@ void title_disp(WinMgrEntry* entry) {
 	if (entry->flags & 4) {
 		return;
 	}
-	msg = msgSearch("msg_shop_point_list4");
+	msg = msgSearch("msg_shop_point_list4\0\0\0");
 	FontDrawStart();
 	FontDrawEdge();
-	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawColor(dat_8041bbec);
 	FontDrawMessage(entry->x + (entry->width - FontGetMessageWidth(msg)) / 2, entry->y - 12, msg);
 	FontDrawEdgeOff();
 }
@@ -733,11 +747,9 @@ void title_disp(WinMgrEntry* entry) {
 void list_disp(WinMgrEntry* entry) {
 	PouchData* pouch;
 	const char* msg;
-	s32 i;
 	u32 mask;
-	s32 y;
+	s32 i;
 	ItemData* item;
-	u16 w;
 	char buf[256];
 	Mtx m;
 	Mtx s;
@@ -750,50 +762,48 @@ void list_disp(WinMgrEntry* entry) {
 	msg = msgSearch("msg_shop_point_list5");
 	FontDrawStart();
 	FontDrawEdge();
-	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawColor(dat_8041bbf0);
 	FontDrawMessage(entry->x + 10 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
 	FontDrawEdgeOff();
 	msg = msgSearch("msg_shop_point_list6");
 	FontDrawStart();
 	FontDrawEdge();
-	FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	FontDrawColor(dat_8041bbf4);
 	FontDrawMessage(entry->x + entry->width / 2 - 10 + (100 - FontGetMessageWidth(msg)) / 2, entry->y + 13, msg);
 	FontDrawEdgeOff();
 	FontDrawStart();
-	for (y = 0; shopPointList[i].pts != -1; i++, y += 26) {
+	for (; shopPointList[i].pts != -1; i++) {
 		item = &itemDataTable[shopPointList[i].item];
 		FontDrawStart();
 		if (pouch->field_0x5B4 & (mask = 1 << i)) {
-			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bbf8);
 		}
 		else {
-			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bbfc);
 		}
 		sprintf(buf, "%s", winZenkakuStr(shopPointList[i].pts));
-		w = FontGetMessageWidth(buf);
-		FontDrawMessage(entry->x - (90 - (entry->width / 2 - (s32)w)), entry->y - 20 - y, buf);
+		FontDrawMessage(entry->x + (entry->width / 2 - (s32)FontGetMessageWidth(buf)) - 90, entry->y - 20 - i * 26, buf);
 		FontDrawStart();
 		if (pouch->field_0x5B4 & mask) {
-			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bc00);
 		}
 		else {
-			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bc04);
 		}
 		sprintf(buf, "%s", msgSearch("msg_shop_point_list5"));
-		w = FontGetMessageWidth(buf);
-		PSMTXTrans(m, entry->x + (entry->width / 2 - 0.6f * w) - 40.0f, entry->y - 28 - y, 0.0f);
+		PSMTXTrans(m, entry->x + (entry->width / 2 - 0.6f * FontGetMessageWidth(buf)) - 40.0f, entry->y - 28 - i * 26, 0.0f);
 		PSMTXScale(s, 0.64f, 0.64f, 0.64f);
 		PSMTXConcat(m, s, m);
 		FontDrawMessageMtx(m, buf);
 		msg = msgSearch(item->name);
 		FontDrawStart();
 		if (pouch->field_0x5B4 & mask) {
-			FontDrawColor((GXColor){0xF0, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bc08);
 		}
 		else {
-			FontDrawColor((GXColor){0x00, 0x00, 0x00, 0xFF});
+			FontDrawColor(dat_8041bc0c);
 		}
-		FontDrawMessage(entry->x + (entry->width / 2 - 10), entry->y - 20 - y, msg);
+		FontDrawMessage(entry->x + entry->width / 2 - 10, entry->y - 20 - i * 26, msg);
 	}
 }
 

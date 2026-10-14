@@ -1894,8 +1894,7 @@ void sort_4_2_func(WinPauseWork* wp) {
 void sort_4_3_func(WinPauseWork* wp) {
     ItemData* db;
     ItemData* da;
-    s16 a;
-    s16 b;
+    WinBadgeEnt tmp;
     s32 i;
     BOOL swap;
     s32 j;
@@ -1915,7 +1914,7 @@ void sort_4_3_func(WinPauseWork* wp) {
                     }
                 }
                 if (swap) {
-                    WinBadgeEnt tmp = wp->badgeList[i];
+                    tmp = wp->badgeList[i];
                     wp->badgeList[i] = wp->badgeList[j];
                     wp->badgeList[j] = tmp;
                 }
@@ -1936,7 +1935,7 @@ void sort_4_3_func(WinPauseWork* wp) {
                     }
                 }
                 if (swap) {
-                    WinBadgeEnt tmp = wp->badgeList[i];
+                    tmp = wp->badgeList[i];
                     wp->badgeList[i] = wp->badgeList[j];
                     wp->badgeList[j] = tmp;
                 }

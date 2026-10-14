@@ -1467,10 +1467,11 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
     MapObject* obj;
-    s32 tevStage = info->tevStage;
-    s32 texMap = info->texCoord;
-    s32 texCoord = info->texMap;
-    s32 field_0x18 = info->field_0x18;
+    MapObject* p;
+    s32 tevStage;
+    s32 texMap;
+    s32 texCoord;
+    s32 field_0x18;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1478,19 +1479,26 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXTexObj tex;
     Mtx mtx;
     f32 t;
+    MapObject** objs;
 
-    obj = *(MapObject**)info->field_0x0;
+    objs = (MapObject**)info->field_0x0;
+    tevStage = info->tevStage;
+    texMap = info->texCoord;
+    texCoord = info->texMap;
+    field_0x18 = info->field_0x18;
+    obj = objs[0];
     if (obj->flags & 0x20) {
-        while ((obj = obj->parent) != NULL) {
-            if (obj->flags & 0x10) {
-                if (!(obj->flags & 0x20000000)) {
-                    obj->flags |= 0x20000000;
+        p = obj;
+        while ((p = p->parent) != NULL) {
+            if (p->flags & 0x10) {
+                if (!(p->flags & 0x20000000)) {
+                    p->flags |= 0x20000000;
                     return;
                 }
-                x0 = obj->screenRect[0];
-                y0 = obj->screenRect[1];
-                x1 = obj->screenRect[2];
-                y1 = obj->screenRect[3];
+                x0 = p->screenRect[0];
+                y0 = p->screenRect[1];
+                x1 = p->screenRect[2];
+                y1 = p->screenRect[3];
                 break;
             }
         }
@@ -1548,10 +1556,10 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
-    info->tevStage = ++tevStage;
-    info->texMap = ++texCoord;
+    info->tevStage = tevStage + 1;
+    info->texMap = texCoord + 1;
     info->field_0x18 = field_0x18;
-    info->texCoord = ++texMap;
+    info->texCoord = texMap + 1;
 }
 
 BOOL img_wait(void) {

@@ -2106,7 +2106,7 @@ s32 BattleCheckCounter(CounterWork* work, BattleUnit* attacker, BattleUnit* targ
         case 0x2F: return 11;
         case 0x31: return 12;
         case 0x32: return 13;
-        case 0x34: return 14;
+        case 0x34: if (1) { return 14; }
         case 0x33: return 15;
         case 0x35: return 16;
         case 0x36: return 17;

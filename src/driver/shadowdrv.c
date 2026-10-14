@@ -207,10 +207,10 @@ static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
+    u32 i;
     u32 bufferSize;
     u16* ramp16;
     u8* ramp8;
-    u32 i;
 
     charShadowInit();
     depthShadowInit();
@@ -415,17 +415,17 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
 }
 
 void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
-    CharShadowWork* wp = cswp;
     ShadowConfig* cfg;
+    CharShadowWork* wp = cswp;
     ShadowEntry* entry;
     f32 (*view)[4];
     u8 alpha;
     s32 i;
     Mtx m;
     f32 w, h, fw, fh;
-    f32 x0, x1, z0, z1, cx, cz;
+    f32 z1, z0, x1, x0, cx, cz;
 
-    cfg = &shadowConfig[wp->unk8];
+    cfg = &shadowConfig[cswp->unk8];
     entry = wp->entries;
     view = camGetCurPtr()->view;
     alpha = cswp->unk100.a;

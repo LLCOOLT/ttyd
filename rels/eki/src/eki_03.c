@@ -11,6 +11,7 @@
 
 double sin(double x);
 static smartEntry* ind_lp;
+u32 gap_05_0000000C_bss;
 void envGlareFilter(s32 on, s16 x0, s16 y0, s16 x1, s16 y1);
 void envGlareFilterZ(f32 z);
 
@@ -449,7 +450,9 @@ static void sun_tev(MapTevCallbackInfo* info) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
-            s32 off = ((i / 4) << 5) + ((j / 4) << 9) + ((i % 4) + ((j % 4) << 2)) * 2;
+            s32 off = ((i / 4) << 5) + ((j / 4) << 9);
+
+            off += ((i % 4) + ((j % 4) << 2)) * 2;
             buf[off] = 3.0f * v + 128.0f;
             buf[off + 1] = 0x80;
         }
@@ -494,3 +497,8 @@ static USER_FUNC(test_glare) {
     }
     return EVT_RETURN_BLOCK;
 }
+
+#pragma force_active on
+const u32 gap_03_00000A4C_rodata = 0;
+__declspec(section ".data") u32 gap_04_00003CBC_data[1] = {0};
+#pragma force_active reset
