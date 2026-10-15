@@ -27,10 +27,10 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) {
-    s32* args = event->args;
-    s32 index = args[0];
-    s32 flags = args[1];
-    if (flags & _battleWorkPointer->flags) {
+    s32 index = event->args[0];
+    u32 flags = event->args[1];
+    BattleWork* wp = _battleWorkPointer;
+    if (flags & wp->flags) {
         evtSetValue(event, index, TRUE);
     }
     else {
@@ -175,7 +175,7 @@ USER_FUNC(btlevtcmd_DrawLots) {
         max += alloc[i];
     }
     ceiling = irand(max);
-    ceilcount = 0; i = 0; retcount = ceilcount;
+    ceilcount = 0; i = 0; retcount = i;
     for (; i < count; i++) {
         ceilcount += alloc[i];
         if (ceiling < ceilcount) {
@@ -2222,7 +2222,8 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     BattleUnit *thisUnit, *targetUnit;
     s32 thisId, thisPartId;
     s32 targetId, targetPartId;
-    s32 btlId, flags, index, value, tid;
+    u32 flags;
+    s32 btlId, index, value, tid;
     BattleUnitPart* thisPart = NULL;
     BattleUnitPart* targetPart = NULL;
 
@@ -3656,11 +3657,13 @@ USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
 }
 
 USER_FUNC(btlevtcmd_GetConsumeItem) {
-    BattleCommandWeapon* w = (BattleCommandWeapon*)&_battleWorkPointer->commandMenu;
+    s32* args = event->args;
+    BattleWork* wp = _battleWorkPointer;
+    BattleCommandWeapon* w = (BattleCommandWeapon*)&wp->commandMenu;
     s32 item;
-    w = &w[_battleWorkPointer->commandMenu.cursor[11].field_0];
+    w = &w[wp->commandMenu.cursor[11].field_0];
     item = ((BattleCommand*)w)->weapon[0].itemId;
-    evtSetValue(event, event->args[0], item);
+    evtSetValue(event, args[0], item);
     return EVT_RETURN_DONE;
 }
 

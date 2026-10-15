@@ -26,8 +26,10 @@ extern int sprintf(char* str, const char* format, ...);
 
 //.sbss
 static CardWork* wp;
+u32 gap_08_8041889C_sbss;
 
 //.sdata
+__declspec(section ".sdata") u32 gap_07_80410584_sdata[1] = {0};
 const char* version = "009";
 
 //local prototypes
@@ -414,10 +416,10 @@ static inline void memcard_probe(void) {
     s32 i;
     s32 timeout;
 
-    timeout = 1000000;
     wp->flags |= 1;
+    timeout = 1000000;
     i = 0;
-    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
+    for (; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY; ) {
         if (++i > timeout) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
@@ -1077,12 +1079,11 @@ static inline void make_header(void) {
 	u8* temp;
 	u32 checksum;
 	OSCalendarTime td;
-
 	metadata = &cardGetFilePtr()->metadata;
 	memset(metadata, 0, sizeof(metadata->data));
 	strcpy(metadata->data.fileName, "ペーパーマリオＲＰＧ");
 	OSTicksToCalendarTime(OSGetTime(), &td);
-	sprintf(metadata->data.dateString, "%2d月%2d日のセーブデータです\0\0\0", td.mon + 1, td.mday);
+	sprintf(metadata->data.dateString, "%2d月%2d日のセーブデータです\0\0\0\0\0\0\0", td.mon + 1, td.mday);
 	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
 	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
 	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
@@ -1385,3 +1386,4 @@ static inline void memcard_close(void) {
     wp->result = result;
     wp->flags &= ~1;
 }
+

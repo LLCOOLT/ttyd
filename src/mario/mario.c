@@ -48,7 +48,7 @@ void marioBaloonInit(void);
 void marioGetRubInit(void);
 BOOL kpaGetStageViewType(void);
 s32 marioGetPlaneStatus(void);
-BOOL mario_bomhei_keychk(void);
+s32 mario_bomhei_keychk(void);
 void marioSlitForceCancel(void);
 void marioReInit_ship(void);
 void marioReInit_roll(void);
@@ -382,9 +382,9 @@ BOOL unk_8005bb80(void) {
 	return TRUE;
 }
 
-static inline BOOL marioChkCtrl2(void) { return !mp->ctrlOffCount; }
+static inline s32 marioChkCtrl2(void) { return mp->ctrlOffCount ? 0 : 1; }
 static inline BOOL marioCtrlDisable(void) {
-	return (marioChkCtrl2() ^ 1) & 0xFF;
+	return marioChkCtrl2() ? 0 : 1;
 }
 
 static inline BOOL marioKeyDisable(void) {
@@ -797,6 +797,7 @@ void marioReInit(void) {
 	s32 charId;
 	s32 dotFlag;
 	s32 poseId;
+	s32 t;
 	s8 prev0;
 	s8 prev1;
 	void* motStruct;
@@ -805,8 +806,7 @@ void marioReInit(void) {
 	f32 f1A0;
 	f32 f19C;
 
-	wp = mp;
-	dotFlag = wp->flags & 0x80000000;
+	dotFlag = (wp = mp)->flags & 0x80000000;
 	camId = marioGetCamId();
 	charId = wp->characterId;
 	slot0 = wp->currPartySlotId[0];
@@ -819,12 +819,14 @@ void marioReInit(void) {
 	f1AC = wp->unk1AC;
 	f1A0 = wp->directionView;
 	f19C = wp->unk19C;
+	t = wp->paperPoseId;
+	poseId = t;
 	prev0 = wp->prevPartyMemberId[0];
 	prev1 = wp->prevPartyMemberId[1];
 	anim0 = wp->paperAnimGroupId[0];
 	anim1 = wp->paperAnimGroupId[1];
 	anim2 = wp->paperAnimGroupId[2];
-	if (wp->paperPoseId >= 0) {
+	if (t >= 0) {
 		animPoseSetPaperAnimGroup(anim0, NULL, FALSE);
 		animPoseRelease(wp->paperPoseId);
 		poseId = -1;
@@ -1319,12 +1321,12 @@ static inline f32 mm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); gu
 void marioMoveMain(void) {
 	MarioWork* wp = mp;
 	PartyEntry* party;
-	f32 spd;
-	f32 vx;
-	f32 vz;
-	f32 sn;
-	f32 cs;
 	f32 vy;
+	f32 sn;
+	f32 spd;
+	f32 vz;
+	f32 cs;
+	f32 vx;
 
 	if (wp->currMotionId != MARIO_MOTION_SHIP) {
 		if (wp->flags & 0x1000000) {
@@ -1423,7 +1425,7 @@ void marioMoveMain(void) {
 		wp->flags &= ~0x4000000;
 	}
 	sincosf(&sn, &cs, wp->directionView);
-	vx = spd * sn + vx;
+	vx += spd * sn;
 	spd = spd * cs + vz;
 	if (!(wp->flags & 0x2080000)) {
 		if (*(f32*)((u8*)wp + 0x220) != 0.0f) {
@@ -1433,11 +1435,11 @@ void marioMoveMain(void) {
 			spd *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
 		}
 	}
-	vx += wp->unk174.x;
 	spd += wp->unk174.z;
+	vx += wp->unk174.x;
 	vy = 0.0f;
 	wp->position.y += vy + wp->unk174.y;
-	vz = mm_sqrtf(vx * vx + spd * spd);
+	vz = mm_sqrtf(spd * spd + vx * vx);
 	if (vz != vy) {
 		spd = angleABf(0.0f, 0.0f, vx, spd);
 	}
@@ -1512,20 +1514,16 @@ s32 marioAnimeId(void) {
 	return id;
 }
 
-inline void marioChgPoseChk(const char* name) {
-	MarioWork* wp = mp;
-	if (wp->dispFlags & 0x1000000) {
-		return;
-	}
-	marioChgPose(name);
-}
-
 void unk_80058374(void) {
 	MarioWork* wp = mp;
 	MarioMotion mot = wp->currMotionId;
 
 	if (mot != MARIO_MOTION_SHIP && mot != MARIO_MOTION_ROLL && mot != MARIO_MOTION_PLANE && mot != MARIO_MOTION_JABARA && mot != MARIO_MOTION_YOSHI) {
-		marioChgPoseChk("M_D_1");
+		switch (wp->dispFlags & 0x1000000) {
+		case 0:
+			marioChgPose("M_D_1");
+			break;
+		}
 	}
 }
 
@@ -1635,10 +1633,9 @@ void marioSetPaperAnimeLocalTime(s32 frames) {
 //TODO: move below marioPaperOff when -inline deferred is on
 inline void marioPaperRelease(void) {
 	MarioWork* wp = mp;
-	s32 poseId;
+	s32 poseId = wp->paperPoseId;
 
-	poseId = wp->paperPoseId;
-	if (wp->paperPoseId >= 0) {
+	if (poseId >= 0) {
 		animPaperPoseRelease(poseId);
 		wp->paperPoseId = -1;
 	}
@@ -1654,19 +1651,15 @@ BOOL marioPaperOn(const char* name) {
 	}
 	wp->dispFlags |= 0x40000000; //paper on
 	wp->paperPoseId = animPaperPoseEntry(name, 2);
-	flag = FALSE;
-	if (!strcmp(name, "p_roll")
+	flag = (!strcmp(name, "p_roll")
 		|| !strcmp(name, "p_plane")
 		|| !strcmp(name, "p_hune")
 		|| !strcmp(name, "p_jyabara")
 		|| !strcmp(name, "p_dokan_x")
-		|| !strcmp(name, "p_dokan_y")) {
-		flag = TRUE;
-	}
-	animPoseSetPaperAnimGroup(wp->paperAnimGroupId[0], name, !flag);
+		|| !strcmp(name, "p_dokan_y"));
+	animPoseSetPaperAnimGroup(wp->paperAnimGroupId[0], name, flag == 0);
 	return TRUE;
 }
-
 
 void marioPaperOff(void) { //1:1
 	MarioWork* wp = mp;
@@ -2037,6 +2030,7 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 	Mtx scaleMtx;
 	f32 scale;
 	f32 angle;
+	f32 angle2;
 	f32 yofs = 0.0f;
 
 	scale = marioGetScale();
@@ -2103,7 +2097,7 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 		wp->field_0xA4.z + (wp->field_0x98.z + blurPos[blurId].z));
 	MTXConcat(rotMtx, mtx, mtx);
 	animPoseSetMaterialFlagOn(wp->paperAnimGroupId[marioAnimeId()], 0x40);
-	animPoseSetMaterialEvtColor(mp->paperAnimGroupId[marioAnimeId()], (GXColor){0xFF, 0xFF, 0xFF, 0x80 - (blurId << 4)});
+	animPoseSetMaterialEvtColor(wp->paperAnimGroupId[(wp = mp, marioAnimeId())], (GXColor){0xFF, 0xFF, 0xFF, 0x80 - (blurId << 4)});
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 1, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 2, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 3, 0.0f, 1.0f);
@@ -2115,27 +2109,30 @@ void marioDispBlur(CameraId camId, void* param) {
 	s32 i;
 	Mtx mtx;
 	f32 angle;
+	f32 angle2;
 	u32 flag;
 	s32 q;
+	s32 q2;
 
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 	angle = 6.2831855f * wp->targetYaw / 360.0f;
+	angle2 = angle;
 	if (angle <= 3.1415927f) {
 		if (angle <= 1.5707964f) {
-			q = 0;
+			q2 = 0;
 		}
 		else {
-			q = 1;
+			q2 = 1;
 		}
 	}
 	else if (angle < 4.712389f) {
-		q = 2;
+		q2 = 2;
 	}
 	else {
-		q = 3;
+		q2 = 3;
 	}
-	if (angle <= 3.1415927f) {
-		if (angle <= 1.5707964f) {
+	if (angle2 <= 3.1415927f) {
+		if (angle2 <= 1.5707964f) {
 			q = 0;
 		}
 		else {
@@ -2163,6 +2160,7 @@ void marioDisp(CameraId camId, void* param) {
 	Mtx scaleMtx;
 	f32 scale;
 	f32 angle;
+	f32 angle2;
 
 	scale = marioGetScale();
 	MTXScale(mtx, wp->scale.x * scale, wp->scale.y * scale, wp->scale.z * scale);

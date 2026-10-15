@@ -332,14 +332,14 @@ void computePosHermite(ExtPose* pose, Teresa* ter) {
     Vec m1 = {1.0f, 0.0f, 0.0f};
     f32 t = ter->t;
     f32 t2;
+    f32 u;
     f32 h00, h10, h11, h01;
-    f32 d;
-    f32 u = 1.0f - t;
+    u = 1.0f - t;
     t2 = 2.0f * t;
     h00 = (1.0f + t2) * u * u;
     h10 = t * u * u;
-    h11 = (t * t) * (t - 1.0f);
-    h01 = (3.0f - t2) * (t * t);
+    h11 = (t - 1.0f) * (t * t);
+    h01 = (t * t) * (3.0f - t2);
 
     m0.x = ter->field_0x24;
     m0.y = 3.4f * ter->dst.y;
@@ -454,7 +454,7 @@ USER_FUNC(senteresa_okure_move) {
     f32 h10 = t * u * u;
     f32 tt = (0, t * t);
     f32 h11 = (t - 1.0f) * (t * t);
-    f32 h01 = (3.0f - t2) * (t * t);
+    f32 h01 = (t * t) * (3.0f - t2);
 
     pos.x = event->lwData[10] * h00 + m0.x * h10 + m1.x * h11 + event->lwData[13] * h01;
     pos.y = event->lwData[11] * h00 + m0.y * h10 + m1.y * h11 + event->lwData[14] * h01;

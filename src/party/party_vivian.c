@@ -52,11 +52,14 @@ extern char* partyChgPoseId(VivianParty* party, s32 index);
 
 #pragma force_active on
 s32 gap_08_80418A34_sbss;
-#pragma force_active reset
+#pragma explicit_zero_data reset
 s32 vivian_cancel_req;
 
+#pragma explicit_zero_data on
 void N_marioForceVivianAnime(void) {
+    static const u32 gap_09_8041DF6C_sdata2 = 0;
     MarioWork* mario = marioGetPtr();
+    (void)&gap_09_8041DF6C_sdata2;
 
     marioPaperOff();
     marioChgPaper(NULL);
@@ -67,6 +70,7 @@ void N_marioForceVivianAnime(void) {
     animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], *(u16*)&mario->poseTime);
 }
 
+#pragma explicit_zero_data reset
 void mot_vivian(void) {
     MarioWork* mario = marioGetPtr();
 
@@ -300,14 +304,14 @@ static inline void vivianFollow(VivianParty* party) {
     }
 }
 
-#pragma opt_common_subs off
+#pragma defer_codegen off
+#pragma explicit_zero_data on
 void vivian_use(VivianParty* party) {
     f32 d;
     void* rip;
     Vec s;
-    MarioWork* m;
     u32 fl = party->field_8;
-    m = PF(MarioWork*, 0x160);
+    MarioWork* m = PF(MarioWork*, 0x160);
     if (fl & 8) {
         party->field_8 &= ~8;
         party->useMotionId = 0;
@@ -542,5 +546,12 @@ void vivian_use(VivianParty* party) {
         break;
     }
 }
+
+#pragma explicit_zero_data reset
 #pragma opt_common_subs reset
 
+
+#pragma force_active on
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_8038BA54_data[1] = {0};

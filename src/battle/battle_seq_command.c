@@ -1135,9 +1135,9 @@ s32 BattleCommandInput(BattleWork* wp) {
 		BattleAcHelpSetDispType(0);
 	}
 	_commandRestoreRec();
-	sfxA = "SFX_BTL_CURSOR_MOVE1";
 	loop = 1;
-	sfxB = sfxA;
+	sfxB = "SFX_BTL_CURSOR_MOVE1";
+	sfxA = sfxB;
 	while (loop) {
 		loop = 0;
 	again:
@@ -1269,7 +1269,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = 0;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxA);
+						psndSFXOn(sfxB);
 					}
 				}
 				if (PADREP(0x40000)) {
@@ -1278,7 +1278,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = targets->numTargets - 1;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxB);
+						psndSFXOn(sfxA);
 					}
 				}
 			}
@@ -1854,9 +1854,9 @@ check:
 
 void BattleCommandDisplay_WeaponMultiItemCancelCheckDisp(CameraId camId, void* param) {
 	BattleWork* wp = param;
+	u32 len;
 	char buf[36];
 	Vec pos;
-	u32 len;
 	f32 w;
 	f32 x;
 

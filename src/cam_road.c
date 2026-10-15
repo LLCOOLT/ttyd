@@ -150,15 +150,19 @@ static CamRoadWork* wp = &work;
 void OSReport(const char* msg, ...);
 
 
-static void camRoadDebugPrint(const char* pfx) {
-    OSReport("%scam = %d\n", pfx, wp->map->curveNum);
-    OSReport("%scurve = %d\n\0\0", pfx, wp->state);
-}
+
+
 
 void calcCurrentCamState(CamRoadOut* out);
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
+
+static void
+camRoadDebugPrint(const char* pfx) {
+    OSReport("%scam = %d\n", pfx, wp->map->curveNum);
+    OSReport("%scurve = %d\n\0\0", pfx, wp->state);
+}
 
 s32 camRoadSetup(const char* name) {
     char path[128];
@@ -794,13 +798,12 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     s32* idxp;
     CamRoadCurveX* hitCurve;
 
-    posA.x = a;
-    posA.y = b;
-    posA.z = c;
     posB.x = d;
     posB.y = e;
     posB.z = f;
-    pp = &prev;
+    posA.x = a;
+    posA.y = b;
+    posA.z = c;
     curve = (CamRoadCurveX*)wp->map->curves;
     best = -100000000.0f;
     hitCurve = NULL;
@@ -828,7 +831,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
                 idx = &((s32*)wp->map->f_100)[strip->idxOfs];
                 cnt = strip->num - 1;
                 idxp = idx + 1;
-                for (l = 1; l < cnt; l++, idxp++) {
+                for (l = 1; l < cnt; idxp++, l++) {
                     if (collisionTri_simple(posB, verts[idx[0]], verts[idxp[0]], verts[idxp[1]], &best)) {
                         hitCurve = curve;
                         break;
@@ -848,7 +851,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     }
     curve = hitCurve;
     if (curve == NULL) {
-        curve = (*pp)->on ? (CamRoadCurveX*)(*pp)->cam : NULL;
+        curve = prev->on ? (CamRoadCurveX*)prev->cam : NULL;
         if (curve == NULL) {
             ((f32*)((u8*)wp + 0x1d4))[0] = a;
             ((f32*)((u8*)wp + 0x1d4))[1] = b;
@@ -865,13 +868,13 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             y = b;
         }
         z = c;
-        nx = -(*pp)->dir.x;
-        ny = -(*pp)->dir.y;
-        nz = -(*pp)->dir.z;
-        angle = (*pp)->angle;
-        dist = (*pp)->dist;
-        rot = (*pp)->rot;
-        f4c = (*pp)->f_4c;
+        nx = -prev->dir.x;
+        ny = -prev->dir.y;
+        nz = -prev->dir.z;
+        angle = prev->angle;
+        dist = prev->dist;
+        rot = prev->rot;
+        f4c = prev->f_4c;
         flags = 0;
     } else {
         if (hit.t < 0.0f) {
@@ -889,10 +892,10 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
         } else {
             y = b;
         }
-        nz = hit.dir.x;
         nx = -hit.dir.z;
-        len2 = nx * nx + nz * nz;
+        len2 = nx * nx + hit.dir.x * hit.dir.x;
         f4c = hit.f_24;
+        nz = hit.dir.x;
         z = hit.pos.z;
         flags = hit.flags;
         ny = hit.dir.y;
@@ -920,11 +923,11 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     }
     if (curve != NULL) {
         fov = 3.1415927f * (wp->map->f_e8->x * 0.5f / 180.0f);
-        if (g && hitCurve != NULL && (*pp)->on) {
+        if (g && hitCurve != NULL && prev->on) {
             cs = (f32)cos(fov);
             sn = (f32)sin(fov);
             px = -nz;
-            w = 0.01f * ((*pp)->f_58 * (1.0f * (640.0f * (dist * sn / cs) / 480.0f)));
+            w = 0.01f * (prev->f_58 * (1.0f * (640.0f * (dist * sn / cs) / 480.0f)));
             found = 0;
             hit2.y = -1000000.0f;
             hit2.dir.z = 0.0f;
@@ -995,26 +998,26 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             if (found2) {
                 px = p2.x;
                 pz = p2.z;
-                if (!(hit3.flags & 1) && ((*pp)->f_08 & 1)) {
+                if (!(hit3.flags & 1) && (prev->f_08 & 1)) {
                     wp->f_19c[4] = 0.0f;
                 }
-                if (!(hit3.flags & 2) && ((*pp)->f_08 & 2)) {
+                if (!(hit3.flags & 2) && (prev->f_08 & 2)) {
                     wp->f_19c[5] = 0.0f;
                 }
             } else {
                 px = x;
                 pz = z;
             }
-            v1.x = qx - (*pp)->pos.x;
+            v1.x = qx - prev->pos.x;
             v1.y = 0.0f;
-            v1.z = qz - (*pp)->pos.z;
-            v2.x = px - (*pp)->pos.x;
+            v1.z = qz - prev->pos.z;
+            v2.x = px - prev->pos.x;
             v2.y = 0.0f;
-            v2.z = pz - (*pp)->pos.z;
+            v2.z = pz - prev->pos.z;
             lim1 = PSVECMag(&v1);
             lim2 = PSVECMag(&v2);
-            lim1 += getV60FPS(wp->f_19c[0], (*pp)->time, gp->renderFieldTime);
-            lim2 = getV60FPS(wp->f_19c[1], (*pp)->time, gp->renderFieldTime);
+            lim1 += getV60FPS(wp->f_19c[0], prev->time, gp->renderFieldTime);
+            lim2 = getV60FPS(wp->f_19c[1], prev->time, gp->renderFieldTime);
             l1 = lim1 * wp->f_19c[4];
             spd1 = lim2 * wp->f_19c[4];
             spd2 = lim2 * wp->f_19c[5];
@@ -1048,8 +1051,10 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             if (lim2 > l2 && lim2 > spd2) {
                 PSVECScale(&dB, &r2, l2 * sgn2);
             }
-            x = (*pp)->pos.x + (r1.x + r2.x);
-            z = (*pp)->pos.z + (r1.z + r2.z);
+            x = prev->pos.x;
+            z = prev->pos.z;
+            x += r1.x + r2.x;
+            z += r1.z + r2.z;
         }
     }
     wp->f_19c[4] += wp->f_19c[2];
@@ -1103,10 +1108,10 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         }
         n = a->cam->f_44 - a->cam->f_40;
 
-        if (n - 1 <= __abs(d)) {
+        if (__abs(d) >= --n) {
             return 0;
         }
-        if (n - 2 <= __abs(d)) {
+        if (__abs(d) >= --n) {
             flags |= 0x20;
         }
     }
@@ -1130,8 +1135,8 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     if (ang > 180.0f) {
         ang = 360.0f - ang;
     }
-    speed = 6.2831855f * a->dist * ang / 360.0f;
-    speed *= wp->f_19c[6];
+    t = 6.2831855f * a->dist * ang / 360.0f;
+    speed = t * wp->f_19c[6];
     ang = __fabsf(a->angle - b->angle);
     if (ang > 180.0f) {
         ang = 360.0f - ang;
@@ -1162,7 +1167,17 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
     dist += crSq(dy);
     dist += crSq(dz);
     if (dist) {
-        dist = cr_sqrtf(dist);
+        if (dist > 0.0f) {
+            f64 guess = __frsqrte(dist);
+            guess = 0.5 * guess * (3.0 - guess * guess * dist);
+            guess = 0.5 * guess * (3.0 - guess * guess * dist);
+            guess = 0.5 * guess * (3.0 - guess * guess * dist);
+            dist = dist * guess;
+        } else if (dist < 0.0) {
+            dist = *(f32*)__float_nan;
+        } else if (cr_fpclassifyf(dist) == 1) {
+            dist = *(f32*)__float_nan;
+        }
     } else {
         dist = 0.0f;
     }

@@ -129,6 +129,7 @@ WinDt win_dt3[4] = {
     {140.0f, -65.0f, -120.0f, 60.0f, 10, 0, {1, 1, 2, 2}},
 };
 
+__declspec(section ".data") static u32 gap_06_803DB834_bss;
 static LoadWork work;
 static LoadWork* wp = &work;
 
@@ -765,6 +766,7 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
 }
 
 void loadDraw(CameraId camera, void* param) {
+    WinDt* win;
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXColor white = {255, 255, 255, 255};
     GXColor gray = {160, 160, 160, 255};
@@ -780,7 +782,6 @@ void loadDraw(CameraId camera, void* param) {
     f32 y;
     f32 w;
     f32* py;
-    WinDt* win;
     s32 i;
     s32 j;
     u64 sec;
@@ -1041,13 +1042,12 @@ __declspec(section ".sdata") s32 evt_continue[] = {
     0x00000002, 0x00000001,
 };
 #pragma force_active on
-__declspec(section ".data") static u32 gap_06_803DB834_bss;
 #pragma force_active reset
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
 #pragma force_active reset
 
-
+#pragma force_active on
 void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;
@@ -1202,3 +1202,4 @@ void continueGame(void) {
             break;
     }
 }
+

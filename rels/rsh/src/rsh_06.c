@@ -349,6 +349,7 @@ static void moamoa_pose_main(void) {
     f32 t;
     u64 now;
     s32 i;
+    s32 sndFlag;
     ExtPose* pose;
     Moamoa* moa;
     MoamoaPoseDef* def;
@@ -843,6 +844,7 @@ static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
+    s32 sndFlag;
     s32 hit = 0;
     const char* sfx;
     s32 i;
@@ -866,7 +868,6 @@ static void ext_moamoa_main(void) {
     Vec pv;
     Mtx rot;
     f32 cnt = 0.0f;
-    s32 sndFlag;
 
     if (mario->currMotionId == 0x12) {
         wp->field_0x40++;
@@ -1227,8 +1228,8 @@ void moamoa_joint_position(Moamoa* moa, Vec* out) {
     NpcEntry* npc = npcNameToPtr("base");
     AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
     f32 t;
-    Vec* b = anim->worldPositions[0] + wp->chainIdx[moa->group][1];
     Vec* a = anim->worldPositions[0] + wp->chainIdx[moa->group][0];
+    Vec* b = anim->worldPositions[0] + wp->chainIdx[moa->group][1];
     Vec tmp;
 
     t = (f32)moa->order / (f32)wp->chainNum[moa->group];

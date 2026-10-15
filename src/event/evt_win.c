@@ -91,6 +91,7 @@ static UnitWinWork* _wp;
 USER_FUNC(evt_unitwin_main_func);
 USER_FUNC(unk_80174e98);
 void evt_unitwin_disp_func(CameraId cameraId, void* param);
+
 void unk_8017597c(WinMgrEntry* entry);
 void unk_801758fc(WinMgrEntry* entry);
 void unk_80175710(WinMgrEntry* entry);
@@ -857,8 +858,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			u8* tbl;
 			const char* title;
 			u32 sl, st, sw, sh;
-			s32 i;
 			InformantInfo* info;
+
 
 			h = 8 - wp->count;
 			h = (h > 0 ? h : 0) * 24;
@@ -925,7 +926,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
-			s32 i;
+			
 			s32* pid;
 			s32 lv;
 			s32 flag;
@@ -1056,7 +1057,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
-			s32 i;
+			
 			s32 j;
 			s32 flag;
 			s32 lv;
@@ -1167,7 +1168,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
-			s32 i;
+			
 			s32 j;
 			s32 cnt;
 			s32 lv;
@@ -1248,7 +1249,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
-			s32 i;
+			
 			s32 lv;
 			s32 v;
 			s32 ty;

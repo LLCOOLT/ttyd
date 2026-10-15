@@ -159,7 +159,7 @@ static inline f32 planeDir(MarioWork* mp) {
 }
 
 static inline void
-planeRoll1(MarioWork* mp, f32 max, f32 rate) {
+planeRoll1(MarioWork* mp, f32 rate, f32 max) {
 	f32 cur = MW(mp, 0x2a4, f32);
 	max *= DIRF(mp);
 	max -= cur;
@@ -203,7 +203,7 @@ void mot_plane(void) {
 		SFX3D(0xaf, &mp->position);
 	case 1:
 		marioMakeJumpPara();
-		planeRoll1(mp, 30.0f, 0.125f);
+		planeRoll1(mp, 0.125f, 30.0f);
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -236,7 +236,7 @@ void mot_plane(void) {
 	case 2:
 		animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
 		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
-		planeRoll1(mp, 30.0f, 0.125f);
+		planeRoll1(mp, 0.125f, 30.0f);
 		done = FALSE;
 		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
@@ -381,7 +381,7 @@ void mot_plane(void) {
 		SFX3D(0x180, &MW(mp, 0x8c, Vec));
 		allPartyRideOff2();
 	case 80:
-		planeRoll1(mp, 28.0f, 0.3f);
+		planeRoll1(mp, 0.3f, 28.0f);
 		MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 		marioMakeJumpPara();
 		MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
@@ -399,7 +399,7 @@ void mot_plane(void) {
 		break;
 	case 90:
 		if (MW(mp, 0x48, s32) > 0) {
-			planeRoll1(mp, 28.0f, 0.3f);
+			planeRoll1(mp, 0.3f, 28.0f);
 			MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 			if (--MW(mp, 0x48, s32) <= 0) {
 				MW(mp, 4, u32) &= ~0x100;
@@ -813,10 +813,9 @@ BOOL chkCollision(f32* outY) {
 	z += r * (c1 * -c0);
 	y += s0 * r;
 	sincosf(&s0, &c0, MD(4, f32) - 90.0f);
-	r = planeData[39];
-	x += r * (c0 * s1) - r * (s2 * c1);
-	y += r * (s0 * c2);
-	z += r * (c1 * c0) - r * (s2 * s1);
+	x += planeData[39] * (c0 * s1) - planeData[39] * (s2 * c1);
+	y += planeData[39] * (s0 * c2);
+	z += planeData[39] * (c0 * c1) - planeData[39] * (s2 * s1);
 	{
 		v2 = (Vec){x, y, z};
 	}
@@ -842,12 +841,13 @@ BOOL chkCollision(f32* outY) {
 		ret = TRUE;
 		*outY = oy;
 	}
+	r = 10.0f;
 	x = MD(0x30, f32);
 	y = MD(0x34, f32);
 	z = MD(0x38, f32);
 	MW(mp, 0x1e4, HitEntry*) = NULL;
 	dist = 10.1f;
-	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + 10.0f, z, 0.0f, -1.0f, 0.0f);
+	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + r, z, 0.0f, -1.0f, 0.0f);
 	if (hit != NULL) {
 		MW(mp, 0x1e4, HitEntry*) = hit;
 		ret = TRUE;
@@ -859,7 +859,7 @@ BOOL chkCollision(f32* outY) {
 		z = MD(0x44, f32);
 		MW(mp, 0x1e4, HitEntry*) = NULL;
 		dist = 10.1f;
-		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + 10.0f, z, 0.0f, -1.0f, 0.0f);
+		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + r, z, 0.0f, -1.0f, 0.0f);
 		if (hit != NULL) {
 			MW(mp, 0x1e4, HitEntry*) = hit;
 			ret = TRUE;

@@ -2978,22 +2978,22 @@ static USER_FUNC(viewport) {
 }
 
 void noiseDisp(CameraId cameraId, void* param) {
-    CameraEntry* cam;
-    s32 y;
-    s32 ry;
+    s32 start;
     s32 n;
-    Mtx mtx;
+    s32 off;
     s32 x;
-    s32 len;
+    s32 ry;
     s32 by;
+    s32 len;
+    s32 i;
+    CameraEntry* cam;
     GXTexObj tex;
+    s32 y;
     u8 col;
     u8* buf;
-    s32 i;
-    s32 off;
-    s32 start;
+    Mtx mtx;
+    
     cam = camGetPtr(cameraId);
-
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
         by = y / 4;
@@ -3035,8 +3035,9 @@ void noiseDisp(CameraId cameraId, void* param) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
     {
         GXColor c = noise_color;
-        c.a = (u8)(s32)param;
-        GXSetTevColor(GX_TEVREG0, c);
+        GXColor d = c;
+        d.a = (u8)(s32)param;
+        GXSetTevColor(GX_TEVREG0, d);
     }
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
     GXSetCurrentMtx(0);

@@ -440,7 +440,8 @@ void BattleStatusChangeInfoSetAnnouce(BattleUnit* unit, s32 type, s32 arg2, s32 
 	u8 u, t;
 
 	for (i = 0; i < 6; i++) {
-		if (pri >= (s8)_get_pri((s8)*(u8*)&e[i].type)) break;
+		n = _get_pri((s8)*(u8*)&e[i].type);
+		if (pri >= (s8)n) break;
 	}
 	if (i >= 6) return;
 	tmp.type = type;
@@ -636,20 +637,23 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 #pragma dont_inline reset
 
 
-static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 void _st_chg_msg_disp(void) {
+	static const GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
 	u8* wp = (u8*)_battleWorkPointer + 0x20000;
-	u16 lines;
 	u16 width;
+	u16 lines;
 	f32 x;
-	GXColor col;
-	f32 cx = 0.0f;
-	f32 ty = -120.0f;
+	f32 y;
+	f32 new_var;
 	width = FontGetMessageWidthLine((const char*)(wp - 0x7128), &lines);
 	lines++;
-	x = cx - (width / 2);
-	col = white;
-	windowDispGX_Waku_col(0, col, x - 20.0f, -117.0f + ((lines - 1) * 29), width + 40, lines * 29 + 1, 10.0f);
+	{
+	new_var = -117.0f + ((lines - 1) * 29);
+	y = 0.0f;
+	x = y - (width / 2);
+	y = -120.0f;
+	windowDispGX_Waku_col(0, col, x - 20.0f, new_var, width + 40, lines * 29 + 1, 10.0f);
+	}
 	FontDrawStart();
-	FontDrawMessage(x, (s32)ty + (lines - 1) * 29, (const char*)(wp - 0x7128));
+	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - 0x7128));
 }

@@ -82,12 +82,13 @@ static void effIceMain(EffectEntry* effect) {
     EffIceN64Work* work = effect->userdata;
     Vec calcPos;
     Vec pos = { 0.0f, 0.0f, 0.0f };
+    f32 t;
+    f32 u;
+    f32 s;
     s32 idx;
     s32 i;
     s32 life;
     EffIceN64Piece* p;
-    f32 s;
-    f32 t;
 
     pos.x = work->position.x;
     pos.y = work->position.y;
@@ -111,15 +112,17 @@ static void effIceMain(EffectEntry* effect) {
     idx = life + 20;
     for (i = 1; i < effect->count; idx += 20, i++, work = (EffIceN64Work*)((EffIceN64Piece*)work + 1)) {
         p = (EffIceN64Piece*)work;
-        s = (f32)sin(6.2831855f * (2.0f * p->rotZ) / 360.0f);
+        t = sin(6.2831855f * (2.0f * p->rotZ) / 360.0f);
         p->velY += -0.05f;
-        t = 0.2f * s;
-        p->velX = t + p->velX;
+        u = 0.2f * t;
+        p->velX = u + p->velX;
         p->velY += -0.05f;
         p->velX *= 0.92f;
         p->rotVel += (s32)effTblRandN64(50, idx) - 25;
-        p->rotZ += 10.0f * (f32)sin(6.2831855f * p->rotVel / 360.0f);
-        p->rotY += 10.0f * (f32)cos(6.2831855f * (p->rotVel / 2.0f) / 360.0f);
+        s = sin(6.2831855f * p->rotVel / 360.0f);
+        p->rotZ += 10.0f * s;
+        t = cos(6.2831855f * (p->rotVel / 2.0f) / 360.0f);
+        p->rotY += 10.0f * t;
         p->x += p->velX;
         p->y += p->velY;
     }

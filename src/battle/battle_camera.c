@@ -68,11 +68,11 @@ void battleCameraMain(void) {
   f32 dX, dY, dZ, dAtX, dAtY, dAtZ;
   f32 mx, my, mz;
   f32 px, py, pz;
+  BattleUnit* unit2;
   BattleUnitPart* part;
   BattleUnit* party;
   BattleUnitPart* part2;
   BattleUnit* unit;
-  BattleUnit* unit2;
   f32 w, w2, zz, y, ofs, t, d, yy, atX, atY, atZ;
   s16 moveLv, zoomLv;
   s32 phase;
@@ -791,9 +791,9 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
 USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   s32* args = event->args;
   BattleWork* wp;
-  BattleUnitPart* part;
   BattleUnit* u;
   s32 pri, unit, parts, unit2, parts2;
+  BattleUnitPart* part;
   Vec pos;
   Vec hit;
 
@@ -808,7 +808,7 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   wp->cameraWork.unitId = BattleTransID(event, unit);
   wp->cameraWork.partsId = parts;
   u = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-  BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+  part = BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
   BtlUnit_GetHomePos(u, &pos.x, &pos.y, &pos.z);
   wp->cameraWork.homingOffset = (Vec){pos.x, pos.y, pos.z};
   if (unit2 != -1) {

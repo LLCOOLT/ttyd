@@ -764,13 +764,14 @@ USER_FUNC(cam_test_init_func) {
 }
 
 USER_FUNC(cam_test_func) {
-    s32* args = event->args;
+    s32* p0;
+    s32* args;
     f32 angle, dist, rad, s, c;
     Vec center;
-    s32* p0;
     s32 ix, iz;
-    angle = evtGetFloat(event, args[2]);
-    p0 = args++;
+    p0 = event->args;
+    angle = evtGetFloat(event, p0[2]);
+    args = p0 + 1;
     dist = evtGetFloat(event, args[2]);
     rad = 6.2831855f * angle / 360.0f;
     s = sinf_l(rad);

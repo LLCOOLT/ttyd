@@ -408,11 +408,10 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     GXColor white2;
     GXColor black2;
     GXColor red[1];
-    GXColor white0;
-    GXColor black0;
     GXColor white;
     GXColor black;
-    PouchPartyData* pd;
+    GXColor white0;
+    GXColor black0;
     f32 scale;
     f32 tx;
     f32 bx;
@@ -429,13 +428,13 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     AnimData* anim;
     const char* animName;
     const char* name;
-
-    white2 = winPartyWhiteC;
-    white = winPartyWhiteC;
+    PouchPartyData* pd;
     white0 = winPartyWhiteC;
-    black2 = winPartyBlackC;
-    black = winPartyBlackC;
+    white = winPartyWhiteC;
+    white2 = winPartyWhiteC;
     black0 = winPartyBlackC;
+    black = winPartyBlackC;
+    black2 = winPartyBlackC;
     x = wp->pos[idx].x;
     y = wp->pos[idx].y;
     winBgGX(wp, 1, x, y);
@@ -488,8 +487,7 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     winTexInit(*wp->file->data);
     winTexSet(0x10, (Vec){8.0f + (170.0f + (x - 10.0f)), by2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winFontInit();
-    fy = 4.0f + (12.0f + by);
-    winFontSetR((Vec){10.0f + (110.0f + (x - 10.0f)), fy, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pd->currentHP));
+    winFontSetR((Vec){10.0f + (110.0f + (x - 10.0f)), fy = 4.0f + (12.0f + by), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pd->currentHP));
     winFontSet((Vec){8.0f + (180.0f + (x - 10.0f)), fy, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pd->maximumHP));
     winZClear();
 
@@ -629,14 +627,16 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
                 } else {
                     name = pouchGetYoshiName();
                 }
-                winFontSetEdge((Vec){(200.0f - FontGetMessageWidth(name)) * 0.5f + (x - 230.0f), fy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, name);
+                w2 = FontGetMessageWidth(name);
+                winFontSetEdge((Vec){(200.0f - w2) * 0.5f + (x - 230.0f), fy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, name);
             }
         }
     }
 
     if (wp->count > 1) {
         winFontInit();
-        fy = (-230.0f - 0.8f * FontGetMessageWidth(msgSearch("msg_menu_party_henkou"))) * 0.5f + x;
+        w1 = 0.8f * FontGetMessageWidth(msgSearch("msg_menu_party_henkou"));
+        fy = (-230.0f - w1) * 0.5f + x;
         winFontSet((Vec){fy, y - 90.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, msgSearch("msg_menu_party_henkou"));
         winIconInit();
         winIconSet(100, (Vec){fy - 30.0f, y - 100.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
@@ -654,14 +654,14 @@ void winPartyDisp(s32 camId, WinPartyWork* wp, s32 idx) {
     by = 50.0f + y;
     winWazaGX(wp, 0, x - 5.0f, by, 260.0f, 144.0f);
     winFontInit();
-    w1 = FontGetMessageWidth(msgSearch("msg_menu_party_waza"));
+    w1 = 0.8f * FontGetMessageWidth(msgSearch("msg_menu_party_waza"));
     fy = 45.0f + y;
-    winFontSetEdge((Vec){(200.0f - 0.8f * w1) * 0.5f + x, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_party_waza"));
+    winFontSetEdge((Vec){(200.0f - w1) * 0.5f + x, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_party_waza"));
     bx = 230.0f + x;
     winFontSetEdge((Vec){bx - 20.0f, fy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x65\x82\x6F");
     by2 = (238.0f + x) - 20.0f;
-    w2 = 2.0f + (2.0f + ((17.0f + bx) - 20.0f));
     x = 10.0f + x;
+    w2 = 2.0f + (2.0f + ((17.0f + bx) - 20.0f));
     for (i = 0; i < wp->wazaCount; i++) {
         char buf[0x40];
         fy = (by - (f32)(i * 26)) - 30.0f;

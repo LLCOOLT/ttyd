@@ -107,7 +107,8 @@ static inline void kpaFireEntry2(Vec pos) {
         if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
             flag = 1;
         }
-        MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)(flag ? 180 : 0);
+        ang = flag ? 180 : 0;
+        MF(*(u8**)(fireefp + 0xC), 0x48) = ang;
         child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
         if (child) {
             flag = 0;

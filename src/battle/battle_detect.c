@@ -47,14 +47,14 @@ typedef struct DetWork {
 
 void _btlSamplingEnemy(DetWork* d) {
     BattleUnitKindPart* kp;
+    s32 k;
     s32 n = 0;
     DetTarget* t = d->t;
-    s32 k;
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     s32 i;
-    BattleUnit* unit;
     s32 j;
+    s32 jj;
     u8 np;
 
     if (d->classFlags & 0x80000000) {
@@ -63,11 +63,11 @@ void _btlSamplingEnemy(DetWork* d) {
     }
     {
     for (i = 0; i < 64; i++) {
-        unit = BattleGetUnitPtr(wp, i);
+        BattleUnit* unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
-            part = unit->mParts;
             np = unit->mKindParams->numParts;
-            for (j = 0; j < np; j++) {
+            part = unit->mParts;
+            for (jj = 0; jj < np; jj++) {
                 s32 dir;
                 f32 x, y, z;
                 f32 ox, oy, oz;
@@ -384,35 +384,25 @@ void _btlSamplingEnemy(DetWork* d) {
     if (d->direction > 0) {
         for (i = 0; i < n - 1; i++) {
             for (j = i + 1; j < n; j++) {
-                s8 a = idx[i];
-                s8 b = idx[j];
-                DetTarget* ta = &t[a];
-                DetTarget* tb = &t[b];
+                DetTarget* ta = &t[idx[i]];
+                DetTarget* tb = &t[idx[j]];
                 if (ta->posX + ta->score * 10 > tb->posX + tb->score * 10) {
-                    idx[i] = b;
-                    idx[j] = a;
+                    { s8 a = idx[i]; idx[i] = idx[j]; idx[j] = a; }
                 }
             }
         }
     } else {
         for (i = 0; i < n - 1; i++) {
             for (j = i + 1; j < n; j++) {
-                s8 a = idx[i];
-                s8 b = idx[j];
-                DetTarget* ta = &t[a];
-                DetTarget* tb = &t[b];
+                DetTarget* ta = &t[idx[i]];
+                DetTarget* tb = &t[idx[j]];
                 if (ta->posX + ta->score * 10 <= tb->posX + tb->score * 10) {
-                    idx[i] = b;
-                    idx[j] = a;
+                    { s8 a = idx[i]; idx[i] = idx[j]; idx[j] = a; }
                 }
             }
         }
     }
     }
-}
-
-void BattleSamplingEnemyUpdate(DetWork* d) {
-    _btlSamplingEnemy(d);
 }
 
 BOOL BattleSamplingEnemy(DetWork* d, BattleWeapon* weapon, s32 unitId, s8 belong, u32 classFlags, u32 propFlags,
@@ -437,6 +427,10 @@ BOOL BattleSamplingEnemy(DetWork* d, BattleWeapon* weapon, s32 unitId, s8 belong
     }
     _btlSamplingEnemy(d);
     return r;
+}
+
+void BattleSamplingEnemyUpdate(DetWork* d) {
+    _btlSamplingEnemy(d);
 }
 
 void BattleChoiceSamplingEnemy(DetWork* d, u32 flags, s32* unitOut, s32* partOut) {

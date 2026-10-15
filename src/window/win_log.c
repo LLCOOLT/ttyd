@@ -1191,7 +1191,8 @@ void mapGX(WinLogWork* w, f32 x, f32 y) {
         winTexInit(*(TEXPalette**)w->file->data);
         winTexSet(0, (Vec){mx, my, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
         winTexInit(w->res->tex->tpl);
-        for (i = 0, t = tubuDt; i < sizeof(tubuDt) / sizeof(TubuDt); i++, t++) {
+        for (i = 0; i < sizeof(tubuDt) / sizeof(TubuDt); i++) {
+            t = &tubuDt[i];
             if (swByteGet(0) >= t->id || tubuCheck(t->type)) {
                 if (w->fE14 == i) {
                     winTexSet((tex = 0xBA, ((gp->retraceCount >> 4) & 1) ? tex = 0xB9 : 0, tex), (Vec){mx + t->x, my + t->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
@@ -1489,9 +1490,6 @@ void capture(CameraId camera, void* param) {
     Vec v2;
     Vec v1;
     Vec vv;
-    Vec tgt;
-    Vec up;
-    Vec cam;
     u16 bb0, bb1, bb2, bb3;
     u32 sx, sy, sw, sh;
     f32 cx;
@@ -1532,6 +1530,10 @@ void capture(CameraId camera, void* param) {
     } else {
         dist = ((608.0f * (max.y - cy)) / 480.0f) / (f32)tan(0.21816615760326385);
     }
+    {
+    Vec tgt;
+    Vec up;
+    Vec cam;
     tgt = (Vec){0.0f, 0.0f, 0.0f};
     up = (Vec){0.0f, 1.0f, 0.0f};
     cam = (Vec){0.0f, 0.0f, 0.0f};
@@ -1541,6 +1543,7 @@ void capture(CameraId camera, void* param) {
     tgt.x = cx;
     tgt.y = cy;
     C_MTXLookAt(view, &cam, &up, &tgt);
+    }
     e = ((MonoDat**)m->file2->data)[0];
     n = ((u32*)m->file2->data)[1] / sizeof(MonoDat);
     for (i = 0; i < n; i++, e++) {
@@ -1706,9 +1709,9 @@ void monosiri_disp(CameraId camera, void* param) {
             GXTexCoord2f32(0.0f, 0.0f);
             GXPosition3f32(x1, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
-            GXPosition3f32(x1 + 216.0f, y1 - 160.0f, 0.0f);
+            GXPosition3f32(216.0f + x1, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(x1 + 216.0f, y1, 0.0f);
+            GXPosition3f32(216.0f + x1, y1, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
         }
         id = m->id;

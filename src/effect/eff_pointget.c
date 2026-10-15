@@ -30,7 +30,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     EffPointGetWork* work;
 
     effect = effEntry();
-    effect->type = "PointGet\0\0\0";
+    effect->type = "PointGet\0\0\0\0\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPointGetWork) * effect->count);
     effect->userdata = work;
@@ -93,15 +93,14 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     EffPointGetWork* work = effect->userdata;
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;
-    f32 width;
     f32 base;
-    f32 x0;
-    f32 y1;
+    f32 width;
     f32 wide;
+    f32 y1;
+    f32 x0;
     f32 ox;
     f32 oy;
     GXTexObj texObj;
-    GXColor c1, c2, c3, c4;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx baseMtx;
@@ -131,24 +130,22 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     base = -(362.0f + width);
-    width = 48.0f;
-    y1 = 24.0f;
     wide = 352.0f;
+    y1 = 24.0f;
+    width = 48.0f;
     x0 = -width;
-    x0 *= 0.5f;
+    x0 /= 2.0f;
     for (pass = 1; pass >= 0; pass--) {
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][3], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            c1 = (GXColor){ 0, 0, 0, 0x80 };
-            GXSetChanMatColor(GX_COLOR0A0, c1);
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][2], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            c2 = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-            GXSetChanMatColor(GX_COLOR0A0, c2);
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
         }
         for (i = 0; i < strlen(buf); i++) {
             PSMTXTrans(mtx, ox + (32.0f * (f32)i + base / 2.0f), oy, 0.0f);
@@ -172,13 +169,11 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
         if (pass != 0) {
             effGetTexObj(texid_tbl[gp->language != 0][1], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            c3 = (GXColor){ 0, 0, 0, 0x80 };
-            GXSetChanMatColor(GX_COLOR0A0, c3);
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0, 0, 0, 0x80 });
         } else {
             effGetTexObj(texid_tbl[gp->language != 0][0], &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
-            c4 = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-            GXSetChanMatColor(GX_COLOR0A0, c4);
+            GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });
         }
         PSMTXTrans(mtx, 10.0f + (ox + (32.0f * (f32)strlen(buf) + base / 2.0f)), oy, 0.0f);
         PSMTXConcat(baseMtx, mtx, mtx);

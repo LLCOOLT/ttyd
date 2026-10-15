@@ -300,5 +300,10 @@ s32 effStageClearEndChk(EffectEntry* effect) {
     return ((StageClearWork*)effect->userdata)->done != 0;
 }
 
+
+#pragma force_active on
+#pragma force_active on
 __declspec(section ".data") u32 gap_05_803ADD14_data[3] = {0, 0, 0};
 __declspec(section ".sdata") u32 gap_07_80415C34_sdata[3] = {0, 0, 0};
+#pragma force_active reset
+#pragma force_active reset

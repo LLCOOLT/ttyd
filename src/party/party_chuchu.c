@@ -173,13 +173,15 @@ USER_FUNC(search_result) {
     return EVT_RETURN_DONE;
 }
 
-static inline int chuchu_findTreasure2(MarioWork* pl, f32 range, Vec* bestPos) {
-    int found;
+static inline int chuchu_findTreasure2(ChuchuParty* cpp, f32 range, Vec* bestPos) {
     u32 i;
+    int found;
+    MarioWork* pl;
     ChuchuTreasure* tbl;
     f32 minDist;
 
     found = 0;
+    pl = cpp->player;
     minDist = 10000.0f;
     tbl = unk_8038bb34;
     for (i = 0; i < 40; i++, tbl++) {
@@ -239,7 +241,7 @@ USER_FUNC(set_msg) {
         type = -1;
         item = itemNearDistCheck(player->position.x, player->position.y, player->position.z, range);
         mobj = mobjNearDistCheck2(player->position.x, player->position.y, player->position.z, range, mobj_list);
-        found = chuchu_findTreasure2(cp->player, range, &bestPos);
+        found = chuchu_findTreasure2(cp, range, &bestPos);
 
         minDist = 10000.0f;
         if (item) {

@@ -956,6 +956,7 @@ static USER_FUNC(re_fall_rtn) {
 }
 
 static USER_FUNC(fall_rtn) {
+    const char* sfx;
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
     BOOL exists = FALSE;
     FuneWork* data = wp->data;
@@ -969,7 +970,6 @@ static USER_FUNC(fall_rtn) {
     f32 hi;
     Vec v;
     Monte* m;
-    const char* sfx;
 
     if (isFirstCall) {
         if (monte_p != NULL) {
@@ -1022,9 +1022,9 @@ static USER_FUNC(fall_rtn) {
             sub->scale = 1.0f;
         }
     }
-    sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->num; i++) {
         m = &monte_p[i];
+        sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
         switch (m->state) {
             case 0:
                 if (monte_check_inl(&m->sub.pos, &marioGetPtr()->position) == TRUE) {

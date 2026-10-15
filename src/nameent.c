@@ -426,7 +426,6 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	const char* no;
 	u16 width;
 	f32 w;
-	s32 m;
 
 	white = unused;
 	white2 = white;
@@ -454,15 +453,15 @@ void nameEntDisp(CameraId cameraId, void* param) {
 			}
 		}
 	}
-	for (m = 0; m < 4; m++) {
-		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == m) {
+	for (i = 0; i < 4; i++) {
+		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == i) {
 			winTexInit(*wp->field_0x60->data);
-			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
+			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(m + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(i + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(m + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - m * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(i + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
 	winTexInit(*wp->field_0x60->data);
@@ -597,7 +596,7 @@ void nameBG(void) {
 #pragma inline_max_total_size(100000)
 static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
 	GXTexObj obj;
-	Mtx m;
+	Mtx i;
 	double aw;
 	double ah;
 	f32 sy;
@@ -609,8 +608,8 @@ static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	ah = __fabs(h);
 	aw = __fabs(w);
-	PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
-	GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
+	PSMTXScale(i, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
+	GXLoadTexMtxImm(i, GX_TEXMTX0, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x, y, 0.0f);
 	GXTexCoord2f32(0.0f, 0.0f);
@@ -701,7 +700,7 @@ void nameMaskGX(f32 t) {
 
 static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 y, f32 w, f32 h) {
 	GXTexObj obj;
-	Mtx m;
+	Mtx i;
 	double aw2;
 	double ah2;
 	double aw;
@@ -714,8 +713,8 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	ah = __fabs(h);
 	aw = __fabs(w);
-	PSMTXScale(m, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
-	GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
+	PSMTXScale(i, (f32)aw / GXGetTexObjWidth(&obj), (f32)ah / GXGetTexObjHeight(&obj), 1.0f);
+	GXLoadTexMtxImm(i, GX_TEXMTX0, GX_MTX2x4);
 	TEXGetGXTexObjFromPalette(tpl, &obj, b);
 	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj, GX_TEXMAP1);
@@ -724,8 +723,8 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
 	GXLoadTexObj(&obj, GX_TEXMAP2);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 	{ ah2 = __fabs(h); aw2 = __fabs(w);
-	PSMTXScale(m, (f32)aw2 / GXGetTexObjWidth(&obj), (f32)ah2 / GXGetTexObjHeight(&obj), 1.0f);
-	GXLoadTexMtxImm(m, GX_TEXMTX1, GX_MTX2x4); }
+	PSMTXScale(i, (f32)aw2 / GXGetTexObjWidth(&obj), (f32)ah2 / GXGetTexObjHeight(&obj), 1.0f);
+	GXLoadTexMtxImm(i, GX_TEXMTX1, GX_MTX2x4); }
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	GXPosition3f32(x, y, 0.0f);
 	GXTexCoord2f32(0.0f, 0.0f);

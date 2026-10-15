@@ -307,7 +307,7 @@ void hitMain(void) {
     entry = wp->entries;
     for (i = 0; i < wp->entries->count; entry++, i++) {
         anim = entry->animData;
-        for (j = 0, recalc = FALSE; j < entry->numAnims; j++, anim++) {
+        for (recalc = FALSE, j = 0; j < entry->numAnims; j++, anim++) {
             list = *(HitAnimJointList**)(*(u8**)((u8*)anim + 0x18) + 0xC);
             if (!(anim->flags & 1)) {
                 continue;

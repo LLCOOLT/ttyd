@@ -539,21 +539,17 @@ BOOL SoundSLibLoadDVD(const char* path) { // regalloc, stack, otherwise 1:1
 }
 
 static inline void _ssDropStop(void) {
-    SoundSong* song;
-    SoundEffect* effect;
-    SoundDVD* dvd;
     u32 i;
-    SoundStream* stream;
 
     for (i = 0; i < 4; i++) {
-        song = &sound.songs[i];
+        SoundSong* song = &sound.songs[i];
         if (sndSeqGetValid(song->seqId)) {
             sndSeqStop(song->seqId);
             song->seqId = (SND_SEQID)-1;
         }
     }
     for (i = 0; i < 40; i++) {
-        effect = &sound.effects[i];
+        SoundEffect* effect = &sound.effects[i];
         if (effect->flags) {
             sndFXKeyOff(effect->voiceId);
             if (effect->flags & 0x10) {
@@ -564,7 +560,7 @@ static inline void _ssDropStop(void) {
     }
 
     for (i = 0; i < 2; i++) {
-        dvd = &sound.dvds[i];
+        SoundDVD* dvd = &sound.dvds[i];
         if (dvd->flags & 3) {
             AISetStreamPlayState(0);
             dvd->flags = 0;
@@ -575,8 +571,9 @@ static inline void _ssDropStop(void) {
     }
 
     for (i = 0; i < 3; i++) {
-        stream = &sound.streams[i];
-        if (stream->flags) {
+        SoundStream* stream;
+        if (sound.streams[i].flags) {
+            stream = &sound.streams[i];
             if (!sound.unk20C) {
                 sound.interrupts = OSDisableInterrupts();
             }
@@ -608,7 +605,61 @@ BOOL SoundDropData(void) {
     group = sound.groups;
     _ssDropStop();
     sndSilence();
-    _ssDropStop();
+    for (i = 0; i < 4; i++) {
+        SoundSong* song = &sound.songs[i];
+        if (sndSeqGetValid(song->seqId)) {
+            sndSeqStop(song->seqId);
+            song->seqId = (SND_SEQID)-1;
+        }
+    }
+    for (i = 0; i < 40; i++) {
+        SoundEffect* effect = &sound.effects[i];
+        if (effect->flags) {
+            sndFXKeyOff(effect->voiceId);
+            if (effect->flags & 0x10) {
+                sndRemoveEmitter(&effect->emitter);
+            }
+            effect->flags = 0;
+        }
+    }
+
+    for (i = 0; i < 2; i++) {
+        SoundDVD* dvd = &sound.dvds[i];
+        if (dvd->flags & 3) {
+            AISetStreamPlayState(0);
+            dvd->flags = 0;
+            sound.unkFC = -1;
+            DVDCancelStream(&dvd->info.cb);
+            DVDClose(&dvd->info);
+        }
+    }
+
+    for (i = 0; i < 3; i++) {
+        SoundStream* stream;
+        if (sound.streams[i].flags) {
+            stream = &sound.streams[i];
+            if (!sound.unk20C) {
+                sound.interrupts = OSDisableInterrupts();
+            }
+            sound.unk20C++;
+            if (stream->flags & 0x400) {
+                sound.slotUsed[stream->slot] = 0;
+            }
+            stream->flags = 0;
+            DVDMgrClose(stream->entries[0].dvd);
+            DVDMgrClose(stream->entries[1].dvd);
+            sndStreamFree(stream->entries[0].streamId);
+            if (stream->count == 2) {
+                sndStreamFree(stream->entries[1].streamId);
+            }
+            if (sound.unk20C) {
+                if (!--sound.unk20C) {
+                    OSRestoreInterrupts(sound.interrupts);
+                }
+            }
+            sound.unk104 = -1;
+        }
+    }
 
     for (i = 0; i < sound.dataId; i++) {
         while (sound.groupCount[i]) {
@@ -1058,12 +1109,12 @@ void SoundEfxMain(void) {
     SND_FVECTOR* dir;
     SoundEffect* e2;
     SoundEffect* effect;
+    int i;
     f32 v10;
     f32 v9;
     f32 r = 1.0f;
     f32 v6;
     f32 x, y, z;
-    int i;
 
     v10 = v9 = 0.0f;
     x = sound.pos.x - sound.prevPos.x;
@@ -1102,7 +1153,7 @@ void SoundEfxMain(void) {
         }
     }
 
-    for (i = 0, e2 = sound.effects; i < 40; e2++, i++) {
+    for (e2 = sound.effects, i = 0; i < 40; e2++, i++) {
         if (e2->flags) {
             if (!(e2->flags & 0x10)) {
                 SoundEfxCheckCh(i);
@@ -1220,18 +1271,18 @@ inline void SoundIntOn(void) {
 
 inline void _ssDVDReadAsync(SoundStream* stream, int ch) {
     SoundStreamEntry* entry;
+    u32 extra;
     u32 len;
     u32 aligned;
-    u32 extra;
     u32 addr;
     int i;
 
-    entry = stream->entries + ch;
+    len = 0x8000;
+    entry = &stream->entries[ch];
     extra = 0;
     if (ch) {
         extra = entry->size + (0x20 - (entry->size % 0x20));
     }
-    len = 0x8000;
     if (entry->offset + 0x8000 > entry->size) {
         len = entry->size - entry->offset;
     } else {
@@ -1508,13 +1559,13 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     u32 n;
     s32 j;
 
-    dst = buffer2;
+    dst = buffer1;
     stream = &sound.streams[(u8)user];
     stream->samplePos = 0;
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
             for (; len1 != 0; len1--) {
-                *((s16*)buffer1)++ = 0;
+                *dst++ = 0;
                 stream->samplePos++;
             }
             for (; len2 != 0; len2--) {
@@ -1836,9 +1887,10 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
 }
 
 void SoundSSStopCh(s32 chan) {
-    SoundStream* stream = &sound.streams[chan];
+    SoundStream* stream;
 
-    if (stream->flags) {
+    if (sound.streams[chan].flags) {
+        stream = &sound.streams[chan];
         SoundIntOff();
         if (stream->flags & 0x400) {
             sound.slotUsed[stream->slot] = 0;
@@ -1975,7 +2027,7 @@ void SoundSSMain(void) {
     SoundStream* stream;
 
     for (i = 0; (int)i < 3; i++) {
-        stream = sound.streams + i;
+        stream = &sound.streams[i];
         if ((stream->flags & 8) && !(stream->flags & 2)) {
             if (stream->flags & 4) {
                 stream->flags &= ~4;

@@ -130,6 +130,7 @@ USER_FUNC(_announce_wall_message);
 USER_FUNC(_nozzle_turn);
 USER_FUNC(_set_mobj_shake);
 USER_FUNC(_bgset_audience_bgset_access);
+USER_FUNC(_bgset_audience_bgset_access);
 USER_FUNC(_bgset_kemuri_effect);
 USER_FUNC(_get_bgset_attack_data);
 USER_FUNC(_mobj_destroy);
@@ -1349,15 +1350,17 @@ EVT_BEGIN(_nozzle_work_event_1)
 EVT_END()
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
-	const char* fall3;
-	BOOL busy = FALSE;
 	BattleStageObject* obj;
-	int i;
+	BattleWork* wp;
+	const char* fall3;
+	const char* fall2;
 	s32 layer;
-	BattleWork* wp = _battleWorkPointer;
-	BattleStageObjectWork* sw = STAGE_WORK(wp);
+	BOOL busy;
+	BattleStageObjectWork* sw;
+	int i;
 
-
+	busy = FALSE;
+	sw = STAGE_WORK(wp = _battleWorkPointer);
 	layer = evtGetValue(event, event->args[0]);
 	if (isFirstCall) {
 		switch (layer) {
@@ -1416,7 +1419,8 @@ USER_FUNC(_set_mobj_rotate_x) {
 			}
 			else {
 				if (EVT_UW(event, 3) == 0) {
-					psndSFXOn_3D("SFX_BTL_STAGE_SET_FALL2", &(Vec){0.0f, 0.0f, -100.0f});
+					fall2 = "SFX_BTL_STAGE_SET_FALL2";
+					psndSFXOn_3D(fall2, &(Vec){0.0f, 0.0f, -100.0f});
 				}
 				EVT_UW(event, 3)++;
 				sw->bgRotation.x = (s32)intpl_sub(2, 0.0f, 90.0f, EVT_UW(event, 3), EVT_UW(event, 2));
@@ -1497,9 +1501,9 @@ USER_FUNC(_mobj_destroy) {
 USER_FUNC(_get_bgset_attack_data) {
 	BattleWork* wp = _battleWorkPointer;
 	s32* args = event->args;
-	BattleWeapon* weapon;
 	s32 type = evtGetValue(event, args[0]);
 	s32 out = args[1];
+	BattleWeapon* weapon;
 
 	switch (type) {
 		case 0:
@@ -1521,12 +1525,12 @@ USER_FUNC(_get_bgset_attack_data) {
 }
 
 USER_FUNC(_bgset_kemuri_effect) {
-	s32* args = event->args;
 	s32 layer;
 	const char* sfxA1;
 	const char* sfxA2;
 	const char* sfxB;
 	BattleWork* wp;
+	s32* args = event->args;
 	int i;
 	BattleStageObject* obj;
 	f32 x, y, z;
@@ -1536,6 +1540,8 @@ USER_FUNC(_bgset_kemuri_effect) {
 	sfxA2 = "SFX_BTL_STAGE_SET_DOWN3";
 	sfxB = "SFX_BTL_STAGE_SET_DOWN2";
 	for (i = 0; i < 32; i++) {
+		args++;
+		args--;
 		obj = &wp->stageObjects[i];
 		if (obj->id > 0 && obj->data->mLayer == layer) {
 			x = obj->mPosition.x;
@@ -2366,21 +2372,23 @@ typedef struct FallObjectWork {
 } FallObjectWork;
 
 USER_FUNC(_object_fall_attack) {
+	BOOL found = FALSE;
+	s32 j;
+	BattleWeapon* weapon;
 	BattleWork* wp = _battleWorkPointer;
+	const char* sfxNormal;
+	const char* sfxRest;
+	const char* sfxTub;
 	BattleStageFallObjectData* fd = STAGE_WORK(wp)->fallObjectData;
 	s32* args = event->args;
 	s32 arg0 = args[0];
-	BOOL found = FALSE;
 	FallObjectWork* w;
-	FallObjectWork* w2;
 	FallObjectEntry* e;
 	FallObjectEntry* o;
 	BattleUnit* unit2;
 	s32 k;
-	BattleWeapon* weapon;
 	BattleUnit* unit;
 	s32 i;
-	s32 j;
 	BattleUnitPart* part;
 	s32 sum;
 	s32 r;
@@ -2398,10 +2406,6 @@ USER_FUNC(_object_fall_attack) {
 	Vec p;
 	s32 unitId;
 	s32 partId;
-	const char* sfxTub;
-	const char* sfxRest;
-	const char* sfxNormal;
-	const char* sfxTub2;
 
 	if (isFirstCall) {
 		w = BattleAlloc(sizeof(FallObjectWork));
@@ -2521,11 +2525,10 @@ USER_FUNC(_object_fall_attack) {
 	sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
 	sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
 	sfxRest = "SFX_REST_CONDITION1";
-	sfxTub2 = "SFX_BTL_STAGE_DAMAGE_TUB1";
-	w2 = (FallObjectWork*)EVT_UW(event, 0);
+	w = (FallObjectWork*)EVT_UW(event, 0);
 	done = TRUE;
-	for (i = 0; i < w2->count; i++) {
-		e = &w2->entries[i];
+	for (i = 0; i < w->count; i++) {
+		e = &w->entries[i];
 		if (e->index == -1) {
 			continue;
 		}
@@ -2655,7 +2658,7 @@ USER_FUNC(_object_fall_attack) {
 							switch (e->type) {
 								case 0:
 								case 1:
-									psndSFXOn_3D(sfxTub2, &sfxPos);
+									psndSFXOn_3D(sfxTub, &sfxPos);
 									break;
 								case 5:
 									psndSFXOn_3D(sfxRest, &sfxPos);

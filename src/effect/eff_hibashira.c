@@ -88,13 +88,13 @@ void effHibashiraMain(EffectEntry* effect) {
     EffHibashiraWork* pillar;
     Vec position;
     s32 type;
-    s32 i;
     BOOL inBattle;
+    s32 i;
     s32 k;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
-    inBattle = gp->inBattle ? TRUE : FALSE;
     type = work->type;
+    inBattle = gp->inBattle ? TRUE : FALSE;
 
     // soft delete: start fading out
     if (effect->flags & 4) {

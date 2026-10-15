@@ -78,9 +78,10 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
     if (type == 1 || type == 10 || type == 3 || type == 30) {
-        GXColor c = unk_80423248;
-        c.a = work->alpha;
-        GXSetTevColor(GX_TEVREG0, c);
+        GXColor c2 = unk_80423248;
+        GXColor c3 = c2;
+        c3.a = work->alpha;
+        GXSetTevColor(GX_TEVREG0, c3);
     } else {
         GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
     }

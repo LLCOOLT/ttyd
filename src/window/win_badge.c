@@ -175,10 +175,11 @@ void mario_change(BWin* w, s32 unused) {
 
 s32 winBadgeMain(BWin* w) {
     PouchData* pouch = pouchGetPtr();
+    s32 tab;
     s32 cnt;
     s32 pages;
-    s32 tab;
     s32 mode;
+    s32 m;
 
     switch (w->state) {
     case 0:
@@ -243,15 +244,16 @@ s32 winBadgeMain(BWin* w) {
                 pouchRevisePartyParam();
                 mario_change(w, pouchHaveBadge(idx));
             } else {
-                s32 idx = w->list[w->sel[tab]].idx;
-                if (w->list[w->sel[tab]].equipped) {
+                BWin* wt = (BWin*)((s32*)w + tab);
+                s32 idx = w->list[wt->sel[0]].idx;
+                if (w->list[wt->sel[0]].equipped) {
                     psndSFXOn(0x20039);
                     pouchUnEquipBadgeIndex(idx);
-                    w->list[w->sel[tab]].equipped = 0;
+                    w->list[wt->sel[0]].equipped = 0;
                 } else if (pouch->availableBP >= itemDataTable[pouchHaveBadge(idx)].bp_cost) {
                     psndSFXOn(0x20038);
                     pouchEquipBadgeIndex(idx);
-                    w->list[w->sel[tab]].equipped = 1;
+                    w->list[wt->sel[0]].equipped = 1;
                 }
                 pouchReviseMarioParam();
                 pouchRevisePartyParam();
@@ -283,7 +285,7 @@ s32 winBadgeMain(BWin* w) {
             w->sel[tab]++;
             psndSFXOn(0x20035);
         } else if (w->trg & 0x10) {
-            s32 m = 3;
+            m = 3;
             if (tab == 0) {
                 m = 2;
             }
@@ -342,6 +344,7 @@ void winBadgeDisp(s32 camId, BWin* w, s32 n) {
     f32 b;
     f32 a;
     f32 yy;
+    f32 d;
     f32 x = w->pos[n].x;
     f32 y = w->pos[n].y;
 
@@ -350,7 +353,8 @@ void winBadgeDisp(s32 camId, BWin* w, s32 n) {
     a = 105.0f + y;
     c = (x - 190.0f) - 4.0f;
     b = 4.0f + a;
-    for (i = 0, off = 0; i < 2; i++, off += 40) {
+    for (i = 0; i < 2; i++) {
+        off = i * 40;
         if (i == w->tab) {
             winTexInit(w->res->tex->tpl);
             winTexSet(0xB4, (Vec){x - 190.0f, 20.0f + (a - off), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
@@ -368,12 +372,12 @@ void winBadgeDisp(s32 camId, BWin* w, s32 n) {
     winFontSet((Vec){x - 180.0f, ((20.0f + (y - 108.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, msgSearch("msg_menu_badge_nokori"));
     winFontSetR((Vec){(x - 145.0f) - 16.0f, ((20.0f + (y - 102.0f)) - 18.0f) + (10 - Q) * 13, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, black, "%s", winZenkakuStr(pouch->availableBP));
     winTexInit(w->res->tex->tpl);
-    a = 28.0f + y;
+    d = 28.0f + y;
     for (i = 0; i < pouch->availableBP; i++) {
-        winTexSet(0x1C, (Vec){(x - 242.0f) + (i % 10) * 13, (20.0f + (a - (i / 10) * 13)) - 18.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        winTexSet(0x1C, (Vec){(x - 242.0f) + (i % 10) * 13, (20.0f + (d - (i / 10) * 13)) - 18.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
     for (i = pouch->availableBP; i < pouch->maximumBP; i++) {
-        winTexSet(0x1D, (Vec){(x - 242.0f) + (i % 10) * 13, (20.0f + (a - (i / 10) * 13)) - 18.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        winTexSet(0x1D, (Vec){(x - 242.0f) + (i % 10) * 13, (20.0f + (d - (i / 10) * 13)) - 18.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
     badge_disp(w, x, y);
 }
@@ -397,8 +401,8 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
     s32 badge;
     s32 equipped;
     s32 gray;
-    f32 y;
     f32 yBase;
+    f32 y;
     f32 scroll;
     f32 width;
     s32 tw;
@@ -446,8 +450,8 @@ void badge_disp(BWin* w, f32 xo, f32 yo) {
         } else {
             winIconGrayInit();
         }
+        winIconSet(itemDataTable[badge].icon_id, (Vec){xo - 75.0f, y, 0.0f}, (Vec){0.54f, 0.54f, 0.54f}, colA);
         item = &itemDataTable[badge];
-        winIconSet(item->icon_id, (Vec){xo - 75.0f, y, 0.0f}, (Vec){0.54f, 0.54f, 0.54f}, colA);
         winFontInit();
         winFontSet((Vec){xo - 55.0f, scroll + (12.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, colB, item->id);
         cost = &item->bp_cost;

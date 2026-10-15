@@ -38,11 +38,13 @@ typedef struct effKemuri1EWork {
 } effKemuri1EWork;
 
 EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
+
+
 	EffectEntry* effect;
 	effKemuri1EWork* data;
 	s32 effCount;
 	s32 i;
-	f32 angle2; f32 tmp; f32 angle;
+	f32 angle; f32 tmp;
 
 	effect = effEntry();
 	switch (type) {
@@ -163,6 +165,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 		case 6:
 		case 7:
 			for (i = 1; i < effCount; i++, data++) {
+				f32 angle2;
 				data->f10 = -3.0f;
 				data->f14 = 0.93f;
 				data->f20 = 0.0f;

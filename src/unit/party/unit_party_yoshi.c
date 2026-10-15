@@ -1188,13 +1188,13 @@ s32 _yoshig_tpl_no_tbl[] = {
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
-    BattleWork* wp;
+    BattleUnitPart* part;
     const char* name;
     s32 id;
-    BattleUnitPart* part;
+    BattleWork* wp = _battleWorkPointer;
+    s32 a0 = event->args[0];
 
-    wp = _battleWorkPointer;
-    id = evtGetValue(event, event->args[0]);
+    id = evtGetValue(event, a0);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
@@ -1386,13 +1386,15 @@ void _yoshi_slide_move_sound(void* w, void* s) {
 }
 
 USER_FUNC(_get_nomikomi_hit_position) {
-    BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
+    BattleWork* wp;
+    s32* args;
     BattleUnit* unit;
     Vec pos;
     s32 id, targetId, dir;
     s32 outZ, outX, outY;
 
+    wp = _battleWorkPointer;
+    args = event->args;
     id = evtGetValue(event, args[0]);
     targetId = evtGetValue(event, args[1]);
     evtGetValue(event, args[2]);
@@ -1592,7 +1594,8 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     return EVT_RETURN_BLOCK;
 }
 void _btlYoshiDisp(CameraId camera, f32* p) {
-    f32 s; f32* q;
+    f32* q;
+    f32 s;
     s = (p[3] < 0.0f) ? 0.4f : -0.4f;
     ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
 }

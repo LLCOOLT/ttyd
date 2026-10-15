@@ -700,33 +700,36 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         wp->field_0x558 = 0;
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
-        cam = camGetPtr(CAMERA_3D);
-        rad = 6.2831855f * reviseAngle(cam->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
+        rad = 6.2831855f * reviseAngle(camGetPtr(CAMERA_3D)->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
         dist = 35.0f * moa_sinx(rad) + mario->position.x;
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cosx(rad)) < 35.0f) {
             return 2;
         }
     }
     if (mario->currMotionId == 0x13 && (s32)mario->currSubMotionId == 0x14) {
-        a = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        f32 (*mtx)[4] = pose->mtx;
+        a = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
         if (PSVECDistance(&mario->position, &a) < 65.0f) {
             return 2;
         }
     }
     if (wp->breathDir >= 0.0f) {
-        b = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        f32 (*mtx)[4] = pose->mtx;
+        b = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
         if (PSVECDistance(&wp->breathPos, &b) < 30.0f) {
             return 3;
         }
     }
     if (nokonokoGetStatus(partyGetPtr(0)) == 2) {
-        c = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        f32 (*mtx)[4] = pose->mtx;
+        c = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
         if (PSVECDistance(&partyGetPtr(0)->position, &c) < 30.0f) {
             return 2;
         }
     }
     if (partyGetPtr(0)->currentMemberId == 3 && partyGetPtr(0)->useMotionId == 0x46) {
-        d = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        f32 (*mtx)[4] = pose->mtx;
+        d = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
         if (PSVECDistance(&partyGetPtr(0)->position, &d) < 50.0f) {
             return 4;
         }
@@ -737,7 +740,10 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     if (PSVECDistance(&e, &f) < range) {
         pose->mtx[0][3] = moa->field_0x28;
         pose->mtx[2][3] = moa->field_0x2c;
-        f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
+        {
+        f32 (*mtx)[4] = pose->mtx;
+        f = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
+        }
         dist = PSVECDistance(&e, &f);
         if (dist < range) {
             angle = angleABf(mario->position.x, mario->position.z, pose->mtx[0][3], pose->mtx[2][3]);
@@ -1247,9 +1253,9 @@ static USER_FUNC(npc_jump) {
     s32 frames = evtGetValue(event, args[6]);
     f32 t = 60.0f * frames / 1000.0f;
     NpcEntry* npc = npcNameToPtr(name);
+    f32 dy;
     f32 vy;
     f32 dist;
-    f32 dy;
     f32 angle;
 
     if (isFirstCall) {
@@ -1260,7 +1266,7 @@ static USER_FUNC(npc_jump) {
         } else {
             speed = dist / t;
         }
-        vy = dy / t + gravity * t * 0.5f;
+        vy = dy / t + 0.5f * (gravity * t);
         event->userdata[0] = *(s32*)&t;
         event->userdata[1] = *(s32*)&vy;
         event->userdata[2] = *(s32*)&speed;

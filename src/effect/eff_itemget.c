@@ -259,8 +259,8 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     sh = alpha * 0x80 / 0xFF;
     al = alpha * 0xFF / 0xFF;
     w = 64.0f;
-    d = -w / 2.0f;
-    b = 32.0f;
+
+
     for (i = 0; i < 2; i++) {
         if (i == 0) {
             PSMTXConcat(camera->view, m7c, m19c);
@@ -274,25 +274,24 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(m19c, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        GXPosition3f32(d, b, 0.0f);
+        GXPosition3f32(-w / 2.0f, w / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 0.0f);
-        GXPosition3f32(b, b, 0.0f);
+        GXPosition3f32(w / 2.0f, w / 2.0f, 0.0f);
         GXTexCoord2f32(2.0f, 0.0f);
-        GXPosition3f32(b, d, 0.0f);
+        GXPosition3f32(w / 2.0f, -w / 2.0f, 0.0f);
         GXTexCoord2f32(2.0f, 2.0f);
-        GXPosition3f32(d, d, 0.0f);
+        GXPosition3f32(-w / 2.0f, -w / 2.0f, 0.0f);
         GXTexCoord2f32(0.0f, 2.0f);
     }
     GXSetTevColor(GX_TEVREG0, color_tbl[work->type]);
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-    h = 10.666667f;
-    w = 42.666668f;
-    h = 10.666667f;
-    d = -w;
-    b = 5.3333335f;
-    a = -h / 2.0f;
+    w = 10.666667f;
+    h = 42.666668f;
+
+
+
     work++;
     for (i = 1; i < effect->count; i++, work++) {
         for (pass = 0; pass < 2; pass++) {
@@ -324,13 +323,13 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(mdc, m10c, m19c);
             GXLoadTexMtxImm(m19c, GX_TEXMTX0, GX_MTX3x4);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(a, 0.0f, 0.0f);
+            GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(b, 0.0f, 0.0f);
+            GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(2.0f, 0.0f);
-            GXPosition3f32(b, d, 0.0f);
+            GXPosition3f32(w / 2.0f, -h, 0.0f);
             GXTexCoord2f32(2.0f, 1.0f);
-            GXPosition3f32(a, d, 0.0f);
+            GXPosition3f32(-w / 2.0f, -h, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }
@@ -344,7 +343,7 @@ void effItemUseDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx m68;
     Mtx m38;
     GXTexObj texObj;
-    f32 d, a, b, w, h;
+    f32 d, a, b, h, w;
     s32 i;
     s32 pass;
 

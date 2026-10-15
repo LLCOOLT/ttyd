@@ -1101,8 +1101,8 @@ void yuka_disp(CameraId cam, void* param) {
     DekaWork* w;
     CameraEntry* camera;
     YukaMesh* m;
-    s32 i;
     GXTexObj obj;
+    s32 i;
 
     w = get_ptr();
     camera = camGetPtr(cam);
@@ -1125,7 +1125,9 @@ void yuka_disp(CameraId cam, void* param) {
             GXLoadTexObj(&obj, 0);
             GXLoadPosMtxImm(camera->view, 0);
             GXSetCurrentMtx(0);
-            for (i = 0; i < 128; i++) {
+            GXWGFifo.u8;
+            i = 0;
+            do {
                 GXBegin(0x80, GX_VTXFMT0, 4);
                 GXPosition3f32(m->disp[0][i].x, m->disp[0][i].y, m->disp[0][i].z);
                 GXTexCoord2f32(m->u[0][i], m->v[0][i]);
@@ -1135,7 +1137,8 @@ void yuka_disp(CameraId cam, void* param) {
                 GXTexCoord2f32(m->u[1][i + 1], m->v[1][i + 1]);
                 GXPosition3f32(m->disp[0][i + 1].x, m->disp[0][i + 1].y, m->disp[0][i + 1].z);
                 GXTexCoord2f32(m->u[0][i + 1], m->v[0][i + 1]);
-            }
+                i++;
+            } while (i < 128);
         }
     }
 }

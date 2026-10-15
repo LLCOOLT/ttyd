@@ -39,9 +39,7 @@ void dummy_draw(CameraId camId, void* param);
 void progDisp(CameraId camId, void* param);
 
 
-static inline s32 logoAsyncFirst(void) {
-	return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
-}
+static s32 logoAsyncFirst(void);
 
 void seq_logoInit(SequenceWork* work) {
 	memset(wp, 0, sizeof(LogoWork));
@@ -67,7 +65,7 @@ void seq_logoInit(SequenceWork* work) {
 			wp->progressive = FALSE;
 		}
 	}
-	fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot()); //unused
+	logoAsyncFirst();
 	if (!OSIsRestart() || OSGetResetCode() & OS_RESET_SHUTDOWN) {
 		VIConfigure(&sRMObjHReso);
 		if (!wp && !wp && !wp) {
@@ -435,6 +433,9 @@ void logoDisp(CameraId camId, void* param) {
 }
 
 //param is unused
+static s32 logoAsyncFirst(void) {
+	return fileAsyncf(0, 0, "%s/b/first", getMarioStDvdRoot());
+}
 void dummy_draw(CameraId camId, void* param) {
 	GXRenderModeObj* rmode;
 	f32 scale;

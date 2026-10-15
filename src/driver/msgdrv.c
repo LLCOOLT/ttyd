@@ -695,12 +695,12 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	MsgWinData* data;
 	WindowEntry* window;
 	MsgAChar* entry;
-	s8 check;
+	s32 check;
 	u16 glyph;
 	u16 width;
 	u32 flags;
 	s16 x;
-	s16 y;
+	s32 y;
 	s32 time;
 	s16 rubyX;
 	char tag[0x80];
@@ -757,10 +757,10 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	}
 	time = data->field_0x7A30;
 	s234 = 0;
-	x = data->field_0x7A34;
 	s232 = data->field_0x7A38;
-	y = data->field_0x7A36;
+	x = data->field_0x7A34;
 	s230 = data->field_0x7A3A;
+	y = data->field_0x7A36;
 	step = data->field_0x7A3C;
 	switch (window->type) {
 	case 3:
@@ -787,13 +787,13 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	}
 
 	while (TRUE) {
-		check = *msg;
-		if (_ismbblead(check)) {
+		check = *(u8*)msg;
+		if (_ismbblead((u8)check)) {
 			glyph = kanjiSearch(*(u16*)msg);
 			width = kanjiGetWidth((u16)(glyph + 0));
+			ww = scale * (f32)(width + 4);
 			entry->glyph = glyph;
 			entry->x = x;
-			ww = scale * (f32)(width + 4);
 			entry->y = y - (s32)(10.0f * scale);
 			entry->scale = scale;
 			entry->value = flags;
@@ -811,9 +811,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			entry->time = time;
 			x += ww;
 			msg += 2;
-			data->count++;
-			entry++;
 			time += step;
+			entry++;
+			data->count++;
 			continue;
 		}
 		switch ((s8)check) {
@@ -833,16 +833,13 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			if (0.0f == maxScale) {
 				maxScale = 1.0f;
 			}
+			y -= 32.0f * maxScale;
+			s230 -= 32.0f * maxScale;
 			msg++;
 			entry++;
-			data->count++;
 			time += step;
-			{
-				f32 h = 32.0f * maxScale;
-				maxScale = 0.0f;
-				y -= h;
-				s230 -= h;
-			}
+			data->count++;
+			maxScale = 0.0f;
 			if (data->flags & 0x20) {
 				flags = (flags & ~0xFF00) | (0x100 << data->numSel);
 				data->numSel++;
@@ -1026,17 +1023,17 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				}
 				if (!isHM) {
 					entry->value = iconId;
-					iconGetWidthHight(&iw, &ih, iconId);
+					iconGetWidthHight(&iw, &ih, (u16)iconId);
 					entry->glyph = 0xFFF8;
-					x += 0x28;
 					entry->x = x + 0.5f * iw * iconScale + i38;
+					x += 0x28;
 					entry->y = y - ih * iconScale;
 					entry->extra = i34;
 					entry->scale = iconScale;
 					entry->time = time;
 					entry++;
-					data->count++;
 					time += step;
+					data->count++;
 				} else {
 					glyph = kanjiSearch(0x94B5);
 					width = kanjiGetWidth((u16)(glyph + 0));
@@ -1055,9 +1052,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					}
 					entry->time = time;
 					entry++;
-					data->count++;
 					time += step;
 					x += iw;
+					data->count++;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
 				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
@@ -1070,10 +1067,10 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->x = i28;
 				entry->y = s234 - i24;
 				entry->scale = f1c;
-				entry->dyn = (i20 != 0) ? 180.0f : 0.0f;
+				entry->dyn = (i20 == 0) ? 0.0f : 180.0f;
 				entry++;
-				data->count++;
 				time += step;
+				data->count++;
 			} else if (strcmp(tag, "paper") == 0) {
 				sscanf(args, "%s%d", paper, &i18);
 				entry->value = (strcmp(paper, "me") != 0) ? (u32)npcNameToPtr(paper) : 0;
@@ -1143,9 +1140,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				glyph = hankakuSearch(check);
 			}
 			width = kanjiGetWidth((u16)(glyph + 0));
+			ww = scale * (f32)(width + 2);
 			entry->glyph = glyph;
 			entry->x = x;
-			ww = scale * (f32)(width + 2);
 			entry->y = y - (s32)(10.0f * scale);
 			entry->scale = scale;
 			entry->value = flags;
@@ -1161,9 +1158,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			entry->time = time;
 			x += ww;
 			msg++;
-			data->count++;
-			entry++;
 			time += step;
+			entry++;
+			data->count++;
 			continue;
 		}
 	}

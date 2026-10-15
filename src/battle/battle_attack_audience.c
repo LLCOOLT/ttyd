@@ -147,7 +147,7 @@ s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
 }
 
 void _get_item_announce_disp(s32 cameraId, void* param) {
-    static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
+    GXColor col;
     u16 lines;
     const char* itemName;
     char buf[128];
@@ -156,7 +156,6 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     s32 no;
     f32 x;
     f32 y;
-    GXColor col;
 
     no = BattleAudience_GetPresentItemNo();
     itemName = msgSearch(itemDataTable[no].name);
@@ -167,7 +166,7 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     y = 0.0f;
     x = y - width / 2;
     y = 60.0f;
-    col = color;
+    col = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
     windowDispGX_Waku_col(0, col, x - 10.0f, 34.0f, width + 20, lines * 29 + 3, 10.0f);
     FontDrawStart();
     FontDrawMessage(x, (s32)y - 29, buf);
@@ -232,15 +231,12 @@ s32* btlataudGetMoveEventPtr(void) {
 
 
 
-s32 btlataudevtDummy[16] = {
-    0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
-    (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
-void* btlataudGetAttackEventPtr(s32 unitId) {
+extern s32 btlataudevtDummy[];
+s32* btlataudGetAttackEventPtr(s32 unitId) {
     BattleUnit* u = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    void* p = BtlUnit_GetData(u, 6);
+    s32* p = BtlUnit_GetData(u, 6);
     if (p == NULL) {
-        return (void*)((s32)btlataudevtDummy + 4);
+        p = &btlataudevtDummy[1];
     }
     return p;
 }
@@ -255,6 +251,10 @@ void* btlataudGetAttackEventPtr(s32 unitId) {
 
 
 
+s32 btlataudevtDummy[16] = {
+    0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
+    (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
 EVT_BEGIN(btlataudevtPresentItem_Damage)
     CALL(_delete_present_item, LW(0))
     BEGIN_INLINE_EVENT_GET_ID(LW(15))

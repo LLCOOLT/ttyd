@@ -191,6 +191,28 @@ USER_FUNC(evt_mobj_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
+USER_FUNC(evt_mobj_set_scale) {
+    s32* args = event->args;
+    const char* name = (const char*)evtGetValue(event, args[0]);
+    MapObjectEntry* mobj;
+    f32 x, y, z;
+    Vec scale;
+    mobj = MOBJ_PTR2(event, name);
+    x = evtGetFloat(event, args[1]);
+    y = evtGetFloat(event, args[2]);
+    z = evtGetFloat(event, args[3]);
+    {
+    Vec s2 = {0.0f, 0.0f, 0.0f};
+    scale = s2;
+    }
+    scale.x = x;
+    scale.y = y;
+    scale.z = z;
+    mobj->scale = scale;
+    mobj->flags |= 4;
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(evt_mobj_get_kindname) {
     s32* args = event->args;
     MapObjectEntry* mobj = mobjNameToPtr((const char*)evtGetValue(event, args[0]));
@@ -228,28 +250,6 @@ USER_FUNC(evt_mobj_get_z_position) {
     const char* name = (const char*)evtGetValue(event, args[0]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
     evtSetFloat(event, args[1], mobj->position.z);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_mobj_set_scale) {
-    s32* args = event->args;
-    const char* name = (const char*)evtGetValue(event, args[0]);
-    MapObjectEntry* mobj;
-    f32 x, y, z;
-    Vec scale;
-    mobj = MOBJ_PTR2(event, name);
-    x = evtGetFloat(event, args[1]);
-    y = evtGetFloat(event, args[2]);
-    z = evtGetFloat(event, args[3]);
-    {
-    Vec s2 = {0.0f, 0.0f, 0.0f};
-    scale = s2;
-    }
-    scale.x = x;
-    scale.y = y;
-    scale.z = z;
-    mobj->scale = scale;
-    mobj->flags |= 4;
     return EVT_RETURN_DONE;
 }
 
@@ -475,9 +475,9 @@ USER_FUNC(evt_mobj_floatswitch_blue) {
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     val = evtGetValue(event, args[5]);
+    arg6 = args[6];
     inBattle = gp->inBattle;
     inBattle = inBattle != 0;
-    arg6 = args[6];
     anim = "MOBJ_BlueSwitchBlock";
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -513,9 +513,9 @@ USER_FUNC(evt_mobj_tornadoswitch_blue) {
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     val = evtGetValue(event, args[5]);
+    arg6 = args[6];
     inBattle = gp->inBattle;
     inBattle = inBattle != 0;
-    arg6 = args[6];
     anim = "MOBJ_BlueTornadoSwitch";
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -626,9 +626,9 @@ USER_FUNC(evt_mobj_floatswitch_red) {
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     val = evtGetValue(event, args[5]);
+    arg6 = args[6];
     inBattle = gp->inBattle;
     inBattle = inBattle != 0;
-    arg6 = args[6];
     anim = "MOBJ_RedSwitchBlock";
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -844,6 +844,12 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
     return 0;
 }
 
+static void evt_mobj_rideswitch(void) {
+    mobjNameToPtr("MOBJ_RideSwitchB");
+    mobjNameToPtr("MOBJ_RideSwitchA");
+    mobjNameToPtr("MOBJ_RedTornadoSwitch");
+}
+
 USER_FUNC(evt_mobj_rideswitch_lightblue) {
     s32 val2;
     s32 val;
@@ -860,9 +866,8 @@ USER_FUNC(evt_mobj_rideswitch_lightblue) {
     z = evtGetFloat(event, args[3]);
     val = evtGetValue(event, args[4]);
     val2 = evtGetValue(event, args[5]);
-    anim = "MOBJ_RideSwitchC";
     arg6 = args[6];
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    if (animGroupBaseAsync(anim = "MOBJ_RideSwitchC", gp->inBattle ? 1 : 0, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
     mobjEntry(name, anim);
@@ -956,13 +961,13 @@ USER_FUNC(evt_mobj_jumpstand_red) {
     f32 y = evtGetFloat(event, args[3]);
     f32 z = evtGetFloat(event, args[4]);
     s32 val = evtGetValue(event, args[5]);
+    s32 arg6 = args[6];
+    s32 inBattle = gp->inBattle ? 1 : 0;
     const char* anims[2] = {"MOBJ_RedJumpStand", "MOBJ_RedJumpStand2"};
-    s32 arg6 = event->args[6];
-    const char* anim = anims[kind];
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    if (animGroupBaseAsync(anims[kind], inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
-    mobjEntry(name, anim);
+    mobjEntry(name, anims[kind]);
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_jumpstand_red;
@@ -1048,13 +1053,13 @@ USER_FUNC(evt_mobj_jumpstand_blue) {
     f32 y = evtGetFloat(event, args[4]);
     f32 z = evtGetFloat(event, args[5]);
     s32 val = evtGetValue(event, args[6]);
+    s32 inBattle = gp->inBattle ? 1 : 0;
     const char* anims[2] = {"MOBJ_BlueJumpStand", "MOBJ_BlueJumpStand2"};
-    s32 arg7 = event->args[7];
-    const char* anim = anims[kind];
-    if (animGroupBaseAsync(anim, gp->inBattle != 0, NULL) == 0) {
+    s32 arg7 = args[7];
+    if (animGroupBaseAsync(anims[kind], inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }
-    mobjEntry(name, anim);
+    mobjEntry(name, anims[kind]);
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_jumpstand_blue;
@@ -1698,7 +1703,7 @@ USER_FUNC(evt_mobj_lock) {
     s32 item;
     f32 rot;
     f32 x, y, z;
-    name = (const char*)evtGetValue(event, args[0]);
+    name = (const char*)evtGetValue(event, ((0, args))[0]);
     item = evtGetValue(event, args[1]);
     x = evtGetFloat(event, args[2]);
     y = evtGetFloat(event, args[3]);
@@ -1975,6 +1980,12 @@ USER_FUNC(evt_mobj_signboard) {
     return EVT_RETURN_DONE;
 }
 
+
+static void mobj_sign(void) {
+    mobjNameToPtr("MOBJ_Arrow");
+}
+
+
 extern EffectEntry* effCoinFukidashiEntry(s32 type, s32 number, s32 duration, f32 x, f32 y, f32 z);
 extern EffectEntry* effStardustEntry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
 extern void effSoftDelete(EffectEntry* effect);
@@ -1993,7 +2004,6 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
     PouchData* pouch;
     PouchPartyData* party;
     s32 i;
-    s32 kind;
     switch (mobj->unk1DC) {
     case -1:
         FLD(EffectEntry*, mobj, 0x1c8) = effCoinFukidashiEntry(0, FLD(s32, mobj, 0x1a4), 0, mobj->position.x, 25.0f + mobj->position.y, mobj->position.z - 10.0f);
@@ -2040,13 +2050,12 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
         }
         if (FLD(s32, mobj, 0x1b0) == 100) {
             mario = marioGetPtr();
-            pouch = pouchGetPtr();
+            party = (PouchPartyData*)pouchGetPtr();
             effStardustEntry(2, 50, 100, mario->position.x, mario->position.y, mario->position.z, 50.0f, 50.0f);
             marioChgPose("M_I_1");
-            pouch->currentHP = pouch->maximumHP;
-            pouch->currentFP = pouch->maximumFP;
-            party = pouch->partyData;
-            for (i = 0; i < 8; i++, party++) {
+            ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
+            ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
+            for (i = 0; i < 8; party++, i++) {
                 if ((party->flags & 1) && !(party->flags & 2)) {
                     party->currentHP = party->maximumHP;
                 }
@@ -2064,20 +2073,19 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
             psndSFXOn_3D((const char*)0x1db, &mobj->position);
         }
         if (FLD(s32, mobj, 0x1b0) == 100) {
-            kind = FLD(s32, mobj, 0x1a4);
+            s32 kind = FLD(s32, mobj, 0x1a4);
             mario = marioGetPtr();
-            pouch = pouchGetPtr();
+            party = (PouchPartyData*)pouchGetPtr();
             effStardustEntry(2, 50, 100, mario->position.x, mario->position.y, mario->position.z, 50.0f, 50.0f);
             marioChgPose("M_I_1");
-            pouch->currentHP = pouch->maximumHP;
-            pouch->currentFP = pouch->maximumFP;
-            party = pouch->partyData;
-            for (i = 0; i < 8; i++, party++) {
+            ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
+            ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
+            for (i = 0; i < 8; party++, i++) {
                 if ((party->flags & 1) && !(party->flags & 2)) {
                     party->currentHP = party->maximumHP;
                 }
             }
-            pouchAddCoin(-kind);
+            ((s32 (*)(s32))pouchAddCoin)(-kind);
         }
         FLD(s32, mobj, 0x1b0)--;
         if (FLD(s32, mobj, 0x1b0) <= 0) {
@@ -2149,8 +2157,8 @@ USER_FUNC(evt_mobj_recovery_blk) {
     y = evtGetFloat(event, args[3]);
     z = evtGetFloat(event, args[4]);
     evtGetValue(event, args[5]);
-    inBattle = gp->inBattle != 0;
     arg6 = args[6];
+    inBattle = gp->inBattle != 0;
     anim = kind == 0 ? "MOBJ_RecoveryBlock" : "MOBJ_CoinTakenRecoveryBlock";
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -2353,15 +2361,15 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
 }
 
 USER_FUNC(evt_mobj_badgeblk) {
+    s32* args = event->args;
+    const char* anim;
+    f32 x, y, z;
+    const char* name;
+    s32 val;
     s32 item;
     s32 arg6;
     s32 kind;
-    const char* anim;
-    s32 val;
-    const char* name;
     MapObjectEntry* mobj;
-    s32* args = event->args;
-    f32 x, y, z;
     name = (const char*)evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
     y = evtGetFloat(event, args[2]);
@@ -2369,13 +2377,10 @@ USER_FUNC(evt_mobj_badgeblk) {
     item = evtGetValue(event, args[4]);
     val = evtGetValue(event, args[5]);
     kind = args[7];
-    anim = "MOBJ_HatenaBlock";
     arg6 = args[6];
     {
         BOOL b = gp->inBattle != 0;
-        if (kind != 0) {
-            anim = "MOBJ_BadgeBlock";
-        }
+        anim = kind != 0 ? "MOBJ_BadgeBlock" : "MOBJ_HatenaBlock";
         if (animGroupBaseAsync(anim, b, NULL) == 0) {
         return EVT_RETURN_BLOCK;
     }}
@@ -2855,14 +2860,15 @@ typedef struct KpaPoleScoreWork {
 } KpaPoleScoreWork;
 
 static KpaPoleScoreWork* psw;
+u32 gap_08_80418714_sbss;
 
 void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     u8 saved[0x260];
+    CameraEntry* cam;
     AnimationPoseData* data;
     Vec min, max;
     s32 h, w;
-    u16 ww, hh;
-    CameraEntry* cam;
+    s32 ww, hh;
     smartEntry* e;
     memcpy(saved, camGetPtr((CameraId)camId), 0x260);
     data = animPoseGetAnimBaseDataPtr(mobj->poseId);
@@ -2876,7 +2882,7 @@ void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     cam->cameraUp = (Vec){0.0f, 0.0f, -1.0f};
     cam->cameraAt = mobj->position;
     cam->cameraPos = mobj->position;
-    cam->cameraPos.y += (0.5f * (f32)w) / (f32)tan(0.21816615760326385);
+    cam->cameraPos.y += (f32)w * 0.5f / tan(0.21816615760326385);
     C_MTXPerspective(cam->projection, 25.0f, (f32)(h / w), 1.0f, 32767.0f);
     cam->projType = GX_PERSPECTIVE;
     C_MTXLookAt(cam->view, &cam->cameraPos, &cam->cameraUp, &cam->cameraAt);
@@ -2885,8 +2891,8 @@ void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     GXSetScissor(0, 0, h, w);
     test_kururing_mapdisp(camId);
     sysWaitDrawSync();
-    hh = (u32)h >> 1;
-    ww = (u32)w >> 1;
+    hh = ((u32)h >> 1) & 0x7fff;
+    ww = ((u32)w >> 1) & 0x7fff;
     FLD(smartEntry*, mobj, 0x208) = smartAlloc(GXGetTexBufferSize(hh, ww, 6, 0, 0), 3);
     GXSetTexCopySrc(0, 0, h, w);
     GXSetTexCopyDst(hh, ww, (GXTexFmt)6, 1);
@@ -2895,9 +2901,9 @@ void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     GXInvalidateTexAll();
     GXPixModeSync();
     GXTexModeSync();
-    GXInitTexObj((GXTexObj*)((u8*)mobj + 0x1e8), FLD(smartEntry*, mobj, 0x208)->address, hh, ww, (GXTexFmt)6, (GXTexWrapMode)0, (GXTexWrapMode)0, 0);
-    GXInitTexObjLOD((GXTexObj*)((u8*)mobj + 0x1e8), (GXTexFilter)0, (GXTexFilter)0, 0.0f, 0.0f, 0.0f, 0, 0, (GXAnisotropy)0);
-    PSMTXIdentity((MtxPtr)((u8*)mobj + 0x20c));
+    GXInitTexObj(&mobj->paperTexObj, FLD(smartEntry*, mobj, 0x208)->address, hh, ww, (GXTexFmt)6, (GXTexWrapMode)0, (GXTexWrapMode)0, 0);
+    GXInitTexObjLOD(&mobj->paperTexObj, (GXTexFilter)0, (GXTexFilter)0, 0.0f, 0.0f, 0.0f, 0, 0, (GXAnisotropy)0);
+    PSMTXIdentity(mobj->paperTexMtx);
     memcpy(camGetPtr((CameraId)camId), saved, 0x260);
 }
 
@@ -3223,7 +3229,17 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
     return EVT_RETURN_DONE;
 }
 
+
+static void mobj_koopa_stone_blk(void) {
+    mobjNameToPtr("MOBJ_BombRock");
+    mobjNameToPtr("OFF_d_bom");
+    mobjNameToPtr("MOBJ_trap");
+}
+
 s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj) {
+    "MOBJ_BombRock";
+    "OFF_d_bom";
+    "MOBJ_trap";
     return 0;
 }
 
@@ -3505,9 +3521,9 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     z = evtGetFloat(event, args[3]);
     item = evtGetValue(event, args[4]);
     val = evtGetValue(event, args[5]);
+    arg6 = args[6];
     new_var = gp->inBattle;
     new_var = new_var != 0;
-    arg6 = args[6];
     anim = "MOBJ_HatenaBlock";
     if (animGroupBaseAsync(anim, new_var, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -3547,9 +3563,9 @@ USER_FUNC(evt_mobj_koopa_hidden_blk) {
     z = evtGetFloat(event, args[3]);
     item = evtGetValue(event, args[4]);
     val = evtGetValue(event, args[6]);
+    arg7 = args[7];
     inBattle = gp->inBattle;
     inBattle = inBattle != 0;
-    arg7 = args[7];
     anim = "MOBJ_HiddenHatenaBlock";
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
         return EVT_RETURN_BLOCK;
@@ -4473,6 +4489,7 @@ USER_FUNC(evt_mobj_koopa_pole) {
     MapObjectEntry* mobj;
     MapObjectEntry* hata;
     f32 x, y, z;
+    inBattle = gp->inBattle != 0;
     name = (const char*)evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
     y = evtGetFloat(event, args[2]);

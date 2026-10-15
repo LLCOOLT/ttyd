@@ -207,6 +207,7 @@ void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, void* a, void* b,
 }
 
 void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32 s) {
+    GXColor tev;
     GXColor col;
     Mtx rot;
     Mtx scl;
@@ -222,7 +223,8 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
 
     cam = camGetPtr(8);
     btlDispGXInit2D();
-    GXSetTevColor(GX_TEVREG0, (GXColor){0xE1, 0xE1, 0xE1, 0xFF});
+    tev = (GXColor){0xE1, 0xE1, 0xE1, 0xFF};
+    GXSetTevColor(GX_TEVREG0, tev);
     GXSetNumTevStages(1);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_RASC, GX_CC_C0, GX_CC_ZERO);

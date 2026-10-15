@@ -325,10 +325,10 @@ void effFlameMain(EffectEntry* effect) {
 }
 
 void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
-    CameraEntry* camera;
     s32 type;
     s32 alpha;
     EffFlameN64Work* work;
+    CameraEntry* camera;
     Mtx rot;
     Mtx scl;
     Mtx trn;
@@ -337,8 +337,8 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
-    alpha = work->alpha;
     type = work->type;
+    alpha = work->alpha;
     GXSetNumChans(0);
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(0, 1, 4, 30, 0, 125);
@@ -405,6 +405,8 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadTexObj(&texObj, 1);
         break;
     case 3:
+        break;
+    default:
         break;
     }
     PSMTXTrans(trn, work->position.x, work->position.y, work->position.z);

@@ -237,7 +237,12 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     s32 lifetime, j, i;
     s32 frame, alpha, r, g, b;
     s32 n, m;
+    s32 half;
     JetwEnt* tbl;
+    s32 idx;
+    JetwEnt* e;
+    s32 f5;
+    s32 cur;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
@@ -292,21 +297,14 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
     {
-        s32 half;
-        s32 idx;
-        s32 f5;
-        JetwEnt* e;
-        s32 cur;
-        JetwEnt* e2;
-        cur = frame;
         f5 = frame * 5;
+        cur = frame;
         half = n / 2;
         for (i = 0; i < half; cur += 2, i++) {
             idx = cur % n;
             for (j = 0; j < m; j++) {
                 JetwEnt* row = tbl + j * n;
                 if (idx <= f5 && n - 1 - idx <= lifetime) {
-                    e2 = tbl + idx;
                     e = row + idx;
                     PSMTXTrans(mtx, (f32)e->x, 10.0f + (f32)e->y, 0.0f);
                     PSMTXScale(scale, 0.01f * (f32)tbl[idx].sx, 0.01f * (f32)tbl[idx].sy, 1.0f);

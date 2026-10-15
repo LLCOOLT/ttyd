@@ -247,10 +247,10 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 			if (nhit == 2) break;
 			if (zubastar_get_kouten(p0->x, p0->y, p1->x, p1->y, t->v[j].x, t->v[j].y,
 			                        t->v[(j + 1) % t->n].x, t->v[(j + 1) % t->n].y, &ox, &oy)) {
-				ix = ox;
-				iy = oy;
 				for (k = 0; k < nhit; k++) {
-					if (flags[k] == 1 && (s32)hit[k].x == ix && (s32)hit[k].y == iy) break;
+					if (flags[k] == 1) {
+						if ((s32)ox == (s32)hit[k].x && (s32)oy == (s32)hit[k].y) break;
+					}
 				}
 				if (k == nhit) {
 					hit[k].x = ox;
@@ -313,7 +313,7 @@ void zubastar_bunkatu(Vec* p0, Vec* p1) {
 #pragma dont_inline on
 s32 zubastar_get_kouten(f32 x1, f32 y1, f32 x2, f32 y2, f32 x3, f32 y3, f32 x4, f32 y4, f32* ox, f32* oy) {
 	f32 dx1 = x2 - x1;
-	f32 e2, dx2, e1, a, b, d, t;
+	f32 d, a, t, e1, e2, dx2, b;
 	if (dx1 == 0.0f && (x4 - x3) == 0.0f) return 0;
 	if (dx1 != 0.0f) e1 = dx1; else e1 = 1e-5f;
 	dx2 = x4 - x3;

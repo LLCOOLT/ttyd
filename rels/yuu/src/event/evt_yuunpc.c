@@ -1320,12 +1320,14 @@ static inline s32 yuunpc_hit_ofs(YuuNpc* npc, Vec* ofs) {
     if (out) {
         return -500;
     }
-    return yuunpc_wp->hit[(s32)((npc->pos.z + ofs->z - -150.0f) / 50.0f) * 72 + (s32)((x - -1800.0f) / 50.0f)];
+    {
+        s32 zi = (s32)((npc->pos.z + ofs->z - -150.0f) / 50.0f);
+        s32 xi = (s32)((x - -1800.0f) / 50.0f);
+        return yuunpc_wp->hit[zi * 72 + xi];
+    }
 }
 
-static inline f32 yuunpc_snap(f32 v) /* local helper */ {
-    return ((s32)((3600.0f + v) / 50.0f) + 1) * 50.0f - 3600.0f;
-}
+#define yuunpc_snap(v) (((s32)((3600.0f + (v)) / 50.0f) + 1) * 50.0f - 3600.0f)
 
 
 static inline f32 yuunpc_rnd10(YuuNpc* npc) {
@@ -1524,7 +1526,7 @@ void yuunpc_pose_minigame4_main(void) {
                     if (k == 6) {
                         off = 0.0f;
                     } else {
-                        off = 50.0f * (3 - (k - 2));
+                        off = (3 - (k - 2)) * 50.0f;
                     }
                     npc->dest.x = yuunpc_snap(px + off);
                     {
@@ -1537,7 +1539,7 @@ void yuunpc_pose_minigame4_main(void) {
                 case 8:
                 case 9:
                 case 10:
-                    off = 50.0f * (3 - (h - 7));
+                    off = (3 - (h - 7)) * 50.0f;
                     npc->dest.x = yuunpc_snap(px + off);
                     npc->dest.z = 0.65f * npc->goal.z;
                     npc->dest.y = npc->pos.y;

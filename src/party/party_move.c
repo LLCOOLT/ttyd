@@ -1797,6 +1797,7 @@ BOOL partyGetAppearPos2(PartyEntry* party, Vec* out) {
     f32 dist;
     f32 back;
     f32 ofs = 30.0f;
+    f32 a90 = 90.0f;
 
     mario = party->playerPtr;
     dist = 30.0f + party->width;

@@ -117,6 +117,8 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     u8* a;
     f32 yr;
 
+
+
     EffMagic1N64Work* w = effect->userdata;
     s32 type = w->type;
     f32 scale = w->scale;
@@ -129,6 +131,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     f32 oz = w->offset.z;
     f32 c;
     f32 s;
+    f32 t;
     s32 i;
     s32 j;
     s16 sz;
@@ -194,9 +197,7 @@ static void main_dl(EffectEntry* effect, Mtx base) {
         PSMTXConcat(mf8, m98, m68);
 
         for (j = 0, a = anime_data; j < 3; j++) {
-            GXColor c1;
-            GXColor c0;
-            f32 t = 6.2831855f * ang / 360.0f;
+            t = 6.2831855f * ang / 360.0f;
             c = (f32)cos(t);
             s = (f32)sin(t);
             PSMTXTrans(m38, radius * s, radius * c, 0.0f);
@@ -204,18 +205,24 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             PSMTXConcat(m68, m38, m38);
             PSMTXConcat(base, m38, m38);
             GXLoadPosMtxImm(m38, GX_PNMTX0);
-            c0 = (GXColor){0, 0, 0, 0};
-            c0.r = (u8)(s32)((f32)(s32)a[1] +  0.5f * ((f32)-(s32)a[1] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
-            c0.g = (u8)(s32)((f32)(s32)a[2] +  0.5f * ((f32)-(s32)a[2] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
-            c0.b = (u8)(s32)((f32)(s32)a[3] +  0.5f * ((f32)-(s32)a[3] * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + 180 + gp->retraceCount * 32) / 360.0f))));
-            c0.a = alpha;
-            GXSetTevColor(GX_TEVREG0, c0);
-            c1 = (GXColor){0, 0, 0, 255};
+            {
+            GXSetTevColor(GX_TEVREG0, (GXColor){(u8)(s32)((f32)(s32)a[1] + 0.5f * (((f32)-(s32)a[1]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
+                (u8)(s32)((f32)(s32)a[2] + 0.5f * (((f32)-(s32)a[2]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
+                (u8)(s32)((f32)(s32)a[3] + 0.5f * (((f32)-(s32)a[3]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))), alpha});
 
-            c1.r = (u8)(s32)((f32)(s32)a[1] +  0.5f * ((f32)(255 - a[1]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f))));
-            c1.g = (u8)(s32)((f32)(s32)a[2] +  0.5f * ((f32)(255 - a[2]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f))));
-            c1.b = (u8)(s32)((f32)(s32)a[3] +  0.5f * ((f32)(255 - a[3]) * (1.0f + (f32)sin(6.2831855f * (f32)(s32)(a[0] + gp->retraceCount * 32) / 360.0f))));
-            GXSetTevColor(GX_TEVREG1, c1);
+
+
+
+            }
+            {
+            GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
+                (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
+                (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))), 255});
+
+
+
+
+            }
             if (type == 0) sz = 15; else sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
             PSMTXTrans(mf8, 0.0f, (f32)(3 - j) * 64.0f / 256.0f, 0.0f);

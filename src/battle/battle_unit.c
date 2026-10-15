@@ -2147,7 +2147,7 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
                 state->count++;
                 if (part->mOwner->attackPhase != BattleGetSeq(wp, 4)) {
                     dv = (u32)vol;
-                    psndSFX_vol(id, 0.7 * dv);
+                    psndSFX_vol(id, dv * 0.7);
                 }
             }
             else {
@@ -2183,7 +2183,7 @@ s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pi
         BtlUnit_GetStatus(unit, 0xA, &turns, &strength);
         pit = (s16)((strength * 2 + 1) * -0x155);
     }
-    pit = (s16)(irand(41) + (s32)pit + pitch - 20);
+    pit = (s16)(pitch + irand(41) + (s32)pit - 20);
     id = psndSFXOn_3D(sfxName, pos);
     psndSFX_pit(id, pit);
     psndSFX_vol(id, volume == -250000000 ? psndSFX_get_vol(id) : (u8)volume);

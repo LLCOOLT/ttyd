@@ -16,10 +16,10 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static s32 gsNextID;
+static s32 gsUnused;
 static GSROOT* gsRoot;
 static GSROOT* gsCurrent;
-static s32 gsUnused;
+static s32 gsNextID;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsRoot = NULL;
@@ -312,7 +312,7 @@ bool sndPopGroup() {
 */
 
 u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_call, u8 studio) {
-  s32 i;
+  int i;
   GROUP_DATA* g;
   PAGE* norm;
   PAGE* drum;
@@ -323,7 +323,7 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
 
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; ++i) {
+    for (i = 0; i < root->sp; i++) {
     if (root->stack[i].gAddr->id != sgid) {
       continue;
     }
@@ -363,42 +363,37 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
-  GROUP_DATA* g;
+  int i;
+  void* prj;
   u32 seqId;
+  GSROOT* root;
   MIDISETUP* midiSetup;
   PAGE* drum;
   PAGE* norm;
-  void* prj;
-  s32 i;
-  GSROOT* root;
-
+  GROUP_DATA* g;
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; i++) {
-      if (root->stack[i].gAddr->id != sgid) { continue; }
+    for (i = 0; i < root->sp; ++i) {
+      if (root->stack[i].gAddr->id != sgid) continue;
       if (root->stack[i].gAddr->type == 0) {
         g = root->stack[i].gAddr;
         prj = root->stack[i].prjAddr;
         norm = (PAGE*)((size_t)prj + g->data.song.normpageOff);
         drum = (PAGE*)((size_t)prj + g->data.song.drumpageOff);
         midiSetup = (MIDISETUP*)((size_t)prj + g->data.song.midiSetupOff);
-        while (midiSetup->songId != 0xFFFF) {
+        for (; midiSetup->songId != 0xFFFF; ++midiSetup) {
           if (midiSetup->songId == sid) {
             hwDisableIrq();
             seqId = seqStartPlay(norm, drum, midiSetup, arrfile, para, studio, sgid);
             hwEnableIrq();
             goto done;
           }
-
-          ++midiSetup;
         }
-
         { seqId = 0xffffffff; goto done; }
       } else {
         { seqId = 0xffffffff; goto done; }
       }
     }
   }
-
   { seqId = 0xffffffff; goto done; }
   seqId = 0xffffffff;
 done:

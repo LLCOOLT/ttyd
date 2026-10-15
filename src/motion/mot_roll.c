@@ -228,7 +228,9 @@ static inline s32 makeVec(f32 half) {
 void roll_upstairs(void);
 static void marioRollCan(void);
 
+
 #pragma inline_max_size(20000)
+#pragma inline_max_total_size(200000)
 
 
 void marioRollFixOn(void) {
@@ -304,6 +306,8 @@ void marioResetRollSpd(void) {
 void marioForceRollAnime(void) {
     MarioWork* mario = marioGetPtr();
     marioPaperOff();
+    if (mario) {
+    }
     marioChgPaper(0);
     marioPaperOn("p_roll");
     marioChgPose("M_I_U");
@@ -344,6 +348,7 @@ s32 unk_8009f9c8(void) {
     return ret;
 }
 
+
 s32 marioRollCancel(void) {
     MarioWork* mario = marioGetPtr();
     if (!(mario->flags & 0x1000000)) {
@@ -369,17 +374,7 @@ void mot_roll_post(void) {
     m->unk150.z = 0.004f;
     {
         f32 d = revise360(mario->directionView - mario->targetYaw);
-        if (d >= 180.0f) {
-            mario->unk1A8 = 0.0f;
-            mario->unk1AC = 0.0f;
-            mario->unk19C = 270.0f;
-            mario->directionView = 270.0f;
-        } else {
-            mario->unk1A8 = 180.0f;
-            mario->unk1AC = 180.0f;
-            mario->unk19C = 90.0f;
-            mario->directionView = 90.0f;
-        }
+        do { if (d >= 180.0f) { mario->unk1A8 = 0.0f; mario->unk1AC = 0.0f; mario->unk19C = 270.0f; mario->directionView = 270.0f; } else { mario->unk1A8 = 180.0f; mario->unk1AC = 180.0f; mario->unk19C = 90.0f; mario->directionView = 90.0f; } } while (0);
     }
     marioSetSpec();
     mario->field_0x8 = 0;

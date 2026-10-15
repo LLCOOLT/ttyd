@@ -917,7 +917,7 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
                 pb->adpcm.a[i][0] = 0;
                 pb->adpcm.a[i][1] = 0;
               }
-              addr = (base = (u32)dsp_vptr->smp_info.addr >> 1) + dsp_vptr->smp_info.offset;
+              addr = dsp_vptr->smp_info.offset + (base = (u32)dsp_vptr->smp_info.addr >> 1);
               dsp_vptr->playInfo.posHi = dsp_vptr->smp_info.offset;
               dsp_vptr->playInfo.posLo = 0;
               if (dsp_vptr->smp_info.compType == 6) {
@@ -1081,9 +1081,9 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
               dsp_vptr->vSampleInfo.inLoopBuffer = 1;
             }
           } else if (dsp_vptr->smp_info.compType == 6) {
-            if ((dsp_vptr->vSampleInfo.inLoopBuffer == 0) && (pb->streamLoopCnt != 0)) {
-              tmp_addr = (u32)dsp_vptr->vSampleInfo.loopBufferAddr / 2 + dsp_vptr->vSampleInfo.loopBufferLength;
-              dsp_vptr->smp_info.addr = dsp_vptr->vSampleInfo.loopBufferAddr;
+            if ((dsp_vptr->vSampleInfo.inLoopBuffer == 0) && (pb->streamLoopCnt != 0)) { 
+              tmp_addr = ((u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1) + dsp_vptr->vSampleInfo.loopBufferLength;
+              dsp_vptr->smp_info.addr = dsp_vptr->vSampleInfo.loopBufferAddr; tmp_addr = tmp_addr;
               tmp_addr--;
               pb->addr.endAddressHi = tmp_addr >> 16;
               pb->addr.endAddressLo = tmp_addr;
@@ -1827,6 +1827,6 @@ void salHandleAuxProcessing() {
 }
 
 #pragma force_active on
-__declspec(section ".data") u32 gap_05_803BA894_data[1] = {0};
 __declspec(section ".rodata") const u32 gap_04_80302924_rodata[1] = {0};
+__declspec(section ".data") u32 gap_05_803BA894_data[1] = {0};
 #pragma force_active reset

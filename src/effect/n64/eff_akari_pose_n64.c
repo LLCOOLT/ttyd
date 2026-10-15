@@ -53,7 +53,7 @@ static u8 a_data2[] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 };
 
-__declspec(section ".sdata") u32 gap_07_80412D70_sdata[4] = {0};
+__declspec(section ".sdata") u8 gap_07_80412D70_sdata[16] = {0};
 
 void effAkariPoseMain(EffectEntry* effect);
 void effAkariPoseDisp(CameraId cameraId, EffectEntry* effect);

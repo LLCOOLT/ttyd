@@ -91,6 +91,10 @@ effN64Vtx horao_spell_vtx[] = {
     {0, 8, 0, 7680, 1024, 0, 0, 0, 0},
 };
 
+static u8 colr[20] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
+static u8 colg[20] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
+static u8 colb[20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+
 void effHoraoSpellMain(EffectEntry* effect);
 void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect);
 
@@ -162,7 +166,6 @@ void effHoraoSpellMain(EffectEntry* effect) {
 }
 
 void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
-    CameraEntry* camera;
     GXTexObj texObj;
     Mtx mtx;
     Mtx scale;
@@ -171,25 +174,21 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx2;
     Vec v1;
     Vec v2;
-    effN64Vtx* vtx;
+    s32 n;
     effN64Vtx* p;
     effN64Vtx* q;
-    s32 frame;
-    s32 alpha;
+    s32 k;
     EffHoraoSpellN64Work* work;
+    s32 alpha;
+    s32 frame;
     s32 i;
     s32 j;
-    s32 k;
-    s32 n;
+    effN64Vtx* vtx;
+    CameraEntry* camera;
 
-    static u8 colr[20] = {0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4, 0xAA, 0xA0, 0x96, 0x8C, 0x82};
-    static u8 colg[20] = {0xAA, 0xA0, 0x96, 0x8C, 0x82, 0x78, 0x82, 0x8C, 0x96, 0xA0, 0xAA, 0xB4, 0xBE, 0xC8, 0xC8, 0xBE, 0xB4};
-    static u8 colb[20] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 
     GXColor white;
     f32 s;
-
-
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
@@ -230,7 +229,7 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
         GXSetTevColor(GX_TEVREG0, (GXColor){colr[k], colg[k], colb[k], work->alpha});
-        white = (GXColor){255, 255, 255, 0}; GXSetTevColor(GX_TEVREG1, white);
+        GXSetTevColor(GX_TEVREG1, (GXColor){255, 255, 255, 0});
         PSMTXScale(scale, 0.0078125f, 0.03125f, 0.0f);
         PSMTXTrans(mtx, (f32)(-frame * 2), 0.0f, 0.0f);
         PSMTXConcat(scale, mtx, scale);
@@ -244,7 +243,7 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
         for (j = 0, n = 0; j < 16; j++, n += 2) {
             PSMTXTrans(mtx, 8.0f, 0.0f, 0.0f);
-            s = sin(6.2831855f * (f32)((frame << 3) + j * 720 / 15) / 360.0f);
+            s = sin(6.2831855f * (f32)((frame << 3) + (n * 360) / 15) / 360.0f);
             PSMTXRotRad(rot, 'y', 0.017453292f * (30.0f * s));
             PSMTXConcat(mtx, rot, mtx);
             PSMTXRotRad(rot, 'z', 0.10471976f);
@@ -281,10 +280,15 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
         GXInvalidateVtxCache();
         effSetVtxDescN64(vtx);
-        for (j = 0, k = 0; j < 15; j++, k += 2) {
+        for (n = 0, k = 0; n < 15; n++, k += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
         }
 
     }
 }
+
+#pragma force_active on
+__declspec(section ".sdata") u8 gap_07_80413A4C_sdata[4] = {0};
+__declspec(section ".sdata2") const u32 gap_10_8042315C_sbss2;
+#pragma force_active reset

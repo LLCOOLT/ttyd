@@ -251,6 +251,7 @@ void nokonoko_use(PartyEntry* party) {
     f32 dir;
     f32 spd;
     f32 s2x;
+    u8* new_var;
     f32 s2y;
     f32 s2z;
     f32 s3x;
@@ -259,8 +260,11 @@ void nokonoko_use(PartyEntry* party) {
     u32 flags;
     HitEntry* hit;
     BOOL b;
-    f32 dx;
     f32 dy;
+    f32 dx;
+    f32 qx;
+    f32 qy;
+    f32 qz;
     f32 dz;
     MarioWork* mario = party->playerPtr;
 
@@ -462,6 +466,7 @@ void nokonoko_use(PartyEntry* party) {
         break;
     }
 
+    new_var = ((u8*)party) + 0x128;
     switch (party->useMotionId) {
     case 50:
         partyClearJumpPara(party);
@@ -475,7 +480,7 @@ void nokonoko_use(PartyEntry* party) {
         party->field_104 += 0.3f * (lim - party->field_104);
         if (party->field_104 >= lim) {
             party->field_104 = lim;
-            if (PF(party, 0x128) < 10.0f) {
+            if ((*(f32*)new_var) < 10.0f) {
                 party->useMotionId = 52;
             }
         }
@@ -491,9 +496,9 @@ void nokonoko_use(PartyEntry* party) {
         }
         noko_spin(party);
         party->field_104 += 0.1f * (-1.0f - party->field_104);
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 0.0f) {
-            PF(party, 0x128) = 0.0f;
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 0.0f) {
+            (*(f32*)new_var) = 0.0f;
             party->useMotionId = 53;
             party->field_104 += 0.1f * (-1.0f - party->field_104);
             PF(party, 0x178) = 50.0f;
@@ -510,7 +515,7 @@ void nokonoko_use(PartyEntry* party) {
         }
         noko_spin(party);
         party->field_104 += (-2.0f - party->field_104) * (PH(party, 0x17c) != 0 ? 0.2f : 0.1f);
-        PF(party, 0x128) -= party->field_104;
+        (*(f32*)new_var) -= party->field_104;
         if (party->field_104 <= 0.0f) {
             party->field_104 = 0.0f;
             flags = lookupSafetyPos(PV(party, 0x94), party->field_F0, &out);
@@ -548,7 +553,7 @@ void nokonoko_use(PartyEntry* party) {
             }
             party->useMotionId = 54;
             PV(party, 0x94) = out;
-            PF(party, 0x128) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+            (*(f32*)new_var) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
             party->field_100 = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
         }
         break;
@@ -558,8 +563,8 @@ void nokonoko_use(PartyEntry* party) {
         if (party->field_104 >= 4.0f) {
             party->field_104 = 4.0f;
         }
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 10.0f) {
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 10.0f) {
             party->useMotionId = 70;
             party->field_104 = 0.0f;
             return;
@@ -586,12 +591,12 @@ void nokonoko_use(PartyEntry* party) {
         dx = party->position.x - mario->position.x;
         dy = party->position.y - mario->position.y;
         dz = party->position.z - mario->position.z;
-        dx *= dx;
-        dy *= dy;
-        dz *= dz;
-        if ((f32)sqrt(dz + (dx + dy)) < 5.0f) {
-            f32 a = mario->directionView;
-            a = a + (a >= 180.0 ? -90.0f : 90.0f);
+        qx = dx * dx;
+        qy = dy * dy;
+        qz = dz * dz;
+        if ((f32)sqrt(qz + (qx + qy)) < 5.0f) {
+            f32 a;
+            a = mario->directionView + (mario->directionView >= 180.0 ? -90.0f : 90.0f);
             movePos(&party->position.x, &party->position.z, 0.5f * mario->wPlayerCollisionBox.x, a);
             ccwall(party, 1);
         }
@@ -614,7 +619,7 @@ void nokonoko_use(PartyEntry* party) {
         party->useMotionId = 81;
         party->field_104 = 0.0f;
         party->field_100 = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
-        PF(party, 0x128) += 75.0f;
+        (*(f32*)new_var) += 75.0f;
         psndSFXOn_3D((const char*)0x92b, &party->position);
     case 81:
         noko_spin(party);
@@ -633,8 +638,8 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 110;
             return;
         }
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 20.0f) {
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 20.0f) {
             party->useMotionId = 82;
         }
         break;
@@ -646,9 +651,9 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 100;
             break;
         }
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 0.0f) {
-            PF(party, 0x128) = distABf(PV(party, 0x94).x, PV(party, 0x94).z, party->position.x, party->position.z);
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 0.0f) {
+            (*(f32*)new_var) = distABf(PV(party, 0x94).x, PV(party, 0x94).z, party->position.x, party->position.z);
             party->useMotionId = 84;
             PF(party, 0x178) = 50.0f;
             party->field_100 = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
@@ -660,8 +665,8 @@ void nokonoko_use(PartyEntry* party) {
             party->useMotionId = 100;
             break;
         }
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 30.0f) {
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 30.0f) {
             party->useMotionId = 86;
             party->field_104 = 0.0f;
             PS32(party, 0x24) = sysMsec2Frame(500);
@@ -678,15 +683,15 @@ void nokonoko_use(PartyEntry* party) {
         break;
     case 100:
         ccwall(party, 1);
-        dx = party->position.x - mario->position.x;
-        dy = party->position.y - mario->position.y;
+        dy = party->position.x - mario->position.x;
+        dx = party->position.y - mario->position.y;
         dz = party->position.z - mario->position.z;
-        dx *= dx;
-        dy *= dy;
-        dz *= dz;
-        if ((f32)sqrt(dz + (dx + dy)) < 5.0f) {
-            f32 a = mario->directionView;
-            a = a + (a >= 180.0 ? 90.0f : -90.0f);
+        qx = dy * dy;
+        qy = dx * dx;
+        qz = dz * dz;
+        if ((f32)sqrt(qz + (qx + qy)) < 5.0f) {
+            f32 a;
+            a = mario->directionView + (mario->directionView >= 180.0 ? 90.0f : -90.0f);
             movePos(&party->position.x, &party->position.z, 0.5f * mario->wPlayerCollisionBox.x, a);
             ccwall(party, 1);
         }
@@ -743,7 +748,7 @@ void nokonoko_use(PartyEntry* party) {
         }
         party->useMotionId = 90;
         PV(party, 0x94) = out2;
-        PF(party, 0x128) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
+        (*(f32*)new_var) = distABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
         party->field_100 = angleABf(party->position.x, party->position.z, PV(party, 0x94).x, PV(party, 0x94).z);
         PF(party, 0x178) = 50.0f;
         break;
@@ -753,8 +758,8 @@ void nokonoko_use(PartyEntry* party) {
         if (party->field_104 >= 4.0f) {
             party->field_104 = 4.0f;
         }
-        PF(party, 0x128) -= party->field_104;
-        if (PF(party, 0x128) <= 10.0f) {
+        (*(f32*)new_var) -= party->field_104;
+        if ((*(f32*)new_var) <= 10.0f) {
             party->useMotionId = 70;
             party->field_104 = 0.0f;
         }
@@ -877,17 +882,19 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
     f32 vx;
     f32 vz;
     f32 d;
-    f32 w;
-    f32 yofs;
-    f32 x;
-    f32 z;
+    f32 y0;
     f32 y;
+    f32 z;
+    f32 x;
+    f32 yofs;
+    f32 w;
 
     yofs = 10.0f;
-    y = yofs + (party->position.y + party->field_F0);
+    y0 = party->position.y + party->field_F0;
     dist = party->field_F0 + 30.0f;
+    y0 = yofs + y0;
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, party->position.x,
-                         y, party->position.z, 0.0f, -1.0f, 0.0f);
+                         y0, party->position.z, 0.0f, -1.0f, 0.0f);
     if (((hitGetAttr(hit) >> 9) & 1) == 1) {
         hit = NULL;
     }
@@ -896,6 +903,7 @@ HitEntry* ccwall(PartyEntry* party, s32 mode) {
         hy = (f32)(s32)(100.0f * hy + 0.5f) / 100.0f;
         py = (f32)(s32)(100.0f * party->position.y + 0.5f) / 100.0f;
         if (__fabsf(py - hy) <= 11.0f) {
+
             if (py <= hy) {
                 if (mode == 0) {
                     party->position.y = hy;
@@ -1128,24 +1136,24 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     *out = pos; }
 
 void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
-    f32 dist; f32 x; f32 y; f32 z; f32 s; f32 c; f32 rad; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
+    f32 y; f32 s; f32 dist; f32 z; f32 c; f32 rad; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
     MarioWork* player = marioGetPtr();
     f32 w = player->wPlayerCollisionBox.x;
     rad = 1.5707964f;
     s = (f32)sin(rad);
     c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; x = s + pos.x; z = c + pos.z; y = pos.y;
+    c = -c; s = w * s; c = w * c; s = s + pos.x; z = c + pos.z; y = pos.y;
     dist = 0.1f + height;
-    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
-        out->x = x; out->z = z; out->y = y; return;
+    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, s, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
+        out->x = s; out->z = z; out->y = y; return;
     }
     rad = 4.712389f;
     s = (f32)sin(rad);
     c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; x = s + pos.x; z = c + pos.z; y = pos.y;
+    c = -c; s = w * s; c = w * c; s = s + pos.x; z = c + pos.z; y = pos.y;
     dist = 0.1f + height;
-    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
-        out->x = x; out->z = z; out->y = y; return;
+    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, s, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
+        out->x = s; out->z = z; out->y = y; return;
     }
     *out = pos; }
 

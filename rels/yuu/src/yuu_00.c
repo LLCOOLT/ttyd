@@ -637,9 +637,9 @@ static inline void monte_disp(CameraId camera, void* param) {
 
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
+    const char* sfx;
     BOOL exists = FALSE;
     HikokiWork* data = wp->data;
-    const char* sfx;
     s32 total;
     s32 i;
     s32 t;
@@ -708,7 +708,7 @@ static USER_FUNC(fall_rtn) {
         m = &monte_p[i];
         switch (m->state) {
             case 0:
-                if (get_monte_check(&m->sub.pos, &marioGetPtr()->position) == TRUE) {
+                if (get_monte_check(&m->sub.pos, &marioGetPtr()->position) == 1) {
                     data->monteCount++;
                     psndSFXOn_3D(sfx, &marioGetPtr()->position);
                     m->hidden = 1;

@@ -21,7 +21,9 @@
 extern ItemData itemDataTable[];
 extern int sprintf(char* str, const char* format, ...);
 
-static USER_FUNC(cam_r);
+extern const volatile f32 float_0p5_8041dc98;
+#define HALF_F float_0p5_8041dc98
+USER_FUNC(cam_r);
 USER_FUNC(evt_eff);
 USER_FUNC(evt_eff64);
 USER_FUNC(evt_env_blur_on);
@@ -73,8 +75,12 @@ s32 evt_diary_read[];
 //.data
 
 //.sbss
-static WindowWork* wp;
+#pragma force_active on
+s32 gap_08_80418A1C_sbss;
+#pragma force_active reset
+static s32 cnt;
 TEXPalette* winTexTpl;
+static WindowWork* wp;
 
 // local prototypes
 #include "driver/fadedrv.h"
@@ -111,9 +117,13 @@ void winDispKoopa(CameraId camId, void* param);
 void statusWinForceOff(void);
 void allPartyForceSlitOff(void);
 
+#pragma explicit_zero_data on
 WindowWork* winGetPtr(void) {
+    static const volatile u32 gap_09_8041DCCC_sdata2 = 0;
+    (void)&gap_09_8041DCCC_sdata2;
     return wp;
 }
+#pragma explicit_zero_data reset
 
 void winInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(WindowWork));
@@ -157,6 +167,8 @@ void winOpenDisable(void) {
 typedef struct { const char* s[2]; } WinLangTbl;
 static const WinLangTbl winLangTbl;
 
+#pragma force_active on
+#pragma explicit_zero_data on
 void winMain(void) {
     MarioWork* mario;
     s32 i;
@@ -451,6 +463,8 @@ void winMain(void) {
         }
     }
 }
+#pragma explicit_zero_data reset
+#pragma force_active reset
 
 void winDisp(CameraId camId, void* param) {
     winRootDisp(camId, wp);
@@ -462,6 +476,7 @@ void winDispKoopa(CameraId camId, void* param) {
 }
 
 static const WinLangTbl winLangTbl = { { "jp", "us" } };
+
 
 EVT_BEGIN(kime_pose)
     CALL(evt_party_nokotaro_get_status, 0, LW(0))
@@ -750,7 +765,6 @@ EVT_END()
 
 
 USER_FUNC(itemUseFunc) {
-    static s32 cnt;
     PartyEntry* party;
     MarioWork* mario;
     ItemData* item;
@@ -809,7 +823,7 @@ USER_FUNC(itemUseFunc) {
                 break;
             }
             eff = effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 0, *(u8*)&item->hp_restored);
-            ((f32*)eff->userdata)[0x10] = -party->field_F0 / 2.0f;
+            ((f32*)eff->userdata)[0x10] = -party->field_F0 * HALF_F;
             cnt++;
             break;
         case 230:
@@ -867,7 +881,7 @@ USER_FUNC(unk_80177cf8) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(cam_r) {
+USER_FUNC(cam_r) {
     CameraEntry* cam;
     Vec v;
     f32 s;
@@ -909,6 +923,7 @@ void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     FontDrawMessageMtx(trans, buf);
 }
 
+static const char winNines[] = "９９９";
 void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
@@ -917,7 +932,7 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
 
     va_start(args, fmt);
     do { vsprintf(buf, fmt, args); } while (0);
-    { s32 w = FontGetMessageWidth(fmt == 0 && 0 ? "\202X\202X\202X" : "\202X\202X\202X") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    { s32 w = FontGetMessageWidth(winNines) - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
@@ -1019,11 +1034,11 @@ void winTexSet(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-0.5f, -0.5f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXPosition3f32(HALF_F, -0.5f, 0.0f);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXPosition3f32(HALF_F, HALF_F, 0.0f);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
@@ -1052,11 +1067,11 @@ void unk_80177008(u32 textureId, Vec translate, Vec scale, GXColor color) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-0.5f, -0.5f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXPosition3f32(HALF_F, -0.5f, 0.0f);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXPosition3f32(HALF_F, HALF_F, 0.0f);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
@@ -1095,11 +1110,11 @@ void winTexSetRot(u32 textureId, Vec translate, Vec scale, GXColor color, f32 ro
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-0.5f, -0.5f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXPosition3f32(HALF_F, -0.5f, 0.0f);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXPosition3f32(HALF_F, HALF_F, 0.0f);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
@@ -1151,11 +1166,11 @@ void winTexSet_x2(u32 textureId1, u32 textureId2, Vec translate, Vec scale, GXCo
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-0.5f, -0.5f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXPosition3f32(HALF_F, -0.5f, 0.0f);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXPosition3f32(HALF_F, HALF_F, 0.0f);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
 }
 
@@ -1231,11 +1246,11 @@ void winIconSet(s32 iconId, Vec translate, Vec scale, GXColor color) {
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXPosition3f32(-0.5f, -0.5f, 0.0f);
     GXTexCoord2f32(0.0f, 1.0f);
-    GXPosition3f32(0.5f, -0.5f, 0.0f);
+    GXPosition3f32(HALF_F, -0.5f, 0.0f);
     GXTexCoord2f32(1.0f, 1.0f);
-    GXPosition3f32(0.5f, 0.5f, 0.0f);
+    GXPosition3f32(HALF_F, HALF_F, 0.0f);
     GXTexCoord2f32(1.0f, 0.0f);
-    GXPosition3f32(-0.5f, 0.5f, 0.0f);
+    GXPosition3f32(-0.5f, HALF_F, 0.0f);
     GXTexCoord2f32(0.0f, 0.0f);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
@@ -1324,6 +1339,7 @@ void winLectureOn(void) {
 }
 
 BOOL winLectureCheck(void) {
+
     if ((wp->flags & 0x1000) && evtCheckID(wp->lectureEvent->eventId)) {
         return TRUE;
     }
@@ -1333,7 +1349,6 @@ BOOL winLectureCheck(void) {
 
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
-s32 gap_08_80418A1C_sbss = 0;
 
-__declspec(section ".sdata2") const f32 float_0p5_8041dc98 = 0.5f;
+__declspec(section ".sdata2") const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
 #pragma force_active reset

@@ -281,7 +281,7 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 			if (wp->alertTick <= 0) {
 				wp->alertTick = 60;
 				if (wp->commandMenu.field_4 & 1) {
-					psndSFXOn("SFX_BTL_PINCH1\0");
+					psndSFXOn("SFX_BTL_PINCH1\0\0\0\0\0");
 				}
 			}
 		}
@@ -1176,9 +1176,10 @@ void btlseqTurn(BattleWork* wp) {
 				unit = BattleGetUnitPtr(wp, i);
 				if (unit && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL) && unit->currentHp > 0) {
 					n = 0;
-					for (count = unit->badgesEquipped.HappyFlower; count > 0; count--) {
-						rate = 33 - (unit->currentFp / unit->maxFp) * 3;
-						if (irand(100) < rate) {
+					for (rate = unit->badgesEquipped.HappyFlower; rate > 0; rate--) {
+						count = 33 - (unit->currentFp / unit->maxFp) * 3;
+						if (irand(100) < count) {
+
 							n++;
 						}
 					}
@@ -1983,8 +1984,8 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
 	int i;
-	BattleUnit* unit;
 	BOOL done = TRUE;
+	BattleUnit* unit;
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {

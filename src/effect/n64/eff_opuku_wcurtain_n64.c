@@ -137,23 +137,21 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Vec v;
     f32 s;
-    effN64Vtx* p;
     s32 i;
+    s32 t;
     effN64Vtx* vtx;
+    effN64Vtx* p;
     effN64Vtx* q;
     s32 k;
-    s32 u;
     s32 j;
-
     s32 frame;
-    s32 t;
-    s32 t2;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
     s = 0.1f * work->scale;
     GXSetTevColor(GX_TEVREG0, (GXColor){work->colorR, work->colorG, work->colorB, work->alpha});
+    (void)(GXColor){work->colorR, work->colorG, work->colorB, work->alpha};
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -217,10 +215,9 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCurrentMtx(GX_PNMTX0);
 
     for (j = 0; j < i - 1; j++) {
-        t = j << 1;
-        t2 = t + 2;
-
+        t = j * 2;
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        tri2(t, t2, t + 1, t, t + 1, t + 2, t + 3, t);
+        tri2(t, t + 2, t + 1, t, t + 1, t + 2, t + 3, t);
     }
+
 }

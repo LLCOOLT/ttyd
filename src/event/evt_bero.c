@@ -29,32 +29,146 @@ f32 BeroEX, BeroEY, BeroEZ; //end position
 Vec BeroPT, BeroAT;
 BOOL BeroMarioGO;
 
-EVT_BEGIN(evt_bero_mario_enter)
-CALL(evt_seq_wait, SEQ_GAME)
-CALL(evt_npc_change_fbat_mode, 7)
+USER_FUNC(bero_get_position_normal);
+USER_FUNC(bero_get_position_pipe2);
+USER_FUNC(bero_get_position_pipe_pure);
+USER_FUNC(evt_bero_1stcheck);
+USER_FUNC(evt_bero_cam3d_change);
+USER_FUNC(evt_bero_cam_shift_init);
+USER_FUNC(evt_bero_case_id_load);
+USER_FUNC(evt_bero_case_id_save);
+USER_FUNC(evt_bero_disppos_load);
+USER_FUNC(evt_bero_disppos_save);
+USER_FUNC(evt_bero_exec_get);
+USER_FUNC(evt_bero_exec_onoff);
+USER_FUNC(evt_bero_get_info_anime);
+USER_FUNC(evt_bero_get_info_kinddir);
+USER_FUNC(evt_bero_get_info_length);
+USER_FUNC(evt_bero_get_info_num);
+USER_FUNC(evt_bero_get_into_info);
+USER_FUNC(evt_bero_get_number);
+USER_FUNC(evt_bero_mapchange);
+USER_FUNC(evt_bero_mario_go);
+USER_FUNC(evt_bero_mario_go_init);
+USER_FUNC(evt_bero_mario_go_wait);
+USER_FUNC(evt_bero_move_mario_speed);
+USER_FUNC(evt_bero_read_mario_pera);
+USER_FUNC(evt_bero_set_now_number);
+USER_FUNC(evt_bero_switch_off);
+USER_FUNC(evt_bero_switch_on);
+USER_FUNC(evt_cam3d_evt_off);
+USER_FUNC(evt_cam_road_reset);
+USER_FUNC(evt_cam_road_reset2);
+USER_FUNC(evt_camera_change_event_from_road);
+USER_FUNC(evt_del_case_evt);
+USER_FUNC(evt_fade_end_wait);
+USER_FUNC(evt_fade_set_mapchange_type);
+USER_FUNC(evt_hit_get_position);
+USER_FUNC(evt_hitobj_attr_onoff);
+USER_FUNC(evt_map_checkanim);
+USER_FUNC(evt_map_pauseanim);
+USER_FUNC(evt_map_playanim);
+USER_FUNC(evt_map_replayanim);
+USER_FUNC(evt_mapobj_rotate);
+USER_FUNC(evt_mario_bgmode_off);
+USER_FUNC(evt_mario_bgmode_on);
+USER_FUNC(evt_mario_cam_off);
+USER_FUNC(evt_mario_cam_on);
+USER_FUNC(evt_mario_cam_y_off);
+USER_FUNC(evt_mario_cont_onoff);
+USER_FUNC(evt_mario_dokan_end);
+USER_FUNC(evt_mario_dokan_prepare);
+USER_FUNC(evt_mario_get_mode);
+USER_FUNC(evt_mario_get_motion);
+USER_FUNC(evt_mario_get_pos);
+USER_FUNC(evt_mario_key_onoff);
+USER_FUNC(evt_mario_kill_party);
+USER_FUNC(evt_mario_mov_pos2);
+USER_FUNC(evt_mario_paper_pose_dokan);
+USER_FUNC(evt_mario_paper_pose_off);
+USER_FUNC(evt_mario_party_bero_move);
+USER_FUNC(evt_mario_set_dispdir);
+USER_FUNC(evt_mario_set_force_dir);
+USER_FUNC(evt_mario_set_pos);
+USER_FUNC(evt_mario_set_prev_party);
+USER_FUNC(evt_mario_set_prev_party_dokan);
+USER_FUNC(evt_mario_wait_landon);
+USER_FUNC(evt_npc_change_fbat_mode);
+USER_FUNC(evt_npc_start_for_event);
+USER_FUNC(evt_npc_stop_for_event);
+USER_FUNC(evt_party_run);
+USER_FUNC(evt_party_set_homing_dist);
+USER_FUNC(evt_party_set_pos);
+USER_FUNC(evt_party_stop);
+USER_FUNC(evt_run_case_evt_bero);
+USER_FUNC(evt_seq_wait);
+USER_FUNC(evt_snd_sfxon_3d);
+USER_FUNC(evt_sub_get_system_flag);
+USER_FUNC(evt_sub_intpl_msec_get_value_para);
+USER_FUNC(evt_sub_intpl_msec_init);
+USER_FUNC(evt_bero_overwrite);
+USER_FUNC(evt_bero_id_filter);
+USER_FUNC(evt_bero_get_info);
+USER_FUNC(evt_bero_get_now_number);
+USER_FUNC(evt_bero_get_info_nextarea);
+USER_FUNC(evt_bero_get_end_position);
+USER_FUNC(evt_bero_get_start_position);
+USER_FUNC(evt_bero_exec_wait);
+USER_FUNC(evt_bero_get_entername);
+extern s32 bero_set_disp_position_pipe();
+extern s32 bero_null[];
+extern s32 default_entevt[];
+extern s32 default_outevt[];
+extern s32 evt_bero_info_run_none[];
+extern s32 evt_bero_info_run_gate[];
+extern s32 evt_bero_nonride_check[];
+extern s32 bero_open_door_play_se[];
+extern s32 bero_close_door_play_se[];
+extern s32 bero_play_enter_anime[];
+extern s32 bero_play_out_anime[];
+extern s32 bero_case_init_check[];
+extern s32 bero_case_exec_none[];
+extern s32 bero_case_exec_road[];
+extern s32 bero_case_exec_door[];
+extern s32 bero_case_exec_pipe_sub[];
+extern s32 bero_case_exec_pipe[];
+extern s32 bero_case_exec_gate[];
+extern s32 bero_case_entry[];
+extern s32 bero_case_entry_sub[];
+extern s32 bero_case_switch_on[];
+extern s32 bero_case_switch_off[];
+extern s32 evt_bero_info_run_road[];
+extern s32 evt_bero_info_run_door[];
+extern s32 evt_bero_info_run_pipe_sub00[];
+extern s32 evt_bero_info_run_pipe[];
+extern s32 evt_bero_info_run[];
+extern s32 evt_bero_initial_pos[];
+extern s32 evt_bero_mario_enter[];
+
+s32 bero_null[] = {
+    0, 251658240, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, 0, 0, 65537, 0, 0,
+};
+
+s32 default_entevt[] = {
+    131122, -30000000, 0, 2, 1,
+};
+
+s32 default_outevt[] = {
+    131122, -30000000, 0, 2, 1,
+};
+
+s32 evt_bero_info_run_none[] = {
+    131163, (s32)evt_mario_key_onoff, 1, 2, 1,
+};
+
+s32 evt_bero_info_run_gate[] = {
+    131163, (s32)evt_mario_key_onoff, 1, 2, 1,
+};
 
 
-
-EVT_END()
-
-EVT_BEGIN(evt_bero_info_run)
-CALL(evt_bero_get_into_info)
-
-
-EVT_END()
 
 //new in retail, f32* x, f32* y, f32* z
-USER_FUNC(evt_bero_set_reset_position) {
-	s32* args = event->args;
-	s32 x, y, z;
-
-	x = evtGetValue(event, args[0]);
-	y = evtGetValue(event, args[1]);
-	z = evtGetValue(event, args[2]);
-	marioSetBottomlessResetPosition((f32)x, (f32)y, (f32)z);
-	return EVT_RETURN_DONE;
-}
-
 //new in retail, no args
 extern void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z);
 
@@ -74,12 +188,6 @@ USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry) {
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos) {
 	MarioWork* wp = marioGetPtr();
 	N_marioSetBottomlessRespawnPosOnBeroEntry(wp->position.x, wp->position.y, wp->position.z);
-	return EVT_RETURN_DONE;
-}
-
-USER_FUNC(evt_bero_set_reset_position_current) {
-	MarioWork* wp = marioGetPtr();
-	marioSetBottomlessResetPosition(wp->position.x, wp->position.y, wp->position.z);
 	return EVT_RETURN_DONE;
 }
 
@@ -294,14 +402,16 @@ USER_FUNC(evt_bero_get_now_number) {
 }
 
 USER_FUNC(evt_bero_get_info) {
-	BeroEntry** table = BeroINFOARR;
+	BeroEntry** table;
+	s32 i;
 	BeroEntry* entry;
 	HitEntry* hit;
 	s32* switches;
 	s32 val;
-	s32 i;
 
-	table[0]=table[1]=table[2]=table[3]=table[4]=table[5]=table[6]=table[7]=table[8]=table[9]=table[10]=table[11]=table[12]=table[13]=table[14]=table[15]=NULL;
+	table = BeroINFOARR;
+	i = 0;
+	table[0] = table[1] = table[2] = table[3] = table[4] = table[5] = table[6] = table[7] = table[8] = table[9] = table[10] = table[11] = table[12] = table[13] = table[14] = table[15] = NULL;
 	
 	for (entry = (BeroEntry*)event->lwData[0];; entry++) {
 		hit = hitNameToPtr(entry->hitName);
@@ -335,6 +445,146 @@ extern void N_marioReloadMapOnBottomlessOn(void);
 extern double sin(double);
 extern double cos(double);
 
+static inline s32 bero_get_kind(BeroEntry* bero) {
+	u32 i;
+	const char* dirs[8] = {"n_", "ne_", "e_", "se_", "s_", "sw_", "w_", "nw_"};
+	s32 kind = bero->kinddirArg3;
+	switch (kind) {
+	case 20000:
+		if (kind == 10000) {
+			kind = 10000;
+		} else {
+		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+			case 0:
+			case 1:
+				for (i = 0; i < 8; i++) {
+					if (!strncmp(dirs[i], bero->hitName, strlen(dirs[i]))) {
+						break;
+					}
+				}
+				break;
+			default:
+				i = 10000;
+				break;
+		}
+		kind = i;
+		}
+		break;
+	}
+	return kind;
+}
+
+USER_FUNC(evt_bero_get_into_info) {
+	s32 i;
+	BeroEntry* bero;
+	s32* evt;
+	BeroEntry** table;
+
+	for (i = 0;; i++) {
+		bero = BeroINFOARR[i];
+		if (!bero || !strcmp(gp->beroEnterName, "")) {
+			i = 0;
+			bero = (BeroEntry*)bero_null;
+			break;
+		}
+		if (!strcmp(bero->hitName, gp->beroEnterName)) break;
+	}
+	if ((gp->flags & 2) && !strcmp(gp->beroEnterName, "")) {
+		bero = BeroINFOARR[0];
+		event->lwData[1] = 0;
+		event->lwData[2] = BeroNUM;
+		event->lwData[3] = (s32)bero->hitName;
+		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[5] = bero_get_kind(bero);
+		event->lwData[6] = (s32)&bero->field_0xC;
+		evt = bero->enterEvent;
+		if (!evt) evt = default_entevt;
+		event->lwData[7] = (s32)evt;
+		event->lwData[8] = 0xFFFF0000;
+		return EVT_RETURN_DONE;
+	} else {
+		event->lwData[1] = i;
+		event->lwData[2] = BeroNUM;
+		event->lwData[3] = (s32)gp->beroEnterName;
+		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[5] = bero_get_kind(bero);
+		event->lwData[6] = (s32)&bero->field_0xC;
+		evt = bero->enterEvent;
+		if (!evt) evt = default_entevt;
+		event->lwData[7] = (s32)evt;
+		event->lwData[8] = 0xFFFF0000;
+		return EVT_RETURN_DONE;
+	}
+}
+
+extern BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
+
+USER_FUNC(evt_bero_read_mario_pera) {
+	if (isFirstCall) {
+		event->userdata[0] = 0;
+	}
+	switch (event->userdata[0]) {
+		case 0:
+			if (animGroupBaseAsync("p_dokan_x", 0, NULL)) {
+				event->userdata[0] = 1;
+			}
+			break;
+		case 1:
+			if (animGroupBaseAsync("p_dokan_y\0\0", 0, NULL)) {
+				event->userdata[0] = 100;
+			}
+			break;
+		case 2:
+			break;
+		default:
+			break;
+	}
+	return event->userdata[0] == 100 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(evt_bero_id_filter) {
+	s32* args = event->args;
+	evtSetValue(event, args[0], bero_id_filter(evtGetValue(event, args[0])));
+	return EVT_RETURN_DONE;
+}
+
+USER_FUNC(evt_bero_get_info_num) {
+	s32* args = event->args;
+	s32 id = evtGetValue(event, args[0]);
+	BeroEntry* bero = BeroINFOARR[id];
+	s32 kind;
+	s32* evt;
+
+	event->lwData[3] = (s32)bero->hitName;
+	event->lwData[4] = *(u16*)&bero->kinddirArg1;
+	event->lwData[5] = bero_get_kind(bero);
+	event->lwData[6] = (s32)&bero->field_0xC;
+	evt = bero->enterEvent;
+	if (!evt) evt = default_entevt;
+	event->lwData[7] = (s32)evt;
+	event->lwData[8] = 0xFFFF0000;
+	event->lwData[9] = BeroSW[id];
+	event->lwData[10] = bero->field_0x20;
+	if (bero->field_0x20 == -1) {
+		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+			case 0xF00: event->lwData[10] = 0; break;
+			case 0: event->lwData[10] = 10; break;
+			case 1: event->lwData[10] = 9; break;
+			case 2: event->lwData[10] = 4; break;
+			case 3: event->lwData[10] = 7; break;
+		}
+	}
+	evt = bero->exitEvent;
+	if (!evt) evt = default_outevt;
+	event->lwData[11] = (s32)evt;
+	event->lwData[12] = 0xFFFF0000;
+	event->lwData[13] = bero->nextareaArg1;
+	event->lwData[14] = (s32)bero->nextareaArg2;
+	return EVT_RETURN_DONE;
+}
+
+
+
 USER_FUNC(bero_get_position_normal) {
 	s32* args = event->args;
 	MarioWork* wp = marioGetPtr();
@@ -361,14 +611,15 @@ USER_FUNC(bero_get_position_normal) {
 		f32 rad;
 		hz = hy = hx = 0.0f;
 		dist = 1000000.0f;
-		deg = 360.0f * angle * 0.125f;
+		deg = angle * 360.0f * 0.125f;
 		if (dir == 1) {
 			deg += 180.0f;
 		}
-		rad = 6.2832f * deg / 360.0f;
-		tmp.y = start.y;
+		rad = 6.2831855f * deg / 360.0f;
 		tmp.x = start.x - 30.0f * (f32)sin(rad);
-		tmp.z = start.z - 30.0f * -(f32)cos(rad);
+		tmp.y = start.y;
+		{ f32 c0 = (f32)cos(rad);
+		tmp.z = start.z - 30.0f * -c0; }
 		dist = 1000000.0f;
 		if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f)) {
 			tmp.y = hy;
@@ -493,11 +744,254 @@ USER_FUNC(bero_get_position_pipe2) {
 	return EVT_RETURN_DONE;
 }
 
+EVT_BEGIN(evt_bero_nonride_check)
+    IF_INT_NOT_EQUAL(LW(10), 6)
+        SET_VALUE(LW(0), LW(3))
+        CALL_CHILD(PTR(bero_case_switch_on))
+        RETURN
+    END_IF
+    LOOP(0)
+        CALL(evt_mario_get_motion, LW(0))
+        IF_INT_EQUAL(LW(0), 3)
+            BREAK_LOOP
+        END_IF
+        IF_INT_EQUAL(LW(0), 10)
+            BREAK_LOOP
+        END_IF
+        WAIT_FRAMES(1)
+    END_LOOP
+    DEBUG_PUT_MSG(STRING("土管から降りた"))
+    SET_VALUE(LW(0), LW(3))
+    CALL_CHILD(PTR(bero_case_switch_on))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_open_door_play_se)
+    CALL(evt_bero_get_info_num, LW(1))
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 0)
+    IF_INT_NOT_EQUAL(LW(3), 0)
+        CALL(evt_hit_get_position, LW(3), LW(4), LW(5), LW(6))
+    END_IF
+    CALL(evt_bero_get_info_kinddir, LW(1), LW(10), LW(11), LW(12))
+    SWITCH(LW(11))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(2)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(3)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(4)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_WOOD3"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(5)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_IRON1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(6)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_IRON2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(7)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_GRILLE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(8)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(9)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_TURN1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(10)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_ELEC1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(11)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_STONE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(12)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_CASTLE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(13)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_CASTLE2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(14)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_METAL1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(15)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AUTO_DOOR1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(16)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_LOCKER_OPEN1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(17)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_SLIDE1_3"), LW(4), LW(5), LW(6), 0)
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_close_door_play_se)
+    CALL(evt_bero_get_info_num, LW(1))
+    SET_VALUE(LW(4), 0)
+    SET_VALUE(LW(5), 0)
+    SET_VALUE(LW(6), 0)
+    IF_INT_NOT_EQUAL(LW(3), 0)
+        CALL(evt_hit_get_position, LW(3), LW(4), LW(5), LW(6))
+    END_IF
+    CALL(evt_bero_get_info_kinddir, LW(1), LW(10), LW(11), LW(12))
+    SWITCH(LW(11))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(2)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(3)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(4)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_WOOD2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(5)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_IRON1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(6)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_IRON2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(7)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_GRILLE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(8)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(9)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_TURN1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(10)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_ELEC1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(11)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_OPEN_STONE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(12)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_CASTLE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(13)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_CASTLE2"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(14)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_METAL1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(15)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_AUTO_DOOR1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(16)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_STG3_LOCKER_CLOSE1"), LW(4), LW(5), LW(6), 0)
+        CASE_EQUAL(17)
+        CALL(evt_snd_sfxon_3d, STRING("SFX_DOOR_SHUT_SLIDE1_3"), LW(4), LW(5), LW(6), 0)
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_play_enter_anime)
+    CALL(evt_bero_get_info_anime, LW(1), LW(10), LW(11), LW(12), LW(13))
+    SWITCH(LW(10))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        BEGIN_INLINE_EVENT
+            WAIT_MS(200)
+            CALL(evt_bero_mario_go)
+        END_INLINE_EVENT
+        IF_INT_NOT_EQUAL(LW(12), 0)
+            CALL(evt_map_playanim, LW(12), 0, 0)
+            CALL(evt_map_pauseanim, 0, LW(12))
+            WAIT_MS(700)
+            SPAWN_EVENT(PTR(bero_close_door_play_se))
+            CALL(evt_map_replayanim, 0, LW(12))
+        END_IF
+        CASE_EQUAL(2)
+        IF_INT_EQUAL(LW(12), 0)
+            BREAK_SWITCH
+        END_IF
+        SET_VALUE(LW(8), LW(12))
+        CALL(evt_mapobj_rotate, 1, LW(8), 0, -80, 0)
+        CALL(evt_bero_mario_go)
+        WAIT_MS(500)
+        SPAWN_EVENT(PTR(bero_close_door_play_se))
+        CALL(evt_sub_intpl_msec_init, 11, -80, 0, 500)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+            CALL(evt_mapobj_rotate, 1, LW(8), 0, LW(0), 0)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CASE_EQUAL(4)
+        IF_INT_NOT_EQUAL(LW(12), 0)
+            SPAWN_EVENT(LW(12))
+        END_IF
+        CASE_EQUAL(5)
+        IF_INT_NOT_EQUAL(LW(12), 0)
+            SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
+            CALL_CHILD(LW(12))
+            CALL(evt_bero_mario_go)
+            WAIT_MS(500)
+            SPAWN_EVENT(PTR(bero_close_door_play_se))
+            SET_VALUE(LW(9), LW(12))
+            CALL(evt_sub_intpl_msec_init, 11, 180, 0, 500)
+            LOOP(0)
+                CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
+                IF_INT_EQUAL(LW(10), 0)
+                    SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+                    CALL_CHILD(LW(9))
+                    BREAK_LOOP
+                    ELSE
+                    CALL_CHILD(LW(9))
+                END_IF
+            END_LOOP
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_play_out_anime)
+    CALL(evt_bero_get_info_anime, LW(1), LW(10), LW(11), LW(12), LW(13))
+    SWITCH(LW(11))
+        CASE_EQUAL(0)
+        CASE_EQUAL(1)
+        IF_INT_NOT_EQUAL(LW(13), 0)
+            SPAWN_EVENT(PTR(bero_open_door_play_se))
+            CALL(evt_map_playanim, LW(13), 0, 0)
+            BEGIN_INLINE_EVENT
+                CALL(evt_map_checkanim, LW(13), LW(8), LW(9))
+                WAIT_MS(LW(9))
+                CALL(evt_bero_mario_go)
+            END_INLINE_EVENT
+            ELSE
+            BEGIN_INLINE_EVENT
+                WAIT_MS(500)
+                CALL(evt_bero_mario_go)
+            END_INLINE_EVENT
+        END_IF
+        CASE_EQUAL(2)
+        IF_INT_EQUAL(LW(12), 0)
+            BREAK_SWITCH
+        END_IF
+        SET_VALUE(LW(8), LW(12))
+        SPAWN_EVENT(PTR(bero_open_door_play_se))
+        CALL(evt_sub_intpl_msec_init, 11, 0, 80, 500)
+        LOOP(0)
+            CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(1))
+            CALL(evt_mapobj_rotate, 1, LW(8), 0, LW(0), 0)
+            IF_INT_EQUAL(LW(1), 0)
+                BREAK_LOOP
+            END_IF
+            WAIT_FRAMES(1)
+        END_LOOP
+        CALL(evt_bero_mario_go)
+        CASE_EQUAL(4)
+        IF_INT_NOT_EQUAL(LW(13), 0)
+            SPAWN_EVENT(LW(13))
+        END_IF
+        CASE_EQUAL(5)
+        IF_INT_NOT_EQUAL(LW(13), 0)
+            SPAWN_EVENT(PTR(bero_open_door_play_se))
+            SET_VALUE(LW(9), LW(13))
+            CALL(evt_sub_intpl_msec_init, 11, 0, 180, 500)
+            LOOP(0)
+                CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
+                IF_INT_EQUAL(LW(10), 0)
+                    SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
+                    CALL_CHILD(LW(9))
+                    BREAK_LOOP
+                    ELSE
+                    CALL_CHILD(LW(9))
+                END_IF
+            END_LOOP
+            CALL(evt_bero_mario_go)
+        END_IF
+    END_SWITCH
+    RETURN
+EVT_END()
+
+
 typedef struct { u8 pad[0xac]; u32 flags; s32 kind; } BeroPipeInfo;
 
 s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 	switch (info->kind) {
-		case 2: case 3: case 4: case 5:
+		case 2: case 6:
 			if (!(info->flags & 0x1000)) {
 				marioGetPtr()->field_0x98.y += 3.0f;
 				marioGetPtr()->field_0x98.z -= 15.0f;
@@ -637,166 +1131,6 @@ USER_FUNC(evt_bero_disppos_load) {
 	return EVT_RETURN_DONE;
 }
 
-extern BeroEntry bero_null;
-extern s32 default_entevt[1];
-
-static inline s32 bero_get_kind(BeroEntry* bero) {
-	const char* dirs[8] = {"n_", "ne_", "e_", "se_", "s_", "sw_", "w_", "nw_"};
-	u32 i;
-	s32 kind = bero->kinddirArg3;
-	switch (kind) {
-	case 20000:
-		if (kind == 10000) {
-			kind = 10000;
-		} else {
-		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
-			case 0:
-			case 1:
-				for (i = 0; i < 8; i++) {
-					if (!strncmp(dirs[i], bero->hitName, strlen(dirs[i]))) {
-						break;
-					}
-				}
-				break;
-			default:
-				i = 10000;
-				break;
-		}
-		kind = i;
-		}
-		break;
-	}
-	return kind;
-}
-
-USER_FUNC(evt_bero_get_into_info) {
-	s32 i;
-	BeroEntry* bero;
-	s32* evt;
-	BeroEntry** table;
-
-	for (i = 0;; i++) {
-		bero = BeroINFOARR[i];
-		if (!bero || !strcmp(gp->beroEnterName, "")) {
-			i = 0;
-			bero = &bero_null;
-			break;
-		}
-		if (!strcmp(bero->hitName, gp->beroEnterName)) break;
-	}
-	if ((gp->flags & 2) && !strcmp(gp->beroEnterName, "")) {
-		bero = BeroINFOARR[0];
-		event->lwData[1] = 0;
-		event->lwData[2] = BeroNUM;
-		event->lwData[3] = (s32)bero->hitName;
-		event->lwData[4] = *(u16*)&bero->kinddirArg1;
-		event->lwData[5] = bero_get_kind(bero);
-		event->lwData[6] = (s32)&bero->field_0xC;
-		evt = bero->enterEvent;
-		if (!evt) evt = default_entevt;
-		event->lwData[7] = (s32)evt;
-		event->lwData[8] = 0xFFFF0000;
-		return EVT_RETURN_DONE;
-	} else {
-		event->lwData[1] = i;
-		event->lwData[2] = BeroNUM;
-		event->lwData[3] = (s32)gp->beroEnterName;
-		event->lwData[4] = *(u16*)&bero->kinddirArg1;
-		event->lwData[5] = bero_get_kind(bero);
-		event->lwData[6] = (s32)&bero->field_0xC;
-		evt = bero->enterEvent;
-		if (!evt) evt = default_entevt;
-		event->lwData[7] = (s32)evt;
-		event->lwData[8] = 0xFFFF0000;
-		return EVT_RETURN_DONE;
-	}
-}
-
-extern BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
-
-USER_FUNC(evt_bero_read_mario_pera) {
-	if (isFirstCall) {
-		event->userdata[0] = 0;
-	}
-	switch (event->userdata[0]) {
-		case 0:
-			if (animGroupBaseAsync("p_dokan_x", 0, NULL)) {
-				event->userdata[0] = 1;
-			}
-			break;
-		case 1:
-			if (animGroupBaseAsync("p_dokan_y", 0, NULL)) {
-				event->userdata[0] = 100;
-			}
-			break;
-	}
-	return event->userdata[0] == 100 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(evt_bero_id_filter) {
-	s32* args = event->args;
-	evtSetValue(event, args[0], bero_id_filter(evtGetValue(event, args[0])));
-	return EVT_RETURN_DONE;
-}
-
-
-extern s32 default_outevt[1];
-
-USER_FUNC(evt_bero_get_info_num) {
-	s32* args = event->args;
-	s32 id = evtGetValue(event, args[0]);
-	BeroEntry* bero = BeroINFOARR[id];
-	const char* dirs[8] = {"n_", "ne_", "e_", "se_", "s_", "sw_", "w_", "nw_"};
-	s32 kind;
-	s32* evt;
-
-	event->lwData[3] = (s32)bero->hitName;
-	event->lwData[4] = *(u16*)&bero->kinddirArg1;
-	kind = bero->kinddirArg3;
-	switch (kind) {
-	case 20000:
-		if (kind == 10000) {
-			kind = 10000;
-		} else switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
-			case 0:
-			case 1:
-				for (kind = 0; (u32)kind < 8; kind++) {
-					if (!strncmp(dirs[kind], bero->hitName, strlen(dirs[kind]))) {
-						break;
-					}
-				}
-				break;
-			default:
-				kind = 10000;
-				break;
-		}
-		break;
-	}
-	event->lwData[5] = kind;
-	event->lwData[6] = (s32)&bero->field_0xC;
-	evt = bero->enterEvent;
-	if (!evt) evt = default_entevt;
-	event->lwData[7] = (s32)evt;
-	event->lwData[8] = 0xFFFF0000;
-	event->lwData[9] = BeroSW[id];
-	event->lwData[10] = bero->field_0x20;
-	if (bero->field_0x20 == -1) {
-		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
-			case 0xF00: event->lwData[10] = 0; break;
-			case 0: event->lwData[10] = 10; break;
-			case 1: event->lwData[10] = 9; break;
-			case 2: event->lwData[10] = 4; break;
-			case 3: event->lwData[10] = 7; break;
-		}
-	}
-	evt = bero->exitEvent;
-	if (!evt) evt = default_outevt;
-	event->lwData[11] = (s32)evt;
-	event->lwData[12] = 0xFFFF0000;
-	event->lwData[13] = bero->nextareaArg1;
-	event->lwData[14] = (s32)bero->nextareaArg2;
-	return EVT_RETURN_DONE;
-}
 
 #include "system.h"
 extern double sin(double);
@@ -806,14 +1140,14 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	s32* args = event->args;
 	f32 speed = evtGetFloat(event, args[0]);
 	OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
-	f32 angle, s, c, dx, dy, dist, dist2;
+	f32 dx, dy, s, c, angle, dist, dist2;
 	s32 xdone, ydone;
 
 	if (isFirstCall) {
 		event->savedTime = now;
 	}
 	speed = sysFrame2SecFloat(speed);
-	angle = 6.2832f * reviseAngle(angleABf(BeroSX, BeroSY, BeroEX, BeroEY)) / 360.0f;
+	angle = 6.2831855f * reviseAngle(angleABf(BeroSX, BeroSY, BeroEX, BeroEY)) / 360.0f;
 	s = sin(angle);
 	c = cos(angle);
 	dist = speed * (f32)sysMsec2Frame((s32)(((s32)now - (s32)event->savedTime) / (u64)((*(u32*)0x800000F8 / 4) / 1000)));
@@ -821,8 +1155,8 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	dy = -(speed * c);
 	dist2 = s * dist;
 	marioGetPtr()->position.x = BeroSX + dist2;
-	dist2 = c * dist;
-	marioGetPtr()->position.y = BeroSY + -dist2;
+	dist2 = -(c * dist);
+	marioGetPtr()->position.y = BeroSY + dist2;
 	marioGetPtr()->position.z = BeroSZ;
 	xdone = 0;
 	if (dx >= 0.0f && BeroEX <= marioGetPtr()->position.x) xdone = 1;
@@ -937,3 +1271,690 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	}
 	return EVT_RETURN_DONE;
 }
+
+EVT_BEGIN(bero_case_init_check)
+    CALL(evt_bero_exec_onoff, 1, 65536)
+    CALL(evt_bero_exec_get, LW(0))
+    AND_RAW(LW(0), 1)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        SET_VALUE(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_npc_change_fbat_mode, 7)
+    CALL(evt_npc_stop_for_event)
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4095)
+    SWITCH(LW(0))
+        CASE_OR_EQUAL(0)
+        CASE_OR_EQUAL(1)
+        CALL(evt_bero_get_info_length, LW(1), LW(0))
+        CALL(bero_get_position_normal, 0, LW(0))
+        CASE_END
+        CASE_OR_EQUAL(3840)
+        CASE_OR_EQUAL(3)
+        CALL(bero_get_position_normal, 0, FLOAT(0.0f))
+        CASE_END
+        CASE_EQUAL(2)
+        CALL(evt_bero_get_info_length, LW(1), LW(0))
+        CALL(bero_get_position_pipe_pure, 0, LW(0))
+    END_SWITCH
+    CALL(evt_bero_set_now_number, LW(1))
+    CALL(evt_bero_exec_onoff, 0, 1)
+    SET_VALUE(LW(15), 0)
+    CALL_CHILD(LW(11))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_npc_change_fbat_mode, 1)
+        CALL(evt_npc_start_for_event)
+        CALL(evt_bero_exec_onoff, 0, 65536)
+        CALL(evt_bero_exec_onoff, 1, 1)
+        SET_VALUE(LW(0), 1)
+        RETURN
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_none)
+    CALL(evt_mario_key_onoff, 0)
+    CALL_CHILD(PTR(bero_case_init_check))
+    CALL(evt_mario_key_onoff, 1)
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_bero_exec_onoff, 0, 65536)
+    CALL(evt_bero_exec_onoff, 1, 1)
+    CALL(evt_bero_exec_onoff, 0, 8)
+    WAIT_FRAMES(2)
+    CALL(evt_bero_1stcheck, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_bero_mapchange, LW(13), LW(14))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_road)
+    CALL(evt_mario_key_onoff, 0)
+    CALL_CHILD(PTR(bero_case_init_check))
+    CALL(evt_mario_key_onoff, 1)
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), LW(5))
+        MULTIPLY(LW(0), 45)
+        CALL(evt_mario_set_force_dir, LW(0))
+        CALL(evt_mario_wait_landon)
+        CALL(bero_get_position_normal, 0, FLOAT(150.0f))
+        PEEK_FLOAT(LW(10), PTR(&BeroEX))
+        PEEK_FLOAT(LW(12), PTR(&BeroEZ))
+        CALL(evt_mario_mov_pos2, LW(10), LW(12), FLOAT(150.0f))
+        CALL(evt_bero_exec_onoff, 0, 65536)
+        CALL(evt_bero_exec_onoff, 1, 1)
+    END_INLINE_EVENT
+    WAIT_MS(150)
+    CALL(evt_bero_exec_onoff, 0, 8)
+    WAIT_FRAMES(2)
+    CALL(evt_bero_1stcheck, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_bero_mapchange, LW(13), LW(14))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_door)
+    CALL(evt_mario_key_onoff, 0)
+    CALL_CHILD(PTR(bero_case_init_check))
+    CALL(evt_mario_key_onoff, 1)
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_hitobj_attr_onoff, 0, 1, LW(3), 8388608)
+    CALL(evt_bero_mario_go_init)
+    SPAWN_EVENT(PTR(bero_play_out_anime))
+    BEGIN_INLINE_EVENT
+        SET_VALUE(LW(0), LW(5))
+        MULTIPLY(LW(0), 45)
+        CALL(evt_mario_set_force_dir, LW(0))
+        CALL(evt_mario_wait_landon)
+        CALL(evt_bero_mario_go_wait)
+        CALL(bero_get_position_normal, 0, FLOAT(150.0f))
+        PEEK_FLOAT(LW(10), PTR(&BeroEX))
+        PEEK_FLOAT(LW(12), PTR(&BeroEZ))
+        CALL(evt_mario_mov_pos2, LW(10), LW(12), FLOAT(150.0f))
+        CALL(evt_bero_exec_onoff, 0, 65536)
+        CALL(evt_bero_exec_onoff, 1, 1)
+    END_INLINE_EVENT
+    CALL(evt_bero_mario_go_wait)
+    WAIT_MS(150)
+    CALL(evt_bero_exec_onoff, 0, 8)
+    WAIT_FRAMES(2)
+    CALL(evt_bero_1stcheck, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_bero_mapchange, LW(13), LW(14))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_pipe_sub)
+    BEGIN_INLINE_EVENT
+        CALL(evt_camera_change_event_from_road)
+    END_INLINE_EVENT
+    IF_INT_EQUAL(LW(13), 0)
+        BEGIN_INLINE_EVENT
+            SET_VALUE(LW(0), LW(4))
+            AND_RAW(LW(0), 4096)
+            IF_INT_EQUAL(LW(0), 0)
+                SET_VALUE(LF(0), 0)
+                ELSE
+                SET_VALUE(LF(0), 1)
+            END_IF
+            CALL(evt_bero_get_number, LW(14))
+            CALL(evt_bero_set_now_number, LW(1))
+            CALL(evt_bero_get_info_num, LW(1))
+            SET_VALUE(LW(0), LW(4))
+            AND_RAW(LW(0), 4096)
+            IF_INT_EQUAL(LW(0), 0)
+                SET_VALUE(LF(1), 0)
+                ELSE
+                SET_VALUE(LF(1), 1)
+            END_IF
+            SET_VALUE(LF(2), 0)
+            IF_INT_EQUAL(LF(0), 0)
+                IF_INT_EQUAL(LF(1), 1)
+                    SET_VALUE(LF(2), 1)
+                END_IF
+            END_IF
+            IF_INT_EQUAL(LF(2), 0)
+                POKE_INT(0, PTR(&BeroCAM))
+                CALL(evt_bero_get_info_length, LW(1), LW(10))
+                CALL(bero_get_position_pipe2, 1, LW(10))
+                LOOP(0)
+                    PEEK_INT(LW(0), PTR(&BeroCAM))
+                    IF_INT_EQUAL(LW(0), 1)
+                        BREAK_LOOP
+                    END_IF
+                    WAIT_FRAMES(1)
+                END_LOOP
+                CALL(evt_bero_cam3d_change, 500, 11)
+            END_IF
+        END_INLINE_EVENT
+    END_IF
+    CALL(evt_bero_disppos_save)
+    CALL(evt_bero_get_info_length, LW(1), LW(10))
+    CALL(bero_get_position_pipe_pure, 0, LW(10))
+    CALL(bero_set_disp_position_pipe)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_DOKAN1"), LW(0), LW(1), LW(2), 0)
+    SWITCH(LW(5))
+        CASE_EQUAL(6)
+        CALL(evt_mario_paper_pose_dokan, 5)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(2)
+        CALL(evt_mario_paper_pose_dokan, 5)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(8)
+        CALL(evt_mario_paper_pose_dokan, 2)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(9)
+        CALL(evt_mario_paper_pose_dokan, 3)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+    END_SWITCH
+    POKE_INT(1, PTR(&BeroCAM))
+    IF_INT_EQUAL(LW(13), 0)
+        SET_VALUE(LW(0), LW(4))
+        AND_RAW(LW(0), 4096)
+        IF_INT_EQUAL(LW(0), 0)
+            SET_VALUE(LF(0), 0)
+            ELSE
+            SET_VALUE(LF(0), 1)
+        END_IF
+        WAIT_MS(500)
+        CALL(evt_bero_get_number, LW(14))
+        CALL(evt_bero_get_info_num, LW(1))
+        CALL_CHILD(LW(7))
+        SET_VALUE(LW(0), LW(4))
+        AND_RAW(LW(0), 4096)
+        IF_INT_EQUAL(LW(0), 0)
+            SET_VALUE(LF(1), 0)
+            ELSE
+            SET_VALUE(LF(1), 1)
+        END_IF
+        CALL(evt_bero_disppos_load)
+        CALL(evt_mario_paper_pose_off)
+        CALL(evt_bero_disppos_save)
+        CALL(evt_bero_exec_get, LW(0))
+        IF_BITS_CLEAR(LW(0), 4)
+            CALL(evt_bero_exec_onoff, 0, 2)
+        END_IF
+        CALL(evt_bero_get_info_length, LW(1), LW(10))
+        CALL(bero_get_position_pipe_pure, 1, LW(10))
+        CALL(bero_set_disp_position_pipe)
+        WAIT_MS(500)
+        IF_INT_NOT_EQUAL(LF(1), 0)
+            CALL(evt_mario_bgmode_on)
+            ELSE
+            CALL(evt_mario_bgmode_off)
+        END_IF
+        PEEK_FLOAT(LW(0), PTR(&BeroEX))
+        PEEK_FLOAT(LW(1), PTR(&BeroEY))
+        PEEK_FLOAT(LW(2), PTR(&BeroEZ))
+        CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_DOKAN1"), LW(0), LW(1), LW(2), 0)
+        CALL_CHILD(PTR(evt_bero_info_run_pipe_sub00))
+        CALL(evt_bero_exec_get, LW(0))
+        IF_BITS_CLEAR(LW(0), 4)
+            CALL(evt_bero_exec_onoff, 1, 2)
+        END_IF
+        CALL(evt_bero_disppos_load)
+        CALL(evt_mario_cont_onoff, 1)
+        CALL(evt_mario_key_onoff, 1)
+        SET_VALUE(LW(0), LW(3))
+        CALL_CHILD(PTR(bero_case_switch_off))
+        SPAWN_EVENT(PTR(evt_bero_nonride_check))
+        CALL(evt_bero_cam_shift_init)
+        CALL(evt_cam3d_evt_off, 500, 11)
+        ELSE
+        CALL(evt_bero_disppos_load)
+        CALL(evt_mario_paper_pose_off)
+        SET_VALUE(LW(0), LW(4))
+        AND_RAW(LW(0), 4096)
+        IF_INT_NOT_EQUAL(LW(0), 0)
+            CALL(evt_mario_bgmode_on)
+            ELSE
+            CALL(evt_mario_bgmode_off)
+        END_IF
+    END_IF
+    CALL(evt_npc_change_fbat_mode, 1)
+    CALL(evt_npc_start_for_event)
+    CALL(evt_bero_exec_onoff, 0, 65536)
+    CALL(evt_bero_exec_onoff, 1, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_pipe)
+    CALL(evt_mario_get_mode, LW(0))
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL_CHILD(PTR(bero_case_init_check))
+    CALL(evt_mario_key_onoff, 1)
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_mario_wait_landon)
+    CALL(evt_mario_cont_onoff, 0)
+    IF_INT_EQUAL(LW(13), 0)
+        SPAWN_EVENT(PTR(bero_case_exec_pipe_sub))
+        RETURN
+    END_IF
+    CALL(evt_mario_cam_off)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_DOKAN1"), LW(0), LW(1), LW(2), 0)
+    SWITCH(LW(5))
+        CASE_EQUAL(6)
+        CALL(evt_mario_paper_pose_dokan, 5)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(2)
+        CALL(evt_mario_paper_pose_dokan, 5)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(8)
+        CALL(evt_mario_paper_pose_dokan, 2)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(9)
+        CALL(evt_mario_paper_pose_dokan, 3)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+    END_SWITCH
+    IF_BITS_CLEAR(LW(4), 8192)
+        SWITCH(LW(5))
+            CASE_EQUAL(6)
+            CALL(evt_fade_set_mapchange_type, 1, 45, 0, -1, -1)
+            CALL(evt_fade_set_mapchange_type, 0, 45, 0, -1, -1)
+            CASE_EQUAL(2)
+            CALL(evt_fade_set_mapchange_type, 1, 47, 0, -1, -1)
+            CALL(evt_fade_set_mapchange_type, 0, 47, 0, -1, -1)
+            CASE_EQUAL(8)
+            CALL(evt_fade_set_mapchange_type, 1, 41, 0, -1, -1)
+            CALL(evt_fade_set_mapchange_type, 0, 41, 0, -1, -1)
+            CASE_EQUAL(9)
+            CALL(evt_fade_set_mapchange_type, 1, 43, 0, -1, -1)
+            CALL(evt_fade_set_mapchange_type, 0, 43, 0, -1, -1)
+        END_SWITCH
+    END_IF
+    CALL(evt_bero_exec_onoff, 0, 8)
+    WAIT_FRAMES(2)
+    CALL(evt_bero_1stcheck, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_bero_mapchange, LW(13), LW(14))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_exec_gate)
+    CALL(evt_mario_key_onoff, 0)
+    CALL_CHILD(PTR(bero_case_init_check))
+    CALL(evt_mario_key_onoff, 1)
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_mario_key_onoff, 0)
+    CALL(evt_bero_exec_onoff, 0, 65536)
+    CALL(evt_bero_exec_onoff, 1, 1)
+    CALL(evt_bero_exec_onoff, 0, 8)
+    WAIT_FRAMES(2)
+    CALL(evt_bero_1stcheck, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        WAIT_MS(1000)
+    END_IF
+    CALL(evt_bero_mapchange, LW(13), LW(14))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_entry)
+    PEEK_INT(LW(2), PTR(&BeroNUM))
+    SET_VALUE(LW(1), 0)
+    LOOP(0)
+        CALL(evt_bero_get_info_num, LW(1))
+        IF_INT_EQUAL(LW(9), -1)
+            SET_VALUE(LW(0), LW(4))
+            AND_RAW(LW(0), 4095)
+            SWITCH(LW(0))
+                CASE_EQUAL(3840)
+                CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_none), LW(15))
+                CASE_EQUAL(0)
+                CALL(evt_hitobj_attr_onoff, 0, 1, LW(3), 8388608)
+                CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_road), LW(15))
+                CASE_EQUAL(1)
+                CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_door), LW(15))
+                CASE_EQUAL(2)
+                CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_pipe), LW(15))
+                CASE_EQUAL(3)
+                CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_gate), LW(15))
+            END_SWITCH
+            CALL(evt_bero_case_id_save, LW(1), LW(15))
+            BEGIN_INLINE_EVENT
+                CALL(evt_bero_switch_on, LW(1))
+            END_INLINE_EVENT
+        END_IF
+        ADD(LW(1), 1)
+        IF_INT_EQUAL(LW(1), LW(2))
+            BREAK_LOOP
+        END_IF
+    END_LOOP
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_entry_sub)
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4095)
+    SWITCH(LW(0))
+        CASE_EQUAL(3840)
+        CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_none), LW(15))
+        CASE_EQUAL(0)
+        CALL(evt_hitobj_attr_onoff, 0, 1, LW(3), 8388608)
+        CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_road), LW(15))
+        CASE_EQUAL(1)
+        CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_door), LW(15))
+        CASE_EQUAL(2)
+        CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_pipe), LW(15))
+        CASE_EQUAL(3)
+        CALL(evt_run_case_evt_bero, LW(10), 1, LW(3), 0, PTR(bero_case_exec_gate), LW(15))
+    END_SWITCH
+    CALL(evt_bero_case_id_save, LW(1), LW(15))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_switch_on)
+    CALL(evt_bero_switch_on, LW(0))
+    CALL(evt_bero_get_info_num, LW(1))
+    IF_INT_EQUAL(LW(0), 0)
+        DEBUG_PUT_MSG(STRING("ベロ登録"))
+        CALL_CHILD(PTR(bero_case_entry_sub))
+        ELSE
+        DEBUG_PUT_MSG(STRING("ベロの出て行くデータの二重登録防止をしています"))
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(bero_case_switch_off)
+    CALL(evt_bero_switch_off, LW(0))
+    CALL(evt_bero_get_info_num, LW(1))
+    IF_INT_EQUAL(LW(0), 0)
+        DEBUG_PUT_MSG(STRING("ベロ削除しました"))
+        CALL(evt_bero_case_id_load, LW(1), LW(15))
+        CALL(evt_del_case_evt, 0, LW(15))
+        CALL(evt_hitobj_attr_onoff, 0, 0, LW(3), 8388608)
+        ELSE
+        DEBUG_PUT_MSG(STRING("ベロの削除予約もしくはベロの出て行くデータの二重削除防止です"))
+    END_IF
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_info_run_road)
+    PEEK_FLOAT(LW(13), PTR(&BeroEX))
+    PEEK_FLOAT(LW(14), PTR(&BeroEY))
+    PEEK_FLOAT(LW(15), PTR(&BeroEZ))
+    CALL(evt_party_set_homing_dist, 0, FLOAT(20.0f))
+    CALL(evt_party_set_homing_dist, 1, FLOAT(20.0f))
+    CALL(evt_mario_mov_pos2, LW(13), LW(15), FLOAT(150.0f))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    CALL(evt_party_set_homing_dist, 0, FLOAT(50.0f))
+    CALL(evt_party_set_homing_dist, 1, FLOAT(50.0f))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_info_run_door)
+    CALL(evt_bero_mario_go_init)
+    SPAWN_EVENT(PTR(bero_play_enter_anime))
+    CALL(evt_bero_mario_go_wait)
+    PEEK_FLOAT(LW(13), PTR(&BeroEX))
+    PEEK_FLOAT(LW(14), PTR(&BeroEY))
+    PEEK_FLOAT(LW(15), PTR(&BeroEZ))
+    CALL(evt_party_set_homing_dist, 0, FLOAT(20.0f))
+    CALL(evt_party_set_homing_dist, 1, FLOAT(20.0f))
+    CALL(evt_mario_party_bero_move, LW(13), LW(15), FLOAT(150.0f))
+    CALL(evt_mario_key_onoff, 1)
+    CALL(evt_party_run, 0)
+    CALL(evt_party_run, 1)
+    CALL(evt_party_set_homing_dist, 0, FLOAT(50.0f))
+    CALL(evt_party_set_homing_dist, 1, FLOAT(50.0f))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_info_run_pipe_sub00)
+    CALL(evt_party_stop, 0)
+    CALL(evt_party_stop, 1)
+    SWITCH(LW(5))
+        CASE_EQUAL(6)
+        CALL(evt_mario_set_dispdir, 180)
+        CALL(evt_mario_paper_pose_dokan, 4)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(2)
+        CALL(evt_mario_set_dispdir, 0)
+        CALL(evt_mario_paper_pose_dokan, 4)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(9)
+        CALL(evt_mario_paper_pose_dokan, 1)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+        CASE_EQUAL(8)
+        CALL(evt_mario_paper_pose_dokan, 0)
+        CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+    END_SWITCH
+    CALL(evt_mario_dokan_end)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_info_run_pipe)
+    PEEK_FLOAT(LW(0), PTR(&BeroEX))
+    PEEK_FLOAT(LW(1), PTR(&BeroEY))
+    PEEK_FLOAT(LW(2), PTR(&BeroEZ))
+    CALL(evt_cam_road_reset2, LW(0), LW(1), LW(2))
+    CALL(evt_mario_cam_off)
+    CALL(evt_mario_cont_onoff, 0)
+    CALL(evt_fade_end_wait)
+    CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING("SFX_MARIO_DOKAN1"), LW(0), LW(1), LW(2), 0)
+    CALL_CHILD(PTR(evt_bero_info_run_pipe_sub00))
+    CALL(evt_mario_cont_onoff, 1)
+    SET_VALUE(LW(0), LW(3))
+    CALL_CHILD(PTR(bero_case_switch_off))
+    SPAWN_EVENT(PTR(evt_bero_nonride_check))
+    CALL(evt_mario_cam_on)
+    CALL(evt_mario_key_onoff, 1)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_info_run)
+    CALL(evt_bero_get_into_info)
+    CALL(evt_bero_set_now_number, LW(1))
+    CALL(evt_bero_read_mario_pera)
+    CALL(evt_sub_get_system_flag, LW(0))
+    IF_BITS_SET(LW(0), 1)
+        DEBUG_PUT_MSG(STRING("セーブブロックからのロード時の処理"))
+        CALL(evt_bero_exec_onoff, 0, 1)
+        WAIT_FRAMES(1)
+        CALL(evt_bero_exec_get, LW(0))
+        IF_BITS_CLEAR(LW(0), 4)
+            CALL(evt_bero_exec_onoff, 0, 2)
+        END_IF
+        WAIT_FRAMES(1)
+        CALL(evt_bero_exec_get, LW(0))
+        IF_BITS_CLEAR(LW(0), 4)
+            CALL(evt_bero_exec_onoff, 1, 2)
+        END_IF
+        CALL(evt_npc_change_fbat_mode, 1)
+        CALL(evt_npc_start_for_event)
+        CALL(evt_bero_exec_onoff, 1, 1)
+        CALL(evt_bero_exec_onoff, 0, 65536)
+        CALL_CHILD(PTR(bero_case_entry))
+        RETURN
+    END_IF
+    CALL(evt_bero_exec_get, LW(0))
+    IF_INT_EQUAL(LW(0), 1)
+        RETURN
+    END_IF
+    CALL(evt_bero_exec_onoff, 0, 1)
+    CALL(evt_mario_key_onoff, 0)
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4096)
+    IF_INT_NOT_EQUAL(LW(0), 0)
+        DEBUG_PUT_MSG(STRING("背景に入るときのマリオの初期処理"))
+        CALL(evt_mario_bgmode_on)
+        CALL(evt_mario_kill_party, 0)
+        CALL(evt_mario_kill_party, 1)
+        CALL(evt_mario_cam_y_off)
+        ELSE
+        DEBUG_PUT_MSG(STRING("普通に入るときのマリオの初期処理"))
+        CALL(evt_mario_bgmode_off)
+        SET_VALUE(LW(0), LW(4))
+        AND_RAW(LW(0), 4095)
+        IF_INT_EQUAL(LW(0), 2)
+            CALL(evt_mario_set_prev_party_dokan, 0)
+            CALL(evt_mario_set_prev_party_dokan, 1)
+            ELSE
+            CALL(evt_mario_set_prev_party, 0)
+            CALL(evt_mario_set_prev_party, 1)
+        END_IF
+    END_IF
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4095)
+    IF_INT_EQUAL(LW(0), 2)
+        SWITCH(LW(5))
+            CASE_EQUAL(6)
+            CALL(evt_mario_dokan_prepare, 4)
+            CASE_EQUAL(2)
+            CALL(evt_mario_dokan_prepare, 4)
+            CASE_EQUAL(9)
+            CALL(evt_mario_dokan_prepare, 1)
+            CASE_EQUAL(8)
+            CALL(evt_mario_dokan_prepare, 0)
+        END_SWITCH
+    END_IF
+    CALL_CHILD(PTR(evt_bero_initial_pos))
+    IF_BITS_CLEAR(LW(4), 8192)
+        SET_VALUE(LW(0), LW(4))
+        AND_RAW(LW(0), 4095)
+        IF_INT_EQUAL(LW(0), 2)
+            SWITCH(LW(5))
+                CASE_EQUAL(6)
+                CALL(evt_fade_set_mapchange_type, 1, -1, -1, 46, 0)
+                CALL(evt_fade_set_mapchange_type, 0, -1, -1, 46, 0)
+                CASE_EQUAL(2)
+                CALL(evt_fade_set_mapchange_type, 1, -1, -1, 48, 0)
+                CALL(evt_fade_set_mapchange_type, 0, -1, -1, 48, 0)
+                CASE_EQUAL(8)
+                CALL(evt_fade_set_mapchange_type, 1, -1, -1, 42, 0)
+                CALL(evt_fade_set_mapchange_type, 0, -1, -1, 42, 0)
+                CASE_EQUAL(9)
+                CALL(evt_fade_set_mapchange_type, 1, -1, -1, 44, 0)
+                CALL(evt_fade_set_mapchange_type, 0, -1, -1, 44, 0)
+            END_SWITCH
+        END_IF
+    END_IF
+    DEBUG_PUT_MSG(STRING("ほかの初期設定開始"))
+    SPAWN_EVENT(PTR(evt_bero_mario_enter))
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_initial_pos)
+    CALL(evt_bero_get_into_info)
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4095)
+    SWITCH(LW(0))
+        CASE_EQUAL(3840)
+        CASE_EQUAL(3)
+        CALL(bero_get_position_normal, 0, FLOAT(0.0f))
+        PEEK_FLOAT(LW(10), PTR(&BeroSX))
+        PEEK_FLOAT(LW(11), PTR(&BeroSY))
+        PEEK_FLOAT(LW(12), PTR(&BeroSZ))
+        CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
+        CASE_END
+        CASE_EQUAL(0)
+        CALL(evt_bero_get_info_length, LW(1), LW(10))
+        CALL(bero_get_position_normal, 1, LW(10))
+        PEEK_FLOAT(LW(10), PTR(&BeroSX))
+        PEEK_FLOAT(LW(11), PTR(&BeroSY))
+        PEEK_FLOAT(LW(12), PTR(&BeroSZ))
+        CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
+        CASE_EQUAL(1)
+        CALL(evt_bero_get_info_length, LW(1), LW(10))
+        CALL(bero_get_position_normal, 1, LW(10))
+        PEEK_FLOAT(LW(10), PTR(&BeroSX))
+        PEEK_FLOAT(LW(11), PTR(&BeroSY))
+        PEEK_FLOAT(LW(12), PTR(&BeroSZ))
+        CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
+        CASE_EQUAL(2)
+        CALL(evt_bero_get_info_length, LW(1), LW(10))
+        CALL(bero_get_position_pipe_pure, 1, LW(10))
+        PEEK_FLOAT(LW(10), PTR(&BeroSX))
+        PEEK_FLOAT(LW(11), PTR(&BeroSY))
+        PEEK_FLOAT(LW(12), PTR(&BeroSZ))
+        CALL(evt_mario_set_pos, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 0, LW(10), LW(11), LW(12))
+        CALL(evt_party_set_pos, 1, LW(10), LW(11), LW(12))
+    END_SWITCH
+    CALL(evt_cam_road_reset)
+    RETURN
+EVT_END()
+
+EVT_BEGIN(evt_bero_mario_enter)
+    CALL(evt_seq_wait, 2)
+    CALL(evt_npc_change_fbat_mode, 7)
+    CALL(evt_npc_stop_for_event)
+    CALL_CHILD(LW(7))
+    IF_INT_EQUAL(LW(0), 1)
+        CALL(evt_mario_key_onoff, 1)
+        GOTO(100)
+    END_IF
+    CALL(evt_bero_exec_get, LW(0))
+    IF_BITS_CLEAR(LW(0), 4)
+        CALL(evt_bero_exec_onoff, 0, 2)
+    END_IF
+    CALL(evt_bero_get_into_info)
+    SET_VALUE(LW(0), LW(4))
+    AND_RAW(LW(0), 4095)
+    SWITCH(LW(0))
+        CASE_EQUAL(3840)
+        CALL_CHILD(PTR(evt_bero_info_run_none))
+        CASE_EQUAL(0)
+        CALL_CHILD(PTR(evt_bero_info_run_road))
+        CASE_EQUAL(1)
+        CALL_CHILD(PTR(evt_bero_info_run_door))
+        CASE_EQUAL(2)
+        CALL_CHILD(PTR(evt_bero_info_run_pipe))
+        CASE_EQUAL(3)
+        CALL_CHILD(PTR(evt_bero_info_run_gate))
+        CASE_DEFAULT
+        CALL(evt_mario_key_onoff, 1)
+    END_SWITCH
+    CALL(evt_bero_exec_get, LW(0))
+    IF_BITS_CLEAR(LW(0), 4)
+        CALL(evt_bero_exec_onoff, 1, 2)
+    END_IF
+    LABEL(100)
+    CALL(evt_npc_change_fbat_mode, 1)
+    CALL(evt_npc_start_for_event)
+    CALL_CHILD(PTR(bero_case_entry))
+    CALL(evt_bero_exec_onoff, 1, 1)
+    CALL(evt_bero_exec_onoff, 0, 65536)
+    RETURN
+EVT_END()
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_8030DA24_data[1] = {0};
+
+#pragma force_active reset

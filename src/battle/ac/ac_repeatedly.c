@@ -341,7 +341,6 @@ void battleAcDelete_Repeatedly(BattleWork* work) {
 #pragma dont_inline reset
 
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
     RepeatWork* r;
     RepeatDisp* d;
     s32 odd;
@@ -349,10 +348,10 @@ static void actionCommandDisp(f32 x, f32 y) {
     u16 icon1, icon2;
     s32 flags;
     f32 target;
-    camGetPtr(8);
-    d = RD(_battleWorkPointer);
     r = RW(_battleWorkPointer);
-    if (ACP(work, 0x38, s32) != 16) {
+    d = RD(_battleWorkPointer);
+    camGetPtr(8);
+    if (*(s32*)((u8*)r - 0x2BC + 0x38) != 16) {
         switch (r->btn0) {
             case 0x100:
                 icon1 = 0x65;
@@ -456,7 +455,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         flags |= 2;
     }
     BattleAcDrawGauge((s32)x, (s32)y, d->gauge, r->iconParam, 2,
-                      (ACP(work, 0x34, s32) & 2) ? 100 : (s32)r->pos, 100, 100, flags);
+                      (*(s32*)((u8*)r - 0x2BC + 0x34) & 2) ? 100 : (s32)r->pos, 100, 100, flags);
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = (-288.0f + x) + (176.0f * r->pos) / 100.0f;
@@ -466,3 +465,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     d->frame++;
     d->frame2++;
 }
+
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_804117CC_sdata[5] = {0};
+#pragma force_active reset

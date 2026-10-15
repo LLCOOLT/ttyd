@@ -1,14 +1,35 @@
+#define MATH_NO_SQRT_HACK 1
+#define _MATH_H_
+#define SND3D_LISTENER_NO_ROOM 1
+#define SND3D_EMITTER_NO_ROOM 1
 #include "musyx/musyx.h"
 
 #include "musyx/hardware.h"
 #include "musyx/sal.h"
 #include "musyx/synth.h"
 
+#define S3D_DEFINE_SQRT(name)                    \
+  extern inline float name(float x) {            \
+    volatile float y;                            \
+    if (x > 0.0f) {                              \
+      double guess = __frsqrte((double)x);       \
+      guess = 0.5 * guess * (3.0 - guess * guess * x); \
+      guess = 0.5 * guess * (3.0 - guess * guess * x); \
+      guess = 0.5 * guess * (3.0 - guess * guess * x); \
+      y = (float)(x * guess);                    \
+      return y;                                  \
+    }                                            \
+    return x;                                    \
+  }
+S3D_DEFINE_SQRT(sqrtf)
+
 static u8 s3dCallCnt;
 static SND_EMITTER* s3dEmitterRoot;
 static SND_LISTENER* s3dListenerRoot;
+#ifdef SND3D_UNUSED /* dead-stripped from this game build */
 static SND_ROOM* s3dRoomRoot;
 static SND_DOOR* s3dDoorRoot;
+#endif
 static u32 snd_used_studios;
 static u8 snd_base_studio;
 static u8 snd_max_studios;
@@ -16,7 +37,8 @@ static u8 s3dUseMaxVoices;
 u8 s3dUseLegacyLogic;
 void (*s3dOcclusionCallback)(struct SND_EMITTER*, SND_FVECTOR*, SND_FVECTOR*, void*, SND_FVECTOR*, SND_FVECTOR*, f32*, f32*);
 
-static void UpdateRoomDistances() {
+#ifdef SND3D_UNUSED /* dead-stripped from this game build */
+static inline void UpdateRoomDistances() {
   struct SND_ROOM* r;      // r30
   struct SND_LISTENER* li; // r31
   float distance;          // f31
@@ -43,7 +65,7 @@ static void UpdateRoomDistances() {
   }
 }
 
-static void CheckRoomStatus() {
+static inline void CheckRoomStatus() {
   SND_LISTENER* li;   // r30
   SND_EMITTER* em;    // r28
   SND_ROOM* r;        // r27
@@ -170,7 +192,7 @@ static void CheckRoomStatus() {
   }
 }
 
-bool sndAddRoom(SND_ROOM* room, SND_FVECTOR* pos, void (*activateReverb)(u8 studio, void* user),
+static inline bool sndAddRoom(SND_ROOM* room, SND_FVECTOR* pos, void (*activateReverb)(u8 studio, void* user),
                 void (*deActivateReverb)(u8 studio)) {
   if (sndActive) {
     hwDisableIrq();
@@ -194,7 +216,7 @@ bool sndAddRoom(SND_ROOM* room, SND_FVECTOR* pos, void (*activateReverb)(u8 stud
   return FALSE;
 }
 
-bool sndRemoveRoom(SND_ROOM* room) {
+static inline bool sndRemoveRoom(SND_ROOM* room) {
   if (sndActive) {
     hwDisableIrq();
     if (room->prev != NULL) {
@@ -226,7 +248,7 @@ bool sndRemoveRoom(SND_ROOM* room) {
   return FALSE;
 }
 
-bool sndUpdateRoom(SND_ROOM* room, SND_FVECTOR* pos) {
+static inline bool sndUpdateRoom(SND_ROOM* room, SND_FVECTOR* pos) {
 
   if (sndActive) {
     hwDisableIrq();
@@ -238,7 +260,7 @@ bool sndUpdateRoom(SND_ROOM* room, SND_FVECTOR* pos) {
   return FALSE;
 }
 
-static void AddListener2Room(SND_ROOM* room) {
+static inline void AddListener2Room(SND_ROOM* room) {
   if (room->flags & 0x80000000) {
     return;
   }
@@ -250,7 +272,7 @@ static void AddListener2Room(SND_ROOM* room) {
   room->flags |= 0x80000000;
 }
 
-static void RemoveListenerFromRoom(SND_ROOM* room) {
+static inline void RemoveListenerFromRoom(SND_ROOM* room) {
   u32 n;            // r30
   SND_LISTENER* li; // r31
 
@@ -266,7 +288,7 @@ static void RemoveListenerFromRoom(SND_ROOM* room) {
   }
 }
 
-static void CalcDoorParameters(SND_DOOR* door) {
+static inline void CalcDoorParameters(SND_DOOR* door) {
   f32 f; // r1+0xC
   f32 v; // r63
   v = door->open;
@@ -276,7 +298,7 @@ static void CalcDoorParameters(SND_DOOR* door) {
   door->input.vol = v * 127.f;
 }
 
-static void CheckDoorStatus() {
+static inline void CheckDoorStatus() {
   SND_DOOR* door; // r31
 
   for (door = s3dDoorRoot; door != NULL; door = door->next) {
@@ -308,7 +330,7 @@ static void CheckDoorStatus() {
   }
 }
 
-bool sndAddDoor(SND_DOOR* door, SND_ROOM* a, SND_ROOM* b, SND_FVECTOR* pos, f32 dampen, f32 open,
+static inline bool sndAddDoor(SND_DOOR* door, SND_ROOM* a, SND_ROOM* b, SND_FVECTOR* pos, f32 dampen, f32 open,
                 unsigned char fxVol, s16 filterCoef[4], u32 flags) {
 
   hwDisableIrq();
@@ -330,7 +352,7 @@ bool sndAddDoor(SND_DOOR* door, SND_ROOM* a, SND_ROOM* b, SND_FVECTOR* pos, f32 
   return 1;
 }
 
-bool sndRemoveDoor(SND_DOOR* door) {
+static inline bool sndRemoveDoor(SND_DOOR* door) {
   hwDisableIrq();
   if (door->prev != NULL) {
     door->prev->next = door->next;
@@ -344,6 +366,7 @@ bool sndRemoveDoor(SND_DOOR* door) {
   return 1;
 }
 
+#endif
 static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPan, f32* yPan,
                         f32* zPan, f32* occl) {
   SND_LISTENER* li; // r31
@@ -397,6 +420,7 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
       }
 
       if (s3dUseLegacyLogic) {
+  long i;
         *vol += v1;
       } else if (*vol < v1) {
         *vol = v1;
@@ -478,22 +502,22 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
   }
 }
 
-static u8 clip127(u8 v) {
+static inline u8 clip127(u8 v) {
   if (v > 0x7f) {
     return 0x7f;
   }
   return v;
 }
 
-static u16 clip3FFF(u32 v) {
-  if (v > 0x3fff) {
+static inline u16 clip3FFF(f32 v) {
+  if (v > 16383.f) {
     return 0x3fff;
   }
-  return v;
+  return (u16)v;
 }
 
-static void SetFXParameters(SND_EMITTER* const em, f32 vol, f32 xPan, f32 yPan, f32 zPan,
-                            f32 doppler) {
+static inline void SetFXParameters(SND_EMITTER* const em, f32 vol, f32 xPan, f32 yPan, f32 zPan,
+                            f32 doppler, f32 occl) {
   SND_VOICEID vid;     // r30
   u8 i;                // r28
   SND_PARAMETER* pPtr; // r31
@@ -509,19 +533,30 @@ static void SetFXParameters(SND_EMITTER* const em, f32 vol, f32 xPan, f32 yPan, 
   synthFXSetCtrl(vid, 131, clip127((1.f - zPan) * 64.f));
   synthFXSetCtrl14(vid, 132, clip3FFF(doppler * 8192.f));
 
+  if ((em->flags & 0x180) != 0) {
+    if (occl != 0.f) {
+      synthFXSetCtrl14(vid, 0x1f, clip3FFF(occl * 16383.f));
+      synthFXSetCtrl(vid, 0x4f, 0x7f);
+    } else {
+      synthFXSetCtrl(vid, 0x4f, 0);
+    }
+  }
+
   if (em->paraInfo != NULL) {
     pPtr = em->paraInfo->paraArray;
     for (i = 0; i < em->paraInfo->numPara; ++pPtr, ++i) {
-      if (pPtr->ctrl < 0x40 || pPtr->ctrl == 0x80 || pPtr->ctrl == 0x84) {
-        synthFXSetCtrl14(vid, pPtr->ctrl, (pPtr->paraData).value14);
-      } else {
-        synthFXSetCtrl(vid, pPtr->ctrl, (pPtr->paraData).value7);
+      if ((pPtr->ctrl & 0xFF00) == 0) {
+        if (pPtr->ctrl < 0x40 || pPtr->ctrl == 0x80 || pPtr->ctrl == 0x84) {
+          synthFXSetCtrl14(vid, pPtr->ctrl, (pPtr->paraData).value14);
+        } else {
+          synthFXSetCtrl(vid, pPtr->ctrl, (pPtr->paraData).value7);
+        }
       }
     }
   }
 }
 
-static void EmitterShutdown(SND_EMITTER* em) {
+static inline void EmitterShutdown(SND_EMITTER* em) {
   if (em->next != NULL) {
     em->next->prev = em->prev;
   }
@@ -563,7 +598,8 @@ bool sndCheckEmitter(SND_EMITTER* em) {
   return FALSE;
 }
 
-static SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+#ifdef SND3D_UNUSED /* dead-stripped from this game build */
+static inline SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                               f32 maxDis, f32 comp, u32 flags, u16 fxid, u32 groupid, u8 maxVol,
                               u8 minVol, SND_ROOM* room, SND_PARAMETER_INFO* para, u8 studio) {
   static SND_EMITTER tmp_em;
@@ -613,7 +649,7 @@ static SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVEC
         hwEnableIrq();
         return -1;
       }
-      SetFXParameters(em, cvol, xPan, yPan, zPan, pitch);
+      SetFXParameters(em, cvol, xPan, yPan, zPan, pitch, occl);
       hwEnableIrq();
       return em->vid;
     }
@@ -635,7 +671,7 @@ static SND_VOICEID AddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVEC
   return -1;
 }
 
-SND_VOICEID sndAddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis,
+static inline SND_VOICEID sndAddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis,
                           f32 comp, u32 flags, SND_FXID fxid, u8 maxVol, u8 minVol,
                           SND_ROOM* room) {
   if (sndActive) {
@@ -646,7 +682,7 @@ SND_VOICEID sndAddEmitter(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR*
   return -1;
 }
 
-SND_VOICEID sndAddEmitterEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis,
+static inline SND_VOICEID sndAddEmitterEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis,
                             f32 comp, u32 flags, SND_FXID fxid, unsigned short groupid, u8 maxVol,
                             u8 minVol, SND_ROOM* room) {
   if (sndActive) {
@@ -657,7 +693,7 @@ SND_VOICEID sndAddEmitterEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTO
   return -1;
 }
 
-SND_VOICEID sndAddEmitterPara(SND_EMITTER* em_buffer, struct SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitterPara(SND_EMITTER* em_buffer, struct SND_FVECTOR* pos, SND_FVECTOR* dir,
                               f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, u8 maxVol, u8 minVol,
                               SND_ROOM* room, struct SND_PARAMETER_INFO* para) {
   if (sndActive) {
@@ -667,7 +703,7 @@ SND_VOICEID sndAddEmitterPara(SND_EMITTER* em_buffer, struct SND_FVECTOR* pos, S
   return -1;
 }
 
-SND_VOICEID sndAddEmitterParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitterParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                                 f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, SND_GROUPID groupid,
                                 u8 maxVol, u8 minVol, SND_ROOM* room, SND_PARAMETER_INFO* para) {
   if (sndActive) {
@@ -678,7 +714,7 @@ SND_VOICEID sndAddEmitterParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FV
   return -1;
 }
 
-SND_VOICEID sndAddEmitter2Studio(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitter2Studio(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                                  f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, u8 maxVol,
                                  u8 minVol, u8 studio) {
   if (sndActive) {
@@ -688,7 +724,7 @@ SND_VOICEID sndAddEmitter2Studio(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_F
   return -1;
 }
 
-SND_VOICEID sndAddEmitter2StudioEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitter2StudioEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                                    f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, u16 groupid,
                                    u8 maxVol, u8 minVol, u8 studio) {
   if (sndActive) {
@@ -698,7 +734,7 @@ SND_VOICEID sndAddEmitter2StudioEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND
   return -1;
 }
 
-SND_VOICEID sndAddEmitter2StudioPara(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitter2StudioPara(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                                      f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, u8 maxVol,
                                      u8 minVol, u8 studio, SND_PARAMETER_INFO* para) {
   if (sndActive) {
@@ -708,7 +744,7 @@ SND_VOICEID sndAddEmitter2StudioPara(SND_EMITTER* em_buffer, SND_FVECTOR* pos, S
   return -1;
 }
 
-SND_VOICEID sndAddEmitter2StudioParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
+static inline SND_VOICEID sndAddEmitter2StudioParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos, SND_FVECTOR* dir,
                                        f32 maxDis, f32 comp, u32 flags, SND_FXID fxid, u16 groupid,
                                        u8 maxVol, u8 minVol, u8 studio, SND_PARAMETER_INFO* para) {
   if (sndActive) {
@@ -718,6 +754,7 @@ SND_VOICEID sndAddEmitter2StudioParaEx(SND_EMITTER* em_buffer, SND_FVECTOR* pos,
   return -1;
 }
 
+#endif
 bool sndRemoveEmitter(SND_EMITTER* em) {
   if (sndActive) {
     hwDisableIrq();
@@ -761,12 +798,12 @@ void s3dKillAllEmitter() {
 void s3dKillEmitterByFXID(FX_TAB* fxTab, unsigned long num) {
   struct SND_EMITTER* em;  // r31
   struct SND_EMITTER* nem; // r29
-  unsigned long j;         // r30
+  unsigned long i;         // r30
 
   for (em = s3dEmitterRoot; em != NULL; em = nem) {
     nem = em->next;
-    for (j = 0; j < num; ++j) {
-      if (em->fxid == fxTab[j].id) {
+    for (i = 0; i < num; ++i) {
+      if (em->fxid == fxTab[i].id) {
         sndRemoveEmitter(em);
         break;
       }
@@ -774,7 +811,7 @@ void s3dKillEmitterByFXID(FX_TAB* fxTab, unsigned long num) {
   }
 }
 
-static void MakeListenerMatrix(SND_LISTENER* li) {
+static inline void MakeListenerMatrix(SND_LISTENER* li) {
   struct SND_FMATRIX mat; // r1+0xC
   salCrossProduct(&li->right, &li->heading, &li->up);
   mat.m[0][0] = li->right.x;
@@ -810,7 +847,8 @@ bool sndUpdateListener(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND
   return FALSE;
 }
 
-bool sndAddListenerEx(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND_FVECTOR* heading,
+#ifdef SND3D_UNUSED /* dead-stripped from this game build */
+static inline bool sndAddListenerEx(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND_FVECTOR* heading,
                       SND_FVECTOR* up, f32 front_sur, f32 back_sur, f32 soundSpeed,
                       f32 volPosOffset, u32 flags, u8 vol, SND_ROOM* room) {
 
@@ -844,14 +882,14 @@ bool sndAddListenerEx(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND_
   return FALSE;
 }
 
-bool sndAddListener(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND_FVECTOR* heading,
+static inline bool sndAddListener(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND_FVECTOR* heading,
                     SND_FVECTOR* up, f32 front_sur, f32 back_sur, f32 soundSpeed, u32 flags, u8 vol,
                     SND_ROOM* room) {
   return sndAddListenerEx(li, pos, dir, heading, up, front_sur, back_sur, soundSpeed, 0.f, flags,
                           vol, room);
 }
 
-bool sndRemoveListener(SND_LISTENER* li) {
+static inline bool sndRemoveListener(SND_LISTENER* li) {
   if (sndActive) {
 
     hwDisableIrq();
@@ -875,6 +913,7 @@ bool sndRemoveListener(SND_LISTENER* li) {
 
   return FALSE;
 }
+#endif
 
 typedef struct START_LIST {
   // total size: 0x20
@@ -907,16 +946,16 @@ static START_GROUP startGroup[64];  // size: 0x400
 static u8 startGroupNum;            // size: 0x1
 static START_LIST startListNum[64]; // size: 0x700
 static u8 startListNumnum;          // size: 0x1
-static RUN_LIST runList[64];        // size: 0x300
+static RUN_LIST runList[128];
 static u8 runListNum;               // size: 0x1
 
-void ClearStartList() {
+static inline void ClearStartList() {
   startGroupNum = 0;
   startListNumnum = 0;
   runListNum = 0;
 }
 
-void AddRunningEmitter(SND_EMITTER* em, f32 vol) {
+static inline void AddRunningEmitter(SND_EMITTER* em, f32 vol) {
   long i;        // r30
   RUN_LIST* rl;  // r29
   RUN_LIST* lrl; // r28
@@ -956,7 +995,7 @@ void AddRunningEmitter(SND_EMITTER* em, f32 vol) {
   runList[runListNum++].vol = vol;
 }
 
-bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, f32 pitch) {
+bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, f32 pitch, f32 occl) {
   long i;         // r30
   START_LIST* sl; // r29
 
@@ -999,6 +1038,7 @@ bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, 
 
   startListNum[startListNumnum].em = em;
   startListNum[startListNumnum].pitch = pitch;
+  startListNum[startListNumnum].occl = occl;
   startListNum[startListNumnum].xPan = xPan;
   startListNum[startListNumnum].yPan = yPan;
   startListNum[startListNumnum].zPan = zPan;
@@ -1009,9 +1049,9 @@ bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, 
 
 int synthCheckFXRealloc(unsigned short fid);
 void StartContinousEmitters() {
-  long i;          // r30
-  START_LIST* sl;  // r29
-  SND_EMITTER* em; // r31
+  SND_EMITTER* em;
+  START_LIST* sl;
+  long i;
   f32 dv;          // r63
 
   if (s3dUseLegacyLogic) {
@@ -1039,8 +1079,8 @@ void StartContinousEmitters() {
         if (em->paraInfo == NULL) {
           key = 0xFF;
         } else {
-          SND_PARAMETER* pp = em->paraInfo->paraArray;
           u8 k;
+          SND_PARAMETER* pp = em->paraInfo->paraArray;
           for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
             if (pp->ctrl == 0x8000) {
               key = pp->paraData.value7;
@@ -1064,7 +1104,7 @@ void StartContinousEmitters() {
         } else {
           em->fade = 1.f;
         }
-        SetFXParameters(em, sl->vol, sl->xPan, sl->yPan, sl->zPan, sl->pitch);
+        SetFXParameters(em, sl->vol, sl->xPan, sl->yPan, sl->zPan, sl->pitch, sl->occl);
         em->flags &= ~0x20000;
         ++startGroup[i].numRunning;
         if (startGroup[i].running != NULL) {
@@ -1100,8 +1140,8 @@ void StartContinousEmitters() {
         if (em->paraInfo == NULL) {
           key = 0xFF;
         } else {
-          SND_PARAMETER* pp = em->paraInfo->paraArray;
           u8 k;
+          SND_PARAMETER* pp = em->paraInfo->paraArray;
           for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
             if (pp->ctrl == 0x8000) {
               key = pp->paraData.value7;
@@ -1125,20 +1165,35 @@ void StartContinousEmitters() {
         } else {
           em->fade = 1.f;
         }
-        SetFXParameters(em, sl->vol, sl->xPan, sl->yPan, sl->zPan, sl->pitch);
+        SetFXParameters(em, sl->vol, sl->xPan, sl->yPan, sl->zPan, sl->pitch, sl->occl);
         em->flags &= ~0x20000;
-        ++startGroup[i].numRunning;
-        if (startGroup[i].running != NULL) {
-          startGroup[i].running = startGroup[i].running->next;
+        {
+          RUN_LIST* rl;
+          for (rl = startGroup[i].running; rl != NULL; rl = rl->next) {
+            if (rl->vol >= sl->vol) {
+              RUN_LIST* nr = &runList[runListNum];
+              f32 sv;
+              nr->em = em;
+              sv = sl->vol;
+              startGroup[i].running = nr;
+              nr->vol = sv;
+              nr->next = rl;
+              ++startGroup[i].numRunning;
+              ++runListNum;
+              goto next_sl;
+            }
+          }
         }
       }
       }
+    next_sl:;
     }
   }
   }
 }
 
 void s3dHandle() {
+  SND_VOICEID vid;
   SND_EMITTER* em;  // r31
   SND_EMITTER* nem; // r30
   f32 vol;          // r1+0x18
@@ -1177,22 +1232,26 @@ void s3dHandle() {
         }
 
         if (em->flags & 1) {
-          if (AddStartingEmitter(em, vol, xPan, yPan, zPan, pitch)) {
+          if (AddStartingEmitter(em, vol, xPan, yPan, zPan, pitch, occl)) {
             continue;
           }
-        } else if (em->room == NULL || em->room->studio != 0xFF) {
-          if (
-#if MUSY_VERSION <= MUSY_VERSION_CHECK(2, 0, 1)
-              (em->vid =
-                   synthFXStart(em->fxid, 127, 64, em->room != NULL ? em->room->studio : em->studio,
-                                (em->flags & 0x10) != 0)
-#else
-              (em->vid = synthFXStart(em->fxid, 5, 127, 64,
-                                      em->room != NULL ? em->room->studio : em->studio,
-                                      (em->flags & 0x10) != 0)
-#endif
-                   ) == -1) {
-          derp:
+        } else {
+          u8 key;
+          if (em->paraInfo == NULL) {
+            key = 0xff;
+          } else {
+            u8 i;
+            SND_PARAMETER* pPtr = em->paraInfo->paraArray;
+            for (i = 0; i < em->paraInfo->numPara; ++pPtr, ++i) {
+              if (pPtr->ctrl == 0x8000) {
+                key = pPtr->paraData.value7;
+                goto got_key;
+              }
+            }
+            key = 0xff;
+          }
+        got_key:
+          if ((em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0)) == -1) {
             if (!(em->flags & 2)) {
               em->flags |= 0x40000;
               em->flags &= ~0x20000;
@@ -1200,8 +1259,6 @@ void s3dHandle() {
               continue;
             }
           }
-        } else {
-          goto derp;
         }
       } else if ((em->vid = sndFXCheck(em->vid)) == -1) {
         if ((em->flags & 2)) {
@@ -1225,7 +1282,7 @@ void s3dHandle() {
             em->flags |= 0x40000;
           }
         } else {
-          SetFXParameters(em, vol, xPan, yPan, zPan, pitch);
+          SetFXParameters(em, vol, xPan, yPan, zPan, pitch, occl);
         }
       }
       if ((em->flags & 0x100000) != 0) {
@@ -1234,22 +1291,21 @@ void s3dHandle() {
           em->flags &= ~0x100000;
         }
       }
-    } else if ((em->room == NULL || (em->room != NULL && em->room->studio != 0xff)) && vol != 0.f) {
+    } else if (vol != 0.f) {
       em->flags &= ~0x80000;
       em->flags |= 0x20000;
     }
   }
   StartContinousEmitters();
-  CheckRoomStatus();
-  CheckDoorStatus();
 }
 
-void sndSetup3DStudios(unsigned char first, unsigned char num) {
+#ifdef SND3D_UNUSED /* dead-stripped from this game build */
+static inline void sndSetup3DStudios(unsigned char first, unsigned char num) {
   snd_base_studio = first;
   snd_max_studios = num;
 }
 
-void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis, f32 comp,
+static inline void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f32 maxDis, f32 comp,
                         u8 maxVol, u8 minVol, SND_ROOM* room) {
   f32 xPan;  // r1+0x34
   f32 yPan;  // r1+0x30
@@ -1278,6 +1334,7 @@ void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FVECTOR* dir, f3
   hwEnableIrq();
 }
 
+#endif
 void s3dInit(u32 flags) {
   s3dEmitterRoot = 0;
   s3dListenerRoot = 0;
@@ -1289,4 +1346,4 @@ void s3dInit(u32 flags) {
   s3dUseLegacyLogic = ((flags & 4) != 0);
 }
 
-void s3dExit() {}
+static inline void s3dExit() {}

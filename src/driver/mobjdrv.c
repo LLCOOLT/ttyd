@@ -19,10 +19,268 @@
 #include <string.h>
 
 
-extern u8 cubeDJ[0x68];
-extern u8 headDJ[0x68];
-extern u8 frontDJ[0x68];
-extern u8 front2DJ[0x68];
+
+u32 cubeMSJ[5] = {
+    0x00010000, 0x00000000, 0x80000000, 0x00000000, 0x00000000
+};
+
+u32 front2MSJ[5] = {
+    0x00010000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+};
+
+// static data from inlined header functions
+__declspec(section ".data") s32 fd_mobjdrv_negone_one_374[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 lbl_803083C8[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 fd_mobjdrv_one_negone_373[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 lbl_803083D8[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 fd_mobjdrv_negone_one_360[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 lbl_803083E8[] = {-1082130432, 1065353216};
+__declspec(section ".data") s32 fd_mobjdrv_one_negone_359[] = {1065353216, -1082130432};
+__declspec(section ".data") s32 lbl_803083F8[] = {1065353216, -1082130432};
+
+u32 cubeDVP[103] = {
+    0x00000008, 0xBF000000, 0x00000000, 0x3F000000, 0x3F000000, 0x00000000, 0x3F000000, 0xBF000000,
+    0x3F800000, 0x3F000000, 0x3F000000, 0x3F800000, 0x3F000000, 0xBF000000, 0x3F800000, 0xBF000000,
+    0x3F000000, 0x3F800000, 0xBF000000, 0xBF000000, 0x00000000, 0xBF000000, 0x3F000000, 0x00000000,
+    0xBF000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+};
+
+u32 cubeDVN[55] = {
+    0x00000006, 0x00000000, 0x00000000, 0x3F800000, 0x00000000, 0x3F800000, 0x00000000, 0x00000000,
+    0x00000000, 0xBF800000, 0x00000000, 0xBF800000, 0x00000000, 0x3F800000, 0x00000000, 0x00000000,
+    0xBF800000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+};
+
+void* cubeDDT[26] = {
+    cubeDVP, cubeDVN, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000
+};
+
+u32 cubeDN[1230] = {
+    0x00000004, 0x00000005, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00060005,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00020005, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00040005, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000004, 0x00070004, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00010004, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0x00050004, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0x00030004, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000004, 0x00070003, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0x00060003, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00010003,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000003, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000004,
+    0x00050002, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00040002, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00070002, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0x00060002, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000004, 0x00030001, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00020001, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0x00050001, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00040001,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000004, 0x00010000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0x00000000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00030000, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0x00020000, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+    0xFFFFFFFF, 0xFFFFFFFF, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000,
+    0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000, 0x00000000
+};
+
+void* cubeDP[19] = {
+    (void*)0x00000000, (void*)0x00000006, (void*)0x00000000, cubeDDT, cubeDN, (void*)&cubeDN[205], (void*)&cubeDN[410], (void*)&cubeDN[615],
+    (void*)&cubeDN[820], (void*)&cubeDN[1025], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+};
+
+void* cubeDJ[26] = {
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
+    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
+    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
+    (void*)0x00000000, cubeDP
+};
+
+void* headDP[19] = {
+    (void*)0x00000000, (void*)0x00000001, (void*)0x00000000, cubeDDT, (void*)&cubeDN[410], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+};
+
+void* headDJ[26] = {
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
+    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
+    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x00000000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
+    (void*)0x00000000, headDP
+};
+
+void* frontDP[19] = {
+    (void*)0x00000000, (void*)0x00000001, (void*)0x00000000, cubeDDT, (void*)&cubeDN[1025], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+};
+
+void* frontDJ[26] = {
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
+    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
+    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, cubeMSJ, (void*)0x00000001,
+    (void*)0x00000000, frontDP
+};
+
+void* front2DP[19] = {
+    (void*)0x00000000, (void*)0x00000005, (void*)0x00000000, cubeDDT, cubeDN, (void*)&cubeDN[205], (void*)&cubeDN[410], (void*)&cubeDN[615],
+    (void*)&cubeDN[820], (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000,
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000
+};
+
+void* front2DJ[26] = {
+    (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x3F800000, (void*)0x3F800000,
+    (void*)0x3F800000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0x00000000, (void*)0xBF000000,
+    (void*)0x00000000, (void*)0xBF000000, (void*)0x3F000000, (void*)0x3F800000, (void*)0x3F000000, (void*)0x00000000, front2MSJ, (void*)0x00000001,
+    (void*)0x00000000, front2DP
+};
+
+
 HitEntry* hitEntryMOBJ(MapFileJoint* joint, Mtx mtx);
 
 #define MAX_MOBJ_WORK 3
@@ -36,6 +294,8 @@ BOOL koopaRunFlag;
 static MapObjectWork work[MAX_MOBJ_WORK];
 
 #define mobjGetWorkFlag(flag) (flag ? &work[1] : &work[0])
+
+static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry);
 
 void mobjKoopaOn(void) {
     if (!koopaRunFlag) {
@@ -56,33 +316,9 @@ inline MapObjectWork* mobjGetWork(void) {
     }
 }
 
-inline void calcMtx(MapObjectEntry* entry, Mtx dest, Vec position) { // guessing, always inlined
-    Mtx trans, scale, xrot, yrot, zrot;
 
-    MTXTrans(trans, position.x, position.y, position.z);
-    MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
-    MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
-    MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
-    MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
-    MTXConcat(trans, zrot, trans);
-    MTXConcat(trans, yrot, trans);
-    MTXConcat(trans, xrot, trans);
-    MTXConcat(trans, scale, dest);
-}
 
-inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
-    if (!strcmp(entry->animName, "MOBJ_KururinFloor")) {
-        ItemEntry* item = itemNameToPtr(entry->name);
-        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->unk1E4) == 0))
-            return 1;
-        else if ((evtGetValue(0, entry->unk1E4) != 0))
-            return 1;
-        else
-            return 2;
-    } else {
-        return 0;
-    }
-}
+
 
 void mobjDispXLU(CameraId camId, void* param) {
     MapObjectEntry* entry = param; // cast to correct type
@@ -205,11 +441,12 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
         entry->translation.z = 0.0f;
         entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
     }
-    switch (type) {
+    switch (type)
+ {
         case 0:
             PSVECAdd(&entry->position, &entry->translation, &position);
             {
-                Mtx trans, scale, xrot, yrot, zrot;
+                Mtx zrot, yrot, xrot, scale, trans;
                 MTXTrans(trans, position.x, position.y, position.z);
                 MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
                 MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
@@ -220,17 +457,17 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy((u8*)&entry->hitObj[0] + 0x1C, cubeDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, cubeDJ, 0x68);
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
             *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
             break;
         case 1:
             PSVECAdd(&entry->position, &entry->translation, &position);
             {
-                Mtx trans, scale, xrot, yrot, zrot;
+                Mtx zrot, yrot, xrot, scale, trans;
                 MTXTrans(trans, position.x, position.y, position.z);
                 MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
                 MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
@@ -241,17 +478,17 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy((u8*)&entry->hitObj[0] + 0x1C, headDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, headDJ, 0x68);
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
             *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
             break;
         case 2:
             PSVECAdd(&entry->position, &entry->translation, &position);
             {
-                Mtx trans, scale, xrot, yrot, zrot;
+                Mtx zrot, yrot, xrot, scale, trans;
                 MTXTrans(trans, position.x, position.y, position.z);
                 MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
                 MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
@@ -262,17 +499,17 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
                 MTXConcat(trans, xrot, trans);
                 MTXConcat(trans, scale, mtx);
             }
-            memcpy((u8*)&entry->hitObj[0] + 0x1C, frontDJ, 0x68);
+            memcpy(entry->hitObj[0].unk4 + 8, frontDJ, 0x68);
             strcpy(entry->hitObj[0].name, "MOBJ_");
             strcat(entry->hitObj[0].name, entry->name);
-            *(char**)((u8*)&entry->hitObj[0] + 0x1C) = entry->hitObj[0].name;
-            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[0] + 0x1C), mtx);
+            *(char**)(entry->hitObj[0].unk4 + 8) = entry->hitObj[0].name;
+            entry->hitObj[0].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[0].unk4 + 8), mtx);
             *(MapObjectEntry**)((u8*)entry->hitObj[0].hitObject + 0xD0) = entry;
-            memcpy((u8*)&entry->hitObj[1] + 0x1C, front2DJ, 0x68);
+            memcpy(entry->hitObj[1].unk4 + 8, front2DJ, 0x68);
             strcpy(entry->hitObj[1].name, "MOBJ~");
             strcat(entry->hitObj[1].name, entry->name);
-            *(char**)((u8*)&entry->hitObj[1] + 0x1C) = entry->hitObj[1].name;
-            entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)((u8*)&entry->hitObj[1] + 0x1C), mtx);
+            *(char**)(entry->hitObj[1].unk4 + 8) = entry->hitObj[1].name;
+            entry->hitObj[1].hitObject = hitEntryMOBJ((MapFileJoint*)(entry->hitObj[1].unk4 + 8), mtx);
             *(MapObjectEntry**)((u8*)entry->hitObj[1].hitObject + 0xD0) = entry;
             break;
     }
@@ -361,128 +598,311 @@ void mobjSetPosition(const char* name, f32 x, f32 y, f32 z) {
 }
 
 s32 marioChkHipBump(void);
+s32 mobjCheckItemboxOpen(MapObjectEntry* entry);
+extern void* kpaGetHitobjHead(s32 idx);
+extern void* kpaGetHitobjRide(s32 idx);
+extern BOOL kpaHipAttackCheck(void);
+extern void* kpaGetHitobj(void);
+extern s32 kpaGetLevel(void);
+extern void* kpaGetHitFlame(void);
+extern void mapGetBlend(GXColor* color);
+extern void mapGetBlend2(GXColor* color);
+extern s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
+extern void shadowSetType(s32 id, s32 type);
+extern void shadowSetSize(s32 id, f32 size);
+
+#define MB(p, off, T) (*(T*)((u8*)(p) + (off)))
+typedef struct MobjWorkHit {
+    s32 count;
+    MapObjectEntry* entries;
+    HitEntry* hit[5];
+} MobjWorkHit;
+#define WH(k) (wp->hit[k])
 
 void mobjMain(void) {
-    MapObjectWork* wp;
+    MobjWorkHit* wp;
     MapObjectEntry* entry;
     MarioWork* mario;
-    void* party;
-    void* fbat;
+    PartyEntry* party;
+    s16 fbat;
+    s32 count;
     s32 i;
-    s32 j;
-    Mtx mtx;
+    s32 hit;
+    HitEntry* hitJump;
+    s32 partyFlag;
+    HitEntry* hitPtr;
+    s32 k;
+    GXColor blend1;
+    GXColor blend2;
+    GXColor evt;
+    Vec camPos;
+    f32 nz, ny, nx, dist, hz, hy, hx;
 
-    wp = mobjGetWork();
+    {
+        MapObjectWork* w = mobjGetWork();
+        wp = (MobjWorkHit*)w;
+    }
+    count = wp->count;
     entry = wp->entries;
     mario = marioGetPtr();
     party = partyGetPtr(marioGetPartyId());
-    fbat = fbatGetPointer();
-    /* TODO: block at 0x68-0x22c: 5x hitGetName/strcmp ride/hit checks on mario & party */
+    fbat = *(s16*)fbatGetPointer();
+    hitJump = NULL;
+    partyFlag = 0;
+    if (party != NULL && (party->flags & 0x100)) {
+        partyFlag = 1;
+    }
 
-    for (i = 0; i < wp->count; i++, entry++) {
+    if (gp->inBattle == 0) {
+        if (((HitEntry*)mario->field_0x1FC) != NULL) {
+            if (WH(0) == NULL || strcmp(hitGetName(WH(0)), hitGetName(((HitEntry*)mario->field_0x1FC))) != 0) {
+                WH(0) = ((HitEntry*)mario->field_0x1FC);
+            }
+        } else {
+            WH(0) = NULL;
+        }
+        if (((HitEntry*)mario->field_0x1F4) != NULL) {
+            if (WH(1) == NULL || strcmp(hitGetName(WH(1)), hitGetName(((HitEntry*)mario->field_0x1F4))) != 0) {
+                hitJump = WH(1) = ((HitEntry*)mario->field_0x1F4);
+            }
+        } else {
+            WH(1) = NULL;
+        }
+        if (((HitEntry*)mario->hitobjStandOn) != NULL) {
+            if (WH(2) == NULL || strcmp(hitGetName(WH(2)), hitGetName(((HitEntry*)mario->hitobjStandOn))) != 0) {
+                WH(2) = ((HitEntry*)mario->hitobjStandOn);
+            }
+        } else {
+            WH(2) = NULL;
+        }
+        if (((HitEntry*)mario->field_0x1E0) != NULL) {
+            if (WH(3) == NULL || strcmp(hitGetName(WH(3)), hitGetName(((HitEntry*)mario->field_0x1E0))) != 0) {
+                WH(3) = ((HitEntry*)mario->field_0x1E0);
+            }
+        } else {
+            WH(3) = NULL;
+        }
+        if (party != NULL && MB(party, 0x130, HitEntry*) != NULL) {
+            if (WH(4) == NULL || strcmp(hitGetName(WH(4)), hitGetName(MB(party, 0x130, HitEntry*))) != 0) {
+                WH(4) = MB(party, 0x130, HitEntry*);
+            }
+        } else {
+            WH(4) = NULL;
+        }
+    }
+
+    for (i = 0; i < count; i++, entry++) {
         if (!(entry->flags & 1)) {
             continue;
         }
-        /* TODO: 0x23c-0x264 flag/type filter (else goto anim section 0xd0c) */
+        if (gp->inBattle == 0 && (gp->inBattle != 0 || ((u32)fbat > 1 && fbat != 8))) {
+            goto afterHit;
+        }
+        if (entry->flags & 4) {
+            if (mobjCheckItemboxOpen(entry) == 2) {
+                mobjCalcMtx2(entry);
+            } else {
+                mobjCalcMtx(entry);
+            }
+            entry->flags &= ~4;
+        }
+        if (entry->flags & 0x40) {
+            if (entry->unk5C.y >= 0.0f) {
+                entry->position.y += entry->unk5C.y;
+                entry->unk5C.y -= entry->unk68;
+            } else {
+                dist = 10.0f + (1.0f + (f32)__fabs(entry->unk5C.y));
+                if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
+                                   10.0f + entry->position.y, entry->position.z, 0.0f, -1.0f, 0.0f) != NULL) {
+                    entry->position.y = hy;
+                    entry->unk5C.y = (-0.5f * entry->unk6C) * entry->unk5C.y;
+                    if (__fabs(entry->unk5C.y) <= 2.0) {
+                        entry->unk5C.y = 0.0f;
+                    }
+                } else {
+                    entry->position.y += entry->unk5C.y;
+                    entry->unk5C.y -= entry->unk68;
+                }
+            }
+            mobjCalcMtx(entry);
+        }
+        if (!(entry->flags & 8)) {
+            hit = 0;
+            hitPtr = entry->hitObj[0].hitObject;
+            if ((s32)MB(mario, 0x3c, u8) != 2) {
+                if ((entry->flags & 0x10000) && MB(mario, 0x1fc, HitEntry*) == hitPtr) {
+                    if (MB(marioGetPtr(), 0x90, f32) <= 5.0f + entry->position.y) {
+                        entry->unk1E0 = 0x10000;
+                        hit = 1;
+                        goto hitDone;
+                    }
+                }
+                if ((entry->flags & 0x400000) && hitJump == hitPtr) {
+                    entry->unk1E0 = 0x400000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x200000) && MB(mario, 0x1e4, HitEntry*) == hitPtr) {
+                    entry->unk1E0 = 0x200000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x1000000) && MB(mario, 0x1e4, HitEntry*) == hitPtr && marioChkHipBump()) {
+                    entry->unk1E0 = 0x1000000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if (unk_8005bb80() && (entry->flags & 0x40000) && MB(mario, 0x1e0, HitEntry*) == hitPtr &&
+                    (MB(mario, 0x248, u16) & 0x100) && !partyFlag) {
+                    entry->unk1E0 = 0x40000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x800000) && party != NULL) {
+                    if (MB(party, 0x130, HitEntry*) == hitPtr) {
+                        entry->unk1E0 = 0x800000;
+                        hit = 1;
+                        goto hitDone;
+                    } else if (MB(party, 0x130, HitEntry*) != NULL && (s32)MB(party, 0x31, u8) == 3) {
+                        if (PSVECDistance(&party->position, &entry->position) <
+                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + MB(party, 0xf4, f32)) {
+                            entry->unk1E0 = 0x800000;
+                            hit = 1;
+                            goto hitDone;
+                        }
+                    }
+                }
+                if ((entry->flags & 0x2000000) && party != NULL && (s32)MB(party, 0x31, u8) == 3) {
+                    if (MB(party, 0x130, HitEntry*) == hitPtr) {
+                        entry->unk1E0 = 0x2000000;
+                        hit = 1;
+                        goto hitDone;
+                    } else if (MB(party, 0x130, HitEntry*) != NULL) {
+                        if (PSVECDistance(&party->position, &entry->position) <
+                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + MB(party, 0xf4, f32)) {
+                            entry->unk1E0 = 0x800000;
+                            hit = 1;
+                            goto hitDone;
+                        }
+                    }
+                }
+            } else {
+                if (entry->flags & 0x4000000) {
+                    for (k = 0; k < 10; k++) {
+                        if (kpaGetHitobjHead(k) == hitPtr) {
+                            entry->unk1E0 = 0x4000000;
+                            hit = 1;
+                            break;
+                        }
+                    }
+                }
+                if (entry->flags & 0x10000000) {
+                    for (k = 0; k < 10 && hit == 0; k++) {
+                        if (kpaGetHitobjRide(k) == hitPtr && kpaHipAttackCheck()) {
+                            entry->unk1E0 = 0x10000000;
+                            hit = 1;
+                            break;
+                        }
+                    }
+                }
+                if ((entry->flags & 0x8000000) && kpaGetHitobj() == hitPtr && kpaGetLevel() == 3) {
+                    entry->unk1E0 = 0x8000000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x20000000) && kpaGetHitFlame() == hitPtr) {
+                    entry->unk1E0 = 0x20000000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x80000) && MB(mario, 0x1e0, HitEntry*) == hitPtr) {
+                    entry->unk1E0 = 0x80000;
+                    hit = 1;
+                    goto hitDone;
+                }
+                if ((entry->flags & 0x200000) && MB(mario, 0x1e4, HitEntry*) == hitPtr) {
+                    entry->unk1E0 = 0x200000;
+                    hit = 1;
+                }
+            }
+        hitDone:
+            if (hit != 0) {
+                entry->flags |= 8;
+            }
+        }
+        if (entry->flags & 0x100) {
+            entry->flags &= ~8;
+        }
+        if ((u32)marioStGetSystemLevel() != 0) {
+            entry->flags &= ~8;
+        }
         {
-            if (strcmp(entry->name, "") == 0 || strcmp(entry->name, "") == 0 ||
-                strcmp(entry->name, "") == 0 || strcmp(entry->name, "") == 0) {
-                /* TODO: 0x2bc-0x2d8 */
+            u16 motion = MB(marioGetPtr(), 0x2e, u16);
+            if (motion == 0x1f || motion == 0x20) {
+                entry->flags &= ~8;
             }
-            /* TODO: 0x2dc type == 2 branch */
-            if (entry->flags == 2) {
-                PSVECAdd(&entry->position, &entry->position, &entry->position);
-                PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
-                PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
-                PSMTXRotRad(mtx, 'x', 0.0f);
-                PSMTXRotRad(mtx, 'y', 0.0f);
-                PSMTXRotRad(mtx, 'z', 0.0f);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                for (j = 0; j < 2; j++) {
-                    if (entry->hitObj[j].hitObject != NULL) {
-                        hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
-                    }
-                }
+        }
+        if (entry->mainFunc != NULL) {
+            if (entry->mainFunc(entry) == -1) {
+                continue;
+            }
+        }
+    afterHit:
+        if (!(entry->flags & 1)) {
+            continue;
+        }
+        if (!koopaRunFlag && !(entry->flags & 0x802)) {
+            MapWork* mw = mapGetWork();
+            s32 shadowId;
+            mapGetBlend(&blend1);
+            mapGetBlend2(&blend2);
+            if ((MB(mw, 4, u16) & 2) && !(animPoseGetMaterialFlag(entry->poseId) & 0x800) && blend1.a != 0xff) {
+            } else if ((MB(mw, 4, u16) & 4) && !(animPoseGetMaterialFlag(entry->poseId) & 0x1000) &&
+                       blend2.a != 0xff) {
             } else {
-                PSVECAdd(&entry->position, &entry->position, &entry->position);
-                animPoseGetAnimBaseDataPtr(entry->poseId);
-                /* TODO: block at 0x3ec-0x4e8 joint search */
-                if (strncmp(entry->name, "", strlen("")) == 0) {
-                    /* TODO: 0x504-0x524 */
-                }
-                PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
-                PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
-                PSMTXRotRad(mtx, 'x', 0.0f);
-                PSMTXRotRad(mtx, 'y', 0.0f);
-                PSMTXRotRad(mtx, 'z', 0.0f);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                PSMTXConcat(mtx, mtx, mtx);
-                for (j = 0; j < 2; j++) {
-                    if (entry->hitObj[j].hitObject != NULL) {
-                        hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
-                    }
+                shadowId = shadowEntry(entry->position.x, entry->position.y, entry->position.z,
+                                       10.0f * entry->scale.x * entry->scale2.x / 25.0f);
+                if (entry->flags & 0x400000) {
+                    shadowSetType(shadowId, 1);
+                    shadowSetSize(shadowId, 10.0f * entry->scale.x * entry->scale2.x / 20.0f);
                 }
             }
         }
-        if (entry->flags & 0x10) {
-            /* TODO: block at 0x624-0x710 (hitCheckFilter) */
-            hitCheckFilter(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-            PSVECAdd(&entry->position, &entry->position, &entry->position);
-            animPoseGetAnimBaseDataPtr(entry->poseId);
-            /* TODO: block at 0x72c-0x828 */
-            if (strncmp(entry->name, "", strlen("")) == 0) {
-                /* TODO: 0x844-0x864 */
-            }
-            PSMTXTrans(mtx, 0.0f, 0.0f, 0.0f);
-            PSMTXScale(mtx, 1.0f, 1.0f, 1.0f);
-            PSMTXRotRad(mtx, 'x', 0.0f);
-            PSMTXRotRad(mtx, 'y', 0.0f);
-            PSMTXRotRad(mtx, 'z', 0.0f);
-            PSMTXConcat(mtx, mtx, mtx);
-            PSMTXConcat(mtx, mtx, mtx);
-            PSMTXConcat(mtx, mtx, mtx);
-            PSMTXConcat(mtx, mtx, mtx);
-            for (j = 0; j < 2; j++) {
-                if (entry->hitObj[j].hitObject != NULL) {
-                    hitReCalcMatrix(entry->hitObj[j].hitObject, mtx);
-                }
-            }
-        }
-        /* TODO: block at 0x944-0xc88 attack checks: marioGetPtr, marioChkHipBump,
-           unk_8005bb80, PSVECDistance x2, kpaGetHitobjHead/Ride, kpaHipAttackCheck,
-           kpaGetHitobj, kpaGetLevel, kpaGetHitFlame */
-        marioStGetSystemLevel();
-        marioGetPtr();
-        /* TODO: 0xcd0-0xd08 callback (bctrl) */
-        /* TODO: 0xd0c-0xdfc shadow: mapGetWork, mapGetBlend, mapGetBlend2,
-           animPoseGetMaterialFlag x2, shadowEntry, shadowSetType, shadowSetSize */
         animPoseMain(entry->poseId);
-        animPoseGetMaterialEvtColor(entry->poseId);
-        /* TODO: 0xe20-0xe8c camGetPtr, PSMTXMultVec, PSMTX44MultVec cull */
-        if (entry->flags & 0x20) {
-            if (animPoseGetMaterialFlag(entry->poseId) & 1) {
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+        evt = animPoseGetMaterialEvtColor(entry->poseId);
+        if (entry->flags & 0x4000) {
+            continue;
+        }
+        if (!(entry->flags & 0x80)) {
+            PSMTXMultVec((void*)((u8*)camGetPtr(CAMERA_3D) + 0x11c), &entry->position, &camPos);
+            PSMTX44MultVec((void*)((u8*)camGetPtr(CAMERA_3D) + 0x15c), &camPos, &camPos);
+            if (__fabs(camPos.x) > 1.5 || __fabs(camPos.y) > 1.5 || __fabs(camPos.z) > 1.0) {
+                continue;
+            }
+        }
+        if ((entry->flags & 0x2000) && ((gp->retraceCount >> 3) & 1)) {
+            continue;
+        }
+        if (entry->offscreenId == -1) {
+            if ((animPoseGetMaterialFlag(entry->poseId) & 0x40) && evt.a != 0xff) {
+                dispEntry(entry->camId, dispCalcZ(&entry->position), 2, mobjDispXLU, entry);
             } else {
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(entry->camId, dispCalcZ(&entry->position), 0, mobjDisp, entry);
+                dispEntry(entry->camId, dispCalcZ(&entry->position), 1, mobjDisp, entry);
+                dispEntry(entry->camId, dispCalcZ(&entry->position), 2, mobjDisp, entry);
             }
         } else {
-            if (animPoseGetMaterialFlag(entry->poseId) & 1) {
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+            if ((animPoseGetMaterialFlag(entry->poseId) & 0x40) && evt.a != 0xff) {
+                dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 2, mobjDisp_OffscreenXLU, entry);
             } else {
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
-                dispEntry(CAMERA_3D, 1, dispCalcZ(&entry->position), NULL, entry);
+                dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 0, mobjDisp_OffscreenXLU, entry);
+                dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 1, mobjDisp_OffscreenXLU, entry);
+                dispEntry(CAMERA_OFFSCREEN2, dispCalcZ(&entry->position), 2, mobjDisp_OffscreenXLU, entry);
             }
         }
     }
 }
+
 
 MapObjectEntry* mobjNameToPtr(const char* name) {
     int i;
@@ -551,7 +971,7 @@ EventEntry* mobjRunEvent(MapObjectEntry* entry, s32* eventCode) {
 void mobjCalcMtx(MapObjectEntry* entry) {
     AnimationPoseData* pose;
     Mtx mtx;
-    Mtx trans, scale, xrot, yrot, zrot;
+    Mtx zrot, yrot, xrot, scale, trans;
     Vec position;
     Vec min;
     Vec max;
@@ -569,7 +989,6 @@ void mobjCalcMtx(MapObjectEntry* entry) {
         entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
     }
     {
-                Mtx trans, scale, xrot, yrot, zrot;
                 MTXTrans(trans, position.x, position.y, position.z);
                 MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
                 MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
@@ -581,8 +1000,11 @@ void mobjCalcMtx(MapObjectEntry* entry) {
                 MTXConcat(trans, scale, mtx);
             }
     for (i = 0; i < 2; i++) {
-        if (entry->hitObj[i].hitObject != NULL)
+        if (entry->hitObj[i].hitObject != NULL) {
+            if (1) {
+            }
             hitReCalcMatrix(entry->hitObj[i].hitObject, mtx);
+        }
     }
 }
 
@@ -635,6 +1057,21 @@ BOOL mobjCheckExec() {
     return FALSE;
 }
 
+extern const char kururinName[];
+static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
+    if (!strcmp(entry->animName, kururinName)) {
+        ItemEntry* item = itemNameToPtr(entry->name);
+        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->unk1E4) == 0))
+            return 1;
+        else if ((evtGetValue(0, entry->unk1E4) != 0))
+            return 1;
+        else
+            return 2;
+    } else {
+        return 0;
+    }
+}
+
 s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     if (strcmp(entry->animName, "MOBJ_TreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BigTreasureBox") == 0 ||
         strcmp(entry->animName, "MOBJ_GrayTreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BlackTreasureBox") == 0) {
@@ -647,11 +1084,13 @@ s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     }
 }
 
+
 MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char** names) {
     int entryCount;
     Vec pos;
     Vec dist;
     Vec _pos;
+    Vec unusedVec;
     MapObjectEntry* entry;
     MapObjectWork* wp = mobjGetWork();
     MapObjectEntry* ret;
@@ -663,6 +1102,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
     entry = wp->entries;
     ret = NULL;
 
+    unusedVec = (Vec){ 0.0f, 0.0f, 0.0f };
     _pos = (Vec){ 0.0f, 0.0f, 0.0f };
     _pos.x = x;
     _pos.y = y;
@@ -684,7 +1124,7 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
                         animName++;
                         continue;
                     }
-                } else if (strcmp(entry->animName, "MOBJ_KururinFloor") == 0) {
+                } else if (strcmp(entry->animName, kururinName) == 0) {
                     if (mobjCheckKururingFloorItem(entry) != 2) {
                         animName++;
                         continue;
@@ -706,3 +1146,5 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 
     return ret;
 }
+
+const char kururinName[] = "MOBJ_KururinFloor";

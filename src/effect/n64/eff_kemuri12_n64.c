@@ -48,7 +48,7 @@ EffectEntry* effKemuri12N64Entry(s32 type, s32 duration, f32 x, f32 y, f32 z, f3
     EffKemuri12N64Work* work;
 
     effect = effEntry();
-    effect->type = "Kemuri12N64\0\0\0\0";
+    effect->type = "Kemuri12N64";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri12N64Work));
     effect->userdata = work;
@@ -107,14 +107,14 @@ void effKemuri12Main(EffectEntry* effect) {
 #pragma opt_propagation off
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
+    s32 alpha;
+    CameraEntry* camera;
+    s32 ofs;
+    EffKemuri12N64Work* work;
+    effN64Vtx* vtx;
     u16 type;
     s32 last;
     s32 idx;
-    EffKemuri12N64Work* work;
-    CameraEntry* camera;
-    s32 ofs;
-    s32 alpha;
-    effN64Vtx* vtx;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rot;
@@ -123,9 +123,9 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     idx = work->progress;
-    alpha = (s32)(256.0f * (work->progress - (f32)idx));
-    last = (idx == 7);
+    alpha = 256.0f * (work->progress - idx);
     type = work->type;
+    last = (idx == 7);
     GXSetNumChans(0);
     GXSetNumTevStages(3);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

@@ -159,11 +159,11 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
+	s16 count;
 	s32 i;
-	s32* p;
 	int j;
 	u32 k;
-	s16 count;
+	s32* p;
 
 	for (k = 0; k < 0x11; k++) {
 		table[k][1] = 200;
@@ -171,12 +171,13 @@ void badgeShop_bottakuruGeneration(void) {
 	}
 
 	k = 0;
+	i = 0;
 	p = (s32*)table;
-	for (i = 0; i < BADGE_MAX - 1; i++) {
+	for (; i < BADGE_MAX - 1; i++) {
 		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
 		for (j = 0; j < count; j++) {
-			p[k*2+1] = irand(100);
-			p[k++*2] = i + 1;
+			table[k][1] = irand(100);
+			table[k++][0] = i + 1;
 			if (k >= 0x10) break;
 		}
 		if (k >= 0x10) break;

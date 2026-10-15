@@ -26,9 +26,9 @@ USER_FUNC(yuuminigame_window_end);
 PiantaParlorWork yuugijouwork;
 
 //.sbss
-s32 unk_80418b54;
-PiantaParlorWork* yuwp;
 s32 gap_08_80418B5C_sbss;
+PiantaParlorWork* yuwp;
+s32 unk_80418b54;
 
 s32 minigame_end[] = {
 	0x00020032, 0xFD050F80, 0x00000002,

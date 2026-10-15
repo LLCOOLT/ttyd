@@ -57,10 +57,13 @@ typedef struct Anim40 {
 } Anim40;
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
+	u16 i;
 	TEXPalette* tpl;
 	s32 j, n;
 	Anim40* e;
 	u8* q;
+	TEXHeader* img;
+	CLUTHeader* pal;
 	void* data = *entry->data;
 	switch (entry->field_0x1) {
 		case 1:
@@ -115,10 +118,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 				OSPanic("filemgr.c", 147, "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray >= (u32)tpl) {
-					u16 i;
-					TEXHeader* img;
-					CLUTHeader* pal;
-				for (i = 0; i < tpl->numDescriptors; i++) {
+				for (i = 0; i < tpl->numDescriptors; ++i) {
 					img = tpl->descriptorArray[i].textureHeader;
 					if (img) {
 						if (img->unpacked) {
@@ -243,9 +243,13 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
-	u8* q;
-	s32 j, n;
+	u16 i;
+	TEXHeader* img;
+	CLUTHeader* pal;
 	TEXPalette* tpl;
+	s32 j;
+	u8* q;
+	s32 n;
 	switch (type) {
 		case 1:
 			if (FLD(data, 0x14c) < (u32)data) {
@@ -299,11 +303,8 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 				OSPanic("filemgr.c", 106, "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray < (u32)tpl) {
-				u16 i;
-				TEXHeader* img;
-				CLUTHeader* pal;
 				*(u32*)&tpl->descriptorArray += (u32)tpl;
-				for (i = 0; i < tpl->numDescriptors; i++) {
+				for (i = 0; i < tpl->numDescriptors; ++i) {
 					img = tpl->descriptorArray[i].textureHeader;
 					if (img) {
 						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)img);

@@ -55,6 +55,7 @@ extern inline float sqrtf(float x) {
     return x;
 }
 
+#ifndef MATH_NO_SQRT_HACK
 // TODO: this isn't correct! It's just to generate sdata2 in GXDraw.o
 extern inline float sqrt(float x) {
     static const double _half = .5;
@@ -75,6 +76,7 @@ extern inline float sqrt(float x) {
     }
     return x;
 }
+#endif
 
 #ifdef __MWERKS__
 #define fabs(x) __fabs(x)

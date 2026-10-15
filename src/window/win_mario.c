@@ -81,7 +81,6 @@ LinkDt linkDt[18] = {
     {3, -102, "M_S_1", NULL, "S_1", 0, 0, "msg_menu_mario_time", {16, 11, 4, 4}},
 };
 
-const char* const N_stat_name_tbl[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
 const char* hammer_help[] = {NULL, "msg_hammer_1", "msg_hammer_2", "msg_hammer_3"};
 const char* boots_help[] = {NULL, "msg_boots_1", "msg_boots_2", "msg_boots_3"};
 const char* hammer_pose[] = {NULL, "M_H_1", "M_H_4", "M_H_7"};
@@ -411,6 +410,7 @@ void winFontSetEdge(Vec pos, Vec scale, GXColor color, const char* fmt, ...);
 void winFontSetLabel(Vec pos, Vec scale, GXColor color, const char* msg);
 const char* BattleGetRankNameLabel(s32 level);
 
+
 void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     static s32 pri[6] = {3, 2, 8, 10, 7, 9};
     GXColor white2;
@@ -420,12 +420,12 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     PouchData* pouch;
     f32 x;
     f32 y;
+    f32 v25;
     f32 v29;
     f32 v26;
     f32 v27;
     f32 v28;
     f32 v24;
-    f32 v25;
     f32 v23;
     f32 v30;
     f32 v22;
@@ -478,11 +478,12 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     fukidashi(w, w->idx, x, y);
 
     winKirinukiGX(w, 0, x - 270.0f, y - 10.0f, 264.0f, 110.0f);
-    v24 = 50.0f + (x - 270.0f);
+    v21 = 50.0f + (x - 270.0f);
     v25 = 50.0f + (x - 270.0f) - 2.0f;
     for (i = 0; i < 3; i++) {
         GXColor cols[3] = {{0xCB, 0x8C, 0xA2, 0xFE}, {0xCB, 0xBE, 0x89, 0xFE}, {0x94, 0xB9, 0xC7, 0xFE}};
         GXColor reds[3] = {{0xA7, 0x3C, 0x3C, 0xFF}, {0x37, 0x69, 0x1E, 0xFF}, {0x0F, 0x21, 0x7A, 0xFF}};
+        const char* const N_stat_name_tbl[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
         const char* ruby[3] = {"msg_menu_mario_ruby_hp", "msg_menu_mario_ruby_fp", "msg_menu_mario_ruby_bp"};
 
         v23 = FontGetMessageWidth(N_stat_name_tbl[i]);
@@ -493,8 +494,8 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
         v18 = (y - 38.0f) - (f32)(i * 34);
         winTexSet(0xAF, (Vec){v25, v18 - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, cols[i]);
         winFontInit();
-        winFontSet((Vec){v24 - v23 / 2.0f, 12.0f + v18, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, N_stat_name_tbl[i]);
-        winFontSet((Vec){v24 - v22 / 2.0f, 21.0f + v18, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, reds[i], msgSearch(ruby[i]));
+        winFontSet((Vec){v21 - v23 / 2.0f, 12.0f + v18, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, N_stat_name_tbl[i]);
+        winFontSet((Vec){v21 - v22 / 2.0f, 21.0f + v18, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, reds[i], msgSearch(ruby[i]));
     }
 
     winIconInit();

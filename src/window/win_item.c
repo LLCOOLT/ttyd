@@ -25,7 +25,9 @@ typedef struct IRes {
 typedef struct IWinPos {
     f32 x;
     f32 y;
-    u8 pad[0xC];
+    f32 scroll;
+    f32 width;
+    u8 pad[4];
 } IWinPos;
 
 typedef struct ItemWork {
@@ -287,6 +289,10 @@ void winItemExit(ItemWork* w) {
 
 s32 winItemMain(ItemWork* w) {
     s32 cnt;
+    s32 col;
+    f32 width;
+
+    f32 scroll;
     s32 mode;
     s32 pages;
     s32 id;
@@ -351,7 +357,7 @@ s32 winItemMain(ItemWork* w) {
         if (w->trg & 0x100) {
             if (w->mode == 0) {
                 id = pouchHaveItem(w->cursor[mode]);
-                if (*(u16*)&itemDataTable[id].usable_locations & 4) {
+                if ((*(u16*)&itemDataTable[id].usable_locations & 4) != 0) {
                     w->f2D4 = id;
                     w->f2D8 = w->cursor[mode];
                     w->state = 300;
@@ -769,21 +775,17 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     GXColor grayc = {0x80, 0x80, 0x80, 255};
     GXColor white3;
     GXColor white4;
-    s32 ok;
     f32 yBase;
-    s32 row;
-    ItemWork* p;
-    s32 col;
     ItemData* item;
+    ItemWork* p;
     f32 y;
     s32 i;
-
     s32 id;
-    s32 gray;
+    s32 ok;
     s32 cnt;
-    f32 width;
-
+    s32 gray;
     f32 scroll;
+    f32 width;
 
     white4 = white;
     white2 = white4;
@@ -795,9 +797,9 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     }
     GXSetScissor(0, 0x6D, 0x260, 0xC0);
     p = w;
-    for (i = 0; i < cnt; p = (ItemWork*)((u8*)p + 2), i++) {
-        col = i % 2;
-        row = i / 2;
+    for (i = 0; i < cnt; p = (ItemWork*)((s16*)p + 1), i++) {
+        s32 col = i % 2;
+        s32 row = i / 2;
         if (w->mode == 0) {
             id = pouchHaveItem(i);
         } else {

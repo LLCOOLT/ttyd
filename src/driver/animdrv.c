@@ -1274,7 +1274,7 @@ void materialProc(s32 shapeId, s32 xluStage) {
                                 GXLoadTexObj(texObj, GX_TEXMAP0);
                                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE,
                                                   GX_PTIDENTITY);
-                                GXLoadTexMtxImm(*wp->paperMtxPtr[texChange1 == 0], GX_TEXMTX0, GX_MTX2x4);
+                                GXLoadTexMtxImm(*wp->paperMtxPtr[!texChange1], GX_TEXMTX0, GX_MTX2x4);
                             }
                             GXLoadTexObj(currTexObj, GX_TEXMAP1);
                             GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE,
@@ -1304,6 +1304,7 @@ void materialProc(s32 shapeId, s32 xluStage) {
 // I'm so sorry, whoever gets tasked with matching this function
 // note: I detect at least 8 inlined functions here, good luck finding the separation
 void renderProc(s32 shapeId, s32 unused) {
+    int i;
     CameraEntry* camera;
     AnimationPoseData* data;
     AnimPoseShape *shapes, *shape;
@@ -1333,7 +1334,7 @@ void renderProc(s32 shapeId, s32 unused) {
     s32 index;
     s32 texIndex;
 
-    int i, j, k, l;
+    int j, k, l;
 
     // stack variables
     s32 clr0VtxSize, posVtxSize; // TODO: make sure stack, +0xB0, +0xAC
@@ -1366,7 +1367,6 @@ void renderProc(s32 shapeId, s32 unused) {
             wp->mpCurPose->materialColor.a != 0xFF || wp->mpCurPose->materialColor2.a != 0xFF) {
             GXSetCullMode(tbl[shape->cullMode]);
             data = wp->mpCurPoseData;
-            posVtxSize = (s32)sizeof(Vec) * posFirstVtx;
             clr0VtxSize = (s32)sizeof(GXColor) * clr0FirstVtx;
             buffer = data->texVtxBuffer;
             texVtxIndices[0] = &buffer[2 * shape->vtxTex[0].first];
@@ -1378,6 +1378,7 @@ void renderProc(s32 shapeId, s32 unused) {
             texVtxIndices[6] = &buffer[2 * shape->vtxTex[6].first];
             texVtxIndices[7] = &buffer[2 * shape->vtxTex[7].first];
             nrmVtxSize = (s32)sizeof(Vec) * nrmFirstVtx;
+            posVtxSize = (s32)sizeof(Vec) * posFirstVtx;
 
             for (i = 0; i < drawCount; i++, draw++) {
                 texCount = draw->texCount;
@@ -1430,7 +1431,7 @@ void renderProc(s32 shapeId, s32 unused) {
                                 GXLoadTexObj(texObj, GX_TEXMAP0);
                                 GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE,
                                                   GX_PTIDENTITY);
-                                GXLoadTexMtxImm(*wp->paperMtxPtr[texChange1 == 0], GX_TEXMTX0, GX_MTX2x4);
+                                GXLoadTexMtxImm(*wp->paperMtxPtr[!texChange1], GX_TEXMTX0, GX_MTX2x4);
                             }
                             GXLoadTexObj(currTexObj, GX_TEXMAP1);
                             GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE,
@@ -1469,8 +1470,8 @@ void renderProc(s32 shapeId, s32 unused) {
                     posVtxPtr = (Vec*)((u8*)wp->vtxArrayPos + posVtxSize);
                 } else {
                     pose = wp->mpCurPose;
-                    posVtxPtr = (Vec*)((u8*)pose->mpVtxArrayPos + posVtxSize);
                     nrmVtxPtr = (Vec*)((u8*)pose->mpVtxArrayNrm + nrmVtxSize);
+                    posVtxPtr = (Vec*)((u8*)pose->mpVtxArrayPos + posVtxSize);
                 }
                 GXClearVtxDesc();
                 GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
@@ -1488,15 +1489,14 @@ void renderProc(s32 shapeId, s32 unused) {
                     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
                     GXSetArray(GX_VA_TEX0, texVtxIndices[texIds[0]], sizeof(f32) * 2);
                     for (j = 0; j < drawCallCount; j++, drawCall++) {
-                        data = wp->mpCurPoseData; // doubly inlined function here
-                        count = (u16)drawCall->count;
-                        // indices are stored as u32, has to do math to load the lower 2 bytes
-                        posIndexPtr = &data->posIndex[((drawCall->first + posFirstId) * 2) + 1];
-                        nrmIndexPtr = &data->nrmIndex[((drawCall->first + nrmFirstId) * 2) + 1];
-                        clr0IndexPtr = &data->clr0Index[((drawCall->first + clr0FirstId) * 2) + 1];
-                        texIndexPtr = &data->texIndex[texIds[0]][((drawCall->first + firstId[texIds[0]]) * 2) + 1];
+                        firstDrawId = drawCall->first;
+                        data = wp->mpCurPoseData;
+                        posIndexPtr = (u16*)((u32*)data->posIndex + (firstDrawId + posFirstId)) + 1;
+                        nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
+                        clr0IndexPtr = (u16*)((u32*)data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
+                        texIndexPtr = (u16*)((u32*)data->texIndex[texIds[0]] + (firstDrawId + firstId[texIds[0]])) + 1;
                         GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, (u16)drawCall->count);
-                        for (k = count; k > 0; k--) {
+                        for (k = (u16)drawCall->count; k > 0; k--) {
                             GXPosition1x16(*posIndexPtr);
                             posIndexPtr += 2;
                             GXNormal1x16(*nrmIndexPtr);
@@ -1521,15 +1521,14 @@ void renderProc(s32 shapeId, s32 unused) {
                         nrmIndexPtr = (u16*)((u32*)data->nrmIndex + (firstDrawId + nrmFirstId)) + 1;
                         clr0IndexPtr = (u16*)((u32*)data->clr0Index + (firstDrawId + clr0FirstId)) + 1;
                         GXBegin(GX_TRIANGLEFAN, GX_VTXFMT0, count);
-                        for (k = 0, clr0FirstVtx = 0; k < count; k++) {
+                        for (k = 0; k < count; k++) {
                             GXPosition1x16(*posIndexPtr);
                             GXNormal1x16(*nrmIndexPtr);
                             GXColor1x16(*clr0IndexPtr);
                             for (l = texCount, index = 0; l > 0; l--, index++) {
-                                texIndex = texIds[texCount - 1 - index];
-                                GXTexCoord1x16(*(u32*)((u8*)&((u32*)wp->mpCurPoseData->texIndex[texIndex])[firstDrawId + firstId[texIndex]] + clr0FirstVtx));
+                                texIndex = texIds[(u32)(texCount - index - 1)];
+                                GXTexCoord1x16((&((u32*)wp->mpCurPoseData->texIndex[texIndex])[firstDrawId + firstId[texIndex]])[k]);
                             }
-                            clr0FirstVtx += 4;
                             posIndexPtr += 2;
                             nrmIndexPtr += 2;
                             clr0IndexPtr += 2;

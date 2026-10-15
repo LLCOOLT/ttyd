@@ -418,13 +418,15 @@ HitEntry* marioSearchUnder(void) {
     f32 d = 1000.0f;
     HitEntry* hit;
     f32 h;
+    float new_var;
     MarioWork* w = marioGetPtr();
     h = MF(w, 0x1b8, f32);
     if (w->flags & 0x1000000) {
         h *= 0.5f;
     }
     pos = w->position;
-    pos.y = pos.y + h;
+    new_var = pos.y + h;
+    pos.y = new_var;
     {
     Vec dir = {0.0f, -1.0f, 0.0f};
     hit = marioHitCheckVecInl(&pos, &dir, &outPos, &outNrm, &d);
@@ -443,6 +445,8 @@ HitEntry* searchUnder2(f32* out, f32 x, f32 y, f32 z) {
     pos.z = z;
     pos2 = pos;
     pos2.y += 37.0f;
+    if (x) {
+    }
     {
     Vec dir = {0.0f, -1.0f, 0.0f};
     hit = marioHitCheckVecInl(&pos2, &dir, &outPos, &outNrm, &d);
@@ -671,7 +675,9 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     f32 best, yl, sx, sz, x0, y0, z0, a;
     f32 x, z;
     f32 lim;
+    f32 dir;
     f32 sn;
+    f32* new_var;
     HitEntry* found;
     s32 i;
     HitEntry* hit;
@@ -683,6 +689,8 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     if (w->flags & 0x200) {
         *y = w->position.y;
         return NULL;
+        if (b) {
+        }
     }
     if (w->flags & 0x100) {
         *y = w->position.y;
@@ -693,6 +701,7 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     spd += 0.01f;
     yl = 5.0f + __fabsf(h);
     *b = -1.0f;
+    new_var = &MF(w, 0x1b4, f32);
     if (MF(w, 0x180, f32)) {
         a = revise360(MF(w, 0x1a0, f32) - MF(w, 0x198, f32));
     } else {
@@ -701,13 +710,13 @@ HitEntry* marioSearchGround(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     if (w->flags & 0x100000) {
         a = (3.1415927f * a) / 180.0f;
         sn = (f32)sin(a);
-        sx = 0.425f * (MF(w, 0x1b4, f32) * sn);
+        sx = 0.425f * (*new_var * sn);
         sn = (f32)cos(a);
-        sz = 0.425f * (MF(w, 0x1b4, f32) * -sn);
+        sz = 0.425f * (*new_var * -sn);
     } else {
         a = (3.1415927f * a) / 180.0f;
         sn = (f32)sin(a);
-        sx = 0.375f * (MF(w, 0x1b4, f32) * sn);
+        sx = 0.375f * (*new_var * sn);
         sn = (f32)cos(a);
         sz = 0.375f * (MF(w, 0x1b4, f32) * -sn);
     }
@@ -802,6 +811,8 @@ HitEntry* marioSearchGroundRoll(f32* y, f32* b, f32* c, f32 spd, f32 h) {
     if (w->flags & 0x200) {
         *y = w->position.y;
         return NULL;
+        if (b) {
+        }
     }
     if (w->flags & 0x100) {
         *y = w->position.y;
@@ -1030,7 +1041,6 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
     f32 zero, mone;
     f32 hh;
     f32 range;
-    f32 a;
     f32 ox, oz;
     f32 sn;
     f32 px, py, pz;
@@ -1041,6 +1051,7 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
     s32 i;
     HitEntry* hit;
     MarioWork* w = marioGetPtr();
+    f32 a;
 
     MF(w, 0x218, f32) = 0.0f;
     MF(w, 0x21c, f32) = 0.0f;
@@ -1375,24 +1386,26 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     Vec outPos, outNrm;
     f32 dist;
     f32 hh;
-    f32 a, ang;
-    f32 x, z;
     f32 sx, sz;
+    f32 a, ang;
+    f32 top;
+    f32 x, z;
     HitEntry* hit;
     s32 i;
     MarioWork* w = marioGetPtr();
     if (MF(w, 0x180, f32)) {
-        ang = MF(w, 0x1a0, f32);
+        hh = MF(w, 0x1a0, f32);
     } else {
-        ang = toMovedir(MF(w, 0x1a8, f32));
+        hh = toMovedir(MF(w, 0x1a8, f32));
     }
-    a = (3.1415927f * ang) / 180.0f;
-    sx = sin(a);
+    hh = (3.1415927f * hh) / 180.0f;
+    sx = sin(hh);
     sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * sx);
-    sz = cos(a);
+    sz = cos(hh);
     sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -sz);
-    dd = *h + dd;
-    hh = 0.5f * *h;
+    a = *h;
+    hh = 0.5f * a;
+    top = a + dd;
     *h = -1.0f;
     for (i = 0; i < 5; i++) {
         if (i == 0) {
@@ -1413,7 +1426,7 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
         {
             Vec v = {0.0f, 0.0f, 0.0f};
             Vec dir = {0.0f, 1.0f, 0.0f};
-            dist = dd;
+            dist = top;
             v.x = pos->x + x;
             v.y = pos->y + hh;
             v.z = pos->z + z;
@@ -1463,12 +1476,12 @@ inline f32 marioSearchHead_roll_cos(f32 a) {
 }
 
 HitEntry* marioSearchHead_roll(Vec* pos, f32* h, f32 d) {
+    f32 a;
     Vec outPos, outNrm;
     f32 x, z;
     f32 dist;
     f32 base, top;
     Vec* pdir;
-    f32 a;
     s32 i;
     HitEntry* hit;
     MarioWork* w = marioGetPtr();
@@ -1982,6 +1995,8 @@ HitEntry* dou10_yoko_yari(f32* out) {
             MF(w, 0x1e0, HitEntry*) = hit;
             *out = 0.8f;
         }
+        if ((!w->flags) && (!w->flags)) {
+        }
         pos = w->position;
         movePos(&pos.x, &pos.z, step, 90.0f);
         hit = searchFrontWall(&pos, &h, 20.0f, 0.0f, 20.0f);
@@ -2106,7 +2121,7 @@ HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     f32 dist;
     f32 hh;
     f32 x0, y0, z0;
-    f32 r, s, a;
+    f32 a, s, r;
     HitEntry* hit;
     MarioWork* w = marioGetPtr();
     MF(w, 0x218, f32) = 0.0f;

@@ -1060,9 +1060,9 @@ void bmapUnLoad(void) {
 	arcDelete(1);
 	arcDelete(2);
 	memset(wp, 0, sizeof(MapWork));
-	wp = mapWork;
+	wp0 = mapWork;
 	activeGroup = 0;
-	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
+	for (i = 0, entry = wp0->entries; i < wp0->entries[0].count; entry++, i++) {
 
 
 		if (MAPENT_FIELD(entry, void*, 0x170)) {
@@ -1080,8 +1080,8 @@ void bmapUnLoad(void) {
 		}
 		makeDisplayList(i);
 	}
-	if (MAPENT_FIELD(wp->entries, void*, 0x8C)) {
-		arcEntry(1, MAPENT_FIELD(wp->entries, void*, 0x8C), MAPENT_FIELD(wp->entries, u32, 0x90));
+	if (MAPENT_FIELD(wp0->entries, void*, 0x8C)) {
+		arcEntry(1, MAPENT_FIELD(wp0->entries, void*, 0x8C), MAPENT_FIELD(wp0->entries, u32, 0x90));
 
 	}
 }
@@ -1282,22 +1282,367 @@ void mapReCalcMatrix(MapObject* obj, Mtx mtx, BOOL force) {
 	}
 }
 
+typedef struct MapAnimNm {
+	const char** name; // 0x0
+	u8* data;          // 0x4
+} MapAnimNm;
+
+typedef struct MapAnimList {
+	s32 count;
+	MapAnimNm* items[1];
+} MapAnimList;
+
+typedef struct MapAnimKey4 {
+	f32 time;
+	MapAnimKeyCh ch[4];
+} MapAnimKey4;
+
+typedef struct MapAnimKey5 {
+	f32 time;
+	MapAnimKeyCh ch[5];
+} MapAnimKey5;
+
+typedef struct MapAnimKey9 {
+	f32 time;
+	MapAnimKeyCh ch[9];
+} MapAnimKey9;
+
+typedef struct MapAnimMatData {
+	const char* name;
+	s32 idx;
+	f32 u;
+	f32 v;
+	s32 keyCount;
+	MapAnimKey5 keys[1];
+} MapAnimMatData;
+
+typedef struct MapAnimAlphaData {
+	const char* name;
+	s32 keyCount;
+	MapAnimKey4 keys[1];
+} MapAnimAlphaData;
+
+typedef struct MapAnimLightData {
+	const char* name;
+	s32 keyCount;
+	MapAnimKey9 keys[1];
+} MapAnimLightData;
+
+typedef struct MapAnimLightData2 {
+	const char* name;
+	s32 keyCount;
+	MapAnimKey5 keys[1];
+} MapAnimLightData2;
+
+#define mapMainFindObj(res_, nm_, lbl_) \
+{ \
+	const char* n_ = nm_; \
+	w_ = &mapWork[activeGroup]; \
+	if (n_ == NULL) { \
+		res_ = NULL; \
+	} \
+	else { \
+		e_ = w_->entries; \
+		for (i_ = 0; i_ < w_->entries[0].count; e_++, i_++) { \
+			o_ = e_->objects; \
+			for (j_ = 0; j_ < e_->numJoints; j_++, o_++) { \
+				if (!strcmp(*(const char**)o_->joints, n_)) { \
+				res_ = o_; \
+					goto lbl_; \
+				} \
+			} \
+		} \
+		res_ = NULL; \
+	} \
+	lbl_:; \
+}
+
+#define mapMainFindTbl(res_, nm_, lbl_) \
+{ \
+	MapWork* w_ = &mapWork[activeGroup]; \
+	MapEntry* e_ = w_->entries; \
+	 \
+	for (i_ = 0; i_ < w_->entries[0].count; e_++, i_++) { \
+		if (!MAPENT_FIELD(e_, u32*, 0xA0)) { \
+			res_ = NULL; \
+			goto lbl_; \
+		} \
+		for (j_ = 0; j_ < (s32)MAPENT_FIELD(e_, u32*, 0xA0)[0]; j_++) { \
+			u32* pr_ = (u32*)&((struct { u32 n_; struct { const char* nm; u8* p; } e_[1]; }*)MAPENT_FIELD(e_, u32*, 0xA0))->e_[j_]; \
+			if (!strcmp((const char*)pr_[0], nm_)) { \
+				res_ = (u8*)pr_[1]; \
+				goto lbl_; \
+			} \
+		} \
+	} \
+	res_ = NULL; \
+	lbl_:; \
+}
+
+#define mapMainMat(a_, i_, b_, x_, lbl_) \
+{ \
+	MapAnimMatData* d; \
+	u8* obj; \
+	f32 cur; \
+	int n, c; \
+	strcpy(b_, (const char*)i_->name); \
+	if (x_) { \
+		strcat(b_, x_); \
+	} \
+	mapMainFindTbl(obj, b_, lbl_); \
+	if (obj) { \
+		d = (void*)i_; \
+		for (n = 1; n < d->keyCount; n++) { \
+			MapAnimKey5* k0 = &d->keys[n - 1]; \
+			MapAnimKey5* k1 = &d->keys[n]; \
+			f32 t_ = a_->time; \
+			if (t_ <= k1->time) { \
+				cur = t_; \
+			} \
+			else if (n == d->keyCount - 1) { \
+				cur = k1->time; \
+			} \
+			else { continue; } \
+			\
+			for (c = 0; c < 5; c++) { \
+				if (k0->ch[c].step) { \
+					*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = k0->ch[c].value; \
+				} \
+				else { \
+					*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = mapHermite(cur, k0->time, k1->time, k0->ch[c].value, k0->ch[c].tanOut, k1->ch[c].value, k1->ch[c].tanIn); \
+				} \
+			} \
+			*(f32*)(obj + d->idx * 0x1c + 0x40) = d->u; \
+			*(f32*)(obj + d->idx * 0x1c + 0x44) = d->v; \
+			break; \
+		} \
+	} \
+}
+
+#define mapMainAlpha(a_, i_, b_, x_, lbl_) \
+{ \
+	MapAnimAlphaData* d; \
+	u8* obj; \
+	f32 cur; \
+	int n; \
+	strcpy(b_, (const char*)i_->name); \
+	if (x_) { \
+		strcat(b_, x_); \
+	} \
+	mapMainFindTbl(obj, b_, lbl_); \
+	if (obj) { \
+		d = (void*)i_; \
+		for (n = 1; n < d->keyCount; n++) { \
+			MapAnimKey4* k0 = &d->keys[n - 1]; \
+			MapAnimKey4* k1 = &d->keys[n]; \
+			\
+			f32 t_ = a_->time; \
+			if (t_ <= k1->time) { \
+				cur = t_; \
+			} \
+			else if (n == d->keyCount - 1) { \
+				cur = k1->time; \
+			} \
+			else { continue; } \
+			\
+			if (k0->ch[0].step) { \
+				*(u8*)(obj + 0x10c) = (u8)(255.0f - 255.0f * k0->ch[0].value); \
+			} \
+			else { \
+				*(u8*)(obj + 0x10c) = (u8)(255.0f - 255.0f * mapHermite(cur, k0->time, k1->time, k0->ch[0].value, k0->ch[0].tanOut, k1->ch[0].value, k1->ch[0].tanIn)); \
+			} \
+			\
+			break; \
+		} \
+	} \
+}
+
 void mapMain(void) {
+	int i_, j_;
+	MapEntry* e_;
+	MapWork* w_;
+	MapObject* o;
+	MapObject* o_;
+	s32 k, c, n;
+	f32 cur;
 	MapWork* wp = &mapWork[activeGroup];
 	MapEntry* entry;
-	MapEntryAnimData* anim;
-	Mtx scale;
+	MapAnim* anim;
+	char mbuf[0x100];
 	s32 i, j;
+	BOOL changed;
+	OSTime ms, t;
+	char abuf[0x100];
+	Mtx scale;
+	f32 v[9];
+	f32 cv[5];
 
 	entry = wp->entries;
 	for (i = 0; i < wp->entries[0].count; entry++, i++) {
-		anim = entry->animData;
-		for (j = 0; j < 1; j++) {
-			/* TODO: per-anim body 0x3c-0x1508: flag checks, timer (__div2i/__cvt),
-			   joint anims (strcmp/mapCalcAnimMatrix), material/texture anims (strcpy/strcat/strcmp x3),
-			   light anims (lightNameToPtr x2) */
+		changed = FALSE;
+		anim = (MapAnim*)entry->animData;
+		for (j = 0; j < entry->numAnims; j++, anim++) {
+			MapAnimList* jl = MAPENT_FIELD(anim->anim, MapAnimList*, 0xC);
+			MapAnimList* ml = MAPENT_FIELD(anim->anim, MapAnimList*, 0x10);
+			MapAnimList* al = MAPENT_FIELD(anim->anim, MapAnimList*, 0x14);
+			MapAnimList* ll = MAPENT_FIELD(anim->anim, MapAnimList*, 0x18);
+			MapAnimList* lc = MAPENT_FIELD(anim->anim, MapAnimList*, 0x1C);
+
+			if (!(anim->flags & 1) || (anim->flags & 2)) {
+				continue;
+			}
+			if (anim->flags & 0x100) {
+				t = gp->systemLv0Time;
+			}
+			else if (anim->flags & 0x200) {
+				t = gp->systemLv1Time;
+			}
+			else if (anim->flags & 0x400) {
+				t = gp->systemLv2Time;
+			}
+			else if (anim->flags & 0x800) {
+				t = gp->systemLv3Time;
+			}
+			else if (gp->inBattle) {
+				t = gp->renderTime;
+			}
+			else {
+				t = gp->renderFieldTime;
+			}
+			if (!(anim->flags & 0x10)) {
+				ms = OSTicksToMilliseconds(t);
+				cur = gp->framerate * (f32)(u64)(ms - anim->startTime) / 1000.0f;
+				if (cur < anim->time) {
+					anim->time = anim->time - (anim->time - cur);
+				}
+				else {
+					anim->time = anim->time + anim->rate * (cur - anim->time);
+				}
+				anim->startTime = OSTicksToMilliseconds(t);
+				anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+			}
+			else if (anim->flags & 0x20) {
+				anim->startTime = OSTicksToMilliseconds(t);
+				anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+				anim->flags &= ~0x20;
+				anim->flags &= ~0x10;
+			}
+			if (anim->time >= anim->anim->length) {
+				if (anim->flags & 4) {
+					cur = anim->time;
+					while (cur > anim->anim->length) {
+						cur -= anim->anim->length;
+					}
+					anim->time = cur;
+					anim->startTime = OSTicksToMilliseconds(t);
+					anim->startTime -= (u64)(1000.0f * anim->time / gp->framerate);
+				}
+				else {
+					anim->time = anim->anim->length;
+					anim->flags |= 2;
+				}
+			}
+			if (jl) {
+				for (k = 0; k < jl->count; k++) {
+					mapMainFindObj(o, (const char*)jl->items[k]->name, fo_end);
+					if (o) {
+						mapCalcAnimMatrix(o->unk7C, o->localMtx, anim, (MapAnimJoint*)jl->items[k]);
+						changed = TRUE;
+						o->flags |= 0x2000;
+						o->flags |= 0x200;
+					}
+				}
+			}
+			if (ml) {
+				for (k = 0; k < ml->count; k++) {
+					mapMainMat(anim, ml->items[k], mbuf, NULL, ft1);
+					mapMainMat(anim, ml->items[k], mbuf, "_v", ft2);
+					mapMainMat(anim, ml->items[k], mbuf, "_v_x", ft3);
+				}
+			}
+			if (al) {
+				for (k = 0; k < al->count; k++) {
+					mapMainAlpha(anim, al->items[k], abuf, NULL, ft4);
+					mapMainAlpha(anim, al->items[k], abuf, "_v", ft5);
+					mapMainAlpha(anim, al->items[k], abuf, "_v_x", ft6);
+				}
+			}
+			if (ll) {
+				for (k = 0; k < ll->count; k++) {
+					u8* lp = (u8*)lightNameToPtr((const char*)ll->items[k]->name);
+					MapAnimLightData* d;
+					if (lp) {
+						d = (MapAnimLightData*)ll->items[k];
+						for (n = 1; n < d->keyCount; n++) {
+							MapAnimKey9* k0 = &d->keys[n - 1];
+							MapAnimKey9* k1 = &d->keys[n];
+							if (anim->time <= k1->time) {
+								cur = anim->time;
+							}
+							else if (n == d->keyCount - 1) {
+								cur = k1->time;
+							}
+							else {
+								continue;
+							}
+							for (c = 0; c < 9; c++) {
+								if (k0->ch[c].step) {
+									v[c] = k0->ch[c].value;
+								}
+								else {
+									v[c] = mapHermite(cur, k0->time, k1->time, k0->ch[c].value, k0->ch[c].tanOut, k1->ch[c].value, k1->ch[c].tanIn);
+								}
+							}
+							*(f32*)(lp + 0x24) = 10.0f * v[0];
+							*(f32*)(lp + 0x28) = 10.0f * v[1];
+							*(f32*)(lp + 0x2c) = 10.0f * v[2];
+							*(f32*)(lp + 0x30) = v[3];
+							*(f32*)(lp + 0x34) = v[4];
+							*(f32*)(lp + 0x38) = v[5];
+							break;
+						}
+					}
+				}
+			}
+			if (lc) {
+				for (k = 0; k < lc->count; k++) {
+					u8* lp = (u8*)lightNameToPtr((const char*)lc->items[k]->name);
+					MapAnimLightData2* d;
+					if (lp) {
+						d = (MapAnimLightData2*)lc->items[k];
+						for (n = 1; n < d->keyCount; n++) {
+							MapAnimKey5* k0 = &d->keys[n - 1];
+							MapAnimKey5* k1 = &d->keys[n];
+							if (anim->time <= k1->time) {
+								cur = anim->time;
+							}
+							else if (n == d->keyCount - 1) {
+								cur = k1->time;
+							}
+							else {
+								continue;
+							}
+							for (c = 0; c < 5; c++) {
+								if (k0->ch[c].step) {
+									cv[c] = k0->ch[c].value;
+								}
+								else {
+									cv[c] = mapHermite(cur, k0->time, k1->time, k0->ch[c].value, k0->ch[c].tanOut, k1->ch[c].value, k1->ch[c].tanIn);
+								}
+							}
+							lp[0x48] = (u8)(255.0f * cv[0]);
+							lp[0x49] = (u8)(255.0f * cv[1]);
+							lp[0x4a] = (u8)(255.0f * cv[2]);
+							lp[0x4b] = 0xff;
+							*(f32*)(lp + 0x4c) = cv[4];
+							*(f32*)(lp + 0x50) = cv[3];
+							break;
+						}
+					}
+				}
+			}
 		}
-		if (entry->rootMapObj != NULL) {
+		if (changed) {
 			PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
 			mapReCalcMatrix(entry->rootMapObj, scale, 0);
 		}
@@ -1342,10 +1687,10 @@ void _mapDispMapObj(CameraId cam, MapObject* obj) {
 	Mtx mtx;
 	Mtx nrm;
 	f32 proj[7];
+	MapFileMesh* mesh;
 	int i;
 	int j;
 	void* material;
-	MapFileMesh* mesh;
 
 	camera = camGetPtr(cam);
 	current_mp = obj;
@@ -1361,7 +1706,8 @@ void _mapDispMapObj(CameraId cam, MapObject* obj) {
 		}
 		scale = 0.01f * n;
 		GXGetProjectionv(proj);
-		d = 1.0f * (camera->far + camera->near) * (1.0f + scale);
+		d = 1.0f;
+		d = d * (camera->far + camera->near) * (d + scale);
 		proj[5] *= 1.0f + (scale * (-2.0f * camera->far * camera->near)) / d;
 		GXSetProjectionv(proj);
 	}

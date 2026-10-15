@@ -136,6 +136,7 @@ static const char* mario_status_name_table[] = {"\x82\x67\x82\x6F", "\x82\x65\x8
 static s32 mario_status_henka_table[] = {5, 5, 3};
 s32 mario_status_max_table[] = {200, 200, 99};
 #pragma force_active on
+
 __declspec(section ".sdata") u32 gap_07_8041799C_sdata[1] = {0};
 #pragma force_active reset
 
@@ -201,7 +202,11 @@ USER_FUNC(unk_802399f8) {
     return EVT_RETURN_DONE;
 }
 
+__declspec(section ".sdata2") const u32 gap_10_80423334_sbss2;
+
 void winMgrInit(void) {
+    static const u32 gap_09_80421AD4_sdata2 = 0;
+    (void)&gap_09_80421AD4_sdata2;
     wp->mNumEntries = 32;
     wp->mEntries = (WinMgrEntry*)__memAlloc(HEAP_DEFAULT, wp->mNumEntries * sizeof(WinMgrEntry));
     memset(wp->mEntries, 0, wp->mNumEntries * sizeof(WinMgrEntry));
@@ -554,7 +559,8 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     jdt = &_jdt;
     sel = __memAlloc(HEAP_DEFAULT, sizeof(WinMgrSelect));
     memset(sel, 0, sizeof(WinMgrSelect));
-    sel->type = n = type;
+    n = type;
+    sel->type = n;
     sel->cursor = 0;
     sel->scrollTop = 0;
     sel->field_0x18 = 0.0f;
@@ -567,8 +573,8 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     if (n < 0) {
         n = 0;
     }
-    sel->numDescriptors = select_desc_tbl[n].numDescriptors;
     d = select_desc_tbl[n].descriptors;
+    sel->numDescriptors = select_desc_tbl[n].numDescriptors;
     for (i = 0; i < sel->numDescriptors; i++) {
         sel->descriptorId[i] = winMgrEntry(d++);
         winMgrSetParam(sel->descriptorId[i], sel);
@@ -577,7 +583,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     sel->field_0x14 = desc->x;
     sel->field_0x18 = desc->y - 54;
 
-    switch (sel->type) {
+    switch (m = sel->type) {
         case 0:
             sel->items = __memAlloc(HEAP_DEFAULT, 0x1E8);
             memset(sel->items, 0, 0x1E8);
@@ -798,7 +804,7 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             break;
         case 17:
         case 18:
-            if (sel->type == 17) {
+            if (m == 17) {
                 tbl = jdt->unk14.unkD;
             }
             else {
@@ -825,8 +831,8 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
                 if (a2) {
                     sel->items[sel->numItems++].id = a2;
                 }
-                for (list = (s32*)type, i = 0; *list != -1; list++, i++) {
-                    sel->items[sel->numItems++].id = ((s32*)type)[i];
+                for (list = (s32*)type, i = 0; *list != -1; list++) {
+                    sel->items[sel->numItems++].id = ((s32*)type)[i++];
                 }
             }
             break;
@@ -869,6 +875,8 @@ s32 winMgrSelect(WinMgrSelect* sel) {
 }
 
 
+
+static const char* select_party_name(u16 id);
 s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
     InformantWork* jdt = &_jdt;
     s32 id;
@@ -1225,7 +1233,7 @@ void select_disp(WinMgrEntry* entry) {
             sprintf(buf, "%d", price);
             tw = FontGetMessageWidth(buf);
             winFontInit();
-            winFontSet((Vec){(entry->width - 10) + entry->x - tw, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+            winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & 1) ? &gray : &black), buf);
         }
         if (sel->field_0x38) {
@@ -1262,6 +1270,8 @@ void select_disp(WinMgrEntry* entry) {
             case 3:
             case 11:
             case 12:
+            case 14:
+            case 15:
                 PSMTXTrans(mtx, entry->x + 268, entry->y - 18, 0.0f);
                 PSMTXScale(scale, 0.6f, 0.6f, 0.6f);
                 PSMTXConcat(mtx, scale, mtx);
@@ -1329,7 +1339,9 @@ static inline s32 select_party_icon(u16 id) /* */ {
 
 
 
-static const char* select_party_name(u16 id);
+
+
+
 void select_disp_party(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     PouchData* pouch = pouchGetPtr();
@@ -1386,11 +1398,11 @@ void select_disp_party(WinMgrEntry* entry) {
         msg = msgSearch("msg_window_title_7");
         w = (120 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + ((entry->width * 3 / 5 - 120) * 2 / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
+        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 - 120) * 2 / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
         msg = msgSearch("msg_window_title_8");
         w = (85 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
+        winFontSetEdge((Vec){entry->x + entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
         iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
@@ -1502,9 +1514,9 @@ void select_disp_mario(WinMgrEntry* entry) {
 void select_disp_luigi(WinMgrEntry* entry) {
     WinMgrEntry* ent = entry;
     WinMgrSelect* sel = ent->param;
-    InformantWork* jdt = &_jdt;
     u32 left, top, wd, ht;
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
+    InformantWork* jdt = &_jdt;
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
     GXColor* col;
@@ -1532,9 +1544,10 @@ void select_disp_luigi(WinMgrEntry* entry) {
             winFontInit();
             save = ((char*)info->initEndPos)[info->tagEndPos];
             ((char*)info->initEndPos)[info->tagEndPos] = 0;
-            col = &black;
             if (sel->items[i].flags & 1) {
                 col = &gray;
+            } else {
+                col = &black;
             }
             winFontSet((Vec){ent->x + 25, sel->field_0x1C + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
             ((char*)info->initEndPos)[info->tagEndPos] = save;

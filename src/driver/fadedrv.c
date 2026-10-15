@@ -20,7 +20,6 @@ s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 extern GlobalWork* gp;
 
 static FadeWork* wp;
-__declspec(section ".sdata") static u8 i4tex[0x20] = {0xFF};
 
 //local prototypes
 void _callback(s32 error, DVDFileInfo* info);
@@ -846,6 +845,7 @@ void fadeMain(void) {
 
 
 void disp_texture(CameraId camId, void* param) {
+	static u8 i4tex[1] = {0xFF};
 	FadeWork* work;
 	CameraEntry* camera;
 	f32 scale;
@@ -1277,4 +1277,3 @@ TEXPalette* fadeGetTpl(void) {
 void fadeSetNarrowFast(void) {
 	wp->entries[1].flags |= 8;
 }
-

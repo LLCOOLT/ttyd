@@ -1466,12 +1466,12 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 }
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
-    int tevStage;
-    int texMap;
-    int texCoord;
-    int field_0x18;
+    MapObject* q;
     MapObject* p;
-    MapObject* obj;
+    s32 tevStage;
+    s32 texMap;
+    s32 texCoord;
+    int field_0x18;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1484,9 +1484,8 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     texMap = info->texCoord;
     texCoord = info->texMap;
     field_0x18 = info->field_0x18;
-    obj = *(MapObject**)info->field_0x0;
-    p = obj;
-    if (obj->flags & 0x20) {
+    p = *(MapObject**)info->field_0x0;
+    if (p->flags & 0x20) {
         while ((p = p->parent) != NULL) {
             if (p->flags & 0x10) {
                 if (!(p->flags & 0x20000000)) {
@@ -1501,14 +1500,14 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
             }
         }
     } else {
-        if (!(obj->flags & 0x20000000)) {
-            obj->flags |= 0x20000000;
+        if (!(p->flags & 0x20000000)) {
+            p->flags |= 0x20000000;
             return;
         }
-        x0 = obj->screenRect[0];
-        y0 = obj->screenRect[1];
-        x1 = obj->screenRect[2];
-        y1 = obj->screenRect[3];
+        x0 = p->screenRect[0];
+        y0 = p->screenRect[1];
+        x1 = p->screenRect[2];
+        y1 = p->screenRect[3];
     }
     if (x0 == 0x3FF || y0 == 0x3FF || x1 == 0x3FF || y1 == 0x3FF) {
         return;
@@ -1554,11 +1553,11 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
-    info->tevStage = ++tevStage;
-    info->texMap = ++texCoord;
+    info->tevStage = tevStage = tevStage + 1;
+    info->texMap = texCoord = texCoord + 1;
     info->field_0x18 = field_0x18;
-    info->texCoord = ++texMap;
-}
+    info->texCoord = texMap = texMap + 1;
+    }
 
 BOOL img_wait(void) {
     ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);

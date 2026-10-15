@@ -80,7 +80,7 @@ s32 battleAcMain_SignalTiming(BattleWork* work) {
     if (ac->mAcUnit->badgesEquipped.AutoCommand) {
         autoCommand = TRUE;
     }
-    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0\0\0\0\0";
+    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0\0\0\0\0"; 
 
     do {
         loop = FALSE;
@@ -347,11 +347,11 @@ void battleAcDelete_SignalTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
+    s32 i;
     BattleWork* work = _battleWorkPointer;
     SignalTimingWork* w;
     s32 count;
     s32 next;
-    s32 i;
     s32 n;
     s32 num;
     s32 num2;
@@ -365,8 +365,8 @@ static void actionCommandDisp(f32 x, f32 y) {
 
     camGetPtr(8);
     count = ST_COUNT(work);
-    w = (SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC);
-    next = w->next;
+    next = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC))->next;
+    w = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC));
     if (!(ST_FLAGS(work) & 1)) {
         if (w->okFlag) {
             Vec pos = {0.0f, 0.0f, 0.0f};

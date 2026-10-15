@@ -280,11 +280,11 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
+    GXColor color;
     CameraEntry* cam;
     s32 type;
     s32 i;
     f32 z;
-    GXColor color;
 
     cam = camGetPtr(cameraId);
     type = work->type;

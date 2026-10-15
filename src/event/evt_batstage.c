@@ -38,11 +38,10 @@ USER_FUNC(evt_batstage_light_set_player_off) {
 }
 
 USER_FUNC(evt_batstage_light_set_player_on) {
-    BattleWork* bw = _battleWorkPointer;
     s32 i;
-    s32* args = event->args;
-    s32 sel = evtGetValue(event, args[0]);
     s32 idx;
+    BattleWork* bw = _battleWorkPointer;
+    s32 sel = evtGetValue(event, event->args[0]);
     char names[3][32] = {"sys_activeUnit_1", "sys_activeUnit_2", "sys_activeUnit_3\0\0\0"};
     Vec pos[3] = {{100.0f, 250.0f, 70.0f}, {-300.0f, 250.0f, 70.0f}, {-120.0f, 250.0f, -70.0f}};
     Vec tg[3] = {{100.0f, 0.0f, -70.0f}, {-300.0f, 0.0f, -70.0f}, {-120.0f, 0.0f, -70.0f}};
@@ -86,7 +85,7 @@ USER_FUNC(evt_batstage_light_set_player_on) {
 
 USER_FUNC(evt_batstage_return_aud_dark_base) {
     s32* args = event->args;
-    s32 a = evtGetValue(event, args[0]);
+    s32 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     BattleStageReturnAudDarkBase(a, b);
     return EVT_RETURN_DONE;
@@ -94,7 +93,7 @@ USER_FUNC(evt_batstage_return_aud_dark_base) {
 
 USER_FUNC(evt_batstage_set_aud_dark_base) {
     s32* args = event->args;
-    u8 a = evtGetValue(event, args[0]);
+    u8 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
     BattleStageSetAudDarkBase(a, b, c);
@@ -103,7 +102,7 @@ USER_FUNC(evt_batstage_set_aud_dark_base) {
 
 USER_FUNC(evt_batstage_set_aud_dark) {
     s32* args = event->args;
-    u8 a = evtGetValue(event, args[0]);
+    u8 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
     BattleStageSetAudDark(a, b, c);
@@ -112,7 +111,7 @@ USER_FUNC(evt_batstage_set_aud_dark) {
 
 USER_FUNC(evt_batstage_return_stg_dark_base) {
     s32* args = event->args;
-    s32 a = evtGetValue(event, args[0]);
+    s32 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     BattleStageReturnStgDarkBase(a, b);
     return EVT_RETURN_DONE;
@@ -120,7 +119,7 @@ USER_FUNC(evt_batstage_return_stg_dark_base) {
 
 USER_FUNC(evt_batstage_set_stg_dark_base) {
     s32* args = event->args;
-    u8 a = evtGetValue(event, args[0]);
+    u8 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
     BattleStageSetStgDarkBase(a, b, c);
@@ -129,7 +128,7 @@ USER_FUNC(evt_batstage_set_stg_dark_base) {
 
 USER_FUNC(evt_batstage_set_stg_dark) {
     s32* args = event->args;
-    u8 a = evtGetValue(event, args[0]);
+    u8 a = evtGetValue(event, event->args[0]);
     s32 b = evtGetValue(event, args[1]);
     s32 c = evtGetValue(event, args[2]);
     BattleStageSetStgDark(a, b, c);

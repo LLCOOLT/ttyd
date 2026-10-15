@@ -346,6 +346,8 @@ static u8* color_tbl[] = { diamond_1_color0_tbl, diamond_2_color0_tbl, diamond_3
 #define LOOP2X(i1, w, tbl, sz, n) dq = tbl; sq = sz; for (i1 = 0; i1 < n##U; i1++, sq++, dq++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(*dq, *sq << 5); } }
 #define LOOP2X(i1, w, tbl, sz, n) dq = tbl; sq = sz; for (i1 = 0; i1 < n##U; i1++, sq++, dq++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(*dq, *sq << 5); } }
 #define LOOP2W(i1, w, tbl, sz, n) for (i1 = 0; i1 < n##U; i1++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(tbl[i1], sz[i1] << 5); } }
+#define LOOP2Y(w, tbl, sz, n) { u8** dp = tbl; u8* sp = sz; s32 i; for (i = 0; i < n##U; i++, dp++, sp++) { if ((w->flags & 1) || i != 0) { GXCallDisplayList(*dp, *sp << 5); } } }
+#define LOOP2U(w, tbl, sz, n) dp = tbl; sp = sz; for (i = 0; i < n##U; i++, dp++, sp++) { if ((w->flags & 1) || i != 0) { GXCallDisplayList(*dp, *sp << 5); } }
 #define LOOP1(tbl, sz, n)                          \
     i = 0; dp = tbl; sp = sz; \
     for (; i < n##U; i++, sp++, dp++) {       \
@@ -644,11 +646,11 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
     Mtx s;
     Mtx r;
     GXTexObj tex;
+    s32 q4; s32 q3; s32 q2; s32 q;
     
     EffStarStoneWork* w = effect->userdata;
     CameraEntry* cam = camGetPtr(cameraId);
     s32 type = w->type;
-    s32 q;
 
     DISP_START(w)
     BLEND_STATE()

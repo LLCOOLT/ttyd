@@ -351,13 +351,11 @@ void moamoa_init(void) {
             if (!(x < 185.0f)) {
                 if (x < 257.0f) {
                     Mtx m;
-
                     PSMTXRotRad(m, 'y', -0.7853982f);
                     PSMTXConcat(pose->mtx, m, pose->mtx);
                     moa->flags |= 1;
                 } else {
                     Mtx m;
-
                     PSMTXRotRad(m, 'y', 1.5707964f);
                     PSMTXConcat(pose->mtx, m, pose->mtx);
                     moa->flags |= 1;
@@ -464,8 +462,7 @@ USER_FUNC(evt_moamoa_set_one) {
     Mtx m;
     ExtPose* pose = extGetPosePtr();
     Moamoa* moa;
-
-    (moa = &wp->moa[idx])->state = 3;
+    (moa = wp->moa + idx)->state = 3;
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
 

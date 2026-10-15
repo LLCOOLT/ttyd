@@ -95,6 +95,8 @@ void effSleepMain(EffectEntry* effect) {
 #pragma push
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+
+
 void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	int i;
 	s32 off;

@@ -51,15 +51,18 @@ void _disp(CameraId cameraId, void* param) {
     u16 width;
     u16 lines;
     f32 x, y, w, h;
+    f32 wx, wy;
 
     x = announce->x;
     y = announce->y + 120;
     width = FontGetMessageWidthLine(announce->text, &lines);
     lines++;
-    h = lines * 29 + 3;
     x -= width / 2;
     w = width + 20;
-    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, x - 10.0f, -29.0f + (3.0f + y), w, h, 10.0f);
+    h = lines * 29 + 3;
+    wx = x - 10.0f;
+    wy = -29.0f + (3.0f + y);
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, wx, wy, w, h, 10.0f);
     FontDrawStart();
     FontDrawMessage(x, (s32)y - 29, announce->text);
 }

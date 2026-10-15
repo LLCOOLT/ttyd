@@ -130,7 +130,7 @@ USER_FUNC(evt_npc_slave_entry) {
     index = *args++;
     deadEvent = (void*)evtGetValue(event, *args++);
     memset(&sp2C, 0, sizeof(sp2C));
-    sprintf(ident, "_s%d", id);
+    sprintf(ident, "_s%d\0", id);
     strcpy(slaveName, npc->description);
     strcat(slaveName, ident);
     npcEntry(slaveName, animName);
@@ -1152,7 +1152,7 @@ USER_FUNC(evt_npc_homing_target) {
 
 // intplGetValue, but for a normalized t in [0, 1]
 f32 _intplGetFloat(s32 mode, f32 t) {
-    f32 c, u, v;
+    f32 v, u, c;
 
     if (t > 1.0f) {
         t = 1.0f;
@@ -1199,7 +1199,7 @@ f32 _intplGetFloat(s32 mode, f32 t) {
             u = 1.0f - c;
             return u * v;
         case 12:
-            t = (f32)sin(1.5707964f * t);
+            t = sin(1.5707964f * t);
             return t;
         case 13:
             return 1.0f - (f32)cos(1.5707964f * t);
@@ -2748,3 +2748,4 @@ USER_FUNC(evt_npc_release_fieldnpc) {
     }
     return EVT_RETURN_DONE;
 }
+

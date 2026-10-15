@@ -1,3 +1,4 @@
+#pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -283,7 +284,7 @@ static void ext_main(void) {
                 dist = randf(4.0f, 7.0f);
                 {
                     f32 rad = 3.1415927f * randf_scale(x, 0.0f, 360.0f) / 180.0f;
-                    x = pose->mtx[0][3] + dist * chb_sin(rad);
+                    x = pose->mtx[0][3] + chb_sin(rad) * dist;
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - dist * chb_cos(rad);
                 }
@@ -300,13 +301,13 @@ static void ext_main(void) {
                     dist = randf(15.0f, 20.0f);
                     {
                         f32 rad = 3.1415927f * z / 180.0f;
-                        x = pose->mtx[0][3] + dist * chb_sin(rad);
+                        x = pose->mtx[0][3] + chb_sin(rad) * dist;
                         y = pose->mtx[1][3];
                         z = pose->mtx[2][3] - dist * chb_cos(rad);
                     }
                     speed = rand() / 32767.0f;
                     gravity = rand01();
-                    chb_jump(pose, chb, chb->state, x, y, z, 2.0f * (speed * (1.2f - 1.0f) + 1.0f), randf_scale(gravity, 0.8f, 0.8f));
+                    chb_jump(pose, chb, chb->state, x, y, z, 2.0f * ((1.2f - 1.0f) * speed + 1.0f), randf_scale(gravity, 0.8f, 0.8f));
                     if (rand() % 150 == 0) {
                         pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
                         psndSFXOn_3D(sfx, &pos);
@@ -586,3 +587,7 @@ EVT_BEGIN(hei_10_init_evt)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING("mizu"), 256)
     RETURN
 EVT_END()
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_0000A464_data[1] = {0};
+#pragma force_active reset

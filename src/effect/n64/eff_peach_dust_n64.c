@@ -115,9 +115,8 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     work->lifetime = 80;
     p = work->particles;
     count = 1;
-    base = data + type * 256;
 
-    for (i = 0; i < 16; i++) {
+    for (i = 0, base = data + type * 256; i < 16; i++) {
         row = base + (15 - i) * 16;
         for (j = 0; j < 16; j++, row++) {
             if ((s32)*row == '.') {

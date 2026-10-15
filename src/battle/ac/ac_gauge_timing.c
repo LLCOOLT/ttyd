@@ -376,11 +376,13 @@ static void actionCommandDisp(f32 x, f32 y) {
     GaugeDisp* disp = (GaugeDisp*)((u8*)ac + 0x290);
     GaugeAC* g;
     GaugeWork* cw;
-    f32 ratio;
-    f32 t;
-    f32 step;
-    f32 ry, ry2, rx2;
     f32 rx;
+    f32 ry;
+    f32 bx;
+    f32 by;
+    f32 step;
+    f32 t;
+    f32 ratio;
     s32 i;
     s32 n;
     u16 pressed;
@@ -432,16 +434,19 @@ static void actionCommandDisp(f32 x, f32 y) {
             btlDispGXQuads2DRasta(rx, ry, rx + 10.0f, ry - 16.0f, 0, 255, 0, 255);
         }
         n = g->target;
+        bx = -288.0f + x;
+        by = 20.0f + y;
         for (i = 0; i < n; i++) {
             u16 icon = 0x91;
-            f32 step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
+            f32 step;
+            step = 100.0f / (f32)(n + 1) * (f32)(i + 1);
             if (cw->inRange) {
                 icon = 0x95;
             }
             {
                 Vec pos = {0.0f, 0.0f, 0.0f};
-                pos.x = (-288.0f + x) + 176.0f * step / 100.0f;
-                pos.y = 20.0f + y;
+                pos.x = bx + 176.0f * step / 100.0f;
+                pos.y = by;
                 iconDispGx(&pos, 0x10, icon, 0.8f);
             }
         }
@@ -479,6 +484,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         case 1005:
             if (pressed2) {
                 Vec pos = {0.0f, 0.0f, 0.0f};
+                f32 rx, ry;
                 rx = -228.0f + x;
                 ry = 55.0f + y;
                 pos.x = rx;
@@ -503,6 +509,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 rx, ry;
                         rx = -228.0f + x;
                         ry = 55.0f + y;
                         pos.x = rx;
@@ -523,6 +530,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 rx, ry;
                         rx = -228.0f + x;
                         ry = 55.0f + y;
                         pos.x = rx;
@@ -545,6 +553,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                 if (cw->inRange) {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 rx, ry;
                         rx = -228.0f + x;
                         ry = 55.0f + y;
                         pos.x = rx;
@@ -565,6 +574,7 @@ static void actionCommandDisp(f32 x, f32 y) {
                 } else {
                     if (pressed2) {
                         Vec pos = {0.0f, 0.0f, 0.0f};
+                        f32 rx, ry;
                         rx = -228.0f + x;
                         ry = 55.0f + y;
                         pos.x = rx;

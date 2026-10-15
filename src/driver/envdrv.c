@@ -386,9 +386,8 @@ void envDisp_DepthOfField(void) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetCullMode(GX_CULL_NONE);
         if ((dof->unk0 & 1) && dof->unk4) {
-            tbl = texmtx_tbl;
             coord = stage = i = 0;
-            for (; i < 4; i++, tbl++, stage++, coord++) {
+            for (; i < 4; i++, stage++, coord++) {
                 PSMTXTrans(mtx, dof->unk4 * env_sin(6.2831855f * i / 4.0f) / 100.0f, dof->unk4 * env_cos(6.2831855f * i / 4.0f) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx, texmtx_tbl[i], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i], GX_FALSE, GX_PTIDENTITY);
@@ -425,9 +424,8 @@ void envDisp_DepthOfField(void) {
             DOF_QUAD(gp, 2.0f);
         }
         if ((dof->unk0 & 2) && dof->unk8) {
-            tbl2 = texmtx_tbl;
             coord2 = stage2 = i2 = 0;
-            for (; i2 < 4; i2++, tbl2++, stage2++, coord2++) {
+            for (; i2 < 4; i2++, stage2++, coord2++) {
                 PSMTXTrans(mtx2, dof->unk8 * env_sin(6.2831855f * i2 / 4.0f) / 100.0f, dof->unk8 * env_cos(6.2831855f * i2 / 4.0f) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx2, texmtx_tbl[i2], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i2], GX_FALSE, GX_PTIDENTITY);
@@ -529,8 +527,7 @@ void envDisp_Blur(void) {
             else {
                 alpha = 120.0f * (1.0f - t) + 128.0f;
             }
-            c = envBlurColor(alpha);
-            GXSetTevKColor(GX_KCOLOR0, c);
+            GXSetTevKColor(GX_KCOLOR0, envBlurColor(alpha));
         }
         else {
             GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0xFF, 0xFF, 0xA0});
@@ -1199,23 +1196,22 @@ void envSetWater(MapTevCallbackInfo* info) {
     s32 x1;
     s32 y1;
 
-    obj = *(MapObject**)info->field_0x0;
     stage = info->tevStage;
+    obj = *(MapObject**)info->field_0x0;
     map = info->texCoord;
     coord = info->texMap;
     ind = info->field_0x18;
     if (obj->flags & 0x20) {
-        MapObject* o = obj;
-        while ((o = o->parent) != NULL) {
-            if (o->flags & 0x10) {
-                if (!(o->flags & 0x20000000)) {
-                    o->flags |= 0x20000000;
+        while ((obj = obj->parent) != NULL) {
+            if (obj->flags & 0x10) {
+                if (!(obj->flags & 0x20000000)) {
+                    obj->flags |= 0x20000000;
                     return;
                 }
-                x0 = o->screenRect[0];
-                y0 = o->screenRect[1];
-                x1 = o->screenRect[2];
-                y1 = o->screenRect[3];
+                x0 = obj->screenRect[0];
+                y0 = obj->screenRect[1];
+                x1 = obj->screenRect[2];
+                y1 = obj->screenRect[3];
                 break;
             }
         }

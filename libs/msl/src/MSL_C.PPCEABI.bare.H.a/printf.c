@@ -584,10 +584,10 @@ static char* double2hex(long double num, char* buff, print_format format) {
     exp_format.precision_specified = 0;
     exp_format.alternate_form = 0;
     exp_format.argument_options = normal_argument;
-    exp_format.conversion_char = 'd';
-    exp = (*(short*)&ld & 0x7FF0) >> 4;
     exp_format.field_width = 0;
     exp_format.precision = 1;
+    exp = (*(short*)&ld & 0x7FF0) >> 4;
+    exp_format.conversion_char = 'd';
     p = long2str(exp - 0x3FF, buff, exp_format);
 
     if (format.conversion_char == 'a') {

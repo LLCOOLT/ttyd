@@ -187,7 +187,7 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);
 	GXSetZMode(GX_TRUE, GX_ALWAYS, GX_FALSE);
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog_color);
+	fogOff();
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
@@ -204,8 +204,7 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
 	GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 	GXSetCurrentMtx(0);
-	color = (GXColor){0xFF, 0xFF, 0xFF, alpha};
-	GXSetTevColor(GX_TEVREG0, color);
+	GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, alpha});
 	MTXTrans(trans, x, y, 0.0f);
 	MTXScale(scale, height / 560.0f, width / 176.0f, 1.0f);
 	MTXConcat(trans, scale, trans);
@@ -417,7 +416,7 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 //regalloc issues wrt f29/f28, stack swap in GXColor, some vert code (see comments), 99.8% 1:1
 void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width) {
 	CameraEntry* camera;
-	f32 x5, scroll;
+	f32 scroll, x5;
 
 	Mtx mtx;
 	Mtx trans, scale;
@@ -551,7 +550,6 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	x5 = width - 32.0f;
 	y3 = -x5;
 	y4 = y3 - 32.0f;
-
 	GXPosition3f32(0.0f, y3, 0.0f); //f27 = y3, neg(width - 32.0f)
 	GXTexCoord2f32(0.0f, 0.0f);
 
@@ -1300,8 +1298,7 @@ void windowDispGX2_Waku_col(Mtx mtx, u16 gxTexMapID, GXColor color, f32 x, f32 y
 		GXSetCurrentMtx(0);
 		GXSetTevColor(GX_TEVREG0, color);
 
-		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = (f32)0.5 * dVar10;
-		dVar9 = height; dVar10 = -width; dVar9 *= 0.5f; dVar10 = (f32)0.5 * dVar10;
+		dVar9 = height / 2.0f; dVar10 = -width; dVar10 = (f32)(dVar10 / 2.0f);
 		MTXTrans(mtx2, x - dVar10, y - dVar9, 0.0f);
 		MTXConcat(mtx2, mtx, mtx2);
 		MTXConcat(camera->view, mtx2, mtx2);
@@ -1459,3 +1456,4 @@ WindowEntry* windowGetPointer(s32 id) {
 GXTexObj* getWakuTexObj(s32 id) {
 	return &wakuTexObj[id];
 }
+

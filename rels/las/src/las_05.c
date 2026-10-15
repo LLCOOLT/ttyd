@@ -367,9 +367,9 @@ USER_FUNC(kurokaron_move_position) {
     NpcEntry* npc = evtNpcNameToPtr(event, name);
     MarioWork* mario;
     Vec diff;
-    f32 dist;
     f32 step;
     f32 marioDist;
+    f32 dist;
 
     npc->jumpFlags |= 0x10;
     if (isFirstCall) {
@@ -786,6 +786,7 @@ static void senkaron_ext_main(void) {
     f32 near;
     const char* sfx[2];
     s32 hammerDir;
+    f32 dist;
     s32 group;
     s32 start;
     s32 end;
@@ -797,7 +798,7 @@ static void senkaron_ext_main(void) {
     f32 adz;
     f32 angle;
     f32 speed;
-    f32 dist;
+    f32 d2;
 
     pose = extGetPosePtr();
     mario = marioGetPtr();
@@ -881,9 +882,9 @@ static void senkaron_ext_main(void) {
                         s->vx = 1.0f;
                         s->vz = 1.0f;
                     } else {
-                        dist = sqrt(ep->mtx[0][3] * ep->mtx[0][3] + ep->mtx[2][3] * ep->mtx[2][3]);
-                        s->vx = 4.0f * ep->mtx[0][3] / dist;
-                        s->vz = 4.0f * ep->mtx[2][3] / dist;
+                        f32 d1 = sqrt(ep->mtx[0][3] * ep->mtx[0][3] + ep->mtx[2][3] * ep->mtx[2][3]);
+                        s->vx = 4.0f * ep->mtx[0][3] / d1;
+                        s->vz = 4.0f * ep->mtx[2][3] / d1;
                     }
                     if (s->vx < 0.0f) {
                         ep->rot = 90.0f;
@@ -961,8 +962,8 @@ static void senkaron_ext_main(void) {
                     }
                 }
                 if (hit != 0) {
-                    dist = k_sqrtf(adx * adx + adz * adz);
-                    s->vx = push + 3.0f * dx / dist;
+                    d2 = k_sqrtf(adx * adx + adz * adz);
+                    s->vx = push + 3.0f * dx / d2;
                     s->vy = randf(5.0f, 10.0f);
                     s->vz = randf(-5.0f, 10.0f);
                     s->state = 0x61;
@@ -1080,8 +1081,9 @@ static void senkaron_ext_main(void) {
     if (((skwp->marioPushed & 1) && mario->position.x > 0.0f) || ((skwp->marioPushed & 2) && mario->position.x < 0.0f)) {
         f32 mx = -mario->position.x;
         f32 mz = -mario->position.z;
+        near = mx * mx + mz * mz;
+        near = k_sqrtf(near);
 
-        dist = k_sqrtf(mx * mx + mz * mz);
         switch (mario->currMotionId) {
             case 0x12:
             case 0x13:
@@ -1100,8 +1102,8 @@ static void senkaron_ext_main(void) {
                 speed = randf(1.7f, 2.2f);
                 break;
         }
-        mario->position.x += speed * (mx / dist);
-        mario->position.z += speed * (mz / dist);
+        mario->position.x += speed * (mx / near);
+        mario->position.z += speed * (mz / near);
     }
 }
 

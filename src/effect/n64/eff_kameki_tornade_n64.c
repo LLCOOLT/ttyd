@@ -32,6 +32,8 @@ static inline void OSs16tof32(s16* in, f32* out) {
     *out = __OSs16tof32(in);
 }
 
+#define Vec2Vtx(v, o) do { OSf32tos16(&(v)->x, &(o)[0]); OSf32tos16(&(v)->y, &(o)[1]); OSf32tos16(&(v)->z, &(o)[2]); } while (0)
+
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
     s16 s, t;      // 0x6
@@ -291,9 +293,7 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
             OSs16tof32(&vtx[j].z, &v1.z);
             PSMTXMultVec(mtx, &v1, &v1);
             OSInitFastCast();
-            OSf32tos16(&v1.x, &vtx[j].x);
-            OSf32tos16(&v1.y, &vtx[j].y);
-            OSf32tos16(&v1.z, &vtx[j].z);
+            Vec2Vtx(&v1, &vtx[j].x);
         }
         PSMTXTrans(mtx, 10.0f * work->px[i + 1], 10.0f * work->py[i + 1], 10.0f * work->pz[i + 1]);
         PSMTXRotRad(rot, 'z', 0.017453292f * work->rot[i + 1]);
@@ -316,9 +316,7 @@ void effKamekiTornadeDisp(CameraId cameraId, EffectEntry* effect) {
             OSs16tof32(&vtx[j].z, &v2.z);
             PSMTXMultVec(mtx, &v2, &v2);
             OSInitFastCast();
-            OSf32tos16(&v2.x, &vtx[j].x);
-            OSf32tos16(&v2.y, &vtx[j].y);
-            OSf32tos16(&v2.z, &vtx[j].z);
+            Vec2Vtx(&v2, &vtx[j].x);
         }
         GXInvalidateVtxCache();
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);

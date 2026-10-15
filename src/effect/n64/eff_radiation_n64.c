@@ -80,7 +80,7 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffRadiationN64Work* p;
     s32 count;
     s32 camera;
-    u32 k;
+    s32 k;
     s32 lf;
     s32 i;
     s32 flag;
@@ -322,7 +322,7 @@ void effRadiationDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
     u32* vtx;
     s32 i;
-    u32 k;
+    s32 k;
     s32 lf;
     s32 type;
     f32 a;

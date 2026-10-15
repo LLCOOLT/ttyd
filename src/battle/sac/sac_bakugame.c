@@ -301,16 +301,18 @@ USER_FUNC(end_bakugame) {
 USER_FUNC(bakuGameDecideWeapon) {
     s32* args = event->args;
     s32 v;
-    BakuWork* w;
     u8* q;
-    int i;
+    s32* src;
+    BakuWork* w;
 
     evtGetFloat(event, args[0]);
     v = evtGetValue(event, args[1]);
     w = GetBakuGamePtr();
+
+    src = weapon;
     q = w->weapon;
+    memcpy(q, src, 0xC0);
     q += 0x80;
-    memcpy(w->weapon, weapon, 0xC0);
     q[2] = 100;
     if (v != -1) {
         if (w->gauge >= 100.0f) { q[2] = 127; } else { q[2] = 100; }
@@ -1498,5 +1500,6 @@ EVT_BEGIN(hitCheck_AudienceTeam)
     END_IF
     RETURN
 EVT_END()
+
 
 

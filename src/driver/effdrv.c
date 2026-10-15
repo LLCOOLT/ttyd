@@ -352,13 +352,12 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 	gqr = 0x06070607;
 	for (k = 1; k < n; k++) {
 		MayaKey* prev;
-		f32 a;
+		MayaKey* curr;
 		f32 t;
 		s32 i;
 		register s8* pb;
 		f32* out;
 		register s8* pa;
-		MayaKey* curr;
 		prev = &list->keys[k - 1];
 		curr = &list->keys[k];
 		asm { mtspr GQR5, gqr }
@@ -422,8 +421,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		PSMTXConcat(tmp, pivot1Inv, tmp2);
 		PSMTXConcat(trans, tmp2, tmp);
 		PSMTXConcat(tmp, scale, (MtxPtr)mtx);
-		a = buf[21];
-		*alpha = a > 1.0f ? 1.0f : (a < 0.0f ? 0.0f : a);
+		*alpha = buf[21] > 1.0f ? 1.0f : (buf[21] < 0.0f ? 0.0f : buf[21]);
 		return;
 	}
 }

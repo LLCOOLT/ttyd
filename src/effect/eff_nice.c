@@ -34,9 +34,9 @@ static const char** anim_tbl[2] = { anim_jp, anim_us };
 s32 acrobat_jp[] = {179, 180, 181, 182, 183, 184, 185};
 s32 acrobat_us[] = {183, 184, 185, 186, 187, 188}; //includes nonexistant textures
 s32* acrobat_tbl[2] = { acrobat_jp, acrobat_us };
-#pragma explicit_zero_data on
-s32 gap_07_80411CDC_sdata[1] = {0};
-#pragma explicit_zero_data reset
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80411CDC_sdata[1] = {0};
+#pragma force_active reset
  // unreferenced zero word in target
 
 //forward declarations

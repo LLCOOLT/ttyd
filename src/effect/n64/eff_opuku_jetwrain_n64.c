@@ -175,10 +175,10 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     void* buf;
     s32 j, i;
     s32 edgeY;
-    s32 x0, k, y0, y1, x1;
-    s32 bx;
+    s32 y0, y1, x1, k, x0;
     s32 px;
     s32 by;
+    s32 bx;
 
     camGetPtr(cameraId);
     work = effect->userdata;
@@ -232,7 +232,7 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
             y1 = 0;
         }
         for (j = 0; j < 18; j++) {
-                        bx = j * 16 + 16;
+            bx = j * 16 + 16;
             k = 0;
             if (j == 0) {
                 k = 1;

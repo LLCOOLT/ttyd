@@ -164,8 +164,8 @@ void effBalloonMain(EffectEntry* effect) {
 }
 
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
-    CameraEntry* camera;
     EffBalloonN64Work* work;
+    CameraEntry* camera;
     effN64Vtx* vtx;
     s32 type;
     s32 i;

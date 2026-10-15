@@ -93,7 +93,7 @@ void memClear(HEAP_TYPE heap) {
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
 	if (heap == HEAP_MALLOC) {
 		size = (u32)heapEnd[1] - (u32)heapStart[1] - 32;
-		entry = OSAllocFromHeap(heapHandle[1], size);
+		entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 		if (entry) {
 			memset(entry, 0, size);
 			DCFlushRange(entry, size);

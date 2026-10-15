@@ -94,6 +94,7 @@ u16 party_icon[8] = { 0x1A4, 0x1A4, 0x1A5, 0x1A6, 0x1A7, 0x1AE, 0x1AF, 0x1B0 };
 u16 gauge_back[8] = { 0x1B7, 0x1B8, 0x1B9, 0x1BA, 0x1BB, 0x1BC, 0x1BD, 0x1BE };
 u16 gauge_wakka[16] = { 0x1C0, 0x1C1, 0x1C2, 0x1C3, 0x1C4, 0x1C5, 0x1C6, 0x1C7,
                         0x1C8, 0x1C9, 0x1CA, 0x1CB, 0x1CC, 0x1CD, 0x1CE, 0x1CF };
+
 #pragma force_active on
 __declspec(section ".sdata") u16 gap_07_804118FC_sdata[2] = { 0, 0 };
 #pragma force_active reset
@@ -113,6 +114,8 @@ BOOL statusWinCheck(void);
 void statusWinInit(void) {
     wp = __memAlloc(HEAP_DEFAULT, sizeof(SWork));
     memset(wp, 0, sizeof(SWork));
+    if (!wp) {
+    }
     wp->speed = 1.0f;
     wp->openX = -304.0f;
     wp->openY = 208.0f;
@@ -152,7 +155,6 @@ void statusWinMain(void) {
     f32 inv;
 
     one = 1.0f;
-
 
     mario = marioGetPtr();
     if (mario->characterId) {
@@ -251,7 +253,7 @@ void statusWinMain(void) {
         }
     } else {
         inv = (f32)cos(3.1415927f * wp->timer / wp->duration);
-        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (one - inv) / 2.0f;
+        wp->t = wp->tStart + (wp->tEnd - (0, wp)->tStart) * (one - inv) / 2.0f;
     }
     t = wp->t;
     inv = 1.0f - t;
@@ -293,7 +295,6 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         pos.x = x + (f32)(full * 32);
         pos.y = y;
         pos.z = 0.0f;
-
         iconDispGx(&pos, 0x10, gauge_wakka[part], 1.0f);
     }
     y = 12.0f + y;
@@ -450,6 +451,7 @@ void statusGetValue(SVal* values) {
     BattleWork* bw;
     BattleUnit* mario;
     BattleUnit* party;
+
 
     if (!gp->inBattle) {
         values->hp = pouchGetHP();

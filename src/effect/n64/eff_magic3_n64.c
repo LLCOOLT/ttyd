@@ -79,7 +79,9 @@ void effMagic3Main(EffectEntry* effect);
 void effMagic3Disp(CameraId cameraId, EffectEntry* effect);
 
 #pragma opt_propagation off
+#pragma opt_strength_reduction off
 EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
+    s32 j;
     EffectEntry* effect;
     EffMagic3N64Work* w;
     f32 nx, ny, nz;
@@ -130,7 +132,7 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
     w = __memAlloc(HEAP_EFFECT, sizeof(EffMagic3N64Work) * 5);
     effect->userdata = w;
     effect->callback = effMagic3Main;
-    for (i = 0; i < 5; i++, w++) {
+    for (i = 0, j = 0; i < 5; i++, w++, j += 100) {
         rad = 6.2831855f * camGetPtr(CAMERA_3D)->viewYaw / 360.0f;
         {
             Vec dir = {0.0f, 0.0f, 0.0f};
@@ -146,7 +148,7 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
         w->velocity.x = 0.6f * (mtx[0][0] * nx + mtx[0][1] * ny + mtx[0][2] * nz);
         w->velocity.y = mtx[1][0] * nx + mtx[1][1] * ny + mtx[1][2] * nz;
         w->velocity.z = 0.6f * (mtx[2][0] * nx + mtx[2][1] * ny + mtx[2][2] * nz);
-        w->rot = -(i * 100 / 4 - 50);
+        w->rot = -(j / 4 - 50);
         w->scale = 0.5f;
         w->life = life;
         w->age = 0;
@@ -156,6 +158,7 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
 }
 
 #pragma opt_propagation reset
+#pragma opt_strength_reduction reset
 inline f32 magic3_scale(f32 a, f32 b) { return 3.0f * a + b; }
 
 void effMagic3Main(EffectEntry* effect) {

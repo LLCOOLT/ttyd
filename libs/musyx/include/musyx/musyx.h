@@ -684,7 +684,9 @@ typedef struct SND_DOOR {
 typedef struct SND_LISTENER {
   struct SND_LISTENER* next;
   struct SND_LISTENER* prev;
+#ifndef SND3D_LISTENER_NO_ROOM
   SND_ROOM* room;
+#endif
 
   u32 flags;
   SND_FVECTOR pos;
@@ -707,7 +709,9 @@ typedef struct SND_LISTENER {
 typedef struct SND_EMITTER {
   struct SND_EMITTER* next;
   struct SND_EMITTER* prev;
+#ifndef SND3D_EMITTER_NO_ROOM
   SND_ROOM* room;
+#endif
 
   SND_PARAMETER_INFO* paraInfo;
 

@@ -10,8 +10,10 @@
 #include "mario/mario.h"
 
 double sin(double x);
-static smartEntry* ind_lp;
+#pragma force_active on
 u32 gap_05_0000000C_bss;
+#pragma force_active reset
+static smartEntry* ind_lp;
 void envGlareFilter(s32 on, s16 x0, s16 y0, s16 x1, s16 y1);
 void envGlareFilterZ(f32 z);
 
@@ -39,6 +41,7 @@ __declspec(section ".data") u64 fd_eki_03_negone_one_374;
 __declspec(section ".data") s32 fd_eki_03_neg_one_382[1];
 __declspec(section ".data") s32 fd_eki_03___local_PI_383[1];
 __declspec(section ".data") s32 fd_eki_03___local_3PIO2_385[1];
+__declspec(section ".data") u32 gap_04_0000301C_data[1];
 __declspec(section ".data") u64 fd_eki_03_one_negone_373;
 __declspec(section ".data") s32 fd_eki_03___local_PIO2_384[1];
 __declspec(section ".data") s32 fd_eki_03_one_381[1];
@@ -46,6 +49,7 @@ __declspec(section ".data") u64 fd_eki_03_negone_one_360;
 __declspec(section ".data") s32 fd_eki_03_neg_one_365[1];
 __declspec(section ".data") s32 fd_eki_03___local_PI_366[1];
 __declspec(section ".data") s32 fd_eki_03___local_3PIO2_368[1];
+__declspec(section ".data") u32 gap_04_00003044_data[1];
 __declspec(section ".data") u64 fd_eki_03_one_negone_359;
 __declspec(section ".data") s32 fd_eki_03___local_PIO2_367[1];
 __declspec(section ".data") s32 fd_eki_03_one_364[1];
@@ -87,6 +91,8 @@ __declspec(section ".data") s32 fd_eki_03___local_3PIO2_385[] = {
     1083624420,
 };
 
+__declspec(section ".data") u32 gap_04_0000301C_data[1] = {0};
+
 __declspec(section ".data") u64 fd_eki_03_one_negone_373 = 0x3F800000BF800000;
 
 __declspec(section ".data") s32 fd_eki_03___local_PIO2_384[] = {
@@ -110,6 +116,8 @@ __declspec(section ".data") s32 fd_eki_03___local_PI_366[] = {
 __declspec(section ".data") s32 fd_eki_03___local_3PIO2_368[] = {
     1083624420,
 };
+
+__declspec(section ".data") u32 gap_04_00003044_data[1] = {0};
 
 __declspec(section ".data") u64 fd_eki_03_one_negone_359 = 0x3F800000BF800000;
 
@@ -441,7 +449,6 @@ static void sun_tev(MapTevCallbackInfo* info) {
     u8* buf;
     s32 i;
     s32 j;
-    s32 hi;
 
     // a scrolling sine-wave warp texture for the sun's heat haze
     if (ind_lp == NULL) {
@@ -449,11 +456,12 @@ static void sun_tev(MapTevCallbackInfo* info) {
     }
     buf = ind_lp->address;
     for (i = 0; i < 64; i++) {
-        hi = i / 4;
         for (j = 0; j < 64; j++) {
-            s32 off;
             f32 v = sin(31.41592f * j / 64 - gp->retraceCount / 8.0f);
-            off = (hi << 5) + ((j / 4) << 9);
+            s32 off;
+
+            off = i / 4;
+            off = (off << 5) + ((j / 4) << 9);
             off += ((i % 4) + ((j % 4) << 2)) * 2;
             buf[off] = 3.0f * v + 128.0f;
             buf[off + 1] = 0x80;
@@ -500,7 +508,6 @@ static USER_FUNC(test_glare) {
     return EVT_RETURN_BLOCK;
 }
 
-#pragma force_active on
-const u32 gap_03_00000A4C_rodata = 0;
+
+__declspec(section ".rodata") const u32 gap_03_00000A4C_rodata = 0;
 __declspec(section ".data") u32 gap_04_00003CBC_data[1] = {0};
-#pragma force_active reset
