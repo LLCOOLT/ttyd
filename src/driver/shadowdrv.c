@@ -186,6 +186,8 @@ GXColor color_tbl_nodecay[3] ATTRIBUTE_ALIGN(32) = {
 GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
     {0x00, 0x00, 0x00, 0x8E}, {0x00, 0x00, 0x00, 0x00}, {0x00, 0x00, 0x00, 0x16},
 };
+
+
 #pragma explicit_zero_data on
 u32 gap_07_8040F4AC_sdata = 0;
 #pragma explicit_zero_data reset
@@ -195,10 +197,10 @@ static inline void depthShadowInit(void);
 static inline void projShadowInit(void);
 
 void shadowInit(void) {
-    u32 bufferSize;
-    u32 i;
-    u8* ramp8;
     u16* ramp16;
+    u8* ramp8;
+    u32 i;
+    u32 bufferSize;
 
     charShadowInit();
     depthShadowInit();
@@ -361,6 +363,7 @@ BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
     return TRUE;
 }
 
+
 #define CHAR_SHADOW_INIT_SIG static inline void charShadowInit(void)
 CHAR_SHADOW_INIT_SIG {
     CharShadowWork* wp;
@@ -445,14 +448,9 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetBlendMode(GX_BM_NONE, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     if (gp->inBattle) {
-        GXColor w = {0xFF, 0xFF, 0xFF, 0xFF};
-        GXSetChanMatColor(GX_COLOR0A0, w);
+        GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
     } else {
-        GXColor c = {0, 0, 0, 0xFF};
-        c.r = alpha;
-        c.g = alpha;
-        c.b = alpha;
-        GXSetChanMatColor(GX_COLOR0A0, c);
+        GXSetChanMatColor(GX_COLOR0A0, (GXColor){alpha, alpha, alpha, 0xFF});
     }
     GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
     for (i = 0; i < cswp->unk104; i++, entry++) {

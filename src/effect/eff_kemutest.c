@@ -38,14 +38,12 @@ typedef struct KemuTestWork {
     f32 rz; // 0x54
 } KemuTestWork;
 
-
-static f32 bom_spd[10] = { 2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f };
-static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
-
 static void effKemuTestMain(EffectEntry* effect);
 void effKemuTestDisp(CameraId cameraId, void* param);
 
 EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
+    static f32 bom_dir[10] = { 10.0f, 40.0f, 80.0f, 170.0f, 140.0f, 100.0f, 25.0f, 155.0f, 60.0f, 120.0f };
+    static f32 bom_spd[10] = { 2.2f, 2.7f, 3.0f, 2.2f, 2.7f, 3.0f, 1.9f, 1.9f, 1.5f, 1.5f };
     EffectEntry* effect;
     KemuTestWork* work;
     s32 i;
@@ -239,8 +237,10 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             if (type == 4 || type == 13) {
                 f32 ang;
                 f32 spd;
+                f32 d;
+                d = bom_dir[i - 1];
                 spd = 2.0f * bom_spd[i - 1];
-                ang = 6.2831855f * (90.0f + bom_dir[i - 1]) / 360.0f;
+                ang = 6.2831855f * (90.0f + d) / 360.0f;
                 work->vel.x = spd * (f32)sin(ang);
                 work->vel.y = -spd * (f32)cos(ang);
                 work->scale = 1.0f;
@@ -274,6 +274,7 @@ EffectEntry* effKemuTestEntry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
                 f32 ang = (f32)irand(0x168);
                 f32 a2;
                 f32 spd;
+                f32 d;
                 if (i < (effect->count - 1) / 2 + 1) {
                     spd = 4.5f;
                 } else {

@@ -98,8 +98,8 @@ typedef struct ScreenWork {
 } ScreenWork;
 
 //.sbss
-static ScreenWork* screen_wp;
 static BattleSpotWork work;
+static ScreenWork* screen_wp;
 
 
 //.sdata
@@ -118,6 +118,7 @@ __declspec(section ".sdata") EVT_BEGIN(screen_evt)
 	RETURN
 EVT_END()
 
+
 __declspec(section ".sdata") u32 gap_07_8041183C_sdata[1] = {0};
 
 // forward declarations
@@ -126,7 +127,7 @@ BattleSpotEntry* batSpotEntry(void);
 void BattleStageDispDark(CameraId camId, void* param);
 void BattleStageDispLight(CameraId camId, void* param);
 void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z);
-void DarkBySquare(u8 alpha, f32 x0, f32 y0, f32 x1, f32 y1, f32 z);
+void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha);
 void BattleStageSetDark(StageDark* d, u8 v, s32 time, u8 mode);
 void BattleStageSetDarkBase(StageDark* d, u8 v, s32 time, u8 mode);
 void BattleStageLightSetTarget(s32 idx, f32 x, f32 y, f32 z, s32 time, u8 mode);
@@ -295,7 +296,7 @@ void DarkByPoint(u8 alpha, f32 x, f32 y, f32 z) {
 #pragma dont_inline reset
 
 #pragma dont_inline on
-void DarkBySquare(u8 alpha, f32 x0, f32 y0, f32 x1, f32 y1, f32 z) {
+void DarkBySquare(f32 x0, f32 y0, f32 x1, f32 y1, f32 z, u8 alpha) {
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 	DarkByPoint(alpha, x0, y0, z);
 	DarkByPoint(alpha, x1, y0, z);
@@ -330,15 +331,16 @@ void BattleStageDispDark(CameraId camId, void* param) {
 	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
 	aud = &s->audDark;
 	GXSetZMode(GX_TRUE, GX_GEQUAL, GX_FALSE);
-	DarkBySquare(aud->cur, -640.0f, 640.0f, 640.0f, -640.0f, 105.0f);
+	DarkBySquare(-640.0f, 640.0f, 640.0f, -640.0f, 105.0f, aud->cur);
 	GXSetZMode(GX_TRUE, GX_LESS, GX_FALSE);
-	DarkBySquare(aud->cur, 640.0f, 640.0f, -640.0f, -640.0f, 105.0f);
+	DarkBySquare(640.0f, 640.0f, -640.0f, -640.0f, 105.0f, aud->cur);
 	GXSetZMode(GX_TRUE, GX_LESS, GX_FALSE);
-	DarkBySquare(s->stgDark.cur, -640.0f, 640.0f, 640.0f, -640.0f, 105.0f);
+	DarkBySquare(-640.0f, 640.0f, 640.0f, -640.0f, 105.0f, s->stgDark.cur);
 }
 
 void BattleStageDispLight(CameraId camId, void* param) {
 	s32 i, j;
+	f32 width;
 	StageWork* s = STG;
 	CameraEntry* cam = camGetPtr(CAMERA_3D);
 
@@ -367,7 +369,6 @@ void BattleStageDispLight(CameraId camId, void* param) {
 			Mtx m;
 			Vec v;
 			Vec axis;
-			f32 width;
 
 			axis = (Vec){s->lights[i].target.x - s->lights[i].pos.x, s->lights[i].target.y - s->lights[i].pos.y, s->lights[i].target.z - s->lights[i].pos.z};
 			width = s->lights[i].width;
@@ -836,7 +837,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	Mtx m1;
 	Mtx m2;
 	u8* tex;
-	s32 i, j, n, w, s, k, row, col;
+	s32 i, j, n, w, s, k, row, col, idx;
 	u8 c;
 	f32 lim;
 	f32 x, y;
@@ -851,7 +852,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 			row = i / 4;
 			col = i % 4;
 			for (j = 0; j < 64; j++) {
-				tex[(j / 8) * 32 + row * 256 + (j % 8) + col * 8] = (i & 1) ? 0xFF : 0;
+				idx = (j / 8) * 32 + (row << 8); idx += j % 8; idx += col << 3; tex[idx] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
 			for (k = 0; k < n; k++) {
@@ -859,7 +860,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					((u8(*)[4][8])tex)[row * 8 + j / 8][col][j % 8] = c;
+					idx = (j / 8) * 32 + row * 256; idx += j % 8; idx += col * 8; tex[idx] = c;
 				}
 			}
 		}

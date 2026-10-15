@@ -840,9 +840,12 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
     if (n >= 6) {
         n = 5;
     }
-    pos.x = v->x;
-    pos.y = v->y - (f32)n * 24.0f;
-    pos.z = 0.0f;
+    {
+        f32 y = v->y - (f32)n * 24.0f;
+        pos.x = v->x;
+        pos.z = 0.0f;
+        pos.y = y;
+    }
     iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
 }
 

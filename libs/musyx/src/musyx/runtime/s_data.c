@@ -16,10 +16,10 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static s32 gsUnused;
-static GSROOT* gsRoot;
-static GSROOT* gsCurrent;
 static s32 gsNextID;
+static GSROOT* gsCurrent;
+static GSROOT* gsRoot;
+static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsRoot = NULL;
@@ -323,7 +323,8 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
 
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; i++) {
+    i = 0;
+    for (; i < root->sp; i++) {
     if (root->stack[i].gAddr->id != sgid) {
       continue;
     }
@@ -363,16 +364,17 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
-  int i;
   void* prj;
   u32 seqId;
+  int i;
   GSROOT* root;
   MIDISETUP* midiSetup;
   PAGE* drum;
   PAGE* norm;
   GROUP_DATA* g;
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; ++i) {
+    i = 0;
+    for (; i < root->sp; i++) {
       if (root->stack[i].gAddr->id != sgid) continue;
       if (root->stack[i].gAddr->type == 0) {
         g = root->stack[i].gAddr;
@@ -380,13 +382,14 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
         norm = (PAGE*)((size_t)prj + g->data.song.normpageOff);
         drum = (PAGE*)((size_t)prj + g->data.song.drumpageOff);
         midiSetup = (MIDISETUP*)((size_t)prj + g->data.song.midiSetupOff);
-        for (; midiSetup->songId != 0xFFFF; ++midiSetup) {
+        while (midiSetup->songId != 0xFFFF) {
           if (midiSetup->songId == sid) {
             hwDisableIrq();
             seqId = seqStartPlay(norm, drum, midiSetup, arrfile, para, studio, sgid);
             hwEnableIrq();
             goto done;
           }
+          ++midiSetup;
         }
         { seqId = 0xffffffff; goto done; }
       } else {

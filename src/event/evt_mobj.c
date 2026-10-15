@@ -24,11 +24,11 @@ extern void kpaPowUp(void);
 extern void hitGrpFlagOff(const char* name, u32 flag);
 
 static inline MapObjectEntry* MOBJ_PTR(EventEntry* event, const char* name) {
-    return strcmp(name, "me") ? mobjNameToPtr(name) : event->thisMapObj;
+    return strcmp(name, "me\0") ? mobjNameToPtr(name) : event->thisMapObj;
 }
 
 static inline MapObjectEntry* MOBJ_PTR2(EventEntry* event, const char* name) {
-    return !strcmp(name, "me") ? event->thisMapObj : mobjNameToPtr(name);
+    return !strcmp(name, "me\0") ? event->thisMapObj : mobjNameToPtr(name);
 }
 
 __declspec(section ".data") u64 fd_evt_mobj_negone_one_374 = 0xBF8000003F800000;
@@ -843,6 +843,11 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
     }
     return 0;
 }
+
+
+
+
+
 
 static void evt_mobj_rideswitch(void) {
     mobjNameToPtr("MOBJ_RideSwitchB");
@@ -1765,11 +1770,11 @@ EVT_END()
 
 static inline void mobj_itemb(MapObjectEntry* mobj) { \
     void* data = animPoseGetAnimBaseDataPtr(mobj->poseId); \
-    Vec b, a; \
+    Vec a, b; \
     a = (Vec){FLD(f32, data, 0xd0), FLD(f32, data, 0xd4), FLD(f32, data, 0xd8)}; \
     b = (Vec){FLD(f32, data, 0xdc), FLD(f32, data, 0xe0), FLD(f32, data, 0xe4)}; \
     a.z = a.z - 0.2f * __fabs(b.y - a.y); \
-    PSVECAdd(&a, &b, &mobj->translation); \
+    PSVECAdd(&b, &a, &mobj->translation); \
     PSVECScale(&mobj->translation, &mobj->translation, 0.5f); \
     PSVECScale(&mobj->translation, &mobj->translation, 10.0f); \
     mobj->translation.y = 0.0f; \
@@ -1793,18 +1798,20 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
         }
         break;
     case 1:
-        if (mobj->eventId && evtCheckID(mobj->eventId) == 1) {
-            break;
-        }
-        if (mobj->flags & 0x1000) {
-            mobj->flags &= ~0x1000;
-            mobj->flags &= ~8;
-            marioKeyOn();
-            partyKeyOn();
-            marioStSystemLevel(0);
-            mobj->eventId = 0;
-            mobj->unk1DC = 0;
-            break;
+        if (mobj->eventId) {
+            if (evtCheckID(mobj->eventId) == 1) {
+                break;
+            }
+            if (mobj->flags & 0x1000) {
+                mobj->flags &= ~0x1000;
+                mobj->flags &= ~8;
+                marioKeyOn();
+                partyKeyOn();
+                marioStSystemLevel(0);
+                mobj->eventId = 0;
+                mobj->unk1DC = 0;
+                break;
+            }
         }
         mobj->unk1DC++;
         break;
@@ -1981,10 +1988,15 @@ USER_FUNC(evt_mobj_signboard) {
 }
 
 
+
+
+
+
+
+
 static void mobj_sign(void) {
     mobjNameToPtr("MOBJ_Arrow");
 }
-
 
 extern EffectEntry* effCoinFukidashiEntry(s32 type, s32 number, s32 duration, f32 x, f32 y, f32 z);
 extern EffectEntry* effStardustEntry(s32 type, s32 arg1, s32 arg2, f32 x, f32 y, f32 z, f32 arg6, f32 arg7);
@@ -2305,7 +2317,7 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
             if (FLD(u32, mobj, 0x1d4) != 0) {
                 mobjRunEvent(mobj, (s32*)mobj->unk1D4);
             } else if (FLD(s32, mobj, 0x1a0) != 0x79) {
-                itemEntry(mobj->name, FLD(s32, mobj, 0x1a0), 4, (s32)mobj->unk1E4, NULL, mobj->position.x, 40.0f + mobj->position.y, mobj->position.z);
+                itemEntry(mobj->name, FLD(s32, mobj, 0x1a0), 4, mobj->unk1E4, NULL, mobj->position.x, mobj->position.y + 40.0f, mobj->position.z);
                 item = itemNameToPtr(mobj->name);
                 itemFlagOn(item, 0x10);
                 FLD(f32, item, 0x80) = 0.7f;
@@ -2521,13 +2533,13 @@ s32 mobj_brickblk(MapObjectEntry* mobj) {
         offscreenEntry(oname);
         imgEntry(iname, type);
         mobj->offscreenId = offscreenNameToId(oname);
+        ev1.args = args1;
         args1[0] = (s32)iname; args1[1] = 0; args1[2] = (s32)oname; args1[3] = 1;
         args1[4] = 0; args1[5] = 0; args1[6] = 0; args1[7] = 0;
-        ev1.args = args1;
         evt_img_alloc_capture(&ev1, TRUE);
+        ev2.args = args2;
         args2[0] = (s32)iname; args2[1] = 1; args2[2] = (s32)oname; args2[3] = 1;
         args2[4] = 0; args2[5] = 0; args2[6] = 0; args2[7] = 0;
-        ev2.args = args2;
         evt_img_alloc_capture(&ev2, TRUE);
         img = imgNameToPtr(iname, type);
         img->poseId = animPaperPoseGetId("P_box_y", type);
@@ -2775,19 +2787,19 @@ s32 mobj_breaking_floor(MapObjectEntry* mobj) {
             evtSetValue(NULL, mobj->unk1E4, 1);
             mobj->unk1DC = 1;
             animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
-            animPoseSetMaterialEvtColor(mobj->poseId, c3);
+            animPoseSetMaterialEvtColor(mobj->poseId, c2);
             mobj->unk1B0 = 64;
         }
         break;
     case 1:
-        c2 = animPoseGetMaterialEvtColor(mobj->poseId);
-        if (((0, c2)).a >= 4) {
-            c2.a -= 4;
+        c3 = animPoseGetMaterialEvtColor(mobj->poseId);
+        if (((0, c3)).a >= 4) {
+            c3.a -= 4;
         } else {
-            c2.a = 0;
+            c3.a = 0;
             mobj->unk1DC = 99;
         }
-        animPoseSetMaterialEvtColor(mobj->poseId, c2);
+        animPoseSetMaterialEvtColor(mobj->poseId, c3);
         mobj->unk1B0--;
         if (mobj->unk1B0 <= 0) {
             mobj->unk1DC = 99;
@@ -2867,7 +2879,7 @@ void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     CameraEntry* cam;
     AnimationPoseData* data;
     Vec min, max;
-    s32 h, w;
+    s32 w, h;
     s32 ww, hh;
     smartEntry* e;
     memcpy(saved, camGetPtr((CameraId)camId), 0x260);
@@ -2882,7 +2894,7 @@ void kururing_capture(s32 camId, MapObjectEntry* mobj) {
     cam->cameraUp = (Vec){0.0f, 0.0f, -1.0f};
     cam->cameraAt = mobj->position;
     cam->cameraPos = mobj->position;
-    cam->cameraPos.y += (f32)w * 0.5f / tan(0.21816615760326385);
+    cam->cameraPos.y += (f32)(u32)w * 0.5f / (f32)tan(0.21816615760326385);
     C_MTXPerspective(cam->projection, 25.0f, (f32)(h / w), 1.0f, 32767.0f);
     cam->projType = GX_PERSPECTIVE;
     C_MTXLookAt(cam->view, &cam->cameraPos, &cam->cameraUp, &cam->cameraAt);
@@ -2928,6 +2940,7 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
     void* mario = marioGetPtr();
     void* party = partyGetPtr(marioGetPartyId());
     s32 mode;
+    void* pose;
     f32 dist;
     void* item;
     void* p;
@@ -2986,7 +2999,7 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             mobj->unk1DC = 1;
             item = itemNameToPtr(mobj->name);
             if (item == NULL || !(FLD(u16, item, 0) & 1)) {
-                if (itemEntry(mobj->name, 0x7d, 4, mobj->unk1E4, NULL, mobj->position.x, mobj->position.y + 30.0f, mobj->position.z)) {
+                if (itemEntry(mobj->name, 0x7d, 4, mobj->unk1E4, NULL, mobj->position.x, 30.0f + mobj->position.y, mobj->position.z)) {
                     item = itemNameToPtr(mobj->name);
                     itemFlagOn(item, 0x10);
                     FLD(f32, item, 0x80) = 0.6f;
@@ -3017,21 +3030,21 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
         KURU_POSE_FLAGS(mobj) |= 0x10;
         mobj->flags |= 0x400;
         dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
-        party = *(void**)FLD(void*, animPoseGetAnimPosePtr(mobj->poseId), 0x15c);
+        pose = *(void**)FLD(void*, animPoseGetAnimPosePtr(mobj->poseId), 0x15c);
         p = marioGetPtr();
         if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x8c), FLD(f32, p, 0x94), 30.0f)) {
-            FLD(f32, p, 0x90) = FLD(f32, party, 0x10);
+            FLD(f32, p, 0x90) = FLD(f32, pose, 0x10);
         }
         p = partyGetPtr(marioGetPartyId());
         if (p) {
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
-                FLD(f32, p, 0x5c) = FLD(f32, party, 0x10);
+                FLD(f32, p, 0x5c) = FLD(f32, pose, 0x10);
             }
         }
         p = partyGetPtr(marioGetExtraPartyId());
         if (p) {
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
-                FLD(f32, p, 0x5c) = FLD(f32, party, 0x10);
+                FLD(f32, p, 0x5c) = FLD(f32, pose, 0x10);
             }
         }
         {
@@ -3041,14 +3054,14 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             for (i = 0; i < wp->total; i++, npc += 0x340) {
                 if (FLD(u32, npc, 0) & 1) {
                     if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, npc, 0x8c), FLD(f32, npc, 0x94), 42.420002f)) {
-                        FLD(f32, npc, 0x90) = FLD(f32, party, 0x10);
+                        FLD(f32, npc, 0x90) = FLD(f32, pose, 0x10);
                     }
                 }
             }
         }
         p = itemNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.420002f);
         if (p) {
-            FLD(f32, p, 0x40) = FLD(f32, party, 0x10);
+            FLD(f32, p, 0x40) = FLD(f32, pose, 0x10);
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 2.0f) {
             break;
@@ -3228,6 +3241,12 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
     }
     return EVT_RETURN_DONE;
 }
+
+
+
+
+
+
 
 
 static void mobj_koopa_stone_blk(void) {
@@ -4008,13 +4027,15 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
             mobj->unk1DC = 99;
         }
         break;
-    case 99:
-        for (i = 0; i < FLD(s32, mobj, 0x1a4); i++) {
-            sprintf(buf2, "%s%2x", mobj->name, i);
+    case 99: {
+        s32 j;
+        for (j = 0; j < FLD(s32, mobj, 0x1a4); j++) {
+            sprintf(buf2, "%s%2x", mobj->name, j);
             npcDelete(npcNameToPtr(buf2));
         }
         mobjDelete(mobj->name);
         break;
+    }
     }
     return 0;
 }
@@ -4533,3 +4554,7 @@ USER_FUNC(evt_mobj_koopa_pole) {
     }
     return EVT_RETURN_DONE;
 }
+
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80410304_sdata[1] = {0};
+#pragma force_active reset

@@ -52,10 +52,10 @@ void _btlSamplingEnemy(DetWork* d) {
     DetTarget* t = d->t;
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
-    s32 i;
-    s32 j;
-    s32 jj;
     u8 np;
+    s32 j;
+    s32 i;
+    BattleUnit* unit;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -63,11 +63,11 @@ void _btlSamplingEnemy(DetWork* d) {
     }
     {
     for (i = 0; i < 64; i++) {
-        BattleUnit* unit = BattleGetUnitPtr(wp, i);
+        unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
             np = unit->mKindParams->numParts;
             part = unit->mParts;
-            for (jj = 0; jj < np; jj++) {
+            for (j = 0; j < np; j++) {
                 s32 dir;
                 f32 x, y, z;
                 f32 ox, oy, oz;

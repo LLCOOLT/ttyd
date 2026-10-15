@@ -779,11 +779,11 @@ static void senkaron_ext_main(void) {
     ExtPose* pose;
     s32 hit;
     f32 range;
+    f32 near;
     ExtPose* p;
     Senkaron* s;
     Senkaron* sk;
     ExtPose* ep;
-    f32 near;
     const char* sfx[2];
     s32 hammerDir;
     f32 dist;
@@ -799,6 +799,8 @@ static void senkaron_ext_main(void) {
     f32 angle;
     f32 speed;
     f32 d2;
+    f32 mx;
+    f32 mz;
 
     pose = extGetPosePtr();
     mario = marioGetPtr();
@@ -1079,10 +1081,9 @@ static void senkaron_ext_main(void) {
         }
     }
     if (((skwp->marioPushed & 1) && mario->position.x > 0.0f) || ((skwp->marioPushed & 2) && mario->position.x < 0.0f)) {
-        f32 mx = -mario->position.x;
-        f32 mz = -mario->position.z;
-        near = mx * mx + mz * mz;
-        near = k_sqrtf(near);
+        mx = -mario->position.x;
+        mz = -mario->position.z;
+        d2 = k_sqrtf(mx * mx + mz * mz);
 
         switch (mario->currMotionId) {
             case 0x12:
@@ -1102,8 +1103,8 @@ static void senkaron_ext_main(void) {
                 speed = randf(1.7f, 2.2f);
                 break;
         }
-        mario->position.x += speed * (mx / near);
-        mario->position.z += speed * (mz / near);
+        mario->position.x += speed * (mx / d2);
+        mario->position.z += speed * (mz / d2);
     }
 }
 

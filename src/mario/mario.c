@@ -2108,42 +2108,52 @@ void marioDispBlur(CameraId camId, void* param) {
 	MarioWork* wp = param;
 	s32 i;
 	Mtx mtx;
-	f32 angle;
-	f32 angle2;
 	u32 flag;
 	s32 q;
 	s32 q2;
+	f32 angle;
+	f32 angle2;
+	f32 angle3;
+	f32 angle4;
 
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 	angle = 6.2831855f * wp->targetYaw / 360.0f;
 	angle2 = angle;
-	if (angle <= 3.1415927f) {
-		if (angle <= 1.5707964f) {
-			q2 = 0;
+	angle3 = angle;
+	angle4 = angle;
+	{
+		f32 a = angle2;
+		if (a <= 3.1415927f) {
+			if (a <= 1.5707964f) {
+				q2 = 0;
+			}
+			else {
+				q2 = 1;
+			}
+		}
+		else if (a < 4.712389f) {
+			q2 = 2;
 		}
 		else {
-			q2 = 1;
+			q2 = 3;
 		}
 	}
-	else if (angle < 4.712389f) {
-		q2 = 2;
-	}
-	else {
-		q2 = 3;
-	}
-	if (angle2 <= 3.1415927f) {
-		if (angle2 <= 1.5707964f) {
-			q = 0;
+	{
+		f32 a = angle3;
+		if (a <= 3.1415927f) {
+			if (a <= 1.5707964f) {
+				q = 0;
+			}
+			else {
+				q = 1;
+			}
+		}
+		else if (a < 4.712389f) {
+			q = 2;
 		}
 		else {
-			q = 1;
+			q = 3;
 		}
-	}
-	else if (angle < 4.712389f) {
-		q = 2;
-	}
-	else {
-		q = 3;
 	}
 	for (i = 7; i > 0; i--) {
 		marioDispBlurSub(mtx, i);

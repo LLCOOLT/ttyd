@@ -215,9 +215,9 @@ static void main_dl(EffectEntry* effect, Mtx base) {
 
             }
             {
-            GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)((f32)(s32)a[1] + 0.5f * ((f32)(255 - a[1]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
-                (u8)(s32)((f32)(s32)a[2] + 0.5f * ((f32)(255 - a[2]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
-                (u8)(s32)((f32)(s32)a[3] + 0.5f * ((f32)(255 - a[3]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))), 255});
+            GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)((f32)(s32)a[1] + ((f32)(255 - a[1]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)),
+                (u8)(s32)((f32)(s32)a[2] + ((f32)(255 - a[2]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)),
+                (u8)(s32)((f32)(s32)a[3] + ((f32)(255 - a[3]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)), 255});
 
 
 

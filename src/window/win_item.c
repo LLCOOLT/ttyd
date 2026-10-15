@@ -777,9 +777,9 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     GXColor white4;
     f32 yBase;
     ItemData* item;
-    ItemWork* p;
     f32 y;
     s32 i;
+    ItemWork* p;
     s32 id;
     s32 ok;
     s32 cnt;

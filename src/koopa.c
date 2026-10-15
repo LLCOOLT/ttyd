@@ -108,7 +108,7 @@ static inline void kpaFireEntry2(Vec pos) {
             flag = 1;
         }
         ang = flag ? 180 : 0;
-        MF(*(u8**)(fireefp + 0xC), 0x48) = ang;
+        MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)ang;
         child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
         if (child) {
             flag = 0;
@@ -116,7 +116,7 @@ static inline void kpaFireEntry2(Vec pos) {
                 flag = 1;
             }
             ang = flag ? 180 : 0;
-            MF(*(u8**)(child + 0xC), 0x48) = ang;
+            MF(*(u8**)(child + 0xC), 0x48) = (f32)ang;
         }
     }
 }

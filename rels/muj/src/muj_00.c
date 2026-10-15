@@ -13,6 +13,7 @@
 #include "party.h"
 #include "dolphin/mtx.h"
 
+static u8 muj_00_bss_0C[4];
 static u8* _ap;
 typedef struct TobiWork { Vec pos; s32 type; } TobiWork;
 typedef struct NanNpc { u8 field_0x0[0x18]; Vec pos; Vec start; Vec target; u8 field_0x3C[0x50 - 0x3C]; OSTime time; u8 field_0x58[0x60 - 0x58]; f32 dir; void (*func)(struct NanNpc*); s32 state; s32 duration; s32 nextState; u8 field_0x74[0x78 - 0x74]; f32 vy; f32 dy; u8 field_0x80[0xA0 - 0x80]; TobiWork* work; s32 angle; s32 radius; u8 field_0xAC[0xC0 - 0xAC]; } NanNpc;
@@ -28,7 +29,6 @@ NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
 NanNpc* random_choice_target(s32 type);
 void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 TobiWork* Tobidat;
-static u8 muj_00_bss_0C[4];
 void tobikakari_seq00(NanNpc* npc);
 double atan2(double y, double x);
 static inline f32 sinf_l(f32 x) { return sin(x); }

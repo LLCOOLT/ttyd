@@ -164,11 +164,10 @@ void effBalloonMain(EffectEntry* effect) {
 }
 
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
-    EffBalloonN64Work* work;
     CameraEntry* camera;
+    EffBalloonN64Work* work;
     effN64Vtx* vtx;
     s32 type;
-    s32 i;
     Vec v0;
     Vec v1;
     Vec v2;
@@ -178,6 +177,7 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx a;
     Mtx b;
+    register s32 i;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;

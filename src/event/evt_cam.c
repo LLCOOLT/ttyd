@@ -68,13 +68,13 @@ USER_FUNC(evt_cam_get_at) {
 USER_FUNC(evt_cam_shake) {
     s32* args = event->args;
     u64 mask = -1;
-    CameraId id;
-    f32 x, y;
-    s32 msec;
     u64 now;
+    u64 last;
+    CameraId id;
+    s32 msec;
+    f32 x, y;
     f32 len;
     s32 onTime, offTime;
-    u64 last;
 
     id = evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
@@ -112,14 +112,14 @@ USER_FUNC(evt_cam_shake) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = now & mask;
+                event->wInterpRelatedTime = mask & now;
             }
         }
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = now & mask;
+                event->wInterpRelatedTime = mask & now;
             }
         }
     }

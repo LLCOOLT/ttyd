@@ -751,6 +751,7 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     left = -w;
     left = half * left;
     right = left + w;
+    right = left + w;
     for (i = 0; i < 2; i++) {
         if (i == 0) {
             effGetTexObj(0x8B, &texObj);

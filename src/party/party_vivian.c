@@ -310,9 +310,8 @@ void vivian_use(VivianParty* party) {
     f32 d;
     void* rip;
     Vec s;
-    u32 fl = party->field_8;
     MarioWork* m = PF(MarioWork*, 0x160);
-    if (fl & 8) {
+    if (PF(u32, 8) & 8) {
         party->field_8 &= ~8;
         party->useMotionId = 0;
         party->field_174 = 10.0f;

@@ -1039,7 +1039,10 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
     ok = 0;
     BtlUnit_GetStatus(unit, 0x10, NULL, &prevStrength);
     switch (type) {
-        case 0x16: case 0x17: case 0x18:
+        case 0x16:
+        case 0x17:
+        case 0x18:
+            break;
         case 0x13:
         case 0x14:
             if (time <= 0) {

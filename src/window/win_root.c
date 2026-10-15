@@ -1474,35 +1474,34 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
 
     ofs = a * 13;
     npages = (num + 27) / 28;
-    t7b = ofs + 0x7B;
     t7d = ofs + 0x7D;
     t7e = ofs + 0x7E;
-    t7f = ofs + 0x7F;
-    t80 = ofs + 0x80;
-    t81 = ofs + 0x81;
-    t82 = ofs + 0x82;
-    t83 = ofs + 0x83;
-    t84 = ofs + 0x84;
     t85 = ofs + 0x85;
+    t84 = ofs + 0x84;
+    t7b = ofs + 0x7B;
+    t81 = ofs + 0x81;
     t86 = ofs + 0x86;
+    t80 = ofs + 0x80;
+    t7f = ofs + 0x7F;
+    t83 = ofs + 0x83;
     t87 = ofs + 0x87;
-    for (p = 0; p < npages; p++) {
-        py = p * 232;
-        if (scroll + (y - py) - j * 56 > 400.0f || scroll + (y - py) - j * 56 < -400.0f) {
+    t82 = ofs + 0x82;
+    for (p = 0, py = 0; p < npages; py += 232, p++) {
+        if (scroll + (y - j * 56) - py > 400.0f || scroll + (y - j * 56) - py < -400.0f) {
             continue;
         }
         if ((ofs != 0 && p == 2) || (ofs != 1 && p == 3)) {
-            winBookTex((WinBookWork*)w, t7b, x, y + scroll - py, 56.0f, 56.0f);
-            winBookTex((WinBookWork*)w, t7d, x, y - 56.0f + scroll - py, 56.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t7e, 8.0f + x, y - 56.0f + scroll - py, 48.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t85, 56.0f + x, y + scroll - py, 8.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t84, 56.0f + x, y - 8.0f + scroll - py, 8.0f, 48.0f);
-            winBookTex((WinBookWork*)w, t81, 56.0f + x, y - 56.0f + scroll - py, 8.0f, 8.0f);
+            winBookTex((WinBookWork*)w, t7b, x, y + scroll - p * 232, 56.0f, 56.0f);
+            winBookTex((WinBookWork*)w, t7d, x, y - 56.0f + scroll - p * 232, 56.0f, 8.0f);
+            winBookTex((WinBookWork*)w, t7e, 8.0f + x, y - 56.0f + scroll - p * 232, 48.0f, 8.0f);
+            winBookTex((WinBookWork*)w, t85, 56.0f + x, y + scroll - p * 232, 8.0f, 8.0f);
+            winBookTex((WinBookWork*)w, t84, 56.0f + x, y - 8.0f + scroll - p * 232, 8.0f, 48.0f);
+            winBookTex((WinBookWork*)w, t81, 56.0f + x, y - 56.0f + scroll - p * 232, 8.0f, 8.0f);
             break;
         }
         for (i = 0; i < 7; i++) {
             for (j = 0; j < 4; j++) {
-                winBookTex((WinBookWork*)w, t7b + ((i + j * 7) & 1), x + i * 56, scroll + (y - py) - j * 56, 56.0f, 56.0f);
+                winBookTex((WinBookWork*)w, t7b + ((i + j * 7) & 1), x + i * 56, scroll + (y - j * 56) - py, 56.0f, 56.0f);
             }
         }
         for (i = 0; i < 7; i++) {
@@ -1542,7 +1541,7 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
 
     winTexInit(((WinPauseWork*)w)->res->tex->tpl);
     for (p = 0, py = 0, idx = 0; p < npages; py += 232, idx += 28, p++) {
-        if (scroll + (y - py) - j * 56 > 400.0f || scroll + (y - py) - j * 56 < -400.0f) {
+        if (scroll + (y - j * 56) - py > 400.0f || scroll + (y - j * 56) - py < -400.0f) {
             continue;
         }
         for (j = 0; j < 4; j++) {

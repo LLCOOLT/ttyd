@@ -1188,13 +1188,12 @@ s32 _yoshig_tpl_no_tbl[] = {
 };
 
 USER_FUNC(yoshi_original_color_anim_set) {
+    BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
     s32 id;
-    BattleWork* wp = _battleWorkPointer;
-    s32 a0 = event->args[0];
 
-    id = evtGetValue(event, a0);
+    id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
@@ -1480,6 +1479,7 @@ USER_FUNC(_wait_yoshig_complete) {
     return EVT_RETURN_DONE;
 }
 
+
 static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
     switch (p->state) {
     case 0:
@@ -1530,6 +1530,7 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     Vec pos;
     s32 id;
 
+    do {
     id = evtGetValue(event, event->args[0]);
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(_battleWorkPointer, id);
@@ -1591,11 +1592,11 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     for (i = 0; i < 256; i++) {
         dispEntry(CAMERA_3D, dispCalcZ((Vec*)p), 2, (DispCallback)_btlYoshiDisp, &w->parts[i]);
     }
+    } while (0);
     return EVT_RETURN_BLOCK;
 }
 void _btlYoshiDisp(CameraId camera, f32* p) {
-    f32* q;
-    f32 s;
-    s = (p[3] < 0.0f) ? 0.4f : -0.4f;
-    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)(q = p))[0x25]], (GXColor){255, 255, 255, 255}, 0, q[0], q[1] + 20.0f, q[2], s, 0.4f);
+    f32 s = (p[3] < 0.0f) ? 0.4f : -0.4f;
+    s32 z = 0;
+    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)p)[0x25]], (GXColor){255,255,255,255}, z, p[0], p[1] + 20.0f, p[2], s, 0.4f);
 }

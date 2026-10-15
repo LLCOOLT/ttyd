@@ -2584,6 +2584,7 @@ void raster_disp(CameraId cameraId, void* param) {
     f32 h;
     f32 w;
     s32 i;
+    s32 j;
     if (amp > 127.0f) {
         amp = 127.0f;
     }
@@ -2591,8 +2592,7 @@ void raster_disp(CameraId cameraId, void* param) {
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 3)->address;
     phase = 6.2831855f * phase;
     for (i = 0; i < 64; i++) {
-        s32 j = 0;
-        for (; j < 64; j++) {
+        for (j = 0; j < 64; j++) {
             f32 v = sin(j + (gp->retraceCount / 4.0f + phase));
             s32 o = ia8_ofs(j, i);
 
@@ -2684,6 +2684,7 @@ void _prolog(void) {
     relSetEvtAddr("jon_06", jon_init_evt);
     relSetBtlAddr("jon", btlsetup_jon_tbl, btl_jon_setup_no_tbl);
 }
+
 
 #pragma force_active on
 __declspec(section ".rodata") const u32 gap_03_00000984_rodata = 0;

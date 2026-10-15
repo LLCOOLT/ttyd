@@ -92,8 +92,8 @@ extern HitEntry* partySearchGround(PartyEntry* party, f32 a, f32 b);
 void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 
 Footmark footmarkBuf[2][80];
-s32 readId[2];
 s32 writeId[2];
+s32 readId[2];
 
 static const char* objNames[] = {
     "MOBJ_TreasureBox",
@@ -1833,7 +1833,7 @@ BOOL partyGetAppearPos2(PartyEntry* party, Vec* out) {
             out->x = mario->position.x;
             out->y = mario->position.y;
             out->z = mario->position.z;
-            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? -20.0f : 20.0f));
+            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? 20.0f : -20.0f));
             query.targetDistance = 38.0f;
             query.targetPos = (Vec){out->x, 37.0f + out->y, out->z};
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
@@ -1850,7 +1850,7 @@ BOOL partyGetAppearPos2(PartyEntry* party, Vec* out) {
             out->x = mario->position.x;
             out->y = mario->position.y;
             out->z = mario->position.z;
-            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? 20.0f : -20.0f));
+            partyAppearMoveBack(out, ofs, toMovedir2(dir, party->currentSlotId == 0 ? -20.0f : 20.0f));
             query.targetDistance = 38.0f;
             query.targetPos = (Vec){out->x, 37.0f + out->y, out->z};
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
@@ -2045,6 +2045,12 @@ BOOL partyGetAppearPos4(PartyEntry* party, Vec* out) {
 
 const Vec vec3_802ce0ac = {0.0f, 0.0f, 0.0f};
 const Vec vec3_802ce0b8 = {0.0f, 0.0f, 0.0f};
+
+// Stand-in for a function the original linker dead-stripped; it created 90.0f and 20.0f in the .sdata2 pool here.
+static void partyMoveStrippedPool(f32* f) {
+    f[0] = 90.0f;
+    f[1] = 20.0f;
+}
 
 BOOL partyGetAppearPos5(PartyEntry* party, HitEntry* hit, Vec* out) {
     s32 angles[12] = {0, 30, -30, 60, -60, 90, -90, 120, -120, 150, -150, 180};

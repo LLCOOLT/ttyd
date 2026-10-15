@@ -120,7 +120,7 @@ static void effIceMain(EffectEntry* effect) {
         p->velX *= 0.92f;
         p->rotVel += (s32)effTblRandN64(50, idx) - 25;
         s = sin(6.2831855f * p->rotVel / 360.0f);
-        p->rotZ += 10.0f * s;
+        p->rotZ = p->rotZ + 10.0f * s;
         t = cos(6.2831855f * (p->rotVel / 2.0f) / 360.0f);
         p->rotY += 10.0f * t;
         p->x += p->velX;

@@ -481,6 +481,7 @@ void marioChkGnd(void) {
     f32 sy, sb, sc;
     f32 d;
     HitEntry* hit;
+    u8* new_var;
     MarioWork* w = marioGetPtr();
     if (vivianGetStatus() == 2 || vivianGetStatus() == 1 || vivianGetStatus() == 3) {
         w->hitobjStandOn = marioSearchGround(&y, &b, &c, 37.0f, 0.0f);
@@ -542,6 +543,7 @@ void marioChkGnd(void) {
         }
         return;
     }
+    new_var = ((u8*)w) + 0x214;
     if (w->currMotionId != 0x1f && w->hitobjStandOn && (hitGetAttr(w->hitobjStandOn) & 0x200)) {
         if (MF(w, 0x7c, f32) >= 0.0f) {
             marioSetFallPara();
@@ -561,7 +563,7 @@ void marioChkGnd(void) {
         if (!(w->flags & 0x1000000)) {
             hit = marioChkFrontStep(&sy, &sb, &sc);
             d = sy - w->position.y;
-            if (hit && d <= 11.0f && d >= 5.0f && MF(w, 0x214, f32) <= 30.0f) {
+            if (hit && d <= 11.0f && d >= 5.0f && *(f32*)new_var <= 30.0f) {
                 MF(w, 0x1c4, f32) = sy;
                 if (MF(w, 0x180, f32)) {
                     if (!(MF(w, 0x4, u32) & 0x1000000)) {
@@ -1820,7 +1822,6 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     f32 heights[4];
     f32 s, c;
     f32 s2, c2;
-    f32 d1, d2;
     f32 half;
     f32 range;
     f32 mx, mz;
@@ -2086,7 +2087,9 @@ HitEntry* N_dou10_yoko_yari3(void) {
     hit = hitCheckVecFilter(&query, NULL);
     if (hit) {
         MF(w, 0x1e0, HitEntry*) = hit;
-        return hit;
+        if (1) {
+            return hit;
+        }
     }
     x = w->position.x;
     y = w->position.y;
@@ -2118,10 +2121,14 @@ HitEntry* N_dou10_yoko_yari3(void) {
 HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     Vec outPos;
     Vec outNrm;
-    f32 dist;
+    f32 x0;
+    f32 y0;
+    f32 z0;
+    f32 a;
     f32 hh;
-    f32 x0, y0, z0;
-    f32 a, s, r;
+    f32 s;
+    f32 r;
+    f32 dist;
     HitEntry* hit;
     MarioWork* w = marioGetPtr();
     MF(w, 0x218, f32) = 0.0f;
@@ -2181,15 +2188,16 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     Vec d;
     Vec acc;
     Vec saved;
-    Vec base;
-    Vec base2;
     Vec dd;
+    Vec base2;
+    Vec base;
     f32 s, c;
     f32 s2, c2;
-    f32 step;
-    f32 lim;
     f32 a;
     f32 half;
+    f32 d1, d2;
+    f32 lim;
+    f32 step;
     s32 i;
     s32 n;
     BOOL hitAny;
@@ -2202,16 +2210,15 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
         n = 2;
     }
     step = 360.0f / n;
-    half = 0.5f * w;
     a = dir;
     base = *pos;
     hi = base;
+    half = 0.5f * w;
     hi.y += 11.0f;
     lo = base;
     lo.y += h - 1.0f;
     acc = (Vec){0.0f, 0.0f, 0.0f};
-    for (i = 0; i < n; i++, a += step) {
-        f32 d1, d2;
+    for (i = 0; i < n; i++) {
         sincosf(&s, &c, a);
         d1 = half;
         d2 = half;
@@ -2241,6 +2248,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
             acc.x += s2 * t;
             acc.z += c2 * t;
         }
+        a += step;
     }
     if (!hitAny) {
         return hitAny;
@@ -2271,8 +2279,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     lo = base2;
     lo.y += h - 1.0f;
     acc = (Vec){0.0f, 0.0f, 0.0f};
-    for (i = 0; i < n; i++, a += step) {
-        f32 d1, d2;
+    for (i = 0; i < n; i++) {
         sincosf(&s, &c, a);
         d1 = half;
         d2 = half;
@@ -2302,6 +2309,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
             acc.x += s2 * t;
             acc.z += c2 * t;
         }
+        a += step;
     }
     if (!hitAny) {
         return TRUE;

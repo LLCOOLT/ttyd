@@ -637,7 +637,6 @@ static inline void monte_disp(CameraId camera, void* param) {
 
 static USER_FUNC(fall_rtn) {
     MiniGameWork* wp = (MiniGameWork*)event->lwData[0];
-    const char* sfx;
     BOOL exists = FALSE;
     HikokiWork* data = wp->data;
     s32 total;
@@ -703,7 +702,8 @@ static USER_FUNC(fall_rtn) {
             sub->scale = 1.0f;
         }
     }
-    sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
+    {
+    const char* sfx = (0, "SFX_EVT_GAME_MONTE_COUNT1");
     for (i = 0; i < monte_p->num; i++) {
         m = &monte_p[i];
         switch (m->state) {
@@ -718,6 +718,7 @@ static USER_FUNC(fall_rtn) {
             case 1:
                 break;
         }
+    }
     }
     if (!exists) {
         dispEntry(CAMERA_3D, 0.0f, 1, monte_disp, monte_p);

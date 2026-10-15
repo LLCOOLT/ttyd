@@ -277,8 +277,8 @@ void effMahojinMain(EffectEntry* effect) {
 }
 
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
-    f32* zp;
     Mtx mtx;
+    f32* zp;
     f32 z[16];
     s32 idx[16];
     MapWork* map;
@@ -317,8 +317,8 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         for (i = 0; i < effect->count - 1; i++) {
             for (j = i + 1; j < effect->count; j++) {
                 if (zp[i] > z[j]) {
-                    f32 tz = zp[i];
                     s32 ti = idx[i];
+                    f32 tz = zp[i];
                     zp[i] = z[j];
                     idx[i] = idx[j];
                     z[j] = tz;

@@ -95,6 +95,7 @@ u16 gauge_back[8] = { 0x1B7, 0x1B8, 0x1B9, 0x1BA, 0x1BB, 0x1BC, 0x1BD, 0x1BE };
 u16 gauge_wakka[16] = { 0x1C0, 0x1C1, 0x1C2, 0x1C3, 0x1C4, 0x1C5, 0x1C6, 0x1C7,
                         0x1C8, 0x1C9, 0x1CA, 0x1CB, 0x1CC, 0x1CD, 0x1CE, 0x1CF };
 
+
 #pragma force_active on
 __declspec(section ".sdata") u16 gap_07_804118FC_sdata[2] = { 0, 0 };
 #pragma force_active reset
@@ -711,4 +712,11 @@ void statusMarioHPBlink(s32 frames) {
 void statusPartyHPBlink(s32 frames) {
     wp->blink |= 8;
     wp->blinkTimer = frames;
+}
+
+void statusWinEase(f32* f) {
+    f[0] = 0.0f;
+    f[1] = 1.0f;
+    f[2] = 3.1415927f;
+    f[3] = 0.5f;
 }

@@ -149,19 +149,20 @@ void effMagicHoraoMain(EffectEntry* effect) {
 void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
     s32 i;
     s32 angle;
+    s32 j;
     CameraEntry* camera;
     EffMagicHoraoN64Work* work;
     s32 frame;
     s32 alpha;
-    effN64Vtx* vtx;
-    s32 j;
     s32 y, x;
-    f32 ang;
     f32 ang2;
+    f32 ang;
     Mtx mtx;
     Mtx scale;
     GXTexObj texObj;
     f32 s;
+    effN64Vtx* vtx;
+    effN64Vtx* v;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
@@ -226,10 +227,9 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
             effGetTexObjN64(0x56, &texObj);
             GXLoadTexObj(&texObj, GX_TEXMAP0);
         }
-        vtx = smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+        v = smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
+        vtx = v;
         for (i = 0; i < 16; i++) {
-            effN64Vtx* v = vtx + i * 2;
-            
             ang = 500.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 60)) / 360.0f);
             x = s * ang;
             ang2 = 200.0f * (f32)sin(6.2831855f * (f32)(angle + (frame * 10 + i * 6)) / 360.0f);
@@ -239,11 +239,12 @@ void effMagicHoraoDisp(CameraId cameraId, EffectEntry* effect) {
             v[0].z = 0;
             v[0].s = 0;
             v[0].t = i * 128;
-            v[1].x = 3200 + x;
+            v[1].x = x + 3200;
             v[1].y = y + i * 400;
             v[1].z = 0;
             v[1].s = 2048;
             v[1].t = i * 128;
+            v += 2;
         }
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
         GXInvalidateVtxCache();

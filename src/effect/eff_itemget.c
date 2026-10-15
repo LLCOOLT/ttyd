@@ -199,28 +199,31 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     Vec eye = { 0.0f, 0.0f, 1000.0f };
     Vec up = { 0.0f, 1.0f, 0.0f };
     Vec target = { 0.0f, 0.0f, 0.0f };
-    f32 scale, s, k;
-    f32 d, a, b, w, h;
+    f32 h;
+    f32 d;
+    f32 s, a, b;
+    f32 w;
+    f32 scale;
     s32 alpha;
     s32 i;
     s32 al;
     s32 sh;
     s32 pass;
 
+    scale = work->scale * work->size;
     alpha = work->alpha;
-    w = work->scale * work->size;
     GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
     GXSetZCompLoc(GX_TRUE);
     GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
     GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
     PSMTXTrans(m19c, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(m13c, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
-    PSMTXScale(m16c, w, w, w);
+    PSMTXScale(m16c, scale, scale, scale);
     PSMTXConcat(m19c, m13c, m19c);
     PSMTXConcat(m19c, m16c, m7c);
-    w = (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    d = (f32)sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    PSMTXTrans(m19c, 2.0f * d, 0.0f, 2.0f * -w);
+    d = cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
+    s = sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
+    PSMTXTrans(m19c, 2.0f * s, 0.0f, 2.0f * -d);
     PSMTXConcat(m19c, m7c, m7c);
     GXSetTevColor(GX_TEVREG0, white);
     GXSetTevColor(GX_TEVREG1, color_tbl[work->type]);
@@ -256,9 +259,9 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
+    w = 64.0f;
     sh = alpha * 0x80 / 0xFF;
     al = alpha * 0xFF / 0xFF;
-    w = 64.0f;
 
 
     for (i = 0; i < 2; i++) {
@@ -287,7 +290,7 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-    w = 10.666667f;
+        w = 10.666667f;
     h = 42.666668f;
 
 

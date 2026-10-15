@@ -182,8 +182,8 @@ void effConfettiMain(EffectEntry* effect) {
     s32 frame;
     s32 count;
     s32 camId;
-    s32 anm;
     Vec position;
+    s32 anm;
 
     w = effect->userdata;
     {
@@ -203,8 +203,7 @@ void effConfettiMain(EffectEntry* effect) {
     if (w->frame > 0x4F1A0) {
         w->frame = 10;
     }
-    anm = w->frame;
-    anm = w->frame;
+    frame = w->frame;
     type = w->type;
     count = w->count;
     if (w->life < 10) {
@@ -212,7 +211,7 @@ void effConfettiMain(EffectEntry* effect) {
     }
     mod = type % 10;
     w++;
-    anm = (anm >> 1) % 6;
+    anm = (frame >> 1) % 6;
     for (i = 0; i < count; i++, w++) {
         switch (mod) {
         case 3:
@@ -265,14 +264,12 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
-    u8* seq;
     s32 type;
     EffConfettiN64Work* w;
     s32 i;
     s32 alpha;
     s32 count;
     CameraEntry* camera;
-    s32 anm;
     s32 frm;
     s32 off;
     Mtx tmp;
@@ -280,9 +277,13 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     Mtx mtx;
     GXTexObj texObj;
+    u8* col;
+    u8* seq;
+    s32 anm;
 
     camera = camGetPtr(cameraId);
     w = effect->userdata;
+    anm = w->frame;
     type = w->type;
     count = w->count;
     alpha = w->alpha;
@@ -306,8 +307,7 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     anm = (anm >> 1) % 6;
     type = type % 10;
     for (i = 0; i < count; i++, w++) {
-        s32 ci = i % 12;
-        u8* col = color_table + ci * 3;
+        col = color_table + (i % 12) * 3;
         if (w->delay > 0) {
             continue;
         }

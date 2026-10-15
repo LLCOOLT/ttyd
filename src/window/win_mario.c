@@ -420,19 +420,19 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     PouchData* pouch;
     f32 x;
     f32 y;
-    f32 v25;
     f32 v29;
     f32 v26;
     f32 v27;
     f32 v28;
     f32 v24;
+    f32 v21;
     f32 v23;
     f32 v30;
     f32 v22;
-    f32 v21;
     f32 v20;
     f32 v19;
     f32 v18;
+    f32 v25;
     s32 i;
     s64 secs;
     u64 tsecs;
@@ -483,7 +483,7 @@ void winMarioDisp(s32 camId, WinMarioWork* w, s32 idx) {
     for (i = 0; i < 3; i++) {
         GXColor cols[3] = {{0xCB, 0x8C, 0xA2, 0xFE}, {0xCB, 0xBE, 0x89, 0xFE}, {0x94, 0xB9, 0xC7, 0xFE}};
         GXColor reds[3] = {{0xA7, 0x3C, 0x3C, 0xFF}, {0x37, 0x69, 0x1E, 0xFF}, {0x0F, 0x21, 0x7A, 0xFF}};
-        const char* const N_stat_name_tbl[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
+        const char* N_stat_name_tbl[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
         const char* ruby[3] = {"msg_menu_mario_ruby_hp", "msg_menu_mario_ruby_fp", "msg_menu_mario_ruby_bp"};
 
         v23 = FontGetMessageWidth(N_stat_name_tbl[i]);

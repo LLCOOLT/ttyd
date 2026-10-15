@@ -406,6 +406,7 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     best = NULL;
     maxD = rd + dist;
     bestD = maxD;
+    do {
     qpos = *pos;
     {
     Vec dir1 = {0.0f, 0.0f, 0.0f};
@@ -487,6 +488,7 @@ HitEntry* partySearchWallFront(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
         pos->z += dist * cs;
     }
     return NULL;
+    } while (0);
 }
 
 HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
@@ -548,6 +550,8 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
 
 
 
+    
+    
     f32 ten = 10.0f, zero = 0.0f, one = 1.0f;
     oz = party->width * 0.3f;
     sincosf(&s, &c, angle);
@@ -637,4 +641,13 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
         pos->z = lz;
         *dist = 0.0f;
     }
+}
+
+void partyHitStrippedPool(f32* f, s32 i) {
+    f[0] = 10.0f;
+    f[1] = 0.0f;
+    f[2] = 1.0f;
+    f[3] = 0.5f;
+    f[4] = 100.0f;
+    f[5] = (f32)i;
 }

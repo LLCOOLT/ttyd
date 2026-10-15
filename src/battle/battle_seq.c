@@ -1983,10 +1983,10 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 }
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
-	int i;
 	BOOL done = TRUE;
+	int i = 0;
 	BattleUnit* unit;
-	for (i = 0; i < 64; i++) {
+	for (; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {
 			while (unit->phaseEventId) {

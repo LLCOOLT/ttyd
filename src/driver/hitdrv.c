@@ -517,7 +517,6 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
     s32 count = 0;
     MapFileMesh* mesh;
     MapWork* wp;
-    HitVector* vec;
     Vec* pos;
     Vec a, b, c;
 
@@ -534,6 +533,7 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                 s32* list = (s32*)mesh->displayLists.normalLists[j];
                 for (k = 0; k < *list - 2; k++) {
                     BOOL even;
+                    HitVector* vec;
                     s16 i1, i2;
                     s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
                     i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
@@ -561,19 +561,21 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             }
             stride *= 2;
             for (j = 0; j < mesh->displayListCount; j++) {
+                s32 n;
                 u8* list = (u8*)mesh->displayLists.packedLists[j].offset;
-                s32 n = *(u16*)(list + 1) - 2;
+                n = *(u16*)(list + 1) - 2;
                 for (k = 0; k < n; k++) {
                     u16 i0, i1, i2;
                     s32 o0, o1, o2;
                     BOOL even;
                     s16* base;
                     register u32 gqr;
+                    HitVector* v2;
                     i0 = *(u16*)&list[k * stride + 3];
                     even = !(k & 1);
                     i1 = *(u16*)&list[stride * (k + 1) + 3];
                     i2 = *(u16*)&list[stride * (k + 2) + 3];
-                    vec = &hit->vectors[count];
+                    v2 = &hit->vectors[count];
                     base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     o0 = i0 * 3;
                     o1 = (u16)(even ? i2 : i1) * 3;
@@ -590,14 +592,14 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     c.x = hitDequant(base, o2);
                     c.y = hitDequant(base, o2 + 1);
                     c.z = hitDequant(base, o2 + 2);
-                    MTXMultVec(hit->worldMtx, &a, &vec->v0);
-                    MTXMultVec(hit->worldMtx, &b, &vec->v1);
-                    MTXMultVec(hit->worldMtx, &c, &vec->v2);
-                    PSVECSubtract(&vec->v2, &vec->v0, &vec->edge0);
-                    PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
-                    PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
-                    PSVECCrossProduct(&vec->edge0, &vec->edge1, &vec->normal);
-                    if (!(vec->normal.x == 0.0f && vec->normal.y == 0.0f && vec->normal.z == 0.0f)) {
+                    MTXMultVec(hit->worldMtx, &a, &v2->v0);
+                    MTXMultVec(hit->worldMtx, &b, &v2->v1);
+                    MTXMultVec(hit->worldMtx, &c, &v2->v2);
+                    PSVECSubtract(&v2->v2, &v2->v0, &v2->edge0);
+                    PSVECSubtract(&v2->v0, &v2->v1, &v2->edge1);
+                    PSVECSubtract(&v2->v1, &v2->v2, &v2->edge2);
+                    PSVECCrossProduct(&v2->edge0, &v2->edge1, &v2->normal);
+                    if (v2->normal.x || v2->normal.y || v2->normal.z) {
                         count++;
                     }
                 }

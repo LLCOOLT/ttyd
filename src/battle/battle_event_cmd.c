@@ -27,9 +27,10 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) {
-    s32 index = event->args[0];
-    u32 flags = event->args[1];
+    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
+    s32 index = args[0];
+    u32 flags = args[1];
     if (flags & wp->flags) {
         evtSetValue(event, index, TRUE);
     }
@@ -163,7 +164,8 @@ USER_FUNC(btlevtcmd_DrawLots) {
     s32 index = args[0];
     s32 *alloc;
     s32 i, count, max;
-    s32 ceiling, ceilcount, retcount;
+    s32 ceiling;
+    s32 nv[2];
 
     index = args[0];
     args += 2;
@@ -175,15 +177,15 @@ USER_FUNC(btlevtcmd_DrawLots) {
         max += alloc[i];
     }
     ceiling = irand(max);
-    ceilcount = 0; i = 0; retcount = i;
+    nv[1] = 0; i = 0; nv[0] = i;
     for (; i < count; i++) {
-        ceilcount += alloc[i];
-        if (ceiling < ceilcount) {
+        nv[1] += alloc[i];
+        if (ceiling < nv[1]) {
             break;
         }
-        retcount++;
+        nv[0]++;
     }
-    evtSetValue(event, index, retcount);
+    evtSetValue(event, index, nv[0]);
     BattleFree(alloc);
     return EVT_RETURN_DONE;
 }
@@ -3663,7 +3665,7 @@ USER_FUNC(btlevtcmd_GetConsumeItem) {
     s32 item;
     w = &w[wp->commandMenu.cursor[11].field_0];
     item = ((BattleCommand*)w)->weapon[0].itemId;
-    evtSetValue(event, args[0], item);
+    evtSetValue(event, event->args[0], item);
     return EVT_RETURN_DONE;
 }
 
@@ -4424,7 +4426,7 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
                 MJ_F(unit, 0x1B4) = 360.0f / BEC_MVFRAME(unit);
                 t = BEC_MVDIST(unit) - 20.0;
                 t = t / 6.0;
-                t = t + 47.0;
+                t = 47.0 + t;
                 MJ_F(unit, 0x180) = t;
                 if (type == 2) {
                     t = MJ_F(unit, 0x180) * 1.12;
@@ -4440,7 +4442,7 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
                 MJ_F(unit, 0x1B4) = (f32)(360 / BEC_MVFRAME(unit));
                 t = BEC_MVDIST(unit) - 20.0;
                 t = t / 6.0;
-                t = t + 47.0;
+                t = 47.0 + t;
                 MJ_F(unit, 0x180) = t;
                 if (type == 4) {
                     t = MJ_F(unit, 0x180) * 1.25;

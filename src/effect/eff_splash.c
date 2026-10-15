@@ -326,16 +326,19 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     GXTexObj texObj;
     GXColor color;
+
     s32 i;
     s32 k;
     s32 type;
     s32 n;
     CameraEntry* cam;
+    u8** dl;
     f32 a, b, c;
     f32 r0, g0, b0, r1, g1, b1;
     f32 ang, sn, cs;
     f32 w;
     u32 u;
+
     f32 nw;
 
 
@@ -499,7 +502,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, geso_shibuki_texcoord0_tbl, 4);
             {
-                u8** dl; u32 k2; u8* sz;
+                u32 k2; u8* sz;
                 for (k2 = 0, sz = geso_shibuki_dl_0_size_tbl, dl = geso_shibuki_dl_0_tbl; k2 < 5; k2++, sz++, dl++) {
                     GXCallDisplayList(*dl, *sz << 5);
                 }

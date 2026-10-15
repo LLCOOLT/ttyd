@@ -550,7 +550,7 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	x5 = width - 32.0f;
 	y3 = -x5;
 	y4 = y3 - 32.0f;
-	GXPosition3f32(0.0f, y3, 0.0f); //f27 = y3, neg(width - 32.0f)
+	GXPosition3f32(0.0f, y3, 0.0f);
 	GXTexCoord2f32(0.0f, 0.0f);
 
 	GXPosition3f32(x2, y3, 0.0f);

@@ -19,8 +19,8 @@ typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; Vec pos; f32 angle; s16 pose; u64 startTime; } Moamoa;
 typedef struct MoamoaWork { s32 field_0x0; s32 count; Moamoa* moa; s32 numDefs; MoamoaPoseDef defs[32]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
-static MoamoaWork* wp;
 static s32 wp_pad;
+static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 int rand(void);
@@ -455,14 +455,15 @@ void moamoa_dispent(void) {
 
 USER_FUNC(evt_moamoa_set_one) {
     s32* args = event->args;
+    Moamoa* moa;
     s32 idx = evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
     f32 z = evtGetFloat(event, args[3]);
     Mtx m;
     ExtPose* pose = extGetPosePtr();
-    Moamoa* moa;
-    (moa = wp->moa + idx)->state = 3;
+    {
+    (moa = &wp->moa[idx])->state = 3;
     {
         Vec pos = {0.0f, 0.0f, 0.0f};
 
@@ -475,6 +476,7 @@ USER_FUNC(evt_moamoa_set_one) {
         PSMTXRotRad(m, 'y', 1.5707964f);
         PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
         moa->flags |= 1;
+    }
     }
     return EVT_RETURN_DONE;
 }

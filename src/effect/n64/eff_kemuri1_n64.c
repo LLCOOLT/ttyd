@@ -44,7 +44,7 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 	effKemuri1EWork* data;
 	s32 effCount;
 	s32 i;
-	f32 angle; f32 tmp;
+	f32 angle2; f32 tmp; f32 tmp2; f32 angle;
 
 	effect = effEntry();
 	switch (type) {
@@ -165,19 +165,18 @@ EffectEntry* effKemuri1N64Entry(s32 type, f32 x, f32 y, f32 z, f32 a5) {
 		case 6:
 		case 7:
 			for (i = 1; i < effCount; i++, data++) {
-				f32 angle2;
 				data->f10 = -3.0f;
 				data->f14 = 0.93f;
 				data->f20 = 0.0f;
 				data->f24 = 0.099999994f;
 				data->f28 = 0.94f;
 				data->f2C = 0.94f;
-				angle2 = 6.2831855f * (a5 + (f32)(((i - 1) * 360) / (effCount - 1))) / 360.0f;
+				angle2 = 6.2831855f * ((f32)(((i - 1) * 360) / (effCount - 1)) + a5) / 360.0f;
 				tmp = sin(angle2);
 				data->position.x = 10.0f * -tmp;
 				data->position.y = 0.0f;
-				tmp = cos(angle2);
-				data->position.z = 10.0f * -tmp;
+				tmp2 = cos(angle2);
+				data->position.z = 10.0f * -tmp2;
 				data->f30 = sin(angle2);
 				data->f34 = cos(angle2);
 				switch (type) {

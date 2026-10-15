@@ -30,7 +30,7 @@ EffectEntry* effPointGetEntry(s32 type, f32 x, f32 y, f32 z, s32 number, s32 dur
     EffPointGetWork* work;
 
     effect = effEntry();
-    effect->type = "PointGet\0\0\0\0\0\0\0";
+    effect->type = "PointGet\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPointGetWork) * effect->count);
     effect->userdata = work;
@@ -129,12 +129,13 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    base = -(362.0f + width);
     wide = 352.0f;
-    y1 = 24.0f;
-    width = 48.0f;
+    x0 = 48.0f;
+    base = -(362.0f + width);
+    width = x0;
     x0 = -width;
     x0 /= 2.0f;
+    y1 = 24.0f;
     for (pass = 1; pass >= 0; pass--) {
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);

@@ -1125,8 +1125,8 @@ void yuka_disp(CameraId cam, void* param) {
             GXLoadTexObj(&obj, 0);
             GXLoadPosMtxImm(camera->view, 0);
             GXSetCurrentMtx(0);
-            GXWGFifo.u8;
             i = 0;
+            GXWGFifo.u8;
             do {
                 GXBegin(0x80, GX_VTXFMT0, 4);
                 GXPosition3f32(m->disp[0][i].x, m->disp[0][i].y, m->disp[0][i].z);

@@ -766,7 +766,6 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
 }
 
 void loadDraw(CameraId camera, void* param) {
-    WinDt* win;
     CameraEntry* cam = camGetPtr(CAMERA_2D);
     GXColor white = {255, 255, 255, 255};
     GXColor gray = {160, 160, 160, 255};
@@ -782,9 +781,11 @@ void loadDraw(CameraId camera, void* param) {
     f32 y;
     f32 w;
     f32* py;
+    u64 sec;
+    WinDt* win;
+    WinDt* win1;
     s32 i;
     s32 j;
-    u64 sec;
 
     if (wp->unk18 >= 0x20 && wp->unk18 < 0x28) {
         return;
@@ -818,7 +819,6 @@ void loadDraw(CameraId camera, void* param) {
 
     win = win_dt;
     for (i = 0; i < 9; i++) {
-        WinDt* win1 = &win_dt[i];
         GXColor col = gray;
         if (i == wp->slot) {
             col = white;
@@ -832,21 +832,21 @@ void loadDraw(CameraId camera, void* param) {
         if (i == 5 && (wp->flags & 0x20)) {
             col = dark;
         }
-        switch (win1->unk10) {
+        switch (win_dt[i].unk10) {
             case 10:
             case 11:
             case 12:
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                winTexSet(0xe, (Vec){win1->x, win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(0xe, (Vec){win_dt[i].x, win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 winTexInit(*wp->file->data);
-                winTexSet(win1->unk10, (Vec){win1->x, 60.0f + win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(win_dt[i].unk10, (Vec){win_dt[i].x, 60.0f + win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(win1->unk10, win1->unk14, (Vec){win1->x, win1->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet_x2(win_dt[i].unk10, win_dt[i].unk14, (Vec){win_dt[i].x, win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
         }

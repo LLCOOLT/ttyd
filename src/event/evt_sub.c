@@ -1101,9 +1101,6 @@ __declspec(section ".data") s32 lbl_803080CC[] = {
     1,
 };
 
-#pragma force_active on
-__declspec(section ".rodata") static const u32 gap_04_802C360C_rodata[1] = {0};
-#pragma force_active reset
 #pragma explicit_zero_data on
 USER_FUNC(evt_sub_intpl_init) {
 	static u32 gap_07_804101EC_sdata = 0;
@@ -1120,7 +1117,6 @@ USER_FUNC(evt_sub_intpl_init) {
 	event->lwData[15] = steps;
 	(void)&gap_07_804101EC_sdata;
 	(void)&gap_09_80419DAC_sdata2;
-	(void)gap_04_802C360C_rodata;
 	return EVT_RETURN_DONE;
 }
 #pragma explicit_zero_data reset

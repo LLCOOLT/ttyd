@@ -20,7 +20,6 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg);
 typedef struct YuuRankingWork { EventEntry* event; u16 flags; u32 dispFlags; f32 x; f32 y; s32 type; s32 mode; s32 score; s32 bonus; s32 mul; s32 rank; s32 max; s32 phase; s32 monte; s32 dispScore; s32 timer; } YuuRankingWork;
 typedef struct YuuParlorRank { u8 pad[0x14]; s32 used[4][6]; s32 score[4][6]; s32 pts[4][6]; } YuuParlorRank;
 extern YuuParlorRank* yuwp;
-static YuuRankingWork* _wp;
 void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* str);
 void FontDrawScale(f32 scale);
 s32 psndSFXOn(const char* name);
@@ -601,6 +600,8 @@ static void evt_yuuranking_disp_func(CameraId camera, void* param) {
     }
     return EVT_RETURN_BLOCK;
 }
+
+static YuuRankingWork* _wp;
 
 static s32 yuu_kesan(s32 type, s32 score, s32 bonus, s32 mul, s32 max) {
     s32 ret;

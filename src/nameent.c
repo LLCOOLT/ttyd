@@ -147,17 +147,17 @@ BOOL nameEntIsCancel(void) {
 }
 
 const char* nameEntGetName(void) {
-	s32 i;
+	s32 j;
 
 	if (wp->field_0x8 != 0x65) {
 		return NULL;
 	}
-	for (i = 7; i >= 1; i--) {
-		if (strncmp(&wp->field_0x3C[i * 2], "\x81\x40", 2)) {
+	for (j = 7; j >= 1; j--) {
+		if (strncmp(&wp->field_0x3C[j * 2], "\x81\x40", 2)) {
 			break;
 		}
-		wp->field_0x3C[i * 2] = 0;
-		wp->field_0x3C[i * 2 + 1] = 0;
+		wp->field_0x3C[j * 2] = 0;
+		wp->field_0x3C[j * 2 + 1] = 0;
 	}
 	return wp->field_0x3C;
 }
@@ -196,7 +196,7 @@ void nameEntMain(void) {
 
 s32 nameMain(void) {
 	s32 len;
-	s32 i;
+	s32 j;
 	s32 off;
 	s32 o2;
 	s32 idx;
@@ -266,16 +266,16 @@ s32 nameMain(void) {
 					}
 				} else if (keyGetButtonTrg(0) & 0x1000) {
 					len = strlen(wp->field_0x3C) / 2;
-					for (i = 0, off = 0; i < len; off += 2, i++) {
+					for (j = 0, off = 0; j < len; off += 2, j++) {
 						if (strncmp(&wp->field_0x3C[off], "\x81\x40", 2)) {
 							break;
 						}
 					}
-					if (i < len || wp->field_0xC != 0) {
+					if (j < len || wp->field_0xC != 0) {
 						wp->field_0x5C = 1;
 						wp->field_0x8 = 100;
 						psndSFXOn((const char*)0x12);
-						if (wp->field_0xC == 1 && i >= len) {
+						if (wp->field_0xC == 1 && j >= len) {
 							strcpy(wp->field_0x3C, msgSearch("name_party3"));
 							wp->field_0x18 = strlen(wp->field_0x3C) / 2;
 						}
@@ -413,9 +413,9 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor white;
 	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
 	const char* str;
-	s32 k;
-	s32 j;
 	s32 i;
+	s32 j;
+	s32 k;
 	CameraEntry saved;
 	f32 proj[7];
 	f32 vp[6];

@@ -35,7 +35,7 @@ static u8 snd_base_studio;
 static u8 snd_max_studios;
 static u8 s3dUseMaxVoices;
 u8 s3dUseLegacyLogic;
-void (*s3dOcclusionCallback)(struct SND_EMITTER*, SND_FVECTOR*, SND_FVECTOR*, void*, SND_FVECTOR*, SND_FVECTOR*, f32*, f32*);
+extern void (*s3dOcclusionCallback)(struct SND_EMITTER*, SND_FVECTOR*, SND_FVECTOR*, void*, SND_FVECTOR*, SND_FVECTOR*, f32*, f32*);
 
 #ifdef SND3D_UNUSED /* dead-stripped from this game build */
 static inline void UpdateRoomDistances() {
@@ -948,6 +948,7 @@ static START_LIST startListNum[64]; // size: 0x700
 static u8 startListNumnum;          // size: 0x1
 static RUN_LIST runList[128];
 static u8 runListNum;               // size: 0x1
+void (*s3dOcclusionCallback)(struct SND_EMITTER*, SND_FVECTOR*, SND_FVECTOR*, void*, SND_FVECTOR*, SND_FVECTOR*, f32*, f32*);
 
 static inline void ClearStartList() {
   startGroupNum = 0;

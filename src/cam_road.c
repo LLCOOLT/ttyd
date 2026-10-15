@@ -751,6 +751,7 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
 }
 // CC_END
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
+    f32 pz, qx, qz;
     CamRoadState** pp;
     f32 cs2;
     f32 angle;
@@ -773,6 +774,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     Vec r1;
     Vec r2;
     f32 best;
+    f32 zoom;
     f32 nx;
     f32 ny;
     f32 nz;
@@ -783,7 +785,6 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     f32 dist;
     f32 fov;
     f32 cs, sn, w, ox, oz;
-    f32 pz, qx, qz;
     f32 lim1, lim2, l1, l2;
     f32 s, t, sgn1, sgn2, len2, len;
     s32 n, m, cnt;
@@ -798,12 +799,12 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     s32* idxp;
     CamRoadCurveX* hitCurve;
 
-    posB.x = d;
-    posB.y = e;
-    posB.z = f;
     posA.x = a;
     posA.y = b;
     posA.z = c;
+    posB.x = d;
+    posB.y = e;
+    posB.z = f;
     curve = (CamRoadCurveX*)wp->map->curves;
     best = -100000000.0f;
     hitCurve = NULL;
@@ -923,11 +924,11 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     }
     if (curve != NULL) {
         fov = 3.1415927f * (wp->map->f_e8->x * 0.5f / 180.0f);
+        zoom = 1.0f;
         if (g && hitCurve != NULL && prev->on) {
             cs = (f32)cos(fov);
             sn = (f32)sin(fov);
-            px = -nz;
-            w = 0.01f * (prev->f_58 * (1.0f * (640.0f * (dist * sn / cs) / 480.0f)));
+            w = 0.01f * (prev->f_58 * (zoom * (640.0f * (dist * sn / cs) / 480.0f)));
             found = 0;
             hit2.y = -1000000.0f;
             hit2.dir.z = 0.0f;
@@ -935,7 +936,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             hit2.dir.x = 0.0f;
             p = posA;
             p.y = 1000000.0f;
-            ox = w * px;
+            ox = w * -nz;
             oz = w * nx;
             p.x = p.x + ox;
             p.z = p.z + oz;
@@ -965,7 +966,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             
             cs2 = (f32)cos(fov);
             sn = (f32)sin(fov);
-            w = 0.01f * (g * (1.0f * (640.0f * (dist * sn / cs2) / 480.0f)));
+            w = 0.01f * (g * (zoom * (640.0f * (dist * sn / cs2) / 480.0f)));
             found2 = 0;
             flags = 0;
             hit3.y = -1000000.0f;
@@ -974,7 +975,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             hit3.dir.x = 0.0f;
             p2 = posA;
             p2.y = 1000000.0f;
-            ox = w * px;
+            ox = w * -nz;
             oz = w * nx;
             p2.x = p2.x + ox;
             p2.z = p2.z + oz;

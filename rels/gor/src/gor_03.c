@@ -29,15 +29,18 @@ static const FuwaTable fuwa_table = {{0.0f, 0.5f, 1.0f, 1.4f, 1.8f, 2.0f, 2.3f, 
 typedef struct ExchangeRyokin { s32 ryokin; s32 medal; } ExchangeRyokin;
 #define RYOKIN_TBL ((ExchangeRyokin(*)[3])exchange_ryokin_medal_tbl)
 s32 exchange_ret_tbl_no(void);
-char* exchange_msgp;
-static s32 dataadr[8];
 s32 yuugijou_montemedal_keep(EventEntry* event, BOOL isFirstCall);
 void monteCountDisp(void);
 typedef struct GoryuuWork { EventEntry* event; EventEntry* subEvent; u16 flags; s32 type; s32 (*init)(EventEntry* event, BOOL isFirstCall); s32 (*main)(EventEntry* event, BOOL isFirstCall); void (*disp)(CameraId camera, void* param); void* data; } GoryuuWork;
 typedef struct SlotWork { u32 flags; s32 phase; f32 reberAngle; f32 angle[2][3]; f32 speed[3]; s8 state[3]; s8 face[2][3]; s8 stopCount[3]; s32 wait[3]; s32 extra[3]; s32 counter; s32 neonCount; s32 monteCount; s32 nowSlot; s32 caseId[2]; EventEntry* monteEvt; s32 sfxId; s16 cursor; } SlotWork;
 typedef struct GMonteSub { s32 unk0; Vec pos; f32 scale; u8 unk14[0x38 - 0x14]; } GMonteSub;
 typedef struct GMonte { u8 hidden; u8 state; s16 wait; s16 timer; u8 unk6[2]; GMonteSub sub; Vec vel; SlotWork* owner; } GMonte;
+static s32 dataadr[8];
 static GMonte* monte_p;
+NpcEntry* npc;
+static EffectEntry* eff;
+static s32 xlw[16];
+char* exchange_msgp;
 typedef struct GorYuuWork { s32 unk0; s32 unk4; s32 medals; } GorYuuWork;
 extern GorYuuWork* yuwp;
 int rand(void);
@@ -55,14 +58,11 @@ void goryuugijo_upsidewindow_dispoff_sub(s32 slot, s32 reel);
 s32 slot_rotate_sub(GoryuuWork* wp, SlotWork* data, s32 reel);
 void slot_neon_sub(GoryuuWork* wp, SlotWork* data);
 void mapObjGetPos(const char* name, Vec* pos);
-static EffectEntry* eff;
-NpcEntry* npc;
 EffectEntry* effMarioBalloonEntry(s32 type, NpcEntry* npc);
 s32 shadowEntry(f32 x, f32 y, f32 z, f32 size);
 void shadowSetCollision(s32 id, s32 on);
 typedef struct KujiMsgWork { u8 unk0[8]; u16 unk8; u8 unkA[6]; s32 unk10; } KujiMsgWork;
 void* effBombEntry(s32 type, f32 x, f32 y, f32 z, f32 scale);
-static s32 xlw[16];
 
 USER_FUNC(desk_talk_func);
 USER_FUNC(desk_talk_init_func);

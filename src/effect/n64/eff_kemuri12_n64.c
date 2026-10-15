@@ -107,14 +107,14 @@ void effKemuri12Main(EffectEntry* effect) {
 #pragma opt_propagation off
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
-    s32 alpha;
-    CameraEntry* camera;
-    s32 ofs;
-    EffKemuri12N64Work* work;
-    effN64Vtx* vtx;
     u16 type;
     s32 last;
     s32 idx;
+    EffKemuri12N64Work* work;
+    CameraEntry* camera;
+    s32 ofs;
+    s32 alpha;
+    effN64Vtx* vtx;
     Mtx mtx;
     Mtx scaleMtx;
     Mtx rot;

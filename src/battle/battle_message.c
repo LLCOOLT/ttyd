@@ -48,18 +48,18 @@ USER_FUNC(btlevtcmd_AnnounceMessage) {
 
 void _disp(CameraId cameraId, void* param) {
     BattleAnnounce* announce = &_battleWorkPointer->announce;
-    u16 width;
     u16 lines;
-    f32 x, y, w, h;
+    u16 width;
     f32 wx, wy;
+    f32 x, y, w, h;
 
     x = announce->x;
     y = announce->y + 120;
     width = FontGetMessageWidthLine(announce->text, &lines);
     lines++;
-    x -= width / 2;
+    x -= (s32)width / 2;
     w = width + 20;
-    h = lines * 29 + 3;
+    h = (s32)(lines * 29) + 3;
     wx = x - 10.0f;
     wy = -29.0f + (3.0f + y);
     windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, wx, wy, w, h, 10.0f);

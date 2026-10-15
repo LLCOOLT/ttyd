@@ -177,8 +177,8 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     s32 n;
     effN64Vtx* p;
     effN64Vtx* q;
-    s32 k;
     EffHoraoSpellN64Work* work;
+    s32 k;
     s32 alpha;
     s32 frame;
     s32 i;

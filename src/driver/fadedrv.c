@@ -19,6 +19,8 @@ double tan(double);
 s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 extern GlobalWork* gp;
 
+#pragma force_active on
+u32 gap_fd_sbss;
 static FadeWork* wp;
 
 //local prototypes
@@ -1277,3 +1279,8 @@ TEXPalette* fadeGetTpl(void) {
 void fadeSetNarrowFast(void) {
 	wp->entries[1].flags |= 8;
 }
+
+__declspec(section ".sdata") u32 gap_fd_sdata2[7] = {0};
+__declspec(section ".sdata2") const u32 gap_10_80422F7C_sbss2;
+
+#pragma force_active reset

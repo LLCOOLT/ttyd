@@ -976,7 +976,6 @@ static void ext_moamoa_main(void) {
                 }
                 break;
             case 14:
-            case 50:
                 if (--moa->timer < 0) {
                     moa->timer = 0;
                     moa->state++;
@@ -992,7 +991,7 @@ static void ext_moamoa_main(void) {
                 } else {
                     moamoa_joint_position(moa, &jv);
                     PSVECAdd(&jv, &moa->field_0x30, &jv);
-                    { f32 a1 = randf(1.5f, 1.5f); f32 a2 = randf(0.8f, 0.8f); moamoa_jump(pose, moa, 61, 0, jv.x, jv.y, jv.z, 2.0f * a1, 2.0f * a2); }
+                    { f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; f32 z0 = 0.0f; moamoa_jump(pose, moa, 61, 0, jv.x, jv.y, jv.z, 2.0f * (r1 * z0 + 1.5f), 2.0f * (r2 * z0 + 0.8f)); }
                     moa->flags |= 0x200;
                     pose->flags |= 4;
                 }
@@ -1003,6 +1002,12 @@ static void ext_moamoa_main(void) {
                 pose->mtx[0][3] = pv.x;
                 pose->mtx[1][3] = pv.y;
                 pose->mtx[2][3] = pv.z;
+                break;
+            case 50:
+                if (--moa->timer < 0) {
+                    moa->timer = 0;
+                    moa->state++;
+                }
                 break;
             case 51:
                 moa->speed = randf(0.0f, 200.0f);
@@ -1037,7 +1042,7 @@ static void ext_moamoa_main(void) {
                 x2 = 15.0f * moa_sinx(6.2831855f * angle / 360.0f) + pose->mtx[0][3];
                 y = pose->mtx[1][3];
                 z2 = pose->mtx[2][3] - 15.0f * moa_cosx(6.2831855f * angle / 360.0f);
-                { f32 a1 = randf(1.0f, 1.0f); f32 a2 = randf(0.4f, 0.4f); moamoa_jump(pose, moa, dist < 100.0f ? moa->state : 0, 0, x2, y, z2, a1, a2); }
+                moamoa_jump(pose, moa, dist < 100.0f ? moa->state : 0, 0, x2, y, z2, randf(1.0f, 1.0f), randf(0.4f, 0.4f));
                 break;
             case 2:
                 angle = (wp->angle + randf(-45.0f, 45.0f) + 180.0f);
@@ -1187,17 +1192,17 @@ static void ext_moamoa_main(void) {
         }
         if (!(moa->flags & 0x588)) {
             if (pose->mtx[0][3] > 100.0f) {
-                pose->mtx[0][3] = 100.0f + randf(0.0f, 5.0f);
+                pose->mtx[0][3] = 100.0f + (rand() / 32767.0f * (5.0f - 0.0f) + 0.0f);
             }
             if (pose->mtx[0][3] < -1870.0f) {
-                pose->mtx[0][3] = -1870.0f + randf(0.0f, 5.0f);
+                pose->mtx[0][3] = -1870.0f + (rand() / 32767.0f * (5.0f - 0.0f) + 0.0f);
             }
             if (!(moa->flags & 0x40)) {
                 if (pose->mtx[2][3] > 45.0f) {
-                    pose->mtx[2][3] = 45.0f + randf(0.0f, 5.0f);
+                    pose->mtx[2][3] = 45.0f + (rand() / 32767.0f * (5.0f - 0.0f) + 0.0f);
                 }
                 if (pose->mtx[2][3] < -45.0f) {
-                    pose->mtx[2][3] = -45.0f + randf(0.0f, 5.0f);
+                    pose->mtx[2][3] = -45.0f + (rand() / 32767.0f * (5.0f - 0.0f) + 0.0f);
                 }
             }
         }

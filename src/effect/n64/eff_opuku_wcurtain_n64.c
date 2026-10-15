@@ -138,13 +138,13 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     Vec v;
     f32 s;
     s32 i;
-    s32 t;
     effN64Vtx* vtx;
     effN64Vtx* p;
     effN64Vtx* q;
     s32 k;
     s32 j;
     s32 frame;
+    s32 t;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;

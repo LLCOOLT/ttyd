@@ -206,6 +206,7 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, work->alpha});
     vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     for (i = 0, p = vtx; i < 16; i++, p += 2) {
+        s32 t = i << 7;
         f32 sc;
         f32 a1;
         f32 a2;
@@ -213,7 +214,6 @@ void effTimestampDisp(CameraId cameraId, EffectEntry* effect) {
         f32 s2;
         s32 sx;
         s32 sy;
-        s32 t = i << 7;
 
         sc = work->scale2;
         a1 = 6.2831855f * (f32)(frame * 10 + i * 60) / 360.0f;

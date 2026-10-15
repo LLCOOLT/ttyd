@@ -478,6 +478,8 @@ USER_FUNC(evt_party_jump_pos) {
 		hgt = 20.0f;
 	}
 	ff = sysMsec2Frame(ms);
+	half = 0.5f;
+	dy = 1.0f;
 	switch (event->field_84) {
 	case 0:
 		PU(p, 0x13C) = PU(p, 0x138);

@@ -82,6 +82,9 @@ GXColor hibana_col[32] = {
 };
 
 s32 seed = 1;
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80417BC4_sdata[1] = {0};
+#pragma force_active reset
 
 
 static inline s32 pt_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
@@ -118,6 +121,11 @@ static inline f32 pt_gauss(void) {
         use_last = 1;
     }
     return y1;
+}
+
+// Stand-in for a function the original linker dead-stripped; its signed int->float constant is last in .rodata.
+void particleStrippedPool(f32* f, s32 i) {
+    *f = (f32)i;
 }
 
 void ParticleEmit(EffectEntry* effect, ParticleItem* p, ParticleEmitter* emitter) {

@@ -861,17 +861,18 @@ void partyGetReturnPos(Vec* out) {
 
 HitEntry* check_front(PartyEntry* party) {
     const s32 angles[8] = {0, 45, -45, 90, -90, 135, -135, 180};
+    f32 height;
     static const Vec down = {0.0f, -1.0f, 0.0f};
     HitCheckQuery q;
-    f32 height = 0.8f * party->field_F0;
+    HitEntry* hit;
     HitEntry* found = NULL;
     HitEntry* last = NULL;
-    HitEntry* hit;
     f32 movedir;
     f32 ang;
     f32 lim;
     u32 i;
 
+    height = 0.8f * party->field_F0;
     movedir = partyToMovedir(party->field_10C);
     for (i = 0; i < 8; i++) {
         sincosf(&q.targetDir.x, &q.targetDir.z, movedir + (f32)angles[i]);

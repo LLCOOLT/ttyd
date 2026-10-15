@@ -23,8 +23,6 @@ BOOL parsePush(const char* tag) {
 	s32 newStart;
 	s32 newEnd;
 	s32 depth;
-	s32 n;
-	s32 j;
 	depth = 0;
 	state = 0;
 	p = (s8*)parse.ptr;
@@ -48,8 +46,9 @@ BOOL parsePush(const char* tag) {
 			}
 			else {
 				if (state == 0 && depth == 0) {
-					n = 0;
-					for (j = i; j < end; j++) {
+					s32 j;
+					s32 n;
+					for (n = 0, j = i; j < end; ++j) {
 						s8 c = p[j];
 						if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
 							buf[n] = c;

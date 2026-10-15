@@ -692,6 +692,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s16 s230;
 	s16 s232;
 	s16 s234;
+
 	MsgWinData* data;
 	WindowEntry* window;
 	MsgAChar* entry;
@@ -1695,6 +1696,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 	Vec pos;
 	f32 x, y, w, h;
 	f32 ex, ey;
+	s32 al;
 	s32 sy;
 	static u16 active;
 
@@ -1717,10 +1719,14 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			case 6:
 			case 8:
 			case 9:
-				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height / 2.0f);
-				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width / 2.0f);
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				al = window->alpha;
+				al = window->alpha;
+				ex = window->height / 2.0f + window->x;
+				x = intplGetValue(0, al, 255, pos.x, ex);
+				ey = window->y - window->width / 2.0f;
+				y = intplGetValue(0, al, 255, pos.y, ey);
+				w = intplGetValue(0, al, 255, 10.0f, window->height);
+				h = intplGetValue(0, al, 255, 10.0f, window->width);
 				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
@@ -1734,10 +1740,13 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				x = intplGetValue(0, window->alpha, 255, pos.x, window->x + window->height / 2.0f);
-				y = intplGetValue(0, window->alpha, 255, pos.y, window->y - window->width / 2.0f);
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				al = window->alpha;
+				ex = window->height / 2.0f + window->x;
+				x = intplGetValue(0, al, 255, pos.x, ex);
+				ey = window->y - window->width / 2.0f;
+				y = intplGetValue(0, al, 255, pos.y, ey);
+				w = intplGetValue(0, al, 255, 10.0f, window->height);
+				h = intplGetValue(0, al, 255, 10.0f, window->width);
 				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((s32)window->y - 10);
@@ -1870,15 +1879,8 @@ void selectWindow_Disp(CameraId camId, void* param) {
 	MsgWinData* data = window->userdata->address;
 	Vec pos;
 
-	{
-		GXColor fog = {0, 0, 0, 0};
-		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, fog);
-	}
-	{
-		GXColor color = {0xFF, 0xFF, 0xFF, 0x00};
-		color.a = window->alpha;
-		windowDispGX_Waku_col(0, color, window->x, window->y, window->height, window->width, 30.0f);
-	}
+	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
+	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, window->alpha}, window->x, window->y, window->height, window->width, 30.0f);
 	msgDisp(window->userdata, window->alpha, 40.0f + window->x, window->y - 25.0f);
 	pos.x = 2.0f + window->x;
 	data->cursorY += 0.3f * (window->y - (f32)(data->sel * 31 + 58) - data->cursorY);

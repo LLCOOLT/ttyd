@@ -940,7 +940,8 @@ void _MarioExpDisp(CameraId camId, void* param) {
 }
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
-    Vec pos; f32 zero = 0.0f; u32 len; f32 w; char buf[0x14]; SeqEndWork* work = SEW((BattleWork*)param);
+    Vec pos; f32 zero = 0.0f; u32 len; s32 *new_var; f32 w; char buf[0x14]; SeqEndWork* work = SEW((BattleWork*)param);
+    new_var = &work->cursor;
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
     len = strlen(buf); ((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(-30.0f - (w = 6.25f * len), 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -950,7 +951,7 @@ void _LvupParamConfirmDisp(CameraId camId, void* param) {
     FontDrawString(-20.0f, -13.0f, msgSearch("btl_msg_lvup_yes"));
     FontDrawString(-20.0f, -38.0f, msgSearch("btl_msg_lvup_no"));
     pos.x = -40.0f;
-    pos.y = -50 - work->cursor * 25;
+    pos.y = -50 - (*new_var) * 25;
     pos.z = 0.0f;
     iconDispGx(&pos, 0x10, 0x18C, 1.0f);
 }

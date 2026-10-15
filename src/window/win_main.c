@@ -923,11 +923,11 @@ void winFontSet(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     FontDrawMessageMtx(trans, buf);
 }
 
-static const char winNines[] = "９９９";
 void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
     Mtx scl;
+    static const char winNines[] = "９９９";
     va_list args;
 
     va_start(args, fmt);

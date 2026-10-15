@@ -147,7 +147,6 @@ s32 _get_present_target_id(EventEntry* event, BOOL isFirstCall) {
 }
 
 void _get_item_announce_disp(s32 cameraId, void* param) {
-    GXColor col;
     u16 lines;
     const char* itemName;
     char buf[128];
@@ -156,6 +155,7 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     s32 no;
     f32 x;
     f32 y;
+    GXColor col;
 
     no = BattleAudience_GetPresentItemNo();
     itemName = msgSearch(itemDataTable[no].name);
@@ -163,13 +163,11 @@ void _get_item_announce_disp(s32 cameraId, void* param) {
     sprintf(buf, msg, itemName);
     width = FontGetMessageWidthLine(buf, &lines);
     lines++;
-    y = 0.0f;
-    x = y - width / 2;
+    x = 0.0f;
     y = 60.0f;
-    col = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
-    windowDispGX_Waku_col(0, col, x - 10.0f, 34.0f, width + 20, lines * 29 + 3, 10.0f);
+    windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, (x - width / 2) - 10.0f, 34.0f, width + 20, lines * 29 + 3, 10.0f);
     FontDrawStart();
-    FontDrawMessage(x, (s32)y - 29, buf);
+    FontDrawMessage(x - width / 2, (s32)y - 29, buf);
 }
 
 s32 _get_item_announce(EventEntry* event, BOOL isFirstCall) {
@@ -231,30 +229,21 @@ s32* btlataudGetMoveEventPtr(void) {
 
 
 
-extern s32 btlataudevtDummy[];
+
+
+__declspec(section ".data") static s32 btlataudevtDummyPad[1] = {0};
+s32 btlataudevtDummy[] = {
+    327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
+    (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
+};
 s32* btlataudGetAttackEventPtr(s32 unitId) {
-    BattleUnit* u = BattleGetUnitPtr(_battleWorkPointer, unitId);
-    s32* p = BtlUnit_GetData(u, 6);
+    s32* p = BtlUnit_GetData(BattleGetUnitPtr(_battleWorkPointer, unitId), 6);
     if (p == NULL) {
-        p = &btlataudevtDummy[1];
+        p = btlataudevtDummy;
     }
     return p;
 }
 
-
-
-
-
-
-
-
-
-
-
-s32 btlataudevtDummy[16] = {
-    0, 327771, (s32)_get_attack_aud_no, -29999997, -30000000, -29999999, -29999998, 196699,
-    (s32)_attack_aud, -29999997, 0, 131163, (s32)btlevtcmd_StartWaitEvent, -2, 2, 1,
-};
 EVT_BEGIN(btlataudevtPresentItem_Damage)
     CALL(_delete_present_item, LW(0))
     BEGIN_INLINE_EVENT_GET_ID(LW(15))

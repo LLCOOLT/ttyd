@@ -30,7 +30,7 @@ typedef struct JetwEnt {
     u8 alpha, pad;
 } JetwEnt;
 
-__declspec(section ".data") u64 lbl_803A33D8 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 lbl_803A33D8 = 0xBF8000003F800000;
 static __declspec(section ".data") u64 fd_jetw_negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A33E8 = 0x3F800000BF800000;
 static __declspec(section ".data") u64 fd_jetw_one_negone_373 = 0x3F800000BF800000;
@@ -237,12 +237,12 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     s32 lifetime, j, i;
     s32 frame, alpha, r, g, b;
     s32 n, m;
-    s32 half;
     JetwEnt* tbl;
-    s32 idx;
-    JetwEnt* e;
-    s32 f5;
+    s32 half;
     s32 cur;
+    s32 f5;
+    JetwEnt* e;
+    s32 idx;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;

@@ -89,8 +89,8 @@ void effHibashiraMain(EffectEntry* effect) {
     Vec position;
     s32 type;
     BOOL inBattle;
-    s32 i;
     s32 k;
+    s32 i;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
     type = work->type;
@@ -124,7 +124,7 @@ void effHibashiraMain(EffectEntry* effect) {
         work->alpha = work->timer * 16;
     }
     if (work->timer < 0) {
-        for (i = 0, pillar = work; i < effect->count; pillar++, i++) {
+        for (k = 0, pillar = work; k < effect->count; pillar++, k++) {
             if (pillar->poseId != -1) {
                 animPoseRelease(pillar->poseId);
             }
@@ -133,7 +133,8 @@ void effHibashiraMain(EffectEntry* effect) {
         return;
     }
 
-    for (k = 1, work++; k < effect->count; k++, work++) {
+    work++;
+    for (i = 1; i < effect->count; i++, work++) {
         if (work->delay) {
             work->delay--;
             continue;

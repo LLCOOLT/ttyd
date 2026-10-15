@@ -28,11 +28,11 @@ void extLoadTev(void);
 void extDraw(void);
 void extLoadTextureExit(void);
 static void senteresa_ext_disp(CameraId camera, void* param);
+s32 jin_07_bss_pad_C;
 typedef struct Teresa { Vec pos; Vec dst; f32 t; f32 field_0x1C; f32 field_0x20; f32 field_0x24; s32 wait; u8 state; } Teresa;
 static Teresa* pTeresa;
 static s32 g_nNumEndProc[1];
 s32 g_nNumOutBox[1];
-s32 jin_07_bss_pad_C;
 void computePosHermite(ExtPose* pose, Teresa* ter);
 f32 randf(f32 min, f32 max);
 int rand(void);
@@ -336,11 +336,10 @@ void computePosHermite(ExtPose* pose, Teresa* ter) {
     f32 h00, h10, h11, h01;
     u = 1.0f - t;
     t2 = 2.0f * t;
-    h00 = (1.0f + t2) * u * u;
+    h00 = ((1.0f + t2) * u) * u;
     h10 = t * u * u;
-    h11 = (t - 1.0f) * (t * t);
-    h01 = (t * t) * (3.0f - t2);
-
+    h11 = (t * t) * (t - 1.0f);
+    h01 = (3.0f - t2) * (t * t);
     m0.x = ter->field_0x24;
     m0.y = 3.4f * ter->dst.y;
     pose->mtx[0][3] = ter->pos.x * h00 + m0.x * h10 + m1.x * h11 + ter->dst.x * h01;
@@ -453,8 +452,8 @@ USER_FUNC(senteresa_okure_move) {
     f32 h00 = (1.0f + t2) * u * u;
     f32 h10 = t * u * u;
     f32 tt = (0, t * t);
-    f32 h11 = (t - 1.0f) * (t * t);
-    f32 h01 = (t * t) * (3.0f - t2);
+    f32 h11 = (t * t) * (t - 1.0f);
+    f32 h01 = (3.0f - t2) * (t * t);
 
     pos.x = event->lwData[10] * h00 + m0.x * h10 + m1.x * h11 + event->lwData[13] * h01;
     pos.y = event->lwData[11] * h00 + m0.y * h10 + m1.y * h11 + event->lwData[14] * h01;

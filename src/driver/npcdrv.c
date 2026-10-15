@@ -45,6 +45,7 @@ static inline f32 npc_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.
 void FontDrawScale(f32 scale);
 void FontDrawStringShake(f32 x, f32 y, const char* message);
 
+#define NPC_RAD2DEG(r) ((r) * 57.29579f)
 extern int __float_nan[];
 static inline s32 npc_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 npc_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (npc_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
@@ -245,7 +246,7 @@ void npcDisp_xlu(CameraId cameraId, void* param) {
         camera = camGetPtr(CAMERA_3D);
         dx = camera->cameraAt.x - camera->cameraPos.x;
         dz = camera->cameraAt.z - camera->cameraPos.z;
-        angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+        angle = reviseAngle(NPC_RAD2DEG((f32)atan2(-dx, -dz)));
         if (angle < 0.0f) {
             angle += 360.0f;
         }
@@ -317,7 +318,7 @@ void npcDisp(CameraId camId, void* param) {
                 camera = camGetPtr(CAMERA_3D);
                 dx = camera->cameraAt.x - camera->cameraPos.x;
                 dz = camera->cameraAt.z - camera->cameraPos.z;
-                angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+                angle = reviseAngle(NPC_RAD2DEG((f32)atan2(-dx, -dz)));
                 if (angle < 0.0f) {
                     angle += 360.0f;
                 }
@@ -392,7 +393,7 @@ void npcDisp_offscreen_xlu(CameraId camId, void* param) {
         camera = camGetPtr(CAMERA_3D);
         dx = camera->cameraAt.x - camera->cameraPos.x;
         dz = camera->cameraAt.z - camera->cameraPos.z;
-        angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+        angle = reviseAngle(NPC_RAD2DEG((f32)atan2(-dx, -dz)));
         if (angle < 0.0f) {
             angle += 360.0f;
         }
@@ -467,7 +468,7 @@ void npcDisp_offscreen(CameraId camId, void* param) {
                 camera = camGetPtr(CAMERA_3D);
                 dx = camera->cameraAt.x - camera->cameraPos.x;
                 dz = camera->cameraAt.z - camera->cameraPos.z;
-                angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+                angle = reviseAngle(NPC_RAD2DEG((f32)atan2(-dx, -dz)));
                 if (angle < 0.0f) {
                     angle += 360.0f;
                 }
@@ -1323,11 +1324,11 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     mario->field_0x1D8 = (s32)npc;
     angle = angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z);
     if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-        dx = (range - dist) * -npc_sin((6.2832f * mario->directionView) / 360.0f);
-        dz = (range - dist) * npc_cos((6.2832f * mario->directionView) / 360.0f);
+        dx = (range - dist) * -npc_sin((6.2831855f * mario->directionView) / 360.0f);
+        dz = (range - dist) * npc_cos((6.2831855f * mario->directionView) / 360.0f);
 
     } else {
-        rad = (6.2832f * angle) / 360.0f;
+        rad = (6.2831855f * angle) / 360.0f;
         dx = (npc->position.x - range * npc_sin(rad)) - mario->position.x;
         dz = (npc->position.z + range * npc_cos(rad)) - mario->position.z;
     }
@@ -1615,7 +1616,7 @@ static inline f32 fbat_camAngle(void) {
     CameraEntry* camera = camGetPtr(CAMERA_3D);
     f32 dx = camera->cameraAt.x - camera->cameraPos.x;
     f32 dz = camera->cameraAt.z - camera->cameraPos.z;
-    f32 angle = reviseAngle(MTXRadToDeg((f32)atan2(-dx, -dz)));
+    f32 angle = reviseAngle(NPC_RAD2DEG((f32)atan2(-dx, -dz)));
     if (angle < 0.0f) {
         angle += 360.0f;
     }

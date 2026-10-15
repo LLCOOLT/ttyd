@@ -184,7 +184,7 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     for (j = 1; j >= 0; j--) {
         for (i = effect->count - 1; i >= 1; i--) {
             w = effect->userdata;
-            w = w + i;
+            w = &w[i];
             dx = j * 4;
             dy = -j * 4;
             if (j != 0) {

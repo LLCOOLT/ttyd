@@ -283,7 +283,7 @@ label_2:
             check = wp->totalTextures;
             for (i = 0; i < check; i++) {
                 texture = &wp->textures[i];
-                if (texture->active) {
+                if (*(u32*)&texture->active) {
                     if (texture->handle) {
                         if (!strcmp(texture->handle->filename, textureName)) {
                             texture->references++;
@@ -295,7 +295,7 @@ label_2:
 
             for (i = 0, texId = 0; i < wp->totalTextures; i++, texId++) {
                 temptex = &wp->textures[i];
-                if (!temptex->active) {
+                if (!*(u32*)&temptex->active) {
                     texture = temptex;
                     goto label_3;
                 }
@@ -684,23 +684,50 @@ extern double atan2(double y, double x);
 #define APM_S(p, o) (*(s32*)((u8*)(p) + (o)))
 #define APM_F(p, o) (*(f32*)((u8*)(p) + (o)))
 #define APM_P(p, o) (*(u8**)((u8*)(p) + (o)))
+#define APM_S8(dst, p, off) asm { psq_l dst, off(p), 1, 4 }
 void animPoseMain(s32 poseId) {
     u8* pose;
     u8* file;
     u8* anim;
-    u8* data;
     u8* poses;
-    s32 loop, frame, nextFrame, cnt, i;
-    s32 nA, nB, nC, nD, nE;
-    u8 *grpA, *grpB;
+    u8 *grpB, *grpA;
+    u8* q;
+    f32 key;
     u8* kf;
-    f32 t, len, f, time;
+    u8* kfEnd;
+    u8* v;
+    register u8* d;
+    u8* e;
+    register f32 x, y, z;
+    s32 loop, frame, nextFrame, cnt, i, b;
+    s32 nA, nB, nC, nD, nE;
+    f32 t, f, cur, start, len, tm, dt, s, t2, t3;
+    s64 ms;
+    struct APMG { u8 pad[8]; u8* p; u8 pad2[4]; };
+    struct APMA { u8 pad[0x3c]; u8* p; };
+    struct APMA* aa;
+    struct APMK { s32 a; s32 b; };
+    struct APMF { u8 pad[0x2c]; };
+    struct APMD { u8 pad[0x28]; struct APMF* f; u8 pad2[0x40 - 0x2c]; struct APMK* k; };
 
     poses = APM_P(wp, 0x10);
     pose = poses + poseId * 0x170;
-    file = *(u8**)(APM_P(APM_P(APM_P(wp, 0) + APM_S(pose, 0x10) * 16, 8), 0xa0));
-    anim = APM_P(APM_P(file, 0x1ac) + APM_S(pose, 0x14) * 64, 0x3c);
-    /* TODO: GQR2-5 setup */
+    file = (u8*)animPoseGetBaseData((AnimationPose*)pose);
+    anim = (u8*)((AnimationPoseData*)file)->mpAnims[((AnimationPose*)pose)->animId].data;
+    asm {
+        li r3, 4
+        oris r3, r3, 4
+        mtspr GQR2, r3
+        li r3, 5
+        oris r3, r3, 5
+        mtspr GQR3, r3
+        li r3, 6
+        oris r3, r3, 6
+        mtspr GQR4, r3
+        li r3, 7
+        oris r3, r3, 7
+        mtspr GQR5, r3
+    }
     if (APM_S(wp, 0xe8) != 0) {
         grpA = APM_P(wp, 0xf8);
         grpB = APM_P(wp, 0xfc);
@@ -714,24 +741,50 @@ void animPoseMain(s32 poseId) {
     if (anim == NULL) return;
     loop = *(s32*)APM_P(anim, 0x24);
     if (APM_S(pose, 0xc) == 0) {
-        time = (f32)(*(s64*)((u8*)gp + 0x40) / OSTicksToMilliseconds(1));
+        ms = OSTicksToMilliseconds(*(s64*)((u8*)gp + 0x40));
     } else {
-        time = (f32)(*(s64*)((u8*)gp + 0x38) / OSTicksToMilliseconds(1));
+        ms = OSTicksToMilliseconds(*(s64*)((u8*)gp + 0x38));
     }
-    APM_F(pose, 0x20) = 60.0f * time / 1000.0f;
+    tm = (f32)(u64)(ms - *(s64*)(pose + 0x18));
+    APM_F(pose, 0x20) = 60.0f * tm / 1000.0f;
     APM_F(pose, 0x20) *= APM_F(pose, 0x44);
-    /* TODO: block at 0x1a4-0x250 (loop/clamp of anim time) */
-    data = APM_P(anim, 0x28);
+    cur = APM_F(pose, 0x20);
+    f = APM_F(APM_P(anim, 0x24), 8);
+    start = APM_F(APM_P(anim, 0x24), 4);
+    len = f - start;
+    if (0.0f == len) {
+        APM_F(pose, 0x84) = cur - start;
+    } else if (loop != 0) {
+        tm = cur - start;
+        if (tm < 0.0f) {
+            APM_F(pose, 0x84) = 0.0f;
+        } else {
+            APM_F(pose, 0x84) = tm / len;
+            start = cur - (f32)(s32)APM_F(pose, 0x84) * len;
+        }
+    } else if (cur < start) {
+        APM_F(pose, 0x84) = 0.0f;
+    } else if (cur > f) {
+        APM_F(pose, 0x84) = (cur - start) / len;
+        start = f;
+    } else {
+        APM_F(pose, 0x84) = (cur - start) / len;
+        start = cur;
+    }
+    APM_F(pose, 0x24) = start;
+    key = APM_F(pose, 0x24);
     cnt = APM_S(anim, 8);
-    for (i = 0; i < cnt; i++, data += 0x2c) {
-        if (*(f32*)data > APM_F(pose, 0x24)) break;
+    q = APM_P(anim, 0x28);
+    for (i = 0; i < cnt; i++, q += 0x2c) {
+        if (*(f32*)q > key) break;
     }
     APM_S(pose, 0x28) = i - 1;
     APM_S(pose, 0x2c) = APM_S(pose, 0x28) + 1;
-    data = APM_P(anim, 0x40);
+    key = APM_F(pose, 0x24);
+    q = APM_P(anim, 0x40);
     cnt = APM_S(anim, 0x20);
-    for (i = 0; i < cnt; i++, data += 8) {
-        if (*(f32*)data > APM_F(pose, 0x24)) break;
+    for (i = 0; i < cnt; q += 8, i++) {
+        if (*(f32*)q > key) break;
     }
     APM_S(pose, 0x34) = i - 1;
     APM_S(pose, 0x38) = APM_S(pose, 0x34) + 1;
@@ -739,8 +792,24 @@ void animPoseMain(s32 poseId) {
         if (APM_S(pose, 0x2c) >= APM_S(anim, 8)) APM_S(pose, 0x2c) = APM_S(pose, 0x28);
         if (APM_S(pose, 0x38) >= APM_S(anim, 0x20)) APM_S(pose, 0x38) = APM_S(pose, 0x34);
     }
-    APM_S(pose, 0x80) = *(s32*)(APM_P(anim, 0x40) + APM_S(pose, 0x34) * 8 + 4);
-    /* TODO: block at 0x34c-0x3c8 (keyframe length / t) */
+    APM_S(pose, 0x80) = ((struct APMD*)anim)->k[APM_S(pose, 0x34)].b;
+    start = *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x28) * 0x2c);
+    tm = APM_F(pose, 0x24) - start;
+    if (loop != 0) {
+        if (APM_S(pose, 0x2c) >= APM_S(anim, 8)) {
+            APM_S(pose, 0x2c) = 0;
+            len = APM_F(APM_P(anim, 0x24), 8) - *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x28) * 0x2c);
+        } else {
+            len = *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x2c) * 0x2c) - start;
+        }
+    } else {
+        len = *(f32*)(APM_P(anim, 0x28) + APM_S(pose, 0x2c) * 0x2c) - start;
+    }
+    if (0.0f == len) {
+        APM_F(pose, 0x30) = 0.0f;
+    } else {
+        APM_F(pose, 0x30) = tm / len;
+    }
     frame = APM_S(pose, 0x28);
     nextFrame = APM_S(pose, 0x2c);
     t = APM_F(pose, 0x30);
@@ -749,39 +818,192 @@ void animPoseMain(s32 poseId) {
     nC = APM_S(file, 0x13c);
     nD = APM_S(file, 0x140);
     nE = APM_S(file, 0x12c);
-    if (APM_S(pose, 0x3c) == frame) {
-        if (APM_F(pose, 0x40) > t) APM_F(pose, 0x40) = 0.0f;
-    } else if (APM_S(pose, 0x3c) == -1 || APM_S(pose, 0x3c) > frame) {
-        if (nA != 0) memcpy_as4(APM_P(pose, 0x48), APM_P(file, 0x154), nA * 0xc);
-        if (nB != 0) memcpy_as4(0, 0, nB * 0xc); /* TODO */
-        if (nC != 0) memcpy(0, 0, nC); /* TODO */
-        if (nD != 0) memcpy_as4(0, 0, nD); /* TODO */
-        if (nE != 0) memcpy_as4(0, 0, nE); /* TODO */
-        for (kf = APM_P(anim, 0x28); kf < APM_P(anim, 0x28) + (frame + 1) * 0x2c; kf += 0x2c) {
-            /* TODO: block at 0x4ac-0xbd4 (5 delta-apply groups, each with unrolled+tail loop) */
+    if (APM_S(pose, 0x3c) != frame) {
+        if (APM_S(pose, 0x3c) == -1 || APM_S(pose, 0x3c) > frame) {
+            kfEnd = (u8*)((struct APMD*)anim)->f + (frame * 0x2c + 0x2c);
+            kf = (u8*)((struct APMD*)anim)->f;
+            if (nA != 0) memcpy_as4(APM_P(pose, 0x48), APM_P(file, 0x154), nA * 0xc);
+            if (nB != 0) memcpy_as4(APM_P(pose, 0x50), APM_P(file, 0x15c), nB * 0xc);
+            if (nC != 0) memcpy(APM_P(pose, 0x58), APM_P(file, 0x1a0), nC);
+            if (nD != 0) memcpy_as4(APM_P(pose, 0x60), APM_P(file, 0x1a4), nD * 4);
+            if (nE != 0) memcpy_as4(APM_P(pose, 0x68), APM_P(file, 0x190), nE * 0x18);
+            if (APM_S(pose, 0x3c) == -1) APM_S(pose, 0x3c) = 0;
+            s = 0.0625f;
+            for (; kf < kfEnd; kf += 0x2c) {
+                v = APM_P(pose, 0x48);
+                d = APM_P(anim, 0x2c) + APM_S(kf, 4) * 4;
+                e = d + APM_S(kf, 8) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 0xc;
+                    APM_S8(x, d, 1);
+                    APM_S8(y, d, 2);
+                    APM_S8(z, d, 3);
+                    ((f32*)v)[0] += s * x;
+                    ((f32*)v)[1] += s * y;
+                    ((f32*)v)[2] += s * z;
+                }
+                v = APM_P(pose, 0x50);
+                d = APM_P(anim, 0x30) + APM_S(kf, 0xc) * 4;
+                e = d + APM_S(kf, 0x10) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 0xc;
+                    APM_S8(x, d, 1);
+                    APM_S8(y, d, 2);
+                    APM_S8(z, d, 3);
+                    ((f32*)v)[0] += s * x;
+                    ((f32*)v)[1] += s * y;
+                    ((f32*)v)[2] += s * z;
+                }
+                v = APM_P(pose, 0x58);
+                d = APM_P(anim, 0x38) + APM_S(kf, 0x1c) * 2;
+                e = d + APM_S(kf, 0x20) * 2;
+                for (; d < e; d += 2) {
+                    v += d[0];
+                    v[0] += d[1];
+                }
+                v = APM_P(pose, 0x60);
+                d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
+                e = d + APM_S(kf, 0x28) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 4;
+                    APM_S8(x, d, 1);
+                    ((f32*)v)[0] += s * x;
+                }
+                v = APM_P(pose, 0x68);
+                d = APM_P(anim, 0x34) + APM_S(kf, 0x14) * 0xc;
+                e = d + APM_S(kf, 0x18) * 0xc;
+                for (; d < e; d += 0xc) {
+                    v += d[0] * 0x18;
+                    v[0] += d[1];
+                    APM_F(v, 4) += APM_F(d, 4);
+                    APM_F(v, 8) += APM_F(d, 8);
+                }
+            }
+        } else if (APM_S(pose, 0x3c) < frame) {
+            kf = APM_P(anim, 0x28) + (APM_S(pose, 0x3c) + 1) * 0x2c;
+            kfEnd = APM_P(anim, 0x28) + (frame + 1) * 0x2c;
+            s = 0.0625f;
+            for (; kf < kfEnd; kf += 0x2c) {
+                v = APM_P(pose, 0x48);
+                d = APM_P(anim, 0x2c) + APM_S(kf, 4) * 4;
+                e = d + APM_S(kf, 8) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 0xc;
+                    APM_S8(x, d, 1);
+                    APM_S8(y, d, 2);
+                    APM_S8(z, d, 3);
+                    ((f32*)v)[0] += s * x;
+                    ((f32*)v)[1] += s * y;
+                    ((f32*)v)[2] += s * z;
+                }
+                v = APM_P(pose, 0x50);
+                d = APM_P(anim, 0x30) + APM_S(kf, 0xc) * 4;
+                e = d + APM_S(kf, 0x10) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 0xc;
+                    APM_S8(x, d, 1);
+                    APM_S8(y, d, 2);
+                    APM_S8(z, d, 3);
+                    ((f32*)v)[0] += s * x;
+                    ((f32*)v)[1] += s * y;
+                    ((f32*)v)[2] += s * z;
+                }
+                v = APM_P(pose, 0x58);
+                d = APM_P(anim, 0x38) + APM_S(kf, 0x1c) * 2;
+                e = d + APM_S(kf, 0x20) * 2;
+                for (; d < e; d += 2) {
+                    v += d[0];
+                    v[0] += d[1];
+                }
+                v = APM_P(pose, 0x60);
+                d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
+                e = d + APM_S(kf, 0x28) * 4;
+                for (; d < e; d += 4) {
+                    v += d[0] * 4;
+                    APM_S8(x, d, 1);
+                    ((f32*)v)[0] += s * x;
+                }
+                v = APM_P(pose, 0x68);
+                d = APM_P(anim, 0x34) + APM_S(kf, 0x14) * 0xc;
+                e = d + APM_S(kf, 0x18) * 0xc;
+                for (; d < e; d += 0xc) {
+                    v += d[0] * 0x18;
+                    v[0] += d[1];
+                    APM_F(v, 4) += APM_F(d, 4);
+                    APM_F(v, 8) += APM_F(d, 8);
+                }
+            }
         }
     } else {
-        for (kf = APM_P(anim, 0x28) + (APM_S(pose, 0x3c) + 1) * 0x2c; kf < APM_P(anim, 0x28) + (frame + 1) * 0x2c; kf += 0x2c) {
-            /* TODO: block at 0xc0c-0x1334 (5 delta-apply groups) */
-        }
+        if (APM_F(pose, 0x40) > t) APM_F(pose, 0x40) = 0.0f;
     }
     if (frame == nextFrame) {
-        /* TODO: block at 0x1360-0x13a8 (3 memcpy_as4 copies) */
-        if (nA != 0) memcpy_as4(0, 0, nA * 0xc);
-        if (nB != 0) memcpy_as4(0, 0, nB * 0xc);
-        if (nC != 0) memcpy_as4(0, 0, nC);
-    } else if (!(t > 0.0f)) {
-        /* TODO: block at 0x13ac-0x180c (interpolation: memcpy_as4 + loops) */
-        if (nA != 0) memcpy_as4(0, 0, nA);
-        if (nB != 0) memcpy_as4(0, 0, nB);
-        if (nC != 0) memcpy_as4(0, 0, nC);
+        if (nA != 0) memcpy_as4(grpA, APM_P(pose, 0x48), nA * 0xc);
+        if (nB != 0) memcpy_as4(grpB, APM_P(pose, 0x50), nB * 0xc);
+        if (nD != 0) memcpy_as4(APM_P(pose, 0x64), APM_P(pose, 0x60), nD * 4);
+    } else if (frame < nextFrame) {
+        kf = APM_P(anim, 0x28) + nextFrame * 0x2c;
+        s = 0.0625f * t;
+        v = grpA;
+        d = APM_P(anim, 0x2c) + APM_S(kf, 4) * 4;
+        e = d + APM_S(kf, 8) * 4;
+        if (nA != 0) memcpy_as4(grpA, APM_P(pose, 0x48), nA * 0xc);
+        for (; d < e; d += 4) {
+            v += d[0] * 0xc;
+            APM_S8(x, d, 1);
+            APM_S8(y, d, 2);
+            APM_S8(z, d, 3);
+            ((f32*)v)[0] += x * s;
+            ((f32*)v)[1] += y * s;
+            ((f32*)v)[2] += z * s;
+        }
+        v = grpB;
+        d = APM_P(anim, 0x30) + APM_S(kf, 0xc) * 4;
+        e = d + APM_S(kf, 0x10) * 4;
+        if (nB != 0) memcpy_as4(grpB, APM_P(pose, 0x50), nB * 0xc);
+        for (; d < e; d += 4) {
+            v += d[0] * 0xc;
+            APM_S8(x, d, 1);
+            APM_S8(y, d, 2);
+            APM_S8(z, d, 3);
+            ((f32*)v)[0] += x * s;
+            ((f32*)v)[1] += y * s;
+            ((f32*)v)[2] += z * s;
+        }
+        dt = *(f32*)(APM_P(anim, 0x28) + nextFrame * 0x2c) - *(f32*)(APM_P(anim, 0x28) + frame * 0x2c);
+        d = APM_P(anim, 0x3c) + APM_S(kf, 0x24) * 4;
+        e = d + APM_S(kf, 0x28) * 4;
+        v = APM_P(pose, 0x64);
+        if (nD != 0) memcpy_as4(v, APM_P(pose, 0x60), nD * 4);
+        t2 = t * t;
+        for (; d < e; d += 4) {
+            b = (s8)d[3];
+            v += d[0] * 4;
+            if (b < 0x59 && b > -0x59) {
+                APM_S8(x, d, 1);
+                t3 = t * t2;
+                ((f32*)v)[0] = ((f32*)v)[0] + ((t + (t3 - 2.0f * t2)) * (dt * tanfTbl[(s8)d[2] + 0x59]) +
+                                (-2.0f * t3 + 3.0f * t2) * (0.0625f * x) +
+                                (t3 - t2) * (dt * tanfTbl[b + 0x59]));
+            }
+        }
     }
     APM_S(pose, 0x3c) = frame;
     APM_F(pose, 0x40) = t;
     if (APM_U(pose, 0) & 8) {
         CameraEntry* cam = camGetPtr(CAMERA_3D);
         f = 57.29578f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z));
-        /* TODO: block at 0x1864-0x191c (angle clamp & billboard flag) */
+        while (f < -360.0f) f += 360.0f;
+        while (f >= 360.0f) f -= 360.0f;
+        if (f < 0.0f) f += 360.0f;
+        f -= APM_F(pose, 0x74);
+        while (f < -360.0f) f += 360.0f;
+        while (f >= 360.0f) f -= 360.0f;
+        if ((f > 90.0f && f <= 270.0f) || (f < -90.0f && f >= -270.0f)) {
+            APM_F(pose, 0x78) = -1.0f;
+        } else {
+            APM_F(pose, 0x78) = 1.0f;
+        }
     }
 }
 
@@ -2064,12 +2286,13 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
     PaperAnimData* d;
     Mtx m, save;
     GXColor col1, col2;
+    s32 lightFlag;
     u32 flags;
-    s32 matFlag, lightFlag;
+    s32 matFlag;
     u16 left, top, right, bottom;
     u16 w, h;
     f32 scale, hh;
-    s32 x1, y0, y1, a, b, e, t;
+    s32 t, e, b, a, x1, y0, y1;
 
     scale = 8.0f;
     if (!(pose->flags & 1)) {
@@ -2138,15 +2361,15 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
     if (pose->flags & 2) {
         if (pose->flags & 4) {
             a = DEMOGetRenderModeObj()->fbWidth / 2 - left;
-            b = a;
             t = right - DEMOGetRenderModeObj()->fbWidth / 2;
+            b = a;
             if (a < t) {
                 b = t;
             }
             a = 0.5f * b;
             e = 0.14881f * (bottom - top);
             PP_S(pose, 0x114) = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
-            PP_S(pose, 0x116) = b + (DEMOGetRenderModeObj()->fbWidth / 2 + a);
+            PP_S(pose, 0x116) = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
             PP_S(pose, 0x118) = top - e;
             PP_S(pose, 0x11A) = bottom + e;
             PP_F(pose, 0xF8) = (8.0f / scale) * ((f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114)) / 150.0f);
@@ -2156,21 +2379,25 @@ void animPaperPoseDispSub(s32 unused, AnimationPose* pose) {
         }
     } else {
         a = DEMOGetRenderModeObj()->fbWidth / 2 - left;
-        b = a;
         t = right - DEMOGetRenderModeObj()->fbWidth / 2;
+        b = a;
         if (a < t) {
             b = t;
         }
         a = 0.5f * b;
         e = 0.14881f * (bottom - top);
         PP_S(pose, 0x114) = DEMOGetRenderModeObj()->fbWidth / 2 - b - a;
-        PP_S(pose, 0x116) = b + (DEMOGetRenderModeObj()->fbWidth / 2 + a);
+        PP_S(pose, 0x116) = DEMOGetRenderModeObj()->fbWidth / 2 + b + a;
         PP_S(pose, 0x118) = top - e;
         PP_S(pose, 0x11A) = bottom + e;
         PP_F(pose, 0xF8) = (8.0f / scale) * ((f32)(PP_S(pose, 0x116) - PP_S(pose, 0x114)) / 150.0f);
         PP_F(pose, 0xFC) = (8.0f / scale) * ((f32)(PP_S(pose, 0x11A) - PP_S(pose, 0x118)) / 215.0f);
         PP_F(pose, 0x100) = d->x48 + (hh - bottom) / scale;
     }
+    left -= 2;
+    top -= 2;
+    right += 2;
+    bottom += 2;
     left -= left & 1;
     top -= top & 1;
     right += right & 1;

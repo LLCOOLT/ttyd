@@ -1083,8 +1083,8 @@ void salBuildCommandList(s16* dest, u32 nsDelay) {
           } else if (dsp_vptr->smp_info.compType == 6) {
             if ((dsp_vptr->vSampleInfo.inLoopBuffer == 0) && (pb->streamLoopCnt != 0)) { 
               tmp_addr = ((u32)dsp_vptr->vSampleInfo.loopBufferAddr >> 1) + dsp_vptr->vSampleInfo.loopBufferLength;
-              dsp_vptr->smp_info.addr = dsp_vptr->vSampleInfo.loopBufferAddr; tmp_addr = tmp_addr;
-              tmp_addr--;
+              dsp_vptr->smp_info.addr = dsp_vptr->vSampleInfo.loopBufferAddr; tmp_addr -= 1;
+
               pb->addr.endAddressHi = tmp_addr >> 16;
               pb->addr.endAddressLo = tmp_addr;
               dsp_vptr->vSampleInfo.inLoopBuffer = 1;

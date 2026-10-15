@@ -1466,12 +1466,13 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 }
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
-    MapObject* q;
-    MapObject* p;
-    s32 tevStage;
-    s32 texMap;
-    s32 texCoord;
+    int tevStage;
+    int texMap;
+    int texCoord;
     int field_0x18;
+    MapObject* p;
+    u32 fl;
+    MapObject* q;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1485,8 +1486,10 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     texCoord = info->texMap;
     field_0x18 = info->field_0x18;
     p = *(MapObject**)info->field_0x0;
-    if (p->flags & 0x20) {
-        while ((p = p->parent) != NULL) {
+    fl = p->flags;
+    if (fl & 0x20) {
+        while ((q = p->parent) != NULL) {
+            p = q;
             if (p->flags & 0x10) {
                 if (!(p->flags & 0x20000000)) {
                     p->flags |= 0x20000000;
@@ -1553,10 +1556,13 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
-    info->tevStage = tevStage = tevStage + 1;
-    info->texMap = texCoord = texCoord + 1;
+    tevStage += 1;
+    texCoord += 1;
+    texMap += 1;
+    info->tevStage = tevStage;
+    info->texMap = texCoord;
     info->field_0x18 = field_0x18;
-    info->texCoord = texMap = texMap + 1;
+    info->texCoord = texMap;
     }
 
 BOOL img_wait(void) {

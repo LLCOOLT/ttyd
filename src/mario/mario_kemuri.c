@@ -42,8 +42,9 @@ void mario_kemuri_80130474(void) {
 
     if ((u32)marioStGetSystemLevel() == 0 && !(mario->flags & 0x01000000)) {
         if (mario->currMotionId == 0x1D) {
+            return;
         }
-        else if (mario->currMotionId != 3) {
+        if (mario->currMotionId != 3) {
             if (mario->hitobjStandOn != NULL) {
                 attr = hitGetAttr(mario->hitobjStandOn);
             }

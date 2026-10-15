@@ -170,9 +170,7 @@ void badgeShop_bottakuruGeneration(void) {
 		table[k][0] = 0;
 	}
 
-	k = 0;
-	i = 0;
-	p = (s32*)table;
+	k = 0;\n\tp = (s32*)table;\n\ti = 0;
 	for (; i < BADGE_MAX - 1; i++) {
 		count = badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
 		for (j = 0; j < count; j++) {
