@@ -502,6 +502,33 @@ static void CalcEmitter(struct SND_EMITTER* em, f32* vol, f32* doppler, f32* xPa
   }
 }
 
+typedef struct START_LIST {
+  // total size: 0x20
+  struct START_LIST* next; // offset 0x0, size 0x4
+  f32 vol;                 // offset 0x4, size 0x4
+  f32 xPan;                // offset 0x8, size 0x4
+  f32 yPan;                // offset 0xC, size 0x4
+  f32 zPan;                // offset 0x10, size 0x4
+  f32 pitch;               // offset 0x14, size 0x4
+  f32 occl;
+  SND_EMITTER* em;         // offset 0x18, size 0x4
+} START_LIST;
+
+typedef struct RUN_LIST {
+  // total size: 0xC
+  struct RUN_LIST* next; // offset 0x0, size 0x4
+  f32 vol;               // offset 0x4, size 0x4
+  SND_EMITTER* em;       // offset 0x8, size 0x4
+} RUN_LIST;
+
+typedef struct START_GROUP {
+  // total size: 0x10
+  unsigned long id;          // offset 0x0, size 0x4
+  struct START_LIST* list;   // offset 0x4, size 0x4
+  struct RUN_LIST* running;  // offset 0x8, size 0x4
+  unsigned short numRunning; // offset 0xC, size 0x2
+} START_GROUP;
+
 static inline u8 clip127(u8 v) {
   if (v > 0x7f) {
     return 0x7f;
@@ -571,6 +598,18 @@ static inline void EmitterShutdown(SND_EMITTER* em) {
   if (em->vid != -1) {
     synthSendKeyOff(em->vid);
   }
+}
+
+
+static START_GROUP startGroup[64];
+static RUN_LIST runList[128];
+
+void snd3dStrippedPool(float* f) {
+  f[0] = 16383.0f;
+  f[1] = 127.0f;
+  f[2] = 64.0f;
+  f[3] = 8192.0f;
+  startGroup[0].running = runList;
 }
 
 bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 maxVol,
@@ -915,32 +954,6 @@ static inline bool sndRemoveListener(SND_LISTENER* li) {
 }
 #endif
 
-typedef struct START_LIST {
-  // total size: 0x20
-  struct START_LIST* next; // offset 0x0, size 0x4
-  f32 vol;                 // offset 0x4, size 0x4
-  f32 xPan;                // offset 0x8, size 0x4
-  f32 yPan;                // offset 0xC, size 0x4
-  f32 zPan;                // offset 0x10, size 0x4
-  f32 pitch;               // offset 0x14, size 0x4
-  f32 occl;
-  SND_EMITTER* em;         // offset 0x18, size 0x4
-} START_LIST;
-
-typedef struct RUN_LIST {
-  // total size: 0xC
-  struct RUN_LIST* next; // offset 0x0, size 0x4
-  f32 vol;               // offset 0x4, size 0x4
-  SND_EMITTER* em;       // offset 0x8, size 0x4
-} RUN_LIST;
-
-typedef struct START_GROUP {
-  // total size: 0x10
-  unsigned long id;          // offset 0x0, size 0x4
-  struct START_LIST* list;   // offset 0x4, size 0x4
-  struct RUN_LIST* running;  // offset 0x8, size 0x4
-  unsigned short numRunning; // offset 0xC, size 0x2
-} START_GROUP;
 
 static START_GROUP startGroup[64];  // size: 0x400
 static u8 startGroupNum;            // size: 0x1

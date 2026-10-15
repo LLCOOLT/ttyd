@@ -1103,8 +1103,6 @@ __declspec(section ".data") s32 lbl_803080CC[] = {
 
 #pragma explicit_zero_data on
 USER_FUNC(evt_sub_intpl_init) {
-	static u32 gap_07_804101EC_sdata = 0;
-	static const u32 gap_09_80419DAC_sdata2 = 0;
 	s32* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
 	s32 start = evtGetValue(event, args[1]);
@@ -1115,8 +1113,6 @@ USER_FUNC(evt_sub_intpl_init) {
 	event->lwData[13] = end;
 	event->lwData[14] = 0;
 	event->lwData[15] = steps;
-	(void)&gap_07_804101EC_sdata;
-	(void)&gap_09_80419DAC_sdata2;
 	return EVT_RETURN_DONE;
 }
 #pragma explicit_zero_data reset
@@ -1502,12 +1498,13 @@ USER_FUNC(evt_sub_get_language) {
 USER_FUNC(evt_sub_animgroup_async) {
 	s32 group = evtGetValue(event, event->args[0]);
 	s32 r = animGroupBaseAsync((const char*)group, gp->inBattle != 0, NULL);
-	switch (r) {
-	default:
-	return EVT_RETURN_BLOCK;
-	case 0:
-	return EVT_RETURN_DONE;
+	if (r == 0) {
+		return EVT_RETURN_BLOCK;
 	}
+	if (r != 0) {
+		return EVT_RETURN_DONE;
+	}
+	return EVT_RETURN_DONE;
 }
 
 
@@ -1809,3 +1806,4 @@ USER_FUNC(mail_evt_gor_04_keyoff_check) {
 
 #pragma force_active on
 #pragma force_active reset
+

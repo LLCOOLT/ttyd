@@ -34,15 +34,14 @@ void BattleAcHelpMain(void) {
 }
 void _ac_help_disp(CameraId cameraId, void *param)
 {
-  static const GXColor color = {0xFF, 0xFF, 0xFF, 0xFF};
-  const char *new_var3[2];
   float new_var;
+  u16 lines;
+  const char *new_var3[2];
   BattleWork *wp = _battleWorkPointer;
   s32 width;
   u8 alpha;
   f32 x;
   f32 y;
-  u16 lines;
   const char **help = &wp->acHelpMsg;
   alpha = 0xFF;
   if (wp->acHelpDispType == 1)
@@ -57,24 +56,12 @@ void _ac_help_disp(CameraId cameraId, void *param)
   new_var3[1] = new_var3[0];
   width = FontGetMessageWidthLine(new_var3[1], &lines);
   lines++;
-  {
-  {
-  GXColor col2 = color;
-  GXColor col = col2;
-  col2.a = alpha;
-  col = col2;
-
   y = 0.0f;
-  x = y - (width / 2);
+  windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, alpha}, (x = y - (width / 2)) - 20.0f, (-145.0f) + ((lines - 1) * 29), width + 40, (lines * 29) + 1, 10.0f);
   y = -148.0f;
-  new_var = (-145.0f) + ((lines - 1) * 29);
-  windowDispGX_Waku_col(0, col, x - 20.0f, new_var, width + 40, (lines * 29) + 1, 10.0f);
-  }
   FontDrawStart_alpha(alpha);
   FontDrawMessage(x, ((s32) y) + ((lines - 1) * 29), new_var3[1]);
 }
-}
-
 
 
 

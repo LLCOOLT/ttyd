@@ -28,10 +28,10 @@ USER_FUNC(btlevtcmd_WaitEventEnd) {
 //s32 retIndex, s32 battleFlags
 USER_FUNC(btlevtcmd_check_battleflag) {
     s32* args = event->args;
+    s32 index = *args++;
     BattleWork* wp = _battleWorkPointer;
-    s32 index = args[0];
-    u32 flags = args[1];
-    if (flags & wp->flags) {
+    u32 flags = *args++;
+    if (wp->flags & flags) {
         evtSetValue(event, index, TRUE);
     }
     else {
@@ -2221,11 +2221,17 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     f32 localX, localY, localZ;
     f32 thisOffsetX, thisOffsetY, thisOffsetZ;
     f32 calculate;
-    BattleUnit *thisUnit, *targetUnit;
-    s32 thisId, thisPartId;
-    s32 targetId, targetPartId;
+    BattleUnit* thisUnit;
+    BattleUnit* targetUnit;
+    s32 index;
+    s32 thisId;
+    s32 thisPartId;
+    s32 targetId;
+    s32 targetPartId;
     u32 flags;
-    s32 btlId, index, value, tid;
+    s32 btlId;
+    s32 value;
+    s32 tid;
     BattleUnitPart* thisPart = NULL;
     BattleUnitPart* targetPart = NULL;
 
@@ -2239,7 +2245,7 @@ USER_FUNC(btlevtcmd_CalculateFaceDirection) {
     index = args[5];
 
     if (!(flags & 9)) {
-        tid = BattleTransID(event, targetId);
+        tid = BattleTransID(event, tid);
     }
 
     thisUnit = BattleGetUnitPtr(_battleWorkPointer, thisId);
@@ -3659,13 +3665,10 @@ USER_FUNC(btlevtcmd_GetFirstAttackTarget) {
 }
 
 USER_FUNC(btlevtcmd_GetConsumeItem) {
-    s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    BattleCommandWeapon* w = (BattleCommandWeapon*)&wp->commandMenu;
-    s32 item;
-    w = &w[wp->commandMenu.cursor[11].field_0];
-    item = ((BattleCommand*)w)->weapon[0].itemId;
-    evtSetValue(event, event->args[0], item);
+    s32* args = event->args;
+    BecCmd* cmd = (BecCmd*)&wp->commandMenu;
+    evtSetValue(event, *args++, cmd->items[BEC_FIELD(cmd, 0x1C38 - 0x171C, s32)].id);
     return EVT_RETURN_DONE;
 }
 
@@ -4426,10 +4429,10 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
                 MJ_F(unit, 0x1B4) = 360.0f / BEC_MVFRAME(unit);
                 t = BEC_MVDIST(unit) - 20.0;
                 t = t / 6.0;
-                t = 47.0 + t;
+                t += 47.0;
                 MJ_F(unit, 0x180) = t;
                 if (type == 2) {
-                    t = MJ_F(unit, 0x180) * 1.12;
+                    MJ_F(unit, 0x180) *= 1.12; t = MJ_F(unit, 0x180);
                     MJ_F(unit, 0x180) = t;
                 }
                 MJ_F(unit, 0x1B8) = 0.0f;
@@ -4442,10 +4445,10 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
                 MJ_F(unit, 0x1B4) = (f32)(360 / BEC_MVFRAME(unit));
                 t = BEC_MVDIST(unit) - 20.0;
                 t = t / 6.0;
-                t = 47.0 + t;
+                t += 47.0;
                 MJ_F(unit, 0x180) = t;
                 if (type == 4) {
-                    t = MJ_F(unit, 0x180) * 1.25;
+                    MJ_F(unit, 0x180) *= 1.25; t = MJ_F(unit, 0x180);
                     MJ_F(unit, 0x180) = t;
                 }
                 MJ_F(unit, 0x1B8) = 0.0f;
@@ -4529,13 +4532,17 @@ USER_FUNC(btlevtcmd_MarioJumpPosition) {
 USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     s32* args = event->args;
     BattleWork* wp = _battleWorkPointer;
-    s32 id, id2, pno, ox, oy, oz;
     BattleUnit* unit;
     BattleUnit* target;
+    s32 id;
+    s32 id2;
+    s32 ox;
+    s32 belong;
+    s32 oy;
+    s32 pno;
+    s32 back;
+    s32 oz;
     BattleUnitPart* part;
-    BattleUnit* u2;
-    BattleUnitPart* p2;
-    s32 belong, back;
     u8* al;
     BattleWorkWeaponTargets targets;
     f32 hx, hy, hz, y, x, tx;
@@ -4550,7 +4557,8 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
     id = BattleTransID(event, id);
     unit = BattleGetUnitPtr(wp, id);
     BtlUnit_GetPos(unit, &x, &y, &y);
-    target = BattleGetUnitPtr(wp, BattleTransID(event, id2));
+    id2 = BattleTransID(event, id2);
+    target = BattleGetUnitPtr(wp, id2);
     part = BtlUnit_GetPartsPtr(target, pno);
     BtlUnit_GetHomePos(unit, &hx, &hy, &hz);
     BtlUnit_GetHitPos(target, part, &hx, &y, &hz);
@@ -4560,6 +4568,8 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
         &targets, NULL, id, belong, 0x1001240, 0x1000000, -*(s8*)(al + 0xA));
     BattleChoiceSamplingEnemy(&targets, 4, &cid, &cpno);
     if (targets.numTargets > 0) {
+        BattleUnit* u2;
+        BattleUnitPart* p2;
         cid = BattleTransID(event, cid);
         u2 = BattleGetUnitPtr(wp, cid);
         p2 = BtlUnit_GetPartsPtr(u2, cpno);
@@ -4568,7 +4578,7 @@ USER_FUNC(btlevtcmd_GetTakeoffPosition) {
             hx = tx;
         }
         if (part == p2) {
-            if (back) hx += *(s8*)(al + 0xA) * -60;
+            if (back) hx += *(s8*)((u8*)wp + belong * 8 + 0xA) * -60;
             else hx += *(s8*)(al + 0xA) * 60;
         }
         else {
@@ -5198,7 +5208,8 @@ USER_FUNC(btlevtcmd_ACSuccessEffect) {
         case 6: name = "SFX_SYSTEM_EXCELLENT1"; w = 180.0f; eff = 4; break;
         default: return EVT_RETURN_DONE;
     }
-    h = w * scale / 2.0f;
+    w *= scale;
+    h = w / 2.0f;
     if (pos.x + h > 160.0f) {
         pos.x = 160.0f - h;
     }

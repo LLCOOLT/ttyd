@@ -42,17 +42,11 @@ effN64Vtx foot_vtx[] = {
 void effKemuri7Main(EffectEntry* effect);
 void effKemuri7Disp(CameraId cameraId, EffectEntry* effect);
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
 EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     EffectEntry* effect;
     EffKemuri7N64Work* work;
-    f32 full;
-    f32 twoPi;
-    f32 ofs;
-    f32 dist;
+    s32 i;
     f32 ang;
-    f32 sideAngle;
     f32 rad;
 
     effect = effEntry();
@@ -61,40 +55,34 @@ EffectEntry* effKemuri7N64Entry(f32 x, f32 y, f32 z, f32 angle, f32 side) {
     work = __memAlloc(HEAP_EFFECT, sizeof(EffKemuri7N64Work));
     effect->userdata = work;
     effect->callback = effKemuri7Main;
-    work->active = TRUE;
-    work->field_0x6C = 0.0f;
-    work->position.x = x;
-    work->position.y = y;
-    work->position.z = z;
-    work->scale.x = 1.0f;
-    work->scale.y = 1.0f;
-    work->scale.z = 1.0f;
-    work->alpha = 255;
-    work->side = side;
-    work->field_0x70 = 0.0f;
-    work->field_0x74 = 0.0f;
-    work->timer = 255;
-    work->rotation.x = 0.0f;
-    work->rotation.y = 30.0f * side + angle - 15.0f;
-    work->rotation.z = 0.0f;
-    sideAngle = 180.0f * side;
-    twoPi = 6.2831855f;
-    full = 360.0f;
-    ofs = 45.0f;
-    dist = 5.0f;
-    ang = reviseAngle(angle);
-    rad = twoPi * ang / full;
-    work->sinAngle = sin(rad);
-    work->cosAngle = cos(rad);
-    rad = twoPi * (ang + ofs - sideAngle) / full;
-    work->position.x += dist * (f32)sin(rad);
-    work->position.z += dist * (f32)cos(rad);
-    work->alpha = 255;
+    for (i = 0; i < 1; i++, work++) {
+        work->active = TRUE;
+        work->field_0x6C = 0.0f;
+        work->position.x = x;
+        work->position.y = y;
+        work->position.z = z;
+        work->scale.x = 1.0f;
+        work->scale.y = 1.0f;
+        work->scale.z = 1.0f;
+        work->alpha = 255;
+        work->side = side;
+        work->field_0x70 = 0.0f;
+        work->field_0x74 = 0.0f;
+        work->timer = 255;
+        work->rotation.x = 0.0f;
+        work->rotation.y = angle + 30.0f * side - 15.0f;
+        work->rotation.z = 0.0f;
+        ang = reviseAngle(angle);
+        work->sinAngle = sin(6.2831855f * ang / 360.0f);
+        work->cosAngle = cos(6.2831855f * ang / 360.0f);
+        rad = ang + 45.0f - side * 180.0f;
+        work->position.x += 5.0f * (f32)sin(rad = 6.2831855f * rad / 360.0f);
+        work->position.z += 5.0f * (f32)cos(rad);
+        work->alpha = 255;
+    }
     return effect;
 }
 
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
 void effKemuri7Main(EffectEntry* effect) {
     EffKemuri7N64Work* work = effect->userdata;
     s32 i;

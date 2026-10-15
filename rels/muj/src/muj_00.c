@@ -36,7 +36,7 @@ static inline f32 cosf_l(f32 x) { return cos(x); }
 static inline void orbit_update(OrbitData* o, Vec* pos, f32 d, f32 cx, f32 cz) {
     f32 rad; f32 r; f32 x; f32 z;
     o->angle += d; rad = o->angle; rad = 3.141592f * rad / 180.0f; r = o->dist;
-    x = r * (f32)sin(rad) + cx; z = r * (f32)cos(rad) + cz; pos->x = x; pos->z = z;
+    x = r * sinf_l(rad) + cx; z = r * cosf_l(rad) + cz; pos->x = x; pos->z = z;
 }
 
 

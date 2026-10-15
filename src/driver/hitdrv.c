@@ -232,9 +232,11 @@ inline void hitPreCheck(void) {
     HitEntry* hit;
     HitEntry* prev;
 
+    i = 0;
+    prev = NULL;
     unk_80418408 = NULL;
     entry = wp->entries;
-    for (i = 0, prev = NULL; i < wp->entries->count; entry++, i++) {
+    for (; i < wp->entries->count; entry++, i++) {
         hit = entry->hitEntries;
         for (j = 0; j < entry->hitNumJoints; j++, hit++) {
             if (hit->joint->partCount != 0 && !(hit->flags & 0x81)) {
@@ -532,7 +534,6 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             for (j = 0; j < mesh->displayListCount; j++) {
                 s32* list = (s32*)mesh->displayLists.normalLists[j];
                 for (k = 0; k < *list - 2; k++) {
-                    BOOL even;
                     HitVector* vec;
                     s16 i1, i2;
                     s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
@@ -541,9 +542,8 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     vec = &hit->vectors[count++];
                     pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
                     MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);
-                    even = !(k & 1);
-                    MTXMultVec(hit->worldMtx, &pos[even ? i2 : i1], &vec->v1);
-                    MTXMultVec(hit->worldMtx, &pos[even ? i1 : i2], &vec->v2);
+                    MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i2 : i1], &vec->v1);
+                    MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i1 : i2], &vec->v2);
                     PSVECSubtract(&vec->v2, &vec->v0, &vec->edge0);
                     PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
                     PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
@@ -552,29 +552,29 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             }
         } else {
             u32 m;
-            s32 stride;
             u32 bit;
+            s32 stride;
             wp = mapGetWork();
             stride = 0;
             for (bit = 0; bit < 12; bit++) {
-                stride += (mesh->elementMask >> bit) & 1;
+                stride += ((u32)mesh->elementMask >> bit) & 1;
             }
             stride *= 2;
-            for (j = 0; j < mesh->displayListCount; j++) {
+            for (k = 0; k < mesh->displayListCount; k++) {
                 s32 n;
-                u8* list = (u8*)mesh->displayLists.packedLists[j].offset;
+                u8* list = (u8*)mesh->displayLists.packedLists[k].offset;
                 n = *(u16*)(list + 1) - 2;
-                for (k = 0; k < n; k++) {
+                for (j = 0; j < n; j++) {
                     u16 i0, i1, i2;
                     s32 o0, o1, o2;
                     BOOL even;
                     s16* base;
                     register u32 gqr;
                     HitVector* v2;
-                    i0 = *(u16*)&list[k * stride + 3];
-                    even = !(k & 1);
-                    i1 = *(u16*)&list[stride * (k + 1) + 3];
-                    i2 = *(u16*)&list[stride * (k + 2) + 3];
+                    i0 = *(u16*)&list[j * stride + 3];
+                    even = !(j & 1);
+                    i1 = *(u16*)&list[stride * (j + 1) + 3];
+                    i2 = *(u16*)&list[stride * (j + 2) + 3];
                     v2 = &hit->vectors[count];
                     base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     o0 = i0 * 3;
@@ -1350,3 +1350,8 @@ s32 hitGetEntNum(HitEntry* hit) {
     return numVectors;
 }
 */
+
+void hitStrippedPool(f32* f) {
+    f[0] = 0.0f;
+    f[1] = 0.1f;
+}

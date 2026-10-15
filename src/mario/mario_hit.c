@@ -1036,10 +1036,10 @@ static inline HitEntry* landonHitCheck(LandonRay* ray, Vec* outPos, Vec* outNrm,
 
 HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
     LandonRay ray;
-    Vec hp;
     Vec nrm;
-    f32 nx, ny, nz;
+    Vec hp;
     f32 hy;
+    f32 nx, ny, nz;
     f32 zero, mone;
     f32 hh;
     f32 range;
@@ -1108,8 +1108,8 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
         ray = *(volatile LandonRay*)&zv0;
         zero = 0.0f;
         mone = -1.0f;
-        ystart = py + hh;
         top = hh + range;
+        ystart = py + hh;
         ray.pos.x = px + dx; ray.pos.y = ystart; ray.pos.z = pz + dz;
         ray.dir.x = zero; ray.dir.y = mone; ray.dir.z = zero;
         dist = top;
@@ -1400,10 +1400,10 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     } else {
         hh = toMovedir(MF(w, 0x1a8, f32));
     }
-    hh = (3.1415927f * hh) / 180.0f;
-    sx = sin(hh);
+    ang = (3.1415927f * hh) / 180.0f;
+    sx = sin(ang);
     sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * sx);
-    sz = cos(hh);
+    sz = cos(ang);
     sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -sz);
     a = *h;
     hh = 0.5f * a;
@@ -1878,8 +1878,8 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     best = NULL;
     range = half + dx;
     bestDist = range;
-    dir = (Vec){s, 0.0f, c};
     p = *pos;
+    dir = (Vec){s, 0.0f, c};
     for (i = 0; i < count; i++) {
         p.y = pos->y + heights[i];
         dist = range;
@@ -1902,9 +1902,10 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
         }
     }
     if (best) {
-        f32 vx = s * dx;
-        f32 vz = c * dx;
-        f32 dot = vx * bestNrm.x + vz * bestNrm.z;
+        f32 dot, vz, vx;
+        vz = c * dx;
+        vx = s * dx;
+        dot = vx * bestNrm.x + vz * bestNrm.z;
         mx = 0.5f * (vx - dot * bestNrm.x);
         mz = 0.5f * (vz - dot * bestNrm.z);
     }
@@ -1912,8 +1913,8 @@ HitEntry* searchFrontWall(Vec* pos, f32* h, f32 dx, f32 dz, f32 w) {
     sincosf(&s2, &c2, dz + 45.0f);
     {
     Vec dir2;
-    dir2 = (Vec){s2, 0.0f, c2};
     p = *pos;
+    dir2 = (Vec){s2, 0.0f, c2};
     dist = half;
     for (i = 0; i < count; i++) {
         p.y = pos->y + heights[i];

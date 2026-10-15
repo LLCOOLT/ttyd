@@ -696,43 +696,44 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 
 	MapFileInfo* info;
 
-	entry = (MapEntry*)((u8*)wp + group * sizeof(MapEntry));
+	entry = wp->entries;
+	entry += group;
 	error_flag = FALSE;
 	error_count = 0;
 	strncpy(entry->name, map, sizeof(entry->name));
 
 	sprintf(str1, "./m/%s/d", map);
 	arcOpen(str1, &entry->dat, &entry->datSize);
-	if (!entry->dat) {
+	if (!wp->entries[group].dat) {
 		sprintf(str2, "%s/%s", ".", str1);
 		dvd = DVDMgrOpen(str2, 2, 0);
-		entry->datSize = DVDMgrGetLength(dvd);
-		entry->dat = _mapAllocTail(OSRoundUp32B(entry->datSize));
-		DVDMgrRead(dvd, entry->dat, OSRoundUp32B(entry->datSize), 0);
+		wp->entries[group].datSize = DVDMgrGetLength(dvd);
+		wp->entries[group].dat = _mapAllocTail(OSRoundUp32B(wp->entries[group].datSize));
+		DVDMgrRead(dvd, wp->entries[group].dat, OSRoundUp32B(wp->entries[group].datSize), 0);
 		DVDMgrClose(dvd);
 	}
 
 	sprintf(str1, "./m/%s/t", map);
 	wp->entries[group].tpl = NULL;
 	arcOpen(str1, &entry->tpl, &entry->tplSize);
-	if (entry->tpl) {
-		UnpackTexPalette(entry->tpl);
+	if (wp->entries[group].tpl) {
+		UnpackTexPalette(wp->entries[group].tpl);
 	}
 	else {
 		sprintf(str3, "%s/%s", ".", str1);
 		dvd = DVDMgrOpen(str3, 2, 0);
 		if (dvd) {
-			entry->tplSize = DVDMgrGetLength(dvd);
-			entry->tpl = _mapAllocTail(OSRoundUp32B(entry->tplSize));
-			DVDMgrRead(dvd, entry->tpl, OSRoundUp32B(entry->tplSize), 0);
+			wp->entries[group].tplSize = DVDMgrGetLength(dvd);
+			wp->entries[group].tpl = _mapAllocTail(OSRoundUp32B(wp->entries[group].tplSize));
+			DVDMgrRead(dvd, wp->entries[group].tpl, OSRoundUp32B(wp->entries[group].tplSize), 0);
 			DVDMgrClose(dvd);
-			UnpackTexPalette(entry->tpl);
+			UnpackTexPalette(wp->entries[group].tpl);
 		}
 	}
 
 	GXInvalidateVtxCache();
 	datSize = wp->entries[group].datSize;
-	data = (u8*)entry->dat;
+	data = (u8*)wp->entries[group].dat;
 	header = &entry->header;
 	if (header != NULL) {
 		memset(header, 0, sizeof(MapHeader));
@@ -759,7 +760,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 			if (sizeCheck < wp->entries[group].header.file.fileSize) {
 				wp->entries[group].header.strings = (const char*)&data[sizeCheck];
 			}
-			*(void**)entry->header.field_0x40 = data;
+			*(void**)wp->entries[group].header.field_0x40 = data;
 
 			for (k = 0; k < (u32)entry->header.file.relCount; k++) {
 				r4 = (u32)entry->header.rel;
@@ -780,7 +781,7 @@ void _mapLoad(MapWork* wp, BOOL group, const char* map) {
 	}
 	info = NULL;
 infofound:
-#define FINDCHUNK(off, name, lbl) { void* found; for (k = 0; k < (u32)header->file.chunkCount; k++) { if (!strcmp(&header->strings[header->chunks[k].string], name)) { found = (u8*)header->data + header->chunks[k].offset; goto lbl; } } found = NULL; lbl: *(void**)&entry->field_0x8C[(off) - 0x8C] = found; }
+#define FINDCHUNK(off, name, lbl) { void* found; for (k = 0; k < (u32)header->file.chunkCount; k++) { if (!strcmp(&header->strings[header->chunks[k].string], name)) { found = (u8*)header->data + header->chunks[k].offset; goto lbl; } } found = NULL; lbl: *(void**)&wp->entries[group].field_0x8C[(off) - 0x8C] = found; }
 	FINDCHUNK(0x94, "texture_table", fc1);
 	FINDCHUNK(0x98, "light_table", fc2);
 	FINDCHUNK(0x9C, "fog_table", fc3);
@@ -834,17 +835,17 @@ infofound:
 		paper_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
 		paperCraft_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
 		if ((*(void**)&wp->entries[group].field_0x8C[0x10]) != NULL) {
-			(*(s32*)&wp->entries[group].field_0x22[2]) = ((s32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[0];
+			*(s32*)(wp->entries[group].field_0x22 + 2) = ((s32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[0];
 			wp->entries[group].fogType = ((s32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[1];
 			wp->entries[group].fogStart = ((f32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[2];
 			wp->entries[group].fogEnd = ((f32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[3];
 			*(s32*)&wp->entries[group].fogColor = ((s32*)(*(void**)&wp->entries[group].field_0x8C[0x10]))[4];
-			if ((*(s32*)&wp->entries[group].field_0x22[2]) != 0) {
+			if (*(s32*)(wp->entries[group].field_0x22 + 2) != 0) {
 				wp->entries[group].flags |= 1;
 			}
 		}
 		else {
-			(*(s32*)&wp->entries[group].field_0x22[2]) = 0;
+			*(s32*)(wp->entries[group].field_0x22 + 2) = 0;
 			wp->entries[group].fogType = 0;
 			wp->entries[group].fogStart = 0.0f;
 			wp->entries[group].fogEnd = 0.0f;
@@ -856,7 +857,7 @@ infofound:
 			camLoadRoad(4, str1);
 		}
 		camSetTypePersp(4);
-		mapBuildTexture(wp->entries[group].rootMapObj, wp->entries[group].tpl, MAPENT_FIELD(entry, void*, 0x94));
+		mapBuildTexture(wp->entries[group].rootMapObj, wp->entries[group].tpl, MAPENT_FIELD(&wp->entries[group], void*, 0x94));
 		{
 			Vec mn, mx;
 			mapGetBoundingBox(&mn, &mx);
@@ -2686,7 +2687,7 @@ void mapSetMaterial(MapObject* obj, void* material) {
 			MTXMultVecSR(camGetCurPtr()->view, &dir, &dir);
 			GXInitLightPos(&lightObj, pos.x, pos.y, pos.z);
 			GXInitLightDir(&lightObj, dir.x, dir.y, dir.z);
-			GXInitLightSpot(&lightObj, 0.5f * lights[i]->spotAngle, GX_SP_SHARP);
+			GXInitLightSpot(&lightObj, lights[i]->spotAngle * 0.5f, GX_SP_SHARP);
 			GXInitLightDistAttn(&lightObj, 1000.0f, 0.5f, GX_DA_OFF);
 			GXInitLightColor(&lightObj, lights[i]->color);
 			GXLoadLightObjImm(&lightObj, lightid_tbl[i]);
@@ -2722,9 +2723,9 @@ void mapSetMaterial(MapObject* obj, void* material) {
 		k = mapSearchTexName(MAPENT_FIELD(&wp->entries[obj->groupIndex], MapTexTable*, 0x94), sampler->tex->name);
 		desc = TEXGet(wp->entries[obj->groupIndex].tpl, k);
 		hdr = desc->textureHeader;
-		mip = GX_TRUE;
-		if (hdr->minLOD == hdr->maxLOD) {
-			mip = GX_FALSE;
+		mip = GX_FALSE;
+		if (hdr->minLOD != hdr->maxLOD) {
+			mip = GX_TRUE;
 		}
 		GXInitTexObj(&texObj, hdr->data, hdr->width, hdr->height, (GXTexFmt)hdr->format,
 					 (GXTexWrapMode)texwrap_tbl[sampler->wrapS], (GXTexWrapMode)texwrap_tbl[sampler->wrapT],
@@ -2973,7 +2974,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 		u32 mask = mesh->elementMask;
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)(*(MapVtxFmtInfo**)((obj->groupIndex * 0x178 + 0xA4) + (u8*)wp))->posFrac);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)(*(MapVtxFmtInfo**)((u8*)wp + (0xA4 + obj->groupIndex * 0x178)))->posFrac);
 		GXSetArray(GX_VA_POS, pos, 6);
 		GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);
@@ -3006,11 +3007,11 @@ void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
 	MapWork* wp;
 	u32 mask;
 	MapVcdTable* vcd;
-	void* nrm;
 	void* pos;
+	void* nrm;
 	int i;
 
-	wp = &mapWork[activeGroup];
+	wp = mapGetWork();
 
 	vcd = (MapVcdTable*)mesh->vcdTableOffset;
 	mask = mesh->elementMask;
@@ -3018,7 +3019,7 @@ void mapSetPolygonVtxDesc(MapObject* obj, MapFileMesh* mesh) {
 	nrm = (u8*)vcd->normals + 4;
 	GXClearVtxDesc();
 	GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)(*(MapVtxFmtInfo**)((u8*)wp + (obj->groupIndex * 0x178 + 0xA4)))->posFrac);
+	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)((MapVtxFmtInfo**)((u8*)wp + 0xA4))[obj->groupIndex * 0x5E]->posFrac);
 	GXSetArray(GX_VA_POS, pos, 6);
 	GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);
@@ -3214,7 +3215,30 @@ void _setOffScrnId(MapObject* obj, s32 id, BOOL doNext) {
 }
 
 void mapObjSetOffScreen(const char* name, const char* offscreen) {
-	MapObject* obj = mapGetMapObj(name);
+	MapObject* obj;
+	MapObject* object;
+	int i;
+	int j;
+	MapWork* wp;
+	MapEntry* entry;
+
+	wp = &mapWork[activeGroup];
+	if (!name) {
+		obj = NULL;
+		goto done;
+	}
+	entry = &wp->entries[0];
+	for (i = 0; i < wp->entries[0].count; entry++, i++) {
+		object = entry->objects;
+		for (j = 0; j < entry->numJoints; j++, object++) {
+			if (!strcmp(object->joints->name, name)) {
+				obj = object;
+				goto done;
+			}
+		}
+	}
+	obj = NULL;
+done:
 
 	obj->offscreenId = offscreenNameToId(offscreen);
 	obj->flags |= 0x80;
@@ -3320,14 +3344,13 @@ void mapObjGetPos(const char* name, Vec* pos) {
 	VECScale(&sum, pos, 1.0f / count);
 }
 
-void mapSetFog(s32 type, f32 start, f32 end, GXColor* color) {
+void mapSetFog(s32 type, f32 start, f32 end, GXColor color) {
 	MapWork* wp = &mapWork[activeGroup];
-	u32 c = *(u32*)color;
 
 	wp->entries[0].fogType = type;
 	wp->entries[0].fogStart = start;
 	wp->entries[0].fogEnd = end;
-	*(u32*)&wp->entries[0].fogColor = c;
+	wp->entries[0].fogColor = color;
 }
 
 void mapGetFog(s32* type, f32* start, f32* end, GXColor* color) {

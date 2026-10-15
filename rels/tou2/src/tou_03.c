@@ -2961,8 +2961,8 @@ void screen_tev(MapTevCallbackInfo* info) {
     Mtx mtx;
     Mtx scale;
     Mtx trans;
-    s32 ry;
     s32 by;
+    s32 ry;
     u8* buf;
     s32 i;
     s32 j;
@@ -2972,6 +2972,8 @@ void screen_tev(MapTevCallbackInfo* info) {
     s32 off;
     s32 start;
     u8 col;
+    s32 y0;
+    s32 y1;
     f32 lim;
     f32 x;
     f32 y;
@@ -2987,12 +2989,14 @@ void screen_tev(MapTevCallbackInfo* info) {
                     off = (j / 8) * 32 + (by << 8); off += j % 8; off += (ry << 3); buf[off] = (i & 1) ? 0xFF : 0;
                 }
                 n = rand() % 100 + 100;
+                y0 = by * 256;
+                y1 = ry * 8;
                 for (k = 0; k < n; k++) {
                     len = rand() % 4 + 2;
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        off = (j / 8) * 32 + by * 256; off += j % 8; off += ry * 8; buf[off] = col;
+                        off = (j / 8) * 32 + y0; off += j % 8; off += y1; buf[off] = col;
                     }
                 }
             }

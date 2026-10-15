@@ -1865,6 +1865,7 @@ void battleSortPhaseMoveTable(BattleWork* wp, s32 count) {
 	s32 tmp;
 
 	if (count <= 0) {
+		BattleWork* w = wp; (void)w;
 		count = 0;
 		for (i = 0; i < 64; i++) {
 			if (wp->movePriorityQueue[i] == -1) {
@@ -1983,10 +1984,9 @@ BOOL BattleWaitAllActiveEvtEnd(BattleWork* wp) {
 }
 
 BOOL BattleWaitAllActiveEvtEnd_NoBgSetEndWait(BattleWork* wp) {
-	BOOL done = TRUE;
-	int i = 0;
-	BattleUnit* unit;
-	for (; i < 64; i++) {
+	int i; BOOL done; BattleUnit* unit;
+	done = TRUE;
+	for (i = 0; i < 0x40; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit) {
 			while (unit->phaseEventId) {
@@ -2216,4 +2216,5 @@ USER_FUNC(_set_haikei_entry_scale) {
 	}
 	return busy ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
+
 

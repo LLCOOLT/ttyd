@@ -14,7 +14,8 @@
 #include "battle/battle_disp.h"
 
 
-void _btlYoshiDisp(CameraId camera, f32* p);
+typedef struct YoshiGundanPart YoshiGundanPart;
+void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p);
 void _yoshi_slide_move_sound(void* w, void* s);
 static void __makeTechMenuFunc(BattleWorkCommand* command, s32* count);
 
@@ -1191,9 +1192,14 @@ USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
+    s32* new_var2;
+    s32* new_var;
     s32 id;
 
-    id = evtGetValue(event, event->args[0]);
+    new_var2 = event->args;
+    if (part && part) {
+    }
+    id = evtGetValue(event, new_var2[0]);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
@@ -1226,8 +1232,9 @@ USER_FUNC(yoshi_original_color_anim_set) {
         }
         part = BattleGetUnitPartsPtr(id, 1);
         animPoseGetAnimPosePtr(part->poseId);
+        new_var = &part->poseId;
         if (part->poseId != -1) {
-            animPoseRelease(part->poseId);
+            animPoseRelease(*new_var);
             part->poseId = -1;
         }
     }
@@ -1237,6 +1244,8 @@ USER_FUNC(yoshi_original_color_anim_set) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
+    name++;
+    name--;
 }
 
 #define ADD_WEAPON(w)                                                                              \
@@ -1480,46 +1489,7 @@ USER_FUNC(_wait_yoshig_complete) {
 }
 
 
-static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
-    switch (p->state) {
-    case 0:
-        p->state++;
-        p->delay = irand(3);
-        p->x = (f32)(-(i / 16 * 30 + 300) + irand(10));
-        p->y = 0.0f;
-        p->z = (f32)(i % 16 * 10 - 80);
-        p->frame = irand(6);
-        p->frameCount = irand(5);
-        p->vx = 0.1f * (f32)irand(10) + 3.0f;
-        p->vy = 0.0f;
-        p->vz = 0.001f * (f32)(irand(2000) - 1000);
-    case 1:
-        if (p->delay > 0) {
-            p->delay--;
-            break;
-        }
-    case 2:
-        p->z += p->vz;
-        if (p->z >= 80.0f) {
-            p->z = 80.0f;
-            p->vz *= -1.0f;
-        }
-        if (p->z <= -80.0f) {
-            p->z = -80.0f;
-            p->vz *= -1.0f;
-        }
-        p->x += p->vx;
-        if (p->x >= 300.0f) {
-            p->x = 300.0f;
-            p->vx = 0.0f;
-            p->state = 999;
-        }
-        break;
-    default:
-        return FALSE;
-    }
-    return TRUE;
-}
+static s32 _gundan_part_update(YoshiGundanPart* p, s32 i);
 
 USER_FUNC(_gundan_yoshi_run_effect) {
     BattleUnit* unit;
@@ -1595,8 +1565,51 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     } while (0);
     return EVT_RETURN_BLOCK;
 }
-void _btlYoshiDisp(CameraId camera, f32* p) {
-    f32 s = (p[3] < 0.0f) ? 0.4f : -0.4f;
-    s32 z = 0;
-    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[((u8*)p)[0x25]], (GXColor){255,255,255,255}, z, p[0], p[1] + 20.0f, p[2], s, 0.4f);
+static s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
+    switch (p->state) {
+    case 0:
+        p->state++;
+        p->delay = irand(3);
+        p->x = (f32)(-(i / 16 * 30 + 300) + irand(10));
+        p->y = 0.0f;
+        p->z = (f32)(i % 16 * 10 - 80);
+        p->frame = irand(6);
+        p->frameCount = irand(5);
+        p->vx = 0.1f * (f32)irand(10) + 3.0f;
+        p->vy = 0.0f;
+        p->vz = 0.001f * (f32)(irand(2000) - 1000);
+    case 1:
+        if (p->delay > 0) {
+            p->delay--;
+            break;
+        }
+    case 2:
+        p->z += p->vz;
+        if (p->z >= 80.0f) {
+            p->z = 80.0f;
+            p->vz *= -1.0f;
+        }
+        if (p->z <= -80.0f) {
+            p->z = -80.0f;
+            p->vz *= -1.0f;
+        }
+        p->x += p->vx;
+        if (p->x >= 300.0f) {
+            p->x = 300.0f;
+            p->vx = 0.0f;
+            p->state = 999;
+        }
+        break;
+    default:
+        return FALSE;
+    }
+    return TRUE;
 }
+
+void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
+    YoshiGundanPart* q;
+    f32 s;
+    s = (p->vx < 0.0f) ? 0.4f : -0.4f;
+    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[(q = p)->frame], (GXColor){255,255,255,255}, 0, q->x, q->y + 20.0f, q->z, s, 0.4f);
+}
+

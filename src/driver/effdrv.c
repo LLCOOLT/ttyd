@@ -343,32 +343,35 @@ typedef struct MayaPoly {
 } MayaPoly;
 
 void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {
-	register u32 gqr;
 	f32 buf[22];
 	Mtx trans, scale, tmp2, pivot2, pivot2Inv, trans3, pivot1, pivot1Inv, trans2, rotX, rotY, rotZ, tmp;
+
+
+	register u32 gqr;
 	s32 n = list->count;
 	s32 k;
+	f32 t;
 
-	gqr = 0x06070607;
+
 	for (k = 1; k < n; k++) {
 		MayaKey* prev;
 		MayaKey* curr;
-		f32 t;
 		s32 i;
 		register s8* pb;
 		f32* out;
 		register s8* pa;
 		prev = &list->keys[k - 1];
 		curr = &list->keys[k];
+		gqr = 0x06070607;
 		asm { mtspr GQR5, gqr }
 		if (anim->time <= curr->time) {
 			t = anim->time;
 		}
-		else if (k == n - 1) {
-			t = curr->time;
+		else if (k != n - 1) {
+			continue;
 		}
 		else {
-			continue;
+			t = curr->time;
 		}
 		pa = (s8*)prev;
 		pb = (s8*)curr;

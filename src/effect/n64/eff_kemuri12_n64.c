@@ -107,11 +107,11 @@ void effKemuri12Main(EffectEntry* effect) {
 #pragma opt_propagation off
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
-    u16 type;
     s32 last;
     s32 idx;
     EffKemuri12N64Work* work;
     CameraEntry* camera;
+    u16 type;
     s32 ofs;
     s32 alpha;
     effN64Vtx* vtx;
@@ -120,12 +120,13 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry* effect) {
     Mtx rot;
     GXTexObj texObj;
 
+    work = effect->userdata;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     idx = work->progress;
+    last = (idx == 7);
     alpha = 256.0f * (work->progress - idx);
     type = work->type;
-    last = (idx == 7);
     GXSetNumChans(0);
     GXSetNumTevStages(3);
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);

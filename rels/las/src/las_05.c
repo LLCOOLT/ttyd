@@ -289,9 +289,17 @@ s32 _kurokaron_run_away(f32 x, f32 z, f32 tx, f32 tz) {
     return result;
 }
 
+
+u8 kurokaron_move_index = 0;
+u8 kurokaron_move_flag = 0;
+u8 kurokaron_same_goal = 0;
+s32 kurokaron_vivian_prev_sts = 0;
+u8 kurokaron_stop_cnt = 0;
+u16 kurokaron_run_cnt = 0;
+
 s32 kurokaron_move2(NpcEntry* npc, MarioWork* mario) {
-    static s32 flag;
-    static s32 count;
+    static s32 flag = 0;
+    static s32 count = 0;
     f32 angle;
 
     if (!(kurokaron_move_flag & 2)) {
@@ -964,7 +972,19 @@ static void senkaron_ext_main(void) {
                     }
                 }
                 if (hit != 0) {
-                    d2 = k_sqrtf(adx * adx + adz * adz);
+                    d2 = adx * adx + adz * adz;
+                    if (d2 > 0.0f) {
+                        f64 guess = __frsqrte(d2);
+                        guess = .5 * guess * (3.0 - guess * guess * d2);
+                        guess = .5 * guess * (3.0 - guess * guess * d2);
+                        guess = .5 * guess * (3.0 - guess * guess * d2);
+                        d2 = d2 * guess;
+                    } else if (d2 < 0.0) {
+                        d2 = *(f32*)__float_nan;
+                    } else if (k_fpclassifyf(d2) == 1) {
+                        d2 = *(f32*)__float_nan;
+                    }
+
                     s->vx = push + 3.0f * dx / d2;
                     s->vy = randf(5.0f, 10.0f);
                     s->vz = randf(-5.0f, 10.0f);
@@ -1083,7 +1103,18 @@ static void senkaron_ext_main(void) {
     if (((skwp->marioPushed & 1) && mario->position.x > 0.0f) || ((skwp->marioPushed & 2) && mario->position.x < 0.0f)) {
         mx = -mario->position.x;
         mz = -mario->position.z;
-        d2 = k_sqrtf(mx * mx + mz * mz);
+        dist = mx * mx + mz * mz;
+        if (dist > 0.0f) {
+            f64 guess = __frsqrte(dist);
+            guess = .5 * guess * (3.0 - guess * guess * dist);
+            guess = .5 * guess * (3.0 - guess * guess * dist);
+            guess = .5 * guess * (3.0 - guess * guess * dist);
+            dist = dist * guess;
+        } else if (dist < 0.0) {
+            dist = *(f32*)__float_nan;
+        } else if (k_fpclassifyf(dist) == 1) {
+            dist = *(f32*)__float_nan;
+        }
 
         switch (mario->currMotionId) {
             case 0x12:
@@ -1103,8 +1134,8 @@ static void senkaron_ext_main(void) {
                 speed = randf(1.7f, 2.2f);
                 break;
         }
-        mario->position.x += speed * (mx / d2);
-        mario->position.z += speed * (mz / d2);
+        mario->position.x += speed * (mx / dist);
+        mario->position.z += speed * (mz / dist);
     }
 }
 
@@ -1678,9 +1709,3 @@ static USER_FUNC(make_name) {
     return EVT_RETURN_DONE;
 }
 
-u16 kurokaron_run_cnt;
-u8 kurokaron_stop_cnt;
-s32 kurokaron_vivian_prev_sts;
-u8 kurokaron_same_goal;
-u8 kurokaron_move_flag;
-u8 kurokaron_move_index;

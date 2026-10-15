@@ -401,7 +401,6 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 	u16 code;
 	CameraEntry* camera;
 	Mtx m;
-	GXColor save;
 
 	camera = camGetCurPtr();
 	x = -(f32)FontGetMessageWidthLine((const char*)msg, NULL) * 0.5f;
@@ -416,6 +415,7 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 			code = JUTFont_CodeToGlyph(*msg++);
 		}
 		{
+			GXColor save;
 			if (fontEdge) {
 				save = fontColor;
 				FontDrawColorIDX(0);
@@ -933,7 +933,6 @@ void JUTFont_DrawStart(GXColor color) {
 
 
 
-static const GXColor hsv0 = {0x00, 0xAA, 0xFF, 0xFF};
 
 #pragma opt_lifetimes off
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
@@ -944,6 +943,7 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	BinaryFontGlyph* glyph;
 	f32 cellh, cellw, tu, w, h, tw;
 	FontWidthEntry* entry;
+	u16 rows;
 	GXColor c;
 	u16 u0, u1, v1;
 	u16 v0;
@@ -957,9 +957,9 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	entry = fontGetWidth(code);
 	kern = entry->kerning;
 	glyph = blockGlyph;
-	idx = code - glyph->firstcode;
-	row = idx / glyph->sheetrows;
-	col = idx % glyph->sheetrows;
+	rows = glyph->sheetrows;
+	row = (code - glyph->firstcode) / rows;
+	col = (code - glyph->firstcode) % rows;
 	row = row % glyph->sheetcolumns;
 	cellh = glyph->cellheight;
 	cellw = glyph->cellwidth;
@@ -974,10 +974,10 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	n1 = irand(64);
 	x0 = x + 0;
 	y0 = y - 1;
-	tv = row * cellh;
 	x1 = x0 + w;
 	hue = x0 - (u8)gp->retraceCount * 2;
-	hsv = hsv0;
+	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
+	tv = row * cellh;
 	v0 = 1.0f + tv;
 	GXPosition3s16(x, y0, 0);
 	hr0 = x0 + hue;

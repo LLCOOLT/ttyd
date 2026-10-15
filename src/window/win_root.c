@@ -1413,15 +1413,13 @@ typedef struct WinHakoWork {
 } WinHakoWork;
 
 void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
-    s32 ofs;
-    s32 num;
-    s32 page;
+    u32 c0;
+    u32 c1;
     f32 scroll;
-    s32 npages;
+    s32 ofs;
     s32 j;
     s32 i;
     s32 py;
-    s32 p;
     s32 k;
     s32 idx;
     s32 id;
@@ -1429,27 +1427,19 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
     const char* msg;
     f32 mw;
     f32 fx;
-    s32 t7b;
-    s32 t7d;
-    s32 t7e;
-    s32 t7f;
-    s32 t80;
-    s32 t81;
-    s32 t82;
-    s32 t83;
-    s32 t84;
-    s32 t85;
-    s32 t86;
-    s32 t87;
+    s32 npages;
+    s32 p;
+    s32 page;
+    s32 num;
 
     if (a == 0) {
-        page = w->list[0].page;
         scroll = w->list[0].scroll;
         num = w->list[0].num;
+        page = w->list[0].page;
     } else {
-        page = w->list[1].page;
         scroll = w->list[1].scroll;
         num = w->list[1].num;
+        page = w->list[1].page;
     }
 
     GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, GX_LO_CLEAR);
@@ -1473,84 +1463,77 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
     GXSetScissor(304.0f + x, 240.0f - y, 400, 228);
 
     ofs = a * 13;
-    npages = (num + 27) / 28;
-    t7d = ofs + 0x7D;
-    t7e = ofs + 0x7E;
-    t85 = ofs + 0x85;
-    t84 = ofs + 0x84;
-    t7b = ofs + 0x7B;
-    t81 = ofs + 0x81;
-    t86 = ofs + 0x86;
-    t80 = ofs + 0x80;
-    t7f = ofs + 0x7F;
-    t83 = ofs + 0x83;
-    t87 = ofs + 0x87;
-    t82 = ofs + 0x82;
-    for (p = 0, py = 0; p < npages; py += 232, p++) {
+    for (p = 0; p < (num + 27) / 28; p++) {
+        py = p * 232;
         if (scroll + (y - j * 56) - py > 400.0f || scroll + (y - j * 56) - py < -400.0f) {
             continue;
         }
         if ((ofs != 0 && p == 2) || (ofs != 1 && p == 3)) {
-            winBookTex((WinBookWork*)w, t7b, x, y + scroll - p * 232, 56.0f, 56.0f);
-            winBookTex((WinBookWork*)w, t7d, x, y - 56.0f + scroll - p * 232, 56.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t7e, 8.0f + x, y - 56.0f + scroll - p * 232, 48.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t85, 56.0f + x, y + scroll - p * 232, 8.0f, 8.0f);
-            winBookTex((WinBookWork*)w, t84, 56.0f + x, y - 8.0f + scroll - p * 232, 8.0f, 48.0f);
-            winBookTex((WinBookWork*)w, t81, 56.0f + x, y - 56.0f + scroll - p * 232, 8.0f, 8.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x7B), x, y + scroll - p * 232, 56.0f, 56.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x7D), x, y - 56.0f + scroll - p * 232, 8.0f, 8.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x7E), 8.0f + x, y - 56.0f + scroll - p * 232, 48.0f, 8.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x85), 56.0f + x, y + scroll - p * 232, 8.0f, 8.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x84), 56.0f + x, y - 8.0f + scroll - p * 232, 8.0f, 48.0f);
+            winBookTex((WinBookWork*)w, (a * 13 + 0x81), 56.0f + x, y - 56.0f + scroll - p * 232, 8.0f, 8.0f);
             break;
         }
         for (i = 0; i < 7; i++) {
             for (j = 0; j < 4; j++) {
-                winBookTex((WinBookWork*)w, t7b + ((i + j * 7) & 1), x + i * 56, scroll + (y - j * 56) - py, 56.0f, 56.0f);
+                winBookTex((WinBookWork*)w, (a * 13 + 0x7B) + ((i + j * 7) & 1), x + i * 56, scroll + (y - j * 56) - py, 56.0f, 56.0f);
             }
         }
+        c0 = (a * 13 + 0x7D);
+        c1 = (a * 13 + 0x7E);
         for (i = 0; i < 7; i++) {
             if (i == 0) {
-                id = t7d;
+                id = c0;
             } else if (i & 1) {
-                id = t7f;
+                id = (a * 13 + 0x7F);
             } else {
-                id = t86;
+                id = (a * 13 + 0x86);
             }
             winBookTex((WinBookWork*)w, id, x + i * 56, y - 224.0f + scroll - py, 8.0f, 8.0f);
-            if (i & 1) {
-                id = t80;
+            if ((i & 1) == 0) {
+                id = c1;
             } else {
-                id = t7e;
+                id = (a * 13 + 0x80);
             }
             winBookTex((WinBookWork*)w, id, 8.0f + (x + i * 56), y - 224.0f + scroll - py, 48.0f, 8.0f);
         }
-        for (j = 0; j < 4; j++) {
-            if (j == 0) {
-                id = t85;
-            } else if (j & 1) {
-                id = t83;
+        c0 = (a * 13 + 0x85);
+        c1 = (a * 13 + 0x84);
+        for (i = 0; i < 4; i++) {
+            if (i == 0) {
+                id = c0;
+            } else if (i & 1) {
+                id = (a * 13 + 0x83);
             } else {
-                id = t87;
+                id = (a * 13 + 0x87);
             }
-            winBookTex((WinBookWork*)w, id, 392.0f + x, scroll + (y - j * 56) - py, 8.0f, 8.0f);
-            if (j & 1) {
-                id = t82;
+            winBookTex((WinBookWork*)w, id, 392.0f + x, scroll + (y - i * 56) - py, 8.0f, 8.0f);
+            if ((i & 1) == 0) {
+                id = c1;
             } else {
-                id = t84;
+                id = (a * 13 + 0x82);
             }
-            winBookTex((WinBookWork*)w, id, 392.0f + x, scroll + (y - j * 56 - 8.0f) - py, 8.0f, 48.0f);
+            winBookTex((WinBookWork*)w, id, 392.0f + x, scroll + (y - i * 56 - 8.0f) - py, 8.0f, 48.0f);
         }
-        winBookTex((WinBookWork*)w, t81, 392.0f + x, y - 224.0f + scroll - py, 8.0f, 8.0f);
+        winBookTex((WinBookWork*)w, (a * 13 + 0x81), 392.0f + x, y - 224.0f + scroll - py, 8.0f, 8.0f);
     }
 
+    npages = (num + 27) / 28;
     winTexInit(((WinPauseWork*)w)->res->tex->tpl);
-    for (p = 0, py = 0, idx = 0; p < npages; py += 232, idx += 28, p++) {
-        if (scroll + (y - j * 56) - py > 400.0f || scroll + (y - j * 56) - py < -400.0f) {
+    for (p = 0; p < npages; p++) {
+        if (scroll + (y - j * 56) - p * 232 > 400.0f || scroll + (y - j * 56) - p * 232 < -400.0f) {
             continue;
         }
         for (j = 0; j < 4; j++) {
-            yy = scroll + (y - j * 56) - py - 28.0f;
-            for (k = 0; k < 7; k++) {
-                s32 n = idx + j * 7 + k;
+            for (i = 0; i < 7; i++) {
+                s32 n = p * 28 + j * 7 + i;
                 if (n >= num) {
                     continue;
                 }
+                yy = scroll + (y - j * 56) - p * 232 - 28.0f;
                 if (ofs == 0) {
                     if (swGet(w->list[0].ids[n] + 0x80)) {
                         continue;
@@ -1560,22 +1543,22 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
                         continue;
                     }
                 }
-                winTexSet(0x97, (Vec){4.0f + (24.0f + (x + k * 56)), yy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+                winTexSet(0x97, (Vec){4.0f + (24.0f + (x + i * 56)), yy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                           (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         }
     }
 
     winIconInit();
-    for (p = 0, py = 0, idx = 0; p < npages; idx += 28, py += 232, p++) {
+    for (p = 0; p < npages; p++) {
         for (j = 0; j < 4; j++) {
-            yy = scroll + (y - j * 56) - py - 28.0f;
-            for (k = 0; k < 7; k++) {
-                s32 n = idx + j * 7 + k;
-                u16 icon;
+            for (i = 0; i < 7; i++) {
+                s32 n = p * 28 + j * 7 + i;
+                s32 icon;
                 if (n >= num) {
                     continue;
                 }
+                yy = scroll + (y - j * 56) - p * 232 - 28.0f;
                 if (ofs == 0) {
                     if (!swGet(w->list[0].ids[n] + 0x80)) {
                         continue;
@@ -1587,7 +1570,7 @@ void winHakoGX(WinHakoWork* w, s32 a, f32 x, f32 y) {
                     }
                     icon = itemDataTable[w->list[1].ids[n] + 0xB3].icon_id;
                 }
-                winIconSet(icon, (Vec){4.0f + (24.0f + (x + k * 56)), yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f},
+                winIconSet(icon, (Vec){4.0f + (24.0f + (x + i * 56)), yy, 0.0f}, (Vec){0.8f, 0.8f, 0.8f},
                            (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
             }
         }
@@ -2632,7 +2615,6 @@ void winMailDisp(WinPauseWork* wp) {
             for (i = 0; i < wp->mailNum; i++) {
                 GXColor white;
                 GXColor black;
-                s32 t;
 
                 id = wp->mailList[i].id;
                 kind = wp->mailList[i].kind;
@@ -2650,7 +2632,7 @@ void winMailDisp(WinPauseWork* wp) {
                 winTexInit(wp->res->tex->tpl);
                 winTexSet(0x77, (Vec){ 4.0f + (208.0f + WM_X), WM_SCR + ((WM_Y - 56.0f) - (f32)(i * 40)), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, col);
                 white = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-                t = pouchCheckMail(id); winTexSet((t == 2 ? 0x5E : 0x5D), (Vec){ 72.0f + WM_X, WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
+                winTexSet((pouchCheckMail(id) == 2 ? 0x5E : 0x5D), (Vec){ 72.0f + WM_X, WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winTexSet(0x65 + (kind + 1) / 10, (Vec){ 2.0f + (88.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winTexSet(0x65 + (kind + 1) % 10, (Vec){ 2.0f + (104.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winFontInit();
@@ -2658,9 +2640,9 @@ void winMailDisp(WinPauseWork* wp) {
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
         } else {
+            GXColor col;
             GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
             GXColor black = { 0x00, 0x00, 0x00, 0xFF };
-            GXColor col;
             s32 kind2;
 
             kind2 = wp->mailList[wp->mailSel].kind;

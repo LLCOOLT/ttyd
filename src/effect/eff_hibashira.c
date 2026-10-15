@@ -88,9 +88,9 @@ void effHibashiraMain(EffectEntry* effect) {
     EffHibashiraWork* pillar;
     Vec position;
     s32 type;
-    BOOL inBattle;
     s32 k;
     s32 i;
+    BOOL inBattle;
 
     position = (Vec){ work->position.x, work->position.y, work->position.z };
     type = work->type;
@@ -133,8 +133,7 @@ void effHibashiraMain(EffectEntry* effect) {
         return;
     }
 
-    work++;
-    for (i = 1; i < effect->count; i++, work++) {
+    for (work++, i = 1; i < effect->count; i++, work++) {
         if (work->delay) {
             work->delay--;
             continue;
@@ -186,8 +185,7 @@ void effHibashiraDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     PSMTXConcat(mtx, rot, mtx);
     PSMTXConcat(mtx, scale, base);
-    work++;
-    for (i = 1; i < effect->count; i++, work++) {
+    for (work++, i = 1; i < effect->count; i++, work++) {
         if (work->poseId != -1) {
             PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
             PSMTXScale(scale, work->scale, work->scale, work->scale);

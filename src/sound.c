@@ -1205,7 +1205,7 @@ void SoundDVDMain(void) {
     SoundDVD* dvd;
 
     for (i = 0; (int)i < 2; i++) {
-        dvd = &sound.dvds[i];
+        SoundDVD* dvd = &sound.dvds[i];
         if (!(dvd->flags & 2)) {
             if (dvd->flags & 0x40) {
                 if (dvd->unk8 == 0.0f) {
@@ -1549,9 +1549,9 @@ u8* ssDecodeDPCM(SoundStream* stream, SoundStreamEntry* entry, s16* out, u32 cou
     return src;
 }
 u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
+    s16* dst;
     SoundStream* stream;
     SoundStreamEntry* entry;
-    s16* dst;
     s16* src16;
     u8* dst8;
     u8* src8;
@@ -1559,9 +1559,9 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     u32 n;
     s32 j;
 
-    dst = buffer1;
     stream = &sound.streams[(u8)user];
     stream->samplePos = 0;
+    dst = buffer1;
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
             for (; len1 != 0; len1--) {
@@ -1721,9 +1721,9 @@ void SoundSSPlayCh(s32 chan, const char* name) {
 }
 
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
-    char* path;
     SoundStream* stream;
     int i;
+    char* path;
 
     stream = &sound.streams[chan];
     if (stream->flags) {
@@ -1817,16 +1817,16 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
                 break;
             case 2:
                 stream->flags |= 0x100;
-                dst = (u8*)&stream->entries[0].info;
                 src = (u8*)header + 0x5C;
+                dst = (u8*)&stream->entries[0].info;
                 for (j = 32; j != 0; j--) {
                     *dst++ = *src++;
                 }
                 if (stream->count == 2) {
-                    src = (u8*)header + 0xBC;
-                    dst = (u8*)&stream->entries[1].info;
-                    for (j = 32; j != 0; j--) {
-                        *dst++ = *src++;
+                    u8* d2;
+                    u8* s2;
+                    for (s2 = (u8*)header + 0xBC, d2 = (u8*)&stream->entries[1].info, j = 32; j != 0; j--) {
+                        *d2++ = *s2++;
                     }
                 }
                 stream->dataOffset = 0x100;
@@ -1875,9 +1875,10 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
         SoundSSSetPanCh(i, stream->pan);
         if (stream->flags & 0x400) {
             len = DVDMgrGetLength(stream->entries[0].dvd);
-            size = 0x8000;
             if (stream->entries[0].offset + 0x8000 >= len) {
                 size = len - stream->entries[0].offset;
+            } else {
+                size = 0x8000;
             }
             DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].loadBuffer[0], (size + 0x1F) & ~0x1F,
                             stream->entries[0].offset, _ssDVDReadAsync_cache_next);

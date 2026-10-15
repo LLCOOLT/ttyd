@@ -27,6 +27,9 @@ s32 size_table[6][2] = {
 	{0, 0x64}
 };
 static SmartWork* wp = &smartWork;
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_8040F50C_sdata[1] = {0};
+#pragma force_active reset
 
 //.sbss
 OSHeapHandle heapHandle[6];
@@ -35,7 +38,8 @@ void* heapEnd[6];
 void* mapalloc_base_ptr;
 u32 mapalloc_size;
 BOOL g_bFirstSmartAlloc;
-u16 count;
+u32 count;
+#define COUNT (*(u16*)&count)
 
 //local prototypes
 void smartGarbage(void);
@@ -89,21 +93,22 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
 void memClear(HEAP_TYPE heap) {
 	MapAllocEntry* entry;
 	u32 size;
+
 	OSDestroyHeap(heapHandle[heap]);
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
 	if (heap == HEAP_MALLOC) {
-		size = (u32)heapEnd[1] - (u32)heapStart[1] - 32;
+		size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
 		entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
 		if (entry) {
 			memset(entry, 0, size);
 			DCFlushRange(entry, size);
 		}
 		entry->next = NULL;
-		entry->size = size - 32;
+		entry->size = size - 0x20;
 		entry->inuse = 0;
 		mapalloc_base_ptr = entry;
 		mapalloc_size = size;
-		count = 0;
+		COUNT = 0;
 	}
 }
 
@@ -157,7 +162,7 @@ void* _mapAlloc(u32 size) {
 		currEntry->next = (void*)((u32)currEntry + fullSize);
 		currEntry->size = usableSize;
 		currEntry->inuse = 1;
-		currEntry->currId = count++;
+		currEntry->currId = COUNT++;
 
 		nextptr = currEntry->next;
 		nextptr->next = tailEntry;
@@ -215,7 +220,7 @@ void* _mapAllocTail(u32 size) {
 		tailEntry = (void*)((u32)nextptr + 0x20);
 		nextptr->size = usableSize;
 		nextptr->inuse = 1;
-		nextptr->currId = count++;
+		nextptr->currId = COUNT++;
 
 		memset(tailEntry, 0, usableSize);
 		DCFlushRange(tailEntry, usableSize);

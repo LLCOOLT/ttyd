@@ -102,8 +102,28 @@ void winIconInit(void);
 void winIconGrayInit(void);
 void winIconSet(u32 id, Vec translate, Vec scale, GXColor color);
 void winFontSetPitch(f32 pitch, Vec translate, Vec scale, GXColor color, const char* fmt, ...);
-void winBookGX(ItemWork* w, s32 a);
-extern ItemData itemDataTable[];
+void winBookGX(ItemWork* w, s32 a, f32 x, f32 y);
+/* ItemData view with an unsigned usable_locations (lhz loads) */
+typedef struct ItemDataU {
+    const char* id;
+    const char* name;
+    const char* description;
+    const char* menu_description;
+    u16 usable_locations;
+    s16 type_sort_order;
+    u16 buy_price;
+    u16 discount_price;
+    u16 star_piece_price;
+    u16 sell_price;
+    s8 bp_cost;
+    s8 hp_restored;
+    s8 fp_restored;
+    s8 sp_restored;
+    u16 icon_id;
+    s16 field_0x22;
+    BattleWeapon* battle_params;
+} ItemDataU;
+extern ItemDataU itemDataTable[];
 void winFontSetR(Vec translate, Vec scale, GXColor color, const char* fmt, ...);
 
 typedef struct WinPartyDt {
@@ -287,6 +307,8 @@ void winItemExit(ItemWork* w) {
     winMgrDelete(w->winId1);
 }
 
+typedef struct { u8 pad[0x10]; u16 usable; u8 pad2[0x16]; } ItemDataU16;
+
 s32 winItemMain(ItemWork* w) {
     s32 cnt;
     s32 col;
@@ -296,6 +318,7 @@ s32 winItemMain(ItemWork* w) {
     s32 mode;
     s32 pages;
     s32 id;
+    ItemData* item;
     s32 c;
     s32 old;
     s32 ok;
@@ -309,6 +332,7 @@ s32 winItemMain(ItemWork* w) {
     s32 n;
     s32 i;
     f32 yoff;
+    s32 k;
 
     switch (w->state) {
     case 0:
@@ -357,7 +381,7 @@ s32 winItemMain(ItemWork* w) {
         if (w->trg & 0x100) {
             if (w->mode == 0) {
                 id = pouchHaveItem(w->cursor[mode]);
-                if ((*(u16*)&itemDataTable[id].usable_locations & 4) != 0) {
+                if (itemDataTable[id].usable_locations & 4) {
                     w->f2D4 = id;
                     w->f2D8 = w->cursor[mode];
                     w->state = 300;
@@ -635,15 +659,15 @@ s32 winItemMain(ItemWork* w) {
                 return -2;
             }
             party = !marioBgmodeChk() ? marioGetParty() : marioGetPtr()->prevPartyMemberId[0];
-            n = 0;
+            k = 0;
             for (i = 0; i < 7; i++) {
                 if (party == winPartyDt[i].partyId) {
-                    list[n++] = &winPartyDt[i];
+                    list[k++] = &winPartyDt[i];
                 }
             }
             for (i = 0; i < 7; i++) {
                 if (party != winPartyDt[i].partyId) {
-                    list[n++] = &winPartyDt[i];
+                    list[k++] = &winPartyDt[i];
                 }
             }
             if (w->sel < 1) {
@@ -777,15 +801,22 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     GXColor white4;
     f32 yBase;
     ItemData* item;
+    s32 row;
+    ItemWork* p;
+    s32 col;
+    s32 cx;
     f32 y;
     s32 i;
-    ItemWork* p;
-    s32 id;
     s32 ok;
+    s32 id;
     s32 cnt;
     s32 gray;
     f32 scroll;
     f32 width;
+    f32 w2;
+    f32 w3;
+    f32 w4;
+    f32 w5;
 
     white4 = white;
     white2 = white4;
@@ -797,18 +828,17 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     }
     GXSetScissor(0, 0x6D, 0x260, 0xC0);
     p = w;
-    for (i = 0; i < cnt; p = (ItemWork*)((s16*)p + 1), i++) {
-        s32 col = i % 2;
-        s32 row = i / 2;
+    for (i = 0; i < cnt; p = (ItemWork*)((s16*)p + 1), ++i) {
+        col = i % 2;
+        row = i / 2;
         if (w->mode == 0) {
             id = pouchHaveItem(i);
         } else {
             id = p->skip[0];
         }
         scroll = (&w->curX)[w->mode];
-        ok = w->mode != 0 || (*(u16*)&itemDataTable[id].usable_locations & 4);
+        ok = (w->mode != 0 || (*(u16*)&itemDataTable[id].usable_locations & 4)) == 0;
         y = scroll + (20.0f + ((yBase = (100.0f + yo) - row * 38) - 10.0f));
-        ok = ok == 0;
         if (y > 240.0f) {
             continue;
         }
@@ -820,9 +850,9 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
         } else {
             winIconInit();
         }
-        winIconSet(itemDataTable[id].icon_id, (Vec){(xo - 125.0f) + col * 204, y, 0.0f}, w->mode == 0 ? (Vec){0.8f, 0.8f, 0.8f} : (Vec){0.6666667f, 0.6666667f, 0.6666667f}, white3);
+        winIconSet(itemDataTable[id].icon_id, (Vec){(xo - 125.0f) + (cx = col * 204), y, 0.0f}, w->mode == 0 ? (Vec){0.8f, 0.8f, 0.8f} : (Vec){0.6666667f, 0.6666667f, 0.6666667f}, white3);
         winFontInit();
-        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + col * 204, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, ok ? grayc : black, msgSearch(itemDataTable[id].name));
+        winFontSetPitch(20.0f, (Vec){(xo - 105.0f) + cx, scroll + (20.0f + yBase), 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, ok ? grayc : black, msgSearch(itemDataTable[id].name));
     }
     GXSetScissor(0, 0, 0x260, 0x1E0);
     if ((&w->page[0])[w->mode] > 0) {
@@ -834,19 +864,19 @@ void item_disp(ItemWork* w, f32 xo, f32 yo) {
     }
     if (cnt > (&w->page[0])[w->mode] * 10 + 10) {
         winTexInit(w->res->tex->tpl);
-        width = 250.0f + xo;
-        winTexSet(0x17, (Vec){width, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+        w3 = 250.0f + xo;
+        winTexSet(0x17, (Vec){w3, 20.0f + ((yo - 90.0f) - 15.0f), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
         winIconInit();
-        winIconSet(0x80, (Vec){width, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
+        winIconSet(0x80, (Vec){w3, 20.0f + (yo - 90.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
     }
-    width = 0.7f * (f32)(u32)FontGetMessageWidth(msgSearch("msg_menu_sort_narabikae"));
+    w2 = 0.7f * (f32)(u32)FontGetMessageWidth(msgSearch("msg_menu_sort_narabikae"));
     winFontInit();
-    width = xo + (220.0f - width);
-    winFontSet((Vec){width, 20.0f + ((yo - 92.0f) - 10.0f), 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, msgSearch("msg_menu_sort_narabikae"));
+    w4 = xo + (220.0f - w2);
+    winFontSet((Vec){w4, 20.0f + ((yo - 92.0f) - 10.0f), 0.0f}, (Vec){0.7f, 0.7f, 0.7f}, black, msgSearch("msg_menu_sort_narabikae"));
     winIconInit();
-    winIconSet(0x217, (Vec){width - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
+    winIconSet(0x217, (Vec){w4 - 30.0f, 20.0f + ((yo - 100.0f) - 10.0f), 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white2);
     if (w->box[0] < 320.0f && w->box[2] > -240.0f) {
-        winBookGX(w, 0);
+        winBookGX(w, 0, w->box[0], w->box[2]);
     }
 }
 
@@ -979,3 +1009,517 @@ void itemUseDisp2(WinMgrEntry* entry) {
 
 
 __declspec(section ".data") u32 gap_05_80374D0C_data[1] = {0};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

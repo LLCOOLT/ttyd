@@ -413,9 +413,9 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor white;
 	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
 	const char* str;
-	s32 i;
-	s32 j;
 	s32 k;
+	s32 j;
+	s32 i;
 	CameraEntry saved;
 	f32 proj[7];
 	f32 vp[6];
@@ -453,26 +453,26 @@ void nameEntDisp(CameraId cameraId, void* param) {
 			}
 		}
 	}
-	for (i = 0; i < 4; i++) {
-		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == i) {
+	for (k = 0; k < 4; k++) {
+		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == k) {
 			winTexInit(*wp->field_0x60->data);
-			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
+			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(i + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(k + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(i + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - i * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(k + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
 	winTexInit(*wp->field_0x60->data);
 	winTexSet(0x24, (Vec){2.0f + wp->field_0x2C, wp->field_0x30 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
 	winTexSet(0x24, (Vec){wp->field_0x2C, wp->field_0x30, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	FontDrawStart();
-	for (j = 0; j < 8; j++) {
+	for (i = 0; i < 8; i++) {
 		memset(buf, 0, sizeof(buf));
-		strncpy(buf, &wp->field_0x3C[j * 2], 2);
+		strncpy(buf, &wp->field_0x3C[i * 2], 2);
 		if (strlen(buf)) {
-			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(j * 32 - 120), 171.0f, buf);
+			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(i * 32 - 120), 171.0f, buf);
 		}
 	}
 	str = msg_tbl[wp->field_0xC];

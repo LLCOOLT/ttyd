@@ -2235,11 +2235,12 @@ battle/battle_seq_end.c:
 	.rodata     start:0x802FDDF0 end:0x802FE1D8
 	.data       start:0x803ACB10 end:0x803ADA18
 	.sdata      start:0x80415A00 end:0x80415A58
-	.sdata2     start:0x80420C00 end:0x80420D80
+	.sdata2     start:0x80420C00 end:0x80420D60
 
 battle/battle_ac_help.c:
 	.text       start:0x80211A94 end:0x80211CD0
 	.rodata     start:0x802FE1D8 end:0x802FE200
+	.sdata2     start:0x80420D60 end:0x80420D80
 
 kpa_act.c:
 	.text       start:0x80211CD0 end:0x80212778

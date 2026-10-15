@@ -164,6 +164,7 @@ void effOpukuJetwrainMain(EffectEntry* effect) {
 }
 
 void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 px;
     EffOpukuJetwrainWork* work;
     s32 alpha;
     Mtx trans;
@@ -175,10 +176,12 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
     void* buf;
     s32 j, i;
     s32 edgeY;
-    s32 y0, y1, x1, k, x0;
-    s32 px;
-    s32 by;
-    s32 bx;
+    s32 x1;
+    s32 y0;
+    s32 y1;
+    s32 by, bx;
+    s32 x0;
+    s32 k; s32 edgeX;
 
     camGetPtr(cameraId);
     work = effect->userdata;
@@ -233,16 +236,16 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
         }
         for (j = 0; j < 18; j++) {
             bx = j * 16 + 16;
-            k = 0;
+            edgeX = 0;
             if (j == 0) {
-                k = 1;
                 x0 = -4;
+                edgeX = 1;
             } else {
                 x0 = 0;
             }
             if (j == 17) {
                 x1 = 4;
-                k = 1;
+                edgeX = 1;
             } else {
                 x1 = 0;
             }
@@ -251,9 +254,9 @@ void effOpukuJetwrainDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXTrans(trans, px, by + y0, 0.0f);
             PSMTXConcat(texMtx, trans, texMtx);
             GXLoadTexMtxImm(texMtx, GX_TEXMTX0, GX_MTX2x4);
-            if (k != 0 && edgeY != 0) {
+            if (edgeX != 0 && edgeY != 0) {
                 k = 12;
-            } else if (k != 0) {
+            } else if (edgeX != 0) {
                 k = 4;
             } else if (edgeY) {
                 k = 8;

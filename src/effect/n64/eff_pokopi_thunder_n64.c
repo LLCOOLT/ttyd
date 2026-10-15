@@ -384,12 +384,13 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     GXInvalidateVtxCache();
     effSetVtxDescN64(vtx);
     k = 0;
-    n = k;
+    n = 0;
     lim = i - 1;
-    for (; k < lim; k++) {
+    while (k < lim) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);
         n += 2;
+        k++;
     }
     if (work->cameraId != 4) {
         GXSetProjectionv(proj);

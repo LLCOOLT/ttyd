@@ -94,9 +94,9 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera = camGetPtr(cameraId);
     f32 scale = work->scale;
     f32 base;
+    f32 y1;
     f32 width;
     f32 wide;
-    f32 y1;
     f32 x0;
     f32 ox;
     f32 oy;
@@ -129,14 +129,12 @@ void effPointGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    wide = 352.0f;
-    x0 = 48.0f;
     base = -(362.0f + width);
-    width = x0;
-    x0 = -width;
-    x0 /= 2.0f;
+    width = 48.0f;
+    wide = 352.0f;
     y1 = 24.0f;
     for (pass = 1; pass >= 0; pass--) {
+        x0 = -width / 2.0f;
         ox = (f32)(pass * 4);
         oy = (f32)(-pass * 4);
         if (pass != 0) {

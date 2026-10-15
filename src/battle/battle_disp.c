@@ -600,15 +600,15 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	Mtx pT;
 	Mtx pS;
 	Mtx mT5;
-	BattleUnit* unit = part->mOwner;
 	BattleWork* wp = _battleWorkPointer;
+	BattleUnit* unit = part->mOwner;
 	CameraEntry* cam;
+	f32 rotY;
 	f32 x, y, z;
 	f32 angle;
 	f32 dir;
 	f32 camAngle;
 	f32 a;
-	f32 rotY;
 	f32 zscale = 1.0f;
 	GXColor* color;
 	if (part->poseId < 0) return;
@@ -634,8 +634,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	if (part->attributes & 0x10000000) {
 		if (part->faceDirection >= 0) angle = 90.0f;
 		x = part->mPosition.x;
-		y = getFloatDispOffset(part);
-		y = part->mPosition.y + getGravityDispOffset(part) + y;
+		y = part->mPosition.y + getGravityDispOffset(part) + getFloatDispOffset(part);
 		z = part->mPosition.z;
 		cam = camGetCurPtr();
 		a = CAMDIR(cam);
@@ -686,8 +685,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 			dir = wp->alliances[unit->mAlliance].attackDirection;
 		}
 		x = part->mPositionOffset.x * dir + unit->mPosition.x;
-		y = getFloatDispOffset(part);
-		y = unit->mPosition.y + part->mPositionOffset.y + getGravityDispOffset(part) + y;
+		y = unit->mPosition.y + part->mPositionOffset.y + getGravityDispOffset(part) + getFloatDispOffset(part);
 		z = unit->mPosition.z + part->mPositionOffset.z;
 		dir = 0.0f;
 		if (part->mOwner->mAttributeFlags & 0x4000000) {
@@ -841,7 +839,6 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 	s32 item;
 	f32 height;
 	Vec pos;
-	f32 scale = 1.0f;
 
 	height = BtlUnit_GetHeight(unit);
 
@@ -857,7 +854,7 @@ void btlUnitItemDisp(CameraId camId, BattleUnit* unit) {
 		pos.x += unit->heldItemOffset.x;
 		pos.y += unit->heldItemOffset.y;
 		pos.z += unit->heldItemOffset.z;
-		iconDispGx(&pos, 0, itemDataTable[item].icon_id, scale);
+		((void (*)(f32, Vec*, s16, u16))iconDispGx)(1.0f, &pos, 0, itemDataTable[item].icon_id);
 	}
 }
 #pragma pop
@@ -888,8 +885,8 @@ void btlUnitStolenItemDisp(CameraId camId, void* param) {
 	s32 item = unit->heldItem;
 
 	BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-	pos.y += unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit) + 5.0f;
-	iconDispGx(&pos, 0, itemDataTable[item].icon_id, 1.0f);
+	pos.y += 5.0f + unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit);
+	((void (*)(f32, Vec*, s16, u16))iconDispGx)(1.0f, &pos, 0, itemDataTable[item].icon_id);
 }
 
 #pragma dont_inline on

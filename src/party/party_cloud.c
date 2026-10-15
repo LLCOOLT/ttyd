@@ -644,3 +644,10 @@ void cloudGetAt(Vec* position) {
         }
     }
 }
+
+void partyCloudStrippedPool(f32* f, s32 i) {
+    f[0] = 0.0f;
+    f[1] = 70.0f;
+    f[2] = 180.0f;
+    f[3] = (f32)i;
+}

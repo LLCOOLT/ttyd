@@ -486,7 +486,6 @@ void party_motion_stay(PartyEntry* party) {
     PartyEntry* other;
     HitEntry* hit;
     f32 lim;
-    f32 d;
     f32 x, z;
     f32 dir, spd;
     Vec v;
@@ -521,12 +520,48 @@ void party_motion_stay(PartyEntry* party) {
         !strcmp(gp->currentMapName, "aji_12"))
     {
         if (!marioKeyOffChk()) {
-            lim = partyStayDist(party);
+            {
+                f32 sd;
+                if (party->unk32 == 0) {
+                    sd = 18.0f;
+                } else if (party->currentMemberId == 5) {
+                    if (party->flags3 & 0x200000) {
+                        sd = 8.0f;
+                    } else {
+                        sd = 30.0f;
+                    }
+                } else if (party->currentMemberId == 6) {
+                    if (party->flags3 & 0x200000) {
+                        sd = 8.0f;
+                    } else {
+                        sd = 30.0f;
+                    }
+                }
+                lim = sd;
+            }
             party->flags3 |= 0x20000;
         }
     }
     if ((party->flags3 >> 17) & 1) {
-        lim = partyStayDist(party);
+        {
+            f32 sd;
+            if (party->unk32 == 0) {
+                sd = 18.0f;
+            } else if (party->currentMemberId == 5) {
+                if (party->flags3 & 0x200000) {
+                    sd = 8.0f;
+                } else {
+                    sd = 30.0f;
+                }
+            } else if (party->currentMemberId == 6) {
+                if (party->flags3 & 0x200000) {
+                    sd = 8.0f;
+                } else {
+                    sd = 30.0f;
+                }
+            }
+            lim = sd;
+        }
     }
     party_slit(party);
     party_roll(party);
@@ -538,6 +573,7 @@ void party_motion_stay(PartyEntry* party) {
     if (party->unk34 != 0) {
         if (!party->unk2F || !partyGetPtr(marioGetPartyId())) {
             if (partyChkMarioFollowY(party->playerPtr)) {
+                f32 d;
                 if (party->unk32 == 0) {
                     p = party->position;
                     d = partyGetTargetDist3D(id, &p);
@@ -1628,7 +1664,19 @@ void party_motion_behind_mario(PartyEntry* party) {
     z = target.z;
     ty = target.y;
     ang = angleABf(party->position.x, party->position.z, x, z);
-    gy = partyGetGndY(x, ty, z);
+    {
+        f32 py = ty;
+        f32 nz, ny, nx, dd, hz, hy, hx;
+        py += touch_wall_ct;
+        dd = 1000.0f;
+        hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
+        if (!hit) {
+            gy = -2000.0f;
+        } else {
+            gy = (s32)(100.0f * hy + 0.5f) / 100.0f;
+            hitGetAttr(hit);
+        }
+    }
     if (gy <= -2000.0f) {
         gy = 1.5f * mario->unk1B4;
         movePos(&x, &z, gy, toMovedir(mario->unk1A8));
@@ -1650,7 +1698,21 @@ void party_motion_behind_mario(PartyEntry* party) {
             z = party->position.z;
             movePos(&x, &z, dist, ang);
             angleABf(party->position.x, party->position.z, x, z);
-            thr = partyGetGndY(x, ty, z);
+            {
+                f32 py = ty;
+                f32 GG;
+                f32 nz, ny, nx, dd, hz, hy, hx;
+                py += touch_wall_ct;
+                dd = 1000.0f;
+                hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
+                if (!hit) {
+                    GG = -2000.0f;
+                } else {
+                    GG = (s32)(100.0f * hy + 0.5f) / 100.0f;
+                    hitGetAttr(hit);
+                }
+                thr = GG;
+            }
             if (__fabsf(party->position.y - thr) > 1.0f) {
                 party->unk94.x = x;
                 party->unk94.y = thr;
@@ -1663,7 +1725,21 @@ void party_motion_behind_mario(PartyEntry* party) {
             z = party->position.z;
             movePos(&x, &z, dist, ang);
             angleABf(party->position.x, party->position.z, x, z);
-            thr = partyGetGndY(x, ty, z);
+            {
+                f32 py = ty;
+                f32 GG;
+                f32 nz, ny, nx, dd, hz, hy, hx;
+                py += touch_wall_ct;
+                dd = 1000.0f;
+                hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dd, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
+                if (!hit) {
+                    GG = -2000.0f;
+                } else {
+                    GG = (s32)(100.0f * hy + 0.5f) / 100.0f;
+                    hitGetAttr(hit);
+                }
+                thr = GG;
+            }
             if (__fabsf(party->position.y - thr) > 1.0f) {
                 party->unk94.x = x;
                 party->unk94.y = thr;
@@ -1710,8 +1786,8 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     HitEntry* hit;
     f32 y;
     f32 gy;
-    f32 thr;
     f32 sp;
+    f32 thr;
     f32 x, z;
 
     { f32 t = partyGetFollowDir(party); t += 180.0f; party->unk54 = revise360(t); }
@@ -1749,8 +1825,20 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
     }
     movePos(&x, &z, sp, party->unk54);
     angleABf(party->position.x, party->position.z, x, z);
-    sp = partyGetGndY(x, y, z);
-    if (sp <= -2000.0f) {
+    {
+        f32 py = y;
+        f32 nz, ny, nx, dist, hz, hy, hx;
+        py += touch_wall_ct;
+        dist = 1000.0f;
+        hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, py, z, 0.0f, -1.0f, 0.0f);
+        if (!hit) {
+            gy = -2000.0f;
+        } else {
+            gy = (s32)(100.0f * hy + 0.5f) / 100.0f;
+            hitGetAttr(hit);
+        }
+    }
+    if (gy <= -2000.0f) {
         sp = 1.5f * mario->unk1B4;
         movePos(&x, &z, sp, toMovedir(mario->unk1A8));
     }
@@ -2736,8 +2824,8 @@ BOOL party_roll(PartyEntry* party) {
 
 
 
-static s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
-static f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (pm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
+static inline s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
+static inline f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (pm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
 
 
 

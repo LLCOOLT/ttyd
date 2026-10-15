@@ -47,6 +47,9 @@ static u8 geso_shibuki_dl_0_3[] = { 0x98, 0x00, 0x06, 0x0F, 0x00, 0x01, 0x0F, 0x
 static u8 geso_shibuki_dl_0_4[] = { 0x98, 0x00, 0x06, 0x10, 0x00, 0x01, 0x10, 0x11, 0x00, 0x01, 0x11, 0x0A, 0x00, 0x01, 0x08, 0x0B, 0x00, 0x01, 0x0A, 0x04, 0x00, 0x00, 0x09, 0x05, 0x00, 0x00, 0x0B, 0x00, 0x00, 0x00, 0x00, 0x00 };
 static u8* geso_shibuki_dl_0_tbl[] = { geso_shibuki_dl_0_0, geso_shibuki_dl_0_1, geso_shibuki_dl_0_2, geso_shibuki_dl_0_3, geso_shibuki_dl_0_4 };
 static u8 geso_shibuki_dl_0_size_tbl[] = { 1, 1, 1, 1, 1, 0, 0, 0 };
+#pragma force_active on
+static __declspec(section ".sdata") u32 gap_07_804161FC_sdata[1] = {0};
+#pragma force_active reset
 
 EffectEntry* effSplashEntry(s32 type, f32 x, f32 y, f32 z, f32 size) {
     EffectEntry* effect;
@@ -332,7 +335,6 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     s32 type;
     s32 n;
     CameraEntry* cam;
-    u8** dl;
     f32 a, b, c;
     f32 r0, g0, b0, r1, g1, b1;
     f32 ang, sn, cs;
@@ -340,6 +342,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
     u32 u;
 
     f32 nw;
+    u32 k2; u8* sz; u8** dl; s32 kb;
 
 
     cam = camGetPtr(cameraId);
@@ -476,14 +479,15 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
                 ang = 6.2831855f * (f32)k / 8.0f;
                 cs = (f32)cos(ang);
                 sn = (f32)sin(ang);
+                kb = k & 1;
                 GXPosition3f32(a * sn, 0.0f, a * cs);
                 GXColor4u8((u8)(255.0f * r0), (u8)(255.0f * g0), (u8)(255.0f * b0), 255);
-                GXTexCoord2f32((f32)(k & 1), 0.1f);
+                GXTexCoord2f32((f32)kb, 0.1f);
                 cs = (f32)cos(ang);
                 sn = (f32)sin(ang);
                 GXPosition3f32(b * sn, c, b * cs);
                 GXColor4u8((u8)(255.0f * r1), (u8)(255.0f * g1), (u8)(255.0f * b1), 255);
-                GXTexCoord2f32((f32)(k & 1), 2.1f);
+                GXTexCoord2f32((f32)kb, 2.1f);
             }
             break;
         case 3:
@@ -502,7 +506,7 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, geso_shibuki_texcoord0_tbl, 4);
             {
-                u32 k2; u8* sz;
+                
                 for (k2 = 0, sz = geso_shibuki_dl_0_size_tbl, dl = geso_shibuki_dl_0_tbl; k2 < 5; k2++, sz++, dl++) {
                     GXCallDisplayList(*dl, *sz << 5);
                 }
@@ -562,4 +566,4 @@ void effSplashDisp(CameraId cameraId, EffectEntry* effect) {
 }
 
 
-__declspec(section ".sdata") u32 gap_07_804161FC_sdata[1] = {0};
+

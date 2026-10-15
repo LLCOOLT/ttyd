@@ -961,3 +961,12 @@ USER_FUNC(evt_party_cloud_breathout) {
 	}
 	return EVT_RETURN_BLOCK;
 }
+
+void evtPartyStrippedPool(f32* f) {
+    f[0] = 1.0f;
+    f[1] = 0.5f;
+    f[2] = 20.0f;
+    f[3] = 0.0f;
+    f[4] = 37.0f;
+    f[5] = -1000.0f;
+}

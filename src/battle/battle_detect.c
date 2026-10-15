@@ -52,10 +52,9 @@ void _btlSamplingEnemy(DetWork* d) {
     DetTarget* t = d->t;
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
-    u8 np;
-    s32 j;
     s32 i;
-    BattleUnit* unit;
+    s32 j;
+    u8 np2;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -63,11 +62,12 @@ void _btlSamplingEnemy(DetWork* d) {
     }
     {
     for (i = 0; i < 64; i++) {
-        unit = BattleGetUnitPtr(wp, i);
+        BattleUnit* unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
-            np = unit->mKindParams->numParts;
             part = unit->mParts;
-            for (j = 0; j < np; j++) {
+            np2 = unit->mKindParams->numParts;
+            for (j = 0; j < np2; j++) {
+
                 s32 dir;
                 f32 x, y, z;
                 f32 ox, oy, oz;
@@ -331,11 +331,12 @@ void _btlSamplingEnemy(DetWork* d) {
 
     {
         for (i = 0; n > i; i++) {
+            BOOL keep;
             DetTarget* tg = &t[i];
             BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
-            BOOL keep;
             if ((d->propFlags & 0x1000000) && !(part->attributes & 0x10)) {
-                BOOL ok = TRUE;
+                BOOL ok;
+                ok = TRUE;
                 for (j = 0; j < n; j++) {
                     DetTarget* o = &t[j];
                     if (tg != o && tg->side == o->side) {

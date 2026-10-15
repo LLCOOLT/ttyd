@@ -327,6 +327,10 @@ static f32 computePos(f32 a, f32 b, f32 t) {
     return (1.0f - t) * a + t * b;
 }
 
+inline f32 jin07HermiteMul3(f32 a, f32 b, f32 c) {
+    return (a * b) * c;
+}
+
 void computePosHermite(ExtPose* pose, Teresa* ter) {
     Vec m0 = {0.0f, 0.0f, 0.0f};
     Vec m1 = {1.0f, 0.0f, 0.0f};
@@ -336,7 +340,7 @@ void computePosHermite(ExtPose* pose, Teresa* ter) {
     f32 h00, h10, h11, h01;
     u = 1.0f - t;
     t2 = 2.0f * t;
-    h00 = ((1.0f + t2) * u) * u;
+    h00 = jin07HermiteMul3(1.0f + t2, u, u);
     h10 = t * u * u;
     h11 = (t * t) * (t - 1.0f);
     h01 = (3.0f - t2) * (t * t);

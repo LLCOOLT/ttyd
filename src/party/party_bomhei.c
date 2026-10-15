@@ -19,7 +19,7 @@ extern void partyGoodbyeInit(PartyEntry* party);
 extern s32 partyGoodbyeMain(PartyEntry* party);
 extern void partyGetAppearPos(PartyEntry* party, Vec* pos);
 
-extern f32 partyToMovedir(f32 dir);
+extern f32 partyToMovedir(PartyEntry* party, f32 dir);
 extern void* mobjHitObjPtrToPtr(HitEntry* hit);
 extern u8* caseCheckHitObj2(void* hit);
 
@@ -77,7 +77,10 @@ static inline BOOL isBombRock(HitEntry* hit) {
         PF(p, 0x170, void*) = NULL;            \
     }
 
+#pragma explicit_zero_data on
 void bomhei_bye(PartyEntry* party) {
+    static const volatile u32 gap_09_8041B2C4_sdata2 = 0;
+    (void)&gap_09_8041B2C4_sdata2;
     if (party->field_8 & 8) {
         party->field_8 &= ~8;
         partyGoodbyeInit(party);
@@ -88,6 +91,7 @@ void bomhei_bye(PartyEntry* party) {
         partyChgRunMode(party, 14);
     }
 }
+#pragma explicit_zero_data reset
 
 void bomhei_init_800BFBB0(PartyEntry* party) {
     PF(party, 0x33, u8) = 3;
@@ -861,9 +865,9 @@ void partyGetReturnPos(Vec* out) {
 
 HitEntry* check_front(PartyEntry* party) {
     const s32 angles[8] = {0, 45, -45, 90, -90, 135, -135, 180};
-    f32 height;
     static const Vec down = {0.0f, -1.0f, 0.0f};
     HitCheckQuery q;
+    f32 height;
     HitEntry* hit;
     HitEntry* found = NULL;
     HitEntry* last = NULL;
@@ -873,7 +877,7 @@ HitEntry* check_front(PartyEntry* party) {
     u32 i;
 
     height = 0.8f * party->field_F0;
-    movedir = partyToMovedir(party->field_10C);
+    movedir = partyToMovedir(party, party->field_10C);
     for (i = 0; i < 8; i++) {
         sincosf(&q.targetDir.x, &q.targetDir.z, movedir + (f32)angles[i]);
         q.targetDir.y = 0.0f;

@@ -1298,30 +1298,6 @@ static inline GXColor tou_mkcolor(u8 a) {
     c.a = a;
     return c;
 }
-void monitor_tev(MapTevCallbackInfo* info) {
-    if (gans_wp->ready) {
-        GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
-        GXLoadTexObj(smartTexObj(&gans_wp->tex, &gans_wp->buf->address), GX_TEXMAP1);
-        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_TEXC, GX_CC_CPREV, GX_CC_A0, GX_CC_ZERO);
-        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
-        GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
-        {
-            GXSetTevColor(GX_TEVREG0, tou_mkcolor(gans_wp->alpha));
-        }
-        info->tevStage = 2;
-        info->texMap = 2;
-        info->texCoord = 2;
-    }
-}
 
 EVT_BEGIN(evt_tou_monitor_on)
     CALL(evt_hit_get_position, STRING("M_make"), LW(0), LW(1), LW(2))
@@ -2368,6 +2344,109 @@ EVT_BEGIN(evt_michel_7)
     RETURN
 EVT_END()
 
+USER_FUNC(make_monitor) {
+    NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
+    GansWork* wp;
+
+    if (isFirstCall) {
+        wp = _mapAlloc(sizeof(GansWork));
+        event->userdatap[0] = wp;
+        wp->onoff = 0;
+        wp->ready = 0;
+    }
+    if (npc == NULL) {
+        return EVT_RETURN_BLOCK;
+    }
+    wp = event->userdatap[0];
+    gans_wp = wp;
+    wp->buf = smartAlloc(GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB5A3, GX_FALSE, 0), 3);
+    GXInitTexObj(&wp->tex, wp->buf->address, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObjLOD(&wp->tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    if (gans_wp->onoff) {
+        gans_wp->alpha += 4;
+        if (gans_wp->alpha > 0x80) {
+            gans_wp->alpha = 0x80;
+        }
+    } else {
+        gans_wp->alpha -= 4;
+        if (gans_wp->alpha < 0) {
+            gans_wp->alpha = 0;
+        }
+    }
+    dispEntry(CAMERA_SHADOW, 0.0f, 3, gans_tex, wp);
+    return EVT_RETURN_BLOCK;
+}
+
+void monitor_tev(MapTevCallbackInfo* info) {
+    if (gans_wp->ready) {
+        GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, 60, GX_FALSE, GX_PTIDENTITY);
+        GXLoadTexObj(smartTexObj(&gans_wp->tex, &gans_wp->buf->address), GX_TEXMAP1);
+        GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD1, GX_TEXMAP1, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+        GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
+        GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+        GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_TEXC, GX_CC_CPREV, GX_CC_A0, GX_CC_ZERO);
+        GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
+        GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
+        {
+            GXSetTevColor(GX_TEVREG0, tou_mkcolor(gans_wp->alpha));
+        }
+        info->tevStage = 2;
+        info->texMap = 2;
+        info->texCoord = 2;
+    }
+}
+
+
+USER_FUNC(onoff) {
+    gans_wp->onoff = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+static USER_FUNC(getYoshiColor) {
+    s32* args = event->args;
+    evtSetValue(event, args[0], pouchGetPartyColor(4));
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(chk) {
+    s32* args = event->args;
+    evtSetValue(event, args[0], partyChkJoin(4) != 0);
+    return EVT_RETURN_DONE;
+}
+
+USER_FUNC(unk_tou_0000063c) {
+    MarioWork* mario = marioGetPtr();
+
+    if (isFirstCall) {
+        event->userdata[0] = 0;
+    }
+    if (!marioKeyOffChk() && !marioCtrlOffChk() && (mario->currMotionId == 0 || mario->currMotionId == 1 || mario->currMotionId == 2)) {
+        event->userdata[0]++;
+        if (event->userdata[0] > 240) {
+            event->userdata[0] = 240;
+            return EVT_RETURN_DONE;
+        }
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+USER_FUNC(unk_tou_000005d0) {
+    s32* args = event->args;
+
+    if (marioKeyOffChk() || marioCtrlOffChk()) {
+        evtSetValue(event, args[0], 1);
+    } else {
+        evtSetValue(event, args[0], 0);
+    }
+    return EVT_RETURN_DONE;
+}
+
 USER_FUNC(octo_stop) {
     NpcEntry* npc = npcNameToPtr_NoAssert("\203I\203N\203g\201[\203\213");
 
@@ -2388,6 +2467,92 @@ USER_FUNC(octo_start) {
     }
     return EVT_RETURN_DONE;
 }
+
+
+
+USER_FUNC(fight_money) {
+    s32* args = event->args;
+    s32 rank = evtGetValue(event, args[0]);
+    s32 win = evtGetValue(event, args[1]);
+    s32 money;
+
+    if (win) {
+        if (rank > 10) {
+            money = (s32)(0.99f + (2.0f + (21 - rank) / 2.0f));
+        } else if (rank > 0) {
+            money = (s32)(0.99f + (5.0f + (21 - rank) / 2.0f));
+        } else {
+            money = 20;
+        }
+    } else {
+        money = 1;
+    }
+    evtSetValue(event, args[2], money);
+    return EVT_RETURN_DONE;
+}
+
+static f32 camGetRy(void) {
+    CameraEntry* cam = camGetPtr(CAMERA_3D);
+    f32 ry = reviseAngle(57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
+
+    if (ry < 0.0f) {
+        ry += 360.0f;
+    }
+    return ry;
+}
+
+USER_FUNC(tou_champion_belt_27_text_34) {
+    void** new_var2;
+    EffectEntry* eff;
+    s32 idx;
+    Vec* positions;
+    NpcEntry* npc;
+    f32 angle;
+    float new_var;
+    AnimationPose* pose;
+
+    npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
+    if (isFirstCall) {
+        EffectEntry* entry = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
+        animPoseWorldPositionEvalOn(npc->poseId);
+        event->userdatap[0] = entry;
+        champion_belt_onoff = 0;
+    }
+    pose = animPoseGetAnimPosePtr(npc->poseId);
+    positions = *pose->worldPositions;
+    idx = animPoseGetGroupIdx(npc->poseId, "locator8");
+    angle = reviseAngle(camGetRy() - pose->rotationY);
+    eff = event->userdatap[0];
+    new_var2 = &eff->userdata;
+    new_var = -90.0f;
+    ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
+    ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
+    ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
+    if ((angle > 90.0f && angle <= 270.0f) || (angle < new_var && angle >= -270.0f)) {
+        ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
+    } else {
+        ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
+    }
+    if (npc->position.y <= -1000.0f) {
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
+    }
+    if (champion_belt_onoff) {
+        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
+        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
+        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
+    }
+    return EVT_RETURN_BLOCK;
+}
+
+static USER_FUNC(tou_champion_belt_onoff) {
+    champion_belt_onoff = evtGetValue(event, event->args[0]);
+    return EVT_RETURN_DONE;
+}
+
+
+
 
 EVT_BEGIN(evt_michel_8)
     CALL(evt_npc_set_position, STRING("オクトール"), 145, 0, 50)
@@ -3447,168 +3612,3 @@ EVT_BEGIN(evt_tou_match_after_default)
     CALL(evt_mario_key_onoff, 1)
     RETURN
 EVT_END()
-
-
-
-
-USER_FUNC(make_monitor) {
-    NpcEntry* npc = npcNameToPtr_NoAssert(evtGetValue(NULL, GSW(0)) < 0xAC ? "\203K\203\223\203X" : "\203L\203m\203V\203R\203\217");
-    GansWork* wp;
-
-    if (isFirstCall) {
-        wp = _mapAlloc(sizeof(GansWork));
-        event->userdatap[0] = wp;
-        wp->onoff = 0;
-        wp->ready = 0;
-    }
-    if (npc == NULL) {
-        return EVT_RETURN_BLOCK;
-    }
-    wp = event->userdatap[0];
-    gans_wp = wp;
-    wp->buf = smartAlloc(GXGetTexBufferSize(0x80, 0x80, GX_TF_RGB5A3, GX_FALSE, 0), 3);
-    GXInitTexObj(&wp->tex, wp->buf->address, 0x80, 0x80, GX_TF_RGB5A3, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&wp->tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    if (gans_wp->onoff) {
-        gans_wp->alpha += 4;
-        if (gans_wp->alpha > 0x80) {
-            gans_wp->alpha = 0x80;
-        }
-    } else {
-        gans_wp->alpha -= 4;
-        if (gans_wp->alpha < 0) {
-            gans_wp->alpha = 0;
-        }
-    }
-    dispEntry(CAMERA_SHADOW, 0.0f, 3, gans_tex, wp);
-    return EVT_RETURN_BLOCK;
-}
-
-
-USER_FUNC(onoff) {
-    gans_wp->onoff = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-
-static USER_FUNC(getYoshiColor) {
-    s32* args = event->args;
-    evtSetValue(event, args[0], pouchGetPartyColor(4));
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(chk) {
-    s32* args = event->args;
-    evtSetValue(event, args[0], partyChkJoin(4) != 0);
-    return EVT_RETURN_DONE;
-}
-
-USER_FUNC(unk_tou_0000063c) {
-    MarioWork* mario = marioGetPtr();
-
-    if (isFirstCall) {
-        event->userdata[0] = 0;
-    }
-    if (!marioKeyOffChk() && !marioCtrlOffChk() && (mario->currMotionId == 0 || mario->currMotionId == 1 || mario->currMotionId == 2)) {
-        event->userdata[0]++;
-        if (event->userdata[0] > 240) {
-            event->userdata[0] = 240;
-            return EVT_RETURN_DONE;
-        }
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-USER_FUNC(unk_tou_000005d0) {
-    s32* args = event->args;
-
-    if (marioKeyOffChk() || marioCtrlOffChk()) {
-        evtSetValue(event, args[0], 1);
-    } else {
-        evtSetValue(event, args[0], 0);
-    }
-    return EVT_RETURN_DONE;
-}
-
-
-
-USER_FUNC(fight_money) {
-    s32* args = event->args;
-    s32 rank = evtGetValue(event, args[0]);
-    s32 win = evtGetValue(event, args[1]);
-    s32 money;
-
-    if (win) {
-        if (rank > 10) {
-            money = (s32)(0.99f + (2.0f + (21 - rank) / 2.0f));
-        } else if (rank > 0) {
-            money = (s32)(0.99f + (5.0f + (21 - rank) / 2.0f));
-        } else {
-            money = 20;
-        }
-    } else {
-        money = 1;
-    }
-    evtSetValue(event, args[2], money);
-    return EVT_RETURN_DONE;
-}
-
-static f32 camGetRy(void) {
-    CameraEntry* cam = camGetPtr(CAMERA_3D);
-    f32 ry = reviseAngle(57.29579f * (f32)atan2(-(cam->cameraAt.x - cam->cameraPos.x), -(cam->cameraAt.z - cam->cameraPos.z)));
-
-    if (ry < 0.0f) {
-        ry += 360.0f;
-    }
-    return ry;
-}
-
-USER_FUNC(tou_champion_belt_27_text_34) {
-    void** new_var2;
-    EffectEntry* eff;
-    s32 idx;
-    Vec* positions;
-    NpcEntry* npc;
-    f32 angle;
-    float new_var;
-    AnimationPose* pose;
-
-    npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
-    if (isFirstCall) {
-        EffectEntry* entry = effStarStoneEntry(9, 0.0f, 0.0f, 0.0f, 0.6f);
-        animPoseWorldPositionEvalOn(npc->poseId);
-        event->userdatap[0] = entry;
-        champion_belt_onoff = 0;
-    }
-    pose = animPoseGetAnimPosePtr(npc->poseId);
-    positions = *pose->worldPositions;
-    idx = animPoseGetGroupIdx(npc->poseId, "locator8");
-    angle = reviseAngle(camGetRy() - pose->rotationY);
-    eff = event->userdatap[0];
-    new_var2 = &eff->userdata;
-    new_var = -90.0f;
-    ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
-    ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
-    ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
-    if ((angle > 90.0f && angle <= 270.0f) || (angle < new_var && angle >= -270.0f)) {
-        ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
-    } else {
-        ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;
-    }
-    if (npc->position.y <= -1000.0f) {
-        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
-        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
-        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
-    }
-    if (champion_belt_onoff) {
-        ((StarStoneWork*)(*new_var2))->pos.x = 0.0f;
-        ((StarStoneWork*)(*new_var2))->pos.y = -1000.0f;
-        ((StarStoneWork*)(*new_var2))->pos.z = 0.0f;
-    }
-    return EVT_RETURN_BLOCK;
-}
-
-static USER_FUNC(tou_champion_belt_onoff) {
-    champion_belt_onoff = evtGetValue(event, event->args[0]);
-    return EVT_RETURN_DONE;
-}
-

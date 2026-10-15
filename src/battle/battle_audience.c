@@ -302,7 +302,7 @@ BattleAudienceSound* BattleAudienceSoundGetPtr(s32 id) {
 void BattleAudience_Init(void) {
 	BattleAudience* audience;
 	BattleAudienceWindow* window;
-	int i, j, index;
+	int i; int j;
 	u8 status;
 
 	audience = BattleAudienceBaseGetPtr();
@@ -324,7 +324,7 @@ void BattleAudience_Init(void) {
 
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
-			index = (i * 20) + j + 10;
+			int index = (i * 20) + j + 10;
 			if (AUD_U8CALL(BattleAudience_GetExist, index) == (1 & 0xFFFF)) {
 				status = BattleAudienceGetPtr(index)->status;
 				if (status != 12 && status != 11) { //TODO: add status enum
@@ -336,7 +336,7 @@ void BattleAudience_Init(void) {
 
 	for (j = 0; j < 10; j++) {
 		for (i = 0; i < 10; i++) {
-			int index = (j * 20) + i;
+			int index = j * 20 + i;
 			if (AUD_U8CALL(BattleAudience_GetExist, index) == TRUE) {
 				status = BattleAudienceGetPtr(index)->status;
 				if (status != 12 && status != 11) { //TODO: add status enum
@@ -979,7 +979,7 @@ extern void* memcpy(void*, const void*, unsigned long);
 
 void BattleAudienceSettingAudience(void) {
 	s32 hasKind = 0;
-	s32 total, target, used, sum, lim;
+	s32 target, used, sum, lim;
 	s32 ar;
 	s32 kind;
 	s32 n;
@@ -1055,12 +1055,12 @@ void BattleAudienceSettingAudience(void) {
 		break;
 	default:
 		w = R_num_audience_type_weights;
-		total = 0;
+		sum = 0;
 		target = irand(100);
 		kind = 12;
 		for (i = 1; i < 12; i++) {
-			total += w.v[i - 1];
-			if (target < total) {
+			sum += w.v[i - 1];
+			if (target < sum) {
 				kind = i;
 				break;
 			}
@@ -1079,7 +1079,7 @@ void BattleAudienceSettingAudience(void) {
 			if (k >= kind) {
 				weights[id] = 0;
 			} else if (rec[id + 4] != 0) {
-				weights[id] = (irand(10) + 1) * (s8)rec[id + 4];
+				weights[id] = (s8)rec[id + 4] * (irand(10) + 1);
 				if (((u8*)audience_kind)[id * 32] & 1) {
 					weights[id] *= 2;
 				}
@@ -1188,7 +1188,7 @@ void BattleAudienceSettingAudience(void) {
 	default: {
 		n = 0;
 		for (i = 0; i <= 12; i++) {
-			for (j = 0; j < counts[i]; j++) {
+				for (j = 0; j < counts[i]; j++) {
 				list[n++] = i;
 			}
 		}
@@ -1582,7 +1582,7 @@ void BattleAudienceItemCtrlProcess(void) {
 				Vec v = {0.0f, 0.0f, 0.0f};
 				v.x = *(f32*)(aud + 0xc0) + *(f32*)(kd + 0xc);
 				ox = intplGetValue(0, k, 5, -10.0f, 0.0f);
-				v.y = (*(f32*)(aud + 0xc4) + *(f32*)(kd + 0x10)) + ox;
+				{ f32 t = *(f32*)(aud + 0xc4) + *(f32*)(kd + 0x10); v.y = t + ox; }
 				v.z = 1.0f + *(f32*)(aud + 0xc8);
 				it->pos = v;
 				}

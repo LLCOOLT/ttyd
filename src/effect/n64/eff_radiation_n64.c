@@ -65,13 +65,14 @@ s32 r_data[] = {
     0x00000124, 0xFFFFFFFF, 0x00000009, 0xFFFFFFF6, 0x00000014, 0x00000151, 0x00000001, 0x00000001,
 };
 
-u32 size300x40_tex32x32[] = {
+__declspec(section ".sdata") u32 size300x40_tex32x32[] = {
     0x00000000, 0x00000010, 0x0000FFFF, 0xFFFF012C, 0x00140000, 0x00000400,
     0xEBFFF500, 0x012CFFEC, 0x00000400, 0x0400EBFF, 0xF5000000,
 };
 
+
 #pragma force_active on
-__declspec(section ".sdata") u8 gap_07_80413CCC_sdata[4] = {0};
+__declspec(section ".sdata") u32 gap_07_80413CCC_sdata[1] = {0};
 #pragma force_active reset
 
 EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
@@ -157,7 +158,8 @@ EffectEntry* effRadiationN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
             p->scrollVel3 = 0.6f;
             p->rotVelX = 0.0f;
             p->rotVelY = 0.0f;
-            p->rotVelZ = 0.1f * (f32)r_data[k];
+            k++;
+            p->rotVelZ = 0.1f * (f32)r_data[k++];
             p->delay = 0;
         }
         break;
@@ -292,7 +294,8 @@ void effRadiationMain(EffectEntry* effect) {
                 p->scrollVel3 = 0.6f;
                 p->rotVelX = 0.0f;
                 p->rotVelY = 0.0f;
-                p->rotVelZ = 0.1f * (f32)r_data[k];
+                k++;
+                p->rotVelZ = 0.1f * (f32)r_data[k++];
                 p->delay = 0;
             }
             if (p->delay <= 0 || (--p->delay, p->delay <= 0)) {

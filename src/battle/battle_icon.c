@@ -243,3 +243,9 @@ USER_FUNC(btlevtcmd_BtlIconJumpPosition) {
 	}
 	return 0;
 }
+
+void btlIconStrippedPool(f32* f) {
+    f[0] = 0.0f;
+    f[1] = 1.0f;
+    f[2] = 0.5f;
+}

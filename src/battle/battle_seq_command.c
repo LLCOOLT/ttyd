@@ -1109,14 +1109,16 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd);
 #define CMDX_S32(off) CMD_S32(cmd, off)
 
 #pragma dont_inline on
-s32 BattleCommandInput(BattleWork* wp) {
+s32 BattleCommandInput(BattleWork* work) {
 	const char* sfxA;
 	const char* sfxB;
 	BattleUnit* unit;
 	BattleCommand* cmd;
 	s32 loop;
 	s32 type;
+	s32 wtype;
 	BattleWorkWeaponTargets* targets;
+	BattleWork* wp;
 	s16 unitIdx;
 	s16 partIdx;
 	s32 state;
@@ -1124,7 +1126,8 @@ s32 BattleCommandInput(BattleWork* wp) {
 	s32 i;
 	BattleWorkTarget* t;
 
-	unit = BattleGetUnitPtr(wp, wp->activeUnitId);
+	wp = (BattleWork*)(u32)work;
+	unit = BattleGetUnitPtr(work, work->activeUnitId);
 	cmd = &wp->commandMenu;
 	if (cmd == NULL) {
 		return 1;
@@ -1135,11 +1138,11 @@ s32 BattleCommandInput(BattleWork* wp) {
 		BattleAcHelpSetDispType(0);
 	}
 	_commandRestoreRec();
+	sfxA = (0, "SFX_BTL_CURSOR_MOVE2");
 	loop = 1;
-	sfxB = "SFX_BTL_CURSOR_MOVE1";
-	sfxA = sfxB;
 	while (loop) {
 		loop = 0;
+		sfxB = sfxA;
 	again:
 		switch (state = cmd->unk0) {
 		case 0:
@@ -1245,12 +1248,12 @@ s32 BattleCommandInput(BattleWork* wp) {
 			cmd->unk0 = 11;
 			break;
 		case 11:
-			type = CMDX_S32(0x540);
+			wtype = CMDX_S32(0x540);
 			targets = &wp->weaponTargets;
-			_btlcmd_GetCursorPtr(cmd, type, &cursor);
+			_btlcmd_GetCursorPtr(cmd, wtype, &cursor);
 			t = &targets->targets[targets->targetIndices[targets->currentTarget]];
-			unitIdx = t->unitIdx;
-			partIdx = t->partIdx;
+			unitIdx = (0, t->unitIdx);
+			partIdx = (0, t->partIdx);
 			BattleSamplingEnemyUpdate(targets);
 			for (i = 0; i < targets->numTargets; i++) {
 				t = &targets->targets[targets->targetIndices[i]];
@@ -1269,7 +1272,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = 0;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxB);
+						psndSFXOn(sfxA);
 					}
 				}
 				if (PADREP(0x40000)) {
@@ -1278,7 +1281,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 						targets->currentTarget = targets->numTargets - 1;
 					}
 					if (targets->numTargets >= 2) {
-						psndSFXOn(sfxA);
+						psndSFXOn(sfxB);
 					}
 				}
 			}
@@ -1302,7 +1305,7 @@ s32 BattleCommandInput(BattleWork* wp) {
 				cmd->unk0 = 0x1d;
 				BattleCommandDisplay_TargetSelectMenuEnd(wp);
 				CMD_S32(wp, 0xef4) |= 4;
-				if (type == 2 && (s8)CMD_U8(unit, 0x20) == 0) {
+				if (wtype == 2 && (s8)CMD_U8(unit, 0x20) == 0) {
 					switch (CMD_U8(cmd, 0x550)) {
 					case 2:
 						CMD_U8(unit, 0x20) = 8;
@@ -2653,6 +2656,37 @@ void BattleAcHelpSetDispType(s32 type);
 s32 irand(s32 scalar);
 #define WPN_U32(w, o) (*(u32*)((u8*)(w) + (o)))
 
+#define TEXPLANE ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)
+#pragma dont_inline on
+void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color) {
+	CameraEntry* cam = camGetPtr(CAMERA_2D);
+	f32 x, y;
+
+	btlDispGXInit2DRasta();
+	GXLoadPosMtxImm(cam->view, 0);
+	pos.x -= 10.0f;
+	TEXPLANE(10, color, 0, 19.0f + pos.x, pos.y - 3.0f, 0.0f, 1.0f, 1.0f);
+	switch (*(u16*)&unit->hpGauge) {
+	case 1:
+		if (unit->hpGauge.field_0x4 > 0) {
+			btlDispGXInit2DRasta();
+			GXLoadPosMtxImm(cam->view, 0);
+			y = 2.0f + pos.y;
+			x = 1.0f + pos.x;
+			btlDispGXQuads2DRasta(x, y, x + 34.0f * unit->hpGauge.field_0x18, y - 8.0f, 0, 0, 0, color.a);
+			btlDispGXInit2DRasta();
+			GXLoadPosMtxImm(cam->view, 0);
+		}
+		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - unit->hpGauge.field_0x14), pos.y - 3.0f, 0.0f, unit->hpGauge.field_0x14, 1.0f);
+		break;
+	default:
+		x = unit->hpGauge.field_0x14;
+		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - x), pos.y - 3.0f, 0.0f, x, 1.0f);
+		break;
+	}
+}
+#pragma dont_inline reset
+
 void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 	BattleCommand* cmd = &wp->commandMenu;
 	BattleCursor* cursor;
@@ -2834,36 +2868,6 @@ void _commandRestoreRec(void) {
 }
 #pragma dont_inline reset
 
-#define TEXPLANE ((void (*)(u32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)
-#pragma dont_inline on
-void BattleDrawEnemyHPBar(Vec pos, BattleUnit* unit, GXColor color) {
-	CameraEntry* cam = camGetPtr(CAMERA_2D);
-	f32 x, y;
-
-	btlDispGXInit2DRasta();
-	GXLoadPosMtxImm(cam->view, 0);
-	pos.x -= 10.0f;
-	TEXPLANE(10, color, 0, 19.0f + pos.x, pos.y - 3.0f, 0.0f, 1.0f, 1.0f);
-	switch (*(u16*)&unit->hpGauge) {
-	case 1:
-		if (unit->hpGauge.field_0x4 > 0) {
-			btlDispGXInit2DRasta();
-			GXLoadPosMtxImm(cam->view, 0);
-			y = 2.0f + pos.y;
-			x = 1.0f + pos.x;
-			btlDispGXQuads2DRasta(x, y, x + 34.0f * unit->hpGauge.field_0x18, y - 8.0f, 0, 0, 0, color.a);
-			btlDispGXInit2DRasta();
-			GXLoadPosMtxImm(cam->view, 0);
-		}
-		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - unit->hpGauge.field_0x14), pos.y - 3.0f, 0.0f, unit->hpGauge.field_0x14, 1.0f);
-		break;
-	default:
-		x = unit->hpGauge.field_0x14;
-		TEXPLANE(11, color, 0, 19.0f + pos.x - 20.0f * (1.0f - x), pos.y - 3.0f, 0.0f, x, 1.0f);
-		break;
-	}
-}
-#pragma dont_inline reset
 
 #pragma dont_inline on
 BOOL BattleCommandAttackAudienceCheck(void) {
@@ -2940,3 +2944,5 @@ s32 _check_weapon_type_attack(BattleWeapon* weapon) {
 	if (WS8(weapon, 0xa2) > 0 && WS8(weapon, 0xa3) > 0) return 1;
 	return 0;
 }
+
+__declspec(section ".sdata") u32 gap_07_8041102C_sdata[1] = {0};

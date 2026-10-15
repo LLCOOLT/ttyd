@@ -255,13 +255,13 @@ void acrobatMain(EffectEntry* effect) {
 	pos = tmp;
 	wp++;
 	for (i = 1; i < effect->count; i++, wp++) {
-		const char* sfx = "SFX_SYSTEM_ACROBAT1";
+		const char* sfx2 = "SFX_SYSTEM_ACROBAT1";
 		switch (wp->field_0x28) {
 		case 0:
 			wp->field_0x20 = i * 4;
 			wp->field_0x28++;
 			if (i == 1) {
-				psndSFXOn(sfx);
+				psndSFXOn(sfx2);
 			}
 			break;
 		case 1:
@@ -297,7 +297,7 @@ void acrobatMain(EffectEntry* effect) {
 			break;
 		case 5:
 			wp->field_0x20++;
-			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i * 4, i * 12);
+			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i * 4, i * 3 * 4);
 			wp->field_0x10 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.2f, 1.0f, wp->field_0x20, 30);
 			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.5f, 1.0f, wp->field_0x20, 30);
 			if (wp->field_0x20 >= 30) {

@@ -289,7 +289,6 @@ void DrawMainIconHukidasi(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, f32
 
 void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v, f32 s) {
     GXColor tev;
-    GXColor col;
     Mtx rot;
     Mtx scl;
     Mtx trn;
@@ -361,17 +360,17 @@ void DrawMainIconCircle(BattleSubMenu* menu, BattleCommandAct* act, Mtx m, Vec v
         icon = 0x18B;
     }
     if (act->enabled == 1) {
-        col = (GXColor){0x00, 0x00, 0x00, 0xFF};
-        col.r = c;
-        col.g = c;
-        col.b = c;
-        iconDispGxCol(out, 0x10, icon, col);
+        iconDispGxCol(out, 0x10, icon, (GXColor){c, c, c, 0xFF});
+
+
+
+
     } else {
-        col = (GXColor){0x00, 0x00, 0x00, 0xFF};
-        col.r = c;
-        col.g = c;
-        col.b = c;
-        iconDispGxCol(out, 0x30, icon, col);
+        iconDispGxCol(out, 0x30, icon, (GXColor){c, c, c, 0xFF});
+
+
+
+
     }
 }
 
@@ -813,6 +812,8 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
     BattleCursor* cursor = menu->cursor;
     f32 bob;
     s32 n;
+    f32 ax = 155.0f;
+    f32 ay = 15.0f;
 
     bob = intplGetValue(4, menu->field_11C, 6, 0.0f, 10.0f);
     menu->field_11C++;
@@ -820,10 +821,11 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-        pos.y = 15.0f + v->y;
+        pos.y = ay + v->y;
         pos.z = 0.0f;
-        pos.x = 155.0f + v->x;
+        pos.x = ax + v->x;
         pos.y = pos.y + bob;
+
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
@@ -1280,7 +1282,8 @@ void DrawMainMenu(BattleWork* wp_) {
                     menu->field_84[i] = cursor->unk8 - 1;
                 }
             }
-        } else if (diff == -1 || menu->cursor->unk8 - 1 == diff) {
+        } else if (diff == -1 || mc->unk8 - 1 == diff) {
+
             menu->field_C = 2;
             menu->field_14 = 0;
             menu->field_18 = menu->cursor->field_0;
@@ -1324,8 +1327,8 @@ void DrawMainMenu(BattleWork* wp_) {
             break;
         case 1:
             menu->field_20[i] |= 1;
-            a = 0.0f;
-            a += 0.2f * menu->field_48[i];
+            c = 0.0f;
+            a = c + 0.2f * menu->field_48[i];
             b = 3.1415927f * kakutable[cursor->unk8 - 3][menu->field_84[i]] / 180.0f;
             if (a >= b) {
                 a = b;
@@ -1513,10 +1516,10 @@ void DrawWeaponWin(void) {
     s32 i;
     s32 idx;
 
-    menu = WP_SUBMENU(wp);
+    cmd = &wp->commandMenu;
+    menu = *(BattleSubMenu**)&cmd->field_55C;
     cursor = menu->cursor;
     unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-    cmd = &wp->commandMenu;
     weapon = menu->weapons[cursor->field_0].weapon;
     DrawSubMenuCommonProcess(&x, &y, bufF4, bufB8, bufA4, buf1E4);
     for (i = 0; i < 7; i++) {

@@ -16,9 +16,9 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
-static s32 gsNextID;
-static GSROOT* gsCurrent;
 static GSROOT* gsRoot;
+static GSROOT* gsCurrent;
+static s32 gsNextID;
 static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
@@ -323,8 +323,7 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   MUSY_ASSERT_MSG(sndActive != FALSE, "Sound system is not initialized.");
 
   for (root = gsRoot; root != NULL; root = root->next) {
-    i = 0;
-    for (; i < root->sp; i++) {
+    for (i = 0; i < root->sp; ++i) {
     if (root->stack[i].gAddr->id != sgid) {
       continue;
     }
@@ -360,22 +359,25 @@ u32 seqPlaySong(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 irq_cal
   }
 
   MUSY_DEBUG("Group ID=%d is not on soundstack.", sgid);
-  return 0xffffffff;
+  seqId = 0xffffffff;
+done:
+  return seqId;
 }
 
 u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio) {
-  void* prj;
-  u32 seqId;
   int i;
-  GSROOT* root;
+  u32 seqId;
+  GROUP_DATA* g;
   MIDISETUP* midiSetup;
   PAGE* drum;
   PAGE* norm;
-  GROUP_DATA* g;
+  GSROOT* root;
+  void* prj;
   for (root = gsRoot; root != NULL; root = root->next) {
-    i = 0;
-    for (; i < root->sp; i++) {
-      if (root->stack[i].gAddr->id != sgid) continue;
+    for (i = 0; i < root->sp; ++i) {
+      if (root->stack[i].gAddr->id != sgid) {
+        continue;
+      }
       if (root->stack[i].gAddr->type == 0) {
         g = root->stack[i].gAddr;
         prj = root->stack[i].prjAddr;
@@ -391,13 +393,12 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
           }
           ++midiSetup;
         }
-        { seqId = 0xffffffff; goto done; }
+        seqId = 0xffffffff; goto done;
       } else {
-        { seqId = 0xffffffff; goto done; }
+        seqId = 0xffffffff; goto done;
       }
     }
   }
-  { seqId = 0xffffffff; goto done; }
   seqId = 0xffffffff;
 done:
   return seqId;

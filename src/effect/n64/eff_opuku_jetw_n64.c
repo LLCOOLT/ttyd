@@ -157,7 +157,9 @@ effN64Vtx size6x22_tex32x32_vtx[] = {
 
 
 static s32 dat_ry[] = {0, 40, 55, 190, 20, 130, 270, 300};
+#pragma force_active on
 __declspec(section ".data") u32 gap_05_803A382C_data[1] = {0};
+#pragma force_active reset
 
 
 void effOpukuJetwMain(EffectEntry* effect);
@@ -238,11 +240,11 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     s32 frame, alpha, r, g, b;
     s32 n, m;
     JetwEnt* tbl;
-    s32 half;
-    s32 cur;
+    s32 idx;
     s32 f5;
     JetwEnt* e;
-    s32 idx;
+    s32 cur;
+    s32 half;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;

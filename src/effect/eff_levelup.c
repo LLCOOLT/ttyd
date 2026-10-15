@@ -145,8 +145,11 @@ void effLevelupMain(EffectEntry* effect) {
 }
 
 void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
-    EffLevelupWork* work = effect->userdata;
+    s32 ofs;
+    s32 tofs;
+    s32 xofs;
     EffLevelupWork* w;
+    EffLevelupWork* work = effect->userdata;
     CameraEntry* cam;
     Mtx m0;
     Mtx rot;
@@ -181,19 +184,19 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    for (j = 1; j >= 0; j--) {
-        for (i = effect->count - 1; i >= 1; i--) {
+    for (j = 1, xofs = 4; j >= 0; j--, xofs -= 4) {
+        for (i = effect->count - 1, ofs = i * 0x24, tofs = i * 4; i >= 1; i--, ofs -= 0x24, tofs -= 4) {
             w = effect->userdata;
-            w = &w[i];
-            dx = j * 4;
+            (u8*)w += ofs;
+            dx = xofs;
             dy = -j * 4;
             if (j != 0) {
-                effGetTexObj(texid_tbl[gp->language != 0][i + 2], &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs + 8), &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0, 0, 0, 0x80 };
                 GXSetChanMatColor(GX_COLOR0A0, color);
             } else {
-                effGetTexObj(texid_tbl[gp->language != 0][i - 1], &texObj);
+                effGetTexObj(*(s32*)((u8*)texid_tbl[gp->language != 0] + tofs - 4), &texObj);
                 GXLoadTexObj(&texObj, GX_TEXMAP0);
                 color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
                 GXSetChanMatColor(GX_COLOR0A0, color);
@@ -207,7 +210,8 @@ void effLevelupDisp(CameraId cameraId, EffectEntry* effect) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             {
                 s32 arr[2][4] = { { 0, 128, 120, 24 }, { 0, 176, 68, 24 } };
-                f32 width = arr[gp->language != 0][i];
+                f32 width = *(s32*)((u8*)arr[gp->language != 0] + tofs);
+
                 f32 half = width * halfScale;
                 f32 negHalf = -width * halfScale;
                 GXPosition3f32(negHalf, height, 0.0f);

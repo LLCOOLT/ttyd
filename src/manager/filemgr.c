@@ -57,7 +57,8 @@ typedef struct Anim40 {
 } Anim40;
 
 void fileGarbageDataAdrClear(FileEntry* entry) {
-	u32 i;
+	u16 i;
+	u32 off;
 	TEXPalette* tpl;
 	s32 j, n;
 	Anim40* e;
@@ -118,22 +119,25 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 				OSPanic("filemgr.c", 147, "invalid version number for texture palette\0");
 			}
 			if ((u32)tpl->descriptorArray >= (u32)tpl) {
-								for (i = 0; i < tpl->numDescriptors; ++i) {
-					img = tpl->descriptorArray[i].textureHeader;
+				for (i = 0; (u16)i < tpl->numDescriptors; i++) {
+					off = i * 8;
+					img = *(TEXHeader**)((u8*)tpl->descriptorArray + off);
 					if (img) {
 						if (img->unpacked) {
 							img->unpacked = FALSE;
-							*(u32*)&tpl->descriptorArray[i].textureHeader->data -= (u32)tpl;
+							img = *(TEXHeader**)((u8*)tpl->descriptorArray + off);
+							img->data -= (u32)tpl;
 						}
-						*(u32*)&tpl->descriptorArray[i].textureHeader -= (u32)tpl;
+						*(u32*)((u8*)tpl->descriptorArray + off) -= (u32)tpl;
 					}
-					pal = tpl->descriptorArray[i].CLUTHeader;
+					pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4);
 					if (pal) {
 						if (pal->unpacked) {
 							pal->unpacked = FALSE;
-							*(u32*)&tpl->descriptorArray[i].CLUTHeader->data -= (u32)tpl;
+							pal = *(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4);
+							pal->data -= (u32)tpl;
 						}
-						*(u32*)&tpl->descriptorArray[i].CLUTHeader -= (u32)tpl;
+						*(u32*)((u8*)tpl->descriptorArray + off + 4) -= (u32)tpl;
 					}
 				}
 				*(u32*)&tpl->descriptorArray -= (u32)tpl;
@@ -243,13 +247,12 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
-	u16 i;
-	TEXPalette* tpl;
+	u8* q;
+	s32 j, n;
 	TEXHeader* img;
 	CLUTHeader* pal;
-	s32 j;
-	u8* q;
-	s32 n;
+	TEXHeader* img2;
+	CLUTHeader* pal2;
 	switch (type) {
 		case 1:
 			if (FLD(data, 0x14c) < (u32)data) {
@@ -297,33 +300,39 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 				FLD(data, 0x48) += (u32)data;
 			}
 			break;
-		case 4:
-			tpl = data;
-			if (tpl->versionNumber != 0x0020AF30) {
+case 4:
+{
+TEXPalette* tpl = data;
+if (tpl->versionNumber != 0x0020AF30) {
 				OSPanic("filemgr.c", 106, "invalid version number for texture palette\0");
-			}
-			if ((u32)tpl->descriptorArray < (u32)tpl) {
-				*(u32*)&tpl->descriptorArray += (u32)tpl;
-								for (i = 0; i < tpl->numDescriptors; ++i) {
-					img = tpl->descriptorArray[i].textureHeader;
-					if (img) {
-						tpl->descriptorArray[i].textureHeader = (TEXHeader*)((u32)tpl + (u32)img);
-						if (!tpl->descriptorArray[i].textureHeader->unpacked) {
-							tpl->descriptorArray[i].textureHeader->data = (char*)((u32)tpl + (u32)tpl->descriptorArray[i].textureHeader->data);
-							tpl->descriptorArray[i].textureHeader->unpacked = TRUE;
-						}
-					}
-					pal = tpl->descriptorArray[i].CLUTHeader;
-					if (pal) {
-						tpl->descriptorArray[i].CLUTHeader = (CLUTHeader*)((u32)tpl + (u32)pal);
-						if (!tpl->descriptorArray[i].CLUTHeader->unpacked) {
-							tpl->descriptorArray[i].CLUTHeader->data = (char*)((u32)tpl + (u32)tpl->descriptorArray[i].CLUTHeader->data);
-							tpl->descriptorArray[i].CLUTHeader->unpacked = TRUE;
-						}
-					}
-				}
-			}
-			break;
+}
+if ((u32)tpl->descriptorArray < (u32)tpl) {
+u16 i;
+*(u32*)&tpl->descriptorArray += (u32)tpl;
+for (i = 0; (u16)i < tpl->numDescriptors; i++) {
+u32 off = i * 8;
+img = (*(TEXHeader**)((u8*)tpl->descriptorArray + off));
+if (img) {
+(*(TEXHeader**)((u8*)tpl->descriptorArray + off)) = (TEXHeader*)((u32)tpl + (u32)img);
+img2 = (*(TEXHeader**)((u8*)tpl->descriptorArray + off));
+if (!img2->unpacked) {
+img2->data = (char*)((u32)tpl + (u32)img2->data);
+(*(TEXHeader**)((u8*)tpl->descriptorArray + off))->unpacked = TRUE;
+}
+}
+pal = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4));
+if (pal) {
+(*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4)) = (CLUTHeader*)((u32)tpl + (u32)pal);
+pal2 = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4));
+if (!pal2->unpacked) {
+pal2->data = (char*)((u32)tpl + (u32)pal2->data);
+(*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4))->unpacked = TRUE;
+}
+}
+}
+}
+}
+break;
 		case 5:
 			if (FLD(data, 0x14c) < (u32)data) {
 				FLD(data, 0x14c) += (u32)data;

@@ -23,6 +23,8 @@
 #include "string.h"
 #include "stdio.h"
 
+#pragma force_active on
+
 typedef struct RankEntry {
     u16 flags;
     // pad 2 bytes
@@ -1248,3 +1250,5 @@ void _prolog(void) {
     relSetBtlAddr("tou", btlsetup_tou_tbl, btl_tou_setup_no_tbl);
     rankingInit();
 }
+
+#pragma force_active reset

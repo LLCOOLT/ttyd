@@ -151,12 +151,12 @@ void statusWinReInit(void) {
 
 void statusWinMain(void) {
     MarioWork* mario;
-    f32 t;
-    f32 one;
     f32 inv;
+    f32 one;
+    f32 t;
+
 
     one = 1.0f;
-
     mario = marioGetPtr();
     if (mario->characterId) {
         wp->flags = 2;
@@ -254,7 +254,7 @@ void statusWinMain(void) {
         }
     } else {
         inv = (f32)cos(3.1415927f * wp->timer / wp->duration);
-        wp->t = wp->tStart + (wp->tEnd - (0, wp)->tStart) * (one - inv) / 2.0f;
+        wp->t = wp->tStart + (wp->tEnd - wp->tStart) * (one - inv) / 2.0f;
     }
     t = wp->t;
     inv = 1.0f - t;
@@ -266,13 +266,15 @@ void statusWinMain(void) {
     }
 }
 
+// iconDispGx's original prototype takes the scale first (f1 either way); calling it in that
+// order gives the target's argument evaluation order.
+#define iconDispGxScaleFirst ((void (*)(f32, Vec*, s16, u16))iconDispGx)
+
 void gaugeDisp(s32 sp, f32 x, f32 y) {
     s32 i;
     s32 max;
     s32 full;
     s32 part;
-    Vec pos;
-    Vec pos2;
 
     max = 0;
     for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
@@ -293,24 +295,26 @@ void gaugeDisp(s32 sp, f32 x, f32 y) {
         part = 1;
     }
     if (part) {
+        Vec pos;
         pos.x = x + (f32)(full * 32);
         pos.y = y;
         pos.z = 0.0f;
-        iconDispGx(&pos, 0x10, gauge_wakka[part], 1.0f);
+        iconDispGxScaleFirst(1.0f, &pos, 0x10, gauge_wakka[part]);
     }
-    y = 12.0f + y;
     for (i = 0; i < sizeof(gauge_back) / sizeof(gauge_back[0]); i++) {
+        Vec pos2;
         if (!(*(u16*)&pouchGetPtr()->mStarPowersObtained & (1 << i))) {
             break;
         }
         pos2.x = x + (f32)(i * 32);
-        pos2.y = y;
+        pos2.y = 12.0f + y;
         pos2.z = 0.0f;
-        iconDispGx(&pos2, 0x10, i < full ? gauge_back[i] : 0x1BF, 1.0f);
+        iconDispGxScaleFirst(1.0f, &pos2, 0x10, i < full ? gauge_back[i] : 0x1BF);
     }
 }
 
-static inline void numDisp(f32 x, f32 y, s32 value, BOOL small) {
+static inline void
+numDisp(f32 x, f32 y, s32 value, BOOL small) {
     Mtx m;
     MTXTrans(m, x, y, 0.0f);
     iconNumberDispGx(m, value, small, (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF });

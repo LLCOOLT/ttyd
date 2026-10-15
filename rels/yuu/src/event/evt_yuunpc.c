@@ -282,6 +282,32 @@ __declspec(section ".data") s32 chusan_act_tbl[] = {
     1, 2, 3, 3, 3, 2, 1, 0,
 };
 
+void yuunpc_maphit_init(void) {
+    signed char key[3] = "\x81\xA1";
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < 72; i++) {
+        yuunpc_wp->hitY[i] = (hitdata[i * 2] - '0') * 10 + (hitdata[i * 2 + 1] - '0');
+    }
+    for (i = 0; i < 72; i++) {
+        s16 h = -((hitdata[0x90 + i * 2] - '0') * 10 + (hitdata[0x90 + i * 2 + 1] - '0'));
+        yuunpc_wp->hit[i + 72 * 5] = h;
+        yuunpc_wp->hit[i + 72 * 4] = h;
+        yuunpc_wp->hit[i + 72 * 3] = h;
+        yuunpc_wp->hit[i + 72 * 2] = h;
+        yuunpc_wp->hit[i + 72 * 1] = h;
+        yuunpc_wp->hit[i] = h;
+    }
+    for (j = 0; j < 6; j++) {
+        for (i = 0; i < 72; i++) {
+            if (key[0] == hitdata[0x120 + j * 0x90 + i * 2] && key[1] == hitdata[0x120 + j * 0x90 + i * 2 + 1]) {
+                yuunpc_wp->hit[i + j * 72] = -500;
+            }
+        }
+    }
+}
+
 void yuunpc_pose_init(YuuNpcData* data) {
     char name[32];
     char anim[32];
@@ -503,31 +529,6 @@ f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
     return t;
 }
 
-void yuunpc_maphit_init(void) {
-    signed char key[3] = "\x81\xA1";
-    s32 i;
-    s32 j;
-
-    for (i = 0; i < 72; i++) {
-        yuunpc_wp->hitY[i] = (hitdata[i * 2] - '0') * 10 + (hitdata[i * 2 + 1] - '0');
-    }
-    for (i = 0; i < 72; i++) {
-        s16 h = -((hitdata[0x90 + i * 2] - '0') * 10 + (hitdata[0x90 + i * 2 + 1] - '0'));
-        yuunpc_wp->hit[i + 72 * 5] = h;
-        yuunpc_wp->hit[i + 72 * 4] = h;
-        yuunpc_wp->hit[i + 72 * 3] = h;
-        yuunpc_wp->hit[i + 72 * 2] = h;
-        yuunpc_wp->hit[i + 72 * 1] = h;
-        yuunpc_wp->hit[i] = h;
-    }
-    for (j = 0; j < 6; j++) {
-        for (i = 0; i < 72; i++) {
-            if (key[0] == hitdata[0x120 + j * 0x90 + i * 2] && key[1] == hitdata[0x120 + j * 0x90 + i * 2 + 1]) {
-                yuunpc_wp->hit[i + j * 72] = -500;
-            }
-        }
-    }
-}
 
 void ext_yuunpc_minigame1_init(void) {
     f32 ytbl[5] = {260.0f, 220.0f, 180.0f, 140.0f, 100.0f};
@@ -1311,17 +1312,18 @@ static inline s32 yuunpc_hitY_get(f32 x) {
     return yuunpc_wp->hitY[(s32)((x - -1800.0f) / 50.0f)];
 }
 
-static inline s32 yuunpc_hit_ofs(YuuNpc* npc, Vec* ofs) {
-    f32 x = npc->pos.x + ofs->x;
-    s32 out = 0;
-    if (x < -1800.0f || x >= 1800.0f || npc->pos.z + ofs->z < -150.0f || npc->pos.z + ofs->z >= 150.0f) {
-        out = 1;
-    }
-    if (out) {
-        return -500;
-    }
-    return yuunpc_wp->hit[(s32)((npc->pos.z + ofs->z - -150.0f) / 50.0f) * 72 + (s32)((x - -1800.0f) / 50.0f)];
-}
+#define HG(x, zp) (((x) < -1800.0f || (x) >= 1800.0f || *(zp) < -150.0f || *(zp) >= 150.0f) ? -500 : yuunpc_wp->hit[(s32)((*(zp) - -150.0f) / 50.0f) * 72 + (s32)(((x) - -1800.0f) / 50.0f)])
+#define yuunpc_hit_ofs(npc, ofs) ((((npc)->pos.x + (ofs)->x) < -1800.0f || ((npc)->pos.x + (ofs)->x) >= 1800.0f || ((npc)->pos.z + (ofs)->z) < -150.0f || ((npc)->pos.z + (ofs)->z) >= 150.0f) ? -500 : yuunpc_wp->hit[(s32)((((npc)->pos.z + (ofs)->z) - -150.0f) / 50.0f) * 72 + (s32)((((npc)->pos.x + (ofs)->x) - -1800.0f) / 50.0f)])
+
+
+
+
+
+
+
+
+
+
 
 #define yuunpc_snap(v) (((s32)((3600.0f + (v)) / 50.0f) + 1) * 50.0f - 3600.0f)
 
@@ -1550,8 +1552,8 @@ void yuunpc_pose_minigame4_main(void) {
                 case 14:
                 case 15:
                     if ((u16)npc->id & 3) {
-                        off = (3 - (h - 12)) * 50.0f;
-                        npc->dest.x = yuunpc_snap(px + off);
+                        off = (3 - (h - 12)) * 50.0f; px += off;
+                        npc->dest.x = yuunpc_snap(px);
                         npc->dest.z = -(75.0f + yuunpc_rnd10(npc));
                         npc->dest.y = npc->pos.y;
                     } else {
@@ -1565,8 +1567,8 @@ void yuunpc_pose_minigame4_main(void) {
                 case 18:
                 case 19:
                     if ((u16)npc->id & 3) {
-                        off = (3 - (h - 16)) * 50.0f;
-                        npc->dest.x = yuunpc_snap(px + off);
+                        off = (3 - (h - 16)) * 50.0f; px += off;
+                        npc->dest.x = yuunpc_snap(px);
                         npc->dest.z = -25.0f + yuunpc_rnd10(npc);
                         npc->dest.y = npc->pos.y;
                     } else {
@@ -1580,8 +1582,8 @@ void yuunpc_pose_minigame4_main(void) {
                 case 22:
                 case 23:
                     if ((u16)npc->id & 3) {
-                        off = (3 - (h - 20)) * 50.0f;
-                        npc->dest.x = yuunpc_snap(px + off);
+                        off = (3 - (h - 20)) * 50.0f; px += off;
+                        npc->dest.x = yuunpc_snap(px);
                         npc->dest.z = 75.0f + yuunpc_rnd10(npc);
                         npc->dest.y = npc->pos.y;
                     } else {
@@ -1855,8 +1857,8 @@ void yuunpc_pose_minigame4_main(void) {
                     }
                     if (npc->state >= 2 || (npc->state <= 1 && irand(36) == 0)) {
                         px = npc->pos.x;
-                        hb = yuunpc_hit_get(25.0f + px, &npc->pos.z);
-                        ha = yuunpc_hit_get(75.0f + px, &npc->pos.z);
+                        hb = HG(25.0f + px, &npc->pos.z);
+                        ha = HG(75.0f + px, &npc->pos.z);
                         if (npc->state <= 3 && irand(2)) {
                             if (hb >= npc->pos.y) {
                                 YUU_WALK(npc);

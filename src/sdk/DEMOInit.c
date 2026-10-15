@@ -41,7 +41,7 @@ static void __NoHangDoneRender(void);
 static void __DEMODiagnoseHang(void);
 static inline void DEMOSwapBuffers(void);
 static inline void DEMOSetGPHangMetric(GXBool enable);
-static inline void DEMOReInit(GXRenderModeObj* mode);
+void DEMOReInit(GXRenderModeObj* mode);
 
 static inline void __DEMOInitMem(void) {
 	void *arenaLo, *arenaHi;
@@ -233,6 +233,29 @@ static void __NoHangRetraceCallback(u32 count) {
 	}
 }
 
+static void __NoHangDoneRender(void) {
+	BOOL abort = FALSE;
+	u16 token = sysGetToken();
+	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
+	GXSetColorUpdate(GX_TRUE);
+	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
+	GXSetAlphaUpdate(GX_TRUE);
+	GXCopyDisp(DemoCurrentBuffer, GX_TRUE);
+	GXSetDrawSync(token);
+	FrameCount = 0;
+
+	while ((GXReadDrawSync() != token) && !abort) {
+		if (FrameCount >= FrameMissThreshold) {
+			abort = TRUE;
+			__DEMODiagnoseHang();
+			DEMOReInit(rmode);
+			DEMOSetGPHangMetric(GX_TRUE);
+		}
+	}
+
+	DEMOSwapBuffers();
+}
+
 static void __DEMODiagnoseHang(void) {
 	u32 xfTop0, xfBot0, suRdy0, r0Rdy0;
 	u32 xfTop1, xfBot1, suRdy1, r0Rdy1;
@@ -274,29 +297,6 @@ static void __DEMODiagnoseHang(void) {
 	strcpy(__GXErrorMessage, newmsg);
 }
 
-static void __NoHangDoneRender(void) {
-	BOOL abort = FALSE;
-	u16 token = sysGetToken();
-	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-	GXSetColorUpdate(GX_TRUE);
-	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
-	GXSetAlphaUpdate(GX_TRUE);
-	GXCopyDisp(DemoCurrentBuffer, GX_TRUE);
-	GXSetDrawSync(token);
-	FrameCount = 0;
-
-	while ((GXReadDrawSync() != token) && !abort) {
-		if (FrameCount >= FrameMissThreshold) {
-			abort = TRUE;
-			__DEMODiagnoseHang();
-			DEMOReInit(rmode);
-			DEMOSetGPHangMetric(GX_TRUE);
-		}
-	}
-
-	DEMOSwapBuffers();
-}
-
 static inline void DEMOSetGPHangMetric(GXBool enable) {
 	if (enable) {
 		GXSetGPMetric(GX_PERF0_NONE, GX_PERF1_NONE);
@@ -326,7 +326,7 @@ static inline void DEMOSetGPHangMetric(GXBool enable) {
 	}
 }
 
-static inline void DEMOReInit(GXRenderModeObj* mode) {
+void DEMOReInit(GXRenderModeObj* mode) {
 	GXFifoObj tmpobj;
 	void* tmpFifo = __memAlloc(HEAP_DEFAULT, 64 * 1024);
 

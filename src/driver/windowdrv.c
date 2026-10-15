@@ -416,13 +416,14 @@ void windowDispGX_Kanban(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 //regalloc issues wrt f29/f28, stack swap in GXColor, some vert code (see comments), 99.8% 1:1
 void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width) {
 	CameraEntry* camera;
-	f32 scroll, x5;
+	f32 x5, scroll;
 
 	Mtx mtx;
 	Mtx trans, scale;
 	f32 x2, y2;
 	Mtx trans2, scale2;
 	f32 y3, y4;
+	f32 zz;
 	Mtx trans3, scale3;
 	f32 x3, x4;
 	Mtx trans4, scale4;
@@ -547,10 +548,11 @@ void windowDispGX_System(s32 type, u8 alpha, f32 x, f32 y, f32 height, f32 width
 	GXLoadTexMtxImm(scale2, 0x21, GX_MTX2x4);
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
-	x5 = width - 32.0f;
-	y3 = -x5;
+	GXWGFifo.f32 = 0.0f;
+	y3 = -(width - 32.0f);
 	y4 = y3 - 32.0f;
-	GXPosition3f32(0.0f, y3, 0.0f);
+	GXWGFifo.f32 = y3;
+	GXWGFifo.f32 = 0.0f;
 	GXTexCoord2f32(0.0f, 0.0f);
 
 	GXPosition3f32(x2, y3, 0.0f);
@@ -1457,3 +1459,6 @@ GXTexObj* getWakuTexObj(s32 id) {
 	return &wakuTexObj[id];
 }
 
+
+
+#pragma force_active reset

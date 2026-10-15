@@ -217,7 +217,8 @@ void battleCameraMain(void) {
       t = 0.5f;
     }
     zz = 2.0f * wp->cameraWork.zoom;
-    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
+    w2 = w + w2;
+    zz = (1.0f - t) * (zz - 1.5f * w2);
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
     ofs = -zz / 10.0f;
@@ -329,7 +330,8 @@ void battleCameraMain(void) {
       t = 0.5f;
     }
     zz = 2.0f * wp->cameraWork.zoom;
-    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
+    w2 = w + w2;
+    zz = (1.0f - t) * (zz - 1.5f * w2);
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
     ofs = -zz / 10.0f;
@@ -376,9 +378,9 @@ void battleCameraMain(void) {
     if (t < 0.5f) {
       t = 0.5f;
     }
-    yy = pos.y - wp->cameraWork.homingOffset.y - 100.0f;
-    zz = 2.0f * wp->cameraWork.zoom;
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
+    zz = 2.0f * wp->cameraWork.zoom;
+    yy = pos.y - wp->cameraWork.homingOffset.y - 100.0f;
     if (yy > 0.0f) {
       yy = 0.0f;
     }
@@ -808,7 +810,7 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   wp->cameraWork.unitId = BattleTransID(event, unit);
   wp->cameraWork.partsId = parts;
   u = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-  part = BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
+  BattleGetUnitPartsPtr(wp->cameraWork.unitId, wp->cameraWork.partsId);
   BtlUnit_GetHomePos(u, &pos.x, &pos.y, &pos.z);
   wp->cameraWork.homingOffset = (Vec){pos.x, pos.y, pos.z};
   if (unit2 != -1) {

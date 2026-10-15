@@ -786,6 +786,7 @@ void loadDraw(CameraId camera, void* param) {
     WinDt* win1;
     s32 i;
     s32 j;
+    s32 k;
 
     if (wp->unk18 >= 0x20 && wp->unk18 < 0x28) {
         return;
@@ -817,7 +818,7 @@ void loadDraw(CameraId camera, void* param) {
     loadDrawBg(0x34, -272.0f, 240.0f, 272.0f, -240.0f);
     loadDrawBg(0x36, 272.0f, 240.0f, 304.0f, -240.0f);
 
-    win = win_dt;
+    win1 = win = win_dt;
     for (i = 0; i < 9; i++) {
         GXColor col = gray;
         if (i == wp->slot) {
@@ -832,21 +833,21 @@ void loadDraw(CameraId camera, void* param) {
         if (i == 5 && (wp->flags & 0x20)) {
             col = dark;
         }
-        switch (win_dt[i].unk10) {
+        switch (win[i].unk10) {
             case 10:
             case 11:
             case 12:
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                winTexSet(0xe, (Vec){win_dt[i].x, win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(0xe, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 winTexInit(*wp->file->data);
-                winTexSet(win_dt[i].unk10, (Vec){win_dt[i].x, 60.0f + win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(win[i].unk10, (Vec){win[i].x, 60.0f + win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(win_dt[i].unk10, win_dt[i].unk14, (Vec){win_dt[i].x, win_dt[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
                 break;
             }
         }
@@ -859,8 +860,8 @@ void loadDraw(CameraId camera, void* param) {
         FontDrawMessage(-FontGetMessageWidth(msg) / 2, 192, msg);
     }
 
-    for (i = 0; i < 4; i++, win++) {
-        CardSaveSlot* save = &cardGetFilePtr()->saves[i];
+    for (j = 0; j < 4; j++, win1++) {
+        CardSaveSlot* save = &cardGetFilePtr()->saves[j];
         u16 flags = save->data.flags;
         s16 level = save->data.pouch.level;
         OSTime time = save->data.global.retraceLocalTime;
@@ -873,30 +874,30 @@ void loadDraw(CameraId camera, void* param) {
 
         FontDrawStart();
         FontDrawColor((GXColor){192, 192, 192, 255});
-        if (i == wp->slot) {
+        if (j == wp->slot) {
             FontDrawColor((GXColor){255, 255, 255, 255});
         }
         FontDrawScale(0.6f);
         FontDrawEdge();
-        sprintf(buf, "\x83\x66\x81\x5b\x83\x5e%s", winZenkakuStr(i + 1));
-        FontDrawString(win->x - 100.0f, 84.0f + win->y, buf);
+        sprintf(buf, "\x83\x66\x81\x5b\x83\x5e%s", winZenkakuStr(j + 1));
+        FontDrawString(win1->x - 100.0f, 84.0f + win1->y, buf);
         FontDrawEdgeOff();
         FontDrawScale(1.0f);
         FontDrawColor((GXColor){32, 32, 32, 255});
-        if (i == wp->slot) {
+        if (j == wp->slot) {
             FontDrawColor((GXColor){0, 0, 0, 255});
         }
         if (flags & 2) {
             str = "\x82\xb1\x82\xed\x82\xea\x82\xc4\x82\xa2\x82\xdc\x82\xb7";
-            FontDrawString(win->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
         } else if (flags & 1) {
             str = "\x83\x6a\x83\x85\x81\x5b\x83\x51\x81\x5b\x83\x80";
-            FontDrawString(win->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
         } else if (gsw0 == 0) {
             str = "\x82\xcd\x82\xb6\x82\xdf\x82\xa9\x82\xe7";
-            FontDrawString(win->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
             if (strlen(name) != 0) {
-                FontDrawString(win->x - FontGetMessageWidth(name) / 2, 70.0f + win->y, name);
+                FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
         } else {
             FontGetMessageWidth("\x82\x57\x82\x57");
@@ -909,28 +910,28 @@ void loadDraw(CameraId camera, void* param) {
                 mins = ((u64)sec % 3600) / 60;
             }
             if (strlen(name) != 0) {
-                FontDrawString(win->x - FontGetMessageWidth(name) / 2, 70.0f + win->y, name);
+                FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
             sprintf(buf2, "\x83\x8c\x83\x78\x83\x8b\x81\x40%s", winZenkakuStr(level));
-            FontDrawString(win->x - FontGetMessageWidth(buf2) / 2.0f, 30.0f + win->y, buf2);
+            FontDrawString(win1->x - FontGetMessageWidth(buf2) / 2.0f, 30.0f + win1->y, buf2);
             strcpy(buf2, "\x83\x76\x83\x8c\x83\x43\x82\xb6\x82\xa9\x82\xf1\x81\x40");
             strcat(buf2, unk_8016af5c(hours, 2));
             strcat(buf2, " ");
             strcat(buf2, unk_8016af5c(mins, 2));
-            w = FontGetMessageWidth(buf2) / 2.0f;
-            FontDrawString(win->x - w, win->y, buf2);
+            w = FontGetMessageWidth(buf2);
+            FontDrawString(win1->x - w / 2.0f, win1->y, buf2);
             strcpy(buf2, "\x83\x76\x83\x8c\x83\x43\x82\xb6\x82\xa9\x82\xf1\x81\x40");
             strcat(buf2, unk_8016af5c(hours, 2));
             x = FontGetMessageWidth(buf2);
-            PSMTXTrans(m, 8.0f + (x + (win->x - w)), 1.0f + (win->y - 22.0f), 0.0f);
+            PSMTXTrans(m, 8.0f + (x + (win1->x - w / 2.0f)), 1.0f + (win1->y - 22.0f), 0.0f);
             PSMTXScale(s, 1.5f, 1.5f, 1.5f);
             PSMTXConcat(m, s, m);
             iconDispGxCol(m, 0, 0x201, (GXColor){0, 0, 0, 255});
-            py = &win->y;
-            for (j = 0; j < 7; j++) {
-                if (stars & (1 << (j + 1))) {
-                    PSMTXTrans(m, (win->x - 106.0f) + j * 32, *py - 52.0f, 0.0f);
-                    iconDispGxCol(m, 0, (u16)stone_id[j], i == wp->slot ? white : gray);
+            py = &win1->y;
+            for (k = 0; k < 7; k++) {
+                if (stars & (1 << (k + 1))) {
+                    PSMTXTrans(m, (win1->x - 106.0f) + k * 32, *py - 52.0f, 0.0f);
+                    iconDispGxCol(m, 0, (u16)stone_id[k], j == wp->slot ? white : gray);
                 }
             }
         }
@@ -1047,6 +1048,7 @@ __declspec(section ".sdata") s32 evt_continue[] = {
 __declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
 #pragma force_active reset
 
+#pragma defer_codegen off
 #pragma force_active on
 void continueGame(void) {
     cardCopy2Main(wp->slot);
@@ -1202,4 +1204,8 @@ void continueGame(void) {
             break;
     }
 }
+#pragma defer_codegen reset
 
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_8034A0BC_data[1] = {0};
+#pragma force_active reset

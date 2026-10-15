@@ -23,9 +23,7 @@ typedef struct EffRippleN64Work {
     s32 priority; // 0x34
 } EffRippleN64Work;
 
-const GXColor unk_80423248;
 
-static const Vec vec3_802fb520 = {0.0f, 0.0f, 0.0f};
 
 effN64Vtx size16x16_tex32x32_0_vtx[] = {
     {-8, 0, -8, 0, 0, 0, 0, 0, 255},
@@ -37,6 +35,7 @@ effN64Vtx size16x16_tex32x32_0_vtx[] = {
 void effRippleMain(EffectEntry* effect);
 void effRippleDisp(CameraId cameraId, EffectEntry* effect);
 
+__declspec(section ".rodata") static Vec vec3_802fb520 = {0.0f, 0.0f, 0.0f};
 void effRippleN64SetRxRz(EffectEntry* effect, f32 rx, f32 rz) {
     EffRippleN64Work* work = effect->userdata;
     work->rx = rx;
@@ -78,10 +77,7 @@ void effRippleDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_TEXA, GX_CA_A0, GX_CA_ZERO);
     if (type == 1 || type == 10 || type == 3 || type == 30) {
-        GXColor c2 = unk_80423248;
-        GXColor c3 = c2;
-        c3.a = work->alpha;
-        GXSetTevColor(GX_TEVREG0, c3);
+        GXSetTevColor(GX_TEVREG0, (GXColor){0, 0, 0, work->alpha});
     } else {
         GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, work->alpha});
     }

@@ -7,6 +7,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#include "eff/eff_magic1_n64.h"
 
 extern double sin(double x);
 extern double cos(double x);
@@ -117,8 +118,6 @@ static void main_dl(EffectEntry* effect, Mtx base) {
     u8* a;
     f32 yr;
 
-
-
     EffMagic1N64Work* w = effect->userdata;
     s32 type = w->type;
     f32 scale = w->scale;
@@ -205,24 +204,12 @@ static void main_dl(EffectEntry* effect, Mtx base) {
             PSMTXConcat(m68, m38, m38);
             PSMTXConcat(base, m38, m38);
             GXLoadPosMtxImm(m38, GX_PNMTX0);
-            {
-            GXSetTevColor(GX_TEVREG0, (GXColor){(u8)(s32)((f32)(s32)a[1] + 0.5f * (((f32)-(s32)a[1]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
-                (u8)(s32)((f32)(s32)a[2] + 0.5f * (((f32)-(s32)a[2]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))),
-                (u8)(s32)((f32)(s32)a[3] + 0.5f * (((f32)-(s32)a[3]) * ((f32)sin(6.2831855f * (f32)(s32)(180 + (gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f))), alpha});
-
-
-
-
-            }
-            {
-            GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)((f32)(s32)a[1] + ((f32)(255 - a[1]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)),
-                (u8)(s32)((f32)(s32)a[2] + ((f32)(255 - a[2]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)),
-                (u8)(s32)((f32)(s32)a[3] + ((f32)(255 - a[3]) * ((f32)sin(6.2831855f * (f32)(s32)((gp->retraceCount << 5) + a[0]) / 360.0f) + 1.0f) * 0.5f)), 255});
-
-
-
-
-            }
+            GXSetTevColor(GX_TEVREG0, (GXColor){(u8)(s32)effMagic1Blend(a[1], 0, (f32)(s32)(180 + (gp->retraceCount << 5) + a[0])),
+                                                (u8)(s32)effMagic1Blend(a[2], 0, (f32)(s32)(180 + (gp->retraceCount << 5) + a[0])),
+                                                (u8)(s32)effMagic1Blend(a[3], 0, (f32)(s32)(180 + (gp->retraceCount << 5) + a[0])), alpha});
+            GXSetTevColor(GX_TEVREG1, (GXColor){(u8)(s32)effMagic1Blend(a[1], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])),
+                                                (u8)(s32)effMagic1Blend(a[2], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])),
+                                                (u8)(s32)effMagic1Blend(a[3], 255, (f32)(s32)((gp->retraceCount << 5) + a[0])), 255});
             if (type == 0) sz = 15; else sz = 10;
             PSMTXScale(m98, 2.0f, 0.25f, 1.0f);
             PSMTXTrans(mf8, 0.0f, (f32)(3 - j) * 64.0f / 256.0f, 0.0f);

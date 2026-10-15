@@ -2104,57 +2104,22 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 }
 
 #pragma opt_dead_assignments off
+#define BLURQ(dst, a_in) { f32 a = (a_in); s32 r_; if ((a) <= 3.1415927f) { if ((a) <= 1.5707964f) r_ = 0; else r_ = 1; } else if ((a) < 4.712389f) r_ = 2; else r_ = 3; dst = r_; }
 void marioDispBlur(CameraId camId, void* param) {
 	MarioWork* wp = param;
 	s32 i;
 	Mtx mtx;
 	u32 flag;
-	s32 q;
 	s32 q2;
+	s32 q;
+	f32 angleB;
 	f32 angle;
-	f32 angle2;
-	f32 angle3;
-	f32 angle4;
 
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
-	angle = 6.2831855f * wp->targetYaw / 360.0f;
-	angle2 = angle;
-	angle3 = angle;
-	angle4 = angle;
-	{
-		f32 a = angle2;
-		if (a <= 3.1415927f) {
-			if (a <= 1.5707964f) {
-				q2 = 0;
-			}
-			else {
-				q2 = 1;
-			}
-		}
-		else if (a < 4.712389f) {
-			q2 = 2;
-		}
-		else {
-			q2 = 3;
-		}
-	}
-	{
-		f32 a = angle3;
-		if (a <= 3.1415927f) {
-			if (a <= 1.5707964f) {
-				q = 0;
-			}
-			else {
-				q = 1;
-			}
-		}
-		else if (a < 4.712389f) {
-			q = 2;
-		}
-		else {
-			q = 3;
-		}
-	}
+	angle = wp->targetYaw * 6.2831855f / 360.0f;
+	
+	BLURQ(q2, angle)
+	BLURQ(q, angle)
 	for (i = 7; i > 0; i--) {
 		marioDispBlurSub(mtx, i);
 	}

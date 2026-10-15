@@ -1083,8 +1083,12 @@ void winLogDisp(CameraId cam, WinLogWork* w, s32 idx) {
     s32 i;
     EffStarStoneWork* wk;
 
-    x = w->pos[idx].x;
-    y = w->pos[idx].y;
+    {
+        WinLogPos* p = &w->pos[idx];
+        x = p->x;
+        y = p->y;
+    }
+
     winBgGX(w, 4, x, y);
     if (y + w->fE34 > -480.0f) {
         mapGX(w, x + w->fE2C, y + w->fE34);
@@ -1476,6 +1480,8 @@ void animPoseVivianMain(s32 poseId, Vec* v);
 void capture(CameraId camera, void* param) {
     MonosiriWork* m = param;
     AnimBBox* data;
+    Vec min;
+    Vec max;
     CameraEntry bak;
     Mtx44 pm;
     Mtx view;
@@ -1485,8 +1491,6 @@ void capture(CameraId camera, void* param) {
     GXTexObj tex;
     f32 vp[6];
     f32 proj[7];
-    Vec min;
-    Vec max;
     Vec v2;
     Vec v1;
     Vec vv;
@@ -1509,6 +1513,9 @@ void capture(CameraId camera, void* param) {
     Vec* a;
     Vec* b;
     s32 k;
+    Vec up;
+    Vec tgt;
+    Vec cam;
 
     data = (AnimBBox*)animPoseGetAnimDataPtr(m->pose1);
     min = (Vec){data->minX, data->minY, data->minZ};
@@ -1531,9 +1538,6 @@ void capture(CameraId camera, void* param) {
         dist = ((608.0f * (max.y - cy)) / 480.0f) / (f32)tan(0.21816615760326385);
     }
     {
-    Vec tgt;
-    Vec up;
-    Vec cam;
     tgt = (Vec){0.0f, 0.0f, 0.0f};
     up = (Vec){0.0f, 1.0f, 0.0f};
     cam = (Vec){0.0f, 0.0f, 0.0f};
@@ -1660,7 +1664,8 @@ void monosiri_disp(CameraId camera, void* param) {
         GXInitTexObjLOD(&tex, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
         GXLoadTexObj(&tex, GX_TEXMAP1);
         GXSetNumTexGens(8);
-        for (i = 0, mtx = GX_TEXMTX0; i < 8; i++, mtx += 3) {
+        for (i = 0; i < 8; i++) {
+            mtx = GX_TEXMTX0 + i * 3;
             s = 1.0f - 0.04f * (7 - i);
             PSMTXTrans(t1, 0.5f, 0.5f, 0.0f);
             PSMTXScale(sc, s, s, s);

@@ -313,7 +313,7 @@ void BSE_Kagegakure(BattleUnit* unit) {
 	}
 	if (on) {
 		if (KAGE_ICON(unit) == NULL) {
-			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
+			sprintf(name, "_biK_%02x\0\0\0\0\0\0", *(s32*)unit);
 			iconEntry(name, 0x99);
 			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
 		}
@@ -638,22 +638,19 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 
 
 void _st_chg_msg_disp(void) {
-	static const GXColor col = {0xFF, 0xFF, 0xFF, 0xFF};
 	u8* wp = (u8*)_battleWorkPointer + 0x20000;
-	u16 width;
-	u16 lines;
-	f32 x;
-	f32 y;
-	f32 new_var;
+	f32 y; f32 x; u16 width; u16 lines;
 	width = FontGetMessageWidthLine((const char*)(wp - 0x7128), &lines);
 	lines++;
-	{
-	new_var = -117.0f + ((lines - 1) * 29);
-	y = 0.0f;
-	x = y - (width / 2);
-	y = -120.0f;
-	windowDispGX_Waku_col(0, col, x - 20.0f, new_var, width + 40, lines * 29 + 1, 10.0f);
-	}
+	y = 0.0f; x = y - (width / 2); y = -120.0f;
+	{ GXColor col0 = {0xFF, 0xFF, 0xFF, 0xFF};
+	windowDispGX_Waku_col(0, col0, x - 20.0f, ((lines - 1) * 29) + -117.0f, (f32)(width + 40), (f32)(lines * 29 + 1), 10.0f); }
 	FontDrawStart();
 	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - 0x7128));
 }
+
+#pragma force_active on
+#pragma explicit_zero_data on
+__declspec(section ".sdata") u32 gap_07_8041270C_sdata = 0;
+#pragma explicit_zero_data reset
+#pragma force_active reset

@@ -248,7 +248,7 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
         dist = bd;
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px + ox, yh, pz + oz, 0.0f, -1.0f, 0.0f);
         if (hit) {
-            f32 tx = nx, tz = nz, ty = ny;
+            f32 tx = nx, ty = ny, tz = nz;
             m2 = marioGetPtr();
             if (kpa_nrmSet(m2, tz, ty, tx) >= 50.0f) {
                 hit = NULL;

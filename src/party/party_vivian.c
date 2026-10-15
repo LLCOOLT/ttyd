@@ -30,7 +30,9 @@ typedef struct VivianParty {
     u8 padC4[0xF0 - 0xC4];   // 0xC4
     f32 field_F0;            // 0xF0
     f32 field_F4;            // 0xF4
-    u8 padF8[0x174 - 0xF8];  // 0xF8
+    u8 padF8[0x160 - 0xF8];  // 0xF8
+    MarioWork* mw160;
+    u8 pad164[0x174 - 0x164];
     f32 field_174;           // 0x174
     u8 pad178[0x184 - 0x178]; // 0x178
     s32 field_184;           // 0x184
@@ -233,7 +235,7 @@ typedef struct VivianUseWork {
 #define PF(t, o) (*(t*)((u8*)party + (o)))
 #define MF(t, o) (*(t*)((u8*)m + (o)))
 
-extern void L_partyForceSlitOff(void);
+extern void L_partyForceSlitOff(VivianParty* party);
 extern void* marioSearchGround(f32* x, f32* y, f32* z, f32 a, f32 b);
 extern s32 hitGetAttr(void* hit);
 extern f32 toMovedirSimple(f32 angle);
@@ -307,17 +309,17 @@ static inline void vivianFollow(VivianParty* party) {
 #pragma defer_codegen off
 #pragma explicit_zero_data on
 void vivian_use(VivianParty* party) {
-    f32 d;
-    void* rip;
     Vec s;
-    MarioWork* m = PF(MarioWork*, 0x160);
-    if (PF(u32, 8) & 8) {
+    void* rip;
+    f32 d;
+    MarioWork* m = party->mw160;
+    if (party->field_8 & 8) {
         party->field_8 &= ~8;
         party->useMotionId = 0;
         party->field_174 = 10.0f;
         party->shadow = party->position;
         vivian_cancel_req = 0;
-        L_partyForceSlitOff();
+        L_partyForceSlitOff(party);
     }
     MF(f32, 0x180) = 0.0f;
     PF(f32, 0x104) = 0.0f;
@@ -550,7 +552,10 @@ void vivian_use(VivianParty* party) {
 #pragma opt_common_subs reset
 
 
-#pragma force_active on
+
 
 #pragma force_active on
+#pragma explicit_zero_data on
 __declspec(section ".data") u32 gap_05_8038BA54_data[1] = {0};
+#pragma explicit_zero_data reset
+#pragma force_active reset

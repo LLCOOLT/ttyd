@@ -107,8 +107,7 @@ static inline void kpaFireEntry2(Vec pos) {
         if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
             flag = 1;
         }
-        ang = flag ? 180 : 0;
-        MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)ang;
+        MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)(flag ? 180 : 0);
         child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
         if (child) {
             flag = 0;
@@ -782,7 +781,6 @@ void kpaFireAttack(void) {
         break;
     }
 }
-
 
 void kpaCancelAttackMode(void) {
     MarioWork* mp;

@@ -1122,6 +1122,10 @@ void disp_maku(CameraId camId, void* param) {
 	sysWaitDrawSync();
 }
 
+void fadeStrippedPool(f32* f) {
+	f[0] = 3.141592f;
+}
+
 static inline GXColor fadeTecAlpha(f32 a) {
 	GXColor c = (GXColor){0, 0, 0, 0};
 	c.a = 255.0f * a;

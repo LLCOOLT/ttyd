@@ -199,11 +199,12 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     Vec eye = { 0.0f, 0.0f, 1000.0f };
     Vec up = { 0.0f, 1.0f, 0.0f };
     Vec target = { 0.0f, 0.0f, 0.0f };
-    f32 h;
-    f32 d;
-    f32 s, a, b;
-    f32 w;
     f32 scale;
+    f32 d;
+    f32 h;
+    f32 s;
+    f32 w;
+    f32 cs;
     s32 alpha;
     s32 i;
     s32 al;
@@ -221,9 +222,9 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXScale(m16c, scale, scale, scale);
     PSMTXConcat(m19c, m13c, m19c);
     PSMTXConcat(m19c, m16c, m7c);
-    d = cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    s = sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f);
-    PSMTXTrans(m19c, 2.0f * s, 0.0f, 2.0f * -d);
+    cs = (0, (f32)cos(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f));
+    s = (0, (f32)sin(6.2831855f * camGetPtr(cameraId)->viewYaw / 360.0f));
+    PSMTXTrans(m19c, 2.0f * s, 0.0f, -cs * 2.0f);
     PSMTXConcat(m19c, m7c, m7c);
     GXSetTevColor(GX_TEVREG0, white);
     GXSetTevColor(GX_TEVREG1, color_tbl[work->type]);
@@ -290,7 +291,7 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, white);
     effGetTexObj(0x2B, &texObj);
     GXLoadTexObj(&texObj, GX_TEXMAP1);
-        w = 10.666667f;
+    d = 10.666667f;
     h = 42.666668f;
 
 
@@ -326,13 +327,13 @@ void effItemGetDisp(CameraId cameraId, EffectEntry* effect) {
             PSMTXConcat(mdc, m10c, m19c);
             GXLoadTexMtxImm(m19c, GX_TEXMTX0, GX_MTX3x4);
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-            GXPosition3f32(-w / 2.0f, 0.0f, 0.0f);
+            GXPosition3f32(-d / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
-            GXPosition3f32(w / 2.0f, 0.0f, 0.0f);
+            GXPosition3f32(d / 2.0f, 0.0f, 0.0f);
             GXTexCoord2f32(2.0f, 0.0f);
-            GXPosition3f32(w / 2.0f, -h, 0.0f);
+            GXPosition3f32(d / 2.0f, -h, 0.0f);
             GXTexCoord2f32(2.0f, 1.0f);
-            GXPosition3f32(-w / 2.0f, -h, 0.0f);
+            GXPosition3f32(-d / 2.0f, -h, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
         }
     }

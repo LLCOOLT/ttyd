@@ -264,8 +264,10 @@ void effConfettiMain(EffectEntry* effect) {
 }
 
 void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
+    s32 anm;
     s32 type;
     EffConfettiN64Work* w;
+    u8* seq;
     s32 i;
     s32 alpha;
     s32 count;
@@ -278,8 +280,6 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     GXTexObj texObj;
     u8* col;
-    u8* seq;
-    s32 anm;
 
     camera = camGetPtr(cameraId);
     w = effect->userdata;
@@ -304,10 +304,8 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
-    anm = (anm >> 1) % 6;
-    type = type % 10;
     for (i = 0; i < count; i++, w++) {
-        col = color_table + (i % 12) * 3;
+        col = &color_table[(i % 12) * 3];
         if (w->delay > 0) {
             continue;
         }
@@ -317,12 +315,12 @@ void effConfettiDisp(CameraId cameraId, EffectEntry* effect) {
         GXSetCurrentMtx(0);
         GXSetTevColor(GX_TEVREG0, (GXColor){col[0], col[1], col[2], alpha});
         GXSetTevColor(GX_TEVREG1, (GXColor){0x3C, 0x3C, 0x3C, 0});
-        off = ((i + anm_seq[anm]) & 0xF) << 6;
+        off = ((i + anm_seq[(anm >> 1) % 6]) & 0xF) << 6;
         PSMTXScale(scale, 0.0625f, 0.00390625f, 0.0f);
         PSMTXTrans(tmp, 0.0f, (f32)off, 0.0f);
         PSMTXConcat(scale, tmp, scale);
         GXLoadTexMtxImm(scale, GX_TEXMTX0, GX_MTX2x4);
-        switch (type) {
+        switch (type % 10) {
         case 3:
             effSetVtxDescN64(size6x6_tex16x16_2_vtx);
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 24);

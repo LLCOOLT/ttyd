@@ -386,8 +386,9 @@ void envDisp_DepthOfField(void) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetCullMode(GX_CULL_NONE);
         if ((dof->unk0 & 1) && dof->unk4) {
-            coord = stage = i = 0;
-            for (; i < 4; i++, stage++, coord++) {
+            coord = 0;
+            stage = 0;
+            for (i = 0; i < 4; i++, stage++, coord++) {
                 PSMTXTrans(mtx, dof->unk4 * env_sin(6.2831855f * i / 4.0f) / 100.0f, dof->unk4 * env_cos(6.2831855f * i / 4.0f) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx, texmtx_tbl[i], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i], GX_FALSE, GX_PTIDENTITY);
@@ -424,8 +425,9 @@ void envDisp_DepthOfField(void) {
             DOF_QUAD(gp, 2.0f);
         }
         if ((dof->unk0 & 2) && dof->unk8) {
-            coord2 = stage2 = i2 = 0;
-            for (; i2 < 4; i2++, stage2++, coord2++) {
+            coord2 = 0;
+            stage2 = 0;
+            for (i2 = 0; i2 < 4; i2++, stage2++, coord2++) {
                 PSMTXTrans(mtx2, dof->unk8 * env_sin(6.2831855f * i2 / 4.0f) / 100.0f, dof->unk8 * env_cos(6.2831855f * i2 / 4.0f) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx2, texmtx_tbl[i2], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i2], GX_FALSE, GX_PTIDENTITY);

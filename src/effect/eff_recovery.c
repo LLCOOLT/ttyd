@@ -707,9 +707,10 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     Mtx tmp;
     Mtx base;
     f32 w;
-    f32 half;
+    f32 nw;
     f32 left;
     f32 right;
+    f32 half;
     f32 top;
     f32 bot;
 
@@ -747,11 +748,6 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
     bot = -20.0f;
     top = 20.0f;
     w = 108.0f;
-    half = 0.5f;
-    left = -w;
-    left = half * left;
-    right = left + w;
-    right = left + w;
     for (i = 0; i < 2; i++) {
         if (i == 0) {
             effGetTexObj(0x8B, &texObj);
@@ -770,6 +766,9 @@ void effRecoveryDisp3(CameraId cameraId, EffectEntry* effect) {
         PSMTXConcat(base, mtx, mtx);
         GXLoadPosMtxImm(mtx, GX_PNMTX0);
         GXSetCurrentMtx(GX_PNMTX0);
+        left = -w;
+        left *= 0.5f;
+        right = left + w;
         QUAD(left, right, top, bot, 1.0f)
     }
 }

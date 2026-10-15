@@ -174,13 +174,12 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx2;
     Vec v1;
     Vec v2;
-    s32 n;
     effN64Vtx* p;
     effN64Vtx* q;
     EffHoraoSpellN64Work* work;
-    s32 k;
     s32 alpha;
     s32 frame;
+    s32 k;
     s32 i;
     s32 j;
     effN64Vtx* vtx;
@@ -241,17 +240,18 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         PSMTXRotRad(rot, 'y', 0.017453292f * (-30.0f * s));
         PSMTXConcat(mtx, rot, mtx2);
         vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
-        for (j = 0, n = 0; j < 16; j++, n += 2) {
+        for (j = 0; j < 16; j++) {
+            k = j * 2;
             PSMTXTrans(mtx, 8.0f, 0.0f, 0.0f);
-            s = sin(6.2831855f * (f32)((frame << 3) + (n * 360) / 15) / 360.0f);
+            s = sin(6.2831855f * (f32)(frame * 8 + (j * 2 * 360) / 15) / 360.0f);
             PSMTXRotRad(rot, 'y', 0.017453292f * (30.0f * s));
             PSMTXConcat(mtx, rot, mtx);
             PSMTXRotRad(rot, 'z', 0.10471976f);
             PSMTXConcat(mtx, rot, mtx);
-            PSMTXScale(scale, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f, 0.01f * (f32)j + 1.0f);
+            s = 0.01f * (f32)j + 1.0f;
+            PSMTXScale(scale, s, s, s);
             PSMTXConcat(mtx, scale, mtx);
             PSMTXConcat(mtx2, mtx, mtx2);
-            k = j * 2;
             p = &vtx[k];
             memcpy(p, &horao_spell_vtx[k], sizeof(effN64Vtx));
 
@@ -264,8 +264,8 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
             OSf32tos16(&v1.x, &p->x);
             OSf32tos16(&v1.y, &p->y);
             OSf32tos16(&v1.z, &p->z);
-            q = &vtx[n + 1];
-            memcpy(q, &horao_spell_vtx[n + 1], sizeof(effN64Vtx));
+            q = &vtx[k + 1];
+            memcpy(q, &horao_spell_vtx[k + 1], sizeof(effN64Vtx));
 
             OSInitFastCast();
             OSs16tof32(&q->x, &v2.x);
@@ -280,7 +280,7 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
         DCFlushRange(vtx, sizeof(effN64Vtx) * 32);
         GXInvalidateVtxCache();
         effSetVtxDescN64(vtx);
-        for (n = 0, k = 0; n < 15; n++, k += 2) {
+        for (j = 0, k = 0; j < 15; j++, k += 2) {
             GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
             tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
         }

@@ -278,10 +278,11 @@ void effMahojinMain(EffectEntry* effect) {
 
 void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
-    f32* zp;
     f32 z[16];
     s32 idx[16];
     MapWork* map;
+    s32* ip;
+    f32* zp;
     s32 i, j, k, n;
     EffMahojinWork* work = effect->userdata;
     s32 pass;
@@ -291,27 +292,27 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     camGetPtr(cameraId);
     alpha = work->alpha;
     map = mapGetWork();
-    flags = map->entries[0].flags;
     zp = z;
+    ip = idx;
+    flags = map->entries[0].flags;
 
 
 
     for (pass = 0; pass < 2; pass++) {
         n = 0;
         if (pass == 0) {
-            z[0] = -9999.0f;
+            zp[0] = -9999.0f;
             idx[n++] = 0;
             z[n] = -10000.0f;
             idx[n++] = 1;
         } else {
-            z[0] = -10000.0f;
+            zp[0] = -10000.0f;
             idx[n++] = 0;
             z[n] = 10000.0f;
             idx[n++] = 1;
         }
         for (i = 2; i < effect->count; i++) {
-            f32 zz = dispCalcZ(&pos_tbl[i - 2]);
-            z[n] = zz;
+            z[n] = dispCalcZ(&pos_tbl[i - 2]);
             idx[n++] = i;
         }
         for (i = 0; i < effect->count - 1; i++) {

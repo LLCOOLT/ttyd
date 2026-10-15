@@ -1,4 +1,9 @@
+/* header declares lightEntry/lightGetNearObj with by-value structs and void return; the real ABI differs */
+#define lightEntry lightEntry_header_decl
+#define lightGetNearObj lightGetNearObj_header_decl
 #include "driver/lightdrv.h"
+#undef lightEntry
+#undef lightGetNearObj
 #include "driver/camdrv.h"
 #include "driver/mapdrv.h"
 #include "memory.h"
@@ -106,7 +111,7 @@ void lightMain(void) {
 
 
 
-s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
+s32 lightEntry(const char* name, s32 type, Vec* position, Vec* rotation, GXColor color, s32 attenType, s32 flags, f32 spotAngle, f32 attenAngle) {
 	static const Vec decay_tbl[] = {
 	{1.0f, 0.0f, 0.0f},
 	{0.0f, 0.1f, 0.0f},
@@ -149,9 +154,9 @@ s32 lightEntry(const char* name, s32 type, Vec position, Vec rotation, GXColor c
 	}
 	memset(entry, 0, sizeof(LightEntry));
 	strcpy(entry->name, name);
-	entry->position = position;
-	entry->rotation = rotation;
-	entry->field_0x3C = entry->position;
+	entry->position = *position;
+	entry->rotation = *rotation;
+	entry->field_0x3C = *position;
 	entry->color = color;
 	entry->spotAngle = spotAngle;
 	entry->attenAngle = attenAngle;
@@ -212,15 +217,16 @@ static s32 _sort(const void* a, const void* b) {
 	return 0;
 }
 
-void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
+s32 lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags flags) {
+	s32 found;
 	LightWork* wp = lightGetWork();
 	NearWork tmp[32];
 	LightEntry** op;
-	s32 found;
 	NearWork* tp;
 	LightEntry* entry;
-	u32 n;
 	s32 i;
+	u32 n;
+	u32 mask;
 
 	if (lightGetEntryNum() > 8) {
 		entry = wp->entries;
@@ -249,10 +255,11 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 	}
 
 	op = out; tp = tmp;
+	mask = flags;
 	found = 0;
-	for (i = 0; i < n; tp++, i++) {
+	for (i = 0; i < n; i++, tp++) {
 		u32 fl; LightEntry* e = tp->entry; fl = e->flags;
-		if (!(fl & LIGHT_AMBIENT) && (flags == 0 || (flags & fl))) {
+		if (!(fl & LIGHT_AMBIENT) && (!mask || (mask & fl))) {
 			*op++ = e;
 			found++;
 			if (found >= count) {
@@ -263,6 +270,7 @@ void lightGetNearObj(Vec position, LightEntry** out, s32 count, LightEntryFlags 
 	for (i = found; i < count; i++) {
 		out[i] = NULL;
 	}
+	return found;
 }
 
 LightEntry* lightGetAmbient(void) {

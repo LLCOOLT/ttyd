@@ -904,6 +904,10 @@ BOOL winGhostDiaryChk(void) {
     return seqGetSeq() == 5;
 }
 
+const char* winMainStrippedTpl(void) {
+    return "%s/w/%s/win.tpl";
+}
+
 void winFontInit(void) {
     FontDrawStart();
 }
@@ -927,12 +931,11 @@ void winFontSetR(Vec pos, Vec scale, GXColor color, const char* fmt, ...) {
     char buf[0x400];
     Mtx trans;
     Mtx scl;
-    static const char winNines[] = "９９９";
     va_list args;
 
     va_start(args, fmt);
     do { vsprintf(buf, fmt, args); } while (0);
-    { s32 w = FontGetMessageWidth(winNines) - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
+    { s32 w = FontGetMessageWidth("９９９") - FontGetMessageWidth(buf); PSMTXTrans(trans, pos.x + scale.x * w, pos.y, pos.z); }
     PSMTXScale(scl, scale.x, scale.y, scale.z);
     PSMTXConcat(trans, scl, trans);
     FontDrawColor(color);
@@ -1352,3 +1355,7 @@ __declspec(section ".data") u32 gap_05_8037631C_data[1] = {0};
 
 __declspec(section ".sdata2") const volatile f32 float_0p5_8041dc98 __attribute__((aligned(8))) = 0.5f;
 #pragma force_active reset
+
+void winMainStrippedPool(f32* f, s32 i) {
+    *f = (f32)i;
+}

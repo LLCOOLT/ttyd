@@ -524,7 +524,7 @@ static char* double2hex(long double num, char* buff, print_format format) {
     char working_byte;
     unsigned char b;
     long double ld;
-    short exp;
+    long exp;
     print_format exp_format;
     int hex_precision;
     decform form;
@@ -587,8 +587,8 @@ static char* double2hex(long double num, char* buff, print_format format) {
     exp_format.field_width = 0;
     exp_format.precision = 1;
     exp_format.conversion_char = 'd';
-    exp = (*(short*)&ld & 0x7FF0) >> 4;
-    p = long2str(exp - 0x3FF, buff, exp_format);
+    exp = (short)((*(short*)&ld & 0x7FF0) >> 4) - 0x3FF;
+    p = long2str(exp, buff, exp_format);
 
     if (format.conversion_char == 'a') {
         *--p = 'p';
