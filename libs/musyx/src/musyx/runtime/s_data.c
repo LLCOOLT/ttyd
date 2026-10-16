@@ -16,10 +16,10 @@ typedef struct GSROOT {
 } GSROOT;
 
 static GSROOT gsDefault;
+static s32 gsUnused;
 static GSROOT* gsRoot;
 static GSROOT* gsCurrent;
 static s32 gsNextID;
-static s32 gsUnused;
 
 void dataInitStack(unsigned long aramBase, unsigned long aramSize) {
   gsRoot = NULL;
@@ -374,8 +374,10 @@ u32 sndSeqPlayEx(u16 sgid, u16 sid, void* arrfile, SND_PLAYPARA* para, u8 studio
   GSROOT* root;
   void* prj;
   for (root = gsRoot; root != NULL; root = root->next) {
-    for (i = 0; i < root->sp; ++i) {
-      if (root->stack[i].gAddr->id != sgid) {
+    /* fake: r steps one GSTACK per i; reproduces the register use of seqPlaySong(.., 0, ..) inlined */
+    GSROOT* r;
+    for (i = 0, r = root; i < root->sp; r = (GSROOT*)((u8*)r + sizeof(GSTACK)), ++i) {
+      if (r->stack[0].gAddr->id != sgid) {
         continue;
       }
       if (root->stack[i].gAddr->type == 0) {

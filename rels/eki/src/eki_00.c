@@ -843,10 +843,10 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_moamoa_main(void) {
+    const char* sfx;
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
-    const char* sfx;
     s32 sndFlag;
     s32 i;
     s32 ret;

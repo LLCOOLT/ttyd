@@ -372,17 +372,16 @@ s32 marioChkHammer2(void) {
 
 #define MS(o) (*(s16*)((u8*)mario + (o)))
 
-static const Vec v = {0.0f, 40.0f, 0.0f};
 
-#define H2_LV(lvl, a148, a68)                                       \
-	{                                                               \
-		MarioWork* m = marioGetPtr();                               \
-		m->unk148 = a148;                                           \
-		*(f32*)((u8*)m + 0x158) = 0.005f;                           \
-		m->field_68 = a68;                                          \
-		marioGetPtr()->field_6C = v; \
-		MS(0x2B4) |= 0x1000;                                        \
-	}
+static inline void mot_ham(f32 a148, f32 a68) {
+	MarioWork* m = marioGetPtr();
+	m->unk148 = a148;
+	*(f32*)((u8*)m + 0x158) = 0.005f;
+	m->field_68 = a68;
+	m->field_6C = (Vec){0.0f, 40.0f, 0.0f};
+}
+
+#define H2_LV(lvl, a148, a68) { mot_ham(a148, a68); MS(0x2B4) |= 0x1000; }
 
 #define H2_RAMP(maxv, midv, minv, lvl, a148, a68)                         \
 	marioChgPaper("P_H_1A");                                        \
@@ -566,7 +565,7 @@ void mot_hammer2(void) {
 			} else if (MB(0x42) <= 1) {
 				MF(0x2A8) = 15.0f;
 			}
-			{ f32 y = 20.0f + MF(0x90); effUltraHammerEntry(MB(0x43) != 0, MI(0x48), MF(0x8C), y, MF(0x94), 1.0f); }
+			((EffectEntry* (*)(f32, f32, f32, f32, BOOL, s32))effUltraHammerEntry)(MF(0x8C), 20.0f + MF(0x90), MF(0x94), 1.0f, MB(0x43) != 0, MI(0x48));
 		}
 		break;
 	case 20:

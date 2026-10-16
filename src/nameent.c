@@ -21,7 +21,7 @@ void GXGetViewportv(f32* vp);
 void nameBG(void);
 void nameKirinukiGX(f32 x, f32 y, f32 w, f32 h);
 void nameMaskGX(f32 t);
-void nameWinGX(TEXPalette* tpl, s32 type, f32 x, f32 y, f32 w, f32 h);
+void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type);
 #include <string.h>
 
 s32 nameMain(void);
@@ -98,7 +98,7 @@ void nameEntReInit(void) {
 }
 
 BOOL nameEntPrepare(void) {
-	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0;
+	return fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0;
 }
 
 void nameEntOn(s32 type) {
@@ -116,7 +116,7 @@ void nameEntOn(s32 type) {
 	wp->y1 = wp->y2 = (f32)(112 - wp->field_0x14 * 28);
 	wp->field_0x2C = wp->field_0x34 = -106.0f;
 	wp->field_0x30 = wp->field_0x38 = 135.0f;
-	strcpy(wp->field_0x3C, "");
+	strcpy(wp->field_0x3C, "\0\0\0");
 	for (i = 0; i < 8; i++) {
 		strcat(wp->field_0x3C, "\x81\x40");
 	}
@@ -163,8 +163,8 @@ const char* nameEntGetName(void) {
 }
 
 static inline BOOL nameEntLoad(void) {
-	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl", getMarioStDvdRoot()) != 0U) {
-		wp->field_0x60 = fileAllocf(4, "%s/w/jp/name.tpl", getMarioStDvdRoot());
+	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0U) {
+		wp->field_0x60 = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
 		return TRUE;
 	}
 	return FALSE;
@@ -414,6 +414,7 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	GXColor unused = {0xFF, 0xFF, 0xFF, 0xFF};
 	const char* str;
 	s32 k;
+	s32 n;
 	s32 j;
 	s32 i;
 	CameraEntry saved;
@@ -446,10 +447,10 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	nameKirinukiGX(-240.0f, 120.0f, 480.0f, 270.0f);
 	FontDrawStart();
 	for (j = 0; j < 9; j++) {
-		for (k = 0; k < 14; k++) {
-			str = wp->field_0x50[j * 14 + k];
+		for (n = 0; n < 14; n++) {
+			str = wp->field_0x50[j * 14 + n];
 			if (str) {
-				FontDrawString((f32)(k * 24 - 190 + (k / 5) * 30 + (24 - FontGetMessageWidth(str)) / 2), (f32)(112 - j * 28), str);
+				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(str)) / 2), (f32)(112 - j * 28), str);
 			}
 		}
 	}
@@ -468,11 +469,12 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	winTexSet(0x24, (Vec){2.0f + wp->field_0x2C, wp->field_0x30 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
 	winTexSet(0x24, (Vec){wp->field_0x2C, wp->field_0x30, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	FontDrawStart();
-	for (i = 0; i < 8; i++) {
+	for (n = 0; n < 8; n++) {
 		memset(buf, 0, sizeof(buf));
-		strncpy(buf, &wp->field_0x3C[i * 2], 2);
+		strncpy(buf, &wp->field_0x3C[n * 2], 2);
 		if (strlen(buf)) {
-			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(i * 32 - 120), 171.0f, buf);
+			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(n * 32 - 120)
+, 171.0f, buf);
 		}
 	}
 	str = msg_tbl[wp->field_0xC];
@@ -488,8 +490,8 @@ void nameEntDisp(CameraId cameraId, void* param) {
 		if (wp->field_0xC == 4) {
 			ok = msgSearch("msg_nameent_ok_01");
 		}
-		nameWinGX(*wp->field_0x60->data, 1, -180.0f, 130.0f, 360.0f, 100.0f);
-		nameWinGX(*wp->field_0x60->data, 1, -80.0f, 10.0f, 160.0f, 120.0f);
+		nameWinGX(-180.0f, 130.0f, 360.0f, 100.0f, *wp->field_0x60->data, 1);
+		nameWinGX(-80.0f, 10.0f, 160.0f, 120.0f, *wp->field_0x60->data, 1);
 		FontDrawStart();
 		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		FontDrawEdge();
@@ -736,7 +738,7 @@ static inline void nameWinQuad(TEXPalette* tpl, s32 a, s32 b, s32 c, f32 x, f32 
 	GXTexCoord2f32(1.0f, 0.0f);
 }
 
-void nameWinGX(TEXPalette* tpl, s32 type, f32 x, f32 y, f32 w, f32 h) {
+void nameWinGX(f32 x, f32 y, f32 w, f32 h, TEXPalette* tpl, s32 type) {
 	GXSetZCompLoc(GX_TRUE);
 	GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
 	GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_OR);

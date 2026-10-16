@@ -637,14 +637,18 @@ BOOL BattleStatusChangeMsgMain(BattleWork* wp) {
 #pragma dont_inline reset
 
 
+typedef void (*WakuColByRefFunc)(u16, GXColor*, f32, f32, f32, f32, f32);
+
 void _st_chg_msg_disp(void) {
 	u8* wp = (u8*)_battleWorkPointer + 0x20000;
 	f32 y; f32 x; u16 width; u16 lines;
+	GXColor col0;
 	width = FontGetMessageWidthLine((const char*)(wp - 0x7128), &lines);
 	lines++;
+	col0 = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
 	y = 0.0f; x = y - (width / 2); y = -120.0f;
-	{ GXColor col0 = {0xFF, 0xFF, 0xFF, 0xFF};
-	windowDispGX_Waku_col(0, col0, x - 20.0f, ((lines - 1) * 29) + -117.0f, (f32)(width + 40), (f32)(lines * 29 + 1), 10.0f); }
+	// the color is passed by address here (same ABI as by-value GXColor)
+	((WakuColByRefFunc)windowDispGX_Waku_col)(0, &col0, x - 20.0f, ((lines - 1) * 29) + -117.0f, (f32)(width + 40), (f32)(lines * 29 + 1), 10.0f);
 	FontDrawStart();
 	FontDrawMessage(x, (s32)y + (lines - 1) * 29, (const char*)(wp - 0x7128));
 }

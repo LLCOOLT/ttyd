@@ -12,10 +12,14 @@ double sin(double);
 double cos(double);
 
 static inline s16 __OSf32tos16(register f32 inF) {
-    s32 out;
-    register s16* outPtr = (s16*)&out;
-    asm { psq_st inF, 0(outPtr), 1, OS_FASTCAST_S16 }
-    return *(s16*)&out;
+    u32 tmp;
+    register u32* tmpPtr = &tmp;
+    register s16 out;
+    asm {
+        psq_st inF, 0(tmpPtr), 1, OS_FASTCAST_S16
+        lha out, 0(tmpPtr)
+    }
+    return out;
 }
 
 static inline void OSf32tos16(f32* f, s16* out) {

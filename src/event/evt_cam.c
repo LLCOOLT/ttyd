@@ -66,10 +66,10 @@ USER_FUNC(evt_cam_get_at) {
 
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
-    s32* args = event->args;
-    u64 mask = -1;
     u64 now;
+    s32* args = event->args;
     u64 last;
+    u32 hi, lo;
     CameraId id;
     s32 msec;
     f32 x, y;
@@ -80,12 +80,16 @@ USER_FUNC(evt_cam_shake) {
     x = evtGetFloat(event, args[1]);
     y = evtGetFloat(event, args[2]);
     msec = evtGetValue(event, args[3]);
-    now = event->lifetime;
+    hi = ((u32*)&event->lifetime)[0];
+    lo = ((u32*)&event->lifetime)[1];
+    now = ((u64)hi << 32) | lo;
     if (isFirstCall) {
         event->userdata[0] = 0;
-        *(OSTime*)&event->userdata[1] = now & mask;
+        ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
+        ((u32*)&event->userdata[1])[1] = now & 0xFFFFFFFF;
         *(s32*)&event->field_84 = 0;
-        event->wInterpRelatedTime = now & mask;
+        ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
+        ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
     }
     event->userdata[0]++;
     event->userdata[0] %= 4;
@@ -97,7 +101,7 @@ USER_FUNC(evt_cam_shake) {
     }
     camGetPtr(id)->flags |= 8;
     if (msec) {
-        if (msec < OSTicksToMilliseconds(now - *(u64*)&event->userdata[1])) {
+        if ((u64)msec < OSTicksToMilliseconds(now - *(u64*)&event->userdata[1])) {
             camGetPtr(id)->flags &= ~8;
             padRumbleOff(0);
             return EVT_RETURN_DONE;
@@ -112,14 +116,16 @@ USER_FUNC(evt_cam_shake) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = mask & now;
+                ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
+                ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
         }
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
                 event->field_84 = 1 - event->field_84;
-                event->wInterpRelatedTime = mask & now;
+                ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
+                ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
         }
     }

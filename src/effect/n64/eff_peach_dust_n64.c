@@ -88,8 +88,6 @@ void effPeachDustMain(EffectEntry* effect);
 void effPeachDustDisp(CameraId cameraId, EffectEntry* effect);
 
 EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32 scale) {
-    char* row;
-    s32 k;
     char* base;
     EffectEntry* effect;
     EffPeachDustParticle* p;
@@ -110,21 +108,21 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
     work->position.y = y;
     work->position.z = z;
     x = 6.2831855f * scale;
-    work->frame = k = 0;
+    work->frame = 0;
     work->type = type;
     work->lifetime = 80;
+    base = data + type * 256;
     p = work->particles;
     count = 1;
 
-    for (i = 0, base = data + type * 256; i < 16; i++) {
-        row = base + (15 - i) * 16;
-        for (j = 0; j < 16; j++, row++) {
-            if ((s32)*row == '.') {
+    for (i = 0; i < 16; i++) {
+        for (j = 0; j < 16; j++) {
+            if ((s32)base[(15 - i) * 16 + j] == '.') {
                 continue;
             }
             r = 0.1f * (rand() % 20 - 10) + (f32)((j - 8) * 2);
             p->position.x = r * (f32)cos(ang = x / 360.0f);
-            p->position.y = 0.1f * (rand() % 20 - 10) + (f32)k;
+            p->position.y = 0.1f * (rand() % 20 - 10) + (f32)(i * 2);
             p->position.z = r * (f32)sin(ang);
             p->velocity.x = 0.04f * p->position.x;
             p->velocity.y = 0.04f * p->position.y;
@@ -140,7 +138,6 @@ EffectEntry* effPeachDustN64Entry(s32 type, f32 x, f32 y, f32 z, f32 unused, f32
         if (count >= 101) {
             break;
         }
-        k += 2;
     }
     for (; count < 101; count++) {
         p->scale = 0.0f;

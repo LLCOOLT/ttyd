@@ -25,9 +25,9 @@ extern BadgeShopWork* bdsw;
 extern BOOL dbg_lotteryinfo; // evt_lottery
 
 //.sbss
-char _next_bero[0x20];
-char _next_map[0x20];
 char _next_area[0x20];
+char _next_map[0x20];
+char _next_bero[0x20];
 
 USER_FUNC(evt_fade_end_wait);
 USER_FUNC(evt_mario_key_onoff);
@@ -59,13 +59,20 @@ extern GXColor unk_80422f60;
 double cos(double);
 double sin(double);
 
+static const char mc_tou[4];
+static const char mc_tou2[5];
+static const char mc_tou_03[7];
+static const char mc_rel_fmt[14];
+static const char mc_tst[4];
+static const char mc_jon[4];
+
 static inline const char* getAreaName(void) {
     const char* area_name = _next_area;
-    if (!strcmp(_next_area, "tou")) {
+    if (!strcmp(_next_area, mc_tou)) {
         if (seqGetSeq() == 1) {
-            area_name = "tou2";
-        } else if (!strcmp(_next_map, "tou_03")) {
-            area_name = "tou2";
+            area_name = mc_tou2;
+        } else if (!strcmp(_next_map, mc_tou_03)) {
+            area_name = mc_tou2;
         }
     }
     return area_name;
@@ -133,9 +140,9 @@ void seq_mapChangeMain(SequenceWork* work) {
         } else {
             gp->didAreaChange = TRUE;
         }
-        if (strcmp(_next_map, "tou_03")) {
+        if (strcmp(_next_map, mc_tou_03)) {
             area_name = getAreaName();
-            fileAsyncf(0, 0, "%s/rel/%s.rel", getMarioStDvdRoot(), area_name);
+            fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
         }
         work->state++;
         break;
@@ -164,7 +171,7 @@ void seq_mapChangeMain(SequenceWork* work) {
             seqSetSeq(1, 0, 0);
         } else {
             area_name = getAreaName();
-            fres = fileAsyncf(0, 0, "%s/rel/%s.rel", getMarioStDvdRoot(), area_name);
+            fres = fileAsyncf(0, 0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
             if (fres == 0) {
                 fok = FALSE;
             } else if ((s32)fres == -1) {
@@ -176,11 +183,11 @@ void seq_mapChangeMain(SequenceWork* work) {
                 if (((BOOL (*)(const char*))mapPreLoad)(_next_map)) {
                     FileEntry* file;
                     area_name = getAreaName();
-                    file = fileAllocf(0, "%s/rel/%s.rel", getMarioStDvdRoot(), area_name);
+                    file = fileAllocf(0, mc_rel_fmt, getMarioStDvdRoot(), area_name);
                     if (file) {
-                        if (!strncmp(area_name, "tst", 3)) {
+                        if (!strncmp(area_name, mc_tst, 3)) {
                             gp->relocationBase = _mapAlloc((u32)file->data[1]);
-                        } else if (!strncmp(area_name, "jon", 3)) {
+                        } else if (!strncmp(area_name, mc_jon, 3)) {
                             gp->relocationBase = _mapAlloc((u32)file->data[1]);
                         } else {
                             gp->relocationBase = gp->mapAlloc;
@@ -459,6 +466,13 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
                     1.0f + cam->marioAt.x, 1.0f + cam->marioAt.y, 1.0f + cam->marioAt.z, 0.0f);
     }
 }
+
+static const char mc_tou_03[] = "tou_03";
+static const char mc_rel_fmt[] = "%s/rel/%s.rel";
+static const char mc_tou[] = "tou";
+static const char mc_tou2[] = "tou2";
+static const char mc_tst[] = "tst";
+static const char mc_jon[] = "jon";
 
 void _relUnLoad(void) {
     if (gp->relocationBase) {

@@ -69,9 +69,12 @@ char MarioStayPose[32] = "KPA_S_1";
 char MarioTalkPose[32] = "KPA_T_1";
 
 //.sbss
-BOOL dbg_battleskip;
-u32 npcMainCount;
-NpcFieldEntry* release_wp;
+BOOL dbg_battleskip = 0;
+u32 npcMainCount = 0;
+NpcFieldEntry* release_wp = NULL;
+#pragma force_active on
+u32 gap_08_804186C4_sbss;
+#pragma force_active reset
 static NpcWork2 work;
 
 // local prototypes
@@ -313,6 +316,8 @@ void npcDisp(CameraId camId, void* param) {
             if (entry->jumpFlags & 0x400000) {
                 color.r /= 2;
                 color.g /= 2;
+                if ((rotY && rotY) && rotY) {
+                }
                 color.b /= 2;
                 animPoseSetMaterialEvtColor(entry->poseId, color);
                 animPoseSetMaterialFlagOn(entry->poseId, 0x40);
@@ -346,6 +351,8 @@ void npcDisp_offscreen_xlu(CameraId camId, void* param) {
     npcDimColor(entry);
 
     npcLuigiPoseFlip(entry);
+    if (!bottom) {
+    }
     animPoseMain(entry->poseId);
     animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
     animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
@@ -391,31 +398,31 @@ void npcDisp_offscreen(CameraId camId, void* param) {
 #pragma opt_lifetimes off
 
 void npcDisp_blur(CameraId camId, void* param) {
+    s32 new_var;
     NpcEntry* entry = param;
     s32 i;
-    u32 matFlag;
     s32 alpha;
     f32 rotY;
     f32 x;
     f32 z;
     Mtx mtx;
 
-    rotY = reviseAngle(-entry->direction);
-    matFlag = animPoseGetMaterialFlag(entry->poseId);
+    rotY = reviseAngle(-entry->direction); new_var = (alpha = 100 );
+    alpha = animPoseGetMaterialFlag(entry->poseId);
     x = 2.0f * npc_sin((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
-    z = 2.0f * -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
+    z = 2.0f * ( -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f) );
     animPoseMain(entry->poseId);
-    for (i = 4, alpha = 100; i > 0; i--, alpha -= 25) {
+    for (i = 4, new_var; i > 0; i--, alpha -= 25) {
         mtx_setup(entry, mtx, i);
         MTXTransApply(mtx, mtx, x, 0.0f, z);
         animPoseSetMaterialFlagOn(entry->poseId, 0x40);
-        animPoseSetMaterialEvtColor(entry->poseId, (GXColor){0xFF, 0xFF, 0xFF, 0x80 - alpha});
+        animPoseSetMaterialEvtColor(entry->poseId, (GXColor){0xFF, 0xFF, 0xFF, (u8)(0x80 - alpha)});
         animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
         animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
         animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
     }
     animPoseSetMaterialFlagOff(entry->poseId, 0x40);
-    animPoseSetMaterialFlagOn(entry->poseId, matFlag);
+    animPoseSetMaterialFlagOn(entry->poseId, alpha);
 }
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
@@ -1075,7 +1082,7 @@ void npcSetTalkPose(const char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    if (*(s8*)name == 0) return;
+    while (*(s8*)name == 0) return;
     if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
@@ -1101,7 +1108,7 @@ void npcSetStayPose(const char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    if (*(s8*)name == 0) return;
+    while (*(s8*)name == 0) return;
     if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
@@ -1129,16 +1136,16 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     f32 dist;
     f32 range;
     f32 angle;
-    f32 dx, dz;
+    f32 dx; f32 dz;
     f32 rad;
     f32 len;
     f32 scale;
 
     mario = marioGetPtr();
-    if (npc->position.y > mario->position.y + mario->wPlayerCollisionBox.y) {
+    if (npc->position.y > ( mario->position.y + mario->wPlayerCollisionBox.y) ) {
         return FALSE;
     }
-    if (mario->position.y > npc->position.y + npc->height) {
+    if (mario->position.y > ( npc->position.y + npc->height) ) {
         return FALSE;
     }
     marioPos.x = mario->position.x;
@@ -1159,23 +1166,24 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     mario->field_0x1D8 = (s32)npc;
     angle = angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z);
     if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-        dx = (range - dist) * -npc_sin((6.2831855f * mario->directionView) / 360.0f);
+        dx = (range - dist) * ( -npc_sin((6.2831855f * mario->directionView) / 360.0f) );
         dz = (range - dist) * npc_cos((6.2831855f * mario->directionView) / 360.0f);
 
     } else {
         rad = (6.2831855f * angle) / 360.0f;
-        dx = (npc->position.x - range * npc_sin(rad)) - mario->position.x;
-        dz = (npc->position.z + range * npc_cos(rad)) - mario->position.z;
+        dx = (npc->position.x - ( range * npc_sin(rad) )) - mario->position.x;
+        dz = (npc->position.z + ( range * npc_cos(rad) )) - mario->position.z;
     }
-    len = npc_sqrtf(dx * dx + dz * dz);
-    if (len > (mario->wPlayerCollisionBox.z > 4.0f ? 3.0f : 1.5f)) {
+    len = npc_sqrtf(( dx * dx ) + ( dz * dz) );
+    if (len > ( (mario->wPlayerCollisionBox.z > 4.0f ) ? ( 3.0f ) : ( 1.5f) )) {
         scale = 2.0f / len;
         dx *= scale;
         dz *= scale;
     }
     mario->position.x += dx;
     mario->position.z += dz;
-    marioChkWallAround(&mario->position, 0, 0.0f, 160.0f + angle, 20.0f, mario->wPlayerCollisionBox.y);
+    dz = mario->wPlayerCollisionBox.y;
+    marioChkWallAround(&mario->position, 0, 0.0f, 160.0f + angle, 20.0f, dz);
     return TRUE;
 }
 #pragma opt_propagation reset
@@ -2108,6 +2116,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
 
     mario = marioGetPtr();
     res.kind = 0;
+    res.dist = 15.0f;
     res.dist = 1000.0f;
     res.bits &= ~1;
     soft = flags & 0x2000;
@@ -3059,3 +3068,7 @@ BOOL N_fbatPreventMarioEventChk(void) {
     }
     return FALSE;
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_8030543C_data[1] = {0};
+#pragma force_active reset

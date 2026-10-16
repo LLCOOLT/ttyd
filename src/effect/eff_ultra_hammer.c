@@ -167,6 +167,8 @@ f32 scroll_tbl[] = {
 	-2.9166667f, -3.0625f, -3.2083333f, -3.3541667f, -3.5f
 };
 
+__declspec(section ".data") u32 gap_05_803B735C_data[1] = {0};
+
 s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
 	0, 64, 0, // 0
 };
@@ -418,6 +420,8 @@ u8 wakka_dl_0_size_tbl[] = {
 	1, // 18
 	1, // 19
 };
+
+__declspec(section ".sdata") u32 gap_07_80418194_sdata[1] = {0};
 
 #endif
 

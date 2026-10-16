@@ -57,6 +57,7 @@ typedef struct RollWork {
 
 static const Vec rollOfs = {0.0f, 40.0f, 0.0f};
 
+
 f32 roll_grx;
 f32 roll_grz;
 s32 roll_flyout_flag2;
@@ -560,7 +561,7 @@ void mot_roll(void) {
             MF(0x19c) = 270.0f;
         } else {
             MB(0x43) = 0;
-            MF(0x1a0) = revise360(v31 - MF(0x198));
+            MF(0x1a0) = revise360(90.0f - MF(0x198));
             MF(0x19c) = 90.0f;
         }
         marioGetRubInit();
@@ -653,8 +654,8 @@ void mot_roll(void) {
             if (v31 < 180.0f) {
                 f32 t = 90.0f;
                 f32 diff = t - MF(0x1a8);
-                f32 d = 0.1f * diff;
-                f32 n = d + MF(0x1a8);
+                f32 n = 0.1f * diff;
+                n += MF(0x1a8);
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
@@ -663,8 +664,8 @@ void mot_roll(void) {
             } else {
                 f32 t = 270.0f;
                 f32 diff = t - MF(0x1a8);
-                f32 d = 0.1f * diff;
-                f32 n = d + MF(0x1a8);
+                f32 n = 0.1f * diff;
+                n += MF(0x1a8);
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
@@ -1149,14 +1150,14 @@ static void marioRollCan(void) {
     MarioWork* mario = marioGetPtr();
     f32 v26;
     {
-        Vec d2;
-        Vec nrm;
-        Vec out;
-        Vec dir;
-        Vec pos;
-        f32 dist;
-        f32 c;
         f32 s;
+        f32 c;
+        f32 dist;
+        Vec pos;
+        Vec dir;
+        Vec out;
+        Vec nrm;
+        Vec d2;
         dist = 100.0f;
         pos = mario->position;
         pos.y = pos.y + MF(0x1b8);
@@ -1181,7 +1182,6 @@ static void marioRollCan(void) {
                 pos = mario->position;
                 d2 = (Vec){0.0f, 0.0f, 0.0f};
                 d2.x = s;
-                d2.y = 0.0f;
                 d2.z = c;
                 dir = d2;
                 marioHitCheckVec(&pos, &dir, &out, &nrm, &dist);

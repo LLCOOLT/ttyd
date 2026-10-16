@@ -196,6 +196,11 @@ void effOpukuWgunMain(EffectEntry* effect) {
 }
 
 static u8 a_data[12] = {255, 255, 255, 255, 255, 255, 255, 255, 255, 200, 128, 32};
+#pragma force_active on
+#pragma explicit_zero_data on
+__declspec(section ".sdata") u32 gap_07_80413BFC_sdata[1] = {0};
+#pragma explicit_zero_data reset
+#pragma force_active reset
 void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     s32 k;
     CameraEntry* camera;
@@ -204,7 +209,7 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
     Vec v;
     f32 scl;
-    f32 zero;
+    f32 zero = 0.0f;
     f32 rad;
     f32 dx;
     f32 dy;
@@ -231,7 +236,6 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCullMode(GX_CULL_NONE);
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     k = 0;
-    zero = 0.0f;
     vtx = p;
     for (i = 0; i < 12; i++) {
         if (i == 0 || i == 0) {

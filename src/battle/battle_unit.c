@@ -107,7 +107,7 @@ s32 _enemy_can_use_item_table[] = {
     0x97, 0x98, 0x99, 0x9A, 0x9B, 0x9C, 0x9D, 0x9E, 0x9F, 0xA0, 0x00
 };
 
-s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pitch, Vec* pos);
+s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch, Vec* pos);
 BOOL BtlUnit_CanActStatus(BattleUnit* unit);
 void BtlUnit_SetAnimType(BattleUnitPart* part, s32 type);
 
@@ -2146,8 +2146,10 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
                 psndSFX_vol(id, vol = 0x7F);
                 state->count++;
                 if (part->mOwner->attackPhase != BattleGetSeq(wp, 4)) {
+                    f64 k;
                     dv = (f64)(u32)vol;
-                    psndSFX_vol(id, dv * 0.7);
+                    vol = dv * (k = 0.7);
+                    psndSFX_vol(id, vol);
                 }
             }
             else {
@@ -2167,13 +2169,14 @@ void BtlUnit_ControlPoseSoundMain(BattleUnitPart* part) {
 s32 BtlUnit_snd_se(BattleUnit* unit, const char* sfxName, s32 volume, s32 pan) {
     Vec pos;
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
-    return BtlUnit_snd_se_pos(unit, sfxName, volume, pan, &pos);
+    return ((s32 (*)(BattleUnit*, const char*, s32, s32, Vec*))BtlUnit_snd_se_pos)(unit, sfxName, volume, pan, &pos);
 }
 
-s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pitch, Vec* pos) {
+s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s16 pitch, Vec* pos) {
     s32 id;
     s8 turns, strength;
     s16 pit = 0;
+    s16 p;
 
     if (BtlUnit_CheckStatus(unit, 0xB)) {
         BtlUnit_GetStatus(unit, 0xB, &turns, &strength);
@@ -2184,10 +2187,11 @@ s32 BtlUnit_snd_se_pos(BattleUnit* unit, const char* sfxName, s32 volume, s32 pi
         pit = (strength * 2 + 1) * -0x155;
     }
 
-    pit += pitch;
-    pit += irand(41) - 20;
+    p = pitch;
+    p += pit;
+    p += irand(41) - 20;
     id = psndSFXOn_3D(sfxName, pos);
-    psndSFX_pit(id, pit);
+    psndSFX_pit(id, p);
     psndSFX_vol(id, volume == -250000000 ? psndSFX_get_vol(id) : (u8)volume);
     return id;
 }

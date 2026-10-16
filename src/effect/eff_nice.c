@@ -253,12 +253,13 @@ void acrobatMain(EffectEntry* effect) {
 	tmp.y = wp->position.y;
 	tmp.z = wp->position.z;
 	pos = tmp;
-	wp++;
-	for (i = 1; i < effect->count; i++, wp++) {
-		const char* sfx2 = "SFX_SYSTEM_ACROBAT1";
+	for (i = 1, wp++; i < effect->count; i++, wp++) {
+		char* sfx2 = "SFX_SYSTEM_ACROBAT1";
+		s32 i12 = i * 12;
+		s32 i4 = i * 4;
 		switch (wp->field_0x28) {
 		case 0:
-			wp->field_0x20 = i * 4;
+			wp->field_0x20 = i4;
 			wp->field_0x28++;
 			if (i == 1) {
 				psndSFXOn(sfx2);
@@ -273,7 +274,7 @@ void acrobatMain(EffectEntry* effect) {
 			break;
 		case 2:
 			wp->field_0x20++;
-			wp->position.x = intplGetValue(12, wp->field_0x20, 30, 500.0f, i * 4);
+			wp->position.x = intplGetValue(12, wp->field_0x20, 30, 500.0f, i4);
 			if (wp->field_0x20 >= 30) {
 				wp->field_0x20 = 0;
 				wp->field_0x28++;
@@ -297,7 +298,7 @@ void acrobatMain(EffectEntry* effect) {
 			break;
 		case 5:
 			wp->field_0x20++;
-			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i * 4, i * 3 * 4);
+			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i4, i12);
 			wp->field_0x10 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.2f, 1.0f, wp->field_0x20, 30);
 			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.5f, 1.0f, wp->field_0x20, 30);
 			if (wp->field_0x20 >= 30) {

@@ -309,6 +309,8 @@ s32 winRootMain(WinRootWork* w) {
     };
     s32 i;
     s32 ret;
+    WinRootWork* t;
+    s32 x;
 
     switch (w->active) {
     case 0:
@@ -524,41 +526,41 @@ s32 winRootMain(WinRootWork* w) {
         break;
     }
 
-    for (i = 0; i < 5; i++) {
-        switch (w->tab[i].state) {
+    for (i = 0, t = w, x = -205; i < 5; i++, t = (WinRootWork*)((u8*)t + sizeof(WinRootTab)), x += 105) {
+        switch (t->tab[0].state) {
         case 0:
-            w->tab[i].x = i * 105 - 205;
-            w->tab[i].y = 300.0f;
-            w->tab[i].timer = i * 4;
-            w->tab[i].state++;
+            t->tab[0].x = x;
+            t->tab[0].y = 300.0f;
+            t->tab[0].timer = i * 4;
+            t->tab[0].state++;
             break;
         case 1:
         case 11:
-            if (--w->tab[i].timer < 0) {
-                w->tab[i].timer = 0;
-                w->tab[i].state++;
+            if (--t->tab[0].timer < 0) {
+                t->tab[0].timer = 0;
+                t->tab[0].state++;
             }
             break;
         case 2:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 300.0f, 185.0f);
-            if (w->tab[i].timer > 10) {
-                w->tab[i].state++;
+            t->tab[0].y = intplGetValue(11, t->tab[0].timer++, 10, 300.0f, 185.0f);
+            if (t->tab[0].timer > 10) {
+                t->tab[0].state++;
             }
             break;
         case 10:
-            w->tab[i].timer = (4 - i) * 4;
-            w->tab[i].state++;
+            t->tab[0].timer = (4 - i) * 4;
+            t->tab[0].state++;
             break;
         case 12:
-            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 180.0f, 300.0f);
-            if (w->tab[i].timer > 10) {
-                w->tab[i].state++;
+            t->tab[0].y = intplGetValue(11, t->tab[0].timer++, 10, 180.0f, 300.0f);
+            if (t->tab[0].timer > 10) {
+                t->tab[0].state++;
             }
             break;
         case 13:
             break;
         }
-    }
+        }
 
     winBgMain((WinPauseWork*)w);
     winMsgMain((WinPauseWork*)w);
@@ -2614,12 +2616,12 @@ void winMailDisp(WinPauseWork* wp) {
         if (WM_MODE != 0xCA) {
             for (i = 0; i < wp->mailNum; i++) {
                 GXColor white;
-                GXColor black;
 
                 id = wp->mailList[i].id;
                 kind = wp->mailList[i].kind;
                 mail = (WinMailData*)mailGetPtr(id);
-                black = (GXColor){ 0x00, 0x00, 0x00, 0xFF };
+                {
+                GXColor black = { 0x00, 0x00, 0x00, 0xFF };
                 if (mail->flags & 1) {
                     col = (GXColor){ 0xD7, 0xAC, 0xBC, 0xFF };
                 } else if (mail->flags & 2) {
@@ -2632,20 +2634,20 @@ void winMailDisp(WinPauseWork* wp) {
                 winTexInit(wp->res->tex->tpl);
                 winTexSet(0x77, (Vec){ 4.0f + (208.0f + WM_X), WM_SCR + ((WM_Y - 56.0f) - (f32)(i * 40)), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, col);
                 white = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-                winTexSet((pouchCheckMail(id) == 2 ? 0x5E : 0x5D), (Vec){ 72.0f + WM_X, WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
+                winTexSet((u32)((s32)pouchCheckMail(id) == 2 ? (void*)0x5E : (void*)0x5D), (Vec){ 72.0f + WM_X, WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winTexSet(0x65 + (kind + 1) / 10, (Vec){ 2.0f + (88.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winTexSet(0x65 + (kind + 1) % 10, (Vec){ 2.0f + (104.0f + WM_X), WM_SCR + (((WM_Y - 56.0f) - (f32)(i * 40)) - 3.0f), 0.0f }, (Vec){ 1.0f, 1.0f, 1.0f }, white);
                 winFontInit();
                 winFontSetLabel((Vec){ 120.0f + WM_X, WM_SCR + (8.0f + ((WM_Y - 56.0f) - (f32)(i * 40))), 0.0f }, (Vec){ 0.75f, 0.75f, 0.75f }, black, mail->name);
+                }
             }
             GXSetScissor(0, 0, 0x260, 0x1E0);
         } else {
-            GXColor col;
+            s32 kind2 = wp->mailList[wp->mailSel].kind;
             GXColor white = { 0xFF, 0xFF, 0xFF, 0xFF };
             GXColor black = { 0x00, 0x00, 0x00, 0xFF };
-            s32 kind2;
+            GXColor col;
 
-            kind2 = wp->mailList[wp->mailSel].kind;
             mail = (WinMailData*)mailGetPtr(wp->mailList[wp->mailSel].id);
             if (mail->flags & 1) {
                 col = (GXColor){ 0xD7, 0xAC, 0xBC, 0xFF };

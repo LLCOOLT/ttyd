@@ -138,6 +138,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
 u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
 static inline void crCheck(BOOL b) {}
+
 void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
@@ -716,9 +717,10 @@ s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit) {
 }
 // CC_END
 void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g) {
-    f32 mnz;
+    f32 nx;
     f32 ny;
     f32 nz;
+    f32 mnz;
     f32 cs, sn, w, ox, oz;
     s32 cnt;
     s32* idxp;
@@ -757,7 +759,6 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     Vec r2;
     f32 best;
     f32 zoom;
-    f32 nx;
     f32 px;
     f32 x;
     f32 y;
@@ -768,7 +769,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
     s32 found, found2;
     s32 i;
     f32 fov;
-    f32 l1, l2, lim1, lim2;
+    f32 l1, l2, lim2, lim1;
     curve = (CamRoadCurveX*)wp->map->curves;
     best = -100000000.0f;
     hitCurve = NULL;
@@ -802,7 +803,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
                 cnt = strip->num - 1;
                 idx = &((s32*)wp->map->f_100)[strip->idxOfs];
                 idxp = idx + 1;
-                for (l = 1; l < cnt; idxp++, l++) {
+                for (l = 1; cnt > l; idxp++, l++) {
                     if (collisionTri_simple(posB, verts[idx[0]], verts[idxp[0]], verts[idxp[1]], &best)) {
                         hitCurve = curve;
                         break;
@@ -994,8 +995,8 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
             l2 = lim1 * wp->f_19c[5];
             spd1 = lim2 * wp->f_19c[4];
             spd2 = lim2 * wp->f_19c[5];
-            dA.z = nx;
             dA.x = mnz;
+            dA.z = nx;
             dB.x = -dA.z;
             dB.z = dA.x;
             dA.y = 0.0f;
@@ -1347,6 +1348,3 @@ void camRoadCurveOff(const char* name) {
         }
     }
 }
-
-
-

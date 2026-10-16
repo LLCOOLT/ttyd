@@ -23,6 +23,9 @@ BOOL parsePush(const char* tag) {
 	s32 newStart;
 	s32 newEnd;
 	s32 depth;
+	s32 j;
+	s32 n;
+	s8 c;
 	depth = 0;
 	state = 0;
 	p = (s8*)parse.ptr;
@@ -46,19 +49,17 @@ BOOL parsePush(const char* tag) {
 			}
 			else {
 				if (state == 0 && depth == 0) {
-					s32 j;
-					s32 n;
-						for (j = i, n = 0; j < end; j++) {
-							s8 c = p[j];
-							if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
-								buf[n] = c;
-								n += 1;
-							}
-							if (n >= 127 || p[j] == '>') {
-								break;
-							}
+					for (j = i, n = 0; j < end; j++) {
+						c = p[j];
+						if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
+							buf[n] = c;
+							n += 1;
 						}
-						*(buf + n) = 0;
+						if (n >= 127 || p[j] == '>') {
+							break;
+						}
+					}
+					*(buf + n) = 0;
 					if (strcmp(&buf[0], tag) == 0) {
 						for (; i < end; i++) {
 							if (p[i] == '>') {
@@ -184,4 +185,3 @@ BOOL parseTagGet1(const char* tag, s32 type, void* data) {
 	}
 	return FALSE;
 }
-

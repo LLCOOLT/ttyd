@@ -600,8 +600,8 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	Mtx pT;
 	Mtx pS;
 	Mtx mT5;
-	BattleWork* wp = _battleWorkPointer;
 	BattleUnit* unit = part->mOwner;
+	BattleWork* wp = _battleWorkPointer;
 	CameraEntry* cam;
 	f32 rotY;
 	f32 x, y, z;

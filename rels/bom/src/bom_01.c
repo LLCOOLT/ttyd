@@ -341,7 +341,7 @@ void disp_sight(CameraId camera, void* param) {
     s32 j;
     s32 n;
     s32 id;
-    s32 on;
+    int on;
     f32 x;
     f32 y;
 
@@ -366,7 +366,7 @@ void disp_sight(CameraId camera, void* param) {
     winTexInit(*sight_wp->tpl->data);
     winTexSet(5, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black);
     for (id = 0; id < 3; id++) {
-        if ((s32)(gp->retraceCount % 30) / 10 != id) {
+        if (((( s32)(gp->retraceCount % 30) ) / 10 ) != id) {
             i = 4 - id;
             drawBG(i, 100.0f, 60.0f, 1.0f, 1.0f, 0.0f);
             drawBG(i, -100.0f, 60.0f, -1.0f, 1.0f, 0.0f);
@@ -377,10 +377,10 @@ void disp_sight(CameraId camera, void* param) {
 
     winTexInit(*sight_wp->tpl->data);
     winTexSet(23, (Vec){-200.0f, 150.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
-    drawNum(gp->renderTime / 100 / 1000, 10, 90.0f, 180.0f, 0.6f);
-    drawNum(gp->renderTime / 200 / 1000, 8, 126.0f, 150.0f, 0.6f);
-    drawNum(gp->renderTime / 300 / 1000, 6, 162.0f, 120.0f, 0.6f);
-    drawNum(gp->renderTime / 400 / 1000, 6, 162.0f, 90.0f, 0.6f);
+    drawNum(( gp->renderTime / 100 ) / 1000, 10, 90.0f, 180.0f, 0.6f);
+    drawNum(( gp->renderTime / 200 ) / 1000, 8, 126.0f, 150.0f, 0.6f);
+    drawNum(( gp->renderTime / 300 ) / 1000, 6, 162.0f, 120.0f, 0.6f);
+    drawNum(( gp->renderTime / 400 ) / 1000, 6, 162.0f, 90.0f, 0.6f);
     drawNum(gp->retraceCount / 4, 4, 110.0f, -160.0f, 1.0f);
     drawNum(gp->retraceCount / 8, 2, 230.0f, -170.0f, 0.8f);
 
@@ -397,9 +397,9 @@ void disp_sight(CameraId camera, void* param) {
         if (n > 7) {
             n = 7;
         }
-        x = -240.0f + 20.0f * i;
+        x = ( -240.0f ) + ( 20.0f * i) ;
         for (j = 0; j < n; j++) {
-            y = -190.0f + 16.0f * j;
+            y = ( -190.0f ) + ( 16.0f * j) ;
             if (j == 6) {
                 drawBG(10, x, y, 1.0f, 1.0f, 0.0f);
             } else {
@@ -407,7 +407,7 @@ void disp_sight(CameraId camera, void* param) {
             }
         }
         for (j = n; j < 7; j++) {
-            y = -190.0f + 16.0f * j;
+            y = ( -190.0f ) + ( 16.0f * j) ;
             if (j == 6) {
                 drawBG(12, x, y, 1.0f, 1.0f, 0.0f);
             } else {
@@ -418,7 +418,7 @@ void disp_sight(CameraId camera, void* param) {
 
     winTexInit(*sight_wp->tpl->data);
     for (i = 0; i < 4; i++) {
-        on = (gp->retraceCount % 20 > 6 && i == sight_wp->dir) ? 1 : 0;
+        on = ((( gp->retraceCount % 20 ) > 6 ) && ( i == sight_wp->dir) ) ? ( 1 ) : ( 0) ;
         id = 7;
         if (on != 0) {
             id = 6;
@@ -436,13 +436,13 @@ void disp_sight(CameraId camera, void* param) {
                 break;
             case 2:
                 drawBG(id, -180.0f, 16.0f, 1.0f, 1.0f, 180.0f);
-                if (on && (gp->retraceCount & 3) == 0) {
+                if (on && (( gp->retraceCount & 3) == 0) ) {
                     sight_wp->count1++;
                 }
                 break;
             case 3:
                 drawBG(id, 180.0f, -16.0f, 1.0f, 1.0f, 0.0f);
-                if (on && (gp->retraceCount & 3) == 0) {
+                if (on && (( gp->retraceCount & 3) == 0) ) {
                     sight_wp->count2++;
                 }
                 break;

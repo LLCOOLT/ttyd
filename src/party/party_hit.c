@@ -156,8 +156,12 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
 }
 
 
-f32 partyNrmToAngle(Vec* n) {
+static inline f32 partyNrmTo(Vec* n) {
     return angleABf(0.0f, 0.0f, party_sqrtf(n->x * n->x + n->z * n->z), -n->y);
+}
+
+f32 partyNrmToAngle(Vec n) {
+    return angleABf(0.0f, 0.0f, party_sqrtf(n.x * n.x + n.z * n.z), -n.y);
 }
 
 void partyChkGnd(PartyEntry* party) {
@@ -207,7 +211,7 @@ static inline f32 partyNrmSet(PartyEntry* party, Vec n) {
     PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
     PF(party, 0xC8) = 0.0f;
     PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
-    return partyNrmToAngle(&n);
+    return partyNrmTo(&n);
 }
 
 HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
@@ -355,7 +359,7 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
         PF(party, 0xC4) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.z, 100.0f * n.y) - 180.0f);
         PF(party, 0xC8) = 0.0f;
         PF(party, 0xCC) = (s32)(angleABf(0.0f, 0.0f, 100.0f * n.x, 100.0f * n.y) - 180.0f);
-        PF(party, 0xE0) = partyNrmToAngle(&n);
+        PF(party, 0xE0) = partyNrmTo(&n);
         gy = outPos.y;
         if (gy < oy && __fabsf(gy - oy) >= 2.0f) {
             *outDist = oy - gy;
@@ -522,7 +526,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 ang) {
     p.y += dy;
     hit = partyHitCheckInl(party, &p, &dir, &outPos, &nrm, &d);
     if (hit) {
-        if (partyNrmToAngle(&nrm) >= 45.0f) {
+        if (partyNrmTo(&nrm) >= 45.0f) {
             PF(party, 0xEC) = d;
             partyWallSlide(pos, nrm, dist, sn, cs);
             return hit;
@@ -541,13 +545,13 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
     f32 oz, ox;
     Vec t;
     f32 s, c;
-    volatile f32 px, py, pz;
+    volatile f32 px; volatile f32 py; volatile f32 pz;
     f32 d0, nz0, ny0, nx0, hz0, hy0, hx0;
     f32 d1, nz1, ny1, nx1, hz1, hy1, hx1;
     f32 d2, nz2, ny2, nx2, hz2, hy2, hx2;
     f32 d3, nz3, ny3, nx3, hz3, hy3, hx3;
     HitEntry* hit;
-    f32 ten = 10.0f, zero = 0.0f, one = 1.0f;
+    f32 zero = 0.0f, one = 1.0f;
 
     oz = party->width * 0.3f;
     sincosf(&s, &c, angle);
@@ -561,15 +565,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
         lx = px + oz;
         lz = pz + ox;
         ly = py;
-        {
-        Vec v0 = {0.0f, 0.0f, 0.0f};
-        v0.y = ly;
-        v0.z = lz;
-        v0.x = lx;
-        t = v0;
-        }
+        t = (Vec){lx, ly, lz};
         d0 = best;
-        hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + ten, t.z, zero, one, zero);
+        hit = hitCheckFilter(NULL, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, zero, one, zero);
         if (hit && best >= d0) {
             best = d0;
         }
@@ -578,15 +576,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
         lx = px - oz;
         ly = py;
         lz = pz - ox;
-        {
-        Vec v1 = {0.0f, 0.0f, 0.0f};
-        v1.y = ly;
-        v1.z = lz;
-        v1.x = lx;
-        t = v1;
-        }
+        t = (Vec){lx, ly, lz};
         d1 = best;
-        hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + ten, t.z, zero, one, zero);
+        hit = hitCheckFilter(NULL, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, zero, one, zero);
         if (hit && best >= d1) {
             best = d1;
         }
@@ -594,15 +586,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
             lx = px + ox;
             ly = py;
             lz = pz + oz;
-            {
-            Vec v2 = {0.0f, 0.0f, 0.0f};
-            v2.y = ly;
-            v2.z = lz;
-            v2.x = lx;
-            t = v2;
-            }
+            t = (Vec){lx, ly, lz};
             d2 = best;
-            hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + ten, t.z, zero, one, zero);
+            hit = hitCheckFilter(NULL, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, zero, one, zero);
             if (hit && best >= d2) {
                 best = d2;
             }
@@ -610,15 +596,9 @@ void partySearchHead(PartyEntry* party, Vec* pos, f32* dist, f32 angle) {
                 lx = px - ox;
                 ly = py;
                 lz = pz - oz;
-                {
-                Vec v3 = {0.0f, 0.0f, 0.0f};
-                v3.y = ly;
-                v3.z = lz;
-                v3.x = lx;
-                t = v3;
-                }
+                t = (Vec){lx, ly, lz};
                 d3 = best;
-                hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + ten, t.z, zero, one, zero);
+                hit = hitCheckFilter(NULL, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, zero, one, zero);
                 if (hit && best >= d3) {
                     best = d3;
                 }

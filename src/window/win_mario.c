@@ -114,7 +114,7 @@ void winMarioInit(WinMarioWork* w) {
             case 0: name = "a_mario"; break;
             case 1: name = "a_mario_l"; break;
             case 2: name = "a_mario_w"; break;
-            case 3: name = "a_mario_wl"; break;
+            case 3: name = "a_mario_wl\0\0\0\0\0"; break;
         }
         w->poseId = animPoseEntry(name, 0);
         animPoseSetAnim(w->poseId, "M_S_1", 1);
@@ -421,6 +421,7 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     PouchData* pouch;
     f32 x;
     f32 y;
+    f32 v21;
     f32 v25;
     f32 v24;
     f32 v18;
@@ -430,11 +431,10 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     f32 v31;
     f32 v26;
     f32 v27;
-    f32 v22;
     f32 v30;
-    f32 v21;
     f32 v20;
     f32 v29;
+    f32 v22;
     s32 i;
     s64 secs;
     u64 tsecs;
@@ -612,14 +612,14 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winFontSetEdge((Vec){v24 - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x72\x82\x6F");
         v18 = 10.0f + (v31 - 270.0f);
         v20 = (228.0f + x) - 270.0f;
-        v21 = 4.0f + ((17.0f + v24) - 270.0f);
+        v25 = 4.0f + ((17.0f + v24) - 270.0f);
         for (i = 0; i < w->f198; i++) {
             char sbuf[0x20];
 
             winFontSetLabel((Vec){v18, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, superActionTable[i]->name);
             sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->cost));
             winFontSet((Vec){v20 - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, sbuf);
-            winFontSet((Vec){v21, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black2, "\x82\x72\x82\x6F");
+            winFontSet((Vec){v25, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black2, "\x82\x72\x82\x6F");
         }
     }
 }

@@ -23,14 +23,18 @@ extern int sprintf(char* str, const char* format, ...);
 #include "assets/_mariost_icon_tex.inc"
 #include "assets/_mariost_icon_tlut.inc"
 #include "assets/_mariost_banner_tex.inc"
+const char str_802CCC80[0x14] = "mariost_save_file";
+const char str_802CCC94[0x18] = "ペーパーマリオＲＰＧ";
+const char str_802CCCAC[0x20] = "%2d月%2d日のセーブデータです";
+__declspec(section ".rodata") const u32 gap_04_802CCCCC_rodata[1] = {0};
 
 //.sbss
 static CardWork* wp;
 u32 gap_08_8041889C_sbss;
 
 //.sdata
-__declspec(section ".sdata") u32 gap_07_80410584_sdata[1] = {0};
 const char* version = "009";
+__declspec(section ".sdata") u32 gap_07_80410584_sdata[1] = {0};
 
 //local prototypes
 static inline void check_sum(CardSaveSlot* save);
@@ -409,7 +413,6 @@ void cardWrite(s32 slot) {
     }
 }
 
-#pragma opt_propagation off
 static inline void memcard_probe(void) {
     s32 memSize, sectorSize;
     s32 result;
@@ -419,11 +422,12 @@ static inline void memcard_probe(void) {
     wp->flags |= 1;
     timeout = 1000000;
     i = 0;
-    for (; (result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY; ) {
+    while ((result = CARDProbeEx(0, &memSize, &sectorSize)) == CARD_RESULT_BUSY) {
         if (++i > timeout) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
         }
+        timeout = (u32)timeout;
     }
 
     if (result == CARD_RESULT_READY && sectorSize != 0x2000) {
@@ -1081,9 +1085,9 @@ static inline void make_header(void) {
 	OSCalendarTime td;
 	metadata = &cardGetFilePtr()->metadata;
 	memset(metadata, 0, sizeof(metadata->data));
-	strcpy(metadata->data.fileName, "ペーパーマリオＲＰＧ");
+	strcpy(metadata->data.fileName, str_802CCC94);
 	OSTicksToCalendarTime(OSGetTime(), &td);
-	sprintf(metadata->data.dateString, "%2d月%2d日のセーブデータです\0\0\0\0\0\0\0", td.mon + 1, td.mday);
+	sprintf(metadata->data.dateString, str_802CCCAC, td.mon + 1, td.mday);
 	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
 	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
 	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
@@ -1180,7 +1184,7 @@ static inline void memcard_delete(void) {
     wp->flags |= 1;
     
     i = 0;
-    while (result = CARDDelete(wp->chan, "mariost_save_file"), result == CARD_RESULT_BUSY) {
+    while (result = CARDDelete(wp->chan, str_802CCC80), result == CARD_RESULT_BUSY) {
         if (++i > 1000000) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
@@ -1201,7 +1205,7 @@ void createCallback(s32 chan, s32 result) {
 
 static inline void memcard_create(void) {
     wp->flags |= 1;
-    CARDCreateAsync(wp->chan, "mariost_save_file", sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
+    CARDCreateAsync(wp->chan, str_802CCC80, sizeof(CardData) + (sizeof(CardSaveSlot) * 4), &wp->info, createCallback);
 }
 
 void writeCallback(s32 chan, s32 result) {
@@ -1309,7 +1313,7 @@ void memcard_open(void) {
         }
         if ((result != CARD_RESULT_NOFILE) && (result != CARD_RESULT_NOPERM)) {
             if (result == CARD_RESULT_READY) {
-                if (!strcmp(stat.fileName, "mariost_save_file")) {
+                if (!strcmp(stat.fileName, str_802CCC80)) {
                     if ((stat.commentAddr == 0) && (stat.iconAddr == 0x40) && (stat.length == 0x22000)) {
                         wp->fileNo = fileNo;
                         break;
@@ -1359,7 +1363,7 @@ void memcard_open(void) {
         return;
     }
     i = 0;
-    while (result = CARDOpen(wp->chan, "mariost_save_file", &wp->info), result == CARD_RESULT_BUSY) {
+    while (result = CARDOpen(wp->chan, str_802CCC80, &wp->info), result == CARD_RESULT_BUSY) {
         if (++i > 1000000) {
             result = CARD_RESULT_FATAL_ERROR;
             break;
@@ -1386,4 +1390,3 @@ static inline void memcard_close(void) {
     wp->result = result;
     wp->flags &= ~1;
 }
-

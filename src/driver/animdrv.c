@@ -590,19 +590,10 @@ label_5:
 }
 
 s32 animPaperPoseEntry(const char* animName, s32 group) {
-    AnimationPose* pose;
     s32 i;
+    AnimationPose* pose;
 
-    for (i = 0; i < wp->totalPoses; i++) {
-        pose = animPoseGetAnimPosePtr(i);
-        if (pose->flags & 1 && pose->typeFlags & 1 && pose->typeFlags & 2 && pose->type == group &&
-            !strcmp(animPoseGetBaseData(pose)->fileName, animName)) {
-            break;
-        }
-    }
-    if (i == wp->totalPoses) {
-        i = -1;
-    }
+    i = animPaperPoseGetId(animName, group);
     if (i >= 0) {
         pose = animPoseGetAnimPosePtr(i);
         pose->references++;
@@ -619,22 +610,7 @@ s32 animPaperPoseEntry(const char* animName, s32 group) {
     return i;
 }
 
-inline const char* animGetTexName(const char* name) {
-    void** data = wp->mp_ag2tg->data;
-    s32 size;
-    s32 i;
-    char* entry;
-
-    size = (s32)data[1];
-    entry = data[0];
-
-    for (i = 0; i < size; entry += 0x20, i += 0x20) {
-        if (!strcmp(entry, name)) {
-            return entry + 0x20;
-        }
-    }
-    return "";
-}
+const char* animGetTexName(const char* name);
 
 BOOL animEffectAsync(const char* animName, u32 group) {
     s32 model, anim;
@@ -770,7 +746,7 @@ s32 animPaperPoseGetId(const char* animName, s32 group) {
 }
 
 void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) {
-    AnimationPose* pose = &wp->poses[poseId];
+    AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
 
     if (!animName) {
         pose->paperId = -1;
@@ -795,7 +771,7 @@ void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag) 
 }
 
 void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
-    AnimationPose* pose = &wp->poses[poseId];
+    AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
     AnimationPoseData* data;
     s32 id;
     s32 idx;
@@ -813,7 +789,7 @@ void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset) {
 void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
     AnimationPose* paper;
     s32 id;
-    AnimationPose* pose = &wp->poses[poseId];
+    AnimationPose* pose = animPoseGetAnimPosePtr(poseId);
 
     if (pose->paperId != -1) {
         if (animName && !strcmp(animPoseGetAnimBaseDataPtr(pose->paperId)->fileName, animName) &&
@@ -829,7 +805,7 @@ void animPoseSetEffect(s32 poseId, const char* animName, BOOL someflag) {
     }
     id = animPoseEntry(animName, pose->type);
     if (id != -2) {
-        paper = &wp->poses[id];
+        paper = animPoseGetAnimPosePtr(id);
         paper->typeFlags = 1;
         paper->references = 0;
         paper->flags |= 1;
@@ -2819,6 +2795,23 @@ BOOL animGroupBaseAsync(const char* name, s32 group, void* callback) {
         return TRUE;
     }
     return anim != 0;
+}
+
+inline const char* animGetTexName(const char* name) {
+    void** data = wp->mp_ag2tg->data;
+    s32 size;
+    s32 i;
+    char* entry;
+
+    size = (s32)data[1];
+    entry = data[0];
+
+    for (i = 0; i < size; entry += 0x20, i += 0x20) {
+        if (!strcmp(entry, name)) {
+            return entry + 0x20;
+        }
+    }
+    return "";
 }
 
 AnimationPose* animPoseGetAnimPosePtr(s32 poseId) {

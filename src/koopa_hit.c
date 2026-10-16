@@ -51,6 +51,9 @@ static inline f32 kpa_nrmSet(MarioWork* m, f32 x, f32 y, f32 z) {
     return kpa_nrmToAngle(x, y, z);
 }
 
+
+static f32 kpaHalf(f32 v);
+
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     Mtx m3;
     Mtx m1;
@@ -91,7 +94,7 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     }
     PSMTXConcat(m1, m2, m1);
     PSMTXConcat(m1, m3, m4);
-    half = 0.5f * w;
+    half = kpaHalf(w);
     e += 0x50;
     for (i = 1; i < *(s32*)(efp + 8); i++, e += 0x50) {
         if (*(s32*)(e + 0x44) == 0) {
@@ -113,9 +116,12 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     return 0;
 }
 
+
 s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
-    MarioWork* m = marioGetPtr();
+    MarioWork* m;
     f32 dh, dw, dx, dy;
+
+    m = marioGetPtr();
 
     if (kpaEnemyFireHitChk(x, y, z, h, w)) {
         return 2;
@@ -248,17 +254,13 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
         dist = bd;
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px + ox, yh, pz + oz, 0.0f, -1.0f, 0.0f);
         if (hit) {
-            f32 tx = nx, ty = ny, tz = nz;
-            m2 = marioGetPtr();
-            if (kpa_nrmSet(m2, tz, ty, tx) >= 50.0f) {
+            if (kpa_nrmSet(marioGetPtr(), nx, ny, nz) >= 50.0f) {
                 hit = NULL;
             }
         }
         hy = (s32)(100.0f * hy + 0.5f) / 100.0f;
         if (hit) {
-            f32 ty = ny, tz = nz, tx = nx;
-            m2 = marioGetPtr();
-            MF(m, 0x214) = kpa_nrmSet(m2, tz, ty, tx);
+            MF(m, 0x214) = kpa_nrmSet(marioGetPtr(), nx, ny, nz);
             if (hy < py && __fabsf(hy - py) >= 2.0f) {
                 *outDepth = py - hy;
                 *outAng = angleABf(px, pz, hx, hz);
@@ -531,13 +533,19 @@ BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry) {
     return TRUE;
 }
 
+
+static f32 kpaHalf(f32 v) {
+    return 0.5f * v;
+}
+
+
 HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
     marioGetPtr();
     return hitCheckSphereFilter(kpaFlameHitFilter, x, y, z, r);
 }
 
 
-// Stand-in for a function the original linker dead-stripped; its 0.5f is first in the .sdata2 pool.
-void kpaStrippedPool(f32* f) {
-    *f = 0.5f;
-}
+
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_80415B84_sdata[1] = {0};
+#pragma force_active reset

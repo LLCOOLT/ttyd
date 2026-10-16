@@ -1012,8 +1012,9 @@ s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 
 USER_FUNC(evt_bero_switch_on) {
 	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, event->args[0]);
+	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -1045,8 +1046,9 @@ USER_FUNC(evt_bero_switch_on) {
 
 USER_FUNC(evt_bero_switch_off) {
 	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, event->args[0]);
+	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {
@@ -1078,8 +1080,9 @@ USER_FUNC(evt_bero_switch_off) {
 
 USER_FUNC(evt_bero_get_number) {
 	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
 	BeroEntry** temp;
-	s32 id = evtGetValue(event, event->args[0]);
+	s32 id = evtGetValue(event, *args++);
 	s32 newId = id;
 	const char *string, *test;
 	if (id < 0 || id >= 16) {

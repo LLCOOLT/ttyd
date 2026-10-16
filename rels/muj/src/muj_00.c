@@ -25,19 +25,15 @@ double cos(double x);
 typedef struct OrbitData { f32 angle; f32 dist; } OrbitData;
 OrbitData* _op;
 NpcEntry* evtNpcNameToPtr(EventEntry* event, const char* name);
-#define ORBIT(i, p) op[i].angle += d; t = op[i].angle; rad = 3.141592f * t / 180.0f; r = op[i].dist; x = r * sinf_l(rad) + cx; z = r * cosf_l(rad) + cz; p.x = x; p.z = z; (void)0
+#define ORBIT(i, p) op[i].angle += d; t = op[i].angle; rad = orbit_update(t); r = op[i].dist; x = r * sinf_l(rad) + cx; t = r * cosf_l(rad) + cz; p.x = x; p.z = t; (void)0
 NanNpc* random_choice_target(s32 type);
 void evt_nannpc_set_animtbl_sub(NanNpc* npc, void* animtbl);
 TobiWork* Tobidat;
 void tobikakari_seq00(NanNpc* npc);
 double atan2(double y, double x);
-static inline f32 sinf_l(f32 x) { return sin(x); }
+static inline f32 sinf_l(f32 x) { f32 v = sin(x); return v; }
 static inline f32 cosf_l(f32 x) { return cos(x); }
-static inline void orbit_update(OrbitData* o, Vec* pos, f32 d, f32 cx, f32 cz) {
-    f32 rad; f32 r; f32 x; f32 z;
-    o->angle += d; rad = o->angle; rad = 3.141592f * rad / 180.0f; r = o->dist;
-    x = r * sinf_l(rad) + cx; z = r * cosf_l(rad) + cz; pos->x = x; pos->z = z;
-}
+static inline f32 orbit_update(f32 x) { return x * 3.141592f / 180.0f; }
 
 
 USER_FUNC(L_evt_mario_keyon_wait);
@@ -475,13 +471,13 @@ USER_FUNC(kaizoku_main_func) {
     for (i = 0; i < 100; i++) {
         npc = &wp->entries[i + 105];
         npc->angle += d;
-        r = npc->radius;
+        s = npc->radius;
         rad = npc->angle;
         rad = 3.141592f * rad / 180.0f;
-        s = sin(rad);
+        r = sin(rad);
         c = cos(rad);
         npc->pos.x = s * r + cx;
-        npc->pos.z = r * c + cz;
+        npc->pos.z = s * c + cz;
     }
     return EVT_RETURN_DONE;
 }
@@ -525,23 +521,41 @@ USER_FUNC(mario_main_setup_func) {
 }
 
 USER_FUNC(mario_main_func) {
-    s32* args = event->args;
-    f32 a = evtGetValue(event, args[0]);
-    f32 b = evtGetValue(event, args[1]);
-    f32 cx = evtGetValue(event, args[2]);
-    f32 cz = evtGetValue(event, args[3]);
-    OrbitData* op = _op;
-    MarioWork* mario = marioGetPtr();
-    PartyEntry* party = partyGetPtr(0);
-    NpcEntry* npc1 = evtNpcNameToPtr(event, "\203}\203\213\203R");
-    NpcEntry* npc2 = evtNpcNameToPtr(event, "\203R\203\213\203e\203X");
-    NpcEntry* npc3 = evtNpcNameToPtr(event, "\203\202\203j\201[");
-    NpcEntry* npc4 = evtNpcNameToPtr(event, "\203K\203\211\202\314\210\253\202\242\220\205\225v");
-    NpcEntry* npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
-    NpcEntry* npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
-    f32 d = b - a;
-    f32 r, x, rad, z, t;
+    s32* args;
+    OrbitData* op;
+    MarioWork* mario;
+    PartyEntry* party;
+    NpcEntry* npc1;
+    NpcEntry* npc2;
+    NpcEntry* npc3;
+    NpcEntry* npc4;
+    NpcEntry* npc5;
+    NpcEntry* npc6;
+    f32 a;
+    f32 b;
+    f32 cx;
+    f32 cz;
+    f32 d;
+    f32 t;
+    f32 r;
+    f32 rad;
+    f32 x;
 
+    args = event->args;
+    a = evtGetValue(event, args[0]);
+    b = evtGetValue(event, args[1]);
+    cx = evtGetValue(event, args[2]);
+    cz = evtGetValue(event, args[3]);
+    op = _op;
+    mario = marioGetPtr();
+    party = partyGetPtr(0);
+    npc1 = evtNpcNameToPtr(event, "\203}\203\213\203R");
+    npc2 = evtNpcNameToPtr(event, "\203R\203\213\203e\203X");
+    npc3 = evtNpcNameToPtr(event, "\203\202\203j\201[");
+    npc4 = evtNpcNameToPtr(event, "\203K\203\211\202\314\210\253\202\242\220\205\225v");
+    npc5 = evtNpcNameToPtr(event, "\203s\201[\203g\203\223");
+    npc6 = evtNpcNameToPtr(event, "\203I\203h\203I\203h\220\205\225v");
+    d = b - a;
     ORBIT(0, mario->position);
     ORBIT(1, party->position);
     ORBIT(2, npc1->position);
@@ -764,26 +778,21 @@ USER_FUNC(cam_test_init_func) {
 }
 
 USER_FUNC(cam_test_func) {
-    s32* p0;
-    s32* args;
-    f32 angle, dist, rad, s, c;
+    s32* args = event->args;
+    s32* p0 = args++;
+    s32* p1 = args++;
+    f32 angle = evtGetFloat(event, *args++);
+    f32 dist = evtGetFloat(event, *args++);
+    f32 rad, s, c;
     Vec center;
-    s32 ix, iz;
-    p0 = event->args;
-    angle = evtGetFloat(event, p0[2]);
-    args = p0 + 1;
-    dist = evtGetFloat(event, args[2]);
     rad = 6.2831855f * angle / 360.0f;
     s = sinf_l(rad);
     c = cosf_l(rad);
-
     center.x = 70.0f;
     center.y = 110.0f;
     center.z = 0.0f;
-    ix = center.x + dist * s;
-    evtSetValue(event, *p0, ix);
-    iz = center.z - dist * c;
-    evtSetValue(event, *args, iz);
+    evtSetValue(event, *p0, center.x + dist * s);
+    evtSetValue(event, *p1, center.z - dist * c);
     return EVT_RETURN_DONE;
 }
 

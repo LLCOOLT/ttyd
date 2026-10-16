@@ -2594,7 +2594,11 @@ void raster_disp(CameraId cameraId, void* param) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 v = sin(j + (gp->retraceCount / 4.0f + phase));
-            s32 o = ia8_ofs(j, i);
+            s32 o;
+
+            o = i / 4;
+            o = (o << 5) + ((j / 4) << 9);
+            o += ((i % 4) + ((j % 4) << 2)) * 2;
 
             buf[o] = amp * v + 128.0f;
             buf[o + 1] = 0x80;

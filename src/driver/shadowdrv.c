@@ -194,9 +194,16 @@ u32 gap_07_8040F4AC_sdata = 0;
 
 
 
-#define CHAR_SHADOW_INIT_SIG static inline void charShadowInit(void)
-CHAR_SHADOW_INIT_SIG {
+
+static inline void depthShadowInit(void);
+static inline void projShadowInit(void);
+
+
+void shadowInit(void) {
+    u32 bufferSize;
     CharShadowWork* wp;
+    void* ramp;
+    u32 i;
 
     cswp->unk0 = 0;
     cswp->unk4 = 0;
@@ -210,39 +217,33 @@ CHAR_SHADOW_INIT_SIG {
     cswp->entries = __memAlloc(HEAP_DEFAULT, sizeof(ShadowEntry) * 64);
     memset(cswp->entries, 0, sizeof(ShadowEntry) * 64);
     wp = cswp;
-    wp->unkFC = smartAlloc(GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0), 0);
-}
-static inline void depthShadowInit(void);
-static inline void projShadowInit(void);
-
-void shadowInit(void) {
-    u32 bufferSize;
-    u16* ramp16;
-    u8* ramp8;
-    u32 i;
-
-    charShadowInit();
+    bufferSize = GXGetTexBufferSize(ShadowSizeTbl[0], ShadowSizeTbl[0], 2, 0, 0);
+    wp->unkFC = smartAlloc(bufferSize, 0);
     depthShadowInit();
 
-    bufferSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
-    ramp8 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0));
-    for (i = 0; i < 256; i++) {
-        ramp8[(((i & 0x3) * 8) + (((i & 0xC) * 16) + (((i & 0x80) / 4) + ((i & 0x70) / 16))))] = i;
+    {
+        bufferSize = GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0);
+        ramp = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x10, 0x10, GX_TF_I8, GX_FALSE, 0));
+        for (i = 0; i < 256; i++) {
+            ((u8*)ramp)[(((i & 0x3) * 8) + (((i & 0xC) * 16) + (((i & 0x80) / 4) + ((i & 0x70) / 16))))] = i;
+        }
+        GXInitTexObj(&rampTex8, ramp, 0x10, 0x10, GX_TF_I8, GX_CLAMP, GX_REPEAT, GX_FALSE);
+        GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        DCFlushRange(ramp, bufferSize);
     }
-    GXInitTexObj(&rampTex8, ramp8, 0x10, 0x10, GX_TF_I8, GX_CLAMP, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&rampTex8, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    DCFlushRange(ramp8, bufferSize);
+    {
+        u32 j;
 
-    bufferSize = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
-    ramp16 = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
-    for (i = 0; i < 0x10000; i++) {
-        ramp16[(((i & 0x3) * 4) + (((i & 0xFC) * 256) + (((i & 0xFC00) / 64) + ((i & 0x300) / 256))))] = i;
+        i = GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0);
+        ramp = __memAlloc(HEAP_DEFAULT, GXGetTexBufferSize(0x100, 0x100, GX_TF_IA8, GX_FALSE, 0));
+        for (j = 0; j < 0x10000; j++) {
+            ((u16*)ramp)[(((j & 0x3) * 4) + (((j & 0xFC) * 256) + (((j & 0xFC00) / 64) + ((j & 0x300) / 256))))] = j;
+        }
+        GXInitTexObj(&rampTex16, ramp, 0x100, 0x100, GX_TF_IA8, GX_CLAMP, GX_REPEAT, GX_FALSE);
+        GXInitTexObjLOD(&rampTex16, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        DCFlushRange(ramp, i);
     }
-    GXInitTexObj(&rampTex16, ramp16, 0x100, 0x100, GX_TF_IA8, GX_CLAMP, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&rampTex16, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    DCFlushRange(ramp16, bufferSize);
     projShadowInit();
-
 }
 
 void shadowMain(void) {
@@ -318,13 +319,16 @@ static inline void shadowBegin(ProjShadowWork* wp, BOOL depth) {
 void shadowDisp(CameraId cameraId, void* param) {
     DispEntry* disp;
     CameraEntry* cam;
-    ShadowConfig* cfg;
 
     disp = dispGetCurWork();
 
     if (cameraId == CAMERA_OFFSCREEN2 || (u32)(cameraId - CAMERA_3D) <= 1 || cameraId == CAMERA_3D_EFFECTB) {
         shadowCharShadowDisp_Polygon(cameraId, param);
-        camGetCurPtr();
+        {
+            f32 t;
+            cam = camGetCurPtr();
+            t = cam->cameraAt.y * 20.0f;
+        }
         shadowSetupPolygon();
         GXSetArray(GX_VA_POS, testKagePosArray, 12);
         GXClearVtxDesc();
@@ -342,9 +346,9 @@ void shadowDisp(CameraId cameraId, void* param) {
     } else if (cameraId == CAMERA_SHADOW) {
         switch (disp->renderMode) {
             case 5: {
+                ShadowConfig* cfg;
                 shadowCharShadowDisp_Collision(cameraId, param);
-                cfg = &shadowConfig[cswp->unk8];
-                if (cfg->follow == 1) {
+                if ((cfg = &shadowConfig[cswp->unk8])->follow == 1) {
                     cam = camGetPtr(CAMERA_3D);
                     cfg->pos.x = cam->cameraAt.x;
                     cfg->pos.y = 1000.0f + cam->cameraAt.y;
@@ -375,21 +379,26 @@ void shadowDisp(CameraId cameraId, void* param) {
     }
 }
 
+#pragma push
+#pragma opt_dead_assignments off
 BOOL _filter(HitCheckQuery* query, HitEntry* hit) {
+    f32 t = 20.0f;
+
     if ((hitGetAttr(hit) & 0x80000000) && (*(u32*)mobjHitObjPtrToPtr(hit) & 0x800)) {
         return FALSE;
     }
     return TRUE;
 }
+#pragma pop
 
 
 
 void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
-    HitCheckQuery query;
     f32 (*m)[4];
     f32 size, sy;
+    HitCheckQuery query;
 
     camGetCurPtr();
     for (i = 0; i < cswp->unk104; i++, entry++) {
@@ -434,11 +443,9 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
     s32 i;
     Mtx m;
     f32 w, h, fw, fh;
-    f32 z1, z0, x1, x0
-, cx, cz;
+    f32 cx, cz;
 
-    wp = cswp;
-    cfg = &shadowConfig[wp->unk8];
+    cfg = &shadowConfig[(wp = cswp)->unk8];
     entry = wp->entries;
     view = camGetCurPtr()->view;
     alpha = cswp->unk100.a;
@@ -495,26 +502,22 @@ void shadowCharShadowDisp_Projection(CameraId cameraId, void* param) {
         GXBegin(GX_QUADS, GX_VTXFMT0, 16);
         cx = 0.0f;
         cz = 0.0f;
-        x0 = cx - w;
-        z0 = cz - h;
-        z1 = cz + h;
-        x1 = cx + w;
-        GXPosition3f32(x0, cx, z0); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1, cx, z0); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1, cx, fh + z0); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x0, cx, fh + z0); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x0, cx, z1); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1, cx, z1); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1, cx, z1 - fh); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x0, cx, z1 - fh); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x0, cx, z0); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x0, cx, z1); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(fw + x0, cx, z1); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(fw + x0, cx, z0); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x1, cx, z0); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1, cx, z1); GXColor4u8(0, 0, 0, 0xFF);
-        GXPosition3f32(x1 - fw, cx, z1); GXColor4u8(0, 0, 0, 0);
-        GXPosition3f32(x1 - fw, cx, z0); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, fh + (cz - h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, fh + (cz - h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h) - fh); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz + h) - fh); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32(fw + (cx - w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32(fw + (cx - w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx + w), cx, (cz - h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w), cx, (cz + h)); GXColor4u8(0, 0, 0, 0xFF);
+        GXPosition3f32((cx + w) - fw, cx, (cz + h)); GXColor4u8(0, 0, 0, 0);
+        GXPosition3f32((cx + w) - fw, cx, (cz - h)); GXColor4u8(0, 0, 0, 0);
     }
 }
 

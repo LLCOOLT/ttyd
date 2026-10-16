@@ -1466,13 +1466,12 @@ USER_FUNC(evt_rsh_get_rnd_npc) {
 }
 
 void rsh_window_tev(MapTevCallbackInfo* info) {
-    int tevStage;
-    int texMap;
-    int texCoord;
-    int field_0x18;
     MapObject* p;
-    u32 fl;
-    MapObject* q;
+    u32 flags;
+    GXTevStageID tevStage;
+    GXTexMapID texMap;
+    GXTexCoordID texCoord;
+    int field_0x18;
     u16 x0, y0, x1, y1;
     s32 height, width;
     s32 halfHeight, halfWidth;
@@ -1481,18 +1480,18 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     Mtx mtx;
     f32 t;
 
+    p = *(MapObject**)info->field_0x0;
     tevStage = info->tevStage;
     texMap = info->texCoord;
     texCoord = info->texMap;
     field_0x18 = info->field_0x18;
-    p = *(MapObject**)info->field_0x0;
-    fl = p->flags;
-    if (fl & 0x20) {
-        while ((q = p->parent) != NULL) {
-            p = q;
-            if (p->flags & 0x10) {
-                if (!(p->flags & 0x20000000)) {
-                    p->flags |= 0x20000000;
+    flags = p->flags;
+    if (flags & 0x20) {
+        while ((p = p->parent) != NULL) {
+            u32 f = p->flags;
+            if (f & 0x10) {
+                if (!(f & 0x20000000)) {
+                    p->flags = f | 0x20000000;
                     return;
                 }
                 x0 = p->screenRect[0];
@@ -1503,8 +1502,8 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
             }
         }
     } else {
-        if (!(p->flags & 0x20000000)) {
-            p->flags |= 0x20000000;
+        if (!(flags & 0x20000000)) {
+            p->flags = flags | 0x20000000;
             return;
         }
         x0 = p->screenRect[0];
@@ -1556,14 +1555,14 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
     GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_3_4);
-    tevStage += 1;
-    texCoord += 1;
-    texMap += 1;
+    tevStage++;
+    texCoord++;
+    texMap++;
     info->tevStage = tevStage;
     info->texMap = texCoord;
     info->field_0x18 = field_0x18;
     info->texCoord = texMap;
-    }
+}
 
 BOOL img_wait(void) {
     ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);

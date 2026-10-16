@@ -86,12 +86,15 @@ static effN64Vtx balloon_vtx[] = {
 void effBalloonMain(EffectEntry* effect);
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect);
 
+#pragma explicit_zero_data on
+static const u32 gap_09_8041E97C_sdata2 = 0;
+
 EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, f32 rotation) {
     EffectEntry* effect;
     EffBalloonN64Work* work;
 
     effect = effEntry();
-    effect->type = "BalloonN64\0";
+    effect->type = "BalloonN64\0\0\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffBalloonN64Work));
     effect->userdata = work;
@@ -106,8 +109,10 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
     work->targetScale = targetScale;
     work->scale = 0.0f;
     work->frame = 0;
+    (void)&gap_09_8041E97C_sdata2;
     return effect;
 }
+#pragma explicit_zero_data reset
 
 void effBalloonMain(EffectEntry* effect) {
     s32 lifetime;
@@ -163,10 +168,12 @@ void effBalloonMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effBalloonDisp, effect);
 }
 
+#pragma opt_dead_assignments off
 void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
-    EffBalloonN64Work* work;
-    effN64Vtx* vtx;
+    CameraEntry* camera = camGetPtr(cameraId);
+    EffBalloonN64Work* work = effect->userdata;
     s32 type;
+    effN64Vtx* vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     Vec v0;
     Vec v1;
     Vec v2;
@@ -177,11 +184,7 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx a;
     Mtx b;
     s32 i;
-    CameraEntry* camera;
 
-    camera = camGetPtr(cameraId);
-    work = effect->userdata;
-    vtx = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 32, 3)->address;
     type = work->lifetime;
     if (type == 0) {
         effGetTexObjN64(0x5F, &texObj);
@@ -268,3 +271,8 @@ void effBalloonDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
+#pragma force_active on
+static __declspec(section ".data") u32 gap_05_8039A934_data[1] = {0};
+#pragma force_active reset
+#pragma opt_dead_assignments reset

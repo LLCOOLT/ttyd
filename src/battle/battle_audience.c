@@ -217,6 +217,7 @@ typedef struct AudMemberAnim {
 } AudMemberAnim;
 
 void BattleStatusWindowAPRecoveryOn(void);
+#pragma force_active on
 __declspec(section ".sdata2") const u32 gap_10_80423084_sbss2;
 
 __declspec(section ".data") f32 aud_uv0[2] = {-1.0f, 1.0f};
@@ -261,6 +262,7 @@ s32 weapon_data_hammer[] = {
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 100, 0, 0,
 };
+#pragma force_active reset
 s32 haiti_data[][10] = {
 	{ 18, 16, 16, 0, 0, 0, 0, 0, 0, 0 },
 	{ 18, 18, 18, 16, 16, 14, 0, 0, 0, 0 },
@@ -302,7 +304,7 @@ BattleAudienceSound* BattleAudienceSoundGetPtr(s32 id) {
 void BattleAudience_Init(void) {
 	BattleAudience* audience;
 	BattleAudienceWindow* window;
-	int i; int j;
+	int j; int i;
 	u8 status;
 
 	audience = BattleAudienceBaseGetPtr();
@@ -334,15 +336,13 @@ void BattleAudience_Init(void) {
 		}
 	}
 
-	for (j = 0; j < 10; j++) {
-		for (i = 0; i < 10; i++) {
-			int index = j * 20 + i;
+	for (i = 0; i < 10; i++) {
+		for (j = 0; j < 10; j++) {
+			s32 index = i * 20 + j;
 			if (AUD_U8CALL(BattleAudience_GetExist, index) == TRUE) {
 				status = BattleAudienceGetPtr(index)->status;
-				if (status != 12 && status != 11) { //TODO: add status enum
+				if (status != 12 && status != 11) {
 					audience->mCurrentAudienceIntCountLeft++;
-				}
-				if ((audience && audience) && audience) {
 				}
 			}
 		}
@@ -639,9 +639,9 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 		case 13:
 			memcpy(queue, pe->list, pe->count * 4);
 			qn = pe->count;
-			pe->count = k = 0;
-			for (; k < qn; k++) {
-				switch (queue[k]) {
+			pe->count = counter = 0;
+			for (; counter < qn; counter++) {
+				switch (queue[counter]) {
 					case 0:
 						for (i = 0; i <= 59; i++) {
 							if (check_exe_phase_evt_status(i, 0)) { BattleAudienceAddPhaseEvtList(0); break; }
@@ -736,11 +736,13 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 		case 12:
 			if (pe->count == 1) {
 				switch (pe->list[0]) {
-					case 0:
-						QSEL(0)
-						BattleAudienceItemOn(list[irand(counter)], 0, 1);
+					case 0: {
+						u32 n = 0;
+						for (i = 0; i <= 59; i++) { if (check_exe_phase_evt_status(i, 0)) { list[n] = i; n++; } }
+						BattleAudienceItemOn(list[irand(n)], 0, 1);
 						CLR
 						break;
+					}
 					case 1:
 						for (i = 0; i < 200; i++) {
 							if (check_exe_phase_evt_status(i, 8) && BattleAudienceGetPtr(i)->status != 17) {
@@ -979,17 +981,23 @@ extern void* memcpy(void*, const void*, unsigned long);
 
 void BattleAudienceSettingAudience(void) {
 	s32 hasKind = 0;
-	s32 target, used, sum, lim;
+	s32 target;
+	s32 sum;
+	s32 lim;
+	s32 id;
+	s32 n;
+	s32 i;
+	s32 j;
+	s32 k;
 	s32 ar;
 	s32 kind;
-	s32 n;
+	s32 used;
 	s32 list[200];
 	AudDeltaArr delta;
 	s32 perm[12];
 	s32 weights[12];
 	s32 counts[13];
 	AudWArr w;
-	s32 i, j, k, id;
 	s32* bflags = (s32*)((u8*)_battleWorkPointer + 0x19068);
 	BattleAudience* audience = BattleAudienceBaseGetPtr();
 	s8* rec = *(s8**)(*(u8**)((u8*)_battleWorkPointer + 0x2738) + 0xC) + 0xAC;
@@ -1066,20 +1074,19 @@ void BattleAudienceSettingAudience(void) {
 			}
 		}
 		for (i = 0; i < 12; i++) perm[i] = i;
-		for (i = 0; i < 24; i++) {
+		for (j = 0; j < 24; j++) {
 			s32 a = irand(12);
 			s32 b = irand(12);
 			s32 t = perm[a];
 			perm[a] = perm[b];
 			perm[b] = t;
 		}
-		k = 0;
-		for (i = 0; i <= 11; i++) {
+		for (i = 0, k = 0; i <= 11; i++) {
 			id = perm[i];
 			if (k >= kind) {
 				weights[id] = 0;
 			} else if (rec[id + 4] != 0) {
-				weights[id] = (s8)rec[id + 4] * (irand(10) + 1);
+				weights[id] = rec[id + 4] * (irand(10) + 1);
 				if (((u8*)audience_kind)[id * 32] & 1) {
 					weights[id] *= 2;
 				}
@@ -1090,21 +1097,21 @@ void BattleAudienceSettingAudience(void) {
 		}
 		if (bflags[4] != 0) {
 			switch (bflags[4]) {
-			case 1: kind = 0; break;
-			case 2: kind = 10; break;
-			case 3: kind = 8; break;
-			case 4: kind = 4; break;
-			case 5: kind = 7; break;
-			case 6: kind = 2; break;
-			case 7: kind = 1; break;
-			case 8: kind = 3; break;
-			case 9: kind = 5; break;
-			case 10: kind = 6; break;
-			case 11: kind = 9; break;
-			case 12: kind = 11; break;
+			case 1: id = 0; break;
+			case 2: id = 10; break;
+			case 3: id = 8; break;
+			case 4: id = 4; break;
+			case 5: id = 7; break;
+			case 6: id = 2; break;
+			case 7: id = 1; break;
+			case 8: id = 3; break;
+			case 9: id = 5; break;
+			case 10: id = 6; break;
+			case 11: id = 9; break;
+			case 12: id = 11; break;
 			}
 			for (i = 0; i < 12; i++) {
-				if (i == kind) weights[i] = 1; else weights[i] = 0;
+				if (i == id) weights[i] = 1; else weights[i] = 0;
 			}
 		}
 		hasKind = 1;
@@ -1114,9 +1121,9 @@ void BattleAudienceSettingAudience(void) {
 	ar = (s32)(audience->mTargetAudienceCount + audience->mAddedAudienceCount);
 	if (ar < 0) ar = 0;
 	if (ar > audience->mMaxAudience) ar = audience->mMaxAudience;
+	used = 0;
 	sum = 0;
 	for (i = 0; i < 12; i++) sum += weights[i];
-	used = 0;
 	for (i = 0; i < 12; i++) {
 		counts[i] = ar * weights[i] / sum;
 		if (((u8*)audience_kind)[i * 32] & 1) {
@@ -1128,11 +1135,11 @@ void BattleAudienceSettingAudience(void) {
 	}
 	for (i = 0; i < 12; i++) perm[i] = i;
 	for (i = 0; i <= 10; i++) {
-		for (j = i + 1; j <= 11; j++) {
-			if ((weights[i] == weights[j] && irand(2) == 0) || weights[i] < weights[j]) {
+		for (id = i + 1; id <= 11; id++) {
+			if ((weights[i] == weights[id] && irand(2) == 0) || weights[i] < weights[id]) {
 				s32 t = perm[i];
-				perm[i] = perm[j];
-				perm[j] = t;
+				perm[i] = perm[id];
+				perm[id] = t;
 			}
 		}
 	}
@@ -1155,7 +1162,7 @@ void BattleAudienceSettingAudience(void) {
 				counts[id]++;
 			}
 		}
-		i = (i + 1) % 12;
+		i++; i %= 12;
 	}
 	if (hasKind == 1 && used != 0 && (irand(20) == 0 || (*bflags & 0x40000))) {
 		for (i = 0; i < 12; i++) perm[i] = i;
@@ -1186,20 +1193,20 @@ void BattleAudienceSettingAudience(void) {
 		}
 		break;
 	default: {
-		n = 0;
-		for (i = 0; i <= 12; i++) {
-				for (j = 0; j < counts[i]; j++) {
-				list[n++] = i;
+		s32 cnt;
+		for (kind = 0, cnt = 0; kind <= 12; kind++) {
+			for (j = 0; j < counts[kind]; j++) {
+				list[cnt++] = kind;
 			}
 		}
 		for (i = 0; i < 150; i++) {
-			s32 a = irand(n);
-			s32 b = irand(n);
+			s32 a = irand(cnt);
+			s32 b = irand(cnt);
 			s32 t = list[a];
 			list[a] = list[b];
 			list[b] = t;
 		}
-		for (i = 0; i < n; i++) {
+		for (i = 0; i < cnt; i++) {
 			s32 idx = BattleAudience_NoUsedFCHaitiRand();
 			if (idx == -1) break;
 			BattleAudience_Entry(idx, (u8)list[i], 0);
@@ -2172,12 +2179,12 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		sx = sin(a0); cx = cos(a0);
 		sy = sin(a1); cy = cos(a1);
 		sz = sin(a2); cz = cos(a2);
-		rot[0][3] = 0.0f; rot[1][3] = 0.0f; rot[2][3] = 0.0f;
 		t0 = sx * sy;
 		t1 = sx * cy;
 		rot[0][0] = cy * cz - t0 * sz;
 		rot[0][1] = -cy * sz - t0 * cz;
 		rot[0][2] = -cx * sy;
+		rot[0][3] = 0.0f; rot[1][3] = 0.0f; rot[2][3] = 0.0f;
 		rot[1][0] = cx * sz;
 		rot[1][1] = cx * cz;
 		rot[1][2] = -sx;
@@ -2967,8 +2974,7 @@ void BattleAudience_ApRecoveryBuild(StarPowerInfo* info) {
 		pm = 1.0f;
 	}
 	if (BattleBreakSlot_GetBreakTurn() >= 1) {
-		f32* slot = (f32*)BattleBreakSlotGetPtr();
-		{ f32 v = slot[5] * (pm * (mm * (cnt * (scale * root * (a + b))))); *(s32*)(base + 0x137C4) = (s32)v + *(s32*)(base + 0x137C4); }
+		*(s32*)(base + 0x137C4) = *(s32*)(base + 0x137C4) + (s32)((pm * (mm * (cnt * (scale * root * (a + b))))) * ((f32*)BattleBreakSlotGetPtr())[5]);
 	} else {
 		*(s32*)(base + 0x137C4) = *(s32*)(base + 0x137C4) + (s32)((mm * (cnt * (scale * root * (a + b)))) * pm);
 	}
@@ -3298,8 +3304,7 @@ void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
 	s32 r, ab;
 
 	BattleAudienceBaseGetPtr();
-	total = b + c;
-	total = total + a;
+	total = c + (a + b);
 	for (i = 0, member = BattleAudienceGetPtr(0); i < 200; i++, member++) {
 		if (!AUD_U8CALL(BattleAudience_GetWaiting, i)) {
 			continue;
@@ -3320,7 +3325,7 @@ void BattleAudienceJoy_Sub(s32 a, s32 b, s32 c, s32 type) {
 				} else {
 					member->field_0xC = 2.0f;
 				}
-			} else if (r < (ab = a + b)) {
+			} else if (r < (ab = a + (s32)b)) {
 				BattleAudience_ChangeStatus(i, 5);
 			} else if (r < ab + c) {
 				BattleAudience_ChangeStatus(i, 6);

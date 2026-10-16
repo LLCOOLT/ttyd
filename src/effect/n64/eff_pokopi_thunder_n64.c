@@ -239,9 +239,7 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     EffPokopiThunderN64Work* work;
     s32 type;
     s32 i;
-    s32 lim;
     s32 n;
-    s32 k;
     effN64Vtx* vtx;
     effN64Vtx* v;
     u8* data;
@@ -383,14 +381,10 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     DCFlushRange(vtx, 0x2a0);
     GXInvalidateVtxCache();
     effSetVtxDescN64(vtx);
-    k = 0;
-    n = 0;
-    lim = i - 1;
-    while (k < lim) {
+    for (idx = 0; idx < i - 1; idx++) {
+        n = idx * 2;
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(n, n + 2, n + 1, 2, n + 1, n + 2, n + 3, 0);
-        n += 2;
-        k++;
     }
     if (work->cameraId != 4) {
         GXSetProjectionv(proj);

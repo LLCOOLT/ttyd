@@ -14,7 +14,10 @@ struct MapAllocEntry {
 };
 
 //.bss
+__declspec(section ".data") u8 gap_06_803D48AC_bss[4];
+#pragma force_active on
 SmartWork smartWork;
+#pragma force_active reset
 
 //.sdata
 //flag, size / 0x400 (>> 10)
@@ -89,6 +92,8 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
         memClear(i);
     }
 }
+
+void* __memAlloc(HEAP_TYPE heap, u32 size);
 
 void memClear(HEAP_TYPE heap) {
 	MapAllocEntry* entry;

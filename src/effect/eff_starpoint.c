@@ -27,7 +27,6 @@ static inline f32 _sinf(f32 x) {
     f32 a = 0.00761f;
     f32 b = 0.16605f;
     f32 c = 1.0f;
-    f32 y;
     f32 x2;
 
     if (x <= PI) {
@@ -38,27 +37,27 @@ static inline f32 _sinf(f32 x) {
             a = a * x;
         }
         else {
-            y = HALF_PI - (x - HALF_PI);
-            x2 = y * y;
+            x = HALF_PI - (x - HALF_PI);
+            x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
-            a = a * y;
+            a = a * x;
         }
     }
     else if (x < 4.712389f) {
-        y = x - PI;
-        x2 = y * y;
+        x = x - PI;
+        x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
-        a = a * y;
+        a = a * x;
         a = -a;
     }
     else {
-        y = HALF_PI - (x - 4.712389f);
-        x2 = y * y;
+        x = HALF_PI - (x - 4.712389f);
+        x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
-        a = a * y;
+        a = a * x;
         a = -a;
     }
     return a;
@@ -68,7 +67,6 @@ static inline f32 _cosf(f32 x) {
     f32 a = 0.03705f;
     f32 b = 0.4967f;
     f32 c = 1.0f;
-    f32 y;
     f32 x2;
 
     if (x <= PI) {
@@ -78,23 +76,23 @@ static inline f32 _cosf(f32 x) {
             a = a * x2 + c;
         }
         else {
-            y = HALF_PI - (x - HALF_PI);
-            x2 = y * y;
+            x = HALF_PI - (x - HALF_PI);
+            x2 = x * x;
             a = a * x2 - b;
             a = a * x2 + c;
             a = -a;
         }
     }
     else if (x < 4.712389f) {
-        y = x - PI;
-        x2 = y * y;
+        x = x - PI;
+        x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
         a = -a;
     }
     else {
-        y = HALF_PI - (x - 4.712389f);
-        x2 = y * y;
+        x = HALF_PI - (x - 4.712389f);
+        x2 = x * x;
         a = a * x2 - b;
         a = a * x2 + c;
     }
@@ -132,10 +130,10 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
         work->position.z = 0.0f;
         angle = r * 6.2831855f / 360.0f;
         work->velX = (speed = 2.0f) * _sinf(angle);
-        work->velZ = 2.0f * _cosf(angle);
-                work->velY = 14.0f;
+        work->velZ = speed * _cosf(angle);
+        work->velY = 14.0f;
         work->gravity = speed;
-                work->alpha = 0;
+        work->alpha = 0;
         work->delay = delay;
     }
     return effect;

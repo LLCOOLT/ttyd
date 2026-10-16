@@ -32,6 +32,7 @@ typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
 typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; EventEntry* escapeEvt; u8 field_0x48[0x4c - 0x48]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
+static s32 bss_pad;
 static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -1074,8 +1075,8 @@ static void ext_moamoa_main(void) {
                 d = r2 * (500.0f - 300.0f) + 300.0f;
                 x = pose->mtx[0][3] + d * moa_sinx(rad);
                 z = pose->mtx[2][3] - d * moa_cosx(rad); }
-                a = randf(5.0f, 6.0f);
-                s = randf(0.2f, 0.3f);
+                { f32 r1 = rand() / 32767.0f; a = r1 * (6.0f - 5.0f) + 5.0f; }
+                { f32 k; f32 r1 = rand() / 32767.0f; k = 0.3f - 0.2f; s = r1 * k + 0.2f; }
                 if (!sfx) {
                     psndSFXOn_3D((const char*)0x6c3, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                     sfx = 1;
@@ -1159,10 +1160,10 @@ static void ext_moamoa_main(void) {
                 pose->flags |= 4;
                 break;
             case 63:
-                a = randf(225.0f, 315.0f);
+                { f32 r1 = rand() / 32767.0f;
                 s = randf(2.0f, 3.0f);
                 moa->timer = irand(i / 2);
-                rad = 6.2831855f * a / 360.0f;
+                rad = 6.2831855f * (r1 * (315.0f - 225.0f) + 225.0f) / 360.0f; }
                 moa->target.x = s * moa_sinx(rad);
                 moa->target.y = randf(1.0f, 2.0f);
                 moa->target.z = s * -moa_cosx(rad);
@@ -1258,14 +1259,21 @@ static USER_FUNC(npc_jump) {
     f32 angle;
 
     if (isFirstCall) {
-        dist = PSVECDistance(&(Vec){x, 0.0f, z}, &(Vec){npc->position.x, 0.0f, npc->position.z});
+        static const Vec va = {0.0f, 0.0f, 0.0f};
+        static const Vec vb = {0.0f, 0.0f, 0.0f};
+        Vec a;
+        Vec b;
+
+        b = vb; b.x = npc->position.x; b.z = npc->position.z;
+        a = va; a.x = x; a.z = z;
+        dist = PSVECDistance(&a, &b);
         dy = y - npc->position.y;
         if (t == 0.0f) {
             t = dist / speed;
         } else {
             speed = dist / t;
         }
-        vy = dy / t + 0.5f * (gravity * t);
+        vy = dy / t + gravity * t / 2.0f;
         event->userdata[0] = *(s32*)&t;
         event->userdata[1] = *(s32*)&vy;
         event->userdata[2] = *(s32*)&speed;
@@ -1765,4 +1773,4 @@ EVT_BEGIN(rsh_05_a_init_evt_nidome)
 EVT_END()
 
 
-__declspec(section ".data") s32 fd_pad_data = 0;
+

@@ -1040,16 +1040,19 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
     Vec hp;
     f32 hy;
     f32 nx, ny, nz;
-    f32 zero, mone;
-    f32 hh;
-    f32 range;
-    f32 ox, oz;
-    f32 sn;
-    f32 px, py, pz;
-    f32 top, ystart;
     f32 dx, dz;
+    f32 mone, zero;
     f32 dist;
     f32 d;
+    f32 noz, nox;
+    f32 top, ystart;
+    f32 px;
+    f32 ox, oz;
+    f32 pz;
+    f32 hh;
+    f32 range;
+    f32 sn;
+    f32 py;
     s32 i;
     HitEntry* hit;
     MarioWork* w = marioGetPtr();
@@ -1088,6 +1091,12 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
         *outY = gy;
         return hit;
     }
+    noz = -oz;
+    nox = -ox;
+    zero = 0.0f;
+    mone = -1.0f;
+    top = hh + range;
+    ystart = py + hh;
     for (i = 0; i < 5; i++) {
         if (i == 0) {
             dx = 0.0f;
@@ -1096,20 +1105,16 @@ HitEntry* marioLandonChk_old(f32* outY, f32 spd) {
             dx = ox;
             dz = oz;
         } else if (i == 2) {
-            dx = -oz;
+            dx = noz;
             dz = oz;
         } else if (i == 3) {
             dx = oz;
-            dz = -ox;
+            dz = nox;
         } else if (i == 4) {
-            dx = -ox;
-            dz = -oz;
+            dx = nox;
+            dz = noz;
         }
         ray = *(volatile LandonRay*)&zv0;
-        zero = 0.0f;
-        mone = -1.0f;
-        top = hh + range;
-        ystart = py + hh;
         ray.pos.x = px + dx; ray.pos.y = ystart; ray.pos.z = pz + dz;
         ray.dir.x = zero; ray.dir.y = mone; ray.dir.z = zero;
         dist = top;
@@ -2150,9 +2155,9 @@ HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     } else {
         r = 0.265f * MF(w, 0x1b4, f32);
     }
-    a = (3.1415927f * a) / 180.0f;
-    {f32 c; s = (f32)sin(a);
-    c = (f32)cos(a);
+    {f32 c; f32 rad = (3.1415927f * a) / 180.0f;
+    s = (f32)sin(rad);
+    c = (f32)cos(rad);
     s = r * s;
     a = r * -c;}
     y0 = MF(w, 0x90, f32);
@@ -2212,9 +2217,9 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     }
     step = 360.0f / n;
     a = dir;
+    half = 0.5f * w;
     base = *pos;
     hi = base;
-    half = 0.5f * w;
     hi.y += 11.0f;
     lo = base;
     lo.y += h - 1.0f;

@@ -1350,24 +1350,26 @@ EVT_BEGIN(_nozzle_work_event_1)
 EVT_END()
 USER_FUNC(_set_mobj_rotate_x) {
 	const char* fall1;
-	BattleStageObject* obj;
-	BattleWork* wp;
 	const char* fall3;
+	BattleWork* wp;
+	int j;
+	int i;
+	BOOL busy;
 	const char* fall2;
 	s32 layer;
-	BOOL busy;
 	BattleStageObjectWork* sw;
-	int i;
+	BattleStageObject* obj;
 
+	s32* args = event->args;
 	busy = FALSE;
 	sw = STAGE_WORK(wp = _battleWorkPointer);
-	layer = evtGetValue(event, event->args[0]);
+	layer = evtGetValue(event, *args++);
 	if (isFirstCall) {
 		switch (layer) {
 			case 0:
 			case 1:
-				for (i = 0; i < 32; i++) {
-					obj = &wp->stageObjects[i];
+				for (j = 0; j < 32; j++) {
+					obj = &wp->stageObjects[j];
 					if (obj->id > 0 && obj->data->mLayer == layer) {
 						obj->mNumFramesToStartFalling = obj->data->mNumFramesToStartFalling;
 						obj->mNumFramesFalling = 0;
@@ -2030,7 +2032,8 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						EVT_UW(event, 5) = -1;
 					}
-					rot = reviseAngle(90.0f + angle1);
+					rot = 90.0f + angle1;
+					rot = reviseAngle(rot);
 					z = 10.0f * sinfd(angle1) + obj->mPosition.z;
 					EVT_UW(event, 1) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle1), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
 				}
@@ -2080,9 +2083,9 @@ USER_FUNC(_nozzle_work_effect) {
 					else {
 						EVT_UW(event, 7) = -1;
 					}
-					rot = reviseAngle(90.0f + angle3);
-					z = 10.0f * sinfd(angle3) + obj->mPosition.z;
-					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, z, -80.0f, rot, 90);
+					z = reviseAngle(90.0f + angle3);
+					rot = 10.0f * sinfd(angle3) + obj->mPosition.z;
+					EVT_UW(event, 3) = (s32)effNozleEntry(effType, obj->mPosition.x - 10.0f * cosfd(angle3), 12.0f + obj->mPosition.y, rot, -80.0f, z, 90);
 				}
 				else {
 					if (sfx) {
@@ -2381,13 +2384,15 @@ USER_FUNC(_object_fall_attack) {
 	const char* sfxTub;
 	BattleStageFallObjectData* fd = STAGE_WORK(wp)->fallObjectData;
 	s32* args = event->args;
-	s32 arg0 = args[0];
+	s32 arg0 = *args++;
 	FallObjectWork* w;
 	FallObjectEntry* e;
 	FallObjectEntry* o;
 	BattleUnit* unit2;
+	BattleUnitPart* part0;
 	s32 k;
 	BattleUnit* unit;
+	const char* sfxTub2;
 	s32 i;
 	BattleUnitPart* part;
 	s32 sum;
@@ -2481,7 +2486,7 @@ USER_FUNC(_object_fall_attack) {
 				e->noAc = 1;
 				for (k = i; k >= 0; k--) {
 					o = &w->entries[k];
-					if (o != e && o->kind == 0 && e->unitId == o->unitId) {
+					if (e != o && o->kind == 0 && e->unitId == o->unitId) {
 						o->noAc = 0;
 					}
 				}
@@ -2502,9 +2507,8 @@ USER_FUNC(_object_fall_attack) {
 				if (e->field_0x15) {
 					flags |= 0x100000;
 				}
-				part = BattleGetUnitPartsPtr(e->unitId, e->partId);
-				unit = BattleGetUnitPtr(wp, e->unitId);
-				e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), unit, part, weapon, flags);
+				part0 = BattleGetUnitPartsPtr(e->unitId, e->partId);
+				e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), BattleGetUnitPtr(wp, e->unitId), part0, weapon, flags);
 				if (e->preCheck == 1 && !e->noAc) {
 					delay = irand(0);
 					for (k = 0; k < i; k++) {
@@ -2525,6 +2529,7 @@ USER_FUNC(_object_fall_attack) {
 	sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
 	sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
 	sfxRest = "SFX_REST_CONDITION1";
+	sfxTub2 = *&sfxTub;
 	w = (FallObjectWork*)EVT_UW(event, 0);
 	done = TRUE;
 	for (i = 0; i < w->count; i++) {
@@ -2658,7 +2663,7 @@ USER_FUNC(_object_fall_attack) {
 							switch (e->type) {
 								case 0:
 								case 1:
-									psndSFXOn_3D(sfxTub, &sfxPos);
+									psndSFXOn_3D(sfxTub2, &sfxPos);
 									break;
 								case 5:
 									psndSFXOn_3D(sfxRest, &sfxPos);
@@ -2680,15 +2685,13 @@ USER_FUNC(_object_fall_attack) {
 					if (targets2.numTargets > 0) {
 						for (;;) {
 							BattleWorkTarget* tg;
-							BattleUnitPart* part2;
 
 							if (targets2.currentTarget >= targets2.numTargets) {
 								break;
 							}
 							tg = &targets2.targets[targets2.targetIndices[targets2.currentTarget]];
 							unit2 = BattleGetUnitPtr(wp, tg->unitIdx);
-							part2 = BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx);
-							switch (BattlePreCheckDamage(BattleGetSystemPtr(wp), unit2, part2, weapon, 0x100)) {
+							switch (BattlePreCheckDamage(BattleGetSystemPtr(wp), unit2, BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx), weapon, 0x100)) {
 								case 2:
 								case 4:
 									break;

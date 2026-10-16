@@ -7,6 +7,7 @@
 #include "musyx/hardware.h"
 #include "musyx/sal.h"
 #include "musyx/synth.h"
+#include "musyx/s3d_key.h"
 
 #define S3D_DEFINE_SQRT(name)                    \
   extern inline float name(float x) {            \
@@ -24,6 +25,7 @@
 S3D_DEFINE_SQRT(sqrtf)
 
 static u8 s3dCallCnt;
+u8 gap_08_80418DD9_sbss[7];
 static SND_EMITTER* s3dEmitterRoot;
 static SND_LISTENER* s3dListenerRoot;
 #ifdef SND3D_UNUSED /* dead-stripped from this game build */
@@ -529,6 +531,11 @@ typedef struct START_GROUP {
   unsigned short numRunning; // offset 0xC, size 0x2
 } START_GROUP;
 
+static const f32 s3d_f16383[1] = {16383.0f};
+static const f32 s3d_f127[1] = {127.0f};
+static const f32 s3d_f64[1] = {64.0f};
+static const f32 s3d_f8192[1] = {8192.0f};
+
 static inline u8 clip127(u8 v) {
   if (v > 0x7f) {
     return 0x7f;
@@ -537,7 +544,7 @@ static inline u8 clip127(u8 v) {
 }
 
 static inline u16 clip3FFF(f32 v) {
-  if (v > 16383.f) {
+  if (v > s3d_f16383[0]) {
     return 0x3fff;
   }
   return (u16)v;
@@ -551,18 +558,18 @@ static inline void SetFXParameters(SND_EMITTER* const em, f32 vol, f32 xPan, f32
 
   vid = em->vid;
   if ((em->flags & 0x100000) != 0) {
-    synthFXSetCtrl(vid, 7, clip127((em->fade * vol) * 127.f));
+    synthFXSetCtrl(vid, 7, clip127(s3d_f127[0] * (em->fade * vol)));
   } else {
-    synthFXSetCtrl(vid, 7, clip127(vol * 127.f));
+    synthFXSetCtrl(vid, 7, clip127(s3d_f127[0] * vol));
   }
 
-  synthFXSetCtrl(vid, 10, clip127((1.f + xPan) * 64.f));
-  synthFXSetCtrl(vid, 131, clip127((1.f - zPan) * 64.f));
-  synthFXSetCtrl14(vid, 132, clip3FFF(doppler * 8192.f));
+  synthFXSetCtrl(vid, 10, clip127(s3d_f64[0] * (1.f + xPan)));
+  synthFXSetCtrl(vid, 131, clip127(s3d_f64[0] * (1.f - zPan)));
+  synthFXSetCtrl14(vid, 132, clip3FFF(s3d_f8192[0] * doppler));
 
   if ((em->flags & 0x180) != 0) {
     if (occl != 0.f) {
-      synthFXSetCtrl14(vid, 0x1f, clip3FFF(occl * 16383.f));
+      synthFXSetCtrl14(vid, 0x1f, clip3FFF(s3d_f16383[0] * occl));
       synthFXSetCtrl(vid, 0x4f, 0x7f);
     } else {
       synthFXSetCtrl(vid, 0x4f, 0);
@@ -604,13 +611,7 @@ static inline void EmitterShutdown(SND_EMITTER* em) {
 static START_GROUP startGroup[64];
 static RUN_LIST runList[128];
 
-void snd3dStrippedPool(float* f) {
-  f[0] = 16383.0f;
-  f[1] = 127.0f;
-  f[2] = 64.0f;
-  f[3] = 8192.0f;
-  startGroup[0].running = runList;
-}
+
 
 bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 maxVol,
                       SND_ROOM* room) {
@@ -619,7 +620,7 @@ bool sndUpdateEmitter(SND_EMITTER* em, SND_FVECTOR* pos, SND_FVECTOR* dir, u8 ma
 
     *(SND_FVECTOR*)((u8*)em + 0x10) = *pos;
     *(SND_FVECTOR*)((u8*)em + 0x1c) = *dir;
-    *(f32*)((u8*)em + 0x2c) = maxVol / 127.f;
+    *(f32*)((u8*)em + 0x2c) = maxVol / s3d_f127[0];
     if (*(f32*)((u8*)em + 0x30) > *(f32*)((u8*)em + 0x2c)) {
       *(f32*)((u8*)em + 0x30) = *(f32*)((u8*)em + 0x2c);
     }
@@ -878,7 +879,7 @@ bool sndUpdateListener(SND_LISTENER* li, SND_FVECTOR* pos, SND_FVECTOR* dir, SND
     li->up = *up;
 
     MakeListenerMatrix(li);
-    li->vol = vol / 127.f;
+    li->vol = vol / s3d_f127[0];
     hwEnableIrq();
     return TRUE;
   }
@@ -957,7 +958,7 @@ static inline bool sndRemoveListener(SND_LISTENER* li) {
 
 static START_GROUP startGroup[64];  // size: 0x400
 static u8 startGroupNum;            // size: 0x1
-static START_LIST startListNum[64]; // size: 0x700
+extern START_LIST startListNum[64]; // size: 0x700
 static u8 startListNumnum;          // size: 0x1
 static RUN_LIST runList[128];
 static u8 runListNum;               // size: 0x1
@@ -1063,12 +1064,12 @@ bool AddStartingEmitter(SND_EMITTER* em, f32 vol, f32 xPan, f32 yPan, f32 zPan, 
 
 int synthCheckFXRealloc(unsigned short fid);
 void StartContinousEmitters() {
-  SND_EMITTER* em;
-  START_LIST* sl;
-  long i;
   f32 dv;          // r63
 
   if (s3dUseLegacyLogic) {
+    long i;
+    START_LIST* sl;
+    SND_EMITTER* em;
   for (i = 0; i < startGroupNum; ++i) {
 
     for (sl = startGroup[i].list; sl != NULL; sl = sl->next) {
@@ -1089,21 +1090,7 @@ void StartContinousEmitters() {
       }
       em = sl->em;
       {
-        u8 key;
-        if (em->paraInfo == NULL) {
-          key = 0xFF;
-        } else {
-          u8 k;
-          SND_PARAMETER* pp = em->paraInfo->paraArray;
-          for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
-            if (pp->ctrl == 0x8000) {
-              key = pp->paraData.value7;
-              goto key_done;
-            }
-          }
-          key = 0xFF;
-        key_done:;
-        }
+        u8 key = s3dGetEmitterKey(em);
         if (
           (em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0))
           == -1) {
@@ -1129,6 +1116,9 @@ void StartContinousEmitters() {
     }
   }
   } else {
+    long i;
+    START_LIST* sl;
+    SND_EMITTER* em;
   for (i = 0; i < startGroupNum; ++i) {
     for (sl = startGroup[i].list; sl != NULL; sl = sl->next) {
       if (startGroup[i].running != NULL) {
@@ -1150,21 +1140,7 @@ void StartContinousEmitters() {
       }
       em = sl->em;
       {
-        u8 key;
-        if (em->paraInfo == NULL) {
-          key = 0xFF;
-        } else {
-          u8 k;
-          SND_PARAMETER* pp = em->paraInfo->paraArray;
-          for (k = 0; k < em->paraInfo->numPara; ++pp, ++k) {
-            if (pp->ctrl == 0x8000) {
-              key = pp->paraData.value7;
-              goto key_done2;
-            }
-          }
-          key = 0xFF;
-        key_done2:;
-        }
+        u8 key = s3dGetEmitterKey(em);
       if ((em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0))
           == -1) {
       set_flags2:
@@ -1205,6 +1181,8 @@ void StartContinousEmitters() {
   }
   }
 }
+
+START_LIST startListNum[64];
 
 void s3dHandle() {
   SND_VOICEID vid;
@@ -1250,21 +1228,7 @@ void s3dHandle() {
             continue;
           }
         } else {
-          u8 key;
-          if (em->paraInfo == NULL) {
-            key = 0xff;
-          } else {
-            u8 i;
-            SND_PARAMETER* pPtr = em->paraInfo->paraArray;
-            for (i = 0; i < em->paraInfo->numPara; ++pPtr, ++i) {
-              if (pPtr->ctrl == 0x8000) {
-                key = pPtr->paraData.value7;
-                goto got_key;
-              }
-            }
-            key = 0xff;
-          }
-        got_key:
+          u8 key = s3dGetEmitterKey(em);
           if ((em->vid = synthFXStart(em->fxid, key, 127, 64, em->studio, (em->flags & 0x10) != 0)) == -1) {
             if (!(em->flags & 2)) {
               em->flags |= 0x40000;
@@ -1349,7 +1313,9 @@ static inline void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FV
 }
 
 #endif
+__declspec(section ".sdata2") const u32 gap_09_80422CD4_sdata2[1] = {0};
 void s3dInit(u32 flags) {
+  
   s3dEmitterRoot = 0;
   s3dListenerRoot = 0;
   snd_used_studios = 0;

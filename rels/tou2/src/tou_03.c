@@ -2996,7 +2996,7 @@ void screen_tev(MapTevCallbackInfo* info) {
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        off = (j / 8) * 32 + y0; off += j % 8; off += y1; buf[off] = col;
+                        off = j / 8 * 32; off = off + y0; off += j % 8; off += y1; buf[off] = col;
                     }
                 }
             }

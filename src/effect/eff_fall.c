@@ -333,7 +333,7 @@ void effFallMain(EffectEntry* effect) {
     const char* light1;
     const char* bug1;
 
-    EffFallElem* e;
+    EffFallElem* e; EffFallElem * new_var ;
     const char* koopa1;
     s32 type;
     s32 arg8;
@@ -354,7 +354,7 @@ void effFallMain(EffectEntry* effect) {
     {
         Vec v = { 0.0f, 0.0f, 0.0f };
         v.x = e->pos.x;
-        v.y = y = e->pos.y;
+        v.y = ( y = e->pos.y) ;
         v.z = e->pos.z;
         sndPos = v;
     }
@@ -368,10 +368,10 @@ void effFallMain(EffectEntry* effect) {
     if (effect->flags & 4) {
         effect->flags &= ~4;
         for (i = 0, e = effect->userdata; i < effect->count; i++, e++) {
-            if (e->pose0 != -1) {
+            if (e->pose0 != ( -1) ) {
                 animPoseRelease(e->pose0);
             }
-            if (e->pose1 != -1) {
+            if (e->pose1 != ( -1) ) {
                 animPoseRelease(e->pose1);
             }
             psndSFXOff(e->sfx);
@@ -408,13 +408,13 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 1:
-                        if (type == 0 && i > 1 && !played && gp->retraceCount % 6 == 0) {
+                        if (((( type == 0 ) && ( i > 1 )) && ( !played )) && (( gp->retraceCount % 6 ) == 0) ) {
                             psndSFXOn_3D(bug2, &sndPos);
                             played = 1;
                         }
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < ( arg4 / 2.0f) ) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
                                 e->f34 *= -0.3f;
@@ -429,12 +429,12 @@ void effFallMain(EffectEntry* effect) {
                     case 2:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        a = 6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z) / 360.0f;
+                        a = ( 6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z) ) / 360.0f;
                         if (i == 1) {
                             a = angle / 360.0f;
                         }
-                        e->pos.x += 0.5f * (f32)sin(a);
-                        e->pos.z += 0.5f * -(f32)cos(a);
+                        e->pos.x += 0.5f * (( f32)sin(a) );
+                        e->pos.z += 0.5f * ( -( (f32)cos(a)) );
                         if (e->pos.y < y) {
                             e->pos.y = y;
                             e->timer = 0;
@@ -458,13 +458,13 @@ void effFallMain(EffectEntry* effect) {
                         done++;
                         break;
                 }
-                if ((gp->retraceCount >> 2) & 1) {
+                if ((( gp->retraceCount >> 1) >> 1) & 1) {
                     e->scroll++;
                 }
                 if (e->scroll >= 3) {
                     e->scroll = 0;
                 }
-                e->rot2 = 35.0f * (f32)sin(gp->retraceCount / 2.0f + i);
+                e->rot2 = 35.0f * (( f32)sin( (gp->retraceCount / 2.0f ) + i) );
                 break;
             case 2:
                 switch (e->state) {
@@ -479,11 +479,11 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 1:
-                        a = (f32)sin(62.831856f * e->timer / 60.0f);
-                        e->f44 = (60.0f - e->timer) * a / 60.0f;
+                        a = (f32)sin(( 62.831856f * e->timer ) / 60.0f);
+                        e->f44 = (( 60.0f - e->timer) * a ) / 60.0f;
                         e->timer++;
                         if (e->timer > 60) {
-                            e->state++;
+                            e->state++; do { } while (0) ;
                         }
                         break;
                     case 2:
@@ -507,17 +507,17 @@ void effFallMain(EffectEntry* effect) {
                 {
                     EffFallVtx* v = *e->vtx;
                     for (j = 0; j < 32; j++, v++) {
-                        v->x = (j & 1) ? 16.0f : -16.0f;
-                        v->y = 128.0f - 8.533334f * (j / 2);
+                        v->x = (j & 1) ? ( 16.0f ) : ( -16.0f) ;
+                        v->y = 128.0f - ( 8.533334f * (j / 2) );
                         v->z = 0.0f;
-                        v->u = (j & 1) ? 2.0f : 0.0f;
+                        v->u = (j & 1) ? ( 2.0f ) : ( 0.0f) ;
                         v->v = 0.06666667f * (j / 2);
                     }
                 }
                 {
                     EffFallVtx* v = *e->vtx;
                     for (i = 0; i < 32; i++, v++) {
-                        v->x += e->f44 * (v->y * v->y / 600.0f);
+                        v->x += e->f44 * (( v->y * v->y ) / 600.0f);
                     }
                 }
                 DCFlushRange(*e->vtx, 0x280);
@@ -534,7 +534,7 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 1:
-                        if (e->timer % 10 == 0) {
+                        if (( e->timer % 10 ) == 0) {
                             effWaterDamageN64Entry(4, 20, sndPos.x, sndPos.y, sndPos.z, 1.0f);
                         }
                         e->timer++;
@@ -562,15 +562,15 @@ void effFallMain(EffectEntry* effect) {
                             if (!animGroupBaseAsync("EFF_Baketu\0", group, 0)) {
                                 break;
                             }
-                            if (e->pose0 == -1) {
-                                e->pose0 = animPoseEntry("EFF_Baketu\0", group);
+                            if (e->pose0 == ( -1) ) {
+                                e->pose0 = animPoseEntry("EFF_Baketu\0", group& 0xFFFFFFFFu );
                                 animPoseSetAnim(e->pose0, "Z_1", 1);
                             }
                         } else {
                             if (!animGroupBaseAsync("EFF_Tarai\0\0", group, 0)) {
                                 break;
                             }
-                            if (e->pose0 == -1) {
+                            if (e->pose0 == ( -1) ) {
                                 e->pose0 = animPoseEntry("EFF_Tarai\0\0", group);
                                 animPoseSetAnim(e->pose0, "Z_1", 1);
                             }
@@ -585,7 +585,7 @@ void effFallMain(EffectEntry* effect) {
                     case 1:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < ( arg4 / 2.0f) ) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
                                 e->f34 *= -0.3f;
@@ -600,12 +600,12 @@ void effFallMain(EffectEntry* effect) {
                     case 2:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        a = 6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z) / 360.0f;
+                        a = ( 6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z) ) / 360.0f;
                         if (i == 1) {
                             a = angle / 360.0f;
                         }
-                        e->pos.x += 2.0f * (f32)sin(a);
-                        e->pos.z += 2.0f * -(f32)cos(a);
+                        e->pos.x += 2.0f * (( f32)sin(a) );
+                        e->pos.z += 2.0f * ( -( (f32)cos(a)) );
                         if (e->pos.y < y) {
                             e->pos.y = y;
                             e->f34 *= -0.5f;
@@ -647,7 +647,7 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                 }
-                if (e->pose0 != -1) {
+                if (e->pose0 != ( -1) ) {
                     animPoseMain(e->pose0);
                 }
                 break;
@@ -657,7 +657,7 @@ void effFallMain(EffectEntry* effect) {
                         if (!animGroupBaseAsync("EFF_koopa\0\0", group, 0)) {
                             break;
                         }
-                        if (e->pose0 == -1) {
+                        if (e->pose0 == ( -1) ) {
                             e->pose0 = animPoseEntry("EFF_koopa\0\0", group);
                             animPoseSetAnim(e->pose0, "Z_1", 1);
                             psndSFXOn_3D(koopa1, &sndPos);
@@ -676,53 +676,54 @@ void effFallMain(EffectEntry* effect) {
                     case 1:
                         e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -27.0f, 11, e->timer, 180);
                         if (e->rot2 < 0.0f) {
+                            new_var = e;
                             e->rot3 = e->rot2;
-                            e->rot2 = 0.0f;
+                            new_var->rot2 = 0.0f;
                         }
-                        e->timer++;
-                        if (e->timer > 180) {
-                            e->timer = 0;
-                            e->state++;
+                        new_var->timer++;
+                        if (new_var->timer > 180) {
+                            new_var->timer = 0;
+                            new_var->state++;
                         }
-                        if (e->timer == 100) {
+                        if (new_var->timer == 100) {
                             psndSFXOn_3D(koopa1, &sndPos);
                         }
                         break;
                     case 2:
-                        e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-27.0f, 80.0f, 11, e->timer, 200);
-                        if (e->rot2 < 0.0f) {
-                            e->rot3 = e->rot2;
-                            e->rot2 = 0.0f;
+                        new_var->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-27.0f, 80.0f, 11, new_var->timer, 200);
+                        if (new_var->rot2 < 0.0f) {
+                            new_var->rot3 = new_var->rot2;
+                            new_var->rot2 = 0.0f;
                         }
-                        e->timer++;
-                        if (e->timer > 200) {
-                            animPoseRelease(e->pose0);
-                            e->pose0 = -1;
+                        new_var->timer++;
+                        if (new_var->timer > 200) {
+                            animPoseRelease(new_var->pose0);
+                            new_var->pose0 = -1;
                             done++;
                         }
-                        if (e->timer == 70) {
+                        if (new_var->timer == 70) {
                             psndSFXOn_3D(koopa1, &sndPos);
                         }
                         break;
                 }
-                if (e->pose0 != -1) {
-                    animPoseMain(e->pose0);
+                if (new_var->pose0 != ( -1) ) {
+                    animPoseMain(new_var->pose0);
                 }
                 break;
             case 7:
-                switch (e->state) {
+                switch (new_var->state) {
                     case 0:
                         if (!animGroupBaseAsync("EFF_inseki\0", group, 0)) {
                             break;
                         }
                         psndSFXOn_3D(meteor1, &sndPos);
-                        if (e->pose0 == -1) {
-                            e->pose0 = animPoseEntry("EFF_inseki\0", group);
-                            animPoseSetAnim(e->pose0, "Z_1", 1);
+                        if (new_var->pose0 == ( -1) ) {
+                            new_var->pose0 = animPoseEntry("EFF_inseki\0", group);
+                            animPoseSetAnim(new_var->pose0, "Z_1", 1);
                         }
-                        if (e->pose1 == -1) {
-                            e->pose1 = animPoseEntry("EFF_inseki\0", group);
-                            animPoseSetAnim(e->pose1, "Z_2", 1);
+                        if (new_var->pose1 == ( -1) ) {
+                            new_var->pose1 = animPoseEntry("EFF_inseki\0", group);
+                            animPoseSetAnim(new_var->pose1, "Z_2", 1);
                         }
                     case 2:
                     case 4:
@@ -731,120 +732,120 @@ void effFallMain(EffectEntry* effect) {
                             { 140.0f, 40.0f, -10.0f },
                             { 0.0f, 40.0f, -40.0f },
                             { -140.0f, 40.0f, -10.0f },
-                            { -400.0f, 40.0f, -40.0f },
+                            { -400.0f, 40.0f, -40.0f }
                         };
-                        e->vel.x = tbl[e->state / 2][0];
-                        e->vel.y = tbl[e->state / 2][1];
-                        e->vel.z = tbl[e->state / 2][2];
-                        e->f30 = 0.4f;
-                        e->timer = distABf(e->vel.x, e->vel.z, e->pos.x, e->pos.z) / 5.0f;
-                        e->f34 = (e->vel.y - e->pos.y) / e->timer + e->f30 * e->timer / 2.0f;
-                        e->rotY = angleABf(e->pos.x, e->pos.z, e->vel.x, e->vel.z);
-                        e->rot2 = 0.0f;
-                        e->state++;
+                        new_var->vel.x = tbl[new_var->state / 2][0];
+                        new_var->vel.y = tbl[new_var->state / 2][1];
+                        new_var->vel.z = tbl[new_var->state / 2][2];
+                        new_var->f30 = 0.4f;
+                        new_var->timer = distABf(new_var->vel.x, new_var->vel.z, new_var->pos.x, new_var->pos.z) / 5.0f;
+                        new_var->f34 = ((new_var->vel.y - new_var->pos.y) / new_var->timer ) + ((new_var->f30 * new_var->timer ) / 2.0f) ;
+                        new_var->rotY = angleABf(new_var->pos.x, new_var->pos.z, new_var->vel.x, new_var->vel.z);
+                        new_var->rot2 = 0.0f;
+                        new_var->state++;
                         break;
                     }
                     case 1:
                     case 3:
                     case 5:
                     case 7:
-                        e->pos.y += e->f34;
-                        e->f34 -= e->f30;
-                        e->pos.x += 5.0f * fall_sinf(6.2831855f * e->rotY / 360.0f);
-                        e->pos.z += 5.0f * -fall_cosf(6.2831855f * e->rotY / 360.0f);
-                        if (--e->timer < 0) {
-                            e->pos.x = e->vel.x;
-                            e->pos.y = e->vel.y;
-                            e->pos.z = e->vel.z;
-                            e->state++;
-                            if (e->state == 2) {
-                                e->sfx = psndSFXOn_3D(meteor2, &sndPos);
+                        new_var->pos.y += new_var->f34;
+                        new_var->f34 -= new_var->f30;
+                        new_var->pos.x += 5.0f * fall_sinf(( 6.2831855f * new_var->rotY ) / 360.0f);
+                        new_var->pos.z += 5.0f * ( -fall_cosf(( 6.2831855f * new_var->rotY ) / 360.0f) );
+                        if (( --new_var->timer ) < 0) {
+                            new_var->pos.x = new_var->vel.x;
+                            new_var->pos.y = new_var->vel.y;
+                            new_var->pos.z = new_var->vel.z;
+                            new_var->state++;
+                            if (new_var->state == 2) {
+                                new_var->sfx = psndSFXOn_3D(meteor2, &sndPos);
                             }
-                            if (e->state != 8) {
-                                effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + e->pos.y - 40.0f, sndPos.z + e->pos.z, 0.0f);
+                            if (new_var->state != 8) {
+                                effKemuri1N64Entry(4, sndPos.x + new_var->pos.x, ( sndPos.y + new_var->pos.y ) - 40.0f, sndPos.z + new_var->pos.z, 0.0f);
                                 evtEntry(evt_shake, 0, 0);
                             }
                         }
-                        e->rot2 += (360.0f - e->rot2) / 30.0f;
+                        new_var->rot2 += (360.0f - new_var->rot2) / 30.0f;
                         break;
                     case 8:
-                        psndSFXOff(e->sfx);
-                        animPoseRelease(e->pose0);
-                        animPoseRelease(e->pose1);
-                        e->pose0 = -1;
-                        e->pose1 = -1;
-                        e->state++;
+                        psndSFXOff(new_var->sfx);
+                        animPoseRelease(new_var->pose0);
+                        animPoseRelease(new_var->pose1);
+                        new_var->pose0 = -1;
+                        new_var->pose1 = -1;
+                        new_var->state++;
                         break;
                     case 9:
                         done++;
                         break;
                 }
-                if (e->pose0 != -1) {
-                    animPoseMain(e->pose0);
+                if (new_var->pose0 != ( -1) ) {
+                    animPoseMain(new_var->pose0);
                 }
-                if (e->pose1 != -1) {
-                    animPoseMain(e->pose1);
+                if (new_var->pose1 != ( -1) ) {
+                    animPoseMain(new_var->pose1);
                 }
                 break;
             case 8:
-                switch (e->state) {
+                switch (new_var->state) {
                     case 0:
                         if (!animGroupBaseAsync("EFF_light\0\0", group, 0)) {
                             break;
                         }
-                        e->pose0 = animPoseEntry("EFF_light\0\0", group);
-                        animPoseSetAnim(e->pose0, "Z_1", 1);
-                        e->state++;
+                        new_var->pose0 = animPoseEntry("EFF_light\0\0", group);
+                        animPoseSetAnim(new_var->pose0, "Z_1", 1);
+                        new_var->state++;
                         break;
                     case 1:
                     case 2:
-                        e->pos.y += e->f34;
-                        e->f34 -= e->f30;
-                        if (e->pos.y < y) {
-                            e->pos.y = y;
-                            e->timer = 0;
-                            e->state++;
+                        new_var->pos.y += new_var->f34;
+                        new_var->f34 -= new_var->f30;
+                        if (new_var->pos.y < y) {
+                            new_var->pos.y = y;
+                            new_var->timer = 0;
+                            new_var->state++;
                         }
-                        if (e->state == 1 && e->pos.y < top) {
-                            effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + y, sndPos.z + e->pos.z, 0.0f);
+                        if ((1 == new_var->state  ) && (new_var->pos.y < top) ) {
+                            effKemuri1N64Entry(4, sndPos.x + new_var->pos.x, sndPos.y + y, sndPos.z + new_var->pos.z, 0.0f);
                             evtEntry(evt_shake, 0, 0);
-                            animPoseSetAnim(e->pose0, "A_1", 1);
-                            e->state++;
+                            animPoseSetAnim(new_var->pose0, "A_1", 1);
+                            new_var->state++;
                             psndSFXOn_3D(light1, &sndPos);
                         }
                         break;
                     case 3:
-                        if (animPoseGetLoopTimes(e->pose0) < 1.0f) {
+                        if (animPoseGetLoopTimes(new_var->pose0) < 1.0f) {
                             break;
                         }
-                        e->timer++;
-                        if (e->timer > e->arg8) {
-                            e->state++;
+                        new_var->timer++;
+                        if (new_var->timer > new_var->arg8) {
+                            new_var->state++;
                         }
                         break;
                     case 4:
-                        e->alpha -= 10;
-                        if (e->alpha < 0) {
-                            e->alpha = 0;
-                            e->state++;
+                        new_var->alpha -= 10;
+                        if (new_var->alpha < 0) {
+                            new_var->alpha = 0;
+                            new_var->state++;
                         }
                         break;
                     case 5:
-                        animPoseRelease(e->pose0);
-                        e->pose0 = -1;
-                        e->state++;
+                        animPoseRelease(new_var->pose0);
+                        new_var->pose0 = -1;
+                        new_var->state++;
                         break;
                     case 6:
                         done++;
                         break;
                 }
-                if (e->pose0 != -1) {
-                    animPoseMain(e->pose0);
+                if (new_var->pose0 != ( -1) ) {
+                    animPoseMain(new_var->pose0);
                 }
                 break;
         }
     }
-    if (done >= effect->count - 1) {
+    if (done >= ( effect->count - 1) ) {
         effDelete(effect);
         return;
     }

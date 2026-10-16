@@ -483,13 +483,6 @@ typedef struct EnvBlurWork {
     u8 pad14[4]; //0x14
 } EnvBlurWork;
 
-static inline GXColor
-envBlurColor(u8 a) {
-    GXColor c = {0xFF, 0xFF, 0xFF, 0x00};
-    c.a = a;
-    return c;
-}
-
 void envDisp_Blur(void) {
     EnvironmentWork* wp = envGetWork();
     EnvBlurWork* blur = (EnvBlurWork*)&wp->unk98;
@@ -529,7 +522,7 @@ void envDisp_Blur(void) {
             else {
                 alpha = 120.0f * (1.0f - t) + 128.0f;
             }
-            GXSetTevKColor(GX_KCOLOR0, envBlurColor(alpha));
+            GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0xFF, 0xFF, alpha});
         }
         else {
             GXSetTevKColor(GX_KCOLOR0, (GXColor){0xFF, 0xFF, 0xFF, 0xA0});
@@ -580,10 +573,10 @@ void envGlare(EnvironmentGlare* glare) {
     static f32 frame_cnt = 0.0f;
     EnvironmentWork* var_r4 = envGetWork();
     EnvironmentGlareFilter* temp_r30;
-    s32 var_r22;
     s32 var_r23;
-    u32 temp_r20;
+    s32 var_r22;
     u32 temp_r21;
+    u32 temp_r20;
     EnvironmentGlare* var_r21;
     EnvironmentGlare* var_r22_3;
     s32 temp_r31;
@@ -631,17 +624,17 @@ void envGlare(EnvironmentGlare* glare) {
     GXLoadTexObj(&sp8, GX_TEXMAP0);
     temp_r29 = glare->count;
     var_r28 = 0;
-    kc0 = glare->unkC;
-    kc1 = glare->unk10;
+    temp_r20 = glare->unkC;
+    temp_r21 = glare->unk10;
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_KONST, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    GXSetTevKColorSel(GX_TEVSTAGE0, kc0);
+    GXSetTevKColorSel(GX_TEVSTAGE0, temp_r20);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_KONST, GX_CC_ZERO);
-    GXSetTevKColorSel(GX_TEVSTAGE1, kc1);
+    GXSetTevKColorSel(GX_TEVSTAGE1, temp_r21);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
     i = 0;
@@ -651,12 +644,12 @@ void envGlare(EnvironmentGlare* glare) {
         GXSetTevOrder(var_r23, i + 1, 0, 0xFF);
         GXSetTevColorOp(var_r23, 1, 0, 0, 1, 2);
         GXSetTevColorIn(var_r23, 0xE, 0xF, 0xF, 8);
-        GXSetTevKColorSel(var_r23, kc0);
+        GXSetTevKColorSel(var_r23, temp_r20);
         GXSetTevSwapMode(var_r23, 0, 0);
         GXSetTevOrder(var_r22, 0xFF, 0xFF, 0xFF);
         GXSetTevColorOp(var_r22, 0, 0, 0, 1, 0);
         GXSetTevColorIn(var_r22, 0xF, 4, 0xE, 0);
-        GXSetTevKColorSel(var_r22, kc1);
+        GXSetTevKColorSel(var_r22, temp_r21);
         GXSetTevSwapMode(var_r22, 0, 0);
         var_r22 += 2;
         var_r23 += 2;

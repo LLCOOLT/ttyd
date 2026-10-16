@@ -20,6 +20,7 @@
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 typedef struct Chorobon { s16 flags; s16 state; s16 field_0x4; u8 field_0x6[2]; Vec target; f32 vy; s16 timer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[0x30 - 0x26]; } Chorobon;
 typedef struct ChorobonWork { s32 field_0x0; s32 count; Chorobon* chb; } ChorobonWork;
+u8 gap_05_00000004_bss[4];
 static ChorobonWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -255,7 +256,7 @@ void chb_jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 s
     chb->state = 100;
     chb->next = next;
 }
-
+static inline void jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, rs * (smax - smin) + smin, rg * (gmax - gmin) + gmin); } static inline void escape(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f32 z, f32 rs, f32 smin, f32 smax, f32 rg, f32 gmin, f32 gmax) { chb_jump(pose, chb, next, x, y, z, 2.0f * (rs * (smax - smin) + smin), rg * (gmax - gmin) + gmin); }
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_main(void) {
@@ -279,7 +280,7 @@ static void ext_main(void) {
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         switch (chb->state) {
             case 0: {
-                f32 dist, x, y, z, speed, gravity;
+                f32 z, speed, gravity, dist, x, y;
                 x = rand() / 32767.0f;
                 dist = randf(4.0f, 7.0f);
                 {
@@ -290,7 +291,7 @@ static void ext_main(void) {
                 }
                 speed = rand() / 32767.0f;
                 gravity = rand01();
-                chb_jump(pose, chb, chb->state, x, y, z, (0.5f - 0.3f) * speed + 0.3f, (0.8f - 0.5f) * gravity + 0.5f);
+                jump(pose, chb, chb->state, x, y, z, speed, 0.3f, 0.5f, gravity, 0.5f, 0.8f);
                 break;
             }
             case 1:
@@ -307,7 +308,7 @@ static void ext_main(void) {
                     }
                     speed = rand() / 32767.0f;
                     gravity = rand01();
-                    chb_jump(pose, chb, chb->state, x, y, z, 2.0f * ((1.2f - 1.0f) * speed + 1.0f), randf_scale(gravity, 0.8f, 0.8f));
+                    escape(pose, chb, chb->state, x, y, z, speed, 1.0f, 1.2f, gravity, 0.8f, 0.8f);
                     if (rand() % 150 == 0) {
                         pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
                         psndSFXOn_3D(sfx, &pos);
@@ -419,7 +420,14 @@ static USER_FUNC(npc_jump) {
     f32 angle;
 
     if (isFirstCall) {
-        dist = PSVECDistance(&(Vec){x, 0.0f, z}, &(Vec){npc->position.x, 0.0f, npc->position.z});
+        static const Vec va = {0.0f, 0.0f, 0.0f};
+        static const Vec vb = {0.0f, 0.0f, 0.0f};
+        Vec a;
+        Vec b;
+
+        b = vb; b.x = npc->position.x; b.z = npc->position.z;
+        a = va; a.x = x; a.z = z;
+        dist = PSVECDistance(&a, &b);
         dy = y - npc->position.y;
         if (t == 0.0f) {
             t = dist / speed;
@@ -588,6 +596,6 @@ EVT_BEGIN(hei_10_init_evt)
     RETURN
 EVT_END()
 
-#pragma force_active on
+#pragma explicit_zero_data on
 __declspec(section ".data") u32 gap_04_0000A464_data[1] = {0};
-#pragma force_active reset
+#pragma explicit_zero_data reset

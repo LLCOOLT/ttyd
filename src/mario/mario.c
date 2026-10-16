@@ -1326,7 +1326,9 @@ void marioMoveMain(void) {
 	f32 spd;
 	f32 vz;
 	f32 cs;
+	f32 dist;
 	f32 vx;
+	f32 vz2;
 
 	if (wp->currMotionId != MARIO_MOTION_SHIP) {
 		if (wp->flags & 0x1000000) {
@@ -1426,39 +1428,39 @@ void marioMoveMain(void) {
 	}
 	sincosf(&sn, &cs, wp->directionView);
 	vx += spd * sn;
-	spd = spd * cs + vz;
+	vz2 = vz + spd * cs;
 	if (!(wp->flags & 0x2080000)) {
 		if (*(f32*)((u8*)wp + 0x220) != 0.0f) {
 			vx *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
 		}
 		if (*(f32*)((u8*)wp + 0x218) != 0.0f) {
-			spd *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
+			vz2 *= (f32)cos(3.1415927f * *(f32*)((u8*)wp + 0x214) / 180.0f);
 		}
 	}
-	spd += wp->unk174.z;
 	vx += wp->unk174.x;
+	vz2 += wp->unk174.z;
 	vy = 0.0f;
 	wp->position.y += vy + wp->unk174.y;
-	vz = mm_sqrtf(spd * spd + vx * vx);
-	if (vz != vy) {
-		spd = angleABf(0.0f, 0.0f, vx, spd);
+	dist = mm_sqrtf(vx * vx + vz2 * vz2);
+	if (dist != vy) {
+		spd = angleABf(0.0f, 0.0f, vx, vz2);
 	}
 	else {
 		spd = toMovedir(wp->unk1A8);
 	}
 	if (!(wp->flags & 0x100000) && (wp->flags & 0x30000)) {
 		vx = wp->mBaseDashSpeed * wp->playerGravity;
-		if (vz > vx) {
-			vz = vx;
+		if (dist > vx) {
+			dist = vx;
 		}
 	}
 	if (!(wp->flags & 0x1000000)) {
-		vz *= marioGetMoveRate(wp->unk19C);
+		dist *= marioGetMoveRate(wp->unk19C);
 	}
 	if (wp->flags & 0x1000) {
-		vz = 0.0f;
+		dist = 0.0f;
 	}
-	*(f32*)((u8*)wp + 0x18C) = vz;
+	*(f32*)((u8*)wp + 0x18C) = dist;
 	if (wp->flags & 0x40) {
 		spd = wp->unk1A4;
 		wp->directionView = spd;
@@ -1471,14 +1473,14 @@ void marioMoveMain(void) {
 		return;
 	}
 	if (!(wp->flags & 0x1000000)) {
-		marioCheckWall(vz, spd);
+		marioCheckWall(dist, spd);
 	}
 	else {
 		if (!(wp->flags & 0x10000)) {
-			marioCheckWall(vz, spd);
+			marioCheckWall(dist, spd);
 		}
 		else {
-			marioCheckWall_roll(vz, spd);
+			marioCheckWall_roll(dist, spd);
 		}
 		N_dou10_yoko_yari3((u8*)wp + 0x210);
 		if (wp->field_0x1E0 && (hitGetAttr(wp->field_0x1E0) & 0x800)) {
@@ -1500,12 +1502,12 @@ BOOL marioChkPushAnime(void) {
 }
 
 s32 marioAnimeId(void) {
-	s32 flags = mp->dispFlags;
+	MarioWork* wp = mp;
 	s32 id;
-	if (flags & 0x10000000) {
+	if (wp->dispFlags & 0x10000000) {
 		id = 2;
 	}
-	else if (flags & 0x80000000) {
+	else if (wp->dispFlags & 0x80000000) {
 		id = 1;
 	}
 	else {
@@ -2097,29 +2099,25 @@ void marioDispBlurSub(Mtx unused, s32 blurId) {
 		wp->field_0xA4.z + (wp->field_0x98.z + blurPos[blurId].z));
 	MTXConcat(rotMtx, mtx, mtx);
 	animPoseSetMaterialFlagOn(wp->paperAnimGroupId[marioAnimeId()], 0x40);
-	animPoseSetMaterialEvtColor(wp->paperAnimGroupId[(wp = mp, marioAnimeId())], (GXColor){0xFF, 0xFF, 0xFF, 0x80 - (blurId << 4)});
+	animPoseSetMaterialEvtColor(wp->paperAnimGroupId[marioAnimeId()], (GXColor){0xFF, 0xFF, 0xFF, 0x80 - (blurId << 4)});
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 1, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 2, 0.0f, 1.0f);
 	animPoseDrawMtx(wp->paperAnimGroupId[marioAnimeId()], mtx, 3, 0.0f, 1.0f);
 }
 
 #pragma opt_dead_assignments off
-#define BLURQ(dst, a_in) { f32 a = (a_in); s32 r_; if ((a) <= 3.1415927f) { if ((a) <= 1.5707964f) r_ = 0; else r_ = 1; } else if ((a) < 4.712389f) r_ = 2; else r_ = 3; dst = r_; }
 void marioDispBlur(CameraId camId, void* param) {
 	MarioWork* wp = param;
 	s32 i;
 	Mtx mtx;
 	u32 flag;
-	s32 q2;
-	s32 q;
-	f32 angleB;
+	f32 s, c, sg, cg, sy;
 	f32 angle;
-
 	flag = animPoseGetMaterialFlag(wp->paperAnimGroupId[marioAnimeId()]);
 	angle = wp->targetYaw * 6.2831855f / 360.0f;
-	
-	BLURQ(q2, angle)
-	BLURQ(q, angle)
+	if (angle <= 3.1415927f) { if (angle <= 1.5707964f) { s = angle; sg = 1.0f; sy = s * s; } else { s = angle - 1.5707964f; sg = 1.0f; sy = s * s; } } else if (angle < 4.712389f) { s = angle - 3.1415927f; sg = -1.0f; sy = s * s; } else { s = angle - 4.712389f; sg = -1.0f; sy = s * s; }
+	if (angle <= 3.1415927f) { if (angle <= 1.5707964f) { c = angle; cg = 1.0f; } else { c = angle - 1.5707964f; cg = 1.0f; } } else if (angle < 4.712389f) { c = angle - 3.1415927f; cg = -1.0f; } else { c = angle - 4.712389f; cg = -1.0f; }
+	s = s * sg * c * cg * sy;
 	for (i = 7; i > 0; i--) {
 		marioDispBlurSub(mtx, i);
 	}

@@ -377,9 +377,9 @@ void BattleStageDispLight(CameraId camId, void* param) {
 				f32 px = s->lights[i].pos.x;
 				f32 py = s->lights[i].pos.y;
 				f32 pz = s->lights[i].pos.z;
-				f32 ex = 2.0f * (s->lights[i].target.x - px) + px;
-				f32 ey = 2.0f * (s->lights[i].target.y - py) + py;
-				f32 ez = 2.0f * (s->lights[i].target.z - pz) + pz;
+				f32 ex = (s->lights[i].target.x - px) * 2.0f + px;
+				f32 ey = (s->lights[i].target.y - py) * 2.0f + py;
+				f32 ez = (s->lights[i].target.z - pz) * 2.0f + pz;
 				f32 ax = v.x * width + ex;
 				f32 ay = v.y * width + ey;
 				f32 az = v.z * width + ez;

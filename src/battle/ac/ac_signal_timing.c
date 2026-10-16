@@ -364,9 +364,9 @@ static void actionCommandDisp(f32 x, f32 y) {
     Mtx mScale;
 
     camGetPtr(8);
+    w = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC));
     count = ST_COUNT(work);
     next = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC))->next;
-    w = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC));
     if (!(ST_FLAGS(work) & 1)) {
         if (w->okFlag) {
             Vec pos = {0.0f, 0.0f, 0.0f};

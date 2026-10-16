@@ -5045,7 +5045,8 @@ static inline f32 ps_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); gu
 u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 	static u8 PAN[4];
 	Vec v = *pos;
-	f32 pd, ang, d, rel;
+	f32 d;
+	f32 pd, ang;
 	s16 span, pan, t;
 	PaperSoundWork* wp = &psnd;
 
@@ -5067,8 +5068,8 @@ u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 			ang -= 360.0f;
 		}
 	}
-	rel = (ang - pd) / 180.0f;
-	t = 127.0f * rel + 127.0f;
+	ang = (ang - pd) / 180.0f;
+	t = 127.0f * ang + 127.0f;
 	if (t < 64) {
 		t = 127 - t;
 	}
@@ -5080,14 +5081,28 @@ u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 	if (t > 127) t = 127;
 	span = t;
 
-	{ f32 dx = v.x - wp->position.x; f32 dy = v.y - wp->position.y; f32 dz = v.z - wp->position.z; d = ps_sqrtf(dx * dx + dy * dy + dz * dz); }
 	{
-		f32 c = d * (f32)cos((f32)(3.14 * rel));
+		f32 dx = v.x - wp->position.x; f32 dy = v.y - wp->position.y; f32 dz = v.z - wp->position.z;
+		d = dx * dx + dy * dy + dz * dz;
+		if (d > 0.0f) {
+			f64 guess = __frsqrte(d);
+			guess = 0.5 * guess * (3.0 - guess * guess * d);
+			guess = 0.5 * guess * (3.0 - guess * guess * d);
+			guess = 0.5 * guess * (3.0 - guess * guess * d);
+			d = d * guess;
+		} else if (d < 0.0) {
+			d = *(f32*)__float_nan;
+		} else if (ps_fpclassifyf(d) == 1) {
+			d = *(f32*)__float_nan;
+		}
+	}
+	{
+		f32 c = d * (f32)cos((f32)(3.14 * ang));
 		f32 ac = __fabsf(c);
 		f32 q;
 		if (ac > 2048.0f) ac = 2048.0f;
 		q = 64.0f * ac / 2048.0f;
-		if (__fabsf(rel) < 0.5f) {
+		if (__fabsf(ang) < 0.5f) {
 			t = 64.0f - q;
 			if (t < 1) t = 1;
 		}
@@ -5097,10 +5112,12 @@ u32 calc3D(s32 id, Vec* pos, u8 vol, u16 dist) {
 		}
 	}
 	if (t <= 64) {
-		pan = 64.0f - 64.0f * (f32)sin(6.2831855f * ((64 - t) * 90 / 64) / 360.0f);
+		f32 sn = sin(6.2831855f * ((64 - t) * 90 / 64) / 360.0f);
+		pan = 64.0f - 64.0f * sn;
 	}
 	else {
-		pan = 64.0f + 64.0f * (f32)sin(6.2831855f * ((t - 64) * 90 / 64) / 360.0f);
+		f32 sn = sin(6.2831855f * ((t - 64) * 90 / 64) / 360.0f);
+		pan = 64.0f + 64.0f * sn;
 	}
 	if (pan < 0) pan = 0;
 	if (pan > 127) pan = 127;
@@ -5342,6 +5359,7 @@ void psndBGM_rate(s32 id, u16 rate) {
 void psndBGMMain(void) {
 	PaperSoundBGM* bgm;
 	PaperSoundFade* fade;
+	s32 id;
 	s32 i;
 	s32 maxv = 100;
 	s32 vol;
@@ -6431,27 +6449,135 @@ u8 psndSFX_get_vol(s32 id) {
 
 #pragma dont_inline off
 void psndENV_stop(u32 id) {
-	s32 i;
+	PaperSoundEffect* sfx;
 	u8* e;
-	
-	for (i = 0; i < 16; i++) {
-		e = (u8*)&psenv[i];
+	s32 i;
+
+	for (e = (0, (u8*)psenv), i = 0; i < 16; i++, e += sizeof(PaperSoundEnv)) {
 		if (*(u16*)(e + 4) != id) continue;
 		switch (e[8]) {
 		case 0:
-			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) psndSFXOff(*(s32*)(e + 0x14));
+			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) {
+				s32 sid = *(s32*)(e + 0x14);
+				if (sid != 0xFFFFFFFF) {
+					sfx = &pssfx[sid & 0xFF];
+					if (sfx->unk0 != 0xFFFFFFFF) {
+						if (sfx->unk6 & 1) {
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+						else {
+							SoundEffectEntry* entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+							if (sfx->unk18 != 0xFFFFFFFF) {
+								if (entry->field_0x4 & 0x80000000) {
+									SoundSSStopCh(sfx->unk18);
+								}
+								else if (entry->field_0x4 & 0x40000000) {
+									SoundSongStopCh(sfx->unk18);
+								}
+								else {
+									SoundEfxStop(sfx->unk18);
+								}
+							}
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+					}
+				}
+			}
 			*(u16*)(e + 4) = 0;
 			break;
 		case 1:
-			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) psndSFXOff(*(s32*)(e + 0x14));
+			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) {
+				s32 sid = *(s32*)(e + 0x14);
+				if (sid != 0xFFFFFFFF) {
+					sfx = &pssfx[sid & 0xFF];
+					if (sfx->unk0 != 0xFFFFFFFF) {
+						if (sfx->unk6 & 1) {
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+						else {
+							SoundEffectEntry* entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+							if (sfx->unk18 != 0xFFFFFFFF) {
+								if (entry->field_0x4 & 0x80000000) {
+									SoundSSStopCh(sfx->unk18);
+								}
+								else if (entry->field_0x4 & 0x40000000) {
+									SoundSongStopCh(sfx->unk18);
+								}
+								else {
+									SoundEfxStop(sfx->unk18);
+								}
+							}
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+					}
+				}
+			}
 			*(u16*)(e + 4) = 0;
 			break;
 		case 2:
-			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) psndSFXOff(*(s32*)(e + 0x14));
+			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) {
+				s32 sid = *(s32*)(e + 0x14);
+				if (sid != 0xFFFFFFFF) {
+					sfx = &pssfx[sid & 0xFF];
+					if (sfx->unk0 != 0xFFFFFFFF) {
+						if (sfx->unk6 & 1) {
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+						else {
+							SoundEffectEntry* entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+							if (sfx->unk18 != 0xFFFFFFFF) {
+								if (entry->field_0x4 & 0x80000000) {
+									SoundSSStopCh(sfx->unk18);
+								}
+								else if (entry->field_0x4 & 0x40000000) {
+									SoundSongStopCh(sfx->unk18);
+								}
+								else {
+									SoundEfxStop(sfx->unk18);
+								}
+							}
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+					}
+				}
+			}
 			*(u16*)(e + 4) = 0;
 			break;
 		case 3:
-			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) psndSFXOff(*(s32*)(e + 0x14));
+			if (*(s32*)(e + 0x14) != 0xFFFFFFFF) {
+				s32 sid = *(s32*)(e + 0x14);
+				if (sid != 0xFFFFFFFF) {
+					sfx = &pssfx[sid & 0xFF];
+					if (sfx->unk0 != 0xFFFFFFFF) {
+						if (sfx->unk6 & 1) {
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+						else {
+							SoundEffectEntry* entry = &pssfxlist[sfx->unk0 & 0x1FFF];
+							if (sfx->unk18 != 0xFFFFFFFF) {
+								if (entry->field_0x4 & 0x80000000) {
+									SoundSSStopCh(sfx->unk18);
+								}
+								else if (entry->field_0x4 & 0x40000000) {
+									SoundSongStopCh(sfx->unk18);
+								}
+								else {
+									SoundEfxStop(sfx->unk18);
+								}
+							}
+							sfx->unk0 = -1;
+							sfx->unk18 = -1;
+						}
+					}
+				}
+			}
 			*(u16*)(e + 4) = 0;
 			break;
 		}
@@ -6465,7 +6591,7 @@ typedef struct EnvE_ {
 typedef struct EnvF_ {
 	u8 state, u1; s16 time, timeMax; u8 u6, u7; s16 u8_, uA;
 } EnvF_;
-#define ENVVOL(e, p, out) 	{ 		EnvF_* f = NULL; 		s16 v; 		if ((p)->unk18[0] == (e)->id) f = (EnvF_*)&(p)->fade[0]; 		if ((p)->unk18[1] == (e)->id) f = (EnvF_*)&(p)->fade[1]; 		if (f == NULL) out = (e)->f6 * (p)->unk5A / 100; 		else { 			if (f->u6 == 0) v = 0x7f; else v = f->uA * 0x7f / f->u8_; 			if (f->state == 0) out = (p)->unk5A * ((e)->f6 * v / 127) / 100; 			else { 				v = f->timeMax * ((e)->f6 * v / 127) / f->time; 				out = (p)->unk5A * v / 100; 			} 		} 	}
+#define ENVVOL(e, p, out) 	{ 		EnvF_* f = NULL; 		s16 v; 		if ((p)->unk18[0] == (e)->id) f = (EnvF_*)&(p)->fade[0]; 		if ((p)->unk18[1] == (e)->id) f = (EnvF_*)&(p)->fade[1]; 		if (f == NULL) out = (e)->f6 * (p)->unk5A / 100; 		else { 			if (f->u6 == 0) v = 0x7f; else v = f->uA * 0x7f / f->u8_; 			if (f->state == 0) out = (p)->unk5A * ((e)->f6 * v / 127) / 100; 			else { 				{ s16 w = f->timeMax * ((e)->f6 * v / 127) / f->time; out = w * (p)->unk5A / 100; } 			} 		} 	}
 #define ENVDONE(e) 	{ 		(e)->sfx = -1; 		(e)->state = 0; 		(e)->fE = 0; 		switch ((e)->type) { 		case 0: (e)->fE = (e)->fA * 60; (e)->fE += irand((e)->f9) * 60; break; case 2: (e)->fE = (e)->fA * 60; (e)->fE += irand((e)->f9) * 60; break; case 3: break; 		} 	}
 #pragma dont_inline on
 void psndENVMain(void) {
@@ -6622,6 +6748,7 @@ BOOL psndENVOn(u32 flags, const char* name) {
 typedef struct EnvEnt_ {
 	u32 f0; u16 id; u8 f6, f7, f8, f9, fA, fB, fC, fD; u16 fE; u16 f10; u16 pad12; u32 pad14, f18, f1C, f20;
 } EnvEnt_;
+typedef struct PairU32_ { u32 a, b; } PairU32_;
 typedef struct EnvLst_ {
 	u16 id; u16 f2; u8 f4, f5, f6, f7, f8; u32 fC, f10, f14; u8 f18, f19, f1A;
 } EnvLst_;
@@ -6641,8 +6768,8 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 		id = (s32)name;
 	}
 	else {
-		for (id = 0; id < 0x76; id++, names++) {
-			if (strcmp(*names, name) == 0) break;
+		for (id = 0; id < 0x76; id++) {
+			if (strcmp(names[id], name) == 0) break;
 		}
 		if (id >= 0x76) id = 0;
 	}
@@ -6650,8 +6777,7 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 	fade = &psnd.fade[idx];
 	if (psnd.unk56 & 2) return FALSE;
 	env = &psnd.unk18[idx];
-	cur = *env;
-	if (cur != 0) {
+	if ((cur = *env) != 0) {
 		if (!(flags & 0x10)) {
 			if (flags & 0x20) {
 				if (flags & 0x100) {
@@ -6682,12 +6808,14 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 		if (list->id == 0x76) break;
 		if (list->id != id) continue;
 		{
+			s32 j;
 			EnvEnt_* p = (EnvEnt_*)psenv;
-			for (i = 0; i < 16; p++, i++) {
+			for (j = 0; j < 16; j++) {
 				if (p->id == 0) {
-					e = &((EnvEnt_*)psenv)[i];
+					e = &((EnvEnt_*)psenv)[j];
 					goto found;
 				}
+				p++;
 			}
 			e = NULL;
 		}
@@ -6700,12 +6828,7 @@ found:
 		e->f8 = list->f6;
 		e->f9 = list->f7;
 		e->fA = list->f8;
-		{
-			u32 w0 = list->fC;
-			u32 w1 = list->f10;
-			e->f18 = w0;
-			e->f1C = w1;
-		}
+		*(PairU32_*)&e->f18 = *(PairU32_*)&list->fC;
 
 		e->f20 = list->f14;
 		e->fB = list->f18;
@@ -6728,7 +6851,7 @@ found:
 	}
 	*env = id;
 	fade->state = 0;
-	*(u16*)((u8*)psnd.unk1C + idx * 2) = 0x7D00;
+	((u16*)psnd.unk1C)[idx] = 0x7D00;
 	psnd.unk20[idx] = 0x7D00;
 	if (flags & 0x100) {
 		fade->state = 1;
@@ -6768,7 +6891,7 @@ BOOL psndENVOff_f_d(u32 flags, u32 fadetime, s32 r5) {
 	u16* env;
 	s32 silent = silent_tbl[(flags >> 12) & 0xF];
 	PaperSoundFade* fade;
-	f32 dead = (f32)r5;
+
 
 	if (psnd.unk18[flags & 0xF] == 0) {
 		return FALSE;
@@ -6820,4 +6943,8 @@ BOOL psndENV_LPF(s32 id, u16 freq) {
 	}
 	psnd.unk20[id & 0xF] = freq;
 	return TRUE;
+}
+
+void psndStrippedPool(f32* f, s32 i) {
+    *f = (f32)i;
 }

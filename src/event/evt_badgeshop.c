@@ -160,27 +160,28 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
 	s32* p;
-	u32 k;
 	s32 i;
-	int j;
+	s32 k;
 	s32 count;
+	s32 j;
+	s32 m;
 
-	for (k = 0; k < 0x11; k++) {
-		table[k][1] = 200;
-		table[k][0] = 0;
+	for (m = 0; m < sizeof(table) / sizeof(table[0]); m++) {
+		table[m][1] = 200;
+		table[m][0] = 0;
 	}
 
+	i = 0;
 	p = (s32*)table;
 	k = 0;
-	i = 0;
 	for (; i < BADGE_MAX - 1; i++) {
-		count = (s16)badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1)); //inline
+		count = (s16)badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1));
 		for (j = 0; j < count; j++) {
 			table[k][1] = irand(100);
 			table[k++][0] = i + 1;
-			if (k >= 0x10) break;
+			if (k >= 0x10u) break;
 		}
-		if (k >= 0x10) {
+		if (k >= 0x10u) {
 			break;
 		}
 	}
@@ -188,16 +189,15 @@ void badgeShop_bottakuruGeneration(void) {
 	qqsort(table, 0x11, 8, bottakuruComp);
 
 	i = 0;
-	do { //only 4 slots
-		for (k = 0; k < 0x11u; k++) {
-			if (p[0] == badge_bottakuru_table[k]) {
-				evtSetValue(NULL, i + GSW(118), k);
+	do {
+		for (m = 0; m < sizeof(badge_bottakuru_table) / sizeof(badge_bottakuru_table[0]); m++) {
+			if (p[0] == badge_bottakuru_table[m]) {
+				evtSetValue(NULL, i + GSW(118), m);
 			}
 		}
 		p += 2;
 	} while (++i < 4);
 }
-
 
 void badgeShop_bteresaGeneration(void) {
 	s32* ptr;

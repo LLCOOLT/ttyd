@@ -227,7 +227,6 @@ void effOpukuJetwMain(EffectEntry* effect) {
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuJetwDisp, effect);
 }
 
-#pragma opt_loop_invariants off
 void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx mtx;
     Mtx scale;
@@ -240,11 +239,6 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     s32 frame, alpha, r, g, b;
     s32 n, m;
     JetwEnt* tbl;
-    s32 idx;
-    s32 f5;
-    JetwEnt* e;
-    s32 cur;
-    s32 half;
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
@@ -298,20 +292,17 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
         tri2(0, 1, 2, 0, 0, 2, 3, 0);
     }
-    {
-        f5 = frame * 5;
-        cur = frame;
-        half = n / 2;
-        for (i = 0; i < half; cur += 2, i++) {
-            idx = cur % n;
-            for (j = 0; j < m; j++) {
-                JetwEnt* row = tbl + j * n;
-                if (idx <= f5 && n - 1 - idx <= lifetime) {
-                    e = row + idx;
-                    PSMTXTrans(mtx, (f32)e->x, 10.0f + (f32)e->y, 0.0f);
+    for (i = 0; i < n / 2; i++) {
+        for (j = 0; j < m; j++) {
+            s32 idx = (frame + i * 2) % n;
+            JetwEnt* ptr = &tbl[j * n];
+
+            if (idx <= frame * 5) {
+                if (n - 1 - idx <= lifetime) {
+                    PSMTXTrans(mtx, (f32)ptr[idx].x, 10.0f + (f32)ptr[idx].y, 0.0f);
                     PSMTXScale(scale, 0.01f * (f32)tbl[idx].sx, 0.01f * (f32)tbl[idx].sy, 1.0f);
                     PSMTXConcat(mtx, scale, mtx);
-                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)e->rot + (f32)dat_ry[(j + i) & 7]));
+                    PSMTXRotRad(rot, 'z', 0.017453292f * ((f32)ptr[idx].rot + (f32)dat_ry[(j + i) & 7]));
                     PSMTXConcat(mtx, rot, mtx);
                     PSMTXConcat(mtx2, mtx, mtx);
                     GXLoadPosMtxImm(mtx, GX_PNMTX0);
@@ -325,6 +316,5 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
-#pragma opt_loop_invariants reset
 
 __declspec(section ".sdata2") const u32 gap_10_804231D4_sbss2;

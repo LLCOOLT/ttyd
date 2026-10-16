@@ -124,6 +124,7 @@ static inline void kpaFireEntry(Vec pos) {
     MarioWork* mp = marioGetPtr();
     kpaFireEntry2(pos);
 }
+
 static inline void kpaFireSEOn(void) {
     MarioWork* mp = marioGetPtr();
     if (*(u32*)(KPW(mp) + 0x14C) == 0xFFFFFFFFU) {
@@ -502,6 +503,15 @@ f32 kpaSetJumpPara(void) {
 }
 
 f32 kpaSetFallPara(void);
+f32 kpaSetFallPara(void) {
+    MarioWork* mp = marioGetPtr();
+    if ((*(u16*)((u8*)mp + 0x246) & 0x100)) {
+        SETP(mp, -0.05f, -0.08f, -0.006f, -0.002f);
+    } else {
+        SETP(mp, -0.1f, -0.2f, -0.024f, -0.01f);
+    }
+}
+
 void kpa_jumpNpc(void) {
     MarioWork* mp = marioGetPtr();
     if (mp->trigFlags & 1) {
@@ -611,16 +621,18 @@ void kpaFall(void) {
     }
 }
 
-f32 kpaSetFallPara(void);
-f32 kpaSetFallPara(void) {
-    MarioWork* mp = marioGetPtr();
-    if ((*(u16*)((u8*)mp + 0x246) & 0x100)) {
-        SETP(mp, -0.05f, -0.08f, -0.006f, -0.002f);
-    } else {
-        SETP(mp, -0.1f, -0.2f, -0.024f, -0.01f);
-    }
+void kpaStrippedFallPool(f32* f) {
+    f[0] = -0.05f;
+    f[1] = -0.08f;
+    f[2] = -0.006f;
+    f[3] = -0.002f;
+    f[4] = -0.1f;
+    f[5] = -0.2f;
+    f[6] = -0.024f;
+    f[7] = -0.01f;
 }
 
+f32 kpaSetFallPara(void);
 s32 kpaFireAttackCheck(void) {
     s32 m;
     MarioWork* mp = marioGetPtr();
@@ -810,6 +822,10 @@ void unk_801f8cd0(void) {
     }
 }
 
+void kpaStrippedPool(f32* f, s32 i) {
+    *f = (f32)i;
+}
+
 void kpaFireMain(void) {
     MarioWork* mp = marioGetPtr();
     Mtx mb0;
@@ -827,7 +843,7 @@ void kpaFireMain(void) {
     f32 f30;
     f32 f29;
     *(s32*)(KPW(mp) + 0x18) = flag = 0;
-    if (fireefp) {
+    if (fireefp && (f32)flag == 0.0f) {
         f32 dir;
         f32 scale;
         f32 x;

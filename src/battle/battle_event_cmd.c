@@ -2213,33 +2213,32 @@ USER_FUNC(btlevtcmd_GetPartyTechLv) {
 }
 
 USER_FUNC(btlevtcmd_CalculateFaceDirection) {
-    BattleWork* wp = _battleWorkPointer;
-    s32* args = event->args;
     f32 thisX, thisY, thisZ;
     f32 targetX, targetY, targetZ;
     f32 offsetX, offsetY, offsetZ;
     f32 localX, localY, localZ;
     f32 thisOffsetX, thisOffsetY, thisOffsetZ;
     f32 calculate;
-    BattleUnit* thisUnit;
-    BattleUnit* targetUnit;
-    s32 index;
-    s32 thisId;
-    s32 thisPartId;
-    s32 targetId;
-    s32 targetPartId;
-    u32 flags;
-    s32 btlId;
-    s32 value;
     s32 tid;
+    s32 targetPartId;
+    BattleUnit* thisUnit;
+    s32* args = event->args;
+    s32 value;
+    BattleWork* wp = _battleWorkPointer;
+    s32 btlId;
+    s32 index;
+    s32 targetId;
+    s32 thisPartId;
+    u32 flags;
+    s32 thisId;
+    BattleUnit* targetUnit;
     BattleUnitPart* thisPart = NULL;
     BattleUnitPart* targetPart = NULL;
 
     btlId = evtGetValue(event, args[0]);
     thisId = BattleTransID(event, btlId);
     thisPartId = evtGetValue(event, args[1]);
-    targetId = evtGetValue(event, args[2]);
-    tid = targetId;
+    tid = targetId = evtGetValue(event, args[2]);
     targetPartId = evtGetValue(event, args[3]);
     flags = args[4];
     index = args[5];

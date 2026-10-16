@@ -1071,11 +1071,12 @@ void effStarStoneDraw(CameraId cam, EffectEntry* e);
 void mapGX(WinLogWork* w, f32 x, f32 y);
 void monoshiriGX(WinLogWork* w, f32 x, f32 y);
 
-void winLogDisp(CameraId cam, WinLogWork* w, s32 idx) {
+void winLogDisp(CameraId cam, void* param, s32 idx) {
     static const GXColor kW = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor c1 = kW;
-    GXColor c3 = kW;
-    GXColor c2 = kW;
+    WinLogWork* w = param;
+    GXColor c1;
+    GXColor c3;
+    GXColor c2;
     Mtx m1;
     Mtx m2;
     f32 x;
@@ -1083,11 +1084,11 @@ void winLogDisp(CameraId cam, WinLogWork* w, s32 idx) {
     s32 i;
     EffStarStoneWork* wk;
 
-    {
-        WinLogPos* p = &w->pos[idx];
-        x = p->x;
-        y = p->y;
-    }
+    c1 = kW;
+    c2 = kW;
+    c3 = kW;
+    x = w->pos[idx].x;
+    y = w->pos[idx].y;
 
     winBgGX(w, 4, x, y);
     if (y + w->fE34 > -480.0f) {
@@ -1493,7 +1494,6 @@ void capture(CameraId camera, void* param) {
     f32 proj[7];
     Vec v2;
     Vec v1;
-    Vec vv;
     u16 bb0, bb1, bb2, bb3;
     u32 sx, sy, sw, sh;
     f32 cx;
@@ -1501,21 +1501,17 @@ void capture(CameraId camera, void* param) {
     f32 dist;
     f32 tx, ty, s;
     f32 f;
-    f32 x, y, z;
     u16 tw;
     u16 th;
     s32 i;
-    s32 n;
     MonoDat* e;
+    s32 n;
     Vec* gpos;
     s32* cnt;
     s32* idx;
     Vec* a;
     Vec* b;
     s32 k;
-    Vec up;
-    Vec tgt;
-    Vec cam;
 
     data = (AnimBBox*)animPoseGetAnimDataPtr(m->pose1);
     min = (Vec){data->minX, data->minY, data->minZ};
@@ -1537,19 +1533,9 @@ void capture(CameraId camera, void* param) {
     } else {
         dist = ((608.0f * (max.y - cy)) / 480.0f) / (f32)tan(0.21816615760326385);
     }
-    {
-    tgt = (Vec){0.0f, 0.0f, 0.0f};
-    up = (Vec){0.0f, 1.0f, 0.0f};
-    cam = (Vec){0.0f, 0.0f, 0.0f};
-    cam.x = cx;
-    cam.y = cy;
-    cam.z = dist;
-    tgt.x = cx;
-    tgt.y = cy;
-    C_MTXLookAt(view, &cam, &up, &tgt);
-    }
-    e = ((MonoDat**)m->file2->data)[0];
+    C_MTXLookAt(view, &(Vec){cx, cy, dist}, &(Vec){0.0f, 1.0f, 0.0f}, &(Vec){cx, cy, 0.0f});
     n = ((u32*)m->file2->data)[1] / sizeof(MonoDat);
+    e = ((MonoDat**)m->file2->data)[0];
     for (i = 0; i < n; i++, e++) {
         if (e->id == m->id) break;
     }
@@ -1558,7 +1544,7 @@ void capture(CameraId camera, void* param) {
         ty = e->y;
         s = e->scale;
     } else {
-        tx = ty = 0.0f;
+        ty = tx = 0.0f;
         s = 1.0f;
     }
     PSMTXTrans(t, tx, ty, 0.0f);
@@ -1570,8 +1556,7 @@ void capture(CameraId camera, void* param) {
     bak = *camGetPtr(camera);
     PSMTXCopy(view, camGetCurPtr()->view);
     if (animPoseGetVivianType(m->pose1)) {
-        Vec vv = {0.0f, 0.0f, 0.0f};
-        animPoseVivianMain(m->pose1, &vv);
+        animPoseVivianMain(m->pose1, &(Vec){0.0f, 0.0f, 0.0f});
     }
     animPoseSetMaterialFlagOn(m->pose1, 0x1800);
     animPosePeraOff(m->pose1);
@@ -1598,10 +1583,7 @@ void capture(CameraId camera, void* param) {
             PSVECScale(a, &v1, f);
             PSVECScale(b, &v2, 1.0f - f);
             PSVECAdd(&v1, &v2, &v1);
-            z = v1.z + (5 - irand(10));
-            y = v1.y + (5 - irand(10));
-            x = v1.x + (5 - irand(10));
-            PSMTXTrans(t2, x, y, z);
+            PSMTXTrans(t2, v1.x + (5 - irand(10)), v1.y + (5 - irand(10)), v1.z + (5 - irand(10)));
             animPoseDrawMtx(m->pose2, t2, 1, 0.0f, 1.0f);
             animPoseDrawMtx(m->pose2, t2, 2, 0.0f, 1.0f);
             animPoseDrawMtx(m->pose2, t2, 3, 0.0f, 1.0f);
@@ -1710,13 +1692,14 @@ void monosiri_disp(CameraId camera, void* param) {
         {
             f32 x1 = 32.0f + x;
             f32 y1 = y - 8.0f;
+            f32 qw = 216.0f;
             GXPosition3f32(x1, y1, 0.0f);
             GXTexCoord2f32(0.0f, 0.0f);
             GXPosition3f32(x1, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(0.0f, 1.0f);
-            GXPosition3f32(216.0f + x1, y1 - 160.0f, 0.0f);
+            GXPosition3f32(x1 + qw, y1 - 160.0f, 0.0f);
             GXTexCoord2f32(1.0f, 1.0f);
-            GXPosition3f32(216.0f + x1, y1, 0.0f);
+            GXPosition3f32(x1 + qw, y1, 0.0f);
             GXTexCoord2f32(1.0f, 0.0f);
         }
         id = m->id;
@@ -1732,9 +1715,13 @@ void monosiri_disp(CameraId camera, void* param) {
         }
         w = 0.75f * FontGetMessageWidth(buf);
         winFontInit();
-        winFontSet((Vec){(16.0f + x) + (248.0f - w) * 0.5f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        winFontSet((Vec){(16.0f + x) + (248.0f - w) / 2.0f, y - 180.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
         sprintf(buf, "%s\201@%s", msgSearch("menu_monosiri_derutokoro"), msgSearch(te->locationTag));
         w = 0.75f * FontGetMessageWidth(buf);
-        winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) * 0.5f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
+        winFontSet((Vec){1.0f + ((16.0f + x) + (248.0f - w) / 2.0f), y - 210.0f, 0.0f}, (Vec){0.75f, 0.75f, 0.75f}, black, buf);
     }
 }
+
+#pragma force_active on
+__declspec(section ".sdata2") const u32 gap_10_80423054_sbss2;
+#pragma force_active reset

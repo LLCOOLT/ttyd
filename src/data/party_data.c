@@ -137,3 +137,10 @@ s32 yoshiDotPoseTbl[] = {
     (s32)"R_11",
 };
 
+#pragma force_active on
+#pragma explicit_zero_data on
+__declspec(section ".rodata") const u32 gap_04_802CD31C_rodata[1] = {0};
+__declspec(section ".data") u32 gap_05_803134EC_data[1] = {0};
+__declspec(section ".sdata2") const u32 gap_09_8041B3E4_sdata2[1] = {0};
+#pragma explicit_zero_data reset
+#pragma force_active reset

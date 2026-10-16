@@ -472,3 +472,7 @@ void effFunemizuShibukiDisp(CameraId cameraId, EffectEntry* effect) {
         }
     }
 }
+
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803B0744_data[1] = {0};
+#pragma force_active reset

@@ -140,6 +140,41 @@ s32 mario_status_max_table[] = {200, 200, 99};
 __declspec(section ".sdata") u32 gap_07_8041799C_sdata[1] = {0};
 #pragma force_active reset
 
+static const char name_party0[12];
+static const char name_party1[12];
+static const char name_party4[12];
+static const char name_party5[12];
+static const char name_party2[12];
+static const char name_party6[12];
+
+static inline const char* select_party_name(u16 id) /* */ {
+    const char* name;
+    switch (id) {
+        case 0:
+            name = msgSearch(name_party0);
+            break;
+        case 1:
+            name = msgSearch(name_party1);
+            break;
+        case 2:
+            name = msgSearch(name_party4);
+            break;
+        case 3:
+            name = pouchGetYoshiName();
+            break;
+        case 4:
+            name = msgSearch(name_party5);
+            break;
+        case 5:
+            name = msgSearch(name_party2);
+            break;
+        case 6:
+            name = msgSearch(name_party6);
+            break;
+    }
+    return name;
+}
+
 USER_FUNC(unk_80239b2c) {
     PouchData* pouch;
     u16* p;
@@ -496,7 +531,7 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
 
     if (!(entry->flags & 4)) {
         GXSetScissor(0, 384, 608, 56);
-        if (!strcmp(entry->msg, msgSearch("msg_lottery_number"))) {
+        if (!strcmp(entry->msg, msgSearch("msg_lottery_number\0"))) {
             sprintf(buf, entry->msg, *(s16*)((u8*)lotteryGetPtr() + 0x20));
             FontDrawStart();
             FontDrawMessage(-210, -144.0f + 28.0f * entry->scroll, buf);
@@ -542,13 +577,15 @@ void winMgrHelpDraw(WinMgrEntry* entry) {
 }
 
 WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
+    s32 n;
     WinMgrDesc* desc;
     WinMgrSelect* sel;
     InformantWork* jdt;
+    u16* p;
     PouchData* pouch;
     WinMgrSelectTbl* table;
     u16 id;
-    s32 i, j, n;
+    s32 i, j;
     s32 m;
     WinMgrDesc* d;
     s32 cnt, over;
@@ -652,22 +689,19 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             break;
         case 6:
         case 7: {
-            u16* p;
             sel->items = __memAlloc(HEAP_DEFAULT, 0x1C);
             memset(sel->items, 0, 0x1C);
-            i = 0;
-            p = party_id_table;
-            sel->numItems = i;
-            for (; *p != 0; p++, i++) {
-                if (partyChkJoin(*p)) {
+            sel->numItems = 0;
+            for (i = 0; party_id_table[i] != 0; i++) {
+                if (partyChkJoin(party_id_table[i])) {
                     sel->items[sel->numItems].id = i;
                     if (!evtGetValue(NULL, GSWF(1186))) {
-                        if (pouch->partyData[*p].techLevel >= 1) {
+                        if (pouch->partyData[party_id_table[i]].techLevel >= 1) {
                             sel->items[sel->numItems].flags |= 3;
                         }
                     }
                     else {
-                        if (pouch->partyData[*p].techLevel >= 2) {
+                        if (pouch->partyData[party_id_table[i]].techLevel >= 2) {
                             sel->items[sel->numItems].flags |= 3;
                         }
                     }
@@ -677,16 +711,13 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             break;
         }
         case 8: {
-            u16* p;
             sel->items = __memAlloc(HEAP_DEFAULT, 0x1C);
             memset(sel->items, 0, 0x1C);
-            i = 0;
-            p = party_id_table;
-            sel->numItems = i;
-            for (; *p != 0; p++, i++) {
-                if (partyChkJoin(*p) && *p != evtGetValue(NULL, GW(1))) {
+            sel->numItems = 0;
+            for (i = 0; party_id_table[i] != 0; i++) {
+                if (partyChkJoin(party_id_table[i]) && party_id_table[i] != evtGetValue(NULL, GW(1))) {
                     sel->items[sel->numItems].id = i;
-                    if (pouch->partyData[*p].techLevel == 0) {
+                    if (pouch->partyData[party_id_table[i]].techLevel == 0) {
                         sel->items[sel->numItems].flags |= 3;
                     }
                     sel->numItems++;
@@ -822,8 +853,11 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
             break;
         default:
             if (type < 0) {
+                s32 m;
+                s32* it;
+                list = (s32*)type;
                 m = 0;
-                while (((s32*)type)[m++] != -1) {
+                while (list[m++] != -1) {
                 }
                 sel->items = __memAlloc(HEAP_DEFAULT, (m + 1) * 4);
                 memset(sel->items, 0, (m + 1) * 4);
@@ -831,8 +865,8 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
                 if (a2) {
                     sel->items[sel->numItems++].id = a2;
                 }
-                for (list = (s32*)type, i = 0; *list != -1; list++) {
-                    sel->items[sel->numItems++].id = ((s32*)type)[i++];
+                for (it = list, i = 0; *it != -1; it++) {
+                    sel->items[sel->numItems++].id = list[i++];
                 }
             }
             break;
@@ -894,25 +928,25 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             evt->lwData[1] = party_id_table[id];
             switch (id) {
                 case 0:
-                    name = msgSearch("name_party0");
+                    name = msgSearch(name_party0);
                     break;
                 case 1:
-                    name = msgSearch("name_party1");
+                    name = msgSearch(name_party1);
                     break;
                 case 2:
-                    name = msgSearch("name_party4");
+                    name = msgSearch(name_party4);
                     break;
                 case 3:
                     name = pouchGetYoshiName();
                     break;
                 case 4:
-                    name = msgSearch("name_party5");
+                    name = msgSearch(name_party5);
                     break;
                 case 5:
-                    name = msgSearch("name_party2");
+                    name = msgSearch(name_party2);
                     break;
                 case 6:
-                    name = msgSearch("name_party6");
+                    name = msgSearch(name_party6);
                     break;
             }
 
@@ -922,25 +956,25 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             evt->lwData[2] = party_id_table[id];
             switch (id) {
                 case 0:
-                    name = msgSearch("name_party0");
+                    name = msgSearch(name_party0);
                     break;
                 case 1:
-                    name = msgSearch("name_party1");
+                    name = msgSearch(name_party1);
                     break;
                 case 2:
-                    name = msgSearch("name_party4");
+                    name = msgSearch(name_party4);
                     break;
                 case 3:
                     name = pouchGetYoshiName();
                     break;
                 case 4:
-                    name = msgSearch("name_party5");
+                    name = msgSearch(name_party5);
                     break;
                 case 5:
-                    name = msgSearch("name_party2");
+                    name = msgSearch(name_party2);
                     break;
                 case 6:
-                    name = msgSearch("name_party6");
+                    name = msgSearch(name_party6);
                     break;
             }
 
@@ -1419,18 +1453,18 @@ void select_disp_mario(WinMgrEntry* entry) {
     WinMgrSelect* sel = entry->param;
     PouchData* pouch = pouchGetPtr();
     u32 left, top, wd, ht;
+    char buf[4];
     GXColor black = {0x00, 0x00, 0x00, 0xFF};
     GXColor gray = {0xA0, 0xA0, 0xA0, 0xFF};
+    GXColor tmp;
     GXColor iconcol;
     GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
-    GXColor tmp;
     GXColor white2 = white;
     GXColor* col;
     s32 i;
     s32 id;
     const char* msg;
     u16 w;
-    char buf[4];
     f32 ofs;
     tmp = white;
     iconcol = tmp;
@@ -1442,8 +1476,8 @@ void select_disp_mario(WinMgrEntry* entry) {
         ofs = 0.0f;
         for (i = 0; i < sel->numItems; i++) {
             f32 py;
-            id = sel->items[i].id;
             py = sel->field_0x1C + (ofs + (entry->y - 44 - i * 24));
+            id = sel->items[i].id;
             if ((f32)entry->y < py - 32.0f || (f32)(entry->y - entry->height) > py + 32.0f) {
                 continue;
             }
@@ -1494,11 +1528,11 @@ void select_disp_mario(WinMgrEntry* entry) {
         msg = msgSearch("msg_window_title_9");
         w = (120 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + ((entry->width * 3 / 5 - 120) * 2 / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, msg);
+        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 - 120) * 2 / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, msg);
         msg = msgSearch("msg_window_title_10");
         w = (85 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
-        winFontSetEdge((Vec){entry->x + (entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w), entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, msg);
+        winFontSetEdge((Vec){entry->x + entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, msg);
         iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
@@ -1725,30 +1759,9 @@ void select_disp3_mario(WinMgrEntry* entry) {
     }
 }
 
-static const char* select_party_name(u16 id) /* */ {
-    const char* name;
-    switch (id) {
-        case 0:
-            name = msgSearch("name_party0");
-            break;
-        case 1:
-            name = msgSearch("name_party1");
-            break;
-        case 2:
-            name = msgSearch("name_party4");
-            break;
-        case 3:
-            name = pouchGetYoshiName();
-            break;
-        case 4:
-            name = msgSearch("name_party5");
-            break;
-        case 5:
-            name = msgSearch("name_party2");
-            break;
-        case 6:
-            name = msgSearch("name_party6");
-            break;
-    }
-    return name;
-}
+static const char name_party0[] = "name_party0";
+static const char name_party1[] = "name_party1";
+static const char name_party4[] = "name_party4";
+static const char name_party5[] = "name_party5";
+static const char name_party2[] = "name_party2";
+static const char name_party6[] = "name_party6";

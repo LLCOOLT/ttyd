@@ -47,14 +47,19 @@ typedef struct DetWork {
 
 void _btlSamplingEnemy(DetWork* d) {
     BattleUnitKindPart* kp;
+    DetTarget* tg4;
     s32 k;
     s32 n = 0;
     DetTarget* t = d->t;
     BattleWork* wp = _battleWorkPointer;
+    s32 j;
     BattleUnitPart* part;
     s32 i;
-    s32 j;
-    u8 np2;
+    BOOL ok4;
+    BattleUnit* u1;
+    DetTarget* o4;
+    s32 np2;
+    BattleUnit* u2;
 
     if (d->classFlags & 0x80000000) {
         d->numTargets = -1;
@@ -65,7 +70,7 @@ void _btlSamplingEnemy(DetWork* d) {
         BattleUnit* unit = BattleGetUnitPtr(wp, i);
         if (unit && !BtlUnit_CheckStatus(unit, 0x1B) && !(unit->mAttributeFlags & 0x40)) {
             part = unit->mParts;
-            np2 = unit->mKindParams->numParts;
+            np2 = unit->mKindParams->numParts & 0xFF;
             for (j = 0; j < np2; j++) {
 
                 s32 dir;
@@ -332,37 +337,41 @@ void _btlSamplingEnemy(DetWork* d) {
     {
         for (i = 0; n > i; i++) {
             BOOL keep;
-            DetTarget* tg = &t[i];
-            BattleUnitPart* part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg->unitIdx), tg->partIdx);
+            BattleUnitPart* part;
+            tg4 = &t[i];
+            part = BtlUnit_GetPartsPtr(BattleGetUnitPtr(wp, tg4->unitIdx), tg4->partIdx);
+            do {
             if ((d->propFlags & 0x1000000) && !(part->attributes & 0x10)) {
-                BOOL ok;
-                ok = TRUE;
+                ok4 = TRUE;
                 for (j = 0; j < n; j++) {
-                    DetTarget* o = &t[j];
-                    if (tg != o && tg->side == o->side) {
-                        s32 a = tg->x;
-                        s32 b = o->x;
-                        if (d->direction < 0) {
-                            a *= -1;
-                            b *= -1;
-                        }
-                        if (a > b) {
-                            u32 pa = BattleGetUnitPartsPtr(o->unitIdx, o->partIdx)->attributes;
-                            if (!(pa & 0x10) && !(pa & 0x400000)) {
-                                BattleUnit* u1 = BattleGetUnitPtr(wp, d->unitId);
-                                BattleUnit* u2 = BattleGetUnitPtr(wp, o->unitIdx);
-                                if (!(u1->mTokenFlags & 0x10) || u1 != u2) {
-                                    ok = FALSE;
-                                    break;
-                                }
+                    s32 a;
+                    s32 b;
+                    o4 = &t[j];
+                    if (tg4 == o4 || tg4->side != o4->side) {
+                        continue;
+                    }
+                    a = tg4->x;
+                    b = o4->x;
+                    if (d->direction < 0) {
+                        a *= -1;
+                        b *= -1;
+                    }
+                    if (a > b) {
+                        BattleUnitPart* op = BattleGetUnitPartsPtr(o4->unitIdx, o4->partIdx);
+                        if (!(op->attributes & 0x10) && !(op->attributes & 0x400000)) {
+                            u1 = BattleGetUnitPtr(wp, d->unitId);
+                            u2 = BattleGetUnitPtr(wp, o4->unitIdx);
+                            if (!(u1->mTokenFlags & 0x10) || u1 != u2) {
+                                ok4 = FALSE;
+                                break;
                             }
                         }
                     }
                 }
-                if (!ok) { keep = FALSE; goto done; }
+                if (!ok4) { keep = FALSE; break; }
             }
             keep = TRUE;
-        done:
+            } while (0);
 
             if (!keep) {
                 for (k = i; k < n - 1; k++) {

@@ -67,7 +67,9 @@ void spline_maketable(s32 n, void* pts, f32* ts, void* tbl);
 #define EVT_FLOAT_OF(x) ((s32)(1024.0f * (x)) - 230000000)
 
 
+#pragma force_active on
 static const char coin_fmt[] = "%f%f%f";
+#pragma force_active reset
 
 static const GXColor coin_black = {0x00, 0x00, 0x00, 0xFF};
 
@@ -1097,12 +1099,17 @@ s32 evt_sub_mail_event[] = {
     65630, (s32)mail_evt_pik_00, 2, 33, 2,
 };
 
+#pragma force_active on
 __declspec(section ".data") s32 lbl_803080CC[] = {
     1,
 };
+#pragma force_active reset
 
 #pragma explicit_zero_data on
 USER_FUNC(evt_sub_intpl_init) {
+#pragma force_active on
+    static const u32 gap_09_80419DAC_sdata2 = 0;
+#pragma force_active reset
 	s32* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
 	s32 start = evtGetValue(event, args[1]);
@@ -1113,6 +1120,7 @@ USER_FUNC(evt_sub_intpl_init) {
 	event->lwData[13] = end;
 	event->lwData[14] = 0;
 	event->lwData[15] = steps;
+	(void)&gap_09_80419DAC_sdata2;
 	return EVT_RETURN_DONE;
 }
 #pragma explicit_zero_data reset
@@ -1548,7 +1556,7 @@ void coingetDisp(WinMgrEntry* entry) {
 	s32* work = entry->param;
 	char buf[0x400];
 	if (work[1]) {
-		sprintf(buf, msgSearch("msg_window_coin_get"), work[0]);
+		sprintf(buf, msgSearch("msg_window_coin_get\0\0\0\0"), work[0]);
 		FontDrawStart();
 		FontDrawColor(coin_black);
 		FontDrawMessage(-(s32)FontGetMessageWidth(buf) / 2, entry->y - 8, buf);
@@ -1807,3 +1815,8 @@ USER_FUNC(mail_evt_gor_04_keyoff_check) {
 #pragma force_active on
 #pragma force_active reset
 
+#pragma explicit_zero_data on
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_804101EC_sdata[1] = {0};
+#pragma force_active reset
+#pragma explicit_zero_data reset

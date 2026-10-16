@@ -81,9 +81,9 @@ typedef struct NanNPCWork {
     void (*func1c)();  // 0x1C
 } NanNPCWork;
 
+s32 gap_08_8041899C_sbss;
 NanNPCWork* nanNPCWork;
 char makestring[16];
-s32 gap_08_8041899C_sbss;
 
 void nannpc_ext_disp();
 void nannpc_ext_shadow_disp();
@@ -179,9 +179,9 @@ void nanNPCOption(void) {
                     PSVECAdd(&r->pos, &r->move, &r->pos);
                     PSVECScale(&r->move, &r->move, 0.6f);
                 } else {
+                    clear = 1;
                     v84 = v6c;
                     v78 = v60;
-                    clear = 1;
                     r->hit1 = NULL;
                     r->hit0 = NULL;
                     d20 = mag;
@@ -199,7 +199,7 @@ void nanNPCOption(void) {
                         C_VECReflect(&v84, &n, &v54);
                         PSVECScale(&v54, &r->move, mag);
                         clear = 0;
-                        PSVECScale(&n, &n, -(mag - d20) * PSVECDotProduct(&v84, &n) + 0.1f);
+                        PSVECScale(&n, &n, PSVECDotProduct(&v84, &n) * -(mag - d20) + 0.1f);
                         PSVECAdd(&r->pos, &n, &r->pos);
                         PSVECSubtract(&r->pos, &v48, &v3c);
                         d20 = PSVECMag(&v3c);
@@ -223,6 +223,7 @@ void nanNPCOption(void) {
     }
 }
 
+
 s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
     if (a->z < b->z) {
         return 1;
@@ -237,7 +238,6 @@ void nannpc_ext_disp() {
     NanNPCWork* w = nanNPCWork;
     s32 i;
     s32 idx;
-    GXColor tc;
     NanNPCSort* sp;
     NanNPC* np;
     if (w->flags & 1) {
@@ -250,10 +250,7 @@ void nannpc_ext_disp() {
         GXSetTevAlphaIn(0, 7, 4, 1, 7);
         GXSetNumChans(0);
         GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
-        {
-            GXColor fog = {255, 255, 255, 255};
-            GXSetFog(0, 0.0f, 0.0f, 0.0f, 0.0f, fog);
-        }
+        GXSetFog(0, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){255, 255, 255, 255});
         GXSetNumTexGens(1);
         GXSetNumTevStages(1);
         for (i = extGetPoseNum() - 1; i >= 0; i--) {
@@ -265,8 +262,7 @@ void nannpc_ext_disp() {
         qqsort(w->sort, w->num, 8, (s32(*)(void*, void*))nannpc_zcompare);
         for (i = extGetPoseNum() - 1; i >= 0; i--) {
             idx = w->sort[i].idx;
-            tc = w->npc[idx].color;
-            GXSetTevColor(1, tc);
+            GXSetTevColor(1, w->npc[idx].color);
             extPoseDraw(idx);
         }
         extLoadTextureExit();
@@ -450,6 +446,7 @@ USER_FUNC(evt_nannpc_entry) {
     NanNPC* p;
     ExtPose* pose;
     char* str;
+    s32 off;
     s32 name;
     s32 i;
     s32* args;
@@ -458,9 +455,9 @@ USER_FUNC(evt_nannpc_entry) {
     pose = extGetPosePtr();
     name = evtGetValue(event, args[0]);
     w = nanNPCWork;
-    for (i = 0; i < w->num; i++) {
+    for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++) {
+        p = (NanNPC*)((u8*)w->npc + off);
         str = (char*)name;
-        p = &w->npc[i];
         if (!((u32)str & 0x80000000)) {
             sprintf(makestring, "%06x", name);
             str = makestring;
@@ -644,11 +641,11 @@ USER_FUNC(evt_nannpc_jump_position) {
         event->userdataf[1] = -4.0f * height;
         event->userdataf[2] = y - (f32)npc->ipos[1] - event->userdataf[1];
     }
-    elapsed = ((u32)gp->renderTime - (u32)npc->startTime) / (OS_TIMER_CLOCK / 1000);
-    if (elapsed < duration) {
+    el = ((u32)gp->renderTime - (u32)npc->startTime) / (OS_TIMER_CLOCK / 1000);
+    if (el < duration) {
+        elapsed = el;
         t = (f32)elapsed / (f32)duration;
         npc->pos.x = intplGetValue(0, elapsed, duration, npc->ipos[0], x);
-        el = elapsed;
         npc->pos.z = intplGetValue(0, el, duration, npc->ipos[2], z);
         npc->pos.y = t * (event->userdataf[1] * t + event->userdataf[2]) + (f32)npc->ipos[1];
         return 0;
@@ -715,7 +712,6 @@ USER_FUNC(evt_nannpc_set_color) {
 #pragma force_active on
 #pragma explicit_zero_data on
 USER_FUNC(evt_nannpcwork_flag_onoff) {
-    static const u32 gap_09_8041C5AC_sdata2 = 0;
     s32* args = event->args;
     s32 onoff = evtGetValue(event, args[0]);
     NanNPCWork* w = nanNPCWork;

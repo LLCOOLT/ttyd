@@ -11,7 +11,10 @@
 #include "pmario_sound.h"
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
+#define btlDispTexPlane btlDispTexPlane_hdr
 #include "battle/battle_disp.h"
+#undef btlDispTexPlane
+void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
 
 
 typedef struct YoshiGundanPart YoshiGundanPart;
@@ -1489,7 +1492,46 @@ USER_FUNC(_wait_yoshig_complete) {
 }
 
 
-static s32 _gundan_part_update(YoshiGundanPart* p, s32 i);
+static inline s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
+    switch (p->state) {
+    case 0:
+        p->state++;
+        p->delay = irand(3);
+        p->x = (f32)(-(i / 16 * 30 + 300) + irand(10));
+        p->y = 0.0f;
+        p->z = (f32)(i % 16 * 10 - 80);
+        p->frame = irand(6);
+        p->frameCount = irand(5);
+        p->vx = 0.1f * (f32)irand(10) + 3.0f;
+        p->vy = 0.0f;
+        p->vz = 0.001f * (f32)(irand(2000) - 1000);
+    case 1:
+        if (p->delay > 0) {
+            p->delay--;
+            break;
+        }
+    case 2:
+        p->z += p->vz;
+        if (p->z >= 80.0f) {
+            p->z = 80.0f;
+            p->vz *= -1.0f;
+        }
+        if (p->z <= -80.0f) {
+            p->z = -80.0f;
+            p->vz *= -1.0f;
+        }
+        p->x += p->vx;
+        if (p->x >= 300.0f) {
+            p->x = 300.0f;
+            p->vx = 0.0f;
+            p->state = 999;
+        }
+        break;
+    default:
+        return FALSE;
+    }
+    return TRUE;
+}
 
 USER_FUNC(_gundan_yoshi_run_effect) {
     BattleUnit* unit;
@@ -1511,7 +1553,8 @@ USER_FUNC(_gundan_yoshi_run_effect) {
         w->state = 0;
         w->timer = 0.0f;
         event->userdata[0] = 0;
-        event->userdata[1] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_YOSHI_TAIGUN1\0\0");
+        { Vec tmp; tmp.x = (f32)id; }
+        event->userdata[1] = ((s32 (*)(const char*))psndSFXOn)("SFX_BTL_YOSHI_TAIGUN1");
     } else {
         w = (YoshiGundanWork*)unit->countersetWeapon;
     }
@@ -1565,51 +1608,12 @@ USER_FUNC(_gundan_yoshi_run_effect) {
     } while (0);
     return EVT_RETURN_BLOCK;
 }
-static s32 _gundan_part_update(YoshiGundanPart* p, s32 i) {
-    switch (p->state) {
-    case 0:
-        p->state++;
-        p->delay = irand(3);
-        p->x = (f32)(-(i / 16 * 30 + 300) + irand(10));
-        p->y = 0.0f;
-        p->z = (f32)(i % 16 * 10 - 80);
-        p->frame = irand(6);
-        p->frameCount = irand(5);
-        p->vx = 0.1f * (f32)irand(10) + 3.0f;
-        p->vy = 0.0f;
-        p->vz = 0.001f * (f32)(irand(2000) - 1000);
-    case 1:
-        if (p->delay > 0) {
-            p->delay--;
-            break;
-        }
-    case 2:
-        p->z += p->vz;
-        if (p->z >= 80.0f) {
-            p->z = 80.0f;
-            p->vz *= -1.0f;
-        }
-        if (p->z <= -80.0f) {
-            p->z = -80.0f;
-            p->vz *= -1.0f;
-        }
-        p->x += p->vx;
-        if (p->x >= 300.0f) {
-            p->x = 300.0f;
-            p->vx = 0.0f;
-            p->state = 999;
-        }
-        break;
-    default:
-        return FALSE;
-    }
-    return TRUE;
-}
-
 void _btlYoshiDisp(CameraId camera, YoshiGundanPart* p) {
-    YoshiGundanPart* q;
     f32 s;
     s = (p->vx < 0.0f) ? 0.4f : -0.4f;
-    ((void (*)(s32, GXColor, s32, f32, f32, f32, f32, f32))btlDispTexPlane)(((u8*)_yoshig_tpl_no_tbl)[(q = p)->frame], (GXColor){255,255,255,255}, 0, q->x, q->y + 20.0f, q->z, s, 0.4f);
+    ((void (*)(f32, f32, f32, f32, f32, u32, GXColor, s32))btlDispTexPlane)(p->x, p->y + 20.0f, p->z, s, 0.4f, ((u8*)_yoshig_tpl_no_tbl)[p->frame], (GXColor){255,255,255,255}, 0);
 }
 
+void yoshiStrippedPool(f32* f, s32 i) {
+    *f = (f32)i;
+}

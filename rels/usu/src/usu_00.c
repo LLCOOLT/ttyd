@@ -1,3 +1,4 @@
+#pragma defer_codegen on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -21,8 +22,8 @@
 
 typedef struct UsuCbInfo { u8 field_0x0[0x8]; u16 field_0x8; } UsuCbInfo;
 typedef struct KpaSen { s8 state; u8 field_0x1; u16 wait; f32 t; Vec start; Vec end; u8 pose99Lo; u8 pose99Hi; u8 pose1Lo; u8 pose1Hi; } KpaSen;
-KpaSen* kpaSen;
 static s32 kpaSen_pad;
+KpaSen* kpaSen;
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; u8 field_0x14[0x20 - 0x14]; } ExtPose;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -376,7 +377,7 @@ void kpa_stg5_009_7_cb(s32 type, UsuCbInfo** param) {
     switch (type) {
         case 3:
             if (info->field_0x8 == 1) {
-                psndBGMOn(0x201, "BGM_FF_GET_ITEM1");
+                psndBGMOn(0x201, "BGM_FF_GET_ITEM1\0\0\0\0\0\0\0");
             }
             break;
     }
@@ -2211,8 +2212,9 @@ void kpaSen_ext_init(void) {
 s32 calcPose(s32 i, s32 lo, s32 hi, s32 flag) {
     s32 range = hi - lo + 1;
     s32 n = flag ? 6 : 7;
+    u32 t = gp->retraceCount + i * i;
 
-    return lo + ((gp->retraceCount + i * i) % (range * n)) / n;
+    return lo + (t % (range * n)) / n;
 }
 
 void kpaSen_ext_main(void) {
@@ -2229,10 +2231,7 @@ void kpaSen_ext_main(void) {
                 break;
             case 1:
                 if (i < 100) {
-                    pose->frame = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
-                    if (i % 10 == 0) {
-                        kpaSen[i].t = kpaSen[i].t;
-                    }
+pose->frame = calcPose(i, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1); if (i % 10 == 0) { kpaSen[i].t = kpaSen[i].t; pose[i / 10].rot = pose[i / 10].rot; pose[i / 10].mtx[0][3] = pose[i / 10].mtx[0][3]; }
                 } else {
                     pose->frame = calcPose(i - 100, kpaSen[i].pose1Lo, kpaSen[i].pose1Hi, 1);
                 }
@@ -2305,6 +2304,8 @@ EVT_BEGIN(kanbu_regl)
     END_LOOP
     RETURN
 EVT_END()
+
+void kpaSen_ext_dispent(void);
 
 void kpaSen_ext_dispent(void) {
     dispEntry(CAMERA_3D, 0.0f, 1, kpaSen_ext_disp, NULL);

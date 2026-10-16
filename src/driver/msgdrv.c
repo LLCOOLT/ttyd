@@ -133,9 +133,9 @@ s32 msgWindowOpen_SE_Data[] = {
 };
 
 //.sbss
-void* msgSortDvdData; //TODO: re-type
-BOOL msgSEflag; //msgSEInit and related functions are unused
 MessageWork msgWork;
+BOOL msgSEflag; //msgSEInit and related functions are unused
+void* msgSortDvdData; //TODO: re-type
 
 //.sdata
 MessageWork* msgw = &msgWork;
@@ -720,6 +720,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 iconId;
 	s32 i38;
 	s32 i34;
+	MsgWinData * new_var;
 	s32 i30;
 	f32 iconScale;
 	s32 i28;
@@ -749,7 +750,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 
 	data = smart->address;
 	window = data->window;
-	entry = (MsgAChar*)&data->entries[data->count];
+	entry = (MsgAChar*)( &data->entries[data->count]) ;
 	flags = 0;
 	maxScale = 0.0f;
 	scale = 1.0f;
@@ -769,12 +770,12 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		switch (window->type) {
 		case 3: {
 			static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
-			entry->value = *(u32*)&c;
+			entry->value = *(( u32*)( &c)) ;
 			break;
 		}
 		case 8: {
 			static const GXColor c = {0x00, 0xD9, 0x14, 0xFF};
-			entry->value = *(u32*)&c;
+			entry->value = *(( u32*)( &c)) ;
 			break;
 		}
 		}
@@ -788,19 +789,19 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	}
 
 	while (TRUE) {
-		check = *(u8*)msg;
+		check = *(( u8*)msg) ;
 		if (_ismbblead((u8)check)) {
-			glyph = kanjiSearch(*(u16*)msg);
+			glyph = kanjiSearch(*(( u16*)msg) );
 			width = kanjiGetWidth((u16)(glyph + 0));
-			ww = scale * (f32)(width + 4);
+			ww = scale * (( f32)(width + 4) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (s32)(10.0f * scale);
+			entry->y = y - (( s32)(10.0f * scale) );
 			entry->scale = scale;
 			entry->value = flags;
-			if (*(u16*)msg == 0x8145) {
+			if (( *( (u16*)msg )) == 0x8145) {
 				entry->value |= 0x10;
-			} else if (*(u16*)msg != 0x8140 && *(u16*)msg != 0x8151) {
+			} else if ((( *( (u16*)msg )) != 0x8140 ) && (( *( (u16*)msg )) != 0x8151) ) {
 				entry->value |= 8;
 			}
 			if (flags & 1) {
@@ -842,14 +843,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			data->count++;
 			maxScale = 0.0f;
 			if (data->flags & 0x20) {
-				flags = (flags & ~0xFF00) | (0x100 << data->numSel);
+				flags = (flags & ( ~0xFF00) ) | (0x100 << data->numSel);
 				data->numSel++;
 			}
 			continue;
 		case '<':
 			next = msgGetCommand(msg + 1, tag, args);
 			msg = next;
-			if (strcmp(tag, "k") == 0 || strcmp(tag, "key") == 0) {
+			if (( strcmp(tag, "k") == 0 ) || ( strcmp(tag, "key") == 0) ) {
 				entry->glyph = 0xFFFE;
 				entry->x = s232;
 				entry->time = time;
@@ -859,7 +860,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				s232++;
 			} else if (strcmp(tag, "keyxon") == 0) {
 				data->flags |= 0x100;
-			} else if (strcmp(tag, "p") == 0 || strcmp(tag, "scrl_auto") == 0) {
+			} else if (( strcmp(tag, "p") == 0 ) || ( strcmp(tag, "scrl_auto") == 0) ) {
 				if (s230 != 0) {
 					entry->glyph = 0xFFFD;
 					entry->y = s230 - 3;
@@ -871,7 +872,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					s230 = 0;
 					data->count++;
 				}
-			} else if (strcmp(tag, "o") == 0 || strcmp(tag, "once_stop") == 0) {
+			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, "once_stop") == 0) ) {
 				entry->glyph = 0xFFFC;
 				entry->time = time;
 				time += 0x32;
@@ -950,7 +951,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "system") == 0) {
 				static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
 				window->type = 3;
-				entry->value = *(u32*)&c;
+				entry->value = *(( u32*)( &c)) ;
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
@@ -958,7 +959,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "tec") == 0) {
 				static const GXColor c = {0x00, 0xD9, 0x14, 0xFF};
 				window->type = 8;
-				entry->value = *(u32*)&c;
+				entry->value = *(( u32*)( &c)) ;
 				entry->glyph = 0xFFF7;
 				entry->time = time;
 				entry++;
@@ -1010,7 +1011,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
 				isHM = FALSE;
-				if ((s8)args[0] >= '0' && (s8)args[0] <= '9') {
+				if ((( (s8)args[0] ) >= '0') && (((s8) args [0]) <= '9') ) {
 					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
 					sscanf(args, "%s%f%d%d%d", name, &iconScale, &i38, &i34, &i30);
@@ -1026,9 +1027,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					entry->value = iconId;
 					iconGetWidthHight(&iw, &ih, (u16)iconId);
 					entry->glyph = 0xFFF8;
-					entry->x = x + 0.5f * iw * iconScale + i38;
+					entry->x = ( x + (( 0.5f * iw ) * iconScale )) + i38;
 					x += 0x28;
-					entry->y = y - ih * iconScale;
+					entry->y = y - ( ih * iconScale) ;
 					entry->extra = i34;
 					entry->scale = iconScale;
 					entry->time = time;
@@ -1038,10 +1039,10 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				} else {
 					glyph = kanjiSearch(0x94B5);
 					width = kanjiGetWidth((u16)(glyph + 0));
-					iw = scale * (f32)(width + 4);
+					iw = scale * (( f32)(width + 4) );
 					entry->glyph = glyph;
 					entry->x = x;
-					entry->y = y - (s32)(10.0f * scale);
+					entry->y = y - (( s32)(10.0f * scale) );
 					entry->scale = scale;
 					entry->value = flags;
 					entry->value |= 8;
@@ -1068,51 +1069,54 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->x = i28;
 				entry->y = s234 - i24;
 				entry->scale = f1c;
-				entry->dyn = (i20 == 0) ? 0.0f : 180.0f;
+				entry->dyn = (i20 == 0) ? ( 0.0f ) : ( 180.0f) ;
 				entry++;
 				time += step;
 				data->count++;
 			} else if (strcmp(tag, "paper") == 0) {
 				sscanf(args, "%s%d", paper, &i18);
-				entry->value = (strcmp(paper, "me") != 0) ? (u32)npcNameToPtr(paper) : 0;
+				entry->value = (strcmp(paper, "me") != 0) ? (( u32)npcNameToPtr(paper) ) : ( 0) ;
 				entry->glyph = 0xFFF3;
 				entry->time = i18;
 				entry++;
 				data->count++;
 			} else if (strcmp(tag, "/paper") == 0) {
 				sscanf(args, "%s", paper2);
-				entry->value = (strcmp(paper2, "me") != 0) ? (u32)npcNameToPtr(paper2) : 0;
+				entry->value = (strcmp(paper2, "me") != 0) ? (( u32)npcNameToPtr(paper2) ) : ( 0) ;
 				entry->glyph = 0xFFF2;
 				entry++;
 				data->count++;
 			} else if (strcmp(tag, "r") == 0) {
-				if (data->window->type != 1) {
+				new_var = data;
+				if (new_var->window->type != 1) {
 					rubyX = x;
 				}
-			} else if (((s8*)tag)[0] == 'R' || (((s8*)tag)[0] == '/' && (u32)((s8*)tag)[0] == 0x2F72)) {
+			} else if (((( s8*)tag)[0] == 'R' ) || ( (((s8*)tag)[0] == '/' ) && (( (u32)((s8*)tag)[0] ) == 0x2F72) )) {
 				i = 1;
-				if (((s8*)tag)[0] != 'R') i = 2;
-				if (data->window->type == 1) {
+				if (((s8*)tag)[0] != 'R') { i = 2;
+				}
+				if (new_var->window->type == 1) {
 					continue;
 				}
-				half = (s32)strlen(tag + i) / 2;
+				half = (( s32)strlen(tag + i) ) / 2;
 				total = 0;
 				j = i;
-				p = tag + i;
+				isHM = i;
+				p = tag + isHM;
 				for (k = 0; k < half; k++) {
-					glyph = kanjiSearch(*(u16*)p);
+					glyph = kanjiSearch(*(( u16*)p) );
 					width = kanjiGetWidth((u16)(glyph + 0));
-					total += (s32)(0.55f * (scale * (f32)(width + 4)));
+					total += (s32)(0.55f * (scale * (( f32)(width + 4) )));
 					p += 2;
 					j += 2;
 				}
-				rubyW = (u16)total - 0.55f * (4.0f * scale);
-				rubyX = ((f32)(rubyX + x) - 4.0f * scale - (f32)rubyW) * 0.5f;
+				rubyW = (( u16)total ) - ( 0.55f * (4.0f * scale)) ;
+				rubyX = (( ((f32)(rubyX + x) ) - ( 4.0f * scale )) - ( (f32)rubyW) ) * 0.5f;
 				p = tag + i;
 				for (k = 0; k < half; k++) {
-					glyph = kanjiSearch(*(u16*)p);
+					glyph = kanjiSearch(*(( u16*)p) );
 					width = kanjiGetWidth((u16)(glyph + 0));
-					ww = 0.55f * (scale * (f32)(width + 4));
+					ww = 0.55f * (scale * (( f32)(width + 4) ));
 					entry->glyph = glyph;
 					entry->x = rubyX;
 					entry->y = y;
@@ -1130,24 +1134,24 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				}
 				continue;
 			}
-			if (*(s8*)next == '\n') {
+			if (( *( (s8*)next )) == '\n') {
 				msg++;
 			}
 			continue;
 		default:
-			if ((u32)gp->language == 0 && (s8)check >= '0' && (s8)check <= '9') {
+			if ((((( u32)gp->language ) == 0 ) && (( (s8)check ) >= '0' )) && (( (s8)check ) <= '9') ) {
 				glyph = kanjiSearch((u16)(check + 0x821F));
 			} else {
 				glyph = hankakuSearch(check);
 			}
 			width = kanjiGetWidth((u16)(glyph + 0));
-			ww = scale * (f32)(width + 2);
+			ww = scale * (( f32)(width + 2) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (s32)(10.0f * scale);
+			entry->y = y - (( s32)(10.0f * scale) );
 			entry->scale = scale;
 			entry->value = flags;
-			if (*(s8*)msg != ' ') {
+			if (( *( (s8*)msg )) != ' ') {
 				entry->value |= 8;
 			}
 			if (flags & 1) {
@@ -1161,7 +1165,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			msg++;
 			time += step;
 			entry++;
-			data->count++;
+			new_var->count++;
 			continue;
 		}
 	}

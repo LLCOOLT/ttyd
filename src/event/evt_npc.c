@@ -1205,7 +1205,7 @@ f32 _intplGetFloat(s32 mode, f32 t) {
         default:
             return 0.0f;
     }
-}
+    }
 
 // const char* lookupName, f32 ry
 USER_FUNC(evt_npc_set_ry) {

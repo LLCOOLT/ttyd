@@ -89,7 +89,7 @@ void winFullDisp(WinMgrEntry* win);
 BOOL N_itemPickUpFromFieldCheck(void);
 
 ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
-HitEntry* itemHitCheckY(f32 x, f32 y, f32 z, f32 vy, f32* outY);
+HitEntry* itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy);
 HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy);
 
 
@@ -1221,7 +1221,7 @@ void itemseq_Bound(ItemEntry* entry) {
 	MapObjectEntry* mobj;
 	BOOL isFloor, bounce;
 	s64 delta;
-	f32 dt, dy, t2sq, t2, dx;
+	f32 t2sq, dt, dy, t2, dx, t1;
 	f32 dz, v, peak, height;
 	f32 newX, newZ;
 	s32 newDir;
@@ -1310,7 +1310,7 @@ void itemseq_Bound(ItemEntry* entry) {
 			entry->field_0x70 = gp->renderTime;
 			delta = entry->field_0x70 - entry->field_0x68;
 			dt = OSTicksToMicroseconds(delta) / 1000000.0f;
-			dy = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
+			t1 = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
 			t2 = OSTicksToMicroseconds(entry->airTime + delta) / 1000000.0f;
 			dx = dt * (entry->speed * (f32)sin(6.2831855f * entry->direction / 360.0f));
 			dz = dt * (entry->speed * -(f32)cos(6.2831855f * entry->direction / 360.0f));
@@ -1318,7 +1318,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				dz = 0.0f;
 			}
 			t2sq = t2 * t2;
-			dy = entry->velocityY * dt + (-980.0f * entry->field_0x84) * (t2sq - dy * dy);
+			dy = entry->velocityY * dt + (-980.0f * entry->field_0x84) * (t2sq - t1 * t1);
 			if (entry->flags2 & 4) {
 				if (entry->field_0x8C != 0 || dy < 0.0f) {
 					entry->flags2 &= ~4;
@@ -1341,12 +1341,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				entry->speed *= 0.25f;
 			}
 			if (!(entry->flags2 & 0x20) && !(entry->flags & 0x800)) {
-				if (dy <= 0.0f) {
-					hit = NULL;
-				}
-				else {
-					hit = itemHitCheckUp(entry, dy);
-				}
+				hit = itemHitCheckUp(entry, dy);
 				if (hit) {
 					entry->velocityY = -entry->velocityY * 0.25f;
 					dy = 0.0f;
@@ -1377,18 +1372,13 @@ void itemseq_Bound(ItemEntry* entry) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
-			else if (entry->flags2 & 0x100000) {
+			else if (entry->flags2 & 0x100000U) {
 				hit = NULL;
 				entry->position.y += dy;
-			}
-			else { f32 hitY;
-			if (hit = itemHitCheckY(entry->position.x, 20.0f + entry->position.y, entry->position.z, dy, &hitY)) {
-				entry->position.y = hitY;
 			}
 			else {
-				hit = NULL;
-				entry->position.y += dy;
-			} }
+				hit = itemHitCheckY(entry, entry->position.z, 20.0f + entry->position.y, entry->position.x, dy);
+			}
 			if (hit) {
 				if (hitGetAttr(hit) & 0x600) {
 					entry->flags2 |= 0x100000;
@@ -1457,10 +1447,11 @@ void itemseq_Bound(ItemEntry* entry) {
 							isFloor = TRUE;
 						}
 						else {
-							bounce = FALSE;
+							goto no_bounce;
 						}
 					}
 					else {
+					no_bounce:
 						bounce = FALSE;
 					}
 					if (!bounce) {
@@ -1543,7 +1534,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); len = (f32)(lenSq * g); } else if (lenSq < 0.0) { len = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { len = *(f32*)__float_nan; } else { len = lenSq; }
 	hitDist = 10.0f + len;
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
-		entry->position.x, entry->position.y + 15.0f, entry->position.z, sin, 0.0f, cos);
+		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
 		dot = dx * hitNX + dz * hitNZ;
 		ox = 0.5f * (dx - dot * hitNX);
@@ -1558,7 +1549,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); lenSq = lenSq * g; } else if (lenSq < 0.0) { lenSq = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { lenSq = *(f32*)__float_nan; }
 	hitDist = 10.0f + lenSq;
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
-		entry->position.x, entry->position.y + 15.0f, entry->position.z, sin, 0.0f, cos);
+		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
 		dot = dx * hitNX + dz * hitNZ;
 		ox = 0.5f * (dx - dot * hitNX);
@@ -1576,10 +1567,29 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 }
 
 HitEntry*
+itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy) {
+	HitEntry* hit;
+	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
+
+	hitDist = 20.0f + __fabs(vy);
+	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f)) {
+		entry->position.y = hitY;
+	}
+	else {
+		hit = NULL;
+		entry->position.y += vy;
+	}
+	return hit;
+}
+
+HitEntry*
 itemHitCheckUp(ItemEntry* entry, f32 vy) {
 	HitEntry* hit;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
+	if (vy <= 0.0f) {
+		return NULL;
+	}
 	hitDist = 20.0f + __fabs(vy);
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, entry->position.x, 20.0f + entry->position.y, entry->position.z, 0.0f, 1.0f, 0.0f)) {
 		entry->position.y = hitY - 20.0f - 4.0f;
@@ -1591,14 +1601,6 @@ itemHitCheckUp(ItemEntry* entry, f32 vy) {
 		return hit;
 	}
 	return NULL;
-}
-
-HitEntry*
-itemHitCheckY(f32 x, f32 y, f32 z, f32 vy, f32* outY) {
-	f32 hitX, hitZ, hitDist, hitNX, hitNY, hitNZ;
-
-	hitDist = 20.0f + __fabs(vy);
-	return hitCheckFilter(NULL, &hitX, outY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f);
 }
 
 void itemForceGet(ItemEntry* entry) {

@@ -802,6 +802,7 @@ void partyReInit(void) {
     s32 poseId;
     s32 dotted;
     PartyEntry* party;
+    char* pose;
 
     party = partyGetPtr(marioGetExtraPartyId());
     if (party) {
@@ -876,12 +877,12 @@ void partyReInit(void) {
             return;
         }
         if (!(marioGetPtr()->flags & 0x400000)) {
-            char* pose = partyChgPoseId(party, 1);
+            pose = partyChgPoseId(party, 1);
             partyChgPose(party, pose);
             partyChgRunMode(party, 2);
             partyChgMot(party, 0);
         } else {
-            char* pose = partyChgPoseId(party, 1);
+            pose = partyChgPoseId(party, 1);
             partyChgPose(party, pose);
             partyChgRunMode(party, 2);
             party->field_3A[1] = 6;
@@ -2811,7 +2812,7 @@ void partySetFamicomMode(PartyEntry* party, s32 mode) {
         }
         party->flags2 &= ~0x8000;
         partyPoseEntryF(party);
-        partyChgPose(party, partyChgPoseId(party, 1));
+        { char* id = partyChgPoseId(party, 1); partyChgPose(party, id); }
     }
 }
 

@@ -144,16 +144,15 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     s32 k;
     s32 j;
     s32 frame;
-    s32 t;
     s32 m;
     s32 n;
+    s32 t;
 
     camera = camGetPtr(cameraId);
     work = effect->userdata;
     frame = work->frame;
     s = 0.1f * work->scale;
     GXSetTevColor(GX_TEVREG0, (GXColor){work->colorR, work->colorG, work->colorB, work->alpha});
-    (void)(GXColor){work->colorR, work->colorG, work->colorB, work->alpha};
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_VTX, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -172,27 +171,26 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
     vtx = p;
     for (i = 0; i < 12; i++) {
-        s32 sv = (frame + i * 4) << 5;
-        p->x = i * 50 - 300;
-        p->y = 600;
-        p->z = 0;
-        p->s = sv;
-        p->t = (s32)work->offset[i] << 5;
-        p->r = 255;
-        p->g = 255;
-        p->b = 255;
-        p->a = 255 - i * 20;
-        p++;
-        p->x = i * 50 - 300;
-        p->y = (s32)(10.0f * (60.0f + work->offset[i]));
-        p->z = 0;
-        p->s = sv;
-        p->t = 0x400;
-        p->r = 255;
-        p->g = 255;
-        p->b = 255;
-        p->a = 255 - i * 20;
-        p++;
+        t = (frame + i * 4) << 5;
+        p[0].x = (i * 5 - 30) * 10;
+        p[0].y = 600;
+        p[0].z = 0;
+        p[0].s = t;
+        p[0].t = (s32)work->offset[i] << 5;
+        p[0].r = 255;
+        p[0].g = 255;
+        p[0].b = 255;
+        p[0].a = 255 - i * 20;
+        p[1].x = (i * 5 - 30) * 10;
+        p[1].y = (s32)(10.0f * (60.0f + work->offset[i]));
+        p[1].z = 0;
+        p[1].s = t;
+        p[1].t = 0x400;
+        p[1].r = 255;
+        p[1].g = 255;
+        p[1].b = 255;
+        p[1].a = 255 - i * 20;
+        p += 2;
     }
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXScale(scale, s, s, s);
@@ -218,9 +216,12 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetCurrentMtx(GX_PNMTX0);
 
     for (j = 0; j < i - 1; j++) {
-        k = j * 2;
         GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
-        tri2(k, k + 2, k + 1, k, k + 1, k + 2, k + 3, k);
+        frame = j << 1;
+        tri2(frame, frame + 2, frame + 1, frame, frame + 1, frame + 2, frame + 3, frame);
     }
-
 }
+
+#pragma force_active on
+__declspec(section ".sdata2") const u32 gap_10_804231E4_sbss2;
+#pragma force_active reset

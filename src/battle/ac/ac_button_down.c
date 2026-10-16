@@ -27,6 +27,7 @@ static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
 static void actionCommandDisp(s32 unused, f32 x, f32 y);
 
 s32 battleAcMain_ButtonDown(BattleWork* work) {
+    unsigned int new_var;
     BattleActions* ac = &work->actionCommands;
     BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
     u8* disp = (u8*)work + 0x1f20;
@@ -140,8 +141,9 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                     break;
                 }
                 OUT = 0;
+                new_var = (off = 0);
                 allDone = 1;
-                for (i = 0, off = 0; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
+                for (i = 0, new_var; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
                     if (BTNO(off)) {
                         if (PRSO(off)) {
                             OUT++;
@@ -253,13 +255,13 @@ void battleAcDelete_ButtonDown(BattleWork* work) {
 
 static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     BattleWork* work = _battleWorkPointer;
-    s32 i;
-    s32 end = NN * 3 + 2;
+    BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
     s32 k;
+    s32 end = NN * 3 + 2;
     s32 count;
     s32 off;
     s32 j;
-    BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
+    s32 i;
     f32 bx = -200.0f + x;
     f32 by;
     f32 lx = bx - 40.0f;
@@ -283,12 +285,10 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
         iconDispGx(&pos3, 16, 0x90, 1.0f);
     }
     if (*(u32*)((u8*)work + 0x1cc4) & 1) {
-        count = 0;
-        for (i = 0, j = 0x3c; i < NN; i++, j += 4) {
-            if (!(*(s32*)((u8*)p + j))) {
+        for (count = 0, j = 0; count < NN; count++, j += 4) {
+            if (!p->pressed[j >> 2]) {
                 break;
             }
-            count++;
         }
         if (count < NN) {
             count++;
@@ -300,10 +300,10 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
     j = 0;
     for (i = 0; i < count; i++, off += 0x30, j += 4) {
         s32 a, b;
-                if (*(u32*)((u8*)p + (j + 8)) == 0U) {
+                if (p->button[j >> 2] == 0U) {
             continue;
         }
-        switch (*(u32*)((u8*)p + (j + 8))) {
+        switch (p->button[j >> 2]) {
             case 0x100:
                 a = 0x65;
                 b = 0x64;
@@ -338,7 +338,7 @@ static void actionCommandDisp(s32 unused, f32 x, f32 y) {
                 b = 0x79;
                 break;
         }
-        if (*(s32*)((u8*)p + (j + 0x3c))) {
+        if (p->pressed[j >> 2]) {
             Vec pos4 = {0.0f, 0.0f, 0.0f};
             pos4.x = bx + (f32)off;
             pos4.y = by;

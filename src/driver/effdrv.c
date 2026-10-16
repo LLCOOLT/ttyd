@@ -134,7 +134,7 @@ void effTexSetup(void) {
 	wp->texLoaded = FALSE;
 	wp->texture = arcOpen("effect.tpl", 0, 0);
 	if (!wp->texture) {
-		sprintf(path, "%s/e/jp/effect.tpl", getMarioStDvdRoot());
+		sprintf(path, "%s/e/jp/effect.tpl\0", getMarioStDvdRoot());
 		entry = DVDMgrOpen(path, 2, 0);
 		size = OSRoundUp32B(DVDMgrGetLength(entry));
 		wp->texture = __memAlloc(HEAP_DEFAULT, size);
@@ -352,7 +352,6 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 	s32 k;
 	f32 t;
 
-
 	for (k = 1; k < n; k++) {
 		MayaKey* prev;
 		MayaKey* curr;
@@ -360,8 +359,8 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		register s8* pb;
 		f32* out;
 		register s8* pa;
-		prev = &list->keys[k - 1];
 		curr = &list->keys[k];
+		prev = &list->keys[k - 1];
 		gqr = 0x06070607;
 		asm { mtspr GQR5, gqr }
 		if (anim->time <= curr->time) {

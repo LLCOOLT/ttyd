@@ -247,6 +247,9 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 }
 
 void fileGarbageDataAdrSet(void* data, s32 type) {
+	u16 i;
+	u32 off; u32 off2;
+	TEXPalette* tpl;
 	u8* q;
 	s32 j, n;
 	TEXHeader* img;
@@ -302,15 +305,14 @@ void fileGarbageDataAdrSet(void* data, s32 type) {
 			break;
 case 4:
 {
-TEXPalette* tpl = data;
+tpl = data;
 if (tpl->versionNumber != 0x0020AF30) {
 				OSPanic("filemgr.c", 106, "invalid version number for texture palette\0");
 }
 if ((u32)tpl->descriptorArray < (u32)tpl) {
-u16 i;
 *(u32*)&tpl->descriptorArray += (u32)tpl;
 for (i = 0; (u16)i < tpl->numDescriptors; i++) {
-u32 off = i * 8;
+off = i * 8;
 img = (*(TEXHeader**)((u8*)tpl->descriptorArray + off));
 if (img) {
 (*(TEXHeader**)((u8*)tpl->descriptorArray + off)) = (TEXHeader*)((u32)tpl + (u32)img);
@@ -320,13 +322,14 @@ img2->data = (char*)((u32)tpl + (u32)img2->data);
 (*(TEXHeader**)((u8*)tpl->descriptorArray + off))->unpacked = TRUE;
 }
 }
-pal = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4));
+off2 = off + 4;
+pal = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off2));
 if (pal) {
-(*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4)) = (CLUTHeader*)((u32)tpl + (u32)pal);
-pal2 = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4));
+(*(CLUTHeader**)((u8*)tpl->descriptorArray + off2)) = (CLUTHeader*)((u32)tpl + (u32)pal);
+pal2 = (*(CLUTHeader**)((u8*)tpl->descriptorArray + off2));
 if (!pal2->unpacked) {
 pal2->data = (char*)((u32)tpl + (u32)pal2->data);
-(*(CLUTHeader**)((u8*)tpl->descriptorArray + off + 4))->unpacked = TRUE;
+(*(CLUTHeader**)((u8*)tpl->descriptorArray + off2))->unpacked = TRUE;
 }
 }
 }

@@ -462,21 +462,13 @@ USER_FUNC(evt_moamoa_set_one) {
     f32 z = evtGetFloat(event, args[3]);
     Mtx m;
     ExtPose* pose = extGetPosePtr();
-    {
-    (moa = &wp->moa[idx])->state = 3;
-    {
-        Vec pos = {0.0f, 0.0f, 0.0f};
-
-        pos.x = x;
-        pos.y = y;
-        pos.z = z;
-        moa->pos = pos;
-    }
-    if (!(moa->flags & 1)) {
+    moa = wp->moa;
+    moa[idx].state = 3;
+    moa[idx].pos = (Vec){x, y, z};
+    if (!(moa[idx].flags & 1)) {
         PSMTXRotRad(m, 'y', 1.5707964f);
         PSMTXConcat(pose[idx].mtx, m, pose[idx].mtx);
-        moa->flags |= 1;
-    }
+        moa[idx].flags |= 1;
     }
     return EVT_RETURN_DONE;
 }
