@@ -2703,14 +2703,10 @@ effect/eff_mahorn2.c:
 
 effect/eff_ultra_hammer.c:
 	.text       start:0x802577C0 end:0x8025854C
-	.rodata     start:0x803019B0 end:0x803019E0
+	.rodata     start:0x803019B0 end:0x80301B78
 	.data       start:0x803B70C0 end:0x803B7360
 	.sdata      start:0x80417EC0 end:0x80418198
-	.sdata2     start:0x804225E0 end:0x80422600
-
-unk_0x8025de70.c:
-	.rodata     start:0x803019E0 end:0x80301B78
-	.sdata2     start:0x80422600 end:0x80422620
+	.sdata2     start:0x804225E0 end:0x80422620
 
 TRK_MINNOW_DOLPHIN.a/mainloop.c:
 	.text       start:0x8025854C end:0x80258644

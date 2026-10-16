@@ -292,7 +292,7 @@ void battleAcDelete_GaugeTiming2(BattleWork* work) {
 #pragma opt_loop_invariants off
 static void actionCommandDisp(f32 x, f32 y) {
     BattleActions* ac = &_battleWorkPointer->actionCommands;
-    GT2Disp* disp = (GT2Disp*)((( u8*)ac ) + 0x290);
+    GT2Disp* disp = (GT2Disp*)((u8*)ac + 0x290);
     GT2Work* gw;
     CameraEntry* cam;
     f32 x0; f32 y0; f32 y1; f32 x1; f32 y2; f32 y3; f32 ratio; f32 t;
@@ -302,30 +302,30 @@ static void actionCommandDisp(f32 x, f32 y) {
     Vec d0; Vec d1;
 
     camGetPtr(8);
-    gw = (GT2Work*)((( u8*)ac ) + 0x2BC);
+    gw = (GT2Work*)((u8*)ac + 0x2BC);
     cam = camGetPtr(8);
     v = gw->width - 16;
-    x0 = ( -288.0f ) + x;
+    x0 = (-288.0f) + x;
     y0 = 49.0f + y;
     y1 = y0 - 8.0f;
     q = 0;
     r = 0;
     if (v > 0) {
         q = (v + 3) / 4;
-        r = v - ( q * 4) ;
+        r = v - q * 4;
     }
     btlDispGXInit2DRasta();
     GXLoadPosMtxImm(cam->view, 0);
     TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, x0, y1, 0.0f, 1.0f, 1.0f);
     t = 2.0f + (8.0f + x0);
     for (i = 0; i < q; i++) {
-        if (i != ( q - 1) ) {
-            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, t + (( f32)(i * 4) ), y1, 0.0f, 1.0f, 1.0f);
+        if (i != q - 1) {
+            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, t + (f32)(i * 4), y1, 0.0f, 1.0f, 1.0f);
         } else {
-            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, (( f32)r ) + (t + ( (f32)(i * 4) )), y1, 0.0f, 1.0f, 1.0f);
+            TEXPLANE(0x44, (GXColor){255, 255, 255, 255}, 0, (f32)r + (t + (f32)(i * 4)), y1, 0.0f, 1.0f, 1.0f);
         }
     }
-    TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, (16.0f + x0) + (( f32)v) , y1, 0.0f, -1.0f, 1.0f);
+    TEXPLANE(0x43, (GXColor){255, 255, 255, 255}, 0, 16.0f + x0 + (f32)v, y1, 0.0f, -1.0f, 1.0f);
     ratio = gw->cursor / 100.0f;
     if (ratio > 1.0f) {
         ratio = 1.0f;
@@ -334,7 +334,7 @@ static void actionCommandDisp(f32 x, f32 y) {
 
     cam = camGetPtr(8);
     y2 = y0 - 16.0f;
-    x1 = x0 + (((( f32)gw->width ) * gw->cursor) / 100.0f) ;
+    x1 = x0 + (((f32)gw->width) * gw->cursor) / 100.0f;
     if (x1 >= x0) {
         btlDispGXInit2DRasta();
         GXLoadPosMtxImm(cam->view, 0);
@@ -342,10 +342,10 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
 
     y3 = 23.0f + y;
-    cnt = *(( s32*)( ((u8*)ac ) + 0x40) );
+    cnt = *(s32*)((u8*)ac + 0x40);
     for (i = 0; i < cnt; i++) {
         f32 target = gw->targets[i];
-        if (( target <= gw->cursor ) || ( __fabs(gw->cursor - target) <= 6.0) ) {
+        if (target <= gw->cursor || __fabs(gw->cursor - target) <= 6.0) {
             id = 0x95;
         } else {
             id = 0x91;
@@ -353,7 +353,7 @@ static void actionCommandDisp(f32 x, f32 y) {
         pos = (Vec){0.0f, 0.0f, 0.0f};
         d0 = (Vec){0.0f, 0.0f, 0.0f};
         d1 = (Vec){0.0f, 0.0f, 0.0f};
-        pos.x = ((- 288.0f) + x) + (( ((f32)gw->width ) * target) / 100.0f) ;
+        pos.x = (- 288.0f + x) + ((f32)gw->width) * target / 100.0f;
         pos.y = y3;
         ICON(&pos, 0x10, id, 0.75f);
     }
@@ -369,7 +369,7 @@ static void actionCommandDisp(f32 x, f32 y) {
             Vec p = {0.0f, 0.0f, 0.0f};
             Vec e0 = {0.0f, 0.0f, 0.0f};
             Vec e1 = {0.0f, 0.0f, 0.0f};
-            p.x = 28.0f + (( -225.0f ) + x);
+            p.x = 28.0f + (-225.0f + x);
             p.y = 55.0f + y;
             ICON(&p, 0x10, icon, 1.0f);
             break;
@@ -379,12 +379,12 @@ static void actionCommandDisp(f32 x, f32 y) {
                 Vec p = {0.0f, 0.0f, 0.0f};
                 Vec e0 = {0.0f, 0.0f, 0.0f};
                 Vec e1 = {0.0f, 0.0f, 0.0f};
-                p.x = 28.0f + (( -225.0f ) + x);
+                p.x = 28.0f + (-225.0f + x);
                 p.y = 55.0f + y;
                 ICON(&p, 0x10, pressedIcon, 1.0f);
             } else {
                 Vec p = {0.0f, 0.0f, 0.0f};
-                p.x = 28.0f + (( -225.0f ) + x);
+                p.x = 28.0f + (-225.0f + x);
                 p.y = 55.0f + y;
                 ICON(&p, 0x10, icon, 1.0f);
             }
@@ -406,8 +406,8 @@ static void actionCommandDisp(f32 x, f32 y) {
                 id = 0x45;
                 break;
         }
-        if ((( u16)id ) != 0x45) {
-            TEXPLANE((u16)id, (GXColor){255, 255, 255, 255}, 0, ((- 288.0f) + x) + (( ((f32)gw->width ) * gw->targets[i]) / 100.0f) , y4, 0.0f, 1.0f, 1.0f);
+        if ((u16)id != 0x45) {
+            TEXPLANE((u16)id, (GXColor){255, 255, 255, 255}, 0, - 288.0f + x + (((f32)gw->width) * gw->targets[i]) / 100.0f, y4, 0.0f, 1.0f, 1.0f);
         }
     }
     }
@@ -415,7 +415,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     {
         Mtx m3; Mtx m1; Mtx m2;
         s32 num = ac->outputParams[0] + ((GT2Params*)ac)->bonus;
-        PSMTXTrans(m1, ((( -200.0f ) + x) + ( (f32)gw->width) ) - 60.0f, y1, 0.0f);
+        PSMTXTrans(m1, -200.0f + x + ((f32)gw->width) - 60.0f, y1, 0.0f);
         PSMTXScale(m2, 1.0f, 1.0f, 1.0f);
         PSMTXConcat(m1, m2, m3);
         iconNumberDispGx(m3, num, FALSE, (GXColor){255, 255, 255, 255});

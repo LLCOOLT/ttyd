@@ -27,7 +27,7 @@ static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
 static void actionCommandDisp(s32 unused, f32 x, f32 y);
 
 s32 battleAcMain_ButtonDown(BattleWork* work) {
-    unsigned int new_var;
+    unsigned int tmpi2;
     BattleActions* ac = &work->actionCommands;
     BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
     u8* disp = (u8*)work + 0x1f20;
@@ -141,9 +141,9 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                     break;
                 }
                 OUT = 0;
-                new_var = (off = 0);
+                tmpi2 = (off = 0);
                 allDone = 1;
-                for (i = 0, new_var; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
+                for (i = 0, tmpi2; i < *(s32*)((u8*)work + 0x1cd0); i++, off += 4) {
                     if (BTNO(off)) {
                         if (PRSO(off)) {
                             OUT++;

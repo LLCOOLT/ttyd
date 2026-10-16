@@ -366,7 +366,7 @@ void disp_sight(CameraId camera, void* param) {
     winTexInit(*sight_wp->tpl->data);
     winTexSet(5, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black);
     for (id = 0; id < 3; id++) {
-        if (((( s32)(gp->retraceCount % 30) ) / 10 ) != id) {
+        if ((s32)(gp->retraceCount % 30) / 10 != id) {
             i = 4 - id;
             drawBG(i, 100.0f, 60.0f, 1.0f, 1.0f, 0.0f);
             drawBG(i, -100.0f, 60.0f, -1.0f, 1.0f, 0.0f);
@@ -377,10 +377,10 @@ void disp_sight(CameraId camera, void* param) {
 
     winTexInit(*sight_wp->tpl->data);
     winTexSet(23, (Vec){-200.0f, 150.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
-    drawNum(( gp->renderTime / 100 ) / 1000, 10, 90.0f, 180.0f, 0.6f);
-    drawNum(( gp->renderTime / 200 ) / 1000, 8, 126.0f, 150.0f, 0.6f);
-    drawNum(( gp->renderTime / 300 ) / 1000, 6, 162.0f, 120.0f, 0.6f);
-    drawNum(( gp->renderTime / 400 ) / 1000, 6, 162.0f, 90.0f, 0.6f);
+    drawNum((gp->renderTime / 100) / 1000, 10, 90.0f, 180.0f, 0.6f);
+    drawNum((gp->renderTime / 200) / 1000, 8, 126.0f, 150.0f, 0.6f);
+    drawNum((gp->renderTime / 300) / 1000, 6, 162.0f, 120.0f, 0.6f);
+    drawNum((gp->renderTime / 400) / 1000, 6, 162.0f, 90.0f, 0.6f);
     drawNum(gp->retraceCount / 4, 4, 110.0f, -160.0f, 1.0f);
     drawNum(gp->retraceCount / 8, 2, 230.0f, -170.0f, 0.8f);
 
@@ -397,9 +397,9 @@ void disp_sight(CameraId camera, void* param) {
         if (n > 7) {
             n = 7;
         }
-        x = ( -240.0f ) + ( 20.0f * i) ;
+        x = (-240.0f) + 20.0f * i;
         for (j = 0; j < n; j++) {
-            y = ( -190.0f ) + ( 16.0f * j) ;
+            y = (-190.0f) + 16.0f * j;
             if (j == 6) {
                 drawBG(10, x, y, 1.0f, 1.0f, 0.0f);
             } else {
@@ -407,7 +407,7 @@ void disp_sight(CameraId camera, void* param) {
             }
         }
         for (j = n; j < 7; j++) {
-            y = ( -190.0f ) + ( 16.0f * j) ;
+            y = (-190.0f) + 16.0f * j;
             if (j == 6) {
                 drawBG(12, x, y, 1.0f, 1.0f, 0.0f);
             } else {
@@ -418,7 +418,7 @@ void disp_sight(CameraId camera, void* param) {
 
     winTexInit(*sight_wp->tpl->data);
     for (i = 0; i < 4; i++) {
-        on = ((( gp->retraceCount % 20 ) > 6 ) && ( i == sight_wp->dir) ) ? ( 1 ) : ( 0) ;
+        on = (gp->retraceCount % 20 > 6 && i == sight_wp->dir) ? 1 : 0;
         id = 7;
         if (on != 0) {
             id = 6;
@@ -436,13 +436,13 @@ void disp_sight(CameraId camera, void* param) {
                 break;
             case 2:
                 drawBG(id, -180.0f, 16.0f, 1.0f, 1.0f, 180.0f);
-                if (on && (( gp->retraceCount & 3) == 0) ) {
+                if (on && (gp->retraceCount & 3) == 0) {
                     sight_wp->count1++;
                 }
                 break;
             case 3:
                 drawBG(id, 180.0f, -16.0f, 1.0f, 1.0f, 0.0f);
-                if (on && (( gp->retraceCount & 3) == 0) ) {
+                if (on && (gp->retraceCount & 3) == 0) {
                     sight_wp->count2++;
                 }
                 break;
@@ -822,13 +822,14 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_main(void) {
-    BomWork* wp = lp->address;
+    f32 * new_var;
+    BomWork* wp = lp->address; int new_var3 ;
     ExtPose* pose = extGetPosePtr();
     s32 i;
     f32 angle;
     f32 dist;
     f32 speed;
-    f32 gravity;
+    f32 gravity; f32 new_var2 ;
     f32 x;
     f32 z;
     f32 rad;
@@ -840,12 +841,11 @@ static void ext_main(void) {
     for (i = 0; i < wp->count; i++, pose++) {
         Vec center = {0.0f, 0.0f, 0.0f};
         Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-        Vec move = {0.0f, 0.0f, 0.0f};
-        Vec dir;
+        Vec dir; Vec move = {0.0f, 0.0f, 0.0f};
 
         switch ((s8)wp->bom[i].state) {
             case 0:
-                if (PSVECDistance(&center, &pos) > 280.0f) {
+                if (1) { new_var2 = PSVECDistance(&center, &pos) ; if (new_var2 > 280.0f) {
                     PSVECSubtract(&center, &pos, &dir);
                     PSVECNormalize(&dir, &dir);
                     PSVECScale(&dir, &move, 3.0f);
@@ -858,45 +858,47 @@ static void ext_main(void) {
                     wp->bom[i].state++;
                 }
                 break;
+            }
             case 1:
-                angle = 6.2831855f * rand() / 32767.0f;
-                dist = 150.0f + 30.0f * rand() / 32767.0f;
-                gravity = 0.1f + 0.1f * rand() / 32767.0f;
-                speed = 3.0f + rand() / 32767.0f;
-                z = dist * -chb_cos(angle);
+                angle = ( 6.2831855f * rand() ) / 32767.0f;
+                dist = 150.0f + (( 30.0f * rand() ) / 32767.0f) ;
+                gravity = 0.1f + (( 0.1f * rand() ) / 32767.0f) ;
+                speed = 3.0f + ( rand() / 32767.0f) ;
+                z = dist * ( -chb_cos(angle) );
                 x = dist * chb_sin(angle);
                 jump(i, 2, x, 150.0f, z, speed, gravity);
                 break;
             case 2:
-                angle = 6.2831855f * rand() / 32767.0f;
-                dist = 50.0f + 30.0f * rand() / 32767.0f;
-                gravity = 0.1f + 0.1f * rand() / 32767.0f;
-                speed = 3.0f + rand() / 32767.0f;
-                z = dist * -chb_cos(angle);
+                angle = ( 6.2831855f * rand() ) / 32767.0f;
+                dist = 50.0f + (( 30.0f * rand() ) / 32767.0f) ;
+                x = ( 0.1f * rand() ) / 32767.0f; gravity = 0.1f + x ;
+                speed = 3.0f + ( rand() / 32767.0f) ;
+                z = dist * ( -chb_cos(angle) );
                 x = dist * chb_sin(angle);
                 jump(i, 3, x, 400.0f, z, speed, gravity);
                 break;
             case 3:
-                angle = 6.2831855f * rand() / 32767.0f;
-                dist = 70.0f * rand() / 32767.0f;
-                gravity = 0.1f + 0.0f * rand() / 32767.0f;
-                speed = 3.0f + 0.0f * rand() / 32767.0f;
-                z = dist * -chb_cos(angle);
-                x = dist * chb_sin(angle) + (100.0f + i % 100);
-                jump(i, 4, x, 350.0f + i % 150, z, speed, gravity);
-                break;
+                angle = ( 6.2831855f * rand() ) / 32767.0f;
+                dist = ( 70.0f * rand() ) / 32767.0f;
+                gravity =  0.1f + (( 0.0f * rand() ) / gravity); gravity = 32767.0f ; speed = rand () ;
+                speed = 3.0f + (( 0.0f * speed) / 32767.0f) ;
+                z = dist * ( -chb_cos(angle)) ;
+                x = ( dist * chb_sin(angle) ) + (100.0f + ( i % 100) );
+                jump(i, 4, x, 350.0f + ( i % 150) , z, speed, gravity);
+                break; new_var = pose->mtx [1] ;
             case 4:
                 wp->bom[i].state++;
                 break;
             case 5:
                 break;
+            new_var3 = 2;
             case 100:
                 pose->mtx[1][3] += wp->bom[i].vy;
                 wp->bom[i].vy -= wp->bom[i].gravity;
-                rad = 3.1415927f * angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->bom[i].target.x, wp->bom[i].target.z) / 180.0f;
+                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], pose->mtx[new_var3][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
                 pose->mtx[0][3] += wp->bom[i].field_0x10 * chb_sin(rad);
-                pose->mtx[2][3] += wp->bom[i].field_0x10 * -chb_cos(rad);
-                if (--wp->bom[i].timer < 0) {
+                pose->mtx[2][3] += wp->bom[i].field_0x10 * ( -chb_cos(rad)) ;
+                if ( (--wp->bom[i].timer ) < 0) {
                     pose->mtx[0][3] = wp->bom[i].target.x;
                     pose->mtx[1][3] = wp->bom[i].target.y;
                     pose->mtx[2][3] = wp->bom[i].target.z;
@@ -904,11 +906,11 @@ static void ext_main(void) {
                 }
                 break;
             case 127:
-                if (pose->mtx[1][3] > -1000.0f) {
+                if (new_var[3] > ( -1000.0f) ) {
                     pose->mtx[1][3] = pose->mtx[1][3] - 2.0f;
-                    pose->flags &= ~2;
+                    pose->flags &= ~new_var3;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
-                    PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * (f32)sin((gp->retraceCount + i) / 100.0f)));
+                    PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * (( f32)sin((gp->retraceCount + i) / 100.0f) )));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);
                     PSMTXConcat(m1, m2, m2);
                     PSMTXConcat(m2, m3, m3);

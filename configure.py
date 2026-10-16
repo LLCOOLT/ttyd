@@ -889,7 +889,6 @@ config.libs = [
             Object(Matching, "statuswindow.c"),
             Object(Matching, "R_build.c"),
             Object(Matching, "system.c"),
-            Object(NonMatching, "unk_0x8025de70.c"),
         ],
     },
     DolphinLib(

@@ -766,6 +766,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+__declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
 static void ext_moamoa_main(void) {
     MarioWork* mario;
     PartyEntry* party;
@@ -898,7 +899,7 @@ static void ext_moamoa_main(void) {
                 x = (wp->breathDir + wp->angle) * 0.5f;
                 moa->flags |= 0x84;
                 moa->state = 0x30;
-                { static const Vec zv = {0.0f, 0.0f, 0.0f}; moa->target = zv; }
+                moa->target = moamoa_zero_vec;
                 s = randf(0.1f, 0.2f);
                 rad = 6.2831855f * x / 360.0f;
                 moa->vy = s * moa_sinx(rad);
@@ -1075,7 +1076,7 @@ static void ext_moamoa_main(void) {
                 d = r2 * (500.0f - 300.0f) + 300.0f;
                 x = pose->mtx[0][3] + d * moa_sinx(rad);
                 z = pose->mtx[2][3] - d * moa_cosx(rad); }
-                { f32 r1 = rand() / 32767.0f; a = r1 * (6.0f - 5.0f) + 5.0f; }
+                { f32 k; f32 r1 = rand() / 32767.0f; a = r1 * (k = 6.0f - 5.0f) + 5.0f; }
                 { f32 k; f32 r1 = rand() / 32767.0f; k = 0.3f - 0.2f; s = r1 * k + 0.2f; }
                 if (!sfx) {
                     psndSFXOn_3D((const char*)0x6c3, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
@@ -1136,7 +1137,7 @@ static void ext_moamoa_main(void) {
                     f32 rad = 6.2831855f * a / 360.0f;
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                     z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
-                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; k = 1.0f - 1.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * (r1 * k + 1.0f), r2 * k + 1.0f); }
+                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * (r1 * (k = 1.0f - 1.0f) + 1.0f), r2 * k + 1.0f); }
                 } else {
                     moa->state++;
                 }
@@ -1149,7 +1150,7 @@ static void ext_moamoa_main(void) {
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
-                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; k = 1.0f - 1.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * (r1 * k + 1.0f), r2 * k + 1.0f); }
+                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * (r1 * (k = 1.0f - 1.0f) + 1.0f), r2 * k + 1.0f); }
                 } else {
                     moa->state = 0x3e;
                 }

@@ -459,16 +459,19 @@ void unk_800d06b4(const char* src, char* dst) {
 }
 
 s32 comp_aiueo(s16* a, s16* b) {
-	char bufA[0x80];
-	char bufB[0x80];
-	s16 ia = *a;
+	 const char * new_var ;
+	char bufA[0x80]; char bufB [0x80];
+	s16 ia ;
 	s16 ib = *b;
-	const char* nA = itemDataTable[ia].name;
+	const char* nA = itemDataTable[0, ia].name;
 	const char* nB;
-	unk_800d06b4(msgSearch(nA), bufA);
-	nB = itemDataTable[ib].name;
+	nA =msgSearch(nA); unk_800d06b4 (new_var = nA , bufA);
+	new_var = itemDataTable [ib].name;
+	ia = * a;
+	nB = new_var;
 	unk_800d06b4(msgSearch(nB), bufB);
-	return strcmp(bufA, bufB);
+	ia = strcmp(bufA, bufB);
+return ia;
 }
 
 s32 comp_kind(s16* a, s16* b) {

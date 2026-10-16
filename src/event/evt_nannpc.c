@@ -442,46 +442,52 @@ USER_FUNC(evt_nannpc_set_subfunc) {
     return 2;
 }
 
-USER_FUNC(evt_nannpc_entry) {
-    NanNPC* p;
-    ExtPose* pose;
-    char* str;
-    s32 off;
-    s32 name;
-    s32 i;
-    s32* args;
-    NanNPCWork* w;
-    args = event->args;
-    pose = extGetPosePtr();
-    name = evtGetValue(event, args[0]);
-    w = nanNPCWork;
-    for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++) {
-        p = (NanNPC*)((u8*)w->npc + off);
-        str = (char*)name;
-        if (!((u32)str & 0x80000000)) {
-            sprintf(makestring, "%06x", name);
-            str = makestring;
-        }
-        strcmp((char*)p->name, str);
-        if (!p->pose) {
-            strcpy((char*)p->name, str);
-            p->pose = &pose[i];
-            p->flags = 0;
-            p->field_16 = 0;
-            p->pos = (Vec){0.0f, -1000.0f, 0.0f};
-            p->field_30 = (Vec){0.0f, -1000.0f, 0.0f};
-            p->hosei = (Vec){0.0f, 0.0f, 0.0f};
-            p->sizeX = 32.0f;
-            p->sizeY = 32.0f;
-            p->startTime = 0;
-            p->animnum = 0;
-            p->dir = 0.0f;
-            p->pose->rot = -p->dir;
-            p->color = (GXColor){255, 255, 255, 255};
-            break;
-        }
+s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
+{
+  NanNPC *p;
+  ExtPose *pose;
+  char *str;
+  s32 off;
+  s32 name;
+  s32 i;
+  s32 *args;
+  NanNPCWork *w;
+  args = event->args;
+  pose = extGetPosePtr();
+  name = (long long) evtGetValue(event, args[0]);
+  w = nanNPCWork;
+  for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++)
+  {
+    p = (NanNPC *) (((u8 *) w->npc) - (-off));
+    str = (char *) name;
+    if (!(((u32) str) & 0x80000000))
+    {
+ do { } while (0);
+      sprintf(makestring, "%06x", name);
+      str = makestring;
     }
-    return 2;
+    strcmp((char *) p->name, str);
+    if (!p->pose)
+    {
+      strcpy((char *) p->name, str);
+      p->pose = &pose[i];
+      p->flags = 0;
+      p->field_16 = 0;
+      p->pos = (Vec){0.0f, -1000.0f, 0.0f};
+      p->field_30 = (Vec){0.0f, -1000.0f, 0.0f};
+      p->hosei = (Vec){0.0f, 0.0f, 0.0f};
+      p->sizeX = 32.0f;
+      p->sizeY = 32.0f;
+      p->startTime = 0;
+      p->animnum = 0;
+      p->dir = 0.0f;
+      p->pose->rot = -p->dir;
+      p->color = (GXColor){255, 255, 255, 255};
+      break;
+    }
+  }
+
+  return 2;
 }
 
 USER_FUNC(evt_nannpc_set_position) {

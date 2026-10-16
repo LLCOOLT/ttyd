@@ -843,6 +843,7 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
 #pragma opt_lifetimes reset
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+__declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
 static void ext_moamoa_main(void) {
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
@@ -930,7 +931,7 @@ static void ext_moamoa_main(void) {
                 angle = (wp->breathDir + wp->angle) * 0.5f;
                 moa->flags |= 0x84;
                 moa->state = 48;
-                { static const Vec zv = {0.0f, 0.0f, 0.0f}; moa->target = zv; }
+                moa->target = moamoa_zero_vec;
                 { spd = randf(0.1f, 0.2f);
                 rad = 6.2831855f * angle / 360.0f;
                 moa->vy = spd * moa_sinx(rad);

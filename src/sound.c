@@ -154,7 +154,7 @@ void SoundInit(void) { // 1:1, assuming sndMalloc inlines
     }
 
     // force register
-    tempdvd = (sound.dvds = sndMalloc((sizeof(SoundDVD)) * 2));
+    tempdvd = (sound.dvds = sndMalloc(sizeof(SoundDVD) * 2));
     dvds = tempdvd;
     if (dvds == 0) {
         while (1)
@@ -599,7 +599,7 @@ static inline void _ssDropStop(void) {
 }
 
 BOOL SoundDropData(void) {
-    SoundGroup *group, *temp;
+    SoundGroup *group; SoundGroup *temp;
     u32 i;
 
     group = sound.groups;
@@ -609,11 +609,11 @@ BOOL SoundDropData(void) {
         SoundSong* song = &sound.songs[i];
         if (sndSeqGetValid(song->seqId)) {
             sndSeqStop(song->seqId);
-            song->seqId = (SND_SEQID)-1;
+            song->seqId = (SND_SEQID)(-1);
         }
     }
     for (i = 0; i < 40; i++) {
-        SoundEffect* effect = &sound.effects[i];
+        SoundEffect* effect = (0, &sound.effects[i]);
         if (effect->flags) {
             sndFXKeyOff(effect->voiceId);
             if (effect->flags & 0x10) {
@@ -653,7 +653,7 @@ BOOL SoundDropData(void) {
                 sndStreamFree(stream->entries[1].streamId);
             }
             if (sound.unk20C) {
-                if (!--sound.unk20C) {
+                if (!(--sound.unk20C)) {
                     OSRestoreInterrupts(sound.interrupts);
                 }
             }
@@ -683,7 +683,9 @@ BOOL SoundDropData(void) {
     for (i = 0; i < sound.slibId; i++) {
         __memFree(HEAP_DEFAULT, sound.slibData[i]);
         __memFree(HEAP_DEFAULT, sound.stblData[i]);
+        if (1) {
         __memFree(HEAP_DEFAULT, sound.etblData[i]);
+    }
     }
 
     sound.dataId = 0;
@@ -1120,7 +1122,7 @@ void SoundEfxMain(void) {
     x = sound.pos.x - sound.prevPos.x;
     y = sound.pos.y - sound.prevPos.y;
     z = sound.pos.z - sound.prevPos.z;
-    v6 = ((TWO_PI * sound.unk1F4) / 360.0f);
+    v6 = (TWO_PI * sound.unk1F4 / 360.0f);
     sound.prevPos.x = sound.pos.x;
     sound.prevPos.y = sound.pos.y;
     sound.prevPos.z = sound.pos.z;
@@ -1560,16 +1562,16 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
     s32 j;
 
     stream = &sound.streams[(u8)user];
-    stream->samplePos = 0;
+    (& sound.streams [(u8) user])->samplePos = 0;
     dst = buffer1;
     if ((stream->flags & 0x8006) || sound.unk214) {
         if (!(stream->flags & 0x100)) {
             for (; len1 != 0; len1--) {
-                *dst++ = 0;
+                *(dst++) = 0;
                 stream->samplePos++;
             }
             for (; len2 != 0; len2--) {
-                *((s16*)buffer2)++ = 0;
+                *(((s16*)buffer2)++) = 0;
                 stream->samplePos++;
             }
             return stream->samplePos;
@@ -1577,12 +1579,12 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
             j = (s32)(len1 / 14 * 8);
             j /= 2;
             for (; j != 0; j--) {
-                *((s16*)buffer1)++ = 0;
+                *(((s16*)buffer1)++) = 0;
             }
             j = (s32)(len2 / 14 * 8);
             j /= 2;
             for (; j != 0; j--) {
-                *((s16*)buffer2)++ = 0;
+                *(((s16*)buffer2)++) = 0;
             }
             return len1 + len2;
         }
@@ -1597,10 +1599,10 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                      ssDecodeDPCM(stream, entry, buffer1, len1, entry->loadBuffer[entry->curBuf] + entry->srcPos));
     } else if (stream->flags & 0x100) {
         dst8 = buffer1;
-        src8 = entry->loadBuffer[entry->curBuf] + entry->srcPos;
-        n = (len1 + 13) / 14 * 8;
+        src8 = entry->loadBuffer[entry->curBuf]; src8 = src8 + entry->srcPos;
+        n = ((len1 + 13) / 14) * 8;
         while (n != 0) {
-            *dst8++ = *src8++;
+            *(dst8++) = *(src8++);
             n--;
             entry->srcPos++;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
@@ -1612,7 +1614,7 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                 }
                 entry->loaded = 0;
                 entry->srcPos = 0;
-                entry->curBuf = 1 - entry->curBuf;
+                entry->curBuf = ((int) 1) - entry->curBuf;
                 src8 = entry->loadBuffer[entry->curBuf];
             }
             entry->pos++;
@@ -1625,9 +1627,9 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
             }
         }
         dst8 = buffer2;
-        n = (len2 + 13) / 14 * 8;
+        n = ((len2 + 13) / 14) * 8;
         while (n != 0) {
-            *dst8++ = *src8++;
+            *(dst8++) = *(src8++);
             n--;
             entry->srcPos++;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
@@ -1654,10 +1656,10 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
         stream->samplePos = len1 + len2;
     } else {
         dst = buffer1;
-        src16 = (s16*)(entry->loadBuffer[entry->curBuf] + (entry->srcPos & ~1));
+        src16 = (s16*)(entry->loadBuffer[entry->curBuf] + (entry->srcPos & (~1)));
         n = len1;
         while (n != 0) {
-            *dst++ = *src16++;
+            *(dst++) = *(src16++);
             n--;
             stream->samplePos++;
             entry->srcPos += 2;
@@ -1682,17 +1684,17 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                 }
             }
         }
-        dst = buffer2;
         n = len2;
+        dst = buffer2;
         while (n != 0) {
-            *dst++ = *src16++;
+            *(dst++) = *(src16++);
             n--;
             stream->samplePos++;
             entry->srcPos += 2;
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
                 if (entry->loaded == 0 && !(stream->flags & 0x4000)) {
                     entry->pos -= entry->srcPos;
-                    entry->srcPos = 0;
+                    entry->srcPos = (0, 0);
                     src16 = (s16*)entry->loadBuffer[entry->curBuf];
                     continue;
                 }

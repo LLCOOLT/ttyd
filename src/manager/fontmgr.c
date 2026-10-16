@@ -436,6 +436,10 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 	}
 }
 
+inline u8 fontGetGlyphWidth(u16 code) {
+	return fontGetWidth(code)->width;
+}
+
 void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 	CameraEntry* camera;
 	Mtx trans, scale;
@@ -455,7 +459,7 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 		}
 		sx = x + fontScale.x * (irand(10000) % 3);
 		sy = y + fontScale.y * (irand(10000) % 3);
-		width = fontGetWidth(code)->width;
+		width = fontGetGlyphWidth(code);
 		PSMTXTransApply(scale, trans, sx, sy, 0.0f);
 		PSMTXConcat(camera->view, trans, trans);
 		GXLoadPosMtxImm(trans, 0);

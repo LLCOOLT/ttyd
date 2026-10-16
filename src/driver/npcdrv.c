@@ -169,7 +169,7 @@ void mtx_setup(NpcEntry* entry, Mtx mtx, s32 history) {
     f32 rotationAngle;
     f32 scaleSign;
     CameraEntry* camera;
-    f32 new_var[2];
+    f32 tmpi2[2];
     f32 v15;
     Mtx mtxX, mtxY, mtxZ;
 
@@ -177,9 +177,9 @@ void mtx_setup(NpcEntry* entry, Mtx mtx, s32 history) {
     scaleSign = 1.0f;
     if (!(entry->flags & 0x2000000) && !(entry->flags & 0x8000000)) {
         camera = camGetCurPtr();
-        new_var[1] = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
-        new_var[0] = angleABf(camera->cameraPos.x, camera->cameraPos.z, entry->position.x, entry->position.z);
-        rotationAngle = reviseAngle(new_var[1] - new_var[0]);
+        tmpi2[1] = angleABf(camera->cameraPos.x, camera->cameraPos.z, camera->cameraAt.x, camera->cameraAt.z);
+        tmpi2[0] = angleABf(camera->cameraPos.x, camera->cameraPos.z, entry->position.x, entry->position.z);
+        rotationAngle = reviseAngle(tmpi2[1] - tmpi2[0]);
     }
     v15 = reviseAngle(reviseAngle(entry->rotation.y));
     if (v15 >= 90.0f && v15 <= 270.0f) {
@@ -316,7 +316,7 @@ void npcDisp(CameraId camId, void* param) {
             if (entry->jumpFlags & 0x400000) {
                 color.r /= 2;
                 color.g /= 2;
-                if ((rotY && rotY) && rotY) {
+                if (rotY && rotY && rotY) {
                 }
                 color.b /= 2;
                 animPoseSetMaterialEvtColor(entry->poseId, color);
@@ -398,7 +398,7 @@ void npcDisp_offscreen(CameraId camId, void* param) {
 #pragma opt_lifetimes off
 
 void npcDisp_blur(CameraId camId, void* param) {
-    s32 new_var;
+    s32 tmpi2;
     NpcEntry* entry = param;
     s32 i;
     s32 alpha;
@@ -407,12 +407,12 @@ void npcDisp_blur(CameraId camId, void* param) {
     f32 z;
     Mtx mtx;
 
-    rotY = reviseAngle(-entry->direction); new_var = (alpha = 100 );
+    rotY = reviseAngle(-entry->direction); tmpi2 = (alpha = 100);
     alpha = animPoseGetMaterialFlag(entry->poseId);
     x = 2.0f * npc_sin((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
-    z = 2.0f * ( -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f) );
+    z = 2.0f * -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
     animPoseMain(entry->poseId);
-    for (i = 4, new_var; i > 0; i--, alpha -= 25) {
+    for (i = 4, tmpi2; i > 0; i--, alpha -= 25) {
         mtx_setup(entry, mtx, i);
         MTXTransApply(mtx, mtx, x, 0.0f, z);
         animPoseSetMaterialFlagOn(entry->poseId, 0x40);
@@ -1142,10 +1142,10 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     f32 scale;
 
     mario = marioGetPtr();
-    if (npc->position.y > ( mario->position.y + mario->wPlayerCollisionBox.y) ) {
+    if (npc->position.y > mario->position.y + mario->wPlayerCollisionBox.y) {
         return FALSE;
     }
-    if (mario->position.y > ( npc->position.y + npc->height) ) {
+    if (mario->position.y > npc->position.y + npc->height) {
         return FALSE;
     }
     marioPos.x = mario->position.x;
@@ -1166,16 +1166,16 @@ BOOL npcCheckHitMarioSide(NpcEntry* npc) {
     mario->field_0x1D8 = (s32)npc;
     angle = angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z);
     if (__fabsf(compAngle(angle, mario->directionView)) < 40.0f) {
-        dx = (range - dist) * ( -npc_sin((6.2831855f * mario->directionView) / 360.0f) );
+        dx = (range - dist) * -npc_sin((6.2831855f * mario->directionView) / 360.0f);
         dz = (range - dist) * npc_cos((6.2831855f * mario->directionView) / 360.0f);
 
     } else {
         rad = (6.2831855f * angle) / 360.0f;
-        dx = (npc->position.x - ( range * npc_sin(rad) )) - mario->position.x;
-        dz = (npc->position.z + ( range * npc_cos(rad) )) - mario->position.z;
+        dx = (npc->position.x - range * npc_sin(rad)) - mario->position.x;
+        dz = (npc->position.z + range * npc_cos(rad)) - mario->position.z;
     }
-    len = npc_sqrtf(( dx * dx ) + ( dz * dz) );
-    if (len > ( (mario->wPlayerCollisionBox.z > 4.0f ) ? ( 3.0f ) : ( 1.5f) )) {
+    len = npc_sqrtf(dx * dx + dz * dz);
+    if (len > (mario->wPlayerCollisionBox.z > 4.0f ? 3.0f : 1.5f)) {
         scale = 2.0f / len;
         dx *= scale;
         dz *= scale;
@@ -2416,7 +2416,7 @@ NpcEntry* _npcHitCheckSphere(NpcEntry* npc, f32* dist, f32 x, f32 y, f32 z, f32 
 NpcEntry* _npcHitCheckHammerAllMotion(NpcEntry* npc, f32* dist, f32 r, f32 angle) {
     f32 t;
     f32 d;
-    float new_var;
+    float tmpi2;
     NpcEntry* hit;
 
     for (t = 0.0f; t <= 11.0f; t += 1.0f) {
@@ -2434,8 +2434,8 @@ NpcEntry* _npcHitCheckHammerAllMotion(NpcEntry* npc, f32* dist, f32 r, f32 angle
         }
         sincosf(&s1, &c1, angle);
         sincosf(&s2, &c2, tbl.v[(s32)f]);
-        new_var = mario->position.x + s2 * (s1 * r);
-        x = new_var;
+        tmpi2 = mario->position.x + s2 * (s1 * r);
+        x = tmpi2;
         z = mario->position.z + s2 * (c1 * r);
         y = mario->position.y + r * c2;
         hit = _npcHitCheckSphere(npc, &d, x, y, z, 12.0f);
