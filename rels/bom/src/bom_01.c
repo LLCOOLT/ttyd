@@ -827,11 +827,10 @@ static void ext_main(void) {
     ExtPose* pose = extGetPosePtr();
     s32 i;
     f32 angle;
-    f32 dist;
-    f32 speed;
+    f32  speed;
     f32 gravity; f32 new_var2 ;
     f32 x;
-    f32 z;
+    f32 z; f32 * new_var4 ; f32 dist ;
     f32 rad;
     Mtx m1;
     Mtx m2;
@@ -895,7 +894,8 @@ static void ext_main(void) {
             case 100:
                 pose->mtx[1][3] += wp->bom[i].vy;
                 wp->bom[i].vy -= wp->bom[i].gravity;
-                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], pose->mtx[new_var3][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
+                new_var4 = pose->mtx [new_var3];
+                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], new_var4[3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
                 pose->mtx[0][3] += wp->bom[i].field_0x10 * chb_sin(rad);
                 pose->mtx[2][3] += wp->bom[i].field_0x10 * ( -chb_cos(rad)) ;
                 if ( (--wp->bom[i].timer ) < 0) {

@@ -777,13 +777,13 @@ static void ext_moamoa_main(void) {
     s32 hit;
     s32 sfx;
     s32 ret;
-    f32 s;
     f32 y;
+    f32 a;
     f32 rad;
-    f32 t;
+    f32 s;
     f32 z;
     f32 d;
-    f32 a;
+    f32 t;
     f32 r;
     f32 x;
     Mtx m1;
@@ -931,7 +931,6 @@ static void ext_moamoa_main(void) {
         switch (moa->state) {
             case 0:
                 if (i % 133 < 100) {
-                    f32 x, y, z;
                     a = randf(0.0f, 6.2831855f);
                     d = randf(0.0f, 50.0f);
                     {
@@ -946,7 +945,6 @@ static void ext_moamoa_main(void) {
                     { f32 k1, k2; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, r1 * (k1 = 3.0f - 1.5f) + 1.5f, r2 * (k2 = 2.0f - 0.8f) + 0.8f); }
                     moa->flags |= 1;
                 } else {
-                    f32 x, y, z;
                     d = distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
                     { f32 a = angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[i % 3].x, wp->target[i % 3].z);
                     f32 rad;
@@ -974,7 +972,6 @@ static void ext_moamoa_main(void) {
                 moa->timer = 0;
             case 52:
                 {
-                f32 y, t, x, z;
                 t = moa->timer < 200 ? 1.0f : (800 - moa->timer) / 600.0f;
                 if (t < 0.0f) {
                     t = 0.0f;
@@ -984,8 +981,9 @@ static void ext_moamoa_main(void) {
                 y = wp->target[i % 3].y;
                 z = wp->target[i % 3].z;
                 x += t * (moa->gravity * (f32)sin((f32)(i + gp->retraceCount) * 0.25f));
+                                r = i + gp->retraceCount;
                 y += moa->speed * t;
-                z += t * (-moa->gravity * (f32)cos((f32)(i + gp->retraceCount) * 0.25f));
+                z += t * (-moa->gravity * (f32)cos(r * 0.25f));
 
                 pose->mtx[0][3] += (x - pose->mtx[0][3]) / 15.0f;
                 pose->mtx[1][3] += (y - pose->mtx[1][3]) / 15.0f;
@@ -996,7 +994,6 @@ static void ext_moamoa_main(void) {
             case 1:
                 {
                 f32 rad;
-                f32 x, y, z;
                 {
                 f32 a = wp->angle + randf(-45.0f, 45.0f);
                 d = wp->dist;
@@ -1005,11 +1002,12 @@ static void ext_moamoa_main(void) {
                 x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
-                { f32 a1 = randf(1.0f, 1.0f); moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, a1, randf(0.4f, 0.4f)); }
+                moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, randf(1.0f, 1.0f), randf(0.4f, 0.4f));
                                 }
                 break;
             case 2:
-                a = wp->angle + randf(-45.0f, 45.0f) + 180.0f;
+                a = wp->angle + randf(-45.0f, 45.0f);
+                a += 180.0f;
                 d = wp->dist;
                 {
                 f32 rad = 6.2831855f * a / 360.0f;

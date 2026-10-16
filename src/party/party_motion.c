@@ -2087,6 +2087,26 @@ void party_motion_beside_mario(PartyEntry* party) {
     }
 }
 
+static inline void partyJumpWallMove(PartyEntry* party) {
+    Vec v;
+    HitEntry* hit;
+
+    if (party->flags & 0x1000000) {
+        movePos(&v.x, &v.z, party->unk104, party->unk100);
+        return;
+    }
+    v = party->position;
+    hit = partySearchFrontWall(party, &v, party->unk104, party->unk100);
+    if (hit) {
+        party->unk12C = hit;
+        if (party->unk104) {
+            party->unk134 = hit;
+        }
+    }
+    party->position.x = v.x;
+    party->position.z = v.z;
+}
+
 void party_motion_jump(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
@@ -2097,7 +2117,6 @@ void party_motion_jump(PartyEntry* party) {
     f32 lim;
     f32 t, dy, g;
     Vec fl;
-    Vec v;
     f32 s, c;
     f32 x, y, z;
 
@@ -2118,8 +2137,7 @@ void party_motion_jump(PartyEntry* party) {
             movePos(&x, &z, party->unk104, party->unk100);
             party->unk94 = (Vec){x, y, z};
         } else if (!(party->flags3 & 0x400000)) {
-            w = partyGetFootmarkWriteId(id);
-            if (partyGetFootmarkReadId(id) == w) {
+            if (partyGetFootmarkReadId(id) == partyGetFootmarkWriteId(id)) {
                 if (partyGetTargetDist(id, party->position.x, party->position.z) > 2.0f * mario->unk1B4) {
                     dir = partyGetTargetDir(id, party->position.x, party->position.z);
                     getFrontFloor(party, &fl, dir);
@@ -2134,9 +2152,8 @@ void party_motion_jump(PartyEntry* party) {
                 partyGetReadId(id, &x, &y, &z);
                 lim = 50.0f;
                 dist = distABf(party->position.x, party->position.z, x, z);
-                t = 1.4f * (y - party->position.y);
-                if (50.0f > t) {
-                    lim = t;
+                if (50.0f > 1.4f * (y - party->position.y)) {
+                    lim = 1.4f * (y - party->position.y);
                 }
                 sincosf(&s, &c, angleABf(party->position.x, party->position.z, x, z));
                 if (dist > lim) {
@@ -2180,6 +2197,7 @@ void party_motion_jump(PartyEntry* party) {
         if (__fabsf(dy) < 1.0f) {
             dy = 25.0f;
         } else if (dy >= 0.0f) {
+            x = x;
         } else {
             dy = 10.0f;
         }
@@ -2241,20 +2259,7 @@ void party_motion_jump(PartyEntry* party) {
                 break;
             }
         }
-        if (party->flags & 0x1000000) {
-            movePos(&v.x, &v.z, party->unk104, party->unk100);
-            break;
-        }
-        v = party->position;
-        hit = partySearchFrontWall(party, &v, party->unk104, party->unk100);
-        if (hit) {
-            party->unk12C = hit;
-            if (party->unk104) {
-                party->unk134 = hit;
-            }
-        }
-        party->position.x = v.x;
-        party->position.z = v.z;
+        partyJumpWallMove(party);
         break;
     }
 }

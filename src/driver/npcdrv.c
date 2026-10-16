@@ -1082,8 +1082,9 @@ void npcSetTalkPose(const char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    while (*(s8*)name == 0) return;
-    if (!strcmp(name, "(^x^)party")) return;
+    while (( *( (s8*)name )) == 0) { if (1) { } }
+    if (!strcmp(name, "(^x^)party")) { return;
+    }
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
         if (party) {
@@ -1093,6 +1094,7 @@ void npcSetTalkPose(const char* name) {
         party = partyGetPtr(marioGetExtraPartyId());
         if (party) {
             partyChgPoseId(party, 7);
+        return;
         }
     } else if (!strcmp(name, "mario")) {
         marioChgPose(MarioTalkPose);
@@ -1108,8 +1110,9 @@ void npcSetStayPose(const char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    while (*(s8*)name == 0) return;
-    if (!strcmp(name, "(^x^)party")) return;
+    while (( *( (s8*)name )) == 0) { }
+    if (!strcmp(name, "(^x^)party")) { return;
+    return; }
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
         if (party) {
@@ -2116,7 +2119,6 @@ void* fbatHitCheck(u32 flags, void* a1) {
 
     mario = marioGetPtr();
     res.kind = 0;
-    res.dist = 15.0f;
     res.dist = 1000.0f;
     res.bits &= ~1;
     soft = flags & 0x2000;
@@ -2392,6 +2394,10 @@ void* fbatHitCheck(u32 flags, void* a1) {
         *(FbatHitResult*)a1 = res;
     }
     return hit;
+}
+
+void npcStrippedHitPool(f32* f) {
+    f[0] = 15.0f;
 }
 
 NpcEntry* _npcHitCheckSphere(NpcEntry* npc, f32* dist, f32 x, f32 y, f32 z, f32 r) {

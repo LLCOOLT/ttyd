@@ -624,7 +624,7 @@ BOOL SoundDropData(void) {
     }
 
     for (i = 0; i < 2; i++) {
-        SoundDVD* dvd = &sound.dvds[i];
+        SoundDVD* dvd = (0, &sound.dvds[i]);
         if (dvd->flags & 3) {
             AISetStreamPlayState(0);
             dvd->flags = 0;
@@ -1893,7 +1893,7 @@ void SoundSSStopCh(s32 chan) {
     SoundStream* stream;
 
     if (sound.streams[chan].flags) {
-        stream = &sound.streams[chan];
+        stream = (0, &sound.streams[chan]);
         SoundIntOff();
         if (stream->flags & 0x400) {
             sound.slotUsed[stream->slot] = 0;
@@ -1935,7 +1935,7 @@ void SoundSSContinueCh(s32 chan) {
 }
 
 void SoundSSSetPanCh(s32 chan, u8 pan) {
-    SoundStream* stream = &sound.streams[chan];
+    SoundStream* stream = (0, &sound.streams[chan]);
     f32 left, right;
 
     if (stream->flags) {
@@ -2030,7 +2030,7 @@ void SoundSSMain(void) {
     SoundStream* stream;
 
     for (i = 0; (int)i < 3; i++) {
-        stream = &sound.streams[i];
+        stream = (0, &sound.streams[i]);
         if ((stream->flags & 8) && !(stream->flags & 2)) {
             if (stream->flags & 4) {
                 stream->flags &= ~4;

@@ -1008,14 +1008,18 @@ static void ext_moamoa_main(void) {
                 break;
             case 2:
                 {
-                f32 r2 = 6.2831855f * (wp->angle + randf(-45.0f, 45.0f) + 180.0f) / 360.0f;
+                f32 r2;
+                f32 a = wp->angle + randf(-45.0f, 45.0f);
+                a += 180.0f;
+                r2 = 6.2831855f * a / 360.0f;
                 dist = wp->dist;
                 x = 30.0f * moa_sinx(r2) + pose->mtx[0][3];
                 }
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3];
+                grav = randf(0.4f, 0.4f);
                 spd = 2.0f * randf(1.0f, 1.0f);
-                grav = 2.0f * randf(0.4f, 0.4f);
+                grav *= 2.0f;
                 moamoa_jump(pose, moa, dist < 100.0f ? moa->state : 0, 1, x, y, z, spd, grav);
                 break;
             case 3:
@@ -1444,11 +1448,8 @@ USER_FUNC(img_set_color) {
     u8 b = evtGetValue(event, args[3]);
     u8 a = evtGetValue(event, args[4]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
-    GXColor color;
     animPoseSetMaterialFlagOn(img->poseId, 0x40);
-    color = (GXColor){0, 0, 0, 0};
-    color.r = r; color.g = g; color.b = b; color.a = a;
-    animPoseSetMaterialEvtColor(img->poseId, color);
+    animPoseSetMaterialEvtColor(img->poseId, (GXColor){r, g, b, a});
     return EVT_RETURN_DONE;
 }
 

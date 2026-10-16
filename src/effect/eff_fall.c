@@ -180,7 +180,6 @@ static inline f32 fall_cosf(f32 x) {
     return a;
 }
 
-#pragma opt_propagation off
 EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
     const char* sfxName;
     EffectEntry* effect;
@@ -215,7 +214,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     effect->userdata = w;
     effect->callback = effFallMain;
     effect->flags |= 2;
-    sfxName = "SFX_BTL_STAGE_FALL_WATER1\0\0";
+    sfxName = (0, "SFX_BTL_STAGE_FALL_WATER1\0\0");
     w->type = type;
     w->pos.x = x;
     w->pos.y = y;
@@ -323,6 +322,7 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
     }
     return effect;
 }
+#pragma opt_propagation off
 
 void effFallMain(EffectEntry* effect) {
     Vec sndPos;

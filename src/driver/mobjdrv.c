@@ -1148,3 +1148,11 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 }
 
 const char kururinName[] = "MOBJ_KururinFloor";
+
+void mobjStrippedFallPool(MapObjectEntry* entry) {
+    entry->unk5C.y = 0.0f;
+    entry->position.y = 10.0f;
+    entry->position.x = 1.0f;
+    entry->position.z = -1.0f;
+    entry->unk5C.x = -0.5f;
+}

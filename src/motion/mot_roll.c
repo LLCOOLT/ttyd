@@ -1189,3 +1189,21 @@ static void marioRollCan(void) {
         }
     }
 }
+
+void marioRollStrippedPool(void) {
+    MarioWork* mario = marioGetPtr();
+    MF(0x98) = 100.0f;
+    MF(0x9c) = 0.0f;
+    MF(0xa0) = 0.5f;
+    MF(0xa4) = 3.1415927f;
+    MF(0xa8) = 180.0f;
+    MF(0xac) = 6.0f;
+    MF(0xb0) = 5.0f;
+    MF(0xb4) = -4.0f;
+    MF(0xb8) = 90.0f;
+    MF(0xbc) = 270.0f;
+    MF(0xc0) = 360.0f;
+    MF(0xc4) = 10.0f;
+    MF(0xc8) = 135.0f;
+    MF(0xcc) = 1.2f;
+}

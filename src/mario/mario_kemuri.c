@@ -34,17 +34,18 @@ void mario_kemuri_landon(void);
 
 void mario_kemuri_80130474(void) {
     static s32 ct = 8;
-    static s32 left_or_right;
+    static s32 left_or_right = 0;
     MarioWork* mario = marioGetPtr();
     u32 attr;
+    f32 c, s;
 
     attr = 0;
 
     if ((u32)marioStGetSystemLevel() == 0) {
       if (!(mario->flags & 0x01000000)) {
         if (mario->currMotionId == 0x1D) {
-            goto out;
-        }
+            s = s;
+        } else {
         if (mario->currMotionId != 3) {
             if (mario->hitobjStandOn != NULL) {
                 attr = hitGetAttr(mario->hitobjStandOn);
@@ -61,7 +62,6 @@ void mario_kemuri_80130474(void) {
                 mario_kemuri_landon();
             }
             else if (attr & 0x100000) {
-                f32 c, s;
                 mario = marioGetPtr();
                 if (mario->currMotionId != 2 && mario->currMotionId != 1) {
                     ct = 8;
@@ -81,6 +81,7 @@ void mario_kemuri_80130474(void) {
                     kemuri();
                 }
             }
+        }
         }
       }
     }
@@ -125,7 +126,7 @@ void unk_80130374(void) {
 }
 
 void mario_kemuri_landon(void) {
-    static s32 cnt;
+    static s32 cnt = 0;
     static s32 cnt2 = 10;
     MarioWork* mario = marioGetPtr();
     s32 type = 0;
@@ -159,10 +160,10 @@ void mario_kemuri_landon(void) {
 }
 
 void kemuri_mugi(void) {
-    static f32 dir;
+    static f32 dir = 0;
     static s32 ct = 4;
     static s32 ct2 = 10;
-    static s32 left_or_right;
+    static s32 left_or_right = 0;
     MarioWork* mario = marioGetPtr();
 
     if (strncmp(gp->currentMapName, "mri", 3) == 0) {
@@ -203,7 +204,7 @@ void kemuri_mugi(void) {
 }
 
 void kemuri(void) {
-    static f32 dir;
+    static f32 dir = 0;
     static s32 ct = 4;
     MarioWork* mario = marioGetPtr();
     EffectEntry* eff;

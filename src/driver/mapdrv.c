@@ -9,7 +9,10 @@
 #include "driver/offscreendrv.h"
 #include "driver/camdrv.h"
 #include "driver/lightdrv.h"
+#include "driver/shadowdrv.h"
 double sin(double);
+double cos(double);
+static inline f32 sinf(f32 x) { return sin(x); }
 #include <string.h>
 
 extern f32 queen_uv[]; //gxsub.c
@@ -61,12 +64,6 @@ typedef struct MapJointDrawModeEx {
 	u32 lightMask;            // 0x4
 } MapJointDrawModeEx;
 
-//.rodata
-const GXTexMtx texmtx_tbl[10] = {GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9};
-const s32 texfmt_tbl[11] = {4, 5, 6, 14, 0, 1, 2, 3, 8, 9, 10};
-const s32 texwrap_tbl[3] = {GX_CLAMP, GX_REPEAT, GX_MIRROR};
-const s32 palfmt_tbl[2] = {1, 2};
-const GXLightID lightid_tbl[8] = {GX_LIGHT0, GX_LIGHT1, GX_LIGHT2, GX_LIGHT3, GX_LIGHT4, GX_LIGHT5, GX_LIGHT6, GX_LIGHT7};
 
 LightEntry* lightGetPaper(void);
 LightEntry* lightGetPaperCraft(void);
@@ -401,7 +398,20 @@ s32 shadowGetCharShadowProjection(void);
 GXTexObj* shadowGetCharShadowTexObj(void);
 GXColor shadowGetCharShadowColor(void);
 f32 (*shadowGetCharShadowProjTexMtx(void))[4];
+GXTexObj* shadowGetDepthShadowTexObj(void);
+f32 (*shadowGetDepthShadowDepthMtx(void))[4];
+f32 (*shadowGetDepthShadowProjTexMtx(void))[4];
+GXColor shadowGetDepthShadowColor(void);
+ShadowConfig* shadowGetDepthShadowConfig(void);
+GXTexObj* shadowGetRamp8TexObj(void);
+GXTexObj* shadowGetRamp16TexObj(void);
+GXTexObj* shadowGetProjShadowTexObj(void);
+f32 (*shadowGetProjShadowProjTexMtx(void))[4];
+GXColor shadowGetProjShadowColor(void);
+ShadowConfig* shadowGetProjShadowConfig(void);
 void mapSetMaterial(MapObject* obj, void* material);
+void mapResetPaperAmbColor(void);
+static inline void mapResetPaperCraftAmbColor(void);
 
 typedef struct MapObjectDL {
 	u8 field_0x0[0xF4];  // 0x0
@@ -857,8 +867,8 @@ infofound:
 				((s32(*)(const char*, s32, Vec*, Vec*, GXColor*, f32, f32, s32, s32))lightEntry)(light->name, type, &pos, &light->rotation, &lcolor, light->spotAngle, light->attenAngle, light->attenType, lflags);
 			}
 		}
-		paper_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
-		paperCraft_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
+		mapResetPaperAmbColor();
+		mapResetPaperCraftAmbColor();
 		if ((&wo->entries[group])->fogTable != NULL) {
 			wo->entries[group].fogEnable = ((s32*)(&wo->entries[group])->fogTable)[0];
 			wp->entries[group].fogType = ((s32*)(&wo->entries[group])->fogTable)[1];
@@ -1677,6 +1687,7 @@ void mapMain(void) {
 }
 
 void _mapDispMapObj(CameraId cam, MapObject* obj);
+static inline void mapSetObjFog(MapObject* obj);
 void _mapDispMapGrp(CameraId cam, MapObject* obj);
 void _mapDispMapGrp_NoMaterial(CameraId cam, MapObject* obj);
 void mapSetPolygon(MapObject* obj, MapFileMesh* mesh);
@@ -1793,15 +1804,7 @@ setup:
 	if (cull != culling[obj->joints->drawMode->cullMode]) {
 		GXSetCullMode(culling[obj->joints->drawMode->cullMode]);
 	}
-	cur = camGetCurPtr();
-	wp = &mapWork[activeGroup];
-	if ((wp->entries[0].flags & 1) && !(obj->flags & 0x80000)) {
-		GXSetFog((GXFogType)fog_type[wp->entries[0].fogType], wp->entries[0].fogStart, wp->entries[0].fogEnd,
-				 cur->near, cur->far, wp->entries[0].fogColor);
-	}
-	else {
-		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-	}
+	mapSetObjFog(obj);
 	if (obj->flags & 0x20) {
 		if (obj->flags & 0x4000) {
 			goto end;
@@ -2168,13 +2171,44 @@ s32 mapSetLight(MapObject* obj, LightEntry** lights) {
 	return count;
 }
 
+const GXCullMode culling[4] = {GX_CULL_FRONT, GX_CULL_BACK, GX_CULL_ALL, GX_CULL_NONE};
+const GXTexMtx texmtx_tbl[10] = {GX_TEXMTX0, GX_TEXMTX1, GX_TEXMTX2, GX_TEXMTX3, GX_TEXMTX4, GX_TEXMTX5, GX_TEXMTX6, GX_TEXMTX7, GX_TEXMTX8, GX_TEXMTX9};
+const s32 texfmt_tbl[11] = {4, 5, 6, 14, 0, 1, 2, 3, 8, 9, 10};
+const s32 texwrap_tbl[3] = {GX_CLAMP, GX_REPEAT, GX_MIRROR};
+const s32 palfmt_tbl[2] = {1, 2};
+const GXLightID lightid_tbl[8] = {GX_LIGHT0, GX_LIGHT1, GX_LIGHT2, GX_LIGHT3, GX_LIGHT4, GX_LIGHT5, GX_LIGHT6, GX_LIGHT7};
+
+static u32 texture_0[64] ATTRIBUTE_ALIGN(32) = {
+	0xEB88E228, 0x55FFAA00, 0x00000000, 0x00000000,
+	0xF528EC08, 0x55FFAA00, 0x00000000, 0x00000000,
+	0xFEE8F5A8, 0x55FFAA00, 0x00000000, 0x00000000,
+	0xFF47D6E8, 0x00AAFF55, 0x00000000, 0x00000000,
+	0xBEA8860A, 0x00AAFF55, 0x00000000, 0x00000000,
+	0x7DEA0D8B, 0x00AAFF55, 0x00000000, 0x00000000,
+	0x056B054A, 0x00AAAA00, 0x00000000, 0x00000000,
+	0x056B054E, 0x0000AAFF, 0x00000000, 0x00000000,
+	0x05BA0570, 0x55FFAAAA, 0x00000000, 0x00000000,
+	0x05DE05BA, 0x55FFAAAA, 0x00000000, 0x00000000,
+	0x05BD051B, 0x0000AA55, 0x00000000, 0x00000000,
+	0x1376049A, 0x55FFAA00, 0x00000000, 0x00000000,
+	0x33154253, 0x00AA5555, 0x00000000, 0x00000000,
+	0x6A333A53, 0xFFFFAA00, 0x00000000, 0x00000000,
+	0xB1F28212, 0x55FFAA00, 0x00000000, 0x00000000,
+	0xE9F2C212, 0x55FFAA00, 0x00000000, 0x00000000,
+};
+
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 	static f32 scrl_uv[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-	GXTevStageID tevStage;
-	Mtx queen_mtx;
+	GXTexMapID map;
+	GXTexCoordID coord;
+	s32 tevStage;
+	s32 indStages;
 	s32 i;
-	s32 map = texCount;
-	s32 coord = texCount;
+	Mtx queen_mtx;
+
+	map = (GXTexMapID)texCount;
+	coord = (GXTexCoordID)texCount;
+	indStages = 0;
 	
 	if (texCount > 0) {
 		switch (drawMode) {
@@ -2369,7 +2403,7 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 
 			case 8:
 				GXSetTevColor(GX_TEVREG0, (GXColor) {
-					0, (u8)((127.0f * (f32)sin((TWO_PI * (f32)(2 * gp->retraceCount)) / 360.0f)) + 127.0f),
+					0, (u8)((127.0f * sinf((TWO_PI * (f32)(2 * gp->retraceCount)) / 360.0f)) + 127.0f),
 					0, 0}); //TODO: check
 				GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
 				GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -2454,20 +2488,20 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 		GXColor shColor = shadowGetCharShadowColor();
 		Mtx shMtx;
 		PSMTXConcat(shadowGetCharShadowProjTexMtx(), mtx, shMtx);
-		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
 		GXLoadTexMtxImm(shMtx, texmtx_tbl[map], GX_MTX3x4);
 		GXLoadTexObj(shadowGetCharShadowTexObj(), (GXTexMapID)map);
 		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
 		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
-		GXSetTevAlphaIn(tevStage, GX_CA_KONST, GX_CA_KONST, GX_CA_KONST, GX_CA_ZERO);
+		GXSetTevColorIn(tevStage, GX_CC_CPREV, GX_CC_KONST, GX_CC_TEXC, GX_CC_ZERO);
+		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
 		GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
 		GXSetTevKColor(GX_KCOLOR1, shColor);
 		GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_K1);
 		tevStage++;
-		map++;
-		coord++;
+		map = (GXTexMapID)(map + 1);
+		coord = (GXTexCoordID)(coord + 1);
 	}
 
 	if (flags & 0x400) {
@@ -2475,17 +2509,19 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 		GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
 		GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
 		PSMTXConcat(projMtx, mtx, pjMtx);
-		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
 		GXLoadTexMtxImm(pjMtx, texmtx_tbl[map], GX_MTX3x4);
 		GXLoadTexObj(smartTexObj(&projTexObj, projTexImgRef), (GXTexMapID)map);
 		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
 		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_2, GX_TRUE, GX_TEVPREV);
 		GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C1);
 		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
 		GXSetTevSwapMode(tevStage, GX_TEV_SWAP3, GX_TEV_SWAP3);
 		GXSetTevSwapModeTable(GX_TEV_SWAP3, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_RED);
-		GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, 0});
+		GXSetTevColor(GX_TEVREG1, (GXColor){0, 0, 0, 0xFF});
+		map = (GXTexMapID)(map + 1);
+		coord = (GXTexCoordID)(coord + 1);
 		GXSetTevOrder((GXTevStageID)(tevStage + 1), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
 		GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
 		GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -2493,12 +2529,360 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 		GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
 		GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP0);
 		tevStage += 2;
-		map++;
-		coord++;
+	}
+
+	if ((flags & 0x10000) && shadowGetDepthShadowTexObj()) {
+		GXTexObj* depthTex = shadowGetDepthShadowTexObj();
+		MtxPtr depthMtx = shadowGetDepthShadowDepthMtx();
+		MtxPtr projTexMtx = shadowGetDepthShadowProjTexMtx();
+		GXColor depthColor = shadowGetDepthShadowColor();
+		Mtx dsMtx;
+
+		switch ((s32)shadowGetDepthShadowConfig()->format) {
+			case 0:
+				GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp8TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				GXSetTevOrder((GXTevStageID)(tevStage + 1), (GXTexCoordID)(coord + 1), (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 1), GX_CC_CPREV, GX_CC_TEXC, GX_CC_ONE, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)(coord + 1), GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 2);
+				GXSetTevOrder((GXTevStageID)(tevStage + 2), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 2), GX_CC_ZERO, GX_CC_KONST, GX_CC_CPREV, GX_CC_C0);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 2), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevKColor(GX_KCOLOR1, depthColor);
+				GXSetTevKColorSel((GXTevStageID)(tevStage + 2), GX_TEV_KCSEL_K1);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 2), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 2), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				tevStage += 3;
+				break;
+
+			case 1:
+				GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0x00, 0x00, 0x00});
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp8TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				tevStage++;
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 1);
+				break;
+
+			case 2:
+				GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0x00, 0x00, 0x00});
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				tevStage++;
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 1);
+				break;
+
+			case 3:
+				GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_ALPHA, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP1);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp16TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				GXSetTevOrder((GXTevStageID)(tevStage + 1), (GXTexCoordID)(coord + 1), (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 1), GX_CC_CPREV, GX_CC_TEXC, GX_CC_ONE, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_COMP_GR16_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP2);
+				GXSetTexCoordGen2((GXTexCoordID)(coord + 1), GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 2);
+				GXSetTevOrder((GXTevStageID)(tevStage + 2), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 2), GX_CC_ZERO, GX_CC_KONST, GX_CC_CPREV, GX_CC_C0);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 2), GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevKColor(GX_KCOLOR1, depthColor);
+				GXSetTevKColorSel((GXTevStageID)(tevStage + 2), GX_TEV_KCSEL_K1);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 2), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_A0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 2), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				tevStage += 3;
+				break;
+
+			case 4:
+				GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0xFF, 0x00, 0x00});
+				GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_ALPHA, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP1);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp16TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				tevStage++;
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 1);
+				break;
+
+			case 5:
+				GXSetTevColor(GX_TEVREG1, (GXColor){0xFF, 0xFF, 0x00, 0x00});
+				GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_TEXC, GX_CC_C1, GX_CC_ZERO);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP1);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				tevStage++;
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 1);
+				break;
+		}
+	}
+
+	if ((flags & 0x20000) && shadowGetProjShadowTexObj()) {
+		GXTexObj* projTex = shadowGetProjShadowTexObj();
+		MtxPtr projTexMtx = shadowGetProjShadowProjTexMtx();
+		GXColor projColor = shadowGetProjShadowColor();
+		Mtx psMtx;
+
+		shadowGetProjShadowConfig();
+		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+		GXSetTevColorIn(tevStage, GX_CC_CPREV, GX_CC_KONST, GX_CC_TEXA, GX_CC_ZERO);
+		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_KONST, GX_CA_TEXA, GX_CA_APREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXLoadTexObj(projTex, (GXTexMapID)map);
+		PSMTXConcat(projTexMtx, mtx, psMtx);
+		GXLoadTexMtxImm(psMtx, texmtx_tbl[map], GX_MTX3x4);
+		GXSetTevKColor(GX_KCOLOR1, projColor);
+		GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_K1);
+		GXSetTevKAlphaSel(tevStage, GX_TEV_KASEL_K1_A);
+		tevStage++;
+		map = (GXTexMapID)(map + 1);
+		coord = (GXTexCoordID)(coord + 1);
+	}
+
+	if ((flags & 0x40000) && shadowGetDepthShadowTexObj()) {
+		GXTexObj* depthTex = shadowGetDepthShadowTexObj();
+		MtxPtr depthMtx = shadowGetDepthShadowDepthMtx();
+		MtxPtr projTexMtx = shadowGetDepthShadowProjTexMtx();
+		GXColor depthColor = shadowGetDepthShadowColor();
+		Mtx dsMtx;
+
+		switch ((s32)shadowGetDepthShadowConfig()->format) {
+			case 0:
+				GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp8TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				GXSetTevOrder((GXTevStageID)(tevStage + 1), (GXTexCoordID)(coord + 1), (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 1), GX_CC_CPREV, GX_CC_TEXC, GX_CC_ONE, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_COMP_R8_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTexCoordGen2((GXTexCoordID)(coord + 1), GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 2);
+				GXSetTevOrder((GXTevStageID)(tevStage + 2), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 2), GX_CC_C0, GX_CC_KONST, GX_CC_CPREV, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 2), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 2), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTevKColor(GX_KCOLOR1, depthColor);
+				GXSetTevKColorSel((GXTevStageID)(tevStage + 2), GX_TEV_KCSEL_K1);
+				GXSetTevKAlphaSel((GXTevStageID)(tevStage + 2), GX_TEV_KASEL_K1_A);
+				tevStage += 3;
+				break;
+
+			case 3:
+				GXSetTevColorOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage - 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
+				GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_ALPHA, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevSwapModeTable(GX_TEV_SWAP2, GX_CH_ALPHA, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
+				GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn(tevStage, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+				GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP1);
+				GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(shadowGetRamp16TexObj(), (GXTexMapID)map);
+				PSMTXConcat(depthMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				GXSetTevOrder((GXTevStageID)(tevStage + 1), (GXTexCoordID)(coord + 1), (GXTexMapID)map, GX_COLOR_NULL);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 1), GX_CC_CPREV, GX_CC_TEXC, GX_CC_ONE, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 1), GX_TEV_COMP_GR16_GT, GX_TB_ZERO, GX_CS_SCALE_1, GX_FALSE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 1), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 1), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 1), GX_TEV_SWAP0, GX_TEV_SWAP2);
+				GXSetTexCoordGen2((GXTexCoordID)(coord + 1), GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+				GXLoadTexObj(depthTex, (GXTexMapID)map);
+				PSMTXConcat(projTexMtx, mtx, dsMtx);
+				GXLoadTexMtxImm(dsMtx, texmtx_tbl[map], GX_MTX3x4);
+				map = (GXTexMapID)(map + 1);
+				coord = (GXTexCoordID)(coord + 2);
+				GXSetTevOrder((GXTevStageID)(tevStage + 2), GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
+				GXSetTevColorIn((GXTevStageID)(tevStage + 2), GX_CC_C0, GX_CC_KONST, GX_CC_CPREV, GX_CC_ZERO);
+				GXSetTevColorOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevAlphaIn((GXTevStageID)(tevStage + 2), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_KONST);
+				GXSetTevAlphaOp((GXTevStageID)(tevStage + 2), GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+				GXSetTevSwapMode((GXTevStageID)(tevStage + 2), GX_TEV_SWAP0, GX_TEV_SWAP0);
+				GXSetTevKColor(GX_KCOLOR1, depthColor);
+				GXSetTevKColorSel((GXTevStageID)(tevStage + 2), GX_TEV_KCSEL_K1);
+				GXSetTevKAlphaSel((GXTevStageID)(tevStage + 2), GX_TEV_KASEL_K1_A);
+				tevStage += 3;
+				break;
+		}
+	}
+
+	if (flags & 0x80100000) {
+		s32 r, g, b, a;
+		f32 pulse;
+
+		if (flags & 0x100000) {
+			r = current_mp->color.r;
+			g = current_mp->color.g;
+			b = current_mp->color.b;
+			a = current_mp->color.a;
+		}
+		else {
+			r = 0xF0;
+			g = 0xF0;
+			b = 0x64;
+			pulse = cos((1.5707964f * gp->retraceCount) / 20.0f);
+			a = (u8)(64.0f * (1.0f - pulse) * 0.5f + 64.0f);
+		}
+		GXSetTevOrder(tevStage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn(tevStage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_KONST);
+		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+		GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+		GXSetTevKColor(GX_KCOLOR1, (GXColor){r * a / 255, g * a / 255, b * a / 255, 0xFF});
+		GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_K1);
+		tevStage++;
+	}
+
+	if (flags & 0x800000) {
+		Vec camPos = {0.0f, 0.0f, 1.0f};
+		Vec camUp = {0.0f, 1.0f, 0.0f};
+		Vec target = {0.0f, 0.0f, 0.0f};
+		GXTexObj waveTex;
+		Mtx lookMtx;
+		Mtx texMtx;
+		s32 level;
+		f32 pulse;
+
+		pulse = cos((1.5707964f * gp->retraceCount) / 30.0f);
+		level = 127.0f * (1.0f - pulse) * 0.5f + 128.0f;
+		GXInitTexObj(&waveTex, texture_0, 4, 64, GX_TF_CMPR, GX_CLAMP, GX_REPEAT, GX_FALSE);
+		GXLoadTexObj(&waveTex, (GXTexMapID)map);
+		C_MTXLightOrtho(texMtx, -2.0f, 2.0f, -2.0f, 2.0f, 0.5f, 0.5f, 0.5f, gp->retraceCount / 50.0f);
+		C_MTXLookAt(lookMtx, &camPos, &camUp, &target);
+		PSMTXConcat(texMtx, lookMtx, texMtx);
+		GXLoadTexMtxImm(texMtx, texmtx_tbl[map], GX_MTX3x4);
+		GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
+		GXSetTevOrder(tevStage, (GXTexCoordID)coord, (GXTexMapID)map, GX_COLOR_NULL);
+		GXSetTevColorOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevAlphaOp(tevStage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
+		GXSetTevColorIn(tevStage, GX_CC_TEXC, GX_CC_CPREV, GX_CC_KONST, GX_CC_ZERO);
+		GXSetTevAlphaIn(tevStage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+		GXSetTevSwapMode(tevStage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+		GXSetTevKColor(GX_KCOLOR1, (GXColor){level, level, level, 0xFF});
+		GXSetTevKColorSel(tevStage, GX_TEV_KCSEL_K1);
+		tevStage++;
+		map = (GXTexMapID)(map + 1);
+		coord = (GXTexCoordID)(coord + 1);
+	}
+
+	if (flags & 0xF000000) {
+		MapTevCallbackInfo info;
+		MapTevCallback callback;
+
+		*(MapObject**)info.field_0x0 = current_mp;
+		info.mtx = mtx;
+		*(s32*)info.field_0x8 = drawMode;
+		info.tevStage = tevStage;
+		info.texCoord = map;
+		info.texMap = coord;
+		info.field_0x18 = 0;
+		callback = ((MapTevCallback*)((u8*)&mapWork[activeGroup] + offsetof(MapEntry, tevCallbacks)))[(u32)flags >> 24];
+		if (callback) {
+			callback(&info);
+		}
+		tevStage = info.tevStage;
+		coord = info.texMap;
+		indStages = info.field_0x18;
 	}
 
 	GXSetNumTexGens((u8)coord);
 	GXSetNumTevStages((u8)tevStage);
+	GXSetNumIndStages((u8)indStages);
 }
 
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2) {
@@ -2540,6 +2924,19 @@ void mapSetMaterialFog(void) {
 	MapWork* wp = mapGetWork();
 
 	if (wp->entries[0].flags & 1) {
+		GXSetFog((GXFogType)fog_type[wp->entries[0].fogType], wp->entries[0].fogStart, wp->entries[0].fogEnd,
+				 camera->near, camera->far, wp->entries[0].fogColor);
+	}
+	else {
+		GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	}
+}
+
+static inline void mapSetObjFog(MapObject* obj) {
+	CameraEntry* camera = camGetCurPtr();
+	MapWork* wp = mapGetWork();
+
+	if ((wp->entries[0].flags & 1) && !(obj->flags & 0x80000)) {
 		GXSetFog((GXFogType)fog_type[wp->entries[0].fogType], wp->entries[0].fogStart, wp->entries[0].fogEnd,
 				 camera->near, camera->far, wp->entries[0].fogColor);
 	}
@@ -2771,6 +3168,10 @@ void mapResetPaperAmbColor(void) {
 	paper_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
 }
 
+static inline void mapResetPaperCraftAmbColor(void) {
+	paperCraft_ambient = (GXColor){0x70, 0x70, 0x70, 0xFF};
+}
+
 void mapSetMaterialLight(s32 flags, Vec position) {
 	GXColor matColor = {0xFF, 0xFF, 0xFF, 0xFF};
 	GXColor ambColor = {0x00, 0x00, 0x00, 0xFF};
@@ -2931,7 +3332,6 @@ typedef struct MapRawDL {
 	MapVtxRec vtx[];  // 0x4
 } MapRawDL;
 
-const GXCullMode culling[4] = {GX_CULL_FRONT, GX_CULL_BACK, GX_CULL_ALL, GX_CULL_NONE};
 const GXVtxAttrFmtList attr_fmt[12] = {
 	{GX_VA_POS, GX_POS_XYZ, GX_F32, 0},
 	{GX_VA_NRM, GX_NRM_XYZ, GX_F32, 0},
@@ -3629,14 +4029,7 @@ void mapObjSetFlushColor(const char* name, u8 r, u8 g, u8 b, u8 a) {
 }
 
 void mapGrpSetFlushColor(const char* name, u8 r, u8 g, u8 b, u8 a) {
-	GXColor color = {0};
-
-	color.r = r;
-	color.g = g;
-	color.b = b;
-	color.a = a;
-
-	mapGrpSetColor(name, color);
+	mapGrpSetColor(name, (GXColor){r, g, b, a});
 	mapGrpFlagOff(name, 0x40);
 }
 
@@ -3656,3 +4049,27 @@ void mapObjGetFlushColor(const char* name, u8* r, u8* g, u8* b, u8* a) {
 	*b = obj->color.b;
 	*a = obj->color.a;
 }
+
+// Stand-in for a function the original linker dead-stripped; it only keeps the
+// constants that function left behind in .rodata/.sdata2 in their original order.
+void mapStrippedPool(const char** str, f32* val) {
+	str[0] = ".";
+	val[0] = 3.0f;
+	val[1] = 0.0f;
+	val[2] = 0.5f;
+	val[3] = 2.0f;
+	str[1] = "%s/m/%s/d";
+	str[2] = "information";
+	str[3] = "ver1.01";
+	str[4] = "ver1.02";
+	str[5] = "--/--/-- --:--:--";
+	str[6] = "\x83\x52\x83\x93\x83\x6F\x81\x5B\x83\x67\x82\xB3\x82\xEA\x82\xC4\x82\xA2\x82\xDC\x82\xB9\x82\xF1";
+	str[7] = "animation_table";
+	str[8] = "curve_table";
+}
+
+#pragma force_active on
+#pragma explicit_zero_data on
+__declspec(section ".sdata") u32 gap_07_8040F3F4_sdata[3] = {0};
+#pragma explicit_zero_data reset
+#pragma force_active reset

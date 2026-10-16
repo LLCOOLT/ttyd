@@ -458,11 +458,33 @@ void unk_800d06b4(const char* src, char* dst) {
 	dst[i * 2] = 0;
 }
 
+static inline void pouchAiueoConv(const char* src, char* dst) {
+	u16* s = (u16*)src;
+	s32 len = strlen(src) / 2;
+	u16* d = (u16*)dst;
+	u16 c;
+	s32 i;
+	for (i = 0; i < len; i++) {
+		c = *s;
+		if (c >= 0x829F && c < 0x82DE) {
+			c += 0xA1;
+		}
+		else if (c >= 0x82DE && c <= 0x82F1) {
+			c += 0xA2;
+		}
+		*d = c;
+		s++;
+		d++;
+	}
+	dst[i * 2] = 0;
+}
+
 s32 comp_aiueo(s16* a, s16* b) {
 	 const char * new_var ;
 	char bufA[0x80]; char bufB [0x80];
 	s16 ia ;
 	s16 ib = *b;
+	// ia is read before it is set; this matches the target, keep it.
 	const char* nA = itemDataTable[0, ia].name;
 	const char* nB;
 	nA =msgSearch(nA); unk_800d06b4 (new_var = nA , bufA);
@@ -486,11 +508,9 @@ s32 comp_aiueo_r(s16* a, s16* b) {
 	char bufB[0x80];
 	s16 ia = *a;
 	s16 ib = *b;
-	const char* nA = itemDataTable[ia].name;
-	const char* nB;
-	unk_800d06b4(msgSearch(nA), bufA);
-	nB = itemDataTable[ib].name;
-	unk_800d06b4(msgSearch(itemDataTable[ib].name), bufB);
+
+	pouchAiueoConv(msgSearch(itemDataTable[ia].name), bufA);
+	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
 	return strcmp(bufB, bufA);
 }
 

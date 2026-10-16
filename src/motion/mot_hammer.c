@@ -24,6 +24,7 @@ f32 toMovedir2(f32 angle, f32 off);
 void* mobjHitObjPtrToPtr(HitEntry* hit);
 USER_FUNC(evt_cam_shake);
 HitEntry* hitEstimate(s32* out);
+static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz);
 void marioChgMotSub(s32 a, s32 b);
 s32 marioGetRub(s32 mask, s32* a, s32* b, f32* c);
 
@@ -164,11 +165,8 @@ void mot_hammer(void) {
 		}
 		if (kind != 0) {
 			{
-				s32 v = 3;
-				if (kind != 7) {
-					v = kind;
-				}
-				MI(0x2A0) = v;
+				s32 k = kind;
+				MI(0x2A0) = k == 7 ? 3 : k;
 			}
 			mario->flags |= 0x800;
 		} else {
@@ -212,9 +210,8 @@ void mot_hammer(void) {
 			done = 1;
 		}
 	} else {
-		s32 t = MI(0x48);
-		n = t <= 10 ? t : 10;
-		if (t == 10) {
+		n = MI(0x48) <= 10 ? MI(0x48) : 10;
+		if (MI(0x48) == 10) {
 			done = 1;
 		}
 	}
@@ -573,12 +570,7 @@ void mot_hammer2(void) {
 		MS(0x2A4) = 10;
 		mario->dispFlags |= 0x100;
 		ang2 = revise360(270.0f - MF(0x1A8));
-		{
-			MarioWork* m = marioGetPtr();
-			sincosf(&s, &co, ang2);
-			len = 2.0f * *(f32*)((u8*)m + 0x1B4);
-			hit = hitCheckFilter(0, &hx, &hy, &hz, &len, &nx, &ny, &nz, m->position.x, 0.5f * *(f32*)((u8*)m + 0x1B8) + m->position.y, m->position.z, s, 0.0f, co);
-		}
+		hit = hammerHitWall(ang2, &s, &co, &len, &hx, &hy, &hz, &nx, &ny, &nz);
 		if (hit && (hitGetAttr(hit) & 0x800005)) {
 			ang = ang;
 		}
@@ -596,16 +588,17 @@ void mot_hammer2(void) {
 		if (MB(0x42) > 2 && MI(0x48) == 10) {
 			H2_CLR_PAPER()
 		}
-		if (MI(0x48) <= 0) {
-			if (MB(0x42) <= 2) {
-				MI(0x48) = sysMsec2Frame(300);
-			} else {
-				MF(0x1A8) = revise360(MF(0x1A8));
-				marioAdjustMoveDir();
-				MI(0x48) = 30;
-			}
-			MI(0x44) = 22;
+		if (MI(0x48) > 0) {
+			break;
 		}
+		if (MB(0x42) <= 2) {
+			MI(0x48) = sysMsec2Frame(300);
+		} else {
+			MF(0x1A8) = revise360(MF(0x1A8));
+			marioAdjustMoveDir();
+			MI(0x48) = 30;
+		}
+		MI(0x44) = 22;
 	case 22:
 		if (--MI(0x48) > 0) {
 			break;
@@ -807,3 +800,10 @@ static const char isS2_str[] = "MOBJ_Lv2Block";
 static const char isB2_str[] = "MOBJ_Lv2BigBlock";
 static const char isS3_str[] = "MOBJ_Lv3Block";
 static const char isB3_str[] = "MOBJ_Lv3BigBlock";
+
+static HitEntry* hammerHitWall(f32 ang, f32* s, f32* co, f32* len, f32* hx, f32* hy, f32* hz, f32* nx, f32* ny, f32* nz) {
+	MarioWork* m = marioGetPtr();
+	sincosf(s, co, ang);
+	*len = 2.0f * *(f32*)((u8*)m + 0x1B4);
+	return hitCheckFilter(0, hx, hy, hz, len, nx, ny, nz, m->position.x, 0.5f * *(f32*)((u8*)m + 0x1B8) + m->position.y, m->position.z, *s, 0.0f, *co);
+}

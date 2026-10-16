@@ -160,16 +160,14 @@ static inline f32 planeDir(MarioWork* mp) {
 
 static inline void
 planeRoll1(MarioWork* mp, f32 rate, f32 max) {
-	f32 cur = MW(mp, 0x2a4, f32);
-	max *= DIRF(mp);
-	max -= cur;
-	rate = rate * max + cur;
-	MW(mp, 0x2a4, f32) = rate;
+	f32* p = &MW(mp, 0x2a4, f32);
+	f32 m = max * DIRF(mp);
+	*p += rate * (m - *p);
 }
 
 static inline void planeRoll2(MarioWork* mp, f32 rate, f32 max) {
-	max = max * DIRF(mp) - MW(mp, 0x2a4, f32);
-	MW(mp, 0x2a4, f32) += rate * max;
+	f32* p = &MW(mp, 0x2a4, f32);
+	*p += rate * (max * DIRF(mp) - *p);
 }
 
 void mot_plane(void) {
@@ -381,7 +379,7 @@ void mot_plane(void) {
 		SFX3D(0x180, &MW(mp, 0x8c, Vec));
 		allPartyRideOff2();
 	case 80:
-		planeRoll1(mp, 0.3f, 28.0f);
+		planeRoll2(mp, 0.3f, 28.0f);
 		MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 		marioMakeJumpPara();
 		MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
@@ -399,7 +397,7 @@ void mot_plane(void) {
 		break;
 	case 90:
 		if (MW(mp, 0x48, s32) > 0) {
-			planeRoll1(mp, 0.3f, 28.0f);
+			planeRoll2(mp, 0.3f, 28.0f);
 			MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
 			if (--MW(mp, 0x48, s32) <= 0) {
 				MW(mp, 4, u32) &= ~0x100;
