@@ -557,6 +557,7 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
   f32 nz0;
   f32 ny0;
   f32 nx0;
+  float new_var;
   f32 hz0;
   f32 hy0;
   f32 hx0;
@@ -601,7 +602,8 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     if ((t.z && t.z) && t.z)
     {
     }
-    hit = hitCheckFilter((void *) 0, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + 10.0f, t.z, zero, one, zero);
+    new_var = 10.0f;
+    hit = hitCheckFilter((void *) 0, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + new_var, t.z, zero, one, zero);
     if (hit && (best >= d0))
     {
       best = d0;
@@ -614,7 +616,7 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     lz = pz - ox;
     t = (Vec){lx, ly, lz};
     d1 = best;
-    hit = hitCheckFilter((void *) 0, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + 10.0f, t.z, zero, one, zero);
+    hit = hitCheckFilter((void *) 0, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + new_var, t.z, zero, one, zero);
     if (hit && (best >= d1))
     {
       best = d1;
@@ -627,7 +629,8 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
       t = (Vec){lx, ly, lz};
       if ((t.z && t.z) && t.z) { }
       d2 = best;
-      hit = hitCheckFilter((void *) 0, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + 10.0f, t.z, zero, one, zero);
+      new_var = 10.0f;
+      hit = hitCheckFilter((void *) 0, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + new_var, t.z, zero, one, zero);
       if (hit && (best >= d2))
       {
         best = d2;
@@ -639,7 +642,7 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
         lz = pz - oz;
         t = (Vec){lx, ly, lz};
         d3 = best;
-        hit = hitCheckFilter((void *) 0, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + 10.0f, t.z, zero, one, zero);
+        hit = hitCheckFilter((void *) 0, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + new_var, t.z, zero, one, zero);
         if (hit && (best >= d3))
         {
           best = d3;

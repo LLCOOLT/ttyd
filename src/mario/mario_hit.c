@@ -1139,23 +1139,33 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     Vec dir;
     Vec outPos;
     Vec outNrm;
-    f32 yl, d0, sx, sz, x0, z0, a;
+    f32 nsx;
+    f32 yl;
+    f32 d0;
+    f32 sx;
+    f32 sz;
+    f32 x0;
+    f32 z0;
+    f32 a;
     f32 sn;
     f32 dist;
+    f32 py;
     f32 x, z;
     s32 i;
     HitEntry* hit;
+    void* vp;
     MarioWork* w = marioGetPtr();
+    vp = (void*)y;
     MF(w, 0x218, f32) = 0.0f;
     MF(w, 0x21c, f32) = 0.0f;
     MF(w, 0x220, f32) = 0.0f;
     MF(w, 0x214, f32) = 0.0f;
     if (w->flags & 0x200) {
-        *y = w->position.y;
+        *((f32*)vp) = w->position.y;
         return NULL;
     }
     if (w->flags & 0x100) {
-        *y = w->position.y;
+        *((f32*)vp) = w->position.y;
         return NULL;
     }
     d0 = 0.1f + __fabsf(spd);
@@ -1170,8 +1180,9 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
     sx = 0.25f * (MF(w, 0x1b4, f32) * sn);
     sn = (f32)cos(a);
     sz = 0.25f * (MF(w, 0x1b4, f32) * -sn);
+    nsx = -sx;
     d0 = yl + d0;
-    yl = (w->position.y + ofs) + yl;
+    py = w->position.y + ofs;
     x0 = w->position.x;
     z0 = w->position.z;
     {
@@ -1187,23 +1198,23 @@ HitEntry* marioChkLandon2(f32* y, f32 spd, f32 ofs) {
             z = sz;
         } else if (i == 3) {
             x = sz;
-            z = -sx;
+            z = nsx;
         } else if (i == 4) {
-            x = -sx;
+            x = nsx;
             z = -sz;
         }
         {
             Vec v = {0.0f, 0.0f, 0.0f};
             v.x = x0 + x;
-            v.y = yl;
+            v.y = py + yl;
             v.z = z0 + z;
             dist = d0;
             hit = marioHitCheckVecInl(&v, &dir, &outPos, &outNrm, &dist);
         }
         if (hit) {
             MF(w, 0x214, f32) = marioHitNrmAnglePtr(&outNrm);
-            if (__fabsf((s32)(100.0f * ((yl - outPos.y) - dist) + 0.5f) / 100.0f) < 0.1f) {
-                *y = outPos.y;
+            if (__fabsf((s32)(100.0f * (((py + yl) - outPos.y) - dist) + 0.5f) / 100.0f) < 0.1f) {
+                *((f32*)vp) = outPos.y;
                 return hit;
             }
         }
@@ -1254,6 +1265,10 @@ static inline f32 marioGetHeightInl(void) {
         }
     }
     return ph;
+}
+
+void marioHitStrippedPool2(f32* f) {
+    f[0] = 18.0f;
 }
 
 f32 marioChkOverhead(void) {
@@ -1399,7 +1414,9 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     f32 x, z;
     HitEntry* hit;
     s32 i;
+    void* vp;
     MarioWork* w = marioGetPtr();
+    vp = (void*)h;
     if (MF(w, 0x180, f32)) {
         hh = MF(w, 0x1a0, f32);
     } else {
@@ -1410,10 +1427,10 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
     sx = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * sx);
     sz = cos(ang);
     sz = 0.5f * ((MF(w, 0x1b4, f32) - 0.5f) * -sz);
-    a = *h;
+    a = *((f32*)vp);
     hh = 0.5f * a;
     top = a + dd;
-    *h = -1.0f;
+    *((f32*)vp) = -1.0f;
     for (i = 0; i < 5; i++) {
         if (i == 0) {
             z = x = 0.0f;
@@ -1456,10 +1473,10 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
                 outPos.y = outPos.y - 0.05f * a;
                 if (pos->y + a >= outPos.y) {
                     pos->y = outPos.y;
-                    *h = 0.0f;
+                    *((f32*)vp) = 0.0f;
                     return hit;
                 }
-                *h = outPos.y - pos->y - a;
+                *((f32*)vp) = outPos.y - pos->y - a;
                 return NULL;
             }
         } else {
@@ -1467,10 +1484,10 @@ HitEntry* marioSearchHead(Vec* pos, f32* h, f32 dd) {
                 outPos.y = (s32)(100.0f * outPos.y + hh) / 100.0f;
                 if (pos->y + a >= outPos.y) {
                     pos->y = outPos.y;
-                    *h = 0.0f;
+                    *((f32*)vp) = 0.0f;
                     return hit;
                 }
-                *h = outPos.y - pos->y - a;
+                *((f32*)vp) = outPos.y - pos->y - a;
                 return NULL;
             }
         }
@@ -2187,6 +2204,14 @@ HitEntry* marioChkFrontStep(f32* y, f32* h, f32* ang) {
     return NULL;
 }
 
+void marioHitStrippedPool(f32* f) {
+    f[0] = 0.75f;
+    f[1] = -1.0f;
+    f[2] = 3.1415927f;
+    f[3] = 0.1f;
+    f[4] = 2.0f;
+}
+
 extern s32 kpaGetStageViewType(void);
 BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     Vec hi;
@@ -2194,7 +2219,6 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     Vec d;
     Vec acc;
     Vec saved;
-    Vec dd;
     Vec base2;
     Vec base;
     f32 s, c;
@@ -2202,6 +2226,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
     f32 a;
     f32 half;
     f32 d1, d2;
+    Vec dd;
     f32 lim;
     f32 step;
     s32 i;
@@ -2251,7 +2276,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
             sincosf(&s2, &c2, 180.0f + a);
             t = __fabsf(half - d1);
             hitAny = TRUE;
-            acc.x += s2 * t;
+            acc.x += t * s2;
             acc.z += c2 * t;
         }
         a += step;
@@ -2312,7 +2337,7 @@ BOOL marioChkWallAround(Vec* pos, void* p, f32 unused, f32 dir, f32 w, f32 h) {
             sincosf(&s2, &c2, 180.0f + a);
             t = __fabsf(half - d1);
             hitAny = TRUE;
-            acc.x += s2 * t;
+            acc.x += t * s2;
             acc.z += c2 * t;
         }
         a += step;

@@ -436,9 +436,10 @@ void battleAcDelete_SignalTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
-    s32 i;
     BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w;
+    s32 i;
     s32 count;
     s32 next;
     s32 n;
@@ -453,7 +454,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     Mtx mScale;
 
     camGetPtr(8);
-    w = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC));
+    w = (SignalTimingWork*)((u8*)ac + 0x2BC);
     count = ST_COUNT(work);
     next = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC))->next;
     if (!(ST_FLAGS(work) & 1)) {

@@ -327,9 +327,9 @@ void effFlameMain(EffectEntry* effect) {
 #pragma push
 #pragma opt_dead_assignments off
 void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
-    s32 type;
     s32 alpha;
-    EffFlameN64Work* work;
+    s32 type;
+    EffFlameN64Work* work[1];
     CameraEntry* camera;
     Mtx rot;
     Mtx scl;
@@ -338,9 +338,9 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
     GXTexObj texObj;
 
     camera = camGetPtr(cameraId);
-    work = effect->userdata;
-    type = work->type;
-    alpha = work->alpha;
+    work[0] = effect->userdata;
+    type = work[0]->type;
+    alpha = work[0]->alpha;
     GXSetNumChans(0);
     GXSetNumTexGens(2);
     GXSetTexCoordGen2(0, 1, 4, 30, 0, 125);
@@ -411,90 +411,90 @@ void effFlameDisp(CameraId cameraId, EffectEntry* effect) {
     default:
         break;
     }
-    PSMTXTrans(trn, work->position.x, work->position.y, work->position.z);
+    PSMTXTrans(trn, work[0]->position.x, work[0]->position.y, work[0]->position.z);
     if (type == 2) {
-        PSMTXRotRad(rot, 'y', 0.017453292f * work->rot);
+        PSMTXRotRad(rot, 'y', 0.017453292f * work[0]->rot);
     } else {
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     }
     PSMTXConcat(trn, rot, mtx);
-    PSMTXScale(scl, work->sx, work->sy, 1.0f);
+    PSMTXScale(scl, work[0]->sx, work[0]->sy, 1.0f);
     PSMTXConcat(mtx, scl, mtx);
     if (type == 0) {
-        PSMTXTrans(trn, 10.0f * (-(work->sx - work->sz) / work->sz), 0.0f, 0.0f);
+        PSMTXTrans(trn, 10.0f * (-(work[0]->sx - work[0]->sz) / work[0]->sz), 0.0f, 0.0f);
         PSMTXConcat(mtx, trn, mtx);
     }
     switch (type) {
     case 0:
-        xf(mtx, &work->vtx[2], &stg_flame_v[2]);
-        xf(mtx, &work->vtx[3], &stg_flame_v[3]);
-        xf(mtx, &work->vtx[6], &stg_flame_v[6]);
-        xf(mtx, &work->vtx[7], &stg_flame_v[7]);
+        xf(mtx, &work[0]->vtx[2], &stg_flame_v[2]);
+        xf(mtx, &work[0]->vtx[3], &stg_flame_v[3]);
+        xf(mtx, &work[0]->vtx[6], &stg_flame_v[6]);
+        xf(mtx, &work[0]->vtx[7], &stg_flame_v[7]);
         break;
     case 1:
-        xf(mtx, &work->vtx[2], &stg_flame_3_v[2]);
-        xf(mtx, &work->vtx[3], &stg_flame_3_v[3]);
-        xf(mtx, &work->vtx[6], &stg_flame_3_v[6]);
-        xf(mtx, &work->vtx[7], &stg_flame_3_v[7]);
+        xf(mtx, &work[0]->vtx[2], &stg_flame_3_v[2]);
+        xf(mtx, &work[0]->vtx[3], &stg_flame_3_v[3]);
+        xf(mtx, &work[0]->vtx[6], &stg_flame_3_v[6]);
+        xf(mtx, &work[0]->vtx[7], &stg_flame_3_v[7]);
         break;
     default:
-        xf(mtx, &work->vtx[2], &stg_flame_2_v[2]);
-        xf(mtx, &work->vtx[3], &stg_flame_2_v[3]);
-        xf(mtx, &work->vtx[6], &stg_flame_2_v[6]);
-        xf(mtx, &work->vtx[7], &stg_flame_2_v[7]);
+        xf(mtx, &work[0]->vtx[2], &stg_flame_2_v[2]);
+        xf(mtx, &work[0]->vtx[3], &stg_flame_2_v[3]);
+        xf(mtx, &work[0]->vtx[6], &stg_flame_2_v[6]);
+        xf(mtx, &work[0]->vtx[7], &stg_flame_2_v[7]);
         break;
     }
-    PSMTXTrans(trn, work->position.x, work->position.y, work->position.z);
+    PSMTXTrans(trn, work[0]->position.x, work[0]->position.y, work[0]->position.z);
     if (type == 2) {
-        PSMTXRotRad(rot, 'y', 0.017453292f * work->rot);
+        PSMTXRotRad(rot, 'y', 0.017453292f * work[0]->rot);
     } else {
         PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(CAMERA_3D)->viewYaw);
     }
     PSMTXConcat(trn, rot, mtx);
-    PSMTXScale(scl, work->sx, work->sy, 1.0f);
+    PSMTXScale(scl, work[0]->sx, work[0]->sy, 1.0f);
     PSMTXConcat(mtx, scl, mtx);
     if (type == 0) {
-        PSMTXTrans(trn, 10.0f * (-(work->sx - work->sz) / work->sz), 0.0f, 0.0f);
+        PSMTXTrans(trn, 10.0f * (-(work[0]->sx - work[0]->sz) / work[0]->sz), 0.0f, 0.0f);
         PSMTXConcat(mtx, trn, mtx);
     }
     switch (type) {
     case 0:
-        xf(mtx, &work->vtx[0], &stg_flame_v[0]);
-        xf(mtx, &work->vtx[1], &stg_flame_v[1]);
-        xf(mtx, &work->vtx[4], &stg_flame_v[4]);
-        xf(mtx, &work->vtx[5], &stg_flame_v[5]);
+        xf(mtx, &work[0]->vtx[0], &stg_flame_v[0]);
+        xf(mtx, &work[0]->vtx[1], &stg_flame_v[1]);
+        xf(mtx, &work[0]->vtx[4], &stg_flame_v[4]);
+        xf(mtx, &work[0]->vtx[5], &stg_flame_v[5]);
         break;
     case 1:
-        xf(mtx, &work->vtx[0], &stg_flame_3_v[0]);
-        xf(mtx, &work->vtx[1], &stg_flame_3_v[1]);
-        xf(mtx, &work->vtx[4], &stg_flame_3_v[4]);
-        xf(mtx, &work->vtx[5], &stg_flame_3_v[5]);
+        xf(mtx, &work[0]->vtx[0], &stg_flame_3_v[0]);
+        xf(mtx, &work[0]->vtx[1], &stg_flame_3_v[1]);
+        xf(mtx, &work[0]->vtx[4], &stg_flame_3_v[4]);
+        xf(mtx, &work[0]->vtx[5], &stg_flame_3_v[5]);
         break;
     default:
-        xf(mtx, &work->vtx[0], &stg_flame_2_v[0]);
-        xf(mtx, &work->vtx[1], &stg_flame_2_v[1]);
-        xf(mtx, &work->vtx[4], &stg_flame_2_v[4]);
-        xf(mtx, &work->vtx[5], &stg_flame_2_v[5]);
+        xf(mtx, &work[0]->vtx[0], &stg_flame_2_v[0]);
+        xf(mtx, &work[0]->vtx[1], &stg_flame_2_v[1]);
+        xf(mtx, &work[0]->vtx[4], &stg_flame_2_v[4]);
+        xf(mtx, &work[0]->vtx[5], &stg_flame_2_v[5]);
         break;
     }
     GXInvalidateVtxCache();
-    DCFlushRange(work->vtx, sizeof(work->vtx));
+    DCFlushRange(work[0]->vtx, sizeof(work[0]->vtx));
     GXSetCullMode(GX_CULL_NONE);
-    effSetVtxDescN64(work->vtx);
+    effSetVtxDescN64(work[0]->vtx);
     GXLoadPosMtxImm(camera->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    GXSetTevColor(GX_TEVREG0, (GXColor){work->c0r, work->c0g, work->c0b, alpha});
-    GXSetTevColor(GX_TEVREG1, (GXColor){work->c1r, work->c1g, work->c1b, work->c1a});
+    GXSetTevColor(GX_TEVREG0, (GXColor){work[0]->c0r, work[0]->c0g, work[0]->c0b, alpha});
+    GXSetTevColor(GX_TEVREG1, (GXColor){work[0]->c1r, work[0]->c1g, work[0]->c1b, work[0]->c1a});
     PSMTXScale(scl, 0.03125f, 0.03125f, 0.0f);
     GXLoadTexMtxImm(scl, GX_TEXMTX0, GX_MTX2x4);
     PSMTXScale(scl, 0.03125f, 0.0078125f, 0.0f);
-    PSMTXTrans(trn, work->u0, work->v0, 0.0f);
+    PSMTXTrans(trn, work[0]->u0, work[0]->v0, 0.0f);
     PSMTXConcat(scl, trn, trn);
     GXLoadTexMtxImm(trn, GX_TEXMTX1, GX_MTX2x4);
     GXBegin(GX_TRIANGLES, GX_VTXFMT0, 6);
     tri2(4, 5, 6, 0, 4, 6, 7, 0);
     PSMTXScale(scl, 0.03125f, 0.0078125f, 0.0f);
-    PSMTXTrans(trn, 30.0f + work->u1, 30.0f + work->v1, 0.0f);
+    PSMTXTrans(trn, 30.0f + work[0]->u1, 30.0f + work[0]->v1, 0.0f);
     PSMTXConcat(scl, trn, trn);
     GXLoadTexMtxImm(trn, GX_TEXMTX1, GX_MTX2x4);
     switch (type) {

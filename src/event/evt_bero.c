@@ -632,7 +632,7 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
       deg += new_var3;
     }
     rad = (6.2831855f * deg) / 360.0f;
-    tmp.x = start.x - (30.0f * ((f32) sin(rad)));
+    tmp.x = start.x - (30.0f * ((f32) sin((6.2831855f * deg) / 360.0f)));
     tmp.y = start.y;
     {
       f32 c0 = (f32) cos(rad);
@@ -646,7 +646,7 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
     }
     tmp2 = tmp;
     tmp2.x += (30.0f + len) * ((0, (f32) sin(rad)));
-    tmp2.z += (30.0f + len) * (-((f32) cos(rad)));
+    tmp2.z += (30.0f + len) * (-((f32) cos((6.2831855f * deg) / 360.0f)));
     start = tmp;
     end = tmp2;
   }

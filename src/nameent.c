@@ -448,9 +448,8 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	FontDrawStart();
 	for (j = 0; j < 9; j++) {
 		for (n = 0; n < 14; n++) {
-			str = wp->field_0x50[j * 14 + n];
-			if (str) {
-				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(str)) / 2), (f32)(112 - j * 28), str);
+			if (wp->field_0x50[j * 14 + n]) {
+				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->field_0x50[j * 14 + n])) / 2), (f32)(112 - j * 28), wp->field_0x50[j * 14 + n]);
 			}
 		}
 	}

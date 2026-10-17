@@ -88,22 +88,24 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     decimal d = {0, 0, 0, {0, ""}};
     char* ip;
     int scan_state = start;
+    short hex_exp = 0;
     int hex_digits = 0;
     int nan_index;
-    int hex_exp_digits = 0;
     union {
         long double v;
         unsigned char b[8];
         short s;
         unsigned long long u;
     } r;
+    int radix = *(unsigned char*)__lconv.decimal_point;
+    int hex_exp_digits = 0;
     unsigned char* buf = r.b;
-    int exp_negative = 0;
     int hex_dig_count;
     int c;
     int n_index;
     char* np;
     int sign = 0;
+    int exp_negative = 0;
     int hex_scan_state = not_hex;
     int sign_detected = 0;
     int hex_exp_negative = 0;
@@ -111,8 +113,6 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     int spaces = 0;
     int exp_value = 0;
     int dec_exp = 0;
-    short hex_exp = 0;
-    int radix = *(unsigned char*)__lconv.decimal_point;
     int inf_index;
     *overflow = 0;
     c = fetch();
