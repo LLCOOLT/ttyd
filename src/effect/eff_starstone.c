@@ -644,40 +644,197 @@ void effStarStoneDisp_1(CameraId cameraId, EffectEntry* effect) {
 }
 
 #define LOOP2S(i1, w, tbl, sz, n) for (i1 = 0; i1 < n##U; i1++) { if ((w->flags & 1) || i1 != 0) { GXCallDisplayList(tbl[i1], sz[i1] << 5); } }
-void effStarStoneDisp_2(CameraId cameraId, EffectEntry* effect) {
-    Mtx m;
-    Mtx s;
-    Mtx r;
-    GXTexObj tex;
-    EffStarStoneWork* w = effect->userdata;
-    CameraEntry* cam = camGetPtr(cameraId);
-    s32 type = w->type;
-    s32 qa; s32 qb;
-
-    DISP_START(w)
-    BLEND_STATE()
-    GXSetCullMode(2);
-    XFORM(w, w->f48, w->f4c, 1.1f * w->scale, POS_ID, POS_ID)
-    VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2S(qa, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
-    XFORM(w, w->f50, w->f54, 1.1f * w->scale, NEG, NEG)
-    VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2S(qb, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
-    DISP_MID(w)
-    if (type != 2) {
-        effGetTexObj(0x29, &tex);
-        GXLoadTexObj(&tex, 0);
-    } else {
-        effGetTexObj(0x2e, &tex);
-        GXLoadTexObj(&tex, 0);
+void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
+{
+  Mtx m;
+  Mtx s;
+  Mtx r;
+  GXTexObj tex;
+  int new_var;
+  EffStarStoneWork *w = effect->userdata;
+  CameraEntry *cam = camGetPtr(cameraId);
+  s32 type = w->type;
+  int new_var2[4];
+  mapSetMaterialFog();
+  GXSetArray(11, color_tbl[w->type], 4);
+  GXSetNumChans(1);
+  GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
+  GXSetChanMatColor(4, w->color);
+  GXSetNumTexGens(0);
+  GXSetNumTevStages(2);
+  GXSetTevOrder(0, 255, 255, 4);
+  GXSetTevOp(0, 4);
+  GXSetTevOrder(1, 255, 255, 255);
+  GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+  GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+  GXSetTevColorIn(1, 15, 2, 0, 15);
+  GXSetTevAlphaIn(1, 7, 1, 0, 7);
+  GXSetTevColor(1, (GXColor){w->r, w->g, w->b, w->a});
+  GXSetBlendMode(1, 4, 5, 0);
+  GXSetZCompLoc(1);
+  GXSetAlphaCompare(7, 0, 0, 7, 0);
+  GXSetZMode(1, 3, 0);
+  GXSetCullMode(2);
+  PSMTXTrans(m, w->position.x + w->f48, w->position.y, w->position.z + w->f4c);
+  PSMTXScale(s, 1.1f * w->scale, 1.1f * w->scale, 1.1f * w->scale);
+  PSMTXConcat(m, s, m);
+  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'z', w->f20 * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'y', w->f18 * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXConcat(cam->view, m, m);
+  GXLoadPosMtxImm(m, 0);
+  GXSetCurrentMtx(0);
+  GXClearVtxDesc();
+  GXSetVtxDesc(9, 2);
+  GXSetVtxAttrFmt(0, 9, 1, 3, 11);
+  GXSetArray(9, diamond_2_2_vertex_tbl, 6);
+  GXSetVtxDesc(10, 2);
+  GXSetVtxAttrFmt(0, 10, 0, 1 & 0xFFFFFFFF, 6);
+  GXSetArray(10, diamond_2_2_normal_tbl, 3);
+  GXSetVtxDesc(11, 2);
+  GXSetVtxAttrFmt(0, 11, 1, 5, 0);
+  GXSetVtxDesc(13, 2);
+  GXSetVtxAttrFmt(0, 13, 1, 3, 14);
+  GXSetArray(13, diamond_2_2_texcoord0_tbl, 4);
+  for (new_var2[0] = 0; new_var2[0] < 19U; new_var2[0]++)
+  {
+    if ((w->flags & 1) || (new_var2[0] != 0))
+    {
+      GXCallDisplayList(diamond_2_2_dl_0_tbl[new_var2[0]], diamond_2_2_dl_0_size_tbl[new_var2[0]] << 5);
     }
-    BLEND_STATE()
-    XFORM(w, w->f48, w->f4c, w->scale, POS_ID, POS_ID)
-    VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2S(qb, w, diamond_2_2_dl_0_tbl, diamond_2_2_dl_0_size_tbl, 19)
-    XFORM(w, w->f50, w->f54, w->scale, NEG, NEG)
-    VTX_SETUP(diamond_2_2_vertex_tbl, diamond_2_2_normal_tbl, CLR_NONE, diamond_2_color0_tbl, diamond_2_2_texcoord0_tbl, 14)
-    LOOP2S(qb, w, diamond_2_2_dl_1_tbl, diamond_2_2_dl_1_size_tbl, 19)
+  }
+
+  PSMTXTrans(m, w->position.x + w->f50, w->position.y, w->position.z + w->f54);
+  PSMTXScale(s, 1.1f * w->scale, 1.1f * w->scale, 1.1f * w->scale);
+  PSMTXConcat(m, s, m);
+  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'z', (-w->f20) * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'y', (-w->f18) * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXConcat(cam->view, m, m);
+  GXLoadPosMtxImm(m, 0);
+  GXSetCurrentMtx(0);
+  GXClearVtxDesc();
+  GXSetVtxDesc(9, 2);
+  GXSetVtxAttrFmt(0, 9, 1, 3, 11);
+  GXSetArray(9, diamond_2_2_vertex_tbl, 6);
+  GXSetVtxDesc(10, 2);
+  GXSetVtxAttrFmt(0, 10, 0, 1, 6);
+  GXSetArray(10, diamond_2_2_normal_tbl, 3);
+  GXSetVtxDesc(11, 2);
+  GXSetVtxAttrFmt(0, 11, 1, 5, 0);
+  GXSetVtxDesc(13, 2);
+  GXSetVtxAttrFmt(0, 13, 1, 3, 14);
+  GXSetArray(13, diamond_2_2_texcoord0_tbl, 4);
+  for (new_var2[1] = 0; new_var2[1] < 19U; new_var2[1]++)
+  {
+    if ((w->flags & 1) || (new_var2[1] != 0))
+    {
+      GXCallDisplayList(diamond_2_2_dl_1_tbl[new_var2[1]], diamond_2_2_dl_1_size_tbl[new_var2[1]] << 5);
+    }
+  }
+
+  GXSetNumChans(1);
+  GXSetChanCtrl(4, 0, 0, 1, 0, 0, 2);
+  GXSetNumTexGens(1);
+  GXSetTexCoordGen2(0, 1, 4, 30, 0, 125);
+  PSMTXTrans(m, w->f24, w->f28, 0.0f);
+  GXLoadTexMtxImm(m, 30, 1);
+  GXSetNumTevStages(2);
+  GXSetTevOrder(0, 0, 0, 4);
+  GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+  GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+  GXSetTevOp(0, 0);
+  GXSetTevOrder(1, 255, 255, 255);
+  GXSetTevColorOp(1, 0, 0, 0, 1, 0);
+  GXSetTevAlphaOp(1, 0, 0, 0, 1, 0);
+  GXSetTevColorIn(1, 15, 2, 0, 15);
+  GXSetTevAlphaIn(1, 7, 1, 0, 7);
+  GXSetTevColor(1, (GXColor){w->r, w->g, w->b, w->a});
+  if (type != 2)
+  {
+    effGetTexObj(0x29, &tex);
+    GXLoadTexObj(&tex, 0);
+  }
+  else
+  {
+    effGetTexObj(0x2e, &tex);
+    GXLoadTexObj(&tex, 0);
+  }
+  GXSetBlendMode(1, 4, 5, 0);
+  GXSetZCompLoc(1);
+  GXSetAlphaCompare(7, 0, 0, 7, 0);
+  GXSetZMode(1, 3, 0);
+  PSMTXTrans(m, w->position.x + w->f48, w->position.y, w->position.z + w->f4c);
+  PSMTXScale(s, w->scale, w->scale, w->scale);
+  PSMTXConcat(m, s, m);
+  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'z', w->f20 * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'y', w->f18 * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXConcat(cam->view, m, m);
+  GXLoadPosMtxImm(m, 0);
+  GXSetCurrentMtx(0);
+  GXClearVtxDesc();
+  GXSetVtxDesc(9, 2);
+  GXSetVtxAttrFmt(0, 9, 1, 3, 11);
+  GXSetArray(9, diamond_2_2_vertex_tbl, 6);
+  GXSetVtxDesc(10, 2);
+  GXSetVtxAttrFmt(0, 10, 0, 1, 6);
+  GXSetArray(10, diamond_2_2_normal_tbl, 3);
+  GXSetVtxDesc(11, 2);
+  GXSetVtxAttrFmt(0, 11, 1, 5, 0);
+  GXSetVtxDesc(13, 2);
+  GXSetVtxAttrFmt(0, 13, 1, 3, 14);
+  GXSetArray(13, diamond_2_2_texcoord0_tbl, 4);
+  for (new_var2[2] = 0; new_var2[2] < 19U; new_var2[2]++)
+  {
+    if ((w->flags & 1) || (new_var2[2] != 0))
+    {
+      GXCallDisplayList(diamond_2_2_dl_0_tbl[new_var2[2]], diamond_2_2_dl_0_size_tbl[new_var2[2]] << 5);
+    }
+  }
+
+  PSMTXTrans(m, w->position.x + w->f50, w->position.y, w->position.z + w->f54);
+  PSMTXScale(s, w->scale, w->scale, w->scale);
+  PSMTXConcat(m, s, m);
+  PSMTXRotRad(r, 'y', w->f1c * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'z', (-w->f20) * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXRotRad(r, 'y', (-w->f18) * 0.01745329252f);
+  PSMTXConcat(m, r, m);
+  PSMTXConcat(cam->view, m, m);
+  GXLoadPosMtxImm(m, 0);
+  GXSetCurrentMtx(0);
+  GXClearVtxDesc();
+  GXSetVtxDesc(9, 2);
+  GXSetVtxAttrFmt(0, 9, 1, 3, 11);
+  GXSetArray(9, diamond_2_2_vertex_tbl, 6);
+  new_var = 0;
+  GXSetVtxDesc(10, 2);
+  GXSetVtxAttrFmt(0, 10, 0, 1, 6);
+  GXSetArray(10, diamond_2_2_normal_tbl, 3);
+  GXSetVtxDesc(11, 2);
+  GXSetVtxAttrFmt(0, 11, 1, 5, 0);
+  GXSetVtxDesc(13, 2);
+  GXSetVtxAttrFmt(new_var, 13, 1, 3, 14);
+  GXSetArray(13, diamond_2_2_texcoord0_tbl, 4);
+  for (new_var2[3] = 0; new_var2[3] < 19U; new_var2[3]++)
+  {
+    if ((w->flags & 1) || (new_var2[3] != 0))
+    {
+      GXCallDisplayList(diamond_2_2_dl_1_tbl[new_var2[3]], diamond_2_2_dl_1_size_tbl[new_var2[3]] << 5);
+    }
+  }
+
 }
 
 void effStarStoneDraw(CameraId cameraId, EffectEntry* effect) {

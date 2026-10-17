@@ -2374,368 +2374,486 @@ typedef struct FallObjectWork {
 	FallObjectEntry entries[1]; //0x4
 } FallObjectWork;
 
-USER_FUNC(_object_fall_attack) {
-	BOOL found = FALSE;
-	s32 j;
-	BattleWeapon* weapon;
-	BattleWork* wp = _battleWorkPointer;
-	const char* sfxNormal;
-	const char* sfxRest;
-	const char* sfxTub;
-	BattleStageFallObjectData* fd = STAGE_WORK(wp)->fallObjectData;
-	s32* args = event->args;
-	s32 arg0 = *args++;
-	FallObjectWork* w;
-	FallObjectEntry* e;
-	FallObjectEntry* o;
-	BattleUnit* unit2;
-	BattleUnitPart* part0;
-	s32 k;
-	BattleUnit* unit;
-	const char* sfxTub2;
-	s32 i;
-	BattleUnitPart* part;
-	s32 sum;
-	s32 r;
-	u32 flags;
-	s16 delay;
-	BOOL done;
-	s32 acCount;
-	f32 width;
-	f32 dir;
-	BattleWorkWeaponTargets targets;
-	BattleWorkWeaponTargets targets2;
-	Vec pos;
-	Vec hit;
-	Vec sfxPos;
-	Vec p;
-	s32 unitId;
-	s32 partId;
+s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
+{
+  BOOL found = 0;
+  s32 j;
+  BattleWeapon *weapon;
+  BattleWork *wp = _battleWorkPointer;
+  const char *sfxNormal;
+  const char *sfxTub;
+  BattleStageFallObjectData *fd = ((BattleStageObjectWork *) wp->field_180C0)->fallObjectData;
+  s32 *args = event->args;
+  s32 arg0 = *(args++);
+  FallObjectWork *w;
+  FallObjectEntry *e;
+  FallObjectEntry *o;
+  BattleUnit *unit2;
+  BattleUnitPart *part0;
+  s32 k;
+  BattleUnit *unit;
+  const char *sfxTub2;
+  const char *sfxRest;
+  s32 i;
+  BattleUnitPart *part;
+  s32 sum;
+  s32 r;
+  u32 flags;
+  s16 delay;
+  BOOL done;
+  s32 acCount;
+  f32 width;
+  f32 dir;
+  BattleWorkWeaponTargets targets;
+  BattleWorkWeaponTargets targets2;
+  Vec pos;
+  Vec hit;
+  Vec sfxPos;
+  Vec p;
+  s32 unitId;
+  s32 partId;
+  if (isFirstCall)
+  {
+    w = BattleAlloc(sizeof(FallObjectWork));
+    ((s32 *) event->userdata)[0] = (s32) w;
+    ((s32 *) event->userdata)[1] = 0;
+    memset(w, 0, sizeof(FallObjectWork));
+    w->entries[0].index = -1;
+    for (i = 0; i < 3; i++)
+    {
+      w->prevTypes[i] = -1;
+    }
 
-	if (isFirstCall) {
-		w = BattleAlloc(sizeof(FallObjectWork));
-		EVT_UW(event, 0) = (s32)w;
-		EVT_UW(event, 1) = 0;
-		memset(w, 0, sizeof(FallObjectWork));
-		w->entries[0].index = -1;
-		for (i = 0; i < 3; i++) {
-			w->prevTypes[i] = -1;
-		}
-		if (BattleCheckConcluded(wp)) {
-			evtSetValue(event, arg0, EVT_UW(event, 1));
-			return EVT_RETURN_DONE;
-		}
-		w->count = 1;
-		for (i = 0; i < w->count; i++) {
-			e = &w->entries[i];
-			e->index = i;
-			for (j = 0; j < 3; j++) {
-				if (w->prevTypes[j] == -1) {
-					break;
-				}
-			}
-			if (j >= 3) {
-				e->type = w->prevTypes[irand(3)];
-			} else {
-				sum = 0;
-				for (k = 0; k < 9; k++) {
-					sum += fd->rates[k];
-				}
-				r = irand(sum);
-				for (e->type = 0; e->type < 8; e->type++) {
-					if ((r -= fd->rates[e->type]) < 0) {
-						break;
-					}
-				}
-				w->prevTypes[j] = e->type;
-			}
-			e->weapon = fd->weapons[e->type];
-			if (e->type == 6) {
-				if (irand(100) < 50) {
-					e->weapon.weapon.targetClassFlags |= 0x100;
-					e->weapon.weapon.targetClassFlags &= ~0x200;
-				} else {
-					e->weapon.weapon.targetClassFlags &= ~0x100;
-					e->weapon.weapon.targetClassFlags |= 0x200;
-				}
-			}
-			weapon = &e->weapon.weapon;
-			e->kind = 0;
-			if (*(u16*)&pouchGetPtr()->mStarPowersObtained && !(BattleAudienceBaseGetPtr()->flags & 0x4000) &&
-				e->type != 6 && e->type != 7)
-			{
-				if ((*(u32*)&wp->field_19064[4] & 2) || irand(100) < 10) {
-					e->kind = 1;
-					e->partId = -1;
-					e->unitId = BattleAudience_HaitiRandForFallObject();
-					found = TRUE;
-					EVT_UW(event, 1) = 1;
-				}
-			}
-			if (e->kind == 0) {
-				BattleSamplingEnemy(&targets, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags,
-					weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
-				if (targets.numTargets <= 0) {
-					evtSetValue(event, arg0, EVT_UW(event, 1));
-					return EVT_RETURN_DONE;
-				}
-				found = TRUE;
-				BattleChoiceSamplingEnemy(&targets, *(u32*)((u8*)weapon + 0x7C), &unitId, &partId);
-				e->unitId = unitId;
-				e->partId = partId;
-				e->noAc = 1;
-				for (k = i; k >= 0; k--) {
-					o = &w->entries[k];
-					if (e != o && o->kind == 0 && e->unitId == o->unitId) {
-						o->noAc = 0;
-					}
-				}
-			}
-		}
-		if (!found) {
-			evtSetValue(event, arg0, EVT_UW(event, 1));
-			return EVT_RETURN_DONE;
-		}
-		for (i = 0; i < w->count; i++) {
-			e = &w->entries[i];
-			weapon = &e->weapon.weapon;
-			if (e->kind == 0) {
-				flags = 0;
-				if (e->noAc) {
-					flags |= 0x100;
-				}
-				if (e->field_0x15) {
-					flags |= 0x100000;
-				}
-				part0 = BattleGetUnitPartsPtr(e->unitId, e->partId);
-				e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), BattleGetUnitPtr(wp, e->unitId), part0, weapon, flags);
-				if (e->preCheck == 1 && !e->noAc) {
-					delay = irand(0);
-					for (k = 0; k < i; k++) {
-						o = &w->entries[k];
-						if (e->unitId == o->unitId) {
-							o->delay = delay;
-							delay += irand(22) + 20;
-							if (o->noAc) {
-								o->field_0x15 = 1;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    if (BattleCheckConcluded(wp))
+    {
+      evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+      return 2;
+    }
+    w->count = 1;
+    for (i = 0; i < w->count; i++)
+    {
+      e = &w->entries[i];
+      e->index = i;
+      for (j = 0; j < 3; j++)
+      {
+        if (w->prevTypes[j] == (-1))
+        {
+          break;
+        }
+      }
 
-	sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
-	sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
-	sfxRest = "SFX_REST_CONDITION1";
-	sfxTub2 = *&sfxTub;
-	w = (FallObjectWork*)EVT_UW(event, 0);
-	done = TRUE;
-	for (i = 0; i < w->count; i++) {
-		e = &w->entries[i];
-		if (e->index == -1) {
-			continue;
-		}
-		acCount = 0;
-		done = FALSE;
-		if (e->kind == 0) {
-			unit = BattleGetUnitPtr(wp, e->unitId);
-			part = BattleGetUnitPartsPtr(e->unitId, e->partId);
-		}
-		if (e->effect == NULL || e->delay > 0) {
-			e->delay--;
-			if (e->delay > 0) {
-				continue;
-			}
-			switch (e->kind) {
-				case 0:
-					BtlUnit_GetHitPos(unit, part, &hit.x, &hit.y, &hit.z);
-					width = BtlUnit_GetWidth(unit);
-					break;
-				case 1:
-					hit.x = e->unitId % 20 * 25 - 230;
-					hit.y = BattleStageGetPtr()->field_0xB34;
-					hit.z = 0.1f * (e->unitId % 20) + (e->unitId / 20 * 30 + 115);
-					btl_camera_set_mode(0, 6);
-					btl_camera_set_moveSpeedLv(0, 2);
-					width = 0.0f;
-					break;
-				default:
-					hit = (Vec){0.0f, 0.0f, 0.0f};
-					width = 0.0f;
-					break;
-			}
-			pos = hit;
-			pos.y = BattleGetFloorHeight(wp, pos.x, pos.y, pos.z);
-			if (hit.x >= 0.0f) {
-				dir = 90.0f;
-			} else {
-				dir = 270.0f;
-			}
-			switch (e->preCheck) {
-				case 2:
-				case 3:
-				case 4:
-				case 6:
-					hit.y = pos.y;
-					break;
-			}
-			e->sfxId = -1;
-			e->field_0x12 = 0;
-			switch (e->type) {
-				case 0:
-					e->effect = effFallEntry(4, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 1:
-					e->effect = effFallEntry(5, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 2:
-					e->effect = effFallEntry(0, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 100, 90);
-					break;
-				case 3:
-					e->effect = effFallEntry(1, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 4:
-					e->effect = effFallEntry(2, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 8:
-					e->effect = effFallEntry(8, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 5:
-					e->effect = effFallEntry(3, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
-					break;
-				case 6:
-					if (BtlUnit_GetBelong(unit) == 0) {
-						e->effect = effFallEntry(6, -300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
-					} else {
-						e->effect = effFallEntry(6, 300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
-					}
-					break;
-				case 7:
-					e->effect = effFallEntry(7, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 180);
-					break;
-			}
-		} else {
-			if (e->effect != NULL && !effFallCheckHit(e->effect)) {
-				continue;
-			}
-			weapon = &e->weapon.weapon;
-			if (e->kind == 1) {
-				BattleAudience_Case_FallObject_Aud(e->unitId, e->type);
-				psndSFXOff(e->sfxId);
-				BattleAudience_GetHomePosition(e->unitId, &sfxPos.x, &sfxPos.y, &sfxPos.z);
-				switch (e->type) {
-					case 5:
-						break;
-					case 0:
-					case 1:
-						psndSFXOn_3D(sfxTub, &sfxPos);
-						break;
-					default:
-						psndSFXOn_3D(sfxNormal, &sfxPos);
-						break;
-				}
-			} else {
-				BattleAudience_Case_FallObject_Stage();
-				if (weapon->targetClassFlags & 0x1000000) {
-					BtlUnit_GetHitPos(unit, part, &sfxPos.x, &sfxPos.y, &sfxPos.z);
-					flags = 0;
-					if (e->noAc) {
-						flags |= 0x100;
-					}
-					psndSFXOff(e->sfxId);
-					switch (e->preCheck) {
-						case 2:
-						case 3:
-						case 4:
-						case 6:
-							switch (e->type) {
-								case 5:
-									break;
-								case 0:
-								case 1:
-									psndSFXOn_3D(sfxTub, &sfxPos);
-									break;
-							}
-							break;
-						case 1:
-							switch (e->type) {
-								case 0:
-								case 1:
-									psndSFXOn_3D(sfxTub2, &sfxPos);
-									break;
-								case 5:
-									psndSFXOn_3D(sfxRest, &sfxPos);
-									break;
-								default:
-									psndSFXOn_3D(sfxNormal, &sfxPos);
-									break;
-							}
-							if (BtlUnit_GetACPossibility(unit)) {
-								BattleActionCommandCheckDefence(unit, weapon);
-							}
-							BattleCheckDamage(BattleGetSystemPtr(wp), unit, part, weapon, flags);
-							break;
-					}
-				} else {
-					psndSFXOff(e->sfxId);
-					BattleSamplingEnemy(&targets2, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags,
-						weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
-					if (targets2.numTargets > 0) {
-						for (;;) {
-							BattleWorkTarget* tg;
+      if (j >= 3)
+      {
+        e->type = w->prevTypes[irand(3)];
+      }
+      else
+      {
+        sum = 0;
+        for (k = 0; k < 9; k++)
+        {
+          sum += fd->rates[k];
+        }
 
-							if (targets2.currentTarget >= targets2.numTargets) {
-								break;
-							}
-							tg = &targets2.targets[targets2.targetIndices[targets2.currentTarget]];
-							unit2 = BattleGetUnitPtr(wp, tg->unitIdx);
-							switch (BattlePreCheckDamage(BattleGetSystemPtr(wp), unit2, BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx), weapon, 0x100)) {
-								case 2:
-								case 4:
-									break;
-								case 3: {
-									EffectEntry* eff;
+        r = irand(sum);
+        for (e->type = 0; e->type < 8; e->type++)
+        {
+          if ((r -= fd->rates[e->type]) < 0)
+          {
+            break;
+          }
+        }
 
-									BtlUnit_GetPos(unit2, &p.x, &p.y, &p.z);
-									if (p.y < 85.0f) {
-										p.y += 50.0f;
-									} else {
-										p.y += -50.0f;
-									}
-									p.x -= 45.0f;
-									eff = effNiceEntry(6, p.x, p.y, p.z);
-									((f32*)eff->userdata)[7] = 0.75f;
-									unit2->damagePattern = 0;
-									BattleRunHitEvent(unit2, 0x126);
-									break;
-								}
-								case 6:
-									unit2->damagePattern = 0;
-									BattleRunHitEvent(unit2, 0x127);
-									break;
-								case 1:
-									if (BtlUnit_GetACPossibility(unit2) && acCount <= 0) {
-										BattleActionCommandCheckDefence(unit2, weapon);
-										acCount++;
-									}
-									BattleCheckDamage(BattleGetSystemPtr(wp), unit2,
-										BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx), weapon, 0x100);
-									break;
-							}
-							targets2.currentTarget++;
-						}
-					}
-				}
-			}
-			e->index = -1;
-		}
-	}
-	if (!done) {
-		return EVT_RETURN_BLOCK;
-	}
-	BattleFree((void*)EVT_UW(event, 0));
-	evtSetValue(event, arg0, EVT_UW(event, 1));
-	return EVT_RETURN_DONE;
+        w->prevTypes[j] = e->type;
+      }
+      e->weapon = fd->weapons[e->type];
+      if (e->type == 6)
+      {
+        if (irand(100) < 50)
+        {
+          e->weapon.weapon.targetClassFlags |= 0x100;
+          e->weapon.weapon.targetClassFlags &= ~0x200;
+        }
+        else
+        {
+          e->weapon.weapon.targetClassFlags &= ~0x100;
+          e->weapon.weapon.targetClassFlags |= 0x200;
+        }
+      }
+      weapon = &e->weapon.weapon;
+      e->kind = 0;
+      if ((((*((u16 *) (&pouchGetPtr()->mStarPowersObtained))) && (!(BattleAudienceBaseGetPtr()->flags & 0x4000))) && (e->type != 6)) && (e->type != 7))
+      {
+        if (((*((u32 *) (&wp->field_19064[4]))) & 2) || (irand(100) < 10))
+        {
+          e->kind = 1;
+          e->partId = -1;
+          e->unitId = BattleAudience_HaitiRandForFallObject();
+          found = 1;
+          ((s32 *) event->userdata)[1] = 1;
+        }
+      }
+      if (e->kind == 0)
+      {
+        BattleSamplingEnemy(&targets, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags, weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
+        if (targets.numTargets <= 0)
+        {
+          evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+          return 2;
+        }
+        found = 1;
+        BattleChoiceSamplingEnemy(&targets, *((u32 *) (((u8 *) weapon) + 0x7C)), &unitId, &partId);
+        e->unitId = unitId;
+        e->partId = partId;
+        e->noAc = 1;
+        for (k = i; k >= 0; k--)
+        {
+          o = &w->entries[k];
+          if (((e != o) && (o->kind == 0)) && (e->unitId == o->unitId))
+          {
+            o->noAc = 0;
+          }
+        }
+
+      }
+    }
+
+    if (!found)
+    {
+      evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+      return 2;
+    }
+    for (i = 0; i < w->count; i++)
+    {
+      e = &w->entries[i];
+      weapon = &e->weapon.weapon;
+      if (e->kind == 0)
+      {
+        flags = 0;
+        if (e->noAc)
+        {
+          flags |= 0x100;
+        }
+        if (e->field_0x15)
+        {
+          flags |= 0x100000;
+        }
+        part0 = BattleGetUnitPartsPtr(e->unitId, e->partId);
+        e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), BattleGetUnitPtr(wp, e->unitId), part0, weapon, flags);
+        if ((e->preCheck == 1) && (!e->noAc))
+        {
+          delay = irand(0);
+          for (k = 0; k < i; k++)
+          {
+            o = &w->entries[k];
+            if (e->unitId == o->unitId)
+            {
+              o->delay = delay;
+              delay += irand(22) + 20;
+              if (o->noAc)
+              {
+                o->field_0x15 = 1;
+              }
+            }
+          }
+
+        }
+      }
+    }
+
+  }
+  sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
+  sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
+  sfxRest = "SFX_REST_CONDITION1";
+  sfxTub2 = *(&sfxTub);
+  w = (FallObjectWork *) ((s32 *) event->userdata)[0];
+  done = 1;
+  for (i = 0; i < w->count; i++)
+  {
+    e = &w->entries[i];
+    if (e->index == (-1))
+    {
+      continue;
+    }
+    acCount = 0;
+    done = 0;
+    if (e->kind == 0)
+    {
+      unit = BattleGetUnitPtr(wp, e->unitId);
+      part = BattleGetUnitPartsPtr(e->unitId, e->partId);
+    }
+    if ((e->effect == ((void *) 0)) || (e->delay > 0))
+    {
+      e->delay--;
+      if (e->delay > 0)
+      {
+        continue;
+      }
+      switch (e->kind)
+      {
+        case 0:
+          BtlUnit_GetHitPos(unit, part, &hit.x, &hit.y, &hit.z);
+          width = BtlUnit_GetWidth(unit);
+          break;
+
+        case 1:
+          hit.x = ((e->unitId % 20) * 25) - 230;
+          hit.y = BattleStageGetPtr()->field_0xB34;
+          hit.z = (0.1f * (e->unitId % 20)) + (((e->unitId / 20) * 30) + 115);
+          btl_camera_set_mode(0, 6);
+          btl_camera_set_moveSpeedLv(0, 2);
+          width = 0.0f;
+          break;
+
+        default:
+          hit = (Vec){0.0f, 0.0f, 0.0f};
+          width = 0.0f;
+          break;
+
+      }
+
+      pos = hit;
+      pos.y = BattleGetFloorHeight(wp, pos.x, pos.y, pos.z);
+      if (hit.x >= 0.0f)
+      {
+        dir = 90.0f;
+      }
+      else
+      {
+        dir = 270.0f;
+      }
+      switch (e->preCheck)
+      {
+        case 2:
+
+        case 3:
+
+        case 4:
+
+        case 6:
+          hit.y = pos.y;
+          break;
+
+      }
+
+      e->sfxId = -1;
+      e->field_0x12 = 0;
+      sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
+      switch (e->type)
+      {
+        case 0:
+          e->effect = effFallEntry(4, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 1:
+          e->effect = effFallEntry(5, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 2:
+          e->effect = effFallEntry(0, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 100, 90);
+          break;
+
+        case 3:
+          e->effect = effFallEntry(1, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 4:
+          e->effect = effFallEntry(2, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 8:
+          e->effect = effFallEntry(8, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 5:
+          e->effect = effFallEntry(3, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
+          break;
+
+        case 6:
+          if (BtlUnit_GetBelong(unit) == 0)
+        {
+          e->effect = effFallEntry(6, -300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
+        }
+        else
+        {
+          e->effect = effFallEntry(6, 300.0f, pos.y, 15.0f + pos.z, 0.0f, 0.0f, dir, 1, 180);
+        }
+          break;
+
+        case 7:
+          e->effect = effFallEntry(7, pos.x, pos.y, 5.0f + pos.z, width, hit.y - pos.y, dir, 1, 180);
+          break;
+
+      }
+
+    }
+    else
+    {
+      if ((e->effect != ((void *) 0)) && (!effFallCheckHit(e->effect)))
+      {
+        continue;
+      }
+      weapon = &e->weapon.weapon;
+      if (e->kind == 1)
+      {
+        BattleAudience_Case_FallObject_Aud(e->unitId, e->type);
+        psndSFXOff(e->sfxId);
+        BattleAudience_GetHomePosition(e->unitId, &sfxPos.x, &sfxPos.y, &sfxPos.z);
+        switch (e->type)
+        {
+          case 5:
+            break;
+
+          case 0:
+
+          case 1:
+            psndSFXOn_3D(sfxTub, &sfxPos);
+            break;
+
+          default:
+            psndSFXOn_3D(sfxNormal, &sfxPos);
+            break;
+
+        }
+
+      }
+      else
+      {
+        BattleAudience_Case_FallObject_Stage();
+        if (weapon->targetClassFlags & 0x1000000)
+        {
+          BtlUnit_GetHitPos(unit, part, &sfxPos.x, &sfxPos.y, &sfxPos.z);
+          flags = 0;
+          if (e->noAc)
+          {
+            flags |= 0x100;
+          }
+          psndSFXOff(e->sfxId);
+          switch (e->preCheck)
+          {
+            case 2:
+
+            case 3:
+
+            case 4:
+
+            case 6:
+              switch (e->type)
+            {
+              case 5:
+                break;
+
+              case 0:
+
+              case 1:
+                psndSFXOn_3D(sfxTub, &sfxPos);
+                break;
+
+            }
+
+              break;
+
+            case 1:
+              switch (e->type)
+            {
+              case 0:
+
+              case 1:
+                psndSFXOn_3D(sfxTub2, &sfxPos);
+                break;
+
+              case 5:
+                psndSFXOn_3D(sfxRest, &sfxPos);
+                break;
+
+              default:
+                psndSFXOn_3D(sfxNormal, &sfxPos);
+                break;
+
+            }
+
+              if (BtlUnit_GetACPossibility(unit))
+            {
+              BattleActionCommandCheckDefence(unit, weapon);
+            }
+              BattleCheckDamage(BattleGetSystemPtr(wp), unit, part, weapon, flags);
+              break;
+
+          }
+
+        }
+        else
+        {
+          psndSFXOff(e->sfxId);
+          BattleSamplingEnemy(&targets2, weapon, BattleGetSystemPtr(wp)->unitId, 1, weapon->targetClassFlags, weapon->targetPropertyFlags, -wp->alliances[1].attackDirection);
+          if (targets2.numTargets > 0)
+          {
+            for (;;)
+            {
+              BattleWorkTarget *tg;
+              if (targets2.currentTarget >= targets2.numTargets)
+              {
+                break;
+              }
+              tg = &targets2.targets[targets2.targetIndices[targets2.currentTarget]];
+              unit2 = BattleGetUnitPtr(wp, tg->unitIdx);
+              switch (BattlePreCheckDamage(BattleGetSystemPtr(wp), unit2, BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx), weapon, 0x100))
+              {
+                case 2:
+
+                case 4:
+                  break;
+
+                case 3:
+                {
+                  EffectEntry *eff;
+                  BtlUnit_GetPos(unit2, &p.x, &p.y, &p.z);
+                  if (p.y < 85.0f)
+                  {
+                    p.y += 50.0f;
+                  }
+                  else
+                  {
+                    p.y += -50.0f;
+                  }
+                  p.x -= 45.0f;
+                  eff = effNiceEntry(6, p.x, p.y, p.z);
+                  ((f32 *) eff->userdata)[7] = 0.75f;
+                  unit2->damagePattern = 0;
+                  BattleRunHitEvent(unit2, 0x126);
+                  break;
+                }
+
+                case 6:
+                  unit2->damagePattern = 0;
+                  BattleRunHitEvent(unit2, 0x127);
+                  break;
+
+                case 1:
+                  if (BtlUnit_GetACPossibility(unit2) && (acCount <= 0))
+                {
+                  BattleActionCommandCheckDefence(unit2, weapon);
+                  acCount++;
+                }
+                  BattleCheckDamage(BattleGetSystemPtr(wp), unit2, BattleGetUnitPartsPtr(tg->unitIdx, tg->partIdx), weapon, 0x100);
+                  break;
+
+              }
+
+              targets2.currentTarget++;
+            }
+
+          }
+        }
+      }
+      e->index = -1;
+    }
+  }
+
+  if (!done)
+  {
+    return 0;
+  }
+  BattleFree((void *) ((s32 *) event->userdata)[0]);
+  evtSetValue(event, arg0, ((s32 *) event->userdata)[1]);
+  return 2;
 }

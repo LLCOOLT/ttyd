@@ -253,101 +253,129 @@ void battleAcDelete_ButtonDown(BattleWork* work) {
     work->actionCommands.mAcState = 1003;
 }
 
-static void actionCommandDisp(s32 unused, f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BDWork* p = (BDWork*)((u8*)work + 0x1f4c);
-    s32 k;
-    s32 end = NN * 3 + 2;
-    s32 count;
-    s32 off;
-    s32 j;
-    s32 i;
-    f32 bx = -200.0f + x;
-    f32 by;
-    f32 lx = bx - 40.0f;
-    Vec pos = {0.0f, 0.0f, -2.0f};
-    by = 70.0f + y;
-    pos.x = lx;
-    pos.y = by;
-    iconDispGx(&pos, 16, 0x8f, 1.0f);
+static void actionCommandDisp(s32 unused, f32 x, f32 y)
+{
+  BattleWork *work = _battleWorkPointer;
+  BDWork *p = (BDWork *) (((u8 *) work) + 0x1f4c);
+  s32 k;
+  s32 end = ((*((s32 *) (((u8 *) work) + 0x1cd0))) * 3) + 2;
+  s32 i;
+  s32 count;
+  s32 off;
+  s32 j;
+  f32 bx = (-200.0f) + x;
+  f32 by;
+  f32 lx = bx - 40.0f;
+  Vec pos = {0.0f, 0.0f, -2.0f};
+  by = 70.0f + y;
+  pos.x = lx;
+  pos.y = by;
+  iconDispGx(&pos, 16, 0x8f, 1.0f);
+  lx += 16.0f;
+  for (k = 1; k < end; k++)
+  {
+    Vec pos2 = {0.0f, 0.0f, -2.0f};
+    pos2.x = lx;
+    pos2.y = by;
+    iconDispGx(&pos2, 16, 0x8e, 1.0f);
     lx += 16.0f;
-    for (k = 1; k < end; k++) {
-        Vec pos2 = {0.0f, 0.0f, -2.0f};
-        pos2.x = lx;
-        pos2.y = by;
-        iconDispGx(&pos2, 16, 0x8e, 1.0f);
-        lx += 16.0f;
-    }
+  }
+
+  {
+    Vec pos3 = {0.0f, 0.0f, -2.0f};
+    pos3.x = lx;
+    pos3.y = by;
+    iconDispGx(&pos3, 16, 0x90, 1.0f);
+  }
+  if ((*((u32 *) (((u8 *) work) + 0x1cc4))) & 1)
+  {
+    for (count = 0, j = 0; count < (*((s32 *) (((u8 *) work) + 0x1cd0))); count++, j += 4)
     {
-        Vec pos3 = {0.0f, 0.0f, -2.0f};
-        pos3.x = lx;
-        pos3.y = by;
-        iconDispGx(&pos3, 16, 0x90, 1.0f);
+      if (!p->pressed[j >> 2])
+      {
+        break;
+      }
     }
-    if (*(u32*)((u8*)work + 0x1cc4) & 1) {
-        for (count = 0, j = 0; count < NN; count++, j += 4) {
-            if (!p->pressed[j >> 2]) {
-                break;
-            }
-        }
-        if (count < NN) {
-            count++;
-        }
-    } else {
-        count = NN;
+
+    if (count < (*((s32 *) (((u8 *) work) + 0x1cd0))))
+    {
+      count++;
     }
-    off = 0;
-    j = 0;
-    for (i = 0; i < count; i++, off += 0x30, j += 4) {
-        s32 a, b;
-                if (p->button[j >> 2] == 0U) {
-            continue;
-        }
-        switch (p->button[j >> 2]) {
-            case 0x100:
-                a = 0x65;
-                b = 0x64;
-                break;
-            case 0x200:
-                a = 0x67;
-                b = 0x66;
-                break;
-            case 0x400:
-                a = 0x69;
-                b = 0x68;
-                break;
-            case 0x800:
-                a = 0x6b;
-                b = 0x6a;
-                break;
-            case 0x40:
-                a = 0x7f;
-                b = 0x7e;
-                break;
-            case 0x20:
-                a = 0x81;
-                b = 0x80;
-                break;
-            case 0x10:
-                a = 0x83;
-                b = 0x82;
-                break;
-            case 0x40000:
-            default:
-                a = 0x78;
-                b = 0x79;
-                break;
-        }
-        if (p->pressed[j >> 2]) {
-            Vec pos4 = {0.0f, 0.0f, 0.0f};
-            pos4.x = bx + (f32)off;
-            pos4.y = by;
-            ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&pos4, 16, a, 1.0f);
-        } else {
-            Vec pos5 = {0.0f, 0.0f, 0.0f};
-            pos5.x = bx + (f32)off;
-            pos5.y = by;
-            ((void (*)(Vec*, s32, s32, f32))iconDispGx)(&pos5, 16, b, 1.0f);
-        }
+  }
+  else
+  {
+    count = *((s32 *) (((u8 *) work) + 0x1cd0));
+  }
+  off = 0;
+  j = 0;
+  for (i = 0; i < count; i++, off += 0x30, j += 4)
+  {
+    s32 a;
+    s32 b;
+    if (p->button[j >> 2] == 0U)
+    {
+      continue;
     }
+    switch (p->button[(j >> 1) >> 1])
+    {
+      case 0x100:
+        a = 0x65;
+        b = 0x64;
+        break;
+
+      case 0x200:
+        a = 0x67;
+        b = 0x66;
+        break;
+
+      case 0x400:
+        a = 0x69;
+        b = 0x68;
+        break;
+
+      case 0x800:
+        a = 0x6b;
+        b = 0x6a;
+        break;
+
+      case 0x40:
+        a = 0x7f;
+        b = 0x7e;
+        break;
+
+      case 0x20:
+        a = 0x81;
+        b = 0x80;
+        break;
+
+      case 0x10:
+        a = 0x83;
+        b = 0x82;
+        break;
+
+      case 0x40000:
+
+      default:
+        a = 0x78;
+        b = 0x79;
+        break;
+
+    }
+
+    if (p->pressed[j >> 2])
+    {
+      Vec pos4 = {0.0f, 0.0f, 0.0f};
+      pos4.x = bx + ((f32) off);
+      pos4.y = by;
+      ((void (*)(Vec *, s32, s32, f32)) iconDispGx)(&pos4, 16, a, 1.0f);
+    }
+    else
+    {
+      Vec pos5 = {0.0f, 0.0f, 0.0f};
+      pos5.x = bx + ((f32) off);
+      pos5.y = by;
+      ((void (*)(Vec *, s32, s32, f32)) iconDispGx)(&pos5, 16, b, 1.0f);
+    }
+  }
+
 }

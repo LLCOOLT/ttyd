@@ -23,11 +23,11 @@
 extern GlobalWork* gp;
 
 //.sbss
-TEXPalette* icon_tpl;
-IconBinary* icon_bin;
-BOOL icon_tpl_ok;
-BOOL icon_bin_ok;
 static IconWork work[2];
+BOOL icon_bin_ok;
+BOOL icon_tpl_ok;
+IconBinary* icon_bin;
+TEXPalette* icon_tpl;
 
 //.sdata
 
@@ -499,10 +499,11 @@ void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {
     if (!icon_tpl_ok || !icon_bin_ok) {
         return;
     }
-    id = (u16)(s16)iconId;
     entry.uflags = flags;
     entry.color = color;
-    entry.iconId = iconId;
+    if (icon_bin_ok && icon_bin_ok) {
+    }
+    entry.iconId = (id = iconId);
     data = iconGetBinData(id);
     entry.width = data->width;
     entry.height = data->height;

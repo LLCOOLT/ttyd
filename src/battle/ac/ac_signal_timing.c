@@ -58,250 +58,339 @@ s32 _get_ok_frame_range(s32 difficulty) {
 }
 
 #pragma dont_inline reset
-s32 battleAcMain_SignalTiming(BattleWork* work) {
-    const char* sfxPi;
-    const char* sfxPone;
-    const char* sfxOk;
-    const char* sfxNg;
-    s32 j;
-    s32 i;
-    s32 k;
-    BOOL unique;
-    BattleActions* ac = &work->actionCommands;
-    SignalTimingWork* w = (SignalTimingWork*)((u8*)ac + 0x2BC);
-    BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
-    BOOL loop;
-    BOOL autoCommand = FALSE;
-    BOOL got;
-    BOOL good;
-    u32 btn;
-    BOOL done;
-
-    if (ac->mAcUnit->badgesEquipped.AutoCommand) {
-        autoCommand = TRUE;
-    }
-    sfxPi = "SFX_AC_PI1"; sfxPone = "SFX_AC_PONE1"; sfxOk = "SFX_AC_COMMAND_OK1"; sfxNg = "SFX_AC_COMMAND_NG1\0\0\0\0\0"; 
-
-    do {
-        loop = FALSE;
-        got = FALSE;
-        switch (ac->mAcState) {
-            case 0:
-                ac->result = 1;
-                memset(disp, 0, sizeof(BattleACDispParams));
-                disp->iconX = -300.0f;
-                disp->iconY = 0.0f;
-                *(s32*)&disp->field_0x1C[4] = 20;
-                w->hits = 0;
-                w->misses = 0;
-                w->frame = 0;
-                w->index = 0;
-                w->next = 0;
-                w->difficulty = ((s32(*)(BattleWork*))BattleActionCommandGetDifficulty)(work);
-                w->okFlag = 0;
-                W32(work, 0x1CEC) = 0;
-                for (k = 0; k < 5; k++) {
-                    w->results[k] = 0;
-                }
-                switch (W32(work, 0x1CD8)) {
-                case 1:
-                case 2:
-                    for (i = 0; i < ST_COUNT(work); i++) {
-                        done = FALSE;
-                        while (!done) {
-                            if (W32(work, 0x1CD8) == 1) {
-                                btn = _button_table_4dir[irand(4)];
-                            } else {
-                                btn = _button_table_abxy[irand(4)];
-                            }
-                            unique = TRUE;
-                            for (j = i - 1; j >= 0; j--) {
-                                if (w->buttons[j] == btn) {
-                                    unique = FALSE;
-                                }
-                            }
-                            if (unique) {
-                                done = TRUE;
-                            }
-                        }
-                        w->buttons[i] = btn;
-                    }
-                    w->button = w->buttons[0];
-                    break;
-                default:
-                    w->button = 0x100;
-                    for (i = 0; i < ST_COUNT(work); i++) {
-                        w->buttons[i] = 0x100;
-                    }
-                    w->button = w->buttons[0];
-                }
-                ac->mAcState = 99;
-                break;
-            case 99:
-                break;
-            case 100:
-                if (*(s16*)((u8*)work + 0x1D18) > 0) {
-                    (*(s16*)((u8*)work + 0x1D18))--;
-                    ac->result = 2;
-                    loop = TRUE;
-                    ac->mAcState = 1002;
-                    break;
-                }
-                w->rangeStart = w->index * ST_STEP(work);
-                w->rangeEnd = (w->index + 1) * ST_STEP(work) - 1;
-                w->okStart = w->rangeStart;
-                j = _get_ok_frame_range(w->difficulty) - 1;
- w->okEnd = w->okStart + j;
-                ac->mAcState = 1000;
-            case 1000:
-                w->unk28 = (w->next + 1) * ST_STEP(work) - 1;
-                w->next++;
-                if (w->next < ST_LEAD(work) + 1) {
-                    if (!ST_CONF(work)) {
-                        psndSFXOn(sfxPi);
-                    }
-                } else {
-                    if (!ST_CONF(work)) {
-                        psndSFXOn(sfxPone);
-                    }
-                }
-                w->pressed = 0;
-                ac->mAcState = 1001;
-            case 1001:
-                w->frame++;
-                if (w->pressed) {
-                    w->okFlag = 0;
-                } else if (w->index >= ST_LEAD(work)) {
-                    if (w->frame >= w->okStart && w->frame <= w->okEnd) {
-                        w->okFlag = 1;
-                    } else {
-                        w->okFlag = 0;
-                    }
-                } else {
-                    w->okFlag = 0;
-                }
-                good = FALSE;
-                if (BattlePadCheckTrigger(w->button)) {
-                    got = TRUE;
-                }
-                if (got) {
-                    switch (W32(work, 0x1CD8)) {
-                    case 2:
-                        if (w->button == BattlePadGetTrigger()) {
-                            good = TRUE;
-                        } else {
-                            good = FALSE;
-                        }
-                        break;
-                    default:
-                        good = TRUE;
-                    }
-                }
-                if (autoCommand && w->okFlag) {
-                    got = TRUE;
-                    good = TRUE;
-                }
-                if (w->hits + w->misses >= ST_COUNT(work)) {
-                    got = FALSE;
-                }
-                if (w->index >= ST_LEAD(work) && got && !w->pressed) {
-                    w->pressed = 1;
-                    if (w->frame >= w->okStart && w->frame <= w->okEnd && good) {
-                        w->hits++;
-                        W32(work, 0x1CEC) = 1;
-                        if (w->index >= ST_LEAD(work) && w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                            w->results[w->index - ST_LEAD(work)] = 1;
-                            if (!ST_CONF(work)) {
-                                psndSFXOn(sfxOk);
-                            }
-                        }
-                        if (ST_FLAGS(work) & 0x10) {
-                            W32(work, 0x1CE8) = w->hits;
-                            ac->result &= ~1;
-                            if (w->hits >= W32(work, 0x1CD4)) {
-                                ac->result |= 2;
-                            }
-                            loop = TRUE;
-                            ac->mAcState = 1002;
-                        }
-                    } else if (w->index >= ST_LEAD(work) && w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                        w->misses++;
-                        if (w->frame >= w->rangeStart) {
-                            w->results[w->index - ST_LEAD(work)] = -1;
-                            if (!ST_CONF(work)) {
-                                psndSFXOn(sfxNg);
-                            }
-                            W32(work, 0x1CEC) = -1;
-                        } else {
-                            w->pressed = 0;
-                        }
-                    }
-                }
-                if (!w->pressed && w->frame > w->okEnd) {
-                    w->pressed = 1;
-                    W32(work, 0x1CEC) = -1;
-                    if (w->index >= ST_LEAD(work) && w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                        w->misses++;
-                        w->results[w->index - ST_LEAD(work)] = -1;
-                        if (!ST_CONF(work)) {
-                            psndSFXOn(sfxNg);
-                        }
-                    }
-                }
-                if (w->pressed && w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                    w->index++;
-                    if (w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                        w->rangeStart = w->index * ST_STEP(work) - 10;
-                        w->rangeEnd = (w->index + 1) * ST_STEP(work) - 1;
-                        w->okStart = w->index * ST_STEP(work);
-                        j = _get_ok_frame_range(w->difficulty) - 1;
- w->okEnd = w->okStart + j;
-                        w->pressed = 0;
-                        if (w->index >= ST_LEAD(work) && w->index < ST_COUNT(work) + ST_LEAD(work)) {
-                            w->button = w->buttons[w->index - ST_LEAD(work)];
-                        }
-                    }
-                }
-                if (w->frame >= w->next * ST_STEP(work)) {
-                    if (w->next < ST_COUNT(work) + ST_LEAD(work)) {
-                        ac->mAcState = 1000;
-                    } else {
-                        W32(work, 0x1CE8) = w->hits;
-                        ac->result &= ~1;
-                        if (w->hits >= W32(work, 0x1CD4)) {
-                            ac->result |= 2;
-                        }
-                        loop = TRUE;
-                        ac->mAcState = 1002;
-                    }
-                }
-                break;
-            case 1002:
-                ac->mAcState = 1003;
-                break;
-            case 1003:
-                break;
-            case 1004:
-                W32(work, 0x1CC0) |= 1;
-                w->okFlag = 0;
-                w->endTimer = 60;
-                ac->mAcState = 1005;
-                break;
-            case 1005:
-                w->endTimer--;
-                if (w->endTimer <= 0) {
-                    ac->mAcState = 1006;
-                }
-                break;
-            case 1006:
-                ac->maincb = NULL;
-                ac->dispcb = NULL;
-                ac->resultcb = NULL;
-                ac->deletecb = NULL;
-                break;
+s32 battleAcMain_SignalTiming(BattleWork *work)
+{
+  const char *sfxPi;
+  const char *sfxPone;
+  const char *sfxOk;
+  const char *sfxNg;
+  s32 j;
+  s32 i;
+  s32 k;
+  BOOL unique;
+  BattleActions *ac = &work->actionCommands;
+  SignalTimingWork *w = (SignalTimingWork *) (((u8 *) ac) + 0x2BC);
+  BattleACDispParams *disp = (BattleACDispParams *) (((u8 *) ac) + 0x290);
+  BOOL loop;
+  BOOL autoCommand = 0;
+  BOOL got;
+  BOOL good;
+  u32 btn;
+  BOOL done;
+  if (ac->mAcUnit->badgesEquipped.AutoCommand)
+  {
+    autoCommand = 1;
+  }
+  sfxPi = "SFX_AC_PI1";
+  sfxPone = "SFX_AC_PONE1";
+  sfxOk = "SFX_AC_COMMAND_OK1";
+  sfxNg = "SFX_AC_COMMAND_NG1\0";
+  do
+  {
+    loop = 0;
+    got = 0;
+    switch (ac->mAcState)
+    {
+      case 0:
+        ac->result = 1;
+        memset(disp, 0, sizeof(BattleACDispParams));
+        disp->iconX = -300.0f;
+        disp->iconY = 0.0f;
+        *((s32 *) (&disp->field_0x1C[4])) = 20;
+        w->hits = 0;
+        w->misses = 0;
+        w->frame = 0;
+        w->index = 0;
+        w->next = 0;
+        w->difficulty = ((s32 (*)(BattleWork *)) BattleActionCommandGetDifficulty)(work);
+        w->okFlag = 0;
+        *((s32 *) (((u8 *) work) + 0x1CEC)) = 0;
+        for (k = 0; k < 5; k++)
+      {
+        w->results[k] = 0;
+        if ((!w->hits) && (!w->hits))
+        {
         }
-    } while (loop);
-    return 1;
+      }
+
+        switch (*((s32 *) (((u8 *) work) + 0x1CD8)))
+      {
+        case 1:
+
+        case 2:
+          for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1CC8))); i++)
+        {
+          done = 0;
+          while (!done)
+          {
+            if ((*((s32 *) (((u8 *) work) + 0x1CD8))) == 1)
+            {
+              btn = _button_table_4dir[irand(4)];
+            }
+            else
+            {
+              btn = _button_table_abxy[irand(4)];
+            }
+            unique = 1;
+            for (j = i - 1; j >= 0; j--)
+            {
+              if (w->buttons[j] == btn)
+              {
+                unique = 0;
+              }
+            }
+
+            if (unique)
+            {
+              done = 1;
+            }
+          }
+
+          w->buttons[i] = btn;
+        }
+
+          w->button = w->buttons[0];
+          break;
+
+        default:
+          w->button = 0x100;
+          for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1CC8))); i++)
+        {
+          w->buttons[i] = 0x100;
+        }
+
+          w->button = w->buttons[0];
+
+      }
+
+        ac->mAcState = 99;
+        break;
+
+      case 99:
+        break;
+
+      case 100:
+        if ((*((s16 *) (((u8 *) work) + 0x1D18))) > 0)
+      {
+        (*((s16 *) (((u8 *) work) + 0x1D18)))--;
+        ac->result = 2;
+        loop = 1;
+        ac->mAcState = 1002;
+        break;
+      }
+        w->rangeStart = w->index * (*((s32 *) (((u8 *) work) + 0x1CD0)));
+        w->rangeEnd = ((w->index + 1) * (*((s32 *) (((u8 *) work) + 0x1CD0)))) - 1;
+        w->okStart = w->rangeStart;
+        j = _get_ok_frame_range(w->difficulty) - 1;
+        w->okEnd = w->okStart + j;
+        ac->mAcState = 1000;
+
+      case 1000:
+        w->unk28 = ((w->next + 1) * (*((s32 *) (((u8 *) work) + 0x1CD0)))) - 1;
+        w->next++;
+        if (w->next < ((*((s32 *) (((u8 *) work) + 0x1CE0))) + 1))
+      {
+        if (!((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
+        {
+          psndSFXOn(sfxPi);
+        }
+      }
+      else
+        if (!((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
+      {
+        psndSFXOn(sfxPone);
+      }
+        w->pressed = 0;
+        ac->mAcState = 1001;
+
+      case 1001:
+        w->frame++;
+        if (w->pressed)
+      {
+        w->okFlag = 0;
+      }
+      else
+        if (w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0))))
+      {
+        if ((w->frame >= w->okStart) && (w->frame <= w->okEnd))
+        {
+          w->okFlag = 1;
+        }
+        else
+        {
+          w->okFlag = 0;
+        }
+      }
+      else
+      {
+        w->okFlag = 0;
+      }
+        good = 0;
+        if (BattlePadCheckTrigger(w->button))
+      {
+        got = 1;
+      }
+        if (got)
+      {
+        switch (*((s32 *) (((u8 *) work) + 0x1CD8)))
+        {
+          case 2:
+            if (w->button == BattlePadGetTrigger())
+          {
+            good = 1;
+          }
+          else
+          {
+            good = 0;
+          }
+            break;
+
+          default:
+            good = 1;
+
+        }
+
+      }
+        if (autoCommand && w->okFlag)
+      {
+        got = 1;
+        good = 1;
+      }
+        if ((w->hits + w->misses) >= (*((s32 *) (((u8 *) work) + 0x1CC8))))
+      {
+        got = 0;
+      }
+        if (((w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0)))) && got) && (!w->pressed))
+      {
+        w->pressed = 1;
+        if (((w->frame >= w->okStart) && (w->frame <= w->okEnd)) && good)
+        {
+          w->hits++;
+          *((s32 *) (((u8 *) work) + 0x1CEC)) = 1;
+          if ((w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0)))) && (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0))))))
+          {
+            w->results[w->index - (*((s32 *) (((u8 *) work) + 0x1CE0)))] = 1;
+            if (!((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
+            {
+              psndSFXOn(sfxOk);
+            }
+          }
+          if ((*((s32 *) (((u8 *) work) + 0x1CC4))) & 0x10)
+          {
+            *((s32 *) (((u8 *) work) + 0x1CE8)) = w->hits;
+            ac->result &= ~1;
+            if (w->hits >= (*((s32 *) (((u8 *) work) + 0x1CD4))))
+            {
+              ac->result |= 2;
+            }
+            loop = 1;
+            ac->mAcState = 1002;
+          }
+        }
+        else
+          if ((w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0)))) && (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0))))))
+        {
+          w->misses++;
+          if (w->frame >= w->rangeStart)
+          {
+            w->results[w->index - (*((s32 *) (((u8 *) work) + 0x1CE0)))] = -1;
+            if (!((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
+            {
+              psndSFXOn(sfxNg);
+            }
+            *((s32 *) (((u8 *) work) + 0x1CEC)) = -1;
+          }
+          else
+          {
+            w->pressed = 0;
+          }
+        }
+      }
+        if ((!w->pressed) && (w->frame > w->okEnd))
+      {
+        w->pressed = 1;
+        *((s32 *) (((u8 *) work) + 0x1CEC)) = -1;
+        if ((w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0)))) && (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0))))))
+        {
+          w->misses++;
+          w->results[w->index - (*((s32 *) (((u8 *) work) + 0x1CE0)))] = -1;
+          if (!((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
+          {
+            psndSFXOn(sfxNg);
+          }
+        }
+      }
+        if (w->pressed && (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0))))))
+      {
+        w->index++;
+        if (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0)))))
+        {
+          w->rangeStart = (w->index * (*((s32 *) (((u8 *) work) + 0x1CD0)))) - 10;
+          w->rangeEnd = ((w->index + 1) * (*((s32 *) (((u8 *) work) + 0x1CD0)))) - 1;
+          w->okStart = w->index * (*((s32 *) (((u8 *) work) + 0x1CD0)));
+          j = _get_ok_frame_range(w->difficulty) - 1;
+          w->okEnd = w->okStart + j;
+          w->pressed = 0;
+          if ((w->index >= (*((s32 *) (((u8 *) work) + 0x1CE0)))) && (w->index < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0))))))
+          {
+            w->button = w->buttons[w->index - (*((s32 *) (((u8 *) work) + 0x1CE0)))];
+          }
+        }
+      }
+        if (w->frame >= (w->next * (*((s32 *) (((u8 *) work) + 0x1CD0)))))
+      {
+        if (w->next < ((*((s32 *) (((u8 *) work) + 0x1CC8))) + (*((s32 *) (((u8 *) work) + 0x1CE0)))))
+        {
+          ac->mAcState = 1000;
+        }
+        else
+        {
+          *((s32 *) (((u8 *) work) + 0x1CE8)) = w->hits;
+          ac->result &= ~1;
+          if (w->hits >= (*((s32 *) (((u8 *) work) + 0x1CD4))))
+          {
+            ac->result |= 2;
+          }
+          loop = 1;
+          ac->mAcState = 1002;
+        }
+      }
+        break;
+
+      case 1002:
+        ac->mAcState = 1003;
+        break;
+
+      case 1003:
+        break;
+
+      case 1004:
+        *((s32 *) (((u8 *) work) + 0x1CC0)) |= 1;
+        w->okFlag = 0;
+        w->endTimer = 60;
+        ac->mAcState = 1005;
+        break;
+
+      case 1005:
+        w->endTimer--;
+        if (w->endTimer <= 0)
+      {
+        ac->mAcState = 1006;
+      }
+        break;
+
+      case 1006:
+        ac->maincb = (void *) 0;
+        ac->dispcb = (void *) 0;
+        ac->resultcb = (void *) 0;
+        ac->deletecb = (void *) 0;
+        break;
+
+    }
+
+  }
+  while (loop);
+  return 1;
 }
 
 s32 battleAcResult_SignalTiming(BattleWork* work) {

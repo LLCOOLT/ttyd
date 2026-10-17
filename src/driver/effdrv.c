@@ -344,7 +344,7 @@ typedef struct MayaPoly {
 
 void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {
 	f32 buf[22];
-	Mtx trans, scale, tmp2, pivot2, pivot2Inv, trans3, pivot1, pivot1Inv, trans2, rotX, rotY, rotZ, tmp;
+	Mtx trans; Mtx scale; Mtx tmp2; Mtx pivot2; Mtx pivot2Inv; Mtx trans3; Mtx pivot1; Mtx pivot1Inv; Mtx trans2; Mtx rotX; Mtx rotY; Mtx rotZ; Mtx tmp;
 
 
 	register u32 gqr;
@@ -366,7 +366,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		if (anim->time <= curr->time) {
 			t = anim->time;
 		}
-		else if (k != n - 1) {
+		else if (k != ( n - 1) ) {
 			continue;
 		}
 		else {
@@ -376,15 +376,15 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		pb = (s8*)curr;
 		out = buf;
 		for (i = 0; i < 22; i++) {
-			f32 u, dt, s, s2, s3, div;
-			register f32 qd0, qv1, qv0, qm0, qm1;
+			f32 u; f32 dt; f32 s; f32 s2; f32 s3; f32 div;
+			register f32 qm0; register f32 qd0; register f32 qv1; register f32 qv0; register f32 qm1;
 			asm {
 				psq_l qv0, 2(pa), 1, 5
-				psq_l qd0, 4(pa), 1, 5
-				psq_l qm0, 6(pa), 1, 5
-				psq_l qv1, 2(pb), 1, 5
-				psq_l qm1, 4(pb), 1, 5
-				psq_l qd0, 6(pb), 1, 5
+				} asm { psq_l qd0, 4(pa), 1, 5
+				} asm { psq_l qm0, 6(pa), 1, 5
+				} asm { psq_l qv1, 2(pb), 1, 5
+				} asm { psq_l qm1, 4(pb), 1, 5
+				} asm { psq_l qd0, 6(pb), 1, 5
 			}
 			if (pa[9] != 0) {
 				*out = qv0;
@@ -392,11 +392,12 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 			else {
 				u = t - prev->time;
 				dt = curr->time - prev->time;
-				div = (!dt) ? 0.00000001f : dt;
+				div = (!dt) ? ( 0.00000001f ) : ( dt) ;
 				s = u / div;
-				s2 = s * s;
+				t = s;
+				s2 = s * t;
 				s3 = s2 * s;
-				*out = qv0 * (1.0f + (2.0f * s3 - 3.0f * s2)) + qm0 * (dt * (s + (s3 - 2.0f * s2))) + qv1 * (-2.0f * s3 + 3.0f * s2) + qm1 * (dt * (s3 - s2));
+				*out = ((( qv0 * (1.0f + (( 2.0f * s3 ) - ( 3.0f * s2)) )) + ( qm0 * (dt * (s + (s3 - ( 2.0f * s2))) ))) + ( qv1 * ((( -2.0f ) * s3 ) + ( 3.0f * s2) ))) + ( qm1 * (dt * (s3 - s2) ));
 			}
 			pa += 8;
 			pb += 8;
@@ -423,7 +424,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		PSMTXConcat(tmp, pivot1Inv, tmp2);
 		PSMTXConcat(trans, tmp2, tmp);
 		PSMTXConcat(tmp, scale, (MtxPtr)mtx);
-		*alpha = buf[21] > 1.0f ? 1.0f : (buf[21] < 0.0f ? 0.0f : buf[21]);
+		*alpha = ( buf[21] > 1.0f ) ? ( 1.0f ) : ((buf [21] < ( (buf[21] < 0.0f ) * 0.0f)) ? ( 0.0f ) : ( buf[21]) );
 		return;
 	}
 }

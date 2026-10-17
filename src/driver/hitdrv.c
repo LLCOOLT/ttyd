@@ -1115,8 +1115,8 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
                             if (var_f28 < 0.0f || var_f28 > temp_f1) {
                                 var_f28 = temp_f1;
                                 var_f31 = var_r23->radius;
-                                entryId = i;
                                 objectId = j;
+                                entryId = i;
                             }
                         }
                     }
@@ -1145,7 +1145,8 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
     }
     vector = temp_r27->vectors;
     for (i = 0; i < temp_r27->unkA8; i++, vector++) {
-        if ((query->singleSided == 0) || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
+        entryId = query->singleSided;
+        if ((entryId == 0) || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
             if (tempfunc3(query, vector) && ((var_f30 < 0.0f) || (var_f30 > query->targetDistance))) {
                 var_f30 = query->targetDistance;
                 var_r29 = 1;

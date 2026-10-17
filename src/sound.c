@@ -1725,7 +1725,7 @@ void SoundSSPlayCh(s32 chan, const char* name) {
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
-    char* path;
+    const char* new_var2 [2];
 
     stream = &sound.streams[chan];
     if (stream->flags) {
@@ -1753,15 +1753,17 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     if (aram) {
         stream->flags |= 0x400;
     }
-    sprintf(str, "%s/%s%s", getMarioStDvdRoot(), name, ".stm");
-    if (!(stream->entries[0].dvd = DVDMgrOpen(path = str, 0, 0))) {
+    new_var2 [1] = getMarioStDvdRoot ();
+    sprintf(str, "%s/%s%s", new_var2 [1], name, ".stm");
+    if (!(stream->entries[0].dvd = DVDMgrOpen(new_var2 [0] = str, 0, 0))) {
         stream->flags = 0;
         return;
     }
-    if (!(stream->entries[1].dvd = DVDMgrOpen(path, 0, 0))) {
+    if (!(stream->entries[1].dvd = DVDMgrOpen(new_var2 [0], 0, 0))) {
         stream->flags = 0;
         return;
     }
+    stream = stream;
     DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].buffer, 0x100, 0, SoundSSPlayChEx_main);
 }
 

@@ -855,12 +855,14 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 				idx = (j / 8) * 32 + (row << 8); idx += j % 8; idx += col << 3; tex[idx] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
-			for (k = 0; k < n; k++) {
+			row = row * 256;
+			k = col * 8;
+			for (col = 0; col < n; col++) {
 				w = rand() % 4 + 2;
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					idx = (j / 8) * 32 + row * 256; idx += j % 8; idx += col * 8; tex[idx] = c;
+					idx = j / 8 * 32; idx = idx + row; idx += j % 8; idx += k; tex[idx] = c;
 				}
 			}
 		}

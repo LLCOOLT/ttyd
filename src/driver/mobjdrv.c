@@ -434,9 +434,9 @@ void mobjHitEntry(MapObjectEntry* entry, s32 type) {
     PSVECScale(&entry->translation, &entry->translation, 0.5f);
     PSVECScale(&entry->translation, &entry->translation, 10.0f);
     entry->translation.y = 0.0f;
-    entry->scale2.x = 10.0f * (entry->scale.x * (f32)__fabs(max.x - min.x));
+    entry->scale2.x = 10.0f * (entry->scale.x * (f32)(0, __fabs((0, max.x - min.x))));
     entry->scale2.y = 10.0f * (entry->scale.y * (f32)__fabs(max.y));
-    entry->scale2.z = 10.0f * (entry->scale.z * (f32)__fabs(max.z - min.z));
+    entry->scale2.z = 10.0f * (entry->scale.z * (f32)(0, __fabs((0, max.z - min.z))));
     if (strncmp(pose->fileName, "HOBJ_", strlen("HOBJ_")) == 0) {
         entry->translation.z = 0.0f;
         entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
@@ -968,10 +968,26 @@ EventEntry* mobjRunEvent(MapObjectEntry* entry, s32* eventCode) {
     return event;
 }
 
+static inline void calcMtx(Mtx mtx, Vec* pos, Vec* sc, Vec* rot) {
+    Mtx trans;
+    Mtx scale;
+    Mtx xrot;
+    Mtx yrot;
+    Mtx zrot;
+    MTXTrans(trans, pos->x, pos->y, pos->z);
+    MTXScale(scale, sc->x, sc->y, sc->z);
+    MTXRotRad(xrot, 'x', MTXDegToRad(rot->x));
+    MTXRotRad(yrot, 'y', MTXDegToRad(rot->y));
+    MTXRotRad(zrot, 'z', MTXDegToRad(rot->z));
+    MTXConcat(trans, zrot, trans);
+    MTXConcat(trans, yrot, trans);
+    MTXConcat(trans, xrot, trans);
+    MTXConcat(trans, scale, mtx);
+}
+
 void mobjCalcMtx(MapObjectEntry* entry) {
     AnimationPoseData* pose;
     Mtx mtx;
-    Mtx zrot, yrot, xrot, scale, trans;
     Vec position;
     Vec min;
     Vec max;
@@ -988,17 +1004,7 @@ void mobjCalcMtx(MapObjectEntry* entry) {
         entry->translation.z = 0.0f;
         entry->scale2.z = 10.0f * (2.5f * entry->scale.z);
     }
-    {
-                MTXTrans(trans, position.x, position.y, position.z);
-                MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
-                MTXRotRad(xrot, 'x', MTXDegToRad(entry->rotation.x));
-                MTXRotRad(yrot, 'y', MTXDegToRad(entry->rotation.y));
-                MTXRotRad(zrot, 'z', MTXDegToRad(entry->rotation.z));
-                MTXConcat(trans, zrot, trans);
-                MTXConcat(trans, yrot, trans);
-                MTXConcat(trans, xrot, trans);
-                MTXConcat(trans, scale, mtx);
-            }
+    calcMtx(mtx, &position, &entry->scale2, &entry->rotation);
     for (i = 0; i < 2; i++) {
         if (entry->hitObj[i].hitObject != NULL) {
             if (1) {
@@ -1010,11 +1016,6 @@ void mobjCalcMtx(MapObjectEntry* entry) {
 
 void mobjCalcMtx2(MapObjectEntry* entry) {
     Mtx mtx;
-    Mtx zRot;
-    Mtx yRot;
-    Mtx xRot;
-    Mtx scale;
-    Mtx trans;
     Vec position;
     s32 i;
 
@@ -1022,15 +1023,7 @@ void mobjCalcMtx2(MapObjectEntry* entry) {
 
     // TODO: Try matching using calcMtx inline function - had issues with lining up the stack offsets
     // Matches fine here
-    MTXTrans(trans, position.x, position.y, position.z);
-    MTXScale(scale, entry->scale2.x, entry->scale2.y, entry->scale2.z);
-    MTXRotRad(xRot, 'x', MTXDegToRad((0, entry->rotation.x)));
-    MTXRotRad(yRot, 'y', MTXDegToRad(entry->rotation.y));
-    MTXRotRad(zRot, 'z', MTXDegToRad(entry->rotation.z));
-    MTXConcat(trans, zRot, trans);
-    MTXConcat(trans, yRot, trans);
-    MTXConcat(trans, xRot, trans);
-    MTXConcat(trans, scale, mtx);
+    calcMtx(mtx, &position, &entry->scale2, &entry->rotation);
 
     for (i = 0; i < 2; i++) {
         if (entry->hitObj[i].hitObject != 0)

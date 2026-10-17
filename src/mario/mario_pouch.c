@@ -179,114 +179,167 @@ s32 pouchGetEmptyKeepItemCnt(void) {
 }
 
 //we have obtained an item, update the appropriate data
-BOOL pouchGetItem(ItemType type) {
-	s16* list;
-	s16* equip;
-	s32 size;
-	s32 j;
-	BOOL ok;
+BOOL pouchGetItem(ItemType type)
+{
+  s16 *new_var[2];
+  s32 size;
+  s32 j;
+  BOOL ok;
+  if (type == ITEM_COIN)
+  {
+    if (mpp->coins < 999)
+    {
+      mpp->coins++;
+    }
+    return 1;
+  }
+  if (type == ITEM_PIANTA_TOKEN)
+  {
+    if (yuwp->tokens < 99999)
+    {
+      yuwp->tokens++;
+    }
+    return 1;
+  }
+  if (type == ITEM_HEART)
+  {
+    size = marioGetParty();
+    if (mpp->currentHP < mpp->maximumHP)
+    {
+      mpp->currentHP++;
+    }
+    if (size != 0)
+    {
+      if (mpp->partyData[size].currentHP < mpp->partyData[size].maximumHP)
+      {
+        mpp->partyData[size].currentHP++;
+      }
+    }
+    return 1;
+  }
+  if (type == 0x7C)
+  {
+    if (mpp->currentFP < mpp->maximumFP)
+    {
+      mpp->currentFP++;
+    }
+    return 1;
+  }
+  if (type == 0x7D)
+  {
+    mpp->mStarPieceCount++;
+    return 1;
+  }
+  if (type == 0x57)
+  {
+    mpp->mShineSpriteCount++;
+    return 1;
+  }
+  if (((type == 6) || (type == 7)) || (type == 8))
+  {
+    switch (type)
+    {
+      case 6:
+        mpp->jumpLevel = 1;
+        break;
 
-	if (type == ITEM_COIN) {
-		if (mpp->coins < 999) {
-			mpp->coins++;
-		}
-		return TRUE;
-	}
-	if (type == ITEM_PIANTA_TOKEN) {
-		if (yuwp->tokens < 99999) {
-			yuwp->tokens++;
-		}
-		return TRUE;
-	}
-	if (type == ITEM_HEART) {
-		size = marioGetParty();
-		if (mpp->currentHP < mpp->maximumHP) {
-			mpp->currentHP++;
-		}
-		if (size != 0) {
-			if (mpp->partyData[size].currentHP < mpp->partyData[size].maximumHP) {
-				mpp->partyData[size].currentHP++;
-			}
-		}
-		return TRUE;
-	}
-	if (type == 0x7C) {
-		if (mpp->currentFP < mpp->maximumFP) {
-			mpp->currentFP++;
-		}
-		return TRUE;
-	}
-	if (type == 0x7D) {
-		mpp->mStarPieceCount++;
-		return TRUE;
-	}
-	if (type == 0x57) {
-		mpp->mShineSpriteCount++;
-		return TRUE;
-	}
-	if (type == 6 || type == 7 || type == 8) {
-		switch (type) {
-		case 6: mpp->jumpLevel = 1; break;
-		case 7: mpp->jumpLevel = 2; break;
-		case 8: mpp->jumpLevel = 3; break;
-		}
-	}
-	else if (type == 9 || type == 10 || type == 11) {
-		switch (type) {
-		case 9: mpp->hammerLevel = 1; break;
-		case 10: mpp->hammerLevel = 2; break;
-		case 11: mpp->hammerLevel = 3; break;
-		}
-	}
-	else if (type == 0x59) {
-		return TRUE;
-	}
-	else if (type >= 0xF0 && type < 0x153) {
-		swSet(type - 0x70);
-	}
+      case 7:
+        mpp->jumpLevel = 2;
+        break;
 
-	list = NULL;
-	equip = NULL;
-	size = 0;
-	if (type >= 0x79 && type < 0xEC) {
-		list = mpp->heldItems;
-		size = CHECK_ITEM(1) ? 20 : 10;
-		ok = TRUE;
-	}
-	else if (type >= 1 && type < 0x79) {
-		equip = NULL;
-		size = 0x79;
-		ok = TRUE;
-		list = mpp->keyItems;
-	}
-	else if (type >= 0xF0 && type < 0x153) {
-		size = 200;
-		ok = TRUE;
-		list = mpp->badges;
-		equip = mpp->equippedBadges;
-	}
-	else {
-		ok = FALSE;
-	}
-	if (!ok) {
-		return FALSE;
-	}
-	for (size--; size >= 0; size--) {
-		if (list[size] == 0) {
-			for (j = size; j > 0; j--) {
-				list[j] = list[j - 1];
-				if (equip) {
-					equip[j] = equip[j - 1];
-				}
-			}
-			list[0] = type;
-			if (equip) {
-				equip[0] = 0;
-			}
-			return TRUE;
-		}
-	}
-	return FALSE;
+      case 8:
+        mpp->jumpLevel = 3;
+        break;
+
+    }
+
+  }
+  else
+    if (((type == 9) || (type == 10)) || (type == 11))
+  {
+    switch (type)
+    {
+      case 9:
+        mpp->hammerLevel = 1;
+        break;
+
+      case 10:
+        mpp->hammerLevel = 2;
+        break;
+
+      case 11:
+        mpp->hammerLevel = 3;
+        break;
+
+    }
+
+  }
+  else
+    if (type == 0x59)
+  {
+    return 1;
+  }
+  else
+    if ((type >= 0xF0) && (type < 0x153))
+  {
+    swSet(type - 0x70);
+  }
+  new_var[0] = (void *) 0;
+  new_var[1] = (void *) 0;
+  size = 0;
+  if ((type >= 0x79) && (type < 0xEC))
+  {
+    new_var[0] = mpp->heldItems;
+    size = (((s32 (*)(s32)) pouchCheckItem)(1)) ? (20) : (10);
+    ok = 1;
+  }
+  else
+    if ((type >= 1) && (type < 0x79))
+  {
+    new_var[1] = (void *) 0;
+    size = 0x79;
+    ok = 1;
+    new_var[0] = mpp->keyItems;
+  }
+  else
+    if ((type >= 0xF0) && (type < 0x153))
+  {
+    size = 200;
+    ok = 1;
+    new_var[0] = mpp->badges;
+    new_var[1] = mpp->equippedBadges;
+  }
+  else
+  {
+    ok = 0;
+  }
+  if (!ok)
+  {
+    return 0;
+  }
+  for (size--; size >= 0; size--)
+  {
+    if (new_var[0][size] == 0)
+    {
+      for (j = size; j > 0; j--)
+      {
+        new_var[0][j] = new_var[0][j - 1];
+        if (new_var[1])
+        {
+          new_var[1][j] = new_var[1][j - 1];
+        }
+      }
+
+      new_var[0][0] = type;
+      if (new_var[1])
+      {
+        new_var[1][0] = 0;
+      }
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 u32 pouchCheckItem(u32 itemId) {
@@ -480,20 +533,14 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 }
 
 s32 comp_aiueo(s16* a, s16* b) {
-	 const char * new_var ;
-	char bufA[0x80]; char bufB [0x80];
-	s16 ia ;
+	char bufA[0x80];
+	char bufB[0x80];
+	s16 ia = *a;
 	s16 ib = *b;
-	// ia is read before it is set; this matches the target, keep it.
-	const char* nA = itemDataTable[0, ia].name;
-	const char* nB;
-	nA =msgSearch(nA); unk_800d06b4 (new_var = nA , bufA);
-	new_var = itemDataTable [ib].name;
-	ia = * a;
-	nB = new_var;
-	unk_800d06b4(msgSearch(nB), bufB);
-	ia = strcmp(bufA, bufB);
-return ia;
+
+	pouchAiueoConv(msgSearch(itemDataTable[ia].name), bufA);
+	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
+	return strcmp(bufA, bufB);
 }
 
 s32 comp_kind(s16* a, s16* b) {

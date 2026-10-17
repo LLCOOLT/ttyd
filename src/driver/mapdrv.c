@@ -490,7 +490,7 @@ void makeDisplayList(BOOL group) {
 				dst = MAPENT_FIELD(e, void*, 0x16C);
 			}
 			else {
-				*(void**)((u8*)wp + (group * 0x178 + 0x16C)) = NULL;
+				((void**)((u8*)wp + 0x16C))[group * 0x5E] = NULL;
 				break;
 			}
 		}
@@ -1123,50 +1123,59 @@ void bmapUnLoad(void) {
 	}
 }
 
-void bmapLoad(const char* map, const char* map2) {
-	MapWork* wp;
-	MapEntry* entry;
-	MapEntry* e;
-	int i;
+void bmapLoad(const char *map, const char *map2)
+{
+  MapWork *wp;
+  MapEntry *entry;
+  MapEntry *e;
+  int i;
+  sysWaitDrawSync();
+  activeGroup = 0;
+  wp = mapGetWork();
+  for (i = 0; i < wp->entries[0].count; i++)
+  {
+    e = &mapWork[activeGroup].entries[i];
+    entry = &wp->entries[i];
+    if (*((void **) (((u8 *) e) + 0x16C)))
+    {
+      _mapFree(*((void **) (((u8 *) e) + 0x16C)));
+    }
+    *((s32 *) (((u8 *) e) + 0x168)) = 0;
+    *((void **) (((u8 *) e) + 0x16C)) = (void *) 0;
+    *((void **) (((u8 *) entry) + 0x170)) = (void *) 0;
+    *((void **) (((u8 *) entry) + 0x178)) = (void *) 0;
+    *((void **) (((u8 *) entry) + 0x174)) = (void *) 0;
+    if (entry->dat)
+    {
+      if (!arcDataCheck(entry->dat))
+      {
+        entry->tpl += 0;
+        *((ARAMEntry **) (((u8 *) entry) + 0x170)) = aramMgrToAram(entry->dat, entry->datSize);
+        *((ARAMEntry **) (((u8 *) entry) + 0x178)) = aramMgrToAram(entry->tpl, entry->tplSize);
+        _mapFree(entry->tpl);
+        _mapFree(entry->dat);
+        entry->tpl = (void *) 0;
+        entry->dat = (void *) 0;
+      }
+      else
+      {
+        *((ARAMEntry **) (((u8 *) entry) + 0x174)) = aramMgrToAram(*((void **) (((u8 *) entry) + 0x8C)), *((u32 *) (((u8 *) entry) + 0x90)));
+        _mapFree(*((void **) (((u8 *) entry) + 0x8C)));
+        *((void **) (((u8 *) entry) + 0x8C)) = (void *) 0;
+      }
+    }
+  }
 
-	sysWaitDrawSync();
-	activeGroup = 0;
-	wp = mapGetWork();
-	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
-		e = &mapWork[activeGroup].entries[i];
-		if (MAPENT_FIELD(e, void*, 0x16C)) {
-			_mapFree(MAPENT_FIELD(e, void*, 0x16C));
-		}
-		MAPENT_FIELD(e, s32, 0x168) = 0;
-		MAPENT_FIELD(e, void*, 0x16C) = NULL;
-		MAPENT_FIELD(entry, void*, 0x170) = NULL;
-		MAPENT_FIELD(entry, void*, 0x178) = NULL;
-		MAPENT_FIELD(entry, void*, 0x174) = NULL;
-		if (entry->dat) {
-			if (!arcDataCheck(entry->dat)) {
-				MAPENT_FIELD(entry, ARAMEntry*, 0x170) = aramMgrToAram(entry->dat, entry->datSize);
-				MAPENT_FIELD(entry, ARAMEntry*, 0x178) = aramMgrToAram(entry->tpl, entry->tplSize);
-				_mapFree(entry->tpl);
-				_mapFree(entry->dat);
-				entry->tpl = NULL;
-				entry->dat = NULL;
-			}
-			else {
-				MAPENT_FIELD(entry, ARAMEntry*, 0x174) = aramMgrToAram(MAPENT_FIELD(entry, void*, 0x8C), MAPENT_FIELD(entry, u32, 0x90));
-				_mapFree(MAPENT_FIELD(entry, void*, 0x8C));
-				MAPENT_FIELD(entry, void*, 0x8C) = NULL;
-			}
-		}
-	}
-	wp = &mapWork[1];
-	activeGroup = 1;
-	memset(wp, 0, sizeof(MapWork));
-	_mapLoad(wp, 0, map);
-	wp->entries[0].count = 1;
-	if (map2) {
-		_mapLoad(wp, 1, map2);
-		wp->entries[0].count = 2;
-	}
+  wp = (0, &mapWork[1]);
+  activeGroup = 1;
+  memset(wp, 0, sizeof(MapWork));
+  _mapLoad(wp, 0, map);
+  wp->entries[0].count = 1;
+  if (map2)
+  {
+    _mapLoad(wp, 1, map2);
+    wp->entries[0].count = 2;
+  }
 }
 
 typedef struct MapAnimKeyCh {
@@ -1473,9 +1482,9 @@ typedef struct MapAnimLightData2 {
 			MapAnimKey4* k0 = &d->keys[n - 1]; \
 			MapAnimKey4* k1 = &d->keys[n]; \
 			\
-			f32 t_ = a_->time; \
-			if (t_ <= k1->time) { \
-				cur = t_; \
+			cur = a_->time; \
+			if (cur <= k1->time) { \
+				cur = a_->time; \
 			} \
 			else if (n == d->keyCount - 1) { \
 				cur = k1->time; \
@@ -1712,145 +1721,181 @@ static inline BOOL mapObjIsTranslucent(u32 flags, GXColor objColor, GXColor matC
 	return FALSE;
 }
 
-void _mapDispMapObj(CameraId cam, MapObject* obj) {
-	CameraEntry* camera;
-	CameraEntry* cur;
-	MapFileJoint* joint;
-	f32 scale;
-	s32 n;
-	s32 mode;
-	GXCullMode cull;
-	f32 d;
-	Mtx mtx;
-	Mtx nrm;
-	f32 proj[7];
-	MapFileMesh* mesh;
-	int i;
-	MapWork* wp;
-	int j;
-	void* material;
+void _mapDispMapObj(CameraId cam, MapObject *obj)
+{
+  CameraEntry *camera;
+  CameraEntry *cur;
+  MapFileJoint *joint;
+  f32 scale;
+  s32 n;
+  s32 mode;
+  GXCullMode cull;
+  f32 d;
+  Mtx mtx;
+  Mtx nrm;
+  f32 proj[7];
+  MapFileMesh *mesh;
+  int i;
+  MapWork *wp;
+  int j;
+  void *material;
+  camera = camGetPtr(cam);
+  current_mp = obj;
+  if (!(obj->flags & 0x20))
+  {
+    goto setup;
+  }
+  if (obj->flags & 0x8000)
+  {
+    n = 0;
+    for (joint = obj->joints; joint->prev; joint = joint->prev)
+    {
+    }
 
-	camera = camGetPtr(cam);
-	current_mp = obj;
-	if (!(obj->flags & 0x20)) {
-		goto setup;
-	}
-	if (obj->flags & 0x8000) {
-		n = 0;
-		for (joint = obj->joints; joint->prev; joint = joint->prev) {
-		}
-		for (; joint != obj->joints; joint = joint->next) {
-			n++;
-		}
-		scale = 0.01f * n;
-		GXGetProjectionv(proj);
-		d = 1.0f;
-		d = d * (camera->far + camera->near) * (d + scale);
-		proj[5] *= 1.0f + (scale * (-2.0f * camera->far * camera->near)) / d;
-		GXSetProjectionv(proj);
-	}
-	mode = obj->blendMode;
-	if (obj->joints->partCount > 0) {
-		if (mapObjIsTranslucent(obj->flags, obj->color, *(GXColor*)((u8*)obj->joints->parts[0].material + 0x10C))) {
-			mode = 2;
-		}
-	}
-	switch (mode) {
-		case 0:
-			GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 7);
-			GXSetZCompLoc(GX_TRUE);
-			GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-			break;
-		case 3:
-			GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
-			GXSetZCompLoc(GX_TRUE);
-			GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-			GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-			break;
-		case 1:
-			GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
-			GXSetZCompLoc(GX_FALSE);
-			GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
-			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-			break;
-		case 4:
-			GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
-			GXSetZCompLoc(GX_FALSE);
-			GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
-			GXSetZMode(GX_FALSE, GX_LEQUAL, GX_FALSE);
-			break;
-		case 2:
-		case 5:
-		default:
-			GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, 0);
-			GXSetZCompLoc(GX_TRUE);
-			GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
-			GXSetZMode(GX_TRUE, GX_LEQUAL, GX_FALSE);
-			break;
-	}
-setup:
-	if (cam == 1) {
-		GXSetZCompLoc(GX_FALSE);
-	}
-	PSMTXConcat(camera->view, obj->modelWorldMtx, mtx);
-	GXLoadPosMtxImm(mtx, 0);
-	if (!(obj->flags & 0x100)) {
-		PSMTXInvXpose(mtx, nrm);
-		GXLoadNrmMtxImm(nrm, 0);
-	}
-	GXSetCurrentMtx(0);
-	GXGetCullMode(&cull);
-	if (cull != culling[obj->joints->drawMode->cullMode]) {
-		GXSetCullMode(culling[obj->joints->drawMode->cullMode]);
-	}
-	mapSetObjFog(obj);
-	if (obj->flags & 0x20) {
-		if (obj->flags & 0x4000) {
-			goto end;
-		}
-		if ((obj->flags & 1) && !(obj->flags & 0x80)) {
-			goto end;
-		}
-		if ((obj->flags & 0x40) && obj->color.a == 0) {
-			goto end;
-		}
-	}
-	if (obj->flags & 0x100) {
-		for (i = 0; i < obj->joints->partCount; i++) {
-			material = obj->joints->parts[i].material;
-			mesh = obj->joints->parts[i].mesh;
-			mapSetTextureMatrix(material);
-			mapSetMaterialLastStageBlend(obj->flags, obj->color, *(GXColor*)((u8*)material + 0x10C));
-			mapSetPolygonVtxDesc(obj, mesh);
-			GXCallDisplayList(MAPOBJ_DL(obj)[i], MAPOBJ_DLSIZE(obj)[i]);
-			for (j = 0; j < mesh->displayListCount; j++) {
-				GXCallDisplayList((void*)mesh->displayLists.packedLists[j].offset, *(u32*)&mesh->displayLists.packedLists[j].vertexCount);
-			}
-		}
-	}
-	else {
-		for (i = 0; i < obj->joints->partCount; i++) {
-			material = obj->joints->parts[i].material;
-			mesh = obj->joints->parts[i].mesh;
-			mapSetTextureMatrix(material);
-			mapSetMaterialLastStageBlend(obj->flags, obj->color, *(GXColor*)((u8*)material + 0x10C));
-			mapSetMaterial(obj, material);
-			mapSetPolygon(obj, mesh);
-		}
-	}
-end:
-	if (obj->flags & 0x8000) {
-		GXSetProjection(camera->projection, camera->projType);
-	}
-	if (obj->flags & 0x0F000000) {
-		GXSetTevDirect(GX_TEVSTAGE0);
-		GXSetTevDirect(GX_TEVSTAGE1);
-		GXSetTevDirect(GX_TEVSTAGE2);
-		GXSetTevDirect(GX_TEVSTAGE3);
-		GXSetTevDirect(GX_TEVSTAGE4);
-		GXSetNumIndStages(0);
-	}
+    for (; joint != obj->joints; joint = joint->next)
+    {
+      n++;
+    }
+
+    scale = 0.01f * n;
+    GXGetProjectionv(proj);
+    d = 1.0f;
+    d = (d * (camera->far + camera->near)) * (d + scale);
+    proj[5] *= 1.0f + ((scale * (((-2.0f) * camera->far) * camera->near)) / d);
+    GXSetProjectionv(proj);
+  }
+  mode = obj->blendMode;
+  if (obj->joints->partCount > 0)
+  {
+    if (mapObjIsTranslucent(obj->flags, obj->color, *((GXColor *) (((u8 *) obj->joints->parts[0].material) + 0x10C))))
+    {
+      mode = 2;
+    }
+  }
+  switch (mode)
+  {
+    case 0:
+      GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 7);
+      GXSetZCompLoc((GXBool) 1);
+      GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+      GXSetZMode((GXBool) 1, GX_LEQUAL, (GXBool) 1);
+      break;
+
+    case 3:
+      GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
+      GXSetZCompLoc((GXBool) 1);
+      GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+      GXSetZMode((GXBool) 0, GX_LEQUAL, (GXBool) 0);
+      break;
+
+    case 1:
+      GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
+      GXSetZCompLoc((GXBool) 0);
+      GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+      GXSetZMode((GXBool) 1, GX_LEQUAL, (GXBool) 1);
+      break;
+
+    case 4:
+      GXSetBlendMode(GX_BM_NONE, GX_BL_ONE, GX_BL_ZERO, 0);
+      GXSetZCompLoc((GXBool) 0);
+      GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
+      GXSetZMode((GXBool) 0, GX_LEQUAL, (GXBool) 0);
+      break;
+
+    case 2:
+
+    case 5:
+
+    default:
+      GXSetBlendMode(GX_BM_BLEND, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, 0);
+      GXSetZCompLoc((GXBool) 1);
+      GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_AND, GX_ALWAYS, 0);
+      GXSetZMode((GXBool) 1, GX_LEQUAL, (GXBool) 0);
+      break;
+
+  }
+
+  setup:
+  if (cam == 1)
+  {
+    GXSetZCompLoc((GXBool) 0);
+  }
+
+  PSMTXConcat(camera->view, obj->modelWorldMtx, mtx);
+  GXLoadPosMtxImm(mtx, 0);
+  if (!(obj->flags & 0x100))
+  {
+    PSMTXInvXpose(mtx, nrm);
+    GXLoadNrmMtxImm(nrm, 0);
+  }
+  GXSetCurrentMtx(0);
+  GXGetCullMode(&cull);
+  if (cull != culling[obj->joints->drawMode->cullMode])
+  {
+    GXSetCullMode(culling[obj->joints->drawMode->cullMode]);
+  }
+  mapSetObjFog(obj);
+  if (obj->flags & 0x20)
+  {
+    if (obj->flags & 0x4000)
+    {
+      goto end;
+    }
+    if ((obj->flags & 1) && (!(obj->flags & 0x80)))
+    {
+      goto end;
+    }
+    if ((obj->flags & 0x40) && (obj->color.a == 0))
+    {
+      goto end;
+    }
+  }
+  if (obj->flags & 0x100)
+  {
+    for (i = 0; i < obj->joints->partCount; i++)
+    {
+      mesh = obj->joints->parts[i].mesh;
+      material = obj->joints->parts[i].material;
+      mapSetTextureMatrix(material);
+      mapSetMaterialLastStageBlend(obj->flags, obj->color, *((GXColor *) (((u8 *) material) + 0x10C)));
+      mapSetPolygonVtxDesc(obj, mesh);
+      GXCallDisplayList(((MapObjectDL *) obj)->dl[i], ((MapObjectDL *) obj)->dlSize[i]);
+      for (j = 0; j < mesh->displayListCount; j++)
+      {
+        GXCallDisplayList((void *) mesh->displayLists.packedLists[j].offset, *((u32 *) (&mesh->displayLists.packedLists[j].vertexCount)));
+      }
+
+    }
+
+  }
+  else
+  {
+    for (i = 0; i < obj->joints->partCount; i++)
+    {
+      material = obj->joints->parts[i].material;
+      mesh = obj->joints->parts[i].mesh;
+      mapSetTextureMatrix(material);
+      mapSetMaterialLastStageBlend(obj->flags, obj->color, *((GXColor *) (((u8 *) material) + 0x10C)));
+      mapSetMaterial(obj, material);
+      mapSetPolygon(obj, mesh);
+    }
+
+  }
+  end:
+  if (obj->flags & 0x8000)
+  {
+    GXSetProjection(camera->projection, camera->projType);
+  }
+
+  if (obj->flags & 0x0F000000)
+  {
+    GXSetTevDirect(GX_TEVSTAGE0);
+    GXSetTevDirect(GX_TEVSTAGE1);
+    GXSetTevDirect(GX_TEVSTAGE2);
+    GXSetTevDirect(GX_TEVSTAGE3);
+    GXSetTevDirect(GX_TEVSTAGE4);
+    GXSetNumIndStages(0);
+  }
 }
 
 
@@ -2197,6 +2242,8 @@ static u32 texture_0[64] ATTRIBUTE_ALIGN(32) = {
 	0xE9F2C212, 0x55FFAA00, 0x00000000, 0x00000000,
 };
 
+#pragma push
+#pragma opt_lifetimes off
 void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 	static f32 scrl_uv[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 	GXTexMapID map;
@@ -2884,6 +2931,7 @@ void mapSetMaterialTev(s32 texCount, s32 drawMode, s32 flags, Mtx mtx) {
 	GXSetNumTevStages((u8)tevStage);
 	GXSetNumIndStages((u8)indStages);
 }
+#pragma pop
 
 void mapSetMaterialLastStageBlend(s32 flags, GXColor color1, GXColor color2) {
 	MapWork* wp = mapGetWork();
@@ -3109,7 +3157,7 @@ void mapSetMaterial(MapObject* obj, void* material) {
 			MTXMultVecSR(camGetCurPtr()->view, &dir, &dir);
 			GXInitLightPos(&lightObj, pos.x, pos.y, pos.z);
 			GXInitLightDir(&lightObj, dir.x, dir.y, dir.z);
-			GXInitLightSpot(&lightObj, lights[i]->spotAngle * 0.5f, GX_SP_SHARP);
+			GXInitLightSpot(&lightObj, lights[i]->spotAngle / 2, GX_SP_SHARP);
 			GXInitLightDistAttn(&lightObj, 1000.0f, 0.5f, GX_DA_OFF);
 			GXInitLightColor(&lightObj, lights[i]->color);
 			GXLoadLightObjImm(&lightObj, lightid_tbl[i]);
@@ -3349,8 +3397,8 @@ const GXVtxAttrFmtList attr_fmt[12] = {
 
 void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 	MapWork* wp;
-	void* nrm;
 	void* pos;
+	void* nrm;
 	s32 texCount;
 	MapVcdTable* vcd;
 
@@ -3399,7 +3447,7 @@ void mapSetPolygon(MapObject* obj, MapFileMesh* mesh) {
 		u32 mask = mesh->elementMask;
 		GXClearVtxDesc();
 		GXSetVtxDesc(GX_VA_POS, GX_INDEX16);
-		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)(*(MapVtxFmtInfo**)((u8*)wp + (0xA4 + obj->groupIndex * 0x178)))->posFrac);
+		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_S16, (u8)((MapVtxFmtInfo**)((u8*)wp + 0xA4))[obj->groupIndex * 0x5E]->posFrac);
 		GXSetArray(GX_VA_POS, pos, 6);
 		GXSetVtxDesc(GX_VA_NRM, GX_INDEX16);
 		GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_NRM_XYZ, GX_S8, 6);

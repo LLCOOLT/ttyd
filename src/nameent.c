@@ -454,15 +454,15 @@ void nameEntDisp(CameraId cameraId, void* param) {
 			}
 		}
 	}
-	for (k = 0; k < 4; k++) {
-		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == k) {
+	for (j = 0; j < 4; j++) {
+		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == j) {
 			winTexInit(*wp->field_0x60->data);
-			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
+			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(k + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(j + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
 			winTexInit_x2(*wp->field_0x60->data);
-			winTexSet_x2(k + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - k * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
+			winTexSet_x2(j + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
 	winTexInit(*wp->field_0x60->data);

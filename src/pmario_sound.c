@@ -5927,10 +5927,11 @@ static inline s32 sfxvol(SFXW* s) {
 void psndSFXMain(void) {
 	s32 i;
 	u32 j;
+	unsigned int new_var3;
 	s32 cnt;
 	s32 fade = 0;
-	s32 tmpp2 [2];
-	SFXW* fade2 [2];
+	s32 new_var2 [2];
+	SFXW* new_var [2];
 	PaperSoundWork* p = &psnd;
 	SFXL* e;
 	u32 f;
@@ -5938,23 +5939,23 @@ void psndSFXMain(void) {
 	u8 b[4];
 	s32 rv;
 
-	fade2 [0] = (SFXW*)pssfx;
-	for (i = 0, fade2 [1] = fade2 [0]; i < 40; i++, fade2 [1]++) {
-		if (fade2 [1]->id != -1 && !(fade2 [1]->flags & 1)) {
-			f = ((SFXL*)pssfxlist)[fade2 [1]->id & 0x1FFF].flags;
+	new_var3 = - 1; new_var [0] = (SFXW*)pssfx;
+	for (i = 0, new_var [1] = new_var [0]; i < 40; i++, new_var [1]++) {
+		if ((new_var [1]->id != ( -1 )) && ( !(new_var [1]->flags & 1) )) {
+			f = ((SFXL*)pssfxlist)[new_var [1]->id & 0x1FFF].flags;
 			if (f & 0x80000000) {
-				if (!((u32(*)(s32))SoundSSCheck)(fade2 [1]->ch)) {
-					fade2 [1]->id = -1;
-					fade2 [1]->ch = -1;
+				if (!((u32(*)(s32))SoundSSCheck)(new_var [1]->ch)) {
+					new_var [1]->id = new_var3;
+					new_var [1]->ch = new_var3;
 				}
 			} else { fade =f & 0x40000000; if (fade) {
-				if (!((u32(*)(s32))SoundSongCheck)(fade2 [1]->ch)) {
-					fade2 [1]->id = -1;
-					fade2 [1]->ch = -1;
+				if (!((u32(*)(s32))SoundSongCheck)(new_var [1]->ch)) {
+					new_var [1]->id = new_var3;
+					new_var [1]->ch = -1;
 				}
-			} else if (!((u32(*)(s32))SoundEfxCheck)(fade2 [1]->ch)) {
-				fade2 [1]->id = -1;
-				fade2 [1]->ch = -1;
+			} else if (!((u32(*)(s32))SoundEfxCheck)(new_var [1]->ch)) {
+				new_var [1]->id = new_var3;
+				new_var [1]->ch = new_var3;
 			}
 			}
 		}
@@ -5966,35 +5967,35 @@ void psndSFXMain(void) {
 		}
 		fade = (p->unk28 * 127) / p->unk26;
 	}
-	tmpp2 [1] = 100;
-	if ((psnd.unk56 & 0x20) && !(psnd.unk56 & 0x40)) {
-		tmpp2 [1] = 120;
+	new_var2 [1] = 100;
+	if ((psnd.unk56 & 0x20) && ( !(psnd.unk56 & 0x40)) ) {
+		new_var2 [1] = 120;
 	}
-	if (seqGetSeq() != 3 && (gp->retraceCount & 1)) {
-		if (psnd.unk59 < tmpp2 [1]) {
+	if (( seqGetSeq() != 3 ) && (gp->retraceCount & 1)) {
+		if (psnd.unk59 < new_var2 [1]) {
 			psnd.unk59++;
 		}
-		if (psnd.unk59 > tmpp2 [1]) {
+		if (psnd.unk59 > new_var2 [1]) {
 			psnd.unk59--;
 		}
 	}
 	cnt = 0;
-	for (i = 0, fade2 [1] = fade2 [0]; i < 40; i++, fade2 [1]++) {
-		if (fade2 [1]->id == -1) {
+	for (i = 0, new_var [1] = new_var [0]; i < 40; i++, new_var [1]++) {
+		if (new_var [1]->id == ( -1) ) {
 			continue;
 		}
-		e = &((SFXL*)pssfxlist)[fade2 [1]->id & 0x1FFF];
+		e = &((SFXL*)pssfxlist)[new_var [1]->id & 0x1FFF];
 		cnt++;
-		if (fade2 [1]->flags & 1) {
-			fade2 [1]->flags &= ~0x100;
-			if (fade2 [1]->delay) {
-				fade2 [1]->delay--;
+		if (new_var [1]->flags & 1) {
+			new_var [1]->flags &= ~0x100;
+			if (new_var [1]->delay) {
+				new_var [1]->delay--;
 				continue;
 			}
 			f = e->flags;
 			if (f & 0x80000000) {
 				for (j = 0; j < 3; j++) {
-					if (!((u32(*)(s32))SoundSSCheck)(j)) { tmpp2 [0] = j; goto ssfound; }
+					if (!((u32(*)(s32))SoundSSCheck)(j)) { new_var2 [0] = j; goto ssfound; }
 				}
 				for (j = 0; j < 3; j++) {
 					if (((u32(*)(s32))SoundSSCheck)(j) & 0x20) {
@@ -6002,117 +6003,117 @@ void psndSFXMain(void) {
 					}
 				}
 				for (j = 0; j < 3; j++) {
-					if (!((u32(*)(s32))SoundSSCheck)(j)) { tmpp2 [0] = j; goto ssfound; }
+					if (!((u32(*)(s32))SoundSSCheck)(j)) { new_var2 [0] = j; goto ssfound; }
 				}
-				tmpp2 [0] = -1;
+				new_var2 [0] = new_var3;
 ssfound:
-				fade2 [1]->ch = tmpp2 [0];
-				if (fade2 [1]->ch != -1) {
-					SoundSSPlayCh(fade2 [1]->ch, e->c);
-					SoundSSSetPanCh(fade2 [1]->ch, fade2 [1]->pan);
-					SoundSSSetVolCh(fade2 [1]->ch, SFX_VOL(fade2 [1]));
+				new_var [1]->ch = new_var2 [0];
+				if (new_var [1]->ch != new_var3) {
+					SoundSSPlayCh(new_var [1]->ch, e->c);
+					SoundSSSetPanCh(new_var [1]->ch, new_var [1]->pan);
+					SoundSSSetVolCh(new_var [1]->ch, SFX_VOL(new_var [1]));
 				}
 			} else if (f & 0x40000000) {
 				for (j = 0; j < 4; j++) {
-					if (!((u32(*)(s32))SoundSongCheck)(j)) { tmpp2 [0] = j; goto sgfound; }
+					if (!((u32(*)(s32))SoundSongCheck)(j)) { new_var2 [0] = j; goto sgfound; }
 				}
-				tmpp2 [0] = -1;
+				new_var2 [0] = new_var3;
 sgfound:
-				fade2 [1]->ch = tmpp2 [0];
-				if (fade2 [1]->ch != -1) {
-					SoundSongPlayCh(fade2 [1]->ch, e->flags & 0xFFFFFFF);
-					SoundSongSetVolCh(fade2 [1]->ch, SFX_VOL(fade2 [1]));
+				new_var [1]->ch = new_var2 [0];
+				if (new_var [1]->ch != new_var3) {
+					SoundSongPlayCh(new_var [1]->ch, e->flags & 0xFFFFFFF);
+					SoundSongSetVolCh(new_var [1]->ch, SFX_VOL(new_var [1]));
 				}
-			} else if (fade2 [1]->flags & 2) {
-				*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(fade2 [1]->id, &fade2 [1]->pos, SFX_VOL(fade2 [1]), fade2 [1]->dist);
-				fade2 [1]->ch = SoundEfxPlayEx(e->flags & 0xFFFF, 0, b[0], b[1]);
-				if (fade2 [1]->ch != -1) {
-					SoundEfxSetVolume(fade2 [1]->ch, b[0]);
-					SoundEfxSetSrndPan(fade2 [1]->ch, b[2]);
-					((void(*)(s32,s16))SoundEfxSetPitch)(fade2 [1]->ch, fade2 [1]->pitch);
+			} else if (new_var [1]->flags & 2) {
+				*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(new_var [1]->id, &new_var [1]->pos, SFX_VOL(new_var [1]), new_var [1]->dist);
+				new_var [1]->ch = SoundEfxPlayEx(e->flags & 0xFFFF, 0, b[0], b[1]);
+				if (new_var [1]->ch != ( -1) ) {
+					SoundEfxSetVolume(new_var [1]->ch, b[0]);
+					SoundEfxSetSrndPan(new_var [1]->ch, b[2]);
+					((void(*)(s32,s16))SoundEfxSetPitch)(new_var [1]->ch, new_var [1]->pitch);
 				}
 			} else {
-				{ u8 pn = fade2 [1]->pan; fade2 [1]->ch = SoundEfxPlayEx(f & 0xFFFF, 0, SFX_VOL(fade2 [1]), pn); }
-				if (fade2 [1]->ch != -1) {
-					((void(*)(s32,s16))SoundEfxSetPitch)(fade2 [1]->ch, fade2 [1]->pitch);
+				{ u8 pn = new_var [1]->pan; new_var [1]->ch = SoundEfxPlayEx(f & 0xFFFF, 0, SFX_VOL(new_var [1]), pn); }
+				if (new_var [1]->ch != new_var3) {
+					((void(*)(s32,s16))SoundEfxSetPitch)(new_var [1]->ch, new_var [1]->pitch);
 				}
-				if (fade2 [1]->ch != -1) {
+				if (new_var [1]->ch != new_var3) {
 					rv = e->reverb;
 					if (rv > 0) {
-						rv += *(u16*)(&psnd.unk52);
+						rv += *(( u16*)(&psnd.unk52) );
 					}
 					if (rv > 127) {
 						rv = 127;
 					}
-					SoundEfxSetAux1(fade2 [1]->ch, rv);
+					SoundEfxSetAux1(new_var [1]->ch, rv);
 				}
 			}
-			if (fade2 [1]->ch == -1) {
-				fade2 [1]->id = -1;
-				fade2 [1]->ch = -1;
+			if (new_var [1]->ch == ( -1) ) {
+				new_var [1]->id = new_var3;
+				new_var [1]->ch = new_var3;
 				continue;
 			}
-			fade2 [1]->flags &= ~1;
+			new_var [1]->flags &= ~1;
 		}
-		if (fade2 [1]->flags & 2) {
-			*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(fade2 [1]->id, &fade2 [1]->pos, SFX_VOL(fade2 [1]), fade2 [1]->dist);
+		if (new_var [1]->flags & 2) {
+			*((u32*)b) = ((u32 (*)(s32, Vec*, u8, u16))calc3D)(new_var [1]->id, &new_var [1]->pos, SFX_VOL(new_var [1]), new_var [1]->dist);
 			f = e->flags;
 			if (f & 0x80000000) {
-				SoundSSSetPanCh(fade2 [1]->ch, b[1]);
+				SoundSSSetPanCh(new_var [1]->ch, b[1]);
 				r = (b[0] * psnd.unk59) / 100; if (r < 0) { r = 0; }
 				if (r > 127) { r = 127;
 				}
-				SoundSSSetVolCh(fade2 [1]->ch, r);
-				SoundSSSetSrndPanCh(fade2 [1]->ch, b[2]);
+				SoundSSSetVolCh(new_var [1]->ch, r);
+				SoundSSSetSrndPanCh(new_var [1]->ch, b[2]);
 			} else if (f & 0x40000000) {
 				r = (b[0] * psnd.unk59) / 100; if (r < 0) { r = 0; }
 				if (r > 127) { r = 127;
 				}
-				SoundSongSetVolCh(fade2 [1]->ch, r);
+				SoundSongSetVolCh(new_var [1]->ch, r);
 			} else {
-				SoundEfxSetPan(fade2 [1]->ch, b[1]);
+				SoundEfxSetPan(new_var [1]->ch, b[1]);
 				r = (b[0] * psnd.unk59) / 100; if (r < 0) { r = 0; }
 				if (r > 127) { r = 127;
 				}
-				SoundEfxSetVolume(fade2 [1]->ch, r);
-				SoundEfxSetSrndPan(fade2 [1]->ch, b[2]);
+				SoundEfxSetVolume(new_var [1]->ch, r);
+				SoundEfxSetSrndPan(new_var [1]->ch, b[2]);
 			}
 		} else {
 			f = e->flags;
 			if (f & 0x80000000) {
-				SoundSSSetPanCh(fade2 [1]->ch, fade2 [1]->pan);
-				SoundSSSetVolCh(fade2 [1]->ch, SFX_VOL(fade2 [1]));
+				SoundSSSetPanCh(new_var [1]->ch, new_var [1]->pan);
+				SoundSSSetVolCh(new_var [1]->ch, SFX_VOL(new_var [1]));
 			} else if (f & 0x40000000) {
-				SoundSongSetVolCh(fade2 [1]->ch, SFX_VOL(fade2 [1]));
+				SoundSongSetVolCh(new_var [1]->ch, SFX_VOL(new_var [1]));
 			} else {
-				SoundEfxSetPan(fade2 [1]->ch, fade2 [1]->pan);
-				SoundEfxSetVolume(fade2 [1]->ch, SFX_VOL(fade2 [1]));
+				SoundEfxSetPan(new_var [1]->ch, new_var [1]->pan);
+				SoundEfxSetVolume(new_var [1]->ch, SFX_VOL(new_var [1]));
 			}
 		}
-		if (!(fade2 [1]->flags & 0xA30) && (psnd.unk56 & 0x80)) {
+		if (( !(new_var [1]->flags & 0xA30) ) && (psnd.unk56 & 0x80)) {
 			f = e->flags;
 			if (f & 0x80000000) {
-				SoundSSSetVolCh(fade2 [1]->ch, 0);
+				SoundSSSetVolCh(new_var [1]->ch, 0);
 			} else if (f & 0x40000000) {
-				SoundSongSetVolCh(fade2 [1]->ch, 0);
+				SoundSongSetVolCh(new_var [1]->ch, 0);
 			} else {
-				SoundEfxSetVolume(fade2 [1]->ch, 0);
+				SoundEfxSetVolume(new_var [1]->ch, 0);
 			}
 		}
-		if (fade2 [1]->flags & 0x40) {
+		if (new_var [1]->flags & 0x40) {
 			f = e->flags;
 			if (f & 0x80000000) {
-				r = ((u8)SoundSSGetVolCh(fade2 [1]->ch) * fade) / 127;
-				SoundSSSetVolCh(fade2 [1]->ch, r);
-				if (r == 0 && (u32)i != (u32)(-1)) {
+				r = ((( u8)SoundSSGetVolCh(new_var [1]->ch) ) * fade) / 127;
+				SoundSSSetVolCh(new_var [1]->ch, r);
+				if (( r == 0 ) && (( (u32)i ) != ( (u32)(-1)) )) {
 					SFXW* o = &((SFXW*)pssfx)[(u8)i];
-					if (o->id != -1) {
+					if (o->id != ( -1) ) {
 						if (o->flags & 1) {
-							o->id = -1;
+							o->id = new_var3;
 							o->ch = -1;
 						} else {
 							SFXL* le = &((SFXL*)pssfxlist)[o->id & 0x1FFF];
-							if (o->ch != -1) {
+							if (o->ch != new_var3) {
 								if (le->flags & 0x80000000) { SoundSSStopCh(o->ch);
 								}
 								else if (le->flags & 0x40000000) { SoundSongStopCh(o->ch);
@@ -6126,17 +6127,17 @@ sgfound:
 					}
 				}
 			} else if (f & 0x40000000) {
-				r = ((u8)SoundSongGetVolCh(fade2 [1]->ch) * fade) / 127;
-				SoundSongSetVolCh(fade2 [1]->ch, r);
-				if (r == 0 && (u32)i != (u32)(-1)) {
+				r = ((( u8)SoundSongGetVolCh(new_var [1]->ch) ) * fade) / 127;
+				SoundSongSetVolCh(new_var [1]->ch, r);
+				if (( r == 0 ) && (( (u32)i ) != ( (u32)new_var3))) {
 					SFXW* o = &((SFXW*)pssfx)[(u8)i];
-					if (o->id != -1) {
+					if (o->id != new_var3) {
 						if (o->flags & 1) {
 							o->id = -1;
 							o->ch = -1;
 						} else {
 							SFXL* le = &((SFXL*)pssfxlist)[o->id & 0x1FFF];
-							if (o->ch != -1) {
+							if (o->ch != new_var3) {
 								if (le->flags & 0x80000000) { SoundSSStopCh(o->ch);
 								}
 								else if (le->flags & 0x40000000) { SoundSongStopCh(o->ch);
@@ -6150,17 +6151,17 @@ sgfound:
 					}
 				}
 			} else {
-				r = ((u8)SoundEfxGetVolume(fade2 [1]->ch) * fade) / 127;
-				SoundEfxSetVolume(fade2 [1]->ch, r);
-				if (r == 0 && (u32)i != (u32)(-1)) {
+				r = ((( u8)SoundEfxGetVolume(new_var [1]->ch) ) * fade) / 127;
+				SoundEfxSetVolume(new_var [1]->ch, r);
+				if (( r == 0 ) && (( (u32)i ) != ( (u32)(-1)) )) {
 					SFXW* o = &((SFXW*)pssfx)[(u8)i];
-					if (o->id != -1) {
+					if (o->id != ( -1) ) {
 						if (o->flags & 1) {
-							o->id = -1;
-							o->ch = -1;
+							o->id = new_var3;
+							o->ch = new_var3;
 						} else {
 							SFXL* le = &((SFXL*)pssfxlist)[o->id & 0x1FFF];
-							if (o->ch != -1) {
+							if (o->ch != ( -1) ) {
 								if (le->flags & 0x80000000) { SoundSSStopCh(o->ch);
 								}
 								else if (le->flags & 0x40000000) { SoundSongStopCh(o->ch);
@@ -6168,20 +6169,20 @@ sgfound:
 								else { SoundEfxStop(o->ch);
 							}
 							}
-							o->id = -1;
+							o->id = new_var3;
 							o->ch = -1;
 						}
 					}
 				}
 			}
 		}
-		if ((psnd.unk56 & 0x100) && (fade2 [1]->flags & 0x400)) {
+		if ((psnd.unk56 & 0x100) && (new_var [1]->flags & 0x400)) {
 			f = e->flags;
-			if (f & 0x80000000) { SoundSSSetVolCh(fade2 [1]->ch, 0);
+			if (f & 0x80000000) { SoundSSSetVolCh(new_var [1]->ch, 0);
 			}
-			else if (f & 0x40000000) { SoundSongSetVolCh(fade2 [1]->ch, 0);
+			else if (f & 0x40000000) { SoundSongSetVolCh(new_var [1]->ch, 0);
 			}
-			else { SoundEfxSetVolume(fade2 [1]->ch, 0);
+			else { SoundEfxSetVolume(new_var [1]->ch, 0);
 		}
 		}
 	}

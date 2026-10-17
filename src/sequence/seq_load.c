@@ -860,8 +860,8 @@ void loadDraw(CameraId camera, void* param) {
         FontDrawMessage(-FontGetMessageWidth(msg) / 2, 192, msg);
     }
 
-    for (j = 0; j < 4; j++, win1++) {
-        CardSaveSlot* save = &cardGetFilePtr()->saves[j];
+    for (i = 0; i < 4; i++, win1++) {
+        CardSaveSlot* save = &cardGetFilePtr()->saves[i];
         u16 flags = save->data.flags;
         s16 level = save->data.pouch.level;
         OSTime time = save->data.global.retraceLocalTime;
@@ -874,17 +874,17 @@ void loadDraw(CameraId camera, void* param) {
 
         FontDrawStart();
         FontDrawColor((GXColor){192, 192, 192, 255});
-        if (j == wp->slot) {
+        if (i == wp->slot) {
             FontDrawColor((GXColor){255, 255, 255, 255});
         }
         FontDrawScale(0.6f);
         FontDrawEdge();
-        sprintf(buf, "\x83\x66\x81\x5b\x83\x5e%s", winZenkakuStr(j + 1));
+        sprintf(buf, "\x83\x66\x81\x5b\x83\x5e%s", winZenkakuStr(i + 1));
         FontDrawString(win1->x - 100.0f, 84.0f + win1->y, buf);
         FontDrawEdgeOff();
         FontDrawScale(1.0f);
         FontDrawColor((GXColor){32, 32, 32, 255});
-        if (j == wp->slot) {
+        if (i == wp->slot) {
             FontDrawColor((GXColor){0, 0, 0, 255});
         }
         if (flags & 2) {
@@ -931,7 +931,7 @@ void loadDraw(CameraId camera, void* param) {
             for (k = 0; k < 7; k++) {
                 if (stars & (1 << (k + 1))) {
                     PSMTXTrans(m, (win1->x - 106.0f) + k * 32, *py - 52.0f, 0.0f);
-                    iconDispGxCol(m, 0, (u16)stone_id[k], j == wp->slot ? white : gray);
+                    iconDispGxCol(m, 0, (u16)stone_id[k], i == wp->slot ? white : gray);
                 }
             }
         }
@@ -955,15 +955,15 @@ void loadDraw(CameraId camera, void* param) {
         winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
         winTexSet_x2(0x13, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
-        for (j = 0; j < 3; j++) {
-            if (j == wp->unk24) {
+        for (i = 0; i < 3; i++) {
+            if (i == wp->unk24) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 50 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(j + 0x15, 0x33, (Vec){-4.0f, 54 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){-4.0f, 54 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(j + 0x15, 0x33, (Vec){0.0f, 50 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             }
         }
     }
@@ -973,15 +973,15 @@ void loadDraw(CameraId camera, void* param) {
         winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
         winTexSet_x2(0x14, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
-        for (j = 0; j < 2; j++) {
-            if (j == wp->unk28) {
+        for (i = 0; i < 2; i++) {
+            if (i == wp->unk28) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 30 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(j + 0x18, 0x33, (Vec){-4.0f, 34 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){-4.0f, 34 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(j + 0x18, 0x33, (Vec){0.0f, 30 - j * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
             }
         }
     }

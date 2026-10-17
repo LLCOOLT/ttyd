@@ -2091,9 +2091,8 @@ USER_FUNC(taihou_r) {
     f32 rx;
     f32 rz;
 
-    y = 100.0f * s;
     x = 100.0f * c;
-    rx = -angleABf(0.0f, 0.0f, 0.0f, y);
+    rx = -angleABf(0.0f, 0.0f, 0.0f, y = 100.0f * s);
     rz = -angleABf(0.0f, 0.0f, x, y);
 
     effKemuTestSetRxRz(effNameToPtr("kemuri"), rx, rz);

@@ -861,145 +861,157 @@ void nokotaro_hold_cancel(PartyEntry* party) {
     party->useMotionId = 20;
 }
 
-HitEntry* ccwall(PartyEntry* party, s32 mode) {
-    f32 s;
-    f32 c;
-    f32 dist;
-    f32 hx;
-    f32 hy;
-    f32 hz;
-    f32 nx;
-    f32 ny;
-    f32 nz;
-    f32 s1;
-    f32 c1;
-    f32 s2;
-    f32 c2;
-    f32 s3;
-    f32 c3;
-    HitEntry* hit;
-    f32 py;
-    f32 vx;
-    f32 vz;
-    f32 d;
-    f32 y0;
-    f32 y;
-    f32 z;
-    f32 x;
-    f32 yofs;
-    f32 w;
-
-    yofs = 10.0f;
-    y0 = party->position.y + party->field_F0;
-    dist = party->field_F0 + 30.0f;
-    y0 = yofs + y0;
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, party->position.x,
-                         y0, party->position.z, 0.0f, -1.0f, 0.0f);
-    if (((hitGetAttr(hit) >> 9) & 1) == 1) {
-        hit = NULL;
-    }
-    party->field_138 = hit;
-    if (hit != NULL) {
-        hy = (f32)(s32)(100.0f * hy + 0.5f) / 100.0f;
-        py = (f32)(s32)(100.0f * party->position.y + 0.5f) / 100.0f;
-        if (__fabsf(py - hy) <= 11.0f) {
-
-            if (py <= hy) {
-                if (mode == 0) {
-                    party->position.y = hy;
-                    if (__fabsf(py - hy) >= 1.0f) {
-                        PH(party, 0x17e) |= 2;
-                    }
-                }
-            } else {
-                if ((PH(party, 0x17e) & 2) && mode == 1) {
-                    party->position.y = hy;
-                }
-                if (__fabsf(py - hy) <= 6.0f) {
-                    party->position.y = hy;
-                }
-            }
+HitEntry *ccwall(PartyEntry *party, s32 mode)
+{
+  f32 s;
+  f32 c;
+  f32 dist;
+  f32 hx;
+  f32 hy;
+  f32 hz;
+  f32 nx;
+  f32 ny;
+  f32 nz;
+  f32 s1;
+  f32 c1;
+  f32 s2;
+  f32 c2;
+  f32 s3;
+  f32 c3;
+  HitEntry *hit;
+  f32 py;
+  f32 vx;
+  f32 vz;
+  f32 d;
+  f32 y0;
+  f32 y;
+  f32 z;
+  f32 x;
+  f32 yofs;
+  f32 w;
+  yofs = 10.0f;
+  y0 = party->position.y + party->field_F0;
+  x = party->position.x;
+  dist = party->field_F0 + 30.0f;
+  y0 = yofs + y0;
+  hit = hitCheckFilter((void *) 0, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y0, party->position.z, 0.0f, -1.0f, 0.0f);
+  if (((hitGetAttr(hit) >> 9) & 1) == 1)
+  {
+    hit = (void *) 0;
+  }
+  party->field_138 = hit;
+  if (hit != ((void *) 0))
+  {
+    hy = ((f32) ((s32) ((100.0f * hy) + 0.5f))) / 100.0f;
+    py = ((f32) ((s32) ((100.0f * party->position.y) + 0.5f))) / 100.0f;
+    if (__fabsf(py - hy) <= 11.0f)
+    {
+      if (py <= hy)
+      {
+        if (mode == 0)
+        {
+          party->position.y = hy;
+          if (__fabsf(py - hy) >= 1.0f)
+          {
+            *((s16 *) (((u8 *) party) + 0x17e)) |= 2;
+          }
         }
-    }
-
-    PW(party, 0x130) = 0;
-    PW(party, 0x12c) = 0;
-    yofs += 1.0f;
-    x = party->position.x;
-    z = party->position.z;
-    y = party->position.y + yofs;
-    dist = 0.5f * party->width + party->field_104;
-    sincosf(&s, &c, party->field_100);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
-    if (hit != NULL && !(hitGetAttr(hit) & 5)) {
-        sincosf(&s1, &c1, 180.0f + party->field_100);
-        party->position.x = hx + 0.5f * (s1 * party->width);
-        party->position.z = hz + 0.5f * (c1 * party->width);
-        vx = s * party->field_104;
-        vz = c * party->field_104;
-        d = vx * nx + vz * nz;
-        party->position.x += 0.5f * (vx - d * nx);
-        party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
+      }
+      else
+      {
+        if (((*((s16 *) (((u8 *) party) + 0x17e))) & 2) && (mode == 1))
+        {
+          party->position.y = hy;
         }
-        PW(party, 0x12c) = (u32)hit;
-        return hit;
-    }
-
-    w = 0.4f * party->width;
-    z = w * (f32)cos(3.1415927f * (party->field_100 - 90.0f) / 180.0f) + party->position.z;
-    x = w * (f32)sin(3.1415927f * (party->field_100 - 90.0f) / 180.0f) + party->position.x;
-    y = party->position.y + yofs;
-    dist = 0.4f * party->width + party->field_104;
-    sincosf(&s, &c, party->field_100);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
-    if (hit != NULL && !(hitGetAttr(hit) & 5)) {
-        sincosf(&s2, &c2, 180.0f + party->field_100);
-        party->position.x = hx + 0.5f * (s2 * party->width);
-        party->position.z = hz + 0.5f * (c2 * party->width);
-        party->position.z -= w * (f32)cos(3.1415927f * (party->field_100 - 90.0f) / 180.0f);
-        party->position.x -= w * (f32)sin(3.1415927f * (party->field_100 - 90.0f) / 180.0f);
-        vx = s * party->field_104;
-        vz = c * party->field_104;
-        d = vx * nx + vz * nz;
-        party->position.x += 0.5f * (vx - d * nx);
-        party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
+        if (__fabsf(py - hy) <= 6.0f)
+        {
+          party->position.y = hy;
         }
-        PW(party, 0x12c) = (u32)hit;
-        party->position.x = hx;
-        return hit;
+      }
     }
-
-    w = 0.4f * party->width;
-    z = w * (f32)cos(3.1415927f * (90.0f + party->field_100) / 180.0f) + party->position.z;
-    x = w * (f32)sin(3.1415927f * (90.0f + party->field_100) / 180.0f) + party->position.x;
-    y = party->position.y + yofs;
-    dist = 0.4f * party->width + party->field_104;
-    dist = 0.4f * party->width + party->field_104;
-    sincosf(&s, &c, party->field_100);
-    hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
-    if (hit != NULL && !(hitGetAttr(hit) & 5)) {
-        sincosf(&s3, &c3, 180.0f + party->field_100);
-        party->position.x = hx + 0.5f * (s3 * party->width);
-        party->position.z = hz + 0.5f * (c3 * party->width);
-        party->position.z -= w * (f32)cos(3.1415927f * (90.0f + party->field_100) / 180.0f);
-        party->position.x -= w * (f32)sin(3.1415927f * (90.0f + party->field_100) / 180.0f);
-        vx = s * party->field_104;
-        vz = c * party->field_104;
-        d = vx * nx + vz * nz;
-        party->position.x += 0.5f * (vx - d * nx);
-        party->position.z += 0.5f * (vz - d * nz);
-        if (PH(party, 0x17c) != 0 || mode == 0) {
-            PW(party, 0x130) = (u32)hit;
-        }
-        PW(party, 0x12c) = (u32)hit;
-        party->position.x = hx;
-        return hit;
+  }
+  *((u32 *) (((u8 *) party) + 0x130)) = 0;
+  *((u32 *) (((u8 *) party) + 0x12c)) = 0;
+  yofs += 1.0f;
+  x = party->position.x;
+  z = party->position.z;
+  y = party->position.y + yofs;
+  dist = (0.5f * party->width) + party->field_104;
+  sincosf(&s, &c, party->field_100);
+  hit = hitCheckFilter((void *) 0, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
+  if ((hit != ((void *) 0)) && (!(hitGetAttr(hit) & 5)))
+  {
+    sincosf(&s1, &c1, 180.0f + party->field_100);
+    party->position.x = hx + (0.5f * (s1 * party->width));
+    party->position.z = hz + (0.5f * (c1 * party->width));
+    vx = s * party->field_104;
+    vz = c * party->field_104;
+    d = (vx * nx) + (vz * nz);
+    party->position.x += 0.5f * (vx - (d * nx));
+    party->position.z += 0.5f * (vz - (d * nz));
+    if (((*((s16 *) (((u8 *) party) + 0x17c))) != 0) || (mode == 0))
+    {
+      *((u32 *) (((u8 *) party) + 0x130)) = (u32) hit;
     }
-    return NULL;
+    *((u32 *) (((u8 *) party) + 0x12c)) = (u32) hit;
+    return hit;
+  }
+  w = 0.4f * party->width;
+  z = (w * ((f32) cos((3.1415927f * (party->field_100 - 90.0f)) / 180.0f))) + party->position.z;
+  x = (w * ((f32) sin((3.1415927f * (party->field_100 - 90.0f)) / 180.0f))) + party->position.x;
+  y = party->position.y + yofs;
+  dist = (0.4f * party->width) + party->field_104;
+  sincosf(&s, &c, party->field_100);
+  hit = hitCheckFilter((void *) 0, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
+  if ((hit != ((void *) 0)) && (!(hitGetAttr(hit) & 5)))
+  {
+    sincosf(&s2, &c2, 180.0f + party->field_100);
+    party->position.x = hx + (0.5f * (s2 * party->width));
+    party->position.z = hz + (0.5f * (c2 * party->width));
+    party->position.z -= w * ((f32) cos((3.1415927f * (party->field_100 - 90.0f)) / 180.0f));
+    party->position.x -= w * ((f32) sin((3.1415927f * (party->field_100 - 90.0f)) / 180.0f));
+    vx = s * party->field_104;
+    vz = c * party->field_104;
+    d = (vx * nx) + (vz * nz);
+    party->position.x += 0.5f * (vx - (d * nx));
+    party->position.z += 0.5f * (vz - (d * nz));
+    if (((*((s16 *) (((u8 *) party) + 0x17c))) != 0) || (mode == 0))
+    {
+      *((u32 *) (((u8 *) party) + 0x130)) = (u32) hit;
+    }
+    *((u32 *) (((u8 *) party) + 0x12c)) = (u32) hit;
+    party->position.x = hx;
+    return hit;
+  }
+  w = 0.4f * party->width;
+  z = (w * ((f32) cos((3.1415927f * (90.0f + party->field_100)) / 180.0f))) + party->position.z;
+  x = (w * ((f32) sin((3.1415927f * (90.0f + party->field_100)) / 180.0f))) + party->position.x;
+  y = party->position.y + yofs;
+  dist = (0.4f * party->width) + party->field_104;
+  dist = (0.4f * party->width) + party->field_104;
+  sincosf(&s, &c, party->field_100);
+  hit = hitCheckFilter((void *) 0, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c);
+  if ((hit != ((void *) 0)) && (!(hitGetAttr(hit) & 5)))
+  {
+    sincosf(&s3, &c3, 180.0f + party->field_100);
+    party->position.x = hx + (0.5f * (s3 * party->width));
+    party->position.z = hz + (0.5f * (c3 * party->width));
+    party->position.z -= w * ((f32) cos((3.1415927f * (90.0f + party->field_100)) / 180.0f));
+    party->position.x -= w * ((f32) sin((3.1415927f * (90.0f + party->field_100)) / 180.0f));
+    vx = s * party->field_104;
+    vz = c * party->field_104;
+    d = (vx * nx) + (vz * nz);
+    party->position.x += 0.5f * (vx - (d * nx));
+    party->position.z += 0.5f * (vz - (d * nz));
+    if (((*((s16 *) (((u8 *) party) + 0x17c))) != 0) || (mode == 0))
+    {
+      *((u32 *) (((u8 *) party) + 0x130)) = (u32) hit;
+    }
+    *((u32 *) (((u8 *) party) + 0x12c)) = (u32) hit;
+    party->position.x = hx;
+    return hit;
+  }
+  return (void *) 0;
 }
 
 u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {

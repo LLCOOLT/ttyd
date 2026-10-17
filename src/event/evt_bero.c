@@ -585,62 +585,84 @@ USER_FUNC(evt_bero_get_info_num) {
 
 
 
-USER_FUNC(bero_get_position_normal) {
-	s32* args = event->args;
-	MarioWork* wp = marioGetPtr();
-	s32 dir = evtGetValue(event, args[0]);
-	f32 len = evtGetFloat(event, args[1]);
-	s32* pos = (s32*)event->lwData[6];
-	const char* name = (const char*)event->lwData[3];
-	s32 angle = event->lwData[5];
-	Vec start, end;
-
-	start.x = pos[0];
-	start.y = pos[1];
-	start.z = pos[2];
-	end.x = pos[0];
-	end.y = pos[1];
-	end.z = pos[2];
-	if (pos[0] == 100000) {
-		hitObjGetPos((const char*)name, &start);
-	}
-	if (len != 0.0f) {
-		Vec tmp2, tmp;
-		f32 nz, ny, nx, dist, hz, hy, hx;
-		f32 deg;
-		f32 rad;
-		hz = hy = hx = 0.0f;
-		dist = 1000000.0f;
-		deg = angle * 360.0f * 0.125f;
-		if (dir == 1) {
-			deg += 180.0f;
-		}
-		rad = 6.2831855f * deg / 360.0f;
-		tmp.x = start.x - 30.0f * (f32)sin(rad);
-		tmp.y = start.y;
-		{ f32 c0 = (f32)cos(rad);
-		tmp.z = start.z - 30.0f * -c0; }
-		dist = 1000000.0f;
-		if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f)) {
-			tmp.y = hy;
-		}
-		tmp2 = tmp;
-		tmp2.x += (30.0f + len) * (f32)sin(rad);
-		tmp2.z += (30.0f + len) * -(f32)cos(rad);
-		start = tmp;
-		end = tmp2;
-	}
-	BeroSX = start.x;
-	BeroSY = start.y;
-	BeroSZ = start.z;
-	BeroEX = end.x;
-	BeroEY = end.y;
-	BeroEZ = end.z;
-	N_marioSetBottomlessRespawnPosOnBeroEntry(end.x, end.y, end.z);
-	if (wp->currMotionId == 0x19) {
-		N_marioReloadMapOnBottomlessOn();
-	}
-	return EVT_RETURN_DONE;
+s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
+{
+  s32 *args = event->args;
+  MarioWork *wp = marioGetPtr();
+  s32 dir = evtGetValue(event, args[0]);
+  float new_var3;
+  f32 new_var2;
+  f32 len = evtGetFloat(event, args[1]);
+  s32 *pos = (s32 *) event->lwData[6];
+  const char *name = (const char *) event->lwData[3];
+  s32 angle = event->lwData[5];
+  Vec start;
+  f32 *new_var;
+  Vec end;
+  start.x = pos[0];
+  start.y = pos[1];
+  start.z = pos[2];
+  end.x = pos[0];
+  end.y = pos[1];
+  end.z = pos[2];
+  if (pos[0] == 100000)
+  {
+    hitObjGetPos((const char *) name, &start);
+  }
+  if (len != 0.0f)
+  {
+    Vec tmp2;
+    Vec tmp;
+    f32 nz;
+    f32 ny;
+    f32 nx;
+    f32 dist;
+    f32 hz;
+    f32 hy;
+    f32 hx;
+    f32 deg;
+    f32 rad;
+    hz = (hy = (hx = 0.0f));
+    dist = 1000000.0f;
+    deg = 0.125f;
+    deg = (angle * 360.0f) * deg;
+    new_var3 = 180.0f;
+    if (dir == 1)
+    {
+      deg += new_var3;
+    }
+    rad = (6.2831855f * deg) / 360.0f;
+    tmp.x = start.x - (30.0f * ((f32) sin(rad)));
+    tmp.y = start.y;
+    {
+      f32 c0 = (f32) cos(rad);
+      tmp.z = start.z - (30.0f * (-c0));
+    }
+    dist = 1000000.0f;
+    new_var = &hx;
+    if (hitCheckFilter((void *) 0, new_var, &hy, &hz, &dist, &nx, &ny, &nz, tmp.x, tmp.y, tmp.z, 0.0f, -1.0f, 0.0f))
+    {
+      tmp.y = hy;
+    }
+    tmp2 = tmp;
+    tmp2.x += (30.0f + len) * ((0, (f32) sin(rad)));
+    tmp2.z += (30.0f + len) * (-((f32) cos(rad)));
+    start = tmp;
+    end = tmp2;
+  }
+  BeroSX = start.x;
+  BeroSY = start.y;
+  BeroSZ = start.z;
+  BeroEX = end.x;
+  new_var2 = end.z;
+  BeroEY = end.y;
+  BeroEZ = end.z;
+  N_marioSetBottomlessRespawnPosOnBeroEntry(end.x, end.y, new_var2);
+  if (wp->currMotionId == 0x19)
+  {
+    N_marioReloadMapOnBottomlessOn();
+  }
+  return 2;
 }
 
 void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
@@ -1139,41 +1161,62 @@ USER_FUNC(evt_bero_disppos_load) {
 extern double sin(double);
 extern double cos(double);
 
-USER_FUNC(evt_bero_move_mario_speed) {
-	s32* args = event->args;
-	f32 speed = evtGetFloat(event, args[0]);
-	OSTime now = gp->inBattle ? gp->renderTime : gp->renderFieldTime;
-	f32 dx, dy, s, c, angle, dist, dist2;
-	s32 xdone, ydone;
-
-	if (isFirstCall) {
-		event->savedTime = now;
-	}
-	speed = sysFrame2SecFloat(speed);
-	angle = 6.2831855f * reviseAngle(angleABf(BeroSX, BeroSY, BeroEX, BeroEY)) / 360.0f;
-	s = sin(angle);
-	c = cos(angle);
-	dist = speed * (f32)sysMsec2Frame((s32)(((s32)now - (s32)event->savedTime) / (u64)((*(u32*)0x800000F8 / 4) / 1000)));
-	dx = speed * s;
-	dy = -(speed * c);
-	dist2 = s * dist;
-	marioGetPtr()->position.x = BeroSX + dist2;
-	dist2 = -(c * dist);
-	marioGetPtr()->position.y = BeroSY + dist2;
-	marioGetPtr()->position.z = BeroSZ;
-	xdone = 0;
-	if (dx >= 0.0f && BeroEX <= marioGetPtr()->position.x) xdone = 1;
-	if (dx < 0.0f && BeroEX >= marioGetPtr()->position.x) xdone = 1;
-	ydone = 0;
-	if (dy >= 0.0f && BeroEY <= marioGetPtr()->position.y) ydone = 1;
-	if (dy < 0.0f && BeroEY >= marioGetPtr()->position.y) ydone = 1;
-	if (xdone + ydone != 2) {
-		return EVT_RETURN_BLOCK;
-	}
-	marioGetPtr()->position.x = BeroEX;
-	marioGetPtr()->position.y = BeroEY;
-	marioGetPtr()->position.z = BeroEZ;
-	return EVT_RETURN_DONE;
+s32 evt_bero_move_mario_speed(EventEntry *event, BOOL isFirstCall)
+{
+  s32 *args = event->args;
+  f32 speed = evtGetFloat(event, args[0]);
+  OSTime now = (gp->inBattle) ? (gp->renderTime) : (gp->renderFieldTime);
+  f32 dx;
+  f32 dy;
+  f32 s;
+  f32 c;
+  f32 angle;
+  f32 dist;
+  f32 dist2;
+  s32 xdone;
+  s32 ydone;
+  if (isFirstCall)
+  {
+    event->savedTime = now;
+  }
+  speed = sysFrame2SecFloat(speed);
+  angle = (6.2831855f * reviseAngle(angleABf(BeroSX, BeroSY, BeroEX, BeroEY))) / 360.0f;
+  s = sin(angle);
+  c = cos(angle);
+  dist = speed * ((f32) sysMsec2Frame((s32) ((((s32) now) - ((s32) event->savedTime)) / ((u64) (((*((u32 *) 0x800000F8)) / 4) / 1000)))));
+  dx = speed * s;
+  dy = -(speed * c);
+  dist2 = s * dist;
+  marioGetPtr()->position.x = dist2 + BeroSX;
+  dist2 = -(c * dist);
+  marioGetPtr()->position.y = BeroSY + dist2;
+  marioGetPtr()->position.z = BeroSZ;
+  xdone = 0;
+  if ((dx >= 0.0f) && (BeroEX <= marioGetPtr()->position.x))
+  {
+    xdone = 1;
+  }
+  if ((dx < 0.0f) && (BeroEX >= marioGetPtr()->position.x))
+  {
+    xdone = 1;
+  }
+  ydone = 0;
+  if ((dy >= 0.0f) && (BeroEY <= marioGetPtr()->position.y))
+  {
+    ydone = 1;
+  }
+  if ((dy < 0.0f) && (BeroEY >= marioGetPtr()->position.y))
+  {
+    ydone = 1;
+  }
+  if ((xdone + ydone) != 2)
+  {
+    return 0;
+  }
+  marioGetPtr()->position.x = BeroEX;
+  marioGetPtr()->position.y = BeroEY;
+  marioGetPtr()->position.z = BeroEZ;
+  return 2;
 }
 
 USER_FUNC(evt_bero_overwrite) {

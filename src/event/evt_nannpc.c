@@ -234,6 +234,18 @@ s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
     return 0;
 }
 
+static inline void nannpc_loadTev(void) {
+    GXSetTevOrder(0, 0, 0, 4);
+    GXSetTevColorOp(0, 0, 0, 0, 1, 0);
+    GXSetTevColorIn(0, 15, 8, 2, 15);
+    GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
+    GXSetTevAlphaIn(0, 7, 4, 1, 7);
+    GXSetNumChans(0);
+    GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
+    GXSetFog(0, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){255, 255, 255, 255});
+    GXSetNumTexGens(1);
+    GXSetNumTevStages(1);
+}
 void nannpc_ext_disp() {
     NanNPCWork* w = nanNPCWork;
     s32 i;
@@ -243,16 +255,7 @@ void nannpc_ext_disp() {
     if (w->flags & 1) {
         extLoadVertex();
         extLoadTexture();
-        GXSetTevOrder(0, 0, 0, 4);
-        GXSetTevColorOp(0, 0, 0, 0, 1, 0);
-        GXSetTevColorIn(0, 15, 8, 2, 15);
-        GXSetTevAlphaOp(0, 0, 0, 0, 1, 0);
-        GXSetTevAlphaIn(0, 7, 4, 1, 7);
-        GXSetNumChans(0);
-        GXSetChanCtrl(4, 0, 0, 0, 0, 0, 2);
-        GXSetFog(0, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){255, 255, 255, 255});
-        GXSetNumTexGens(1);
-        GXSetNumTevStages(1);
+        nannpc_loadTev();
         for (i = extGetPoseNum() - 1; i >= 0; i--) {
             np = w->npc + i;
             sp = w->sort + i;

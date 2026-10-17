@@ -38,13 +38,13 @@ s16 wakka_texcoord0_tbl[];
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_803B70C0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803B70D0 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803B70E0 = 0xBF8000003F800000;
-__declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803B70F0 = 0x3F800000BF800000;
-__declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
 
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
 	24347, 0, -8825, // 0
@@ -430,207 +430,6 @@ __declspec(section ".sdata") u32 gap_07_80418194_sdata[1] = {0};
 void effUltraHammerMain(EffectEntry* effect);
 void effUltraHammerDisp(enum CameraId camId, void *param);
 
-extern void* DemoCurrentBuffer, * DemoFrameBuffer1, * DemoFrameBuffer2;
-extern int sprintf(char* str, const char* format, ...);
-extern s32 N_getDebugMode(void);
-extern void L_smartReInit(void);
-
-//local prototypes
-void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);
-
-void N_setupErrorHandler(void) {
-	OSSetErrorHandler(OS_ERROR_DSI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
-	OSSetErrorHandler(OS_ERROR_ISI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
-	OSSetErrorHandler(OS_ERROR_PROGRAM, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
-}
-
-void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
-	//registers
-	char* textBase;
-	int i;
-	OSFontHeader* fontHeader;
-	s8* loop_newline;
-	s8* loop_zero;
-	int width2, height2;
-	u32 count, stack;
-	s16 w1, w2, h1, h2, x2, y2;
-	int x1, y1;
-	//stack vars
-	char print_buffer2[0x400]; // 0x10E0
-	char print_buffer[0x1000]; // 0xE0
-	Mtx44 projection; // 0xA0
-	Mtx matrix; // 0x70
-	Mtx matrix2; // 0x40
-	GXTexObj texObj; // 0x20
-	void* image; // 0x1C
-	s32 x; // 0x18
-	s32 y; // 0x14
-	s32 width; // 0x10
-
-	if (N_getDebugMode() >= 0) {
-		psndExit();
-		while (1) {} //softlock
-	}
-
-	switch (error) {
-		case OS_ERROR_DSI:
-			strcpy(print_buffer, "---- OS_ERROR_DSI ----\n");
-			break;
-		case OS_ERROR_ISI:
-			strcpy(print_buffer, "---- OS_ERROR_ISI ----\n");
-			break;
-		case OS_ERROR_PROGRAM:
-			strcpy(print_buffer, "---- OS_ERROR_PROGRAM ----\n");
-			break;
-	}
-	sprintf(print_buffer2, "---- Context 0x%08x ----\n", context);
-	strcat(print_buffer, print_buffer2);
-	for (i = 0; i < 16; i++) {
-		sprintf(print_buffer2, "r%-2d  = 0x%08x r%-2d  = 0x%08x\n",
-			i, context->gpr[i],
-			i + 16, context->gpr[i + 16]
-		);
-		strcat(print_buffer, print_buffer2);
-	}
-	sprintf(print_buffer2, "LR   = 0x%08x CR   = 0x%08x\n", context->lr, context->cr);
-	strcat(print_buffer, print_buffer2);
-	sprintf(print_buffer2, "SRR0 = 0x%08x SRR1 = 0x%08x\n", context->srr0, context->srr1);
-	strcat(print_buffer, print_buffer2);
-	sprintf(print_buffer2, "DSISR= 0x%08x DAR  = 0x%08x\n", dsisr, dar);
-	strcat(print_buffer, print_buffer2);
-	strcat(print_buffer, "\n");
-	sprintf(print_buffer2, "Address:      Back Chain    LR Save\n");
-	strcat(print_buffer, print_buffer2);
-	stack = context->gpr[1]; //get r1 (stack)
-	i = 0;
-	while ((stack != 0) && (stack != 0xFFFFFFFF) && (i++ < 16)) {
-		sprintf(print_buffer2, "0x%08x:   0x%08x    0x%08x\n", stack, *(u32*)stack, *(u32*)(stack + 4));
-		strcat(print_buffer, print_buffer2);
-		stack = *(u32*)stack;
-	}
-	strcat(print_buffer, "\n");
-	sprintf(print_buffer2, "Instruction at 0x%x\n(read from SRR0) attempted to access\ninvalid address 0x%x (read from DAR)\n", context->srr0, dar);
-	strcat(print_buffer, print_buffer2);
-	psndExit();
-	OSFillFPUContext(context);
-#ifdef __MWERKS__
-	asm{
-		mfmsr	r5
-		ori		r5, r5, 0x8000
-		ori		r5, r5, 2
-		mtmsr	r5
-		isync
-	};
-#endif
-	L_smartReInit();
-	if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
-		fontHeader = smartAlloc(OS_FONT_SIZE_SJIS, 0)->address;
-	}
-	else {
-		fontHeader = smartAlloc(OS_FONT_SIZE_ANSI, 0)->address;
-	}
-	OSInitFont(fontHeader);
-	GXSetCopyClear((GXColor) { 0, 0, 0, 0xFF }, 0xFFFFFF);
-	GXCopyDisp(DEMOGetCurrentBuffer(), 1);
-	GXSetViewport(0.0f, 0.0f, 608.0f, 480.0f, 0.0f, 1.0f);
-	GXSetScissor(0, 0, 608, 480);
-	MTXOrtho(projection, 0.0f, 608.0f, 0.0f, 480.0f, 0.0f, 1.0f);
-	GXSetProjection(projection, GX_ORTHOGRAPHIC);
-	MTXScale(matrix, 0.5f, 0.5f, 1.0f);
-	GXLoadPosMtxImm(matrix, 0);
-	GXSetCurrentMtx(0);
-	GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-	GXSetNumChans(0);
-	GXSetNumTevStages(1);
-	GXSetTevOp(GX_TEVSTAGE0, GX_REPLACE);
-	GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
-	GXSetNumTexGens(1);
-	GXSetTexCoordGen(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0);
-	GXSetBlendMode(GX_BM_BLEND, GX_BL_ONE, GX_BL_ONE, GX_LO_CLEAR);
-	GXClearVtxDesc();
-	GXSetVtxDesc(GX_VA_POS, GX_DIRECT);
-	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, 1, 3, 0);
-	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, 1, 3, 0);
-	textBase = print_buffer;
-	while (1) {
-		count = VIGetRetraceCount();
-		loop_newline = (s8*)&print_buffer;
-		width2 = 50;
-		height2 = 50;
-		i = 0;
-		loop_zero = loop_newline;
-		while (*loop_zero != '\0') {
-			if (*loop_newline == '\n') {
-				width2 = 50;
-				height2 += 24;
-				i++;
-				loop_zero++;
-				loop_newline++;
-			}
-			else {
-				OSGetFontTexture(&textBase[i], &image, &x, &y, &width);
-				GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
-					(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				GXLoadTexObj(&texObj, GX_TEXMAP0);
-				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
-				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
-				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				h1 = height2; w1 = width2;
-				w2 = w1 + fontHeader->cellWidth;
-				h1 = height2;
-				h2 = h1 + fontHeader->cellHeight;
-				x1 = x;
-				y1 = y;
-				x2 = x1 + fontHeader->cellWidth;
-				y2 = y1 + fontHeader->cellHeight;
-
-				GXPosition1x16(w1);
-				GXPosition1x16(h1);
-				GXPosition1x16(0);
-				GXPosition1x16(x1);
-				GXPosition1x16(y1);
-
-				GXPosition1x16(w2);
-				GXPosition1x16(h1);
-				GXPosition1x16(0);
-				GXPosition1x16(x2);
-				GXPosition1x16(y1);
-
-				GXPosition1x16(w2);
-				GXPosition1x16(h2);
-				GXPosition1x16(0);
-				GXPosition1x16(x2);
-				GXPosition1x16(y2);
-
-				GXPosition1x16(w1);
-				GXPosition1x16(h2);
-				GXPosition1x16(0);
-				GXPosition1x16(x1);
-				GXPosition1x16(y2);
-
-				i++;
-				loop_zero++;
-				loop_newline++;
-				width2 += width;
-			}
-		}
-		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
-		GXSetColorUpdate(1);
-		GXSetAlphaCompare(GX_ALWAYS, 0, GX_AOP_OR, GX_ALWAYS, 0);
-		GXSetAlphaUpdate(1);
-		GXCopyDisp(DemoCurrentBuffer, GX_TRUE);
-		VISetNextFrameBuffer(DemoCurrentBuffer);
-		VISetBlack(0);
-		VIFlush();
-		do { ; } while (count == VIGetRetraceCount());
-		if (DemoCurrentBuffer == DemoFrameBuffer1)
-			DemoCurrentBuffer = DemoFrameBuffer2;
-		else
-			DemoCurrentBuffer = DemoFrameBuffer1;
-	}
-}
-
 EffectEntry* effUltraHammerEntry(BOOL arg0, s32 counter, f32 x, f32 y, f32 z, f32 scale) {
     EffectEntry* effect;
     EffUltraHammerData* data;
@@ -714,79 +513,86 @@ inline Vec initializeVec(Vec* input) {
 }
 
 
-void effUltraHammerDisp(enum CameraId camId, void *param) { //minor regalloc
-    u32 j;
-    CameraEntry *temp_r31;
-    EffUltraHammerData *data; s32 i;
-    s32 temp_r24;
-    EffectEntry *effect;
-    Mtx spC0;
-    Mtx sp90;
-    Mtx sp60;
-    Mtx sp30;
-    GXTexObj sp10;
-    
-    effect = param;
-    data = effect->userdata;
-    temp_r31 = camGetPtr(camId);
-    temp_r24 = data->unk0;
-    
-    PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
-    PSMTXScale(sp60, data->scale, data->scale, data->scale);
-    PSMTXRotRad(sp90, 'y', MTXDegToRad(-camGetPtr(camId)->viewYaw));
-    PSMTXConcat(spC0, sp90, spC0);
-    PSMTXConcat(spC0, sp60, sp30);
-    GXSetNumChans(1);
-    GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
-    GXSetNumTevStages(2);
-    GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
-    GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
-    GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
-    GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
-    GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
-    GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
-    GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
-    GXSetNumTexGens(1);
-    GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 30, 0, 125);
-    effGetTexObj(145, &sp10);
-    GXLoadTexObj(&sp10, GX_TEXMAP0);
-    GXSetCullMode(GX_CULL_NONE);
-    GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
-    data++;
-    for (i = 1; i < effect->count; i++, data++) {
-        if (data->update == 0) {
-            PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
-            PSMTXScale(sp60, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);
-            PSMTXConcat(spC0, sp60, spC0);
-            if (temp_r24 != 0) {
-                PSMTXScale(sp60, -1.0f, 1.0f, 1.0f);
-                PSMTXConcat(spC0, sp60, spC0);
-            }
-            PSMTXConcat(sp30, spC0, spC0);
-            PSMTXConcat(temp_r31->view, spC0, spC0);
-            GXLoadPosMtxImm(spC0, 0);
-            GXSetCurrentMtx(0);
-            PSMTXTrans(spC0, data->offsetX, data->offsetY, 0.0f);
-            GXLoadTexMtxImm(spC0, 30, GX_MTX2x4);
-            GXClearVtxDesc();
-            GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_TEX_ST, GX_RGBA4, 10);
-            GXSetArray(GX_VA_POS, &wakka_vertex_tbl, 6);
-            GXSetVtxDesc(GX_VA_NRM, GX_INDEX8);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_NRM, GX_TEX_S, GX_RGB8, 6);
-            GXSetArray(GX_VA_NRM, &wakka_normal_tbl, 3);
-            GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_TEX_ST, GX_RGBA8, 0);
-            GXSetArray(GX_VA_CLR0, &wakka_color0_tbl, 4);
-            GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
-            GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_RGBA4, 13);
-            GXSetArray(GX_VA_TEX0, &wakka_texcoord0_tbl, 4);
-            for (j = 0; j < 20; j++) {
-                GXCallDisplayList(wakka_dl_0_tbl[j], wakka_dl_0_size_tbl[j] << 5);
-            }
-        }
+void effUltraHammerDisp(enum CameraId camId, void *param)
+{
+  u32 new_var2[2];
+  CameraEntry *temp_r31;
+  EffUltraHammerData *data;
+  s32 i;
+  s32 temp_r24;
+  EffectEntry *effect;
+  Mtx spC0;
+  Mtx sp90;
+  Mtx sp60;
+  Mtx sp30;
+  GXTexObj sp10;
+  effect = param;
+  data = effect->userdata;
+  temp_r31 = camGetPtr(camId);
+  temp_r24 = data->unk0;
+  PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
+  PSMTXScale(sp60, data->scale, data->scale, data->scale);
+  PSMTXRotRad(sp90, 'y', (-camGetPtr(camId)->viewYaw) * 0.01745329252f);
+  PSMTXConcat(spC0, sp90, spC0);
+  PSMTXConcat(spC0, sp60, sp30);
+  GXSetNumChans(1);
+  GXSetChanCtrl(GX_COLOR0A0, 0, GX_SRC_REG, GX_SRC_VTX, 0, GX_DF_NONE, GX_AF_NONE);
+  GXSetNumTevStages(2);
+  GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR0A0);
+  GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevAlphaOp(GX_TEVSTAGE0, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_RASC);
+  GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_RASA, GX_CA_TEXA, GX_CA_ZERO);
+  GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
+  GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
+  GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_A0, GX_CA_ZERO);
+  GXSetNumTexGens(1);
+  GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, 30, 0, 125);
+  effGetTexObj(145, &sp10);
+  GXLoadTexObj(&sp10, GX_TEXMAP0);
+  GXSetCullMode(GX_CULL_NONE);
+  GXSetTevColor(GX_TEVREG0, (GXColor){0xFF, 0xFF, 0xFF, data->alpha});
+  data++;
+  for (i = 1; i < effect->count; i++, data++)
+  {
+    if (data->update == 0)
+    {
+      PSMTXTrans(spC0, data->position.x, data->position.y, data->position.z);
+      PSMTXScale(sp60, 0.6f * data->scale, 0.6f * data->scale, 0.6f * data->scale);
+      PSMTXConcat(spC0, sp60, spC0);
+      if (temp_r24 != 0)
+      {
+        PSMTXScale(sp60, -1.0f, 1.0f, 1.0f);
+        PSMTXConcat(spC0, sp60, spC0);
+      }
+      PSMTXConcat(sp30, spC0, spC0);
+      PSMTXConcat(temp_r31->view, spC0, spC0);
+      GXLoadPosMtxImm(spC0, 0);
+      GXSetCurrentMtx(0);
+      PSMTXTrans(spC0, data->offsetX, data->offsetY, 0.0f);
+      GXLoadTexMtxImm(spC0, 30, GX_MTX2x4);
+      GXClearVtxDesc();
+      GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
+      GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_TEX_ST, GX_RGBA4, 10);
+      GXSetArray(GX_VA_POS, &wakka_vertex_tbl, 6);
+      GXSetVtxDesc(GX_VA_NRM, GX_INDEX8);
+      new_var2[0] = GX_VTXFMT0;
+      GXSetVtxAttrFmt(new_var2[0], GX_VA_NRM, GX_TEX_S, GX_RGB8, 6);
+      GXSetArray(GX_VA_NRM, &wakka_normal_tbl, 3);
+      GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
+      GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_TEX_ST, GX_RGBA8, 0);
+      GXSetArray(GX_VA_CLR0, &wakka_color0_tbl, 4);
+      GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
+      GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_RGBA4, 13);
+      GXSetArray(GX_VA_TEX0, &wakka_texcoord0_tbl, 4);
+      for (new_var2[1] = 0; new_var2[1] < 20; new_var2[1]++)
+      {
+        GXCallDisplayList(wakka_dl_0_tbl[new_var2[1]], wakka_dl_0_size_tbl[new_var2[1]] << 5);
+      }
+
     }
+  }
+
 }

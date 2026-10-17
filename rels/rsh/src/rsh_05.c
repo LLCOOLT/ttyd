@@ -996,11 +996,11 @@ static void ext_moamoa_main(void) {
                 f32 rad;
                 {
                 f32 a = wp->angle + randf(-45.0f, 45.0f);
-                d = wp->dist;
                 rad = 6.2831855f * a / 360.0f;
                 }
                 x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                 y = pose->mtx[1][3];
+                d = wp->dist;
                 z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
                 moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, randf(1.0f, 1.0f), randf(0.4f, 0.4f));
                                 }
@@ -1015,7 +1015,7 @@ static void ext_moamoa_main(void) {
                 }
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3];
-                { f32 a1 = 2.0f * randf(1.0f, 1.0f); f32 a2 = 2.0f * randf(0.4f, 0.4f); moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, a1, a2); }
+                { f32 a2 = randf(0.4f, 0.4f); f32 a1 = 2.0f * randf(1.0f, 1.0f); a2 *= 2.0f; moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, a1, a2); }
                 break;
             case 3:
                 pose->mtx[1][3] += moa->vy;
@@ -1069,13 +1069,14 @@ static void ext_moamoa_main(void) {
                 }
                 break;
             case 47:
-                { f32 rad, d; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f;
-                rad = 6.2831855f * (r1 * (225.0f - 135.0f) + 135.0f) / 360.0f;
-                d = r2 * (500.0f - 300.0f) + 300.0f;
-                x = pose->mtx[0][3] + d * moa_sinx(rad);
-                z = pose->mtx[2][3] - d * moa_cosx(rad); }
-                { f32 k; f32 r1 = rand() / 32767.0f; a = r1 * (k = 6.0f - 5.0f) + 5.0f; }
-                { f32 k; f32 r1 = rand() / 32767.0f; k = 0.3f - 0.2f; s = r1 * k + 0.2f; }
+                a = rand() / 32767.0f;
+                d = rand() / 32767.0f;
+                rad = 6.2831855f * (a * (225.0f - 135.0f) + 135.0f) / 360.0f;
+                d = d * (500.0f - 300.0f) + 300.0f;
+                x = d * moa_sinx(rad) + pose->mtx[0][3];
+                z = pose->mtx[2][3] - d * moa_cosx(rad);
+                a = randf(5.0f, 6.0f);
+                s = randf(0.2f, 0.3f);
                 if (!sfx) {
                     psndSFXOn_3D((const char*)0x6c3, &(Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]});
                     sfx = 1;

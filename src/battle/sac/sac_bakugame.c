@@ -298,29 +298,44 @@ USER_FUNC(end_bakugame) {
     return 2;
 }
 
-USER_FUNC(bakuGameDecideWeapon) {
-    s32* args = event->args;
-    s32 v;
-    BakuWork* w;
-    u8* q;
-    BattleWeapon* wp;
+s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
+{
+  s32 *args = event->args;
+  s32 v;
+  BakuWork *w;
+  u8 *new_var;
+  u8 *q;
+  BattleWeapon *wp;
+  evtGetFloat(event, args[0]);
+  v = evtGetValue(event, args[1]);
+  w = GetBakuGamePtr();
 
-    evtGetFloat(event, args[0]);
-    v = evtGetValue(event, args[1]);
-    w = GetBakuGamePtr();
-    wp = (BattleWeapon*)w->weapon;
-    q = w->weapon; q += 0x80;
-    memcpy(w->weapon, weapon, 0xC0);
-    q[2] = 100;
-    if (v != -1) {
-        if (w->gauge >= 100.0f) { q[2] = 127; } else { q[2] = 100; }
-        q[3] = v - 1;
-    } else {
-        q[2] = 0;
-        q[3] = 0;
+  wp = (BattleWeapon *) w->weapon;
+  new_var = &wp->field_78[8];
+  q = (0, new_var);
+  memcpy(w->weapon, weapon, 0xC0);
+
+  q[2] = 100;
+  if (v != (-1))
+  {
+    if (w->gauge >= 100.0f)
+    {
+      q[2] = 127;
+      q = new_var;
     }
-    evtSetValue(event, args[2], (s32)w->weapon);
-    return 2;
+    else
+    {
+      q[2] = 100;
+    }
+    q[3] = v - 1;
+  }
+  else
+  {
+    q[2] = 0;
+    q[3] = 0;
+  }
+  evtSetValue(event, args[2], (s32) w->weapon);
+  return 2;
 }
 
 USER_FUNC(bakuGameBombEntry) {
