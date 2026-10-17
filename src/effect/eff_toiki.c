@@ -20,7 +20,7 @@ typedef struct EffToikiWork {
     s32 timer;        // 0x30
 } EffToikiWork;
 
-__declspec(section ".data") u64 lbl_toiki_0 = 0xBF8000003F800000;
+__declspec(section ".data") u64 lbl_toiki_0 __attribute__((aligned(32))) = 0xBF8000003F800000;
 __declspec(section ".data") u64 fd_eff_toiki_negone_one_374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_toiki_1 = 0x3F800000BF800000;
 __declspec(section ".data") u64 fd_eff_toiki_one_negone_373 = 0x3F800000BF800000;

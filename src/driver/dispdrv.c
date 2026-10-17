@@ -167,3 +167,6 @@ f32 dispCalcZ(Vec* input) {
 DispEntry* dispGetCurWork(void) {
 	return currentWorkPtr;
 }
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_8040F344_sdata[7] = {0, 0, 0, 0, 0, 0, 0};
+#pragma force_active reset

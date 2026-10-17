@@ -1696,13 +1696,13 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
+	f32 new_var;
 	CameraEntry* camera = camGetCurPtr();
 	BOOL ret = FALSE;
 	WindowEntry* window = param;
 	Vec pos;
-	f32 x, y, w, h;
-	f32 ex, ey;
-	s32 al;
+	f32  y; f32 w; f32 h;
+	f32 ex; f32 ey;
 	s32 sy;
 	static u16 active;
 
@@ -1716,48 +1716,50 @@ void msgWindow_Disp(CameraId camId, void* param) {
 	case 9:
 		if (window->field_0x2C != 0) {
 			if (window->field_0x2C & 0x10) {
-				pos = *(Vec*)((u8*)window + 0x30);
+				pos = *(( Vec*)( ((u8*)window ) + 0x30) );
 			} else {
-				getScreenPoint((Vec*)((u8*)window + 0x30), &pos);
+				getScreenPoint((Vec*)((( u8*)window ) + 0x30), &pos);
 			}
 			switch (window->type) {
 			case 0:
 			case 6:
 			case 8:
 			case 9:
-				al = window->alpha;
-				al = window->alpha;
-				ex = window->height / 2.0f + window->x;
-				x = intplGetValue(0, al, 255, pos.x, ex);
-				ey = window->y - window->width / 2.0f;
-				y = intplGetValue(0, al, 255, pos.y, ey);
-				w = intplGetValue(0, al, 255, 10.0f, window->height);
-				h = intplGetValue(0, al, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
+				ret = window->alpha;
+				ret = window->alpha;
+				ex = ( window->height / 2.0f ) + window->x;
+				ey = intplGetValue(0, ret, 255, pos.x, ex);
+				ey = window->y - ( window->width / 2.0f) ;
+				y = intplGetValue(0, ret, 255, pos.y, ey);
+				w = intplGetValue(0, ret, 255, 10.0f, window->height);
+				h = intplGetValue(0, ret, 255, 10.0f, window->width);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ey - ( w / 2.0f) , y + ( h / 2.0f) , w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
 					ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 				}
 				break;
 			case 1:
-				window->x = pos.x - window->height / 2.0f;
+				window->x = pos.x - ( window->height / 2.0f) ;
 				if (window->field_0x2C & 8) {
 					window->y = pos.y - 80.0f;
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				al = window->alpha;
-				ex = window->height / 2.0f + window->x;
-				x = intplGetValue(0, al, 255, pos.x, ex);
-				ey = window->y - window->width / 2.0f;
-				y = intplGetValue(0, al, 255, pos.y, ey);
-				w = intplGetValue(0, al, 255, 10.0f, window->height);
-				h = intplGetValue(0, al, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, x - w / 2.0f, y + h / 2.0f, w, h, pos.x, pos.y);
+				ret = window->alpha;
+				ex = ( window->height / 2.0f ) + window->x;
+				ey = intplGetValue(0, ret, 255, pos.x, ex);
+				ey = window->y ; ey = ey - ( window->width / 2.0f) ;
+				y = intplGetValue(0, ret, 255, pos.y, ey);
+				w = intplGetValue(0, ret, 255, 10.0f, window->height);
+				h = intplGetValue(0, ret, 255, 10.0f, window->width); new_var = h ;
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ey - ( w / 2.0f) , y + ( h / 2.0f) , w, new_var, pos.x, pos.y);
 				if (window->alpha == 255) {
-					sy = 240 - ((s32)window->y - 10);
-					if (sy < 0) sy = 0;
-					if (sy > 480) sy = 480;
+					sy = 240 - ((( s32)window->y ) - 10);
+					if (sy < 0) { sy = 0;
+					}
+					if (sy > 480) { sy = 480;
+					}
 					GXSetScissor(camera->scissor[0], sy, camera->scissor[2], 0x7E);
 					msgDisp(window->userdata, window->alpha, 20.0f + window->x, window->y - 7.0f);
 				}
@@ -1765,7 +1767,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			}
 		} else {
 			windowDispGX_Message(window->type, 0, window->alpha, window->x, window->y, window->height, window->width, 0.0f, 0.0f);
-			GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], 0x7E);
+			GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
 			ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		}
 		break;
@@ -1773,21 +1775,21 @@ void msgWindow_Disp(CameraId camId, void* param) {
 	case 4:
 	case 10:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 2.0f, camera->scissor[2], 0x68);
+		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 2.0f, camera->scissor[2], 0x68);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
 	case 7:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], 0x7E);
+		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
 	case 3:
 		windowDispGX_System(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
 	case 11:
-		GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
 		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
 		break;
 	case 5:
@@ -1796,9 +1798,10 @@ void msgWindow_Disp(CameraId camId, void* param) {
 
 	GXSetScissor(camera->scissor[0], camera->scissor[1], camera->scissor[2], camera->scissor[3]);
 	if (ret) {
-		if (active == 0) active = 1;
+		if (active == 0) { active = 1;
+		}
 		animPoseMain(msgw->poseId);
-		animPoseDraw(msgw->poseId, window->x + window->height - 52.0f, 31.0f + (window->y - window->width), 0.0f, 180.0f, 5.0f, 2);
+		animPoseDraw(msgw->poseId, ( window->x + window->height ) - 52.0f, 31.0f + (window->y - window->width), 0.0f, 180.0f, 5.0f, 2);
 	}
 }
 

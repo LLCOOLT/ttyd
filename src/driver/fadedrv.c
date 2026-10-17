@@ -1001,7 +1001,7 @@ static f32 z(void) {
 #pragma dont_inline reset
 
 static void zFill(void) {
-	static s32 depth_image[32] = {
+	static s32 depth_image[32] __attribute__((aligned(32))) = {
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1,
 		-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 	CameraEntry* camera;

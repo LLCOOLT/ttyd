@@ -372,65 +372,118 @@ void iconDisp(CameraId camId, void* param) {
     iconGX(mtx, entry);
 }
 
-void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale) {
-    IconEntry entry;
-    Mtx transmtx, scalemtx, rotmtx, mtx;
-    CameraEntry* camera;
-    IconBinData* data;
-    IconEntry* ep;
-
-    camera = camGetCurPtr();
-    ep = &entry;
-    if (!icon_tpl_ok || !icon_bin_ok) {
-        return;
+void iconDispGxAlpha(Vec *position, s16 flags, u16 iconId, u8 alpha, f32 scale)
+{
+  IconEntry entry;
+  Mtx transmtx;
+  Mtx scalemtx;
+  Mtx rotmtx;
+  Mtx mtx;
+  CameraEntry *camera;
+  IconBinData *data;
+  IconEntry *ep;
+  camera = camGetCurPtr();
+  ep = &entry;
+  if ((!icon_tpl_ok) || (!icon_bin_ok))
+  {
+    return;
+  }
+  PSMTXTrans(transmtx, position->x, position->y, position->z);
+  PSMTXScale(scalemtx, scale, scale, scale);
+  PSMTXRotRad(rotmtx, 'y', (-camera->viewYaw) * 0.01745329252f);
+  PSMTXConcat(transmtx, rotmtx, mtx);
+  PSMTXConcat(mtx, scalemtx, mtx);
+  PSMTXConcat(camera->view, mtx, mtx);
+  entry.color = (GXColor){0xFF, 0xFF, 0xFF, alpha};
+  entry.uflags = flags;
+  iconId++;
+  iconId--;
+  entry.iconId = iconId;
+  data = iconGetBinData(iconId);
+  entry.width = data->width;
+  entry.height = data->height;
+  entry.tplId = data->frames[0].tplId;
+  entry.frameDelay = data->frames[0].delay;
+  if (data->numIcons > 1)
+  {
+    s32 i;
+    s32 t;
+    s32 total = 0;
+    for (i = 0; i < data->numIcons; i++)
+    {
+      total += data->frames[i].delay;
     }
-    MTXTrans(transmtx, position->x, position->y, position->z);
-    MTXScale(scalemtx, scale, scale, scale);
-    MTXRotRad(rotmtx, 'y', MTXDegToRad(-camera->viewYaw));
-    MTXConcat(transmtx, rotmtx, mtx);
-    MTXConcat(mtx, scalemtx, mtx);
-    MTXConcat(camera->view, mtx, mtx);
-    entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, alpha };
-    entry.uflags = flags;
-    entry.iconId = iconId;
-    data = iconGetBinData(iconId);
-    entry.width = data->width;
-    entry.height = data->height;
-    entry.tplId = data->frames[0].tplId;
-    entry.frameDelay = data->frames[0].delay;
-    ICON_ANIM_TPL_S(data, entry.tplId);
-    iconGX(mtx, ep);
+
+    t = ((s32) gp->retraceCount) % total;
+    for (i = 0; i < data->numIcons; i++)
+    {
+      if (t < data->frames[i].delay)
+      {
+        entry.tplId = data->frames[i].tplId;
+        break;
+      }
+      t -= data->frames[i].delay;
+    }
+
+  }
+  ;
+  iconGX(mtx, ep);
 }
 
 void iconDispGx(Vec* position, s16 flags, u16 iconId, f32 scale) {
     iconDispGxAlpha(position, flags, iconId, 0xFF, scale);
 }
 
-void iconDispGx2(Mtx mtx, s16 flags, s16 iconId) {
-    IconEntry entry;
-    Mtx m;
-    CameraEntry* camera;
-    IconBinData* data;
-    IconEntry* ep;
-    u16 id;
-
-    camera = camGetCurPtr();
-    ep = &entry;
-    if (!icon_tpl_ok || !icon_bin_ok) {
-        return;
+void iconDispGx2(Mtx mtx, s16 flags, s16 iconId)
+{
+  IconEntry entry;
+  Mtx m;
+  CameraEntry *camera;
+  IconBinData *data;
+  IconEntry *ep;
+  u16 id;
+  camera = camGetCurPtr();
+  ep = &entry;
+  if ((!icon_tpl_ok) || (!icon_bin_ok))
+  {
+    return;
+  }
+  entry.uflags = flags;
+  entry.color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
+  if (icon_bin_ok && icon_bin_ok)
+  {
+  }
+  entry.iconId = (id = iconId);
+  data = iconGetBinData(id);
+  entry.width = data->width;
+  entry.height = data->height;
+  entry.tplId = data->frames[0].tplId;
+  entry.frameDelay = data->frames[0].delay;
+  if (data->numIcons > 1)
+  {
+    s32 i;
+    s32 t;
+    s32 total = 0;
+    for (i = 0; i < data->numIcons; i++)
+    {
+      total += data->frames[i].delay;
     }
-    entry.uflags = flags;
-    entry.color = (GXColor){ 0xFF, 0xFF, 0xFF, 0xFF };
-    entry.iconId = iconId;
-    id = entry.iconId;
-    data = iconGetBinData(id);
-    entry.width = data->width;
-    entry.height = data->height;
-    entry.tplId = data->frames[0].tplId;
-    entry.frameDelay = data->frames[0].delay;
-    ICON_ANIM_TPL_S(data, entry.tplId);
-    MTXConcat(camera->view, mtx, m);
-    iconGX(m, ep);
+
+    t = ((s32) gp->retraceCount) % total;
+    for (i = i * 0; i < data->numIcons; i++)
+    {
+      if (t < data->frames[i].delay)
+      {
+        entry.tplId = data->frames[i].tplId;
+        break;
+      }
+      t -= data->frames[i].delay;
+    }
+
+  }
+  ;
+  PSMTXConcat(camera->view, mtx, m);
+  iconGX(m, ep);
 }
 
 void iconDispGxCol(Mtx pos, s16 flags, s32 iconId, GXColor color) {

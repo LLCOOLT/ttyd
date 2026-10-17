@@ -1305,3 +1305,6 @@ int __VIGetLatchPosition(u32 port, s16* px, s16* py) {
         return __VIGetLatch1Position(px, py);
     }
 }
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803BF7D0_data[4] = {0, 0, 0, 0};
+#pragma force_active reset

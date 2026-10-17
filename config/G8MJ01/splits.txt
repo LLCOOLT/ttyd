@@ -51,7 +51,7 @@ sequence/seq_title.c:
 	.sdata2     start:0x80419480 end:0x80419510
 	.sbss2      start:0x80422F68 end:0x80422F70
 
-seqdef.c:
+sequence/seqdef.c:
 	.data       start:0x80302E40 end:0x80302EA0
 
 driver/bgdrv.c:
@@ -78,8 +78,8 @@ driver/camdrv.c:
 
 driver/dispdrv.c:
 	.text       start:0x800106B8 end:0x80010B28
-	.data       start:0x80302EA0 end:0x80302ECC
-	.sdata      start:0x8040F318 end:0x8040F344
+	.data       start:0x80302EA0 end:0x80302EE0
+	.sdata      start:0x8040F318 end:0x8040F360
 	.sbss       start:0x804183F0 end:0x80418400
 	.sdata2     start:0x80419680 end:0x80419694
 
@@ -821,7 +821,7 @@ data/battle/battle_item_data.c:
 battle/battle_monosiri.c:
 	.text       start:0x80129848 end:0x80129A50
 	.rodata     start:0x802F0158 end:0x802F2FD0
-	.data       start:0x8036A5B8 end:0x8036BE94
+	.data       start:0x8036A5B8 end:0x8036BEA0
 	.sdata      start:0x80411188 end:0x804113B8
 	.sdata2     start:0x8041C540 end:0x8041C568
 
@@ -1287,7 +1287,7 @@ event/evt_env.c:
 driver/envdrv.c:
 	.text       start:0x80193418 end:0x801983C4
 	.rodata     start:0x802F9338 end:0x802F93E0
-	.data       start:0x80398968 end:0x80398D20
+	.data       start:0x80398960 end:0x80398D20
 	.bss        start:0x803E0EF8 end:0x803E10E0
 	.sbss       start:0x80418A70 end:0x80418A90
 	.sdata2     start:0x8041E510 end:0x8041E5D0
@@ -1307,7 +1307,7 @@ battle/ac/ac_lst_rc_keep.c:
 battle/battle_audience.c:
 	.text       start:0x80198DA8 end:0x801A2724
 	.rodata     start:0x802F9578 end:0x802F9E20
-	.data       start:0x80399948 end:0x80399F60
+	.data       start:0x80399940 end:0x80399F60
 	.sdata      start:0x80412BB0 end:0x80412C40
 	.sdata2     start:0x8041E608 end:0x8041E720
 	.sbss2      start:0x80423080 end:0x80423088
@@ -2466,7 +2466,7 @@ battle/ac/ac_gauge_timing2.c:
 effect/eff_naniga.c:
 	.text       start:0x8023AA24 end:0x8023BAC0
 	.rodata     start:0x803000A8 end:0x80300134
-	.data       start:0x803B2EE0 end:0x803B2F84
+	.data       start:0x803B2EE0 end:0x803B2FA0
 	.sdata2     start:0x80421B48 end:0x80421B98
 
 effect/eff_sandars.c:
@@ -2684,7 +2684,7 @@ effect/eff_gonbaba_breath.c:
 	.sdata2     start:0x804224E8 end:0x80422568
 
 gxsub.c:
-	.sdata      start:0x80417EA0 end:0x80417EB0
+	.sdata      start:0x80417EA0 end:0x80417EC0
 
 event/evt_memcard.c:
 	.text       start:0x8025613C end:0x80256544
@@ -2702,11 +2702,16 @@ effect/eff_mahorn2.c:
 	.sdata2     start:0x80422598 end:0x804225E0
 
 effect/eff_ultra_hammer.c:
-	.text       start:0x802577C0 end:0x8025854C
-	.rodata     start:0x803019B0 end:0x80301B78
+	.text       start:0x802577C0 end:0x80257EF4
+	.rodata     start:0x803019B0 end:0x803019E0
 	.data       start:0x803B70C0 end:0x803B7360
 	.sdata      start:0x80417EC0 end:0x80418198
-	.sdata2     start:0x804225E0 end:0x80422620
+	.sdata2     start:0x804225E0 end:0x80422600
+
+error_handler.c:
+	.text       start:0x80257EF4 end:0x8025854C
+	.rodata     start:0x803019E0 end:0x80301B78
+	.sdata2     start:0x80422600 end:0x80422620
 
 TRK_MINNOW_DOLPHIN.a/mainloop.c:
 	.text       start:0x8025854C end:0x80258644
@@ -3118,7 +3123,7 @@ musyx/runtime/synth_ac.c:
 	.sdata2     start:0x80422C10 end:0x80422C28
 
 musyx/runtime/synth_dbtab.c:
-	.data       start:0x803B86A0 end:0x803B8E28
+	.data       start:0x803B86A0 end:0x803B8E40
 
 musyx/runtime/synth_adsr.c:
 	.text       start:0x80280384 end:0x80280B44
@@ -3168,7 +3173,7 @@ musyx/runtime/snd_midictrl.c:
 musyx/runtime/snd_service.c:
 	.text       start:0x8028A2C4 end:0x8028A598
 	.rodata     start:0x80302A38 end:0x80302A64
-	.data       start:0x803BAB50 end:0x803BB350
+	.data       start:0x803BAB50 end:0x803BB360
 	.sdata      start:0x804181D0 end:0x804181D4
 	.sdata2     start:0x80422CF8 end:0x80422D00
 
@@ -3412,7 +3417,7 @@ dvd/fstload.c:
 
 vi/vi.c:
 	.text       start:0x8029D6FC end:0x8029F53C
-	.data       start:0x803BF3E8 end:0x803BF7D0
+	.data       start:0x803BF3E8 end:0x803BF7E0
 	.bss        start:0x8040DBC8 end:0x8040DD10
 	.sdata      start:0x80418278 end:0x80418288
 	.sbss       start:0x80419008 end:0x80419070

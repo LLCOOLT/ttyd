@@ -26,8 +26,6 @@ typedef struct YuuNpcData { const char* name; const char* anim; f32 frames; } Yu
 s32 yuunpc_pose_check(const char* name, const char* anim);
 void yuunpc_pose_change(YuuNpc* npc, s16 id, f32 speed, f32 frame);
 f32 yuusintbl[450];
-extern const f32 float_6000_yuu_0001518c, float_7000_yuu_00015190, float_neg560_yuu_00015194, float_450_yuu_00015198, float_224_yuu_0001519c;
-extern const char zero_yuu_000151a0[];
 s32 chusan_mov_tbl[28];
 s32 chusan_act_tbl[8];
 f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc);
@@ -315,13 +313,13 @@ void yuunpc_pose_init(YuuNpcData* data) {
     s32 start;
     s32 i;
 
-    strcpy(name, zero_yuu_000151a0);
-    strcpy(anim, zero_yuu_000151a0);
+    strcpy(name, "");
+    strcpy(anim, "");
     yuunpc_wp->numPoses = -1;
     do {
         if (strcmp(data->name, name) != 0) {
             strcpy(name, data->name);
-            strcpy(anim, zero_yuu_000151a0);
+            strcpy(anim, "");
         }
         if (strcmp(data->anim, anim) != 0) {
             strcpy(anim, data->anim);
@@ -358,7 +356,7 @@ void yuunpc_pose_init(YuuNpcData* data) {
     for (i = 0; i < yuunpc_wp->basePoseNum; i++) {
         if (strcmp(yuunpc_wp->pose[i].name, "c_tyusan") == 0 && strcmp(yuunpc_wp->pose[i].anim, "CHU_S_1") == 0) {
             yuunpc_wp->chusanPose = i;
-            yuunpc_wp->pose[i].frames = float_224_yuu_0001519c;
+            yuunpc_wp->pose[i].frames = 224.0f;
         }
     }
 }
@@ -483,7 +481,7 @@ f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
 
     if (!(ext->flags & 2)) {
         f32 c, s;
-        a = ext->rot; a = float_450_yuu_00015198 - a;
+        a = ext->rot; a = 450.0f - a;
         if (a >= 360.0f) {
             a -= 360.0f;
         }
@@ -521,7 +519,7 @@ f32 yuunpc_pose_sub(ExtPose* ext, YuuNpc* npc) {
             if (npc->poseId != yuunpc_wp->chusanPose) {
                 ext->frame = pose->start + (s32)(pose->count * t);
             } else {
-                s32 k = float_224_yuu_0001519c * t;
+                s32 k = 224.0f * t;
                 ext->frame = pose->start + (chusan_mov_tbl[k >> 3] ? chusan_act_tbl[k & 7] : 0);
             }
             break;
@@ -556,9 +554,9 @@ void ext_yuunpc_minigame1_init(void) {
         npc->flags |= 1;
         ext->flags |= 7;
         PSMTXIdentity(ext->mtx);
-        z = 30.0f + (60.0f * (i % 5) + float_neg560_yuu_00015194);
+        z = 30.0f + (60.0f * (i % 5) + -560.0f);
         ext->mtx[0][3] = 16.666666f * row - 500.0f;
-        ext->mtx[1][3] = ytbl[(s32)((z - float_neg560_yuu_00015194) / 60.0f)];
+        ext->mtx[1][3] = ytbl[(s32)((z - -560.0f) / 60.0f)];
         ext->mtx[2][3] = z + ztbl[row % 8];
         ext->rot = irand(2) * 180 + 90;
         npc->animSpeed = 1.0f;
@@ -615,7 +613,7 @@ void yuunpc_pose_minigame1_main(void) {
             z = ext->mtx[2][3];
             if (z < -260.0f) {
                 y = ext->mtx[1][3];
-                if ((x >= -5000.0f && x <= -1500.0f) || (x >= 1700.0f && x <= 5000.0f) || (x >= float_6000_yuu_0001518c && x <= float_7000_yuu_00015190)) {
+                if ((x >= -5000.0f && x <= -1500.0f) || (x >= 1700.0f && x <= 5000.0f) || (x >= 6000.0f && x <= 7000.0f)) {
                     if (y > -500.0f) {
                         y += -1000.0f;
                         ext->mtx[1][3] = y;

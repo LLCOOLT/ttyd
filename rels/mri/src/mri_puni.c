@@ -5518,51 +5518,99 @@ static inline void puni_swget_idx(s32 idx, s32* val, Vec* pos) {
     pos->z = z;
 }
 
-USER_FUNC(evt_puni_debug_info) {
-    char buf[256];
-    s32 i;
-    for (i = 1; i <= 102; i++) {
-        s32 b0;
-        Vec pos;
-        s32 a, trap;
-        f32 fx, fy, fz;
-        puni_swget_idx(i, &b0, &pos);
-        fx = pos.x; fy = pos.y; fz = pos.z;
-        if (i >= 103) {
-            a = 0;
-        } else {
-            a = (swByteGet(i / 8 + 0x28C) >> (i % 8)) & 1;
-        }
-        trap = 0;
-        if (i == 1) {
-            if (!swGet(0xB3C)) trap = 1;
-        } else if (i == 2) {
-            if (!swGet(0xB3D)) trap = 1;
-        } else if (i == 4) {
-            if (!swGet(0xB3F)) trap = 1;
-        } else if (i == 3) {
-            if (!swGet(0xB3E)) trap = 1;
-        } else if (swByteGet(0x28B) + 5 <= i) {
-            trap = 1;
-        }
-        if (a == 0) {
-            if (trap == 0) {
-                if (b0 == 0) {
-                    sprintf(buf, "No%03d,\202\302\202\242\202\304\227\210\202\304\202\242\202\334\202\267\n", i);
-                } else {
-                    sprintf(buf, "No%03d,\202\315\202\256\202\352\202\304\202\242\202\334\202\267 area = mri_%02d, x = %04d, y = %04d, z = %04d,\n", i, b0 - 1, (s32)fx, (s32)fy, (s32)fz);
-                }
-            } else {
-                sprintf(buf, "No%03d,\201\203\202\334\202\276\222\207\212\324\202\311\202\310\202\301\202\304\202\242\202\334\202\271\202\361\201\204\n", i);
-            }
-        } else {
-            sprintf(buf, "No%03d,\201\203\203g\203\211\203b\203v\202\311\202\251\202\251\202\301\202\304\202\242\202\334\202\267\201\204\n", i);
-        }
-        if (i == 1 && swGet(0xB14)) {
-            sprintf(buf, "No%03d,\201\203mri_03\202\314\230S\211\256\202\311\221\330\215\335\202\265\202\304\202\242\202\334\202\267\201\204\n", i);
-        }
+s32 evt_puni_debug_info(EventEntry *event, BOOL isFirstCall)
+{
+  char buf[256];
+  s32 i;
+  for (i = 1; i <= 102; i++)
+  {
+    s32 b0;
+    Vec pos;
+    s32 a;
+    s32 trap;
+    f32 fx;
+    f32 fy;
+    f32 fz;
+    puni_swget_idx(i, &b0, &pos);
+    fx = pos.x;
+    fy = pos.y;
+    fz = pos.z;
+    if (i >= 103)
+    {
+      a = 0;
     }
-    return EVT_RETURN_DONE;
+    else
+    {
+      a = 8;
+      trap = swByteGet((i / 8) + 0x28C);
+      a = (trap >> (i % a)) & 1;
+    }
+    trap = 0;
+    if (i == 1)
+    {
+      if (!swGet(0xB3C))
+      {
+        trap = 1;
+      }
+    }
+    else
+      if (i == 2)
+    {
+      if (!swGet(0xB3D))
+      {
+        trap = 1;
+      }
+    }
+    else
+      if (i == 4)
+    {
+      if (!swGet(0xB3F))
+      {
+        trap = 1;
+      }
+    }
+    else
+      if (i == 3)
+    {
+      if (!swGet(0xB3E))
+      {
+        trap = 1;
+      }
+    }
+    else
+      if ((swByteGet(0x28B) + 5) <= i)
+    {
+      trap = 1;
+    }
+    if (a == 0)
+    {
+      if (trap == 0)
+      {
+        if (b0 == 0)
+        {
+          sprintf(buf, "No%03d,���ė��Ă��܂�\n", i);
+        }
+        else
+        {
+          sprintf(buf, "No%03d,�͂���Ă��܂� area = mri_%02d, x = %04d, y = %04d, z = %04d,\n", i, b0 - 1, (s32) fx, (s32) fy, (s32) fz);
+        }
+      }
+      else
+      {
+        sprintf(buf, "No%03d,���܂����ԂɂȂ��Ă��܂���\n", i);
+      }
+    }
+    else
+    {
+      sprintf(buf, "No%03d,���g���b�v�ɂ������Ă��܂���\n", i);
+    }
+    if ((i == 1) && swGet(0xB14))
+    {
+      sprintf(buf, "No%03d,��mri_03�̘S���ɑ؍݂��Ă��܂���\n", i);
+    }
+  }
+
+  return 2;
 }
 
 extern double fabs(double);

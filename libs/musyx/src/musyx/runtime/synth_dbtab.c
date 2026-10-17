@@ -112,3 +112,6 @@ float dspDLSVolTab[129] = {
 #ifdef __cplusplus
 }
 #endif
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803B8E28_data[6] = {0, 0, 0, 0, 0, 0};
+#pragma force_active reset

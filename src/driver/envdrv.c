@@ -14,6 +14,7 @@ extern GlobalWork* gp;
 
 //.data
 // static data from an inlined header function
+__declspec(section ".data") s32 lbl_80398960[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 env_negone_one_374[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 lbl_80398970[] = {1065353216, -1082130432};
 __declspec(section ".data") s32 env_one_negone_373[] = {1065353216, -1082130432};

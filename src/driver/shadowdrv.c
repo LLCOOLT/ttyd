@@ -322,7 +322,7 @@ void shadowDisp(CameraId cameraId, void* param) {
 
     disp = dispGetCurWork();
 
-    if (cameraId == CAMERA_OFFSCREEN2 || (u32)(cameraId - CAMERA_3D) <= 1 || cameraId == CAMERA_3D_EFFECTB) {
+    if ((( cameraId == CAMERA_OFFSCREEN2 ) || (( (u32)(cameraId - CAMERA_3D) ) <= 1 )) || ( cameraId == CAMERA_3D_EFFECTB) ) {
         shadowCharShadowDisp_Polygon(cameraId, param);
         {
             f32 t;
@@ -339,7 +339,7 @@ void shadowDisp(CameraId cameraId, void* param) {
         GXSetVtxDesc(GX_VA_CLR0, GX_INDEX8);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
-        GXSetArray(GX_VA_POS, vertex_tbl, 12);
+        GXSetArray(GX_VA_POS, (0, vertex_tbl) , 12);
         GXSetArray(GX_VA_CLR0, color_tbl, 4);
         cylinderShadowDraw(cameraId, param);
         shadowCharShadowDisp_Texture(cameraId, param);
@@ -349,6 +349,7 @@ void shadowDisp(CameraId cameraId, void* param) {
                 ShadowConfig* cfg;
                 shadowCharShadowDisp_Collision(cameraId, param);
                 if ((cfg = &shadowConfig[cswp->unk8])->follow == 1) {
+                    cam->cameraAt.z = cam->cameraAt.z;
                     cam = camGetPtr(CAMERA_3D);
                     cfg->pos.x = cam->cameraAt.x;
                     cfg->pos.y = 1000.0f + cam->cameraAt.y;
@@ -397,23 +398,27 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
     ShadowEntry* entry = cswp->entries;
     s32 i;
     f32 (*m)[4];
-    f32 size, sy;
+    f32 size; HitCheckQuery * new_var; f32 sy;
     HitCheckQuery query;
 
     camGetCurPtr();
     for (i = 0; i < cswp->unk104; i++, entry++) {
         m = entry->mtx;
-        if (!entry->size) continue;
-        if (entry->flags & 2) continue;
-        if (entry->mode != 3 && (entry->flags & 1)) {
+        if (!entry->size) { continue;
+        }
+        if (entry->flags & 2) { continue;
+        }
+        if ( (entry->mode != 3 ) && (entry->flags & 1)) {
             query.targetPos = entry->pos;
             query.targetPos.y += 1.0f;
             query.targetDir = (Vec){0.0f, -1.0f, 0.0f};
             query.targetDistance = 150.0f;
-            if (!hitCheckVecFilter(&query, _filter)) continue;
+            new_var = & query;
+            if (!hitCheckVecFilter(&query, _filter)) { continue;
+            }
             size = entry->size;
             sy = entry->sizeY;
-            m[0][3] = query.hitPos.x + query.hitNormal.x;
+            m[0][3] = (* new_var).hitPos.x + query.hitNormal.x;
             m[1][3] = query.hitPos.y + query.hitNormal.y;
             m[2][3] = query.hitPos.z + query.hitNormal.z;
             m[1][0] = query.hitNormal.x * size;
@@ -421,13 +426,13 @@ void shadowCharShadowDisp_Collision(CameraId cameraId, void* param) {
             m[1][2] = query.hitNormal.z * size;
             m[2][0] = 0.0f;
             m[2][1] = query.hitNormal.z * size;
-            m[2][2] = -query.hitNormal.y * size;
-            m[0][0] = size * (-query.hitNormal.y * query.hitNormal.y - query.hitNormal.z * query.hitNormal.z);
+            m[2][2] = ( -query.hitNormal.y ) * size;
+            m[0][0] = size * ((( -query.hitNormal.y ) * query.hitNormal.y ) - ( query.hitNormal.z * query.hitNormal.z) );
             m[0][1] = size * (query.hitNormal.x * query.hitNormal.y);
             m[0][2] = size * (query.hitNormal.x * query.hitNormal.z);
         } else {
             PSMTXTrans(m, entry->pos.x, 1.5f + entry->pos.y, entry->pos.z);
-            m[0][0] = m[2][2] = entry->size;
+            m[0][0] = ( m[2][2] = entry->size) ;
             m[1][1] = entry->sizeY;
         }
         entry->flags |= 2;

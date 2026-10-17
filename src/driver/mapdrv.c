@@ -446,7 +446,7 @@ void makeDisplayList(BOOL group) {
 			MAPOBJ_DL(obj)[k] = NULL;
 			MAPOBJ_DLSIZE(obj)[k] = 0;
 		}
-		for (i = 0; i < e->numJoints; i++, obj++) {
+		for (i = 0; i < wp->entries[group].numJoints; i++, obj++) {
 			if (obj->joints->partCount < 1 || obj->joints->partCount > 8) {
 				continue;
 			}

@@ -1,8 +1,7 @@
-/* This file is only in retail, filename is unknown, "error_handler" for convenience */
-#include "error_handler.h"
-#include "sdk/DEMOInit.h"
-#include "seq/seq_title.h"
+/* Original TU name unknown; separate object after eff_ultra_hammer in the retail DOL. */
 #include "memory.h"
+#include "system.h"
+#include "sdk/DEMOInit.h"
 #include "pmario_sound.h"
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
@@ -11,25 +10,29 @@
 
 extern void* DemoCurrentBuffer, * DemoFrameBuffer1, * DemoFrameBuffer2;
 extern int sprintf(char* str, const char* format, ...);
+extern s32 N_getDebugMode(void);
+extern void L_smartReInit(void);
 
 //local prototypes
-void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);
+void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar);
 
-void setupErrorHandler(void) {
-	OSSetErrorHandler(OS_ERROR_DSI, (void (*)(u16, OSContext*, ...))systemErrorHandler);
-	OSSetErrorHandler(OS_ERROR_ISI, (void (*)(u16, OSContext*, ...))systemErrorHandler);
-	OSSetErrorHandler(OS_ERROR_PROGRAM, (void (*)(u16, OSContext*, ...))systemErrorHandler);
+void N_setupErrorHandler(void) {
+	OSSetErrorHandler(OS_ERROR_DSI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
+	OSSetErrorHandler(OS_ERROR_ISI, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
+	OSSetErrorHandler(OS_ERROR_PROGRAM, (void (*)(u16, OSContext*, ...))N_systemErrorHandler);
 }
 
-void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
+void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 	//registers
-	OSFontHeader* fontHeader;
-	char* loop_newline;
-	char* loop_zero;
-	u16 width2, height2;
+	char* textBase;
 	int i;
+	OSFontHeader* fontHeader;
+	s8* loop_newline;
+	s8* loop_zero;
+	int width2, height2;
 	u32 count, stack;
-	u16 w1, w2, h1, h2, x1, x2, y1, y2;
+	s16 w1, w2, h1, h2, x2, y2;
+	int x1, y1;
 	//stack vars
 	char print_buffer2[0x400]; // 0x10E0
 	char print_buffer[0x1000]; // 0xE0
@@ -42,7 +45,7 @@ void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 	s32 y; // 0x14
 	s32 width; // 0x10
 
-	if (getDebugMode() >= 0) {
+	if (N_getDebugMode() >= 0) {
 		psndExit();
 		while (1) {} //softlock
 	}
@@ -97,7 +100,7 @@ void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 		isync
 	};
 #endif
-	smartReInit();
+	L_smartReInit();
 	if (OSGetFontEncode() == OS_FONT_ENCODE_SJIS) {
 		fontHeader = smartAlloc(OS_FONT_SIZE_SJIS, 0)->address;
 	}
@@ -127,9 +130,10 @@ void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, 1, 3, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, 1, 3, 0);
+	textBase = print_buffer;
 	while (1) {
 		count = VIGetRetraceCount();
-		loop_newline = (char*)&print_buffer;
+		loop_newline = (s8*)&print_buffer;
 		width2 = 50;
 		height2 = 50;
 		i = 0;
@@ -143,21 +147,21 @@ void systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 				loop_newline++;
 			}
 			else {
-				OSGetFontTexture((const char*)&print_buffer[i], &image, &x, &y, &width);
+				OSGetFontTexture(&textBase[i], &image, &x, &y, &width);
 				GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
 					(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
 				GXLoadTexObj(&texObj, GX_TEXMAP0);
-				MTXScale(matrix2, (float)fontHeader->sheetWidth, (float)fontHeader->sheetHeight, 1.0f);
+				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
 				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				w1 = width2;
-				w2 = (u16)(w1 + fontHeader->cellWidth);
+				h1 = height2; w1 = width2;
+				w2 = w1 + fontHeader->cellWidth;
 				h1 = height2;
-				h2 = (u16)(h1 + fontHeader->cellHeight);
-				x1 = (u16)x;
-				x2 = (u16)(x1 + fontHeader->cellWidth);
-				y1 = (u16)y;
-				y2 = (u16)(y1 + fontHeader->cellHeight);
+				h2 = h1 + fontHeader->cellHeight;
+				x1 = x;
+				y1 = y;
+				x2 = x1 + fontHeader->cellWidth;
+				y2 = y1 + fontHeader->cellHeight;
 
 				GXPosition1x16(w1);
 				GXPosition1x16(h1);
