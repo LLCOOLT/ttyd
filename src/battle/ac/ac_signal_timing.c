@@ -81,10 +81,10 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   {
     autoCommand = 1;
   }
+  sfxNg = "SFX_AC_COMMAND_NG1\0\0\0\0\0";
   sfxPi = "SFX_AC_PI1";
   sfxPone = "SFX_AC_PONE1";
   sfxOk = "SFX_AC_COMMAND_OK1";
-  sfxNg = "SFX_AC_COMMAND_NG1\0";
   do
   {
     loop = 0;
@@ -108,9 +108,6 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
         for (k = 0; k < 5; k++)
       {
         w->results[k] = 0;
-        if ((!w->hits) && (!w->hits))
-        {
-        }
       }
 
         switch (*((s32 *) (((u8 *) work) + 0x1CD8)))
@@ -436,9 +433,10 @@ void battleAcDelete_SignalTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
-    s32 i;
     BattleWork* work = _battleWorkPointer;
+    BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w;
+    s32 i;
     s32 count;
     s32 next;
     s32 n;
@@ -453,7 +451,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     Mtx mScale;
 
     camGetPtr(8);
-    w = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC));
+    w = (SignalTimingWork*)((u8*)ac + 0x2BC);
     count = ST_COUNT(work);
     next = ((SignalTimingWork*)((u8*)&work->actionCommands + 0x2BC))->next;
     if (!(ST_FLAGS(work) & 1)) {

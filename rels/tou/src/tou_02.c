@@ -1443,14 +1443,15 @@ void fan_disp(CameraId camera, void* param) {
     extLoadTextureExit();
 }
 
+static __declspec(section ".rodata") Vec fan_zero = {0.0f, 0.0f, 0.0f};
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
     Vec dir;
     Vec target = {0.0f, 0.0f, 0.0f};
-    ExtPose* pose;
     Fan* fan;
+    ExtPose* pose;
     s32 i;
 
     if (mario->currMotionId == 0x12) {
@@ -1575,12 +1576,11 @@ void ext_fan_main(void) {
                         psndSFXOn_3D(sfx1, &fan->pos);
                         break;
                     case 2: {
-                        static const Vec zero = {0.0f, 0.0f, 0.0f};
 
                         angle = angleABf(mario->position.x, mario->position.z, fan->pos.x, fan->pos.z);
                         dir2 = cloudGetBreathDir();
                         fan->state = 20;
-                        fan->target = zero;
+                        fan->target = fan_zero;
                         angle = (angle + dir2) / 2.0f;
                         spd = randf(0.1f, 0.2f);
                         angle = 6.2831855f * angle / 360.0f;
@@ -1608,6 +1608,7 @@ void ext_fan_main(void) {
             switch (fan->state) {
                 case 0: {
                     HitCheckQuery query;
+                    HitCheckQuery* q = &query;
                     PSVECNormalize(&fan->vel, &fan->vel);
                     dist = PSVECMag(&fan->vel);
                     query.targetPos = fan->pos;
@@ -1616,7 +1617,7 @@ void ext_fan_main(void) {
                     query.targetDir.y = 0.0f;
                     query.targetDistance = 25.0f + dist;
                     if (hitCheckVecFilter(&query, NULL)) {
-                        C_VECReflect(&fan->vel, &query.hitNormal, &fan->vel);
+                        C_VECReflect(&fan->vel, &q->hitNormal, &fan->vel);
                     } else {
                         fan->pos.x += fan->vel.x;
                         fan->pos.z += fan->vel.z;

@@ -822,15 +822,15 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static void ext_main(void) {
-    f32 * new_var;
-    BomWork* wp = lp->address; int new_var3 ;
+    
+    BomWork* wp = lp->address;
     ExtPose* pose = extGetPosePtr();
     s32 i;
     f32 angle;
     f32  speed;
     f32 gravity; f32 new_var2 ;
     f32 x;
-    f32 z; f32 * new_var4 ; f32 dist ;
+    f32 z; f32 dist ;
     f32 rad;
     Mtx m1;
     Mtx m2;
@@ -844,7 +844,7 @@ static void ext_main(void) {
 
         switch ((s8)wp->bom[i].state) {
             case 0:
-                if (1) { new_var2 = PSVECDistance(&center, &pos) ; if (new_var2 > 280.0f) {
+                new_var2 = PSVECDistance(&center, &pos) ; if (new_var2 > 280.0f) {
                     PSVECSubtract(&center, &pos, &dir);
                     PSVECNormalize(&dir, &dir);
                     PSVECScale(&dir, &move, 3.0f);
@@ -857,7 +857,6 @@ static void ext_main(void) {
                     wp->bom[i].state++;
                 }
                 break;
-            }
             case 1:
                 angle = ( 6.2831855f * rand() ) / 32767.0f;
                 dist = 150.0f + (( 30.0f * rand() ) / 32767.0f) ;
@@ -884,18 +883,16 @@ static void ext_main(void) {
                 z = dist * ( -chb_cos(angle)) ;
                 x = ( dist * chb_sin(angle) ) + (100.0f + ( i % 100) );
                 jump(i, 4, x, 350.0f + ( i % 150) , z, speed, gravity);
-                break; new_var = pose->mtx [1] ;
+                break;
             case 4:
                 wp->bom[i].state++;
                 break;
             case 5:
                 break;
-            new_var3 = 2;
             case 100:
                 pose->mtx[1][3] += wp->bom[i].vy;
                 wp->bom[i].vy -= wp->bom[i].gravity;
-                new_var4 = pose->mtx [new_var3];
-                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], new_var4[3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
+                rad = ( 3.1415927f * angleABf(pose->mtx[0][3], pose->mtx[2][3], wp->bom[i].target.x, wp->bom[i].target.z) ) / 180.0f;
                 pose->mtx[0][3] += wp->bom[i].field_0x10 * chb_sin(rad);
                 pose->mtx[2][3] += wp->bom[i].field_0x10 * ( -chb_cos(rad)) ;
                 if ( (--wp->bom[i].timer ) < 0) {
@@ -906,9 +903,9 @@ static void ext_main(void) {
                 }
                 break;
             case 127:
-                if (new_var[3] > ( -1000.0f) ) {
+                if (pose->mtx[2][3] > ( -1000.0f) ) {
                     pose->mtx[1][3] = pose->mtx[1][3] - 2.0f;
-                    pose->flags &= ~new_var3;
+                    pose->flags &= ~2;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
                     PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * (( f32)sin((gp->retraceCount + i) / 100.0f) )));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);

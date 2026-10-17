@@ -27,12 +27,13 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	char* textBase;
 	int i;
 	OSFontHeader* fontHeader;
-	s8* loop_newline;
-	s8* loop_zero;
 	int width2, height2;
+	s8* loop_zero;
+	s8* loop_newline;
 	u32 count, stack;
 	s16 w1, w2, h1, h2, x2, y2;
 	int x1, y1;
+	int cw;
 	//stack vars
 	char print_buffer2[0x400]; // 0x10E0
 	char print_buffer[0x1000]; // 0xE0
@@ -154,13 +155,14 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
 				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				h1 = height2; w1 = width2;
-				w2 = w1 + fontHeader->cellWidth;
-				h1 = height2;
-				h2 = h1 + fontHeader->cellHeight;
 				x1 = x;
+				h1 = height2;
+				w1 = width2;
+				cw = fontHeader->cellWidth;
+				w2 = w1 + cw;
 				y1 = y;
 				x2 = x1 + fontHeader->cellWidth;
+				h2 = h1 + fontHeader->cellHeight;
 				y2 = y1 + fontHeader->cellHeight;
 
 				GXPosition1x16(w1);

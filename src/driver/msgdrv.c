@@ -707,7 +707,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	char tag[0x80];
 	char args[0x80];
 	char name[0x20];
-	char anim1[0x20]; s32 tmpi2;
+	char anim1[0x20];
 	char anim2[0x20];
 	char paper[0x20];
 	char paper2[0x20];
@@ -846,7 +846,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				flags = (flags & (~0xFF00)) | (0x100 << data->numSel);
 				data->numSel++;
 			}
-			continue; tmpi2 = gp->language;
+			continue;
 		case '<':
 			next = msgGetCommand(msg + 1, tag, args);
 			msg = next;
@@ -1141,7 +1141,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			}
 			continue;
 		default:
-			if ((((( u32)tmpi2 ) == 0 ) && (( (s8)check ) >= '0' )) && (( (s8)check ) <= '9') ) {
+			if (((( (u32)gp->language ) == 0 ) && (( (s8)check ) >= '0' )) && (( (s8)check ) <= '9') ) {
 				glyph = kanjiSearch((u16)(check + 0x821F));
 			} else {
 				glyph = hankakuSearch(check);
@@ -1696,7 +1696,6 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 }
 
 void msgWindow_Disp(CameraId camId, void* param) {
-	f32 new_var;
 	CameraEntry* camera = camGetCurPtr();
 	BOOL ret = FALSE;
 	WindowEntry* window = param;
@@ -1725,15 +1724,11 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			case 6:
 			case 8:
 			case 9:
-				ret = window->alpha;
-				ret = window->alpha;
-				ex = ( window->height / 2.0f ) + window->x;
-				ey = intplGetValue(0, ret, 255, pos.x, ex);
-				ey = window->y - ( window->width / 2.0f) ;
-				y = intplGetValue(0, ret, 255, pos.y, ey);
-				w = intplGetValue(0, ret, 255, 10.0f, window->height);
-				h = intplGetValue(0, ret, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ey - ( w / 2.0f) , y + ( h / 2.0f) , w, h, pos.x, pos.y);
+				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
+				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
+				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
+				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
 					ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
@@ -1746,14 +1741,11 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				ret = window->alpha;
-				ex = ( window->height / 2.0f ) + window->x;
-				ey = intplGetValue(0, ret, 255, pos.x, ex);
-				ey = window->y ; ey = ey - ( window->width / 2.0f) ;
-				y = intplGetValue(0, ret, 255, pos.y, ey);
-				w = intplGetValue(0, ret, 255, 10.0f, window->height);
-				h = intplGetValue(0, ret, 255, 10.0f, window->width); new_var = h ;
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ey - ( w / 2.0f) , y + ( h / 2.0f) , w, new_var, pos.x, pos.y);
+				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
+				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
+				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
+				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((( s32)window->y ) - 10);
 					if (sy < 0) { sy = 0;

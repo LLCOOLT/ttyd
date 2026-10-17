@@ -176,12 +176,10 @@ USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry) {
 	s32* args = event->args;
 	s32 x, y, z;
 
-	if (1) {
-		x = evtGetValue(event, args[0]);
-		y = evtGetValue(event, args[1]);
-		z = evtGetValue(event, args[2]);
-		N_marioSetBottomlessRespawnPosOnBeroEntry((f32)x, (f32)y, (f32)z);
-	}
+	x = evtGetValue(event, args[0]);
+	y = evtGetValue(event, args[1]);
+	z = evtGetValue(event, args[2]);
+	N_marioSetBottomlessRespawnPosOnBeroEntry((f32)x, (f32)y, (f32)z);
 	return EVT_RETURN_DONE;
 }
 
@@ -363,7 +361,7 @@ USER_FUNC(evt_bero_get_info_length) {
 			storeme = 60.0f;
 			break;
 		default:
-			if (1) { storeme = 60.0f; }
+			storeme = 60.0f;
 			break;
 	}
 	evtSetFloat(event, args[1], storeme);
@@ -632,7 +630,7 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
       deg += new_var3;
     }
     rad = (6.2831855f * deg) / 360.0f;
-    tmp.x = start.x - (30.0f * ((f32) sin(rad)));
+    tmp.x = start.x - (30.0f * ((f32) sin((6.2831855f * deg) / 360.0f)));
     tmp.y = start.y;
     {
       f32 c0 = (f32) cos(rad);
@@ -646,7 +644,7 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
     }
     tmp2 = tmp;
     tmp2.x += (30.0f + len) * ((0, (f32) sin(rad)));
-    tmp2.z += (30.0f + len) * (-((f32) cos(rad)));
+    tmp2.z += (30.0f + len) * (-((f32) cos((6.2831855f * deg) / 360.0f)));
     start = tmp;
     end = tmp2;
   }

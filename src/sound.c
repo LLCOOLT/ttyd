@@ -683,9 +683,7 @@ BOOL SoundDropData(void) {
     for (i = 0; i < sound.slibId; i++) {
         __memFree(HEAP_DEFAULT, sound.slibData[i]);
         __memFree(HEAP_DEFAULT, sound.stblData[i]);
-        if (1) {
         __memFree(HEAP_DEFAULT, sound.etblData[i]);
-    }
     }
 
     sound.dataId = 0;
@@ -1614,7 +1612,7 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
                 }
                 entry->loaded = 0;
                 entry->srcPos = 0;
-                entry->curBuf = ((int) 1) - entry->curBuf;
+                entry->curBuf = 1 - entry->curBuf;
                 src8 = entry->loadBuffer[entry->curBuf];
             }
             entry->pos++;
@@ -1694,7 +1692,7 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
             if (entry->srcPos >= entry->loadedLen[entry->curBuf]) {
                 if (entry->loaded == 0 && !(stream->flags & 0x4000)) {
                     entry->pos -= entry->srcPos;
-                    entry->srcPos = (0, 0);
+                    entry->srcPos = 0;
                     src16 = (s16*)entry->loadBuffer[entry->curBuf];
                     continue;
                 }
@@ -1763,7 +1761,6 @@ void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
         stream->flags = 0;
         return;
     }
-    stream = stream;
     DVDMgrReadAsync(stream->entries[0].dvd, stream->entries[0].buffer, 0x100, 0, SoundSSPlayChEx_main);
 }
 

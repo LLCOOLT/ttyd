@@ -470,6 +470,7 @@ static inline s32 unitwin_party_icon(s32 icon) {
 }
 
 #define ICONGX ((void (*)(Vec*, u16, u16, f32))iconDispGx)
+#define ICONGX2 ((void (*)(Vec*, u16, f32, u16))iconDispGx)
 
 void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	PouchData* pouch = pouchGetPtr();
@@ -479,7 +480,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	s32 i;
 	char fbuf[64];
 
-	if (0) { sprintf(fbuf, "%s_%04d", "", 0); }
 	if (wp->flags & 1) {
 		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
 		const char* name = itemDataTable[wp->goods[wp->goodsIdx]].id;
@@ -633,7 +633,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				s32 id = pouchKeepItem(i);
 				ItemData* item = &itemDataTable[id];
 				if (id) {
-					iconDispGx(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, 0x10, item->icon_id, 0.5f);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, 0x10, 0.5f, item->icon_id);
 					FontDrawStart();
 					FontDrawString(36.0f, wp->scroll + (80 - row * 24), item->id);
 					if (row == wp->cursor) {
@@ -668,7 +668,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 flag;
 			u32 sl, st, sw, sh;
 
-			row = 0;
 			desc = NULL;
 			if (mode == 2 || mode == 3) {
 				h = (8 - pouchGetHaveItemCnt() > 0 ? 8 - pouchGetHaveItemCnt() : 0) * 24;
@@ -733,7 +732,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			}
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (tbl = badge_bottakuru100_table, i = 0; i < max; i++) {
+			for (tbl = badge_bottakuru100_table, i = 0, row = i; i < max; i++) {
 				
 				GXColor color = {0x00, 0x00, 0x00, 0xFF};
 				s32 id;
@@ -788,13 +787,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						flag = 0x20;
 					}
 					{
-						ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, item->icon_id, 0.5f);
+						ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, 0.5f, item->icon_id);
 					}
 					FontDrawStart();
 					FontDrawScale(0.8f);
 					FontDrawColor(color);
-					ty = 80 - row * 24;
-					FontDrawString(36.0f, wp->scroll + ty - 2.0f, item->id);
+					FontDrawString(36.0f, wp->scroll + (80 - row * 24) - 2.0f, item->id);
 					if (wp->field_0x50 != 3) {
 						char buf[32];
 						f32 sc;
@@ -835,7 +833,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						FontDrawStart();
 						FontDrawScale(sc);
 						FontDrawColor(color);
-						FontDrawString(xoff + 226, wp->scroll + ty, buf);
+						FontDrawString(xoff + 226, wp->scroll + (80 - row * 24), buf);
 					}
 					if (row == wp->cursor) {
 						desc = item->description;
@@ -854,11 +852,11 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		case 17:
 		case 18: {
 			InformantWork* jdt = &_jdt;
+			InformantInfo* info;
 			s32 h;
 			u8* tbl;
 			const char* title;
 			u32 sl, st, sw, sh;
-			InformantInfo* info;
 
 
 			h = 8 - wp->count;
@@ -907,13 +905,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				((char*)info->initEndPos)[info->tagEndPos] = 0;
 				FontDrawColor(color);
 				FontDrawScale(0.8f);
-				ty = 80 - i * 24;
-				FontDrawString(1.0f, wp->scroll + ty, (char*)info->initEndPos);
+				FontDrawString(1.0f, wp->scroll + (80 - i * 24), (char*)info->initEndPos);
 				((char*)info->initEndPos)[info->tagEndPos] = c;
 				if (wp->field_0x50 == 17) {
 					FontDrawStart();
 					FontDrawColor(color);
-					FontDrawString(221.0f, wp->scroll + ty, buf);
+					FontDrawString(221.0f, wp->scroll + (80 - i * 24), buf);
 				}
 			}
 			GXSetScissor(sl, st, sw, sh);
@@ -922,16 +919,15 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		case 5:
 		case 6:
 		case 7: {
+			const char* name;
 			char msgName[64] = {0};
 			s32 row = 0;
 			s32 h;
 			u32 sl, st, sw, sh;
 			
-			s32* pid;
 			s32 lv;
 			s32 flag;
 			GXColor color;
-			const char* name;
 
 			h = 8 - wp->count;
 			h = (h > 0 ? h : 0) * 24;
@@ -950,18 +946,18 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			FontDrawEdgeOff();
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (i = 0, pid = party_id_table; *pid; i++, pid++) {
+			for (i = 0; party_id_table[i]; i++) {
 				s32 icon;
 				s32 ty;
 				char buf[32];
 				char help[16];
 				char dir[16];
 				if (wp->field_0x50 == 5 || wp->field_0x50 == 6) {
-					if (!partyChkJoin(*pid)) {
+					if (!partyChkJoin(party_id_table[i])) {
 						continue;
 					}
 					if (evtGetValue(NULL, 0xF8406022) == 0) {
-						if (pouch->partyData[*pid].techLevel < 1) {
+						if (pouch->partyData[party_id_table[i]].techLevel < 1) {
 							color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 							lv = 0;
 							flag = 0;
@@ -971,7 +967,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 							flag = 0x20;
 						}
 					} else {
-						if (pouch->partyData[*pid].techLevel < 2) {
+						if (pouch->partyData[party_id_table[i]].techLevel < 2) {
 							color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 							lv = 0;
 							flag = 0;
@@ -982,13 +978,13 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						}
 					}
 				} else {
-					if (!partyChkJoin(*pid)) {
+					if (!partyChkJoin(party_id_table[i])) {
 						continue;
 					}
-					if (wp->field_0x4C == *pid) {
+					if (wp->field_0x4C == party_id_table[i]) {
 						continue;
 					}
-					if (pouch->partyData[*pid].techLevel > 0) {
+					if (pouch->partyData[party_id_table[i]].techLevel > 0) {
 						color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 						lv = 0;
 						flag = 0;
@@ -998,7 +994,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						flag = 0x20;
 					}
 				}
-				ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, unitwin_party_icon(party_icon_table[i]), 0.5f);
+				ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, 0.5f, unitwin_party_icon(party_icon_table[i]));
 				FontDrawStart();
 				FontDrawColor(color);
 				switch (i) {
@@ -1026,7 +1022,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				}
 				ty = 80 - row * 24;
 				FontDrawString(36.0f, wp->scroll + ty, name);
-				sprintf(buf, "%d", pouch->partyData[*pid].techLevel);
+				sprintf(buf, "%d", pouch->partyData[party_id_table[i]].techLevel);
 				FontDrawStart();
 				FontDrawString(236.0f, wp->scroll + ty, buf);
 				if (row == wp->cursor) {
@@ -1040,7 +1036,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					} else {
 						sprintf(dir, "lankdown");
 					}
-					sprintf(msgName, "%s_%s_lank%d%s", help, dir, pouch->partyData[*pid].techLevel + 1, party_labelname_table[i]);
+					sprintf(msgName, "%s_%s_lank%d%s", help, dir, pouch->partyData[party_id_table[i]].techLevel + 1, party_labelname_table[i]);
 				}
 				row++;
 			}
@@ -1061,13 +1057,13 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 j;
 			s32 flag;
 			s32 lv;
-			s32 v;
-			s32 icon;
 			s32 bob;
 			s32 iy;
 			s32 iflag;
+			s32 v;
 			s32 ty;
 			GXColor color;
+			s32 icon;
 
 			h = 8 - wp->count;
 			h = (h > 0 ? h : 0) * 24;
@@ -1086,7 +1082,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			FontDrawEdgeOff();
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (i = 0; i < wp->count; i++, row++) {
+			for (i = 0; i < wp->count; i++) {
 				char buf[32];
 				char help[16];
 				flag = 0;
@@ -1098,22 +1094,19 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 				if (!flag) {
 					color = (GXColor){0x00, 0x00, 0x00, 0xFF};
 					lv = 0;
-					iflag = 0;
+					flag = 0;
 				} else {
 					color = (GXColor){0xA0, 0xA0, 0xA0, 0xFF};
 					lv = 1;
-					iflag = 0x20;
+					flag = 0x20;
 				}
-				iy = 56 - i * 24;
-				iflag |= 0x10;
 				{
-					ICONGX(&(Vec){11.0f, wp->scroll + iy, 0.0f}, iflag, mario_status_icon_table[i], 0.5f);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, iflag = flag | 0x10, 0.5f, mario_status_icon_table[i]);
 				}
 				FontDrawStart();
 				FontDrawColor(color);
 				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
-				ty = 80 - i * 24;
-				FontDrawString(36.0f, wp->scroll + ty, buf);
+				FontDrawString(36.0f, wp->scroll + (80 - i * 24), buf);
 				bob = (gp->retraceCount & 0xF) > 7 ? 0 : 2;
 				if (row == wp->cursor) {
 					if (lv == 0) {
@@ -1130,10 +1123,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						bob = 0;
 					}
 					{
-						ICONGX(&(Vec){166.0f, bob + (wp->scroll + iy), 0.0f}, iflag, icon, 0.5f);
+						ICONGX2(&(Vec){166.0f, bob + (wp->scroll + (56 - i * 24)), 0.0f}, iflag, 0.5f, icon);
 					}
 					{
-						ICONGX(&(Vec){186.0f, bob + (wp->scroll + iy), 0.0f}, iflag, icon, 0.5f);
+						ICONGX2(&(Vec){186.0f, bob + (wp->scroll + (56 - i * 24)), 0.0f}, iflag, 0.5f, icon);
 					}
 				} else {
 					v = *mario_status_point_table[i] - mario_status_henka_table[i];
@@ -1144,7 +1137,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						bob = 0;
 					}
 					{
-						ICONGX(&(Vec){176.0f, (wp->scroll + iy) - bob, 0.0f}, iflag, icon, 0.5f);
+						ICONGX2(&(Vec){176.0f, (wp->scroll + (56 - i * 24)) - bob, 0.0f}, iflag, 0.5f, icon);
 					}
 				}
 				if (v > 0) {
@@ -1153,7 +1146,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					sprintf(buf, "  \x81\x48", v);
 				}
 				FontDrawStart();
-				FontDrawString(206.0f, wp->scroll + ty, buf);
+				FontDrawString(206.0f, wp->scroll + (80 - i * 24), buf);
+				row++;
 			}
 			GXSetScissor(sl, st, sw, sh);
 			if (*(s8*)msgName) {
@@ -1193,7 +1187,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			FontDrawEdgeOff();
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (i = 0; i < wp->count; i++, row++) {
+			for (i = 0; i < wp->count; i++) {
 				char buf[32];
 				char help[16];
 				cnt = 0;
@@ -1212,13 +1206,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					j = 0x20;
 				}
 				{
-					ICONGX(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, j | 0x10, mario_status_icon_table[i], 0.5f);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - i * 24), 0.0f}, j | 0x10, 0.5f, mario_status_icon_table[i]);
 				}
 				FontDrawStart();
 				FontDrawColor(color);
 				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
-				ty = 80 - i * 24;
-				FontDrawString(36.0f, wp->scroll + ty, buf);
+				FontDrawString(36.0f, wp->scroll + (80 - i * 24), buf);
 				if (row == wp->cursor) {
 					if (lv == 0) {
 						sprintf(help, "help");
@@ -1233,8 +1226,9 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						sprintf(buf, "  \x81\x48", v);
 					}
 					FontDrawStart();
-					FontDrawString(206.0f, wp->scroll + ty, buf);
+					FontDrawString(206.0f, wp->scroll + (80 - i * 24), buf);
 				}
+				row++;
 			}
 			GXSetScissor(sl, st, sw, sh);
 			if (*(s8*)msgName) {
@@ -1250,11 +1244,11 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32 h;
 			u32 sl, st, sw, sh;
 			
-			s32 lv;
 			s32 v;
 			s32 ty;
 			s32 flag;
 			GXColor color;
+			s32 lv;
 
 			h = 8 - wp->count;
 			h = (h > 0 ? h : 0) * 24;
@@ -1289,13 +1283,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 					flag = 0x20;
 				}
 				{
-					ICONGX(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, mario_status_icon_table[i], 0.5f);
+					ICONGX2(&(Vec){11.0f, wp->scroll + (56 - row * 24), 0.0f}, flag | 0x10, 0.5f, mario_status_icon_table[i]);
 				}
 				FontDrawStart();
 				FontDrawColor(color);
 				sprintf(buf, "%s%3d", mario_status_name_table[i], *mario_status_point_table[i]);
-				ty = 80 - row * 24;
-				FontDrawString(36.0f, wp->scroll + ty, buf);
+				FontDrawString(36.0f, wp->scroll + (80 - row * 24), buf);
 				if (row == wp->cursor) {
 					if (lv == 0) {
 						sprintf(help, "help");
@@ -1310,7 +1303,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 						sprintf(buf, "  \x81\x48", v);
 					}
 					FontDrawStart();
-					FontDrawString(206.0f, wp->scroll + ty, buf);
+					FontDrawString(206.0f, wp->scroll + (80 - row * 24), buf);
 				}
 				row++;
 			}
@@ -1328,10 +1321,9 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		char text[136];
 		char* line1;
 		char* line2 = NULL;
-		s32 lines;
-		s32 k;
 		s8* p;
-		s32 w;
+		s32 k;
+		s32 lines;
 		s32 w2;
 
 		switch (wp->field_0x50) {
@@ -1392,24 +1384,24 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 		}
 		windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -280.0f, 100.0f, 240.0f, (lines - 1) * 24 + 45, 20.0f);
 		FontDrawStart();
-		w = line1 ? FontGetMessageWidth(line1) : 0;
+		k = line1 ? FontGetMessageWidth(line1) : 0;
 		if (line2) {
 			w2 = FontGetMessageWidth(line2);
 		} else {
 			w2 = 0;
 		}
-		if (w2 > w) {
-			w = w2;
+		if (w2 > k) {
+			k = w2;
 		}
-		if (w <= 228) {
-			w = (228 - w) / 2;
+		if (k <= 228) {
+			k = (228 - k) / 2;
 		} else {
-			FontDrawScale(228.0f / w);
-			w = 0;
+			FontDrawScale(228.0f / k);
+			k = 0;
 		}
-		FontDrawString(w - 274, 90.0f, line1);
+		FontDrawString(k - 274, 90.0f, line1);
 		if (line2) {
-			FontDrawString(w - 274, 66.0f, line2);
+			FontDrawString(k - 274, 66.0f, line2);
 		}
 		iconFlagOff("yubicursor_2", 2);
 		iconSetPos("yubicursor_2", wp->cursorX, wp->cursorY, 0.0f);

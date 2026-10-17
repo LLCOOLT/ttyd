@@ -692,7 +692,7 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   GXSetVtxAttrFmt(0, 9, 1, 3, 11);
   GXSetArray(9, diamond_2_2_vertex_tbl, 6);
   GXSetVtxDesc(10, 2);
-  GXSetVtxAttrFmt(0, 10, 0, 1 & 0xFFFFFFFF, 6);
+  GXSetVtxAttrFmt(0, 10, 0, 1, 6);
   GXSetArray(10, diamond_2_2_normal_tbl, 3);
   GXSetVtxDesc(11, 2);
   GXSetVtxAttrFmt(0, 11, 1, 5, 0);

@@ -1,3 +1,4 @@
+#pragma defer_codegen on
 #include "dolphin/types.h"
 #include "driver/hitdrv.h"
 #include "mario/mario.h"
@@ -55,7 +56,7 @@ typedef struct RollWork {
 
 #define RW() ((RollWork*)marioGetPtr()->motStruct)
 
-static const Vec rollOfs = {0.0f, 40.0f, 0.0f};
+static __declspec(section ".rodata") Vec rollOfs = {0.0f, 40.0f, 0.0f};
 
 
 f32 roll_grx;
@@ -182,7 +183,7 @@ static inline s32 makeVec(f32 half) {
         b = revise360(180.0f + b);                                                                \
     }                                                                                             \
     {                                                                                             \
-        f32 ty_ = trunc10((m2)->targetYaw); f32 dd = revise360(-(ty_ - trunc10(b))); \
+        f32 ty_ = trunc10((m2)->targetYaw); f32 dd = revise360(trunc10(b) - ty_);  \
         s32 sgn = (dd < 180.0f) ? 0 : 1;                                                          \
         if (sgn == 0) {                                                                           \
             if (__fabsf(b - a) > 90.0f) {                                                            \
@@ -227,7 +228,7 @@ static inline s32 makeVec(f32 half) {
     }
 
 void roll_upstairs(void);
-static void marioRollCan(void);
+static inline void marioRollCan(void);
 
 
 #pragma inline_max_size(20000)
@@ -462,7 +463,6 @@ void rollEvtJumpSetup(void) {
 void marioReInit_roll(void) {
     void* p;
     MarioWork* mario = marioGetPtr();
-    f32* new_var;
     f32 z0;
     f32 z1;
     p = __memAlloc(0, 0x14);
@@ -492,8 +492,7 @@ void marioReInit_roll(void) {
     RW()->z = z1;
     *(f32*)(0xb0 + (u8*)mario) = -6.0f;
     MF(0xb4) = 6.0f;
-    new_var = (f32*)((u8*)mario + 0x98);
-    *new_var = 6.0f;
+    *(f32*)((u8*)mario + 0x98) = 6.0f;
     MF(0x9c) = 0.0f;
     MF(0xc8) = 1.0f;
     MF(0xcc) = 1.0f;
@@ -1138,15 +1137,13 @@ void mot_fall_roll(void) {
     } else {
         mario->position.y += spd;
     }
-    if (1) {
-        if (mario->hitobjStandOn) {
-            marioLandOn();
-            roll_flyout_flag2 = 0;
-        }
+    if (mario->hitobjStandOn) {
+        marioLandOn();
+        roll_flyout_flag2 = 0;
     }
 }
 
-static void marioRollCan(void) {
+static inline void marioRollCan(void) {
     MarioWork* mario = marioGetPtr();
     f32 v26;
     {
