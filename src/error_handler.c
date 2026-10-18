@@ -24,16 +24,13 @@ void N_setupErrorHandler(void) {
 
 void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar) {
 	//registers
-	char* textBase;
+	signed char* textBase;
 	int i;
 	OSFontHeader* fontHeader;
-	int width2, height2;
-	s8* loop_zero;
-	s8* loop_newline;
+	int px, py;
 	u32 count, stack;
-	s16 w1, w2, h1, h2, x2, y2;
-	int x1, y1;
-	int cw;
+	s16 px2, py2, x2, y2;
+	s32 tx, ty;
 	//stack vars
 	char print_buffer2[0x400]; // 0x10E0
 	char print_buffer[0x1000]; // 0xE0
@@ -131,69 +128,54 @@ void N_systemErrorHandler(OSError error, OSContext* context, u32 dsisr, u32 dar)
 	GXSetVtxDesc(GX_VA_TEX0, GX_DIRECT);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, 1, 3, 0);
 	GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, 1, 3, 0);
-	textBase = print_buffer;
+	textBase = (signed char*)print_buffer;
 	while (1) {
 		count = VIGetRetraceCount();
-		loop_newline = (s8*)&print_buffer;
-		width2 = 50;
-		height2 = 50;
+		px = 50;
+		py = 50;
 		i = 0;
-		loop_zero = loop_newline;
-		while (*loop_zero != '\0') {
-			if (*loop_newline == '\n') {
-				width2 = 50;
-				height2 += 24;
+		while (textBase[i] != 0) {
+			if ((s32)print_buffer[i] == '\n') {
+				px = 50;
+				py += 24;
 				i++;
-				loop_zero++;
-				loop_newline++;
+				continue;
 			}
-			else {
-				OSGetFontTexture(&textBase[i], &image, &x, &y, &width);
-				GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
-					(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
-				GXLoadTexObj(&texObj, GX_TEXMAP0);
-				MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
-				GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
-				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-				x1 = x;
-				h1 = height2;
-				w1 = width2;
-				cw = fontHeader->cellWidth;
-				w2 = w1 + cw;
-				y1 = y;
-				x2 = x1 + fontHeader->cellWidth;
-				h2 = h1 + fontHeader->cellHeight;
-				y2 = y1 + fontHeader->cellHeight;
-
-				GXPosition1x16(w1);
-				GXPosition1x16(h1);
-				GXPosition1x16(0);
-				GXPosition1x16(x1);
-				GXPosition1x16(y1);
-
-				GXPosition1x16(w2);
-				GXPosition1x16(h1);
-				GXPosition1x16(0);
-				GXPosition1x16(x2);
-				GXPosition1x16(y1);
-
-				GXPosition1x16(w2);
-				GXPosition1x16(h2);
-				GXPosition1x16(0);
-				GXPosition1x16(x2);
-				GXPosition1x16(y2);
-
-				GXPosition1x16(w1);
-				GXPosition1x16(h2);
-				GXPosition1x16(0);
-				GXPosition1x16(x1);
-				GXPosition1x16(y2);
-
-				i++;
-				loop_zero++;
-				loop_newline++;
-				width2 += width;
-			}
+			OSGetFontTexture(&print_buffer[i], &image, &x, &y, &width);
+			GXInitTexObj(&texObj, image, fontHeader->sheetWidth, fontHeader->sheetHeight,
+				(GXTexFmt)fontHeader->sheetFormat, GX_CLAMP, GX_CLAMP, GX_FALSE);
+			GXLoadTexObj(&texObj, GX_TEXMAP0);
+			MTXScale(matrix2, 1.0f / (float)fontHeader->sheetWidth, 1.0f / (float)fontHeader->sheetHeight, 1.0f);
+			GXLoadTexMtxImm(matrix2, 0x1E, GX_MTX2x4);
+			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
+			px2 = (s16)px + fontHeader->cellWidth;
+			py2 = (s16)py + fontHeader->cellHeight;
+			x2 = x + fontHeader->cellWidth;
+			y2 = y + fontHeader->cellHeight;
+			tx = x;
+			ty = y;
+			GXPosition1x16(px);
+			GXPosition1x16(py);
+			GXPosition1x16(0);
+			GXPosition1x16(tx);
+			GXPosition1x16(ty);
+			GXPosition1x16(px2);
+			GXPosition1x16(py);
+			GXPosition1x16(0);
+			GXPosition1x16(x2);
+			GXPosition1x16(ty);
+			GXPosition1x16(px2);
+			GXPosition1x16(py2);
+			GXPosition1x16(0);
+			GXPosition1x16(x2);
+			GXPosition1x16(y2);
+			GXPosition1x16(px);
+			GXPosition1x16(py2);
+			GXPosition1x16(0);
+			GXPosition1x16(tx);
+			GXPosition1x16(y2);
+			px += width;
+			i++;
 		}
 		GXSetZMode(GX_TRUE, GX_LEQUAL, GX_TRUE);
 		GXSetColorUpdate(1);

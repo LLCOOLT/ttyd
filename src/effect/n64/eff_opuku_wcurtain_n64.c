@@ -7,6 +7,13 @@
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
 
+#ifdef NONMATCHING
+#define EXT_LIT(sym, val) (val)
+#else
+#define EXT_LIT(sym, val) (sym)
+extern const f32 float_0_8041f820;
+#endif
+
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
     s16 s, t;      // 0x6
@@ -83,13 +90,14 @@ EffectEntry* effOpukuWcurtainN64Entry(s32 type, s32 lifetime, f32 x, f32 y, f32 
     work->colorG = 120;
     work->colorB = 255;
     for (i = 0; i < 12; i++) {
-        work->offset[i] = 0.0f;
+        work->offset[i] = EXT_LIT(float_0_8041f820, 0.0f);
         work->speed[i] = -1.0f + 0.01f * (f32)(rand() % 11);
         work->speed[i] *= 0.5f;
     }
     return effect;
 }
 
+#ifdef NONMATCHING
 void effOpukuWcurtainMain(EffectEntry* effect) {
     EffOpukuWcurtainN64Work* work = effect->userdata;
     Vec position;
@@ -128,7 +136,9 @@ void effOpukuWcurtainMain(EffectEntry* effect) {
     }
     dispEntry(CAMERA_3D, dispCalcZ(&position), 2, (DispCallback)effOpukuWcurtainDisp, effect);
 }
+#endif
 
+#ifdef NONMATCHING
 void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     CameraEntry* camera;
     EffOpukuWcurtainN64Work* work;
@@ -221,7 +231,452 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
         tri2(frame, frame + 2, frame + 1, frame, frame + 1, frame + 2, frame + 3, frame);
     }
 }
+#endif
 
 #pragma force_active on
 __declspec(section ".sdata2") const u32 gap_10_804231E4_sbss2;
 #pragma force_active reset
+
+#ifndef NONMATCHING
+// FAKE (asm stopgap): effOpukuWcurtainMain (and the functions before it in the target order, see asm_inline.py) are the
+// target code until the C in the NONMATCHING branch matches.
+// clang-format off
+__declspec(section ".rodata") const f32 vec3_802fb298[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".sdata2") const f32 float_0p1_8041f818 = 0.1f;
+__declspec(section ".sdata2") const f32 float_0p03125_8041f81c = 0.03125f;
+__declspec(section ".sdata2") const f32 float_0_8041f820 = 0.0f;
+__declspec(section ".sdata2") const f32 float_10_8041f824 = 10.0f;
+__declspec(section ".sdata2") const f32 float_60_8041f828 = 60.0f;
+__declspec(section ".sdata2") const f32 float_neg0p05_8041f82c = -0.05f;
+__declspec(section ".sdata2") const f32 float_5_8041f830 = 5.0f;
+
+__declspec(section ".sdata2") const u32 unk_804231e0;
+asm void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
+	nofralloc
+	stwu r1, -0x110(r1)
+	mflr r0
+	stw r0, 0x114(r1)
+	stfd f31, 0x100(r1)
+	psq_st f31, 0x108(r1), 0, 0
+	stfd f30, 0xf0(r1)
+	psq_st f30, 0xf8(r1), 0, 0
+	stfd f29, 0xe0(r1)
+	psq_st f29, 0xe8(r1), 0, 0
+	stfd f28, 0xd0(r1)
+	psq_st f28, 0xd8(r1), 0, 0
+	stmw r26, 0xb8(r1)
+	mr r26, r4
+	bl camGetPtr
+	lwz r30, 0xc(r26)
+	mr r31, r3
+	lwz r0, unk_804231e0(r2)
+	addi r4, r1, 0x18
+	lwz r7, 0x18(r30)
+	li r3, 0x1
+	stw r0, 0x14(r1)
+	lwz r6, 0x1c(r30)
+	lwz r5, 0x20(r30)
+	lwz r0, 0x24(r30)
+	stb r7, 0x14(r1)
+	lfs f1, float_0p1_8041f818(r2)
+	lfs f0, 0x28(r30)
+	stb r6, 0x15(r1)
+	lwz r26, 0x14(r30)
+	fmuls f28, f1, f0
+	stb r5, 0x16(r1)
+	stb r0, 0x17(r1)
+	lwz r0, 0x14(r1)
+	stw r0, 0x18(r1)
+	bl GXSetTevColor
+	li r3, 0x1
+	bl GXSetNumChans
+	li r3, 0x4
+	li r4, 0x0
+	li r5, 0x0
+	li r6, 0x1
+	li r7, 0x0
+	li r8, 0x0
+	li r9, 0x2
+	bl GXSetChanCtrl
+	li r3, 0x1
+	bl GXSetNumTevStages
+	li r3, 0x0
+	li r4, 0x0
+	li r5, 0x0
+	li r6, 0x4
+	bl GXSetTevOrder
+	li r3, 0x0
+	li r4, 0x0
+	li r5, 0x0
+	li r6, 0x0
+	li r7, 0x1
+	li r8, 0x0
+	bl GXSetTevColorOp
+	li r3, 0x0
+	li r4, 0x0
+	li r5, 0x0
+	li r6, 0x0
+	li r7, 0x1
+	li r8, 0x0
+	bl GXSetTevAlphaOp
+	li r3, 0x0
+	li r4, 0x2
+	li r5, 0xc
+	li r6, 0x8
+	li r7, 0xf
+	bl GXSetTevColorIn
+	li r3, 0x0
+	li r4, 0x7
+	li r5, 0x4
+	li r6, 0x5
+	li r7, 0x7
+	bl GXSetTevAlphaIn
+	addi r4, r1, 0x28
+	li r3, 0x8f
+	bl effGetTexObjN64
+	addi r3, r1, 0x28
+	li r4, 0x0
+	bl GXLoadTexObj
+	li r3, 0x1
+	bl GXSetNumTexGens
+	li r3, 0x0
+	li r4, 0x1
+	li r5, 0x4
+	li r6, 0x1e
+	li r7, 0x0
+	li r8, 0x7d
+	bl GXSetTexCoordGen2
+	lfs f1, float_0p03125_8041f81c(r2)
+	addi r3, r1, 0x48
+	lfs f3, float_0_8041f820(r2)
+	fmr f2, f1
+	bl PSMTXScale
+	addi r3, r1, 0x48
+	li r4, 0x1e
+	li r5, 0x1
+	bl GXLoadTexMtxImm
+	li r3, 0x0
+	bl GXSetCullMode
+	li r3, 0x2a0
+	li r4, 0x3
+	bl smartAlloc
+	lwz r12, 0x0(r3)
+	li r0, 0xc
+	mr r9, r30
+	slwi r4, r26, 5
+	mr r28, r12
+	lfs f2, float_10_8041f824(r2)
+	lfs f1, float_60_8041f828(r2)
+	li r29, 0x0
+	li r5, -0x12c
+	li r10, 0x0
+	mtctr r0
+	@1:
+	sth r5, 0x0(r12)
+	li r0, 0x258
+	subfic r11, r10, 0xff
+	li r8, 0x0
+	sth r0, 0x2(r12)
+	li r7, 0xff
+	li r0, 0x400
+	addi r10, r10, 0x14
+	sth r8, 0x4(r12)
+	addi r29, r29, 0x1
+	sth r4, 0x6(r12)
+	lfs f0, 0x2c(r9)
+	fctiwz f0, f0
+	stfd f0, 0xa8(r1)
+	lwz r6, 0xac(r1)
+	slwi r6, r6, 5
+	sth r6, 0x8(r12)
+	stb r7, 0xa(r12)
+	stb r7, 0xb(r12)
+	stb r7, 0xc(r12)
+	stb r11, 0xd(r12)
+	sth r5, 0xe(r12)
+	addi r5, r5, 0x32
+	lfs f0, 0x2c(r9)
+	addi r9, r9, 0x4
+	fadds f0, f1, f0
+	fmuls f0, f2, f0
+	fctiwz f0, f0
+	stfd f0, 0xb0(r1)
+	lwz r6, 0xb4(r1)
+	sth r6, 0x10(r12)
+	sth r8, 0x12(r12)
+	sth r4, 0x14(r12)
+	addi r4, r4, 0x80
+	sth r0, 0x16(r12)
+	stb r7, 0x18(r12)
+	stb r7, 0x19(r12)
+	stb r7, 0x1a(r12)
+	stb r11, 0x1b(r12)
+	addi r12, r12, 0x1c
+	bdnz @1
+	lfs f1, 0x4(r30)
+	addi r3, r1, 0x78
+	lfs f2, 0x8(r30)
+	lfs f3, 0xc(r30)
+	bl PSMTXTrans
+	fmr f1, f28
+	addi r3, r1, 0x48
+	fmr f2, f28
+	fmr f3, f28
+	bl PSMTXScale
+	addi r3, r1, 0x78
+	addi r4, r1, 0x48
+	mr r5, r3
+	bl PSMTXConcat
+	mr r30, r28
+	slwi r27, r29, 1
+	li r26, 0x0
+	b @2
+	@3:
+	li r3, 0x4
+	oris r3, r3, 0x4
+	mtspr GQR2, r3
+	li r3, 0x5
+	oris r3, r3, 0x5
+	mtspr GQR3, r3
+	li r3, 0x6
+	oris r3, r3, 0x6
+	mtspr GQR4, r3
+	li r3, 0x7
+	oris r3, r3, 0x7
+	mtspr GQR5, r3
+	psq_l f0, 0x0(r30), 1, 5
+	stfs f0, 0x1c(r1)
+	psq_l f0, 0x2(r30), 1, 5
+	stfs f0, 0x20(r1)
+	psq_l f0, 0x4(r30), 1, 5
+	addi r4, r1, 0x1c
+	mr r5, r4
+	addi r3, r1, 0x78
+	stfs f0, 0x24(r1)
+	bl PSMTXMultVec
+	li r3, 0x4
+	oris r3, r3, 0x4
+	mtspr GQR2, r3
+	li r3, 0x5
+	oris r3, r3, 0x5
+	mtspr GQR3, r3
+	li r3, 0x6
+	oris r3, r3, 0x6
+	mtspr GQR4, r3
+	li r3, 0x7
+	oris r3, r3, 0x7
+	mtspr GQR5, r3
+	lfs f31, 0x1c(r1)
+	psq_st f31, 0x10(r1), 1, 5
+	lha r0, 0x10(r1)
+	sth r0, 0x0(r30)
+	lfs f30, 0x20(r1)
+	psq_st f30, 0xc(r1), 1, 5
+	lha r0, 0xc(r1)
+	sth r0, 0x2(r30)
+	lfs f29, 0x24(r1)
+	psq_st f29, 0x8(r1), 1, 5
+	addi r26, r26, 0x1
+	lha r0, 0x8(r1)
+	sth r0, 0x4(r30)
+	addi r30, r30, 0xe
+	@2:
+	cmpw r26, r27
+	blt @3
+	mr r3, r28
+	li r4, 0x2a0
+	bl DCFlushRange
+	bl GXInvalidateVtxCache
+	mr r3, r28
+	bl effSetVtxDescN64
+	addi r3, r31, 0x11c
+	li r4, 0x0
+	bl GXLoadPosMtxImm
+	li r3, 0x0
+	bl GXSetCurrentMtx
+	li r30, 0x0
+	subi r28, r29, 0x1
+	mr r27, r30
+	b @4
+	@5:
+	li r3, 0x90
+	li r4, 0x0
+	li r5, 0x6
+	bl GXBegin
+	addi r4, r27, 0x2
+	addi r5, r27, 0x1
+	mr r3, r27
+	mr r6, r27
+	mr r7, r5
+	mr r8, r4
+	mr r10, r27
+	addi r9, r27, 0x3
+	bl tri2
+	addi r27, r27, 0x2
+	addi r30, r30, 0x1
+	@4:
+	cmpw r30, r28
+	blt @5
+	psq_l f31, 0x108(r1), 0, 0
+	lfd f31, 0x100(r1)
+	psq_l f30, 0xf8(r1), 0, 0
+	lfd f30, 0xf0(r1)
+	psq_l f29, 0xe8(r1), 0, 0
+	lfd f29, 0xe0(r1)
+	psq_l f28, 0xd8(r1), 0, 0
+	lfd f28, 0xd0(r1)
+	lmw r26, 0xb8(r1)
+	lwz r0, 0x114(r1)
+	mtlr r0
+	addi r1, r1, 0x110
+	blr
+}
+
+asm void effOpukuWcurtainMain(EffectEntry* effect) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	lis r4, vec3_802fb298@ha
+	stw r0, 0x34(r1)
+	addi r5, r4, vec3_802fb298@l
+	stw r31, 0x2c(r1)
+	mr r31, r3
+	lwz r6, 0xc(r3)
+	lwz r4, 0x0(r5)
+	lwz r3, 0x4(r5)
+	lwz r0, 0x8(r5)
+	stw r4, 0x8(r1)
+	lfs f0, 0x4(r6)
+	stw r3, 0xc(r1)
+	lfs f1, 0x8(r6)
+	stfs f0, 0x8(r1)
+	lfs f0, 0xc(r6)
+	stw r0, 0x10(r1)
+	lwz r4, 0x8(r1)
+	stfs f1, 0xc(r1)
+	stfs f0, 0x10(r1)
+	lwz r3, 0xc(r1)
+	lwz r0, 0x10(r1)
+	stw r4, 0x14(r1)
+	stw r3, 0x18(r1)
+	stw r0, 0x1c(r1)
+	lwz r3, 0x0(r31)
+	rlwinm. r0, r3, 0, 29, 29
+	beq @1
+	rlwinm r3, r3, 0, 30, 28
+	li r0, 0x10
+	stw r3, 0x0(r31)
+	stw r0, 0x10(r6)
+	@1:
+	lwz r3, 0x10(r6)
+	cmpwi r3, 0x3e8
+	bge @2
+	subi r0, r3, 0x1
+	stw r0, 0x10(r6)
+	@2:
+	lwz r3, 0x14(r6)
+	addi r0, r3, 0x1
+	stw r0, 0x14(r6)
+	lwz r0, 0x10(r6)
+	cmpwi r0, 0x0
+	bge @3
+	mr r3, r31
+	bl effDelete
+	b @4
+	@3:
+	cmpwi r0, 0x10
+	lwz r3, 0x14(r6)
+	bge @5
+	slwi r0, r0, 4
+	stw r0, 0x24(r6)
+	@5:
+	cmpwi r3, 0x10
+	bge @6
+	slwi r3, r3, 4
+	addi r0, r3, 0xf
+	stw r0, 0x24(r6)
+	@6:
+	li r0, 0x3
+	mr r3, r6
+	lfs f3, float_neg0p05_8041f82c(r2)
+	li r4, 0x0
+	lfs f2, float_5_8041f830(r2)
+	lfs f1, float_0p1_8041f818(r2)
+	mtctr r0
+	@7:
+	lfs f4, 0x2c(r3)
+	lfs f0, 0x5c(r3)
+	fadds f0, f4, f0
+	stfs f0, 0x2c(r3)
+	lfs f0, 0x5c(r3)
+	fadds f0, f0, f3
+	stfs f0, 0x5c(r3)
+	lfs f4, 0x5c(r3)
+	fcmpo cr0, f4, f2
+	ble @8
+	fsubs f0, f2, f4
+	fmadds f0, f1, f0, f4
+	stfs f0, 0x5c(r3)
+	@8:
+	lfs f4, 0x30(r3)
+	lfs f0, 0x60(r3)
+	fadds f0, f4, f0
+	stfs f0, 0x30(r3)
+	lfs f0, 0x60(r3)
+	fadds f0, f0, f3
+	stfs f0, 0x60(r3)
+	lfs f4, 0x60(r3)
+	fcmpo cr0, f4, f2
+	ble @9
+	fsubs f0, f2, f4
+	fmadds f0, f1, f0, f4
+	stfs f0, 0x60(r3)
+	@9:
+	lfs f4, 0x34(r3)
+	lfs f0, 0x64(r3)
+	fadds f0, f4, f0
+	stfs f0, 0x34(r3)
+	lfs f0, 0x64(r3)
+	fadds f0, f0, f3
+	stfs f0, 0x64(r3)
+	lfs f4, 0x64(r3)
+	fcmpo cr0, f4, f2
+	ble @10
+	fsubs f0, f2, f4
+	fmadds f0, f1, f0, f4
+	stfs f0, 0x64(r3)
+	@10:
+	lfs f4, 0x38(r3)
+	lfs f0, 0x68(r3)
+	fadds f0, f4, f0
+	stfs f0, 0x38(r3)
+	lfs f0, 0x68(r3)
+	fadds f0, f0, f3
+	stfs f0, 0x68(r3)
+	lfs f4, 0x68(r3)
+	fcmpo cr0, f4, f2
+	ble @11
+	fsubs f0, f2, f4
+	fmadds f0, f1, f0, f4
+	stfs f0, 0x68(r3)
+	@11:
+	addi r3, r3, 0x10
+	addi r4, r4, 0x3
+	bdnz @7
+	addi r3, r1, 0x14
+	bl dispCalcZ
+	lis r3, effOpukuWcurtainDisp@ha
+	mr r6, r31
+	addi r5, r3, effOpukuWcurtainDisp@l
+	li r4, 0x2
+	li r3, 0x4
+	bl dispEntry
+	@4:
+	lwz r0, 0x34(r1)
+	lwz r31, 0x2c(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+// clang-format on
+#endif

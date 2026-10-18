@@ -1,3 +1,4 @@
+// FAKE: whole unit as G5 asm stopgap (force_active + fixbase); C under #ifdef NONMATCHING.
 #include "evt/evt_cmd.h"
 #include "manager/evtmgr.h"
 #include "manager/evtmgr_cmd.h"
@@ -194,12 +195,15 @@ BOOL psndBGMOn_f_d(s32 a, s32 b, s32 c, s32 d, s32 e);
 BOOL psndBGMOff(s32 a);
 void unk_800d7270(s32 a, s32 b, s32 c, s32 d);
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgmon) {
     s32* args = event->args;
     psndBGMOn(args[0], (char*)args[1]);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgmon_f) {
     s32* args = event->args;
     s32 a = args[0];
@@ -208,7 +212,9 @@ USER_FUNC(evt_snd_bgmon_f) {
     unk_800d7270(a, b, c, 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(unk_8014cc24) {
     s32* args = event->args;
     s32 a = args[0];
@@ -218,12 +224,16 @@ USER_FUNC(unk_8014cc24) {
     psndBGMOn_f_d(a, b, c, c, 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgmoff) {
     psndBGMOff(event->args[0]);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgmoff_f) {
     s32* args = event->args;
     s32 a = args[0];
@@ -231,7 +241,9 @@ USER_FUNC(evt_snd_bgmoff_f) {
     ((BOOL (*)(s32, s32, s32))psndBGMOff_f_d)(a, t, 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgm_freq) {
     s32* args = event->args;
     s32 a = args[0];
@@ -239,7 +251,9 @@ USER_FUNC(evt_snd_bgm_freq) {
     psndBGM_rate(a, t);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_bgm_scope) {
     s32* args = event->args;
     s32 a = args[0];
@@ -247,7 +261,9 @@ USER_FUNC(evt_snd_bgm_scope) {
     psndBGMScope(a, t);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxon) {
     s32* args = event->args;
     const char* name = (const char*)args[0];
@@ -259,7 +275,9 @@ USER_FUNC(evt_snd_sfxon) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxon__) {
     s32* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
@@ -271,7 +289,9 @@ USER_FUNC(evt_snd_sfxon__) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxon_) {
     s32* args = event->args;
     const char* name = (const char*)args[0];
@@ -283,7 +303,9 @@ USER_FUNC(evt_snd_sfxon_) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxon_3d) {
     s32* args = event->args;
     const char* name = (const char*)args[0];
@@ -300,7 +322,9 @@ USER_FUNC(evt_snd_sfxon_3d) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxon_3d_ex) {
     s32* args = event->args;
     const char* name = (const char*)args[0];
@@ -322,18 +346,24 @@ USER_FUNC(evt_snd_sfxon_3d_ex) {
     }
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxoff) {
     psndSFXOff(evtGetValue(event, event->args[0]));
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfxchk) {
     s32* args = event->args;
     evtSetValue(event, args[1], psndSFXChk(evtGetValue(event, args[0])));
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfx_pit) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -341,7 +371,9 @@ USER_FUNC(evt_snd_sfx_pit) {
     psndSFX_pit(id, t);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfx_vol) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
@@ -349,7 +381,9 @@ USER_FUNC(evt_snd_sfx_vol) {
     psndSFX_vol(id, t);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfx_pos) {
     s32* args = event->args;
     Vec pos;
@@ -360,20 +394,26 @@ USER_FUNC(evt_snd_sfx_pos) {
     psndSFX_pos(id, &pos);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfx_dist) {
     s32* args = event->args;
     s32 id = evtGetValue(event, args[0]);
     psndSFX_dist(id, evtGetValue(event, args[1]));
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_envon) {
     s32* args = event->args;
     psndENVOn(args[0], args[1]);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_envon_f) {
     s32* args = event->args;
     s32 a = args[0];
@@ -382,12 +422,16 @@ USER_FUNC(evt_snd_envon_f) {
     psndENVOn_f_d(a, b, c, 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_envoff) {
     psndENVOff(event->args[0]);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_envoff_f) {
     s32* args = event->args;
     s32 a = args[0];
@@ -395,35 +439,48 @@ USER_FUNC(evt_snd_envoff_f) {
     psndENVOff_f_d(a, t, 0);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_env_lpf) {
     s32* args = event->args;
     s32 a = args[0];
     psndENV_LPF(a, evtGetValue(event, args[1]));
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_set_rev_mode) {
     psndSetReverb(event->args[0]);
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_snd_sfx_all_stop) {
     psndSFXAllOff();
     return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 void unk_8014c47c(void) {
     touch_wall_ct = 60.0f;
 }
+#endif
 
+#ifdef NONMATCHING
 void N_partyFollowCloseOn(PartyEntry* party) {
     party->flags3 |= 0x20000;
 }
+#endif
 
+#ifdef NONMATCHING
 void N_partyFollowCloseOff(PartyEntry* party) {
     party->flags3 &= ~0x20000;
 }
+#endif
 
 void unk_800c8e74(PartyEntry* party);
 void unk_800c93d0(PartyEntry* party, f32 spd);
@@ -431,6 +488,7 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
 void partyGetAppearPos3(PartyEntry* party, Vec* pos);
 s32 marioCtrlOffChk(void);
 extern int __float_nan[];
+#ifdef NONMATCHING
 static inline HitEntry* partyBehindGround(PartyEntry* party) {
     HitEntry* hit = partySearchGround(party, 10.0f, 0.0f);
     if (hit && (hitGetAttr(hit) & 0x200)) {
@@ -442,6 +500,7 @@ static inline HitEntry* partyBehindGround(PartyEntry* party) {
     }
     return hit;
 }
+#endif
 
 s32 partyGetFootmarkWriteId(s32 id);
 s32 partyGetFootmarkReadId(s32 id);
@@ -480,6 +539,7 @@ HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 dir);
 
 void party_force_reset_outofscreen(PartyEntry* party);
 
+#ifdef NONMATCHING
 void party_motion_stay(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
@@ -662,7 +722,9 @@ void party_motion_stay(PartyEntry* party) {
         }
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void unk_8014bbc8(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     if (party->flags3 & 2) {
@@ -715,7 +777,9 @@ void unk_8014bbc8(PartyEntry* party) {
         }
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void unk_8014ba3c(PartyEntry* party) {
     Vec pos;
     f32 height;
@@ -768,7 +832,9 @@ void unk_8014ba3c(PartyEntry* party) {
         partyChgMot(party, 2);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 static inline BOOL partyChkMarioFollowY(PartyMarioView* mario) {
     if (mario->unk50 != 0 && mario->unk180 == 0.0f) {
         return FALSE;
@@ -780,7 +846,9 @@ static inline BOOL partyChkMarioFollowY(PartyMarioView* mario) {
     }
     return TRUE;
 }
+#endif
 
+#ifdef NONMATCHING
 void unk_8014b824(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -857,6 +925,7 @@ void unk_8014b824(PartyEntry* party) {
         }
     }
 }
+#endif
 
 typedef struct PartyFootmark {
     u8 unk0;
@@ -874,6 +943,7 @@ void partyGetReadId2(s32 id, Vec* pos);
 void L_getTargetPos(s32 id, Vec* pos);
 void partyChkFrontStep(PartyEntry* party, f32 dist, f32* y, f32* a, f32* b);
 
+#ifdef NONMATCHING
 void party_motion_homing_walk(PartyEntry* party) {
     HitEntry* hit = NULL;
     s32 id;
@@ -1297,7 +1367,9 @@ found:
     party_force_reset_outofscreen(party);
     partyGorFix(party);
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_homing_fly(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
@@ -1605,12 +1677,16 @@ void party_motion_homing_fly(PartyEntry* party) {
     }
     party_force_reset_outofscreen(party);
 }
+#endif
 
+#ifdef NONMATCHING
 void party_set_behind_dir(PartyEntry* party, f32 dir) {
     party->unk54 = revise360(dir + ((PartyCamView*)camGetPtr((CameraId)4))->unk114);
     party->flags3 |= 0x100000;
 }
+#endif
 
+#ifdef NONMATCHING
 static inline f32 partyGetFollowDir(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     PartyEntry* other;
@@ -1623,10 +1699,12 @@ static inline f32 partyGetFollowDir(PartyEntry* party) {
     }
     return toMovedir(mario->unk1A8);
 }
+#endif
 
 void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 PartyEntry* anotherPartyGetPtr(s32 id);
 
+#ifdef NONMATCHING
 void party_motion_behind_mario(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -1782,7 +1860,9 @@ void party_motion_behind_mario(PartyEntry* party) {
         party->flags3 &= ~0x40000;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_behind_mario_continue(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     PartyEntry* other;
@@ -1889,7 +1969,9 @@ void party_motion_behind_mario_continue(PartyEntry* party) {
         party->flags2 &= ~0x10;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_behind_mario_fly(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -2001,7 +2083,9 @@ void party_motion_behind_mario_fly(PartyEntry* party) {
     }
     party->unk138 = hit;
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_beside_mario(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -2089,7 +2173,9 @@ void party_motion_beside_mario(PartyEntry* party) {
         party->flags2 &= ~0x10;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void partyJumpWallMove(PartyEntry* party) {
     Vec v;
     HitEntry* hit;
@@ -2109,7 +2195,9 @@ static inline void partyJumpWallMove(PartyEntry* party) {
     party->position.x = v.x;
     party->position.z = v.z;
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_jump(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
@@ -2261,7 +2349,9 @@ void party_motion_jump(PartyEntry* party) {
         partyJumpWallMove(party);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_jump2(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -2348,7 +2438,9 @@ void party_motion_jump2(PartyEntry* party) {
         partyChgMot(party, 0);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 s32 party_motion_fall(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     HitEntry* hit;
@@ -2441,7 +2533,9 @@ s32 party_motion_fall(PartyEntry* party) {
     }
     return 3;
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_upstairs(PartyEntry* party) {
     if (party->flags3 & 2) {
         party->flags3 &= ~2;
@@ -2455,7 +2549,9 @@ void party_motion_upstairs(PartyEntry* party) {
         partyChgMot(party, 1);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 static inline BOOL partyChkHitAttr200(HitEntry* hit) {
     if (!hit) {
         return FALSE;
@@ -2465,7 +2561,9 @@ static inline BOOL partyChkHitAttr200(HitEntry* hit) {
     }
     return FALSE;
 }
+#endif
 
+#ifdef NONMATCHING
 void party_motion_damage(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     f32 x, y, z;
@@ -2536,7 +2634,9 @@ void party_motion_damage(PartyEntry* party) {
             break;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void allPartySlitOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -2553,7 +2653,9 @@ void allPartySlitOn(void) {
         }
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void allPartySlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party && (party->flags & 0x1000) && party->unk3A < 0x28) {
@@ -2564,7 +2666,9 @@ void allPartySlitOff(void) {
         party->unk3A = 0x28;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void allPartyForceSlitOff(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -2575,7 +2679,9 @@ void allPartyForceSlitOff(void) {
         L_partyForceSlitOff(party);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void L_partyForceSlitOff(PartyEntry* party) {
     if ((party->flags & 0x1000) || (party->flags2 & 0x100)) {
         party->unk10C = revise360(party->unk100 - party->unkF8) >= 180.0f ? 0.0f : 180.0f;
@@ -2589,7 +2695,9 @@ void L_partyForceSlitOff(PartyEntry* party) {
         partyChgPoseId(party, 1);
     }
 }
+#endif
 
+#ifdef NONMATCHING
 void partyChgMotSlitFloor(PartyEntry* party) {
     if (party->flags & 0x2000) {
         return;
@@ -2600,7 +2708,9 @@ void partyChgMotSlitFloor(PartyEntry* party) {
     }
     party->flags |= 0x2000;
 }
+#endif
 
+#ifdef NONMATCHING
 BOOL party_slit(PartyEntry* party) {
     BOOL ret = TRUE;
     PartyMarioView* mario;
@@ -2722,7 +2832,9 @@ BOOL party_slit(PartyEntry* party) {
     }
     return ret;
 }
+#endif
 
+#ifdef NONMATCHING
 BOOL party_roll(PartyEntry* party) {
     BOOL ret = TRUE;
     f32 d;
@@ -2824,6 +2936,7 @@ BOOL party_roll(PartyEntry* party) {
     }
     return ret;
 }
+#endif
 
 
 
@@ -2868,6 +2981,7 @@ static inline f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); gu
 
 
 
+#ifdef NONMATCHING
 static f32 partyStayDist(PartyEntry* party) {
     f32 d;
     if (party->unk32 == 0) {
@@ -2887,7 +3001,9 @@ static f32 partyStayDist(PartyEntry* party) {
     }
     return d;
 }
+#endif
 
+#ifdef NONMATCHING
 static f32 partyHomingOff(PartyEntry* party) {
     f32 off = 5.0f;
     if (party->flags2 & 0x8000) {
@@ -2895,7 +3011,9 @@ static f32 partyHomingOff(PartyEntry* party) {
     }
     return off;
 }
+#endif
 
+#ifdef NONMATCHING
 s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
     f32 s2, c2;
     HitCheckQuery q2;
@@ -2958,6 +3076,7 @@ found:
     out->z = (s32)((1000.0f * q2.hitPos.z) + rf) / 1000.0f;
     return hitGetAttr(hit);
 }
+#endif
 
 
 
@@ -2977,10 +3096,13 @@ found:
 
 
 
+#ifdef NONMATCHING
 static inline void partyDownDirX(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
+#endif
 
+#ifdef NONMATCHING
 static f32 partyGetDirGndY(Vec u, f32 md) {
     f32 k = 40.0f;
     HitCheckQuery q2;
@@ -3006,7 +3128,9 @@ static f32 partyGetDirGndY(Vec u, f32 md) {
     }
     return gy;
 }
+#endif
 
+#ifdef NONMATCHING
 static f32 partyGetGndY(f32 x, f32 y, f32 z) {
     f32 r;
     f32 hx, hy, hz, dist, nx, ny, nz;
@@ -3022,7 +3146,9 @@ static f32 partyGetGndY(f32 x, f32 y, f32 z) {
     }
     return r;
 }
+#endif
 
+#ifdef NONMATCHING
 static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -3036,6 +3162,7 @@ static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     hit = hitCheckVecFilter(&q, NULL);
     return hit ? hitGetAttr(hit) : 0;
 }
+#endif
 
 
 
@@ -3091,6 +3218,7 @@ static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
 
 
 
+#ifdef NONMATCHING
 static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     HitCheckQuery q;
     HitEntry* hit;
@@ -3105,11 +3233,15 @@ static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     hit = hitCheckVecFilter(&q, NULL);
     return hit ? hitGetAttr(hit) : 0;
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void partyDownDirY(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
+#endif
 
+#ifdef NONMATCHING
 void party_force_reset_outofscreen(PartyEntry* party) {
     PartyMarioView* m2;
     s32 i;
@@ -3221,6 +3353,7 @@ void party_force_reset_outofscreen(PartyEntry* party) {
         i++;
     }
 }
+#endif
 
 
 
@@ -3244,6 +3377,7 @@ void party_force_reset_outofscreen(PartyEntry* party) {
 
 
 
+#ifdef NONMATCHING
 static void partyGorFix(PartyEntry* party) {
     PartyMarioView* m3 = party->playerPtr;
     if (!strcmp(gp->currentMapName, "gor_01") && m3->unk1E4 && party->unk138 &&
@@ -3253,9 +3387,8026 @@ static void partyGorFix(PartyEntry* party) {
         party->position = fix;
     }
 }
+#endif
 
+#ifdef NONMATCHING
 static void partyPoseA2(PartyEntry* party) {
     partyChgPose(party, "PCH_A2_1");
     party->unk39 = 1;
     party->unk24 = 30;
 }
+#endif
+
+#ifndef NONMATCHING
+// ASM-STOPGAP: evt_snd_bgmon (and the functions before it in the target order, see asm_inline.py) are the
+// target code until the C in the NONMATCHING branch matches.
+// clang-format off
+#pragma force_active on
+#pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
+__declspec(section ".rodata") const f32 vec3_802f3e40[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e4c[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e58[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e64[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e70[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e7c[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e88[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3e94[3] = { 0.0f, 0.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3ea0[3] = { 0.0f, 1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3eac[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3eb8[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3ec4[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3ed0[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3edc[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3ee8[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3ef4[3] = { 0.0f, -1.0f, 0.0f };
+__declspec(section ".rodata") const f32 vec3_802f3f00[3] = { 122.0f, 130.0f, -313.0f };
+__declspec(section ".rodata") const char str_802F3F0C[] = "PCH_A2_1\000\000\000";
+__declspec(section ".rodata") const char str_802F3F18[] = "gor_01\000";
+__declspec(section ".rodata") const char str_802F3F20[] = "A_ie_03_yuka_f1_C\000\000";
+__declspec(section ".rodata") const char str_802F3F34[] = "A_ie_03_yuka_f2_C\000\000";
+__declspec(section ".rodata") const f64 double_to_int_802f3f48 = 4503601774854144;
+__declspec(section ".rodata") const f64 double_0p5_802f3f50 = 0.5;
+__declspec(section ".rodata") const f64 double_3_802f3f58 = 3;
+__declspec(section ".rodata") const f64 double_0_802f3f60 = 0;
+__declspec(section ".rodata") const char str_802F3F68[] = "p_roll\000";
+__declspec(section ".rodata") const char str_802F3F70[] = "PM_R_1A";
+__declspec(section ".rodata") const char str_802F3F78[] = "PM_R_1B";
+__declspec(section ".rodata") const char str_802F3F80[] = "PM_R_1C";
+__declspec(section ".rodata") const char str_802F3F88[] = "p_slit\000";
+__declspec(section ".rodata") const char str_802F3F90[] = "PM_S_1A";
+__declspec(section ".rodata") const char str_802F3F98[] = "PM_S_1B";
+__declspec(section ".rodata") const f64 double_180_802f3fa0 = 180;
+__declspec(section ".rodata") const char str_802F3FA8[] = "PM_S_1E";
+__declspec(section ".rodata") const char str_802F3FB0[] = "PM_S_1D";
+__declspec(section ".rodata") const char str_802F3FB8[] = "PM_S_1H";
+__declspec(section ".rodata") const char str_802F3FC0[] = "PM_S_1C";
+__declspec(section ".rodata") const char str_802F3FC8[] = "aji_02\000";
+__declspec(section ".rodata") const char str_802F3FD0[] = "aji_05\000";
+__declspec(section ".rodata") const char str_802F3FD8[] = "aji_12\000";
+__declspec(section ".rodata") const f64 double_12_802f3fe0 = 12;
+__declspec(section ".sdata2") const f32 float_20_8041cdc0 = 20.0f;
+__declspec(section ".sdata2") const f32 float_800_8041cdc4 = 800.0f;
+__declspec(section ".sdata2") const f32 float_neg100_8041cdc8 = -100.0f;
+__declspec(section ".sdata2") const f32 float_700_8041cdcc = 700.0f;
+__declspec(section ".sdata2") const f32 float_650_8041cdd0 = 650.0f;
+__declspec(section ".sdata2") const f32 float_10_8041cdd4 = 10.0f;
+__declspec(section ".sdata2") const f32 float_200_8041cdd8 = 200.0f;
+__declspec(section ".sdata2") const f32 float_300_8041cddc = 300.0f;
+__declspec(section ".sdata2") const f32 float_100_8041cde0 = 100.0f;
+__declspec(section ".sdata2") const f32 float_74_8041cde4 = 74.0f;
+__declspec(section ".sdata2") const f32 float_50_8041cde8 = 50.0f;
+__declspec(section ".sdata2") const f32 float_0_8041cdec = 0.0f;
+__declspec(section ".sdata2") const f32 float_40_8041cdf0 = 40.0f;
+__declspec(section ".sdata2") const f32 float_1000_8041cdf4 = 1000.0f;
+__declspec(section ".sdata2") const f32 float_neg1_8041cdf8 = -1.0f;
+__declspec(section ".sdata2") const f32 float_neg2000_8041cdfc = -2000.0f;
+__declspec(section ".sdata2") const f32 float_0p5_8041ce00 = 0.5f;
+__declspec(section ".sdata2") const f32 float_neg0p5_8041ce04 = -0.5f;
+__declspec(section ".sdata2") const f32 float_2_8041ce08 = 2.0f;
+__declspec(section ".sdata2") const f32 float_3_8041ce0c = 3.0f;
+__declspec(section ".sdata2") const f32 float_45_8041ce10 = 45.0f;
+__declspec(section ".sdata2") const f32 float_0p75_8041ce14 = 0.75f;
+__declspec(section ".sdata2") const f32 float_5_8041ce18 = 5.0f;
+__declspec(section ".sdata2") const f32 float_1_8041ce1c = 1.0f;
+__declspec(section ".sdata2") const f32 float_18_8041ce20 = 18.0f;
+__declspec(section ".sdata2") const f32 float_8_8041ce24 = 8.0f;
+__declspec(section ".sdata2") const f32 float_30_8041ce28 = 30.0f;
+__declspec(section ".sdata2") const f32 float_neg6_8041ce2c = -6.0f;
+__declspec(section ".sdata2") const f32 float_6_8041ce30 = 6.0f;
+__declspec(section ".sdata2") const f32 float_270_8041ce34 = 270.0f;
+__declspec(section ".sdata2") const f32 float_180_8041ce38 = 180.0f;
+__declspec(section ".sdata2") const f32 float_7_8041ce3c = 7.0f;
+__declspec(section ".sdata2") const f32 float_neg3_8041ce40 = -3.0f;
+__declspec(section ".sdata2") const f32 float_0p1_8041ce44 = 0.1f;
+__declspec(section ".sdata2") const f32 float_90_8041ce48 = 90.0f;
+__declspec(section ".sdata2") const f32 float_280_8041ce4c = 280.0f;
+__declspec(section ".sdata2") const f32 float_260_8041ce50 = 260.0f;
+__declspec(section ".sdata2") const f32 float_315_8041ce54 = 315.0f;
+__declspec(section ".sdata2") const f32 float_135_8041ce58 = 135.0f;
+__declspec(section ".sdata2") const f32 float_225_8041ce5c = 225.0f;
+__declspec(section ".sdata2") const f32 float_15_8041ce60 = 15.0f;
+__declspec(section ".sdata2") const f32 float_neg300_8041ce64 = -300.0f;
+__declspec(section ".sdata2") const f32 float_240_8041ce68 = 240.0f;
+__declspec(section ".sdata2") const f32 float_neg1p4_8041ce6c = -1.4f;
+__declspec(section ".sdata2") const f32 float_neg16_8041ce70 = -16.0f;
+__declspec(section ".sdata2") const f32 float_neg2001_8041ce74 = -2001.0f;
+__declspec(section ".sdata2") const f32 float_37_8041ce78 = 37.0f;
+__declspec(section ".sdata2") const f32 float_1p3_8041ce7c = 1.3f;
+__declspec(section ".sdata2") const f32 float_2p25_8041ce80 = 2.25f;
+__declspec(section ".sdata2") const f32 float_0p6_8041ce84 = 0.6f;
+__declspec(section ".sdata2") const f32 float_1p4_8041ce88 = 1.4f;
+__declspec(section ".sdata2") const f32 float_0p9_8041ce8c = 0.9f;
+__declspec(section ".sdata2") const f32 float_25_8041ce90 = 25.0f;
+__declspec(section ".sdata2") const f32 float_13_8041ce94 = 13.0f;
+__declspec(section ".sdata2") const f32 float_1p5_8041ce98 = 1.5f;
+__declspec(section ".sdata2") const f32 float_3p6_8041ce9c = 3.6f;
+__declspec(section ".sdata2") const f32 float_0p05_8041cea0 = 0.05f;
+__declspec(section ".sdata2") const f32 float_28_8041cea4 = 28.0f;
+__declspec(section ".sdata2") const f32 float_32_8041cea8 = 32.0f;
+__declspec(section ".sdata2") const f32 float_35_8041ceac = 35.0f;
+__declspec(section ".sdata2") const f32 float_4_8041ceb0 = 4.0f;
+__declspec(section ".sdata2") const f32 float_37p5_8041ceb4 = 37.5f;
+__declspec(section ".sdata2") const f32 float_70_8041ceb8 = 70.0f;
+__declspec(section ".sdata2") const f32 float_150_8041cebc = 150.0f;
+__declspec(section ".sdata2") const f32 float_60_8041cec0 = 60.0f;
+__declspec(section ".sdata2") const f32 float_11_8041cec4 = 11.0f;
+__declspec(section ".sdata2") const f32 float_18p5_8041cec8 = 18.5f;
+__declspec(section ".sdata2") const f32 float_neg15_8041cecc = -15.0f;
+__declspec(section ".sdata2") const f32 float_neg1p5_8041ced0 = -1.5f;
+__declspec(section ".sdata2") const f32 float_31_8041ced4 = 31.0f;
+
+asm void party_force_reset_outofscreen(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x120(r1)
+	mflr r0
+	stw r0, 0x124(r1)
+	stfd f31, 0x110(r1)
+	psq_st f31, 0x118(r1), 0, 0
+	stfd f30, 0x100(r1)
+	psq_st f30, 0x108(r1), 0, 0
+	stfd f29, 0xf0(r1)
+	psq_st f29, 0xf8(r1), 0, 0
+	stfd f28, 0xe0(r1)
+	psq_st f28, 0xe8(r1), 0, 0
+	stfd f27, 0xd0(r1)
+	psq_st f27, 0xd8(r1), 0, 0
+	stfd f26, 0xc0(r1)
+	psq_st f26, 0xc8(r1), 0, 0
+	stfd f25, 0xb0(r1)
+	psq_st f25, 0xb8(r1), 0, 0
+	stfd f24, 0xa0(r1)
+	psq_st f24, 0xa8(r1), 0, 0
+	stmw r24, 0x80(r1)
+	mr r25, r3
+	lwz r24, 0x160(r3)
+	bl marioCtrlOffChk
+	cmpwi r3, 0x0
+	bne @1
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @1
+	lwz r7, 0x58(r25)
+	addi r3, r1, 0x30
+	lwz r0, 0x5c(r25)
+	addi r4, r1, 0x10
+	addi r5, r1, 0xc
+	addi r6, r1, 0x8
+	stw r7, 0x30(r1)
+	stw r0, 0x34(r1)
+	lwz r0, 0x60(r25)
+	stw r0, 0x38(r1)
+	bl marioGetScreenPos
+	lfs f1, 0x8c(r24)
+	lfs f2, 0x94(r24)
+	lfs f3, 0x58(r25)
+	lfs f4, 0x60(r25)
+	bl distABf
+	lfs f0, float_20_8041cdc0(r2)
+	fcmpo cr0, f1, f0
+	bge @2
+	lfs f1, 0xc(r1)
+	lfs f0, float_800_8041cdc4(r2)
+	fcmpo cr0, f1, f0
+	ble @2
+	mr r3, r25
+	addi r4, r1, 0x6c
+	bl partyGetAppearPos3
+	lwz r3, 0x6c(r1)
+	lwz r0, 0x70(r1)
+	stw r3, 0x58(r25)
+	stw r0, 0x5c(r25)
+	lwz r0, 0x74(r1)
+	stw r0, 0x60(r25)
+	b @1
+	@2:
+	lfs f0, float_neg100_8041cdc8(r2)
+	li r26, 0x64
+	lfs f1, 0x10(r1)
+	fcmpo cr0, f0, f1
+	cror eq, lt, eq
+	bne @3
+	lfs f0, float_700_8041cdcc(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @3
+	lfs f1, 0xc(r1)
+	lfs f0, float_650_8041cdd0(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	beq @1
+	@3:
+	lwz r0, 0x0(r25)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @4
+	bl partyClearFootmark
+	b @5
+	@4:
+	bl partyClearFootmark
+	@5:
+	lwz r28, 0x160(r25)
+	li r27, 0x0
+	lwz r3, 0x58(r25)
+	lwz r0, 0x5c(r25)
+	stw r3, 0x6c(r1)
+	stw r0, 0x70(r1)
+	lwz r0, 0x60(r25)
+	stw r0, 0x74(r1)
+	lbz r0, 0x32(r25)
+	cmplwi r0, 0x0
+	bne @6
+	lfs f30, 0xf4(r25)
+	b @7
+	@6:
+	lbz r0, 0x31(r25)
+	cmpwi r0, 0x5
+	bne @8
+	lfs f30, float_10_8041cdd4(r2)
+	li r26, 0x46
+	b @7
+	@8:
+	lfs f30, float_10_8041cdd4(r2)
+	li r26, 0x32
+	@7:
+	lis r4, vec3_802f3ef4@ha
+	lis r3, double_to_int_802f3f48@ha
+	addi r6, r4, vec3_802f3ef4@l
+	neg r7, r26
+	lwz r5, 0x0(r6)
+	addi r29, r1, 0x74
+	lwz r4, 0x4(r6)
+	xoris r30, r7, 0x8000
+	lwz r0, 0x8(r6)
+	lis r31, 0x4330
+	stw r5, 0x54(r1)
+	lfs f27, float_100_8041cde0(r2)
+	stw r4, 0x58(r1)
+	lfs f28, float_50_8041cde8(r2)
+	stw r0, 0x5c(r1)
+	lfs f29, float_0_8041cdec(r2)
+	lfs f26, float_300_8041cddc(r2)
+	lfd f31, double_to_int_802f3f48@l(r3)
+	@9:
+	lwz r6, 0x6c(r1)
+	addi r3, r1, 0x24
+	lwz r7, 0x70(r1)
+	addi r4, r1, 0x10
+	lwz r0, 0x74(r1)
+	addi r5, r1, 0xc
+	stw r6, 0x24(r1)
+	addi r6, r1, 0x8
+	stw r7, 0x28(r1)
+	stw r0, 0x2c(r1)
+	bl marioGetScreenPos
+	stw r30, 0x7c(r1)
+	lfs f2, 0x10(r1)
+	stw r31, 0x78(r1)
+	lfd f0, 0x78(r1)
+	fsubs f0, f0, f31
+	fcmpo cr0, f0, f2
+	cror eq, lt, eq
+	bne @10
+	addi r3, r26, 0x258
+	lis r0, 0x4330
+	xoris r3, r3, 0x8000
+	lis r4, double_to_int_802f3f48@ha
+	stw r3, 0x7c(r1)
+	lfd f1, double_to_int_802f3f48@l(r4)
+	stw r0, 0x78(r1)
+	lfd f0, 0x78(r1)
+	fsubs f0, f0, f1
+	fcmpo cr0, f2, f0
+	cror eq, lt, eq
+	bne @10
+	lwz r3, 0x6c(r1)
+	lwz r0, 0x70(r1)
+	stw r3, 0x58(r25)
+	stw r0, 0x5c(r25)
+	lwz r0, 0x74(r1)
+	stw r0, 0x60(r25)
+	b @1
+	@10:
+	cmpwi r27, 0x64
+	bgt @1
+	lfs f1, 0x6c(r1)
+	lfs f2, 0x74(r1)
+	lfs f3, 0x8c(r28)
+	lfs f4, 0x94(r28)
+	bl angleABf
+	fmr f0, f1
+	mr r4, r29
+	fmr f1, f30
+	addi r3, r1, 0x6c
+	fmr f2, f0
+	bl movePos
+	lfs f24, float_200_8041cdd8(r2)
+	li r24, 0x0
+	lfs f25, 0x70(r1)
+	@11:
+	lwz r0, 0x70(r1)
+	mr r3, r25
+	lwz r9, 0x6c(r1)
+	addi r4, r1, 0x60
+	stw r0, 0x64(r1)
+	addi r5, r1, 0x54
+	lwz r0, 0x74(r1)
+	addi r6, r1, 0x48
+	lfs f0, 0x64(r1)
+	addi r7, r1, 0x3c
+	stfs f26, 0x14(r1)
+	addi r8, r1, 0x14
+	fadds f0, f0, f24
+	stw r9, 0x60(r1)
+	stw r0, 0x68(r1)
+	stfs f0, 0x64(r1)
+	bl partyHitCheck
+	cmplwi r3, 0x0
+	beq @12
+	bne @13
+	li r0, 0x0
+	b @14
+	@13:
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @15
+	li r0, 0x1
+	b @14
+	@15:
+	li r0, 0x0
+	@14:
+	cmpwi r0, 0x0
+	bne @16
+	lfs f25, 0x4c(r1)
+	b @16
+	@12:
+	lfs f25, 0x90(r28)
+	@16:
+	stfs f25, 0x64(r1)
+	addi r3, r1, 0x18
+	lwz r8, 0x60(r1)
+	addi r4, r1, 0x10
+	lwz r7, 0x64(r1)
+	addi r5, r1, 0xc
+	lwz r0, 0x68(r1)
+	addi r6, r1, 0x8
+	stw r8, 0x18(r1)
+	stw r7, 0x1c(r1)
+	stw r0, 0x20(r1)
+	bl marioGetScreenPos
+	lfs f0, 0xc(r1)
+	fcmpo cr0, f0, f27
+	ble @17
+	lfs f1, float_74_8041cde4(r2)
+	lfs f0, 0x70(r1)
+	lwz r4, 0x6c(r1)
+	fadds f0, f1, f0
+	lwz r3, 0x70(r1)
+	lwz r0, 0x74(r1)
+	stfs f27, 0x14(r1)
+	fcmpo cr0, f0, f25
+	stw r4, 0x60(r1)
+	stw r3, 0x64(r1)
+	stw r0, 0x68(r1)
+	ble @18
+	lfs f0, 0x64(r1)
+	mr r3, r25
+	addi r4, r1, 0x60
+	addi r5, r1, 0x54
+	fadds f0, f0, f1
+	addi r6, r1, 0x48
+	addi r7, r1, 0x3c
+	addi r8, r1, 0x14
+	stfs f0, 0x64(r1)
+	bl partyHitCheck
+	cmplwi r3, 0x0
+	beq @18
+	bne @19
+	li r0, 0x0
+	b @20
+	@19:
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @21
+	li r0, 0x1
+	b @20
+	@21:
+	li r0, 0x0
+	@20:
+	cmpwi r0, 0x0
+	bne @18
+	lfs f25, 0x4c(r1)
+	b @18
+	@17:
+	addi r24, r24, 0x1
+	cmpwi r24, 0x4
+	bgt @18
+	fsubs f24, f24, f28
+	fcmpo cr0, f24, f29
+	bge @11
+	fmr f24, f29
+	b @11
+	@18:
+	stfs f25, 0x70(r1)
+	addi r27, r27, 0x1
+	b @9
+	@1:
+	psq_l f31, 0x118(r1), 0, 0
+	lfd f31, 0x110(r1)
+	psq_l f30, 0x108(r1), 0, 0
+	lfd f30, 0x100(r1)
+	psq_l f29, 0xf8(r1), 0, 0
+	lfd f29, 0xf0(r1)
+	psq_l f28, 0xe8(r1), 0, 0
+	lfd f28, 0xe0(r1)
+	psq_l f27, 0xd8(r1), 0, 0
+	lfd f27, 0xd0(r1)
+	psq_l f26, 0xc8(r1), 0, 0
+	lfd f26, 0xc0(r1)
+	psq_l f25, 0xb8(r1), 0, 0
+	lfd f25, 0xb0(r1)
+	psq_l f24, 0xa8(r1), 0, 0
+	lfd f24, 0xa0(r1)
+	lmw r24, 0x80(r1)
+	lwz r0, 0x124(r1)
+	mtlr r0
+	addi r1, r1, 0x120
+	blr
+}
+
+asm s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir) {
+	nofralloc
+	stwu r1, -0x140(r1)
+	mflr r0
+	stw r0, 0x144(r1)
+	stfd f31, 0x130(r1)
+	psq_st f31, 0x138(r1), 0, 0
+	stfd f30, 0x120(r1)
+	psq_st f30, 0x128(r1), 0, 0
+	stfd f29, 0x110(r1)
+	psq_st f29, 0x118(r1), 0, 0
+	stfd f28, 0x100(r1)
+	psq_st f28, 0x108(r1), 0, 0
+	stfd f27, 0xf0(r1)
+	psq_st f27, 0xf8(r1), 0, 0
+	stmw r27, 0xdc(r1)
+	mr r29, r3
+	lis r3, vec3_802f3e40@ha
+	lfs f2, float_2_8041ce08(r2)
+	addi r31, r3, vec3_802f3e40@l
+	lfs f0, 0xf4(r29)
+	mr r30, r4
+	lwz r4, 0x60(r31)
+	fmr f27, f1
+	fmuls f2, f2, f0
+	lfs f0, float_3_8041ce0c(r2)
+	lwz r5, 0x64(r31)
+	addi r3, r1, 0xc
+	lwz r0, 0x68(r31)
+	fdivs f29, f2, f0
+	stw r4, 0x34(r1)
+	addi r4, r1, 0x10
+	lfs f28, touch_wall_ct(r13)
+	stw r5, 0x38(r1)
+	stw r0, 0x3c(r1)
+	bl sincosf
+	lfd f30, 0x108(r31)
+	li r27, 0x0
+	lfs f31, float_100_8041cde0(r2)
+	lis r28, 0x4330
+	@1:
+	xoris r0, r27, 0x8000
+	lfs f1, 0xc(r1)
+	stw r0, 0xa4(r1)
+	addi r3, r1, 0x1c
+	lfs f0, 0x10(r1)
+	fmuls f3, f1, f29
+	stw r28, 0xa0(r1)
+	li r4, 0x0
+	lfs f2, 0x58(r29)
+	fmuls f1, f0, f29
+	lfd f0, 0xa0(r1)
+	stw r0, 0xac(r1)
+	fsubs f0, f0, f30
+	stw r28, 0xa8(r1)
+	fmadds f3, f0, f3, f2
+	lfd f0, 0xa8(r1)
+	fsubs f2, f0, f30
+	stfs f3, 0x28(r1)
+	lfs f0, 0x60(r29)
+	fmadds f0, f2, f1, f0
+	stfs f0, 0x30(r1)
+	lfs f1, 0x5c(r29)
+	lfs f0, 0xf0(r29)
+	fadds f0, f1, f0
+	stfs f31, 0x58(r1)
+	stfs f0, 0x2c(r1)
+	bl hitCheckVecFilter
+	cmplwi r3, 0x0
+	beq @2
+	lfs f0, 0x4c(r1)
+	lfs f1, 0x54(r1)
+	fmuls f2, f0, f0
+	lfs f0, float_0_8041cdec(r2)
+	fmuls f1, f1, f1
+	fadds f4, f2, f1
+	fcmpo cr0, f4, f0
+	ble @3
+	frsqrte f1, f4
+	lfd f3, 0x110(r31)
+	lfd f2, 0x118(r31)
+	fmul f0, f1, f1
+	fmul f1, f3, f1
+	fnmsub f0, f4, f0, f2
+	fmul f1, f1, f0
+	fmul f0, f1, f1
+	fmul f1, f3, f1
+	fnmsub f0, f4, f0, f2
+	fmul f1, f1, f0
+	fmul f0, f1, f1
+	fmul f1, f3, f1
+	fnmsub f0, f4, f0, f2
+	fmul f0, f1, f0
+	fmul f4, f4, f0
+	frsp f4, f4
+	b @4
+	@3:
+	lfd f0, 0x120(r31)
+	fcmpo cr0, f4, f0
+	bge @5
+	lis r3, __float_nan@ha
+	lfs f4, __float_nan@l(r3)
+	b @4
+	@5:
+	stfs f4, 0x8(r1)
+	lis r0, 0x7f80
+	lwz r4, 0x8(r1)
+	rlwinm r3, r4, 0, 1, 8
+	cmpw r3, r0
+	beq @6
+	bge @7
+	cmpwi r3, 0x0
+	beq @8
+	b @7
+	@6:
+	clrlwi. r0, r4, 9
+	beq @9
+	li r0, 0x1
+	b @10
+	@9:
+	li r0, 0x2
+	b @10
+	@8:
+	clrlwi. r0, r4, 9
+	beq @11
+	li r0, 0x5
+	b @10
+	@11:
+	li r0, 0x3
+	b @10
+	@7:
+	li r0, 0x4
+	@10:
+	cmpwi r0, 0x1
+	bne @4
+	lis r3, __float_nan@ha
+	lfs f4, __float_nan@l(r3)
+	@4:
+	lfs f0, float_45_8041ce10(r2)
+	fcmpo cr0, f4, f0
+	bge @2
+	lfs f2, 0x44(r1)
+	b @12
+	@2:
+	addi r27, r27, 0x1
+	cmpwi r27, 0x3
+	blt @1
+	lfs f2, float_neg2000_8041cdfc(r2)
+	@12:
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f2, f0
+	ble @13
+	lfs f1, 0x5c(r29)
+	lfs f0, float_2_8041ce08(r2)
+	fadds f1, f1, f28
+	fsubs f0, f2, f0
+	fcmpo cr0, f1, f0
+	bge @14
+	stfs f1, 0x6c(r1)
+	b @15
+	@14:
+	stfs f0, 0x6c(r1)
+	b @15
+	@13:
+	lfs f0, 0x5c(r29)
+	fadds f0, f0, f28
+	stfs f0, 0x6c(r1)
+	@15:
+	lfs f2, float_0p75_8041ce14(r2)
+	fmr f1, f27
+	lfs f0, 0xf4(r29)
+	addi r3, r1, 0x18
+	addi r4, r1, 0x14
+	fmuls f27, f2, f0
+	bl sincosf
+	lfs f1, 0x18(r1)
+	addi r3, r1, 0x5c
+	lfs f0, 0x58(r29)
+	li r4, 0x0
+	lfs f2, 0x14(r1)
+	fmadds f1, f1, f27, f0
+	lfs f0, float_300_8041cddc(r2)
+	lwz r6, 0x6c(r31)
+	lwz r5, 0x70(r31)
+	stfs f1, 0x68(r1)
+	lwz r0, 0x74(r31)
+	lfs f1, 0x60(r29)
+	fmadds f1, f2, f27, f1
+	stfs f0, 0x98(r1)
+	stw r6, 0x74(r1)
+	stfs f1, 0x70(r1)
+	stw r5, 0x78(r1)
+	stw r0, 0x7c(r1)
+	bl hitCheckVecFilter
+	cmplwi r3, 0x0
+	bne @16
+	lfs f0, 0x58(r29)
+	li r3, 0x0
+	stfs f0, 0x0(r30)
+	lfs f0, 0x5c(r29)
+	stfs f0, 0x4(r30)
+	lfs f0, 0x60(r29)
+	stfs f0, 0x8(r30)
+	b @17
+	@16:
+	lfs f1, 0x80(r1)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @18
+	lfs f0, float_0p5_8041ce00(r2)
+	b @19
+	@18:
+	lfs f0, float_neg0p5_8041ce04(r2)
+	@19:
+	lfs f3, float_1000_8041cdf4(r2)
+	lis r0, 0x4330
+	stw r0, 0xa0(r1)
+	fmadds f1, f3, f1, f0
+	lfd f2, 0x108(r31)
+	lfs f0, float_0_8041cdec(r2)
+	fctiwz f1, f1
+	stfd f1, 0xa8(r1)
+	lwz r0, 0xac(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0xa4(r1)
+	lfd f1, 0xa0(r1)
+	fsubs f1, f1, f2
+	fdivs f1, f1, f3
+	stfs f1, 0x0(r30)
+	lfs f1, 0x84(r1)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @20
+	lfs f0, float_0p5_8041ce00(r2)
+	b @21
+	@20:
+	lfs f0, float_neg0p5_8041ce04(r2)
+	@21:
+	lfs f3, float_1000_8041cdf4(r2)
+	lis r0, 0x4330
+	stw r0, 0xb8(r1)
+	fmadds f1, f3, f1, f0
+	lfd f2, 0x108(r31)
+	lfs f0, float_0_8041cdec(r2)
+	fctiwz f1, f1
+	stfd f1, 0xb0(r1)
+	lwz r0, 0xb4(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0xbc(r1)
+	lfd f1, 0xb8(r1)
+	fsubs f1, f1, f2
+	fdivs f1, f1, f3
+	stfs f1, 0x4(r30)
+	lfs f1, 0x88(r1)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @22
+	lfs f0, float_0p5_8041ce00(r2)
+	b @23
+	@22:
+	lfs f0, float_neg0p5_8041ce04(r2)
+	@23:
+	lfs f2, float_1000_8041cdf4(r2)
+	lis r0, 0x4330
+	stw r0, 0xc8(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, 0x108(r31)
+	fctiwz f0, f0
+	stfd f0, 0xc0(r1)
+	lwz r0, 0xc4(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0xcc(r1)
+	lfd f0, 0xc8(r1)
+	fsubs f0, f0, f1
+	fdivs f0, f0, f2
+	stfs f0, 0x8(r30)
+	bl hitGetAttr
+	@17:
+	psq_l f31, 0x138(r1), 0, 0
+	lfd f31, 0x130(r1)
+	psq_l f30, 0x128(r1), 0, 0
+	lfd f30, 0x120(r1)
+	psq_l f29, 0x118(r1), 0, 0
+	lfd f29, 0x110(r1)
+	psq_l f28, 0x108(r1), 0, 0
+	lfd f28, 0x100(r1)
+	psq_l f27, 0xf8(r1), 0, 0
+	lfd f27, 0xf0(r1)
+	lmw r27, 0xdc(r1)
+	lwz r0, 0x144(r1)
+	mtlr r0
+	addi r1, r1, 0x140
+	blr
+}
+
+asm BOOL party_roll(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	lis r4, vec3_802f3e40@ha
+	stw r0, 0x24(r1)
+	stw r31, 0x1c(r1)
+	addi r31, r4, vec3_802f3e40@l
+	stw r30, 0x18(r1)
+	li r30, 0x1
+	stw r29, 0x14(r1)
+	mr r29, r3
+	lbz r0, 0x37(r3)
+	cmplwi r0, 0x2
+	beq @1
+	li r3, 0x1
+	b @2
+	@1:
+	lwz r4, 0x8(r29)
+	clrlwi. r0, r4, 31
+	beq @3
+	clrrwi r0, r4, 1
+	addi r4, r31, 0x128
+	stw r0, 0x8(r29)
+	bl partyPaperOn
+	mr r3, r29
+	addi r4, r31, 0x130
+	bl partyChgPaper
+	mr r3, r29
+	li r4, 0x0
+	bl partyChgPoseId
+	lfs f0, float_neg6_8041ce2c(r2)
+	li r4, 0x41
+	lfs f2, float_6_8041ce30(r2)
+	li r0, 0x0
+	stfs f0, 0x88(r29)
+	mr r3, r29
+	lfs f0, float_2_8041ce08(r2)
+	stfs f2, 0x8c(r29)
+	lfs f1, float_0_8041cdec(r2)
+	stfs f2, 0x7c(r29)
+	stfs f0, 0x80(r29)
+	stw r4, 0x24(r29)
+	stb r0, 0x3a(r29)
+	bl unk_800c9398
+	@3:
+	lbz r0, 0x3a(r29)
+	cmpwi r0, 0xa
+	beq @4
+	bge @5
+	cmpwi r0, 0x0
+	beq @6
+	b @5
+	@6:
+	lwz r3, 0x24(r29)
+	subi r0, r3, 0x1
+	stw r0, 0x24(r29)
+	lwz r0, 0x24(r29)
+	cmpwi r0, 0x0
+	bgt @5
+	mr r3, r29
+	addi r4, r31, 0x138
+	bl partyChgPaper
+	li r0, 0xa
+	stb r0, 0x3a(r29)
+	b @5
+	@4:
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x100(r29)
+	fsubs f1, f1, f0
+	bl revise360
+	stfs f1, 0x10c(r29)
+	lfs f1, 0xfc(r29)
+	lfs f0, 0x10c(r29)
+	fadds f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	ble @7
+	lfs f2, float_7_8041ce3c(r2)
+	lfs f1, 0x104(r29)
+	lfs f0, 0x6c(r29)
+	fmadds f1, f2, f1, f0
+	bl revise360
+	stfs f1, 0x6c(r29)
+	b @5
+	@7:
+	lfs f2, float_7_8041ce3c(r2)
+	lfs f1, 0x104(r29)
+	lfs f0, 0x6c(r29)
+	fnmsubs f1, f2, f1, f0
+	bl revise360
+	stfs f1, 0x6c(r29)
+	@5:
+	lbz r0, 0x3a(r29)
+	cmpwi r0, 0x65
+	beq @8
+	bge @9
+	cmpwi r0, 0x64
+	bge @10
+	b @9
+	@10:
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, float_180_8041ce38(r2)
+	stfs f1, 0x104(r29)
+	stfs f1, 0x64(r29)
+	stfs f1, 0x6c(r29)
+	stfs f1, 0x88(r29)
+	stfs f1, 0x8c(r29)
+	lfs f1, 0x100(r29)
+	fcmpo cr0, f1, f0
+	bge @11
+	lfs f0, float_3_8041ce0c(r2)
+	b @12
+	@11:
+	lfs f0, float_neg3_8041ce40(r2)
+	@12:
+	stfs f0, 0x7c(r29)
+	li r5, 0x41
+	lfs f0, float_0_8041cdec(r2)
+	li r0, 0x65
+	mr r3, r29
+	addi r4, r31, 0x140
+	stfs f0, 0x80(r29)
+	stw r5, 0x24(r29)
+	stb r0, 0x3a(r29)
+	bl partyChgPaper
+	mr r3, r29
+	bl partyPaperLightOff
+	@8:
+	lwz r3, 0x24(r29)
+	li r30, 0x0
+	subi r0, r3, 0x1
+	stw r0, 0x24(r29)
+	lwz r0, 0x24(r29)
+	cmpwi r0, 0x0
+	ble @13
+	lfs f1, 0x100(r29)
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	bge @14
+	lfs f3, float_90_8041ce48(r2)
+	lfs f4, 0x10c(r29)
+	lfs f2, float_0p1_8041ce44(r2)
+	fsubs f1, f3, f4
+	lfs f0, float_1_8041ce1c(r2)
+	fmuls f5, f2, f1
+	fadds f5, f5, f4
+	fsubs f1, f3, f5
+	fcmpo cr0, f1, f0
+	mfcr r3
+	lis r0, 0x4330
+	srwi r3, r3, 31
+	stw r0, 0x8(r1)
+	xoris r0, r3, 0x8000
+	lfd f2, 0x108(r31)
+	stw r0, 0xc(r1)
+	lfs f0, float_0_8041cdec(r2)
+	lfd f1, 0x8(r1)
+	fsubs f1, f1, f2
+	fabs f1, f1
+	fcmpu cr0, f1, f0
+	beq @15
+	fmr f5, f3
+	@15:
+	stfs f5, 0x10c(r29)
+	stfs f5, 0x110(r29)
+	b @9
+	@14:
+	lfs f3, float_270_8041ce34(r2)
+	lfs f4, 0x10c(r29)
+	lfs f2, float_0p1_8041ce44(r2)
+	fsubs f1, f3, f4
+	lfs f0, float_1_8041ce1c(r2)
+	fmuls f5, f2, f1
+	fadds f5, f5, f4
+	fsubs f1, f3, f5
+	fcmpo cr0, f1, f0
+	mfcr r3
+	lis r0, 0x4330
+	srwi r3, r3, 31
+	stw r0, 0x8(r1)
+	xoris r0, r3, 0x8000
+	lfd f2, 0x108(r31)
+	stw r0, 0xc(r1)
+	lfs f0, float_0_8041cdec(r2)
+	lfd f1, 0x8(r1)
+	fsubs f1, f1, f2
+	fabs f1, f1
+	fcmpu cr0, f1, f0
+	beq @16
+	fmr f5, f3
+	@16:
+	stfs f5, 0x10c(r29)
+	stfs f5, 0x110(r29)
+	b @9
+	@13:
+	lfs f0, 0x100(r29)
+	li r30, 0x1
+	lfs f1, float_180_8041ce38(r2)
+	fcmpo cr0, f0, f1
+	cror eq, gt, eq
+	bne @17
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, float_270_8041ce34(r2)
+	stfs f1, 0x10c(r29)
+	stfs f1, 0x110(r29)
+	stfs f0, 0xfc(r29)
+	stfs f0, 0x100(r29)
+	b @18
+	@17:
+	stfs f1, 0x10c(r29)
+	lfs f0, float_90_8041ce48(r2)
+	stfs f1, 0x110(r29)
+	stfs f0, 0xfc(r29)
+	stfs f0, 0x100(r29)
+	@18:
+	lwz r6, 0x48(r31)
+	li r4, 0x0
+	lwz r5, 0x4c(r31)
+	li r0, 0x64
+	mr r3, r29
+	stw r6, 0x88(r29)
+	stw r5, 0x8c(r29)
+	lwz r5, 0x50(r31)
+	stw r5, 0x90(r29)
+	lwz r6, 0x54(r31)
+	lwz r5, 0x58(r31)
+	stw r6, 0x7c(r29)
+	stw r5, 0x80(r29)
+	lwz r5, 0x5c(r31)
+	stw r5, 0x84(r29)
+	stb r4, 0x37(r29)
+	lwz r4, 0x0(r29)
+	rlwinm r4, r4, 0, 20, 18
+	stw r4, 0x0(r29)
+	lwz r4, 0x4(r29)
+	rlwinm r4, r4, 0, 24, 22
+	stw r4, 0x4(r29)
+	lwz r4, 0x0(r29)
+	rlwinm r4, r4, 0, 23, 21
+	stw r4, 0x0(r29)
+	lwz r4, 0x4(r29)
+	rlwinm r4, r4, 0, 28, 26
+	stw r4, 0x4(r29)
+	lwz r4, 0x4(r29)
+	rlwinm r4, r4, 0, 29, 27
+	stw r4, 0x4(r29)
+	stb r0, 0x3a(r29)
+	bl partyPaperOff
+	@9:
+	mr r3, r30
+	@2:
+	lwz r0, 0x24(r1)
+	lwz r31, 0x1c(r1)
+	lwz r30, 0x18(r1)
+	lwz r29, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+asm BOOL party_slit(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	lis r4, vec3_802f3e40@ha
+	stw r0, 0x24(r1)
+	stw r31, 0x1c(r1)
+	addi r31, r4, vec3_802f3e40@l
+	stw r30, 0x18(r1)
+	li r30, 0x1
+	stw r29, 0x14(r1)
+	stw r28, 0x10(r1)
+	mr r28, r3
+	lbz r0, 0x37(r3)
+	lwz r29, 0x160(r3)
+	cmplwi r0, 0x1
+	beq @1
+	li r3, 0x1
+	b @2
+	@1:
+	lwz r4, 0x8(r28)
+	clrlwi. r0, r4, 31
+	beq @3
+	clrrwi r0, r4, 1
+	addi r4, r31, 0x148
+	stw r0, 0x8(r28)
+	lwz r0, 0x4(r28)
+	ori r0, r0, 0x100
+	stw r0, 0x4(r28)
+	bl partyPaperOn
+	mr r3, r28
+	addi r4, r31, 0x150
+	bl partyChgPaper
+	li r0, 0x1e
+	lfs f1, float_0_8041cdec(r2)
+	stw r0, 0x24(r28)
+	mr r3, r28
+	bl unk_800c9398
+	lfs f1, 0x100(r28)
+	lfs f0, 0x198(r29)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @4
+	lwz r3, 0x4(r28)
+	li r0, 0x0
+	rlwinm r3, r3, 0, 23, 21
+	stw r3, 0x4(r28)
+	stb r0, 0x3a(r28)
+	b @3
+	@4:
+	lwz r3, 0x4(r28)
+	li r0, 0x2
+	ori r3, r3, 0x200
+	stw r3, 0x4(r28)
+	stb r0, 0x3a(r28)
+	@3:
+	lbz r0, 0x3a(r28)
+	cmpwi r0, 0x2
+	beq @5
+	bge @6
+	cmpwi r0, 0x0
+	beq @7
+	b @8
+	@6:
+	cmpwi r0, 0xa
+	beq @9
+	b @8
+	@7:
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bge @8
+	lwz r0, 0x0(r28)
+	mr r3, r28
+	lfs f0, float_270_8041ce34(r2)
+	addi r4, r31, 0x158
+	ori r0, r0, 0x1000
+	stw r0, 0x0(r28)
+	stfs f0, 0x10c(r28)
+	lfs f0, 0x10c(r28)
+	stfs f0, 0x110(r28)
+	bl partyChgPaper
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 18, 18
+	bne @10
+	li r0, 0xa
+	li r30, 0x0
+	stb r0, 0x3a(r28)
+	b @8
+	@10:
+	li r0, 0x14
+	stb r0, 0x3a(r28)
+	b @8
+	@5:
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bge @8
+	lwz r0, 0x0(r28)
+	mr r3, r28
+	lfs f0, float_270_8041ce34(r2)
+	addi r4, r31, 0x158
+	ori r0, r0, 0x1000
+	stw r0, 0x0(r28)
+	stfs f0, 0x10c(r28)
+	lfs f0, 0x10c(r28)
+	stfs f0, 0x110(r28)
+	bl partyChgPaper
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 18, 18
+	bne @11
+	li r0, 0xa
+	li r30, 0x0
+	stb r0, 0x3a(r28)
+	b @8
+	@11:
+	li r0, 0x14
+	stb r0, 0x3a(r28)
+	b @8
+	@9:
+	lfs f1, 0x104(r28)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	bne @12
+	mr r3, r28
+	addi r4, r31, 0x158
+	bl partyChgPaper
+	lfs f0, float_270_8041ce34(r2)
+	stfs f0, 0x10c(r28)
+	b @13
+	@12:
+	lfs f1, 0x100(r28)
+	lfs f0, 0x198(r29)
+	fsubs f1, f1, f0
+	bl revise360
+	lfd f0, 0x160(r31)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @14
+	lwz r0, 0x4(r28)
+	ori r0, r0, 0x200
+	stw r0, 0x4(r28)
+	b @15
+	@14:
+	lwz r0, 0x4(r28)
+	rlwinm r0, r0, 0, 23, 21
+	stw r0, 0x4(r28)
+	@15:
+	lwz r0, 0x4(r28)
+	rlwinm. r0, r0, 0, 22, 22
+	beq @16
+	lfs f0, float_280_8041ce4c(r2)
+	b @17
+	@16:
+	lfs f0, float_260_8041ce50(r2)
+	@17:
+	stfs f0, 0x10c(r28)
+	lfs f1, 0x100(r28)
+	lfs f0, 0x198(r29)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_315_8041ce54(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	beq @18
+	lfs f0, float_45_8041ce10(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	beq @18
+	lfs f0, float_135_8041ce58(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @19
+	lfs f0, float_225_8041ce5c(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @19
+	@18:
+	mr r3, r28
+	addi r4, r31, 0x168
+	bl partyChgPaper
+	b @13
+	@19:
+	mr r3, r28
+	addi r4, r31, 0x170
+	bl partyChgPaper
+	@13:
+	lwz r0, 0x0(r29)
+	rlwinm. r0, r0, 0, 11, 11
+	bne @8
+	lwz r3, 0x12c(r28)
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 18, 18
+	bne @8
+	lwz r3, 0x134(r28)
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 18, 18
+	bne @8
+	li r0, 0x28
+	stb r0, 0x3a(r28)
+	@8:
+	lbz r0, 0x3a(r28)
+	cmpwi r0, 0x15
+	beq @20
+	bge @21
+	cmpwi r0, 0x14
+	bge @22
+	b @23
+	@21:
+	cmpwi r0, 0x17
+	bge @23
+	b @24
+	@22:
+	mr r3, r28
+	addi r4, r31, 0x178
+	bl partyChgPaper
+	lwz r4, 0x0(r28)
+	li r0, 0x14
+	lfs f1, float_0_8041cdec(r2)
+	mr r3, r28
+	oris r4, r4, 0x200
+	stw r4, 0x0(r28)
+	lwz r4, 0x0(r28)
+	ori r4, r4, 0x20
+	stw r4, 0x0(r28)
+	stw r0, 0x24(r28)
+	bl unk_800c9398
+	li r0, 0x15
+	stb r0, 0x3a(r28)
+	b @23
+	@20:
+	lfs f1, 0x100(r28)
+	lfs f0, 0xf8(r28)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @25
+	lfs f0, float_260_8041ce50(r2)
+	b @26
+	@25:
+	lfs f0, float_280_8041ce4c(r2)
+	@26:
+	stfs f0, 0x10c(r28)
+	lfs f0, float_neg3_8041ce40(r2)
+	lfs f1, 0x5c(r28)
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r28)
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bgt @23
+	li r0, 0x16
+	stb r0, 0x3a(r28)
+	b @23
+	@24:
+	li r0, 0xa
+	stb r0, 0x3a(r28)
+	lwz r0, 0x0(r28)
+	rlwinm r0, r0, 0, 7, 5
+	stw r0, 0x0(r28)
+	bl marioClearSlitFloor
+	@23:
+	lbz r0, 0x3a(r28)
+	cmpwi r0, 0x29
+	beq @27
+	bge @28
+	cmpwi r0, 0x28
+	bge @29
+	b @30
+	@28:
+	cmpwi r0, 0x2b
+	bge @30
+	b @31
+	@29:
+	mr r3, r28
+	addi r4, r31, 0x180
+	bl partyChgPaper
+	li r3, 0x1e
+	li r0, 0x29
+	stw r3, 0x24(r28)
+	stb r0, 0x3a(r28)
+	lfs f1, 0x100(r28)
+	lfs f0, 0x198(r29)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @32
+	lfs f0, float_0_8041cdec(r2)
+	@32:
+	stfs f0, 0x10c(r28)
+	lfs f0, 0x10c(r28)
+	stfs f0, 0x110(r28)
+	@27:
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bgt @30
+	li r0, 0x2a
+	stb r0, 0x3a(r28)
+	b @30
+	@31:
+	lwz r0, 0x4(r28)
+	mr r3, r28
+	rlwinm r0, r0, 0, 26, 21
+	stw r0, 0x4(r28)
+	bl partyPaperOff
+	lwz r3, 0x0(r28)
+	li r0, 0x0
+	rlwinm r3, r3, 0, 20, 17
+	stw r3, 0x0(r28)
+	stb r0, 0x37(r28)
+	@30:
+	mr r3, r30
+	@2:
+	lwz r0, 0x24(r1)
+	lwz r31, 0x1c(r1)
+	lwz r30, 0x18(r1)
+	lwz r29, 0x14(r1)
+	lwz r28, 0x10(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+asm void partyChgMotSlitFloor(PartyEntry* party) {
+	nofralloc
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 18, 18
+	bnelr
+	lwz r4, 0x160(r3)
+	lwz r0, 0xc(r4)
+	clrrwi. r0, r0, 31
+	bne @1
+	lwz r4, 0x8(r3)
+	li r0, 0x1
+	ori r4, r4, 0x1
+	stw r4, 0x8(r3)
+	stb r0, 0x37(r3)
+	@1:
+	lwz r0, 0x0(r3)
+	ori r0, r0, 0x2000
+	stw r0, 0x0(r3)
+	blr
+}
+
+asm void L_partyForceSlitOff(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	mr r31, r3
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 19, 19
+	bne @1
+	lwz r0, 0x4(r31)
+	rlwinm. r0, r0, 0, 23, 23
+	beq @2
+	@1:
+	lfs f1, 0x100(r31)
+	lfs f0, 0xf8(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @3
+	lfs f0, float_0_8041cdec(r2)
+	@3:
+	stfs f0, 0x10c(r31)
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x10c(r31)
+	stfs f0, 0x110(r31)
+	lfs f0, 0x10c(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	stfs f1, 0xfc(r31)
+	mr r3, r31
+	lfs f0, 0xfc(r31)
+	stfs f0, 0x100(r31)
+	lwz r0, 0x4(r31)
+	rlwinm r0, r0, 0, 26, 21
+	stw r0, 0x4(r31)
+	bl partyPaperOff
+	lwz r5, 0x0(r31)
+	li r0, 0x0
+	mr r3, r31
+	li r4, 0x1
+	rlwinm r5, r5, 0, 20, 17
+	stw r5, 0x0(r31)
+	stb r0, 0x37(r31)
+	bl partyChgPoseId
+	@2:
+	lwz r0, 0x14(r1)
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm void allPartyForceSlitOff(void) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	bl marioGetPartyId
+	bl partyGetPtr
+	mr. r31, r3
+	beq @1
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 19, 19
+	bne @2
+	lwz r0, 0x4(r31)
+	rlwinm. r0, r0, 0, 23, 23
+	beq @1
+	@2:
+	lfs f1, 0x100(r31)
+	lfs f0, 0xf8(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @3
+	lfs f0, float_0_8041cdec(r2)
+	@3:
+	stfs f0, 0x10c(r31)
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x10c(r31)
+	stfs f0, 0x110(r31)
+	lfs f0, 0x10c(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	stfs f1, 0xfc(r31)
+	mr r3, r31
+	lfs f0, 0xfc(r31)
+	stfs f0, 0x100(r31)
+	lwz r0, 0x4(r31)
+	rlwinm r0, r0, 0, 26, 21
+	stw r0, 0x4(r31)
+	bl partyPaperOff
+	lwz r5, 0x0(r31)
+	li r0, 0x0
+	mr r3, r31
+	li r4, 0x1
+	rlwinm r5, r5, 0, 20, 17
+	stw r5, 0x0(r31)
+	stb r0, 0x37(r31)
+	bl partyChgPoseId
+	@1:
+	bl marioGetExtraPartyId
+	bl partyGetPtr
+	mr. r31, r3
+	beq @4
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 19, 19
+	bne @5
+	lwz r0, 0x4(r31)
+	rlwinm. r0, r0, 0, 23, 23
+	beq @4
+	@5:
+	lfs f1, 0x100(r31)
+	lfs f0, 0xf8(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	lfs f0, float_180_8041ce38(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @6
+	lfs f0, float_0_8041cdec(r2)
+	@6:
+	stfs f0, 0x10c(r31)
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x10c(r31)
+	stfs f0, 0x110(r31)
+	lfs f0, 0x10c(r31)
+	fsubs f1, f1, f0
+	bl revise360
+	stfs f1, 0xfc(r31)
+	mr r3, r31
+	lfs f0, 0xfc(r31)
+	stfs f0, 0x100(r31)
+	lwz r0, 0x4(r31)
+	rlwinm r0, r0, 0, 26, 21
+	stw r0, 0x4(r31)
+	bl partyPaperOff
+	lwz r5, 0x0(r31)
+	li r0, 0x0
+	mr r3, r31
+	li r4, 0x1
+	rlwinm r5, r5, 0, 20, 17
+	stw r5, 0x0(r31)
+	stb r0, 0x37(r31)
+	bl partyChgPoseId
+	@4:
+	lwz r0, 0x14(r1)
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm void allPartySlitOff(void) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @1
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 19, 19
+	beq @1
+	lbz r0, 0x3a(r3)
+	cmplwi r0, 0x28
+	bge @1
+	li r0, 0x28
+	stb r0, 0x3a(r3)
+	@1:
+	bl marioGetExtraPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @2
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 19, 19
+	beq @2
+	lbz r0, 0x3a(r3)
+	cmplwi r0, 0x28
+	bge @2
+	li r0, 0x28
+	stb r0, 0x3a(r3)
+	@2:
+	lwz r0, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm void allPartySlitOn(void) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @1
+	lwz r4, 0x160(r3)
+	lwz r0, 0xc(r4)
+	clrrwi. r0, r0, 31
+	bne @1
+	lwz r4, 0x8(r3)
+	li r0, 0x1
+	ori r4, r4, 0x1
+	stw r4, 0x8(r3)
+	stb r0, 0x37(r3)
+	@1:
+	bl marioGetExtraPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @2
+	lwz r4, 0x160(r3)
+	lwz r0, 0xc(r4)
+	clrrwi. r0, r0, 31
+	bne @2
+	lwz r4, 0x8(r3)
+	li r0, 0x1
+	ori r4, r4, 0x1
+	stw r4, 0x8(r3)
+	stb r0, 0x37(r3)
+	@2:
+	lwz r0, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm void party_motion_damage(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x40(r1)
+	mflr r0
+	stw r0, 0x44(r1)
+	stw r31, 0x3c(r1)
+	mr r31, r3
+	stw r30, 0x38(r1)
+	lwz r3, 0x8(r3)
+	lwz r30, 0x160(r31)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @1
+	rlwinm r3, r3, 0, 31, 29
+	li r0, 0x0
+	stw r3, 0x8(r31)
+	stb r0, 0x38(r31)
+	@1:
+	lbz r0, 0x38(r31)
+	cmpwi r0, 0xa
+	beq @2
+	bge @3
+	cmpwi r0, 0x1
+	beq @4
+	bge @5
+	cmpwi r0, 0x0
+	bge @6
+	b @5
+	@3:
+	cmpwi r0, 0xc
+	beq @7
+	bge @5
+	b @8
+	@6:
+	mr r3, r31
+	li r4, 0x8
+	bl partyChgPoseId
+	lfs f1, float_15_8041ce60(r2)
+	li r3, 0x3c
+	lfs f0, float_0_8041cdec(r2)
+	li r0, 0x1
+	stfs f1, 0x114(r31)
+	stfs f0, 0x118(r31)
+	stw r3, 0x24(r31)
+	stb r0, 0x38(r31)
+	@4:
+	lfs f1, 0x5c(r31)
+	addi r3, r1, 0x20
+	lfs f0, 0x114(r31)
+	addi r4, r1, 0x10
+	addi r5, r1, 0xc
+	addi r6, r1, 0x8
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r31)
+	lwz r7, 0x58(r31)
+	lwz r0, 0x5c(r31)
+	stw r7, 0x20(r1)
+	stw r0, 0x24(r1)
+	lwz r0, 0x60(r31)
+	stw r0, 0x28(r1)
+	bl marioGetScreenPos
+	lfs f1, 0xc(r1)
+	lfs f0, float_neg300_8041ce64(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @5
+	li r3, 0x14
+	li r0, 0xa
+	stw r3, 0x24(r31)
+	stb r0, 0x38(r31)
+	b @5
+	@2:
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0x1f
+	beq @5
+	cmplwi r0, 0x20
+	beq @5
+	lwz r3, 0x24(r31)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r31)
+	bgt @5
+	addi r3, r1, 0x2c
+	bl partyGetReturnPos
+	lfs f0, 0x2c(r1)
+	mr r3, r31
+	lfs f3, float_200_8041cdd8(r2)
+	stfs f0, 0x58(r31)
+	lfs f1, float_0_8041cdec(r2)
+	lfs f2, 0x30(r1)
+	lfs f0, float_neg1_8041cdf8(r2)
+	fadds f2, f3, f2
+	stfs f2, 0x5c(r31)
+	lfs f2, 0x34(r1)
+	stfs f2, 0x60(r31)
+	stfs f1, 0x114(r31)
+	stfs f0, 0x118(r31)
+	bl unk_800c9398
+	lwz r3, 0x0(r31)
+	li r0, 0xb
+	ori r3, r3, 0x20
+	stw r3, 0x0(r31)
+	lwz r3, 0x0(r31)
+	oris r3, r3, 0x200
+	stw r3, 0x0(r31)
+	stb r0, 0x38(r31)
+	b @5
+	@8:
+	lwz r7, 0x58(r31)
+	addi r3, r1, 0x14
+	lwz r0, 0x5c(r31)
+	addi r4, r1, 0x10
+	addi r5, r1, 0xc
+	addi r6, r1, 0x8
+	stw r7, 0x14(r1)
+	stw r0, 0x18(r1)
+	lwz r0, 0x60(r31)
+	stw r0, 0x1c(r1)
+	bl marioGetScreenPos
+	lfs f1, 0xc(r1)
+	lfs f0, float_240_8041ce68(r2)
+	fcmpo cr0, f1, f0
+	ble @9
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 7, 5
+	stw r0, 0x0(r31)
+	@9:
+	mr r3, r31
+	bl partyMove
+	lfs f0, 0x114(r31)
+	lfs f1, float_neg6_8041ce2c(r2)
+	fcmpo cr0, f0, f1
+	cror eq, lt, eq
+	bne @10
+	lfs f0, float_0_8041cdec(r2)
+	stfs f0, 0x118(r31)
+	stfs f1, 0x114(r31)
+	@10:
+	lfs f1, 0x5c(r31)
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f1, f0
+	bge @11
+	lwz r3, 0x8c(r30)
+	lwz r0, 0x90(r30)
+	lfs f0, float_200_8041cdd8(r2)
+	stw r3, 0x58(r31)
+	stw r0, 0x5c(r31)
+	lwz r0, 0x94(r30)
+	stw r0, 0x60(r31)
+	lfs f1, 0x5c(r31)
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r31)
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 28, 24
+	stw r0, 0x0(r31)
+	@11:
+	lwz r3, 0x138(r31)
+	cmplwi r3, 0x0
+	beq @5
+	bne @12
+	li r0, 0x0
+	b @13
+	@12:
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @14
+	li r0, 0x1
+	b @13
+	@14:
+	li r0, 0x0
+	@13:
+	cmpwi r0, 0x0
+	bne @5
+	li r3, 0xc
+	li r0, 0x1e
+	stb r3, 0x38(r31)
+	stw r0, 0x24(r31)
+	b @5
+	@7:
+	lwz r3, 0x24(r31)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r31)
+	bgt @5
+	mr r3, r31
+	li r4, 0x2
+	bl partyChgRunMode
+	li r0, 0x0
+	stb r0, 0x3b(r31)
+	lwz r0, 0x4(r31)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r31)
+	@5:
+	lwz r0, 0x44(r1)
+	lwz r31, 0x3c(r1)
+	lwz r30, 0x38(r1)
+	mtlr r0
+	addi r1, r1, 0x40
+	blr
+}
+
+asm void party_motion_upstairs(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x8(r3)
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r4, r4, 0, 31, 29
+	li r0, 0x3
+	stw r4, 0x8(r3)
+	lfs f0, float_3_8041ce0c(r2)
+	lwz r4, 0x0(r3)
+	ori r4, r4, 0x40
+	stw r4, 0x0(r3)
+	stw r0, unk_804189ec(r13)
+	lfs f2, 0x120(r3)
+	lfs f1, 0x5c(r3)
+	fsubs f1, f2, f1
+	fdivs f0, f1, f0
+	stfs f0, unk_804189e8(r13)
+	@1:
+	lfs f1, 0x5c(r3)
+	lfs f0, unk_804189e8(r13)
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r3)
+	lwz r4, unk_804189ec(r13)
+	subic. r0, r4, 0x1
+	stw r0, unk_804189ec(r13)
+	bgt @2
+	lwz r0, 0x0(r3)
+	li r4, 0x1
+	rlwinm r0, r0, 0, 26, 24
+	stw r0, 0x0(r3)
+	bl partyChgMot
+	@2:
+	lwz r0, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 party_motion_fall(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	stw r31, 0x2c(r1)
+	stw r30, 0x28(r1)
+	mr r30, r3
+	stw r29, 0x24(r1)
+	lwz r0, 0x0(r3)
+	lwz r31, 0x160(r3)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @1
+	bl partyGetFootmarkId
+	bl partyNextReadId
+	@1:
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @2
+	rlwinm r0, r3, 0, 31, 29
+	mr r3, r30
+	stw r0, 0x8(r30)
+	li r4, 0x4
+	bl partyChgPoseId
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 13, 11
+	stw r0, 0x0(r30)
+	@2:
+	lwz r0, 0x0(r30)
+	li r29, 0x0
+	rlwinm. r0, r0, 0, 6, 6
+	bne @3
+	lfs f0, 0x114(r30)
+	mr r3, r30
+	lfs f1, float_10_8041cdd4(r2)
+	fabs f2, f0
+	bl partySearchGround
+	mr r29, r3
+	@3:
+	cmplwi r29, 0x0
+	beq @4
+	mr r3, r29
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @4
+	lbz r0, 0x32(r30)
+	li r29, 0x0
+	cmplwi r0, 0x0
+	bne @4
+	lbz r0, 0x4c(r30)
+	extsb. r0, r0
+	bne @4
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@4:
+	cmplwi r29, 0x0
+	stw r29, 0x138(r30)
+	bne @5
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 31, 29
+	stw r0, 0x0(r30)
+	lwz r3, 0x0(r30)
+	rlwinm. r0, r3, 0, 26, 26
+	bne @6
+	ori r0, r3, 0x20
+	lfs f1, float_0_8041cdec(r2)
+	stw r0, 0x0(r30)
+	lfs f0, 0x11c(r30)
+	fcmpu cr0, f1, f0
+	bne @6
+	lfs f0, float_neg1p4_8041ce6c(r2)
+	stfs f0, 0x11c(r30)
+	@6:
+	lfs f2, 0x114(r30)
+	lfs f1, 0x11c(r30)
+	lfs f0, float_neg16_8041ce70(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x114(r30)
+	lfs f1, 0x114(r30)
+	fcmpo cr0, f1, f0
+	bge @7
+	stfs f0, 0x114(r30)
+	@7:
+	lfs f2, 0x5c(r30)
+	lfs f1, 0x114(r30)
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x5c(r30)
+	lfs f1, 0x5c(r30)
+	fcmpo cr0, f1, f0
+	bge @8
+	lfs f0, float_neg2001_8041ce74(r2)
+	stfs f0, 0x5c(r30)
+	lhz r0, 0x2e(r31)
+	cmplwi r0, 0x1f
+	beq @9
+	cmplwi r0, 0x20
+	bne @10
+	@9:
+	li r3, 0x2
+	b @11
+	@10:
+	lwz r0, 0x0(r30)
+	lfs f0, float_0_8041cdec(r2)
+	rlwinm r0, r0, 0, 28, 24
+	stw r0, 0x0(r30)
+	stfs f0, 0x114(r30)
+	stfs f0, 0x11c(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x8c(r31)
+	lfs f4, 0x94(r31)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x1ac(r31)
+	bl toMovedir
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f0, f1
+	bl revise360
+	stfs f1, 0x54(r30)
+	mr r3, r30
+	addi r4, r30, 0x58
+	bl partyGetAppearPos4
+	lfs f1, 0x5c(r30)
+	mr r3, r30
+	lfs f0, float_37_8041ce78(r2)
+	li r4, 0x0
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r30)
+	bl partyChgMot
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 7, 5
+	stw r0, 0x0(r30)
+	@8:
+	lfs f1, 0x104(r30)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @12
+	lwz r5, 0x58(r30)
+	mr r3, r30
+	lwz r0, 0x5c(r30)
+	addi r4, r1, 0x8
+	lfs f0, float_1p3_8041ce7c(r2)
+	stw r5, 0x8(r1)
+	fmuls f1, f0, f1
+	stw r0, 0xc(r1)
+	lwz r0, 0x60(r30)
+	stw r0, 0x10(r1)
+	lfs f2, 0x100(r30)
+	bl partySearchFrontWall
+	lfs f0, 0x8(r1)
+	stfs f0, 0x58(r30)
+	lfs f0, 0x10(r1)
+	stfs f0, 0x60(r30)
+	@12:
+	li r3, 0x2
+	b @11
+	@5:
+	lwz r3, 0x0(r30)
+	rlwinm. r0, r3, 0, 26, 26
+	beq @13
+	rlwinm r0, r3, 0, 28, 24
+	lfs f1, float_0_8041cdec(r2)
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	ori r0, r0, 0x2
+	stw r0, 0x0(r30)
+	stfs f1, 0x114(r30)
+	lfs f0, 0xe4(r30)
+	stfs f0, 0x5c(r30)
+	lfs f0, 0x104(r30)
+	fcmpu cr0, f1, f0
+	bne @14
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	b @15
+	@14:
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMot
+	@15:
+	mr r3, r30
+	bl N_partyPlaySfxPartyLanding1
+	li r3, 0x3
+	b @11
+	@13:
+	rlwinm r0, r3, 0, 19, 17
+	lfs f1, float_0_8041cdec(r2)
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 28, 24
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	ori r0, r0, 0x2
+	stw r0, 0x0(r30)
+	stfs f1, 0x114(r30)
+	lfs f0, 0xe4(r30)
+	stfs f0, 0x5c(r30)
+	lfs f0, 0x104(r30)
+	fcmpu cr0, f1, f0
+	bne @16
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	b @17
+	@16:
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMot
+	@17:
+	mr r3, r30
+	bl N_partyPlaySfxPartyLanding1
+	lwz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @18
+	bl partyClearFootmark
+	b @19
+	@18:
+	bl partyClearFootmark2
+	@19:
+	li r3, 0x3
+	@11:
+	lwz r0, 0x34(r1)
+	lwz r31, 0x2c(r1)
+	lwz r30, 0x28(r1)
+	lwz r29, 0x24(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+
+asm void party_motion_jump2(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x40(r1)
+	mflr r0
+	stw r0, 0x44(r1)
+	stw r31, 0x3c(r1)
+	stw r30, 0x38(r1)
+	mr r30, r3
+	stw r29, 0x34(r1)
+	lwz r3, 0x8(r3)
+	lwz r31, 0x160(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @1
+	rlwinm r3, r3, 0, 31, 29
+	li r0, 0x0
+	stw r3, 0x8(r30)
+	lfs f2, float_neg1_8041cdf8(r2)
+	stw r0, 0x24(r30)
+	lfs f1, float_2p25_8041ce80(r2)
+	lfs f0, 0x224(r31)
+	fmuls f0, f2, f0
+	stfs f0, 0x11c(r30)
+	lfs f0, 0x224(r31)
+	fmuls f0, f1, f0
+	stfs f0, 0x104(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl distABf
+	lfs f0, float_50_8041cde8(r2)
+	fcmpo cr0, f1, f0
+	ble @2
+	fmr f1, f0
+	@2:
+	stfs f1, 0x128(r30)
+	lfs f3, float_10_8041cdd4(r2)
+	lfs f2, 0x104(r30)
+	lfs f0, float_0p5_8041ce00(r2)
+	fdivs f1, f1, f2
+	lfs f4, 0x98(r30)
+	lfs f2, 0x5c(r30)
+	fmadds f0, f3, f1, f0
+	fsubs f4, f4, f2
+	fdivs f0, f0, f3
+	fctiwz f0, f0
+	stfd f0, 0x18(r1)
+	lwz r5, 0x1c(r1)
+	cmpwi r5, 0xa
+	bge @3
+	li r5, 0xa
+	@3:
+	xoris r3, r5, 0x8000
+	lis r0, 0x4330
+	stw r3, 0x24(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfd f3, double_to_int_802f3f48@l(r4)
+	stw r0, 0x20(r1)
+	lfs f2, float_0p5_8041ce00(r2)
+	lfd f0, 0x20(r1)
+	stw r5, 0x24(r30)
+	fsubs f5, f0, f3
+	lfs f0, float_20_8041cdc0(r2)
+	lfs f1, 0x128(r30)
+	lfs f3, 0x224(r31)
+	fdivs f1, f1, f5
+	fmuls f1, f3, f1
+	stfs f1, 0x104(r30)
+	lfs f1, 0x11c(r30)
+	fabs f1, f1
+	fmuls f1, f5, f1
+	fmuls f1, f5, f1
+	fmadds f1, f2, f1, f4
+	fdivs f1, f1, f5
+	stfs f1, 0x114(r30)
+	lfs f2, 0x114(r30)
+	lfs f1, 0x224(r31)
+	fmuls f1, f2, f1
+	stfs f1, 0x114(r30)
+	lfs f1, 0x114(r30)
+	fcmpo cr0, f1, f0
+	ble @4
+	stfs f0, 0x114(r30)
+	@4:
+	lfs f1, 0x114(r30)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f1, f0
+	bge @5
+	stfs f0, 0x114(r30)
+	@5:
+	mr r3, r30
+	li r4, 0x4
+	bl partyChgPoseId
+	lwz r0, 0x0(r30)
+	addi r4, r30, 0x58
+	li r3, 0x927
+	ori r0, r0, 0x10
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 31, 29
+	stw r0, 0x0(r30)
+	bl psndSFXOn_3D
+	li r0, 0x0
+	stb r0, 0x38(r30)
+	@1:
+	lbz r0, 0x38(r30)
+	cmpwi r0, 0x1
+	beq @6
+	bge @7
+	cmpwi r0, 0x0
+	bge @8
+	b @7
+	@8:
+	li r0, 0x1
+	stb r0, 0x38(r30)
+	b @7
+	@6:
+	lfs f1, 0x114(r30)
+	mr r3, r30
+	lfs f0, 0x11c(r30)
+	addi r4, r1, 0x8
+	fadds f0, f1, f0
+	stfs f0, 0x114(r30)
+	lfs f1, 0x5c(r30)
+	lfs f0, 0x114(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x5c(r30)
+	lwz r5, 0x58(r30)
+	lwz r0, 0x5c(r30)
+	stw r5, 0x8(r1)
+	stw r0, 0xc(r1)
+	lwz r0, 0x60(r30)
+	stw r0, 0x10(r1)
+	lfs f1, 0x104(r30)
+	lfs f2, 0x100(r30)
+	bl partySearchFrontWall
+	lfs f0, 0x8(r1)
+	lfs f2, float_0_8041cdec(r2)
+	stfs f0, 0x58(r30)
+	lfs f0, 0x10(r1)
+	stfs f0, 0x60(r30)
+	lfs f0, 0x114(r30)
+	fcmpo cr0, f0, f2
+	cror eq, lt, eq
+	bne @7
+	fabs f1, f0
+	mr r3, r30
+	bl partySearchGround
+	lfs f0, 0xe4(r30)
+	mr. r29, r3
+	stfs f0, 0xc(r1)
+	beq @9
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @9
+	lbz r0, 0x4c(r30)
+	extsb. r0, r0
+	bne @10
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@10:
+	li r0, 0x0
+	mr r3, r30
+	stw r0, 0x138(r30)
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r30)
+	b @11
+	@9:
+	lfs f0, 0xc(r1)
+	cmplwi r29, 0x0
+	stfs f0, 0x5c(r30)
+	stw r29, 0x138(r30)
+	beq @7
+	mr r3, r30
+	bl N_partyPlaySfxPartyLanding1
+	lwz r0, 0x0(r30)
+	lfs f0, float_0_8041cdec(r2)
+	rlwinm r0, r0, 0, 28, 24
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	ori r0, r0, 0x2
+	stw r0, 0x0(r30)
+	stfs f0, 0x114(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl distABf
+	lfs f0, float_5_8041ce18(r2)
+	fcmpo cr0, f1, f0
+	bge @12
+	li r4, 0x0
+	b @13
+	@12:
+	li r4, 0x1
+	@13:
+	mr r3, r30
+	bl partyChgMot
+	@7:
+	lfs f1, 0x5c(r30)
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f1, f0
+	bge @11
+	lwz r0, 0x0(r30)
+	lfs f0, float_0_8041cdec(r2)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x0(r30)
+	stfs f0, 0x114(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x8c(r31)
+	lfs f4, 0x94(r31)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	mr r3, r30
+	li r4, 0x0
+	lwz r5, 0x8c(r31)
+	lwz r0, 0x90(r31)
+	stw r5, 0x58(r30)
+	stw r0, 0x5c(r30)
+	lwz r0, 0x94(r31)
+	stw r0, 0x60(r30)
+	bl partyChgMot
+	@11:
+	lwz r0, 0x44(r1)
+	lwz r31, 0x3c(r1)
+	lwz r30, 0x38(r1)
+	lwz r29, 0x34(r1)
+	mtlr r0
+	addi r1, r1, 0x40
+	blr
+}
+
+asm void party_motion_jump(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0xb0(r1)
+	mflr r0
+	stw r0, 0xb4(r1)
+	stfd f31, 0xa0(r1)
+	psq_st f31, 0xa8(r1), 0, 0
+	stfd f30, 0x90(r1)
+	psq_st f30, 0x98(r1), 0, 0
+	stmw r27, 0x7c(r1)
+	mr r28, r3
+	lis r4, vec3_802f3e40@ha
+	lwz r30, 0x160(r3)
+	addi r31, r4, vec3_802f3e40@l
+	bl partyGetFootmarkId
+	lwz r4, 0x8(r28)
+	mr r29, r3
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r3, r4, 0, 31, 29
+	li r0, 0x0
+	stw r3, 0x8(r28)
+	stb r0, 0x38(r28)
+	@1:
+	lbz r0, 0x38(r28)
+	cmpwi r0, 0xa
+	beq @2
+	bge @3
+	cmpwi r0, 0x0
+	beq @4
+	b @3
+	@4:
+	lfs f0, 0x94(r28)
+	stfs f0, 0x10(r1)
+	lfs f0, 0x98(r28)
+	stfs f0, 0xc(r1)
+	lfs f0, 0x9c(r28)
+	stfs f0, 0x8(r1)
+	lha r0, 0x28(r28)
+	cmpwi r0, 0x0
+	bne @5
+	lbz r0, 0x34(r28)
+	cmplwi r0, 0x9
+	bne @6
+	@5:
+	lfs f0, 0x58(r28)
+	addi r3, r1, 0x10
+	addi r4, r1, 0x8
+	stfs f0, 0x10(r1)
+	lfs f0, 0x5c(r28)
+	stfs f0, 0xc(r1)
+	lfs f0, 0x60(r28)
+	stfs f0, 0x8(r1)
+	lfs f1, 0x104(r28)
+	lfs f2, 0x100(r28)
+	bl movePos
+	lwz r0, 0x18(r31)
+	lwz r3, 0x1c(r31)
+	stw r0, 0x4c(r1)
+	lfs f0, 0x10(r1)
+	lwz r0, 0x20(r31)
+	stfs f0, 0x4c(r1)
+	lfs f1, 0xc(r1)
+	stw r3, 0x50(r1)
+	lfs f0, 0x8(r1)
+	stw r0, 0x54(r1)
+	lwz r0, 0x4c(r1)
+	stfs f1, 0x50(r1)
+	stfs f0, 0x54(r1)
+	lwz r3, 0x50(r1)
+	stw r0, 0x94(r28)
+	lwz r0, 0x54(r1)
+	stw r3, 0x98(r28)
+	stw r0, 0x9c(r28)
+	b @7
+	@6:
+	lwz r0, 0x8(r28)
+	rlwinm. r0, r0, 0, 9, 9
+	bne @7
+	mr r3, r29
+	bl partyGetFootmarkWriteId
+	mr r27, r3
+	mr r3, r29
+	bl partyGetFootmarkReadId
+	cmpw r3, r27
+	bne @8
+	lfs f1, 0x58(r28)
+	mr r3, r29
+	lfs f2, 0x60(r28)
+	bl partyGetTargetDist
+	lfs f2, float_2_8041ce08(r2)
+	lfs f0, 0x1b4(r30)
+	fmuls f0, f2, f0
+	fcmpo cr0, f1, f0
+	ble @9
+	lfs f1, 0x58(r28)
+	mr r3, r29
+	lfs f2, 0x60(r28)
+	bl partyGetTargetDir
+	fmr f30, f1
+	mr r3, r28
+	addi r4, r1, 0x58
+	bl getFrontFloor
+	lfs f3, 0x5c(r1)
+	fmr f2, f30
+	lfs f0, float_10_8041cdd4(r2)
+	addi r3, r1, 0x10
+	lfs f1, float_0p6_8041ce84(r2)
+	addi r4, r1, 0x8
+	fadds f0, f3, f0
+	stfs f0, 0x5c(r1)
+	stfs f0, 0xc(r1)
+	lfs f0, 0x58(r28)
+	stfs f0, 0x10(r1)
+	lfs f0, 0x60(r28)
+	stfs f0, 0x8(r1)
+	lfs f0, 0xf4(r28)
+	fmuls f1, f1, f0
+	bl movePos
+	@9:
+	lwz r0, 0x24(r31)
+	lwz r3, 0x28(r31)
+	stw r0, 0x40(r1)
+	lfs f0, 0x10(r1)
+	lwz r0, 0x2c(r31)
+	stfs f0, 0x40(r1)
+	lfs f1, 0xc(r1)
+	stw r3, 0x44(r1)
+	lfs f0, 0x8(r1)
+	stw r0, 0x48(r1)
+	lwz r0, 0x40(r1)
+	stfs f1, 0x44(r1)
+	stfs f0, 0x48(r1)
+	lwz r3, 0x44(r1)
+	stw r0, 0x94(r28)
+	lwz r0, 0x48(r1)
+	stw r3, 0x98(r28)
+	stw r0, 0x9c(r28)
+	b @7
+	@8:
+	mr r3, r29
+	addi r4, r1, 0x10
+	addi r5, r1, 0xc
+	addi r6, r1, 0x8
+	bl partyGetReadId
+	lfs f30, float_50_8041cde8(r2)
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x10(r1)
+	lfs f4, 0x8(r1)
+	bl distABf
+	lfs f2, 0xc(r1)
+	fmr f31, f1
+	lfs f0, 0x5c(r28)
+	lfs f3, float_1p4_8041ce88(r2)
+	fsubs f0, f2, f0
+	lfs f2, float_50_8041cde8(r2)
+	fmuls f0, f3, f0
+	fcmpo cr0, f2, f0
+	ble @10
+	fmr f30, f0
+	@10:
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x10(r1)
+	lfs f4, 0x8(r1)
+	bl angleABf
+	addi r3, r1, 0x18
+	addi r4, r1, 0x14
+	bl sincosf
+	fcmpo cr0, f31, f30
+	ble @11
+	fmr f31, f30
+	mr r3, r29
+	bl partyGetTargetDistY
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f0, f1
+	bne @12
+	fmr f31, f0
+	@12:
+	lfs f1, 0x58(r28)
+	lfs f0, 0x18(r1)
+	stfs f1, 0x10(r1)
+	lwz r0, 0x30(r31)
+	fmadds f3, f31, f0, f1
+	lfs f1, 0x60(r28)
+	lfs f0, 0x14(r1)
+	stw r0, 0x34(r1)
+	lwz r3, 0x34(r31)
+	fmadds f2, f31, f0, f1
+	stfs f1, 0x8(r1)
+	lwz r0, 0x38(r31)
+	stfs f3, 0x34(r1)
+	lfs f1, 0xc(r1)
+	lfs f0, float_10_8041cdd4(r2)
+	stw r0, 0x3c(r1)
+	fadds f0, f1, f0
+	lwz r4, 0x34(r1)
+	stw r3, 0x38(r1)
+	stfs f0, 0x38(r1)
+	stfs f2, 0x3c(r1)
+	lwz r3, 0x38(r1)
+	stfs f3, 0x10(r1)
+	lwz r0, 0x3c(r1)
+	stfs f2, 0x8(r1)
+	stfs f0, 0xc(r1)
+	stw r4, 0x94(r28)
+	stw r3, 0x98(r28)
+	stw r0, 0x9c(r28)
+	b @13
+	@11:
+	mr r3, r29
+	bl partyGetTargetDistY
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f0, f1
+	bne @14
+	fmr f31, f0
+	@14:
+	lfs f1, 0x18(r1)
+	lfs f0, 0x10(r1)
+	lwz r0, 0x3c(r31)
+	fmadds f2, f31, f1, f0
+	lwz r3, 0x40(r31)
+	stw r0, 0x28(r1)
+	lwz r0, 0x44(r31)
+	stfs f2, 0x28(r1)
+	lfs f1, 0x14(r1)
+	lfs f0, 0x8(r1)
+	stw r3, 0x2c(r1)
+	fmadds f1, f31, f1, f0
+	lfs f0, 0xc(r1)
+	stw r0, 0x30(r1)
+	lwz r4, 0x28(r1)
+	stfs f0, 0x2c(r1)
+	stfs f1, 0x30(r1)
+	lwz r3, 0x2c(r1)
+	stfs f2, 0x10(r1)
+	lwz r0, 0x30(r1)
+	stfs f1, 0x8(r1)
+	stw r4, 0x94(r28)
+	stw r3, 0x98(r28)
+	stw r0, 0x9c(r28)
+	@13:
+	fcmpo cr0, f31, f30
+	bge @7
+	mr r3, r29
+	bl partyNextReadId
+	@7:
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x94(r28)
+	lfs f4, 0x9c(r28)
+	bl distABf
+	stfs f1, 0x128(r28)
+	lha r0, 0x28(r28)
+	cmpwi r0, 0x0
+	bne @15
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x94(r28)
+	lfs f4, 0x9c(r28)
+	bl angleABf
+	stfs f1, 0x100(r28)
+	lfs f1, float_2p25_8041ce80(r2)
+	lwz r3, 0x160(r28)
+	lfs f0, 0x224(r3)
+	fmuls f0, f1, f0
+	stfs f0, 0x104(r28)
+	@15:
+	lfs f5, 0x128(r28)
+	lfs f0, 0x104(r28)
+	lfs f2, float_0p9_8041ce8c(r2)
+	fdivs f1, f5, f0
+	lfs f3, float_10_8041cdd4(r2)
+	lfs f0, float_0p5_8041ce00(r2)
+	fmuls f1, f2, f1
+	fmadds f0, f3, f1, f0
+	fdivs f0, f0, f3
+	fctiwz f0, f0
+	stfd f0, 0x68(r1)
+	lwz r0, 0x6c(r1)
+	stw r0, 0x24(r28)
+	lwz r0, 0x24(r28)
+	cmpwi r0, 0xc
+	bge @16
+	li r0, 0xc
+	stw r0, 0x24(r28)
+	@16:
+	lwz r0, 0x24(r28)
+	cmpwi r0, 0x28
+	ble @17
+	li r0, 0x28
+	stw r0, 0x24(r28)
+	@17:
+	lwz r3, 0x24(r28)
+	lis r0, 0x4330
+	lfs f1, 0x98(r28)
+	xoris r3, r3, 0x8000
+	lfs f0, 0x5c(r28)
+	stw r3, 0x6c(r1)
+	fsubs f6, f1, f0
+	lfd f3, 0x108(r31)
+	stw r0, 0x68(r1)
+	lfs f4, float_0p5_8041ce00(r2)
+	lfd f2, 0x68(r1)
+	fabs f1, f6
+	lfs f0, float_1_8041ce1c(r2)
+	fsubs f2, f2, f3
+	fcmpo cr0, f1, f0
+	fmuls f4, f4, f2
+	bge @18
+	lfs f6, float_25_8041ce90(r2)
+	b @19
+	@18:
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f6, f0
+	cror eq, gt, eq
+	bne @20
+	b @19
+	@20:
+	lfs f6, float_10_8041cdd4(r2)
+	@19:
+	fadds f3, f6, f6
+	lfs f2, 0x224(r30)
+	fmsubs f1, f4, f4, f4
+	lfs f0, float_13_8041ce94(r2)
+	fdivs f3, f3, f1
+	fmuls f1, f3, f4
+	fmuls f1, f2, f1
+	stfs f1, 0x114(r28)
+	lfs f1, 0x114(r28)
+	fcmpo cr0, f1, f0
+	ble @21
+	stfs f0, 0x114(r28)
+	@21:
+	lfs f1, 0x114(r28)
+	lfs f0, float_3_8041ce0c(r2)
+	fcmpo cr0, f1, f0
+	bge @22
+	stfs f0, 0x114(r28)
+	@22:
+	fneg f1, f3
+	lfs f0, 0x224(r30)
+	mr r3, r28
+	li r4, 0x4
+	fmuls f0, f1, f0
+	stfs f0, 0x11c(r28)
+	lwz r0, 0x0(r28)
+	ori r0, r0, 0x10
+	stw r0, 0x0(r28)
+	lwz r0, 0x0(r28)
+	rlwinm r0, r0, 0, 31, 29
+	stw r0, 0x0(r28)
+	bl partyChgPoseId
+	addi r4, r28, 0x58
+	li r3, 0x927
+	bl psndSFXOn_3D
+	li r0, 0xa
+	stb r0, 0x38(r28)
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @3
+	mr r3, r28
+	bl partyGetFootmarkId
+	bl partyNextReadId
+	b @3
+	@2:
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @23
+	mr r3, r28
+	bl partyGetFootmarkId
+	bl partyNextReadId
+	@23:
+	lfs f2, 0x114(r28)
+	lfs f1, 0x11c(r28)
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x114(r28)
+	lfs f2, 0x5c(r28)
+	lfs f1, 0x114(r28)
+	fadds f1, f2, f1
+	stfs f1, 0x5c(r28)
+	lfs f1, 0x5c(r28)
+	fcmpo cr0, f1, f0
+	bge @24
+	lwz r0, 0x0(r28)
+	lfs f0, float_0_8041cdec(r2)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x0(r28)
+	stfs f0, 0x114(r28)
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl angleABf
+	stfs f1, 0x100(r28)
+	mr r3, r28
+	li r4, 0x0
+	lwz r5, 0x8c(r30)
+	lwz r0, 0x90(r30)
+	stw r5, 0x58(r28)
+	stw r0, 0x5c(r28)
+	lwz r0, 0x94(r30)
+	stw r0, 0x60(r28)
+	bl partyChgMot
+	b @3
+	@24:
+	lfs f0, 0x114(r28)
+	lfs f2, float_0_8041cdec(r2)
+	fcmpo cr0, f0, f2
+	cror eq, lt, eq
+	bne @25
+	lwz r0, 0x0(r28)
+	mr r3, r28
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x0(r28)
+	lwz r0, 0x0(r28)
+	ori r0, r0, 0x20
+	stw r0, 0x0(r28)
+	lfs f0, 0x114(r28)
+	fabs f1, f0
+	bl partySearchGround
+	mr. r29, r3
+	beq @26
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @26
+	lbz r0, 0x4c(r28)
+	extsb. r0, r0
+	bne @27
+	lwz r0, 0x8(r28)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r28)
+	lwz r0, 0x0(r28)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r28)
+	@27:
+	li r0, 0x0
+	mr r3, r28
+	stw r0, 0x138(r28)
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r28)
+	b @3
+	@26:
+	stw r29, 0x138(r28)
+	cmplwi r29, 0x0
+	lfs f0, 0xe4(r28)
+	stfs f0, 0x5c(r28)
+	beq @25
+	lwz r0, 0x0(r28)
+	mr r3, r28
+	ori r0, r0, 0x2
+	stw r0, 0x0(r28)
+	lwz r0, 0x0(r28)
+	rlwinm r0, r0, 0, 28, 24
+	stw r0, 0x0(r28)
+	bl N_partyPlaySfxPartyLanding1
+	lfs f0, float_0_8041cdec(r2)
+	mr r3, r28
+	li r4, 0x0
+	stfs f0, 0x114(r28)
+	bl partyChgMot
+	lwz r0, 0x8(r28)
+	oris r0, r0, 0x80
+	stw r0, 0x8(r28)
+	b @3
+	@25:
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 7, 7
+	beq @28
+	lfs f1, 0x104(r28)
+	addi r3, r1, 0x1c
+	lfs f2, 0x100(r28)
+	addi r4, r1, 0x24
+	bl movePos
+	b @3
+	@28:
+	lwz r5, 0x58(r28)
+	mr r3, r28
+	lwz r0, 0x5c(r28)
+	addi r4, r1, 0x1c
+	stw r5, 0x1c(r1)
+	stw r0, 0x20(r1)
+	lwz r0, 0x60(r28)
+	stw r0, 0x24(r1)
+	lfs f1, 0x104(r28)
+	lfs f2, 0x100(r28)
+	bl partySearchFrontWall
+	cmplwi r3, 0x0
+	beq @29
+	stw r3, 0x12c(r28)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r28)
+	fcmpu cr0, f1, f0
+	beq @29
+	stw r3, 0x134(r28)
+	@29:
+	lfs f0, 0x1c(r1)
+	stfs f0, 0x58(r28)
+	lfs f0, 0x24(r1)
+	stfs f0, 0x60(r28)
+	@3:
+	psq_l f31, 0xa8(r1), 0, 0
+	lfd f31, 0xa0(r1)
+	psq_l f30, 0x98(r1), 0, 0
+	lfd f30, 0x90(r1)
+	lmw r27, 0x7c(r1)
+	lwz r0, 0xb4(r1)
+	mtlr r0
+	addi r1, r1, 0xb0
+	blr
+}
+
+asm void party_motion_beside_mario(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x60(r1)
+	mflr r0
+	stw r0, 0x64(r1)
+	stfd f31, 0x50(r1)
+	psq_st f31, 0x58(r1), 0, 0
+	stw r31, 0x4c(r1)
+	stw r30, 0x48(r1)
+	stw r29, 0x44(r1)
+	mr r30, r3
+	lwz r3, 0x8(r3)
+	lwz r31, 0x160(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @1
+	rlwinm r0, r3, 0, 31, 29
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @2
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @3
+	@2:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @4
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @3
+	@4:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@3:
+	lfs f0, float_90_8041ce48(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	addi r3, r1, 0x28
+	lfs f2, float_1p5_8041ce98(r2)
+	addi r4, r1, 0x24
+	lfs f1, 0x1b4(r31)
+	lfs f0, 0x8c(r31)
+	fmuls f1, f2, f1
+	stfs f0, 0x28(r1)
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f2, 0x54(r30)
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	fctiwz f0, f1
+	stfd f0, 0x30(r1)
+	lwz r0, 0x34(r1)
+	stw r0, 0x24(r30)
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	bgt @1
+	li r0, 0x1
+	stw r0, 0x24(r30)
+	@1:
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	beq @5
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @6
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @7
+	@6:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @8
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @7
+	@8:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@7:
+	lfs f0, float_90_8041ce48(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	@5:
+	lfs f1, 0x1b4(r31)
+	addi r3, r1, 0x28
+	lfs f0, 0x8c(r31)
+	addi r4, r1, 0x24
+	lfs f2, float_1p5_8041ce98(r2)
+	stfs f0, 0x28(r1)
+	fmuls f1, f2, f1
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f31, 0x90(r31)
+	lfs f2, 0x54(r30)
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl angleABf
+	lfs f0, touch_wall_ct(r13)
+	addi r4, r1, 0x8
+	lfs f4, float_0_8041cdec(r2)
+	addi r5, r1, 0xc
+	fadds f2, f31, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	lfs f1, 0x28(r1)
+	stfs f0, 0x14(r1)
+	addi r6, r1, 0x10
+	lfs f3, 0x24(r1)
+	addi r7, r1, 0x14
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r8, r1, 0x18
+	addi r9, r1, 0x1c
+	addi r10, r1, 0x20
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @9
+	lfs f31, float_neg2000_8041cdfc(r2)
+	b @10
+	@9:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0xc(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0x38(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, double_to_int_802f3f48@l(r4)
+	fctiwz f0, f0
+	stfd f0, 0x30(r1)
+	lwz r0, 0x34(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x3c(r1)
+	lfd f0, 0x38(r1)
+	fsubs f0, f0, f1
+	fdivs f31, f0, f2
+	bl hitGetAttr
+	@10:
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f31, f0
+	cror eq, lt, eq
+	bne @11
+	lfs f1, 0x1b4(r31)
+	lfs f0, 0x8c(r31)
+	lfs f2, float_1p5_8041ce98(r2)
+	stfs f0, 0x28(r1)
+	fmuls f31, f2, f1
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f1, 0x1a8(r31)
+	bl toMovedir
+	fmr f2, f1
+	addi r3, r1, 0x28
+	fmr f1, f31
+	addi r4, r1, 0x24
+	bl movePos
+	@11:
+	lfs f1, 0x180(r31)
+	lfs f0, float_1_8041ce1c(r2)
+	lfs f31, float_2_8041ce08(r2)
+	fcmpo cr0, f1, f0
+	ble @12
+	lfs f31, float_10_8041cdd4(r2)
+	@12:
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	lwz r3, 0x24(r30)
+	fcmpo cr0, f1, f31
+	subi r0, r3, 0x1
+	stw r0, 0x24(r30)
+	cror eq, gt, eq
+	bne @13
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	ble @13
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	lfs f2, float_10_8041cdd4(r2)
+	lfs f0, float_2_8041ce08(r2)
+	fdivs f1, f1, f2
+	fcmpo cr0, f1, f0
+	ble @14
+	fmr f1, f0
+	@14:
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	bge @15
+	fmr f1, f0
+	@15:
+	mr r3, r30
+	bl unk_800c9398
+	mr r3, r30
+	bl partyMoveCheckWall
+	lfs f1, 0x104(r30)
+	mr r3, r30
+	bl unk_800c8f24
+	lfs f1, float_10_8041cdd4(r2)
+	mr r3, r30
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	mr. r29, r3
+	beq @16
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @16
+	lbz r0, 0x4c(r30)
+	li r29, 0x0
+	extsb. r0, r0
+	bne @16
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@16:
+	cmplwi r29, 0x0
+	stw r29, 0x138(r30)
+	bne @17
+	mr r3, r30
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r30)
+	@17:
+	lfs f0, 0xe4(r30)
+	stfs f0, 0x5c(r30)
+	b @18
+	@13:
+	li r0, 0x0
+	mr r3, r30
+	stw r0, 0x24(r30)
+	li r4, 0x1
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	@18:
+	lwz r0, 0x134(r30)
+	cmplwi r0, 0x0
+	beq @19
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	@19:
+	psq_l f31, 0x58(r1), 0, 0
+	lwz r0, 0x64(r1)
+	lfd f31, 0x50(r1)
+	lwz r31, 0x4c(r1)
+	lwz r30, 0x48(r1)
+	lwz r29, 0x44(r1)
+	mtlr r0
+	addi r1, r1, 0x60
+	blr
+}
+
+asm void party_motion_behind_mario_fly(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x70(r1)
+	mflr r0
+	stw r0, 0x74(r1)
+	stfd f31, 0x60(r1)
+	psq_st f31, 0x68(r1), 0, 0
+	stfd f30, 0x50(r1)
+	psq_st f30, 0x58(r1), 0, 0
+	stfd f29, 0x40(r1)
+	psq_st f29, 0x48(r1), 0, 0
+	stw r31, 0x3c(r1)
+	stw r30, 0x38(r1)
+	stw r29, 0x34(r1)
+	mr r30, r3
+	lwz r3, 0x8(r3)
+	lwz r31, 0x160(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @1
+	rlwinm r0, r3, 0, 31, 29
+	stw r0, 0x8(r30)
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x4
+	stw r0, 0x8(r30)
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 11, 11
+	bne @2
+	rlwinm. r0, r3, 0, 15, 15
+	bne @3
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @4
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @5
+	@4:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @6
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @5
+	@6:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@5:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	b @7
+	@3:
+	rlwinm r0, r3, 0, 16, 14
+	stw r0, 0x8(r30)
+	lfs f1, 0x8c(r31)
+	lfs f2, 0x94(r31)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl angleABf
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f0, f1
+	bl revise360
+	@7:
+	stfs f1, 0x54(r30)
+	@2:
+	mr r3, r30
+	addi r4, r30, 0x94
+	bl partyGetAppearPos4
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl distABf
+	fctiwz f0, f1
+	stfd f0, 0x20(r1)
+	lwz r0, 0x24(r1)
+	stw r0, 0x24(r30)
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	bgt @1
+	li r0, 0x1
+	stw r0, 0x24(r30)
+	@1:
+	lwz r0, 0x8(r30)
+	rlwinm. r0, r0, 0, 11, 11
+	bne @8
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	beq @8
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @9
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @10
+	@9:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @11
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @10
+	@11:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@10:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	@8:
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl angleABf
+	lfs f1, 0x180(r31)
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	ble @12
+	lfs f30, float_6_8041ce30(r2)
+	b @13
+	@12:
+	lfs f30, float_2_8041ce08(r2)
+	@13:
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl distABf
+	fmr f31, f1
+	lwz r3, 0x24(r30)
+	subi r0, r3, 0x1
+	fcmpo cr0, f31, f30
+	stw r0, 0x24(r30)
+	cror eq, gt, eq
+	beq @14
+	lfs f2, 0x98(r30)
+	lfs f1, 0x5c(r30)
+	lfs f0, float_2_8041ce08(r2)
+	fsubs f1, f2, f1
+	fabs f1, f1
+	fcmpo cr0, f1, f0
+	ble @15
+	@14:
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	ble @15
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl distABf
+	lwz r0, 0x8(r30)
+	rlwinm. r0, r0, 0, 11, 11
+	beq @16
+	lfs f29, float_3p6_8041ce9c(r2)
+	b @17
+	@16:
+	lfs f29, float_2_8041ce08(r2)
+	@17:
+	fcmpo cr0, f31, f30
+	bge @18
+	lfs f29, float_0_8041cdec(r2)
+	mr r3, r30
+	fmr f1, f29
+	bl unk_800c9398
+	@18:
+	fmr f1, f29
+	mr r3, r30
+	bl unk_800c93d0
+	lwz r6, 0x58(r30)
+	mr r3, r30
+	lwz r0, 0x5c(r30)
+	addi r4, r1, 0x8
+	addi r5, r1, 0xc
+	stw r6, 0x10(r1)
+	stw r0, 0x14(r1)
+	lwz r0, 0x60(r30)
+	stw r0, 0x18(r1)
+	bl partyGetMoveDirSpd
+	lfs f1, 0xc(r1)
+	mr r3, r30
+	lfs f2, 0x8(r1)
+	addi r4, r1, 0x10
+	bl partySearchFrontWall
+	cmplwi r3, 0x0
+	beq @19
+	stw r3, 0x12c(r30)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r30)
+	fcmpu cr0, f1, f0
+	beq @19
+	stw r3, 0x134(r30)
+	@19:
+	lfs f0, 0x10(r1)
+	mr r3, r30
+	lfs f2, float_0p05_8041cea0(r2)
+	stfs f0, 0x58(r30)
+	lfs f0, 0x18(r1)
+	stfs f0, 0x60(r30)
+	lfs f0, 0x98(r30)
+	lfs f1, 0x5c(r30)
+	fsubs f0, f0, f1
+	fmadds f0, f2, f0, f1
+	stfs f0, 0x5c(r30)
+	lfs f1, 0x104(r30)
+	bl unk_800c8f24
+	b @20
+	@15:
+	li r0, 0x0
+	stw r0, 0x24(r30)
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 10, 10
+	beq @21
+	rlwinm r0, r3, 0, 15, 13
+	stw r0, 0x8(r30)
+	lbz r0, 0x32(r30)
+	cmplwi r0, 0x1
+	bne @21
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	@21:
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	mr r3, r30
+	lfs f1, float_0_8041cdec(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	bl unk_800c9398
+	lwz r0, 0x0(r30)
+	mr r3, r30
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 12, 10
+	stw r0, 0x8(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 14, 12
+	stw r0, 0x8(r30)
+	bl unk_800c8e74
+	lwz r0, 0x134(r30)
+	cmplwi r0, 0x0
+	beq @22
+	lwz r0, 0x0(r30)
+	mr r3, r30
+	li r4, 0x1
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 14, 12
+	stw r0, 0x8(r30)
+	@22:
+	lfs f1, float_100_8041cde0(r2)
+	mr r3, r30
+	fmr f2, f1
+	bl partySearchGround
+	mr. r29, r3
+	beq @23
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @24
+	lbz r0, 0x4c(r30)
+	li r29, 0x0
+	extsb. r0, r0
+	bne @24
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@24:
+	lfs f0, 0xf0(r30)
+	fcmpo cr0, f31, f0
+	ble @25
+	li r29, 0x0
+	@25:
+	lfs f0, 0xe4(r30)
+	lfs f1, 0x5c(r30)
+	lfs f2, float_0p05_8041cea0(r2)
+	fsubs f0, f0, f1
+	fmadds f0, f2, f0, f1
+	stfs f0, 0x5c(r30)
+	@23:
+	stw r29, 0x138(r30)
+	@20:
+	psq_l f31, 0x68(r1), 0, 0
+	lfd f31, 0x60(r1)
+	psq_l f30, 0x58(r1), 0, 0
+	lfd f30, 0x50(r1)
+	psq_l f29, 0x48(r1), 0, 0
+	lfd f29, 0x40(r1)
+	lwz r31, 0x3c(r1)
+	lwz r30, 0x38(r1)
+	lwz r0, 0x74(r1)
+	lwz r29, 0x34(r1)
+	mtlr r0
+	addi r1, r1, 0x70
+	blr
+}
+
+asm void party_motion_behind_mario_continue(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x70(r1)
+	mflr r0
+	stw r0, 0x74(r1)
+	stfd f31, 0x60(r1)
+	psq_st f31, 0x68(r1), 0, 0
+	stfd f30, 0x50(r1)
+	psq_st f30, 0x58(r1), 0, 0
+	stw r31, 0x4c(r1)
+	stw r30, 0x48(r1)
+	stw r29, 0x44(r1)
+	lwz r0, 0x0(r3)
+	mr r30, r3
+	lwz r31, 0x160(r3)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @1
+	lfs f1, 0x1a8(r31)
+	bl toMovedir
+	b @2
+	@1:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @3
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @2
+	@3:
+	lfs f1, 0x1a8(r31)
+	bl toMovedir
+	@2:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @4
+	rlwinm r0, r3, 0, 31, 29
+	lfs f2, float_1p5_8041ce98(r2)
+	stw r0, 0x8(r30)
+	addi r3, r1, 0x28
+	addi r4, r1, 0x24
+	lfs f1, 0x1b4(r31)
+	lfs f0, 0x8c(r31)
+	fmuls f1, f2, f1
+	stfs f0, 0x28(r1)
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f2, 0x54(r30)
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	fctiwz f0, f1
+	stfd f0, 0x30(r1)
+	lwz r0, 0x34(r1)
+	stw r0, 0x24(r30)
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	bgt @4
+	li r0, 0x1
+	stw r0, 0x24(r30)
+	@4:
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	beq @5
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @6
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @7
+	@6:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @8
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @7
+	@8:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@7:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	@5:
+	lwz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @9
+	lfs f1, 0x1b4(r31)
+	lfs f0, 0x8c(r31)
+	lfs f2, float_1p5_8041ce98(r2)
+	stfs f0, 0x28(r1)
+	fmuls f31, f2, f1
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f30, 0x90(r31)
+	b @10
+	@9:
+	lfs f1, float_1p5_8041ce98(r2)
+	lfs f0, 0x1b4(r31)
+	lbz r3, 0x2f(r30)
+	fmuls f31, f1, f0
+	extsb r3, r3
+	bl anotherPartyGetPtr
+	cmplwi r3, 0x0
+	beq @11
+	lfs f0, 0x58(r3)
+	stfs f0, 0x28(r1)
+	lfs f0, 0x60(r3)
+	stfs f0, 0x24(r1)
+	lfs f30, 0x5c(r3)
+	b @10
+	@11:
+	lfs f0, 0x8c(r31)
+	stfs f0, 0x28(r1)
+	lfs f0, 0x94(r31)
+	stfs f0, 0x24(r1)
+	lfs f30, 0x90(r31)
+	@10:
+	fmr f1, f31
+	lfs f2, 0x54(r30)
+	addi r3, r1, 0x28
+	addi r4, r1, 0x24
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl angleABf
+	lfs f0, touch_wall_ct(r13)
+	addi r4, r1, 0x8
+	lfs f4, float_0_8041cdec(r2)
+	addi r5, r1, 0xc
+	fadds f2, f30, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	lfs f1, 0x28(r1)
+	stfs f0, 0x14(r1)
+	addi r6, r1, 0x10
+	lfs f3, 0x24(r1)
+	addi r7, r1, 0x14
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r8, r1, 0x18
+	addi r9, r1, 0x1c
+	addi r10, r1, 0x20
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @12
+	lfs f30, float_neg2000_8041cdfc(r2)
+	b @13
+	@12:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0xc(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0x38(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, double_to_int_802f3f48@l(r4)
+	fctiwz f0, f0
+	stfd f0, 0x30(r1)
+	lwz r0, 0x34(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x3c(r1)
+	lfd f0, 0x38(r1)
+	fsubs f0, f0, f1
+	fdivs f30, f0, f2
+	bl hitGetAttr
+	@13:
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f30, f0
+	cror eq, lt, eq
+	bne @14
+	lfs f2, float_1p5_8041ce98(r2)
+	lfs f0, 0x1b4(r31)
+	lfs f1, 0x1a8(r31)
+	fmuls f31, f2, f0
+	bl toMovedir
+	fmr f2, f1
+	addi r3, r1, 0x28
+	fmr f1, f31
+	addi r4, r1, 0x24
+	bl movePos
+	@14:
+	lfs f1, 0x180(r31)
+	lfs f0, float_1_8041ce1c(r2)
+	lfs f30, float_2_8041ce08(r2)
+	fcmpo cr0, f1, f0
+	ble @15
+	lfs f30, float_10_8041cdd4(r2)
+	@15:
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	lwz r3, 0x24(r30)
+	fcmpo cr0, f1, f30
+	subi r0, r3, 0x1
+	stw r0, 0x24(r30)
+	cror eq, gt, eq
+	bne @16
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x28(r1)
+	lfs f4, 0x24(r1)
+	bl distABf
+	lfs f2, float_10_8041cdd4(r2)
+	lfs f0, float_2_8041ce08(r2)
+	fdivs f1, f1, f2
+	fcmpo cr0, f1, f0
+	ble @17
+	fmr f1, f0
+	@17:
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	bge @18
+	fmr f1, f0
+	@18:
+	mr r3, r30
+	bl unk_800c9398
+	mr r3, r30
+	bl partyMoveCheckWall
+	lfs f1, 0x104(r30)
+	mr r3, r30
+	bl unk_800c8f24
+	lfs f1, float_10_8041cdd4(r2)
+	mr r3, r30
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	mr. r29, r3
+	beq @19
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @19
+	lbz r0, 0x4c(r30)
+	li r29, 0x0
+	extsb. r0, r0
+	bne @19
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@19:
+	cmplwi r29, 0x0
+	stw r29, 0x138(r30)
+	bne @20
+	mr r3, r30
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r30)
+	@20:
+	lfs f0, 0xe4(r30)
+	stfs f0, 0x5c(r30)
+	b @21
+	@16:
+	li r0, 0x0
+	lfs f1, float_0_8041cdec(r2)
+	stw r0, 0x24(r30)
+	lfs f0, 0x180(r31)
+	fcmpu cr0, f1, f0
+	bne @21
+	lwz r0, 0x0(r30)
+	mr r3, r30
+	li r4, 0x1
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	@21:
+	lwz r0, 0x134(r30)
+	cmplwi r0, 0x0
+	beq @22
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x28(r1)
+	mr r3, r30
+	lfs f2, 0x24(r1)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	@22:
+	psq_l f31, 0x68(r1), 0, 0
+	lfd f31, 0x60(r1)
+	psq_l f30, 0x58(r1), 0, 0
+	lfd f30, 0x50(r1)
+	lwz r31, 0x4c(r1)
+	lwz r30, 0x48(r1)
+	lwz r0, 0x74(r1)
+	lwz r29, 0x44(r1)
+	mtlr r0
+	addi r1, r1, 0x70
+	blr
+}
+
+asm void party_motion_behind_mario(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0xd0(r1)
+	mflr r0
+	stw r0, 0xd4(r1)
+	stfd f31, 0xc0(r1)
+	psq_st f31, 0xc8(r1), 0, 0
+	stfd f30, 0xb0(r1)
+	psq_st f30, 0xb8(r1), 0, 0
+	stfd f29, 0xa0(r1)
+	psq_st f29, 0xa8(r1), 0, 0
+	stfd f28, 0x90(r1)
+	psq_st f28, 0x98(r1), 0, 0
+	stw r31, 0x8c(r1)
+	stw r30, 0x88(r1)
+	stw r29, 0x84(r1)
+	mr r30, r3
+	lwz r3, 0x8(r3)
+	lwz r31, 0x160(r30)
+	rlwinm. r0, r3, 0, 30, 30
+	beq @1
+	rlwinm r0, r3, 0, 31, 29
+	stw r0, 0x8(r30)
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x4
+	stw r0, 0x8(r30)
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 11, 11
+	bne @2
+	rlwinm. r0, r3, 0, 15, 15
+	bne @3
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @4
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @5
+	@4:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @6
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @5
+	@6:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@5:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	b @7
+	@3:
+	rlwinm r0, r3, 0, 16, 14
+	stw r0, 0x8(r30)
+	lfs f1, 0x8c(r31)
+	lfs f2, 0x94(r31)
+	lfs f3, 0x94(r30)
+	lfs f4, 0x9c(r30)
+	bl angleABf
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f0, f1
+	bl revise360
+	@7:
+	stfs f1, 0x54(r30)
+	@2:
+	mr r3, r30
+	addi r4, r1, 0x64
+	bl partyGetAppearPos4
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x64(r1)
+	lfs f4, 0x6c(r1)
+	bl distABf
+	fctiwz f0, f1
+	stfd f0, 0x70(r1)
+	lwz r0, 0x74(r1)
+	stw r0, 0x24(r30)
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	bgt @1
+	li r0, 0x1
+	stw r0, 0x24(r30)
+	@1:
+	lwz r0, 0x8(r30)
+	rlwinm. r0, r0, 0, 11, 11
+	bne @8
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	beq @8
+	lwz r0, 0x0(r30)
+	lwz r29, 0x160(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @9
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	b @10
+	@9:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @11
+	lfs f1, 0x10c(r3)
+	mr r3, r30
+	bl partyToMovedir
+	b @10
+	@11:
+	lfs f1, 0x1a8(r29)
+	bl toMovedir
+	@10:
+	lfs f0, float_180_8041ce38(r2)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r30)
+	@8:
+	mr r3, r30
+	addi r4, r1, 0x64
+	bl partyGetAppearPos4
+	lfs f3, 0x64(r1)
+	lfs f4, 0x6c(r1)
+	stfs f3, 0x60(r1)
+	lfs f30, 0x68(r1)
+	stfs f4, 0x5c(r1)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	bl angleABf
+	lfs f0, touch_wall_ct(r13)
+	fmr f31, f1
+	lfs f4, float_0_8041cdec(r2)
+	addi r4, r1, 0x40
+	fadds f2, f30, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	stfs f0, 0x4c(r1)
+	addi r5, r1, 0x44
+	lfs f1, 0x60(r1)
+	lfs f3, 0x5c(r1)
+	addi r6, r1, 0x48
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r7, r1, 0x4c
+	addi r8, r1, 0x50
+	addi r9, r1, 0x54
+	addi r10, r1, 0x58
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @12
+	lfs f29, float_neg2000_8041cdfc(r2)
+	b @13
+	@12:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0x44(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0x78(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, double_to_int_802f3f48@l(r4)
+	fctiwz f0, f0
+	stfd f0, 0x70(r1)
+	lwz r0, 0x74(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x7c(r1)
+	lfd f0, 0x78(r1)
+	fsubs f0, f0, f1
+	fdivs f29, f0, f2
+	bl hitGetAttr
+	@13:
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f29, f0
+	cror eq, lt, eq
+	bne @14
+	lfs f2, float_1p5_8041ce98(r2)
+	lfs f0, 0x1b4(r31)
+	lfs f1, 0x1a8(r31)
+	fmuls f29, f2, f0
+	bl toMovedir
+	fmr f2, f1
+	addi r3, r1, 0x60
+	fmr f1, f29
+	addi r4, r1, 0x5c
+	bl movePos
+	@14:
+	lfs f1, 0x180(r31)
+	lfs f0, float_1_8041ce1c(r2)
+	lfs f28, float_2_8041ce08(r2)
+	fcmpo cr0, f1, f0
+	ble @15
+	lfs f28, float_10_8041cdd4(r2)
+	@15:
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x60(r1)
+	lfs f4, 0x5c(r1)
+	bl distABf
+	fmr f29, f1
+	lwz r3, 0x24(r30)
+	subi r0, r3, 0x1
+	fcmpo cr0, f29, f28
+	stw r0, 0x24(r30)
+	cror eq, gt, eq
+	bne @16
+	lwz r0, 0x24(r30)
+	cmpwi r0, 0x0
+	ble @16
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x60(r1)
+	lfs f4, 0x5c(r1)
+	bl angleABf
+	stfs f1, 0x100(r30)
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x60(r1)
+	lfs f4, 0x5c(r1)
+	bl distABf
+	lwz r0, 0x8(r30)
+	mr r3, r30
+	rlwinm. r0, r0, 0, 11, 11
+	beq @17
+	lfs f1, float_3p6_8041ce9c(r2)
+	b @18
+	@17:
+	lfs f1, float_2_8041ce08(r2)
+	@18:
+	bl unk_800c9398
+	mr r3, r30
+	bl partyMoveCheckWall
+	lfs f1, 0x104(r30)
+	mr r3, r30
+	bl unk_800c8f24
+	lwz r0, 0x12c(r30)
+	cmplwi r0, 0x0
+	beq @19
+	lfs f0, 0x58(r30)
+	fmr f1, f29
+	fmr f2, f31
+	addi r3, r1, 0x60
+	stfs f0, 0x60(r1)
+	addi r4, r1, 0x5c
+	lfs f0, 0x60(r30)
+	stfs f0, 0x5c(r1)
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x60(r1)
+	lfs f4, 0x5c(r1)
+	bl angleABf
+	lfs f0, touch_wall_ct(r13)
+	addi r4, r1, 0x24
+	lfs f4, float_0_8041cdec(r2)
+	addi r5, r1, 0x28
+	fadds f2, f30, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	lfs f1, 0x60(r1)
+	stfs f0, 0x30(r1)
+	addi r6, r1, 0x2c
+	lfs f3, 0x5c(r1)
+	addi r7, r1, 0x30
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r8, r1, 0x34
+	addi r9, r1, 0x38
+	addi r10, r1, 0x3c
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @20
+	lfs f28, float_neg2000_8041cdfc(r2)
+	b @21
+	@20:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0x28(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0x70(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, double_to_int_802f3f48@l(r4)
+	fctiwz f0, f0
+	stfd f0, 0x78(r1)
+	lwz r0, 0x7c(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x74(r1)
+	lfd f0, 0x70(r1)
+	fsubs f0, f0, f1
+	fdivs f28, f0, f2
+	bl hitGetAttr
+	@21:
+	lfs f1, 0x5c(r30)
+	lfs f0, float_1_8041ce1c(r2)
+	fsubs f1, f1, f28
+	fabs f1, f1
+	fcmpo cr0, f1, f0
+	ble @22
+	lfs f0, 0x60(r1)
+	mr r3, r30
+	li r4, 0x2
+	stfs f0, 0x94(r30)
+	stfs f28, 0x98(r30)
+	lfs f0, 0x5c(r1)
+	stfs f0, 0x9c(r30)
+	bl partyChgMot
+	b @23
+	@19:
+	lfs f0, 0x5c(r30)
+	fcmpo cr0, f30, f0
+	ble @22
+	lfs f0, 0x58(r30)
+	fmr f1, f29
+	fmr f2, f31
+	addi r3, r1, 0x60
+	stfs f0, 0x60(r1)
+	addi r4, r1, 0x5c
+	lfs f0, 0x60(r30)
+	stfs f0, 0x5c(r1)
+	bl movePos
+	lfs f1, 0x58(r30)
+	lfs f2, 0x60(r30)
+	lfs f3, 0x60(r1)
+	lfs f4, 0x5c(r1)
+	bl angleABf
+	lfs f0, touch_wall_ct(r13)
+	addi r4, r1, 0x8
+	lfs f4, float_0_8041cdec(r2)
+	addi r5, r1, 0xc
+	fadds f2, f30, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	lfs f1, 0x60(r1)
+	stfs f0, 0x14(r1)
+	addi r6, r1, 0x10
+	lfs f3, 0x5c(r1)
+	addi r7, r1, 0x14
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r8, r1, 0x18
+	addi r9, r1, 0x1c
+	addi r10, r1, 0x20
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @24
+	lfs f28, float_neg2000_8041cdfc(r2)
+	b @25
+	@24:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0xc(r1)
+	lis r4, double_to_int_802f3f48@ha
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0x70(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, double_to_int_802f3f48@l(r4)
+	fctiwz f0, f0
+	stfd f0, 0x78(r1)
+	lwz r0, 0x7c(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x74(r1)
+	lfd f0, 0x70(r1)
+	fsubs f0, f0, f1
+	fdivs f28, f0, f2
+	bl hitGetAttr
+	@25:
+	lfs f1, 0x5c(r30)
+	lfs f0, float_1_8041ce1c(r2)
+	fsubs f1, f1, f28
+	fabs f1, f1
+	fcmpo cr0, f1, f0
+	ble @22
+	lfs f0, 0x60(r1)
+	mr r3, r30
+	li r4, 0x2
+	stfs f0, 0x94(r30)
+	stfs f28, 0x98(r30)
+	lfs f0, 0x5c(r1)
+	stfs f0, 0x9c(r30)
+	bl partyChgMot
+	b @23
+	@22:
+	lfs f1, float_10_8041cdd4(r2)
+	mr r3, r30
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	mr. r29, r3
+	beq @26
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @26
+	lbz r0, 0x4c(r30)
+	li r29, 0x0
+	extsb. r0, r0
+	bne @26
+	lwz r0, 0x8(r30)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r30)
+	@26:
+	cmplwi r29, 0x0
+	stw r29, 0x138(r30)
+	bne @27
+	mr r3, r30
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r30)
+	@27:
+	lfs f0, 0xe4(r30)
+	stfs f0, 0x5c(r30)
+	b @28
+	@16:
+	li r0, 0x0
+	stw r0, 0x24(r30)
+	lwz r3, 0x8(r30)
+	rlwinm. r0, r3, 0, 10, 10
+	beq @29
+	rlwinm r0, r3, 0, 15, 13
+	stw r0, 0x8(r30)
+	@29:
+	mr r3, r30
+	li r4, 0x1
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x8c(r31)
+	mr r3, r30
+	lfs f2, 0x94(r31)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	lwz r0, 0x0(r30)
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 12, 10
+	stw r0, 0x8(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 14, 12
+	stw r0, 0x8(r30)
+	@28:
+	lwz r0, 0x134(r30)
+	cmplwi r0, 0x0
+	beq @23
+	lwz r0, 0x0(r30)
+	mr r3, r30
+	li r4, 0x1
+	oris r0, r0, 0x8
+	stw r0, 0x0(r30)
+	bl partyChgMoveMode
+	mr r3, r30
+	li r4, 0x0
+	bl partyChgMot
+	lfs f1, 0x60(r1)
+	mr r3, r30
+	lfs f2, 0x5c(r1)
+	bl partySetDir
+	lfs f0, float_50_8041cde8(r2)
+	stfs f0, 0x40(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	lwz r0, 0x8(r30)
+	rlwinm r0, r0, 0, 14, 12
+	stw r0, 0x8(r30)
+	@23:
+	psq_l f31, 0xc8(r1), 0, 0
+	lfd f31, 0xc0(r1)
+	psq_l f30, 0xb8(r1), 0, 0
+	lfd f30, 0xb0(r1)
+	psq_l f29, 0xa8(r1), 0, 0
+	lfd f29, 0xa0(r1)
+	psq_l f28, 0x98(r1), 0, 0
+	lfd f28, 0x90(r1)
+	lwz r31, 0x8c(r1)
+	lwz r30, 0x88(r1)
+	lwz r0, 0xd4(r1)
+	lwz r29, 0x84(r1)
+	mtlr r0
+	addi r1, r1, 0xd0
+	blr
+}
+
+asm void party_set_behind_dir(PartyEntry* party, f32 dir) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	stw r0, 0x24(r1)
+	stfd f31, 0x10(r1)
+	psq_st f31, 0x18(r1), 0, 0
+	stw r31, 0xc(r1)
+	fmr f31, f1
+	mr r31, r3
+	li r3, 0x4
+	bl camGetPtr
+	lfs f0, 0x114(r3)
+	fadds f1, f31, f0
+	bl revise360
+	stfs f1, 0x54(r31)
+	lwz r0, 0x8(r31)
+	oris r0, r0, 0x10
+	stw r0, 0x8(r31)
+	psq_l f31, 0x18(r1), 0, 0
+	lwz r0, 0x24(r1)
+	lfd f31, 0x10(r1)
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+asm void party_motion_homing_fly(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x130(r1)
+	mflr r0
+	stw r0, 0x134(r1)
+	stfd f31, 0x120(r1)
+	psq_st f31, 0x128(r1), 0, 0
+	stfd f30, 0x110(r1)
+	psq_st f30, 0x118(r1), 0, 0
+	stfd f29, 0x100(r1)
+	psq_st f29, 0x108(r1), 0, 0
+	stfd f28, 0xf0(r1)
+	psq_st f28, 0xf8(r1), 0, 0
+	stfd f27, 0xe0(r1)
+	psq_st f27, 0xe8(r1), 0, 0
+	stfd f26, 0xd0(r1)
+	psq_st f26, 0xd8(r1), 0, 0
+	stfd f25, 0xc0(r1)
+	psq_st f25, 0xc8(r1), 0, 0
+	stmw r26, 0xa8(r1)
+	mr r27, r3
+	lis r4, vec3_802f3e40@ha
+	lwz r30, 0x160(r3)
+	addi r31, r4, vec3_802f3e40@l
+	bl partyGetFootmarkId
+	lwz r4, 0x8(r27)
+	mr r29, r3
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r3, r4, 0, 31, 29
+	li r0, 0x0
+	stw r3, 0x8(r27)
+	lwz r3, 0x0(r27)
+	rlwinm r3, r3, 0, 13, 11
+	stw r3, 0x0(r27)
+	stb r0, 0x4e(r27)
+	@1:
+	lha r0, 0x28(r27)
+	cmpwi r0, 0x0
+	beq @2
+	lfs f31, float_28_8041cea4(r2)
+	b @3
+	@2:
+	lfs f31, float_32_8041cea8(r2)
+	@3:
+	lwz r3, gp(r13)
+	addi r4, r31, 0x188
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @4
+	lwz r3, gp(r13)
+	addi r4, r31, 0x190
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @4
+	lwz r3, gp(r13)
+	addi r4, r31, 0x198
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @5
+	@4:
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @5
+	lbz r0, 0x32(r27)
+	cmplwi r0, 0x0
+	bne @6
+	lfs f25, float_18_8041ce20(r2)
+	b @7
+	@6:
+	lbz r0, 0x31(r27)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @8
+	lwz r0, 0x8(r27)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @9
+	lfs f25, float_8_8041ce24(r2)
+	b @7
+	@9:
+	lfs f25, float_30_8041ce28(r2)
+	b @7
+	@8:
+	cmpwi r0, 0x6
+	bne @7
+	lwz r0, 0x8(r27)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @10
+	lfs f25, float_8_8041ce24(r2)
+	b @7
+	@10:
+	lfs f25, float_30_8041ce28(r2)
+	@7:
+	lwz r0, 0x8(r27)
+	fmr f31, f25
+	oris r0, r0, 0x2
+	stw r0, 0x8(r27)
+	@5:
+	mr r3, r29
+	bl partyGetTargetDistY
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @11
+	lfs f30, float_50_8041cde8(r2)
+	b @12
+	@11:
+	lfs f30, float_35_8041ceac(r2)
+	@12:
+	lwz r3, 0x8(r27)
+	extrwi. r0, r3, 1, 14
+	beq @13
+	lbz r0, 0x32(r27)
+	cmplwi r0, 0x0
+	bne @14
+	lfs f26, float_18_8041ce20(r2)
+	b @15
+	@14:
+	lbz r0, 0x31(r27)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @16
+	rlwinm. r0, r3, 0, 10, 10
+	beq @17
+	lfs f26, float_8_8041ce24(r2)
+	b @15
+	@17:
+	lfs f26, float_30_8041ce28(r2)
+	b @15
+	@16:
+	cmpwi r0, 0x6
+	bne @15
+	rlwinm. r0, r3, 0, 10, 10
+	beq @18
+	lfs f26, float_8_8041ce24(r2)
+	b @15
+	@18:
+	lfs f26, float_30_8041ce28(r2)
+	@15:
+	fmr f30, f26
+	@13:
+	mr r3, r27
+	bl party_slit
+	cmpwi r3, 0x0
+	beq @19
+	mr r3, r27
+	bl party_roll
+	cmpwi r3, 0x0
+	beq @19
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0xe
+	bne @20
+	lwz r0, 0x0(r27)
+	rlwinm. r0, r0, 0, 12, 12
+	bne @20
+	mr r3, r27
+	li r4, 0x0
+	bl partyMoveBehindMario
+	b @19
+	@20:
+	lwz r3, 0x160(r27)
+	lha r0, 0x50(r3)
+	cmpwi r0, 0x0
+	beq @21
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	bne @21
+	li r0, 0x0
+	b @22
+	@21:
+	lhz r0, 0x2e(r3)
+	cmplwi r0, 0x1f
+	beq @23
+	cmplwi r0, 0x20
+	beq @23
+	cmplwi r0, 0x10
+	beq @23
+	cmplwi r0, 0x11
+	bne @24
+	@23:
+	li r0, 0x0
+	b @22
+	@24:
+	li r0, 0x1
+	@22:
+	cmpwi r0, 0x0
+	bne @25
+	mr r3, r27
+	li r4, 0x0
+	bl partyChgMot
+	b @19
+	@25:
+	mr r3, r27
+	bl partyGetTargetMovespd2
+	fmr f29, f1
+	addi r3, r30, 0x8c
+	addi r4, r27, 0x58
+	bl PSVECDistance
+	lfs f0, float_35_8041ceac(r2)
+	fcmpo cr0, f1, f0
+	bge @26
+	lfs f29, float_1_8041ce1c(r2)
+	b @27
+	@26:
+	lfs f0, float_50_8041cde8(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @27
+	lfs f29, float_3_8041ce0c(r2)
+	@27:
+	lwz r3, 0x160(r27)
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @28
+	lfs f29, float_1_8041ce1c(r2)
+	lfs f31, float_100_8041cde0(r2)
+	@28:
+	fmr f1, f29
+	mr r3, r27
+	bl unk_800c93d0
+	lfs f28, 0x58(r27)
+	mr r3, r29
+	lfs f27, 0x5c(r27)
+	lfs f26, 0x60(r27)
+	bl partyGetFootmarkPtr
+	lfs f0, 0x4(r3)
+	lfs f1, float_5_8041ce18(r2)
+	stfs f0, 0x34(r1)
+	lwz r0, 0x4(r27)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @29
+	lfs f1, float_1_8041ce1c(r2)
+	@29:
+	lfs f0, 0x8(r3)
+	addi r4, r1, 0x58
+	fadds f0, f0, f1
+	stfs f0, 0x30(r1)
+	lfs f0, 0xc(r3)
+	mr r3, r29
+	stfs f0, 0x2c(r1)
+	lwz r5, 0x58(r27)
+	lwz r0, 0x5c(r27)
+	stw r5, 0x58(r1)
+	stw r0, 0x5c(r1)
+	lwz r0, 0x60(r27)
+	stw r0, 0x60(r1)
+	bl partyGetTargetDist3D
+	fcmpo cr0, f1, f31
+	cror eq, gt, eq
+	bne @30
+	fmr f1, f29
+	mr r3, r27
+	bl unk_800c93d0
+	@30:
+	lfs f0, float_20_8041cdc0(r2)
+	fcmpo cr0, f30, f0
+	bge @31
+	fmr f1, f29
+	mr r3, r27
+	bl unk_800c93d0
+	@31:
+	li r28, 0x0
+	@32:
+	fmr f1, f28
+	lfs f3, 0x34(r1)
+	fmr f2, f26
+	lfs f4, 0x2c(r1)
+	bl angleABf
+	stfs f1, 0x3c(r1)
+	fmr f1, f28
+	fmr f2, f26
+	lfs f3, 0x34(r1)
+	lfs f4, 0x2c(r1)
+	bl distABf
+	lwz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @33
+	lfs f2, 0xf4(r27)
+	lfs f0, 0x1b4(r30)
+	fadds f0, f2, f0
+	b @34
+	@33:
+	lfs f3, float_0p5_8041ce00(r2)
+	lfs f2, 0xf4(r27)
+	lfs f0, 0x104(r27)
+	fmadds f0, f3, f2, f0
+	@34:
+	fcmpo cr0, f1, f0
+	ble @35
+	lwz r6, 0xc(r31)
+	mr r3, r29
+	lwz r5, 0x10(r31)
+	addi r4, r1, 0x4c
+	lwz r0, 0x14(r31)
+	stw r6, 0x40(r1)
+	stw r5, 0x44(r1)
+	stw r0, 0x48(r1)
+	stfs f28, 0x40(r1)
+	stfs f27, 0x44(r1)
+	lwz r6, 0x40(r1)
+	stfs f26, 0x48(r1)
+	lwz r5, 0x44(r1)
+	lwz r0, 0x48(r1)
+	stw r6, 0x4c(r1)
+	stw r5, 0x50(r1)
+	stw r0, 0x54(r1)
+	bl partyGetTargetDist3D
+	fmr f25, f1
+	fcmpo cr0, f25, f31
+	cror eq, gt, eq
+	bne @36
+	lwz r0, 0x8(r27)
+	rlwinm. r0, r0, 0, 14, 14
+	beq @37
+	fsubs f1, f25, f30
+	lfs f2, float_0p1_8041ce44(r2)
+	lfs f0, float_4_8041ceb0(r2)
+	fmuls f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @38
+	fmr f1, f0
+	@38:
+	lfs f0, float_0p5_8041ce00(r2)
+	fcmpo cr0, f1, f0
+	bge @39
+	lfs f1, float_0_8041cdec(r2)
+	@39:
+	lfs f0, 0x180(r30)
+	mr r3, r27
+	fadds f1, f0, f1
+	bl unk_800c9398
+	@37:
+	li r28, 0x1
+	b @40
+	@36:
+	addi r3, r1, 0x88
+	bl marioGetSlitFloorPos
+	cmpwi r3, 0x0
+	beq @41
+	lfs f1, float_1p5_8041ce98(r2)
+	mr r3, r27
+	bl unk_800c93d0
+	mr r3, r29
+	bl partyNextReadId
+	addi r3, r1, 0x88
+	bl marioGetSlitFloorPos
+	cmpwi r3, 0x0
+	beq @40
+	lwz r0, 0x90(r1)
+	fmr f1, f28
+	lwz r3, 0x88(r1)
+	fmr f2, f26
+	stw r0, 0x84(r1)
+	lwz r0, 0x8c(r1)
+	lfs f25, 0x84(r1)
+	stw r3, 0x7c(r1)
+	fmr f4, f25
+	stw r0, 0x80(r1)
+	lfs f3, 0x7c(r1)
+	bl distABf
+	fmr f27, f1
+	lfs f3, 0x7c(r1)
+	fmr f1, f28
+	fmr f2, f26
+	fmr f4, f25
+	bl angleABf
+	lfs f0, float_5_8041ce18(r2)
+	stfs f1, 0x3c(r1)
+	fcmpo cr0, f27, f0
+	cror eq, lt, eq
+	bne @40
+	mr r3, r27
+	bl partyChgMotSlitFloor
+	b @40
+	@41:
+	fcmpo cr0, f25, f30
+	ble @42
+	lwz r0, 0x8(r27)
+	rlwinm. r0, r0, 0, 14, 14
+	beq @43
+	fsubs f1, f25, f30
+	lfs f2, float_0p1_8041ce44(r2)
+	lfs f0, float_4_8041ceb0(r2)
+	fmuls f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @44
+	fmr f1, f0
+	@44:
+	lfs f0, float_0p5_8041ce00(r2)
+	fcmpo cr0, f1, f0
+	bge @45
+	lfs f1, float_0_8041cdec(r2)
+	@45:
+	lfs f0, 0x180(r30)
+	mr r3, r27
+	fadds f1, f0, f1
+	bl unk_800c9398
+	b @35
+	@43:
+	fsubs f1, f25, f30
+	lfs f2, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f2
+	cror eq, gt, eq
+	bne @46
+	lfs f0, float_20_8041cdc0(r2)
+	fmr f1, f2
+	fcmpo cr0, f30, f0
+	bge @46
+	fmr f1, f29
+	@46:
+	mr r3, r27
+	bl unk_800c93d0
+	b @40
+	@42:
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0xa0(r27)
+	fcmpu cr0, f1, f0
+	bne @47
+	lfs f0, 0xa8(r27)
+	fcmpu cr0, f1, f0
+	bne @47
+	lwz r4, 0x160(r27)
+	mr r3, r27
+	lfs f1, 0x180(r4)
+	bl unk_800c93d0
+	b @35
+	@47:
+	lfs f1, float_0_8041cdec(r2)
+	mr r3, r27
+	bl unk_800c9398
+	lfs f1, 0x58(r27)
+	lfs f2, 0x60(r27)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl angleABf
+	stfs f1, 0x100(r27)
+	mr r3, r27
+	li r4, 0x1
+	bl partyChgPoseId
+	@35:
+	mr r3, r29
+	bl partyGetFootmarkWriteId
+	mr r26, r3
+	mr r3, r29
+	bl partyGetFootmarkReadId
+	cmpw r3, r26
+	bne @48
+	lwz r4, 0x160(r27)
+	mr r3, r27
+	lfs f1, 0x180(r4)
+	bl unk_800c93d0
+	lwz r3, 0x160(r27)
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	beq @49
+	lfs f0, 0xa0(r27)
+	fcmpu cr0, f1, f0
+	bne @49
+	lfs f0, 0xa8(r27)
+	fcmpu cr0, f1, f0
+	beq @40
+	@49:
+	lfs f0, 0x100(r27)
+	mr r3, r27
+	lfs f1, float_0_8041cdec(r2)
+	stfs f0, 0x3c(r1)
+	bl unk_800c93d0
+	lfs f0, float_0_8041cdec(r2)
+	stfs f0, 0x11c(r27)
+	lwz r0, 0x0(r27)
+	rlwinm. r0, r0, 0, 22, 22
+	bne @50
+	mr r3, r27
+	li r4, 0x1
+	bl partyChgPoseId
+	@50:
+	mr r3, r27
+	li r4, 0x0
+	bl partyChgMot
+	b @40
+	@48:
+	mr r3, r29
+	bl partyNextReadId
+	mr r3, r29
+	addi r4, r1, 0x34
+	addi r5, r1, 0x30
+	addi r6, r1, 0x2c
+	bl partyGetReadId
+	lwz r3, 0x0(r27)
+	rlwinm. r0, r3, 0, 5, 5
+	bne @32
+	lfs f1, float_100_8041cde0(r2)
+	rlwinm r0, r3, 0, 25, 23
+	stw r0, 0x0(r27)
+	mr r3, r27
+	fmr f2, f1
+	bl partySearchGround
+	mr. r26, r3
+	beq @51
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @51
+	li r26, 0x0
+	@51:
+	cmplwi r26, 0x0
+	stw r26, 0x138(r27)
+	bne @52
+	mr r3, r27
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r27)
+	b @32
+	@52:
+	mr r3, r26
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 23, 23
+	beq @53
+	lwz r0, 0x0(r27)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r27)
+	b @54
+	@53:
+	lwz r0, 0x0(r27)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r27)
+	@54:
+	rlwinm. r0, r3, 0, 20, 20
+	beq @32
+	mr r3, r27
+	li r4, 0x0
+	bl partyChgMot
+	@40:
+	lfs f1, 0x104(r27)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @55
+	mr r3, r27
+	bl unk_800c8f24
+	b @56
+	@55:
+	mr r3, r27
+	li r4, 0x0
+	bl partyChgMot
+	@56:
+	lbz r0, 0x4e(r27)
+	extsb r0, r0
+	cmpwi r0, 0xa
+	ble @57
+	lfs f1, 0x58(r27)
+	lfs f2, 0x60(r27)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl angleABf
+	stfs f1, 0x3c(r1)
+	@57:
+	cmpwi r28, 0x0
+	beq @58
+	lwz r28, 0x160(r27)
+	mr r3, r27
+	addi r4, r1, 0x70
+	bl partyGetAppearPos3
+	lfs f1, 0x58(r27)
+	lfs f2, 0x60(r27)
+	lfs f3, 0x70(r1)
+	lfs f4, 0x78(r1)
+	bl angleABf
+	stfs f1, 0x3c(r1)
+	mr r3, r27
+	lfs f1, float_10_8041cdd4(r2)
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	lfs f0, 0xe4(r27)
+	mr. r26, r3
+	stfs f0, 0x74(r1)
+	beq @59
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @59
+	li r26, 0x0
+	@59:
+	cmplwi r26, 0x0
+	beq @60
+	lfs f0, 0x74(r1)
+	stfs f0, 0x5c(r27)
+	b @58
+	@60:
+	lwz r0, 0x4(r27)
+	lfs f2, float_5_8041ce18(r2)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @61
+	lfs f2, float_1_8041ce1c(r2)
+	@61:
+	lfs f0, 0x90(r28)
+	lfs f1, 0x5c(r27)
+	fadds f0, f0, f2
+	lfs f2, float_0p05_8041cea0(r2)
+	fsubs f0, f0, f1
+	fmadds f0, f2, f0, f1
+	stfs f0, 0x5c(r27)
+	@58:
+	lfs f0, 0x3c(r1)
+	mr r3, r27
+	addi r4, r1, 0x3c
+	addi r5, r1, 0x38
+	stfs f0, 0x100(r27)
+	lwz r6, 0x58(r27)
+	lwz r0, 0x5c(r27)
+	stw r6, 0x88(r1)
+	stw r0, 0x8c(r1)
+	lwz r0, 0x60(r27)
+	stw r0, 0x90(r1)
+	bl partyGetMoveDirSpd
+	lfs f1, 0x38(r1)
+	mr r3, r27
+	lfs f2, 0x3c(r1)
+	addi r4, r1, 0x88
+	bl partySearchFrontWall
+	lwz r0, 0x0(r27)
+	rlwinm. r0, r0, 0, 7, 7
+	beq @62
+	li r3, 0x0
+	@62:
+	cmplwi r3, 0x0
+	bne @63
+	lwz r0, 0x8(r27)
+	rlwinm. r0, r0, 0, 10, 10
+	bne @64
+	lfs f1, 0x100(r27)
+	mr r3, r27
+	addi r4, r1, 0x64
+	bl getFrontFloor
+	b @65
+	@64:
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x198(r30)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r27)
+	mr r3, r27
+	addi r4, r1, 0x64
+	bl partyGetAppearPos4
+	@65:
+	lfs f1, 0x68(r1)
+	lfs f0, 0x90(r30)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @66
+	lwz r0, 0x4(r27)
+	lfs f0, float_5_8041ce18(r2)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @67
+	lfs f0, float_1_8041ce1c(r2)
+	@67:
+	fadds f0, f1, f0
+	lfs f1, 0x5c(r27)
+	lfs f2, float_0p05_8041cea0(r2)
+	fsubs f0, f0, f1
+	fmadds f0, f2, f0, f1
+	stfs f0, 0x5c(r27)
+	@66:
+	li r0, 0x0
+	lfs f0, float_0_8041cdec(r2)
+	stb r0, 0x4e(r27)
+	lfs f1, 0x104(r27)
+	fcmpu cr0, f1, f0
+	beq @68
+	lfs f0, 0x58(r27)
+	addi r4, r1, 0x90
+	addi r3, r1, 0x88
+	stfs f0, 0x88(r1)
+	lfs f0, 0x60(r27)
+	stfs f0, 0x90(r1)
+	lfs f2, 0x100(r27)
+	bl movePos
+	b @68
+	@63:
+	stw r3, 0x12c(r27)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r27)
+	fcmpu cr0, f1, f0
+	beq @68
+	stw r3, 0x134(r27)
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 18, 18
+	beq @69
+	lbz r0, 0x37(r27)
+	cmplwi r0, 0x1
+	beq @70
+	lwz r3, 0x160(r27)
+	lwz r0, 0xc(r3)
+	clrrwi. r0, r0, 31
+	bne @68
+	lwz r3, 0x8(r27)
+	li r0, 0x1
+	ori r3, r3, 0x1
+	stw r3, 0x8(r27)
+	stb r0, 0x37(r27)
+	b @68
+	@70:
+	lfs f1, 0x104(r27)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @68
+	lfs f0, 0x58(r27)
+	addi r4, r1, 0x90
+	addi r3, r1, 0x88
+	stfs f0, 0x88(r1)
+	lfs f0, 0x60(r27)
+	stfs f0, 0x90(r1)
+	lfs f2, 0x100(r27)
+	bl movePos
+	b @68
+	@69:
+	lfs f0, 0x58(r27)
+	addi r3, r1, 0x28
+	lfs f2, 0x3c(r1)
+	addi r4, r1, 0x24
+	stfs f0, 0x28(r1)
+	lfs f25, 0x5c(r27)
+	lfs f0, 0x60(r27)
+	stfs f0, 0x24(r1)
+	lfs f1, 0xf4(r27)
+	bl movePos
+	lfs f0, touch_wall_ct(r13)
+	addi r4, r1, 0x8
+	lfs f4, float_0_8041cdec(r2)
+	addi r5, r1, 0xc
+	fadds f2, f25, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fmr f6, f4
+	lfs f1, 0x28(r1)
+	stfs f0, 0x14(r1)
+	addi r6, r1, 0x10
+	lfs f3, 0x24(r1)
+	addi r7, r1, 0x14
+	lfs f5, float_neg1_8041cdf8(r2)
+	addi r8, r1, 0x18
+	addi r9, r1, 0x1c
+	addi r10, r1, 0x20
+	li r3, 0x0
+	bl hitCheckFilter
+	cmplwi r3, 0x0
+	bne @71
+	lfs f25, float_neg2000_8041cdfc(r2)
+	b @72
+	@71:
+	lfs f2, float_100_8041cde0(r2)
+	lis r0, 0x4330
+	lfs f1, 0xc(r1)
+	lfs f0, float_0p5_8041ce00(r2)
+	stw r0, 0xa0(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, 0x108(r31)
+	fctiwz f0, f0
+	stfd f0, 0x98(r1)
+	lwz r0, 0x9c(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0xa4(r1)
+	lfd f0, 0xa0(r1)
+	fsubs f0, f0, f1
+	fdivs f25, f0, f2
+	bl hitGetAttr
+	@72:
+	lfs f0, float_neg2000_8041cdfc(r2)
+	fcmpo cr0, f25, f0
+	ble @73
+	lfs f0, 0xf0(r27)
+	lfs f1, 0x5c(r27)
+	fadds f0, f25, f0
+	lfs f2, float_0p05_8041cea0(r2)
+	fsubs f0, f0, f1
+	fmadds f0, f2, f0, f1
+	stfs f0, 0x5c(r27)
+	b @68
+	@73:
+	lbz r4, 0x4e(r27)
+	mr r3, r29
+	addi r0, r4, 0x1
+	stb r0, 0x4e(r27)
+	lfs f1, 0x5c(r27)
+	bl unk_800c9f48
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @68
+	lfs f3, 0x90(r30)
+	lfs f2, 0x5c(r27)
+	lfs f0, float_10_8041cdd4(r2)
+	fsubs f1, f3, f2
+	fabs f1, f1
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @68
+	fadds f0, f0, f3
+	lfs f1, float_0p1_8041ce44(r2)
+	fsubs f0, f0, f2
+	fmadds f0, f1, f0, f2
+	stfs f0, 0x5c(r27)
+	lfs f0, 0x88(r1)
+	stfs f0, 0x58(r27)
+	lfs f0, 0x90(r1)
+	stfs f0, 0x60(r27)
+	b @19
+	@68:
+	lfs f0, 0x88(r1)
+	mr r3, r27
+	lfs f1, float_10_8041cdd4(r2)
+	stfs f0, 0x58(r27)
+	fmr f2, f1
+	lfs f0, 0x90(r1)
+	stfs f0, 0x60(r27)
+	lwz r0, 0x0(r27)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r27)
+	bl partySearchGround
+	cmplwi r3, 0x0
+	beq @74
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 20, 20
+	beq @75
+	mr r3, r27
+	li r4, 0xd
+	bl partyChgRunMode
+	b @19
+	@75:
+	rlwinm. r0, r3, 0, 23, 23
+	beq @76
+	lwz r0, 0x0(r27)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r27)
+	b @74
+	@76:
+	lwz r0, 0x0(r27)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r27)
+	@74:
+	mr r3, r27
+	bl party_force_reset_outofscreen
+	@19:
+	psq_l f31, 0x128(r1), 0, 0
+	lfd f31, 0x120(r1)
+	psq_l f30, 0x118(r1), 0, 0
+	lfd f30, 0x110(r1)
+	psq_l f29, 0x108(r1), 0, 0
+	lfd f29, 0x100(r1)
+	psq_l f28, 0xf8(r1), 0, 0
+	lfd f28, 0xf0(r1)
+	psq_l f27, 0xe8(r1), 0, 0
+	lfd f27, 0xe0(r1)
+	psq_l f26, 0xd8(r1), 0, 0
+	lfd f26, 0xd0(r1)
+	psq_l f25, 0xc8(r1), 0, 0
+	lfd f25, 0xc0(r1)
+	lmw r26, 0xa8(r1)
+	lwz r0, 0x134(r1)
+	mtlr r0
+	addi r1, r1, 0x130
+	blr
+}
+
+asm void party_motion_homing_walk(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x220(r1)
+	mflr r0
+	stw r0, 0x224(r1)
+	stfd f31, 0x210(r1)
+	psq_st f31, 0x218(r1), 0, 0
+	stfd f30, 0x200(r1)
+	psq_st f30, 0x208(r1), 0, 0
+	stfd f29, 0x1f0(r1)
+	psq_st f29, 0x1f8(r1), 0, 0
+	stfd f28, 0x1e0(r1)
+	psq_st f28, 0x1e8(r1), 0, 0
+	stfd f27, 0x1d0(r1)
+	psq_st f27, 0x1d8(r1), 0, 0
+	stfd f26, 0x1c0(r1)
+	psq_st f26, 0x1c8(r1), 0, 0
+	stfd f25, 0x1b0(r1)
+	psq_st f25, 0x1b8(r1), 0, 0
+	stfd f24, 0x1a0(r1)
+	psq_st f24, 0x1a8(r1), 0, 0
+	stmw r25, 0x184(r1)
+	lis r4, vec3_802f3e40@ha
+	mr r31, r3
+	addi r29, r4, vec3_802f3e40@l
+	li r28, 0x0
+	bl partyGetFootmarkId
+	lwz r4, 0x8(r31)
+	mr r27, r3
+	lwz r26, 0x160(r31)
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r0, r4, 0, 31, 29
+	stw r0, 0x8(r31)
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 13, 11
+	stw r0, 0x0(r31)
+	@1:
+	lha r0, 0x28(r31)
+	cmpwi r0, 0x0
+	beq @2
+	lfs f31, float_28_8041cea4(r2)
+	b @3
+	@2:
+	lfs f31, float_37p5_8041ceb4(r2)
+	@3:
+	lwz r3, gp(r13)
+	addi r4, r29, 0x188
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @4
+	lwz r3, gp(r13)
+	addi r4, r29, 0x190
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @4
+	lwz r3, gp(r13)
+	addi r4, r29, 0x198
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @5
+	@4:
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @5
+	lbz r0, 0x32(r31)
+	cmplwi r0, 0x0
+	bne @6
+	lfs f24, float_18_8041ce20(r2)
+	b @7
+	@6:
+	lbz r0, 0x31(r31)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @8
+	lwz r0, 0x8(r31)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @9
+	lfs f24, float_8_8041ce24(r2)
+	b @7
+	@9:
+	lfs f24, float_30_8041ce28(r2)
+	b @7
+	@8:
+	cmpwi r0, 0x6
+	bne @7
+	lwz r0, 0x8(r31)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @10
+	lfs f24, float_8_8041ce24(r2)
+	b @7
+	@10:
+	lfs f24, float_30_8041ce28(r2)
+	@7:
+	lwz r0, 0x8(r31)
+	fmr f31, f24
+	oris r0, r0, 0x2
+	stw r0, 0x8(r31)
+	@5:
+	mr r3, r27
+	bl partyGetTargetDistY
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @11
+	lfs f30, float_50_8041cde8(r2)
+	b @12
+	@11:
+	lfs f30, float_35_8041ceac(r2)
+	@12:
+	lbz r0, 0x3c(r26)
+	cmpwi r0, 0x2
+	bne @13
+	lfs f30, float_70_8041ceb8(r2)
+	@13:
+	lwz r3, 0x8(r31)
+	extrwi. r0, r3, 1, 14
+	beq @14
+	lbz r0, 0x32(r31)
+	cmplwi r0, 0x0
+	bne @15
+	lfs f25, float_18_8041ce20(r2)
+	b @16
+	@15:
+	lbz r0, 0x31(r31)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @17
+	rlwinm. r0, r3, 0, 10, 10
+	beq @18
+	lfs f25, float_8_8041ce24(r2)
+	b @16
+	@18:
+	lfs f25, float_30_8041ce28(r2)
+	b @16
+	@17:
+	cmpwi r0, 0x6
+	bne @16
+	rlwinm. r0, r3, 0, 10, 10
+	beq @19
+	lfs f25, float_8_8041ce24(r2)
+	b @16
+	@19:
+	lfs f25, float_30_8041ce28(r2)
+	@16:
+	fmr f30, f25
+	@14:
+	mr r3, r31
+	bl party_slit
+	cmpwi r3, 0x0
+	beq @20
+	mr r3, r31
+	bl party_roll
+	cmpwi r3, 0x0
+	beq @20
+	lhz r0, 0x2e(r26)
+	cmplwi r0, 0xe
+	bne @21
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 12, 12
+	bne @21
+	mr r3, r31
+	li r4, 0x0
+	bl partyMoveBehindMario
+	b @20
+	@21:
+	lwz r3, 0x160(r31)
+	lha r0, 0x50(r3)
+	cmpwi r0, 0x0
+	beq @22
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	bne @22
+	li r0, 0x0
+	b @23
+	@22:
+	lhz r0, 0x2e(r3)
+	cmplwi r0, 0x1f
+	beq @24
+	cmplwi r0, 0x20
+	beq @24
+	cmplwi r0, 0x10
+	beq @24
+	cmplwi r0, 0x11
+	bne @25
+	@24:
+	li r0, 0x0
+	b @23
+	@25:
+	li r0, 0x1
+	@23:
+	cmpwi r0, 0x0
+	bne @26
+	mr r3, r31
+	li r4, 0x0
+	bl partyChgMot
+	b @20
+	@26:
+	mr r3, r31
+	bl partyGetTargetMovespd2
+	lwz r0, 0x0(r31)
+	fmr f29, f1
+	rlwinm. r0, r0, 0, 28, 28
+	bne @27
+	addi r3, r26, 0x8c
+	addi r4, r31, 0x58
+	bl PSVECDistance
+	lfs f0, float_35_8041ceac(r2)
+	fcmpo cr0, f1, f0
+	bge @28
+	lfs f29, float_1_8041ce1c(r2)
+	b @29
+	@28:
+	lfs f0, float_50_8041cde8(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @29
+	lfs f29, float_3_8041ce0c(r2)
+	@29:
+	lwz r3, 0x160(r31)
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @30
+	lfs f29, float_1_8041ce1c(r2)
+	lfs f31, float_100_8041cde0(r2)
+	@30:
+	fmr f1, f29
+	mr r3, r31
+	bl unk_800c93d0
+	b @31
+	@27:
+	bl marioGetPartyId
+	bl partyGetPtr
+	mr. r25, r3
+	beq @31
+	lwz r4, 0x58(r25)
+	lwz r0, 0x5c(r25)
+	stw r4, 0xa0(r1)
+	stw r0, 0xa4(r1)
+	lwz r0, 0x60(r25)
+	stw r0, 0xa8(r1)
+	bl nokonokoGetStatus
+	cmpwi r3, 0x3
+	beq @32
+	addi r3, r26, 0x8c
+	addi r4, r25, 0x58
+	bl PSVECDistance
+	lfs f0, float_150_8041cebc(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @33
+	@32:
+	addi r3, r26, 0x8c
+	addi r4, r31, 0x58
+	bl PSVECDistance
+	lfs f0, float_35_8041ceac(r2)
+	fcmpo cr0, f1, f0
+	bge @34
+	lfs f29, float_1_8041ce1c(r2)
+	b @35
+	@34:
+	lfs f0, float_50_8041cde8(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @35
+	lfs f29, float_3_8041ce0c(r2)
+	@35:
+	lwz r3, 0x160(r31)
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @36
+	lfs f29, float_1_8041ce1c(r2)
+	@36:
+	fmr f1, f29
+	mr r3, r31
+	bl unk_800c93d0
+	b @31
+	@33:
+	addi r3, r25, 0x58
+	addi r4, r31, 0x58
+	bl PSVECDistance
+	lfs f0, float_35_8041ceac(r2)
+	fcmpo cr0, f1, f0
+	bge @37
+	lfs f29, float_1_8041ce1c(r2)
+	b @38
+	@37:
+	lfs f0, float_50_8041cde8(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @38
+	lfs f29, float_3_8041ce0c(r2)
+	@38:
+	lwz r3, 0x160(r31)
+	lwz r0, 0x0(r3)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @39
+	lfs f29, float_1_8041ce1c(r2)
+	@39:
+	fmr f1, f29
+	mr r3, r31
+	bl unk_800c93d0
+	@31:
+	lfs f28, 0x58(r31)
+	li r25, 0x0
+	lfs f27, 0x5c(r31)
+	lfs f26, 0x60(r31)
+	lfs f24, float_40_8041cdf0(r2)
+	lfs f25, float_20_8041cdc0(r2)
+	@40:
+	mr r3, r27
+	bl partyGetFootmarkPtr
+	mr r30, r3
+	fmr f1, f28
+	lwz r3, 0x4(r3)
+	fmr f2, f26
+	lwz r0, 0x8(r30)
+	stw r3, 0x94(r1)
+	stw r0, 0x98(r1)
+	lfs f3, 0x94(r1)
+	lwz r0, 0xc(r30)
+	stw r0, 0x9c(r1)
+	lfs f4, 0x9c(r1)
+	bl angleABf
+	stfs f1, 0x44(r1)
+	frsp f1, f1
+	addi r3, r1, 0x18
+	addi r4, r1, 0x1c
+	bl sincosf
+	stfs f24, 0x168(r1)
+	addi r3, r1, 0x12c
+	lfs f2, 0x18(r1)
+	li r4, 0x0
+	lfs f0, 0x58(r31)
+	lfs f1, 0x1c(r1)
+	fmadds f0, f25, f2, f0
+	lwz r6, 0x90(r29)
+	lwz r5, 0x94(r29)
+	lwz r0, 0x98(r29)
+	stfs f0, 0x138(r1)
+	lfs f0, 0x60(r31)
+	fmadds f0, f25, f1, f0
+	stfs f0, 0x140(r1)
+	lfs f0, 0x5c(r31)
+	fadds f0, f25, f0
+	stw r6, 0x144(r1)
+	stw r5, 0x148(r1)
+	stfs f0, 0x13c(r1)
+	stw r0, 0x14c(r1)
+	bl hitCheckVecFilter
+	cmplwi r3, 0x0
+	beq @41
+	bl hitGetAttr
+	b @42
+	@41:
+	li r3, 0x0
+	@42:
+	rlwinm. r0, r3, 0, 20, 20
+	beq @43
+	mr r3, r27
+	bl partyNextReadId
+	mr r3, r27
+	addi r4, r1, 0x94
+	bl partyGetReadId2
+	addi r25, r25, 0x1
+	cmpwi r25, 0xa
+	ble @40
+	bl marioGetPtr
+	lwz r4, 0x8c(r3)
+	lwz r0, 0x90(r3)
+	stw r4, 0x94(r1)
+	stw r0, 0x98(r1)
+	lwz r0, 0x94(r3)
+	stw r0, 0x9c(r1)
+	@43:
+	lwz r5, 0x58(r31)
+	mr r3, r27
+	lwz r0, 0x5c(r31)
+	addi r4, r1, 0x70
+	stw r5, 0x70(r1)
+	stw r0, 0x74(r1)
+	lwz r0, 0x60(r31)
+	stw r0, 0x78(r1)
+	bl partyGetTargetDist3D
+	fcmpo cr0, f1, f31
+	cror eq, gt, eq
+	bne @44
+	fmr f1, f29
+	mr r3, r31
+	bl unk_800c93d0
+	@44:
+	lfs f0, float_20_8041cdc0(r2)
+	fcmpo cr0, f30, f0
+	bge @45
+	fmr f1, f29
+	mr r3, r31
+	bl unk_800c93d0
+	@45:
+	fmr f1, f28
+	lfs f3, 0x94(r1)
+	fmr f2, f26
+	lfs f4, 0x9c(r1)
+	bl distABf
+	fmr f25, f1
+	lfs f3, 0x94(r1)
+	fmr f1, f28
+	lfs f4, 0x9c(r1)
+	fmr f2, f26
+	bl angleABf
+	stfs f1, 0x44(r1)
+	lwz r0, 0x0(r26)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @46
+	lfs f1, 0xf4(r31)
+	lfs f0, 0x1b4(r26)
+	fadds f0, f1, f0
+	b @47
+	@46:
+	lfs f2, float_0p5_8041ce00(r2)
+	lfs f1, 0xf4(r31)
+	lfs f0, 0x104(r31)
+	fmadds f0, f2, f1, f0
+	@47:
+	fcmpo cr0, f25, f0
+	ble @48
+	lwz r6, 0x0(r29)
+	mr r3, r27
+	lwz r5, 0x4(r29)
+	addi r4, r1, 0x64
+	lwz r0, 0x8(r29)
+	stw r6, 0x58(r1)
+	stw r5, 0x5c(r1)
+	stw r0, 0x60(r1)
+	stfs f28, 0x58(r1)
+	stfs f27, 0x5c(r1)
+	lwz r6, 0x58(r1)
+	stfs f26, 0x60(r1)
+	lwz r5, 0x5c(r1)
+	lwz r0, 0x60(r1)
+	stw r6, 0x64(r1)
+	stw r5, 0x68(r1)
+	stw r0, 0x6c(r1)
+	bl partyGetTargetDist3D
+	fmr f25, f1
+	fcmpo cr0, f25, f31
+	cror eq, gt, eq
+	bne @49
+	lwz r0, 0x8(r31)
+	rlwinm. r0, r0, 0, 14, 14
+	beq @50
+	fsubs f1, f25, f30
+	lfs f2, float_0p1_8041ce44(r2)
+	lfs f0, float_4_8041ceb0(r2)
+	fmuls f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @51
+	fmr f1, f0
+	@51:
+	lfs f0, float_0p5_8041ce00(r2)
+	fcmpo cr0, f1, f0
+	bge @52
+	lfs f1, float_0_8041cdec(r2)
+	@52:
+	lfs f0, 0x180(r26)
+	mr r3, r31
+	fadds f1, f0, f1
+	bl unk_800c9398
+	b @50
+	@49:
+	addi r3, r1, 0xa0
+	bl marioGetSlitFloorPos
+	cmpwi r3, 0x0
+	beq @53
+	lfs f1, float_1p5_8041ce98(r2)
+	mr r3, r31
+	bl unk_800c93d0
+	mr r3, r27
+	bl partyNextReadId
+	addi r3, r1, 0xa0
+	bl marioGetSlitFloorPos
+	cmpwi r3, 0x0
+	beq @50
+	lwz r3, 0xa0(r1)
+	fmr f1, f28
+	lwz r0, 0xa8(r1)
+	fmr f2, f26
+	stw r3, 0x94(r1)
+	lwz r3, 0xa4(r1)
+	stw r0, 0x9c(r1)
+	lfs f3, 0x94(r1)
+	stw r3, 0x98(r1)
+	lfs f4, 0x9c(r1)
+	bl distABf
+	fmr f27, f1
+	lfs f3, 0x94(r1)
+	fmr f1, f28
+	lfs f4, 0x9c(r1)
+	fmr f2, f26
+	bl angleABf
+	lfs f0, float_5_8041ce18(r2)
+	stfs f1, 0x44(r1)
+	fcmpo cr0, f27, f0
+	cror eq, lt, eq
+	bne @50
+	mr r3, r31
+	bl partyChgMotSlitFloor
+	b @50
+	@53:
+	fcmpo cr0, f25, f30
+	ble @54
+	lwz r0, 0x8(r31)
+	rlwinm. r0, r0, 0, 14, 14
+	beq @55
+	fsubs f1, f25, f30
+	lfs f2, float_0p1_8041ce44(r2)
+	lfs f0, float_4_8041ceb0(r2)
+	fmuls f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @56
+	fmr f1, f0
+	@56:
+	lfs f0, float_0p5_8041ce00(r2)
+	fcmpo cr0, f1, f0
+	bge @57
+	lfs f1, float_0_8041cdec(r2)
+	@57:
+	lfs f0, 0x180(r26)
+	mr r3, r31
+	fadds f1, f0, f1
+	bl unk_800c9398
+	b @50
+	@55:
+	fsubs f1, f25, f30
+	lfs f2, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f2
+	cror eq, gt, eq
+	bne @58
+	lfs f0, float_20_8041cdc0(r2)
+	fmr f1, f2
+	fcmpo cr0, f30, f0
+	bge @58
+	fmr f1, f29
+	@58:
+	mr r3, r31
+	bl unk_800c93d0
+	b @50
+	@54:
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0xa0(r31)
+	fcmpu cr0, f1, f0
+	bne @59
+	lfs f0, 0xa8(r31)
+	fcmpu cr0, f1, f0
+	bne @59
+	lwz r4, 0x160(r31)
+	mr r3, r31
+	lfs f1, 0x180(r4)
+	bl unk_800c93d0
+	b @48
+	@59:
+	lfs f1, float_0_8041cdec(r2)
+	mr r3, r31
+	bl unk_800c9398
+	lfs f1, 0x58(r31)
+	lfs f2, 0x60(r31)
+	lfs f3, 0x8c(r26)
+	lfs f4, 0x94(r26)
+	bl angleABf
+	stfs f1, 0x100(r31)
+	mr r3, r31
+	li r4, 0x1
+	bl partyChgPoseId
+	@48:
+	mr r3, r27
+	bl partyGetFootmarkWriteId
+	mr r25, r3
+	mr r3, r27
+	bl partyGetFootmarkReadId
+	cmpw r3, r25
+	bne @60
+	lwz r4, 0x160(r31)
+	mr r3, r31
+	lfs f1, 0x180(r4)
+	bl unk_800c93d0
+	lwz r3, 0x160(r31)
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	beq @61
+	lfs f0, 0xa0(r31)
+	fcmpu cr0, f1, f0
+	bne @61
+	lfs f0, 0xa8(r31)
+	fcmpu cr0, f1, f0
+	beq @50
+	@61:
+	lfs f0, 0x100(r31)
+	mr r3, r31
+	lfs f1, float_0_8041cdec(r2)
+	stfs f0, 0x44(r1)
+	bl unk_800c93d0
+	lfs f0, float_0_8041cdec(r2)
+	stfs f0, 0x11c(r31)
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 22, 22
+	bne @62
+	mr r3, r31
+	li r4, 0x1
+	bl partyChgPoseId
+	@62:
+	mr r3, r31
+	li r4, 0x0
+	bl partyChgMot
+	b @50
+	@60:
+	mr r3, r27
+	bl partyNextReadId
+	mr r3, r27
+	addi r4, r1, 0x94
+	bl partyGetReadId2
+	lwz r3, 0x0(r31)
+	rlwinm. r0, r3, 0, 5, 5
+	bne @63
+	rlwinm r0, r3, 0, 25, 23
+	lfs f1, float_10_8041cdd4(r2)
+	stw r0, 0x0(r31)
+	mr r3, r31
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	mr. r28, r3
+	beq @64
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @64
+	lbz r0, 0x4c(r31)
+	li r28, 0x0
+	extsb. r0, r0
+	bne @64
+	lwz r0, 0x8(r31)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r31)
+	lwz r0, 0x0(r31)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r31)
+	@64:
+	cmplwi r28, 0x0
+	stw r28, 0x138(r31)
+	bne @65
+	mr r3, r31
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r31)
+	b @63
+	@65:
+	mr r3, r28
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 23, 23
+	beq @66
+	lwz r0, 0x0(r31)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r31)
+	b @67
+	@66:
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r31)
+	@67:
+	rlwinm. r0, r3, 0, 20, 20
+	beq @63
+	mr r3, r31
+	li r4, 0x0
+	bl partyChgMot
+	b @50
+	@63:
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 30, 30
+	beq @68
+	lbz r0, 0x0(r30)
+	clrlwi. r0, r0, 31
+	beq @68
+	lfs f1, 0x110(r31)
+	bl toMovedir
+	fmr f24, f1
+	mr r3, r27
+	addi r4, r1, 0x38
+	addi r5, r1, 0x34
+	addi r6, r1, 0x30
+	bl partyGetReadId
+	mr r3, r27
+	addi r4, r1, 0x88
+	bl L_getTargetPos
+	lfs f1, 0x8c(r1)
+	lfs f0, 0x34(r1)
+	fcmpo cr0, f1, f0
+	bge @69
+	stfs f1, 0x34(r1)
+	@69:
+	lfs f0, 0x38(r1)
+	fmr f1, f24
+	addi r3, r1, 0x10
+	addi r4, r1, 0x14
+	stfs f0, 0x94(r31)
+	lfs f0, 0x30(r1)
+	stfs f0, 0x9c(r31)
+	lfs f0, 0x34(r1)
+	stfs f0, 0x98(r31)
+	lwz r6, 0x94(r31)
+	lwz r5, 0x98(r31)
+	lwz r0, 0x9c(r31)
+	stw r6, 0x4c(r1)
+	lfs f24, touch_wall_ct(r13)
+	stw r5, 0x50(r1)
+	stw r0, 0x54(r1)
+	bl sincosf
+	lwz r6, 0x4c(r1)
+	addi r3, r1, 0xec
+	lwz r5, 0x50(r1)
+	li r4, 0x0
+	lwz r0, 0x54(r1)
+	stw r6, 0xf8(r1)
+	lfs f2, 0x10(r1)
+	stw r5, 0xfc(r1)
+	lfs f5, float_40_8041cdf0(r2)
+	stw r0, 0x100(r1)
+	lfs f0, 0xf8(r1)
+	lfs f1, 0xfc(r1)
+	fmadds f4, f2, f5, f0
+	lfs f0, float_1000_8041cdf4(r2)
+	fadds f1, f1, f24
+	lwz r6, 0x84(r29)
+	lwz r5, 0x88(r29)
+	lwz r0, 0x8c(r29)
+	lfs f3, 0x14(r1)
+	lfs f2, 0x100(r1)
+	stfs f4, 0xf8(r1)
+	fmadds f2, f3, f5, f2
+	stfs f1, 0xfc(r1)
+	stfs f2, 0x100(r1)
+	stfs f0, 0x128(r1)
+	stw r6, 0x104(r1)
+	stw r5, 0x108(r1)
+	stw r0, 0x10c(r1)
+	bl hitCheckVecFilter
+	cmplwi r3, 0x0
+	beq @70
+	lfs f1, 0x114(r1)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @71
+	lfs f0, float_0p5_8041ce00(r2)
+	b @72
+	@71:
+	lfs f0, float_neg0p5_8041ce04(r2)
+	@72:
+	lfs f2, float_1000_8041cdf4(r2)
+	lis r0, 0x4330
+	stw r0, 0x178(r1)
+	fmadds f0, f2, f1, f0
+	lfd f1, 0x108(r29)
+	fctiwz f0, f0
+	stfd f0, 0x170(r1)
+	lwz r0, 0x174(r1)
+	xoris r0, r0, 0x8000
+	stw r0, 0x17c(r1)
+	lfd f0, 0x178(r1)
+	fsubs f0, f0, f1
+	fdivs f24, f0, f2
+	bl hitGetAttr
+	b @73
+	@70:
+	lfs f24, float_neg2000_8041cdfc(r2)
+	@73:
+	lfs f0, 0x5c(r31)
+	fcmpo cr0, f24, f0
+	ble @74
+	lfs f1, 0x110(r31)
+	mr r3, r31
+	bl partyToMovedir
+	stfs f1, 0x44(r1)
+	frsp f1, f1
+	addi r3, r1, 0x40
+	addi r4, r1, 0x3c
+	bl sincosf
+	lfs f0, 0x40(r1)
+	lfs f1, float_40_8041cdf0(r2)
+	fmuls f0, f0, f1
+	stfs f0, 0x94(r31)
+	lfs f0, 0x3c(r1)
+	fmuls f0, f0, f1
+	stfs f0, 0x9c(r31)
+	stfs f24, 0x98(r31)
+	@74:
+	mr r3, r31
+	li r4, 0x2
+	bl partyChgMot
+	b @50
+	@68:
+	mr r3, r28
+	bl unk_800c8dd0
+	cmpwi r3, 0x0
+	beq @75
+	mr r3, r31
+	mr r4, r28
+	addi r5, r31, 0x94
+	bl partyGetAppearPos5
+	lwz r0, 0x8(r31)
+	mr r3, r31
+	li r4, 0x2
+	oris r0, r0, 0x40
+	stw r0, 0x8(r31)
+	bl partyChgMot
+	b @50
+	@75:
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 30, 30
+	beq @45
+	lbz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 29, 29
+	beq @45
+	fmr f1, f28
+	lfs f3, 0x94(r1)
+	fmr f2, f26
+	lfs f4, 0x9c(r1)
+	bl distABf
+	lfs f0, float_5_8041ce18(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @50
+	mr r3, r31
+	bl partyChgMotSlitFloor
+	@50:
+	lfs f1, 0x104(r31)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @76
+	mr r3, r31
+	bl unk_800c8f24
+	b @77
+	@76:
+	lbz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 29, 29
+	bne @77
+	mr r3, r31
+	li r4, 0x0
+	bl partyChgMot
+	@77:
+	lfs f0, 0x44(r1)
+	mr r3, r31
+	addi r4, r1, 0x44
+	addi r5, r1, 0x48
+	stfs f0, 0x100(r31)
+	lwz r6, 0x58(r31)
+	lwz r0, 0x5c(r31)
+	stw r6, 0xa0(r1)
+	stw r0, 0xa4(r1)
+	lwz r0, 0x60(r31)
+	stw r0, 0xa8(r1)
+	bl partyGetMoveDirSpd
+	lfs f1, 0x48(r1)
+	mr r3, r31
+	lfs f2, 0x44(r1)
+	addi r4, r1, 0xa0
+	bl partySearchFrontWall
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 7, 7
+	beq @78
+	li r3, 0x0
+	@78:
+	cmplwi r3, 0x0
+	bne @79
+	li r0, 0x0
+	stb r0, 0x4d(r31)
+	lwz r0, 0x8(r31)
+	rlwinm. r0, r0, 0, 10, 10
+	bne @80
+	lfs f1, 0x100(r31)
+	mr r3, r31
+	addi r4, r1, 0x94
+	bl getFrontFloor
+	b @81
+	@80:
+	lfs f1, float_270_8041ce34(r2)
+	lfs f0, 0x198(r26)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x54(r31)
+	mr r3, r31
+	addi r4, r1, 0x94
+	bl partyGetAppearPos4
+	@81:
+	lfs f2, 0x98(r1)
+	lfs f1, 0x5c(r31)
+	fcmpo cr0, f2, f1
+	ble @82
+	fsubs f3, f2, f1
+	lfd f0, 0x1a0(r29)
+	fcmpo cr0, f3, f0
+	ble @83
+	lfs f0, float_60_8041cec0(r2)
+	fcmpo cr0, f3, f0
+	bge @83
+	lwz r5, 0x94(r1)
+	mr r3, r31
+	lwz r0, 0x98(r1)
+	li r4, 0x2
+	stw r5, 0x94(r31)
+	stw r0, 0x98(r31)
+	lwz r0, 0x9c(r1)
+	stw r0, 0x9c(r31)
+	bl partyChgMot
+	b @20
+	@83:
+	fcmpo cr0, f2, f1
+	ble @82
+	stfs f2, 0x5c(r31)
+	@82:
+	lfs f1, 0x104(r31)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @84
+	lfs f1, 0x100(r31)
+	addi r3, r1, 0x8
+	addi r4, r1, 0xc
+	bl sincosf
+	lfs f0, float_100_8041cde0(r2)
+	addi r3, r1, 0xac
+	lfs f3, 0x8(r1)
+	li r4, 0x0
+	stfs f0, 0xe8(r1)
+	lfs f2, float_40_8041cdf0(r2)
+	lfs f0, 0x58(r31)
+	lfs f1, 0xc(r1)
+	fmadds f0, f3, f2, f0
+	lwz r6, 0x9c(r29)
+	lwz r5, 0xa0(r29)
+	lwz r0, 0xa4(r29)
+	stfs f0, 0xb8(r1)
+	lfs f0, 0x60(r31)
+	fmadds f0, f1, f2, f0
+	stfs f0, 0xc0(r1)
+	lfs f0, 0x5c(r31)
+	fadds f0, f0, f2
+	stw r6, 0xc4(r1)
+	stw r5, 0xc8(r1)
+	stfs f0, 0xbc(r1)
+	stw r0, 0xcc(r1)
+	bl hitCheckVecFilter
+	cmplwi r3, 0x0
+	beq @85
+	bl hitGetAttr
+	b @86
+	@85:
+	li r3, 0x0
+	@86:
+	rlwinm. r0, r3, 0, 22, 22
+	bne @84
+	lfs f0, 0x58(r31)
+	addi r4, r1, 0xa8
+	addi r3, r1, 0xa0
+	stfs f0, 0xa0(r1)
+	lfs f0, 0x60(r31)
+	stfs f0, 0xa8(r1)
+	lfs f1, 0x104(r31)
+	lfs f2, 0x100(r31)
+	bl movePos
+	b @84
+	@79:
+	stw r3, 0x12c(r31)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r31)
+	fcmpu cr0, f1, f0
+	beq @84
+	stw r3, 0x134(r31)
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 18, 18
+	beq @87
+	lbz r0, 0x37(r31)
+	cmplwi r0, 0x1
+	beq @88
+	lwz r3, 0x160(r31)
+	lwz r0, 0xc(r3)
+	clrrwi. r0, r0, 31
+	bne @84
+	lwz r3, 0x8(r31)
+	li r0, 0x1
+	ori r3, r3, 0x1
+	stw r3, 0x8(r31)
+	stb r0, 0x37(r31)
+	b @84
+	@88:
+	lfs f1, 0x104(r31)
+	lfs f0, float_0_8041cdec(r2)
+	fcmpu cr0, f1, f0
+	beq @84
+	lfs f0, 0x58(r31)
+	addi r4, r1, 0xa8
+	addi r3, r1, 0xa0
+	stfs f0, 0xa0(r1)
+	lfs f0, 0x60(r31)
+	stfs f0, 0xa8(r1)
+	lfs f2, 0x100(r31)
+	bl movePos
+	b @84
+	@87:
+	lbz r3, 0x4d(r31)
+	addi r0, r3, 0x1
+	stb r0, 0x4d(r31)
+	lbz r0, 0x4d(r31)
+	extsb r0, r0
+	cmpwi r0, 0x8
+	ble @84
+	li r0, 0x0
+	mr r3, r27
+	stb r0, 0x4d(r31)
+	lfs f1, 0x5c(r31)
+	bl unk_800c9f48
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @89
+	lfs f1, 0x100(r31)
+	mr r3, r31
+	addi r4, r1, 0x94
+	bl getFrontFloor
+	lfs f2, 0x98(r1)
+	lfs f1, 0x5c(r31)
+	lfs f0, float_5_8041ce18(r2)
+	fsubs f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @90
+	lwz r5, 0x94(r1)
+	mr r3, r31
+	lwz r0, 0x98(r1)
+	li r4, 0x2
+	stw r5, 0x94(r31)
+	stw r0, 0x98(r31)
+	lwz r0, 0x9c(r1)
+	stw r0, 0x9c(r31)
+	bl partyChgMot
+	b @20
+	@90:
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 26, 27
+	bne @84
+	lfs f1, float_11_8041cec4(r2)
+	mr r3, r31
+	addi r4, r1, 0x2c
+	addi r5, r1, 0x28
+	addi r6, r1, 0x24
+	bl partyChkFrontStep
+	lfs f2, 0x2c(r1)
+	lfs f1, 0x5c(r31)
+	lfs f0, float_5_8041ce18(r2)
+	fsubs f1, f2, f1
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @84
+	lfs f1, 0xe0(r31)
+	lfs f0, float_30_8041ce28(r2)
+	fcmpo cr0, f1, f0
+	cror eq, lt, eq
+	bne @84
+	stfs f2, 0x120(r31)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r31)
+	fcmpu cr0, f1, f0
+	beq @84
+	mr r3, r31
+	li r4, 0x6
+	bl partyChgMot
+	b @20
+	@89:
+	lfs f1, 0x58(r31)
+	mr r3, r27
+	lfs f2, 0x60(r31)
+	bl partyGetTargetDir
+	stfs f1, 0x44(r1)
+	frsp f1, f1
+	mr r3, r31
+	addi r4, r1, 0x94
+	bl getFrontFloor
+	lfs f2, 0x98(r1)
+	lfs f1, 0x5c(r31)
+	lfs f0, float_100_8041cde0(r2)
+	fsubs f1, f2, f1
+	fcmpo cr0, f1, f0
+	ble @91
+	lwz r5, 0x94(r1)
+	mr r3, r31
+	lwz r0, 0x98(r1)
+	li r4, 0x1
+	stw r5, 0x58(r31)
+	stw r0, 0x5c(r31)
+	lwz r0, 0x9c(r1)
+	stw r0, 0x60(r31)
+	bl partyChgMot
+	b @84
+	@91:
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @92
+	lwz r5, 0x94(r1)
+	mr r3, r31
+	lwz r0, 0x98(r1)
+	li r4, 0x2
+	stw r5, 0x94(r31)
+	stw r0, 0x98(r31)
+	lwz r0, 0x9c(r1)
+	stw r0, 0x9c(r31)
+	bl partyChgMot
+	b @84
+	@92:
+	mr r3, r31
+	li r4, 0x0
+	bl partyChgMot
+	@84:
+	lfs f0, 0xa0(r1)
+	mr r3, r31
+	addi r4, r1, 0x7c
+	addi r5, r1, 0x20
+	stfs f0, 0x58(r31)
+	lfs f0, 0xa8(r1)
+	stfs f0, 0x60(r31)
+	lfs f0, 0xf0(r31)
+	stfs f0, 0x20(r1)
+	lwz r6, 0x58(r31)
+	lwz r0, 0x5c(r31)
+	stw r6, 0x7c(r1)
+	stw r0, 0x80(r1)
+	lwz r0, 0x60(r31)
+	stw r0, 0x84(r1)
+	lfs f1, 0x10c(r31)
+	bl partySearchHead
+	cmplwi r3, 0x0
+	beq @93
+	stw r3, 0x140(r31)
+	@93:
+	lwz r0, 0x0(r31)
+	mr r3, r31
+	lfs f1, float_10_8041cdd4(r2)
+	rlwinm r0, r0, 0, 25, 23
+	fmr f2, f1
+	stw r0, 0x0(r31)
+	bl partySearchGround
+	lfs f0, 0xe4(r31)
+	mr. r25, r3
+	stfs f0, 0xa4(r1)
+	beq @94
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	beq @95
+	lbz r0, 0x4c(r31)
+	li r25, 0x0
+	extsb. r0, r0
+	bne @94
+	lwz r0, 0x8(r31)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r31)
+	lwz r0, 0x0(r31)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r31)
+	b @94
+	@95:
+	rlwinm. r0, r3, 0, 20, 20
+	beq @94
+	mr r3, r31
+	li r4, 0xd
+	bl partyChgRunMode
+	b @20
+	@94:
+	cmplwi r25, 0x0
+	stw r25, 0x138(r31)
+	bne @96
+	mr r3, r31
+	li r4, 0x3
+	bl partyChgMot
+	lfs f0, float_neg1_8041cdf8(r2)
+	stfs f0, 0x11c(r31)
+	b @97
+	@96:
+	mr r3, r25
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 23, 23
+	beq @98
+	lwz r0, 0x0(r31)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r31)
+	b @99
+	@98:
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r31)
+	@99:
+	mr r3, r25
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 1, 1
+	beq @97
+	stw r25, 0x14c(r31)
+	@97:
+	lfs f0, 0xa4(r1)
+	mr r3, r31
+	stfs f0, 0x5c(r31)
+	bl party_force_reset_outofscreen
+	lwz r3, gp(r13)
+	addi r4, r29, 0xd8
+	lwz r25, 0x160(r31)
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @20
+	lwz r3, 0x1e4(r25)
+	cmplwi r3, 0x0
+	beq @20
+	lwz r0, 0x138(r31)
+	cmplwi r0, 0x0
+	beq @20
+	bl hitGetName
+	addi r4, r29, 0xe0
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @20
+	lwz r3, 0x138(r31)
+	bl hitGetName
+	addi r4, r29, 0xf4
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @20
+	lwz r3, 0xc0(r29)
+	lwz r0, 0xc4(r29)
+	stw r3, 0x58(r31)
+	stw r0, 0x5c(r31)
+	lwz r0, 0xc8(r29)
+	stw r0, 0x60(r31)
+	@20:
+	psq_l f31, 0x218(r1), 0, 0
+	lfd f31, 0x210(r1)
+	psq_l f30, 0x208(r1), 0, 0
+	lfd f30, 0x200(r1)
+	psq_l f29, 0x1f8(r1), 0, 0
+	lfd f29, 0x1f0(r1)
+	psq_l f28, 0x1e8(r1), 0, 0
+	lfd f28, 0x1e0(r1)
+	psq_l f27, 0x1d8(r1), 0, 0
+	lfd f27, 0x1d0(r1)
+	psq_l f26, 0x1c8(r1), 0, 0
+	lfd f26, 0x1c0(r1)
+	psq_l f25, 0x1b8(r1), 0, 0
+	lfd f25, 0x1b0(r1)
+	psq_l f24, 0x1a8(r1), 0, 0
+	lfd f24, 0x1a0(r1)
+	lmw r25, 0x184(r1)
+	lwz r0, 0x224(r1)
+	mtlr r0
+	addi r1, r1, 0x220
+	blr
+}
+
+asm void unk_8014b824(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	stw r0, 0x24(r1)
+	stw r31, 0x1c(r1)
+	mr r31, r3
+	stw r30, 0x18(r1)
+	stw r29, 0x14(r1)
+	lwz r0, 0x0(r3)
+	lwz r29, 0x160(r3)
+	rlwinm. r0, r0, 0, 5, 5
+	bne @1
+	lfs f1, float_10_8041cdd4(r2)
+	lfs f2, float_0_8041cdec(r2)
+	bl partySearchGround
+	mr. r30, r3
+	beq @2
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 20, 20
+	beq @3
+	mr r3, r31
+	li r4, 0xd
+	bl partyChgRunMode
+	b @1
+	@3:
+	rlwinm. r0, r3, 0, 23, 23
+	beq @4
+	lwz r0, 0x0(r31)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r31)
+	b @2
+	@4:
+	lwz r0, 0x0(r31)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r31)
+	@2:
+	lwz r3, 0x160(r31)
+	lha r0, 0x50(r3)
+	cmpwi r0, 0x0
+	beq @5
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	bne @5
+	li r0, 0x0
+	b @6
+	@5:
+	lhz r0, 0x2e(r3)
+	cmplwi r0, 0x1f
+	beq @7
+	cmplwi r0, 0x20
+	beq @7
+	cmplwi r0, 0x10
+	beq @7
+	cmplwi r0, 0x11
+	bne @8
+	@7:
+	li r0, 0x0
+	b @6
+	@8:
+	li r0, 0x1
+	@6:
+	cmpwi r0, 0x0
+	beq @9
+	cmplwi r30, 0x0
+	lfs f3, float_0p05_8041cea0(r2)
+	beq @10
+	lfs f0, 0x90(r29)
+	lfs f1, 0xe4(r31)
+	fcmpo cr0, f0, f1
+	ble @11
+	fmr f2, f0
+	lfs f3, float_0p1_8041ce44(r2)
+	b @12
+	@11:
+	fmr f2, f1
+	lfs f3, float_0p1_8041ce44(r2)
+	@12:
+	lfs f0, 0x5c(r31)
+	fcmpo cr0, f0, f1
+	bge @13
+	lfs f0, float_18p5_8041cec8(r2)
+	lfs f3, float_0p1_8041ce44(r2)
+	fadds f2, f0, f1
+	b @13
+	@10:
+	lfs f2, 0x90(r29)
+	@13:
+	lwz r0, 0x4(r31)
+	lfs f0, float_5_8041ce18(r2)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @14
+	lfs f0, float_1_8041ce1c(r2)
+	@14:
+	fadds f2, f2, f0
+	lfs f1, 0x5c(r31)
+	lfs f0, float_5_8041ce18(r2)
+	fsubs f1, f2, f1
+	fcmpo cr0, f1, f0
+	bgt @15
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f0, f1
+	ble @1
+	@15:
+	lfs f0, 0x5c(r31)
+	fmadds f0, f1, f3, f0
+	stfs f0, 0x5c(r31)
+	b @1
+	@9:
+	cmplwi r30, 0x0
+	beq @16
+	lfs f2, 0x90(r29)
+	lfs f1, 0xe4(r31)
+	fcmpo cr0, f2, f1
+	ble @17
+	b @18
+	@17:
+	fmr f2, f1
+	@18:
+	lfs f0, 0x5c(r31)
+	fcmpo cr0, f0, f1
+	bge @19
+	lfs f0, float_18p5_8041cec8(r2)
+	fadds f2, f0, f1
+	b @19
+	@16:
+	lfs f2, 0x5c(r31)
+	@19:
+	lwz r0, 0x4(r31)
+	lfs f0, float_5_8041ce18(r2)
+	rlwinm. r0, r0, 0, 16, 16
+	beq @20
+	lfs f0, float_1_8041ce1c(r2)
+	@20:
+	fadds f2, f2, f0
+	lfs f1, 0x5c(r31)
+	lfs f0, float_5_8041ce18(r2)
+	fsubs f2, f2, f1
+	fcmpo cr0, f2, f0
+	bgt @21
+	lfs f0, float_0_8041cdec(r2)
+	fcmpo cr0, f0, f2
+	ble @1
+	@21:
+	lfs f1, float_0p05_8041cea0(r2)
+	lfs f0, 0x5c(r31)
+	fmadds f0, f2, f1, f0
+	stfs f0, 0x5c(r31)
+	@1:
+	lwz r0, 0x24(r1)
+	lwz r31, 0x1c(r1)
+	lwz r30, 0x18(r1)
+	lwz r29, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+asm void unk_8014ba3c(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	addi r4, r1, 0xc
+	addi r5, r1, 0x8
+	stw r31, 0x2c(r1)
+	stw r30, 0x28(r1)
+	stw r29, 0x24(r1)
+	mr r29, r3
+	lwz r6, 0x58(r3)
+	lwz r0, 0x5c(r3)
+	stw r6, 0xc(r1)
+	stw r0, 0x10(r1)
+	lwz r0, 0x60(r3)
+	stw r0, 0x14(r1)
+	lfs f0, 0xf0(r3)
+	stfs f0, 0x8(r1)
+	lfs f1, 0x10c(r3)
+	bl partySearchHead
+	cmplwi r3, 0x0
+	beq @1
+	stw r3, 0x140(r29)
+	@1:
+	lwz r3, 0x0(r29)
+	rlwinm. r0, r3, 0, 5, 5
+	bne @2
+	rlwinm r0, r3, 0, 25, 23
+	lfs f1, float_15_8041ce60(r2)
+	stw r0, 0x0(r29)
+	mr r3, r29
+	lfs f2, float_neg15_8041cecc(r2)
+	bl partySearchGround
+	mr. r31, r3
+	beq @3
+	bl hitGetAttr
+	rlwinm. r0, r3, 0, 22, 22
+	mr r30, r3
+	beq @3
+	lbz r0, 0x4c(r29)
+	li r31, 0x0
+	extsb. r0, r0
+	bne @3
+	lwz r0, 0x8(r29)
+	oris r0, r0, 0x100
+	stw r0, 0x8(r29)
+	lwz r0, 0x0(r29)
+	oris r0, r0, 0x200
+	stw r0, 0x0(r29)
+	@3:
+	cmplwi r31, 0x0
+	stw r31, 0x138(r29)
+	bne @4
+	lwz r0, 0x0(r29)
+	mr r3, r29
+	li r4, 0x3
+	rlwinm r0, r0, 0, 31, 29
+	stw r0, 0x0(r29)
+	bl partyChgMot
+	lfs f0, float_neg1p5_8041ced0(r2)
+	stfs f0, 0x11c(r29)
+	b @2
+	@4:
+	lfs f0, 0xe4(r29)
+	rlwinm. r0, r30, 0, 23, 23
+	stfs f0, 0x5c(r29)
+	lwz r0, 0x0(r29)
+	ori r0, r0, 0x2
+	stw r0, 0x0(r29)
+	beq @5
+	lwz r0, 0x0(r29)
+	ori r0, r0, 0x80
+	stw r0, 0x0(r29)
+	b @6
+	@5:
+	lwz r0, 0x0(r29)
+	rlwinm r0, r0, 0, 25, 23
+	stw r0, 0x0(r29)
+	@6:
+	rlwinm. r0, r30, 0, 1, 1
+	beq @7
+	stw r31, 0x14c(r29)
+	@7:
+	mr r3, r31
+	bl unk_800c8dd0
+	cmpwi r3, 0x0
+	beq @2
+	mr r3, r29
+	mr r4, r31
+	addi r5, r29, 0x94
+	bl partyGetAppearPos5
+	lwz r0, 0x8(r29)
+	mr r3, r29
+	li r4, 0x2
+	oris r0, r0, 0x40
+	stw r0, 0x8(r29)
+	lfs f0, 0x5c(r29)
+	stfs f0, 0x98(r29)
+	bl partyChgMot
+	@2:
+	lwz r0, 0x34(r1)
+	lwz r31, 0x2c(r1)
+	lwz r30, 0x28(r1)
+	lwz r29, 0x24(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+
+asm void unk_8014bbc8(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	mr r31, r3
+	stw r30, 0x8(r1)
+	lwz r4, 0x8(r3)
+	lwz r30, 0x160(r3)
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r0, r4, 0, 31, 29
+	li r4, 0x1
+	stw r0, 0x8(r31)
+	bl partyChgPoseId
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @2
+	bl partyClearFootmark
+	b @3
+	@2:
+	bl partyClearFootmark2
+	@3:
+	li r0, -0x1
+	stw r0, 0x168(r31)
+	@1:
+	mr r3, r31
+	bl party_slit
+	mr r3, r31
+	bl party_roll
+	mr r3, r31
+	bl unk_800c9044
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 7, 7
+	bne @4
+	mr r3, r31
+	bl partyChkWall
+	@4:
+	mr r3, r31
+	bl partyChkGnd
+	lfs f1, 0x58(r31)
+	lfs f2, 0x60(r31)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl distABf
+	lfs f0, float_31_8041ced4(r2)
+	fcmpo cr0, f1, f0
+	ble @5
+	mr r3, r31
+	li r4, 0x2
+	bl partyChgRunMode
+	@5:
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0xe
+	bne @6
+	lwz r0, 0x0(r31)
+	rlwinm. r0, r0, 0, 12, 12
+	bne @6
+	mr r3, r31
+	li r4, 0x0
+	bl partyMoveBehindMario
+	b @7
+	@6:
+	lbz r0, 0x32(r31)
+	cmplwi r0, 0x1
+	bne @8
+	mr r3, r31
+	bl unk_8014b824
+	b @7
+	@8:
+	mr r3, r31
+	bl unk_8014ba3c
+	lbz r0, 0x31(r31)
+	cmpwi r0, 0x7
+	bne @7
+	lwz r0, 0x4(r31)
+	rlwinm. r0, r0, 0, 16, 16
+	bne @7
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @7
+	bl marioChkDeepSleep
+	cmpwi r3, 0x1
+	beq @7
+	bl chuchu_searchObject
+	cmpwi r3, 0x0
+	beq @7
+	lbz r0, 0x39(r31)
+	cmpwi r0, 0x1
+	beq @9
+	bge @10
+	b @11
+	@10:
+	cmpwi r0, 0x3
+	bge @11
+	b @12
+	@9:
+	lwz r3, 0x24(r31)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r31)
+	bgt @7
+	mr r3, r31
+	li r4, 0x1
+	bl partyChgPoseId
+	li r3, 0x1e
+	li r0, 0x2
+	stw r3, 0x24(r31)
+	stb r0, 0x39(r31)
+	b @7
+	@12:
+	lwz r3, 0x24(r31)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r31)
+	bgt @7
+	li r0, 0x0
+	stb r0, 0x39(r31)
+	b @7
+	@11:
+	lis r4, str_802F3F0C@ha
+	mr r3, r31
+	addi r4, r4, str_802F3F0C@l
+	bl partyChgPose
+	li r3, 0x1
+	li r0, 0x1e
+	stb r3, 0x39(r31)
+	stw r0, 0x24(r31)
+	@7:
+	lwz r0, 0x14(r1)
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm void party_motion_stay(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x80(r1)
+	mflr r0
+	stw r0, 0x84(r1)
+	stfd f31, 0x70(r1)
+	psq_st f31, 0x78(r1), 0, 0
+	stfd f30, 0x60(r1)
+	psq_st f30, 0x68(r1), 0, 0
+	stfd f29, 0x50(r1)
+	psq_st f29, 0x58(r1), 0, 0
+	stmw r27, 0x3c(r1)
+	mr r28, r3
+	lis r4, vec3_802f3e40@ha
+	lwz r30, 0x160(r3)
+	addi r31, r4, vec3_802f3e40@l
+	bl partyGetFootmarkId
+	lwz r4, 0x8(r28)
+	mr r29, r3
+	rlwinm. r0, r4, 0, 30, 30
+	beq @1
+	rlwinm r0, r4, 0, 31, 29
+	mr r3, r28
+	stw r0, 0x8(r28)
+	li r4, 0x1
+	bl partyChgPoseId
+	lwz r0, 0x8(r28)
+	rlwinm. r0, r0, 0, 8, 8
+	bne @2
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 28, 28
+	bne @3
+	bl partyClearFootmark
+	b @2
+	@3:
+	bl partyClearFootmark2
+	@2:
+	lwz r4, 0x8(r28)
+	li r0, -0x1
+	lfs f1, float_0_8041cdec(r2)
+	mr r3, r28
+	rlwinm r4, r4, 0, 9, 7
+	stw r4, 0x8(r28)
+	stw r0, 0x168(r28)
+	bl unk_800c9398
+	@1:
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0xe
+	beq @4
+	lwz r3, 0x0(r28)
+	rlwinm. r0, r3, 0, 12, 12
+	beq @4
+	rlwinm r0, r3, 0, 13, 11
+	stw r0, 0x0(r28)
+	@4:
+	lfs f1, 0x190(r30)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f31, 0x40(r28)
+	fcmpu cr0, f1, f0
+	bne @5
+	lfs f1, 0x180(r30)
+	lfs f0, float_1_8041ce1c(r2)
+	fcmpo cr0, f1, f0
+	bge @5
+	lfs f31, float_100_8041cde0(r2)
+	@5:
+	lbz r0, 0x3c(r30)
+	cmpwi r0, 0x2
+	bne @6
+	lfs f31, float_70_8041ceb8(r2)
+	@6:
+	lwz r3, gp(r13)
+	addi r4, r31, 0x188
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @7
+	lwz r3, gp(r13)
+	addi r4, r31, 0x190
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @7
+	lwz r3, gp(r13)
+	addi r4, r31, 0x198
+	addi r3, r3, 0x12c
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @8
+	@7:
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @8
+	lbz r0, 0x32(r28)
+	cmplwi r0, 0x0
+	bne @9
+	lfs f30, float_18_8041ce20(r2)
+	b @10
+	@9:
+	lbz r0, 0x31(r28)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @11
+	lwz r0, 0x8(r28)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @12
+	lfs f30, float_8_8041ce24(r2)
+	b @10
+	@12:
+	lfs f30, float_30_8041ce28(r2)
+	b @10
+	@11:
+	cmpwi r0, 0x6
+	bne @10
+	lwz r0, 0x8(r28)
+	rlwinm. r0, r0, 0, 10, 10
+	beq @13
+	lfs f30, float_8_8041ce24(r2)
+	b @10
+	@13:
+	lfs f30, float_30_8041ce28(r2)
+	@10:
+	lwz r0, 0x8(r28)
+	fmr f31, f30
+	oris r0, r0, 0x2
+	stw r0, 0x8(r28)
+	@8:
+	lwz r3, 0x8(r28)
+	extrwi. r0, r3, 1, 14
+	beq @14
+	lbz r0, 0x32(r28)
+	cmplwi r0, 0x0
+	bne @15
+	lfs f29, float_18_8041ce20(r2)
+	b @16
+	@15:
+	lbz r0, 0x31(r28)
+	extsb r0, r0
+	cmpwi r0, 0x5
+	bne @17
+	rlwinm. r0, r3, 0, 10, 10
+	beq @18
+	lfs f29, float_8_8041ce24(r2)
+	b @16
+	@18:
+	lfs f29, float_30_8041ce28(r2)
+	b @16
+	@17:
+	cmpwi r0, 0x6
+	bne @16
+	rlwinm. r0, r3, 0, 10, 10
+	beq @19
+	lfs f29, float_8_8041ce24(r2)
+	b @16
+	@19:
+	lfs f29, float_30_8041ce28(r2)
+	@16:
+	fmr f31, f29
+	@14:
+	mr r3, r28
+	bl party_slit
+	mr r3, r28
+	bl party_roll
+	mr r3, r28
+	bl unk_800c9044
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0xe
+	bne @20
+	lwz r0, 0x0(r28)
+	rlwinm. r0, r0, 0, 12, 12
+	bne @20
+	mr r3, r28
+	li r4, 0x0
+	bl partyMoveBehindMario
+	b @21
+	@20:
+	lbz r0, 0x34(r28)
+	cmplwi r0, 0x0
+	beq @22
+	lbz r0, 0x2f(r28)
+	extsb. r0, r0
+	beq @23
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	bne @24
+	@23:
+	lwz r3, 0x160(r28)
+	lha r0, 0x50(r3)
+	cmpwi r0, 0x0
+	beq @25
+	lfs f1, float_0_8041cdec(r2)
+	lfs f0, 0x180(r3)
+	fcmpu cr0, f1, f0
+	bne @25
+	li r0, 0x0
+	b @26
+	@25:
+	lhz r0, 0x2e(r3)
+	cmplwi r0, 0x1f
+	beq @27
+	cmplwi r0, 0x20
+	beq @27
+	cmplwi r0, 0x10
+	beq @27
+	cmplwi r0, 0x11
+	bne @28
+	@27:
+	li r0, 0x0
+	b @26
+	@28:
+	li r0, 0x1
+	@26:
+	cmpwi r0, 0x0
+	beq @22
+	lbz r0, 0x32(r28)
+	cmplwi r0, 0x0
+	bne @29
+	lwz r5, 0x58(r28)
+	mr r3, r29
+	lwz r0, 0x5c(r28)
+	addi r4, r1, 0x18
+	stw r5, 0x18(r1)
+	stw r0, 0x1c(r1)
+	lwz r0, 0x60(r28)
+	stw r0, 0x20(r1)
+	bl partyGetTargetDist3D
+	fmr f0, f1
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	mr r3, r29
+	fmr f29, f0
+	bl partyGetTargetDist
+	b @30
+	@29:
+	lfs f0, 0x58(r28)
+	stfs f0, 0x14(r1)
+	lfs f0, 0x60(r28)
+	stfs f0, 0x10(r1)
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl angleABf
+	lfs f3, float_0p5_8041ce00(r2)
+	fmr f2, f1
+	lfs f0, 0xf4(r28)
+	addi r3, r1, 0x14
+	addi r4, r1, 0x10
+	fmuls f1, f3, f0
+	bl movePos
+	lfs f1, 0x14(r1)
+	lfs f2, 0x10(r1)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl distABf
+	fmr f29, f1
+	@30:
+	bl marioChkSlitThrouh
+	cmpwi r3, 0x0
+	bne @31
+	fcmpo cr0, f29, f31
+	cror eq, gt, eq
+	bne @22
+	@31:
+	bl marioChkDeepSleep
+	cmpwi r3, 0x0
+	bne @22
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgMot
+	b @22
+	@24:
+	lbz r3, 0x2f(r28)
+	extsb r3, r3
+	bl anotherPartyGetPtr
+	mr. r27, r3
+	beq @22
+	bl nokonokoGetStatus
+	cmpwi r3, 0x3
+	beq @32
+	addi r3, r30, 0x8c
+	addi r4, r27, 0x58
+	bl PSVECDistance
+	lfs f0, float_150_8041cebc(r2)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne @33
+	@32:
+	lfs f1, 0x58(r28)
+	mr r3, r29
+	lfs f2, 0x60(r28)
+	bl partyGetTargetDist
+	fcmpo cr0, f1, f31
+	cror eq, gt, eq
+	bne @34
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgMot
+	bl partyClearFootmark2
+	b @34
+	@33:
+	lbz r3, 0x31(r27)
+	cmpwi r3, 0x3
+	bne @35
+	lbz r0, 0x34(r27)
+	cmplwi r0, 0x3
+	bne @35
+	lhz r0, 0x2e(r30)
+	cmplwi r0, 0x1f
+	beq @34
+	cmplwi r0, 0x10
+	beq @34
+	cmplwi r0, 0x11
+	beq @34
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x8c(r30)
+	lfs f4, 0x94(r30)
+	bl distABf
+	fcmpo cr0, f1, f31
+	cror eq, gt, eq
+	bne @34
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgMot
+	b @34
+	@35:
+	lwz r0, 0x0(r27)
+	rlwinm. r0, r0, 0, 23, 23
+	beq @36
+	extsb r0, r3
+	cmpwi r0, 0x4
+	bne @34
+	@36:
+	lfs f1, 0x58(r28)
+	lfs f2, 0x60(r28)
+	lfs f3, 0x58(r27)
+	lfs f4, 0x60(r27)
+	bl distABf
+	fcmpo cr0, f1, f31
+	cror eq, gt, eq
+	bne @34
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgMot
+	@34:
+	bl marioChkSlitThrouh
+	cmpwi r3, 0x0
+	beq @22
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgMot
+	@22:
+	lwz r6, 0x58(r28)
+	mr r3, r28
+	lwz r0, 0x5c(r28)
+	addi r4, r1, 0xc
+	addi r5, r1, 0x8
+	stw r6, 0x24(r1)
+	stw r0, 0x28(r1)
+	lwz r0, 0x60(r28)
+	stw r0, 0x2c(r1)
+	bl partyGetMoveDirSpd
+	lfs f1, 0x8(r1)
+	mr r3, r28
+	lfs f2, 0xc(r1)
+	addi r4, r1, 0x24
+	bl partySearchFrontWall
+	cmplwi r3, 0x0
+	beq @37
+	stw r3, 0x12c(r28)
+	lfs f0, float_0_8041cdec(r2)
+	lfs f1, 0x104(r28)
+	fcmpu cr0, f1, f0
+	beq @37
+	stw r3, 0x134(r28)
+	@37:
+	lfs f0, 0x24(r1)
+	mr r3, r28
+	addi r4, r1, 0xc
+	addi r5, r1, 0x8
+	stfs f0, 0x58(r28)
+	lfs f0, 0x2c(r1)
+	stfs f0, 0x60(r28)
+	bl partyGetMoveDirSpd
+	lfs f1, 0x8(r1)
+	addi r3, r1, 0x24
+	lfs f2, 0xc(r1)
+	li r4, 0x1
+	lfs f3, 0xf4(r28)
+	lfs f4, 0xf0(r28)
+	bl marioChkWallAround
+	lfs f0, 0x24(r1)
+	stfs f0, 0x58(r28)
+	lfs f0, 0x2c(r1)
+	stfs f0, 0x60(r28)
+	lbz r0, 0x32(r28)
+	cmplwi r0, 0x1
+	bne @38
+	mr r3, r28
+	bl unk_8014b824
+	b @21
+	@38:
+	mr r3, r28
+	bl unk_8014ba3c
+	mr r3, r28
+	bl party_force_reset_outofscreen
+	lbz r0, 0x31(r28)
+	cmpwi r0, 0x7
+	bne @21
+	lwz r0, 0x4(r28)
+	rlwinm. r0, r0, 0, 16, 16
+	bne @21
+	bl marioKeyOffChk
+	cmpwi r3, 0x0
+	bne @21
+	bl marioChkDeepSleep
+	cmpwi r3, 0x1
+	beq @21
+	bl chuchu_searchObject
+	cmpwi r3, 0x0
+	beq @21
+	lbz r0, 0x39(r28)
+	cmpwi r0, 0x1
+	beq @39
+	bge @40
+	b @41
+	@40:
+	cmpwi r0, 0x3
+	bge @41
+	b @42
+	@39:
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bgt @21
+	mr r3, r28
+	li r4, 0x1
+	bl partyChgPoseId
+	li r3, 0x1e
+	li r0, 0x2
+	stw r3, 0x24(r28)
+	stb r0, 0x39(r28)
+	b @21
+	@42:
+	lwz r3, 0x24(r28)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r28)
+	bgt @21
+	li r0, 0x0
+	stb r0, 0x39(r28)
+	b @21
+	@41:
+	mr r3, r28
+	addi r4, r31, 0xcc
+	bl partyChgPose
+	li r3, 0x1
+	li r0, 0x1e
+	stb r3, 0x39(r28)
+	stw r0, 0x24(r28)
+	@21:
+	psq_l f31, 0x78(r1), 0, 0
+	lfd f31, 0x70(r1)
+	psq_l f30, 0x68(r1), 0, 0
+	lfd f30, 0x60(r1)
+	psq_l f29, 0x58(r1), 0, 0
+	lfd f29, 0x50(r1)
+	lmw r27, 0x3c(r1)
+	lwz r0, 0x84(r1)
+	mtlr r0
+	addi r1, r1, 0x80
+	blr
+}
+
+asm void N_partyFollowCloseOff(PartyEntry* party) {
+	nofralloc
+	lwz r0, 0x8(r3)
+	rlwinm r0, r0, 0, 15, 13
+	stw r0, 0x8(r3)
+	blr
+}
+
+asm void N_partyFollowCloseOn(PartyEntry* party) {
+	nofralloc
+	lwz r0, 0x8(r3)
+	oris r0, r0, 0x2
+	stw r0, 0x8(r3)
+	blr
+}
+
+asm void unk_8014c47c(void) {
+	nofralloc
+	lfs f0, float_60_8041cec0(r2)
+	stfs f0, touch_wall_ct(r13)
+	blr
+}
+
+asm s32 evt_snd_sfx_all_stop(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	bl psndSFXAllOff
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_set_rev_mode(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r3, 0x18(r3)
+	lwz r3, 0x0(r3)
+	bl psndSetReverb
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_env_lpf(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl evtGetValue
+	clrlwi r4, r3, 16
+	mr r3, r31
+	bl psndENV_LPF
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_envoff_f(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	mr r4, r0
+	li r5, 0x0
+	bl psndENVOff_f_d
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_envoff(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r3, 0x18(r3)
+	lwz r3, 0x0(r3)
+	bl psndENVOff
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_envon_f(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r30, 0x4(r4)
+	lwz r4, 0x8(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	mr r5, r0
+	mr r4, r30
+	li r6, 0x0
+	bl psndENVOn_f_d
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r3, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl psndENVOn
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfx_dist(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	lwz r4, 0x4(r31)
+	mr r31, r3
+	mr r3, r30
+	bl evtGetValue
+	clrlwi r4, r3, 16
+	mr r3, r31
+	bl psndSFX_dist
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfx_pos(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	stw r31, 0x2c(r1)
+	stw r30, 0x28(r1)
+	stw r29, 0x24(r1)
+	mr r29, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	lwz r4, 0x4(r31)
+	mr r30, r3
+	mr r3, r29
+	bl evtGetFloat
+	stfs f1, 0x8(r1)
+	mr r3, r29
+	lwz r4, 0x8(r31)
+	bl evtGetFloat
+	stfs f1, 0xc(r1)
+	mr r3, r29
+	lwz r4, 0xc(r31)
+	bl evtGetFloat
+	stfs f1, 0x10(r1)
+	mr r3, r30
+	addi r4, r1, 0x8
+	bl psndSFX_pos
+	lwz r0, 0x34(r1)
+	li r3, 0x2
+	lwz r31, 0x2c(r1)
+	lwz r30, 0x28(r1)
+	lwz r29, 0x24(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+
+asm s32 evt_snd_sfx_vol(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	lwz r4, 0x4(r31)
+	mr r31, r3
+	mr r3, r30
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	clrlwi r4, r0, 24
+	bl psndSFX_vol
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfx_pit(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	lwz r4, 0x4(r31)
+	mr r31, r3
+	mr r3, r30
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	extsh r4, r0
+	bl psndSFX_pit
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfxchk(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	bl psndSFXChk
+	lwz r4, 0x4(r31)
+	mr r5, r3
+	mr r3, r30
+	bl evtSetValue
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfxoff(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	bl psndSFXOff
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfxon_3d_ex(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	stmw r26, 0x18(r1)
+	mr r26, r3
+	lwz r31, 0x18(r3)
+	lwz r30, 0x0(r31)
+	lwz r4, 0x4(r31)
+	bl evtGetFloat
+	stfs f1, 0x8(r1)
+	mr r3, r26
+	lwz r4, 0x8(r31)
+	bl evtGetFloat
+	stfs f1, 0xc(r1)
+	mr r3, r26
+	lwz r4, 0xc(r31)
+	bl evtGetFloat
+	stfs f1, 0x10(r1)
+	mr r3, r26
+	lwz r4, 0x10(r31)
+	bl evtGetValue
+	lwz r4, 0x14(r31)
+	clrlwi r29, r3, 16
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x18(r31)
+	clrlwi r28, r3, 16
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x1c(r31)
+	clrlwi r27, r3, 16
+	mr r3, r26
+	bl evtGetValue
+	lwz r31, 0x20(r31)
+	clrlwi r8, r3, 16
+	cmpwi r31, 0x0
+	bne @1
+	mr r3, r30
+	mr r7, r27
+	addi r4, r1, 0x8
+	clrlwi r5, r29, 24
+	clrlwi r6, r28, 24
+	bl psndSFXOnEx_3D
+	b @2
+	@1:
+	mr r3, r30
+	mr r7, r27
+	addi r4, r1, 0x8
+	clrlwi r5, r29, 24
+	clrlwi r6, r28, 24
+	bl psndSFXOnEx_3D
+	mr r5, r3
+	mr r3, r26
+	mr r4, r31
+	bl evtSetValue
+	@2:
+	lmw r26, 0x18(r1)
+	li r3, 0x2
+	lwz r0, 0x34(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+
+asm s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x30(r1)
+	mflr r0
+	stw r0, 0x34(r1)
+	stw r31, 0x2c(r1)
+	stw r30, 0x28(r1)
+	stw r29, 0x24(r1)
+	mr r29, r3
+	lwz r31, 0x18(r3)
+	lwz r30, 0x0(r31)
+	lwz r4, 0x4(r31)
+	bl evtGetFloat
+	stfs f1, 0x8(r1)
+	mr r3, r29
+	lwz r4, 0x8(r31)
+	bl evtGetFloat
+	stfs f1, 0xc(r1)
+	mr r3, r29
+	lwz r4, 0xc(r31)
+	bl evtGetFloat
+	stfs f1, 0x10(r1)
+	lwz r31, 0x10(r31)
+	cmpwi r31, 0x0
+	beq @1
+	addis r0, r31, 0xee7
+	cmplwi r0, 0x4d80
+	bne @2
+	@1:
+	mr r3, r30
+	addi r4, r1, 0x8
+	bl psndSFXOn_3D
+	b @3
+	@2:
+	mr r3, r30
+	addi r4, r1, 0x8
+	bl psndSFXOn_3D
+	mr r5, r3
+	mr r3, r29
+	mr r4, r31
+	bl evtSetValue
+	@3:
+	lwz r0, 0x34(r1)
+	li r3, 0x2
+	lwz r31, 0x2c(r1)
+	lwz r30, 0x28(r1)
+	lwz r29, 0x24(r1)
+	mtlr r0
+	addi r1, r1, 0x30
+	blr
+}
+
+asm s32 evt_snd_sfxon_(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r3, 0x18(r3)
+	lwz r31, 0x4(r3)
+	lwz r3, 0x0(r3)
+	cmpwi r31, 0x0
+	bne @1
+	bl psndSFXOn_
+	b @2
+	@1:
+	bl psndSFXOn_
+	mr r5, r3
+	mr r3, r30
+	mr r4, r31
+	bl evtSetValue
+	@2:
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfxon__(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r31, 0x18(r3)
+	lwz r4, 0x0(r31)
+	bl evtGetValue
+	lwz r31, 0x4(r31)
+	cmpwi r31, 0x0
+	bne @1
+	bl psndSFXOn
+	b @2
+	@1:
+	bl psndSFXOn
+	mr r5, r3
+	mr r3, r30
+	mr r4, r31
+	bl evtSetValue
+	@2:
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_sfxon(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lwz r3, 0x18(r3)
+	lwz r31, 0x4(r3)
+	lwz r3, 0x0(r3)
+	cmpwi r31, 0x0
+	bne @1
+	bl psndSFXOn
+	b @2
+	@1:
+	bl psndSFXOn
+	mr r5, r3
+	mr r3, r30
+	mr r4, r31
+	bl evtSetValue
+	@2:
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_bgm_scope(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	mr r4, r0
+	bl psndBGMScope
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_bgm_freq(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	clrlwi r4, r0, 16
+	bl psndBGM_rate
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_bgmoff_f(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	mr r4, r0
+	li r5, 0x0
+	bl psndBGMOff_f_d
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r3, 0x18(r3)
+	lwz r3, 0x0(r3)
+	bl psndBGMOff
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 unk_8014cc24(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	stw r0, 0x24(r1)
+	stw r31, 0x1c(r1)
+	stw r30, 0x18(r1)
+	stw r29, 0x14(r1)
+	stw r28, 0x10(r1)
+	mr r28, r3
+	lwz r31, 0x18(r3)
+	lwz r30, 0x0(r31)
+	lwz r29, 0x4(r31)
+	lwz r4, 0x8(r31)
+	bl evtGetValue
+	lwz r4, 0xc(r31)
+	mr r31, r3
+	mr r3, r28
+	bl evtGetValue
+	mr r3, r30
+	mr r4, r29
+	mr r5, r31
+	mr r6, r31
+	li r7, 0x0
+	bl psndBGMOn_f_d
+	lwz r0, 0x24(r1)
+	li r3, 0x2
+	lwz r31, 0x1c(r1)
+	lwz r30, 0x18(r1)
+	lwz r29, 0x14(r1)
+	lwz r28, 0x10(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+asm s32 evt_snd_bgmon_f(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	lwz r4, 0x18(r3)
+	lwz r31, 0x0(r4)
+	lwz r30, 0x4(r4)
+	lwz r4, 0x8(r4)
+	bl evtGetValue
+	mr r0, r3
+	mr r3, r31
+	mr r5, r0
+	mr r4, r30
+	li r6, 0x0
+	bl unk_800d7270
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r3, 0x0(r4)
+	lwz r4, 0x4(r4)
+	bl psndBGMOn
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+// clang-format on
+#endif
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on

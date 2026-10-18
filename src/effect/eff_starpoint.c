@@ -203,7 +203,7 @@ void effStarPointDisp(CameraId cameraId, EffectEntry* effect) {
 #endif
 
 #ifndef NONMATCHING
-// ASM-STOPGAP: effStarPointEntry (and the functions before it in the target order, see asm_inline.py) are the
+// FAKE (asm stopgap): effStarPointEntry (and the functions before it in the target order, see asm_inline.py) are the
 // target code until the C in the NONMATCHING branch matches.
 // clang-format off
 __declspec(section ".rodata") const f32 vec3_802fdbe0[3] = { 0.0f, 0.0f, 0.0f };

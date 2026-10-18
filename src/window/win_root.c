@@ -303,6 +303,46 @@ void winBgMain(WinPauseWork* wp);
 void winMsgMain(WinPauseWork* wp);
 void winSortMain(WinPauseWork* wp);
 
+static inline void winRootTabMain(WinRootWork* w) {
+    s32 i;
+
+    for (i = 0; i < 5; i++) {
+        switch (w->tab[i].state) {
+        case 0:
+            w->tab[i].x = i * 105 - 205;
+            w->tab[i].y = 300.0f;
+            w->tab[i].timer = i << 2;
+            w->tab[i].state++;
+            break;
+        case 1:
+        case 11:
+            if (--w->tab[i].timer < 0) {
+                w->tab[i].timer = 0;
+                w->tab[i].state++;
+            }
+            break;
+        case 2:
+            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 300.0f, 185.0f);
+            if (w->tab[i].timer > 10) {
+                w->tab[i].state++;
+            }
+            break;
+        case 10:
+            w->tab[i].timer = (4 - i) * 4;
+            w->tab[i].state++;
+            break;
+        case 12:
+            w->tab[i].y = intplGetValue(11, w->tab[i].timer++, 10, 180.0f, 300.0f);
+            if (w->tab[i].timer > 10) {
+                w->tab[i].state++;
+            }
+            break;
+        case 13:
+            break;
+        }
+        }
+}
+
 s32 winRootMain(WinRootWork* w) {
     static char* msg_help[] = {
         "msg_menu_mario", "msg_menu_nakama", "msg_menu_mochimono", "msg_menu_badge", "msg_menu_kiroku",
@@ -310,7 +350,6 @@ s32 winRootMain(WinRootWork* w) {
     s32 x;
     s32 i;
     s32 ret;
-    WinRootTab* t;
 
     switch (w->active) {
     case 0:
@@ -526,41 +565,7 @@ s32 winRootMain(WinRootWork* w) {
         break;
     }
 
-    for (x = -205, t = w->tab, i = 0; i < 5; t++, x += 105, i++) {
-        switch (t->state) {
-        case 0:
-            t->x = x;
-            t->y = 300.0f;
-            t->timer = i << 2;
-            t->state++;
-            break;
-        case 1:
-        case 11:
-            if (--t->timer < 0) {
-                t->timer = 0;
-                t->state++;
-            }
-            break;
-        case 2:
-            t->y = intplGetValue(11, t->timer++, 10, 300.0f, 185.0f);
-            if (t->timer > 10) {
-                t->state++;
-            }
-            break;
-        case 10:
-            t->timer = (4 - i) * 4;
-            t->state++;
-            break;
-        case 12:
-            t->y = intplGetValue(11, t->timer++, 10, 180.0f, 300.0f);
-            if (t->timer > 10) {
-                t->state++;
-            }
-            break;
-        case 13:
-            break;
-        }
-        }
+    winRootTabMain(w);
 
     winBgMain((WinPauseWork*)w);
     winMsgMain((WinPauseWork*)w);

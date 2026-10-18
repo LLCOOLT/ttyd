@@ -1153,6 +1153,7 @@ USER_FUNC(evt_npc_homing_target) {
 // intplGetValue, but for a normalized t in [0, 1]
 f32 _intplGetFloat(s32 mode, f32 t) {
     f32 v, u, c;
+    f32 r;
 
     if (t > 1.0f) {
         t = 1.0f;
@@ -1199,13 +1200,17 @@ f32 _intplGetFloat(s32 mode, f32 t) {
             u = 1.0f - c;
             return u * v;
         case 12:
-            t = (f32)sin(1.5707964f * t); return t;
+            c = (f32)sin(1.5707964f * t);
+            r = c;
+            break;
         case 13:
             return 1.0f - (f32)cos(1.5707964f * t);
         default:
-            return 0.0f;
+            r = 0.0f;
+            break;
     }
-    }
+    return r;
+}
 
 // const char* lookupName, f32 ry
 USER_FUNC(evt_npc_set_ry) {

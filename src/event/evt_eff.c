@@ -160,57 +160,50 @@ extern EffectEntry* effQueen2Entry(s32, f32, f32, f32);
 extern EffectEntry* effGonbabaBreathEntry(s32, s32, f32, f32, f32, f32);
 extern EffectEntry* effMajinaiEntry(s32, f32, f32, f32);
 
+#ifdef NONMATCHING
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
-	s32* a2;
-	s32* f2;
-
+	s32* p;
 	EffectEntry* entry;
 	const char* effName;
+	s32 int2, int3, int4, int5, int6, int7, int8, int9;
 	const char* effSet;
-	s32 int2, int3, int4, int5, int6, int7, int8, int9,
-		int10, int11, int12, int13, int14;
+	s32 int10, int11, int12, int13, int14;
 	f32 float2, float3, float4, float5, float6, float7, float8,
 		float9, float10, float11, float12, float13, float14;
 
 	effName = (const char*)evtGetValue(event, args[0]);
-	//these are probably storing different typecasts, s32 and u32
 	evtGetValue(event, args[0]);
 	evtGetValue(event, args[0]);
-	a2 = args + 2;
-	f2 = a2;
 	effSet = (const char*)evtGetValue(event, args[1]);
 	evtGetValue(event, args[1]);
-
 	evtGetValue(event, args[1]);
-	int2 = evtGetValue(event, *a2++);
-	int3 = evtGetValue(event, *a2++); //unused
-	int4 = evtGetValue(event, *a2++); //unused
-	int5 = evtGetValue(event, *a2++); //unused
-
-	int6 = evtGetValue(event, *a2++);
-	int7 = evtGetValue(event, *a2++);
-	int8 = evtGetValue(event, *a2++);
-	int9 = evtGetValue(event, *a2++);
-	int10 = evtGetValue(event, *a2++);
-	int11 = evtGetValue(event, *a2++);
-	int12 = evtGetValue(event, *a2++); //unused
-	int13 = evtGetValue(event, *a2++); //unused
-	int14 = evtGetValue(event, *a2++); //unused
-
-	float2 = evtGetFloat(event, *f2++); //unused
-	float3 = evtGetFloat(event, *f2++);
-	float4 = evtGetFloat(event, *f2++);
-	float5 = evtGetFloat(event, *f2++);
-	float6 = evtGetFloat(event, *f2++);
-	float7 = evtGetFloat(event, *f2++);
-	float8 = evtGetFloat(event, *f2++);
-	float9 = evtGetFloat(event, *f2++);
-	float10 = evtGetFloat(event, *f2++);
-	float11 = evtGetFloat(event, *f2++);
-	float12 = evtGetFloat(event, *f2++);
-	float13 = evtGetFloat(event, *f2++);
-	float14 = evtGetFloat(event, *f2++);
+	int2 = evtGetValue(event, args[2]);
+	int3 = evtGetValue(event, args[3]);
+	int4 = evtGetValue(event, args[4]);
+	int5 = evtGetValue(event, args[5]);
+	int6 = evtGetValue(event, args[6]);
+	int7 = evtGetValue(event, args[7]);
+	int8 = evtGetValue(event, args[8]);
+	int9 = evtGetValue(event, args[9]);
+	int10 = evtGetValue(event, args[10]);
+	int11 = evtGetValue(event, args[11]);
+	int12 = evtGetValue(event, args[12]);
+	int13 = evtGetValue(event, args[13]);
+	int14 = evtGetValue(event, args[14]);
+	float2 = evtGetFloat(event, args[2]);
+	float3 = evtGetFloat(event, args[3]);
+	float4 = evtGetFloat(event, args[4]);
+	float5 = evtGetFloat(event, args[5]);
+	float6 = evtGetFloat(event, args[6]);
+	float7 = evtGetFloat(event, args[7]);
+	float8 = evtGetFloat(event, args[8]);
+	float9 = evtGetFloat(event, args[9]);
+	float10 = evtGetFloat(event, args[10]);
+	float11 = evtGetFloat(event, args[11]);
+	float12 = evtGetFloat(event, args[12]);
+	float13 = evtGetFloat(event, args[13]);
+	float14 = evtGetFloat(event, args[14]);
 
 	entry = NULL;
 	switch (effGetSet(effSet)->id) {
@@ -383,18 +376,21 @@ USER_FUNC(evt_eff) {
 
 	return EVT_RETURN_DONE;
 }
+#endif
 
 
 
 
 #pragma push
 #pragma optimization_level 2
+#ifdef NONMATCHING
 s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
 {
   s32 *args;
   s32 *pi;
   s32 *pf;
   s32 *pr;
+  s32 new_var;
   const char *effName;
   const char *effSet;
   s32 int2;
@@ -435,9 +431,9 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   evtGetValue(event, args[0]);
   pi = args + 2;
   effSet = (const char *) evtGetValue(event, args[1]);
-  pf = pi;
-  u1a = evtGetValue(event, args[1]);
   pr = pi;
+  u1a = evtGetValue(event, args[1]);
+  pf = pi;
   u1b = evtGetValue(event, args[1]);
   int2 = evtGetValue(event, *(pi++));
   int3 = evtGetValue(event, *(pi++));
@@ -605,6 +601,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       effect = effCoolLeafN64Entry(int2, float3, float4, float5);
       break;
 
+    new_var = int2;
     case 35:
       effect = effBushN64Entry(int2, float3, float4, float5);
       break;
@@ -726,7 +723,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       break;
 
     case 65:
-      effect = effCrystalN64Entry(int2, int7, float3, float4, float5, float6);
+      effect = effCrystalN64Entry(new_var, int7, float3, float4, float5, float6);
       break;
 
     case 66:
@@ -888,28 +885,37 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   }
   return 2;
 }
+#endif
 
 #pragma pop
 
+#ifdef NONMATCHING
 USER_FUNC(evt_eff_softdelete) {
 	effSoftDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));
 	return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_eff_delete) {
 	effDelete(effNameToPtr((const char*)evtGetValue(event, *event->args)));
 	return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_eff_softdelete_ptr) {
 	effSoftDelete((EffectEntry*)evtGetValue(event, *event->args));
 	return EVT_RETURN_DONE;
 }
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(evt_eff_delete_ptr) {
 	effDelete((EffectEntry*)evtGetValue(event, *event->args));
 	return EVT_RETURN_DONE;
 }
+#endif
 
 extern void* marioGetPtr(void);
 extern s32 marioGetPartyId(void);
@@ -919,6 +925,7 @@ extern EffectEntry* effFukidashiEntry(s32 a, s32 b, s32 c, s32 d, f32 x, f32 y, 
 
 #pragma push
 #pragma opt_propagation off
+#ifdef NONMATCHING
 USER_FUNC(evt_eff_fukidashi) {
 	s32* args = event->args;
 	s32 mode = evtGetValue(event, args[0]);
@@ -970,4 +977,2564 @@ USER_FUNC(evt_eff_fukidashi) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
 #pragma pop
+
+#ifndef NONMATCHING
+void evtGetValue();
+#endif
+#ifndef NONMATCHING
+// FAKE (asm stopgap, asmfake.py --whole): evt_eff (and the functions before it in the target order, see asm_inline.py) are the
+// target code until the C in the NONMATCHING branch matches.
+// clang-format off
+#pragma force_active on
+void jt_8006B830(void);
+void jt_8006B848(void);
+void jt_8006B868(void);
+void jt_8006B88C(void);
+void jt_8006B8A8(void);
+void jt_8006B8CC(void);
+void jt_8006B8E8(void);
+void jt_8006B904(void);
+void jt_8006B924(void);
+void jt_8006B944(void);
+void jt_8006B960(void);
+void jt_8006B9A8(void);
+void jt_8006B9C8(void);
+void jt_8006B9F4(void);
+void jt_8006BA18(void);
+void jt_8006BA38(void);
+void jt_8006BA58(void);
+void jt_8006BA78(void);
+void jt_8006BA94(void);
+void jt_8006BAC0(void);
+void jt_8006BADC(void);
+void jt_8006BAFC(void);
+void jt_8006BB1C(void);
+void jt_8006BB48(void);
+void jt_8006C6DC(void);
+void jt_8006BB74(void);
+void jt_8006BB9C(void);
+void jt_8006BBC8(void);
+void jt_8006BBE8(void);
+void jt_8006BC0C(void);
+void jt_8006BC28(void);
+void jt_8006BC44(void);
+void jt_8006BC68(void);
+void jt_8006BC90(void);
+void jt_8006BCB4(void);
+void jt_8006BCD0(void);
+void jt_8006BCEC(void);
+void jt_8006BD10(void);
+void jt_8006BD34(void);
+void jt_8006BD58(void);
+void jt_8006BD74(void);
+void jt_8006BD90(void);
+void jt_8006BDB0(void);
+void jt_8006BDD0(void);
+void jt_8006BDF4(void);
+void jt_8006BE28(void);
+void jt_8006BE4C(void);
+void jt_8006BE70(void);
+void jt_8006BE9C(void);
+void jt_8006BEBC(void);
+void jt_8006BEE8(void);
+void jt_8006BF0C(void);
+void jt_8006BF2C(void);
+void jt_8006BF4C(void);
+void jt_8006BF6C(void);
+void jt_8006BF90(void);
+void jt_8006BFB4(void);
+void jt_8006BFC8(void);
+void jt_8006BFE4(void);
+void jt_8006C008(void);
+void jt_8006C02C(void);
+void jt_8006C050(void);
+void jt_8006C078(void);
+void jt_8006C0A8(void);
+void jt_8006C0D8(void);
+void jt_8006C0FC(void);
+void jt_8006C120(void);
+void jt_8006C13C(void);
+void jt_8006C160(void);
+void jt_8006C184(void);
+void jt_8006C1B4(void);
+void jt_8006C1D8(void);
+void jt_8006C1FC(void);
+void jt_8006C220(void);
+void jt_8006C244(void);
+void jt_8006C274(void);
+void jt_8006C298(void);
+void jt_8006C2BC(void);
+void jt_8006C2E0(void);
+void jt_8006C304(void);
+void jt_8006C338(void);
+void jt_8006C368(void);
+void jt_8006C38C(void);
+void jt_8006C3B0(void);
+void jt_8006C3D4(void);
+void jt_8006C3F8(void);
+void jt_8006C41C(void);
+void jt_8006C440(void);
+void jt_8006C46C(void);
+void jt_8006C490(void);
+void jt_8006C4C8(void);
+void jt_8006C4EC(void);
+void jt_8006C51C(void);
+void jt_8006C544(void);
+void jt_8006C574(void);
+void jt_8006C5A4(void);
+void jt_8006C5C8(void);
+void jt_8006C5EC(void);
+void jt_8006C610(void);
+void jt_8006C634(void);
+void jt_8006C658(void);
+void jt_8006C67C(void);
+void jt_8006C6BC(void);
+__declspec(section ".data") void* jumptable_8030A890[103] = {jt_8006B830, jt_8006B848, jt_8006B868, jt_8006B88C, jt_8006B8A8, jt_8006B8CC, jt_8006B8E8, jt_8006B904, jt_8006B924, jt_8006B944, jt_8006B960, jt_8006B9A8, jt_8006B9C8, jt_8006B9F4, jt_8006BA18, jt_8006BA38, jt_8006BA58, jt_8006BA78, jt_8006BA94, jt_8006BAC0, jt_8006BADC, jt_8006BAFC, jt_8006BB1C, jt_8006BB48, jt_8006C6DC, jt_8006BB74, jt_8006BB9C, jt_8006BBC8, jt_8006BBE8, jt_8006BC0C, jt_8006BC28, jt_8006BC44, jt_8006BC68, jt_8006BC90, jt_8006BCB4, jt_8006BCD0, jt_8006BCEC, jt_8006BD10, jt_8006BD34, jt_8006BD58, jt_8006BD74, jt_8006BD90, jt_8006BDB0, jt_8006BDD0, jt_8006BDF4, jt_8006BE28, jt_8006BE4C, jt_8006BE70, jt_8006BE9C, jt_8006BEBC, jt_8006BEE8, jt_8006BF0C, jt_8006BF2C, jt_8006BF4C, jt_8006BF6C, jt_8006BF90, jt_8006BFB4, jt_8006BFC8, jt_8006BFE4, jt_8006C008, jt_8006C02C, jt_8006C050, jt_8006C078, jt_8006C0A8, jt_8006C0D8, jt_8006C0FC, jt_8006C120, jt_8006C13C, jt_8006C160, jt_8006C184, jt_8006C1B4, jt_8006C1D8, jt_8006C1FC, jt_8006C220, jt_8006C244, jt_8006C274, jt_8006C298, jt_8006C2BC, jt_8006C2E0, jt_8006C304, jt_8006C338, jt_8006C368, jt_8006C38C, jt_8006C3B0, jt_8006C3D4, jt_8006C3F8, jt_8006C41C, jt_8006C440, jt_8006C46C, jt_8006C490, jt_8006C4C8, jt_8006C4EC, jt_8006C51C, jt_8006C544, jt_8006C574, jt_8006C5A4, jt_8006C5C8, jt_8006C5EC, jt_8006C610, jt_8006C634, jt_8006C658, jt_8006C67C, jt_8006C6BC};
+void jt_8006C9D8(void);
+void jt_8006CA38(void);
+void jt_8006D0F8(void);
+void jt_8006CA58(void);
+void jt_8006CAE0(void);
+void jt_8006CB8C(void);
+void jt_8006CEB4(void);
+void jt_8006CDE0(void);
+void jt_8006CA74(void);
+void jt_8006CD2C(void);
+void jt_8006CA94(void);
+void jt_8006CB24(void);
+void jt_8006CB48(void);
+void jt_8006CB68(void);
+void jt_8006CFBC(void);
+void jt_8006CB04(void);
+void jt_8006D008(void);
+void jt_8006CBE0(void);
+void jt_8006CCCC(void);
+void jt_8006C9F8(void);
+void jt_8006CA18(void);
+void jt_8006CC00(void);
+void jt_8006CC38(void);
+void jt_8006CC1C(void);
+void jt_8006CC58(void);
+void jt_8006CC88(void);
+void jt_8006CCA4(void);
+void jt_8006CD0C(void);
+void jt_8006CE08(void);
+void jt_8006CCEC(void);
+void jt_8006CD48(void);
+void jt_8006CE60(void);
+void jt_8006CE24(void);
+void jt_8006CE98(void);
+void jt_8006CE7C(void);
+void jt_8006CD94(void);
+void jt_8006CF28(void);
+void jt_8006CD6C(void);
+void jt_8006CDB0(void);
+void jt_8006CEE0(void);
+void jt_8006CF00(void);
+void jt_8006D05C(void);
+void jt_8006CF68(void);
+void jt_8006CF48(void);
+void jt_8006CF88(void);
+void jt_8006D040(void);
+void jt_8006CFE0(void);
+void jt_8006D024(void);
+void jt_8006D07C(void);
+void jt_8006D0A0(void);
+void jt_8006D0BC(void);
+void jt_8006D0E0(void);
+__declspec(section ".data") void* jumptable_8030AA2C[79] = {jt_8006C9D8, jt_8006CA38, jt_8006D0F8, jt_8006CA58, jt_8006CAE0, jt_8006CB8C, jt_8006CEB4, jt_8006D0F8, jt_8006D0F8, jt_8006CDE0, jt_8006CA74, jt_8006D0F8, jt_8006CD2C, jt_8006CA94, jt_8006D0F8, jt_8006D0F8, jt_8006D0F8, jt_8006D0F8, jt_8006CB24, jt_8006CB48, jt_8006CB68, jt_8006CFBC, jt_8006CB04, jt_8006D008, jt_8006D0F8, jt_8006CBE0, jt_8006CCCC, jt_8006D0F8, jt_8006C9F8, jt_8006CA18, jt_8006CC00, jt_8006D0F8, jt_8006D0F8, jt_8006CC38, jt_8006CC1C, jt_8006CC58, jt_8006D0F8, jt_8006D0F8, jt_8006D0F8, jt_8006CC88, jt_8006CCA4, jt_8006D0F8, jt_8006D0F8, jt_8006CD0C, jt_8006CE08, jt_8006CCEC, jt_8006D0F8, jt_8006CD48, jt_8006D0F8, jt_8006D0F8, jt_8006CE60, jt_8006D0F8, jt_8006CE24, jt_8006D0F8, jt_8006CE98, jt_8006CE7C, jt_8006CD94, jt_8006CF28, jt_8006CD6C, jt_8006CDB0, jt_8006CEE0, jt_8006CF00, jt_8006D0F8, jt_8006D05C, jt_8006CF68, jt_8006CF48, jt_8006CF88, jt_8006D0F8, jt_8006D040, jt_8006CFE0, jt_8006D024, jt_8006D0F8, jt_8006D0F8, jt_8006D0F8, jt_8006D0F8, jt_8006D07C, jt_8006D0A0, jt_8006D0BC, jt_8006D0E0};
+__declspec(section ".sdata2") const f32 float_2_8041a238 = 2.0f;
+__declspec(section ".sdata2") const f32 float_3_8041a23c = 3.0f;
+__declspec(section ".sdata2") const f32 float_0_8041a240 = 0.0f;
+__declspec(section ".sdata2") const char str_8041A244[4] = "me\0";
+__declspec(section ".sdata2") const u32 lbl_8041A248 = 0x00000000;
+__declspec(section ".sdata2") const u32 zero_8041a24c = 0x00000000;
+#pragma force_active on
+__declspec(section ".rodata") const f64 double_to_int_802c47d8 = 4503601774854144;
+#pragma force_active reset
+USER_FUNC(evt_eff_fukidashi);
+USER_FUNC(evt_eff_delete_ptr);
+USER_FUNC(evt_eff_softdelete_ptr);
+USER_FUNC(evt_eff_delete);
+USER_FUNC(evt_eff_softdelete);
+s32 evt_eff64(EventEntry *event, BOOL isFirstCall);
+USER_FUNC(evt_eff);
+
+asm s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x80(r1)
+	mflr r0
+	stw r0, 0x84(r1)
+	stfd f31, 0x70(r1)
+	psq_st f31, 0x78(r1), 0, 0
+	stfd f30, 0x60(r1)
+	psq_st f30, 0x68(r1), 0, 0
+	stfd f29, 0x50(r1)
+	psq_st f29, 0x58(r1), 0, 0
+	stfd f28, 0x40(r1)
+	psq_st f28, 0x48(r1), 0, 0
+	stfd f27, 0x30(r1)
+	psq_st f27, 0x38(r1), 0, 0
+	stmw r24, 0x10(r1)
+	mr r24, r3
+	lwz r30, 0x18(r3)
+	lwz r4, 0x0(r30)
+	bl evtGetValue
+	lwz r4, 0x4(r30)
+	mr r31, r3
+	mr r3, r24
+	bl evtGetValue
+	lwz r4, 0x8(r30)
+	mr r29, r3
+	mr r3, r24
+	bl evtGetValue
+	lwz r4, 0xc(r30)
+	mr r28, r3
+	mr r3, r24
+	bl evtGetValue
+	lwz r4, 0x10(r30)
+	mr r27, r3
+	mr r3, r24
+	bl evtGetValue
+	lwz r4, 0x14(r30)
+	mr r26, r3
+	mr r3, r24
+	bl evtGetFloat
+	fmr f31, f1
+	lwz r4, 0x18(r30)
+	mr r3, r24
+	bl evtGetFloat
+	fmr f30, f1
+	lwz r4, 0x1c(r30)
+	mr r3, r24
+	bl evtGetFloat
+	fmr f29, f1
+	lwz r4, 0x20(r30)
+	mr r3, r24
+	bl evtGetFloat
+	fmr f28, f1
+	lwz r4, 0x24(r30)
+	mr r3, r24
+	bl evtGetFloat
+	fmr f27, f1
+	lwz r4, 0x28(r30)
+	mr r3, r24
+	bl evtGetValue
+	cmpwi r31, 0x2
+	mr r30, r3
+	li r25, 0x0
+	beq @1
+	bge @2
+	cmpwi r31, 0x0
+	beq @3
+	bge @4
+	b @5
+	@2:
+	cmpwi r31, 0x4
+	beq @6
+	bge @5
+	b @7
+	@3:
+	bl marioGetPtr
+	lfs f3, 0x1b8(r3)
+	fmr f5, f27
+	lfs f1, float_2_8041a238(r2)
+	mr r3, r27
+	lfs f0, float_3_8041a23c(r2)
+	mr r4, r26
+	fmuls f2, f1, f3
+	fdivs f4, f3, f0
+	lfs f1, float_0_8041a240(r2)
+	mr r6, r30
+	li r5, -0x1
+	fdivs f2, f2, f0
+	fmr f3, f1
+	bl effFukidashiEntry
+	mr r25, r3
+	b @5
+	@4:
+	mr r3, r28
+	la r4, str_8041A244(r2)
+	bl strcmp
+	cmpwi r3, 0x0
+	bne @8
+	lwz r5, 0x170(r24)
+	b @9
+	@8:
+	mr r3, r28
+	bl npcNameToPtr
+	mr r5, r3
+	@9:
+	lfs f1, float_2_8041a238(r2)
+	fmr f5, f27
+	lfs f3, 0x150(r5)
+	mr r3, r27
+	lfs f0, float_3_8041a23c(r2)
+	mr r4, r26
+	fmuls f2, f1, f3
+	fdivs f4, f3, f0
+	lfs f1, float_0_8041a240(r2)
+	mr r6, r30
+	fdivs f2, f2, f0
+	fmr f3, f1
+	bl effFukidashiEntry
+	mr r25, r3
+	b @5
+	@1:
+	fmr f1, f31
+	mr r3, r27
+	fmr f2, f30
+	mr r4, r26
+	fmr f3, f29
+	mr r6, r30
+	fmr f4, f28
+	li r5, 0x0
+	fmr f5, f27
+	bl effFukidashiEntry
+	mr r25, r3
+	b @5
+	@7:
+	bl marioGetPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @5
+	lfs f3, 0xf0(r3)
+	fmr f5, f27
+	lfs f1, float_2_8041a238(r2)
+	mr r3, r27
+	lfs f0, float_3_8041a23c(r2)
+	mr r4, r26
+	fmuls f2, f1, f3
+	fdivs f4, f3, f0
+	lfs f1, float_0_8041a240(r2)
+	mr r6, r30
+	li r5, -0x2
+	fdivs f2, f2, f0
+	fmr f3, f1
+	bl effFukidashiEntry
+	mr r25, r3
+	b @5
+	@6:
+	bl marioGetExtraPartyId
+	bl partyGetPtr
+	cmplwi r3, 0x0
+	beq @5
+	lfs f3, 0xf0(r3)
+	fmr f5, f27
+	lfs f1, float_2_8041a238(r2)
+	mr r3, r27
+	lfs f0, float_3_8041a23c(r2)
+	mr r4, r26
+	fmuls f2, f1, f3
+	fdivs f4, f3, f0
+	lfs f1, float_0_8041a240(r2)
+	mr r6, r30
+	li r5, -0x3
+	fdivs f2, f2, f0
+	fmr f3, f1
+	bl effFukidashiEntry
+	mr r25, r3
+	@5:
+	cmplwi r29, 0x0
+	beq @10
+	mr r3, r29
+	la r4, lbl_8041A248(r2)
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @10
+	cmplwi r25, 0x0
+	beq @10
+	mr r3, r25
+	mr r4, r29
+	bl effSetName
+	@10:
+	li r3, 0x2
+	psq_l f31, 0x78(r1), 0, 0
+	lfd f31, 0x70(r1)
+	psq_l f30, 0x68(r1), 0, 0
+	lfd f30, 0x60(r1)
+	psq_l f29, 0x58(r1), 0, 0
+	lfd f29, 0x50(r1)
+	psq_l f28, 0x48(r1), 0, 0
+	lfd f28, 0x40(r1)
+	psq_l f27, 0x38(r1), 0, 0
+	lfd f27, 0x30(r1)
+	lmw r24, 0x10(r1)
+	lwz r0, 0x84(r1)
+	mtlr r0
+	addi r1, r1, 0x80
+	blr
+}
+
+asm s32 evt_eff_delete_ptr(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	bl effDelete
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_eff_softdelete_ptr(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	bl effSoftDelete
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_eff_delete(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	bl effNameToPtr
+	bl effDelete
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_eff_softdelete(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	lwz r4, 0x18(r3)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	bl effNameToPtr
+	bl effSoftDelete
+	lwz r0, 0x14(r1)
+	li r3, 0x2
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+asm s32 evt_eff64(EventEntry *event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x100(r1)
+	mflr r0
+	stw r0, 0x104(r1)
+	stfd f31, 0xf0(r1)
+	psq_st f31, 0xf8(r1), 0, 0
+	stfd f30, 0xe0(r1)
+	psq_st f30, 0xe8(r1), 0, 0
+	stfd f29, 0xd0(r1)
+	psq_st f29, 0xd8(r1), 0, 0
+	stfd f28, 0xc0(r1)
+	psq_st f28, 0xc8(r1), 0, 0
+	stfd f27, 0xb0(r1)
+	psq_st f27, 0xb8(r1), 0, 0
+	stfd f26, 0xa0(r1)
+	psq_st f26, 0xa8(r1), 0, 0
+	stfd f25, 0x90(r1)
+	psq_st f25, 0x98(r1), 0, 0
+	stfd f24, 0x80(r1)
+	psq_st f24, 0x88(r1), 0, 0
+	stfd f23, 0x70(r1)
+	psq_st f23, 0x78(r1), 0, 0
+	stfd f22, 0x60(r1)
+	psq_st f22, 0x68(r1), 0, 0
+	stfd f21, 0x50(r1)
+	psq_st f21, 0x58(r1), 0, 0
+	stmw r17, 0x14(r1)
+	mr r30, r3
+	lwz r17, 0x18(r3)
+	lwz r4, 0x0(r17)
+	bl evtGetValue
+	lwz r4, 0x0(r17)
+	mr r31, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x0(r17)
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x4(r17)
+	mr r3, r30
+	addi r29, r17, 0x8
+	bl evtGetValue
+	lwz r4, 0x4(r17)
+	mr r26, r3
+	mr r3, r30
+	mr r28, r29
+	bl evtGetValue
+	lwz r4, 0x4(r17)
+	mr r3, r30
+	mr r27, r29
+	bl evtGetValue
+	lwz r4, 0x0(r29)
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x4(r29)
+	mr r25, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x8(r29)
+	mr r24, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0xc(r29)
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x10(r29)
+	mr r23, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x14(r29)
+	mr r22, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x18(r29)
+	mr r21, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x1c(r29)
+	mr r20, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x20(r29)
+	mr r19, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x24(r29)
+	mr r18, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x28(r29)
+	mr r17, r3
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x2c(r29)
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x30(r29)
+	mr r3, r30
+	bl evtGetValue
+	lwz r4, 0x0(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f31, f1
+	lwz r4, 0x4(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f30, f1
+	lwz r4, 0x8(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f29, f1
+	lwz r4, 0xc(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f28, f1
+	lwz r4, 0x10(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f27, f1
+	lwz r4, 0x14(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f26, f1
+	lwz r4, 0x18(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f25, f1
+	lwz r4, 0x1c(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f24, f1
+	lwz r4, 0x20(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f23, f1
+	lwz r4, 0x24(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f22, f1
+	lwz r4, 0x28(r28)
+	mr r3, r30
+	bl evtGetFloat
+	fmr f21, f1
+	lwz r4, 0x2c(r28)
+	mr r3, r30
+	bl evtGetFloat
+	lwz r4, 0x30(r28)
+	mr r3, r30
+	bl evtGetFloat
+	lwz r27, 0x4(r27)
+	mr r3, r26
+	li r26, 0x0
+	bl effGetSetN64
+	lha r0, 0x0(r3)
+	cmplwi r0, 0x66
+	bgt @1
+	lis r3, jumptable_8030A890@ha
+	slwi r0, r0, 2
+	addi r3, r3, jumptable_8030A890@l
+	lwzx r0, r3, r0
+	mtctr r0
+	bctr
+	@2:
+	entry jt_8006B830
+	fmr f1, f31
+	fmr f2, f30
+	fmr f3, f29
+	bl effExpBomN64Entry
+	mr r26, r3
+	b @1
+	@3:
+	entry jt_8006B848
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effKemuri1N64Entry
+	mr r26, r3
+	b @1
+	@4:
+	entry jt_8006B868
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effKemuri2N64Entry
+	mr r26, r3
+	b @1
+	@5:
+	entry jt_8006B88C
+	fmr f1, f31
+	fmr f2, f30
+	fmr f3, f29
+	fmr f4, f28
+	bl effKemuri3N64Entry
+	mr r26, r3
+	b @1
+	@6:
+	entry jt_8006B8A8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effKemuri4N64Entry
+	mr r26, r3
+	b @1
+	@7:
+	entry jt_8006B8CC
+	fmr f1, f31
+	fmr f2, f30
+	fmr f3, f29
+	fmr f4, f28
+	bl effKemuri5N64Entry
+	mr r26, r3
+	b @1
+	@8:
+	entry jt_8006B8E8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effKemuri6N64Entry
+	mr r26, r3
+	b @1
+	@9:
+	entry jt_8006B904
+	fmr f1, f31
+	fmr f2, f30
+	fmr f3, f29
+	fmr f4, f28
+	fmr f5, f27
+	bl effKemuri7N64Entry
+	mr r26, r3
+	b @1
+	@10:
+	entry jt_8006B924
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effFlowerN64Entry
+	mr r26, r3
+	b @1
+	@11:
+	entry jt_8006B944
+	fmr f1, f31
+	mr r3, r23
+	fmr f2, f30
+	fmr f3, f28
+	bl effSnowN64Entry
+	mr r26, r3
+	b @1
+	@12:
+	entry jt_8006B960
+	xoris r3, r19, 0x8000
+	lis r0, 0x4330
+	stw r3, 0xc(r1)
+	lis r4, double_to_int_802c47d8@ha
+	lfd f7, double_to_int_802c47d8@l(r4)
+	fmr f1, f30
+	stw r0, 0x8(r1)
+	fmr f2, f29
+	fmr f3, f28
+	mr r3, r25
+	lfd f0, 0x8(r1)
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fsubs f7, f0, f7
+	bl effSstarN64Entry
+	mr r26, r3
+	b @1
+	@13:
+	entry jt_8006B9A8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effStardustN64Entry
+	mr r26, r3
+	b @1
+	@14:
+	entry jt_8006B9C8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	bl effMagic1N64Entry
+	mr r26, r3
+	b @1
+	@15:
+	entry jt_8006B9F4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effMagic2N64Entry
+	mr r26, r3
+	b @1
+	@16:
+	entry jt_8006BA18
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effFallLeafN64Entry
+	mr r26, r3
+	b @1
+	@17:
+	entry jt_8006BA38
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effHokoriN64Entry
+	mr r26, r3
+	b @1
+	@18:
+	entry jt_8006BA58
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effGarekiN64Entry
+	mr r26, r3
+	b @1
+	@19:
+	entry jt_8006BA78
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effKemuri8N64Entry
+	mr r26, r3
+	b @1
+	@20:
+	entry jt_8006BA94
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	bl effSmallStarN64Entry
+	mr r26, r3
+	b @1
+	@21:
+	entry jt_8006BAC0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effBombN64Entry
+	mr r26, r3
+	b @1
+	@22:
+	entry jt_8006BADC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effWangFlushN64Entry
+	mr r26, r3
+	b @1
+	@23:
+	entry jt_8006BAFC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effMagic3N64Entry
+	mr r26, r3
+	b @1
+	@24:
+	entry jt_8006BB1C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	mr r5, r19
+	fmr f4, f27
+	fmr f5, f25
+	bl effKemuri9N64Entry
+	mr r26, r3
+	b @1
+	@25:
+	entry jt_8006BB48
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effKemuri10N64Entry
+	mr r26, r3
+	b @1
+	@26:
+	entry jt_8006BB74
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r20
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effRappaN64Entry
+	mr r26, r3
+	b @1
+	@27:
+	entry jt_8006BB9C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r20
+	fmr f3, f28
+	mr r5, r19
+	fmr f4, f27
+	fmr f5, f26
+	bl effStardust2N64Entry
+	mr r26, r3
+	b @1
+	@28:
+	entry jt_8006BBC8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effRippleN64Entry
+	mr r26, r3
+	b @1
+	@29:
+	entry jt_8006BBE8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effExplosionN64Entry
+	mr r26, r3
+	b @1
+	@30:
+	entry jt_8006BC0C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effKemuri11N64Entry
+	mr r26, r3
+	b @1
+	@31:
+	entry jt_8006BC28
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effOnpuN64Entry
+	mr r26, r3
+	b @1
+	@32:
+	entry jt_8006BC44
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effKemuri12N64Entry
+	mr r26, r3
+	b @1
+	@33:
+	entry jt_8006BC68
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r20
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effSweatN64Entry
+	mr r26, r3
+	b @1
+	@34:
+	entry jt_8006BC90
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effBalloonN64Entry
+	mr r26, r3
+	b @1
+	@35:
+	entry jt_8006BCB4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effCoolLeafN64Entry
+	mr r26, r3
+	b @1
+	@36:
+	entry jt_8006BCD0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effBushN64Entry
+	mr r26, r3
+	b @1
+	@37:
+	entry jt_8006BCEC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	mr r5, r21
+	bl effRotHammerSuccessN64Entry
+	mr r26, r3
+	b @1
+	@38:
+	entry jt_8006BD10
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effRotHammerFailN64Entry
+	mr r26, r3
+	b @1
+	@39:
+	entry jt_8006BD34
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effGuruguruN64Entry
+	mr r26, r3
+	b @1
+	@40:
+	entry jt_8006BD58
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effIceN64Entry
+	mr r26, r3
+	b @1
+	@41:
+	entry jt_8006BD74
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effStampN64Entry
+	mr r26, r3
+	b @1
+	@42:
+	entry jt_8006BD90
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effThruHammerN64Entry
+	mr r26, r3
+	b @1
+	@43:
+	entry jt_8006BDB0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effRadiationN64Entry
+	mr r26, r3
+	b @1
+	@44:
+	entry jt_8006BDD0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effThunderN64Entry
+	mr r26, r3
+	b @1
+	@45:
+	entry jt_8006BDF4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	mr r5, r18
+	fmr f4, f27
+	mr r6, r17
+	fmr f5, f26
+	fmr f6, f25
+	bl effBreathFireN64Entry
+	mr r26, r3
+	b @1
+	@46:
+	entry jt_8006BE28
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effBrokenBarrierN64Entry
+	mr r26, r3
+	b @1
+	@47:
+	entry jt_8006BE4C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effFireRingN64Entry
+	mr r26, r3
+	b @1
+	@48:
+	entry jt_8006BE70
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r20
+	fmr f3, f28
+	mr r5, r19
+	fmr f4, f27
+	fmr f5, f26
+	bl effFireDustN64Entry
+	mr r26, r3
+	b @1
+	@49:
+	entry jt_8006BE9C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	bl effFlameN64Entry
+	mr r26, r3
+	b @1
+	@50:
+	entry jt_8006BEBC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	bl effBlowN64Entry
+	mr r26, r3
+	b @1
+	@51:
+	entry jt_8006BEE8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effBomheiN64Entry
+	mr r26, r3
+	b @1
+	@52:
+	entry jt_8006BF0C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effFireFlowerN64Entry
+	mr r26, r3
+	b @1
+	@53:
+	entry jt_8006BF2C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effRecoverHeartN64Entry
+	mr r26, r3
+	b @1
+	@54:
+	entry jt_8006BF4C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r22
+	fmr f3, f28
+	bl effPturnN64Entry
+	mr r26, r3
+	b @1
+	@55:
+	entry jt_8006BF6C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effHitN64Entry
+	mr r26, r3
+	b @1
+	@56:
+	entry jt_8006BF90
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effConfettiN64Entry
+	mr r26, r3
+	b @1
+	@57:
+	entry jt_8006BFB4
+	mr r3, r25
+	mr r4, r24
+	bl effSnowfallN64Entry
+	mr r26, r3
+	b @1
+	@58:
+	entry jt_8006BFC8
+	fmr f1, f29
+	mr r3, r25
+	mr r4, r27
+	mr r5, r23
+	bl effWhirlwindN64Entry
+	mr r26, r3
+	b @1
+	@59:
+	entry jt_8006BFE4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effThunderflareN64Entry
+	mr r26, r3
+	b @1
+	@60:
+	entry jt_8006C008
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effCoinN64Entry
+	mr r26, r3
+	b @1
+	@61:
+	entry jt_8006C02C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effShockN64Entry
+	mr r26, r3
+	b @1
+	@62:
+	entry jt_8006C050
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r20
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	bl effBalloonHeihoN64Entry
+	mr r26, r3
+	b @1
+	@63:
+	entry jt_8006C078
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effRubbleN64Entry
+	mr r26, r3
+	b @1
+	@64:
+	entry jt_8006C0A8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	mr r5, r19
+	fmr f4, f27
+	mr r6, r17
+	fmr f5, f25
+	fmr f6, f23
+	bl effMagicHoraoN64Entry
+	b @1
+	@65:
+	entry jt_8006C0D8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effLensflareN64Entry
+	mr r26, r3
+	b @1
+	@66:
+	entry jt_8006C0FC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effCrystalN64Entry
+	mr r26, r3
+	b @1
+	@67:
+	entry jt_8006C120
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	bl effButterflyN64Entry
+	mr r26, r3
+	b @1
+	@68:
+	entry jt_8006C13C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effAkariChargeN64Entry
+	mr r26, r3
+	b @1
+	@69:
+	entry jt_8006C160
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effAkariSflushN64Entry
+	mr r26, r3
+	b @1
+	@70:
+	entry jt_8006C184
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effOpukuWgunN64Entry
+	mr r26, r3
+	b @1
+	@71:
+	entry jt_8006C1B4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effOpukuWprotectN64Entry
+	mr r26, r3
+	b @1
+	@72:
+	entry jt_8006C1D8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effOpukuWcurtainN64Entry
+	mr r26, r3
+	b @1
+	@73:
+	entry jt_8006C1FC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effOpukuJetwN64Entry
+	mr r26, r3
+	b @1
+	@74:
+	entry jt_8006C220
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effOpukuJetwrainN64Entry
+	mr r26, r3
+	b @1
+	@75:
+	entry jt_8006C244
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effPokopiThunderN64Entry
+	mr r26, r3
+	b @1
+	@76:
+	entry jt_8006C274
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effWaterDamageN64Entry
+	mr r26, r3
+	b @1
+	@77:
+	entry jt_8006C298
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effSnowmanN64Entry
+	mr r26, r3
+	b @1
+	@78:
+	entry jt_8006C2BC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effHolographyN64Entry
+	mr r26, r3
+	b @1
+	@79:
+	entry jt_8006C2E0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effTimestampN64Entry
+	mr r26, r3
+	b @1
+	@80:
+	entry jt_8006C304
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	mr r5, r17
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effPacknBfireN64Entry
+	mr r26, r3
+	b @1
+	@81:
+	entry jt_8006C338
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effPokopiPipoN64Entry
+	mr r26, r3
+	b @1
+	@82:
+	entry jt_8006C368
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effCloudN64Entry
+	mr r26, r3
+	b @1
+	@83:
+	entry jt_8006C38C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effDogabonAttackN64Entry
+	mr r26, r3
+	b @1
+	@84:
+	entry jt_8006C3B0
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effKamekiTornadeN64Entry
+	mr r26, r3
+	b @1
+	@85:
+	entry jt_8006C3D4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effStoneSmokeN64Entry
+	mr r26, r3
+	b @1
+	@86:
+	entry jt_8006C3F8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effPokopiPchargeN64Entry
+	mr r26, r3
+	b @1
+	@87:
+	entry jt_8006C41C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effHagetakaFlushN64Entry
+	mr r26, r3
+	b @1
+	@88:
+	entry jt_8006C440
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	bl effKumokumoN64Entry
+	mr r26, r3
+	b @1
+	@89:
+	entry jt_8006C46C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effVaporN64Entry
+	mr r26, r3
+	b @1
+	@90:
+	entry jt_8006C490
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	mr r5, r18
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f22
+	fmr f8, f21
+	bl effFireSparkN64Entry
+	mr r26, r3
+	b @1
+	@91:
+	entry jt_8006C4C8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effHoraoSpellN64Entry
+	mr r26, r3
+	b @1
+	@92:
+	entry jt_8006C4EC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r19
+	fmr f3, f28
+	mr r5, r18
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	bl effSnowDustN64Entry
+	mr r26, r3
+	b @1
+	@93:
+	entry jt_8006C51C
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	mr r5, r20
+	fmr f4, f27
+	bl effAkariPoseN64Entry
+	mr r26, r3
+	b @1
+	@94:
+	entry jt_8006C544
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	fmr f8, f23
+	bl effKumokumoChipN64Entry
+	mr r26, r3
+	b @1
+	@95:
+	entry jt_8006C574
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r18
+	fmr f3, f28
+	fmr f4, f27
+	fmr f5, f26
+	fmr f6, f25
+	fmr f7, f24
+	bl effFireworksN64Entry
+	mr r26, r3
+	b @1
+	@96:
+	entry jt_8006C5A4
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effGlassN64Entry
+	mr r26, r3
+	b @1
+	@97:
+	entry jt_8006C5C8
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effBoobooN64Entry
+	mr r26, r3
+	b @1
+	@98:
+	entry jt_8006C5EC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effPikkyoloN64Entry
+	mr r26, r3
+	b @1
+	@99:
+	entry jt_8006C610
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effFreezeN64Entry
+	mr r26, r3
+	b @1
+	@100:
+	entry jt_8006C634
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effSunlightN64Entry
+	mr r26, r3
+	b @1
+	@101:
+	entry jt_8006C658
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effReleaseN64Entry
+	mr r26, r3
+	b @1
+	@102:
+	entry jt_8006C67C
+	xoris r3, r21, 0x8000
+	lis r0, 0x4330
+	stw r3, 0xc(r1)
+	lis r4, double_to_int_802c47d8@ha
+	lfd f5, double_to_int_802c47d8@l(r4)
+	fmr f1, f30
+	stw r0, 0x8(r1)
+	fmr f2, f29
+	fmr f3, f28
+	mr r3, r25
+	lfd f0, 0x8(r1)
+	fmr f4, f27
+	fsubs f5, f0, f5
+	bl effPeachDustN64Entry
+	mr r26, r3
+	b @1
+	@103:
+	entry jt_8006C6BC
+	fmr f1, f30
+	mr r3, r25
+	fmr f2, f29
+	mr r4, r21
+	fmr f3, f28
+	fmr f4, f27
+	bl effStarPowerN64Entry
+	mr r26, r3
+	@1:
+	entry jt_8006C6DC
+	cmplwi r26, 0x0
+	beq @104
+	cmplwi r31, 0x0
+	beq @104
+	mr r3, r31
+	la r4, lbl_8041A248(r2)
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @104
+	mr r3, r26
+	mr r4, r31
+	bl effSetName
+	@104:
+	li r3, 0x2
+	psq_l f31, 0xf8(r1), 0, 0
+	lfd f31, 0xf0(r1)
+	psq_l f30, 0xe8(r1), 0, 0
+	lfd f30, 0xe0(r1)
+	psq_l f29, 0xd8(r1), 0, 0
+	lfd f29, 0xd0(r1)
+	psq_l f28, 0xc8(r1), 0, 0
+	lfd f28, 0xc0(r1)
+	psq_l f27, 0xb8(r1), 0, 0
+	lfd f27, 0xb0(r1)
+	psq_l f26, 0xa8(r1), 0, 0
+	lfd f26, 0xa0(r1)
+	psq_l f25, 0x98(r1), 0, 0
+	lfd f25, 0x90(r1)
+	psq_l f24, 0x88(r1), 0, 0
+	lfd f24, 0x80(r1)
+	psq_l f23, 0x78(r1), 0, 0
+	lfd f23, 0x70(r1)
+	psq_l f22, 0x68(r1), 0, 0
+	lfd f22, 0x60(r1)
+	psq_l f21, 0x58(r1), 0, 0
+	lfd f21, 0x50(r1)
+	lmw r17, 0x14(r1)
+	lwz r0, 0x104(r1)
+	mtlr r0
+	addi r1, r1, 0x100
+	blr
+}
+
+asm s32 evt_eff(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0xe0(r1)
+	mflr r0
+	stw r0, 0xe4(r1)
+	stfd f31, 0xd0(r1)
+	psq_st f31, 0xd8(r1), 0, 0
+	stfd f30, 0xc0(r1)
+	psq_st f30, 0xc8(r1), 0, 0
+	stfd f29, 0xb0(r1)
+	psq_st f29, 0xb8(r1), 0, 0
+	stfd f28, 0xa0(r1)
+	psq_st f28, 0xa8(r1), 0, 0
+	stfd f27, 0x90(r1)
+	psq_st f27, 0x98(r1), 0, 0
+	stfd f26, 0x80(r1)
+	psq_st f26, 0x88(r1), 0, 0
+	stfd f25, 0x70(r1)
+	psq_st f25, 0x78(r1), 0, 0
+	stfd f24, 0x60(r1)
+	psq_st f24, 0x68(r1), 0, 0
+	stfd f23, 0x50(r1)
+	psq_st f23, 0x58(r1), 0, 0
+	stmw r20, 0x20(r1)
+	mr r26, r3
+	lwz r27, 0x18(r3)
+	lwz r4, 0x0(r27)
+	bl evtGetValue
+	lwz r4, 0x0(r27)
+	mr r31, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x0(r27)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x4(r27)
+	mr r3, r26
+	addi r25, r27, 0x8
+	bl evtGetValue
+	lwz r4, 0x4(r27)
+	mr r23, r3
+	mr r3, r26
+	mr r24, r25
+	bl evtGetValue
+	lwz r4, 0x4(r27)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x0(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x4(r25)
+	mr r30, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x8(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0xc(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x10(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x14(r25)
+	mr r29, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x18(r25)
+	mr r28, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x1c(r25)
+	mr r27, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x20(r25)
+	mr r22, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x24(r25)
+	mr r21, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x28(r25)
+	mr r20, r3
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x2c(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x30(r25)
+	mr r3, r26
+	bl evtGetValue
+	lwz r4, 0x0(r24)
+	mr r3, r26
+	bl evtGetFloat
+	lwz r4, 0x4(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f29, f1
+	lwz r4, 0x8(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f28, f1
+	lwz r4, 0xc(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f27, f1
+	lwz r4, 0x10(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f26, f1
+	lwz r4, 0x14(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f25, f1
+	lwz r4, 0x18(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f24, f1
+	lwz r4, 0x1c(r24)
+	mr r3, r26
+	bl evtGetFloat
+	lwz r4, 0x20(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f23, f1
+	lwz r4, 0x24(r24)
+	mr r3, r26
+	bl evtGetFloat
+	lwz r4, 0x28(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f30, f1
+	lwz r4, 0x2c(r24)
+	mr r3, r26
+	bl evtGetFloat
+	fmr f31, f1
+	lwz r4, 0x30(r24)
+	mr r3, r26
+	bl evtGetFloat
+	mr r3, r23
+	li r23, 0x0
+	bl effGetSet
+	lha r0, 0x0(r3)
+	cmplwi r0, 0x4e
+	bgt @1
+	lis r3, jumptable_8030AA2C@ha
+	slwi r0, r0, 2
+	addi r3, r3, jumptable_8030AA2C@l
+	lwzx r0, r3, r0
+	mtctr r0
+	bctr
+	@2:
+	entry jt_8006C9D8
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effKemuriEntry
+	mr r23, r3
+	b @1
+	@3:
+	entry jt_8006C9F8
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effKemuTestEntry
+	mr r23, r3
+	b @1
+	@4:
+	entry jt_8006CA18
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effStarStoneEntry
+	mr r23, r3
+	b @1
+	@5:
+	entry jt_8006CA38
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effConfettiEntry
+	mr r23, r3
+	b @1
+	@6:
+	entry jt_8006CA58
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effButterflyEntry
+	mr r23, r3
+	b @1
+	@7:
+	entry jt_8006CA74
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effRecoveryEntry
+	mr r23, r3
+	b @1
+	@8:
+	entry jt_8006CA94
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r22
+	fmr f3, f27
+	mr r5, r21
+	fmr f4, f26
+	mr r6, r20
+	fmr f5, f25
+	fmr f6, f24
+	bl effBreathFireEntry
+	mr r23, r3
+	lwz r3, 0xc(r3)
+	stfs f30, 0x38(r3)
+	lwz r3, 0xc(r23)
+	stfs f30, 0x30(r3)
+	lwz r3, 0xc(r23)
+	stfs f31, 0x34(r3)
+	b @1
+	@9:
+	entry jt_8006CAE0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effHitEntry
+	mr r23, r3
+	b @1
+	@10:
+	entry jt_8006CB04
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effBombEntry
+	mr r23, r3
+	b @1
+	@11:
+	entry jt_8006CB24
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effChargeEntry
+	mr r23, r3
+	b @1
+	@12:
+	entry jt_8006CB48
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effTogeFlushEntry
+	mr r23, r3
+	b @1
+	@13:
+	entry jt_8006CB68
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effIceEntry
+	mr r23, r3
+	b @1
+	@14:
+	entry jt_8006CB8C
+	lis r5, 0x4330
+	xoris r3, r29, 0x8000
+	stw r3, 0xc(r1)
+	xoris r0, r28, 0x8000
+	lis r4, double_to_int_802c47d8@ha
+	fmr f1, f29
+	stw r5, 0x8(r1)
+	fmr f2, f28
+	lfd f5, double_to_int_802c47d8@l(r4)
+	fmr f3, f27
+	lfd f0, 0x8(r1)
+	stw r0, 0x14(r1)
+	mr r3, r30
+	fsubs f4, f0, f5
+	mr r4, r27
+	stw r5, 0x10(r1)
+	lfd f0, 0x10(r1)
+	fsubs f5, f0, f5
+	bl effDamageStarEntry
+	mr r23, r3
+	b @1
+	@15:
+	entry jt_8006CBE0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effStarPointEntry
+	mr r23, r3
+	b @1
+	@16:
+	entry jt_8006CC00
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effItemGetEntry
+	mr r23, r3
+	b @1
+	@17:
+	entry jt_8006CC1C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effStageClearEntry
+	mr r23, r3
+	b @1
+	@18:
+	entry jt_8006CC38
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effLevelupEntry
+	mr r23, r3
+	b @1
+	@19:
+	entry jt_8006CC58
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r22
+	fmr f3, f27
+	mr r5, r21
+	fmr f4, f26
+	fmr f5, f25
+	fmr f6, f24
+	bl effFallEntry
+	mr r23, r3
+	b @1
+	@20:
+	entry jt_8006CC88
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effMahojinEntry
+	mr r23, r3
+	b @1
+	@21:
+	entry jt_8006CCA4
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r27
+	fmr f3, f27
+	fmr f4, f26
+	fmr f5, f25
+	bl effNozleEntry
+	mr r23, r3
+	b @1
+	@22:
+	entry jt_8006CCCC
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effPuniBalloonEntry
+	mr r23, r3
+	b @1
+	@23:
+	entry jt_8006CCEC
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effKissEntry
+	mr r23, r3
+	b @1
+	@24:
+	entry jt_8006CD0C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	bl effSplashEntry
+	mr r23, r3
+	b @1
+	@25:
+	entry jt_8006CD2C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effNiceEntry
+	mr r23, r3
+	b @1
+	@26:
+	entry jt_8006CD48
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effMistEntry
+	mr r23, r3
+	b @1
+	@27:
+	entry jt_8006CD6C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r27
+	fmr f3, f27
+	fmr f4, f26
+	fmr f5, f25
+	bl effMist2Entry
+	mr r23, r3
+	b @1
+	@28:
+	entry jt_8006CD94
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effScanningEntry
+	mr r23, r3
+	b @1
+	@29:
+	entry jt_8006CDB0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r22
+	fmr f3, f27
+	mr r5, r21
+	fmr f4, f26
+	fmr f5, f25
+	fmr f6, f24
+	bl effParticleEntry
+	mr r23, r3
+	b @1
+	@30:
+	entry jt_8006CDE0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r27
+	fmr f3, f27
+	mr r5, r22
+	fmr f4, f26
+	fmr f5, f25
+	bl effStardustEntry
+	b @1
+	@31:
+	entry jt_8006CE08
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effTreasureMapEntry
+	mr r23, r3
+	b @1
+	@32:
+	entry jt_8006CE24
+	xoris r3, r29, 0x8000
+	lis r0, 0x4330
+	stw r3, 0x14(r1)
+	lis r4, double_to_int_802c47d8@ha
+	lfd f4, double_to_int_802c47d8@l(r4)
+	fmr f1, f29
+	stw r0, 0x10(r1)
+	fmr f2, f28
+	fmr f3, f27
+	mr r3, r30
+	lfd f0, 0x10(r1)
+	fsubs f4, f0, f4
+	bl effSandarsEntry
+	mr r23, r3
+	b @1
+	@33:
+	entry jt_8006CE60
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effSheepEntry
+	mr r23, r3
+	b @1
+	@34:
+	entry jt_8006CE7C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effRankupEntry
+	mr r23, r3
+	b @1
+	@35:
+	entry jt_8006CE98
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effIrekaeruEntry
+	mr r23, r3
+	b @1
+	@36:
+	entry jt_8006CEB4
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r22
+	fmr f3, f27
+	fmr f4, f26
+	fmr f5, f25
+	fmr f6, f24
+	bl effSmallStarEntry
+	mr r23, r3
+	b @1
+	@37:
+	entry jt_8006CEE0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effIbukiEntry
+	mr r23, r3
+	b @1
+	@38:
+	entry jt_8006CF00
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	mr r5, r27
+	fmr f4, f26
+	bl effMahornEntry
+	mr r23, r3
+	b @1
+	@39:
+	entry jt_8006CF28
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effToikiEntry
+	mr r23, r3
+	b @1
+	@40:
+	entry jt_8006CF48
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effUranokoEntry
+	mr r23, r3
+	b @1
+	@41:
+	entry jt_8006CF68
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effSyuryouEntry
+	mr r23, r3
+	b @1
+	@42:
+	entry jt_8006CF88
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r22
+	fmr f3, f27
+	mr r5, r20
+	fmr f4, f26
+	fmr f5, f25
+	fmr f6, f24
+	fmr f7, f23
+	bl effHibashiraEntry
+	mr r23, r3
+	b @1
+	@43:
+	entry jt_8006CFBC
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effFireEntry
+	mr r23, r3
+	b @1
+	@44:
+	entry jt_8006CFE0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	fmr f4, f26
+	fmr f5, f25
+	fmr f6, f24
+	bl effMachinegunEntry
+	mr r23, r3
+	b @1
+	@45:
+	entry jt_8006D008
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effRippleEntry
+	mr r23, r3
+	b @1
+	@46:
+	entry jt_8006D024
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effLasMonEntry
+	mr r23, r3
+	b @1
+	@47:
+	entry jt_8006D040
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effLaserEntry
+	mr r23, r3
+	b @1
+	@48:
+	entry jt_8006D05C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r29
+	fmr f3, f27
+	bl effIndirectEntry
+	mr r23, r3
+	b @1
+	@49:
+	entry jt_8006D07C
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effQueenEntry
+	mr r23, r3
+	b @1
+	@50:
+	entry jt_8006D0A0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effQueen2Entry
+	mr r23, r3
+	b @1
+	@51:
+	entry jt_8006D0BC
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	mr r4, r28
+	fmr f3, f27
+	fmr f4, f26
+	bl effGonbabaBreathEntry
+	mr r23, r3
+	b @1
+	@52:
+	entry jt_8006D0E0
+	fmr f1, f29
+	mr r3, r30
+	fmr f2, f28
+	fmr f3, f27
+	bl effMajinaiEntry
+	mr r23, r3
+	@1:
+	entry jt_8006D0F8
+	cmplwi r23, 0x0
+	beq @53
+	cmplwi r31, 0x0
+	beq @53
+	mr r3, r31
+	la r4, lbl_8041A248(r2)
+	bl strcmp
+	cmpwi r3, 0x0
+	beq @53
+	mr r3, r23
+	mr r4, r31
+	bl effSetName
+	@53:
+	li r3, 0x2
+	psq_l f31, 0xd8(r1), 0, 0
+	lfd f31, 0xd0(r1)
+	psq_l f30, 0xc8(r1), 0, 0
+	lfd f30, 0xc0(r1)
+	psq_l f29, 0xb8(r1), 0, 0
+	lfd f29, 0xb0(r1)
+	psq_l f28, 0xa8(r1), 0, 0
+	lfd f28, 0xa0(r1)
+	psq_l f27, 0x98(r1), 0, 0
+	lfd f27, 0x90(r1)
+	psq_l f26, 0x88(r1), 0, 0
+	lfd f26, 0x80(r1)
+	psq_l f25, 0x78(r1), 0, 0
+	lfd f25, 0x70(r1)
+	psq_l f24, 0x68(r1), 0, 0
+	lfd f24, 0x60(r1)
+	psq_l f23, 0x58(r1), 0, 0
+	lfd f23, 0x50(r1)
+	lmw r20, 0x20(r1)
+	lwz r0, 0xe4(r1)
+	mtlr r0
+	addi r1, r1, 0xe0
+	blr
+}
+// clang-format on
+#endif

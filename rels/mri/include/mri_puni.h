@@ -44,16 +44,24 @@ typedef struct PuniWork {
     s32 seed0;                // 0x450
     s32 seed1;                // 0x454
     u32 sfx458;               // 0x458
-    u8 unk45C[0x468 - 0x45C]; // 0x45C
+    s32 puniMoveCount;        // 0x45C
+    s32 puniMoveLevel;        // 0x460
+    u8 unk464[0x468 - 0x464]; // 0x464
     u32 sfx468;               // 0x468
-    u8 unk46C[0x47C - 0x46C]; // 0x46C
+    s32 togeMoveCount;        // 0x46C
+    s32 togeMoveLevel;        // 0x470
+    s32 togeMoveLevelPrev;    // 0x474
+    u32 sfxTogetti;           // 0x478
     s32 beroMode;             // 0x47C
     Vec beroStart;            // 0x480
     Vec beroEnd;              // 0x48C
     u8 unk498[0x4B0 - 0x498]; // 0x498
     f32 beroStartRange;       // 0x4B0
     f32 beroEndRange;         // 0x4B4
-    u8 unk4B8[0x4CC - 0x4B8]; // 0x4B8
+    u8 unk4B8[0x4C0 - 0x4B8]; // 0x4B8
+    s32 unk4C0;               // 0x4C0
+    s32 unk4C4;               // 0x4C4
+    u8 unk4C8[0x4CC - 0x4C8]; // 0x4C8
     s32 unk4CC;               // 0x4CC
 } PuniWork;
 
@@ -130,7 +138,9 @@ typedef struct PuniData {
     s16 unk586;           // 0x586
     s16 unk588;           // 0x588
     s16 unk58A;           // 0x58A
-    u8 unk58C[0x5A8 - 0x58C]; // 0x58C
+    s32 unk58C;           // 0x58C
+    Vec unk590;           // 0x590
+    Vec unk59C;           // 0x59C
 } PuniData;
 
 typedef struct PuniMap {

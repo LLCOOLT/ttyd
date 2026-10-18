@@ -298,22 +298,29 @@ USER_FUNC(end_bakugame) {
     return 2;
 }
 
+// FAKE: inline asm pins the weapon@ha temp to r4 (target schedules it before the r28 addi)
 s32 bakuGameDecideWeapon(EventEntry *event, BOOL isFirstCall)
 {
   s32 *args = event->args;
   s32 v;
-  BakuWork *w;
+  register BakuWork *w;
   u8 *new_var;
-  u8 *q;
+  register u8 *q;
   BattleWeapon *wp;
   evtGetFloat(event, args[0]);
   v = evtGetValue(event, args[1]);
   w = GetBakuGamePtr();
 
-  wp = (BattleWeapon *) w->weapon;
-  new_var = &wp->sleepChance;
-  q = (0, new_var);
-  memcpy(w->weapon, weapon, 0xC0);
+  asm {
+    lis r4, weapon@ha
+    addi r4, r4, weapon@l
+    li r5, 0xc0
+    addi r28, w, 0x178
+    addi r3, w, 0xf8
+    bl memcpy
+    mr q, r28
+  }
+  new_var = q;
 
   q[2] = 100;
   if (v != (-1))

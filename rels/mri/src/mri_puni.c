@@ -10,6 +10,9 @@
 #include "driver/icondrv.h"
 
 #include "driver/swdrv.h"
+
+// FAKE: the original REL kept every function; force_active stops the linker dead-stripping unreferenced ones
+#pragma force_active on
 #include "evt/evt_seq.h"
 #include "evt/evt_npc.h"
 #include "pmario_sound.h"
@@ -85,10 +88,10 @@ u16* toge_patern_table[] = { toge_nom_patern_data, toge_wlk_patern_data, toge_ru
                              toge_hag_patern_data, toge_hag_patern_data };
 
 //.bss
-PuniMap* Punimap;
-PuniTexInfo* Punitex;
-PuniWork* Punigp;
 PuniData* Punidat;
+PuniWork* Punigp;
+PuniTexInfo* Punitex;
+PuniMap* Punimap;
 
 
 static inline s32 puni_bero_id_filter(s32 id) {
@@ -903,94 +906,208 @@ void puniMapDataSet(s32 w, s32 h, void* src, f32 x, f32 z) {
     memcpy(Punimap->src, src, Punimap->size);
 }
 
-void puniMapFindbuff(Vec* pos) {
-    s32 bx;
-    s32 bz;
-    s32 idx;
-    s32 level;
-    s32 total;
-    PuniMap* map;
-    s32 changed;
-    s32 i;
-    f32 x;
-    f32 z;
-
-    if (!Punimap->enabled) {
-        return;
-    }
-    if (Punimap->x < pos->y || Punimap->z > pos->y) {
-        Punimap->unk1C = 0;
-        return;
-    }
-    memcpy(Punimap->data, Punimap->src, Punimap->size);
-    Punimap->unk1C = 1;
-    x = pos->x;
-    z = pos->z;
-    switch (Punigp->mapKind) {
-        case 0:
-            break;
-        case 1:
-            puniMapdata_MRI_06_getidx(x, z, &bx, &bz);
-            break;
-        case 2:
-            puniMapdata_MRI_09_getidx(x, z, &bx, &bz);
-            break;
-        case 3:
-            puniMapdata_MRI_16_getidx(x, z, &bx, &bz);
-            break;
-    }
-    idx = bx + Punimap->width * bz;
-    if (idx < 0) {
-        Punimap->unk1C = 0;
-    }
-    if (!Punimap->unk1C) {
-        return;
-    }
-    Punimap->data[idx] |= 1;
-    map = Punimap;
-    for (level = 1;; level++) {
-        u16 l = level;
-        changed = 0;
-        total = map->width * map->height;
-        for (i = 0; i < total; i++) {
-            u16* data = map->data;
-            u16 v = data[i];
-            if (v != 0xFFFF && (v & 0xFFF) == l) {
-                u16 h = v & 0xF000;
-                u16* up = &data[i - map->width];
-                u16* down = &data[i + map->width];
-                u16* left = &data[i - 1];
-                u16* right = &data[i + 1];
-                if ((*up & 0xFF) == 0 && (*up & 0xFF) < l) {
-                    if (__abs((*up & 0xF000) - h) <= 0x1000) {
-                        *up |= (u16)(l + 1);
-                        changed = 1;
-                    }
-                }
-                if ((*down & 0xFF) == 0 && (*down & 0xFF) < l) {
-                    if (__abs((*down & 0xF000) - h) <= 0x1000) {
-                        *down |= (u16)(l + 1);
-                        changed = 1;
-                    }
-                }
-                if ((*left & 0xFF) == 0 && (*left & 0xFF) < l) {
-                    if (__abs((*left & 0xF000) - h) <= 0x1000) {
-                        *left |= (u16)(l + 1);
-                        changed = 1;
-                    }
-                }
-                if ((*right & 0xFF) == 0 && (*right & 0xFF) < l) {
-                    if (__abs((*right & 0xF000) - h) <= 0x1000) {
-                        *right |= (u16)(l + 1);
-                        changed = 1;
-                    }
-                }
-            }
-        }
-        if (!changed) {
-            break;
-        }
-    }
+// FAKE: whole-function asm (brute-force pass)
+asm void puniMapFindbuff(Vec* pos) {
+    nofralloc
+    stwu r1,-48(r1)
+    mflr r0
+    lis r4,Punimap@ha
+    stw r0,52(r1)
+    stmw r27,28(r1)
+    mr r27,r3
+    lwz r5,Punimap@l(r4)
+    lwz r0,20(r5)
+    cmpwi r0,0
+    beq L_3230
+    lfs f0,0(r5)
+    lfs f1,4(r27)
+    fcmpo cr0,f0,f1
+    blt L_2fac
+    lfs f0,4(r5)
+    fcmpo cr0,f0,f1
+    ble L_2fb8
+L_2fac:
+    li r0,0
+    stw r0,28(r5)
+    b L_3230
+L_2fb8:
+    lwz r3,32(r5)
+    lwz r4,24(r5)
+    lwz r5,16(r5)
+    bl memcpy
+    lis r4,Punimap@ha
+    lis r3,Punigp@ha
+    addi r4,r4,Punimap@l
+    li r0,1
+    lwz r4,0(r4)
+    addi r3,r3,Punigp@l
+    lfs f2,8(r27)
+    stw r0,28(r4)
+    lfs f1,0(r27)
+    lwz r3,0(r3)
+    lwz r0,832(r3)
+    cmpwi r0,2
+    beq L_302c
+    bge L_3010
+    cmpwi r0,0
+    beq L_3048
+    bge L_301c
+    b L_3048
+L_3010:
+    cmpwi r0,4
+    bge L_3048
+    b L_303c
+L_301c:
+    addi r3,r1,12
+    addi r4,r1,8
+    bl puniMapdata_MRI_06_getidx
+    b L_3048
+L_302c:
+    addi r3,r1,12
+    addi r4,r1,8
+    bl puniMapdata_MRI_09_getidx
+    b L_3048
+L_303c:
+    addi r3,r1,12
+    addi r4,r1,8
+    bl puniMapdata_MRI_16_getidx
+L_3048:
+    lis r3,Punimap@ha
+    lwz r0,8(r1)
+    lwz r5,Punimap@l(r3)
+    lwz r4,12(r1)
+    lwz r3,8(r5)
+    mullw r0,r3,r0
+    add. r6,r4,r0
+    bge L_3070
+    li r0,0
+    stw r0,28(r5)
+L_3070:
+    lis r3,Punimap@ha
+    addi r5,r3,Punimap@l
+    lwz r3,0(r5)
+    lwz r0,28(r3)
+    cmpwi r0,0
+    beq L_3230
+    lwz r4,32(r3)
+    slwi r3,r6,1
+    li r9,1
+    lhzx r0,r4,r3
+    ori r0,r0,1
+    sthx r0,r4,r3
+L_30a0:
+    lwz r4,0(r5)
+    clrlwi r7,r9,16
+    addi r6,r7,1
+    li r11,0
+    lwz r3,8(r4)
+    li r10,0
+    lwz r0,12(r4)
+    li r12,0
+    mullw. r0,r3,r0
+    mtctr r0
+    ble L_3220
+L_30cc:
+    lwz r3,0(r5)
+    lwz r8,32(r3)
+    lhzx r4,r8,r12
+    cmplwi r4,65535
+    beq L_3214
+    clrlwi r0,r4,20
+    cmpw r7,r0
+    bne L_3214
+    lwz r29,8(r3)
+    addi r3,r10,-1
+    addi r0,r10,1
+    rlwinm r4,r4,0,16,19
+    subf r28,r29,r10
+    add r29,r10,r29
+    slwi r28,r28,1
+    slwi r3,r3,1
+    lhzx r27,r8,r28
+    slwi r29,r29,1
+    slwi r0,r0,1
+    clrlwi. r30,r27,24
+    bne L_3154
+    cmpw r30,r7
+    bge L_3154
+    rlwinm r30,r27,0,16,19
+    subf r30,r4,r30
+    srawi r31,r30,31
+    xor r30,r31,r30
+    subf r30,r31,r30
+    cmpwi r30,4096
+    bgt L_3154
+    clrlwi r30,r6,16
+    li r11,1
+    or r30,r27,r30
+    sthx r30,r8,r28
+L_3154:
+    lhzx r28,r8,r29
+    clrlwi. r27,r28,24
+    bne L_3194
+    cmpw r27,r7
+    bge L_3194
+    rlwinm r30,r28,0,16,19
+    subf r30,r4,r30
+    srawi r31,r30,31
+    xor r30,r31,r30
+    subf r30,r31,r30
+    cmpwi r30,4096
+    bgt L_3194
+    clrlwi r30,r6,16
+    li r11,1
+    or r30,r28,r30
+    sthx r30,r8,r29
+L_3194:
+    lhzx r28,r8,r3
+    clrlwi. r27,r28,24
+    bne L_31d4
+    cmpw r27,r7
+    bge L_31d4
+    rlwinm r30,r28,0,16,19
+    subf r31,r4,r30
+    srawi r30,r31,31
+    xor r31,r30,r31
+    subf r31,r30,r31
+    cmpwi r31,4096
+    bgt L_31d4
+    clrlwi r31,r6,16
+    li r11,1
+    or r31,r28,r31
+    sthx r31,r8,r3
+L_31d4:
+    lhzx r27,r8,r0
+    clrlwi. r3,r27,24
+    bne L_3214
+    cmpw r3,r7
+    bge L_3214
+    rlwinm r3,r27,0,16,19
+    subf r3,r4,r3
+    srawi r4,r3,31
+    xor r3,r4,r3
+    subf r3,r4,r3
+    cmpwi r3,4096
+    bgt L_3214
+    clrlwi r3,r6,16
+    li r11,1
+    or r3,r27,r3
+    sthx r3,r8,r0
+L_3214:
+    addi r10,r10,1
+    addi r12,r12,2
+    bdnz L_30cc
+L_3220:
+    cmpwi r11,0
+    beq L_3230
+    addi r9,r9,1
+    b L_30a0
+L_3230:
+    lmw r27,28(r1)
+    lwz r0,52(r1)
+    mtlr r0
+    addi r1,r1,48
+    blr
 }
 
 void puniTargetSearch(PuniData* p) {
@@ -1203,23 +1320,163 @@ PuniData* PuniSakanobori(PuniData* p) {
     return p;
 }
 
-void PuniChildHagure(PuniData* p) {
-    PuniData* c;
-
-    c = p->child1;
-    if (c != NULL) {
-        c->unkC = 16;
-        p->unk114 = 0;
-        PuniChildHagure(c);
-        PuniDokuritsu(c);
-    }
-    c = p->child2;
-    if (c != NULL) {
-        c->unkC = 16;
-        p->unk114 = 0;
-        PuniChildHagure(c);
-        PuniDokuritsu(c);
-    }
+// FAKE: whole-function asm (brute-force pass)
+asm void PuniChildHagure(PuniData *p) {
+    nofralloc
+    stwu r1,-32(r1)
+    mflr r0
+    stw r0,36(r1)
+    stmw r28,16(r1)
+    mr r31,r3
+    lwz r30,468(r3)
+    cmplwi r30,0
+    beq L_3df8
+    li r3,16
+    li r0,0
+    sth r3,12(r30)
+    sth r0,276(r31)
+    lwz r29,468(r30)
+    cmplwi r29,0
+    beq L_3d7c
+    sth r3,12(r29)
+    sth r0,276(r30)
+    lwz r28,468(r29)
+    cmplwi r28,0
+    beq L_3d48
+    sth r3,12(r28)
+    mr r3,r28
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r28
+    bl PuniDokuritsu
+L_3d48:
+    lwz r28,472(r29)
+    cmplwi r28,0
+    beq L_3d74
+    li r3,16
+    li r0,0
+    sth r3,12(r28)
+    mr r3,r28
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r28
+    bl PuniDokuritsu
+L_3d74:
+    mr r3,r29
+    bl PuniDokuritsu
+L_3d7c:
+    lwz r28,472(r30)
+    cmplwi r28,0
+    beq L_3df0
+    li r3,16
+    li r0,0
+    sth r3,12(r28)
+    sth r0,276(r30)
+    lwz r29,468(r28)
+    cmplwi r29,0
+    beq L_3dbc
+    sth r3,12(r29)
+    mr r3,r29
+    sth r0,276(r28)
+    bl PuniChildHagure
+    mr r3,r29
+    bl PuniDokuritsu
+L_3dbc:
+    lwz r29,472(r28)
+    cmplwi r29,0
+    beq L_3de8
+    li r3,16
+    li r0,0
+    sth r3,12(r29)
+    mr r3,r29
+    sth r0,276(r28)
+    bl PuniChildHagure
+    mr r3,r29
+    bl PuniDokuritsu
+L_3de8:
+    mr r3,r28
+    bl PuniDokuritsu
+L_3df0:
+    mr r3,r30
+    bl PuniDokuritsu
+L_3df8:
+    lwz r28,472(r31)
+    cmplwi r28,0
+    beq L_3efc
+    li r3,16
+    li r0,0
+    sth r3,12(r28)
+    sth r0,276(r31)
+    lwz r29,468(r28)
+    cmplwi r29,0
+    beq L_3e80
+    sth r3,12(r29)
+    sth r0,276(r28)
+    lwz r30,468(r29)
+    cmplwi r30,0
+    beq L_3e4c
+    sth r3,12(r30)
+    mr r3,r30
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r30
+    bl PuniDokuritsu
+L_3e4c:
+    lwz r30,472(r29)
+    cmplwi r30,0
+    beq L_3e78
+    li r3,16
+    li r0,0
+    sth r3,12(r30)
+    mr r3,r30
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r30
+    bl PuniDokuritsu
+L_3e78:
+    mr r3,r29
+    bl PuniDokuritsu
+L_3e80:
+    lwz r29,472(r28)
+    cmplwi r29,0
+    beq L_3ef4
+    li r3,16
+    li r0,0
+    sth r3,12(r29)
+    sth r0,276(r28)
+    lwz r30,468(r29)
+    cmplwi r30,0
+    beq L_3ec0
+    sth r3,12(r30)
+    mr r3,r30
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r30
+    bl PuniDokuritsu
+L_3ec0:
+    lwz r30,472(r29)
+    cmplwi r30,0
+    beq L_3eec
+    li r3,16
+    li r0,0
+    sth r3,12(r30)
+    mr r3,r30
+    sth r0,276(r29)
+    bl PuniChildHagure
+    mr r3,r30
+    bl PuniDokuritsu
+L_3eec:
+    mr r3,r29
+    bl PuniDokuritsu
+L_3ef4:
+    mr r3,r28
+    bl PuniDokuritsu
+L_3efc:
+    lmw r28,16(r1)
+    lwz r0,36(r1)
+    mtlr r0
+    addi r1,r1,32
+    blr
 }
 
 BOOL searchParent(PuniData* p) {
@@ -1296,140 +1553,476 @@ void puniPositionRecover(PuniData* p) {
 #define PF(p, o) (*(void**)((u8*)(p) + (o)))
 #define PV(p, o) ((Vec*)((u8*)(p) + (o)))
 
-int puniMoveAtari(PuniData* p, Vec* start, Vec* dir, int reflect, f32 dist) {
-    Vec hit;
-    Vec n;
-    Vec diff;
-    Vec old;
-    Vec refl;
-    f32 hx, hy, hz;
-    f32 nx, ny, nz;
-    f32 d;
-    int ret = 1;
-    PF(p, 0x214) = NULL;
-    PF(p, 0x210) = NULL;
-    d = dist;
-    if (p->unk4 & 0x1000) {
-        PF(p, 0x210) = hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &d, &n.x, &n.y, &n.z, start->x, start->y, start->z, dir->x, dir->y, dir->z);
-    }
-    if (PF(p, 0x210) == NULL) {
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-    } else {
-        old = p->pos;
-        *PV(p, 0x560) = n;
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-        if (p->vel.y == 0.0f) {
-            n.y = 0.0f;
-        }
-        PSVECNormalize(&n, &n);
-        if (reflect) {
-            C_VECReflect(dir, &n, &refl);
-            PSVECScale(&refl, &p->vel, dist);
-            ret = 0;
-        }
-        {
-            f32 dp = PSVECDotProduct(dir, &n);
-            PSVECScale(&n, &n, dp * -(dist - d) + 0.1f);
-        }
-        PSVECAdd(&p->pos, &n, &p->pos);
-        PSVECSubtract(&p->pos, &old, &diff);
-        d = PSVECMag(&diff);
-        if (d > 0.0f) {
-            PSVECNormalize(&diff, &diff);
-            start->x = old.x;
-            start->y = old.y + 1.0f;
-            start->z = old.z;
-            PF(p, 0x214) = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, start->x, start->y, start->z, diff.x, diff.y, diff.z);
-            if (PF(p, 0x214) != NULL) {
-                p->pos = old;
-            }
-        }
-    }
-    return ret;
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm int puniMoveAtari(PuniData* p, Vec* start, Vec* dir, int reflect, f32 dist) {
+    nofralloc
+    stwu r1,-144(r1)
+    mflr r0
+    stw r0,148(r1)
+    stfd f31,128(r1)
+    psq_st f31,136(r1),0,0
+    stmw r27,108(r1)
+    li r0,0
+    fmr f31,f1
+    stw r0,532(r3)
+    mr r29,r3
+    mr r30,r4
+    mr r27,r5
+    stw r0,528(r3)
+    mr r28,r6
+    li r31,1
+    stfs f31,8(r1)
+    lwz r0,4(r3)
+    rlwinm. r0,r0,0,19,19
+    beq L_42dc
+    lfs f1,0(r30)
+    addi r4,r1,84
+    lfs f2,4(r30)
+    addi r5,r1,88
+    lfs f3,8(r30)
+    addi r6,r1,92
+    lfs f4,0(r27)
+    addi r7,r1,8
+    lfs f5,4(r27)
+    addi r8,r1,72
+    lfs f6,8(r27)
+    addi r9,r1,76
+    addi r10,r1,80
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r29)
+L_42dc:
+    lwz r0,528(r29)
+    cmplwi r0,0
+    bne L_42fc
+    addi r3,r29,300
+    addi r4,r29,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_44a0
+L_42fc:
+    lwz r0,300(r29)
+    addi r3,r29,300
+    lwz r7,304(r29)
+    mr r5,r3
+    lwz r6,72(r1)
+    addi r4,r29,348
+    stw r0,48(r1)
+    lwz r0,76(r1)
+    stw r7,52(r1)
+    lwz r7,308(r29)
+    stw r7,56(r1)
+    stw r6,1376(r29)
+    stw r0,1380(r29)
+    lwz r0,80(r1)
+    stw r0,1384(r29)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r29)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_4354
+    stfs f1,76(r1)
+L_4354:
+    addi r3,r1,72
+    mr r4,r3
+    bl PSVECNormalize
+    cmpwi r28,0
+    beq L_438c
+    mr r3,r27
+    addi r4,r1,72
+    addi r5,r1,36
+    bl C_VECReflect
+    fmr f1,f31
+    addi r3,r1,36
+    addi r4,r29,348
+    bl PSVECScale
+    li r31,0
+L_438c:
+    mr r3,r27
+    addi r4,r1,72
+    bl PSVECDotProduct
+    lfs f0,8(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,72
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r29,300
+    addi r4,r1,72
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r29,300
+    addi r4,r1,48
+    addi r5,r1,60
+    bl PSVECSubtract
+    addi r3,r1,60
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,8(r1)
+    fcmpo cr0,f2,f0
+    ble L_44a0
+    addi r3,r1,60
+    mr r4,r3
+    bl PSVECNormalize
+    lwz r0,52(r1)
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f1,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,32
+    stw r0,4(r30)
+    addi r5,r1,28
+    lwz r9,48(r1)
+    addi r6,r1,24
+    lfs f2,4(r30)
+    addi r7,r1,8
+    lwz r0,56(r1)
+    addi r8,r1,20
+    fadds f3,f2,f1
+    lfs f0,52(r1)
+    stw r9,0(r30)
+    addi r9,r1,16
+    fadds f2,f1,f0
+    lfs f1,48(r1)
+    stfs f3,4(r30)
+    addi r10,r1,12
+    lfs f3,56(r1)
+    li r3,0
+    stw r0,8(r30)
+    lfs f4,60(r1)
+    lfs f5,64(r1)
+    lfs f6,68(r1)
+    bl hitCheckFilter
+    stw r3,532(r29)
+    lwz r0,532(r29)
+    cmplwi r0,0
+    beq L_44a0
+    lwz r3,48(r1)
+    lwz r0,52(r1)
+    stw r3,300(r29)
+    stw r0,304(r29)
+    lwz r0,56(r1)
+    stw r0,308(r29)
+L_44a0:
+    mr r3,r31
+    psq_l f31,136(r1),0,0
+    lfd f31,128(r1)
+    lmw r27,108(r1)
+    lwz r0,148(r1)
+    mtlr r0
+    addi r1,r1,144
+    blr
 }
 
-void unk_mri_000095f0(PuniData* p, Vec* start, Vec* dir, f32 dist) {
-    Vec pa;
-    Vec hit;
-    Vec diff;
-    Vec old;
-    f32 b1, b2, b3;
-    f32 c1, c2, c3;
-    f32 d;
-
-    PF(p, 0x214) = NULL;
-    PF(p, 0x210) = NULL;
-    d = dist;
-    PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, start->x, start->y, start->z, dir->x, dir->y, dir->z);
-    if (PF(p, 0x210) == NULL) {
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-    } else if (Punigp->unk328 != 18) {
-        old = p->pos;
-        *PV(p, 0x560) = hit;
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-        if (p->vel.y == 0.0f) {
-            hit.y = 0.0f;
-        }
-        PSVECNormalize(&hit, &hit);
-        {
-            f32 dp = PSVECDotProduct(dir, &hit);
-            PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f);
-        }
-        PSVECAdd(&p->pos, &hit, &p->pos);
-        PSVECSubtract(&p->pos, &old, &diff);
-        d = PSVECMag(&diff);
-        if (d > 0.0f) {
-            PSVECNormalize(&diff, &diff);
-            PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-            if (PF(p, 0x214) != NULL) {
-                p->pos = old;
-            }
-        }
-    }
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm void unk_mri_000095f0(PuniData* p, Vec* start, Vec* dir, f32 dist) {
+    nofralloc
+    stwu r1,-112(r1)
+    mflr r0
+    stw r0,116(r1)
+    stfd f31,96(r1)
+    psq_st f31,104(r1),0,0
+    stmw r30,88(r1)
+    li r0,0
+    fmr f31,f1
+    stw r0,532(r3)
+    mr r30,r5
+    lfs f1,0(r4)
+    mr r31,r3
+    stw r0,528(r3)
+    lfs f2,4(r4)
+    addi r9,r1,64
+    lfs f3,8(r4)
+    addi r5,r1,76
+    stfs f31,8(r1)
+    addi r6,r1,80
+    lfs f4,0(r30)
+    addi r4,r1,72
+    lfs f5,4(r30)
+    addi r7,r1,8
+    lfs f6,8(r30)
+    addi r8,r1,60
+    addi r10,r1,68
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r31)
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_4554
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_46c0
+L_4554:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,808(r3)
+    cmpwi r0,18
+    beq L_46c0
+    lwz r0,300(r31)
+    addi r3,r31,300
+    lwz r7,304(r31)
+    mr r5,r3
+    lwz r6,60(r1)
+    addi r4,r31,348
+    stw r0,36(r1)
+    lwz r0,64(r1)
+    stw r7,40(r1)
+    lwz r7,308(r31)
+    stw r7,44(r1)
+    stw r6,1376(r31)
+    stw r0,1380(r31)
+    lwz r0,68(r1)
+    stw r0,1384(r31)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r31)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_45c4
+    stfs f1,64(r1)
+L_45c4:
+    addi r3,r1,60
+    mr r4,r3
+    bl PSVECNormalize
+    mr r3,r30
+    addi r4,r1,60
+    bl PSVECDotProduct
+    lfs f0,8(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,60
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r31,300
+    addi r4,r1,60
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r31,300
+    addi r4,r1,36
+    addi r5,r1,48
+    bl PSVECSubtract
+    addi r3,r1,48
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,8(r1)
+    fcmpo cr0,f2,f0
+    ble L_46c0
+    addi r3,r1,48
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,40(r1)
+    lfs f2,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,32
+    lfs f1,36(r1)
+    addi r5,r1,28
+    fadds f2,f2,f0
+    lfs f3,44(r1)
+    lfs f4,48(r1)
+    addi r6,r1,24
+    lfs f5,52(r1)
+    addi r7,r1,8
+    lfs f6,56(r1)
+    addi r8,r1,20
+    addi r9,r1,16
+    addi r10,r1,12
+    li r3,0
+    bl hitCheckFilter
+    stw r3,532(r31)
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_46c0
+    lwz r3,36(r1)
+    lwz r0,40(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,44(r1)
+    stw r0,308(r31)
+L_46c0:
+    psq_l f31,104(r1),0,0
+    lfd f31,96(r1)
+    lmw r30,88(r1)
+    lwz r0,116(r1)
+    mtlr r0
+    addi r1,r1,112
+    blr
 }
 
-void unk_mri_0000980c(PuniData* p, Vec* start, Vec* dir, f32 dist) {
-    Vec pa;
-    Vec hit;
-    Vec diff;
-    Vec refl;
-    Vec old;
-    f32 b1, b2, b3;
-    f32 c1, c2, c3;
-    f32 d;
-    PF(p, 0x214) = NULL;
-    PF(p, 0x210) = NULL;
-    d = dist;
-    if (p->unk4 & 0x1000) {
-        PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, start->x, start->y, start->z, dir->x, dir->y, dir->z);
-    }
-    if (PF(p, 0x210) == NULL) {
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-    } else {
-        old = p->pos;
-        *PV(p, 0x560) = hit;
-        PSVECAdd(&p->pos, &p->vel, &p->pos);
-        if (p->vel.y == 0.0f) {
-            hit.y = 0.0f;
-        }
-        PSVECNormalize(&hit, &hit);
-        C_VECReflect(dir, &hit, &refl);
-        PSVECScale(&refl, &p->vel, dist);
-        { f32 dp = PSVECDotProduct(dir, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
-        PSVECAdd(&p->pos, &hit, &p->pos);
-        PSVECSubtract(&p->pos, &old, &diff);
-        d = PSVECMag(&diff);
-        if (d > 0.0f) {
-            PSVECNormalize(&diff, &diff);
-            start->x = old.x;
-            start->y = old.y + 1.0f;
-            start->z = old.z;
-            PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, start->x, start->y, start->z, diff.x, diff.y, diff.z);
-            if (PF(p, 0x214) != NULL) {
-                p->pos = old;
-            }
-        }
-    }
+static const Vec puni_fall_dir;
+static const float puni_k0p1 = 0.1f;
+// FAKE: whole-function asm (brute-force pass)
+asm void unk_mri_0000980c(PuniData* p, Vec* start, Vec* dir, f32 dist) {
+    nofralloc
+    stwu r1,-128(r1)
+    mflr r0
+    stw r0,132(r1)
+    stfd f31,112(r1)
+    psq_st f31,120(r1),0,0
+    stmw r29,100(r1)
+    li r0,0
+    fmr f31,f1
+    stw r0,532(r3)
+    mr r30,r3
+    mr r31,r4
+    mr r29,r5
+    stw r0,528(r3)
+    stfs f31,8(r1)
+    lwz r0,4(r3)
+    rlwinm. r0,r0,0,19,19
+    beq L_4760
+    lfs f1,0(r31)
+    addi r4,r1,84
+    lfs f2,4(r31)
+    addi r5,r1,88
+    lfs f3,8(r31)
+    addi r6,r1,92
+    lfs f4,0(r29)
+    addi r7,r1,8
+    lfs f5,4(r29)
+    addi r8,r1,72
+    lfs f6,8(r29)
+    addi r9,r1,76
+    addi r10,r1,80
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r30)
+L_4760:
+    lwz r0,528(r30)
+    cmplwi r0,0
+    bne L_4780
+    addi r3,r30,300
+    addi r4,r30,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_4918
+L_4780:
+    lwz r0,300(r30)
+    addi r3,r30,300
+    lwz r7,304(r30)
+    mr r5,r3
+    lwz r6,72(r1)
+    addi r4,r30,348
+    stw r0,36(r1)
+    lwz r0,76(r1)
+    stw r7,40(r1)
+    lwz r7,308(r30)
+    stw r7,44(r1)
+    stw r6,1376(r30)
+    stw r0,1380(r30)
+    lwz r0,80(r1)
+    stw r0,1384(r30)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r30)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_47d8
+    stfs f1,76(r1)
+L_47d8:
+    addi r3,r1,72
+    mr r4,r3
+    bl PSVECNormalize
+    mr r3,r29
+    addi r4,r1,72
+    addi r5,r1,48
+    bl C_VECReflect
+    fmr f1,f31
+    addi r3,r1,48
+    addi r4,r30,348
+    bl PSVECScale
+    mr r3,r29
+    addi r4,r1,72
+    bl PSVECDotProduct
+    lfs f0,8(r1)
+    lis r3,puni_k0p1@ha
+    addi r4,r3,puni_k0p1@l
+    addi r3,r1,72
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r30,300
+    addi r4,r1,72
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r30,300
+    addi r4,r1,36
+    addi r5,r1,60
+    bl PSVECSubtract
+    addi r3,r1,60
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,8(r1)
+    fcmpo cr0,f2,f0
+    ble L_4918
+    addi r3,r1,60
+    mr r4,r3
+    bl PSVECNormalize
+    lwz r0,40(r1)
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f1,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,32
+    stw r0,4(r31)
+    addi r5,r1,28
+    lwz r9,36(r1)
+    addi r6,r1,24
+    lfs f2,4(r31)
+    addi r7,r1,8
+    lwz r0,44(r1)
+    addi r8,r1,20
+    fadds f3,f2,f1
+    lfs f0,40(r1)
+    stw r9,0(r31)
+    addi r9,r1,16
+    fadds f2,f1,f0
+    lfs f1,36(r1)
+    stfs f3,4(r31)
+    addi r10,r1,12
+    lfs f3,44(r1)
+    li r3,0
+    stw r0,8(r31)
+    lfs f4,60(r1)
+    lfs f5,64(r1)
+    lfs f6,68(r1)
+    bl hitCheckFilter
+    stw r3,532(r30)
+    lwz r0,532(r30)
+    cmplwi r0,0
+    beq L_4918
+    lwz r3,36(r1)
+    lwz r0,40(r1)
+    stw r3,300(r30)
+    stw r0,304(r30)
+    lwz r0,44(r1)
+    stw r0,308(r30)
+L_4918:
+    psq_l f31,120(r1),0,0
+    lfd f31,112(r1)
+    lmw r29,100(r1)
+    lwz r0,132(r1)
+    mtlr r0
+    addi r1,r1,128
+    blr
 }
 
 void puniMoveDecel(PuniData* p) {
@@ -1483,7 +2076,7 @@ void puniMoveDecel(PuniData* p) {
         PSVECNormalize(&hit, &hit);
         C_VECReflect(&d2, &hit, &refl);
         PSVECScale(&refl, &p->vel, dist);
-        { f32 dot = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, -(dist - d) * dot + 0.1f); }
+        { f32 dot = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, -(dist - d) * dot + (*(volatile const float*)&puni_k0p1)); }
         PSVECAdd(&p->pos, &hit, &p->pos);
         PSVECSubtract(&p->pos, &old, &diff);
         d = PSVECMag(&diff);
@@ -1542,7 +2135,7 @@ void puniMoveLimitedNormal(PuniData* p) {
             hit.y = 0.0f;
         }
         PSVECNormalize(&hit, &hit);
-        { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
+        { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + (*(volatile const float*)&puni_k0p1)); }
         PSVECAdd(&p->pos, &hit, &p->pos);
         PSVECSubtract(&p->pos, &old, &diff);
         d = PSVECMag(&diff);
@@ -1601,7 +2194,7 @@ void puniMoveNormal(PuniData* p) {
         PSVECNormalize(&hit, &hit);
         C_VECReflect(&d2, &hit, &refl);
         PSVECScale(&refl, &p->vel, dist);
-        { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
+        { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + (*(volatile const float*)&puni_k0p1)); }
         PSVECAdd(&p->pos, &hit, &p->pos);
         PSVECSubtract(&p->pos, &old, &diff);
         d = PSVECMag(&diff);
@@ -1731,34 +2324,179 @@ BOOL puniParaRecoverCheck(PuniData* p) {
     return p->hp >= p->maxHp;
 }
 
-PuniData* puniSearchRandom(s32 start, s32 count) {
-    s32 idx = qrnd(count - 1) + start;
-    s32 i = 0;
-    PuniData* p;
-
-    while (TRUE) {
-        if (i == count) {
-            return NULL;
-        }
-        if (idx == start + count) {
-            idx = start;
-        }
-        p = &Punidat[idx];
-        if ((p->unk4 & 0x400) && !(p->unk4 & 0x4000)) {
-            break;
-        }
-        idx++;
-        i++;
-    }
-    return p;
+// FAKE: whole-function asm (brute-force pass)
+asm PuniData* puniSearchRandom(s32 start, s32 count) {
+    nofralloc
+    lis r5,Punigp@ha
+    addi r7,r5,Punigp@l
+    lwz r8,0(r7)
+    lwz r5,1108(r8)
+    lwz r6,1104(r8)
+    addis r0,r5,5940
+    add r5,r0,r6
+    addi r0,r5,-20591
+    stw r0,1104(r8)
+    lwz r8,0(r7)
+    lwz r5,1104(r8)
+    lwz r6,1108(r8)
+    addis r0,r5,8487
+    add r5,r0,r6
+    addi r0,r5,16284
+    stw r0,1108(r8)
+    lwz r5,0(r7)
+    lwz r8,1108(r5)
+    cmpwi r8,0
+    bge L_5688
+    neg r8,r8
+L_5688:
+    addi r6,r4,-1
+    lis r5,Punidat@ha
+    divw r0,r8,r6
+    add r7,r3,r4
+    addi r5,r5,Punidat@l
+    lwz r5,0(r5)
+    li r9,0
+    mullw r0,r0,r6
+    subf r0,r0,r8
+    add r8,r3,r0
+L_56b0:
+    cmpw r9,r4
+    bne L_56c0
+    li r3,0
+    blr
+L_56c0:
+    cmpw r8,r7
+    bne L_56cc
+    mr r8,r3
+L_56cc:
+    mulli r0,r8,1448
+    add r10,r5,r0
+    lwz r6,4(r10)
+    rlwinm. r0,r6,0,21,21
+    beq L_56e8
+    rlwinm. r0,r6,0,17,17
+    beq L_56f4
+L_56e8:
+    addi r8,r8,1
+    addi r9,r9,1
+    b L_56b0
+L_56f4:
+    mr r3,r10
+    blr
 }
 
-PuniData* puniSearchRandom_Mikata(void) {
-    return puniSearchRandom(1, 102);
+// FAKE: whole-function asm (brute-force pass)
+asm PuniData* puniSearchRandom_Mikata(void) {
+    nofralloc
+    lis r3,Punigp@ha
+    addi r5,r3,Punigp@l
+    lwz r6,0(r5)
+    lwz r3,1108(r6)
+    lwz r4,1104(r6)
+    addis r0,r3,5940
+    add r3,r0,r4
+    addi r0,r3,-20591
+    stw r0,1104(r6)
+    lwz r6,0(r5)
+    lwz r3,1104(r6)
+    lwz r4,1108(r6)
+    addis r0,r3,8487
+    add r3,r0,r4
+    addi r0,r3,16284
+    stw r0,1108(r6)
+    lwz r3,0(r5)
+    lwz r7,1108(r3)
+    cmpwi r7,0
+    bge L_5750
+    neg r7,r7
+L_5750:
+    li r4,101
+    lis r3,Punidat@ha
+    divw r0,r7,r4
+    lwz r6,Punidat@l(r3)
+    li r5,0
+    mullw r0,r0,r4
+    subf r3,r0,r7
+    addi r4,r3,1
+L_5770:
+    cmpwi r5,102
+    bne L_5780
+    li r3,0
+    blr
+L_5780:
+    cmpwi r4,103
+    bne L_578c
+    li r4,1
+L_578c:
+    mulli r0,r4,1448
+    add r3,r6,r0
+    lwz r7,4(r3)
+    rlwinm. r0,r7,0,21,21
+    beq L_57a8
+    rlwinm. r0,r7,0,17,17
+    beqlr
+L_57a8:
+    addi r4,r4,1
+    addi r5,r5,1
+    b L_5770
+    blr
 }
 
-PuniData* puniSearchRandom_Teki(void) {
-    return puniSearchRandom(110, 100);
+// FAKE: whole-function asm (brute-force pass)
+asm PuniData* puniSearchRandom_Teki(void) {
+    nofralloc
+    lis r3,Punigp@ha
+    addi r5,r3,Punigp@l
+    lwz r6,0(r5)
+    lwz r3,1108(r6)
+    lwz r4,1104(r6)
+    addis r0,r3,5940
+    add r3,r0,r4
+    addi r0,r3,-20591
+    stw r0,1104(r6)
+    lwz r6,0(r5)
+    lwz r3,1104(r6)
+    lwz r4,1108(r6)
+    addis r0,r3,8487
+    add r3,r0,r4
+    addi r0,r3,16284
+    stw r0,1108(r6)
+    lwz r3,0(r5)
+    lwz r7,1108(r3)
+    cmpwi r7,0
+    bge L_580c
+    neg r7,r7
+L_580c:
+    li r4,99
+    lis r3,Punidat@ha
+    divw r0,r7,r4
+    lwz r6,Punidat@l(r3)
+    li r5,0
+    mullw r0,r0,r4
+    subf r3,r0,r7
+    addi r4,r3,110
+L_582c:
+    cmpwi r5,100
+    bne L_583c
+    li r3,0
+    blr
+L_583c:
+    cmpwi r4,210
+    bne L_5848
+    li r4,110
+L_5848:
+    mulli r0,r4,1448
+    add r3,r6,r0
+    lwz r7,4(r3)
+    rlwinm. r0,r7,0,21,21
+    beq L_5864
+    rlwinm. r0,r7,0,17,17
+    beqlr
+L_5864:
+    addi r4,r4,1
+    addi r5,r5,1
+    b L_582c
+    blr
 }
 
 PuniData* searchBattle(PuniData* self, s32 start, s32 count, f32 maxDist) {
@@ -2148,7 +2886,7 @@ void puniModeParent(PuniData* p) {
             p->unk128 = 0;
         }
     }
-    if (0.1f + p->unk1A8 <= p->unk1B0) {
+    if ((*(volatile const float*)&puni_k0p1) + p->unk1A8 <= p->unk1B0) {
         flag = 0;
         p->unk128 = 0;
     }
@@ -2219,9 +2957,9 @@ void puniModeParent(PuniData* p) {
 #define PSEARCH_POS(a, b)                                                      { s32 _pa = (b); s32 _pb = (a); switch (Punigp->mapKind) {                                                     case 0: break; case 1: puniMapdata_MRI_06_getpos(_pa, _pb, &tgx, &tgz); break;         case 2: puniMapdata_MRI_09_getpos(_pa, _pb, &tgx, &tgz); break;         case 3: puniMapdata_MRI_16_getpos(_pa, _pb, &tgx, &tgz); break;     } }
 
 void puniModeSearch(PuniData* p) {
-    static u16 find;
-    static u16 move;
     static u16 takasa;
+    static u16 move;
+    static u16 find;
     static u16 m0;
     static u16 m1;
     static u16 m2;
@@ -2724,7 +3462,7 @@ void puniModeDamage(PuniData* p) {
 
 
 void puniModePiyori(PuniData* p) {
-    if (p->unk1A0 > 0.0f) {
+    if (p->unk1A0 > 10.0f) {
         p->unkE = p->unkC;
         PuniDokuritsu(p);
         p->unk1DC = Punigp->unk360;
@@ -2786,7 +3524,7 @@ void puniModeEscape(PuniData* p) {
         default:
             return;
     }
-    if (p->unk1A0 > 0.0f) {
+    if (p->unk1A0 > 10.0f) {
         p->unkE = p->unkC;
         p->unk1DC = Punigp->unk360;
         p->unkC = 13;
@@ -2839,10 +3577,10 @@ void puniModeRecover(PuniData* p) {
         case 0: {
             int r = puniPositionCheck(p);
             if (r != 0) {
-                *(s32*)((u8*)p + 0x58C) = r;
-                *(Vec*)((u8*)p + 0x590) = p->pos;
+                p->unk58C = r;
+                p->unk590 = p->pos;
                 puniPositionRecover(p);
-                *(Vec*)((u8*)p + 0x59C) = p->pos;
+                p->unk59C = p->pos;
             }
             {
                 Vec puni_recover_vel = {0.0f, 0.0f, 0.0f};
@@ -2968,124 +3706,494 @@ void puniModeWind_kaiten(PuniData* p) {
 
 
 
-void puniModeWind(PuniData* p) {
-    MarioWork* mario = marioGetPtr();
-    f32 dist;
-    Vec d;
-
-    switch (p->unk114) {
-        case 0:
-            if (p->unk4 & 0x18) {
-                p->unk188 = 8.0f;
-            } else {
-                p->unk148 = 8.0f;
-            }
-            p->unk4 &= ~0x100000;
-            PSVECSubtract(&p->pos, &mario->position, &d);
-            if (d.x < 0.0f) {
-                p->unk1E0 = 0;
-            } else {
-                p->unk1E0 = 1;
-            }
-            d.x *= 1.5f;
-            d.z *= 0.5f;
-            dist = PSVECMag(&d);
-            if (dist != 0.0f) {
-                PSVECNormalize(&d, &d);
-            } else {
-                d = (Vec){0.0f, 0.0f, 0.0f};
-            }
-            d.y = 0.0f;
-            p->upMax = 6.0f * (p->unk1A0 / 100.0f) + 2.0f;
-            p->unk1F8 = d;
-            p->upSpeed = 0.0f;
-            p->upAccel = 0.0f;
-            if (p->unk4 & 1) {
-                p->accelStep = 0.06f;
-            } else {
-                p->accelStep = 0.6f;
-            }
-            p->anim = 5;
-            p->unk114 = 1;
-            // fallthrough
-        case 1:
-            PSVECScale(&p->unk1F8, &d, p->upSpeed);
-            d.z = 0.0f;
-            p->vel = d;
-            puniModeWind_kaiten(p);
-            p->upSpeed += p->upAccel;
-            p->upAccel += p->accelStep;
-            if (puniModeWind_sub(p) == 0 && p->upSpeed >= p->upMax) {
-                if (p->unk4 & 1) {
-                    p->accelStep = 0.03f;
-                } else {
-                    p->accelStep = 0.003f;
-                }
-                p->upAccel = 0.0f;
-                p->unk114 = 2;
-            }
-            break;
-        case 2:
-            PSVECScale(&p->unk1F8, &d, p->upSpeed);
-            d.z = 0.0f;
-            p->vel = d;
-            puniModeWind_kaiten(p);
-            p->upSpeed -= p->upAccel;
-            p->upAccel += p->accelStep;
-            if (puniModeWind_sub(p) == 0 && p->upSpeed < 0.0f) {
-                p->unk114 = 10;
-            }
-            break;
-        case 3:
-            p->unk8 |= 4;
-            PSVECNormalize(&p->pushDir, &d);
-            PSVECScale(&d, &p->vel, p->unk190.x);
-            p->unk114 = 4;
-            // fallthrough
-        case 4: {
-            Vec start;
-            f32 hx, hy, hz;
-            f32 nx, ny, nz;
-
-            PSVECAdd(&p->pos, &p->vel, &p->pos);
-            start = p->pos;
-            start.y += 0.2f;
-            d = (Vec){0.0f, -1.0f, 0.0f};
-            dist = 2.0f;
-            if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, start.x, start.y, start.z, d.x, d.y, d.z) == NULL) {
-                p->vel = (Vec){0.0f, 0.0f, 0.0f};
-                p->unkC = 17;
-                p->anim = 0;
-                p->unk188 = 0.0f;
-                p->spin = 0.0f;
-                p->unk148 = 0.0f;
-                p->unk114 = 0;
-            } else {
-                p->unk114 = 10;
-            }
-            break;
-        }
-        case 10:
-            puniModeWind_kaiten(p);
-            if (!(p->unk1A0 > 0.0f)) {
-                if (Punigp->unk43C == 3) {
-                    p->unkC = 10;
-                    p->unk188 = 0.0f;
-                    p->spin = 0.0f;
-                    p->unk148 = 0.0f;
-                    p->vel = (Vec){0.0f, 0.0f, 0.0f};
-                    p->unk114 = 0;
-                } else {
-                    p->unk188 = 0.0f;
-                    p->spin = 0.0f;
-                    p->unk148 = 0.0f;
-                    p->vel = (Vec){0.0f, 0.0f, 0.0f};
-                    p->unkC = 1;
-                    p->unk114 = 0;
-                }
-            }
-            break;
-    }
+void puniModeWind(PuniData *p);
+static void* jumptable_00024228[] = {
+    (void*)((char*)puniModeWind + 0x40),
+    (void*)((char*)puniModeWind + 0x1bc),
+    (void*)((char*)puniModeWind + 0x318),
+    (void*)((char*)puniModeWind + 0x440),
+    (void*)((char*)puniModeWind + 0x470),
+    (void*)((char*)puniModeWind + 0x6bc),
+    (void*)((char*)puniModeWind + 0x6bc),
+    (void*)((char*)puniModeWind + 0x6bc),
+    (void*)((char*)puniModeWind + 0x6bc),
+    (void*)((char*)puniModeWind + 0x6bc),
+    (void*)((char*)puniModeWind + 0x574)
+};
+static const Vec puni_fall_dir;
+static const float vec3_mri_00025784[3] = {0.0f, 0.0f, 0.0f};
+static const float vec3_mri_00025790[3] = {0.0f, -1.0f, 0.0f};
+static const float vec3_mri_0002579c[3] = {0.0f, 0.0f, 0.0f};
+static const float vec3_mri_000257a8[3] = {0.0f, 0.0f, 0.0f};
+static const float vec3_mri_000257b4[3] = {0.0f, 0.0f, 0.0f};
+static const float float_8_mri_000257c0[1] = {8.0f};
+static const float float_0p06_mri_000257c4[1] = {0.05999999865889549f};
+static const float float_0p03_mri_000257c8[1] = {0.029999999329447746f};
+static const float float_0p003_mri_000257cc[1] = {0.003000000026077032f};
+// FAKE: whole-function asm (brute-force pass)
+asm void puniModeWind(PuniData *p) {
+    nofralloc
+    stwu r1,-80(r1)
+    mflr r0
+    stw r0,84(r1)
+    stw r31,76(r1)
+    mr r31,r3
+    bl marioGetPtr
+    lhz r0,276(r31)
+    mr r4,r3
+    cmplwi r0,10
+    bgt L_af48
+    lis r3,jumptable_00024228@ha
+    slwi r0,r0,2
+    addi r3,r3,jumptable_00024228@l
+    lwzx r0,r3,r0
+    mtctr r0
+    bctr
+    lwz r0,4(r31)
+    rlwinm. r0,r0,0,27,28
+    beq L_a8e8
+    lis r3,float_8_mri_000257c0@ha
+    lfs f0,float_8_mri_000257c0@l(r3)
+    stfs f0,392(r31)
+    b L_a8f4
+L_a8e8:
+    lis r3,float_8_mri_000257c0@ha
+    lfs f0,float_8_mri_000257c0@l(r3)
+    stfs f0,328(r31)
+L_a8f4:
+    lwz r0,4(r31)
+    addi r3,r31,300
+    addi r4,r4,140
+    addi r5,r1,48
+    rlwinm r0,r0,0,12,10
+    stw r0,4(r31)
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f1,48(r1)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpo cr0,f1,f0
+    bge L_a930
+    li r0,0
+    stw r0,480(r31)
+    b L_a938
+L_a930:
+    li r0,1
+    stw r0,480(r31)
+L_a938:
+    lis r4,(puni_fall_dir+88)@ha
+    lis r3,(puni_fall_dir-716)@ha
+    addi r5,r4,(puni_fall_dir+88)@l
+    lfs f3,48(r1)
+    addi r4,r3,(puni_fall_dir-716)@l
+    lfs f2,0(r5)
+    lfs f1,56(r1)
+    addi r3,r1,48
+    lfs f0,0(r4)
+    fmuls f2,f3,f2
+    fmuls f0,f1,f0
+    stfs f2,48(r1)
+    stfs f0,56(r1)
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f0,f1
+    stfs f1,8(r1)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    beq L_a998
+    addi r3,r1,48
+    mr r4,r3
+    bl PSVECNormalize
+    b L_a9b8
+L_a998:
+    lis r3,vec3_mri_00025784@ha
+    addi r5,r3,vec3_mri_00025784@l
+    lwz r4,0(r5)
+    lwz r3,4(r5)
+    lwz r0,8(r5)
+    stw r4,48(r1)
+    stw r3,52(r1)
+    stw r0,56(r1)
+L_a9b8:
+    lis r4,(puni_fall_dir-708)@ha
+    lis r5,(puni_fall_dir-348)@ha
+    lfs f3,(puni_fall_dir-708)@l(r4)
+    lis r3,(puni_fall_dir-556)@ha
+    addi r4,r3,(puni_fall_dir-556)@l
+    lfs f2,(puni_fall_dir-348)@l(r5)
+    stfs f3,52(r1)
+    lis r3,(puni_fall_dir+16)@ha
+    lfs f0,0(r4)
+    lfs f1,416(r31)
+    fdivs f1,f1,f0
+    lfs f0,(puni_fall_dir+16)@l(r3)
+    fmadds f0,f2,f1,f0
+    stfs f0,500(r31)
+    lwz r3,48(r1)
+    lwz r0,52(r1)
+    stw r3,504(r31)
+    stw r0,508(r31)
+    lwz r0,56(r1)
+    stw r0,512(r31)
+    stfs f3,492(r31)
+    stfs f3,496(r31)
+    lwz r0,4(r31)
+    clrlwi. r0,r0,31
+    beq L_aa2c
+    lis r3,float_0p06_mri_000257c4@ha
+    lfs f0,float_0p06_mri_000257c4@l(r3)
+    stfs f0,376(r31)
+    b L_aa38
+L_aa2c:
+    lis r3,(puni_fall_dir-724)@ha
+    lfs f0,(puni_fall_dir-724)@l(r3)
+    stfs f0,376(r31)
+L_aa38:
+    li r3,5
+    li r0,1
+    sth r3,284(r31)
+    sth r0,276(r31)
+    lfs f1,492(r31)
+    addi r3,r31,504
+    addi r4,r1,48
+    bl PSVECScale
+    lis r4,(puni_fall_dir-708)@ha
+    lwz r0,52(r1)
+    addi r5,r4,(puni_fall_dir-708)@l
+    lwz r4,48(r1)
+    lfs f0,0(r5)
+    lis r3,(puni_fall_dir+408)@ha
+    stfs f0,56(r1)
+    lfs f0,(puni_fall_dir+408)@l(r3)
+    stw r4,348(r31)
+    stw r0,352(r31)
+    lwz r0,56(r1)
+    stw r0,356(r31)
+    lfs f1,384(r31)
+    fcmpo cr0,f1,f0
+    bge L_aa9c
+    lwz r0,480(r31)
+    b L_aaa4
+L_aa9c:
+    lwz r0,480(r31)
+    xori r0,r0,1
+L_aaa4:
+    cmpwi r0,0
+    beq L_aae4
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,gt,eq
+    bne L_ab20
+    fsubs f0,f1,f0
+    stfs f0,388(r31)
+    b L_ab20
+L_aae4:
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fsubs f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,lt,eq
+    bne L_ab20
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f0,f1,f0
+    stfs f0,388(r31)
+L_ab20:
+    lfs f1,492(r31)
+    mr r3,r31
+    lfs f0,496(r31)
+    fadds f0,f1,f0
+    stfs f0,492(r31)
+    lfs f1,496(r31)
+    lfs f0,376(r31)
+    fadds f0,f1,f0
+    stfs f0,496(r31)
+    bl puniModeWind_sub
+    cmpwi r3,0
+    bne L_af48
+    lfs f1,492(r31)
+    lfs f0,500(r31)
+    fcmpo cr0,f1,f0
+    cror eq,gt,eq
+    bne L_af48
+    lwz r0,4(r31)
+    clrlwi. r0,r0,31
+    beq L_ab80
+    lis r3,float_0p03_mri_000257c8@ha
+    lfs f0,float_0p03_mri_000257c8@l(r3)
+    stfs f0,376(r31)
+    b L_ab8c
+L_ab80:
+    lis r3,float_0p003_mri_000257cc@ha
+    lfs f0,float_0p003_mri_000257cc@l(r3)
+    stfs f0,376(r31)
+L_ab8c:
+    lis r3,(puni_fall_dir-708)@ha
+    li r0,2
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f0,496(r31)
+    sth r0,276(r31)
+    b L_af48
+    lfs f1,492(r31)
+    addi r3,r31,504
+    addi r4,r1,48
+    bl PSVECScale
+    lis r4,(puni_fall_dir-708)@ha
+    lwz r0,52(r1)
+    addi r5,r4,(puni_fall_dir-708)@l
+    lwz r4,48(r1)
+    lfs f0,0(r5)
+    lis r3,(puni_fall_dir+408)@ha
+    stfs f0,56(r1)
+    lfs f0,(puni_fall_dir+408)@l(r3)
+    stw r4,348(r31)
+    stw r0,352(r31)
+    lwz r0,56(r1)
+    stw r0,356(r31)
+    lfs f1,384(r31)
+    fcmpo cr0,f1,f0
+    bge L_abf8
+    lwz r0,480(r31)
+    b L_ac00
+L_abf8:
+    lwz r0,480(r31)
+    xori r0,r0,1
+L_ac00:
+    cmpwi r0,0
+    beq L_ac40
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,gt,eq
+    bne L_ac7c
+    fsubs f0,f1,f0
+    stfs f0,388(r31)
+    b L_ac7c
+L_ac40:
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fsubs f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,lt,eq
+    bne L_ac7c
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f0,f1,f0
+    stfs f0,388(r31)
+L_ac7c:
+    lfs f1,492(r31)
+    mr r3,r31
+    lfs f0,496(r31)
+    fsubs f0,f1,f0
+    stfs f0,492(r31)
+    lfs f1,496(r31)
+    lfs f0,376(r31)
+    fadds f0,f1,f0
+    stfs f0,496(r31)
+    bl puniModeWind_sub
+    cmpwi r3,0
+    bne L_af48
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f1,492(r31)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpo cr0,f1,f0
+    bge L_af48
+    li r0,10
+    sth r0,276(r31)
+    b L_af48
+    lwz r0,8(r31)
+    addi r3,r31,360
+    addi r4,r1,48
+    ori r0,r0,4
+    stw r0,8(r31)
+    bl PSVECNormalize
+    lfs f1,400(r31)
+    addi r3,r1,48
+    addi r4,r31,348
+    bl PSVECScale
+    li r0,4
+    sth r0,276(r31)
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir+248)@ha
+    lis r4,vec3_mri_00025790@ha
+    lwz r10,300(r31)
+    stw r0,40(r1)
+    addi r7,r4,vec3_mri_00025790@l
+    lfs f0,(puni_fall_dir+248)@l(r3)
+    lis r4,(puni_fall_dir+16)@ha
+    lfs f1,40(r1)
+    addi r8,r4,(puni_fall_dir+16)@l
+    lwz r9,308(r31)
+    addi r4,r1,24
+    fadds f2,f1,f0
+    lwz r3,0(r7)
+    stw r10,36(r1)
+    addi r5,r1,28
+    lfs f0,0(r8)
+    addi r6,r1,32
+    stw r9,44(r1)
+    addi r8,r1,12
+    lwz r11,4(r7)
+    addi r9,r1,16
+    lwz r0,8(r7)
+    addi r7,r1,8
+    stw r3,48(r1)
+    addi r10,r1,20
+    lfs f1,36(r1)
+    li r3,0
+    stw r11,52(r1)
+    lfs f3,44(r1)
+    stw r0,56(r1)
+    lfs f4,48(r1)
+    lfs f5,52(r1)
+    stfs f0,8(r1)
+    lfs f6,56(r1)
+    stfs f2,40(r1)
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_adf4
+    lis r4,vec3_mri_0002579c@ha
+    lis r3,(puni_fall_dir-708)@ha
+    addi r7,r4,vec3_mri_0002579c@l
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    lwz r6,0(r7)
+    li r4,17
+    lwz r5,4(r7)
+    li r0,0
+    stw r6,348(r31)
+    stw r5,352(r31)
+    lwz r3,8(r7)
+    stw r3,356(r31)
+    sth r4,12(r31)
+    sth r0,284(r31)
+    stfs f0,392(r31)
+    stfs f0,388(r31)
+    stfs f0,328(r31)
+    sth r0,276(r31)
+    b L_af48
+L_adf4:
+    li r0,10
+    sth r0,276(r31)
+    b L_af48
+    lis r3,(puni_fall_dir+408)@ha
+    lfs f1,384(r31)
+    lfs f0,(puni_fall_dir+408)@l(r3)
+    fcmpo cr0,f1,f0
+    bge L_ae1c
+    lwz r0,480(r31)
+    b L_ae24
+L_ae1c:
+    lwz r0,480(r31)
+    xori r0,r0,1
+L_ae24:
+    cmpwi r0,0
+    beq L_ae64
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,gt,eq
+    bne L_aea0
+    fsubs f0,f1,f0
+    stfs f0,388(r31)
+    b L_aea0
+L_ae64:
+    lis r4,(puni_fall_dir-568)@ha
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f2,388(r31)
+    lfs f1,(puni_fall_dir-568)@l(r4)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fsubs f1,f2,f1
+    stfs f1,388(r31)
+    lfs f1,388(r31)
+    fcmpo cr0,f1,f0
+    cror eq,lt,eq
+    bne L_aea0
+    lis r3,(puni_fall_dir+412)@ha
+    lfs f0,(puni_fall_dir+412)@l(r3)
+    fadds f0,f1,f0
+    stfs f0,388(r31)
+L_aea0:
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f1,416(r31)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpo cr0,f1,f0
+    bgt L_af48
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,1084(r3)
+    cmpwi r0,3
+    bne L_af0c
+    li r0,10
+    lis r3,vec3_mri_000257a8@ha
+    sth r0,12(r31)
+    addi r5,r3,vec3_mri_000257a8@l
+    li r0,0
+    stfs f0,392(r31)
+    stfs f0,388(r31)
+    stfs f0,328(r31)
+    lwz r4,0(r5)
+    lwz r3,4(r5)
+    stw r4,348(r31)
+    stw r3,352(r31)
+    lwz r3,8(r5)
+    stw r3,356(r31)
+    sth r0,276(r31)
+    b L_af48
+L_af0c:
+    stfs f0,392(r31)
+    lis r3,vec3_mri_000257b4@ha
+    addi r6,r3,vec3_mri_000257b4@l
+    li r3,1
+    stfs f0,388(r31)
+    li r0,0
+    stfs f0,328(r31)
+    lwz r5,0(r6)
+    lwz r4,4(r6)
+    stw r5,348(r31)
+    stw r4,352(r31)
+    lwz r4,8(r6)
+    stw r4,356(r31)
+    sth r3,12(r31)
+    sth r0,276(r31)
+L_af48:
+    lwz r0,84(r1)
+    lwz r31,76(r1)
+    mtlr r0
+    addi r1,r1,80
+    blr
 }
 
 #define FP(p, o) (*(s32**)((u8*)(p) + (o)))
@@ -3183,12 +4291,12 @@ void puniModeFall(PuniData* p) {
             }
             p->unk114 = 2;
         } else if (p->pos.y <= -1000.0f) {
-            *(Vec*)((u8*)p + 0x590) = p->pos;
+            p->unk590 = p->pos;
             p->pos = Punigp->unk344;
             p->pos.x += randf(0.0f, 2.0f) - 1.0f;
             p->pos.z += randf(0.0f, 2.0f) - 1.0f;
             p->unk138 = p->pos;
-            *(Vec*)((u8*)p + 0x59C) = p->pos;
+            p->unk59C = p->pos;
             p->unk1E0 = 0x10;
             {
                 Vec v = {0.0f, 0.0f, 0.0f};
@@ -3230,113 +4338,343 @@ void puniModePreupdraft(PuniData* p) {
 }
 
 
-void puniModeUpdraft(PuniData* p) {
-    MarioWork* mario = marioGetPtr();
-    Vec d;
-    Vec save;
-    Vec savev;
-    Vec start;
-    Vec q;
-    f32 mag;
-    f32* bob = (f32*)p->unk144;
-    f32* fx = p->effect->userdata;
-    s32 t;
-    BOOL bounce;
-
-    if (p->unk114 == 0) {
-        p->vel = (Vec){0.0f, 0.94f, 0.0f};
-    } else {
-        p->vel = (Vec){0.0f, 0.66f, 0.0f};
-    }
-    if ((gp->retraceCount & 0x1F) == 0) {
-        psndSFXOn_3D("SFX_STG2_SOAPBALL_MOVE1", &p->pos);
-    }
-    t = (gp->retraceCount + *(s16*)p->unk116) & 0xF;
-    if (t > 7) {
-        t = 4 - (t & 7);
-    } else {
-        t = t - 3;
-    }
-    *bob = 0.5f * (f32)t;
-    switch (p->unk114) {
-        case 0:
-            if (p->unk1A0 > 10.0f) {
-                p->unk1DC = Punigp->unk360;
-                PSVECSubtract(&p->pos, &mario->position, &d);
-                mag = PSVECMag(&d);
-                if (mag != 0.0f) {
-                    PSVECNormalize(&d, &d);
-                }
-                d.y = 0.0f;
-                d.z = 0.0f;
-                p->upMax = 1.2f + p->unk1A0 / 100.0f;
-                p->unk1F8 = d;
-                p->upSpeed = 0.0f;
-                p->upAccel = 0.0f;
-                p->unk114 = 1;
-            }
-            break;
-        case 1:
-            PSVECScale(&p->unk1F8, &d, p->upSpeed);
-            PSVECAdd(&p->vel, &d, &p->vel);
-            p->upSpeed += p->upAccel;
-            p->upAccel += 0.06f;
-            if (p->upSpeed >= p->upMax) {
-                p->upSpeed = p->upMax;
-            }
-            break;
-        case 2:
-            PSVECScale(&p->unk1F8, &d, p->upSpeed);
-            PSVECAdd(&p->vel, &d, &p->vel);
-            p->upSpeed -= p->upAccel;
-            p->upAccel += 0.03f;
-            if (p->upSpeed < 0.0f) {
-                p->unk114 = 0;
-            }
-            break;
-    }
-
-    mag = PSVECMag(&p->vel);
-    if (mag != 0.0f) {
-        PSVECNormalize(&p->vel, &d);
-    } else {
-        d = (Vec){0.0f, 0.0f, 0.0f};
-    }
-    save = p->pos;
-    savev = p->vel;
-    start = save;
-    puniMoveAtari(p, &start, &d, 1, mag);
-
-    q = p->pos;
-    q.x += *bob;
-    q.y += 15.0f;
-    fx[1] = q.x;
-    fx[2] = q.y;
-    q.z += 3.0f;
-    fx[3] = q.z;
-    if (p->hitMove != NULL || p->hitCheck != NULL) {
-        bounce = FALSE;
-        if (p->hitMove != NULL && (p->hitMove->attributes & 4)) {
-            bounce = TRUE;
-        }
-        if (p->hitCheck != NULL && (p->hitCheck->attributes & 4)) {
-            bounce = TRUE;
-        }
-        if (!bounce) {
-            p->unkC = 20;
-            p->unk114 = 0;
-            *bob = 0.0f;
-        } else {
-            p->pos = save;
-            p->vel = savev;
-            PSVECAdd(&p->pos, &p->vel, &p->pos);
-        }
-    }
-    if (p->pos.y >= 0.0f) {
-        p->unkC = 20;
-        p->unk114 = 0;
-        *bob = 0.0f;
-    }
+static const Vec puni_fall_dir;
+static const float vec3_mri_00025810[3] = {0.0f, 0.9399999976158142f, 0.0f};
+static const float vec3_mri_0002581c[3] = {0.0f, 0.6600000262260437f, 0.0f};
+static const float vec3_mri_00025828[3] = {0.0f, 0.0f, 0.0f};
+static const char str_00005514[] = "SFX_STG2_SOAPBALL_MOVE1";
+static const float float_1p2_mri_0002584c[1] = {1.2000000476837158f};
+// FAKE: whole-function asm (brute-force pass)
+asm void puniModeUpdraft(PuniData *p) {
+    nofralloc
+    stwu r1,-128(r1)
+    mflr r0
+    stw r0,132(r1)
+    stfd f31,112(r1)
+    psq_st f31,120(r1),0,0
+    stmw r29,100(r1)
+    mr r30,r3
+    bl marioGetPtr
+    lhz r0,276(r30)
+    mr r31,r3
+    cmplwi r0,0
+    bne L_b5d8
+    lis r3,vec3_mri_00025810@ha
+    addi r4,r3,vec3_mri_00025810@l
+    lwz r3,0(r4)
+    lwz r0,4(r4)
+    stw r3,348(r30)
+    stw r0,352(r30)
+    lwz r0,8(r4)
+    stw r0,356(r30)
+    b L_b5f8
+L_b5d8:
+    lis r3,vec3_mri_0002581c@ha
+    addi r4,r3,vec3_mri_0002581c@l
+    lwz r3,0(r4)
+    lwz r0,4(r4)
+    stw r3,348(r30)
+    stw r0,352(r30)
+    lwz r0,8(r4)
+    stw r0,356(r30)
+L_b5f8:
+    lis r3,gp@ha
+    addi r3,r3,gp@l
+    lwz r3,0(r3)
+    lwz r0,28(r3)
+    clrlwi. r0,r0,27
+    bne L_b620
+    lis r3,str_00005514@ha
+    addi r4,r30,300
+    addi r3,r3,str_00005514@l
+    bl psndSFXOn_3D
+L_b620:
+    lis r3,gp@ha
+    lha r0,278(r30)
+    addi r3,r3,gp@l
+    lwz r3,0(r3)
+    lwz r3,28(r3)
+    add r0,r3,r0
+    clrlwi r3,r0,28
+    cmpwi r3,7
+    addi r0,r3,-3
+    ble L_b650
+    clrlwi r0,r3,29
+    subfic r0,r0,4
+L_b650:
+    xoris r3,r0,32768
+    lis r0,17200
+    lis r4,(puni_fall_dir-580)@ha
+    stw r3,84(r1)
+    addi r3,r4,(puni_fall_dir-580)@l
+    stw r0,80(r1)
+    lis r4,(puni_fall_dir-716)@ha
+    lfd f1,0(r3)
+    lfd f0,80(r1)
+    lfs f2,(puni_fall_dir-716)@l(r4)
+    fsubs f0,f0,f1
+    fmuls f0,f2,f0
+    stfs f0,324(r30)
+    lhz r0,276(r30)
+    cmpwi r0,1
+    beq L_b768
+    bge L_b6a0
+    cmpwi r0,0
+    bge L_b6ac
+    b L_b82c
+L_b6a0:
+    cmpwi r0,3
+    bge L_b82c
+    b L_b7c8
+L_b6ac:
+    lis r3,(puni_fall_dir-568)@ha
+    lfs f1,416(r30)
+    lfs f0,(puni_fall_dir-568)@l(r3)
+    fcmpo cr0,f1,f0
+    ble L_b82c
+    lis r4,Punigp@ha
+    addi r3,r30,300
+    addi r5,r4,Punigp@l
+    addi r4,r31,140
+    lwz r6,0(r5)
+    addi r5,r1,68
+    lwz r0,864(r6)
+    stw r0,476(r30)
+    bl PSVECSubtract
+    addi r3,r1,68
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f0,f1
+    beq L_b708
+    addi r3,r1,68
+    mr r4,r3
+    bl PSVECNormalize
+L_b708:
+    lis r4,(puni_fall_dir-708)@ha
+    lis r3,(puni_fall_dir-556)@ha
+    addi r5,r4,(puni_fall_dir-708)@l
+    lfs f0,(puni_fall_dir-556)@l(r3)
+    lfs f3,0(r5)
+    lis r4,float_1p2_mri_0002584c@ha
+    lfs f2,float_1p2_mri_0002584c@l(r4)
+    li r0,1
+    stfs f3,72(r1)
+    stfs f3,76(r1)
+    lfs f1,416(r30)
+    fdivs f0,f1,f0
+    fadds f0,f2,f0
+    stfs f0,500(r30)
+    lwz r4,68(r1)
+    lwz r3,72(r1)
+    stw r4,504(r30)
+    stw r3,508(r30)
+    lwz r3,76(r1)
+    stw r3,512(r30)
+    stfs f3,492(r30)
+    stfs f3,496(r30)
+    sth r0,276(r30)
+    b L_b82c
+L_b768:
+    lfs f1,492(r30)
+    addi r3,r30,504
+    addi r4,r1,68
+    bl PSVECScale
+    addi r3,r30,348
+    addi r4,r1,68
+    mr r5,r3
+    bl PSVECAdd
+    lfs f2,492(r30)
+    lis r3,(puni_fall_dir+480)@ha
+    lfs f1,496(r30)
+    lfs f0,(puni_fall_dir+480)@l(r3)
+    fadds f1,f2,f1
+    stfs f1,492(r30)
+    lfs f1,496(r30)
+    fadds f0,f1,f0
+    stfs f0,496(r30)
+    lfs f0,492(r30)
+    lfs f1,500(r30)
+    fcmpo cr0,f0,f1
+    cror eq,gt,eq
+    bne L_b82c
+    stfs f1,492(r30)
+    b L_b82c
+L_b7c8:
+    lfs f1,492(r30)
+    addi r3,r30,504
+    addi r4,r1,68
+    bl PSVECScale
+    addi r3,r30,348
+    addi r4,r1,68
+    mr r5,r3
+    bl PSVECAdd
+    lfs f2,492(r30)
+    lis r3,(puni_fall_dir+484)@ha
+    lfs f0,496(r30)
+    addi r4,r3,(puni_fall_dir+484)@l
+    lfs f1,0(r4)
+    lis r3,(puni_fall_dir-708)@ha
+    fsubs f2,f2,f0
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f2,492(r30)
+    lfs f2,496(r30)
+    fadds f1,f2,f1
+    stfs f1,496(r30)
+    lfs f1,492(r30)
+    fcmpo cr0,f1,f0
+    bge L_b82c
+    li r0,0
+    sth r0,276(r30)
+L_b82c:
+    addi r3,r30,348
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    fmr f31,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f0,f31
+    beq L_b858
+    addi r3,r30,348
+    addi r4,r1,68
+    bl PSVECNormalize
+    b L_b878
+L_b858:
+    lis r3,vec3_mri_00025828@ha
+    addi r5,r3,vec3_mri_00025828@l
+    lwz r4,0(r5)
+    lwz r3,4(r5)
+    lwz r0,8(r5)
+    stw r4,68(r1)
+    stw r3,72(r1)
+    stw r0,76(r1)
+L_b878:
+    lwz r29,300(r30)
+    fmr f1,f31
+    lwz r31,304(r30)
+    mr r3,r30
+    lwz r12,308(r30)
+    addi r4,r1,20
+    lwz r11,348(r30)
+    lwz r10,352(r30)
+    addi r5,r1,8
+    lwz r9,356(r30)
+    li r6,1
+    lwz r8,68(r1)
+    lwz r7,72(r1)
+    lwz r0,76(r1)
+    stw r29,56(r1)
+    stw r31,60(r1)
+    stw r12,64(r1)
+    stw r11,44(r1)
+    stw r10,48(r1)
+    stw r9,52(r1)
+    stw r8,8(r1)
+    stw r7,12(r1)
+    stw r0,16(r1)
+    stw r29,20(r1)
+    stw r31,24(r1)
+    stw r12,28(r1)
+    bl puniMoveAtari
+    lwz r0,300(r30)
+    lis r4,(puni_fall_dir-720)@ha
+    lwz r3,536(r30)
+    addi r5,r4,(puni_fall_dir-720)@l
+    stw r0,32(r1)
+    lis r4,(puni_fall_dir+12)@ha
+    lwz r6,304(r30)
+    lfs f1,32(r1)
+    lfs f0,324(r30)
+    lwz r0,308(r30)
+    fadds f3,f1,f0
+    lwz r3,12(r3)
+    stw r6,36(r1)
+    lfs f0,0(r5)
+    stfs f3,4(r3)
+    lfs f1,36(r1)
+    lwz r3,536(r30)
+    fadds f2,f1,f0
+    stw r0,40(r1)
+    lwz r3,12(r3)
+    lfs f1,40(r1)
+    stfs f2,8(r3)
+    lfs f0,(puni_fall_dir+12)@l(r4)
+    lwz r3,536(r30)
+    fadds f0,f1,f0
+    stfs f3,32(r1)
+    lwz r3,12(r3)
+    stfs f2,36(r1)
+    stfs f0,12(r3)
+    lwz r3,528(r30)
+    stfs f0,40(r1)
+    cmplwi r3,0
+    bne L_b974
+    lwz r0,532(r30)
+    cmplwi r0,0
+    beq L_ba14
+L_b974:
+    cmplwi r3,0
+    li r4,0
+    beq L_b990
+    lwz r0,4(r3)
+    rlwinm. r0,r0,0,29,29
+    beq L_b990
+    li r4,1
+L_b990:
+    lwz r3,532(r30)
+    cmplwi r3,0
+    beq L_b9ac
+    lwz r0,4(r3)
+    rlwinm. r0,r0,0,29,29
+    beq L_b9ac
+    li r4,1
+L_b9ac:
+    cmpwi r4,0
+    bne L_b9d4
+    li r0,20
+    lis r3,(puni_fall_dir-708)@ha
+    sth r0,12(r30)
+    li r0,0
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    sth r0,276(r30)
+    stfs f0,324(r30)
+    b L_ba14
+L_b9d4:
+    lwz r4,56(r1)
+    addi r3,r30,300
+    lwz r0,60(r1)
+    mr r5,r3
+    stw r4,300(r30)
+    addi r4,r30,348
+    lwz r6,64(r1)
+    stw r0,304(r30)
+    lwz r0,44(r1)
+    stw r6,308(r30)
+    lwz r6,48(r1)
+    stw r0,348(r30)
+    lwz r0,52(r1)
+    stw r6,352(r30)
+    stw r0,356(r30)
+    bl PSVECAdd
+L_ba14:
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f1,304(r30)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpo cr0,f1,f0
+    cror eq,gt,eq
+    bne L_ba40
+    li r3,20
+    li r0,0
+    sth r3,12(r30)
+    sth r0,276(r30)
+    stfs f0,324(r30)
+L_ba40:
+    psq_l f31,120(r1),0,0
+    lfd f31,112(r1)
+    lmw r29,100(r1)
+    lwz r0,132(r1)
+    mtlr r0
+    addi r1,r1,128
+    blr
 }
 
 void puniModeWonder(PuniData* p) {
@@ -3513,13 +4851,13 @@ void puniModePrehagure(PuniData* p) {
                 }
             }
             if (res != 0) {
-                *(s32*)&FF(p, 0x58C) = res;
-                *(Vec*)&FF(p, 0x590) = p->pos;
+                p->unk58C = res;
+                p->unk590 = p->pos;
                 p->pos = Punigp->unk344;
                 p->pos.x += randf(0.0f, 2.0f) - 1.0f;
                 p->pos.z += randf(0.0f, 2.0f) - 1.0f;
                 p->unk138 = p->pos;
-                *(Vec*)&FF(p, 0x59C) = p->pos;
+                p->unk59C = p->pos;
             }
             p->unk114 = 1;
             break;
@@ -3741,7 +5079,7 @@ void puniModeEnterSub(PuniData* p) {
     if (Punigp->unk324 & 3) {
         p->unk1E0++;
         if (p->unk1E0 >= 10) {
-            p->alpha += 0.1f;
+            p->alpha += (*(volatile const float*)&puni_k0p1);
             if (p->alpha >= 1.0f) {
                 p->alpha = 1.0f;
             }
@@ -3778,7 +5116,7 @@ void puniModeEnter(PuniData* p) {
             if (Punigp->unk324 & 3) {
                 p->unk1E0++;
                 if (p->unk1E0 >= 10) {
-                    p->alpha += 0.1f;
+                    p->alpha += (*(volatile const float*)&puni_k0p1);
                     if (p->alpha >= 1.0f) {
                         p->alpha = 1.0f;
                     }
@@ -4104,510 +5442,1841 @@ void puniModeFall(PuniData* p);
 void puniModeUpdraft(PuniData* p);
 
 
-void unk_mri_00012d58(PuniData* p) {
-    switch (p->unkC) {
-        case 0:
-            p->unk4 &= ~0x8000;
-            if (p->unk1A0 > 10.0f) {
-                p->unkE = p->unkC;
-                PuniDokuritsu(p);
-                p->unk1DC = Punigp->unk360;
-                p->unkC = 13;
-                p->unk114 = 0;
-            } else if (p->unk1A4 < 150.0f) {
-                p->unkC = 1;
-            }
-            break;
-        case 1: {
-            Vec d;
-            p->unk4 &= ~0x8000;
-            searchParent(p);
-            p->unkC = 2;
-            p->unk4 |= 0x180000;
-            PSVECSubtract(&p->parent->pos, &p->pos, &d);
-            {
-                f32 m = PSVECMag(&d);
-                p->unk1A8 = m;
-                p->unk1B0 = m;
-            }
-            p->unk128 = 0;
-            p->unk114 = 0;
-            p->anim = 1;
-            break;
-        }
-        case 2:
-            p->unk4 &= ~0x8000;
-            puniModeParent(p);
-            break;
-        case 3:
-            p->unk4 &= ~0x8000;
-            puniModeSearch(p);
-            break;
-        case 4:
-            p->unk4 |= 0x8000;
-            puniModeMass(p);
-            break;
-        case 5:
-            p->unk4 |= 0x8000;
-            puniModeAwayjump(p);
-            break;
-        case 6:
-            p->unk4 |= 0x8000;
-            puniModeAway(p);
-            break;
-        case 7:
-            p->unk4 &= ~0x8000;
-            puniModeAttack(p);
-            break;
-        case 9:
-            p->unk4 &= ~0x8000;
-            puniModeDamage(p);
-            break;
-        case 10:
-            p->unk4 &= ~0x8000;
-            puniModePiyori(p);
-            break;
-        case 8:
-            p->unk4 &= ~0x8000;
-            puniModeEscape(p);
-            break;
-        case 11:
-            p->unk4 &= ~0x8000;
-            puniModeRecover(p);
-            break;
-        case 12:
-            p->unk4 &= ~0x8000;
-            puniModeDead(p);
-            break;
-        case 13:
-            p->unk4 &= ~0x8000;
-            puniModeWind(p);
-            break;
-        case 14:
-            break;
-        case 15:
-            p->unk4 |= 0x8000;
-            switch (p->unk114) {
-                case 0: {
-                    s32 r = puniPositionCheck(p);
-                    if (r != 0) {
-                        *(s32*)((u8*)p + 0x58C) = r;
-                        *(Vec*)((u8*)p + 0x590) = p->pos;
-                        puniPositionRecover(p);
-                        *(Vec*)((u8*)p + 0x59C) = p->pos;
-                    }
-                    p->unk114 = 1;
-                    break;
-                }
-                case 1:
-                    p->unkC = 16;
-                    p->unk114 = 0;
-                    break;
-            }
-            break;
-        case 16:
-            p->unk4 |= 0x8000;
-            puniModeHagure(p);
-            break;
-        case 18:
-            p->unk4 |= 0x8000;
-            puniModePreupdraft(p);
-            break;
-        case 19:
-            p->unk4 |= 0x8000;
-            puniModeUpdraft(p);
-            break;
-        case 20:
-            p->unk4 |= 0x8000;
-            puniModeWonder(p);
-            break;
-        case 21:
-            p->unk4 |= 0x8000;
-            puniModeFunbari(p);
-            break;
-        case 22:
-            p->unk4 |= 0x8000;
-            puniModeWater(p);
-            break;
-        case 17:
-            p->unk4 |= 0x8000;
-            puniModeFall(p);
-            break;
-        case 23:
-            p->unk4 |= 0x8000;
-            puniModeDodai(p);
-            break;
-        case 24:
-            p->unk4 &= ~0x8000;
-            puniModeTrap(p);
-            break;
-        case 25:
-            p->unk4 &= ~0x8000;
-            puniModeEnter(p);
-            break;
-        case 26:
-            p->unk4 &= ~0x8000;
-            puniModeExit(p);
-            break;
-        case 28:
-            p->unk4 &= ~0x8000;
-            puniModeDokan(p);
-            break;
-        case 27:
-            p->unk4 &= ~0x8000;
-            puniModePoint(p);
-            break;
-        case 29:
-            p->unk4 &= ~0x8000;
-            if (p->modeFunc != NULL) {
-                p->modeFunc(p);
-            }
-            break;
-    }
+void unk_mri_00012d58(PuniData* p);
+static void* jumptable_00024390[] = {
+    (void*)((char*)unk_mri_00012d58 + 0x40),
+    (void*)((char*)unk_mri_00012d58 + 0xb4),
+    (void*)((char*)unk_mri_00012d58 + 0x1b4),
+    (void*)((char*)unk_mri_00012d58 + 0x1c8),
+    (void*)((char*)unk_mri_00012d58 + 0x1dc),
+    (void*)((char*)unk_mri_00012d58 + 0x1f0),
+    (void*)((char*)unk_mri_00012d58 + 0x204),
+    (void*)((char*)unk_mri_00012d58 + 0x218),
+    (void*)((char*)unk_mri_00012d58 + 0x4a8),
+    (void*)((char*)unk_mri_00012d58 + 0x480),
+    (void*)((char*)unk_mri_00012d58 + 0x494),
+    (void*)((char*)unk_mri_00012d58 + 0x4bc),
+    (void*)((char*)unk_mri_00012d58 + 0x4d0),
+    (void*)((char*)unk_mri_00012d58 + 0x53c),
+    (void*)((char*)unk_mri_00012d58 + 0xde0),
+    (void*)((char*)unk_mri_00012d58 + 0x550),
+    (void*)((char*)unk_mri_00012d58 + 0x804),
+    (void*)((char*)unk_mri_00012d58 + 0xa68),
+    (void*)((char*)unk_mri_00012d58 + 0x818),
+    (void*)((char*)unk_mri_00012d58 + 0x900),
+    (void*)((char*)unk_mri_00012d58 + 0x914),
+    (void*)((char*)unk_mri_00012d58 + 0xa40),
+    (void*)((char*)unk_mri_00012d58 + 0xa54),
+    (void*)((char*)unk_mri_00012d58 + 0xa7c),
+    (void*)((char*)unk_mri_00012d58 + 0xb44),
+    (void*)((char*)unk_mri_00012d58 + 0xb58),
+    (void*)((char*)unk_mri_00012d58 + 0xb6c),
+    (void*)((char*)unk_mri_00012d58 + 0xbd4),
+    (void*)((char*)unk_mri_00012d58 + 0xb80),
+    (void*)((char*)unk_mri_00012d58 + 0xdc0)
+};
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm void unk_mri_00012d58(PuniData* p) {
+    nofralloc
+    stwu r1,-192(r1)
+    mflr r0
+    stw r0,196(r1)
+    stfd f31,176(r1)
+    psq_st f31,184(r1),0,0
+    stmw r28,160(r1)
+    mr r31,r3
+    lhz r0,12(r3)
+    cmplwi r0,29
+    bgt L_ea08
+    lis r4,jumptable_00024390@ha
+    slwi r0,r0,2
+    addi r4,r4,jumptable_00024390@l
+    lwzx r0,r4,r0
+    mtctr r0
+    bctr
+    lwz r0,4(r31)
+    lis r4,(puni_fall_dir-568)@ha
+    lfs f0,(puni_fall_dir-568)@l(r4)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    lfs f1,416(r31)
+    fcmpo cr0,f1,f0
+    ble L_dcbc
+    lhz r0,12(r31)
+    sth r0,14(r31)
+    bl PuniDokuritsu
+    lis r4,Punigp@ha
+    li r3,13
+    addi r4,r4,Punigp@l
+    li r0,0
+    lwz r4,0(r4)
+    lwz r4,864(r4)
+    stw r4,476(r31)
+    sth r3,12(r31)
+    sth r0,276(r31)
+    b L_ea08
+L_dcbc:
+    lis r3,(puni_fall_dir-180)@ha
+    lfs f1,420(r31)
+    lfs f0,(puni_fall_dir-180)@l(r3)
+    fcmpo cr0,f1,f0
+    bge L_ea08
+    li r0,1
+    sth r0,12(r31)
+    b L_ea08
+    lwz r4,4(r31)
+    lis r3,Punidat@ha
+    addi r3,r3,Punidat@l
+    li r0,211
+    rlwinm r4,r4,0,17,15
+    li r6,10000
+    stw r4,4(r31)
+    lwz r3,0(r3)
+    mtctr r0
+L_dd00:
+    lwz r0,4(r3)
+    rlwinm. r0,r0,0,12,12
+    beq L_dd50
+    lwz r0,472(r3)
+    cmplwi r0,0
+    bne L_dd50
+    lwz r0,468(r3)
+    cmplwi r0,0
+    beq L_dd30
+    lha r0,282(r3)
+    cmpwi r0,2
+    bge L_dd50
+L_dd30:
+    cmplw r3,r31
+    beq L_dd50
+    lha r4,282(r3)
+    extsh r0,r6
+    cmpw r0,r4
+    ble L_dd50
+    mr r5,r3
+    addi r6,r4,1
+L_dd50:
+    addi r3,r3,1448
+    bdnz L_dd00
+    extsh r0,r6
+    cmpwi r0,10000
+    beq L_dd8c
+    stw r5,464(r31)
+    sth r6,282(r31)
+    lha r0,280(r5)
+    sth r0,280(r31)
+    lwz r0,468(r5)
+    cmplwi r0,0
+    bne L_dd88
+    stw r31,468(r5)
+    b L_dd8c
+L_dd88:
+    stw r31,472(r5)
+L_dd8c:
+    li r0,2
+    addi r4,r31,300
+    sth r0,12(r31)
+    addi r5,r1,120
+    lwz r0,4(r31)
+    oris r0,r0,24
+    stw r0,4(r31)
+    lwz r3,464(r31)
+    addi r3,r3,300
+    bl PSVECSubtract
+    addi r3,r1,120
+    bl PSVECMag
+    stfs f1,424(r31)
+    li r3,0
+    li r0,1
+    stfs f1,432(r31)
+    stw r3,296(r31)
+    sth r3,276(r31)
+    sth r0,284(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeParent
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeSearch
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeMass
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeAwayjump
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeAway
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_de74
+    bge L_ea08
+    cmpwi r0,0
+    bge L_de68
+    b L_ea08
+L_de68:
+    li r0,1
+    sth r0,284(r31)
+    sth r0,276(r31)
+L_de74:
+    lis r3,(puni_fall_dir-568)@ha
+    lfs f1,416(r31)
+    lfs f0,(puni_fall_dir-568)@l(r3)
+    fcmpo cr0,f1,f0
+    ble L_dec0
+    lhz r0,12(r31)
+    mr r3,r31
+    sth r0,14(r31)
+    bl PuniDokuritsu
+    lis r4,Punigp@ha
+    li r3,13
+    addi r4,r4,Punigp@l
+    li r0,0
+    lwz r4,0(r4)
+    lwz r4,864(r4)
+    stw r4,476(r31)
+    sth r3,12(r31)
+    sth r0,276(r31)
+    b L_ea08
+L_dec0:
+    lis r3,gp@ha
+    lha r0,278(r31)
+    addi r3,r3,gp@l
+    lwz r3,0(r3)
+    clrlwi r0,r0,30
+    lwz r3,28(r3)
+    clrlwi r3,r3,30
+    cmpw r3,r0
+    bne L_e018
+    lwz r0,4(r31)
+    clrlwi. r0,r0,31
+    beq L_df88
+    lis r3,Punidat@ha
+    lis r4,(puni_fall_dir-20)@ha
+    addi r3,r3,Punidat@l
+    lfs f31,(puni_fall_dir-20)@l(r4)
+    lwz r3,0(r3)
+    li r30,0
+    li r28,110
+    addis r29,r3,2
+    addi r29,r29,28208
+L_df14:
+    lwz r3,4(r29)
+    rlwinm. r0,r3,0,21,21
+    beq L_df58
+    rlwinm. r0,r3,0,17,17
+    bne L_df58
+    lhz r0,12(r29)
+    cmplwi r0,9
+    beq L_df58
+    cmplwi r0,13
+    beq L_df58
+    addi r3,r31,300
+    addi r4,r29,300
+    bl PSVECSquareDistance
+    fcmpo cr0,f1,f31
+    bge L_df58
+    fmr f31,f1
+    mr r30,r29
+L_df58:
+    addi r28,r28,1
+    addi r29,r29,1448
+    cmpwi r28,210
+    blt L_df14
+    lis r3,(puni_fall_dir-20)@ha
+    lfs f0,(puni_fall_dir-20)@l(r3)
+    fcmpo cr0,f31,f0
+    bge L_df7c
+    b L_df80
+L_df7c:
+    li r30,0
+L_df80:
+    stw r30,476(r31)
+    b L_e018
+L_df88:
+    lis r3,Punidat@ha
+    lis r4,(puni_fall_dir-20)@ha
+    addi r3,r3,Punidat@l
+    lfs f31,(puni_fall_dir-20)@l(r4)
+    lwz r3,0(r3)
+    li r28,0
+    li r30,1
+    addi r29,r3,1448
+L_dfa8:
+    lwz r3,4(r29)
+    rlwinm. r0,r3,0,21,21
+    beq L_dfec
+    rlwinm. r0,r3,0,17,17
+    bne L_dfec
+    lhz r0,12(r29)
+    cmplwi r0,9
+    beq L_dfec
+    cmplwi r0,13
+    beq L_dfec
+    addi r3,r31,300
+    addi r4,r29,300
+    bl PSVECSquareDistance
+    fcmpo cr0,f1,f31
+    bge L_dfec
+    fmr f31,f1
+    mr r28,r29
+L_dfec:
+    addi r30,r30,1
+    addi r29,r29,1448
+    cmpwi r30,103
+    blt L_dfa8
+    lis r3,(puni_fall_dir-20)@ha
+    lfs f0,(puni_fall_dir-20)@l(r3)
+    fcmpo cr0,f31,f0
+    bge L_e010
+    b L_e014
+L_e010:
+    li r28,0
+L_e014:
+    stw r28,476(r31)
+L_e018:
+    lwz r3,476(r31)
+    cmplwi r3,0
+    beq L_ea08
+    addi r3,r3,300
+    addi r4,r31,300
+    addi r5,r1,108
+    bl PSVECSubtract
+    addi r3,r1,108
+    bl PSVECMag
+    lwz r4,476(r31)
+    lfs f0,412(r4)
+    fcmpo cr0,f1,f0
+    ble L_e09c
+    addi r3,r1,108
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-708)@ha
+    lis r4,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-708)@l
+    lfs f1,(puni_fall_dir-712)@l(r4)
+    lfs f0,0(r5)
+    addi r3,r1,108
+    mr r4,r3
+    stfs f0,112(r1)
+    bl PSVECScale
+    addi r3,r31,348
+    addi r4,r1,108
+    mr r5,r3
+    bl PSVECAdd
+    lis r3,(puni_fall_dir+12)@ha
+    lfs f0,(puni_fall_dir+12)@l(r3)
+    stfs f0,372(r31)
+    b L_ea08
+L_e09c:
+    mr r3,r31
+    bl puniParaAttack
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeDamage
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModePiyori
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeEscape
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeRecover
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_ea08
+    bge L_ea08
+    cmpwi r0,0
+    bge L_e120
+    b L_ea08
+L_e120:
+    lis r3,(puni_fall_dir+372)@ha
+    addi r4,r31,300
+    addi r3,r3,(puni_fall_dir+372)@l
+    bl psndSFXOn_3D
+    lis r4,(puni_fall_dir+360)@ha
+    li r3,4
+    addi r6,r4,(puni_fall_dir+360)@l
+    li r0,1
+    lwz r5,0(r6)
+    lwz r4,4(r6)
+    stw r5,348(r31)
+    stw r4,352(r31)
+    lwz r4,8(r6)
+    stw r4,356(r31)
+    sth r3,284(r31)
+    sth r0,276(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeWind
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_e418
+    bge L_ea08
+    cmpwi r0,0
+    bge L_e1a0
+    b L_ea08
+L_e1a0:
+    lis r4,Punigp@ha
+    lis r3,(puni_fall_dir-588)@ha
+    addi r4,r4,Punigp@l
+    lfs f0,(puni_fall_dir-588)@l(r3)
+    lwz r4,0(r4)
+    li r0,0
+    lfs f2,848(r4)
+    lfs f1,852(r4)
+    fcmpu cr0,f0,f2
+    beq L_e1e0
+    lfs f0,304(r31)
+    fcmpo cr0,f0,f2
+    bge L_e1e0
+    fcmpo cr0,f0,f1
+    ble L_e1e0
+    li r0,1
+L_e1e0:
+    lis r3,(puni_fall_dir-588)@ha
+    lfs f1,856(r4)
+    lfs f0,(puni_fall_dir-588)@l(r3)
+    lfs f2,860(r4)
+    fcmpu cr0,f0,f1
+    beq L_e210
+    lfs f0,304(r31)
+    fcmpo cr0,f0,f1
+    bge L_e210
+    fcmpo cr0,f0,f2
+    ble L_e210
+    li r0,1
+L_e210:
+    cmpwi r0,0
+    bne L_e220
+    li r0,1
+    b L_e2c8
+L_e220:
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir-712)@ha
+    addi r4,r3,(puni_fall_dir-712)@l
+    lwz r8,300(r31)
+    stw r0,16(r1)
+    lis r3,(puni_fall_dir+0)@ha
+    addi r7,r3,(puni_fall_dir+0)@l
+    lfs f0,0(r4)
+    lfs f1,16(r1)
+    lis r3,(puni_fall_dir+12)@ha
+    lwz r9,308(r31)
+    addi r4,r1,36
+    fadds f2,f1,f0
+    lwz r10,0(r7)
+    stw r8,12(r1)
+    addi r5,r1,40
+    lfs f0,(puni_fall_dir+12)@l(r3)
+    addi r6,r1,44
+    stw r9,20(r1)
+    addi r8,r1,48
+    lwz r11,4(r7)
+    addi r9,r1,52
+    lwz r0,8(r7)
+    addi r7,r1,8
+    stw r10,24(r1)
+    addi r10,r1,56
+    lfs f1,12(r1)
+    li r3,0
+    stw r11,28(r1)
+    lfs f3,20(r1)
+    stw r0,32(r1)
+    lfs f4,24(r1)
+    lfs f5,28(r1)
+    stfs f2,16(r1)
+    lfs f6,32(r1)
+    stfs f0,8(r1)
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_e2c4
+    li r0,2
+    b L_e2c8
+L_e2c4:
+    li r0,0
+L_e2c8:
+    cmpwi r0,0
+    beq L_e40c
+    stw r0,1420(r31)
+    lis r3,Punigp@ha
+    lwz r4,300(r31)
+    lwz r0,304(r31)
+    stw r4,1424(r31)
+    stw r0,1428(r31)
+    lwz r0,308(r31)
+    stw r0,1432(r31)
+    lwz r4,Punigp@l(r3)
+    lwz r3,836(r4)
+    lwz r0,840(r4)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,844(r4)
+    stw r0,308(r31)
+    bl rand
+    xoris r3,r3,32768
+    lis r0,17200
+    stw r3,140(r1)
+    lis r4,(puni_fall_dir-580)@ha
+    lfd f2,(puni_fall_dir-580)@l(r4)
+    lis r3,(puni_fall_dir-4)@ha
+    stw r0,136(r1)
+    addi r5,r3,(puni_fall_dir-4)@l
+    lfs f0,0(r5)
+    lis r4,(puni_fall_dir+16)@ha
+    lfd f1,136(r1)
+    lis r3,(puni_fall_dir-708)@ha
+    addi r5,r4,(puni_fall_dir+16)@l
+    fsubs f3,f1,f2
+    addi r4,r3,(puni_fall_dir-708)@l
+    lfs f2,0(r5)
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f1,0(r4)
+    fdivs f4,f3,f0
+    lfs f0,(puni_fall_dir-712)@l(r3)
+    lfs f3,300(r31)
+    fmadds f1,f4,f2,f1
+    fsubs f0,f1,f0
+    fadds f0,f3,f0
+    stfs f0,300(r31)
+    bl rand
+    xoris r3,r3,32768
+    lis r0,17200
+    stw r3,148(r1)
+    lis r4,(puni_fall_dir-580)@ha
+    lfd f2,(puni_fall_dir-580)@l(r4)
+    lis r3,(puni_fall_dir-4)@ha
+    stw r0,144(r1)
+    addi r5,r3,(puni_fall_dir-4)@l
+    lfs f0,0(r5)
+    lis r4,(puni_fall_dir+16)@ha
+    lfd f1,144(r1)
+    lis r3,(puni_fall_dir-708)@ha
+    addi r5,r4,(puni_fall_dir+16)@l
+    fsubs f3,f1,f2
+    addi r4,r3,(puni_fall_dir-708)@l
+    lfs f2,0(r5)
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f1,0(r4)
+    fdivs f4,f3,f0
+    lfs f0,(puni_fall_dir-712)@l(r3)
+    lfs f3,308(r31)
+    fmadds f1,f4,f2,f1
+    fsubs f0,f1,f0
+    fadds f0,f3,f0
+    stfs f0,308(r31)
+    lwz r3,300(r31)
+    lwz r0,304(r31)
+    stw r3,312(r31)
+    stw r0,316(r31)
+    lwz r0,308(r31)
+    stw r0,320(r31)
+    lwz r3,300(r31)
+    lwz r0,304(r31)
+    stw r3,1436(r31)
+    stw r0,1440(r31)
+    lwz r0,308(r31)
+    stw r0,1444(r31)
+L_e40c:
+    li r0,1
+    sth r0,276(r31)
+    b L_ea08
+L_e418:
+    li r3,16
+    li r0,0
+    sth r3,12(r31)
+    sth r0,276(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeHagure
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_e4f0
+    bge L_ea08
+    cmpwi r0,0
+    bge L_e468
+    b L_ea08
+L_e468:
+    lwz r5,304(r31)
+    lis r4,(puni_fall_dir-720)@ha
+    lwz r0,308(r31)
+    addi r6,r4,(puni_fall_dir-720)@l
+    stw r5,100(r1)
+    lis r3,(puni_fall_dir+12)@ha
+    addi r5,r3,(puni_fall_dir+12)@l
+    lwz r7,300(r31)
+    stw r0,104(r1)
+    lis r3,(puni_fall_dir+88)@ha
+    lfs f2,100(r1)
+    addi r4,r3,(puni_fall_dir+88)@l
+    lfs f0,0(r6)
+    li r3,0
+    lfs f1,104(r1)
+    fadds f2,f2,f0
+    lfs f0,0(r5)
+    stw r7,96(r1)
+    fadds f3,f1,f0
+    lfs f4,0(r4)
+    stfs f2,100(r1)
+    lfs f1,96(r1)
+    stfs f3,104(r1)
+    bl effPuniBalloonEntry
+    stw r3,536(r31)
+    bl rand
+    li r5,201
+    li r0,1
+    divw r4,r3,r5
+    mullw r4,r4,r5
+    subf r3,r4,r3
+    addi r3,r3,30
+    stw r3,296(r31)
+    sth r0,276(r31)
+L_e4f0:
+    lwz r3,296(r31)
+    addi r0,r3,-1
+    cmpwi r3,0
+    stw r0,296(r31)
+    bne L_ea08
+    lwz r5,0(r31)
+    li r3,19
+    li r0,0
+    lwz r4,0(r5)
+    ori r4,r4,4
+    stw r4,0(r5)
+    sth r3,12(r31)
+    sth r0,276(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeUpdraft
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_e61c
+    bge L_ea08
+    cmpwi r0,0
+    bge L_e564
+    b L_ea08
+L_e564:
+    lis r3,(puni_fall_dir+620)@ha
+    addi r4,r31,300
+    addi r3,r3,(puni_fall_dir+620)@l
+    bl psndSFXOn_3D
+    lwz r3,536(r31)
+    cmplwi r3,0
+    beq L_e58c
+    bl effDelete
+    li r0,0
+    stw r0,536(r31)
+L_e58c:
+    lwz r5,304(r31)
+    lis r4,(puni_fall_dir-720)@ha
+    lwz r0,308(r31)
+    addi r6,r4,(puni_fall_dir-720)@l
+    stw r5,88(r1)
+    lis r3,(puni_fall_dir+12)@ha
+    addi r5,r3,(puni_fall_dir+12)@l
+    lwz r7,300(r31)
+    stw r0,92(r1)
+    lis r3,(puni_fall_dir+88)@ha
+    lfs f2,88(r1)
+    addi r4,r3,(puni_fall_dir+88)@l
+    lfs f0,0(r6)
+    li r3,1
+    lfs f1,92(r1)
+    fadds f2,f2,f0
+    lfs f0,0(r5)
+    stw r7,84(r1)
+    fadds f3,f1,f0
+    lfs f4,0(r4)
+    stfs f2,88(r1)
+    lfs f1,84(r1)
+    stfs f3,92(r1)
+    bl effPuniBalloonEntry
+    stw r3,536(r31)
+    li r0,20
+    li r4,9
+    li r3,0
+    stw r0,296(r31)
+    li r0,1
+    sth r4,284(r31)
+    stw r3,292(r31)
+    lwz r3,4(r31)
+    oris r3,r3,256
+    stw r3,4(r31)
+    sth r0,276(r31)
+L_e61c:
+    lwz r3,296(r31)
+    addi r0,r3,-1
+    cmpwi r3,0
+    stw r0,296(r31)
+    bne L_ea08
+    lwz r6,0(r31)
+    li r4,21
+    li r3,1
+    li r0,0
+    lwz r5,0(r6)
+    rlwinm r5,r5,0,30,28
+    stw r5,0(r6)
+    sth r4,12(r31)
+    sth r3,284(r31)
+    lwz r3,4(r31)
+    rlwinm r3,r3,0,8,6
+    stw r3,4(r31)
+    sth r0,276(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeFunbari
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeWater
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    bl puniModeFall
+    b L_ea08
+    lwz r0,4(r31)
+    ori r0,r0,32768
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,0
+    beq L_e6c0
+    b L_ea08
+L_e6c0:
+    addi r3,r31,300
+    addi r4,r31,504
+    addi r5,r1,72
+    bl PSVECSubtract
+    addi r3,r1,72
+    bl PSVECMag
+    lis r3,(puni_fall_dir-568)@ha
+    lfs f0,(puni_fall_dir-568)@l(r3)
+    fcmpo cr0,f1,f0
+    bge L_e71c
+    lis r4,(puni_fall_dir+676)@ha
+    li r3,16
+    addi r6,r4,(puni_fall_dir+676)@l
+    li r0,0
+    lwz r5,0(r6)
+    lwz r4,4(r6)
+    stw r5,348(r31)
+    stw r4,352(r31)
+    lwz r4,8(r6)
+    stw r4,356(r31)
+    sth r3,12(r31)
+    sth r0,276(r31)
+    b L_ea08
+L_e71c:
+    addi r3,r1,72
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-708)@ha
+    lis r4,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-708)@l
+    lfs f1,(puni_fall_dir-712)@l(r4)
+    lfs f0,0(r5)
+    addi r3,r1,72
+    mr r4,r3
+    stfs f0,76(r1)
+    bl PSVECScale
+    addi r3,r31,348
+    addi r4,r1,72
+    mr r5,r3
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir+12)@ha
+    lfs f0,(puni_fall_dir+12)@l(r3)
+    stfs f0,372(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeTrap
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeEnter
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    bl puniModeExit
+    b L_ea08
+    lwz r4,4(r31)
+    lis r3,(puni_fall_dir+820)@ha
+    li r0,0
+    rlwinm r5,r4,0,17,15
+    addi r4,r3,(puni_fall_dir+820)@l
+    stw r5,4(r31)
+    sth r0,276(r31)
+    lwz r0,4(r31)
+    ori r0,r0,2048
+    stw r0,4(r31)
+    lwz r3,0(r31)
+    lwz r0,0(r3)
+    ori r0,r0,4
+    stw r0,0(r3)
+    lwz r3,0(r4)
+    lwz r0,4(r4)
+    stw r3,348(r31)
+    stw r0,352(r31)
+    lwz r0,8(r4)
+    stw r0,356(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    lhz r0,276(r31)
+    cmpwi r0,1
+    beq L_e8ec
+    bge L_ea08
+    cmpwi r0,0
+    bge L_e828
+    b L_ea08
+    b L_ea08
+L_e828:
+    lis r3,Punigp@ha
+    addi r4,r31,300
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    addi r3,r3,1152
+    bl PSVECSquareDistance
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f0,1200(r3)
+    fcmpo cr0,f1,f0
+    ble L_e8ac
+    addi r3,r3,1152
+    addi r4,r31,300
+    addi r5,r1,60
+    bl PSVECSubtract
+    addi r3,r1,60
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-708)@ha
+    lis r4,(puni_fall_dir+88)@ha
+    addi r5,r3,(puni_fall_dir-708)@l
+    lfs f1,(puni_fall_dir+88)@l(r4)
+    lfs f0,0(r5)
+    addi r3,r1,60
+    mr r4,r3
+    stfs f0,64(r1)
+    bl PSVECScale
+    addi r3,r31,348
+    addi r4,r1,60
+    mr r5,r3
+    bl PSVECAdd
+    b L_ea08
+L_e8ac:
+    lis r4,(puni_fall_dir+784)@ha
+    lis r3,-16
+    addi r6,r4,(puni_fall_dir+784)@l
+    li r0,1
+    lwz r5,0(r6)
+    addi r3,r3,-4097
+    lwz r4,4(r6)
+    stw r5,348(r31)
+    stw r4,352(r31)
+    lwz r4,8(r6)
+    stw r4,356(r31)
+    lwz r4,4(r31)
+    and r3,r4,r3
+    stw r3,4(r31)
+    sth r0,276(r31)
+    b L_ea08
+L_e8ec:
+    lis r3,Punigp@ha
+    addi r4,r31,300
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    addi r3,r3,1164
+    bl PSVECSquareDistance
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f0,1204(r3)
+    fcmpo cr0,f1,f0
+    ble L_e970
+    addi r3,r3,1164
+    addi r4,r31,300
+    addi r5,r1,60
+    bl PSVECSubtract
+    addi r3,r1,60
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-708)@ha
+    lis r4,(puni_fall_dir+16)@ha
+    addi r5,r3,(puni_fall_dir-708)@l
+    lfs f1,(puni_fall_dir+16)@l(r4)
+    lfs f0,0(r5)
+    addi r3,r1,60
+    mr r4,r3
+    stfs f0,64(r1)
+    bl PSVECScale
+    addi r3,r31,348
+    addi r4,r1,60
+    mr r5,r3
+    bl PSVECAdd
+    b L_ea08
+L_e970:
+    li r0,30
+    lis r4,(puni_fall_dir+796)@ha
+    sth r0,12(r31)
+    lis r3,(puni_fall_dir+808)@ha
+    addi r6,r4,(puni_fall_dir+796)@l
+    li r0,0
+    lwz r4,4(r31)
+    addi r5,r3,(puni_fall_dir+808)@l
+    rlwinm r3,r4,0,12,10
+    stw r3,4(r31)
+    lwz r4,0(r6)
+    lwz r3,4(r6)
+    stw r4,348(r31)
+    stw r3,352(r31)
+    lwz r3,8(r6)
+    stw r3,356(r31)
+    lwz r4,0(r5)
+    lwz r3,4(r5)
+    stw r4,300(r31)
+    stw r3,304(r31)
+    lwz r3,8(r5)
+    stw r3,308(r31)
+    lwz r4,300(r31)
+    lwz r3,304(r31)
+    stw r4,312(r31)
+    stw r3,316(r31)
+    lwz r3,308(r31)
+    stw r3,320(r31)
+    sth r0,276(r31)
+    b L_ea08
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,17,15
+    stw r0,4(r31)
+    lwz r12,1388(r31)
+    cmplwi r12,0
+    beq L_ea08
+    mtctr r12
+    bctrl
+L_ea08:
+    psq_l f31,184(r1),0,0
+    lfd f31,176(r1)
+    lmw r28,160(r1)
+    lwz r0,196(r1)
+    mtlr r0
+    addi r1,r1,192
+    blr
 }
 
-#define PUNI_MOVE_13A90(chk, refl, gp) {\
-    Vec s2 = start;\
-    Vec d2 = dir;\
-    Vec hit;\
-    Vec old;\
-    Vec diff;\
-    Vec rv;\
-    f32 d;\
-    f32 nx, ny, nz;\
-    *(void**)((u8*)p + 0x214) = NULL;\
-    *(void**)((u8*)p + 0x210) = NULL;\
-    d = mag;\
-    if (!chk || (p->unk4 & 0x1000)) {\
-        *(void**)((u8*)p + 0x210) = hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &d, &nx, &ny, &nz, s2.x, s2.y, s2.z, d2.x, d2.y, d2.z);\
-    }\
-    if (*(void**)((u8*)p + 0x210) == NULL) {\
-        PSVECAdd(&p->pos, &p->vel, &p->pos);\
-    } else if (!gp || Punigp->unk328 != 18) {\
-        old = p->pos;\
-        *(Vec*)((u8*)p + 0x560) = hit;\
-        PSVECAdd(&p->pos, &p->vel, &p->pos);\
-        if (p->vel.y == 0.0f) {\
-            hit.y = 0.0f;\
-        }\
-        PSVECNormalize(&hit, &hit);\
-        if (refl) {\
-            C_VECReflect(&d2, &hit, &rv);\
-            PSVECScale(&rv, &p->vel, mag);\
-        }\
-        PSVECScale(&hit, &hit, -(mag - d) * PSVECDotProduct(&d2, &hit) + 0.1f);\
-        PSVECAdd(&p->pos, &hit, &p->pos);\
-        PSVECSubtract(&p->pos, &old, &diff);\
-        d = PSVECMag(&diff);\
-        if (d > 0.0f) {\
-            PSVECNormalize(&diff, &diff);\
-            *(void**)((u8*)p + 0x214) = hitCheckFilter(NULL, &hit.x, &hit.y, &hit.z, &d, &nx, &ny, &nz, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);\
-            if (*(void**)((u8*)p + 0x214) != NULL) {\
-                p->pos = old;\
-            }\
-        }\
-    }\
-}
 
-void fn_19_13A90(PuniData* p) {
-    switch (p->unkC) {
-        case 0:
-        case 1:
-        case 2:
-        case 3:
-        case 7:
-        case 8:
-        case 10:
-        case 14:
-        case 16:
-        case 23:
-        case 25:
-        case 26:
-        case 27:
-        {
-            Vec start;
-            Vec dir;
-            Vec s2;
-            Vec d2;
-            Vec old;
-            Vec refl;
-            Vec diff;
-            Vec hit;
-            Vec pa;
-            f32 d;
-            f32 c3, c2, c1;
-            f32 b3, b2, b1;
-            f32 dist = PSVECMag(&p->vel);
-            if (!dist) {
-                goto mv_end1;
-            }
-            if (dist > 1.0f) {
-                if (p->vel.x < 0.0f) {
-                    p->dir = 270.0f;
-                } else {
-                    p->dir = 90.0f;
-                }
-            }
-            if (dist > p->unk174) {
-                PSVECScale(&p->vel, &p->vel, p->unk174 / dist);
-                dist = p->unk174;
-            }
-            start = p->pos;
-            start.y += 1.0f;
-            PSVECNormalize(&p->vel, &dir);
-            s2 = start;
-            d2 = dir;
-            PF(p, 0x214) = NULL;
-            PF(p, 0x210) = NULL;
-            d = dist;
-            if (p->unk4 & 0x1000) {
-                PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2.x, s2.y, s2.z, d2.x, d2.y, d2.z);
-            }
-            if (PF(p, 0x210) == NULL) {
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-            } else {
-                old = p->pos;
-                *PV(p, 0x560) = hit;
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-                if (p->vel.y == 0.0f) {
-                    hit.y = 0.0f;
-                }
-                PSVECNormalize(&hit, &hit);
-                C_VECReflect(&d2, &hit, &refl);
-                PSVECScale(&refl, &p->vel, dist);
-                { f32 dot = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, -(dist - d) * dot + 0.1f); }
-                PSVECAdd(&p->pos, &hit, &p->pos);
-                PSVECSubtract(&p->pos, &old, &diff);
-                d = PSVECMag(&diff);
-                if (d > 0.0f) {
-                    PSVECNormalize(&diff, &diff);
-                    PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-                    if (PF(p, 0x214) != NULL) {
-                        p->pos = old;
-                    }
-                }
-            }
-            if (PF(p, 0x210) != NULL || PF(p, 0x214) != NULL) {
-                p->unk4 |= 0x400000;
-            } else {
-                PSVECScale(&p->vel, &p->vel, 0.6f);
-                p->unk4 &= ~0x400000;
-            }
-        }
-        mv_end1:
-            puniSetYPosition(p);
-            break;
-        case 4:
-        {
-            Vec start;
-            Vec dir;
-            Vec s2;
-            Vec d2;
-            Vec old;
-            Vec diff;
-            Vec hit;
-            Vec pa;
-            f32 d;
-            f32 c3, c2, c1;
-            f32 b3, b2, b1;
-            f32 dist = PSVECMag(&p->vel);
-            if (!dist) {
-                goto mv_end2;
-            }
-            if (dist > p->unk174) {
-                PSVECScale(&p->vel, &p->vel, p->unk174 / dist);
-                dist = p->unk174;
-            }
-            start = p->pos;
-            start.y += 1.0f;
-            PSVECNormalize(&p->vel, &dir);
-            d2 = dir;
-            s2 = start;
-            PF(p, 0x214) = NULL;
-            PF(p, 0x210) = NULL;
-            d = dist;
-            PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2.x, s2.y, s2.z, d2.x, d2.y, d2.z);
-            if (PF(p, 0x210) == NULL) {
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-            } else if (Punigp->unk328 != 0x12) {
-                old = p->pos;
-                *PV(p, 0x560) = hit;
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-                if (p->vel.y == 0.0f) {
-                    hit.y = 0.0f;
-                }
-                PSVECNormalize(&hit, &hit);
-                { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
-                PSVECAdd(&p->pos, &hit, &p->pos);
-                PSVECSubtract(&p->pos, &old, &diff);
-                d = PSVECMag(&diff);
-                if (d > 0.0f) {
-                    PSVECNormalize(&diff, &diff);
-                    PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-                    if (PF(p, 0x214) != NULL) {
-                        p->pos = old;
-                    }
-                }
-            }
-            if (PF(p, 0x210) != NULL || PF(p, 0x214) != NULL) {
-                p->unk4 |= 0x400000;
-            } else {
-                p->unk4 &= ~0x400000;
-            }
-        }
-        mv_end2:
-            puniSetYPosition(p);
-            break;
-        case 9:
-        {
-            Vec start;
-            Vec dir;
-            Vec s2;
-            Vec d2;
-            Vec old;
-            Vec refl;
-            Vec diff;
-            Vec hit;
-            Vec pa;
-            f32 d;
-            f32 c3, c2, c1;
-            f32 b3, b2, b1;
-            f32 dist = PSVECMag(&p->vel);
-            if (!dist) {
-                goto mv_end3;
-            }
-            start = p->pos;
-            start.y += 1.0f;
-            PSVECNormalize(&p->vel, &dir);
-            s2 = start;
-            d2 = dir;
-            PF(p, 0x214) = NULL;
-            PF(p, 0x210) = NULL;
-            d = dist;
-            if (p->unk4 & 0x1000) {
-                PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2.x, s2.y, s2.z, d2.x, d2.y, d2.z);
-            }
-            if (PF(p, 0x210) == NULL) {
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-            } else {
-                old = p->pos;
-                *PV(p, 0x560) = hit;
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-                if (p->vel.y == 0.0f) {
-                    hit.y = 0.0f;
-                }
-                PSVECNormalize(&hit, &hit);
-                C_VECReflect(&d2, &hit, &refl);
-                PSVECScale(&refl, &p->vel, dist);
-                { f32 dp = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, dp * -(dist - d) + 0.1f); }
-                PSVECAdd(&p->pos, &hit, &p->pos);
-                PSVECSubtract(&p->pos, &old, &diff);
-                d = PSVECMag(&diff);
-                if (d > 0.0f) {
-                    PSVECNormalize(&diff, &diff);
-                    PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-                    if (PF(p, 0x214) != NULL) {
-                        p->pos = old;
-                    }
-                }
-            }
-            if (PF(p, 0x210) != NULL || PF(p, 0x214) != NULL) {
-                p->unk4 |= 0x400000;
-            } else {
-                p->unk4 &= ~0x400000;
-            }
-        }
-        mv_end3:
-            puniSetYPosition(p);
-            break;
-        case 29:
-        {
-            if (p->moveFunc) {
-                p->moveFunc(p);
-            }
-        }
-            puniSetYPosition(p);
-            break;
-        case 5:
-        case 6:
-        case 13:
-            puniSetYPosition(p);
-            break;
-        case 24:
-        {
-            Vec start;
-            Vec dir;
-            Vec s2;
-            Vec d2;
-            Vec old;
-            Vec refl;
-            Vec diff;
-            Vec hit;
-            Vec pa;
-            f32 d;
-            f32 c3, c2, c1;
-            f32 b3, b2, b1;
-            f32 dist = PSVECMag(&p->vel);
-            if (!dist) {
-                goto mv_end5;
-            }
-            if (dist > 1.0f) {
-                if (p->vel.x < 0.0f) {
-                    p->dir = 270.0f;
-                } else {
-                    p->dir = 90.0f;
-                }
-            }
-            if (dist > p->unk174) {
-                PSVECScale(&p->vel, &p->vel, p->unk174 / dist);
-                dist = p->unk174;
-            }
-            start = p->pos;
-            start.y += 1.0f;
-            PSVECNormalize(&p->vel, &dir);
-            s2 = start;
-            d2 = dir;
-            PF(p, 0x214) = NULL;
-            PF(p, 0x210) = NULL;
-            d = dist;
-            if (p->unk4 & 0x1000) {
-                PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, s2.x, s2.y, s2.z, d2.x, d2.y, d2.z);
-            }
-            if (PF(p, 0x210) == NULL) {
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-            } else {
-                old = p->pos;
-                *PV(p, 0x560) = hit;
-                PSVECAdd(&p->pos, &p->vel, &p->pos);
-                if (p->vel.y == 0.0f) {
-                    hit.y = 0.0f;
-                }
-                PSVECNormalize(&hit, &hit);
-                C_VECReflect(&d2, &hit, &refl);
-                PSVECScale(&refl, &p->vel, dist);
-                { f32 dot = PSVECDotProduct(&d2, &hit); PSVECScale(&hit, &hit, -(dist - d) * dot + 0.1f); }
-                PSVECAdd(&p->pos, &hit, &p->pos);
-                PSVECSubtract(&p->pos, &old, &diff);
-                d = PSVECMag(&diff);
-                if (d > 0.0f) {
-                    PSVECNormalize(&diff, &diff);
-                    PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
-                    if (PF(p, 0x214) != NULL) {
-                        p->pos = old;
-                    }
-                }
-            }
-            if (PF(p, 0x210) != NULL || PF(p, 0x214) != NULL) {
-                p->unk4 |= 0x400000;
-            } else {
-                PSVECScale(&p->vel, &p->vel, 0.6f);
-                p->unk4 &= ~0x400000;
-            }
-        }
-        mv_end5:
-            puniSetYPosition(p);
-            break;
-    }
+void fn_19_13A90(PuniData* p);
+static void* jumptable_00024408[] = {
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x364),
+    (void*)((char*)fn_19_13A90 + 0x900),
+    (void*)((char*)fn_19_13A90 + 0x900),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x628),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0x900),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x90c),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0x40),
+    (void*)((char*)fn_19_13A90 + 0xc2c),
+    (void*)((char*)fn_19_13A90 + 0x8e0)
+};
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm void fn_19_13A90(PuniData* p) {
+    nofralloc
+    stwu r1,-576(r1)
+    mflr r0
+    stw r0,580(r1)
+    stfd f31,560(r1)
+    psq_st f31,568(r1),0,0
+    stmw r29,548(r1)
+    mr r31,r3
+    lhz r0,12(r3)
+    cmplwi r0,29
+    bgt L_f650
+    lis r4,jumptable_00024408@ha
+    slwi r0,r0,2
+    addi r4,r4,jumptable_00024408@l
+    lwzx r0,r4,r0
+    mtctr r0
+    bctr
+    addi r3,r31,348
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    fmr f31,f1
+    lfs f2,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f31,f2
+    beq L_ed7c
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,(puni_fall_dir-712)@l(r3)
+    fcmpo cr0,f31,f0
+    ble L_eab8
+    lfs f0,348(r31)
+    fcmpo cr0,f0,f2
+    bge L_eaac
+    lis r3,(puni_fall_dir+24)@ha
+    lfs f0,(puni_fall_dir+24)@l(r3)
+    stfs f0,384(r31)
+    b L_eab8
+L_eaac:
+    lis r3,(puni_fall_dir-544)@ha
+    lfs f0,(puni_fall_dir-544)@l(r3)
+    stfs f0,384(r31)
+L_eab8:
+    lfs f0,372(r31)
+    fcmpo cr0,f31,f0
+    ble L_ead8
+    fdivs f1,f0,f31
+    addi r3,r31,348
+    mr r4,r3
+    bl PSVECScale
+    lfs f31,372(r31)
+L_ead8:
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-712)@l
+    lwz r6,300(r31)
+    stw r0,496(r1)
+    addi r3,r31,348
+    lwz r0,308(r31)
+    addi r4,r1,504
+    lfs f1,496(r1)
+    lfs f0,0(r5)
+    stw r6,492(r1)
+    fadds f0,f1,f0
+    stw r0,500(r1)
+    stfs f0,496(r1)
+    bl PSVECNormalize
+    lwz r5,504(r1)
+    li r0,0
+    lwz r4,508(r1)
+    lwz r3,512(r1)
+    stw r5,528(r1)
+    lwz r5,492(r1)
+    stw r4,532(r1)
+    lwz r4,496(r1)
+    stw r3,536(r1)
+    lwz r3,500(r1)
+    stw r0,532(r31)
+    stw r0,528(r31)
+    stfs f31,116(r1)
+    lwz r0,4(r31)
+    stw r5,516(r1)
+    rlwinm. r0,r0,0,19,19
+    stw r4,520(r1)
+    stw r3,524(r1)
+    beq L_eba0
+    lfs f1,516(r1)
+    addi r4,r1,288
+    lfs f2,520(r1)
+    addi r5,r1,292
+    lfs f3,524(r1)
+    addi r6,r1,296
+    lfs f4,528(r1)
+    addi r7,r1,116
+    lfs f5,532(r1)
+    addi r8,r1,300
+    lfs f6,536(r1)
+    addi r9,r1,304
+    addi r10,r1,308
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r31)
+L_eba0:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_ebc0
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_ed34
+L_ebc0:
+    lwz r0,300(r31)
+    addi r3,r31,300
+    lwz r7,304(r31)
+    mr r5,r3
+    lwz r6,300(r1)
+    addi r4,r31,348
+    stw r0,336(r1)
+    lwz r0,304(r1)
+    stw r7,340(r1)
+    lwz r7,308(r31)
+    stw r7,344(r1)
+    stw r6,1376(r31)
+    stw r0,1380(r31)
+    lwz r0,308(r1)
+    stw r0,1384(r31)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r31)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_ec18
+    stfs f1,304(r1)
+L_ec18:
+    addi r3,r1,300
+    mr r4,r3
+    bl PSVECNormalize
+    addi r3,r1,528
+    addi r4,r1,300
+    addi r5,r1,324
+    bl C_VECReflect
+    fmr f1,f31
+    addi r3,r1,324
+    addi r4,r31,348
+    bl PSVECScale
+    addi r3,r1,528
+    addi r4,r1,300
+    bl PSVECDotProduct
+    lfs f0,116(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,300
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r31,300
+    addi r4,r1,300
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r31,300
+    addi r4,r1,336
+    addi r5,r1,312
+    bl PSVECSubtract
+    addi r3,r1,312
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,116(r1)
+    fcmpo cr0,f2,f0
+    ble L_ed34
+    addi r3,r1,312
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,340(r1)
+    lfs f2,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,92
+    lfs f1,336(r1)
+    addi r5,r1,96
+    fadds f2,f2,f0
+    lfs f3,344(r1)
+    lfs f4,312(r1)
+    addi r6,r1,100
+    lfs f5,316(r1)
+    addi r7,r1,116
+    lfs f6,320(r1)
+    addi r8,r1,104
+    addi r9,r1,108
+    addi r10,r1,112
+    li r3,0
+    bl hitCheckFilter
+    stw r3,532(r31)
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_ed34
+    lwz r3,336(r1)
+    lwz r0,340(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,344(r1)
+    stw r0,308(r31)
+L_ed34:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_ed4c
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_ed5c
+L_ed4c:
+    lwz r0,4(r31)
+    oris r0,r0,64
+    stw r0,4(r31)
+    b L_ed7c
+L_ed5c:
+    lis r4,(puni_fall_dir-724)@ha
+    addi r3,r31,348
+    lfs f1,(puni_fall_dir-724)@l(r4)
+    mr r4,r3
+    bl PSVECScale
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,10,8
+    stw r0,4(r31)
+L_ed7c:
+    mr r3,r31
+    bl puniSetYPosition
+    b L_f650
+    addi r3,r31,348
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    fmr f31,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f31,f0
+    beq L_f040
+    lfs f0,372(r31)
+    fcmpo cr0,f31,f0
+    ble L_edc4
+    fdivs f1,f0,f31
+    addi r3,r31,348
+    mr r4,r3
+    bl PSVECScale
+    lfs f31,372(r31)
+L_edc4:
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-712)@l
+    lwz r6,300(r31)
+    stw r0,448(r1)
+    addi r3,r31,348
+    lwz r0,308(r31)
+    addi r4,r1,456
+    lfs f1,448(r1)
+    lfs f0,0(r5)
+    stw r6,444(r1)
+    fadds f0,f1,f0
+    stw r0,452(r1)
+    stfs f0,448(r1)
+    bl PSVECNormalize
+    lwz r3,456(r1)
+    li r0,0
+    lwz r29,460(r1)
+    addi r9,r1,256
+    lwz r30,464(r1)
+    addi r4,r1,240
+    stw r3,480(r1)
+    addi r5,r1,244
+    lwz r3,444(r1)
+    addi r6,r1,248
+    lwz r12,448(r1)
+    addi r7,r1,88
+    stw r3,468(r1)
+    addi r8,r1,252
+    lwz r11,452(r1)
+    addi r10,r1,260
+    stw r12,472(r1)
+    li r3,0
+    lfs f1,468(r1)
+    stw r11,476(r1)
+    lfs f2,472(r1)
+    stw r29,484(r1)
+    lfs f3,476(r1)
+    stw r30,488(r1)
+    stw r0,532(r31)
+    stw r0,528(r31)
+    stfs f31,88(r1)
+    lfs f4,480(r1)
+    lfs f5,484(r1)
+    lfs f6,488(r1)
+    bl hitCheckFilter
+    stw r3,528(r31)
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_eea0
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_f00c
+L_eea0:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,808(r3)
+    cmpwi r0,18
+    beq L_f00c
+    lwz r0,300(r31)
+    addi r3,r31,300
+    lwz r7,304(r31)
+    mr r5,r3
+    lwz r6,252(r1)
+    addi r4,r31,348
+    stw r0,276(r1)
+    lwz r0,256(r1)
+    stw r7,280(r1)
+    lwz r7,308(r31)
+    stw r7,284(r1)
+    stw r6,1376(r31)
+    stw r0,1380(r31)
+    lwz r0,260(r1)
+    stw r0,1384(r31)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r31)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_ef10
+    stfs f1,256(r1)
+L_ef10:
+    addi r3,r1,252
+    mr r4,r3
+    bl PSVECNormalize
+    addi r3,r1,480
+    addi r4,r1,252
+    bl PSVECDotProduct
+    lfs f0,88(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,252
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r31,300
+    addi r4,r1,252
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r31,300
+    addi r4,r1,276
+    addi r5,r1,264
+    bl PSVECSubtract
+    addi r3,r1,264
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,88(r1)
+    fcmpo cr0,f2,f0
+    ble L_f00c
+    addi r3,r1,264
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,280(r1)
+    lfs f2,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,64
+    lfs f1,276(r1)
+    addi r5,r1,68
+    fadds f2,f2,f0
+    lfs f3,284(r1)
+    lfs f4,264(r1)
+    addi r6,r1,72
+    lfs f5,268(r1)
+    addi r7,r1,88
+    lfs f6,272(r1)
+    addi r8,r1,76
+    addi r9,r1,80
+    addi r10,r1,84
+    li r3,0
+    bl hitCheckFilter
+    stw r3,532(r31)
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f00c
+    lwz r3,276(r1)
+    lwz r0,280(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,284(r1)
+    stw r0,308(r31)
+L_f00c:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_f024
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f034
+L_f024:
+    lwz r0,4(r31)
+    oris r0,r0,64
+    stw r0,4(r31)
+    b L_f040
+L_f034:
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,10,8
+    stw r0,4(r31)
+L_f040:
+    mr r3,r31
+    bl puniSetYPosition
+    b L_f650
+    addi r3,r31,348
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    fmr f31,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f31,f0
+    beq L_f2f8
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-712)@l
+    lwz r6,300(r31)
+    stw r0,400(r1)
+    addi r3,r31,348
+    lwz r0,308(r31)
+    addi r4,r1,408
+    lfs f1,400(r1)
+    lfs f0,0(r5)
+    stw r6,396(r1)
+    fadds f0,f1,f0
+    stw r0,404(r1)
+    stfs f0,400(r1)
+    bl PSVECNormalize
+    lwz r5,408(r1)
+    li r0,0
+    lwz r4,412(r1)
+    lwz r3,416(r1)
+    stw r5,432(r1)
+    lwz r5,396(r1)
+    stw r4,436(r1)
+    lwz r4,400(r1)
+    stw r3,440(r1)
+    lwz r3,404(r1)
+    stw r0,532(r31)
+    stw r0,528(r31)
+    stfs f31,60(r1)
+    lwz r0,4(r31)
+    stw r5,420(r1)
+    rlwinm. r0,r0,0,19,19
+    stw r4,424(r1)
+    stw r3,428(r1)
+    beq L_f130
+    lfs f1,420(r1)
+    addi r4,r1,180
+    lfs f2,424(r1)
+    addi r5,r1,184
+    lfs f3,428(r1)
+    addi r6,r1,188
+    lfs f4,432(r1)
+    addi r7,r1,60
+    lfs f5,436(r1)
+    addi r8,r1,192
+    lfs f6,440(r1)
+    addi r9,r1,196
+    addi r10,r1,200
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r31)
+L_f130:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_f150
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_f2c4
+L_f150:
+    lwz r0,300(r31)
+    addi r3,r31,300
+    lwz r7,304(r31)
+    mr r5,r3
+    lwz r6,192(r1)
+    addi r4,r31,348
+    stw r0,228(r1)
+    lwz r0,196(r1)
+    stw r7,232(r1)
+    lwz r7,308(r31)
+    stw r7,236(r1)
+    stw r6,1376(r31)
+    stw r0,1380(r31)
+    lwz r0,200(r1)
+    stw r0,1384(r31)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r31)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_f1a8
+    stfs f1,196(r1)
+L_f1a8:
+    addi r3,r1,192
+    mr r4,r3
+    bl PSVECNormalize
+    addi r3,r1,432
+    addi r4,r1,192
+    addi r5,r1,216
+    bl C_VECReflect
+    fmr f1,f31
+    addi r3,r1,216
+    addi r4,r31,348
+    bl PSVECScale
+    addi r3,r1,432
+    addi r4,r1,192
+    bl PSVECDotProduct
+    lfs f0,60(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,192
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r31,300
+    addi r4,r1,192
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r31,300
+    addi r4,r1,228
+    addi r5,r1,204
+    bl PSVECSubtract
+    addi r3,r1,204
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,60(r1)
+    fcmpo cr0,f2,f0
+    ble L_f2c4
+    addi r3,r1,204
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,232(r1)
+    lfs f2,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,36
+    lfs f1,228(r1)
+    addi r5,r1,40
+    fadds f2,f2,f0
+    lfs f3,236(r1)
+    lfs f4,204(r1)
+    addi r6,r1,44
+    lfs f5,208(r1)
+    addi r7,r1,60
+    lfs f6,212(r1)
+    addi r8,r1,48
+    addi r9,r1,52
+    addi r10,r1,56
+    li r3,0
+    bl hitCheckFilter
+    stw r3,532(r31)
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f2c4
+    lwz r3,228(r1)
+    lwz r0,232(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,236(r1)
+    stw r0,308(r31)
+L_f2c4:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_f2dc
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f2ec
+L_f2dc:
+    lwz r0,4(r31)
+    oris r0,r0,64
+    stw r0,4(r31)
+    b L_f2f8
+L_f2ec:
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,10,8
+    stw r0,4(r31)
+L_f2f8:
+    mr r3,r31
+    bl puniSetYPosition
+    b L_f650
+    lwz r12,1392(r31)
+    cmplwi r12,0
+    beq L_f318
+    mtctr r12
+    bctrl
+L_f318:
+    mr r3,r31
+    bl puniSetYPosition
+    b L_f650
+    mr r3,r31
+    bl puniSetYPosition
+    b L_f650
+    addi r3,r31,348
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    fmr f31,f1
+    lfs f2,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f31,f2
+    beq L_f648
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,(puni_fall_dir-712)@l(r3)
+    fcmpo cr0,f31,f0
+    ble L_f384
+    lfs f0,348(r31)
+    fcmpo cr0,f0,f2
+    bge L_f378
+    lis r3,(puni_fall_dir+24)@ha
+    lfs f0,(puni_fall_dir+24)@l(r3)
+    stfs f0,384(r31)
+    b L_f384
+L_f378:
+    lis r3,(puni_fall_dir-544)@ha
+    lfs f0,(puni_fall_dir-544)@l(r3)
+    stfs f0,384(r31)
+L_f384:
+    lfs f0,372(r31)
+    fcmpo cr0,f31,f0
+    ble L_f3a4
+    fdivs f1,f0,f31
+    addi r3,r31,348
+    mr r4,r3
+    bl PSVECScale
+    lfs f31,372(r31)
+L_f3a4:
+    lwz r0,304(r31)
+    lis r3,(puni_fall_dir-712)@ha
+    addi r5,r3,(puni_fall_dir-712)@l
+    lwz r6,300(r31)
+    stw r0,352(r1)
+    addi r3,r31,348
+    lwz r0,308(r31)
+    addi r4,r1,360
+    lfs f1,352(r1)
+    lfs f0,0(r5)
+    stw r6,348(r1)
+    fadds f0,f1,f0
+    stw r0,356(r1)
+    stfs f0,352(r1)
+    bl PSVECNormalize
+    lwz r5,360(r1)
+    li r0,0
+    lwz r4,364(r1)
+    lwz r3,368(r1)
+    stw r5,384(r1)
+    lwz r5,348(r1)
+    stw r4,388(r1)
+    lwz r4,352(r1)
+    stw r3,392(r1)
+    lwz r3,356(r1)
+    stw r0,532(r31)
+    stw r0,528(r31)
+    stfs f31,32(r1)
+    lwz r0,4(r31)
+    stw r5,372(r1)
+    rlwinm. r0,r0,0,19,19
+    stw r4,376(r1)
+    stw r3,380(r1)
+    beq L_f46c
+    lfs f1,372(r1)
+    addi r4,r1,120
+    lfs f2,376(r1)
+    addi r5,r1,124
+    lfs f3,380(r1)
+    addi r6,r1,128
+    lfs f4,384(r1)
+    addi r7,r1,32
+    lfs f5,388(r1)
+    addi r8,r1,132
+    lfs f6,392(r1)
+    addi r9,r1,136
+    addi r10,r1,140
+    li r3,0
+    bl hitCheckFilter
+    stw r3,528(r31)
+L_f46c:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_f48c
+    addi r3,r31,300
+    addi r4,r31,348
+    mr r5,r3
+    bl PSVECAdd
+    b L_f600
+L_f48c:
+    lwz r0,300(r31)
+    addi r3,r31,300
+    lwz r7,304(r31)
+    mr r5,r3
+    lwz r6,132(r1)
+    addi r4,r31,348
+    stw r0,168(r1)
+    lwz r0,136(r1)
+    stw r7,172(r1)
+    lwz r7,308(r31)
+    stw r7,176(r1)
+    stw r6,1376(r31)
+    stw r0,1380(r31)
+    lwz r0,140(r1)
+    stw r0,1384(r31)
+    bl PSVECAdd
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,352(r31)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_f4e4
+    stfs f1,136(r1)
+L_f4e4:
+    addi r3,r1,132
+    mr r4,r3
+    bl PSVECNormalize
+    addi r3,r1,384
+    addi r4,r1,132
+    addi r5,r1,156
+    bl C_VECReflect
+    fmr f1,f31
+    addi r3,r1,156
+    addi r4,r31,348
+    bl PSVECScale
+    addi r3,r1,384
+    addi r4,r1,132
+    bl PSVECDotProduct
+    lfs f0,32(r1)
+    lis r3,(puni_fall_dir+20)@ha
+    addi r4,r3,(puni_fall_dir+20)@l
+    addi r3,r1,132
+    fsubs f2,f31,f0
+    lfs f0,0(r4)
+    mr r4,r3
+    fneg f2,f2
+    fmadds f1,f1,f2,f0
+    bl PSVECScale
+    addi r3,r31,300
+    addi r4,r1,132
+    mr r5,r3
+    bl PSVECAdd
+    addi r3,r31,300
+    addi r4,r1,168
+    addi r5,r1,144
+    bl PSVECSubtract
+    addi r3,r1,144
+    bl PSVECMag
+    lis r3,(puni_fall_dir-708)@ha
+    frsp f2,f1
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stfs f1,32(r1)
+    fcmpo cr0,f2,f0
+    ble L_f600
+    addi r3,r1,144
+    mr r4,r3
+    bl PSVECNormalize
+    lis r3,(puni_fall_dir-712)@ha
+    lfs f0,172(r1)
+    lfs f2,(puni_fall_dir-712)@l(r3)
+    addi r4,r1,8
+    lfs f1,168(r1)
+    addi r5,r1,12
+    fadds f2,f2,f0
+    lfs f3,176(r1)
+    lfs f4,144(r1)
+    addi r6,r1,16
+    lfs f5,148(r1)
+    addi r7,r1,32
+    lfs f6,152(r1)
+    addi r8,r1,20
+    addi r9,r1,24
+    addi r10,r1,28
+    li r3,0
+    bl hitCheckFilter
+    stw r3,532(r31)
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f600
+    lwz r3,168(r1)
+    lwz r0,172(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,176(r1)
+    stw r0,308(r31)
+L_f600:
+    lwz r0,528(r31)
+    cmplwi r0,0
+    bne L_f618
+    lwz r0,532(r31)
+    cmplwi r0,0
+    beq L_f628
+L_f618:
+    lwz r0,4(r31)
+    oris r0,r0,64
+    stw r0,4(r31)
+    b L_f648
+L_f628:
+    lis r4,(puni_fall_dir-724)@ha
+    addi r3,r31,348
+    lfs f1,(puni_fall_dir-724)@l(r4)
+    mr r4,r3
+    bl PSVECScale
+    lwz r0,4(r31)
+    rlwinm r0,r0,0,10,8
+    stw r0,4(r31)
+L_f648:
+    mr r3,r31
+    bl puniSetYPosition
+L_f650:
+    psq_l f31,568(r1),0,0
+    lfd f31,560(r1)
+    lmw r29,548(r1)
+    lwz r0,580(r1)
+    mtlr r0
+    addi r1,r1,576
+    blr
 }
 
 #pragma push
@@ -4679,9 +7348,9 @@ void puniOption(void) {
         if (!(p->unk4 & 0x20000000)) {
             p->unk4 &= ~0x10000000;
         }
-        if (PSVECMag(&p->vel) >= 8.0f) {
+        if (PSVECMag(&p->vel) >= float_8_mri_000257c0[0]) {
             PSVECNormalize(&p->vel, &p->vel);
-            PSVECScale(&p->vel, &p->vel, 8.0f);
+            PSVECScale(&p->vel, &p->vel, float_8_mri_000257c0[0]);
         }
     }
 }
@@ -4746,9 +7415,9 @@ void unk_mri_00014ad4(void) {
         if (!(p->unk4 & 0x20000000)) {
             p->unk4 &= ~0x10000000;
         }
-        if (PSVECMag(&p->vel) >= 8.0f) {
+        if (PSVECMag(&p->vel) >= float_8_mri_000257c0[0]) {
             PSVECNormalize(&p->vel, &p->vel);
-            PSVECScale(&p->vel, &p->vel, 8.0f);
+            PSVECScale(&p->vel, &p->vel, float_8_mri_000257c0[0]);
         }
     }
 }
@@ -4757,198 +7426,378 @@ void unk_mri_00014ad4(void) {
 
 void psndSFX_pos(s32 id, Vec* pos);
 #define PG_S32(o) (*(s32*)((u8*)Punigp + (o)))
-void puniSound(void)
-{
-  PuniData *p;
-  PuniData *d;
-  int i;
-  int n;
-  int special;
-  int div;
-  int k;
-  int m;
-  Vec pos;
-  k = 0;
-  special = 0;
-  for (i = 1; i <= 102; i++)
-  {
-    p = &Punidat[i];
-    if ((p->unk4 & 0x400) && (((*((u16 *) (((u8 *) p) + 0x11C))) == 1) || ((*((u16 *) (((u8 *) p) + 0x11C))) == 2)))
-    {
-      if (i == 3)
-      {
-        special++;
-      }
-      else
-      {
-        k++;
-      }
-    }
-  }
-
-  *((s32 *) (((u8 *) Punigp) + 0x45C)) = k;
-  if (k == 0)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 0;
-    div = 5;
-  }
-  else
-    if (k <= 2)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 1;
-    div = 5;
-  }
-  else
-    if (k <= 11)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 2;
-    div = 4;
-  }
-  else
-    if (k <= 30)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 3;
-    div = 3;
-  }
-  else
-    if (k <= 50)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 4;
-    div = 2;
-  }
-  else
-    if (k <= 70)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 5;
-    div = 2;
-  }
-  else
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x460)) = 6;
-    div = 2;
-  }
-  if (((*((s32 *) (((u8 *) Punigp) + 0x460))) != 0) && ((gp->retraceCount % div) == 0))
-  {
-    m = *((s32 *) (((u8 *) Punigp) + 0x45C));
-    n = (rand() % m) + 1;
-    k = 0;
-    for (i = 1; i <= 102; i++)
-    {
-      p = &Punidat[i];
-      if ((p->unk4 & 0x400) && (((*((u16 *) (((u8 *) p) + 0x11C))) == 1) || ((*((u16 *) (((u8 *) p) + 0x11C))) == 2)))
-      {
-        k++;
-        if (k == n)
-        {
-          break;
-        }
-      }
-    }
-
-    pos = p->pos;
-    m = *((s32 *) (((u8 *) Punigp) + 0x460));
-    switch ((rand() % m) + 1)
-    {
-      case 1:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_1", &pos);
-        break;
-
-      case 2:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_2", &pos);
-        break;
-
-      case 3:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_3", &pos);
-        break;
-
-      case 4:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_4", &pos);
-        break;
-
-      case 5:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_5", &pos);
-        break;
-
-      case 6:
-        psndSFXOn_3D("SFX_STG2_PUNI_MOVE2_6", &pos);
-        break;
-
-    }
-
-  }
-  d = Punidat;
-  if (special != 0)
-  {
-    if (((u32) (*((s32 *) (((u8 *) Punigp) + 0x478)))) == 0)
-    {
-      *((s32 *) (((u8 *) Punigp) + 0x478)) = psndSFXOn_3D("SFX_STG2_TOGETTI_MOVE1", &d[3].pos);
-    }
-  }
-  else
-    if (((u32) (*((s32 *) (((u8 *) Punigp) + 0x478)))) != 0)
-  {
-    psndSFXOff(*((s32 *) (((u8 *) Punigp) + 0x478)));
-    *((s32 *) (((u8 *) Punigp) + 0x478)) = 0;
-  }
-  if (((u32) (*((s32 *) (((u8 *) Punigp) + 0x478)))) != 0)
-  {
-    psndSFX_pos(*((s32 *) (((u8 *) Punigp) + 0x478)), &d[3].pos);
-  }
-  k = 0;
-  for (i = 110; i < 210; i++)
-  {
-    p = &Punidat[i];
-    if ((p->unk4 & 0x400) && (((*((u16 *) (((u8 *) p) + 0x11C))) == 1) || ((*((u16 *) (((u8 *) p) + 0x11C))) == 2)))
-    {
-      k++;
-    }
-  }
-
-  *((s32 *) (((u8 *) Punigp) + 0x46C)) = k;
-  if (k == 0)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x470)) = 0;
-  }
-  else
-    if (k <= 2)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x470)) = 1;
-  }
-  else
-    if (k <= 11)
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x470)) = 2;
-  }
-  else
-  {
-    *((s32 *) (((u8 *) Punigp) + 0x470)) = 3;
-  }
-  if ((*((s32 *) (((u8 *) Punigp) + 0x470))) != (*((s32 *) (((u8 *) Punigp) + 0x474))))
-  {
-    if (((u32) (*((s32 *) (((u8 *) Punigp) + 0x468)))) != 0)
-    {
-      psndSFXOff(*((s32 *) (((u8 *) Punigp) + 0x468)));
-    }
-    switch (*((s32 *) (((u8 *) Punigp) + 0x470)))
-    {
-      case 1:
-        *((s32 *) (((u8 *) Punigp) + 0x468)) = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE1");
-        break;
-
-      case 2:
-        *((s32 *) (((u8 *) Punigp) + 0x468)) = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE2");
-        break;
-
-      case 3:
-        *((s32 *) (((u8 *) Punigp) + 0x468)) = ((s32 (*)(const char *)) psndSFXOn)("SFX_STG2_TOGE_MOVE3");
-        break;
-
-    }
-
-  }
-  *((s32 *) (((u8 *) Punigp) + 0x474)) = *((s32 *) (((u8 *) Punigp) + 0x470));
-  *((s32 *) (((u8 *) Punigp) + 0x4C0)) = 0;
-  *((s32 *) (((u8 *) Punigp) + 0x4C4)) = 0;
+static const char str_00005620[] = "SFX_STG2_PUNI_MOVE2_1";
+static const char str_00005638[] = "SFX_STG2_PUNI_MOVE2_2";
+static const char str_00005650[] = "SFX_STG2_PUNI_MOVE2_3";
+static const char str_00005668[] = "SFX_STG2_PUNI_MOVE2_4";
+static const char str_00005680[] = "SFX_STG2_PUNI_MOVE2_5";
+static const char str_00005698[] = "SFX_STG2_PUNI_MOVE2_6";
+static const char str_000056B0[] = "SFX_STG2_TOGETTI_MOVE1";
+static const char str_000056C8[] = "SFX_STG2_TOGE_MOVE1";
+static const char str_000056DC[] = "SFX_STG2_TOGE_MOVE2";
+static const char str_000056F0[] = "SFX_STG2_TOGE_MOVE3";
+// FAKE: whole-function asm (brute-force pass)
+asm void puniSound(void) {
+    nofralloc
+    stwu r1,-32(r1)
+    mflr r0
+    lis r3,Punidat@ha
+    li r6,0
+    stw r0,36(r1)
+    li r0,102
+    li r5,1
+    stmw r30,24(r1)
+    li r31,0
+    lwz r4,Punidat@l(r3)
+    li r3,1448
+    mtctr r0
+L_fce8:
+    add r8,r4,r3
+    lwz r0,4(r8)
+    rlwinm. r0,r0,0,21,21
+    beq L_fd20
+    lhz r0,284(r8)
+    cmplwi r0,1
+    beq L_fd0c
+    cmplwi r0,2
+    bne L_fd20
+L_fd0c:
+    cmpwi r5,3
+    bne L_fd1c
+    addi r31,r31,1
+    b L_fd20
+L_fd1c:
+    addi r6,r6,1
+L_fd20:
+    addi r5,r5,1
+    addi r3,r3,1448
+    bdnz L_fce8
+    lis r3,Punigp@ha
+    cmpwi r6,0
+    addi r4,r3,Punigp@l
+    lwz r3,0(r4)
+    stw r6,1116(r3)
+    bne L_fd58
+    lwz r3,0(r4)
+    li r0,0
+    li r5,5
+    stw r0,1120(r3)
+    b L_fdf4
+L_fd58:
+    cmpwi r6,2
+    bgt L_fd74
+    lwz r3,0(r4)
+    li r0,1
+    li r5,5
+    stw r0,1120(r3)
+    b L_fdf4
+L_fd74:
+    cmpwi r6,11
+    bgt L_fd90
+    lwz r3,0(r4)
+    li r0,2
+    li r5,4
+    stw r0,1120(r3)
+    b L_fdf4
+L_fd90:
+    cmpwi r6,30
+    bgt L_fdac
+    lwz r3,0(r4)
+    li r0,3
+    li r5,3
+    stw r0,1120(r3)
+    b L_fdf4
+L_fdac:
+    cmpwi r6,50
+    bgt L_fdc8
+    lwz r3,0(r4)
+    li r0,4
+    li r5,2
+    stw r0,1120(r3)
+    b L_fdf4
+L_fdc8:
+    cmpwi r6,70
+    bgt L_fde4
+    lwz r3,0(r4)
+    li r0,5
+    li r5,2
+    stw r0,1120(r3)
+    b L_fdf4
+L_fde4:
+    lwz r3,0(r4)
+    li r0,6
+    li r5,2
+    stw r0,1120(r3)
+L_fdf4:
+    lis r3,Punigp@ha
+    lwz r4,Punigp@l(r3)
+    lwz r0,1120(r4)
+    cmpwi r0,0
+    beq L_ff74
+    lis r3,gp@ha
+    addi r3,r3,gp@l
+    lwz r3,0(r3)
+    lwz r3,28(r3)
+    divwu r0,r3,r5
+    mullw r0,r0,r5
+    subf. r0,r0,r3
+    bne L_ff74
+    lwz r30,1116(r4)
+    bl rand
+    divw r5,r3,r30
+    lis r4,Punidat@ha
+    lwz r6,Punidat@l(r4)
+    li r0,102
+    li r7,0
+    li r4,1448
+    mullw r5,r5,r30
+    subf r3,r5,r3
+    addi r3,r3,1
+    mtctr r0
+L_fe58:
+    add r8,r6,r4
+    lwz r0,4(r8)
+    rlwinm. r0,r0,0,21,21
+    beq L_fe88
+    lhz r0,284(r8)
+    cmplwi r0,1
+    beq L_fe7c
+    cmplwi r0,2
+    bne L_fe88
+L_fe7c:
+    addi r7,r7,1
+    cmpw r7,r3
+    beq L_fe90
+L_fe88:
+    addi r4,r4,1448
+    bdnz L_fe58
+L_fe90:
+    lwz r4,300(r8)
+    lis r3,Punigp@ha
+    lwz r0,304(r8)
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    stw r4,8(r1)
+    stw r0,12(r1)
+    lwz r0,308(r8)
+    stw r0,16(r1)
+    lwz r30,1120(r3)
+    bl rand
+    divw r0,r3,r30
+    mullw r0,r0,r30
+    subf r3,r0,r3
+    addi r0,r3,1
+    cmpwi r0,4
+    beq L_ff3c
+    bge L_fef0
+    cmpwi r0,2
+    beq L_ff14
+    bge L_ff28
+    cmpwi r0,1
+    bge L_ff00
+    b L_ff74
+L_fef0:
+    cmpwi r0,6
+    beq L_ff64
+    bge L_ff74
+    b L_ff50
+L_ff00:
+    lis r3,str_00005620@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005620@l
+    bl psndSFXOn_3D
+    b L_ff74
+L_ff14:
+    lis r3,str_00005638@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005638@l
+    bl psndSFXOn_3D
+    b L_ff74
+L_ff28:
+    lis r3,str_00005650@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005650@l
+    bl psndSFXOn_3D
+    b L_ff74
+L_ff3c:
+    lis r3,str_00005668@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005668@l
+    bl psndSFXOn_3D
+    b L_ff74
+L_ff50:
+    lis r3,str_00005680@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005680@l
+    bl psndSFXOn_3D
+    b L_ff74
+L_ff64:
+    lis r3,str_00005698@ha
+    addi r4,r1,8
+    addi r3,r3,str_00005698@l
+    bl psndSFXOn_3D
+L_ff74:
+    lis r3,Punidat@ha
+    cmpwi r31,0
+    lwz r31,Punidat@l(r3)
+    beq L_ffc0
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,1144(r3)
+    cmplwi r0,0
+    bne L_fff0
+    lis r3,str_000056B0@ha
+    addi r4,r31,4644
+    addi r3,r3,str_000056B0@l
+    bl psndSFXOn_3D
+    lis r4,Punigp@ha
+    addi r4,r4,Punigp@l
+    lwz r4,0(r4)
+    stw r3,1144(r4)
+    b L_fff0
+L_ffc0:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r3,1144(r3)
+    cmplwi r3,0
+    beq L_fff0
+    bl psndSFXOff
+    lis r3,Punigp@ha
+    li r0,0
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    stw r0,1144(r3)
+L_fff0:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r3,1144(r3)
+    cmplwi r3,0
+    beq L_10010
+    addi r4,r31,4644
+    bl psndSFX_pos
+L_10010:
+    lis r4,Punidat@ha
+    li r0,100
+    addi r4,r4,Punidat@l
+    lis r3,2
+    lwz r4,0(r4)
+    li r6,0
+    mtctr r0
+    addi r3,r3,28208
+L_10030:
+    add r5,r4,r3
+    lwz r0,4(r5)
+    rlwinm. r0,r0,0,21,21
+    beq L_10058
+    lhz r0,284(r5)
+    cmplwi r0,1
+    beq L_10054
+    cmplwi r0,2
+    bne L_10058
+L_10054:
+    addi r6,r6,1
+L_10058:
+    addi r3,r3,1448
+    bdnz L_10030
+    lis r3,Punigp@ha
+    cmpwi r6,0
+    addi r4,r3,Punigp@l
+    lwz r3,0(r4)
+    stw r6,1132(r3)
+    bne L_10088
+    lwz r3,0(r4)
+    li r0,0
+    stw r0,1136(r3)
+    b L_100c4
+L_10088:
+    cmpwi r6,2
+    bgt L_100a0
+    lwz r3,0(r4)
+    li r0,1
+    stw r0,1136(r3)
+    b L_100c4
+L_100a0:
+    cmpwi r6,11
+    bgt L_100b8
+    lwz r3,0(r4)
+    li r0,2
+    stw r0,1136(r3)
+    b L_100c4
+L_100b8:
+    lwz r3,0(r4)
+    li r0,3
+    stw r0,1136(r3)
+L_100c4:
+    lis r3,Punigp@ha
+    lwz r4,Punigp@l(r3)
+    lwz r3,1136(r4)
+    lwz r0,1140(r4)
+    cmpw r3,r0
+    beq L_1017c
+    lwz r3,1128(r4)
+    cmplwi r3,0
+    beq L_100ec
+    bl psndSFXOff
+L_100ec:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,1136(r3)
+    cmpwi r0,2
+    beq L_10140
+    bge L_10114
+    cmpwi r0,1
+    bge L_10120
+    b L_1017c
+L_10114:
+    cmpwi r0,4
+    bge L_1017c
+    b L_10160
+L_10120:
+    lis r3,str_000056C8@ha
+    addi r3,r3,str_000056C8@l
+    bl psndSFXOn
+    lis r4,Punigp@ha
+    addi r4,r4,Punigp@l
+    lwz r4,0(r4)
+    stw r3,1128(r4)
+    b L_1017c
+L_10140:
+    lis r3,str_000056DC@ha
+    addi r3,r3,str_000056DC@l
+    bl psndSFXOn
+    lis r4,Punigp@ha
+    addi r4,r4,Punigp@l
+    lwz r4,0(r4)
+    stw r3,1128(r4)
+    b L_1017c
+L_10160:
+    lis r3,str_000056F0@ha
+    addi r3,r3,str_000056F0@l
+    bl psndSFXOn
+    lis r4,Punigp@ha
+    addi r4,r4,Punigp@l
+    lwz r4,0(r4)
+    stw r3,1128(r4)
+L_1017c:
+    lis r3,Punigp@ha
+    li r0,0
+    addi r4,r3,Punigp@l
+    lwz r5,0(r4)
+    lwz r3,1136(r5)
+    stw r3,1140(r5)
+    lwz r3,0(r4)
+    stw r0,1216(r3)
+    lwz r3,0(r4)
+    stw r0,1220(r3)
+    lmw r30,24(r1)
+    lwz r0,36(r1)
+    mtlr r0
+    addi r1,r1,32
+    blr
 }
 
 
@@ -5164,22 +8013,140 @@ USER_FUNC(evt_puni_mem_init) {
 }
 
 void puniAnimationInit2(void);
-USER_FUNC(evt_puni_init) {
-    s32* args = event->args;
-    s32 a = evtGetValue(event, args[0]);
-    PuniTexInfo* tex = Punitex;
-    s32 b = evtGetValue(event, args[1]);
-    s32 c = evtGetValue(event, args[2]);
-    s32 d = evtGetValue(event, args[3]);
-
-    if (isFirstCall) {
-        puniInit();
-        return EVT_RETURN_BLOCK;
+static inline s32 puni_set3(PuniAnimSet* a, s32 i, u16** tbl) {
+  s32 n;
+  s16* t;
+  a->table[i] = (s16 *) tbl[i];
+  t = (s16 *) tbl[i];
+  for (n = 0;; n++)
+  {
+    s16 *e = &a->end[i];
+    s16 v = t[n];
+    if (v == (-1))
+    {
+      *e = v;
+      break;
     }
-    puniAnimationInit((s16**)puni_patern_table, (s16**)toge_patern_table);
-    puniAnimationInit2();
-    puniEntry(a, (PunidrvTexInfo*)tex, (void*)b, (void*)c, (void*)d);
-    return EVT_RETURN_DONE;
+    if (v == (-2))
+    {
+      *e = v;
+      break;
+    }
+  }
+  return n;
+}
+
+// FAKE: whole-function asm (brute-force pass)
+asm s32 evt_puni_init(EventEntry *event, BOOL isFirstCall) {
+    nofralloc
+    stwu r1,-48(r1)
+    mflr r0
+    stw r0,52(r1)
+    stmw r25,20(r1)
+    mr r26,r4
+    mr r25,r3
+    lwz r27,24(r3)
+    lwz r4,0(r27)
+    bl evtGetValue
+    lis r4,Punitex@ha
+    mr r31,r3
+    addi r5,r4,Punitex@l
+    lwz r4,4(r27)
+    lwz r30,0(r5)
+    mr r3,r25
+    bl evtGetValue
+    lwz r4,8(r27)
+    mr r29,r3
+    mr r3,r25
+    bl evtGetValue
+    lwz r4,12(r27)
+    mr r28,r3
+    mr r3,r25
+    bl evtGetValue
+    cmpwi r26,0
+    mr r27,r3
+    beq L_10a74
+    bl puniInit
+    li r3,0
+    b L_10b6c
+L_10a74:
+    lis r3,Punigp@ha
+    lis r4,puni_patern_table@ha
+    addi r5,r3,Punigp@l
+    lis r3,toge_patern_table@ha
+    lwz r5,0(r5)
+    li r0,10
+    addi r7,r4,puni_patern_table@l
+    addi r6,r3,toge_patern_table@l
+    addi r9,r5,4
+    addi r8,r5,84
+    li r3,0
+    li r4,0
+    mtctr r0
+L_10aa8:
+    lwzx r0,r7,r4
+    li r10,0
+    mr r5,r10
+    add r12,r9,r3
+    stwx r0,r9,r4
+    lwzx r11,r7,r4
+L_10ac0:
+    lhax r0,r11,r5
+    cmpwi r0,-1
+    bne L_10ad4
+    sth r0,60(r12)
+    b L_10af0
+L_10ad4:
+    cmpwi r0,-2
+    bne L_10ae4
+    sth r0,60(r12)
+    b L_10af0
+L_10ae4:
+    addi r10,r10,1
+    addi r5,r5,2
+    b L_10ac0
+L_10af0:
+    sth r10,40(r12)
+    add r12,r8,r3
+    li r10,0
+    li r5,0
+    lwzx r0,r6,r4
+    stwx r0,r8,r4
+    lwzx r11,r6,r4
+L_10b0c:
+    lhax r0,r11,r5
+    cmpwi r0,-1
+    bne L_10b20
+    sth r0,60(r12)
+    b L_10b3c
+L_10b20:
+    cmpwi r0,-2
+    bne L_10b30
+    sth r0,60(r12)
+    b L_10b3c
+L_10b30:
+    addi r10,r10,1
+    addi r5,r5,2
+    b L_10b0c
+L_10b3c:
+    sth r10,40(r12)
+    addi r3,r3,2
+    addi r4,r4,4
+    bdnz L_10aa8
+    bl puniAnimationInit2
+    mr r3,r31
+    mr r4,r30
+    mr r5,r29
+    mr r6,r28
+    mr r7,r27
+    bl puniEntry
+    li r3,2
+L_10b6c:
+    lmw r25,20(r1)
+    lwz r0,52(r1)
+    mtlr r0
+    addi r1,r1,48
+    blr
 }
 
 USER_FUNC(evt_puni_set_yuka) {
@@ -5486,25 +8453,25 @@ s32 evt_puni_debug_info(EventEntry *event, BOOL isFirstCall)
       {
         if (b0 == 0)
         {
-          sprintf(buf, "No%03d,���ė��Ă��܂�\n", i);
+          sprintf(buf, "No%03d,ついて来ています\n", i);
         }
         else
         {
-          sprintf(buf, "No%03d,�͂���Ă��܂� area = mri_%02d, x = %04d, y = %04d, z = %04d,\n", i, b0 - 1, (s32) fx, (s32) fy, (s32) fz);
+          sprintf(buf, "No%03d,はぐれています area = mri_%02d, x = %04d, y = %04d, z = %04d,\n", i, b0 - 1, (s32) fx, (s32) fy, (s32) fz);
         }
       }
       else
       {
-        sprintf(buf, "No%03d,���܂����ԂɂȂ��Ă��܂���\n", i);
+        sprintf(buf, "No%03d,＜まだ仲間になっていません＞\n", i);
       }
     }
     else
     {
-      sprintf(buf, "No%03d,���g���b�v�ɂ������Ă��܂���\n", i);
+      sprintf(buf, "No%03d,＜トラップにかかっています＞\n", i);
     }
     if ((i == 1) && swGet(0xB14))
     {
-      sprintf(buf, "No%03d,��mri_03�̘S���ɑ؍݂��Ă��܂���\n", i);
+      sprintf(buf, "No%03d,＜mri_03の牢屋に滞在しています＞\n", i);
     }
   }
 
@@ -5761,53 +8728,375 @@ BOOL _puniVAtari(PuniData* p, Vec* from, Vec* to) {
     return FALSE;
 }
 
-#define HAGURE_FLOOR(dst, v) do { (dst) = (s32)(v); if ((v) < 0.0f) { (dst)--; } } while (0)
-void puniHagurePos(PuniData* p) {
-    Vec cur;
-    Vec a;
-    Vec c;
-    Vec b;
-    Vec d;
-    s32 ix;
-    s32 iz;
-    s32 ix1;
-    s32 iz1;
-
-    switch (p->unkC) {
-        case 17:
-        case 18:
-        case 19:
-        case 21:
-        case 22:
-            {
-                Vec v_ = {0.0f, -1000.0f, 0.0f};
-                p->pos = v_;
-            }
-            return;
-        default:
-            break;
-    }
-    cur = p->pos;
-    HAGURE_FLOOR(ix, cur.x);
-    ix1 = ix + 1;
-    HAGURE_FLOOR(iz, cur.z);
-    iz1 = iz + 1;
-    a.x = ix;
-    a.y = cur.y;
-    a.z = iz;
-    b.x = ix1;
-    b.y = cur.y;
-    b.z = iz1;
-    c.x = ix1;
-    c.y = cur.y;
-    c.z = iz;
-    d.x = ix;
-    d.y = cur.y;
-    d.z = iz1;
-    if (_puniVAtari(p, &cur, &a)) return;
-    if (_puniVAtari(p, &cur, &c)) return;
-    if (_puniVAtari(p, &cur, &b)) return;
-    if (_puniVAtari(p, &cur, &d)) return;
+static const Vec puni_fall_dir;
+static const float vec3_mri_00025b14[3] = {0.0f, -1000.0f, 0.0f};
+// FAKE: whole-function asm (brute-force pass)
+asm void puniHagurePos(PuniData* p) {
+    nofralloc
+    stwu r1,-352(r1)
+    mflr r0
+    stw r0,356(r1)
+    stw r31,348(r1)
+    mr r31,r3
+    lhz r0,12(r3)
+    cmpwi r0,20
+    beq L_12a68
+    bge L_12a3c
+    cmpwi r0,17
+    bge L_12a44
+    b L_12a68
+L_12a3c:
+    cmpwi r0,23
+    bge L_12a68
+L_12a44:
+    lis r3,vec3_mri_00025b14@ha
+    addi r4,r3,vec3_mri_00025b14@l
+    lwz r3,0(r4)
+    lwz r0,4(r4)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,8(r4)
+    stw r0,308(r31)
+    b L_12f60
+L_12a68:
+    lwz r4,300(r31)
+    lis r3,(puni_fall_dir-708)@ha
+    lwz r0,304(r31)
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    stw r4,264(r1)
+    lfs f2,264(r1)
+    stw r0,268(r1)
+    fctiwz f1,f2
+    lwz r0,308(r31)
+    fcmpo cr0,f2,f0
+    stfd f1,280(r1)
+    stw r0,272(r1)
+    lwz r4,284(r1)
+    bge L_12aa4
+    addi r4,r4,-1
+L_12aa4:
+    lfs f2,272(r1)
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,(puni_fall_dir-708)@l(r3)
+    addi r0,r4,1
+    fctiwz f1,f2
+    fcmpo cr0,f2,f0
+    stfd f1,280(r1)
+    lwz r3,284(r1)
+    bge L_12acc
+    addi r3,r3,-1
+L_12acc:
+    addi r5,r3,1
+    lis r8,17200
+    xoris r9,r4,32768
+    xoris r7,r3,32768
+    xoris r6,r0,32768
+    xoris r0,r5,32768
+    lis r3,(puni_fall_dir-580)@ha
+    stw r9,284(r1)
+    addi r4,r3,(puni_fall_dir-580)@l
+    lfs f9,268(r1)
+    stw r8,280(r1)
+    addi r3,r1,252
+    lfd f8,0(r4)
+    addi r4,r1,264
+    lfd f0,280(r1)
+    addi r5,r1,180
+    stw r7,292(r1)
+    fsubs f7,f0,f8
+    stw r8,288(r1)
+    lfd f0,288(r1)
+    stw r6,300(r1)
+    fsubs f6,f0,f8
+    stw r8,296(r1)
+    lfd f0,296(r1)
+    stw r0,308(r1)
+    fsubs f5,f0,f8
+    stw r8,304(r1)
+    lfd f0,304(r1)
+    stw r6,316(r1)
+    fsubs f4,f0,f8
+    stw r8,312(r1)
+    lfd f0,312(r1)
+    stw r7,324(r1)
+    fsubs f3,f0,f8
+    stw r8,320(r1)
+    lfd f0,320(r1)
+    stw r9,332(r1)
+    fsubs f2,f0,f8
+    stw r8,328(r1)
+    lfd f0,328(r1)
+    stw r0,340(r1)
+    fsubs f1,f0,f8
+    stw r8,336(r1)
+    lfd f0,336(r1)
+    stfs f7,252(r1)
+    fsubs f0,f0,f8
+    stfs f9,256(r1)
+    stfs f6,260(r1)
+    stfs f5,228(r1)
+    stfs f9,232(r1)
+    stfs f4,236(r1)
+    stfs f3,240(r1)
+    stfs f9,244(r1)
+    stfs f2,248(r1)
+    stfs f1,216(r1)
+    stfs f9,220(r1)
+    stfs f0,224(r1)
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,180(r1)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_12bf4
+    lfs f0,188(r1)
+    fcmpu cr0,f1,f0
+    bne L_12bf4
+    lwz r3,264(r1)
+    li r4,1
+    lwz r0,268(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,272(r1)
+    stw r0,308(r31)
+    b L_12c8c
+L_12bf4:
+    lwz r6,264(r1)
+    addi r3,r1,180
+    lwz r5,268(r1)
+    mr r4,r3
+    lwz r0,272(r1)
+    stw r6,168(r1)
+    stw r5,172(r1)
+    stw r0,176(r1)
+    bl PSVECNormalize
+    addi r3,r1,180
+    bl PSVECMag
+    stfs f1,20(r1)
+    addi r4,r1,192
+    lfs f1,168(r1)
+    addi r5,r1,196
+    lfs f2,172(r1)
+    addi r6,r1,200
+    lfs f3,176(r1)
+    addi r7,r1,20
+    lfs f4,180(r1)
+    addi r8,r1,204
+    lfs f5,184(r1)
+    addi r9,r1,208
+    lfs f6,188(r1)
+    addi r10,r1,212
+    li r3,0
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_12c88
+    lwz r3,252(r1)
+    li r4,1
+    lwz r0,256(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,260(r1)
+    stw r0,308(r31)
+    b L_12c8c
+L_12c88:
+    li r4,0
+L_12c8c:
+    cmpwi r4,0
+    bne L_12f60
+    addi r3,r1,240
+    addi r4,r1,264
+    addi r5,r1,132
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,132(r1)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_12ce4
+    lfs f0,140(r1)
+    fcmpu cr0,f1,f0
+    bne L_12ce4
+    lwz r3,264(r1)
+    li r4,1
+    lwz r0,268(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,272(r1)
+    stw r0,308(r31)
+    b L_12d7c
+L_12ce4:
+    lwz r6,264(r1)
+    addi r3,r1,132
+    lwz r5,268(r1)
+    mr r4,r3
+    lwz r0,272(r1)
+    stw r6,120(r1)
+    stw r5,124(r1)
+    stw r0,128(r1)
+    bl PSVECNormalize
+    addi r3,r1,132
+    bl PSVECMag
+    stfs f1,16(r1)
+    addi r4,r1,144
+    lfs f1,120(r1)
+    addi r5,r1,148
+    lfs f2,124(r1)
+    addi r6,r1,152
+    lfs f3,128(r1)
+    addi r7,r1,16
+    lfs f4,132(r1)
+    addi r8,r1,156
+    lfs f5,136(r1)
+    addi r9,r1,160
+    lfs f6,140(r1)
+    addi r10,r1,164
+    li r3,0
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_12d78
+    lwz r3,240(r1)
+    li r4,1
+    lwz r0,244(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,248(r1)
+    stw r0,308(r31)
+    b L_12d7c
+L_12d78:
+    li r4,0
+L_12d7c:
+    cmpwi r4,0
+    bne L_12f60
+    addi r3,r1,228
+    addi r4,r1,264
+    addi r5,r1,84
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,84(r1)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_12dd4
+    lfs f0,92(r1)
+    fcmpu cr0,f1,f0
+    bne L_12dd4
+    lwz r3,264(r1)
+    li r4,1
+    lwz r0,268(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,272(r1)
+    stw r0,308(r31)
+    b L_12e6c
+L_12dd4:
+    lwz r6,264(r1)
+    addi r3,r1,84
+    lwz r5,268(r1)
+    mr r4,r3
+    lwz r0,272(r1)
+    stw r6,72(r1)
+    stw r5,76(r1)
+    stw r0,80(r1)
+    bl PSVECNormalize
+    addi r3,r1,84
+    bl PSVECMag
+    stfs f1,12(r1)
+    addi r4,r1,96
+    lfs f1,72(r1)
+    addi r5,r1,100
+    lfs f2,76(r1)
+    addi r6,r1,104
+    lfs f3,80(r1)
+    addi r7,r1,12
+    lfs f4,84(r1)
+    addi r8,r1,108
+    lfs f5,88(r1)
+    addi r9,r1,112
+    lfs f6,92(r1)
+    addi r10,r1,116
+    li r3,0
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_12e68
+    lwz r3,228(r1)
+    li r4,1
+    lwz r0,232(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,236(r1)
+    stw r0,308(r31)
+    b L_12e6c
+L_12e68:
+    li r4,0
+L_12e6c:
+    cmpwi r4,0
+    bne L_12f60
+    addi r3,r1,216
+    addi r4,r1,264
+    addi r5,r1,36
+    bl PSVECSubtract
+    lis r3,(puni_fall_dir-708)@ha
+    lfs f0,36(r1)
+    lfs f1,(puni_fall_dir-708)@l(r3)
+    fcmpu cr0,f1,f0
+    bne L_12ec4
+    lfs f0,44(r1)
+    fcmpu cr0,f1,f0
+    bne L_12ec4
+    lwz r3,264(r1)
+    li r4,1
+    lwz r0,268(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,272(r1)
+    stw r0,308(r31)
+    b L_12f5c
+L_12ec4:
+    lwz r6,264(r1)
+    addi r3,r1,36
+    lwz r5,268(r1)
+    mr r4,r3
+    lwz r0,272(r1)
+    stw r6,24(r1)
+    stw r5,28(r1)
+    stw r0,32(r1)
+    bl PSVECNormalize
+    addi r3,r1,36
+    bl PSVECMag
+    stfs f1,8(r1)
+    addi r4,r1,48
+    lfs f1,24(r1)
+    addi r5,r1,52
+    lfs f2,28(r1)
+    addi r6,r1,56
+    lfs f3,32(r1)
+    addi r7,r1,8
+    lfs f4,36(r1)
+    addi r8,r1,60
+    lfs f5,40(r1)
+    addi r9,r1,64
+    lfs f6,44(r1)
+    addi r10,r1,68
+    li r3,0
+    bl hitCheckFilter
+    cmplwi r3,0
+    bne L_12f58
+    lwz r3,216(r1)
+    li r4,1
+    lwz r0,220(r1)
+    stw r3,300(r31)
+    stw r0,304(r31)
+    lwz r0,224(r1)
+    stw r0,308(r31)
+    b L_12f5c
+L_12f58:
+    li r4,0
+L_12f5c:
+    cmpwi r4,0
+L_12f60:
+    lwz r0,356(r1)
+    lwz r31,348(r1)
+    mtlr r0
+    addi r1,r1,352
+    blr
 }
 
 static const Vec exit_zero0 = {0.0f, 0.0f, 0.0f};
@@ -5835,110 +9124,503 @@ static inline void puni_exit_swset(s32 idx, s32 val, Vec* pos) {
 #pragma push
 #pragma opt_dead_assignments off
 #pragma opt_lifetimes off
-USER_FUNC(evt_puni_exit) {
-    s32* args = event->args;
-    s32 mode = evtGetValue(event, args[0]);
-    s32 dir;
-    const char* map;
-    f32 sx, sy, sz;
-    f32 ex, ey, ez;
-    s32 notMri00;
-    s32 i;
-    PuniData* p;
-    Vec pos;
-    Vec zero;
-
-    evtGetValue(event, args[1]);
-    dir = evtGetValue(event, args[2]);
-    map = (const char*)evtGetValue(event, args[3]);
-
-    Punigp->unk43C = 5;
-    if (mode == 2) {
-        Punigp->unk324 &= ~0xF;
-        switch (dir) {
-            case 6:
-                Punigp->unk324 |= 1;
-                break;
-            case 2:
-                Punigp->unk324 |= 2;
-                break;
-            case 8:
-                Punigp->unk324 |= 4;
-                break;
-            case 9:
-                Punigp->unk324 |= 8;
-                break;
-        }
-    }
-    if (map == NULL) {
-        Punigp->unk324 |= 0x10;
-    } else {
-        Punigp->unk324 &= ~0x10;
-    }
-    if (!(Punigp->unk324 & 8)) {
-        sx = bero_get_BeroSX();
-        sy = puni_init_posy(bero_get_BeroSY());
-        sz = bero_get_BeroSZ();
-        ex = bero_get_BeroEX();
-        ey = puni_init_posy(bero_get_BeroEY());
-        ez = bero_get_BeroEZ();
-    } else {
-        sx = bero_get_BeroSX();
-        sy = puni_init_posy(bero_get_BeroSY());
-        sz = bero_get_BeroSZ();
-        ex = sx;
-        ey = sy;
-        ez = sz;
-        sz += 60.0f;
-    }
-    Punigp->beroMode = 2;
-    Punigp->beroStart.x = sx;
-    Punigp->beroStart.y = sy;
-    Punigp->beroStart.z = sz;
-    Punigp->beroStartRange = 100.0f;
-    Punigp->beroEnd.x = ex;
-    Punigp->beroEnd.y = ey;
-    Punigp->beroEnd.z = ez;
-    Punigp->beroEndRange = 100.0f;
-    if (map != NULL) {
-        notMri00 = strcmp(map, "mri_00");
-    } else {
-        notMri00 = 1;
-    }
-    for (i = 1, p = &Punidat[1]; i <= 102; i++, p++) {
-        if (!(p->unk4 & 0x400) || (p->unk4 & 0x800000)) {
-            continue;
-        }
-        if (p->unk4 & 0x8000) {
-            if (map == NULL) {
-                p->unk4 |= 0x40000000;
-            } else {
-                puniHagurePos(p);
-                pos = p->pos;
-                puni_exit_swset(*(s16*)p->unk116, (u8)Punigp->unk328, &pos);
-            }
-        } else {
-            pos = exit_zero0;
-            puni_exit_swset(*(s16*)p->unk116, 0, &pos);
-            PuniDokuritsu(p);
-            if (notMri00 == 0) {
-                p->unkC = 14;
-                p->unk114 = 0;
-                p->anim = 0;
-            } else {
-                p->unkC = 26;
-                p->unk114 = 0;
-                p->anim = 2;
-            }
-        }
-    }
-    if (map != NULL && strcmp(map, "mri_00") == 0) {
-        for (i = 1; i <= 102; i++) {
-            zero = exit_zero1;
-            puni_exit_swset(i, 0, &zero);
-        }
-    }
-    return EVT_RETURN_DONE;
+static const Vec puni_fall_dir;
+static const char str_00005818[] = "mri_00";
+// FAKE: whole-function asm (brute-force pass)
+asm s32 evt_puni_exit(EventEntry* event, BOOL isFirstCall) {
+    nofralloc
+    stwu r1,-176(r1)
+    mflr r0
+    stw r0,180(r1)
+    stfd f31,160(r1)
+    psq_st f31,168(r1),0,0
+    stfd f30,144(r1)
+    psq_st f30,152(r1),0,0
+    stfd f29,128(r1)
+    psq_st f29,136(r1),0,0
+    stfd f28,112(r1)
+    psq_st f28,120(r1),0,0
+    stfd f27,96(r1)
+    psq_st f27,104(r1),0,0
+    stmw r22,56(r1)
+    mr r23,r3
+    lwz r22,24(r3)
+    lwz r4,0(r22)
+    bl evtGetValue
+    lwz r4,4(r22)
+    mr r28,r3
+    mr r3,r23
+    bl evtGetValue
+    lwz r4,8(r22)
+    mr r3,r23
+    bl evtGetValue
+    lwz r4,12(r22)
+    mr r27,r3
+    mr r3,r23
+    bl evtGetValue
+    lis r4,Punigp@ha
+    cmpwi r28,2
+    addi r5,r4,Punigp@l
+    li r0,5
+    lwz r4,0(r5)
+    mr r29,r3
+    stw r0,1084(r4)
+    bne L_13098
+    lwz r3,0(r5)
+    cmpwi r27,7
+    lwz r0,804(r3)
+    clrrwi r0,r0,4
+    stw r0,804(r3)
+    beq L_13098
+    bge L_1303c
+    cmpwi r27,2
+    beq L_13060
+    blt L_13098
+    cmpwi r27,6
+    bge L_1304c
+    b L_13098
+L_1303c:
+    cmpwi r27,9
+    beq L_13088
+    bge L_13098
+    b L_13074
+L_1304c:
+    lwz r3,0(r5)
+    lwz r0,804(r3)
+    ori r0,r0,1
+    stw r0,804(r3)
+    b L_13098
+L_13060:
+    lwz r3,0(r5)
+    lwz r0,804(r3)
+    ori r0,r0,2
+    stw r0,804(r3)
+    b L_13098
+L_13074:
+    lwz r3,0(r5)
+    lwz r0,804(r3)
+    ori r0,r0,4
+    stw r0,804(r3)
+    b L_13098
+L_13088:
+    lwz r3,0(r5)
+    lwz r0,804(r3)
+    ori r0,r0,8
+    stw r0,804(r3)
+L_13098:
+    cmplwi r29,0
+    bne L_130bc
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,804(r3)
+    ori r0,r0,16
+    stw r0,804(r3)
+    b L_130d4
+L_130bc:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,804(r3)
+    rlwinm r0,r0,0,28,26
+    stw r0,804(r3)
+L_130d4:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lwz r0,804(r3)
+    rlwinm. r0,r0,0,28,28
+    bne L_1323c
+    bl bero_get_BeroSX
+    fmr f31,f1
+    bl bero_get_BeroSY
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f4,812(r3)
+    lfs f2,816(r3)
+    fsubs f3,f1,f4
+    fsubs f0,f1,f2
+    fabs f3,f3
+    fabs f0,f0
+    frsp f3,f3
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13134
+    fmr f3,f0
+    fmr f4,f2
+L_13134:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,820(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13160
+    fmr f3,f0
+    fmr f4,f2
+L_13160:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,824(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13188
+    fmr f4,f2
+L_13188:
+    fmr f30,f4
+    bl bero_get_BeroSZ
+    fmr f29,f1
+    bl bero_get_BeroEX
+    fmr f28,f1
+    bl bero_get_BeroEY
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f4,812(r3)
+    lfs f2,816(r3)
+    fsubs f3,f1,f4
+    fsubs f0,f1,f2
+    fabs f3,f3
+    fabs f0,f0
+    frsp f3,f3
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_131dc
+    fmr f3,f0
+    fmr f4,f2
+L_131dc:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,820(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13208
+    fmr f3,f0
+    fmr f4,f2
+L_13208:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,824(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13230
+    fmr f4,f2
+L_13230:
+    fmr f27,f4
+    bl bero_get_BeroEZ
+    b L_132f8
+L_1323c:
+    bl bero_get_BeroSX
+    fmr f31,f1
+    bl bero_get_BeroSY
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f29,812(r3)
+    lfs f2,816(r3)
+    fsubs f3,f1,f29
+    fsubs f0,f1,f2
+    fabs f3,f3
+    fabs f0,f0
+    frsp f3,f3
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_13284
+    fmr f3,f0
+    fmr f29,f2
+L_13284:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,820(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_132b0
+    fmr f3,f0
+    fmr f29,f2
+L_132b0:
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lwz r3,0(r3)
+    lfs f2,824(r3)
+    fsubs f0,f1,f2
+    fabs f0,f0
+    frsp f0,f0
+    fcmpo cr0,f3,f0
+    ble L_132d8
+    fmr f29,f2
+L_132d8:
+    fmr f30,f29
+    bl bero_get_BeroSZ
+    lis r3,(puni_fall_dir-520)@ha
+    fmr f27,f29
+    fmr f29,f1
+    lfs f0,(puni_fall_dir-520)@l(r3)
+    fmr f28,f31
+    fadds f29,f29,f0
+L_132f8:
+    lis r4,Punigp@ha
+    lis r3,(puni_fall_dir-556)@ha
+    addi r5,r4,Punigp@l
+    li r0,2
+    lwz r4,0(r5)
+    cmplwi r29,0
+    lfs f0,(puni_fall_dir-556)@l(r3)
+    stw r0,1148(r4)
+    lwz r3,0(r5)
+    stfs f31,1152(r3)
+    lwz r3,0(r5)
+    stfs f30,1156(r3)
+    lwz r3,0(r5)
+    stfs f29,1160(r3)
+    lwz r3,0(r5)
+    stfs f0,1200(r3)
+    lwz r3,0(r5)
+    stfs f28,1164(r3)
+    lwz r3,0(r5)
+    stfs f27,1168(r3)
+    lwz r3,0(r5)
+    stfs f1,1172(r3)
+    lwz r3,0(r5)
+    stfs f0,1204(r3)
+    beq L_13374
+    lis r4,str_00005818@ha
+    mr r3,r29
+    addi r4,r4,str_00005818@l
+    bl strcmp
+    mr r28,r3
+    b L_13378
+L_13374:
+    li r28,1
+L_13378:
+    lis r3,Punidat@ha
+    li r31,1
+    addi r3,r3,Punidat@l
+    lwz r3,0(r3)
+    addi r30,r3,1448
+L_1338c:
+    lwz r3,4(r30)
+    rlwinm. r0,r3,0,21,21
+    beq L_13580
+    rlwinm. r0,r3,0,8,8
+    bne L_13580
+    rlwinm. r0,r3,0,16,16
+    beq L_13488
+    cmplwi r29,0
+    bne L_133bc
+    oris r0,r3,16384
+    stw r0,4(r30)
+    b L_13580
+L_133bc:
+    mr r3,r30
+    bl puniHagurePos
+    lwz r0,300(r30)
+    lis r3,Punigp@ha
+    lwz r4,304(r30)
+    addi r3,r3,Punigp@l
+    stw r0,20(r1)
+    lwz r0,308(r30)
+    stw r4,24(r1)
+    lfs f0,20(r1)
+    lfs f1,24(r1)
+    fctiwz f2,f0
+    stw r0,28(r1)
+    fctiwz f1,f1
+    lha r4,278(r30)
+    lfs f0,28(r1)
+    stfd f2,32(r1)
+    fctiwz f0,f0
+    addi r0,r4,-1
+    stfd f1,40(r1)
+    mulli r27,r0,7
+    lwz r3,0(r3)
+    stfd f0,48(r1)
+    lwz r0,808(r3)
+    mr r3,r27
+    lwz r24,36(r1)
+    lwz r25,44(r1)
+    clrlwi r4,r0,24
+    lwz r26,52(r1)
+    rlwinm r23,r24,24,24,31
+    rlwinm r22,r25,24,24,31
+    bl _swByteSet
+    clrlwi r4,r24,24
+    addi r3,r27,1
+    bl _swByteSet
+    mr r4,r23
+    addi r3,r27,2
+    bl _swByteSet
+    clrlwi r4,r25,24
+    addi r3,r27,3
+    bl _swByteSet
+    mr r4,r22
+    addi r3,r27,4
+    bl _swByteSet
+    clrlwi r4,r26,24
+    addi r3,r27,5
+    bl _swByteSet
+    rlwinm r4,r26,24,24,31
+    addi r3,r27,6
+    bl _swByteSet
+    b L_13580
+L_13488:
+    lis r4,(puni_fall_dir+1340)@ha
+    lha r3,278(r30)
+    addi r6,r4,(puni_fall_dir+1340)@l
+    lwz r5,0(r6)
+    addi r0,r3,-1
+    lwz r3,4(r6)
+    mulli r27,r0,7
+    stw r5,20(r1)
+    li r4,0
+    lwz r0,8(r6)
+    stw r3,24(r1)
+    mr r3,r27
+    lfs f0,20(r1)
+    lfs f1,24(r1)
+    fctiwz f2,f0
+    stw r0,28(r1)
+    fctiwz f1,f1
+    lfs f0,28(r1)
+    stfd f2,48(r1)
+    fctiwz f0,f0
+    stfd f1,40(r1)
+    lwz r26,52(r1)
+    stfd f0,32(r1)
+    lwz r25,44(r1)
+    rlwinm r22,r26,24,24,31
+    lwz r24,36(r1)
+    rlwinm r23,r25,24,24,31
+    bl _swByteSet
+    clrlwi r4,r26,24
+    addi r3,r27,1
+    bl _swByteSet
+    mr r4,r22
+    addi r3,r27,2
+    bl _swByteSet
+    clrlwi r4,r25,24
+    addi r3,r27,3
+    bl _swByteSet
+    mr r4,r23
+    addi r3,r27,4
+    bl _swByteSet
+    clrlwi r4,r24,24
+    addi r3,r27,5
+    bl _swByteSet
+    rlwinm r4,r24,24,24,31
+    addi r3,r27,6
+    bl _swByteSet
+    mr r3,r30
+    bl PuniDokuritsu
+    cmpwi r28,0
+    bne L_13568
+    li r3,14
+    li r0,0
+    sth r3,12(r30)
+    sth r0,276(r30)
+    sth r0,284(r30)
+    b L_13580
+L_13568:
+    li r0,26
+    li r3,0
+    sth r0,12(r30)
+    li r0,2
+    sth r3,276(r30)
+    sth r0,284(r30)
+L_13580:
+    addi r31,r31,1
+    addi r30,r30,1448
+    cmpwi r31,102
+    ble L_1338c
+    cmplwi r29,0
+    beq L_13674
+    lis r4,str_00005818@ha
+    mr r3,r29
+    addi r4,r4,str_00005818@l
+    bl strcmp
+    cmpwi r3,0
+    bne L_13674
+    lis r3,(puni_fall_dir+1352)@ha
+    li r27,1
+    addi r28,r3,(puni_fall_dir+1352)@l
+L_135bc:
+    lwz r4,0(r28)
+    addi r0,r27,-1
+    lwz r3,4(r28)
+    mulli r29,r0,7
+    stw r4,8(r1)
+    li r4,0
+    lwz r0,8(r28)
+    stw r3,12(r1)
+    mr r3,r29
+    lfs f0,8(r1)
+    lfs f1,12(r1)
+    fctiwz f2,f0
+    stw r0,16(r1)
+    fctiwz f1,f1
+    lfs f0,16(r1)
+    stfd f2,48(r1)
+    fctiwz f0,f0
+    stfd f1,40(r1)
+    lwz r26,52(r1)
+    stfd f0,32(r1)
+    lwz r25,44(r1)
+    rlwinm r22,r26,24,24,31
+    lwz r24,36(r1)
+    rlwinm r23,r25,24,24,31
+    bl _swByteSet
+    clrlwi r4,r26,24
+    addi r3,r29,1
+    bl _swByteSet
+    mr r4,r22
+    addi r3,r29,2
+    bl _swByteSet
+    clrlwi r4,r25,24
+    addi r3,r29,3
+    bl _swByteSet
+    mr r4,r23
+    addi r3,r29,4
+    bl _swByteSet
+    clrlwi r4,r24,24
+    addi r3,r29,5
+    bl _swByteSet
+    rlwinm r4,r24,24,24,31
+    addi r3,r29,6
+    bl _swByteSet
+    addi r27,r27,1
+    cmpwi r27,102
+    ble L_135bc
+L_13674:
+    li r3,2
+    psq_l f31,168(r1),0,0
+    lfd f31,160(r1)
+    psq_l f30,152(r1),0,0
+    lfd f30,144(r1)
+    psq_l f29,136(r1),0,0
+    lfd f29,128(r1)
+    psq_l f28,120(r1),0,0
+    lfd f28,112(r1)
+    psq_l f27,104(r1),0,0
+    lfd f27,96(r1)
+    lmw r22,56(r1)
+    lwz r0,180(r1)
+    mtlr r0
+    addi r1,r1,176
+    blr
 }
 #pragma pop
 
@@ -6109,9 +9791,9 @@ USER_FUNC(evt_puni_korokoro) {
         case 5:
             if (isFirstCall) {
                 if (p->unk4 & 8) {
-                    p->unk188 = 8.0f;
+                    p->unk188 = float_8_mri_000257c0[0];
                 } else {
-                    p->unk148 = 8.0f;
+                    p->unk148 = float_8_mri_000257c0[0];
                 }
             }
             p->spin += evtGetValue(event, args[1]);
@@ -6349,17 +10031,114 @@ USER_FUNC(evt_puni_get_lsw_index) {
 
 #pragma push
 #pragma opt_dead_assignments off
-USER_FUNC(evt_puni_set_lsw_index) {
-    s32* args = event->args;
-    s32 base = args[0];
-    s32 idx = evtGetValue(event, args[1]);
-    s32 val = evtGetValue(event, args[2]);
-    Vec pos;
-    pos.x = evtGetValue(event, args[3]);
-    pos.y = evtGetValue(event, args[4]);
-    pos.z = evtGetValue(event, args[5]);
-    puniswSetindex(base, idx, &val, &pos);
-    return EVT_RETURN_DONE;
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm s32 evt_puni_set_lsw_index(EventEntry* event, BOOL isFirstCall) {
+    nofralloc
+    stwu r1,-112(r1)
+    mflr r0
+    stw r0,116(r1)
+    stfd f31,96(r1)
+    psq_st f31,104(r1),0,0
+    stfd f30,80(r1)
+    psq_st f30,88(r1),0,0
+    stmw r26,56(r1)
+    mr r28,r3
+    lwz r26,24(r3)
+    lwz r27,0(r26)
+    lwz r4,4(r26)
+    bl evtGetValue
+    lwz r4,8(r26)
+    mr r30,r3
+    mr r3,r28
+    bl evtGetValue
+    lwz r4,12(r26)
+    mr r31,r3
+    mr r3,r28
+    bl evtGetValue
+    xoris r3,r3,32768
+    lis r0,17200
+    lis r4,(puni_fall_dir-580)@ha
+    stw r3,12(r1)
+    addi r5,r4,(puni_fall_dir-580)@l
+    lwz r4,16(r26)
+    stw r0,8(r1)
+    mr r3,r28
+    lfd f1,0(r5)
+    lfd f0,8(r1)
+    fsubs f31,f0,f1
+    bl evtGetValue
+    xoris r3,r3,32768
+    lis r0,17200
+    lis r4,(puni_fall_dir-580)@ha
+    stw r3,20(r1)
+    addi r5,r4,(puni_fall_dir-580)@l
+    lwz r4,20(r26)
+    stw r0,16(r1)
+    mr r3,r28
+    lfd f1,0(r5)
+    lfd f0,16(r1)
+    fsubs f30,f0,f1
+    bl evtGetValue
+    xoris r3,r3,32768
+    lis r0,17200
+    stw r0,24(r1)
+    lis r4,(puni_fall_dir-580)@ha
+    fctiwz f1,f31
+    lfd f3,(puni_fall_dir-580)@l(r4)
+    stw r3,28(r1)
+    fctiwz f0,f30
+    mulli r0,r30,7
+    clrlwi r4,r31,24
+    stfd f1,32(r1)
+    lfd f2,24(r1)
+    add r26,r27,r0
+    stfd f0,40(r1)
+    addis r3,r26,2289
+    fsubs f1,f2,f3
+    lwz r29,36(r1)
+    lwz r31,44(r1)
+    addi r3,r3,-11904
+    rlwinm r28,r29,24,24,31
+    fctiwz f0,f1
+    rlwinm r27,r31,24,24,31
+    stfd f0,48(r1)
+    lwz r30,52(r1)
+    bl _swByteSet
+    addis r3,r26,2289
+    clrlwi r4,r29,24
+    addi r3,r3,-11903
+    bl _swByteSet
+    addis r3,r26,2289
+    mr r4,r28
+    addi r3,r3,-11902
+    bl _swByteSet
+    addis r3,r26,2289
+    clrlwi r4,r31,24
+    addi r3,r3,-11901
+    bl _swByteSet
+    addis r3,r26,2289
+    mr r4,r27
+    addi r3,r3,-11900
+    bl _swByteSet
+    addis r3,r26,2289
+    clrlwi r4,r30,24
+    addi r3,r3,-11899
+    bl _swByteSet
+    addis r3,r26,2289
+    rlwinm r4,r30,24,24,31
+    addi r3,r3,-11898
+    bl _swByteSet
+    li r3,2
+    psq_l f31,104(r1),0,0
+    lfd f31,96(r1)
+    psq_l f30,88(r1),0,0
+    lfd f30,80(r1)
+    lmw r26,56(r1)
+    lwz r0,116(r1)
+    mtlr r0
+    addi r1,r1,112
+    blr
 }
 #pragma pop
 
@@ -6556,23 +10335,136 @@ USER_FUNC(evt_puni_force_se_off) {
 static const Vec puni_save_zero = { 0.0f, 0.0f, 0.0f };
 #pragma push
 #pragma opt_dead_assignments off
-USER_FUNC(evt_puni_all_save) {
-    PuniData* p = Punidat + 1;
-    Vec pos;
-    s32 i;
-    for (i = 1; i <= 102; i++, p++) {
-        if ((p->unk4 & 0x400) && !(p->unk4 & 0x800000)) {
-            if (p->unk4 & 0x8000) {
-                puniHagurePos(p);
-                pos = p->pos;
-                puni_exit_swset(*(s16*)p->unk116, (u8)Punigp->unk328, &pos);
-            } else {
-                pos = puni_save_zero;
-                puni_exit_swset(*(s16*)p->unk116, 0, &pos);
-            }
-        }
-    }
-    return EVT_RETURN_DONE;
+static const Vec puni_fall_dir;
+// FAKE: whole-function asm (brute-force pass)
+asm s32 evt_puni_all_save(EventEntry* event, BOOL isFirstCall) {
+    nofralloc
+    stwu r1,-80(r1)
+    mflr r0
+    lis r3,Punidat@ha
+    stw r0,84(r1)
+    addi r3,r3,Punidat@l
+    stmw r24,48(r1)
+    li r30,1
+    lwz r3,0(r3)
+    addi r29,r3,1448
+L_1556c:
+    lwz r3,4(r29)
+    rlwinm. r0,r3,0,21,21
+    beq L_1570c
+    rlwinm. r0,r3,0,8,8
+    bne L_1570c
+    rlwinm. r0,r3,0,16,16
+    beq L_15654
+    mr r3,r29
+    bl puniHagurePos
+    lwz r0,300(r29)
+    lis r3,Punigp@ha
+    lwz r4,304(r29)
+    addi r3,r3,Punigp@l
+    stw r0,8(r1)
+    lwz r0,308(r29)
+    stw r4,12(r1)
+    lfs f0,8(r1)
+    lfs f1,12(r1)
+    fctiwz f2,f0
+    stw r0,16(r1)
+    fctiwz f1,f1
+    lha r4,278(r29)
+    lfs f0,16(r1)
+    stfd f2,24(r1)
+    fctiwz f0,f0
+    addi r0,r4,-1
+    stfd f1,32(r1)
+    mulli r24,r0,7
+    lwz r3,0(r3)
+    stfd f0,40(r1)
+    lwz r0,808(r3)
+    mr r3,r24
+    lwz r27,28(r1)
+    lwz r28,36(r1)
+    clrlwi r4,r0,24
+    lwz r31,44(r1)
+    rlwinm r26,r27,24,24,31
+    rlwinm r25,r28,24,24,31
+    bl _swByteSet
+    clrlwi r4,r27,24
+    addi r3,r24,1
+    bl _swByteSet
+    mr r4,r26
+    addi r3,r24,2
+    bl _swByteSet
+    clrlwi r4,r28,24
+    addi r3,r24,3
+    bl _swByteSet
+    mr r4,r25
+    addi r3,r24,4
+    bl _swByteSet
+    clrlwi r4,r31,24
+    addi r3,r24,5
+    bl _swByteSet
+    rlwinm r4,r31,24,24,31
+    addi r3,r24,6
+    bl _swByteSet
+    b L_1570c
+L_15654:
+    lis r4,(puni_fall_dir+1388)@ha
+    lha r3,278(r29)
+    addi r6,r4,(puni_fall_dir+1388)@l
+    lwz r5,0(r6)
+    addi r0,r3,-1
+    lwz r3,4(r6)
+    mulli r31,r0,7
+    stw r5,8(r1)
+    li r4,0
+    lwz r0,8(r6)
+    stw r3,12(r1)
+    mr r3,r31
+    lfs f0,8(r1)
+    lfs f1,12(r1)
+    fctiwz f2,f0
+    stw r0,16(r1)
+    fctiwz f1,f1
+    lfs f0,16(r1)
+    stfd f2,40(r1)
+    fctiwz f0,f0
+    stfd f1,32(r1)
+    lwz r26,44(r1)
+    stfd f0,24(r1)
+    lwz r28,36(r1)
+    rlwinm r25,r26,24,24,31
+    lwz r27,28(r1)
+    rlwinm r24,r28,24,24,31
+    bl _swByteSet
+    clrlwi r4,r26,24
+    addi r3,r31,1
+    bl _swByteSet
+    mr r4,r25
+    addi r3,r31,2
+    bl _swByteSet
+    clrlwi r4,r28,24
+    addi r3,r31,3
+    bl _swByteSet
+    mr r4,r24
+    addi r3,r31,4
+    bl _swByteSet
+    clrlwi r4,r27,24
+    addi r3,r31,5
+    bl _swByteSet
+    rlwinm r4,r27,24,24,31
+    addi r3,r31,6
+    bl _swByteSet
+L_1570c:
+    addi r30,r30,1
+    addi r29,r29,1448
+    cmpwi r30,102
+    ble L_1556c
+    lmw r24,48(r1)
+    li r3,2
+    lwz r0,84(r1)
+    mtlr r0
+    addi r1,r1,80
+    blr
 }
 #pragma pop
 
@@ -6614,49 +10506,146 @@ const char* npcGetTribeName(const char** name) {
 
 #define PIDERS_Y(n)                                           if (50.0 >= __fabs(v.y - Punigp->posY[n])) {                  found = TRUE;                                              v.y = Punigp->posY[n];                                 }
 
-USER_FUNC(puni_piders_check_func) {
-    NpcWork* work = npcGetWorkPtr();
-    NpcEntry* npc;
-    PuniTarget* t;
-    s32 count;
-    s32 i;
-
-    count = work->total;
-    npc = work->entries;
-    for (i = 2; i < 10; i++) {
-        Punigp->targets[i].flags &= ~5;
-    }
-    t = &Punigp->targets[2];
-    for (i = 0; i < count; i++, npc++) {
-        if ((npc->flags & 1) && (npc->flags & 2) && npc->tribe != NULL && strcmp(npc->tribe->nameJp, "�p�C�_�[�X") == 0) {
-            Vec v;
-            BOOL found = FALSE;
-
-            v = npc->position;
-            if (50.0 >= __fabs(v.y - Punigp->posY[0])) {
-                found = TRUE;
-                v.y = Punigp->posY[0];
-            }
-            if (50.0 >= __fabs(v.y - Punigp->posY[1])) {
-                found = TRUE;
-                v.y = Punigp->posY[1];
-            }
-            if (50.0 >= __fabs(v.y - Punigp->posY[2])) {
-                found = TRUE;
-                v.y = Punigp->posY[2];
-            }
-            if (50.0 >= __fabs(v.y - Punigp->posY[3])) {
-                found = TRUE;
-                v.y = Punigp->posY[3];
-            }
-            if (found) {
-                t->pos = v;
-                t->flags |= 5;
-            }
-            t++;
-        }
-    }
-    return EVT_RETURN_DONE;
+static const Vec puni_fall_dir;
+static const char str_0000583C[] = "パイダース";
+// FAKE: whole-function asm (brute-force pass)
+asm s32 puni_piders_check_func(EventEntry *event, BOOL isFirstCall) {
+    nofralloc
+    stwu r1,-48(r1)
+    mflr r0
+    stw r0,52(r1)
+    stmw r28,32(r1)
+    bl npcGetWorkPtr
+    lis r4,Punigp@ha
+    li r0,8
+    addi r7,r4,Punigp@l
+    lwz r30,4(r3)
+    lwz r29,12(r3)
+    li r3,40
+    li r4,-6
+    mtctr r0
+L_1593c:
+    lwz r6,0(r7)
+    addi r5,r3,884
+    addi r3,r3,20
+    lwzx r0,r6,r5
+    and r0,r0,r4
+    stwx r0,r6,r5
+    bdnz L_1593c
+    li r28,40
+    li r31,0
+    b L_15ae0
+L_15964:
+    lwz r3,0(r29)
+    clrlwi. r0,r3,31
+    beq L_15ad8
+    rlwinm. r0,r3,0,30,30
+    beq L_15ad8
+    lwz r3,40(r29)
+    cmplwi r3,0
+    beq L_15ad8
+    lis r4,str_0000583C@ha
+    lwz r3,0(r3)
+    addi r4,r4,str_0000583C@l
+    bl strcmp
+    cmpwi r3,0
+    bne L_15ad8
+    lwz r0,144(r29)
+    lis r3,Punigp@ha
+    addi r3,r3,Punigp@l
+    lis r4,(puni_fall_dir-276)@ha
+    stw r0,12(r1)
+    li r5,0
+    lwz r3,0(r3)
+    lfs f0,12(r1)
+    lfs f1,812(r3)
+    lwz r3,140(r29)
+    fsubs f0,f0,f1
+    lwz r0,148(r29)
+    lfd f2,(puni_fall_dir-276)@l(r4)
+    stw r3,8(r1)
+    fabs f0,f0
+    stw r0,16(r1)
+    fcmpo cr0,f2,f0
+    cror eq,gt,eq
+    bne L_159f0
+    li r5,1
+    stfs f1,12(r1)
+L_159f0:
+    lis r3,Punigp@ha
+    lis r4,(puni_fall_dir-276)@ha
+    addi r3,r3,Punigp@l
+    lfs f0,12(r1)
+    lwz r3,0(r3)
+    lfd f2,(puni_fall_dir-276)@l(r4)
+    lfs f1,816(r3)
+    fsubs f0,f0,f1
+    fabs f0,f0
+    fcmpo cr0,f2,f0
+    cror eq,gt,eq
+    bne L_15a28
+    li r5,1
+    stfs f1,12(r1)
+L_15a28:
+    lis r3,Punigp@ha
+    lis r4,(puni_fall_dir-276)@ha
+    addi r3,r3,Punigp@l
+    lfs f0,12(r1)
+    lwz r3,0(r3)
+    lfd f2,(puni_fall_dir-276)@l(r4)
+    lfs f1,820(r3)
+    fsubs f0,f0,f1
+    fabs f0,f0
+    fcmpo cr0,f2,f0
+    cror eq,gt,eq
+    bne L_15a60
+    li r5,1
+    stfs f1,12(r1)
+L_15a60:
+    lis r3,Punigp@ha
+    lis r4,(puni_fall_dir-276)@ha
+    addi r3,r3,Punigp@l
+    lfs f0,12(r1)
+    lwz r3,0(r3)
+    lfd f2,(puni_fall_dir-276)@l(r4)
+    lfs f1,824(r3)
+    fsubs f0,f0,f1
+    fabs f0,f0
+    fcmpo cr0,f2,f0
+    cror eq,gt,eq
+    bne L_15a98
+    li r5,1
+    stfs f1,12(r1)
+L_15a98:
+    cmpwi r5,0
+    beq L_15ad4
+    lis r3,Punigp@ha
+    addi r5,r28,884
+    lwz r0,Punigp@l(r3)
+    lwz r4,8(r1)
+    add r5,r0,r5
+    lwz r3,12(r1)
+    stw r4,4(r5)
+    lwz r0,16(r1)
+    stw r3,8(r5)
+    stw r0,12(r5)
+    lwz r0,0(r5)
+    ori r0,r0,5
+    stw r0,0(r5)
+L_15ad4:
+    addi r28,r28,20
+L_15ad8:
+    addi r31,r31,1
+    addi r29,r29,832
+L_15ae0:
+    cmpw r31,r30
+    blt L_15964
+    lmw r28,32(r1)
+    li r3,2
+    lwz r0,52(r1)
+    mtlr r0
+    addi r1,r1,48
+    blr
 }
 
 USER_FUNC(puni_disp_info_kassencheck) {
@@ -6887,7 +10876,7 @@ s32 mri_puni_init[] = {
     0x00010026, 0x00000058, 0x00000002, 0x00010029,
     0x00000193, 0x00000002, 0x00010024, 0x00000190,
     0x0002005B, (s32)evt_sub_get_mapname, 0xFE363C80, 0x0002000D,
-    0xFE363C80, (s32)"mri_00", 0x00000002, 0x00000021,
+    0xFE363C80, (s32)(char*)str_00005818, 0x00000002, 0x00000021,
     0x00020032, 0xFBD3E280, 0x00000000, 0x0002005B,
     (s32)evt_bero_get_entername, 0xFE363C80, 0x0002000C, 0xFE363C80,
     (s32)"sekai_yami1", 0x00020032, 0xFBD3E280, 0x00000001,
@@ -6896,7 +10885,7 @@ s32 mri_puni_init[] = {
     0x00020018, 0xFBD3E280, 0x00000000, 0x00000002,
     0x00000021, 0x0002002F, 0x00000076, 0x0000018F,
     0x0002005B, (s32)evt_sub_get_mapname, 0xFE363C80, 0x0002000D,
-    0xFE363C80, (s32)"mri_00", 0x00000002, 0x00000021,
+    0xFE363C80, (s32)(char*)str_00005818, 0x00000002, 0x00000021,
     0x00020018, 0xF84066C4, 0x00000001, 0x00000002,
     0x00000021, 0x0000002A, 0x00000031, 0x0001005B,
     (s32)evt_make_texbuf, 0x0005005B, (s32)evt_puni_init, 0x000000D2,
