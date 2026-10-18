@@ -200,10 +200,10 @@ void seq_loadMain(SequenceWork* seq) {
                             wp->unk40 = 2;
                         }
                     }
-                    wp->unk44 = gp->unk1294 == 0;
+                    wp->unk44 = gp->rumbleEnabled == 0;
                     wp->unk24 = wp->unk40;
                     wp->unk28 = wp->unk44;
-                    wp->slot = gp->unk11B8;
+                    wp->slot = gp->lastSlot;
                     wp->x = win_dt[wp->slot].x;
                     wp->y = win_dt[wp->slot].y;
                 }
@@ -437,7 +437,7 @@ void loadMain(SequenceWork* seq) {
                     wp->unk18 = 1;
                 } else {
                     strcpy((char*)gp->field_0x11BC, nameEntGetName());
-                    gp->unk11B8 = wp->slot;
+                    gp->lastSlot = wp->slot;
                     stg0_00_init();
                     gp->saveSlot = wp->slot;
                     marioPartyKill();
@@ -695,12 +695,12 @@ void loadMain(SequenceWork* seq) {
                 wp->unk28++;
                 SFX(5);
             } else if (trg & 0x100) {
-                gp->unk1294 = wp->unk28 == 0;
+                gp->rumbleEnabled = wp->unk28 == 0;
                 SFX(0x12);
                 wp->unk44 = wp->unk28;
                 wp->flags &= ~1;
                 wp->unk18 = 1;
-                if (gp->unk1294) {
+                if (gp->rumbleEnabled) {
                     evtEntryType(evt_shake, 0, 0, 0);
                 }
             } else if (trg & 0x200) {
@@ -1053,7 +1053,7 @@ __declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
 void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;
-    gp->unk11B8 = wp->slot;
+    gp->lastSlot = wp->slot;
     marioPartyKill();
     {
         MarioWork* m = marioGetPtr();

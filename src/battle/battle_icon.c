@@ -41,7 +41,7 @@ void BattleIconMain(void) {
 		if (icon->flags & 1) { //in use
 			if (icon->base) {
 				iconSetPos(icon->base->name, icon->position.x, icon->position.y, icon->position.z);
-				iconSetScale(icon->base->name, icon->field_0x14 * icon->field_0x18);
+				iconSetScale(icon->base->name, icon->scale * icon->scaleMul);
 				if (icon->flags & 2) {
 					iconFlagOn(icon->base->name, 2);
 				}
@@ -79,8 +79,8 @@ BattleIcon* BtlIcon_Entry(u16 iconId, f32 x, f32 y, f32 z) {
 	memset(icon, 0, sizeof(BattleIcon));
 	icon->index = i;
 	icon->flags = 1;
-	icon->field_0x14 = 1.0f;
-	icon->field_0x18 = 1.0f;
+	icon->scale = 1.0f;
+	icon->scaleMul = 1.0f;
 	icon->position.x = x;
 	icon->position.y = y;
 	icon->position.z = z;

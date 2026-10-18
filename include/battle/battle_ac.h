@@ -20,8 +20,8 @@ typedef struct BattleACDispParams {
 
 typedef struct BattleActions {
     struct BattleUnit* mAcUnit;      // 0x0
-    s32 field_0x4;                   // 0x4
-    s32 field_0x8;                   // 0x8
+    s32 setupFlags;                   // 0x4, BattleActionCommandSetup a4; bit0: auto-play while confused
+    s32 setupParam;                   // 0x8, BattleActionCommandSetup a5
     s32 mAcState;                    // 0xC
     BattleACMainCallback maincb;     // 0x10
     BattleACResultCallback resultcb; // 0x14
@@ -34,12 +34,16 @@ typedef struct BattleActions {
     s8 mAcDifficulty;                // 0x2D
     u8 field_0x2E[2];                // 0x2E
     s32 field_0x30;                  // 0x30
-    u8 field_34[0x58 - 0x34];        // 0x34
+    u32 acFlags;                     // 0x34, btlevtcmd_AcSetFlag; 0x10 tested in signal timing
+    s32 params[8];                   // 0x38, btlevtcmd_AcSetParam/AcSetParamAll/AcGetParam
     u32 outputParams[8];             // 0x58
-    u8 field_78[0x8C - 0x78];        // 0x78
+    s32 gaugeParams[4];              // 0x78, btlevtcmd_AcSetGaugeParam
+    s16 countdown;                   // 0x88, per-frame countdown in repeatedly/signal_timing/stick_rotate
+    u8 field_0x8A[0x8C - 0x8A];      // 0x8A
     BattleWorkPad pad;               // 0x8C
-    s32 field_0x288;                 // 0x288
-    u8 field_0x28C[0x30C - 0x28C];   // 0x28C
+    u32 seId;                        // 0x288, power gauge SFX id (battle_ac.c)
+    f32 seValue;                     // 0x28C, power gauge SFX value
+    u8 field_0x290[0x30C - 0x290];   // 0x290
 } BattleActions;
 // NB: 0x308 is as far as I can pin to this struct (0x1F98 in battleAcMain_PendulumCraneTiming, TODO?)
 

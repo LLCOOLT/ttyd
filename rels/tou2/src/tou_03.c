@@ -2961,19 +2961,15 @@ void screen_tev(MapTevCallbackInfo* info) {
     Mtx mtx;
     Mtx scale;
     Mtx trans;
-    s32 by;
-    s32 ry;
     u8* buf;
     s32 i;
     s32 j;
     s32 k;
     s32 n;
     s32 len;
-    s32 off;
     s32 start;
+    s32 off;
     u8 col;
-    s32 y0;
-    s32 y1;
     f32 lim;
     f32 x;
     f32 y;
@@ -2983,20 +2979,20 @@ void screen_tev(MapTevCallbackInfo* info) {
         if (screen_wp->mode) {
             buf = screen_wp->noise;
             for (i = 0; i < 64; i++) {
-                by = i / 4;
-                ry = i % 4;
                 for (j = 0; j < 64; j++) {
-                    off = (j / 8) * 32 + (by << 8); off += j % 8; off += (ry << 3); buf[off] = (i & 1) ? 0xFF : 0;
+                    off = (j / 8) * 32 + (i / 4) * 256;
+                    off = off + j % 8 + (i % 4) * 8;
+                    buf[off] = (i & 1) ? 0xFF : 0;
                 }
                 n = rand() % 100 + 100;
-                y0 = by * 256;
-                y1 = ry * 8;
                 for (k = 0; k < n; k++) {
                     len = rand() % 4 + 2;
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        off = j / 8 * 32; off = off + y0; off += j % 8; off += y1; buf[off] = col;
+                        off = (j / 8) * 32 + (i / 4) * 256;
+                        off = off + j % 8 + (i % 4) * 8;
+                        buf[off] = col;
                     }
                 }
             }
@@ -3312,7 +3308,7 @@ static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
-    s32 field_0x18 = info->field_0x18;
+    s32 field_0x18 = info->indStage;
 
     cb_set_color(gans_alpha);
     GXSetTevOrder(stage, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
@@ -3323,7 +3319,7 @@ static void callback(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     info->tevStage = stage + 1;
     info->texMap = texMap;
-    info->field_0x18 = field_0x18;
+    info->indStage = field_0x18;
     info->texCoord = texCoord;
 }
 

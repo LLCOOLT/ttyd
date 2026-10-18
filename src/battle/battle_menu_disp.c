@@ -746,8 +746,7 @@ void DrawMenuPinchMark(void) {
 void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
     f32 tx;
     s8 lines[4][0x30];
-    s32 ofs;
-    s8 c;
+    s32 line;
     const s8* p;
     s8* dst;
     s32 i;
@@ -762,28 +761,25 @@ void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
             lines[i][0] = 0;
         }
         p = (const s8*)msg;
+        line = 0;
         dst = lines[0];
-        ofs = 0;
         while (1) {
             if (*p == '<') {
                 while (*++p != '>') {
                 }
                 p++;
             }
-            c = *p;
-            if (!c) {
+            if (*p == 0) {
                 *dst = 0;
                 break;
             }
             if (*p == '\n') {
                 *dst = 0;
-                ofs += 0x30;
-                dst = lines[0];
-                dst += ofs;
+                dst = lines[++line];
                 p++;
                 continue;
             }
-            *dst = c;
+            *dst = *p;
             p++;
             dst++;
         }
@@ -806,14 +802,12 @@ void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
 }
 
 void DrawMenuCursorAndScrollArrow(Vec* v) {
-    Vec pos;
     BattleWork* wp = _battleWorkPointer;
     BattleSubMenu* menu = WP_SUBMENU(wp);
     BattleCursor* cursor = menu->cursor;
+    Vec pos;
     f32 bob;
     s32 n;
-    f32 ax = 155.0f;
-    f32 ay = 15.0f;
 
     bob = intplGetValue(4, menu->field_11C, 6, 0.0f, 10.0f);
     menu->field_11C++;
@@ -821,20 +815,14 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-        pos.y = ay + v->y;
+        pos.x = v->x + 155.0f;
+        pos.y = v->y + 15.0f + bob;
         pos.z = 0.0f;
-        {
-            f32 py = pos.y + bob;
-            pos.x = ax + v->x;
-            pos.y = py;
-        }
-
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
-        f32 x = 155.0f + v->x;
-        pos.y = 20.0f + v->y - 164.0f - bob;
-        pos.x = x;
+        pos.x = v->x + 155.0f;
+        pos.y = v->y + 20.0f - 164.0f - bob;
         pos.z = 0.0f;
         iconDispGx(&pos, 0x10, 0x1B6, 0.75f);
     }
@@ -845,12 +833,9 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
     if (n >= 6) {
         n = 5;
     }
-    {
-        f32 y = v->y - (f32)n * 24.0f;
-        pos.x = v->x;
-        pos.z = 0.0f;
-        pos.y = y;
-    }
+    pos.y = v->y - n * 24.0f;
+    pos.x = v->x;
+    pos.z = 0.0f;
     iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
 }
 
@@ -983,7 +968,6 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
     f32 s;
     s32 sw;
     s32 nn;
-    s32 nn2;
 
     if (BattleGetUnitPtr(wp, wp->activeUnitId)->currentKind == 0xDE) {
         mainCursor = &wp->commandMenu.cursor[0];
@@ -995,15 +979,10 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
         n = cursor->unk8;
     }
     prev = cursor->field_4;
-    nn2 = n;
-    {
-        s32 p = cursor->field_4;
-        s32 m = n - 1;
-        if (cursor->field_0 <= p) {
-            cursor->field_4 = cursor->field_0 - 1;
-        } else if (cursor->field_0 >= p + m) {
-            cursor->field_4 = cursor->field_0 - n + 2;
-        }
+    if (cursor->field_0 <= cursor->field_4) {
+        cursor->field_4 = cursor->field_0 - 1;
+    } else if (cursor->field_0 >= cursor->field_4 + n - 1) {
+        cursor->field_4 = cursor->field_0 - n + 2;
     }
     if (cursor->field_4 < 0) {
         cursor->field_4 = 0;
@@ -1032,12 +1011,12 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
             if (cnt == mainCursor->unk8 && cnt2 == 7) {
                 menu->field_C = 2;
             }
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
             break;
         case 2:
             menu->field_14 = 1;
             menu->field_98 = cursor->field_4;
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
             break;
         case 10:
         case 20:
@@ -1056,7 +1035,7 @@ void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d
                 menu->field_C = 2;
                 menu->field_98 = cursor->field_4;
             }
-            DrawSubMenuCommonProcessSub1(menu, cursor, prev, nn2);
+            DrawSubMenuCommonProcessSub1(menu, cursor, prev, n);
             break;
     }
     menu->field_1C = 0;

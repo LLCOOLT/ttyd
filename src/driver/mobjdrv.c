@@ -325,7 +325,7 @@ void mobjDispXLU(CameraId camId, void* param) {
 
     if (entry->flags & 0x400) {
         animSetPaperTexMtx(entry->paperTexMtx, NULL, NULL);
-        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->unk208, NULL, NULL, 1, 1);
+        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->paperTexData, NULL, NULL, 1, 1);
     }
     animPoseDraw(entry->poseId, entry->position.x, entry->position.y, entry->position.z, entry->rotation.y,
                  10.0f * entry->scale.x, 1);
@@ -345,7 +345,7 @@ void mobjDisp(CameraId camId, void* param) {
 
     if (entry->flags & 0x400) {
         animSetPaperTexMtx(entry->paperTexMtx, NULL, NULL);
-        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->unk208, NULL, NULL, 1, 1);
+        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->paperTexData, NULL, NULL, 1, 1);
     }
     disp = dispGetCurWork();
     switch (disp->renderMode) {
@@ -377,7 +377,7 @@ void mobjDisp_OffscreenXLU(CameraId camId, void* param) {
     GXClearBoundingBox();
     if (entry->flags & 0x400) {
         animSetPaperTexMtx(entry->paperTexMtx, NULL, NULL);
-        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->unk208, NULL, NULL, 1, 1);
+        animSetPaperTexObj(&entry->paperTexObj, NULL, NULL, entry->paperTexData, NULL, NULL, 1, 1);
     }
     animPoseDraw(entry->poseId, entry->position.x, entry->position.y, entry->position.z, entry->rotation.y,
                  10.0f * entry->scale.x, 1);
@@ -540,9 +540,9 @@ s32 mobjEntry(const char* name, const char* animPoseName) {
     entry->position = (Vec){ 0.0f, 0.0f, 0.0f };
     entry->scale = (Vec){ 1.0f, 1.0f, 1.0f };
     entry->rotation = (Vec){ 0.0f, 0.0f, 0.0f };
-    entry->unk5C = (Vec){ 0.0f, 0.0f, 0.0f };
-    entry->unk68 = 1.0f;
-    entry->unk6C = 1.0f;
+    entry->velocity = (Vec){ 0.0f, 0.0f, 0.0f };
+    entry->gravity = 1.0f;
+    entry->bounce = 1.0f;
     entry->camId = CAMERA_3D;
     entry->poseId = animPoseEntry(animPoseName, gp->inBattle != 0);
     animPosePeraOff(entry->poseId);
@@ -661,9 +661,9 @@ void mobjMain(void) {
         } else {
             WH(0) = NULL;
         }
-        if (((HitEntry*)mario->field_0x1F4) != NULL) {
-            if (WH(1) == NULL || strcmp(hitGetName(WH(1)), hitGetName(((HitEntry*)mario->field_0x1F4))) != 0) {
-                hitJump = WH(1) = ((HitEntry*)mario->field_0x1F4);
+        if (((HitEntry*)mario->hitobjHead) != NULL) {
+            if (WH(1) == NULL || strcmp(hitGetName(WH(1)), hitGetName(((HitEntry*)mario->hitobjHead))) != 0) {
+                hitJump = WH(1) = ((HitEntry*)mario->hitobjHead);
             }
         } else {
             WH(1) = NULL;
@@ -675,9 +675,9 @@ void mobjMain(void) {
         } else {
             WH(2) = NULL;
         }
-        if (((HitEntry*)mario->field_0x1E0) != NULL) {
-            if (WH(3) == NULL || strcmp(hitGetName(WH(3)), hitGetName(((HitEntry*)mario->field_0x1E0))) != 0) {
-                WH(3) = ((HitEntry*)mario->field_0x1E0);
+        if (((HitEntry*)mario->hitobjFront) != NULL) {
+            if (WH(3) == NULL || strcmp(hitGetName(WH(3)), hitGetName(((HitEntry*)mario->hitobjFront))) != 0) {
+                WH(3) = ((HitEntry*)mario->hitobjFront);
             }
         } else {
             WH(3) = NULL;
@@ -707,21 +707,21 @@ void mobjMain(void) {
             entry->flags &= ~4;
         }
         if (entry->flags & 0x40) {
-            if (entry->unk5C.y >= 0.0f) {
-                entry->position.y += entry->unk5C.y;
-                entry->unk5C.y -= entry->unk68;
+            if (entry->velocity.y >= 0.0f) {
+                entry->position.y += entry->velocity.y;
+                entry->velocity.y -= entry->gravity;
             } else {
-                dist = 10.0f + (1.0f + (f32)__fabs(entry->unk5C.y));
+                dist = 10.0f + (1.0f + (f32)__fabs(entry->velocity.y));
                 if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, entry->position.x,
                                    10.0f + entry->position.y, entry->position.z, 0.0f, -1.0f, 0.0f) != NULL) {
                     entry->position.y = hy;
-                    entry->unk5C.y = (-0.5f * entry->unk6C) * entry->unk5C.y;
-                    if (__fabs(entry->unk5C.y) <= 2.0) {
-                        entry->unk5C.y = 0.0f;
+                    entry->velocity.y = (-0.5f * entry->bounce) * entry->velocity.y;
+                    if (__fabs(entry->velocity.y) <= 2.0) {
+                        entry->velocity.y = 0.0f;
                     }
                 } else {
-                    entry->position.y += entry->unk5C.y;
-                    entry->unk5C.y -= entry->unk68;
+                    entry->position.y += entry->velocity.y;
+                    entry->velocity.y -= entry->gravity;
                 }
             }
             mobjCalcMtx(entry);
@@ -730,43 +730,43 @@ void mobjMain(void) {
             hit = 0;
             hitPtr = entry->hitObj[0].hitObject;
             if ((s32)MB(mario, 0x3c, u8) != 2) {
-                if ((entry->flags & 0x10000) && MB(mario, 0x1fc, HitEntry*) == hitPtr) {
+                if ((entry->flags & 0x10000) && mario->field_0x1FC == hitPtr) {
                     if (MB(marioGetPtr(), 0x90, f32) <= 5.0f + entry->position.y) {
-                        entry->unk1E0 = 0x10000;
+                        entry->hitFlag = 0x10000;
                         hit = 1;
                         goto hitDone;
                     }
                 }
                 if ((entry->flags & 0x400000) && hitJump == hitPtr) {
-                    entry->unk1E0 = 0x400000;
+                    entry->hitFlag = 0x400000;
                     hit = 1;
                     goto hitDone;
                 }
-                if ((entry->flags & 0x200000) && MB(mario, 0x1e4, HitEntry*) == hitPtr) {
-                    entry->unk1E0 = 0x200000;
+                if ((entry->flags & 0x200000) && mario->hitobjStandOn == hitPtr) {
+                    entry->hitFlag = 0x200000;
                     hit = 1;
                     goto hitDone;
                 }
-                if ((entry->flags & 0x1000000) && MB(mario, 0x1e4, HitEntry*) == hitPtr && marioChkHipBump()) {
-                    entry->unk1E0 = 0x1000000;
+                if ((entry->flags & 0x1000000) && mario->hitobjStandOn == hitPtr && marioChkHipBump()) {
+                    entry->hitFlag = 0x1000000;
                     hit = 1;
                     goto hitDone;
                 }
-                if (unk_8005bb80() && (entry->flags & 0x40000) && MB(mario, 0x1e0, HitEntry*) == hitPtr &&
-                    (MB(mario, 0x248, u16) & 0x100) && !partyFlag) {
-                    entry->unk1E0 = 0x40000;
+                if (unk_8005bb80() && (entry->flags & 0x40000) && mario->hitobjFront == hitPtr &&
+                    (mario->buttonBuffer & 0x100) && !partyFlag) {
+                    entry->hitFlag = 0x40000;
                     hit = 1;
                     goto hitDone;
                 }
                 if ((entry->flags & 0x800000) && party != NULL) {
                     if (MB(party, 0x130, HitEntry*) == hitPtr) {
-                        entry->unk1E0 = 0x800000;
+                        entry->hitFlag = 0x800000;
                         hit = 1;
                         goto hitDone;
                     } else if (MB(party, 0x130, HitEntry*) != NULL && (s32)MB(party, 0x31, u8) == 3) {
                         if (PSVECDistance(&party->position, &entry->position) <
-                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + MB(party, 0xf4, f32)) {
-                            entry->unk1E0 = 0x800000;
+                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + party->width) {
+                            entry->hitFlag = 0x800000;
                             hit = 1;
                             goto hitDone;
                         }
@@ -774,13 +774,13 @@ void mobjMain(void) {
                 }
                 if ((entry->flags & 0x2000000) && party != NULL && (s32)MB(party, 0x31, u8) == 3) {
                     if (MB(party, 0x130, HitEntry*) == hitPtr) {
-                        entry->unk1E0 = 0x2000000;
+                        entry->hitFlag = 0x2000000;
                         hit = 1;
                         goto hitDone;
                     } else if (MB(party, 0x130, HitEntry*) != NULL) {
                         if (PSVECDistance(&party->position, &entry->position) <
-                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + MB(party, 0xf4, f32)) {
-                            entry->unk1E0 = 0x800000;
+                            MB(entry->hitObj[0].hitObject, 0xcc, f32) + party->width) {
+                            entry->hitFlag = 0x800000;
                             hit = 1;
                             goto hitDone;
                         }
@@ -790,7 +790,7 @@ void mobjMain(void) {
                 if (entry->flags & 0x4000000) {
                     for (k = 0; k < 10; k++) {
                         if (kpaGetHitobjHead(k) == hitPtr) {
-                            entry->unk1E0 = 0x4000000;
+                            entry->hitFlag = 0x4000000;
                             hit = 1;
                             break;
                         }
@@ -799,29 +799,29 @@ void mobjMain(void) {
                 if (entry->flags & 0x10000000) {
                     for (k = 0; k < 10 && hit == 0; k++) {
                         if (kpaGetHitobjRide(k) == hitPtr && kpaHipAttackCheck()) {
-                            entry->unk1E0 = 0x10000000;
+                            entry->hitFlag = 0x10000000;
                             hit = 1;
                             break;
                         }
                     }
                 }
                 if ((entry->flags & 0x8000000) && kpaGetHitobj() == hitPtr && kpaGetLevel() == 3) {
-                    entry->unk1E0 = 0x8000000;
+                    entry->hitFlag = 0x8000000;
                     hit = 1;
                     goto hitDone;
                 }
                 if ((entry->flags & 0x20000000) && kpaGetHitFlame() == hitPtr) {
-                    entry->unk1E0 = 0x20000000;
+                    entry->hitFlag = 0x20000000;
                     hit = 1;
                     goto hitDone;
                 }
-                if ((entry->flags & 0x80000) && MB(mario, 0x1e0, HitEntry*) == hitPtr) {
-                    entry->unk1E0 = 0x80000;
+                if ((entry->flags & 0x80000) && mario->hitobjFront == hitPtr) {
+                    entry->hitFlag = 0x80000;
                     hit = 1;
                     goto hitDone;
                 }
-                if ((entry->flags & 0x200000) && MB(mario, 0x1e4, HitEntry*) == hitPtr) {
-                    entry->unk1E0 = 0x200000;
+                if ((entry->flags & 0x200000) && mario->hitobjStandOn == hitPtr) {
+                    entry->hitFlag = 0x200000;
                     hit = 1;
                 }
             }
@@ -1054,9 +1054,9 @@ extern const char kururinName[];
 static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was always inlined in retail but not in demo
     if (!strcmp(entry->animName, kururinName)) {
         ItemEntry* item = itemNameToPtr(entry->name);
-        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->unk1E4) == 0))
+        if ((item != NULL && (item->flags & 1) && evtGetValue(0, entry->flagVar) == 0))
             return 1;
-        else if ((evtGetValue(0, entry->unk1E4) != 0))
+        else if ((evtGetValue(0, entry->flagVar) != 0))
             return 1;
         else
             return 2;
@@ -1068,7 +1068,7 @@ static inline int mobjCheckKururingFloorItem(MapObjectEntry* entry) { // was alw
 s32 mobjCheckItemboxOpen(MapObjectEntry* entry) {
     if (strcmp(entry->animName, "MOBJ_TreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BigTreasureBox") == 0 ||
         strcmp(entry->animName, "MOBJ_GrayTreasureBox") == 0 || strcmp(entry->animName, "MOBJ_BlackTreasureBox") == 0) {
-        if (entry->unk1DC == 99)
+        if (entry->state == 99)
             return 2;
         else
             return 1;
@@ -1143,9 +1143,9 @@ MapObjectEntry* mobjNearDistCheck2(f32 x, f32 y, f32 z, f32 minMagnitude, char**
 const char kururinName[] = "MOBJ_KururinFloor";
 
 void mobjStrippedFallPool(MapObjectEntry* entry) {
-    entry->unk5C.y = 0.0f;
+    entry->velocity.y = 0.0f;
     entry->position.y = 10.0f;
     entry->position.x = 1.0f;
     entry->position.z = -1.0f;
-    entry->unk5C.x = -0.5f;
+    entry->velocity.x = -0.5f;
 }

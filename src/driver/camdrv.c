@@ -483,14 +483,14 @@ void cam3dMain(CameraEntry* camera) {
 
             if (!(camera->flags & 0x10)) {
                 camera->marioPos.y +=
-                    (((1.0f + marioGetPtr()->field_EC.y) - camera->marioPos.y) * marioGetCamFollowRate());
+                    (((1.0f + marioGetPtr()->camTarget.y) - camera->marioPos.y) * marioGetCamFollowRate());
             }
-            camera->marioPos.x = 0.01f + marioGetPtr()->field_EC.x;
-            camera->marioPos.z = marioGetPtr()->field_EC.z;
+            camera->marioPos.x = 0.01f + marioGetPtr()->camTarget.x;
+            camera->marioPos.z = marioGetPtr()->camTarget.z;
             camera->dollyStart = 0.0f;
-            camera->marioAt.x = marioGetPtr()->field_F8.x;
-            camera->marioAt.y = 1.0f + marioGetPtr()->field_F8.y;
-            camera->marioAt.z = marioGetPtr()->field_F8.z;
+            camera->marioAt.x = marioGetPtr()->camCollision.x;
+            camera->marioAt.y = 1.0f + marioGetPtr()->camCollision.y;
+            camera->marioAt.z = marioGetPtr()->camCollision.z;
 
             {
                 f32 t, it;

@@ -10,8 +10,8 @@ typedef struct MapData {
 typedef struct AreaData {
     const char* areaName;
     const char* areaJpName;
-    void* field_8;
-    void* field_C;
+    void* btlSetupTbl;   // BattleSetupData table, set by relSetBtlAddr
+    void* btlSetupNoTbl; // NpcTerritoryInfo table, set by relSetBtlAddr
     MapData* maps[];
 } AreaData;
 
@@ -24,4 +24,4 @@ typedef struct WorldData {
 MapData* mapDataPtr(const char* mapName);
 AreaData* areaDataPtr(const char* areaName);
 void relSetEvtAddr(const char* mapName, s32* eventAddr);
-void relSetBtlAddr(const char* areaName, void* field_8, void* field_C);
+void relSetBtlAddr(const char* areaName, void* btlSetupTbl, void* btlSetupNoTbl);

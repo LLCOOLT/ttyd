@@ -515,7 +515,7 @@ inline Vec initializeVec(Vec* input) {
 
 void effUltraHammerDisp(enum CameraId camId, void *param)
 {
-  u32 new_var2[2];
+  u32 new_var2[2]; // FAKE: register-promoted array (vtx fmt + loop counter); separate scalars differ
   CameraEntry *temp_r31;
   EffUltraHammerData *data;
   s32 i;

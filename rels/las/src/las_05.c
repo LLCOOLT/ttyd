@@ -426,7 +426,7 @@ USER_FUNC(kurokaron_move_position) {
     if (kurokaron_run_cnt != 0) {
         kurokaron_run_cnt--;
     }
-    if (npc->field_2FC) {
+    if (npc->wallHit) {
         f32 angle = angleABf(mario->position.x, mario->position.z, npc->position.x, npc->position.z);
 
         if (kurokaron_move_flag & 4) {
@@ -823,11 +823,11 @@ static void senkaron_ext_main(void) {
         skwp->hammerFrame = 0;
     }
     if (mario->currMotionId == 0x12 && skwp->hammerFrame == 10) {
-        if (0.0f == mario->unk1AC) {
+        if (0.0f == mario->displayDirectionTarget) {
             hammerDir = 1;
-        } else if (180.0f == mario->unk1AC) {
+        } else if (180.0f == mario->displayDirectionTarget) {
             hammerDir = 2;
-        } else if (mario->unk1A8 < 90.0f || 270.0f < mario->unk1A8) {
+        } else if (mario->displayDirection < 90.0f || 270.0f < mario->displayDirection) {
             hammerDir = 1;
         } else {
             hammerDir = 2;

@@ -24,54 +24,6 @@
 #include <string.h>
 #include <stdio.h>
 
-typedef struct ShopObj {
-	const char* mobj; //0x0
-	const char* hit; //0x4
-} ShopObj;
-
-typedef struct ShopItem {
-	s32 id; //0x0
-	s32 price; //0x4
-} ShopItem;
-
-typedef struct ShopperData {
-	const char* name; //0x0
-	void* fook_evt; //0x4
-	void* buy_evt; //0x8
-	const char* msgs[1]; //0xC
-} ShopperData;
-
-typedef struct ShopPoint {
-	s32 pts; //0x0
-	s32 item; //0x4
-} ShopPoint;
-
-typedef struct ShopDb {
-	s32 id; //0x0
-	s16 price; //0x4
-	s16 save; //0x6
-} ShopDb;
-
-typedef struct ShopWork {
-	u16 flags; //0x0
-	ShopObj* objs; //0x4
-	ShopItem* items; //0x8
-	ShopperData* shopper; //0xC
-	ShopDb* db; //0x10
-	u16 itemFlags[6]; //0x14
-	s32 count; //0x20
-	EventEntry* mainEvt; //0x24
-	EventEntry* buyEvt; //0x28
-	s32 cur; //0x2C
-	u8 field_0x30[0x38 - 0x30]; //0x30
-	s32 points; //0x38
-	u8 field_0x3C[0x50 - 0x3C]; //0x3C
-	s32 win[3]; //0x50
-	u8 field_0x5C[0xD0 - 0x5C]; //0x5C
-	s32 sel; //0xD0
-	s32 buyItem; //0xD4
-} ShopWork;
-
 #define SHOP_PTS(p) (*(s16*)&(p)->mShopPoints)
 
 extern GlobalWork* gp;
@@ -775,7 +727,7 @@ void list_disp(WinMgrEntry* entry) {
 	for (; shopPointList[i].pts != -1; i++) {
 		item = &itemDataTable[shopPointList[i].item];
 		FontDrawStart();
-		if (pouch->field_0x5B4 & (mask = 1 << i)) {
+		if (pouch->shopPointRewardFlags & (mask = 1 << i)) {
 			FontDrawColor(dat_8041bbf8);
 		}
 		else {
@@ -784,7 +736,7 @@ void list_disp(WinMgrEntry* entry) {
 		sprintf(buf, "%s", winZenkakuStr(shopPointList[i].pts));
 		FontDrawMessage(entry->x + (entry->width / 2 - (s32)FontGetMessageWidth(buf)) - 90, entry->y - 20 - i * 26, buf);
 		FontDrawStart();
-		if (pouch->field_0x5B4 & mask) {
+		if (pouch->shopPointRewardFlags & mask) {
 			FontDrawColor(dat_8041bc00);
 		}
 		else {
@@ -797,7 +749,7 @@ void list_disp(WinMgrEntry* entry) {
 		FontDrawMessageMtx(m, buf);
 		msg = msgSearch(item->name);
 		FontDrawStart();
-		if (pouch->field_0x5B4 & mask) {
+		if (pouch->shopPointRewardFlags & mask) {
 			FontDrawColor(dat_8041bc08);
 		}
 		else {
@@ -957,7 +909,7 @@ USER_FUNC(add_shop_point) {
 USER_FUNC(reset_shop_point) {
 	PouchData* pouch = pouchGetPtr();
 	SHOP_PTS(pouch) = 0;
-	pouch->field_0x5B4 = 0;
+	pouch->shopPointRewardFlags = 0;
 	return EVT_RETURN_DONE;
 }
 
@@ -971,7 +923,7 @@ USER_FUNC(chk_shop_point) {
 	s32 v;
 
 	for (p = shopPointList; (v = p->pts) != -1; i++, p++) {
-		if (v <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
+		if (v <= SHOP_PTS(pouch) && !(pouch->shopPointRewardFlags & (1 << i))) {
 			if (SHOP_PTS(pouch) != 300) {
 				evtSetValue(event, args[0], 0);
 				evtSetValue(event, args[1], p->item);
@@ -1000,8 +952,8 @@ USER_FUNC(exchange_shop_point) {
 	s32 v;
 
 	for (p = shopPointList; (v = p->pts) != -1; i++, p++) {
-		if (v <= SHOP_PTS(pouch) && !(pouch->field_0x5B4 & (1 << i))) {
-			pouch->field_0x5B4 |= (1 << i);
+		if (v <= SHOP_PTS(pouch) && !(pouch->shopPointRewardFlags & (1 << i))) {
+			pouch->shopPointRewardFlags |= (1 << i);
 			return EVT_RETURN_DONE;
 		}
 	}

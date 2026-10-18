@@ -171,7 +171,7 @@ void partyChkGnd(PartyEntry* party) {
 
     if (!(party->flags & 0x2000000)) {
         attr = 0;
-        hit = partySearchGround(party, 11.0f, PF(party, 0x114));
+        hit = partySearchGround(party, 11.0f, party->velY);
         if (hit) {
             attr = hitGetAttr(hit);
             if (attr & 0x200) {
@@ -183,7 +183,7 @@ void partyChkGnd(PartyEntry* party) {
         if (hit == NULL) {
             party->flags &= ~0x2;
             partyChgMot(party, 3);
-            PF(party, 0x11C) = -1.0f;
+            party->gravity = -1.0f;
         } else {
             party->flags |= 0x2;
             if (attr & 0x100) {
@@ -197,7 +197,7 @@ void partyChkGnd(PartyEntry* party) {
             partyChkFrontStep(party, 11.0f, &a, &b, &c);
             if (a - party->position.y >= 5.0f && PF(party, 0xE0) <= 30.0f) {
                 PF(party, 0x120) = a;
-                if (PF(party, 0x104)) {
+                if (party->moveSpeed) {
                     partyChgMot(party, 6);
                 }
             }
@@ -238,10 +238,10 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     PF(party, 0xE4) = party->position.y;
     PF(party, 0xE8) = -1.0f;
-    if (PF(party, 0x104)) {
-        rad = PF(party, 0x100);
+    if (party->moveSpeed) {
+        rad = party->targetDir;
     } else {
-        rad = partyToMovedir(party, PF(party, 0x10C));
+        rad = partyToMovedir(party, party->displayDirection);
     }
     rad = 3.1415927f * rad / 180.0f;
     nsz = (f32)sin(rad); sx = 0.375f * (party->width * nsz); nsz = (f32)cos(rad); sz = 0.375f * (party->width * -nsz);
@@ -325,10 +325,10 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     h = partyGetHeight(party);
     *outY = party->position.y;
     *outDist = -1.0f;
-    if (PF(party, 0x104)) {
-        ang = PF(party, 0x100);
+    if (party->moveSpeed) {
+        ang = party->targetDir;
     } else {
-        ang = toMovedir(PF(party, 0x10C));
+        ang = toMovedir(party->displayDirection);
     }
     ang = revise360((s32)(0.5f + ang));
     dx = 0.265f * party->width;

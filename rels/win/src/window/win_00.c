@@ -1112,7 +1112,7 @@ USER_FUNC(win_item_move_3d_position) {
         event->userdata[0] = gp->renderTime;
         event->userdataf[1] = item->position.x;
         event->userdataf[2] = item->position.y;
-        *(f32*)&event->field_84 = item->position.z;
+        *(f32*)&event->userdata3 = item->position.z;
     }
     elapsed = OSTicksToMilliseconds((u32)gp->renderTime - event->userdata[0]);
     if (elapsed < frames) {
@@ -1120,7 +1120,7 @@ USER_FUNC(win_item_move_3d_position) {
         isFirstCall = elapsed;
         item->position.x = intplGetValue(mode, isFirstCall, frames, event->userdataf[1], x);
         item->position.y = yOffset + intplGetValue(mode, isFirstCall, frames, event->userdataf[2], y);
-        item->position.z = intplGetValue(mode, isFirstCall, frames, *(f32*)&event->field_84, z);
+        item->position.z = intplGetValue(mode, isFirstCall, frames, *(f32*)&event->userdata3, z);
         return EVT_RETURN_BLOCK;
     }
     item->position.x = x;

@@ -94,7 +94,7 @@ void nameEntInit(void) {
 }
 
 void nameEntReInit(void) {
-	wp->field_0x4 = 3;
+	wp->loadState = 3;
 }
 
 BOOL nameEntPrepare(void) {
@@ -104,23 +104,23 @@ BOOL nameEntPrepare(void) {
 void nameEntOn(s32 type) {
 	s32 i;
 
-	wp->field_0x0 = 0;
-	wp->field_0xC = type;
-	wp->field_0x4 = 1;
-	wp->field_0x8 = 0;
-	wp->field_0x50 = hiragana_tbl;
-	wp->field_0x18 = 0;
-	wp->field_0x10 = 0;
-	wp->field_0x14 = 0;
-	wp->x1 = wp->x2 = (f32)(wp->field_0x10 * 24 - 190 + (wp->field_0x10 / 5) * 30);
-	wp->y1 = wp->y2 = (f32)(112 - wp->field_0x14 * 28);
-	wp->field_0x2C = wp->field_0x34 = -106.0f;
-	wp->field_0x30 = wp->field_0x38 = 135.0f;
-	strcpy(wp->field_0x3C, "\0\0\0");
+	wp->flags = 0;
+	wp->type = type;
+	wp->loadState = 1;
+	wp->state = 0;
+	wp->charTable = hiragana_tbl;
+	wp->nameLen = 0;
+	wp->cursorX = 0;
+	wp->cursorY = 0;
+	wp->x1 = wp->x2 = (f32)(wp->cursorX * 24 - 190 + (wp->cursorX / 5) * 30);
+	wp->y1 = wp->y2 = (f32)(112 - wp->cursorY * 28);
+	wp->caretX = wp->caretTargetX = -106.0f;
+	wp->caretY = wp->caretTargetY = 135.0f;
+	strcpy(wp->name, "\0\0\0");
 	for (i = 0; i < 8; i++) {
-		strcat(wp->field_0x3C, "\x81\x40");
+		strcat(wp->name, "\x81\x40");
 	}
-	wp->field_0x54 = 0.0f;
+	wp->maskAlpha = 0.0f;
 	switch (type) {
 		case 2:
 			hiragana_tbl[9] = "\x81\x40";
@@ -134,62 +134,62 @@ void nameEntOn(s32 type) {
 }
 
 void nameEntOff(void) {
-	wp->field_0x4 = 3;
+	wp->loadState = 3;
 }
 
 BOOL nameEntWait(void) {
-	wp->field_0x0 |= 1;
-	return wp->field_0x8 != 0x65;
+	wp->flags |= 1;
+	return wp->state != 0x65;
 }
 
 BOOL nameEntIsCancel(void) {
-	return (wp->field_0x0 >> 1) & 1;
+	return (wp->flags >> 1) & 1;
 }
 
 const char* nameEntGetName(void) {
 	s32 j;
 
-	if (wp->field_0x8 != 0x65) {
+	if (wp->state != 0x65) {
 		return NULL;
 	}
 	for (j = 7; j >= 1; j--) {
-		if (strncmp(&wp->field_0x3C[j * 2], "\x81\x40", 2)) {
+		if (strncmp(&wp->name[j * 2], "\x81\x40", 2)) {
 			break;
 		}
-		wp->field_0x3C[j * 2] = 0;
-		wp->field_0x3C[j * 2 + 1] = 0;
+		wp->name[j * 2] = 0;
+		wp->name[j * 2 + 1] = 0;
 	}
-	return wp->field_0x3C;
+	return wp->name;
 }
 
 static inline BOOL nameEntLoad(void) {
 	if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0U) {
-		wp->field_0x60 = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
+		wp->tplFile = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
 		return TRUE;
 	}
 	return FALSE;
 }
 
 void nameEntMain(void) {
-	switch (wp->field_0x4) {
+	switch (wp->loadState) {
 		case 0:
 			break;
 		case 1:
 			if (nameEntLoad()) {
-				wp->field_0x4++;
+				wp->loadState++;
 			}
 		case 2:
 			nameMain();
 			break;
 		case 3:
-			if (wp->field_0x60) {
-				fileFree(wp->field_0x60);
+			if (wp->tplFile) {
+				fileFree(wp->tplFile);
 			}
-			wp->field_0x60 = NULL;
-			wp->field_0x4 = 0;
+			wp->tplFile = NULL;
+			wp->loadState = 0;
 			break;
 	}
-	if (wp->field_0x4 > 1) {
+	if (wp->loadState > 1) {
 		dispEntry(CAMERA_3D, 0.0f, 7, nameEntDisp, NULL);
 	}
 }
@@ -203,24 +203,24 @@ s32 nameMain(void) {
 	f32 dist;
 
 	dist = distABf(wp->x2, wp->y2, wp->x1, wp->y1);
-	switch (wp->field_0x8) {
+	switch (wp->state) {
 		case 0:
-			if ((wp->field_0x0 & 1) && gp->unk8 == 0) {
+			if ((wp->flags & 1) && gp->unk8 == 0) {
 				if (keyGetButtonTrg(0) & 0x100) {
-					off = wp->field_0x10;
-					if (off >= 10 && wp->field_0x14 >= 4) {
-						switch (wp->field_0x14) {
+					off = wp->cursorX;
+					if (off >= 10 && wp->cursorY >= 4) {
+						switch (wp->cursorY) {
 							case 4:
-								wp->field_0x50 = hiragana_tbl;
+								wp->charTable = hiragana_tbl;
 								psndSFXOn((const char*)0x2000C);
 								break;
 							case 5:
-								wp->field_0x50 = katakana_tbl;
+								wp->charTable = katakana_tbl;
 								psndSFXOn((const char*)0x2000C);
 								break;
 							case 6:
-								if (wp->field_0x18 > 0) {
-									wp->field_0x18--;
+								if (wp->nameLen > 0) {
+									wp->nameLen--;
 									psndSFXOn((const char*)0x2000B);
 															}
 								break;
@@ -228,19 +228,19 @@ s32 nameMain(void) {
 								s32 n;
 								s32 k;
 								s32 o;
-								n = strlen(wp->field_0x3C) / 2;
+								n = strlen(wp->name) / 2;
 								for (k = 0, o = 0; k < n; o += 2, k++) {
-									if (strncmp(&wp->field_0x3C[o], "\x81\x40", 2)) {
+									if (strncmp(&wp->name[o], "\x81\x40", 2)) {
 										break;
 									}
 								}
-								if (k < n || wp->field_0xC != 0) {
-									wp->field_0x5C = 1;
-									wp->field_0x8 = 100;
+								if (k < n || wp->type != 0) {
+									wp->confirmSel = 1;
+									wp->state = 100;
 									psndSFXOn((const char*)0x20012);
-									if (wp->field_0xC == 1 && k >= n) {
-										strcpy(wp->field_0x3C, msgSearch("name_party3"));
-										wp->field_0x18 = strlen(wp->field_0x3C) / 2;
+									if (wp->type == 1 && k >= n) {
+										strcpy(wp->name, msgSearch("name_party3"));
+										wp->nameLen = strlen(wp->name) / 2;
 									}
 								} else {
 									psndSFXOn((const char*)0x20014);
@@ -248,163 +248,163 @@ s32 nameMain(void) {
 }
 								break;
 						}
-					} else if (wp->field_0x18 < 8) {
-						((u16*)wp->field_0x3C)[wp->field_0x18] = *(u16*)wp->field_0x50[wp->field_0x14 * 14 + off];
-						wp->field_0x18++;
-						if (wp->field_0x18 >= 8) {
-							wp->field_0x18 = 7;
-							wp->field_0x10 = 10;
-							wp->field_0x14 = 7;
+					} else if (wp->nameLen < 8) {
+						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + off];
+						wp->nameLen++;
+						if (wp->nameLen >= 8) {
+							wp->nameLen = 7;
+							wp->cursorX = 10;
+							wp->cursorY = 7;
 						}
 						psndSFXOn((const char*)0xA);
-					} else if (wp->field_0x18 == 8) {
-						wp->field_0x18 = 7;
-						((u16*)wp->field_0x3C)[wp->field_0x18] = *(u16*)wp->field_0x50[wp->field_0x14 * 14 + wp->field_0x10];
-						wp->field_0x10 = 10;
-						wp->field_0x14 = 7;
+					} else if (wp->nameLen == 8) {
+						wp->nameLen = 7;
+						((u16*)wp->name)[wp->nameLen] = *(u16*)wp->charTable[wp->cursorY * 14 + wp->cursorX];
+						wp->cursorX = 10;
+						wp->cursorY = 7;
 						psndSFXOn((const char*)0xA);
 					}
 				} else if (keyGetButtonTrg(0) & 0x1000) {
-					len = strlen(wp->field_0x3C) / 2;
+					len = strlen(wp->name) / 2;
 					for (j = 0, off = 0; j < len; off += 2, j++) {
-						if (strncmp(&wp->field_0x3C[off], "\x81\x40", 2)) {
+						if (strncmp(&wp->name[off], "\x81\x40", 2)) {
 							break;
 						}
 					}
-					if (j < len || wp->field_0xC != 0) {
-						wp->field_0x5C = 1;
-						wp->field_0x8 = 100;
+					if (j < len || wp->type != 0) {
+						wp->confirmSel = 1;
+						wp->state = 100;
 						psndSFXOn((const char*)0x12);
-						if (wp->field_0xC == 1 && j >= len) {
-							strcpy(wp->field_0x3C, msgSearch("name_party3"));
-							wp->field_0x18 = strlen(wp->field_0x3C) / 2;
+						if (wp->type == 1 && j >= len) {
+							strcpy(wp->name, msgSearch("name_party3"));
+							wp->nameLen = strlen(wp->name) / 2;
 						}
 					} else {
 						psndSFXOn((const char*)0x20014);
 					}
 				} else if (keyGetButtonTrg(0) & 0x200) {
-					if (wp->field_0x18 == 0 && wp->field_0xC == 0 && !strncmp(wp->field_0x3C, "\x81\x40", 2)) {
+					if (wp->nameLen == 0 && wp->type == 0 && !strncmp(wp->name, "\x81\x40", 2)) {
 						psndSFXOn((const char*)0x13);
-						wp->field_0x8 = 0x65;
-						wp->field_0x0 |= 2;
+						wp->state = 0x65;
+						wp->flags |= 2;
 					} else {
-						((u16*)wp->field_0x3C)[wp->field_0x18] = *(u16*)"\x81\x40";
-						wp->field_0x18--;
-						if (wp->field_0x18 < 0) {
-							wp->field_0x18 = 0;
+						((u16*)wp->name)[wp->nameLen] = *(u16*)"\x81\x40";
+						wp->nameLen--;
+						if (wp->nameLen < 0) {
+							wp->nameLen = 0;
 						}
 						psndSFXOn((const char*)0xB);
 					}
 				} else if (keyGetDirRep(0) & 0x4000) {
 					if (dist < 10.0f) {
-						wp->field_0x10--;
-						if (wp->field_0x14 > 3) {
-							if (wp->field_0x10 < 0) {
-								wp->field_0x10 = 10;
-								if (wp->field_0x14 > 7) {
-									wp->field_0x14 = 7;
+						wp->cursorX--;
+						if (wp->cursorY > 3) {
+							if (wp->cursorX < 0) {
+								wp->cursorX = 10;
+								if (wp->cursorY > 7) {
+									wp->cursorY = 7;
 								}
 							}
-						} else if (wp->field_0x10 < 0) {
-							wp->field_0x10 = 13;
+						} else if (wp->cursorX < 0) {
+							wp->cursorX = 13;
 						}
 						psndSFXOn((const char*)5);
 					}
 				} else if (keyGetDirRep(0) & 0x8000) {
 					if (dist < 10.0f) {
-						wp->field_0x10++;
-						if (wp->field_0x14 > 3) {
-							if (wp->field_0x10 >= 10 && wp->field_0x14 > 7) {
-								wp->field_0x14 = 7;
+						wp->cursorX++;
+						if (wp->cursorY > 3) {
+							if (wp->cursorX >= 10 && wp->cursorY > 7) {
+								wp->cursorY = 7;
 							}
-							if (wp->field_0x10 >= 11) {
-								wp->field_0x10 = 0;
+							if (wp->cursorX >= 11) {
+								wp->cursorX = 0;
 							}
-						} else if (wp->field_0x10 >= 14) {
-							wp->field_0x10 = 0;
+						} else if (wp->cursorX >= 14) {
+							wp->cursorX = 0;
 						}
 						psndSFXOn((const char*)5);
 					}
 				} else if (keyGetDirRep(0) & 0x1000) {
 					if (dist < 10.0f) {
-						wp->field_0x14--;
-						if (wp->field_0x14 < 0) {
-							if (wp->field_0x10 > 9) {
-								wp->field_0x14 = 7;
-								wp->field_0x10 = 10;
+						wp->cursorY--;
+						if (wp->cursorY < 0) {
+							if (wp->cursorX > 9) {
+								wp->cursorY = 7;
+								wp->cursorX = 10;
 							} else {
-								wp->field_0x14 = 8;
+								wp->cursorY = 8;
 							}
 						}
 						psndSFXOn((const char*)5);
 					}
 				} else if (keyGetDirRep(0) & 0x2000) {
 					if (dist < 10.0f) {
-						wp->field_0x14++;
-						if (wp->field_0x10 > 9) {
-							if (wp->field_0x14 >= 4) {
-								wp->field_0x10 = 10;
+						wp->cursorY++;
+						if (wp->cursorX > 9) {
+							if (wp->cursorY >= 4) {
+								wp->cursorX = 10;
 							}
-							if (wp->field_0x14 >= 8) {
-								wp->field_0x14 = 0;
+							if (wp->cursorY >= 8) {
+								wp->cursorY = 0;
 							}
-						} else if (wp->field_0x14 >= 9) {
-							wp->field_0x14 = 0;
+						} else if (wp->cursorY >= 9) {
+							wp->cursorY = 0;
 						}
 						psndSFXOn((const char*)5);
 					}
 				}
 			}
-			idx = wp->field_0x10;
-			if (idx > 9 && wp->field_0x14 > 3) {
+			idx = wp->cursorX;
+			if (idx > 9 && wp->cursorY > 3) {
 				wp->x2 = 100.0f;
-				wp->y2 = (f32)(-20 - (wp->field_0x14 - 4) * 34);
+				wp->y2 = (f32)(-20 - (wp->cursorY - 4) * 34);
 				wp->x2 -= 6.0f;
 				wp->y2 += 6.0f;
 			} else {
 				wp->x2 = (f32)(idx * 24 - 190 + (idx / 5) * 30);
-				wp->y2 = (f32)(112 - wp->field_0x14 * 28);
+				wp->y2 = (f32)(112 - wp->cursorY * 28);
 				wp->x2 -= 16.0f;
 				wp->y2 -= 12.0f;
 			}
-			wp->field_0x54 -= 0.05f;
-			if (wp->field_0x54 <= 0.0f) {
-				wp->field_0x54 = 0.0f;
+			wp->maskAlpha -= 0.05f;
+			if (wp->maskAlpha <= 0.0f) {
+				wp->maskAlpha = 0.0f;
 			}
 			break;
 		case 100:
 			if (keyGetButtonTrg(0) & 0x100) {
-				if (wp->field_0x5C == 0) {
-					wp->field_0x8++;
+				if (wp->confirmSel == 0) {
+					wp->state++;
 					psndSFXOn((const char*)0x12);
 				} else {
-					wp->field_0x8 = 0;
+					wp->state = 0;
 					psndSFXOn((const char*)0x13);
 				}
 			} else if (keyGetButtonTrg(0) & 0x200) {
-				wp->field_0x8 = 0;
+				wp->state = 0;
 				psndSFXOn((const char*)0x13);
 			} else if (keyGetDirRep(0) & 0x3000) {
-				wp->field_0x5C = 1 - wp->field_0x5C;
+				wp->confirmSel = 1 - wp->confirmSel;
 				psndSFXOn((const char*)5);
 			}
 			wp->x2 = -60.0f;
-			wp->y2 = -30.0f - 40.0f * (f32)wp->field_0x5C;
-			wp->field_0x54 += 0.05f;
-			if (wp->field_0x54 >= 1.0f) {
-				wp->field_0x54 = 1.0f;
+			wp->y2 = -30.0f - 40.0f * (f32)wp->confirmSel;
+			wp->maskAlpha += 0.05f;
+			if (wp->maskAlpha >= 1.0f) {
+				wp->maskAlpha = 1.0f;
 			}
 			break;
 	}
 	wp->x1 += (wp->x2 - wp->x1) / 4.0f;
 	wp->y1 += (wp->y2 - wp->y1) / 4.0f;
 	wp->x1 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
-	idx = wp->field_0x18 >= 8 ? wp->field_0x18 - 1 : wp->field_0x18;
-	wp->field_0x34 = idx * 32 - 106;
-	wp->field_0x38 = 135.0f;
-	wp->field_0x2C += (wp->field_0x34 - wp->field_0x2C) / 4.0f;
-	wp->field_0x30 += (wp->field_0x38 - wp->field_0x30) / 4.0f;
-	wp->field_0x30 += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
+	idx = wp->nameLen >= 8 ? wp->nameLen - 1 : wp->nameLen;
+	wp->caretTargetX = idx * 32 - 106;
+	wp->caretTargetY = 135.0f;
+	wp->caretX += (wp->caretTargetX - wp->caretX) / 4.0f;
+	wp->caretY += (wp->caretTargetY - wp->caretY) / 4.0f;
+	wp->caretY += __fabs(2.0f * (f32)sin(gp->retraceCount / 8.0f));
 	return 0;
 }
 
@@ -438,7 +438,7 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	cam = camGetPtr(CAMERA_2D);
 	GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
 	nameBG();
-	winTexInit(*wp->field_0x60->data);
+	winTexInit(*wp->tplFile->data);
 	winTexSet(0x2a, (Vec){-130.0f, 160.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	for (i = 0; i < 8; i++) {
 		winTexSet(0x29, (Vec){(f32)(i * 32 - 106), 160.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
@@ -448,59 +448,59 @@ void nameEntDisp(CameraId cameraId, void* param) {
 	FontDrawStart();
 	for (j = 0; j < 9; j++) {
 		for (n = 0; n < 14; n++) {
-			if (wp->field_0x50[j * 14 + n]) {
-				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->field_0x50[j * 14 + n])) / 2), (f32)(112 - j * 28), wp->field_0x50[j * 14 + n]);
+			if (wp->charTable[j * 14 + n]) {
+				FontDrawString((f32)(n * 24 - 190 + (n / 5) * 30 + (24 - FontGetMessageWidth(wp->charTable[j * 14 + n])) / 2), (f32)(112 - j * 28), wp->charTable[j * 14 + n]);
 			}
 		}
 	}
 	for (j = 0; j < 4; j++) {
-		if (wp->field_0x10 >= 10 && wp->field_0x14 - 4 == j) {
-			winTexInit(*wp->field_0x60->data);
+		if (wp->cursorX >= 10 && wp->cursorY - 4 == j) {
+			winTexInit(*wp->tplFile->data);
 			winTexSet(0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x40});
-			winTexInit_x2(*wp->field_0x60->data);
+			winTexInit_x2(*wp->tplFile->data);
 			winTexSet_x2(j + 0x25, 0x33, (Vec){154.0f, (f32)(-14 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		} else {
-			winTexInit_x2(*wp->field_0x60->data);
+			winTexInit_x2(*wp->tplFile->data);
 			winTexSet_x2(j + 0x25, 0x33, (Vec){160.0f, (f32)(-20 - j * 34), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2);
 		}
 	}
-	winTexInit(*wp->field_0x60->data);
-	winTexSet(0x24, (Vec){2.0f + wp->field_0x2C, wp->field_0x30 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
-	winTexSet(0x24, (Vec){wp->field_0x2C, wp->field_0x30, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+	winTexInit(*wp->tplFile->data);
+	winTexSet(0x24, (Vec){2.0f + wp->caretX, wp->caretY - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
+	winTexSet(0x24, (Vec){wp->caretX, wp->caretY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	FontDrawStart();
 	for (n = 0; n < 8; n++) {
 		memset(buf, 0, sizeof(buf));
-		strncpy(buf, &wp->field_0x3C[n * 2], 2);
+		strncpy(buf, &wp->name[n * 2], 2);
 		if (strlen(buf)) {
 			FontDrawString((28.0f - FontGetMessageWidth(buf)) / 2.0f + (f32)(n * 32 - 120)
 , 171.0f, buf);
 		}
 	}
-	str = msg_tbl[wp->field_0xC];
+	str = msg_tbl[wp->type];
 	w = FontGetMessageWidth(msgSearch(str));
 	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -250.0f, -160.0f, 500.0f, 40.0f, 20.0f);
 	FontDrawStart();
 	FontDrawString((240.0f - w) / 2.0f + -120.0f, -168.0f, msgSearch(str));
-	nameMaskGX(wp->field_0x54);
-	if (wp->field_0x8 == 100) {
+	nameMaskGX(wp->maskAlpha);
+	if (wp->state == 100) {
 		ok = msgSearch("msg_nameent_ok");
 		yes = msgSearch("msg_nameent_yes");
 		no = msgSearch("msg_nameent_no");
-		if (wp->field_0xC == 4) {
+		if (wp->type == 4) {
 			ok = msgSearch("msg_nameent_ok_01");
 		}
-		nameWinGX(-180.0f, 130.0f, 360.0f, 100.0f, *wp->field_0x60->data, 1);
-		nameWinGX(-80.0f, 10.0f, 160.0f, 120.0f, *wp->field_0x60->data, 1);
+		nameWinGX(-180.0f, 130.0f, 360.0f, 100.0f, *wp->tplFile->data, 1);
+		nameWinGX(-80.0f, 10.0f, 160.0f, 120.0f, *wp->tplFile->data, 1);
 		FontDrawStart();
 		FontDrawColor((GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 		FontDrawEdge();
 		FontDrawString(-(f32)FontGetMessageWidth(ok) / 2.0f, 110.0f, ok);
-		FontDrawString(-(f32)FontGetMessageWidth(wp->field_0x3C) / 2.0f, 70.0f, wp->field_0x3C);
+		FontDrawString(-(f32)FontGetMessageWidth(wp->name) / 2.0f, 70.0f, wp->name);
 		FontDrawString(-(f32)FontGetMessageWidth(no) / 2.0f, -20.0f, yes);
 		FontDrawString(-(f32)FontGetMessageWidth(no) / 2.0f, -60.0f, no);
 		FontDrawEdgeOff();
 	}
-	winTexInit(*wp->field_0x60->data);
+	winTexInit(*wp->tplFile->data);
 	winTexSet(0, (Vec){2.0f + wp->x1, wp->y1 - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 0x80});
 	winTexSet(0, (Vec){wp->x1, wp->y1, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 	*camGetCurPtr() = saved;
@@ -533,7 +533,7 @@ void nameBG(void) {
 	GXLoadPosMtxImm(camGetPtr(CAMERA_2D)->view, GX_PNMTX0);
 	GXSetCurrentMtx(GX_PNMTX0);
 
-	TEXGetGXTexObjFromPalette(*wp->field_0x60->data, &obj1, 0x22);
+	TEXGetGXTexObjFromPalette(*wp->tplFile->data, &obj1, 0x22);
 	GXInitTexObjLOD(&obj1, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj1, GX_TEXMAP0);
 	GXSetNumTexGens(1);
@@ -553,7 +553,7 @@ void nameBG(void) {
 	GXPosition3f32(-272.0f, 240.0f, 0.0f);
 	GXTexCoord2f32(1.0f, 0.0f);
 
-	TEXGetGXTexObjFromPalette(*wp->field_0x60->data, &obj2, 0x21);
+	TEXGetGXTexObjFromPalette(*wp->tplFile->data, &obj2, 0x21);
 	GXInitTexObjLOD(&obj2, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj2, GX_TEXMAP0);
 	GXSetNumTexGens(1);
@@ -573,7 +573,7 @@ void nameBG(void) {
 	GXPosition3f32(272.0f, 240.0f, 0.0f);
 	GXTexCoord2f32(1.0f, 0.0f);
 
-	TEXGetGXTexObjFromPalette(*wp->field_0x60->data, &obj3, 0x23);
+	TEXGetGXTexObjFromPalette(*wp->tplFile->data, &obj3, 0x23);
 	GXInitTexObjLOD(&obj3, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj3, GX_TEXMAP0);
 	GXSetNumTexGens(1);
@@ -602,7 +602,7 @@ static inline void nameTexQuad(s32 id, f32 x, f32 y, f32 w, f32 h) {
 	double ah;
 	f32 sy;
 
-	TEXGetGXTexObjFromPalette(*wp->field_0x60->data, &obj, id);
+	TEXGetGXTexObjFromPalette(*wp->tplFile->data, &obj, id);
 	GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
 	GXLoadTexObj(&obj, GX_TEXMAP0);
 	GXSetNumTexGens(1);

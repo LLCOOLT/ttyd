@@ -541,13 +541,13 @@ s32 exchange_ret_tbl_no(void) {
 
 USER_FUNC(exchange_ryokin_medal) {
     s32* args = event->args;
-    ExchangeRyokin (*new_var)[3];
+    ExchangeRyokin (*tbl)[3];
     s32 idx = evtGetValue(event, args[0]);
     s32 no = exchange_ret_tbl_no();
 
     evtSetValue(event, args[1], RYOKIN_TBL[no][idx].ryokin);
-    new_var = RYOKIN_TBL;
-    evtSetValue(event, args[2], new_var[no][idx].medal);
+    tbl = RYOKIN_TBL; // FAKE: table pointer reloaded right before use; direct RYOKIN_TBL[no][idx] is 12 B shorter
+    evtSetValue(event, args[2], tbl[no][idx].medal);
     return EVT_RETURN_DONE;
 }
 
@@ -5498,7 +5498,7 @@ void goryuugijo_main_slot(EventEntry* event, BOOL isFirstCall) {
                 data->flags &= ~1;
                 {s32 n; CaseSetup* s = &setup;
                 for (n = 0; n < 2; n++) {
-                    s->activeConditionId = 0x8009;
+                    s->conditionId = 0x8009;
                     s->hitObjName = DRUMNAME[n].anim;
                     s->swFlag = 0;
                     s->activeFunc = NULL;
@@ -5601,7 +5601,7 @@ USER_FUNC(get_mario_dispReqDir) {
     s32* args = event->args;
     MarioWork* mario = marioGetPtr();
 
-    evtSetValue(event, args[0], mario->unk1AC);
+    evtSetValue(event, args[0], mario->displayDirectionTarget);
     return EVT_RETURN_DONE;
 }
 

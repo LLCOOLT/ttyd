@@ -16,9 +16,9 @@ void psndSFX_pit(s32 id, s32 pitch);
 void BattleAudience_Case_ActionCommandBad(BattleWeapon* weapon);
 void BattleAudience_Case_ActionCommandGood(BattleWeapon* weapon);
 
-#define AC_SE_ID(wp) (*(u32*)((u8*)(wp) + 0x1F18))
-#define AC_SE_VAL(wp) (*(f32*)((u8*)(wp) + 0x1F1C))
-#define AC_GUARD_TIMER(wp) (*(s16*)((u8*)(wp) + 0x1D18))
+#define AC_SE_ID(wp) ((wp)->actionCommands.seId)
+#define AC_SE_VAL(wp) ((wp)->actionCommands.seValue)
+#define AC_GUARD_TIMER(wp) ((wp)->actionCommands.countdown)
 
 //local prototypes
 s32 BattleACPadCheckRecordTrigger(s32 chan, s32 mask);
@@ -30,7 +30,7 @@ void BattleActionCommandManagerInit(BattleWork* wp) {
 	wp->actionCommands.resultcb = NULL;
 	wp->actionCommands.dispcb = NULL;
 	wp->actionCommands.deletecb = NULL;
-	wp->actionCommands.field_0x288 = -1;
+	wp->actionCommands.seId = -1;
 }
 
 void BattleActionCommandManager(BattleWork* wp) {
@@ -84,7 +84,7 @@ void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 a4
 
 	entry = ActionCommandList;
 	work->actionCommands.mAcUnit = unit;
-	work->actionCommands.field_0x4 = a4;
+	work->actionCommands.setupFlags = a4;
 	work->actionCommands.mAcState = 0;
 	work->actionCommands.mResultCount = 0;
 	work->actionCommands.result = 1;
@@ -92,7 +92,7 @@ void BattleActionCommandSetup(BattleWork* work, s32 id, BattleUnit* unit, s32 a4
 	work->actionCommands.dispcb = NULL;
 	work->actionCommands.resultcb = NULL;
 	work->actionCommands.deletecb = NULL;
-	work->actionCommands.field_0x8 = a5;
+	work->actionCommands.setupParam = a5;
 	work->actionCommands.field_0x30 = 0;
 	for (; entry->id; entry++) {
 		if (entry->id == id) {

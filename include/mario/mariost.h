@@ -41,17 +41,17 @@ typedef struct GlobalWork {
 	char currentAreaName[0x20]; //0x13C
 	void* relocationBase; //0x15C
 	void* mapAlloc; //0x160
-	u32 field_0x164; //0x164
+	u32 mapEventId; //0x164, map init event id (seq_mapchange.c)
 	FieldBattleData* fbatData; //0x168
 	s32 language; //0x16C
 	u16 fbWidth; //0x170
 	u16 efbHeight; //0x172
 	s32 mGSW0; //0x174
-	u32 mGSFW[0x100]; //0x178
+	u32 mGSWF[0x100]; //0x178, global saved work flags (GSWF)
 	u8 mGSW[0x800]; //0x578
 	u32 mLSWF[0x10]; //0xD78
 	u8 mLSW[0x400]; //0xDB8
-	s32 unk11B8; //0x11B8
+	s32 lastSlot; //0x11B8, last used save slot, start cursor on load screen
 	u8 field_0x11BC[0x11D0 - 0x11BC]; //0x11BC
 	s32 saveSlot; //0x11D0
 	Vec savePlayerPos; //0x11D4
@@ -61,26 +61,26 @@ typedef struct GlobalWork {
 	u8 field_0x11F4[0x1274 - 0x11F4]; //0x11F4
 	s32 unk1274; //0x1274
 	s32 resetType; //0x1278, 0 = no reset, 1 = soft reset, 2 = menu
-	BOOL unk127C; //0x127C
+	BOOL resetButtonDown; //0x127C, reset button was down (mariost.c)
 	BOOL softResetWait; //0x1280
 	u8 field_0x1284[0x1288 - 0x1284]; //0x1284
 	OSTime softResetTimeout; //0x1288
-	BOOL field_0x1290; //0x1290
-	BOOL unk1294; //0x1294
+	BOOL restartChecked; //0x1290, restart reset-combo check done
+	BOOL rumbleEnabled; //0x1294, rumble option, 0 = off
 	u8 field_0x1298[0x12C0 - 0x1298]; //0x1298
 	u8 rumbleStart[4]; //0x12C0
 	u8 field_0x12C4[4]; //0x12C4
 	OSTime rumbleStartTime[4]; //0x12C8
-	u8 field_0x12E8[4]; //0x12E8
-	u8 field_0x12EC[4]; //0x12EC
-	OSTime field_0x12F0[4];
+	u8 rumbleForcedOff[4]; //0x12E8, rumble cut after 30 s
+	u8 rumbleForcedOffLatch[4]; //0x12EC, rumble cut latch
+	OSTime rumbleForcedOffTime[4]; //time rumble was cut
 	//u8 field_0x1300[0x1310 - 0x1300]; //0x1300
-	u8 unk1310[4]; //0x1310
+	u8 rumbleHardStop[4]; //0x1310, stop motor hard (PADControlMotor 2)
 	OSTick mDeltaGame; //0x1314
 	OSTick mDeltaRender; //0x1318
 	u8 field_0x131C[0x1324 - 0x131C]; //0x131C
 // system.c "key" controller data, TODO sub-struct?
-	BOOL unk1324; //0x1324
+	BOOL keyDataValid; //0x1324, key data valid (system.c)
 	u32 button[4]; //0x1328
 	u32 buttonNew[4]; //0x1338
 	u32 buttonRepeat[4]; //0x1348

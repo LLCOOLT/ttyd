@@ -2286,13 +2286,13 @@ USER_FUNC(_cam_rot) {
     f32 rot;
 
     if (isFirstCall) {
-        EVW(event, 0x78) = sysMsec2Frame(2000);
-        EVW(event, 0x7C) = EVW(event, 0x78);
+        event->userdata[0] = sysMsec2Frame(2000);
+        event->userdata[1] = event->userdata[0];
     }
-    rot = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(720.0f, 0.0f, 4, EVW(event, 0x78), EVW(event, 0x7C));
+    rot = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(720.0f, 0.0f, 4, event->userdata[0], event->userdata[1]);
     camGetPtr(4)->rollAngle = rot;
-    EVW(event, 0x78)--;
-    if (EVW(event, 0x78) <= 0) {
+    event->userdata[0]--;
+    if (event->userdata[0] <= 0) {
         camGetPtr(4)->rollAngle = 0.0f;
         return EVT_RETURN_YIELD;
     }
@@ -2371,8 +2371,8 @@ USER_FUNC(_naniga_okorukana_check) {
         for (i = 0; R_mystery_item_table[i] != 0; i++) {
         }
         item = R_mystery_item_table[irand(i)];
-        EVW(event, 0x78) = (s32)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
-        effSetName((EffectEntry*)EVW(event, 0x78), "effNaniga\0\0");
+        event->userdata[0] = (s32)effNanigaEntry(0, R_mystery_item_table, item, pos.x, pos.y, pos.z);
+        effSetName((EffectEntry*)event->userdata[0], "effNaniga\0\0");
         evtSetValue(event, out, item);
         if (unit->currentKind == 0xDE) {
             a = (u8*)wp + 0x16F25;
@@ -2442,8 +2442,8 @@ USER_FUNC(_throw_item_icon) {
 
     if (isFirstCall) {
         Vec v;
-        EVP(event, 0x78) = BattleAlloc(sizeof(ThrowWork));
-        wk = EVP(event, 0x78);
+        ((ThrowWork*)event->userdatap[0]) = BattleAlloc(sizeof(ThrowWork));
+        wk = ((ThrowWork*)event->userdatap[0]);
         wk->target.x = tx;
         wk->target.y = ty;
         wk->target.z = tz;
@@ -2456,12 +2456,12 @@ USER_FUNC(_throw_item_icon) {
         wk->gravity = 0.5f;
         wk->vy = (wk->target.y - wk->start.y) / wk->frames + wk->gravity * wk->frames / 2.0f;
         wk->speed = distABf(wk->start.x, wk->start.z, wk->target.x, wk->target.z) / wk->frames;
-        EVW(event, 0x7C) = item;
-        EVW(event, 0x80) = 0;
+        event->userdata[1] = item;
+        event->userdata[2] = 0;
         EVW(event, 0x84) = psndSFXOn_3D("SFX_ITEM_COOKING_THROW1", &v);
     }
-    wk = EVP(event, 0x78);
-    if (EVW(event, 0x80)) {
+    wk = ((ThrowWork*)event->userdatap[0]);
+    if (event->userdata[2]) {
         psndSFXOff(EVW(event, 0x84));
         BattleFree(wk);
         return EVT_RETURN_DONE;
@@ -2474,7 +2474,7 @@ USER_FUNC(_throw_item_icon) {
     btlMovePos(wk->speed, angleABf(wk->start.x, wk->start.z, wk->target.x, wk->target.z), &wk->pos.x, &wk->pos.z);
     wk->frames--;
     if (wk->frames <= 0) {
-        EVW(event, 0x80) = 1;
+        event->userdata[2] = 1;
         wk->pos = wk->target;
     }
     dispEntry(CAMERA_3D, 900.0f, 1, _disp_item_icon, event);
@@ -2483,7 +2483,7 @@ USER_FUNC(_throw_item_icon) {
 
 void _disp_item_icon(CameraId cameraId, void* param) {
     EventEntry* event = param;
-    iconDispGx(&EVP(event, 0x78)->pos, 0, itemDataTable[EVW(event, 0x7C)].icon_id, 1.0f);
+    iconDispGx(&((ThrowWork*)event->userdatap[0])->pos, 0, itemDataTable[event->userdata[1]].icon_id, 1.0f);
 }
 
 USER_FUNC(_nancy_mirage) {
@@ -2493,22 +2493,22 @@ USER_FUNC(_nancy_mirage) {
     f32 z = evtGetFloat(event, args[2]);
 
     if (isFirstCall) {
-        EVW(event, 0x78) = 60;
-        EVW(event, 0x7C) = animPoseEntry("c_cook", 1);
-        EVW(event, 0x80) = 0;
+        event->userdata[0] = 60;
+        event->userdata[1] = animPoseEntry("c_cook", 1);
+        event->userdata[2] = 0;
         EVW(event, 0x84) = x;
         EVW(event, 0x88) = y;
         EVW(event, 0x8C) = z;
-        animPoseSetAnim(EVW(event, 0x7C), "A_2", 1);
-        animPoseSetEffectAnim(EVW(event, 0x7C), "PM_Y_1A", 1);
+        animPoseSetAnim(event->userdata[1], "A_2", 1);
+        animPoseSetEffectAnim(event->userdata[1], "PM_Y_1A", 1);
     }
-    EVW(event, 0x78)--;
-    if (EVW(event, 0x78) < 0) {
-        animPoseSetEffect(EVW(event, 0x7C), NULL, 0);
-        animPoseRelease(EVW(event, 0x7C));
+    event->userdata[0]--;
+    if (event->userdata[0] < 0) {
+        animPoseSetEffect(event->userdata[1], NULL, 0);
+        animPoseRelease(event->userdata[1]);
         return EVT_RETURN_DONE;
     }
-    animPoseMain(EVW(event, 0x7C));
+    animPoseMain(event->userdata[1]);
     dispEntry(CAMERA_3D, z, 2, _nancy_disp, event);
     return EVT_RETURN_BLOCK;
 }
@@ -2522,8 +2522,8 @@ void _nancy_disp(CameraId cameraId, void* param) {
     u8 alpha;
     s32 n;
 
-    if (EVW(event, 0x78) < 30) {
-        n = 30 - EVW(event, 0x78);
+    if (event->userdata[0] < 30) {
+        n = 30 - event->userdata[0];
         s = 4.0f + 0.05f * n;
         alpha = 128 - n * 4;
     } else {
@@ -2535,11 +2535,11 @@ void _nancy_disp(CameraId cameraId, void* param) {
     PSMTXIdentity(mtx);
     PSMTXConcat(scale, mtx, mtx);
     PSMTXConcat(trans, mtx, mtx);
-    animPoseSetMaterialEvtColor(EVW(event, 0x7C), (GXColor){0xFF, 0xFF, 0xFF, alpha});
-    animPoseSetMaterialFlagOn(EVW(event, 0x7C), 0x40);
-    animPoseDrawMtx(EVW(event, 0x7C), mtx, 1, 0.0f, 2.0f);
-    animPoseDrawMtx(EVW(event, 0x7C), mtx, 2, 0.0f, 2.0f);
-    animPoseDrawMtx(EVW(event, 0x7C), mtx, 3, 0.0f, 2.0f);
+    animPoseSetMaterialEvtColor(event->userdata[1], (GXColor){0xFF, 0xFF, 0xFF, alpha});
+    animPoseSetMaterialFlagOn(event->userdata[1], 0x40);
+    animPoseDrawMtx(event->userdata[1], mtx, 1, 0.0f, 2.0f);
+    animPoseDrawMtx(event->userdata[1], mtx, 2, 0.0f, 2.0f);
+    animPoseDrawMtx(event->userdata[1], mtx, 3, 0.0f, 2.0f);
 }
 
 USER_FUNC(_full_ap_recover) {

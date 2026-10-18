@@ -5,9 +5,9 @@
 #include "memory.h"
 
 typedef struct DepthShadowWork {
-    s32 unk0; //0x0, flags
-    s32 unk4; //0x4, draw count
-    s32 unk8; //0x8, config index
+    s32 flags; //0x0, bit0 = drawn this frame
+    s32 drawCount; //0x4
+    s32 configIdx; //0x8, index into shadowConfig
     union {
         u8 unkC[0xFC - 0xC]; //0xC
         struct {
@@ -18,14 +18,14 @@ typedef struct DepthShadowWork {
             GXTexObj texObj; //0xDC
         };
     };
-    smartEntry* unkFC; //0xFC
-    GXColor unk100; //0x100
+    smartEntry* texBuffer; //0xFC, shadow texture memory
+    GXColor color; //0x100
 } DepthShadowWork;
 
 typedef struct ProjShadowWork {
-    s32 unk0; //0x0, flags
-    s32 unk4; //0x4, draw count
-    s32 unk8; //0x8, config index
+    s32 flags; //0x0, bit0 = drawn this frame
+    s32 drawCount; //0x4
+    s32 configIdx; //0x8, index into shadowConfig
     union {
         u8 unkC[0xFC - 0xC]; //0xC
         struct {
@@ -36,8 +36,8 @@ typedef struct ProjShadowWork {
             GXTexObj texObj; //0xDC
         };
     };
-    smartEntry* unkFC; //0xFC
-    GXColor unk100; //0x100
+    smartEntry* texBuffer; //0xFC, shadow texture memory
+    GXColor color; //0x100
 } ProjShadowWork;
 
 typedef struct ShadowEntry {
@@ -58,9 +58,9 @@ typedef struct ShadowEntry {
 } ShadowEntry;
 
 typedef struct CharShadowWork {
-    s32 unk0; //0x0, flags
-    s32 unk4; //0x4, draw count
-    s32 unk8; //0x8, config index
+    s32 flags; //0x0, bit0 = drawn this frame
+    s32 drawCount; //0x4
+    s32 configIdx; //0x8, index into shadowConfig
     union {
         u8 field_0xC[0xFC - 0xC]; //0xC
         struct {
@@ -71,13 +71,13 @@ typedef struct CharShadowWork {
             GXTexObj texObj; //0xDC
         };
     };
-    smartEntry* unkFC; //0xFC
-    GXColor unk100; //0x100
-    s32 unk104; //0x104
+    smartEntry* texBuffer; //0xFC, shadow texture memory
+    GXColor color; //0x100
+    s32 numEntries; //0x104, ShadowEntry count this frame
     ShadowEntry* entries; //0x108
-    s32 unk10C; //0x10C
-    s32 unk110; //0x110
-    f32 unk114; //0x114
+    s32 projection; //0x10C, shadowGetCharShadowProjection
+    s32 defaultMode; //0x110, mode given to new entries
+    f32 defaultSizeY; //0x114, sizeY given to new entries
     s32 unk118; //0x118
 } CharShadowWork;
 

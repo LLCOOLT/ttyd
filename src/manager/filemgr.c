@@ -66,7 +66,7 @@ void fileGarbageDataAdrClear(FileEntry* entry) {
 	TEXHeader* img;
 	CLUTHeader* pal;
 	void* data = *entry->data;
-	switch (entry->field_0x1) {
+	switch (entry->type) {
 		case 1:
 			if (FLD(data, 0x14c) >= (u32)data) {
 				FLD(data, 0x14c) -= (u32)data;
@@ -454,11 +454,11 @@ void fileGarbageMoveMem(void* data, FileEntry* file) {
 			file->entry->address = data;
 		}
 		else {
-			fileGarbageDataAdrSet(*file->data, file->field_0x1);
+			fileGarbageDataAdrSet(*file->data, file->type);
 		}
 	}
 	else {
-		fileGarbageDataAdrSet(*file->data, file->field_0x1);
+		fileGarbageDataAdrSet(*file->data, file->type);
 	}
 }
 
@@ -512,7 +512,7 @@ void _fileGarbage(BOOL a1) {
 		next = f->next;
 		if (f->state == 2) {
 			f->state = 0;
-			if ((void**)&f->field_0x4 != f->data) {
+			if ((void**)&f->dataSlot != f->data) {
 				smartFree((smartEntry*)f->data);
 			}
 			if (prev) {
@@ -613,10 +613,10 @@ FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry
 	}
 	if (handle) {
 		newentry->state = 1;
-		newentry->data = &newentry->field_0x4;
+		newentry->data = &newentry->dataSlot;
 		*newentry->data = handle;
 		newentry->references = 1;
-		newentry->field_0x1 = type;
+		newentry->type = type;
 		newentry->next = NULL;
 		strcpy(newentry->filename, filename);
 		newentry->entry = NULL;
@@ -636,13 +636,13 @@ FileEntry* _fileAlloc(const char* filename, s32 type, void (*callback)(FileEntry
 			test += 32 - (test & 31);
 		}
 		smart = smartAlloc(test, 0);
-		smart->field_0x8 = newentry;
+		smart->file = newentry;
 		DVDMgrRead(entry, smart->address, test, 0);
 		DVDMgrClose(entry);
 		newentry->data = &smart->address;
 		newentry->state = 1;
 		newentry->references = 1;
-		newentry->field_0x1 = type;
+		newentry->type = type;
 		newentry->next = NULL;
 		strcpy(newentry->filename, filename);
 		newentry->entry = NULL;
@@ -689,12 +689,12 @@ void dvdReadDoneCallBack(s32 error, DVDFileInfo* info) {
 	if (error == -3) {
 		f->entry = NULL;
 		f->state = 2;
-		f->field_0x1 = 11;
+		f->type = 11;
 		DVDMgrClose(entry);
 	}
 	else {
 		f->entry = NULL;
-		fileGarbageDataAdrSet(*f->data, f->field_0x1);
+		fileGarbageDataAdrSet(*f->data, f->type);
 		DVDMgrClose(entry);
 		if (f->callback) {
 			f->callback(f);
@@ -771,10 +771,10 @@ s32 fileAsync(const char* filename, s32 type, FileCallback callback) {
 	
 	if (handle) {
 		newentry->state = 3;
-		newentry->data = &newentry->field_0x4;
+		newentry->data = &newentry->dataSlot;
 		*newentry->data = handle;
 		newentry->references = 0;
-		newentry->field_0x1 = type;
+		newentry->type = type;
 		newentry->next = 0;
 		strcpy(newentry->filename, filename);
 		newentry->entry = NULL;
@@ -808,11 +808,11 @@ s32 fileAsync(const char* filename, s32 type, FileCallback callback) {
 			test += 32 - (test & 31);
 		}
 		smart = smartAlloc(test, 0);
-		smart->field_0x8 = newentry;
+		smart->file = newentry;
 		newentry->data = &smart->address;
 		newentry->state = 3;
 		newentry->references = 0;
-		newentry->field_0x1 = type;
+		newentry->type = type;
 		newentry->next = NULL;
 		newentry->callback = callback;
 		strcpy(newentry->filename, filename);

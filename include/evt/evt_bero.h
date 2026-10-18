@@ -10,22 +10,22 @@ typedef union BeroINFO {
 
 typedef struct BeroEntry {
 	const char* hitName; //0x0
-	s16 kinddirArg1; //0x4
-	s16 kinddirArg2; //0x6
-	s32 kinddirArg3; //0x8
-	s32 field_0xC; //0xC
-	s32 unknown1; //0x10
-	s32 unknown2; //0x14
-	s32 field_0x18; //0x18
+	s16 type; //0x4, BeroInfoType | 0x1000 background | 0x2000 no fade; low 12 bits: 0 road, 1 door, 2 pipe, 3 gate, 0xF00 none
+	s16 sfxId; //0x6
+	s32 directionId; //0x8, 45-degree steps from north, 8 up, 9 down
+	s32 centerPosition; //0xC, x of centerPosition[3]
+	s32 centerPositionY; //0x10
+	s32 centerPositionZ; //0x14
+	s32 length; //0x18, -1 = default for type
 	s32* enterEvent; //0x1C;
-	s32 field_0x20; //0x20
+	s32 caseType; //0x20, -1 = default for type
 	s32* exitEvent; //0x24
-	s32 nextareaArg1; //0x28
-	const char* nextareaArg2; //0x2C
-	s16 animeArg1; //0x30
-	s16 animeArg2; //0x32
-	s32 animeArg3; //0x34
-	s32 animeArg4; //0x28
+	s32 nextMapName; //0x28, const char* held as s32
+	const char* nextBeroName; //0x2C
+	s16 enterAnimeType; //0x30
+	s16 exitAnimeType; //0x32
+	s32 enterAnimeArg; //0x34
+	s32 exitAnimeArg; //0x38
 } BeroEntry;
 
 EVT_DEF(evt_bero_info_run);

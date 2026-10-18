@@ -112,28 +112,28 @@ static inline NanNPC* nanNPCSearch(char* name) {
 void nanNPCOption(void) {
     s32 clear;
     NanNPC* q;
-    void* w;
+    NanNPCWork* w;
     NanNPC* p;
     NanNPC* r;
     Vec diff;
-    Vec v84;
-    Vec v78;
-    Vec v6c;
-    Vec v60;
-    Vec v54;
-    Vec v48;
-    Vec v3c;
+    Vec dir;
+    Vec start;
+    Vec moveDir;
+    Vec from;
+    Vec refl;
+    Vec prev;
+    Vec back;
     Vec n;
     Vec h;
     f32 mag;
     f32 dist;
-    f32 d20;
+    f32 hitDist;
     f32 nz, ny, nx, hz, hy, hx;
 
     w = nanNPCWork;
-    for (p = ((NanNPCWork*)w)->npc; p < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; p++) {
+    for (p = w->npc; p < w->npc + w->num; p++) {
         if (p->flags & 4) {
-            for (q = ((NanNPCWork*)w)->npc; q < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; q++) {
+            for (q = w->npc; q < w->npc + w->num; q++) {
                 if (p != q && (q->flags & 4)) {
                     dist = PSVECDistance(&p->pos, &q->pos);
                     PSVECSubtract(&p->pos, &q->pos, &diff);
@@ -152,7 +152,7 @@ void nanNPCOption(void) {
             }
         }
     }
-    for (p = ((NanNPCWork*)w)->npc; p < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; p++) {
+    for (p = w->npc; p < w->npc + w->num; p++) {
         if (p->flags & 4) {
             PSVECSubtract(&p->field_30, &p->pos, &diff);
             mag = PSVECMag(&diff);
@@ -164,7 +164,7 @@ void nanNPCOption(void) {
             }
         }
     }
-    for (r = ((NanNPCWork*)w)->npc; r < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; r++) {
+    for (r = w->npc; r < w->npc + w->num; r++) {
         if (r->flags & 4) {
             mag = PSVECMag(&r->move);
             if (mag) {
@@ -172,45 +172,45 @@ void nanNPCOption(void) {
                     PSVECScale(&r->move, &r->move, 5.0f / mag);
                     mag = 5.0f;
                 }
-                v60 = r->pos;
-                v60.y += 1.0f;
-                PSVECNormalize(&r->move, &v6c);
+                from = r->pos;
+                from.y += 1.0f;
+                PSVECNormalize(&r->move, &moveDir);
                 if (r->flags & 8) {
                     PSVECAdd(&r->pos, &r->move, &r->pos);
                     PSVECScale(&r->move, &r->move, 0.6f);
                 } else {
                     clear = 1;
-                    v84 = v6c;
-                    v78 = v60;
+                    dir = moveDir;
+                    start = from;
                     r->hit1 = NULL;
                     r->hit0 = NULL;
-                    d20 = mag;
-                    r->hit0 = hitCheckFilter(NULL, &h.x, &h.y, &h.z, &d20, &n.x, &n.y, &n.z,
-                                             v78.x, v78.y, v78.z, v84.x, v84.y, v84.z);
+                    hitDist = mag;
+                    r->hit0 = hitCheckFilter(NULL, &h.x, &h.y, &h.z, &hitDist, &n.x, &n.y, &n.z,
+                                             start.x, start.y, start.z, dir.x, dir.y, dir.z);
                     if (!r->hit0) {
                         PSVECAdd(&r->pos, &r->move, &r->pos);
                     } else {
-                        v48 = r->pos;
+                        prev = r->pos;
                         PSVECAdd(&r->pos, &r->move, &r->pos);
                         if (r->move.y == 0.0f) {
                             n.y = 0.0f;
                         }
                         PSVECNormalize(&n, &n);
-                        C_VECReflect(&v84, &n, &v54);
-                        PSVECScale(&v54, &r->move, mag);
+                        C_VECReflect(&dir, &n, &refl);
+                        PSVECScale(&refl, &r->move, mag);
                         clear = 0;
-                        PSVECScale(&n, &n, PSVECDotProduct(&v84, &n) * -(mag - d20) + 0.1f);
+                        PSVECScale(&n, &n, PSVECDotProduct(&dir, &n) * -(mag - hitDist) + 0.1f);
                         PSVECAdd(&r->pos, &n, &r->pos);
-                        PSVECSubtract(&r->pos, &v48, &v3c);
-                        d20 = PSVECMag(&v3c);
-                        if ((f32)d20 > 0.0f) {
-                            PSVECNormalize(&v3c, &v3c);
-                            v78 = v48;
+                        PSVECSubtract(&r->pos, &prev, &back);
+                        hitDist = PSVECMag(&back);
+                        if (hitDist > 0.0f) {
+                            PSVECNormalize(&back, &back);
+                            start = prev;
                             r->hit1 = hitCheckFilter(
-                                NULL, &hx, &hy, &hz, &d20, &nx, &ny, &nz, v48.x, 1.0f + v48.y, v48.z,
-                                v3c.x, v3c.y, v3c.z);
+                                NULL, &hx, &hy, &hz, &hitDist, &nx, &ny, &nz, prev.x, 1.0f + prev.y, prev.z,
+                                back.x, back.y, back.z);
                             if (r->hit1) {
-                                r->pos = v78;
+                                r->pos = start;
                             }
                         }
                     }
@@ -447,26 +447,20 @@ USER_FUNC(evt_nannpc_set_subfunc) {
 
 s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
 {
+  s32 *args = event->args;
+  ExtPose *pose = extGetPosePtr();
+  s32 name = evtGetValue(event, args[0]);
+  NanNPCWork *w = nanNPCWork;
   NanNPC *p;
-  ExtPose *pose;
   char *str;
-  s32 off;
-  s32 name;
   s32 i;
-  s32 *args;
-  NanNPCWork *w;
-  args = event->args;
-  pose = extGetPosePtr();
-  name = (long long) evtGetValue(event, args[0]);
-  w = nanNPCWork;
-  for (i = 0, off = 0; i < w->num; off += sizeof(NanNPC), i++)
+  for (i = 0; i < w->num; i++)
   {
-    p = (NanNPC *) (((u8 *) w->npc) - (-off));
+    p = &w->npc[i];
     str = (char *) name;
     if (!(((u32) str) & 0x80000000))
     {
- do { } while (0);
-      sprintf(makestring, "%06x", name);
+      sprintf(makestring, "%06x", (unsigned long) name);
       str = makestring;
     }
     strcmp((char *) p->name, str);

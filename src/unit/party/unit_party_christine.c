@@ -931,23 +931,19 @@ USER_FUNC(_monosiri_flag_on) {
 }
 
 USER_FUNC(_dictionary) {
-    EventEntry* new_var3;
-    s32 new_var2;
     s32* args = event->args;
     s32 state;
     BattleWork* wp = _battleWorkPointer;
     BattleUnit* unit;
     s32 selfId, targetId;
-    int new_var;
     void* work;
 
-    selfId = (0, BattleTransID(event, -2));
+    selfId = (0, BattleTransID(event, -2)); // FAKE: comma expression; plain call changes codegen
     targetId = evtGetValue(event, args[0]);
-    new_var3 = event;
-    targetId = BattleTransID(new_var3, targetId);
+    targetId = BattleTransID(event, targetId);
     evtGetValue(event, args[1]);
     unit = BattleGetUnitPtr(wp, selfId);
-    state = (new_var2 = unit->work[0]);
+    state = unit->work[0];
     work = (void*)unit->work[1];
     switch (state) {
         case 0:
@@ -958,8 +954,7 @@ USER_FUNC(_dictionary) {
             break;
         case 2:
             monosiriMain(work);
-            new_var = 3;
-            state = new_var;
+            state = 3;
             break;
         case 3:
             monosiriMain(work);

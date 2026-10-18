@@ -877,7 +877,7 @@ config.libs = [
             Object(Matching, "koopa_motion.c"),
             Object(Matching, "kpa_act.c"),
             Object(Matching, "main.c"),
-            Object(NonMatching, "memory.c"),
+            Object(Matching, "memory.c"),
             Object(Matching, "nameent.c"),
             Object(Matching, "npc_event.c"),
             Object(NonMatching, "parse.c"),
@@ -1548,7 +1548,7 @@ config.libs = [
             Object(Matching, "event/evt_lect_gon.c", extra_cflags=["-inline noauto"]),
             Object(Matching, "unit/unit_kuriboo.c"),
             Object(Matching, "gon_03.c"),
-            Object(NonMatching, "gon_11.c"),
+            Object(Matching, "gon_11.c"),
         ]
     ),
     Rel(

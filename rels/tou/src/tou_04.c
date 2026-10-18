@@ -184,7 +184,7 @@ s32 tou_04_init_evt[668];
 USER_FUNC(memoryRY) {
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
 
-    npc->field_148 = npc->direction;
+    npc->savedDirection = npc->direction;
     return EVT_RETURN_DONE;
 }
 

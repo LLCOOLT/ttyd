@@ -11,9 +11,9 @@
 void marioResetCamShift(void) {
     MarioWork* mario = marioGetPtr();
 
-    mario->unk138 = 0.0f;
-    mario->unk140 = 0.0f;
-    mario->unk148 = 0.0f;
+    mario->camShiftTargetX = 0.0f;
+    mario->camShiftTargetY = 0.0f;
+    mario->camShiftTargetZ = 0.0f;
     mario->field_64 = 0.0f;
     mario->field_68 = 2.0f;
     mario->field_6C = (Vec){ 0.0f, 0.0f, 0.0f };
@@ -22,9 +22,9 @@ void marioResetCamShift(void) {
 void marioResetCamShiftRate(void) {
     MarioWork* mario = marioGetPtr();
 
-    mario->unk150.x = 0.03;
-    mario->unk150.y = 0.06;
-    mario->unk150.z = 0.06;
+    mario->camShiftRate.x = 0.03;
+    mario->camShiftRate.y = 0.06;
+    mario->camShiftRate.z = 0.06;
     mario->field_64 = 0.0f;
     mario->field_68 = 2.0f;
     mario->field_6C = (Vec){ 0.0f, 0.0f, 0.0f };
@@ -78,19 +78,19 @@ void marioCamMain(void) {
     camera = camGetPtr(CAMERA_3D);
     mario2 = marioGetPtr();
     if (mario2->controlStickSensitivity) {
-        if (camera->cameraPos.x == mario2->unk160) {
+        if (camera->cameraPos.x == mario2->prevCamPosX) {
             mario2->dispFlags |= 0x20;
         } else {
             mario2->dispFlags &= ~0x20;
         }
     }
-    mario2->unk160 = camera->cameraPos.x;
+    mario2->prevCamPosX = camera->cameraPos.x;
     mario->dispFlags &= ~0x40000;
 }
 
 void marioUpdateCamCollision(Vec collision) {
     MarioWork* mario = marioGetPtr();
-    mario->field_F8 = collision;
+    mario->camCollision = collision;
     mario->dispFlags |= 0x40000;
 }
 
@@ -101,25 +101,25 @@ void marioUpdateCam(void) {
     f32 sin;
     f32 cos;
 
-    UPDATE_CAM_SHIFT(mario->unk13C, mario->unk138, mario->unk150.x);
-    UPDATE_CAM_SHIFT(mario->unk144, mario->unk140, mario->unk150.y);
-    UPDATE_CAM_SHIFT(mario->unk14C, mario->unk148, mario->unk150.z);
+    UPDATE_CAM_SHIFT(mario->camShiftX, mario->camShiftTargetX, mario->camShiftRate.x);
+    UPDATE_CAM_SHIFT(mario->camShiftY, mario->camShiftTargetY, mario->camShiftRate.y);
+    UPDATE_CAM_SHIFT(mario->camShiftZ, mario->camShiftTargetZ, mario->camShiftRate.z);
 
     if (!(mario->dispFlags & 0x10000)) {
         camGetPtr(CAMERA_3D);
         sincosf(&sin, &cos, camGetPtr(CAMERA_3D)->viewYaw - 90.0f);
         if (!(mario->dispFlags & 0x20000)) {
-            mario->field_EC.x = mario->position.x + sin * mario->unk13C;
-            mario->field_EC.z = mario->position.z + cos * mario->unk13C;
-            mario->field_EC.y = mario->unk144 + (mario->position.y + mario->field_0x98.y);
+            mario->camTarget.x = mario->position.x + sin * mario->camShiftX;
+            mario->camTarget.z = mario->position.z + cos * mario->camShiftX;
+            mario->camTarget.y = mario->camShiftY + (mario->position.y + mario->dispOfs.y);
             if (mario->currMotionId == 0x19) {
-                mario->field_EC.y += 10.0f;
+                mario->camTarget.y += 10.0f;
             }
-            mario->field_64 = mario->unk14C;
+            mario->field_64 = mario->camShiftZ;
         } else {
-            mario->field_EC.x = mario->position.x + sin * mario->unk13C + sin * mario->unk14C;
-            mario->field_EC.z = mario->position.z + cos * mario->unk13C + cos * mario->unk14C;
-            mario->field_64 = mario->unk14C;
+            mario->camTarget.x = mario->position.x + sin * mario->camShiftX + sin * mario->camShiftZ;
+            mario->camTarget.z = mario->position.z + cos * mario->camShiftX + cos * mario->camShiftZ;
+            mario->field_64 = mario->camShiftZ;
         }
     }
 }
@@ -236,16 +236,16 @@ BOOL marioCamZoomUp(void) {
 
     zoomDistance = (mario->characterId == 2) ? 750.0f : 450.0f;
 
-    xOffset = (f32)(mario->unk168 - 303) / 5.0f;
+    xOffset = (f32)(mario->screenX - 303) / 5.0f;
     yOffset = 0.0f;
 
-    if ((f32)mario->unk16C > 320.0f) {
-        yOffset = (320.0f - (f32)mario->unk16C) / 3.5f;
+    if ((f32)mario->screenY > 320.0f) {
+        yOffset = (320.0f - (f32)mario->screenY) / 3.5f;
     }
 
     if (party && party->currentMemberId == PARTY_MEMBER_FLURRIE && party->flags & 0x100) {
-        angleAdjust = toMovedir(mario->unk1A8) >= 180.0f ? -70.0f : 70.0f;
-        tempX = mario->unk168;
+        angleAdjust = toMovedir(mario->displayDirection) >= 180.0f ? -70.0f : 70.0f;
+        tempX = mario->screenX;
         zoomDistance = 550.0f;
         xOffset = ((f32)(tempX - 303) / 5.0f) + angleAdjust;
     }
@@ -316,11 +316,11 @@ BOOL marioCamZoomUpLevelMain(void) {
         zoomDistance = 450.0f;
     }
 
-    xOffset = (f32)(mario->unk168 - 303) / 5.0f;
+    xOffset = (f32)(mario->screenX - 303) / 5.0f;
     yOffset = 0.0f;
 
-    if ((f32)mario->unk16C > 320.0f) {
-        yOffset = (320.0f - (f32)mario->unk16C) / 3.5f;
+    if ((f32)mario->screenY > 320.0f) {
+        yOffset = (320.0f - (f32)mario->screenY) / 3.5f;
     }
 
     camera = camGetPtr(CAMERA_3D);

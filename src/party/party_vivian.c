@@ -28,7 +28,7 @@ typedef struct VivianParty {
     u8 pad88[0xB8 - 0x88];   // 0x88
     Vec shadow;              // 0xB8
     u8 padC4[0xF0 - 0xC4];   // 0xC4
-    f32 field_F0;            // 0xF0
+    f32 height;              // 0xF0
     f32 field_F4;            // 0xF4
     u8 padF8[0x160 - 0xF8];  // 0xF8
     MarioWork* mw160;
@@ -102,7 +102,7 @@ void mot_vivian_post(void) {
         marioPaperOff();
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
-            mario->field_0xA4 = zero;
+            mario->dispOfs2 = zero;
         }
         mario->flags &= ~0x400;
         if (party) {
@@ -131,7 +131,7 @@ cancel:
 void vivian_init_801809C0(VivianParty* party) {
     party->field_33 = 6;
     party->field_32 = 1;
-    party->field_F0 = 35.0f;
+    party->height = 35.0f;
     party->field_F4 = 24.0f;
     party->field_174 = 10.0f;
     party->field_4F = 0;
@@ -264,9 +264,9 @@ static inline void vivianFollow(VivianParty* party) {
     marioGetScreenPos(m->position, &sx, &sy, &sz);
     hit = marioSearchGround(&gx, &gy, &gz, 37.0f, -37.0f);
     if (hit && !(hitGetAttr(hit) & 0xA00)) {
-        MF(void*, 0x1E4) = hit;
-        MF(f32, 0x90) = gx;
-        if (MF(f32, 0x178) < 0.0f) {
+        m->hitobjStandOn = hit;
+        m->position.y = gx;
+        if (m->unk174.y < 0.0f) {
             gx += 0.2f;
         }
     }
@@ -277,14 +277,14 @@ static inline void vivianFollow(VivianParty* party) {
             PF(f32, 0x17C) = -13.0f;
         }
         PF(Vec, 0x94) = m->position;
-        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), PF(f32, 0x17C), toMovedirSimple(MF(f32, 0x1A8)));
-        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), 0.0f, toMovedirSimple(MF(f32, 0x1A8)));
-        if (0.0f == MF(f32, 0x1AC)) {
+        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), PF(f32, 0x17C), toMovedirSimple(m->displayDirection));
+        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), 0.0f, toMovedirSimple(m->displayDirection));
+        if (0.0f == m->displayDirectionTarget) {
             ofs = -2.5f;
         } else {
             ofs = 2.5f;
         }
-        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), ofs, toMovedir(270.0f + MF(f32, 0x1A8)));
+        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), ofs, toMovedir(270.0f + m->displayDirection));
     } else {
         if (id >= 4) {
             PF(f32, 0x17C) += 0.4f;
@@ -293,16 +293,16 @@ static inline void vivianFollow(VivianParty* party) {
             }
         }
         PF(Vec, 0x94) = m->position;
-        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), PF(f32, 0x17C), toMovedirSimple(MF(f32, 0x1A8)));
-        if (0.0f == MF(f32, 0x1AC)) {
+        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), PF(f32, 0x17C), toMovedirSimple(m->displayDirection));
+        if (0.0f == m->displayDirectionTarget) {
             ofs = -2.5f;
         } else {
             ofs = 2.5f;
         }
-        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), ofs, toMovedir(270.0f + MF(f32, 0x1A8)));
+        movePos(&PF(f32, 0x94), &PF(f32, 0x9C), ofs, toMovedir(270.0f + m->displayDirection));
     }
     if (strcmp(gp->currentMapName, "eki_02") == 0) {
-        marioChkWallAround(&m->position, 1, 0.0f, MF(f32, 0x1A0), MF(f32, 0x1BC), 0.5f);
+        marioChkWallAround(&m->position, 1, 0.0f, m->directionView, m->wPlayerCollisionBox.z, 0.5f);
     }
 }
 
@@ -321,7 +321,7 @@ void vivian_use(VivianParty* party) {
         vivian_cancel_req = 0;
         L_partyForceSlitOff(party);
     }
-    MF(f32, 0x180) = 0.0f;
+    m->baseSpeed = 0.0f;
     PF(f32, 0x104) = 0.0f;
 
     switch (party->useMotionId) {
@@ -330,8 +330,8 @@ void vivian_use(VivianParty* party) {
         PF(f32, 0x17C) = -13.0f;
         vivianFollow(party);
         PF(f32, 0x100) = angleABf(party->position.x, party->position.z, PF(f32, 0x94), PF(f32, 0x9C));
-        PF(f32, 0x10C) = MF(f32, 0x1A8);
-        PF(f32, 0x110) = MF(f32, 0x1AC);
+        PF(f32, 0x10C) = m->displayDirection;
+        PF(f32, 0x110) = m->displayDirectionTarget;
         PF(f32, 0x104) = 0.0f;
         PF(f32, 0x114) = 0.0f;
         party->useMotionId = 1;
@@ -347,7 +347,7 @@ void vivian_use(VivianParty* party) {
             break;
         }
         party->flags2 |= 0x200000;
-        PF(f32, 0x110) = MF(f32, 0x1AC);
+        PF(f32, 0x110) = m->displayDirectionTarget;
         PF(f32, 0xFC) = toMovedirSimple(PF(f32, 0x110));
         party->shadow = party->position;
         MF(u32, 0x4) |= 0x1000;
@@ -366,12 +366,12 @@ void vivian_use(VivianParty* party) {
         vivianFollow(party);
         if (30 - PF(s32, 0x24) <= 24) {
             party->field_7C.y += 0.4f;
-            MF(f32, 0xA8) += 0.4f;
+            m->dispOfs2.y += 0.4f;
             if (party->field_7C.y >= 8.0f) {
                 party->field_7C.y = 8.0f;
             }
-            if (MF(f32, 0xA8) >= 8.0f) {
-                MF(f32, 0xA8) = 8.0f;
+            if (m->dispOfs2.y >= 8.0f) {
+                m->dispOfs2.y = 8.0f;
             }
         }
         party->field_174 += 1.0f;
@@ -396,7 +396,7 @@ void vivian_use(VivianParty* party) {
         if (party->field_174 <= 10.0f) {
             party->field_174 = 10.0f;
             party->useMotionId = 10;
-            MF(u32, 0x0) |= 0x400;
+            m->flags |= 0x400;
         }
         break;
     case 10:
@@ -411,16 +411,16 @@ void vivian_use(VivianParty* party) {
         break;
     }
 
-    MF(f32, 0x8C) += MF(f32, 0x174);
-    MF(f32, 0x94) += MF(f32, 0x17C);
-    MF(f32, 0x90) += MF(f32, 0x178);
+    m->position.x += m->unk174.x;
+    m->position.z += m->unk174.z;
+    m->position.y += m->unk174.y;
     if (party->useMotionId >= 2) {
         party->position = PF(Vec, 0x94);
         party->shadow = m->position;
     } else {
         party->shadow = party->position;
     }
-    d = MF(f32, 0x90) - MF(f32, 0x114);
+    d = m->position.y - MF(f32, 0x114);
     if (d > 0.0f) {
         party->shadow.y += d;
     }
@@ -436,7 +436,7 @@ void vivian_use(VivianParty* party) {
     switch (party->useMotionId) {
     case 20:
         PF(f32, 0x17C) = 0.0f;
-        MF(u32, 0x0) &= ~0x400;
+        m->flags &= ~0x400;
         psndSFXOn_3D(0x934, &party->position);
         party->useMotionId = 21;
     case 21:
@@ -473,7 +473,7 @@ void vivian_use(VivianParty* party) {
         }
         if (PF(s32, 0x24) == 20) {
             marioChgPose("M_S_1");
-            MF(s16, 0x28) = 24;
+            m->poseTime = 24;
             PF(s16, 0x182) = 24;
             party->useMotionId = 25;
         }
@@ -482,9 +482,9 @@ void vivian_use(VivianParty* party) {
         vivianFollow(party);
         animPoseSetLocalTime(PF(s32, 0xC), PF(s32, 0x24));
         animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], PF(s16, 0x182));
-        MF(f32, 0xA8) -= 0.4f;
-        if (MF(f32, 0xA8) <= 2.7f) {
-            MF(f32, 0xA8) = 2.7f;
+        m->dispOfs2.y -= 0.4f;
+        if (m->dispOfs2.y <= 2.7f) {
+            m->dispOfs2.y = 2.7f;
         }
         party->field_7C.y -= 0.4f;
         if (party->field_7C.y <= 2.7f) {
@@ -500,9 +500,9 @@ void vivian_use(VivianParty* party) {
         vivianFollow(party);
         animPoseSetLocalTime(PF(s32, 0xC), 0.0f);
         animPoseSetLocalTime(m->paperAnimGroupId[marioAnimeId()], PF(s16, 0x182));
-        MF(f32, 0xA8) -= 0.4f;
-        if (MF(f32, 0xA8) <= 2.7f) {
-            MF(f32, 0xA8) = 2.7f;
+        m->dispOfs2.y -= 0.4f;
+        if (m->dispOfs2.y <= 2.7f) {
+            m->dispOfs2.y = 2.7f;
         }
         party->field_7C.y -= 0.4f;
         if (party->field_7C.y <= 2.7f) {
@@ -519,14 +519,14 @@ void vivian_use(VivianParty* party) {
             marioPaperOff();
             MF(s32, 0x20) = 0;
             MF(u32, 0x4) &= ~0x1000;
-            MF(void*, 0x1E8) = MF(void*, 0x1E4);
-            MF(void*, 0x1E4) = NULL;
+            m->hitobjJumpFrom = m->hitobjStandOn;
+            m->hitobjStandOn = NULL;
             {
                 Vec zero = {0.0f, 0.0f, 0.0f};
                 MF(Vec, 0xA4) = zero;
             }
             marioChgSmallJumpMotion();
-            MF(f32, 0x180) = 0.0f;
+            m->baseSpeed = 0.0f;
         }
         break;
     case 27:

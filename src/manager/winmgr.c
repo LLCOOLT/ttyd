@@ -600,10 +600,10 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
     sel->type = n;
     sel->cursor = 0;
     sel->scrollTop = 0;
-    sel->field_0x18 = 0.0f;
-    sel->field_0x14 = 0.0f;
-    sel->field_0x1C = 0.0f;
-    sel->field_0x38 = a2;
+    sel->cursorY = 0.0f;
+    sel->cursorX = 0.0f;
+    sel->scrollY = 0.0f;
+    sel->newItem = a2;
     if (a3) {
         sel->flags |= 0x100;
     }
@@ -617,8 +617,8 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
         winMgrSetParam(sel->descriptorId[i], sel);
     }
     desc = select_desc_tbl[n].descriptors;
-    sel->field_0x14 = desc->x;
-    sel->field_0x18 = desc->y - 54;
+    sel->cursorX = desc->x;
+    sel->cursorY = desc->y - 54;
 
     switch (m = sel->type) {
         case 0:
@@ -836,10 +836,10 @@ WinMgrSelect* winMgrSelectEntry(s32 type, s32 a2, BOOL a3) {
         case 17:
         case 18:
             if (m == 17) {
-                tbl = jdt->unk14.unkD;
+                tbl = jdt->readFlags.perfectRead;
             }
             else {
-                tbl = jdt->unk14.unk1A;
+                tbl = jdt->readFlags.luigiRead;
             }
             sel->numItems = jdt->count;
             sel->items = __memAlloc(HEAP_DEFAULT, (sel->numItems + 1) * 4);
@@ -900,7 +900,7 @@ s32 winMgrSelect(WinMgrSelect* sel) {
         if (sel->flags & 0x2000) {
             return -1;
         }
-        if (sel->field_0x38 && sel->cursor == 0 && (sel->flags & 0x100)) {
+        if (sel->newItem && sel->cursor == 0 && (sel->flags & 0x100)) {
             return -1;
         }
         return sel->items[sel->cursor].id;
@@ -1032,12 +1032,12 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
         case 17:
             sprintf((char*)jdt->infoEnd, "%s_%04d", jdt->prefix, jdt->info[id].storyId);
             sprintf(buf, "jperfect_title_%04d", jdt->info[id].storyId);
-            *(s32*)jdt->unk10 = id;
+            jdt->curIndex = id;
             name = msgSearch(buf);
             evt->lwData[1] = (s32)jdt->infoEnd;
             evt->lwData[2] = (s32)name;
             evt->lwData[3] = strlen(name);
-            if (johoya_get(jdt->unk14.unkD, jdt->info[id].storyId)) {
+            if (johoya_get(jdt->readFlags.perfectRead, jdt->info[id].storyId)) {
                 evt->lwData[4] = 0;
             }
             else {
@@ -1046,11 +1046,11 @@ s32 winMgrSelectOther(WinMgrSelect* sel, EventEntry* evt) {
             break;
         case 18:
             sprintf((char*)jdt->infoEnd, "%s_%04d", jdt->prefix, jdt->info[id].storyId);
-            *(s32*)jdt->unk10 = id;
+            jdt->curIndex = id;
             evt->lwData[1] = (s32)jdt->infoEnd;
             evt->lwData[2] = jdt->info[id].initEndPos;
             evt->lwData[3] = jdt->info[id].tagEndPos;
-            if (johoya_get(jdt->unk14.unk1A, jdt->info[id].storyId)) {
+            if (johoya_get(jdt->readFlags.luigiRead, jdt->info[id].storyId)) {
                 evt->lwData[4] = 0;
             }
             else {
@@ -1159,9 +1159,9 @@ void select_main(WinMgrEntry* entry) {
                     sel->state++;
                 }
             }
-            sel->field_0x1C += (24.0f * sel->scrollTop - sel->field_0x1C) / 6.0f;
-            sel->field_0x14 += (entry->x - sel->field_0x14) / 6.0f;
-            sel->field_0x18 += ((entry->y - 54) - 24.0f * (sel->cursor - sel->scrollTop) - sel->field_0x18) / 6.0f;
+            sel->scrollY += (24.0f * sel->scrollTop - sel->scrollY) / 6.0f;
+            sel->cursorX += (entry->x - sel->cursorX) / 6.0f;
+            sel->cursorY += ((entry->y - 54) - 24.0f * (sel->cursor - sel->scrollTop) - sel->cursorY) / 6.0f;
             break;
         case 2:
             for (i = 0; i < sel->numDescriptors; i++) {
@@ -1217,11 +1217,11 @@ void select_disp(WinMgrEntry* entry) {
         for (i = 0; i < sel->numItems; i++) {
             f32 py;
             item = &itemDataTable[sel->items[i].id];
-            py = sel->field_0x1C + (ofs + (entry->y - 44 - i * 24));
+            py = sel->scrollY + (ofs + (entry->y - 44 - i * 24));
             if ((f32)entry->y < py - 32.0f || (f32)(entry->y - entry->height) > py + 32.0f) {
                 continue;
             }
-            if (sel->field_0x38 == 0) {
+            if (sel->newItem == 0) {
                 ofs = ofs + 0.0f;
             }
             if (sel->items[i].flags & 1) {
@@ -1229,9 +1229,9 @@ void select_disp(WinMgrEntry* entry) {
             } else {
                 winIconInit();
             }
-            winIconSet(item->icon_id, (Vec){entry->x + 35, sel->field_0x1C + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, iconcol);
+            winIconSet(item->icon_id, (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, iconcol);
             winFontInit();
-            winFontSet((Vec){entry->x + 60, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+            winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & 1) ? &gray : &black), msgSearch(item->name));
             show = FALSE;
             switch (sel->type) {
@@ -1267,13 +1267,13 @@ void select_disp(WinMgrEntry* entry) {
             sprintf(buf, "%d", price);
             tw = FontGetMessageWidth(buf);
             winFontInit();
-            winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
+            winFontSet((Vec){entry->x + entry->width - 10 - tw, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & 1) ? &gray : &black), buf);
         }
-        if (sel->field_0x38) {
+        if (sel->newItem) {
             winIconInit();
             for (k = 2; k < 30; k++) {
-                winIconSet(0x1B7, (Vec){entry->x + k * entry->width / 31, (entry->y - 56) + sel->field_0x1C, 0.0f}, (Vec){0.15f, 0.15f, 0.15f}, black);
+                winIconSet(0x1B7, (Vec){entry->x + k * entry->width / 31, (entry->y - 56) + sel->scrollY, 0.0f}, (Vec){0.15f, 0.15f, 0.15f}, black);
             }
         }
         GXSetScissor(left, top, wd, ht);
@@ -1327,7 +1327,7 @@ void select_disp(WinMgrEntry* entry) {
                 iconDispGx(&(Vec){entry->x + 268, entry->y - 12, 0.0f}, 16, 0x13F, 0.6f);
                 break;
         }
-        iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
+        iconDispGx(&(Vec){sel->cursorX, sel->cursorY, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
                 iconDispGx(&(Vec){entry->x + entry->width / 2.0f, entry->y - 36, 1.0f}, 16, 0x1B5, 0.6f);
@@ -1402,15 +1402,15 @@ void select_disp_party(WinMgrEntry* entry) {
         ofs = 0.0f;
         for (i = 0; i < sel->numItems; i++) {
             f32 py;
-            py = sel->field_0x1C + (ofs + (entry->y - 44 - i * 24));
+            py = sel->scrollY + (ofs + (entry->y - 44 - i * 24));
             if ((f32)entry->y < py - 32.0f || (f32)(entry->y - entry->height) > py + 32.0f) {
                 continue;
             }
-            if (sel->field_0x38 == 0) {
+            if (sel->newItem == 0) {
                 ofs = ofs + 0.0f;
             }
             winFontInit();
-            winFontSet((Vec){entry->x + 60, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f},
+            winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f},
                        (Vec){FontGetMessageWidth(select_party_name(sel->items[i].id)) > 170 ? 170.0f / FontGetMessageWidth(select_party_name(sel->items[i].id)) : 1.0f, 1.0f, 1.0f},
                        *((sel->items[i].flags & 1) ? &gray : &black), select_party_name(sel->items[i].id));
             if (sel->items[i].flags & 1) {
@@ -1418,14 +1418,14 @@ void select_disp_party(WinMgrEntry* entry) {
             } else {
                 winIconInit();
             }
-            winIconSet(select_party_icon(sel->items[i].id), (Vec){entry->x + 35, sel->field_0x1C + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
+            winIconSet(select_party_icon(sel->items[i].id), (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
             for (j = 0; j < pouch->partyData[party_id_table[sel->items[i].id]].techLevel; j++) {
                 if (sel->items[i].flags & 1) {
                     winIconGrayInit();
                 } else {
                     winIconInit();
                 }
-                winIconSet(0x102, (Vec){entry->x + 253 + j * 27, sel->field_0x1C + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
+                winIconSet(0x102, (Vec){entry->x + 253 + j * 27, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
             }
         }
         GXSetScissor(left, top, wd, ht);
@@ -1437,7 +1437,7 @@ void select_disp_party(WinMgrEntry* entry) {
         w = (85 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
         winFontSetEdge((Vec){entry->x + entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, msg);
-        iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
+        iconDispGx(&(Vec){sel->cursorX, sel->cursorY, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
                 iconDispGx(&(Vec){entry->x + entry->width / 2.0f, entry->y - 36, 1.0f}, 16, 0x1B5, 0.6f);
@@ -1476,12 +1476,12 @@ void select_disp_mario(WinMgrEntry* entry) {
         ofs = 0.0f;
         for (i = 0; i < sel->numItems; i++) {
             f32 py;
-            py = sel->field_0x1C + (ofs + (entry->y - 44 - i * 24));
+            py = sel->scrollY + (ofs + (entry->y - 44 - i * 24));
             id = sel->items[i].id;
             if ((f32)entry->y < py - 32.0f || (f32)(entry->y - entry->height) > py + 32.0f) {
                 continue;
             }
-            if (sel->field_0x38 == 0) {
+            if (sel->newItem == 0) {
                 ofs = ofs + 0.0f;
             }
             winFontInit();
@@ -1489,20 +1489,20 @@ void select_disp_mario(WinMgrEntry* entry) {
             if (sel->items[i].flags & 1) {
                 col = &gray;
             }
-            winFontSet((Vec){entry->x + 60, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, mario_status_name_table[id]);
+            winFontSet((Vec){entry->x + 60, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, mario_status_name_table[id]);
             if (sel->items[i].flags & 1) {
                 winIconGrayInit();
             } else {
                 winIconInit();
             }
-            winIconSet(mario_status_icon_table[id], (Vec){entry->x + 35, sel->field_0x1C + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
+            winIconSet(mario_status_icon_table[id], (Vec){entry->x + 35, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){0.55f, 0.55f, 0.55f}, iconcol);
             sprintf(buf, "%3d", *mario_status_point_table[id]);
             winFontInit();
             col = &black;
             if (sel->items[i].flags & 1) {
                 col = &gray;
             }
-            winFontSet((Vec){entry->x + 160, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
+            winFontSet((Vec){entry->x + 160, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
             if (sel->items[i].flags & 2) {
                 continue;
             }
@@ -1520,9 +1520,9 @@ void select_disp_mario(WinMgrEntry* entry) {
             if (sel->items[i].flags & 1) {
                 col = &gray;
             }
-            winFontSet((Vec){entry->x + 240, sel->field_0x1C + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
+            winFontSet((Vec){entry->x + 240, sel->scrollY + (ofs + (entry->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
             winIconInit();
-            winIconSet(0x163, (Vec){entry->x + 220, sel->field_0x1C + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){-0.55f, 0.55f, 0.55f}, iconcol);
+            winIconSet(0x163, (Vec){entry->x + 220, sel->scrollY + (ofs + (entry->y - 44 - i * 24)), 0.0f}, (Vec){-0.55f, 0.55f, 0.55f}, iconcol);
         }
         GXSetScissor(left, top, wd, ht);
         msg = msgSearch("msg_window_title_9");
@@ -1533,7 +1533,7 @@ void select_disp_mario(WinMgrEntry* entry) {
         w = (85 - FontGetMessageWidth(msg)) / 2;
         winFontInit();
         winFontSetEdge((Vec){entry->x + entry->width * 3 / 5 + (entry->width * 2 / 5 - 85) / 3 + w, entry->y + 14, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white2, msg);
-        iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
+        iconDispGx(&(Vec){sel->cursorX, sel->cursorY, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
                 iconDispGx(&(Vec){entry->x + entry->width / 2.0f, entry->y - 36, 1.0f}, 16, 0x1B5, 0.6f);
@@ -1571,7 +1571,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
         GXSetScissor(ent->x + 304, 274 - ent->y, ent->width, ent->height - 50);
         info = jdt->info;
         for (i = 0; i < sel->numItems; i++, info++) {
-            py = sel->field_0x1C + (zero + (ent->y - 44 - i * 24));
+            py = sel->scrollY + (zero + (ent->y - 44 - i * 24));
             if ((f32)ent->y < py - 32.0f || (f32)(ent->y - ent->height) > py + 32.0f) {
                 continue;
             }
@@ -1583,7 +1583,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
             } else {
                 col = &black;
             }
-            winFontSet((Vec){ent->x + 25, sel->field_0x1C + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
+            winFontSet((Vec){ent->x + 25, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, *col, (char*)info->initEndPos);
             ((char*)info->initEndPos)[info->tagEndPos] = save;
             if (sel->type == 17 && !(sel->items[i].flags & 1)) {
                 sprintf(buf, "%3d", info->unkA);
@@ -1592,7 +1592,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
                 if (sel->items[i].flags & 1) {
                     col = &gray;
                 }
-                winFontSet((Vec){ent->x + 245, sel->field_0x1C + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
+                winFontSet((Vec){ent->x + 245, sel->scrollY + (zero + (ent->y - 32 - i * 24)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, *col, buf);
             }
         }
         GXSetScissor(left, top, wd, ht);
@@ -1617,7 +1617,7 @@ void select_disp_luigi(WinMgrEntry* entry) {
                 iconDispGx(&(Vec){ent->x + 268, ent->y - 12, 0.0f}, 16, 0x18B, 0.6f);
                 break;
         }
-        iconDispGx(&(Vec){sel->field_0x14, sel->field_0x18, 1.0f}, 20, 0x1F0, 1.0f);
+        iconDispGx(&(Vec){sel->cursorX, sel->cursorY, 1.0f}, 20, 0x1F0, 1.0f);
         if (sel->numItems > 8 && (gp->retraceCount & 31) < 20) {
             if (sel->scrollTop != 0) {
                 iconDispGx(&(Vec){ent->x + ent->width / 2.0f, ent->y - 36, 1.0f}, 16, 0x1B5, 0.6f);

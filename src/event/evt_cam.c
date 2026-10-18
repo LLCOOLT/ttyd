@@ -66,13 +66,9 @@ USER_FUNC(evt_cam_get_at) {
 
 // CameraId id, f32 x, f32 y, s32 msec
 USER_FUNC(evt_cam_shake) {
-    u64 now;
     s32* args = event->args;
-    int new_var;
+    u64 now;
     u64 last;
-    u32 hi;
-    int new_var2;
-    u32 lo;
     CameraId id;
     s32 msec;
     f32 x, y;
@@ -81,29 +77,26 @@ USER_FUNC(evt_cam_shake) {
 
     id = evtGetValue(event, args[0]);
     x = evtGetFloat(event, args[1]);
-    new_var2 = id;
     y = evtGetFloat(event, args[2]);
     msec = evtGetValue(event, args[3]);
-    hi = ((u32*)&event->lifetime)[0];
-    lo = ((u32*)&event->lifetime)[1];
-    now = ((u64)hi << 32) | lo;
+    now = event->lifetime;
     if (isFirstCall) {
         event->userdata[0] = 0;
         ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->userdata[1])[1] = now & 0xFFFFFFFF;
-        *(s32*)&event->field_84 = 0;
+        event->userdata3 = 0;
         ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
     }
     event->userdata[0]++;
     event->userdata[0] %= 4;
     if (event->userdata[0] < 2) {
-        PSMTX44Trans(camGetPtr(new_var2)->projAdjust, x, y, 0.0f);
+        PSMTX44Trans(camGetPtr(id)->projAdjust, x, y, 0.0f);
     }
     else {
-        PSMTX44Trans(camGetPtr(new_var2)->projAdjust, -x, -y, 0.0f);
+        PSMTX44Trans(camGetPtr(id)->projAdjust, -x, -y, 0.0f);
     }
-    camGetPtr(new_var2)->flags |= 8;
+    camGetPtr(id)->flags |= 8;
     if (msec) {
         if ((u64)msec < OSTicksToMilliseconds(now - *(u64*)&event->userdata[1])) {
             camGetPtr(id)->flags &= ~8;
@@ -116,19 +109,18 @@ USER_FUNC(evt_cam_shake) {
     offTime = 50.0f * (1.0f - len);
     last = event->wInterpRelatedTime;
     if (onTime && offTime) {
-        if (!*(s32*)&event->field_84) {
+        if (!event->userdata3) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
-                new_var = 32;
-                event->field_84 = 1 - event->field_84;
-                ((u32*)&event->wInterpRelatedTime)[0] = (now >> new_var) & 0xFFFFFFFF;
+                event->userdata3 = 1 - event->userdata3;
+                ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
         }
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
-                event->field_84 = 1 - event->field_84;
+                event->userdata3 = 1 - event->userdata3;
                 ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
@@ -502,8 +494,8 @@ USER_FUNC(evt_cam_road_reset) {
     camera->marioAt.x = camera->marioPos.x;
     camera->marioAt.y = camera->marioPos.y;
     camera->marioAt.z = camera->marioPos.z;
-    mario->field_EC = mario->position;
-    mario->field_F8 = mario->position;
+    mario->camTarget = mario->position;
+    mario->camCollision = mario->position;
     camRoadReset();
     camShiftReset();
     return EVT_RETURN_DONE;
@@ -528,8 +520,8 @@ USER_FUNC(evt_cam_road_reset2) {
     camera->marioAt.x = camera->marioPos.x;
     camera->marioAt.y = camera->marioPos.y;
     camera->marioAt.z = camera->marioPos.z;
-    mario->field_EC = (Vec){x, y, z};
-    mario->field_F8 = (Vec){x, y, z};
+    mario->camTarget = (Vec){x, y, z};
+    mario->camCollision = (Vec){x, y, z};
     camRoadReset();
     camShiftReset();
     return EVT_RETURN_DONE;

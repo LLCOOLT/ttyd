@@ -170,10 +170,10 @@ typedef struct AnimationPose {
     AnimPoseNode* mpNodes;              // 0x64
     AnimTexMtx* mpBufferTexAnimEntries; // 0x68
     AnimTexMtx* mpTexAnimEntries;       // 0x6C
-    f32 field_0x70;                     // 0x70
+    f32 peraRotY;                       // 0x70, base Y rotation for the paper turn (flags & 8)
     f32 rotationY;                      // 0x74
     f32 field_0x78;                     // 0x78
-    f32 field_0x7C;                     // 0x7C
+    f32 peraTargetRotY;                 // 0x7C, rotationY turns toward this; animPoseGetPeraEnd checks it
     s32 field_0x80;                     // 0x80
     f32 loopTime;                       // 0x84
     OSTime mLocalTimeInit;              // 0x88
@@ -185,9 +185,9 @@ typedef struct AnimationPose {
     s32 materialLightFlag;              // 0xEC
     GXColor materialColor;              // 0xF0
     GXColor materialColor2;             // 0xF4
-    f32 field_0xF8;                     // 0xF8
-    f32 field_0xFC;                     // 0xFC
-    f32 field_0x100;                    // 0x100
+    f32 paperScaleXZ;                   // 0xF8, paper-mode draw scale
+    f32 paperScaleY;                    // 0xFC
+    f32 paperOfsY;                      // 0x100, paper-mode Y offset (doubled in battle)
     u8 field_0x104[0x11C - 0x104];      // 0x104
     s32 vivianType;                     // 0x11C
     s32* vivianGroupNo;                 // 0x120

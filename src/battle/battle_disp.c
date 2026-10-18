@@ -20,15 +20,15 @@ f32 sinfd(f32 degrees);
 s32 BtlUnit_EnemyItemCanUseCheck(s32 item);
 
 #define PART_FIELD(p, T, o) (*(T*)((u8*)(p) + (o)))
-#define PART_GRAVITY(p) PART_FIELD(p, u16, 0x1A6)
-#define PART_FLOAT(p) PART_FIELD(p, u16, 0x1A8)
-#define PART_POSENAME(p) ((char*)(p)->field_0x1C4)
-#define PART_ANIMFLAGS(p) PART_FIELD(p, u32, 0x204)
-#define PART_ANIMSPEED(p) PART_FIELD(p, f32, 0x208)
-#define PART_ANIMSPEED2(p) PART_FIELD(p, f32, 0x20C)
-#define PART_POSESTATE(p) PART_FIELD(p, u8, 0x214)
-#define PART_POSETYPE(p) PART_FIELD(p, u8, 0x215)
-#define PART_POSETIMER(p) PART_FIELD(p, u16, 0x216)
+#define PART_GRAVITY(p) ((p)->gravityTimer)
+#define PART_FLOAT(p) ((p)->floatTimer)
+#define PART_POSENAME(p) ((p)->poseName)
+#define PART_ANIMFLAGS(p) ((p)->animFlags)
+#define PART_ANIMSPEED(p) ((p)->animSpeed)
+#define PART_ANIMSPEED2(p) ((p)->animSpeed2)
+#define PART_POSESTATE(p) ((p)->poseState)
+#define PART_POSETYPE(p) ((p)->poseType)
+#define PART_POSETIMER(p) ((p)->poseTimer)
 #define BW_S32(w, o) (*(s32*)((u8*)(w) + (o)))
 
 extern BattleWork* _battleWorkPointer;
@@ -367,7 +367,7 @@ void btlDispMain(void) {
 			}
 		}
 next:
-		loop = UNF(unit, u8, 0x30E);
+		loop = unit->moveColorLvDisp;
 		BtlUnit_OffUnitFlag(unit, 2);
 		if (loop != unit->mMoveColorLv) {
 			BtlUnit_OnUnitFlag(unit, 2);
@@ -380,7 +380,7 @@ next:
 				if (loop < unit->mMoveColorLv) loop = unit->mMoveColorLv;
 			}
 		}
-		UNF(unit, u8, 0x30E) = loop;
+		unit->moveColorLvDisp = loop;
 		BtlUnit_HpGaugeMain(unit);
 		unit->mSizeMultiplier = 1.0f;
 		BtlUnit_GetStatus(unit, 0xB, &turns, &strength);
@@ -484,18 +484,18 @@ next:
 			statusPoseControl(part);
 			BtlUnit_GetPartsWorldPos(part, &wx, &wy, &wz);
 			animPoseMain(part->poseId);
-			zpos = (Vec){wx, wy, wz + PART_FIELD(part, f32, 0x4F8)};
-			PART_FIELD(part, u8, 0x4F7) = part->mKindPartParams->baseAlpha;
+			zpos = (Vec){wx, wy, wz + part->dispZOffset};
+			part->dispColor.a = part->mKindPartParams->baseAlpha;
 			if (BtlUnit_CheckStatus(unit, 0x12) || (unit->mAttributeFlags & 8)) {
-				PART_FIELD(part, u8, 0x4F7) = (PART_FIELD(part, u8, 0x4F7) << 7) / 255;
+				part->dispColor.a = (part->dispColor.a << 7) / 255;
 			}
-			PART_FIELD(part, u8, 0x4F7) = PART_FIELD(part, u8, 0x4F7) * part->color.a / 255;
-			PART_FIELD(part, u8, 0x4F4) = part->color.r;
-			PART_FIELD(part, u8, 0x4F5) = part->color.g;
-			PART_FIELD(part, u8, 0x4F6) = part->color.b;
+			part->dispColor.a = part->dispColor.a * part->color.a / 255;
+			part->dispColor.r = part->color.r;
+			part->dispColor.g = part->color.g;
+			part->dispColor.b = part->color.b;
 			if (!(unit->mAttributeFlags & 0x1000000) && !(part->attributes & 0x1000000)) {
 				if (!(part->attributes & 1) || !(unit->mAttributeFlags & 0x10)) {
-					if (PART_FIELD(part, u8, 0x4F7) < 0xFF || animPoseTestXLU(part->poseId)) {
+					if (part->dispColor.a < 0xFF || animPoseTestXLU(part->poseId)) {
 						if (!(PART_ANIMFLAGS(part) & 0x100)) {
 							dispEntry(CAMERA_3D, dispCalcZ(&zpos), 2, (DispCallback)btlUnitPartsDisp, part);
 						}
@@ -517,8 +517,8 @@ next:
 					BtlUnit_GetPos(partner, &vpos.x, &vpos.y, &vpos.z);
 					spos.x += vpos.x;
 					spos.y += vpos.y;
-					spos.z += vpos.z;
 					spos.x *= 0.5f;
+					spos.z += vpos.z;
 					spos.y *= 0.5f;
 					spos.z *= 0.5f;
 				}
@@ -531,8 +531,8 @@ next:
 				}
 				if (scale > 1.0) scale = 1.0f;
 				if (scale < 0.1f) scale = 0.1f;
-				scale = scale * ((f32)PART_FIELD(part, s16, 0x1A2) * unit->mScale.x * part->mScale.x * unit->mSizeMultiplier) ;
-				scale = scale * part->field_0x78;
+				scale = scale * ((f32)part->shadowSize * unit->mScale.x * part->mScale.x * unit->mSizeMultiplier) ;
+				scale = scale * part->shadowScale;
 				if ((unit->flags & 0x10000) && scale < 16.0f) scale = 16.0f;
 				if (scale < 10.0f) scale = 8.0f;
 				shadowEntry(spos.x, 10.0f + h, spos.z, scale);
@@ -713,7 +713,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 				PSMTXIdentity(uM);
 				PSMTXConcat(uS, uM, uM);
 				PSMTXConcat(uTN, uM, uM);
-				switch (PART_FIELD(part, s8, 0x4FC)) {
+				switch (part->rotationOrder) {
 					case 0:
 						PSMTXConcat(uRy, uM, uM);
 						PSMTXConcat(uRz, uM, uM);
@@ -754,7 +754,7 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 		PSMTXConcat(uMtx, uM, uM);
 		PSMTXConcat(pS, uM, uM);
 		PSMTXConcat(pTN, uM, uM);
-		switch (PART_FIELD(part, s8, 0x4FC)) {
+		switch (part->rotationOrder) {
 			case 0:
 				PSMTXConcat(pRy, uM, uM);
 				PSMTXConcat(pRz, uM, uM);
@@ -794,8 +794,8 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 		PSMTXConcat(mT5, blurMtx, blurMtx);
 	}
 
-	color = &PART_FIELD(part, GXColor, 0x218);
-	*color = PART_FIELD(part, GXColor, 0x4F4);
+	color = &part->drawColor;
+	*color = part->dispColor;
 	if (PART_ANIMFLAGS(part) & 0x10) {
 		color->r = 0;
 		color->g = 0;
@@ -811,14 +811,14 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 			color->r = color->r * 160 / 255;
 			color->b = color->r * 160 / 255;
 		}
-		color->r = color->r * UNF(unit, u8, 0x30E) / 255;
-		color->g = color->g * UNF(unit, u8, 0x30E) / 255;
-		color->b = color->b * UNF(unit, u8, 0x30E) / 255;
+		color->r = color->r * unit->moveColorLvDisp / 255;
+		color->g = color->g * unit->moveColorLvDisp / 255;
+		color->b = color->b * unit->moveColorLvDisp / 255;
 	}
 	animPoseSetMaterialEvtColor(part->poseId, *color);
 	animPoseSetMaterialFlagOn(part->poseId, 0x40);
-	if (PART_FIELD(part, void*, 0x210)) {
-		PART_FIELD(part, PartsDispCb, 0x210)(part, 0);
+	if (part->dispCallback) {
+		part->dispCallback(part, 0);
 	}
 	if (BtlUnit_CheckStatus(unit, 0x10)) {
 		animPoseSetMaterialFlagOn(part->poseId, 0x800000);
@@ -829,8 +829,8 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part) {
 	animPoseDrawMtx(part->poseId, drawMtx, 1, rotY, 2.0f);
 	animPoseDrawMtx(part->poseId, drawMtx, 2, rotY, 2.0f);
 	animPoseDrawMtx(part->poseId, drawMtx, 3, rotY, 2.0f);
-	if (PART_FIELD(part, void*, 0x210)) {
-		PART_FIELD(part, PartsDispCb, 0x210)(part, 1);
+	if (part->dispCallback) {
+		part->dispCallback(part, 1);
 	}
 	btlUnitPartsBlurControl(part, 0, blurMtx, *color, rotY);
 }
@@ -1270,10 +1270,10 @@ void _btlDispTex4(u32 id, Vec pos, Vec scale, Vec rot, Vec pos2, Vec scale2, GXC
 void BattleStockExpDisp(void) {
 	BattleWork* wp = _battleWorkPointer;
 
-	if (BW_S32(wp, 0xF00) > BW_S32(wp, 0xF04)) {
-		BW_S32(wp, 0xF08)++;
-		if (BW_S32(wp, 0xF08) >= 4) {
-			BW_S32(wp, 0xF04)++;
+	if (wp->stockExp > wp->stockExpDisp) {
+		wp->stockExpTimer++;
+		if (wp->stockExpTimer >= 4) {
+			wp->stockExpDisp++;
 		}
 	}
 	if (wp->dispFlags & 2) {
@@ -1291,7 +1291,7 @@ void _btlStockExpDisp(CameraId camId, void* param) {
 	s32 i;
 	s32 n;
 
-	exp = BW_S32(_battleWorkPointer, 0xF04);
+	exp = _battleWorkPointer->stockExpDisp;
 	if (exp > 0) {
 		n = exp;
 		if (exp > 100) {

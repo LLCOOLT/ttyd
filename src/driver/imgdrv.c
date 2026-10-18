@@ -141,8 +141,8 @@ void imgDisp(CameraId camId, void* param) {
 			} else {
 				fx = sh->x;
 				fy = sh->y;
-				fw = entry->field_0xE4;
-				fh = entry->field_0xE6;
+				fw = entry->width;
+				fh = entry->height;
 			}
 			PSMTXTrans(m1, -((f32)sh->left - fx) / (f32)sh->right, -((f32)sh->top - fy) / (f32)sh->bottom, 0.0f);
 			PSMTXScale(m2, fw / (f32)sh->right, fh / (f32)sh->bottom, 1.0f);
@@ -165,13 +165,13 @@ void imgDisp(CameraId camId, void* param) {
 	animSetPaperTexMtx(mp[0], mp[1], mp[2]);
 	animSetPaperTexObj(texs[0], texs[1], texs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].field_0x10 != -1 ? 1 : 0, entry->shadows[1].field_0x10 != -1 ? 1 : 0);
-	if ((u32)entry->field_0x108 != 0) {
-		animPoseSetAnim(entry->poseId, (const char*)entry->field_0x108, FALSE);
+	if ((u32)entry->animName != 0) {
+		animPoseSetAnim(entry->poseId, (const char*)entry->animName, FALSE);
 	}
 	animPoseSetStartTime(entry->poseId, *(OSTime*)&entry->field_0x10C[4]);
 	animPoseMain(entry->poseId);
 	animPoseSetMaterialLightFlagOn(entry->poseId, 1);
-	entry->field_0x118 = animPoseGetLoopTimes(entry->poseId);
+	entry->loopTimes = animPoseGetLoopTimes(entry->poseId);
 	if (entry->flags & 8) {
 		zFill();
 		scale = 1.0f;
@@ -194,17 +194,17 @@ void imgDisp(CameraId camId, void* param) {
 		if (entry->flags & 4) {
 			fl = ((ImgDispSh*)entry + first)->left; ft = ((ImgDispSh*)entry + first)->top; fr = ((ImgDispSh*)entry + first)->right; fb = ((ImgDispSh*)entry + first)->bottom;
 		} else {
-			fl = ((ImgDispSh*)entry + first)->x; ft = ((ImgDispSh*)entry + first)->y; fr = entry->field_0xE4; fb = entry->field_0xE6;
+			fl = ((ImgDispSh*)entry + first)->x; ft = ((ImgDispSh*)entry + first)->y; fr = entry->width; fb = entry->height;
 		}
 	}
-	PSMTXTrans(m3, 64.0f * ((entry->field_0xE8 + fl) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->fbWidth), 48.0f * (-(entry->field_0xEC + ft) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->efbHeight), zoff);
+	PSMTXTrans(m3, 64.0f * ((entry->offsetX + fl) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->fbWidth), 48.0f * (-(entry->offsetY + ft) / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->efbHeight), zoff);
 	PSMTXTrans(m4, -32.0f, 24.0f, 0.0f);
 	PSMTXConcat(m3, m4, m3);
 	PSMTXScale(m4, fr / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->fbWidth, fb / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->efbHeight, fr / (f32)((GXRenderModeObj*)DEMOGetRenderModeObj())->fbWidth);
 	PSMTXConcat(m3, m4, m3);
 	PSMTXTrans(m4, 32.0f, -24.0f, 0.0f);
 	PSMTXConcat(m3, m4, m3);
-	PSMTXConcat(entry->field_0x120, m3, m3);
+	PSMTXConcat(entry->mtx, m3, m3);
 	animPoseDrawMtx(entry->poseId, m3, 1, 0.0f, scale);
 	animPoseDrawMtx(entry->poseId, m3, 2, 0.0f, scale);
 	animPoseDrawMtx(entry->poseId, m3, 3, 0.0f, scale);
@@ -242,7 +242,7 @@ void imgDisp_ProjPlane(CameraId camId, void* param) {
 			break;
 		case 2:
 			flags = 0x40000;
-			PSMTXTrans(mtx, 0.0f, 0.0f, entry->field_0x11C);
+			PSMTXTrans(mtx, 0.0f, 0.0f, entry->offsetZ);
 			GXSetBlendMode(GX_BM_SUBTRACT, GX_BL_SRCALPHA, GX_BL_INVSRCALPHA, GX_LO_CLEAR);
 			break;
 	}
@@ -298,8 +298,8 @@ static inline void imgCaptureCopy(ImgShd* sh, ImageEntry* entry) {
 	smartEntry* data;
 	sh->left = sh->x;
 	sh->top = sh->y;
-	sh->right = entry->field_0xE4;
-	sh->bottom = entry->field_0xE6;
+	sh->right = entry->width;
+	sh->bottom = entry->height;
 	h = sh->bottom;
 	w = sh->right;
 	fmt = sh->fmt;
@@ -391,7 +391,7 @@ void imgCapture(CameraId camId, void* param) {
 	for (entry = wp->entries; i < count; i++, entry++) {
 		if (entry->flags & 1 && entry->poseId != -1) {
 			if (entry->type == 2 || entry->type == type) {
-				if (entry->field_0x154 == camId) {
+				if (entry->dispCamId == camId) {
 					int j;
 					for (j = 0; j < 3; j++) {
 						imgCapture_Prim(entry, j);
@@ -441,38 +441,38 @@ s32 imgEntry(const char* name, s32 type) { //1:1, needs variable names
 	entry->type = type;
 	strcpy(entry->name, name);
 	entry->poseId = -1;
-	entry->field_0x108 = 0;
-	entry->field_0xE4 = 0;
-	entry->field_0xE6 = 0;
-	entry->field_0xE8 = 0.0f;
-	entry->field_0xEC = 0.0f;
+	entry->animName = 0;
+	entry->width = 0;
+	entry->height = 0;
+	entry->offsetX = 0.0f;
+	entry->offsetY = 0.0f;
 	entry->order = 0.0f;
-	entry->field_0x118 = 0.0f;
+	entry->loopTimes = 0.0f;
 	entry->shadowId = 0;
-	entry->field_0x11C = 0.0f;
-	MTXIdentity(entry->field_0x120);
+	entry->offsetZ = 0.0f;
+	MTXIdentity(entry->mtx);
 	entry->camId = CAMERA_3D_IMAGE;
-	entry->field_0x154 = 4;
+	entry->dispCamId = 4;
 
 	entry->shadows[0].flags = 0;
-	entry->shadows[0].field_0x4 = 0;
-	entry->shadows[0].field_0x6 = 0;
+	entry->shadows[0].x = 0;
+	entry->shadows[0].y = 0;
 	entry->shadows[0].field_0x10 = -1;
 	entry->shadows[0].field_0x14 = 6;
 	entry->shadows[0].field_0x18 = 6;
 	entry->shadows[0].field_0x40 = 0;
 
 	entry->shadows[1].flags = 0;
-	entry->shadows[1].field_0x4 = 0;
-	entry->shadows[1].field_0x6 = 0;
+	entry->shadows[1].x = 0;
+	entry->shadows[1].y = 0;
 	entry->shadows[1].field_0x10 = -1;
 	entry->shadows[1].field_0x14 = 6;
 	entry->shadows[1].field_0x18 = 6;
 	entry->shadows[1].field_0x40 = 0;
 
 	entry->shadows[2].flags = 0;
-	entry->shadows[2].field_0x4 = 0;
-	entry->shadows[2].field_0x6 = 0;
+	entry->shadows[2].x = 0;
+	entry->shadows[2].y = 0;
 	entry->shadows[2].field_0x10 = -1;
 	entry->shadows[2].field_0x14 = 6;
 	entry->shadows[2].field_0x18 = 6;
@@ -548,7 +548,7 @@ void imgFreeCapture(ImageEntry* entry, s32 shadowId) { //1:1, needs enums
 		}
 		else {
 			shadow->flags = 0;
-			smartFree(shadow->field_0x3C);
+			smartFree(shadow->data);
 		}
 	}
 }
@@ -611,17 +611,17 @@ void imgShadowDisp(CameraId camId, void* param) {
 				w = r->c;
 				h = r->d;
 			} else {
-				x0 = sh->field_0x4;
-				y0 = sh->field_0x6;
-				w = entry->field_0xE4;
-				h = entry->field_0xE6;
+				x0 = sh->x;
+				y0 = sh->y;
+				w = entry->width;
+				h = entry->height;
 			}
 			r = (ImgRect*)sh->field_0x8;
 			PSMTXTrans(m, -((f32)r->a - x0) / (f32)r->c, -((f32)r->b - y0) / (f32)r->d, 0.0f);
 			PSMTXScale(m1, w / (f32)r->c, h / (f32)r->d, 1.0f);
 			PSMTXConcat(m, m1, mtxs[i]);
 			objs[i] = (GXTexObj*)((u8*)sh + 0x1C);
-			datas[i] = sh->field_0x3C;
+			datas[i] = sh->data;
 		}
 		if (objs[i] != NULL) {
 			mp[i] = &mtxs[i];
@@ -638,11 +638,11 @@ void imgShadowDisp(CameraId camId, void* param) {
 	animSetPaperTexMtx((void*)mp[0], (void*)mp[1], (void*)mp[2]);
 	animSetPaperTexObj(objs[0], objs[1], objs[2], datas[0], datas[1], datas[2],
 	                   entry->shadows[0].field_0x10 != -1 ? 1 : 0, entry->shadows[1].field_0x10 != -1 ? 1 : 0);
-	if ((u32)entry->field_0x108 != 0) animPoseSetAnim(entry->poseId, (const char*)entry->field_0x108, 0);
+	if ((u32)entry->animName != 0) animPoseSetAnim(entry->poseId, (const char*)entry->animName, 0);
 	animPoseSetStartTime(entry->poseId, *(OSTime*)&entry->field_0x10C[4]);
 	animPoseMain(entry->poseId);
 	animPoseSetMaterialLightFlagOn(entry->poseId, 1);
-	entry->field_0x118 = animPoseGetLoopTimes(entry->poseId);
+	entry->loopTimes = animPoseGetLoopTimes(entry->poseId);
 	{
 		f32 x0, y0, w, h; f32 sc, z;
 		typedef struct { u16 p, q, w, h; } RM;
@@ -655,11 +655,11 @@ void imgShadowDisp(CameraId camId, void* param) {
 		if (entry->flags & 4) {
 			x0 = ((u16*)&entry->shadows[first])[4]; y0 = ((u16*)&entry->shadows[first])[5]; w = ((u16*)&entry->shadows[first])[6]; h = ((u16*)&entry->shadows[first])[7];
 		} else {
-			x0 = entry->shadows[first].field_0x4;
-			y0 = entry->shadows[first].field_0x6;
-			w = entry->field_0xE4; h = entry->field_0xE6;
+			x0 = entry->shadows[first].x;
+			y0 = entry->shadows[first].y;
+			w = entry->width; h = entry->height;
 		}
-		PSMTXTrans(t, 64.0f * ((entry->field_0xE8 + x0) / (f32)((RM*)DEMOGetRenderModeObj())->w), 48.0f * (-(entry->field_0xEC + y0) / (f32)((RM*)DEMOGetRenderModeObj())->h), z);
+		PSMTXTrans(t, 64.0f * ((entry->offsetX + x0) / (f32)((RM*)DEMOGetRenderModeObj())->w), 48.0f * (-(entry->offsetY + y0) / (f32)((RM*)DEMOGetRenderModeObj())->h), z);
 		PSMTXTrans(m2, -32.0f, 24.0f, 0.0f);
 		PSMTXConcat(t, m2, t);
 		PSMTXScale(m2, w / (f32)((RM*)DEMOGetRenderModeObj())->w, h / (f32)((RM*)DEMOGetRenderModeObj())->h, w / (f32)((RM*)DEMOGetRenderModeObj())->w);

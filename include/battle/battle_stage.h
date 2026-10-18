@@ -42,11 +42,12 @@ typedef struct BattleStageData {
 
 typedef struct BattleWorkStage {
 	u8 field_0x0[0xB24 - 0x0]; //0x0
-	f32 field_0xB24; //0xB24, stage edge X?
-	f32 field_0xB28; //0xB28, escape wall height
-	u8 field_0xB2C[0xB34 - 0xB2C]; //0xB2C
-	f32 field_0xB34; //0xB34, ceiling height
-	u8 field_0xB38[0xB3C - 0xB38]; //0xB38
+	f32 stageSizeX; //0xB24, btlevtcmd_GetStageSize (init 290)
+	f32 stageSizeY; //0xB28 (init 200)
+	f32 stageSizeZ; //0xB2C (init 90)
+	f32 audienceSizeX; //0xB30, btlevtcmd_GetStageAudienceAreaSize (init = stageSizeX)
+	f32 audienceSizeY; //0xB34, also the floor height past stageSizeZ (init -50)
+	f32 audienceSizeZ; //0xB38 (init 200)
 } BattleStage;
 
 BattleStage* BattleStageGetPtr(void);

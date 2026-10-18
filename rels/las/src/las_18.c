@@ -211,7 +211,7 @@ USER_FUNC(get_mobj_seq) {
     if (mobj == NULL) {
         evtSetValue(event, args[1], 1);
     } else {
-        evtSetValue(event, args[1], mobj->unk1DC);
+        evtSetValue(event, args[1], mobj->state);
     }
     return EVT_RETURN_DONE;
 }

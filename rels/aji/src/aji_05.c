@@ -225,7 +225,7 @@ static USER_FUNC(ride_chk) {
             hit = mario->hitobjJumpFrom;
         }
     } else {
-        hit = (HitEntry*)mario->field_0x1F8;
+        hit = (HitEntry*)mario->hitobjUnder;
     }
     // panels stay lit for 30 frames after being touched
     for (i = 0; i < 24; i++) {

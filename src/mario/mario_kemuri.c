@@ -249,7 +249,7 @@ void kemuri(void) {
     else if (--ct <= 0) {
         f32 scale, dist;
         sincosf(&s, &c, 6.2831855f * reviseAngle(-mario->directionView) / 360.0f);
-        sincosf(&s, &c, toMovedirSimple(180.0f + (kpaGetStageViewType() == 0 ? mario->unk1AC : mario->unk1A8)));
+        sincosf(&s, &c, toMovedirSimple(180.0f + (kpaGetStageViewType() == 0 ? mario->displayDirectionTarget : mario->displayDirection)));
         switch (kpaGetLevel()) {
         case 0:
             ct = 4;
@@ -283,34 +283,34 @@ void kemuri(void) {
 void party_kemuri(PartyEntry* party) {
 
     if (MU8(party, 0x32) != 1) {
-        if (MU8(party, 0x34) == 3 && MS8(party, 0x31) == 4) {
+        if (party->runMode == 3 && party->currentMemberId == 4) {
             if (MPTR(party, 0x138) != NULL) {
-                if (MF(party, 0x104) < 2.0f) {
+                if (party->moveSpeed < 2.0f) {
                     MS8(party, 0x2c) = 7;
                 }
                 else if (MS8(party, 0x2c)++ > 6) {
                     f32 c, s;
                     f32 x, y, z;
                     MS8(party, 0x2c) = 0;
-                    sincosf(&s, &c, 6.2831855f * reviseAngle(-MF(party, 0x100)) / 360.0f);
-                    effKemuri2Entry(0, MF(party, 0x58) + 0.2f * (MF(party, 0xF4) * s), 1.5f + MF(party, 0x5C), MF(party, 0x60) + 0.2f * (MF(party, 0xF4) * c), s, c);
+                    sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
+                    effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                 }
             }
             else {
                 MS8(party, 0x2c) = 4;
             }
         }
-        else if (MU8(party, 0x36) == 1) {
+        else if (party->field_36 == 1) {
             if (MPTR(party, 0x138) != NULL) {
-                if (MF(party, 0x104) < 2.0f) {
+                if (party->moveSpeed < 2.0f) {
                     MS8(party, 0x2c) = 7;
                 }
                 else if (MS8(party, 0x2c)++ > 6) {
                     f32 c, s;
                     f32 x, y, z;
                     MS8(party, 0x2c) = 0;
-                    sincosf(&s, &c, 6.2831855f * reviseAngle(-MF(party, 0x100)) / 360.0f);
-                    effKemuri2Entry(0, MF(party, 0x58) + 0.2f * (MF(party, 0xF4) * s), 1.5f + MF(party, 0x5C), MF(party, 0x60) + 0.2f * (MF(party, 0xF4) * c), s, c);
+                    sincosf(&s, &c, 6.2831855f * reviseAngle(-party->targetDir) / 360.0f);
+                    effKemuri2Entry(0, party->position.x + 0.2f * (party->width * s), 1.5f + party->position.y, party->position.z + 0.2f * (party->width * c), s, c);
                 }
             }
             else {

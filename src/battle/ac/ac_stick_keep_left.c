@@ -105,10 +105,10 @@ s32 battleAcMain_StickKeepLeft(BattleWork* work) {
                 work->actionCommands.mAcState = 1000;
                 // fallthrough
             case 1000:
-                if ((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & 0x10)) {
-                    if (work->actionCommands.field_0x4 & 2) {
-                        work->actionCommands.field_0x8--;
-                        if (work->actionCommands.field_0x8 >= 0) {
+                if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & 0x10)) {
+                    if (work->actionCommands.setupFlags & 2) {
+                        work->actionCommands.setupParam--;
+                        if (work->actionCommands.setupParam >= 0) {
                             break;
                         }
                     }

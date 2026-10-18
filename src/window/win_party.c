@@ -429,7 +429,8 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
     s32 pose;
     s32 j;
     AnimData* anim;
-    const char* animName; s32 new_var2 ;
+    const char* animName;
+    s32 id;
     const char* name;
     PouchPartyData* pd;
     white0 = winPartyWhiteC;
@@ -626,9 +627,9 @@ void winPartyDisp(s32 camId, void* param, s32 idx) {
         winFontInit();
         fy = ( 20.0f + ((y - 50.0f) - 4.0f) ) - 10.0f;
         for (i = 0; i < 7; i++) {
-            new_var2 = winPartyDt [i].partyId;
-            if (wp->partyIds[wp->cursor] == winPartyDt[i].partyId) {
-                if (new_var2 != 4) {
+            id = winPartyDt[i].partyId;
+            if (wp->partyIds[wp->cursor] == id) {
+                if (id != 4) {
                     name = msgSearch(winPartyDt[i].name);
                 } else {
                     name = pouchGetYoshiName();

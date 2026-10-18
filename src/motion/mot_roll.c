@@ -148,7 +148,7 @@ static inline s32 makeVec(f32 half) {
     s32 w = 0;
     s32 r = w;
     MarioWork* m = marioGetPtr();
-    f32 c = trunc10(m->unk19C);
+    f32 c = trunc10(m->moveDirection);
     f32 x = angleABf(0.0f, 0.0f, (f32)(s32)*((s8*)m + 0x24e), (f32)(s32)*((s8*)m + 0x24f));
     f32 lo;
     f32 hi;
@@ -301,7 +301,7 @@ void marioResetRollSpd(void) {
             b = 0.0f;
             RW()->z = b;
         }
-        MF(0x180) = 0.0f;
+        mario->baseSpeed = 0.0f;
     }
 }
 
@@ -372,16 +372,16 @@ void mot_roll_post(void) {
         *(s32*)((u8*)m + 0x2a8) = -1;
     }
     m = marioGetPtr();
-    m->unk148 = 0.0f;
-    m->unk150.z = 0.004f;
+    m->camShiftTargetZ = 0.0f;
+    m->camShiftRate.z = 0.004f;
     {
         f32 d = revise360(mario->directionView - mario->targetYaw);
-        do { if (d >= 180.0f) { mario->unk1A8 = 0.0f; mario->unk1AC = 0.0f; mario->unk19C = 270.0f; mario->directionView = 270.0f; } else { mario->unk1A8 = 180.0f; mario->unk1AC = 180.0f; mario->unk19C = 90.0f; mario->directionView = 90.0f; } } while (0);
+        do { if (d >= 180.0f) { mario->displayDirection = 0.0f; mario->displayDirectionTarget = 0.0f; mario->moveDirection = 270.0f; mario->directionView = 270.0f; } else { mario->displayDirection = 180.0f; mario->displayDirectionTarget = 180.0f; mario->moveDirection = 90.0f; mario->directionView = 90.0f; } } while (0);
     }
     marioSetSpec();
     mario->field_0x8 = 0;
     mario->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
-    mario->field_0x98 = (Vec){0.0f, 0.0f, 0.0f};
+    mario->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
     mario->rot = (Vec){0.0f, 0.0f, 0.0f};
     mario->dispFlags &= ~0x100;
     mario->dispFlags &= ~8;
@@ -406,26 +406,26 @@ void marioRollForceCancel(void) {
             *(s32*)((u8*)m + 0x2a8) = -1;
         }
         m = marioGetPtr();
-        m->unk148 = 0.0f;
-        m->unk150.z = 0.004f;
+        m->camShiftTargetZ = 0.0f;
+        m->camShiftRate.z = 0.004f;
         {
             f32 d = revise360(mario->directionView - mario->targetYaw);
             if (d >= 180.0f) {
-                mario->unk1A8 = 0.0f;
-                mario->unk1AC = 0.0f;
-                mario->unk19C = 270.0f;
+                mario->displayDirection = 0.0f;
+                mario->displayDirectionTarget = 0.0f;
+                mario->moveDirection = 270.0f;
                 do { mario->directionView = 270.0f; } while (0);
             } else {
-                mario->unk1A8 = 180.0f;
-                mario->unk1AC = 180.0f;
-                mario->unk19C = 90.0f;
+                mario->displayDirection = 180.0f;
+                mario->displayDirectionTarget = 180.0f;
+                mario->moveDirection = 90.0f;
                 mario->directionView = 90.0f;
             }
         }
         marioSetSpec();
         mario->field_0x8 = 0;
         mario->rotOfs = (Vec){0.0f, 0.0f, 0.0f};
-        mario->field_0x98 = (Vec){0.0f, 0.0f, 0.0f};
+        mario->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
         mario->rot = (Vec){0.0f, 0.0f, 0.0f};
         mario->dispFlags &= ~0x100;
         mario->dispFlags &= ~8;
@@ -448,7 +448,7 @@ void marioSetRollDispDir(void) {
     f32 b, a;
     MarioWork* m2;
     a = mario->directionView;
-    b = mario->unk19C;
+    b = mario->moveDirection;
     m2 = marioGetPtr();
     DISPDIR_BODY(a, b, m2)
 }
@@ -484,20 +484,20 @@ void marioReInit_roll(void) {
     mario->currSubMotionId = 0x1e;
     mario = marioGetPtr();
     z0 = 0.0f;
-    MF(0x1b4) = 14.8f;
-    MF(0x1b8) = 14.8f;
-    MF(0x188) = rollData[0];
+    mario->wPlayerCollisionBox.x = 14.8f;
+    mario->wPlayerCollisionBox.y = 14.8f;
+    mario->mBaseDashSpeed = rollData[0];
     RW()->x = z0;
     z1 = 0.0f;
     RW()->z = z1;
     *(f32*)(0xb0 + (u8*)mario) = -6.0f;
-    MF(0xb4) = 6.0f;
+    mario->rotOfs.y = 6.0f;
     *(f32*)((u8*)mario + 0x98) = 6.0f;
-    MF(0x9c) = 0.0f;
-    MF(0xc8) = 1.0f;
-    MF(0xcc) = 1.0f;
-    MF(0xd0) = 1.0f;
-    MF(0x130) = 1.0f;
+    mario->dispOfs.y = 0.0f;
+    mario->scale.x = 1.0f;
+    mario->scale.y = 1.0f;
+    mario->scale.z = 1.0f;
+    mario->unk130 = 1.0f;
     allPartyForceRideOn();
 }
 
@@ -553,15 +553,15 @@ void mot_roll(void) {
         s32 z1;
         CAMF() |= 0x200;
         marioAdjustMoveDir();
-        v31 = MF(0x1a8);
+        v31 = mario->displayDirection;
         if (v31 < 90.0f || v31 > 270.0f) {
             MB(0x43) = 1;
-            MF(0x1a0) = revise360(270.0f - MF(0x198));
-            MF(0x19c) = 270.0f;
+            MF(0x1a0) = revise360(270.0f - mario->targetYaw);
+            mario->moveDirection = 270.0f;
         } else {
             MB(0x43) = 0;
-            MF(0x1a0) = revise360(90.0f - MF(0x198));
-            MF(0x19c) = 90.0f;
+            MF(0x1a0) = revise360(90.0f - mario->targetYaw);
+            mario->moveDirection = 90.0f;
         }
         marioGetRubInit();
         mario->flags |= 0x1000000;
@@ -574,28 +574,28 @@ void mot_roll(void) {
         MI(0x48) = 0x41;
         m = marioGetPtr();
         v28 = 0.0f;
-        PF(m, 0x1b4) = 14.8f;
-        PF(m, 0x1b8) = 14.8f;
-        PF(m, 0x188) = rollData[0];
+        m->wPlayerCollisionBox.x = 14.8f;
+        m->wPlayerCollisionBox.y = 14.8f;
+        m->mBaseDashSpeed = rollData[0];
         RW()->x = v28;
         v27 = 0.0f;
         RW()->z = v27;
-        PF(m, 0xb0) = -6.0f;
-        PF(m, 0xb4) = 6.0f;
-        PF(m, 0x98) = 6.0f;
-        PF(m, 0x9c) = 0.0f;
-        PF(m, 0xc8) = 1.0f;
-        PF(m, 0xcc) = 1.0f;
-        PF(m, 0xd0) = 1.0f;
-        PF(m, 0x130) = 1.0f;
+        m->rotOfs.x = -6.0f;
+        m->rotOfs.y = 6.0f;
+        m->dispOfs.x = 6.0f;
+        m->dispOfs.y = 0.0f;
+        m->scale.x = 1.0f;
+        m->scale.y = 1.0f;
+        m->scale.z = 1.0f;
+        m->unk130 = 1.0f;
         mario->airTimer = 0;
-        if (MH(0x4e) == 0) {
-            MF(0x180) = 0.0f;
+        if (mario->forceMoveTimer == 0) {
+            mario->baseSpeed = 0.0f;
         }
         m = marioGetPtr();
-        PF(m, 0x148) = 0.4f;
-        PF(m, 0x158) = 0.01f;
-        PF(m, 0x68) = 2.0f;
+        m->camShiftTargetZ = 0.4f;
+        m->camShiftRate.z = 0.01f;
+        m->field_68 = 2.0f;
         ((MarioWork*)m)->field_6C = rollOfs;
         RW()->state = z0;
         z1 = 0;
@@ -609,9 +609,9 @@ void mot_roll(void) {
         if (MI(0x48) == 0x36) {
             allPartyRideShip();
         }
-        MF(0x9c) += 0.1f;
-        if (MF(0x9c) > 1.0f) {
-            MF(0x9c) = 1.0f;
+        mario->dispOfs.y += 0.1f;
+        if (mario->dispOfs.y > 1.0f) {
+            mario->dispOfs.y = 1.0f;
         }
         if (--MI(0x48) <= 0) {
             MI(0x44) = 0x1e;
@@ -621,17 +621,17 @@ void mot_roll(void) {
         }
         break;
     case 0x14:
-        MF(0x180) = 0.0f;
-        MF(0xbc) = 0.0f;
-        MF(0xc4) = 0.0f;
-        MF(0xb0) = 0.0f;
-        MF(0xb4) = 0.0f;
-        v31 = revise360(MF(0x1a0) - MF(0x198));
-        MF(0x98) = (v31 < 180.0f) ? 3.0f : -3.0f;
-        MF(0x9c) = 0.0f;
+        mario->baseSpeed = 0.0f;
+        mario->rot.x = 0.0f;
+        mario->rot.z = 0.0f;
+        mario->rotOfs.x = 0.0f;
+        mario->rotOfs.y = 0.0f;
+        v31 = revise360(MF(0x1a0) - mario->targetYaw);
+        mario->dispOfs.x = (v31 < 180.0f) ? 3.0f : -3.0f;
+        mario->dispOfs.y = 0.0f;
         MI(0x48) = 0x41;
         MI(0x44) = 0x15;
-        MF(0x1a8) = 0.0f;
+        mario->displayDirection = 0.0f;
         {
             MarioWork* m = marioGetPtr();
             if ((u32)PI(m, 0x2a8) != (u32)-1) {
@@ -641,47 +641,47 @@ void mot_roll(void) {
         }
         {
             MarioWork* m = marioGetPtr();
-            m->unk148 = 0.0f;
-            m->unk150.z = 0.004f;
+            m->camShiftTargetZ = 0.0f;
+            m->camShiftRate.z = 0.004f;
         }
         marioChgPaper("PM_R_1C");
         marioPaperLightOff();
         psndSFXOn_3D((char*)0x17a, &mario->position);
     case 0x15:
         if (--MI(0x48) > 0) {
-            v31 = revise360(MF(0x1a0) - MF(0x198));
+            v31 = revise360(MF(0x1a0) - mario->targetYaw);
             if (v31 < 180.0f) {
                 f32 t = 90.0f;
-                f32 diff = t - MF(0x1a8);
+                f32 diff = t - mario->displayDirection;
                 f32 n = 0.1f * diff;
-                n += MF(0x1a8);
+                n += mario->displayDirection;
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
-                MF(0x1a8) = n;
-                MF(0x1ac) = n;
+                mario->displayDirection = n;
+                mario->displayDirectionTarget = n;
             } else {
                 f32 t = 270.0f;
-                f32 diff = t - MF(0x1a8);
+                f32 diff = t - mario->displayDirection;
                 f32 n = 0.1f * diff;
-                n += MF(0x1a8);
+                n += mario->displayDirection;
                 if (__fabsf((f32)((t - n) < 1.0f))) {
                     n = t;
                 }
-                MF(0x1a8) = n;
-                MF(0x1ac) = n;
+                mario->displayDirection = n;
+                mario->displayDirectionTarget = n;
             }
         } else {
-            v31 = revise360(MF(0x1a0) - MF(0x198));
+            v31 = revise360(MF(0x1a0) - mario->targetYaw);
             if (v31 >= 180.0f) {
-                MF(0x1a8) = 0.0f;
-                MF(0x1ac) = 0.0f;
-                MF(0x19c) = 270.0f;
+                mario->displayDirection = 0.0f;
+                mario->displayDirectionTarget = 0.0f;
+                mario->moveDirection = 270.0f;
                 MF(0x1a0) = 270.0f;
             } else {
-                MF(0x1a8) = 180.0f;
-                MF(0x1ac) = 180.0f;
-                MF(0x19c) = 90.0f;
+                mario->displayDirection = 180.0f;
+                mario->displayDirectionTarget = 180.0f;
+                mario->moveDirection = 90.0f;
                 MF(0x1a0) = 90.0f;
             }
             marioSetSpec();
@@ -715,15 +715,15 @@ void mot_roll(void) {
         roll_upstairs();
         return;
     }
-    if (MU(0x248) & 0x200) {
+    if (mario->buttonBuffer & 0x200) {
         if (!rollChk()) {
             MI(0x44) = 0x14;
             CAMF() |= 0x200;
         } else {
-            MU(0x248) |= 0x100;
+            mario->buttonBuffer |= 0x100;
         }
     }
-    v26 = MF(0x130);
+    v26 = mario->unk130;
     if (RW()->state) {
         s32 z = 0;
         s32 one;
@@ -766,8 +766,8 @@ void mot_roll(void) {
         }
         break;
     }
-    MF(0x130) = v26;
-    if (!mario->hitobjStandOn && mario->field_0x1E0 && !marioChkBero(mario->field_0x1E0)) {
+    mario->unk130 = v26;
+    if (!mario->hitobjStandOn && mario->hitobjFront && !marioChkBero(mario->hitobjFront)) {
         v26 = RW()->x;
         v27 = RW()->z;
         v26 += 0.2f * -v26;
@@ -782,14 +782,14 @@ void mot_roll(void) {
         RW()->z = v27;
     }
     if (mario->hitobjStandOn) {
-        if (!(hitGetAttr(mario->hitobjStandOn) & 0xa00) && mario->airTimer == 0 && (MU(0x248) & 0x100)) {
+        if (!(hitGetAttr(mario->hitobjStandOn) & 0xa00) && mario->airTimer == 0 && (mario->buttonBuffer & 0x100)) {
             if (!(strcmp(gp->currentMapName, "eki_04") == 0 && __fabsf(MF(0x214)) >= 40.0f)) {
                 MarioWork* m = marioGetPtr();
                 camFollowYOff();
-                PF(m, 0x7c) = 2.85f;
-                PF(m, 0x80) = -0.14f;
-                PF(m, 0x84) = 0.08f;
-                PF(m, 0x88) = -0.02f;
+                m->jumpVelocityY = 2.85f;
+                m->jumpAccelerationY = -0.14f;
+                m->jumpJerkY = 0.08f;
+                m->jumpSnapY = -0.02f;
                 m->flags |= 0x10000;
                 m->airTimer = 1;
                 psndSFXOn_3D((char*)0x17c, &marioGetPtr()->position);
@@ -807,20 +807,20 @@ void mot_roll(void) {
         mario->airTimer = 0;
     }
     if (mario->flags & 0x30000) {
-        if (mario->field_0x1F4) {
-            if (MF(0x7c) >= 0.0f) {
-                MF(0x7c) = -0.03f;
-                MF(0x80) = -0.02f;
-                MF(0x84) = -0.02f;
-                MF(0x88) = -0.002f;
+        if (mario->hitobjHead) {
+            if (mario->jumpVelocityY >= 0.0f) {
+                mario->jumpVelocityY = -0.03f;
+                mario->jumpAccelerationY = -0.02f;
+                mario->jumpJerkY = -0.02f;
+                mario->jumpSnapY = -0.002f;
             }
             mario->flags |= 0x20000;
         }
-        if (mario->airTimer == 0 && MF(0x7c) < 0.0f) {
+        if (mario->airTimer == 0 && mario->jumpVelocityY < 0.0f) {
             MV(0xd4) = mario->position;
             camFollowYOn();
         }
-        if (mario->position.y < MF(0x120)) {
+        if (mario->position.y < mario->lastGroundPos.y) {
             camFollowYOn();
         }
         mario->airTimer++;
@@ -835,7 +835,7 @@ void mot_roll(void) {
         a30 = (f32)(s32)(s8)mario->wStickDir2;
         v27 = distABf(v30, v30, a26, a30);
         v31 = angleABf(0.0f, 0.0f, a26, a30);
-        v31 = revise360(MF(0x198) + v31);
+        v31 = revise360(mario->targetYaw + v31);
         v26 = 3.1415927f * v31 / 180.0f;
         v30 = v27 * (f32)sin(v26);
         v27 = v27 * -(f32)cos(v26);
@@ -896,7 +896,7 @@ void mot_roll(void) {
         }
     }
     if (*(void**)((u8*)mario + 0x1d8)) {
-        if (!marioChkBero(mario->field_0x1E0)) {
+        if (!marioChkBero(mario->hitobjFront)) {
             v29 = 0.05f * -v29 + v29;
             v28 = 0.05f * -v28 + v28;
             if (__fabsf(v29) < 0.1f) {
@@ -907,7 +907,7 @@ void mot_roll(void) {
             }
         }
     }
-    if (mario->field_0x1E0 && !MB(0x24e) && !MB(0x24f) && !marioChkBero(mario->field_0x1E0)) {
+    if (mario->hitobjFront && !MB(0x24e) && !MB(0x24f) && !marioChkBero(mario->hitobjFront)) {
         v29 = 0.6f * -v29 + v29;
         v28 = 0.6f * -v28 + v28;
         if (__fabsf(v29) < 0.1f) {
@@ -917,9 +917,9 @@ void mot_roll(void) {
             v28 = 0.0f;
         }
     }
-    if (MH(0x4e) == 0 && !v30 && !v27) {
-        if (mario->field_0x1F0) {
-            if (!marioChkBero(mario->field_0x1F0)) {
+    if (mario->forceMoveTimer == 0 && !v30 && !v27) {
+        if (mario->hitobjWall) {
+            if (!marioChkBero(mario->hitobjWall)) {
                 f32 k = rollData[2];
                 v29 = v29 * k + v29;
                 v28 = v28 * k + v28;
@@ -954,14 +954,14 @@ void mot_roll(void) {
                 v28 = 0.0f;
             }
             if (v29 == 0.0f && v28 == 0.0f) {
-                MF(0x19c) = revise360(180.0f + MF(0x19c));
-                MF(0x1a0) = MF(0x19c);
+                mario->moveDirection = revise360(180.0f + mario->moveDirection);
+                MF(0x1a0) = mario->moveDirection;
             }
         }
     }
     v31 = rollData[0] / 0.05f;
     v26 = 1.0f;
-    if (MH(0x4e) == 0 && __fabsf(MF(0x214)) >= v26) {
+    if (mario->forceMoveTimer == 0 && __fabsf(MF(0x214)) >= v26) {
         f32 ang = angleABf(0.0f, 0.0f, v29, -v28);
         f32 sp = MF(0x220);
         if (sp > 0.0f) {
@@ -994,7 +994,7 @@ void mot_roll(void) {
     }
     v31 = rollData[0] / 0.05f;
     v30 = 1.0f;
-    if (MH(0x4e) == 0 && __fabsf(MF(0x214)) >= v30) {
+    if (mario->forceMoveTimer == 0 && __fabsf(MF(0x214)) >= v30) {
         f32 ang = angleABf(0.0f, 0.0f, v29, -v28);
         f32 sp = MF(0x218);
         if (sp > 0.0f) {
@@ -1032,20 +1032,20 @@ void mot_roll(void) {
     v26 = (f32)cos(v27);
     v27 = distABf(0.0f, 0.0f, v29 * (f32)sin(v27), v28 * v26);
     v27 = 0.05f * v27;
-    if (!getRollEvtFlag() && MH(0x4e) == 0) {
+    if (!getRollEvtFlag() && mario->forceMoveTimer == 0) {
         v30 = angleABf(0.0f, 0.0f, v29, v31);
         if (!(MI(0x2a4) & 0x10000)) {
-            v27 = v27 * MF(0x224);
+            v27 = v27 * mario->playerGravity;
             if (v27 < 0.05f) {
                 v27 = 0.0f;
             }
-            MF(0x180) = v27;
+            mario->baseSpeed = v27;
             if (v27) {
                 MF(0x1a0) = v30;
             }
         }
     }
-    if (MF(0x180)) {
+    if (mario->baseSpeed) {
         MarioWork* m = marioGetPtr();
         if ((u32)PI(m, 0x2a8) == (u32)-1) {
             PI(m, 0x2a8) = (s32)psndSFXOn_3D((char*)0x17b, &m->position);
@@ -1062,35 +1062,35 @@ void mot_roll(void) {
     {
         s32 flip;
         f32 sgn;
-        f32 mv = toMovedir(MF(0x1a8));
+        f32 mv = toMovedir(mario->displayDirection);
         f32 pre;
         tcA = MF(0x1a0);
         flip = angOut(tcA, 90.0f, mv);
-        pre = MF(0x180) * v28;
+        pre = mario->baseSpeed * v28;
         sgn = (flip == 1) ? -1.0f : 1.0f;
-        MF(0xc4) = revise360(pre * sgn + MF(0xc4));
+        mario->rot.z = revise360(pre * sgn + mario->rot.z);
     }
-    if (MH(0x4e) == 0 && !getRollEvtFlag() && v27) {
-        v31 = MF(0x19c);
+    if (mario->forceMoveTimer == 0 && !getRollEvtFlag() && v27) {
+        v31 = mario->moveDirection;
         {
             MarioWork* m2 = marioGetPtr();
             DISPDIR_BODY(v30, v31, m2)
         }
         MF(0x1a0) = v31;
-        MF(0x19c) = v31;
+        mario->moveDirection = v31;
     }
     if (MF(0x220) != 0.0f) {
-        MF(0xbc) = revise360(-MF(0x220) * (f32)sin(3.1415927f * MF(0x1a8) / 180.0f));
+        mario->rot.x = revise360(-MF(0x220) * (f32)sin(3.1415927f * mario->displayDirection / 180.0f));
     } else {
-        MF(0xbc) = 0.0f;
+        mario->rot.x = 0.0f;
     }
     if (MB(0x24e) || MB(0x24f)) {
         MI(0x2a4) |= 0x4000;
     }
-    if (MF(0x180)) {
+    if (mario->baseSpeed) {
         MarioWork* m = marioGetPtr();
-        m->unk148 = 0.0f;
-        m->unk150.z = 0.004f;
+        m->camShiftTargetZ = 0.0f;
+        m->camShiftRate.z = 0.004f;
     }
     marioRollCan();
 }
@@ -1101,17 +1101,17 @@ void roll_upstairs_on(void) {
     mario->flags |= 0x80;
     marioClearJumpPara();
     mario->multiTimer = 3;
-    MF(0x7c) = (MF(0x1c4) - mario->position.y) / (f32)(s32)mario->multiTimer;
-    MF(0x7c) = 4.0f;
-    MF(0x80) = -0.42f;
-    MF(0x84) = 0.04f;
-    MF(0x88) = -0.01f;
+    mario->jumpVelocityY = (MF(0x1c4) - mario->position.y) / (f32)(s32)mario->multiTimer;
+    mario->jumpVelocityY = 4.0f;
+    mario->jumpAccelerationY = -0.42f;
+    mario->jumpJerkY = 0.04f;
+    mario->jumpSnapY = -0.01f;
 }
 
 #pragma dont_inline on
 void roll_upstairs(void) {
     MarioWork* mario = marioGetPtr();
-    mario->position.y = mario->position.y + MF(0x7c);
+    mario->position.y = mario->position.y + mario->jumpVelocityY;
     if ((s32)--mario->multiTimer <= 0) {
         mario->flags &= ~0x80;
         mario->flags &= ~0x40;
@@ -1157,7 +1157,7 @@ static inline void marioRollCan(void) {
         Vec d2;
         dist = 100.0f;
         pos = mario->position;
-        pos.y = pos.y + MF(0x1b8);
+        pos.y = pos.y + mario->wPlayerCollisionBox.y;
         dir = (Vec){0.0f, -1.0f, 0.0f};
         if (marioHitCheckVec(&pos, &dir, &out, &nrm, &dist)) {
             f32 sq = roll_sqrtf(nrm.x * nrm.x + nrm.z * nrm.z);
@@ -1170,8 +1170,8 @@ static inline void marioRollCan(void) {
                 {
                     f32 t1 = 5.0f * s;
                     f32 t2 = 5.0f * c;
-                    MF(0x98) = 6.0f + t1;
-                    MF(0x9c) = -4.0f + t2;
+                    mario->dispOfs.x = 6.0f + t1;
+                    mario->dispOfs.y = -4.0f + t2;
                 }
             } else {
                 sincosf(&s, &c, 90.0f);

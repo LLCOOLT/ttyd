@@ -147,7 +147,7 @@ void BattleDamageDirect(s32 unitId, BattleUnit* target, BattleUnitPart* part, s3
         damage = -99;
     }
     if (attacker) {
-        BU_S32(attacker, 0x280) += damage;
+        attacker->totalDamageDealt += damage;
     }
     if (part) {
         target->currentTarget = part;
@@ -1316,8 +1316,8 @@ s32 BattleSetStatusDamage(u32* result, BattleUnit* unit, BattleUnitPart* part, u
         y += BtlUnit_GetHeight(unit) / 2;
         switch (type) {
             case 8:
-                if (*(EffectEntry**)((u8*)unit + 0x328)) {
-                    effSoftDelete(*(EffectEntry**)((u8*)unit + 0x328));
+                if (unit->iceEff) {
+                    effSoftDelete(unit->iceEff);
                 }
                 break;
             case 9:

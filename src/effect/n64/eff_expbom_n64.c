@@ -10,16 +10,16 @@ double cos(double x);
 #include <stdlib.h>
 
 typedef struct effExpBomData {
-	s16 field_0x0; //0x0
-	s16 field_0x2; //0x2
-	s16 field_0x4; //0x4
-	s16 field_0x6; //0x6
-	s32 field_0x8; //0x8
+	s16 age; //0x0, frames shown
+	s16 lifeLeft; //0x2, counts down from lifetime; <0 = done
+	s16 lifetime; //0x4, rand 16..21
+	s16 slowDelay; //0x6, frames before velocity starts decaying (/1.25)
+	s32 startDelay; //0x8
 	Vec position; //0xC
-	f32 field_0x18; //0x18
-	f32 field_0x1C; //0x1C
-	f32 field_0x20; //0x20
-	f32 field_0x24; //0x24
+	f32 offsetX; //0x18
+	f32 offsetY; //0x1C
+	f32 velX; //0x20, from bom_dir/bom_spd
+	f32 velY; //0x24
 	u8 field_0x28[0x2C - 0x28]; //0x28
 } effExpBomData;
 
@@ -65,24 +65,24 @@ EffectEntry* effExpBomN64Entry(f32 x, f32 y, f32 z) {
 	effect->userdata = data;
 	effect->callback = effExpBomMain;
 	for (i = 0, direction = bom_dir, speed = bom_spd; i < effect->count; direction++, speed++, i++, data++) {
-		data->field_0x0 = 0;
+		data->age = 0;
 		random = rand() % 6 + 16;
-		data->field_0x4 = random;
-		data->field_0x2 = random;
-		data->field_0x6 = 4;
-		data->field_0x8 = 0;
+		data->lifetime = random;
+		data->lifeLeft = random;
+		data->slowDelay = 4;
+		data->startDelay = 0;
 		data->position.x = x;
 		data->position.y = y;
 		data->position.z = z;
-		data->field_0x18 = 0.0f;
-		data->field_0x1C = 0.0f;
+		data->offsetX = 0.0f;
+		data->offsetY = 0.0f;
 
 		v28 = 2.0f * *speed;
 		v29 = ((6.2831855f * (90.0f + *direction)) / 360.0f);
 		sv = sin(v29);
 		cv = cos(v29);
-		data->field_0x20 = v28 * sv;
-		data->field_0x24 = -v28 * cv;
+		data->velX = v28 * sv;
+		data->velY = -v28 * cv;
 	}
 	return effect;
 }
@@ -102,19 +102,19 @@ void effExpBomMain(EffectEntry* effect) {
 	position = tmp;
 
 	for (i = 0; i < effect->count; i++, data++) {
-		if (data->field_0x2 >= 0) {
-			data->field_0x8--;
-			if (data->field_0x8 < 0) {
+		if (data->lifeLeft >= 0) {
+			data->startDelay--;
+			if (data->startDelay < 0) {
 				disp = TRUE;
-				data->field_0x18 += data->field_0x20;
-				data->field_0x1C += data->field_0x24;
-				data->field_0x0++;
-				data->field_0x2--;
-				if (data->field_0x2 >= 0) {
-					data->field_0x6--;
-					if (data->field_0x6 < 0) {
-						data->field_0x20 /= 1.25f;
-						data->field_0x24 /= 1.25f;
+				data->offsetX += data->velX;
+				data->offsetY += data->velY;
+				data->age++;
+				data->lifeLeft--;
+				if (data->lifeLeft >= 0) {
+					data->slowDelay--;
+					if (data->slowDelay < 0) {
+						data->velX /= 1.25f;
+						data->velY /= 1.25f;
 					}
 				}
 			}
@@ -148,18 +148,18 @@ void effExpBomDisp(CameraId camId, void* param) {
 	PSMTXConcat(mtx, rot, base);
 	PSMTXConcat(camera->view, base, base);
 	for (i = 0, scl = bom_scale, ry = bom_ry; i < ((EffectEntry*)param)->count; scl++, ry++, i++, data++) {
-		if (data->field_0x2 < 0 || data->field_0x8 >= 0) continue;
-		n = data->field_0x2;
+		if (data->lifeLeft < 0 || data->startDelay >= 0) continue;
+		n = data->lifeLeft;
 		if (n > 16) n = 16;
-		PSMTXTrans(mtx, data->field_0x18, data->field_0x1C, 0.0f);
+		PSMTXTrans(mtx, data->offsetX, data->offsetY, 0.0f);
 		PSMTXScale(scale, *scl, *scl, *scl);
 		PSMTXRotRad(rot, 'z', 0.017453292f * *ry);
 		PSMTXConcat(mtx, scale, mtx);
 		PSMTXConcat(mtx, rot, rot);
 		PSMTXConcat(base, rot, rot);
 		GXLoadPosMtxImm(rot, GX_PNMTX0);
-		a = (f32)data->field_0x0 - 1.0f;
-		b = (f32)data->field_0x4;
+		a = (f32)data->age - 1.0f;
+		b = (f32)data->lifetime;
 		if (a >= b) {
 			alpha = 255;
 			tex = 6;

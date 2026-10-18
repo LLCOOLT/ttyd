@@ -64,7 +64,7 @@ static inline BOOL chkBalloonStand(HitEntry* hit) {
         }
         else {
             entry = caseCheckHitObj(hit);
-            if (entry != NULL && (entry->flags & 4) && entry->activeConditionId == 9) {
+            if (entry != NULL && (entry->flags & 4) && entry->conditionId == 9) {
                 ret = TRUE;
             }
         }
@@ -86,7 +86,7 @@ static inline BOOL chkBalloonJump(HitEntry* hit) {
             entry = caseCheckHitObj(hit);
             if (entry != NULL) {
                 if (entry->flags & 4) {
-                    if (entry->activeConditionId == 9 || entry->activeConditionId == 12) {
+                    if (entry->conditionId == 9 || entry->conditionId == 12) {
                         ret = TRUE;
                     }
                 }
@@ -122,7 +122,7 @@ static inline BOOL chkBalloonPush(HitEntry* hit) {
                 entry = caseCheckHitObj(hit);
                 if (entry != NULL) {
                     if (entry->flags & 4) {
-                        if (entry->activeConditionId == 12 || entry->activeConditionId == 5) {
+                        if (entry->conditionId == 12 || entry->conditionId == 5) {
                             ret = TRUE;
                         }
                     }
@@ -179,11 +179,11 @@ void marioBalloonMain(void) {
             return;
     }
 
-    if (chkBalloonStand((HitEntry*)mario->field_0x1DC)) {
+    if (chkBalloonStand((HitEntry*)mario->hitobjFrontA)) {
         type = 0;
         show = TRUE;
     }
-    if (chkBalloonJump((HitEntry*)mario->field_0x1E0)) {
+    if (chkBalloonJump((HitEntry*)mario->hitobjFront)) {
         type = 0;
         show = TRUE;
     }
@@ -191,9 +191,9 @@ void marioBalloonMain(void) {
         type = 0;
         show = TRUE;
     }
-    if ((HitEntry*)mario->field_0x1E0 != NULL) {
-        if (chkItemBox((HitEntry*)mario->field_0x1E0) >= 0) {
-            show = chkItemBox((HitEntry*)mario->field_0x1E0);
+    if ((HitEntry*)mario->hitobjFront != NULL) {
+        if (chkItemBox((HitEntry*)mario->hitobjFront) >= 0) {
+            show = chkItemBox((HitEntry*)mario->hitobjFront);
         }
     }
 
@@ -243,7 +243,7 @@ BOOL chkBalloon(HitEntry* hit) {
             entry = caseCheckHitObj(hit);
             if (entry != NULL) {
                 if (entry->flags & 4) {
-                    if (entry->activeConditionId == 9 || entry->activeConditionId == 4 || entry->activeConditionId == 12 || entry->activeConditionId == 5) {
+                    if (entry->conditionId == 9 || entry->conditionId == 4 || entry->conditionId == 12 || entry->conditionId == 5) {
                         ret = TRUE;
                     }
                 }

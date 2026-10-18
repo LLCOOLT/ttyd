@@ -448,7 +448,7 @@ USER_FUNC(party_reset) {
 
     party->scale.x = party->scale.y = party->scale.z = 1.0f;
     party->field_8C = 0.0f;
-    party->field_6C = 0.0f;
+    party->rotation = 0.0f;
     return EVT_RETURN_DONE;
 }
 
@@ -466,9 +466,9 @@ USER_FUNC(party_kirimomi) {
     PartyEntry* party = partyGetPtr(0);
 
     party->scale.x = party->scale.y = party->scale.z = 1.0f;
-    party->field_8C = party->field_F0 / 2 * party->scale.y;
-    party->field_6C = angle;
-    party->field_6C = fmod(party->field_6C, 360.0);
+    party->field_8C = party->height / 2 * party->scale.y;
+    party->rotation = angle;
+    party->rotation = fmod(party->rotation, 360.0);
     return EVT_RETURN_DONE;
 }
 

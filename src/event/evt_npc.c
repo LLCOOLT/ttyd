@@ -540,7 +540,7 @@ USER_FUNC(evt_npc_move_position) {
     event->userdata[0]++;
 
     // flag 0x4: bail if blocked and stuck > 5 frames
-    if ((moveFlags & 0x4) && npc->field_2FC && event->userdata[0] > 5) {
+    if ((moveFlags & 0x4) && npc->wallHit && event->userdata[0] > 5) {
         return EVT_RETURN_DONE;
     }
 
@@ -804,7 +804,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
 
         event->userdataf[1] = -4.0f * arcHeight;
         event->userdataf[2] = (targetY - npc->jumpStartPos.y) - event->userdataf[1];
-        event->field_84 = npc->flags & 0x80000;
+        event->userdata3 = npc->flags & 0x80000;
         npc->flags &= ~0x80000;
 
         if (psndGetFlag() & 0x100) {
@@ -828,7 +828,7 @@ USER_FUNC(evt_npc_jump_position_nohit) {
     }
 
     npc->position = (Vec){ targetX, targetY, targetZ };
-    npc->flags |= event->field_84;
+    npc->flags |= event->userdata3;
 
     sfxFlag = 0;
     if (psndGetFlag() & 0x100) {
@@ -904,7 +904,7 @@ USER_FUNC(evt_npc_glide_position) {
     }
 
     // flag 0x1: bail if blocked
-    if ((moveFlags & 0x1) && npc->field_2FC) {
+    if ((moveFlags & 0x1) && npc->wallHit) {
         return EVT_RETURN_DONE;
     }
 
@@ -989,7 +989,7 @@ USER_FUNC(evt_npc_return_interrupt) {
 
     name = (const char*)evtGetValue(event, args[0]);
     npc = evtNpcNameToPtr(event, name);
-    npc->field_140 |= 0x10000000;
+    npc->interruptFlags |= 0x10000000;
     return EVT_RETURN_YIELD;
 }
 
@@ -1108,7 +1108,7 @@ USER_FUNC(evt_npc_homing_target) {
     else if (stopDistance > 0.0f && dist < stopDistance) {
         finished = TRUE;
     }
-    else if ((moveFlags & 0x4) && npc->field_2FC) {
+    else if ((moveFlags & 0x4) && npc->wallHit) {
         finished = TRUE;
     }
     if (finished) {
@@ -1681,7 +1681,7 @@ USER_FUNC(evt_npc_restart_regular_event) {
 
     name = (const char*)evtGetValue(event, args[0]);
     npc = evtNpcNameToPtr(event, name);
-    npc->field_140 |= 0x10000000;
+    npc->interruptFlags |= 0x10000000;
     npcCheckInterrupt(npc);
     return EVT_RETURN_DONE;
 }
@@ -1697,7 +1697,7 @@ USER_FUNC(evt_npc_facedirection_add) {
     amount = evtGetFloat(event, args[2]);
     if (!strcmp(name, "mario")) {
         MarioWork* mario = marioGetPtr();
-        if (180.0f == mario->unk1A8) {
+        if (180.0f == mario->displayDirection) {
             sign = 1.0f;
         }
         else {
@@ -1837,10 +1837,10 @@ USER_FUNC(evt_npc_set_offscreen) {
     offscreen = (const char*)evtGetValue(event, args[1]);
     npc = evtNpcNameToPtr(event, name);
     if (offscreen == NULL) {
-        npc->field_110 = -1;
+        npc->offscreenId = -1;
     }
     else {
-        npc->field_110 = offscreenNameToId(offscreen);
+        npc->offscreenId = offscreenNameToId(offscreen);
     }
     return EVT_RETURN_DONE;
 }
@@ -2324,7 +2324,7 @@ USER_FUNC(evt_npc_majo_disp_on) {
             break;
 
         case 0:
-            npc->field_154 += (3.0f - npc->field_154) / 10.0f;
+            npc->shadowScale += (3.0f - npc->shadowScale) / 10.0f;
             animPoseSetLocalTime(npc->poseId, 0.0f);
             event->userdata[1]++;
             if (event->userdata[1] > 30) {
@@ -2361,7 +2361,7 @@ USER_FUNC(evt_npc_majo_disp_on) {
             break;
 
         case 3:
-            npc->field_154 += (1.0f - npc->field_154) / 10.0f;
+            npc->shadowScale += (1.0f - npc->shadowScale) / 10.0f;
             event->userdata[1]++;
             if (event->userdata[1] > 30) {
                 return EVT_RETURN_DONE;
@@ -2388,7 +2388,7 @@ USER_FUNC(evt_npc_majo_disp_off) {
 
     switch (event->userdata[0]) {
         case 0:
-            npc->field_154 += (3.0f - npc->field_154) / 10.0f;
+            npc->shadowScale += (3.0f - npc->shadowScale) / 10.0f;
             event->userdata[1]++;
             if (event->userdata[1] > 30) {
                 event->userdata[0]++;
@@ -2427,10 +2427,10 @@ USER_FUNC(evt_npc_majo_disp_off) {
             break;
 
         case 3:
-            npc->field_154 += (-npc->field_154 / 10.0f);
+            npc->shadowScale += (-npc->shadowScale / 10.0f);
             event->userdata[1]++;
             if (event->userdata[1] > 30) {
-                npc->field_154 = 0.0f;
+                npc->shadowScale = 0.0f;
                 return EVT_RETURN_DONE;
             }
             break;
@@ -2545,7 +2545,7 @@ USER_FUNC(evt_npc_kamek_move_position) {
     }
 
     // flag 0x4: bail if blocked
-    if ((moveFlags & 0x4) && npc->field_2FC) {
+    if ((moveFlags & 0x4) && npc->wallHit) {
         return EVT_RETURN_DONE;
     }
 

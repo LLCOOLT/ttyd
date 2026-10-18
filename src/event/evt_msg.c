@@ -127,11 +127,11 @@ s32 _evt_msg_print(EventEntry* event, BOOL isFirstCall, s32 flags, s32 msg, s32 
 				break;
 			case 2:
 				win->toge = 7;
-				win->pos = *(Vec*)&event->unk184;
+				win->pos = *(Vec*)&event->msgPos;
 				break;
 			case 3:
 				win->toge = 2;
-				win->pos = *(Vec*)&event->unk184;
+				win->pos = *(Vec*)&event->msgPos;
 				break;
 		}
 		if (event->printWindowFlags & 0x80000000) {
@@ -363,9 +363,9 @@ USER_FUNC(evt_msg_toge) {
 	s32 v = evtGetValue(event, args[0]);
 	event->printWindowFlags &= 0xE1000000;
 	event->printWindowFlags |= v;
-	event->unk184.field_0x0 = evtGetFloat(event, args[1]);
-	event->unk184.field_0x4 = evtGetFloat(event, args[2]);
-	*(f32*)&event->unk18C = evtGetFloat(event, args[3]);
+	event->msgPos.x = evtGetFloat(event, args[1]);
+	event->msgPos.y = evtGetFloat(event, args[2]);
+	*(f32*)&event->msgPosZ = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
 

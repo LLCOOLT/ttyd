@@ -105,16 +105,21 @@ void hitReInit(void) {
 // This function is cursed, managed to hit 99% - https://decomp.me/scratch/FjwSA
 HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapIndex) {
     MapWork* wp = mapGetWork();
-    HitEntry* hit = wp->entries[mapIndex].hitEntries;
+    MapEntry* entry = &wp->entries[mapIndex];
+    HitEntry* hit;
+    MapFileMesh* mesh;
     Mtx trans, scale, rotX, rotY, rotZ;
     Vec vtmp;
+    s32 numVectors;
     s32 i;
+    s32 j;
 
-    for (i = 0; i < wp->entries[mapIndex].hitNumJoints; hit++, i++) {
-        if (!hit->joint) {
+    for (i = 0; i < entry->hitNumJoints; i++) {
+        if (entry->hitEntries[i].joint == NULL) {
             break;
         }
     }
+    hit = &entry->hitEntries[i];
 
     hit->flags = 0;
     hit->joint = joint;
@@ -157,34 +162,26 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     joint->bboxMax.y += 0.1f;
     joint->bboxMax.z += 0.1f;
 
-    MTXMultVec(hit->worldMtx, &hit->joint->bboxMax, &vtmp);
+    MTXMultVec(hit->worldMtx, &joint->bboxMax, &vtmp);
     hit->radius = PSVECDistance(&vtmp, &hit->centerWorld);
 
-    {
-        s32 numVectors, j, k;
-        s32 partIdx;
-        for (numVectors = 0, partIdx = 0; partIdx < hit->joint->partCount; partIdx++) {
-            MapFileMesh* mesh = hit->joint->parts[partIdx].mesh;
-            if (mesh == NULL) {
-                continue;
-            }
-
-            if (!mesh->isPackedDisplay) {
-                for (j = 0; j < mesh->displayListCount; j++) {
-                    numVectors += *(s32*)mesh->displayLists.normalLists[j] - 2;
-                }
+    numVectors = 0;
+    for (i = 0; i < joint->partCount; i++) {
+        mesh = joint->parts[i].mesh;
+        if (mesh == NULL) {
+            continue;
+        }
+        for (j = 0; j < mesh->displayListCount; j++) {
+            if (mesh->isPackedDisplay) {
+                numVectors += *(u16*)((u8*)mesh->displayLists.packedLists[j].offset + 1) - 2;
             } else {
-                for (k = 0; k < mesh->displayListCount; k++) {
-                    j = *(u16*)((u8*)mesh->displayLists.packedLists[k].offset + 1);
-                    numVectors += j - 2;
-                }
+                numVectors += *(s32*)mesh->displayLists.normalLists[j] - 2;
             }
         }
-
-        if (numVectors > 0) {
-            hit->vectors = _mapAlloc(sizeof(HitVector) * numVectors);
-            hit->unkA8 = hitCalcVtxPosition(hit);
-        }
+    }
+    if (numVectors > 0) {
+        hit->vectors = _mapAlloc(sizeof(HitVector) * numVectors);
+        hit->vectorCount = hitCalcVtxPosition(hit);
     }
     return hit;
 }
@@ -274,17 +271,18 @@ inline HitEntry* hitNameToPtrNoChk(const char* name) {
 }
 
 void hitDelete(const char* name) {
-    MapEntry* map;
     MapWork* wp = mapGetWork();
     s32 j;
     s32 i;
-    HitEntry* hit;
 
-    map = wp->entries;
-    for (i = 0; i < wp->entries->count; map++, i++) {
-        hit = map->hitEntries;
-        for (j = 0; j < map->hitNumJoints; j++, hit++) {
-            if (!(hit->flags & 0x80) && !strcmp(name, hit->joint->name)) {
+    for (i = 0; i < wp->entries->count; i++) {
+        HitEntry* hit;
+
+        for (j = 0, hit = wp->entries[i].hitEntries; j < wp->entries[i].hitNumJoints; j++, hit++) {
+            if (hit->flags & 0x80) {
+                continue;
+            }
+            if (strcmp(name, hit->joint->name) == 0) {
                 hit->flags |= 0x80;
                 hitPreCheck();
                 return;
@@ -294,38 +292,33 @@ void hitDelete(const char* name) {
 }
 
 void hitMain(void) {
-    void** joints;
-    MapEntry* entry;
     MapWork* wp = mapGetWork();
-    s32 j;
-    s32 k;
-    s32 i;
+    MapEntry* entry;
     MapEntryAnimData* anim;
-    BOOL recalc;
     HitAnimJointList* list;
     HitEntry* hit;
+    void* joint;
+    BOOL recalc;
+    s32 i;
+    s32 j;
+    s32 k;
     Mtx mtx;
 
     hitPreCheck();
-    entry = wp->entries;
-    for (i = 0; i < wp->entries->count; entry++, i++) {
-        anim = entry->animData;
-        for (recalc = FALSE, j = 0; j < entry->numAnims; j++, anim++) {
+    for (i = 0; i < wp->entries->count; i++) {
+        entry = &wp->entries[i];
+        recalc = FALSE;
+        for (j = 0; j < entry->numAnims; j++) {
+            anim = &entry->animData[j];
             list = *(HitAnimJointList**)(*(u8**)((u8*)anim + 0x18) + 0xC);
-            if (!(anim->flags & 1)) {
+            if (!(anim->flags & 1) || ((anim->flags & 2) && (anim->flags & 0x1000)) || list == NULL) {
                 continue;
             }
-            if ((anim->flags & 2) && (anim->flags & 0x1000)) {
-                continue;
-            }
-            if (list == NULL) {
-                continue;
-            }
-            joints = (void**)list;
-            for (k = 0; k < list->count; joints++, k++) {
-                hit = hitNameToPtr(*(const char**)joints[1]);
+            for (k = 0; k < list->count; k++) {
+                joint = list->joints[k];
+                hit = hitNameToPtr(*(const char**)joint);
                 if (hit != NULL) {
-                    mapCalcAnimMatrix(hit->unk6C, hit->localMtx, anim, joints[1]);
+                    mapCalcAnimMatrix(hit->animMtx, hit->localMtx, anim, joint);
                     recalc = TRUE;
                     hit->flags |= 0x10;
                     hit->flags |= 0x40;
@@ -481,7 +474,7 @@ void hitReCalcMatrix2(HitEntry* hit, Mtx mtx, BOOL recursion) {
     }
     if (var_r3_3 != 0) {
         if (hit->flags & 0x10) {
-            PSMTXConcat(mtx, hit->unk6C, hit->worldMtx);
+            PSMTXConcat(mtx, hit->animMtx, hit->worldMtx);
         } else {
             PSMTXConcat(mtx, hit->localMtx, hit->worldMtx);
         }
@@ -537,14 +530,19 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                 for (k = 0; k < *list - 2; k++) {
                     HitVector* vec;
                     s16 i1, i2;
-                    s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
+                    s16 i0 = *(s16*)((u8*)list + k * 0x18 + 4);
                     i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
                     i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
+                    if (k & 1) {
+                        s16 t = i1;
+                        i1 = i2;
+                        i2 = t;
+                    }
                     vec = &hit->vectors[count++];
                     pos = (Vec*)(*(u8**)mesh->vcdTableOffset + 4);
-                    MTXMultVec(hit->worldMtx, &pos[*idx], &vec->v0);
-                    MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i2 : i1], &vec->v1);
-                    MTXMultVec(hit->worldMtx, &pos[!(k & 1) ? i1 : i2], &vec->v2);
+                    MTXMultVec(hit->worldMtx, &pos[i0], &vec->v0);
+                    MTXMultVec(hit->worldMtx, &pos[i2], &vec->v1);
+                    MTXMultVec(hit->worldMtx, &pos[i1], &vec->v2);
                     PSVECSubtract(&vec->v2, &vec->v0, &vec->edge0);
                     PSVECSubtract(&vec->v0, &vec->v1, &vec->edge1);
                     PSVECSubtract(&vec->v1, &vec->v2, &vec->edge2);
@@ -578,9 +576,14 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     i2 = *(u16*)&list[stride * (j + 2) + 3];
                     v2 = &hit->vectors[count];
                     base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
+                    if (!even) {
+                        u16 t = i1;
+                        i1 = i2;
+                        i2 = t;
+                    }
                     o0 = i0 * 3;
-                    o1 = (u16)(even ? i2 : i1) * 3;
-                    o2 = (u16)(even ? i1 : i2) * 3;
+                    o1 = i2 * 3;
+                    o2 = i1 * 3;
                     gqr = (*(s32*)(*(u8**)((u8*)&wp->entries[hit->mapIndex] + 0xA4) + 0x44) << 8) | 7;
                     gqr |= gqr << 16;
                     asm { mtspr GQR5, gqr }
@@ -826,7 +829,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                         query->singleSided = 0;
                     }
                     var_r31 = var_r29->vectors;
-                    for (i = 0; i < var_r29->unkA8; i++, var_r31++) {
+                    for (i = 0; i < var_r29->vectorCount; i++, var_r31++) {
                         if ((query->singleSided == 0) ||
                             !(PSVECDotProduct(&var_r31->normal, &query->targetDir) >= 0.0f)) {
                             if (checkTriVec_xz(query, var_r31) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
@@ -853,7 +856,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                             query->singleSided = 0;
                         }
                         vector = var_r29->vectors;
-                        for (i = 0; i < var_r29->unkA8; i++, vector++) {
+                        for (i = 0; i < var_r29->vectorCount; i++, vector++) {
                             if (query->singleSided == 0 || !(vector->normal.y <= 0.0f)) {
                                 if (tempfunc(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
                                     var_f29 = query->targetDistance;
@@ -878,7 +881,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                             query->singleSided = 0;
                         }
                         vector = var_r29->vectors;
-                        for (i = 0; i < var_r29->unkA8; i++, vector++) {
+                        for (i = 0; i < var_r29->vectorCount; i++, vector++) {
                             if (query->singleSided == 0 || !(vector->normal.y >= 0.0f)) {
                                 if (tempfunc2(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
                                     var_f29 = query->targetDistance;
@@ -907,7 +910,7 @@ HitEntry* hitCheckVecFilter(HitCheckQuery* query, HitFilterCallback callback) { 
                         query->singleSided = 0;
                     }
                     vector = var_r29->vectors;
-                    for (i = 0; i < var_r29->unkA8; i++, vector++) {
+                    for (i = 0; i < var_r29->vectorCount; i++, vector++) {
                         if (query->singleSided == 0 || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
                             if (tempfunc3(query, vector) && (var_f29 < 0.0f || var_f29 > query->targetDistance)) {
                                 var_f29 = query->targetDistance;
@@ -1042,7 +1045,7 @@ BOOL hitCheckVecHitObjXZ(HitCheckQuery* query, HitEntry* entry) { // 1:1
         query->singleSided = 0;
     }
     vector = entry->vectors;
-    for (i = 0; i < entry->unkA8; i++, vector++) {
+    for (i = 0; i < entry->vectorCount; i++, vector++) {
         if ((query->singleSided == 0 || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) &&
             checkTriVec_xz(query, vector)) {
             return 1;
@@ -1145,7 +1148,7 @@ HitEntry* hitCheckSphereFilter(HitFilterCallback callback, f32 x, f32 y, f32 z,
         query->singleSided = 0;
     }
     vector = temp_r27->vectors;
-    for (i = 0; i < temp_r27->unkA8; i++, vector++) {
+    for (i = 0; i < temp_r27->vectorCount; i++, vector++) {
         if ((query->singleSided == 0) || !(PSVECDotProduct(&vector->normal, &query->targetDir) >= 0.0f)) {
             if (tempfunc3(query, vector) && ((var_f30 < 0.0f) || (var_f30 > query->targetDistance))) {
                 var_f30 = query->targetDistance;

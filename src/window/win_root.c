@@ -310,7 +310,7 @@ s32 winRootMain(WinRootWork* w) {
     s32 x;
     s32 i;
     s32 ret;
-    WinRootWork* t;
+    WinRootTab* t;
 
     switch (w->active) {
     case 0:
@@ -526,35 +526,35 @@ s32 winRootMain(WinRootWork* w) {
         break;
     }
 
-    for (x = -205, t = w, i = 0; i < 5; t = (WinRootWork*)((u8*)t + sizeof(WinRootTab)), x += 105, i++) {
-        switch (t->tab[0].state) {
+    for (x = -205, t = w->tab, i = 0; i < 5; t++, x += 105, i++) {
+        switch (t->state) {
         case 0:
-            t->tab[0].x = x;
-            t->tab[0].y = 300.0f;
-            t->tab[0].timer = i << 2;
-            t->tab[0].state++;
+            t->x = x;
+            t->y = 300.0f;
+            t->timer = i << 2;
+            t->state++;
             break;
         case 1:
         case 11:
-            if (--t->tab[0].timer < 0) {
-                t->tab[0].timer = 0;
-                t->tab[0].state++;
+            if (--t->timer < 0) {
+                t->timer = 0;
+                t->state++;
             }
             break;
         case 2:
-            t->tab[0].y = intplGetValue(11, t->tab[0].timer++, 10, 300.0f, 185.0f);
-            if (t->tab[0].timer > 10) {
-                t->tab[0].state++;
+            t->y = intplGetValue(11, t->timer++, 10, 300.0f, 185.0f);
+            if (t->timer > 10) {
+                t->state++;
             }
             break;
         case 10:
-            t->tab[0].timer = (4 - i) * 4;
-            t->tab[0].state++;
+            t->timer = (4 - i) * 4;
+            t->state++;
             break;
         case 12:
-            t->tab[0].y = intplGetValue(11, t->tab[0].timer++, 10, 180.0f, 300.0f);
-            if (t->tab[0].timer > 10) {
-                t->tab[0].state++;
+            t->y = intplGetValue(11, t->timer++, 10, 180.0f, 300.0f);
+            if (t->timer > 10) {
+                t->state++;
             }
             break;
         case 13:

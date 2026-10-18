@@ -4,17 +4,17 @@
 #include "memory.h"
 
 typedef struct EnvironmentGlareTexCoord {
-    f32 unk0; //0x0
-    f32 unk4; //0x4
+    f32 x; //0x0, screen pixels, scaled by coordScale / fbWidth
+    f32 y; //0x4
 } EnvironmentGlareTexCoord;
 
 typedef struct EnvironmentGlare {
     GXBlendMode mode; //0x0
     GXBlendFactor srcFactor; //0x4
     GXBlendFactor dstFactor; //0x8
-    GXTevKColorSel unkC; //0xC
-    GXTevKColorSel unk10; //0x10
-    f32 unk14; //0x14
+    GXTevKColorSel kcolorSel0; //0xC
+    GXTevKColorSel kcolorSel1; //0x10
+    f32 coordScale; //0x14
     s32 count; //0x18, number of coords that follors
     EnvironmentGlareTexCoord coords[]; //0x1C
 } EnvironmentGlare;
@@ -29,13 +29,13 @@ typedef struct EnvironmentGlareFilter {
     f32 zscale; //0xC
 } EnvironmentGlareFilter;
 
-typedef struct EnvironmentUnk88 {
-    u16 unk0; //0x0
-    u8 unk2; //0x2
-    u8 unk3; //0x3
-    f32 unk4; //0x4
-    f32 unk8; //0x8
-} EnvironmentUnk88;
+typedef struct EnvironmentDof {
+    u16 flags; //0x0, bit0 = pass 1 on, bit1 = pass 2 on
+    u8 level1; //0x2, pass 1 konst color
+    u8 level2; //0x3, pass 2 konst color
+    f32 radius1; //0x4, pass 1 sample offset (4 taps)
+    f32 radius2; //0x8, pass 2 sample offset
+} EnvironmentDof; // two-pass depth-of-field style screen blur
 
 typedef struct EnvironmentWork {
     s32 flags; //0x0
@@ -46,7 +46,7 @@ typedef struct EnvironmentWork {
     void* envBlur; //0x4C, see envBlurOn
     GXTexObj envBlurObj; //0x50
     u8 unk70[0x88 - 0x70]; //0x70
-    EnvironmentUnk88 unk88; //0x88
+    EnvironmentDof dof; //0x88
     u8 unk94[0x98 - 0x94]; //0x94
     u16 unk98; //0x98, some substruct
     u8 unk9A[0xB0 - 0x9A]; //0x9A

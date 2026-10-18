@@ -159,7 +159,7 @@ void setupDataBase(const char* areaName, const char* mapName) {
 				tribe = npcGetTribe(tribeName);
 				npcEntry(npcName, (const char*)tribe->modelName);
 				npc = npcNameToPtr(npcName);
-				npc->field_314 = k;
+				npc->setupIndex = k;
 				ai = npc_ai_type_table;
 				npc->flags |= 4;
 				npc->position = pos;
@@ -204,7 +204,7 @@ void setupDataBase(const char* areaName, const char* mapName) {
 				btl = -1;
 				area = areaDataPtr(areaName);
 				if (strcmp(btlSetup, "BTLNO_INVALID")) {
-					btl = dbGetDefData((NpcTerritoryInfo*)area->field_C, btlSetup);
+					btl = dbGetDefData((NpcTerritoryInfo*)area->btlSetupNoTbl, btlSetup);
 				}
 				npcSetBattleInfo(npc, btl);
 				if (tribe->stayAnim) strcpy(npc->stayAnim, tribe->stayAnim);

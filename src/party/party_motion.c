@@ -2128,8 +2128,7 @@ void party_motion_jump(PartyEntry* party) {
         party->flags3 &= ~2;
         party->unk38 = 0;
     }
-    switch (party->unk38) {
-    case 0:
+    if (party->unk38 == 0) {
         x = party->unk94.x;
         y = party->unk94.y;
         z = party->unk94.z;
@@ -2199,9 +2198,7 @@ void party_motion_jump(PartyEntry* party) {
         t = 0.5f * party->unk24;
         if (__fabsf(dy) < 1.0f) {
             dy = 25.0f;
-        } else if (dy >= 0.0f) {
-            x = x;
-        } else {
+        } else if (dy < 0.0f) {
             dy = 10.0f;
         }
         g = (dy + dy) / (t * t - t);
@@ -2221,8 +2218,7 @@ void party_motion_jump(PartyEntry* party) {
         if (!(party->flags & 8)) {
             partyNextReadId(partyGetFootmarkId(party));
         }
-        break;
-    case 10:
+    } else if (party->unk38 == 10) {
         if (!(party->flags & 8)) {
             partyNextReadId(partyGetFootmarkId(party));
         }
@@ -2234,7 +2230,7 @@ void party_motion_jump(PartyEntry* party) {
             party->unk100 = angleABf(party->position.x, party->position.z, mario->position.x, mario->position.z);
             party->position = mario->position;
             partyChgMot(party, 0);
-            break;
+            return;
         }
         if (party->unk114 <= 0.0f) {
             party->flags &= ~0x10;
@@ -2248,7 +2244,7 @@ void party_motion_jump(PartyEntry* party) {
                 party->unk138 = NULL;
                 partyChgMot(party, 3);
                 party->unk11C = -1.0f;
-                break;
+                return;
             }
             party->unk138 = hit;
             party->position.y = party->unkE4;
@@ -2259,11 +2255,10 @@ void party_motion_jump(PartyEntry* party) {
                 party->unk114 = 0.0f;
                 partyChgMot(party, 0);
                 party->flags3 |= 0x800000;
-                break;
+                return;
             }
         }
         partyJumpWallMove(party);
-        break;
     }
 }
 

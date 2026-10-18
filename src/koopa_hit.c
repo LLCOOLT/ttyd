@@ -126,13 +126,13 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     if (kpaEnemyFireHitChk(x, y, z, h, w)) {
         return 2;
     }
-    dh = 0.5f * (MF(m, 0x1B8) + h);
-    dw = 0.5f * (MF(m, 0x1B4) + w);
-    dx = __fabsf(MF(m, 0x8C) - x);
-    dy = __fabsf(MF(m, 0x90) + 0.5f * MF(m, 0x1B8) - y - 0.5f * h);
+    dh = 0.5f * (m->wPlayerCollisionBox.y + h);
+    dw = 0.5f * (m->wPlayerCollisionBox.x + w);
+    dx = __fabsf(m->position.x - x);
+    dy = __fabsf(m->position.y + 0.5f * m->wPlayerCollisionBox.y - y - 0.5f * h);
     if (dy <= dh && dx <= dw) {
-        if ((m->flags & 0x20000) && MF(m, 0x90) > y) {
-            if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && MS16(m, 0x4C) == 0 && z < 50.0f) {
+        if ((m->flags & 0x20000) && m->position.y > y) {
+            if (kpaGetLevel() == 0 && kpaGetStageType() != 1 && m->unk4C == 0 && z < 50.0f) {
                 marioChgMot(4);
             }
             return 1;
@@ -140,7 +140,7 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
         if (kpaMutekiCheck() == 1) {
             return 3;
         }
-        if (MS16(m, 0x4C) != 0) {
+        if (m->unk4C != 0) {
             return 3;
         }
         if (MS16(m, 0x78) == 0) {
@@ -176,25 +176,25 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     MF(m, 0x220) = 0.0f;
     MF(m, 0x214) = 0.0f;
     if (m->flags & 0x200) {
-        *outY = MF(m, 0x90);
+        *outY = m->position.y;
         return NULL;
     }
     range += 0.01f;
     if (kpaGetLevel() == 0) {
-        h = MF(m, 0x1B8);
+        h = m->wPlayerCollisionBox.y;
     } else {
-        h = 0.25f * MF(m, 0x1B8);
+        h = 0.25f * m->wPlayerCollisionBox.y;
     }
-    *outY = MF(m, 0x90);
+    *outY = m->position.y;
     *outDepth = -1.0f;
     if (m->baseSpeed) {
         deg = m->directionView;
     } else {
-        deg = toMovedir(m->unk1A8);
+        deg = toMovedir(m->displayDirection);
     }
-    px = MF(m, 0x8C);
-    py = MF(m, 0x90);
-    pz = MF(m, 0x94);
+    px = m->position.x;
+    py = m->position.y;
+    pz = m->position.z;
     for (i = 0; i < 10; i++) {
         KRIDE(i) = NULL;
         KRIDED(i) = 1000.0f;
@@ -204,11 +204,11 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     case 1:
     case 2:
         n = 3;
-        r2 = 0.6f * (0.5 * MF(m, 0x1B4));
+        r2 = 0.6f * (0.5 * m->wPlayerCollisionBox.x);
         break;
     case 3:
         n = 7;
-        r2 = 0.6f * (0.5f * MF(m, 0x1B4) / 3.0f);
+        r2 = 0.6f * (0.5f * m->wPlayerCollisionBox.x / 3.0f);
         break;
     }
     r2b = 2.0f * r2 - 0.05f;
@@ -306,7 +306,7 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
     if (m->baseSpeed) {
         deg = m->directionView;
     } else {
-        deg = toMovedir(m->unk1A8);
+        deg = toMovedir(m->displayDirection);
     }
     off = *outB;
     *outB = -1.0f;
@@ -353,9 +353,9 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
         if (md == 0 && !(m->flags & 0x10000)) {
             continue;
         }
-        x = MF(m, 0x8C) + s_;
-        y = MF(m, 0x90) + oy;
-        z = MF(m, 0x94) + oz;
+        x = m->position.x + s_;
+        y = m->position.y + oy;
+        z = m->position.z + oz;
         d = off;
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, x, y, z, 0.0f, 1.0f, 0.0f);
         if (hit) {
@@ -484,10 +484,10 @@ HitEntry* kpaHitCheck(void) {
     n = *p++;
     for (j = 0; j < n; j++) {
         sn = (f32)sin(3.1415927f * m->directionView / 180.0f);
-        x = MF(m, 0x8C) + p[0] * sn;
+        x = m->position.x + p[0] * sn;
         sn = (f32)cos(3.1415927f * m->directionView / 180.0f);
-        z = MF(m, 0x94) - p[0] * sn;
-        y = MF(m, 0x90) + p[1];
+        z = m->position.z - p[0] * sn;
+        y = m->position.y + p[1];
         r = p[2];
         i = p[3];
         p += 4;

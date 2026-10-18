@@ -7,9 +7,9 @@ typedef void (*FileCallback)(struct FileEntry* file);
 
 typedef struct FileEntry {
 	u8 state; //0x0
-	s8 field_0x1; //0x1, TODO enum archivetype/type
+	s8 type; //0x1, fileAlloc(name, type); passed to fileGarbageDataAdrSet
 	s16 references; //0x2
-	void* field_0x4; //0x4
+	void* dataSlot; //0x4, data points here unless the data is in a smart block
 	u8 field_0x8[0x20 - 0x8]; //0x8
 	char filename[64]; //0x20
 	u8 field_0x60[0xA0 - 0x60]; //0x60

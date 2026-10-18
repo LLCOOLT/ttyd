@@ -4,8 +4,8 @@
 
 typedef struct PartyCloud {
     f32 unk0; //0x0
-    f32 unk4; //0x4
-    f32 unk8; //0x8
+    f32 breathDir; //0x4, Gale Force breath direction (toMovedir)
+    f32 breathDist; //0x8, Gale Force breath reach
     u8 field_0xC[0x20 - 0xC]; // 0xC
     s32 unk20; //0x20
     s32 unk24; //0x24

@@ -392,8 +392,8 @@ BattleUnit* BattleGetPartyPtr(BattleWork* wp) {
     BattleUnit* unit;
     for (i = 0; i < 64; i++) {
         unit = BattleGetUnitPtr(wp, i);
-        if (unit != NULL && !(*(u32*)((u8*)unit + 0x1C) & 8) && *(s32*)((u8*)unit + 8) >= 0xE0 &&
-            *(s32*)((u8*)unit + 8) < 0xE7 && *(s8*)((u8*)unit + 0xC) == 0) {
+        if (unit != NULL && !(unit->flags & 8) && unit->currentKind >= 0xE0 &&
+            unit->currentKind < 0xE7 && unit->mAlliance == 0) {
             return unit;
         }
     }
@@ -401,7 +401,7 @@ BattleUnit* BattleGetPartyPtr(BattleWork* wp) {
 }
 
 BattleUnit* BattleGetPartnerPtr(BattleWork* wp, BattleUnit* unit) {
-    if (*(s32*)((u8*)unit + 8) == 0xDE) {
+    if (unit->currentKind == 0xDE) {
         return BattleGetPartyPtr(wp);
     }
     return BattleGetMarioPtr(wp);
@@ -428,12 +428,12 @@ BattleUnit* BattleChangeParty(BattleWork* wp) {
     }
     unit = BtlUnit_Spawn(&entryunit_party[kind - 0xE0], 1);
     for (i = 0; i < 64; i++) {
-        s32 id = *(s32*)((u8*)wp + 0x120 + i * 4);
+        s32 id = wp->movePriorityQueue[i];
         if (id != -1) {
             if (id == oldId) {
-                *(s32*)((u8*)wp + 0x120 + i * 4) = *(s32*)unit;
+                wp->movePriorityQueue[i] = *(s32*)unit;
             } else if (id == *(s32*)unit) {
-                *(s32*)((u8*)wp + 0x120 + i * 4) = oldId;
+                wp->movePriorityQueue[i] = oldId;
             }
         }
     }
@@ -442,17 +442,17 @@ BattleUnit* BattleChangeParty(BattleWork* wp) {
     BtlUnit_EquipItem(unit, EQUIP_RESET | EQUIP_PARTNER, 0);
     y += ((f32 (*)(BattleWork*, f32, f32, f32))BattleGetFloorHeight)(_battleWorkPointer, x, y, z);
     BtlUnit_SetHomePos(unit, x, y, z);
-    if (*(s32*)((u8*)wp + 0x420) == oldId) {
-        *(s32*)((u8*)wp + 0x420) = *(s32*)unit;
+    if (wp->activeUnitId == oldId) {
+        wp->activeUnitId = *(s32*)unit;
     }
-    *((u8*)unit + 0x20) = *((u8*)party + 0x20);
-    *((u8*)unit + 0x22) = *((u8*)party + 0x22);
-    *((u8*)unit + 0x23) = *((u8*)party + 0x23);
-    *((u8*)unit + 0x24) = *((u8*)party + 0x24);
+    unit->moveState = party->moveState;
+    unit->movesRemaining = party->movesRemaining;
+    unit->maxMovesThisTurn = party->maxMovesThisTurn;
+    unit->activeTurns = party->activeTurns;
     BtlUnit_SetParamToPouch(party);
-    *(u32*)((u8*)party + 0x1C) |= 8;
-    *((u8*)unit + 0x30D) = *((u8*)party + 0x30D);
-    *((u8*)unit + 0x30E) = *((u8*)party + 0x30E);
+    party->flags |= 8;
+    unit->mMoveColorLv = party->mMoveColorLv;
+    unit->moveColorLvDisp = party->moveColorLvDisp;
     return unit;
 }
 
@@ -745,15 +745,15 @@ void BattlePartyInfoWorkInit(BattleWork* wp) {
 }
 
 void BattleStoreCoin(BattleWork* wp, s32 coin) {
-    *(s32*)((u8*)wp->fbatInfo + 0x14) += coin;
+    wp->fbatInfo->coins += coin;
 }
 
 void BattleStoreExp(BattleWork* wp, s32 exp) {
-    *(s32*)wp->field_F00 += exp;
+    wp->stockExp += exp;
 }
 
 s32 BattleGetStockExp(BattleWork* wp) {
-    s32 exp = *(s32*)wp->field_F00;
+    s32 exp = wp->stockExp;
     if (exp <= 0) {
         return 1;
     }
@@ -765,10 +765,10 @@ s32 BattleGetStockExp(BattleWork* wp) {
 
 f32 BattleGetFloorHeight(f32 x, f32 y, f32 z) {
     BattleStage* stage = BattleStageGetPtr();
-    if (z <= *(f32*)&stage->field_0xB2C) {
+    if (z <= stage->stageSizeZ) {
         return 0.0f;
     }
-    return stage->field_0xB34;
+    return stage->audienceSizeY;
 }
 
 #include "driver/animdrv.h"
@@ -854,7 +854,7 @@ BOOL BattleAfterReactionMain(void) {
             BattleAfterReactionRelease(id, tag);
             evt = evtEntry(BtlUnit_GetData(unit, tag), 10, 0);
             if (evt != NULL) {
-                *(s32*)((u8*)unit + 0x2A4) = evt->eventId;
+                unit->attackEventId = evt->eventId;
                 evt->unitId = *(s32*)unit;
             }
             return TRUE;
@@ -867,7 +867,7 @@ BOOL BattleStatusWindowCheck(void);
 
 BOOL battleDisableHResetCheck(void) {
     BattleWork* wp = _battleWorkPointer;
-    if (*(s32*)((u8*)gp + 0x14) == 0) {
+    if (gp->inBattle == 0) {
         return FALSE;
     }
     if (wp == NULL) {
@@ -883,33 +883,33 @@ u8 BattleMajinaiCheck(void) {
     if (pouch->mMerleeCurseUsesRemaining == 0) {
         return 0;
     }
-    if (*((s8*)pouch + 0x5B9) < 0) {
-        *((u8*)pouch + 0x5BA) = 0;
-        *((s8*)pouch + 0x5B9) = irand(5) + 6;
-        (*((s8*)pouch + 0x5B9))--;
+    if (pouch->mTurnsUntilMerleeActivation < 0) {
+        pouch->mMerleeNextCurseType = 0;
+        pouch->mTurnsUntilMerleeActivation = irand(5) + 6;
+        (pouch->mTurnsUntilMerleeActivation)--;
         return 0;
     }
-    if (*((u8*)pouch + 0x5BA) != 0) {
-        return *((u8*)pouch + 0x5BA);
+    if (pouch->mMerleeNextCurseType != 0) {
+        return pouch->mMerleeNextCurseType;
     }
-    (*((s8*)pouch + 0x5B9))--;
-    if (*((s8*)pouch + 0x5B9) > 0) {
+    (pouch->mTurnsUntilMerleeActivation)--;
+    if (pouch->mTurnsUntilMerleeActivation > 0) {
         return 0;
     }
-    *((s8*)pouch + 0x5B9) = 0;
+    pouch->mTurnsUntilMerleeActivation = 0;
     if (*(u32*)(*(u8**)(*(u8**)((u8*)wp + 0x2738) + 0xC) + 4) & 0x20) {
         r = irand(100);
-        if (r < 45) *((u8*)pouch + 0x5BA) = 1;
-        else if (r < 90) *((u8*)pouch + 0x5BA) = 2;
-        else *((u8*)pouch + 0x5BA) = 3;
+        if (r < 45) pouch->mMerleeNextCurseType = 1;
+        else if (r < 90) pouch->mMerleeNextCurseType = 2;
+        else pouch->mMerleeNextCurseType = 3;
     } else {
         r = irand(100);
-        if (r < 30) *((u8*)pouch + 0x5BA) = 1;
-        else if (r < 60) *((u8*)pouch + 0x5BA) = 2;
-        else if (r < 80) *((u8*)pouch + 0x5BA) = 3;
-        else *((u8*)pouch + 0x5BA) = 4;
+        if (r < 30) pouch->mMerleeNextCurseType = 1;
+        else if (r < 60) pouch->mMerleeNextCurseType = 2;
+        else if (r < 80) pouch->mMerleeNextCurseType = 3;
+        else pouch->mMerleeNextCurseType = 4;
     }
-    return *((u8*)pouch + 0x5BA);
+    return pouch->mMerleeNextCurseType;
 }
 
 #include "battle/battle_stage.h"
@@ -918,11 +918,11 @@ void BattleMajinaiDone(void) {
     PouchData* pouch = pouchGetPtr();
     pouch->mMerleeCurseUsesRemaining--;
     if (pouch->mMerleeCurseUsesRemaining != 0) {
-        *((s8*)pouch + 0x5B9) = -1;
-        *((u8*)pouch + 0x5BA) = 0;
+        pouch->mTurnsUntilMerleeActivation = -1;
+        pouch->mMerleeNextCurseType = 0;
     } else {
-        *((s8*)pouch + 0x5B9) = -1;
-        *((u8*)pouch + 0x5BA) = 0;
+        pouch->mTurnsUntilMerleeActivation = -1;
+        pouch->mMerleeNextCurseType = 0;
     }
 }
 
@@ -934,45 +934,45 @@ void BattleMajinaiEndCheck(void) {
 }
 
 void BattleStatusWindowAPRecoveryOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 1;
+    _battleWorkPointer->statusWindowAPRecoveryOn = 1;
     BattleStatusWindowCheck();
 }
 
 void BattleStatusWindowAPRecoveryOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x274C) = 0;
+    _battleWorkPointer->statusWindowAPRecoveryOn = 0;
     BattleStatusWindowCheck();
 }
 
 void BattleStatusWindowEventOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 1;
+    _battleWorkPointer->statusWindowEventOn = 1;
     BattleStatusWindowCheck();
 }
 
 void BattleStatusWindowSystemOn(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 1;
+    _battleWorkPointer->statusWindowSystemOn = 1;
     BattleStatusWindowCheck();
 }
 
 void BattleStatusWindowEventOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2748) = 0;
+    _battleWorkPointer->statusWindowEventOn = 0;
     BattleStatusWindowCheck();
 }
 
 void BattleStatusWindowSystemOff(void) {
-    *(s32*)((u8*)_battleWorkPointer + 0x2744) = 0;
+    _battleWorkPointer->statusWindowSystemOn = 0;
     BattleStatusWindowCheck();
 }
 
 BOOL BattleStatusWindowCheck(void) {
     BattleWork* wp = _battleWorkPointer;
     BOOL open;
-    if (*(s32*)((u8*)wp + 0x273C)) {
+    if (wp->statusWindowOff) {
         open = FALSE;
-    } else if (*(s32*)((u8*)wp + 0x2740)) {
+    } else if (wp->lectureMode) {
         open = FALSE;
-    } else if (*(s32*)((u8*)wp + 0x274C)) {
+    } else if (wp->statusWindowAPRecoveryOn) {
         open = TRUE;
-    } else if (*(s32*)((u8*)wp + 0x2748) && *(s32*)((u8*)wp + 0x2744)) {
+    } else if (wp->statusWindowEventOn && wp->statusWindowSystemOn) {
         open = TRUE;
     } else {
         open = FALSE;

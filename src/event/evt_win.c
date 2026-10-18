@@ -863,10 +863,10 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			h = (h > 0 ? h : 0) * 24;
 			if (mode == 17) {
 				title = msgSearch("msg_window_title_5");
-				tbl = jdt->unk14.unkD;
+				tbl = jdt->readFlags.perfectRead;
 			} else {
 				title = msgSearch("msg_window_title_6");
-				tbl = jdt->unk14.unk1A;
+				tbl = jdt->readFlags.luigiRead;
 			}
 			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
 			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 51.0f, 114.0f, 150.0f, 28.0f, 8.0f);

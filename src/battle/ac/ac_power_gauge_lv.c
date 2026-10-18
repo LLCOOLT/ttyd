@@ -48,13 +48,13 @@ s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
             tw->gauge = 0.0f;
             break;
         case 100:
-            if ((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
+            if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
                 if (irand(100) >= 0) {
-                    work->actionCommands.field_0x8 = 30;
+                    work->actionCommands.setupParam = 30;
                     work->actionCommands.outputParams[0] = 0;
                 } else {
                     work->actionCommands.outputParams[0] = irand(PG_S32(ac, 0x3C) - 1) + 1;
-                    work->actionCommands.field_0x8 = 30;
+                    work->actionCommands.setupParam = 30;
                 }
                 work->actionCommands.mAcState = 1001;
                 break;
@@ -98,8 +98,8 @@ s32 battleAcMain_PowerGaugeLv(BattleWork* work) {
             }
             break;
         case 1001:
-            work->actionCommands.field_0x8--;
-            if (work->actionCommands.field_0x8 < 0) {
+            work->actionCommands.setupParam--;
+            if (work->actionCommands.setupParam < 0) {
                 if ((s32)work->actionCommands.outputParams[0] > 0) {
                     work->actionCommands.result = 2;
                     work->actionCommands.mResultCount++;

@@ -148,7 +148,7 @@ void mot_walk(void) {
             unkConditionActive = FALSE;
         } else {
             caseEntry = caseCheckHitObj(player->hitobjPush);
-            if (caseEntry != NULL && caseEntry->activeConditionId == 0xA) {
+            if (caseEntry != NULL && caseEntry->conditionId == 0xA) {
                 unkConditionActive = TRUE;
             } else {
                 unkConditionActive = FALSE;
@@ -260,7 +260,7 @@ void mot_dash(void) {
         unkConditionActive = FALSE;
     } else {
         caseEntry = caseCheckHitObj(player->hitobjPush);
-        if (caseEntry != NULL && caseEntry->activeConditionId == 0xA) {
+        if (caseEntry != NULL && caseEntry->conditionId == 0xA) {
             unkConditionActive = TRUE;
         } else {
             unkConditionActive = FALSE;

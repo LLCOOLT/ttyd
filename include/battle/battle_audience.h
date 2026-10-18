@@ -51,23 +51,23 @@ typedef struct BattleAudienceMember {
     u8 field_0x24[0x30 - 0x24];    // 0x24
     s32 field_0x30;                // 0x30
     u8 field_0x34[0x41 - 0x34];    // 0x34
-    u8 field_0x41;                 // 0x41
-    u8 field_0x42;                 // 0x42
-    u8 field_0x43;                 // 0x43
-    u8 field_0x44;                 // 0x44
+    u8 colorR;                     // 0x41, draw colour (read with G/B/A in the member draw)
+    u8 colorG;                     // 0x42
+    u8 colorB;                     // 0x43
+    u8 colorA;                     // 0x44, 0xFF = opaque (separate draw pass)
     u8 field_0x45[0x48 - 0x45];    // 0x45
     Vec position;                  // 0x48
-    u8 field_0x54[0x60 - 0x54];    // 0x54
-    Vec field_0x60;                // 0x60
-    Vec field_0x6C;                // 0x6C
+    Vec scale;                     // 0x54, final draw scale: baseScale * kind texture size (PSMTXScale in the member draw)
+    Vec baseScale;                 // 0x60
+    Vec dispOffset;                // 0x6C, added to position for the drawn quad
     Vec field_0x78;                // 0x78
     u8 field_0x84[0x90 - 0x84];    // 0x84
-    Vec field_0x90;                // 0x90
+    Vec facingDir;                 // 0x90, (0,0,-1) rotated by the member matrix; dot-product facing test
     Vec mRotation;                 // 0x9C
     Vec mRotationOffset;           // 0xA8
     Vec mHomePosition;             // 0xB4
     u8 field_0xC0[0xE8 - 0xC0];    // 0xC0
-    f32 field_0xE8;                // 0xE8
+    f32 angle;                     // 0xE8, init 270, wrapped to 0..360
     u8 field_0xEC[0xF8 - 0xEC];    // 0xEC
     s32 interpFramesLeft;          // 0xF8
     s32 interpFramesTotal;         // 0xFC
@@ -80,7 +80,7 @@ typedef struct BattleAudienceMember {
     Vec interpDelta;               // 0x118
     f32 interpGravity;             // 0x124
     s32 interpType;                // 0x128
-    s32 field_0x12C;               // 0x12C, some counter
+    s32 statusTimer;               // 0x12C, set to 5 and counted down while status == 18
     u8 field_0x130[0x134 - 0x130]; // 0x130
 } BattleAudienceMember;
 

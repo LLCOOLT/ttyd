@@ -47,7 +47,7 @@ s32 marioUseParty(void) {
         return 0;
     }
     party = partyGetPtr(marioGetPartyId());
-    if (party != NULL && party->field_34 == 3) {
+    if (party != NULL && party->runMode == 3) {
         return 0;
     }
     if (wp->currPartySlotId[0] < 0) {
@@ -87,7 +87,7 @@ s32 marioUseParty(void) {
     if (party->currentMemberId == 4 && yoshiGetStatus()) {
         return 0;
     }
-    if (!(wp->trigFlags & 2) && (wp->field_0x248 & 0x400)) {
+    if (!(wp->trigFlags & 2) && (wp->buttonBuffer & 0x400)) {
         wp->trigFlags |= 2;
         wp->field_0x3B = 5;
     }

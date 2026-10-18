@@ -51,7 +51,7 @@ void marioPreJump(void) {
 	mario->flags &= ~0x20000;
 	mario->flags |= 0x10000;
 	mario->airTimer = 0;
-	MH(0x52) = 0;
+	mario->jumpPeakAirTime = 0;
 	mario->hitobjJumpFrom = mario->hitobjStandOn;
 	clear_hitobj_ride();
 	marioSetJumpPara();
@@ -60,7 +60,7 @@ void marioPreJump(void) {
 
 f32 marioGetJumpHeight(void) {
 	MarioWork* mario = marioGetPtr();
-	return MF(0x2B8);
+	return mario->unk2B8;
 }
 
 void mot_jumpStand(void) {
@@ -68,7 +68,7 @@ void mot_jumpStand(void) {
 	f32 prev;
 	if (mario->trigFlags & 1) {
 		mario->trigFlags &= ~1;
-		MF(0x180) = 0.0f;
+		mario->baseSpeed = 0.0f;
 		marioPreJump();
 		MF(0x2B0) = 0.0f;
 		MI(0x44) = 0;
@@ -78,44 +78,44 @@ void mot_jumpStand(void) {
 	case 0:
 		if (++MI(0x48) >= 3) {
 			MI(0x44) = 4;
-			MF(0x7C) = marioJumpStandData[0];
-			MF(0x80) = marioJumpStandData[1];
-			MF(0x84) = marioJumpStandData[2];
-			MF(0x88) = marioJumpStandData[3];
+			mario->jumpVelocityY = marioJumpStandData[0];
+			mario->jumpAccelerationY = marioJumpStandData[1];
+			mario->jumpJerkY = marioJumpStandData[2];
+			mario->jumpSnapY = marioJumpStandData[3];
 			chgPoseB(mario);
 		}
 		break;
 	case 4:
-		prev = MF(0x7C);
+		prev = mario->jumpVelocityY;
 		marioMakeJumpPara();
-		if (prev >= MF(0x7C)) {
+		if (prev >= mario->jumpVelocityY) {
 			MI(0x44) = 6;
 		}
-		MF(0x90) += MF(0x7C);
-		MF(0x2B0) += MF(0x7C);
+		mario->position.y += mario->jumpVelocityY;
+		MF(0x2B0) += mario->jumpVelocityY;
 		break;
 	case 6:
-		MF(0x90) += MF(0x7C);
-		MF(0x2B0) += MF(0x7C);
-		if (MF(0x2B0) >= MF(0x2B8) * marioJumpStandData[9]) {
+		mario->position.y += mario->jumpVelocityY;
+		MF(0x2B0) += mario->jumpVelocityY;
+		if (MF(0x2B0) >= mario->unk2B8 * marioJumpStandData[9]) {
 			MI(0x44) = 8;
 		}
-		if (MF(0x7C) <= 0.0f) {
+		if (mario->jumpVelocityY <= 0.0f) {
 			MI(0x44) = 8;
 		}
 		break;
 	case 8:
-		MF(0x7C) += (-1.0f - MF(0x7C)) * marioJumpStandData[8];
-		MF(0x90) += MF(0x7C);
-		MF(0x2B0) += MF(0x7C);
-		if (MF(0x7C) <= 0.0f) {
+		mario->jumpVelocityY += (-1.0f - mario->jumpVelocityY) * marioJumpStandData[8];
+		mario->position.y += mario->jumpVelocityY;
+		MF(0x2B0) += mario->jumpVelocityY;
+		if (mario->jumpVelocityY <= 0.0f) {
 			MI(0x44) = 10;
 			chgPoseC(mario);
 			marioSetPeakYpos();
-			MF(0x7C) = marioJumpStandData[4];
-			MF(0x80) = marioJumpStandData[5];
-			MF(0x84) = marioJumpStandData[6];
-			MF(0x88) = marioJumpStandData[7];
+			mario->jumpVelocityY = marioJumpStandData[4];
+			mario->jumpAccelerationY = marioJumpStandData[5];
+			mario->jumpJerkY = marioJumpStandData[6];
+			mario->jumpSnapY = marioJumpStandData[7];
 			mario->flags &= ~0x10000;
 			mario->flags |= 0x20000;
 			MI(0x44) = 20;
@@ -123,22 +123,22 @@ void mot_jumpStand(void) {
 		break;
 	case 10:
 		marioMakeJumpPara();
-		if (MF(0x7C) <= 0.0f) {
+		if (mario->jumpVelocityY <= 0.0f) {
 			chgPoseC(mario);
 			marioSetPeakYpos();
-			MF(0x7C) = marioJumpStandData[4];
-			MF(0x80) = marioJumpStandData[5];
-			MF(0x84) = marioJumpStandData[6];
-			MF(0x88) = marioJumpStandData[7];
+			mario->jumpVelocityY = marioJumpStandData[4];
+			mario->jumpAccelerationY = marioJumpStandData[5];
+			mario->jumpJerkY = marioJumpStandData[6];
+			mario->jumpSnapY = marioJumpStandData[7];
 			mario->flags &= ~0x10000;
 			mario->flags |= 0x20000;
 			MI(0x44) = 20;
 		}
-		MF(0x90) += MF(0x7C);
+		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 20:
 		if (--MI(0x48) <= 0) {
-			MF(0x180) = 0.0f;
+			mario->baseSpeed = 0.0f;
 			MI(0x44) = 30;
 		}
 		break;
@@ -166,37 +166,37 @@ void mot_jumpSw(void) {
 			if (hitGetAttr((HitEntry*)MI(0x1E8)) & 0x80000000) {
 				mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
 				MF(0x2B4) = MO(mobj, 0x38);
-				MF(0x2B8) = MO(mobj, 0x40);
+				mario->unk2B8 = MO(mobj, 0x40);
 				{
 				Vec v;
 				Vec t = {0.0f, 0.0f, 0.0f};
 				f32 out;
 				t.x = MO(mobj, 0x38);
-				t.y = 0.5f * MF(0x1B8) + MO(mobj, 0x3C);
+				t.y = 0.5f * mario->wPlayerCollisionBox.y + MO(mobj, 0x3C);
 				t.z = MO(mobj, 0x40);
 				v = t;
-				if (marioChkFront((Vec*)&out, &v, MF(0x1A0), 5.0f * MF(0x1B4)) != NULL && out >= 0.0f &&
-				    out <= 0.5f * MF(0x1B4) + 30.0f) {
-					MF(0x19C) = MF(0x1A0) = revise360(180.0f + MF(0x1A0));
+				if (marioChkFront((Vec*)&out, &v, mario->directionView, 5.0f * mario->wPlayerCollisionBox.x) != NULL && out >= 0.0f &&
+				    out <= 0.5f * mario->wPlayerCollisionBox.x + 30.0f) {
+					mario->moveDirection = mario->directionView = revise360(180.0f + mario->directionView);
 				}
 				}
 				{
-				sincosf(&s, &c, MF(0x1A0));
+				sincosf(&s, &c, mario->directionView);
 				x = 30.0f * s + MO(mobj, 0x38);
 				z = 30.0f * c + MO(mobj, 0x40);
 				MI(0x48) = 20;
-				MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
+				mario->baseSpeed = distABf(mario->position.x, mario->position.z, x, z) / (f32)MI(0x48);
 				}
 			}
 		} else {
-			dir = revise360(180.0f + MF(0x1A0));
+			dir = revise360(180.0f + mario->directionView);
 			sincosf(&s, &c, dir);
-			x = 30.0f * s + MF(0x8C);
-			z = 30.0f * c + MF(0x94);
-			MF(0x1A0) = dir;
-			MF(0x19C) = dir;
+			x = 30.0f * s + mario->position.x;
+			z = 30.0f * c + mario->position.z;
+			mario->directionView = dir;
+			mario->moveDirection = dir;
 			MI(0x48) = 20;
-			MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
+			mario->baseSpeed = distABf(mario->position.x, mario->position.z, x, z) / (f32)MI(0x48);
 		}
 		MI(0x44) = 0;
 	}
@@ -204,22 +204,22 @@ void mot_jumpSw(void) {
 	case 0:
 		MI(0x48) = MI(0x48) - 1;
 		marioMakeJumpPara();
-		if (MF(0x7C) <= 0.0f) {
+		if (mario->jumpVelocityY <= 0.0f) {
 			chgPoseC(mario);
 			marioSetPeakYpos();
-			MF(0x7C) = marioJumpSwData[4];
-			MF(0x80) = marioJumpSwData[5];
-			MF(0x84) = marioJumpSwData[6];
-			MF(0x88) = marioJumpSwData[7];
+			mario->jumpVelocityY = marioJumpSwData[4];
+			mario->jumpAccelerationY = marioJumpSwData[5];
+			mario->jumpJerkY = marioJumpSwData[6];
+			mario->jumpSnapY = marioJumpSwData[7];
 			mario->flags &= ~0x10000;
 			mario->flags |= 0x20000;
 			MI(0x44) = 10;
 		}
-		MF(0x90) += MF(0x7C);
+		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 10:
 		if (--MI(0x48) <= 0) {
-			MF(0x180) = 0.0f;
+			mario->baseSpeed = 0.0f;
 			MI(0x44) = 20;
 		}
 		break;
@@ -246,54 +246,54 @@ void mot_jumpNpc(void) {
 		camFollowYOff();
 		marioPreJump();
 		if (mario->characterId == 2) {
-			MF(0x7C) = 2.6f;
-			MF(0x80) = -0.06f;
-			MF(0x84) = -0.01f;
-			MF(0x88) = -0.002f;
+			mario->jumpVelocityY = 2.6f;
+			mario->jumpAccelerationY = -0.06f;
+			mario->jumpJerkY = -0.01f;
+			mario->jumpSnapY = -0.002f;
 		} else {
-			MF(0x7C) = 1.0f;
-			MF(0x80) = -0.04f;
-			MF(0x84) = -0.01f;
-			MF(0x88) = -0.02f;
+			mario->jumpVelocityY = 1.0f;
+			mario->jumpAccelerationY = -0.04f;
+			mario->jumpJerkY = -0.01f;
+			mario->jumpSnapY = -0.02f;
 		}
 		chgPoseB(mario);
 		if (mario->hitobjJumpFrom != NULL) {
 			if (hitGetAttr((HitEntry*)MI(0x1E8)) & 0x80000000) {
 				mobj = mobjHitObjPtrToPtr(mario->hitobjJumpFrom);
 				MF(0x2B4) = MO(mobj, 0x38);
-				MF(0x2B8) = MO(mobj, 0x40);
+				mario->unk2B8 = MO(mobj, 0x40);
 				{
 				Vec v;
 				Vec t = {0.0f, 0.0f, 0.0f};
 				Vec out;
 				t.x = MO(mobj, 0x38);
-				t.y = 0.5f * MF(0x1B8) + MO(mobj, 0x3C);
+				t.y = 0.5f * mario->wPlayerCollisionBox.y + MO(mobj, 0x3C);
 				t.z = MO(mobj, 0x40);
 				v = t;
-				if (marioChkFront(&out, &v, MF(0x1A0), 5.0f * MF(0x1B4)) != NULL && out.x >= 0.0f &&
-				    out.x <= 0.5f * MF(0x1B4) + 30.0f) {
-					MF(0x19C) = MF(0x1A0) = revise360(180.0f + MF(0x1A0));
+				if (marioChkFront(&out, &v, mario->directionView, 5.0f * mario->wPlayerCollisionBox.x) != NULL && out.x >= 0.0f &&
+				    out.x <= 0.5f * mario->wPlayerCollisionBox.x + 30.0f) {
+					mario->moveDirection = mario->directionView = revise360(180.0f + mario->directionView);
 				}
 				
 				
 				
-				sincosf(&out.z, &out.y, MF(0x1A0));
+				sincosf(&out.z, &out.y, mario->directionView);
 				x = 30.0f * out.z + MO(mobj, 0x38);
 				z = 30.0f * out.y + MO(mobj, 0x40);
 				MI(0x48) = 20;
-				MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
+				mario->baseSpeed = distABf(mario->position.x, mario->position.z, x, z) / (f32)MI(0x48);
 				}
 			}
 		} else {
-			revise360(180.0f + MF(0x1A0));
-			dir = MF(0x1A0);
+			revise360(180.0f + mario->directionView);
+			dir = mario->directionView;
 			sincosf(&s, &c, dir);
-			x = 30.0f * s + MF(0x8C);
-			z = 30.0f * c + MF(0x94);
-			MF(0x1A0) = dir;
-			MF(0x19C) = dir;
+			x = 30.0f * s + mario->position.x;
+			z = 30.0f * c + mario->position.z;
+			mario->directionView = dir;
+			mario->moveDirection = dir;
 			MI(0x48) = 20;
-			MF(0x180) = distABf(MF(0x8C), MF(0x94), x, z) / (f32)MI(0x48);
+			mario->baseSpeed = distABf(mario->position.x, mario->position.z, x, z) / (f32)MI(0x48);
 		}
 		MI(0x44) = 0;
 	}
@@ -301,22 +301,22 @@ void mot_jumpNpc(void) {
 	case 0:
 		MI(0x48) = MI(0x48) - 1;
 		marioMakeJumpPara();
-		if (MF(0x7C) <= 0.0f) {
+		if (mario->jumpVelocityY <= 0.0f) {
 			chgPoseC(mario);
 			marioSetPeakYpos();
-			MF(0x7C) = -0.03f;
-			MF(0x80) = -0.02f;
-			MF(0x84) = 0.04f;
-			MF(0x88) = 0.0f;
+			mario->jumpVelocityY = -0.03f;
+			mario->jumpAccelerationY = -0.02f;
+			mario->jumpJerkY = 0.04f;
+			mario->jumpSnapY = 0.0f;
 			mario->flags &= ~0x10000;
 			mario->flags |= 0x20000;
 			MI(0x44) = 20;
 		}
-		MF(0x90) += MF(0x7C);
+		mario->position.y += mario->jumpVelocityY;
 		break;
 	case 20:
 		if (--MI(0x48) <= 0) {
-			MF(0x180) = 0.0f;
+			mario->baseSpeed = 0.0f;
 			MI(0x44) = 30;
 		}
 		break;
@@ -425,12 +425,12 @@ void mot_upstairs(void) {
 		mario->flags |= 0x80;
 		marioClearJumpPara();
 		MI(0x48) = 3;
-		MF(0x7C) = (MF(0x1C4) - MF(0x90)) / (f32)MI(0x48);
+		mario->jumpVelocityY = (MF(0x1C4) - mario->position.y) / (f32)MI(0x48);
 		MI(0x44) = 0;
 	}
 	switch (MI(0x44)) {
 	case 0:
-		MF(0x90) = MF(0x90) + MF(0x7C);
+		mario->position.y = mario->position.y + mario->jumpVelocityY;
 		if (--MI(0x48) <= 0) {
 			mario->flags &= ~0x80;
 			mario->flags &= ~0x40;
@@ -478,7 +478,7 @@ void mot_fall(void) {
 	}
 	switch (MI(0x44)) {
 	case 0:
-		if (MF(0x90) <= MF(0x120)) {
+		if (mario->position.y <= mario->lastGroundPos.y) {
 			if (!marioBgmodeChk()) {
 				camFollowYOn();
 			}
@@ -487,7 +487,7 @@ void mot_fall(void) {
 		break;
 	}
 	mario->airTimer++;
-	if (MI(0x16C) >= 0x1AE) {
+	if (mario->screenY >= 0x1AE) {
 		f32 r = marioGetCamFollowRate();
 		r += 0.1f;
 		if (r >= 0.8f) {
@@ -511,9 +511,9 @@ void mot_land(void) {
 		mario->trigFlags &= ~1;
 		mario->flags &= ~0xF0000;
 		mario->airTimer = 0;
-		MH(0x52) = 0;
+		mario->jumpPeakAirTime = 0;
 		MI(0x44) = 0;
-		MF(0x180) = 0.0f;
+		mario->baseSpeed = 0.0f;
 		marioResetCamFollowRate();
 		if (mario->soundId[2] != (u32)-1) {
 			psndSFXOff(mario->soundId[2]);

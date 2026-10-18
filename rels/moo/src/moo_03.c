@@ -221,13 +221,13 @@ static USER_FUNC(mario_kirimomi) {
     mario->field_0xC4 = fmod(mario->field_0xC4, 360.0);
     if (party != NULL) {
         if (party->currentMemberId != 4) {
-            party->field_8C = party->field_F0 / 2;
+            party->field_8C = party->height / 2;
         } else {
-            party->field_8C = (party->field_F0 - 10.0f) / 2;
+            party->field_8C = (party->height - 10.0f) / 2;
         }
         party->field_8C *= party->scale.y;
-        party->field_6C -= 10.0f;
-        party->field_6C = fmod(party->field_6C, 360.0);
+        party->rotation -= 10.0f;
+        party->rotation = fmod(party->rotation, 360.0);
     }
     return EVT_RETURN_BLOCK;
 }

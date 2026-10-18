@@ -220,10 +220,10 @@ void marioReInit_ship(void) {
 	marioGetPtr()->motStruct = p;
 	memset(marioGetPtr()->motStruct, 0, 0x48);
 	*(s16*)((u8*)m + 0x2E) = 0x19;
-	MSF(m, 0x9C) = -15.0f;
+	m->dispOfs.y = -15.0f;
 	MSI(m, 0x44) = 0x32;
-	MSF(m, 0x1B4) = 40.0f;
-	MSF(m, 0x1B8) = 40.0f;
+	m->wPlayerCollisionBox.x = 40.0f;
+	m->wPlayerCollisionBox.y = 40.0f;
 	marioPaperOn(paper_ship[marioGetColor()]);
 	marioChgPaper("PM_H_1B");
 	marioChgPose("M_Z_1");
@@ -250,7 +250,7 @@ void marioReInit_ship(void) {
 	MSOF(0xC) = a;
 	t = (s32)effFunemizuEntry(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
 	MSO(0x24) = t;
-	u = MSI(m, 0x134);
+	u = m->camId;
 	*(s32*)((u8*)*(void**)((u8*)*(void**)((u8*)marioGetPtr()->motStruct + 0x24) + 0xC) + 0x48) = u;
 	allPartyForceRideOn();
 }
@@ -262,8 +262,8 @@ void mot_ship_post(void) {
 	if (m->dispFlags & 0x40000000) {
 		marioPaperOff();
 	}
-	MSF(m, 0x1B4) = 20.0f;
-	MSF(m, 0x1B8) = 37.0f;
+	m->wPlayerCollisionBox.x = 20.0f;
+	m->wPlayerCollisionBox.y = 37.0f;
 	marioGetPtr();
 	if (marioGetPtr()->motStruct != NULL) {
 		if ((u32)MSO(0x38) != 0xFFFFFFFFU) {
@@ -320,7 +320,7 @@ void mot_ship(void) {
 		m->currSubMotionId = 1;
 		*(s16*)((u8*)m + 0x50) = 0;
 		*(s16*)((u8*)m + 0x52) = 0;
-		MSF(m, 0x180) = 0.0f;
+		m->baseSpeed = 0.0f;
 		MSOF(0x1c) = 0.0f;
 		N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
 		{
@@ -331,11 +331,11 @@ void mot_ship(void) {
 			r29 = 0;
 			if (attr & 0x4000) {
 				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), &p1);
-				f30 = revise360(angleABf(m2->position.x, m2->position.z, p1.x, p1.z) - MSF(m2, 0x198));
+				f30 = revise360(angleABf(m2->position.x, m2->position.z, p1.x, p1.z) - m2->targetYaw);
 				r29 = (f30 >= 180.0f) ? 2 : 1;
 			} else if (attr & 0x8000) {
 				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), &p2);
-				f30 = revise360(angleABf(m2->position.x, m2->position.z, p2.x, p2.z) - MSF(m2, 0x198));
+				f30 = revise360(angleABf(m2->position.x, m2->position.z, p2.x, p2.z) - m2->targetYaw);
 				r29 = (f30 >= 180.0f) ? 2 : 1;
 			} else if (attr & 0x10000) {
 				r29 = 2;
@@ -364,14 +364,14 @@ void mot_ship(void) {
 				MS_ARM() = f30;
 			}
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		r27 = 0;
 		if (SHIP_DIR) {
-			if (MSF(m, 0x1A8) >= 270.0f) {
+			if (m->displayDirection >= 270.0f) {
 				r27 = 1;
 			}
 		} else {
-			if (MSF(m, 0x1A8) <= -270.0f) {
+			if (m->displayDirection <= -270.0f) {
 				r27 = 1;
 			}
 		}
@@ -391,8 +391,8 @@ void mot_ship(void) {
 				MSI(e, 0xa4) = (s32)(1024.0f * m->position.z) - 230000000;
 			}
 		}
-		if (MSF(m, 0x7c) > 0.0f) {
-			m->position.y += MSF(m, 0x7c);
+		if (m->jumpVelocityY > 0.0f) {
+			m->position.y += m->jumpVelocityY;
 			MSI(m, 0) &= ~0xF0000;
 		}
 		break;
@@ -404,14 +404,14 @@ void mot_ship(void) {
 			f32 old = ms[7];
 			ms[7] = old + 0.125f * (f31 - MS_ARM());
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		r27 = 0;
 		if (SHIP_DIR) {
-			if (MSF(m, 0x1A8) >= 1260.0f) {
+			if (m->displayDirection >= 1260.0f) {
 				r27 = 1;
 			}
 		} else {
-			if (MSF(m, 0x1A8) <= -1080.0f) {
+			if (m->displayDirection <= -1080.0f) {
 				r27 = 1;
 			}
 		}
@@ -431,10 +431,10 @@ void mot_ship(void) {
 		if (--MSI(m, 0x48) <= 0) {
 			m->currSubMotionId = 4;
 		}
-		if (MSF(m, 0x9c) > -15.0f) {
-			MSF(m, 0x9c) -= 1.0f;
-			if (MSF(m, 0x9c) <= -15.0f) {
-				MSF(m, 0x9c) = -15.0f;
+		if (m->dispOfs.y > -15.0f) {
+			m->dispOfs.y -= 1.0f;
+			if (m->dispOfs.y <= -15.0f) {
+				m->dispOfs.y = -15.0f;
 			}
 		}
 	case 4:
@@ -445,7 +445,7 @@ void mot_ship(void) {
 			f32 old = ms[7];
 			ms[7] = old + 0.125f * (f31 - MS_ARM());
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		MSOF(0x20) -= 0.1f;
 		f30 = 1.0f;
 		if (MSOF(0x20) <= f30) {
@@ -453,13 +453,13 @@ void mot_ship(void) {
 		}
 		r27 = 0;
 		if (SHIP_DIR) {
-			if (MSF(m, 0x1A8) >= 1620.0f) {
-				MSF(m, 0x1A8) = 1620.0f;
+			if (m->displayDirection >= 1620.0f) {
+				m->displayDirection = 1620.0f;
 				r27 = 1;
 			}
 		} else {
-			if (MSF(m, 0x1A8) <= -1440.0f) {
-				MSF(m, 0x1A8) = -1440.0f;
+			if (m->displayDirection <= -1440.0f) {
+				m->displayDirection = -1440.0f;
 				r27 = 1;
 			}
 		}
@@ -477,16 +477,16 @@ void mot_ship(void) {
 		HitEntry* hit;
 		s32 attr;
 		m->dispFlags &= ~0x100;
-		MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
-		MSF(m, 0x1B4) = 40.0f;
-		MSF(m, 0x1B8) = 40.0f;
+		m->displayDirection = revise360(m->displayDirection);
+		m->wPlayerCollisionBox.x = 40.0f;
+		m->wPlayerCollisionBox.y = 40.0f;
 		ms = marioGetPtr()->motStruct;
 		hit = (HitEntry*)MSP(m, 0x1E8);
 		mm = marioGetPtr();
 		hitObjGetPos(hitGetName(hit), &pos);
 		fx = ix = (s32)((100.0f * pos.x + 0.5f) / 100.0f);
 		iz = (s32)((100.0f * pos.z + 0.5f) / 100.0f);
-		MSF(ms, 0x40) = MSF(m, 0x90) - 15.0f;
+		MSF(ms, 0x40) = m->position.y - 15.0f;
 		fz = iz;
 		r27 = harborKind((HitEntry*)MSP(mm, 0x1E8));
 		if (r27 == 1) {
@@ -512,17 +512,17 @@ void mot_ship(void) {
 		case 3: MSOF(0x3c) -= f30; break;
 		case 4: MSOF(0x3c) += f30; break;
 		}
-		MSF(m, 0x180) = distABf(m->position.x, m->position.z, MSOF(0x3c), MSOF(0x44)) / 36.0f;
-		MSF(m, 0x1a0) = angleABf(m->position.x, m->position.z, MSOF(0x3c), MSOF(0x44));
-		MSF(m, 0x19c) = MSF(m, 0x1a0);
+		m->baseSpeed = distABf(m->position.x, m->position.z, MSOF(0x3c), MSOF(0x44)) / 36.0f;
+		m->directionView = angleABf(m->position.x, m->position.z, MSOF(0x3c), MSOF(0x44));
+		m->moveDirection = m->directionView;
 		MSOF(4) = MSOF(0x40);
 		{
 			f32 dd = MSOF(0x40) - m->position.y;
-			MSF(m, 0x7c) = 0.0f;
-			MSF(m, 0x80) = (dd + dd) / 306.0f;
+			m->jumpVelocityY = 0.0f;
+			m->jumpAccelerationY = (dd + dd) / 306.0f;
 		}
-		MSF(m, 0x84) = 0.0f;
-		MSF(m, 0x88) = 0.0f;
+		m->jumpJerkY = 0.0f;
+		m->jumpSnapY = 0.0f;
 		MSI(m, 0x48) = 36;
 		m->currSubMotionId = 11;
 		break;
@@ -532,21 +532,21 @@ void mot_ship(void) {
 		u32 land;
 		f32 ly;
 		MarioWork* mm;
-		movePos(&m->position.x, &m->position.z, MSF(m, 0x180), MSF(m, 0x1a0));
-		m->position.y += MSF(m, 0x7c);
+		movePos(&m->position.x, &m->position.z, m->baseSpeed, m->directionView);
+		m->position.y += m->jumpVelocityY;
 		marioMakeJumpPara();
-		f30 = MSF(m, 0x7c);
+		f30 = m->jumpVelocityY;
 		mm = marioGetPtr();
-		MSF(mm, 0x1b4) = 20.0f;
+		mm->wPlayerCollisionBox.x = 20.0f;
 		land = marioChkLandon(f30, &ly);
-		MSF(mm, 0x1b4) = 40.0f;
+		mm->wPlayerCollisionBox.x = 40.0f;
 		{
 			f32 d;
 			if (land && ((d = mm->position.y - ly) <= 0.0f || d + f30 <= 0.0f)) {
 				MSI(mm, 0x1e4) = land;
 				mm->position.y = ly;
 				MSI(mm, 0) &= ~0xF0000;
-				MSF(mm, 0x128) = __fabsf(distABf(mm->position.x, mm->position.z, MSF(mm, 0x11c), MSF(mm, 0x124)));
+				mm->jumpDistance = __fabsf(distABf(mm->position.x, mm->position.z, mm->lastGroundPos.x, mm->lastGroundPos.z));
 				MSI(mm, 0) &= ~0x80;
 				*(s16*)((u8*)mm + 0x50) = 0;
 				*(s16*)((u8*)mm + 0x52) = 0;
@@ -558,22 +558,22 @@ void mot_ship(void) {
 		}
 		if (ok) {
 			f30 = 0.0f;
-			MSF(m, 0x7c) = f30;
-			MSF(m, 0x80) = f30;
-			MSF(m, 0x84) = f30;
-			MSF(m, 0x88) = f30;
-			MSF(m, 0x180) = f30;
+			m->jumpVelocityY = f30;
+			m->jumpAccelerationY = f30;
+			m->jumpJerkY = f30;
+			m->jumpSnapY = f30;
+			m->baseSpeed = f30;
 			MSOF(0x1c) = f30;
 			MSI(m, 0) &= ~0xF0000;
-			MSF(m, 0x1a8) = revise360(MSF(m, 0x1a8));
-			MSF(m, 0x1ac) = MSF(m, 0x1a8);
-			MSF(m, 0x1a0) = toMovedir(MSF(m, 0x1a8));
-			MSF(m, 0x19c) = MSF(m, 0x1a0);
+			m->displayDirection = revise360(m->displayDirection);
+			m->displayDirectionTarget = m->displayDirection;
+			m->directionView = toMovedir(m->displayDirection);
+			m->moveDirection = m->directionView;
 			m->dispFlags &= ~0x100;
 			m->dispFlags |= 0x1000;
 			psndSFXOn_3D((const char*)0x18f, &m->position);
 			MSO(0x24) = (s32)effFunemizuEntry(0, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
-			MSI(*(void**)((u8*)*(void**)((u8*)marioGetPtr()->motStruct + 0x24) + 0xC), 0x48) = MSI(m, 0x134);
+			MSI(*(void**)((u8*)*(void**)((u8*)marioGetPtr()->motStruct + 0x24) + 0xC), 0x48) = m->camId;
 			MSOF(8) = 0.0f;
 			MSOF(0xC) = 4.25f;
 			m->currSubMotionId = 50;
@@ -590,8 +590,8 @@ void mot_ship(void) {
 		m->currSubMotionId = 31;
 		/* fallthrough */
 	case 31: {
-		MSF(m, 0x9c) += -0.4f;
-		if (MSF(m, 0x9c) <= -18.0f) {
+		m->dispOfs.y += -0.4f;
+		if (m->dispOfs.y <= -18.0f) {
 			MSI(m, 0x48) = 4;
 			m->currSubMotionId = 32;
 		}
@@ -606,7 +606,7 @@ void mot_ship(void) {
 			f31 = mm->position.z;
 			MSF(EFFP(), 0xc) = f31;
 			MSF(EFFP(), 0x10) = f30;
-			f31 = MSF(mm, 0x1a8);
+			f31 = mm->displayDirection;
 			MSF(EFFP(), 0x14) = f31;
 		}
 		break;
@@ -633,36 +633,36 @@ void mot_ship(void) {
 		m->dispFlags &= ~0x1000;
 		f31 = MSOF(0x40);
 		MSOF(4) = f31;
-		MSF(m, 0x180) = 2.8f;
+		m->baseSpeed = 2.8f;
 		ms2 = marioGetPtr()->motStruct;
 		dd = distABf(m->position.x, m->position.z, MSOF(0x3c), MSF(ms2, 0x44));
-		n = (s32)((10.0f * (2.0f * dd / MSF(m, 0x180)) + 0.5f) / 10.0f);
+		n = (s32)((10.0f * (2.0f * dd / m->baseSpeed) + 0.5f) / 10.0f);
 		ms2 = marioGetPtr()->motStruct;
-		MSF(m, 0x1a0) = angleABf(m->position.x, m->position.z, MSOF(0x3c), MSF(ms2, 0x44));
-		MSF(m, 0x19c) = MSF(m, 0x1a0);
+		m->directionView = angleABf(m->position.x, m->position.z, MSOF(0x3c), MSF(ms2, 0x44));
+		m->moveDirection = m->directionView;
 		r29 = ((m->trigFlags >> 9) & 1) + 1;
 		MSO(0) = r29;
 		tt = 0.5f * (f32)n;
 		qq = 80.0f / (tt * tt - tt);
 		f30 = 0.0f;
-		MSF(m, 0x7c) = qq * tt;
-		MSF(m, 0x80) = -qq;
-		MSF(m, 0x84) = f30;
-		MSF(m, 0x88) = f30;
+		m->jumpVelocityY = qq * tt;
+		m->jumpAccelerationY = -qq;
+		m->jumpJerkY = f30;
+		m->jumpSnapY = f30;
 		MSI(m, 0x48) = (s16)(s32)(0.5f + tt);
 		m->currSubMotionId = 0x29;
-		MSF(m, 0x2b0) = __fabsf(MSF(m, 0x9c) / (f32)(MSI(m, 0x48) + 0x58));
+		MSF(m, 0x2b0) = __fabsf(m->dispOfs.y / (f32)(MSI(m, 0x48) + 0x58));
 		effDelete((EffectEntry*)MSO(0x24));
 		break;
 	}
 	case 41:
-		movePos(&m->position.x, &m->position.z, MSF(m, 0x180), MSF(m, 0x1a0));
-		m->position.y += MSF(m, 0x7c);
+		movePos(&m->position.x, &m->position.z, m->baseSpeed, m->directionView);
+		m->position.y += m->jumpVelocityY;
 		marioMakeJumpPara();
-		MSF(m, 0x9c) += MSF(m, 0x2b0);
+		m->dispOfs.y += MSF(m, 0x2b0);
 		f30 = 0.0f;
-		if (MSF(m, 0x9c) > f30) {
-			MSF(m, 0x9c) = f30;
+		if (m->dispOfs.y > f30) {
+			m->dispOfs.y = f30;
 		}
 		if (--MSI(m, 0x48) > 0) {
 			break;
@@ -685,10 +685,10 @@ void mot_ship(void) {
 		}
 		break;
 	case 43:
-		MSF(m, 0x9c) += MSF(m, 0x2b0);
+		m->dispOfs.y += MSF(m, 0x2b0);
 		f30 = 0.0f;
-		if (MSF(m, 0x9c) > f30) {
-			MSF(m, 0x9c) = f30;
+		if (m->dispOfs.y > f30) {
+			m->dispOfs.y = f30;
 		}
 		marioSetPaperAnimeLocalTime(MSI(m, 0x2a4));
 		if ((MSI(m, 0x2a4) = MSI(m, 0x2a4) - 1) < 0x2c) {
@@ -711,28 +711,28 @@ void mot_ship(void) {
 				MS_ARM() = f31;
 			}
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		if (MSI(m, 0x2a4) == 0x2c) {
 			m->currSubMotionId = 0x2c;
 		}
 		break;
 	case 44:
-		MSF(m, 0x9c) += MSF(m, 0x2b0);
+		m->dispOfs.y += MSF(m, 0x2b0);
 		f30 = 0.0f;
-		if (MSF(m, 0x9c) > f30) {
-			MSF(m, 0x9c) = f30;
+		if (m->dispOfs.y > f30) {
+			m->dispOfs.y = f30;
 		}
 		marioSetPaperAnimeLocalTime(MSI(m, 0x2a4));
 		if ((MSI(m, 0x2a4) = MSI(m, 0x2a4) - 1) <= 0) {
 			MSI(m, 0x2a4) = 0;
 			m->currSubMotionId = 0x2d;
 			MSI(m, 0x48) = 6;
-			MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
+			m->displayDirection = revise360(m->displayDirection);
 			if (MSI(marioGetPtr()->motStruct, 0) & 2) {
-				MSF(m, 0x1A8) = MSF(m, 0x1A8) - 360.0f;
+				m->displayDirection = m->displayDirection - 360.0f;
 			}
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		break;
 	case 45:
 		marioSetPaperAnimeLocalTime(MSI(m, 0x2a4));
@@ -743,7 +743,7 @@ void mot_ship(void) {
 			f32 old = ms[7];
 			ms[7] = old + 0.05f * (f30 - MS_ARM());
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		MSOF(0x20) += -0.005f;
 		f31 = 10.0f;
 		if (MSOF(0x20) <= f31) {
@@ -760,7 +760,7 @@ void mot_ship(void) {
 			f32 old = ms[7];
 			ms[7] = old + 0.05f * (f30 - MS_ARM());
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		MSOF(0x20) += -0.005f;
 		f31 = 10.0f;
 		if (MSOF(0x20) <= f31) {
@@ -768,22 +768,22 @@ void mot_ship(void) {
 		}
 		r27 = 0;
 		if (SHIP_DIR) {
-			if (MSF(m, 0x1A8) >= 360.0f) {
-				MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
+			if (m->displayDirection >= 360.0f) {
+				m->displayDirection = revise360(m->displayDirection);
 				r27 = 1;
 			}
 		} else {
-			if (MSF(m, 0x1A8) <= -360.0f) {
-				MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
+			if (m->displayDirection <= -360.0f) {
+				m->displayDirection = revise360(m->displayDirection);
 				r27 = 1;
 			}
 		}
 		if (!r27) {
 			break;
 		}
-		MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
+		m->displayDirection = revise360(m->displayDirection);
 		if (MSI(marioGetPtr()->motStruct, 0) & 2) {
-			MSF(m, 0x1A8) = MSF(m, 0x1A8) - 360.0f;
+			m->displayDirection = m->displayDirection - 360.0f;
 		}
 		marioPaperOff();
 		m->dispFlags &= ~8;
@@ -801,36 +801,36 @@ void mot_ship(void) {
 			f32 old = ms[7];
 			ms[7] = old + 0.05f * (f30 - MS_ARM());
 		}
-		MSF(m, 0x1A8) += MS_ARM();
+		m->displayDirection += MS_ARM();
 		if (SHIP_DIR) {
-			if (MSF(m, 0x1A8) >= 540.0f) {
-				MSF(m, 0x1A8) = 540.0f;
+			if (m->displayDirection >= 540.0f) {
+				m->displayDirection = 540.0f;
 				r27 = 1;
 			}
 		} else {
-			if (MSF(m, 0x1A8) <= -360.0f) {
-				MSF(m, 0x1A8) = -360.0f;
+			if (m->displayDirection <= -360.0f) {
+				m->displayDirection = -360.0f;
 				r27 = 1;
 			}
 		}
 		if (MSI(m, 0x44) != 0x2f || !r27) {
 			break;
 		}
-		MSF(m, 0x1A8) = revise360(MSF(m, 0x1A8));
-		MSF(m, 0x1AC) = MSF(m, 0x1A8);
-		MSF(m, 0x19c) = toMovedir(MSF(m, 0x1A8));
-		MSF(m, 0x1a0) = MSF(m, 0x19c);
+		m->displayDirection = revise360(m->displayDirection);
+		m->displayDirectionTarget = m->displayDirection;
+		m->moveDirection = toMovedir(m->displayDirection);
+		m->directionView = m->moveDirection;
 		m->dispFlags &= ~0x100;
-		MSF(m, 0x1B4) = 20.0f;
-		MSF(m, 0x1B8) = 37.0f;
+		m->wPlayerCollisionBox.x = 20.0f;
+		m->wPlayerCollisionBox.y = 37.0f;
 		f30 = 0.0f;
-		MSF(m, 0x7c) = f30;
-		MSF(m, 0x80) = f30;
-		MSF(m, 0x84) = f30;
-		MSF(m, 0x88) = f30;
-		MSF(m, 0x180) = f30;
+		m->jumpVelocityY = f30;
+		m->jumpAccelerationY = f30;
+		m->jumpJerkY = f30;
+		m->jumpSnapY = f30;
+		m->baseSpeed = f30;
 		MSI(m, 0) &= ~0xF0000;
-		MSF(m, 0x9c) = f30;
+		m->dispOfs.y = f30;
 		marioChgMot(10);
 		marioSetFallPara();
 		allPartyRideOff();
@@ -852,7 +852,7 @@ void mot_ship(void) {
 			f31 = MSOF(0xC);
 			f31 = revise360(MSOF(8) - f31);
 			MSOF(8) = f31;
-			MSF(m, 0x9c) = 3.0f * (f32)sin(3.1415927f * MSOF(8) / 180.0f) + -13.0f;
+			m->dispOfs.y = 3.0f * (f32)sin(3.1415927f * MSOF(8) / 180.0f) + -13.0f;
 		}
 		if (MSI(m, 0) & 0x20) {
 			SHIP_EFF()
@@ -868,21 +868,21 @@ void mot_ship(void) {
 			s32 ok; u32 land;
 			f32 ly;
 			marioMakeJumpPara();
-			if (MSF(m, 0x7c) <= -7.0f) {
-				MSF(m, 0x7c) = -7.0f;
+			if (m->jumpVelocityY <= -7.0f) {
+				m->jumpVelocityY = -7.0f;
 			}
-			f30 = MSF(m, 0x7c);
+			f30 = m->jumpVelocityY;
 			mm = marioGetPtr();
-			MSF(mm, 0x1b4) = 20.0f;
+			mm->wPlayerCollisionBox.x = 20.0f;
 			land = marioChkLandon(f30, &ly);
-			MSF(mm, 0x1b4) = 40.0f;
+			mm->wPlayerCollisionBox.x = 40.0f;
 			{
 				f32 d;
 				if (land && ((d = mm->position.y - ly) <= 0.0f || d + f30 <= 0.0f)) {
 					MSI(mm, 0x1e4) = land;
 					mm->position.y = ly;
 					MSI(mm, 0) &= ~0xF0000;
-					MSF(mm, 0x128) = __fabsf(distABf(mm->position.x, mm->position.z, MSF(mm, 0x11c), MSF(mm, 0x124)));
+					mm->jumpDistance = __fabsf(distABf(mm->position.x, mm->position.z, mm->lastGroundPos.x, mm->lastGroundPos.z));
 					MSI(mm, 0) &= ~0x80;
 					*(s16*)((u8*)mm + 0x50) = 0;
 					*(s16*)((u8*)mm + 0x52) = 0;
@@ -893,7 +893,7 @@ void mot_ship(void) {
 				}
 			}
 			if (!ok) {
-				m->position.y += MSF(m, 0x7c);
+				m->position.y += m->jumpVelocityY;
 			}
 		} else {
 			marioClearJumpPara();
@@ -911,9 +911,9 @@ void mot_ship(void) {
 		MSI(m, 0x1dc) = 0;
 		MSI(m, 0x1ec) = 0;
 		MSI(m, 0x1f0) = 0;
-		marioCheckWallShip(MSF(m, 0x180), MSF(m, 0x1a0));
-		if (MSF(m, 0x180) < 0.5f) {
-			MSF(m, 0x180) = 0.0f;
+		marioCheckWallShip(m->baseSpeed, m->directionView);
+		if (m->baseSpeed < 0.5f) {
+			m->baseSpeed = 0.0f;
 			m->currSubMotionId = 0x32;
 		}
 		SHIP_EFF()
@@ -955,7 +955,6 @@ void shipMove(void)
 {
   MarioWork *m = marioGetPtr();
   f32 len;
-  unsigned long long new_var;
   f32 vz;
   f32 spd;
   f32 tz;
@@ -966,8 +965,7 @@ void shipMove(void)
   f32 dz;
   f32 fr;
   s32 snd;
-  spd = *((f32 *) (((u8 *) m) + 0x190));
-  dx = 0.0f;
+  spd = m->controlStickSensitivity;
   dx = 0.0f;
   if (((ShipWork *) marioGetPtr()->motStruct)->swirlTime != 0)
   {
@@ -998,11 +996,10 @@ void shipMove(void)
   }
   vx = ((ShipDir *) marioGetPtr()->motStruct)->dispX;
   vz = ((ShipDir *) marioGetPtr()->motStruct)->dispY;
-  new_var = 3;
-  if (*((f32 *) (((u8 *) m) + 0x190)))
+  if (m->controlStickSensitivity)
   {
-    tx = spd * ((f32) sin((3.1415927f * (*((f32 *) (((u8 *) m) + 0x194)))) / 180.0f));
-    tz = spd * (-((f32) cos((3.1415927f * (*((f32 *) (((u8 *) m) + 0x194)))) / 180.0f)));
+    tx = spd * ((f32) sin((3.1415927f * m->controlStickAngle) / 180.0f));
+    tz = spd * (-((f32) cos((3.1415927f * m->controlStickAngle) / 180.0f)));
   }
   else
   {
@@ -1014,7 +1011,7 @@ void shipMove(void)
   {
     if (tx > vx)
     {
-      vx += ((1.0f + tx) - vx) * shipData[new_var];
+      vx += ((1.0f + tx) - vx) * shipData[3];
       if (vx >= max)
       {
         vx = max;
@@ -1022,7 +1019,7 @@ void shipMove(void)
     }
     else
     {
-      vx += ((tx - 1.0f) - vx) * shipData[new_var];
+      vx += ((tx - 1.0f) - vx) * shipData[3];
       if (vx <= (-max))
       {
         vx = -max;
@@ -1030,7 +1027,7 @@ void shipMove(void)
     }
     if (tz > vz)
     {
-      vz += ((1.0f + tz) - vz) * shipData[new_var];
+      vz += ((1.0f + tz) - vz) * shipData[3];
       if (max <= vz)
       {
         vz = max;
@@ -1038,7 +1035,7 @@ void shipMove(void)
     }
     else
     {
-      vz += ((tz - 1.0f) - vz) * shipData[new_var];
+      vz += ((tz - 1.0f) - vz) * shipData[3];
       if (vz <= (-max))
       {
         vz = -max;
@@ -1048,7 +1045,7 @@ void shipMove(void)
   if (!spd)
   {
     fr = shipData[0];
-    if (((u32) (*((s32 *) (((u8 *) m) + 0x1F0)))) != 0)
+    if (m->hitobjWall != NULL)
     {
       fr = shipData[1];
     }
@@ -1081,17 +1078,17 @@ void shipMove(void)
     ((ShipDir *) marioGetPtr()->motStruct)->dispX = 0.0f;
     ((ShipDir *) marioGetPtr()->motStruct)->dispY = 0.0f;
   }
-  *((f32 *) (((u8 *) m) + 0x180)) = len;
+  m->baseSpeed = len;
   if (len)
   {
-    *((f32 *) (((u8 *) m) + 0x1A0)) = angleABf(0.0f, 0.0f, ((ShipDir *) marioGetPtr()->motStruct)->dispX, ((ShipDir *) marioGetPtr()->motStruct)->dispY);
+    m->directionView = angleABf(0.0f, 0.0f, ((ShipDir *) marioGetPtr()->motStruct)->dispX, ((ShipDir *) marioGetPtr()->motStruct)->dispY);
   }
   if (len >= 1.0f)
   {
     MarioWork *mm = marioGetPtr();
     if ((marioGetPtr()->motStruct != ((void *) 0)) && (((u32) (*((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)))) == 0xFFFFFFFFU))
     {
-      snd = psndSFXOn_3D((const char *) 0x190, (Vec *) (((u8 *) mm) + 0x8C));
+      snd = psndSFXOn_3D((const char *) 0x190, &mm->position);
       *((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)) = snd;
     }
   }
@@ -1108,7 +1105,7 @@ void shipMove(void)
   }
   if (((u32) (*((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)))) != 0xFFFFFFFFU)
   {
-    psndSFX_pos(*((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)), (Vec *) (((u8 *) m) + 0x8C));
+    psndSFX_pos(*((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)), &m->position);
   }
   *((f32 *) (((u8 *) m) + 0x18C)) = len;
 }
@@ -1121,8 +1118,8 @@ BOOL checkHarbor(Vec* out) {
 	Vec p1, p2, p3;
 	HitEntry* hit;
 	MarioWork* m = marioGetPtr();
-	HARBOR_PROBE(m->unk1A8, p1)
-	HARBOR_PROBE(90.0f + m->unk1A8, p2)
-	HARBOR_PROBE(m->unk1A8 - 90.0f, p3)
+	HARBOR_PROBE(m->displayDirection, p1)
+	HARBOR_PROBE(90.0f + m->displayDirection, p2)
+	HARBOR_PROBE(m->displayDirection - 90.0f, p3)
 	return FALSE;
 }

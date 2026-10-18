@@ -19,6 +19,6 @@ typedef struct ItemData {
 	s8 fp_restored; //0x1E
 	s8 sp_restored; //0x1F
 	u16 icon_id; //0x20
-	s16 field_0x22; //0x22
+	s16 pad_22; //0x22, always 0 (alignment before battle_params)
 	BattleWeapon* battle_params; //0x24
 } ItemData;

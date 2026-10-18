@@ -25,21 +25,21 @@ void marioPaperOff(void);
 
 static inline void jabaraSetSpd(f32 a, f32 b, f32 c) {
 	MarioWork* mp = marioGetPtr();
-	MW(mp, 0x148, f32) = a;
-	MW(mp, 0x158, f32) = b;
-	MW(mp, 0x68, f32) = c;
+	mp->camShiftTargetZ = a;
+	mp->camShiftRate.z = b;
+	mp->field_68 = c;
 	MW(mp, 0x6c, Vec) = (Vec){0.0f, 40.0f, 0.0f};
 }
 
 static inline void jabaraResetPose(void) {
 	MarioWork* m2 = marioGetPtr();
-	MW(m2, 0x1a8, f32) = MW(m2, 0x2a4, f32);
-	MW(m2, 0x1ac, f32) = MW(m2, 0x2a4, f32);
+	m2->displayDirection = MW(m2, 0x2a4, f32);
+	m2->displayDirectionTarget = MW(m2, 0x2a4, f32);
 	MW(m2, 0xb0, Vec) = (Vec){0.0f, 0.0f, 0.0f};
 	MW(m2, 0x98, Vec) = (Vec){0.0f, 0.0f, 0.0f};
 	MW(m2, 0xbc, Vec) = (Vec){0.0f, 0.0f, 0.0f};
-	MW(m2, 0x1b4, f32) = 20.0f;
-	MW(m2, 0x1b8, f32) = 37.0f;
+	m2->wPlayerCollisionBox.x = 20.0f;
+	m2->wPlayerCollisionBox.y = 37.0f;
 	marioAdjustMoveDir();
 	MW(m2, 4, u32) &= ~0x4;
 	MW(m2, 4, u32) &= ~0x100;
@@ -48,10 +48,10 @@ static inline void jabaraResetPose(void) {
 static inline void* jabaraHitFront(f32 ang) {
 	f32 sn, cs, hx, hy, hz, dist, nx, ny, nz;
 	MarioWork* mp = marioGetPtr();
-	f32 px = MW(mp, 0x8c, f32);
-	f32 py = 2.0f + (MW(mp, 0x90, f32) + MW(mp, 0x1b8, f32));
-	f32 pz = MW(mp, 0x94, f32);
-	dist = 0.5f * MW(mp, 0x1b4, f32);
+	f32 px = mp->position.x;
+	f32 py = 2.0f + (mp->position.y + mp->wPlayerCollisionBox.y);
+	f32 pz = mp->position.z;
+	dist = 0.5f * mp->wPlayerCollisionBox.x;
 	sincosf(&sn, &cs, ang);
 	return hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, px, py, pz, sn, 0.0f, cs);
 }
@@ -89,7 +89,7 @@ s32 marioGetJabaraState(void) {
 
 BOOL marioPriCheckJabara(void) {
 	MarioWork* mario = marioGetPtr();
-	u32 flags = MW(mario, 0, u32);
+	u32 flags = mario->flags;
 	if ((flags & 0x80000000) || (flags & 0x100000)) {
 		MW(mario, 0x40, u8) = 0;
 		return FALSE;
@@ -99,7 +99,7 @@ BOOL marioPriCheckJabara(void) {
 
 static inline BOOL priChk(void) {
 	MarioWork* mario = marioGetPtr();
-	u32 flags = MW(mario, 0, u32);
+	u32 flags = mario->flags;
 	BOOL ret;
 	if ((flags & 0x80000000) || (flags & 0x100000)) {
 		MW(mario, 0x40, u8) = 0;
@@ -122,7 +122,7 @@ BOOL marioChkJabara(void) {
 	}
 	if (!(MW(mario, 0x246, u16) & 0x100)) {
 		if (!(MW(mario, 0x246, u16) & 0x200)) {
-			if (strcmp(MW(mario, 0x18, char*), "M_I_Y") == 0 && MW(mario, 0x2e, u16) == 0) {
+			if (strcmp(mario->animName, "M_I_Y") == 0 && MW(mario, 0x2e, u16) == 0) {
 				marioChgPose("M_S_1");
 				marioVoiceGlareOff();
 			}
@@ -130,14 +130,14 @@ BOOL marioChkJabara(void) {
 		}
 		return FALSE;
 	}
-	MW(mario, 0x40, s8)++;
-	if (MW(mario, 0x190, f32) && MW(mario, 0x40, s8) > 10 && MW(mario, 0x2e, u16) == 0 &&
+	mario->wMotionTimer++;
+	if (mario->controlStickSensitivity && mario->wMotionTimer > 10 && MW(mario, 0x2e, u16) == 0 &&
 	    !(MW(mario, 4, u32) & 0x40000000)) {
 		marioChgPose("M_I_Y");
 		marioVoiceGlareOn();
 	}
-	if (MW(mario, 0x40, s8) >= 0x32) {
-		MW(mario, 0x40, s8) = 0x32;
+	if (mario->wMotionTimer >= 0x32) {
+		mario->wMotionTimer = 0x32;
 		if (MW(mario, 0x2e, u16) == 0 && !(MW(mario, 4, u32) & 0x40000000)) {
 			marioChgPose("M_I_Y");
 			marioVoiceGlareOn();
@@ -157,12 +157,12 @@ static inline void jabaraHitPos(HitEntry* hit, Vec* v) {
 
 static inline void jabaraLand(f32 y_, void* h_) {
 	MarioWork* mp_ = marioGetPtr();
-	MW(mp_, 0x50, s16) = 0;
-	MW(mp_, 0x52, s16) = 0;
-	MW(mp_, 0x1e4, void*) = h_;
+	mp_->airTimer = 0;
+	mp_->jumpPeakAirTime = 0;
+	mp_->hitobjStandOn = h_;
 	MW(mp_, 0x1e8, s32) = 0;
-	MW(mp_, 0x90, f32) = y_;
-	MW(mp_, 0, u32) &= ~0xF0000;
+	mp_->position.y = y_;
+	mp_->flags &= ~0xF0000;
 }
 
 #define VC(m, off, src) MW(m, off, Vec) = src
@@ -332,8 +332,8 @@ void mot_jabara(void) {
 		}
 		{
 			MarioWork* mp = marioGetPtr();
-			MW(mp, 0x148, f32) = 0.0f;
-			MW(mp, 0x158, f32) = 0.01f;
+			mp->camShiftTargetZ = 0.0f;
+			mp->camShiftRate.z = 0.01f;
 		}
 		camFollowYOff();
 		marioChgPose("M_J_5A");
@@ -718,10 +718,10 @@ BOOL jabaraNoHitChk(void) {
 void mot_jabara_post(void) {
 	MarioWork* mario = marioGetPtr();
 	MarioWork* m2;
-	MW(mario, 0, u32) &= ~0x400;
+	mario->flags &= ~0x400;
 	m2 = marioGetPtr();
-	MW(m2, 0x148, f32) = 0.0f;
-	MW(m2, 0x158, f32) = 0.01f;
+	m2->camShiftTargetZ = 0.0f;
+	m2->camShiftRate.z = 0.01f;
 	if (MW(mario, 4, u32) & 0x40000000) {
 		marioPaperOff();
 	}
@@ -773,7 +773,7 @@ void jabaraSwingWalk(void) {
 void swingMain(void) {
 	MarioWork* m = marioGetPtr();
 	if (marioGetPtr()->motStruct) {
-		if (MW(m, 0x44, s32) < 0x5a && (MW(m, 0x248, u16) & 0x300) && !(MS(0, u32) & 1)) {
+		if (MW(m, 0x44, s32) < 0x5a && (m->buttonBuffer & 0x300) && !(MS(0, u32) & 1)) {
 			MW(m, 0x2b8, s16) = 0;
 			MS(0, u32) |= 1;
 		}
@@ -792,7 +792,7 @@ void swingMain(void) {
 				if (MW(m, 0x2b0, f32) <= 0.0f) {
 					MW(m, 0x2b0, f32) = 0.0f;
 					MW(m, 0x2b4, f32) = 0.1f;
-					if (MW(m, 0xbc, f32) >= 180.0f) {
+					if (m->rot.x >= 180.0f) {
 						MW(m, 0x2ba, s8) = 2;
 					} else {
 						MW(m, 0x2ba, s8) = 4;
@@ -800,19 +800,19 @@ void swingMain(void) {
 				}
 			}
 			if (MS(0, u32) & 1) {
-				f32 old = MW(m, 0xbc, f32);
-				MW(m, 0xbc, f32) = revise360(old + MW(m, 0x2b0, f32));
-				if (MW(m, 0xbc, f32) < old) {
+				f32 old = m->rot.x;
+				m->rot.x = revise360(old + MW(m, 0x2b0, f32));
+				if (m->rot.x < old) {
 					MW(m, 0x2b0, f32) = 1.4f;
 					MW(m, 0x2b4, f32) = 0.1f;
-					if (MW(m, 0xbc, f32) >= 180.0f) {
+					if (m->rot.x >= 180.0f) {
 						MW(m, 0x2ba, s8) = 2;
 					} else {
 						MW(m, 0x2ba, s8) = 4;
 					}
 				}
 			} else {
-				MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) + MW(m, 0x2b0, f32));
+				m->rot.x = revise360(m->rot.x + MW(m, 0x2b0, f32));
 			}
 			break;
 		default:
@@ -821,8 +821,8 @@ void swingMain(void) {
 		switch (MW(m, 0x2ba, s8)) {
 		case 2:
 			MW(m, 0x2b0, f32) = MW(m, 0x2b0, f32) + MW(m, 0x2b4, f32);
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) + MW(m, 0x2b0, f32));
-			if (MW(m, 0xbc, f32) < 180.0f) {
+			m->rot.x = revise360(m->rot.x + MW(m, 0x2b0, f32));
+			if (m->rot.x < 180.0f) {
 				MW(m, 0x2ba, s8) = 3;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) + MS(0x10, f32);
 			}
@@ -833,16 +833,16 @@ void swingMain(void) {
 				MW(m, 0x2b0, f32) = 0.0f;
 				MW(m, 0x2ba, s8) = 4;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) - MS(0x10, f32);
-				if (__fabsf(MW(m, 0xbc, f32)) < 0.8f) {
+				if (__fabsf(m->rot.x) < 0.8f) {
 					MW(m, 0x2ba, s8) = 0;
 				}
 			}
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) + MW(m, 0x2b0, f32));
+			m->rot.x = revise360(m->rot.x + MW(m, 0x2b0, f32));
 			break;
 		case 4:
 			MW(m, 0x2b0, f32) = MW(m, 0x2b0, f32) - MW(m, 0x2b4, f32);
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) + MW(m, 0x2b0, f32));
-			if (MW(m, 0xbc, f32) > 180.0f) {
+			m->rot.x = revise360(m->rot.x + MW(m, 0x2b0, f32));
+			if (m->rot.x > 180.0f) {
 				MW(m, 0x2ba, s8) = 5;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) + MS(0x10, f32);
 			}
@@ -853,11 +853,11 @@ void swingMain(void) {
 				MW(m, 0x2b0, f32) = 0.0f;
 				MW(m, 0x2ba, s8) = 2;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) - MS(0x10, f32);
-				if (__fabsf(MW(m, 0xbc, f32)) < 0.8f) {
+				if (__fabsf(m->rot.x) < 0.8f) {
 					MW(m, 0x2ba, s8) = 0;
 				}
 			}
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) + MW(m, 0x2b0, f32));
+			m->rot.x = revise360(m->rot.x + MW(m, 0x2b0, f32));
 			break;
 		}
 		switch (MW(m, 0x2ba, s8)) {
@@ -875,7 +875,7 @@ void swingMain(void) {
 				if (MW(m, 0x2b0, f32) <= 0.0f) {
 					MW(m, 0x2b0, f32) = 1.4f;
 					MW(m, 0x2b4, f32) = 0.1f;
-					if (MW(m, 0xbc, f32) >= 180.0f) {
+					if (m->rot.x >= 180.0f) {
 						MW(m, 0x2ba, s8) = 0xc;
 					} else {
 						MW(m, 0x2ba, s8) = 0xe;
@@ -883,27 +883,27 @@ void swingMain(void) {
 				}
 			}
 			if (MS(0, u32) & 1) {
-				f32 old = MW(m, 0xbc, f32);
-				MW(m, 0xbc, f32) = revise360(old - MW(m, 0x2b0, f32));
-				if (MW(m, 0xbc, f32) > old) {
+				f32 old = m->rot.x;
+				m->rot.x = revise360(old - MW(m, 0x2b0, f32));
+				if (m->rot.x > old) {
 					MW(m, 0x2b0, f32) = 5.0f;
 					MW(m, 0x2b4, f32) = 0.1f;
-					if (MW(m, 0xbc, f32) >= 180.0f) {
+					if (m->rot.x >= 180.0f) {
 						MW(m, 0x2ba, s8) = 0xc;
 					} else {
 						MW(m, 0x2ba, s8) = 0xe;
 					}
 				}
 			} else {
-				MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) - MW(m, 0x2b0, f32));
+				m->rot.x = revise360(m->rot.x - MW(m, 0x2b0, f32));
 			}
 			break;
 		}
 		switch (MW(m, 0x2ba, s8)) {
 		case 0xc:
 			MW(m, 0x2b0, f32) = MW(m, 0x2b0, f32) + MW(m, 0x2b4, f32);
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) - MW(m, 0x2b0, f32));
-			if (MW(m, 0xbc, f32) > 180.0f) {
+			m->rot.x = revise360(m->rot.x - MW(m, 0x2b0, f32));
+			if (m->rot.x > 180.0f) {
 				MW(m, 0x2ba, s8) = 0xd;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) + MS(0x10, f32);
 			}
@@ -914,16 +914,16 @@ void swingMain(void) {
 				MW(m, 0x2b0, f32) = 0.0f;
 				MW(m, 0x2ba, s8) = 0xe;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) - MS(0x10, f32);
-				if (__fabsf(MW(m, 0xbc, f32)) < 0.8f) {
+				if (__fabsf(m->rot.x) < 0.8f) {
 					MW(m, 0x2ba, s8) = 0;
 				}
 			}
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) - MW(m, 0x2b0, f32));
+			m->rot.x = revise360(m->rot.x - MW(m, 0x2b0, f32));
 			break;
 		case 0xe:
 			MW(m, 0x2b0, f32) = MW(m, 0x2b0, f32) - MW(m, 0x2b4, f32);
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) - MW(m, 0x2b0, f32));
-			if (MW(m, 0xbc, f32) < 180.0f) {
+			m->rot.x = revise360(m->rot.x - MW(m, 0x2b0, f32));
+			if (m->rot.x < 180.0f) {
 				MW(m, 0x2ba, s8) = 0xf;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) + MS(0x10, f32);
 			}
@@ -934,11 +934,11 @@ void swingMain(void) {
 				MW(m, 0x2b0, f32) = 0.0f;
 				MW(m, 0x2ba, s8) = 0xc;
 				MW(m, 0x2b4, f32) = MW(m, 0x2b4, f32) - MS(0x10, f32);
-				if (__fabsf(MW(m, 0xbc, f32)) < 0.8f) {
+				if (__fabsf(m->rot.x) < 0.8f) {
 					MW(m, 0x2ba, s8) = 0xa;
 				}
 			}
-			MW(m, 0xbc, f32) = revise360(MW(m, 0xbc, f32) - MW(m, 0x2b0, f32));
+			m->rot.x = revise360(m->rot.x - MW(m, 0x2b0, f32));
 			break;
 		}
 	}
@@ -946,8 +946,8 @@ void swingMain(void) {
 
 void mot_grasp(void) {
 	MarioWork* mario = marioGetPtr();
-	if (MW(mario, 0xc, u32) & 1) {
-		MW(mario, 0xc, u32) &= ~1;
-		MW(mario, 0, u32) &= ~0xf0000;
+	if (mario->trigFlags & 1) {
+		mario->trigFlags &= ~1;
+		mario->flags &= ~0xf0000;
 	}
 }

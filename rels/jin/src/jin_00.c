@@ -290,7 +290,7 @@ s32 computeAlpha(Teresa* ter, MarioWork* mp, f32 angle) {
     if (angle > 180.0f) {
         angle = 360.0f - angle;
     }
-    dir = mp->unk1AC - 180.0f;
+    dir = mp->displayDirectionTarget - 180.0f;
     if (dir < 0.0f) {
         dir += 360.0f;
     }

@@ -19,19 +19,19 @@
 typedef void (*ReverbCallback)(u8 reason, SND_AUX_INFO* info, void* user);
 
 typedef struct StreamHeader {
-    u8 field_0x0;   // 0x0
+    u8 type;        // 0x0
     u16 freq;       // 0x2
     u32 count;      // 0x4
-    u32 field_0x8;  // 0x8
-    u32 field_0xC;  // 0xC
-    u32 field_0x10; // 0x10
-    u32 field_0x14; // 0x14
-    u32 field_0x18; // 0x18
-    u32 field_0x1C; // 0x1C
-    u16 field_0x20; // 0x20
-    u16 field_0x22; // 0x22
-    u16 field_0x24; // 0x24
-    u16 field_0x26; // 0x26
+    u32 loopEnd;    // 0x8
+    u32 loopStart;  // 0xC
+    u32 size0;      // 0x10, channel 0 data size
+    u32 size1;      // 0x14, channel 1
+    u32 loopStart0; // 0x18
+    u32 loopStart1; // 0x1C
+    u16 initHist0;  // 0x20, ADPCM initial history
+    u16 initHist1;  // 0x22
+    u16 loopHist0;  // 0x24, ADPCM loop history
+    u16 loopHist1;  // 0x26
 } StreamHeader;
 
 typedef struct SoundGroup {  // TODO: rename

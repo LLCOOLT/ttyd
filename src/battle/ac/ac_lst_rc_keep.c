@@ -68,10 +68,10 @@ s32 battleAcMain_LstRcKeep(BattleWork* work) {
                 lw->held0 = 0;
                 lw->held1 = 0;
             case 1000:
-                if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8--;
-                        if (ac->field_0x8 >= 0) {
+                if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+                    if (ac->setupFlags & 2) {
+                        ac->setupParam--;
+                        if (ac->setupParam >= 0) {
                             break;
                         }
                     }

@@ -95,26 +95,29 @@ void memInit(void) { //almost 1:1, stubborn regalloc at the end
 
 void* __memAlloc(HEAP_TYPE heap, u32 size);
 
-void memClear(HEAP_TYPE heap) {
+static inline void mapallocInit(void) {
 	MapAllocEntry* entry;
 	u32 size;
 
-	size = (u32)heapHandle[heap];
-	OSDestroyHeap((OSHeapHandle)size);
+	size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
+	entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
+	if (entry) {
+		memset(entry, 0, size);
+		DCFlushRange(entry, size);
+	}
+	entry->next = NULL;
+	entry->size = size - 0x20;
+	entry->inuse = 0;
+	mapalloc_base_ptr = entry;
+	mapalloc_size = size;
+	COUNT = 0;
+}
+
+void memClear(HEAP_TYPE heap) {
+	OSDestroyHeap(heapHandle[heap]);
 	OSCreateHeap(heapStart[heap], heapEnd[heap]);
 	if (heap == HEAP_MALLOC) {
-		size = (u32)heapEnd[1] - (u32)heapStart[1] - 0x20;
-		entry = OSAllocFromHeap(heapHandle[HEAP_MALLOC], size);
-		if (entry) {
-			memset(entry, 0, size);
-			DCFlushRange(entry, size);
-		}
-		entry->next = NULL;
-		entry->size = size - 0x20;
-		entry->inuse = 0;
-		mapalloc_base_ptr = entry;
-		mapalloc_size = size;
-		COUNT = 0;
+		mapallocInit();
 	}
 }
 
@@ -282,8 +285,8 @@ void smartInit(void) {
 		DCFlushRange(ptr, size);
 	}
 	wp->ptr = ptr;
-	wp->field_0xE008 = 0;
-	wp->field_0xE00C = 0;
+	wp->allocHead = 0;
+	wp->allocTail = 0;
 	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
 	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
@@ -304,8 +307,8 @@ void L_smartReInit(void) {
 	smartEntry* e;
 	int i;
 
-	wp->field_0xE008 = 0;
-	wp->field_0xE00C = 0;
+	wp->allocHead = 0;
+	wp->allocTail = 0;
 	wp->bytesLeft = (u32)heapEnd[5] - (u32)heapStart[5] - 32;
 	memset(wp->ptr, 0, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 	memset(wp->work, 0, sizeof(wp->work));
@@ -327,14 +330,14 @@ void smartAutoFree(s32 a1) {
 	smartEntry* next;
 	u16 type = a1;
 
-	for (entry = wp->field_0xE008; entry; entry = next) {
+	for (entry = wp->allocHead; entry; entry = next) {
 		next = entry->next;
 		if (entry->type == type) {
 			smartFree(entry);
 		}
 	}
 	if (a1 == 3) {
-		for (entry = wp->field_0xE008; entry; entry = next) {
+		for (entry = wp->allocHead; entry; entry = next) {
 			next = entry->next;
 			if ((s32)entry->type == 4) {
 				smartFree(entry);
@@ -352,26 +355,26 @@ void smartFree(smartEntry* entry) {
 		return;
 	}
 	if (!entry->prev) {
-		wp->field_0xE008 = entry->next;
-		if (wp->field_0xE008) {
-			wp->field_0xE008->prev = NULL;
+		wp->allocHead = entry->next;
+		if (wp->allocHead) {
+			wp->allocHead->prev = NULL;
 		}
 	}
 	else {
 		entry->prev->next = entry->next;
 	}
 	if (!entry->next) {
-		wp->field_0xE00C = entry->prev;
-		if (wp->field_0xE00C) {
-			wp->field_0xE00C->next = NULL;
+		wp->allocTail = entry->prev;
+		if (wp->allocTail) {
+			wp->allocTail->next = NULL;
 		}
 	}
 	else {
 		entry->next->prev = entry->prev;
 	}
-	total = entry->size + entry->field_0x10;
+	total = entry->size + entry->spaceAfter;
 	if (entry->prev) {
-		entry->prev->field_0x10 += total;
+		entry->prev->spaceAfter += total;
 	}
 	else {
 		wp->bytesLeft += total;
@@ -387,8 +390,8 @@ void smartFree(smartEntry* entry) {
 	entry->field_0xC = 0;
 	entry->next = NULL;
 	entry->size = 0;
-	entry->field_0x10 = 0;
-	entry->field_0x8 = NULL;
+	entry->spaceAfter = 0;
+	entry->file = NULL;
 	wp->tail = entry;
 	wp->waitsync++;
 }
@@ -438,36 +441,36 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 	entry2->field_0xC = 1;
 	entry2->type = type;
 	entry2->size = sz;
-	entry2->field_0x8 = 0;
+	entry2->file = 0;
 	if (wp->bytesLeft >= sz) {
 		entry2->address = wp->ptr;
-		entry2->field_0x10 = wp->bytesLeft - sz;
-		entry2->next = wp->field_0xE008;
+		entry2->spaceAfter = wp->bytesLeft - sz;
+		entry2->next = wp->allocHead;
 		entry2->prev = NULL;
 		wp->bytesLeft = 0;
-		if (wp->field_0xE008) {
-			wp->field_0xE008->prev = entry2;
+		if (wp->allocHead) {
+			wp->allocHead->prev = entry2;
 		}
-		wp->field_0xE008 = entry2;
+		wp->allocHead = entry2;
 		if (!entry2->next) {
-			entry2->field_0x10 = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
-			wp->field_0xE00C = entry2;
+			entry2->spaceAfter = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry2->address - entry2->size;
+			wp->allocTail = entry2;
 		}
 		return entry2;
 	}
 	else {
-		for (entry1 = wp->field_0xE008; entry1; entry1 = entry1->next) {
-			if (entry1->field_0x10 >= sz) {
+		for (entry1 = wp->allocHead; entry1; entry1 = entry1->next) {
+			if (entry1->spaceAfter >= sz) {
 				entry2->address = (void*)((u32)entry1->address + entry1->size);
-				entry2->field_0x10 = entry1->field_0x10 - sz;
+				entry2->spaceAfter = entry1->spaceAfter - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
-				entry1->field_0x10 = 0;
+				entry1->spaceAfter = 0;
 				if (entry1->next) {
 					entry1->next->prev = entry2;
 				}
 				else {
-					wp->field_0xE00C = entry2;
+					wp->allocTail = entry2;
 				}
 				entry1->next = entry2;
 				return entry2;
@@ -485,18 +488,18 @@ smartEntry* smartAlloc(u32 size, u8 type) {
 					break;
 			}
 			smartGarbage();
-			entry1 = wp->field_0xE00C;
-			if (entry1->field_0x10 >= sz) {
+			entry1 = wp->allocTail;
+			if (entry1->spaceAfter >= sz) {
 				entry2->address = (void*)((u32)entry1->address + entry1->size);
-				entry2->field_0x10 = entry1->field_0x10 - sz;
+				entry2->spaceAfter = entry1->spaceAfter - sz;
 				entry2->next = entry1->next;
 				entry2->prev = entry1;
-				entry1->field_0x10 = 0;
+				entry1->spaceAfter = 0;
 				if (entry1->next) {
 					entry1->next->prev = entry2;
 				}
 				else {
-					wp->field_0xE00C = entry2;
+					wp->allocTail = entry2;
 				}
 				entry1->next = entry2;
 				return entry2;
@@ -514,7 +517,7 @@ void smartGarbage(void) {
 	smartEntry* prev;
 
 	sysWaitDrawSync();
-	if (wp->field_0xE008) {
+	if (wp->allocHead) {
 		wp->bytesLeft = 0;
 	}
 	else {
@@ -522,34 +525,34 @@ void smartGarbage(void) {
 	}
 	prev = NULL;
 	ptr = wp->ptr;
-	for (entry = wp->field_0xE008; entry; prev = entry, entry = entry->next) {
+	for (entry = wp->allocHead; entry; prev = entry, entry = entry->next) {
 		addr = entry->address;
 		if (addr != ptr) {
-			if (entry->field_0x8) {
-				if (entry->field_0x8->state == 3 && entry->field_0x8->entry && OSGetCurrentThread() != &dvdmgr_thread) {
+			if (entry->file) {
+				if (entry->file->state == 3 && entry->file->entry && OSGetCurrentThread() != &dvdmgr_thread) {
 					if (prev) {
-						prev->field_0x10 = addr - ptr;
+						prev->spaceAfter = addr - ptr;
 					}
 					else {
 						wp->bytesLeft = addr - ptr;
 					}
 					ptr = (u8*)entry->address + entry->size;
-					entry->field_0x10 = 0;
+					entry->spaceAfter = 0;
 					continue;
 				}
-				fileGarbageMoveMem(ptr, entry->field_0x8);
+				fileGarbageMoveMem(ptr, entry->file);
 			}
 			else {
 				memmove(ptr, addr, entry->size);
 				entry->address = ptr;
 			}
 		}
-		entry->field_0x10 = 0;
+		entry->spaceAfter = 0;
 		ptr = (u8*)entry->address + entry->size;
 	}
-	entry = wp->field_0xE00C;
+	entry = wp->allocTail;
 	if (entry) {
-		entry->field_0x10 = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
+		entry->spaceAfter = ((u32)heapEnd[5] - (u32)heapStart[5] - 32) + (u32)wp->ptr - (u32)entry->address - entry->size;
 	}
 	DCFlushRange(wp->ptr, (u32)heapEnd[5] - (u32)heapStart[5] - 32);
 }

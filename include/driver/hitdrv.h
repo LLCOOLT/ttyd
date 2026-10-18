@@ -40,9 +40,9 @@ struct HitEntry {
     MapFileJoint* joint;            // 0x8
     Mtx worldMtx;                   // 0xC
     Mtx localMtx;                   // 0x3C
-    Mtx unk6C;                      // 0x6C
+    Mtx animMtx;                    // 0x6C, joint animation matrix (output of mapCalcAnimMatrix, concatenated into worldMtx)
     Vec centerLocal;                // 0x9C
-    s16 unkA8;                      // 0xA8
+    s16 vectorCount;                // 0xA8, number of HitVector triangles (set from hitCalcVtxPosition)
     s16 mapIndex;                   // 0xAA
     HitVector* vectors;             // 0xAC
     HitDamageReturn* damage;        // 0xB0

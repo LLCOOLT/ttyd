@@ -334,9 +334,8 @@ static USER_FUNC(viewport) {
 
 void noiseDisp(CameraId cameraId, void* param) {
     s32 x;
-    s32 ry;
+    s32 k;
     s32 y;
-    s32 by;
     s32 off;
     CameraEntry* cam;
     s32 len;
@@ -346,24 +345,23 @@ void noiseDisp(CameraId cameraId, void* param) {
     u8* buf;
     Mtx mtx;
     s32 start;
-    s32 y1;
     cam = camGetPtr(cameraId);
     buf = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_I8, GX_FALSE, 0), 3)->address;
     for (y = 0; y < 64; y++) {
-        by = y / 4;
-        ry = y % 4;
         for (x = 0; x < 64; x++) {
-            off = (x / 8) * 32 + (by << 8); off += x % 8; off += (ry << 3); col = (y & 1) ? 0xFF : 0; buf[off] = col;
+            off = (x / 8) * 32 + (y / 4) * 256;
+            off = off + x % 8 + (y % 4) * 8;
+            buf[off] = (y & 1) ? 0xFF : 0;
         }
         n = rand() % 100 + 100;
-        by = by * 256;
-        y1 = ry * 8;
-        for (ry = 0; ry < n; ry++) {
+        for (k = 0; k < n; k++) {
             len = rand() % 4 + 2;
             start = rand() % (65 - len);
             col = rand() % 255;
             for (x = start; x < start + len; x++) {
-                off = x / 8 * 32; off = off + by; off += x % 8; off += y1; buf[off] = col;
+                off = (x / 8) * 32 + (y / 4) * 256;
+                off = off + x % 8 + (y % 4) * 8;
+                buf[off] = col;
             }
         }
     }

@@ -149,9 +149,9 @@ void BattleAudienceCtrlProcessKinopio(s32 index) {
     m->position.z += m->field_0x78.z;
     m->field_0x78.z += AM_F32(m, 0x8C);
     if (m->field_0x78.x > 0.0f) {
-        m->field_0xE8 = 90.0f;
+        m->angle = 90.0f;
     } else if (m->field_0x78.x < 0.0f) {
-        m->field_0xE8 = 270.0f;
+        m->angle = 270.0f;
     }
     if (AM_F32(m, 0xD0) < 0.0f) {
         AM_F32(m, 0xD0) = 0.0f;
@@ -235,19 +235,19 @@ void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
     case 4:
         if (m->field_0x30 > 180) {
             if (m->field_0x30 <= 188) {
-                AM_F32(m, 0x64) += 0.005f * speed;
+                m->baseScale.y += 0.005f * speed;
             } else if ((f32)m->field_0x30 <= 8.0f * scale + 188.0f) {
-                AM_F32(m, 0x64) -= 0.005f * speed;
+                m->baseScale.y -= 0.005f * speed;
             } else if ((f32)m->field_0x30 <= 16.0f * scale + 188.0f) {
-                AM_F32(m, 0x64) += 0.005f * speed;
+                m->baseScale.y += 0.005f * speed;
             } else if ((f32)m->field_0x30 <= 24.0f * scale + 188.0f) {
-                AM_F32(m, 0x64) -= 0.005f * speed;
+                m->baseScale.y -= 0.005f * speed;
             } else if ((f32)m->field_0x30 <= 32.0f * scale + 188.0f) {
-                AM_F32(m, 0x64) += 0.005f * speed;
+                m->baseScale.y += 0.005f * speed;
             } else if ((f32)m->field_0x30 <= 40.0f * scale + 188.0f) {
-                AM_F32(m, 0x64) -= 0.005f * speed;
+                m->baseScale.y -= 0.005f * speed;
             } else {
-                AM_F32(m, 0x64) = 1.0f;
+                m->baseScale.y = 1.0f;
                 m->field_0x30 = 0;
             }
         }
@@ -255,37 +255,37 @@ void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
         break;
     case 6:
         if ((f32)m->field_0x30 >= 36.0f * scale) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if ((f32)m->field_0x30 <= 17.0f * scale) {
-            AM_F32(m, 0x64) += 0.00175f * speed;
+            m->baseScale.y += 0.00175f * speed;
         } else {
-            AM_F32(m, 0x64) -= 0.00175f * speed;
+            m->baseScale.y -= 0.00175f * speed;
         }
         m->field_0x30++;
         break;
     case 7:
         if ((f32)m->field_0x30 >= 22.0f * scale) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if ((f32)m->field_0x30 <= 10.0f * scale) {
-            AM_F32(m, 0x64) += 0.00375f * speed;
+            m->baseScale.y += 0.00375f * speed;
         } else {
-            AM_F32(m, 0x64) -= 0.00375f * speed;
+            m->baseScale.y -= 0.00375f * speed;
         }
         m->field_0x30++;
         break;
     case 9:
         if ((f32)m->field_0x30 >= 64.0f * scale) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if ((f32)m->field_0x30 <= 31.0f * scale) {
-            AM_F32(m, 0x64) += 0.00125f * speed;
+            m->baseScale.y += 0.00125f * speed;
         } else {
-            AM_F32(m, 0x64) -= 0.00125f * speed;
+            m->baseScale.y -= 0.00125f * speed;
         }
         m->field_0x30++;
         break;
@@ -293,13 +293,13 @@ void BattleAudienceCtrlProcessKinopioWait(s32 index, s32 front) {
         break;
     default:
         if ((f32)m->field_0x30 >= 32.0f * scale) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if ((f32)m->field_0x30 <= 15.0f * scale) {
-            AM_F32(m, 0x64) += 0.0025f * speed;
+            m->baseScale.y += 0.0025f * speed;
         } else {
-            AM_F32(m, 0x64) -= 0.0025f * speed;
+            m->baseScale.y -= 0.0025f * speed;
         }
         m->field_0x30++;
         break;
@@ -381,13 +381,13 @@ void BattleAudienceCtrlProcessKinopioWaitKubiKatamuke(s32 index, s32 front) {
         BattleAudience_SetAnim(index, 1, FALSE);
     }
     if (m->field_0x30 >= 0 && m->field_0x30 <= 10) {
-        m->field_0x6C.x = 1.5f * (f32)m->field_0x30;
+        m->dispOffset.x = 1.5f * (f32)m->field_0x30;
     }
     if (m->field_0x30 >= 20 && m->field_0x30 <= 40) {
-        m->field_0x6C.x -= 1.5f;
+        m->dispOffset.x -= 1.5f;
     }
     if (m->field_0x30 >= 50 && m->field_0x30 <= 60) {
-        m->field_0x6C.x += 1.5f;
+        m->dispOffset.x += 1.5f;
     }
     if (m->field_0x30 > 60) {
         BattleAudience_ChangeStatus(index, 0);
@@ -440,13 +440,13 @@ void BattleAudienceCtrlProcessKinopioJoyRaiseArm(s32 index, s32 front) {
     switch (m->field_0x4) {
     case 0:
         if (irand(2) == 0) {
-            m->field_0xE8 = 270.0f;
+            m->angle = 270.0f;
         } else {
-            m->field_0xE8 = 90.0f;
+            m->angle = 90.0f;
         }
         m->field_0x4++;
     case 1:
-        m->field_0x6C.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 10.0f, 4, m->field_0x8, 15);
+        m->dispOffset.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 10.0f, 4, m->field_0x8, 15);
         m->field_0x8++;
         if (m->field_0x8 > 30) {
             m->field_0xC -= 1.0f;
@@ -570,13 +570,13 @@ void BattleAudienceCtrlProcessKinopioBooing(s32 index) {
     switch (m->field_0x4) {
     case 0:
         if (irand(2) == 0) {
-            m->field_0xE8 = 270.0f;
+            m->angle = 270.0f;
         } else {
-            m->field_0xE8 = 90.0f;
+            m->angle = 90.0f;
         }
         m->field_0x4++;
     case 1:
-        m->field_0x6C.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 10.0f, 4, m->field_0x8, 15);
+        m->dispOffset.y = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(0.0f, 10.0f, 4, m->field_0x8, 15);
         m->field_0x8++;
         if (m->field_0x8 > 30) {
             m->field_0xC -= 1.0f;
@@ -599,21 +599,21 @@ void BattleAudienceCtrlProcessKinopioDamage(s32 index) {
         AM_F32(m, 0xDC) = 8.0f;
         AM_F32(m, 0xE4) = -1.0f;
         m->field_0x30 = 0;
-        m->field_0xE8 = 270.0f;
+        m->angle = 270.0f;
         m->field_0x4++;
     case 1:
         if (m->field_0x30 >= 8) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if (m->field_0x30 <= 4) {
-            AM_F32(m, 0x64) -= 0.1f;
+            m->baseScale.y -= 0.1f;
         } else {
-            AM_F32(m, 0x64) += 0.1f;
+            m->baseScale.y += 0.1f;
         }
         m->field_0x30++;
         if (BattleAudience_GetAnimEnd(index) == 1) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
             if (BattleAudience_GetEscapeChangeOK(index) == 1) {
                 BattleAudience_ChangeStatus(index, 12);
@@ -768,19 +768,19 @@ void BattleAudienceCtrlProcessKinopioSleep(s32 index, s32 front) {
             BattleAudience_SetAnim(index, 11, FALSE);
         }
         if (m->field_0x30 >= 320) {
-            AM_F32(m, 0x64) = 1.0f;
+            m->baseScale.y = 1.0f;
             m->field_0x30 = 0;
         }
         if (m->field_0x30 <= 160) {
-            AM_F32(m, 0x64) -= 0.0025f;
+            m->baseScale.y -= 0.0025f;
         } else {
-            AM_F32(m, 0x64) += 0.0025f;
+            m->baseScale.y += 0.0025f;
         }
         m->field_0x30++;
-        m->field_0x43 += m->field_0x18;
-        if (m->field_0x43 >= 200) {
+        m->colorB += m->field_0x18;
+        if (m->colorB >= 200) {
             *(s8*)&m->field_0x18 = -4;
-        } else if (m->field_0x43 <= 5) {
+        } else if (m->colorB <= 5) {
             m->field_0x18 = 4;
         }
     }
@@ -802,8 +802,8 @@ void BattleAudienceCtrlProcessKinopioSleep(s32 index, s32 front) {
         } else {
             BattleAudience_SetAnim(index, 1, FALSE);
         }
-        AM_F32(m, 0x64) = 1.0f;
-        m->field_0x43 = 0;
+        m->baseScale.y = 1.0f;
+        m->colorB = 0;
         m->field_0x4++;
     case 3:
         if (0.0f == AM_F32(m, 0xE4)) {
@@ -852,9 +852,9 @@ void BattleAudienceCtrlProcessKinopioTransEvt(s32 index) {
             BattleAudience_SetAnim(index, 7, FALSE);
             BtlUnit_GetHitPos(unit, parts, &x, &y, &z);
             if (m->position.x >= x) {
-                m->field_0xE8 = 270.0f;
+                m->angle = 270.0f;
             } else {
-                m->field_0xE8 = 90.0f;
+                m->angle = 90.0f;
             }
             m->field_0x4 = 10;
             m->field_0x8 = 0;
@@ -995,11 +995,11 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
             btl_camera_set_moveSpeedLv(0, 1);
         }
     case 20:
-        AM_S32(m, 0x12C) = BattleStage_ObjectFallCheck();
+        m->statusTimer = BattleStage_ObjectFallCheck();
         m->field_0x4 = 25;
         break;
     case 25:
-        if (!evtCheckID(AM_S32(m, 0x12C))) {
+        if (!evtCheckID(m->statusTimer)) {
             m->field_0x4 = 30;
             m->mRotation.y = 0.0f;
         }
@@ -1047,10 +1047,10 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
     case 67:
         m->field_0x8++;
         if (1.0f == m->field_0xC) {
-            m->field_0xE8 = 270.0f;
+            m->angle = 270.0f;
         }
         if (-1.0f == m->field_0xC) {
-            m->field_0xE8 = 90.0f;
+            m->angle = 90.0f;
         }
         if (m->field_0x8 <= 5) {
             m->position.x -= 5.0f * m->field_0xC;
@@ -1068,7 +1068,7 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         break;
     case 70:
         BattleStage_NozzleWorkCheck(1);
-        AM_S32(m, 0x12C) = AM_S32(bw, 0x18298);
+        m->statusTimer = AM_S32(bw, 0x18298);
         m->field_0x4 = 75;
         tx = 300.0f * m->field_0xC;
         tz = 0.0f;
@@ -1087,7 +1087,7 @@ void BattleAudienceCtrlProcessKinopioIntrude(s32 index) {
         }
         break;
     case 80:
-        if (!evtCheckID(AM_S32(m, 0x12C))) {
+        if (!evtCheckID(m->statusTimer)) {
             m->field_0x4 = 85;
         }
         break;
@@ -1205,7 +1205,7 @@ void BattleAudienceCtrlProcessKinopioShell(s32 index) {
         if (m->field_0x8 <= 0) {
             BattleAudience_ChangeStatus(index, 0);
         }
-        AM_S32(m, 0x12C) = 0;
+        m->statusTimer = 0;
         break;
     }
 }
@@ -1256,8 +1256,8 @@ void BattleAudienceCtrlProcessKinopioFire(s32 index, s32 front) {
         m->field_0x8 = 10;
         m->field_0x4++;
     case 1:
-        m->field_0x60.x += 0.05f;
-        m->field_0x60.y += 0.05f;
+        m->baseScale.x += 0.05f;
+        m->baseScale.y += 0.05f;
         m->field_0x8--;
         if (m->field_0x8 <= 0) {
             s32 offs[24][2] = {{0, 3},  {-1, 2},  {0, 2},  {1, 2},  {-2, 1},  {-1, 1},  {0, 1},  {1, 1},
@@ -1333,9 +1333,9 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
             *(s16*)((u8*)m + 0xF0) = k;
             t = BattleAudienceGetPtr(*(s16*)((u8*)m + 0xF0));
             if (m->position.x >= t->position.x) {
-                m->field_0xE8 = 270.0f;
+                m->angle = 270.0f;
             } else {
-                m->field_0xE8 = 90.0f;
+                m->angle = 90.0f;
             }
             BattleAudience_SetAnim(index, 0, FALSE);
         } else {
@@ -1358,11 +1358,11 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
     case 3:
         t = BattleAudienceGetPtr(*(s16*)((u8*)m + 0xF0));
         if (m->position.x >= t->position.x) {
-            m->field_0x6C.x -= 6.0f;
+            m->dispOffset.x -= 6.0f;
         } else {
-            m->field_0x6C.x += 6.0f;
+            m->dispOffset.x += 6.0f;
         }
-        if (m->field_0x6C.x <= -60.0f || m->field_0x6C.x >= 60.0f) {
+        if (m->dispOffset.x <= -60.0f || m->dispOffset.x >= 60.0f) {
             m->field_0x4++;
         }
         break;
@@ -1374,14 +1374,14 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
         m->field_0x4++;
         break;
     case 5:
-        if (m->field_0x6C.x > 0.0f) {
-            m->field_0x6C.x -= 6.0f;
-            if (m->field_0x6C.x <= 0.0f) {
+        if (m->dispOffset.x > 0.0f) {
+            m->dispOffset.x -= 6.0f;
+            if (m->dispOffset.x <= 0.0f) {
                 m->field_0x4 = 7;
             }
         } else {
-            m->field_0x6C.x += 6.0f;
-            if (m->field_0x6C.x >= 0.0f) {
+            m->dispOffset.x += 6.0f;
+            if (m->dispOffset.x >= 0.0f) {
                 m->field_0x4 = 7;
             }
         }
@@ -1401,7 +1401,7 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
             }
             if (cnt >= 1) {
                 m->field_0x4 = 8;
-                AM_S32(m, 0x12C) = list[irand(cnt)];
+                m->statusTimer = list[irand(cnt)];
             } else if (i == 60) {
                 m->field_0x4 = 99;
                 m->field_0x8 = 10;
@@ -1416,7 +1416,7 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
         break;
     case 9:
         if (m->position.y <= -100.0f) {
-            k = AM_S32(m, 0x12C);
+            k = m->statusTimer;
             pz = 0.1f * (f32)(k % 20) + (f32)(k / 20 * 30 + 115);
             m->mHomePosition.x = m->position.x = (f32)((rand() * 10 / 32767) + (k % 20 * 25 - 235));
             m->mHomePosition.y = AM_F32(stage, 0xB34);
@@ -1437,7 +1437,7 @@ void BattleAudienceCtrlProcessKinopioEat(s32 index) {
             m->field_0x78.y = 0.0f;
             m->field_0x4 = 99;
             m->field_0x8 = 10;
-            memcpy(BattleAudienceGetPtr(AM_S32(m, 0x12C)), m, 0x134);
+            memcpy(BattleAudienceGetPtr(m->statusTimer), m, 0x134);
             BattleAudience_Delete(index);
         }
         break;

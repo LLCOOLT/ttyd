@@ -94,7 +94,7 @@ void effFallLeafMain(EffectEntry* effect) {
     Vec tmp = {0.0f, 0.0f, 0.0f};
     s32 i;
     s32 type;
-    f32 new_var;
+    f32 c;
     s32 lifetime;
     s32 frame;
     f32 s;
@@ -142,8 +142,8 @@ void effFallLeafMain(EffectEntry* effect) {
         }
         work->spin += (f32)((s32)effTblRandN64(50, frame + i * 20) - 25);
         work->angleZ += 10.0f * (f32)sin(6.2831855f * work->spin / 360.0f);
-        new_var = (f32)cos(6.2831855f * (work->spin / 2.0f) / 360.0f);
-        work->angleY += 10.0f * new_var;
+        c = (f32)cos(6.2831855f * (work->spin / 2.0f) / 360.0f);
+        work->angleY += 10.0f * c;
         work->position.x += work->vx;
         work->position.y += work->vy;
     }

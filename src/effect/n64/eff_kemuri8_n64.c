@@ -13,10 +13,10 @@ typedef struct EffKemuri8N64Work {
     u16 type;       // 0x0
     s16 pad_2;      // 0x2
     Vec position;   // 0x4
-    f32 field_0x10; // 0x10
-    f32 field_0x14; // 0x14
-    f32 field_0x18; // 0x18
-    f32 field_0x1C; // 0x1C
+    f32 speed; // 0x10, along (sinAngle, cosAngle)
+    f32 accel; // 0x14, added to speed each frame
+    f32 accelStep; // 0x18, added to accel
+    f32 accelStep2; // 0x1C, added to accelStep
     f32 field_0x20; // 0x20
     f32 field_0x24; // 0x24
     f32 field_0x28; // 0x28
@@ -25,12 +25,12 @@ typedef struct EffKemuri8N64Work {
     f32 cosAngle;   // 0x34
     s32 field_0x38; // 0x38
     s32 timer;      // 0x3C
-    s32 field_0x40; // 0x40
+    s32 texFrame; // 0x40, current of 16 texture frames; >15 = done
     u8 r;           // 0x44
     u8 g;           // 0x45
     u8 b;           // 0x46
     u8 a;           // 0x47
-    s32 field_0x48; // 0x48
+    s32 texFrameNext; // 0x48
     s32 limit;      // 0x4C
     BOOL flag;      // 0x50
     s32 counter;    // 0x54
@@ -88,16 +88,16 @@ EffectEntry* effKemuri8N64Entry(s32 type, f32 x, f32 y, f32 z) {
     work->position.x = x;
     work->position.y = y;
     work->position.z = z;
-    work->field_0x40 = 0;
-    work->field_0x48 = 0;
+    work->texFrame = 0;
+    work->texFrameNext = 0;
     work->limit = 17;
     work->camId = 4;
     work++;
     for (i = 1; i < count; i++, work++) {
-        work->field_0x10 = -3.0f;
-        work->field_0x14 = 0.19999999f;
-        work->field_0x18 = 0.0f;
-        work->field_0x1C = 0.0f;
+        work->speed = -3.0f;
+        work->accel = 0.19999999f;
+        work->accelStep = 0.0f;
+        work->accelStep2 = 0.0f;
         work->field_0x20 = 1.75f;
         work->field_0x24 = -0.16f;
         work->field_0x28 = 0.0f;
@@ -154,15 +154,15 @@ void effKemuri8Main(EffectEntry* effect) {
         effDelete(effect);
         return;
     }
-    work->field_0x40 = cur;
-    work->field_0x48 = next;
+    work->texFrame = cur;
+    work->texFrameNext = next;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
-        work->field_0x18 += work->field_0x1C;
-        work->field_0x14 += work->field_0x18;
-        work->field_0x10 += work->field_0x14;
-        work->position.x += work->field_0x10 * work->sinAngle;
-        work->position.y += work->field_0x10 * work->cosAngle;
+        work->accelStep += work->accelStep2;
+        work->accel += work->accelStep;
+        work->speed += work->accel;
+        work->position.x += work->speed * work->sinAngle;
+        work->position.y += work->speed * work->cosAngle;
     }
     dispEntry(camId, dispCalcZ(&position), 2, (DispCallback)effKemuri8Disp, effect);
 }
@@ -189,8 +189,8 @@ void effKemuri8Disp(CameraId cameraId, EffectEntry* effect) {
     work = effect->userdata;
     camera = camGetPtr(cameraId);
     type = work->type;
-    cur = work->field_0x40;
-    next = work->field_0x48;
+    cur = work->texFrame;
+    next = work->texFrameNext;
     PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', 0.017453292f * -camGetPtr(cameraId)->viewYaw);
     PSMTXScale(scale, 1.0f, 1.0f, 1.0f);
@@ -232,7 +232,7 @@ void effKemuri8Disp(CameraId cameraId, EffectEntry* effect) {
     u1 = 0.0625f * (f32)next;
     work++;
     for (i = 1; i < effect->count; i++, work++) {
-        if (work->field_0x40 > 15) {
+        if (work->texFrame > 15) {
             continue;
         }
         PSMTXTrans(mtx, u0, 0.0f, 0.0f);

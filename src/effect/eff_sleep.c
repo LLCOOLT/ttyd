@@ -28,19 +28,19 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 	effect->userdata = data;
 	effect->callback = effSleepMain;
 	effect->flags |= 2;
-	data->field_0x0 = a1;
+	data->type = a1;
 	data->position.x = x;
 	data->position.y = y;
 	data->position.z = z;
 	data->scale = scale;
-	data->field_0x14 = 0;
+	data->alpha = 0;
 	if (a2 <= 0) {
-		data->field_0x18 = 1000;
+		data->lifetime = 1000;
 	}
 	else {
-		data->field_0x18 = a2;
+		data->lifetime = a2;
 	}
-	data->field_0x1C = 0;
+	data->age = 0;
 
 	radians = (6.2831855f * rotation) / 360.0f; //TODO: get radians to f26
 	for (data++, i = 1, smth = 16; i < effect->count; i++, smth += 16, data++) {
@@ -48,8 +48,8 @@ EffectEntry* effSleepEntry(s32 a1, s32 a2, f32 x, f32 y, f32 z, f32 scale, f32 r
 		data->position.y = r * (f32)sin(radians);
 		data->position.z = 0.0f;
 		data->scale = (0.2f * (f32)i) + 1.0f;
-		data->field_0x14 = 0;
-		data->field_0x20 = smth;
+		data->alpha = 0;
+		data->delay = smth;
 	}
 	return effect;
 }
@@ -62,30 +62,30 @@ void effSleepMain(EffectEntry* effect) {
 	position = (Vec){ data->position.x, data->position.y, data->position.z };
 	if (effect->flags & 4) {
 		effect->flags &= ~4;
-		data->field_0x18 = 16;
+		data->lifetime = 16;
 	}
-	if (data->field_0x18 < 1000) {
-		data->field_0x18--;
+	if (data->lifetime < 1000) {
+		data->lifetime--;
 	}
-	if (data->field_0x18 < 32) {
-		data->field_0x14 = data->field_0x18 * 8;
+	if (data->lifetime < 32) {
+		data->alpha = data->lifetime * 8;
 	}
-	if (data->field_0x18 < 0) {
+	if (data->lifetime < 0) {
 		effDelete(effect);
 		return;
 	}
-	data->field_0x1C++;
-	if (data->field_0x1C < 32) {
-		data->field_0x14 = data->field_0x1C * 8 + 7;
+	data->age++;
+	if (data->age < 32) {
+		data->alpha = data->age * 8 + 7;
 	}
 	for (i = 1, data++; i < effect->count; i++, data++) {
-		if (data->field_0x20 != 0) {
-			data->field_0x20--;
+		if (data->delay != 0) {
+			data->delay--;
 		}
 		else {
-			data->field_0x14 += 8;
-			if (data->field_0x14 > 255) {
-				data->field_0x14 = 255;
+			data->alpha += 8;
+			if (data->alpha > 255) {
+				data->alpha = 255;
 			}
 		}
 	}
@@ -121,7 +121,7 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 
 	data = effect->userdata;
 	cam = camGetPtr(camId);
-	alpha = data->field_0x14;
+	alpha = data->alpha;
 
 	PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
 	PSMTXScale(scale, data->scale, data->scale, data->scale);
@@ -150,8 +150,8 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	x0 = -w;
 
 	for (i = 1, data++, base = 50; i < effect->count; base += 50, i++, data++) {
-		if (data->field_0x20 == 0) {
-			GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, data->field_0x14 * alpha / 255 });
+		if (data->delay == 0) {
+			GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 0xFF, 0xFF, 0xFF, data->alpha * alpha / 255 });
 			PSMTXTrans(mtx, data->position.x, data->position.y, data->position.z);
 			PSMTXScale(scale, data->scale, data->scale, data->scale);
 			PSMTXConcat(mtx, scale, mtx);

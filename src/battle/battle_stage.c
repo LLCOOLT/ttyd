@@ -73,12 +73,12 @@ typedef struct StageWork {
 	StageLight lights[12];  // 0x4
 	StageDark stgDark;      // 0xAE4
 	StageDark audDark;      // 0xB04
-	f32 field_B24;          // 0xB24
-	f32 field_B28;          // 0xB28
-	f32 field_B2C;          // 0xB2C
-	f32 field_B30;          // 0xB30
-	f32 field_B34;          // 0xB34
-	f32 field_B38;          // 0xB38
+	f32 stageSizeX;          // 0xB24
+	f32 stageSizeY;          // 0xB28
+	f32 stageSizeZ;          // 0xB2C
+	f32 audienceSizeX;          // 0xB30
+	f32 audienceSizeY;          // 0xB34
+	f32 audienceSizeZ;          // 0xB38
 } StageWork;
 
 #define STG ((StageWork*)BattleStageGetPtr())
@@ -165,12 +165,12 @@ void BattleStageInit(void) {
 	s->audDark.target = 0;
 	s->audDark.time = 0;
 	s->audDark.max = 0;
-	s->field_B24 = 290.0f;
-	s->field_B28 = 200.0f;
-	s->field_B2C = 90.0f;
-	s->field_B30 = s->field_B24;
-	s->field_B34 = -50.0f;
-	s->field_B38 = 200.0f;
+	s->stageSizeX = 290.0f;
+	s->stageSizeY = 200.0f;
+	s->stageSizeZ = 90.0f;
+	s->audienceSizeX = s->stageSizeX;
+	s->audienceSizeY = -50.0f;
+	s->audienceSizeZ = 200.0f;
 	BattleStageObjectInit();
 	batSpotInit();
 }
@@ -468,7 +468,7 @@ void BattleStageLightRelease(s32 idx, s32 time, u8 mode) {
 		} else {
 			l->flags |= 2;
 			l->colorStart = (GXColor){l->color.r, l->color.g, l->color.b};
-			{ GXColor z = {0, 0, 0}; l->colorTarget = z; }
+			l->colorTarget = (GXColor){0, 0, 0};
 			l->colorTime = time;
 			l->colorMax = time;
 			l->colorMode = mode;
@@ -838,7 +838,6 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	Mtx m2;
 	u8* tex;
 	s32 i, j, n, w, s, k, idx;
-	s32 rc[2];
 	u8 c;
 	f32 lim;
 	f32 x, y;
@@ -850,20 +849,22 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	if (screen_wp->field_24 != 0) {
 		tex = screen_wp->tex;
 		for (i = 0; i < 64; i++) {
-			rc[1] = i / 4;
-			rc[0] = i % 4;
 			for (j = 0; j < 64; j++) {
-				idx = (j / 8) * 32 + (rc[1] << 8); idx += j % 8; idx += rc[0] << 3; tex[idx] = (i & 1) ? 0xFF : 0;
+				idx = (j / 8) * 32 + (i / 4) * 256;
+				idx += j % 8;
+				idx += (i % 4) * 8;
+				tex[idx] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
-			rc[1] = rc[1] * 256;
-			k = rc[0] * 8;
-			for (rc[0] = 0; rc[0] < n; rc[0]++) {
+			for (k = 0; k < n; k++) {
 				w = rand() % 4 + 2;
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					idx = j / 8 * 32; idx = idx + rc[1]; idx += j % 8; idx += k; tex[idx] = c;
+					idx = (j / 8) * 32 + (i / 4) * 256;
+					idx += j % 8;
+					idx += (i % 4) * 8;
+					tex[idx] = c;
 				}
 			}
 		}

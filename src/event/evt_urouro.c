@@ -104,7 +104,7 @@ USER_FUNC(urouro_main_func) {
             npc->moveDir = npc->direction;
             work->flags &= ~0x3;
         }
-        if (animPoseGetPeraEnd(npc->poseId) && npc->field_2FC != 0) {
+        if (animPoseGetPeraEnd(npc->poseId) && npc->wallHit != 0) {
             npc->direction = reviseAngle(angleABf(npc->position.x, npc->position.z, work->x, work->z));
             npc->moveDir = npc->direction;
             work->flags &= ~0x3;

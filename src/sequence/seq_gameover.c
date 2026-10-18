@@ -235,7 +235,7 @@ void seq_gameOverMain(SequenceWork* work) {
                 camera->marioAt.y = camera->marioPos.y;
                 camera->marioAt.z = camera->marioPos.z;
                 mario->position = (Vec){0.0f, 0.0f, 0.0f};
-                mario->field_EC = mario->position;
+                mario->camTarget = mario->position;
             }
             camRoadReset();
             camShiftReset();

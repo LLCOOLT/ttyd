@@ -7,7 +7,7 @@ typedef struct MailData {
     s32 id;            // 0x4
     const char* name;  // 0x8, message tag of the mail's title
     const char* body;  // 0xC, message tag of the mail's text
-    s32 field_0x10;    // 0x10
+    s32 icon;          // 0x10, texture drawn next to the title when flags & 0x1000 (win_root mail list)
 } MailData;
 
 extern MailData mail_data[44];

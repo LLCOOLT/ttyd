@@ -72,86 +72,86 @@ void yuugijou_init(void) {
 	yuwp = &yuugijouwork;
 	memset(yuwp, 0, sizeof(PiantaParlorWork));
 
-	yuwp->field_0x14 = 1;
-	yuwp->field_0x18 = 1;
-	yuwp->field_0x1C = 1;
-	yuwp->field_0x20 = 1;
-	yuwp->field_0x24 = 1;
+	yuwp->recordOn[0][0] = 1;
+	yuwp->recordOn[0][1] = 1;
+	yuwp->recordOn[0][2] = 1;
+	yuwp->recordOn[0][3] = 1;
+	yuwp->recordOn[0][4] = 1;
 
-	yuwp->field_0x74 = 0x5B964;
-	yuwp->field_0x78 = 0x5825A;
-	yuwp->field_0x7C = 0x4F826;
-	yuwp->field_0x80 = 0x4C3D8;
-	yuwp->field_0x84 = 0x4237E;
+	yuwp->recordScore[0][0] = 0x5B964;
+	yuwp->recordScore[0][1] = 0x5825A;
+	yuwp->recordScore[0][2] = 0x4F826;
+	yuwp->recordScore[0][3] = 0x4C3D8;
+	yuwp->recordScore[0][4] = 0x4237E;
 
-	yuwp->field_0xD4 = 0xE;
-	yuwp->field_0xD8 = 0xC;
-	yuwp->field_0xDC = 0xF;
-	yuwp->field_0xE0 = 0xB;
-	yuwp->field_0xE4 = 0xA;
+	yuwp->recordParam[0][0] = 0xE;
+	yuwp->recordParam[0][1] = 0xC;
+	yuwp->recordParam[0][2] = 0xF;
+	yuwp->recordParam[0][3] = 0xB;
+	yuwp->recordParam[0][4] = 0xA;
 
-	yuwp->field_0x2C = 1;
-	yuwp->field_0x30 = 1;
-	yuwp->field_0x34 = 1;
-	yuwp->field_0x38 = 1;
-	yuwp->field_0x3C = 1;
+	yuwp->recordOn[1][0] = 1;
+	yuwp->recordOn[1][1] = 1;
+	yuwp->recordOn[1][2] = 1;
+	yuwp->recordOn[1][3] = 1;
+	yuwp->recordOn[1][4] = 1;
 
-	yuwp->field_0x8C = 2;
-	yuwp->field_0x90 = 5;
-	yuwp->field_0x94 = 0x12;
-	yuwp->field_0x98 = 0x1B;
-	yuwp->field_0x9C = 0x8A;
+	yuwp->recordScore[1][0] = 2;
+	yuwp->recordScore[1][1] = 5;
+	yuwp->recordScore[1][2] = 0x12;
+	yuwp->recordScore[1][3] = 0x1B;
+	yuwp->recordScore[1][4] = 0x8A;
 
-	yuwp->field_0xEC = MAX0(((700 - (s32)yuwp->field_0x8C) * 15) / 700) + 1;
-	t = (700 - (s32)yuwp->field_0x90) * 15;
-	yuwp->field_0xF0 = MAX0(t / 700);
-	t = (700 - (s32)yuwp->field_0x94) * 15;
-	yuwp->field_0xF4 = MAX0(t / 700);
-	t = (700 - (s32)yuwp->field_0x98) * 15;
-	yuwp->field_0xF8 = MAX0(t / 700);
-	t = (700 - (s32)yuwp->field_0x9C) * 15;
-	yuwp->field_0xFC = MAX0(t / 700);
+	yuwp->recordParam[1][0] = MAX0(((700 - (s32)yuwp->recordScore[1][0]) * 15) / 700) + 1;
+	t = (700 - (s32)yuwp->recordScore[1][1]) * 15;
+	yuwp->recordParam[1][1] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][2]) * 15;
+	yuwp->recordParam[1][2] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][3]) * 15;
+	yuwp->recordParam[1][3] = MAX0(t / 700);
+	t = (700 - (s32)yuwp->recordScore[1][4]) * 15;
+	yuwp->recordParam[1][4] = MAX0(t / 700);
 
-	yuwp->field_0x44 = 1;
-	yuwp->field_0x48 = 1;
-	yuwp->field_0x4C = 1;
-	yuwp->field_0x50 = 1;
-	yuwp->field_0x54 = 1;
+	yuwp->recordOn[2][0] = 1;
+	yuwp->recordOn[2][1] = 1;
+	yuwp->recordOn[2][2] = 1;
+	yuwp->recordOn[2][3] = 1;
+	yuwp->recordOn[2][4] = 1;
 
-	yuwp->field_0xA4 = 0x20850;
-	yuwp->field_0xA8 = 0x20436;
-	yuwp->field_0xAC = 0x20184;
-	yuwp->field_0xB0 = 0x1F91E;
-	yuwp->field_0xB4 = 0x1E3AC;
+	yuwp->recordScore[2][0] = 0x20850;
+	yuwp->recordScore[2][1] = 0x20436;
+	yuwp->recordScore[2][2] = 0x20184;
+	yuwp->recordScore[2][3] = 0x1F91E;
+	yuwp->recordScore[2][4] = 0x1E3AC;
 
-	yuwp->field_0x104 = MAX0(((s32)yuwp->field_0xA4 - 109000) / 2000) + 7;
-	t = (s32)yuwp->field_0xA8 - 109000;
-	yuwp->field_0x108 = MAX0(t / 2000) + 6;
-	yuwp->field_0x10C = MAX0(((s32)yuwp->field_0xAC - 109000) / 2000) + 4;
-	t = (s32)yuwp->field_0xB0 - 109000;
-	yuwp->field_0x110 = MAX0(t / 2000) + 4;
-	yuwp->field_0x114 = MAX0(((s32)yuwp->field_0xB4 - 109000) / 2000) + 1;
+	yuwp->recordParam[2][0] = MAX0(((s32)yuwp->recordScore[2][0] - 109000) / 2000) + 7;
+	t = (s32)yuwp->recordScore[2][1] - 109000;
+	yuwp->recordParam[2][1] = MAX0(t / 2000) + 6;
+	yuwp->recordParam[2][2] = MAX0(((s32)yuwp->recordScore[2][2] - 109000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[2][3] - 109000;
+	yuwp->recordParam[2][3] = MAX0(t / 2000) + 4;
+	yuwp->recordParam[2][4] = MAX0(((s32)yuwp->recordScore[2][4] - 109000) / 2000) + 1;
 
-	yuwp->field_0x5C = 1;
-	yuwp->field_0x60 = 1;
-	yuwp->field_0x64 = 1;
-	yuwp->field_0x68 = 1;
-	yuwp->field_0x6C = 1;
+	yuwp->recordOn[3][0] = 1;
+	yuwp->recordOn[3][1] = 1;
+	yuwp->recordOn[3][2] = 1;
+	yuwp->recordOn[3][3] = 1;
+	yuwp->recordOn[3][4] = 1;
 
-	yuwp->field_0xBC = 0x16BDE;
-	yuwp->field_0xC0 = 0x16968;
-	yuwp->field_0xC4 = 0x16382;
-	yuwp->field_0xC8 = 0x1627E;
-	yuwp->field_0xCC = 0x15950;
+	yuwp->recordScore[3][0] = 0x16BDE;
+	yuwp->recordScore[3][1] = 0x16968;
+	yuwp->recordScore[3][2] = 0x16382;
+	yuwp->recordScore[3][3] = 0x1627E;
+	yuwp->recordScore[3][4] = 0x15950;
 
-	t = (s32)yuwp->field_0xBC - 74000;
-	yuwp->field_0x11C = MAX0(t / 2000) + 7;
-	t = (s32)yuwp->field_0xC0 - 74000;
-	yuwp->field_0x120 = MAX0(t / 2000) + 6;
-	yuwp->field_0x124 = MAX0(((s32)yuwp->field_0xC4 - 74000) / 2000) + 4;
-	t = (s32)yuwp->field_0xC8 - 74000;
-	yuwp->field_0x128 = MAX0(t / 2000) + 3;
-	yuwp->field_0x12C = MAX0(((s32)yuwp->field_0xCC - 74000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[3][0] - 74000;
+	yuwp->recordParam[3][0] = MAX0(t / 2000) + 7;
+	t = (s32)yuwp->recordScore[3][1] - 74000;
+	yuwp->recordParam[3][1] = MAX0(t / 2000) + 6;
+	yuwp->recordParam[3][2] = MAX0(((s32)yuwp->recordScore[3][2] - 74000) / 2000) + 4;
+	t = (s32)yuwp->recordScore[3][3] - 74000;
+	yuwp->recordParam[3][3] = MAX0(t / 2000) + 3;
+	yuwp->recordParam[3][4] = MAX0(((s32)yuwp->recordScore[3][4] - 74000) / 2000) + 4;
 }
 static inline s32 cmpSign(s32 a, s32 b) {
 	if (a > b) {
@@ -163,7 +163,7 @@ static inline s32 cmpSign(s32 a, s32 b) {
 void monteCountDisp(void) {
 	static s32 monte_snd_flag;
 	s32 y = -0xB4;
-	u32 flags = yuwp->field_0x0;
+	u32 flags = yuwp->flags;
 	Mtx mtx;
 	GXColor c1, c2, c3, c4;
 	if (flags & 4) y = -0x78;
@@ -180,11 +180,11 @@ void monteCountDisp(void) {
 		iconDispGxCol(mtx, 0x10, 0x1D6, c3);
 		PSMTXTrans(mtx, -128.0f, (f32)(y + 2), 0.0f);
 		c4 = (GXColor){255, 255, 255, 255};
-		iconNumberDispGx(mtx, yuwp->field_0x10, 0, c4);
-		yuwp->field_0xC++;
-		if ((yuwp->field_0xC & 3) == 0) {
-			y = yuwp->tokens - yuwp->field_0x10;
-			yuwp->field_0xC = 0;
+		iconNumberDispGx(mtx, yuwp->dispTokens, 0, c4);
+		yuwp->dispTick++;
+		if ((yuwp->dispTick & 3) == 0) {
+			y = yuwp->tokens - yuwp->dispTokens;
+			yuwp->dispTick = 0;
 			if (monte_snd_flag == 0 && y != 0) {
 				psndSFXOn(0x8CA);
 				monte_snd_flag = 8;
@@ -193,10 +193,10 @@ void monteCountDisp(void) {
 				y = y / 10;
 				if (y == 0) {
 					s32 sg;
-					if ((s32)yuwp->tokens > (s32)yuwp->field_0x10) sg = 1; else sg = -1;
+					if ((s32)yuwp->tokens > (s32)yuwp->dispTokens) sg = 1; else sg = -1;
 					y = sg;
 				}
-				yuwp->field_0x10 += y;
+				yuwp->dispTokens += y;
 			}
 		}
 		if (monte_snd_flag != 0) monte_snd_flag--;
@@ -213,7 +213,7 @@ USER_FUNC(yuugijou_add_montemedal) {
 	} else {
 		yuwp->tokens = 0x1869F;
 	}
-	if (a != 0) yuwp->field_0x10 = yuwp->tokens;
+	if (a != 0) yuwp->dispTokens = yuwp->tokens;
 	return EVT_RETURN_DONE;
 }
 
@@ -224,10 +224,10 @@ USER_FUNC(yuugijou_get_montemedal) {
 
 USER_FUNC(yuugijou_get_montemedal_keep) {
 	s32* args = event->args;
-	if (yuwp->field_0x0 & 2) {
+	if (yuwp->flags & 2) {
 		evtSetValue(event, args[0], 0);
 	} else {
-		evtSetValue(event, args[0], yuwp->field_0x4);
+		evtSetValue(event, args[0], yuwp->keptTokens);
 	}
 	return EVT_RETURN_DONE;
 }
@@ -235,50 +235,50 @@ USER_FUNC(yuugijou_get_montemedal_keep) {
 USER_FUNC(yuugijou_add_montemedal_moto) {
 	s32* args = event->args;
 	evtGetValue(event, args[0]);
-	if (yuwp->field_0x0 & 2) {
-		yuwp->field_0x4 += evtGetValue(event, args[1]);
+	if (yuwp->flags & 2) {
+		yuwp->keptTokens += evtGetValue(event, args[1]);
 	}
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuugijou_montemedal_disp_onoff) {
 	if (evtGetValue(event, event->args[0]) != 0) {
-		yuwp->field_0x0 |= 1;
-		yuwp->field_0x10 = yuwp->tokens;
+		yuwp->flags |= 1;
+		yuwp->dispTokens = yuwp->tokens;
 	} else {
-		yuwp->field_0x0 &= ~1;
+		yuwp->flags &= ~1;
 	}
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuugijou_montemedal_wait) {
-	if ((s32)yuwp->field_0x10 != yuwp->tokens) return EVT_RETURN_BLOCK;
+	if ((s32)yuwp->dispTokens != yuwp->tokens) return EVT_RETURN_BLOCK;
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuugijou_montemedal_keep) {
-	if (yuwp->field_0x0 & 2) {
-		yuwp->field_0x4 = yuwp->tokens;
+	if (yuwp->flags & 2) {
+		yuwp->keptTokens = yuwp->tokens;
 		yuwp->tokens = 0;
-		yuwp->field_0x10 = 0;
-		yuwp->field_0x0 &= ~2;
-		yuwp->field_0x0 &= ~1;
+		yuwp->dispTokens = 0;
+		yuwp->flags &= ~2;
+		yuwp->flags &= ~1;
 	}
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuugijou_montemedal_return) {
-	if (!(yuwp->field_0x0 & 2)) {
-		yuwp->field_0x10 = yuwp->tokens = yuwp->field_0x4;
-		yuwp->field_0x0 |= 2;
-		yuwp->field_0x0 |= 1;
+	if (!(yuwp->flags & 2)) {
+		yuwp->dispTokens = yuwp->tokens = yuwp->keptTokens;
+		yuwp->flags |= 2;
+		yuwp->flags |= 1;
 	}
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuugijou_get_takeoutflag) {
 	s32* args = event->args;
-	if (yuwp->field_0x0 & 2) {
+	if (yuwp->flags & 2) {
 		evtSetValue(event, args[0], 1);
 	} else {
 		evtSetValue(event, args[0], 0);
@@ -288,15 +288,15 @@ USER_FUNC(yuugijou_get_takeoutflag) {
 
 USER_FUNC(yuugijou_set_yupflag) {
 	if (evtGetValue(event, event->args[0]) != 0) {
-		yuwp->field_0x0 |= 4;
+		yuwp->flags |= 4;
 	} else {
-		yuwp->field_0x0 &= ~4;
+		yuwp->flags &= ~4;
 	}
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(yuuminigame_window_end) {
-	yuwp->field_0x0 |= 8;
+	yuwp->flags |= 8;
 	return EVT_RETURN_DONE;
 }
 
@@ -315,10 +315,10 @@ void unk_8022439c(s32 value) {
 }
 
 void evtYuuWindow(void) {
-	yuwp->field_0x0 &= ~8;
+	yuwp->flags &= ~8;
 	evtEntryType(window_open, 0, 0, 0);
 }
 
 s32 evtYuuWindowEndChk(void) {
-	return (yuwp->field_0x0 >> 3) & 1;
+	return (yuwp->flags >> 3) & 1;
 }

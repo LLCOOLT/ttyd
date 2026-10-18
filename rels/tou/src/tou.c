@@ -2502,13 +2502,12 @@ static f32 camGetRy(void) {
 }
 
 USER_FUNC(tou_champion_belt_27_text_34) {
-    void** new_var2;
+    void** new_var2; // FAKE: alias of &eff->userdata; a typed StarStoneWork* local or direct eff->userdata changes codegen
     EffectEntry* eff;
     s32 idx;
     Vec* positions;
     NpcEntry* npc;
     f32 angle;
-    float new_var;
     AnimationPose* pose;
 
     npc = npcNameToPtr((const char*)evtGetValue(event, event->args[0]));
@@ -2524,11 +2523,10 @@ USER_FUNC(tou_champion_belt_27_text_34) {
     angle = reviseAngle(camGetRy() - pose->rotationY);
     eff = event->userdatap[0];
     new_var2 = &eff->userdata;
-    new_var = -90.0f;
     ((StarStoneWork*)(*new_var2))->pos.x = positions[idx].x;
     ((StarStoneWork*)(*new_var2))->pos.y = positions[idx].y;
     ((StarStoneWork*)(*new_var2))->pos.z = positions[idx].z;
-    if ((angle > 90.0f && angle <= 270.0f) || (angle < new_var && angle >= -270.0f)) {
+    if ((angle > 90.0f && angle <= 270.0f) || (angle < -90.0f && angle >= -270.0f)) {
         ((StarStoneWork*)(*new_var2))->rot = 8.0f - (angle + camGetPtr(CAMERA_3D)->viewYaw);
     } else {
         ((StarStoneWork*)(*new_var2))->rot = -(angle + camGetPtr(CAMERA_3D)->viewYaw) - 8.0f;

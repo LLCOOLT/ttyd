@@ -264,7 +264,7 @@ extern s32 _move_to_badge_point_event[];
 
 void btlseqEnd(BattleWork* wp) {
     SeqEndWork* work = *(SeqEndWork**)((u8*)wp + 0xF28);
-    FieldBattleInfo* info = *(FieldBattleInfo**)((u8*)wp + 0x2738);
+    FieldBattleInfo* info = wp->fbatInfo;
     PouchData* pouch = pouchGetPtr();
 
     _audience_Whistle_control();
@@ -277,9 +277,9 @@ void btlseqEnd(BattleWork* wp) {
         SeqEndWork* nw;
         btlsubResetMoveColorLvAll(wp);
         mu = BattleGetMarioPtr(wp);
-        marioBelong = BP(s8, mu, 0xC);
+        marioBelong = mu->mAlliance;
         enemyBelong = BtlUnit_GetEnemyBelong(mu);
-        flags = *(u32*)((u8*)wp + 0xEF4);
+        flags = wp->flags;
         if (flags & 0x40) {
             BattleInformationSetResult(info, 4);
         } else if (flags & 0x20) {
@@ -357,7 +357,7 @@ void btlseqEnd(BattleWork* wp) {
     }
     case 0x7000002:
         if (!fadeIsFinish()) break;
-        if (!(BP(u32, BP(void*, BP(void*, wp, 0x2738), 0xC), 4) & 0x40)) {
+        if (!(BP(u32, BP(void*, wp->fbatInfo, 0xC), 4) & 0x40)) {
             seqSetSeq(SEQ_GAME_OVER, (const char*)1, NULL);
             break;
         }
@@ -384,8 +384,8 @@ void btlseqEnd(BattleWork* wp) {
             EventEntry* e;
             if (!p2) break;
             e = evtEntry(BtlUnit_GetData(p2, 3), 10, 0);
-            BP(s32, e, 0x160) = BP(s32, p2, 0);
-            BP(s32, p2, 0x2A4) = BP(s32, e, 0x15C);
+            BP(s32, e, 0x160) = p2->unitId;
+            p2->attackEventId = BP(s32, e, 0x15C);
             break;
         }
         SS(0x7000006);
@@ -401,12 +401,12 @@ void btlseqEnd(BattleWork* wp) {
         mario = BattleGetMarioPtr(wp);
         if (BP(u8, pp, 0x5BA) == 3) {
             EventEntry* e;
-            BP(u8, wp, 0x18FE1) = 3;
+            wp->majinaiState = 3;
             BattleMajinaiDone();
             BattleMajinaiEndCheck();
             e = evtEntry(marioAttackEvent_MajinaiExpUp, 10, 0);
-            BP(s32, e, 0x160) = BP(s32, mario, 0);
-            BP(s32, mario, 0x2A4) = BP(s32, e, 0x15C);
+            BP(s32, e, 0x160) = mario->unitId;
+            mario->attackEventId = BP(s32, e, 0x15C);
             SS(0x7000007);
             break;
         }
@@ -422,7 +422,7 @@ void btlseqEnd(BattleWork* wp) {
         BattleFogForceStop();
         BP(s32, work, 0xC) = 0;
         BP(s16, work, 0x8) = BattleGetStockExp(wp);
-        if (BP(u8, wp, 0x18FE1) == 3) {
+        if (wp->majinaiState == 3) {
             BP(s16, work, 0x8) = BP(s16, work, 0x8) * 2;
         }
         if (BP(s16, pouch, 0x8A) >= 99) {
@@ -438,7 +438,7 @@ void btlseqEnd(BattleWork* wp) {
         }
         BP(s32, work, 4) = 0x78;
         btl_camera_set_moveSpeedLv(0, 2);
-        if (!(BP(u32, wp, 0xEF4) & 0x100)) {
+        if (!(wp->flags & 0x100)) {
             btl_camera_set_mode(0, 0x11);
         } else {
             btl_camera_set_mode(0, 0x12);
@@ -474,14 +474,14 @@ void btlseqEnd(BattleWork* wp) {
             BattleUnit* party = BattleGetPartyPtr(wp);
             EventEntry* e = evtEntry(BtlUnit_GetData(mario, 0x40), 10, 0);
             if (e) {
-                BP(s32, e, 0x160) = BP(s32, mario, 0);
-                BP(s32, mario, 0x2A4) = BP(s32, e, 0x15C);
+                BP(s32, e, 0x160) = mario->unitId;
+                mario->attackEventId = BP(s32, e, 0x15C);
             }
             if (party) {
                 e = evtEntry(BtlUnit_GetData(party, 0x40), 10, 0);
                 if (e) {
-                    BP(s32, e, 0x160) = BP(s32, party, 0);
-                    BP(s32, party, 0x2A4) = BP(s32, e, 0x15C);
+                    BP(s32, e, 0x160) = party->unitId;
+                    party->attackEventId = BP(s32, e, 0x15C);
                 }
             }
             if (!BP(EffectEntry*, work, 0x29C)) {
@@ -490,7 +490,7 @@ void btlseqEnd(BattleWork* wp) {
             SS(0x700000B);
             break;
         }
-        if (!(BP(u32, wp, 0xEF4) & 0x400000)) {
+        if (!(wp->flags & 0x400000)) {
             SS(0x7000019);
             break;
         }
@@ -547,11 +547,11 @@ void btlseqEnd(BattleWork* wp) {
         SS(0x700000E);
         break;
     case 0x700000E:
-        if (BP(u32, wp, 0xEF4) & 0x400000) {
+        if (wp->flags & 0x400000) {
             BattleUnit* mario = BattleGetMarioPtr(wp);
             EventEntry* e = evtEntry(_event_MajinaiEnd, 10, 0);
-            BP(s32, e, 0x160) = BP(s32, mario, 0);
-            BP(s32, mario, 0x2A4) = BP(s32, e, 0x15C);
+            BP(s32, e, 0x160) = mario->unitId;
+            mario->attackEventId = BP(s32, e, 0x15C);
             SS(0x700000F);
             break;
         }
@@ -714,10 +714,10 @@ void btlseqEnd(BattleWork* wp) {
             if (id != 0 && id < 8) {
                 void* pe = (u8*)pouch + id * 0xE;
                 BP(s16, pe, 6) = BP(s16, pe, 2);
-                BP(s16, party, 0x10C) = BP(s16, party, 0x108);
+                party->currentHp = party->maxHp;
             }
         }
-        fd = BP(void*, BP(void*, wp, 0x2738), 0xC);
+        fd = BP(void*, wp->fbatInfo, 0xC);
         ok = 1;
         mario = BattleGetMarioPtr(wp);
         party2 = BattleGetPartyPtr(wp);
@@ -743,10 +743,10 @@ void btlseqEnd(BattleWork* wp) {
         mario = BattleGetMarioPtr(wp);
         party = BattleGetPartyPtr(wp);
         if (mario) {
-            effRecoveryEntry(4, 0, BP(f32, mario, 0x3C), 40.0f + BP(f32, mario, 0x40), BP(f32, mario, 0x44));
+            effRecoveryEntry(4, 0, mario->mPosition.x, 40.0f + mario->mPosition.y, mario->mPosition.z);
         }
         if (party) {
-            effRecoveryEntry(4, 0, BP(f32, party, 0x3C), 40.0f + BP(f32, party, 0x40), BP(f32, party, 0x44));
+            effRecoveryEntry(4, 0, party->mPosition.x, 40.0f + party->mPosition.y, party->mPosition.z);
         }
         break;
     }
@@ -755,7 +755,7 @@ void btlseqEnd(BattleWork* wp) {
         if (BP(s32, work, 4) == 0x78) {
             BattleUnit* mario = BattleGetMarioPtr(wp);
             if (mario) {
-                effRecoveryEntry(5, 0, BP(f32, mario, 0x3C), 40.0f + BP(f32, mario, 0x40), BP(f32, mario, 0x44));
+                effRecoveryEntry(5, 0, mario->mPosition.x, 40.0f + mario->mPosition.y, mario->mPosition.z);
             }
         }
         if (BP(s32, work, 4) > 0) break;
@@ -779,7 +779,7 @@ void btlseqEnd(BattleWork* wp) {
         break;
     case 0x7000019: {
         s32 ok = 1;
-        void* fd = BP(void*, BP(void*, wp, 0x2738), 0xC);
+        void* fd = BP(void*, wp->fbatInfo, 0xC);
         BattleUnit* mario = BattleGetMarioPtr(wp);
         BattleUnit* party = BattleGetPartyPtr(wp);
         if ((BP(u32, mario, 0x138) & 0x10000000) || (BP(u32, mario, 0x138) & 0x20000000)) {
@@ -807,7 +807,7 @@ void btlseqEnd(BattleWork* wp) {
         BtlUnit_SetBodyAnimType(BattleGetMarioPtr(wp), 0x2A);
         if (BattleGetPartyPtr(wp)) {
             BattleUnit* party = BattleGetPartyPtr(wp);
-            if (BP(s32, party, 8) != 0xE1 || BP(s8, party, 0x12B) < 1) {
+            if (BP(s32, party, 8) != 0xE1 || party->flippedTurns < 1) {
                 BtlUnit_SetBodyAnimType(BattleGetPartyPtr(wp), 0x2A);
             }
         }
@@ -845,13 +845,13 @@ void btlseqEnd(BattleWork* wp) {
         void* pe;
         if (party) kind = BP(s32, party, 8); else kind = 0;
         id = BattleTransPartyId(kind);
-        fd = BP(void*, BP(void*, wp, 0x2738), 0xC);
+        fd = BP(void*, wp->fbatInfo, 0xC);
         mario = BattleGetMarioPtr(wp);
         if (BP(u32, fd, 4) & 0x40) {
-            if (BP(s16, mario, 0x10C) <= 0) BP(s16, mario, 0x10C) = 1;
+            if (mario->currentHp <= 0) mario->currentHp = 1;
         }
         BattleSetMarioParamToFieldBattle(wp);
-        BattleFree(BP(void*, wp, 0xF28));
+        BattleFree(wp->seqEndWork);
         BP(s32, wp, 0xF28) = 0;
         BattleSetSeq(wp, (BattleSequence)0, 4);
         mw = marioGetPtr();
@@ -941,7 +941,7 @@ void _MarioExpDisp(CameraId camId, void* param) {
 
 void _LvupParamConfirmDisp(CameraId camId, void* param) {
     Vec pos; f32 zero = 0.0f; u32 len; s32 *new_var; f32 w; char buf[0x14]; SeqEndWork* work = SEW((BattleWork*)param);
-    new_var = &work->cursor;
+    new_var = &work->cursor; // FAKE: pointer to the field; direct work->cursor differs
     pouchGetPtr();
     sprintf(buf, msgSearch("btl_msg_lvup_ok"));
     len = strlen(buf); ((void (*)(f32, f32, f32, f32, f32, u16, GXColor))windowDispGX_Waku_col)(-30.0f - (w = 6.25f * len), 30.0f, 12.5f * len + 65.0f, 32.0f, 10.0f, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
@@ -1028,7 +1028,7 @@ void _GetExpIcon_Init(SeqEndWork* work) {
 }
 
 void _GetExpIcon_Main(BattleWork* wp) {
-    s32 new_var[2];
+    s32 new_var[2]; // FAKE: register-promoted array (tens, ones); two scalars differ
     SeqEndWork* work = SEW(wp);
     s32 exp = work->expDisp;
     s32 i;
@@ -1259,7 +1259,7 @@ USER_FUNC(_nozzle_set_offset) {
     ofs = evtGetFloat(event, args[1]);
     obj = BattleSearchObjectPtr(name);
     if (obj) {
-        obj->field_0x10.y = ofs;
+        obj->positionOffset.y = ofs;
     }
     return 2;
 }
@@ -1299,7 +1299,7 @@ USER_FUNC(_disable_enemy_unit_disp) {
     }
     obj = BattleSearchObjectPtr("if_body");
     if (obj) {
-        *((u8*)wp + 0x180DC) |= 0x20;
+        wp->field_180DC |= 0x20;
         obj->mFlags |= 1;
         mapGrpFlagOn("if_body", 1);
         mapGrpFlagOn("if_wire", 1);
@@ -1390,7 +1390,7 @@ USER_FUNC(_lvup_spot_on) {
         break;
     }
     case 3:
-        if (1) {
+        {
             Vec v = {0.0f, -10.0f, -50.0f};
             v.x = 25.0f * n + -50.0f;
             e->pos = v;

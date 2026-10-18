@@ -72,44 +72,53 @@ typedef struct PartyEntry {
     s32 paperAnimGroup;          // 0xC
     s32 field_10;                // 0x10
     s32 paperPoseId;             // 0x14
-    char* field_18;              // 0x18
+    char* animName;              // 0x18, current pose name (strcmp'd with "PYS_S_2" etc.)
     u32 field_1C;                // 0x1C, unsigned
     u16 field_20;                // 0x20
-    u8 field_22[0x28 - 0x22];    // 0x22
+    u8 field_22[0x24 - 0x22];    // 0x22
+    s32 moveFrames;              // 0x24, frames left in a move/jump (16 at jump start)
     s16 field_28;                // 0x28
     u8 field_2A[0x2F - 0x2A];    // 0x2A
     s8 currentSlotId;            // 0x2F
     u8 field_30;                 // 0x30
     s8 currentMemberId;          // 0x31, PartyMembers
     u8 field_32[0x34 - 0x32];    // 0x32
-    u8 field_34;                 // 0x34
-    u8 field_35[0x37 - 0x35];    // 0x35
+    u8 runMode;                  // 0x34, partyChgRunMode
+    u8 prevRunMode;              // 0x35, saved by partyChgRunMode
+    u8 field_36;                 // 0x36
     u8 field_37;                 // 0x37
     u8 field_38;                 // 0x38
     u8 useMotionId;              // 0x39
     u8 field_3A[0x58 - 0x3A];    // 0x3A
     Vec position;                // 0x58
     u8 field_64[0x6C - 0x64];    // 0x64
-    f32 field_6C;                // 0x6C, rotation (degrees)
+    f32 rotation;                // 0x6C, degrees, fmod 360
     Vec scale;                   // 0x70
     u8 field_7C[0x8C - 0x7C];    // 0x7C
     f32 field_8C;                // 0x8C, half height times scale
-    u8 field_90[0xAC - 0x90];    // 0x90
+    u8 field_90[0x94 - 0x90];    // 0x90
+    Vec moveTarget;              // 0x94, move/jump destination (partyGetAppearPos)
+    u8 field_A0[0xAC - 0xA0];    // 0xA0
     f32 field_AC;                // 0xAC
     u8 field_B0[0xB4 - 0xB0];    // 0xB0
     f32 field_B4;                // 0xB4
     Vec field_B8;                // 0xB8
     u8 field_C4[0xF0 - 0xC4];    // 0xC4
-    f32 field_F0;                // 0xF0, height
+    f32 height;                  // 0xF0
     f32 width;                   // 0xF4
     u8 field_F8[0xFC - 0xF8];    // 0xF8
-    f32 field_FC;                // 0xFC
-    f32 field_100;               // 0x100
-    f32 field_104;               // 0x104
+    f32 moveDir;                 // 0xFC, copied from targetDir when moving
+    f32 targetDir;               // 0x100, angleABf from position to the move target
+    f32 moveSpeed;               // 0x104, distance/18 etc.
     u8 field_108[0x10C - 0x108]; // 0x108
-    f32 field_10C;               // 0x10C
-    f32 field_110;               // 0x110
-    u8 field_114[0x138 - 0x114]; // 0x114
+    f32 displayDirection;        // 0x10C, copied from MarioWork displayDirection
+    f32 displayDirectionTarget;  // 0x110, copied from MarioWork displayDirectionTarget
+    f32 velY;                    // 0x114, vertical velocity; jump ends when <= 0
+    f32 accelY;                  // 0x118, vertical acceleration (-dy at jump start, -1.6 when falling)
+    f32 gravity;                 // 0x11C, subtracted from velY each frame (1.6 / 0.4)
+    u8 field_120[0x128 - 0x120]; // 0x120
+    f32 moveDistance;            // 0x128, distABf to moveTarget; moveSpeed = moveDistance / moveFrames
+    u8 field_12C[0x138 - 0x12C]; // 0x12C
     struct HitEntry* field_138;  // 0x138, hit object stood on
     u8 field_13C[0x144 - 0x13C]; // 0x13C
     void* field_144;             // 0x144

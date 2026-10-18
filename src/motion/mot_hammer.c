@@ -59,7 +59,7 @@ inline BOOL chkRevDir(f32 angle) {
 	return ret;
 }
 
-#define HAM_DIR(mario, dst)                                         	{                                                               		f32 a = MF(0x1A8);                                          		MarioWork* p = marioGetPtr(); f32 r;                         		f32 off = 0.0f;                                             		if (p->dispFlags & 0x80000000) {                            			off = chkRevDir(p->unk1A8) ? 30.0f : -30.0f;            		} if (a >= 90.0f && a <= 270.0f) { r = revise360(180.0f + off); } else { r = revise360(off); } dst = r;                                                           	}
+#define HAM_DIR(mario, dst)                                         	{                                                               		f32 a = MF(0x1A8);                                          		MarioWork* p = marioGetPtr(); f32 r;                         		f32 off = 0.0f;                                             		if (p->dispFlags & 0x80000000) {                            			off = chkRevDir(p->displayDirection) ? 30.0f : -30.0f;            		} if (a >= 90.0f && a <= 270.0f) { r = revise360(180.0f + off); } else { r = revise360(off); } dst = r;                                                           	}
 
 static inline s32 hamLv(void) {
 	return pouchGetHammerLv();
@@ -135,7 +135,7 @@ void mot_hammer(void) {
 		hit = hitEstimate(&kind);
 		MI(0x200) = (s32)hit;
 		if (hit) {
-			f32 a = MF(0x1A8);
+			f32 a = mario->displayDirection;
 			f32 off = marioGetPtr()->dispFlags & 0x80000000 ? -30.0f : 0.0f;
 			f32 r;
 			if (a >= 90.0f && a <= 270.0f) {
@@ -143,7 +143,7 @@ void mot_hammer(void) {
 			} else {
 				r = toMovedir2(0.0f, off);
 			}
-			MF(0x1A0) = r;
+			mario->directionView = r;
 			HAM_DIR(mario, MF(0x2A4));
 		}
 		if (hitGetAttr(hit) & 0x80000000) {
@@ -196,12 +196,12 @@ void mot_hammer(void) {
 		if (a >= 90.0f && a <= 270.0f) {
 			r = TRUE;
 		}
-		MF(0x1A8) = r ? 180.0f : 0.0f;
+		mario->displayDirection = r ? 180.0f : 0.0f;
 	}
-	MF(0x1AC) = MF(0x1A8);
-	MF(0x19C) = toMovedir(MF(0x2A4));
+	mario->displayDirectionTarget = mario->displayDirection;
+	mario->moveDirection = toMovedir(MF(0x2A4));
 	done = 0;
-	MF(0x1A0) = MF(0x19C);
+	mario->directionView = mario->moveDirection;
 	if (mario->flags & 0x800) {
 		s32 t = MI(0x48);
 		s32 lim = MI(0x2A0);
@@ -237,23 +237,23 @@ void mot_hammer(void) {
 			efType = -1;
 			switch (MI(0x2A8)) {
 			case 7:
-				movePos(&px, &pz, 16.0f, toMovedir2(MF(0x1AC), 0.0f));
+				movePos(&px, &pz, 16.0f, toMovedir2(mario->displayDirectionTarget, 0.0f));
 				ez = 53.0f;
 				efType = 0x16;
 				break;
 			case 0:
 			case 6:
-				movePos(&px, &pz, 25.0f, toMovedir2(MF(0x1AC), 0.0f));
+				movePos(&px, &pz, 25.0f, toMovedir2(mario->displayDirectionTarget, 0.0f));
 				ez = -3.0f;
 				efType = 0x15;
 				break;
 			case 5:
-				movePos(&px, &pz, 31.0f, toMovedir2(MF(0x1AC), 0.0f));
+				movePos(&px, &pz, 31.0f, toMovedir2(mario->displayDirectionTarget, 0.0f));
 				ez = 5.0f;
 				efType = 0x15;
 				break;
 			case 4:
-				movePos(&px, &pz, 30.0f, toMovedir2(MF(0x1AC), 0.0f));
+				movePos(&px, &pz, 30.0f, toMovedir2(mario->displayDirectionTarget, 0.0f));
 				ez = 30.0f;
 				efType = 0x16;
 				break;
@@ -262,23 +262,23 @@ void mot_hammer(void) {
 			efType = -1;
 			switch (MI(0x2A8)) {
 			case 7:
-				movePos(&px, &pz, 16.0f, toMovedir2(MF(0x1AC), -2.0f));
+				movePos(&px, &pz, 16.0f, toMovedir2(mario->displayDirectionTarget, -2.0f));
 				ez = 53.0f;
 				efType = 0x16;
 				break;
 			case 0:
 			case 6:
-				movePos(&px, &pz, 30.0f, toMovedir2(MF(0x1AC), -6.0f));
+				movePos(&px, &pz, 30.0f, toMovedir2(mario->displayDirectionTarget, -6.0f));
 				ez = -3.0f;
 				efType = 0x15;
 				break;
 			case 5:
-				movePos(&px, &pz, 36.0f, toMovedir2(MF(0x1AC), -6.0f));
+				movePos(&px, &pz, 36.0f, toMovedir2(mario->displayDirectionTarget, -6.0f));
 				ez = 20.0f;
 				efType = 0x16;
 				break;
 			case 4:
-				movePos(&px, &pz, 37.0f, toMovedir2(MF(0x1AC), -6.0f));
+				movePos(&px, &pz, 37.0f, toMovedir2(mario->displayDirectionTarget, -6.0f));
 				ez = 28.0f;
 				efType = 0x16;
 				break;
@@ -372,7 +372,7 @@ s32 marioChkHammer2(void) {
 
 static inline void mot_ham(f32 a148, f32 a68) {
 	MarioWork* m = marioGetPtr();
-	m->unk148 = a148;
+	m->camShiftTargetZ = a148;
 	*(f32*)((u8*)m + 0x158) = 0.005f;
 	m->field_68 = a68;
 	m->field_6C = (Vec){0.0f, 40.0f, 0.0f};
@@ -434,16 +434,16 @@ void mot_hammer2(void) {
 		mario->dispFlags |= 4;
 		MB(0x41) = 0;
 		MB(0x42) = 0;
-		MF(0x180) = 0.0f;
-		MS(0x50) = 0;
+		mario->baseSpeed = 0.0f;
+		mario->airTimer = 0;
 		MI(0x44) = 1;
 		MI(0x48) = 30;
 		if (MB(0x42) == 3) {
-			MF(0x2A8) = 38.0f;
+			mario->wCamVal1 = 38.0f;
 		} else if (MB(0x42) <= 2) {
-			MF(0x2A8) = 15.0f;
+			mario->wCamVal1 = 15.0f;
 		} else {
-			MF(0x2A8) = 10.0f;
+			mario->wCamVal1 = 10.0f;
 		}
 		switch (pouchGetHammerLv()) {
 		case 1:
@@ -464,18 +464,18 @@ void mot_hammer2(void) {
 		if (--MI(0x48) > 0) {
 			break;
 		}
-		if (180.0f == MF(0x1AC) && MB(0x43) == 1) {
+		if (180.0f == mario->displayDirectionTarget && MB(0x43) == 1) {
 			mario->dispFlags |= 8;
 		}
-		if (0.0f == MF(0x1AC) && MB(0x43) == 0) {
+		if (0.0f == mario->displayDirectionTarget && MB(0x43) == 0) {
 			mario->dispFlags |= 0x10;
 		}
 		marioPaperOn("p_kaiten_h");
 		marioChgPaper("P_H_1C");
 		marioPaperLightOff();
-		MI(0x2B8) = psndSFXOn_3D(0x162, (Vec*)&MF(0x8C));
+		MI(0x2B8) = psndSFXOn_3D(0x162, (Vec*)&mario->position.x);
 		MF(0x2B0) = 0.0f;
-		MS(0x28) = 0;
+		mario->poseTime = 0;
 		animPoseSetLocalTime(mario->paperAnimGroupId[marioAnimeId()], MF(0x2B0));
 		MI(0x44) = 10;
 		MI(0x48) = 30;
@@ -531,7 +531,7 @@ void mot_hammer2(void) {
 			}
 			{
 				MarioWork* m = marioGetPtr();
-				m->unk148 = 0.0f;
+				m->camShiftTargetZ = 0.0f;
 				*(f32*)((u8*)m + 0x158) = 0.01f;
 			}
 			switch (pouchGetHammerLv()) {
@@ -556,33 +556,33 @@ void mot_hammer2(void) {
 			}
 			MS(0x2A4) = 0;
 			if (MB(0x42) == 3) {
-				MF(0x2A8) = 38.0f;
+				mario->wCamVal1 = 38.0f;
 			} else if (MB(0x42) == 2) {
-				MF(0x2A8) = 22.0f;
+				mario->wCamVal1 = 22.0f;
 			} else if (MB(0x42) <= 1) {
-				MF(0x2A8) = 15.0f;
+				mario->wCamVal1 = 15.0f;
 			}
-			((EffectEntry* (*)(f32, f32, f32, f32, BOOL, s32))effUltraHammerEntry)(MF(0x8C), 20.0f + MF(0x90), MF(0x94), 1.0f, MB(0x43) != 0, MI(0x48));
+			((EffectEntry* (*)(f32, f32, f32, f32, BOOL, s32))effUltraHammerEntry)(mario->position.x, 20.0f + mario->position.y, mario->position.z, 1.0f, MB(0x43) != 0, MI(0x48));
 		}
 		break;
 	case 20:
-		ang = MF(0x1A8);
+		ang = mario->displayDirection;
 		MS(0x2A4) = 10;
 		mario->dispFlags |= 0x100;
-		ang2 = revise360(270.0f - MF(0x1A8));
+		ang2 = revise360(270.0f - mario->displayDirection);
 		hit = hammerHitWall(ang2, &s, &co, &len, &hx, &hy, &hz, &nx, &ny, &nz);
 		if (hit && (hitGetAttr(hit) & 0x800005)) {
-			ang = ang;
+			ang = ang; // FAKE: self-assignment keeps the branch; removing it (or the if) changes codegen
 		}
 		if (hit) {
 			MI(0x1FC) = (s32)hit;
 		}
-		MF(0x1A8) = MF(0x2A8) * (MB(0x43) ? -1.0f : 1.0f) + MF(0x1A8);
-		if ((s32)ang / 360 != (s32)MF(0x1A8) / 360) {
-			psndSFXOn_3D(0x163, (Vec*)&MF(0x8C));
+		mario->displayDirection = mario->wCamVal1 * (MB(0x43) ? -1.0f : 1.0f) + mario->displayDirection;
+		if ((s32)ang / 360 != (s32)mario->displayDirection / 360) {
+			psndSFXOn_3D(0x163, (Vec*)&mario->position.x);
 		}
 		if (MS(0x2A4) == 1) {
-			psndSFXOn_3D(0x163, (Vec*)&MF(0x8C));
+			psndSFXOn_3D(0x163, (Vec*)&mario->position.x);
 		}
 		MI(0x48)--;
 		if (MB(0x42) > 2 && MI(0x48) == 10) {
@@ -594,7 +594,7 @@ void mot_hammer2(void) {
 		if (MB(0x42) <= 2) {
 			MI(0x48) = sysMsec2Frame(300);
 		} else {
-			MF(0x1A8) = revise360(MF(0x1A8));
+			mario->displayDirection = revise360(mario->displayDirection);
 			marioAdjustMoveDir();
 			MI(0x48) = 30;
 		}
@@ -605,7 +605,7 @@ void mot_hammer2(void) {
 		}
 		if (MB(0x42) <= 2) {
 			H2_CLR_PAPER()
-			MF(0x1A8) = revise360(MF(0x1A8));
+			mario->displayDirection = revise360(mario->displayDirection);
 			marioAdjustMoveDir();
 		}
 		mario->dispFlags &= ~0x100;
@@ -637,7 +637,7 @@ f32 marioGetAngleKaitenHammer(void) {
 	if ((s32)mario->currSubMotionId != 0x14) {
 		return -2.0f;
 	}
-	return revise360(270.0f - mario->unk1A8);
+	return revise360(270.0f - mario->displayDirection);
 }
 
 
@@ -648,7 +648,7 @@ void mot_ham2_post(void) {
 	}
 	{
 		MarioWork* m = marioGetPtr();
-		m->unk148 = 0.0f;
+		m->camShiftTargetZ = 0.0f;
 		*(f32*)((u8*)m + 0x158) = 0.01f;
 	}
 	marioPaperOff();
@@ -677,7 +677,7 @@ HitEntry *hitEstimate(s32 *out)
   f32 k5 = 5.0f;
   mario = marioGetPtr();
   *out = 0;
-  a = mario->unk1A8;
+  a = mario->displayDirection;
   {
     f32 off = (marioGetPtr()->dispFlags & 0x80000000) ? (-20.0f) : (0.0f);
     if ((a >= 90.0f) && (a <= 270.0f))
@@ -751,7 +751,7 @@ HitEntry *hitEstimate(s32 *out)
   {
     Vec dir4 = {0.0f, 0.0f, 0.0f};
     dir4.y = -cy;
-    new_var = dir4;
+    new_var = dir4; // FAKE: Vec copy through a temp; Vec dir4b = dir4 differs
     {
       Vec dir4b = new_var;
       for (i = 0; i < 2; i++)

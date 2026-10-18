@@ -363,7 +363,7 @@ void effBoobooDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx scl;
     Mtx rot;
     CameraEntry* camera;
-    s32 new_var[2];
+    s32 new_var[2]; // FAKE: register-promoted array (anim id + time*30); separate scalars differ
     EffBoobooN64Work* work;
     s32 i;
 

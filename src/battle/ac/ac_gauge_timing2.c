@@ -62,7 +62,7 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
   BOOL pressed;
   const char *sfxNg;
   BOOL allDone;
-  const char *new_var[2];
+  const char *new_var[2]; // FAKE: register-promoted array of the two SFX names; separate scalars swap regs
   BOOL found;
   s32 i3;
   s32 i4;
@@ -111,17 +111,17 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       break;
 
     case 100:
-      if ((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction))
+      if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction))
     {
       if (irand(100) >= 0)
       {
-        work->actionCommands.field_0x8 = 30;
+        work->actionCommands.setupParam = 30;
         gw->miss = 0;
       }
       else
       {
         gw->miss = 1;
-        work->actionCommands.field_0x8 = 30;
+        work->actionCommands.setupParam = 30;
       }
       work->actionCommands.mAcState = 1001;
       break;
@@ -252,8 +252,8 @@ s32 battleAcMain_GaugeTiming2(BattleWork *work)
       break;
 
     case 1001:
-      work->actionCommands.field_0x8--;
-      if (work->actionCommands.field_0x8 < 0)
+      work->actionCommands.setupParam--;
+      if (work->actionCommands.setupParam < 0)
     {
       if (gw->miss)
       {

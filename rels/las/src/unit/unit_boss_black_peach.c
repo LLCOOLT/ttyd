@@ -4513,33 +4513,33 @@ USER_FUNC(peach_talk_synchro_shadow_head_evt) {
     BattleUnitPart* part;
 
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0 || strcmp((char*)part->field_0x1C4, "KRT_T_2") == 0 ||
-        strcmp((char*)part->field_0x1C4, "KRT_T_3") == 0) {
+    if (strcmp(part->poseName, "KRT_T_1") == 0 || strcmp(part->poseName, "KRT_T_2") == 0 ||
+        strcmp(part->poseName, "KRT_T_3") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0) {
+        if (strcmp(part->poseName, "KRT_T_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_T_1");
             return 0;
         }
     }
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 1);
-    if (strcmp((char*)part->field_0x1C4, "KRT_T_1") != 0 && strcmp((char*)part->field_0x1C4, "KRT_T_2") != 0 &&
-        strcmp((char*)part->field_0x1C4, "KRT_T_3") != 0) {
+    if (strcmp(part->poseName, "KRT_T_1") != 0 && strcmp(part->poseName, "KRT_T_2") != 0 &&
+        strcmp(part->poseName, "KRT_T_3") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part->field_0x1C4, "KRT_T_1") == 0) {
+        if (strcmp(part->poseName, "KRT_T_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") == 0) {
+    if (strcmp(BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->poseName, "KRT_D_1") == 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") != 0) {
+        if (strcmp(part->poseName, "KRT_D_1") != 0) {
             BtlUnit_SetAnim(part, "KRT_D_1");
             return 0;
         }
     }
-    if (strcmp((char*)BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->field_0x1C4, "KRT_D_1") != 0) {
+    if (strcmp(BattleGetUnitPartsPtr(BattleTransID(event, -2), 1)->poseName, "KRT_D_1") != 0) {
         part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
-        if (strcmp((char*)part->field_0x1C4, "KRT_D_1") == 0) {
+        if (strcmp(part->poseName, "KRT_D_1") == 0) {
             BtlUnit_SetAnim(part, "KRT_S_1");
             return 0;
         }
@@ -4570,11 +4570,11 @@ USER_FUNC(shadow_queen_connect) {
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 3);
     BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 5);
-    *(f32*)((u8*)part + 0x4F8) = 7.0f;
+    part->dispZOffset = 7.0f;
     BtlUnit_SetPartsPos(part, wpos[wk->idx[0]].x, wpos[wk->idx[0]].y, wpos[wk->idx[0]].z);
     wpos = *animPoseGetAnimPosePtr(wk->poseId[1])->worldPositions;
     part = BattleGetUnitPartsPtr(BattleTransID(event, -2), 4);
-    *(f32*)((u8*)part + 0x4F8) = 1.0f;
+    part->dispZOffset = 1.0f;
     BtlUnit_SetPartsPos(part, wpos[wk->idx[1]].x, wpos[wk->idx[1]].y, wpos[wk->idx[1]].z);
     return 0;
 }

@@ -27,8 +27,8 @@
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; Vec field_0x30; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; Vec field_0x30; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
@@ -723,19 +723,19 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (mario->wPlayerCollisionBox.x + 20.0f) / 2
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
-        && wp->field_0x558 < 2) {
+        && wp->bounceCount < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
             marioChgMot(5);
         }
-        wp->field_0x558++;
+        wp->bounceCount++;
         return 1;
     }
     if (!(mario->flags & 0x30000)) {
-        wp->field_0x558 = 0;
+        wp->bounceCount = 0;
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         f32 r2; f32 t; cam = camGetPtr(CAMERA_3D);
-        t = cam->viewYaw; r2 = 6.2831855f * reviseAngle((f32)(mario->unk1A8 - 90.0f) + t) / 360.0f;
+        t = cam->viewYaw; r2 = 6.2831855f * reviseAngle((f32)(mario->displayDirection - 90.0f) + t) / 360.0f;
         angle = 35.0f * moa_sin(r2) + mario->position.x;
         dist = mario->position.z - 35.0f * moa_cos(r2);
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], angle, dist) < 35.0f) {
@@ -774,8 +774,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
     range = (mario->wPlayerCollisionBox.x + 20.0f) / 2;
     if (PSVECDistance(&e, &f) < range) {
-        pose->mtx[0][3] = moa->field_0x28;
-        pose->mtx[2][3] = moa->field_0x2c;
+        pose->mtx[0][3] = moa->lastX;
+        pose->mtx[2][3] = moa->lastZ;
         {
             f32 (*m)[4] = pose->mtx;
             f = (Vec){m[0][3], m[1][3], m[2][3]};
@@ -838,12 +838,12 @@ static void ext_moamoa_main(void) {
         wp->field_0x40 = 0;
     }
     if (mario->currMotionId == 0) {
-        wp->field_0x42++;
-        if (wp->field_0x42 > 1000) {
-            wp->field_0x42 = 1000;
+        wp->idleFrames++;
+        if (wp->idleFrames > 1000) {
+            wp->idleFrames = 1000;
         }
     } else {
-        wp->field_0x42 = 0;
+        wp->idleFrames = 0;
     }
     if (party->flags & 0x100) {
         wp->flags |= 0x10;
@@ -860,7 +860,7 @@ static void ext_moamoa_main(void) {
         wp->breathPos.z = party->position.z - wp->breathDist * moa_cosx(6.2831855f * wp->breathDir / 360.0f);
     }
 
-    if (wp->field_0x38 > 250) {
+    if (wp->hitCount > 250) {
         s32 j;
         Moamoa* mm;
         extGetPosePtr();
@@ -888,13 +888,13 @@ static void ext_moamoa_main(void) {
             if (ret == 1) {
                 moa->flags |= 4;
                 moa->state = 36;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 hit = 1;
             } else if (ret == 2 || ret == 4) {
                 moa->flags |= 0xc;
                 moa->state = 47;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 if (ret != 4) {
                     hit = 1;
@@ -911,7 +911,7 @@ static void ext_moamoa_main(void) {
                 moa->speed = randf(0.03f, 0.06f);
                 moa->gravity = spd * -moa_cosx(rad);
                 moa->jumpTimer = 120;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(moa, "c_n_moa_a", "D_1");
                 hit = 1;
             }
@@ -1100,7 +1100,7 @@ static void ext_moamoa_main(void) {
                     moa->state = 62;
                     break;
                 }
-                if (wp->field_0x38 < 250) {
+                if (wp->hitCount < 250) {
                     PSMTXIdentity(pose->mtx);
                     pose->mtx[0][3] = wp->target[i % 3].x;
                     pose->mtx[1][3] = wp->target[i % 3].y;
@@ -1181,8 +1181,8 @@ static void ext_moamoa_main(void) {
             if (pose->mtx[2][3] > 70.0f) pose->mtx[2][3] = 70.0f;
             if (pose->mtx[2][3] < -70.0f) pose->mtx[2][3] = -70.0f;
         }
-        moa->field_0x28 = pose->mtx[0][3];
-        moa->field_0x2c = pose->mtx[2][3];
+        moa->lastX = pose->mtx[0][3];
+        moa->lastZ = pose->mtx[2][3];
     }
     moamoa_pose_main();
     if (wp->flags & 0x10) {

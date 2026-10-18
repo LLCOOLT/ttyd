@@ -102,7 +102,7 @@ void _btlSamplingEnemy(DetWork* d) {
                 if ((unit->mAttributeFlags & 1) && !(part->attributes & 0x20000)) {
                     t->score += d->direction * 300;
                 }
-                t->score += part->field_0x1A0 * dir;
+                t->score += part->hitOffsetX * dir;
                 t->x = (s16)(ox + t->score);
                 t->y = (s16)oy;
                 t->z = (s16)oz;

@@ -111,9 +111,10 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     int hex_exp_negative = 0;
     int count = 0;
     int spaces = 0;
-    int exp_value = 0;
+    int exp_value;
     int dec_exp = 0;
     int inf_index;
+    exp_value = 0;
     *overflow = 0;
     c = fetch();
 

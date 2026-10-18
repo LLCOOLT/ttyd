@@ -94,7 +94,7 @@ void battleAcDisp_TimingA(CameraId cameraId, void* param) {
         case 1000:
         case 1001:
             if (*(s32*)&disp->field_0x1C[4] >= 40) {
-                new_var = 4;
+                new_var = 4; // FAKE: register-held index; also read uninitialized on the else path below. Literal 4 / slot = 4 at decl both differ
                 disp->iconX = intplGetValue(new_var, *(s32*)&disp->field_0x1C[new_var] - 40, 20, 30.0f, -300.0f);
             } else {
                 disp->iconX = 30.0f;
@@ -114,7 +114,7 @@ s32 battleAcResult_TimingA(BattleWork* work) {
     s32 successFrame = battleAcTimingA_GetSuccessFrame(work);
     s32 count = 0;
     s32 i;
-    if ((work->actionCommands.field_0x4 & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
+    if ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)) {
         if (irand(100) >= 0) {
             work->actionCommands.result = 0;
         } else {

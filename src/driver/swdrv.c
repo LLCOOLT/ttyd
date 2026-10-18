@@ -11,7 +11,7 @@
 extern GlobalWork* gp;
 
 void swInit(void) {
-	memset(gp->mGSFW, 0, sizeof(gp->mGSFW));
+	memset(gp->mGSWF, 0, sizeof(gp->mGSWF));
 	memset(gp->mGSW, 0, sizeof(gp->mGSW));
 	memset(gp->mLSWF, 0, sizeof(gp->mLSWF));
 	memset(gp->mLSW, 0, sizeof(gp->mLSW));
@@ -25,15 +25,15 @@ void swReInit(void) {
 
 //Global Saved Work Flags --------------------------------------
 void swSet(s32 index) { //set specific bit
-	gp->mGSFW[index / 32] |= (1 << (index % 32));
+	gp->mGSWF[index / 32] |= (1 << (index % 32));
 }
 
 BOOL swGet(s32 index) { //get specific bit
-	return (gp->mGSFW[index / 32] & (1 << (index % 32))) != 0;
+	return (gp->mGSWF[index / 32] & (1 << (index % 32))) != 0;
 }
 
 void swClear(s32 index) { //clear specific bit
-	gp->mGSFW[index / 32] &= ~(1 << (index % 32));
+	gp->mGSWF[index / 32] &= ~(1 << (index % 32));
 }
 
 //Global Saved Work --------------------------------------------

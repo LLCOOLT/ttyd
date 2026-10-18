@@ -121,10 +121,10 @@ s32 battleAcMain_ButtonDown(BattleWork* work) {
                 p->sndCount = 0;
                 p->timer = *(s32*)((u8*)work + 0x1cc8);
             case 1000:
-                if ((ac->field_0x4 & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8--;
-                        if (ac->field_0x8 >= 0) {
+                if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+                    if (ac->setupFlags & 2) {
+                        ac->setupParam--;
+                        if (ac->setupParam >= 0) {
                             break;
                         }
                     }

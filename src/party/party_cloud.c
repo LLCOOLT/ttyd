@@ -95,8 +95,8 @@ void cloudResetAt() {
     mario->dispFlags &= ~(1 << 8); //kDisableMakeDispDir
     mario->dispFlags &= ~(1 << 2); //kForceFrontPose
     marioAdjustMoveDir();
-    mario->unk150.x = 0.01f;
-    mario->unk138 = 0.0f;
+    mario->camShiftRate.x = 0.01f;
+    mario->camShiftTargetX = 0.0f;
 }
 
 u8 cloudGetStatus() {
@@ -131,7 +131,7 @@ f32 cloudGetBreathDir() {
     }
     else {
         PartyCloud* cloud = (PartyCloud*)party->useStruct;
-        breathDir = toMovedir(cloud->unk4);
+        breathDir = toMovedir(cloud->breathDir);
     }
     
     return breathDir;
@@ -158,10 +158,10 @@ f32 cloudGetBreathPower(f32 param_1, Vec* param_2) {
         && ((fabs(party->position.y - param_2->y - 18.0f)) <= val)
     ) {
         PartyCloud* cloud = (PartyCloud*)party->useStruct;
-        unk8 = cloud->unk8;
+        unk8 = cloud->breathDist;
         if (-((0.5f * param_1) - distABf(party->position.x, party->position.z, param_2->x, param_2->z)) <= unk8) {
             PartyCloud* cloud = (PartyCloud*)party->useStruct;
-            dist = toMovedir(cloud->unk4);
+            dist = toMovedir(cloud->breathDir);
             angle = angleABf(party->position.x, party->position.z, param_2->x, param_2->z);
             dist = revise360(angle - dist);
             
@@ -225,7 +225,7 @@ f32 cloudGetBreathDist() {
     }
     else {
         PartyCloud* cloud = (PartyCloud*)party->useStruct;
-        breathDist = cloud->unk8;
+        breathDist = cloud->breathDist;
     }
 
     return breathDist;
@@ -259,7 +259,7 @@ void cloud_move(PartyEntry* party) {
 void cloud_init(PartyEntry* party) {
     CLD_B(party, 0x33) = 5;
     CLD_B(party, 0x32) = 1;
-    party->field_F0 = 38.0f;
+    party->height = 38.0f;
     party->width = 24.0f;
     CLD_S(party, 0x174) = 0;
     CLD_S(party, 0x178) = 0;
@@ -281,7 +281,7 @@ void cloud_use(PartyEntry* party) {
     if (mot == 0x1B || mot <= 1 || mot == 2) {
         return;
     }
-    CLD_U(party, 0) &= ~0x100;
+    party->flags &= ~0x100;
     if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) != 0xFFFFFFFF) {
         psndSFXOff(CLD_S(CLD_P(party, 0x170), 0x34));
         CLD_S(CLD_P(party, 0x170), 0x34) = -1;
@@ -291,9 +291,9 @@ void cloud_use(PartyEntry* party) {
         CLD_P(party, 0x178) = NULL;
     }
     cloudCalcPos(party);
-    party->position = *(Vec*)&CLD_F(party, 0x94);
-    CLD_U(party, 4) |= 0x10;
-    CLD_U(party, 0) &= ~0x80000000;
+    party->position = *(Vec*)&party->moveTarget.x;
+    party->flags2 |= 0x10;
+    party->flags &= ~0x80000000;
     if (CLD_P(party, 0x170) != NULL) {
         __memFree(HEAP_DEFAULT, CLD_P(party, 0x170));
         CLD_P(party, 0x170) = NULL;
@@ -318,12 +318,12 @@ void N__cloud_use(PartyEntry* party) {
     f32 dir;
     u8* cl;
 
-    if (CLD_U(party, 8) & 8) {
-        CLD_U(party, 8) &= ~8;
+    if (party->field_8 & 8) {
+        party->field_8 &= ~8;
         CLD_S(party, 0x17C) = 0;
         CLD_S(party, 0x180) = 0;
         marioAdjustMoveDir();
-        CLD_B(party, 0x39) = 0;
+        party->useMotionId = 0;
         CLD_P(party, 0x170) = __memAlloc(HEAP_DEFAULT, 0x48);
         memset(CLD_P(party, 0x170), 0, 0x48);
         CLD_F(CLD_P(party, 0x170), 0) = 100.0f;
@@ -336,30 +336,30 @@ void N__cloud_use(PartyEntry* party) {
         if (CLD_P(party, 0x170) != NULL) {
             CLD_S(CLD_P(party, 0x170), 0x34) = -1;
         }
-        if (CLD_U(party, 0) & 0x80000000) {
-            CLD_S(CLD_P(party, 0x170), 0x30) = sysMsec2Frame(CLD_S(party, 0x16C));
+        if (party->flags & 0x80000000) {
+            CLD_S(CLD_P(party, 0x170), 0x30) = sysMsec2Frame(party->unk16C);
         }
     }
 
-    switch (CLD_B(party, 0x39)) {
+    switch (party->useMotionId) {
     case 0:
         CLD_U(mario, 4) |= 0x100;
-        CLD_S(party, 0x24) = 4;
-        CLD_B(party, 0x39) = 1;
+        party->moveFrames = 4;
+        party->useMotionId = 1;
     case 1:
         cloudCalcPos(party);
-        CLD_F(party, 0x10C) = CLD_F(mario, 0x1A8);
-        CLD_F(party, 0x110) = CLD_F(mario, 0x1AC);
-        CLD_F(party, 0x58) += (CLD_F(party, 0x94) - CLD_F(party, 0x58)) / (f32)CLD_S(party, 0x24);
-        CLD_F(party, 0x5C) += (CLD_F(party, 0x98) - CLD_F(party, 0x5C)) / (f32)CLD_S(party, 0x24);
-        CLD_F(party, 0x60) += (CLD_F(party, 0x9C) - CLD_F(party, 0x60)) / (f32)CLD_S(party, 0x24);
-        if (--CLD_S(party, 0x24) > 0) {
+        party->displayDirection = CLD_F(mario, 0x1A8);
+        party->displayDirectionTarget = CLD_F(mario, 0x1AC);
+        party->position.x += (party->moveTarget.x - party->position.x) / (f32)party->moveFrames;
+        party->position.y += (party->moveTarget.y - party->position.y) / (f32)party->moveFrames;
+        party->position.z += (party->moveTarget.z - party->position.z) / (f32)party->moveFrames;
+        if (--party->moveFrames > 0) {
             break;
         }
-        CLD_B(party, 0x39) = 10;
+        party->useMotionId = 10;
     case 10:
         cloudCalcPos(party);
-        party->position = *(Vec*)&CLD_F(party, 0x94);
+        party->position = *(Vec*)&party->moveTarget.x;
         if (CLD_P(party, 0x178) == NULL) {
             CLD_P(party, 0x178) = effKumokumoN64Entry(0, 0, 0.0f, 0.0f, 0.0f, 0.0f, -2.0f, 0.0f);
             CLD_P(CLD_P(CLD_P(party, 0x178), 0xC), 0x60) = CLD_P(party, 0x164);
@@ -373,14 +373,14 @@ void N__cloud_use(PartyEntry* party) {
         marioChgMot(0x1B);
         marioChgPose("M_A_2A");
         partyChgPose(party, (s32)"PWD_A_5");
-        CLD_S(party, 0x24) = 16;
-        CLD_B(party, 0x39) = 11;
+        party->moveFrames = 16;
+        party->useMotionId = 11;
         CLD_U(mario, 4) |= 4;
         CLD_U(mario, 4) |= 0x100;
-        CLD_U(party, 4) |= 0x10;
+        party->flags2 |= 0x10;
         CLD_F(CLD_P(party, 0x170), 8) = 0.0f;
         CLD_F(CLD_P(party, 0x170), 4) = CLD_F(mario, 0x1A8);
-        if (!(CLD_U(party, 0) & 0x80000000)) {
+        if (!(party->flags & 0x80000000)) {
             CLD_F(mario, 0x150) = 0.03f;
             CLD_F(mario, 0x138) = 70.0f * (revise360(270.0f - CLD_F(mario, 0x1AC)) <= 180.0f ? -1.0f : 1.0f);
         }
@@ -390,21 +390,21 @@ void N__cloud_use(PartyEntry* party) {
         }
     case 11:
         cloudCalcPos(party);
-        party->position = *(Vec*)&CLD_F(party, 0x94);
-        if (--CLD_S(party, 0x24) > 0) {
+        party->position = *(Vec*)&party->moveTarget.x;
+        if (--party->moveFrames > 0) {
             break;
         }
         partyChgPose(party, (s32)"PWD_A_6");
         marioChgPose("M_A_2B");
-        CLD_B(party, 0x39) = 12;
+        party->useMotionId = 12;
     case 12:
         cloudCalcPos(party);
-        party->position = *(Vec*)&CLD_F(party, 0x94);
+        party->position = *(Vec*)&party->moveTarget.x;
         partyUpdateKeyData(party);
         CLD_F(mario, 0x1A8) = CLD_F(CLD_P(party, 0x170), 4);
         CLD_F(mario, 0x1AC) = CLD_F(CLD_P(party, 0x170), 4);
-        CLD_F(party, 0x10C) = CLD_F(CLD_P(party, 0x170), 4);
-        CLD_F(party, 0x110) = CLD_F(CLD_P(party, 0x170), 4);
+        party->displayDirection = CLD_F(CLD_P(party, 0x170), 4);
+        party->displayDirectionTarget = CLD_F(CLD_P(party, 0x170), 4);
         ofsX = CLD_F(mario, 0x8C);
         ofsZ = CLD_F(mario, 0x94);
         flag = 0;
@@ -413,9 +413,9 @@ void N__cloud_use(PartyEntry* party) {
             flag = 1;
         }
         movePos(&ofsX, &ofsZ, 3.3f, toMovedir(dir + (flag ? -90.0f : 90.0f)));
-        CLD_F(party, 0x58) = ofsX;
-        CLD_F(party, 0x60) = ofsZ;
-        CLD_F(party, 0x5C) = 10.0f + CLD_F(mario, 0x90);
+        party->position.x = ofsX;
+        party->position.z = ofsZ;
+        party->position.y = 10.0f + CLD_F(mario, 0x90);
         {
             Vec zero = {0.0f, 0.0f, 0.0f};
             *(Vec*)&CLD_F(party, 0x7C) = zero;
@@ -430,7 +430,7 @@ void N__cloud_use(PartyEntry* party) {
         sincosf(&ys, &yc, -45.0f);
         dist = CLD_F(CLD_P(party, 0x170), 8);
         hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                             CLD_F(party, 0x58), 18.0f + CLD_F(mario, 0x90), CLD_F(party, 0x60),
+                             party->position.x, 18.0f + CLD_F(mario, 0x90), party->position.z,
                              dirSin, ys, dirCos);
         if (hit != NULL && (hitGetAttr(hit) & 4)) {
             hit = NULL;
@@ -440,7 +440,7 @@ void N__cloud_use(PartyEntry* party) {
         if (++*(s16*)((u8*)CLD_P(party, 0x170) + 0x38) > 2) {
             *(s16*)((u8*)CLD_P(party, 0x170) + 0x38) = 0;
         }
-        if (!(CLD_U(party, 0) & 0x80000000)) {
+        if (!(party->flags & 0x80000000)) {
             if (CLD_H(party, 0x150) & 0x400) {
                 if (marioKeyOffChk() == 0) {
                     break;
@@ -453,10 +453,10 @@ void N__cloud_use(PartyEntry* party) {
         CLD_P(CLD_P(party, 0x170), 0x24) = NULL;
         CLD_P(CLD_P(party, 0x170), 0x28) = NULL;
         CLD_P(CLD_P(party, 0x170), 0x2C) = NULL;
-        CLD_S(party, 0x24) = sysMsec2Frame(200);
-        CLD_B(party, 0x39) = 13;
-        if (CLD_U(party, 0) & 0x80000000) {
-            CLD_B(party, 0x39) = 20;
+        party->moveFrames = sysMsec2Frame(200);
+        party->useMotionId = 13;
+        if (party->flags & 0x80000000) {
+            party->useMotionId = 20;
         }
         if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) != 0xFFFFFFFF) {
             psndSFXOff(CLD_S(CLD_P(party, 0x170), 0x34));
@@ -465,21 +465,21 @@ void N__cloud_use(PartyEntry* party) {
         break;
     case 13:
         cloudCalcPos(party);
-        party->position = *(Vec*)&CLD_F(party, 0x94);
+        party->position = *(Vec*)&party->moveTarget.x;
         partyUpdateKeyData(party);
         if (CLD_H(party, 0x152) & 0x400) {
-            CLD_B(party, 0x39) = 10;
+            party->useMotionId = 10;
         }
-        if (--CLD_S(party, 0x24) <= 0) {
-            CLD_B(party, 0x39) = 20;
+        if (--party->moveFrames <= 0) {
+            party->useMotionId = 20;
             break;
         }
         if (*(s8*)((u8*)party + 0x158) == 0 && *(s8*)((u8*)party + 0x159) == 0) {
             break;
         }
-        CLD_B(party, 0x39) = 20;
+        party->useMotionId = 20;
     case 20:
-        CLD_U(party, 0) &= ~0x100;
+        party->flags &= ~0x100;
         if (CLD_P(party, 0x170) != NULL && CLD_U(CLD_P(party, 0x170), 0x34) != 0xFFFFFFFF) {
             psndSFXOff(CLD_S(CLD_P(party, 0x170), 0x34));
             CLD_S(CLD_P(party, 0x170), 0x34) = -1;
@@ -489,26 +489,26 @@ void N__cloud_use(PartyEntry* party) {
             CLD_P(party, 0x178) = NULL;
         }
         cloudCalcPos(party);
-        party->position = *(Vec*)&CLD_F(party, 0x94);
-        CLD_U(party, 4) &= ~0x10;
+        party->position = *(Vec*)&party->moveTarget.x;
+        party->flags2 &= ~0x10;
         if (CLD_H(mario, 0x2E) == 0x1B) {
             CLD_U(mario, 4) &= ~0x100;
             CLD_U(mario, 4) &= ~4;
             marioAdjustMoveDir();
-            CLD_U(party, 8) |= 0x40000;
+            party->field_8 |= 0x40000;
             CLD_U(mario, 4) &= ~0x100;
             marioChgMot(0);
         }
-        CLD_U(party, 4) |= 0x10;
+        party->flags2 |= 0x10;
         partyChgRunMode(party, 2);
         CLD_B(party, 0x3D) = 0;
         partyChgMoveMode(party, 2);
         partyChgMot(party, 1);
-        if (!(CLD_U(party, 0) & 0x80000000)) {
+        if (!(party->flags & 0x80000000)) {
             CLD_F(mario, 0x150) = 0.01f;
             CLD_F(mario, 0x138) = 0.0f;
         }
-        CLD_U(party, 0) &= ~0x80000000;
+        party->flags &= ~0x80000000;
         if (CLD_P(party, 0x170) != NULL) {
             __memFree(HEAP_DEFAULT, CLD_P(party, 0x170));
             CLD_P(party, 0x170) = NULL;
@@ -570,7 +570,7 @@ void getHitBreatheout2(PartyEntry* party, f32 unk) {
     sincosf(&dirSin, &dirCos, dir);
     dist = CLD_F(CLD_P(party, 0x170), 8);
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         party->position.x, CLD_F(mario, 0x90) + height, party->position.z,
                          dirSin, ys, dirCos);
     if (hit != NULL && (hitGetAttr(hit) & 4)) {
         hit = NULL;
@@ -580,9 +580,9 @@ void getHitBreatheout2(PartyEntry* party, f32 unk) {
     ofsZ = 0.0f;
     if (CLD_P(party, 0x178) != NULL) {
         movePos(&ofsX, &ofsZ, 24.0f, dir);
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 4) = CLD_F(party, 0x58) + ofsX;
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 8) = 18.0f + CLD_F(party, 0x5C);
-        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0xC) = CLD_F(party, 0x60) + ofsZ;
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 4) = party->position.x + ofsX;
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 8) = 18.0f + party->position.y;
+        CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0xC) = party->position.z + ofsZ;
         cl = CLD_P(party, 0x170);
         CLD_F(CLD_P(CLD_P(party, 0x178), 0xC), 0x5C) = 0.6f * (CLD_F(cl, 8) / CLD_F(cl, 0xC));
         cl = CLD_P(party, 0x170);
@@ -604,7 +604,7 @@ void getHitBreatheout2(PartyEntry* party, f32 unk) {
     sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x10) * sign + CLD_F(cl, 4)));
     dist = CLD_F(CLD_P(party, 0x170), 8);
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         party->position.x, CLD_F(mario, 0x90) + height, party->position.z,
                          dirSin, ys, dirCos);
     if (hit != NULL && (hitGetAttr(hit) & 4)) {
         hit = NULL;
@@ -616,7 +616,7 @@ void getHitBreatheout2(PartyEntry* party, f32 unk) {
     sincosf(&dirSin, &dirCos, toMovedir(CLD_F(cl, 0x18) * sign + CLD_F(cl, 4)));
     dist = CLD_F(CLD_P(party, 0x170), 8);
     hit = hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz,
-                         CLD_F(party, 0x58), CLD_F(mario, 0x90) + height, CLD_F(party, 0x60),
+                         party->position.x, CLD_F(mario, 0x90) + height, party->position.z,
                          dirSin, ys, dirCos);
     if (hit != NULL && (hitGetAttr(hit) & 4)) {
         hit = NULL;

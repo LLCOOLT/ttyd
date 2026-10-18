@@ -22,8 +22,8 @@ extern int sscanf(const char* str, const char* format, ...);
 typedef struct MsgChar {
 	u32 value; //0x0
 	u16 glyph; //0x4
-	s16 field_0x6; //0x6
-	s16 field_0x8; //0x8
+	s16 x; //0x6 (page-break entries: page number)
+	s16 y; //0x8 (page-scroll entries: scroll amount)
 	u8 field_0xA[0xC - 0xA]; //0xA
 	u32 time; //0xC
 	u8 field_0x10[0x18 - 0x10]; //0x10
@@ -32,36 +32,36 @@ typedef struct MsgChar {
 typedef struct MsgWinData {
 	const char* tag; //0x0
 	u32 flags; //0x4
-	u16 field_0x8; //0x8
-	u16 field_0xA; //0xA
-	u16 field_0xC; //0xC
+	u16 curPage; //0x8, page being shown (page-break entries carry their page number)
+	u16 pageState; //0xA, 1: waiting for the key, 2: advance to the next page
+	u16 pageAdvanced; //0xC
 	u8 field_0xE[0x10 - 0xE]; //0xE
-	s32 field_0x10; //0x10
+	s32 nextEntry; //0x10, index into entries
 	u8 field_0x14[0x18 - 0x14]; //0x14
 	OSTime time18; //0x18
-	s32 field_0x20; //0x20
-	s32 field_0x24; //0x24
-	s32 field_0x28; //0x28
+	s32 playTime; //0x20, playback clock (ms) compared with entries[].time
+	s32 scrollTarget; //0x24
+	s32 scrollPos; //0x28, eases toward scrollTarget
 	u8 field_0x2C[0x30 - 0x2C]; //0x2C
 	OSTime time30; //0x30
 	s32 count; //0x38
 	MsgChar entries[0x500]; //0x3C
 	s32 page; //0x783C
-	s32 field_0x7840; //0x7840
+	s32 pageCount; //0x7840, number of pageY entries
 	s32 pageY[(0x79FC - 0x7844) / 4]; //0x7844
-	s32 field_0x79FC; //0x79FC
+	s32 callback; //0x79FC, void (*)(s32 event, smartEntry*), see MSG_CB
 	u8 field_0x7A00[0x7A04 - 0x7A00]; //0x7A00
 	char stayPose[0x20]; //0x7A04
 	s32 unitId; //0x7A24
 	s32 field_0x7A28; //0x7A28
-	u8 field_0x7A2C; //0x7A2C
+	u8 sfxVolume; //0x7A2C, default 0x7F
 	u8 field_0x7A2D[0x7A30 - 0x7A2D]; //0x7A2D
-	s32 field_0x7A30; //0x7A30
-	s16 field_0x7A34; //0x7A34
-	s16 field_0x7A36; //0x7A36
+	s32 parseTime; //0x7A30, msgAnalize state
+	s16 parseX; //0x7A34
+	s16 parseY; //0x7A36
 	s16 field_0x7A38; //0x7A38
 	s16 field_0x7A3A; //0x7A3A
-	s32 field_0x7A3C; //0x7A3C
+	s32 parseSpeed; //0x7A3C, text speed (default 25)
 	s8 numSel; //0x7A40
 	s8 defSel; //0x7A41
 	s8 cancel; //0x7A42
@@ -70,11 +70,11 @@ typedef struct MsgWinData {
 	s16 selY; //0x7A46
 	f32 cursorY; //0x7A48
 	WindowEntry* window; //0x7A4C
-	s32 field_0x7A50; //0x7A50
-	s32 field_0x7A54; //0x7A54
+	s32 talkTimer; //0x7A50, frames until the talk pose is set
+	s32 talkPoseSet; //0x7A54
 } MsgWinData;
 
-#define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->field_0x79FC)
+#define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->callback)
 #define WIN_DATA(w) ((MsgWinData*)(w)->userdata->address)
 #define WIN_TIME(w) (*(OSTime*)((u8*)(w) + 0x20))
 void msgWindow_Disp(CameraId camId, void* param);
@@ -248,9 +248,9 @@ void msgLoad(const char* filename, s32 index) {
 
 static inline void msgAddPage(smartEntry* smart, s32 y) {
 	MsgWinData* d = smart->address;
-	if (!(d->flags & 0x200) && d->field_0x7840 < 110) {
-		if (d->field_0x7840 == 0 || d->pageY[d->field_0x7840 - 1] != y) {
-			d->pageY[d->field_0x7840++] = y;
+	if (!(d->flags & 0x200) && d->pageCount < 110) {
+		if (d->pageCount == 0 || d->pageY[d->pageCount - 1] != y) {
+			d->pageY[d->pageCount++] = y;
 		}
 	}
 }
@@ -272,7 +272,7 @@ static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
 static inline void msgVoiceSE(smartEntry* smart) {
 	MsgWinData* d = smart->address;
 	if (d->window->type != 1 && !msgSEflag) {
-		psndSFXOnVol((const char*)0x20044, d->field_0x7A2C);
+		psndSFXOnVol((const char*)0x20044, d->sfxVolume);
 		msgSEflag = 1;
 	}
 }
@@ -292,27 +292,27 @@ s32 msgMain(smartEntry* smart) {
 		data->flags &= ~2;
 		msgAddPage(smart, 0);
 	}
-	if (data->field_0x24 > data->field_0x28) {
-		data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+	if (data->scrollTarget > data->scrollPos) {
+		data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		msgCheckSkip(smart, data);
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
-			data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+			data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		}
-		if (data->field_0x24 < data->field_0x28) {
-			data->field_0x28 = data->field_0x24;
+		if (data->scrollTarget < data->scrollPos) {
+			data->scrollPos = data->scrollTarget;
 		}
 		data->time30 = gp->renderTime;
 		return 3;
 	}
-	switch (data->field_0xA) {
+	switch (data->pageState) {
 	case 1:
 		return 2;
 	case 2:
-		data->field_0xC = 1;
-		data->field_0x8++;
-		data->field_0xA = 0;
+		data->pageAdvanced = 1;
+		data->curPage++;
+		data->pageState = 0;
 		psndSFXOn((const char*)0x2003D);
-		data->field_0x20 += 100;
+		data->playTime += 100;
 		if (MSG_CB(data)) {
 			MSG_CB(data)(3, smart);
 		}
@@ -323,13 +323,13 @@ s32 msgMain(smartEntry* smart) {
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
 			ms *= 100;
 		}
-		data->field_0x20 += ms;
+		data->playTime += ms;
 		break;
 	}
 	data->time30 = gp->renderTime;
-	entry = &data->entries[data->field_0x10];
-	for (i = data->field_0x10; i < 0x500; i++, entry++) {
-		if (entry->time > data->field_0x20) {
+	entry = &data->entries[data->nextEntry];
+	for (i = data->nextEntry; i < 0x500; i++, entry++) {
+		if (entry->time > data->playTime) {
 			break;
 		}
 		switch (entry->glyph) {
@@ -337,12 +337,12 @@ s32 msgMain(smartEntry* smart) {
 			if (MSG_CB(data)) {
 				MSG_CB(data)(1, smart);
 			}
-			data->field_0x10 = i;
+			data->nextEntry = i;
 			return 0;
 		case 0xFFFE:
-			if (entry->field_0x6 == data->field_0x8) {
-				data->field_0xA = 1;
-				data->field_0x20 = entry->time;
+			if (entry->x == data->curPage) {
+				data->pageState = 1;
+				data->playTime = entry->time;
 				data->flags &= ~4;
 				if (MSG_CB(data)) {
 					MSG_CB(data)(2, smart);
@@ -350,13 +350,13 @@ s32 msgMain(smartEntry* smart) {
 			}
 			break;
 		case 0xFFFD:
-			data->field_0x24 -= entry->field_0x8;
-			data->field_0x20 = entry->time;
-			msgAddPage(smart, data->field_0x24);
+			data->scrollTarget -= entry->y;
+			data->playTime = entry->time;
+			msgAddPage(smart, data->scrollTarget);
 			break;
 		case 0xFFFC:
-			data->field_0x10 = i + 1;
-			data->field_0x20 = entry->time;
+			data->nextEntry = i + 1;
+			data->playTime = entry->time;
 			data->flags &= ~4;
 			return 1;
 		case 0xFFFB:
@@ -368,13 +368,13 @@ s32 msgMain(smartEntry* smart) {
 			data->field_0x7A28 = entry->value;
 			break;
 		case 0xFFF9:
-			data->field_0x7A2C = entry->value;
+			data->sfxVolume = entry->value;
 			break;
 		case 0xFFF5:
 			if (entry->value) {
 				data->flags |= 0x80;
 				data->flags &= ~4;
-				data->field_0x20 = entry->time;
+				data->playTime = entry->time;
 			}
 			else {
 				data->flags &= ~0x80;
@@ -391,7 +391,7 @@ s32 msgMain(smartEntry* smart) {
 			break;
 		case 0xFFF2:
 			npc = (NpcEntry*)entry->value;
-			if (data->field_0xA) {
+			if (data->pageState) {
 				i--;
 				break;
 			}
@@ -412,15 +412,15 @@ s32 msgMain(smartEntry* smart) {
 			}
 			else if (entry->value & 8) {
 				if (((MsgWinData*)smart->address)->window->type != 3) {
-					((MsgWinData*)smart->address)->field_0x7A50 = 15;
+					((MsgWinData*)smart->address)->talkTimer = 15;
 				}
 				msgVoiceSE(smart);
 			}
 			break;
 		}
 	}
-	data->field_0x10 = i;
-	if (data->field_0xA) {
+	data->nextEntry = i;
+	if (data->pageState) {
 		return 2;
 	}
 	return 3;
@@ -472,12 +472,12 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 
 	FontDrawStart_alpha(alpha);
 	al = alpha;
-	for (i = 0; i < data->field_0x10; i++, c++) {
+	for (i = 0; i < data->nextEntry; i++, c++) {
 		switch (c->glyph) {
 			case 0xFFFF:
 				return FALSE;
 			case 0xFFFE:
-				if (data->field_0x8 == c->x) {
+				if (data->curPage == c->x) {
 					ret = TRUE;
 				}
 				break;
@@ -498,7 +498,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				if (c->rot >= 90.0f && c->rot <= 270.0f) {
 					PSMTXScaleApply(m, m, 1.0f, 1.0f, -1.0f);
 				}
-				PSMTXTransApply(m, m, x + c->x, c->y + (y + data->field_0x28) - 40.0f, 0.0f);
+				PSMTXTransApply(m, m, x + c->x, c->y + (y + data->scrollPos) - 40.0f, 0.0f);
 				animPoseMain((s32)c->value);
 				animPoseDrawMtx((s32)c->value, m, 2, c->rot, c->scale);
 				FontDrawStart_alpha(alpha);
@@ -515,27 +515,27 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				hide = 0;
 				a = 0xFF;
 				sx = x + c->x;
-				sy = c->y + (y + data->field_0x28);
+				sy = c->y + (y + data->scrollPos);
 				if (data->flags & 0x40) {
 					page = data->page;
 					py = data->pageY[page];
-					if (data->field_0x28 == py) {
+					if (data->scrollPos == py) {
 						if (c->y + data->pageY[page + 1] <= 0) {
 							break;
 						}
 						hide = 1;
 					}
-					else if (data->field_0x28 < py) {
+					else if (data->scrollPos < py) {
 						if (c->y + py > 0) {
 							hide = 1;
 						}
 						else {
-							d = py - data->field_0x28;
+							d = py - data->scrollPos;
 							if (d > 100) {
 								d = 100;
 							}
 							a = (100 - d) * 255 / 100;
-							if (page != data->field_0x7840 - 1) {
+							if (page != data->pageCount - 1) {
 								if (c->y + data->pageY[page + 1] <= 0) {
 									break;
 								}
@@ -553,12 +553,12 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 							hide = 1;
 						}
 						else {
-							d = data->field_0x28 - py;
+							d = data->scrollPos - py;
 							if (d > 100) {
 								d = 100;
 							}
 							a = d * 255 / 100;
-							if (page != data->field_0x7840 - 2) {
+							if (page != data->pageCount - 2) {
 								if (c->y + data->pageY[page + 2] <= 0) {
 									break;
 								}
@@ -575,14 +575,14 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				if (c->glyph == 0xFFF8) {
 					col4 = FontGetDrawColor();
 					pos.x = 20.0f + (x + c->x);
-					pos.y = c->iconY + (c->y + (y + data->field_0x28) - 40.0f);
+					pos.y = c->iconY + (c->y + (y + data->scrollPos) - 40.0f);
 					pos.z = 0.0f;
 					iconDispGxAlpha(&pos, 0x10, (u16)c->value, a * al / 255, c->scale);
 					FontDrawStart_alpha(alpha);
 					FontDrawColor(col4);
 					break;
 				}
-				if ((f32)(c->y + data->field_0x28) >= 32.0f * c->scale - 10.0f) {
+				if ((f32)(c->y + data->scrollPos) >= 32.0f * c->scale - 10.0f) {
 					break;
 				}
 				if (hide) {
@@ -722,9 +722,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 i34;
 	MsgWinData* data2;
 	s32 i30;
-	f32 iconScale;
 	s32 i28;
 	s32 i24;
+	f32 iconScale;
 	s32 i20;
 	f32 f1c;
 	s32 i18;
@@ -757,13 +757,13 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	if (window->type < 0) {
 		window->type = 0;
 	}
-	time = data->field_0x7A30;
+	time = data->parseTime;
 	s234 = 0;
 	s232 = data->field_0x7A38;
-	x = data->field_0x7A34;
+	x = data->parseX;
 	s230 = data->field_0x7A3A;
-	y = data->field_0x7A36;
-	step = data->field_0x7A3C;
+	y = data->parseY;
+	step = data->parseSpeed;
 	switch (window->type) {
 	case 3:
 	case 8:
@@ -822,9 +822,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		case 0:
 			entry->glyph = 0xFFFF;
 			entry->time = time;
-			data->field_0x7A30 = time;
-			data->field_0x7A34 = x;
-			data->field_0x7A36 = y;
+			data->parseTime = time;
+			data->parseX = x;
+			data->parseY = y;
 			data->field_0x7A38 = s232;
 			data->field_0x7A3A = s230;
 			return;
@@ -895,7 +895,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "speed") == 0) {
 				sscanf(args, "%d", &step);
 			} else if (strcmp(tag, "/speed") == 0) {
-				step = data->field_0x7A3C;
+				step = data->parseSpeed;
 			} else if (strcmp(tag, "dynamic") == 0) {
 				sscanf(args, "%f", &fv);
 				flags |= 1;
@@ -947,7 +947,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "plate") == 0) {
 				window->type = 2;
 				step = 0;
-				data->field_0x7A3C = 0;
+				data->parseSpeed = 0;
 			} else if (strcmp(tag, "system") == 0) {
 				static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
 				window->type = 3;
@@ -975,7 +975,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "kanban") == 0) {
 				window->type = 4;
 				step = 0;
-				data->field_0x7A3C = 0;
+				data->parseSpeed = 0;
 			} else if (strcmp(tag, "small") == 0) {
 				window->type = 1;
 				data->flags |= 0x10;
@@ -1010,7 +1010,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "nowinse") == 0) {
 				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
-				isHM =(unsigned long long)  FALSE;
+				isHM = FALSE;
 				if ((( (s8) args [0] ) >= '0') && (((s8) args [0]) <= '9') ) {
 					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
@@ -1102,8 +1102,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				half = ((s32)strlen(tag + i)) / 2;
 				total = 0;
 				j = i;
-				isHM = i;
-				p = tag + isHM;
+				p = tag;
+				p = p + i;
 				for (k = 0; k < half; k++) {
 					glyph = kanjiSearch(*(( u16*)p) );
 					width = kanjiGetWidth((u16)(glyph + 0));
@@ -1300,18 +1300,18 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	memset(data, 0, 0x7A58);
 	data->window = window;
 	data->flags = 3;
-	data->field_0x79FC = field_0x79FC;
+	data->callback = field_0x79FC;
 	data->time30 = gp->renderTime;
 	data->time18 = gp->renderTime;
 	data->field_0x7A28 = 0;
-	data->field_0x7A2C = 0x7F;
-	data->field_0x7A30 = 0;
-	data->field_0x7A34 = 0;
-	data->field_0x7A36 = 0;
+	data->sfxVolume = 0x7F;
+	data->parseTime = 0;
+	data->parseX = 0;
+	data->parseY = 0;
 	data->field_0x7A38 = 0;
 	data->field_0x7A3A = 0;
-	data->field_0x7A3C = 25;
-	data->field_0x7840 = 0;
+	data->parseSpeed = 25;
+	data->pageCount = 0;
 	msgAnalize(smart, copy);
 	if (window->type == 1) {
 		data->flags |= 0x200;
@@ -1319,8 +1319,8 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	__memFree(HEAP_DEFAULT, copy);
 	window->userdata = smart;
 	data = window->userdata->address;
-	data->field_0x7A50 = 0;
-	data->field_0x7A54 = 0;
+	data->talkTimer = 0;
+	data->talkPoseSet = 0;
 	switch (window->type) {
 	case 11:
 		window->main = msgWindow_Clear_Main;
@@ -1403,10 +1403,10 @@ void msgWindow_Repeat(s32 id) {
 	data = window->userdata->address;
 	data->time30 = gp->renderTime;
 	data->time18 = gp->renderTime;
-	data->field_0x20 = 0;
-	data->field_0x24 = 0;
-	data->field_0x28 = 0;
-	data->field_0x10 = 0;
+	data->playTime = 0;
+	data->scrollTarget = 0;
+	data->scrollPos = 0;
+	data->nextEntry = 0;
 }
 
 void msgWindow_ForceClose(const char* name) {
@@ -1445,7 +1445,7 @@ static inline void msgWinNextPage(WindowEntry* window) {
 	MsgWinData* d = WIN_DATA(window);
 	s32 max;
 	d->page++;
-	max = d->field_0x7840 - 1;
+	max = d->pageCount - 1;
 	if (d->page > max) {
 		d->page = max;
 	}
@@ -1459,18 +1459,18 @@ void msgWindow_Main(WindowEntry* window) {
 	s32 target;
 	u32 trg;
 
-	if (data->field_0x7A50) {
-		if (!data->field_0x7A54) {
+	if (data->talkTimer) {
+		if (!data->talkPoseSet) {
 			if (data->flags & 8) {
 				BtlUnit_ChangeTalkAnim(data->unitId);
 			}
 			else {
 				npcSetTalkPose(data->stayPose);
 			}
-			data->field_0x7A54 = 1;
+			data->talkPoseSet = 1;
 		}
-		data->field_0x7A50--;
-		if (data->field_0x7A50 == 0) {
+		data->talkTimer--;
+		if (data->talkTimer == 0) {
 			MsgWinData* d2 = smart->address;
 			if (d2->flags & 8) {
 				BtlUnit_ChangeStayAnim(d2->unitId);
@@ -1478,7 +1478,7 @@ void msgWindow_Main(WindowEntry* window) {
 			else {
 				npcSetStayPose(d2->stayPose);
 			}
-			data->field_0x7A54 = 0;
+			data->talkPoseSet = 0;
 		}
 	}
 
@@ -1557,7 +1557,7 @@ void msgWindow_Main(WindowEntry* window) {
 		trg = keyGetButtonTrg(0);
 		if (trg & (target | 0x200)) {
 			WIN_STATE(window) = 1;
-			data->field_0xA = 2;
+			data->pageState = 2;
 			if (keyGetButtonTrg(0) & 0x200) {
 				if (!(data->flags & 0x80)) {
 					data->flags |= 4;
@@ -1565,7 +1565,7 @@ void msgWindow_Main(WindowEntry* window) {
 			}
 		}
 		if (keyGetButtonTrg(0) & 0x10) {
-			data->page = data->field_0x7840 - 1;
+			data->page = data->pageCount - 1;
 			if (msgWinPrevPage(window) != 0U) {
 				WIN_STATE(window) = 9;
 				WIN_TIME(window) = gp->renderTime;
@@ -1576,23 +1576,23 @@ void msgWindow_Main(WindowEntry* window) {
 		break;
 	case 9:
 		target = data->pageY[data->page];
-		if (data->field_0x28 >= target) {
-			data->field_0x28 = data->field_0x28 - 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
+		if (data->scrollPos >= target) {
+			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
 			WIN_TIME(window) = gp->renderTime;
-			if (data->field_0x28 <= target) {
-				data->field_0x28 = target;
+			if (data->scrollPos <= target) {
+				data->scrollPos = target;
 				WIN_STATE(window) = 11;
 			}
 		}
 		break;
 	case 10:
 		target = data->pageY[data->page];
-		if (data->field_0x28 <= target) {
-			data->field_0x28 = data->field_0x28 + 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
+		if (data->scrollPos <= target) {
+			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
 			WIN_TIME(window) = gp->renderTime;
-			if (data->field_0x28 >= target) {
-				data->field_0x28 = target;
-				if (data->page == data->field_0x7840 - 1) {
+			if (data->scrollPos >= target) {
+				data->scrollPos = target;
+				if (data->page == data->pageCount - 1) {
 					WIN_STATE(window) = 3;
 					data->flags &= ~0x40;
 				}
@@ -1617,7 +1617,7 @@ void msgWindow_Main(WindowEntry* window) {
 		if (keyGetButtonTrg(0) & 0x200) {
 			WIN_STATE(window) = 10;
 			WIN_TIME(window) = gp->renderTime;
-			data->page = data->field_0x7840 - 1;
+			data->page = data->pageCount - 1;
 			psndSFXOn((const char*)0x20041);
 		}
 		if (keyGetButtonTrg(0) & 0x10) {
@@ -1724,10 +1724,10 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			case 6:
 			case 8:
 			case 9:
-				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
-				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				ex = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.x, ( window->height / 2.0f ) + window->x, 0, window->alpha, 255);
+				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / 2.0f ), 0, window->alpha, 255);
+				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(10.0f, window->height, 0, window->alpha, 255);
+				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(10.0f, window->width, 0, window->alpha, 255);
 				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
@@ -1741,10 +1741,10 @@ void msgWindow_Disp(CameraId camId, void* param) {
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
-				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
+				ex = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.x, ( window->height / 2.0f ) + window->x, 0, window->alpha, 255);
+				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / 2.0f ), 0, window->alpha, 255);
+				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(10.0f, window->height, 0, window->alpha, 255);
+				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(10.0f, window->width, 0, window->alpha, 255);
 				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((( s32)window->y ) - 10);

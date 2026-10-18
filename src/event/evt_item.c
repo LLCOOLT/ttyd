@@ -100,7 +100,7 @@ USER_FUNC(evt_item_set_gravity) {
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
-	item->field_0x84 = v;
+	item->gravityScale = v;
 	return EVT_RETURN_DONE;
 }
 
@@ -109,7 +109,7 @@ USER_FUNC(evt_item_set_bound_rate) {
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
-	item->field_0x80 = v;
+	item->bounceFactor = v;
 	return EVT_RETURN_DONE;
 }
 
@@ -118,7 +118,7 @@ USER_FUNC(evt_item_set_bound_limit) {
 	ItemEntry* item = ITEM(event);
 	s32 v = evtGetValue(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
-	item->field_0x88 = v;
+	item->maxBounces = v;
 	return EVT_RETURN_DONE;
 }
 
@@ -158,7 +158,7 @@ USER_FUNC(evt_item_set_bound_next_speed) {
 	ItemEntry* item = ITEM(event);
 	f32 v = evtGetFloat(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
-	item->field_0x94 = v;
+	item->savedSpeed = v;
 	return EVT_RETURN_DONE;
 }
 
@@ -167,7 +167,7 @@ USER_FUNC(evt_item_set_bound_next_dir) {
 	ItemEntry* item = ITEM(event);
 	s32 v = evtGetValue(event, args[1]);
 	if (item == NULL) return EVT_RETURN_DONE;
-	item->field_0x90 = v;
+	item->savedDirection = v;
 	return EVT_RETURN_DONE;
 }
 
@@ -231,7 +231,7 @@ USER_FUNC(evt_item_move_3d_position) {
 	s32 mode = evtGetValue(event, args[5]);
 	ItemEntry* item = itemNameToPtr(name);
 	u32 elapsed;
-	f32* z0 = (f32*)&event->field_84;
+	f32* z0 = (f32*)&event->userdata3;
 	if (isFirstCall) {
 		if (item == NULL) return EVT_RETURN_DONE;
 		event->userdata[0] = (s32)gp->renderTime;
@@ -273,7 +273,7 @@ USER_FUNC(evt_item_get_important_item) {
 		event->userdata[0] = *(s32*)&ta;
 		event->userdata[1] = *(s32*)&tb;
 		event->userdata[2] = *(s32*)&spd;
-		event->field_84 = 0;
+		event->userdata3 = 0;
 	}
 	ta = event->userdataf[0];
 	tb = event->userdataf[1];

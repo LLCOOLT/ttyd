@@ -79,11 +79,11 @@ s32 N_getDebugMode(void) {
 void L_titleInit(SequenceWork* work) {
 	memset(wp2, 0, sizeof(TitleWork));
 	wp2->texture = fileAllocf(4, "%s/mariost.tpl", getMarioStDvdRoot());
-	wp2->field_0xC = 0.0f;
-	wp2->field_0x10 = 1000.0f;
-	wp2->field_0x14 = 0.0f;
-	wp2->field_0x18 = -1000.0f;
-	wp2->field_0x1C = 0.0f;
+	wp2->topPosX = 0.0f;
+	wp2->topPosY = 1000.0f;
+	wp2->bottomPosX = 0.0f;
+	wp2->bottomPosY = -1000.0f;
+	wp2->fadeAlpha = 0.0f;
 	wp2->debug = 0;
 	if (seqGetPrevSeq() == SEQ_LOAD) {
 		psndSFXAllOff();
@@ -124,7 +124,7 @@ void L_titleInit(SequenceWork* work) {
 
 
 void titleMain(SequenceWork* work) {
-	switch (wp2->field_0x8) {
+	switch (wp2->state) {
 		case 0:
 			if (psndBGMStartCheck(0) != 0U
 				&& animGroupBaseAsync("OFF_d_maku_left_right", 2, 0)
@@ -133,8 +133,8 @@ void titleMain(SequenceWork* work) {
 				if (seqGetPrevSeq() == SEQ_LOAD) {
 					fadeEntry(0x40, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 					fadeEntry(0x1F, 0, (GXColor){0x00, 0x00, 0x00, 0xFF});
-					wp2->field_0x10 = 120.0f;
-					wp2->field_0x18 = -170.0f;
+					wp2->topPosY = 120.0f;
+					wp2->bottomPosY = -170.0f;
 					wp2->timer = 0;
 				}
 				else if (seqGetPrevSeq() == SEQ_GAME_OVER) {
@@ -148,7 +148,7 @@ void titleMain(SequenceWork* work) {
 					fadeSetNarrowFast();
 					wp2->timer = 23;
 				}
-				wp2->field_0x8++;
+				wp2->state++;
 			}
 			break;
 		case 1:
@@ -161,19 +161,19 @@ void titleMain(SequenceWork* work) {
 			if (fadeIsFinish()) {
 				if (seqGetPrevSeq() != SEQ_LOAD) {
 					fadeEntry(0x14, 500, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-					wp2->field_0x8++;
+					wp2->state++;
 				}
 				else {
-					wp2->field_0x10 = 120.0f;
-					wp2->field_0x18 = -170.0f;
+					wp2->topPosY = 120.0f;
+					wp2->bottomPosY = -170.0f;
 					wp2->frame = 0;
-					wp2->field_0x8 = 3;
+					wp2->state = 3;
 				}
 			}
 			break;
 		case 2:
-			wp2->field_0xC = 0.0f;
-			wp2->field_0x10 = intplGetValue(10, wp2->counter, 60, 300.0f, 120.0f);
+			wp2->topPosX = 0.0f;
+			wp2->topPosY = intplGetValue(10, wp2->counter, 60, 300.0f, 120.0f);
 			wp2->timer--;
 			if (wp2->timer == 0) {
 				if ((u32)psbgm[0].streamId != 0xFFFFFFFFU) {
@@ -183,35 +183,35 @@ void titleMain(SequenceWork* work) {
 					psndSFXOn((const char*)0xAB8);
 				}
 			}
-			wp2->field_0x14 = 0.0f;
-			wp2->field_0x18 = intplGetValue(11, wp2->counter, 60, -300.0f, -170.0f);
+			wp2->bottomPosX = 0.0f;
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -300.0f, -170.0f);
 			wp2->counter++;
 			if (wp2->counter > 60) {
 				titleLoadDemo();
 				wp2->frame = 0;
-				wp2->field_0x8++;
+				wp2->state++;
 			}
 			break;
 		case 3:
-			wp2->field_0x1C += 0.1f;
-			if (wp2->field_0x1C > 1.0f) {
-				wp2->field_0x1C = 1.0f;
+			wp2->fadeAlpha += 0.1f;
+			if (wp2->fadeAlpha > 1.0f) {
+				wp2->fadeAlpha = 1.0f;
 			}
 			if (keyGetButtonTrg(0) & 0x1100) {
 				psndSFXOn((const char*)8);
-				wp2->field_0x8 = 10;
+				wp2->state = 10;
 			}
 			else if (++wp2->idle > 1140) {
-				wp2->field_0x8 = 20;
+				wp2->state = 20;
 			}
 			break;
 		case 10:
 			fadeEntry(0x3F, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-			wp2->field_0x8++;
+			wp2->state++;
 		case 11:
 			if (fadeIsFinish()) {
 				fadeEntry(0x1A, 0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-				wp2->field_0x8++;
+				wp2->state++;
 			}
 			break;
 		case 12:
@@ -225,18 +225,18 @@ void titleMain(SequenceWork* work) {
 			fadeEntry(10, 1000, (GXColor){0x00, 0x00, 0x00, 0xFF});
 			psndBGMOff_f_d(0x200, 1000, 0);
 			wp2->counter = 0;
-			wp2->field_0x8++;
+			wp2->state++;
 			break;
 		case 21:
-			wp2->field_0x10 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 400.0f, 11, wp2->counter, 60);
-			wp2->field_0x18 = intplGetValue(11, wp2->counter, 60, -170.0f, -400.0f);
+			wp2->topPosY = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(120.0f, 400.0f, 11, wp2->counter, 60);
+			wp2->bottomPosY = intplGetValue(11, wp2->counter, 60, -170.0f, -400.0f);
 			wp2->counter++;
 			if (wp2->counter > 60) {
 				wp2->counter = 60;
 			}
-			wp2->field_0x1C -= 0.1f;
-			if (wp2->field_0x1C < 0.0f) {
-				wp2->field_0x1C = 0.0f;
+			wp2->fadeAlpha -= 0.1f;
+			if (wp2->fadeAlpha < 0.0f) {
+				wp2->fadeAlpha = 0.0f;
 			}
 			if (fadeIsFinish()) {
 				fadeReset(1);
@@ -249,7 +249,7 @@ void titleMain(SequenceWork* work) {
 			}
 			break;
 	}
-	if (wp2->field_0x8 != 12 && work->state < 14) {
+	if (wp2->state != 12 && work->state < 14) {
 		dispEntry((CameraId)4, 0.0f, 0, disp1, NULL);
 		dispEntry((CameraId)7, 0.0f, 0, disp2, NULL);
 		switch (wp2->debug) {
@@ -341,11 +341,11 @@ void disp2(CameraId cameraId, void* param) {
 	GXSetViewport(cam->viewport[0], cam->viewport[1], cam->viewport[2],
 				  cam->viewport[3], cam->viewport[4], cam->viewport[5]);
 	winTexInit(*wp2->texture->data);
-	unk_80177008(5, (Vec){wp2->field_0xC, wp2->field_0x10, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
-	winTexSet(6, (Vec){wp2->field_0x14, wp2->field_0x18, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	unk_80177008(5, (Vec){wp2->topPosX, wp2->topPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
+	winTexSet(6, (Vec){wp2->bottomPosX, wp2->bottomPosY, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 	wp2->frame++;
 	s = (f32)sin(6.2831855f * (f32)wp2->frame / 120.0f);
-	alpha = (s32)(wp2->field_0x1C * (459.0f * s));
+	alpha = (s32)(wp2->fadeAlpha * (459.0f * s));
 	if (alpha < 0) {
 		alpha = 0;
 	}

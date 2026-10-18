@@ -328,10 +328,10 @@ USER_FUNC(evt_bero_get_info_anime) {
 	s32* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], *(u16*)&bero->animeArg1);
-	evtSetValue(event, args[2], *(u16*)&bero->animeArg2);
-	evtSetValue(event, args[3], bero->animeArg3);
-	evtSetValue(event, args[4], bero->animeArg4);
+	evtSetValue(event, args[1], *(u16*)&bero->enterAnimeType);
+	evtSetValue(event, args[2], *(u16*)&bero->exitAnimeType);
+	evtSetValue(event, args[3], bero->enterAnimeArg);
+	evtSetValue(event, args[4], bero->exitAnimeArg);
 	return EVT_RETURN_DONE;
 }
 
@@ -343,12 +343,12 @@ USER_FUNC(evt_bero_get_info_length) {
 
 	args = event->args;
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	v5 = bero->field_0x18;
+	v5 = bero->length;
 	if (v5 != -1) {
 		evtSetFloat(event, args[1], (f32)v5);
 		return EVT_RETURN_DONE;
 	}
-	switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+	switch (*(u16*)&bero->type & 0xFFF) {
 		case 0:
 		case 3:
 		case 0xF00:
@@ -373,9 +373,9 @@ USER_FUNC(evt_bero_get_info_kinddir) {
 	s32* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], *(u16*)&bero->kinddirArg1);
-	evtSetValue(event, args[2], *(u16*)&bero->kinddirArg2);
-	evtSetValue(event, args[3], bero->kinddirArg3);
+	evtSetValue(event, args[1], *(u16*)&bero->type);
+	evtSetValue(event, args[2], *(u16*)&bero->sfxId);
+	evtSetValue(event, args[3], bero->directionId);
 	return EVT_RETURN_DONE;
 }
 
@@ -384,8 +384,8 @@ USER_FUNC(evt_bero_get_info_nextarea) {
 	s32* args = event->args;
 
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
-	evtSetValue(event, args[1], bero->nextareaArg1);
-	evtSetValue(event, args[2], (s32)bero->nextareaArg2);
+	evtSetValue(event, args[1], bero->nextMapName);
+	evtSetValue(event, args[2], (s32)bero->nextBeroName);
 	return EVT_RETURN_DONE;
 }
 
@@ -408,8 +408,23 @@ USER_FUNC(evt_bero_get_info) {
 	s32 val;
 
 	table = BeroINFOARR;
-	i = 0;
-	table[0] = table[1] = table[2] = table[3] = table[4] = table[5] = table[6] = table[7] = table[8] = table[9] = table[10] = table[11] = table[12] = table[13] = table[14] = table[15] = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	*table++ = NULL;
+	table = BeroINFOARR;
 	
 	for (entry = (BeroEntry*)event->lwData[0];; entry++) {
 		hit = hitNameToPtr(entry->hitName);
@@ -446,13 +461,13 @@ extern double cos(double);
 static inline s32 bero_get_kind(BeroEntry* bero) {
 	u32 i;
 	const char* dirs[8] = {"n_", "ne_", "e_", "se_", "s_", "sw_", "w_", "nw_"};
-	s32 kind = bero->kinddirArg3;
+	s32 kind = bero->directionId;
 	switch (kind) {
 	case 20000:
 		if (kind == 10000) {
 			kind = 10000;
 		} else {
-		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+		switch (*(u16*)&bero->type & 0xFFF) {
 			case 0:
 			case 1:
 				for (i = 0; i < 8; i++) {
@@ -492,9 +507,9 @@ USER_FUNC(evt_bero_get_into_info) {
 		event->lwData[1] = 0;
 		event->lwData[2] = BeroNUM;
 		event->lwData[3] = (s32)bero->hitName;
-		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[4] = *(u16*)&bero->type;
 		event->lwData[5] = bero_get_kind(bero);
-		event->lwData[6] = (s32)&bero->field_0xC;
+		event->lwData[6] = (s32)&bero->centerPosition;
 		evt = bero->enterEvent;
 		if (!evt) evt = default_entevt;
 		event->lwData[7] = (s32)evt;
@@ -504,9 +519,9 @@ USER_FUNC(evt_bero_get_into_info) {
 		event->lwData[1] = i;
 		event->lwData[2] = BeroNUM;
 		event->lwData[3] = (s32)gp->beroEnterName;
-		event->lwData[4] = *(u16*)&bero->kinddirArg1;
+		event->lwData[4] = *(u16*)&bero->type;
 		event->lwData[5] = bero_get_kind(bero);
-		event->lwData[6] = (s32)&bero->field_0xC;
+		event->lwData[6] = (s32)&bero->centerPosition;
 		evt = bero->enterEvent;
 		if (!evt) evt = default_entevt;
 		event->lwData[7] = (s32)evt;
@@ -554,17 +569,17 @@ USER_FUNC(evt_bero_get_info_num) {
 	s32* evt;
 
 	event->lwData[3] = (s32)bero->hitName;
-	event->lwData[4] = *(u16*)&bero->kinddirArg1;
+	event->lwData[4] = *(u16*)&bero->type;
 	event->lwData[5] = bero_get_kind(bero);
-	event->lwData[6] = (s32)&bero->field_0xC;
+	event->lwData[6] = (s32)&bero->centerPosition;
 	evt = bero->enterEvent;
 	if (!evt) evt = default_entevt;
 	event->lwData[7] = (s32)evt;
 	event->lwData[8] = 0xFFFF0000;
 	event->lwData[9] = BeroSW[id];
-	event->lwData[10] = bero->field_0x20;
-	if (bero->field_0x20 == -1) {
-		switch (*(u16*)&bero->kinddirArg1 & 0xFFF) {
+	event->lwData[10] = bero->caseType;
+	if (bero->caseType == -1) {
+		switch (*(u16*)&bero->type & 0xFFF) {
 			case 0xF00: event->lwData[10] = 0; break;
 			case 0: event->lwData[10] = 10; break;
 			case 1: event->lwData[10] = 9; break;
@@ -576,8 +591,8 @@ USER_FUNC(evt_bero_get_info_num) {
 	if (!evt) evt = default_outevt;
 	event->lwData[11] = (s32)evt;
 	event->lwData[12] = 0xFFFF0000;
-	event->lwData[13] = bero->nextareaArg1;
-	event->lwData[14] = (s32)bero->nextareaArg2;
+	event->lwData[13] = bero->nextMapName;
+	event->lwData[14] = (s32)bero->nextBeroName;
 	return EVT_RETURN_DONE;
 }
 
@@ -1013,17 +1028,17 @@ s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 	switch (info->kind) {
 		case 2: case 6:
 			if (!(info->flags & 0x1000)) {
-				marioGetPtr()->field_0x98.y += 3.0f;
-				marioGetPtr()->field_0x98.z -= 15.0f;
+				marioGetPtr()->dispOfs.y += 3.0f;
+				marioGetPtr()->dispOfs.z -= 15.0f;
 			}
 			break;
 		case 7: case 10000:
 			break;
 		case 8: case 9:
 			if (!(info->flags & 0x1000)) {
-				marioGetPtr()->field_0x98.z -= 13.0f;
+				marioGetPtr()->dispOfs.z -= 13.0f;
 			} else {
-				marioGetPtr()->field_0x98.z -= 20.0f;
+				marioGetPtr()->dispOfs.z -= 20.0f;
 			}
 			break;
 	}
@@ -1141,16 +1156,16 @@ USER_FUNC(evt_bero_case_id_load) {
 }
 
 USER_FUNC(evt_bero_disppos_save) {
-	BeroOX = marioGetPtr()->field_0x98.x;
-	BeroOY = marioGetPtr()->field_0x98.y;
-	BeroOZ = marioGetPtr()->field_0x98.z;
+	BeroOX = marioGetPtr()->dispOfs.x;
+	BeroOY = marioGetPtr()->dispOfs.y;
+	BeroOZ = marioGetPtr()->dispOfs.z;
 	return EVT_RETURN_DONE;
 }
 
 USER_FUNC(evt_bero_disppos_load) {
-	marioGetPtr()->field_0x98.x = BeroOX;
-	marioGetPtr()->field_0x98.y = BeroOY;
-	marioGetPtr()->field_0x98.z = BeroOZ;
+	marioGetPtr()->dispOfs.x = BeroOX;
+	marioGetPtr()->dispOfs.y = BeroOY;
+	marioGetPtr()->dispOfs.z = BeroOZ;
 	return EVT_RETURN_DONE;
 }
 

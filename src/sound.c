@@ -1723,7 +1723,7 @@ void SoundSSPlayCh(s32 chan, const char* name) {
 void SoundSSPlayChEx(s32 chan, const char* name, s32 aram) {
     SoundStream* stream;
     int i;
-    const char* new_var2 [2];
+    const char* new_var2 [2]; // FAKE: alias array needed for 100% (a plain str/root form is 5 rows off)
 
     stream = &sound.streams[chan];
     if (stream->flags) {
@@ -1784,19 +1784,19 @@ void SoundSSPlayChEx_main(s32 result, DVDFileInfo* fileInfo) {
             }
         }
         header = stream->entries[0].buffer;
-        type = header->field_0x0;
+        type = header->type;
         stream->freq = header->freq;
         stream->count = header->count;
-        stream->loopEnd = header->field_0x8;
-        stream->loopStart = header->field_0xC;
-        stream->entries[0].size = header->field_0x10;
-        stream->entries[1].size = header->field_0x14;
-        stream->entries[0].loopStart = header->field_0x18;
-        stream->entries[1].loopStart = header->field_0x1C;
-        stream->entries[0].initHist = header->field_0x20;
-        stream->entries[1].initHist = header->field_0x22;
-        stream->entries[0].loopHist = header->field_0x24;
-        stream->entries[1].loopHist = header->field_0x26;
+        stream->loopEnd = header->loopEnd;
+        stream->loopStart = header->loopStart;
+        stream->entries[0].size = header->size0;
+        stream->entries[1].size = header->size1;
+        stream->entries[0].loopStart = header->loopStart0;
+        stream->entries[1].loopStart = header->loopStart1;
+        stream->entries[0].initHist = header->initHist0;
+        stream->entries[1].initHist = header->initHist1;
+        stream->entries[0].loopHist = header->loopHist0;
+        stream->entries[1].loopHist = header->loopHist1;
         if (stream->loopStart != -1) {
             stream->flags |= 0x200;
         } else {

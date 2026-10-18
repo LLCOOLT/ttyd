@@ -75,17 +75,17 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             ac->result = 1;
             break;
         case 100:
-            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+            if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
                 if (irand(100) >= 0) {
-                    ac->field_0x8 = 0;
+                    ac->setupParam = 0;
                     if (AC_S32(ac, 0x40) > 0) {
-                        ac->field_0x8 = irand(AC_S32(ac, 0x40));
+                        ac->setupParam = irand(AC_S32(ac, 0x40));
                     }
-                    if (ac->field_0x8 <= 0) {
-                        ac->field_0x8 = AC_S32(ac, 0x3C) + 2;
+                    if (ac->setupParam <= 0) {
+                        ac->setupParam = AC_S32(ac, 0x3C) + 2;
                     }
                 } else {
-                    ac->field_0x8 = *(s32*)&ac->field_34[0xC] + irand(*(s32*)&ac->field_34[0x10] - *(s32*)&ac->field_34[0xC]);
+                    ac->setupParam = ac->params[2] + irand(ac->params[3] - ac->params[2]);
                 }
                 ac->mAcState = 0x3EA;
                 tw->state = 2;
@@ -166,12 +166,12 @@ s32 battleAcMain_TimingWide(BattleWork* work) {
             break;
         case 0x3EA:
             tw->frame++;
-            ac->field_0x8--;
+            ac->setupParam--;
             if (tw->frame > AC_S32(ac, 0x3C)) {
                 ac->result = 0;
                 return 0;
             }
-            if (ac->field_0x8 < 0) {
+            if (ac->setupParam < 0) {
                 if (tw->frame >= AC_S32(ac, 0x40) && tw->frame < AC_S32(ac, 0x44)) {
                     ac->result = 2;
                     ac->mResultCount++;

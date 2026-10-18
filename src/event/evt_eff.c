@@ -395,7 +395,6 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   s32 *pi;
   s32 *pf;
   s32 *pr;
-  s32 new_var;
   const char *effName;
   const char *effSet;
   s32 int2;
@@ -606,7 +605,6 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       effect = effCoolLeafN64Entry(int2, float3, float4, float5);
       break;
 
-    new_var = int2;
     case 35:
       effect = effBushN64Entry(int2, float3, float4, float5);
       break;
@@ -728,7 +726,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       break;
 
     case 65:
-      effect = effCrystalN64Entry(new_var, int7, float3, float4, float5, float6);
+      effect = effCrystalN64Entry(int2, int7, float3, float4, float5, float6);
       break;
 
     case 66:

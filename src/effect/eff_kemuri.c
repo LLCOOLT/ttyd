@@ -12,24 +12,24 @@ double sin(double);
 double cos(double);
 
 typedef struct effKemuriData {
-	s32 field_0x0; //0x0
-	f32 field_0x4; //0x4
-	f32 field_0x8; //0x8
-	f32 field_0xC; //0xC
+	s32 type; //0x0, type
+	f32 x; //0x4
+	f32 y; //0x8
+	f32 z; //0xC
 	u8 field_0x10[0x40 - 0x10]; //0x10
-	s32 field_0x40; //0x40
-	f32 field_0x44; //0x44
-	f32 field_0x48; //0x48
-	f32 field_0x4C; //0x4C
+	s32 frame; //0x40, frames since start
+	f32 scaleX; //0x44, touchdown_scale[frame][0] / 128
+	f32 scaleY; //0x48, touchdown_scale[frame][1] / 128
+	f32 velX; //0x4C, sideways drift (+-3, decays by 0.85)
 	u8 field_0x50[0x58 - 0x50]; //0x50
-	f32 field_0x58; //0x58
+	f32 offsetX; //0x58, accumulated drift
 	f32 field_0x5C; //0x5C
 	u8 field_0x60[0x74 - 0x60]; //0x60
-	f32 field_0x74; //0x74
+	f32 scale; //0x74, uniform scale
 	u8 field_0x78[0x80 - 0x78]; //0x78
-	s32 field_0x80; //0x80
-	s32 field_0x84; //0x84
-	s32 field_0x88; //0x88
+	s32 texFrame0; //0x80, current texture frame (0..15)
+	s32 texFrame1; //0x84, next texture frame, clamped to 15
+	s32 lifetime; //0x88, frames (32 or 64)
 } effKemuriData;
 
 typedef struct effKemuri2Data {
@@ -100,44 +100,44 @@ EffectEntry* effKemuriEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 	entry->userdata = data;
 	entry->callback = effKemuriMain;
 
-	data->field_0x0 = int2;
-	data->field_0x4 = float3;
-	data->field_0x8 = float4;
-	data->field_0xC = float5;
+	data->type = int2;
+	data->x = float3;
+	data->y = float4;
+	data->z = float5;
 
-	data->field_0x40 = 0;
+	data->frame = 0;
 
-	data->field_0x44 = 1.0f;
-	data->field_0x48 = 1.0f;
-	data->field_0x74 = 1.0f;
+	data->scaleX = 1.0f;
+	data->scaleY = 1.0f;
+	data->scale = 1.0f;
 	for (i = 1, d = data + 1; i < entry->count; i++, d++) {
-		d->field_0x4 = 0.0f;
-		d->field_0x8 = 0.0f;
-		d->field_0xC = 0.0f;
+		d->x = 0.0f;
+		d->y = 0.0f;
+		d->z = 0.0f;
 
-		d->field_0x44 = 1.0f;
-		d->field_0x48 = 1.0f;
-		d->field_0x74 = 1.0f;
+		d->scaleX = 1.0f;
+		d->scaleY = 1.0f;
+		d->scale = 1.0f;
 
-		d->field_0x58 = 0.0f;
+		d->offsetX = 0.0f;
 		d->field_0x5C = 0.0f;
 
-		d->field_0x40 = 0;
-		d->field_0x80 = 0;
-		d->field_0x84 = 0;
+		d->frame = 0;
+		d->texFrame0 = 0;
+		d->texFrame1 = 0;
 
 		switch (int2) {
 			case 0:
-				d->field_0x4C = i & 1 ? 3.0f : -3.0f;
-				d->field_0x88 = 32;
+				d->velX = i & 1 ? 3.0f : -3.0f;
+				d->lifetime = 32;
 				break;
 			case 1:
-				d->field_0x4C = 0.0f;
-				d->field_0x88 = 32;
+				d->velX = 0.0f;
+				d->lifetime = 32;
 				break;
 			case 2:
-				d->field_0x4C = 0.0f;
-				d->field_0x88 = 64;
+				d->velX = 0.0f;
+				d->lifetime = 64;
 				break;
 		}
 	}
@@ -194,48 +194,48 @@ void effKemuriMain(EffectEntry* effect) {
 	s32 i;
 	s32 type;
 
-	pos.x = data->field_0x4;
-	pos.y = data->field_0x8;
-	pos.z = data->field_0xC;
+	pos.x = data->x;
+	pos.y = data->y;
+	pos.z = data->z;
 	pos2 = pos;
-	type = data->field_0x0;
+	type = data->type;
 	data++;
 	for (i = 1; i < effect->count; i++, data++) {
-		data->field_0x80 = 16.0f * data->field_0x40 / data->field_0x88;
-		data->field_0x84 = 16.0f * (data->field_0x40 + 1) / data->field_0x88;
-		if (data->field_0x84 > 15) {
-			data->field_0x84 = 15;
+		data->texFrame0 = 16.0f * data->frame / data->lifetime;
+		data->texFrame1 = 16.0f * (data->frame + 1) / data->lifetime;
+		if (data->texFrame1 > 15) {
+			data->texFrame1 = 15;
 		}
 		switch (type) {
 			case 0:
-				if ((u32)data->field_0x40 < 30) {
-					data->field_0x44 = touchdown_scale[data->field_0x40][0] / 128.0f;
-					data->field_0x48 = touchdown_scale[data->field_0x40][1] / 128.0f;
+				if ((u32)data->frame < 30) {
+					data->scaleX = touchdown_scale[data->frame][0] / 128.0f;
+					data->scaleY = touchdown_scale[data->frame][1] / 128.0f;
 				}
 				else {
-					data->field_0x44 = 1.5f;
-					data->field_0x48 = 0.8f;
+					data->scaleX = 1.5f;
+					data->scaleY = 0.8f;
 				}
-				data->field_0x4C *= 0.85f;
-				data->field_0x58 += data->field_0x4C;
-				data->field_0x40++;
+				data->velX *= 0.85f;
+				data->offsetX += data->velX;
+				data->frame++;
 				break;
 			case 1:
-				data->field_0x40++;
+				data->frame++;
 				break;
 			case 2:
-				if ((u32)data->field_0x40 < 30) {
-					data->field_0x44 = heavy_scale[data->field_0x40][0] / 128.0f;
-					data->field_0x48 = heavy_scale[data->field_0x40][1] / 128.0f;
+				if ((u32)data->frame < 30) {
+					data->scaleX = heavy_scale[data->frame][0] / 128.0f;
+					data->scaleY = heavy_scale[data->frame][1] / 128.0f;
 				}
 				else {
-					data->field_0x44 = 2.0f;
-					data->field_0x48 = 1.2f;
+					data->scaleX = 2.0f;
+					data->scaleY = 1.2f;
 				}
-				data->field_0x40++;
+				data->frame++;
 				break;
 		}
-		if (data->field_0x40 >= data->field_0x88) {
+		if (data->frame >= data->lifetime) {
 			effDelete(effect);
 			return;
 		}
@@ -285,7 +285,7 @@ void effKemuriDisp(CameraId camId, void* param) {
 	s32 i, j, off;
 	EffectEntry* entry = param;
 	effKemuriData* data = entry->userdata;
-	s32 type = data->field_0x0;
+	s32 type = data->type;
 	CameraEntry* cam = camGetPtr(camId);
 	f32 w = 1.0f;
 
@@ -303,9 +303,9 @@ void effKemuriDisp(CameraId camId, void* param) {
 			GXLoadTexObj(&tex, GX_TEXMAP0);
 			break;
 	}
-	PSMTXTrans(t, data->field_0x4, data->field_0x8, data->field_0xC);
+	PSMTXTrans(t, data->x, data->y, data->z);
 	PSMTXRotRad(r, 'y', 0.017453292f * -camGetPtr(camId)->viewYaw);
-	PSMTXScale(s, data->field_0x74, data->field_0x74, 1.0f);
+	PSMTXScale(s, data->scale, data->scale, 1.0f);
 	PSMTXConcat(t, r, m);
 	PSMTXConcat(m, s, m);
 	PSMTXConcat(cam->view, m, m);
@@ -348,17 +348,17 @@ void effKemuriDisp(CameraId camId, void* param) {
 				GXSetChanMatColor(GX_COLOR0A0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF});
 			}
 			off = 1 - j;
-			PSMTXTrans(t, data->field_0x58 + off, -off, 0.0f);
-			PSMTXScale(s, 20.0f * data->field_0x44, 20.0f * data->field_0x48, 20.0f);
+			PSMTXTrans(t, data->offsetX + off, -off, 0.0f);
+			PSMTXScale(s, 20.0f * data->scaleX, 20.0f * data->scaleY, 20.0f);
 			PSMTXConcat(m, t, m2);
 			PSMTXConcat(m2, s, m2);
 			GXLoadPosMtxImm(m2, 0);
 			PSMTXScale(s, 0.0625f, 1.0f, 1.0f);
-			PSMTXTrans(t, data->field_0x80, -0.2f, 0.0f);
+			PSMTXTrans(t, data->texFrame0, -0.2f, 0.0f);
 			PSMTXConcat(s, t, t);
 			GXLoadTexMtxImm(t, GX_TEXMTX0, GX_MTX2x4);
 			PSMTXScale(s, 0.0625f, 1.0f, 1.0f);
-			PSMTXTrans(t, data->field_0x84, -0.2f, 0.0f);
+			PSMTXTrans(t, data->texFrame1, -0.2f, 0.0f);
 			PSMTXConcat(s, t, t);
 			GXLoadTexMtxImm(t, GX_TEXMTX1, GX_MTX2x4);
 			GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -492,3 +492,4 @@ static void effKemuri2Disp(CameraId camId, void* param) {
 		GXTexCoord2f32(0.0f, 1.0f);
 	}
 }
+

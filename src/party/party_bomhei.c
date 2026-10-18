@@ -96,8 +96,8 @@ void bomhei_bye(PartyEntry* party) {
 void bomhei_init_800BFBB0(PartyEntry* party) {
     PF(party, 0x33, u8) = 3;
     PF(party, 0x32, u8) = 0;
-    PF(party, 0xF0, f32) = 28.0f;
-    PF(party, 0xF4, f32) = 28.0f;
+    party->height = 28.0f;
+    party->width = 28.0f;
     PF(party, 0x17A, u8) = 100;
     PF(party, 0x17C, s32) = -1;
     PF(party, 0x180, s32) = -1;
@@ -124,7 +124,7 @@ void bomhei_exit(PartyEntry* party) {
     p = partyGetPtr(marioGetPartyId());
     if (p != NULL && p->currentMemberId == PARTY_MEMBER_BOBBERY && (p->flags & PARTY_FLAG_IS_BEING_USED)) {
         p->playerPtr->flags &= ~(1 << 13);
-        if (p->field_34 != 9) {
+        if (p->runMode != 9) {
             partyChgRunMode(p, 2);
             p->field_3A[1] = 0;
         }
@@ -138,7 +138,7 @@ void bomhei_use_cancel() {
     PartyEntry* p = partyGetPtr(marioGetPartyId());
     if (p != NULL && p->currentMemberId == PARTY_MEMBER_BOBBERY && (p->flags & PARTY_FLAG_IS_BEING_USED)) {
         p->playerPtr->flags &= ~(1 << 13);
-        if (p->field_34 != 9) {
+        if (p->runMode != 9) {
             partyChgRunMode(p, 2);
             p->field_3A[1] = 0;
         }
@@ -153,7 +153,7 @@ void bomhei_use_cancel2() {
     if (p != NULL && p->currentMemberId == PARTY_MEMBER_BOBBERY && (p->flags & PARTY_FLAG_IS_BEING_USED) && (p->playerPtr->flags & (1 << 13))) {
         p->playerPtr->flags &= ~(1 << 13);
         marioChgPose("M_S_1");
-        if (p->field_34 != 9) {
+        if (p->runMode != 9) {
             partyChgRunMode(p, 2);
             p->field_3A[1] = 0;
         }
@@ -183,7 +183,7 @@ void bomhei_use_post(PartyEntry* party) {
         marioChgPose(name);
     }
     BOMHEI_CLEAN_FLAGS(party);
-    if (party->field_34 != 9) {
+    if (party->runMode != 9) {
         party->field_3A[1] = 0;
         party->field_8 |= 8;
     }
@@ -215,12 +215,12 @@ void bomhei_use(PartyEntry* party) {
             partyChkGnd(party);
             if (party->flags & 2) {
                 partyChgMot(party, 0);
-                PF(party, 0x114, f32) = 0.0f;
+                party->velY = 0.0f;
             }
             if (strcmp(gp->currentMapName, "muj_05") == 0 && party->field_138 != NULL &&
                 strcmp(hitGetName(party->field_138), "A_dokuro_bero") == 0) {
-                party->field_100 = angleABf(party->position.x, party->position.z, 638.0f, 12.5f);
-                party->field_FC = party->field_100;
+                party->targetDir = angleABf(party->position.x, party->position.z, 638.0f, 12.5f);
+                party->moveDir = party->targetDir;
             }
         }
         if (PF(party, 0x17A, u8) != 0x66) {
@@ -315,16 +315,16 @@ static inline void bomheiSetHoldPos(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     f32 height = 36.0f;
 
-    if (strcmp(PF(mario, 0x18, char*), "M_W_7") == 0) {
+    if (strcmp(mario->animName, "M_W_7") == 0) {
         height += m_w_7_sync[PF(party, 0x17B, u8)] / 4.0f;
     }
     party->position.x = mario->position.x;
     party->position.y = mario->position.y + height;
     party->position.z = mario->position.z;
-    movePos(&party->position.x, &party->position.z, -6.0f, toMovedirSimple(mario->unk1AC));
+    movePos(&party->position.x, &party->position.z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
     party->position.z += 2.0f;
-    party->field_110 = mario->unk1AC;
-    party->field_10C = PF(mario, 0x1A8, f32);
+    party->displayDirectionTarget = mario->displayDirectionTarget;
+    party->displayDirection = mario->displayDirection;
 }
 
 void bomhei_use_main(PartyEntry* party) {
@@ -354,7 +354,7 @@ void bomhei_use_main(PartyEntry* party) {
         partyChgPose(party, "R_1");
     case 1:
         bt->target = mario->position;
-        movePos(&bt->target.x, &bt->target.z, -6.0f, toMovedirSimple(mario->unk1AC));
+        movePos(&bt->target.x, &bt->target.z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
         party->position.x += (bt->target.x - party->position.x) / BTIMER(party);
         party->position.y += (bt->target.y - party->position.y) / BTIMER(party);
         party->position.z += (bt->target.z - party->position.z) / BTIMER(party);
@@ -364,10 +364,10 @@ void bomhei_use_main(PartyEntry* party) {
         BTIMER(party) = 9;
         x = mario->position.x;
         z = mario->position.z;
-        movePos(&x, &z, -6.0f, toMovedirSimple(mario->unk1AC));
-        party->field_104 = distABf(party->position.x, party->position.z, x, z) / 18.0f;
-        party->field_100 = angleABf(party->position.x, party->position.z, x, z);
-        party->field_FC = party->field_100;
+        movePos(&x, &z, -6.0f, toMovedirSimple(mario->displayDirectionTarget));
+        party->moveSpeed = distABf(party->position.x, party->position.z, x, z) / 18.0f;
+        party->targetDir = angleABf(party->position.x, party->position.z, x, z);
+        party->moveDir = party->targetDir;
         BVY(party) = 7.5f;
         tmp = 0.8333333f;
         BGRAV(party) = -tmp;
@@ -407,10 +407,10 @@ void bomhei_use_main(PartyEntry* party) {
         party->useMotionId = 21;
         x = party->position.x;
         z = party->position.z;
-        movePos(&x, &z, 38.0f, toMovedirSimple(mario->unk1AC));
-        party->field_104 = distABf(party->position.x, party->position.z, x, z) / 20.0f;
-        party->field_100 = angleABf(party->position.x, party->position.z, x, z);
-        party->field_FC = party->field_100;
+        movePos(&x, &z, 38.0f, toMovedirSimple(mario->displayDirectionTarget));
+        party->moveSpeed = distABf(party->position.x, party->position.z, x, z) / 20.0f;
+        party->targetDir = angleABf(party->position.x, party->position.z, x, z);
+        party->moveDir = party->targetDir;
         BVY(party) = 3.5555556f;
         tmp = 0.35555556f;
         BGRAV(party) = -tmp;
@@ -463,7 +463,7 @@ void bomhei_use_main(PartyEntry* party) {
             BWORK(party)->timer = (s16)(sysMsec2Frame(500) + 1);
         }
         partyChgPose(party, !(BWORK(party)->flags & 2) ? "W_1" : "W_2");
-        party->field_104 = 0.6f;
+        party->moveSpeed = 0.6f;
         partyMove(party);
         if (BWORK(party)->timer <= 0) {
             party->useMotionId = 50;
@@ -512,10 +512,10 @@ void bomhei_use_main(PartyEntry* party) {
             BGRAV(party) = 0.0f;
         }
     case 42:
-        tmp = 0.1f * (-1.0f - party->field_104);
-        party->field_104 += tmp;
-        if (party->field_104 <= 0.0f) {
-            party->field_104 = 0.0f;
+        tmp = 0.1f * (-1.0f - party->moveSpeed);
+        party->moveSpeed += tmp;
+        if (party->moveSpeed <= 0.0f) {
+            party->moveSpeed = 0.0f;
         }
         break;
     }
@@ -535,7 +535,7 @@ void bomhei_use_main(PartyEntry* party) {
     case 51:
         if (!(mario->flags & 0x2000)) {
             if (party->flags & 2) {
-                party->field_104 = 0.0f;
+                party->moveSpeed = 0.0f;
             }
             partyMove(party);
         } else {
@@ -566,7 +566,7 @@ void bomhei_use_main(PartyEntry* party) {
         BOMHEI_CLEAN_SFX(party);
         psndSFXOn_3D((const char*)0x93B, &party->position);
         BWORK(party)->timer = 0;
-        party->field_104 = 0.0f;
+        party->moveSpeed = 0.0f;
         partyMove(party);
         if (isBombRock(PF(party, 0x130, HitEntry*))) {
             evtEntryType(longQuake_evt, 0, 0, 0);
@@ -574,14 +574,14 @@ void bomhei_use_main(PartyEntry* party) {
             evtEntryType(quake_evt, 0, 0, 0);
         }
         eff = effSandarsEntry(pouchGetPartyAttackLv((PartyId)3), party->position.x,
-                              party->position.y + party->field_F0, party->position.z, 0.0f);
+                              party->position.y + party->height, party->position.z, 0.0f);
         PF(PF(eff, 0xC, void*), 0x40, s32) = party->camId;
         fbatSandersBombTriggerOn();
         party->useMotionId = 70;
         break;
     }
     case 70:
-        party->field_104 = 0.0f;
+        party->moveSpeed = 0.0f;
         BVY(party) = 8.0f;
         BGRAV(party) = 0.0f;
         BTIMER(party) = 60;
@@ -605,7 +605,7 @@ void bomhei_use_main(PartyEntry* party) {
             party->position.z = pos.z;
             BVY(party) = 0.0f;
             BGRAV(party) = -1.0f;
-            party->field_104 = 0.0f;
+            party->moveSpeed = 0.0f;
             party->flags &= ~0x10;
             party->flags |= 0x20;
             party->flags |= 0x2000000;
@@ -621,7 +621,7 @@ void bomhei_use_main(PartyEntry* party) {
             party->flags &= ~0x2000000;
         }
         hit = partySearchGround(party, 11.0f, BVY(party));
-        limit = PF(mario, 0x16C, s32) - 25.0f;
+        limit = mario->screenY - 25.0f;
         marioGetScreenPos(party->position, &sx, &sy, &sz);
         if (sy > limit) {
             party->flags &= ~0x2000000;
@@ -831,7 +831,7 @@ void partyGetReturnPos(Vec* out) {
     y = 2.0f + mario->position.y;
     z = mario->position.z;
     dist = mario->wPlayerCollisionBox.x;
-    angle = revise360(toMovedirSimple(mario->unk1AC) - 180.0f);
+    angle = revise360(toMovedirSimple(mario->displayDirectionTarget) - 180.0f);
     sincosf(&s, &c, angle);
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c) == NULL) {
         p = mario->position;
@@ -843,7 +843,7 @@ void partyGetReturnPos(Vec* out) {
         }
     }
 
-    angle = toMovedirSimple(mario->unk1AC);
+    angle = toMovedirSimple(mario->displayDirectionTarget);
     sincosf(&s, &c, angle);
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y, z, s, 0.0f, c) == NULL) {
         p = mario->position;
@@ -876,8 +876,8 @@ HitEntry* check_front(PartyEntry* party) {
     f32 lim;
     u32 i;
 
-    height = 0.8f * party->field_F0;
-    movedir = partyToMovedir(party, party->field_10C);
+    height = 0.8f * party->height;
+    movedir = partyToMovedir(party, party->displayDirection);
     for (i = 0; i < 8; i++) {
         sincosf(&q.targetDir.x, &q.targetDir.z, movedir + (f32)angles[i]);
         q.targetDir.y = 0.0f;

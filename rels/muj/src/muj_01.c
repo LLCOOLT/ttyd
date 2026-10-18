@@ -1594,7 +1594,7 @@ static USER_FUNC(delete_itemsel_table) {
 USER_FUNC(evt_mario_get_reqdir) {
     s32* args = event->args;
 
-    evtSetFloat(event, args[0], marioGetPtr()->unk1AC);
+    evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
     return EVT_RETURN_DONE;
 }
 

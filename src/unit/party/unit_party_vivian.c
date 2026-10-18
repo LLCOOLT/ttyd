@@ -377,7 +377,7 @@ USER_FUNC(battle_evt_majo_disp_on) {
     }
     switch (event->userdata[0]) {
         case 0:
-            part->field_0x78 = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
+            part->shadowScale = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
             if (event->userdata[1] == 0) {
                 psndSFXOn_3D("SFX_BTL_VIVIAN_SHADOW1_1", &unit->mPosition);
             }
@@ -388,7 +388,7 @@ USER_FUNC(battle_evt_majo_disp_on) {
             break;
         case 1:
             if (event->userdata[1] <= 30) {
-                part->field_0x78 = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
+                part->shadowScale = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
                 event->userdata[1]++;
             }
             if (!animEffectAsync("p_bibi", 1)) {
@@ -407,7 +407,7 @@ USER_FUNC(battle_evt_majo_disp_on) {
             break;
         case 2:
             if (event->userdata[1] <= 30) {
-                part->field_0x78 = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
+                part->shadowScale = INTPL(0, event->userdata[1], 30, 0.0f, 2.0f);
                 event->userdata[1]++;
             }
             if (animPoseGetLoopTimes(animPoseGetAnimPosePtr(pose)->paperId) >= 0.6666667f) {
@@ -417,10 +417,10 @@ USER_FUNC(battle_evt_majo_disp_on) {
             }
             break;
         case 3:
-            part->field_0x78 = INTPL(0, event->userdata[1], 15, 2.0f, 1.0f);
+            part->shadowScale = INTPL(0, event->userdata[1], 15, 2.0f, 1.0f);
             event->userdata[1]++;
             if (event->userdata[1] > 15) {
-                part->field_0x78 = 1.0f;
+                part->shadowScale = 1.0f;
                 animPoseSetEffect(pose, NULL, 1);
                 if (flag != 0) {
                     unit->flags &= ~0x10000;
@@ -945,7 +945,7 @@ USER_FUNC(battle_evt_majo_disp_off) {
     }
     switch (event->userdata[0]) {
         case 0:
-            part->field_0x78 = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
+            part->shadowScale = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
             if (flag != 0) {
                 unit->flags |= 0x10000;
             }
@@ -956,7 +956,7 @@ USER_FUNC(battle_evt_majo_disp_off) {
             break;
         case 1:
             if (event->userdata[1] <= 30) {
-                part->field_0x78 = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
+                part->shadowScale = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
                 event->userdata[1]++;
             }
             if (!animEffectAsync("p_bibi", 1)) {
@@ -969,7 +969,7 @@ USER_FUNC(battle_evt_majo_disp_off) {
             break;
         case 2:
             if (event->userdata[1] <= 30) {
-                part->field_0x78 = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
+                part->shadowScale = INTPL(0, event->userdata[1], 30, 1.0f, 2.0f);
                 event->userdata[1]++;
             }
             if (animPoseGetLoopTimes(animPoseGetAnimPosePtr(pose)->paperId) >= 1.0f) {
@@ -982,10 +982,10 @@ USER_FUNC(battle_evt_majo_disp_off) {
             }
             break;
         case 3:
-            part->field_0x78 = INTPL(0, event->userdata[1], 20, 2.0f, 0.0f);
+            part->shadowScale = INTPL(0, event->userdata[1], 20, 2.0f, 0.0f);
             event->userdata[1]++;
             if (event->userdata[1] > 20) {
-                part->field_0x78 = 0.0f;
+                part->shadowScale = 0.0f;
                 unit->mPosition.y -= 500.0f;
                 animPoseSetEffect(pose, NULL, 1);
                 animPoseSetPaperAnimGroup(pose, NULL, 1);
@@ -1113,7 +1113,7 @@ USER_FUNC(_make_kagenuke_weapon) {
     src = (void*)evtGetValue(event, index);
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
-    weapon->field_8F[1] = value;
+    weapon->burnTime = value;
     evtSetValue(event, index, (s32)weapon);
     return EVT_RETURN_DONE;
 }

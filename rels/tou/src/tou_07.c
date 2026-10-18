@@ -838,7 +838,7 @@ static USER_FUNC(paper_on) {
         marioChgPose("M_S_1");
         marioChgPaper("PM_S_3A");
     }
-    mario->unk1A8 = mario->unk1AC = value;
+    mario->displayDirection = mario->displayDirectionTarget = value;
     return EVT_RETURN_BLOCK;
 }
 

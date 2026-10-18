@@ -137,7 +137,8 @@ typedef struct MarioWork {
 	s16 unk4C;                     // 0x4C
 	s16 forceMoveTimer;            // 0x4E
     s16 airTimer;                  // 0x50
-    u8 field_0x52[0x5C - 0x52];    // 0x52
+    s16 jumpPeakAirTime;           // 0x52, airTimer when the jump reached its peak (mario_motion.c marioJump)
+    u8 field_0x54[0x5C - 0x54];    // 0x54
     s16 unk5C;                     // 0x5C
     s16 unk5E;                     // 0x5E
     s16 unk60;                     // 0x60
@@ -146,11 +147,14 @@ typedef struct MarioWork {
     f32 field_68;                  // 0x68
     Vec field_6C;                  // 0x6C
     u8 unk78[0x7A - 0x78];         // 0x78
-    s16 field_0x7A;                // 0x7A
-    u8 field_0x7C[0x8C - 0x7C];    // 0x7C
+    s16 itemGetDisableTimer;       // 0x7A, frames until flag 0x4000 (item get disabled) clears
+    f32 jumpVelocityY;             // 0x7C, JP0 in marioMakeJumpPara: position step per frame
+    f32 jumpAccelerationY;         // 0x80, JP1: velocity += this / div
+    f32 jumpJerkY;                 // 0x84, JP2: acceleration += this / div
+    f32 jumpSnapY;                 // 0x88, JP3: jerk += this / div
     Vec position;                  // 0x8C
-    Vec field_0x98;                // 0x98
-    Vec field_0xA4;                // 0xA4
+    Vec dispOfs;                   // 0x98, added to position for drawing
+    Vec dispOfs2;                  // 0xA4, second draw offset
     union {
         Vec rotOfs;                // 0xB0
         struct {
@@ -167,23 +171,26 @@ typedef struct MarioWork {
     };
     Vec scale;                     // 0xC8
     u8 field_0xD4[0xEC - 0xD4];    // 0xD4
-    Vec field_EC;                  // 0xEC
-    Vec field_F8;                  // 0xF8
-    u8 unk104[0x130 - 0x104];      // 0x104
+    Vec camTarget;                  // 0xEC
+    Vec camCollision;                  // 0xF8
+    u8 unk104[0x11C - 0x104];      // 0x104
+    Vec lastGroundPos;             // 0x11C, position copied when leaving the ground (jump/roll/stay start), y = landing height
+    f32 jumpDistance;              // 0x128, horizontal distance from lastGroundPos (marioSetFallPara/landing)
+    f32 jumpPeakY;                 // 0x12C, position.y at the jump peak (marioSetPeakYpos)
     f32 unk130;                    // 0x130, y scale while in tube mode
     CameraId camId;                // 0x134
-    f32 unk138;                    // 0x138
-    f32 unk13C;                    // 0x13C
-    f32 unk140;                    // 0x140
-    f32 unk144;                    // 0x144
-    f32 unk148;                    // 0x148
-    f32 unk14C;                    // 0x14C
-    Vec unk150;                    // 0x150
+    f32 camShiftTargetX;                    // 0x138
+    f32 camShiftX;                    // 0x13C
+    f32 camShiftTargetY;                    // 0x140
+    f32 camShiftY;                    // 0x144
+    f32 camShiftTargetZ;                    // 0x148
+    f32 camShiftZ;                    // 0x14C
+    Vec camShiftRate;                    // 0x150
     f32 camFollowRate;             // 0x15C
-    f32 unk160;                    // 0x160
+    f32 prevCamPosX;                    // 0x160
     u8 unk164[0x168 - 0x164];      // 0x164
-    s32 unk168;                    // 0x168
-    s32 unk16C;                    // 0x16C
+    s32 screenX;                    // 0x168
+    s32 screenY;                    // 0x16C
     u8 unk170[0x174 - 0x170];      // 0x170
     Vec unk174;                    // 0x174, movement from a moving floor
 	f32 baseSpeed;                 // 0x180, same on US
@@ -193,23 +200,23 @@ typedef struct MarioWork {
 	f32 controlStickSensitivity;   // 0x190
 	f32 controlStickAngle;         // 0x194
     f32 targetYaw;                 // 0x198
-    f32 unk19C;                    // 0x19C
+    f32 moveDirection;                    // 0x19C
 	f32 directionView;             // 0x1A0
 	f32 unk1A4;                    // 0x1A4
-    f32 unk1A8;                    // 0x1A8
-    f32 unk1AC;                    // 0x1AC
+    f32 displayDirection;                           // 0x1A8
+    f32 displayDirectionTarget;                     // 0x1AC
     u8 unk1B0[0x1B4 - 0x1B0];      // 0x1B0
     Vec wPlayerCollisionBox;       // 0x1B4 JP, 0x1B8 US
     u8 field_0x1C0[0x1D8 - 0x1C0]; // 0x1C0
-    s32 field_0x1D8;               // 0x1D8
-    void* field_0x1DC;              // 0x1DC
-    void* field_0x1E0;              // 0x1E0
+    s32 targetNpc;                 // 0x1D8, NpcEntry* in range for interaction (npcdrv)
+    void* hitobjFrontA;             // 0x1DC, wall in front found on an A press
+    void* hitobjFront;              // 0x1E0
 	void* hitobjStandOn;           // 0x1E4, 0x1E8 US HitEntry
 	void* hitobjJumpFrom;          // 0x1E8, 0x1EC US HitEntry
 	void* hitobjPush;              // 0x1EC JP, 0x1F0 US HitEntry
-	void* field_0x1F0;              // 0x1F0
-	void* field_0x1F4;              // 0x1F4
-	void* field_0x1F8;              // 0x1F8
+	void* hitobjWall;               // 0x1F0, wall touched this frame (before push threshold)
+	void* hitobjHead;              // 0x1F4
+	void* hitobjUnder;              // 0x1F8
 	void* field_0x1FC;              // 0x1FC
 	u8 field_0x200[0x204 - 0x200]; // 0x200
 	void* damageHit;               // 0x204, HitEntry
@@ -221,7 +228,7 @@ typedef struct MarioWork {
     s8 currPartySlotId[2];         // 0x241 JP, 0x245 US
     s8 prevPartyMemberId[2];       // 0x243 JP, 0x247 US
     u8 field_0x245[0x248 - 0x245]; // 0x245
-    u16 field_0x248;               // 0x248
+    u16 buttonBuffer;               // 0x248
     u8 field_0x24A[0x24E - 0x24A]; // 0x24A
 	u8 wStickDir1;                 // 0x24E JP, 0x252 US
 	u8 wStickDir2;                 // 0x24F JP, 0x253 US

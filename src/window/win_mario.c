@@ -414,27 +414,25 @@ const char* BattleGetRankNameLabel(s32 level);
 void winMarioDisp(s32 camId, void* param, s32 idx) {
     static s32 pri[6] = {3, 2, 8, 10, 7, 9};
     WinMarioWork* w;
-    GXColor white2;
-    GXColor black2;
     GXColor white;
     GXColor black;
     PouchData* pouch;
     f32 x;
     f32 y;
-    f32 v21;
-    f32 v25;
-    f32 v24;
-    f32 v18;
-    f32 v19;
-    f32 v23;
-    f32 v28;
-    f32 v31;
-    f32 v26;
-    f32 v27;
-    f32 v30;
-    f32 v20;
-    f32 v29;
-    f32 v22;
+    f32 statX;
+    f32 rowA;
+    f32 rowB;
+    f32 cx;
+    f32 col;
+    f32 nameW;
+    f32 row2;
+    f32 left;
+    f32 row0;
+    f32 row1;
+    f32 numX;
+    f32 costX;
+    f32 row3;
+    f32 rubyW;
     s32 i;
     s64 secs;
     u64 tsecs;
@@ -447,27 +445,25 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     w = param;
     pouch = pouchGetPtr();
     white = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
-    white2 = white;
     black = (GXColor){0x00, 0x00, 0x00, 0xFF};
-    black2 = black;
     x = w->pos[idx].x;
     y = w->pos[idx].y;
     winBgGX(w, 0, x, y);
     winNameGX(w, 2, x - 265.0f, 154.0f + y, 190.0f, 24.0f);
-    v18 = 10.0f + (x - 265.0f);
+    cx = 10.0f + (x - 265.0f);
     winFontInit();
-    v25 = 152.0f + y;
-    winFontSetEdge((Vec){v18, v25, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("name_mario"));
-    v18 += 0.8f * FontGetMessageWidth(msgSearch("name_mario"));
-    v18 += 20.0f;
+    rowA = 152.0f + y;
+    winFontSetEdge((Vec){cx, rowA, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("name_mario"));
+    cx += 0.8f * FontGetMessageWidth(msgSearch("name_mario"));
+    cx += 20.0f;
     winIconInit();
-    winIconSet(0x19E, (Vec){v18, 142.0f + y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
-    v18 += 20.0f;
+    winIconSet(0x19E, (Vec){cx, 142.0f + y, 0.0f}, (Vec){0.6f, 0.6f, 0.6f}, white);
+    cx += 20.0f;
     winFontInit();
-    winFontSetEdge((Vec){v18, v25, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_mario_level"));
+    winFontSetEdge((Vec){cx, rowA, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_mario_level"));
     sprintf(buf, "%s", winZenkakuStr(pouch->level));
     winFontInit();
-    winFontSetEdge((Vec){(190.0f + (x - 265.0f)) - 0.8f * FontGetMessageWidth(buf) - 10.0f, v25, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, buf);
+    winFontSetEdge((Vec){(190.0f + (x - 265.0f)) - 0.8f * FontGetMessageWidth(buf) - 10.0f, rowA, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, buf);
     winTexInit(*w->file->data);
     winTexSet(0xB0, (Vec){x - 255.0f, 112.0f + y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winFontInit();
@@ -481,118 +477,118 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
     fukidashi(w, w->idx, x, y);
 
     winKirinukiGX(w, 0, x - 270.0f, y - 10.0f, 264.0f, 110.0f);
-    v25 = 50.0f + (x - 270.0f) - 2.0f;
-    v21 = 50.0f + (x - 270.0f);
+    rowA = 50.0f + (x - 270.0f) - 2.0f;
+    statX = 50.0f + (x - 270.0f);
     for (i = 0; i < 3; i++) {
         GXColor cols[3] = {{0xCB, 0x8C, 0xA2, 0xFE}, {0xCB, 0xBE, 0x89, 0xFE}, {0x94, 0xB9, 0xC7, 0xFE}};
         GXColor reds[3] = {{0xA7, 0x3C, 0x3C, 0xFF}, {0x37, 0x69, 0x1E, 0xFF}, {0x0F, 0x21, 0x7A, 0xFF}};
         const char* const N_stat_name_tbl[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
         const char* ruby[3] = {"msg_menu_mario_ruby_hp", "msg_menu_mario_ruby_fp", "msg_menu_mario_ruby_bp"};
 
-        v23 = FontGetMessageWidth(N_stat_name_tbl[i]);
-        v22 = 0.5f * FontGetMessageWidth(msgSearch(ruby[i]));
+        nameW = FontGetMessageWidth(N_stat_name_tbl[i]);
+        rubyW = 0.5f * FontGetMessageWidth(msgSearch(ruby[i]));
         winTexInit(*w->file->data);
         GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_C0);
         GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
-        winTexSet(0xAF, (Vec){v25, (v18 = (y - 38.0f) - (f32)(i * 34)) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, cols[i]);
+        winTexSet(0xAF, (Vec){rowA, (cx = (y - 38.0f) - (f32)(i * 34)) - 4.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, cols[i]);
         winFontInit();
-        winFontSet((Vec){v21 - v23 / 2.0f, 12.0f + v18, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, N_stat_name_tbl[i]);
-        winFontSet((Vec){v21 - v22 / 2.0f, 21.0f + v18, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, reds[i], msgSearch(ruby[i]));
+        winFontSet((Vec){statX - nameW / 2.0f, 12.0f + cx, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, N_stat_name_tbl[i]);
+        winFontSet((Vec){statX - rubyW / 2.0f, 21.0f + cx, 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, reds[i], msgSearch(ruby[i]));
     }
 
     winIconInit();
-    v19 = 110.0f + (x - 270.0f);
-    v26 = 4.0f + (y - 38.0f);
-    winIconSet(0x19F, (Vec){v19, v26, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
-    v24 = (y - 38.0f) - 34.0f;
-    v27 = 4.0f + v24;
-    winIconSet(0x1A0, (Vec){v19, v27, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
-    v25 = (y - 38.0f) - 68.0f;
-    winIconSet(0x1A1, (Vec){v19, 4.0f + v25, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
+    col = 110.0f + (x - 270.0f);
+    row0 = 4.0f + (y - 38.0f);
+    winIconSet(0x19F, (Vec){col, row0, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
+    rowB = (y - 38.0f) - 34.0f;
+    row1 = 4.0f + rowB;
+    winIconSet(0x1A0, (Vec){col, row1, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
+    rowA = (y - 38.0f) - 68.0f;
+    winIconSet(0x1A1, (Vec){col, 4.0f + rowA, 0.0f}, (Vec){0.82f, 0.82f, 0.82f}, white);
     winFontInit();
-    v19 = 130.0f + (x - 270.0f);
-    v28 = 4.0f + (12.0f + (y - 38.0f));
-    winFontSetR((Vec){v19, v28, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentHP));
-    v24 = 4.0f + (12.0f + v24);
-    winFontSetR((Vec){v19, v24, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentFP));
-    winFontSetR((Vec){v19, 4.0f + (12.0f + v25), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumBP));
+    col = 130.0f + (x - 270.0f);
+    row2 = 4.0f + (12.0f + (y - 38.0f));
+    winFontSetR((Vec){col, row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentHP));
+    rowB = 4.0f + (12.0f + rowB);
+    winFontSetR((Vec){col, rowB, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->currentFP));
+    winFontSetR((Vec){col, 4.0f + (12.0f + rowA), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumBP));
     winTexInit(*w->file->data);
-    v19 = 190.0f + (x - 270.0f);
-    winTexSet(0x10, (Vec){v19, v26, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
-    winTexSet(0x10, (Vec){v19, v27, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+    col = 190.0f + (x - 270.0f);
+    winTexSet(0x10, (Vec){col, row0, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+    winTexSet(0x10, (Vec){col, row1, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     winFontInit();
-    v19 = 200.0f + (x - 270.0f);
-    winFontSet((Vec){v19, v28, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
-    winFontSet((Vec){v19, v24, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
+    col = 200.0f + (x - 270.0f);
+    winFontSet((Vec){col, row2, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumHP));
+    winFontSet((Vec){col, rowB, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, "%s", winZenkakuStr(pouch->maximumFP));
 
     if (w->f198 > 0) {
         winKirinukiGX(w, 0, 10.0f + x, (20.0f + (130.0f + y)) - 20.0f, 260.0f, 80.0f);
         winIconInit();
-        v19 = 10.0f + (40.0f + x);
-        v24 = 106.0f + y;
-        winIconSet(0x20F, (Vec){v19, v24, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
-        v18 = 70.0f + y;
-        winIconSet(0x197, (Vec){v19, v18, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
+        col = 10.0f + (40.0f + x);
+        rowB = 106.0f + y;
+        winIconSet(0x20F, (Vec){col, rowB, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
+        cx = 70.0f + y;
+        winIconSet(0x197, (Vec){col, cx, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
         winFontInit();
-        winFontSet((Vec){10.0f + (70.0f + x), 10.0f + v18, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, msgSearch("msg_menu_mario_special"));
+        winFontSet((Vec){10.0f + (70.0f + x), 10.0f + cx, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, msgSearch("msg_menu_mario_special"));
         winIconInit();
-        v18 = 10.0f + (80.0f + x);
+        cx = 10.0f + (80.0f + x);
         for (i = 0; i < w->f198; i++) {
             if (i < pouch->currentSP / 100) {
-                winIconSet(0x1B7 + i, (Vec){v18 + (f32)(i * 22), v24, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white2);
+                winIconSet(0x1B7 + i, (Vec){cx + (f32)(i * 22), rowB, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             } else {
-                winIconSet(0x1BF, (Vec){v18 + (f32)(i * 22), v24, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white2);
+                winIconSet(0x1BF, (Vec){cx + (f32)(i * 22), rowB, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white);
             }
         }
     }
 
-    v31 = 10.0f + x;
-    winKirinukiGX(w, 0, v31, 10.0f + (20.0f + y), 260.0f, 150.0f);
+    left = 10.0f + x;
+    winKirinukiGX(w, 0, left, 10.0f + (20.0f + y), 260.0f, 150.0f);
     winIconInit();
-    v24 = 10.0f + (20.0f + x);
-    winIconSet(0x18C, (Vec){v24, 10.0f + y, 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
-    winIconSet(0x18B, (Vec){v24, 10.0f + (y - 28.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
-    winIconSet(0x18D, (Vec){v24, 10.0f + (y - 56.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
-    winIconSet(0x102, (Vec){v24, 10.0f + (y - 84.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
-    winIconSet(0x1A2, (Vec){v24, 10.0f + (y - 112.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
+    rowB = 10.0f + (20.0f + x);
+    winIconSet(0x18C, (Vec){rowB, 10.0f + y, 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
+    winIconSet(0x18B, (Vec){rowB, 10.0f + (y - 28.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
+    winIconSet(0x18D, (Vec){rowB, 10.0f + (y - 56.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
+    winIconSet(0x102, (Vec){rowB, 10.0f + (y - 84.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
+    winIconSet(0x1A2, (Vec){rowB, 10.0f + (y - 112.0f), 0.0f}, (Vec){0.62f, 0.62f, 0.62f}, white);
     winFontInit();
-    v19 = 10.0f + (35.0f + x);
-    v25 = 12.0f + y;
-    v26 = 10.0f + v25;
-    winFontSet((Vec){v19, v26, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_sp"));
-    v27 = 10.0f + (v25 - 28.0f);
-    winFontSet((Vec){v19, v27, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_coin"));
-    v28 = 10.0f + (v25 - 56.0f);
-    winFontSet((Vec){v19, v28, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_hoshi"));
-    v29 = 10.0f + (v25 - 84.0f);
-    winFontSet((Vec){v19, v29, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_super_coin"));
-    v25 = 10.0f + (v25 - 112.0f);
-    winFontSet((Vec){v19, v25, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_playtime"));
-    v30 = 2.0f + (8.0f + (205.0f + x));
-    winFontSetR((Vec){v30, v26, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mStarPoints));
-    winFontSetR((Vec){v30, v27, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->coins));
-    winFontSetR((Vec){v30, v28, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mStarPieceCount));
-    winFontSetR((Vec){v30, v29, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mShineSpriteCount));
+    col = 10.0f + (35.0f + x);
+    rowA = 12.0f + y;
+    row0 = 10.0f + rowA;
+    winFontSet((Vec){col, row0, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_sp"));
+    row1 = 10.0f + (rowA - 28.0f);
+    winFontSet((Vec){col, row1, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_coin"));
+    row2 = 10.0f + (rowA - 56.0f);
+    winFontSet((Vec){col, row2, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_hoshi"));
+    row3 = 10.0f + (rowA - 84.0f);
+    winFontSet((Vec){col, row3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_super_coin"));
+    rowA = 10.0f + (rowA - 112.0f);
+    winFontSet((Vec){col, rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, msgSearch("msg_menu_mario_num_playtime"));
+    numX = 2.0f + (8.0f + (205.0f + x));
+    winFontSetR((Vec){numX, row0, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mStarPoints));
+    winFontSetR((Vec){numX, row1, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->coins));
+    winFontSetR((Vec){numX, row2, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mStarPieceCount));
+    winFontSetR((Vec){numX, row3, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", winZenkakuStr(pouch->mShineSpriteCount));
 
-    tsecs = gp->retraceLocalTime / (*(u32*)0x800000F8 >> 2);
+    tsecs = gp->retraceLocalTime / OS_TIMER_CLOCK;
     if (tsecs > 359999) {
         hour = 99;
         min = 59;
     } else {
-        secs = tsecs + 0;
+        secs = tsecs;
         hour = (u64)secs / 3600;
         min = (u64)secs % 3600 / 60;
     }
-    winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), v25, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(hour, 2));
-    winFontSetR((Vec){v30, v25, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(min, 2));
+    winFontSetR((Vec){2.0f + (2.0f + ((8.0f + (172.0f + x)) - 16.0f)), rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(hour, 2));
+    winFontSetR((Vec){numX, rowA, 0.0f}, (Vec){0.9f, 0.9f, 0.9f}, black, "%s", unk_8016af5c(min, 2));
 
     winTexInit(*w->file->data);
-    v18 = 10.0f + (190.0f + x);
+    cx = 10.0f + (190.0f + x);
     for (i = 0; i < 4; i++) {
-        winTexSet(0x11, (Vec){v18, 10.0f + (y - (f32)(i * 28)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        winTexSet(0x11, (Vec){cx, 10.0f + (y - (f32)(i * 28)), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
     }
-    v24 = 220.0f + x;
-    winTexSet(0x12, (Vec){v24, (10.0f + (2.0f + (y - 112.0f))) - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+    rowB = 220.0f + x;
+    winTexSet(0x12, (Vec){rowB, (10.0f + (2.0f + (y - 112.0f))) - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
 
     animPoseGetAnimPosePtr(w->poseId);
     anim = animPoseGetAnimDataPtr(w->poseId);
@@ -609,17 +605,17 @@ void winMarioDisp(s32 camId, void* param, s32 idx) {
         winWazaGX(w, 0, x - 270.0f, 160.0f, 270.0f, 254.0f);
         winFontInit();
         winFontSetEdge((Vec){(90.0f + x) - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, msgSearch("msg_menu_mario_sac_waza"));
-        winFontSetEdge((Vec){v24 - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x72\x82\x6F");
-        v18 = 10.0f + (v31 - 270.0f);
-        v20 = (228.0f + x) - 270.0f;
-        v25 = 4.0f + ((17.0f + v24) - 270.0f);
+        winFontSetEdge((Vec){rowB - 270.0f, 155.0f, 0.0f}, (Vec){0.8f, 0.8f, 0.8f}, white, "\x82\x72\x82\x6F");
+        cx = 10.0f + (left - 270.0f);
+        costX = (228.0f + x) - 270.0f;
+        rowA = 4.0f + ((17.0f + rowB) - 270.0f);
         for (i = 0; i < w->f198; i++) {
             char sbuf[0x20];
 
-            winFontSetLabel((Vec){v18, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, superActionTable[i]->name);
+            winFontSetLabel((Vec){cx, (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, superActionTable[i]->name);
             sprintf(sbuf, "%s", winZenkakuStr(superActionTable[i]->cost));
-            winFontSet((Vec){v20 - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black2, sbuf);
-            winFontSet((Vec){v25, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black2, "\x82\x72\x82\x6F");
+            winFontSet((Vec){costX - (f32)(FontGetMessageWidth(sbuf) / 2), (f32)(130 - i * 26), 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, black, sbuf);
+            winFontSet((Vec){rowA, (f32)(120 - i * 26), 0.0f}, (Vec){0.5f, 0.5f, 0.5f}, black, "\x82\x72\x82\x6F");
         }
     }
 }

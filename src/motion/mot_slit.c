@@ -327,9 +327,9 @@ BOOL marioGetMotSlitCancel3(void) {
 
 static inline void slitSetDir(MarioWork* m, f32 a) {
 	if (revise360(m->directionView - m->targetYaw) <= 180.0f) {
-		m->unk1A8 = 260.0f;
+		m->displayDirection = 260.0f;
 	} else {
-		m->unk1A8 = 280.0f;
+		m->displayDirection = 280.0f;
 	}
 }
 
@@ -338,16 +338,16 @@ void marioSlitForceCancel(void) {
 	if (m->flags & 0x100000) {
 		m->flags &= ~0x100000;
 		if (m->directionView >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		}
 		m->dispFlags &= CLR_DISP;
 		m->flags &= ~0x400000;
 		m->flags &= ~0x200000;
-		MW(m, 0x1b4, f32) = 10.0f;
+		m->wPlayerCollisionBox.x = 10.0f;
 		m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
@@ -355,8 +355,8 @@ void marioSlitForceCancel(void) {
 		marioAdjustMoveDir();
 		{
 			MarioWork* p = marioGetPtr();
-			MW(p, 0x148, f32) = 0.0f;
-			MW(p, 0x158, f32) = 0.004f;
+			p->camShiftTargetZ = 0.0f;
+			p->camShiftRate.z = 0.004f;
 		}
 		allPartyForceSlitOff();
 	}
@@ -365,19 +365,18 @@ void marioSlitForceCancel(void) {
 void mot_slit_post(void) {
 	MarioWork* m = marioGetPtr();
 	u16 id = m->currMotionId;
-	int new_var;
 	if (id == 0x15 || (u16)(id - 0xb) <= 1 || m->currMotionId <= 7 || m->currMotionId == 8) {
 		return;
 	}
 	if (!(m->flags & 0x100000)) {
 		if (m->dispFlags & 0x1000000) {
-			MW(m, 0x1b4, f32) = 20.0f;
+			m->wPlayerCollisionBox.x = 20.0f;
 			if (m->directionView >= 180.0f) {
-				m->unk1A8 = 0.0f;
-				m->unk1AC = m->unk1A8;
+				m->displayDirection = 0.0f;
+				m->displayDirectionTarget = m->displayDirection;
 			} else {
-				m->unk1A8 = 180.0f;
-				m->unk1AC = m->unk1A8;
+				m->displayDirection = 180.0f;
+				m->displayDirectionTarget = m->displayDirection;
 			}
 			CLR_SLITFLAGS(m)
 			marioPaperOff();
@@ -388,18 +387,17 @@ void mot_slit_post(void) {
 		}
 	} else if (m->currMotionId != 10) {
 		m->flags &= ~0x100000;
-		MW(m, 0x1b4, f32) = 20.0f;
-		new_var = 0xFEFFF3FF;
+		m->wPlayerCollisionBox.x = 20.0f;
 		if (m->directionView >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		}
 		m->flags &= ~0x400000;
 		m->flags &= ~0x200000;
-		m->dispFlags &= new_var;
+		m->dispFlags &= 0xFEFFF3FF;
 		m->dispFlags &= CLR_DISP;
 		marioPaperOff();
 		mapResetPaperAmbColor();
@@ -448,13 +446,13 @@ void marioReInit_slit(void) {
 	m->trigFlags &= ~1;
 	m->currMotionId = MARIO_MOTION_SLIT;
 	MW(m, 0x2d8, s16) = 10;
-	m->unk1A8 = 270.0f;
-	m->unk1AC = m->unk1A8;
+	m->displayDirection = 270.0f;
+	m->displayDirectionTarget = m->displayDirection;
 	marioChgPose("M_S_1");
 	marioChgPaper("PM_S_1B");
 	MW(m, 0x2d8, s16) = 10;
 	MW(m, 0x2b6, s16) = 0;
-	MW(m, 0x1b4, f32) = 6.0f;
+	m->wPlayerCollisionBox.x = 6.0f;
 	m->flags |= 0x100000;
 	m->dispFlags |= 0x1000000;
 	allPartySlitOn();
@@ -502,9 +500,9 @@ static inline f32 slitWalkSpeed(void) {
 	return spd;
 }
 
-#define SLITDIR(m) 	(m)->unk1A8 = (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) ? 260.0f : 280.0f;
+#define SLITDIR(m) 	(m)->displayDirection = (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) ? 260.0f : 280.0f;
 
-#define SLITDIR2(m) 	if (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) { 		MW(m, 0x2ba, s16) = 1; 		(m)->unk1A8 = 260.0f; 	} else { 		MW(m, 0x2ba, s16) = 2; 		(m)->unk1A8 = 280.0f; 	}
+#define SLITDIR2(m) 	if (revise360((m)->directionView - (m)->targetYaw) <= 180.0f) { 		MW(m, 0x2ba, s16) = 1; 		(m)->displayDirection = 260.0f; 	} else { 		MW(m, 0x2ba, s16) = 2; 		(m)->displayDirection = 280.0f; 	}
 
 #define CAMFIX(m) \
 	{ \
@@ -527,11 +525,11 @@ void mot_slit(void) {
 	}
 	if (marioRollChgChk()) {
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
 		}
 		m->flags &= ~0x400000;
 		m->flags &= ~0x200000;
@@ -558,7 +556,7 @@ void mot_slit(void) {
 		if (--MW(m, 0x2dc, s32) <= 0) {
 			m->flags |= 0x100000;
 			MW(m, 0x2d8, s16) = 4;
-			MW(m, 0x1b4, f32) = 6.0f;
+			m->wPlayerCollisionBox.x = 6.0f;
 		}
 		if (MW(m, 0x2dc, s32) == 0x14) {
 			allPartySlitOn();
@@ -570,11 +568,11 @@ void mot_slit(void) {
 				m->baseSpeed = 0.0f;
 				marioChgPose("M_S_1");
 			}
-			m->directionView = toMovedirSimple(m->unk1A8);
+			m->directionView = toMovedirSimple(m->displayDirection);
 		}
 		SPEEDCHK(m)
-		m->unk1A8 = 270.0f;
-		m->unk1AC = m->unk1A8;
+		m->displayDirection = 270.0f;
+		m->displayDirectionTarget = m->displayDirection;
 		if (!m->controlStickSensitivity) {
 			marioChgPose("M_S_1");
 		}
@@ -593,10 +591,10 @@ void mot_slit(void) {
 			marioChgPaper("PM_S_1D");
 			if (revise360(m->directionView - m->targetYaw) <= 180.0f) {
 				MW(m, 0x2ba, s16) = 1;
-				m->unk1A8 = 260.0f;
+				m->displayDirection = 260.0f;
 			} else {
 				MW(m, 0x2ba, s16) = 2;
-				m->unk1A8 = 280.0f;
+				m->displayDirection = 280.0f;
 			}
 			break;
 		}
@@ -703,7 +701,7 @@ void mot_slit(void) {
 					MW(m, 0x2d8, s16) = 0x15;
 					MW(m, 0x2ba, s16) = 2;
 					m->baseSpeed = slitWalkSpeed();
-					m->unk1A8 = 260.0f;
+					m->displayDirection = 260.0f;
 				}
 			} else if (MW(m, 0x2ba, s16) == 2) {
 				if (d <= 180.0f) {
@@ -712,7 +710,7 @@ void mot_slit(void) {
 					MW(m, 0x2d8, s16) = 0x15;
 					MW(m, 0x2ba, s16) = 1;
 					m->baseSpeed = slitWalkSpeed();
-					m->unk1A8 = 280.0f;
+					m->displayDirection = 280.0f;
 				}
 			}
 		}
@@ -723,7 +721,7 @@ void mot_slit(void) {
 		}
 		marioChgPaper("PM_S_1D");
 		MW(m, 0x2d8, s16) = 0x14;
-		m->unk1A8 = (MW(m, 0x2ba, s16) == 1) ? 260.0f : 280.0f;
+		m->displayDirection = (MW(m, 0x2ba, s16) == 1) ? 260.0f : 280.0f;
 		break;
 	}
 	if (m->flags & 0x100000) {
@@ -735,12 +733,12 @@ void mot_slit(void) {
 					f32 sn, cs;
 					d = revise360(m->controlStickAngle - m->targetYaw);
 					if (d > 90.0f && d < 270.0f) {
-						MW(m, 0x2a8, f32) = 180.0f;
+						m->wCamVal1 = 180.0f;
 					} else {
-						MW(m, 0x2a8, f32) = 0.0f;
+						m->wCamVal1 = 0.0f;
 					}
 					if (++MW(m, 0x2a4, s32) >= sysMsec2Frame(50)) {
-						qp = &q; m->directionView = revise360(MW(m, 0x2a8, f32) + m->targetYaw);
+						qp = &q; m->directionView = revise360(m->wCamVal1 + m->targetYaw);
 						MW(m, 0x2a4, s32) = 0;
 						sincosf(&sn, &cs, m->directionView);
 						{ Vec tmp = {0, 0, 0};
@@ -755,12 +753,12 @@ void mot_slit(void) {
 							q.targetPos.x = m->position.x;
 							q.targetPos.z = m->position.z;
 							q.targetDistance = 20.0f;
-							movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(90.0f + m->unk19C));
+							movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(90.0f + m->moveDirection));
 							if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
 								q.targetPos.x = m->position.x;
 								q.targetPos.z = m->position.z;
 								q.targetDistance = 20.0f;
-								movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(m->unk19C - 90.0f));
+								movePos(&qp->targetPos.x, &qp->targetPos.z, 1.0f, reviseAngle(m->moveDirection - 90.0f));
 								if (hitCheckVecHitObjXZ(qp, m->hitobjPush)) {
 									MW(m, 0x2d8, s16) = 0x50;
 								}
@@ -792,14 +790,14 @@ void mot_slit(void) {
 		camGetPtr(8)->flags |= 0x200;
 		CAMFIX(m)
 		m->flags |= 0x10000000;
-		if (0.0f == MW(m, 0x2a8, f32)) {
+		if (0.0f == m->wCamVal1) {
 			marioChgPaper("PM_S_1F");
 		} else {
 			marioChgPaper("PM_S_1G");
 		}
 		m->flags |= 0x400;
 		MW(m, 0x2dc, s32) = 20;
-		m->baseSpeed = (2.0f * MW(m, 0x1b4, f32)) / (f32)MW(m, 0x2dc, s32);
+		m->baseSpeed = (2.0f * m->wPlayerCollisionBox.x) / (f32)MW(m, 0x2dc, s32);
 		MW(m, 0x2d8, s16) = 0x51;
 		m->flags |= 0x200000;
 		break;
@@ -861,7 +859,7 @@ void mot_slit(void) {
 		m->flags &= ~0x200000;
 		MW(m, 0x2da, s16) = 0;
 		m->flags &= ~0x100000;
-		MW(m, 0x1b4, f32) = 20.0f;
+		m->wPlayerCollisionBox.x = 20.0f;
 		if (m->baseSpeed == 0.0f) {
 			marioChgPose("M_S_1");
 		}
@@ -869,16 +867,16 @@ void mot_slit(void) {
 		MW(m, 0x2da, s16) = 30;
 		MW(m, 0x2d8, s16) = 0x65;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
 			if (!m->controlStickSensitivity) {
-				m->directionView = toMovedirSimple(m->unk1A8);
+				m->directionView = toMovedirSimple(m->displayDirection);
 			}
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
 			if (!m->controlStickSensitivity) {
-				m->directionView = toMovedirSimple(m->unk1A8);
+				m->directionView = toMovedirSimple(m->displayDirection);
 			}
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
@@ -913,7 +911,7 @@ void mot_slit(void) {
 		m->flags &= ~0x400;
 		MW(m, 0x2da, s16) = 0;
 		m->flags &= ~0x100000;
-		MW(m, 0x1b4, f32) = 20.0f;
+		m->wPlayerCollisionBox.x = 20.0f;
 		if (!m->controlStickSensitivity) {
 			marioChgPose("M_S_1");
 		}
@@ -922,13 +920,13 @@ void mot_slit(void) {
 		MW(m, 0x2d8, s16) = 0x6f;
 		m->baseSpeed = 0.0f;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
-			m->directionView = toMovedirSimple(m->unk1A8);
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
+			m->directionView = toMovedirSimple(m->displayDirection);
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
-			m->directionView = toMovedirSimple(m->unk1A8);
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
+			m->directionView = toMovedirSimple(m->displayDirection);
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x6f:
@@ -950,7 +948,7 @@ void mot_slit(void) {
 	case 0x78:
 		MW(m, 0x2da, s16) = 0;
 		m->flags &= ~0x100000;
-		MW(m, 0x1b4, f32) = 20.0f;
+		m->wPlayerCollisionBox.x = 20.0f;
 		if (!m->controlStickSensitivity) {
 			marioChgPose("M_S_1");
 		}
@@ -959,13 +957,13 @@ void mot_slit(void) {
 		MW(m, 0x2d8, s16) = 0x79;
 		m->baseSpeed = 0.0f;
 		if (revise360(m->directionView - m->targetYaw) >= 180.0f) {
-			m->unk1A8 = 0.0f;
-			m->unk1AC = m->unk1A8;
-			m->directionView = toMovedirSimple(m->unk1A8);
+			m->displayDirection = 0.0f;
+			m->displayDirectionTarget = m->displayDirection;
+			m->directionView = toMovedirSimple(m->displayDirection);
 		} else {
-			m->unk1A8 = 180.0f;
-			m->unk1AC = m->unk1A8;
-			m->directionView = toMovedirSimple(m->unk1A8);
+			m->displayDirection = 180.0f;
+			m->displayDirectionTarget = m->displayDirection;
+			m->directionView = toMovedirSimple(m->displayDirection);
 		}
 		psndSFXOn_3D((char*)0x178, &m->position);
 	case 0x79:

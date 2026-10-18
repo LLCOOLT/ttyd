@@ -29,8 +29,8 @@
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; EventEntry* escapeEvt; u8 field_0x48[0x4c - 0x48]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; EventEntry* escapeEvt; u8 field_0x48[0x4c - 0x48]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static s32 bss_pad;
 static MoamoaWork* wp;
@@ -690,18 +690,18 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2.0f
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
-        && wp->field_0x558 < 2) {
+        && wp->bounceCount < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
             marioChgMot(5);
         }
-        wp->field_0x558++;
+        wp->bounceCount++;
         return 1;
     }
     if (!(mario->flags & 0x30000)) {
-        wp->field_0x558 = 0;
+        wp->bounceCount = 0;
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
-        rad = 6.2831855f * reviseAngle(camGetPtr(CAMERA_3D)->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
+        rad = 6.2831855f * reviseAngle(camGetPtr(CAMERA_3D)->viewYaw + (mario->displayDirection - 90.0f)) / 360.0f;
         dist = 35.0f * moa_sinx(rad) + mario->position.x;
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cosx(rad)) < 35.0f) {
             return 2;
@@ -739,8 +739,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
     range = (20.0f + mario->wPlayerCollisionBox.x) / 2.0f;
     if (PSVECDistance(&e, &f) < range) {
-        pose->mtx[0][3] = moa->field_0x28;
-        pose->mtx[2][3] = moa->field_0x2c;
+        pose->mtx[0][3] = moa->lastX;
+        pose->mtx[2][3] = moa->lastZ;
         {
         f32 (*mtx)[4] = pose->mtx;
         f = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
@@ -801,12 +801,12 @@ static void ext_moamoa_main(void) {
         wp->field_0x40 = 0;
     }
     if (mario->currMotionId == 0) {
-        wp->field_0x42++;
-        if (wp->field_0x42 > 1000) {
-            wp->field_0x42 = 1000;
+        wp->idleFrames++;
+        if (wp->idleFrames > 1000) {
+            wp->idleFrames = 1000;
         }
     } else {
-        wp->field_0x42 = 0;
+        wp->idleFrames = 0;
     }
     if (party->flags & 0x100) {
         wp->flags |= 0x10;
@@ -872,7 +872,7 @@ static void ext_moamoa_main(void) {
                 moa->state = 0x24;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -885,7 +885,7 @@ static void ext_moamoa_main(void) {
                 moa->state = 0x2f;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -909,7 +909,7 @@ static void ext_moamoa_main(void) {
                 moa->jumpTimer = 120;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -1103,7 +1103,7 @@ static void ext_moamoa_main(void) {
             case 49:
                 if ((wp->flags & 0x1000) && (wp->flags & 0x2000)) {
                     moa->state = 0x3e;
-                } else if (wp->field_0x38 < 500) {
+                } else if (wp->hitCount < 500) {
                     PSMTXIdentity(pose->mtx);
                     pose->mtx[0][3] = wp->target[i % 3].x;
                     pose->mtx[1][3] = wp->target[i % 3].y;
@@ -1210,8 +1210,8 @@ static void ext_moamoa_main(void) {
             }
         }
         pose->mtx[1][3] += wp->mobj->modelWorldMtx[1][3] - wp->mobjY;
-        moa->field_0x28 = pose->mtx[0][3];
-        moa->field_0x2c = pose->mtx[2][3];
+        moa->lastX = pose->mtx[0][3];
+        moa->lastZ = pose->mtx[2][3];
     }
     moamoa_pose_main();
     wp->mobjY = wp->mobj->modelWorldMtx[1][3];

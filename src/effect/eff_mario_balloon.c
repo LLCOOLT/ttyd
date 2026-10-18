@@ -59,7 +59,7 @@ void effMarioBalloonMain(EffectEntry* effect) {
         work->position.z = mario->position.z;
     } else {
         work->position.x = mario->position.x;
-        work->position.y = 10.0f + (mario->position.y + mario->unk150.x);
+        work->position.y = 10.0f + (mario->position.y + mario->camShiftRate.x);
         work->position.z = mario->position.z;
     }
     work->rotation += 4.0f;

@@ -183,7 +183,7 @@ void marioStInit(void) {
 	memset(gp, 0, sizeof(GlobalWork));
 	gp->fbWidth = DEMOGetRenderModeObj()->fbWidth;
 	gp->efbHeight = DEMOGetRenderModeObj()->efbHeight;
-	gp->unk1294 = 1;
+	gp->rumbleEnabled = 1;
 	gp->unk1274 = 0;
 
 	gp->retraceLocalTime = 0;
@@ -403,12 +403,12 @@ void viPostCallback(u32 retraceCount) {
 	gp->retraceTime = time;
 	gp->retraceCount = retraceCount;
 	if (battleDisableHResetCheck()) {
-		gp->unk127C = FALSE;
+		gp->resetButtonDown = FALSE;
 	}
 	else {
-		if (!gp->unk127C) {
+		if (!gp->resetButtonDown) {
 			if (OSGetResetButtonState()) {
-				gp->unk127C = TRUE;
+				gp->resetButtonDown = TRUE;
 			}
 		}
 		else {
@@ -416,14 +416,14 @@ void viPostCallback(u32 retraceCount) {
 				gp->resetType = 1;
 			}
 		}
-		if (gp->unk1324) {
-			if (OSIsRestart() && !gp->field_0x1290) {
+		if (gp->keyDataValid) {
+			if (OSIsRestart() && !gp->restartChecked) {
 				if ((keyGetButton(0) & reset) == reset) {
 					gp->resetType = 0;
 					goto exitcheck;
 				}
 				else {
-					gp->field_0x1290 = TRUE;
+					gp->restartChecked = TRUE;
 				}
 			}
 			if ((keyGetButton(0) & reset) == reset) {
@@ -524,7 +524,7 @@ void gcRumbleCheck(void) {
 
 	now = OSGetTime();
 	for (i = 0; i < 4; i++) {
-		if (!gp->field_0x12E8[i]) {
+		if (!gp->rumbleForcedOff[i]) {
 			if (padGetRumbleStatus(i) == 1) {
 				if (!gp->rumbleStart[i]) {
 					gp->rumbleStart[i] = TRUE;
@@ -532,10 +532,10 @@ void gcRumbleCheck(void) {
 				}
 diff = (s32)now - (s32)gp->rumbleStartTime[i];
 				if (OSTicksToMilliseconds(diff) > 30000) {
-					if (!gp->field_0x12EC[i]) {
-						gp->field_0x12EC[i] = TRUE;
-						gp->field_0x12E8[i] = TRUE;
-						gp->field_0x12F0[i] = now;
+					if (!gp->rumbleForcedOffLatch[i]) {
+						gp->rumbleForcedOffLatch[i] = TRUE;
+						gp->rumbleForcedOff[i] = TRUE;
+						gp->rumbleForcedOffTime[i] = now;
 					}
 				}
 				off_trg[i] = FALSE;
@@ -555,10 +555,10 @@ diff = (s32)now - (s32)off_time[i];
 			}
 		}
 		else {
-diff = (s32)now - (s32)gp->field_0x12F0[i];
+diff = (s32)now - (s32)gp->rumbleForcedOffTime[i];
 			if (OSTicksToMilliseconds(diff) > 30000) {
-				gp->field_0x12EC[i] = FALSE;
-				gp->field_0x12E8[i] = FALSE;
+				gp->rumbleForcedOffLatch[i] = FALSE;
+				gp->rumbleForcedOff[i] = FALSE;
 				gp->rumbleStart[i] = FALSE;
 			}
 			array[i] = TRUE;
@@ -570,10 +570,10 @@ diff = (s32)now - (s32)gp->field_0x12F0[i];
 			array[i] = TRUE;
 		}
 		if (array[i]) {
-			gp->unk1310[i] = TRUE;
+			gp->rumbleHardStop[i] = TRUE;
 		}
 		else {
-			gp->unk1310[i] = FALSE;
+			gp->rumbleHardStop[i] = FALSE;
 		}
 	}
 }

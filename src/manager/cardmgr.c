@@ -102,7 +102,7 @@ void cardBufReset(void) {
 	wp->chan = -1;
 	wp->fileNo = -1;
 	wp->serialNo = 0;
-	wp->unkE0 = 0;
+	wp->op = 0;
 	wp->result = CARD_RESULT_NOCARD;
 	wp->flags = 0;
 }
@@ -114,10 +114,10 @@ void cardInit(void) {
 	memset(wp->workArea, 0, CARD_WORKAREA_SIZE);
 	wp->data = __memAlloc(HEAP_DEFAULT, sizeof(CardData));
 	memset(wp->data, 0, sizeof(CardData));
-	wp->unkAC = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
-	memset(wp->unkAC, 0, sizeof(CardSaveSlot));
-	wp->unkB0 = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
-	memset(wp->unkB0, 0, sizeof(CardSaveSlot));
+	wp->readBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
+	memset(wp->readBuf, 0, sizeof(CardSaveSlot));
+	wp->writeBuf = __memAlloc(HEAP_DEFAULT, sizeof(CardSaveSlot));
+	memset(wp->writeBuf, 0, sizeof(CardSaveSlot));
 
 	make_header();
 	make_data();
@@ -125,15 +125,15 @@ void cardInit(void) {
 	wp->chan = -1;
 	wp->fileNo = -1;
 	wp->serialNo = 0;
-	wp->unkE0 = 0;
+	wp->op = 0;
 	wp->result = CARD_RESULT_NOCARD;
 	wp->flags = 0;
 	CARDInit();
 }
 
 void unk_800b0ed0(void) {
-	wp->unkE4 = wp->chan;
-	wp->unkEC = 10;
+	wp->prevInserted = wp->chan;
+	wp->busyFrames = 10;
 	wp->flags |= 0x8000;
 }
 
@@ -159,7 +159,7 @@ BOOL cardIsExec(void) {
     if (wp->flags & 1) {
         return TRUE;
     }
-    return wp->unkEC != 0;
+    return wp->busyFrames != 0;
 }
 
 s32 cardGetCode(void) {
@@ -172,16 +172,16 @@ void cardMain(void) {
 
 	if (wp->flags & 0x8000) {
 		temp_r4 = (s32)(s64)-(CARDProbe(0) == 0); //is something inserted?
-		if (wp->unkE4 != temp_r4) {
+		if (wp->prevInserted != temp_r4) {
 			wp->flags |= 0x4000;
 		}
-		wp->unkE4 = temp_r4;
-		if (wp->unkEC) {
-			wp->unkEC--;
+		wp->prevInserted = temp_r4;
+		if (wp->busyFrames) {
+			wp->busyFrames--;
 		}
 	}
 
-	switch (wp->unkE0) {
+	switch (wp->op) {
 		case 1:
 			write_main();
 			break;
@@ -204,12 +204,12 @@ void cardMain(void) {
 
 		case 6:
 			if (wp->result != CARD_RESULT_READY) {
-				wp->unkE0 = 8;
+				wp->op = 8;
 				wp->flags |= 0x200;
 				wp->flags &= ~2;
 			}
 			else if (!(wp->flags & 1)) {
-				switch (wp->unkD8) {
+				switch (wp->opStep) {
 					case 0:
 						memcard_probe();
 						break;
@@ -227,12 +227,12 @@ void cardMain(void) {
 						break;
 
 					case 4:
-						wp->unkE0 = 0;
+						wp->op = 0;
 						wp->flags |= 0x100;
 						wp->flags &= ~2;
 						break;
 				}
-				wp->unkD8++;
+				wp->opStep++;
 			}
 			else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
 				wp->result = CARDGetResultCode(wp->chan);
@@ -242,12 +242,12 @@ void cardMain(void) {
 
 		case 7:
 			if (wp->result != CARD_RESULT_READY) {
-				wp->unkE0 = 8;
+				wp->op = 8;
 				wp->flags |= 0x200;
 				wp->flags &= ~2;
 			}
 			else if (!(wp->flags & 1)) {
-				switch (wp->unkD8) {
+				switch (wp->opStep) {
 					case 0:
 						memcard_probe();
 						break;
@@ -269,12 +269,12 @@ void cardMain(void) {
 						break;
 
 					case 5:
-						wp->unkE0 = 0;
+						wp->op = 0;
 						wp->flags |= 0x100;
 						wp->flags &= ~2;
 						break;
 				}
-				wp->unkD8++;
+				wp->opStep++;
 			}
 			else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
 				wp->result = CARDGetResultCode(wp->chan);
@@ -303,24 +303,24 @@ void cardCopy2Main(s32 slot) {
     backup2 = gp->mapAlloc;
     backup3 = (u32)(gp->flags & 8);
     backup4 = gp->unk1274;
-    backup5 = gp->unk1294;
-    backup6 = gp->unk11B8;
+    backup5 = gp->rumbleEnabled;
+    backup6 = gp->lastSlot;
     memcpy(gp, &save->data.global, sizeof(GlobalWork));
     gp->fbatData = backup1;
     memcpy(pouchGetPtr(), &save->data.pouch, sizeof(PouchData));
     memcpy(fbatGetPointer()->deadInfo, save->data.deadInfo, sizeof(NpcDeadInfo) * 64);
     memcpy(bdsw, &save->data.badgeShop, sizeof(BadgeShopWork));
     memcpy(yuwp, &save->data.parlor, sizeof(PiantaParlorWork));
-    memcpy(&_jdt.unk14, &save->data.informant, sizeof(InformantUnknown));
+    memcpy(&_jdt.readFlags, &save->data.informant, sizeof(InformantUnknown));
     gp->resetType = 0;
-    gp->unk127C = 0;
+    gp->resetButtonDown = 0;
     gp->dvdError = 0;
     gp->retraceTime = OSGetTime();
     strcpy(gp->currentAreaName, "123");
     gp->relocationBase = NULL;
     gp->unk1274 = backup4;
-    gp->unk1294 = backup5;
-    gp->unk11B8 = backup6;
+    gp->rumbleEnabled = backup5;
+    gp->lastSlot = backup6;
     gp->mapAlloc = backup2;
     gp->unk8 = 0;
     gp->field_C = 0;
@@ -336,14 +336,14 @@ void cardErase(s32 slotNo) {
     CardSaveSlot* save;
 
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 1;
+        wp->op = 1;
         wp->currSlot = slotNo;
-        wp->unkD8 = 0;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x300;
         wp->flags |= 0x800;
-        save = wp->unkB0;
+        save = wp->writeBuf;
         memset(save, 0, sizeof(save->data));
         save->data.flags |= 1;
         check_sum(save);
@@ -352,14 +352,14 @@ void cardErase(s32 slotNo) {
 
 void cardCopy(s32 from, s32 to) {
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 1;
+        wp->op = 1;
         wp->currSlot = to;
-        wp->unkD8 = 0;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x300;
         wp->flags |= 0x800;
-        memcpy(wp->unkB0, &wp->data->saves[from], sizeof(CardSaveSlot));
+        memcpy(wp->writeBuf, &wp->data->saves[from], sizeof(CardSaveSlot));
     }
 }
 
@@ -370,9 +370,9 @@ void cardWrite(s32 slot) {
     s8 partyId;
 
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 1;
+        wp->op = 1;
         wp->currSlot = slot;
-        wp->unkD8 = 0;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x300;
@@ -406,7 +406,7 @@ void cardWrite(s32 slot) {
         memcpy(save->data.deadInfo, fbatGetPointer()->deadInfo, sizeof(save->data.deadInfo));
         memcpy(&save->data.badgeShop, bdsw, sizeof(BadgeShopWork));
         memcpy(&save->data.parlor, yuwp, sizeof(PiantaParlorWork));
-        memcpy(&save->data.informant, &_jdt.unk14, sizeof(_jdt.unk14));
+        memcpy(&save->data.informant, &_jdt.readFlags, sizeof(_jdt.readFlags));
         save->data.flags &= ~1;
         save->data.flags &= ~2;
         check_sum(save);
@@ -451,12 +451,12 @@ static inline void memcard_probe(void) {
 #pragma opt_propagation on //needed for memcard_probe? TODO fix
 void write_main(void) {
     if (wp->result) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -470,7 +470,7 @@ void write_main(void) {
                 memcard_open();
                 break;
             case 4:
-                memcard_read(wp->unkAC, sizeof(CardMetadata), 0);
+                memcard_read(wp->readBuf, sizeof(CardMetadata), 0);
                 break;
             case 5:
                 if (!headerCheck()) {
@@ -479,13 +479,13 @@ void write_main(void) {
                 }
                 break;
             case 6:
-                memcard_read(wp->unkAC, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot))));
+                memcard_read(wp->readBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot))));
                 break;
             case 7:
                 wp->validSave1 = dataCheck();
                 break;
             case 8:
-                memcard_read(wp->unkAC, sizeof(CardSaveSlot), (s32)(sizeof(CardData) + (wp->currSlot * sizeof(CardSaveSlot))));
+                memcard_read(wp->readBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardData) + (wp->currSlot * sizeof(CardSaveSlot))));
                 break;
             case 9:
                 wp->validSave2 = dataCheck();
@@ -499,14 +499,14 @@ void write_main(void) {
                     wp->unkC0 = 1;
                 }
                 if (wp->flags & 0x800) {
-                    memcard_write(wp->unkB0, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkBC * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkBC * (sizeof(CardSaveSlot) * 4))));
                 } else {
                     memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkBC * (sizeof(CardSaveSlot) * 4))));
                 }
                 break;
             case 11:
                 if (wp->flags & 0x800) {
-                    memcard_write(wp->unkB0, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkC0 * (sizeof(CardSaveSlot) * 4))));
+                    memcard_write(wp->writeBuf, sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkC0 * (sizeof(CardSaveSlot) * 4))));
                 } else {
                     memcard_write(&wp->data->saves[wp->currSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->currSlot * sizeof(CardSaveSlot)) + (wp->unkC0 * (sizeof(CardSaveSlot) * 4))));
                 }
@@ -521,17 +521,17 @@ void write_main(void) {
                 memcard_unmount();
                 break;
             case 15:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags |= 0x2000;
                 wp->flags &= ~2;
                 if (wp->flags & 0x800) {
                     wp->flags &= ~0x800;
-                    memcpy(&wp->data->saves[wp->currSlot], wp->unkB0, sizeof(CardSaveSlot));
+                    memcpy(&wp->data->saves[wp->currSlot], wp->writeBuf, sizeof(CardSaveSlot));
                 }
                 break;
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -542,9 +542,9 @@ void write_main(void) {
 
 void cardWriteHeader(void) {
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 2;
+        wp->op = 2;
         wp->currSlot = 0;
-        wp->unkD8 = 0;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x300;
@@ -556,12 +556,12 @@ void cardWriteHeader(void) {
 #pragma opt_propagation off
 void write_header_main(void) {
     if (wp->result) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -587,13 +587,13 @@ void write_header_main(void) {
                 memcard_unmount();
                 break;
             case 8:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags |= 0x2000;
                 wp->flags &= ~2;
                 break;
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -607,12 +607,12 @@ void read_main(void) {
     s32 saveType; //invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -626,7 +626,7 @@ void read_main(void) {
                 memcard_open();
                 break;
             case 4:
-                memcard_read(wp->unkAC, sizeof(CardMetadata), 0);
+                memcard_read(wp->readBuf, sizeof(CardMetadata), 0);
                 break;
             case 5:
                 if (!headerCheck()) {
@@ -634,18 +634,18 @@ void read_main(void) {
                 }
                 break;
             case 6:
-                memcard_read(wp->unkAC, 0x4000, (s32)((wp->unkA4 * sizeof(CardSaveSlot)) + sizeof(CardMetadata)));
+                memcard_read(wp->readBuf, 0x4000, (s32)((wp->opSlot * sizeof(CardSaveSlot)) + sizeof(CardMetadata)));
                 break;
             case 7:
                 wp->validSave1 = dataCheck();
-                wp->lastSaveTime1 = ((CardSaveSlot*)wp->unkAC)->data.global.saveTime;
+                wp->lastSaveTime1 = ((CardSaveSlot*)wp->readBuf)->data.global.saveTime;
                 break;
             case 8:
-                memcard_read(wp->unkAC, 0x4000, (s32)((wp->unkA4 * sizeof(CardSaveSlot)) + sizeof(CardData)));
+                memcard_read(wp->readBuf, 0x4000, (s32)((wp->opSlot * sizeof(CardSaveSlot)) + sizeof(CardData)));
                 break;
             case 9:
                 wp->validSave2 = dataCheck();
-                wp->lastSaveTime2 = ((CardSaveSlot*)wp->unkAC)->data.global.saveTime;
+                wp->lastSaveTime2 = ((CardSaveSlot*)wp->readBuf)->data.global.saveTime;
                 break;
             case 10:
                 if (wp->validSave1 != 0 && wp->validSave2 != 0) {
@@ -663,9 +663,9 @@ void read_main(void) {
                     saveType = -1;
                 }
                 if (saveType != -1) {
-                    memcard_read(&wp->data->saves[wp->unkA4], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->unkA4 * sizeof(CardSaveSlot)) + (saveType * (sizeof(CardSaveSlot) * 4))));
+                    memcard_read(&wp->data->saves[wp->opSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->opSlot * sizeof(CardSaveSlot)) + (saveType * (sizeof(CardSaveSlot) * 4))));
                 } else {
-                    wp->data->saves[wp->unkA4].data.flags |= 2;
+                    wp->data->saves[wp->opSlot].data.flags |= 2;
                 }
                 break;
             case 11:
@@ -678,13 +678,13 @@ void read_main(void) {
                 memcard_unmount();
                 break;
             case 14:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags |= 0x2000;
                 wp->flags &= ~2;
                 break;
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -695,9 +695,9 @@ void read_main(void) {
 
 void cardReadAll(void) {
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 4;
-        wp->unkA4 = 0;
-        wp->unkD8 = 0;
+        wp->op = 4;
+        wp->opSlot = 0;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
@@ -710,13 +710,13 @@ void read_all_main(void) {
     s32 saveType; //invalid = -1, main = 0, backup = 1
 
     if (wp->result) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
         return;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -738,22 +738,22 @@ void read_all_main(void) {
                     wp->flags |= 0x400;
                 }
                 gp->unk1274 = wp->data->metadata.data.unk1E42;
-                gp->unk1294 = wp->data->metadata.data.unk1E40;
-                gp->unk11B8 = wp->data->metadata.data.unk1E44;
+                gp->rumbleEnabled = wp->data->metadata.data.unk1E40;
+                gp->lastSlot = wp->data->metadata.data.unk1E44;
                 break;
             case 6:
-                memcard_read(wp->unkAC, 0x4000, (wp->unkA4 << 0xE) + 0x2000);
+                memcard_read(wp->readBuf, 0x4000, (wp->opSlot << 0xE) + 0x2000);
                 break;
             case 7:
                 wp->validSave1 = dataCheck();
-                wp->lastSaveTime1 = ((CardSaveSlot*)wp->unkAC)->data.global.saveTime;
+                wp->lastSaveTime1 = ((CardSaveSlot*)wp->readBuf)->data.global.saveTime;
                 break;
             case 8:
-                memcard_read(wp->unkAC, 0x4000, (wp->unkA4 << 0xE) + 0x12000);
+                memcard_read(wp->readBuf, 0x4000, (wp->opSlot << 0xE) + 0x12000);
                 break;
             case 9:
                 wp->validSave2 = dataCheck();
-                wp->lastSaveTime2 = ((CardSaveSlot*)wp->unkAC)->data.global.saveTime;
+                wp->lastSaveTime2 = ((CardSaveSlot*)wp->readBuf)->data.global.saveTime;
                 break;
             case 10:
                 if (wp->validSave1 != 0 && wp->validSave2 != 0) {
@@ -771,13 +771,13 @@ void read_all_main(void) {
                     saveType = -1;
                 }
                 if (saveType != -1) {
-                    memcard_read(&wp->data->saves[wp->unkA4], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->unkA4 * sizeof(CardSaveSlot)) + (saveType * (sizeof(CardSaveSlot) * 4))));
+                    memcard_read(&wp->data->saves[wp->opSlot], sizeof(CardSaveSlot), (s32)(sizeof(CardMetadata) + (wp->opSlot * sizeof(CardSaveSlot)) + (saveType * (sizeof(CardSaveSlot) * 4))));
                 } else {
-                    wp->data->saves[wp->unkA4].data.flags |= 2;
+                    wp->data->saves[wp->opSlot].data.flags |= 2;
                 }
-                wp->unkA4++;
-                if (wp->unkA4 < 4) {
-                    wp->unkD8 = 3;
+                wp->opSlot++;
+                if (wp->opSlot < 4) {
+                    wp->opStep = 3;
                 }
                 break;
             case 11:
@@ -790,13 +790,13 @@ void read_all_main(void) {
                 memcard_unmount();
                 break;
             case 14:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags |= 0x2000;
                 wp->flags &= ~2;
                 break;
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -807,8 +807,8 @@ void read_all_main(void) {
 
 void cardCreate(void) {
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 5;
-        wp->unkD8 = 0;
+        wp->op = 5;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
@@ -822,12 +822,12 @@ void cardCreate(void) {
 #pragma opt_dead_code off
 void create_main(void) {
     if (wp->result) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -877,13 +877,13 @@ void create_main(void) {
                 memcard_unmount();
                 break;
             case 13:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags |= 0x2000;
                 wp->flags &= ~2;
                 break;
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -895,8 +895,8 @@ void create_main(void) {
 
 void cardFormat(void) {
     if (!(wp->flags & 2)) {
-        wp->unkE0 = 6;
-        wp->unkD8 = 0;
+        wp->op = 6;
+        wp->opStep = 0;
         wp->result = 0;
         wp->flags |= 2;
         wp->flags &= ~0x700;
@@ -906,12 +906,12 @@ void cardFormat(void) {
 
 static inline void format_main(void) {
     if (wp->result != CARD_RESULT_READY) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -929,13 +929,13 @@ static inline void format_main(void) {
                 break;
             
             case 4:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags &= ~2;
                 break;
             
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -945,12 +945,12 @@ static inline void format_main(void) {
 
 static inline void delete_main(void) {
     if (wp->result != CARD_RESULT_READY) {
-        wp->unkE0 = 8;
+        wp->op = 8;
         wp->flags |= 0x200;
         wp->flags &= ~2;
     }
     else if (!(wp->flags & 1)) {
-        switch (wp->unkD8) {
+        switch (wp->opStep) {
             case 0:
                 memcard_probe();
                 break;
@@ -972,13 +972,13 @@ static inline void delete_main(void) {
                 break;
             
             case 5:
-                wp->unkE0 = 0;
+                wp->op = 0;
                 wp->flags |= 0x100;
                 wp->flags &= ~2;
                 break;
             
         }
-        wp->unkD8++;
+        wp->opStep++;
     }
     else if (CARDGetResultCode(wp->chan) != CARD_RESULT_BUSY && wp->result != CARDGetResultCode(wp->chan)) {
         wp->result = CARDGetResultCode(wp->chan);
@@ -1010,7 +1010,7 @@ static inline BOOL headerCheck(void) {
     u8* temp;
     CardMetadata* metadata;
 
-    metadata = wp->unkAC;
+    metadata = wp->readBuf;
     if (metadata->checksum2 != ~metadata->checksum1) {
         return FALSE;
     } else {
@@ -1056,7 +1056,7 @@ static inline BOOL dataCheck(void) {
     u8* temp;
     CardSaveSlot* save;
 
-    save = wp->unkAC;
+    save = wp->readBuf;
     if (save->size != sizeof(save->data)) {
         return FALSE;
     } else if (strcmp(save->version, version)) {
@@ -1091,9 +1091,9 @@ static inline void make_header(void) {
 	memcpy(metadata->data.bannerTex, _mariost_banner_tex, sizeof(metadata->data.bannerTex));
 	memcpy(metadata->data.iconTex, _mariost_icon_tex, sizeof(metadata->data.iconTex));
 	memcpy(metadata->data.iconTlut, _mariost_icon_tlut, sizeof(metadata->data.iconTlut));
-	metadata->data.unk1E40 = (gp->unk1294 != 0);
+	metadata->data.unk1E40 = (gp->rumbleEnabled != 0);
 	metadata->data.unk1E42 = (u16)gp->unk1274;
-	metadata->data.unk1E44 = (u16)gp->unk11B8;
+	metadata->data.unk1E44 = (u16)gp->lastSlot;
 	metadata->checksum1 = (checksum = 0u);
 	metadata->checksum2 = ~0u;
 
@@ -1114,7 +1114,7 @@ static inline void make_data(void) {
             save = &cardGetFilePtr()->saves[i];
         }
         else {
-            save = wp->unkB0;
+            save = wp->writeBuf;
         }
         memset(save, 0, sizeof(save->data));
         save->data.flags |= 1;

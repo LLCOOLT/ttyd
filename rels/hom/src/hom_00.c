@@ -746,9 +746,8 @@ static void sun_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texMap = info->texCoord;
     s32 texCoord = info->texMap;
-    s32 indStage = info->field_0x18;
+    s32 indStage = info->indStage;
     GXTexObj obj;
-    int new_var;
     f32 mtx[2][3];
     u8* buf;
     s32 i;
@@ -772,23 +771,22 @@ static void sun_tev(MapTevCallbackInfo* info) {
         }
     }
     DCFlushRange(buf, 0x2000);
-    new_var = 1;
     GXInitTexObj(&obj, buf, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
     GXInitTexObjLOD(&obj, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&obj, texMap);
     mtx[0][0] = 0.5f;
-    mtx[0][new_var] = 0.0f;
+    mtx[0][1] = 0.0f;
     mtx[0][2] = 0.0f;
-    mtx[new_var][0] = 0.0f;
-    mtx[new_var][new_var] = 0.5f;
+    mtx[1][0] = 0.0f;
+    mtx[1][1] = 0.5f;
     mtx[1][2] = 0.0f;
-    GXSetIndTexMtx(GX_ITM_0, mtx, new_var);
+    GXSetIndTexMtx(GX_ITM_0, mtx, 1);
     GXSetIndTexOrder(indStage, GX_TEXCOORD0, texMap);
     GXSetIndTexCoordScale(indStage, GX_ITS_1, GX_ITS_1);
     GXSetTevIndWarp(GX_TEVSTAGE0, indStage, GX_TRUE, GX_FALSE, GX_ITM_0);
     info->tevStage = stage;
     info->texMap = texCoord;
-    info->field_0x18 = indStage + new_var;
+    info->indStage = indStage + 1;
     info->texCoord = texMap + 1;
 }
 

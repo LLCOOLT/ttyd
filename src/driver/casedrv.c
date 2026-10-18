@@ -58,8 +58,8 @@ s32 caseEntry(CaseSetup* setup) {
 	memset(entry, 0, sizeof(CaseEntry));
 	entry->caseId = i;
 	entry->flags = 0;
-	entry->activeConditionId = setup->activeConditionId & ~0x8000;
-	if (setup->activeConditionId & 0x8000) {
+	entry->conditionId = setup->conditionId & ~0x8000;
+	if (setup->conditionId & 0x8000) {
 		entry->flags |= 4u;
 	}
 	entry->flags |= 1u;
@@ -97,13 +97,13 @@ void caseMain(void) {
 	mario = marioGetPtr();
 	partyGetPtr(marioGetPartyId());
 	standOn = mario->hitobjStandOn;
-	h1f8 = mario->field_0x1F8;
+	h1f8 = mario->hitobjUnder;
 	jumpFrom = mario->hitobjJumpFrom;
-	h1e0 = mario->field_0x1E0;
+	h1e0 = mario->hitobjFront;
 	push = mario->hitobjPush;
 	h1fc = mario->field_0x1FC;
-	h1f4 = mario->field_0x1F4;
-	btn = mario->field_0x248;
+	h1f4 = mario->hitobjHead;
+	btn = mario->buttonBuffer;
 	if ((u32)marioStGetSystemLevel() == 0 && !winCheck() && gp->inBattle == 0 &&
 	    !N_fbatPreventMarioEventChk() && marioCaseEventValidChk()) {
 		if (mario->currMotionId != 0 && mario->currMotionId != 1 && mario->currMotionId != 2 &&
@@ -114,7 +114,7 @@ void caseMain(void) {
 		entry = wp->entries;
 		for (i = 0; i < wp->count; i++, entry++) {
 			if (!(entry->flags & 1)) continue;
-			switch (entry->activeConditionId) {
+			switch (entry->conditionId) {
 			case 0:
 				if (standOn != NULL && !strcmp(hitGetName(standOn), entry->hitObjName)) SET_HIT(entry);
 				break;
@@ -140,7 +140,7 @@ void caseMain(void) {
 				break;
 			case 4:
 				if (jumpFrom != NULL && mario->airTimer == 1 && fbatNpcTalkCheck() == NULL &&
-				    !strcmp(hitGetName(jumpFrom), entry->hitObjName) && (mario->field_0x248 & 0x100)) {
+				    !strcmp(hitGetName(jumpFrom), entry->hitObjName) && (mario->buttonBuffer & 0x100)) {
 					SET_HIT(entry);
 				}
 				break;
@@ -236,8 +236,8 @@ CaseEntry* caseCheckHitObj(void* obj) {
 	if (gp->inBattle != 0) return NULL;
 	entry = wp->entries;
 	for (i = 0; i < wp->count; i++, entry++) {
-		if ((entry->flags & 1) && entry->activeConditionId != 0x11 &&
-		    (u32)(entry->activeConditionId - 0x12) > 1) {
+		if ((entry->flags & 1) && entry->conditionId != 0x11 &&
+		    (u32)(entry->conditionId - 0x12) > 1) {
 			if (!strcmp(hitGetName(obj), entry->hitObjName)) return entry;
 		}
 	}
@@ -250,8 +250,8 @@ CaseEntry* caseCheckHitObj2(void* obj) {
 	if (gp->inBattle != 0) return NULL;
 	entry = wp->entries;
 	for (i = 0; i < wp->count; i++, entry++) {
-		if ((entry->flags & 1) && entry->activeConditionId != 0x11 &&
-		    (u32)(entry->activeConditionId - 0x12) > 1 && entry->activeConditionId == 0xF) {
+		if ((entry->flags & 1) && entry->conditionId != 0x11 &&
+		    (u32)(entry->conditionId - 0x12) > 1 && entry->conditionId == 0xF) {
 			if (!strcmp(hitGetName(obj), entry->hitObjName)) return entry;
 		}
 	}

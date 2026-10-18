@@ -158,7 +158,7 @@ s32 battleAcMain_Repeatedly(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if (!((work->actionCommands.field_0x4 & 1) &&
+            if (!((work->actionCommands.setupFlags & 1) &&
                   (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction))) {
                 if (r->holdMask) {
                     if (!PadNow(r->holdMask)) {

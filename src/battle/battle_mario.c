@@ -2962,14 +2962,14 @@ USER_FUNC(_kaiten_hammer_acrobat_rotate) {
             event->userdata[1] = 360.0f + reviseAngle(ry);
         }
         event->userdata[2] = unit->faceDirection * event->userdata[1] / n;
-        event->field_84 = 0;
+        event->userdata3 = 0;
     }
     BtlUnit_AddRotate(unit, 0, event->userdata[2], 0);
     event->userdata[0]--;
-    if ((s32)event->field_84 == 0) {
+    if ((s32)event->userdata3 == 0) {
         event->userdata[1] -= event->userdata[2];
         if (event->userdata[1] <= 270) {
-            event->field_84 = 1;
+            event->userdata3 = 1;
             BtlUnit_SetAnim(part, anim);
         }
     }

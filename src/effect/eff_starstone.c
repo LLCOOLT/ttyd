@@ -650,11 +650,10 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   Mtx s;
   Mtx r;
   GXTexObj tex;
-  int new_var;
   EffStarStoneWork *w = effect->userdata;
   CameraEntry *cam = camGetPtr(cameraId);
   s32 type = w->type;
-  int new_var2[4];
+  int new_var2[4]; // FAKE: four loop counters as one register-promoted array; one counter / four scalars differ
   mapSetMaterialFog();
   GXSetArray(11, color_tbl[w->type], 4);
   GXSetNumChans(1);
@@ -818,14 +817,13 @@ void effStarStoneDisp_2(CameraId cameraId, EffectEntry *effect)
   GXSetVtxDesc(9, 2);
   GXSetVtxAttrFmt(0, 9, 1, 3, 11);
   GXSetArray(9, diamond_2_2_vertex_tbl, 6);
-  new_var = 0;
   GXSetVtxDesc(10, 2);
   GXSetVtxAttrFmt(0, 10, 0, 1, 6);
   GXSetArray(10, diamond_2_2_normal_tbl, 3);
   GXSetVtxDesc(11, 2);
   GXSetVtxAttrFmt(0, 11, 1, 5, 0);
   GXSetVtxDesc(13, 2);
-  GXSetVtxAttrFmt(new_var, 13, 1, 3, 14);
+  GXSetVtxAttrFmt(0, 13, 1, 3, 14);
   GXSetArray(13, diamond_2_2_texcoord0_tbl, 4);
   for (new_var2[3] = 0; new_var2[3] < 19U; new_var2[3]++)
   {

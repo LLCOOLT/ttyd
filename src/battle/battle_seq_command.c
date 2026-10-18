@@ -411,7 +411,11 @@ s32 _btlcmd_MakeSelectWeaponTable(BattleWork* wp, s32 type) {
 	static BattleWeapon defaultWeapon_Dummy_NoItem = {
 		"btl_wn_dummy_noitem", 0, {0}, 0, "msg_dummy_noitem", 100, 0, 0, 0, 0.0f, 0, 0, 0, 0,
 		NULL, {0}, NULL, {0}, 0x01000160, 0x20000002, 0, 0, 3, 2, NULL, 0,
-		{0, 0, 0, 0, 0x80, 0x00, 0x20, 0x00}, 0, 0, 0, 0, {0}, 0, {0}, 0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100}
+		0, 0x80002000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* counterResist, targetWeight, sleep..confuse */
+		0, 0, 0, 0, /* electric, dodgy */
+		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, /* burn..payback */
+		0, 0, 0, /* holdFast, invisible */
+		0, 0, 0, 0, {0}, NULL, {0, 0, 0, 100}
 	};
 
 	unit = BattleGetUnitPtr(wp, wp->activeUnitId);
@@ -1158,7 +1162,7 @@ s32 BattleCommandInput(BattleWork* work) {
 				}
 			}
 			CMD_U8(cmd, 0x551) = 0;
-			CMD_S32(wp, 0xef8) |= 1;
+			wp->dispFlags |= 1;
 			BtlUnit_SetCommandAnimPose(unit);
 			if ((s8)CMD_U8(unit, 0x20) >= 5 && (s8)CMD_U8(unit, 0x20) <= 9) {
 				BattleStageOnLightInCommand();
@@ -1404,7 +1408,7 @@ s32 BattleCommandInput(BattleWork* work) {
 		case 29:
 			_btlcmd_SetAttackEvent(unit, cmd);
 			cmd->field_4 &= ~0x1000000;
-			CMD_S32(wp, 0xef8) &= ~1;
+			wp->dispFlags &= ~1;
 			BattleStageOffLightInCommand(0, 0);
 			return 1;
 		}
@@ -2352,9 +2356,9 @@ void* btlataudGetAttackEventPtr(s32 id);
 void* btlataudGetMoveEventPtr(s32 id);
 void msgWindow_Continue(s32 id);
 s32 _check_weapon_type_attack(BattleWeapon* weapon);
-#define UEVT(u) (*(void**)((u8*)(u) + 0x29c))
-#define UEVTMODE(u) (*(s32*)((u8*)(u) + 0x2a8))
-#define WEVT(w) (*(void**)((u8*)(w) + 0xb0))
+#define UEVT(u) ((u)->attackEventCode)
+#define UEVTMODE(u) ((u)->attackEventFlags)
+#define WEVT(w) ((w)->mAttackEvtScript)
 #define ACTREC(o) ((u8*)wp + (o))
 
 void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
@@ -2366,14 +2370,14 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 	if (CMD_U8(cmd, 0x551)) {
 		unit->moveState = 0;
 		UEVT(unit) = btldefaultevt_Wait;
-		UEVTMODE(unit) = 1;
+		unit->attackEventFlags = 1;
 		return;
 	}
 	switch (type) {
 	case 5:
 		switch ((u32)CMD_S32(cmd, 0x548)) {
 		case 6:
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			if (unit->currentKind == 0xde) {
 				UEVT(unit) = btldefaultevt_Defend;
 			} else {
@@ -2382,7 +2386,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			break;
 		case 5:
 			UEVT(unit) = btldefaultevt_Appeal;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			if (unit->currentKind == 0xde) {
 				BtlActRec_AddCount(ACTREC(0x16f2d));
 			} else {
@@ -2391,7 +2395,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			break;
 		case 7:
 			UEVT(unit) = btldefaultevt_Wait;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			if (unit->currentKind == 0xde) {
 				BtlActRec_AddCount(ACTREC(0x16f2d));
 			} else {
@@ -2400,7 +2404,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			break;
 		case 3:
 			UEVT(unit) = btldefaultevt_Escape;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			if (unit->currentKind == 0xde) {
 				BtlActRec_AddCount(ACTREC(0x16f37));
 			} else {
@@ -2408,7 +2412,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			}
 			break;
 		case 1:
-			UEVTMODE(unit) = 0;
+			unit->attackEventFlags = 0;
 			if (unit->currentKind == 0xde) {
 				UEVT(unit) = WEVT(&badgeWeapon_Charge);
 				BtlActRec_AddCount(ACTREC(0x16f33));
@@ -2418,7 +2422,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			}
 			break;
 		case 2:
-			UEVTMODE(unit) = 0;
+			unit->attackEventFlags = 0;
 			if (unit->currentKind == 0xde) {
 				UEVT(unit) = WEVT(&badgeWeapon_SuperCharge);
 				BtlActRec_AddCount(ACTREC(0x16f35));
@@ -2429,9 +2433,9 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			break;
 		case 0:
 			UEVT(unit) = btldefaultevt_ChangeParty;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			CMD_S32(cmd, 0x4a4) = 0;
-			if (CMD_S32(wp, 0x163d8) & 1) {
+			if (wp->badgeEquippedFlags & 1) {
 				unit->moveState = 3;
 			}
 			if (unit->currentKind == 0xde) {
@@ -2442,15 +2446,15 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 			break;
 		case 4:
 			UEVT(unit) = btldefaultevt_ProtectPartner;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			break;
 		case 8:
 			UEVT(unit) = BtlUnit_GetData(unit, 2);
-			UEVTMODE(unit) = 3;
+			unit->attackEventFlags = 3;
 			break;
 		default:
 			UEVT(unit) = btldefaultevt_Wait;
-			UEVTMODE(unit) = 1;
+			unit->attackEventFlags = 1;
 			break;
 		}
 		break;
@@ -2462,7 +2466,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 		_btlcmd_GetCursorPtr(cmd, type, &cursor);
 		weapon = cmd->weapon[cursor->field_0].weapon;
 		UEVT(unit) = WEVT(weapon);
-		UEVTMODE(unit) = 0;
+		unit->attackEventFlags = 0;
 		if (!UEVT(unit)) {
 			UEVT(unit) = btldefaultevt_Wait;
 		}
@@ -2508,7 +2512,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 	case 9:
 		unit->moveState = 1;
 		UEVT(unit) = btldefaultevt_ChangePosition;
-		UEVTMODE(unit) = 7;
+		unit->attackEventFlags = 7;
 		break;
 	case 11:
 		switch (unit->moveState) {
@@ -2518,7 +2522,7 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 		default: unit->moveState = 4; break;
 		}
 		UEVT(unit) = btlataudGetAttackEventPtr(unit->unitId);
-		UEVTMODE(unit) = 3;
+		unit->attackEventFlags = 3;
 		if (unit->currentKind == 0xde) {
 			BtlActRec_AddCount(ACTREC(0x16f2b));
 		} else {
@@ -2536,15 +2540,15 @@ void _btlcmd_SetAttackEvent(BattleUnit* unit, BattleCommand* cmd) {
 		default: unit->moveState = 4; break;
 		}
 		UEVT(unit) = btlataudGetMoveEventPtr(unit->unitId);
-		UEVTMODE(unit) = 3;
+		unit->attackEventFlags = 3;
 		break;
 	case 13:
 		UEVT(unit) = btldefaultevt_LectureEnd;
-		UEVTMODE(unit) = 3;
+		unit->attackEventFlags = 3;
 		break;
 	default:
 		UEVT(unit) = btldefaultevt_Wait;
-		UEVTMODE(unit) = 0;
+		unit->attackEventFlags = 0;
 		break;
 	}
 }
@@ -2764,10 +2768,10 @@ void* BattleSetConfuseAct(BattleWork* wp, BattleUnit* unit) {
 		if ((WPN_U32(weapon, 0x64) & 0x2000000) || !(WPN_U32(weapon, 0x64) & 0x1000000)) {
 			return subsetevt_confuse_flustered;
 		}
-		if (*(s8*)((u8*)wp + 0xe94) <= 0) {
+		if (wp->weaponTargets.numTargets <= 0) {
 			return subsetevt_confuse_flustered;
 		}
-		*(s8*)((u8*)wp + 0xedf) = irand(*(s8*)((u8*)wp + 0xe94));
+		wp->weaponTargets.currentTarget = irand(wp->weaponTargets.numTargets);
 		CMD_S32(wp, 0xef4) |= 4;
 		return WEVT(weapon);
 	case 5:
