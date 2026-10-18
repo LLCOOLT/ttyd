@@ -1858,10 +1858,10 @@ f32 toMovedir(f32 a);
 void partyRideMain(PartyEntry *party)
 {
   f32 new_var;
-  Vec pos;
+  Vec pos; f32 new_var2 ;
   Vec s;
   f32 dy0;
-  u8 *mario = (u8 *) party->playerPtr;
+  u8 *mario = (u8 *) party->playerPtr; int new_var3 ;
   switch (party->field_38)
   {
     case 0:
@@ -2159,6 +2159,7 @@ void partyRideMain(PartyEntry *party)
       }
       *((f32 *) (((u8 *) party) + 0x110)) = *((f32 *) (((u8 *) mario) + 0x1AC));
       *((s32 *) (((u8 *) party) + 0x24)) = 16;
+      new_var3 = 0xF0;
       *((f32 *) (((u8 *) party) + 0x128)) = distABf(x, z, *((f32 *) (((u8 *) party) + 0x94)), *((f32 *) (((u8 *) party) + 0x9C)));
       *((f32 *) (((u8 *) party) + 0x100)) = angleABf(x, z, *((f32 *) (((u8 *) party) + 0x94)), *((f32 *) (((u8 *) party) + 0x9C)));
       *((f32 *) (((u8 *) party) + 0x104)) = (*((f32 *) (((u8 *) party) + 0x128))) / ((f32) (*((s32 *) (((u8 *) party) + 0x24))));
@@ -2171,7 +2172,7 @@ void partyRideMain(PartyEntry *party)
       else
         if (dy >= 0.0f)
       {
-        dy = (0.5f * (*((f32 *) (((u8 *) party) + 0xF0)))) + dy;
+        dy = (0.5f * (*((f32 *) (((u8 *) party) + new_var3)))) + dy;
       }
       else
       {
@@ -2214,9 +2215,9 @@ void partyRideMain(PartyEntry *party)
       party->field_38 = 111;
 
     case 111:
-    {
+    new_var2 = (f32) (16 - (* ((s32 *) (((u8 *) party) + 0x24)))); {
       s = (Vec){0.0f, 0.0f, 0.0f};
-      s.x = (s.y = (s.z = ((f32) (16 - (*((s32 *) (((u8 *) party) + 0x24))))) * 0.0625f));
+      s.x = (s.y = (s.z = new_var2 * 0.0625f));
       party->scale = s;
       if ((--(*((s32 *) (((u8 *) party) + 0x24)))) > 0)
       {

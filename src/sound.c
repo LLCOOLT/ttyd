@@ -1653,9 +1653,9 @@ u32 _sscallback(void* buffer1, u32 len1, void* buffer2, u32 len2, u32 user) {
         }
         stream->samplePos = len1 + len2;
     } else {
+        n = len1;
         dst = buffer1;
         src16 = (s16*)(entry->loadBuffer[entry->curBuf] + (entry->srcPos & (~1)));
-        n = len1;
         while (n != 0) {
             *(dst++) = *(src16++);
             n--;

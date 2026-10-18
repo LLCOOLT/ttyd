@@ -1224,8 +1224,8 @@ const char* msgSearch(const char* tag) {
 }
 
 BOOL _ismbblead(u32 a1) {
-	u8 check = (u8)a1;
-	if ((check >= 0x81 && check <= 0x9F) || (check >= 0xE0 && check <= 0xFC)) {
+	a1 = (u8)a1;
+	if ((a1 >= 0x81 && a1 <= 0x9F) || (a1 >= 0xE0 && a1 <= 0xFC)) {
 		return TRUE;
 	}
 	return FALSE;

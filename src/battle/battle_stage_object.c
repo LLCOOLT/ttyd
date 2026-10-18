@@ -2389,7 +2389,6 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   FallObjectEntry *e;
   FallObjectEntry *o;
   BattleUnit *unit2;
-  BattleUnitPart *part0;
   s32 k;
   BattleUnit *unit;
   const char *sfxTub2;
@@ -2537,8 +2536,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         {
           flags |= 0x100000;
         }
-        part0 = BattleGetUnitPartsPtr(e->unitId, e->partId);
-        e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), BattleGetUnitPtr(wp, e->unitId), part0, weapon, flags);
+        e->preCheck = BattlePreCheckDamage(BattleGetSystemPtr(wp), BattleGetUnitPtr(wp, e->unitId), BattleGetUnitPartsPtr(e->unitId, e->partId), weapon, flags);
         if ((e->preCheck == 1) && (!e->noAc))
         {
           delay = irand(0);

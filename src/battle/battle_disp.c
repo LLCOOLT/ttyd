@@ -298,7 +298,6 @@ void btlUnitPartsDisp(CameraId camId, BattleUnitPart* part);
 StatusEffectType _GetStatusPoseType(BattleUnit* unit);
 
 void btlDispMain(void) {
-	s32 xlu;
 	BattleUnit* unit;
 	BattleUnitPart* part;
 	void* wv = (void*)_battleWorkPointer;
@@ -311,6 +310,7 @@ void btlDispMain(void) {
 	f32 h;
 	f32 scale;
 	Vec tpos;
+	s32 xlu;
 	Vec pos;
 	Vec zpos;
 	Vec ppos;

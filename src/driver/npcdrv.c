@@ -1919,8 +1919,8 @@ void fbatBattleMode(void) {
     MarioWork* mario;
     data = gp->fbatData;
     cur = data->target;
-    pouch = pouchGetPtr();
     mario = marioGetPtr();
+    pouch = pouchGetPtr();
     cur->rotation.y = 0.0f;
     switch (FBAT_SUB(data)) {
         case 0:
@@ -2314,7 +2314,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                 s32 v;
                 f32 f;
                 f32 s1, c1, s2, c2;
-                f32 x, y, z;
+                f32 z, x, y;
                 u32 f1000;
                 if (FH(mario, 0x2E, u16) != 0x12) break;
                 r = 1.5f * FH(mario, 0x1B4, f32);

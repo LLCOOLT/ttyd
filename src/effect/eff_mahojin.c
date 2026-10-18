@@ -282,6 +282,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
     s32 idx[16];
     f32* zp;
     MapWork* map;
+    s32* new_var; // FAKE: alias of idx forces z/idx base register order
     s32 i;
     s32 j;
     s32 k;
@@ -317,6 +318,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
             z[n] = d;
             idx[n++] = i;
         }
+        new_var = idx; // FAKE
         for (i = 0; i < effect->count - 1; i++) {
             for (j = i + 1; j < effect->count; j++) {
                 if (zp[i] > z[j]) {
@@ -332,7 +334,7 @@ void effMahojinDisp(CameraId cameraId, EffectEntry* effect) {
         map->entries[0].flags &= ~1;
         PSMTXTrans(mtx, work->position.x, work->position.y, work->position.z);
         for (k = 0; k < effect->count; k++) {
-            EffMahojinWork* p = &work[idx[k]];
+            EffMahojinWork* p = &work[new_var[k]];
             if (pass == 1 && p->arg != NULL) {
                 p->func(cameraId, p->arg);
             }

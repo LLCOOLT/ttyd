@@ -53,12 +53,12 @@ __declspec(section ".data") s32 fd_evt_yuuranking_one_364[1];
 static __declspec(section ".data") s32 main_evt[4];
 
 static s32 fontlenpitch(const char* str, s32 pitch) {
-    const s8* p;
+    s32 i;
     s32 n;
 
     if (pitch != 0) {
-        for (n = 0, p = (const s8*)str; *p != 0; p++) {
-            if (_ismbblead(*p)) { n++; p++; } else { n++; }
+        for (n = 0, i = 0; ((const s8*)str)[i] != 0; i++) {
+            if (_ismbblead(((const s8*)str)[i])) { n++; i++; } else { n++; }
         }
         return n * pitch;
     }

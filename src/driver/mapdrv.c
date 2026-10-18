@@ -1456,7 +1456,8 @@ typedef struct MapAnimLightData2 {
 					*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = k0->ch[c].value; \
 				} \
 				else { \
-					*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = mapHermite(cur, k0->time, k1->time, k0->ch[c].value, k0->ch[c].tanOut, k1->ch[c].value, k1->ch[c].tanIn); \
+					f32 v1 = k1->ch[c].value; \
+					*(f32*)(obj + d->idx * 0x1c + c * 4 + 0x2c) = mapHermite(cur, k0->time, k1->time, k0->ch[c].value, k0->ch[c].tanOut, v1, k1->ch[c].tanIn); \
 				} \
 			} \
 			*(f32*)(obj + d->idx * 0x1c + 0x40) = d->u; \

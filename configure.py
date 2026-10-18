@@ -504,7 +504,7 @@ config.libs = [
             Object(Matching, "effect/eff_levelup.c"),
             Object(Matching, "effect/eff_break.c"),
             Object(Matching, "effect/eff_mobj_broken.c"),
-            Object(NonMatching, "effect/eff_mahojin.c"),
+            Object(Matching, "effect/eff_mahojin.c"),
             Object(Matching, "effect/eff_nozle.c"),
             Object(Matching, "effect/eff_mizutama.c"),
             Object(Matching, "effect/eff_minigame.c"),

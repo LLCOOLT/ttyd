@@ -484,10 +484,9 @@ void mot_ship(void) {
 		hit = (HitEntry*)MSP(m, 0x1E8);
 		mm = marioGetPtr();
 		hitObjGetPos(hitGetName(hit), &pos);
-		ix = (s32)((100.0f * pos.x + 0.5f) / 100.0f);
+		fx = ix = (s32)((100.0f * pos.x + 0.5f) / 100.0f);
 		iz = (s32)((100.0f * pos.z + 0.5f) / 100.0f);
 		MSF(ms, 0x40) = MSF(m, 0x90) - 15.0f;
-		fx = ix;
 		fz = iz;
 		r27 = harborKind((HitEntry*)MSP(mm, 0x1E8));
 		if (r27 == 1) {

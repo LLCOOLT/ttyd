@@ -221,7 +221,7 @@ BOOL pouchGetItem(ItemType type)
   {
     if (mpp->currentFP < mpp->maximumFP)
     {
-      mpp->currentFP++;
+      mpp->currentFP++; new_var [1] = (void *) 0 ;
     }
     return 1;
   }
@@ -284,8 +284,8 @@ BOOL pouchGetItem(ItemType type)
   {
     swSet(type - 0x70);
   }
-  new_var[0] = (void *) 0;
   new_var[1] = (void *) 0;
+  new_var[0] = (void *) 0;
   size = 0;
   if ((type >= 0x79) && (type < 0xEC))
   {

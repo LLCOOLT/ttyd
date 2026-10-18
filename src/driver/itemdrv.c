@@ -1225,6 +1225,7 @@ void itemseq_Bound(ItemEntry* entry) {
 	f32 dz, v, peak, height;
 	f32 newX, newZ;
 	s32 newDir;
+	Vec pos;
 	s32 itemId;
 
 	mario = marioGetPtr();
@@ -1402,7 +1403,6 @@ void itemseq_Bound(ItemEntry* entry) {
 						break;
 					}
 					{
-					Vec pos;
 					pos = (Vec){entry->position.x, entry->position.y, entry->position.z};
 					switch (itemId = entry->itemId) {
 						case 0x79:
@@ -1519,7 +1519,7 @@ void itemGetSound(ItemEntry* entry) {
 
 HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle) {
 	HitEntry* hit;
-	f32 len, lenSq, a, b;
+	f32 a, b;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 	f32 sin, cos;
 	f32 dot, ox, oz;
@@ -1530,9 +1530,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 		return NULL;
 	}
 	sincosf(&sin, &cos, angleABf(0.0f, 0.0f, dx, dz));
-	lenSq = dx * dx + dz * dz;
-	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); len = (f32)(lenSq * g); } else if (lenSq < 0.0) { len = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { len = *(f32*)__float_nan; } else { len = lenSq; }
-	hitDist = 10.0f + len;
+	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
@@ -1546,8 +1544,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* out
 		*angle = reviseAngle(b + reviseAngle(b - a));
 		return hit;
 	}
-	if (lenSq > 0.0f) { f64 g = __frsqrte(lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); g = 0.5 * g * (3.0 - g * g * lenSq); lenSq = lenSq * g; } else if (lenSq < 0.0) { lenSq = *(f32*)__float_nan; } else if (item_fpclassifyf(lenSq) == 1) { lenSq = *(f32*)__float_nan; }
-	hitDist = 10.0f + lenSq;
+	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
 		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
 	if (hit) {

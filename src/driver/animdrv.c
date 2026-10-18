@@ -1759,6 +1759,7 @@ static s32 tbl[4] = { 2, 1, 3, 0 };
 
 void materialProc(s32 shapeId, s32 xluStage)
 {
+  AnimationPoseData * new_var2;
   int i;
   s32 drawCount;
   AnimPoseShapeDraw *draw;
@@ -1811,7 +1812,8 @@ void materialProc(s32 shapeId, s32 xluStage)
         pose = wp->mpCurPose;
         if (((u32) pose->typeFlags) != 0)
         {
-          texChange1 = animSetMaterial_ChangeTexture(wp->mpCurPoseData, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
+          new_var2 = wp->mpCurPoseData;
+          texChange1 = animSetMaterial_ChangeTexture(new_var2, draw, pose, wp->mpTexObjs[0], wp->mpTexDatas[0], *wp->paperMtxPtr[0], 1);
           check1 = texChange1;
           if (!texChange1)
           {
