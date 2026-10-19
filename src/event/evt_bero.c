@@ -12,6 +12,7 @@
 #include "manager/evtmgr_cmd.h"
 #include <string.h>
 #include "driver/camdrv.h"
+#ifdef NONMATCHING
 extern const char str_8041A3C8[4];
 extern const char str_8041A3CC[4];
 extern const char str_8041A3D0[4];
@@ -20,6 +21,37 @@ extern const char str_8041A3D8[4];
 extern const char str_8041A3DC[4];
 extern const char str_8041A3E0[4];
 extern const char str_8041A3E4[4];
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata2") extern const f32 float_6p2832_8041a3e8;
+__declspec(section ".sdata2") extern const f32 float_360_8041a3ec;
+__declspec(section ".sdata2") extern const f32 float_0_8041a3f0;
+__declspec(section ".sdata2") extern const f32 float_3_8041a3f4;
+__declspec(section ".sdata2") extern const f32 float_15_8041a3f8;
+__declspec(section ".sdata2") extern const f32 float_13_8041a3fc;
+__declspec(section ".sdata2") extern const f32 float_20_8041a400;
+__declspec(section ".sdata2") extern const f32 float_1_8041a404;
+__declspec(section ".sdata2") extern const f32 float_37p5_8041a408;
+__declspec(section ".sdata2") extern const f32 float_10000_8041a40c;
+__declspec(section ".sdata2") extern const f32 float_neg1_8041a410;
+__declspec(section ".sdata2") extern const f32 float_1E06_8041a414;
+__declspec(section ".sdata2") extern const f32 float_0p125_8041a418;
+__declspec(section ".sdata2") extern const f32 float_180_8041a41c;
+__declspec(section ".sdata2") extern const f32 float_30_8041a420;
+__declspec(section ".sdata2") extern const f32 float_0_8041a424;
+__declspec(section ".sdata2") extern const f32 float_60_8041a428;
+__declspec(section ".sdata2") extern const u32 gap_09_8041A42C_sdata2;
+#define EXT_LIT(sym, val) (sym)
+
+extern const char str_8041A3C8[];
+extern const char str_8041A3CC[];
+extern const char str_8041A3D0[];
+extern const char str_8041A3D4[];
+extern const char str_8041A3D8[];
+extern const char str_8041A3DC[];
+extern const char str_8041A3E0[];
+extern const char str_8041A3E4[];
+#endif
 __declspec(section ".rodata") const char* const jumptable_802C4970[8] = { str_8041A3C8, str_8041A3CC, str_8041A3D0, str_8041A3D4, str_8041A3D8, str_8041A3DC, str_8041A3E0, str_8041A3E4 };
 __declspec(section ".rodata") const f32 vec3_802c4990[3] = { 0.0f, 0.0f, 0.0f };
 __declspec(section ".rodata") const f32 vec3_802c499c[3] = { 0.0f, 0.0f, 0.0f };
@@ -89,6 +121,7 @@ f32 BeroEX, BeroEY, BeroEZ; //end position
 Vec BeroPT, BeroAT;
 BOOL BeroMarioGO;
 
+#ifdef NONMATCHING
 USER_FUNC(bero_get_position_normal);
 USER_FUNC(bero_get_position_pipe2);
 USER_FUNC(bero_get_position_pipe_pure);
@@ -175,6 +208,95 @@ USER_FUNC(evt_bero_get_end_position);
 USER_FUNC(evt_bero_get_start_position);
 USER_FUNC(evt_bero_exec_wait);
 USER_FUNC(evt_bero_get_entername);
+#endif
+#ifndef NONMATCHING
+s32 bero_get_position_normal(EventEntry* event, BOOL isFirstCall);
+s32 bero_get_position_pipe2(EventEntry* event, BOOL isFirstCall);
+s32 bero_get_position_pipe_pure(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_1stcheck(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_cam3d_change(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_cam_shift_init(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_case_id_load(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_case_id_save(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_disppos_load(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_disppos_save(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_exec_get(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_exec_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info_anime(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info_kinddir(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info_length(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info_num(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_into_info(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_number(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_mario_go(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_mario_go_init(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_mario_go_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_move_mario_speed(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_read_mario_pera(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_set_now_number(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_switch_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_switch_on(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam_road_reset(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam_road_reset2(EventEntry* event, BOOL isFirstCall);
+s32 evt_camera_change_event_from_road(EventEntry* event, BOOL isFirstCall);
+s32 evt_del_case_evt(EventEntry* event, BOOL isFirstCall);
+s32 evt_fade_end_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_fade_set_mapchange_type(EventEntry* event, BOOL isFirstCall);
+s32 evt_hit_get_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_hitobj_attr_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_checkanim(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_pauseanim(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_replayanim(EventEntry* event, BOOL isFirstCall);
+s32 evt_mapobj_rotate(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_bgmode_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_bgmode_on(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_cam_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_cam_on(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_cam_y_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_cont_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_dokan_end(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_dokan_prepare(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_mode(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_motion(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_kill_party(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_mov_pos2(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_paper_pose_dokan(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_paper_pose_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_party_bero_move(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_dispdir(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_force_dir(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_prev_party(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_prev_party_dokan(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_wait_landon(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_change_fbat_mode(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_start_for_event(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_stop_for_event(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_set_homing_dist(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_set_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
+s32 evt_run_case_evt_bero(EventEntry* event, BOOL isFirstCall);
+s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_system_flag(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_intpl_msec_get_value_para(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_overwrite(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_id_filter(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_now_number(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_info_nextarea(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_end_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_start_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_exec_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_get_entername(EventEntry* event, BOOL isFirstCall);
+#endif
 extern s32 bero_set_disp_position_pipe();
 extern s32 bero_null[];
 extern s32 default_entevt[];
@@ -210,11 +332,21 @@ s32 bero_null[] = {
     -1, 0, 0, 0, 65537, 0, 0,
 };
 
+#ifdef NONMATCHING
 s32 default_entevt[] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") s32 default_entevt[] = {
+#endif
     131122, -30000000, 0, 2, 1,
 };
 
+#ifdef NONMATCHING
 s32 default_outevt[] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") s32 default_outevt[] = {
+#endif
     131122, -30000000, 0, 2, 1,
 };
 
@@ -236,13 +368,40 @@ extern void N_marioSetBottomlessRespawnPosOnBeroEntry(f32 x, f32 y, f32 z);
 USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry) {
 	s32* args = event->args;
 	s32 x, y, z;
+#endif
+#ifndef NONMATCHING
+typedef struct { Vec f_0; Vec pos; Vec at; } BeroCamRoadOut;
+int __div2u();
+f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
+BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
+void mapErrorEntry(s32 arg0, const char* arg1);
+f32 reviseAngle(f32 angle);
+int strcmp(const char *s1, const char *s2);
+size_t strlen(const char *s);
+int strncmp(const char *s1, const char *s2, size_t n);
+f32 sysFrame2SecFloat(f32 frame);
+s32 sysMsec2Frame(s32 msec);
+extern void N_marioReloadMapOnBottomlessOn(void);
+extern void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
+extern void camRoadMain(BeroCamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+extern void camRoadReset(void);
+extern void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
+extern void camShiftReset(void);
+extern double cos(double);
+extern double sin(double);
+s32 N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	x = evtGetValue(event, args[0]);
 	y = evtGetValue(event, args[1]);
 	z = evtGetValue(event, args[2]);
 	N_marioSetBottomlessRespawnPosOnBeroEntry((f32)x, (f32)y, (f32)z);
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -252,11 +411,17 @@ USER_FUNC(N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 bero_get_BeroEXEC(void);
+#endif
 
 #ifdef NONMATCHING
 s32 bero_get_BeroEXEC(void) {
 	return BeroEXEC;
 }
+#endif
+#ifndef NONMATCHING
+s32 bero_get_BeroNUM(void);
 #endif
 
 #ifdef NONMATCHING
@@ -264,11 +429,17 @@ s32 bero_get_BeroNUM(void) {
 	return BeroNUM;
 }
 #endif
+#ifndef NONMATCHING
+f32 bero_get_BeroSX(void);
+#endif
 
 #ifdef NONMATCHING
 f32 bero_get_BeroSX(void) {
 	return BeroSX;
 }
+#endif
+#ifndef NONMATCHING
+f32 bero_get_BeroSY(void);
 #endif
 
 #ifdef NONMATCHING
@@ -276,11 +447,17 @@ f32 bero_get_BeroSY(void) {
 	return BeroSY;
 }
 #endif
+#ifndef NONMATCHING
+f32 bero_get_BeroSZ(void);
+#endif
 
 #ifdef NONMATCHING
 f32 bero_get_BeroSZ(void) {
 	return BeroSZ;
 }
+#endif
+#ifndef NONMATCHING
+f32 bero_get_BeroEX(void);
 #endif
 
 #ifdef NONMATCHING
@@ -288,11 +465,17 @@ f32 bero_get_BeroEX(void) {
 	return BeroEX;
 }
 #endif
+#ifndef NONMATCHING
+f32 bero_get_BeroEY(void);
+#endif
 
 #ifdef NONMATCHING
 f32 bero_get_BeroEY(void) {
 	return BeroEY;
 }
+#endif
+#ifndef NONMATCHING
+f32 bero_get_BeroEZ(void);
 #endif
 
 #ifdef NONMATCHING
@@ -300,11 +483,17 @@ f32 bero_get_BeroEZ(void) {
 	return BeroEZ;
 }
 #endif
+#ifndef NONMATCHING
+BeroEntry** bero_get_ptr(void);
+#endif
 
 #ifdef NONMATCHING
 BeroEntry** bero_get_ptr(void) {
 	return BeroINFOARR;
 }
+#endif
+#ifndef NONMATCHING
+void bero_clear_Offset(void);
 #endif
 
 #ifdef NONMATCHING
@@ -313,9 +502,7 @@ void bero_clear_Offset(void) {
 	BeroOY = 0.0f;
 	BeroOZ = 0.0f;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 bero_id_filter(s32 id) { //1:1, cursed function, do not touch
 	BeroEntry** temp, **table = BeroINFOARR;
 	s32 newId = id;
@@ -341,6 +528,9 @@ s32 bero_id_filter(s32 id) { //1:1, cursed function, do not touch
 	return newId;
 }
 #endif
+#ifndef NONMATCHING
+s32 bero_id_filter(s32 id);
+#endif
 
 //const char** mapName, const char** beroName
 #ifdef NONMATCHING
@@ -356,6 +546,9 @@ USER_FUNC(evt_bero_mapchange) {
 	return EVT_RETURN_BLOCK;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
+#endif
 
 //s32 retIndex
 #ifdef NONMATCHING
@@ -363,6 +556,9 @@ USER_FUNC(evt_bero_get_entername) {
 	evtSetValue(event, *event->args, (s32)&gp->beroEnterName);
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_entername(EventEntry* event, BOOL isFirstCall);
 #endif
 
 //BOOL* on/off, s32* mask
@@ -382,6 +578,9 @@ USER_FUNC(evt_bero_exec_onoff) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_exec_onoff(EventEntry* event, BOOL isFirstCall);
+#endif
 
 //s32 retIndex
 #ifdef NONMATCHING
@@ -390,12 +589,18 @@ USER_FUNC(evt_bero_exec_get) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_exec_get(EventEntry* event, BOOL isFirstCall);
+#endif
 
 //s32* mask, TODO: add states, change EvtStatus to s32 and do #defines
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_exec_wait) {
 	return evtGetValue(event, *event->args) & BeroEXEC ? EVT_RETURN_DONE : 0;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_exec_wait(EventEntry* event, BOOL isFirstCall);
 #endif
 
 //f32 retX, f32 retY, f32 retZ
@@ -409,6 +614,9 @@ USER_FUNC(evt_bero_get_start_position) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_start_position(EventEntry* event, BOOL isFirstCall);
+#endif
 
 //f32 retX, f32 retY, f32 retZ
 #ifdef NONMATCHING
@@ -421,13 +629,21 @@ USER_FUNC(evt_bero_get_end_position) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_end_position(EventEntry* event, BOOL isFirstCall);
+#endif
 
 //s32* id, s32 retIndex1, s32 retIndex2, s32 retIndex3, s32 retIndex4
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_get_info_anime) {
 	BeroEntry* bero;
 	s32* args = event->args;
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info_anime(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], *(u16*)&bero->enterAnimeType);
 	evtSetValue(event, args[2], *(u16*)&bero->exitAnimeType);
@@ -436,6 +652,9 @@ USER_FUNC(evt_bero_get_info_anime) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info_length(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_get_info_length) {
@@ -443,7 +662,12 @@ USER_FUNC(evt_bero_get_info_length) {
 	s32* args = event->args;
 	s32 v5;
 	f32 storeme;
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info_kinddir(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	args = event->args;
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	v5 = bero->length;
@@ -471,18 +695,29 @@ USER_FUNC(evt_bero_get_info_length) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info_nextarea(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_get_info_kinddir) {
 	BeroEntry* bero;
 	s32* args = event->args;
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_set_now_number(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	bero = BeroINFOARR[evtGetValue(event, args[0])];
 	evtSetValue(event, args[1], *(u16*)&bero->type);
 	evtSetValue(event, args[2], *(u16*)&bero->sfxId);
 	evtSetValue(event, args[3], bero->directionId);
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_now_number(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -495,23 +730,17 @@ USER_FUNC(evt_bero_get_info_nextarea) {
 	evtSetValue(event, args[2], (s32)bero->nextBeroName);
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
 USER_FUNC(evt_bero_set_now_number) {
 	BeroNOWNUM = evtGetValue(event, *event->args);
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
 USER_FUNC(evt_bero_get_now_number) {
 	evtSetValue(event, *event->args, BeroNOWNUM);
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
 USER_FUNC(evt_bero_get_info) {
 	BeroEntry** table;
 	s32 i;
@@ -570,6 +799,9 @@ USER_FUNC(evt_bero_get_info) {
 	BeroEXEC = 0;
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
 #endif
 
 extern void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
@@ -652,6 +884,9 @@ USER_FUNC(evt_bero_get_into_info) {
 	}
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_into_info(EventEntry* event, BOOL isFirstCall);
+#endif
 
 extern BOOL animGroupBaseAsync(const char* name, s32 group, void* callback);
 
@@ -679,6 +914,9 @@ USER_FUNC(evt_bero_read_mario_pera) {
 	return event->userdata[0] == 100 ? EVT_RETURN_DONE : EVT_RETURN_BLOCK;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_read_mario_pera(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_id_filter) {
@@ -686,6 +924,9 @@ USER_FUNC(evt_bero_id_filter) {
 	evtSetValue(event, args[0], bero_id_filter(evtGetValue(event, args[0])));
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_id_filter(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -723,6 +964,9 @@ USER_FUNC(evt_bero_get_info_num) {
 	event->lwData[14] = (s32)bero->nextBeroName;
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_get_info_num(EventEntry* event, BOOL isFirstCall);
 #endif
 
 
@@ -808,6 +1052,9 @@ s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall)
   return 2;
 }
 #endif
+#ifndef NONMATCHING
+s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
@@ -861,6 +1108,9 @@ void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, V
 	}
 }
 #endif
+#ifndef NONMATCHING
+void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end);
+#endif
 
 
 #ifdef NONMATCHING
@@ -881,9 +1131,14 @@ USER_FUNC(bero_get_position_pipe_pure) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 bero_get_position_pipe_pure(EventEntry* event, BOOL isFirstCall);
+#endif
 
 
+#ifdef NONMATCHING
 typedef struct { Vec f_0; Vec pos; Vec at; } BeroCamRoadOut;
+#endif
 extern void camRoadMain(BeroCamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
 extern void camRoadReset(void);
 extern void camShiftReset(void);
@@ -914,6 +1169,9 @@ USER_FUNC(bero_get_position_pipe2) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 bero_get_position_pipe2(EventEntry* event, BOOL isFirstCall);
 #endif
 
 EVT_BEGIN(evt_bero_nonride_check)
@@ -1076,7 +1334,12 @@ EVT_BEGIN(bero_play_enter_anime)
         END_IF
         CASE_EQUAL(5)
         IF_INT_NOT_EQUAL(LW(12), 0)
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((180.0f)))
+#endif
             CALL_CHILD(LW(12))
             CALL(evt_bero_mario_go)
             WAIT_MS(500)
@@ -1086,7 +1349,12 @@ EVT_BEGIN(bero_play_enter_anime)
             LOOP(0)
                 CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
                 IF_INT_EQUAL(LW(10), 0)
+#ifdef NONMATCHING
                     SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+                    SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
                     CALL_CHILD(LW(9))
                     BREAK_LOOP
                     ELSE
@@ -1145,7 +1413,12 @@ EVT_BEGIN(bero_play_out_anime)
             LOOP(0)
                 CALL(evt_sub_intpl_msec_get_value_para, LW(0), LW(10))
                 IF_INT_EQUAL(LW(10), 0)
+#ifdef NONMATCHING
                     SET_FLOAT_VALUE(LW(0), FLOAT(180.0f))
+#endif
+#ifndef NONMATCHING
+                    SET_FLOAT_VALUE(LW(0), FLOAT((180.0f)))
+#endif
                     CALL_CHILD(LW(9))
                     BREAK_LOOP
                     ELSE
@@ -1183,6 +1456,9 @@ s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
 	return 2;
 }
 #endif
+#ifndef NONMATCHING
+s32 bero_set_disp_position_pipe(BeroPipeInfo* info);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_switch_on) {
@@ -1218,6 +1494,9 @@ USER_FUNC(evt_bero_switch_on) {
 	event->lwData[1] = newId;
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_switch_on(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -1255,6 +1534,9 @@ USER_FUNC(evt_bero_switch_off) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_switch_off(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_get_number) {
@@ -1285,6 +1567,9 @@ USER_FUNC(evt_bero_get_number) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_get_number(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_case_id_save) {
@@ -1293,6 +1578,9 @@ USER_FUNC(evt_bero_case_id_save) {
 	BeroID[id] = evtGetValue(event, args[1]);
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_case_id_save(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -1303,6 +1591,9 @@ USER_FUNC(evt_bero_case_id_load) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_case_id_load(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_disppos_save) {
@@ -1312,6 +1603,9 @@ USER_FUNC(evt_bero_disppos_save) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_disppos_save(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_disppos_load) {
@@ -1320,6 +1614,9 @@ USER_FUNC(evt_bero_disppos_load) {
 	marioGetPtr()->dispOfs.z = BeroOZ;
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_disppos_load(EventEntry* event, BOOL isFirstCall);
 #endif
 
 
@@ -1338,7 +1635,12 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	f32 dist;
 	f32 ox, oy;
 	BOOL xdone, ydone;
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_move_mario_speed(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	if (isFirstCall) {
 		event->savedTime = now;
 	}
@@ -1377,6 +1679,9 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_overwrite(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_overwrite) {
@@ -1406,6 +1711,9 @@ USER_FUNC(evt_bero_overwrite) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_cam3d_change(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_cam3d_change) {
@@ -1424,6 +1732,9 @@ USER_FUNC(evt_bero_cam3d_change) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_cam_shift_init(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_cam_shift_init) {
@@ -1432,12 +1743,18 @@ USER_FUNC(evt_bero_cam_shift_init) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_mario_go_init(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_mario_go_init) {
 	BeroMarioGO = FALSE;
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_mario_go(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -1446,14 +1763,15 @@ USER_FUNC(evt_bero_mario_go) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_bero_mario_go_wait(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_bero_mario_go_wait) {
 	return BeroMarioGO == 0 ? 0 : EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
 USER_FUNC(evt_bero_1stcheck) {
 	s32* args = event->args;
 	if (strcmp((const char*)event->lwData[13], str_802C4D94) == 0) {
@@ -1463,6 +1781,9 @@ USER_FUNC(evt_bero_1stcheck) {
 	}
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_bero_1stcheck(EventEntry* event, BOOL isFirstCall);
 #endif
 
 extern void camShiftMain(CameraEntry* camera, MarioWork* mario, f32* out);
@@ -1492,6 +1813,9 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_camera_change_event_from_road(EventEntry* event, BOOL isFirstCall);
+#endif
 
 EVT_BEGIN(bero_case_init_check)
     CALL(evt_bero_exec_onoff, 1, 65536)
@@ -1513,7 +1837,12 @@ EVT_BEGIN(bero_case_init_check)
         CASE_END
         CASE_OR_EQUAL(3840)
         CASE_OR_EQUAL(3)
+#ifdef NONMATCHING
         CALL(bero_get_position_normal, 0, FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(bero_get_position_normal, 0, FLOAT((0.0f)))
+#endif
         CASE_END
         CASE_EQUAL(2)
         CALL(evt_bero_get_info_length, LW(1), LW(0))
@@ -1674,16 +2003,36 @@ EVT_BEGIN(bero_case_exec_pipe_sub)
     SWITCH(LW(5))
         CASE_EQUAL(6)
         CALL(evt_mario_paper_pose_dokan, 5)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(2)
         CALL(evt_mario_paper_pose_dokan, 5)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(8)
         CALL(evt_mario_paper_pose_dokan, 2)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(9)
         CALL(evt_mario_paper_pose_dokan, 3)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
     END_SWITCH
     POKE_INT(1, PTR(&BeroCAM))
     IF_INT_EQUAL(LW(13), 0)
@@ -1780,16 +2129,36 @@ EVT_BEGIN(bero_case_exec_pipe)
     SWITCH(LW(5))
         CASE_EQUAL(6)
         CALL(evt_mario_paper_pose_dokan, 5)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(2)
         CALL(evt_mario_paper_pose_dokan, 5)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(8)
         CALL(evt_mario_paper_pose_dokan, 2)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(9)
         CALL(evt_mario_paper_pose_dokan, 3)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
     END_SWITCH
     IF_BITS_CLEAR(LW(4), 8192)
         SWITCH(LW(5))
@@ -1921,8 +2290,14 @@ EVT_BEGIN(evt_bero_info_run_road)
     PEEK_FLOAT(LW(13), PTR(&BeroEX))
     PEEK_FLOAT(LW(14), PTR(&BeroEY))
     PEEK_FLOAT(LW(15), PTR(&BeroEZ))
+#ifdef NONMATCHING
     CALL(evt_party_set_homing_dist, 0, FLOAT(20.0f))
     CALL(evt_party_set_homing_dist, 1, FLOAT(20.0f))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_party_set_homing_dist, 0, FLOAT((20.0f)))
+    CALL(evt_party_set_homing_dist, 1, FLOAT((20.0f)))
+#endif
     CALL(evt_mario_mov_pos2, LW(13), LW(15), FLOAT(150.0f))
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
@@ -1939,8 +2314,14 @@ EVT_BEGIN(evt_bero_info_run_door)
     PEEK_FLOAT(LW(13), PTR(&BeroEX))
     PEEK_FLOAT(LW(14), PTR(&BeroEY))
     PEEK_FLOAT(LW(15), PTR(&BeroEZ))
+#ifdef NONMATCHING
     CALL(evt_party_set_homing_dist, 0, FLOAT(20.0f))
     CALL(evt_party_set_homing_dist, 1, FLOAT(20.0f))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_party_set_homing_dist, 0, FLOAT((20.0f)))
+    CALL(evt_party_set_homing_dist, 1, FLOAT((20.0f)))
+#endif
     CALL(evt_mario_party_bero_move, LW(13), LW(15), FLOAT(150.0f))
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
@@ -1957,17 +2338,37 @@ EVT_BEGIN(evt_bero_info_run_pipe_sub00)
         CASE_EQUAL(6)
         CALL(evt_mario_set_dispdir, 180)
         CALL(evt_mario_paper_pose_dokan, 4)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(2)
         CALL(evt_mario_set_dispdir, 0)
         CALL(evt_mario_paper_pose_dokan, 4)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(9)
         CALL(evt_mario_paper_pose_dokan, 1)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
         CASE_EQUAL(8)
         CALL(evt_mario_paper_pose_dokan, 0)
+#ifdef NONMATCHING
         CALL(evt_bero_move_mario_speed, FLOAT(60.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_move_mario_speed, FLOAT((60.0f)))
+#endif
     END_SWITCH
     CALL(evt_mario_dokan_end)
     RETURN
@@ -2092,7 +2493,12 @@ EVT_BEGIN(evt_bero_initial_pos)
     SWITCH(LW(0))
         CASE_EQUAL(3840)
         CASE_EQUAL(3)
+#ifdef NONMATCHING
         CALL(bero_get_position_normal, 0, FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+        CALL(bero_get_position_normal, 0, FLOAT((0.0f)))
+#endif
         PEEK_FLOAT(LW(10), PTR(&BeroSX))
         PEEK_FLOAT(LW(11), PTR(&BeroSY))
         PEEK_FLOAT(LW(12), PTR(&BeroSZ))
@@ -2180,1945 +2586,1471 @@ __declspec(section ".data") u32 gap_05_8030DA24_data[1] = {0};
 
 #pragma force_active reset
 
+
+// FAKE: .bss defined at file end so the asm-only unit keeps target order
+
 #ifndef NONMATCHING
-// ASM-STOPGAP: N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-extern void __div2u(void);
-extern void __mod2u(void);
-extern void __div2i(void);
-extern void __mod2i(void);
-extern const char str_8041A3C8[4];
-extern const char str_8041A3CC[4];
-extern const char str_8041A3D0[4];
-extern const char str_8041A3D4[4];
-extern const char str_8041A3D8[4];
-extern const char str_8041A3DC[4];
-extern const char str_8041A3E0[4];
-extern const char str_8041A3E4[4];
-__declspec(section ".sdata2") const char str_8041A3C8[4] = "n_";
-__declspec(section ".sdata2") const char str_8041A3CC[4] = "ne_";
-__declspec(section ".sdata2") const char str_8041A3D0[4] = "e_";
-__declspec(section ".sdata2") const char str_8041A3D4[4] = "se_";
-__declspec(section ".sdata2") const char str_8041A3D8[4] = "s_";
-__declspec(section ".sdata2") const char str_8041A3DC[4] = "sw_";
-__declspec(section ".sdata2") const char str_8041A3E0[4] = "w_";
-__declspec(section ".sdata2") const char str_8041A3E4[4] = "nw_";
-__declspec(section ".sdata2") const f32 float_6p2832_8041a3e8 = 6.2831855f;
-__declspec(section ".sdata2") const f32 float_360_8041a3ec = 360.0f;
-__declspec(section ".sdata2") const f32 float_0_8041a3f0 = 0.0f;
-__declspec(section ".sdata2") const f32 float_3_8041a3f4 = 3.0f;
-__declspec(section ".sdata2") const f32 float_15_8041a3f8 = 15.0f;
-__declspec(section ".sdata2") const f32 float_13_8041a3fc = 13.0f;
-__declspec(section ".sdata2") const f32 float_20_8041a400 = 20.0f;
-__declspec(section ".sdata2") const f32 float_1_8041a404 = 1.0f;
-__declspec(section ".sdata2") const f32 float_37p5_8041a408 = 37.5f;
-__declspec(section ".sdata2") const f32 float_10000_8041a40c = 10000.0f;
-__declspec(section ".sdata2") const f32 float_neg1_8041a410 = -1.0f;
-__declspec(section ".sdata2") const f32 float_1E06_8041a414 = 1000000.0f;
-__declspec(section ".sdata2") const f32 float_0p125_8041a418 = 0.125f;
-__declspec(section ".sdata2") const f32 float_180_8041a41c = 180.0f;
-__declspec(section ".sdata2") const f32 float_30_8041a420 = 30.0f;
-__declspec(section ".sdata2") const f32 float_0_8041a424 = 0.0f;
-__declspec(section ".sdata2") const f32 float_60_8041a428 = 60.0f;
-__declspec(section ".sdata2") const u32 gap_09_8041A42C_sdata2 = 0;
+static inline s32 bero_id_filter__af_inl(s32 id) { //1:1, cursed function, do not touch
+	BeroEntry** temp, **table = BeroINFOARR;
+	s32 newId = id;
+	const char *string, *test;
 
-asm s32 evt_camera_change_event_from_road(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stw r31, 0x5c(r1)
-	stw r30, 0x58(r1)
-	stw r29, 0x54(r1)
-	stw r28, 0x50(r1)
-	bl marioGetPtr
-	mr r0, r3
-	li r3, 0x4
-	mr r28, r0
-	bl camGetPtr
-	mr r31, r3
-	mr r4, r28
-	addi r5, r1, 0x8
-	bl camShiftMain
-	lfs f3, 0x94(r28)
-	addi r3, r1, 0x24
-	lfs f2, 0x98(r31)
-	lfs f1, 0x8c(r28)
-	fmr f6, f3
-	fmr f5, f2
-	lfs f7, 0x8(r1)
-	fmr f4, f1
-	bl camRoadMain
-	lis r3, vec3_802c4c58@ha
-	lis r4, vec3_802c4c64@ha
-	addi r5, r3, vec3_802c4c58@l
-	lis r3, 0x1062
-	addi r8, r4, vec3_802c4c64@l
-	lwz r28, 0x0(r5)
-	lwz r29, 0x4(r5)
-	lis r6, 0x8000
-	lwz r10, 0x8(r5)
-	addi r7, r3, 0x4dd3
-	lwz r30, 0x0(r8)
-	li r5, 0x0
-	lwz r12, 0x4(r8)
-	li r4, 0x3
-	lwz r11, 0x8(r8)
-	li r0, 0xb
-	lfs f5, 0x30(r1)
-	li r3, 0x2
-	lfs f4, 0x34(r1)
-	lfs f3, 0x38(r1)
-	lfs f2, 0x3c(r1)
-	lfs f1, 0x40(r1)
-	lfs f0, 0x44(r1)
-	lwz r9, 0xc(r31)
-	lwz r8, 0x10(r31)
-	stw r28, 0x18(r1)
-	stw r9, 0x58(r31)
-	stw r8, 0x5c(r31)
-	lwz r8, 0x14(r31)
-	stw r29, 0x1c(r1)
-	stw r8, 0x60(r31)
-	stfs f5, 0x18(r1)
-	lwz r9, 0x18(r31)
-	lwz r8, 0x1c(r31)
-	stw r10, 0x20(r1)
-	lwz r10, 0x18(r1)
-	stw r9, 0x64(r31)
-	stw r8, 0x68(r31)
-	lwz r8, 0x20(r31)
-	stfs f4, 0x1c(r1)
-	stw r8, 0x6c(r31)
-	lwz r8, 0x1c(r1)
-	stfs f3, 0x20(r1)
-	stw r30, 0xc(r1)
-	lwz r9, 0x20(r1)
-	stw r10, 0x40(r31)
-	stw r12, 0x10(r1)
-	stfs f2, 0xc(r1)
-	stw r8, 0x44(r31)
-	lwz r8, 0xc(r1)
-	stw r11, 0x14(r1)
-	stfs f1, 0x10(r1)
-	stw r9, 0x48(r31)
-	lwz r9, 0x10(r1)
-	stfs f0, 0x14(r1)
-	stw r8, 0x4c(r31)
-	lwz r8, 0x14(r1)
-	stw r9, 0x50(r31)
-	stw r8, 0x54(r31)
-	lwz r9, gp(r13)
-	lwz r8, 0x38(r9)
-	lwz r9, 0x3c(r9)
-	stw r9, 0x74(r31)
-	stw r8, 0x70(r31)
-	lwz r6, 0xf8(r6)
-	srwi r6, r6, 2
-	mulhwu r6, r7, r6
-	srwi r6, r6, 6
-	mulli r6, r6, 0x1f4
-	stw r6, 0x7c(r31)
-	stw r5, 0x78(r31)
-	sth r4, 0x4(r31)
-	stb r0, 0x80(r31)
-	lwz r31, 0x5c(r1)
-	lwz r30, 0x58(r1)
-	lwz r29, 0x54(r1)
-	lwz r28, 0x50(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	return newId;
 }
 
-asm s32 evt_bero_1stcheck(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lis r3, str_802C4D94@ha
-	addi r4, r3, str_802C4D94@l
-	lwz r31, 0x18(r30)
-	lwz r3, 0xd0(r30)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @1
-	lwz r4, 0x0(r31)
-	mr r3, r30
-	li r5, 0x1
-	bl evtSetValue
-	b @2
-	@1:
-	lwz r4, 0x0(r31)
-	mr r3, r30
-	li r5, 0x0
-	bl evtSetValue
-	@2:
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+s32 evt_bero_get_into_info(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[64];
+	asm {
+		lis r4, BeroINFOARR@ha
+		addi r31, r4, BeroINFOARR@l
+		mr r29, r3
+	}
+	asm volatile {
+		li r28, 0x0
+		opword 0x83DF0000
+		opword 0x281E0000
+		opword 0x4182001C
+		lwz r3, gp(r13)
+		la r4, float_0_8041a424(r2)
+		opword 0x3863011C
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		lis r3, bero_null@ha
+		opword 0x3B800000
+		addi r0, r3, bero_null@l
+		opword 0x7C1E0378
+		opword 0x48000028
+		lwz r4, gp(r13)
+		opword 0x807E0000
+		opword 0x3884011C
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820010
+		opword 0x3BFF0004
+		opword 0x3B9C0001
+		opword 0x4BFFFFA8
+		lwz r3, gp(r13)
+		opword 0x80030000
+		opword 0x540007BD
+		opword 0x41820134
+		opword 0x3863011C
+		la r4, float_0_8041a424(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820120
+		lis r4, BeroINFOARR@ha
+		lis r3, jumptable_802C4970@ha
+		lwz r30, BeroINFOARR@l(r4)
+		opword 0x3BE00000
+		addi r10, r3, jumptable_802C4970@l
+		opword 0x93FD00A0
+		lwz r0, BeroNUM(r13)
+		opword 0x901D00A4
+		opword 0x801E0000
+		opword 0x901D00A8
+		opword 0xA01E0004
+		opword 0x901D00AC
+		opword 0x817E0008
+		opword 0x812A0000
+		opword 0x810A0004
+		opword 0x2C0B4E20
+		opword 0x80EA0008
+		opword 0x80CA000C
+		opword 0x80AA0010
+		opword 0x808A0014
+		opword 0x806A0018
+		opword 0x800A001C
+		stw r9, _af_pad+32(r1)
+		opword 0x9101002C
+		opword 0x90E10030
+		opword 0x90C10034
+		opword 0x90A10038
+		opword 0x9081003C
+		opword 0x90610040
+		opword 0x90010044
+		opword 0x41820008
+		opword 0x48000070
+		opword 0x2C0B2710
+		opword 0x4082000C
+		opword 0x39602710
+		opword 0x48000060
+		opword 0xA01E0004
+		opword 0x5400053E
+		opword 0x2C000002
+		opword 0x40800048
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x4800003C
+		opword 0x3B810028
+		opword 0x807C0000
+		bl strlen
+		opword 0x7C651B78
+		opword 0x807C0000
+		opword 0x809E0000
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3BFF0001
+		opword 0x3B9C0004
+		opword 0x281F0008
+		opword 0x4180FFD4
+		opword 0x48000008
+		opword 0x3BE02710
+		opword 0x7FEBFB78
+		opword 0x917D00B0
+		opword 0x381E000C
+		opword 0x901D00B4
+		opword 0x801E001C
+		opword 0x28000000
+		opword 0x40820008
+		la r0, default_entevt(r13)
+		opword 0x901D00B8
+		opword 0x3C00FFFF
+		opword 0x38600002
+		opword 0x901D00BC
+		opword 0x48000114
+		opword 0x939D00A0
+		lis r3, jumptable_802C4970@ha
+		addi r10, r3, jumptable_802C4970@l
+		lwz r0, BeroNUM(r13)
+		opword 0x901D00A4
+		lwz r3, gp(r13)
+		opword 0x3803011C
+		opword 0x901D00A8
+		opword 0xA01E0004
+		opword 0x901D00AC
+		opword 0x83FE0008
+		opword 0x812A0000
+		opword 0x810A0004
+		opword 0x2C1F4E20
+		opword 0x80EA0008
+		opword 0x80CA000C
+		opword 0x80AA0010
+		opword 0x808A0014
+		opword 0x806A0018
+		opword 0x800A001C
+		opword 0x91210008
+		opword 0x9101000C
+		opword 0x90E10010
+		opword 0x90C10014
+		opword 0x90A10018
+		opword 0x9081001C
+		opword 0x90610020
+		opword 0x90010024
+		opword 0x41820008
+		opword 0x48000070
+		opword 0x2C1F2710
+		opword 0x4082000C
+		opword 0x3BE02710
+		opword 0x48000060
+		opword 0xA01E0004
+		opword 0x5400053E
+		opword 0x2C000002
+		opword 0x4080004C
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000040
+		opword 0x3BE00000
+		opword 0x3B810008
+		opword 0x807C0000
+		bl strlen
+		opword 0x7C651B78
+		opword 0x807C0000
+		opword 0x809E0000
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3BFF0001
+		opword 0x3B9C0004
+		opword 0x281F0008
+		opword 0x4180FFD4
+		opword 0x48000008
+		opword 0x3BE02710
+		opword 0x93FD00B0
+		opword 0x381E000C
+		opword 0x901D00B4
+		opword 0x801E001C
+		opword 0x28000000
+		opword 0x40820008
+		la r0, default_entevt(r13)
+		opword 0x901D00B8
+		opword 0x3C00FFFF
+		opword 0x38600002
+		opword 0x901D00BC
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_bero_read_mario_pera(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x2C040000
+		opword 0x90010014
+		opword 0x93E1000C
+		opword 0x7C7F1B78
+		opword 0x4182000C
+		opword 0x38000000
+		opword 0x901F0078
+		opword 0x801F0078
+		opword 0x2C000001
+		opword 0x41820040
+		opword 0x40800060
+		opword 0x2C000000
+		opword 0x4080000C
+		opword 0x48000054
+		opword 0x48000050
+		lis r3, str_802C4DA8@ha
+		opword 0x38800000
+		addi r3, r3, str_802C4DA8@l
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x41820034
+		opword 0x38000001
+		opword 0x901F0078
+		opword 0x48000028
+		lis r3, str_802C4DB4@ha
+		opword 0x38800000
+		addi r3, r3, str_802C4DB4@l
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x4182000C
+		opword 0x38000064
+		opword 0x901F0078
+		opword 0x807F0078
+		opword 0x38000002
+		opword 0x3883FF9C
+		opword 0x20630064
+		opword 0x7C8318F8
+		opword 0x7C63FE70
+		opword 0x7C031838
+		opword 0x83E1000C
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+#define bero_id_filter bero_id_filter__af_inl
+s32 evt_bero_id_filter(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	evtSetValue(event, args[0], bero_id_filter(evtGetValue(event, args[0])));
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_mario_go_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	lwz r3, BeroMarioGO(r13)
-	li r0, 0x2
-	cntlzw r3, r3
-	extrwi r3, r3, 1, 26
-	neg r3, r3
-	andc r3, r0, r3
-	blr
+#undef bero_id_filter
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_bero_get_info_num(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFC0
+		opword 0x7C0802A6
+		opword 0x90010044
+		opword 0xBF61002C
+		opword 0x7C7D1B78
+		opword 0x80830018
+		opword 0x80840000
+		bl evtGetValue
+		lis r5, BeroINFOARR@ha
+		lis r4, jumptable_802C4970@ha
+		opword 0x547F103A
+		addi r3, r5, BeroINFOARR@l
+		addi r10, r4, jumptable_802C4970@l
+		opword 0x7FC3F82E
+		opword 0x801E0000
+		opword 0x901D00A8
+		opword 0xA01E0004
+		opword 0x901D00AC
+		opword 0x837E0008
+		opword 0x812A0000
+		opword 0x810A0004
+		opword 0x2C1B4E20
+		opword 0x80EA0008
+		opword 0x80CA000C
+		opword 0x80AA0010
+		opword 0x808A0014
+		opword 0x806A0018
+		opword 0x800A001C
+		opword 0x91210008
+		opword 0x9101000C
+		opword 0x90E10010
+		opword 0x90C10014
+		opword 0x90A10018
+		opword 0x9081001C
+		opword 0x90610020
+		opword 0x90010024
+		opword 0x41820008
+		opword 0x48000070
+		opword 0x2C1B2710
+		opword 0x4082000C
+		opword 0x3B602710
+		opword 0x48000060
+		opword 0xA01E0004
+		opword 0x5400053E
+		opword 0x2C000002
+		opword 0x4080004C
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000040
+		opword 0x3B600000
+		opword 0x3B810008
+		opword 0x807C0000
+		bl strlen
+		opword 0x7C651B78
+		opword 0x807C0000
+		opword 0x809E0000
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3B7B0001
+		opword 0x3B9C0004
+		opword 0x281B0008
+		opword 0x4180FFD4
+		opword 0x48000008
+		opword 0x3B602710
+		opword 0x937D00B0
+		opword 0x381E000C
+		opword 0x901D00B4
+		opword 0x801E001C
+		opword 0x28000000
+		opword 0x40820008
+		la r0, default_entevt(r13)
+		opword 0x901D00B8
+		opword 0x3C00FFFF
+		lis r3, BeroSW@ha
+		opword 0x901D00BC
+		addi r3, r3, BeroSW@l
+		opword 0x7C03F82E
+		opword 0x901D00C0
+		opword 0x801E0020
+		opword 0x901D00C4
+		opword 0x801E0020
+		opword 0x2C00FFFF
+		opword 0x40820074
+		opword 0xA01E0004
+		opword 0x5400053E
+		opword 0x2C000003
+		opword 0x4182005C
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x41820038
+		opword 0x40800040
+		opword 0x2C000000
+		opword 0x40800020
+		opword 0x48000048
+		opword 0x2C000F00
+		opword 0x41820008
+		opword 0x4800003C
+		opword 0x38000000
+		opword 0x901D00C4
+		opword 0x48000030
+		opword 0x3800000A
+		opword 0x901D00C4
+		opword 0x48000024
+		opword 0x38000009
+		opword 0x901D00C4
+		opword 0x48000018
+		opword 0x38000004
+		opword 0x901D00C4
+		opword 0x4800000C
+		opword 0x38000007
+		opword 0x901D00C4
+		opword 0x801E0024
+		opword 0x28000000
+		opword 0x40820008
+		la r0, default_outevt(r13)
+		opword 0x901D00C8
+		opword 0x3C00FFFF
+		opword 0x38600002
+		opword 0x901D00CC
+		opword 0x801E0028
+		opword 0x901D00D0
+		opword 0x801E002C
+		opword 0x901D00D4
+		opword 0xBB61002C
+		opword 0x80010044
+		opword 0x7C0803A6
+		opword 0x38210040
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FF40
+		opword 0x7C0802A6
+		opword 0x900100C4
+		opword 0xDBE100B0
+		opword 0xF3E100B8
+		opword 0xDBC100A0
+		opword 0xF3C100A8
+		opword 0x93E1009C
+		opword 0x93C10098
+		opword 0x93A10094
+		opword 0x7C7D1B78
+		opword 0x83C30018
+		bl marioGetPtr
+		opword 0x809E0000
+		opword 0x7C7F1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x809E0004
+		opword 0x7C7E1B78
+		opword 0x7FA3EB78
+		bl evtGetFloat
+		opword 0x80FD00B4
+		opword 0x3C804330
+		lis r3, double_to_int_802c4da0@ha
+		opword 0x90810058
+		opword 0x80C70000
+		opword 0xFFE00890
+		lfd f4, double_to_int_802c4da0@l(r3)
+		opword 0x6CC58000
+		opword 0x807D00A8
+		opword 0x90A1005C
+		opword 0x3C06FFFF
+		opword 0x83BD00B0
+		opword 0x280086A0
+		opword 0xC8010058
+		opword 0x90810060
+		opword 0xEC002028
+		opword 0x90A10074
+		opword 0xD0010048
+		opword 0x80070004
+		opword 0x90810070
+		opword 0x6C008000
+		opword 0x90010064
+		opword 0xC8010060
+		opword 0x9001007C
+		opword 0xEC202028
+		opword 0xC8010070
+		opword 0x90810078
+		opword 0xEC402028
+		opword 0xD021004C
+		opword 0xC8010078
+		opword 0x80070008
+		opword 0xEC202028
+		opword 0x90810068
+		opword 0x6C008000
+		opword 0x9001006C
+		opword 0xC8610068
+		opword 0x90010084
+		opword 0xEC632028
+		opword 0x90810080
+		opword 0xC8010080
+		opword 0xD0610050
+		opword 0xEC002028
+		opword 0xD041003C
+		opword 0xD0210040
+		opword 0xD0010044
+		opword 0x4082000C
+		opword 0x38810048
+		bl hitObjGetPos
+		lfs f4, float_0_8041a3f0(r2)
+		opword 0xFC04F800
+		opword 0x41820180
+		opword 0x6FA38000
+		opword 0x3C004330
+		opword 0x90610084
+		lis r4, double_to_int_802c4da0@ha
+		lfs f3, float_1E06_8041a414(r2)
+		opword 0x2C1E0001
+		opword 0x90010080
+		lfd f1, double_to_int_802c4da0@l(r4)
+		opword 0xC8010080
+		lfs f2, float_360_8041a3ec(r2)
+		opword 0xEC200828
+		lfs f0, float_0p125_8041a418(r2)
+		opword 0xD0810008
+		opword 0xEC220072
+		opword 0xD081000C
+		opword 0xD0810010
+		opword 0xEC410032
+		opword 0xD0610014
+		opword 0x4082000C
+		lfs f0, float_180_8041a41c(r2)
+		opword 0xEC42002A
+		lfs f1, float_6p2832_8041a3e8(r2)
+		lfs f0, float_360_8041a3ec(r2)
+		opword 0xEC2100B2
+		opword 0xEFC10024
+		opword 0xFC20F090
+		bl sin
+		opword 0xFC800818
+		opword 0xC001004C
+		lfs f3, float_30_8041a420(r2)
+		opword 0xFC20F090
+		opword 0xC0410048
+		opword 0xD0010028
+		opword 0xEC03113C
+		opword 0xD0010024
+		bl cos
+		opword 0xFC200818
+		lfs f4, float_0_8041a3f0(r2)
+		lfs f0, float_1E06_8041a414(r2)
+		opword 0x38810008
+		lfs f5, float_30_8041a420(r2)
+		opword 0xFCC02090
+		opword 0xFC600850
+		opword 0xC0410050
+		opword 0xD0010014
+		opword 0x38A1000C
+		opword 0xC0210024
+		opword 0x38C10010
+		opword 0xEC6510FC
+		opword 0xC0410028
+		lfs f5, float_neg1_8041a410(r2)
+		opword 0x38E10014
+		opword 0x39010018
+		opword 0x3921001C
+		opword 0xD061002C
+		opword 0x39410020
+		opword 0x38600000
+		bl hitCheckFilter
+		opword 0x28030000
+		opword 0x4182000C
+		opword 0xC001000C
+		opword 0xD0010028
+		opword 0x80810024
+		opword 0xFC20F090
+		opword 0x80610028
+		opword 0x8001002C
+		opword 0x90810030
+		opword 0x90610034
+		opword 0x90010038
+		bl sin
+		lfs f2, float_30_8041a420(r2)
+		opword 0xFC600818
+		opword 0xC0010030
+		opword 0xFC20F090
+		opword 0xEFC2F82A
+		opword 0xEC1E00FA
+		opword 0xD0010030
+		bl cos
+		opword 0xFC000818
+		opword 0x80C10024
+		opword 0x80010028
+		opword 0x80A1002C
+		opword 0xFC200050
+		opword 0xC0010038
+		opword 0x80810030
+		opword 0x80610034
+		opword 0xEC1E007A
+		opword 0x90C10048
+		opword 0x9001004C
+		opword 0xD0010038
+		opword 0x80010038
+		opword 0x90A10050
+		opword 0x9081003C
+		opword 0x90610040
+		opword 0x90010044
+		opword 0xC021003C
+		opword 0xC0410040
+		opword 0xC0610044
+		opword 0xC0A10048
+		opword 0xC081004C
+		opword 0xC0010050
+		stfs f5, BeroSX(r13)
+		stfs f4, BeroSY(r13)
+		stfs f0, BeroSZ(r13)
+		stfs f1, BeroEX(r13)
+		stfs f2, BeroEY(r13)
+		stfs f3, BeroEZ(r13)
+		bl N_marioSetBottomlessRespawnPosOnBeroEntry
+		opword 0xA01F002E
+		opword 0x28000019
+		opword 0x40820008
+		bl N_marioReloadMapOnBottomlessOn
+		opword 0x38600002
+		opword 0xE3E100B8
+		opword 0xCBE100B0
+		opword 0xE3C100A8
+		opword 0xCBC100A0
+		opword 0x83E1009C
+		opword 0x83C10098
+		opword 0x800100C4
+		opword 0x83A10094
+		opword 0x7C0803A6
+		opword 0x382100C0
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
+	char _af_pad[32];
+	asm volatile {
+		lfs f1, float_0_8041a3f0(r2)
+		opword 0x2C060008
+		lfs f0, float_10000_8041a40c(r2)
+		opword 0x7C9C2378
+		stfs f1, _af_pad+24(r1)
+		opword 0x7CBD2B78
+		lfs f31, float_20_8041a400(r2)
+		opword 0x7CFE3B78
+		opword 0xD021001C
+		opword 0x7D1F4378
+		opword 0xD0210018
+		opword 0xD0010014
+		opword 0x41820188
+		opword 0x4080001C
+		opword 0x2C060006
+		opword 0x4182002C
+		opword 0x40800218
+		opword 0x2C060002
+		opword 0x41820028
+		opword 0x4800020C
+		opword 0x2C062710
+		opword 0x41820204
+		opword 0x40800200
+		opword 0x2C06000A
+		opword 0x408001F8
+		opword 0x48000150
+		neg r28, r28
+		opword 0xFFE0F850
+		opword 0x2C030000
+		opword 0x4082009C
+		opword 0x7FA3EB78
+		opword 0x7FC4F378
+		bl hitObjGetPos
+		opword 0xC01E0000
+		opword 0x6F838000
+		opword 0x3C004330
+		lis r4, double_to_int_802c4da0@ha
+		opword 0xEC00F828
+		opword 0x9061002C
+		addi r3, r4, double_to_int_802c4da0@l
+		lfs f4, float_0_8041a3f0(r2)
+		opword 0x90010028
+		opword 0x38810020
+		opword 0xD01E0000
+		opword 0xFCC02090
+		opword 0xC8230000
+		opword 0x38A1001C
+		opword 0xC8010028
+		opword 0x38C10018
+		opword 0xC05E0000
+		opword 0xEC000828
+		lfs f5, float_neg1_8041a410(r2)
+		opword 0x38E10014
+		opword 0x39010010
+		opword 0x3921000C
+		opword 0x39410008
+		opword 0xEC02002A
+		opword 0x38600000
+		opword 0xD01F0000
+		opword 0xC01E0004
+		opword 0xD01F0004
+		opword 0xC01E0008
+		opword 0xD01F0008
+		opword 0xC03F0000
+		opword 0xC05F0004
+		opword 0xC07F0008
+		bl hitCheckFilter
+		opword 0x48000098
+		opword 0x7FA3EB78
+		opword 0x7FE4FB78
+		bl hitObjGetPos
+		opword 0xC01F0000
+		opword 0x6F838000
+		opword 0x3C004330
+		lis r4, double_to_int_802c4da0@ha
+		opword 0xEC00F828
+		opword 0x9061002C
+		addi r3, r4, double_to_int_802c4da0@l
+		lfs f4, float_0_8041a3f0(r2)
+		opword 0x90010028
+		opword 0x38810020
+		opword 0xD01F0000
+		opword 0xFCC02090
+		opword 0xC8230000
+		opword 0x38A1001C
+		opword 0xC8010028
+		opword 0x38C10018
+		opword 0xC05F0000
+		opword 0xEC000828
+		lfs f5, float_neg1_8041a410(r2)
+		opword 0x38E10014
+		opword 0x39010010
+		opword 0x3921000C
+		opword 0x39410008
+		opword 0xEC02002A
+		opword 0x38600000
+		opword 0xD01E0000
+		opword 0xC01F0004
+		opword 0xD01E0004
+		opword 0xC01F0008
+		opword 0xD01E0008
+		opword 0xC03E0000
+		opword 0xC05E0004
+		opword 0xC07E0008
+		bl hitCheckFilter
+		opword 0xC001001C
+		opword 0xD01E0004
+		opword 0xD01F0004
+		opword 0x480000C0
+		opword 0x7F9C00D0
+		opword 0x2C030000
+		opword 0x40820050
+		opword 0x7FA3EB78
+		opword 0x7FC4F378
+		bl hitObjGetPos
+		opword 0x6F838000
+		opword 0x3C004330
+		opword 0x9061002C
+		lis r4, double_to_int_802c4da0@ha
+		opword 0xC05E0000
+		opword 0x90010028
+		lfd f1, double_to_int_802c4da0@l(r4)
+		opword 0xC8010028
+		opword 0xD05F0000
+		opword 0xEC000828
+		opword 0xC03E0004
+		opword 0xEC01002A
+		opword 0xD01F0004
+		opword 0xC01E0008
+		opword 0xD01F0008
+		opword 0x48000068
+		opword 0x7FA3EB78
+		opword 0x7FE4FB78
+		bl hitObjGetPos
+		opword 0x6F838000
+		opword 0x3C004330
+		opword 0x9061002C
+		lis r4, double_to_int_802c4da0@ha
+		opword 0xC05F0000
+		opword 0x90010028
+		lfd f1, double_to_int_802c4da0@l(r4)
+		opword 0xC8010028
+		opword 0xD05E0000
+		opword 0xEC000828
+		opword 0xC03F0004
+		opword 0xEC01002A
+		opword 0xD01E0004
+		opword 0xC01F0008
+		opword 0xD01E0008
+		opword 0x4800001C
+		opword 0x7FA3EB78
+		opword 0x7FC4F378
+		bl hitObjGetPos
+		opword 0x7FA3EB78
+		opword 0x7FE4FB78
+		bl hitObjGetPos
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 bero_get_position_pipe_pure(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFC0
+		opword 0x7C0802A6
+		opword 0x90010044
+		opword 0x93E1003C
+		opword 0x93C10038
+		opword 0x93A10034
+		opword 0x7C7D1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7F1B78
+		opword 0x7FA3EB78
+		bl evtGetFloat
+		opword 0xFC00081E
+		opword 0x83DD00B0
+		opword 0x80BD00A8
+		opword 0x7FE3FB78
+		opword 0x7FC6F378
+		opword 0x38E10014
+		opword 0xD8010020
+		opword 0x39010008
+		opword 0x80810024
+		bl bero_get_position_pipe_sub
+		opword 0xC0010014
+		opword 0x2C1E0008
+		stfs f0, BeroSX(r13)
+		opword 0x40820014
+		opword 0xC0210018
+		lfs f0, float_37p5_8041a408(r2)
+		opword 0xEC410028
+		opword 0x48000008
+		opword 0xC0410018
+		opword 0xC001001C
+		opword 0x2C1E0008
+		opword 0xC0210008
+		stfs f2, BeroSY(r13)
+		stfs f0, BeroSZ(r13)
+		stfs f1, BeroEX(r13)
+		opword 0x40820014
+		opword 0xC041000C
+		lfs f0, float_37p5_8041a408(r2)
+		opword 0xEC020028
+		opword 0x48000008
+		opword 0xC001000C
+		opword 0xC0610010
+		opword 0xFC400018
+		stfs f0, BeroEY(r13)
+		stfs f3, BeroEZ(r13)
+		bl N_marioSetBottomlessRespawnPosOnBeroEntry
+		opword 0x80010044
+		opword 0x38600002
+		opword 0x83E1003C
+		opword 0x83C10038
+		opword 0x83A10034
+		opword 0x7C0803A6
+		opword 0x38210040
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 bero_get_position_pipe2(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FF90
+		opword 0x7C0802A6
+		opword 0x90010074
+		opword 0x93E1006C
+		opword 0x93C10068
+		opword 0x7C7E1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7F1B78
+		opword 0x7FC3F378
+		bl evtGetFloat
+		opword 0xFC00081E
+		opword 0x80BE00A8
+		opword 0x80DE00B0
+		opword 0x7FE3FB78
+		opword 0x38E1002C
+		opword 0x39010020
+		opword 0xD8010060
+		opword 0x80810064
+		bl bero_get_position_pipe_sub
+		opword 0xC0210024
+		lfs f0, float_1_8041a404(r2)
+		opword 0xEC01002A
+		opword 0xD0010024
+		bl camRoadReset
+		bl camShiftReset
+		opword 0xC0610028
+		opword 0x38610038
+		opword 0xC0410024
+		opword 0xC0210020
+		opword 0xFCC01890
+		opword 0xFCA01090
+		lfs f7, float_0_8041a3f0(r2)
+		opword 0xFC800890
+		bl camRoadMain
+		lis r4, vec3_802c4990@ha
+		lwzu r9, vec3_802c4990@l(r4)
+		lis r3, vec3_802c499c@ha
+		opword 0xC0A10044
+		addi r6, r3, vec3_802c499c@l
+		opword 0x81040004
+		opword 0x80E40008
+		opword 0x38600002
+		opword 0x80A60000
+		opword 0x80860004
+		opword 0x80060008
+		opword 0x91210014
+		opword 0xC0810048
+		opword 0x91010018
+		opword 0xC061004C
+		opword 0x90E1001C
+		opword 0xC0410050
+		opword 0x90A10008
+		opword 0xC0210054
+		opword 0x9081000C
+		opword 0xC0010058
+		opword 0x90010010
+		opword 0xD0A10014
+		opword 0xD0810018
+		opword 0x81010014
+		opword 0xD061001C
+		opword 0x80E10018
+		opword 0xD0410008
+		opword 0x80C1001C
+		opword 0xD021000C
+		opword 0x80A10008
+		opword 0xD0010010
+		opword 0x8081000C
+		opword 0x80010010
+		stw r8, BeroPT(r13)
+		stw r7, BeroPT+0x4(r13)
+		stw r6, BeroPT+0x8(r13)
+		stw r5, BeroAT(r13)
+		stw r4, BeroAT+0x4(r13)
+		stw r0, BeroAT+0x8(r13)
+		opword 0x83E1006C
+		opword 0x80010074
+		opword 0x83C10068
+		opword 0x7C0803A6
+		opword 0x38210070
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x90010014
+		opword 0x800300B0
+		opword 0x2C000007
+		opword 0x418200A8
+		opword 0x4080001C
+		opword 0x2C000002
+		opword 0x4182002C
+		opword 0x41800098
+		opword 0x2C000006
+		opword 0x40800020
+		opword 0x4800008C
+		opword 0x2C002710
+		opword 0x41820084
+		opword 0x40800080
+		opword 0x2C00000A
+		opword 0x40800078
+		opword 0x4800003C
+		opword 0x800300AC
+		opword 0x540004E7
+		opword 0x40820068
+		bl marioGetPtr
+		opword 0xC023009C
+		lfs f0, float_3_8041a3f4(r2)
+		opword 0xEC01002A
+		opword 0xD003009C
+		bl marioGetPtr
+		opword 0xC02300A0
+		lfs f0, float_15_8041a3f8(r2)
+		opword 0xEC010028
+		opword 0xD00300A0
+		opword 0x4800003C
+		opword 0x800300AC
+		opword 0x540004E7
+		opword 0x4082001C
+		bl marioGetPtr
+		opword 0xC02300A0
+		lfs f0, float_13_8041a3fc(r2)
+		opword 0xEC010028
+		opword 0xD00300A0
+		opword 0x48000018
+		bl marioGetPtr
+		opword 0xC02300A0
+		lfs f0, float_20_8041a400(r2)
+		opword 0xEC010028
+		opword 0xD00300A0
+		opword 0x80010014
+		opword 0x38600002
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+s32 evt_bero_switch_on(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, *args++);
+	s32 newId = id;
+	const char *string, *test;
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	if (BeroSW[newId] == 1) {
+		event->lwData[0] = 1;
+	} else {
+		event->lwData[0] = 0;
+	}
+	BeroSW[newId] = 1;
+	event->lwData[1] = newId;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_mario_go(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	li r0, 0x1
-	li r3, 0x2
-	stw r0, BeroMarioGO(r13)
-	blr
+s32 evt_bero_switch_off(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, *args++);
+	s32 newId = id;
+	const char *string, *test;
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	if (BeroSW[newId] != 1) {
+		event->lwData[0] = 1;
+	} else {
+		event->lwData[0] = 0;
+	}
+	BeroSW[newId] = 0;
+	event->lwData[1] = newId;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_mario_go_init(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	li r0, 0x0
-	li r3, 0x2
-	stw r0, BeroMarioGO(r13)
-	blr
+s32 evt_bero_get_number(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry** table = BeroINFOARR;
+	s32* args = event->args;
+	BeroEntry** temp;
+	s32 id = evtGetValue(event, *args++);
+	s32 newId = id;
+	const char *string, *test;
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	event->lwData[1] = newId;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_cam_shift_init(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl camRoadReset
-	bl camShiftReset
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 evt_bero_case_id_save(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	s32 id = evtGetValue(event, args[0]);
+	BeroID[id] = evtGetValue(event, args[1]);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_cam3d_change(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	li r3, 0x4
-	lwz r31, 0x18(r29)
-	bl camGetPtr
-	lwz r4, 0x0(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r0, 0xc(r30)
-	lis r4, 0x1062
-	lwz r7, 0x10(r30)
-	addi r6, r4, 0x4dd3
-	lis r5, 0x8000
-	li r4, 0x0
-	stw r0, 0x58(r30)
-	li r0, 0x3
-	stw r7, 0x5c(r30)
-	lwz r7, 0x14(r30)
-	stw r7, 0x60(r30)
-	lwz r8, 0x18(r30)
-	lwz r7, 0x1c(r30)
-	stw r8, 0x64(r30)
-	stw r7, 0x68(r30)
-	lwz r7, 0x20(r30)
-	stw r7, 0x6c(r30)
-	lwz r8, BeroPT(r13)
-	lwz r7, BeroPT+0x4(r13)
-	stw r8, 0x40(r30)
-	stw r7, 0x44(r30)
-	lwz r7, BeroPT+0x8(r13)
-	stw r7, 0x48(r30)
-	lwz r8, BeroAT(r13)
-	lwz r7, BeroAT+0x4(r13)
-	stw r8, 0x4c(r30)
-	stw r7, 0x50(r30)
-	lwz r7, BeroAT+0x8(r13)
-	stw r7, 0x54(r30)
-	lwz r8, gp(r13)
-	lwz r7, 0x38(r8)
-	lwz r8, 0x3c(r8)
-	stw r8, 0x74(r30)
-	stw r7, 0x70(r30)
-	lwz r5, 0xf8(r5)
-	srwi r5, r5, 2
-	mulhwu r5, r6, r5
-	srwi r5, r5, 6
-	mullw r5, r31, r5
-	stw r5, 0x7c(r30)
-	stw r4, 0x78(r30)
-	sth r0, 0x4(r30)
-	stb r3, 0x80(r30)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r0, 0x24(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_case_id_load(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	s32 id = evtGetValue(event, args[0]);
+	evtSetValue(event, args[1], BeroID[id]);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_overwrite(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	stw r0, 0x24(r1)
-	addi r0, r4, BeroINFOARR@l
-	stw r31, 0x1c(r1)
-	mr r31, r0
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	mr r28, r3
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	cmpwi r3, 0x0
-	stw r3, 0x8(r1)
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r29, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	lwz r3, 0x0(r31)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r31, r31, 0x4
-	beq @3
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @3
-	@2:
-	lwz r4, 0x4(r30)
-	mr r3, r28
-	bl evtGetValue
-	lwz r0, 0x8(r1)
-	lis r4, BeroINFOARR@ha
-	addi r4, r4, BeroINFOARR@l
-	slwi r0, r0, 2
-	stwx r3, r4, r0
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_disppos_save(EventEntry* event, BOOL isFirstCall) {
+	BeroOX = marioGetPtr()->dispOfs.x;
+	BeroOY = marioGetPtr()->dispOfs.y;
+	BeroOZ = marioGetPtr()->dispOfs.z;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_move_mario_speed(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stfd f29, 0x50(r1)
-	psq_st f29, 0x58(r1), 0, 0
-	stfd f28, 0x40(r1)
-	psq_st f28, 0x48(r1), 0, 0
-	stfd f27, 0x30(r1)
-	psq_st f27, 0x38(r1), 0, 0
-	stfd f26, 0x20(r1)
-	psq_st f26, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	mr r30, r4
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetFloat
-	lwz r3, gp(r13)
-	lwz r0, 0x14(r3)
-	cmpwi r0, 0x0
-	beq @1
-	lwz r0, 0x38(r3)
-	lwz r31, 0x3c(r3)
-	b @2
-	@1:
-	lwz r0, 0x40(r3)
-	lwz r31, 0x44(r3)
-	@2:
-	cmpwi r30, 0x0
-	beq @3
-	stw r31, 0x19c(r29)
-	stw r0, 0x198(r29)
-	@3:
-	bl sysFrame2SecFloat
-	fmr f29, f1
-	lfs f1, BeroSX(r13)
-	lfs f2, BeroSY(r13)
-	lfs f3, BeroEX(r13)
-	lfs f4, BeroEY(r13)
-	bl angleABf
-	bl reviseAngle
-	lfs f2, float_6p2832_8041a3e8(r2)
-	lfs f0, float_360_8041a3ec(r2)
-	fmuls f1, f2, f1
-	fdivs f27, f1, f0
-	fmr f1, f27
-	bl sin
-	frsp f28, f1
-	fmr f1, f27
-	bl cos
-	lis r4, 0x8000
-	lis r3, 0x1062
-	lwz r0, 0xf8(r4)
-	addi r3, r3, 0x4dd3
-	lwz r4, 0x19c(r29)
-	frsp f27, f1
-	srwi r0, r0, 2
-	li r5, 0x0
-	mulhwu r0, r3, r0
-	subf r4, r4, r31
-	srawi r3, r4, 31
-	srwi r6, r0, 6
-	bl __div2u
-	mr r3, r4
-	bl sysMsec2Frame
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xc(r1)
-	lis r4, double_to_int_802c4da0@ha
-	fmuls f2, f29, f27
-	lfd f1, double_to_int_802c4da0@l(r4)
-	stw r0, 0x8(r1)
-	fmuls f31, f29, f28
-	lfd f0, 0x8(r1)
-	fneg f30, f2
-	lfs f2, BeroSX(r13)
-	fsubs f0, f0, f1
-	fmuls f26, f29, f0
-	fmuls f0, f28, f26
-	fadds f29, f2, f0
-	bl marioGetPtr
-	fmuls f0, f27, f26
-	stfs f29, 0x8c(r3)
-	lfs f1, BeroSY(r13)
-	fneg f0, f0
-	fadds f29, f1, f0
-	bl marioGetPtr
-	stfs f29, 0x90(r3)
-	lfs f29, BeroSZ(r13)
-	bl marioGetPtr
-	lfs f0, float_0_8041a3f0(r2)
-	li r31, 0x0
-	stfs f29, 0x94(r3)
-	fcmpo cr0, f31, f0
-	cror eq, gt, eq
-	bne @4
-	bl marioGetPtr
-	lfs f1, 0x8c(r3)
-	lfs f0, BeroEX(r13)
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @4
-	li r31, 0x1
-	@4:
-	lfs f0, float_0_8041a3f0(r2)
-	fcmpo cr0, f31, f0
-	bge @5
-	bl marioGetPtr
-	lfs f1, 0x8c(r3)
-	lfs f0, BeroEX(r13)
-	fcmpo cr0, f0, f1
-	cror eq, gt, eq
-	bne @5
-	li r31, 0x1
-	@5:
-	lfs f0, float_0_8041a3f0(r2)
-	li r30, 0x0
-	fcmpo cr0, f30, f0
-	cror eq, gt, eq
-	bne @6
-	bl marioGetPtr
-	lfs f1, 0x90(r3)
-	lfs f0, BeroEY(r13)
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @6
-	li r30, 0x1
-	@6:
-	lfs f0, float_0_8041a3f0(r2)
-	fcmpo cr0, f30, f0
-	bge @7
-	bl marioGetPtr
-	lfs f1, 0x90(r3)
-	lfs f0, BeroEY(r13)
-	fcmpo cr0, f0, f1
-	cror eq, gt, eq
-	bne @7
-	li r30, 0x1
-	@7:
-	add r0, r31, r30
-	cmpwi r0, 0x2
-	beq @8
-	li r3, 0x0
-	b @9
-	@8:
-	lfs f30, BeroEX(r13)
-	bl marioGetPtr
-	stfs f30, 0x8c(r3)
-	lfs f30, BeroEY(r13)
-	bl marioGetPtr
-	stfs f30, 0x90(r3)
-	lfs f30, BeroEZ(r13)
-	bl marioGetPtr
-	stfs f30, 0x94(r3)
-	li r3, 0x2
-	@9:
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	psq_l f29, 0x58(r1), 0, 0
-	lfd f29, 0x50(r1)
-	psq_l f28, 0x48(r1), 0, 0
-	lfd f28, 0x40(r1)
-	psq_l f27, 0x38(r1), 0, 0
-	lfd f27, 0x30(r1)
-	psq_l f26, 0x28(r1), 0, 0
-	lfd f26, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r0, 0x84(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
+s32 evt_bero_disppos_load(EventEntry* event, BOOL isFirstCall) {
+	marioGetPtr()->dispOfs.x = BeroOX;
+	marioGetPtr()->dispOfs.y = BeroOY;
+	marioGetPtr()->dispOfs.z = BeroOZ;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_disppos_load(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stfd f31, 0x10(r1)
-	psq_st f31, 0x18(r1), 0, 0
-	lfs f31, BeroOX(r13)
-	bl marioGetPtr
-	stfs f31, 0x98(r3)
-	lfs f31, BeroOY(r13)
-	bl marioGetPtr
-	stfs f31, 0x9c(r3)
-	lfs f31, BeroOZ(r13)
-	bl marioGetPtr
-	stfs f31, 0xa0(r3)
-	li r3, 0x2
-	psq_l f31, 0x18(r1), 0, 0
-	lwz r0, 0x24(r1)
-	lfd f31, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_bero_move_mario_speed(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[4];
+	asm volatile {
+		mr r29, r3
+		opword 0x7C9E2378
+		opword 0x80830018
+		opword 0x80840000
+		bl evtGetFloat
+		lwz r3, gp(r13)
+		opword 0x80030014
+		opword 0x2C000000
+		opword 0x41820010
+		opword 0x80030038
+		opword 0x83E3003C
+		opword 0x4800000C
+		opword 0x80030040
+		opword 0x83E30044
+		opword 0x2C1E0000
+		opword 0x4182000C
+		opword 0x93FD019C
+		opword 0x901D0198
+		bl sysFrame2SecFloat
+		opword 0xFFA00890
+		lfs f1, BeroSX(r13)
+		lfs f2, BeroSY(r13)
+		lfs f3, BeroEX(r13)
+		lfs f4, BeroEY(r13)
+		bl angleABf
+		bl reviseAngle
+		lfs f2, float_6p2832_8041a3e8(r2)
+		lfs f0, float_360_8041a3ec(r2)
+		opword 0xEC220072
+		opword 0xEF610024
+		opword 0xFC20D890
+		bl sin
+		opword 0xFF800818
+		opword 0xFC20D890
+		bl cos
+		opword 0x3C808000
+		opword 0x3C601062
+		opword 0x800400F8
+		opword 0x38634DD3
+		opword 0x809D019C
+		opword 0xFF600818
+		opword 0x5400F0BE
+		opword 0x38A00000
+		opword 0x7C030016
+		opword 0x7C84F850
+		opword 0x7C83FE70
+		opword 0x5406D1BE
+		bl __div2u
+		opword 0x7C832378
+		bl sysMsec2Frame
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061000C
+		lis r4, double_to_int_802c4da0@ha
+		opword 0xEC5D06F2
+		lfd f1, double_to_int_802c4da0@l(r4)
+		stw r0, _af_pad+0(r1)
+		opword 0xEFFD0732
+		opword 0xC8010008
+		opword 0xFFC01050
+		lfs f2, BeroSX(r13)
+		opword 0xEC000828
+		fmuls f26, f29, f0
+		opword 0xEC1C06B2
+		opword 0xEFA2002A
+		bl marioGetPtr
+		opword 0xEC1B06B2
+		opword 0xD3A3008C
+		lfs f1, BeroSY(r13)
+		opword 0xFC000050
+		opword 0xEFA1002A
+		bl marioGetPtr
+		opword 0xD3A30090
+		lfs f29, BeroSZ(r13)
+		bl marioGetPtr
+		lfs f0, float_0_8041a3f0(r2)
+		opword 0x3BE00000
+		opword 0xD3A30094
+		opword 0xFC1F0040
+		opword 0x4C411382
+		opword 0x40820020
+		bl marioGetPtr
+		opword 0xC023008C
+		lfs f0, BeroEX(r13)
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0x3BE00001
+		lfs f0, float_0_8041a3f0(r2)
+		opword 0xFC1F0040
+		opword 0x40800020
+		bl marioGetPtr
+		opword 0xC023008C
+		lfs f0, BeroEX(r13)
+		opword 0xFC000840
+		opword 0x4C411382
+		opword 0x40820008
+		opword 0x3BE00001
+		lfs f0, float_0_8041a3f0(r2)
+		opword 0x3BC00000
+		opword 0xFC1E0040
+		opword 0x4C411382
+		opword 0x40820020
+		bl marioGetPtr
+		opword 0xC0230090
+		lfs f0, BeroEY(r13)
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0x3BC00001
+		lfs f0, float_0_8041a3f0(r2)
+		opword 0xFC1E0040
+		opword 0x40800020
+		bl marioGetPtr
+		opword 0xC0230090
+		lfs f0, BeroEY(r13)
+		opword 0xFC000840
+		opword 0x4C411382
+		opword 0x40820008
+		opword 0x3BC00001
+		opword 0x7C1FF214
+		opword 0x2C000002
+		opword 0x4182000C
+		opword 0x38600000
+		opword 0x4800002C
+		lfs f30, BeroEX(r13)
+		bl marioGetPtr
+		opword 0xD3C3008C
+		lfs f30, BeroEY(r13)
+		bl marioGetPtr
+		opword 0xD3C30090
+		lfs f30, BeroEZ(r13)
+		bl marioGetPtr
+		opword 0xD3C30094
+		opword 0x38600002
+	}
+}
+#pragma pop
+
+s32 evt_bero_overwrite(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry** temp, **table = BeroINFOARR;
+	s32* args = event->args;
+	s32 id = evtGetValue(event, args[0]);
+	s32 newId = id;
+	const char *string, *test;
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	BeroINFOARR[newId] = (BeroEntry*)evtGetValue(event, args[1]);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_disppos_save(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lfs f0, 0x98(r3)
-	stfs f0, BeroOX(r13)
-	bl marioGetPtr
-	lfs f0, 0x9c(r3)
-	stfs f0, BeroOY(r13)
-	bl marioGetPtr
-	lfs f0, 0xa0(r3)
-	li r3, 0x2
-	stfs f0, BeroOZ(r13)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 evt_bero_cam3d_change(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	CameraEntry* cam = camGetPtr(4);
+	s32 time = evtGetValue(event, args[0]);
+	s32 curve = evtGetValue(event, args[1]);
+	cam->presetPos = cam->cameraPos;
+	cam->presetAt = cam->cameraAt;
+	cam->storedPos = BeroPT;
+	cam->storedAt = BeroAT;
+	cam->startTimeA = gp->renderTime;
+	cam->durationA = (u32)(time * ((*(u32*)0x800000F8 / 4) / 1000));
+	cam->stateA = 3;
+	cam->curveA = curve;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_case_id_load(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lis r5, BeroID@ha
-	slwi r0, r3, 2
-	addi r5, r5, BeroID@l
-	lwz r4, 0x4(r31)
-	lwzx r5, r5, r0
-	mr r3, r30
-	bl evtSetValue
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 evt_bero_cam_shift_init(EventEntry* event, BOOL isFirstCall) {
+	camRoadReset();
+	camShiftReset();
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_case_id_save(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	lis r4, BeroID@ha
-	slwi r0, r31, 2
-	addi r4, r4, BeroID@l
-	stwx r3, r4, r0
-	li r3, 0x2
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 evt_bero_mario_go_init(EventEntry* event, BOOL isFirstCall) {
+	BeroMarioGO = FALSE;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_get_number(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	stw r0, 0x24(r1)
-	addi r0, r4, BeroINFOARR@l
-	stw r31, 0x1c(r1)
-	mr r31, r0
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r5, 0x18(r3)
-	lwz r4, 0x0(r5)
-	bl evtGetValue
-	cmpwi r3, 0x0
-	stw r3, 0x8(r1)
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r30, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	lwz r3, 0x0(r31)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r31, r31, 0x4
-	beq @3
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @3
-	@2:
-	lwz r0, 0x8(r1)
-	li r3, 0x2
-	stw r0, 0xa0(r29)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_mario_go(EventEntry* event, BOOL isFirstCall) {
+	BeroMarioGO = TRUE;
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_switch_off(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	stw r0, 0x24(r1)
-	addi r0, r4, BeroINFOARR@l
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	mr r30, r0
-	stw r29, 0x14(r1)
-	lwz r5, 0x18(r3)
-	lwz r4, 0x0(r5)
-	bl evtGetValue
-	cmpwi r3, 0x0
-	stw r3, 0x8(r1)
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r29, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	lwz r3, 0x0(r30)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r30, r30, 0x4
-	beq @3
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @3
-	@2:
-	lwz r0, 0x8(r1)
-	lis r3, BeroSW@ha
-	addi r3, r3, BeroSW@l
-	slwi r0, r0, 2
-	lwzx r0, r3, r0
-	cmpwi r0, 0x1
-	beq @4
-	li r0, 0x1
-	stw r0, 0x9c(r31)
-	b @5
-	@4:
-	li r0, 0x0
-	stw r0, 0x9c(r31)
-	@5:
-	lwz r6, 0x8(r1)
-	lis r3, BeroSW@ha
-	addi r4, r3, BeroSW@l
-	li r5, 0x0
-	slwi r0, r6, 2
-	li r3, 0x2
-	stwx r5, r4, r0
-	stw r6, 0xa0(r31)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_mario_go_wait(EventEntry* event, BOOL isFirstCall) {
+	return BeroMarioGO == 0 ? 0 : EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_switch_on(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	stw r0, 0x24(r1)
-	addi r0, r4, BeroINFOARR@l
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	mr r30, r0
-	stw r29, 0x14(r1)
-	lwz r5, 0x18(r3)
-	lwz r4, 0x0(r5)
-	bl evtGetValue
-	cmpwi r3, 0x0
-	stw r3, 0x8(r1)
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r29, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	lwz r3, 0x0(r30)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r30, r30, 0x4
-	beq @3
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @3
-	@2:
-	lwz r0, 0x8(r1)
-	lis r3, BeroSW@ha
-	addi r3, r3, BeroSW@l
-	slwi r0, r0, 2
-	lwzx r0, r3, r0
-	cmpwi r0, 0x1
-	bne @4
-	li r0, 0x1
-	stw r0, 0x9c(r31)
-	b @5
-	@4:
-	li r0, 0x0
-	stw r0, 0x9c(r31)
-	@5:
-	lwz r6, 0x8(r1)
-	lis r3, BeroSW@ha
-	addi r4, r3, BeroSW@l
-	li r5, 0x1
-	slwi r0, r6, 2
-	li r3, 0x2
-	stwx r5, r4, r0
-	stw r6, 0xa0(r31)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_1stcheck(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	if (strcmp((const char*)event->lwData[13], str_802C4D94) == 0) {
+		evtSetValue(event, args[0], 1);
+	} else {
+		evtSetValue(event, args[0], 0);
+	}
+	return EVT_RETURN_DONE;
 }
 
-asm s32 bero_set_disp_position_pipe(BeroPipeInfo* info) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r0, 0xb0(r3)
-	cmpwi r0, 0x7
-	beq @1
-	bge @2
-	cmpwi r0, 0x2
-	beq @3
-	blt @1
-	cmpwi r0, 0x6
-	bge @3
-	b @1
-	@2:
-	cmpwi r0, 0x2710
-	beq @1
-	bge @1
-	cmpwi r0, 0xa
-	bge @1
-	b @4
-	@3:
-	lwz r0, 0xac(r3)
-	rlwinm. r0, r0, 0, 19, 19
-	bne @1
-	bl marioGetPtr
-	lfs f1, 0x9c(r3)
-	lfs f0, float_3_8041a3f4(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x9c(r3)
-	bl marioGetPtr
-	lfs f1, 0xa0(r3)
-	lfs f0, float_15_8041a3f8(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0xa0(r3)
-	b @1
-	@4:
-	lwz r0, 0xac(r3)
-	rlwinm. r0, r0, 0, 19, 19
-	bne @5
-	bl marioGetPtr
-	lfs f1, 0xa0(r3)
-	lfs f0, float_13_8041a3fc(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0xa0(r3)
-	b @1
-	@5:
-	bl marioGetPtr
-	lfs f1, 0xa0(r3)
-	lfs f0, float_20_8041a400(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0xa0(r3)
-	@1:
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_camera_change_event_from_road(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFA0
+		opword 0x7C0802A6
+		opword 0x90010064
+		opword 0x93E1005C
+		opword 0x93C10058
+		opword 0x93A10054
+		opword 0x93810050
+		bl marioGetPtr
+		opword 0x7C601B78
+		opword 0x38600004
+		opword 0x7C1C0378
+		bl camGetPtr
+		opword 0x7C7F1B78
+		opword 0x7F84E378
+		opword 0x38A10008
+		bl camShiftMain
+		opword 0xC07C0094
+		opword 0x38610024
+		opword 0xC05F0098
+		opword 0xC03C008C
+		opword 0xFCC01890
+		opword 0xFCA01090
+		opword 0xC0E10008
+		opword 0xFC800890
+		bl camRoadMain
+		lis r3, vec3_802c4c58@ha
+		lis r4, vec3_802c4c64@ha
+		addi r5, r3, vec3_802c4c58@l
+		opword 0x3C601062
+		addi r8, r4, vec3_802c4c64@l
+		opword 0x83850000
+		opword 0x83A50004
+		opword 0x3CC08000
+		opword 0x81450008
+		opword 0x38E34DD3
+		opword 0x83C80000
+		opword 0x38A00000
+		opword 0x81880004
+		opword 0x38800003
+		opword 0x81680008
+		opword 0x3800000B
+		opword 0xC0A10030
+		opword 0x38600002
+		opword 0xC0810034
+		opword 0xC0610038
+		opword 0xC041003C
+		opword 0xC0210040
+		opword 0xC0010044
+		opword 0x813F000C
+		opword 0x811F0010
+		opword 0x93810018
+		opword 0x913F0058
+		opword 0x911F005C
+		opword 0x811F0014
+		opword 0x93A1001C
+		opword 0x911F0060
+		opword 0xD0A10018
+		opword 0x813F0018
+		opword 0x811F001C
+		opword 0x91410020
+		opword 0x81410018
+		opword 0x913F0064
+		opword 0x911F0068
+		opword 0x811F0020
+		opword 0xD081001C
+		opword 0x911F006C
+		opword 0x8101001C
+		opword 0xD0610020
+		opword 0x93C1000C
+		opword 0x81210020
+		opword 0x915F0040
+		opword 0x91810010
+		opword 0xD041000C
+		opword 0x911F0044
+		opword 0x8101000C
+		opword 0x91610014
+		opword 0xD0210010
+		opword 0x913F0048
+		opword 0x81210010
+		opword 0xD0010014
+		opword 0x911F004C
+		opword 0x81010014
+		opword 0x913F0050
+		opword 0x911F0054
+		lwz r9, gp(r13)
+		opword 0x81090038
+		opword 0x8129003C
+		opword 0x913F0074
+		opword 0x911F0070
+		opword 0x80C600F8
+		opword 0x54C6F0BE
+		opword 0x7CC73016
+		opword 0x54C6D1BE
+		opword 0x1CC601F4
+		opword 0x90DF007C
+		opword 0x90BF0078
+		opword 0xB09F0004
+		opword 0x981F0080
+		opword 0x83E1005C
+		opword 0x83C10058
+		opword 0x83A10054
+		opword 0x83810050
+		opword 0x80010064
+		opword 0x7C0803A6
+		opword 0x38210060
+	}
 }
+#pragma pop
 
-asm s32 bero_get_position_pipe2(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x70(r1)
-	mflr r0
-	stw r0, 0x74(r1)
-	stw r31, 0x6c(r1)
-	stw r30, 0x68(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetFloat
-	fctiwz f0, f1
-	lwz r5, 0xa8(r30)
-	lwz r6, 0xb0(r30)
-	mr r3, r31
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x20
-	stfd f0, 0x60(r1)
-	lwz r4, 0x64(r1)
-	bl bero_get_position_pipe_sub
-	lfs f1, 0x24(r1)
-	lfs f0, float_1_8041a404(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x24(r1)
-	bl camRoadReset
-	bl camShiftReset
-	lfs f3, 0x28(r1)
-	addi r3, r1, 0x38
-	lfs f2, 0x24(r1)
-	lfs f1, 0x20(r1)
-	fmr f6, f3
-	fmr f5, f2
-	lfs f7, float_0_8041a3f0(r2)
-	fmr f4, f1
-	bl camRoadMain
-	lis r4, vec3_802c4990@ha
-	lwzu r9, vec3_802c4990@l(r4)
-	lis r3, vec3_802c499c@ha
-	lfs f5, 0x44(r1)
-	addi r6, r3, vec3_802c499c@l
-	lwz r8, 0x4(r4)
-	lwz r7, 0x8(r4)
-	li r3, 0x2
-	lwz r5, 0x0(r6)
-	lwz r4, 0x4(r6)
-	lwz r0, 0x8(r6)
-	stw r9, 0x14(r1)
-	lfs f4, 0x48(r1)
-	stw r8, 0x18(r1)
-	lfs f3, 0x4c(r1)
-	stw r7, 0x1c(r1)
-	lfs f2, 0x50(r1)
-	stw r5, 0x8(r1)
-	lfs f1, 0x54(r1)
-	stw r4, 0xc(r1)
-	lfs f0, 0x58(r1)
-	stw r0, 0x10(r1)
-	stfs f5, 0x14(r1)
-	stfs f4, 0x18(r1)
-	lwz r8, 0x14(r1)
-	stfs f3, 0x1c(r1)
-	lwz r7, 0x18(r1)
-	stfs f2, 0x8(r1)
-	lwz r6, 0x1c(r1)
-	stfs f1, 0xc(r1)
-	lwz r5, 0x8(r1)
-	stfs f0, 0x10(r1)
-	lwz r4, 0xc(r1)
-	lwz r0, 0x10(r1)
-	stw r8, BeroPT(r13)
-	stw r7, BeroPT+0x4(r13)
-	stw r6, BeroPT+0x8(r13)
-	stw r5, BeroAT(r13)
-	stw r4, BeroAT+0x4(r13)
-	stw r0, BeroAT+0x8(r13)
-	lwz r31, 0x6c(r1)
-	lwz r0, 0x74(r1)
-	lwz r30, 0x68(r1)
-	mtlr r0
-	addi r1, r1, 0x70
-	blr
-}
+#pragma defer_codegen reset
 
-asm s32 bero_get_position_pipe_pure(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stw r31, 0x3c(r1)
-	stw r30, 0x38(r1)
-	stw r29, 0x34(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetFloat
-	fctiwz f0, f1
-	lwz r30, 0xb0(r29)
-	lwz r5, 0xa8(r29)
-	mr r3, r31
-	mr r6, r30
-	addi r7, r1, 0x14
-	stfd f0, 0x20(r1)
-	addi r8, r1, 0x8
-	lwz r4, 0x24(r1)
-	bl bero_get_position_pipe_sub
-	lfs f0, 0x14(r1)
-	cmpwi r30, 0x8
-	stfs f0, BeroSX(r13)
-	bne @1
-	lfs f1, 0x18(r1)
-	lfs f0, float_37p5_8041a408(r2)
-	fsubs f2, f1, f0
-	b @2
-	@1:
-	lfs f2, 0x18(r1)
-	@2:
-	lfs f0, 0x1c(r1)
-	cmpwi r30, 0x8
-	lfs f1, 0x8(r1)
-	stfs f2, BeroSY(r13)
-	stfs f0, BeroSZ(r13)
-	stfs f1, BeroEX(r13)
-	bne @3
-	lfs f2, 0xc(r1)
-	lfs f0, float_37p5_8041a408(r2)
-	fsubs f0, f2, f0
-	b @4
-	@3:
-	lfs f0, 0xc(r1)
-	@4:
-	lfs f3, 0x10(r1)
-	frsp f2, f0
-	stfs f0, BeroEY(r13)
-	stfs f3, BeroEZ(r13)
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	lwz r0, 0x44(r1)
-	li r3, 0x2
-	lwz r31, 0x3c(r1)
-	lwz r30, 0x38(r1)
-	lwz r29, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void bero_get_position_pipe_sub(s32 id, s32 a, s32 name, s32 kind, Vec* start, Vec* end) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stfd f31, 0x40(r1)
-	psq_st f31, 0x48(r1), 0, 0
-	stw r31, 0x3c(r1)
-	stw r30, 0x38(r1)
-	stw r29, 0x34(r1)
-	stw r28, 0x30(r1)
-	lfs f1, float_0_8041a3f0(r2)
-	cmpwi r6, 0x8
-	lfs f0, float_10000_8041a40c(r2)
-	mr r28, r4
-	stfs f1, 0x20(r1)
-	mr r29, r5
-	lfs f31, float_20_8041a400(r2)
-	mr r30, r7
-	stfs f1, 0x1c(r1)
-	mr r31, r8
-	stfs f1, 0x18(r1)
-	stfs f0, 0x14(r1)
-	beq @1
-	bge @2
-	cmpwi r6, 0x6
-	beq @3
-	bge @4
-	cmpwi r6, 0x2
-	beq @5
-	b @4
-	@2:
-	cmpwi r6, 0x2710
-	beq @4
-	bge @4
-	cmpwi r6, 0xa
-	bge @4
-	b @6
-	@3:
-	neg r28, r28
-	fneg f31, f31
-	@5:
-	cmpwi r3, 0x0
-	bne @7
-	mr r3, r29
-	mr r4, r30
-	bl hitObjGetPos
-	lfs f0, 0x0(r30)
-	xoris r3, r28, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802c4da0@ha
-	fsubs f0, f0, f31
-	stw r3, 0x2c(r1)
-	addi r3, r4, double_to_int_802c4da0@l
-	lfs f4, float_0_8041a3f0(r2)
-	stw r0, 0x28(r1)
-	addi r4, r1, 0x20
-	stfs f0, 0x0(r30)
-	fmr f6, f4
-	lfd f1, 0x0(r3)
-	addi r5, r1, 0x1c
-	lfd f0, 0x28(r1)
-	addi r6, r1, 0x18
-	lfs f2, 0x0(r30)
-	fsubs f0, f0, f1
-	lfs f5, float_neg1_8041a410(r2)
-	addi r7, r1, 0x14
-	addi r8, r1, 0x10
-	addi r9, r1, 0xc
-	addi r10, r1, 0x8
-	fadds f0, f2, f0
-	li r3, 0x0
-	stfs f0, 0x0(r31)
-	lfs f0, 0x4(r30)
-	stfs f0, 0x4(r31)
-	lfs f0, 0x8(r30)
-	stfs f0, 0x8(r31)
-	lfs f1, 0x0(r31)
-	lfs f2, 0x4(r31)
-	lfs f3, 0x8(r31)
-	bl hitCheckFilter
-	b @8
-	@7:
-	mr r3, r29
-	mr r4, r31
-	bl hitObjGetPos
-	lfs f0, 0x0(r31)
-	xoris r3, r28, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802c4da0@ha
-	fsubs f0, f0, f31
-	stw r3, 0x2c(r1)
-	addi r3, r4, double_to_int_802c4da0@l
-	lfs f4, float_0_8041a3f0(r2)
-	stw r0, 0x28(r1)
-	addi r4, r1, 0x20
-	stfs f0, 0x0(r31)
-	fmr f6, f4
-	lfd f1, 0x0(r3)
-	addi r5, r1, 0x1c
-	lfd f0, 0x28(r1)
-	addi r6, r1, 0x18
-	lfs f2, 0x0(r31)
-	fsubs f0, f0, f1
-	lfs f5, float_neg1_8041a410(r2)
-	addi r7, r1, 0x14
-	addi r8, r1, 0x10
-	addi r9, r1, 0xc
-	addi r10, r1, 0x8
-	fadds f0, f2, f0
-	li r3, 0x0
-	stfs f0, 0x0(r30)
-	lfs f0, 0x4(r31)
-	stfs f0, 0x4(r30)
-	lfs f0, 0x8(r31)
-	stfs f0, 0x8(r30)
-	lfs f1, 0x0(r30)
-	lfs f2, 0x4(r30)
-	lfs f3, 0x8(r30)
-	bl hitCheckFilter
-	@8:
-	lfs f0, 0x1c(r1)
-	stfs f0, 0x4(r30)
-	stfs f0, 0x4(r31)
-	b @9
-	@6:
-	neg r28, r28
-	@1:
-	cmpwi r3, 0x0
-	bne @10
-	mr r3, r29
-	mr r4, r30
-	bl hitObjGetPos
-	xoris r3, r28, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x2c(r1)
-	lis r4, double_to_int_802c4da0@ha
-	lfs f2, 0x0(r30)
-	stw r0, 0x28(r1)
-	lfd f1, double_to_int_802c4da0@l(r4)
-	lfd f0, 0x28(r1)
-	stfs f2, 0x0(r31)
-	fsubs f0, f0, f1
-	lfs f1, 0x4(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r31)
-	lfs f0, 0x8(r30)
-	stfs f0, 0x8(r31)
-	b @9
-	@10:
-	mr r3, r29
-	mr r4, r31
-	bl hitObjGetPos
-	xoris r3, r28, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x2c(r1)
-	lis r4, double_to_int_802c4da0@ha
-	lfs f2, 0x0(r31)
-	stw r0, 0x28(r1)
-	lfd f1, double_to_int_802c4da0@l(r4)
-	lfd f0, 0x28(r1)
-	stfs f2, 0x0(r30)
-	fsubs f0, f0, f1
-	lfs f1, 0x4(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r30)
-	lfs f0, 0x8(r31)
-	stfs f0, 0x8(r30)
-	b @9
-	@4:
-	mr r3, r29
-	mr r4, r30
-	bl hitObjGetPos
-	mr r3, r29
-	mr r4, r31
-	bl hitObjGetPos
-	@9:
-	psq_l f31, 0x48(r1), 0, 0
-	lwz r0, 0x54(r1)
-	lfd f31, 0x40(r1)
-	lwz r31, 0x3c(r1)
-	lwz r30, 0x38(r1)
-	lwz r29, 0x34(r1)
-	lwz r28, 0x30(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm s32 bero_get_position_normal(EventEntry *event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0xc0(r1)
-	mflr r0
-	stw r0, 0xc4(r1)
-	stfd f31, 0xb0(r1)
-	psq_st f31, 0xb8(r1), 0, 0
-	stfd f30, 0xa0(r1)
-	psq_st f30, 0xa8(r1), 0, 0
-	stw r31, 0x9c(r1)
-	stw r30, 0x98(r1)
-	stw r29, 0x94(r1)
-	mr r29, r3
-	lwz r30, 0x18(r3)
-	bl marioGetPtr
-	lwz r4, 0x0(r30)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x4(r30)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetFloat
-	lwz r7, 0xb4(r29)
-	lis r4, 0x4330
-	lis r3, double_to_int_802c4da0@ha
-	stw r4, 0x58(r1)
-	lwz r6, 0x0(r7)
-	fmr f31, f1
-	lfd f4, double_to_int_802c4da0@l(r3)
-	xoris r5, r6, 0x8000
-	lwz r3, 0xa8(r29)
-	stw r5, 0x5c(r1)
-	subis r0, r6, 0x1
-	lwz r29, 0xb0(r29)
-	cmplwi r0, 0x86a0
-	lfd f0, 0x58(r1)
-	stw r4, 0x60(r1)
-	fsubs f0, f0, f4
-	stw r5, 0x74(r1)
-	stfs f0, 0x48(r1)
-	lwz r0, 0x4(r7)
-	stw r4, 0x70(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x64(r1)
-	lfd f0, 0x60(r1)
-	stw r0, 0x7c(r1)
-	fsubs f1, f0, f4
-	lfd f0, 0x70(r1)
-	stw r4, 0x78(r1)
-	fsubs f2, f0, f4
-	stfs f1, 0x4c(r1)
-	lfd f0, 0x78(r1)
-	lwz r0, 0x8(r7)
-	fsubs f1, f0, f4
-	stw r4, 0x68(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x6c(r1)
-	lfd f3, 0x68(r1)
-	stw r0, 0x84(r1)
-	fsubs f3, f3, f4
-	stw r4, 0x80(r1)
-	lfd f0, 0x80(r1)
-	stfs f3, 0x50(r1)
-	fsubs f0, f0, f4
-	stfs f2, 0x3c(r1)
-	stfs f1, 0x40(r1)
-	stfs f0, 0x44(r1)
-	bne @1
-	addi r4, r1, 0x48
-	bl hitObjGetPos
-	@1:
-	lfs f4, float_0_8041a3f0(r2)
-	fcmpu cr0, f4, f31
-	beq @2
-	xoris r3, r29, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x84(r1)
-	lis r4, double_to_int_802c4da0@ha
-	lfs f3, float_1E06_8041a414(r2)
-	cmpwi r30, 0x1
-	stw r0, 0x80(r1)
-	lfd f1, double_to_int_802c4da0@l(r4)
-	lfd f0, 0x80(r1)
-	lfs f2, float_360_8041a3ec(r2)
-	fsubs f1, f0, f1
-	lfs f0, float_0p125_8041a418(r2)
-	stfs f4, 0x8(r1)
-	fmuls f1, f2, f1
-	stfs f4, 0xc(r1)
-	stfs f4, 0x10(r1)
-	fmuls f2, f1, f0
-	stfs f3, 0x14(r1)
-	bne @3
-	lfs f0, float_180_8041a41c(r2)
-	fadds f2, f2, f0
-	@3:
-	lfs f1, float_6p2832_8041a3e8(r2)
-	lfs f0, float_360_8041a3ec(r2)
-	fmuls f1, f1, f2
-	fdivs f30, f1, f0
-	fmr f1, f30
-	bl sin
-	frsp f4, f1
-	lfs f0, 0x4c(r1)
-	lfs f3, float_30_8041a420(r2)
-	fmr f1, f30
-	lfs f2, 0x48(r1)
-	stfs f0, 0x28(r1)
-	fnmsubs f0, f3, f4, f2
-	stfs f0, 0x24(r1)
-	bl cos
-	frsp f1, f1
-	lfs f4, float_0_8041a3f0(r2)
-	lfs f0, float_1E06_8041a414(r2)
-	addi r4, r1, 0x8
-	lfs f5, float_30_8041a420(r2)
-	fmr f6, f4
-	fneg f3, f1
-	lfs f2, 0x50(r1)
-	stfs f0, 0x14(r1)
-	addi r5, r1, 0xc
-	lfs f1, 0x24(r1)
-	addi r6, r1, 0x10
-	fnmsubs f3, f5, f3, f2
-	lfs f2, 0x28(r1)
-	lfs f5, float_neg1_8041a410(r2)
-	addi r7, r1, 0x14
-	addi r8, r1, 0x18
-	addi r9, r1, 0x1c
-	stfs f3, 0x2c(r1)
-	addi r10, r1, 0x20
-	li r3, 0x0
-	bl hitCheckFilter
-	cmplwi r3, 0x0
-	beq @4
-	lfs f0, 0xc(r1)
-	stfs f0, 0x28(r1)
-	@4:
-	lwz r4, 0x24(r1)
-	fmr f1, f30
-	lwz r3, 0x28(r1)
-	lwz r0, 0x2c(r1)
-	stw r4, 0x30(r1)
-	stw r3, 0x34(r1)
-	stw r0, 0x38(r1)
-	bl sin
-	lfs f2, float_30_8041a420(r2)
-	frsp f3, f1
-	lfs f0, 0x30(r1)
-	fmr f1, f30
-	fadds f30, f2, f31
-	fmadds f0, f30, f3, f0
-	stfs f0, 0x30(r1)
-	bl cos
-	frsp f0, f1
-	lwz r6, 0x24(r1)
-	lwz r0, 0x28(r1)
-	lwz r5, 0x2c(r1)
-	fneg f1, f0
-	lfs f0, 0x38(r1)
-	lwz r4, 0x30(r1)
-	lwz r3, 0x34(r1)
-	fmadds f0, f30, f1, f0
-	stw r6, 0x48(r1)
-	stw r0, 0x4c(r1)
-	stfs f0, 0x38(r1)
-	lwz r0, 0x38(r1)
-	stw r5, 0x50(r1)
-	stw r4, 0x3c(r1)
-	stw r3, 0x40(r1)
-	stw r0, 0x44(r1)
-	@2:
-	lfs f1, 0x3c(r1)
-	lfs f2, 0x40(r1)
-	lfs f3, 0x44(r1)
-	lfs f5, 0x48(r1)
-	lfs f4, 0x4c(r1)
-	lfs f0, 0x50(r1)
-	stfs f5, BeroSX(r13)
-	stfs f4, BeroSY(r13)
-	stfs f0, BeroSZ(r13)
-	stfs f1, BeroEX(r13)
-	stfs f2, BeroEY(r13)
-	stfs f3, BeroEZ(r13)
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	lhz r0, 0x2e(r31)
-	cmplwi r0, 0x19
-	bne @5
-	bl N_marioReloadMapOnBottomlessOn
-	@5:
-	li r3, 0x2
-	psq_l f31, 0xb8(r1), 0, 0
-	lfd f31, 0xb0(r1)
-	psq_l f30, 0xa8(r1), 0, 0
-	lfd f30, 0xa0(r1)
-	lwz r31, 0x9c(r1)
-	lwz r30, 0x98(r1)
-	lwz r0, 0xc4(r1)
-	lwz r29, 0x94(r1)
-	mtlr r0
-	addi r1, r1, 0xc0
-	blr
-}
-
-asm s32 evt_bero_get_info_num(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stmw r27, 0x2c(r1)
-	mr r29, r3
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	lis r5, BeroINFOARR@ha
-	lis r4, jumptable_802C4970@ha
-	slwi r31, r3, 2
-	addi r3, r5, BeroINFOARR@l
-	addi r10, r4, jumptable_802C4970@l
-	lwzx r30, r3, r31
-	lwz r0, 0x0(r30)
-	stw r0, 0xa8(r29)
-	lhz r0, 0x4(r30)
-	stw r0, 0xac(r29)
-	lwz r27, 0x8(r30)
-	lwz r9, 0x0(r10)
-	lwz r8, 0x4(r10)
-	cmpwi r27, 0x4e20
-	lwz r7, 0x8(r10)
-	lwz r6, 0xc(r10)
-	lwz r5, 0x10(r10)
-	lwz r4, 0x14(r10)
-	lwz r3, 0x18(r10)
-	lwz r0, 0x1c(r10)
-	stw r9, 0x8(r1)
-	stw r8, 0xc(r1)
-	stw r7, 0x10(r1)
-	stw r6, 0x14(r1)
-	stw r5, 0x18(r1)
-	stw r4, 0x1c(r1)
-	stw r3, 0x20(r1)
-	stw r0, 0x24(r1)
-	beq @1
-	b @2
-	@1:
-	cmpwi r27, 0x2710
-	bne @3
-	li r27, 0x2710
-	b @2
-	@3:
-	lhz r0, 0x4(r30)
-	clrlwi r0, r0, 20
-	cmpwi r0, 0x2
-	bge @4
-	cmpwi r0, 0x0
-	bge @5
-	b @4
-	@5:
-	li r27, 0x0
-	addi r28, r1, 0x8
-	@6:
-	lwz r3, 0x0(r28)
-	bl strlen
-	mr r5, r3
-	lwz r3, 0x0(r28)
-	lwz r4, 0x0(r30)
-	bl strncmp
-	cmpwi r3, 0x0
-	beq @2
-	addi r27, r27, 0x1
-	addi r28, r28, 0x4
-	cmplwi r27, 0x8
-	blt @6
-	b @2
-	@4:
-	li r27, 0x2710
-	@2:
-	stw r27, 0xb0(r29)
-	addi r0, r30, 0xc
-	stw r0, 0xb4(r29)
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	bne @7
-	la r0, default_entevt(r13)
-	@7:
-	stw r0, 0xb8(r29)
-	lis r0, 0xffff
-	lis r3, BeroSW@ha
-	stw r0, 0xbc(r29)
-	addi r3, r3, BeroSW@l
-	lwzx r0, r3, r31
-	stw r0, 0xc0(r29)
-	lwz r0, 0x20(r30)
-	stw r0, 0xc4(r29)
-	lwz r0, 0x20(r30)
-	cmpwi r0, -0x1
-	bne @8
-	lhz r0, 0x4(r30)
-	clrlwi r0, r0, 20
-	cmpwi r0, 0x3
-	beq @9
-	bge @10
-	cmpwi r0, 0x1
-	beq @11
-	bge @12
-	cmpwi r0, 0x0
-	bge @13
-	b @8
-	@10:
-	cmpwi r0, 0xf00
-	beq @14
-	b @8
-	@14:
-	li r0, 0x0
-	stw r0, 0xc4(r29)
-	b @8
-	@13:
-	li r0, 0xa
-	stw r0, 0xc4(r29)
-	b @8
-	@11:
-	li r0, 0x9
-	stw r0, 0xc4(r29)
-	b @8
-	@12:
-	li r0, 0x4
-	stw r0, 0xc4(r29)
-	b @8
-	@9:
-	li r0, 0x7
-	stw r0, 0xc4(r29)
-	@8:
-	lwz r0, 0x24(r30)
-	cmplwi r0, 0x0
-	bne @15
-	la r0, default_outevt(r13)
-	@15:
-	stw r0, 0xc8(r29)
-	lis r0, 0xffff
-	li r3, 0x2
-	stw r0, 0xcc(r29)
-	lwz r0, 0x28(r30)
-	stw r0, 0xd0(r29)
-	lwz r0, 0x2c(r30)
-	stw r0, 0xd4(r29)
-	lmw r27, 0x2c(r1)
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm s32 evt_bero_id_filter(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	mr r28, r3
-	lwz r29, 0x18(r3)
-	lwz r4, 0x0(r29)
-	bl evtGetValue
-	cmpwi r3, 0x0
-	lis r4, BeroINFOARR@ha
-	stw r3, 0x8(r1)
-	addi r30, r4, BeroINFOARR@l
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r31, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	lwz r3, 0x0(r30)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r31
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r30, r30, 0x4
-	beq @3
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @3
-	@2:
-	lwz r4, 0x0(r29)
-	mr r3, r28
-	lwz r5, 0x8(r1)
-	bl evtSetValue
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 evt_bero_read_mario_pera(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmpwi r4, 0x0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	beq @1
-	li r0, 0x0
-	stw r0, 0x78(r31)
-	@1:
-	lwz r0, 0x78(r31)
-	cmpwi r0, 0x1
-	beq @2
-	bge @3
-	cmpwi r0, 0x0
-	bge @4
-	b @3
-	b @3
-	@4:
-	lis r3, str_802C4DA8@ha
-	li r4, 0x0
-	addi r3, r3, str_802C4DA8@l
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @3
-	li r0, 0x1
-	stw r0, 0x78(r31)
-	b @3
-	@2:
-	lis r3, str_802C4DB4@ha
-	li r4, 0x0
-	addi r3, r3, str_802C4DB4@l
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @3
-	li r0, 0x64
-	stw r0, 0x78(r31)
-	@3:
-	lwz r3, 0x78(r31)
-	li r0, 0x2
-	subi r4, r3, 0x64
-	subfic r3, r3, 0x64
-	nor r3, r4, r3
-	srawi r3, r3, 31
-	and r3, r0, r3
-	lwz r31, 0xc(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 evt_bero_get_into_info(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	stw r0, 0x64(r1)
-	stw r31, 0x5c(r1)
-	addi r31, r4, BeroINFOARR@l
-	stw r30, 0x58(r1)
-	stw r29, 0x54(r1)
-	mr r29, r3
-	stw r28, 0x50(r1)
-	li r28, 0x0
-	@1:
-	lwz r30, 0x0(r31)
-	cmplwi r30, 0x0
-	beq @2
-	lwz r3, gp(r13)
-	la r4, float_0_8041a424(r2)
-	addi r3, r3, 0x11c
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @3
-	@2:
-	lis r3, bero_null@ha
-	li r28, 0x0
-	addi r0, r3, bero_null@l
-	mr r30, r0
-	b @4
-	@3:
-	lwz r4, gp(r13)
-	lwz r3, 0x0(r30)
-	addi r4, r4, 0x11c
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @4
-	addi r31, r31, 0x4
-	addi r28, r28, 0x1
-	b @1
-	@4:
-	lwz r3, gp(r13)
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @5
-	addi r3, r3, 0x11c
-	la r4, float_0_8041a424(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @5
-	lis r4, BeroINFOARR@ha
-	lis r3, jumptable_802C4970@ha
-	lwz r30, BeroINFOARR@l(r4)
-	li r31, 0x0
-	addi r10, r3, jumptable_802C4970@l
-	stw r31, 0xa0(r29)
-	lwz r0, BeroNUM(r13)
-	stw r0, 0xa4(r29)
-	lwz r0, 0x0(r30)
-	stw r0, 0xa8(r29)
-	lhz r0, 0x4(r30)
-	stw r0, 0xac(r29)
-	lwz r11, 0x8(r30)
-	lwz r9, 0x0(r10)
-	lwz r8, 0x4(r10)
-	cmpwi r11, 0x4e20
-	lwz r7, 0x8(r10)
-	lwz r6, 0xc(r10)
-	lwz r5, 0x10(r10)
-	lwz r4, 0x14(r10)
-	lwz r3, 0x18(r10)
-	lwz r0, 0x1c(r10)
-	stw r9, 0x28(r1)
-	stw r8, 0x2c(r1)
-	stw r7, 0x30(r1)
-	stw r6, 0x34(r1)
-	stw r5, 0x38(r1)
-	stw r4, 0x3c(r1)
-	stw r3, 0x40(r1)
-	stw r0, 0x44(r1)
-	beq @6
-	b @7
-	@6:
-	cmpwi r11, 0x2710
-	bne @8
-	li r11, 0x2710
-	b @7
-	@8:
-	lhz r0, 0x4(r30)
-	clrlwi r0, r0, 20
-	cmpwi r0, 0x2
-	bge @9
-	cmpwi r0, 0x0
-	bge @10
-	b @9
-	@10:
-	addi r28, r1, 0x28
-	@11:
-	lwz r3, 0x0(r28)
-	bl strlen
-	mr r5, r3
-	lwz r3, 0x0(r28)
-	lwz r4, 0x0(r30)
-	bl strncmp
-	cmpwi r3, 0x0
-	beq @12
-	addi r31, r31, 0x1
-	addi r28, r28, 0x4
-	cmplwi r31, 0x8
-	blt @11
-	b @12
-	@9:
-	li r31, 0x2710
-	@12:
-	mr r11, r31
-	@7:
-	stw r11, 0xb0(r29)
-	addi r0, r30, 0xc
-	stw r0, 0xb4(r29)
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	bne @13
-	la r0, default_entevt(r13)
-	@13:
-	stw r0, 0xb8(r29)
-	lis r0, 0xffff
-	li r3, 0x2
-	stw r0, 0xbc(r29)
-	b @14
-	@5:
-	stw r28, 0xa0(r29)
-	lis r3, jumptable_802C4970@ha
-	addi r10, r3, jumptable_802C4970@l
-	lwz r0, BeroNUM(r13)
-	stw r0, 0xa4(r29)
-	lwz r3, gp(r13)
-	addi r0, r3, 0x11c
-	stw r0, 0xa8(r29)
-	lhz r0, 0x4(r30)
-	stw r0, 0xac(r29)
-	lwz r31, 0x8(r30)
-	lwz r9, 0x0(r10)
-	lwz r8, 0x4(r10)
-	cmpwi r31, 0x4e20
-	lwz r7, 0x8(r10)
-	lwz r6, 0xc(r10)
-	lwz r5, 0x10(r10)
-	lwz r4, 0x14(r10)
-	lwz r3, 0x18(r10)
-	lwz r0, 0x1c(r10)
-	stw r9, 0x8(r1)
-	stw r8, 0xc(r1)
-	stw r7, 0x10(r1)
-	stw r6, 0x14(r1)
-	stw r5, 0x18(r1)
-	stw r4, 0x1c(r1)
-	stw r3, 0x20(r1)
-	stw r0, 0x24(r1)
-	beq @15
-	b @16
-	@15:
-	cmpwi r31, 0x2710
-	bne @17
-	li r31, 0x2710
-	b @16
-	@17:
-	lhz r0, 0x4(r30)
-	clrlwi r0, r0, 20
-	cmpwi r0, 0x2
-	bge @18
-	cmpwi r0, 0x0
-	bge @19
-	b @18
-	@19:
-	li r31, 0x0
-	addi r28, r1, 0x8
-	@20:
-	lwz r3, 0x0(r28)
-	bl strlen
-	mr r5, r3
-	lwz r3, 0x0(r28)
-	lwz r4, 0x0(r30)
-	bl strncmp
-	cmpwi r3, 0x0
-	beq @16
-	addi r31, r31, 0x1
-	addi r28, r28, 0x4
-	cmplwi r31, 0x8
-	blt @20
-	b @16
-	@18:
-	li r31, 0x2710
-	@16:
-	stw r31, 0xb0(r29)
-	addi r0, r30, 0xc
-	stw r0, 0xb4(r29)
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	bne @21
-	la r0, default_entevt(r13)
-	@21:
-	stw r0, 0xb8(r29)
-	lis r0, 0xffff
-	li r3, 0x2
-	stw r0, 0xbc(r29)
-	@14:
-	lwz r0, 0x64(r1)
-	lwz r31, 0x5c(r1)
-	lwz r30, 0x58(r1)
-	lwz r29, 0x54(r1)
-	lwz r28, 0x50(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
 asm s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall) {
 	nofralloc
 	stwu r1, -0x20(r1)
@@ -4148,37 +4080,37 @@ asm s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall) {
 	stw r0, 0x38(r31)
 	stw r0, 0x3c(r31)
 	lwz r30, 0x9c(r29)
-	@1:
+L_af_1:
 	lwz r3, 0x0(r30)
 	bl hitNameToPtr
 	lwz r4, 0x0(r30)
 	cmplwi r4, 0x0
-	beq @2
+	beq L_af_2
 	cmplwi r3, 0x0
-	bne @3
+	bne L_af_3
 	li r3, 0x1
 	bl mapErrorEntry
-	@3:
+L_af_3:
 	addi r30, r30, 0x3c
-	b @1
-	@2:
+	b L_af_1
+L_af_2:
 	lis r3, BeroSW@ha
 	lwz r6, 0x9c(r29)
 	addi r4, r3, BeroSW@l
 	li r5, 0x0
 	li r0, -0x1
-	@4:
+L_af_4:
 	lwz r3, 0x0(r6)
 	cmplwi r3, 0x0
-	beq @5
+	beq L_af_5
 	stw r6, 0x0(r31)
 	addi r31, r31, 0x4
 	addi r5, r5, 0x1
 	addi r6, r6, 0x3c
 	stw r0, 0x0(r4)
 	addi r4, r4, 0x4
-	b @4
-	@5:
+	b L_af_4
+L_af_5:
 	li r0, 0x0
 	stw r5, BeroNUM(r13)
 	li r3, 0x2
@@ -4192,584 +4124,354 @@ asm s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall) {
 	blr
 }
 
-asm s32 evt_bero_get_now_number(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r5, BeroNOWNUM(r13)
-	lwz r4, 0x0(r4)
-	bl evtSetValue
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFD0
+		opword 0x7C0802A6
+		opword 0x90010034
+		opword 0x93E1002C
+		opword 0x93C10028
+		opword 0x93A10024
+		opword 0x7C7D1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7E1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x809F0008
+		opword 0x7C7F1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x3CA04330
+		opword 0x6FC68000
+		opword 0x90C1000C
+		opword 0x6C608000
+		opword 0x6FE48000
+		lis r3, double_to_int_802c4da0@ha
+		opword 0x90A10008
+		lfd f3, double_to_int_802c4da0@l(r3)
+		opword 0xC8010008
+		opword 0x90810014
+		opword 0xEC201828
+		opword 0x90A10010
+		opword 0xC8010010
+		opword 0x9001001C
+		opword 0xEC401828
+		opword 0x90A10018
+		opword 0xC8010018
+		opword 0xEC601828
+		bl N_marioSetBottomlessRespawnPosOnBeroEntry
+		opword 0x80010034
+		opword 0x38600002
+		opword 0x83E1002C
+		opword 0x83C10028
+		opword 0x83A10024
+		opword 0x7C0803A6
+		opword 0x38210030
+	}
+}
+#pragma pop
+
+s32 N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos(EventEntry* event, BOOL isFirstCall) {
+	MarioWork* wp = marioGetPtr();
+	N_marioSetBottomlessRespawnPosOnBeroEntry(wp->position.x, wp->position.y, wp->position.z);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 evt_bero_set_now_number(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	stw r3, BeroNOWNUM(r13)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 bero_get_BeroEXEC(void) {
+	return BeroEXEC;
 }
 
-asm s32 evt_bero_get_info_nextarea(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	lis r4, BeroINFOARR@ha
-	slwi r0, r3, 2
-	addi r3, r4, BeroINFOARR@l
-	lwz r4, 0x4(r30)
-	lwzx r31, r3, r0
-	mr r3, r29
-	lwz r5, 0x28(r31)
-	bl evtSetValue
-	lwz r4, 0x8(r30)
-	mr r3, r29
-	lwz r5, 0x2c(r31)
-	bl evtSetValue
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 bero_get_BeroNUM(void) {
+	return BeroNUM;
 }
 
-asm s32 evt_bero_get_info_kinddir(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	lis r4, BeroINFOARR@ha
-	slwi r0, r3, 2
-	addi r3, r4, BeroINFOARR@l
-	lwz r4, 0x4(r30)
-	lwzx r31, r3, r0
-	mr r3, r29
-	lhz r5, 0x4(r31)
-	bl evtSetValue
-	lwz r4, 0x8(r30)
-	mr r3, r29
-	lhz r5, 0x6(r31)
-	bl evtSetValue
-	lwz r4, 0xc(r30)
-	mr r3, r29
-	lwz r5, 0x8(r31)
-	bl evtSetValue
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+f32 bero_get_BeroSX(void) {
+	return BeroSX;
 }
 
-asm s32 evt_bero_get_info_length(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lis r4, BeroINFOARR@ha
-	slwi r0, r3, 2
-	addi r3, r4, BeroINFOARR@l
-	lwzx r3, r3, r0
-	lwz r0, 0x18(r3)
-	cmpwi r0, -0x1
-	beq @1
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802c4da0@ha
-	stw r3, 0xc(r1)
-	addi r5, r4, double_to_int_802c4da0@l
-	lwz r4, 0x4(r31)
-	stw r0, 0x8(r1)
-	mr r3, r30
-	lfd f1, 0x0(r5)
-	lfd f0, 0x8(r1)
-	fsubs f1, f0, f1
-	bl evtSetFloat
-	li r3, 0x2
-	b @2
-	@1:
-	lhz r0, 0x4(r3)
-	clrlwi r0, r0, 20
-	cmpwi r0, 0x3
-	beq @3
-	bge @4
-	cmpwi r0, 0x1
-	beq @5
-	bge @6
-	cmpwi r0, 0x0
-	bge @3
-	b @7
-	@4:
-	cmpwi r0, 0xf00
-	beq @3
-	b @7
-	@3:
-	lfs f1, float_30_8041a420(r2)
-	b @8
-	@5:
-	lfs f1, float_60_8041a428(r2)
-	b @8
-	@6:
-	lfs f1, float_60_8041a428(r2)
-	b @8
-	@7:
-	lfs f1, float_60_8041a428(r2)
-	@8:
-	lwz r4, 0x4(r31)
-	mr r3, r30
-	bl evtSetFloat
-	li r3, 0x2
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+f32 bero_get_BeroSY(void) {
+	return BeroSY;
 }
 
-asm s32 evt_bero_get_info_anime(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	lis r4, BeroINFOARR@ha
-	slwi r0, r3, 2
-	addi r3, r4, BeroINFOARR@l
-	lwz r4, 0x4(r30)
-	lwzx r31, r3, r0
-	mr r3, r29
-	lhz r5, 0x30(r31)
-	bl evtSetValue
-	lwz r4, 0x8(r30)
-	mr r3, r29
-	lhz r5, 0x32(r31)
-	bl evtSetValue
-	lwz r4, 0xc(r30)
-	mr r3, r29
-	lwz r5, 0x34(r31)
-	bl evtSetValue
-	lwz r4, 0x10(r30)
-	mr r3, r29
-	lwz r5, 0x38(r31)
-	bl evtSetValue
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+f32 bero_get_BeroSZ(void) {
+	return BeroSZ;
 }
 
-asm s32 evt_bero_get_end_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lfs f1, BeroEX(r13)
-	lwz r4, 0x0(r31)
-	bl evtSetFloat
-	lwz r4, 0x4(r31)
-	mr r3, r30
-	lfs f1, BeroEY(r13)
-	bl evtSetFloat
-	lwz r4, 0x8(r31)
-	mr r3, r30
-	lfs f1, BeroEZ(r13)
-	bl evtSetFloat
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+f32 bero_get_BeroEX(void) {
+	return BeroEX;
 }
 
-asm s32 evt_bero_get_start_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lfs f1, BeroSX(r13)
-	lwz r4, 0x0(r31)
-	bl evtSetFloat
-	lwz r4, 0x4(r31)
-	mr r3, r30
-	lfs f1, BeroSY(r13)
-	bl evtSetFloat
-	lwz r4, 0x8(r31)
-	mr r3, r30
-	lfs f1, BeroSZ(r13)
-	bl evtSetFloat
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+f32 bero_get_BeroEY(void) {
+	return BeroEY;
 }
 
-asm s32 evt_bero_exec_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	lwz r4, BeroEXEC(r13)
-	li r0, 0x2
-	and r4, r4, r3
-	neg r3, r4
-	or r3, r3, r4
-	srawi r3, r3, 31
-	and r3, r0, r3
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+f32 bero_get_BeroEZ(void) {
+	return BeroEZ;
 }
 
-asm s32 evt_bero_exec_get(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r5, BeroEXEC(r13)
-	lwz r4, 0x0(r4)
-	bl evtSetValue
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+BeroEntry** bero_get_ptr(void) {
+	return BeroINFOARR;
 }
 
-asm s32 evt_bero_exec_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	lwz r0, BeroEXEC(r13)
-	cmpwi r31, 0x0
-	or r4, r0, r3
-	beq @1
-	andc r4, r0, r3
-	@1:
-	stw r4, BeroEXEC(r13)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void bero_clear_Offset(void) {
+	asm volatile {
+		lfs f0, float_0_8041a3f0(r2)
+		stfs f0, BeroOX(r13)
+		stfs f0, BeroOY(r13)
+		stfs f0, BeroOZ(r13)
+	}
+}
+#pragma pop
+
+s32 bero_id_filter(s32 id) { //1:1, cursed function, do not touch
+	BeroEntry** temp, **table = BeroINFOARR;
+	s32 newId = id;
+	const char *string, *test;
+
+	if (id < 0 || id >= 16) {
+		test = (const char*)id;
+		if (&newId != NULL) {
+			newId = 0;
+		}
+		temp = table;
+		while (1) {
+			string = (*temp)->hitName;
+			if (!string || !strcmp(string, test)) {
+				break;
+			}
+			temp++;
+			if (&newId != NULL) {
+				newId++;
+			}
+		}
+	}
+	return newId;
 }
 
-asm s32 evt_bero_get_entername(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r5, gp(r13)
-	lwz r4, 0x0(r4)
-	addi r5, r5, 0x11c
-	bl evtSetValue
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	const char *map, *bero;
+
+	map = (const char*)evtGetValue(event, args[0]);
+	bero = (const char*)evtGetValue(event, args[1]);
+	if (isFirstCall) {
+		seqSetSeq(SEQ_MAP_CHANGE, map, bero);
+	}
+	return EVT_RETURN_BLOCK;
 }
 
-asm s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	mr r30, r4
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	cmpwi r30, 0x0
-	beq @1
-	mr r4, r31
-	mr r5, r3
-	li r3, 0x3
-	bl seqSetSeq
-	@1:
-	lwz r0, 0x24(r1)
-	li r3, 0x0
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_get_entername(EventEntry* event, BOOL isFirstCall) {
+	evtSetValue(event, *event->args, (s32)&gp->beroEnterName);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 bero_id_filter(s32 id) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, BeroINFOARR@ha
-	cmpwi r3, 0x0
-	stw r0, 0x24(r1)
-	addi r0, r4, BeroINFOARR@l
-	mr r4, r0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r3, 0x8(r1)
-	blt @1
-	cmpwi r3, 0x10
-	blt @2
-	@1:
-	addic. r0, r1, 0x8
-	mr r30, r3
-	beq @3
-	li r0, 0x0
-	stw r0, 0x8(r1)
-	@3:
-	mr r31, r4
-	@4:
-	lwz r3, 0x0(r31)
-	lwz r3, 0x0(r3)
-	cmplwi r3, 0x0
-	beq @2
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	addic. r0, r1, 0x8
-	addi r31, r31, 0x4
-	beq @4
-	lwz r3, 0x8(r1)
-	addi r0, r3, 0x1
-	stw r0, 0x8(r1)
-	b @4
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r3, 0x8(r1)
-	lwz r30, 0x18(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+s32 evt_bero_exec_onoff(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+	BOOL onoff;
+	s32 mask, value;
+
+	onoff = evtGetValue(event, args[0]);
+	mask = evtGetValue(event, args[1]);
+	value = BeroEXEC | mask;
+	if (onoff) {
+		value = BeroEXEC & ~mask;
+	}
+	BeroEXEC = value;
+	return EVT_RETURN_DONE;
 }
 
-asm void bero_clear_Offset(void) {
-	nofralloc
-	lfs f0, float_0_8041a3f0(r2)
-	stfs f0, BeroOX(r13)
-	stfs f0, BeroOY(r13)
-	stfs f0, BeroOZ(r13)
-	blr
+s32 evt_bero_exec_get(EventEntry* event, BOOL isFirstCall) {
+	evtSetValue(event, *event->args, BeroEXEC);
+	return EVT_RETURN_DONE;
 }
 
-asm BeroEntry** bero_get_ptr(void) {
-	nofralloc
-	lis r3, BeroINFOARR@ha
-	addi r3, r3, BeroINFOARR@l
-	blr
+s32 evt_bero_exec_wait(EventEntry* event, BOOL isFirstCall) {
+	return evtGetValue(event, *event->args) & BeroEXEC ? EVT_RETURN_DONE : 0;
 }
 
-asm f32 bero_get_BeroEZ(void) {
-	nofralloc
-	lfs f1, BeroEZ(r13)
-	blr
+s32 evt_bero_get_start_position(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+
+	evtSetFloat(event, args[0], BeroSX);
+	evtSetFloat(event, args[1], BeroSY);
+	evtSetFloat(event, args[2], BeroSZ);
+	return EVT_RETURN_DONE;
 }
 
-asm f32 bero_get_BeroEY(void) {
-	nofralloc
-	lfs f1, BeroEY(r13)
-	blr
+s32 evt_bero_get_end_position(EventEntry* event, BOOL isFirstCall) {
+	s32* args = event->args;
+
+	evtSetFloat(event, args[0], BeroEX);
+	evtSetFloat(event, args[1], BeroEY);
+	evtSetFloat(event, args[2], BeroEZ);
+	return EVT_RETURN_DONE;
 }
 
-asm f32 bero_get_BeroEX(void) {
-	nofralloc
-	lfs f1, BeroEX(r13)
-	blr
+s32 evt_bero_get_info_anime(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry* bero;
+	s32* args = event->args;
+
+	bero = BeroINFOARR[evtGetValue(event, args[0])];
+	evtSetValue(event, args[1], *(u16*)&bero->enterAnimeType);
+	evtSetValue(event, args[2], *(u16*)&bero->exitAnimeType);
+	evtSetValue(event, args[3], bero->enterAnimeArg);
+	evtSetValue(event, args[4], bero->exitAnimeArg);
+	return EVT_RETURN_DONE;
 }
 
-asm f32 bero_get_BeroSZ(void) {
-	nofralloc
-	lfs f1, BeroSZ(r13)
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_bero_get_info_length(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0x93E1001C
+		opword 0x93C10018
+		opword 0x7C7E1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		lis r4, BeroINFOARR@ha
+		opword 0x5460103A
+		addi r3, r4, BeroINFOARR@l
+		opword 0x7C63002E
+		opword 0x80030018
+		opword 0x2C00FFFF
+		opword 0x4182003C
+		opword 0x6C038000
+		opword 0x3C004330
+		lis r4, double_to_int_802c4da0@ha
+		opword 0x9061000C
+		addi r5, r4, double_to_int_802c4da0@l
+		opword 0x809F0004
+		opword 0x90010008
+		opword 0x7FC3F378
+		opword 0xC8250000
+		opword 0xC8010008
+		opword 0xEC200828
+		bl evtSetFloat
+		opword 0x38600002
+		opword 0x48000068
+		opword 0xA0030004
+		opword 0x5400053E
+		opword 0x2C000003
+		opword 0x4182002C
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x41820028
+		opword 0x4080002C
+		opword 0x2C000000
+		opword 0x40800014
+		opword 0x48000028
+		opword 0x2C000F00
+		opword 0x41820008
+		opword 0x4800001C
+		lfs f1, float_30_8041a420(r2)
+		opword 0x48000018
+		lfs f1, float_60_8041a428(r2)
+		opword 0x48000010
+		lfs f1, float_60_8041a428(r2)
+		opword 0x48000008
+		lfs f1, float_60_8041a428(r2)
+		opword 0x809F0004
+		opword 0x7FC3F378
+		bl evtSetFloat
+		opword 0x38600002
+		opword 0x80010024
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
+
+s32 evt_bero_get_info_kinddir(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry* bero;
+	s32* args = event->args;
+
+	bero = BeroINFOARR[evtGetValue(event, args[0])];
+	evtSetValue(event, args[1], *(u16*)&bero->type);
+	evtSetValue(event, args[2], *(u16*)&bero->sfxId);
+	evtSetValue(event, args[3], bero->directionId);
+	return EVT_RETURN_DONE;
 }
 
-asm f32 bero_get_BeroSY(void) {
-	nofralloc
-	lfs f1, BeroSY(r13)
-	blr
+s32 evt_bero_get_info_nextarea(EventEntry* event, BOOL isFirstCall) {
+	BeroEntry* bero;
+	s32* args = event->args;
+
+	bero = BeroINFOARR[evtGetValue(event, args[0])];
+	evtSetValue(event, args[1], bero->nextMapName);
+	evtSetValue(event, args[2], (s32)bero->nextBeroName);
+	return EVT_RETURN_DONE;
 }
 
-asm f32 bero_get_BeroSX(void) {
-	nofralloc
-	lfs f1, BeroSX(r13)
-	blr
+s32 evt_bero_set_now_number(EventEntry* event, BOOL isFirstCall) {
+	BeroNOWNUM = evtGetValue(event, *event->args);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 bero_get_BeroNUM(void) {
-	nofralloc
-	lwz r3, BeroNUM(r13)
-	blr
+s32 evt_bero_get_now_number(EventEntry* event, BOOL isFirstCall) {
+	evtSetValue(event, *event->args, BeroNOWNUM);
+	return EVT_RETURN_DONE;
 }
 
-asm s32 bero_get_BeroEXEC(void) {
-	nofralloc
-	lwz r3, BeroEXEC(r13)
-	blr
-}
 
-asm s32 N_evt_bero_set_mario_bottomless_respawn_pos_to_current_mario_pos(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lfs f1, 0x8c(r3)
-	lfs f2, 0x90(r3)
-	lfs f3, 0x94(r3)
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".sdata2") const char str_8041A3C8[4] = "n_\0";
+__declspec(section ".sdata2") const char str_8041A3CC[4] = "ne_";
+__declspec(section ".sdata2") const char str_8041A3D0[4] = "e_\0";
+__declspec(section ".sdata2") const char str_8041A3D4[4] = "se_";
+__declspec(section ".sdata2") const char str_8041A3D8[4] = "s_\0";
+__declspec(section ".sdata2") const char str_8041A3DC[4] = "sw_";
+__declspec(section ".sdata2") const char str_8041A3E0[4] = "w_\0";
+__declspec(section ".sdata2") const char str_8041A3E4[4] = "nw_";
+__declspec(section ".sdata2") const f32 float_6p2832_8041a3e8 = 6.2831855f;
+__declspec(section ".sdata2") const f32 float_360_8041a3ec = 360.0f;
+__declspec(section ".sdata2") const f32 float_0_8041a3f0 = 0.0f;
+__declspec(section ".sdata2") const f32 float_3_8041a3f4 = 3.0f;
+__declspec(section ".sdata2") const f32 float_15_8041a3f8 = 15.0f;
+__declspec(section ".sdata2") const f32 float_13_8041a3fc = 13.0f;
+__declspec(section ".sdata2") const f32 float_20_8041a400 = 20.0f;
+__declspec(section ".sdata2") const f32 float_1_8041a404 = 1.0f;
+__declspec(section ".sdata2") const f32 float_37p5_8041a408 = 37.5f;
+__declspec(section ".sdata2") const f32 float_10000_8041a40c = 10000.0f;
+__declspec(section ".sdata2") const f32 float_neg1_8041a410 = -1.0f;
+__declspec(section ".sdata2") const f32 float_1E06_8041a414 = 1000000.0f;
+__declspec(section ".sdata2") const f32 float_0p125_8041a418 = 0.125f;
+__declspec(section ".sdata2") const f32 float_180_8041a41c = 180.0f;
+__declspec(section ".sdata2") const f32 float_30_8041a420 = 30.0f;
+__declspec(section ".sdata2") const f32 float_0_8041a424 = 0.0f;
+__declspec(section ".sdata2") const f32 float_60_8041a428 = 60.0f;
+__declspec(section ".sdata2") const u32 gap_09_8041A42C_sdata2 = 0x00000000;
 
-asm s32 N_evt_bero_set_mario_bottomless_respawn_pos_on_bero_entry(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stw r31, 0x2c(r1)
-	stw r30, 0x28(r1)
-	stw r29, 0x24(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x8(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	lis r5, 0x4330
-	xoris r6, r30, 0x8000
-	stw r6, 0xc(r1)
-	xoris r0, r3, 0x8000
-	xoris r4, r31, 0x8000
-	lis r3, double_to_int_802c4da0@ha
-	stw r5, 0x8(r1)
-	lfd f3, double_to_int_802c4da0@l(r3)
-	lfd f0, 0x8(r1)
-	stw r4, 0x14(r1)
-	fsubs f1, f0, f3
-	stw r5, 0x10(r1)
-	lfd f0, 0x10(r1)
-	stw r0, 0x1c(r1)
-	fsubs f2, f0, f3
-	stw r5, 0x18(r1)
-	lfd f0, 0x18(r1)
-	fsubs f3, f0, f3
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	lwz r0, 0x34(r1)
-	li r3, 0x2
-	lwz r31, 0x2c(r1)
-	lwz r30, 0x28(r1)
-	lwz r29, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-// clang-format on
 #endif
 
-// FAKE: .bss defined at file end so the asm-only unit keeps target order
+// .bss definitions last (target order BeroID, BeroSW, BeroINFOARR: reverse declaration order)
 BeroEntry* BeroINFOARR[16];
 s32 BeroSW[16];
 s32 BeroID[16];
+
+#ifdef NONMATCHING // all-C link: pool objects the C names, defined on the asm side only
+__declspec(section ".sdata2") const char str_8041A3C8[4] = "n_\0";
+__declspec(section ".sdata2") const char str_8041A3CC[4] = "ne_";
+__declspec(section ".sdata2") const char str_8041A3D0[4] = "e_\0";
+__declspec(section ".sdata2") const char str_8041A3D4[4] = "se_";
+__declspec(section ".sdata2") const char str_8041A3D8[4] = "s_\0";
+__declspec(section ".sdata2") const char str_8041A3DC[4] = "sw_";
+__declspec(section ".sdata2") const char str_8041A3E0[4] = "w_\0";
+__declspec(section ".sdata2") const char str_8041A3E4[4] = "nw_";
+#endif

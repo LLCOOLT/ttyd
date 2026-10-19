@@ -7,6 +7,42 @@
 #include <dolphin/mtx.h>
 #include <dolphin/types.h>
 #include <string.h>
+#ifndef NONMATCHING
+__declspec(section ".rodata") extern const f32 vec3_802fe320[3];
+__declspec(section ".rodata") extern const f32 vec3_802fe32c[3];
+__declspec(section ".rodata") extern const f32 vec3_802fe338[3];
+__declspec(section ".rodata") extern const char str_802FE344[];
+__declspec(section ".rodata") extern const char str_802FE35C[];
+__declspec(section ".rodata") extern const f64 double_to_int_802fe368;
+__declspec(section ".rodata") extern const f64 double_0p6_802fe370;
+__declspec(section ".rodata") extern const f64 double_0p5_802fe378;
+__declspec(section ".rodata") extern const f64 double_3_802fe380;
+__declspec(section ".rodata") extern const f64 double_0_802fe388;
+__declspec(section ".sdata2") extern const f32 float_0p5_80420e70;
+__declspec(section ".sdata2") extern const f32 float_1000_80420e74;
+__declspec(section ".sdata2") extern const f32 float_3p1416_80420e78;
+__declspec(section ".sdata2") extern const f32 float_180_80420e7c;
+__declspec(section ".sdata2") extern const f32 float_0_80420e80;
+__declspec(section ".sdata2") extern const f32 float_neg1_80420e84;
+__declspec(section ".sdata2") extern const f32 float_2_80420e88;
+__declspec(section ".sdata2") extern const f32 float_35_80420e8c;
+__declspec(section ".sdata2") extern const f32 float_10_80420e90;
+__declspec(section ".sdata2") extern const f32 float_1_80420e94;
+__declspec(section ".sdata2") extern const f32 float_100_80420e98;
+__declspec(section ".sdata2") extern const f32 float_0p01_80420e9c;
+__declspec(section ".sdata2") extern const f32 float_0p25_80420ea0;
+__declspec(section ".sdata2") extern const f32 float_0p6_80420ea4;
+__declspec(section ".sdata2") extern const f32 float_3_80420ea8;
+__declspec(section ".sdata2") extern const f32 float_0p05_80420eac;
+__declspec(section ".sdata2") extern const f32 float_50_80420eb0;
+__declspec(section ".sdata2") extern const f32 float_deg2rad_80420eb4;
+__declspec(section ".sdata2") extern const f32 float_90_80420eb8;
+__declspec(section ".sdata2") extern const f32 float_270_80420ebc;
+__declspec(section ".sdata2") extern const f32 float_7_80420ec0;
+__declspec(section ".sdata2") extern const u32 gap_09_80420EC4_sdata2;
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w);
 void _restfpr_28(void);
 void _savefpr_28(void);
@@ -14,9 +50,6 @@ BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry);
 
 #ifdef NONMATCHING
 #define EXT_LIT(sym, val) (val)
-#else
-#define EXT_LIT(sym, val) (sym)
-extern const f32 float_0p5_80420e70;
 #endif
 
 extern int __float_nan[];
@@ -48,72 +81,221 @@ typedef struct KpaHitWork {
 #define KRIDE(i) (*(HitEntry**)((u8*)KPW + 0x4C + (i) * 4))
 #define KRIDED(i) (*(f32*)((u8*)KPW + 0xA4 + (i) * 4))
 
+#ifdef NONMATCHING
 static inline s32 party_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 party_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (party_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
+#endif
 
+#ifdef NONMATCHING
 static inline f32 kpa_nrmToAngle(f32 x, f32 y, f32 z) {
     return angleABf(0.0f, 0.0f, party_sqrtf(x * x + z * z), -y);
 }
+#endif
 
+#ifdef NONMATCHING
 static inline f32 kpa_nrmSet(MarioWork* m, f32 x, f32 y, f32 z) {
     MF(m, 0x218) = (s32)(angleABf(0.0f, 0.0f, 100.0f * z, 100.0f * y) - 180.0f);
     MF(m, 0x21C) = 0.0f;
     MF(m, 0x220) = (s32)(angleABf(0.0f, 0.0f, 100.0f * x, 100.0f * y) - 180.0f);
     return kpa_nrmToAngle(x, y, z);
 }
-
-
-#ifdef NONMATCHING
-static f32 kpaHalf(f32 v);
 #endif
+
+
+static f32 kpaHalf(f32 v);
+
+
 
 #ifndef NONMATCHING
-// ASM-STOPGAP: kpaEnemyHitChk (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-#pragma force_active on
-__declspec(section ".rodata") const f32 vec3_802fe320[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fe32c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fe338[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const char str_802FE344[] = "MOBJ_HiddenHatenaBlock\000";
-__declspec(section ".rodata") const char str_802FE35C[] = "MOBJ_Block\000";
-__declspec(section ".rodata") const f64 double_to_int_802fe368 = 4503601774854144;
-__declspec(section ".rodata") const f64 double_0p6_802fe370 = 0.6000000238418579;
-__declspec(section ".rodata") const f64 double_0p5_802fe378 = 0.5;
-__declspec(section ".rodata") const f64 double_3_802fe380 = 3;
-__declspec(section ".rodata") const f64 double_0_802fe388 = 0;
-__declspec(section ".sdata2") const f32 float_0p5_80420e70 = 0.5f;
-__declspec(section ".sdata2") const f32 float_1000_80420e74 = 1000.0f;
-__declspec(section ".sdata2") const f32 float_3p1416_80420e78 = 3.1415927f;
-__declspec(section ".sdata2") const f32 float_180_80420e7c = 180.0f;
-__declspec(section ".sdata2") const f32 float_0_80420e80 = 0.0f;
-__declspec(section ".sdata2") const f32 float_neg1_80420e84 = -1.0f;
-__declspec(section ".sdata2") const f32 float_2_80420e88 = 2.0f;
-__declspec(section ".sdata2") const f32 float_35_80420e8c = 35.0f;
-__declspec(section ".sdata2") const f32 float_10_80420e90 = 10.0f;
-__declspec(section ".sdata2") const f32 float_1_80420e94 = 1.0f;
-__declspec(section ".sdata2") const f32 float_100_80420e98 = 100.0f;
-__declspec(section ".sdata2") const f32 float_0p01_80420e9c = 0.01f;
-__declspec(section ".sdata2") const f32 float_0p25_80420ea0 = 0.25f;
-__declspec(section ".sdata2") const f32 float_0p6_80420ea4 = 0.6f;
-__declspec(section ".sdata2") const f32 float_3_80420ea8 = 3.0f;
-__declspec(section ".sdata2") const f32 float_0p05_80420eac = 0.05f;
-__declspec(section ".sdata2") const f32 float_50_80420eb0 = 50.0f;
-__declspec(section ".sdata2") const f32 float_deg2rad_80420eb4 = 0.017453292f;
-__declspec(section ".sdata2") const f32 float_90_80420eb8 = 90.0f;
-__declspec(section ".sdata2") const f32 float_270_80420ebc = 270.0f;
-__declspec(section ".sdata2") const f32 float_7_80420ec0 = 7.0f;
-#pragma force_active on
-#pragma explicit_zero_data on
-#pragma force_active on
-__declspec(section ".sdata2") const u32 gap_sdata2_80420EC4 = 0;
-#pragma explicit_zero_data reset
-#pragma force_active reset
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
+void PSMTXRotRad(Mtx m, char axis, f32 rad);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+f32 PSVECMag(const Vec* v);
+void PSVECSubtract(const Vec* a, const Vec* b, Vec* a_b);
+extern u32 g5_headchkofs_s581[4];
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
+	asm volatile {
+		opword 0x9421FE90
+		opword 0x7C0802A6
+		opword 0x90010174
+		opword 0xDBE10160
+		opword 0xF3E10168
+		opword 0xDBC10150
+		opword 0xF3C10158
+		opword 0xDBA10140
+		opword 0xF3A10148
+		opword 0xDB810130
+		opword 0xF3810138
+		opword 0xDB610120
+		opword 0xF3610128
+		opword 0x93E1011C
+		opword 0x93C10118
+		opword 0x93A10114
+		opword 0xFF600890
+		opword 0xFF801090
+		opword 0xFFE01890
+		opword 0xFFA02090
+		opword 0xFFC02890
+		bl getKoopaFireEfp
+		opword 0x7C7F1B78
+		opword 0x38600004
+		bl camGetPtr
+		lis r3, vec3_802fe320@ha
+		lfs f0, float_0p5_80420e70(r2)
+		addi r5, r3, vec3_802fe320@l
+		opword 0x281F0000
+		opword 0x80850000
+		opword 0xEC00E77A
+		opword 0x80650004
+		opword 0x80050008
+		opword 0x90810014
+		opword 0x90610018
+		opword 0x9001001C
+		opword 0xD3610014
+		opword 0xD0010018
+		opword 0x80810014
+		opword 0xD3E1001C
+		opword 0x80610018
+		opword 0x8001001C
+		opword 0x9081002C
+		opword 0x90610030
+		opword 0x90010034
+		opword 0x4082000C
+		opword 0x38600000
+		opword 0x48000198
+		opword 0x83DF000C
+		opword 0x386100A4
+		opword 0xC3BE0040
+		opword 0xC03E0004
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0x38600004
+		bl camGetPtr
+		opword 0xC0430114
+		opword 0x38610074
+		opword 0xC03E0048
+		opword 0x38800079
+		lfs f0, float_deg2rad_80420eb4(r2)
+		opword 0xEC211028
+		opword 0xEC200072
+		bl PSMTXRotRad
+		opword 0xC03E0048
+		lfs f0, float_90_80420eb8(r2)
+		opword 0xFC010040
+		opword 0x40810028
+		lfs f0, float_270_80420ebc(r2)
+		opword 0xFC010040
+		opword 0x4080001C
+		opword 0xC03E0040
+		opword 0x386100D4
+		opword 0xFC400890
+		opword 0xFC600850
+		bl PSMTXScale
+		opword 0x48000018
+		opword 0xC03E0040
+		opword 0x386100D4
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100A4
+		opword 0x38810074
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100A4
+		opword 0x388100D4
+		opword 0x38A10044
+		bl PSMTXConcat
+		lfs f0, float_0p5_80420e70(r2)
+		opword 0x3BA00001
+		opword 0x3BDE0050
+		opword 0xEFE007B2
+		opword 0x480000C8
+		opword 0x801E0044
+		opword 0x2C000000
+		opword 0x408200B4
+		lfs f2, float_7_80420ec0(r2)
+		opword 0x386100A4
+		opword 0xC01E0040
+		opword 0xC03E0004
+		opword 0xEFC20032
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0xFC20F090
+		opword 0x386100D4
+		opword 0xFC40F090
+		opword 0xFC60F090
+		bl PSMTXScale
+		opword 0x386100A4
+		opword 0x388100D4
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100A4
+		opword 0x38610044
+		opword 0x7C852378
+		bl PSMTXConcat
+		lis r4, vec3_802fe32c@ha
+		opword 0x386100A4
+		addi r8, r4, vec3_802fe32c@l
+		opword 0x38810008
+		opword 0x80E80000
+		opword 0x38A10038
+		opword 0x80C80004
+		opword 0x80080008
+		opword 0x90E10008
+		opword 0x90C1000C
+		opword 0x90010010
+		bl PSMTXMultVec
+		opword 0x3861002C
+		opword 0x38810038
+		opword 0x38A10020
+		bl PSVECSubtract
+		opword 0x38610020
+		bl PSVECMag
+		opword 0xEC1EFF7A
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600001
+		opword 0x4800001C
+		opword 0x3BBD0001
+		opword 0x3BDE0050
+		opword 0x801F0008
+		opword 0x7C1D0000
+		opword 0x4180FF34
+		opword 0x38600000
+		opword 0xE3E10168
+		opword 0xCBE10160
+		opword 0xE3C10158
+		opword 0xCBC10150
+		opword 0xE3A10148
+		opword 0xCBA10140
+		opword 0xE3810138
+		opword 0xCB810130
+		opword 0xE3610128
+		opword 0xCB610120
+		opword 0x83E1011C
+		opword 0x83C10118
+		opword 0x80010174
+		opword 0x83A10114
+		opword 0x7C0803A6
+		opword 0x38210170
+	}
+}
+#pragma pop
 #endif
-
-
-#ifdef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
+#ifdef NONMATCHING
     MarioWork* m;
     f32 dh, dw, dx, dy;
 
@@ -144,8 +326,116 @@ s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
         }
     }
     return 0;
-}
 #endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFA0
+		opword 0x7C0802A6
+		opword 0x90010064
+		opword 0xDBE10050
+		opword 0xF3E10058
+		opword 0xDBC10040
+		opword 0xF3C10048
+		opword 0xDBA10030
+		opword 0xF3A10038
+		opword 0xDB810020
+		opword 0xF3810028
+		opword 0xDB610010
+		opword 0xF3610018
+		opword 0x93E1000C
+		opword 0xFF600890
+		opword 0xFFC01090
+		opword 0xFFE01890
+		opword 0xFF802090
+		opword 0xFFA02890
+		bl marioGetPtr
+		opword 0xFC20D890
+		opword 0x7C7F1B78
+		opword 0xFC40F090
+		opword 0xFC60F890
+		opword 0xFC80E090
+		opword 0xFCA0E890
+		bl kpaEnemyFireHitChk
+		opword 0x2C030000
+		opword 0x4182000C
+		opword 0x38600002
+		opword 0x480000EC
+		opword 0xC01F01B8
+		lfs f5, float_0p5_80420e70(r2)
+		opword 0xEC80E02A
+		opword 0xC03F0090
+		opword 0xC07F01B4
+		opword 0xEC05083A
+		opword 0xC05F008C
+		opword 0xEC63E82A
+		opword 0xEC42D828
+		opword 0xEC00F028
+		opword 0xEC850132
+		opword 0xEC6500F2
+		opword 0xEC05073C
+		opword 0xFC401210
+		opword 0xFC000210
+		opword 0xFC002040
+		opword 0x4C401382
+		opword 0x408200A0
+		opword 0xFC021840
+		opword 0x4C401382
+		opword 0x40820094
+		opword 0x801F0000
+		opword 0x5400039D
+		opword 0x4182004C
+		opword 0xFC01F040
+		opword 0x40810044
+		bl kpaGetLevel
+		opword 0x2C030000
+		opword 0x40820030
+		bl kpaGetStageType
+		opword 0x2C030001
+		opword 0x41820024
+		opword 0xA81F004C
+		opword 0x2C000000
+		opword 0x40820018
+		lfs f0, float_50_80420eb0(r2)
+		opword 0xFC1F0040
+		opword 0x4080000C
+		opword 0x38600004
+		bl marioChgMot
+		opword 0x38600001
+		opword 0x48000044
+		bl kpaMutekiCheck
+		opword 0x2C030001
+		opword 0x4082000C
+		opword 0x38600003
+		opword 0x48000030
+		opword 0xA81F004C
+		opword 0x2C000000
+		opword 0x4182000C
+		opword 0x38600003
+		opword 0x4800001C
+		opword 0xA81F0078
+		opword 0x2C000000
+		opword 0x4082000C
+		opword 0x38600004
+		opword 0x48000008
+		opword 0x38600000
+		opword 0xE3E10058
+		opword 0xCBE10050
+		opword 0xE3C10048
+		opword 0xCBC10040
+		opword 0xE3A10038
+		opword 0xCBA10030
+		opword 0xE3810028
+		opword 0xCB810020
+		opword 0xE3610018
+		opword 0xCB610010
+		opword 0x80010064
+		opword 0x83E1000C
+		opword 0x7C0803A6
+		opword 0x38210060
+	}
+#endif
+}
+#ifdef NONMATCHING
 
 static inline void kpa_headClear(void) {
     s32 i;
@@ -155,7 +445,6 @@ static inline void kpa_headClear(void) {
     }
 }
 
-#ifdef NONMATCHING
 HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     s32 n, i;
     MarioWork* m;
@@ -279,10 +568,541 @@ HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
     return best;
 }
 #endif
+#ifndef NONMATCHING
+#pragma pop
+#endif
 
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng);
+__declspec(section ".data") static void* jumptable_803ADC44[7];
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
+	char _af_pad[76];
+	asm volatile {
+		opword 0xFE000890
+		lis r6, vec3_802fe320@ha
+		opword 0x7C741B78
+		opword 0x7C952378
+		opword 0x7CB62B78
+		addi r28, r6, vec3_802fe320@l
+		bl marioGetPtr
+		lfs f0, float_0_80420e80(r2)
+		opword 0x7C7D1B78
+		opword 0x3AE00000
+		opword 0xD0030218
+		opword 0xD003021C
+		opword 0xD0030220
+		opword 0xD0030214
+		opword 0x80030000
+		opword 0x540005AD
+		opword 0x41820014
+		opword 0xC01D0090
+		opword 0x38600000
+		opword 0xD0140000
+		opword 0x480007A8
+		lfs f0, float_0p01_80420e9c(r2)
+		opword 0xEE10002A
+		bl kpaGetLevel
+		opword 0x2C030000
+		opword 0x4082000C
+		opword 0xC1FD01B8
+		opword 0x48000010
+		lfs f1, float_0p25_80420ea0(r2)
+		opword 0xC01D01B8
+		opword 0xEDE10032
+		opword 0xC01D0090
+		lfs f1, float_neg1_80420e84(r2)
+		opword 0xD0140000
+		lfs f0, float_0_80420e80(r2)
+		opword 0xD0350000
+		opword 0xC03D0180
+		opword 0xFC010000
+		opword 0x4182000C
+		lfs f14, 0x1a0(r29)
+		opword 0x48000010
+		opword 0xC03D01A8
+		bl toMovedir
+		opword 0xFDC00890
+		opword 0x3B000000
+		opword 0xC2DD008C
+		opword 0xC2BD0090
+		mr r19, r24
+		opword 0xC29D0094
+		opword 0x3B400000
+		lfs f17, float_1000_80420e74(r2)
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x3818004C
+		opword 0x7E63012E
+		bl marioGetPtr
+		opword 0x3B5A0001
+		opword 0x8063028C
+		opword 0x381800A4
+		opword 0x3B180004
+		opword 0x2C1A000A
+		opword 0x7E23052E
+		opword 0x4180FFD4
+		bl kpaGetLevel
+		opword 0x2C030003
+		opword 0x41820034
+		opword 0x40800050
+		opword 0x2C030000
+		opword 0x40800008
+		opword 0x48000044
+		opword 0xC83C0058
+		opword 0x3B200003
+		opword 0xC01D01B4
+		opword 0xC85C0050
+		opword 0xFC010032
+		opword 0xFEE20032
+		opword 0xFEE0B818
+		opword 0x48000024
+		lfs f2, float_0p5_80420e70(r2)
+		opword 0x3B200007
+		opword 0xC03D01B4
+		lfs f0, float_3_80420ea8(r2)
+		opword 0xEC220072
+		lfs f2, float_0p6_80420ea4(r2)
+		opword 0xEC010024
+		opword 0xEEE20032
+		lfs f0, float_3p1416_80420e78(r2)
+		opword 0x3B400000
+		lfs f2, float_2_80420e88(r2)
+		opword 0xEF2F802A
+		lfs f1, float_0p05_80420eac(r2)
+		opword 0xEF8003B2
+		lfs f0, float_3_80420ea8(r2)
+		opword 0xEF15782A
+		opword 0xEF620DF8
+		opword 0xEF400DF8
+		lfs f29, float_100_80420e98(r2)
+		lfs f19, float_0p5_80420e70(r2)
+		opword 0x7F53D378
+		opword 0xC9DC0048
+		opword 0x7F5BD378
+		opword 0x3FC04330
+		opword 0x48000654
+		opword 0x281A0006
+		opword 0x4181016C
+		lis r3, jumptable_803ADC44@ha
+		addi r3, r3, jumptable_803ADC44@l
+		opword 0x7C03982E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		lfs f31, float_0_80420e80(r2)
+		opword 0xFFC0F890
+		opword 0x4800014C
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		lfs f0, float_0p05_80420eac(r2)
+		opword 0xFC400818
+		opword 0xFC207890
+		opword 0xEC170028
+		opword 0xEFE000B2
+		bl cos
+		opword 0xFC400818
+		lfs f0, float_0p05_80420eac(r2)
+		opword 0xEC370028
+		opword 0xFC001050
+		opword 0xEFC10032
+		opword 0x4800010C
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		opword 0xFC600818
+		lfs f0, float_0p05_80420eac(r2)
+		opword 0xFC207890
+		opword 0xEC570028
+		opword 0xFC001850
+		opword 0xEFE20032
+		bl cos
+		opword 0xFC400818
+		lfs f0, float_0p05_80420eac(r2)
+		opword 0xEC370028
+		opword 0xFC001050
+		opword 0xEFC10032
+		opword 0x480000C8
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		opword 0xFC000818
+		opword 0xFC207890
+		opword 0xEFFB0032
+		bl cos
+		opword 0xFC000818
+		opword 0xFC000050
+		opword 0xEFDB0032
+		opword 0x48000098
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		opword 0xFC000818
+		opword 0xFC207890
+		opword 0xFC000050
+		opword 0xEFFB0032
+		bl cos
+		opword 0xFC000818
+		opword 0xFC000050
+		opword 0xEFDB0032
+		opword 0x48000064
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		opword 0xFC000818
+		opword 0xFC207890
+		opword 0xEFFA0032
+		bl cos
+		opword 0xFC000818
+		opword 0xFC000050
+		opword 0xEFDA0032
+		opword 0x48000034
+		lfs f0, float_180_80420e7c(r2)
+		opword 0xEDFC0024
+		opword 0xFC207890
+		bl sin
+		opword 0xFC000818
+		opword 0xFC207890
+		opword 0xFC000050
+		opword 0xEFFA0032
+		bl cos
+		opword 0xFC000818
+		opword 0xFC000050
+		opword 0xEFDA0032
+		lfs f4, float_0_80420e80(r2)
+		opword 0xFC40C090
+		opword 0xEC36F82A
+		stfs f25, _af_pad+20(r1)
+		opword 0xFCC02090
+		lfs f5, float_neg1_80420e84(r2)
+		opword 0xEC74F02A
+		opword 0x38810028
+		opword 0x38A10024
+		opword 0x38C10020
+		opword 0x38E1001C
+		opword 0x39010018
+		opword 0x39210014
+		opword 0x39410010
+		opword 0x38600000
+		bl hitCheckFilter
+		opword 0x7C781B79
+		opword 0x418201BC
+		opword 0xC2010010
+		opword 0xC2210014
+		opword 0xC2410018
+		bl marioGetPtr
+		lfs f0, float_100_80420e98(r2)
+		opword 0x7C7F1B78
+		lfs f1, float_0_80420e80(r2)
+		opword 0xEDE00472
+		opword 0xFC400890
+		opword 0xEC600432
+		opword 0xFC807890
+		bl angleABf
+		lfs f0, float_180_80420e7c(r2)
+		opword 0x3C004330
+		opword 0x90010038
+		opword 0xFC807890
+		opword 0xEC610028
+		lfs f2, float_0_80420e80(r2)
+		lfs f0, float_100_80420e98(r2)
+		opword 0xC8BC0048
+		opword 0xFC201090
+		opword 0xFCC0181E
+		opword 0xEC6004B2
+		opword 0xD8C10030
+		opword 0x80010034
+		opword 0x6C008000
+		opword 0x9001003C
+		opword 0xC8010038
+		opword 0xEC002828
+		opword 0xD01F0218
+		opword 0xD05F021C
+		bl angleABf
+		lfs f0, float_180_80420e7c(r2)
+		opword 0x3C004330
+		opword 0xEC500432
+		opword 0x90010048
+		opword 0xEC810028
+		opword 0xC83C0048
+		lfs f0, float_0_80420e80(r2)
+		opword 0xEC7214BA
+		opword 0xFC40201E
+		opword 0xFC030040
+		opword 0xD8410040
+		opword 0x80010044
+		opword 0x6C008000
+		opword 0x9001004C
+		opword 0xC8010048
+		opword 0xEC000828
+		opword 0xD01F0220
+		opword 0x4081004C
+		opword 0xFC201834
+		opword 0xC89C0058
+		opword 0xC85C0060
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC210032
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC210032
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC010032
+		opword 0xFC630032
+		opword 0xFC601818
+		opword 0x48000088
+		opword 0xC81C0068
+		opword 0xFC030040
+		opword 0x40800010
+		lis r3, __float_nan@ha
+		lfs f3, __float_nan@l(r3)
+		opword 0x48000070
+		opword 0xD061000C
+		opword 0x3C007F80
+		opword 0x8081000C
+		opword 0x54830050
+		opword 0x7C030000
+		opword 0x41820014
+		opword 0x40800040
+		opword 0x2C030000
+		opword 0x41820020
+		opword 0x48000034
+		opword 0x5480027F
+		opword 0x4182000C
+		opword 0x38000001
+		opword 0x48000028
+		opword 0x38000002
+		opword 0x48000020
+		opword 0x5480027F
+		opword 0x4182000C
+		opword 0x38000005
+		opword 0x48000010
+		opword 0x38000003
+		opword 0x48000008
+		opword 0x38000004
+		opword 0x2C000001
+		opword 0x4082000C
+		lis r3, __float_nan@ha
+		lfs f3, __float_nan@l(r3)
+		lfs f1, float_0_80420e80(r2)
+		opword 0xFC808850
+		opword 0xFC400890
+		bl angleABf
+		lfs f0, float_50_80420eb0(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820008
+		opword 0x3B000000
+		opword 0xC0010024
+		opword 0x28180000
+		opword 0x93C10040
+		opword 0xEC1D983A
+		opword 0xFC00001E
+		opword 0xD8010048
+		opword 0x8001004C
+		opword 0x6C008000
+		opword 0x90010044
+		opword 0xC8010040
+		opword 0xEC007028
+		opword 0xEC00E824
+		opword 0xD0010024
+		opword 0x41820280
+		opword 0xC2410010
+		opword 0xC2210014
+		opword 0xC2010018
+		bl marioGetPtr
+		lfs f0, float_100_80420e98(r2)
+		opword 0x7C7F1B78
+		lfs f1, float_0_80420e80(r2)
+		opword 0xEDE00472
+		opword 0xFC400890
+		opword 0xEC6004B2
+		opword 0xFC807890
+		bl angleABf
+		lfs f0, float_180_80420e7c(r2)
+		opword 0x3C004330
+		opword 0x90010040
+		opword 0xFC807890
+		opword 0xEC610028
+		lfs f2, float_0_80420e80(r2)
+		lfs f0, float_100_80420e98(r2)
+		opword 0xC8BC0048
+		opword 0xFC201090
+		opword 0xFCC0181E
+		opword 0xEC600432
+		opword 0xD8C10048
+		opword 0x8001004C
+		opword 0x6C008000
+		opword 0x90010044
+		opword 0xC8010040
+		opword 0xEC002828
+		opword 0xD01F0218
+		opword 0xD05F021C
+		bl angleABf
+		lfs f0, float_180_80420e7c(r2)
+		opword 0x3C004330
+		opword 0xEC5204B2
+		opword 0x90010030
+		opword 0xEC810028
+		opword 0xC83C0048
+		lfs f0, float_0_80420e80(r2)
+		opword 0xEC70143A
+		opword 0xFC40201E
+		opword 0xFC030040
+		opword 0xD8410038
+		opword 0x8001003C
+		opword 0x6C008000
+		opword 0x90010034
+		opword 0xC8010030
+		opword 0xEC000828
+		opword 0xD01F0220
+		opword 0x4081004C
+		opword 0xFC201834
+		opword 0xC89C0058
+		opword 0xC85C0060
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC210032
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC210032
+		opword 0xFC010072
+		opword 0xFC240072
+		opword 0xFC03103C
+		opword 0xFC010032
+		opword 0xFC630032
+		opword 0xFC601818
+		opword 0x48000088
+		opword 0xC81C0068
+		opword 0xFC030040
+		opword 0x40800010
+		lis r3, __float_nan@ha
+		lfs f3, __float_nan@l(r3)
+		opword 0x48000070
+		opword 0xD0610008
+		opword 0x3C007F80
+		opword 0x80810008
+		opword 0x54830050
+		opword 0x7C030000
+		opword 0x41820014
+		opword 0x40800040
+		opword 0x2C030000
+		opword 0x41820020
+		opword 0x48000034
+		opword 0x5480027F
+		opword 0x4182000C
+		opword 0x38000001
+		opword 0x48000028
+		opword 0x38000002
+		opword 0x48000020
+		opword 0x5480027F
+		opword 0x4182000C
+		opword 0x38000005
+		opword 0x48000010
+		opword 0x38000003
+		opword 0x48000008
+		opword 0x38000004
+		opword 0x2C000001
+		opword 0x4082000C
+		lis r3, __float_nan@ha
+		lfs f3, __float_nan@l(r3)
+		lfs f1, float_0_80420e80(r2)
+		opword 0xFC808850
+		opword 0xFC400890
+		bl angleABf
+		opword 0xD03D0214
+		opword 0xC0410024
+		opword 0xFC02A840
+		opword 0x40800044
+		opword 0xEC22A828
+		lfs f0, float_2_80420e88(r2)
+		opword 0xFC200A10
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082002C
+		opword 0xEC151028
+		opword 0xFC20B090
+		opword 0xFC40A090
+		opword 0xD0150000
+		opword 0xC0610028
+		opword 0xC0810020
+		bl angleABf
+		opword 0xD0360000
+		opword 0x3B000000
+		opword 0x4800008C
+		opword 0xC0010018
+		lfs f1, float_0_80420e80(r2)
+		opword 0xFC000800
+		opword 0x40820050
+		opword 0xC0010010
+		opword 0xFC000800
+		opword 0x40820044
+		lfs f2, float_100_80420e98(r2)
+		opword 0x3C004330
+		opword 0xC0210024
+		lfs f0, float_0p5_80420e70(r2)
+		opword 0x90010040
+		opword 0xEC02007A
+		opword 0xC83C0048
+		opword 0xFC00001E
+		opword 0xD8010048
+		opword 0x8001004C
+		opword 0x6C008000
+		opword 0x90010044
+		opword 0xC8010040
+		opword 0xEC000828
+		opword 0xEC001024
+		opword 0xD0010024
+		opword 0xC0610024
+		opword 0xFC20B090
+		lfs f0, float_0_80420e80(r2)
+		opword 0xFC40A090
+		opword 0xD0740000
+		opword 0xD0150000
+		opword 0xC0610028
+		opword 0xC0810020
+		bl angleABf
+		opword 0xD0360000
+		opword 0x7F17C378
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381B004C
+		opword 0x7F03012E
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381B00A4
+		opword 0x3A730004
+		opword 0x3B7B0004
+		opword 0x7FE3052E
+		opword 0x3B5A0001
+		opword 0x7C1AC800
+		opword 0x4180F9AC
+		opword 0x7EE3BB78
+	}
+}
+#pragma pop
+
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
+#ifdef NONMATCHING
     static s32 _ofs0[] = {3, 12, 16, 1, 0, 16, 0, -9, 16, 0};
     static s32 _ofs1[] = {4, 25, 74, 0, 50, 65, 1, 0, 67, 0, -25, 62, 0};
     static s32 _ofs2[] = {6, 50, 102, 0, 76, 90, 1, 25, 100, 0, 0, 94, 0, -25, 90, 0, -45, 68, 0};
@@ -371,34 +1191,217 @@ HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
         }
     }
     return best;
+#endif
+#ifndef NONMATCHING
+	char _af_pad[56];
+	asm volatile {
+		opword 0xFF800890
+		opword 0x7C771B78
+		opword 0x7C982378
+		bl marioGetPtr
+		opword 0x80030000
+		opword 0x7C7E1B78
+		opword 0x5400039D
+		opword 0x4182000C
+		opword 0x38600000
+		opword 0x480002BC
+		opword 0xC03E0180
+		opword 0x3B200000
+		lfs f0, float_0_80420e80(r2)
+		opword 0xFC010000
+		opword 0x4182000C
+		opword 0xC3FE01A0
+		opword 0x48000010
+		opword 0xC03E01A8
+		bl toMovedir
+		opword 0xFFE00890
+		opword 0xC3B80000
+		opword 0x3B600000
+		lfs f0, float_neg1_80420e84(r2)
+		opword 0x7F7CDB78
+		lfs f30, float_1000_80420e74(r2)
+		opword 0x7F7ADB78
+		opword 0xD0180000
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381C0020
+		opword 0x7F43012E
+		bl marioGetPtr
+		opword 0x3B7B0001
+		opword 0x8063028C
+		opword 0x381C0078
+		opword 0x3B9C0004
+		opword 0x2C1B000A
+		opword 0x7FC3052E
+		opword 0x4180FFD4
+		bl kpaGetLevel
+		opword 0x801E0000
+		opword 0x5464103A
+		la r3, g5_headchkofs_s581(r13)
+		opword 0x7F43202E
+		opword 0x540003DF
+		opword 0x837A0000
+		opword 0x3B5A0004
+		opword 0x40820050
+		bl kpaGetLevel
+		opword 0x2C030002
+		opword 0x41820034
+		opword 0x40800014
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x4080001C
+		opword 0x48000060
+		opword 0x2C030004
+		opword 0x40800058
+		opword 0x4800001C
+		lfs f29, float_2_80420e88(r2)
+		opword 0x4800004C
+		lfs f29, float_0_80420e80(r2)
+		opword 0x48000044
+		lfs f29, float_0_80420e80(r2)
+		opword 0x4800003C
+		lfs f29, float_35_80420e8c(r2)
+		opword 0x48000034
+		bl kpaGetLevel
+		opword 0x2C030000
+		opword 0x41820008
+		opword 0x48000020
+		opword 0xA01E002E
+		opword 0x28000025
+		opword 0x4082000C
+		lfs f29, float_10_80420e90(r2)
+		opword 0x48000010
+		opword 0xFFA0E090
+		opword 0x48000008
+		opword 0xFFA0E090
+		lfs f1, float_3p1416_80420e78(r2)
+		lis r3, double_to_int_802fe368@ha
+		lfs f0, float_180_80420e7c(r2)
+		opword 0x3B800000
+		opword 0xEC2107F2
+		lfd f31, double_to_int_802fe368@l(r3)
+		opword 0x3BA00000
+		opword 0x3FE04330
+		opword 0xEFC10024
+		opword 0x48000174
+		opword 0xFC20F090
+		bl sin
+		opword 0x801A0000
+		opword 0xFC400818
+		stw r31, _af_pad+32(r1)
+		opword 0xFC20F090
+		opword 0x6C008000
+		opword 0x9001002C
+		opword 0xC8010028
+		opword 0xEC00F828
+		fmuls f28, f0, f2
+		bl cos
+		opword 0x807A0000
+		opword 0xFC000818
+		opword 0x801A0004
+		opword 0x6C638000
+		opword 0x809A0008
+		opword 0x90610034
+		opword 0x6C008000
+		opword 0xFC200050
+		opword 0x2C040000
+		opword 0x93E10030
+		opword 0x3B5A000C
+		opword 0xC8010030
+		opword 0x9001003C
+		opword 0xEC40F828
+		opword 0x93E10038
+		opword 0xC8010038
+		opword 0xECA20072
+		opword 0xEC60F828
+		opword 0x40820010
+		opword 0x801E0000
+		opword 0x540003DF
+		opword 0x418200E4
+		opword 0xC03E008C
+		opword 0x38810020
+		opword 0xC05E0090
+		opword 0x38A1001C
+		opword 0xEC21E02A
+		opword 0xC01E0094
+		opword 0xEF82182A
+		lfs f4, float_0_80420e80(r2)
+		opword 0xEC60282A
+		opword 0xD3A10008
+		opword 0xFC40E090
+		lfs f5, float_1_80420e94(r2)
+		opword 0xFCC02090
+		opword 0x38C10018
+		opword 0x38E10008
+		opword 0x39010014
+		opword 0x39210010
+		opword 0x3941000C
+		opword 0x38600000
+		bl hitCheckFilter
+		mr. r22, r3
+		opword 0x4182008C
+		lfs f3, float_100_80420e98(r2)
+		opword 0x3C004330
+		opword 0xC041001C
+		lis r3, double_to_int_802fe368@ha
+		lfs f1, float_0p5_80420e70(r2)
+		opword 0xEC1CE82A
+		opword 0x90010030
+		opword 0xEC2308BA
+		lfd f2, double_to_int_802fe368@l(r3)
+		opword 0xFC20081E
+		opword 0xD8210038
+		opword 0x8001003C
+		opword 0x6C008000
+		opword 0x90010034
+		opword 0xC8210030
+		opword 0xEC211028
+		opword 0xEC211824
+		opword 0xFC000840
+		opword 0xD021001C
+		opword 0x4C411382
+		opword 0x40820028
+		opword 0xD0370004
+		opword 0x7ED9B378
+		lfs f0, float_0_80420e80(r2)
+		opword 0xD0180000
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381D0020
+		opword 0x7EC3012E
+		opword 0x48000014
+		opword 0xC0170004
+		opword 0xEC010028
+		opword 0xEC00E828
+		opword 0xD0180000
+		opword 0x3BBD0004
+		opword 0x3B9C0001
+		opword 0x7C1CD800
+		opword 0x4180FE8C
+		opword 0x7F23CB78
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 HitEntry* kpaSearchFrontUnder(void) {
     return NULL;
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaGetHitobjHead(s32 i) {
     return KHEAD(i);
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaGetHitobjHead2(void) {
     return KPW->head[0];
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaGetHitobjRide(s32 i) {
     return KRIDE(i);
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaChkHitobjRide(void) {
 KpaHitWork* w = KPW;
 HitEntry* r;
@@ -433,9 +1436,7 @@ if (r) { return r; } else { return r; }
 }
 return r;
 }
-#endif
 
-#ifdef NONMATCHING
 long kpaClearHitobjRide(void) {
     MarioWork* m = marioGetPtr();
     *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x4C) = NULL;
@@ -449,9 +1450,7 @@ long kpaClearHitobjRide(void) {
     *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x6C) = NULL;
     *(HitEntry**)(*(u8**)((u8*)m + 0x28C) + 0x70) = NULL;
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaGetHitobj(void) {
     MarioWork* m = marioGetPtr();
     if (m->characterId != 2) {
@@ -459,9 +1458,7 @@ HitEntry* kpaGetHitobj(void) {
     }
     return (*(KpaHitWork**)((u8*)m + 0x28C))->obj;
 }
-#endif
 
-#ifdef NONMATCHING
 HitEntry* kpaGetHitFlame(void) {
     MarioWork* m = marioGetPtr();
     if (m->characterId != 2) {
@@ -469,7 +1466,6 @@ HitEntry* kpaGetHitFlame(void) {
     }
     return (*(KpaHitWork**)((u8*)m + 0x28C))->flame;
 }
-#endif
 
 static s32 _ofs0[] = {3, 12, 16, 1, 0, 16, 0, -9, 16, 0};
 static s32 _ofs1[] = {4, 25, 74, 0, 50, 65, 1, 0, 67, 0, -25, 62, 0};
@@ -480,11 +1476,30 @@ static s32* kpaHeadChkOfs[] = {_ofs0, _ofs1, _ofs2, _ofs3};
 static s32 head_sphere_data_lv1[] = {3, 32, 55, 24, 0, 26, 30, 16, 2, -10, 44, 25, 1};
 static s32 head_sphere_data_lv2[] = {3, 45, 75, 34, 0, 36, 30, 16, 2, -15, 59, 36, 1};
 static s32 head_sphere_data_lv3[] = {4, 100, 162, 80, 0, 90, 75, 30, 2, 50, 40, 30, 3, -43, 142, 74, 1};
+#ifndef NONMATCHING
+__declspec(section ".data") static void* jumptable_803ADC44[7] = {
+    (char*)kpaSearchGround + 0x258,
+    (char*)kpaSearchGround + 0x264,
+    (char*)kpaSearchGround + 0x2A4,
+    (char*)kpaSearchGround + 0x2E8,
+    (char*)kpaSearchGround + 0x318,
+    (char*)kpaSearchGround + 0x34C,
+    (char*)kpaSearchGround + 0x37C,
+};
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") u32 g5_headchkofs_s581[4] = {(u32)_ofs0, (u32)_ofs1, (u32)_ofs2, (u32)_ofs3};
+#endif
 static s32 head_sphere_data_lv0[] = {1, 10, 15, 6, 0};
 static s32* head_sphere_data[] = {head_sphere_data_lv0, head_sphere_data_lv1, head_sphere_data_lv2, head_sphere_data_lv3};
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 HitEntry* kpaHitCheck(void) {
+#ifdef NONMATCHING
     s32* p;
     s32 j;
     s32 i;
@@ -544,21 +1559,174 @@ HitEntry* kpaHitCheck(void) {
     }
     (*(KpaHitWork**)((u8*)m + 0x28C))->obj = best;
     return best;
+#endif
+#ifndef NONMATCHING
+	char _af_pad[32];
+	asm volatile {
+		opword 0x3B200000
+		bl marioGetPtr
+		opword 0x8803003C
+		opword 0x7C7E1B78
+		opword 0x2C000002
+		opword 0x4182000C
+		opword 0x38600000
+		opword 0x48000208
+		opword 0x807E028C
+		opword 0x3B400000
+		lfs f29, float_1000_80420e74(r2)
+		opword 0x7F5BD378
+		opword 0x9343001C
+		opword 0x7F5CD378
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381C0020
+		opword 0x7F43012E
+		bl marioGetPtr
+		opword 0x3B7B0001
+		opword 0x8063028C
+		opword 0x381C0078
+		opword 0x3B9C0004
+		opword 0x2C1B000A
+		opword 0x7FA3052E
+		opword 0x4180FFD4
+		bl kpaFireAttackCheck
+		opword 0x2C030001
+		opword 0x4082000C
+		opword 0x38600000
+		opword 0x480001AC
+		bl kpaGetLevel
+		opword 0x5460103A
+		la r3, head_sphere_data(r13)
+		opword 0x7F83002E
+		lis r3, double_to_int_802fe368@ha
+		lfs f31, float_3p1416_80420e78(r2)
+		opword 0x3B600000
+		opword 0x835C0000
+		opword 0x3BA00000
+		lfs f29, float_180_80420e7c(r2)
+		opword 0x3FE04330
+		lfd f30, double_to_int_802fe368@l(r3)
+		opword 0x3B9C0004
+		opword 0x48000160
+		opword 0xC01E01A0
+		opword 0xEC1F0032
+		opword 0xEC20E824
+		bl sin
+		opword 0xC01E01A0
+		opword 0xFC600818
+		opword 0x801C0000
+		opword 0xEC1F0032
+		stw r31, _af_pad+0(r1)
+		opword 0x6C008000
+		opword 0xC05E008C
+		opword 0x9001000C
+		opword 0xEC20E824
+		opword 0xC8010008
+		opword 0xEC00F028
+		opword 0xEF8010FA
+		bl cos
+		opword 0x801C0000
+		opword 0xFC800818
+		opword 0x807C0004
+		opword 0x6C048000
+		opword 0x801C0008
+		opword 0x90810014
+		opword 0x6C638000
+		opword 0x809C000C
+		opword 0x6C008000
+		opword 0x93E10010
+		opword 0x3B9C0010
+		opword 0xC03E0094
+		opword 0x2C040002
+		opword 0xC8010010
+		opword 0x9061001C
+		opword 0xEC60F028
+		opword 0xC05E0090
+		opword 0x93E10018
+		opword 0xC8010018
+		opword 0xEC63093C
+		opword 0x90010024
+		opword 0xEC20F028
+		opword 0x93E10020
+		opword 0xC8010020
+		fadds f27, f2, f1
+		opword 0xEC80F028
+		opword 0x41820030
+		opword 0x40800010
+		opword 0x2C040001
+		opword 0x40800014
+		opword 0x4800003C
+		opword 0x2C040004
+		opword 0x40800034
+		opword 0x48000024
+		opword 0x801E0000
+		opword 0x540003DF
+		opword 0x41820080
+		opword 0x48000020
+		opword 0x801E0000
+		opword 0x540003DF
+		opword 0x40820070
+		opword 0x48000010
+		opword 0x801E0000
+		opword 0x5400039F
+		opword 0x40820060
+		opword 0xFC20E090
+		opword 0x38600000
+		opword 0xFC40D890
+		bl hitCheckSphereFilter
+		opword 0x801E0000
+		mr r24, r3
+		opword 0x540003DF
+		opword 0x41820034
+		bl hitGetAttr
+		opword 0x54600001
+		opword 0x41820028
+		opword 0x7F03C378
+		bl mobjHitObjPtrToPtr
+		opword 0xC003003C
+		opword 0xFC00D840
+		opword 0x40810014
+		bl marioGetPtr
+		opword 0x8063028C
+		opword 0x381D0020
+		opword 0x7F03012E
+		opword 0x28180000
+		opword 0x41820008
+		opword 0x7F19C378
+		opword 0x3BBD0004
+		opword 0x3B7B0001
+		opword 0x7C1BD000
+		opword 0x4180FEA0
+		opword 0x809E028C
+		opword 0x7F23CB78
+		opword 0x9324001C
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry) {
     MapObjectEntry* mobj = mobjHitObjPtrToPtr(entry);
+#ifdef NONMATCHING
     if (!strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock")) {
+#endif
+#ifndef NONMATCHING
+    if (!strcmp(mobj->animName, EXT_LIT((char*)str_802FE344, "MOBJ_HiddenHatenaBlock"))) {
+#endif
         return FALSE;
     }
+#ifdef NONMATCHING
     if (!strcmp(mobj->animName, "MOBJ_Block")) {
+#endif
+#ifndef NONMATCHING
+    if (!strcmp(mobj->animName, EXT_LIT((char*)str_802FE35C, "MOBJ_Block"))) {
+#endif
         return FALSE;
     }
     return TRUE;
 }
-#endif
 
 
 #ifdef NONMATCHING
@@ -568,1439 +1736,24 @@ static f32 kpaHalf(f32 v) {
 #endif
 
 
-#ifdef NONMATCHING
 HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
     marioGetPtr();
     return hitCheckSphereFilter(kpaFlameHitFilter, x, y, z, r);
 }
-#endif
 
 
 
 #pragma force_active on
+#ifndef NONMATCHING
 #pragma explicit_zero_data on
+#endif
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80415B84_sdata[1] = {0};
+#ifndef NONMATCHING
 #pragma explicit_zero_data reset
+#endif
 #pragma force_active reset
 
-#ifndef NONMATCHING
-asm HitEntry* kpaFlameHitCheck(f32 x, f32 y, f32 z, f32 r) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	addi r11, r1, 0x30
-	bl _savefpr_28
-	fmr f28, f1
-	fmr f29, f2
-	fmr f30, f3
-	fmr f31, f4
-	bl marioGetPtr
-	fmr f1, f28
-	lis r3, kpaFlameHitFilter@ha
-	fmr f2, f29
-	addi r3, r3, kpaFlameHitFilter@l
-	fmr f3, f30
-	fmr f4, f31
-	bl hitCheckSphereFilter
-	addi r11, r1, 0x30
-	bl _restfpr_28
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm BOOL kpaFlameHitFilter(HitCheckQuery* query, HitEntry* entry) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	mr r3, r4
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl mobjHitObjPtrToPtr
-	lis r4, str_802FE344@ha
-	mr r31, r3
-	addi r4, r4, str_802FE344@l
-	addi r3, r31, 0x15
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	lis r4, str_802FE35C@ha
-	addi r3, r31, 0x15
-	addi r4, r4, str_802FE35C@l
-	bl strcmp
-	neg r0, r3
-	or r0, r0, r3
-	srwi r3, r0, 31
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaHitCheck(void) {
-	nofralloc
-	stwu r1, -0xa0(r1)
-	mflr r0
-	stw r0, 0xa4(r1)
-	stfd f31, 0x90(r1)
-	psq_st f31, 0x98(r1), 0, 0
-	stfd f30, 0x80(r1)
-	psq_st f30, 0x88(r1), 0, 0
-	stfd f29, 0x70(r1)
-	psq_st f29, 0x78(r1), 0, 0
-	stfd f28, 0x60(r1)
-	psq_st f28, 0x68(r1), 0, 0
-	stfd f27, 0x50(r1)
-	psq_st f27, 0x58(r1), 0, 0
-	stmw r24, 0x30(r1)
-	li r25, 0x0
-	bl marioGetPtr
-	lbz r0, 0x3c(r3)
-	mr r30, r3
-	cmpwi r0, 0x2
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, 0x28c(r30)
-	li r26, 0x0
-	lfs f29, float_1000_80420e74(r2)
-	mr r27, r26
-	stw r26, 0x1c(r3)
-	mr r28, r26
-	@3:
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r28, 0x20
-	stwx r26, r3, r0
-	bl marioGetPtr
-	addi r27, r27, 0x1
-	lwz r3, 0x28c(r3)
-	addi r0, r28, 0x78
-	addi r28, r28, 0x4
-	cmpwi r27, 0xa
-	stfsx f29, r3, r0
-	blt @3
-	bl kpaFireAttackCheck
-	cmpwi r3, 0x1
-	bne @4
-	li r3, 0x0
-	b @2
-	@4:
-	bl kpaGetLevel
-	slwi r0, r3, 2
-	la r3, head_sphere_data(r13)
-	lwzx r28, r3, r0
-	lis r3, double_to_int_802fe368@ha
-	lfs f31, float_3p1416_80420e78(r2)
-	li r27, 0x0
-	lwz r26, 0x0(r28)
-	li r29, 0x0
-	lfs f29, float_180_80420e7c(r2)
-	lis r31, 0x4330
-	lfd f30, double_to_int_802fe368@l(r3)
-	addi r28, r28, 0x4
-	b @5
-	@6:
-	lfs f0, 0x1a0(r30)
-	fmuls f0, f31, f0
-	fdivs f1, f0, f29
-	bl sin
-	lfs f0, 0x1a0(r30)
-	frsp f3, f1
-	lwz r0, 0x0(r28)
-	fmuls f0, f31, f0
-	stw r31, 0x8(r1)
-	xoris r0, r0, 0x8000
-	lfs f2, 0x8c(r30)
-	stw r0, 0xc(r1)
-	fdivs f1, f0, f29
-	lfd f0, 0x8(r1)
-	fsubs f0, f0, f30
-	fmadds f28, f0, f3, f2
-	bl cos
-	lwz r0, 0x0(r28)
-	frsp f4, f1
-	lwz r3, 0x4(r28)
-	xoris r4, r0, 0x8000
-	lwz r0, 0x8(r28)
-	stw r4, 0x14(r1)
-	xoris r3, r3, 0x8000
-	lwz r4, 0xc(r28)
-	xoris r0, r0, 0x8000
-	stw r31, 0x10(r1)
-	addi r28, r28, 0x10
-	lfs f1, 0x94(r30)
-	cmpwi r4, 0x2
-	lfd f0, 0x10(r1)
-	stw r3, 0x1c(r1)
-	fsubs f3, f0, f30
-	lfs f2, 0x90(r30)
-	stw r31, 0x18(r1)
-	lfd f0, 0x18(r1)
-	fnmsubs f3, f3, f4, f1
-	stw r0, 0x24(r1)
-	fsubs f1, f0, f30
-	stw r31, 0x20(r1)
-	lfd f0, 0x20(r1)
-	fadds f27, f2, f1
-	fsubs f4, f0, f30
-	beq @7
-	bge @8
-	cmpwi r4, 0x1
-	bge @9
-	b @10
-	@8:
-	cmpwi r4, 0x4
-	bge @10
-	b @11
-	@9:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 15, 15
-	beq @12
-	b @10
-	@7:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 15, 15
-	bne @12
-	b @10
-	@11:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 14, 15
-	bne @12
-	@10:
-	fmr f1, f28
-	li r3, 0x0
-	fmr f2, f27
-	bl hitCheckSphereFilter
-	lwz r0, 0x0(r30)
-	mr r24, r3
-	rlwinm. r0, r0, 0, 15, 15
-	beq @13
-	bl hitGetAttr
-	clrrwi. r0, r3, 31
-	beq @13
-	mr r3, r24
-	bl mobjHitObjPtrToPtr
-	lfs f0, 0x3c(r3)
-	fcmpo cr0, f0, f27
-	ble @13
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r29, 0x20
-	stwx r24, r3, r0
-	@13:
-	cmplwi r24, 0x0
-	beq @12
-	mr r25, r24
-	@12:
-	addi r29, r29, 0x4
-	addi r27, r27, 0x1
-	@5:
-	cmpw r27, r26
-	blt @6
-	lwz r4, 0x28c(r30)
-	mr r3, r25
-	stw r25, 0x1c(r4)
-	@2:
-	psq_l f31, 0x98(r1), 0, 0
-	lfd f31, 0x90(r1)
-	psq_l f30, 0x88(r1), 0, 0
-	lfd f30, 0x80(r1)
-	psq_l f29, 0x78(r1), 0, 0
-	lfd f29, 0x70(r1)
-	psq_l f28, 0x68(r1), 0, 0
-	lfd f28, 0x60(r1)
-	psq_l f27, 0x58(r1), 0, 0
-	lfd f27, 0x50(r1)
-	lmw r24, 0x30(r1)
-	lwz r0, 0xa4(r1)
-	mtlr r0
-	addi r1, r1, 0xa0
-	blr
-}
-
-asm HitEntry* kpaGetHitFlame(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lbz r0, 0x3c(r3)
-	cmpwi r0, 0x2
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, 0x28c(r3)
-	lwz r3, 0x18(r3)
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaGetHitobj(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lbz r0, 0x3c(r3)
-	cmpwi r0, 0x2
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, 0x28c(r3)
-	lwz r3, 0x1c(r3)
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm long kpaClearHitobjRide(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lwz r4, 0x28c(r3)
-	li r0, 0x0
-	stw r0, 0x4c(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x50(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x54(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x58(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x5c(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x60(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x64(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x68(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x6c(r4)
-	lwz r4, 0x28c(r3)
-	stw r0, 0x70(r4)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaChkHitobjRide(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lwz r4, 0x28c(r3)
-	lwz r3, 0x4c(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x50(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x54(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x58(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x5c(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x60(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x64(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x68(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x6c(r4)
-	cmplwi r3, 0x0
-	bne @1
-	lwz r3, 0x70(r4)
-	cmplwi r3, 0x0
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaGetHitobjRide(s32 i) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	bl marioGetPtr
-	slwi r4, r31, 2
-	lwz r3, 0x28c(r3)
-	addi r0, r4, 0x4c
-	lwzx r3, r3, r0
-	lwz r31, 0xc(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaGetHitobjHead2(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	lwz r0, 0x14(r1)
-	lwz r3, 0x20(r3)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaGetHitobjHead(s32 i) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	bl marioGetPtr
-	slwi r4, r31, 2
-	lwz r3, 0x28c(r3)
-	addi r0, r4, 0x20
-	lwzx r3, r3, r0
-	lwz r31, 0xc(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm HitEntry* kpaSearchFrontUnder(void) {
-	nofralloc
-	li r3, 0x0
-	blr
-}
-
-asm HitEntry* kpaSearchHead(f32 hgt, f32* outA, f32* outB) {
-	nofralloc
-	stwu r1, -0xb0(r1)
-	mflr r0
-	stw r0, 0xb4(r1)
-	stfd f31, 0xa0(r1)
-	psq_st f31, 0xa8(r1), 0, 0
-	stfd f30, 0x90(r1)
-	psq_st f30, 0x98(r1), 0, 0
-	stfd f29, 0x80(r1)
-	psq_st f29, 0x88(r1), 0, 0
-	stfd f28, 0x70(r1)
-	psq_st f28, 0x78(r1), 0, 0
-	stmw r22, 0x48(r1)
-	fmr f28, f1
-	mr r23, r3
-	mr r24, r4
-	bl marioGetPtr
-	lwz r0, 0x0(r3)
-	mr r30, r3
-	rlwinm. r0, r0, 0, 14, 14
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lfs f1, 0x180(r30)
-	li r25, 0x0
-	lfs f0, float_0_80420e80(r2)
-	fcmpu cr0, f1, f0
-	beq @3
-	lfs f31, 0x1a0(r30)
-	b @4
-	@3:
-	lfs f1, 0x1a8(r30)
-	bl toMovedir
-	fmr f31, f1
-	@4:
-	lfs f29, 0x0(r24)
-	li r27, 0x0
-	lfs f0, float_neg1_80420e84(r2)
-	mr r28, r27
-	lfs f30, float_1000_80420e74(r2)
-	mr r26, r27
-	stfs f0, 0x0(r24)
-	@5:
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r28, 0x20
-	stwx r26, r3, r0
-	bl marioGetPtr
-	addi r27, r27, 0x1
-	lwz r3, 0x28c(r3)
-	addi r0, r28, 0x78
-	addi r28, r28, 0x4
-	cmpwi r27, 0xa
-	stfsx f30, r3, r0
-	blt @5
-	bl kpaGetLevel
-	lwz r0, 0x0(r30)
-	slwi r4, r3, 2
-	la r3, kpaHeadChkOfs(r13)
-	lwzx r26, r3, r4
-	rlwinm. r0, r0, 0, 15, 15
-	lwz r27, 0x0(r26)
-	addi r26, r26, 0x4
-	bne @6
-	bl kpaGetLevel
-	cmpwi r3, 0x2
-	beq @7
-	bge @8
-	cmpwi r3, 0x0
-	beq @9
-	bge @10
-	b @11
-	@8:
-	cmpwi r3, 0x4
-	bge @11
-	b @12
-	@9:
-	lfs f29, float_2_80420e88(r2)
-	b @11
-	@10:
-	lfs f29, float_0_80420e80(r2)
-	b @11
-	@7:
-	lfs f29, float_0_80420e80(r2)
-	b @11
-	@12:
-	lfs f29, float_35_80420e8c(r2)
-	b @11
-	@6:
-	bl kpaGetLevel
-	cmpwi r3, 0x0
-	beq @13
-	b @14
-	@13:
-	lhz r0, 0x2e(r30)
-	cmplwi r0, 0x25
-	bne @15
-	lfs f29, float_10_80420e90(r2)
-	b @11
-	@15:
-	fmr f29, f28
-	b @11
-	@14:
-	fmr f29, f28
-	@11:
-	lfs f1, float_3p1416_80420e78(r2)
-	lis r3, double_to_int_802fe368@ha
-	lfs f0, float_180_80420e7c(r2)
-	li r28, 0x0
-	fmuls f1, f1, f31
-	lfd f31, double_to_int_802fe368@l(r3)
-	li r29, 0x0
-	lis r31, 0x4330
-	fdivs f30, f1, f0
-	b @16
-	@17:
-	fmr f1, f30
-	bl sin
-	lwz r0, 0x0(r26)
-	frsp f2, f1
-	stw r31, 0x28(r1)
-	fmr f1, f30
-	xoris r0, r0, 0x8000
-	stw r0, 0x2c(r1)
-	lfd f0, 0x28(r1)
-	fsubs f0, f0, f31
-	fmuls f28, f0, f2
-	bl cos
-	lwz r3, 0x0(r26)
-	frsp f0, f1
-	lwz r0, 0x4(r26)
-	xoris r3, r3, 0x8000
-	lwz r4, 0x8(r26)
-	stw r3, 0x34(r1)
-	xoris r0, r0, 0x8000
-	fneg f1, f0
-	cmpwi r4, 0x0
-	stw r31, 0x30(r1)
-	addi r26, r26, 0xc
-	lfd f0, 0x30(r1)
-	stw r0, 0x3c(r1)
-	fsubs f2, f0, f31
-	stw r31, 0x38(r1)
-	lfd f0, 0x38(r1)
-	fmuls f5, f2, f1
-	fsubs f3, f0, f31
-	bne @18
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 15, 15
-	beq @19
-	@18:
-	lfs f1, 0x8c(r30)
-	addi r4, r1, 0x20
-	lfs f2, 0x90(r30)
-	addi r5, r1, 0x1c
-	fadds f1, f1, f28
-	lfs f0, 0x94(r30)
-	fadds f28, f2, f3
-	lfs f4, float_0_80420e80(r2)
-	fadds f3, f0, f5
-	stfs f29, 0x8(r1)
-	fmr f2, f28
-	lfs f5, float_1_80420e94(r2)
-	fmr f6, f4
-	addi r6, r1, 0x18
-	addi r7, r1, 0x8
-	addi r8, r1, 0x14
-	addi r9, r1, 0x10
-	addi r10, r1, 0xc
-	li r3, 0x0
-	bl hitCheckFilter
-	mr. r22, r3
-	beq @19
-	lfs f3, float_100_80420e98(r2)
-	lis r0, 0x4330
-	lfs f2, 0x1c(r1)
-	lis r3, double_to_int_802fe368@ha
-	lfs f1, float_0p5_80420e70(r2)
-	fadds f0, f28, f29
-	stw r0, 0x30(r1)
-	fmadds f1, f3, f2, f1
-	lfd f2, double_to_int_802fe368@l(r3)
-	fctiwz f1, f1
-	stfd f1, 0x38(r1)
-	lwz r0, 0x3c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x34(r1)
-	lfd f1, 0x30(r1)
-	fsubs f1, f1, f2
-	fdivs f1, f1, f3
-	fcmpo cr0, f0, f1
-	stfs f1, 0x1c(r1)
-	cror eq, gt, eq
-	bne @20
-	stfs f1, 0x4(r23)
-	mr r25, r22
-	lfs f0, float_0_80420e80(r2)
-	stfs f0, 0x0(r24)
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r29, 0x20
-	stwx r22, r3, r0
-	b @19
-	@20:
-	lfs f0, 0x4(r23)
-	fsubs f0, f1, f0
-	fsubs f0, f0, f29
-	stfs f0, 0x0(r24)
-	@19:
-	addi r29, r29, 0x4
-	addi r28, r28, 0x1
-	@16:
-	cmpw r28, r27
-	blt @17
-	mr r3, r25
-	@2:
-	psq_l f31, 0xa8(r1), 0, 0
-	lfd f31, 0xa0(r1)
-	psq_l f30, 0x98(r1), 0, 0
-	lfd f30, 0x90(r1)
-	psq_l f29, 0x88(r1), 0, 0
-	lfd f29, 0x80(r1)
-	psq_l f28, 0x78(r1), 0, 0
-	lfd f28, 0x70(r1)
-	lmw r22, 0x48(r1)
-	lwz r0, 0xb4(r1)
-	mtlr r0
-	addi r1, r1, 0xb0
-	blr
-}
-
-HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng);
-#pragma force_active on
-__declspec(section ".data") static void* jumptable_803ADC44[] = {
-    (char*)kpaSearchGround + 0x258,
-    (char*)kpaSearchGround + 0x264,
-    (char*)kpaSearchGround + 0x2A4,
-    (char*)kpaSearchGround + 0x2E8,
-    (char*)kpaSearchGround + 0x318,
-    (char*)kpaSearchGround + 0x34C,
-    (char*)kpaSearchGround + 0x37C,
-};
-asm HitEntry* kpaSearchGround(f32 range, f32* outY, f32* outDepth, f32* outAng) {
-	nofralloc
-	stwu r1, -0x1b0(r1)
-	mflr r0
-	stw r0, 0x1b4(r1)
-	stfd f31, 0x1a0(r1)
-	psq_st f31, 0x1a8(r1), 0, 0
-	stfd f30, 0x190(r1)
-	psq_st f30, 0x198(r1), 0, 0
-	stfd f29, 0x180(r1)
-	psq_st f29, 0x188(r1), 0, 0
-	stfd f28, 0x170(r1)
-	psq_st f28, 0x178(r1), 0, 0
-	stfd f27, 0x160(r1)
-	psq_st f27, 0x168(r1), 0, 0
-	stfd f26, 0x150(r1)
-	psq_st f26, 0x158(r1), 0, 0
-	stfd f25, 0x140(r1)
-	psq_st f25, 0x148(r1), 0, 0
-	stfd f24, 0x130(r1)
-	psq_st f24, 0x138(r1), 0, 0
-	stfd f23, 0x120(r1)
-	psq_st f23, 0x128(r1), 0, 0
-	stfd f22, 0x110(r1)
-	psq_st f22, 0x118(r1), 0, 0
-	stfd f21, 0x100(r1)
-	psq_st f21, 0x108(r1), 0, 0
-	stfd f20, 0xf0(r1)
-	psq_st f20, 0xf8(r1), 0, 0
-	stfd f19, 0xe0(r1)
-	psq_st f19, 0xe8(r1), 0, 0
-	stfd f18, 0xd0(r1)
-	psq_st f18, 0xd8(r1), 0, 0
-	stfd f17, 0xc0(r1)
-	psq_st f17, 0xc8(r1), 0, 0
-	stfd f16, 0xb0(r1)
-	psq_st f16, 0xb8(r1), 0, 0
-	stfd f15, 0xa0(r1)
-	psq_st f15, 0xa8(r1), 0, 0
-	stfd f14, 0x90(r1)
-	psq_st f14, 0x98(r1), 0, 0
-	stmw r19, 0x5c(r1)
-	fmr f16, f1
-	lis r6, vec3_802fe320@ha
-	mr r20, r3
-	mr r21, r4
-	mr r22, r5
-	addi r28, r6, vec3_802fe320@l
-	bl marioGetPtr
-	lfs f0, float_0_80420e80(r2)
-	mr r29, r3
-	li r23, 0x0
-	stfs f0, 0x218(r3)
-	stfs f0, 0x21c(r3)
-	stfs f0, 0x220(r3)
-	stfs f0, 0x214(r3)
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 22, 22
-	beq @1
-	lfs f0, 0x90(r29)
-	li r3, 0x0
-	stfs f0, 0x0(r20)
-	b @2
-	@1:
-	lfs f0, float_0p01_80420e9c(r2)
-	fadds f16, f16, f0
-	bl kpaGetLevel
-	cmpwi r3, 0x0
-	bne @3
-	lfs f15, 0x1b8(r29)
-	b @4
-	@3:
-	lfs f1, float_0p25_80420ea0(r2)
-	lfs f0, 0x1b8(r29)
-	fmuls f15, f1, f0
-	@4:
-	lfs f0, 0x90(r29)
-	lfs f1, float_neg1_80420e84(r2)
-	stfs f0, 0x0(r20)
-	lfs f0, float_0_80420e80(r2)
-	stfs f1, 0x0(r21)
-	lfs f1, 0x180(r29)
-	fcmpu cr0, f1, f0
-	beq @5
-	lfs f14, 0x1a0(r29)
-	b @6
-	@5:
-	lfs f1, 0x1a8(r29)
-	bl toMovedir
-	fmr f14, f1
-	@6:
-	li r24, 0x0
-	lfs f22, 0x8c(r29)
-	lfs f21, 0x90(r29)
-	mr r19, r24
-	lfs f20, 0x94(r29)
-	li r26, 0x0
-	lfs f17, float_1000_80420e74(r2)
-	@7:
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r24, 0x4c
-	stwx r19, r3, r0
-	bl marioGetPtr
-	addi r26, r26, 0x1
-	lwz r3, 0x28c(r3)
-	addi r0, r24, 0xa4
-	addi r24, r24, 0x4
-	cmpwi r26, 0xa
-	stfsx f17, r3, r0
-	blt @7
-	bl kpaGetLevel
-	cmpwi r3, 0x3
-	beq @8
-	bge @9
-	cmpwi r3, 0x0
-	bge @10
-	b @9
-	@10:
-	lfd f1, 0x58(r28)
-	li r25, 0x3
-	lfs f0, 0x1b4(r29)
-	lfd f2, 0x50(r28)
-	fmul f0, f1, f0
-	fmul f23, f2, f0
-	frsp f23, f23
-	b @9
-	@8:
-	lfs f2, float_0p5_80420e70(r2)
-	li r25, 0x7
-	lfs f1, 0x1b4(r29)
-	lfs f0, float_3_80420ea8(r2)
-	fmuls f1, f2, f1
-	lfs f2, float_0p6_80420ea4(r2)
-	fdivs f0, f1, f0
-	fmuls f23, f2, f0
-	@9:
-	lfs f0, float_3p1416_80420e78(r2)
-	li r26, 0x0
-	lfs f2, float_2_80420e88(r2)
-	fadds f25, f15, f16
-	lfs f1, float_0p05_80420eac(r2)
-	fmuls f28, f0, f14
-	lfs f0, float_3_80420ea8(r2)
-	fadds f24, f21, f15
-	fmsubs f27, f2, f23, f1
-	fmsubs f26, f0, f23, f1
-	lfs f29, float_100_80420e98(r2)
-	lfs f19, float_0p5_80420e70(r2)
-	mr r19, r26
-	lfd f14, 0x48(r28)
-	mr r27, r26
-	lis r30, 0x4330
-	b @11
-	@12:
-	cmplwi r26, 0x6
-	bgt @13
-	lis r3, jumptable_803ADC44@ha
-	addi r3, r3, jumptable_803ADC44@l
-	lwzx r0, r3, r19
-	mtctr r0
-	bctr
-	@14:
-	lfs f31, float_0_80420e80(r2)
-	fmr f30, f31
-	b @13
-	@15:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	lfs f0, float_0p05_80420eac(r2)
-	frsp f2, f1
-	fmr f1, f15
-	fsubs f0, f23, f0
-	fmuls f31, f0, f2
-	bl cos
-	frsp f2, f1
-	lfs f0, float_0p05_80420eac(r2)
-	fsubs f1, f23, f0
-	fneg f0, f2
-	fmuls f30, f1, f0
-	b @13
-	@16:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	frsp f3, f1
-	lfs f0, float_0p05_80420eac(r2)
-	fmr f1, f15
-	fsubs f2, f23, f0
-	fneg f0, f3
-	fmuls f31, f2, f0
-	bl cos
-	frsp f2, f1
-	lfs f0, float_0p05_80420eac(r2)
-	fsubs f1, f23, f0
-	fneg f0, f2
-	fmuls f30, f1, f0
-	b @13
-	@17:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	frsp f0, f1
-	fmr f1, f15
-	fmuls f31, f27, f0
-	bl cos
-	frsp f0, f1
-	fneg f0, f0
-	fmuls f30, f27, f0
-	b @13
-	@18:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	frsp f0, f1
-	fmr f1, f15
-	fneg f0, f0
-	fmuls f31, f27, f0
-	bl cos
-	frsp f0, f1
-	fneg f0, f0
-	fmuls f30, f27, f0
-	b @13
-	@19:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	frsp f0, f1
-	fmr f1, f15
-	fmuls f31, f26, f0
-	bl cos
-	frsp f0, f1
-	fneg f0, f0
-	fmuls f30, f26, f0
-	b @13
-	@20:
-	lfs f0, float_180_80420e7c(r2)
-	fdivs f15, f28, f0
-	fmr f1, f15
-	bl sin
-	frsp f0, f1
-	fmr f1, f15
-	fneg f0, f0
-	fmuls f31, f26, f0
-	bl cos
-	frsp f0, f1
-	fneg f0, f0
-	fmuls f30, f26, f0
-	@13:
-	lfs f4, float_0_80420e80(r2)
-	fmr f2, f24
-	fadds f1, f22, f31
-	stfs f25, 0x1c(r1)
-	fmr f6, f4
-	lfs f5, float_neg1_80420e84(r2)
-	fadds f3, f20, f30
-	addi r4, r1, 0x28
-	addi r5, r1, 0x24
-	addi r6, r1, 0x20
-	addi r7, r1, 0x1c
-	addi r8, r1, 0x18
-	addi r9, r1, 0x14
-	addi r10, r1, 0x10
-	li r3, 0x0
-	bl hitCheckFilter
-	mr. r24, r3
-	beq @21
-	lfs f16, 0x10(r1)
-	lfs f17, 0x14(r1)
-	lfs f18, 0x18(r1)
-	bl marioGetPtr
-	lfs f0, float_100_80420e98(r2)
-	mr r31, r3
-	lfs f1, float_0_80420e80(r2)
-	fmuls f15, f0, f17
-	fmr f2, f1
-	fmuls f3, f0, f16
-	fmr f4, f15
-	bl angleABf
-	lfs f0, float_180_80420e7c(r2)
-	lis r0, 0x4330
-	stw r0, 0x38(r1)
-	fmr f4, f15
-	fsubs f3, f1, f0
-	lfs f2, float_0_80420e80(r2)
-	lfs f0, float_100_80420e98(r2)
-	lfd f5, 0x48(r28)
-	fmr f1, f2
-	fctiwz f6, f3
-	fmuls f3, f0, f18
-	stfd f6, 0x30(r1)
-	lwz r0, 0x34(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x3c(r1)
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f5
-	stfs f0, 0x218(r31)
-	stfs f2, 0x21c(r31)
-	bl angleABf
-	lfs f0, float_180_80420e7c(r2)
-	lis r0, 0x4330
-	fmuls f2, f16, f16
-	stw r0, 0x48(r1)
-	fsubs f4, f1, f0
-	lfd f1, 0x48(r28)
-	lfs f0, float_0_80420e80(r2)
-	fmadds f3, f18, f18, f2
-	fctiwz f2, f4
-	fcmpo cr0, f3, f0
-	stfd f2, 0x40(r1)
-	lwz r0, 0x44(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x4c(r1)
-	lfd f0, 0x48(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x220(r31)
-	ble @22
-	frsqrte f1, f3
-	lfd f4, 0x58(r28)
-	lfd f2, 0x60(r28)
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f1, f1, f0
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f1, f1, f0
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f0, f1, f0
-	fmul f3, f3, f0
-	frsp f3, f3
-	b @23
-	@22:
-	lfd f0, 0x68(r28)
-	fcmpo cr0, f3, f0
-	bge @24
-	lis r3, __float_nan@ha
-	lfs f3, __float_nan@l(r3)
-	b @23
-	@24:
-	stfs f3, 0xc(r1)
-	lis r0, 0x7f80
-	lwz r4, 0xc(r1)
-	rlwinm r3, r4, 0, 1, 8
-	cmpw r3, r0
-	beq @25
-	bge @26
-	cmpwi r3, 0x0
-	beq @27
-	b @26
-	@25:
-	clrlwi. r0, r4, 9
-	beq @28
-	li r0, 0x1
-	b @29
-	@28:
-	li r0, 0x2
-	b @29
-	@27:
-	clrlwi. r0, r4, 9
-	beq @30
-	li r0, 0x5
-	b @29
-	@30:
-	li r0, 0x3
-	b @29
-	@26:
-	li r0, 0x4
-	@29:
-	cmpwi r0, 0x1
-	bne @23
-	lis r3, __float_nan@ha
-	lfs f3, __float_nan@l(r3)
-	@23:
-	lfs f1, float_0_80420e80(r2)
-	fneg f4, f17
-	fmr f2, f1
-	bl angleABf
-	lfs f0, float_50_80420eb0(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @21
-	li r24, 0x0
-	@21:
-	lfs f0, 0x24(r1)
-	cmplwi r24, 0x0
-	stw r30, 0x40(r1)
-	fmadds f0, f29, f0, f19
-	fctiwz f0, f0
-	stfd f0, 0x48(r1)
-	lwz r0, 0x4c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x44(r1)
-	lfd f0, 0x40(r1)
-	fsubs f0, f0, f14
-	fdivs f0, f0, f29
-	stfs f0, 0x24(r1)
-	beq @31
-	lfs f18, 0x10(r1)
-	lfs f17, 0x14(r1)
-	lfs f16, 0x18(r1)
-	bl marioGetPtr
-	lfs f0, float_100_80420e98(r2)
-	mr r31, r3
-	lfs f1, float_0_80420e80(r2)
-	fmuls f15, f0, f17
-	fmr f2, f1
-	fmuls f3, f0, f18
-	fmr f4, f15
-	bl angleABf
-	lfs f0, float_180_80420e7c(r2)
-	lis r0, 0x4330
-	stw r0, 0x40(r1)
-	fmr f4, f15
-	fsubs f3, f1, f0
-	lfs f2, float_0_80420e80(r2)
-	lfs f0, float_100_80420e98(r2)
-	lfd f5, 0x48(r28)
-	fmr f1, f2
-	fctiwz f6, f3
-	fmuls f3, f0, f16
-	stfd f6, 0x48(r1)
-	lwz r0, 0x4c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x44(r1)
-	lfd f0, 0x40(r1)
-	fsubs f0, f0, f5
-	stfs f0, 0x218(r31)
-	stfs f2, 0x21c(r31)
-	bl angleABf
-	lfs f0, float_180_80420e7c(r2)
-	lis r0, 0x4330
-	fmuls f2, f18, f18
-	stw r0, 0x30(r1)
-	fsubs f4, f1, f0
-	lfd f1, 0x48(r28)
-	lfs f0, float_0_80420e80(r2)
-	fmadds f3, f16, f16, f2
-	fctiwz f2, f4
-	fcmpo cr0, f3, f0
-	stfd f2, 0x38(r1)
-	lwz r0, 0x3c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x34(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x220(r31)
-	ble @32
-	frsqrte f1, f3
-	lfd f4, 0x58(r28)
-	lfd f2, 0x60(r28)
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f1, f1, f0
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f1, f1, f0
-	fmul f0, f1, f1
-	fmul f1, f4, f1
-	fnmsub f0, f3, f0, f2
-	fmul f0, f1, f0
-	fmul f3, f3, f0
-	frsp f3, f3
-	b @33
-	@32:
-	lfd f0, 0x68(r28)
-	fcmpo cr0, f3, f0
-	bge @34
-	lis r3, __float_nan@ha
-	lfs f3, __float_nan@l(r3)
-	b @33
-	@34:
-	stfs f3, 0x8(r1)
-	lis r0, 0x7f80
-	lwz r4, 0x8(r1)
-	rlwinm r3, r4, 0, 1, 8
-	cmpw r3, r0
-	beq @35
-	bge @36
-	cmpwi r3, 0x0
-	beq @37
-	b @36
-	@35:
-	clrlwi. r0, r4, 9
-	beq @38
-	li r0, 0x1
-	b @39
-	@38:
-	li r0, 0x2
-	b @39
-	@37:
-	clrlwi. r0, r4, 9
-	beq @40
-	li r0, 0x5
-	b @39
-	@40:
-	li r0, 0x3
-	b @39
-	@36:
-	li r0, 0x4
-	@39:
-	cmpwi r0, 0x1
-	bne @33
-	lis r3, __float_nan@ha
-	lfs f3, __float_nan@l(r3)
-	@33:
-	lfs f1, float_0_80420e80(r2)
-	fneg f4, f17
-	fmr f2, f1
-	bl angleABf
-	stfs f1, 0x214(r29)
-	lfs f2, 0x24(r1)
-	fcmpo cr0, f2, f21
-	bge @41
-	fsubs f1, f2, f21
-	lfs f0, float_2_80420e88(r2)
-	fabs f1, f1
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @41
-	fsubs f0, f21, f2
-	fmr f1, f22
-	fmr f2, f20
-	stfs f0, 0x0(r21)
-	lfs f3, 0x28(r1)
-	lfs f4, 0x20(r1)
-	bl angleABf
-	stfs f1, 0x0(r22)
-	li r24, 0x0
-	b @31
-	@41:
-	lfs f0, 0x18(r1)
-	lfs f1, float_0_80420e80(r2)
-	fcmpu cr0, f0, f1
-	bne @42
-	lfs f0, 0x10(r1)
-	fcmpu cr0, f0, f1
-	bne @42
-	lfs f2, float_100_80420e98(r2)
-	lis r0, 0x4330
-	lfs f1, 0x24(r1)
-	lfs f0, float_0p5_80420e70(r2)
-	stw r0, 0x40(r1)
-	fmadds f0, f2, f1, f0
-	lfd f1, 0x48(r28)
-	fctiwz f0, f0
-	stfd f0, 0x48(r1)
-	lwz r0, 0x4c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x44(r1)
-	lfd f0, 0x40(r1)
-	fsubs f0, f0, f1
-	fdivs f0, f0, f2
-	stfs f0, 0x24(r1)
-	@42:
-	lfs f3, 0x24(r1)
-	fmr f1, f22
-	lfs f0, float_0_80420e80(r2)
-	fmr f2, f20
-	stfs f3, 0x0(r20)
-	stfs f0, 0x0(r21)
-	lfs f3, 0x28(r1)
-	lfs f4, 0x20(r1)
-	bl angleABf
-	stfs f1, 0x0(r22)
-	mr r23, r24
-	@31:
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r27, 0x4c
-	stwx r24, r3, r0
-	bl marioGetPtr
-	lwz r3, 0x28c(r3)
-	addi r0, r27, 0xa4
-	addi r19, r19, 0x4
-	addi r27, r27, 0x4
-	stfsx f31, r3, r0
-	addi r26, r26, 0x1
-	@11:
-	cmpw r26, r25
-	blt @12
-	mr r3, r23
-	@2:
-	psq_l f31, 0x1a8(r1), 0, 0
-	lfd f31, 0x1a0(r1)
-	psq_l f30, 0x198(r1), 0, 0
-	lfd f30, 0x190(r1)
-	psq_l f29, 0x188(r1), 0, 0
-	lfd f29, 0x180(r1)
-	psq_l f28, 0x178(r1), 0, 0
-	lfd f28, 0x170(r1)
-	psq_l f27, 0x168(r1), 0, 0
-	lfd f27, 0x160(r1)
-	psq_l f26, 0x158(r1), 0, 0
-	lfd f26, 0x150(r1)
-	psq_l f25, 0x148(r1), 0, 0
-	lfd f25, 0x140(r1)
-	psq_l f24, 0x138(r1), 0, 0
-	lfd f24, 0x130(r1)
-	psq_l f23, 0x128(r1), 0, 0
-	lfd f23, 0x120(r1)
-	psq_l f22, 0x118(r1), 0, 0
-	lfd f22, 0x110(r1)
-	psq_l f21, 0x108(r1), 0, 0
-	lfd f21, 0x100(r1)
-	psq_l f20, 0xf8(r1), 0, 0
-	lfd f20, 0xf0(r1)
-	psq_l f19, 0xe8(r1), 0, 0
-	lfd f19, 0xe0(r1)
-	psq_l f18, 0xd8(r1), 0, 0
-	lfd f18, 0xd0(r1)
-	psq_l f17, 0xc8(r1), 0, 0
-	lfd f17, 0xc0(r1)
-	psq_l f16, 0xb8(r1), 0, 0
-	lfd f16, 0xb0(r1)
-	psq_l f15, 0xa8(r1), 0, 0
-	lfd f15, 0xa0(r1)
-	psq_l f14, 0x98(r1), 0, 0
-	lfd f14, 0x90(r1)
-	lmw r19, 0x5c(r1)
-	lwz r0, 0x1b4(r1)
-	mtlr r0
-	addi r1, r1, 0x1b0
-	blr
-}
-
-asm s32 kpaEnemyHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stfd f29, 0x30(r1)
-	psq_st f29, 0x38(r1), 0, 0
-	stfd f28, 0x20(r1)
-	psq_st f28, 0x28(r1), 0, 0
-	stfd f27, 0x10(r1)
-	psq_st f27, 0x18(r1), 0, 0
-	stw r31, 0xc(r1)
-	fmr f27, f1
-	fmr f30, f2
-	fmr f31, f3
-	fmr f28, f4
-	fmr f29, f5
-	bl marioGetPtr
-	fmr f1, f27
-	mr r31, r3
-	fmr f2, f30
-	fmr f3, f31
-	fmr f4, f28
-	fmr f5, f29
-	bl kpaEnemyFireHitChk
-	cmpwi r3, 0x0
-	beq @1
-	li r3, 0x2
-	b @2
-	@1:
-	lfs f0, 0x1b8(r31)
-	lfs f5, float_0p5_80420e70(r2)
-	fadds f4, f0, f28
-	lfs f1, 0x90(r31)
-	lfs f3, 0x1b4(r31)
-	fmadds f0, f5, f0, f1
-	lfs f2, 0x8c(r31)
-	fadds f3, f3, f29
-	fsubs f2, f2, f27
-	fsubs f0, f0, f30
-	fmuls f4, f5, f4
-	fmuls f3, f5, f3
-	fnmsubs f0, f5, f28, f0
-	fabs f2, f2
-	fabs f0, f0
-	fcmpo cr0, f0, f4
-	cror eq, lt, eq
-	bne @3
-	fcmpo cr0, f2, f3
-	cror eq, lt, eq
-	bne @3
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 14, 14
-	beq @4
-	fcmpo cr0, f1, f30
-	ble @4
-	bl kpaGetLevel
-	cmpwi r3, 0x0
-	bne @5
-	bl kpaGetStageType
-	cmpwi r3, 0x1
-	beq @5
-	lha r0, 0x4c(r31)
-	cmpwi r0, 0x0
-	bne @5
-	lfs f0, float_50_80420eb0(r2)
-	fcmpo cr0, f31, f0
-	bge @5
-	li r3, 0x4
-	bl marioChgMot
-	@5:
-	li r3, 0x1
-	b @2
-	@4:
-	bl kpaMutekiCheck
-	cmpwi r3, 0x1
-	bne @6
-	li r3, 0x3
-	b @2
-	@6:
-	lha r0, 0x4c(r31)
-	cmpwi r0, 0x0
-	beq @7
-	li r3, 0x3
-	b @2
-	@7:
-	lha r0, 0x78(r31)
-	cmpwi r0, 0x0
-	bne @3
-	li r3, 0x4
-	b @2
-	@3:
-	li r3, 0x0
-	@2:
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	psq_l f29, 0x38(r1), 0, 0
-	lfd f29, 0x30(r1)
-	psq_l f28, 0x28(r1), 0, 0
-	lfd f28, 0x20(r1)
-	psq_l f27, 0x18(r1), 0, 0
-	lfd f27, 0x10(r1)
-	lwz r0, 0x64(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-// clang-format on
-#endif
 
 #ifdef NONMATCHING
 s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
@@ -2018,7 +1771,6 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     f32 r;
     f32 s;
     s32 i;
-
     efp = getKoopaFireEfp();
     camGetPtr(4);
     {
@@ -2064,182 +1816,40 @@ s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
     }
     return 0;
 }
-#else
-// FAKE: whole-function asm stopgap (asm-stopgap pipeline; target inlines kpaHalf)
-asm s32 kpaEnemyFireHitChk(f32 x, f32 y, f32 z, f32 h, f32 w) {
-    nofralloc
-    stwu r1, -0x170(r1)
-    mflr r0
-    stw r0, 0x174(r1)
-    stfd f31, 0x160(r1)
-    psq_st f31, 0x168(r1), 0, 0
-    stfd f30, 0x150(r1)
-    psq_st f30, 0x158(r1), 0, 0
-    stfd f29, 0x140(r1)
-    psq_st f29, 0x148(r1), 0, 0
-    stfd f28, 0x130(r1)
-    psq_st f28, 0x138(r1), 0, 0
-    stfd f27, 0x120(r1)
-    psq_st f27, 0x128(r1), 0, 0
-    stw r31, 0x11c(r1)
-    stw r30, 0x118(r1)
-    stw r29, 0x114(r1)
-    fmr f27, f1
-    fmr f28, f2
-    fmr f31, f3
-    fmr f29, f4
-    fmr f30, f5
-    bl getKoopaFireEfp
-    mr r31, r3
-    li r3, 0x4
-    bl camGetPtr
-    lis r3, vec3_802fe320@ha
-    lfs f0, float_0p5_80420e70(r2)
-    addi r5, r3, vec3_802fe320@l
-    cmplwi r31, 0x0
-    lwz r4, 0x0(r5)
-    fmadds f0, f0, f29, f28
-    lwz r3, 0x4(r5)
-    lwz r0, 0x8(r5)
-    stw r4, 0x14(r1)
-    stw r3, 0x18(r1)
-    stw r0, 0x1c(r1)
-    stfs f27, 0x14(r1)
-    stfs f0, 0x18(r1)
-    lwz r4, 0x14(r1)
-    stfs f31, 0x1c(r1)
-    lwz r3, 0x18(r1)
-    lwz r0, 0x1c(r1)
-    stw r4, 0x2c(r1)
-    stw r3, 0x30(r1)
-    stw r0, 0x34(r1)
-    bne L_80215E18
-    li r3, 0x0
-    b L_80215FAC
-L_80215E18:
-    lwz r30, 0xc(r31)
-    addi r3, r1, 0xa4
-    lfs f29, 0x40(r30)
-    lfs f1, 0x4(r30)
-    lfs f2, 0x8(r30)
-    lfs f3, 0xc(r30)
-    bl PSMTXTrans
-    li r3, 0x4
-    bl camGetPtr
-    lfs f2, 0x114(r3)
-    addi r3, r1, 0x74
-    lfs f1, 0x48(r30)
-    li r4, 0x79
-    lfs f0, float_deg2rad_80420eb4(r2)
-    fsubs f1, f1, f2
-    fmuls f1, f0, f1
-    bl PSMTXRotRad
-    lfs f1, 0x48(r30)
-    lfs f0, float_90_80420eb8(r2)
-    fcmpo cr0, f1, f0
-    ble L_80215E90
-    lfs f0, float_270_80420ebc(r2)
-    fcmpo cr0, f1, f0
-    bge L_80215E90
-    lfs f1, 0x40(r30)
-    addi r3, r1, 0xd4
-    fmr f2, f1
-    fneg f3, f1
-    bl PSMTXScale
-    b L_80215EA4
-L_80215E90:
-    lfs f1, 0x40(r30)
-    addi r3, r1, 0xd4
-    fmr f2, f1
-    fmr f3, f1
-    bl PSMTXScale
-L_80215EA4:
-    addi r3, r1, 0xa4
-    addi r4, r1, 0x74
-    mr r5, r3
-    bl PSMTXConcat
-    addi r3, r1, 0xa4
-    addi r4, r1, 0xd4
-    addi r5, r1, 0x44
-    bl PSMTXConcat
-    lfs f0, float_0p5_80420e70(r2)
-    li r29, 0x1
-    addi r30, r30, 0x50
-    fmuls f31, f0, f30
-    b L_80215F9C
-L_80215ED8:
-    lwz r0, 0x44(r30)
-    cmpwi r0, 0x0
-    bne L_80215F94
-    lfs f2, float_7_80420ec0(r2)
-    addi r3, r1, 0xa4
-    lfs f0, 0x40(r30)
-    lfs f1, 0x4(r30)
-    fmuls f30, f2, f0
-    lfs f2, 0x8(r30)
-    lfs f3, 0xc(r30)
-    bl PSMTXTrans
-    fmr f1, f30
-    addi r3, r1, 0xd4
-    fmr f2, f30
-    fmr f3, f30
-    bl PSMTXScale
-    addi r3, r1, 0xa4
-    addi r4, r1, 0xd4
-    mr r5, r3
-    bl PSMTXConcat
-    addi r4, r1, 0xa4
-    addi r3, r1, 0x44
-    mr r5, r4
-    bl PSMTXConcat
-    lis r4, vec3_802fe32c@ha
-    addi r3, r1, 0xa4
-    addi r8, r4, vec3_802fe32c@l
-    addi r4, r1, 0x8
-    lwz r7, 0x0(r8)
-    addi r5, r1, 0x38
-    lwz r6, 0x4(r8)
-    lwz r0, 0x8(r8)
-    stw r7, 0x8(r1)
-    stw r6, 0xc(r1)
-    stw r0, 0x10(r1)
-    bl PSMTXMultVec
-    addi r3, r1, 0x2c
-    addi r4, r1, 0x38
-    addi r5, r1, 0x20
-    bl PSVECSubtract
-    addi r3, r1, 0x20
-    bl PSVECMag
-    fmadds f0, f30, f29, f31
-    fcmpo cr0, f1, f0
-    bge L_80215F94
-    li r3, 0x1
-    b L_80215FAC
-L_80215F94:
-    addi r29, r29, 0x1
-    addi r30, r30, 0x50
-L_80215F9C:
-    lwz r0, 0x8(r31)
-    cmpw r29, r0
-    blt L_80215ED8
-    li r3, 0x0
-L_80215FAC:
-    psq_l f31, 0x168(r1), 0, 0
-    lfd f31, 0x160(r1)
-    psq_l f30, 0x158(r1), 0, 0
-    lfd f30, 0x150(r1)
-    psq_l f29, 0x148(r1), 0, 0
-    lfd f29, 0x140(r1)
-    psq_l f28, 0x138(r1), 0, 0
-    lfd f28, 0x130(r1)
-    psq_l f27, 0x128(r1), 0, 0
-    lfd f27, 0x120(r1)
-    lwz r31, 0x11c(r1)
-    lwz r30, 0x118(r1)
-    lwz r0, 0x174(r1)
-    lwz r29, 0x114(r1)
-    mtlr r0
-    addi r1, r1, 0x170
-    blr
-}
+#endif
+#ifndef NONMATCHING
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".rodata") const f32 vec3_802fe320[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fe32c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fe338[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const char str_802FE344[] = "MOBJ_HiddenHatenaBlock\0";
+__declspec(section ".rodata") const char str_802FE35C[] = "MOBJ_Block\0";
+__declspec(section ".rodata") const f64 double_to_int_802fe368 = 4503601774854144.0;
+__declspec(section ".rodata") const f64 double_0p6_802fe370 = 0.6000000238418579;
+__declspec(section ".rodata") const f64 double_0p5_802fe378 = 0.5;
+__declspec(section ".rodata") const f64 double_3_802fe380 = 3.0;
+__declspec(section ".rodata") const f64 double_0_802fe388 = 0.0;
+__declspec(section ".sdata2") const f32 float_0p5_80420e70 = 0.5f;
+__declspec(section ".sdata2") const f32 float_1000_80420e74 = 1000.0f;
+__declspec(section ".sdata2") const f32 float_3p1416_80420e78 = 3.1415927f;
+__declspec(section ".sdata2") const f32 float_180_80420e7c = 180.0f;
+__declspec(section ".sdata2") const f32 float_0_80420e80 = 0.0f;
+__declspec(section ".sdata2") const f32 float_neg1_80420e84 = -1.0f;
+__declspec(section ".sdata2") const f32 float_2_80420e88 = 2.0f;
+__declspec(section ".sdata2") const f32 float_35_80420e8c = 35.0f;
+__declspec(section ".sdata2") const f32 float_10_80420e90 = 10.0f;
+__declspec(section ".sdata2") const f32 float_1_80420e94 = 1.0f;
+__declspec(section ".sdata2") const f32 float_100_80420e98 = 100.0f;
+__declspec(section ".sdata2") const f32 float_0p01_80420e9c = 0.01f;
+__declspec(section ".sdata2") const f32 float_0p25_80420ea0 = 0.25f;
+__declspec(section ".sdata2") const f32 float_0p6_80420ea4 = 0.6f;
+__declspec(section ".sdata2") const f32 float_3_80420ea8 = 3.0f;
+__declspec(section ".sdata2") const f32 float_0p05_80420eac = 0.05f;
+__declspec(section ".sdata2") const f32 float_50_80420eb0 = 50.0f;
+__declspec(section ".sdata2") const f32 float_deg2rad_80420eb4 = 0.017453292f;
+__declspec(section ".sdata2") const f32 float_90_80420eb8 = 90.0f;
+__declspec(section ".sdata2") const f32 float_270_80420ebc = 270.0f;
+__declspec(section ".sdata2") const f32 float_7_80420ec0 = 7.0f;
+__declspec(section ".sdata2") const u32 gap_09_80420EC4_sdata2 = 0x00000000;
 #endif

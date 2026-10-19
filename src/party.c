@@ -22,6 +22,98 @@ extern const char str_802CCF40[];
 #include "system.h"
 #include "mario/mariost.h"
 #include <string.h>
+#ifndef NONMATCHING
+#include "mario/mario.h"
+#define EXT_LIT(sym, val) (sym)
+__declspec(section ".rodata") extern const f32 vec3_802ccd30[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccd3c[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccd48[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccd54[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccdcc[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccdd8[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccde4[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccdf0[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccdfc[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce08[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce14[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce20[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce2c[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce38[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce44[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce50[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce5c[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce68[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce74[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce80[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce8c[3];
+__declspec(section ".rodata") extern const f32 vec3_802cce98[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccea4[3];
+__declspec(section ".rodata") extern const f32 vec3_802cceb0[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccebc[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccec8[3];
+__declspec(section ".rodata") extern const f32 vec3_802cced4[3];
+__declspec(section ".rodata") extern const f32 vec3_802ccee0[3];
+__declspec(section ".rodata") extern const f64 double_to_int_mask_802ccef8;
+__declspec(section ".rodata") extern const f64 double_to_int_802ccf00;
+__declspec(section ".sdata2") extern const f32 float_neg6p8_8041b0d8;
+__declspec(section ".sdata2") extern const f32 float_6p8_8041b0dc;
+__declspec(section ".sdata2") extern const f32 float_1p2_8041b0e0;
+__declspec(section ".sdata2") extern const f32 float_2_8041b0e4;
+__declspec(section ".sdata2") extern const f32 float_1_8041b0e8;
+__declspec(section ".sdata2") extern const f32 float_neg1_8041b0ec;
+__declspec(section ".sdata2") extern const f32 float_90_8041b0f0;
+__declspec(section ".sdata2") extern const f32 float_270_8041b0f4;
+__declspec(section ".sdata2") extern const f32 float_deg2rad_8041b0f8;
+__declspec(section ".sdata2") extern const f32 float_180_8041b0fc;
+__declspec(section ".sdata2") extern const f32 float_0_8041b100;
+__declspec(section ".sdata2") extern const f32 float_3_8041b104;
+__declspec(section ".sdata2") extern const f32 float_3p5_8041b108;
+__declspec(section ".sdata2") extern const f32 float_4_8041b10c;
+__declspec(section ".sdata2") extern const f32 float_0p75_8041b110;
+__declspec(section ".sdata2") extern const f32 float_5000_8041b114;
+__declspec(section ".sdata2") extern const f32 float_10000_8041b118;
+__declspec(section ".sdata2") extern const f32 float_13p333_8041b11c;
+__declspec(section ".sdata2") extern const f32 float_1000_8041b120;
+__declspec(section ".sdata2") extern const f32 float_10_8041b124;
+__declspec(section ".sdata2") extern const f32 float_290_8041b128;
+__declspec(section ".sdata2") extern const f32 float_250_8041b12c;
+__declspec(section ".sdata2") extern const f32 float_190_8041b130;
+__declspec(section ".sdata2") extern const f32 float_350_8041b134;
+__declspec(section ".sdata2") extern const f32 float_170_8041b138;
+__declspec(section ".sdata2") extern const f32 float_0p125_8041b13c;
+__declspec(section ".sdata2") extern const f32 float_20_8041b140;
+__declspec(section ".sdata2") extern const f32 float_neg40_8041b144;
+__declspec(section ".sdata2") extern const f32 float_neg30_8041b148;
+__declspec(section ".sdata2") extern const f32 float_220_8041b14c;
+__declspec(section ".sdata2") extern const f32 float_210_8041b150;
+__declspec(section ".sdata2") extern const f32 float_15_8041b154;
+__declspec(section ".sdata2") extern const f32 float_neg100_8041b158;
+__declspec(section ".sdata2") extern const f32 float_240_8041b15c;
+__declspec(section ".sdata2") extern const f32 float_neg6_8041b160;
+__declspec(section ".sdata2") extern const f32 float_neg2000_8041b164;
+__declspec(section ".sdata2") extern const f32 float_200_8041b168;
+__declspec(section ".sdata2") extern const f32 float_1p6_8041b16c;
+__declspec(section ".sdata2") extern const f32 float_0p5_8041b170;
+__declspec(section ".sdata2") extern const f32 float_0p4_8041b174;
+__declspec(section ".sdata2") extern const f32 float_30_8041b178;
+__declspec(section ".sdata2") extern const f32 float_16_8041b17c;
+__declspec(section ".sdata2") extern const f32 float_neg1p6_8041b180;
+__declspec(section ".sdata2") extern const f32 float_0p0625_8041b184;
+__declspec(section ".sdata2") extern const f32 float_3p1416_8041b188;
+__declspec(section ".sdata2") extern const f32 float_12_8041b18c;
+__declspec(section ".sdata2") extern const f32 float_22_8041b190;
+__declspec(section ".sdata2") extern const f32 float_40_8041b194;
+__declspec(section ".sdata2") extern const f32 float_0p05_8041b198;
+__declspec(section ".sdata2") extern const f32 float_neg0p2_8041b19c;
+__declspec(section ".sdata2") extern const f32 float_neg4_8041b1a0;
+__declspec(section ".sdata2") extern const f32 float_1p5_8041b1a4;
+__declspec(section ".sdata2") extern const f32 float_neg3_8041b1a8;
+__declspec(section ".sdata2") extern const f32 float_neg1p5_8041b1ac;
+__declspec(section ".sdata2") extern const f32 float_26_8041b1b0;
+__declspec(section ".sdata2") extern const f32 float_neg26_8041b1b4;
+__declspec(section ".sdata2") extern const f32 float_50_8041b1b8;
+__declspec(section ".sdata2") extern const f32 float_18p5_8041b1bc;
+#endif
 
 //.data
 typedef void (*PartyFunc)(PartyEntry* party);
@@ -172,6 +264,9 @@ PartyEntry* partyGetPtr(s32 index) {
     return NULL;
 }
 #endif
+#ifndef NONMATCHING
+PartyEntry* partyGetPtr(s32 index);
+#endif
 
 #ifdef NONMATCHING
 PartyEntry* anotherPartyGetPtr(s32 index) {
@@ -181,11 +276,78 @@ PartyEntry* anotherPartyGetPtr(s32 index) {
     return *(partyPtrTbl + ((index + 1) & 1));
 }
 #endif
+#ifndef NONMATCHING
+PartyEntry* anotherPartyGetPtr(s32 index);
+#endif
 
 #ifdef NONMATCHING
 BOOL partyPaperOn(PartyEntry* party, const char* animGroup) {
     BOOL flag;
+#endif
+#ifndef NONMATCHING
+void PSMTX44MultVec(const Mtx44 m, const Vec* src, Vec* dst);
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXRotRad(Mtx m, char axis, f32 rad);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+CameraEntry* camGetPtr(CameraId cameraId);
+void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);
+s32 marioAnimeId(void);
+BOOL marioChkInScreen(s32 x, s32 y);
+void *memset(void *dest, int ch, size_t count);
+s32 psndSFXOn_3D(const char* name, Vec* position);
+f32 revise360(f32 angle);
+int strcmp(const char *s1, const char *s2);
+void L_partyForceSlitOff(PartyEntry* party);
+void L_partyVivianTailStart(PartyEntry* party);
+void L_partyVivianTailStop(PartyEntry* party);
+BOOL N_marioShipGetDir(void);
+BOOL N_vivianDisplayTailCheck(PartyEntry* party);
+void allPartyForceRideOn(void);
+void animPoseVivianMain(s32 poseId, Vec* pos);
+void chuchu_reinit(PartyEntry* party);
+double cos(double);
+void getRidePos(PartyEntry* party, Vec* pos);
+s32 hitGetAttr(struct HitEntry* hit);
+void marioGetScreenPos(Vec position, f32* x, f32* y, f32* z);
+BOOL marioWaitDamageReturnFall(void);
+BOOL marioWaitDamageTogeReturnFall(void);
+void partyClearFootmark(void);
+void partyClearJumpPara(PartyEntry* party);
+s32 partyDokanInit(PartyEntry* party);
+s32 partyDokanMain(PartyEntry* party);
+void partyForceWalk(PartyEntry* party);
+void partyGetAppearPos(PartyEntry* party, Vec* pos);
+s32 partyHelloMain(PartyEntry* party);
+struct HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
+void partyMakeDispDir(PartyEntry* party);
+void partyMove(PartyEntry* party);
+void partyMoveNoHosei(PartyEntry* party);
+void partyPreDisp(PartyEntry* party);
+void partyRideMain(PartyEntry* party);
+s32 partyRideYoshiMain(PartyEntry* party);
+f32 partyToMovedir(PartyEntry* party, f32 dir);
+void party_damage_return(PartyEntry* party);
+void party_kemuri(PartyEntry* party);
+s32 shadowEntryMode(s32 mode, f32 x, f32 y, f32 z, f32 size);
+void shadowFlagOn(s32 id, u32 flag);
+void shadowSetCamId(s32 id, s32 camId);
+double sin(double);
+f32 toMovedir(f32 a);
+f32 toMovedir2(f32 a, f32 b);
+f32 toMovedirSimple(f32 a);
+void unk_800c7c98(PartyEntry* party);
+void unk_8014c47c(void);
+s32 vivianGetStatus(void);
+void vivianShadow(PartyEntry* party);
+s32 yoshiGetStatus(void);
+extern void* jumptable_803127F0[];
+extern void* jumptable_80312774[];
+extern void* jumptable_80312720[];
+BOOL partyPaperOn(PartyEntry* party, const char* animGroup);
+#endif
 
+#ifdef NONMATCHING
     if (party->paperPoseId >= 0) {
         animPaperPoseRelease(party->paperPoseId);
         party->paperPoseId = -1;
@@ -205,6 +367,9 @@ BOOL partyPaperOn(PartyEntry* party, const char* animGroup) {
     return TRUE;
 }
 #endif
+#ifndef NONMATCHING
+void partyPaperOff(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 void partyPaperOff(PartyEntry* party) {
@@ -221,19 +386,19 @@ void partyPaperOff(PartyEntry* party) {
         }
     }
 }
-#endif
 
-#ifdef NONMATCHING
 void partyPaperLightOff(PartyEntry* party) {
     animPoseSetMaterialLightFlagOff(party->paperAnimGroup, 1);
 }
 #endif
+#ifndef NONMATCHING
+void partyPaperLightOff(PartyEntry* party);
+#endif
 
 
 
 
 
-#ifdef NONMATCHING
 static inline char* partyChgPoseId_inl(PartyEntry* party, s32 index) {
     BOOL v5;
     s32 poseIdx = index;
@@ -272,7 +437,6 @@ static inline char* partyChgPoseId_inl(PartyEntry* party, s32 index) {
     party->field_8 |= 0x2000u;
     return v6;
 }
-#endif
 
 #define PCPI2(party, index) \
     do { \
@@ -350,6 +514,9 @@ char* partyChgPoseId(PartyEntry* party, s32 index) {
     return v6;
 }
 #endif
+#ifndef NONMATCHING
+char* partyChgPoseId(PartyEntry* party, s32 index);
+#endif
 #define partyChgPoseId partyChgPoseId_inl
 
 
@@ -366,6 +533,9 @@ void partyChgPose(PartyEntry* party, char* pose) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyChgPose(PartyEntry* party, char* pose);
+#endif
 
 #ifdef NONMATCHING
 void partyChgPaper(PartyEntry* party, char* paper) {
@@ -377,6 +547,9 @@ void partyChgPaper(PartyEntry* party, char* paper) {
         }
     }
 }
+#endif
+#ifndef NONMATCHING
+void partyChgPaper(PartyEntry* party, char* paper);
 #endif
 
 #ifdef NONMATCHING
@@ -391,6 +564,9 @@ void partyCtrlOff(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyCtrlOff(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 void partyCtrlOn(PartyEntry* party) {
@@ -404,6 +580,9 @@ void partyCtrlOn(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyCtrlOn(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 void partyRun(PartyEntry* party) {
@@ -412,11 +591,17 @@ void partyRun(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyRun(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 void partyStop(PartyEntry* party) {
     partyChgRunMode(party, 0);
 }
+#endif
+#ifndef NONMATCHING
+void partyStop(PartyEntry* party);
 #endif
 
 #ifdef NONMATCHING
@@ -428,6 +613,9 @@ void partySetForceMove(PartyEntry* party, s16 a2, f32 a3, f32 a4) {
     partyChgMot(party, 1);
 }
 #endif
+#ifndef NONMATCHING
+void partySetForceMove(PartyEntry* party, s16 a2, f32 a3, f32 a4);
+#endif
 
 #ifdef NONMATCHING
 s32 partyEntryHello(s32 memberId) {
@@ -436,13 +624,21 @@ s32 partyEntryHello(s32 memberId) {
     return id;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyEntryHello(s32 memberId);
+#endif
 
 #ifdef NONMATCHING
 s32 partyEntry(s32 memberId) {
     PartyEntry* party;
     s32 id;
     MarioWork* player;
+#endif
+#ifndef NONMATCHING
+s32 partyEntry(s32 memberId);
+#endif
 
+#ifdef NONMATCHING
     id = partyEntryMain(memberId);
     party = partyGetPtr(id);
     party->scale = (Vec){1.0f, 1.0f, 1.0f};
@@ -457,6 +653,9 @@ s32 partyEntry(s32 memberId) {
     return id;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z);
+#endif
 
 #ifdef NONMATCHING
 s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
@@ -465,7 +664,12 @@ s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
     s32 id;
     BOOL lowHp;
     MarioWork* player;
+#endif
+#ifndef NONMATCHING
+BOOL partyGoodbye(s32 id);
+#endif
 
+#ifdef NONMATCHING
     id = partyEntryMain(memberId);
     party = partyGetPtr(id);
     party->scale = (Vec){1.0f, 1.0f, 1.0f};
@@ -500,17 +704,28 @@ s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
     return id;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyKill(s32 id);
+#endif
 
 #ifdef NONMATCHING
 BOOL partyGoodbye(s32 id) {
     BOOL ret = FALSE;
+#endif
+#ifndef NONMATCHING
+s32 partyKill2(s32 id);
+#endif
 
+#ifdef NONMATCHING
     if (id >= 0) {
         partyChgRunMode(partyGetPtr(id), 8);
         ret = TRUE;
     }
     return ret;
 }
+#endif
+#ifndef NONMATCHING
+s32 yoshiSetColor(void);
 #endif
 
 #ifdef NONMATCHING
@@ -539,9 +754,7 @@ s32 partyKill(s32 id) {
     __memFree(HEAP_DEFAULT, party);
     return 0;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 partyKill2(s32 id) {
     PartyEntry* party;
     MarioWork* player;
@@ -562,9 +775,7 @@ s32 partyKill2(s32 id) {
     __memFree(HEAP_DEFAULT, party);
     return 0;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 yoshiSetColor(void) {
     s32 color;
     s32 r = irand(1000);
@@ -587,9 +798,7 @@ s32 yoshiSetColor(void) {
     pouchSetPartyColor(PARTNER_YOSHI, color);
     return color;
 }
-#endif
 
-#ifdef NONMATCHING
 f32 partyGetHeight(PartyEntry* party) {
     if (party->currentMemberId == PARTY_MEMBER_YOSHI && (party->flags & 0x100)) {
         return 18.5f + party->height;
@@ -597,8 +806,10 @@ f32 partyGetHeight(PartyEntry* party) {
     return party->height;
 }
 #endif
+#ifndef NONMATCHING
+f32 partyGetHeight(PartyEntry* party);
+#endif
 
-#ifdef NONMATCHING
 static inline s32 partyGetFreeSlot(s32 start) {
     s32 i;
 
@@ -610,9 +821,7 @@ static inline s32 partyGetFreeSlot(s32 start) {
     }
     return -1;
 }
-#endif
 
-#ifdef NONMATCHING
 static inline void partyPoseEntry(PartyEntry* party) {
     char* animName;
 
@@ -633,9 +842,7 @@ static inline void partyPoseEntry(PartyEntry* party) {
     }
     party->paperAnimGroup = animPoseEntry(animName, 2);
 }
-#endif
 
-#ifdef NONMATCHING
 static inline void setAnimPoseMaterialFlag(PartyEntry* party) {
     MarioWork* player = party->playerPtr;
 
@@ -643,9 +850,7 @@ static inline void setAnimPoseMaterialFlag(PartyEntry* party) {
     animPoseSetMaterialLightFlagOn(party->paperAnimGroup,
                                    animPoseGetMaterialLightFlag(player->paperAnimGroupId[marioAnimeId()]));
 }
-#endif
 
-#ifdef NONMATCHING
 static inline s32 partyGetFreeSlot2(void) {
     if (partyPtrTbl[1] == NULL) {
         memset(partyPtrTbl[1] = __memAlloc(HEAP_DEFAULT, sizeof(PartyEntry)), 0, sizeof(PartyEntry));
@@ -653,7 +858,6 @@ static inline s32 partyGetFreeSlot2(void) {
     }
     return -1;
 }
-#endif
 
 
 #pragma force_active on
@@ -674,7 +878,12 @@ s32 partyEntryMain(s32 memberId) {
     MarioWork* player;
     s32 slot;
     PartyEntry* party;
+#endif
+#ifndef NONMATCHING
+s32 partyEntryMain(s32 memberId);
+#endif
 
+#ifdef NONMATCHING
     player = marioGetPtr();
     slot = partyGetFreeSlot(0);
     if (slot < 0) {
@@ -711,13 +920,21 @@ s32 partyEntryMain(s32 memberId) {
     return slot;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyEntry2(s32 memberId);
+#endif
 
 #ifdef NONMATCHING
 s32 partyEntry2(s32 memberId) {
     MarioWork* player;
     s32 slot;
     PartyEntry* party;
+#endif
+#ifndef NONMATCHING
+s32 partyEntry2Hello(s32 memberId);
+#endif
 
+#ifdef NONMATCHING
     player = marioGetPtr();
     slot = partyGetFreeSlot2();
     if (slot < 0) {
@@ -749,9 +966,7 @@ s32 partyEntry2(s32 memberId) {
     party->runMode = 0;
     return slot;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 partyEntry2Hello(s32 memberId) {
     MarioWork* player;
     s32 slot;
@@ -785,9 +1000,7 @@ s32 partyEntry2Hello(s32 memberId) {
     partyChgRunMode(party, 4);
     return slot;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z) {
     MarioWork* player;
     s32 slot;
@@ -827,6 +1040,9 @@ s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z) {
     return slot;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z);
+#endif
 
 #define PU8(p, o) (*(u8*)((u8*)(p) + (o)))
 #define PS8(p, o) (*(s8*)((u8*)(p) + (o)))
@@ -847,13 +1063,11 @@ s32 yoshiGetStatus(void);
 BOOL N_marioShipGetDir(void);
 void partyClearJumpPara(PartyEntry* party);
 void L_partyForceSlitOff(PartyEntry* party);
-#ifdef NONMATCHING
 static inline void partyShadowOn(PartyEntry* party) {
     if (party) {
         party->flags2 &= ~0x100000;
     }
 }
-#endif
 #define PU16(p, o) (*(u16*)((u8*)(p) + (o)))
 #define PF32(p, o) (*(f32*)((u8*)(p) + (o)))
 
@@ -861,6 +1075,9 @@ static inline void partyShadowOn(PartyEntry* party) {
 void partyInit(void) {
     memset(partyPtrTbl, 0, sizeof(partyPtrTbl));
 }
+#endif
+#ifndef NONMATCHING
+void partyInit(void);
 #endif
 
 
@@ -978,8 +1195,6 @@ void partyReInit(void) {
         unk_8014c47c();
     }
 }
-#endif
-#ifdef NONMATCHING
 void partyUsePost(PartyEntry* party) {
     PartyFunc func;
     if (party && party->runMode == 3) {
@@ -990,6 +1205,10 @@ void partyUsePost(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyReInit(void);
+void partyUsePost(PartyEntry* party);
+#endif
 
 
 static inline void partyChgRunM(PartyEntry* party);
@@ -998,7 +1217,12 @@ static inline void partyChgRunMo(PartyEntry* party);
 void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
     MarioWork* mario;
     PartyFunc func;
+#endif
+#ifndef NONMATCHING
+void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode);
+#endif
 
+#ifdef NONMATCHING
     switch (prev) {
     case 11:
         if (mode != 8) {
@@ -1044,9 +1268,12 @@ void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void partyChgRunMode(PartyEntry* party, s32 mode);
+#endif
 
-#pragma dont_inline on
 #ifdef NONMATCHING
+#pragma dont_inline on
 void partyChgRunMode(PartyEntry* party, s32 mode) {
     if (party->runMode != 9 && party->runMode != 3) {
         party->prevRunMode = party->runMode;
@@ -1055,11 +1282,9 @@ void partyChgRunMode(PartyEntry* party, s32 mode) {
     party->runMode = mode;
     party->field_8 |= 8;
 }
-#endif
 #pragma dont_inline reset
 
 #pragma dont_inline on
-#ifdef NONMATCHING
 void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
     if (party->runMode != 9 && party->runMode != 3) {
         party->prevRunMode = party->runMode;
@@ -1069,8 +1294,11 @@ void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
     party->field_8 &= ~8;
     party->field_38 = sub;
 }
-#endif
 #pragma dont_inline reset
+#endif
+#ifndef NONMATCHING
+void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub);
+#endif
 
 /* @@MID1@@ */
 #ifdef NONMATCHING
@@ -1117,9 +1345,11 @@ void unk_800ba2dc(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void unk_800ba2dc(PartyEntry* party);
+#endif
 
 
-#ifdef NONMATCHING
 static inline s32 partyCountActive(void) {
     s32 count = 0;
     s32 i;
@@ -1130,7 +1360,6 @@ static inline s32 partyCountActive(void) {
     }
     return count;
 }
-#endif
 #ifdef NONMATCHING
 void partyMain(void) {
     s32 i;
@@ -1147,6 +1376,9 @@ void partyMain(void) {
         }
     }
 }
+#endif
+#ifndef NONMATCHING
+void partyMain(void);
 #endif
 
 /* @@DRIVE@@ */
@@ -1295,8 +1527,6 @@ void driveParty(PartyEntry* party) {
     *(Vec*)((u8*)party + 0xAC) = (Vec){0.0f, 0.0f, 0.0f};
     partyPreDisp(party);
 }
-#endif
-#ifdef NONMATCHING
 static inline void partyHello_inl(PartyEntry* party) {
     MarioWork* mario;
 
@@ -1331,6 +1561,9 @@ static inline void partyHello_inl(PartyEntry* party) {
     partyHelloMain(party);
 }
 #endif
+#ifndef NONMATCHING
+void driveParty(PartyEntry* party);
+#endif
 
 
 
@@ -1348,12 +1581,18 @@ BOOL partyDoWork(void) {
     return TRUE;
 }
 #endif
+#ifndef NONMATCHING
+BOOL partyDoWork(void);
+#endif
 
 
 #ifdef NONMATCHING
 void partyHello(PartyEntry* party) {
     partyHello_inl(party);
 }
+#endif
+#ifndef NONMATCHING
+void partyHello(PartyEntry* party);
 #endif
 
 /* @@HELLO@@ */
@@ -1468,6 +1707,9 @@ s32 partyHelloMain(PartyEntry* party) {
     return ret;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyHelloMain(PartyEntry* party);
+#endif
 
 
 #ifdef NONMATCHING
@@ -1494,6 +1736,9 @@ s32 partyGoodbyeInit(PartyEntry* party) {
     }
     return 0;
 }
+#endif
+#ifndef NONMATCHING
+s32 partyGoodbyeInit(PartyEntry* party);
 #endif
 
 /* @@DOKAN@@ */
@@ -1571,6 +1816,10 @@ s32 partyGoodbyeMain(PartyEntry* party) {
     return 0;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyGoodbyeMain(PartyEntry* party);
+s32 partyGoodbyeMain(PartyEntry* party);
+#endif
 
 void L_partyVivianTailStop(PartyEntry* party);
 
@@ -1578,7 +1827,9 @@ void L_partyVivianTailStop(PartyEntry* party);
 static inline void partyPaperOn_inl(PartyEntry* party, const char* animGroup) {
     BOOL v4;
     BOOL v5;
+#endif
 
+#ifdef NONMATCHING
     if (party->paperPoseId >= 0) {
         animPaperPoseRelease(party->paperPoseId);
         party->paperPoseId = -1;
@@ -1597,13 +1848,14 @@ static inline void partyPaperOn_inl(PartyEntry* party, const char* animGroup) {
     animPoseSetPaperAnimGroup(party->paperAnimGroup, animGroup, v5);
 }
 #endif
+#ifndef NONMATCHING
+s32 partyDokanInit(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 static inline void partyChgRunM(PartyEntry* party) {
     party->scale = (Vec){1.0f, 1.0f, 1.0f};
 }
-#endif
-#ifdef NONMATCHING
 s32 partyDokanInit(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
 
@@ -1654,9 +1906,7 @@ s32 partyDokanInit(PartyEntry* party) {
     L_partyVivianTailStop(party);
     return 0;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 partyDokanMain(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
     s32 n;
@@ -1754,6 +2004,9 @@ s32 partyDokanMain(PartyEntry* party) {
     return 0;
 }
 #endif
+#ifndef NONMATCHING
+s32 partyDokanMain(PartyEntry* party);
+#endif
 
 
 #ifdef NONMATCHING
@@ -1772,6 +2025,9 @@ void partyDokanEnd(s32 id, s32 dir) {
         L_partyVivianTailStart(party);
     }
 }
+#endif
+#ifndef NONMATCHING
+void partyDokanEnd(s32 id, s32 dir);
 #endif
 
 
@@ -1792,6 +2048,9 @@ void allPartyRidePlane(void) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void allPartyRidePlane(void);
+#endif
 
 #ifdef NONMATCHING
 void allPartyRideShip(void) {
@@ -1807,6 +2066,9 @@ void allPartyRideShip(void) {
         partyChgRunMode(party, 11);
     }
 }
+#endif
+#ifndef NONMATCHING
+void allPartyRideShip(void);
 #endif
 
 
@@ -1858,10 +2120,13 @@ void getRidePos(PartyEntry* party, Vec* pos) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void getRidePos(PartyEntry* party, Vec* pos);
+#endif
 
 
-#pragma dont_inline on
 #ifdef NONMATCHING
+#pragma dont_inline on
 void allPartyForceRideOn(void) {
     PartyEntry* party = partyGetPtr(marioGetPartyId());
     if (party) {
@@ -1876,8 +2141,11 @@ void allPartyForceRideOn(void) {
         partyShadowOff(party);
     }
 }
-#endif
 #pragma dont_inline reset
+#endif
+#ifndef NONMATCHING
+void allPartyForceRideOn(void);
+#endif
 
 #ifdef NONMATCHING
 void L_allPartyRideOn(void) {
@@ -1890,6 +2158,9 @@ void L_allPartyRideOn(void) {
         partyChgRunMode(party, 11);
     }
 }
+#endif
+#ifndef NONMATCHING
+void L_allPartyRideOn(void);
 #endif
 
 #ifdef NONMATCHING
@@ -1904,6 +2175,9 @@ void allPartyRideOff(void) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void allPartyRideOff(void);
+#endif
 
 #ifdef NONMATCHING
 void allPartyRideOff2(void) {
@@ -1916,6 +2190,9 @@ void allPartyRideOff2(void) {
         party->field_38 = 101;
     }
 }
+#endif
+#ifndef NONMATCHING
+void allPartyRideOff2(void);
 #endif
 
 
@@ -1933,6 +2210,9 @@ s32 partyRideChk(PartyEntry* party) {
     }
     return ret;
 }
+#endif
+#ifndef NONMATCHING
+s32 partyRideChk(PartyEntry* party);
 #endif
 
 /* @@MID3@@ */
@@ -2332,12 +2612,13 @@ void partyRideMain(PartyEntry *party)
 
   party->field_B8 = party->position;
 }
-#endif
-#ifdef NONMATCHING
 static inline void partyChgRunMo(PartyEntry* party) {
     party->scale = (Vec){1.0f, 1.0f, 1.0f};
     *(Vec*)((u8*)party + 0x7C) = (Vec){0.0f, 0.0f, 0.0f};
 }
+#endif
+#ifndef NONMATCHING
+void partyRideMain(PartyEntry *party);
 #endif
 
 
@@ -2356,6 +2637,9 @@ void party_force_ride_yoshi(PartyEntry* party) {
     party->moveDir = toMovedir(party->displayDirectionTarget);
 }
 #endif
+#ifndef NONMATCHING
+void party_force_ride_yoshi(PartyEntry* party);
+#endif
 
 
 #ifdef NONMATCHING
@@ -2369,6 +2653,9 @@ void party_ride_yoshi_force_move(void) {
         party->moveDir = toMovedir(party->displayDirectionTarget);
     }
 }
+#endif
+#ifndef NONMATCHING
+void party_ride_yoshi_force_move(void);
 #endif
 
 void partyGetAppearPos(PartyEntry* party, Vec* pos);
@@ -2433,6 +2720,9 @@ s32 partyRideYoshiMain(PartyEntry* party) {
     }
     return 0;
 }
+#endif
+#ifndef NONMATCHING
+s32 partyRideYoshiMain(PartyEntry* party);
 #endif
 
 
@@ -2553,12 +2843,117 @@ void party_damage_return(PartyEntry* party) {
     }
 }
 #endif
+#ifndef NONMATCHING
+__declspec(section ".data") static void* jumptable_803126C0[] = {
+    (char*)party_damage_return + 0x8C,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0xA4,
+    (char*)party_damage_return + 0x17C,
+    (char*)party_damage_return + 0x1A4,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x508,
+    (char*)party_damage_return + 0x248,
+    (char*)party_damage_return + 0x2D0,
+    (char*)party_damage_return + 0x334,
+    (char*)party_damage_return + 0x4D8,
+};
+__declspec(section ".data") void* jumptable_80312720[] = {
+    (char*)partyGoodbyeMain + 0x78,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x110,
+    (char*)partyGoodbyeMain + 0x2F0,
+    (char*)partyGoodbyeMain + 0x3A4,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4CC,
+    (char*)partyGoodbyeMain + 0x4B8,
+};
+__declspec(section ".data") void* jumptable_80312774[] = {
+    (char*)partyHelloMain + 0x5C,
+    (char*)partyHelloMain + 0x18C,
+    (char*)partyHelloMain + 0x284,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x4A8,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x5C8,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6D0,
+    (char*)partyHelloMain + 0x6C8,
+};
+__declspec(section ".data") void* jumptable_803127F0[] = {
+    (char*)driveParty + 0xF8,
+    (char*)driveParty + 0x260,
+    (char*)driveParty + 0x280,
+    (char*)driveParty + 0x2E4,
+    (char*)driveParty + 0x334,
+    (char*)driveParty + 0x334,
+    (char*)driveParty + 0x334,
+    (char*)driveParty + 0x334,
+    (char*)driveParty + 0x4AC,
+    (char*)driveParty + 0x2C4,
+    (char*)driveParty + 0x4DC,
+    (char*)driveParty + 0x510,
+    (char*)driveParty + 0x560,
+    (char*)driveParty + 0x5A8,
+    (char*)driveParty + 0x5C8,
+};
+void party_damage_return(PartyEntry* party);
+#endif
 
 
 #ifdef NONMATCHING
 void partyInitCamId(PartyEntry* party) {
     party->camId = marioGetCamId();
 }
+#endif
+#ifndef NONMATCHING
+void partyInitCamId(PartyEntry* party);
 #endif
 
 /*
@@ -2776,6 +3171,9 @@ void partySetCamId(PartyEntry* party, s32 cameraId) {
     party->camId = cameraId;
 }
 #endif
+#ifndef NONMATCHING
+void partySetCamId(PartyEntry* party, s32 cameraId);
+#endif
 
 /* @@DISP@@ */
 #include "driver/camdrv.h"
@@ -2795,7 +3193,12 @@ void partyMakeDispDir(PartyEntry* party) {
     f32 tgt;
     f32 cur;
     f32 step;
+#endif
+#ifndef NONMATCHING
+void partyMakeDispDir(PartyEntry* party);
+#endif
 
+#ifdef NONMATCHING
     if (party->flags2 & 0x100) {
         return;
     }
@@ -2875,6 +3278,9 @@ void partyMakeDispDir(PartyEntry* party) {
         }
     }
 }
+#endif
+#ifndef NONMATCHING
+void partyPreDisp(PartyEntry* party);
 #endif
 
 #ifdef NONMATCHING
@@ -2961,9 +3367,7 @@ void partyPreDisp(PartyEntry* party) {
         }
     }
 }
-#endif
 
-#ifdef NONMATCHING
 void partyDisp(CameraId cam, void* param) {
     PartyEntry* party = param;
     Mtx m;
@@ -3040,16 +3444,25 @@ void partyDisp(CameraId cam, void* param) {
     animPoseSetLocalTimeRate(party->paperAnimGroup, (party->flags & 0x80) ? 0.75f : 1.0f);
 }
 #endif
+#ifndef NONMATCHING
+void partyDisp(CameraId cam, void* param);
+#endif
 
 
 #ifdef NONMATCHING
 void partyKeyOn(void) {
 }
 #endif
+#ifndef NONMATCHING
+void partyKeyOn(void);
+#endif
 
 #ifdef NONMATCHING
 void partyKeyOff(void) {
 }
+#endif
+#ifndef NONMATCHING
+void partyKeyOff(void);
 #endif
 
 #ifdef NONMATCHING
@@ -3067,6 +3480,9 @@ void L_partyClearCont(PartyEntry* party) {
     PU16(party, 0x154) = 0;
     PU16(party, 0x156) = 0;
 }
+#endif
+#ifndef NONMATCHING
+void L_partyClearCont(PartyEntry* party);
 #endif
 
 #ifdef NONMATCHING
@@ -3090,6 +3506,9 @@ void partyUpdateKeyData(PartyEntry* party) {
     PU16(party, 0x156) = gp->buttonUp[port];
 }
 #endif
+#ifndef NONMATCHING
+void partyUpdateKeyData(PartyEntry* party);
+#endif
 
 #ifdef NONMATCHING
 void partyShadowOff(PartyEntry* party) {
@@ -3097,6 +3516,9 @@ void partyShadowOff(PartyEntry* party) {
         party->flags2 |= 0x100000;
     }
 }
+#endif
+#ifndef NONMATCHING
+void partyShadowOff(PartyEntry* party);
 #endif
 
 /* @@FAMI@@ */
@@ -3143,6 +3565,9 @@ void partySetFamicomMode(PartyEntry* party, s32 mode) {
         partyChgPose(party, partyChgPoseId(party, 1));
     }
 }
+#endif
+#ifndef NONMATCHING
+void partySetFamicomMode(PartyEntry* party, s32 mode);
 #endif
 
 
@@ -3213,59 +3638,7104 @@ void partyPaperOff(PartyEntry* party);
 BOOL partyPaperOn(PartyEntry* party, const char* animGroup);
 PartyEntry* anotherPartyGetPtr(s32 index);
 PartyEntry* partyGetPtr(s32 index);
+
 #ifndef NONMATCHING
-// ASM-STOPGAP: partyGetPtr (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+static inline PartyEntry* partyGetPtr__af_inl(s32 index) {
+    if (index >= 0) {
+        return partyPtrTbl[index];
+    }
+    return NULL;
+}
+static inline void partyShadowOff__af_inl(PartyEntry* party) {
+    if (party) {
+        party->flags2 |= 0x100000;
+    }
+}
+static inline void partyChgPose__af_inl(PartyEntry* party, char* pose) {
+    if (!(party->flags2 & 2)) {
+        if (party->animName == NULL || strcmp(party->animName, pose)) {
+            if (!(party->flags2 & 0x8000)) {
+                party->animName = pose;
+                party->field_20 = 0;
+                party->field_8 |= 0x2000;
+            }
+        }
+    }
+}
+
+#define partyGetPtr partyGetPtr__af_inl
+void partyDokanEnd(s32 id, s32 dir) {
+    PartyEntry* party = partyGetPtr(id);
+    if (party && party->runMode == 10) {
+        party->field_38 = 100;
+        PU8(party, 0x2E) = dir;
+        party->flags2 &= ~0x8;
+        party->flags2 &= ~0x10;
+        party->flags2 &= ~0xC0;
+        party->flags &= ~0x4000000;
+        party->flags &= ~0x2000000;
+        partyShadowOn(party);
+        party->field_B8 = party->position;
+        L_partyVivianTailStart(party);
+    }
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+void allPartyRidePlane(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party) {
+        bomhei_use_cancel();
+        party->flags |= 0x10000;
+        partyChgRunMode(party, 11);
+    }
+    party = partyPtrTbl[1];
+    if (party) {
+        party->flags |= 0x10000;
+        partyChgRunMode(party, 11);
+    }
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+void allPartyRideShip(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party) {
+        bomhei_use_cancel();
+        party->flags |= 0x20000;
+        partyChgRunMode(party, 11);
+    }
+    party = partyPtrTbl[1];
+    if (party) {
+        party->flags |= 0x20000;
+        partyChgRunMode(party, 11);
+    }
+}
+
+#undef partyGetPtr
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void getRidePos(PartyEntry* party, Vec* pos) {
+	asm volatile {
+		opword 0x9421FFD0
+		opword 0x7C0802A6
+		opword 0x90010034
+		opword 0xDBE10020
+		opword 0xF3E10028
+		opword 0x93E1001C
+		opword 0x93C10018
+		opword 0x93A10014
+		opword 0x7C7F1B78
+		opword 0x7C9D2378
+		opword 0x83C30160
+		opword 0xA01E002E
+		opword 0x2800001A
+		opword 0x4082017C
+		opword 0xC03E01AC
+		bl toMovedir
+		lfs f2, float_3p1416_8041b188(r2)
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0xEC220072
+		opword 0xEFE10024
+		bl yoshiGetStatus
+		opword 0x2C030002
+		opword 0x41820050
+		opword 0xFC20F890
+		bl sin
+		opword 0xFC600818
+		lfs f2, float_10_8041b124(r2)
+		opword 0xC01E008C
+		opword 0xFC20F890
+		opword 0xEC0200FC
+		opword 0xD01D0000
+		bl cos
+		opword 0xFC600818
+		lfs f2, float_10_8041b124(r2)
+		opword 0xC01E0094
+		lfs f1, float_20_8041b140(r2)
+		opword 0xEC0200FC
+		opword 0xD01D0008
+		opword 0xC01E0090
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0x4800004C
+		opword 0xFC20F890
+		bl sin
+		opword 0xFC600818
+		lfs f2, float_20_8041b140(r2)
+		opword 0xC01E008C
+		opword 0xFC20F890
+		opword 0xEC0200FC
+		opword 0xD01D0000
+		bl cos
+		opword 0xFC600818
+		lfs f2, float_20_8041b140(r2)
+		opword 0xC01E0094
+		lfs f1, float_16_8041b17c(r2)
+		opword 0xEC0200FC
+		opword 0xD01D0008
+		opword 0xC01E0090
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0x881F002F
+		opword 0x7C000775
+		opword 0x41820164
+		bl marioGetPartyId
+		opword 0x2C030000
+		opword 0x41800014
+		opword 0x5460103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FE3002E
+		opword 0x48000008
+		opword 0x3BE00000
+		opword 0xC03E01AC
+		lfs f2, float_10_8041b124(r2)
+		bl toMovedir2
+		opword 0x3861000C
+		opword 0x38810008
+		bl sincosf
+		bl yoshiGetStatus
+		opword 0x2C030002
+		opword 0x4182003C
+		lfs f3, float_12_8041b18c(r2)
+		opword 0xC041000C
+		opword 0xC01F0058
+		lfs f1, float_20_8041b140(r2)
+		opword 0xEC0300BC
+		opword 0xD01D0000
+		opword 0xC0410008
+		opword 0xC01F0060
+		opword 0xEC0300BC
+		opword 0xD01D0008
+		opword 0xC01F005C
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0x480000E8
+		lfs f3, float_22_8041b190(r2)
+		opword 0xC041000C
+		opword 0xC01F0058
+		lfs f1, float_16_8041b17c(r2)
+		opword 0xEC0300BC
+		opword 0xD01D0000
+		opword 0xC0410008
+		opword 0xC01F0060
+		opword 0xEC0300BC
+		opword 0xD01D0008
+		opword 0xC01F005C
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0x480000B0
+		opword 0x28000018
+		opword 0x40820028
+		opword 0xC01E008C
+		lfs f1, float_40_8041b194(r2)
+		opword 0xD01D0000
+		opword 0xC01E0094
+		opword 0xD01D0008
+		opword 0xC01E0090
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0x48000084
+		opword 0x28000019
+		opword 0x4082005C
+		bl N_marioShipGetDir
+		opword 0x2C030000
+		opword 0x4182000C
+		lfs f1, float_0_8041b100(r2)
+		opword 0x48000008
+		lfs f1, float_180_8041b0fc(r2)
+		bl toMovedirSimple
+		opword 0x3861000C
+		opword 0x38810008
+		bl sincosf
+		lfs f2, float_22_8041b190(r2)
+		opword 0xC021000C
+		opword 0xC01E008C
+		opword 0xEC02007A
+		opword 0xD01D0000
+		opword 0xC0210008
+		opword 0xC01E0094
+		opword 0xEC02007A
+		opword 0xD01D0008
+		opword 0xC01E0090
+		opword 0xD01D0004
+		opword 0x48000024
+		opword 0xC01E008C
+		lfs f1, float_20_8041b140(r2)
+		opword 0xD01D0000
+		opword 0xC01E0094
+		opword 0xD01D0008
+		opword 0xC01E0090
+		opword 0xEC01002A
+		opword 0xD01D0004
+		opword 0xE3E10028
+		opword 0x80010034
+		opword 0xCBE10020
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x83A10014
+		opword 0x7C0803A6
+		opword 0x38210030
+	}
+}
+#pragma pop
+
+#define partyShadowOff partyShadowOff__af_inl
+#define partyGetPtr partyGetPtr__af_inl
+#pragma dont_inline on
+#pragma dont_inline on
+#pragma dont_inline on
+void allPartyForceRideOn(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party) {
+        N_partyForceChgRunMode(party, 11, 11);
+        party->flags2 |= 1;
+        partyShadowOff(party);
+    }
+    party = partyGetPtr(marioGetExtraPartyId());
+    if (party) {
+        N_partyForceChgRunMode(party, 11, 11);
+        party->flags2 |= 1;
+        partyShadowOff(party);
+    }
+}
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+
+#undef partyShadowOff
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+void L_allPartyRideOn(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party) {
+        partyChgRunMode(party, 11);
+    }
+    party = partyGetPtr(marioGetExtraPartyId());
+    if (party) {
+        partyChgRunMode(party, 11);
+    }
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+void allPartyRideOff(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party && party->runMode == 11) {
+        party->field_38 = 100;
+    }
+    party = partyGetPtr(marioGetExtraPartyId());
+    if (party && party->runMode == 11) {
+        party->field_38 = 100;
+    }
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+void allPartyRideOff2(void) {
+    PartyEntry* party = partyGetPtr(marioGetPartyId());
+    if (party && party->runMode == 11) {
+        party->field_38 = 101;
+    }
+    party = partyGetPtr(marioGetExtraPartyId());
+    if (party && party->runMode == 11) {
+        party->field_38 = 101;
+    }
+}
+
+#undef partyGetPtr
+
+s32 partyRideChk(PartyEntry* party) {
+    s32 ret = 0;
+    if (party == NULL) {
+        return 0;
+    }
+    if (party->runMode == 11) {
+        ret = 1;
+        if (party->field_38 >= 2) {
+            ret = 2;
+        }
+    }
+    return ret;
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void partyRideMain(PartyEntry *party) {
+	char _af_pad[64];
+	asm volatile {
+		opword 0x7C7D1B78
+		lis r4, vec3_802ccd30@ha
+		opword 0x88030038
+		addi r31, r4, vec3_802ccd30@l
+		opword 0x83C30160
+		opword 0x2C000015
+		opword 0x41820634
+		opword 0x40800048
+		opword 0x2C00000A
+		opword 0x41820468
+		opword 0x40800028
+		opword 0x2C000001
+		opword 0x41820240
+		opword 0x40800010
+		opword 0x2C000000
+		opword 0x40800064
+		opword 0x48000B00
+		opword 0x2C000003
+		opword 0x40800AF8
+		opword 0x480002FC
+		opword 0x2C000014
+		opword 0x408005D8
+		opword 0x2C00000C
+		opword 0x40800AE4
+		opword 0x4800045C
+		opword 0x2C00006E
+		opword 0x418207F0
+		opword 0x4080001C
+		opword 0x2C000064
+		opword 0x40800008
+		opword 0x48000AC8
+		opword 0x2C000066
+		opword 0x40800AC0
+		opword 0x48000660
+		opword 0x2C0000C8
+		opword 0x41820608
+		opword 0x40800AB0
+		opword 0x2C000070
+		opword 0x40800AA8
+		opword 0x480008A4
+		la r4, _af_pad+24
+		bl getRidePos
+		opword 0x80610020
+		opword 0x80010024
+		opword 0x907D0094
+		opword 0x901D0098
+		opword 0x80010028
+		opword 0x901D009C
+		opword 0xC03D0058
+		opword 0xC05D0060
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl distABf
+		opword 0xD03D0128
+		opword 0xC03D0058
+		opword 0xC05D0060
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl angleABf
+		opword 0xD03D0100
+		opword 0x3C004330
+		opword 0x3860001E
+		opword 0xC8BF01D0
+		opword 0x907D0024
+		lfs f1, float_0p4_8041b174(r2)
+		opword 0x807D0024
+		opword 0x90010030
+		opword 0x6C638000
+		opword 0xC07D0128
+		opword 0x90610034
+		lfs f4, float_0p5_8041b170(r2)
+		opword 0xC8010030
+		opword 0x90010040
+		opword 0xEC402828
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0x90010038
+		opword 0xEC431024
+		opword 0x90010048
+		opword 0xD05D0104
+		opword 0xC07D0098
+		opword 0xC05D005C
+		opword 0xD03D011C
+		opword 0xECC31028
+		opword 0x801D0024
+		opword 0xC05D011C
+		opword 0x6C008000
+		opword 0x90010044
+		opword 0xC8210040
+		opword 0x9001003C
+		opword 0xEC212828
+		opword 0xC8610038
+		opword 0x9001004C
+		opword 0xEC420072
+		opword 0xEC632828
+		opword 0xC8210048
+		opword 0xEC212828
+		opword 0xEC4300B2
+		opword 0xEC4430BA
+		opword 0xEC220824
+		opword 0xD03D0114
+		opword 0xD01D0124
+		opword 0x801D0004
+		opword 0x60000010
+		opword 0x901D0004
+		opword 0x801D0004
+		opword 0x540007BD
+		opword 0x408200BC
+		opword 0x881D0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820024
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r0, r3, partyPoseTbl@l
+		opword 0x7C830774
+		opword 0x1C63003C
+		opword 0x7C601A14
+		opword 0x83C30010
+		opword 0x48000048
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4182001C
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		addi r0, r3, partyDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x48000020
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r0, r3, yoshiDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x38000001
+		opword 0x981D0038
+		opword 0x480008D4
+		opword 0xC03D0114
+		opword 0x387D0058
+		opword 0xC01D011C
+		opword 0x389D0060
+		opword 0xEC010028
+		opword 0xD01D0114
+		opword 0xC03D005C
+		opword 0xC01D0114
+		opword 0xEC01002A
+		opword 0xD01D005C
+		opword 0xC03D0104
+		opword 0xC05D0100
+		bl movePos
+		opword 0xC03D010C
+		opword 0xC01D0124
+		opword 0xEC21002A
+		bl revise360
+		opword 0xD03D010C
+		lfs f1, float_2_8041b0e4(r2)
+		opword 0xC05D0124
+		lfs f0, float_30_8041b178(r2)
+		opword 0xEC22082A
+		opword 0xD03D0124
+		opword 0xC03D0124
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820008
+		opword 0xD01D0124
+		opword 0x807D0024
+		opword 0x3C004330
+		opword 0x90010048
+		opword 0x6C608000
+		opword 0xC85F01D0
+		opword 0x9001004C
+		lfs f0, float_10_8041b124(r2)
+		opword 0xC8210048
+		opword 0xEC211028
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xFC200090
+		lfs f0, float_10_8041b124(r2)
+		opword 0xEC010024
+		opword 0xD01D0070
+		opword 0xC01D0070
+		opword 0xD01D0074
+		opword 0xC01D0070
+		opword 0xD01D0078
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x40800808
+		opword 0x38000002
+		opword 0x981D0038
+		opword 0x480007FC
+		opword 0x801D0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		li r28, 0x0
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		lfs f0, float_0_8041b100(r2)
+		opword 0x281D0000
+		opword 0xD01D0114
+		opword 0xC01D0098
+		opword 0xD01D005C
+		opword 0x807F015C
+		opword 0x801F0160
+		opword 0x907D0070
+		opword 0x901D0074
+		opword 0x801F0164
+		opword 0x901D0078
+		opword 0x801D0004
+		opword 0x60000001
+		opword 0x901D0004
+		opword 0x41820010
+		opword 0x801D0004
+		opword 0x64000010
+		opword 0x901D0004
+		opword 0x3800000A
+		opword 0x981D0038
+		opword 0x480006B8
+		opword 0x807E008C
+		opword 0x801E0090
+		opword 0x907D0058
+		opword 0x901D005C
+		opword 0x801E0094
+		opword 0x901D0060
+		opword 0xC01E01AC
+		opword 0xD01D0110
+		opword 0xC03D0110
+		bl toMovedir
+		opword 0xD03D00FC
+		opword 0x48000688
+		opword 0x801D0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x801D0004
+		opword 0x281D0000
+		opword 0x60000001
+		opword 0x901D0004
+		opword 0x41820010
+		opword 0x801D0004
+		opword 0x64000010
+		opword 0x901D0004
+		opword 0x7FA3EB78
+		opword 0x38810020
+		bl getRidePos
+		opword 0x807F0168
+		opword 0x801F016C
+		lfs f0, float_0_8041b100(r2)
+		opword 0x907D0070
+		opword 0x901D0074
+		opword 0x801F0170
+		opword 0x901D0078
+		opword 0x80610020
+		opword 0x80010024
+		opword 0x907D0058
+		opword 0x901D005C
+		opword 0x80010028
+		opword 0x901D0060
+		opword 0xD01D0114
+		opword 0x807D0160
+		opword 0xC00301AC
+		opword 0xD01D0110
+		opword 0xC03D0110
+		bl toMovedir
+		opword 0xD03D00FC
+		opword 0x48000518
+		opword 0x38600015
+		opword 0x38000010
+		opword 0x987D0038
+		lfs f1, float_16_8041b17c(r2)
+		opword 0x901D0024
+		lfs f0, float_0p5_8041b170(r2)
+		opword 0xD03D0114
+		opword 0xD01D0174
+		opword 0xC03D005C
+		opword 0xC01D0114
+		opword 0xEC01002A
+		opword 0xD01D005C
+		opword 0xC03D0114
+		opword 0xC01D0174
+		opword 0xEC01002A
+		opword 0xD01D0114
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x418104C8
+		opword 0x38000016
+		opword 0x981D0038
+		opword 0x801D0000
+		opword 0x64000200
+		opword 0x901D0000
+		opword 0x480004B0
+		opword 0x801D0000
+		opword 0x281D0000
+		lfs f1, float_0_8041b100(r2)
+		opword 0x54000418
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0x901D0000
+		opword 0xD03D0080
+		opword 0xD01D0070
+		opword 0xC01D0070
+		opword 0xD01D0074
+		opword 0xC01D0070
+		opword 0xD01D0078
+		opword 0x41820010
+		opword 0x801D0004
+		opword 0x54000314
+		opword 0x901D0004
+		opword 0x7FA3EB78
+		opword 0x38800001
+		bl partyChgRunMode
+		opword 0x48000460
+		opword 0x801D0004
+		lfs f1, float_0p5_8041b170(r2)
+		opword 0x5400003C
+		opword 0x901D0004
+		opword 0xC3FE008C
+		opword 0xC05E0090
+		lfs f30, 0x94(r30)
+		opword 0xD3FD0058
+		opword 0xC01E01B8
+		opword 0xEC01103A
+		opword 0xD01D005C
+		opword 0xD3DD0060
+		opword 0x881D0038
+		opword 0x28000064
+		opword 0x40820010
+		opword 0x389D0094
+		bl partyGetAppearPos
+		opword 0x4800000C
+		opword 0x389D0094
+		bl partyGetAppearPos2
+		opword 0xC01E01AC
+		opword 0x38000010
+		opword 0xFC20F890
+		opword 0xD01D0110
+		opword 0xFC40F090
+		opword 0x901D0024
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl distABf
+		opword 0xD03D0128
+		opword 0xFC20F890
+		opword 0xFC40F090
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl angleABf
+		opword 0xD03D0100
+		opword 0x3C004330
+		opword 0xC89F01D0
+		opword 0x807D0024
+		opword 0x90010048
+		opword 0x6C638000
+		opword 0xC05D0128
+		opword 0x9061004C
+		lfs f3, float_0p5_8041b170(r2)
+		opword 0xC8010048
+		opword 0x90010040
+		opword 0xEC202028
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0xEC220824
+		opword 0xD03D0104
+		opword 0x801D0024
+		opword 0xC05D0098
+		opword 0x6C008000
+		opword 0xC03D005C
+		opword 0x90010044
+		opword 0xECA20828
+		opword 0xC8210040
+		opword 0xEC412028
+		opword 0xFC202A10
+		opword 0xEC4300B2
+		opword 0xFC010040
+		opword 0x4080000C
+		lfs f5, float_10_8041b124(r2)
+		opword 0x48000024
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC050040
+		opword 0x4C411382
+		opword 0x40820010
+		opword 0xC01D00F0
+		opword 0xECA3283A
+		opword 0x48000008
+		lfs f5, float_10_8041b124(r2)
+		opword 0xEC25282A
+		opword 0x281D0000
+		opword 0xEC0210B8
+		opword 0xEC010024
+		opword 0xEC2000B2
+		opword 0xFC000050
+		opword 0xD03D0114
+		opword 0xD01D0118
+		opword 0x801D0000
+		opword 0x60000010
+		opword 0x901D0000
+		opword 0x801D0004
+		opword 0x5400003C
+		opword 0x901D0004
+		opword 0x41820010
+		opword 0x801D0004
+		opword 0x54000314
+		opword 0x901D0004
+		opword 0x3800006E
+		opword 0x981D0038
+		opword 0x480002EC
+		bl partyMoveNoHosei
+		opword 0xC03D0114
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0x801D0000
+		lfs f0, float_neg1p6_8041b180(r2)
+		opword 0x54000734
+		opword 0x901D0000
+		opword 0xD01D0118
+		opword 0xC03D005C
+		lfs f0, float_neg2000_8041b164(r2)
+		opword 0xFC010040
+		opword 0x40800018
+		opword 0x38600000
+		opword 0x3800006F
+		opword 0x907D0024
+		opword 0x981D0038
+		opword 0x4800029C
+		opword 0x801D0138
+		opword 0x28000000
+		opword 0x40820088
+		opword 0x801D0024
+		opword 0x3CA04330
+		opword 0x809F0174
+		opword 0x20000010
+		opword 0x807F0178
+		opword 0x6C068000
+		opword 0x801F017C
+		opword 0x90C1004C
+		opword 0xC85F01D0
+		opword 0x90A10048
+		lfs f0, float_0p0625_8041b184(r2)
+		opword 0xC8210048
+		opword 0x90810014
+		opword 0xEC211028
+		opword 0x90610018
+		opword 0xEC010032
+		opword 0x9001001C
+		opword 0xD0010014
+		opword 0xD0010018
+		opword 0x80010014
+		opword 0xD001001C
+		opword 0x80610018
+		opword 0x901D0070
+		opword 0x8001001C
+		opword 0x907D0074
+		opword 0x901D0078
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x41810218
+		opword 0x38000000
+		opword 0x901D0024
+		opword 0x4800020C
+		opword 0x3800006F
+		opword 0x981D0038
+		opword 0x801D0024
+		opword 0x3CA04330
+		opword 0x809F0180
+		opword 0x20000010
+		opword 0x807F0184
+		opword 0x6C068000
+		opword 0x801F0188
+		opword 0x90C1004C
+		opword 0xC85F01D0
+		opword 0x90A10048
+		lfs f0, float_0p0625_8041b184(r2)
+		opword 0xC8210048
+		opword 0x90810008
+		opword 0xEC211028
+		opword 0x9061000C
+		opword 0xEC010032
+		opword 0x90010010
+		opword 0xD0010008
+		opword 0xD001000C
+		opword 0x80010008
+		opword 0xD0010010
+		opword 0x8061000C
+		opword 0x901D0070
+		opword 0x80010010
+		opword 0x907D0074
+		opword 0x901D0078
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x4181018C
+		opword 0x38000000
+		opword 0x901D0024
+		opword 0xC01E01AC
+		opword 0xD01D0110
+		opword 0xC01E01AC
+		opword 0xD01D010C
+		opword 0xC03D010C
+		bl toMovedirSimple
+		opword 0xD03D00FC
+		opword 0x7FA3EB78
+		opword 0xC01D00FC
+		opword 0xD01D0100
+		bl partyClearJumpPara
+		opword 0x801D0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x801D0004
+		opword 0x281D0000
+		lfs f1, float_0_8041b100(r2)
+		opword 0x54000734
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0x901D0004
+		opword 0x801D0000
+		opword 0x54000418
+		opword 0x901D0000
+		opword 0xD03D0080
+		opword 0xD01D0070
+		opword 0xC01D0070
+		opword 0xD01D0074
+		opword 0xC01D0070
+		opword 0xD01D0078
+		opword 0x801D0004
+		opword 0x5400003C
+		opword 0x901D0004
+		opword 0x41820010
+		opword 0x801D0004
+		opword 0x54000314
+		opword 0x901D0004
+		opword 0x7FA3EB78
+		opword 0x38800001
+		bl partyChgRunMode
+		opword 0x807D0058
+		opword 0x801D005C
+		opword 0x907D00B8
+		opword 0x901D00BC
+		opword 0x801D0060
+		opword 0x901D00C0
+	}
+}
+#pragma pop
+
+#define partyShadowOff partyShadowOff__af_inl
+void party_force_ride_yoshi(PartyEntry* party) {
+    Vec pos;
+
+    N_partyForceChgRunMode(party, 12, 10);
+    party->flags &= ~0x100;
+    getRidePos(party, &pos);
+    party->position = pos;
+    partyChgPoseId(party, 1);
+    party->velY = EXT_LIT(float_0_8041b100, 0.0f);
+    partyShadowOff(party);
+    party->displayDirectionTarget = party->playerPtr->displayDirectionTarget;
+    party->moveDir = toMovedir(party->displayDirectionTarget);
+}
+
+#undef partyShadowOff
+
+#define partyGetPtr partyGetPtr__af_inl
+void party_ride_yoshi_force_move(void) {
+    Vec pos;
+    PartyEntry* party = partyGetPtr(marioGetExtraPartyId());
+    if (party) {
+        getRidePos(party, &pos);
+        party->position = pos;
+        party->displayDirectionTarget = party->playerPtr->displayDirectionTarget;
+        party->moveDir = toMovedir(party->displayDirectionTarget);
+    }
+}
+
+#undef partyGetPtr
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 partyRideYoshiMain(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FFB0
+		opword 0x7C0802A6
+		opword 0x90010054
+		opword 0x93E1004C
+		opword 0x7C7F1B78
+		opword 0x93C10048
+		opword 0x93A10044
+		opword 0x88030038
+		opword 0x83A30160
+		opword 0x2C000002
+		opword 0x418202B8
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x41820018
+		opword 0x408001D4
+		opword 0x48000460
+		opword 0x2C00000A
+		opword 0x418203BC
+		opword 0x48000454
+		lfs f0, float_1p6_8041b16c(r2)
+		opword 0x38810014
+		opword 0xD01F011C
+		bl getRidePos
+		opword 0x80610014
+		opword 0x80010018
+		opword 0x907F0094
+		opword 0x901F0098
+		opword 0x8001001C
+		opword 0x901F009C
+		opword 0xC03F0058
+		opword 0xC05F0060
+		opword 0xC07F0094
+		opword 0xC09F009C
+		bl distABf
+		opword 0xD03F0128
+		opword 0xC03F0058
+		opword 0xC05F0060
+		opword 0xC07F0094
+		opword 0xC09F009C
+		bl angleABf
+		opword 0xD03F0100
+		opword 0x3C004330
+		opword 0x3880000F
+		lis r3, double_to_int_802ccf00@ha
+		opword 0x909F0024
+		lfd f6, double_to_int_802ccf00@l(r3)
+		opword 0x807F0024
+		opword 0x90010020
+		opword 0x6C638000
+		opword 0xC03F0128
+		opword 0x90610024
+		lfs f5, float_0p5_8041b170(r2)
+		opword 0xC8010020
+		opword 0x90010030
+		opword 0xEC003028
+		opword 0x90010028
+		opword 0xEC010024
+		opword 0x90010038
+		opword 0xD01F0104
+		opword 0x801F0024
+		opword 0xC03F0098
+		opword 0x6C008000
+		opword 0xC01F005C
+		opword 0x90010034
+		opword 0xEC210028
+		opword 0xC07F011C
+		opword 0xC8410030
+		opword 0x9001002C
+		opword 0xEC023028
+		opword 0xC8410028
+		opword 0x9001003C
+		opword 0xEC823028
+		opword 0xEC430032
+		opword 0xC8010038
+		opword 0xEC003028
+		opword 0xEC4400B2
+		opword 0xEC2508BA
+		opword 0xEC010024
+		opword 0xD01F0114
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x408200BC
+		opword 0x881F0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820024
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r0, r3, partyPoseTbl@l
+		opword 0x7C830774
+		opword 0x1C63003C
+		opword 0x7C601A14
+		opword 0x83C30010
+		opword 0x48000048
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4182001C
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		addi r0, r3, partyDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x48000020
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r0, r3, yoshiDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x38000001
+		opword 0x981F0038
+		opword 0x48000294
+		opword 0x38810014
+		bl getRidePos
+		opword 0x80610014
+		opword 0x80010018
+		opword 0x907F0094
+		opword 0x901F0098
+		opword 0x8001001C
+		opword 0x901F009C
+		opword 0xC03F0058
+		opword 0xC05F0060
+		opword 0xC07F0094
+		opword 0xC09F009C
+		bl distABf
+		opword 0xD03F0128
+		opword 0xC03F0058
+		opword 0xC05F0060
+		opword 0xC07F0094
+		opword 0xC09F009C
+		bl angleABf
+		opword 0xD03F0100
+		opword 0x3C004330
+		lis r4, double_to_int_802ccf00@ha
+		opword 0x387F0058
+		opword 0x80DF0024
+		addi r5, r4, double_to_int_802ccf00@l
+		opword 0x90010038
+		opword 0x389F0060
+		opword 0x6CC08000
+		opword 0xC8250000
+		opword 0x9001003C
+		opword 0xC05F0128
+		opword 0xC8010038
+		opword 0xEC000828
+		opword 0xEC020024
+		opword 0xD01F0104
+		opword 0xC03F0114
+		opword 0xC01F011C
+		opword 0xEC010028
+		opword 0xD01F0114
+		opword 0xC03F005C
+		opword 0xC01F0114
+		opword 0xEC01002A
+		opword 0xD01F005C
+		opword 0xC03F0104
+		opword 0xC05F0100
+		bl movePos
+		opword 0x807F0024
+		opword 0x3403FFFF
+		opword 0x901F0024
+		opword 0x418101CC
+		opword 0x38000002
+		opword 0x981F0038
+		opword 0x480001C0
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		lfs f0, float_0_8041b100(r2)
+		opword 0x281F0000
+		opword 0x3800000A
+		opword 0xD01F0114
+		opword 0xC01F0098
+		opword 0xD01F005C
+		opword 0x981F0038
+		opword 0x418200B0
+		opword 0x801F0004
+		opword 0x64000010
+		opword 0x901F0004
+		opword 0x480000A0
+		opword 0x38810014
+		bl getRidePos
+		opword 0x80610014
+		opword 0x80010018
+		opword 0x907F0058
+		opword 0x901F005C
+		opword 0x8001001C
+		opword 0x901F0060
+		opword 0xC01D01AC
+		opword 0xD01F0110
+		opword 0xC03F0110
+		bl toMovedir
+		opword 0xD03F00FC
+		opword 0xA01D002E
+		opword 0x2800001A
+		opword 0x41820060
+		opword 0x7FE3FB78
+		opword 0x38810008
+		bl partyGetAppearPos
+		opword 0xC0010008
+		opword 0x7FE3FB78
+		opword 0x38800002
+		opword 0xD01F0058
+		opword 0xC0010010
+		opword 0xD01F0060
+		bl partyChgRunMode
+		opword 0x281F0000
+		opword 0x41820010
+		opword 0x801F0004
+		opword 0x54000314
+		opword 0x901F0004
+		lis r3, vec3_802cced4@ha
+		addi r4, r3, vec3_802cced4@l
+		opword 0x80640000
+		opword 0x80040004
+		opword 0x907F007C
+		opword 0x901F0080
+		opword 0x80040008
+		opword 0x901F0084
+		opword 0x80010054
+		opword 0x38600000
+		opword 0x83E1004C
+		opword 0x83C10048
+		opword 0x83A10044
+		opword 0x7C0803A6
+		opword 0x38210050
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void party_damage_return(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FF90
+		opword 0x7C0802A6
+		opword 0x90010074
+		opword 0x93E1006C
+		opword 0x93C10068
+		opword 0x7C7E1B78
+		opword 0x93A10064
+		opword 0x80630008
+		opword 0x83FE0160
+		opword 0x54600739
+		opword 0x41820040
+		opword 0x54600776
+		opword 0x901E0008
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		opword 0x801E0008
+		opword 0x540001CF
+		opword 0x40820010
+		opword 0x3800000A
+		opword 0x981E0038
+		opword 0x48000014
+		opword 0x38600000
+		opword 0x38000064
+		opword 0x987E0038
+		opword 0x901E0024
+		opword 0x881E0038
+		opword 0x28000017
+		opword 0x41810498
+		lis r3, jumptable_803126C0@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_803126C0@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x807E0024
+		opword 0x3403FFFF
+		opword 0x901E0024
+		opword 0x41810470
+		opword 0x3800000A
+		opword 0x981E0038
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x408200BC
+		opword 0x881E0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820024
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r0, r3, partyPoseTbl@l
+		opword 0x7C830774
+		opword 0x1C63003C
+		opword 0x7C601A14
+		opword 0x83A30020
+		opword 0x48000048
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4182001C
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		addi r0, r3, partyDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83A30020
+		opword 0x48000020
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r0, r3, yoshiDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83A30020
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x386000C8
+		bl sysMsec2Frame
+		opword 0x907E0024
+		opword 0x3800000B
+		opword 0x981E0038
+		opword 0x807E0024
+		opword 0x3403FFFF
+		opword 0x901E0024
+		opword 0x41810380
+		lfs f1, float_15_8041b154(r2)
+		opword 0x3800000C
+		lfs f0, float_0_8041b100(r2)
+		opword 0xD03E0114
+		opword 0xD01E0118
+		opword 0x981E0038
+		opword 0xC03E005C
+		opword 0x38610044
+		opword 0xC01E0114
+		opword 0x3881001C
+		opword 0x38A10018
+		opword 0x38C10014
+		opword 0xEC01002A
+		opword 0xD01E005C
+		opword 0x80FE0058
+		opword 0x801E005C
+		opword 0x90E10044
+		opword 0x90010048
+		opword 0x801E0060
+		opword 0x9001004C
+		bl marioGetScreenPos
+		opword 0x80FF008C
+		opword 0x38610038
+		opword 0x801F0090
+		opword 0x38810010
+		opword 0x38A1000C
+		opword 0x38C10008
+		opword 0x90E10038
+		opword 0x9001003C
+		opword 0x801F0094
+		opword 0x90010040
+		bl marioGetScreenPos
+		opword 0xC021000C
+		lfs f0, float_neg100_8041b158(r2)
+		opword 0xFC010040
+		opword 0x40800008
+		opword 0x48000008
+		opword 0xFC200090
+		opword 0xC0010018
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x408202D8
+		opword 0x38600020
+		opword 0x38000014
+		opword 0x907E0024
+		opword 0x981E0038
+		opword 0x480002C4
+		opword 0x80FE0058
+		opword 0x3861002C
+		opword 0x801E005C
+		opword 0x3881001C
+		opword 0x38A10018
+		opword 0x38C10014
+		opword 0x90E1002C
+		opword 0x90010030
+		opword 0x801E0060
+		opword 0x90010034
+		bl marioGetScreenPos
+		opword 0xC0210018
+		lfs f0, float_neg100_8041b158(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xC03E005C
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0xEC01002A
+		opword 0xD01E005C
+		opword 0xA01F002E
+		opword 0x2800001F
+		opword 0x40820014
+		bl marioWaitDamageReturnFall
+		opword 0x2C030000
+		opword 0x4182025C
+		opword 0x48000018
+		opword 0x28000020
+		opword 0x40820010
+		bl marioWaitDamageTogeReturnFall
+		opword 0x2C030000
+		opword 0x41820244
+		opword 0x38000015
+		opword 0x981E0038
+		opword 0x807E0024
+		opword 0x3403FFFF
+		opword 0x901E0024
+		opword 0x4181022C
+		opword 0x7FC3F378
+		opword 0x38810050
+		bl partyGetAppearPos
+		opword 0xC0010050
+		opword 0x38000016
+		lfs f1, float_0_8041b100(r2)
+		opword 0xD01E0058
+		lfs f0, float_neg1_8041b0ec(r2)
+		opword 0xC0410058
+		opword 0xD05E0060
+		opword 0xD03E0114
+		opword 0xD01E0118
+		opword 0xD03E0104
+		opword 0x807E0000
+		opword 0x60630020
+		opword 0x907E0000
+		opword 0x807E0000
+		opword 0x64630200
+		opword 0x907E0000
+		opword 0x981E0038
+		opword 0x480001D8
+		opword 0x80FE0058
+		opword 0x38610020
+		opword 0x801E005C
+		opword 0x3881001C
+		opword 0x38A10018
+		opword 0x38C10014
+		opword 0x90E10020
+		opword 0x90010024
+		opword 0x801E0060
+		opword 0x90010028
+		bl marioGetScreenPos
+		opword 0xC0210018
+		lfs f0, float_240_8041b15c(r2)
+		opword 0xFC010040
+		opword 0x40810010
+		opword 0x801E0000
+		opword 0x540001CA
+		opword 0x901E0000
+		opword 0x7FC3F378
+		bl partyMove
+		opword 0xC01E0114
+		lfs f1, float_neg6_8041b160(r2)
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x40820010
+		lfs f0, float_0_8041b100(r2)
+		opword 0xD01E0118
+		opword 0xD03E0114
+		opword 0xC03E005C
+		lfs f0, float_neg2000_8041b164(r2)
+		opword 0xFC010040
+		opword 0x40800038
+		opword 0x807F008C
+		opword 0x801F0090
+		lfs f0, float_200_8041b168(r2)
+		opword 0x907E0058
+		opword 0x901E005C
+		opword 0x801F0094
+		opword 0x901E0060
+		opword 0xC03E005C
+		opword 0xEC01002A
+		opword 0xD01E005C
+		opword 0x801E0000
+		opword 0x54000730
+		opword 0x901E0000
+		opword 0x807E0138
+		opword 0x28030000
+		opword 0x41820118
+		bl hitGetAttr
+		opword 0x5460BFFF
+		opword 0x4082010C
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x408200BC
+		opword 0x881E0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820024
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r0, r3, partyPoseTbl@l
+		opword 0x7C830774
+		opword 0x1C63003C
+		opword 0x7C601A14
+		opword 0x83A30024
+		opword 0x48000048
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4182001C
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		addi r0, r3, partyDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83A30024
+		opword 0x48000020
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r0, r3, yoshiDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83A30024
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x38600017
+		opword 0x3800001E
+		opword 0x987E0038
+		opword 0x901E0024
+		opword 0x48000034
+		opword 0x807E0024
+		opword 0x3403FFFF
+		opword 0x901E0024
+		opword 0x41810024
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl partyChgRunMode
+		opword 0x38000000
+		opword 0x981E003B
+		opword 0x801E0004
+		opword 0x54000734
+		opword 0x901E0004
+		bl vivianGetStatus
+		opword 0x2C030002
+		opword 0x4182000C
+		opword 0x7FC3F378
+		bl vivianShadow
+		opword 0x80010074
+		opword 0x83E1006C
+		opword 0x83C10068
+		opword 0x83A10064
+		opword 0x7C0803A6
+		opword 0x38210070
+	}
+}
+#pragma pop
+
+void partyInitCamId(PartyEntry* party) {
+    party->camId = marioGetCamId();
+}
+
+void partySetCamId(PartyEntry* party, s32 cameraId) {
+    party->camId = cameraId;
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void partyMakeDispDir(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x90010014
+		opword 0x93E1000C
+		opword 0x7C7F1B78
+		opword 0x80630004
+		opword 0x546005EF
+		opword 0x40820310
+		opword 0x546006F7
+		opword 0x408200D4
+		opword 0xC03F00FC
+		opword 0xC01F00F8
+		opword 0xEC210028
+		bl revise360
+		opword 0x801F0004
+		opword 0xC07F0110
+		opword 0x540005EF
+		opword 0x40820030
+		lfs f0, float_290_8041b128(r2)
+		opword 0xFC001800
+		opword 0x41820010
+		lfs f0, float_250_8041b12c(r2)
+		opword 0xFC001800
+		opword 0x40820018
+		lfs f3, float_180_8041b0fc(r2)
+		opword 0xFC011840
+		opword 0x4C411382
+		opword 0x40820008
+		lfs f3, float_0_8041b100(r2)
+		opword 0xC01F0104
+		lfs f2, float_0_8041b100(r2)
+		opword 0xFC001000
+		opword 0x41820050
+		lfs f0, float_190_8041b130(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082001C
+		lfs f0, float_350_8041b134(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x4082000C
+		opword 0xFC601090
+		opword 0x48000028
+		lfs f0, float_10_8041b124(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820018
+		lfs f0, float_170_8041b138(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820008
+		lfs f3, float_180_8041b0fc(r2)
+		opword 0xD07F0110
+		opword 0x801F0004
+		opword 0x540006B5
+		opword 0x4182000C
+		opword 0xC01F0110
+		opword 0xD01F010C
+		opword 0xC03F010C
+		opword 0xC01F0110
+		opword 0xFC010000
+		opword 0x41820238
+		opword 0xC05F010C
+		lfs f1, float_180_8041b0fc(r2)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820114
+		lfs f0, float_0_8041b100(r2)
+		opword 0xC07F0110
+		opword 0xFC001800
+		opword 0x40820080
+		opword 0x801F0008
+		lfs f1, float_0p125_8041b13c(r2)
+		opword 0x540004E7
+		opword 0x4182000C
+		lfs f0, float_20_8041b140(r2)
+		opword 0x48000008
+		lfs f0, float_neg40_8041b144(r2)
+		opword 0xEC001028
+		opword 0xEC010032
+		opword 0xEC02002A
+		opword 0xD01F010C
+		opword 0x807F0008
+		opword 0x546004E7
+		opword 0x40820020
+		opword 0xC03F010C
+		lfs f0, float_neg30_8041b148(r2)
+		opword 0xFC010040
+		opword 0x408001CC
+		opword 0x60601000
+		opword 0x901F0008
+		opword 0x480001C0
+		opword 0xC03F010C
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x408201AC
+		opword 0xD01F010C
+		opword 0x801F0008
+		opword 0x54000524
+		opword 0x901F0008
+		opword 0x48000198
+		opword 0xFC011800
+		opword 0x40820190
+		opword 0x801F0008
+		lfs f1, float_0p125_8041b13c(r2)
+		opword 0x540004E7
+		opword 0x4182000C
+		lfs f0, float_170_8041b138(r2)
+		opword 0x48000008
+		lfs f0, float_220_8041b14c(r2)
+		opword 0xEC001028
+		opword 0xEC010032
+		opword 0xEC02002A
+		opword 0xD01F010C
+		opword 0x807F0008
+		opword 0x546004E7
+		opword 0x40820020
+		opword 0xC03F010C
+		lfs f0, float_210_8041b150(r2)
+		opword 0xFC010040
+		opword 0x40810148
+		opword 0x60601000
+		opword 0x901F0008
+		opword 0x4800013C
+		opword 0xC03F010C
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820128
+		opword 0xD01F010C
+		opword 0x801F0008
+		opword 0x54000524
+		opword 0x901F0008
+		opword 0x48000114
+		opword 0xFC020840
+		opword 0x4081010C
+		lfs f0, float_0_8041b100(r2)
+		opword 0xC07F0110
+		opword 0xFC001800
+		opword 0x40820080
+		opword 0x801F0008
+		lfs f1, float_0p125_8041b13c(r2)
+		opword 0x540004E7
+		opword 0x4182000C
+		lfs f0, float_20_8041b140(r2)
+		opword 0x48000008
+		lfs f0, float_neg40_8041b144(r2)
+		opword 0xEC001028
+		opword 0xEC010032
+		opword 0xEC02002A
+		opword 0xD01F010C
+		opword 0x807F0008
+		opword 0x546004E7
+		opword 0x40820020
+		opword 0xC03F010C
+		lfs f0, float_neg30_8041b148(r2)
+		opword 0xFC010040
+		opword 0x408000B4
+		opword 0x60601000
+		opword 0x901F0008
+		opword 0x480000A8
+		opword 0xC03F010C
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820094
+		opword 0xD01F010C
+		opword 0x801F0008
+		opword 0x54000524
+		opword 0x901F0008
+		opword 0x48000080
+		opword 0xFC011800
+		opword 0x40820078
+		opword 0x801F0008
+		lfs f1, float_0p125_8041b13c(r2)
+		opword 0x540004E7
+		opword 0x4182000C
+		lfs f0, float_170_8041b138(r2)
+		opword 0x48000008
+		lfs f0, float_220_8041b14c(r2)
+		opword 0xEC001028
+		opword 0xEC010032
+		opword 0xEC02002A
+		opword 0xD01F010C
+		opword 0x807F0008
+		opword 0x546004E7
+		opword 0x40820040
+		opword 0xC03F010C
+		lfs f0, float_210_8041b150(r2)
+		opword 0xFC010040
+		opword 0x40810010
+		opword 0x60601000
+		opword 0x901F0008
+		opword 0x48000024
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xD01F010C
+		opword 0x801F0008
+		opword 0x54000524
+		opword 0x901F0008
+		opword 0x80010014
+		opword 0x83E1000C
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void partyPreDisp(PartyEntry* party) {
+	char _af_pad[72];
+	asm volatile {
+		opword 0x80030004
+		mr r30, r3
+		opword 0x540006F7
+		opword 0x40820014
+		opword 0x801E0000
+		opword 0x540005AD
+		opword 0x40820008
+		bl partyMakeDispDir
+		opword 0x807E0008
+		opword 0x54600465
+		opword 0x4182007C
+		opword 0x546004A5
+		opword 0x4182000C
+		opword 0x546004E2
+		opword 0x901E0008
+		opword 0x807E0008
+		opword 0x54600463
+		opword 0x4182000C
+		opword 0x546004A0
+		opword 0x901E0008
+		opword 0x807E000C
+		opword 0x38A00001
+		opword 0x809E0018
+		bl animPoseSetAnim
+		opword 0x809E001C
+		opword 0x28040000
+		opword 0x41820010
+		opword 0x807E000C
+		opword 0x38A00001
+		bl animPoseSetPaperAnim
+		opword 0xA0BE0020
+		opword 0x3C004330
+		lis r3, double_to_int_mask_802ccef8@ha
+		stw r0, _af_pad+64(r1)
+		addi r4, r3, double_to_int_mask_802ccef8@l
+		opword 0x807E000C
+		opword 0x90A1004C
+		opword 0xC8240000
+		opword 0xC8010048
+		opword 0xEC200828
+		bl animPoseSetLocalTime
+		opword 0x807E000C
+		bl animPoseMain
+		opword 0x801E0004
+		opword 0x540007FF
+		opword 0x40820228
+		opword 0x809E0058
+		opword 0x38600004
+		opword 0x801E005C
+		opword 0x9081003C
+		opword 0x90010040
+		opword 0x801E0060
+		opword 0x90010044
+		bl camGetPtr
+		opword 0x3881003C
+		opword 0x3863015C
+		opword 0x7C852378
+		bl PSMTX44MultVec
+		lfs f2, float_5000_8041b114(r2)
+		opword 0xC0210044
+		lfs f0, float_0_8041b100(r2)
+		opword 0xEC22107A
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0xFC200090
+		opword 0x48000014
+		lfs f0, float_10000_8041b118(r2)
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xFC200090
+		lfs f0, float_neg1_8041b0ec(r2)
+		opword 0xA81E002A
+		opword 0xEC210032
+		opword 0x2C000000
+		opword 0x40810028
+		opword 0x540007BD
+		opword 0x40820038
+		lis r3, partyDisp@ha
+		opword 0x7FC6F378
+		addi r5, r3, partyDisp@l
+		opword 0x807E0164
+		opword 0x38800001
+		bl dispEntry
+		opword 0x4800001C
+		lis r3, partyDisp@ha
+		opword 0x7FC6F378
+		addi r5, r3, partyDisp@l
+		opword 0x807E0164
+		opword 0x38800001
+		bl dispEntry
+		opword 0x881E0031
+		opword 0x3BE00002
+		lfs f31, float_13p333_8041b11c(r2)
+		opword 0x2C000006
+		opword 0x41820020
+		opword 0x807E0058
+		opword 0x801E005C
+		opword 0x907E00B8
+		opword 0x901E00BC
+		opword 0x801E0060
+		opword 0x901E00C0
+		opword 0x48000058
+		opword 0x881E0034
+		opword 0x28000004
+		opword 0x41820018
+		opword 0x28000008
+		opword 0x40820028
+		opword 0x801E0000
+		opword 0x540005EF
+		opword 0x4082001C
+		opword 0x807E0058
+		opword 0x801E005C
+		opword 0x907E00B8
+		opword 0x901E00BC
+		opword 0x801E0060
+		opword 0x901E00C0
+		opword 0x807E0000
+		opword 0x546005EF
+		opword 0x41820014
+		opword 0x54600001
+		opword 0xC3FE0174
+		opword 0x41820008
+		opword 0x3BE00001
+		opword 0x7FC3F378
+		bl N_vivianDisplayTailCheck
+		opword 0x2C030000
+		opword 0x41820094
+		lfs f1, float_1000_8041b120(r2)
+		lis r3, vec3_802ccee0@ha
+		addi r11, r3, vec3_802ccee0@l
+		lfs f0, float_10_8041b124(r2)
+		opword 0xD0210008
+		opword 0x7FC3F378
+		opword 0x814B0000
+		opword 0x38810030
+		opword 0x819E0058
+		opword 0x38A10024
+		opword 0x801E005C
+		opword 0x38C10018
+		opword 0x812B0004
+		opword 0x38E1000C
+		opword 0x90010034
+		opword 0x39010008
+		opword 0x800B0008
+		opword 0xC0210034
+		opword 0x91810030
+		opword 0xEC01002A
+		opword 0x817E0060
+		opword 0x91610038
+		opword 0xD0010034
+		opword 0x91410024
+		opword 0x91210028
+		opword 0x9001002C
+		bl partyHitCheck
+		opword 0x28030000
+		opword 0x4182000C
+		opword 0xC001001C
+		opword 0x48000008
+		opword 0xC01E005C
+		opword 0xD01E00BC
+		opword 0x389E00B8
+		opword 0x807E000C
+		bl animPoseVivianMain
+		opword 0x801E0004
+		opword 0x540002D7
+		opword 0x40820048
+		opword 0xFC80F890
+		opword 0xC03E00B8
+		opword 0xC05E00BC
+		opword 0x7FE3FB78
+		opword 0xC07E00C0
+		bl shadowEntryMode
+		opword 0x809E0164
+		opword 0x7C7F1B78
+		opword 0x2C040004
+		opword 0x41820008
+		bl shadowSetCamId
+		opword 0x801E0004
+		opword 0x54000295
+		opword 0x41820010
+		opword 0x7FE3FB78
+		opword 0x38800004
+		bl shadowFlagOn
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void partyDisp(CameraId cam, void* param) {
+	asm volatile {
+		opword 0x9421FF60
+		opword 0x7C0802A6
+		la r5, partyPtrTbl(r13)
+		opword 0x38600000
+		opword 0x900100A4
+		opword 0x93E1009C
+		opword 0x7C9F2378
+		lwz r4, partyPtrTbl(r13)
+		opword 0x28040000
+		opword 0x41820024
+		opword 0x2C030000
+		opword 0x41800008
+		opword 0x48000008
+		opword 0x7C641B78
+		opword 0x80040000
+		opword 0x540007FF
+		opword 0x41820008
+		opword 0x38600001
+		opword 0x80850004
+		opword 0x38000001
+		opword 0x28040000
+		opword 0x41820024
+		opword 0x2C000000
+		opword 0x41800008
+		opword 0x48000008
+		opword 0x38800000
+		opword 0x80040000
+		opword 0x540007FF
+		opword 0x41820008
+		opword 0x38630001
+		opword 0x2C030000
+		opword 0x41820378
+		opword 0x801F0000
+		opword 0x540005AD
+		opword 0x41820014
+		lfs f1, float_neg6p8_8041b0d8(r2)
+		lfs f0, float_6p8_8041b0dc(r2)
+		opword 0xD03F0088
+		opword 0xD01F008C
+		opword 0x801F0000
+		opword 0x54000211
+		opword 0x4182000C
+		lfs f3, float_1p2_8041b0e0(r2)
+		opword 0x48000008
+		lfs f3, float_2_8041b0e4(r2)
+		opword 0xC03F0070
+		opword 0x38610068
+		opword 0xC05F0074
+		opword 0xC01F0078
+		opword 0xEC2100F2
+		opword 0xEC4200F2
+		opword 0xEC6000F2
+		bl PSMTXScale
+		opword 0x801F0004
+		opword 0x54000739
+		opword 0x4082006C
+		opword 0xC03F010C
+		bl revise360
+		opword 0xFC600890
+		lfs f0, float_90_8041b0f0(r2)
+		lfs f1, float_1_8041b0e8(r2)
+		opword 0x38610008
+		opword 0x38000000
+		opword 0xFC030040
+		opword 0xFC400890
+		opword 0x4C411382
+		opword 0x40820018
+		lfs f0, float_270_8041b0f4(r2)
+		opword 0xFC030040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0x38000001
+		opword 0x2C000000
+		opword 0x4182000C
+		lfs f3, float_neg1_8041b0ec(r2)
+		opword 0x48000008
+		lfs f3, float_1_8041b0e8(r2)
+		bl PSMTXScale
+		opword 0x38810068
+		opword 0x38610008
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0xC03F0088
+		opword 0x38610038
+		opword 0xC05F008C
+		opword 0xC01F0090
+		opword 0xFC200850
+		opword 0xFC401050
+		opword 0xFC600050
+		bl PSMTXTrans
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		lfs f1, float_deg2rad_8041b0f8(r2)
+		opword 0x38610038
+		opword 0xC01F006C
+		opword 0x3880007A
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		lfs f1, float_deg2rad_8041b0f8(r2)
+		opword 0x38610038
+		opword 0xC01F0064
+		opword 0x38800078
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0xC03F010C
+		opword 0xC01F00F8
+		opword 0xEC210028
+		bl revise360
+		lfs f0, float_deg2rad_8041b0f8(r2)
+		opword 0x38610038
+		opword 0x38800079
+		opword 0xEC200072
+		bl PSMTXRotRad
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x801F0004
+		opword 0x54000633
+		opword 0x418200A8
+		opword 0xC03F010C
+		bl revise360
+		lfs f0, float_90_8041b0f0(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820054
+		lfs f0, float_270_8041b0f4(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820044
+		opword 0x801F0004
+		opword 0x38610038
+		lfs f1, float_deg2rad_8041b0f8(r2)
+		opword 0x38800079
+		opword 0x54000673
+		opword 0x4182000C
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0x48000008
+		lfs f0, float_0_8041b100(r2)
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x48000040
+		opword 0x801F0004
+		opword 0x38610038
+		lfs f1, float_deg2rad_8041b0f8(r2)
+		opword 0x38800079
+		opword 0x54000673
+		opword 0x4182000C
+		lfs f0, float_0_8041b100(r2)
+		opword 0x48000008
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0xC03F0088
+		opword 0x38610038
+		opword 0xC05F008C
+		opword 0xC07F0090
+		bl PSMTXTrans
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x801F001C
+		lfs f5, float_0_8041b100(r2)
+		opword 0x28000000
+		opword 0x41820088
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4082000C
+		lfs f5, float_1_8041b0e8(r2)
+		opword 0x48000070
+		opword 0x2C000003
+		opword 0x4082000C
+		lfs f5, float_2_8041b0e4(r2)
+		opword 0x48000060
+		opword 0x2C000007
+		opword 0x4082000C
+		lfs f5, float_2_8041b0e4(r2)
+		opword 0x48000050
+		opword 0x2C000001
+		opword 0x4082000C
+		lfs f5, float_2_8041b0e4(r2)
+		opword 0x48000040
+		opword 0x2C00000B
+		opword 0x4082000C
+		lfs f5, float_3_8041b104(r2)
+		opword 0x48000030
+		opword 0x2C000008
+		opword 0x4082000C
+		lfs f5, float_3p5_8041b108(r2)
+		opword 0x48000020
+		opword 0x2C00000A
+		opword 0x4082000C
+		lfs f5, float_4_8041b10c(r2)
+		opword 0x48000010
+		opword 0x2C000009
+		opword 0x40820008
+		lfs f5, float_neg1_8041b0ec(r2)
+		opword 0xC03F005C
+		opword 0x38610038
+		opword 0xC01F0080
+		opword 0xC09F0058
+		opword 0xEC41002A
+		opword 0xC03F007C
+		opword 0xC07F0060
+		opword 0xC01F0084
+		opword 0xEC24082A
+		opword 0xEC45102A
+		opword 0xEC63002A
+		bl PSMTXTrans
+		opword 0x38810068
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x807F000C
+		opword 0x38810068
+		lfs f1, float_0_8041b100(r2)
+		opword 0x38A00002
+		lfs f2, float_1_8041b0e8(r2)
+		bl animPoseDrawMtx
+		opword 0x807F000C
+		opword 0x38810068
+		lfs f1, float_0_8041b100(r2)
+		opword 0x38A00001
+		lfs f2, float_1_8041b0e8(r2)
+		bl animPoseDrawMtx
+		opword 0x801F0000
+		opword 0x807F000C
+		opword 0x54000631
+		opword 0x4182000C
+		lfs f1, float_0p75_8041b110(r2)
+		opword 0x48000008
+		lfs f1, float_1_8041b0e8(r2)
+		bl animPoseSetLocalTimeRate
+		opword 0x800100A4
+		opword 0x83E1009C
+		opword 0x7C0803A6
+		opword 0x382100A0
+	}
+}
+#pragma pop
+
+void partyKeyOn(void) {
+}
+
+void partyKeyOff(void) {
+}
+
+void L_partyClearCont(PartyEntry* party) {
+    PS8(party, 0x158) = 0;
+    PS8(party, 0x159) = 0;
+    PS8(party, 0x15A) = 0;
+    PS8(party, 0x15B) = 0;
+    PS8(party, 0x15C) = 0;
+    PS8(party, 0x15D) = 0;
+    PS8(party, 0x15E) = 0;
+    PS8(party, 0x15F) = 0;
+    PU16(party, 0x150) = 0;
+    PU16(party, 0x152) = 0;
+    PU16(party, 0x154) = 0;
+    PU16(party, 0x156) = 0;
+}
+
+void partyUpdateKeyData(PartyEntry* party) {
+    s32 port = PS8(party, 0x30);
+    if (party->flags & 0x60000000) {
+        L_partyClearCont(party);
+        return;
+    }
+    PS8(party, 0x158) = gp->stickX[port];
+    PS8(party, 0x159) = -gp->stickY[port];
+    PS8(party, 0x15A) = gp->substickX[port];
+    PS8(party, 0x15B) = -gp->substickY[port];
+    PS8(party, 0x15C) = gp->triggerLeft[port];
+    PS8(party, 0x15D) = gp->triggerRight[port];
+    PS8(party, 0x15E) = 0;
+    PS8(party, 0x15F) = 0;
+    PU16(party, 0x150) = gp->button[port];
+    PU16(party, 0x152) = gp->buttonNew[port];
+    PU16(party, 0x154) = gp->buttonRepeat[port];
+    PU16(party, 0x156) = gp->buttonUp[port];
+}
+
+void partyShadowOff(PartyEntry* party) {
+    if (party) {
+        party->flags2 |= 0x100000;
+    }
+}
+
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void partySetFamicomMode(PartyEntry* party, s32 mode) {
+	asm {
+		cmpwi r4, 0x1
+		mr r31, r3
+	}
+	asm volatile {
+		opword 0x408201E4
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x408203AC
+		bl L_partyForceSlitOff
+		opword 0x801F0004
+		opword 0x60008000
+		opword 0x901F0004
+		opword 0x881F0031
+		opword 0x2C000004
+		opword 0x41820028
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820010
+		lwz r3, party_dp(r13)
+		opword 0x83C30000
+		opword 0x48000038
+		lis r3, str_802CCEEC@ha
+		addi r30, r3, str_802CCEEC@l
+		opword 0x4800002C
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x801F0004
+		opword 0x5464103A
+		la r3, yoshigroup(r13)
+		opword 0x54000421
+		opword 0x7FC3202E
+		opword 0x4182000C
+		lis r3, str_802CCEEC@ha
+		addi r30, r3, str_802CCEEC@l
+		opword 0x807F000C
+		opword 0x2C030000
+		opword 0x41800008
+		bl animPoseRelease
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl animPoseEntry
+		opword 0x907F000C
+		opword 0x3BC00001
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83DF0018
+		opword 0x480000E8
+		opword 0x881F0031
+		li r29, 0x0
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x4082021C
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820200
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x408201F4
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x480001D8
+		opword 0x807F0004
+		opword 0x54600421
+		opword 0x418201CC
+		opword 0x5460045E
+		opword 0x901F0004
+		opword 0x881F0031
+		opword 0x2C000004
+		opword 0x41820028
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820010
+		lwz r3, party_dp(r13)
+		opword 0x83C30000
+		opword 0x48000038
+		lis r3, str_802CCEEC@ha
+		addi r30, r3, str_802CCEEC@l
+		opword 0x4800002C
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x801F0004
+		opword 0x5464103A
+		la r3, yoshigroup(r13)
+		opword 0x54000421
+		opword 0x7FC3202E
+		opword 0x4182000C
+		lis r3, str_802CCEEC@ha
+		addi r30, r3, str_802CCEEC@l
+		opword 0x807F000C
+		opword 0x2C030000
+		opword 0x41800008
+		bl animPoseRelease
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl animPoseEntry
+		opword 0x907F000C
+		opword 0x3BC00001
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83DF0018
+		opword 0x480000E8
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+	}
+}
+#pragma pop
+
+#pragma defer_codegen reset
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+asm s32 partyDokanMain(PartyEntry* party) {
+	nofralloc
+	stwu r1, -0x10(r1)
+	mflr r0
+	stw r0, 0x14(r1)
+	stw r31, 0xc(r1)
+	stw r30, 0x8(r1)
+	mr r30, r3
+	lis r3, vec3_802ccd30@ha
+	lbz r0, 0x38(r30)
+	addi r31, r3, vec3_802ccd30@l
+	lwz r4, 0x160(r30)
+	cmpwi r0, 0x64
+	beq L_af_1
+	bge L_af_2
+	cmpwi r0, 0xa
+	beq L_af_3
+	bge L_af_4
+	cmpwi r0, 0x0
+	beq L_af_5
+	b L_af_4
+L_af_2:
+	cmpwi r0, 0x66
+	beq L_af_6
+	bge L_af_4
+	b L_af_7
+L_af_5:
+	lwz r3, 0x8c(r4)
+	lwz r0, 0x90(r4)
+	stw r3, 0x58(r30)
+	stw r0, 0x5c(r30)
+	lwz r0, 0x94(r4)
+	stw r0, 0x60(r30)
+	lfs f1, 0x10c(r30)
+	lfs f0, 0x124(r30)
+	fadds f1, f1, f0
+	bl revise360
+	stfs f1, 0x10c(r30)
+	lfs f1, float_0p05_8041b198(r2)
+	lfs f2, 0x70(r30)
+	lfs f0, float_1_8041b0e8(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x70(r30)
+	lfs f1, 0x70(r30)
+	fcmpo cr0, f1, f0
+	cror eq, gt, eq
+	bne L_af_8
+	stfs f0, 0x70(r30)
+L_af_8:
+	lfs f0, 0x70(r30)
+	stfs f0, 0x74(r30)
+	lfs f0, 0x70(r30)
+	stfs f0, 0x78(r30)
+	b L_af_4
+L_af_3:
+	lfs f1, 0x64(r30)
+	lfs f0, 0x124(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x64(r30)
+	b L_af_4
+L_af_1:
+	lbz r0, 0x2e(r30)
+	extsb r0, r0
+	cmpwi r0, 0x4
+	beq L_af_9
+	bge L_af_4
+	cmpwi r0, 0x2
+	bge L_af_4
+	cmpwi r0, 0x0
+	bge L_af_10
+	b L_af_4
+L_af_10:
+	lwz r0, 0x4(r30)
+	rlwinm. r0, r0, 0, 30, 30
+	bne L_af_11
+	lwz r3, 0x1c(r30)
+	cmplwi r3, 0x0
+	beq L_af_12
+	addi r4, r31, 0x1d8
+	bl strcmp
+	cmpwi r3, 0x0
+	beq L_af_11
+L_af_12:
+	addi r3, r31, 0x1d8
+	li r0, 0x0
+	stw r3, 0x1c(r30)
+	sth r0, 0x20(r30)
+	lwz r0, 0x8(r30)
+	ori r0, r0, 0x4000
+	stw r0, 0x8(r30)
+L_af_11:
+	li r3, 0x12
+	li r0, 0x65
+	stw r3, 0x24(r30)
+	stb r0, 0x38(r30)
+	b L_af_4
+L_af_9:
+	lwz r0, 0x4(r30)
+	rlwinm. r0, r0, 0, 30, 30
+	bne L_af_13
+	lwz r3, 0x1c(r30)
+	cmplwi r3, 0x0
+	beq L_af_14
+	addi r4, r31, 0x1d8
+	bl strcmp
+	cmpwi r3, 0x0
+	beq L_af_13
+L_af_14:
+	addi r3, r31, 0x1d8
+	li r0, 0x0
+	stw r3, 0x1c(r30)
+	sth r0, 0x20(r30)
+	lwz r0, 0x8(r30)
+	ori r0, r0, 0x4000
+	stw r0, 0x8(r30)
+L_af_13:
+	li r3, 0x12
+	li r0, 0x65
+	stw r3, 0x24(r30)
+	stb r0, 0x38(r30)
+	b L_af_4
+L_af_7:
+	lbz r0, 0x2e(r30)
+	extsb r0, r0
+	cmpwi r0, 0x2
+	bge L_af_15
+	cmpwi r0, 0x0
+	bge L_af_16
+	b L_af_15
+L_af_16:
+	lfs f1, 0x60(r30)
+	lfs f0, float_neg0p2_8041b19c(r2)
+	fadds f0, f1, f0
+	stfs f0, 0x60(r30)
+L_af_15:
+	lwz r3, 0x24(r30)
+	subic. r0, r3, 0x1
+	stw r0, 0x24(r30)
+	bgt L_af_4
+	li r0, 0x66
+	stb r0, 0x38(r30)
+	b L_af_4
+L_af_6:
+	lwz r3, 0x12c(r31)
+	lwz r0, 0x130(r31)
+	stw r3, 0x70(r30)
+	stw r0, 0x74(r30)
+	lwz r0, 0x134(r31)
+	stw r0, 0x78(r30)
+	lwz r3, 0x138(r31)
+	lwz r0, 0x13c(r31)
+	stw r3, 0x64(r30)
+	stw r0, 0x68(r30)
+	lwz r0, 0x140(r31)
+	stw r0, 0x6c(r30)
+	lwz r3, 0x144(r31)
+	lwz r0, 0x148(r31)
+	stw r3, 0x88(r30)
+	stw r0, 0x8c(r30)
+	lwz r0, 0x14c(r31)
+	stw r0, 0x90(r30)
+	lwz r3, 0x150(r31)
+	lwz r0, 0x154(r31)
+	stw r3, 0x7c(r30)
+	stw r0, 0x80(r30)
+	lwz r0, 0x158(r31)
+	stw r0, 0x84(r30)
+	lfs f0, 0x1ac(r4)
+	stfs f0, 0x110(r30)
+	lfs f0, 0x110(r30)
+	stfs f0, 0x10c(r30)
+	lfs f0, 0x1a0(r4)
+	stfs f0, 0x100(r30)
+	lfs f0, 0x1a0(r4)
+	stfs f0, 0xfc(r30)
+	lwz r0, 0x4(r30)
+	rlwinm. r0, r0, 0, 5, 5
+	beq L_af_17
+	lwz r0, 0x1c(r30)
+	cmplwi r0, 0x0
+	beq L_af_17
+	lwz r3, 0xc(r30)
+	li r4, 0x0
+	li r5, 0x0
+	bl animPoseSetPaperAnimGroup
+	li r0, 0x0
+	stw r0, 0x1c(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 6, 4
+	stw r0, 0x4(r30)
+	lwz r3, 0x14(r30)
+	cmpwi r3, 0x0
+	blt L_af_17
+	bl animPaperPoseRelease
+	li r0, -0x1
+	stw r0, 0x14(r30)
+L_af_17:
+	lwz r3, 0xc(r30)
+	li r4, 0x1
+	bl animPoseSetMaterialLightFlagOn
+	lwz r0, 0x4(r30)
+	cmplwi r30, 0x0
+	rlwinm r0, r0, 0, 29, 27
+	stw r0, 0x4(r30)
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 28, 26
+	stw r0, 0x4(r30)
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 6, 4
+	stw r0, 0x0(r30)
+	lwz r0, 0x0(r30)
+	rlwinm r0, r0, 0, 7, 5
+	stw r0, 0x0(r30)
+	beq L_af_18
+	lwz r0, 0x4(r30)
+	rlwinm r0, r0, 0, 12, 10
+	stw r0, 0x4(r30)
+L_af_18:
+	mr r3, r30
+	bl L_partyVivianTailStart
+	lwz r5, 0x58(r30)
+	mr r3, r30
+	lwz r0, 0x5c(r30)
+	li r4, 0x1
+	stw r5, 0xb8(r30)
+	stw r0, 0xbc(r30)
+	lwz r0, 0x60(r30)
+	stw r0, 0xc0(r30)
+	bl partyChgRunMode
+	li r31, 0x0
+	bl marioGetPartyId
+	cmpwi r3, 0x0
+	blt L_af_19
+	slwi r0, r3, 2
+	la r3, partyPtrTbl(r13)
+	lwzx r0, r3, r0
+	b L_af_20
+L_af_19:
+	li r0, 0x0
+L_af_20:
+	cmplwi r0, 0x0
+	beq L_af_21
+	li r31, 0x1
+L_af_21:
+	bl marioGetExtraPartyId
+	cmpwi r3, 0x0
+	blt L_af_22
+	slwi r0, r3, 2
+	la r3, partyPtrTbl(r13)
+	lwzx r0, r3, r0
+	b L_af_23
+L_af_22:
+	li r0, 0x0
+L_af_23:
+	cmplwi r0, 0x0
+	beq L_af_24
+	addi r31, r31, 0x1
+L_af_24:
+	lbz r0, 0x2e(r30)
+	cmpwi r0, 0x4
+	bne L_af_25
+	cmpwi r31, 0x1
+	bne L_af_26
+	lfs f1, 0x60(r30)
+	lfs f0, float_neg4_8041b1a0(r2)
+	fadds f0, f1, f0
+	stfs f0, 0x60(r30)
+	b L_af_25
+L_af_26:
+	lwz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne L_af_27
+	lfs f2, 0x60(r30)
+	lfs f1, float_neg4_8041b1a0(r2)
+	lfs f0, float_1p5_8041b1a4(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x60(r30)
+	lfs f1, 0x58(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x58(r30)
+	b L_af_25
+L_af_27:
+	lfs f2, 0x60(r30)
+	lfs f1, float_neg3_8041b1a8(r2)
+	lfs f0, float_neg1p5_8041b1ac(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x60(r30)
+	lfs f1, 0x58(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x58(r30)
+L_af_25:
+	lbz r0, 0x2e(r30)
+	cmpwi r0, 0x1
+	bne L_af_4
+	cmpwi r31, 0x1
+	bne L_af_28
+	lfs f1, 0x60(r30)
+	lfs f0, float_neg4_8041b1a0(r2)
+	fadds f0, f1, f0
+	stfs f0, 0x60(r30)
+	b L_af_4
+L_af_28:
+	lwz r0, 0x0(r30)
+	rlwinm. r0, r0, 0, 28, 28
+	bne L_af_29
+	lfs f2, 0x60(r30)
+	lfs f1, float_neg4_8041b1a0(r2)
+	lfs f0, float_1p5_8041b1a4(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x60(r30)
+	lfs f1, 0x58(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x58(r30)
+	b L_af_4
+L_af_29:
+	lfs f2, 0x60(r30)
+	lfs f1, float_neg3_8041b1a8(r2)
+	lfs f0, float_neg1p5_8041b1ac(r2)
+	fadds f1, f2, f1
+	stfs f1, 0x60(r30)
+	lfs f1, 0x58(r30)
+	fadds f0, f1, f0
+	stfs f0, 0x58(r30)
+L_af_4:
+	lwz r0, 0x14(r1)
+	li r3, 0x0
+	lwz r31, 0xc(r1)
+	lwz r30, 0x8(r1)
+	mtlr r0
+	addi r1, r1, 0x10
+	blr
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void driveParty(PartyEntry* party) {
+	char _af_pad[32];
+	asm {
+		lis r4, vec3_802ccd30@ha
+		addi r31, r4, vec3_802ccd30@l
+		mr r30, r3
+	}
+	asm volatile {
+		opword 0x80630160
+		opword 0xC0030198
+		opword 0xD01E00F8
+		opword 0xA89E002A
+		opword 0x2C040000
+		opword 0x4081000C
+		opword 0x3804FFFF
+		opword 0xB01E002A
+		opword 0x881E0034
+		opword 0x2C00000E
+		opword 0x41820044
+		opword 0x40800014
+		opword 0x2C000009
+		opword 0x4080000C
+		opword 0x2C000004
+		opword 0x40800030
+		opword 0x801E0000
+		opword 0x54000085
+		opword 0x41820024
+		bl vivianGetStatus
+		opword 0x2C030002
+		opword 0x4182000C
+		opword 0x7FC3F378
+		bl vivianShadow
+		opword 0x7FC3F378
+		bl partyPreDisp
+		opword 0x48000640
+		opword 0x80030000
+		opword 0x5400018D
+		opword 0x41820014
+		opword 0x801E0000
+		opword 0x64000080
+		opword 0x901E0000
+		opword 0x48000010
+		opword 0x801E0000
+		opword 0x5400024E
+		opword 0x901E0000
+		opword 0x38000000
+		opword 0x901E0138
+		opword 0x901E012C
+		opword 0x901E0140
+		opword 0x901E0134
+		opword 0x901E0130
+		opword 0x881E0034
+		opword 0x2800000E
+		opword 0x41810558
+		lis r4, jumptable_803127F0@ha
+		opword 0x5400103A
+		addi r4, r4, jumptable_803127F0@l
+		opword 0x7C04002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x4182052C
+		opword 0x807E0008
+		opword 0x54600739
+		opword 0x4182011C
+		opword 0x54600776
+		opword 0x3BA00001
+		opword 0x901E0008
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881E0031
+		li r28, 0x0
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BA0000C
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57A0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000050
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		lfs f0, float_0_8041b100(r2)
+		opword 0x7FC3F378
+		opword 0x38800000
+		opword 0xD01E0104
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		bl partyChgMot
+		opword 0x889E0031
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7FC3F378
+		opword 0x7C840774
+		opword 0x1C840028
+		opword 0x7C802214
+		stw r4, party_dp(r13)
+		opword 0x81840008
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x480003D8
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x418203C4
+		opword 0x7FC3F378
+		bl unk_800c7c98
+		opword 0x480003B8
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x418203A4
+		opword 0x889E0031
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7FC3F378
+		opword 0x7C840774
+		opword 0x1C840028
+		opword 0x7C802214
+		stw r4, party_dp(r13)
+		opword 0x81840008
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x48000374
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x41820360
+		opword 0x7FC3F378
+		bl partyForceWalk
+		opword 0x48000354
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x41820340
+		opword 0x889E0031
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7C840774
+		opword 0x7FC3F378
+		opword 0x1C840028
+		opword 0x7C802214
+		stw r4, party_dp(r13)
+		opword 0x801E0000
+		opword 0x8184000C
+		opword 0x60000100
+		opword 0x901E0000
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x48000304
+		opword 0x807E0008
+		opword 0x54600739
+		opword 0x41820164
+		opword 0x54600776
+		opword 0x901E0008
+		opword 0x80BE0160
+		opword 0xA005002E
+		opword 0x28000016
+		opword 0x41820014
+		opword 0x28000018
+		opword 0x4182000C
+		opword 0x28000019
+		opword 0x40820010
+		opword 0x3800001E
+		opword 0x981E0038
+		opword 0x48000124
+		opword 0x881E0034
+		opword 0x28000004
+		opword 0x4182000C
+		opword 0x28000005
+		opword 0x40820074
+		opword 0x807E0004
+		opword 0x38000000
+		opword 0x60630010
+		opword 0x907E0004
+		opword 0x809F00D8
+		opword 0x807F00DC
+		opword 0x909E0070
+		opword 0x907E0074
+		opword 0x807F00E0
+		opword 0x907E0078
+		opword 0x981E0038
+		opword 0xC00501A8
+		opword 0xD01E0110
+		opword 0xC00501A8
+		opword 0xD01E010C
+		opword 0x8065008C
+		opword 0x80050090
+		opword 0x907E0058
+		opword 0x901E005C
+		opword 0x80050094
+		opword 0x901E0060
+		opword 0x807E0058
+		opword 0x801E005C
+		opword 0x907E00B8
+		opword 0x901E00BC
+		opword 0x801E0060
+		opword 0x901E00C0
+		opword 0x480000A0
+		opword 0x28000007
+		opword 0x40820038
+		opword 0x809F00E4
+		opword 0x38000014
+		opword 0x807F00E8
+		opword 0x909E0070
+		opword 0x907E0074
+		opword 0x807F00EC
+		opword 0x907E0078
+		opword 0x981E0038
+		opword 0xC00501A8
+		opword 0xD01E0110
+		opword 0xC00501A8
+		opword 0xD01E010C
+		opword 0x48000064
+		opword 0x809F00F0
+		opword 0x3800000A
+		opword 0x807F00F4
+		opword 0x909E0070
+		opword 0x907E0074
+		opword 0x807F00F8
+		opword 0x907E0078
+		opword 0x981E0038
+		opword 0xC00501A8
+		opword 0xD01E0110
+		opword 0xC00501A8
+		opword 0xD01E010C
+		opword 0x8065008C
+		opword 0x80050090
+		opword 0x907E0058
+		opword 0x901E005C
+		opword 0x80050094
+		opword 0x901E0060
+		opword 0x807E0058
+		opword 0x801E005C
+		opword 0x907E00B8
+		opword 0x901E00BC
+		opword 0x801E0060
+		opword 0x901E00C0
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		opword 0x7FC3F378
+		bl partyHelloMain
+		opword 0x4800018C
+		opword 0x889E0031
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7FC3F378
+		opword 0x7C840774
+		opword 0x1C840028
+		opword 0x7C802214
+		stw r4, party_dp(r13)
+		opword 0x81840014
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x4800015C
+		opword 0x807E0008
+		opword 0x54600739
+		opword 0x41820020
+		opword 0x54600776
+		opword 0x7FC3F378
+		opword 0x901E0008
+		bl partyDokanInit
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		opword 0x7FC3F378
+		bl partyDokanMain
+		opword 0x48000128
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x41820114
+		opword 0x807E0008
+		opword 0x54600739
+		opword 0x41820028
+		opword 0x54630776
+		opword 0x38000000
+		opword 0x907E0008
+		opword 0x7FC3F378
+		opword 0x981E0038
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		bl L_partyForceSlitOff
+		opword 0x7FC3F378
+		bl partyRideMain
+		opword 0x480000D8
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x418200C4
+		opword 0x807E0008
+		opword 0x54600739
+		opword 0x41820020
+		opword 0x54630776
+		opword 0x38000000
+		opword 0x907E0008
+		opword 0x981E0038
+		opword 0x801E0000
+		opword 0x5400062C
+		opword 0x901E0000
+		opword 0x7FC3F378
+		bl partyRideYoshiMain
+		opword 0x48000090
+		opword 0x807E0000
+		opword 0x54600085
+		opword 0x4182000C
+		opword 0x546000C7
+		opword 0x4182007C
+		opword 0x7FC3F378
+		bl party_damage_return
+		opword 0x48000070
+		opword 0x809E0008
+		opword 0x54800739
+		opword 0x4182000C
+		opword 0x54800776
+		opword 0x901E0008
+		opword 0x881E002F
+		opword 0x38C0FFFF
+		opword 0x891E0031
+		opword 0x38A00000
+		opword 0x7C000774
+		la r4, partyPtrTbl(r13)
+		opword 0x7CE30214
+		opword 0x99070243
+		opword 0x881E002F
+		opword 0x7C000774
+		opword 0x7C630214
+		opword 0x98C30241
+		opword 0x881E002F
+		opword 0x7C000774
+		opword 0x5400103A
+		opword 0x7CA4012E
+		opword 0x807E000C
+		bl animPoseRelease
+		opword 0x7FC4F378
+		opword 0x38600000
+		bl __memFree
+		opword 0x480000A0
+		opword 0x7FC3F378
+		bl party_kemuri
+		opword 0x80FE0058
+		la r3, _af_pad+12
+		opword 0x801E005C
+		opword 0x38810010
+		opword 0x38A1000C
+		opword 0x38C10008
+		opword 0x90E10014
+		opword 0x90010018
+		opword 0x801E0060
+		opword 0x9001001C
+		bl marioGetScreenPos
+		opword 0xC0210010
+		opword 0xC001000C
+		opword 0xFC20081E
+		opword 0xFC00001E
+		opword 0xD8210020
+		opword 0xD8010028
+		opword 0x80610024
+		opword 0x8081002C
+		bl marioChkInScreen
+		opword 0x2C030000
+		opword 0x41820014
+		opword 0x801E0004
+		opword 0x5400024E
+		opword 0x901E0004
+		opword 0x48000010
+		opword 0x801E0004
+		opword 0x64000080
+		opword 0x901E0004
+		opword 0x809F00CC
+		opword 0x7FC3F378
+		opword 0x801F00D0
+		opword 0x909E00AC
+		opword 0x901E00B0
+		opword 0x801F00D4
+		opword 0x901E00B4
+		bl partyPreDisp
+	}
+}
+#pragma pop
+
+#define partyGetPtr partyGetPtr__af_inl
+BOOL partyDoWork(void) {
+    PartyEntry* party = partyGetPtr(marioGetPtr()->currPartySlotId[0]);
+    if (!party) {
+        return FALSE;
+    }
+    if (party->runMode != 0 && party->runMode != 1 && party->runMode != 2) {
+        return FALSE;
+    }
+    marioGetPtr()->baseSpeed = EXT_LIT(float_0_8041b100, 0.0f);
+    partyChgRunMode(party, 3);
+    return TRUE;
+}
+
+#undef partyGetPtr
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void partyHello(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		lis r5, vec3_802ccd30@ha
+		opword 0x90010014
+		addi r6, r5, vec3_802ccd30@l
+		opword 0x80830008
+		opword 0x54800739
+		opword 0x41820164
+		opword 0x54800776
+		opword 0x90030008
+		opword 0x80E30160
+		opword 0xA007002E
+		opword 0x28000016
+		opword 0x41820014
+		opword 0x28000018
+		opword 0x4182000C
+		opword 0x28000019
+		opword 0x40820010
+		opword 0x3800001E
+		opword 0x98030038
+		opword 0x48000124
+		opword 0x88030034
+		opword 0x28000004
+		opword 0x4182000C
+		opword 0x28000005
+		opword 0x40820074
+		opword 0x80830004
+		opword 0x38000000
+		opword 0x60840010
+		opword 0x90830004
+		opword 0x80A600D8
+		opword 0x808600DC
+		opword 0x90A30070
+		opword 0x90830074
+		opword 0x808600E0
+		opword 0x90830078
+		opword 0x98030038
+		opword 0xC00701A8
+		opword 0xD0030110
+		opword 0xC00701A8
+		opword 0xD003010C
+		opword 0x8087008C
+		opword 0x80070090
+		opword 0x90830058
+		opword 0x9003005C
+		opword 0x80070094
+		opword 0x90030060
+		opword 0x80830058
+		opword 0x8003005C
+		opword 0x908300B8
+		opword 0x900300BC
+		opword 0x80030060
+		opword 0x900300C0
+		opword 0x480000A0
+		opword 0x28000007
+		opword 0x40820038
+		opword 0x80A600E4
+		opword 0x38000014
+		opword 0x808600E8
+		opword 0x90A30070
+		opword 0x90830074
+		opword 0x808600EC
+		opword 0x90830078
+		opword 0x98030038
+		opword 0xC00701A8
+		opword 0xD0030110
+		opword 0xC00701A8
+		opword 0xD003010C
+		opword 0x48000064
+		opword 0x80A600F0
+		opword 0x3800000A
+		opword 0x808600F4
+		opword 0x90A30070
+		opword 0x90830074
+		opword 0x808600F8
+		opword 0x90830078
+		opword 0x98030038
+		opword 0xC00701A8
+		opword 0xD0030110
+		opword 0xC00701A8
+		opword 0xD003010C
+		opword 0x8087008C
+		opword 0x80070090
+		opword 0x90830058
+		opword 0x9003005C
+		opword 0x80070094
+		opword 0x90030060
+		opword 0x80830058
+		opword 0x8003005C
+		opword 0x908300B8
+		opword 0x900300BC
+		opword 0x80030060
+		opword 0x900300C0
+		opword 0x80030000
+		opword 0x5400062C
+		opword 0x90030000
+		bl partyHelloMain
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 partyHelloMain(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FFA0
+		opword 0x7C0802A6
+		opword 0x90010064
+		opword 0xDBE10050
+		opword 0xF3E10058
+		opword 0xDBC10040
+		opword 0xF3C10048
+		opword 0x93E1003C
+		opword 0x93C10038
+		opword 0x93A10034
+		opword 0x93810030
+		opword 0x7C7D1B78
+		opword 0x3BE00000
+		opword 0x88030038
+		opword 0x83C30160
+		opword 0x2800001E
+		opword 0x41810690
+		lis r4, jumptable_80312774@ha
+		opword 0x5400103A
+		addi r4, r4, jumptable_80312774@l
+		opword 0x7C04002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0xC3FE008C
+		opword 0x389D0094
+		opword 0xC05E0090
+		opword 0xC3DE0094
+		lfs f1, float_0p5_8041b170(r2)
+		opword 0xD3FD0058
+		opword 0xC01E01B8
+		opword 0xEC01103A
+		opword 0xD01D005C
+		opword 0xD3DD0060
+		bl partyGetAppearPos
+		opword 0x38000010
+		opword 0xFC20F890
+		opword 0x901D0024
+		opword 0xFC40F090
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl distABf
+		opword 0xD03D0128
+		opword 0xFC20F890
+		opword 0xFC40F090
+		opword 0xC07D0094
+		opword 0xC09D009C
+		bl angleABf
+		opword 0xD03D0100
+		opword 0x3C004330
+		lis r3, double_to_int_802ccf00@ha
+		lfs f3, float_0p5_8041b170(r2)
+		opword 0x80BD0024
+		addi r4, r3, double_to_int_802ccf00@l
+		opword 0x90010020
+		opword 0x6CA38000
+		opword 0xC8840000
+		opword 0x90610024
+		opword 0xC05D0128
+		opword 0xC8010020
+		opword 0x90010028
+		opword 0xEC202028
+		lfs f0, float_1_8041b0e8(r2)
+		opword 0xEC220824
+		opword 0xD03D0104
+		opword 0x801D0024
+		opword 0xC05D0098
+		opword 0x6C008000
+		opword 0xC03D005C
+		opword 0x9001002C
+		opword 0xECA20828
+		opword 0xC8210028
+		opword 0xEC412028
+		opword 0xFC202A10
+		opword 0xEC4300B2
+		opword 0xFC010040
+		opword 0x4080000C
+		lfs f5, float_10_8041b124(r2)
+		opword 0x48000024
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC050040
+		opword 0x4C411382
+		opword 0x40820010
+		opword 0xC01D00F0
+		opword 0xECA3283A
+		opword 0x48000008
+		lfs f5, float_10_8041b124(r2)
+		opword 0xEC25282A
+		opword 0x38000001
+		opword 0xEC0210B8
+		opword 0xEC010024
+		opword 0xEC2000B2
+		opword 0xFC000050
+		opword 0xD03D0114
+		opword 0xD01D0118
+		opword 0x807D0000
+		opword 0x60630010
+		opword 0x907D0000
+		opword 0x981D0038
+		opword 0x48000548
+		bl partyMoveNoHosei
+		opword 0xC03D0114
+		lfs f0, float_0_8041b100(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0x801D0000
+		lfs f0, float_neg1p6_8041b180(r2)
+		opword 0x54000734
+		opword 0x901D0000
+		opword 0xD01D0118
+		opword 0xC03D005C
+		lfs f0, float_neg2000_8041b164(r2)
+		opword 0xFC010040
+		opword 0x40800018
+		opword 0x38600000
+		opword 0x38000002
+		opword 0x907D0024
+		opword 0x981D0038
+		opword 0x480004F8
+		opword 0x801D0138
+		opword 0x28000000
+		opword 0x40820098
+		opword 0x80BD0024
+		opword 0x3C004330
+		opword 0x90010028
+		lis r4, double_to_int_802ccf00@ha
+		opword 0x20A50010
+		lis r3, vec3_802cce2c@ha
+		opword 0x6CA08000
+		opword 0x9001002C
+		addi r5, r3, vec3_802cce2c@l
+		addi r3, r4, double_to_int_802ccf00@l
+		opword 0x80850000
+		opword 0xC8230000
+		opword 0xC8010028
+		opword 0x80650004
+		opword 0xEC200828
+		lfs f0, float_0p0625_8041b184(r2)
+		opword 0x80050008
+		opword 0x90810014
+		opword 0xEC010032
+		opword 0x90610018
+		opword 0xD0010014
+		opword 0x9001001C
+		opword 0x80010014
+		opword 0xD0010018
+		opword 0xD001001C
+		opword 0x80610018
+		opword 0x901D0070
+		opword 0x8001001C
+		opword 0x907D0074
+		opword 0x901D0078
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x41810464
+		opword 0x38000000
+		opword 0x901D0024
+		opword 0x48000458
+		opword 0x38000002
+		opword 0x981D0038
+		opword 0x80BD0024
+		opword 0x3C004330
+		opword 0x90010028
+		lis r4, double_to_int_802ccf00@ha
+		opword 0x20A50010
+		lis r3, vec3_802cce38@ha
+		opword 0x6CA08000
+		opword 0x9001002C
+		addi r5, r3, vec3_802cce38@l
+		addi r3, r4, double_to_int_802ccf00@l
+		opword 0x80850000
+		opword 0xC8230000
+		opword 0xC8010028
+		opword 0x80650004
+		opword 0xEC200828
+		lfs f0, float_0p0625_8041b184(r2)
+		opword 0x80050008
+		opword 0x90810008
+		opword 0xEC010032
+		opword 0x9061000C
+		opword 0xD0010008
+		opword 0x90010010
+		opword 0x80010008
+		opword 0xD001000C
+		opword 0xD0010010
+		opword 0x8061000C
+		opword 0x901D0070
+		opword 0x80010010
+		opword 0x907D0074
+		opword 0x901D0078
+		opword 0x807D0024
+		opword 0x3403FFFF
+		opword 0x901D0024
+		opword 0x418103C8
+		opword 0x38000000
+		lfs f0, float_90_8041b0f0(r2)
+		opword 0x901D0024
+		opword 0xC03D0110
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082003C
+		lfs f0, float_270_8041b0f4(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x4082002C
+		lfs f1, float_180_8041b0fc(r2)
+		opword 0x7FA3EB78
+		bl partyToMovedir
+		opword 0xD03D00FC
+		lfs f0, float_180_8041b0fc(r2)
+		opword 0xC03D00FC
+		opword 0xD03D0100
+		opword 0xD01D010C
+		opword 0xD01D0110
+		opword 0x48000028
+		lfs f1, float_0_8041b100(r2)
+		opword 0x7FA3EB78
+		bl partyToMovedir
+		opword 0xD03D00FC
+		lfs f0, float_0_8041b100(r2)
+		opword 0xC03D00FC
+		opword 0xD03D0100
+		opword 0xD01D010C
+		opword 0xD01D0110
+		opword 0x7FA3EB78
+		bl partyClearJumpPara
+		opword 0x801D0004
+		opword 0x3BE00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BE0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57E0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FE3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57E0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FE3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57E0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FE3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FE4FB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93FD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x80BD0004
+		opword 0x3C600002
+		opword 0x38000001
+		opword 0x389E008C
+		opword 0x54A50734
+		opword 0x38630920
+		opword 0x90BD0004
+		opword 0x3BE00001
+		opword 0x981D0034
+		bl psndSFXOn_3D
+		opword 0x4800022C
+		opword 0x389D0058
+		bl partyGetAppearPos2
+		opword 0x807D0058
+		opword 0x3BC00001
+		opword 0x801D005C
+		opword 0x907D00B8
+		opword 0x901D00BC
+		opword 0x801D0060
+		opword 0x901D00C0
+		opword 0x801D0004
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x38000001
+		opword 0x3BE00001
+		opword 0x981D0034
+		opword 0x4800010C
+		opword 0x801D0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881D0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DD0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x38000000
+		opword 0x3BE00001
+		opword 0x981D0034
+		opword 0x4800000C
+		bl allPartyForceRideOn
+		opword 0x3BE00001
+		opword 0x7FE3FB78
+		opword 0xE3E10058
+		opword 0xCBE10050
+		opword 0xE3C10048
+		opword 0xCBC10040
+		opword 0x83E1003C
+		opword 0x83C10038
+		opword 0x83A10034
+		opword 0x80010064
+		opword 0x83810030
+		opword 0x7C0803A6
+		opword 0x38210060
+	}
+}
+#pragma pop
+
+s32 partyGoodbyeInit(PartyEntry* party) {
+    MarioWork* mario;
+    party->field_38 = 10;
+    party_dp = &partyDataTbl[party->currentMemberId];
+    if (party_dp->init_func) {
+        party_dp->init_func(party);
+    }
+    if (party->flags & 0x100) {
+        if (party->currentMemberId == PARTY_MEMBER_VIVIAN) {
+            vivianUnhold(party);
+            party->field_38 = 0;
+        }
+        if (party->currentMemberId == PARTY_MEMBER_YOSHI) {
+            marioGetoffYoshi();
+            party->field_38 = 0;
+        }
+    }
+    mario = party->playerPtr;
+    if (mario->currMotionId == 0x16 || mario->currMotionId == 0x18 || mario->currMotionId == 0x19) {
+        party->field_38 = 20;
+    }
+    return 0;
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 partyGoodbyeMain(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FF60
+		opword 0x7C0802A6
+		opword 0x900100A4
+		opword 0xDBE10090
+		opword 0xF3E10098
+		opword 0xDBC10080
+		opword 0xF3C10088
+		opword 0xDBA10070
+		opword 0xF3A10078
+		opword 0xDB810060
+		opword 0xF3810068
+		opword 0xDB610050
+		opword 0xF3610058
+		opword 0xDB410040
+		opword 0xF3410048
+		opword 0x93E1003C
+		opword 0x93C10038
+		opword 0x93A10034
+		opword 0x7C7F1B78
+		bl marioGetPtr
+		opword 0x881F0038
+		opword 0x7C7E1B78
+		opword 0x28000014
+		opword 0x41810470
+		lis r3, jumptable_80312720@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_80312720@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x889F0031
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7FE3FB78
+		opword 0x7C840774
+		opword 0x1C840028
+		opword 0x7C802214
+		stw r4, party_dp(r13)
+		opword 0x8184000C
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000006
+		opword 0x40820024
+		bl vivianGetStatus
+		opword 0x2C030000
+		opword 0x40820410
+		opword 0x3860000A
+		opword 0x38000008
+		opword 0x987F0038
+		opword 0x981F0034
+		opword 0x480003FC
+		opword 0x2C000004
+		opword 0x40820024
+		bl yoshiGetStatus
+		opword 0x2C030000
+		opword 0x408203E8
+		opword 0x3860000A
+		opword 0x38000008
+		opword 0x987F0038
+		opword 0x981F0034
+		opword 0x480003D4
+		opword 0x3860000A
+		opword 0x38000008
+		opword 0x987F0038
+		opword 0x981F0034
+		opword 0x480003C0
+		opword 0x3C600002
+		opword 0x389E008C
+		opword 0x3863091F
+		bl psndSFXOn_3D
+		opword 0xC07E008C
+		lfs f4, float_0p5_8041b170(r2)
+		opword 0xD07F0094
+		opword 0xFFC01890
+		lfs f5, float_4_8041b10c(r2)
+		opword 0xC05E01B8
+		opword 0xC03E0090
+		lfs f0, float_1p6_8041b16c(r2)
+		opword 0xEFE408BA
+		opword 0xD3FF0098
+		opword 0xC09E0094
+		opword 0xD09F009C
+		opword 0xFFA02090
+		opword 0xC39F0058
+		opword 0xC35F0060
+		opword 0xC37F005C
+		opword 0xFC20E090
+		opword 0xFC40D090
+		opword 0xD0BF0104
+		opword 0xD01F011C
+		bl distABf
+		opword 0xD03F0128
+		opword 0xFC20E090
+		opword 0xFC40D090
+		opword 0xFC60F090
+		opword 0xFC80E890
+		bl angleABf
+		opword 0xD03F0100
+		opword 0x3C004330
+		opword 0x3880000F
+		lis r3, double_to_int_802ccf00@ha
+		opword 0x909F0024
+		opword 0xECBFD828
+		lfd f4, double_to_int_802ccf00@l(r3)
+		opword 0x807F0024
+		opword 0x90010008
+		opword 0x6C638000
+		opword 0xC03F0128
+		opword 0x9061000C
+		lfs f3, float_0p5_8041b170(r2)
+		opword 0xC8010008
+		opword 0x90010018
+		opword 0xEC002028
+		opword 0x90010010
+		opword 0xEC010024
+		opword 0x90010020
+		opword 0xD01F0104
+		opword 0x801F0024
+		opword 0xC03F011C
+		opword 0x6C008000
+		opword 0x9001001C
+		opword 0xC8010018
+		opword 0x90010014
+		opword 0xEC002028
+		opword 0xC8410010
+		opword 0x90010024
+		opword 0xEC210032
+		opword 0xEC422028
+		opword 0xC8010020
+		opword 0xEC002028
+		opword 0xEC220072
+		opword 0xEC23287A
+		opword 0xEC010024
+		opword 0xD01F0114
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x408200BC
+		opword 0x881F0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820024
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r0, r3, partyPoseTbl@l
+		opword 0x7C830774
+		opword 0x1C63003C
+		opword 0x7C601A14
+		opword 0x83C30010
+		opword 0x48000048
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x4182001C
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		addi r0, r3, partyDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x48000020
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r0, r3, yoshiDotPoseTbl@l
+		opword 0x7C602214
+		opword 0x83C30010
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x3800000B
+		opword 0x981F0038
+		opword 0x480001E0
+		opword 0xC03F0114
+		opword 0x387F0058
+		opword 0xC01F011C
+		opword 0x389F0060
+		opword 0xEC010028
+		opword 0xD01F0114
+		opword 0xC03F005C
+		opword 0xC01F0114
+		opword 0xEC01002A
+		opword 0xD01F005C
+		opword 0xC03F0104
+		opword 0xC05F0100
+		bl movePos
+		lfs f1, float_50_8041b1b8(r2)
+		opword 0xC01F010C
+		opword 0xEC21002A
+		bl revise360
+		opword 0xD03F010C
+		opword 0x3C004330
+		lis r3, double_to_int_802ccf00@ha
+		lfs f0, float_10_8041b124(r2)
+		opword 0x809F0024
+		opword 0x90010020
+		opword 0x6C808000
+		lfd f2, double_to_int_802ccf00@l(r3)
+		opword 0x90010024
+		opword 0xC8210020
+		opword 0xEC211028
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xFC200090
+		lfs f0, float_10_8041b124(r2)
+		opword 0xEC010024
+		opword 0xD01F0070
+		opword 0xC01F0070
+		opword 0xD01F0074
+		opword 0xC01F0070
+		opword 0xD01F0078
+		opword 0x807F0024
+		opword 0x3403FFFF
+		opword 0x901F0024
+		opword 0x40800138
+		opword 0x3800000C
+		opword 0x981F0038
+		opword 0x4800012C
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		lfs f0, float_0_8041b100(r2)
+		opword 0x7FE3FB78
+		opword 0x3880000E
+		opword 0xD01F0114
+		opword 0xC01F0098
+		opword 0xD01F005C
+		bl partyChgRunMode
+		opword 0x38600001
+		opword 0x4800001C
+		opword 0x7FE3FB78
+		opword 0x3880000E
+		bl partyChgRunMode
+		opword 0x38600001
+		opword 0x48000008
+		opword 0x38600000
+		opword 0xE3E10098
+		opword 0xCBE10090
+		opword 0xE3C10088
+		opword 0xCBC10080
+		opword 0xE3A10078
+		opword 0xCBA10070
+		opword 0xE3810068
+		opword 0xCB810060
+		opword 0xE3610058
+		opword 0xCB610050
+		opword 0xE3410048
+		opword 0xCB410040
+		opword 0x83E1003C
+		opword 0x83C10038
+		opword 0x800100A4
+		opword 0x83A10034
+		opword 0x7C0803A6
+		opword 0x382100A0
+	}
+}
+#pragma pop
+
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the epilogue scheduler run
+s32 partyDokanInit(PartyEntry* party) {
+	asm {
+		mr r29, r3
+		lis r3, vec3_802ccd30@ha
+	}
+	asm volatile {
+		addi r31, r3, vec3_802ccd30@l
+		opword 0x801D0004
+		opword 0x83DD0160
+		opword 0x60000010
+		opword 0x901D0004
+		opword 0x881E003E
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x418202EC
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x41820118
+		opword 0x4080001C
+		opword 0x2C000000
+		opword 0x408000F4
+		opword 0x480003C8
+		opword 0x2C000006
+		opword 0x408003C0
+		opword 0x480001DC
+		opword 0x807D0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901D0014
+		opword 0x801D0004
+		opword 0x387F01E0
+		opword 0x38800002
+		opword 0x64000400
+		opword 0x901D0004
+		bl animPaperPoseEntry
+		opword 0x907D0014
+		opword 0x387F01E0
+		opword 0x389F01EC
+		li r28, 0x0
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820040
+		opword 0x387F01E0
+		opword 0x389F01F4
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182002C
+		opword 0x387F01E0
+		opword 0x389F01FC
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x387F01E0
+		opword 0x7C641B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x3B800001
+		opword 0x7F800034
+		opword 0x387F01E0
+		opword 0x541CD97E
+		opword 0x389F0208
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x20000005
+		opword 0x7C000034
+		opword 0x541CD97E
+		opword 0x807D000C
+		opword 0x7F85E378
+		opword 0x389F01E0
+		bl animPoseSetPaperAnimGroup
+		lfs f0, float_30_8041b178(r2)
+		opword 0x38000000
+		opword 0xD01D0124
+		opword 0x981D0038
+		opword 0x480002DC
+		opword 0x807F0120
+		opword 0x801F0124
+		opword 0x907D0070
+		opword 0x901D0074
+		opword 0x801F0128
+		opword 0x901D0078
+		opword 0x807D0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901D0014
+		opword 0x801D0004
+		opword 0x387F01E0
+		opword 0x38800002
+		opword 0x64000400
+		opword 0x901D0004
+		bl animPaperPoseEntry
+		opword 0x907D0014
+		opword 0x387F01E0
+		opword 0x389F01EC
+		opword 0x3B800000
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820040
+		opword 0x387F01E0
+		opword 0x389F01F4
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182002C
+		opword 0x387F01E0
+		opword 0x389F01FC
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x387F01E0
+		opword 0x7C641B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x3B800001
+		opword 0x7F800034
+		opword 0x387F01E0
+		opword 0x541CD97E
+		opword 0x389F0208
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x20000005
+		opword 0x7C000034
+		opword 0x541CD97E
+		opword 0x807D000C
+		opword 0x7F85E378
+		opword 0x389F01E0
+		bl animPoseSetPaperAnimGroup
+		lfs f0, float_30_8041b178(r2)
+		opword 0x38000000
+		opword 0xD01D0124
+		opword 0x981D0038
+		opword 0x480001E4
+		opword 0x807D0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901D0014
+		opword 0x801D0004
+		opword 0x387F01FC
+		opword 0x38800002
+		opword 0x64000400
+		opword 0x901D0004
+		bl animPaperPoseEntry
+		opword 0x907D0014
+		opword 0x387F01FC
+		opword 0x389F01EC
+		opword 0x3B800000
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820040
+		opword 0x387F01FC
+		opword 0x389F01F4
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182002C
+		opword 0x387F01FC
+		opword 0x7C641B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x387F01FC
+		opword 0x389F01E0
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x3B800001
+		opword 0x7F800034
+		opword 0x387F01FC
+		opword 0x541CD97E
+		opword 0x389F0208
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x20000005
+		opword 0x7C000034
+		opword 0x541CD97E
+		opword 0x807D000C
+		opword 0x7F85E378
+		opword 0x389F01FC
+		bl animPoseSetPaperAnimGroup
+		lfs f1, float_26_8041b1b0(r2)
+		opword 0x3800000A
+		lfs f0, float_10_8041b124(r2)
+		opword 0xD03D0124
+		opword 0x981D0038
+		opword 0xD01D008C
+		opword 0x480000FC
+		opword 0x807D0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901D0014
+		opword 0x801D0004
+		opword 0x387F01FC
+		opword 0x38800002
+		opword 0x64000400
+		opword 0x901D0004
+		bl animPaperPoseEntry
+		opword 0x907D0014
+		opword 0x387F01FC
+		opword 0x389F01EC
+		opword 0x3B800000
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820040
+		opword 0x387F01FC
+		opword 0x389F01F4
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182002C
+		opword 0x387F01FC
+		opword 0x7C641B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x387F01FC
+		opword 0x389F01E0
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x3B800001
+		opword 0x7F800034
+		opword 0x387F01FC
+		opword 0x541CD97E
+		opword 0x389F0208
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x20000005
+		opword 0x7C000034
+		opword 0x541CD97E
+		opword 0x807D000C
+		opword 0x7F85E378
+		opword 0x389F01FC
+		bl animPoseSetPaperAnimGroup
+		lfs f1, float_neg26_8041b1b4(r2)
+		opword 0x3800000A
+		lfs f0, float_10_8041b124(r2)
+		opword 0xD03D0124
+		lfs f1, float_180_8041b0fc(r2)
+		opword 0x981D0038
+		opword 0xD01D008C
+		opword 0xC01E00BC
+		opword 0xEC21002A
+		bl revise360
+		opword 0xD03D0064
+		opword 0x801D0004
+		opword 0x540007BD
+		opword 0x4082003C
+		opword 0x807D001C
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x389F0210
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820020
+		opword 0x387F0210
+		opword 0x38000000
+		opword 0x907D001C
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60004000
+		opword 0x901D0008
+		opword 0x801D0004
+		opword 0x540007BD
+		opword 0x408200B0
+		opword 0x881D0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800008
+		bl partyGetHp
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820020
+		opword 0x881D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x7C000774
+		opword 0x1C00003C
+		opword 0x7F83002E
+		opword 0x48000040
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820018
+		opword 0x1C00003C
+		lis r3, partyDotPoseTbl@ha
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7F83002E
+		opword 0x4800001C
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C03003C
+		lis r3, yoshiDotPoseTbl@ha
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7F83002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7F84E378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x939D0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x801D0004
+		opword 0x38800001
+		opword 0x60000008
+		opword 0x901D0004
+		opword 0x801D0004
+		opword 0x60000010
+		opword 0x901D0004
+		opword 0x807D000C
+		bl animPoseSetMaterialLightFlagOff
+		lfs f1, float_180_8041b0fc(r2)
+		opword 0xC01E01A8
+		opword 0xEC21002A
+		bl revise360
+		opword 0xD03D0110
+		opword 0x7FA3EB78
+		opword 0xC01E01A8
+		opword 0xD01D010C
+		opword 0xC01E019C
+		opword 0xD01D00FC
+		opword 0x809E008C
+		opword 0x801E0090
+		opword 0x909D0058
+		opword 0x901D005C
+		opword 0x801E0094
+		opword 0x901D0060
+		bl L_partyVivianTailStop
+	}
+	asm {
+		li r3, 0x0
+	}
+}
+#pragma pop
+
+#pragma defer_codegen reset
+
+asm void partyMain(void) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	stw r0, 0x24(r1)
+	stw r31, 0x1c(r1)
+	stw r30, 0x18(r1)
+	stw r29, 0x14(r1)
+	bl marioGetPtr
+	la r31, partyPtrTbl(r13)
+	li r3, 0x0
+	lwz r4, partyPtrTbl(r13)
+	cmplwi r4, 0x0
+	beq L_af_1
+	cmpwi r3, 0x0
+	blt L_af_2
+	b L_af_3
+L_af_2:
+	mr r4, r3
+L_af_3:
+	lwz r0, 0x0(r4)
+	clrlwi. r0, r0, 31
+	beq L_af_1
+	li r3, 0x1
+L_af_1:
+	addi r4, r31, 0x4
+	li r0, 0x1
+	lwz r4, 0x0(r4)
+	cmplwi r4, 0x0
+	beq L_af_4
+	cmpwi r0, 0x0
+	blt L_af_5
+	b L_af_6
+L_af_5:
+	li r4, 0x0
+L_af_6:
+	lwz r0, 0x0(r4)
+	clrlwi. r0, r0, 31
+	beq L_af_4
+	addi r3, r3, 0x1
+L_af_4:
+	cmpwi r3, 0x0
+	beq L_af_7
+	bl unk_8013be14
+	li r30, 0x0
+L_af_8:
+	lwz r29, 0x0(r31)
+	cmplwi r29, 0x0
+	beq L_af_9
+	lwz r0, 0x0(r29)
+	clrlwi. r0, r0, 31
+	beq L_af_9
+	bl marioBgmodeChk
+	cmpwi r3, 0x1
+	beq L_af_9
+	mr r3, r29
+	bl driveParty
+L_af_9:
+	addi r30, r30, 0x1
+	addi r31, r31, 0x4
+	cmpwi r30, 0x2
+	blt L_af_8
+L_af_7:
+	lwz r0, 0x24(r1)
+	lwz r31, 0x1c(r1)
+	lwz r30, 0x18(r1)
+	lwz r29, 0x14(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+
+#define partyGetPtr partyGetPtr__af_inl
+BOOL partyGoodbye(s32 id) {
+    BOOL ret = FALSE;
+
+    if (id >= 0) {
+        partyChgRunMode(partyGetPtr(id), 8);
+        ret = TRUE;
+    }
+    return ret;
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+s32 partyKill(s32 id) {
+    PartyEntry* party;
+    MarioWork* player;
+    PartyEntry* other;
+
+    party = partyGetPtr(id);
+    if (party == NULL) {
+        return 0;
+    }
+    player = party->playerPtr;
+    party_dp = &partyDataTbl[partyGetPtr(player->currPartySlotId[id])->currentMemberId];
+    if (party_dp->exit_func && party->runMode != 11) {
+        party_dp->exit_func(party);
+    }
+    if (partyGetPtr(player->currPartySlotId[id])) {
+        player->prevPartyMemberId[id] = partyGetPtr(player->currPartySlotId[id])->currentMemberId;
+    } else {
+        player->prevPartyMemberId[id] = 0;
+    }
+    player->currPartySlotId[id] = -1;
+    partyPtrTbl[id] = NULL;
+    animPoseRelease(party->paperAnimGroup);
+    __memFree(HEAP_DEFAULT, party);
+    return 0;
+}
+
+#undef partyGetPtr
+
+#define partyGetPtr partyGetPtr__af_inl
+s32 partyKill2(s32 id) {
+    PartyEntry* party;
+    MarioWork* player;
+
+    party = partyGetPtr(id);
+    if (party == NULL) {
+        return 0;
+    }
+    player = party->playerPtr;
+    party_dp = &partyDataTbl[partyGetPtr(player->currPartySlotId[id])->currentMemberId];
+    if (party_dp->exit_func && party->runMode != 11) {
+        party_dp->exit_func(party);
+    }
+    player->prevPartyMemberId[id] = 0;
+    player->currPartySlotId[id] = -1;
+    partyPtrTbl[id] = NULL;
+    animPoseRelease(party->paperAnimGroup);
+    __memFree(HEAP_DEFAULT, party);
+    return 0;
+}
+
+#undef partyGetPtr
+
+s32 yoshiSetColor(void) {
+    s32 color;
+    s32 r = irand(1000);
+
+    if (r < 150) {
+        color = 0;
+    } else if (r < 300) {
+        color = 1;
+    } else if (r < 450) {
+        color = 2;
+    } else if (r < 600) {
+        color = 3;
+    } else if (r < 750) {
+        color = 4;
+    } else if (r < 900) {
+        color = 5;
+    } else {
+        color = 6;
+    }
+    pouchSetPartyColor(PARTNER_YOSHI, color);
+    return color;
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+f32 partyGetHeight(PartyEntry* party) {
+	asm volatile {
+		opword 0x88030031
+		opword 0x2C000004
+		opword 0x40820020
+		opword 0x80030000
+		opword 0x540005EF
+		opword 0x41820014
+		lfs f1, float_18p5_8041b1bc(r2)
+		opword 0xC00300F0
+		opword 0xEC21002A
+		opword 0x4E800020
+		opword 0xC02300F0
+	}
+}
+#pragma pop
+
+#define partyChgPose partyChgPose__af_inl
+#define partyGetPtr partyGetPtr__af_inl
+s32 partyEntryMain(s32 memberId) {
+    MarioWork* player;
+    s32 slot;
+    PartyEntry* party;
+
+    player = marioGetPtr();
+    slot = partyGetFreeSlot(0);
+    if (slot < 0) {
+        return -1;
+    }
+    party = partyGetPtr(slot);
+    memset(party, 0, sizeof(PartyEntry));
+    party->camId = marioGetCamId();
+    party->paperAnimGroup = -1;
+    party->field_10 = -1;
+    party->paperPoseId = -1;
+    party->flags = 1;
+    party->currentSlotId = slot;
+    party->playerPtr = player;
+    party->currentMemberId = memberId;
+    if (player->prevPartyMemberId[0] == 0) {
+        player->prevPartyMemberId[0] = party->currentMemberId;
+    }
+    if (slot == 1) {
+        party->flags |= 4;
+    }
+    party_dp = &partyDataTbl[memberId];
+    if (player->flags & 0x80000000) {
+        party->flags2 |= 0x8000;
+    }
+    if (!party && !party && !party) {
+    }
+    partyPoseEntry(party);
+    animPosePeraOff(party->paperAnimGroup);
+    setAnimPoseMaterialFlag(party);
+    partyChgPose(party, partyChgPoseId(party, 1));
+    party->field_1C = 0;
+    party_dp->init_func(party);
+    return slot;
+}
+
+#undef partyChgPose
+#undef partyGetPtr
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 partyEntry2(s32 memberId) {
+	asm volatile {
+		opword 0x7C7C1B78
+		bl marioGetPtr
+		la r27, partyPtrTbl(r13)
+		opword 0x7C7F1B78
+		opword 0x801B0004
+		opword 0x28000000
+		opword 0x40820028
+		opword 0x38600000
+		opword 0x38800188
+		bl __memAlloc
+		opword 0x907B0004
+		opword 0x38800000
+		opword 0x38A00188
+		bl memset
+		opword 0x3BC00001
+		opword 0x48000008
+		opword 0x3BC0FFFF
+		opword 0x2C1E0000
+		opword 0x4080000C
+		opword 0x3860FFFF
+		opword 0x48000300
+		opword 0x41800014
+		opword 0x57C0103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FA3002E
+		opword 0x48000008
+		opword 0x3BA00000
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A00188
+		bl memset
+		bl marioGetCamId
+		opword 0x907D0164
+		opword 0x3860FFFF
+		opword 0x38000009
+		opword 0x2C1E0001
+		opword 0x907D000C
+		opword 0x907D0010
+		opword 0x907D0014
+		opword 0x901D0000
+		opword 0x9BDD002F
+		opword 0x93FD0160
+		opword 0x9B9D0031
+		opword 0x40820010
+		opword 0x801D0000
+		opword 0x60000004
+		opword 0x901D0000
+		opword 0x1C9C0028
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7C602214
+		stw r3, party_dp(r13)
+		opword 0x881D0031
+		opword 0x2C000004
+		opword 0x41820024
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x4082000C
+		opword 0x83830000
+		opword 0x48000038
+		lis r3, str_802CCEEC@ha
+		addi r28, r3, str_802CCEEC@l
+		opword 0x4800002C
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x801D0004
+		opword 0x5464103A
+		la r3, yoshigroup(r13)
+		opword 0x54000421
+		opword 0x7F83202E
+		opword 0x4182000C
+		lis r3, str_802CCEEC@ha
+		addi r28, r3, str_802CCEEC@l
+		opword 0x807D000C
+		opword 0x2C030000
+		opword 0x41800008
+		bl animPoseRelease
+		opword 0x7F83E378
+		opword 0x38800002
+		bl animPoseEntry
+		opword 0x907D000C
+		opword 0x807D000C
+		bl animPosePeraOff
+		opword 0x839D0160
+		bl marioAnimeId
+		opword 0x5460103A
+		opword 0x7C7C0214
+		opword 0x80630228
+		bl animPoseGetMaterialFlag
+		opword 0x7C641B78
+		opword 0x807D000C
+		bl animPoseSetMaterialFlagOn
+		bl marioAnimeId
+		opword 0x5460103A
+		opword 0x7C7C0214
+		opword 0x80630228
+		bl animPoseGetMaterialLightFlag
+		opword 0x7C641B78
+		opword 0x807D000C
+		bl animPoseSetMaterialLightFlagOn
+		opword 0x801D0004
+		opword 0x3B800001
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x839D0018
+		opword 0x480000E8
+		opword 0x881D0031
+		opword 0x3B600000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B600001
+		opword 0x2C1B0001
+		opword 0x40820008
+		opword 0x3B80000C
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889D0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x5780103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7F83002E
+		opword 0x48000050
+		opword 0x881D0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x5780103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7F83002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x5780103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7F83002E
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7F84E378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x939D0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x801D0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807D0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7F84E378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801D0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x939D0018
+		opword 0x38000000
+		opword 0xB01D0020
+		opword 0x801D0008
+		opword 0x60002000
+		opword 0x901D0008
+		opword 0x38000000
+		opword 0x7FA3EB78
+		opword 0x901D001C
+		lwz r4, party_dp(r13)
+		opword 0x81840004
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x80BF008C
+		lis r3, vec3_802ccdcc@ha
+		opword 0x809F0090
+		addi r6, r3, vec3_802ccdcc@l
+		opword 0x38000000
+		opword 0x7FC3F378
+		opword 0x90BD0058
+		opword 0x909D005C
+		opword 0x809F0094
+		opword 0x909D0060
+		opword 0x80BD0058
+		opword 0x809D005C
+		opword 0x90BD00B8
+		opword 0x909D00BC
+		opword 0x809D0060
+		opword 0x909D00C0
+		opword 0x80A60000
+		opword 0x80860004
+		opword 0x90BD0070
+		opword 0x909D0074
+		opword 0x80860008
+		opword 0x909D0078
+		opword 0x981D0034
+	}
+}
+#pragma pop
+
+#define partyChgPose partyChgPose__af_inl
+#define partyGetPtr partyGetPtr__af_inl
+s32 partyEntry2Hello(s32 memberId) {
+    MarioWork* player;
+    s32 slot;
+    PartyEntry* party;
+
+    player = marioGetPtr();
+    slot = partyGetFreeSlot2();
+    if (slot < 0) {
+        return -1;
+    }
+    party = partyGetPtr(slot);
+    memset(party, 0, sizeof(PartyEntry));
+    party->camId = marioGetCamId();
+    party->paperAnimGroup = -1;
+    party->field_10 = -1;
+    party->paperPoseId = -1;
+    party->flags = 9;
+    party->currentSlotId = slot;
+    party->playerPtr = player;
+    party->currentMemberId = memberId;
+    if (slot == 1) {
+        party->flags |= 4;
+    }
+    party_dp = &partyDataTbl[memberId];
+    partyPoseEntry(party);
+    animPosePeraOff(party->paperAnimGroup);
+    setAnimPoseMaterialFlag(party);
+    partyChgPose(party, partyChgPoseId(party, 1));
+    party->field_1C = 0;
+    party_dp->init_func(party);
+    partyChgRunMode(party, 4);
+    return slot;
+}
+
+#undef partyChgPose
+#undef partyGetPtr
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z) {
+	char _af_pad[12];
+	asm volatile {
+		fmr f29, f1
+		mr r27, r3
+		opword 0xFFC01090
+		opword 0xFFE01890
+		bl marioGetPtr
+		la r28, partyPtrTbl(r13)
+		opword 0x7C7D1B78
+		opword 0x801C0004
+		opword 0x28000000
+		opword 0x40820028
+		opword 0x38600000
+		opword 0x38800188
+		bl __memAlloc
+		opword 0x907C0004
+		opword 0x38800000
+		opword 0x38A00188
+		bl memset
+		opword 0x3BE00001
+		opword 0x48000008
+		opword 0x3BE0FFFF
+		opword 0x2C1F0000
+		opword 0x4080000C
+		opword 0x3860FFFF
+		opword 0x48000320
+		opword 0x41800014
+		opword 0x57E0103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FC3002E
+		opword 0x48000008
+		opword 0x3BC00000
+		opword 0x7FC3F378
+		opword 0x38800000
+		opword 0x38A00188
+		bl memset
+		bl marioGetCamId
+		opword 0x907E0164
+		opword 0x3860FFFF
+		opword 0x38000009
+		opword 0x2C1F0001
+		opword 0x907E000C
+		opword 0x907E0010
+		opword 0x907E0014
+		opword 0x901E0000
+		opword 0x9BFE002F
+		opword 0x93BE0160
+		opword 0x9B7E0031
+		opword 0x40820010
+		opword 0x801E0000
+		opword 0x60000004
+		opword 0x901E0000
+		opword 0x1C9B0028
+		lis r3, partyDataTbl@ha
+		addi r0, r3, partyDataTbl@l
+		opword 0x7C602214
+		stw r3, party_dp(r13)
+		opword 0x881E0031
+		opword 0x2C000004
+		opword 0x41820024
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x4082000C
+		opword 0x83A30000
+		opword 0x48000038
+		lis r3, str_802CCEEC@ha
+		addi r29, r3, str_802CCEEC@l
+		opword 0x4800002C
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x801E0004
+		opword 0x5464103A
+		la r3, yoshigroup(r13)
+		opword 0x54000421
+		opword 0x7FA3202E
+		opword 0x4182000C
+		lis r3, str_802CCEEC@ha
+		addi r29, r3, str_802CCEEC@l
+		opword 0x807E000C
+		opword 0x2C030000
+		opword 0x41800008
+		bl animPoseRelease
+		opword 0x7FA3EB78
+		opword 0x38800002
+		bl animPoseEntry
+		opword 0x907E000C
+		opword 0x807E000C
+		bl animPosePeraOff
+		opword 0x83BE0160
+		bl marioAnimeId
+		opword 0x5460103A
+		opword 0x7C7D0214
+		opword 0x80630228
+		bl animPoseGetMaterialFlag
+		opword 0x7C641B78
+		opword 0x807E000C
+		bl animPoseSetMaterialFlagOn
+		bl marioAnimeId
+		opword 0x5460103A
+		opword 0x7C7D0214
+		opword 0x80630228
+		bl animPoseGetMaterialLightFlag
+		opword 0x7C641B78
+		opword 0x807E000C
+		bl animPoseSetMaterialLightFlagOn
+		opword 0x801E0004
+		opword 0x3BA00001
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83BE0018
+		opword 0x480000E8
+		opword 0x881E0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BA0000C
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57A0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000050
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x38000000
+		opword 0x7FC3F378
+		opword 0x901E001C
+		lwz r4, party_dp(r13)
+		opword 0x81840004
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl partyChgRunMode
+		lis r3, vec3_802ccdd8@ha
+		lfs f0, float_1_8041b0e8(r2)
+		addi r5, r3, vec3_802ccdd8@l
+		opword 0x7FE3FB78
+		opword 0x80050000
+		opword 0x80850004
+		stw r0, _af_pad+0(r1)
+		opword 0x80050008
+		opword 0x9081000C
+		opword 0xD3A10008
+		opword 0x90010010
+		opword 0x80010008
+		opword 0xD3C1000C
+		opword 0xD3E10010
+		opword 0x8081000C
+		opword 0x901E0058
+		opword 0x80010010
+		opword 0x909E005C
+		opword 0x901E0060
+		opword 0x809E0058
+		opword 0x801E005C
+		opword 0x909E00B8
+		opword 0x901E00BC
+		opword 0x801E0060
+		opword 0x901E00C0
+		opword 0xD01E0070
+		opword 0xD01E0074
+		opword 0xD01E0078
+	}
+}
+#pragma pop
+
+void partyInit(void) {
+    memset(partyPtrTbl, 0, sizeof(partyPtrTbl));
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void partyReInit(void) {
+	asm {
+		lis r3, vec3_802ccd30@ha
+		addi r31, r3, vec3_802ccd30@l
+	}
+	asm volatile {
+		bl marioGetExtraPartyId
+		opword 0x2C030000
+		opword 0x41800014
+		opword 0x5460103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FC3002E
+		opword 0x48000008
+		opword 0x3BC00000
+		opword 0x281E0000
+		opword 0x41820228
+		opword 0x3860000D
+		opword 0x38000000
+		opword 0x907E0000
+		opword 0x901E0004
+		lwz r28, 0xc(r30)
+		opword 0x2C1C0000
+		opword 0x4180001C
+		opword 0x7F83E378
+		opword 0x3880FFFF
+		bl animPoseSetMaterialFlagOff
+		opword 0x7F83E378
+		opword 0x38800002
+		bl animPoseSetMaterialLightFlagOn
+		opword 0x38000000
+		opword 0x981E0037
+		opword 0x801E001C
+		opword 0x28000000
+		opword 0x41820040
+		opword 0x807E000C
+		opword 0x38800000
+		opword 0x38A00000
+		bl animPoseSetPaperAnimGroup
+		opword 0x38000000
+		opword 0x901E001C
+		opword 0x801E0004
+		opword 0x54000188
+		opword 0x901E0004
+		opword 0x807E0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901E0014
+		opword 0x3B800000
+		opword 0x3BA00001
+		opword 0x939E0130
+		opword 0x939E012C
+		opword 0x939E0148
+		opword 0x939E0138
+		opword 0x939E013C
+		opword 0x939E0134
+		opword 0x939E0140
+		opword 0x939E0144
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83BE0018
+		opword 0x480000E4
+		opword 0x881E0031
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BA0000C
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57A0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000050
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl partyChgRunMode
+		opword 0x7FC3F378
+		opword 0x38800000
+		bl partyChgMot
+		opword 0x3800FFFF
+		opword 0x901E0168
+		opword 0x807F00B4
+		opword 0x801F00B8
+		opword 0x907E0070
+		opword 0x901E0074
+		opword 0x801F00BC
+		opword 0x901E0078
+		bl marioGetPartyId
+		opword 0x2C030000
+		opword 0x41800014
+		opword 0x5460103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FC3002E
+		opword 0x48000008
+		opword 0x3BC00000
+		opword 0x281E0000
+		opword 0x41820468
+		opword 0x809E0004
+		opword 0x38600001
+		opword 0x38000000
+		opword 0x907E0000
+		opword 0x549D0420
+		opword 0x901E0004
+		opword 0x981E0037
+		bl marioGetCamId
+		opword 0x281E0000
+		opword 0x907E0164
+		opword 0x418200AC
+		opword 0x839E000C
+		opword 0x2C1C0000
+		opword 0x4180001C
+		opword 0x7F83E378
+		opword 0x3880FFFF
+		bl animPoseSetMaterialFlagOff
+		opword 0x7F83E378
+		opword 0x38800002
+		bl animPoseSetMaterialLightFlagOn
+		opword 0x801E001C
+		opword 0x28000000
+		opword 0x41820040
+		opword 0x807E000C
+		opword 0x38800000
+		opword 0x38A00000
+		bl animPoseSetPaperAnimGroup
+		opword 0x38000000
+		opword 0x901E001C
+		opword 0x801E0004
+		opword 0x54000188
+		opword 0x901E0004
+		opword 0x807E0014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901E0014
+		opword 0x38000000
+		opword 0x901E0130
+		opword 0x901E012C
+		opword 0x901E0148
+		opword 0x901E0138
+		opword 0x901E013C
+		opword 0x901E0134
+		opword 0x901E0140
+		opword 0x901E0144
+		opword 0x807F00C0
+		opword 0x801F00C4
+		opword 0x907E0070
+		opword 0x901E0074
+		opword 0x801F00C8
+		opword 0x901E0078
+		bl partyClearFootmark
+		opword 0x2C1D0000
+		opword 0x41820074
+		opword 0x881E0031
+		opword 0x2C000004
+		opword 0x41820024
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820010
+		lwz r3, party_dp(r13)
+		opword 0x83A30000
+		opword 0x48000030
+		opword 0x3BBF01BC
+		opword 0x48000028
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x801E0004
+		opword 0x5464103A
+		la r3, yoshigroup(r13)
+		opword 0x54000421
+		opword 0x7FA3202E
+		opword 0x41820008
+		opword 0x3BBF01BC
+		opword 0x807E000C
+		opword 0x2C030000
+		opword 0x41800008
+		bl animPoseRelease
+		opword 0x7FA3EB78
+		opword 0x38800002
+		bl animPoseEntry
+		opword 0x907E000C
+		opword 0x881E0031
+		opword 0x2C000004
+		opword 0x40820010
+		opword 0x881E0034
+		opword 0x28000003
+		opword 0x41820300
+		bl marioGetPtr
+		opword 0x80030000
+		opword 0x54000253
+		opword 0x40820168
+		opword 0x801E0004
+		opword 0x3BA00001
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83BE0018
+		opword 0x480000E8
+		opword 0x881E0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BA0000C
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57A0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000050
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl partyChgRunMode
+		opword 0x7FC3F378
+		opword 0x38800000
+		bl partyChgMot
+		opword 0x48000174
+		opword 0x801E0004
+		opword 0x3BA00001
+		opword 0x540007BD
+		opword 0x4182000C
+		opword 0x83BE0018
+		opword 0x480000E8
+		opword 0x881E0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BA0000C
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889E0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57A0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000050
+		opword 0x881E0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57A0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FA3002E
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820018
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x801E0004
+		opword 0x540007BD
+		opword 0x40820044
+		opword 0x807E0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FA4EB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820028
+		opword 0x801E0004
+		opword 0x54000421
+		opword 0x4082001C
+		opword 0x93BE0018
+		opword 0x38000000
+		opword 0xB01E0020
+		opword 0x801E0008
+		opword 0x60002000
+		opword 0x901E0008
+		opword 0x7FC3F378
+		opword 0x38800002
+		bl partyChgRunMode
+		opword 0x38600006
+		opword 0x38000000
+		opword 0x987E003B
+		opword 0x981E0038
+		opword 0x801E0000
+		opword 0x60008000
+		opword 0x901E0000
+		opword 0x881E0031
+		opword 0x2C000007
+		opword 0x4082000C
+		opword 0x7FC3F378
+		bl chuchu_reinit
+		bl unk_8014c47c
+	}
+}
+#pragma pop
+
+void partyUsePost(PartyEntry* party) {
+    PartyFunc func;
+    if (party && party->runMode == 3) {
+        func = partyDataTbl[party->currentMemberId].post_func;
+        if (func) {
+            func(party);
+        }
+    }
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		lis r6, vec3_802ccd30@ha
+		opword 0x2C040004
+		opword 0x90010024
+		addi r6, r6, vec3_802ccd30@l
+		opword 0x93E1001C
+		opword 0x7C7F1B78
+		opword 0x93C10018
+		opword 0x93A10014
+		opword 0x418201B8
+		opword 0x40800018
+		opword 0x2C040003
+		opword 0x40800318
+		opword 0x2C040001
+		opword 0x40800340
+		opword 0x48000340
+		opword 0x2C04000C
+		opword 0x418202EC
+		opword 0x40800334
+		opword 0x2C04000B
+		opword 0x40800008
+		opword 0x48000328
+		opword 0x2C050008
+		opword 0x41820320
+		opword 0x80BF0160
+		opword 0x8086018C
+		opword 0x80060190
+		opword 0x909F0070
+		opword 0x901F0074
+		opword 0x80060194
+		opword 0x901F0078
+		opword 0x80860198
+		opword 0x8006019C
+		opword 0x909F007C
+		opword 0x901F0080
+		opword 0x800601A0
+		opword 0x901F0084
+		opword 0xC005019C
+		opword 0xD01F00FC
+		opword 0xC00501A0
+		opword 0xD01F0100
+		opword 0xC00501AC
+		opword 0xD01F0110
+		opword 0x801F0000
+		opword 0x54000418
+		opword 0x901F0000
+		bl partyClearJumpPara
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x801F0004
+		opword 0x281F0000
+		opword 0x54000734
+		opword 0x901F0004
+		opword 0x801F0004
+		opword 0x5400003C
+		opword 0x901F0004
+		opword 0x418201B4
+		opword 0x801F0004
+		opword 0x54000314
+		opword 0x901F0004
+		opword 0x480001A4
+		opword 0x80BF0160
+		opword 0x80860114
+		opword 0x80060118
+		opword 0x909F0070
+		opword 0x901F0074
+		opword 0x8006011C
+		opword 0x901F0078
+		opword 0x801F0004
+		opword 0x54000734
+		opword 0x901F0004
+		opword 0xC005019C
+		opword 0xD01F00FC
+		opword 0xC00501A0
+		opword 0xD01F0100
+		opword 0xC00501AC
+		opword 0xD01F0110
+		opword 0xC00501A8
+		opword 0xD01F010C
+		bl partyClearJumpPara
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x807F0004
+		opword 0x38000001
+		opword 0x54630734
+		opword 0x907F0004
+		opword 0x981F0034
+		opword 0x48000050
+		opword 0x281F0000
+		opword 0x41820048
+		opword 0x801F0004
+		opword 0x54000314
+		opword 0x901F0004
+		opword 0x48000038
+		opword 0x881F0031
+		lis r4, partyDataTbl@ha
+		addi r4, r4, partyDataTbl@l
+		opword 0x7C000774
+		opword 0x1C000028
+		opword 0x7C840214
+		opword 0x81840010
+		opword 0x280C0000
+		opword 0x41820014
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x48000008
+		bl L_partyForceSlitOff
+		opword 0x80010024
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x83A10014
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
+
+#pragma dont_inline on
+#pragma dont_inline on
+#pragma dont_inline on
+#pragma dont_inline on
+void partyChgRunMode(PartyEntry* party, s32 mode) {
+    if (party->runMode != 9 && party->runMode != 3) {
+        party->prevRunMode = party->runMode;
+    }
+    N__partyChgRunMode(party, party->runMode, mode);
+    party->runMode = mode;
+    party->field_8 |= 8;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+#pragma dont_inline reset
+
+#pragma dont_inline on
+#pragma dont_inline on
+#pragma dont_inline on
+#pragma dont_inline on
+void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
+    if (party->runMode != 9 && party->runMode != 3) {
+        party->prevRunMode = party->runMode;
+    }
+    N__partyChgRunMode(party, party->runMode, mode);
+    party->runMode = mode;
+    party->field_8 &= ~8;
+    party->field_38 = sub;
+}
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+
+#pragma dont_inline reset
+#pragma dont_inline reset
+
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void unk_800ba2dc(PartyEntry* party) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		lis r4, vec3_802ccd30@ha
+		opword 0x90010024
+		addi r5, r4, vec3_802ccd30@l
+		opword 0x93E1001C
+		opword 0x7C7F1B78
+		opword 0x93C10018
+		opword 0x93A10014
+		opword 0x88C30034
+		opword 0x88030035
+		opword 0x7C060040
+		opword 0x41820404
+		opword 0x28060004
+		opword 0x408201A8
+		opword 0x80DF0160
+		opword 0x80850114
+		opword 0x80050118
+		opword 0x909F0070
+		opword 0x901F0074
+		opword 0x8005011C
+		opword 0x901F0078
+		opword 0x801F0004
+		opword 0x54000734
+		opword 0x901F0004
+		opword 0xC006019C
+		opword 0xD01F00FC
+		opword 0xC00601A0
+		opword 0xD01F0100
+		opword 0xC00601AC
+		opword 0xD01F0110
+		opword 0xC00601A8
+		opword 0xD01F010C
+		bl partyClearJumpPara
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x807F0004
+		opword 0x281F0000
+		opword 0x38000001
+		opword 0x54630734
+		opword 0x907F0004
+		opword 0x981F0034
+		opword 0x41820040
+		opword 0x881F0034
+		opword 0x28000003
+		opword 0x40820034
+		opword 0x881F0031
+		lis r3, partyDataTbl@ha
+		addi r3, r3, partyDataTbl@l
+		opword 0x7C000774
+		opword 0x1C000028
+		opword 0x7C630214
+		opword 0x81830010
+		opword 0x280C0000
+		opword 0x41820010
+		opword 0x7FE3FB78
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x7FE3FB78
+		opword 0x38800000
+		bl partyChgMot
+		opword 0x48000258
+		opword 0x2806000B
+		opword 0x408201D0
+		opword 0x80DF0160
+		opword 0x8085018C
+		opword 0x80050190
+		opword 0x909F0070
+		opword 0x901F0074
+		opword 0x80050194
+		opword 0x901F0078
+		opword 0x80850198
+		opword 0x8005019C
+		opword 0x909F007C
+		opword 0x901F0080
+		opword 0x800501A0
+		opword 0x901F0084
+		opword 0xC006019C
+		opword 0xD01F00FC
+		opword 0xC00601A0
+		opword 0xD01F0100
+		opword 0xC00601AC
+		opword 0xD01F0110
+		opword 0x801F0000
+		opword 0x54000418
+		opword 0x901F0000
+		bl partyClearJumpPara
+		opword 0x801F0004
+		opword 0x3BC00001
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3BA00000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3BA00001
+		opword 0x2C1D0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x801F0004
+		opword 0x281F0000
+		opword 0x54000734
+		opword 0x901F0004
+		opword 0x801F0004
+		opword 0x5400003C
+		opword 0x901F0004
+		opword 0x41820010
+		opword 0x801F0004
+		opword 0x54000314
+		opword 0x901F0004
+		opword 0x281F0000
+		opword 0x41820040
+		opword 0x881F0034
+		opword 0x28000003
+		opword 0x40820034
+		opword 0x881F0031
+		lis r3, partyDataTbl@ha
+		addi r3, r3, partyDataTbl@l
+		opword 0x7C000774
+		opword 0x1C000028
+		opword 0x7C630214
+		opword 0x81830010
+		opword 0x280C0000
+		opword 0x41820010
+		opword 0x7FE3FB78
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x7FE3FB78
+		opword 0x38800000
+		bl partyChgMot
+		opword 0x48000084
+		opword 0x2806000C
+		opword 0x40820018
+		opword 0x281F0000
+		opword 0x41820010
+		opword 0x801F0004
+		opword 0x54000314
+		opword 0x901F0004
+		opword 0x281F0000
+		opword 0x41820040
+		opword 0x881F0034
+		opword 0x28000003
+		opword 0x40820034
+		opword 0x881F0031
+		lis r3, partyDataTbl@ha
+		addi r3, r3, partyDataTbl@l
+		opword 0x7C000774
+		opword 0x1C000028
+		opword 0x7C630214
+		opword 0x81830010
+		opword 0x280C0000
+		opword 0x41820010
+		opword 0x7FE3FB78
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x881F0035
+		opword 0x7FE3FB78
+		opword 0x38800000
+		opword 0x981F0034
+		opword 0x801F0008
+		opword 0x60000008
+		opword 0x901F0008
+		bl partyChgMot
+		opword 0x80010024
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x83A10014
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
+
+#pragma defer_codegen reset
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+asm s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
+	nofralloc
+	stwu r1, -0x60(r1)
+	mflr r0
+	stw r0, 0x64(r1)
+	stfd f31, 0x50(r1)
+	psq_st f31, 0x58(r1), 0, 0
+	stfd f30, 0x40(r1)
+	psq_st f30, 0x48(r1), 0, 0
+	stfd f29, 0x30(r1)
+	psq_st f29, 0x38(r1), 0, 0
+	stw r31, 0x2c(r1)
+	stw r30, 0x28(r1)
+	stw r29, 0x24(r1)
+	stw r28, 0x20(r1)
+	fmr f29, f1
+	lis r4, vec3_802ccd30@ha
+	fmr f30, f2
+	addi r31, r4, vec3_802ccd30@l
+	fmr f31, f3
+	bl partyEntryMain
+	mr. r28, r3
+	blt L_af_1
+	slwi r0, r28, 2
+	la r3, partyPtrTbl(r13)
+	lwzx r30, r3, r0
+	b L_af_2
+L_af_1:
+	li r30, 0x0
+L_af_2:
+	lwz r3, 0xc(r31)
+	li r29, 0x1
+	lwz r0, 0x10(r31)
+	stw r3, 0x70(r30)
+	stw r0, 0x74(r30)
+	lwz r0, 0x14(r31)
+	stw r0, 0x78(r30)
+	lwz r0, 0x18(r31)
+	lwz r3, 0x1c(r31)
+	stw r0, 0x8(r1)
+	lwz r0, 0x20(r31)
+	stw r3, 0xc(r1)
+	stw r0, 0x10(r1)
+	stfs f29, 0x8(r1)
+	lwz r0, 0x8(r1)
+	stfs f30, 0xc(r1)
+	stfs f31, 0x10(r1)
+	lwz r3, 0xc(r1)
+	stw r0, 0x58(r30)
+	lwz r0, 0x10(r1)
+	stw r3, 0x5c(r30)
+	stw r0, 0x60(r30)
+	lwz r4, 0x160(r30)
+	lwz r3, 0x24(r31)
+	lwz r0, 0x28(r31)
+	stw r3, 0x70(r30)
+	stw r0, 0x74(r30)
+	lwz r0, 0x2c(r31)
+	stw r0, 0x78(r30)
+	lfs f0, 0x1a8(r4)
+	stfs f0, 0x110(r30)
+	lfs f0, 0x1a8(r4)
+	stfs f0, 0x10c(r30)
+	lwz r0, 0x4(r30)
+	rlwinm. r0, r0, 0, 30, 30
+	bne L_af_3
+	lbz r0, 0x31(r30)
+	li r31, 0x0
+	extsb r3, r0
+	cmpwi r3, 0x8
+	bge L_af_4
+	bl partyGetHp
+	cmpwi r3, 0x5
+	bgt L_af_4
+	li r31, 0x1
+L_af_4:
+	cmpwi r31, 0x1
+	bne L_af_5
+	li r29, 0xc
+L_af_5:
+	lwz r0, 0x4(r30)
+	rlwinm. r0, r0, 0, 16, 16
+	bne L_af_6
+	lbz r4, 0x31(r30)
+	lis r3, partyPoseTbl@ha
+	addi r3, r3, partyPoseTbl@l
+	slwi r0, r29, 2
+	extsb r4, r4
+	mulli r4, r4, 0x3c
+	add r3, r3, r4
+	lwzx r29, r3, r0
+	b L_af_7
+L_af_6:
+	lbz r0, 0x31(r30)
+	extsb r0, r0
+	cmpwi r0, 0x4
+	beq L_af_8
+	mulli r4, r0, 0x3c
+	lis r3, partyDotPoseTbl@ha
+	slwi r0, r29, 2
+	addi r3, r3, partyDotPoseTbl@l
+	add r3, r3, r4
+	lwzx r29, r3, r0
+	b L_af_7
+L_af_8:
+	li r3, 0x4
+	bl pouchGetPartyColor
+	mulli r4, r3, 0x3c
+	lis r3, yoshiDotPoseTbl@ha
+	slwi r0, r29, 2
+	addi r3, r3, yoshiDotPoseTbl@l
+	add r3, r3, r4
+	lwzx r29, r3, r0
+L_af_7:
+	lwz r3, 0x18(r30)
+	cmplwi r3, 0x0
+	beq L_af_9
+	mr r4, r29
+	bl strcmp
+	cmpwi r3, 0x0
+	beq L_af_3
+L_af_9:
+	stw r29, 0x18(r30)
+	li r0, 0x0
+	sth r0, 0x20(r30)
+	lwz r0, 0x8(r30)
+	ori r0, r0, 0x2000
+	stw r0, 0x8(r30)
+L_af_3:
+	li r0, 0x0
+	mr r3, r28
+	stb r0, 0x34(r30)
+	psq_l f31, 0x58(r1), 0, 0
+	lfd f31, 0x50(r1)
+	psq_l f30, 0x48(r1), 0, 0
+	lfd f30, 0x40(r1)
+	psq_l f29, 0x38(r1), 0, 0
+	lfd f29, 0x30(r1)
+	lwz r31, 0x2c(r1)
+	lwz r30, 0x28(r1)
+	lwz r29, 0x24(r1)
+	lwz r0, 0x64(r1)
+	lwz r28, 0x20(r1)
+	mtlr r0
+	addi r1, r1, 0x60
+	blr
+}
+
+PartyEntry* partyGetPtr(s32 index) {
+    if (index >= 0) {
+        return partyPtrTbl[index];
+    }
+    return NULL;
+}
+
+PartyEntry* anotherPartyGetPtr(s32 index) {
+    if (index < 0) {
+        return NULL;
+    }
+    return *(partyPtrTbl + ((index + 1) & 1));
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the epilogue scheduler run
+BOOL partyPaperOn(PartyEntry* party, const char* animGroup) {
+	asm {
+		lis r5, vec3_802ccd30@ha
+		addi r30, r5, vec3_802ccd30@l
+		mr r29, r4
+	}
+	asm volatile {
+		mr r28, r3
+		opword 0x80630014
+		opword 0x2C030000
+		opword 0x41800010
+		bl animPaperPoseRelease
+		opword 0x3800FFFF
+		opword 0x901C0014
+		opword 0x801C0004
+		opword 0x7FA3EB78
+		opword 0x38800002
+		opword 0x64000400
+		opword 0x901C0004
+		bl animPaperPoseEntry
+		opword 0x907C0014
+		opword 0x7FA3EB78
+		opword 0x389E01EC
+		opword 0x3BE00000
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820040
+		opword 0x7FA3EB78
+		opword 0x389E01F4
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182002C
+		opword 0x7FA3EB78
+		opword 0x389E01FC
+		bl strcmp
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0x7FA3EB78
+		opword 0x389E01E0
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x3BE00001
+		opword 0x7FE00034
+		opword 0x7FA3EB78
+		opword 0x5400D97E
+		opword 0x389E0208
+		opword 0x7C1E0378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x881C0031
+		opword 0x7C000774
+		opword 0x20000005
+		opword 0x7C000034
+		opword 0x541ED97E
+		opword 0x807C000C
+		opword 0x7FA4EB78
+		opword 0x7FC5F378
+		bl animPoseSetPaperAnimGroup
+	}
+	asm {
+		li r3, 0x1
+	}
+}
+#pragma pop
+
+void partyPaperOff(PartyEntry* party) {
+    s32 paperPoseId; // r3
+
+    if ((party->flags2 & 0x4000000) && party->field_1C) {
+        animPoseSetPaperAnimGroup(party->paperAnimGroup, NULL, FALSE);
+        party->field_1C = 0;
+        party->flags2 &= ~0x4000000;
+        paperPoseId = party->paperPoseId;
+        if (paperPoseId >= 0) {
+            animPaperPoseRelease(paperPoseId);
+            party->paperPoseId = -1;
+        }
+    }
+}
+
+void partyPaperLightOff(PartyEntry* party) {
+    animPoseSetMaterialLightFlagOff(party->paperAnimGroup, 1);
+}
+
+#undef partyChgPoseId
+char* partyChgPoseId(PartyEntry* party, s32 index) {
+    char* v6;
+    char* v8;
+    BOOL v5;
+    s32 poseIdx = index;
+
+    if ((party->flags2 & 2) != 0) {
+        return party->animName;
+    }
+    v5 = 0;
+    if ((party->currentMemberId < 8) && (partyGetHp(party->currentMemberId) <= 5)) {
+        v5 = TRUE;
+    }
+    if (v5 == TRUE) {
+        if (index == 1) {
+            poseIdx = 12;
+        } else if (index == 2) {
+            poseIdx = 13;
+        } else if (index == 3) {
+            poseIdx = 14;
+        }
+    }
+    if (!(party->flags2 & 0x8000)) {
+        v6 = partyPoseTbl[party->currentMemberId][poseIdx];
+    } else if (party->currentMemberId != PARTY_MEMBER_YOSHI) {
+        v6 = partyDotPoseTbl[party->currentMemberId][poseIdx];
+    } else {
+        v6 = yoshiDotPoseTbl[pouchGetPartyColor(PARTNER_YOSHI)][poseIdx];
+    }
+    v8 = party->animName;
+    if (v8 && !strcmp(v8, v6)) {
+        return v6;
+    }
+    party->animName = v6;
+    party->field_20 = 0;
+    party->field_8 |= 0x2000u;
+    return v6;
+}
+#define partyChgPoseId partyChgPoseId_inl
+
+void partyChgPose(PartyEntry* party, char* pose) {
+    if (!(party->flags2 & 2)) {
+        if (party->animName == NULL || strcmp(party->animName, pose)) {
+            if (!(party->flags2 & 0x8000)) {
+                party->animName = pose;
+                party->field_20 = 0;
+                party->field_8 |= 0x2000;
+            }
+        }
+    }
+}
+
+void partyChgPaper(PartyEntry* party, char* paper) {
+    if (!(party->flags2 & 2)) {
+        if (party->field_1C == 0 || strcmp((char*)party->field_1C, paper)) {
+            party->field_1C = (u32)paper;
+            party->field_20 = 0;
+            party->field_8 |= 0x4000;
+        }
+    }
+}
+
+void partyCtrlOff(PartyEntry* party) {
+    party = partyPtrTbl[0];
+    if (party) {
+        party->flags |= PARTY_FLAG_CTRL_OFF;
+    }
+    party = partyPtrTbl[1];
+    if (party) {
+        party->flags |= PARTY_FLAG_CTRL_OFF;
+    }
+}
+
+void partyCtrlOn(PartyEntry* party) {
+    party = partyPtrTbl[0];
+    if (party) {
+        party->flags &= ~PARTY_FLAG_CTRL_OFF;
+    }
+    party = partyPtrTbl[1];
+    if (party) {
+        party->flags &= ~PARTY_FLAG_CTRL_OFF;
+    }
+}
+
+#pragma dont_inline on
+void partyRun(PartyEntry* party) {
+    if (party->runMode == 0) {
+        partyChgRunMode(party, 1);
+    }
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void partyStop(PartyEntry* party) {
+    partyChgRunMode(party, 0);
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void partySetForceMove(PartyEntry* party, s16 a2, f32 a3, f32 a4) {
+    party->targetDir = a3;
+    party->field_28 = a2;
+    party->moveSpeed = a4;
+    partyChgRunMode(party, 9);
+    partyChgMot(party, 1);
+}
+#pragma dont_inline reset
+
+s32 partyEntryHello(s32 memberId) {
+    s32 id = partyEntryMain(memberId);
+    partyChgRunMode(partyGetPtr(id), 4);
+    return id;
+}
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 partyEntry(s32 memberId) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0x93E1001C
+		opword 0x93C10018
+		opword 0x93A10014
+		opword 0x93810010
+		bl partyEntryMain
+		opword 0x7C7D1B79
+		opword 0x41800014
+		opword 0x57A0103A
+		la r3, partyPtrTbl(r13)
+		opword 0x7FE3002E
+		opword 0x48000008
+		opword 0x3BE00000
+		lis r3, vec3_802ccd30@ha
+		opword 0x3800000A
+		addi r7, r3, vec3_802ccd30@l
+		opword 0x7FE3FB78
+		opword 0x80C70000
+		opword 0x389F0058
+		opword 0x80A70004
+		opword 0x90DF0070
+		opword 0x90BF0074
+		opword 0x80A70008
+		opword 0x90BF0078
+		opword 0x981F0038
+		opword 0x80BF0160
+		opword 0xC00501A8
+		opword 0xD01F0110
+		opword 0xC00501A8
+		opword 0xD01F010C
+		bl partyGetAppearPos2
+		opword 0x807F0058
+		opword 0x3BC00001
+		opword 0x801F005C
+		opword 0x907F00B8
+		opword 0x901F00BC
+		opword 0x801F0060
+		opword 0x901F00C0
+		opword 0x801F0004
+		opword 0x540007BD
+		opword 0x408200E4
+		opword 0x881F0031
+		opword 0x3B800000
+		opword 0x7C030774
+		opword 0x2C030008
+		opword 0x40800014
+		bl partyGetHp
+		opword 0x2C030005
+		opword 0x41810008
+		opword 0x3B800001
+		opword 0x2C1C0001
+		opword 0x40820008
+		opword 0x3BC0000C
+		opword 0x801F0004
+		opword 0x54000421
+		opword 0x40820028
+		opword 0x889F0031
+		lis r3, partyPoseTbl@ha
+		addi r3, r3, partyPoseTbl@l
+		opword 0x57C0103A
+		opword 0x7C840774
+		opword 0x1C84003C
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000050
+		opword 0x881F0031
+		opword 0x7C000774
+		opword 0x2C000004
+		opword 0x41820020
+		opword 0x1C80003C
+		lis r3, partyDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, partyDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x48000024
+		opword 0x38600004
+		bl pouchGetPartyColor
+		opword 0x1C83003C
+		lis r3, yoshiDotPoseTbl@ha
+		opword 0x57C0103A
+		addi r3, r3, yoshiDotPoseTbl@l
+		opword 0x7C632214
+		opword 0x7FC3002E
+		opword 0x807F0018
+		opword 0x28030000
+		opword 0x41820014
+		opword 0x7FC4F378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x93DF0018
+		opword 0x38000000
+		opword 0xB01F0020
+		opword 0x801F0008
+		opword 0x60002000
+		opword 0x901F0008
+		opword 0x38000001
+		opword 0x7FA3EB78
+		opword 0x981F0034
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x83A10014
+		opword 0x83810010
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
+
+
+// literal pool in target order (asmfake --minimal)
 #pragma force_active on
-__declspec(section ".rodata") const f32 vec3_802ccd30[3] = { 1.0f, 1.0f, 1.0f };
-#pragma force_active on
-__declspec(section ".rodata") const f32 vec3_802ccd3c[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802ccd48[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802ccd54[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const char str_802CCD60[] = "c_babyyoshi";
-__declspec(section ".rodata") const char str_802CCD6C[] = "c_babyyoshi2\000\000\000";
-__declspec(section ".rodata") const char str_802CCD7C[] = "c_babyyoshi3\000\000\000";
-__declspec(section ".rodata") const char str_802CCD8C[] = "c_babyyoshi4\000\000\000";
-__declspec(section ".rodata") const char str_802CCD9C[] = "c_babyyoshi5\000\000\000";
-__declspec(section ".rodata") const char str_802CCDAC[] = "c_babyyoshi6\000\000\000";
-__declspec(section ".rodata") const char str_802CCDBC[] = "c_babyyoshi7\000\000\000";
-__declspec(section ".rodata") const f32 vec3_802ccdcc[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802ccdd8[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802ccde4[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802ccdf0[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802ccdfc[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce08[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce14[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802cce20[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802cce2c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce38[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce44[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802cce50[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce5c[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802cce68[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce74[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce80[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce8c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cce98[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802ccea4[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cceb0[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802ccebc[3] = { 1.0f, 1.0f, 1.0f };
-__declspec(section ".rodata") const f32 vec3_802ccec8[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802cced4[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802ccee0[3] = { 0.0f, -1.0f, 0.0f };
-__declspec(section ".rodata") const char str_802CCEEC[] = "d_mario";
-__declspec(section ".rodata") const f64 double_to_int_mask_802ccef8 = 4503599627370496;
-__declspec(section ".rodata") const f64 double_to_int_802ccf00 = 4503601774854144;
-__declspec(section ".rodata") const char str_802CCF08[] = "PM_D_1B";
-__declspec(section ".rodata") const char str_802CCF10[] = "p_dokan_y\000\000";
-__declspec(section ".rodata") const char str_802CCF1C[] = "p_roll\000";
-__declspec(section ".rodata") const char str_802CCF24[] = "p_plane";
-__declspec(section ".rodata") const char str_802CCF2C[] = "p_dokan_x\000\000";
-__declspec(section ".rodata") const char str_802CCF38[] = "p_slit\000";
-__declspec(section ".rodata") const char str_802CCF40[] = "PM_D_1A";
-#pragma force_active reset
-#pragma force_active on
+__declspec(section ".rodata") const f32 vec3_802ccd30[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccd3c[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccd48[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802ccd54[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const char str_802CCD60[12] = "c_babyyoshi";
+__declspec(section ".rodata") const char str_802CCD6C[15] = "c_babyyoshi2\0\0\0";
+__declspec(section ".rodata") const char str_802CCD7C[15] = "c_babyyoshi3\0\0\0";
+__declspec(section ".rodata") const char str_802CCD8C[15] = "c_babyyoshi4\0\0\0";
+__declspec(section ".rodata") const char str_802CCD9C[15] = "c_babyyoshi5\0\0\0";
+__declspec(section ".rodata") const char str_802CCDAC[15] = "c_babyyoshi6\0\0\0";
+__declspec(section ".rodata") const char str_802CCDBC[15] = "c_babyyoshi7\0\0\0";
+__declspec(section ".rodata") const f32 vec3_802ccdcc[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccdd8[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802ccde4[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccdf0[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccdfc[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce08[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce14[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802cce20[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802cce2c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce38[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce44[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802cce50[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce5c[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802cce68[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce74[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce80[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce8c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cce98[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802ccea4[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cceb0[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802ccebc[3] = {1.0f, 1.0f, 1.0f};
+__declspec(section ".rodata") const f32 vec3_802ccec8[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802cced4[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802ccee0[3] = {0.0f, -1.0f, 0.0f};
+__declspec(section ".rodata") const char str_802CCEEC[8] = "d_mario";
+__declspec(section ".rodata") const f64 double_to_int_mask_802ccef8 = 4503599627370496.0;
+__declspec(section ".rodata") const f64 double_to_int_802ccf00 = 4503601774854144.0;
+__declspec(section ".rodata") const char str_802CCF08[8] = "PM_D_1B";
+__declspec(section ".rodata") const char str_802CCF10[11] = "p_dokan_y\0\0";
+__declspec(section ".rodata") const char str_802CCF1C[7] = "p_roll\0";
+__declspec(section ".rodata") const char str_802CCF24[8] = "p_plane";
+__declspec(section ".rodata") const char str_802CCF2C[11] = "p_dokan_x\0\0";
+__declspec(section ".rodata") const char str_802CCF38[7] = "p_slit\0";
+__declspec(section ".rodata") const char str_802CCF40[8] = "PM_D_1A";
 __declspec(section ".sdata2") const f32 float_neg6p8_8041b0d8 = -6.8f;
 __declspec(section ".sdata2") const f32 float_6p8_8041b0dc = 6.8f;
 __declspec(section ".sdata2") const f32 float_1p2_8041b0e0 = 1.2f;
@@ -3325,9059 +10795,9 @@ __declspec(section ".sdata2") const f32 float_neg26_8041b1b4 = -26.0f;
 __declspec(section ".sdata2") const f32 float_50_8041b1b8 = 50.0f;
 __declspec(section ".sdata2") const f32 float_18p5_8041b1bc = 18.5f;
 
-void party_damage_return(PartyEntry* party);
 #pragma force_active on
-__declspec(section ".data") static void* jumptable_803126C0[] = {
-    (char*)party_damage_return + 0x8C,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0xA4,
-    (char*)party_damage_return + 0x17C,
-    (char*)party_damage_return + 0x1A4,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x508,
-    (char*)party_damage_return + 0x248,
-    (char*)party_damage_return + 0x2D0,
-    (char*)party_damage_return + 0x334,
-    (char*)party_damage_return + 0x4D8,
-};
-s32 partyGoodbyeMain(PartyEntry* party);
-#pragma force_active on
-__declspec(section ".data") static void* jumptable_80312720[] = {
-    (char*)partyGoodbyeMain + 0x78,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x110,
-    (char*)partyGoodbyeMain + 0x2F0,
-    (char*)partyGoodbyeMain + 0x3A4,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4CC,
-    (char*)partyGoodbyeMain + 0x4B8,
-};
-s32 partyHelloMain(PartyEntry* party);
-#pragma force_active on
-__declspec(section ".data") static void* jumptable_80312774[] = {
-    (char*)partyHelloMain + 0x5C,
-    (char*)partyHelloMain + 0x18C,
-    (char*)partyHelloMain + 0x284,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x4A8,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x5C8,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6D0,
-    (char*)partyHelloMain + 0x6C8,
-};
-void driveParty(PartyEntry* party);
-#pragma force_active on
-__declspec(section ".data") static void* jumptable_803127F0[] = {
-    (char*)driveParty + 0xF8,
-    (char*)driveParty + 0x260,
-    (char*)driveParty + 0x280,
-    (char*)driveParty + 0x2E4,
-    (char*)driveParty + 0x334,
-    (char*)driveParty + 0x334,
-    (char*)driveParty + 0x334,
-    (char*)driveParty + 0x334,
-    (char*)driveParty + 0x4AC,
-    (char*)driveParty + 0x2C4,
-    (char*)driveParty + 0x4DC,
-    (char*)driveParty + 0x510,
-    (char*)driveParty + 0x560,
-    (char*)driveParty + 0x5A8,
-    (char*)driveParty + 0x5C8,
-};
-void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode);
-void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub);
-void PSMTX44MultVec(const Mtx44 m, const Vec* src, Vec* dst);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXRotRad(Mtx m, char axis, f32 rad);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-void* __memAlloc(HEAP_TYPE heap, u32 size);
-void __memFree(HEAP_TYPE heap, void* ptr);
-f32 angleABf(f32 x1, f32 y1, f32 x2, f32 y2);
-s32 animPaperPoseEntry(const char* animName, s32 type);
-void animPaperPoseRelease(s32 poseId);
-void animPoseDrawMtx(s32 poseId, Mtx matrix, s32 xluMode, f32 rotY, f32 scale);
-s32 animPoseEntry(const char* animName, s32 type);
-u32 animPoseGetMaterialFlag(s32 poseId);
-u32 animPoseGetMaterialLightFlag(s32 poseId);
-void animPoseMain(s32 poseId);
-void animPosePeraOff(s32 poseId);
-void animPoseRelease(s32 poseId);
-void animPoseSetAnim(s32 poseId, const char* animName, BOOL reset);
-void animPoseSetLocalTime(s32 poseId, f32 localTimeFrames);
-void animPoseSetLocalTimeRate(s32 poseId, f32 localTimeRate);
-void animPoseSetMaterialFlagOff(s32 poseId, u32 mask);
-void animPoseSetMaterialFlagOn(s32 poseId, u32 mask);
-void animPoseSetMaterialLightFlagOff(s32 poseId, u32 mask);
-void animPoseSetMaterialLightFlagOn(s32 poseId, u32 mask);
-void animPoseSetPaperAnim(s32 poseId, const char* animName, BOOL reset);
-void animPoseSetPaperAnimGroup(s32 poseId, const char* animName, BOOL someflag);
-CameraEntry* camGetPtr(CameraId cameraId);
-void dispEntry(CameraId camera, f32 order, s32 renderMode, DispCallback callback, void* param);
-f32 distABf(f32 x1, f32 y1, f32 x2, f32 y2);
-s32 irand(s32 scalar);
-s32 marioAnimeId(void);
-BOOL marioBgmodeChk(void);
-BOOL marioChkInScreen(s32 x, s32 y);
-s32 marioGetCamId(void);
-s32 marioGetExtraPartyId(void);
-s32 marioGetPartyId(void);
-MarioWork* marioGetPtr(void);
-void *memset(void *dest, int ch, size_t count);
-void movePos(float* ret_sin, float* ret_cos, f32 a3, f32 degree);
-s32 partyGetHp(PartyId partnerId);
-void partyMakeDispDir(PartyEntry* party);
-s32 pouchGetPartyColor(PartyId partnerId);
-void pouchSetPartyColor(PartyId partnerId, s32 color);
-s32 psndSFXOn_3D(const char* name, Vec* position);
-f32 revise360(f32 angle);
-void sincosf(f32* ret_sin, f32* ret_cos, f32 degree);
-int strcmp(const char *s1, const char *s2);
-s32 unk_8013be14(void);
-asm void partySetFamicomMode(PartyEntry* party, s32 mode) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	cmpwi r4, 0x1
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	bne @1
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @2
-	bl L_partyForceSlitOff
-	lwz r0, 0x4(r31)
-	ori r0, r0, 0x8000
-	stw r0, 0x4(r31)
-	lbz r0, 0x31(r31)
-	cmpwi r0, 0x4
-	beq @3
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @4
-	lwz r3, party_dp(r13)
-	lwz r30, 0x0(r3)
-	b @5
-	@4:
-	lis r3, str_802CCEEC@ha
-	addi r30, r3, str_802CCEEC@l
-	b @5
-	@3:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r31)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r30, r3, r4
-	beq @5
-	lis r3, str_802CCEEC@ha
-	addi r30, r3, str_802CCEEC@l
-	@5:
-	lwz r3, 0xc(r31)
-	cmpwi r3, 0x0
-	blt @6
-	bl animPoseRelease
-	@6:
-	mr r3, r30
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r31)
-	li r30, 0x1
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @7
-	lwz r30, 0x18(r31)
-	b @8
-	@7:
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @9
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @9
-	li r29, 0x1
-	@9:
-	cmpwi r29, 0x1
-	bne @10
-	li r30, 0xc
-	@10:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @11
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @12
-	@11:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @13
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @12
-	@13:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@12:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @14
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @14
-	b @8
-	@14:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@8:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @2
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @15
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	@15:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @2
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	b @2
-	@1:
-	lwz r3, 0x4(r31)
-	rlwinm. r0, r3, 0, 16, 16
-	beq @2
-	rlwinm r0, r3, 0, 17, 15
-	stw r0, 0x4(r31)
-	lbz r0, 0x31(r31)
-	cmpwi r0, 0x4
-	beq @16
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @17
-	lwz r3, party_dp(r13)
-	lwz r30, 0x0(r3)
-	b @18
-	@17:
-	lis r3, str_802CCEEC@ha
-	addi r30, r3, str_802CCEEC@l
-	b @18
-	@16:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r31)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r30, r3, r4
-	beq @18
-	lis r3, str_802CCEEC@ha
-	addi r30, r3, str_802CCEEC@l
-	@18:
-	lwz r3, 0xc(r31)
-	cmpwi r3, 0x0
-	blt @19
-	bl animPoseRelease
-	@19:
-	mr r3, r30
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r31)
-	li r30, 0x1
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @20
-	lwz r30, 0x18(r31)
-	b @21
-	@20:
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @22
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @22
-	li r29, 0x1
-	@22:
-	cmpwi r29, 0x1
-	bne @23
-	li r30, 0xc
-	@23:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @24
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @25
-	@24:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @26
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @25
-	@26:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@25:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @27
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @27
-	b @21
-	@27:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@21:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @2
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @28
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	@28:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @2
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
+__declspec(section ".data") u32 gap_05_8031282C_data[1] = {0};  // unreferenced zero word after the jumptables in target
+#pragma force_active reset
 
-asm void partyShadowOff(PartyEntry* party) {
-	nofralloc
-	cmplwi r3, 0x0
-	beqlr
-	lwz r0, 0x4(r3)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r3)
-	blr
-}
 
-asm void partyUpdateKeyData(PartyEntry* party) {
-	nofralloc
-	lwz r0, 0x0(r3)
-	lbz r6, 0x30(r3)
-	rlwinm. r0, r0, 0, 1, 2
-	extsb r6, r6
-	beq @1
-	li r0, 0x0
-	stb r0, 0x158(r3)
-	stb r0, 0x159(r3)
-	stb r0, 0x15a(r3)
-	stb r0, 0x15b(r3)
-	stb r0, 0x15c(r3)
-	stb r0, 0x15d(r3)
-	stb r0, 0x15e(r3)
-	stb r0, 0x15f(r3)
-	sth r0, 0x150(r3)
-	sth r0, 0x152(r3)
-	sth r0, 0x154(r3)
-	sth r0, 0x156(r3)
-	blr
-	@1:
-	lwz r5, gp(r13)
-	li r4, 0x0
-	slwi r0, r6, 2
-	add r5, r5, r6
-	lbz r5, 0x13b8(r5)
-	stb r5, 0x158(r3)
-	lwz r5, gp(r13)
-	add r5, r5, r6
-	lbz r5, 0x13bc(r5)
-	neg r5, r5
-	stb r5, 0x159(r3)
-	lwz r5, gp(r13)
-	add r5, r5, r6
-	lbz r5, 0x13c0(r5)
-	stb r5, 0x15a(r3)
-	lwz r5, gp(r13)
-	add r5, r5, r6
-	lbz r5, 0x13c4(r5)
-	neg r5, r5
-	stb r5, 0x15b(r3)
-	lwz r5, gp(r13)
-	add r5, r5, r6
-	lbz r5, 0x13c8(r5)
-	stb r5, 0x15c(r3)
-	lwz r5, gp(r13)
-	add r5, r5, r6
-	lbz r5, 0x13cc(r5)
-	stb r5, 0x15d(r3)
-	stb r4, 0x15e(r3)
-	stb r4, 0x15f(r3)
-	lwz r4, gp(r13)
-	add r4, r4, r0
-	lwz r4, 0x1328(r4)
-	sth r4, 0x150(r3)
-	lwz r4, gp(r13)
-	add r4, r4, r0
-	lwz r4, 0x1338(r4)
-	sth r4, 0x152(r3)
-	lwz r4, gp(r13)
-	add r4, r4, r0
-	lwz r4, 0x1348(r4)
-	sth r4, 0x154(r3)
-	lwz r4, gp(r13)
-	add r4, r4, r0
-	lwz r0, 0x1368(r4)
-	sth r0, 0x156(r3)
-	blr
-}
-
-asm void L_partyClearCont(PartyEntry* party) {
-	nofralloc
-	li r0, 0x0
-	stb r0, 0x158(r3)
-	stb r0, 0x159(r3)
-	stb r0, 0x15a(r3)
-	stb r0, 0x15b(r3)
-	stb r0, 0x15c(r3)
-	stb r0, 0x15d(r3)
-	stb r0, 0x15e(r3)
-	stb r0, 0x15f(r3)
-	sth r0, 0x150(r3)
-	sth r0, 0x152(r3)
-	sth r0, 0x154(r3)
-	sth r0, 0x156(r3)
-	blr
-}
-
-asm void partyKeyOff(void) {
-	nofralloc
-	blr
-}
-
-asm void partyKeyOn(void) {
-	nofralloc
-	blr
-}
-
-asm void partyDisp(CameraId cam, void* param) {
-	nofralloc
-	stwu r1, -0xa0(r1)
-	mflr r0
-	la r5, partyPtrTbl(r13)
-	li r3, 0x0
-	stw r0, 0xa4(r1)
-	stw r31, 0x9c(r1)
-	mr r31, r4
-	lwz r4, partyPtrTbl(r13)
-	cmplwi r4, 0x0
-	beq @1
-	cmpwi r3, 0x0
-	blt @2
-	b @3
-	@2:
-	mr r4, r3
-	@3:
-	lwz r0, 0x0(r4)
-	clrlwi. r0, r0, 31
-	beq @1
-	li r3, 0x1
-	@1:
-	lwz r4, 0x4(r5)
-	li r0, 0x1
-	cmplwi r4, 0x0
-	beq @4
-	cmpwi r0, 0x0
-	blt @5
-	b @6
-	@5:
-	li r4, 0x0
-	@6:
-	lwz r0, 0x0(r4)
-	clrlwi. r0, r0, 31
-	beq @4
-	addi r3, r3, 0x1
-	@4:
-	cmpwi r3, 0x0
-	beq @7
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 22, 22
-	beq @8
-	lfs f1, float_neg6p8_8041b0d8(r2)
-	lfs f0, float_6p8_8041b0dc(r2)
-	stfs f1, 0x88(r31)
-	stfs f0, 0x8c(r31)
-	@8:
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 8, 8
-	beq @9
-	lfs f3, float_1p2_8041b0e0(r2)
-	b @10
-	@9:
-	lfs f3, float_2_8041b0e4(r2)
-	@10:
-	lfs f1, 0x70(r31)
-	addi r3, r1, 0x68
-	lfs f2, 0x74(r31)
-	lfs f0, 0x78(r31)
-	fmuls f1, f1, f3
-	fmuls f2, f2, f3
-	fmuls f3, f0, f3
-	bl PSMTXScale
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 28, 28
-	bne @11
-	lfs f1, 0x10c(r31)
-	bl revise360
-	fmr f3, f1
-	lfs f0, float_90_8041b0f0(r2)
-	lfs f1, float_1_8041b0e8(r2)
-	addi r3, r1, 0x8
-	li r0, 0x0
-	fcmpo cr0, f3, f0
-	fmr f2, f1
-	cror eq, gt, eq
-	bne @12
-	lfs f0, float_270_8041b0f4(r2)
-	fcmpo cr0, f3, f0
-	cror eq, lt, eq
-	bne @12
-	li r0, 0x1
-	@12:
-	cmpwi r0, 0x0
-	beq @13
-	lfs f3, float_neg1_8041b0ec(r2)
-	b @14
-	@13:
-	lfs f3, float_1_8041b0e8(r2)
-	@14:
-	bl PSMTXScale
-	addi r4, r1, 0x68
-	addi r3, r1, 0x8
-	mr r5, r4
-	bl PSMTXConcat
-	@11:
-	lfs f1, 0x88(r31)
-	addi r3, r1, 0x38
-	lfs f2, 0x8c(r31)
-	lfs f0, 0x90(r31)
-	fneg f1, f1
-	fneg f2, f2
-	fneg f3, f0
-	bl PSMTXTrans
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, float_deg2rad_8041b0f8(r2)
-	addi r3, r1, 0x38
-	lfs f0, 0x6c(r31)
-	li r4, 0x7a
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, float_deg2rad_8041b0f8(r2)
-	addi r3, r1, 0x38
-	lfs f0, 0x64(r31)
-	li r4, 0x78
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, 0x10c(r31)
-	lfs f0, 0xf8(r31)
-	fsubs f1, f1, f0
-	bl revise360
-	lfs f0, float_deg2rad_8041b0f8(r2)
-	addi r3, r1, 0x38
-	li r4, 0x79
-	fmuls f1, f0, f1
-	bl PSMTXRotRad
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 24, 25
-	beq @15
-	lfs f1, 0x10c(r31)
-	bl revise360
-	lfs f0, float_90_8041b0f0(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @16
-	lfs f0, float_270_8041b0f4(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @16
-	lwz r0, 0x4(r31)
-	addi r3, r1, 0x38
-	lfs f1, float_deg2rad_8041b0f8(r2)
-	li r4, 0x79
-	rlwinm. r0, r0, 0, 25, 25
-	beq @17
-	lfs f0, float_180_8041b0fc(r2)
-	b @18
-	@17:
-	lfs f0, float_0_8041b100(r2)
-	@18:
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	b @15
-	@16:
-	lwz r0, 0x4(r31)
-	addi r3, r1, 0x38
-	lfs f1, float_deg2rad_8041b0f8(r2)
-	li r4, 0x79
-	rlwinm. r0, r0, 0, 25, 25
-	beq @19
-	lfs f0, float_0_8041b100(r2)
-	b @20
-	@19:
-	lfs f0, float_180_8041b0fc(r2)
-	@20:
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	@15:
-	lfs f1, 0x88(r31)
-	addi r3, r1, 0x38
-	lfs f2, 0x8c(r31)
-	lfs f3, 0x90(r31)
-	bl PSMTXTrans
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r0, 0x1c(r31)
-	lfs f5, float_0_8041b100(r2)
-	cmplwi r0, 0x0
-	beq @21
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	bne @22
-	lfs f5, float_1_8041b0e8(r2)
-	b @21
-	@22:
-	cmpwi r0, 0x3
-	bne @23
-	lfs f5, float_2_8041b0e4(r2)
-	b @21
-	@23:
-	cmpwi r0, 0x7
-	bne @24
-	lfs f5, float_2_8041b0e4(r2)
-	b @21
-	@24:
-	cmpwi r0, 0x1
-	bne @25
-	lfs f5, float_2_8041b0e4(r2)
-	b @21
-	@25:
-	cmpwi r0, 0xb
-	bne @26
-	lfs f5, float_3_8041b104(r2)
-	b @21
-	@26:
-	cmpwi r0, 0x8
-	bne @27
-	lfs f5, float_3p5_8041b108(r2)
-	b @21
-	@27:
-	cmpwi r0, 0xa
-	bne @28
-	lfs f5, float_4_8041b10c(r2)
-	b @21
-	@28:
-	cmpwi r0, 0x9
-	bne @21
-	lfs f5, float_neg1_8041b0ec(r2)
-	@21:
-	lfs f1, 0x5c(r31)
-	addi r3, r1, 0x38
-	lfs f0, 0x80(r31)
-	lfs f4, 0x58(r31)
-	fadds f2, f1, f0
-	lfs f1, 0x7c(r31)
-	lfs f3, 0x60(r31)
-	lfs f0, 0x84(r31)
-	fadds f1, f4, f1
-	fadds f2, f5, f2
-	fadds f3, f3, f0
-	bl PSMTXTrans
-	addi r4, r1, 0x68
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r3, 0xc(r31)
-	addi r4, r1, 0x68
-	lfs f1, float_0_8041b100(r2)
-	li r5, 0x2
-	lfs f2, float_1_8041b0e8(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0xc(r31)
-	addi r4, r1, 0x68
-	lfs f1, float_0_8041b100(r2)
-	li r5, 0x1
-	lfs f2, float_1_8041b0e8(r2)
-	bl animPoseDrawMtx
-	lwz r0, 0x0(r31)
-	lwz r3, 0xc(r31)
-	rlwinm. r0, r0, 0, 24, 24
-	beq @29
-	lfs f1, float_0p75_8041b110(r2)
-	b @30
-	@29:
-	lfs f1, float_1_8041b0e8(r2)
-	@30:
-	bl animPoseSetLocalTimeRate
-	@7:
-	lwz r0, 0xa4(r1)
-	lwz r31, 0x9c(r1)
-	mtlr r0
-	addi r1, r1, 0xa0
-	blr
-}
-
-asm void partyPreDisp(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x70(r1)
-	mflr r0
-	stw r0, 0x74(r1)
-	stfd f31, 0x60(r1)
-	psq_st f31, 0x68(r1), 0, 0
-	stw r31, 0x5c(r1)
-	stw r30, 0x58(r1)
-	lwz r0, 0x4(r3)
-	mr r30, r3
-	rlwinm. r0, r0, 0, 27, 27
-	bne @1
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 22, 22
-	bne @1
-	bl partyMakeDispDir
-	@1:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 17, 18
-	beq @2
-	rlwinm. r0, r3, 0, 18, 18
-	beq @3
-	rlwinm r0, r3, 0, 19, 17
-	stw r0, 0x8(r30)
-	@3:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 17, 17
-	beq @4
-	rlwinm r0, r3, 0, 18, 16
-	stw r0, 0x8(r30)
-	@4:
-	lwz r3, 0xc(r30)
-	li r5, 0x1
-	lwz r4, 0x18(r30)
-	bl animPoseSetAnim
-	lwz r4, 0x1c(r30)
-	cmplwi r4, 0x0
-	beq @5
-	lwz r3, 0xc(r30)
-	li r5, 0x1
-	bl animPoseSetPaperAnim
-	@5:
-	lhz r5, 0x20(r30)
-	lis r0, 0x4330
-	lis r3, double_to_int_mask_802ccef8@ha
-	stw r0, 0x48(r1)
-	addi r4, r3, double_to_int_mask_802ccef8@l
-	lwz r3, 0xc(r30)
-	stw r5, 0x4c(r1)
-	lfd f1, 0x0(r4)
-	lfd f0, 0x48(r1)
-	fsubs f1, f0, f1
-	bl animPoseSetLocalTime
-	@2:
-	lwz r3, 0xc(r30)
-	bl animPoseMain
-	lwz r0, 0x4(r30)
-	clrlwi. r0, r0, 31
-	bne @6
-	lwz r4, 0x58(r30)
-	li r3, 0x4
-	lwz r0, 0x5c(r30)
-	stw r4, 0x3c(r1)
-	stw r0, 0x40(r1)
-	lwz r0, 0x60(r30)
-	stw r0, 0x44(r1)
-	bl camGetPtr
-	addi r4, r1, 0x3c
-	addi r3, r3, 0x15c
-	mr r5, r4
-	bl PSMTX44MultVec
-	lfs f2, float_5000_8041b114(r2)
-	lfs f1, 0x44(r1)
-	lfs f0, float_0_8041b100(r2)
-	fmadds f1, f2, f1, f2
-	fcmpo cr0, f1, f0
-	bge @7
-	fmr f1, f0
-	b @8
-	@7:
-	lfs f0, float_10000_8041b118(r2)
-	fcmpo cr0, f1, f0
-	ble @8
-	fmr f1, f0
-	@8:
-	lfs f0, float_neg1_8041b0ec(r2)
-	lha r0, 0x2a(r30)
-	fmuls f1, f1, f0
-	cmpwi r0, 0x0
-	ble @9
-	rlwinm. r0, r0, 0, 30, 30
-	bne @10
-	lis r3, partyDisp@ha
-	mr r6, r30
-	addi r5, r3, partyDisp@l
-	lwz r3, 0x164(r30)
-	li r4, 0x1
-	bl dispEntry
-	b @10
-	@9:
-	lis r3, partyDisp@ha
-	mr r6, r30
-	addi r5, r3, partyDisp@l
-	lwz r3, 0x164(r30)
-	li r4, 0x1
-	bl dispEntry
-	@10:
-	lbz r0, 0x31(r30)
-	li r31, 0x2
-	lfs f31, float_13p333_8041b11c(r2)
-	cmpwi r0, 0x6
-	beq @11
-	lwz r3, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r3, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	b @12
-	@11:
-	lbz r0, 0x34(r30)
-	cmplwi r0, 0x4
-	beq @13
-	cmplwi r0, 0x8
-	bne @14
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 23, 23
-	bne @14
-	@13:
-	lwz r3, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r3, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	@14:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 23, 23
-	beq @12
-	clrrwi. r0, r3, 31
-	lfs f31, 0x174(r30)
-	beq @12
-	li r31, 0x1
-	@12:
-	mr r3, r30
-	bl N_vivianDisplayTailCheck
-	cmpwi r3, 0x0
-	beq @15
-	lfs f1, float_1000_8041b120(r2)
-	lis r3, vec3_802ccee0@ha
-	addi r11, r3, vec3_802ccee0@l
-	lfs f0, float_10_8041b124(r2)
-	stfs f1, 0x8(r1)
-	mr r3, r30
-	lwz r10, 0x0(r11)
-	addi r4, r1, 0x30
-	lwz r12, 0x58(r30)
-	addi r5, r1, 0x24
-	lwz r0, 0x5c(r30)
-	addi r6, r1, 0x18
-	lwz r9, 0x4(r11)
-	addi r7, r1, 0xc
-	stw r0, 0x34(r1)
-	addi r8, r1, 0x8
-	lwz r0, 0x8(r11)
-	lfs f1, 0x34(r1)
-	stw r12, 0x30(r1)
-	fadds f0, f1, f0
-	lwz r11, 0x60(r30)
-	stw r11, 0x38(r1)
-	stfs f0, 0x34(r1)
-	stw r10, 0x24(r1)
-	stw r9, 0x28(r1)
-	stw r0, 0x2c(r1)
-	bl partyHitCheck
-	cmplwi r3, 0x0
-	beq @16
-	lfs f0, 0x1c(r1)
-	b @17
-	@16:
-	lfs f0, 0x5c(r30)
-	@17:
-	stfs f0, 0xbc(r30)
-	addi r4, r30, 0xb8
-	lwz r3, 0xc(r30)
-	bl animPoseVivianMain
-	@15:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 11, 11
-	bne @6
-	fmr f4, f31
-	lfs f1, 0xb8(r30)
-	lfs f2, 0xbc(r30)
-	mr r3, r31
-	lfs f3, 0xc0(r30)
-	bl shadowEntryMode
-	lwz r4, 0x164(r30)
-	mr r31, r3
-	cmpwi r4, 0x4
-	beq @18
-	bl shadowSetCamId
-	@18:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 10, 10
-	beq @6
-	mr r3, r31
-	li r4, 0x4
-	bl shadowFlagOn
-	@6:
-	psq_l f31, 0x68(r1), 0, 0
-	lwz r0, 0x74(r1)
-	lfd f31, 0x60(r1)
-	lwz r31, 0x5c(r1)
-	lwz r30, 0x58(r1)
-	mtlr r0
-	addi r1, r1, 0x70
-	blr
-}
-
-asm void partyMakeDispDir(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	lwz r3, 0x4(r3)
-	rlwinm. r0, r3, 0, 23, 23
-	bne @1
-	rlwinm. r0, r3, 0, 27, 27
-	bne @2
-	lfs f1, 0xfc(r31)
-	lfs f0, 0xf8(r31)
-	fsubs f1, f1, f0
-	bl revise360
-	lwz r0, 0x4(r31)
-	lfs f3, 0x110(r31)
-	rlwinm. r0, r0, 0, 23, 23
-	bne @3
-	lfs f0, float_290_8041b128(r2)
-	fcmpu cr0, f0, f3
-	beq @4
-	lfs f0, float_250_8041b12c(r2)
-	fcmpu cr0, f0, f3
-	bne @3
-	@4:
-	lfs f3, float_180_8041b0fc(r2)
-	fcmpo cr0, f1, f3
-	cror eq, gt, eq
-	bne @3
-	lfs f3, float_0_8041b100(r2)
-	@3:
-	lfs f0, 0x104(r31)
-	lfs f2, float_0_8041b100(r2)
-	fcmpu cr0, f0, f2
-	beq @5
-	lfs f0, float_190_8041b130(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @6
-	lfs f0, float_350_8041b134(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @6
-	fmr f3, f2
-	b @5
-	@6:
-	lfs f0, float_10_8041b124(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @5
-	lfs f0, float_170_8041b138(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @5
-	lfs f3, float_180_8041b0fc(r2)
-	@5:
-	stfs f3, 0x110(r31)
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 26, 26
-	beq @7
-	lfs f0, 0x110(r31)
-	stfs f0, 0x10c(r31)
-	@7:
-	lfs f1, 0x10c(r31)
-	lfs f0, 0x110(r31)
-	fcmpu cr0, f1, f0
-	beq @1
-	@2:
-	lfs f2, 0x10c(r31)
-	lfs f1, float_180_8041b0fc(r2)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @8
-	lfs f0, float_0_8041b100(r2)
-	lfs f3, 0x110(r31)
-	fcmpu cr0, f0, f3
-	bne @9
-	lwz r0, 0x8(r31)
-	lfs f1, float_0p125_8041b13c(r2)
-	rlwinm. r0, r0, 0, 19, 19
-	beq @10
-	lfs f0, float_20_8041b140(r2)
-	b @11
-	@10:
-	lfs f0, float_neg40_8041b144(r2)
-	@11:
-	fsubs f0, f0, f2
-	fmuls f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x10c(r31)
-	lwz r3, 0x8(r31)
-	rlwinm. r0, r3, 0, 19, 19
-	bne @12
-	lfs f1, 0x10c(r31)
-	lfs f0, float_neg30_8041b148(r2)
-	fcmpo cr0, f1, f0
-	bge @1
-	ori r0, r3, 0x1000
-	stw r0, 0x8(r31)
-	b @1
-	@12:
-	lfs f1, 0x10c(r31)
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @1
-	stfs f0, 0x10c(r31)
-	lwz r0, 0x8(r31)
-	rlwinm r0, r0, 0, 20, 18
-	stw r0, 0x8(r31)
-	b @1
-	@9:
-	fcmpu cr0, f1, f3
-	bne @1
-	lwz r0, 0x8(r31)
-	lfs f1, float_0p125_8041b13c(r2)
-	rlwinm. r0, r0, 0, 19, 19
-	beq @13
-	lfs f0, float_170_8041b138(r2)
-	b @14
-	@13:
-	lfs f0, float_220_8041b14c(r2)
-	@14:
-	fsubs f0, f0, f2
-	fmuls f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x10c(r31)
-	lwz r3, 0x8(r31)
-	rlwinm. r0, r3, 0, 19, 19
-	bne @15
-	lfs f1, 0x10c(r31)
-	lfs f0, float_210_8041b150(r2)
-	fcmpo cr0, f1, f0
-	ble @1
-	ori r0, r3, 0x1000
-	stw r0, 0x8(r31)
-	b @1
-	@15:
-	lfs f1, 0x10c(r31)
-	lfs f0, float_180_8041b0fc(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @1
-	stfs f0, 0x10c(r31)
-	lwz r0, 0x8(r31)
-	rlwinm r0, r0, 0, 20, 18
-	stw r0, 0x8(r31)
-	b @1
-	@8:
-	fcmpo cr0, f2, f1
-	ble @1
-	lfs f0, float_0_8041b100(r2)
-	lfs f3, 0x110(r31)
-	fcmpu cr0, f0, f3
-	bne @16
-	lwz r0, 0x8(r31)
-	lfs f1, float_0p125_8041b13c(r2)
-	rlwinm. r0, r0, 0, 19, 19
-	beq @17
-	lfs f0, float_20_8041b140(r2)
-	b @18
-	@17:
-	lfs f0, float_neg40_8041b144(r2)
-	@18:
-	fsubs f0, f0, f2
-	fmuls f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x10c(r31)
-	lwz r3, 0x8(r31)
-	rlwinm. r0, r3, 0, 19, 19
-	bne @19
-	lfs f1, 0x10c(r31)
-	lfs f0, float_neg30_8041b148(r2)
-	fcmpo cr0, f1, f0
-	bge @1
-	ori r0, r3, 0x1000
-	stw r0, 0x8(r31)
-	b @1
-	@19:
-	lfs f1, 0x10c(r31)
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @1
-	stfs f0, 0x10c(r31)
-	lwz r0, 0x8(r31)
-	rlwinm r0, r0, 0, 20, 18
-	stw r0, 0x8(r31)
-	b @1
-	@16:
-	fcmpu cr0, f1, f3
-	bne @1
-	lwz r0, 0x8(r31)
-	lfs f1, float_0p125_8041b13c(r2)
-	rlwinm. r0, r0, 0, 19, 19
-	beq @20
-	lfs f0, float_170_8041b138(r2)
-	b @21
-	@20:
-	lfs f0, float_220_8041b14c(r2)
-	@21:
-	fsubs f0, f0, f2
-	fmuls f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x10c(r31)
-	lwz r3, 0x8(r31)
-	rlwinm. r0, r3, 0, 19, 19
-	bne @1
-	lfs f1, 0x10c(r31)
-	lfs f0, float_210_8041b150(r2)
-	fcmpo cr0, f1, f0
-	ble @22
-	ori r0, r3, 0x1000
-	stw r0, 0x8(r31)
-	b @1
-	@22:
-	lfs f0, float_180_8041b0fc(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @1
-	stfs f0, 0x10c(r31)
-	lwz r0, 0x8(r31)
-	rlwinm r0, r0, 0, 20, 18
-	stw r0, 0x8(r31)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partySetCamId(PartyEntry* party, s32 cameraId) {
-	nofralloc
-	stw r4, 0x164(r3)
-	blr
-}
-
-asm void partyInitCamId(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	bl marioGetCamId
-	stw r3, 0x164(r31)
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void party_damage_return(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x70(r1)
-	mflr r0
-	stw r0, 0x74(r1)
-	stw r31, 0x6c(r1)
-	stw r30, 0x68(r1)
-	mr r30, r3
-	stw r29, 0x64(r1)
-	lwz r3, 0x8(r3)
-	lwz r31, 0x160(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @1
-	rlwinm r0, r3, 0, 29, 27
-	stw r0, 0x8(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	lwz r0, 0x8(r30)
-	rlwinm. r0, r0, 0, 7, 7
-	bne @2
-	li r0, 0xa
-	stb r0, 0x38(r30)
-	b @1
-	@2:
-	li r3, 0x0
-	li r0, 0x64
-	stb r3, 0x38(r30)
-	stw r0, 0x24(r30)
-	@1:
-	lbz r0, 0x38(r30)
-	cmplwi r0, 0x17
-	bgt @3
-	lis r3, jumptable_803126C0@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_803126C0@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@4:
-	lwz r3, 0x24(r30)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r30)
-	bgt @3
-	li r0, 0xa
-	stb r0, 0x38(r30)
-	@5:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @6
-	lbz r0, 0x31(r30)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @7
-	bl partyGetHp
-	@7:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @8
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r0, r3, partyPoseTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x3c
-	add r3, r0, r3
-	lwz r29, 0x20(r3)
-	b @9
-	@8:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @10
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r0, r3, partyDotPoseTbl@l
-	add r3, r0, r4
-	lwz r29, 0x20(r3)
-	b @9
-	@10:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r0, r3, yoshiDotPoseTbl@l
-	add r3, r0, r4
-	lwz r29, 0x20(r3)
-	@9:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @11
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @6
-	@11:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@6:
-	li r3, 0xc8
-	bl sysMsec2Frame
-	stw r3, 0x24(r30)
-	li r0, 0xb
-	stb r0, 0x38(r30)
-	@12:
-	lwz r3, 0x24(r30)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r30)
-	bgt @3
-	lfs f1, float_15_8041b154(r2)
-	li r0, 0xc
-	lfs f0, float_0_8041b100(r2)
-	stfs f1, 0x114(r30)
-	stfs f0, 0x118(r30)
-	stb r0, 0x38(r30)
-	@13:
-	lfs f1, 0x5c(r30)
-	addi r3, r1, 0x44
-	lfs f0, 0x114(r30)
-	addi r4, r1, 0x1c
-	addi r5, r1, 0x18
-	addi r6, r1, 0x14
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r30)
-	lwz r7, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r7, 0x44(r1)
-	stw r0, 0x48(r1)
-	lwz r0, 0x60(r30)
-	stw r0, 0x4c(r1)
-	bl marioGetScreenPos
-	lwz r7, 0x8c(r31)
-	addi r3, r1, 0x38
-	lwz r0, 0x90(r31)
-	addi r4, r1, 0x10
-	addi r5, r1, 0xc
-	addi r6, r1, 0x8
-	stw r7, 0x38(r1)
-	stw r0, 0x3c(r1)
-	lwz r0, 0x94(r31)
-	stw r0, 0x40(r1)
-	bl marioGetScreenPos
-	lfs f1, 0xc(r1)
-	lfs f0, float_neg100_8041b158(r2)
-	fcmpo cr0, f1, f0
-	bge @14
-	b @15
-	@14:
-	fmr f1, f0
-	@15:
-	lfs f0, 0x18(r1)
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @3
-	li r3, 0x20
-	li r0, 0x14
-	stw r3, 0x24(r30)
-	stb r0, 0x38(r30)
-	b @3
-	@16:
-	lwz r7, 0x58(r30)
-	addi r3, r1, 0x2c
-	lwz r0, 0x5c(r30)
-	addi r4, r1, 0x1c
-	addi r5, r1, 0x18
-	addi r6, r1, 0x14
-	stw r7, 0x2c(r1)
-	stw r0, 0x30(r1)
-	lwz r0, 0x60(r30)
-	stw r0, 0x34(r1)
-	bl marioGetScreenPos
-	lfs f1, 0x18(r1)
-	lfs f0, float_neg100_8041b158(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @17
-	lfs f1, 0x5c(r30)
-	lfs f0, float_1_8041b0e8(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r30)
-	@17:
-	lhz r0, 0x2e(r31)
-	cmplwi r0, 0x1f
-	bne @18
-	bl marioWaitDamageReturnFall
-	cmpwi r3, 0x0
-	beq @3
-	b @19
-	@18:
-	cmplwi r0, 0x20
-	bne @19
-	bl marioWaitDamageTogeReturnFall
-	cmpwi r3, 0x0
-	beq @3
-	@19:
-	li r0, 0x15
-	stb r0, 0x38(r30)
-	@20:
-	lwz r3, 0x24(r30)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r30)
-	bgt @3
-	mr r3, r30
-	addi r4, r1, 0x50
-	bl partyGetAppearPos
-	lfs f0, 0x50(r1)
-	li r0, 0x16
-	lfs f1, float_0_8041b100(r2)
-	stfs f0, 0x58(r30)
-	lfs f0, float_neg1_8041b0ec(r2)
-	lfs f2, 0x58(r1)
-	stfs f2, 0x60(r30)
-	stfs f1, 0x114(r30)
-	stfs f0, 0x118(r30)
-	stfs f1, 0x104(r30)
-	lwz r3, 0x0(r30)
-	ori r3, r3, 0x20
-	stw r3, 0x0(r30)
-	lwz r3, 0x0(r30)
-	oris r3, r3, 0x200
-	stw r3, 0x0(r30)
-	stb r0, 0x38(r30)
-	b @3
-	@21:
-	lwz r7, 0x58(r30)
-	addi r3, r1, 0x20
-	lwz r0, 0x5c(r30)
-	addi r4, r1, 0x1c
-	addi r5, r1, 0x18
-	addi r6, r1, 0x14
-	stw r7, 0x20(r1)
-	stw r0, 0x24(r1)
-	lwz r0, 0x60(r30)
-	stw r0, 0x28(r1)
-	bl marioGetScreenPos
-	lfs f1, 0x18(r1)
-	lfs f0, float_240_8041b15c(r2)
-	fcmpo cr0, f1, f0
-	ble @22
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 7, 5
-	stw r0, 0x0(r30)
-	@22:
-	mr r3, r30
-	bl partyMove
-	lfs f0, 0x114(r30)
-	lfs f1, float_neg6_8041b160(r2)
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @23
-	lfs f0, float_0_8041b100(r2)
-	stfs f0, 0x118(r30)
-	stfs f1, 0x114(r30)
-	@23:
-	lfs f1, 0x5c(r30)
-	lfs f0, float_neg2000_8041b164(r2)
-	fcmpo cr0, f1, f0
-	bge @24
-	lwz r3, 0x8c(r31)
-	lwz r0, 0x90(r31)
-	lfs f0, float_200_8041b168(r2)
-	stw r3, 0x58(r30)
-	stw r0, 0x5c(r30)
-	lwz r0, 0x94(r31)
-	stw r0, 0x60(r30)
-	lfs f1, 0x5c(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 28, 24
-	stw r0, 0x0(r30)
-	@24:
-	lwz r3, 0x138(r30)
-	cmplwi r3, 0x0
-	beq @3
-	bl hitGetAttr
-	extrwi. r0, r3, 1, 22
-	bne @3
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @25
-	lbz r0, 0x31(r30)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @26
-	bl partyGetHp
-	@26:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @27
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r0, r3, partyPoseTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x3c
-	add r3, r0, r3
-	lwz r29, 0x24(r3)
-	b @28
-	@27:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @29
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r0, r3, partyDotPoseTbl@l
-	add r3, r0, r4
-	lwz r29, 0x24(r3)
-	b @28
-	@29:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r0, r3, yoshiDotPoseTbl@l
-	add r3, r0, r4
-	lwz r29, 0x24(r3)
-	@28:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @30
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @25
-	@30:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@25:
-	li r3, 0x17
-	li r0, 0x1e
-	stb r3, 0x38(r30)
-	stw r0, 0x24(r30)
-	b @3
-	@31:
-	lwz r3, 0x24(r30)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r30)
-	bgt @3
-	mr r3, r30
-	li r4, 0x2
-	bl partyChgRunMode
-	li r0, 0x0
-	stb r0, 0x3b(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r30)
-	@3:
-	bl vivianGetStatus
-	cmpwi r3, 0x2
-	beq @32
-	mr r3, r30
-	bl vivianShadow
-	@32:
-	lwz r0, 0x74(r1)
-	lwz r31, 0x6c(r1)
-	lwz r30, 0x68(r1)
-	lwz r29, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x70
-	blr
-}
-
-asm s32 partyRideYoshiMain(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stw r31, 0x4c(r1)
-	mr r31, r3
-	stw r30, 0x48(r1)
-	stw r29, 0x44(r1)
-	lbz r0, 0x38(r3)
-	lwz r29, 0x160(r3)
-	cmpwi r0, 0x2
-	beq @1
-	bge @2
-	cmpwi r0, 0x0
-	beq @3
-	bge @4
-	b @5
-	@2:
-	cmpwi r0, 0xa
-	beq @6
-	b @5
-	@3:
-	lfs f0, float_1p6_8041b16c(r2)
-	addi r4, r1, 0x14
-	stfs f0, 0x11c(r31)
-	bl getRidePos
-	lwz r3, 0x14(r1)
-	lwz r0, 0x18(r1)
-	stw r3, 0x94(r31)
-	stw r0, 0x98(r31)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x9c(r31)
-	lfs f1, 0x58(r31)
-	lfs f2, 0x60(r31)
-	lfs f3, 0x94(r31)
-	lfs f4, 0x9c(r31)
-	bl distABf
-	stfs f1, 0x128(r31)
-	lfs f1, 0x58(r31)
-	lfs f2, 0x60(r31)
-	lfs f3, 0x94(r31)
-	lfs f4, 0x9c(r31)
-	bl angleABf
-	stfs f1, 0x100(r31)
-	lis r0, 0x4330
-	li r4, 0xf
-	lis r3, double_to_int_802ccf00@ha
-	stw r4, 0x24(r31)
-	lfd f6, double_to_int_802ccf00@l(r3)
-	lwz r3, 0x24(r31)
-	stw r0, 0x20(r1)
-	xoris r3, r3, 0x8000
-	lfs f1, 0x128(r31)
-	stw r3, 0x24(r1)
-	lfs f5, float_0p5_8041b170(r2)
-	lfd f0, 0x20(r1)
-	stw r0, 0x30(r1)
-	fsubs f0, f0, f6
-	stw r0, 0x28(r1)
-	fdivs f0, f1, f0
-	stw r0, 0x38(r1)
-	stfs f0, 0x104(r31)
-	lwz r0, 0x24(r31)
-	lfs f1, 0x98(r31)
-	xoris r0, r0, 0x8000
-	lfs f0, 0x5c(r31)
-	stw r0, 0x34(r1)
-	fsubs f1, f1, f0
-	lfs f3, 0x11c(r31)
-	lfd f2, 0x30(r1)
-	stw r0, 0x2c(r1)
-	fsubs f0, f2, f6
-	lfd f2, 0x28(r1)
-	stw r0, 0x3c(r1)
-	fsubs f4, f2, f6
-	fmuls f2, f3, f0
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f6
-	fmuls f2, f4, f2
-	fmadds f1, f5, f2, f1
-	fdivs f0, f1, f0
-	stfs f0, 0x114(r31)
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @7
-	lbz r0, 0x31(r31)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @8
-	bl partyGetHp
-	@8:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @9
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r0, r3, partyPoseTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x3c
-	add r3, r0, r3
-	lwz r30, 0x10(r3)
-	b @10
-	@9:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @11
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r0, r3, partyDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	b @10
-	@11:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r0, r3, yoshiDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	@10:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @12
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @7
-	@12:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@7:
-	li r0, 0x1
-	stb r0, 0x38(r31)
-	b @5
-	@4:
-	addi r4, r1, 0x14
-	bl getRidePos
-	lwz r3, 0x14(r1)
-	lwz r0, 0x18(r1)
-	stw r3, 0x94(r31)
-	stw r0, 0x98(r31)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x9c(r31)
-	lfs f1, 0x58(r31)
-	lfs f2, 0x60(r31)
-	lfs f3, 0x94(r31)
-	lfs f4, 0x9c(r31)
-	bl distABf
-	stfs f1, 0x128(r31)
-	lfs f1, 0x58(r31)
-	lfs f2, 0x60(r31)
-	lfs f3, 0x94(r31)
-	lfs f4, 0x9c(r31)
-	bl angleABf
-	stfs f1, 0x100(r31)
-	lis r0, 0x4330
-	lis r4, double_to_int_802ccf00@ha
-	addi r3, r31, 0x58
-	lwz r6, 0x24(r31)
-	addi r5, r4, double_to_int_802ccf00@l
-	stw r0, 0x38(r1)
-	addi r4, r31, 0x60
-	xoris r0, r6, 0x8000
-	lfd f1, 0x0(r5)
-	stw r0, 0x3c(r1)
-	lfs f2, 0x128(r31)
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f1
-	fdivs f0, f2, f0
-	stfs f0, 0x104(r31)
-	lfs f1, 0x114(r31)
-	lfs f0, 0x11c(r31)
-	fsubs f0, f1, f0
-	stfs f0, 0x114(r31)
-	lfs f1, 0x5c(r31)
-	lfs f0, 0x114(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r31)
-	lfs f1, 0x104(r31)
-	lfs f2, 0x100(r31)
-	bl movePos
-	lwz r3, 0x24(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r31)
-	bgt @5
-	li r0, 0x2
-	stb r0, 0x38(r31)
-	b @5
-	@1:
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @13
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @14
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @14
-	li r29, 0x1
-	@14:
-	cmpwi r29, 0x1
-	bne @15
-	li r30, 0xc
-	@15:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @16
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @17
-	@16:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @18
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @17
-	@18:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@17:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @19
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	@19:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@13:
-	lfs f0, float_0_8041b100(r2)
-	cmplwi r31, 0x0
-	li r0, 0xa
-	stfs f0, 0x114(r31)
-	lfs f0, 0x98(r31)
-	stfs f0, 0x5c(r31)
-	stb r0, 0x38(r31)
-	beq @5
-	lwz r0, 0x4(r31)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r31)
-	b @5
-	@6:
-	addi r4, r1, 0x14
-	bl getRidePos
-	lwz r3, 0x14(r1)
-	lwz r0, 0x18(r1)
-	stw r3, 0x58(r31)
-	stw r0, 0x5c(r31)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x60(r31)
-	lfs f0, 0x1ac(r29)
-	stfs f0, 0x110(r31)
-	lfs f1, 0x110(r31)
-	bl toMovedir
-	stfs f1, 0xfc(r31)
-	lhz r0, 0x2e(r29)
-	cmplwi r0, 0x1a
-	beq @5
-	mr r3, r31
-	addi r4, r1, 0x8
-	bl partyGetAppearPos
-	lfs f0, 0x8(r1)
-	mr r3, r31
-	li r4, 0x2
-	stfs f0, 0x58(r31)
-	lfs f0, 0x10(r1)
-	stfs f0, 0x60(r31)
-	bl partyChgRunMode
-	cmplwi r31, 0x0
-	beq @20
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r31)
-	@20:
-	lis r3, vec3_802cced4@ha
-	addi r4, r3, vec3_802cced4@l
-	lwz r3, 0x0(r4)
-	lwz r0, 0x4(r4)
-	stw r3, 0x7c(r31)
-	stw r0, 0x80(r31)
-	lwz r0, 0x8(r4)
-	stw r0, 0x84(r31)
-	@5:
-	lwz r0, 0x54(r1)
-	li r3, 0x0
-	lwz r31, 0x4c(r1)
-	lwz r30, 0x48(r1)
-	lwz r29, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void party_ride_yoshi_force_move(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	beq @3
-	mr r3, r31
-	addi r4, r1, 0x8
-	bl getRidePos
-	lwz r3, 0x8(r1)
-	lwz r0, 0xc(r1)
-	stw r3, 0x58(r31)
-	stw r0, 0x5c(r31)
-	lwz r0, 0x10(r1)
-	stw r0, 0x60(r31)
-	lwz r3, 0x160(r31)
-	lfs f0, 0x1ac(r3)
-	stfs f0, 0x110(r31)
-	lfs f1, 0x110(r31)
-	bl toMovedir
-	stfs f1, 0xfc(r31)
-	@3:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void party_force_ride_yoshi(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	li r4, 0xc
-	li r5, 0xa
-	stw r0, 0x34(r1)
-	stw r31, 0x2c(r1)
-	stw r30, 0x28(r1)
-	mr r30, r3
-	stw r29, 0x24(r1)
-	bl N_partyForceChgRunMode
-	lwz r0, 0x0(r30)
-	mr r3, r30
-	addi r4, r1, 0x8
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	bl getRidePos
-	lwz r3, 0x8(r1)
-	li r31, 0x1
-	lwz r0, 0xc(r1)
-	stw r3, 0x58(r30)
-	stw r0, 0x5c(r30)
-	lwz r0, 0x10(r1)
-	stw r0, 0x60(r30)
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @1
-	lbz r0, 0x31(r30)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @2
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @2
-	li r29, 0x1
-	@2:
-	cmpwi r29, 0x1
-	bne @3
-	li r31, 0xc
-	@3:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @4
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r31, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	b @5
-	@4:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @6
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r31, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	b @5
-	@6:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r31, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	@5:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @7
-	mr r4, r31
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @1
-	@7:
-	stw r31, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@1:
-	lfs f0, float_0_8041b100(r2)
-	cmplwi r30, 0x0
-	stfs f0, 0x114(r30)
-	beq @8
-	lwz r0, 0x4(r30)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r30)
-	@8:
-	lwz r3, 0x160(r30)
-	lfs f0, 0x1ac(r3)
-	stfs f0, 0x110(r30)
-	lfs f1, 0x110(r30)
-	bl toMovedir
-	stfs f1, 0xfc(r30)
-	lwz r0, 0x34(r1)
-	lwz r31, 0x2c(r1)
-	lwz r30, 0x28(r1)
-	lwz r29, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void partyRideMain(PartyEntry *party) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stw r31, 0x5c(r1)
-	stw r30, 0x58(r1)
-	stw r29, 0x54(r1)
-	stw r28, 0x50(r1)
-	mr r29, r3
-	lis r4, vec3_802ccd30@ha
-	lbz r0, 0x38(r3)
-	addi r31, r4, vec3_802ccd30@l
-	lwz r30, 0x160(r3)
-	cmpwi r0, 0x15
-	beq @1
-	bge @2
-	cmpwi r0, 0xa
-	beq @3
-	bge @4
-	cmpwi r0, 0x1
-	beq @5
-	bge @6
-	cmpwi r0, 0x0
-	bge @7
-	b @8
-	@6:
-	cmpwi r0, 0x3
-	bge @8
-	b @9
-	@4:
-	cmpwi r0, 0x14
-	bge @10
-	cmpwi r0, 0xc
-	bge @8
-	b @11
-	@2:
-	cmpwi r0, 0x6e
-	beq @12
-	bge @13
-	cmpwi r0, 0x64
-	bge @14
-	b @8
-	@14:
-	cmpwi r0, 0x66
-	bge @8
-	b @15
-	@13:
-	cmpwi r0, 0xc8
-	beq @16
-	bge @8
-	cmpwi r0, 0x70
-	bge @8
-	b @17
-	@7:
-	addi r4, r1, 0x20
-	bl getRidePos
-	lwz r3, 0x20(r1)
-	lwz r0, 0x24(r1)
-	stw r3, 0x94(r29)
-	stw r0, 0x98(r29)
-	lwz r0, 0x28(r1)
-	stw r0, 0x9c(r29)
-	lfs f1, 0x58(r29)
-	lfs f2, 0x60(r29)
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl distABf
-	stfs f1, 0x128(r29)
-	lfs f1, 0x58(r29)
-	lfs f2, 0x60(r29)
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl angleABf
-	stfs f1, 0x100(r29)
-	lis r0, 0x4330
-	li r3, 0x1e
-	lfd f5, 0x1d0(r31)
-	stw r3, 0x24(r29)
-	lfs f1, float_0p4_8041b174(r2)
-	lwz r3, 0x24(r29)
-	stw r0, 0x30(r1)
-	xoris r3, r3, 0x8000
-	lfs f3, 0x128(r29)
-	stw r3, 0x34(r1)
-	lfs f4, float_0p5_8041b170(r2)
-	lfd f0, 0x30(r1)
-	stw r0, 0x40(r1)
-	fsubs f2, f0, f5
-	lfs f0, float_1_8041b0e8(r2)
-	stw r0, 0x38(r1)
-	fdivs f2, f3, f2
-	stw r0, 0x48(r1)
-	stfs f2, 0x104(r29)
-	lfs f3, 0x98(r29)
-	lfs f2, 0x5c(r29)
-	stfs f1, 0x11c(r29)
-	fsubs f6, f3, f2
-	lwz r0, 0x24(r29)
-	lfs f2, 0x11c(r29)
-	xoris r0, r0, 0x8000
-	stw r0, 0x44(r1)
-	lfd f1, 0x40(r1)
-	stw r0, 0x3c(r1)
-	fsubs f1, f1, f5
-	lfd f3, 0x38(r1)
-	stw r0, 0x4c(r1)
-	fmuls f2, f2, f1
-	fsubs f3, f3, f5
-	lfd f1, 0x48(r1)
-	fsubs f1, f1, f5
-	fmuls f2, f3, f2
-	fmadds f2, f4, f2, f6
-	fdivs f1, f2, f1
-	stfs f1, 0x114(r29)
-	stfs f0, 0x124(r29)
-	lwz r0, 0x4(r29)
-	ori r0, r0, 0x10
-	stw r0, 0x4(r29)
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @18
-	lbz r0, 0x31(r29)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @19
-	bl partyGetHp
-	@19:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @20
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r0, r3, partyPoseTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x3c
-	add r3, r0, r3
-	lwz r30, 0x10(r3)
-	b @21
-	@20:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @22
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r0, r3, partyDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	b @21
-	@22:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r0, r3, yoshiDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	@21:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @23
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @18
-	@23:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@18:
-	li r0, 0x1
-	stb r0, 0x38(r29)
-	b @8
-	@5:
-	lfs f1, 0x114(r29)
-	addi r3, r29, 0x58
-	lfs f0, 0x11c(r29)
-	addi r4, r29, 0x60
-	fsubs f0, f1, f0
-	stfs f0, 0x114(r29)
-	lfs f1, 0x5c(r29)
-	lfs f0, 0x114(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r29)
-	lfs f1, 0x104(r29)
-	lfs f2, 0x100(r29)
-	bl movePos
-	lfs f1, 0x10c(r29)
-	lfs f0, 0x124(r29)
-	fadds f1, f1, f0
-	bl revise360
-	stfs f1, 0x10c(r29)
-	lfs f1, float_2_8041b0e4(r2)
-	lfs f2, 0x124(r29)
-	lfs f0, float_30_8041b178(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x124(r29)
-	lfs f1, 0x124(r29)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @24
-	stfs f0, 0x124(r29)
-	@24:
-	lwz r3, 0x24(r29)
-	lis r0, 0x4330
-	stw r0, 0x48(r1)
-	xoris r0, r3, 0x8000
-	lfd f2, 0x1d0(r31)
-	stw r0, 0x4c(r1)
-	lfs f0, float_10_8041b124(r2)
-	lfd f1, 0x48(r1)
-	fsubs f1, f1, f2
-	fcmpo cr0, f1, f0
-	ble @25
-	fmr f1, f0
-	@25:
-	lfs f0, float_10_8041b124(r2)
-	fdivs f0, f1, f0
-	stfs f0, 0x70(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x74(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x78(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bge @8
-	li r0, 0x2
-	stb r0, 0x38(r29)
-	b @8
-	@9:
-	lwz r0, 0x4(r29)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @26
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @27
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @27
-	li r28, 0x1
-	@27:
-	cmpwi r28, 0x1
-	bne @28
-	li r30, 0xc
-	@28:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @29
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @30
-	@29:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @31
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @30
-	@31:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@30:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @32
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @26
-	@32:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@26:
-	lfs f0, float_0_8041b100(r2)
-	cmplwi r29, 0x0
-	stfs f0, 0x114(r29)
-	lfs f0, 0x98(r29)
-	stfs f0, 0x5c(r29)
-	lwz r3, 0x15c(r31)
-	lwz r0, 0x160(r31)
-	stw r3, 0x70(r29)
-	stw r0, 0x74(r29)
-	lwz r0, 0x164(r31)
-	stw r0, 0x78(r29)
-	lwz r0, 0x4(r29)
-	ori r0, r0, 0x1
-	stw r0, 0x4(r29)
-	beq @33
-	lwz r0, 0x4(r29)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r29)
-	@33:
-	li r0, 0xa
-	stb r0, 0x38(r29)
-	b @8
-	@3:
-	lwz r3, 0x8c(r30)
-	lwz r0, 0x90(r30)
-	stw r3, 0x58(r29)
-	stw r0, 0x5c(r29)
-	lwz r0, 0x94(r30)
-	stw r0, 0x60(r29)
-	lfs f0, 0x1ac(r30)
-	stfs f0, 0x110(r29)
-	lfs f1, 0x110(r29)
-	bl toMovedir
-	stfs f1, 0xfc(r29)
-	b @8
-	@11:
-	lwz r0, 0x4(r29)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @34
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @35
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @35
-	li r28, 0x1
-	@35:
-	cmpwi r28, 0x1
-	bne @36
-	li r30, 0xc
-	@36:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @37
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @38
-	@37:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @39
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @38
-	@39:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@38:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @40
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @34
-	@40:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@34:
-	lwz r0, 0x4(r29)
-	cmplwi r29, 0x0
-	ori r0, r0, 0x1
-	stw r0, 0x4(r29)
-	beq @41
-	lwz r0, 0x4(r29)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r29)
-	@41:
-	mr r3, r29
-	addi r4, r1, 0x20
-	bl getRidePos
-	lwz r3, 0x168(r31)
-	lwz r0, 0x16c(r31)
-	lfs f0, float_0_8041b100(r2)
-	stw r3, 0x70(r29)
-	stw r0, 0x74(r29)
-	lwz r0, 0x170(r31)
-	stw r0, 0x78(r29)
-	lwz r3, 0x20(r1)
-	lwz r0, 0x24(r1)
-	stw r3, 0x58(r29)
-	stw r0, 0x5c(r29)
-	lwz r0, 0x28(r1)
-	stw r0, 0x60(r29)
-	stfs f0, 0x114(r29)
-	lwz r3, 0x160(r29)
-	lfs f0, 0x1ac(r3)
-	stfs f0, 0x110(r29)
-	lfs f1, 0x110(r29)
-	bl toMovedir
-	stfs f1, 0xfc(r29)
-	b @8
-	@10:
-	li r3, 0x15
-	li r0, 0x10
-	stb r3, 0x38(r29)
-	lfs f1, float_16_8041b17c(r2)
-	stw r0, 0x24(r29)
-	lfs f0, float_0p5_8041b170(r2)
-	stfs f1, 0x114(r29)
-	stfs f0, 0x174(r29)
-	@1:
-	lfs f1, 0x5c(r29)
-	lfs f0, 0x114(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r29)
-	lfs f1, 0x114(r29)
-	lfs f0, 0x174(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x114(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bgt @8
-	li r0, 0x16
-	stb r0, 0x38(r29)
-	lwz r0, 0x0(r29)
-	oris r0, r0, 0x200
-	stw r0, 0x0(r29)
-	b @8
-	@16:
-	lwz r0, 0x0(r29)
-	cmplwi r29, 0x0
-	lfs f1, float_0_8041b100(r2)
-	rlwinm r0, r0, 0, 16, 12
-	lfs f0, float_1_8041b0e8(r2)
-	stw r0, 0x0(r29)
-	stfs f1, 0x80(r29)
-	stfs f0, 0x70(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x74(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x78(r29)
-	beq @42
-	lwz r0, 0x4(r29)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r29)
-	@42:
-	mr r3, r29
-	li r4, 0x1
-	bl partyChgRunMode
-	b @8
-	@15:
-	lwz r0, 0x4(r29)
-	lfs f1, float_0p5_8041b170(r2)
-	clrrwi r0, r0, 1
-	stw r0, 0x4(r29)
-	lfs f31, 0x8c(r30)
-	lfs f2, 0x90(r30)
-	lfs f30, 0x94(r30)
-	stfs f31, 0x58(r29)
-	lfs f0, 0x1b8(r30)
-	fmadds f0, f1, f0, f2
-	stfs f0, 0x5c(r29)
-	stfs f30, 0x60(r29)
-	lbz r0, 0x38(r29)
-	cmplwi r0, 0x64
-	bne @43
-	addi r4, r29, 0x94
-	bl partyGetAppearPos
-	b @44
-	@43:
-	addi r4, r29, 0x94
-	bl partyGetAppearPos2
-	@44:
-	lfs f0, 0x1ac(r30)
-	li r0, 0x10
-	fmr f1, f31
-	stfs f0, 0x110(r29)
-	fmr f2, f30
-	stw r0, 0x24(r29)
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl distABf
-	stfs f1, 0x128(r29)
-	fmr f1, f31
-	fmr f2, f30
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl angleABf
-	stfs f1, 0x100(r29)
-	lis r0, 0x4330
-	lfd f4, 0x1d0(r31)
-	lwz r3, 0x24(r29)
-	stw r0, 0x48(r1)
-	xoris r3, r3, 0x8000
-	lfs f2, 0x128(r29)
-	stw r3, 0x4c(r1)
-	lfs f3, float_0p5_8041b170(r2)
-	lfd f0, 0x48(r1)
-	stw r0, 0x40(r1)
-	fsubs f1, f0, f4
-	lfs f0, float_1_8041b0e8(r2)
-	fdivs f1, f2, f1
-	stfs f1, 0x104(r29)
-	lwz r0, 0x24(r29)
-	lfs f2, 0x98(r29)
-	xoris r0, r0, 0x8000
-	lfs f1, 0x5c(r29)
-	stw r0, 0x44(r1)
-	fsubs f5, f2, f1
-	lfd f1, 0x40(r1)
-	fsubs f2, f1, f4
-	fabs f1, f5
-	fmuls f2, f3, f2
-	fcmpo cr0, f1, f0
-	bge @45
-	lfs f5, float_10_8041b124(r2)
-	b @46
-	@45:
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f5, f0
-	cror eq, gt, eq
-	bne @47
-	lfs f0, 0xf0(r29)
-	fmadds f5, f3, f0, f5
-	b @46
-	@47:
-	lfs f5, float_10_8041b124(r2)
-	@46:
-	fadds f1, f5, f5
-	cmplwi r29, 0x0
-	fmsubs f0, f2, f2, f2
-	fdivs f0, f1, f0
-	fmuls f1, f0, f2
-	fneg f0, f0
-	stfs f1, 0x114(r29)
-	stfs f0, 0x118(r29)
-	lwz r0, 0x0(r29)
-	ori r0, r0, 0x10
-	stw r0, 0x0(r29)
-	lwz r0, 0x4(r29)
-	clrrwi r0, r0, 1
-	stw r0, 0x4(r29)
-	beq @48
-	lwz r0, 0x4(r29)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r29)
-	@48:
-	li r0, 0x6e
-	stb r0, 0x38(r29)
-	b @8
-	@12:
-	bl partyMoveNoHosei
-	lfs f1, 0x114(r29)
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @49
-	lwz r0, 0x0(r29)
-	lfs f0, float_neg1p6_8041b180(r2)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x0(r29)
-	stfs f0, 0x118(r29)
-	@49:
-	lfs f1, 0x5c(r29)
-	lfs f0, float_neg2000_8041b164(r2)
-	fcmpo cr0, f1, f0
-	bge @50
-	li r3, 0x0
-	li r0, 0x6f
-	stw r3, 0x24(r29)
-	stb r0, 0x38(r29)
-	b @8
-	@50:
-	lwz r0, 0x138(r29)
-	cmplwi r0, 0x0
-	bne @51
-	lwz r0, 0x24(r29)
-	lis r5, 0x4330
-	lwz r4, 0x174(r31)
-	subfic r0, r0, 0x10
-	lwz r3, 0x178(r31)
-	xoris r6, r0, 0x8000
-	lwz r0, 0x17c(r31)
-	stw r6, 0x4c(r1)
-	lfd f2, 0x1d0(r31)
-	stw r5, 0x48(r1)
-	lfs f0, float_0p0625_8041b184(r2)
-	lfd f1, 0x48(r1)
-	stw r4, 0x14(r1)
-	fsubs f1, f1, f2
-	stw r3, 0x18(r1)
-	fmuls f0, f1, f0
-	stw r0, 0x1c(r1)
-	stfs f0, 0x14(r1)
-	stfs f0, 0x18(r1)
-	lwz r0, 0x14(r1)
-	stfs f0, 0x1c(r1)
-	lwz r3, 0x18(r1)
-	stw r0, 0x70(r29)
-	lwz r0, 0x1c(r1)
-	stw r3, 0x74(r29)
-	stw r0, 0x78(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bgt @8
-	li r0, 0x0
-	stw r0, 0x24(r29)
-	b @8
-	@51:
-	li r0, 0x6f
-	stb r0, 0x38(r29)
-	@17:
-	lwz r0, 0x24(r29)
-	lis r5, 0x4330
-	lwz r4, 0x180(r31)
-	subfic r0, r0, 0x10
-	lwz r3, 0x184(r31)
-	xoris r6, r0, 0x8000
-	lwz r0, 0x188(r31)
-	stw r6, 0x4c(r1)
-	lfd f2, 0x1d0(r31)
-	stw r5, 0x48(r1)
-	lfs f0, float_0p0625_8041b184(r2)
-	lfd f1, 0x48(r1)
-	stw r4, 0x8(r1)
-	fsubs f1, f1, f2
-	stw r3, 0xc(r1)
-	fmuls f0, f1, f0
-	stw r0, 0x10(r1)
-	stfs f0, 0x8(r1)
-	stfs f0, 0xc(r1)
-	lwz r0, 0x8(r1)
-	stfs f0, 0x10(r1)
-	lwz r3, 0xc(r1)
-	stw r0, 0x70(r29)
-	lwz r0, 0x10(r1)
-	stw r3, 0x74(r29)
-	stw r0, 0x78(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bgt @8
-	li r0, 0x0
-	stw r0, 0x24(r29)
-	lfs f0, 0x1ac(r30)
-	stfs f0, 0x110(r29)
-	lfs f0, 0x1ac(r30)
-	stfs f0, 0x10c(r29)
-	lfs f1, 0x10c(r29)
-	bl toMovedirSimple
-	stfs f1, 0xfc(r29)
-	mr r3, r29
-	lfs f0, 0xfc(r29)
-	stfs f0, 0x100(r29)
-	bl partyClearJumpPara
-	lwz r0, 0x4(r29)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @52
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @53
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @53
-	li r28, 0x1
-	@53:
-	cmpwi r28, 0x1
-	bne @54
-	li r30, 0xc
-	@54:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @55
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @56
-	@55:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @57
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @56
-	@57:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@56:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @58
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @52
-	@58:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@52:
-	lwz r0, 0x4(r29)
-	cmplwi r29, 0x0
-	lfs f1, float_0_8041b100(r2)
-	rlwinm r0, r0, 0, 28, 26
-	lfs f0, float_1_8041b0e8(r2)
-	stw r0, 0x4(r29)
-	lwz r0, 0x0(r29)
-	rlwinm r0, r0, 0, 16, 12
-	stw r0, 0x0(r29)
-	stfs f1, 0x80(r29)
-	stfs f0, 0x70(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x74(r29)
-	lfs f0, 0x70(r29)
-	stfs f0, 0x78(r29)
-	lwz r0, 0x4(r29)
-	clrrwi r0, r0, 1
-	stw r0, 0x4(r29)
-	beq @59
-	lwz r0, 0x4(r29)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r29)
-	@59:
-	mr r3, r29
-	li r4, 0x1
-	bl partyChgRunMode
-	@8:
-	lwz r3, 0x58(r29)
-	lwz r0, 0x5c(r29)
-	stw r3, 0xb8(r29)
-	stw r0, 0xbc(r29)
-	lwz r0, 0x60(r29)
-	stw r0, 0xc0(r29)
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	lwz r31, 0x5c(r1)
-	lwz r30, 0x58(r1)
-	lwz r29, 0x54(r1)
-	lwz r0, 0x84(r1)
-	lwz r28, 0x50(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm s32 partyRideChk(PartyEntry* party) {
-	nofralloc
-	cmplwi r3, 0x0
-	li r4, 0x0
-	bne @1
-	li r3, 0x0
-	blr
-	@1:
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xb
-	bne @2
-	lbz r0, 0x38(r3)
-	li r4, 0x1
-	cmplwi r0, 0x2
-	blt @2
-	li r4, 0x2
-	@2:
-	mr r3, r4
-	blr
-}
-
-asm void allPartyRideOff2(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	cmplwi r3, 0x0
-	beq @3
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xb
-	bne @3
-	li r0, 0x65
-	stb r0, 0x38(r3)
-	@3:
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @4
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @5
-	@4:
-	li r3, 0x0
-	@5:
-	cmplwi r3, 0x0
-	beq @6
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xb
-	bne @6
-	li r0, 0x65
-	stb r0, 0x38(r3)
-	@6:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void allPartyRideOff(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	cmplwi r3, 0x0
-	beq @3
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xb
-	bne @3
-	li r0, 0x64
-	stb r0, 0x38(r3)
-	@3:
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @4
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @5
-	@4:
-	li r3, 0x0
-	@5:
-	cmplwi r3, 0x0
-	beq @6
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xb
-	bne @6
-	li r0, 0x64
-	stb r0, 0x38(r3)
-	@6:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void L_allPartyRideOn(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	cmplwi r3, 0x0
-	beq @3
-	li r4, 0xb
-	bl partyChgRunMode
-	@3:
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @4
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @5
-	@4:
-	li r3, 0x0
-	@5:
-	cmplwi r3, 0x0
-	beq @6
-	li r4, 0xb
-	bl partyChgRunMode
-	@6:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void allPartyForceRideOn(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	beq @3
-	mr r3, r31
-	li r4, 0xb
-	li r5, 0xb
-	bl N_partyForceChgRunMode
-	lwz r0, 0x4(r31)
-	cmplwi r31, 0x0
-	ori r0, r0, 0x1
-	stw r0, 0x4(r31)
-	beq @3
-	lwz r0, 0x4(r31)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r31)
-	@3:
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @4
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @5
-	@4:
-	li r31, 0x0
-	@5:
-	cmplwi r31, 0x0
-	beq @6
-	mr r3, r31
-	li r4, 0xb
-	li r5, 0xb
-	bl N_partyForceChgRunMode
-	lwz r0, 0x4(r31)
-	cmplwi r31, 0x0
-	ori r0, r0, 0x1
-	stw r0, 0x4(r31)
-	beq @6
-	lwz r0, 0x4(r31)
-	oris r0, r0, 0x10
-	stw r0, 0x4(r31)
-	@6:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void getRidePos(PartyEntry* party, Vec* pos) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x20(r1)
-	psq_st f31, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r31, r3
-	mr r29, r4
-	lwz r30, 0x160(r3)
-	lhz r0, 0x2e(r30)
-	cmplwi r0, 0x1a
-	bne @1
-	lfs f1, 0x1ac(r30)
-	bl toMovedir
-	lfs f2, float_3p1416_8041b188(r2)
-	lfs f0, float_180_8041b0fc(r2)
-	fmuls f1, f2, f1
-	fdivs f31, f1, f0
-	bl yoshiGetStatus
-	cmpwi r3, 0x2
-	beq @2
-	fmr f1, f31
-	bl sin
-	frsp f3, f1
-	lfs f2, float_10_8041b124(r2)
-	lfs f0, 0x8c(r30)
-	fmr f1, f31
-	fnmsubs f0, f2, f3, f0
-	stfs f0, 0x0(r29)
-	bl cos
-	frsp f3, f1
-	lfs f2, float_10_8041b124(r2)
-	lfs f0, 0x94(r30)
-	lfs f1, float_20_8041b140(r2)
-	fnmsubs f0, f2, f3, f0
-	stfs f0, 0x8(r29)
-	lfs f0, 0x90(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	b @3
-	@2:
-	fmr f1, f31
-	bl sin
-	frsp f3, f1
-	lfs f2, float_20_8041b140(r2)
-	lfs f0, 0x8c(r30)
-	fmr f1, f31
-	fnmsubs f0, f2, f3, f0
-	stfs f0, 0x0(r29)
-	bl cos
-	frsp f3, f1
-	lfs f2, float_20_8041b140(r2)
-	lfs f0, 0x94(r30)
-	lfs f1, float_16_8041b17c(r2)
-	fnmsubs f0, f2, f3, f0
-	stfs f0, 0x8(r29)
-	lfs f0, 0x90(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	@3:
-	lbz r0, 0x2f(r31)
-	extsb. r0, r0
-	beq @4
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @5
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @6
-	@5:
-	li r31, 0x0
-	@6:
-	lfs f1, 0x1ac(r30)
-	lfs f2, float_10_8041b124(r2)
-	bl toMovedir2
-	addi r3, r1, 0xc
-	addi r4, r1, 0x8
-	bl sincosf
-	bl yoshiGetStatus
-	cmpwi r3, 0x2
-	beq @7
-	lfs f3, float_12_8041b18c(r2)
-	lfs f2, 0xc(r1)
-	lfs f0, 0x58(r31)
-	lfs f1, float_20_8041b140(r2)
-	fnmsubs f0, f3, f2, f0
-	stfs f0, 0x0(r29)
-	lfs f2, 0x8(r1)
-	lfs f0, 0x60(r31)
-	fnmsubs f0, f3, f2, f0
-	stfs f0, 0x8(r29)
-	lfs f0, 0x5c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	b @4
-	@7:
-	lfs f3, float_22_8041b190(r2)
-	lfs f2, 0xc(r1)
-	lfs f0, 0x58(r31)
-	lfs f1, float_16_8041b17c(r2)
-	fnmsubs f0, f3, f2, f0
-	stfs f0, 0x0(r29)
-	lfs f2, 0x8(r1)
-	lfs f0, 0x60(r31)
-	fnmsubs f0, f3, f2, f0
-	stfs f0, 0x8(r29)
-	lfs f0, 0x5c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	b @4
-	@1:
-	cmplwi r0, 0x18
-	bne @8
-	lfs f0, 0x8c(r30)
-	lfs f1, float_40_8041b194(r2)
-	stfs f0, 0x0(r29)
-	lfs f0, 0x94(r30)
-	stfs f0, 0x8(r29)
-	lfs f0, 0x90(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	b @4
-	@8:
-	cmplwi r0, 0x19
-	bne @9
-	bl N_marioShipGetDir
-	cmpwi r3, 0x0
-	beq @10
-	lfs f1, float_0_8041b100(r2)
-	b @11
-	@10:
-	lfs f1, float_180_8041b0fc(r2)
-	@11:
-	bl toMovedirSimple
-	addi r3, r1, 0xc
-	addi r4, r1, 0x8
-	bl sincosf
-	lfs f2, float_22_8041b190(r2)
-	lfs f1, 0xc(r1)
-	lfs f0, 0x8c(r30)
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x0(r29)
-	lfs f1, 0x8(r1)
-	lfs f0, 0x94(r30)
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x8(r29)
-	lfs f0, 0x90(r30)
-	stfs f0, 0x4(r29)
-	b @4
-	@9:
-	lfs f0, 0x8c(r30)
-	lfs f1, float_20_8041b140(r2)
-	stfs f0, 0x0(r29)
-	lfs f0, 0x94(r30)
-	stfs f0, 0x8(r29)
-	lfs f0, 0x90(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r29)
-	@4:
-	psq_l f31, 0x28(r1), 0, 0
-	lwz r0, 0x34(r1)
-	lfd f31, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void allPartyRideShip(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	beq @3
-	bl bomhei_use_cancel
-	lwz r0, 0x0(r31)
-	mr r3, r31
-	li r4, 0xb
-	oris r0, r0, 0x2
-	stw r0, 0x0(r31)
-	bl partyChgRunMode
-	@3:
-	la r3, partyPtrTbl(r13)
-	lwz r3, 0x4(r3)
-	cmplwi r3, 0x0
-	beq @4
-	lwz r0, 0x0(r3)
-	li r4, 0xb
-	oris r0, r0, 0x2
-	stw r0, 0x0(r3)
-	bl partyChgRunMode
-	@4:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void allPartyRidePlane(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	beq @3
-	bl bomhei_use_cancel
-	lwz r0, 0x0(r31)
-	mr r3, r31
-	li r4, 0xb
-	oris r0, r0, 0x1
-	stw r0, 0x0(r31)
-	bl partyChgRunMode
-	@3:
-	la r3, partyPtrTbl(r13)
-	lwz r3, 0x4(r3)
-	cmplwi r3, 0x0
-	beq @4
-	lwz r0, 0x0(r3)
-	li r4, 0xb
-	oris r0, r0, 0x1
-	stw r0, 0x0(r3)
-	bl partyChgRunMode
-	@4:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyDokanEnd(s32 id, s32 dir) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmpwi r3, 0x0
-	stw r0, 0x14(r1)
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	cmplwi r3, 0x0
-	beq @3
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0xa
-	bne @3
-	li r0, 0x64
-	cmplwi r3, 0x0
-	stb r0, 0x38(r3)
-	stb r4, 0x2e(r3)
-	lwz r0, 0x4(r3)
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x4(r3)
-	lwz r0, 0x4(r3)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r3)
-	lwz r0, 0x4(r3)
-	rlwinm r0, r0, 0, 26, 23
-	stw r0, 0x4(r3)
-	lwz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x0(r3)
-	lwz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 7, 5
-	stw r0, 0x0(r3)
-	beq @4
-	lwz r0, 0x4(r3)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r3)
-	@4:
-	lwz r4, 0x58(r3)
-	lwz r0, 0x5c(r3)
-	stw r4, 0xb8(r3)
-	stw r0, 0xbc(r3)
-	lwz r0, 0x60(r3)
-	stw r0, 0xc0(r3)
-	bl L_partyVivianTailStart
-	@3:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyDokanMain(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lis r3, vec3_802ccd30@ha
-	lbz r0, 0x38(r30)
-	addi r31, r3, vec3_802ccd30@l
-	lwz r4, 0x160(r30)
-	cmpwi r0, 0x64
-	beq @1
-	bge @2
-	cmpwi r0, 0xa
-	beq @3
-	bge @4
-	cmpwi r0, 0x0
-	beq @5
-	b @4
-	@2:
-	cmpwi r0, 0x66
-	beq @6
-	bge @4
-	b @7
-	@5:
-	lwz r3, 0x8c(r4)
-	lwz r0, 0x90(r4)
-	stw r3, 0x58(r30)
-	stw r0, 0x5c(r30)
-	lwz r0, 0x94(r4)
-	stw r0, 0x60(r30)
-	lfs f1, 0x10c(r30)
-	lfs f0, 0x124(r30)
-	fadds f1, f1, f0
-	bl revise360
-	stfs f1, 0x10c(r30)
-	lfs f1, float_0p05_8041b198(r2)
-	lfs f2, 0x70(r30)
-	lfs f0, float_1_8041b0e8(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x70(r30)
-	lfs f1, 0x70(r30)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @8
-	stfs f0, 0x70(r30)
-	@8:
-	lfs f0, 0x70(r30)
-	stfs f0, 0x74(r30)
-	lfs f0, 0x70(r30)
-	stfs f0, 0x78(r30)
-	b @4
-	@3:
-	lfs f1, 0x64(r30)
-	lfs f0, 0x124(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x64(r30)
-	b @4
-	@1:
-	lbz r0, 0x2e(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @9
-	bge @4
-	cmpwi r0, 0x2
-	bge @4
-	cmpwi r0, 0x0
-	bge @10
-	b @4
-	@10:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @11
-	lwz r3, 0x1c(r30)
-	cmplwi r3, 0x0
-	beq @12
-	addi r4, r31, 0x1d8
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @11
-	@12:
-	addi r3, r31, 0x1d8
-	li r0, 0x0
-	stw r3, 0x1c(r30)
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x4000
-	stw r0, 0x8(r30)
-	@11:
-	li r3, 0x12
-	li r0, 0x65
-	stw r3, 0x24(r30)
-	stb r0, 0x38(r30)
-	b @4
-	@9:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @13
-	lwz r3, 0x1c(r30)
-	cmplwi r3, 0x0
-	beq @14
-	addi r4, r31, 0x1d8
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	@14:
-	addi r3, r31, 0x1d8
-	li r0, 0x0
-	stw r3, 0x1c(r30)
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x4000
-	stw r0, 0x8(r30)
-	@13:
-	li r3, 0x12
-	li r0, 0x65
-	stw r3, 0x24(r30)
-	stb r0, 0x38(r30)
-	b @4
-	@7:
-	lbz r0, 0x2e(r30)
-	extsb r0, r0
-	cmpwi r0, 0x2
-	bge @15
-	cmpwi r0, 0x0
-	bge @16
-	b @15
-	@16:
-	lfs f1, 0x60(r30)
-	lfs f0, float_neg0p2_8041b19c(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x60(r30)
-	@15:
-	lwz r3, 0x24(r30)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r30)
-	bgt @4
-	li r0, 0x66
-	stb r0, 0x38(r30)
-	b @4
-	@6:
-	lwz r3, 0x12c(r31)
-	lwz r0, 0x130(r31)
-	stw r3, 0x70(r30)
-	stw r0, 0x74(r30)
-	lwz r0, 0x134(r31)
-	stw r0, 0x78(r30)
-	lwz r3, 0x138(r31)
-	lwz r0, 0x13c(r31)
-	stw r3, 0x64(r30)
-	stw r0, 0x68(r30)
-	lwz r0, 0x140(r31)
-	stw r0, 0x6c(r30)
-	lwz r3, 0x144(r31)
-	lwz r0, 0x148(r31)
-	stw r3, 0x88(r30)
-	stw r0, 0x8c(r30)
-	lwz r0, 0x14c(r31)
-	stw r0, 0x90(r30)
-	lwz r3, 0x150(r31)
-	lwz r0, 0x154(r31)
-	stw r3, 0x7c(r30)
-	stw r0, 0x80(r30)
-	lwz r0, 0x158(r31)
-	stw r0, 0x84(r30)
-	lfs f0, 0x1ac(r4)
-	stfs f0, 0x110(r30)
-	lfs f0, 0x110(r30)
-	stfs f0, 0x10c(r30)
-	lfs f0, 0x1a0(r4)
-	stfs f0, 0x100(r30)
-	lfs f0, 0x1a0(r4)
-	stfs f0, 0xfc(r30)
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 5, 5
-	beq @17
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	beq @17
-	lwz r3, 0xc(r30)
-	li r4, 0x0
-	li r5, 0x0
-	bl animPoseSetPaperAnimGroup
-	li r0, 0x0
-	stw r0, 0x1c(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x4(r30)
-	lwz r3, 0x14(r30)
-	cmpwi r3, 0x0
-	blt @17
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r30)
-	@17:
-	lwz r3, 0xc(r30)
-	li r4, 0x1
-	bl animPoseSetMaterialLightFlagOn
-	lwz r0, 0x4(r30)
-	cmplwi r30, 0x0
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x4(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x0(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 7, 5
-	stw r0, 0x0(r30)
-	beq @18
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r30)
-	@18:
-	mr r3, r30
-	bl L_partyVivianTailStart
-	lwz r5, 0x58(r30)
-	mr r3, r30
-	lwz r0, 0x5c(r30)
-	li r4, 0x1
-	stw r5, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	bl partyChgRunMode
-	li r31, 0x0
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @19
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r0, r3, r0
-	b @20
-	@19:
-	li r0, 0x0
-	@20:
-	cmplwi r0, 0x0
-	beq @21
-	li r31, 0x1
-	@21:
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @22
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r0, r3, r0
-	b @23
-	@22:
-	li r0, 0x0
-	@23:
-	cmplwi r0, 0x0
-	beq @24
-	addi r31, r31, 0x1
-	@24:
-	lbz r0, 0x2e(r30)
-	cmpwi r0, 0x4
-	bne @25
-	cmpwi r31, 0x1
-	bne @26
-	lfs f1, 0x60(r30)
-	lfs f0, float_neg4_8041b1a0(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x60(r30)
-	b @25
-	@26:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 28, 28
-	bne @27
-	lfs f2, 0x60(r30)
-	lfs f1, float_neg4_8041b1a0(r2)
-	lfs f0, float_1p5_8041b1a4(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x60(r30)
-	lfs f1, 0x58(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x58(r30)
-	b @25
-	@27:
-	lfs f2, 0x60(r30)
-	lfs f1, float_neg3_8041b1a8(r2)
-	lfs f0, float_neg1p5_8041b1ac(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x60(r30)
-	lfs f1, 0x58(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x58(r30)
-	@25:
-	lbz r0, 0x2e(r30)
-	cmpwi r0, 0x1
-	bne @4
-	cmpwi r31, 0x1
-	bne @28
-	lfs f1, 0x60(r30)
-	lfs f0, float_neg4_8041b1a0(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x60(r30)
-	b @4
-	@28:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 28, 28
-	bne @29
-	lfs f2, 0x60(r30)
-	lfs f1, float_neg4_8041b1a0(r2)
-	lfs f0, float_1p5_8041b1a4(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x60(r30)
-	lfs f1, 0x58(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x58(r30)
-	b @4
-	@29:
-	lfs f2, 0x60(r30)
-	lfs f1, float_neg3_8041b1a8(r2)
-	lfs f0, float_neg1p5_8041b1ac(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x60(r30)
-	lfs f1, 0x58(r30)
-	fadds f0, f1, f0
-	stfs f0, 0x58(r30)
-	@4:
-	lwz r0, 0x14(r1)
-	li r3, 0x0
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyDokanInit(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lis r3, vec3_802ccd30@ha
-	stw r28, 0x10(r1)
-	addi r31, r3, vec3_802ccd30@l
-	lwz r0, 0x4(r29)
-	lwz r30, 0x160(r29)
-	ori r0, r0, 0x10
-	stw r0, 0x4(r29)
-	lbz r0, 0x3e(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @1
-	bge @2
-	cmpwi r0, 0x1
-	beq @3
-	bge @4
-	cmpwi r0, 0x0
-	bge @5
-	b @6
-	@2:
-	cmpwi r0, 0x6
-	bge @6
-	b @7
-	@4:
-	lwz r3, 0x14(r29)
-	cmpwi r3, 0x0
-	blt @8
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r29)
-	@8:
-	lwz r0, 0x4(r29)
-	addi r3, r31, 0x1e0
-	li r4, 0x2
-	oris r0, r0, 0x400
-	stw r0, 0x4(r29)
-	bl animPaperPoseEntry
-	stw r3, 0x14(r29)
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1ec
-	li r28, 0x0
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @9
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1f4
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @9
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1fc
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @9
-	addi r3, r31, 0x1e0
-	mr r4, r3
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @10
-	@9:
-	li r28, 0x1
-	@10:
-	cntlzw r0, r28
-	addi r3, r31, 0x1e0
-	srwi r28, r0, 5
-	addi r4, r31, 0x208
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @11
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	subfic r0, r0, 0x5
-	cntlzw r0, r0
-	srwi r28, r0, 5
-	@11:
-	lwz r3, 0xc(r29)
-	mr r5, r28
-	addi r4, r31, 0x1e0
-	bl animPoseSetPaperAnimGroup
-	lfs f0, float_30_8041b178(r2)
-	li r0, 0x0
-	stfs f0, 0x124(r29)
-	stb r0, 0x38(r29)
-	b @6
-	@5:
-	lwz r3, 0x120(r31)
-	lwz r0, 0x124(r31)
-	stw r3, 0x70(r29)
-	stw r0, 0x74(r29)
-	lwz r0, 0x128(r31)
-	stw r0, 0x78(r29)
-	@3:
-	lwz r3, 0x14(r29)
-	cmpwi r3, 0x0
-	blt @12
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r29)
-	@12:
-	lwz r0, 0x4(r29)
-	addi r3, r31, 0x1e0
-	li r4, 0x2
-	oris r0, r0, 0x400
-	stw r0, 0x4(r29)
-	bl animPaperPoseEntry
-	stw r3, 0x14(r29)
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1ec
-	li r28, 0x0
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1f4
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	addi r3, r31, 0x1e0
-	addi r4, r31, 0x1fc
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	addi r3, r31, 0x1e0
-	mr r4, r3
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @14
-	@13:
-	li r28, 0x1
-	@14:
-	cntlzw r0, r28
-	addi r3, r31, 0x1e0
-	srwi r28, r0, 5
-	addi r4, r31, 0x208
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @15
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	subfic r0, r0, 0x5
-	cntlzw r0, r0
-	srwi r28, r0, 5
-	@15:
-	lwz r3, 0xc(r29)
-	mr r5, r28
-	addi r4, r31, 0x1e0
-	bl animPoseSetPaperAnimGroup
-	lfs f0, float_30_8041b178(r2)
-	li r0, 0x0
-	stfs f0, 0x124(r29)
-	stb r0, 0x38(r29)
-	b @6
-	@7:
-	lwz r3, 0x14(r29)
-	cmpwi r3, 0x0
-	blt @16
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r29)
-	@16:
-	lwz r0, 0x4(r29)
-	addi r3, r31, 0x1fc
-	li r4, 0x2
-	oris r0, r0, 0x400
-	stw r0, 0x4(r29)
-	bl animPaperPoseEntry
-	stw r3, 0x14(r29)
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1ec
-	li r28, 0x0
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @17
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1f4
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @17
-	addi r3, r31, 0x1fc
-	mr r4, r3
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @17
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1e0
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @18
-	@17:
-	li r28, 0x1
-	@18:
-	cntlzw r0, r28
-	addi r3, r31, 0x1fc
-	srwi r28, r0, 5
-	addi r4, r31, 0x208
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @19
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	subfic r0, r0, 0x5
-	cntlzw r0, r0
-	srwi r28, r0, 5
-	@19:
-	lwz r3, 0xc(r29)
-	mr r5, r28
-	addi r4, r31, 0x1fc
-	bl animPoseSetPaperAnimGroup
-	lfs f1, float_26_8041b1b0(r2)
-	li r0, 0xa
-	lfs f0, float_10_8041b124(r2)
-	stfs f1, 0x124(r29)
-	stb r0, 0x38(r29)
-	stfs f0, 0x8c(r29)
-	b @6
-	@1:
-	lwz r3, 0x14(r29)
-	cmpwi r3, 0x0
-	blt @20
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r29)
-	@20:
-	lwz r0, 0x4(r29)
-	addi r3, r31, 0x1fc
-	li r4, 0x2
-	oris r0, r0, 0x400
-	stw r0, 0x4(r29)
-	bl animPaperPoseEntry
-	stw r3, 0x14(r29)
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1ec
-	li r28, 0x0
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @21
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1f4
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @21
-	addi r3, r31, 0x1fc
-	mr r4, r3
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @21
-	addi r3, r31, 0x1fc
-	addi r4, r31, 0x1e0
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @22
-	@21:
-	li r28, 0x1
-	@22:
-	cntlzw r0, r28
-	addi r3, r31, 0x1fc
-	srwi r28, r0, 5
-	addi r4, r31, 0x208
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @23
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	subfic r0, r0, 0x5
-	cntlzw r0, r0
-	srwi r28, r0, 5
-	@23:
-	lwz r3, 0xc(r29)
-	mr r5, r28
-	addi r4, r31, 0x1fc
-	bl animPoseSetPaperAnimGroup
-	lfs f1, float_neg26_8041b1b4(r2)
-	li r0, 0xa
-	lfs f0, float_10_8041b124(r2)
-	stfs f1, 0x124(r29)
-	lfs f1, float_180_8041b0fc(r2)
-	stb r0, 0x38(r29)
-	stfs f0, 0x8c(r29)
-	lfs f0, 0xbc(r30)
-	fadds f1, f1, f0
-	bl revise360
-	stfs f1, 0x64(r29)
-	@6:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @24
-	lwz r3, 0x1c(r29)
-	cmplwi r3, 0x0
-	beq @25
-	addi r4, r31, 0x210
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @24
-	@25:
-	addi r3, r31, 0x210
-	li r0, 0x0
-	stw r3, 0x1c(r29)
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x4000
-	stw r0, 0x8(r29)
-	@24:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @26
-	lbz r0, 0x31(r29)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @27
-	bl partyGetHp
-	@27:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @28
-	lbz r0, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x3c
-	lwzx r28, r3, r0
-	b @29
-	@28:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @30
-	mulli r0, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r3, r3, partyDotPoseTbl@l
-	lwzx r28, r3, r0
-	b @29
-	@30:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r0, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r3, r3, yoshiDotPoseTbl@l
-	lwzx r28, r3, r0
-	@29:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @31
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @26
-	@31:
-	stw r28, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@26:
-	lwz r0, 0x4(r29)
-	li r4, 0x1
-	ori r0, r0, 0x8
-	stw r0, 0x4(r29)
-	lwz r0, 0x4(r29)
-	ori r0, r0, 0x10
-	stw r0, 0x4(r29)
-	lwz r3, 0xc(r29)
-	bl animPoseSetMaterialLightFlagOff
-	lfs f1, float_180_8041b0fc(r2)
-	lfs f0, 0x1a8(r30)
-	fadds f1, f1, f0
-	bl revise360
-	stfs f1, 0x110(r29)
-	mr r3, r29
-	lfs f0, 0x1a8(r30)
-	stfs f0, 0x10c(r29)
-	lfs f0, 0x19c(r30)
-	stfs f0, 0xfc(r29)
-	lwz r4, 0x8c(r30)
-	lwz r0, 0x90(r30)
-	stw r4, 0x58(r29)
-	stw r0, 0x5c(r29)
-	lwz r0, 0x94(r30)
-	stw r0, 0x60(r29)
-	bl L_partyVivianTailStop
-	lwz r0, 0x24(r1)
-	li r3, 0x0
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 partyGoodbyeMain(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0xa0(r1)
-	mflr r0
-	stw r0, 0xa4(r1)
-	stfd f31, 0x90(r1)
-	psq_st f31, 0x98(r1), 0, 0
-	stfd f30, 0x80(r1)
-	psq_st f30, 0x88(r1), 0, 0
-	stfd f29, 0x70(r1)
-	psq_st f29, 0x78(r1), 0, 0
-	stfd f28, 0x60(r1)
-	psq_st f28, 0x68(r1), 0, 0
-	stfd f27, 0x50(r1)
-	psq_st f27, 0x58(r1), 0, 0
-	stfd f26, 0x40(r1)
-	psq_st f26, 0x48(r1), 0, 0
-	stw r31, 0x3c(r1)
-	stw r30, 0x38(r1)
-	stw r29, 0x34(r1)
-	mr r31, r3
-	bl marioGetPtr
-	lbz r0, 0x38(r31)
-	mr r30, r3
-	cmplwi r0, 0x14
-	bgt @1
-	lis r3, jumptable_80312720@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_80312720@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@2:
-	lbz r4, 0x31(r31)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	mr r3, r31
-	extsb r4, r4
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r12, 0xc(r4)
-	mtctr r12
-	bctrl
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x6
-	bne @3
-	bl vivianGetStatus
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0xa
-	li r0, 0x8
-	stb r3, 0x38(r31)
-	stb r0, 0x34(r31)
-	b @1
-	@3:
-	cmpwi r0, 0x4
-	bne @4
-	bl yoshiGetStatus
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0xa
-	li r0, 0x8
-	stb r3, 0x38(r31)
-	stb r0, 0x34(r31)
-	b @1
-	@4:
-	li r3, 0xa
-	li r0, 0x8
-	stb r3, 0x38(r31)
-	stb r0, 0x34(r31)
-	b @1
-	@5:
-	lis r3, 0x2
-	addi r4, r30, 0x8c
-	addi r3, r3, 0x91f
-	bl psndSFXOn_3D
-	lfs f3, 0x8c(r30)
-	lfs f4, float_0p5_8041b170(r2)
-	stfs f3, 0x94(r31)
-	fmr f30, f3
-	lfs f5, float_4_8041b10c(r2)
-	lfs f2, 0x1b8(r30)
-	lfs f1, 0x90(r30)
-	lfs f0, float_1p6_8041b16c(r2)
-	fmadds f31, f4, f2, f1
-	stfs f31, 0x98(r31)
-	lfs f4, 0x94(r30)
-	stfs f4, 0x9c(r31)
-	fmr f29, f4
-	lfs f28, 0x58(r31)
-	lfs f26, 0x60(r31)
-	lfs f27, 0x5c(r31)
-	fmr f1, f28
-	fmr f2, f26
-	stfs f5, 0x104(r31)
-	stfs f0, 0x11c(r31)
-	bl distABf
-	stfs f1, 0x128(r31)
-	fmr f1, f28
-	fmr f2, f26
-	fmr f3, f30
-	fmr f4, f29
-	bl angleABf
-	stfs f1, 0x100(r31)
-	lis r0, 0x4330
-	li r4, 0xf
-	lis r3, double_to_int_802ccf00@ha
-	stw r4, 0x24(r31)
-	fsubs f5, f31, f27
-	lfd f4, double_to_int_802ccf00@l(r3)
-	lwz r3, 0x24(r31)
-	stw r0, 0x8(r1)
-	xoris r3, r3, 0x8000
-	lfs f1, 0x128(r31)
-	stw r3, 0xc(r1)
-	lfs f3, float_0p5_8041b170(r2)
-	lfd f0, 0x8(r1)
-	stw r0, 0x18(r1)
-	fsubs f0, f0, f4
-	stw r0, 0x10(r1)
-	fdivs f0, f1, f0
-	stw r0, 0x20(r1)
-	stfs f0, 0x104(r31)
-	lwz r0, 0x24(r31)
-	lfs f1, 0x11c(r31)
-	xoris r0, r0, 0x8000
-	stw r0, 0x1c(r1)
-	lfd f0, 0x18(r1)
-	stw r0, 0x14(r1)
-	fsubs f0, f0, f4
-	lfd f2, 0x10(r1)
-	stw r0, 0x24(r1)
-	fmuls f1, f1, f0
-	fsubs f2, f2, f4
-	lfd f0, 0x20(r1)
-	fsubs f0, f0, f4
-	fmuls f1, f2, f1
-	fmadds f1, f3, f1, f5
-	fdivs f0, f1, f0
-	stfs f0, 0x114(r31)
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @6
-	lbz r0, 0x31(r31)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @7
-	bl partyGetHp
-	@7:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @8
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r0, r3, partyPoseTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x3c
-	add r3, r0, r3
-	lwz r30, 0x10(r3)
-	b @9
-	@8:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @10
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	addi r0, r3, partyDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	b @9
-	@10:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	addi r0, r3, yoshiDotPoseTbl@l
-	add r3, r0, r4
-	lwz r30, 0x10(r3)
-	@9:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @11
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @6
-	@11:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@6:
-	li r0, 0xb
-	stb r0, 0x38(r31)
-	b @1
-	@12:
-	lfs f1, 0x114(r31)
-	addi r3, r31, 0x58
-	lfs f0, 0x11c(r31)
-	addi r4, r31, 0x60
-	fsubs f0, f1, f0
-	stfs f0, 0x114(r31)
-	lfs f1, 0x5c(r31)
-	lfs f0, 0x114(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x5c(r31)
-	lfs f1, 0x104(r31)
-	lfs f2, 0x100(r31)
-	bl movePos
-	lfs f1, float_50_8041b1b8(r2)
-	lfs f0, 0x10c(r31)
-	fadds f1, f1, f0
-	bl revise360
-	stfs f1, 0x10c(r31)
-	lis r0, 0x4330
-	lis r3, double_to_int_802ccf00@ha
-	lfs f0, float_10_8041b124(r2)
-	lwz r4, 0x24(r31)
-	stw r0, 0x20(r1)
-	xoris r0, r4, 0x8000
-	lfd f2, double_to_int_802ccf00@l(r3)
-	stw r0, 0x24(r1)
-	lfd f1, 0x20(r1)
-	fsubs f1, f1, f2
-	fcmpo cr0, f1, f0
-	ble @13
-	fmr f1, f0
-	@13:
-	lfs f0, float_10_8041b124(r2)
-	fdivs f0, f1, f0
-	stfs f0, 0x70(r31)
-	lfs f0, 0x70(r31)
-	stfs f0, 0x74(r31)
-	lfs f0, 0x70(r31)
-	stfs f0, 0x78(r31)
-	lwz r3, 0x24(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r31)
-	bge @1
-	li r0, 0xc
-	stb r0, 0x38(r31)
-	b @1
-	@14:
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @15
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @16
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @16
-	li r29, 0x1
-	@16:
-	cmpwi r29, 0x1
-	bne @17
-	li r30, 0xc
-	@17:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @18
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @19
-	@18:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @20
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @19
-	@20:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@19:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @21
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @15
-	@21:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@15:
-	lfs f0, float_0_8041b100(r2)
-	mr r3, r31
-	li r4, 0xe
-	stfs f0, 0x114(r31)
-	lfs f0, 0x98(r31)
-	stfs f0, 0x5c(r31)
-	bl partyChgRunMode
-	li r3, 0x1
-	b @22
-	@23:
-	mr r3, r31
-	li r4, 0xe
-	bl partyChgRunMode
-	li r3, 0x1
-	b @22
-	@1:
-	li r3, 0x0
-	@22:
-	psq_l f31, 0x98(r1), 0, 0
-	lfd f31, 0x90(r1)
-	psq_l f30, 0x88(r1), 0, 0
-	lfd f30, 0x80(r1)
-	psq_l f29, 0x78(r1), 0, 0
-	lfd f29, 0x70(r1)
-	psq_l f28, 0x68(r1), 0, 0
-	lfd f28, 0x60(r1)
-	psq_l f27, 0x58(r1), 0, 0
-	lfd f27, 0x50(r1)
-	psq_l f26, 0x48(r1), 0, 0
-	lfd f26, 0x40(r1)
-	lwz r31, 0x3c(r1)
-	lwz r30, 0x38(r1)
-	lwz r0, 0xa4(r1)
-	lwz r29, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0xa0
-	blr
-}
-
-asm s32 partyGoodbyeInit(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r4, partyDataTbl@ha
-	stw r0, 0x14(r1)
-	li r0, 0xa
-	stw r31, 0xc(r1)
-	mr r31, r3
-	stb r0, 0x38(r3)
-	addi r0, r4, partyDataTbl@l
-	lbz r4, 0x31(r3)
-	extsb r4, r4
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r12, 0x4(r4)
-	cmplwi r12, 0x0
-	beq @1
-	mtctr r12
-	bctrl
-	@1:
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 23, 23
-	beq @2
-	lbz r0, 0x31(r31)
-	cmpwi r0, 0x6
-	bne @3
-	mr r3, r31
-	bl vivianUnhold
-	li r0, 0x0
-	stb r0, 0x38(r31)
-	@3:
-	lbz r0, 0x31(r31)
-	cmpwi r0, 0x4
-	bne @2
-	bl marioGetoffYoshi
-	li r0, 0x0
-	stb r0, 0x38(r31)
-	@2:
-	lwz r3, 0x160(r31)
-	lhz r0, 0x2e(r3)
-	cmplwi r0, 0x16
-	beq @4
-	cmplwi r0, 0x18
-	beq @4
-	cmplwi r0, 0x19
-	bne @5
-	@4:
-	li r0, 0x14
-	stb r0, 0x38(r31)
-	@5:
-	lwz r0, 0x14(r1)
-	li r3, 0x0
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyHelloMain(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stw r31, 0x3c(r1)
-	stw r30, 0x38(r1)
-	stw r29, 0x34(r1)
-	stw r28, 0x30(r1)
-	mr r29, r3
-	li r31, 0x0
-	lbz r0, 0x38(r3)
-	lwz r30, 0x160(r3)
-	cmplwi r0, 0x1e
-	bgt @1
-	lis r4, jumptable_80312774@ha
-	slwi r0, r0, 2
-	addi r4, r4, jumptable_80312774@l
-	lwzx r0, r4, r0
-	mtctr r0
-	bctr
-	@2:
-	lfs f31, 0x8c(r30)
-	addi r4, r29, 0x94
-	lfs f2, 0x90(r30)
-	lfs f30, 0x94(r30)
-	lfs f1, float_0p5_8041b170(r2)
-	stfs f31, 0x58(r29)
-	lfs f0, 0x1b8(r30)
-	fmadds f0, f1, f0, f2
-	stfs f0, 0x5c(r29)
-	stfs f30, 0x60(r29)
-	bl partyGetAppearPos
-	li r0, 0x10
-	fmr f1, f31
-	stw r0, 0x24(r29)
-	fmr f2, f30
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl distABf
-	stfs f1, 0x128(r29)
-	fmr f1, f31
-	fmr f2, f30
-	lfs f3, 0x94(r29)
-	lfs f4, 0x9c(r29)
-	bl angleABf
-	stfs f1, 0x100(r29)
-	lis r0, 0x4330
-	lis r3, double_to_int_802ccf00@ha
-	lfs f3, float_0p5_8041b170(r2)
-	lwz r5, 0x24(r29)
-	addi r4, r3, double_to_int_802ccf00@l
-	stw r0, 0x20(r1)
-	xoris r3, r5, 0x8000
-	lfd f4, 0x0(r4)
-	stw r3, 0x24(r1)
-	lfs f2, 0x128(r29)
-	lfd f0, 0x20(r1)
-	stw r0, 0x28(r1)
-	fsubs f1, f0, f4
-	lfs f0, float_1_8041b0e8(r2)
-	fdivs f1, f2, f1
-	stfs f1, 0x104(r29)
-	lwz r0, 0x24(r29)
-	lfs f2, 0x98(r29)
-	xoris r0, r0, 0x8000
-	lfs f1, 0x5c(r29)
-	stw r0, 0x2c(r1)
-	fsubs f5, f2, f1
-	lfd f1, 0x28(r1)
-	fsubs f2, f1, f4
-	fabs f1, f5
-	fmuls f2, f3, f2
-	fcmpo cr0, f1, f0
-	bge @3
-	lfs f5, float_10_8041b124(r2)
-	b @4
-	@3:
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f5, f0
-	cror eq, gt, eq
-	bne @5
-	lfs f0, 0xf0(r29)
-	fmadds f5, f3, f0, f5
-	b @4
-	@5:
-	lfs f5, float_10_8041b124(r2)
-	@4:
-	fadds f1, f5, f5
-	li r0, 0x1
-	fmsubs f0, f2, f2, f2
-	fdivs f0, f1, f0
-	fmuls f1, f0, f2
-	fneg f0, f0
-	stfs f1, 0x114(r29)
-	stfs f0, 0x118(r29)
-	lwz r3, 0x0(r29)
-	ori r3, r3, 0x10
-	stw r3, 0x0(r29)
-	stb r0, 0x38(r29)
-	b @1
-	@6:
-	bl partyMoveNoHosei
-	lfs f1, 0x114(r29)
-	lfs f0, float_0_8041b100(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @7
-	lwz r0, 0x0(r29)
-	lfs f0, float_neg1p6_8041b180(r2)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x0(r29)
-	stfs f0, 0x118(r29)
-	@7:
-	lfs f1, 0x5c(r29)
-	lfs f0, float_neg2000_8041b164(r2)
-	fcmpo cr0, f1, f0
-	bge @8
-	li r3, 0x0
-	li r0, 0x2
-	stw r3, 0x24(r29)
-	stb r0, 0x38(r29)
-	b @1
-	@8:
-	lwz r0, 0x138(r29)
-	cmplwi r0, 0x0
-	bne @9
-	lwz r5, 0x24(r29)
-	lis r0, 0x4330
-	stw r0, 0x28(r1)
-	lis r4, double_to_int_802ccf00@ha
-	subfic r5, r5, 0x10
-	lis r3, vec3_802cce2c@ha
-	xoris r0, r5, 0x8000
-	stw r0, 0x2c(r1)
-	addi r5, r3, vec3_802cce2c@l
-	addi r3, r4, double_to_int_802ccf00@l
-	lwz r4, 0x0(r5)
-	lfd f1, 0x0(r3)
-	lfd f0, 0x28(r1)
-	lwz r3, 0x4(r5)
-	fsubs f1, f0, f1
-	lfs f0, float_0p0625_8041b184(r2)
-	lwz r0, 0x8(r5)
-	stw r4, 0x14(r1)
-	fmuls f0, f1, f0
-	stw r3, 0x18(r1)
-	stfs f0, 0x14(r1)
-	stw r0, 0x1c(r1)
-	lwz r0, 0x14(r1)
-	stfs f0, 0x18(r1)
-	stfs f0, 0x1c(r1)
-	lwz r3, 0x18(r1)
-	stw r0, 0x70(r29)
-	lwz r0, 0x1c(r1)
-	stw r3, 0x74(r29)
-	stw r0, 0x78(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bgt @1
-	li r0, 0x0
-	stw r0, 0x24(r29)
-	b @1
-	@9:
-	li r0, 0x2
-	stb r0, 0x38(r29)
-	@10:
-	lwz r5, 0x24(r29)
-	lis r0, 0x4330
-	stw r0, 0x28(r1)
-	lis r4, double_to_int_802ccf00@ha
-	subfic r5, r5, 0x10
-	lis r3, vec3_802cce38@ha
-	xoris r0, r5, 0x8000
-	stw r0, 0x2c(r1)
-	addi r5, r3, vec3_802cce38@l
-	addi r3, r4, double_to_int_802ccf00@l
-	lwz r4, 0x0(r5)
-	lfd f1, 0x0(r3)
-	lfd f0, 0x28(r1)
-	lwz r3, 0x4(r5)
-	fsubs f1, f0, f1
-	lfs f0, float_0p0625_8041b184(r2)
-	lwz r0, 0x8(r5)
-	stw r4, 0x8(r1)
-	fmuls f0, f1, f0
-	stw r3, 0xc(r1)
-	stfs f0, 0x8(r1)
-	stw r0, 0x10(r1)
-	lwz r0, 0x8(r1)
-	stfs f0, 0xc(r1)
-	stfs f0, 0x10(r1)
-	lwz r3, 0xc(r1)
-	stw r0, 0x70(r29)
-	lwz r0, 0x10(r1)
-	stw r3, 0x74(r29)
-	stw r0, 0x78(r29)
-	lwz r3, 0x24(r29)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r29)
-	bgt @1
-	li r0, 0x0
-	lfs f0, float_90_8041b0f0(r2)
-	stw r0, 0x24(r29)
-	lfs f1, 0x110(r29)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @11
-	lfs f0, float_270_8041b0f4(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @11
-	lfs f1, float_180_8041b0fc(r2)
-	mr r3, r29
-	bl partyToMovedir
-	stfs f1, 0xfc(r29)
-	lfs f0, float_180_8041b0fc(r2)
-	lfs f1, 0xfc(r29)
-	stfs f1, 0x100(r29)
-	stfs f0, 0x10c(r29)
-	stfs f0, 0x110(r29)
-	b @12
-	@11:
-	lfs f1, float_0_8041b100(r2)
-	mr r3, r29
-	bl partyToMovedir
-	stfs f1, 0xfc(r29)
-	lfs f0, float_0_8041b100(r2)
-	lfs f1, 0xfc(r29)
-	stfs f1, 0x100(r29)
-	stfs f0, 0x10c(r29)
-	stfs f0, 0x110(r29)
-	@12:
-	mr r3, r29
-	bl partyClearJumpPara
-	lwz r0, 0x4(r29)
-	li r31, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @13
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @14
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @14
-	li r28, 0x1
-	@14:
-	cmpwi r28, 0x1
-	bne @15
-	li r31, 0xc
-	@15:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @16
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r31, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	b @17
-	@16:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @18
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r31, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	b @17
-	@18:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r31, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r31, r3, r0
-	@17:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @19
-	mr r4, r31
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @13
-	@19:
-	stw r31, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@13:
-	lwz r5, 0x4(r29)
-	lis r3, 0x2
-	li r0, 0x1
-	addi r4, r30, 0x8c
-	rlwinm r5, r5, 0, 28, 26
-	addi r3, r3, 0x920
-	stw r5, 0x4(r29)
-	li r31, 0x1
-	stb r0, 0x34(r29)
-	bl psndSFXOn_3D
-	b @1
-	@20:
-	addi r4, r29, 0x58
-	bl partyGetAppearPos2
-	lwz r3, 0x58(r29)
-	li r30, 0x1
-	lwz r0, 0x5c(r29)
-	stw r3, 0xb8(r29)
-	stw r0, 0xbc(r29)
-	lwz r0, 0x60(r29)
-	stw r0, 0xc0(r29)
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @21
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @22
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @22
-	li r28, 0x1
-	@22:
-	cmpwi r28, 0x1
-	bne @23
-	li r30, 0xc
-	@23:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @24
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @25
-	@24:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @26
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @25
-	@26:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@25:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @27
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @21
-	@27:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@21:
-	li r0, 0x1
-	li r31, 0x1
-	stb r0, 0x34(r29)
-	b @1
-	@28:
-	lwz r0, 0x4(r29)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @29
-	lbz r0, 0x31(r29)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @30
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @30
-	li r28, 0x1
-	@30:
-	cmpwi r28, 0x1
-	bne @31
-	li r30, 0xc
-	@31:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @32
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @33
-	@32:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @34
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @33
-	@34:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@33:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @35
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @29
-	@35:
-	stw r30, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@29:
-	li r0, 0x0
-	li r31, 0x1
-	stb r0, 0x34(r29)
-	b @1
-	@36:
-	bl allPartyForceRideOn
-	li r31, 0x1
-	@1:
-	mr r3, r31
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	lwz r31, 0x3c(r1)
-	lwz r30, 0x38(r1)
-	lwz r29, 0x34(r1)
-	lwz r0, 0x64(r1)
-	lwz r28, 0x30(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm void partyHello(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r5, vec3_802ccd30@ha
-	stw r0, 0x14(r1)
-	addi r6, r5, vec3_802ccd30@l
-	lwz r4, 0x8(r3)
-	rlwinm. r0, r4, 0, 28, 28
-	beq @1
-	rlwinm r0, r4, 0, 29, 27
-	stw r0, 0x8(r3)
-	lwz r7, 0x160(r3)
-	lhz r0, 0x2e(r7)
-	cmplwi r0, 0x16
-	beq @2
-	cmplwi r0, 0x18
-	beq @2
-	cmplwi r0, 0x19
-	bne @3
-	@2:
-	li r0, 0x1e
-	stb r0, 0x38(r3)
-	b @4
-	@3:
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0x4
-	beq @5
-	cmplwi r0, 0x5
-	bne @6
-	@5:
-	lwz r4, 0x4(r3)
-	li r0, 0x0
-	ori r4, r4, 0x10
-	stw r4, 0x4(r3)
-	lwz r5, 0xd8(r6)
-	lwz r4, 0xdc(r6)
-	stw r5, 0x70(r3)
-	stw r4, 0x74(r3)
-	lwz r4, 0xe0(r6)
-	stw r4, 0x78(r3)
-	stb r0, 0x38(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x110(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x10c(r3)
-	lwz r4, 0x8c(r7)
-	lwz r0, 0x90(r7)
-	stw r4, 0x58(r3)
-	stw r0, 0x5c(r3)
-	lwz r0, 0x94(r7)
-	stw r0, 0x60(r3)
-	lwz r4, 0x58(r3)
-	lwz r0, 0x5c(r3)
-	stw r4, 0xb8(r3)
-	stw r0, 0xbc(r3)
-	lwz r0, 0x60(r3)
-	stw r0, 0xc0(r3)
-	b @4
-	@6:
-	cmplwi r0, 0x7
-	bne @7
-	lwz r5, 0xe4(r6)
-	li r0, 0x14
-	lwz r4, 0xe8(r6)
-	stw r5, 0x70(r3)
-	stw r4, 0x74(r3)
-	lwz r4, 0xec(r6)
-	stw r4, 0x78(r3)
-	stb r0, 0x38(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x110(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x10c(r3)
-	b @4
-	@7:
-	lwz r5, 0xf0(r6)
-	li r0, 0xa
-	lwz r4, 0xf4(r6)
-	stw r5, 0x70(r3)
-	stw r4, 0x74(r3)
-	lwz r4, 0xf8(r6)
-	stw r4, 0x78(r3)
-	stb r0, 0x38(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x110(r3)
-	lfs f0, 0x1a8(r7)
-	stfs f0, 0x10c(r3)
-	lwz r4, 0x8c(r7)
-	lwz r0, 0x90(r7)
-	stw r4, 0x58(r3)
-	stw r0, 0x5c(r3)
-	lwz r0, 0x94(r7)
-	stw r0, 0x60(r3)
-	lwz r4, 0x58(r3)
-	lwz r0, 0x5c(r3)
-	stw r4, 0xb8(r3)
-	stw r0, 0xbc(r3)
-	lwz r0, 0x60(r3)
-	stw r0, 0xc0(r3)
-	@4:
-	lwz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r3)
-	@1:
-	bl partyHelloMain
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL partyDoWork(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stfd f31, 0x10(r1)
-	psq_st f31, 0x18(r1), 0, 0
-	stw r31, 0xc(r1)
-	bl marioGetPtr
-	lbz r0, 0x241(r3)
-	extsb. r0, r0
-	blt @1
-	slwi r0, r0, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	bne @3
-	li r3, 0x0
-	b @4
-	@3:
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0x0
-	beq @5
-	cmplwi r0, 0x1
-	beq @5
-	cmplwi r0, 0x2
-	beq @5
-	li r3, 0x0
-	b @4
-	@5:
-	lfs f31, float_0_8041b100(r2)
-	bl marioGetPtr
-	stfs f31, 0x180(r3)
-	mr r3, r31
-	li r4, 0x3
-	bl partyChgRunMode
-	li r3, 0x1
-	@4:
-	psq_l f31, 0x18(r1), 0, 0
-	lwz r0, 0x24(r1)
-	lfd f31, 0x10(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void driveParty(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	lis r4, vec3_802ccd30@ha
-	stw r0, 0x44(r1)
-	stw r31, 0x3c(r1)
-	addi r31, r4, vec3_802ccd30@l
-	stw r30, 0x38(r1)
-	mr r30, r3
-	stw r29, 0x34(r1)
-	stw r28, 0x30(r1)
-	lwz r3, 0x160(r3)
-	lfs f0, 0x198(r3)
-	stfs f0, 0xf8(r30)
-	lha r4, 0x2a(r30)
-	cmpwi r4, 0x0
-	ble @1
-	subi r0, r4, 0x1
-	sth r0, 0x2a(r30)
-	@1:
-	lbz r0, 0x34(r30)
-	cmpwi r0, 0xe
-	beq @2
-	bge @3
-	cmpwi r0, 0x9
-	bge @3
-	cmpwi r0, 0x4
-	bge @2
-	@3:
-	lwz r0, 0x0(r30)
-	rlwinm. r0, r0, 0, 2, 2
-	beq @2
-	bl vivianGetStatus
-	cmpwi r3, 0x2
-	beq @4
-	mr r3, r30
-	bl vivianShadow
-	@4:
-	mr r3, r30
-	bl partyPreDisp
-	b @5
-	@2:
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 6, 6
-	beq @6
-	lwz r0, 0x0(r30)
-	oris r0, r0, 0x80
-	stw r0, 0x0(r30)
-	b @7
-	@6:
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 9, 7
-	stw r0, 0x0(r30)
-	@7:
-	li r0, 0x0
-	stw r0, 0x138(r30)
-	stw r0, 0x12c(r30)
-	stw r0, 0x140(r30)
-	stw r0, 0x134(r30)
-	stw r0, 0x130(r30)
-	lbz r0, 0x34(r30)
-	cmplwi r0, 0xe
-	bgt @8
-	lis r4, jumptable_803127F0@ha
-	slwi r0, r0, 2
-	addi r4, r4, jumptable_803127F0@l
-	lwzx r0, r4, r0
-	mtctr r0
-	bctr
-	@9:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @10
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@10:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @11
-	rlwinm r0, r3, 0, 29, 27
-	li r29, 0x1
-	stw r0, 0x8(r30)
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @12
-	lbz r0, 0x31(r30)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @13
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @13
-	li r28, 0x1
-	@13:
-	cmpwi r28, 0x1
-	bne @14
-	li r29, 0xc
-	@14:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @15
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @16
-	@15:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @17
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @16
-	@17:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@16:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @18
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @12
-	@18:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@12:
-	lfs f0, float_0_8041b100(r2)
-	mr r3, r30
-	li r4, 0x0
-	stfs f0, 0x104(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	bl partyChgMot
-	@11:
-	lbz r4, 0x31(r30)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	mr r3, r30
-	extsb r4, r4
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r12, 0x8(r4)
-	mtctr r12
-	bctrl
-	b @8
-	@19:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @20
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@20:
-	mr r3, r30
-	bl unk_800c7c98
-	b @8
-	@21:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @22
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@22:
-	lbz r4, 0x31(r30)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	mr r3, r30
-	extsb r4, r4
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r12, 0x8(r4)
-	mtctr r12
-	bctrl
-	b @8
-	@23:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @24
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@24:
-	mr r3, r30
-	bl partyForceWalk
-	b @8
-	@25:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @26
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@26:
-	lbz r4, 0x31(r30)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	extsb r4, r4
-	mr r3, r30
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r0, 0x0(r30)
-	lwz r12, 0xc(r4)
-	ori r0, r0, 0x100
-	stw r0, 0x0(r30)
-	mtctr r12
-	bctrl
-	b @8
-	@27:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @28
-	rlwinm r0, r3, 0, 29, 27
-	stw r0, 0x8(r30)
-	lwz r5, 0x160(r30)
-	lhz r0, 0x2e(r5)
-	cmplwi r0, 0x16
-	beq @29
-	cmplwi r0, 0x18
-	beq @29
-	cmplwi r0, 0x19
-	bne @30
-	@29:
-	li r0, 0x1e
-	stb r0, 0x38(r30)
-	b @31
-	@30:
-	lbz r0, 0x34(r30)
-	cmplwi r0, 0x4
-	beq @32
-	cmplwi r0, 0x5
-	bne @33
-	@32:
-	lwz r3, 0x4(r30)
-	li r0, 0x0
-	ori r3, r3, 0x10
-	stw r3, 0x4(r30)
-	lwz r4, 0xd8(r31)
-	lwz r3, 0xdc(r31)
-	stw r4, 0x70(r30)
-	stw r3, 0x74(r30)
-	lwz r3, 0xe0(r31)
-	stw r3, 0x78(r30)
-	stb r0, 0x38(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x110(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x10c(r30)
-	lwz r3, 0x8c(r5)
-	lwz r0, 0x90(r5)
-	stw r3, 0x58(r30)
-	stw r0, 0x5c(r30)
-	lwz r0, 0x94(r5)
-	stw r0, 0x60(r30)
-	lwz r3, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r3, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	b @31
-	@33:
-	cmplwi r0, 0x7
-	bne @34
-	lwz r4, 0xe4(r31)
-	li r0, 0x14
-	lwz r3, 0xe8(r31)
-	stw r4, 0x70(r30)
-	stw r3, 0x74(r30)
-	lwz r3, 0xec(r31)
-	stw r3, 0x78(r30)
-	stb r0, 0x38(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x110(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x10c(r30)
-	b @31
-	@34:
-	lwz r4, 0xf0(r31)
-	li r0, 0xa
-	lwz r3, 0xf4(r31)
-	stw r4, 0x70(r30)
-	stw r3, 0x74(r30)
-	lwz r3, 0xf8(r31)
-	stw r3, 0x78(r30)
-	stb r0, 0x38(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x110(r30)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x10c(r30)
-	lwz r3, 0x8c(r5)
-	lwz r0, 0x90(r5)
-	stw r3, 0x58(r30)
-	stw r0, 0x5c(r30)
-	lwz r0, 0x94(r5)
-	stw r0, 0x60(r30)
-	lwz r3, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r3, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	@31:
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	@28:
-	mr r3, r30
-	bl partyHelloMain
-	b @8
-	@35:
-	lbz r4, 0x31(r30)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	mr r3, r30
-	extsb r4, r4
-	mulli r4, r4, 0x28
-	add r4, r0, r4
-	stw r4, party_dp(r13)
-	lwz r12, 0x14(r4)
-	mtctr r12
-	bctrl
-	b @8
-	@36:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @37
-	rlwinm r0, r3, 0, 29, 27
-	mr r3, r30
-	stw r0, 0x8(r30)
-	bl partyDokanInit
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	@37:
-	mr r3, r30
-	bl partyDokanMain
-	b @8
-	@38:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @39
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@39:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @40
-	rlwinm r3, r3, 0, 29, 27
-	li r0, 0x0
-	stw r3, 0x8(r30)
-	mr r3, r30
-	stb r0, 0x38(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	bl L_partyForceSlitOff
-	@40:
-	mr r3, r30
-	bl partyRideMain
-	b @8
-	@41:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @42
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@42:
-	lwz r3, 0x8(r30)
-	rlwinm. r0, r3, 0, 28, 28
-	beq @43
-	rlwinm r3, r3, 0, 29, 27
-	li r0, 0x0
-	stw r3, 0x8(r30)
-	stb r0, 0x38(r30)
-	lwz r0, 0x0(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x0(r30)
-	@43:
-	mr r3, r30
-	bl partyRideYoshiMain
-	b @8
-	@44:
-	lwz r3, 0x0(r30)
-	rlwinm. r0, r3, 0, 2, 2
-	beq @45
-	rlwinm. r0, r3, 0, 3, 3
-	beq @8
-	@45:
-	mr r3, r30
-	bl party_damage_return
-	b @8
-	@46:
-	lwz r4, 0x8(r30)
-	rlwinm. r0, r4, 0, 28, 28
-	beq @47
-	rlwinm r0, r4, 0, 29, 27
-	stw r0, 0x8(r30)
-	@47:
-	lbz r0, 0x2f(r30)
-	li r6, -0x1
-	lbz r8, 0x31(r30)
-	li r5, 0x0
-	extsb r0, r0
-	la r4, partyPtrTbl(r13)
-	add r7, r3, r0
-	stb r8, 0x243(r7)
-	lbz r0, 0x2f(r30)
-	extsb r0, r0
-	add r3, r3, r0
-	stb r6, 0x241(r3)
-	lbz r0, 0x2f(r30)
-	extsb r0, r0
-	slwi r0, r0, 2
-	stwx r5, r4, r0
-	lwz r3, 0xc(r30)
-	bl animPoseRelease
-	mr r4, r30
-	li r3, 0x0
-	bl __memFree
-	b @5
-	@8:
-	mr r3, r30
-	bl party_kemuri
-	lwz r7, 0x58(r30)
-	addi r3, r1, 0x14
-	lwz r0, 0x5c(r30)
-	addi r4, r1, 0x10
-	addi r5, r1, 0xc
-	addi r6, r1, 0x8
-	stw r7, 0x14(r1)
-	stw r0, 0x18(r1)
-	lwz r0, 0x60(r30)
-	stw r0, 0x1c(r1)
-	bl marioGetScreenPos
-	lfs f1, 0x10(r1)
-	lfs f0, 0xc(r1)
-	fctiwz f1, f1
-	fctiwz f0, f0
-	stfd f1, 0x20(r1)
-	stfd f0, 0x28(r1)
-	lwz r3, 0x24(r1)
-	lwz r4, 0x2c(r1)
-	bl marioChkInScreen
-	cmpwi r3, 0x0
-	beq @48
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 9, 7
-	stw r0, 0x4(r30)
-	b @49
-	@48:
-	lwz r0, 0x4(r30)
-	oris r0, r0, 0x80
-	stw r0, 0x4(r30)
-	@49:
-	lwz r4, 0xcc(r31)
-	mr r3, r30
-	lwz r0, 0xd0(r31)
-	stw r4, 0xac(r30)
-	stw r0, 0xb0(r30)
-	lwz r0, 0xd4(r31)
-	stw r0, 0xb4(r30)
-	bl partyPreDisp
-	@5:
-	lwz r0, 0x44(r1)
-	lwz r31, 0x3c(r1)
-	lwz r30, 0x38(r1)
-	lwz r29, 0x34(r1)
-	lwz r28, 0x30(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void partyMain(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	bl marioGetPtr
-	la r31, partyPtrTbl(r13)
-	li r3, 0x0
-	lwz r4, partyPtrTbl(r13)
-	cmplwi r4, 0x0
-	beq @1
-	cmpwi r3, 0x0
-	blt @2
-	b @3
-	@2:
-	mr r4, r3
-	@3:
-	lwz r0, 0x0(r4)
-	clrlwi. r0, r0, 31
-	beq @1
-	li r3, 0x1
-	@1:
-	addi r4, r31, 0x4
-	li r0, 0x1
-	lwz r4, 0x0(r4)
-	cmplwi r4, 0x0
-	beq @4
-	cmpwi r0, 0x0
-	blt @5
-	b @6
-	@5:
-	li r4, 0x0
-	@6:
-	lwz r0, 0x0(r4)
-	clrlwi. r0, r0, 31
-	beq @4
-	addi r3, r3, 0x1
-	@4:
-	cmpwi r3, 0x0
-	beq @7
-	bl unk_8013be14
-	li r30, 0x0
-	@8:
-	lwz r29, 0x0(r31)
-	cmplwi r29, 0x0
-	beq @9
-	lwz r0, 0x0(r29)
-	clrlwi. r0, r0, 31
-	beq @9
-	bl marioBgmodeChk
-	cmpwi r3, 0x1
-	beq @9
-	mr r3, r29
-	bl driveParty
-	@9:
-	addi r30, r30, 0x1
-	addi r31, r31, 0x4
-	cmpwi r30, 0x2
-	blt @8
-	@7:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void unk_800ba2dc(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r4, vec3_802ccd30@ha
-	stw r0, 0x24(r1)
-	addi r5, r4, vec3_802ccd30@l
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	lbz r6, 0x34(r3)
-	lbz r0, 0x35(r3)
-	cmplw r6, r0
-	beq @1
-	cmplwi r6, 0x4
-	bne @2
-	lwz r6, 0x160(r31)
-	lwz r4, 0x114(r5)
-	lwz r0, 0x118(r5)
-	stw r4, 0x70(r31)
-	stw r0, 0x74(r31)
-	lwz r0, 0x11c(r5)
-	stw r0, 0x78(r31)
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r31)
-	lfs f0, 0x19c(r6)
-	stfs f0, 0xfc(r31)
-	lfs f0, 0x1a0(r6)
-	stfs f0, 0x100(r31)
-	lfs f0, 0x1ac(r6)
-	stfs f0, 0x110(r31)
-	lfs f0, 0x1a8(r6)
-	stfs f0, 0x10c(r31)
-	bl partyClearJumpPara
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @3
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @4
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @4
-	li r29, 0x1
-	@4:
-	cmpwi r29, 0x1
-	bne @5
-	li r30, 0xc
-	@5:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @6
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @7
-	@6:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @8
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @7
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@7:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @9
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @3
-	@9:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@3:
-	lwz r3, 0x4(r31)
-	cmplwi r31, 0x0
-	li r0, 0x1
-	rlwinm r3, r3, 0, 28, 26
-	stw r3, 0x4(r31)
-	stb r0, 0x34(r31)
-	beq @10
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0x3
-	bne @10
-	lbz r0, 0x31(r31)
-	lis r3, partyDataTbl@ha
-	addi r3, r3, partyDataTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x28
-	add r3, r3, r0
-	lwz r12, 0x10(r3)
-	cmplwi r12, 0x0
-	beq @10
-	mr r3, r31
-	mtctr r12
-	bctrl
-	@10:
-	mr r3, r31
-	li r4, 0x0
-	bl partyChgMot
-	b @1
-	@2:
-	cmplwi r6, 0xb
-	bne @11
-	lwz r6, 0x160(r31)
-	lwz r4, 0x18c(r5)
-	lwz r0, 0x190(r5)
-	stw r4, 0x70(r31)
-	stw r0, 0x74(r31)
-	lwz r0, 0x194(r5)
-	stw r0, 0x78(r31)
-	lwz r4, 0x198(r5)
-	lwz r0, 0x19c(r5)
-	stw r4, 0x7c(r31)
-	stw r0, 0x80(r31)
-	lwz r0, 0x1a0(r5)
-	stw r0, 0x84(r31)
-	lfs f0, 0x19c(r6)
-	stfs f0, 0xfc(r31)
-	lfs f0, 0x1a0(r6)
-	stfs f0, 0x100(r31)
-	lfs f0, 0x1ac(r6)
-	stfs f0, 0x110(r31)
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 12
-	stw r0, 0x0(r31)
-	bl partyClearJumpPara
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @12
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @13
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @13
-	li r29, 0x1
-	@13:
-	cmpwi r29, 0x1
-	bne @14
-	li r30, 0xc
-	@14:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @15
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @16
-	@15:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @17
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @16
-	@17:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@16:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @18
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @12
-	@18:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@12:
-	lwz r0, 0x4(r31)
-	cmplwi r31, 0x0
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r31)
-	lwz r0, 0x4(r31)
-	clrrwi r0, r0, 1
-	stw r0, 0x4(r31)
-	beq @19
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r31)
-	@19:
-	cmplwi r31, 0x0
-	beq @20
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0x3
-	bne @20
-	lbz r0, 0x31(r31)
-	lis r3, partyDataTbl@ha
-	addi r3, r3, partyDataTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x28
-	add r3, r3, r0
-	lwz r12, 0x10(r3)
-	cmplwi r12, 0x0
-	beq @20
-	mr r3, r31
-	mtctr r12
-	bctrl
-	@20:
-	mr r3, r31
-	li r4, 0x0
-	bl partyChgMot
-	b @1
-	@11:
-	cmplwi r6, 0xc
-	bne @21
-	cmplwi r31, 0x0
-	beq @21
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r31)
-	@21:
-	cmplwi r31, 0x0
-	beq @22
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0x3
-	bne @22
-	lbz r0, 0x31(r31)
-	lis r3, partyDataTbl@ha
-	addi r3, r3, partyDataTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x28
-	add r3, r3, r0
-	lwz r12, 0x10(r3)
-	cmplwi r12, 0x0
-	beq @22
-	mr r3, r31
-	mtctr r12
-	bctrl
-	@22:
-	lbz r0, 0x35(r31)
-	mr r3, r31
-	li r4, 0x0
-	stb r0, 0x34(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x8
-	stw r0, 0x8(r31)
-	bl partyChgMot
-	@1:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void N_partyForceChgRunMode(PartyEntry* party, s32 mode, s32 sub) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r5
-	stw r30, 0x18(r1)
-	mr r30, r4
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0x9
-	beq @1
-	cmplwi r0, 0x3
-	beq @1
-	stb r0, 0x35(r29)
-	@1:
-	lbz r4, 0x34(r29)
-	mr r3, r29
-	mr r5, r30
-	bl N__partyChgRunMode
-	stb r30, 0x34(r29)
-	lwz r0, 0x8(r29)
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x8(r29)
-	stb r31, 0x38(r29)
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void partyChgRunMode(PartyEntry* party, s32 mode) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r4
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0x9
-	beq @1
-	cmplwi r0, 0x3
-	beq @1
-	stb r0, 0x35(r30)
-	@1:
-	lbz r4, 0x34(r30)
-	mr r3, r30
-	mr r5, r31
-	bl N__partyChgRunMode
-	stb r31, 0x34(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x8
-	stw r0, 0x8(r30)
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void N__partyChgRunMode(PartyEntry* party, s32 prev, s32 mode) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r6, vec3_802ccd30@ha
-	cmpwi r4, 0x4
-	stw r0, 0x24(r1)
-	addi r6, r6, vec3_802ccd30@l
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	beq @1
-	bge @2
-	cmpwi r4, 0x3
-	bge @3
-	cmpwi r4, 0x1
-	bge @4
-	b @5
-	@2:
-	cmpwi r4, 0xc
-	beq @6
-	bge @5
-	cmpwi r4, 0xb
-	bge @7
-	b @5
-	@7:
-	cmpwi r5, 0x8
-	beq @5
-	lwz r5, 0x160(r31)
-	lwz r4, 0x18c(r6)
-	lwz r0, 0x190(r6)
-	stw r4, 0x70(r31)
-	stw r0, 0x74(r31)
-	lwz r0, 0x194(r6)
-	stw r0, 0x78(r31)
-	lwz r4, 0x198(r6)
-	lwz r0, 0x19c(r6)
-	stw r4, 0x7c(r31)
-	stw r0, 0x80(r31)
-	lwz r0, 0x1a0(r6)
-	stw r0, 0x84(r31)
-	lfs f0, 0x19c(r5)
-	stfs f0, 0xfc(r31)
-	lfs f0, 0x1a0(r5)
-	stfs f0, 0x100(r31)
-	lfs f0, 0x1ac(r5)
-	stfs f0, 0x110(r31)
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 12
-	stw r0, 0x0(r31)
-	bl partyClearJumpPara
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @8
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @9
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @9
-	li r29, 0x1
-	@9:
-	cmpwi r29, 0x1
-	bne @10
-	li r30, 0xc
-	@10:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @11
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @12
-	@11:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @13
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @12
-	@13:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@12:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @14
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @8
-	@14:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@8:
-	lwz r0, 0x4(r31)
-	cmplwi r31, 0x0
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r31)
-	lwz r0, 0x4(r31)
-	clrrwi r0, r0, 1
-	stw r0, 0x4(r31)
-	beq @5
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r31)
-	b @5
-	@1:
-	lwz r5, 0x160(r31)
-	lwz r4, 0x114(r6)
-	lwz r0, 0x118(r6)
-	stw r4, 0x70(r31)
-	stw r0, 0x74(r31)
-	lwz r0, 0x11c(r6)
-	stw r0, 0x78(r31)
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x4(r31)
-	lfs f0, 0x19c(r5)
-	stfs f0, 0xfc(r31)
-	lfs f0, 0x1a0(r5)
-	stfs f0, 0x100(r31)
-	lfs f0, 0x1ac(r5)
-	stfs f0, 0x110(r31)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x10c(r31)
-	bl partyClearJumpPara
-	lwz r0, 0x4(r31)
-	li r30, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	bne @15
-	lbz r0, 0x31(r31)
-	li r29, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @16
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @16
-	li r29, 0x1
-	@16:
-	cmpwi r29, 0x1
-	bne @17
-	li r30, 0xc
-	@17:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @18
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @19
-	@18:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @20
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @19
-	@20:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@19:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @21
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @15
-	@21:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@15:
-	lwz r3, 0x4(r31)
-	li r0, 0x1
-	rlwinm r3, r3, 0, 28, 26
-	stw r3, 0x4(r31)
-	stb r0, 0x34(r31)
-	b @5
-	@6:
-	cmplwi r31, 0x0
-	beq @5
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 12, 10
-	stw r0, 0x4(r31)
-	b @5
-	@3:
-	lbz r0, 0x31(r31)
-	lis r4, partyDataTbl@ha
-	addi r4, r4, partyDataTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x28
-	add r4, r4, r0
-	lwz r12, 0x10(r4)
-	cmplwi r12, 0x0
-	beq @5
-	mtctr r12
-	bctrl
-	b @5
-	@4:
-	bl L_partyForceSlitOff
-	@5:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void partyUsePost(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmplwi r3, 0x0
-	stw r0, 0x14(r1)
-	beq @1
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0x3
-	bne @1
-	lbz r0, 0x31(r3)
-	lis r4, partyDataTbl@ha
-	addi r4, r4, partyDataTbl@l
-	extsb r0, r0
-	mulli r0, r0, 0x28
-	add r4, r4, r0
-	lwz r12, 0x10(r4)
-	cmplwi r12, 0x0
-	beq @1
-	mtctr r12
-	bctrl
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyReInit(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r3, vec3_802ccd30@ha
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	addi r31, r3, vec3_802ccd30@l
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	bl marioGetExtraPartyId
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r30, r3, r0
-	b @2
-	@1:
-	li r30, 0x0
-	@2:
-	cmplwi r30, 0x0
-	beq @3
-	li r3, 0xd
-	li r0, 0x0
-	stw r3, 0x0(r30)
-	stw r0, 0x4(r30)
-	lwz r28, 0xc(r30)
-	cmpwi r28, 0x0
-	blt @4
-	mr r3, r28
-	li r4, -0x1
-	bl animPoseSetMaterialFlagOff
-	mr r3, r28
-	li r4, 0x2
-	bl animPoseSetMaterialLightFlagOn
-	@4:
-	li r0, 0x0
-	stb r0, 0x37(r30)
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	beq @5
-	lwz r3, 0xc(r30)
-	li r4, 0x0
-	li r5, 0x0
-	bl animPoseSetPaperAnimGroup
-	li r0, 0x0
-	stw r0, 0x1c(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x4(r30)
-	lwz r3, 0x14(r30)
-	cmpwi r3, 0x0
-	blt @5
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r30)
-	@5:
-	li r28, 0x0
-	li r29, 0x1
-	stw r28, 0x130(r30)
-	stw r28, 0x12c(r30)
-	stw r28, 0x148(r30)
-	stw r28, 0x138(r30)
-	stw r28, 0x13c(r30)
-	stw r28, 0x134(r30)
-	stw r28, 0x140(r30)
-	stw r28, 0x144(r30)
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @6
-	lwz r29, 0x18(r30)
-	b @7
-	@6:
-	lbz r0, 0x31(r30)
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @8
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @8
-	li r28, 0x1
-	@8:
-	cmpwi r28, 0x1
-	bne @9
-	li r29, 0xc
-	@9:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @10
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @11
-	@10:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @12
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @11
-	@12:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@11:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @13
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @13
-	b @7
-	@13:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@7:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @14
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @15
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @14
-	@15:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @14
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@14:
-	mr r3, r30
-	li r4, 0x2
-	bl partyChgRunMode
-	mr r3, r30
-	li r4, 0x0
-	bl partyChgMot
-	li r0, -0x1
-	stw r0, 0x168(r30)
-	lwz r3, 0xb4(r31)
-	lwz r0, 0xb8(r31)
-	stw r3, 0x70(r30)
-	stw r0, 0x74(r30)
-	lwz r0, 0xbc(r31)
-	stw r0, 0x78(r30)
-	@3:
-	bl marioGetPartyId
-	cmpwi r3, 0x0
-	blt @16
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r30, r3, r0
-	b @17
-	@16:
-	li r30, 0x0
-	@17:
-	cmplwi r30, 0x0
-	beq @18
-	lwz r4, 0x4(r30)
-	li r3, 0x1
-	li r0, 0x0
-	stw r3, 0x0(r30)
-	rlwinm r29, r4, 0, 16, 16
-	stw r0, 0x4(r30)
-	stb r0, 0x37(r30)
-	bl marioGetCamId
-	cmplwi r30, 0x0
-	stw r3, 0x164(r30)
-	beq @19
-	lwz r28, 0xc(r30)
-	cmpwi r28, 0x0
-	blt @20
-	mr r3, r28
-	li r4, -0x1
-	bl animPoseSetMaterialFlagOff
-	mr r3, r28
-	li r4, 0x2
-	bl animPoseSetMaterialLightFlagOn
-	@20:
-	lwz r0, 0x1c(r30)
-	cmplwi r0, 0x0
-	beq @21
-	lwz r3, 0xc(r30)
-	li r4, 0x0
-	li r5, 0x0
-	bl animPoseSetPaperAnimGroup
-	li r0, 0x0
-	stw r0, 0x1c(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x4(r30)
-	lwz r3, 0x14(r30)
-	cmpwi r3, 0x0
-	blt @21
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r30)
-	@21:
-	li r0, 0x0
-	stw r0, 0x130(r30)
-	stw r0, 0x12c(r30)
-	stw r0, 0x148(r30)
-	stw r0, 0x138(r30)
-	stw r0, 0x13c(r30)
-	stw r0, 0x134(r30)
-	stw r0, 0x140(r30)
-	stw r0, 0x144(r30)
-	lwz r3, 0xc0(r31)
-	lwz r0, 0xc4(r31)
-	stw r3, 0x70(r30)
-	stw r0, 0x74(r30)
-	lwz r0, 0xc8(r31)
-	stw r0, 0x78(r30)
-	@19:
-	bl partyClearFootmark
-	cmpwi r29, 0x0
-	beq @22
-	lbz r0, 0x31(r30)
-	cmpwi r0, 0x4
-	beq @23
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @24
-	lwz r3, party_dp(r13)
-	lwz r29, 0x0(r3)
-	b @25
-	@24:
-	addi r29, r31, 0x1bc
-	b @25
-	@23:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r30)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r29, r3, r4
-	beq @25
-	addi r29, r31, 0x1bc
-	@25:
-	lwz r3, 0xc(r30)
-	cmpwi r3, 0x0
-	blt @26
-	bl animPoseRelease
-	@26:
-	mr r3, r29
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r30)
-	@22:
-	lbz r0, 0x31(r30)
-	cmpwi r0, 0x4
-	bne @27
-	lbz r0, 0x34(r30)
-	cmplwi r0, 0x3
-	beq @18
-	@27:
-	bl marioGetPtr
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 9, 9
-	bne @28
-	lwz r0, 0x4(r30)
-	li r29, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @29
-	lwz r29, 0x18(r30)
-	b @30
-	@29:
-	lbz r0, 0x31(r30)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @31
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @31
-	li r28, 0x1
-	@31:
-	cmpwi r28, 0x1
-	bne @32
-	li r29, 0xc
-	@32:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @33
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @34
-	@33:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @35
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @34
-	@35:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@34:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @36
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @36
-	b @30
-	@36:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@30:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @37
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @38
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @37
-	@38:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @37
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@37:
-	mr r3, r30
-	li r4, 0x2
-	bl partyChgRunMode
-	mr r3, r30
-	li r4, 0x0
-	bl partyChgMot
-	b @39
-	@28:
-	lwz r0, 0x4(r30)
-	li r29, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @40
-	lwz r29, 0x18(r30)
-	b @41
-	@40:
-	lbz r0, 0x31(r30)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @42
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @42
-	li r28, 0x1
-	@42:
-	cmpwi r28, 0x1
-	bne @43
-	li r29, 0xc
-	@43:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @44
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @45
-	@44:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @46
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @45
-	@46:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@45:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @47
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @47
-	b @41
-	@47:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@41:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @48
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @49
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @48
-	@49:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @48
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@48:
-	mr r3, r30
-	li r4, 0x2
-	bl partyChgRunMode
-	li r3, 0x6
-	li r0, 0x0
-	stb r3, 0x3b(r30)
-	stb r0, 0x38(r30)
-	lwz r0, 0x0(r30)
-	ori r0, r0, 0x8000
-	stw r0, 0x0(r30)
-	@39:
-	lbz r0, 0x31(r30)
-	cmpwi r0, 0x7
-	bne @50
-	mr r3, r30
-	bl chuchu_reinit
-	@50:
-	bl unk_8014c47c
-	@18:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void partyInit(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	la r3, partyPtrTbl(r13)
-	li r4, 0x0
-	stw r0, 0x14(r1)
-	li r5, 0x8
-	bl memset
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyEntry2Pos(s32 memberId, f32 x, f32 y, f32 z) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stfd f29, 0x30(r1)
-	psq_st f29, 0x38(r1), 0, 0
-	stmw r27, 0x1c(r1)
-	fmr f29, f1
-	mr r27, r3
-	fmr f30, f2
-	fmr f31, f3
-	bl marioGetPtr
-	la r28, partyPtrTbl(r13)
-	mr r29, r3
-	lwz r0, 0x4(r28)
-	cmplwi r0, 0x0
-	bne @1
-	li r3, 0x0
-	li r4, 0x188
-	bl __memAlloc
-	stw r3, 0x4(r28)
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	li r31, 0x1
-	b @2
-	@1:
-	li r31, -0x1
-	@2:
-	cmpwi r31, 0x0
-	bge @3
-	li r3, -0x1
-	b @4
-	@3:
-	blt @5
-	slwi r0, r31, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r30, r3, r0
-	b @6
-	@5:
-	li r30, 0x0
-	@6:
-	mr r3, r30
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	bl marioGetCamId
-	stw r3, 0x164(r30)
-	li r3, -0x1
-	li r0, 0x9
-	cmpwi r31, 0x1
-	stw r3, 0xc(r30)
-	stw r3, 0x10(r30)
-	stw r3, 0x14(r30)
-	stw r0, 0x0(r30)
-	stb r31, 0x2f(r30)
-	stw r29, 0x160(r30)
-	stb r27, 0x31(r30)
-	bne @7
-	lwz r0, 0x0(r30)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r30)
-	@7:
-	mulli r4, r27, 0x28
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	add r3, r0, r4
-	stw r3, party_dp(r13)
-	lbz r0, 0x31(r30)
-	cmpwi r0, 0x4
-	beq @8
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @9
-	lwz r29, 0x0(r3)
-	b @10
-	@9:
-	lis r3, str_802CCEEC@ha
-	addi r29, r3, str_802CCEEC@l
-	b @10
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r30)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r29, r3, r4
-	beq @10
-	lis r3, str_802CCEEC@ha
-	addi r29, r3, str_802CCEEC@l
-	@10:
-	lwz r3, 0xc(r30)
-	cmpwi r3, 0x0
-	blt @11
-	bl animPoseRelease
-	@11:
-	mr r3, r29
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r30)
-	lwz r3, 0xc(r30)
-	bl animPosePeraOff
-	lwz r29, 0x160(r30)
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r29, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialFlag
-	mr r4, r3
-	lwz r3, 0xc(r30)
-	bl animPoseSetMaterialFlagOn
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r29, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialLightFlag
-	mr r4, r3
-	lwz r3, 0xc(r30)
-	bl animPoseSetMaterialLightFlagOn
-	lwz r0, 0x4(r30)
-	li r29, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @12
-	lwz r29, 0x18(r30)
-	b @13
-	@12:
-	lbz r0, 0x31(r30)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @14
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @14
-	li r28, 0x1
-	@14:
-	cmpwi r28, 0x1
-	bne @15
-	li r29, 0xc
-	@15:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @16
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @17
-	@16:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @18
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @17
-	@18:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@17:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @19
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @19
-	b @13
-	@19:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@13:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @20
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @21
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @20
-	@21:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @20
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@20:
-	li r0, 0x0
-	mr r3, r30
-	stw r0, 0x1c(r30)
-	lwz r4, party_dp(r13)
-	lwz r12, 0x4(r4)
-	mtctr r12
-	bctrl
-	mr r3, r30
-	li r4, 0x2
-	bl partyChgRunMode
-	lis r3, vec3_802ccdd8@ha
-	lfs f0, float_1_8041b0e8(r2)
-	addi r5, r3, vec3_802ccdd8@l
-	mr r3, r31
-	lwz r0, 0x0(r5)
-	lwz r4, 0x4(r5)
-	stw r0, 0x8(r1)
-	lwz r0, 0x8(r5)
-	stw r4, 0xc(r1)
-	stfs f29, 0x8(r1)
-	stw r0, 0x10(r1)
-	lwz r0, 0x8(r1)
-	stfs f30, 0xc(r1)
-	stfs f31, 0x10(r1)
-	lwz r4, 0xc(r1)
-	stw r0, 0x58(r30)
-	lwz r0, 0x10(r1)
-	stw r4, 0x5c(r30)
-	stw r0, 0x60(r30)
-	lwz r4, 0x58(r30)
-	lwz r0, 0x5c(r30)
-	stw r4, 0xb8(r30)
-	stw r0, 0xbc(r30)
-	lwz r0, 0x60(r30)
-	stw r0, 0xc0(r30)
-	stfs f0, 0x70(r30)
-	stfs f0, 0x74(r30)
-	stfs f0, 0x78(r30)
-	@4:
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	psq_l f29, 0x38(r1), 0, 0
-	lfd f29, 0x30(r1)
-	lmw r27, 0x1c(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm s32 partyEntry2Hello(s32 memberId) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	mr r27, r3
-	bl marioGetPtr
-	la r28, partyPtrTbl(r13)
-	mr r29, r3
-	lwz r0, 0x4(r28)
-	cmplwi r0, 0x0
-	bne @1
-	li r3, 0x0
-	li r4, 0x188
-	bl __memAlloc
-	stw r3, 0x4(r28)
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	li r31, 0x1
-	b @2
-	@1:
-	li r31, -0x1
-	@2:
-	cmpwi r31, 0x0
-	bge @3
-	li r3, -0x1
-	b @4
-	@3:
-	blt @5
-	slwi r0, r31, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r30, r3, r0
-	b @6
-	@5:
-	li r30, 0x0
-	@6:
-	mr r3, r30
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	bl marioGetCamId
-	stw r3, 0x164(r30)
-	li r3, -0x1
-	li r0, 0x9
-	cmpwi r31, 0x1
-	stw r3, 0xc(r30)
-	stw r3, 0x10(r30)
-	stw r3, 0x14(r30)
-	stw r0, 0x0(r30)
-	stb r31, 0x2f(r30)
-	stw r29, 0x160(r30)
-	stb r27, 0x31(r30)
-	bne @7
-	lwz r0, 0x0(r30)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r30)
-	@7:
-	mulli r4, r27, 0x28
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	add r3, r0, r4
-	stw r3, party_dp(r13)
-	lbz r0, 0x31(r30)
-	cmpwi r0, 0x4
-	beq @8
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @9
-	lwz r29, 0x0(r3)
-	b @10
-	@9:
-	lis r3, str_802CCEEC@ha
-	addi r29, r3, str_802CCEEC@l
-	b @10
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r30)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r29, r3, r4
-	beq @10
-	lis r3, str_802CCEEC@ha
-	addi r29, r3, str_802CCEEC@l
-	@10:
-	lwz r3, 0xc(r30)
-	cmpwi r3, 0x0
-	blt @11
-	bl animPoseRelease
-	@11:
-	mr r3, r29
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r30)
-	lwz r3, 0xc(r30)
-	bl animPosePeraOff
-	lwz r29, 0x160(r30)
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r29, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialFlag
-	mr r4, r3
-	lwz r3, 0xc(r30)
-	bl animPoseSetMaterialFlagOn
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r29, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialLightFlag
-	mr r4, r3
-	lwz r3, 0xc(r30)
-	bl animPoseSetMaterialLightFlagOn
-	lwz r0, 0x4(r30)
-	li r29, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @12
-	lwz r29, 0x18(r30)
-	b @13
-	@12:
-	lbz r0, 0x31(r30)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @14
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @14
-	li r28, 0x1
-	@14:
-	cmpwi r28, 0x1
-	bne @15
-	li r29, 0xc
-	@15:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @16
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @17
-	@16:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @18
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @17
-	@18:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@17:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @19
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @19
-	b @13
-	@19:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@13:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @20
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @21
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @20
-	@21:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @20
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@20:
-	li r0, 0x0
-	mr r3, r30
-	stw r0, 0x1c(r30)
-	lwz r4, party_dp(r13)
-	lwz r12, 0x4(r4)
-	mtctr r12
-	bctrl
-	mr r3, r30
-	li r4, 0x4
-	bl partyChgRunMode
-	mr r3, r31
-	@4:
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 partyEntry2(s32 memberId) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	mr r28, r3
-	bl marioGetPtr
-	la r27, partyPtrTbl(r13)
-	mr r31, r3
-	lwz r0, 0x4(r27)
-	cmplwi r0, 0x0
-	bne @1
-	li r3, 0x0
-	li r4, 0x188
-	bl __memAlloc
-	stw r3, 0x4(r27)
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	li r30, 0x1
-	b @2
-	@1:
-	li r30, -0x1
-	@2:
-	cmpwi r30, 0x0
-	bge @3
-	li r3, -0x1
-	b @4
-	@3:
-	blt @5
-	slwi r0, r30, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r29, r3, r0
-	b @6
-	@5:
-	li r29, 0x0
-	@6:
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	bl marioGetCamId
-	stw r3, 0x164(r29)
-	li r3, -0x1
-	li r0, 0x9
-	cmpwi r30, 0x1
-	stw r3, 0xc(r29)
-	stw r3, 0x10(r29)
-	stw r3, 0x14(r29)
-	stw r0, 0x0(r29)
-	stb r30, 0x2f(r29)
-	stw r31, 0x160(r29)
-	stb r28, 0x31(r29)
-	bne @7
-	lwz r0, 0x0(r29)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r29)
-	@7:
-	mulli r4, r28, 0x28
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	add r3, r0, r4
-	stw r3, party_dp(r13)
-	lbz r0, 0x31(r29)
-	cmpwi r0, 0x4
-	beq @8
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @9
-	lwz r28, 0x0(r3)
-	b @10
-	@9:
-	lis r3, str_802CCEEC@ha
-	addi r28, r3, str_802CCEEC@l
-	b @10
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r29)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r28, r3, r4
-	beq @10
-	lis r3, str_802CCEEC@ha
-	addi r28, r3, str_802CCEEC@l
-	@10:
-	lwz r3, 0xc(r29)
-	cmpwi r3, 0x0
-	blt @11
-	bl animPoseRelease
-	@11:
-	mr r3, r28
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r29)
-	lwz r3, 0xc(r29)
-	bl animPosePeraOff
-	lwz r28, 0x160(r29)
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r28, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialFlag
-	mr r4, r3
-	lwz r3, 0xc(r29)
-	bl animPoseSetMaterialFlagOn
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r28, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialLightFlag
-	mr r4, r3
-	lwz r3, 0xc(r29)
-	bl animPoseSetMaterialLightFlagOn
-	lwz r0, 0x4(r29)
-	li r28, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @12
-	lwz r28, 0x18(r29)
-	b @13
-	@12:
-	lbz r0, 0x31(r29)
-	li r27, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @14
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @14
-	li r27, 0x1
-	@14:
-	cmpwi r27, 0x1
-	bne @15
-	li r28, 0xc
-	@15:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @16
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r28, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	b @17
-	@16:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @18
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r28, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	b @17
-	@18:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r28, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	@17:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @19
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @19
-	b @13
-	@19:
-	stw r28, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@13:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @20
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @21
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @20
-	@21:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @20
-	stw r28, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@20:
-	li r0, 0x0
-	mr r3, r29
-	stw r0, 0x1c(r29)
-	lwz r4, party_dp(r13)
-	lwz r12, 0x4(r4)
-	mtctr r12
-	bctrl
-	lwz r5, 0x8c(r31)
-	lis r3, vec3_802ccdcc@ha
-	lwz r4, 0x90(r31)
-	addi r6, r3, vec3_802ccdcc@l
-	li r0, 0x0
-	mr r3, r30
-	stw r5, 0x58(r29)
-	stw r4, 0x5c(r29)
-	lwz r4, 0x94(r31)
-	stw r4, 0x60(r29)
-	lwz r5, 0x58(r29)
-	lwz r4, 0x5c(r29)
-	stw r5, 0xb8(r29)
-	stw r4, 0xbc(r29)
-	lwz r4, 0x60(r29)
-	stw r4, 0xc0(r29)
-	lwz r5, 0x0(r6)
-	lwz r4, 0x4(r6)
-	stw r5, 0x70(r29)
-	stw r4, 0x74(r29)
-	lwz r4, 0x8(r6)
-	stw r4, 0x78(r29)
-	stb r0, 0x34(r29)
-	@4:
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 partyEntryMain(s32 memberId) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	mr r28, r3
-	bl marioGetPtr
-	li r0, 0x2
-	mr r31, r3
-	li r30, 0x0
-	la r3, partyPtrTbl(r13)
-	mtctr r0
-	@1:
-	lwz r0, 0x0(r3)
-	cmplwi r0, 0x0
-	bne @2
-	li r3, 0x0
-	li r4, 0x188
-	bl __memAlloc
-	slwi r0, r30, 2
-	la r4, partyPtrTbl(r13)
-	stwx r3, r4, r0
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	b @3
-	@2:
-	addi r3, r3, 0x4
-	addi r30, r30, 0x1
-	bdnz @1
-	li r30, -0x1
-	@3:
-	cmpwi r30, 0x0
-	bge @4
-	li r3, -0x1
-	b @5
-	@4:
-	blt @6
-	slwi r0, r30, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r29, r3, r0
-	b @7
-	@6:
-	li r29, 0x0
-	@7:
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x188
-	bl memset
-	bl marioGetCamId
-	stw r3, 0x164(r29)
-	li r3, -0x1
-	li r0, 0x1
-	stw r3, 0xc(r29)
-	stw r3, 0x10(r29)
-	stw r3, 0x14(r29)
-	stw r0, 0x0(r29)
-	stb r30, 0x2f(r29)
-	stw r31, 0x160(r29)
-	stb r28, 0x31(r29)
-	lbz r0, 0x243(r31)
-	extsb. r0, r0
-	bne @8
-	lbz r0, 0x31(r29)
-	stb r0, 0x243(r31)
-	@8:
-	cmpwi r30, 0x1
-	bne @9
-	lwz r0, 0x0(r29)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r29)
-	@9:
-	mulli r4, r28, 0x28
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	add r0, r0, r4
-	stw r0, party_dp(r13)
-	lwz r0, 0x0(r31)
-	clrrwi. r0, r0, 31
-	beq @10
-	lwz r0, 0x4(r29)
-	ori r0, r0, 0x8000
-	stw r0, 0x4(r29)
-	@10:
-	lbz r0, 0x31(r29)
-	cmpwi r0, 0x4
-	beq @11
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @12
-	lwz r3, party_dp(r13)
-	lwz r28, 0x0(r3)
-	b @13
-	@12:
-	lis r3, str_802CCEEC@ha
-	addi r28, r3, str_802CCEEC@l
-	b @13
-	@11:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	lwz r0, 0x4(r29)
-	slwi r4, r3, 2
-	la r3, yoshigroup(r13)
-	rlwinm. r0, r0, 0, 16, 16
-	lwzx r28, r3, r4
-	beq @13
-	lis r3, str_802CCEEC@ha
-	addi r28, r3, str_802CCEEC@l
-	@13:
-	lwz r3, 0xc(r29)
-	cmpwi r3, 0x0
-	blt @14
-	bl animPoseRelease
-	@14:
-	mr r3, r28
-	li r4, 0x2
-	bl animPoseEntry
-	stw r3, 0xc(r29)
-	lwz r3, 0xc(r29)
-	bl animPosePeraOff
-	lwz r28, 0x160(r29)
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r28, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialFlag
-	mr r4, r3
-	lwz r3, 0xc(r29)
-	bl animPoseSetMaterialFlagOn
-	bl marioAnimeId
-	slwi r0, r3, 2
-	add r3, r28, r0
-	lwz r3, 0x228(r3)
-	bl animPoseGetMaterialLightFlag
-	mr r4, r3
-	lwz r3, 0xc(r29)
-	bl animPoseSetMaterialLightFlagOn
-	lwz r0, 0x4(r29)
-	li r28, 0x1
-	rlwinm. r0, r0, 0, 30, 30
-	beq @15
-	lwz r28, 0x18(r29)
-	b @16
-	@15:
-	lbz r0, 0x31(r29)
-	li r31, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @17
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @17
-	li r31, 0x1
-	@17:
-	cmpwi r31, 0x1
-	bne @18
-	li r28, 0xc
-	@18:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @19
-	lbz r4, 0x31(r29)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r28, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	b @20
-	@19:
-	lbz r0, 0x31(r29)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @21
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r28, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	b @20
-	@21:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r28, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r28, r3, r0
-	@20:
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @22
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @22
-	b @16
-	@22:
-	stw r28, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@16:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @23
-	lwz r3, 0x18(r29)
-	cmplwi r3, 0x0
-	beq @24
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @23
-	@24:
-	lwz r0, 0x4(r29)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @23
-	stw r28, 0x18(r29)
-	li r0, 0x0
-	sth r0, 0x20(r29)
-	lwz r0, 0x8(r29)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r29)
-	@23:
-	li r0, 0x0
-	mr r3, r29
-	stw r0, 0x1c(r29)
-	lwz r4, party_dp(r13)
-	lwz r12, 0x4(r4)
-	mtctr r12
-	bctrl
-	mr r3, r30
-	@5:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm f32 partyGetHeight(PartyEntry* party) {
-	nofralloc
-	lbz r0, 0x31(r3)
-	cmpwi r0, 0x4
-	bne @1
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 23, 23
-	beq @1
-	lfs f1, float_18p5_8041b1bc(r2)
-	lfs f0, 0xf0(r3)
-	fadds f1, f1, f0
-	blr
-	@1:
-	lfs f1, 0xf0(r3)
-	blr
-}
-
-asm s32 yoshiSetColor(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r3, 0x3e8
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl irand
-	cmpwi r3, 0x96
-	bge @1
-	li r31, 0x0
-	b @2
-	@1:
-	cmpwi r3, 0x12c
-	bge @3
-	li r31, 0x1
-	b @2
-	@3:
-	cmpwi r3, 0x1c2
-	bge @4
-	li r31, 0x2
-	b @2
-	@4:
-	cmpwi r3, 0x258
-	bge @5
-	li r31, 0x3
-	b @2
-	@5:
-	cmpwi r3, 0x2ee
-	bge @6
-	li r31, 0x4
-	b @2
-	@6:
-	cmpwi r3, 0x384
-	bge @7
-	li r31, 0x5
-	b @2
-	@7:
-	li r31, 0x6
-	@2:
-	mr r4, r31
-	li r3, 0x4
-	bl pouchSetPartyColor
-	lwz r0, 0x14(r1)
-	mr r3, r31
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyKill2(s32 id) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr. r29, r3
-	stw r28, 0x10(r1)
-	blt @1
-	slwi r0, r29, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	bne @3
-	li r3, 0x0
-	b @4
-	@3:
-	lwz r28, 0x160(r31)
-	add r30, r28, r29
-	lbz r0, 0x241(r30)
-	extsb. r0, r0
-	blt @5
-	slwi r0, r0, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @6
-	@5:
-	li r3, 0x0
-	@6:
-	lbz r4, 0x31(r3)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x28
-	add r3, r0, r3
-	stw r3, party_dp(r13)
-	lwz r12, 0x24(r3)
-	cmplwi r12, 0x0
-	beq @7
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0xb
-	beq @7
-	mr r3, r31
-	mtctr r12
-	bctrl
-	@7:
-	add r3, r28, r29
-	li r5, 0x0
-	stb r5, 0x243(r3)
-	li r4, -0x1
-	slwi r0, r29, 2
-	la r3, partyPtrTbl(r13)
-	stb r4, 0x241(r30)
-	stwx r5, r3, r0
-	lwz r3, 0xc(r31)
-	bl animPoseRelease
-	mr r4, r31
-	li r3, 0x0
-	bl __memFree
-	li r3, 0x0
-	@4:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 partyKill(s32 id) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	mr. r28, r3
-	blt @1
-	slwi r0, r28, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	cmplwi r31, 0x0
-	bne @3
-	li r3, 0x0
-	b @4
-	@3:
-	lwz r29, 0x160(r31)
-	add r30, r29, r28
-	lbz r0, 0x241(r30)
-	extsb. r0, r0
-	blt @5
-	slwi r0, r0, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @6
-	@5:
-	li r3, 0x0
-	@6:
-	lbz r4, 0x31(r3)
-	lis r3, partyDataTbl@ha
-	addi r0, r3, partyDataTbl@l
-	extsb r3, r4
-	mulli r3, r3, 0x28
-	add r3, r0, r3
-	stw r3, party_dp(r13)
-	lwz r12, 0x24(r3)
-	cmplwi r12, 0x0
-	beq @7
-	lbz r0, 0x34(r31)
-	cmplwi r0, 0xb
-	beq @7
-	mr r3, r31
-	mtctr r12
-	bctrl
-	@7:
-	lbz r4, 0x241(r30)
-	extsb. r4, r4
-	blt @8
-	slwi r0, r4, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r0, r3, r0
-	b @9
-	@8:
-	li r0, 0x0
-	@9:
-	cmplwi r0, 0x0
-	beq @10
-	cmpwi r4, 0x0
-	blt @11
-	slwi r0, r4, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @12
-	@11:
-	li r3, 0x0
-	@12:
-	lbz r0, 0x31(r3)
-	add r3, r29, r28
-	stb r0, 0x243(r3)
-	b @13
-	@10:
-	add r3, r29, r28
-	li r0, 0x0
-	stb r0, 0x243(r3)
-	@13:
-	li r3, -0x1
-	slwi r0, r28, 2
-	stb r3, 0x241(r30)
-	li r4, 0x0
-	la r3, partyPtrTbl(r13)
-	stwx r4, r3, r0
-	lwz r3, 0xc(r31)
-	bl animPoseRelease
-	mr r4, r31
-	li r3, 0x0
-	bl __memFree
-	li r3, 0x0
-	@4:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm BOOL partyGoodbye(s32 id) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmpwi r3, 0x0
-	stw r0, 0x14(r1)
-	li r0, 0x0
-	blt @1
-	blt @2
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @3
-	@2:
-	li r3, 0x0
-	@3:
-	li r4, 0x8
-	bl partyChgRunMode
-	li r0, 0x1
-	@1:
-	mr r3, r0
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 partyEntryPos(s32 memberId, f32 x, f32 y, f32 z) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stfd f29, 0x30(r1)
-	psq_st f29, 0x38(r1), 0, 0
-	stw r31, 0x2c(r1)
-	stw r30, 0x28(r1)
-	stw r29, 0x24(r1)
-	stw r28, 0x20(r1)
-	fmr f29, f1
-	lis r4, vec3_802ccd30@ha
-	fmr f30, f2
-	addi r31, r4, vec3_802ccd30@l
-	fmr f31, f3
-	bl partyEntryMain
-	mr. r28, r3
-	blt @1
-	slwi r0, r28, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r30, r3, r0
-	b @2
-	@1:
-	li r30, 0x0
-	@2:
-	lwz r3, 0xc(r31)
-	li r29, 0x1
-	lwz r0, 0x10(r31)
-	stw r3, 0x70(r30)
-	stw r0, 0x74(r30)
-	lwz r0, 0x14(r31)
-	stw r0, 0x78(r30)
-	lwz r0, 0x18(r31)
-	lwz r3, 0x1c(r31)
-	stw r0, 0x8(r1)
-	lwz r0, 0x20(r31)
-	stw r3, 0xc(r1)
-	stw r0, 0x10(r1)
-	stfs f29, 0x8(r1)
-	lwz r0, 0x8(r1)
-	stfs f30, 0xc(r1)
-	stfs f31, 0x10(r1)
-	lwz r3, 0xc(r1)
-	stw r0, 0x58(r30)
-	lwz r0, 0x10(r1)
-	stw r3, 0x5c(r30)
-	stw r0, 0x60(r30)
-	lwz r4, 0x160(r30)
-	lwz r3, 0x24(r31)
-	lwz r0, 0x28(r31)
-	stw r3, 0x70(r30)
-	stw r0, 0x74(r30)
-	lwz r0, 0x2c(r31)
-	stw r0, 0x78(r30)
-	lfs f0, 0x1a8(r4)
-	stfs f0, 0x110(r30)
-	lfs f0, 0x1a8(r4)
-	stfs f0, 0x10c(r30)
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @3
-	lbz r0, 0x31(r30)
-	li r31, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @4
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @4
-	li r31, 0x1
-	@4:
-	cmpwi r31, 0x1
-	bne @5
-	li r29, 0xc
-	@5:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @6
-	lbz r4, 0x31(r30)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @7
-	@6:
-	lbz r0, 0x31(r30)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @8
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	b @7
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r29, r3, r0
-	@7:
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @9
-	mr r4, r29
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @3
-	@9:
-	stw r29, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@3:
-	li r0, 0x0
-	mr r3, r28
-	stb r0, 0x34(r30)
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	psq_l f29, 0x38(r1), 0, 0
-	lfd f29, 0x30(r1)
-	lwz r31, 0x2c(r1)
-	lwz r30, 0x28(r1)
-	lwz r29, 0x24(r1)
-	lwz r0, 0x64(r1)
-	lwz r28, 0x20(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm s32 partyEntry(s32 memberId) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	bl partyEntryMain
-	mr. r29, r3
-	blt @1
-	slwi r0, r29, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r31, r3, r0
-	b @2
-	@1:
-	li r31, 0x0
-	@2:
-	lis r3, vec3_802ccd30@ha
-	li r0, 0xa
-	addi r7, r3, vec3_802ccd30@l
-	mr r3, r31
-	lwz r6, 0x0(r7)
-	addi r4, r31, 0x58
-	lwz r5, 0x4(r7)
-	stw r6, 0x70(r31)
-	stw r5, 0x74(r31)
-	lwz r5, 0x8(r7)
-	stw r5, 0x78(r31)
-	stb r0, 0x38(r31)
-	lwz r5, 0x160(r31)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x110(r31)
-	lfs f0, 0x1a8(r5)
-	stfs f0, 0x10c(r31)
-	bl partyGetAppearPos2
-	lwz r3, 0x58(r31)
-	li r30, 0x1
-	lwz r0, 0x5c(r31)
-	stw r3, 0xb8(r31)
-	stw r0, 0xbc(r31)
-	lwz r0, 0x60(r31)
-	stw r0, 0xc0(r31)
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @3
-	lbz r0, 0x31(r31)
-	li r28, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @4
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @4
-	li r28, 0x1
-	@4:
-	cmpwi r28, 0x1
-	bne @5
-	li r30, 0xc
-	@5:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @6
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r30, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @7
-	@6:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @8
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @7
-	@8:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r30, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@7:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @9
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @3
-	@9:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@3:
-	li r0, 0x1
-	mr r3, r29
-	stb r0, 0x34(r31)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 partyEntryHello(s32 memberId) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl partyEntryMain
-	mr. r31, r3
-	blt @1
-	slwi r0, r31, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	li r4, 0x4
-	bl partyChgRunMode
-	lwz r0, 0x14(r1)
-	mr r3, r31
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partySetForceMove(PartyEntry* party, s16 a2, f32 a3, f32 a4) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	stfs f1, 0x100(r3)
-	sth r4, 0x28(r3)
-	li r4, 0x9
-	stfs f2, 0x104(r3)
-	bl partyChgRunMode
-	mr r3, r31
-	li r4, 0x1
-	bl partyChgMot
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyStop(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x0
-	stw r0, 0x14(r1)
-	bl partyChgRunMode
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyRun(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lbz r0, 0x34(r3)
-	cmplwi r0, 0x0
-	bne @1
-	li r4, 0x1
-	bl partyChgRunMode
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyCtrlOn(PartyEntry* party) {
-	nofralloc
-	lwz r3, partyPtrTbl(r13)
-	cmplwi r3, 0x0
-	beq @1
-	lwz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 3, 1
-	stw r0, 0x0(r3)
-	@1:
-	la r3, partyPtrTbl(r13)
-	lwz r3, 0x4(r3)
-	cmplwi r3, 0x0
-	beqlr
-	lwz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 3, 1
-	stw r0, 0x0(r3)
-	blr
-}
-
-asm void partyCtrlOff(PartyEntry* party) {
-	nofralloc
-	lwz r3, partyPtrTbl(r13)
-	cmplwi r3, 0x0
-	beq @1
-	lwz r0, 0x0(r3)
-	oris r0, r0, 0x2000
-	stw r0, 0x0(r3)
-	@1:
-	la r3, partyPtrTbl(r13)
-	lwz r3, 0x4(r3)
-	cmplwi r3, 0x0
-	beqlr
-	lwz r0, 0x0(r3)
-	oris r0, r0, 0x2000
-	stw r0, 0x0(r3)
-	blr
-}
-
-asm void partyChgPaper(PartyEntry* party, char* paper) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r4
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r0, 0x4(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @1
-	lwz r3, 0x1c(r30)
-	cmplwi r3, 0x0
-	beq @2
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @1
-	@2:
-	stw r31, 0x1c(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x4000
-	stw r0, 0x8(r30)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyChgPose(PartyEntry* party, char* pose) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r4
-	stw r30, 0x8(r1)
-	mr r30, r3
-	lwz r0, 0x4(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @1
-	lwz r3, 0x18(r30)
-	cmplwi r3, 0x0
-	beq @2
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @1
-	@2:
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @1
-	stw r31, 0x18(r30)
-	li r0, 0x0
-	sth r0, 0x20(r30)
-	lwz r0, 0x8(r30)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r30)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-#undef partyChgPoseId
-asm char* partyChgPoseId(PartyEntry* party, s32 index) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r4
-	lwz r0, 0x4(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @1
-	lwz r3, 0x18(r31)
-	b @2
-	@1:
-	lbz r0, 0x31(r31)
-	li r30, 0x0
-	extsb r3, r0
-	cmpwi r3, 0x8
-	bge @3
-	bl partyGetHp
-	cmpwi r3, 0x5
-	bgt @3
-	li r30, 0x1
-	@3:
-	cmpwi r30, 0x1
-	bne @4
-	cmpwi r29, 0x1
-	bne @5
-	li r29, 0xc
-	b @4
-	@5:
-	cmpwi r29, 0x2
-	bne @6
-	li r29, 0xd
-	b @4
-	@6:
-	cmpwi r29, 0x3
-	bne @4
-	li r29, 0xe
-	@4:
-	lwz r0, 0x4(r31)
-	rlwinm. r0, r0, 0, 16, 16
-	bne @7
-	lbz r4, 0x31(r31)
-	lis r3, partyPoseTbl@ha
-	addi r3, r3, partyPoseTbl@l
-	slwi r0, r29, 2
-	extsb r4, r4
-	mulli r4, r4, 0x3c
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @8
-	@7:
-	lbz r0, 0x31(r31)
-	extsb r0, r0
-	cmpwi r0, 0x4
-	beq @9
-	mulli r4, r0, 0x3c
-	lis r3, partyDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, partyDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	b @8
-	@9:
-	li r3, 0x4
-	bl pouchGetPartyColor
-	mulli r4, r3, 0x3c
-	lis r3, yoshiDotPoseTbl@ha
-	slwi r0, r29, 2
-	addi r3, r3, yoshiDotPoseTbl@l
-	add r3, r3, r4
-	lwzx r30, r3, r0
-	@8:
-	lwz r3, 0x18(r31)
-	cmplwi r3, 0x0
-	beq @10
-	mr r4, r30
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @10
-	mr r3, r30
-	b @2
-	@10:
-	stw r30, 0x18(r31)
-	li r0, 0x0
-	mr r3, r30
-	sth r0, 0x20(r31)
-	lwz r0, 0x8(r31)
-	ori r0, r0, 0x2000
-	stw r0, 0x8(r31)
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void partyPaperLightOff(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x1
-	stw r0, 0x14(r1)
-	lwz r3, 0xc(r3)
-	bl animPoseSetMaterialLightFlagOff
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void partyPaperOff(PartyEntry* party) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	lwz r0, 0x4(r3)
-	rlwinm. r0, r0, 0, 5, 5
-	beq @1
-	lwz r0, 0x1c(r31)
-	cmplwi r0, 0x0
-	beq @1
-	lwz r3, 0xc(r31)
-	li r4, 0x0
-	li r5, 0x0
-	bl animPoseSetPaperAnimGroup
-	li r0, 0x0
-	stw r0, 0x1c(r31)
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 6, 4
-	stw r0, 0x4(r31)
-	lwz r3, 0x14(r31)
-	cmpwi r3, 0x0
-	blt @1
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r31)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL partyPaperOn(PartyEntry* party, const char* animGroup) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r5, vec3_802ccd30@ha
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	addi r30, r5, vec3_802ccd30@l
-	stw r29, 0x14(r1)
-	mr r29, r4
-	stw r28, 0x10(r1)
-	mr r28, r3
-	lwz r3, 0x14(r3)
-	cmpwi r3, 0x0
-	blt @1
-	bl animPaperPoseRelease
-	li r0, -0x1
-	stw r0, 0x14(r28)
-	@1:
-	lwz r0, 0x4(r28)
-	mr r3, r29
-	li r4, 0x2
-	oris r0, r0, 0x400
-	stw r0, 0x4(r28)
-	bl animPaperPoseEntry
-	stw r3, 0x14(r28)
-	mr r3, r29
-	addi r4, r30, 0x1ec
-	li r31, 0x0
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	mr r3, r29
-	addi r4, r30, 0x1f4
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	mr r3, r29
-	addi r4, r30, 0x1fc
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @2
-	mr r3, r29
-	addi r4, r30, 0x1e0
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @3
-	@2:
-	li r31, 0x1
-	@3:
-	cntlzw r0, r31
-	mr r3, r29
-	srwi r0, r0, 5
-	addi r4, r30, 0x208
-	mr r30, r0
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	lbz r0, 0x31(r28)
-	extsb r0, r0
-	subfic r0, r0, 0x5
-	cntlzw r0, r0
-	srwi r30, r0, 5
-	@4:
-	lwz r3, 0xc(r28)
-	mr r4, r29
-	mr r5, r30
-	bl animPoseSetPaperAnimGroup
-	lwz r0, 0x24(r1)
-	li r3, 0x1
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm PartyEntry* anotherPartyGetPtr(s32 index) {
-	nofralloc
-	cmpwi r3, 0x0
-	bge @1
-	li r3, 0x0
-	blr
-	@1:
-	addi r0, r3, 0x1
-	la r3, partyPtrTbl(r13)
-	clrlslwi r0, r0, 31, 2
-	lwzx r3, r3, r0
-	blr
-}
-
-asm PartyEntry* partyGetPtr(s32 index) {
-	nofralloc
-	cmpwi r3, 0x0
-	blt @1
-	slwi r0, r3, 2
-	la r3, partyPtrTbl(r13)
-	lwzx r3, r3, r0
-	blr
-	@1:
-	li r3, 0x0
-	blr
-}
-// clang-format on
 #endif

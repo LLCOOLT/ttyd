@@ -24,6 +24,10 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#ifndef NONMATCHING
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 #pragma force_active on
 __declspec(section ".rodata") const u32 vec3_802f3ac8[3] = {0x4479C000, 0x4479C000, 0x4479C000};
 __declspec(section ".rodata") const u32 vec3_802f3ad4[3] = {0x4479C000, 0x4479C000, 0x4479C000};
@@ -200,6 +204,7 @@ s32 _get_nozzle_attack_index(u8 index);
 void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
 void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
 void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+#ifdef NONMATCHING
 USER_FUNC(_object_fall_attack);
 USER_FUNC(_object_fall_wait);
 USER_FUNC(_nozzle_work_get_weapon_address);
@@ -220,7 +225,31 @@ USER_FUNC(_get_bgset_attack_data);
 USER_FUNC(_mobj_destroy);
 USER_FUNC(_mobj_set_alpha);
 USER_FUNC(_set_mobj_rotate_x);
+#endif
+#ifndef NONMATCHING
+s32 _object_fall_attack(EventEntry* event, BOOL isFirstCall);
+s32 _object_fall_wait(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_get_weapon_address(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_attack_set(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_effect(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_wait(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_delete(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_wait_unit_ready(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_wait(EventEntry* event, BOOL isFirstCall);
+s32 _announce_wall_message(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_turn(EventEntry* event, BOOL isFirstCall);
+s32 _set_mobj_shake(EventEntry* event, BOOL isFirstCall);
+s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall);
+s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall);
+s32 _bgset_kemuri_effect(EventEntry* event, BOOL isFirstCall);
+s32 _get_bgset_attack_data(EventEntry* event, BOOL isFirstCall);
+s32 _mobj_destroy(EventEntry* event, BOOL isFirstCall);
+s32 _mobj_set_alpha(EventEntry* event, BOOL isFirstCall);
+s32 _set_mobj_rotate_x(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 USER_FUNC(btlevtcmd_CheckDamage);
 USER_FUNC(btlevtcmd_GetACPossibility);
 USER_FUNC(btlevtcmd_GetEnemyBelong);
@@ -233,6 +262,21 @@ USER_FUNC(btlevtcmd_StartAvoid);
 USER_FUNC(btlevtcmd_WaitAttackEnd);
 USER_FUNC(btlevtcmd_check_battleflag);
 USER_FUNC(evt_btl_camera_shake_h);
+#endif
+#ifndef NONMATCHING
+s32 btlevtcmd_CheckDamage(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_GetACPossibility(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_GetEnemyBelong(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_GetSelectEnemy(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_GetSelectNextEnemy(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_PreCheckDamage(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_ResultACDefence(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_SamplingEnemy(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_StartAvoid(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_WaitAttackEnd(EventEntry* event, BOOL isFirstCall);
+s32 btlevtcmd_check_battleflag(EventEntry* event, BOOL isFirstCall);
+s32 evt_btl_camera_shake_h(EventEntry* event, BOOL isFirstCall);
+#endif
 
 extern BattleWeaponData _nozzle_at_base_mario;
 extern BattleWeaponData _nozzle_at_base_monster;
@@ -260,7 +304,12 @@ BattleStageObject* BattleGetObjectPtr(s32 id) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObject* obj;
 	int i;
+#endif
+#ifndef NONMATCHING
+BattleStageObject* BattleGetObjectPtr(s32 id);
+#endif
 
+#ifdef NONMATCHING
 	for (i = 0; i < 32; i++) {
 		obj = &wp->stageObjects[i];
 		if (obj->id == id) {
@@ -270,13 +319,23 @@ BattleStageObject* BattleGetObjectPtr(s32 id) {
 	return NULL;
 }
 #endif
+#ifndef NONMATCHING
+BattleStageObject* BattleSearchObjectPtr(const char* name);
+#endif
 
 #ifdef NONMATCHING
 BattleStageObject* BattleSearchObjectPtr(const char* name) {
 	BattleWork* wp = _battleWorkPointer;
 	int i;
 	BattleStageObject* obj;
+#endif
+#ifndef NONMATCHING
+void *memset(void *dest, int ch, size_t count);
+extern u64 lbl_80371490;
+void BattleStageObjectInit(void);
+#endif
 
+#ifdef NONMATCHING
 	for (i = 0; i < 32; i++) {
 		obj = &wp->stageObjects[i];
 		if (obj->id && !strcmp(obj->data->name, name)) {
@@ -285,6 +344,9 @@ BattleStageObject* BattleSearchObjectPtr(const char* name) {
 	}
 	return NULL;
 }
+#endif
+#ifndef NONMATCHING
+void BattleStageObjectMain(void);
 #endif
 
 #ifdef NONMATCHING
@@ -304,7 +366,12 @@ void BattleStageObjectInit(void) {
 	BattleUnit* unit;
 	int i;
 	int j;
+#endif
+#ifndef NONMATCHING
+void BattleObjectConfig(void);
+#endif
 
+#ifdef NONMATCHING
 	memset(wp->stageObjects, 0, sizeof(wp->stageObjects));
 	switch (pouchGetPtr()->rank) {
 		case 1:
@@ -345,7 +412,12 @@ void BattleStageObjectInit(void) {
 		mapGrpFlagOff("C", 2);
 	}
 	mapGrpFlagOn("escape_wall", 1);
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyA1(void);
+#endif
 
+#ifdef NONMATCHING
 	id = 1;
 	if (data) {
 		for (; numObjects != 0; id++, numObjects--, data++) {
@@ -416,7 +488,12 @@ void BattleStageObjectInit(void) {
 			}
 		}
 	}
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyA2(void);
+#endif
 
+#ifdef NONMATCHING
 	if (pouchGetPtr()->rank > 0) {
 		data = _object_nozzle_data;
 		for (j = 0; j < 3; j++, id++, data++) {
@@ -529,9 +606,7 @@ void BattleStageObjectInit(void) {
 		mapGrpFlagOn("if_wire", 1);
 	}
 }
-#endif
 
-#ifdef NONMATCHING
 void BattleStageObjectMain(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -626,15 +701,11 @@ void BattleStageObjectMain(void) {
 	}
 	BattleObjectConfig();
 }
-#endif
 
-#ifdef NONMATCHING
 void BattleObjectConfig(void) {
 	//stubbed in retail
 }
-#endif
 
-#ifdef NONMATCHING
 void BattleStage_DestroyA1(void) {
 	BattleWork* wp = _battleWorkPointer;
 	void* evt = wp->fbatInfo->setup->stageData->destroyBgA1Evt;
@@ -653,9 +724,7 @@ void BattleStage_DestroyA1(void) {
 		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
 	}
 }
-#endif
 
-#ifdef NONMATCHING
 void BattleStage_DestroyA2(void) {
 	BattleWork* wp = _battleWorkPointer;
 	void* evt = wp->fbatInfo->setup->stageData->destroyBgA2Evt;
@@ -667,9 +736,7 @@ void BattleStage_DestroyA2(void) {
 	}
 	evtEntry(evt, 10, 0);
 }
-#endif
 
-#ifdef NONMATCHING
 void BattleStage_DestroyB(void) {
 	BattleWork* wp = _battleWorkPointer;
 	void* evt = wp->fbatInfo->setup->stageData->destroyBgBEvt;
@@ -688,6 +755,9 @@ void BattleStage_DestroyB(void) {
 		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
 	}
 }
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyB(void);
 #endif
 
 __declspec(section ".data") u64 lbl_80371490 = 0xBF8000003F800000;
@@ -1393,17 +1463,32 @@ EVT_END()
 
 BattleStageObjectData _object_wall_data = {(char*)str_802F3BAC, 4, 5, {-175.0f, 0.0f, 0.0f}, 0, 0};
 
+#ifdef NONMATCHING
 BattleStageObjectData _object_spot_light_data[] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") BattleStageObjectData _object_spot_light_data[] = {
+#endif
 	{(char*)str_802F3BB8, 6, 7, {0.0f, 240.0f, 0.0f}, 0, 0},
 	{NULL, 6, 7, {0.0f, 0.0f, 0.0f}, 0, 0},
 };
 
+#ifdef NONMATCHING
 s32 _entry_tree_data[] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") s32 _entry_tree_data[] = {
+#endif
 	(s32)&unit_object_tree, 0x02000000, 0x04000005, 0xC47A0000, 0xC47A0000, 0xC47A0000, 0, 0,
 	0, 0, 0, 0,
 };
 
+#ifdef NONMATCHING
 s32 _entry_switch_data[] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") s32 _entry_switch_data[] = {
+#endif
 	(s32)&unit_object_switch, 0x02000000, 0x04000005, 0xC47A0000, 0xC47A0000, 0xC47A0000, 0, 0,
 	0, 0, 0, 0,
 };
@@ -1460,7 +1545,12 @@ USER_FUNC(_set_mobj_rotate_x) {
 	s32 layer;
 	BattleStageObjectWork* sw;
 	BattleStageObject* obj;
+#endif
+#ifndef NONMATCHING
+s32 _set_mobj_rotate_x(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	s32* args = event->args;
 	busy = FALSE;
 	sw = STAGE_WORK(wp = _battleWorkPointer);
@@ -1536,13 +1626,21 @@ USER_FUNC(_set_mobj_rotate_x) {
 	return busy ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 _mobj_set_alpha(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_mobj_set_alpha) {
 	s32* args = event->args;
 	s32 layer = evtGetValue(event, args[0]);
 	u8 alpha = evtGetValue(event, args[1]);
+#endif
+#ifndef NONMATCHING
+s32 _mobj_destroy(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	switch (layer) {
 		case 0:
 			if (mapGetMapObj("A1")) {
@@ -1568,6 +1666,9 @@ USER_FUNC(_mobj_set_alpha) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 _get_bgset_attack_data(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_mobj_destroy) {
@@ -1577,7 +1678,12 @@ USER_FUNC(_mobj_destroy) {
 	BattleUnitPart* part;
 	s32 layer;
 	int i;
+#endif
+#ifndef NONMATCHING
+s32 _bgset_kemuri_effect(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	layer = evtGetValue(event, event->args[0]);
 	for (i = 0; i < 32; i++) {
 		obj = &wp->stageObjects[i];
@@ -1605,6 +1711,9 @@ USER_FUNC(_mobj_destroy) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_get_bgset_attack_data) {
@@ -1613,7 +1722,12 @@ USER_FUNC(_get_bgset_attack_data) {
 	s32 type = evtGetValue(event, args[0]);
 	s32 out = args[1];
 	BattleWeapon* weapon;
+#endif
+#ifndef NONMATCHING
+s32 _set_mobj_shake_init(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
 	switch (type) {
 		case 0:
 			weapon = &wp->fbatInfo->setup->stageData->bgAWeapon;
@@ -1632,6 +1746,9 @@ USER_FUNC(_get_bgset_attack_data) {
 	evtSetValue(event, out, (s32)weapon);
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+s32 _set_mobj_shake(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -1681,12 +1798,18 @@ USER_FUNC(_bgset_kemuri_effect) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+void _mobj_shake_main(BattleStageObject* obj);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_bgset_audience_bgset_access) {
 	BattleAudience_Case_HaikeiSet();
 	return EVT_RETURN_DONE;
 }
+#endif
+#ifndef NONMATCHING
+void BattleStage_NozzleDirChangeCheck(void);
 #endif
 
 #ifdef NONMATCHING
@@ -1696,7 +1819,12 @@ USER_FUNC(_set_mobj_shake_init) {
 	int i;
 	BattleStageObject* obj;
 	u8 position;
+#endif
+#ifndef NONMATCHING
+void _Nozzle_Change_Check(u8 index, u8* rate);
+#endif
 
+#ifdef NONMATCHING
 	layer = evtGetValue(event, event->args[0]);
 	for (i = 0; i < 32; i++) {
 		obj = &wp->stageObjects[i];
@@ -1716,9 +1844,151 @@ USER_FUNC(_set_mobj_shake_init) {
 	return EVT_RETURN_DONE;
 }
 #endif
+#ifndef NONMATCHING
+s32 _nozzle_turn(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_set_mobj_shake) {
+#endif
+#ifndef NONMATCHING
+void BattleStage_WallCloseCheck(void);
+
+s32 _announce_wall_message(EventEntry* event, BOOL isFirstCall);
+
+void _disp_escape_wall_message(CameraId camera, void* param);
+
+void BattleStage_IronFrameFallCheck(void);
+
+s32 _fall_frame_wait(EventEntry* event, BOOL isFirstCall);
+
+s32 _fall_frame_wait_unit_ready(EventEntry* event, BOOL isFirstCall);
+
+s32 _fall_frame(EventEntry* event, BOOL isFirstCall);
+
+s32 _fall_frame_delete(EventEntry* event, BOOL isFirstCall);
+
+void BattleStage_NozzleWorkCheck(s32 type);
+
+void _nozzle_type_init(void);
+
+s32 _nozzle_work_wait(EventEntry* event, BOOL isFirstCall);
+
+f32 _get_nozzle_dir(s32 index);
+
+s32 _nozzle_work_effect(EventEntry* event, BOOL isFirstCall);
+
+BOOL BattleFogEndCheck(void);
+
+BOOL BattleFogForceStop(void);
+
+s32 _nozzle_work_attack_set(EventEntry* event, BOOL isFirstCall);
+
+s32 _get_nozzle_attack_index(u8 index);
+
+void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+
+void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+
+void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+
+s32 _nozzle_work_get_weapon_address(EventEntry* event, BOOL isFirstCall);
+
+s32 BattleStage_ObjectFallCheck(void);
+
+s32 _object_fall_wait(EventEntry* event, BOOL isFirstCall);
+
+
+typedef struct FallObjectEntry {
+	s8 index; //0x0
+	s8 type; //0x1
+	u8 field_0x2[0x4 - 0x2]; //0x2
+	s32 kind; //0x4, 0 = unit, 1 = audience
+	s32 unitId; //0x8
+	s32 partId; //0xC
+	s16 delay; //0x10
+	s16 field_0x12; //0x12
+	u8 noAc; //0x14
+	u8 field_0x15; //0x15
+	u8 field_0x16[0x1C - 0x16]; //0x16
+	s32 preCheck; //0x1C
+	s32 sfxId; //0x20
+	EffectEntry* effect; //0x24
+	BattleWeaponData weapon; //0x28
+} FallObjectEntry;
+
+typedef struct FallObjectWork {
+	u8 count; //0x0
+	s8 prevTypes[3]; //0x1
+	FallObjectEntry entries[1]; //0x4
+} FallObjectWork;
+extern void* jumptable_80374848[];
+s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall);
+s32 BattleStage_ObjectFallCheck(void);
+void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+s32 _get_nozzle_attack_index(u8 index);
+BOOL BattleFogForceStop(void);
+BOOL BattleFogEndCheck(void);
+f32 _get_nozzle_dir(s32 index);
+void _nozzle_type_init(void);
+void BattleStage_NozzleWorkCheck(s32 type);
+void BattleStage_IronFrameFallCheck(void);
+void _disp_escape_wall_message(CameraId camera, void* param);
+void BattleStage_WallCloseCheck(void);
+void _Nozzle_Change_Check(u8 index, u8* rate);
+void BattleStage_NozzleDirChangeCheck(void);
+void _mobj_shake_main(BattleStageObject* obj);
+void BattleStage_DestroyB(void);
+void BattleStage_DestroyA2(void);
+void BattleStage_DestroyA1(void);
+void BattleObjectConfig(void);
+void BattleStageObjectMain(void);
+void BattleStageObjectInit(void);
+BattleStageObject* BattleSearchObjectPtr(const char* name);
+BattleStageObject* BattleGetObjectPtr(s32 id);
+s32 _object_fall_wait(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_get_weapon_address(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_attack_set(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_effect(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_work_wait(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_delete(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_wait_unit_ready(EventEntry* event, BOOL isFirstCall);
+s32 _fall_frame_wait(EventEntry* event, BOOL isFirstCall);
+s32 _announce_wall_message(EventEntry* event, BOOL isFirstCall);
+s32 _nozzle_turn(EventEntry* event, BOOL isFirstCall);
+s32 _set_mobj_shake(EventEntry* event, BOOL isFirstCall);
+s32 _set_mobj_shake_init(EventEntry* event, BOOL isFirstCall);
+s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall);
+s32 _bgset_kemuri_effect(EventEntry* event, BOOL isFirstCall);
+s32 _get_bgset_attack_data(EventEntry* event, BOOL isFirstCall);
+s32 _mobj_destroy(EventEntry* event, BOOL isFirstCall);
+s32 _mobj_set_alpha(EventEntry* event, BOOL isFirstCall);
+s32 _set_mobj_rotate_x(EventEntry* event, BOOL isFirstCall);
+
+s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall);
+
+
+__declspec(section ".data") void* jumptable_80374848[9] = {
+    (void*)((char*)_object_fall_attack + 0x780),
+    (void*)((char*)_object_fall_attack + 0x7b4),
+    (void*)((char*)_object_fall_attack + 0x7e8),
+    (void*)((char*)_object_fall_attack + 0x81c),
+    (void*)((char*)_object_fall_attack + 0x850),
+    (void*)((char*)_object_fall_attack + 0x8c0),
+    (void*)((char*)_object_fall_attack + 0x8f4),
+    (void*)((char*)_object_fall_attack + 0x974),
+    (void*)((char*)_object_fall_attack + 0x88c)
+};
+__declspec(section ".data") u32 gap_05_8037486C_data[1] = {0};
+__declspec(section ".sdata") u32 gap_07_80411F3C_sdata[1] = {0};
+#pragma force_active reset
+
+#pragma dont_inline on
+s32 _set_mobj_shake(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObject* obj;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -1748,20 +2018,73 @@ USER_FUNC(_set_mobj_shake) {
 	}
 	return EVT_RETURN_BLOCK;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void _mobj_shake_main(BattleStageObject* obj) {
+#ifdef NONMATCHING
 	obj->mShakePeriodPosition++;
 	if (obj->mShakePeriodPosition >= obj->mShakePeriodLength) {
 		obj->mShakePeriodPosition = 0;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0x93E1001C
+		opword 0x7C7F1B78
+		opword 0x88630074
+		opword 0x38030001
+		opword 0x981F0074
+		opword 0x887F0074
+		opword 0x881F0073
+		opword 0x7C030040
+		opword 0x4180000C
+		opword 0x38000000
+		opword 0x981F0074
+		opword 0x88BF0074
+		opword 0x3C004330
+		lis r3, double_to_int_802f3c30@ha
+		opword 0x889F0073
+		opword 0x1CA50168
+		opword 0x90010008
+		lfd f1, double_to_int_802f3c30@l(r3)
+		opword 0x7C0523D6
+		opword 0x6C008000
+		opword 0x9001000C
+		opword 0xC8010008
+		opword 0xEC200828
+		bl sinfd
+		lfs f0, float_5_8041cd10(r2)
+		opword 0xEC000072
+		opword 0xD01F0078
+		opword 0xC01F0078
+		opword 0xD01F001C
+		opword 0x83E1001C
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+#endif
 	}
+#ifdef NONMATCHING
 	obj->mShakeAngle = 5.0f * sinfd(obj->mShakePeriodPosition * 360 / obj->mShakePeriodLength);
 	obj->mRotation.x = obj->mShakeAngle;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+#pragma dont_inline on
+#endif
 void BattleStage_NozzleDirChangeCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -1773,9 +2096,10 @@ void BattleStage_NozzleDirChangeCheck(void) {
 		}
 	}
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void _Nozzle_Change_Check(u8 index, u8* rate) {
 	BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
 	u8* cur = &sw->nozzleDir[index];
@@ -1809,7 +2133,6 @@ void _Nozzle_Change_Check(u8 index, u8* rate) {
 		}
 	}
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_nozzle_turn) {
@@ -1824,7 +2147,156 @@ USER_FUNC(_nozzle_turn) {
 		if (sw->nozzleDir[index]) {
 			EVT_UW(event, 2) = 30;
 		}
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 _nozzle_turn(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		lwz r5, _battleWorkPointer(r13)
+		opword 0x7C7D1B78
+		opword 0x2C040000
+		lis r3, vec3_802f3ac8@ha
+		opword 0x3FE50002
+		opword 0x83DD0160
+		addi r28, r3, vec3_802f3ac8@l
+		opword 0x3BFF80C0
+		opword 0x41820028
+		opword 0x38000000
+		opword 0x7C7FF214
+		opword 0x901D0080
+		opword 0x901D0084
+		opword 0x880301C4
+		opword 0x28000000
+		opword 0x4182000C
+		opword 0x3800001E
+		opword 0x901D0080
+		opword 0x2C1E0001
+		opword 0x41820028
+		opword 0x40800010
+		opword 0x2C1E0000
+		opword 0x40800014
+		opword 0x48000028
+		opword 0x2C1E0003
+		opword 0x40800020
+		opword 0x48000014
+		opword 0x387C00C0
+		opword 0x4800001C
+		opword 0x387C00CC
+		opword 0x48000014
+		opword 0x387C00D8
+		opword 0x4800000C
+		opword 0x38600002
+		opword 0x480001A8
+		bl BattleSearchObjectPtr
+		opword 0x807D0080
+		opword 0x2C03001E
+		opword 0x4080002C
+		opword 0x38030001
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x901D0080
+		opword 0x38600002
+		lfs f2, float_neg80_8041cd3c(r2)
+		opword 0x38A0001E
+		opword 0x809D0080
+		bl intpl_sub
+		opword 0xFFE00890
+		opword 0x48000008
+		lfs f31, float_neg80_8041cd3c(r2)
+		opword 0x807D0084
+		opword 0x2C03001E
+		opword 0x408000B8
+		opword 0x38030001
+		opword 0x7C7FF214
+		opword 0x901D0084
+		opword 0x880301C4
+		opword 0x2C000002
+		opword 0x4182002C
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x41820030
+		opword 0x40800014
+		opword 0x48000028
+		opword 0x2C000004
+		opword 0x40800020
+		opword 0x48000014
+		lfs f1, float_45_8041cd2c(r2)
+		opword 0x48000018
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x48000010
+		lfs f1, float_neg45_8041cd4c(r2)
+		opword 0x48000008
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x7C7FF214
+		opword 0x880301C7
+		opword 0x2C000002
+		opword 0x4182002C
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x41820030
+		opword 0x40800014
+		opword 0x48000028
+		opword 0x2C000004
+		opword 0x40800020
+		opword 0x48000014
+		lfs f2, float_45_8041cd2c(r2)
+		opword 0x48000018
+		lfs f2, float_0_8041cd04(r2)
+		opword 0x48000010
+		lfs f2, float_neg45_8041cd4c(r2)
+		opword 0x48000008
+		lfs f2, float_0_8041cd04(r2)
+		opword 0x809D0084
+		opword 0x3860000C
+		opword 0x38A0001E
+		bl intpl_sub
+		fmr f30, f1
+		opword 0x2C1E0001
+		opword 0x41820038
+		opword 0x40800010
+		opword 0x2C1E0000
+		opword 0x40800014
+		opword 0x48000054
+		opword 0x2C1E0003
+		opword 0x4080004C
+		opword 0x48000034
+		opword 0xFC20F890
+		lfs f3, float_0_8041cd04(r2)
+		opword 0xFC40F090
+		opword 0x387C01D8
+		bl mapObjRotate
+		opword 0x48000030
+		opword 0xFC20F890
+		lfs f3, float_0_8041cd04(r2)
+		opword 0xFC40F090
+		opword 0x387C01E4
+		bl mapObjRotate
+		opword 0x48000018
+		opword 0xFC20F890
+		lfs f3, float_0_8041cd04(r2)
+		opword 0xFC40F090
+		opword 0x387C01F0
+		bl mapObjRotate
+		opword 0x801D0080
+		opword 0x2C00001E
+		opword 0x41800034
+		opword 0x801D0084
+		opword 0x2C00001E
+		opword 0x41800028
+		opword 0x7CDFF214
+		opword 0x57C0103A
+		opword 0x88A601C7
+		opword 0x7C9F0214
+		opword 0x38000000
+		opword 0x38600002
+		opword 0x98A601C4
+		opword 0x900401CC
+		opword 0x48000008
+		opword 0x38600000
+#endif
 	}
+#ifdef NONMATCHING
 	switch (index) {
 		case 0:
 			name = "nozzle_l";
@@ -1897,10 +2369,12 @@ USER_FUNC(_nozzle_turn) {
 		return EVT_RETURN_DONE;
 	}
 	return EVT_RETURN_BLOCK;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void BattleStage_WallCloseCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -1910,23 +2384,120 @@ void BattleStage_WallCloseCheck(void) {
 		sw->closeWallEvtId = evtEntry(_close_wall_event, 10, 0)->eventId;
 	}
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_announce_wall_message) {
 	if (isFirstCall) {
 		event->userdata[0] = 60;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 _announce_wall_message(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x2C040000
+		opword 0x90010014
+		opword 0x4182000C
+		opword 0x3800003C
+		opword 0x90030078
+		opword 0x80830078
+		opword 0x2C040000
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x4800002C
+		opword 0x3804FFFF
+		lis r4, _disp_escape_wall_message@ha
+		opword 0x90030078
+		addi r5, r4, _disp_escape_wall_message@l
+		lfs f1, float_900_8041cd64(r2)
+		opword 0x38600008
+		opword 0x38800001
+		opword 0x38C00000
+		bl dispEntry
+		opword 0x38600000
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+#endif
 	}
+#ifdef NONMATCHING
 	if (event->userdata[0] < 0) {
 		return EVT_RETURN_DONE;
+#endif
+#ifndef NONMATCHING
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void _disp_escape_wall_message(CameraId camera, void* param) {
+	asm volatile {
+		opword 0x9421FFC0
+		opword 0x7C0802A6
+		opword 0x90010044
+		opword 0xDBE10030
+		opword 0xF3E10038
+		opword 0x93E1002C
+		lis r3, str_802F3C84@ha
+		addi r3, r3, str_802F3C84@l
+		bl msgSearch
+		opword 0x7C7F1B78
+		bl FontGetMessageWidth
+		opword 0x5466043E
+		opword 0x3CA04330
+		opword 0x7CC00E70
+		lis r4, double_to_int_802f3c30@ha
+		opword 0x7C600194
+		opword 0x38060028
+		opword 0x6C638000
+		addi r6, r4, double_to_int_802f3c30@l
+		opword 0x90610014
+		opword 0x6C008000
+		lwz r7, dat_8041ccf8(r2)
+		opword 0x38810008
+		opword 0x90A10010
+		opword 0x38600000
+		opword 0xC8660000
+		opword 0xC8010010
+		lfs f2, float_0_8041cd04(r2)
+		opword 0xEC001828
+		opword 0x9001001C
+		lfs f1, float_20_8041cd40(r2)
+		opword 0x90A10018
+		opword 0xEFE20028
+		lfs f2, float_neg117_8041cd58(r2)
+		opword 0xC8010018
+		opword 0x90E10008
+		opword 0xEC3F0828
+		lfs f4, float_30_8041cd5c(r2)
+		opword 0xEC601828
+		lfs f5, float_10_8041cd34(r2)
+		bl windowDispGX_Waku_col
+		bl FontDrawStart
+		opword 0xFC20F890
+		lfs f2, float_neg120_8041cd60(r2)
+		opword 0x7FE3FB78
+		bl FontDrawString
+		opword 0xE3E10038
+		opword 0x80010044
+		opword 0xCBE10030
+		opword 0x83E1002C
+		opword 0x7C0803A6
+		opword 0x38210040
+#endif
 	}
+#ifdef NONMATCHING
 	event->userdata[0]--;
 	dispEntry(CAMERA_2D, 900.0f, 1, _disp_escape_wall_message, NULL);
 	return EVT_RETURN_BLOCK;
-}
 #endif
-
+}
 #ifdef NONMATCHING
+
 void _disp_escape_wall_message(CameraId camera, void* param) {
 	const char* msg = msgSearch("btl_msg_escape_wall_close2");
 	s32 width = FontGetMessageWidth(msg);
@@ -1939,8 +2510,10 @@ void _disp_escape_wall_message(CameraId camera, void* param) {
 	FontDrawString(zero - (width / 2), -120.0f, msg);
 }
 #endif
+#ifndef NONMATCHING
+#pragma pop
+#endif
 
-#ifdef NONMATCHING
 void BattleStage_IronFrameFallCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -1950,10 +2523,13 @@ void BattleStage_IronFrameFallCheck(void) {
 		sw->fallFrameEvtId = evtEntry(_fall_frame_event, 10, 0)->eventId;
 	}
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_fall_frame_wait) {
+#endif
+#ifndef NONMATCHING
+s32 _fall_frame_wait(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 
@@ -1968,10 +2544,13 @@ USER_FUNC(_fall_frame_wait) {
 	}
 	return EVT_RETURN_YIELD;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_fall_frame_wait_unit_ready) {
+#endif
+#ifndef NONMATCHING
+s32 _fall_frame_wait_unit_ready(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleUnit* unit;
 	EventEntry* evt;
@@ -2002,7 +2581,6 @@ USER_FUNC(_fall_frame_wait_unit_ready) {
 	}
 	return EVT_RETURN_DONE;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_fall_frame) {
@@ -2010,14 +2588,129 @@ USER_FUNC(_fall_frame) {
 	s32 arg = event->args[0];
 	BattleStageObject* body;
 	BattleStageObjectWork* sw;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 _fall_frame(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0xBF810010
+		opword 0x7C7E1B78
+		opword 0x7C9D2378
+		opword 0x80C30018
+		lis r3, str_802F3C7C@ha
+		lwz r5, _battleWorkPointer(r13)
+		addi r3, r3, str_802F3C7C@l
+		opword 0x83E60000
+		opword 0x3F850002
+		bl BattleSearchObjectPtr
+		opword 0x2C1D0000
+		opword 0x7C7D1B78
+		opword 0x41820020
+		opword 0x38000000
+		opword 0x901E0080
+		opword 0xC01D0008
+		opword 0xFC00001E
+		opword 0xD8010008
+		opword 0x8001000C
+		opword 0x901E0084
+		opword 0x80BE0080
+		lis r4, double_to_int_802f3c30@ha
+		opword 0x3C604330
+		lfd f1, double_to_int_802f3c30@l(r4)
+		opword 0x38A50001
+		opword 0x90610008
+		opword 0x3800003C
+		lfs f2, float_0_8041cd04(r2)
+		opword 0x90BE0080
+		opword 0x38600002
+		opword 0x38A0003C
+		opword 0x809E0080
+		opword 0x80DE0084
+		opword 0x7C8421D6
+		opword 0x6CC68000
+		opword 0x90C1000C
+		opword 0xC8010008
+		opword 0x7C8403D6
+		opword 0xEC200828
+		bl intpl_sub
+		opword 0xD03D0008
+		opword 0x801E0080
+		opword 0x2C00003C
+		opword 0x4080000C
+		opword 0x38600000
+		opword 0x48000018
+		opword 0x80BC80F8
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		bl evtSetValue
+		opword 0x38600002
+		opword 0xBB810010
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
 	wp = _battleWorkPointer;
 	sw = STAGE_WORK(wp);
 	body = BattleSearchObjectPtr("if_body");
 	if (isFirstCall) {
 		EVT_UW(event, 2) = 0;
 		EVT_UW(event, 3) = body->mPosition.y;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 _fall_frame_delete(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x2C040000
+		opword 0x90010024
+		opword 0xBFC10018
+		opword 0x7C7E1B78
+		lwz r5, _battleWorkPointer(r13)
+		opword 0x3FE50002
+		opword 0x4182000C
+		opword 0x380000FF
+		opword 0x901E0080
+		opword 0x80BE0080
+		lis r3, str_802F3C7C@ha
+		addi r3, r3, str_802F3C7C@l
+		opword 0x3881000C
+		opword 0x3805FFFB
+		opword 0x901E0080
+		lwz r5, dat_8041ccfc(r2)
+		opword 0x801E0080
+		opword 0x90A10008
+		opword 0x9801000B
+		opword 0x80010008
+		opword 0x9001000C
+		bl mapGrpSetColor
+		opword 0x801E0080
+		opword 0x2C000000
+		opword 0x4081000C
+		opword 0x38600000
+		opword 0x48000010
+		opword 0x38000000
+		opword 0x38600002
+		opword 0x901F82A8
+		opword 0xBBC10018
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+#endif
 	}
+#ifdef NONMATCHING
 	EVT_UW(event, 2)++;
 	body->mPosition.y = intpl_sub(2, EVT_UW(event, 3), 0.0f, EVT_UW(event, 2) * EVT_UW(event, 2) / 60, 60);
 	if (EVT_UW(event, 2) < 60) {
@@ -2025,7 +2718,10 @@ USER_FUNC(_fall_frame) {
 	}
 	evtSetValue(event, arg, (s32)sw->fallObjectData);
 	return EVT_RETURN_DONE;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
@@ -2044,9 +2740,11 @@ USER_FUNC(_fall_frame_delete) {
 	sw->fallFrameEvtId = 0;
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+#endif
 void BattleStage_NozzleWorkCheck(s32 type) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2070,9 +2768,10 @@ void BattleStage_NozzleWorkCheck(s32 type) {
 		}
 	}
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void _nozzle_type_init(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2095,10 +2794,13 @@ void _nozzle_type_init(void) {
 		sw->nozzleType = i;
 	}
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_nozzle_work_wait) {
+#endif
+#ifndef NONMATCHING
+s32 _nozzle_work_wait(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	int i;
@@ -2116,10 +2818,14 @@ USER_FUNC(_nozzle_work_wait) {
 	}
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 f32 _get_nozzle_dir(s32 index) {
+#ifdef NONMATCHING
 	switch (STAGE_WORK(_battleWorkPointer)->nozzleDir[index]) {
 		case 1:
 			return -45.0f;
@@ -2128,8 +2834,32 @@ f32 _get_nozzle_dir(s32 index) {
 		case 2:
 		default:
 			return -90.0f;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		lwz r4, _battleWorkPointer(r13)
+		opword 0x3C040002
+		opword 0x7C601A14
+		opword 0x88038284
+		opword 0x2C000002
+		opword 0x41820030
+		opword 0x40800010
+		opword 0x2C000001
+		opword 0x40800014
+		opword 0x48000020
+		opword 0x2C000004
+		opword 0x40800018
+		opword 0x4800000C
+		lfs f1, float_neg45_8041cd4c(r2)
+		opword 0x4E800020
+		lfs f1, float_neg135_8041cd50(r2)
+		opword 0x4E800020
+		lfs f1, float_neg90_8041cd54(r2)
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
@@ -2270,7 +3000,377 @@ USER_FUNC(_nozzle_work_effect) {
 			evtSetValue(event, out, 0);
 			return EVT_RETURN_DONE;
 		}
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 _nozzle_work_effect(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x7C791B78
+		lwz r6, _battleWorkPointer(r13)
+		opword 0x83430018
+		opword 0x7C972378
+		lis r5, vec3_802f3ac8@ha
+		opword 0x7CD83378
+		opword 0x809A0000
+		addi r30, r5, vec3_802f3ac8@l
+		opword 0x3FA60002
+		opword 0x3B600000
+		bl evtGetValue
+		opword 0x2C170000
+		opword 0x835A0004
+		opword 0x7C7F1B78
+		li r23, 0x0
+		opword 0x418204F0
+		opword 0x7F03C378
+		bl BattleCheckConcluded
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x7F23CB78
+		opword 0x7F44D378
+		opword 0x38A00000
+		bl evtSetValue
+		opword 0x38600002
+		opword 0x48000540
+		opword 0x3800005A
+		opword 0x90190078
+		opword 0x881D828A
+		opword 0x7C000774
+		opword 0x2C000002
+		opword 0x4182002C
+		opword 0x40800010
+		opword 0x2C000001
+		opword 0x40800014
+		opword 0x48000030
+		opword 0x2C000004
+		opword 0x40800028
+		opword 0x4800001C
+		opword 0x3B9E0170
+		opword 0x3B600000
+		opword 0x48000018
+		opword 0x3B800000
+		opword 0x3B600001
+		opword 0x4800000C
+		opword 0x3B9E0188
+		opword 0x3B600002
+		opword 0x2C000004
+		opword 0x408003C0
+		opword 0x2C000001
+		opword 0x40800008
+		opword 0x480003B4
+		opword 0x387E00C0
+		bl BattleSearchObjectPtr
+		opword 0x7C781B78
+		opword 0x38600000
+		bl _get_nozzle_dir
+		opword 0x881D8284
+		fmr f29, f1
+		opword 0x28000000
+		opword 0x4182008C
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x9079008C
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x9019008C
+		lfs f0, float_90_8041cd08(r2)
+		opword 0xEC20E82A
+		bl reviseAngle
+		opword 0xFFE00890
+		opword 0xFC20E890
+		bl sinfd
+		lfs f2, float_10_8041cd34(r2)
+		opword 0xC018000C
+		opword 0xEFC2007A
+		opword 0xFC20E890
+		bl cosfd
+		lfs f4, float_10_8041cd34(r2)
+		opword 0xFC60F090
+		opword 0xC0180004
+		opword 0xFCA0F890
+		lfs f2, float_12_8041cd38(r2)
+		opword 0x7F63DB78
+		opword 0xEC24007C
+		opword 0xC0180008
+		opword 0x3880005A
+		lfs f4, float_neg80_8041cd3c(r2)
+		opword 0xEC42002A
+		bl effNozleEntry
+		opword 0x9079007C
+		opword 0x48000090
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x9079008C
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x9019008C
+		lfs f4, float_0_8041cd04(r2)
+		opword 0x7F63DB78
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x3880005A
+		opword 0xC0380008
+		opword 0xFCA02090
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC018000C
+		opword 0xEC42082A
+		opword 0xC0380004
+		opword 0xEC63002A
+		bl effNozleEntry
+		opword 0x2C1F0000
+		opword 0x9079007C
+		opword 0x40820030
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x38600004
+		opword 0xC0380008
+		opword 0x3880005A
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC018000C
+		opword 0xEC42082A
+		opword 0xC0380004
+		opword 0xEC63002A
+		lfs f4, float_1_8041cd48(r2)
+		bl effConfettiN64Entry
+		opword 0x387E00CC
+		bl BattleSearchObjectPtr
+		opword 0x7C781B78
+		opword 0x38600001
+		bl _get_nozzle_dir
+		opword 0x881D8285
+		opword 0xFFA00890
+		opword 0x28000000
+		opword 0x4182008C
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x90790090
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x90190090
+		lfs f0, float_90_8041cd08(r2)
+		opword 0xEC20E82A
+		bl reviseAngle
+		opword 0xFFE00890
+		opword 0xFC20E890
+		bl sinfd
+		lfs f2, float_10_8041cd34(r2)
+		opword 0xC018000C
+		opword 0xEFC2007A
+		opword 0xFC20E890
+		bl cosfd
+		lfs f4, float_10_8041cd34(r2)
+		opword 0xFC60F090
+		opword 0xC0180004
+		opword 0xFCA0F890
+		lfs f2, float_12_8041cd38(r2)
+		opword 0x7F63DB78
+		opword 0xEC24007C
+		opword 0xC0180008
+		opword 0x3880005A
+		lfs f4, float_neg80_8041cd3c(r2)
+		opword 0xEC42002A
+		bl effNozleEntry
+		opword 0x90790080
+		opword 0x48000090
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x90790090
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x90190090
+		lfs f4, float_0_8041cd04(r2)
+		opword 0x7F63DB78
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x3880005A
+		opword 0xC0380008
+		opword 0xFCA02090
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC018000C
+		opword 0xEC42082A
+		opword 0xC0380004
+		opword 0xEC63002A
+		bl effNozleEntry
+		opword 0x2C1F0000
+		opword 0x90790080
+		opword 0x40820030
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x38600004
+		opword 0xC0380008
+		opword 0x3880005A
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC018000C
+		opword 0xEC42082A
+		opword 0xC0380004
+		opword 0xEC63002A
+		lfs f4, float_1_8041cd48(r2)
+		bl effConfettiN64Entry
+		opword 0x387E00D8
+		bl BattleSearchObjectPtr
+		opword 0x7C7E1B78
+		opword 0x38600002
+		bl _get_nozzle_dir
+		opword 0x881D8286
+		opword 0xFFA00890
+		opword 0x28000000
+		opword 0x4182008C
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x389E0004
+		bl psndSFXOn_3D
+		opword 0x90790094
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x90190094
+		lfs f0, float_90_8041cd08(r2)
+		opword 0xEC20E82A
+		bl reviseAngle
+		opword 0xFFC00890
+		opword 0xFC20E890
+		bl sinfd
+		lfs f2, float_10_8041cd34(r2)
+		opword 0xC01E000C
+		opword 0xEFE2007A
+		opword 0xFC20E890
+		bl cosfd
+		lfs f4, float_10_8041cd34(r2)
+		opword 0xFC60F890
+		opword 0xC01E0004
+		opword 0xFCA0F090
+		lfs f2, float_12_8041cd38(r2)
+		opword 0x7F63DB78
+		opword 0xEC24007C
+		opword 0xC01E0008
+		opword 0x3880005A
+		lfs f4, float_neg80_8041cd3c(r2)
+		opword 0xEC42002A
+		bl effNozleEntry
+		opword 0x90790084
+		opword 0x48000090
+		opword 0x281C0000
+		opword 0x41820018
+		opword 0x7F83E378
+		opword 0x389E0004
+		bl psndSFXOn_3D
+		opword 0x90790094
+		opword 0x4800000C
+		opword 0x3800FFFF
+		opword 0x90190094
+		lfs f4, float_0_8041cd04(r2)
+		opword 0x7F63DB78
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x3880005A
+		opword 0xC03E0008
+		opword 0xFCA02090
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC01E000C
+		opword 0xEC42082A
+		opword 0xC03E0004
+		opword 0xEC63002A
+		bl effNozleEntry
+		opword 0x2C1F0000
+		opword 0x90790084
+		opword 0x40820030
+		lfs f2, float_20_8041cd40(r2)
+		opword 0x38600004
+		opword 0xC03E0008
+		opword 0x3880005A
+		lfs f3, float_8_8041cd44(r2)
+		opword 0xC01E000C
+		opword 0xEC42082A
+		opword 0xC03E0004
+		opword 0xEC63002A
+		lfs f4, float_1_8041cd48(r2)
+		bl effConfettiN64Entry
+		opword 0x3AE00001
+		opword 0x48000090
+		opword 0x2C1F0000
+		opword 0x41820088
+		opword 0x801D82A0
+		opword 0x28000000
+		opword 0x4082007C
+		opword 0x38000078
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x90190078
+		opword 0x38000000
+		opword 0xFC400890
+		opword 0x38600003
+		opword 0x9019007C
+		opword 0xFC600890
+		opword 0xFC800890
+		opword 0x388003E8
+		opword 0x90190084
+		opword 0xFCA00890
+		opword 0x90190080
+		bl effNozleEntry
+		opword 0x907D82A0
+		opword 0x38000002
+		opword 0x387E00CC
+		opword 0x809D82A0
+		opword 0x90990084
+		opword 0x901D829C
+		bl BattleSearchObjectPtr
+		opword 0x7C641B78
+		opword 0x387E019C
+		opword 0x38840004
+		bl psndSFXOn_3D
+		opword 0x9079008C
+		opword 0x3800FFFF
+		opword 0x3AE00001
+		opword 0x90190090
+		opword 0x90190094
+		opword 0x2C170000
+		opword 0x4082001C
+		opword 0x7F23CB78
+		opword 0x7F44D378
+		opword 0x38A00000
+		bl evtSetValue
+		opword 0x38600002
+		opword 0x4800007C
+		opword 0x80790078
+		opword 0x2C030000
+		opword 0x4081005C
+		opword 0x3803FFFF
+		opword 0x90190078
+		opword 0x80190078
+		opword 0x2C000000
+		opword 0x41810040
+		opword 0x8079008C
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820008
+		bl psndSFXOff
+		opword 0x80790090
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820008
+		bl psndSFXOff
+		opword 0x80790094
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820008
+		bl psndSFXOff
+		opword 0x38600000
+		opword 0x48000018
+		opword 0x7F23CB78
+		opword 0x7F44D378
+		opword 0x38A00001
+		bl evtSetValue
+		opword 0x38600002
+#endif
 	}
+#ifdef NONMATCHING
 	if (EVT_UW(event, 0) > 0) {
 		EVT_UW(event, 0)--;
 		if (EVT_UW(event, 0) <= 0) {
@@ -2288,10 +3388,12 @@ USER_FUNC(_nozzle_work_effect) {
 	}
 	evtSetValue(event, out, 1);
 	return EVT_RETURN_DONE;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 BOOL BattleFogEndCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2309,9 +3411,7 @@ BOOL BattleFogEndCheck(void) {
 	}
 	return TRUE;
 }
-#endif
 
-#ifdef NONMATCHING
 BOOL BattleFogForceStop(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2325,10 +3425,14 @@ BOOL BattleFogForceStop(void) {
 	}
 	return TRUE;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_nozzle_work_attack_set) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 _nozzle_work_attack_set(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	s32 index;
@@ -2351,9 +3455,10 @@ USER_FUNC(_nozzle_work_attack_set) {
 	}
 	return EVT_RETURN_DONE;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 s32 _get_nozzle_attack_index(u8 index) {
 	BattleStageObjectWork* sw = STAGE_WORK(_battleWorkPointer);
 
@@ -2388,9 +3493,7 @@ s32 _get_nozzle_attack_index(u8 index) {
 	}
 	return -1;
 }
-#endif
 
-#ifdef NONMATCHING
 void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
 	if (*srcChance <= 0) {
 		return;
@@ -2400,9 +3503,7 @@ void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
 	}
 	*dstTime += *srcTime;
 }
-#endif
 
-#ifdef NONMATCHING
 void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength) {
 	if (*srcChance <= 0) {
 		return;
@@ -2417,9 +3518,10 @@ void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8*
 		*dstTime = 0;
 	}
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+#pragma dont_inline on
+#endif
 void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
 	s8* d;
 	s8* s;
@@ -2460,10 +3562,16 @@ void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
 	d[0x2C] += s[0x2C];
 	d[0x2D] += s[0x2D];
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
 #ifdef NONMATCHING
 USER_FUNC(_nozzle_work_get_weapon_address) {
+#endif
+#ifndef NONMATCHING
+s32 _nozzle_work_get_weapon_address(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 	s32* args = event->args;
@@ -2472,9 +3580,7 @@ USER_FUNC(_nozzle_work_get_weapon_address) {
 	evtSetValue(event, args[1], (s32)sw->nozzleWeapons[index]);
 	return EVT_RETURN_DONE;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 BattleStage_ObjectFallCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
@@ -2487,10 +3593,13 @@ s32 BattleStage_ObjectFallCheck(void) {
 	sw->objectFallEvtId = evt->eventId;
 	return evt->eventId;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(_object_fall_wait) {
+#endif
+#ifndef NONMATCHING
+s32 _object_fall_wait(EventEntry* event, BOOL isFirstCall) {
+#endif
 	BattleWork* wp = _battleWorkPointer;
 	BattleStageObjectWork* sw = STAGE_WORK(wp);
 
@@ -2517,9 +3626,886 @@ USER_FUNC(_object_fall_wait) {
 	}
 	return EVT_RETURN_DONE;
 }
+
+#ifndef NONMATCHING
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall) {
+	char _af_pad[5624];
+	asm volatile {
+		lwz r6, _battleWorkPointer(r13)
+		opword 0x7C6F1B78
+		opword 0x80E30018
+		lis r5, vec3_802f3ac8@ha
+		opword 0x3C660002
+		opword 0x2C040000
+		opword 0x822380F8
+		opword 0x7CD93378
+		opword 0x82C70000
+		addi r30, r5, vec3_802f3ac8@l
+		opword 0x3AA00000
+		opword 0x41820494
+		opword 0x386000EC
+		bl BattleAlloc
+		opword 0x7C6E1B78
+		opword 0x38000000
+		opword 0x91CF0078
+		opword 0x38800000
+		opword 0x38A000EC
+		opword 0x900F007C
+		bl memset
+		opword 0x3860FFFF
+		opword 0x38000003
+		opword 0x986E0004
+		opword 0x38800000
+		opword 0x7C0903A6
+		opword 0x38040001
+		opword 0x38840001
+		opword 0x7C6E01AE
+		opword 0x4200FFF4
+		opword 0x7F23CB78
+		bl BattleCheckConcluded
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x80AF007C
+		opword 0x7DE37B78
+		opword 0x7EC4B378
+		bl evtSetValue
+		opword 0x38600002
+		opword 0x48000CE8
+		opword 0x38000001
+		opword 0x3A000000
+		opword 0x980E0000
+		opword 0x3B000000
+		opword 0x480002C4
+		opword 0x3AF80004
+		opword 0x38000003
+		opword 0x7EEEBA14
+		opword 0x3A400000
+		opword 0x9A170000
+		opword 0x7C0903A6
+		opword 0x38120001
+		opword 0x7C0E00AE
+		opword 0x7C000774
+		opword 0x2C00FFFF
+		opword 0x4182000C
+		opword 0x3A520001
+		opword 0x4200FFE8
+		opword 0x2C120003
+		opword 0x4180001C
+		opword 0x38600003
+		bl irand
+		opword 0x38030001
+		opword 0x7C0E00AE
+		opword 0x98170001
+		opword 0x48000070
+		opword 0x38000009
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x7C0903A6
+		opword 0x380400C0
+		opword 0x38840001
+		opword 0x7C1100AE
+		opword 0x7C630214
+		opword 0x4200FFF0
+		bl irand
+		opword 0x38000000
+		opword 0x98170001
+		opword 0x48000024
+		opword 0x7CA40774
+		opword 0x380400C0
+		opword 0x7C1100AE
+		opword 0x7C601851
+		opword 0x41800020
+		opword 0x88970001
+		opword 0x38040001
+		opword 0x98170001
+		opword 0x88B70001
+		opword 0x7CA00774
+		opword 0x2C000008
+		opword 0x4180FFD4
+		opword 0x38120001
+		opword 0x7CAE01AE
+		opword 0x88770001
+		opword 0x38000018
+		opword 0x38B70024
+		opword 0x7C630774
+		opword 0x1C6300C0
+		opword 0x386300CC
+		opword 0x7C911A14
+		opword 0x7C0903A6
+		opword 0x3884FFFC
+		opword 0x80640004
+		opword 0x84040008
+		opword 0x90650004
+		opword 0x94050008
+		opword 0x4200FFF0
+		opword 0x88170001
+		opword 0x2C000006
+		opword 0x40820048
+		opword 0x38600064
+		bl irand
+		opword 0x2C030032
+		opword 0x40800020
+		opword 0x8017008C
+		opword 0x60000100
+		opword 0x9017008C
+		opword 0x8017008C
+		opword 0x540005EA
+		opword 0x9017008C
+		opword 0x4800001C
+		opword 0x8017008C
+		opword 0x5400062C
+		opword 0x9017008C
+		opword 0x8017008C
+		opword 0x60000200
+		opword 0x9017008C
+		opword 0x38000000
+		opword 0x3A570028
+		opword 0x90170004
+		bl pouchGetPtr
+		opword 0xA003008C
+		opword 0x28000000
+		opword 0x41820070
+		bl BattleAudienceBaseGetPtr
+		opword 0x80030000
+		opword 0x54000463
+		opword 0x40820060
+		opword 0x88170001
+		opword 0x7C000774
+		opword 0x2C000006
+		opword 0x41820050
+		opword 0x2C000007
+		opword 0x41820048
+		opword 0x3C790002
+		opword 0x80039068
+		opword 0x540007BD
+		opword 0x40820014
+		opword 0x38600064
+		bl irand
+		opword 0x2C03000A
+		opword 0x40800028
+		opword 0x38600001
+		opword 0x3800FFFF
+		opword 0x90770004
+		opword 0x9017000C
+		bl BattleAudience_HaitiRandForFallObject
+		opword 0x90770008
+		opword 0x38000001
+		opword 0x3AA00001
+		opword 0x900F007C
+		opword 0x80170004
+		opword 0x2C000000
+		opword 0x408200E0
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x88190012
+		opword 0x7E449378
+		opword 0x80A30000
+		la r3, _af_pad+2820
+		opword 0x7C0000D0
+		opword 0x80F20064
+		opword 0x81120068
+		opword 0x7C090774
+		opword 0x38C00001
+		bl BattleSamplingEnemy
+		opword 0x88011578
+		opword 0x7C000775
+		opword 0x4181001C
+		opword 0x80AF007C
+		opword 0x7DE37B78
+		opword 0x7EC4B378
+		bl evtSetValue
+		opword 0x38600002
+		opword 0x48000AA4
+		opword 0x8092007C
+		opword 0x38610B0C
+		opword 0x38A1000C
+		opword 0x38C10008
+		opword 0x3AA00001
+		bl BattleChoiceSamplingEnemy
+		opword 0x8061000C
+		opword 0x38100001
+		opword 0x38A00001
+		opword 0x7E078378
+		opword 0x90770008
+		opword 0x1C7000E8
+		opword 0x38800000
+		opword 0x80C10008
+		opword 0x90D7000C
+		opword 0x98B70014
+		opword 0x7C0903A6
+		opword 0x2C100000
+		opword 0x41800040
+		opword 0x38C30004
+		opword 0x7CCE3214
+		opword 0x7C173040
+		opword 0x41820024
+		opword 0x80060004
+		opword 0x2C000000
+		opword 0x40820018
+		opword 0x80B70008
+		opword 0x80060008
+		opword 0x7C050000
+		opword 0x40820008
+		opword 0x98860014
+		opword 0x38E7FFFF
+		opword 0x3863FF18
+		opword 0x4200FFC8
+		opword 0x3A100001
+		opword 0x3B1800E8
+		opword 0x880E0000
+		opword 0x7C100000
+		opword 0x4180FD38
+		opword 0x2C150000
+		opword 0x4082001C
+		opword 0x80AF007C
+		opword 0x7DE37B78
+		opword 0x7EC4B378
+		bl evtSetValue
+		opword 0x38600002
+		opword 0x480009E8
+		opword 0x3A000000
+		opword 0x3B000000
+		opword 0x4800010C
+		opword 0x3A380004
+		opword 0x7E2E8A14
+		opword 0x80110004
+		opword 0x3AF10028
+		opword 0x2C000000
+		opword 0x408200EC
+		opword 0x88110014
+		opword 0x3B400000
+		opword 0x28000000
+		opword 0x41820008
+		opword 0x635A0100
+		opword 0x88110015
+		opword 0x28000000
+		opword 0x41820008
+		opword 0x675A0010
+		opword 0x80710008
+		opword 0x8091000C
+		bl BattleGetUnitPartsPtr
+		opword 0x80910008
+		opword 0x7C751B78
+		opword 0x7F23CB78
+		bl BattleGetUnitPtr
+		opword 0x7C721B78
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x7E449378
+		opword 0x7EA5AB78
+		opword 0x7EE6BB78
+		opword 0x7F47D378
+		bl BattlePreCheckDamage
+		opword 0x9071001C
+		opword 0x8011001C
+		opword 0x2C000001
+		opword 0x4082007C
+		opword 0x88110014
+		opword 0x28000000
+		opword 0x40820070
+		opword 0x38600000
+		bl irand
+		opword 0x7C720734
+		opword 0x3AA00000
+		opword 0x3B400000
+		opword 0x3B600001
+		opword 0x4800004C
+		opword 0x3AFA0004
+		opword 0x80710008
+		opword 0x7EEEBA14
+		opword 0x80170008
+		opword 0x7C030000
+		opword 0x4082002C
+		opword 0xB2570010
+		opword 0x38600016
+		bl irand
+		opword 0x88170014
+		opword 0x7C639214
+		opword 0x38630014
+		opword 0x28000000
+		opword 0x7C720734
+		opword 0x41820008
+		opword 0x9B770015
+		opword 0x3AB50001
+		opword 0x3B5A00E8
+		opword 0x7C158000
+		opword 0x4180FFB4
+		opword 0x3A100001
+		opword 0x3B1800E8
+		opword 0x880E0000
+		opword 0x7C100000
+		opword 0x4180FEF0
+		opword 0x3BBE0114
+		opword 0x381E0150
+		opword 0x836F0078
+		addi r14, r30, 0x130
+		opword 0x93A115F4
+		opword 0x3B810014
+		opword 0x3B000001
+		opword 0x3B400000
+		opword 0x900115F0
+		opword 0x3BE00000
+		opword 0x48000864
+		opword 0x3ABF0004
+		opword 0x7EBBAA14
+		opword 0x88150000
+		opword 0x7C000774
+		opword 0x2C00FFFF
+		opword 0x41820844
+		opword 0x80150004
+		opword 0x3AE00000
+		opword 0x3B000000
+		opword 0x2C000000
+		opword 0x40820028
+		opword 0x80950008
+		opword 0x7F23CB78
+		bl BattleGetUnitPtr
+		opword 0x7C601B78
+		opword 0x80750008
+		opword 0x8095000C
+		opword 0x7C140378
+		bl BattleGetUnitPartsPtr
+		opword 0x7C731B78
+		opword 0x80750024
+		opword 0x28030000
+		opword 0x41820010
+		opword 0xA8150010
+		opword 0x2C000000
+		opword 0x40810438
+		opword 0xA8750010
+		opword 0x3803FFFF
+		opword 0xB0150010
+		opword 0xA8150010
+		opword 0x2C000000
+		opword 0x418107DC
+		opword 0x80150004
+		opword 0x2C000001
+		opword 0x41820054
+		opword 0x40800110
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000104
+		opword 0x7E83A378
+		opword 0x7E649B78
+		opword 0x38C1002C
+		opword 0x38E10030
+		opword 0x38A10028
+		bl BtlUnit_GetHitPos
+		opword 0x7E83A378
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906115DC
+		opword 0xC83E0168
+		opword 0x900115D8
+		opword 0xC80115D8
+		opword 0xEFC00828
+		opword 0x480000E0
+		opword 0x80B50008
+		opword 0x38800014
+		opword 0x3C004330
+		opword 0xC83E0168
+		opword 0x7C6523D6
+		opword 0x900115D8
+		opword 0x7C0321D6
+		opword 0x7C002850
+		opword 0x1C600019
+		opword 0x3803FF1A
+		opword 0x6C008000
+		opword 0x900115DC
+		opword 0xC80115D8
+		opword 0xEC000828
+		opword 0xD0010028
+		bl BattleStageGetPtr
+		opword 0xC0030B34
+		opword 0x3C004330
+		opword 0x38C00014
+		opword 0x900115E0
+		opword 0xC85E0168
+		opword 0x38600000
+		opword 0xD001002C
+		opword 0x38800006
+		lfs f3, float_0p1_8041cd00(r2)
+		opword 0x80F50008
+		opword 0x900115E8
+		opword 0x7CA733D6
+		opword 0x7C0531D6
+		opword 0x1CA5001E
+		opword 0x7CC03850
+		opword 0x38050073
+		opword 0x6CC58000
+		opword 0x6C008000
+		opword 0x90A115E4
+		opword 0x900115EC
+		opword 0xC82115E0
+		opword 0xC80115E8
+		opword 0xEC211028
+		opword 0xEC001028
+		opword 0xEC03007A
+		opword 0xD0010030
+		bl btl_camera_set_mode
+		opword 0x38600000
+		opword 0x38800002
+		bl btl_camera_set_moveSpeedLv
+		lfs f30, float_0_8041cd04(r2)
+		opword 0x48000020
+		opword 0x809E0108
+		opword 0x807E010C
+		opword 0x801E0110
+		opword 0x90810028
+		lfs f30, float_0_8041cd04(r2)
+		opword 0x9061002C
+		opword 0x90010030
+		opword 0x80A10028
+		opword 0x7F23CB78
+		opword 0x8081002C
+		opword 0x80010030
+		opword 0x90A10034
+		opword 0x90810038
+		opword 0xC0210034
+		opword 0x9001003C
+		opword 0xC0410038
+		opword 0xC061003C
+		bl BattleGetFloorHeight
+		opword 0xC0410028
+		lfs f0, float_0_8041cd04(r2)
+		opword 0xD0210038
+		opword 0xFC020040
+		opword 0x4C411382
+		opword 0x4082000C
+		lfs f31, float_90_8041cd08(r2)
+		opword 0x48000008
+		lfs f31, float_270_8041cd0c(r2)
+		opword 0x8015001C
+		opword 0x2C000005
+		opword 0x41820024
+		opword 0x40800010
+		opword 0x2C000002
+		opword 0x40800010
+		opword 0x48000014
+		opword 0x2C000007
+		opword 0x4080000C
+		opword 0xC0010038
+		opword 0xD001002C
+		opword 0x3860FFFF
+		opword 0x38000000
+		opword 0x90750020
+		opword 0xB0150012
+		opword 0x88150001
+		opword 0x7C000774
+		opword 0x28000008
+		opword 0x41810608
+		lis r3, jumptable_80374848@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_80374848@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600004
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x480005BC
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600005
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x48000588
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600000
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800064
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x48000554
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600001
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x48000520
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		lfs f7, float_5_8041cd10(r2)
+		opword 0x38600002
+		opword 0xC061003C
+		opword 0xECA01028
+		opword 0xC0210034
+		opword 0xEC67182A
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x480004E4
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600008
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x480004B0
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		opword 0xC0210034
+		opword 0x38600003
+		opword 0xECA01028
+		opword 0xC061003C
+		opword 0x38800001
+		opword 0x38A0005A
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x4800047C
+		opword 0x7E83A378
+		bl BtlUnit_GetBelong
+		opword 0x7C600775
+		opword 0x4082003C
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xFCC0F890
+		lfs f2, float_15_8041cd18(r2)
+		opword 0x38600006
+		opword 0xC001003C
+		opword 0xFCA02090
+		lfs f1, float_neg300_8041cd14(r2)
+		opword 0xEC62002A
+		opword 0xC0410038
+		opword 0x38800001
+		opword 0x38A000B4
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x48000434
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xFCC0F890
+		lfs f2, float_15_8041cd18(r2)
+		opword 0x38600006
+		opword 0xC001003C
+		opword 0xFCA02090
+		lfs f1, float_300_8041cd1c(r2)
+		opword 0xEC62002A
+		opword 0xC0410038
+		opword 0x38800001
+		opword 0x38A000B4
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x480003FC
+		opword 0xC0410038
+		opword 0xFC80F090
+		opword 0xC001002C
+		opword 0xFCC0F890
+		lfs f7, float_5_8041cd10(r2)
+		opword 0x38600007
+		opword 0xC061003C
+		opword 0xECA01028
+		opword 0xC0210034
+		opword 0xEC67182A
+		opword 0x38800001
+		opword 0x38A000B4
+		bl effFallEntry
+		opword 0x90750024
+		opword 0x480003C0
+		opword 0x28030000
+		opword 0x41820010
+		bl effFallCheckHit
+		opword 0x2C030000
+		opword 0x418203AC
+		opword 0x80150004
+		opword 0x3A550028
+		opword 0x2C000001
+		opword 0x40820074
+		opword 0x88950001
+		opword 0x80750008
+		bl BattleAudience_Case_FallObject_Aud
+		opword 0x80750020
+		bl psndSFXOff
+		opword 0x80750008
+		opword 0x38A10020
+		opword 0x38C10024
+		opword 0x3881001C
+		bl BattleAudience_GetHomePosition
+		opword 0x88150001
+		opword 0x7C000774
+		opword 0x2C000005
+		opword 0x4182035C
+		opword 0x40800028
+		opword 0x2C000002
+		opword 0x40800020
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000014
+		opword 0x7FA3EB78
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x48000334
+		opword 0x7DC37378
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x48000324
+		bl BattleAudience_Case_FallObject_Stage
+		opword 0x80120064
+		opword 0x540001CF
+		opword 0x41820128
+		opword 0x7E83A378
+		opword 0x7E649B78
+		opword 0x38C10020
+		opword 0x38E10024
+		opword 0x38A1001C
+		bl BtlUnit_GetHitPos
+		opword 0x88150014
+		opword 0x3A000000
+		opword 0x28000000
+		opword 0x41820008
+		opword 0x62100100
+		opword 0x80750020
+		bl psndSFXOff
+		opword 0x8015001C
+		opword 0x2C000005
+		opword 0x418202D4
+		opword 0x40800014
+		opword 0x2C000001
+		opword 0x4182004C
+		opword 0x40800010
+		opword 0x480002C0
+		opword 0x2C000007
+		opword 0x408002B8
+		opword 0x88150001
+		opword 0x7C000774
+		opword 0x2C000005
+		opword 0x418202A8
+		opword 0x408002A4
+		opword 0x2C000002
+		opword 0x4080029C
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000290
+		opword 0x7FA3EB78
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x48000280
+		opword 0x88150001
+		opword 0x7C000774
+		opword 0x2C000005
+		opword 0x4182002C
+		opword 0x40800038
+		opword 0x2C000002
+		opword 0x40800030
+		opword 0x2C000000
+		opword 0x40800008
+		opword 0x48000024
+		opword 0x806115F4
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x48000020
+		opword 0x806115F0
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x48000010
+		opword 0x7DC37378
+		opword 0x3881001C
+		bl psndSFXOn_3D
+		opword 0x7E83A378
+		bl BtlUnit_GetACPossibility
+		opword 0x2C030000
+		opword 0x41820010
+		opword 0x7E83A378
+		opword 0x7E449378
+		bl BattleActionCommandCheckDefence
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x7E84A378
+		opword 0x7E659B78
+		opword 0x7E469378
+		opword 0x7E078378
+		bl BattleCheckDamage
+		opword 0x480001F0
+		opword 0x80750020
+		bl psndSFXOff
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x88190012
+		opword 0x7E449378
+		opword 0x80A30000
+		opword 0x38610040
+		opword 0x7C0000D0
+		opword 0x80F20064
+		opword 0x81120068
+		opword 0x7C090774
+		opword 0x38C00001
+		bl BattleSamplingEnemy
+		opword 0x88010AAC
+		opword 0x7C000775
+		opword 0x408101AC
+		opword 0x88610AF7
+		opword 0x88010AAC
+		opword 0x7C630774
+		opword 0x7C000774
+		opword 0x7C030000
+		opword 0x40800194
+		opword 0x38030A6D
+		opword 0x38810040
+		opword 0x7C0400AE
+		opword 0x7F23CB78
+		opword 0x7C000774
+		opword 0x1C800024
+		opword 0x38010040
+		opword 0x3A240004
+		opword 0x7E208A14
+		opword 0xA8910000
+		bl BattleGetUnitPtr
+		opword 0x7C601B78
+		opword 0xA8710000
+		opword 0xA8910002
+		opword 0x7C100378
+		bl BattleGetUnitPartsPtr
+		opword 0x906115F8
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x80A115F8
+		opword 0x7E048378
+		opword 0x7E469378
+		opword 0x38E00100
+		bl BattlePreCheckDamage
+		opword 0x2C030004
+		opword 0x4182011C
+		opword 0x4080001C
+		opword 0x2C030002
+		opword 0x41820110
+		opword 0x4080001C
+		opword 0x2C030001
+		opword 0x408000B0
+		opword 0x48000100
+		opword 0x2C030006
+		opword 0x4182008C
+		opword 0x480000F4
+		opword 0x7E038378
+		opword 0x7F85E378
+		opword 0x38C10018
+		opword 0x38810010
+		bl BtlUnit_GetPos
+		opword 0xC03C0000
+		lfs f0, float_85_8041cd20(r2)
+		opword 0xFC010040
+		opword 0x40800014
+		lfs f0, float_50_8041cd24(r2)
+		opword 0xEC01002A
+		opword 0xD01C0000
+		opword 0x48000010
+		lfs f0, float_neg50_8041cd28(r2)
+		opword 0xEC01002A
+		opword 0xD01C0000
+		opword 0xC0210010
+		opword 0x38600006
+		lfs f0, float_45_8041cd2c(r2)
+		opword 0xC05C0000
+		opword 0xEC210028
+		opword 0xC0610018
+		opword 0xD0210010
+		bl effNiceEntry
+		opword 0x80A3000C
+		opword 0x38000000
+		lfs f0, float_0p75_8041cd30(r2)
+		opword 0x7E038378
+		opword 0x38800126
+		opword 0xD005001C
+		opword 0x90100270
+		bl BattleRunHitEvent
+		opword 0x48000070
+		opword 0x38000000
+		opword 0x7E038378
+		opword 0x90100270
+		opword 0x38800127
+		bl BattleRunHitEvent
+		opword 0x48000058
+		opword 0x7E038378
+		bl BtlUnit_GetACPossibility
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x2C170000
+		opword 0x41810014
+		opword 0x7E038378
+		opword 0x7E449378
+		bl BattleActionCommandCheckDefence
+		opword 0x3AF70001
+		opword 0xA8710000
+		opword 0xA8910002
+		bl BattleGetUnitPartsPtr
+		opword 0x7C711B78
+		opword 0x7F23CB78
+		bl BattleGetSystemPtr
+		opword 0x7E048378
+		opword 0x7E258B78
+		opword 0x7E469378
+		opword 0x38E00100
+		bl BattleCheckDamage
+		opword 0x88610AF7
+		opword 0x38030001
+		opword 0x98010AF7
+		opword 0x4BFFFE5C
+		opword 0x3800FFFF
+		opword 0x98150000
+		opword 0x3B5A0001
+		opword 0x3BFF00E8
+		opword 0x881B0000
+		opword 0x7C1A0000
+		opword 0x4180F798
+		opword 0x2C180000
+		opword 0x4082000C
+		opword 0x38600000
+		opword 0x48000020
+		opword 0x806F0078
+		bl BattleFree
+		opword 0x80AF007C
+		opword 0x7DE37B78
+		opword 0x7EC4B378
+		bl evtSetValue
+		opword 0x38600002
+	}
+}
+#pragma pop
 #endif
 
-
+#ifdef NONMATCHING
 typedef struct FallObjectEntry {
 	s8 index; //0x0
 	s8 type; //0x1
@@ -2537,7 +4523,12 @@ typedef struct FallObjectEntry {
 	EffectEntry* effect; //0x24
 	BattleWeaponData weapon; //0x28
 } FallObjectEntry;
+#endif
+#ifndef NONMATCHING
+#pragma defer_codegen reset
+#endif
 
+#ifdef NONMATCHING
 typedef struct FallObjectWork {
 	u8 count; //0x0
 	s8 prevTypes[3]; //0x1
@@ -2588,6 +4579,65 @@ USER_FUNC(_get_bgset_attack_data);
 USER_FUNC(_mobj_destroy);
 USER_FUNC(_mobj_set_alpha);
 USER_FUNC(_set_mobj_rotate_x);
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+asm s32 _set_mobj_shake_init(EventEntry* event, BOOL isFirstCall) {
+	nofralloc
+	stwu r1, -0x20(r1)
+	mflr r0
+	stw r0, 0x24(r1)
+	stmw r27, 0xc(r1)
+	lwz r4, 0x18(r3)
+	lwz r29, _battleWorkPointer(r13)
+	lwz r4, 0x0(r4)
+	bl evtGetValue
+	mr r30, r3
+	li r28, 0x0
+	li r31, 0x0
+L_af_1:
+	addis r27, r31, 0x1
+	addi r27, r27, 0x7140
+	add r27, r29, r27
+	lwz r0, 0x0(r27)
+	cmpwi r0, 0x0
+	ble L_af_2
+	lwz r3, 0x64(r27)
+	lhz r0, 0x6(r3)
+	cmpw r0, r30
+	bne L_af_2
+	li r0, 0x0
+	li r3, 0xa
+	stb r0, 0x72(r27)
+	bl irand
+	addi r0, r3, 0x3c
+	li r3, 0x64
+	stb r0, 0x73(r27)
+	bl irand
+	clrlwi. r0, r3, 31
+	beq L_af_3
+	li r0, 0x0
+	b L_af_4
+L_af_3:
+	lbz r0, 0x73(r27)
+	extrwi r0, r0, 8, 23
+L_af_4:
+	stb r0, 0x74(r27)
+	lfs f0, float_0_8041cd04(r2)
+	stfs f0, 0x78(r27)
+L_af_2:
+	addi r28, r28, 0x1
+	addi r31, r31, 0x7c
+	cmpwi r28, 0x20
+	blt L_af_1
+	lmw r27, 0xc(r1)
+	li r3, 0x2
+	lwz r0, 0x24(r1)
+	mtlr r0
+	addi r1, r1, 0x20
+	blr
+}
+#endif
 
 #ifdef NONMATCHING
 s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
@@ -2639,7 +4689,15 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
     {
       w->prevTypes[i] = -1;
     }
+#endif
+#ifndef NONMATCHING
+BattleStageObject* BattleGetObjectPtr(s32 id) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObject* obj;
+	int i;
+#endif
 
+#ifdef NONMATCHING
     if (BattleCheckConcluded(wp))
     {
       evtSetValue(event, arg0, ud[1]);
@@ -2657,7 +4715,19 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           break;
         }
       }
+#endif
+#ifndef NONMATCHING
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id == id) {
+			return obj;
+		}
+	}
+	return NULL;
+}
+#endif
 
+#ifdef NONMATCHING
       if (j >= 3)
       {
         e->type = w->prevTypes[irand(3)];
@@ -2669,7 +4739,15 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         {
           sum += fd->rates[k];
         }
+#endif
+#ifndef NONMATCHING
+BattleStageObject* BattleSearchObjectPtr(const char* name) {
+	BattleWork* wp = _battleWorkPointer;
+	int i;
+	BattleStageObject* obj;
+#endif
 
+#ifdef NONMATCHING
         r = irand(sum);
         for (e->type = 0; e->type < 8; e->type++)
         {
@@ -2678,7 +4756,19 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
             break;
           }
         }
+#endif
+#ifndef NONMATCHING
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id && !strcmp(obj->data->name, name)) {
+			return obj;
+		}
+	}
+	return NULL;
+}
+#endif
 
+#ifdef NONMATCHING
         w->prevTypes[j] = e->type;
       }
       e->weapon = fd->weapons[e->type];
@@ -2729,10 +4819,847 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
             o->noAc = 0;
           }
         }
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void BattleStageObjectInit(void) {
+	asm volatile {
+		lwz r24, _battleWorkPointer(r13)
+		lis r6, lbl_80371490@ha
+		lis r5, vec3_802f3ac8@ha
+		opword 0x3BE00000
+		opword 0x80982738
+		opword 0x3C780001
+		addi r26, r5, vec3_802f3ac8@l
+		addi r25, r6, lbl_80371490@l
+		opword 0x8084000C
+		opword 0x3E980002
+		opword 0x3BC00000
+		opword 0x3BA00000
+		opword 0x82E40000
+		opword 0x3B800000
+		opword 0x3B600000
+		opword 0x38800000
+		opword 0x82D70008
+		opword 0x38A00F80
+		opword 0x82B7000C
+		opword 0x38637140
+		bl memset
+		bl pouchGetPtr
+		opword 0xA8030088
+		opword 0x2C000004
+		opword 0x40800020
+		opword 0x2C000001
+		opword 0x40800008
+		opword 0x48000014
+		la r3, str_8041CD78(r2)
+		opword 0x38800001
+		opword 0x38A00000
+		bl mapPlayAnimationLv
+		bl pouchGetPtr
+		opword 0xA8030088
+		opword 0x2C000004
+		opword 0x4080002C
+		opword 0x2C000001
+		opword 0x40800008
+		opword 0x48000020
+		bl pouchGetPtr
+		opword 0xA8630088
+		opword 0x381901C0
+		opword 0x1C630310
+		opword 0x7C001A14
+		opword 0x901480F4
+		opword 0x4800000C
+		opword 0x38000000
+		opword 0x901480F4
+		bl pouchGetPtr
+		opword 0xA8A30088
+		opword 0x38990E00
+		opword 0x3860FFFF
+		opword 0x38000000
+		opword 0x1CA5078C
+		opword 0x7C842A14
+		opword 0x909480F8
+		opword 0x9874828A
+		opword 0x9014829C
+		opword 0x901482A0
+		bl mapGetWork
+		opword 0x806300A8
+		opword 0x38800002
+		opword 0x80630008
+		opword 0x80630000
+		bl mapGrpFlagOff
+		la r3, str_8041CD68(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x4182001C
+		la r3, str_8041CD68(r2)
+		opword 0x38800001
+		bl mapGrpFlagOn
+		la r3, str_8041CD68(r2)
+		opword 0x38800002
+		bl mapGrpFlagOff
+		la r3, str_8041CD6C(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x4182001C
+		la r3, str_8041CD6C(r2)
+		opword 0x38800001
+		bl mapGrpFlagOn
+		la r3, str_8041CD6C(r2)
+		opword 0x38800002
+		bl mapGrpFlagOff
+		la r3, str_8041CD70(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x4182001C
+		la r3, str_8041CD70(r2)
+		opword 0x38800001
+		bl mapGrpFlagOn
+		la r3, str_8041CD70(r2)
+		opword 0x38800002
+		bl mapGrpFlagOff
+		la r3, str_8041CD74(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x4182001C
+		la r3, str_8041CD74(r2)
+		opword 0x38800001
+		bl mapGrpFlagOn
+		la r3, str_8041CD74(r2)
+		opword 0x38800002
+		bl mapGrpFlagOff
+		opword 0x387A00E4
+		opword 0x38800001
+		bl mapGrpFlagOn
+		opword 0x28150000
+		opword 0x3A800001
+		opword 0x4182024C
+		lfs f31, float_0_8041cd04(r2)
+		opword 0x4800023C
+		opword 0x38000020
+		opword 0x38800000
+		opword 0x38600000
+		opword 0x7C0903A6
+		opword 0x3E630001
+		opword 0x3A737140
+		opword 0x7E789A14
+		opword 0x80130000
+		opword 0x2C000000
+		opword 0x40810010
+		opword 0x38840001
+		opword 0x3863007C
+		opword 0x4200FFE0
+		opword 0x2C040020
+		opword 0x40800208
+		opword 0x92B30064
+		opword 0x3800FFFF
+		opword 0x92930000
+		opword 0x9013006C
+		opword 0x80730064
+		opword 0xA0030006
+		opword 0x2C000003
+		opword 0x41820044
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x41820028
+		opword 0x4080002C
+		opword 0x2C000000
+		opword 0x40800014
+		opword 0x48000034
+		opword 0x2C000006
+		opword 0x41820028
+		opword 0x48000028
+		opword 0x3BFF0001
+		opword 0x48000020
+		opword 0x3BDE0001
+		opword 0x48000018
+		opword 0x3BBD0001
+		opword 0x48000010
+		opword 0x3B9C0001
+		opword 0x48000008
+		opword 0x3B600001
+		opword 0x2C000004
+		opword 0x40800018
+		opword 0x2C000002
+		opword 0x40800040
+		opword 0x2C000000
+		opword 0x4080001C
+		opword 0x4800004C
+		opword 0x2C000008
+		opword 0x40800044
+		opword 0x2C000006
+		opword 0x40800008
+		opword 0x48000038
+		opword 0x80750008
+		opword 0x8015000C
+		opword 0x90730004
+		opword 0x90130008
+		opword 0x80150010
+		opword 0x9013000C
+		opword 0x4800001C
+		opword 0x80750008
+		opword 0x8015000C
+		opword 0x90730004
+		opword 0x90130008
+		opword 0x80150010
+		opword 0x9013000C
+		opword 0xD3F30024
+		opword 0x38800001
+		opword 0xD3F30020
+		opword 0xD3F3001C
+		opword 0x807A0000
+		opword 0x801A0004
+		opword 0x90730034
+		opword 0x90130038
+		opword 0x801A0008
+		opword 0x9013003C
+		opword 0x807A000C
+		opword 0x801A0010
+		opword 0x90730040
+		opword 0x90130044
+		opword 0x801A0014
+		opword 0x90130048
+		opword 0x807A0018
+		opword 0x801A001C
+		opword 0x9073004C
+		opword 0x90130050
+		opword 0x801A0020
+		opword 0x90130054
+		opword 0x807A0024
+		opword 0x801A0028
+		opword 0x90730058
+		opword 0x9013005C
+		opword 0x801A002C
+		opword 0x90130060
+		opword 0x80730064
+		opword 0x80630000
+		bl mapGrpFlagOff
+		opword 0xA0150004
+		opword 0x2C000001
+		opword 0x4182005C
+		opword 0x40800098
+		opword 0x2C000000
+		opword 0x4080000C
+		opword 0x4800008C
+		opword 0x48000088
+		la r3, _entry_tree_data(r13)
+		bl BtlUnit_Entry
+		opword 0x80130000
+		mr r18, r3
+		opword 0x90030B2C
+		opword 0x80030000
+		opword 0x9013006C
+		opword 0xC0330004
+		opword 0xC0530008
+		opword 0xC073000C
+		bl BtlUnit_SetPos
+		opword 0xC0330004
+		opword 0x7E439378
+		opword 0xC0530008
+		opword 0xC073000C
+		bl BtlUnit_SetHomePos
+		opword 0x48000044
+		la r3, _entry_switch_data(r13)
+		bl BtlUnit_Entry
+		opword 0x80130000
+		opword 0x7C721B78
+		opword 0x90030B2C
+		opword 0x80030000
+		opword 0x9013006C
+		opword 0xC0330004
+		opword 0xC0530008
+		opword 0xC073000C
+		bl BtlUnit_SetPos
+		opword 0xC0330004
+		opword 0x7E439378
+		opword 0xC0530008
+		opword 0xC073000C
+		bl BtlUnit_SetHomePos
+		opword 0x3A940001
+		opword 0x3AD6FFFF
+		opword 0x3AB50018
+		opword 0x2C160000
+		opword 0x4082FDC4
+		bl pouchGetPtr
+		opword 0xA8030088
+		opword 0x2C000000
+		opword 0x40810104
+		lfs f31, float_0_8041cd04(r2)
+		opword 0x3B392C30
+		opword 0x3AA00000
+		opword 0x38000020
+		opword 0x38800000
+		opword 0x38600000
+		opword 0x7C0903A6
+		opword 0x3E630001
+		opword 0x3A737140
+		opword 0x7E789A14
+		opword 0x80130000
+		opword 0x2C000000
+		opword 0x40810010
+		opword 0x38840001
+		opword 0x3863007C
+		opword 0x4200FFE0
+		opword 0x2C040020
+		opword 0x408000BC
+		opword 0x93330064
+		opword 0x3800FFFF
+		opword 0x38800001
+		opword 0x92930000
+		opword 0x9013006C
+		opword 0x80790008
+		opword 0x8019000C
+		opword 0x90730004
+		opword 0x90130008
+		opword 0x80190010
+		opword 0x9013000C
+		opword 0xD3F30024
+		opword 0xD3F30020
+		opword 0xD3F3001C
+		opword 0x807A0030
+		opword 0x801A0034
+		opword 0x90730034
+		opword 0x90130038
+		opword 0x801A0038
+		opword 0x9013003C
+		opword 0x807A003C
+		opword 0x801A0040
+		opword 0x90730040
+		opword 0x90130044
+		opword 0x801A0044
+		opword 0x90130048
+		opword 0x807A0048
+		opword 0x801A004C
+		opword 0x9073004C
+		opword 0x90130050
+		opword 0x801A0050
+		opword 0x90130054
+		opword 0x807A0054
+		opword 0x801A0058
+		opword 0x90730058
+		opword 0x9013005C
+		opword 0x801A005C
+		opword 0x90130060
+		opword 0x80730064
+		opword 0x80630000
+		bl mapGrpFlagOff
+		opword 0x3AB50001
+		opword 0x3B390018
+		opword 0x2C150003
+		opword 0x3A940001
+		opword 0x4180FF10
+		opword 0x38000020
+		la r4, _object_wall_data(r13)
+		opword 0x38600000
+		opword 0x7C0903A6
+		opword 0x3E630001
+		opword 0x3A737140
+		opword 0x7E789A14
+		opword 0x80130000
+		opword 0x2C000000
+		opword 0x4081000C
+		opword 0x3863007C
+		opword 0x4200FFE4
+		opword 0x90930064
+		opword 0x3800FFFF
+		opword 0x92930000
+		opword 0x9013006C
+		opword 0x80640008
+		opword 0x8004000C
+		opword 0x90730004
+		opword 0x90130008
+		opword 0x80040010
+		opword 0x9013000C
+		bl BattleStageGetPtr
+		opword 0xC0230B28
+		opword 0x38800001
+		lfs f0, float_0_8041cd04(r2)
+		opword 0xD0330008
+		opword 0xD0130024
+		opword 0xD0130020
+		opword 0xD013001C
+		opword 0x807A0060
+		opword 0x801A0064
+		opword 0x90730034
+		opword 0x90130038
+		opword 0x801A0068
+		opword 0x9013003C
+		opword 0x807A006C
+		opword 0x801A0070
+		opword 0x90730040
+		opword 0x90130044
+		opword 0x801A0074
+		opword 0x90130048
+		opword 0x807A0078
+		opword 0x801A007C
+		opword 0x9073004C
+		opword 0x90130050
+		opword 0x801A0080
+		opword 0x90130054
+		opword 0x807A0084
+		opword 0x801A0088
+		opword 0x90730058
+		opword 0x9013005C
+		opword 0x801A008C
+		opword 0x90130060
+		opword 0x80730064
+		opword 0x80630000
+		bl mapGrpFlagOn
+		opword 0x80130068
+		opword 0x3AA00000
+		lfs f31, float_0_8041cd04(r2)
+		opword 0x3A940001
+		opword 0x60000001
+		opword 0x90130068
+		la r5, _object_spot_light_data(r13)
+		opword 0x7CA5AA14
+		opword 0x80050000
+		opword 0x28000000
+		opword 0x418200EC
+		opword 0x38000020
+		opword 0x38600000
+		opword 0x7C0903A6
+		opword 0x3E630001
+		opword 0x3A737140
+		opword 0x7E789A14
+		opword 0x80130000
+		opword 0x2C000000
+		opword 0x4081000C
+		opword 0x3863007C
+		opword 0x4200FFE4
+		opword 0x90B30064
+		opword 0x3800FFFF
+		opword 0x38800001
+		opword 0x92930000
+		opword 0x9013006C
+		opword 0x80650008
+		opword 0x8005000C
+		opword 0x90730004
+		opword 0x90130008
+		opword 0x80050010
+		opword 0x9013000C
+		opword 0xD3F30024
+		opword 0xD3F30020
+		opword 0xD3F3001C
+		opword 0x807A0090
+		opword 0x801A0094
+		opword 0x90730034
+		opword 0x90130038
+		opword 0x801A0098
+		opword 0x9013003C
+		opword 0x807A009C
+		opword 0x801A00A0
+		opword 0x90730040
+		opword 0x90130044
+		opword 0x801A00A4
+		opword 0x90130048
+		opword 0x807A00A8
+		opword 0x801A00AC
+		opword 0x9073004C
+		opword 0x90130050
+		opword 0x801A00B0
+		opword 0x90130054
+		opword 0x807A00B4
+		opword 0x801A00B8
+		opword 0x90730058
+		opword 0x9013005C
+		opword 0x801A00BC
+		opword 0x90130060
+		opword 0x80730064
+		opword 0x80630000
+		bl mapGrpFlagOn
+		opword 0x80130068
+		opword 0x3A940001
+		opword 0x3AB50018
+		opword 0x60000001
+		opword 0x90130068
+		opword 0x4BFFFF08
+		opword 0x80770190
+		opword 0x28030000
+		opword 0x41820010
+		opword 0x3880000A
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x2C1F0000
+		opword 0x41820028
+		opword 0x807701A0
+		opword 0x28030000
+		opword 0x4182001C
+		opword 0x3880000A
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x8003015C
+		opword 0x3C780002
+		opword 0x900380E4
+		opword 0x2C1E0000
+		opword 0x41820028
+		opword 0x807701A4
+		opword 0x28030000
+		opword 0x4182001C
+		opword 0x3880000A
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x8003015C
+		opword 0x3C780002
+		opword 0x900380E8
+		opword 0x2C1D0000
+		opword 0x41820028
+		opword 0x807701A8
+		opword 0x28030000
+		opword 0x4182001C
+		opword 0x3880000A
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x8003015C
+		opword 0x3C780002
+		opword 0x900380EC
+		opword 0x2C1C0000
+		opword 0x41820028
+		opword 0x807701AC
+		opword 0x28030000
+		opword 0x4182001C
+		opword 0x3880000A
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x8003015C
+		opword 0x3C780002
+		opword 0x900380F0
+		opword 0x2C1F0000
+		opword 0x40820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000002
+		opword 0x980380DC
+		opword 0x2C1E0000
+		opword 0x40820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000004
+		opword 0x980380DC
+		opword 0x2C1D0000
+		opword 0x40820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000008
+		opword 0x980380DC
+		opword 0x881701B1
+		opword 0x7C000775
+		opword 0x41820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000002
+		opword 0x980380DC
+		opword 0x881701B2
+		opword 0x7C000775
+		opword 0x41820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000004
+		opword 0x980380DC
+		opword 0x881701B3
+		opword 0x7C000775
+		opword 0x41820014
+		opword 0x3C780002
+		opword 0x880380DC
+		opword 0x60000008
+		opword 0x980380DC
+		opword 0x2C1B0000
+		opword 0x4082002C
+		opword 0x3CB80002
+		opword 0x387A01B4
+		opword 0x880580DC
+		opword 0x38800001
+		opword 0x60000020
+		opword 0x980580DC
+		bl mapGrpFlagOn
+		opword 0x387A028C
+		opword 0x38800001
+		bl mapGrpFlagOn
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
       }
     }
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void BattleStageObjectMain(void) {
+	asm volatile {
+		opword 0x3B800000
+		li r27, 0x0
+		lwz r31, _battleWorkPointer(r13)
+		opword 0x3FDF0002
+		opword 0x3FBB0001
+		opword 0x3BBD7140
+		opword 0x7FBFEA14
+		opword 0x801D0000
+		opword 0x2C000000
+		opword 0x408103DC
+		opword 0xC03D0004
+		opword 0x38800000
+		opword 0xC01D0034
+		opword 0xFC010000
+		opword 0x40820024
+		opword 0xC03D0008
+		opword 0xC01D0038
+		opword 0xFC010000
+		opword 0x40820014
+		opword 0xC03D000C
+		opword 0xC01D003C
+		opword 0xFC010000
+		opword 0x41820020
+		opword 0x807D0004
+		opword 0x38800001
+		opword 0x801D0008
+		opword 0x907D0034
+		opword 0x901D0038
+		opword 0x801D000C
+		opword 0x901D003C
+		opword 0xC03D0010
+		opword 0xC01D0040
+		opword 0xFC010000
+		opword 0x40820024
+		opword 0xC03D0014
+		opword 0xC01D0044
+		opword 0xFC010000
+		opword 0x40820014
+		opword 0xC03D0018
+		opword 0xC01D0048
+		opword 0xFC010000
+		opword 0x41820020
+		opword 0x807D0010
+		opword 0x38800001
+		opword 0x801D0014
+		opword 0x907D0040
+		opword 0x901D0044
+		opword 0x801D0018
+		opword 0x901D0048
+		opword 0xC03D0028
+		opword 0xC01D0058
+		opword 0xFC010000
+		opword 0x40820024
+		opword 0xC03D002C
+		opword 0xC01D005C
+		opword 0xFC010000
+		opword 0x40820014
+		opword 0xC03D0030
+		opword 0xC01D0060
+		opword 0xFC010000
+		opword 0x41820020
+		opword 0x807D0028
+		opword 0x38800001
+		opword 0x801D002C
+		opword 0x907D0058
+		opword 0x901D005C
+		opword 0x801D0030
+		opword 0x901D0060
+		opword 0xC03D001C
+		opword 0xC01D004C
+		opword 0xFC010000
+		opword 0x40820024
+		opword 0xC03D0020
+		opword 0xC01D0050
+		opword 0xFC010000
+		opword 0x40820014
+		opword 0xC03D0024
+		opword 0xC01D0054
+		opword 0xFC010000
+		opword 0x41820020
+		opword 0x807D001C
+		opword 0x38800001
+		opword 0x801D0020
+		opword 0x907D004C
+		opword 0x901D0050
+		opword 0x801D0024
+		opword 0x901D0054
+		opword 0x807D0068
+		opword 0x546007BD
+		opword 0x41820010
+		opword 0x546007FA
+		opword 0x38800001
+		opword 0x901D0068
+		opword 0x807D0064
+		opword 0xA0030006
+		opword 0x2C000002
+		opword 0x41820008
+		opword 0x48000050
+		opword 0xC03E80C4
+		opword 0xC01E80D0
+		opword 0xFC010000
+		opword 0x40820024
+		opword 0xC03E80C8
+		opword 0xC01E80D4
+		opword 0xFC010000
+		opword 0x40820014
+		opword 0xC03E80CC
+		opword 0xC01E80D8
+		opword 0xFC010000
+		opword 0x41820020
+		opword 0x807E80C4
+		opword 0x38800001
+		opword 0x801E80C8
+		opword 0x907E80D0
+		opword 0x901E80D4
+		opword 0x801E80CC
+		opword 0x901E80D8
+		opword 0x807D0064
+		opword 0xA0030006
+		opword 0x2C000003
+		opword 0x41820128
+		opword 0x40800018
+		opword 0x2C000002
+		opword 0x40800080
+		opword 0x2C000000
+		opword 0x40800010
+		opword 0x480001A8
+		opword 0x2C000008
+		opword 0x408001A0
+		opword 0x2C040000
+		opword 0x41820198
+		opword 0xC07D0004
+		opword 0xC05D0010
+		opword 0xC03D0008
+		opword 0xC01D0014
+		opword 0xEC63102A
+		opword 0xC0BD0028
+		opword 0xC05D000C
+		opword 0xEC81002A
+		opword 0xC01D0018
+		opword 0xEC25182A
+		opword 0xC0BD002C
+		opword 0xEC02002A
+		opword 0xC07D0030
+		opword 0xEC45202A
+		opword 0x80630000
+		opword 0xEC63002A
+		bl mapObjTranslate
+		opword 0x807D0064
+		opword 0xC03D001C
+		opword 0x80630000
+		opword 0xC05D0020
+		opword 0xC07D0024
+		bl mapObjRotate
+		opword 0x48000138
+		opword 0x2C040000
+		opword 0x41820130
+		opword 0xC07D0004
+		opword 0xC05D0010
+		opword 0xC03D0008
+		opword 0xC01D0014
+		opword 0xEC63102A
+		opword 0xC0BD0028
+		opword 0xC05D000C
+		opword 0xEC81002A
+		opword 0xC01D0018
+		opword 0xEC25182A
+		opword 0xC0BD002C
+		opword 0xEC02002A
+		opword 0xC07D0030
+		opword 0xEC45202A
+		opword 0x80630000
+		opword 0xEC63002A
+		bl mapObjTranslate
+		lfs f1, float_0_8041cd04(r2)
+		opword 0xC01D0014
+		opword 0x807D0064
+		opword 0xFC600890
+		opword 0xFC400050
+		opword 0x80630000
+		bl mapObjTranslate
+		opword 0x807D0064
+		opword 0xC03E80C4
+		opword 0x80630000
+		opword 0xC05E80C8
+		opword 0xC07E80CC
+		bl mapObjRotate
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x807D0064
+		opword 0xFC600890
+		opword 0xC05D0014
+		opword 0x80630000
+		bl mapObjTranslate
+		opword 0x4800009C
+		opword 0x2C040000
+		opword 0x41820094
+		opword 0xC07D0004
+		opword 0xC05D0010
+		opword 0xC03D0008
+		opword 0xC01D0014
+		opword 0xEC63102A
+		opword 0xC0BD0028
+		opword 0xC05D000C
+		opword 0xEC81002A
+		opword 0xC01D0018
+		opword 0xEC25182A
+		opword 0xC0BD002C
+		opword 0xEC02002A
+		opword 0xC07D0030
+		opword 0xEC45202A
+		opword 0x80630000
+		opword 0xEC63002A
+		bl mapObjTranslate
+		lfs f1, float_0_8041cd04(r2)
+		opword 0xC01D0008
+		opword 0x807D0064
+		opword 0xFC600890
+		opword 0xFC400050
+		opword 0x80630000
+		bl mapObjTranslate
+		opword 0x807D0064
+		opword 0xC03D001C
+		opword 0x80630000
+		opword 0xC05D0020
+		opword 0xC07D0024
+		bl mapObjRotate
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x807D0064
+		opword 0xFC600890
+		opword 0xC05D0008
+		opword 0x80630000
+		bl mapObjTranslate
+		opword 0x801D0068
+		opword 0x540007FF
+		opword 0x41820030
+		opword 0x807D0064
+		opword 0x80630000
+		bl mapGetMapObj
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x40820040
+		opword 0x807D0064
+		opword 0x38800001
+		opword 0x80630000
+		bl mapGrpFlagOn
+		opword 0x4800002C
+		opword 0x807D0064
+		opword 0x80630000
+		bl mapGetMapObj
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x807D0064
+		opword 0x38800001
+		opword 0x80630000
+		bl mapGrpFlagOff
+		opword 0x3B9C0001
+		opword 0x3B7B007C
+		opword 0x2C1C0020
+		opword 0x4180FC04
+		bl BattleObjectConfig
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
     if (!found)
     {
       evtSetValue(event, arg0, ud[1]);
@@ -2770,11 +5697,26 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
               }
             }
           }
+#endif
+#ifndef NONMATCHING
+void BattleObjectConfig(void) {
+	//stubbed in retail
+}
+#endif
 
+#ifdef NONMATCHING
         }
       }
     }
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyA1(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgA1Evt;
+	EventEntry* entry;
+#endif
 
+#ifdef NONMATCHING
   }
   sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
   sfxNormal = "SFX_BTL_STAGE_DAMAGE_NORMAL1";
@@ -2809,7 +5751,24 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           BtlUnit_GetHitPos(unit, part, &hit.x, &hit.y, &hit.z);
           width = BtlUnit_GetWidth(unit);
           break;
+#endif
+#ifndef NONMATCHING
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[0]);
+	STAGE_WORK(wp)->bgEvtId[0] = 0;
+	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
+		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
+	}
+	if (!evt) {
+		evt = _object_turn_event_A1;
+	}
+	entry = evtEntry(evt, 10, 0);
+	if (entry) {
+		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
+	}
+}
+#endif
 
+#ifdef NONMATCHING
         case 1:
           hit.x = ((e->unitId % 20) * 25) - 230;
           hit.y = BattleStageGetPtr()->audienceSizeY;
@@ -2818,14 +5777,40 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           btl_camera_set_moveSpeedLv(0, 2);
           width = 0.0f;
           break;
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyA2(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgA2Evt;
+#endif
 
+#ifdef NONMATCHING
         default:
           hit = (Vec){0.0f, 0.0f, 0.0f};
           width = 0.0f;
           break;
+#endif
+#ifndef NONMATCHING
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[1]);
+	STAGE_WORK(wp)->bgEvtId[1] = 0;
+	if (!evt) {
+		evt = _object_turn_event_A2;
+	}
+	evtEntry(evt, 10, 0);
+}
+#endif
 
+#ifdef NONMATCHING
       }
+#endif
+#ifndef NONMATCHING
+void BattleStage_DestroyB(void) {
+	BattleWork* wp = _battleWorkPointer;
+	void* evt = wp->fbatInfo->setup->stageData->destroyBgBEvt;
+	EventEntry* entry;
+#endif
 
+#ifdef NONMATCHING
       pos = hit;
       pos.y = BattleGetFloorHeight(wp, pos.x, pos.y, pos.z);
       if (hit.x >= 0.0f)
@@ -2839,17 +5824,336 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
       switch (e->preCheck)
       {
         case 2:
+#endif
+#ifndef NONMATCHING
+	evtDeleteID(STAGE_WORK(wp)->bgEvtId[2]);
+	STAGE_WORK(wp)->bgEvtId[2] = 0;
+	if (STAGE_WORK(wp)->bgDestroyEvtId && evtCheckID(STAGE_WORK(wp)->bgDestroyEvtId)) {
+		evtDeleteID(*(s32*)(wp->field_180C0 + 0x20));
+	}
+	if (!evt) {
+		evt = _object_turn_event_B;
+	}
+	entry = evtEntry(evt, 10, 0);
+	if (entry) {
+		*(s32*)(wp->field_180C0 + 0x20) = entry->eventId;
+	}
+}
+#endif
 
+#ifdef NONMATCHING
         case 3:
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+s32 _set_mobj_rotate_x(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[32];
+	asm {
+		lis r5, vec3_802f3ac8@ha
+	}
+	asm volatile {
+		opword 0x7C982378
+		opword 0x7C7D1B78
+		addi r30, r5, vec3_802f3ac8@l
+		opword 0x3B400000
+		opword 0x80C30018
+		lwz r28, _battleWorkPointer(r13)
+		opword 0x80860000
+		opword 0x3F7C0002
+		bl evtGetValue
+		opword 0x2C180000
+		opword 0x7C7F1B78
+		opword 0x41820080
+		opword 0x2C1F0002
+		opword 0x41820064
+		opword 0x40800074
+		opword 0x2C1F0000
+		opword 0x40800008
+		opword 0x48000068
+		opword 0x38600000
+		opword 0x38000020
+		opword 0x7C641B78
+		opword 0x7C0903A6
+		opword 0x3CC30001
+		opword 0x38C67140
+		opword 0x7CDC3214
+		opword 0x80060000
+		opword 0x2C000000
+		opword 0x40810020
+		opword 0x80A60064
+		opword 0xA0050006
+		opword 0x7C00F800
+		opword 0x40820010
+		opword 0x88050014
+		opword 0x98060070
+		opword 0x98860071
+		opword 0x3863007C
+		opword 0x4200FFC8
+		opword 0x48000018
+		opword 0x38600000
+		opword 0x3800003C
+		opword 0x907D007C
+		opword 0x901D0080
+		opword 0x907D0084
+		opword 0x2C1F0002
+		opword 0x418200F8
+		opword 0x408001A4
+		opword 0x2C1F0000
+		opword 0x40800008
+		opword 0x48000198
+		opword 0x3BBE0244
+		opword 0x3BDE025C
+		opword 0x3B600000
+		opword 0x3B200000
+		addis r24, r25, 0x1
+		opword 0x3B187140
+		opword 0x7F1CC214
+		opword 0x80180000
+		opword 0x2C000000
+		opword 0x408100AC
+		opword 0x80780064
+		opword 0xA0030006
+		opword 0x7C00F800
+		opword 0x4082009C
+		opword 0x88780070
+		opword 0x28030000
+		opword 0x4182001C
+		opword 0x3803FFFF
+		opword 0x7F03C378
+		opword 0x98180070
+		opword 0x3B400001
+		bl _mobj_shake_main
+		opword 0x48000078
+		opword 0x88180071
+		opword 0x28000000
+		opword 0x40820028
+		opword 0x2C1F0000
+		opword 0x40820014
+		opword 0x7FA3EB78
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x48000010
+		opword 0x7FC3F378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x88980071
+		opword 0x38600002
+		lfs f2, float_90_8041cd08(r2)
+		opword 0x38040001
+		opword 0x98180071
+		opword 0x80B80064
+		opword 0xC0380078
+		opword 0x88980071
+		opword 0x88A50015
+		bl intpl_sub
+		opword 0xD038001C
+		opword 0x80780064
+		opword 0x88980071
+		opword 0x88030015
+		opword 0x7C040040
+		opword 0x40800008
+		opword 0x3B400001
+		opword 0x3B7B0001
+		opword 0x3B39007C
+		opword 0x2C1B0020
+		opword 0x4180FF34
+		opword 0x480000B4
+		opword 0x807D007C
+		opword 0x2C030000
+		opword 0x41820014
+		opword 0x3803FFFF
+		opword 0x3B400001
+		opword 0x901D007C
+		opword 0x48000098
+		opword 0x801D0084
+		opword 0x2C000000
+		opword 0x40820028
+		opword 0x80DE00FC
+		opword 0x387E0274
+		opword 0x80BE0100
+		la r4, _af_pad+0
+		opword 0x801E0104
+		opword 0x90C10008
+		opword 0x90A1000C
+		opword 0x90010010
+		bl psndSFXOn_3D
+		opword 0x809D0084
+		opword 0x38600002
+		lfs f1, float_0_8041cd04(r2)
+		opword 0x38040001
+		lfs f2, float_90_8041cd08(r2)
+		opword 0x901D0084
+		opword 0x809D0084
+		opword 0x80BD0080
+		bl intpl_sub
+		opword 0xFC00081E
+		opword 0x3C004330
+		opword 0x90010020
+		opword 0xC83E0168
+		opword 0xD8010018
+		opword 0x8001001C
+		opword 0x6C008000
+		opword 0x90010024
+		opword 0xC8010020
+		opword 0xEC000828
+		opword 0xD01B80C4
+		opword 0x807D0084
+		opword 0x801D0080
+		opword 0x7C030000
+		opword 0x40800008
+		opword 0x3B400001
+		opword 0x207A0000
+		opword 0x38000002
+		opword 0x7C631910
+		opword 0x7C031878
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
         case 4:
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 _mobj_set_alpha(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFD0
+		opword 0x7C0802A6
+		opword 0x90010034
+		opword 0xBFC10028
+		opword 0x7C7E1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7F1B78
+		opword 0x7FC3F378
+		bl evtGetValue
+		opword 0x2C1F0002
+		opword 0x547E063E
+		opword 0x4182008C
+		opword 0x40800014
+		opword 0x2C1F0000
+		opword 0x41820018
+		opword 0x40800048
+		opword 0x480000DC
+		opword 0x2C1F0004
+		opword 0x408000D4
+		opword 0x480000A0
+		la r3, str_8041CD68(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x418200C0
+		lwz r0, dat_8041cce8(r2)
+		opword 0x38810024
+		la r3, str_8041CD68(r2)
+		opword 0x90010020
+		opword 0x9BC10023
+		opword 0x80010020
+		opword 0x90010024
+		bl mapGrpSetColor
+		opword 0x4800009C
+		la r3, str_8041CD6C(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x4182008C
+		lwz r0, dat_8041ccec(r2)
+		opword 0x3881001C
+		la r3, str_8041CD6C(r2)
+		opword 0x90010018
+		opword 0x9BC1001B
+		opword 0x80010018
+		opword 0x9001001C
+		bl mapGrpSetColor
+		opword 0x48000068
+		la r3, str_8041CD70(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x41820058
+		lwz r0, dat_8041ccf0(r2)
+		opword 0x38810014
+		la r3, str_8041CD70(r2)
+		opword 0x90010010
+		opword 0x9BC10013
+		opword 0x80010010
+		opword 0x90010014
+		bl mapGrpSetColor
+		opword 0x48000034
+		la r3, str_8041CD74(r2)
+		bl mapGetMapObj
+		opword 0x28030000
+		opword 0x41820024
+		lwz r0, dat_8041ccf4(r2)
+		opword 0x3881000C
+		la r3, str_8041CD74(r2)
+		opword 0x90010008
+		opword 0x9BC1000B
+		opword 0x80010008
+		opword 0x9001000C
+		bl mapGrpSetColor
+		opword 0xBBC10028
+		opword 0x38600002
+		opword 0x80010034
+		opword 0x7C0803A6
+		opword 0x38210030
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
         case 6:
           hit.y = pos.y;
           break;
+#endif
+#ifndef NONMATCHING
+s32 _mobj_destroy(EventEntry* event, BOOL isFirstCall) {
+	BattleWork* wp = _battleWorkPointer;
+	BattleStageObject* obj;
+	BattleUnit* unit;
+	BattleUnitPart* part;
+	s32 layer;
+	int i;
+#endif
 
+#ifdef NONMATCHING
       }
+#endif
+#ifndef NONMATCHING
+	layer = evtGetValue(event, event->args[0]);
+	for (i = 0; i < 32; i++) {
+		obj = &wp->stageObjects[i];
+		if (obj->id > 0 && obj->data->mLayer == layer) {
+			obj->mFlags |= 1;
+			unit = BattleGetUnitPtr(wp, obj->mBattleUnitIdx);
+			if (unit) {
+				for (part = unit->mParts; part; part = part->mNextPart) {
+					part->attributes |= 0x10000;
+				}
+			}
+		}
+	}
+	switch (layer) {
+		case 0:
+			STAGE_WORK(wp)->flags |= 2;
+			break;
+		case 1:
+			STAGE_WORK(wp)->flags |= 4;
+			break;
+		case 2:
+			STAGE_WORK(wp)->flags |= 8;
+			break;
+	}
+	return EVT_RETURN_DONE;
+}
+#endif
 
+#ifdef NONMATCHING
       e->sfxId = -1;
       e->field_0x12 = 0;
       sfxTub = "SFX_BTL_STAGE_DAMAGE_TUB1";
@@ -2858,15 +6162,139 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
         case 0:
           e->effect = effFallEntry(4, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
           break;
+#endif
+#ifndef NONMATCHING
+s32 _get_bgset_attack_data(EventEntry* event, BOOL isFirstCall) {
+	BattleWork* wp = _battleWorkPointer;
+	s32* args = event->args;
+	s32 type = evtGetValue(event, args[0]);
+	s32 out = args[1];
+	BattleWeapon* weapon;
+#endif
 
+#ifdef NONMATCHING
         case 1:
           e->effect = effFallEntry(5, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
           break;
+#endif
+#ifndef NONMATCHING
+	switch (type) {
+		case 0:
+			weapon = &wp->fbatInfo->setup->stageData->bgAWeapon;
+			break;
+		case 2:
+			weapon = &wp->fbatInfo->setup->stageData->bgBWeapon;
+			break;
+		case 1:
+		default:
+			weapon = NULL;
+			break;
+	}
+	if (weapon && !weapon->hpDamageFn) {
+		weapon = NULL;
+	}
+	evtSetValue(event, out, (s32)weapon);
+	return EVT_RETURN_DONE;
+}
+#endif
 
+#ifdef NONMATCHING
         case 2:
           e->effect = effFallEntry(0, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 100, 90);
           break;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 _bgset_kemuri_effect(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x80A30018
+		lis r4, vec3_802f3ac8@ha
+		lwz r26, _battleWorkPointer(r13)
+		addi r31, r4, vec3_802f3ac8@l
+		opword 0x80850000
+		bl evtGetValue
+		opword 0x7C7E1B78
+		opword 0x3BBF01FC
+		opword 0x3B9F0214
+		opword 0x3B7F022C
+		opword 0x3B200000
+		opword 0x3BE00000
+		addis r24, r31, 0x1
+		opword 0x3B187140
+		opword 0x7F1AC214
+		opword 0x80180000
+		opword 0x2C000000
+		opword 0x408100E8
+		opword 0x80780064
+		opword 0xA0030006
+		opword 0x7C00F000
+		opword 0x408200D8
+		opword 0x2C1E0001
+		opword 0xC3F80004
+		opword 0xC3D80008
+		lfs f29, 0xc(r24)
+		opword 0x41820050
+		opword 0x40800010
+		opword 0x2C1E0000
+		opword 0x40800014
+		opword 0x480000B4
+		opword 0x2C1E0003
+		opword 0x408000AC
+		opword 0x48000064
+		lfs f0, float_30_8041cd5c(r2)
+		opword 0xFC20F890
+		opword 0xFC40F090
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xEFBD002A
+		opword 0x38600003
+		opword 0xFC60E890
+		bl effKemuri1N64Entry
+		opword 0x7FA3EB78
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x48000078
+		lfs f0, float_15_8041cd18(r2)
+		opword 0xFC20F890
+		opword 0xFC40F090
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xEFBD002A
+		opword 0x38600000
+		opword 0xFC60E890
+		bl effKemuri1N64Entry
+		opword 0x7F83E378
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x48000048
+		lfs f0, float_30_8041cd5c(r2)
+		opword 0xFC20F890
+		opword 0xFC40F090
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xEFBD002A
+		opword 0x38600003
+		opword 0xFC60E890
+		bl effKemuri1N64Entry
+		opword 0xFC20F890
+		lfs f4, float_0_8041cd04(r2)
+		opword 0xFC40F090
+		opword 0x38600004
+		opword 0xFC60E890
+		bl effKemuri1N64Entry
+		opword 0x7F63DB78
+		opword 0x38980004
+		bl psndSFXOn_3D
+		opword 0x3B390001
+		opword 0x3BFF007C
+		opword 0x2C190020
+		opword 0x4180FEF8
+		opword 0x38600002
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
         case 3:
           e->effect = effFallEntry(1, pos.x, pos.y, pos.z, width, hit.y - pos.y, dir, 1, 90);
           break;
@@ -3067,4598 +6495,16 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
   BattleFree((void *) ud[0]);
   evtSetValue(event, arg0, ud[1]);
   return 2;
-}
 #endif
-
 #ifndef NONMATCHING
-// ASM-STOPGAP: BattleGetObjectPtr (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-
-asm s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x1670(r1)
-	mflr r0
-	stw r0, 0x1674(r1)
-	li r0, 0x1668
-	stfd f31, 0x1660(r1)
-	psq_stx f31, r1, r0, 0, 0
-	li r0, 0x1658
-	stfd f30, 0x1650(r1)
-	psq_stx f30, r1, r0, 0, 0
-	stmw r14, 0x1608(r1)
-	lwz r6, _battleWorkPointer(r0)
-	mr r15, r3
-	lwz r7, 0x18(r3)
-	lis r5, vec3_802f3ac8@ha
-	addis r3, r6, 0x2
-	cmpwi r4, 0x0
-	lwz r17, -0x7f08(r3)
-	mr r25, r6
-	lwz r22, 0x0(r7)
-	addi r30, r5, vec3_802f3ac8@l
-	li r21, 0x0
-	beq @1
-	li r3, 0xec
-	bl BattleAlloc
-	mr r14, r3
-	li r0, 0x0
-	stw r14, 0x78(r15)
-	li r4, 0x0
-	li r5, 0xec
-	stw r0, 0x7c(r15)
-	bl memset
-	li r3, -0x1
-	li r0, 0x3
-	stb r3, 0x4(r14)
-	li r4, 0x0
-	mtctr r0
-	@2:
-	addi r0, r4, 0x1
-	addi r4, r4, 0x1
-	stbx r3, r14, r0
-	bdnz @2
-	mr r3, r25
-	bl BattleCheckConcluded
-	cmpwi r3, 0x0
-	beq @3
-	lwz r5, 0x7c(r15)
-	mr r3, r15
-	mr r4, r22
-	bl evtSetValue
-	li r3, 0x2
-	b @4
-	@3:
-	li r0, 0x1
-	li r16, 0x0
-	stb r0, 0x0(r14)
-	li r24, 0x0
-	b @5
-	@6:
-	addi r23, r24, 0x4
-	li r0, 0x3
-	add r23, r14, r23
-	li r18, 0x0
-	stb r16, 0x0(r23)
-	mtctr r0
-	@7:
-	addi r0, r18, 0x1
-	lbzx r0, r14, r0
-	extsb r0, r0
-	cmpwi r0, -0x1
-	beq @8
-	addi r18, r18, 0x1
-	bdnz @7
-	@8:
-	cmpwi r18, 0x3
-	blt @9
-	li r3, 0x3
-	bl irand
-	addi r0, r3, 0x1
-	lbzx r0, r14, r0
-	stb r0, 0x1(r23)
-	b @10
-	@9:
-	li r0, 0x9
-	li r3, 0x0
-	li r4, 0x0
-	mtctr r0
-	@11:
-	addi r0, r4, 0xc0
-	addi r4, r4, 0x1
-	lbzx r0, r17, r0
-	add r3, r3, r0
-	bdnz @11
-	bl irand
-	li r0, 0x0
-	stb r0, 0x1(r23)
-	b @12
-	@13:
-	extsb r4, r5
-	addi r0, r4, 0xc0
-	lbzx r0, r17, r0
-	subf. r3, r0, r3
-	blt @14
-	lbz r4, 0x1(r23)
-	addi r0, r4, 0x1
-	stb r0, 0x1(r23)
-	@12:
-	lbz r5, 0x1(r23)
-	extsb r0, r5
-	cmpwi r0, 0x8
-	blt @13
-	@14:
-	addi r0, r18, 0x1
-	stbx r5, r14, r0
-	@10:
-	lbz r3, 0x1(r23)
-	li r0, 0x18
-	addi r5, r23, 0x24
-	extsb r3, r3
-	mulli r3, r3, 0xc0
-	addi r3, r3, 0xcc
-	add r4, r17, r3
-	mtctr r0
-	subi r4, r4, 0x4
-	@15:
-	lwz r3, 0x4(r4)
-	lwzu r0, 0x8(r4)
-	stw r3, 0x4(r5)
-	stwu r0, 0x8(r5)
-	bdnz @15
-	lbz r0, 0x1(r23)
-	cmpwi r0, 0x6
-	bne @16
-	li r3, 0x64
-	bl irand
-	cmpwi r3, 0x32
-	bge @17
-	lwz r0, 0x8c(r23)
-	ori r0, r0, 0x100
-	stw r0, 0x8c(r23)
-	lwz r0, 0x8c(r23)
-	rlwinm r0, r0, 0, 23, 21
-	stw r0, 0x8c(r23)
-	b @16
-	@17:
-	lwz r0, 0x8c(r23)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x8c(r23)
-	lwz r0, 0x8c(r23)
-	ori r0, r0, 0x200
-	stw r0, 0x8c(r23)
-	@16:
-	li r0, 0x0
-	addi r18, r23, 0x28
-	stw r0, 0x4(r23)
-	bl pouchGetPtr
-	lhz r0, 0x8c(r3)
-	cmplwi r0, 0x0
-	beq @18
-	bl BattleAudienceBaseGetPtr
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 17, 17
-	bne @18
-	lbz r0, 0x1(r23)
-	extsb r0, r0
-	cmpwi r0, 0x6
-	beq @18
-	cmpwi r0, 0x7
-	beq @18
-	addis r3, r25, 0x2
-	lwz r0, -0x6f98(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	bne @19
-	li r3, 0x64
-	bl irand
-	cmpwi r3, 0xa
-	bge @18
-	@19:
-	li r3, 0x1
-	li r0, -0x1
-	stw r3, 0x4(r23)
-	stw r0, 0xc(r23)
-	bl BattleAudience_HaitiRandForFallObject
-	stw r3, 0x8(r23)
-	li r0, 0x1
-	li r21, 0x1
-	stw r0, 0x7c(r15)
-	@18:
-	lwz r0, 0x4(r23)
-	cmpwi r0, 0x0
-	bne @20
-	mr r3, r25
-	bl BattleGetSystemPtr
-	lbz r0, 0x12(r25)
-	mr r4, r18
-	lwz r5, 0x0(r3)
-	addi r3, r1, 0xb0c
-	neg r0, r0
-	lwz r7, 0x64(r18)
-	lwz r8, 0x68(r18)
-	extsb r9, r0
-	li r6, 0x1
-	bl BattleSamplingEnemy
-	lbz r0, 0x1578(r1)
-	extsb. r0, r0
-	bgt @21
-	lwz r5, 0x7c(r15)
-	mr r3, r15
-	mr r4, r22
-	bl evtSetValue
-	li r3, 0x2
-	b @4
-	@21:
-	lwz r4, 0x7c(r18)
-	addi r3, r1, 0xb0c
-	addi r5, r1, 0xc
-	addi r6, r1, 0x8
-	li r21, 0x1
-	bl BattleChoiceSamplingEnemy
-	lwz r3, 0xc(r1)
-	addi r0, r16, 0x1
-	li r5, 0x1
-	mr r7, r16
-	stw r3, 0x8(r23)
-	mulli r3, r16, 0xe8
-	li r4, 0x0
-	lwz r6, 0x8(r1)
-	stw r6, 0xc(r23)
-	stb r5, 0x14(r23)
-	mtctr r0
-	cmpwi r16, 0x0
-	blt @20
-	@22:
-	addi r6, r3, 0x4
-	add r6, r14, r6
-	cmplw r23, r6
-	beq @23
-	lwz r0, 0x4(r6)
-	cmpwi r0, 0x0
-	bne @23
-	lwz r5, 0x8(r23)
-	lwz r0, 0x8(r6)
-	cmpw r5, r0
-	bne @23
-	stb r4, 0x14(r6)
-	@23:
-	subi r7, r7, 0x1
-	subi r3, r3, 0xe8
-	bdnz @22
-	@20:
-	addi r16, r16, 0x1
-	addi r24, r24, 0xe8
-	@5:
-	lbz r0, 0x0(r14)
-	cmpw r16, r0
-	blt @6
-	cmpwi r21, 0x0
-	bne @24
-	lwz r5, 0x7c(r15)
-	mr r3, r15
-	mr r4, r22
-	bl evtSetValue
-	li r3, 0x2
-	b @4
-	@24:
-	li r16, 0x0
-	li r24, 0x0
-	b @25
-	@26:
-	addi r17, r24, 0x4
-	add r17, r14, r17
-	lwz r0, 0x4(r17)
-	addi r23, r17, 0x28
-	cmpwi r0, 0x0
-	bne @27
-	lbz r0, 0x14(r17)
-	li r26, 0x0
-	cmplwi r0, 0x0
-	beq @28
-	ori r26, r26, 0x100
-	@28:
-	lbz r0, 0x15(r17)
-	cmplwi r0, 0x0
-	beq @29
-	oris r26, r26, 0x10
-	@29:
-	lwz r3, 0x8(r17)
-	lwz r4, 0xc(r17)
-	bl BattleGetUnitPartsPtr
-	lwz r4, 0x8(r17)
-	mr r21, r3
-	mr r3, r25
-	bl BattleGetUnitPtr
-	mr r18, r3
-	mr r3, r25
-	bl BattleGetSystemPtr
-	mr r4, r18
-	mr r5, r21
-	mr r6, r23
-	mr r7, r26
-	bl BattlePreCheckDamage
-	stw r3, 0x1c(r17)
-	lwz r0, 0x1c(r17)
-	cmpwi r0, 0x1
-	bne @27
-	lbz r0, 0x14(r17)
-	cmplwi r0, 0x0
-	bne @27
-	li r3, 0x0
-	bl irand
-	extsh r18, r3
-	li r21, 0x0
-	li r26, 0x0
-	li r27, 0x1
-	b @30
-	@31:
-	addi r23, r26, 0x4
-	lwz r3, 0x8(r17)
-	add r23, r14, r23
-	lwz r0, 0x8(r23)
-	cmpw r3, r0
-	bne @32
-	sth r18, 0x10(r23)
-	li r3, 0x16
-	bl irand
-	lbz r0, 0x14(r23)
-	add r3, r3, r18
-	addi r3, r3, 0x14
-	cmplwi r0, 0x0
-	extsh r18, r3
-	beq @32
-	stb r27, 0x15(r23)
-	@32:
-	addi r21, r21, 0x1
-	addi r26, r26, 0xe8
-	@30:
-	cmpw r21, r16
-	blt @31
-	@27:
-	addi r16, r16, 0x1
-	addi r24, r24, 0xe8
-	@25:
-	lbz r0, 0x0(r14)
-	cmpw r16, r0
-	blt @26
-	@1:
-	addi r29, r30, 0x114
-	addi r0, r30, 0x150
-	lwz r27, 0x78(r15)
-	addi r14, r30, 0x130
-	stw r29, 0x15f4(r1)
-	addi r28, r1, 0x14
-	li r24, 0x1
-	li r26, 0x0
-	stw r0, 0x15f0(r1)
-	li r31, 0x0
-	b @33
-	@34:
-	addi r21, r31, 0x4
-	add r21, r27, r21
-	lbz r0, 0x0(r21)
-	extsb r0, r0
-	cmpwi r0, -0x1
-	beq @35
-	lwz r0, 0x4(r21)
-	li r23, 0x0
-	li r24, 0x0
-	cmpwi r0, 0x0
-	bne @36
-	lwz r4, 0x8(r21)
-	mr r3, r25
-	bl BattleGetUnitPtr
-	mr r0, r3
-	lwz r3, 0x8(r21)
-	lwz r4, 0xc(r21)
-	mr r20, r0
-	bl BattleGetUnitPartsPtr
-	mr r19, r3
-	@36:
-	lwz r3, 0x24(r21)
-	cmplwi r3, 0x0
-	beq @37
-	lha r0, 0x10(r21)
-	cmpwi r0, 0x0
-	ble @38
-	@37:
-	lha r3, 0x10(r21)
-	subi r0, r3, 0x1
-	sth r0, 0x10(r21)
-	lha r0, 0x10(r21)
-	cmpwi r0, 0x0
-	bgt @35
-	lwz r0, 0x4(r21)
-	cmpwi r0, 0x1
-	beq @39
-	bge @40
-	cmpwi r0, 0x0
-	bge @41
-	b @40
-	@41:
-	mr r3, r20
-	mr r4, r19
-	addi r6, r1, 0x2c
-	addi r7, r1, 0x30
-	addi r5, r1, 0x28
-	bl BtlUnit_GetHitPos
-	mr r3, r20
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x15dc(r1)
-	lfd f1, 0x168(r30)
-	stw r0, 0x15d8(r1)
-	lfd f0, 0x15d8(r1)
-	fsubs f30, f0, f1
-	b @42
-	@39:
-	lwz r5, 0x8(r21)
-	li r4, 0x14
-	lis r0, 0x4330
-	lfd f1, 0x168(r30)
-	divw r3, r5, r4
-	stw r0, 0x15d8(r1)
-	mullw r0, r3, r4
-	subf r0, r0, r5
-	mulli r3, r0, 0x19
-	subi r0, r3, 0xe6
-	xoris r0, r0, 0x8000
-	stw r0, 0x15dc(r1)
-	lfd f0, 0x15d8(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x28(r1)
-	bl BattleStageGetPtr
-	lfs f0, 0xb34(r3)
-	lis r0, 0x4330
-	li r6, 0x14
-	stw r0, 0x15e0(r1)
-	lfd f2, 0x168(r30)
-	li r3, 0x0
-	stfs f0, 0x2c(r1)
-	li r4, 0x6
-	lfs f3, float_0p1_8041cd00(r0)
-	lwz r7, 0x8(r21)
-	stw r0, 0x15e8(r1)
-	divw r5, r7, r6
-	mullw r0, r5, r6
-	mulli r5, r5, 0x1e
-	subf r6, r0, r7
-	addi r0, r5, 0x73
-	xoris r5, r6, 0x8000
-	xoris r0, r0, 0x8000
-	stw r5, 0x15e4(r1)
-	stw r0, 0x15ec(r1)
-	lfd f1, 0x15e0(r1)
-	lfd f0, 0x15e8(r1)
-	fsubs f1, f1, f2
-	fsubs f0, f0, f2
-	fmadds f0, f3, f1, f0
-	stfs f0, 0x30(r1)
-	bl btl_camera_set_mode
-	li r3, 0x0
-	li r4, 0x2
-	bl btl_camera_set_moveSpeedLv
-	lfs f30, float_0_8041cd04(r0)
-	b @42
-	@40:
-	lwz r4, 0x108(r30)
-	lwz r3, 0x10c(r30)
-	lwz r0, 0x110(r30)
-	stw r4, 0x28(r1)
-	lfs f30, float_0_8041cd04(r0)
-	stw r3, 0x2c(r1)
-	stw r0, 0x30(r1)
-	@42:
-	lwz r5, 0x28(r1)
-	mr r3, r25
-	lwz r4, 0x2c(r1)
-	lwz r0, 0x30(r1)
-	stw r5, 0x34(r1)
-	stw r4, 0x38(r1)
-	lfs f1, 0x34(r1)
-	stw r0, 0x3c(r1)
-	lfs f2, 0x38(r1)
-	lfs f3, 0x3c(r1)
-	bl BattleGetFloorHeight
-	lfs f2, 0x28(r1)
-	lfs f0, float_0_8041cd04(r0)
-	stfs f1, 0x38(r1)
-	fcmpo cr0, f2, f0
-	cror eq, gt, eq
-	bne @43
-	lfs f31, float_90_8041cd08(r0)
-	b @44
-	@43:
-	lfs f31, float_270_8041cd0c(r0)
-	@44:
-	lwz r0, 0x1c(r21)
-	cmpwi r0, 0x5
-	beq @45
-	bge @46
-	cmpwi r0, 0x2
-	bge @47
-	b @45
-	@46:
-	cmpwi r0, 0x7
-	bge @45
-	@47:
-	lfs f0, 0x38(r1)
-	stfs f0, 0x2c(r1)
-	@45:
-	li r3, -0x1
-	li r0, 0x0
-	stw r3, 0x20(r21)
-	sth r0, 0x12(r21)
-	lbz r0, 0x1(r21)
-	extsb r0, r0
-	cmplwi r0, 0x8
-	bgt @35
-	lis r3, jumptable_80374848@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_80374848@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@48:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x4
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@49:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x5
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@50:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x0
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x64
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@51:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x1
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@52:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f7, float_5_8041cd10(r0)
-	li r3, 0x2
-	lfs f3, 0x3c(r1)
-	fsubs f5, f0, f2
-	lfs f1, 0x34(r1)
-	fadds f3, f7, f3
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@53:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x8
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@54:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f1, 0x34(r1)
-	li r3, 0x3
-	fsubs f5, f0, f2
-	lfs f3, 0x3c(r1)
-	li r4, 0x1
-	li r5, 0x5a
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@55:
-	mr r3, r20
-	bl BtlUnit_GetBelong
-	extsb. r0, r3
-	bne @56
-	lfs f4, float_0_8041cd04(r0)
-	fmr f6, f31
-	lfs f2, float_15_8041cd18(r0)
-	li r3, 0x6
-	lfs f0, 0x3c(r1)
-	fmr f5, f4
-	lfs f1, float_neg300_8041cd14(r0)
-	fadds f3, f2, f0
-	lfs f2, 0x38(r1)
-	li r4, 0x1
-	li r5, 0xb4
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@56:
-	lfs f4, float_0_8041cd04(r0)
-	fmr f6, f31
-	lfs f2, float_15_8041cd18(r0)
-	li r3, 0x6
-	lfs f0, 0x3c(r1)
-	fmr f5, f4
-	lfs f1, float_300_8041cd1c(r0)
-	fadds f3, f2, f0
-	lfs f2, 0x38(r1)
-	li r4, 0x1
-	li r5, 0xb4
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@57:
-	lfs f2, 0x38(r1)
-	fmr f4, f30
-	lfs f0, 0x2c(r1)
-	fmr f6, f31
-	lfs f7, float_5_8041cd10(r0)
-	li r3, 0x7
-	lfs f3, 0x3c(r1)
-	fsubs f5, f0, f2
-	lfs f1, 0x34(r1)
-	fadds f3, f7, f3
-	li r4, 0x1
-	li r5, 0xb4
-	bl effFallEntry
-	stw r3, 0x24(r21)
-	b @35
-	@38:
-	cmplwi r3, 0x0
-	beq @58
-	bl effFallCheckHit
-	cmpwi r3, 0x0
-	beq @35
-	@58:
-	lwz r0, 0x4(r21)
-	addi r18, r21, 0x28
-	cmpwi r0, 0x1
-	bne @59
-	lbz r4, 0x1(r21)
-	lwz r3, 0x8(r21)
-	bl BattleAudience_Case_FallObject_Aud
-	lwz r3, 0x20(r21)
-	bl psndSFXOff
-	lwz r3, 0x8(r21)
-	addi r5, r1, 0x20
-	addi r6, r1, 0x24
-	addi r4, r1, 0x1c
-	bl BattleAudience_GetHomePosition
-	lbz r0, 0x1(r21)
-	extsb r0, r0
-	cmpwi r0, 0x5
-	beq @60
-	bge @61
-	cmpwi r0, 0x2
-	bge @61
-	cmpwi r0, 0x0
-	bge @62
-	b @61
-	@62:
-	mr r3, r29
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	b @60
-	@61:
-	mr r3, r14
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	b @60
-	@59:
-	bl BattleAudience_Case_FallObject_Stage
-	lwz r0, 0x64(r18)
-	rlwinm. r0, r0, 0, 7, 7
-	beq @63
-	mr r3, r20
-	mr r4, r19
-	addi r6, r1, 0x20
-	addi r7, r1, 0x24
-	addi r5, r1, 0x1c
-	bl BtlUnit_GetHitPos
-	lbz r0, 0x14(r21)
-	li r16, 0x0
-	cmplwi r0, 0x0
-	beq @64
-	ori r16, r16, 0x100
-	@64:
-	lwz r3, 0x20(r21)
-	bl psndSFXOff
-	lwz r0, 0x1c(r21)
-	cmpwi r0, 0x5
-	beq @60
-	bge @65
-	cmpwi r0, 0x1
-	beq @66
-	bge @67
-	b @60
-	@65:
-	cmpwi r0, 0x7
-	bge @60
-	@67:
-	lbz r0, 0x1(r21)
-	extsb r0, r0
-	cmpwi r0, 0x5
-	beq @60
-	bge @60
-	cmpwi r0, 0x2
-	bge @60
-	cmpwi r0, 0x0
-	bge @68
-	b @60
-	@68:
-	mr r3, r29
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	b @60
-	@66:
-	lbz r0, 0x1(r21)
-	extsb r0, r0
-	cmpwi r0, 0x5
-	beq @69
-	bge @70
-	cmpwi r0, 0x2
-	bge @70
-	cmpwi r0, 0x0
-	bge @71
-	b @70
-	@71:
-	lwz r3, 0x15f4(r1)
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	b @72
-	@69:
-	lwz r3, 0x15f0(r1)
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	b @72
-	@70:
-	mr r3, r14
-	addi r4, r1, 0x1c
-	bl psndSFXOn_3D
-	@72:
-	mr r3, r20
-	bl BtlUnit_GetACPossibility
-	cmpwi r3, 0x0
-	beq @73
-	mr r3, r20
-	mr r4, r18
-	bl BattleActionCommandCheckDefence
-	@73:
-	mr r3, r25
-	bl BattleGetSystemPtr
-	mr r4, r20
-	mr r5, r19
-	mr r6, r18
-	mr r7, r16
-	bl BattleCheckDamage
-	b @60
-	@63:
-	lwz r3, 0x20(r21)
-	bl psndSFXOff
-	mr r3, r25
-	bl BattleGetSystemPtr
-	lbz r0, 0x12(r25)
-	mr r4, r18
-	lwz r5, 0x0(r3)
-	addi r3, r1, 0x40
-	neg r0, r0
-	lwz r7, 0x64(r18)
-	lwz r8, 0x68(r18)
-	extsb r9, r0
-	li r6, 0x1
-	bl BattleSamplingEnemy
-	lbz r0, 0xaac(r1)
-	extsb. r0, r0
-	ble @60
-	@74:
-	lbz r3, 0xaf7(r1)
-	lbz r0, 0xaac(r1)
-	extsb r3, r3
-	extsb r0, r0
-	cmpw r3, r0
-	bge @60
-	addi r0, r3, 0xa6d
-	addi r4, r1, 0x40
-	lbzx r0, r4, r0
-	mr r3, r25
-	extsb r0, r0
-	mulli r4, r0, 0x24
-	addi r0, r1, 0x40
-	addi r17, r4, 0x4
-	add r17, r0, r17
-	lha r4, 0x0(r17)
-	bl BattleGetUnitPtr
-	mr r0, r3
-	lha r3, 0x0(r17)
-	lha r4, 0x2(r17)
-	mr r16, r0
-	bl BattleGetUnitPartsPtr
-	stw r3, 0x15f8(r1)
-	mr r3, r25
-	bl BattleGetSystemPtr
-	lwz r5, 0x15f8(r1)
-	mr r4, r16
-	mr r6, r18
-	li r7, 0x100
-	bl BattlePreCheckDamage
-	cmpwi r3, 0x4
-	beq @75
-	bge @76
-	cmpwi r3, 0x2
-	beq @75
-	bge @77
-	cmpwi r3, 0x1
-	bge @78
-	b @75
-	@76:
-	cmpwi r3, 0x6
-	beq @79
-	b @75
-	@77:
-	mr r3, r16
-	mr r5, r28
-	addi r6, r1, 0x18
-	addi r4, r1, 0x10
-	bl BtlUnit_GetPos
-	lfs f1, 0x0(r28)
-	lfs f0, float_85_8041cd20(r0)
-	fcmpo cr0, f1, f0
-	bge @80
-	lfs f0, float_50_8041cd24(r0)
-	fadds f0, f1, f0
-	stfs f0, 0x0(r28)
-	b @81
-	@80:
-	lfs f0, float_neg50_8041cd28(r0)
-	fadds f0, f1, f0
-	stfs f0, 0x0(r28)
-	@81:
-	lfs f1, 0x10(r1)
-	li r3, 0x6
-	lfs f0, float_45_8041cd2c(r0)
-	lfs f2, 0x0(r28)
-	fsubs f1, f1, f0
-	lfs f3, 0x18(r1)
-	stfs f1, 0x10(r1)
-	bl effNiceEntry
-	lwz r5, 0xc(r3)
-	li r0, 0x0
-	lfs f0, float_0p75_8041cd30(r0)
-	mr r3, r16
-	li r4, 0x126
-	stfs f0, 0x1c(r5)
-	stw r0, 0x270(r16)
-	bl BattleRunHitEvent
-	b @75
-	@79:
-	li r0, 0x0
-	mr r3, r16
-	stw r0, 0x270(r16)
-	li r4, 0x127
-	bl BattleRunHitEvent
-	b @75
-	@78:
-	mr r3, r16
-	bl BtlUnit_GetACPossibility
-	cmpwi r3, 0x0
-	beq @82
-	cmpwi r23, 0x0
-	bgt @82
-	mr r3, r16
-	mr r4, r18
-	bl BattleActionCommandCheckDefence
-	addi r23, r23, 0x1
-	@82:
-	lha r3, 0x0(r17)
-	lha r4, 0x2(r17)
-	bl BattleGetUnitPartsPtr
-	mr r17, r3
-	mr r3, r25
-	bl BattleGetSystemPtr
-	mr r4, r16
-	mr r5, r17
-	mr r6, r18
-	li r7, 0x100
-	bl BattleCheckDamage
-	@75:
-	lbz r3, 0xaf7(r1)
-	addi r0, r3, 0x1
-	stb r0, 0xaf7(r1)
-	b @74
-	@60:
-	li r0, -0x1
-	stb r0, 0x0(r21)
-	@35:
-	addi r26, r26, 0x1
-	addi r31, r31, 0xe8
-	@33:
-	lbz r0, 0x0(r27)
-	cmpw r26, r0
-	blt @34
-	cmpwi r24, 0x0
-	bne @83
-	li r3, 0x0
-	b @4
-	@83:
-	lwz r3, 0x78(r15)
-	bl BattleFree
-	lwz r5, 0x7c(r15)
-	mr r3, r15
-	mr r4, r22
-	bl evtSetValue
-	li r3, 0x2
-	@4:
-	li r0, 0x1668
-	psq_lx f31, r1, r0, 0, 0
-	lfd f31, 0x1660(r1)
-	li r0, 0x1658
-	psq_lx f30, r1, r0, 0, 0
-	lfd f30, 0x1650(r1)
-	lmw r14, 0x1608(r1)
-	lwz r0, 0x1674(r1)
-	mtlr r0
-	addi r1, r1, 0x1670
-	blr
-}
-
-asm s32 _object_fall_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	bl BattleWaitAllActiveEvtEnd_NoBgSetEndWait
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, -0x7d68(r31)
-	cmpwi r3, 0x0
-	beq @3
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @4
-	li r3, 0x0
-	b @2
-	@4:
-	li r0, 0x0
-	stw r0, -0x7d68(r31)
-	@3:
-	lwz r3, -0x7d58(r31)
-	cmpwi r3, 0x0
-	beq @5
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @6
-	li r3, 0x0
-	b @2
-	@6:
-	li r0, 0x0
-	stw r0, -0x7d58(r31)
-	@5:
-	lwz r3, -0x7f20(r31)
-	cmpwi r3, 0x0
-	beq @7
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @8
-	li r3, 0x0
-	b @2
-	@8:
-	li r0, 0x0
-	stw r0, -0x7f20(r31)
-	@7:
-	li r3, 0x2
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 BattleStage_ObjectFallCheck(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	lwz r0, 0xef4(r3)
-	addis r31, r3, 0x2
-	rlwinm. r0, r0, 0, 19, 19
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lis r3, _object_fall_event@ha
-	li r4, 0xa
-	addi r3, r3, _object_fall_event@l
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	stw r0, -0x7d54(r31)
-	lwz r3, 0x15c(r3)
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 _nozzle_work_get_weapon_address(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r29, 0x14(r1)
-	mr r29, r3
-	lwz r4, _battleWorkPointer(r0)
-	lwz r30, 0x18(r3)
-	addis r31, r4, 0x2
-	lwz r4, 0x0(r30)
-	subi r31, r31, 0x7f40
-	bl evtGetValue
-	slwi r0, r3, 2
-	lwz r4, 0x4(r30)
-	add r5, r31, r0
-	mr r3, r29
-	lwz r5, 0x3c(r5)
-	bl evtSetValue
-	lmw r29, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmpwi r3, 0x0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	beq @1
-	li r0, 0x18
-	subi r6, r4, 0x4
-	subi r4, r5, 0x4
-	mtctr r0
-	@2:
-	lwz r3, 0x4(r4)
-	lwzu r0, 0x8(r4)
-	stw r3, 0x4(r6)
-	stwu r0, 0x8(r6)
-	bdnz @2
-	b @3
-	@1:
-	lbz r3, 0x11(r4)
-	lbz r0, 0x11(r5)
-	add r0, r3, r0
-	stb r0, 0x11(r4)
-	lbz r3, 0x12(r4)
-	lbz r0, 0x12(r5)
-	add r0, r3, r0
-	stb r0, 0x12(r4)
-	lwz r0, 0x1c(r4)
-	cmplwi r0, 0x0
-	bne @4
-	lwz r0, 0x1c(r5)
-	stw r0, 0x1c(r4)
-	@4:
-	li r0, 0x8
-	li r3, 0x0
-	mtctr r0
-	@5:
-	addi r7, r3, 0x20
-	addi r3, r3, 0x4
-	lwzx r6, r4, r7
-	lwzx r0, r5, r7
-	add r0, r6, r0
-	stwx r0, r4, r7
-	bdnz @5
-	lbz r0, 0x6c(r5)
-	addi r30, r5, 0x80
-	addi r31, r4, 0x80
-	stb r0, 0x6c(r4)
-	mr r3, r31
-	mr r5, r30
-	addi r4, r31, 0x1
-	addi r6, r30, 0x1
-	bl _rate_mix
-	addi r3, r31, 0x2
-	addi r4, r31, 0x3
-	addi r5, r30, 0x2
-	addi r6, r30, 0x3
-	bl _rate_mix
-	addi r3, r31, 0x4
-	addi r4, r31, 0x5
-	addi r5, r30, 0x4
-	addi r6, r30, 0x5
-	bl _rate_mix
-	addi r3, r31, 0x6
-	addi r4, r31, 0x7
-	addi r5, r30, 0x6
-	addi r6, r30, 0x8
-	bl _rate_mix
-	addi r3, r31, 0x9
-	addi r4, r31, 0xa
-	addi r5, r30, 0x9
-	addi r6, r30, 0xa
-	bl _rate_mix
-	addi r3, r31, 0xb
-	addi r4, r31, 0xc
-	addi r5, r30, 0xb
-	addi r6, r30, 0xc
-	bl _rate_mix
-	addi r3, r31, 0xd
-	addi r4, r31, 0xe
-	addi r5, r30, 0xd
-	addi r6, r30, 0xe
-	bl _rate_mix
-	addi r3, r31, 0xf
-	addi r4, r31, 0x10
-	addi r5, r30, 0xf
-	addi r6, r30, 0x10
-	bl _rate_mix
-	addi r3, r31, 0x11
-	addi r4, r31, 0x12
-	addi r5, r30, 0x11
-	addi r6, r30, 0x12
-	bl _rate_mix
-	addi r3, r31, 0x13
-	addi r4, r31, 0x14
-	addi r5, r31, 0x15
-	addi r6, r30, 0x13
-	addi r7, r30, 0x14
-	addi r8, r30, 0x15
-	bl _rate_mix_3
-	addi r3, r31, 0x19
-	addi r4, r31, 0x1a
-	addi r5, r31, 0x1b
-	addi r6, r30, 0x19
-	addi r7, r30, 0x1a
-	addi r8, r30, 0x1b
-	bl _rate_mix_3
-	addi r3, r31, 0x1c
-	addi r4, r31, 0x1d
-	addi r5, r30, 0x1c
-	addi r6, r30, 0x1d
-	bl _rate_mix
-	lbz r7, 0x1f(r31)
-	addi r3, r31, 0x20
-	lbz r0, 0x1f(r30)
-	addi r4, r31, 0x21
-	addi r5, r30, 0x20
-	addi r6, r30, 0x21
-	add r0, r7, r0
-	stb r0, 0x1f(r31)
-	bl _rate_mix
-	addi r3, r31, 0x22
-	addi r4, r31, 0x23
-	addi r5, r30, 0x22
-	addi r6, r30, 0x23
-	bl _rate_mix
-	lbz r3, 0x2a(r31)
-	lbz r0, 0x2a(r30)
-	add r0, r3, r0
-	stb r0, 0x2a(r31)
-	lbz r3, 0x2b(r31)
-	lbz r0, 0x2b(r30)
-	add r0, r3, r0
-	stb r0, 0x2b(r31)
-	lbz r3, 0x2c(r31)
-	lbz r0, 0x2c(r30)
-	add r0, r3, r0
-	stb r0, 0x2c(r31)
-	lbz r3, 0x2d(r31)
-	lbz r0, 0x2d(r30)
-	add r0, r3, r0
-	stb r0, 0x2d(r31)
-	@3:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength) {
-	nofralloc
-	lbz r9, 0x0(r6)
-	extsb. r0, r9
-	blelr
-	lbz r0, 0x0(r3)
-	extsb r6, r9
-	extsb r0, r0
-	cmpw r6, r0
-	ble @1
-	stb r9, 0x0(r3)
-	@1:
-	lbz r6, 0x0(r4)
-	lbz r0, 0x0(r7)
-	add r0, r6, r0
-	stb r0, 0x0(r4)
-	lbz r6, 0x0(r5)
-	lbz r0, 0x0(r8)
-	add r0, r6, r0
-	stb r0, 0x0(r5)
-	lbz r0, 0x0(r5)
-	extsb. r0, r0
-	bnelr
-	li r0, 0x0
-	stb r0, 0x0(r3)
-	stb r0, 0x0(r4)
-	blr
-}
-
-asm void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime) {
-	nofralloc
-	lbz r7, 0x0(r5)
-	extsb. r0, r7
-	blelr
-	lbz r0, 0x0(r3)
-	extsb r5, r7
-	extsb r0, r0
-	cmpw r5, r0
-	ble @1
-	stb r7, 0x0(r3)
-	@1:
-	lbz r3, 0x0(r4)
-	lbz r0, 0x0(r6)
-	add r0, r3, r0
-	stb r0, 0x0(r4)
-	blr
-}
-
-asm s32 _get_nozzle_attack_index(u8 index) {
-	nofralloc
-	clrlwi r0, r3, 24
-	lwz r4, _battleWorkPointer(r0)
-	cmpwi r0, 0x1
-	addis r5, r4, 0x2
-	subi r5, r5, 0x7f40
-	beq @1
-	bge @2
-	cmpwi r0, 0x0
-	bge @3
-	b @4
-	@2:
-	cmpwi r0, 0x3
-	bge @4
-	b @5
-	@3:
-	add r4, r5, r0
-	lbz r0, 0x1c4(r4)
-	cmpwi r0, 0x2
-	beq @6
-	bge @7
-	cmpwi r0, 0x1
-	bge @8
-	b @5
-	@7:
-	cmpwi r0, 0x4
-	bge @5
-	b @9
-	@8:
-	li r3, -0x1
-	blr
-	@6:
-	li r3, 0x0
-	blr
-	@9:
-	li r3, 0x1
-	blr
-	@5:
-	clrlwi r0, r3, 24
-	add r4, r5, r0
-	lbz r0, 0x1c4(r4)
-	cmpwi r0, 0x2
-	beq @10
-	bge @11
-	cmpwi r0, 0x1
-	bge @12
-	b @1
-	@11:
-	cmpwi r0, 0x4
-	bge @1
-	b @13
-	@12:
-	li r3, 0x0
-	blr
-	@10:
-	li r3, 0x1
-	blr
-	@13:
-	li r3, -0x1
-	blr
-	@1:
-	clrlwi r0, r3, 24
-	add r3, r5, r0
-	lbz r0, 0x1c4(r3)
-	cmpwi r0, 0x2
-	beq @14
-	bge @15
-	cmpwi r0, 0x1
-	bge @16
-	b @4
-	@15:
-	cmpwi r0, 0x4
-	bge @4
-	b @17
-	@16:
-	li r3, 0x0
-	blr
-	@14:
-	li r3, -0x1
-	blr
-	@17:
-	li r3, 0x1
-	blr
-	@4:
-	li r3, -0x1
-	blr
-}
-
-asm s32 _nozzle_work_attack_set(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x0
-	li r5, 0xc0
-	stw r0, 0x14(r1)
-	li r0, 0x0
-	stmw r30, 0x8(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	stw r0, -0x7f04(r31)
-	subi r3, r31, 0x7efc
-	stw r0, -0x7f00(r31)
-	subi r31, r31, 0x7f40
-	bl memset
-	addi r3, r31, 0x104
-	li r4, 0x0
-	li r5, 0xc0
-	bl memset
-	lis r3, _nozzle_at_base_mario@ha
-	addi r4, r31, 0x44
-	addi r5, r3, _nozzle_at_base_mario@l
-	li r3, 0x1
-	bl _combine_nozzle_weapon
-	lis r3, _nozzle_at_base_monster@ha
-	addi r4, r31, 0x104
-	addi r5, r3, _nozzle_at_base_monster@l
-	li r3, 0x1
-	bl _combine_nozzle_weapon
-	li r30, 0x0
-	@1:
-	clrlwi r3, r30, 24
-	bl _get_nozzle_attack_index
-	cmpwi r3, 0x0
-	blt @2
-	slwi r4, r3, 2
-	addi r4, r4, 0x3c
-	lwzx r0, r31, r4
-	cmplwi r0, 0x0
-	bne @3
-	mulli r3, r3, 0xc0
-	addi r0, r3, 0x44
-	add r0, r31, r0
-	stwx r0, r31, r4
-	@3:
-	lbz r0, 0x1ca(r31)
-	li r3, 0x0
-	lwz r6, 0x34(r31)
-	extsb r0, r0
-	lwzx r4, r31, r4
-	mulli r5, r0, 0xc0
-	addi r5, r5, 0x10
-	add r5, r6, r5
-	bl _combine_nozzle_weapon
-	@2:
-	addi r30, r30, 0x1
-	cmpwi r30, 0x3
-	blt @1
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL BattleFogForceStop(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lwz r0, -0x7d64(r31)
-	cmpwi r0, 0x0
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, -0x7d60(r31)
-	cmplwi r3, 0x0
-	beq @3
-	bl effSoftDelete
-	li r0, 0x0
-	stw r0, -0x7d60(r31)
-	@3:
-	li r3, 0x1
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL BattleFogEndCheck(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lwz r3, -0x7d64(r31)
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0x1
-	b @2
-	@1:
-	subi r0, r3, 0x1
-	stw r0, -0x7d64(r31)
-	lwz r0, -0x7d64(r31)
-	cmpwi r0, 0x0
-	ble @3
-	li r3, 0x0
-	b @2
-	@3:
-	lwz r3, -0x7d60(r31)
-	cmplwi r3, 0x0
-	beq @4
-	bl effSoftDelete
-	li r0, 0x0
-	stw r0, -0x7d60(r31)
-	@4:
-	li r3, 0x1
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 _nozzle_work_effect(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stfd f29, 0x30(r1)
-	psq_st f29, 0x38(r1), 0, 0
-	stmw r23, 0xc(r1)
-	mr r25, r3
-	lwz r6, _battleWorkPointer(r0)
-	lwz r26, 0x18(r3)
-	mr r23, r4
-	lis r5, vec3_802f3ac8@ha
-	mr r24, r6
-	lwz r4, 0x0(r26)
-	addi r30, r5, vec3_802f3ac8@l
-	addis r29, r6, 0x2
-	li r27, 0x0
-	bl evtGetValue
-	cmpwi r23, 0x0
-	lwz r26, 0x4(r26)
-	mr r31, r3
-	li r23, 0x0
-	beq @1
-	mr r3, r24
-	bl BattleCheckConcluded
-	cmpwi r3, 0x0
-	beq @2
-	mr r3, r25
-	mr r4, r26
-	li r5, 0x0
-	bl evtSetValue
-	li r3, 0x2
-	b @3
-	@2:
-	li r0, 0x5a
-	stw r0, 0x78(r25)
-	lbz r0, -0x7d76(r29)
-	extsb r0, r0
-	cmpwi r0, 0x2
-	beq @4
-	bge @5
-	cmpwi r0, 0x1
-	bge @6
-	b @7
-	@5:
-	cmpwi r0, 0x4
-	bge @7
-	b @8
-	@6:
-	addi r28, r30, 0x170
-	li r27, 0x0
-	b @7
-	@4:
-	li r28, 0x0
-	li r27, 0x1
-	b @7
-	@8:
-	addi r28, r30, 0x188
-	li r27, 0x2
-	@7:
-	cmpwi r0, 0x4
-	bge @9
-	cmpwi r0, 0x1
-	bge @10
-	b @9
-	@10:
-	addi r3, r30, 0xc0
-	bl BattleSearchObjectPtr
-	mr r24, r3
-	li r3, 0x0
-	bl _get_nozzle_dir
-	lbz r0, -0x7d7c(r29)
-	fmr f29, f1
-	cmplwi r0, 0x0
-	beq @11
-	cmplwi r28, 0x0
-	beq @12
-	mr r3, r28
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x8c(r25)
-	b @13
-	@12:
-	li r0, -0x1
-	stw r0, 0x8c(r25)
-	@13:
-	lfs f0, float_90_8041cd08(r0)
-	fadds f1, f0, f29
-	bl reviseAngle
-	fmr f31, f1
-	fmr f1, f29
-	bl sinfd
-	lfs f2, float_10_8041cd34(r0)
-	lfs f0, 0xc(r24)
-	fmadds f30, f2, f1, f0
-	fmr f1, f29
-	bl cosfd
-	lfs f4, float_10_8041cd34(r0)
-	fmr f3, f30
-	lfs f0, 0x4(r24)
-	fmr f5, f31
-	lfs f2, float_12_8041cd38(r0)
-	mr r3, r27
-	fnmsubs f1, f4, f1, f0
-	lfs f0, 0x8(r24)
-	li r4, 0x5a
-	lfs f4, float_neg80_8041cd3c(r0)
-	fadds f2, f2, f0
-	bl effNozleEntry
-	stw r3, 0x7c(r25)
-	b @14
-	@11:
-	cmplwi r28, 0x0
-	beq @15
-	mr r3, r28
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x8c(r25)
-	b @16
-	@15:
-	li r0, -0x1
-	stw r0, 0x8c(r25)
-	@16:
-	lfs f4, float_0_8041cd04(r0)
-	mr r3, r27
-	lfs f2, float_20_8041cd40(r0)
-	li r4, 0x5a
-	lfs f1, 0x8(r24)
-	fmr f5, f4
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r24)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r24)
-	fadds f3, f3, f0
-	bl effNozleEntry
-	cmpwi r31, 0x0
-	stw r3, 0x7c(r25)
-	bne @14
-	lfs f2, float_20_8041cd40(r0)
-	li r3, 0x4
-	lfs f1, 0x8(r24)
-	li r4, 0x5a
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r24)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r24)
-	fadds f3, f3, f0
-	lfs f4, float_1_8041cd48(r0)
-	bl effConfettiN64Entry
-	@14:
-	addi r3, r30, 0xcc
-	bl BattleSearchObjectPtr
-	mr r24, r3
-	li r3, 0x1
-	bl _get_nozzle_dir
-	lbz r0, -0x7d7b(r29)
-	fmr f29, f1
-	cmplwi r0, 0x0
-	beq @17
-	cmplwi r28, 0x0
-	beq @18
-	mr r3, r28
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x90(r25)
-	b @19
-	@18:
-	li r0, -0x1
-	stw r0, 0x90(r25)
-	@19:
-	lfs f0, float_90_8041cd08(r0)
-	fadds f1, f0, f29
-	bl reviseAngle
-	fmr f31, f1
-	fmr f1, f29
-	bl sinfd
-	lfs f2, float_10_8041cd34(r0)
-	lfs f0, 0xc(r24)
-	fmadds f30, f2, f1, f0
-	fmr f1, f29
-	bl cosfd
-	lfs f4, float_10_8041cd34(r0)
-	fmr f3, f30
-	lfs f0, 0x4(r24)
-	fmr f5, f31
-	lfs f2, float_12_8041cd38(r0)
-	mr r3, r27
-	fnmsubs f1, f4, f1, f0
-	lfs f0, 0x8(r24)
-	li r4, 0x5a
-	lfs f4, float_neg80_8041cd3c(r0)
-	fadds f2, f2, f0
-	bl effNozleEntry
-	stw r3, 0x80(r25)
-	b @20
-	@17:
-	cmplwi r28, 0x0
-	beq @21
-	mr r3, r28
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x90(r25)
-	b @22
-	@21:
-	li r0, -0x1
-	stw r0, 0x90(r25)
-	@22:
-	lfs f4, float_0_8041cd04(r0)
-	mr r3, r27
-	lfs f2, float_20_8041cd40(r0)
-	li r4, 0x5a
-	lfs f1, 0x8(r24)
-	fmr f5, f4
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r24)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r24)
-	fadds f3, f3, f0
-	bl effNozleEntry
-	cmpwi r31, 0x0
-	stw r3, 0x80(r25)
-	bne @20
-	lfs f2, float_20_8041cd40(r0)
-	li r3, 0x4
-	lfs f1, 0x8(r24)
-	li r4, 0x5a
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r24)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r24)
-	fadds f3, f3, f0
-	lfs f4, float_1_8041cd48(r0)
-	bl effConfettiN64Entry
-	@20:
-	addi r3, r30, 0xd8
-	bl BattleSearchObjectPtr
-	mr r30, r3
-	li r3, 0x2
-	bl _get_nozzle_dir
-	lbz r0, -0x7d7a(r29)
-	fmr f29, f1
-	cmplwi r0, 0x0
-	beq @23
-	cmplwi r28, 0x0
-	beq @24
-	mr r3, r28
-	addi r4, r30, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x94(r25)
-	b @25
-	@24:
-	li r0, -0x1
-	stw r0, 0x94(r25)
-	@25:
-	lfs f0, float_90_8041cd08(r0)
-	fadds f1, f0, f29
-	bl reviseAngle
-	fmr f30, f1
-	fmr f1, f29
-	bl sinfd
-	lfs f2, float_10_8041cd34(r0)
-	lfs f0, 0xc(r30)
-	fmadds f31, f2, f1, f0
-	fmr f1, f29
-	bl cosfd
-	lfs f4, float_10_8041cd34(r0)
-	fmr f3, f31
-	lfs f0, 0x4(r30)
-	fmr f5, f30
-	lfs f2, float_12_8041cd38(r0)
-	mr r3, r27
-	fnmsubs f1, f4, f1, f0
-	lfs f0, 0x8(r30)
-	li r4, 0x5a
-	lfs f4, float_neg80_8041cd3c(r0)
-	fadds f2, f2, f0
-	bl effNozleEntry
-	stw r3, 0x84(r25)
-	b @26
-	@23:
-	cmplwi r28, 0x0
-	beq @27
-	mr r3, r28
-	addi r4, r30, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x94(r25)
-	b @28
-	@27:
-	li r0, -0x1
-	stw r0, 0x94(r25)
-	@28:
-	lfs f4, float_0_8041cd04(r0)
-	mr r3, r27
-	lfs f2, float_20_8041cd40(r0)
-	li r4, 0x5a
-	lfs f1, 0x8(r30)
-	fmr f5, f4
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r30)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r30)
-	fadds f3, f3, f0
-	bl effNozleEntry
-	cmpwi r31, 0x0
-	stw r3, 0x84(r25)
-	bne @26
-	lfs f2, float_20_8041cd40(r0)
-	li r3, 0x4
-	lfs f1, 0x8(r30)
-	li r4, 0x5a
-	lfs f3, float_8_8041cd44(r0)
-	lfs f0, 0xc(r30)
-	fadds f2, f2, f1
-	lfs f1, 0x4(r30)
-	fadds f3, f3, f0
-	lfs f4, float_1_8041cd48(r0)
-	bl effConfettiN64Entry
-	@26:
-	li r23, 0x1
-	b @29
-	@9:
-	cmpwi r31, 0x0
-	beq @29
-	lwz r0, -0x7d60(r29)
-	cmplwi r0, 0x0
-	bne @29
-	li r0, 0x78
-	lfs f1, float_0_8041cd04(r0)
-	stw r0, 0x78(r25)
-	li r0, 0x0
-	fmr f2, f1
-	li r3, 0x3
-	stw r0, 0x7c(r25)
-	fmr f3, f1
-	fmr f4, f1
-	li r4, 0x3e8
-	stw r0, 0x84(r25)
-	fmr f5, f1
-	stw r0, 0x80(r25)
-	bl effNozleEntry
-	stw r3, -0x7d60(r29)
-	li r0, 0x2
-	addi r3, r30, 0xcc
-	lwz r4, -0x7d60(r29)
-	stw r4, 0x84(r25)
-	stw r0, -0x7d64(r29)
-	bl BattleSearchObjectPtr
-	mr r4, r3
-	addi r3, r30, 0x19c
-	addi r4, r4, 0x4
-	bl psndSFXOn_3D
-	stw r3, 0x8c(r25)
-	li r0, -0x1
-	li r23, 0x1
-	stw r0, 0x90(r25)
-	stw r0, 0x94(r25)
-	@29:
-	cmpwi r23, 0x0
-	bne @1
-	mr r3, r25
-	mr r4, r26
-	li r5, 0x0
-	bl evtSetValue
-	li r3, 0x2
-	b @3
-	@1:
-	lwz r3, 0x78(r25)
-	cmpwi r3, 0x0
-	ble @30
-	subi r0, r3, 0x1
-	stw r0, 0x78(r25)
-	lwz r0, 0x78(r25)
-	cmpwi r0, 0x0
-	bgt @31
-	lwz r3, 0x8c(r25)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @32
-	bl psndSFXOff
-	@32:
-	lwz r3, 0x90(r25)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @33
-	bl psndSFXOff
-	@33:
-	lwz r3, 0x94(r25)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @31
-	bl psndSFXOff
-	@31:
-	li r3, 0x0
-	b @3
-	@30:
-	mr r3, r25
-	mr r4, r26
-	li r5, 0x1
-	bl evtSetValue
-	li r3, 0x2
-	@3:
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	psq_l f29, 0x38(r1), 0, 0
-	lfd f29, 0x30(r1)
-	lmw r23, 0xc(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm f32 _get_nozzle_dir(s32 index) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r0)
-	addis r0, r4, 0x2
-	add r3, r0, r3
-	lbz r0, -0x7d7c(r3)
-	cmpwi r0, 0x2
-	beq @1
-	bge @2
-	cmpwi r0, 0x1
-	bge @3
-	b @1
-	@2:
-	cmpwi r0, 0x4
-	bge @1
-	b @4
-	@3:
-	lfs f1, float_neg45_8041cd4c(r0)
-	blr
-	@4:
-	lfs f1, float_neg135_8041cd50(r0)
-	blr
-	@1:
-	lfs f1, float_neg90_8041cd54(r0)
-	blr
-}
-
-asm s32 _nozzle_work_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r28, r3, 0x2
-	subi r28, r28, 0x7f40
-	bl BattleWaitAllActiveEvtEnd_NoBgSetEndWait
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	li r31, 0x0
-	li r27, 0x0
-	mr r30, r31
-	@3:
-	addi r29, r31, 0x1cc
-	lwzx r3, r28, r29
-	cmpwi r3, 0x0
-	beq @4
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @5
-	li r3, 0x0
-	b @2
-	@5:
-	stwx r30, r28, r29
-	@4:
-	addi r27, r27, 0x1
-	addi r31, r31, 0x4
-	cmpwi r27, 0x3
-	blt @3
-	li r3, 0x2
-	@2:
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void _nozzle_type_init(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lbz r0, -0x7d76(r31)
-	lwz r30, -0x7f0c(r31)
-	extsb r0, r0
-	cmpwi r0, -0x1
-	bne @1
-	li r3, 0x0
-	li r5, 0x0
-	b @2
-	@3:
-	extsb r4, r5
-	addi r5, r5, 0x1
-	addi r0, r4, 0xc
-	lbzx r0, r30, r0
-	add r3, r3, r0
-	@2:
-	extsb r0, r5
-	cmpwi r0, 0x4
-	blt @3
-	bl irand
-	li r5, 0x0
-	b @4
-	@5:
-	extsb r4, r5
-	addi r0, r4, 0xc
-	lbzx r0, r30, r0
-	subf. r3, r0, r3
-	blt @6
-	addi r5, r5, 0x1
-	@4:
-	extsb r0, r5
-	cmpwi r0, 0x4
-	blt @5
-	@6:
-	stb r5, -0x7d76(r31)
-	@1:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleStage_NozzleWorkCheck(s32 type) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r4, _battleWorkPointer(r0)
-	addis r31, r4, 0x2
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x0
-	ble @1
-	bl _nozzle_type_init
-	cmpwi r30, 0x0
-	bne @2
-	lbz r0, -0x7d76(r31)
-	extsb. r0, r0
-	beq @1
-	@2:
-	lwz r3, -0x7d68(r31)
-	cmpwi r3, 0x0
-	beq @3
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @3
-	li r0, 0x0
-	stw r0, -0x7d68(r31)
-	@3:
-	lwz r0, -0x7d68(r31)
-	cmpwi r0, 0x0
-	bne @1
-	cmpwi r30, 0x0
-	beq @4
-	la r3, _nozzle_work_event_1(r0)
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	b @5
-	@4:
-	la r3, _nozzle_work_event_0(r0)
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	@5:
-	lwz r0, 0x15c(r3)
-	stw r0, -0x7d68(r31)
-	@1:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 _fall_frame_delete(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	cmpwi r4, 0x0
-	stw r0, 0x24(r1)
-	stmw r30, 0x18(r1)
-	mr r30, r3
-	lwz r5, _battleWorkPointer(r0)
-	addis r31, r5, 0x2
-	beq @1
-	li r0, 0xff
-	stw r0, 0x80(r30)
-	@1:
-	lwz r5, 0x80(r30)
-	lis r3, str_802F3C7C@ha
-	addi r3, r3, str_802F3C7C@l
-	addi r4, r1, 0xc
-	subi r0, r5, 0x5
-	stw r0, 0x80(r30)
-	lwz r5, dat_8041ccfc(r0)
-	lwz r0, 0x80(r30)
-	stw r5, 0x8(r1)
-	stb r0, 0xb(r1)
-	lwz r0, 0x8(r1)
-	stw r0, 0xc(r1)
-	bl mapGrpSetColor
-	lwz r0, 0x80(r30)
-	cmpwi r0, 0x0
-	ble @2
-	li r3, 0x0
-	b @3
-	@2:
-	li r0, 0x0
-	li r3, 0x2
-	stw r0, -0x7d58(r31)
-	@3:
-	lmw r30, 0x18(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _fall_frame(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r28, 0x10(r1)
-	mr r30, r3
-	mr r29, r4
-	lwz r6, 0x18(r3)
-	lis r3, str_802F3C7C@ha
-	lwz r5, _battleWorkPointer(r0)
-	addi r3, r3, str_802F3C7C@l
-	lwz r31, 0x0(r6)
-	addis r28, r5, 0x2
-	bl BattleSearchObjectPtr
-	cmpwi r29, 0x0
-	mr r29, r3
-	beq @1
-	li r0, 0x0
-	stw r0, 0x80(r30)
-	lfs f0, 0x8(r29)
-	fctiwz f0, f0
-	stfd f0, 0x8(r1)
-	lwz r0, 0xc(r1)
-	stw r0, 0x84(r30)
-	@1:
-	lwz r5, 0x80(r30)
-	lis r4, double_to_int_802f3c30@ha
-	lis r3, 0x4330
-	lfd f1, double_to_int_802f3c30@l(r4)
-	addi r5, r5, 0x1
-	stw r3, 0x8(r1)
-	li r0, 0x3c
-	lfs f2, float_0_8041cd04(r0)
-	stw r5, 0x80(r30)
-	li r3, 0x2
-	li r5, 0x3c
-	lwz r4, 0x80(r30)
-	lwz r6, 0x84(r30)
-	mullw r4, r4, r4
-	xoris r6, r6, 0x8000
-	stw r6, 0xc(r1)
-	lfd f0, 0x8(r1)
-	divw r4, r4, r0
-	fsubs f1, f0, f1
-	bl intpl_sub
-	stfs f1, 0x8(r29)
-	lwz r0, 0x80(r30)
-	cmpwi r0, 0x3c
-	bge @2
-	li r3, 0x0
-	b @3
-	@2:
-	lwz r5, -0x7f08(r28)
-	mr r3, r30
-	mr r4, r31
-	bl evtSetValue
-	li r3, 0x2
-	@3:
-	lmw r28, 0x10(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _fall_frame_wait_unit_ready(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	cmpwi r4, 0x0
-	stw r0, 0x24(r1)
-	stmw r28, 0x10(r1)
-	lwz r28, _battleWorkPointer(r0)
-	beq @1
-	li r29, 0x0
-	@2:
-	mr r3, r28
-	mr r4, r29
-	bl BattleGetUnitPtr
-	mr. r30, r3
-	beq @3
-	lwz r0, 0x1c(r30)
-	clrrwi. r0, r0, 31
-	bne @3
-	li r4, 0x1b
-	bl BtlUnit_CheckStatus
-	cmpwi r3, 0x0
-	bne @3
-	lwz r3, 0x2bc(r30)
-	cmplwi r3, 0x0
-	beq @3
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	cmplwi r3, 0x0
-	beq @4
-	lwz r0, 0x0(r30)
-	stw r0, 0x160(r3)
-	@4:
-	lwz r0, 0x15c(r3)
-	stw r0, 0x2c0(r30)
-	@3:
-	addi r29, r29, 0x1
-	cmpwi r29, 0x40
-	blt @2
-	@1:
-	li r29, 0x0
-	mr r31, r29
-	@5:
-	mr r3, r28
-	mr r4, r29
-	bl BattleGetUnitPtr
-	mr. r30, r3
-	beq @6
-	lwz r0, 0x1c(r30)
-	clrrwi. r0, r0, 31
-	bne @6
-	lwz r3, 0x2c0(r30)
-	cmpwi r3, 0x0
-	beq @7
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @7
-	stw r31, 0x2c0(r30)
-	@7:
-	lwz r0, 0x2c0(r30)
-	cmpwi r0, 0x0
-	beq @6
-	li r3, 0x0
-	b @8
-	@6:
-	addi r29, r29, 0x1
-	cmpwi r29, 0x40
-	blt @5
-	li r3, 0x2
-	@8:
-	lmw r28, 0x10(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _fall_frame_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	bl BattleWaitAllActiveEvtEnd_NoBgSetEndWait
-	cmpwi r3, 0x0
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r3, -0x7d68(r31)
-	cmpwi r3, 0x0
-	beq @3
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @4
-	li r3, 0x0
-	b @2
-	@4:
-	li r0, 0x0
-	stw r0, -0x7d68(r31)
-	@3:
-	li r3, 0x1
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleStage_IronFrameFallCheck(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lbz r3, -0x7f24(r31)
-	rlwinm. r0, r3, 0, 25, 25
-	bne @1
-	rlwinm. r0, r3, 0, 26, 26
-	bne @1
-	ori r0, r3, 0x20
-	lis r3, _fall_frame_event@ha
-	stb r0, -0x7f24(r31)
-	addi r3, r3, _fall_frame_event@l
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	stw r0, -0x7d58(r31)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void _disp_escape_wall_message(CameraId camera, void* param) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stfd f31, 0x30(r1)
-	psq_st f31, 0x38(r1), 0, 0
-	stw r31, 0x2c(r1)
-	lis r3, str_802F3C84@ha
-	addi r3, r3, str_802F3C84@l
-	bl msgSearch
-	mr r31, r3
-	bl FontGetMessageWidth
-	clrlwi r6, r3, 16
-	lis r5, 0x4330
-	srawi r0, r6, 1
-	lis r4, double_to_int_802f3c30@ha
-	addze r3, r0
-	addi r0, r6, 0x28
-	xoris r3, r3, 0x8000
-	addi r6, r4, double_to_int_802f3c30@l
-	stw r3, 0x14(r1)
-	xoris r0, r0, 0x8000
-	lwz r7, dat_8041ccf8(r0)
-	addi r4, r1, 0x8
-	stw r5, 0x10(r1)
-	li r3, 0x0
-	lfd f3, 0x0(r6)
-	lfd f0, 0x10(r1)
-	lfs f2, float_0_8041cd04(r0)
-	fsubs f0, f0, f3
-	stw r0, 0x1c(r1)
-	lfs f1, float_20_8041cd40(r0)
-	stw r5, 0x18(r1)
-	fsubs f31, f2, f0
-	lfs f2, float_neg117_8041cd58(r0)
-	lfd f0, 0x18(r1)
-	stw r7, 0x8(r1)
-	fsubs f1, f31, f1
-	lfs f4, float_30_8041cd5c(r0)
-	fsubs f3, f0, f3
-	lfs f5, float_10_8041cd34(r0)
-	bl windowDispGX_Waku_col
-	bl FontDrawStart
-	fmr f1, f31
-	lfs f2, float_neg120_8041cd60(r0)
-	mr r3, r31
-	bl FontDrawString
-	psq_l f31, 0x38(r1), 0, 0
-	lwz r0, 0x44(r1)
-	lfd f31, 0x30(r1)
-	lwz r31, 0x2c(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm s32 _announce_wall_message(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	cmpwi r4, 0x0
-	stw r0, 0x14(r1)
-	beq @1
-	li r0, 0x3c
-	stw r0, 0x78(r3)
-	@1:
-	lwz r4, 0x78(r3)
-	cmpwi r4, 0x0
-	bge @2
-	li r3, 0x2
-	b @3
-	@2:
-	subi r0, r4, 0x1
-	lis r4, _disp_escape_wall_message@ha
-	stw r0, 0x78(r3)
-	addi r5, r4, _disp_escape_wall_message@l
-	lfs f1, float_900_8041cd64(r0)
-	li r3, 0x8
-	li r4, 0x1
-	li r6, 0x0
-	bl dispEntry
-	li r3, 0x0
-	@3:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleStage_WallCloseCheck(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lbz r3, -0x7f24(r31)
-	rlwinm. r0, r3, 0, 27, 27
-	bne @1
-	ori r0, r3, 0x10
-	la r3, _close_wall_event(r0)
-	stb r0, -0x7f24(r31)
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	stw r0, -0x7d5c(r31)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 _nozzle_turn(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stfd f31, 0x30(r1)
-	psq_st f31, 0x38(r1), 0, 0
-	stfd f30, 0x20(r1)
-	psq_st f30, 0x28(r1), 0, 0
-	stmw r28, 0x10(r1)
-	lwz r5, _battleWorkPointer(r0)
-	mr r29, r3
-	cmpwi r4, 0x0
-	lis r3, vec3_802f3ac8@ha
-	addis r31, r5, 0x2
-	lwz r30, 0x160(r29)
-	addi r28, r3, vec3_802f3ac8@l
-	subi r31, r31, 0x7f40
-	beq @1
-	li r0, 0x0
-	add r3, r31, r30
-	stw r0, 0x80(r29)
-	stw r0, 0x84(r29)
-	lbz r0, 0x1c4(r3)
-	cmplwi r0, 0x0
-	beq @1
-	li r0, 0x1e
-	stw r0, 0x80(r29)
-	@1:
-	cmpwi r30, 0x1
-	beq @2
-	bge @3
-	cmpwi r30, 0x0
-	bge @4
-	b @5
-	@3:
-	cmpwi r30, 0x3
-	bge @5
-	b @6
-	@4:
-	addi r3, r28, 0xc0
-	b @7
-	@2:
-	addi r3, r28, 0xcc
-	b @7
-	@6:
-	addi r3, r28, 0xd8
-	b @7
-	@5:
-	li r3, 0x2
-	b @8
-	@7:
-	bl BattleSearchObjectPtr
-	lwz r3, 0x80(r29)
-	cmpwi r3, 0x1e
-	bge @9
-	addi r0, r3, 0x1
-	lfs f1, float_0_8041cd04(r0)
-	stw r0, 0x80(r29)
-	li r3, 0x2
-	lfs f2, float_neg80_8041cd3c(r0)
-	li r5, 0x1e
-	lwz r4, 0x80(r29)
-	bl intpl_sub
-	fmr f31, f1
-	b @10
-	@9:
-	lfs f31, float_neg80_8041cd3c(r0)
-	@10:
-	lwz r3, 0x84(r29)
-	cmpwi r3, 0x1e
-	bge @11
-	addi r0, r3, 0x1
-	add r3, r31, r30
-	stw r0, 0x84(r29)
-	lbz r0, 0x1c4(r3)
-	cmpwi r0, 0x2
-	beq @12
-	bge @13
-	cmpwi r0, 0x0
-	beq @14
-	bge @15
-	b @14
-	@13:
-	cmpwi r0, 0x4
-	bge @14
-	b @16
-	@15:
-	lfs f1, float_45_8041cd2c(r0)
-	b @17
-	@12:
-	lfs f1, float_0_8041cd04(r0)
-	b @17
-	@16:
-	lfs f1, float_neg45_8041cd4c(r0)
-	b @17
-	@14:
-	lfs f1, float_0_8041cd04(r0)
-	@17:
-	add r3, r31, r30
-	lbz r0, 0x1c7(r3)
-	cmpwi r0, 0x2
-	beq @18
-	bge @19
-	cmpwi r0, 0x0
-	beq @20
-	bge @21
-	b @20
-	@19:
-	cmpwi r0, 0x4
-	bge @20
-	b @22
-	@21:
-	lfs f2, float_45_8041cd2c(r0)
-	b @23
-	@18:
-	lfs f2, float_0_8041cd04(r0)
-	b @23
-	@22:
-	lfs f2, float_neg45_8041cd4c(r0)
-	b @23
-	@20:
-	lfs f2, float_0_8041cd04(r0)
-	@23:
-	lwz r4, 0x84(r29)
-	li r3, 0xc
-	li r5, 0x1e
-	bl intpl_sub
-	fmr f30, f1
-	@11:
-	cmpwi r30, 0x1
-	beq @24
-	bge @25
-	cmpwi r30, 0x0
-	bge @26
-	b @27
-	@25:
-	cmpwi r30, 0x3
-	bge @27
-	b @28
-	@26:
-	fmr f1, f31
-	lfs f3, float_0_8041cd04(r0)
-	fmr f2, f30
-	addi r3, r28, 0x1d8
-	bl mapObjRotate
-	b @27
-	@24:
-	fmr f1, f31
-	lfs f3, float_0_8041cd04(r0)
-	fmr f2, f30
-	addi r3, r28, 0x1e4
-	bl mapObjRotate
-	b @27
-	@28:
-	fmr f1, f31
-	lfs f3, float_0_8041cd04(r0)
-	fmr f2, f30
-	addi r3, r28, 0x1f0
-	bl mapObjRotate
-	@27:
-	lwz r0, 0x80(r29)
-	cmpwi r0, 0x1e
-	blt @29
-	lwz r0, 0x84(r29)
-	cmpwi r0, 0x1e
-	blt @29
-	add r6, r31, r30
-	slwi r0, r30, 2
-	lbz r5, 0x1c7(r6)
-	add r4, r31, r0
-	li r0, 0x0
-	li r3, 0x2
-	stb r5, 0x1c4(r6)
-	stw r0, 0x1cc(r4)
-	b @8
-	@29:
-	li r3, 0x0
-	@8:
-	psq_l f31, 0x38(r1), 0, 0
-	lfd f31, 0x30(r1)
-	psq_l f30, 0x28(r1), 0, 0
-	lfd f30, 0x20(r1)
-	lmw r28, 0x10(r1)
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void _Nozzle_Change_Check(u8 index, u8* rate) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	li r0, 0x4
-	stmw r27, 0xc(r1)
-	clrlwi r30, r3, 24
-	mr r31, r3
-	mr r27, r4
-	li r3, 0x0
-	addi r29, r30, 0x1c4
-	lwz r5, _battleWorkPointer(r0)
-	addis r28, r5, 0x2
-	mtctr r0
-	subi r28, r28, 0x7f40
-	@1:
-	lbz r0, 0x0(r4)
-	addi r4, r4, 0x1
-	add r3, r3, r0
-	bdnz @1
-	bl irand
-	mr r4, r27
-	li r27, 0x0
-	b @2
-	@3:
-	lbz r0, 0x0(r4)
-	subf. r3, r0, r3
-	blt @4
-	addi r4, r4, 0x1
-	addi r27, r27, 0x1
-	@2:
-	clrlwi r0, r27, 24
-	cmplwi r0, 0x4
-	blt @3
-	@4:
-	lbzx r0, r28, r29
-	clrlwi r3, r27, 24
-	cmplw r3, r0
-	beq @5
-	slwi r0, r30, 2
-	add r29, r28, r0
-	lwz r3, 0x1cc(r29)
-	cmpwi r3, 0x0
-	beq @6
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @6
-	li r0, 0x0
-	stw r0, 0x1cc(r29)
-	@6:
-	lwz r0, 0x1cc(r29)
-	cmpwi r0, 0x0
-	bne @5
-	add r4, r28, r30
-	la r3, _nozzle_turn_event(r0)
-	stb r27, 0x1c7(r4)
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	cmplwi r3, 0x0
-	stw r0, 0x1cc(r29)
-	beq @5
-	clrlwi r0, r31, 24
-	stw r0, 0x160(r3)
-	@5:
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void BattleStage_NozzleDirChangeCheck(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r3, _battleWorkPointer(r0)
-	addis r31, r3, 0x2
-	lwz r0, -0x7f0c(r31)
-	cmplwi r0, 0x0
-	beq @1
-	li r30, 0x0
-	b @2
-	@3:
-	lwz r4, -0x7f0c(r31)
-	clrlslwi r0, r30, 24, 2
-	mr r3, r30
-	add r4, r4, r0
-	bl _Nozzle_Change_Check
-	addi r30, r30, 0x1
-	@2:
-	clrlwi r0, r30, 24
-	cmplwi r0, 0x3
-	blt @3
-	@1:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void _mobj_shake_main(BattleStageObject* obj) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	lbz r3, 0x74(r3)
-	addi r0, r3, 0x1
-	stb r0, 0x74(r31)
-	lbz r3, 0x74(r31)
-	lbz r0, 0x73(r31)
-	cmplw r3, r0
-	blt @1
-	li r0, 0x0
-	stb r0, 0x74(r31)
-	@1:
-	lbz r5, 0x74(r31)
-	lis r0, 0x4330
-	lis r3, double_to_int_802f3c30@ha
-	lbz r4, 0x73(r31)
-	mulli r5, r5, 0x168
-	stw r0, 0x8(r1)
-	lfd f1, double_to_int_802f3c30@l(r3)
-	divw r0, r5, r4
-	xoris r0, r0, 0x8000
-	stw r0, 0xc(r1)
-	lfd f0, 0x8(r1)
-	fsubs f1, f0, f1
-	bl sinfd
-	lfs f0, float_5_8041cd10(r0)
-	fmuls f0, f0, f1
-	stfs f0, 0x78(r31)
-	lfs f0, 0x78(r31)
-	stfs f0, 0x1c(r31)
-	lwz r31, 0x1c(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _set_mobj_shake(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r28, 0x10(r1)
-	lwz r4, 0x18(r3)
-	lwz r5, _battleWorkPointer(r0)
-	lwz r4, 0x0(r4)
-	mr r29, r5
-	addis r31, r5, 0x2
-	bl evtGetValue
-	mr r30, r3
-	mr r3, r29
-	bl BattleWaitAllActiveEvtEnd_NoBgSetEndWait
-	cmpwi r3, 0x0
-	beq @1
-	lwz r3, -0x7d68(r31)
-	cmpwi r3, 0x0
-	beq @2
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @1
-	@2:
-	lwz r3, -0x7d58(r31)
-	cmpwi r3, 0x0
-	beq @3
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @1
-	@3:
-	li r3, 0x2
-	b @4
-	@1:
-	cmpwi r30, 0x2
-	beq @5
-	bge @5
-	cmpwi r30, 0x0
-	bge @6
-	b @5
-	@6:
-	li r28, 0x0
-	li r31, 0x0
-	@7:
-	addis r3, r31, 0x1
-	addi r3, r3, 0x7140
-	add r3, r29, r3
-	lwz r0, 0x0(r3)
-	cmpwi r0, 0x0
-	ble @8
-	lwz r4, 0x64(r3)
-	lhz r0, 0x6(r4)
-	cmpw r0, r30
-	bne @8
-	bl _mobj_shake_main
-	@8:
-	addi r28, r28, 0x1
-	addi r31, r31, 0x7c
-	cmpwi r28, 0x20
-	blt @7
-	@5:
-	li r3, 0x0
-	@4:
-	lmw r28, 0x10(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _set_mobj_shake_init(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	lwz r4, 0x18(r3)
-	lwz r29, _battleWorkPointer(r0)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	mr r30, r3
-	li r28, 0x0
-	li r31, 0x0
-	@1:
-	addis r27, r31, 0x1
-	addi r27, r27, 0x7140
-	add r27, r29, r27
-	lwz r0, 0x0(r27)
-	cmpwi r0, 0x0
-	ble @2
-	lwz r3, 0x64(r27)
-	lhz r0, 0x6(r3)
-	cmpw r0, r30
-	bne @2
-	li r0, 0x0
-	li r3, 0xa
-	stb r0, 0x72(r27)
-	bl irand
-	addi r0, r3, 0x3c
-	li r3, 0x64
-	stb r0, 0x73(r27)
-	bl irand
-	clrlwi. r0, r3, 31
-	beq @3
-	li r0, 0x0
-	b @4
-	@3:
-	lbz r0, 0x73(r27)
-	extrwi r0, r0, 8, 23
-	@4:
-	stb r0, 0x74(r27)
-	lfs f0, float_0_8041cd04(r0)
-	stfs f0, 0x78(r27)
-	@2:
-	addi r28, r28, 0x1
-	addi r31, r31, 0x7c
-	cmpwi r28, 0x20
-	blt @1
-	lmw r27, 0xc(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl BattleAudience_Case_HaikeiSet
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 _bgset_kemuri_effect(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stfd f31, 0x50(r1)
-	psq_st f31, 0x58(r1), 0, 0
-	stfd f30, 0x40(r1)
-	psq_st f30, 0x48(r1), 0, 0
-	stfd f29, 0x30(r1)
-	psq_st f29, 0x38(r1), 0, 0
-	stmw r24, 0x10(r1)
-	lwz r5, 0x18(r3)
-	lis r4, vec3_802f3ac8@ha
-	lwz r26, _battleWorkPointer(r0)
-	addi r31, r4, vec3_802f3ac8@l
-	lwz r4, 0x0(r5)
-	bl evtGetValue
-	mr r30, r3
-	addi r29, r31, 0x1fc
-	addi r28, r31, 0x214
-	addi r27, r31, 0x22c
-	li r25, 0x0
-	li r31, 0x0
-	@1:
-	addis r24, r31, 0x1
-	addi r24, r24, 0x7140
-	add r24, r26, r24
-	lwz r0, 0x0(r24)
-	cmpwi r0, 0x0
-	ble @2
-	lwz r3, 0x64(r24)
-	lhz r0, 0x6(r3)
-	cmpw r0, r30
-	bne @2
-	cmpwi r30, 0x1
-	lfs f31, 0x4(r24)
-	lfs f30, 0x8(r24)
-	lfs f29, 0xc(r24)
-	beq @3
-	bge @4
-	cmpwi r30, 0x0
-	bge @5
-	b @2
-	@4:
-	cmpwi r30, 0x3
-	bge @2
-	b @6
-	@5:
-	lfs f0, float_30_8041cd5c(r0)
-	fmr f1, f31
-	fmr f2, f30
-	lfs f4, float_0_8041cd04(r0)
-	fadds f29, f29, f0
-	li r3, 0x3
-	fmr f3, f29
-	bl effKemuri1N64Entry
-	mr r3, r29
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	b @2
-	@3:
-	lfs f0, float_15_8041cd18(r0)
-	fmr f1, f31
-	fmr f2, f30
-	lfs f4, float_0_8041cd04(r0)
-	fadds f29, f29, f0
-	li r3, 0x0
-	fmr f3, f29
-	bl effKemuri1N64Entry
-	mr r3, r28
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	b @2
-	@6:
-	lfs f0, float_30_8041cd5c(r0)
-	fmr f1, f31
-	fmr f2, f30
-	lfs f4, float_0_8041cd04(r0)
-	fadds f29, f29, f0
-	li r3, 0x3
-	fmr f3, f29
-	bl effKemuri1N64Entry
-	fmr f1, f31
-	lfs f4, float_0_8041cd04(r0)
-	fmr f2, f30
-	li r3, 0x4
-	fmr f3, f29
-	bl effKemuri1N64Entry
-	mr r3, r27
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	@2:
-	addi r25, r25, 0x1
-	addi r31, r31, 0x7c
-	cmpwi r25, 0x20
-	blt @1
-	li r3, 0x2
-	psq_l f31, 0x58(r1), 0, 0
-	lfd f31, 0x50(r1)
-	psq_l f30, 0x48(r1), 0, 0
-	lfd f30, 0x40(r1)
-	psq_l f29, 0x38(r1), 0, 0
-	lfd f29, 0x30(r1)
-	lmw r24, 0x10(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm s32 _get_bgset_attack_data(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r29, 0x14(r1)
-	mr r29, r3
-	lwz r30, 0x18(r3)
-	lwz r31, _battleWorkPointer(r0)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	cmpwi r3, 0x1
-	lwz r4, 0x4(r30)
-	beq @1
-	bge @2
-	cmpwi r3, 0x0
-	bge @3
-	b @1
-	@2:
-	cmpwi r3, 0x3
-	bge @1
-	b @4
-	@3:
-	lwz r3, 0x2738(r31)
-	lwz r3, 0xc(r3)
-	lwz r3, 0x0(r3)
-	addi r5, r3, 0x10
-	b @5
-	@4:
-	lwz r3, 0x2738(r31)
-	lwz r3, 0xc(r3)
-	lwz r3, 0x0(r3)
-	addi r5, r3, 0xd0
-	b @5
-	@1:
-	li r5, 0x0
-	@5:
-	cmplwi r5, 0x0
-	beq @6
-	lwz r0, 0x1c(r5)
-	cmplwi r0, 0x0
-	bne @6
-	li r5, 0x0
-	@6:
-	mr r3, r29
-	bl evtSetValue
-	lmw r29, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _mobj_destroy(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r28, 0x10(r1)
-	lwz r4, 0x18(r3)
-	lwz r29, _battleWorkPointer(r0)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	mr r30, r3
-	li r28, 0x0
-	li r31, 0x0
-	@1:
-	addis r4, r31, 0x1
-	addi r4, r4, 0x7140
-	add r4, r29, r4
-	lwz r0, 0x0(r4)
-	cmpwi r0, 0x0
-	ble @2
-	lwz r3, 0x64(r4)
-	lhz r0, 0x6(r3)
-	cmpw r0, r30
-	bne @2
-	lwz r0, 0x68(r4)
-	mr r3, r29
-	ori r0, r0, 0x1
-	stw r0, 0x68(r4)
-	lwz r4, 0x6c(r4)
-	bl BattleGetUnitPtr
-	cmplwi r3, 0x0
-	beq @2
-	lwz r3, 0x14(r3)
-	b @3
-	@4:
-	lwz r0, 0x1ac(r3)
-	oris r0, r0, 0x1
-	stw r0, 0x1ac(r3)
-	lwz r3, 0x0(r3)
-	@3:
-	cmplwi r3, 0x0
-	bne @4
-	@2:
-	addi r28, r28, 0x1
-	addi r31, r31, 0x7c
-	cmpwi r28, 0x20
-	blt @1
-	cmpwi r30, 0x1
-	beq @5
-	bge @6
-	cmpwi r30, 0x0
-	bge @7
-	b @8
-	@6:
-	cmpwi r30, 0x3
-	bge @8
-	b @9
-	@7:
-	addis r3, r29, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x2
-	stb r0, -0x7f24(r3)
-	b @8
-	@5:
-	addis r3, r29, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x4
-	stb r0, -0x7f24(r3)
-	b @8
-	@9:
-	addis r3, r29, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x8
-	stb r0, -0x7f24(r3)
-	@8:
-	lmw r28, 0x10(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 _mobj_set_alpha(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r30, 0x28(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	cmpwi r31, 0x2
-	clrlwi r30, r3, 24
-	beq @1
-	bge @2
-	cmpwi r31, 0x0
-	beq @3
-	bge @4
-	b @5
-	@2:
-	cmpwi r31, 0x4
-	bge @5
-	b @6
-	@3:
-	la r3, str_8041CD68(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @5
-	lwz r0, dat_8041cce8(r0)
-	addi r4, r1, 0x24
-	la r3, str_8041CD68(r0)
-	stw r0, 0x20(r1)
-	stb r30, 0x23(r1)
-	lwz r0, 0x20(r1)
-	stw r0, 0x24(r1)
-	bl mapGrpSetColor
-	b @5
-	@4:
-	la r3, str_8041CD6C(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @5
-	lwz r0, dat_8041ccec(r0)
-	addi r4, r1, 0x1c
-	la r3, str_8041CD6C(r0)
-	stw r0, 0x18(r1)
-	stb r30, 0x1b(r1)
-	lwz r0, 0x18(r1)
-	stw r0, 0x1c(r1)
-	bl mapGrpSetColor
-	b @5
-	@1:
-	la r3, str_8041CD70(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @5
-	lwz r0, dat_8041ccf0(r0)
-	addi r4, r1, 0x14
-	la r3, str_8041CD70(r0)
-	stw r0, 0x10(r1)
-	stb r30, 0x13(r1)
-	lwz r0, 0x10(r1)
-	stw r0, 0x14(r1)
-	bl mapGrpSetColor
-	b @5
-	@6:
-	la r3, str_8041CD74(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @5
-	lwz r0, dat_8041ccf4(r0)
-	addi r4, r1, 0xc
-	la r3, str_8041CD74(r0)
-	stw r0, 0x8(r1)
-	stb r30, 0xb(r1)
-	lwz r0, 0x8(r1)
-	stw r0, 0xc(r1)
-	bl mapGrpSetColor
-	@5:
-	lmw r30, 0x28(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 _set_mobj_rotate_x(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	lis r5, vec3_802f3ac8@ha
-	stw r0, 0x54(r1)
-	stmw r24, 0x30(r1)
-	mr r24, r4
-	mr r29, r3
-	addi r30, r5, vec3_802f3ac8@l
-	li r26, 0x0
-	lwz r6, 0x18(r3)
-	lwz r28, _battleWorkPointer(r0)
-	lwz r4, 0x0(r6)
-	addis r27, r28, 0x2
-	bl evtGetValue
-	cmpwi r24, 0x0
-	mr r31, r3
-	beq @1
-	cmpwi r31, 0x2
-	beq @2
-	bge @1
-	cmpwi r31, 0x0
-	bge @3
-	b @1
-	@3:
-	li r3, 0x0
-	li r0, 0x20
-	mr r4, r3
-	mtctr r0
-	@4:
-	addis r6, r3, 0x1
-	addi r6, r6, 0x7140
-	add r6, r28, r6
-	lwz r0, 0x0(r6)
-	cmpwi r0, 0x0
-	ble @5
-	lwz r5, 0x64(r6)
-	lhz r0, 0x6(r5)
-	cmpw r0, r31
-	bne @5
-	lbz r0, 0x14(r5)
-	stb r0, 0x70(r6)
-	stb r4, 0x71(r6)
-	@5:
-	addi r3, r3, 0x7c
-	bdnz @4
-	b @1
-	@2:
-	li r3, 0x0
-	li r0, 0x3c
-	stw r3, 0x7c(r29)
-	stw r0, 0x80(r29)
-	stw r3, 0x84(r29)
-	@1:
-	cmpwi r31, 0x2
-	beq @6
-	bge @7
-	cmpwi r31, 0x0
-	bge @8
-	b @7
-	@8:
-	addi r29, r30, 0x244
-	addi r30, r30, 0x25c
-	li r27, 0x0
-	li r25, 0x0
-	@9:
-	addis r24, r25, 0x1
-	addi r24, r24, 0x7140
-	add r24, r28, r24
-	lwz r0, 0x0(r24)
-	cmpwi r0, 0x0
-	ble @10
-	lwz r3, 0x64(r24)
-	lhz r0, 0x6(r3)
-	cmpw r0, r31
-	bne @10
-	lbz r3, 0x70(r24)
-	cmplwi r3, 0x0
-	beq @11
-	subi r0, r3, 0x1
-	mr r3, r24
-	stb r0, 0x70(r24)
-	li r26, 0x1
-	bl _mobj_shake_main
-	b @10
-	@11:
-	lbz r0, 0x71(r24)
-	cmplwi r0, 0x0
-	bne @12
-	cmpwi r31, 0x0
-	bne @13
-	mr r3, r29
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	b @12
-	@13:
-	mr r3, r30
-	addi r4, r24, 0x4
-	bl psndSFXOn_3D
-	@12:
-	lbz r4, 0x71(r24)
-	li r3, 0x2
-	lfs f2, float_90_8041cd08(r0)
-	addi r0, r4, 0x1
-	stb r0, 0x71(r24)
-	lwz r5, 0x64(r24)
-	lfs f1, 0x78(r24)
-	lbz r4, 0x71(r24)
-	lbz r5, 0x15(r5)
-	bl intpl_sub
-	stfs f1, 0x1c(r24)
-	lwz r3, 0x64(r24)
-	lbz r4, 0x71(r24)
-	lbz r0, 0x15(r3)
-	cmplw r4, r0
-	bge @10
-	li r26, 0x1
-	@10:
-	addi r27, r27, 0x1
-	addi r25, r25, 0x7c
-	cmpwi r27, 0x20
-	blt @9
-	b @7
-	@6:
-	lwz r3, 0x7c(r29)
-	cmpwi r3, 0x0
-	beq @14
-	subi r0, r3, 0x1
-	li r26, 0x1
-	stw r0, 0x7c(r29)
-	b @7
-	@14:
-	lwz r0, 0x84(r29)
-	cmpwi r0, 0x0
-	bne @15
-	lwz r6, 0xfc(r30)
-	addi r3, r30, 0x274
-	lwz r5, 0x100(r30)
-	addi r4, r1, 0x8
-	lwz r0, 0x104(r30)
-	stw r6, 0x8(r1)
-	stw r5, 0xc(r1)
-	stw r0, 0x10(r1)
-	bl psndSFXOn_3D
-	@15:
-	lwz r4, 0x84(r29)
-	li r3, 0x2
-	lfs f1, float_0_8041cd04(r0)
-	addi r0, r4, 0x1
-	lfs f2, float_90_8041cd08(r0)
-	stw r0, 0x84(r29)
-	lwz r4, 0x84(r29)
-	lwz r5, 0x80(r29)
-	bl intpl_sub
-	fctiwz f0, f1
-	lis r0, 0x4330
-	stw r0, 0x20(r1)
-	lfd f1, 0x168(r30)
-	stfd f0, 0x18(r1)
-	lwz r0, 0x1c(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x24(r1)
-	lfd f0, 0x20(r1)
-	fsubs f0, f0, f1
-	stfs f0, -0x7f3c(r27)
-	lwz r3, 0x84(r29)
-	lwz r0, 0x80(r29)
-	cmpw r3, r0
-	bge @7
-	li r26, 0x1
-	@7:
-	subfic r3, r26, 0x0
-	li r0, 0x2
-	subfe r3, r3, r3
-	andc r3, r0, r3
-	lmw r24, 0x30(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void BattleStage_DestroyB(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r31, _battleWorkPointer(r0)
-	lwz r4, 0x2738(r31)
-	addis r3, r31, 0x2
-	lwz r3, -0x7f14(r3)
-	lwz r4, 0xc(r4)
-	lwz r4, 0x0(r4)
-	lwz r30, 0x19c(r4)
-	bl evtDeleteID
-	addis r3, r31, 0x2
-	li r0, 0x0
-	stw r0, -0x7f14(r3)
-	lwz r3, -0x7f20(r3)
-	cmpwi r3, 0x0
-	beq @1
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @1
-	addis r3, r31, 0x2
-	lwz r3, -0x7f20(r3)
-	bl evtDeleteID
-	@1:
-	cmplwi r30, 0x0
-	bne @2
-	la r30, _object_turn_event_B(r0)
-	@2:
-	mr r3, r30
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	cmplwi r3, 0x0
-	beq @3
-	lwz r0, 0x15c(r3)
-	addis r3, r31, 0x2
-	stw r0, -0x7f20(r3)
-	@3:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleStage_DestroyA2(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r31, _battleWorkPointer(r0)
-	lwz r4, 0x2738(r31)
-	addis r3, r31, 0x2
-	lwz r3, -0x7f18(r3)
-	lwz r4, 0xc(r4)
-	lwz r4, 0x0(r4)
-	lwz r30, 0x198(r4)
-	bl evtDeleteID
-	cmplwi r30, 0x0
-	addis r3, r31, 0x2
-	li r0, 0x0
-	stw r0, -0x7f18(r3)
-	bne @1
-	la r30, _object_turn_event_A2(r0)
-	@1:
-	mr r3, r30
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleStage_DestroyA1(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r31, _battleWorkPointer(r0)
-	lwz r4, 0x2738(r31)
-	addis r3, r31, 0x2
-	lwz r3, -0x7f1c(r3)
-	lwz r4, 0xc(r4)
-	lwz r4, 0x0(r4)
-	lwz r30, 0x194(r4)
-	bl evtDeleteID
-	addis r3, r31, 0x2
-	li r0, 0x0
-	stw r0, -0x7f1c(r3)
-	lwz r3, -0x7f20(r3)
-	cmpwi r3, 0x0
-	beq @1
-	bl evtCheckID
-	cmpwi r3, 0x0
-	beq @1
-	addis r3, r31, 0x2
-	lwz r3, -0x7f20(r3)
-	bl evtDeleteID
-	@1:
-	cmplwi r30, 0x0
-	bne @2
-	la r30, _object_turn_event_A1(r0)
-	@2:
-	mr r3, r30
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	cmplwi r3, 0x0
-	beq @3
-	lwz r0, 0x15c(r3)
-	addis r3, r31, 0x2
-	stw r0, -0x7f20(r3)
-	@3:
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void BattleObjectConfig(void) {
-	nofralloc
-	blr
-}
-
-asm void BattleStageObjectMain(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	li r28, 0x0
-	li r27, 0x0
-	lwz r31, _battleWorkPointer(r0)
-	addis r30, r31, 0x2
-	@1:
-	addis r29, r27, 0x1
-	addi r29, r29, 0x7140
-	add r29, r31, r29
-	lwz r0, 0x0(r29)
-	cmpwi r0, 0x0
-	ble @2
-	lfs f1, 0x4(r29)
-	li r4, 0x0
-	lfs f0, 0x34(r29)
-	fcmpu cr0, f1, f0
-	bne @3
-	lfs f1, 0x8(r29)
-	lfs f0, 0x38(r29)
-	fcmpu cr0, f1, f0
-	bne @3
-	lfs f1, 0xc(r29)
-	lfs f0, 0x3c(r29)
-	fcmpu cr0, f1, f0
-	beq @4
-	@3:
-	lwz r3, 0x4(r29)
-	li r4, 0x1
-	lwz r0, 0x8(r29)
-	stw r3, 0x34(r29)
-	stw r0, 0x38(r29)
-	lwz r0, 0xc(r29)
-	stw r0, 0x3c(r29)
-	@4:
-	lfs f1, 0x10(r29)
-	lfs f0, 0x40(r29)
-	fcmpu cr0, f1, f0
-	bne @5
-	lfs f1, 0x14(r29)
-	lfs f0, 0x44(r29)
-	fcmpu cr0, f1, f0
-	bne @5
-	lfs f1, 0x18(r29)
-	lfs f0, 0x48(r29)
-	fcmpu cr0, f1, f0
-	beq @6
-	@5:
-	lwz r3, 0x10(r29)
-	li r4, 0x1
-	lwz r0, 0x14(r29)
-	stw r3, 0x40(r29)
-	stw r0, 0x44(r29)
-	lwz r0, 0x18(r29)
-	stw r0, 0x48(r29)
-	@6:
-	lfs f1, 0x28(r29)
-	lfs f0, 0x58(r29)
-	fcmpu cr0, f1, f0
-	bne @7
-	lfs f1, 0x2c(r29)
-	lfs f0, 0x5c(r29)
-	fcmpu cr0, f1, f0
-	bne @7
-	lfs f1, 0x30(r29)
-	lfs f0, 0x60(r29)
-	fcmpu cr0, f1, f0
-	beq @8
-	@7:
-	lwz r3, 0x28(r29)
-	li r4, 0x1
-	lwz r0, 0x2c(r29)
-	stw r3, 0x58(r29)
-	stw r0, 0x5c(r29)
-	lwz r0, 0x30(r29)
-	stw r0, 0x60(r29)
-	@8:
-	lfs f1, 0x1c(r29)
-	lfs f0, 0x4c(r29)
-	fcmpu cr0, f1, f0
-	bne @9
-	lfs f1, 0x20(r29)
-	lfs f0, 0x50(r29)
-	fcmpu cr0, f1, f0
-	bne @9
-	lfs f1, 0x24(r29)
-	lfs f0, 0x54(r29)
-	fcmpu cr0, f1, f0
-	beq @10
-	@9:
-	lwz r3, 0x1c(r29)
-	li r4, 0x1
-	lwz r0, 0x20(r29)
-	stw r3, 0x4c(r29)
-	stw r0, 0x50(r29)
-	lwz r0, 0x24(r29)
-	stw r0, 0x54(r29)
-	@10:
-	lwz r3, 0x68(r29)
-	rlwinm. r0, r3, 0, 30, 30
-	beq @11
-	rlwinm r0, r3, 0, 31, 29
-	li r4, 0x1
-	stw r0, 0x68(r29)
-	@11:
-	lwz r3, 0x64(r29)
-	lhz r0, 0x6(r3)
-	cmpwi r0, 0x2
-	beq @12
-	b @13
-	@12:
-	lfs f1, -0x7f3c(r30)
-	lfs f0, -0x7f30(r30)
-	fcmpu cr0, f1, f0
-	bne @14
-	lfs f1, -0x7f38(r30)
-	lfs f0, -0x7f2c(r30)
-	fcmpu cr0, f1, f0
-	bne @14
-	lfs f1, -0x7f34(r30)
-	lfs f0, -0x7f28(r30)
-	fcmpu cr0, f1, f0
-	beq @13
-	@14:
-	lwz r3, -0x7f3c(r30)
-	li r4, 0x1
-	lwz r0, -0x7f38(r30)
-	stw r3, -0x7f30(r30)
-	stw r0, -0x7f2c(r30)
-	lwz r0, -0x7f34(r30)
-	stw r0, -0x7f28(r30)
-	@13:
-	lwz r3, 0x64(r29)
-	lhz r0, 0x6(r3)
-	cmpwi r0, 0x3
-	beq @15
-	bge @16
-	cmpwi r0, 0x2
-	bge @17
-	cmpwi r0, 0x0
-	bge @18
-	b @19
-	@16:
-	cmpwi r0, 0x8
-	bge @19
-	@18:
-	cmpwi r4, 0x0
-	beq @19
-	lfs f3, 0x4(r29)
-	lfs f2, 0x10(r29)
-	lfs f1, 0x8(r29)
-	lfs f0, 0x14(r29)
-	fadds f3, f3, f2
-	lfs f5, 0x28(r29)
-	lfs f2, 0xc(r29)
-	fadds f4, f1, f0
-	lfs f0, 0x18(r29)
-	fadds f1, f5, f3
-	lfs f5, 0x2c(r29)
-	fadds f0, f2, f0
-	lfs f3, 0x30(r29)
-	fadds f2, f5, f4
-	lwz r3, 0x0(r3)
-	fadds f3, f3, f0
-	bl mapObjTranslate
-	lwz r3, 0x64(r29)
-	lfs f1, 0x1c(r29)
-	lwz r3, 0x0(r3)
-	lfs f2, 0x20(r29)
-	lfs f3, 0x24(r29)
-	bl mapObjRotate
-	b @19
-	@17:
-	cmpwi r4, 0x0
-	beq @19
-	lfs f3, 0x4(r29)
-	lfs f2, 0x10(r29)
-	lfs f1, 0x8(r29)
-	lfs f0, 0x14(r29)
-	fadds f3, f3, f2
-	lfs f5, 0x28(r29)
-	lfs f2, 0xc(r29)
-	fadds f4, f1, f0
-	lfs f0, 0x18(r29)
-	fadds f1, f5, f3
-	lfs f5, 0x2c(r29)
-	fadds f0, f2, f0
-	lfs f3, 0x30(r29)
-	fadds f2, f5, f4
-	lwz r3, 0x0(r3)
-	fadds f3, f3, f0
-	bl mapObjTranslate
-	lfs f1, float_0_8041cd04(r0)
-	lfs f0, 0x14(r29)
-	lwz r3, 0x64(r29)
-	fmr f3, f1
-	fneg f2, f0
-	lwz r3, 0x0(r3)
-	bl mapObjTranslate
-	lwz r3, 0x64(r29)
-	lfs f1, -0x7f3c(r30)
-	lwz r3, 0x0(r3)
-	lfs f2, -0x7f38(r30)
-	lfs f3, -0x7f34(r30)
-	bl mapObjRotate
-	lfs f1, float_0_8041cd04(r0)
-	lwz r3, 0x64(r29)
-	fmr f3, f1
-	lfs f2, 0x14(r29)
-	lwz r3, 0x0(r3)
-	bl mapObjTranslate
-	b @19
-	@15:
-	cmpwi r4, 0x0
-	beq @19
-	lfs f3, 0x4(r29)
-	lfs f2, 0x10(r29)
-	lfs f1, 0x8(r29)
-	lfs f0, 0x14(r29)
-	fadds f3, f3, f2
-	lfs f5, 0x28(r29)
-	lfs f2, 0xc(r29)
-	fadds f4, f1, f0
-	lfs f0, 0x18(r29)
-	fadds f1, f5, f3
-	lfs f5, 0x2c(r29)
-	fadds f0, f2, f0
-	lfs f3, 0x30(r29)
-	fadds f2, f5, f4
-	lwz r3, 0x0(r3)
-	fadds f3, f3, f0
-	bl mapObjTranslate
-	lfs f1, float_0_8041cd04(r0)
-	lfs f0, 0x8(r29)
-	lwz r3, 0x64(r29)
-	fmr f3, f1
-	fneg f2, f0
-	lwz r3, 0x0(r3)
-	bl mapObjTranslate
-	lwz r3, 0x64(r29)
-	lfs f1, 0x1c(r29)
-	lwz r3, 0x0(r3)
-	lfs f2, 0x20(r29)
-	lfs f3, 0x24(r29)
-	bl mapObjRotate
-	lfs f1, float_0_8041cd04(r0)
-	lwz r3, 0x64(r29)
-	fmr f3, f1
-	lfs f2, 0x8(r29)
-	lwz r3, 0x0(r3)
-	bl mapObjTranslate
-	@19:
-	lwz r0, 0x68(r29)
-	clrlwi. r0, r0, 31
-	beq @20
-	lwz r3, 0x64(r29)
-	lwz r3, 0x0(r3)
-	bl mapGetMapObj
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	bne @2
-	lwz r3, 0x64(r29)
-	li r4, 0x1
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOn
-	b @2
-	@20:
-	lwz r3, 0x64(r29)
-	lwz r3, 0x0(r3)
-	bl mapGetMapObj
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @2
-	lwz r3, 0x64(r29)
-	li r4, 0x1
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOff
-	@2:
-	addi r28, r28, 0x1
-	addi r27, r27, 0x7c
-	cmpwi r28, 0x20
-	blt @1
-	bl BattleObjectConfig
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void BattleStageObjectInit(void) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stfd f31, 0x40(r1)
-	psq_st f31, 0x48(r1), 0, 0
-	stmw r18, 0x8(r1)
-	lwz r24, _battleWorkPointer(r0)
-	lis r6, lbl_80371490@ha
-	lis r5, vec3_802f3ac8@ha
-	li r31, 0x0
-	lwz r4, 0x2738(r24)
-	addis r3, r24, 0x1
-	addi r26, r5, vec3_802f3ac8@l
-	addi r25, r6, lbl_80371490@l
-	lwz r4, 0xc(r4)
-	addis r20, r24, 0x2
-	li r30, 0x0
-	li r29, 0x0
-	lwz r23, 0x0(r4)
-	li r28, 0x0
-	li r27, 0x0
-	li r4, 0x0
-	lwz r22, 0x8(r23)
-	li r5, 0xf80
-	lwz r21, 0xc(r23)
-	addi r3, r3, 0x7140
-	bl memset
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x4
-	bge @1
-	cmpwi r0, 0x1
-	bge @2
-	b @1
-	@2:
-	la r3, str_8041CD78(r0)
-	li r4, 0x1
-	li r5, 0x0
-	bl mapPlayAnimationLv
-	@1:
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x4
-	bge @3
-	cmpwi r0, 0x1
-	bge @4
-	b @3
-	@4:
-	bl pouchGetPtr
-	lha r3, 0x88(r3)
-	addi r0, r25, 0x1c0
-	mulli r3, r3, 0x310
-	add r0, r0, r3
-	stw r0, -0x7f0c(r20)
-	b @5
-	@3:
-	li r0, 0x0
-	stw r0, -0x7f0c(r20)
-	@5:
-	bl pouchGetPtr
-	lha r5, 0x88(r3)
-	addi r4, r25, 0xe00
-	li r3, -0x1
-	li r0, 0x0
-	mulli r5, r5, 0x78c
-	add r4, r4, r5
-	stw r4, -0x7f08(r20)
-	stb r3, -0x7d76(r20)
-	stw r0, -0x7d64(r20)
-	stw r0, -0x7d60(r20)
-	bl mapGetWork
-	lwz r3, 0xa8(r3)
-	li r4, 0x2
-	lwz r3, 0x8(r3)
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOff
-	la r3, str_8041CD68(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @6
-	la r3, str_8041CD68(r0)
-	li r4, 0x1
-	bl mapGrpFlagOn
-	la r3, str_8041CD68(r0)
-	li r4, 0x2
-	bl mapGrpFlagOff
-	@6:
-	la r3, str_8041CD6C(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @7
-	la r3, str_8041CD6C(r0)
-	li r4, 0x1
-	bl mapGrpFlagOn
-	la r3, str_8041CD6C(r0)
-	li r4, 0x2
-	bl mapGrpFlagOff
-	@7:
-	la r3, str_8041CD70(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @8
-	la r3, str_8041CD70(r0)
-	li r4, 0x1
-	bl mapGrpFlagOn
-	la r3, str_8041CD70(r0)
-	li r4, 0x2
-	bl mapGrpFlagOff
-	@8:
-	la r3, str_8041CD74(r0)
-	bl mapGetMapObj
-	cmplwi r3, 0x0
-	beq @9
-	la r3, str_8041CD74(r0)
-	li r4, 0x1
-	bl mapGrpFlagOn
-	la r3, str_8041CD74(r0)
-	li r4, 0x2
-	bl mapGrpFlagOff
-	@9:
-	addi r3, r26, 0xe4
-	li r4, 0x1
-	bl mapGrpFlagOn
-	cmplwi r21, 0x0
-	li r20, 0x1
-	beq @10
-	lfs f31, float_0_8041cd04(r0)
-	b @11
-	@12:
-	li r0, 0x20
-	li r4, 0x0
-	li r3, 0x0
-	mtctr r0
-	@13:
-	addis r19, r3, 0x1
-	addi r19, r19, 0x7140
-	add r19, r24, r19
-	lwz r0, 0x0(r19)
-	cmpwi r0, 0x0
-	ble @14
-	addi r4, r4, 0x1
-	addi r3, r3, 0x7c
-	bdnz @13
-	@14:
-	cmpwi r4, 0x20
-	bge @10
-	stw r21, 0x64(r19)
-	li r0, -0x1
-	stw r20, 0x0(r19)
-	stw r0, 0x6c(r19)
-	lwz r3, 0x64(r19)
-	lhz r0, 0x6(r3)
-	cmpwi r0, 0x3
-	beq @15
-	bge @16
-	cmpwi r0, 0x1
-	beq @17
-	bge @18
-	cmpwi r0, 0x0
-	bge @19
-	b @20
-	@16:
-	cmpwi r0, 0x6
-	beq @21
-	b @20
-	@19:
-	addi r31, r31, 0x1
-	b @20
-	@17:
-	addi r30, r30, 0x1
-	b @20
-	@18:
-	addi r29, r29, 0x1
-	b @20
-	@15:
-	addi r28, r28, 0x1
-	b @20
-	@21:
-	li r27, 0x1
-	@20:
-	cmpwi r0, 0x4
-	bge @22
-	cmpwi r0, 0x2
-	bge @23
-	cmpwi r0, 0x0
-	bge @24
-	b @25
-	@22:
-	cmpwi r0, 0x8
-	bge @25
-	cmpwi r0, 0x6
-	bge @24
-	b @25
-	@24:
-	lwz r3, 0x8(r21)
-	lwz r0, 0xc(r21)
-	stw r3, 0x4(r19)
-	stw r0, 0x8(r19)
-	lwz r0, 0x10(r21)
-	stw r0, 0xc(r19)
-	b @25
-	@23:
-	lwz r3, 0x8(r21)
-	lwz r0, 0xc(r21)
-	stw r3, 0x4(r19)
-	stw r0, 0x8(r19)
-	lwz r0, 0x10(r21)
-	stw r0, 0xc(r19)
-	@25:
-	stfs f31, 0x24(r19)
-	li r4, 0x1
-	stfs f31, 0x20(r19)
-	stfs f31, 0x1c(r19)
-	lwz r3, 0x0(r26)
-	lwz r0, 0x4(r26)
-	stw r3, 0x34(r19)
-	stw r0, 0x38(r19)
-	lwz r0, 0x8(r26)
-	stw r0, 0x3c(r19)
-	lwz r3, 0xc(r26)
-	lwz r0, 0x10(r26)
-	stw r3, 0x40(r19)
-	stw r0, 0x44(r19)
-	lwz r0, 0x14(r26)
-	stw r0, 0x48(r19)
-	lwz r3, 0x18(r26)
-	lwz r0, 0x1c(r26)
-	stw r3, 0x4c(r19)
-	stw r0, 0x50(r19)
-	lwz r0, 0x20(r26)
-	stw r0, 0x54(r19)
-	lwz r3, 0x24(r26)
-	lwz r0, 0x28(r26)
-	stw r3, 0x58(r19)
-	stw r0, 0x5c(r19)
-	lwz r0, 0x2c(r26)
-	stw r0, 0x60(r19)
-	lwz r3, 0x64(r19)
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOff
-	lhz r0, 0x4(r21)
-	cmpwi r0, 0x1
-	beq @26
-	bge @27
-	cmpwi r0, 0x0
-	bge @28
-	b @27
-	b @27
-	@28:
-	la r3, _entry_tree_data(r0)
-	bl BtlUnit_Entry
-	lwz r0, 0x0(r19)
-	mr r18, r3
-	stw r0, 0xb2c(r3)
-	lwz r0, 0x0(r3)
-	stw r0, 0x6c(r19)
-	lfs f1, 0x4(r19)
-	lfs f2, 0x8(r19)
-	lfs f3, 0xc(r19)
-	bl BtlUnit_SetPos
-	lfs f1, 0x4(r19)
-	mr r3, r18
-	lfs f2, 0x8(r19)
-	lfs f3, 0xc(r19)
-	bl BtlUnit_SetHomePos
-	b @27
-	@26:
-	la r3, _entry_switch_data(r0)
-	bl BtlUnit_Entry
-	lwz r0, 0x0(r19)
-	mr r18, r3
-	stw r0, 0xb2c(r3)
-	lwz r0, 0x0(r3)
-	stw r0, 0x6c(r19)
-	lfs f1, 0x4(r19)
-	lfs f2, 0x8(r19)
-	lfs f3, 0xc(r19)
-	bl BtlUnit_SetPos
-	lfs f1, 0x4(r19)
-	mr r3, r18
-	lfs f2, 0x8(r19)
-	lfs f3, 0xc(r19)
-	bl BtlUnit_SetHomePos
-	@27:
-	addi r20, r20, 0x1
-	subi r22, r22, 0x1
-	addi r21, r21, 0x18
-	@11:
-	cmpwi r22, 0x0
-	bne @12
-	@10:
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x0
-	ble @29
-	lfs f31, float_0_8041cd04(r0)
-	addi r25, r25, 0x2c30
-	li r21, 0x0
-	@30:
-	li r0, 0x20
-	li r4, 0x0
-	li r3, 0x0
-	mtctr r0
-	@31:
-	addis r19, r3, 0x1
-	addi r19, r19, 0x7140
-	add r19, r24, r19
-	lwz r0, 0x0(r19)
-	cmpwi r0, 0x0
-	ble @32
-	addi r4, r4, 0x1
-	addi r3, r3, 0x7c
-	bdnz @31
-	@32:
-	cmpwi r4, 0x20
-	bge @29
-	stw r25, 0x64(r19)
-	li r0, -0x1
-	li r4, 0x1
-	stw r20, 0x0(r19)
-	stw r0, 0x6c(r19)
-	lwz r3, 0x8(r25)
-	lwz r0, 0xc(r25)
-	stw r3, 0x4(r19)
-	stw r0, 0x8(r19)
-	lwz r0, 0x10(r25)
-	stw r0, 0xc(r19)
-	stfs f31, 0x24(r19)
-	stfs f31, 0x20(r19)
-	stfs f31, 0x1c(r19)
-	lwz r3, 0x30(r26)
-	lwz r0, 0x34(r26)
-	stw r3, 0x34(r19)
-	stw r0, 0x38(r19)
-	lwz r0, 0x38(r26)
-	stw r0, 0x3c(r19)
-	lwz r3, 0x3c(r26)
-	lwz r0, 0x40(r26)
-	stw r3, 0x40(r19)
-	stw r0, 0x44(r19)
-	lwz r0, 0x44(r26)
-	stw r0, 0x48(r19)
-	lwz r3, 0x48(r26)
-	lwz r0, 0x4c(r26)
-	stw r3, 0x4c(r19)
-	stw r0, 0x50(r19)
-	lwz r0, 0x50(r26)
-	stw r0, 0x54(r19)
-	lwz r3, 0x54(r26)
-	lwz r0, 0x58(r26)
-	stw r3, 0x58(r19)
-	stw r0, 0x5c(r19)
-	lwz r0, 0x5c(r26)
-	stw r0, 0x60(r19)
-	lwz r3, 0x64(r19)
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOff
-	addi r21, r21, 0x1
-	addi r25, r25, 0x18
-	cmpwi r21, 0x3
-	addi r20, r20, 0x1
-	blt @30
-	@29:
-	li r0, 0x20
-	la r4, _object_wall_data(r0)
-	li r3, 0x0
-	mtctr r0
-	@33:
-	addis r19, r3, 0x1
-	addi r19, r19, 0x7140
-	add r19, r24, r19
-	lwz r0, 0x0(r19)
-	cmpwi r0, 0x0
-	ble @34
-	addi r3, r3, 0x7c
-	bdnz @33
-	@34:
-	stw r4, 0x64(r19)
-	li r0, -0x1
-	stw r20, 0x0(r19)
-	stw r0, 0x6c(r19)
-	lwz r3, 0x8(r4)
-	lwz r0, 0xc(r4)
-	stw r3, 0x4(r19)
-	stw r0, 0x8(r19)
-	lwz r0, 0x10(r4)
-	stw r0, 0xc(r19)
-	bl BattleStageGetPtr
-	lfs f1, 0xb28(r3)
-	li r4, 0x1
-	lfs f0, float_0_8041cd04(r0)
-	stfs f1, 0x8(r19)
-	stfs f0, 0x24(r19)
-	stfs f0, 0x20(r19)
-	stfs f0, 0x1c(r19)
-	lwz r3, 0x60(r26)
-	lwz r0, 0x64(r26)
-	stw r3, 0x34(r19)
-	stw r0, 0x38(r19)
-	lwz r0, 0x68(r26)
-	stw r0, 0x3c(r19)
-	lwz r3, 0x6c(r26)
-	lwz r0, 0x70(r26)
-	stw r3, 0x40(r19)
-	stw r0, 0x44(r19)
-	lwz r0, 0x74(r26)
-	stw r0, 0x48(r19)
-	lwz r3, 0x78(r26)
-	lwz r0, 0x7c(r26)
-	stw r3, 0x4c(r19)
-	stw r0, 0x50(r19)
-	lwz r0, 0x80(r26)
-	stw r0, 0x54(r19)
-	lwz r3, 0x84(r26)
-	lwz r0, 0x88(r26)
-	stw r3, 0x58(r19)
-	stw r0, 0x5c(r19)
-	lwz r0, 0x8c(r26)
-	stw r0, 0x60(r19)
-	lwz r3, 0x64(r19)
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOn
-	lwz r0, 0x68(r19)
-	li r21, 0x0
-	lfs f31, float_0_8041cd04(r0)
-	addi r20, r20, 0x1
-	ori r0, r0, 0x1
-	stw r0, 0x68(r19)
-	@35:
-	la r5, _object_spot_light_data(r0)
-	add r5, r5, r21
-	lwz r0, 0x0(r5)
-	cmplwi r0, 0x0
-	beq @36
-	li r0, 0x20
-	li r3, 0x0
-	mtctr r0
-	@37:
-	addis r19, r3, 0x1
-	addi r19, r19, 0x7140
-	add r19, r24, r19
-	lwz r0, 0x0(r19)
-	cmpwi r0, 0x0
-	ble @38
-	addi r3, r3, 0x7c
-	bdnz @37
-	@38:
-	stw r5, 0x64(r19)
-	li r0, -0x1
-	li r4, 0x1
-	stw r20, 0x0(r19)
-	stw r0, 0x6c(r19)
-	lwz r3, 0x8(r5)
-	lwz r0, 0xc(r5)
-	stw r3, 0x4(r19)
-	stw r0, 0x8(r19)
-	lwz r0, 0x10(r5)
-	stw r0, 0xc(r19)
-	stfs f31, 0x24(r19)
-	stfs f31, 0x20(r19)
-	stfs f31, 0x1c(r19)
-	lwz r3, 0x90(r26)
-	lwz r0, 0x94(r26)
-	stw r3, 0x34(r19)
-	stw r0, 0x38(r19)
-	lwz r0, 0x98(r26)
-	stw r0, 0x3c(r19)
-	lwz r3, 0x9c(r26)
-	lwz r0, 0xa0(r26)
-	stw r3, 0x40(r19)
-	stw r0, 0x44(r19)
-	lwz r0, 0xa4(r26)
-	stw r0, 0x48(r19)
-	lwz r3, 0xa8(r26)
-	lwz r0, 0xac(r26)
-	stw r3, 0x4c(r19)
-	stw r0, 0x50(r19)
-	lwz r0, 0xb0(r26)
-	stw r0, 0x54(r19)
-	lwz r3, 0xb4(r26)
-	lwz r0, 0xb8(r26)
-	stw r3, 0x58(r19)
-	stw r0, 0x5c(r19)
-	lwz r0, 0xbc(r26)
-	stw r0, 0x60(r19)
-	lwz r3, 0x64(r19)
-	lwz r3, 0x0(r3)
-	bl mapGrpFlagOn
-	lwz r0, 0x68(r19)
-	addi r20, r20, 0x1
-	addi r21, r21, 0x18
-	ori r0, r0, 0x1
-	stw r0, 0x68(r19)
-	b @35
-	@36:
-	lwz r3, 0x190(r23)
-	cmplwi r3, 0x0
-	beq @39
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	@39:
-	cmpwi r31, 0x0
-	beq @40
-	lwz r3, 0x1a0(r23)
-	cmplwi r3, 0x0
-	beq @40
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	addis r3, r24, 0x2
-	stw r0, -0x7f1c(r3)
-	@40:
-	cmpwi r30, 0x0
-	beq @41
-	lwz r3, 0x1a4(r23)
-	cmplwi r3, 0x0
-	beq @41
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	addis r3, r24, 0x2
-	stw r0, -0x7f18(r3)
-	@41:
-	cmpwi r29, 0x0
-	beq @42
-	lwz r3, 0x1a8(r23)
-	cmplwi r3, 0x0
-	beq @42
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	addis r3, r24, 0x2
-	stw r0, -0x7f14(r3)
-	@42:
-	cmpwi r28, 0x0
-	beq @43
-	lwz r3, 0x1ac(r23)
-	cmplwi r3, 0x0
-	beq @43
-	li r4, 0xa
-	li r5, 0x0
-	bl evtEntry
-	lwz r0, 0x15c(r3)
-	addis r3, r24, 0x2
-	stw r0, -0x7f10(r3)
-	@43:
-	cmpwi r31, 0x0
-	bne @44
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x2
-	stb r0, -0x7f24(r3)
-	@44:
-	cmpwi r30, 0x0
-	bne @45
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x4
-	stb r0, -0x7f24(r3)
-	@45:
-	cmpwi r29, 0x0
-	bne @46
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x8
-	stb r0, -0x7f24(r3)
-	@46:
-	lbz r0, 0x1b1(r23)
-	extsb. r0, r0
-	beq @47
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x2
-	stb r0, -0x7f24(r3)
-	@47:
-	lbz r0, 0x1b2(r23)
-	extsb. r0, r0
-	beq @48
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x4
-	stb r0, -0x7f24(r3)
-	@48:
-	lbz r0, 0x1b3(r23)
-	extsb. r0, r0
-	beq @49
-	addis r3, r24, 0x2
-	lbz r0, -0x7f24(r3)
-	ori r0, r0, 0x8
-	stb r0, -0x7f24(r3)
-	@49:
-	cmpwi r27, 0x0
-	bne @50
-	addis r5, r24, 0x2
-	addi r3, r26, 0x1b4
-	lbz r0, -0x7f24(r5)
-	li r4, 0x1
-	ori r0, r0, 0x20
-	stb r0, -0x7f24(r5)
-	bl mapGrpFlagOn
-	addi r3, r26, 0x28c
-	li r4, 0x1
-	bl mapGrpFlagOn
-	@50:
-	psq_l f31, 0x48(r1), 0, 0
-	lfd f31, 0x40(r1)
-	lmw r18, 0x8(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm BattleStageObject* BattleSearchObjectPtr(const char* name) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r27, 0xc(r1)
-	mr r27, r3
-	li r29, 0x0
-	li r31, 0x0
-	lwz r30, _battleWorkPointer(r0)
-	@1:
-	addis r28, r31, 0x1
-	addi r28, r28, 0x7140
-	add r28, r30, r28
-	lwz r0, 0x0(r28)
-	cmpwi r0, 0x0
-	beq @2
-	lwz r3, 0x64(r28)
-	mr r4, r27
-	lwz r3, 0x0(r3)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @2
-	mr r3, r28
-	b @3
-	@2:
-	addi r29, r29, 0x1
-	addi r31, r31, 0x7c
-	cmpwi r29, 0x20
-	blt @1
-	li r3, 0x0
-	@3:
-	lmw r27, 0xc(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm BattleStageObject* BattleGetObjectPtr(s32 id) {
-	nofralloc
-	li r0, 0x20
-	lwz r5, _battleWorkPointer(r0)
-	li r4, 0x0
-	mtctr r0
-	@1:
-	addis r6, r4, 0x1
-	addi r6, r6, 0x7140
-	add r6, r5, r6
-	lwz r0, 0x0(r6)
-	cmpw r0, r3
-	bne @2
-	mr r3, r6
-	blr
-	@2:
-	addi r4, r4, 0x7c
-	bdnz @1
-	li r3, 0x0
-	blr
-}
-// clang-format on
+s32 _bgset_audience_bgset_access(EventEntry* event, BOOL isFirstCall) {
+	BattleAudience_Case_HaikeiSet();
+	return EVT_RETURN_DONE;
 #endif
+}
 
+
+#ifdef NONMATCHING
 __declspec(section ".data") void* jumptable_80374848[9] = {
     (void*)((char*)_object_fall_attack + 0x780),
     (void*)((char*)_object_fall_attack + 0x7b4),
@@ -7673,3 +6519,12 @@ __declspec(section ".data") void* jumptable_80374848[9] = {
 __declspec(section ".data") u32 gap_05_8037486C_data[1] = {0};
 __declspec(section ".sdata") u32 gap_07_80411F3C_sdata[1] = {0};
 #pragma force_active reset
+#endif
+#ifndef NONMATCHING
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+#endif
+
+#ifndef NONMATCHING
+
+#endif

@@ -10,6 +10,108 @@
 #include "system.h"
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
+#ifdef NONMATCHING
+#define EXT_LIT(sym, val) (val)
+#else
+#define EXT_LIT(sym, val) (sym)
+__declspec(section ".rodata") extern const f32 vec3_802fe418[3];
+__declspec(section ".rodata") extern const f32 vec3_802fe424[3];
+__declspec(section ".rodata") extern const u32 dat_802fe430[12];
+__declspec(section ".rodata") extern const f32 vec3_802fe460[3];
+__declspec(section ".rodata") extern const f32 vec3_802fe46c[3];
+__declspec(section ".rodata") extern const f64 double_to_int_mask_802fe478;
+__declspec(section ".rodata") extern const f64 double_to_int_802fe480;
+__declspec(section ".rodata") extern const char str_802FE488[24];
+__declspec(section ".rodata") extern const char str_802FE4A0[24];
+__declspec(section ".rodata") extern const char str_802FE4B8[28];
+__declspec(section ".rodata") extern const char str_802FE4D4[28];
+__declspec(section ".rodata") extern const char str_802FE4F0[28];
+__declspec(section ".rodata") extern const char str_802FE50C[32];
+__declspec(section ".rodata") extern const char str_802FE52C[28];
+__declspec(section ".rodata") extern const char str_802FE548[12];
+__declspec(section ".rodata") extern const char str_802FE554[12];
+__declspec(section ".rodata") extern const char str_802FE560[12];
+__declspec(section ".rodata") extern const char str_802FE56C[12];
+__declspec(section ".rodata") extern const char str_802FE578[12];
+__declspec(section ".rodata") extern const char str_802FE584[28];
+__declspec(section ".sdata2") extern const u32 dat_80420f48;
+__declspec(section ".sdata2") extern const u32 dat_80420f4c;
+__declspec(section ".sdata2") extern const u32 dat_80420f50;
+__declspec(section ".sdata2") extern const u32 dat_80420f54;
+__declspec(section ".sdata2") extern const u32 dat_80420f58;
+__declspec(section ".sdata2") extern const u32 dat_80420f5c;
+__declspec(section ".sdata2") extern const u32 dat_80420f60;
+__declspec(section ".sdata2") extern const u32 dat_80420f64;
+__declspec(section ".sdata2") extern const u32 dat_80420f68;
+__declspec(section ".sdata2") extern const u32 dat_80420f6c;
+__declspec(section ".sdata2") extern const f32 float_deg2rad_80420f70;
+__declspec(section ".sdata2") extern const f32 float_64_80420f74;
+__declspec(section ".sdata2") extern const f32 float_704_80420f78;
+__declspec(section ".sdata2") extern const f32 float_0p5_80420f7c;
+__declspec(section ".sdata2") extern const f32 float_1_80420f80;
+__declspec(section ".sdata2") extern const f32 float_0_80420f84;
+__declspec(section ".sdata2") extern const f32 float_2_80420f88;
+__declspec(section ".sdata2") extern const f32 float_0p56_80420f8c;
+__declspec(section ".sdata2") extern const f32 float_0p4_80420f90;
+__declspec(section ".sdata2") extern const f32 float_0p8_80420f94;
+__declspec(section ".sdata2") extern const f32 float_0p125_80420f98;
+__declspec(section ".sdata2") extern const f32 float_0p7_80420f9c;
+__declspec(section ".sdata2") extern const f32 float_0p25_80420fa0;
+__declspec(section ".sdata2") extern const f32 float_6p2832_80420fa4;
+__declspec(section ".sdata2") extern const f32 float_360_80420fa8;
+__declspec(section ".sdata2") extern const f32 float_2p05_80420fac;
+__declspec(section ".sdata2") extern const f32 float_10_80420fb0;
+__declspec(section ".sdata2") extern const f32 float_2p1_80420fb4;
+__declspec(section ".sdata2") extern const f32 float_42p667_80420fb8;
+__declspec(section ".sdata2") extern const f32 float_0p33333_80420fbc;
+__declspec(section ".sdata2") extern const f32 float_180_80420fc0;
+__declspec(section ".sdata2") extern const f32 float_neg200_80420fc4;
+__declspec(section ".sdata2") extern const f32 float_200_80420fc8;
+__declspec(section ".sdata2") extern const f32 float_neg82p655_80420fcc;
+__declspec(section ".sdata2") extern const f32 float_88p8_80420fd0;
+__declspec(section ".sdata2") extern const f32 float_1p03_80420fd4;
+__declspec(section ".sdata2") extern const f32 float_82p655_80420fd8;
+__declspec(section ".sdata2") extern const f32 float_neg88p8_80420fdc;
+__declspec(section ".sdata2") extern const f32 float_30_80420fe0;
+__declspec(section ".sdata2") extern const f32 float_neg0p3_80420fe4;
+__declspec(section ".sdata2") extern const f32 float_35_80420fe8;
+__declspec(section ".sdata2") extern const f32 float_62p832_80420fec;
+__declspec(section ".sdata2") extern const f32 float_60_80420ff0;
+__declspec(section ".sdata2") extern const f32 float_16_80420ff4;
+__declspec(section ".sdata2") extern const f32 float_neg16_80420ff8;
+__declspec(section ".sdata2") extern const f32 float_128_80420ffc;
+__declspec(section ".sdata2") extern const f32 float_8p5333_80421000;
+__declspec(section ".sdata2") extern const f32 float_0p066667_80421004;
+__declspec(section ".sdata2") extern const f32 float_600_80421008;
+__declspec(section ".sdata2") extern const f32 float_0p9_8042100c;
+__declspec(section ".sdata2") extern const f32 float_0p01_80421010;
+__declspec(section ".sdata2") extern const f32 float_0p2_80421014;
+__declspec(section ".sdata2") extern const char str_80421018[4];
+__declspec(section ".sdata2") extern const f32 float_neg0p5_8042101c;
+__declspec(section ".sdata2") extern const f32 float_430_80421020;
+__declspec(section ".sdata2") extern const f32 float_neg27_80421024;
+__declspec(section ".sdata2") extern const f32 float_80_80421028;
+__declspec(section ".sdata2") extern const char str_8042102C[4];
+__declspec(section ".sdata2") extern const f32 float_5_80421030;
+__declspec(section ".sdata2") extern const f32 float_0p00761_80421034;
+__declspec(section ".sdata2") extern const f32 float_0p16605_80421038;
+__declspec(section ".sdata2") extern const f32 float_3p1416_8042103c;
+__declspec(section ".sdata2") extern const f32 float_1p5708_80421040;
+__declspec(section ".sdata2") extern const f32 float_4p7124_80421044;
+__declspec(section ".sdata2") extern const f32 float_0p03705_80421048;
+__declspec(section ".sdata2") extern const f32 float_0p4967_8042104c;
+__declspec(section ".sdata2") extern const f32 float_40_80421050;
+__declspec(section ".sdata2") extern const char str_80421054[4];
+__declspec(section ".sdata2") extern const char str_80421058[8];
+__declspec(section ".sdata2") extern const f32 float_300_80421060;
+__declspec(section ".sdata2") extern const f32 float_1p2_80421064;
+__declspec(section ".sdata2") extern const f32 float_1p6_80421068;
+__declspec(section ".sdata2") extern const f32 float_0p1_8042106c;
+__declspec(section ".sdata2") extern const f32 float_0p6_80421070;
+__declspec(section ".sdata2") extern const f32 float_1p3_80421074;
+__declspec(section ".sdata2") extern const f32 float_400_80421078;
+#define white255 (*(const GXColor*)&dat_80420f54)
+#endif
 
 extern double sin(double);
 extern double cos(double);
@@ -88,7 +190,7 @@ static u8 shibuki_dl_1_1[] = { 0x98, 0x00, 0x06, 0x20, 0x00, 0x04, 0x24, 0x22, 0
 static u8 shibuki_dl_1_2[] = { 0x98, 0x00, 0x06, 0x22, 0x00, 0x04, 0x22, 0x21, 0x00, 0x07, 0x23, 0x23, 0x00, 0x04, 0x1D, 0x1E, 0x00, 0x07, 0x18, 0x24, 0x00, 0x06, 0x1F, 0x1B, 0x00, 0x07, 0x1E, 0x00, 0x00, 0x00, 0x00, 0x00 };
 static u8 shibuki_dl_1_3[] = { 0x98, 0x00, 0x06, 0x25, 0x00, 0x04, 0x20, 0x20, 0x00, 0x04, 0x21, 0x26, 0x00, 0x04, 0x19, 0x1D, 0x00, 0x05, 0x1A, 0x27, 0x00, 0x06, 0x1C, 0x1A, 0x00, 0x06, 0x1B, 0x00, 0x00, 0x00, 0x00, 0x00 };
 
-USER_FUNC(evt_cam_shake);
+s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
 
 static EVT_BEGIN(evt_shake)
     CALL(evt_cam_shake, 4, FLOAT(0.009765625f), FLOAT(0.009765625f), 300)
@@ -104,14 +206,15 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect);
 void effFallDispInseki(CameraId cameraId, EffectEntry* effect);
 void effFallDispWater(CameraId cameraId, EffectEntry* effect);
 
+#ifdef NONMATCHING
 static inline f32 fall_sinf(f32 x) {
     f32 a = 0.00761f;
-    f32 b = 0.16605f;
-    f32 c = 1.0f;
+    f32 b = EXT_LIT(float_0p16605_80421038, 0.16605f);
+    f32 c = EXT_LIT(float_1_80420f80, 1.0f);
     f32 y;
     f32 x2;
 
-    if (x <= 3.1415927f) {
+    if (x <= EXT_LIT(float_3p1416_8042103c, 3.1415927f)) {
         if (x <= 1.5707964f) {
             x2 = x * x;
             a = a * x2 - b;
@@ -126,7 +229,7 @@ static inline f32 fall_sinf(f32 x) {
             a = a * y;
         }
     }
-    else if (x < 4.712389f) {
+    else if (x < EXT_LIT(float_4p7124_80421044, 4.712389f)) {
         y = x - 3.1415927f;
         x2 = y * y;
         a = a * x2 - b;
@@ -144,15 +247,17 @@ static inline f32 fall_sinf(f32 x) {
     }
     return a;
 }
+#endif
 
+#ifdef NONMATCHING
 static inline f32 fall_cosf(f32 x) {
     f32 a = 0.03705f;
-    f32 b = 0.4967f;
-    f32 c = 1.0f;
+    f32 b = EXT_LIT(float_0p4967_8042104c, 0.4967f);
+    f32 c = EXT_LIT(float_1_80420f80, 1.0f);
     f32 y;
     f32 x2;
 
-    if (x <= 3.1415927f) {
+    if (x <= EXT_LIT(float_3p1416_8042103c, 3.1415927f)) {
         if (x <= 1.5707964f) {
             x2 = x * x;
             a = a * x2 - b;
@@ -166,7 +271,7 @@ static inline f32 fall_cosf(f32 x) {
             a = -a;
         }
     }
-    else if (x < 4.712389f) {
+    else if (x < EXT_LIT(float_4p7124_80421044, 4.712389f)) {
         y = x - 3.1415927f;
         x2 = y * y;
         a = a * x2 - b;
@@ -181,7 +286,44 @@ static inline f32 fall_cosf(f32 x) {
     }
     return a;
 }
+#endif
 
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
+void DCFlushRange(void* addr, u32 nBytes);
+void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
+void GXCallDisplayList(void* list, u32 nbytes);
+void GXClearVtxDesc(void);
+u16 GXGetTexObjHeight(const GXTexObj* to);
+void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
+void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
+void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
+void GXSetArray(GXAttr attr, void* base_ptr, u8 stride);
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
+void GXSetChanMatColor(GXChannelID chan, GXColor mat_color);
+void GXSetCullMode(GXCullMode mode);
+void GXSetCurrentMtx(u32 id);
+void GXSetNumChans(u8 nChans);
+void GXSetNumTevStages(u8 nStages);
+void GXSetNumTexGens(u8 nTexGens);
+void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
+void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
+void GXSetTevColor(GXTevRegID id, GXColor color);
+void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
+void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
+void GXSetTevOp(GXTevStageID id, GXTevMode mode);
+void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
+void GXSetVtxDesc(GXAttr attr, GXAttrType type);
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXIdentity(Mtx m);
+void PSMTXRotAxisRad(Mtx m, const Vec* axis, f32 rad);
+void PSMTXRotRad(Mtx m, char axis, f32 rad);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+extern void* jumptable_803AE070[];
+extern void* jumptable_803AE04C[];
+extern void* jumptable_803AE024[];
 #ifdef NONMATCHING
 EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
     const char* sfxName;
@@ -235,12 +377,12 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
         a = 3.1415927f * irand(360) / 180.0f;
         r = irand((s32)arg4);
         e->pos.x = r * (f32)sin(a);
-        e->pos.y = 300.0f + irand(effect->count);
+        e->pos.y = EXT_LIT(float_300_80421060, 300.0f) + irand(effect->count);
         e->pos.z = r * (f32)cos(a);
         e->timer = 0;
         e->scroll = 0;
         e->alpha = 255;
-        e->rot2 = 0.0f;
+        e->rot2 = EXT_LIT(float_0_80420f84, 0.0f);
         e->rotY = irand(100) > 50 ? 0 : 180;
         e->state = 0;
         e->pose0 = -1;
@@ -248,36 +390,36 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
         switch (type) {
             case 0:
             case 1:
-                e->f34 = 0.0f;
-                e->f30 = 0.2f;
+                e->f34 = EXT_LIT(float_0_80420f84, 0.0f);
+                e->f30 = EXT_LIT(float_0p2_80421014, 0.2f);
                 if (i == 1) {
                     e->pos.x = 0.0f;
-                    e->pos.z = 0.0f;
+                    e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
                     e->timer = 0;
                 } else {
                     e->timer = irand(effect->count) + 60;
                 }
-                e->scale = type == 0 ? 0.5f : 1.2f;
+                e->scale = type == 0 ? EXT_LIT(float_0p5_80420f7c, 0.5f) : EXT_LIT(float_1p2_80421064, 1.2f);
                 break;
             case 2:
-                e->f34 = 0.0f;
-                e->f30 = 1.6f;
-                e->pos.x = 0.0f;
-                e->pos.z = 0.0f;
+                e->f34 = EXT_LIT(float_0_80420f84, 0.0f);
+                e->f30 = EXT_LIT(float_1p6_80421068, 1.6f);
+                e->pos.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
                 e->timer = 0;
-                e->f44 = 0.0f;
-                e->scale = 0.5f;
+                e->f44 = EXT_LIT(float_0_80420f84, 0.0f);
+                e->scale = EXT_LIT(float_0p5_80420f7c, 0.5f);
                 break;
             case 3: {
                 e->f34 = 0.0f;
-                e->f30 = 0.1f;
-                e->pos.x = 0.0f;
-                e->pos.y = 200.0f;
-                e->pos.z = 0.0f;
-                e->vel.x = 0.0f;
-                e->vel.y = 0.0f;
-                e->vel.z = 0.0f;
-                e->scale = 1.0f;
+                e->f30 = EXT_LIT(float_0p1_8042106c, 0.1f);
+                e->pos.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->pos.y = EXT_LIT(float_200_80420fc8, 200.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
+                e->vel.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->vel.y = EXT_LIT(float_0_80420f84, 0.0f);
+                e->vel.z = EXT_LIT(float_0_80420f84, 0.0f);
+                e->scale = EXT_LIT(float_1_80420f80, 1.0f);
                 {
                     Vec v = { 0.0f, 0.0f, 0.0f };
                     v.x = x;
@@ -289,45 +431,311 @@ EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32
             }
             case 4:
             case 5:
-                e->f34 = 0.0f;
-                e->f30 = 0.6f;
-                e->pos.x = 0.0f;
-                e->pos.z = 0.0f;
+                e->f34 = EXT_LIT(float_0_80420f84, 0.0f);
+                e->f30 = EXT_LIT(float_0p6_80421070, 0.6f);
+                e->pos.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
                 e->timer = 0;
-                e->scale = 1.0f;
+                e->scale = EXT_LIT(float_1_80420f80, 1.0f);
                 break;
             case 6:
-                e->pos.x = 0.0f;
-                e->pos.y = 200.0f;
-                e->pos.z = 0.0f;
-                e->vel.x = -e->pos.x / 30.0f;
-                e->vel.y = -e->pos.y / 30.0f;
-                e->vel.z = -e->pos.z / 30.0f;
-                e->scale = 1.3f;
-                e->rot2 = 30.0f;
-                e->rot3 = 0.0f;
+                e->pos.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->pos.y = EXT_LIT(float_200_80420fc8, 200.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
+                e->vel.x = -e->pos.x / EXT_LIT(float_30_80420fe0, 30.0f);
+                e->vel.y = -e->pos.y / EXT_LIT(float_30_80420fe0, 30.0f);
+                e->vel.z = -e->pos.z / EXT_LIT(float_30_80420fe0, 30.0f);
+                e->scale = EXT_LIT(float_1p3_80421074, 1.3f);
+                e->rot2 = EXT_LIT(float_30_80420fe0, 30.0f);
+                e->rot3 = EXT_LIT(float_0_80420f84, 0.0f);
                 break;
             case 7:
-                e->pos.x = 400.0f;
-                e->pos.y = 200.0f;
-                e->pos.z = 0.0f;
-                e->scale = 0.5f;
+                e->pos.x = EXT_LIT(float_400_80421078, 400.0f);
+                e->pos.y = EXT_LIT(float_200_80420fc8, 200.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
+                e->scale = EXT_LIT(float_0p5_80420f7c, 0.5f);
                 break;
             case 8:
-                e->f34 = 0.0f;
-                e->f30 = 0.25f;
-                e->pos.x = 0.0f;
-                e->pos.y = 400.0f;
-                e->pos.z = 0.0f;
-                e->scale = 1.0f;
+                e->f34 = EXT_LIT(float_0_80420f84, 0.0f);
+                e->f30 = EXT_LIT(float_0p25_80420fa0, 0.25f);
+                e->pos.x = EXT_LIT(float_0_80420f84, 0.0f);
+                e->pos.y = EXT_LIT(float_400_80421078, 400.0f);
+                e->pos.z = EXT_LIT(float_0_80420f84, 0.0f);
+                e->scale = EXT_LIT(float_1_80420f80, 1.0f);
                 break;
         }
     }
     return effect;
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
+	char _af_pad[44];
+	asm volatile {
+		opword 0xFF000890
+		mr r23, r3
+		opword 0xFF201090
+		opword 0x7C982378
+		opword 0xFF401890
+		opword 0x7CB92B78
+		opword 0xFFE02090
+		opword 0xFEE02890
+		opword 0xFEC03090
+		bl effEntry
+		opword 0x2C170000
+		opword 0x7C7C1B78
+		opword 0x38980001
+		opword 0x41820020
+		opword 0x4180001C
+		opword 0x2C170009
+		opword 0x40800014
+		opword 0x48000008
+		opword 0x4800000C
+		opword 0x3B000001
+		opword 0x38800002
+		la r0, str_80421058(r2)
+		opword 0x38600003
+		opword 0x901C0014
+		opword 0x909C0008
+		opword 0x801C0008
+		opword 0x1C800068
+		bl __memAlloc
+		lis r4, effFallMain@ha
+		opword 0x907C000C
+		addi r0, r4, effFallMain@l
+		lis r5, str_802FE584@ha
+		opword 0x901C0010
+		addi r29, r5, str_802FE584@l
+		opword 0xFC00F81E
+		lis r4, double_to_int_802fe480@ha
+		opword 0x801C0000
+		opword 0x38A00000
+		lfd f27, double_to_int_802fe480@l(r4)
+		opword 0x3B630068
+		opword 0x60000002
+		stfd f0, _af_pad+16(r1)
+		lfs f28, float_3p1416_8042103c(r2)
+		opword 0x3B400001
+		opword 0x901C0000
+		opword 0x3800FFFF
+		opword 0x83C1001C
+		opword 0x3FE04330
+		opword 0x92E30000
+		lfs f29, float_180_80420fc0(r2)
+		opword 0xD3030004
+		lfs f30, float_300_80421060(r2)
+		opword 0xD3230008
+		opword 0xD343000C
+		opword 0xD3E30010
+		lfs f31, float_0_80420f84(r2)
+		opword 0xD2E30014
+		opword 0xD2C30018
+		opword 0x9303001C
+		opword 0x90A30024
+		opword 0x90A30028
+		opword 0x93230020
+		opword 0x9003005C
+		opword 0x90030060
+		opword 0x480002EC
+		opword 0x38600168
+		bl irand
+		opword 0x6C608000
+		opword 0x93E10018
+		opword 0x7FC3F378
+		opword 0x9001001C
+		opword 0xC8010018
+		opword 0xEC00D828
+		opword 0xEC1C0032
+		opword 0xEEE0E824
+		bl irand
+		opword 0x6C608000
+		opword 0x93E10020
+		opword 0xFC20B890
+		opword 0x90010024
+		opword 0xC8010020
+		fsubs f22, f0, f27
+		bl sin
+		opword 0xFC000818
+		opword 0xEC160032
+		opword 0xD01B0004
+		opword 0x807C0008
+		bl irand
+		opword 0x6C608000
+		opword 0x93E10028
+		opword 0xFC20B890
+		opword 0x9001002C
+		opword 0xC8010028
+		opword 0xEC00D828
+		opword 0xEC1E002A
+		opword 0xD01B0008
+		bl cos
+		opword 0xFC000818
+		opword 0x38800000
+		opword 0x380000FF
+		opword 0x38600064
+		opword 0xEC160032
+		opword 0xD01B000C
+		opword 0x909B0024
+		opword 0x909B0028
+		opword 0x901B003C
+		opword 0xD3FB0048
+		bl irand
+		opword 0x38A00032
+		opword 0x54640FFE
+		opword 0x7C032810
+		opword 0x380000B4
+		opword 0x54A30FFE
+		opword 0x93E10030
+		opword 0x7C632110
+		opword 0x38800000
+		opword 0x7C031878
+		opword 0x3800FFFF
+		opword 0x6C638000
+		opword 0x28170008
+		opword 0x90610034
+		opword 0xC8010030
+		opword 0xEC00D828
+		opword 0xD01B0018
+		opword 0x909B0038
+		opword 0x901B005C
+		opword 0x901B0060
+		opword 0x418101E8
+		lis r3, jumptable_803AE070@ha
+		opword 0x56E0103A
+		addi r3, r3, jumptable_803AE070@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		lfs f1, float_0_80420f84(r2)
+		opword 0x2C1A0001
+		lfs f0, float_0p2_80421014(r2)
+		opword 0xD03B0034
+		opword 0xD01B0030
+		opword 0x40820018
+		opword 0xD03B0004
+		opword 0x38000000
+		opword 0xD03B000C
+		opword 0x901B0024
+		opword 0x48000014
+		opword 0x807C0008
+		bl irand
+		opword 0x3803003C
+		opword 0x901B0024
+		opword 0x2C170000
+		opword 0x4082000C
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0x48000008
+		lfs f0, float_1p2_80421064(r2)
+		opword 0xD01B002C
+		opword 0x48000178
+		lfs f2, float_0_80420f84(r2)
+		lfs f1, float_1p6_80421068(r2)
+		opword 0xD05B0034
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0xD03B0030
+		opword 0xD05B0004
+		opword 0xD05B000C
+		opword 0x909B0024
+		opword 0xD05B0044
+		opword 0xD01B002C
+		opword 0x4800014C
+		lfs f2, float_0_80420f84(r2)
+		lis r3, vec3_802fe418@ha
+		lfs f0, float_0p1_8042106c(r2)
+		addi r7, r3, vec3_802fe418@l
+		opword 0xD05B0034
+		opword 0x7FA3EB78
+		lfs f1, float_200_80420fc8(r2)
+		opword 0x38810008
+		opword 0xD01B0030
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD05B0004
+		opword 0xD03B0008
+		opword 0xD05B000C
+		opword 0xD05B0050
+		opword 0xD05B0054
+		opword 0xD05B0058
+		opword 0xD01B002C
+		opword 0x80C70000
+		opword 0x80A70004
+		opword 0x80070008
+		opword 0x90C10008
+		opword 0x90A1000C
+		opword 0x90010010
+		opword 0xD3010008
+		opword 0xD321000C
+		opword 0xD3410010
+		bl psndSFXOn_3D
+		opword 0x907B0064
+		opword 0x480000D8
+		lfs f2, float_0_80420f84(r2)
+		opword 0x38000000
+		lfs f1, float_0p6_80421070(r2)
+		opword 0xD05B0034
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD03B0030
+		opword 0xD05B0004
+		opword 0xD05B000C
+		opword 0x901B0024
+		opword 0xD01B002C
+		opword 0x480000AC
+		lfs f3, float_0_80420f84(r2)
+		lfs f0, float_200_80420fc8(r2)
+		opword 0xD07B0004
+		lfs f2, float_30_80420fe0(r2)
+		opword 0xD01B0008
+		lfs f0, float_1p3_80421074(r2)
+		opword 0xD07B000C
+		opword 0xC03B0004
+		opword 0xFC200850
+		opword 0xEC211024
+		opword 0xD03B0050
+		opword 0xC03B0008
+		opword 0xFC200850
+		opword 0xEC211024
+		opword 0xD03B0054
+		opword 0xC03B000C
+		opword 0xFC200850
+		opword 0xEC211024
+		opword 0xD03B0058
+		opword 0xD01B002C
+		opword 0xD05B0048
+		opword 0xD07B004C
+		opword 0x48000050
+		lfs f1, float_400_80421078(r2)
+		lfs f0, float_200_80420fc8(r2)
+		opword 0xD03B0004
+		lfs f1, float_0_80420f84(r2)
+		opword 0xD01B0008
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0xD03B000C
+		opword 0xD01B002C
+		opword 0x4800002C
+		lfs f2, float_0_80420f84(r2)
+		lfs f0, float_0p25_80420fa0(r2)
+		opword 0xD05B0034
+		lfs f1, float_400_80421078(r2)
+		opword 0xD01B0030
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD05B0004
+		opword 0xD03B0008
+		opword 0xD05B000C
+		opword 0xD01B002C
+		opword 0x3B5A0001
+		opword 0x3B7B0068
+		opword 0x801C0008
+		opword 0x7C1A0000
+		opword 0x4180FD10
+		opword 0x7F83E378
+	}
+}
+#pragma pop
 #endif
 #pragma opt_propagation off
 
+#ifdef NONMATCHING
 static inline void effFallRelease(EffectEntry* effect) {
     EffFallElem* e;
     s32 i;
@@ -341,6 +749,7 @@ static inline void effFallRelease(EffectEntry* effect) {
         psndSFXOff(e->sfx);
     }
 }
+#endif
 #ifdef NONMATCHING
 void effFallMain(EffectEntry* effect) {
     Vec sndPos;
@@ -395,8 +804,8 @@ void effFallMain(EffectEntry* effect) {
     meteor1 = "SFX_BTL_STAGE_FALL_METEOR1\0";
     meteor2 = "SFX_BTL_STAGE_DAMAGE_METEOR2\0\0\0";
     light1 = "SFX_BTL_STAGE_DAMAGE_LIGHT1";
-    angle = 6.2831855f * rotY;
-    top = 30.0f + y;
+    angle = EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * rotY;
+    top = EXT_LIT(float_30_80420fe0, 30.0f) + y;
     done = 0;
     for (i = 1, e++; i < effect->count; i++, e++) {
         switch (type) {
@@ -423,27 +832,27 @@ void effFallMain(EffectEntry* effect) {
                         }
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f)) < arg4 / EXT_LIT(float_2_80420f88, 2.0f)) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
-                                e->f34 *= -0.3f;
+                                e->f34 *= EXT_LIT(float_neg0p3_80420fe4, -0.3f);
                                 e->state++;
                             }
                         } else if (e->pos.y < y) {
                             e->pos.y = y;
-                            e->f34 *= -0.3f;
+                            e->f34 *= EXT_LIT(float_neg0p3_80420fe4, -0.3f);
                             e->state++;
                         }
                         break;
                     case 2:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        a = (6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z)) / 360.0f;
+                        a = (EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * angleABf(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f), e->pos.x, e->pos.z)) / EXT_LIT(float_360_80420fa8, 360.0f);
                         if (i == 1) {
                             a = angle / 360.0f;
                         }
-                        e->pos.x += 0.5f * (f32)sin(a);
-                        e->pos.z += 0.5f * -(f32)cos(a);
+                        e->pos.x += EXT_LIT(float_0p5_80420f7c, 0.5f) * (f32)sin(a);
+                        e->pos.z += EXT_LIT(float_0p5_80420f7c, 0.5f) * -(f32)cos(a);
                         if (e->pos.y < y) {
                             e->pos.y = y;
                             e->timer = 0;
@@ -473,7 +882,7 @@ void effFallMain(EffectEntry* effect) {
                 if (e->scroll >= 3) {
                     e->scroll = 0;
                 }
-                e->rot2 = 35.0f * (f32)sin(gp->retraceCount / 2.0f + i);
+                e->rot2 = EXT_LIT(float_35_80420fe8, 35.0f) * (f32)sin(gp->retraceCount / EXT_LIT(float_2_80420f88, 2.0f) + i);
                 break;
             case 2:
                 switch (e->state) {
@@ -488,8 +897,8 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 1:
-                        a = (f32)sin((62.831856f * e->timer) / 60.0f);
-                        e->f44 = ((60.0f - e->timer) * a) / 60.0f;
+                        a = (f32)sin((EXT_LIT(float_62p832_80420fec, 62.831856f) * e->timer) / EXT_LIT(float_60_80420ff0, 60.0f));
+                        e->f44 = ((EXT_LIT(float_60_80420ff0, 60.0f) - e->timer) * a) / EXT_LIT(float_60_80420ff0, 60.0f);
                         e->timer++;
                         if (e->timer > 60) {
                             e->state++;
@@ -517,10 +926,10 @@ void effFallMain(EffectEntry* effect) {
                     EffFallVtx* v = *e->vtx;
                     for (j = 0; j < 32; j++, v++) {
                         v->x = (j & 1) ? 16.0f : -16.0f;
-                        v->y = 128.0f - 8.533334f * (j / 2);
-                        v->z = 0.0f;
-                        v->u = (j & 1) ? 2.0f : 0.0f;
-                        v->v = 0.06666667f * (j / 2);
+                        v->y = EXT_LIT(float_128_80420ffc, 128.0f) - 8.533334f * (j / 2);
+                        v->z = EXT_LIT(float_0_80420f84, 0.0f);
+                        v->u = (j & 1) ? EXT_LIT(float_2_80420f88, 2.0f) : EXT_LIT(float_0_80420f84, 0.0f);
+                        v->v = EXT_LIT(float_0p066667_80421004, 0.06666667f) * (j / 2);
                     }
                 }
                 {
@@ -552,16 +961,16 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 2:
-                        e->alpha *= 0.9f;
-                        e->scale *= 0.9f;
-                        if (e->scale < 0.01f) {
+                        e->alpha *= EXT_LIT(float_0p9_8042100c, 0.9f);
+                        e->scale *= EXT_LIT(float_0p9_8042100c, 0.9f);
+                        if (e->scale < EXT_LIT(float_0p01_80421010, 0.01f)) {
                             psndSFXOff(e->sfx);
                             effDelete(effect);
                             return;
                         }
                         break;
                 }
-                e->vel.y -= 0.2f;
+                e->vel.y -= EXT_LIT(float_0p2_80421014, 0.2f);
                 break;
             case 4:
             case 5:
@@ -594,33 +1003,33 @@ void effFallMain(EffectEntry* effect) {
                     case 1:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        if (distABf(e->pos.x, e->pos.z, 0.0f, 0.0f) < arg4 / 2.0f) {
+                        if (distABf(e->pos.x, e->pos.z, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f)) < arg4 / EXT_LIT(float_2_80420f88, 2.0f)) {
                             if (e->pos.y < ground) {
                                 e->pos.y = ground;
-                                e->f34 *= -0.3f;
+                                e->f34 *= EXT_LIT(float_neg0p3_80420fe4, -0.3f);
                                 e->state++;
                             }
                         } else if (e->pos.y < y) {
                             e->pos.y = y;
-                            e->f34 *= -0.3f;
+                            e->f34 *= EXT_LIT(float_neg0p3_80420fe4, -0.3f);
                             e->state++;
                         }
                         break;
                     case 2:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        a = (6.2831855f * angleABf(0.0f, 0.0f, e->pos.x, e->pos.z)) / 360.0f;
+                        a = (EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * angleABf(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f), e->pos.x, e->pos.z)) / EXT_LIT(float_360_80420fa8, 360.0f);
                         if (i == 1) {
                             a = angle / 360.0f;
                         }
-                        e->pos.x += 2.0f * (f32)sin(a);
-                        e->pos.z += 2.0f * -(f32)cos(a);
+                        e->pos.x += EXT_LIT(float_2_80420f88, 2.0f) * (f32)sin(a);
+                        e->pos.z += EXT_LIT(float_2_80420f88, 2.0f) * -(f32)cos(a);
                         if (e->pos.y < y) {
                             e->pos.y = y;
-                            e->f34 *= -0.5f;
+                            e->f34 *= EXT_LIT(float_neg0p5_8042101c, -0.5f);
                             e->pos.y = y;
                             e->timer = 0;
-                            if (e->f34 < 1.0f) {
+                            if (e->f34 < EXT_LIT(float_1_80420f80, 1.0f)) {
                                 e->state++;
                             }
                         }
@@ -678,15 +1087,15 @@ void effFallMain(EffectEntry* effect) {
                         if (e->timer > 30) {
                             e->timer = 0;
                             e->state++;
-                            effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + e->pos.y, sndPos.z + e->pos.z, 0.0f);
+                            effKemuri1N64Entry(4, sndPos.x + e->pos.x, sndPos.y + e->pos.y, sndPos.z + e->pos.z, EXT_LIT(float_0_80420f84, 0.0f));
                             evtEntry(evt_shake, 0, 0);
                         }
                         break;
                     case 1:
-                        e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(30.0f, -27.0f, 11, e->timer, 180);
-                        if (e->rot2 < 0.0f) {
+                        e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_30_80420fe0, 30.0f), EXT_LIT(float_neg27_80421024, -27.0f), 11, e->timer, 180);
+                        if (e->rot2 < EXT_LIT(float_0_80420f84, 0.0f)) {
                             e->rot3 = e->rot2;
-                            e->rot2 = 0.0f;
+                            e->rot2 = EXT_LIT(float_0_80420f84, 0.0f);
                         }
                         e->timer++;
                         if (e->timer > 180) {
@@ -698,10 +1107,10 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 2:
-                        e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(-27.0f, 80.0f, 11, e->timer, 200);
-                        if (e->rot2 < 0.0f) {
+                        e->rot2 = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_neg27_80421024, -27.0f), EXT_LIT(float_80_80421028, 80.0f), 11, e->timer, 200);
+                        if (e->rot2 < EXT_LIT(float_0_80420f84, 0.0f)) {
                             e->rot3 = e->rot2;
-                            e->rot2 = 0.0f;
+                            e->rot2 = EXT_LIT(float_0_80420f84, 0.0f);
                         }
                         e->timer++;
                         if (e->timer > 200) {
@@ -745,11 +1154,11 @@ void effFallMain(EffectEntry* effect) {
                         e->vel.x = tbl[e->state / 2][0];
                         e->vel.y = tbl[e->state / 2][1];
                         e->vel.z = tbl[e->state / 2][2];
-                        e->f30 = 0.4f;
-                        e->timer = distABf(e->vel.x, e->vel.z, e->pos.x, e->pos.z) / 5.0f;
-                        e->f34 = ((e->vel.y - e->pos.y) / e->timer) + (e->f30 * e->timer) / 2.0f;
+                        e->f30 = EXT_LIT(float_0p4_80420f90, 0.4f);
+                        e->timer = distABf(e->vel.x, e->vel.z, e->pos.x, e->pos.z) / EXT_LIT(float_5_80421030, 5.0f);
+                        e->f34 = ((e->vel.y - e->pos.y) / e->timer) + (e->f30 * e->timer) / EXT_LIT(float_2_80420f88, 2.0f);
                         e->rotY = angleABf(e->pos.x, e->pos.z, e->vel.x, e->vel.z);
-                        e->rot2 = 0.0f;
+                        e->rot2 = EXT_LIT(float_0_80420f84, 0.0f);
                         e->state++;
                         break;
                     }
@@ -759,8 +1168,8 @@ void effFallMain(EffectEntry* effect) {
                     case 7:
                         e->pos.y += e->f34;
                         e->f34 -= e->f30;
-                        e->pos.x += 5.0f * fall_sinf((6.2831855f * e->rotY) / 360.0f);
-                        e->pos.z += 5.0f * -fall_cosf((6.2831855f * e->rotY) / 360.0f);
+                        e->pos.x += EXT_LIT(float_5_80421030, 5.0f) * fall_sinf((EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * e->rotY) / EXT_LIT(float_360_80420fa8, 360.0f));
+                        e->pos.z += EXT_LIT(float_5_80421030, 5.0f) * -fall_cosf((EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * e->rotY) / EXT_LIT(float_360_80420fa8, 360.0f));
                         if ((--e->timer) < 0) {
                             e->pos.x = e->vel.x;
                             e->pos.y = e->vel.y;
@@ -774,7 +1183,7 @@ void effFallMain(EffectEntry* effect) {
                                 evtEntry(evt_shake, 0, 0);
                             }
                         }
-                        e->rot2 += (360.0f - e->rot2) / 30.0f;
+                        e->rot2 += (EXT_LIT(float_360_80420fa8, 360.0f) - e->rot2) / EXT_LIT(float_30_80420fe0, 30.0f);
                         break;
                     case 8:
                         psndSFXOff(e->sfx);
@@ -823,7 +1232,7 @@ void effFallMain(EffectEntry* effect) {
                         }
                         break;
                     case 3:
-                        if (animPoseGetLoopTimes(e->pose0) < 1.0f) {
+                        if (animPoseGetLoopTimes(e->pose0) < EXT_LIT(float_1_80420f80, 1.0f)) {
                             break;
                         }
                         e->timer++;
@@ -874,9 +1283,1490 @@ void effFallMain(EffectEntry* effect) {
             break;
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void effFallMain(EffectEntry* effect) {
+	char _af_pad[108];
+	asm volatile {
+		lis r4, vec3_802fe418@ha
+		opword 0x8343000C
+		addi r31, r4, vec3_802fe418@l
+		opword 0x7C731B78
+		opword 0x809F000C
+		opword 0x3AC00000
+		opword 0x807F0010
+		opword 0x801F0014
+		stw r4, _af_pad+0(r1)
+		opword 0xC01A0004
+		opword 0x9061000C
+		opword 0xC3FA0008
+		opword 0xD0010008
+		opword 0xC01A000C
+		opword 0x90010010
+		opword 0x80A10008
+		opword 0xD3E1000C
+		lwz r4, gp(r13)
+		opword 0xD0010010
+		opword 0x8061000C
+		opword 0x80010010
+		opword 0x90A10014
+		opword 0x90610018
+		opword 0x9001001C
+		opword 0x80730000
+		opword 0xC01A0014
+		opword 0x80840014
+		opword 0x5460077B
+		opword 0xEF7F002A
+		opword 0x831A0000
+		opword 0x7C0400D0
+		opword 0xC39A0010
+		opword 0x7C002378
+		opword 0xC05A0018
+		opword 0x82FA0020
+		opword 0x54140FFE
+		opword 0x41820060
+		opword 0x546007B8
+		opword 0x3A000000
+		opword 0x90130000
+		lwz r15, 0xc(r19)
+		opword 0x48000034
+		opword 0x806F005C
+		opword 0x2C03FFFF
+		opword 0x41820008
+		bl animPoseRelease
+		opword 0x806F0060
+		opword 0x2C03FFFF
+		opword 0x41820008
+		bl animPoseRelease
+		opword 0x806F0064
+		bl psndSFXOff
+		opword 0x3A100001
+		opword 0x39EF0068
+		opword 0x80130008
+		opword 0x7C100000
+		opword 0x4180FFC8
+		opword 0x7E639B78
+		bl effDelete
+		opword 0x4800155C
+		lfs f1, float_6p2832_80420fa4(r2)
+		opword 0x381F0070
+		lfs f0, float_30_80420fe0(r2)
+		opword 0x3BBF00BC
+		opword 0x9001006C
+		opword 0x381F00A0
+		opword 0xEFC100B2
+		opword 0x3BDF0088
+		opword 0xEFA0F82A
+		opword 0x90010068
+		opword 0x39FF00D8
+		opword 0x3B9F00F4
+		opword 0x3B7F0114
+		opword 0x3AA00000
+		opword 0x3B200001
+		opword 0x3B5A0068
+		opword 0x48001440
+		opword 0x28180008
+		opword 0x41811430
+		lis r3, jumptable_803AE04C@ha
+		opword 0x5700103A
+		addi r3, r3, jumptable_803AE04C@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x801A0038
+		opword 0x2C000003
+		opword 0x41820230
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x41820080
+		opword 0x4080016C
+		opword 0x2C000000
+		opword 0x40800018
+		opword 0x48000270
+		opword 0x2C000005
+		opword 0x41820264
+		opword 0x40800264
+		opword 0x4800022C
+		opword 0x807A0024
+		opword 0x2C030000
+		opword 0x4182000C
+		opword 0x3803FFFF
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x40820240
+		opword 0x807A0038
+		opword 0x2C180001
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x40820014
+		opword 0x8061006C
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x4800021C
+		opword 0x2C190001
+		opword 0x40820214
+		opword 0x7FC3F378
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x48000204
+		opword 0x2C180000
+		opword 0x40820048
+		opword 0x2C190001
+		opword 0x40810040
+		opword 0x2C160000
+		opword 0x40820038
+		lwz r4, gp(r13)
+		opword 0x3C60AAAB
+		opword 0x3803AAAB
+		opword 0x8064001C
+		opword 0x7C001816
+		opword 0x5400F0BE
+		opword 0x1C000006
+		opword 0x7C001851
+		opword 0x40820014
+		opword 0x7FC3F378
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x3AC00001
+		opword 0xC03A0008
+		opword 0xC01A0034
+		lfs f3, float_0_80420f84(r2)
+		opword 0xEC01002A
+		opword 0xFC801890
+		opword 0xD01A0008
+		opword 0xC03A0034
+		opword 0xC01A0030
+		opword 0xEC010028
+		opword 0xD01A0034
+		opword 0xC03A0004
+		opword 0xC05A000C
+		bl distABf
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0xEC1C0032
+		opword 0xFC010040
+		opword 0x40800034
+		opword 0xC01A0008
+		opword 0xFC00D840
+		opword 0x40800168
+		opword 0xD37A0008
+		lfs f0, float_neg0p3_80420fe4(r2)
+		opword 0xC03A0034
+		opword 0xEC010032
+		opword 0xD01A0034
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000144
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x40800138
+		opword 0xD3FA0008
+		lfs f0, float_neg0p3_80420fe4(r2)
+		opword 0xC03A0034
+		opword 0xEC010032
+		opword 0xD01A0034
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000114
+		opword 0xC05A0008
+		opword 0xC01A0034
+		lfs f1, float_0_80420f84(r2)
+		opword 0xEC02002A
+		opword 0xFC400890
+		opword 0xD01A0008
+		opword 0xC07A0034
+		opword 0xC01A0030
+		opword 0xEC030028
+		opword 0xD01A0034
+		opword 0xC07A0004
+		opword 0xC09A000C
+		bl angleABf
+		lfs f2, float_6p2832_80420fa4(r2)
+		opword 0x2C190001
+		lfs f0, float_360_80420fa8(r2)
+		opword 0xEC220072
+		fdivs f26, f1, f0
+		opword 0x40820008
+		opword 0xEF5E0024
+		opword 0xFC20D090
+		bl sin
+		opword 0xFC600818
+		lfs f2, float_0p5_80420f7c(r2)
+		opword 0xC01A0004
+		opword 0xFC20D090
+		opword 0xEC0200FA
+		opword 0xD01A0004
+		bl cos
+		opword 0xFC200818
+		lfs f2, float_0p5_80420f7c(r2)
+		opword 0xC01A000C
+		opword 0xFC200850
+		opword 0xEC02007A
+		opword 0xD01A000C
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x4080007C
+		opword 0xD3FA0008
+		opword 0x38000000
+		opword 0x901A0024
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000060
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C00001E
+		opword 0x40810048
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000038
+		opword 0x807A003C
+		opword 0x3803FFF6
+		opword 0x901A003C
+		opword 0x801A003C
+		opword 0x2C000000
+		opword 0x40800020
+		opword 0x38000000
+		opword 0x901A003C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000008
+		opword 0x3AB50001
+		lwz r3, gp(r13)
+		opword 0x8003001C
+		opword 0x5400F7FF
+		opword 0x41820010
+		opword 0x807A0028
+		opword 0x38030001
+		opword 0x901A0028
+		opword 0x801A0028
+		opword 0x2C000003
+		opword 0x4180000C
+		opword 0x38000000
+		opword 0x901A0028
+		lwz r4, gp(r13)
+		opword 0x3C604330
+		opword 0x6F208000
+		opword 0x90610050
+		opword 0x8084001C
+		opword 0x9001005C
+		opword 0xC87F0060
+		opword 0x90810054
+		opword 0xC83F0068
+		opword 0x90610058
+		opword 0xC8410050
+		opword 0xC8010058
+		opword 0xEC621828
+		lfs f2, float_0p5_80420f7c(r2)
+		opword 0xEC000828
+		opword 0xEC2300BA
+		bl sin
+		opword 0xFC200818
+		lfs f0, float_35_80420fe8(r2)
+		opword 0xEC000072
+		opword 0xD01A0048
+		opword 0x480010FC
+		opword 0x801A0038
+		opword 0x2C000002
+		opword 0x41820110
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x4182001C
+		opword 0x4080006C
+		opword 0x48000158
+		opword 0x2C000004
+		opword 0x4182014C
+		opword 0x4080014C
+		opword 0x48000114
+		opword 0xC03A0008
+		opword 0xC01A0034
+		opword 0xEC01002A
+		opword 0xD01A0008
+		opword 0xC03A0034
+		opword 0xC01A0030
+		opword 0xEC010028
+		opword 0xD01A0034
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x4080011C
+		opword 0xD3FA0008
+		opword 0x38000000
+		opword 0x80610068
+		opword 0x38810014
+		opword 0x901A0024
+		opword 0x80BA0038
+		opword 0x38050001
+		opword 0x901A0038
+		bl psndSFXOn_3D
+		opword 0x480000F4
+		opword 0x807A0024
+		opword 0x3C004330
+		opword 0x90010058
+		opword 0x6C608000
+		opword 0xC85F0068
+		opword 0x9001005C
+		lfs f3, float_62p832_80420fec(r2)
+		opword 0xC8210058
+		lfs f0, float_60_80420ff0(r2)
+		opword 0xEC211028
+		opword 0xEC230072
+		opword 0xEC210024
+		bl sin
+		opword 0x807A0024
+		opword 0x3C004330
+		opword 0x90010050
+		opword 0xFC600818
+		opword 0x6C608000
+		opword 0xC83F0068
+		opword 0x90010054
+		lfs f2, float_60_80420ff0(r2)
+		opword 0xC8010050
+		opword 0xEC000828
+		opword 0xEC020028
+		opword 0xEC0000F2
+		opword 0xEC001024
+		opword 0xD01A0044
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C00003C
+		opword 0x40810070
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000060
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C00001E
+		opword 0x40810048
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000038
+		opword 0x807A003C
+		opword 0x3803FFF6
+		opword 0x901A003C
+		opword 0x801A003C
+		opword 0x2C000000
+		opword 0x40800020
+		opword 0x38000000
+		opword 0x901A003C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000008
+		opword 0x3AB50001
+		opword 0x38600280
+		opword 0x38800003
+		bl smartAlloc
+		opword 0x907A0040
+		opword 0x38000010
+		lfs f6, float_8p5333_80421000(r2)
+		opword 0x38A00000
+		opword 0x809A0040
+		opword 0x3C604330
+		opword 0xC8BF0068
+		opword 0x80C40000
+		lfs f4, float_128_80420ffc(r2)
+		lfs f3, float_0_80420f84(r2)
+		lfs f1, float_0p066667_80421004(r2)
+		opword 0x7C0903A6
+		opword 0x54A407FF
+		opword 0x4182000C
+		lfs f0, float_16_80420ff4(r2)
+		opword 0x48000008
+		lfs f0, float_neg16_80420ff8(r2)
+		opword 0x54A00FFE
+		opword 0x90610058
+		opword 0x7C002A14
+		opword 0x2C040000
+		opword 0x7C040E70
+		opword 0xD0060000
+		opword 0x6C808000
+		opword 0x9001005C
+		opword 0xC8010058
+		opword 0xEC002828
+		opword 0xEC06203C
+		opword 0xD0060004
+		opword 0xD0660008
+		opword 0x4182000C
+		lfs f2, float_2_80420f88(r2)
+		opword 0x48000008
+		opword 0xFC401890
+		opword 0x6C808000
+		opword 0x38A50001
+		opword 0x90010054
+		opword 0x54A407FF
+		opword 0x90610050
+		opword 0xC8010050
+		opword 0xD046000C
+		opword 0xEC002828
+		opword 0xEC010032
+		opword 0xD0060010
+		opword 0x4182000C
+		lfs f0, float_16_80420ff4(r2)
+		opword 0x48000008
+		lfs f0, float_neg16_80420ff8(r2)
+		opword 0x54A00FFE
+		opword 0x90610058
+		opword 0x7C002A14
+		opword 0x2C040000
+		opword 0x7C040E70
+		opword 0xD0060014
+		opword 0x6C808000
+		opword 0x9001005C
+		opword 0xC8010058
+		opword 0xEC002828
+		opword 0xEC06203C
+		opword 0xD0060018
+		opword 0xD066001C
+		opword 0x4182000C
+		lfs f2, float_2_80420f88(r2)
+		opword 0x48000008
+		opword 0xFC401890
+		opword 0x6C808000
+		opword 0x90610050
+		opword 0x38A50001
+		opword 0x90010054
+		opword 0xC8010050
+		opword 0xD0460020
+		opword 0xEC002828
+		opword 0xEC010032
+		opword 0xD0060024
+		opword 0x38C60028
+		opword 0x4200FF04
+		opword 0x807A0040
+		opword 0x38000008
+		lfs f2, float_600_80421008(r2)
+		opword 0x3B200000
+		opword 0x80630000
+		opword 0x7C0903A6
+		opword 0xC0030004
+		opword 0x3B390004
+		opword 0xC07A0044
+		opword 0xEC200032
+		opword 0xC0030000
+		opword 0xEC211024
+		opword 0xEC03007A
+		opword 0xD0030000
+		opword 0xC0030018
+		opword 0xC07A0044
+		opword 0xEC200032
+		opword 0xC0030014
+		opword 0xEC211024
+		opword 0xEC03007A
+		opword 0xD0030014
+		opword 0xC003002C
+		opword 0xC07A0044
+		opword 0xEC200032
+		opword 0xC0030028
+		opword 0xEC211024
+		opword 0xEC03007A
+		opword 0xD0030028
+		opword 0xC0030040
+		opword 0xC07A0044
+		opword 0xEC200032
+		opword 0xC003003C
+		opword 0xEC211024
+		opword 0xEC03007A
+		opword 0xD003003C
+		opword 0x38630050
+		opword 0x4200FF88
+		opword 0x807A0040
+		opword 0x38800280
+		opword 0x80630000
+		bl DCFlushRange
+		opword 0x48000DA4
+		opword 0x801A0038
+		opword 0x2C000001
+		opword 0x41820068
+		opword 0x40800010
+		opword 0x2C000000
+		opword 0x40800014
+		opword 0x4800012C
+		opword 0x2C000003
+		opword 0x40800124
+		opword 0x480000B8
+		opword 0xC03A0008
+		opword 0xC01A0034
+		opword 0xEC01002A
+		opword 0xD01A0008
+		opword 0xC03A0034
+		opword 0xC01A0030
+		opword 0xEC010028
+		opword 0xD01A0034
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x408000F4
+		opword 0xD3FA0008
+		opword 0x38000000
+		opword 0x901A0024
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x480000D8
+		opword 0x3C606666
+		opword 0x809A0024
+		opword 0x38036667
+		opword 0x7C002096
+		opword 0x7C001670
+		opword 0x54030FFE
+		opword 0x7C001A14
+		opword 0x1C00000A
+		opword 0x7C002051
+		opword 0x40820020
+		opword 0xC0210014
+		opword 0x38600004
+		opword 0xC0410018
+		opword 0x38800014
+		opword 0xC061001C
+		lfs f4, float_1_80420f80(r2)
+		bl effWaterDamageN64Entry
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x7C00B800
+		opword 0x4081007C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x4800006C
+		opword 0x807A003C
+		opword 0x3C004330
+		opword 0x90010058
+		opword 0x6C608000
+		opword 0xC87F0068
+		opword 0x9001005C
+		lfs f2, float_0p9_8042100c(r2)
+		opword 0xC8210058
+		lfs f0, float_0p01_80421010(r2)
+		opword 0xEC211828
+		opword 0xEC2100B2
+		opword 0xFC20081E
+		opword 0xD8210050
+		opword 0x80010054
+		opword 0x901A003C
+		opword 0xC03A002C
+		opword 0xEC2100B2
+		opword 0xD03A002C
+		opword 0xC03A002C
+		opword 0xFC010040
+		opword 0x40800018
+		opword 0x807A0064
+		bl psndSFXOff
+		opword 0x7E639B78
+		bl effDelete
+		opword 0x48000D40
+		opword 0xC03A0054
+		lfs f0, float_0p2_80421014(r2)
+		opword 0xEC010028
+		opword 0xD01A0054
+		opword 0x48000C4C
+		opword 0x801A0038
+		opword 0x2C000003
+		opword 0x41820270
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x418200E8
+		opword 0x40800188
+		opword 0x2C000000
+		opword 0x40800018
+		opword 0x480002C0
+		opword 0x2C000005
+		opword 0x418202B4
+		opword 0x408002B4
+		opword 0x4800026C
+		opword 0x2C180005
+		opword 0x4082004C
+		opword 0x7E84A378
+		opword 0x387F0130
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x41820290
+		opword 0x801A005C
+		opword 0x2C00FFFF
+		opword 0x4082006C
+		opword 0x7E84A378
+		opword 0x387F0130
+		bl animPoseEntry
+		opword 0x907A005C
+		la r4, str_80421018(r2)
+		opword 0x38A00001
+		opword 0x807A005C
+		bl animPoseSetAnim
+		opword 0x48000048
+		opword 0x7E84A378
+		opword 0x387F013C
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x41820248
+		opword 0x801A005C
+		opword 0x2C00FFFF
+		opword 0x40820024
+		opword 0x7E84A378
+		opword 0x387F013C
+		bl animPoseEntry
+		opword 0x907A005C
+		la r4, str_80421018(r2)
+		opword 0x38A00001
+		opword 0x807A005C
+		bl animPoseSetAnim
+		opword 0x807A0024
+		opword 0x2C030000
+		opword 0x4182000C
+		opword 0x3803FFFF
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x408201FC
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x480001EC
+		opword 0xC03A0008
+		opword 0xC01A0034
+		lfs f3, float_0_80420f84(r2)
+		opword 0xEC01002A
+		opword 0xFC801890
+		opword 0xD01A0008
+		opword 0xC03A0034
+		opword 0xC01A0030
+		opword 0xEC010028
+		opword 0xD01A0034
+		opword 0xC03A0004
+		opword 0xC05A000C
+		bl distABf
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0xEC1C0032
+		opword 0xFC010040
+		opword 0x40800034
+		opword 0xC01A0008
+		opword 0xFC00D840
+		opword 0x4080019C
+		opword 0xD37A0008
+		lfs f0, float_neg0p3_80420fe4(r2)
+		opword 0xC03A0034
+		opword 0xEC010032
+		opword 0xD01A0034
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000178
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x4080016C
+		opword 0xD3FA0008
+		lfs f0, float_neg0p3_80420fe4(r2)
+		opword 0xC03A0034
+		opword 0xEC010032
+		opword 0xD01A0034
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000148
+		opword 0xC05A0008
+		opword 0xC01A0034
+		lfs f1, float_0_80420f84(r2)
+		opword 0xEC02002A
+		opword 0xFC400890
+		opword 0xD01A0008
+		opword 0xC07A0034
+		opword 0xC01A0030
+		opword 0xEC030028
+		opword 0xD01A0034
+		opword 0xC07A0004
+		opword 0xC09A000C
+		bl angleABf
+		lfs f2, float_6p2832_80420fa4(r2)
+		opword 0x2C190001
+		lfs f0, float_360_80420fa8(r2)
+		opword 0xEC220072
+		opword 0xEF410024
+		opword 0x40820008
+		opword 0xEF5E0024
+		opword 0xFC20D090
+		bl sin
+		opword 0xFC600818
+		lfs f2, float_2_80420f88(r2)
+		opword 0xC01A0004
+		opword 0xFC20D090
+		opword 0xEC0200FA
+		opword 0xD01A0004
+		bl cos
+		opword 0xFC200818
+		lfs f2, float_2_80420f88(r2)
+		opword 0xC01A000C
+		opword 0xFC200850
+		opword 0xEC02007A
+		opword 0xD01A000C
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x408000B0
+		opword 0xD3FA0008
+		opword 0x38000000
+		lfs f1, float_neg0p5_8042101c(r2)
+		opword 0xC05A0034
+		lfs f0, float_1_80420f80(r2)
+		opword 0xEC220072
+		opword 0xD03A0034
+		opword 0xD3FA0008
+		opword 0x901A0024
+		opword 0xC03A0034
+		opword 0xFC010040
+		opword 0x40800080
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000070
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C00001E
+		opword 0x40810058
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000048
+		opword 0x807A003C
+		opword 0x3803FFF6
+		opword 0x901A003C
+		opword 0x801A003C
+		opword 0x2C000000
+		opword 0x40800030
+		opword 0x38000000
+		opword 0x901A003C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x807A005C
+		bl animPoseRelease
+		opword 0x3800FFFF
+		opword 0x901A005C
+		opword 0x48000008
+		opword 0x3AB50001
+		opword 0x2C180005
+		opword 0x41820040
+		opword 0x40800064
+		opword 0x2C180004
+		opword 0x40800008
+		opword 0x48000058
+		opword 0x801A0038
+		opword 0x2C000001
+		opword 0x4081004C
+		opword 0xC05A0048
+		lfs f1, float_360_80420fa8(r2)
+		lfs f0, float_10_80420fb0(r2)
+		opword 0xEC211028
+		opword 0xEC010024
+		opword 0xEC02002A
+		opword 0xD01A0048
+		opword 0x4800002C
+		opword 0x801A0038
+		opword 0x2C000001
+		opword 0x40810020
+		opword 0xC05A0048
+		lfs f1, float_430_80421020(r2)
+		lfs f0, float_10_80420fb0(r2)
+		opword 0xEC211028
+		opword 0xEC010024
+		opword 0xEC02002A
+		opword 0xD01A0048
+		opword 0x807A005C
+		opword 0x2C03FFFF
+		opword 0x418208F0
+		bl animPoseMain
+		opword 0x480008E8
+		opword 0x801A0038
+		opword 0x2C000001
+		opword 0x41820110
+		opword 0x40800010
+		opword 0x2C000000
+		opword 0x40800014
+		opword 0x480001F4
+		opword 0x2C000003
+		opword 0x408001EC
+		opword 0x48000170
+		opword 0x7E84A378
+		opword 0x387F0148
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x418201D0
+		opword 0x801A005C
+		opword 0x2C00FFFF
+		opword 0x40820030
+		opword 0x7E84A378
+		opword 0x387F0148
+		bl animPoseEntry
+		opword 0x907A005C
+		la r4, str_80421018(r2)
+		opword 0x38A00001
+		opword 0x807A005C
+		bl animPoseSetAnim
+		opword 0x7FA3EB78
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0xC03A0004
+		opword 0xC01A0050
+		opword 0xEC01002A
+		opword 0xD01A0004
+		opword 0xC03A0008
+		opword 0xC01A0054
+		opword 0xEC01002A
+		opword 0xD01A0008
+		opword 0xC03A000C
+		opword 0xC01A0058
+		opword 0xEC01002A
+		opword 0xD01A000C
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C00001E
+		opword 0x40810150
+		opword 0x38000000
+		lfs f4, float_0_80420f84(r2)
+		opword 0x901A0024
+		opword 0x38600004
+		opword 0x809A0038
+		opword 0x38040001
+		opword 0x901A0038
+		opword 0xC0210014
+		opword 0xC01A0004
+		opword 0xC0A10018
+		opword 0xC05A0008
+		opword 0xEC21002A
+		opword 0xC061001C
+		opword 0xC01A000C
+		opword 0xEC45102A
+		opword 0xEC63002A
+		bl effKemuri1N64Entry
+		la r3, evt_shake(r13)
+		opword 0x38800000
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x480000F8
+		lfs f1, float_30_80420fe0(r2)
+		opword 0x3860000B
+		lfs f2, float_neg27_80421024(r2)
+		opword 0x38A000B4
+		opword 0x809A0024
+		bl intplGetValue
+		opword 0xD03A0048
+		lfs f0, float_0_80420f84(r2)
+		opword 0xC03A0048
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0xD03A004C
+		opword 0xD01A0048
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C0000B4
+		opword 0x40810018
+		opword 0x38000000
+		opword 0x901A0024
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x801A0024
+		opword 0x2C000064
+		opword 0x4082008C
+		opword 0x7FA3EB78
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x4800007C
+		lfs f1, float_neg27_80421024(r2)
+		opword 0x3860000B
+		lfs f2, float_80_80421028(r2)
+		opword 0x38A000C8
+		opword 0x809A0024
+		bl intplGetValue
+		opword 0xD03A0048
+		lfs f0, float_0_80420f84(r2)
+		opword 0xC03A0048
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0xD03A004C
+		opword 0xD01A0048
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C0000C8
+		opword 0x40810018
+		opword 0x807A005C
+		bl animPoseRelease
+		opword 0x3800FFFF
+		opword 0x3AB50001
+		opword 0x901A005C
+		opword 0x801A0024
+		opword 0x2C000046
+		opword 0x40820010
+		opword 0x7FA3EB78
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x807A005C
+		opword 0x2C03FFFF
+		opword 0x418206D0
+		bl animPoseMain
+		opword 0x480006C8
+		opword 0x801A0038
+		opword 0x28000009
+		opword 0x418104B0
+		lis r3, jumptable_803AE024@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_803AE024@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x7E84A378
+		opword 0x387F0154
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x41820480
+		opword 0x7DE37B78
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x801A005C
+		opword 0x2C00FFFF
+		opword 0x40820024
+		opword 0x7E84A378
+		opword 0x387F0154
+		bl animPoseEntry
+		opword 0x907A005C
+		la r4, str_80421018(r2)
+		opword 0x38A00001
+		opword 0x807A005C
+		bl animPoseSetAnim
+		opword 0x801A0060
+		opword 0x2C00FFFF
+		opword 0x40820024
+		opword 0x7E84A378
+		opword 0x387F0154
+		bl animPoseEntry
+		opword 0x907A0060
+		la r4, str_8042102C(r2)
+		opword 0x38A00001
+		opword 0x807A0060
+		bl animPoseSetAnim
+		opword 0x809A0038
+		opword 0x38610020
+		opword 0x821F0018
+		opword 0x54800FFE
+		opword 0x823F001C
+		opword 0x7C002214
+		opword 0x825F0020
+		opword 0x7C000E70
+		opword 0x819F0024
+		opword 0x817F0028
+		opword 0x1C00000C
+		opword 0x815F002C
+		opword 0x813F0030
+		opword 0x811F0034
+		opword 0x80FF0038
+		opword 0x80DF003C
+		opword 0x80BF0040
+		opword 0x809F0044
+		opword 0x92010020
+		lfs f0, float_0p4_80420f90(r2)
+		opword 0x92210024
+		opword 0x92410028
+		opword 0x9181002C
+		opword 0x91610030
+		opword 0x91410034
+		opword 0x91210038
+		opword 0x9101003C
+		opword 0x90E10040
+		opword 0x90C10044
+		opword 0x90A10048
+		opword 0x9081004C
+		opword 0x7C23042E
+		opword 0xD03A0050
+		opword 0x809A0038
+		opword 0x54800FFE
+		opword 0x7C002214
+		opword 0x7C000E70
+		opword 0x1C80000C
+		opword 0x38040004
+		opword 0x7C23042E
+		opword 0xD03A0054
+		opword 0x809A0038
+		opword 0x54800FFE
+		opword 0x7C002214
+		opword 0x7C000E70
+		opword 0x1C80000C
+		opword 0x38040008
+		opword 0x7C23042E
+		opword 0xD03A0058
+		opword 0xD01A0030
+		opword 0xC03A0050
+		opword 0xC05A0058
+		opword 0xC07A0004
+		opword 0xC09A000C
+		bl distABf
+		lfs f0, float_5_80421030(r2)
+		opword 0x3C004330
+		opword 0x90010060
+		opword 0xEC010024
+		opword 0xC89F0068
+		opword 0x90010050
+		lfs f2, float_0p5_80420f7c(r2)
+		opword 0xFC00001E
+		opword 0xD8010058
+		opword 0x8001005C
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0xC03A0054
+		opword 0x6C008000
+		opword 0xC01A0008
+		opword 0x90010064
+		opword 0xEC210028
+		opword 0xC0BA0030
+		opword 0xC8010060
+		opword 0x90010054
+		opword 0xEC002028
+		opword 0xC8610050
+		opword 0xEC010024
+		opword 0xEC232028
+		opword 0xEC250072
+		opword 0xEC0100BA
+		opword 0xD01A0034
+		opword 0xC03A0004
+		opword 0xC05A000C
+		opword 0xC07A0050
+		opword 0xC09A0058
+		bl angleABf
+		opword 0xD03A0018
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD01A0048
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x480002A4
+		opword 0xC03A0008
+		opword 0xC01A0034
+		lfs f3, float_6p2832_80420fa4(r2)
+		opword 0xEC41002A
+		lfs f0, float_360_80420fa8(r2)
+		lfs f1, float_3p1416_8042103c(r2)
+		lfs f7, float_0p00761_80421034(r2)
+		opword 0xD05A0008
+		lfs f6, float_0p16605_80421038(r2)
+		opword 0xC09A0034
+		opword 0xC05A0030
+		lfs f5, float_1_80420f80(r2)
+		opword 0xEC441028
+		opword 0xD05A0034
+		opword 0xC05A0018
+		opword 0xEC4300B2
+		opword 0xEC420024
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820044
+		lfs f1, float_1p5708_80421040(r2)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0200B2
+		opword 0xECE73038
+		opword 0xECE7283A
+		opword 0xECE700B2
+		opword 0x48000068
+		opword 0xEC020828
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECE73038
+		opword 0xECE7283A
+		opword 0xECE700B2
+		opword 0x4800004C
+		lfs f0, float_4p7124_80421044(r2)
+		opword 0xFC020040
+		opword 0x40800020
+		opword 0xEC420828
+		opword 0xEC0200B2
+		opword 0xECE73038
+		opword 0xECE7283A
+		opword 0xECE700B2
+		opword 0xFCE03850
+		opword 0x48000024
+		opword 0xEC020028
+		lfs f1, float_1p5708_80421040(r2)
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECE73038
+		opword 0xECE7283A
+		opword 0xECE700B2
+		opword 0xFCE03850
+		lfs f1, float_5_80421030(r2)
+		opword 0xC01A0004
+		lfs f3, float_6p2832_80420fa4(r2)
+		opword 0xEC4101FA
+		lfs f0, float_360_80420fa8(r2)
+		lfs f1, float_3p1416_8042103c(r2)
+		lfs f6, float_0p03705_80421048(r2)
+		opword 0xD05A0004
+		lfs f5, float_0p4967_8042104c(r2)
+		opword 0xC05A0018
+		lfs f4, float_1_80420f80(r2)
+		opword 0xEC4300B2
+		opword 0xEC420024
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820040
+		lfs f1, float_1p5708_80421040(r2)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0200B2
+		opword 0xECC62838
+		opword 0xECC6203A
+		opword 0x4800005C
+		opword 0xEC020828
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECC62838
+		opword 0xECC6203A
+		opword 0xFCC03050
+		opword 0x48000040
+		lfs f0, float_4p7124_80421044(r2)
+		opword 0xFC020040
+		opword 0x4080001C
+		opword 0xEC420828
+		opword 0xEC0200B2
+		opword 0xECC62838
+		opword 0xECC6203A
+		opword 0xFCC03050
+		opword 0x4800001C
+		opword 0xEC020028
+		lfs f1, float_1p5708_80421040(r2)
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECC62838
+		opword 0xECC6203A
+		opword 0xFC203050
+		lfs f2, float_5_80421030(r2)
+		opword 0xC01A000C
+		opword 0xEC02007A
+		opword 0xD01A000C
+		opword 0x807A0024
+		opword 0x3403FFFF
+		opword 0x901A0024
+		opword 0x40800098
+		opword 0xC01A0050
+		opword 0xD01A0004
+		opword 0xC01A0054
+		opword 0xD01A0008
+		opword 0xC01A0058
+		opword 0xD01A000C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x801A0038
+		opword 0x2C000002
+		opword 0x40820014
+		opword 0x7F83E378
+		opword 0x38810014
+		bl psndSFXOn_3D
+		opword 0x907A0064
+		opword 0x801A0038
+		opword 0x2C000008
+		opword 0x4182004C
+		opword 0xC0210018
+		opword 0x38600004
+		opword 0xC01A0008
+		opword 0xC0C10014
+		opword 0xC0BA0004
+		opword 0xEC81002A
+		lfs f2, float_40_80421050(r2)
+		opword 0xC061001C
+		opword 0xEC26282A
+		opword 0xC01A000C
+		opword 0xEC441028
+		lfs f4, float_0_80420f84(r2)
+		opword 0xEC63002A
+		bl effKemuri1N64Entry
+		la r3, evt_shake(r13)
+		opword 0x38800000
+		opword 0x38A00000
+		bl evtEntry
+		opword 0xC05A0048
+		lfs f1, float_360_80420fa8(r2)
+		lfs f0, float_30_80420fe0(r2)
+		opword 0xEC211028
+		opword 0xEC010024
+		opword 0xEC02002A
+		opword 0xD01A0048
+		opword 0x4800003C
+		opword 0x807A0064
+		bl psndSFXOff
+		opword 0x807A005C
+		bl animPoseRelease
+		opword 0x807A0060
+		bl animPoseRelease
+		opword 0x3800FFFF
+		opword 0x901A005C
+		opword 0x901A0060
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000008
+		opword 0x3AB50001
+		opword 0x807A005C
+		opword 0x2C03FFFF
+		opword 0x41820008
+		bl animPoseMain
+		opword 0x807A0060
+		opword 0x2C03FFFF
+		opword 0x418201F4
+		bl animPoseMain
+		opword 0x480001EC
+		opword 0x801A0038
+		opword 0x2C000004
+		opword 0x4182017C
+		opword 0x4080001C
+		opword 0x2C000000
+		opword 0x41820024
+		opword 0x418001C0
+		opword 0x2C000003
+		opword 0x40800124
+		opword 0x4800005C
+		opword 0x2C000006
+		opword 0x418201A8
+		opword 0x408001A8
+		opword 0x48000180
+		opword 0x7E84A378
+		opword 0x387F0160
+		opword 0x38A00000
+		bl animGroupBaseAsync
+		opword 0x2C030000
+		opword 0x4182018C
+		opword 0x7E84A378
+		opword 0x387F0160
+		bl animPoseEntry
+		opword 0x907A005C
+		la r4, str_80421018(r2)
+		opword 0x38A00001
+		opword 0x807A005C
+		bl animPoseSetAnim
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x4800015C
+		opword 0xC03A0008
+		opword 0xC01A0034
+		opword 0xEC01002A
+		opword 0xD01A0008
+		opword 0xC03A0034
+		opword 0xC01A0030
+		opword 0xEC010028
+		opword 0xD01A0034
+		opword 0xC01A0008
+		opword 0xFC00F840
+		opword 0x4080001C
+		opword 0xD3FA0008
+		opword 0x38000000
+		opword 0x901A0024
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x801A0038
+		opword 0x2C000001
+		opword 0x4082010C
+		opword 0xC01A0008
+		opword 0xFC00E840
+		opword 0x40800100
+		opword 0xC0010018
+		opword 0x38600004
+		opword 0xC0810014
+		opword 0xC03A0004
+		opword 0xEC40F82A
+		opword 0xC061001C
+		opword 0xC01A000C
+		opword 0xEC24082A
+		lfs f4, float_0_80420f84(r2)
+		opword 0xEC63002A
+		bl effKemuri1N64Entry
+		la r3, evt_shake(r13)
+		opword 0x38800000
+		opword 0x38A00000
+		bl evtEntry
+		opword 0x807A005C
+		la r4, str_80421054(r2)
+		opword 0x38A00001
+		bl animPoseSetAnim
+		opword 0x80BA0038
+		opword 0x7F63DB78
+		opword 0x38810014
+		opword 0x38050001
+		opword 0x901A0038
+		bl psndSFXOn_3D
+		opword 0x48000098
+		opword 0x807A005C
+		bl animPoseGetLoopTimes
+		lfs f0, float_1_80420f80(r2)
+		opword 0xFC010040
+		opword 0x41800084
+		opword 0x807A0024
+		opword 0x38030001
+		opword 0x901A0024
+		opword 0x807A0024
+		opword 0x801A0020
+		opword 0x7C030000
+		opword 0x40810068
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000058
+		opword 0x807A003C
+		opword 0x3803FFF6
+		opword 0x901A003C
+		opword 0x801A003C
+		opword 0x2C000000
+		opword 0x40800040
+		opword 0x38000000
+		opword 0x901A003C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000028
+		opword 0x807A005C
+		bl animPoseRelease
+		opword 0x3800FFFF
+		opword 0x901A005C
+		opword 0x807A0038
+		opword 0x38030001
+		opword 0x901A0038
+		opword 0x48000008
+		opword 0x3AB50001
+		opword 0x807A005C
+		opword 0x2C03FFFF
+		opword 0x41820008
+		bl animPoseMain
+		opword 0x3B390001
+		opword 0x3B5A0068
+		opword 0x80730008
+		opword 0x7C191800
+		opword 0x4180EBBC
+		opword 0x3803FFFF
+		opword 0x7C150000
+		opword 0x41800010
+		opword 0x7E639B78
+		bl effDelete
+		opword 0x480000B8
+		opword 0x2C180006
+		opword 0x41820090
+		opword 0x40800014
+		opword 0x2C180003
+		opword 0x41820018
+		opword 0x40800038
+		opword 0x4800007C
+		opword 0x2C180008
+		opword 0x40800074
+		opword 0x4800004C
+		opword 0x38610014
+		bl dispCalcZ
+		lis r3, effFallDispWater@ha
+		opword 0x7E669B78
+		addi r5, r3, effFallDispWater@l
+		opword 0x38800002
+		opword 0x38600004
+		bl dispEntry
+		opword 0x4800006C
+		opword 0x38610014
+		bl dispCalcZ
+		lis r3, effFallDisp@ha
+		opword 0x7E669B78
+		addi r5, r3, effFallDisp@l
+		opword 0x38800000
+		opword 0x38600004
+		bl dispEntry
+		opword 0x48000048
+		opword 0x38610014
+		bl dispCalcZ
+		lis r3, effFallDispInseki@ha
+		opword 0x7E669B78
+		addi r5, r3, effFallDispInseki@l
+		opword 0x38800002
+		opword 0x38600004
+		bl dispEntry
+		opword 0x48000024
+		opword 0x38610014
+		bl dispCalcZ
+		lis r3, effFallDisp@ha
+		opword 0x7E669B78
+		addi r5, r3, effFallDisp@l
+		opword 0x38800002
+		opword 0x38600004
+		bl dispEntry
+	}
+}
+#pragma pop
 #endif
 
 #pragma opt_propagation reset
+__declspec(section ".data") static void* jumptable_803AE000[] = {
+    (char*)effFallDisp + 0x214,
+    (char*)effFallDisp + 0x214,
+    (char*)effFallDisp + 0x484,
+    (char*)effFallDisp + 0xB04,
+    (char*)effFallDisp + 0x608,
+    (char*)effFallDisp + 0x608,
+    (char*)effFallDisp + 0x7D4,
+    (char*)effFallDisp + 0xB04,
+    (char*)effFallDisp + 0xA38,
+};
+__declspec(section ".data") void* jumptable_803AE024[] = {
+    (char*)effFallMain + 0xF08,
+    (char*)effFallMain + 0x10FC,
+    (char*)effFallMain + 0xF84,
+    (char*)effFallMain + 0x10FC,
+    (char*)effFallMain + 0xF84,
+    (char*)effFallMain + 0x10FC,
+    (char*)effFallMain + 0xF84,
+    (char*)effFallMain + 0x10FC,
+    (char*)effFallMain + 0x1364,
+    (char*)effFallMain + 0x1398,
+};
+__declspec(section ".data") void* jumptable_803AE04C[] = {
+    (char*)effFallMain + 0x194,
+    (char*)effFallMain + 0x194,
+    (char*)effFallMain + 0x4B0,
+    (char*)effFallMain + 0x808,
+    (char*)effFallMain + 0x960,
+    (char*)effFallMain + 0x960,
+    (char*)effFallMain + 0xCC4,
+    (char*)effFallMain + 0xEE4,
+    (char*)effFallMain + 0x13C0,
+};
+__declspec(section ".data") void* jumptable_803AE070[] = {
+    (char*)effFallEntry + 0x278,
+    (char*)effFallEntry + 0x278,
+    (char*)effFallEntry + 0x2D0,
+    (char*)effFallEntry + 0x2FC,
+    (char*)effFallEntry + 0x370,
+    (char*)effFallEntry + 0x370,
+    (char*)effFallEntry + 0x39C,
+    (char*)effFallEntry + 0x3F8,
+    (char*)effFallEntry + 0x41C,
+};
 #ifdef NONMATCHING
 void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     Mtx trans;
@@ -898,7 +2788,7 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
     type = e->type;
     angle = e->rotY;
     PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
-    PSMTXRotRad(rot, 'y', -camGetPtr(cameraId)->viewYaw * 0.017453292f);
+    PSMTXRotRad(rot, 'y', -camGetPtr(cameraId)->viewYaw * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
     PSMTXConcat(trans, rot, mtx);
     GXSetNumChans(1);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
@@ -930,18 +2820,18 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
         switch (type) {
             case 0:
             case 1:
-                hw = 64.0f;
-                hh = 42.666668f;
-                hw /= 2.0f;
-                hh /= 2.0f;
+                hw = EXT_LIT(float_64_80420f74, 64.0f);
+                hh = EXT_LIT(float_42p667_80420fb8, 42.666668f);
+                hw /= EXT_LIT(float_2_80420f88, 2.0f);
+                hh /= EXT_LIT(float_2_80420f88, 2.0f);
                 PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
-                PSMTXRotRad(rot, 'y', e->rotY * 0.017453292f);
+                PSMTXRotRad(rot, 'y', e->rotY * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
                 PSMTXConcat(trans, rot, trans);
-                PSMTXTrans(rot, 0.0f, hh / 2.0f * e->scale, 0.0f);
+                PSMTXTrans(rot, EXT_LIT(float_0_80420f84, 0.0f), hh / EXT_LIT(float_2_80420f88, 2.0f) * e->scale, EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(trans, rot, trans);
-                PSMTXRotRad(rot, 'z', e->rot2 * 0.017453292f);
+                PSMTXRotRad(rot, 'z', e->rot2 * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
                 PSMTXConcat(trans, rot, trans);
-                PSMTXTrans(rot, 0.0f, -hh / 2.0f * e->scale, 0.0f);
+                PSMTXTrans(rot, EXT_LIT(float_0_80420f84, 0.0f), -hh / EXT_LIT(float_2_80420f88, 2.0f) * e->scale, EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(trans, rot, trans);
                 PSMTXScale(scl, e->scale, e->scale, e->scale);
                 PSMTXConcat(trans, scl, trans);
@@ -950,19 +2840,19 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
                 GXLoadPosMtxImm(trans, 0);
                 GXSetCurrentMtx(0);
                 GXSetChanMatColor(GX_COLOR0A0, (GXColor){ 255, 255, 255, e->alpha });
-                PSMTXScale(scl, 1.0f, 0.33333334f, 1.0f);
-                PSMTXTrans(trans, 0.0f, (f32)e->scroll, 0.0f);
+                PSMTXScale(scl, EXT_LIT(float_1_80420f80, 1.0f), EXT_LIT(float_0p33333_80420fbc, 0.33333334f), EXT_LIT(float_1_80420f80, 1.0f));
+                PSMTXTrans(trans, EXT_LIT(float_0_80420f84, 0.0f), (f32)e->scroll, EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(scl, trans, trans);
                 GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
                 GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-                GXPosition3f32(-hw / 2.0f, hh, 0.0f);
-                GXTexCoord2f32(0.0f, 0.0f);
-                GXPosition3f32(hw / 2.0f, hh, 0.0f);
-                GXTexCoord2f32(1.0f, 0.0f);
-                GXPosition3f32(hw / 2.0f, 0.0f, 0.0f);
-                GXTexCoord2f32(1.0f, 1.0f);
-                GXPosition3f32(-hw / 2.0f, 0.0f, 0.0f);
-                GXTexCoord2f32(0.0f, 1.0f);
+                GXPosition3f32(-hw / EXT_LIT(float_2_80420f88, 2.0f), hh, EXT_LIT(float_0_80420f84, 0.0f));
+                GXTexCoord2f32(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
+                GXPosition3f32(hw / EXT_LIT(float_2_80420f88, 2.0f), hh, EXT_LIT(float_0_80420f84, 0.0f));
+                GXTexCoord2f32(EXT_LIT(float_1_80420f80, 1.0f), EXT_LIT(float_0_80420f84, 0.0f));
+                GXPosition3f32(hw / EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
+                GXTexCoord2f32(EXT_LIT(float_1_80420f80, 1.0f), EXT_LIT(float_1_80420f80, 1.0f));
+                GXPosition3f32(-hw / EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
+                GXTexCoord2f32(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_1_80420f80, 1.0f));
                 break;
             case 2:
                 PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
@@ -991,23 +2881,23 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
             case 4:
             case 5: {
                 Vec v = { 0.0f, 0.0f, 0.0f };
-                v.x = (f32)cos(6.2831855f * angle / 360.0f);
-                v.z = (f32)sin(6.2831855f * angle / 360.0f);
+                v.x = (f32)cos(EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * angle / EXT_LIT(float_360_80420fa8, 360.0f));
+                v.z = (f32)sin(EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * angle / EXT_LIT(float_360_80420fa8, 360.0f));
                 axis = v;
                 PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
                 PSMTXScale(scl, e->scale, e->scale, e->scale);
                 PSMTXConcat(trans, scl, trans);
-                PSMTXTrans(scl, 0.0f, (f32)(type == 4 ? 8 : 16), 0.0f);
+                PSMTXTrans(scl, EXT_LIT(float_0_80420f84, 0.0f), (f32)(type == 4 ? 8 : 16), EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(trans, scl, trans);
-                PSMTXRotAxisRad(rot, &axis, -e->rot2 * 0.017453292f);
+                PSMTXRotAxisRad(rot, &axis, -e->rot2 * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
                 PSMTXConcat(trans, rot, trans);
-                PSMTXTrans(scl, 0.0f, (f32)-(type == 4 ? 8 : 16), 0.0f);
+                PSMTXTrans(scl, EXT_LIT(float_0_80420f84, 0.0f), (f32)-(type == 4 ? 8 : 16), EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(trans, scl, trans);
                 PSMTXConcat(mtx, trans, trans);
                 if (e->pose0 != -1) {
                     animPoseDrawMtx(e->pose0, trans, 1, 0.0f, 10.0f);
-                    animPoseDrawMtx(e->pose0, trans, 2, 0.0f, 10.0f);
-                    animPoseDrawMtx(e->pose0, trans, 3, 0.0f, 10.0f);
+                    animPoseDrawMtx(e->pose0, trans, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                    animPoseDrawMtx(e->pose0, trans, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
                 }
                 break;
             }
@@ -1016,7 +2906,7 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
                     break;
                 }
                 PSMTXTrans(trans, e->pos.x, e->pos.y, e->pos.z);
-                if (angle < 180.0f) {
+                if (angle < EXT_LIT(float_180_80420fc0, 180.0f)) {
                     PSMTXScale(scl, e->scale, e->scale, e->scale);
                 } else {
                     PSMTXScale(scl, -e->scale, e->scale, e->scale);
@@ -1028,28 +2918,28 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
                 } else {
                     PSMTXTrans(scl, -200.0f, 0.0f, 0.0f);
                     PSMTXConcat(trans, scl, trans);
-                    PSMTXRotRad(rot, 'z', -e->rot3 * 0.017453292f);
+                    PSMTXRotRad(rot, 'z', -e->rot3 * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
                     PSMTXConcat(trans, rot, trans);
-                    PSMTXTrans(scl, 200.0f, 0.0f, 0.0f);
+                    PSMTXTrans(scl, EXT_LIT(float_200_80420fc8, 200.0f), EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
                     PSMTXConcat(trans, scl, trans);
                 }
                 PSMTXConcat(mtx, trans, trans);
-                PSMTXTrans(scl, -82.655f, 88.8f, 0.0f);
+                PSMTXTrans(scl, EXT_LIT(float_neg82p655_80420fcc, -82.655f), EXT_LIT(float_88p8_80420fd0, 88.8f), EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(trans, scl, scl);
-                PSMTXScale(rot, 1.03f, 1.03f, 1.03f);
+                PSMTXScale(rot, EXT_LIT(float_1p03_80420fd4, 1.03f), EXT_LIT(float_1p03_80420fd4, 1.03f), EXT_LIT(float_1p03_80420fd4, 1.03f));
                 PSMTXConcat(scl, rot, rot);
-                PSMTXTrans(scl, 82.655f, -88.8f, 0.0f);
+                PSMTXTrans(scl, EXT_LIT(float_82p655_80420fd8, 82.655f), EXT_LIT(float_neg88p8_80420fdc, -88.8f), EXT_LIT(float_0_80420f84, 0.0f));
                 PSMTXConcat(rot, scl, scl);
                 animPoseSetMaterialFlagOn(e->pose0, 0x40);
                 animPoseSetMaterialEvtColor(e->pose0, (GXColor){ 0, 0, 0, 255 });
-                animPoseDrawMtx(e->pose0, scl, 1, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, scl, 2, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, scl, 3, 0.0f, 10.0f);
+                animPoseDrawMtx(e->pose0, scl, 1, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, scl, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, scl, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
                 animPoseSetMaterialFlagOn(e->pose0, 0x40);
                 animPoseSetMaterialEvtColor(e->pose0, (GXColor){ 255, 255, 255, 255 });
-                animPoseDrawMtx(e->pose0, trans, 1, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, trans, 2, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, trans, 3, 0.0f, 10.0f);
+                animPoseDrawMtx(e->pose0, trans, 1, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, trans, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, trans, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
                 break;
             case 8:
                 if (e->pose0 == -1) {
@@ -1061,13 +2951,721 @@ void effFallDisp(CameraId cameraId, EffectEntry* effect) {
                 PSMTXConcat(mtx, trans, trans);
                 animPoseSetMaterialFlagOn(e->pose0, 0x40);
                 animPoseSetMaterialEvtColor(e->pose0, (GXColor){ 255, 255, 255, e->alpha });
-                animPoseDrawMtx(e->pose0, trans, 1, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, trans, 2, 0.0f, 10.0f);
-                animPoseDrawMtx(e->pose0, trans, 3, 0.0f, 10.0f);
+                animPoseDrawMtx(e->pose0, trans, 1, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, trans, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+                animPoseDrawMtx(e->pose0, trans, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
                 break;
         }
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void effFallDisp(CameraId cameraId, EffectEntry* effect) {
+	char _af_pad[300];
+	asm volatile {
+		opword 0x7C9B2378
+		opword 0x7C771B78
+		opword 0x83C4000C
+		bl camGetPtr
+		opword 0x839E0000
+		opword 0x7C7F1B78
+		opword 0xC3DE0018
+		la r3, _af_pad+232
+		opword 0xC03E0004
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0x7EE3BB78
+		bl camGetPtr
+		opword 0xC0230114
+		opword 0x38610090
+		lfs f0, float_deg2rad_80420f70(r2)
+		opword 0x38800079
+		opword 0xFC200850
+		opword 0xEC200072
+		bl PSMTXRotRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x38A10060
+		bl PSMTXConcat
+		opword 0x38600001
+		bl GXSetNumChans
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00000
+		opword 0x39000000
+		opword 0x39200002
+		bl GXSetChanCtrl
+		opword 0x38600001
+		bl GXSetNumTevStages
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00004
+		bl GXSetTevOrder
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevColorOp
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevAlphaOp
+		opword 0x38600000
+		opword 0x38800000
+		bl GXSetTevOp
+		opword 0x38600000
+		bl GXSetCullMode
+		bl GXClearVtxDesc
+		opword 0x38600009
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x3860000D
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x38800009
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38600000
+		opword 0x3880000D
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00004
+		opword 0x38C0001E
+		opword 0x38E00000
+		opword 0x3900007D
+		bl GXSetTexCoordGen2
+		opword 0x2C1C0002
+		opword 0x41820030
+		opword 0x40800044
+		opword 0x2C1C0000
+		opword 0x40800008
+		opword 0x48000038
+		opword 0x38810040
+		opword 0x38600032
+		bl effGetTexObj
+		opword 0x38610040
+		opword 0x38800000
+		bl GXLoadTexObj
+		opword 0x4800001C
+		opword 0x38810040
+		opword 0x38600033
+		bl effGetTexObj
+		opword 0x38610040
+		opword 0x38800000
+		bl GXLoadTexObj
+		lfs f0, float_6p2832_80420fa4(r2)
+		opword 0x3BA00001
+		opword 0x3BDE0068
+		opword 0xEFE007B2
+		opword 0x4800091C
+		opword 0x281C0008
+		opword 0x4181090C
+		lis r3, jumptable_803AE000@ha
+		opword 0x5780103A
+		addi r3, r3, jumptable_803AE000@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		lfs f29, float_64_80420f74(r2)
+		opword 0x386100F0
+		lfs f0, float_0p5_80420f7c(r2)
+		lfs f28, float_42p667_80420fb8(r2)
+		opword 0xEFBD0032
+		opword 0xC03E0004
+		opword 0xEF9C0032
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x38610090
+		opword 0xC01E0018
+		opword 0x38800079
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0x38610090
+		lfs f1, float_0_80420f84(r2)
+		opword 0xEC5C0032
+		opword 0xC01E002C
+		opword 0xFC600890
+		opword 0xEC420032
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x38610090
+		opword 0xC01E0048
+		opword 0x3880007A
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0xFC60E050
+		lfs f2, float_0p5_80420f7c(r2)
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38610090
+		opword 0xC01E002C
+		opword 0xEC4300B2
+		opword 0xFC600890
+		opword 0xEC420032
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0xC03E002C
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x38610060
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x387F011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100F0
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		opword 0x38600000
+		bl GXSetCurrentMtx
+		lwz r5, dat_80420f48(r2)
+		opword 0x38810024
+		opword 0x801E003C
+		opword 0x38600004
+		opword 0x90A10020
+		opword 0x98010023
+		opword 0x80010020
+		opword 0x90010024
+		bl GXSetChanMatColor
+		lfs f1, float_1_80420f80(r2)
+		opword 0x386100C0
+		lfs f2, float_0p33333_80420fbc(r2)
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x807E0028
+		opword 0x3C004330
+		lis r4, double_to_int_802fe480@ha
+		lfs f1, float_0_80420f84(r2)
+		opword 0x6C638000
+		opword 0x90010120
+		lfd f2, double_to_int_802fe480@l(r4)
+		opword 0xFC600890
+		opword 0x90610124
+		opword 0x386100F0
+		opword 0xC8010120
+		opword 0xEC401028
+		bl PSMTXTrans
+		opword 0x388100F0
+		opword 0x386100C0
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100F0
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		bl GXBegin
+		opword 0xFC20E850
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0x3C60CC01
+		opword 0xEC5D0032
+		opword 0xEC210032
+		opword 0xD0238000
+		opword 0xD3838000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		opword 0xD0438000
+		opword 0xD3838000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		opword 0xD0438000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0038000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0038000
+		opword 0xD0238000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0038000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0038000
+		opword 0x48000684
+		opword 0xC03E0004
+		opword 0x386100F0
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0xC03E002C
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x38610060
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x387F011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100F0
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		opword 0x38600000
+		bl GXSetCurrentMtx
+		lwz r5, dat_80420f4c(r2)
+		opword 0x3881001C
+		opword 0x801E003C
+		opword 0x38600004
+		opword 0x90A10018
+		opword 0x9801001B
+		opword 0x80010018
+		opword 0x9001001C
+		bl GXSetChanMatColor
+		opword 0x386100F0
+		bl PSMTXIdentity
+		opword 0x386100F0
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0x3B000000
+		opword 0x3B200000
+		opword 0x3F40CC01
+		opword 0x80DE0040
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		opword 0x80060000
+		add r23, r0, r25
+		bl GXBegin
+		opword 0xC0570008
+		opword 0x3B180002
+		opword 0xC0370004
+		opword 0x2C18001E
+		opword 0xC0170000
+		opword 0x3B390028
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xD05A8000
+		opword 0xC0370010
+		opword 0xC017000C
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xC0570030
+		opword 0xC037002C
+		opword 0xC0170028
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xD05A8000
+		opword 0xC0370038
+		opword 0xC0170034
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xC0570044
+		opword 0xC0370040
+		opword 0xC017003C
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xD05A8000
+		opword 0xC037004C
+		opword 0xC0170048
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xC057001C
+		opword 0xC0370018
+		opword 0xC0170014
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0xD05A8000
+		opword 0xC0370024
+		opword 0xC0170020
+		opword 0xD01A8000
+		opword 0xD03A8000
+		opword 0x4180FF38
+		opword 0x48000500
+		lfs f0, float_360_80420fa8(r2)
+		lis r3, vec3_802fe460@ha
+		addi r5, r3, vec3_802fe460@l
+		opword 0xEF9F0024
+		opword 0x80850000
+		opword 0x80650004
+		opword 0x80050008
+		opword 0x90810028
+		opword 0x9061002C
+		opword 0xFC20E090
+		opword 0x90010030
+		bl cos
+		opword 0xFC000818
+		opword 0xFC20E090
+		opword 0xD0010028
+		bl sin
+		opword 0xFC000818
+		opword 0x80010028
+		opword 0x8081002C
+		opword 0x386100F0
+		opword 0x90010034
+		opword 0xD0010030
+		opword 0x80010030
+		opword 0x90810038
+		opword 0x9001003C
+		opword 0xC03E0004
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0xC03E002C
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x2C1C0004
+		lfs f1, float_0_80420f84(r2)
+		opword 0x386100C0
+		opword 0x38000010
+		opword 0x40820008
+		opword 0x38000008
+		opword 0x6C048000
+		opword 0x3C004330
+		opword 0x90810124
+		lis r5, double_to_int_802fe480@ha
+		lfd f2, double_to_int_802fe480@l(r5)
+		opword 0x90010120
+		lfs f3, float_0_80420f84(r2)
+		opword 0xC8010120
+		opword 0xEC401028
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0xC01E0048
+		opword 0x38610090
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x38810034
+		opword 0xFC000050
+		opword 0xEC210032
+		bl PSMTXRotAxisRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x2C1C0004
+		lfs f1, float_0_80420f84(r2)
+		opword 0x386100C0
+		opword 0x38000010
+		opword 0x40820008
+		opword 0x38000008
+		opword 0x7C8000D0
+		opword 0x3C004330
+		opword 0x6C848000
+		lis r5, double_to_int_802fe480@ha
+		opword 0x9081012C
+		lfd f2, double_to_int_802fe480@l(r5)
+		opword 0x90010128
+		lfs f3, float_0_80420f84(r2)
+		opword 0xC8010128
+		opword 0xEC401028
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x38610060
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x807E005C
+		opword 0x2C03FFFF
+		opword 0x4182037C
+		lfs f1, float_0_80420f84(r2)
+		opword 0x388100F0
+		lfs f2, float_10_80420fb0(r2)
+		opword 0x38A00001
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x48000334
+		opword 0x801E005C
+		opword 0x2C00FFFF
+		opword 0x41820328
+		opword 0xC03E0004
+		opword 0x386100F0
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		lfs f0, float_180_80420fc0(r2)
+		opword 0xFC1E0040
+		opword 0x4080001C
+		opword 0xC03E002C
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x48000018
+		opword 0xC05E002C
+		opword 0x386100C0
+		opword 0xFC601090
+		opword 0xFC201050
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0xC01E0048
+		lfs f2, float_0_80420f84(r2)
+		opword 0xFC001000
+		opword 0x41820030
+		opword 0xFC000050
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x38610090
+		opword 0x3880007A
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x48000074
+		opword 0xFC601090
+		lfs f1, float_neg200_80420fc4(r2)
+		opword 0x386100C0
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0xC01E004C
+		opword 0x38610090
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x3880007A
+		opword 0xFC000050
+		opword 0xEC210032
+		bl PSMTXRotRad
+		opword 0x386100F0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		lfs f2, float_0_80420f84(r2)
+		opword 0x386100C0
+		lfs f1, float_200_80420fc8(r2)
+		opword 0xFC601090
+		bl PSMTXTrans
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x38610060
+		opword 0x7C852378
+		bl PSMTXConcat
+		lfs f1, float_neg82p655_80420fcc(r2)
+		opword 0x386100C0
+		lfs f2, float_88p8_80420fd0(r2)
+		lfs f3, float_0_80420f84(r2)
+		bl PSMTXTrans
+		opword 0x388100C0
+		opword 0x386100F0
+		opword 0x7C852378
+		bl PSMTXConcat
+		lfs f1, float_1p03_80420fd4(r2)
+		opword 0x38610090
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x38810090
+		opword 0x386100C0
+		opword 0x7C852378
+		bl PSMTXConcat
+		lfs f1, float_82p655_80420fd8(r2)
+		opword 0x386100C0
+		lfs f2, float_neg88p8_80420fdc(r2)
+		lfs f3, float_0_80420f84(r2)
+		bl PSMTXTrans
+		opword 0x388100C0
+		opword 0x38610090
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x807E005C
+		opword 0x38800040
+		bl animPoseSetMaterialFlagOn
+		lwz r0, dat_80420f50(r2)
+		opword 0x38810014
+		opword 0x90010014
+		opword 0x807E005C
+		bl animPoseSetMaterialEvtColor
+		opword 0x807E005C
+		opword 0x388100C0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00001
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100C0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100C0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x38800040
+		bl animPoseSetMaterialFlagOn
+		lwz r0, dat_80420f54(r2)
+		opword 0x38810010
+		opword 0x90010010
+		opword 0x807E005C
+		bl animPoseSetMaterialEvtColor
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00001
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x480000D0
+		opword 0x801E005C
+		opword 0x2C00FFFF
+		opword 0x418200C4
+		opword 0xC03E0004
+		opword 0x386100F0
+		opword 0xC05E0008
+		opword 0xC07E000C
+		bl PSMTXTrans
+		opword 0xC03E002C
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100F0
+		opword 0x38610060
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x807E005C
+		opword 0x38800040
+		bl animPoseSetMaterialFlagOn
+		lwz r3, dat_80420f58(r2)
+		opword 0x3881000C
+		opword 0x801E003C
+		opword 0x90610008
+		opword 0x9801000B
+		opword 0x80010008
+		opword 0x9001000C
+		opword 0x807E005C
+		bl animPoseSetMaterialEvtColor
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00001
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807E005C
+		opword 0x388100F0
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x3BBD0001
+		opword 0x3BDE0068
+		opword 0x801B0008
+		opword 0x7C1D0000
+		opword 0x4180F6E0
+	}
+}
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
@@ -1083,18 +3681,18 @@ void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
     w = effect->userdata;
     camGetPtr(cameraId);
     PSMTXTrans(trans, w->position.x, w->position.y, w->position.z);
-    PSMTXRotRad(rot, 'y', -camGetPtr(cameraId)->viewYaw * 0.017453292f);
+    PSMTXRotRad(rot, 'y', -camGetPtr(cameraId)->viewYaw * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
     PSMTXConcat(trans, rot, mtx);
     if (w->pose0 != -1 && w->pose1 != -1) {
         Vec v = { 0.0f, 0.0f, 0.0f };
-        v.x = (f32)cos(6.2831855f * w->angle / 360.0f);
-        v.z = (f32)sin(6.2831855f * w->angle / 360.0f);
+        v.x = (f32)cos(EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * w->angle / EXT_LIT(float_360_80420fa8, 360.0f));
+        v.z = (f32)sin(EXT_LIT(float_6p2832_80420fa4, 6.2831855f) * w->angle / EXT_LIT(float_360_80420fa8, 360.0f));
         axis = v;
         for (i = 0; i < 2; i++) {
             if (i == 0) {
                 PSMTXTrans(trans, w->pos2.x, w->pos2.y, w->pos2.z);
-                PSMTXRotAxisRad(rot, &axis, -w->rotation * 0.017453292f);
-                PSMTXScale(scl, 2.05f * w->scale, 2.05f * w->scale, 2.05f * w->scale);
+                PSMTXRotAxisRad(rot, &axis, -w->rotation * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
+                PSMTXScale(scl, EXT_LIT(float_2p05_80420fac, 2.05f) * w->scale, EXT_LIT(float_2p05_80420fac, 2.05f) * w->scale, EXT_LIT(float_2p05_80420fac, 2.05f) * w->scale);
                 PSMTXConcat(mtx, trans, trans);
                 PSMTXConcat(trans, rot, trans);
                 PSMTXConcat(trans, scl, trans);
@@ -1102,32 +3700,251 @@ void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
                 animPoseSetMaterialEvtColor(w->pose0, (GXColor){ 0, 0, 0, 255 });
             } else {
                 PSMTXTrans(trans, w->pos2.x, w->pos2.y, w->pos2.z);
-                PSMTXRotAxisRad(rot, &axis, -w->rotation * 0.017453292f);
-                PSMTXScale(scl, 2.0f * w->scale, 2.0f * w->scale, 2.0f * w->scale);
+                PSMTXRotAxisRad(rot, &axis, -w->rotation * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
+                PSMTXScale(scl, EXT_LIT(float_2_80420f88, 2.0f) * w->scale, EXT_LIT(float_2_80420f88, 2.0f) * w->scale, EXT_LIT(float_2_80420f88, 2.0f) * w->scale);
                 PSMTXConcat(mtx, trans, trans);
                 PSMTXConcat(trans, rot, trans);
                 PSMTXConcat(trans, scl, trans);
                 animPoseSetMaterialFlagOn(w->pose0, 0x40);
                 animPoseSetMaterialEvtColor(w->pose0, (GXColor){ 255, 255, 255, 255 });
             }
-            animPoseDrawMtx(w->pose0, trans, 1, 0.0f, 10.0f);
-            animPoseDrawMtx(w->pose0, trans, 2, 0.0f, 10.0f);
-            animPoseDrawMtx(w->pose0, trans, 3, 0.0f, 10.0f);
+            animPoseDrawMtx(w->pose0, trans, 1, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+            animPoseDrawMtx(w->pose0, trans, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+            animPoseDrawMtx(w->pose0, trans, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
         }
         PSMTXTrans(trans, w->pos2.x, w->pos2.y, w->pos2.z);
-        PSMTXScale(scl, 2.1f * w->scale, 2.1f * w->scale, 2.1f * w->scale);
+        PSMTXScale(scl, EXT_LIT(float_2p1_80420fb4, 2.1f) * w->scale, EXT_LIT(float_2p1_80420fb4, 2.1f) * w->scale, EXT_LIT(float_2p1_80420fb4, 2.1f) * w->scale);
         PSMTXConcat(mtx, trans, trans);
         PSMTXConcat(trans, scl, trans);
-        animPoseDrawMtx(w->pose1, trans, 1, 0.0f, 10.0f);
-        animPoseDrawMtx(w->pose1, trans, 2, 0.0f, 10.0f);
-        animPoseDrawMtx(w->pose1, trans, 3, 0.0f, 10.0f);
+        animPoseDrawMtx(w->pose1, trans, 1, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+        animPoseDrawMtx(w->pose1, trans, 2, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
+        animPoseDrawMtx(w->pose1, trans, 3, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_10_80420fb0, 10.0f));
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
+	asm volatile {
+		opword 0x9421FF10
+		opword 0x7C0802A6
+		opword 0x900100F4
+		opword 0x93E100EC
+		opword 0x93C100E8
+		opword 0x7C7E1B78
+		opword 0x83E4000C
+		bl camGetPtr
+		opword 0xC03F0004
+		opword 0x386100B8
+		opword 0xC05F0008
+		opword 0xC07F000C
+		bl PSMTXTrans
+		opword 0x7FC3F378
+		bl camGetPtr
+		opword 0xC0230114
+		opword 0x38610058
+		lfs f0, float_deg2rad_80420f70(r2)
+		opword 0x38800079
+		opword 0xFC200850
+		opword 0xEC200072
+		bl PSMTXRotRad
+		opword 0x386100B8
+		opword 0x38810058
+		opword 0x38A10028
+		bl PSMTXConcat
+		opword 0x801F00C4
+		opword 0x2C00FFFF
+		opword 0x418202BC
+		opword 0x801F00C8
+		opword 0x2C00FFFF
+		opword 0x418202B0
+		lfs f1, float_6p2832_80420fa4(r2)
+		lis r3, vec3_802fe46c@ha
+		opword 0xC01F0080
+		addi r5, r3, vec3_802fe46c@l
+		opword 0x80850000
+		opword 0xEC210032
+		lfs f0, float_360_80420fa8(r2)
+		opword 0x80650004
+		opword 0x80050008
+		opword 0xEC210024
+		opword 0x90810010
+		opword 0x90610014
+		opword 0x90010018
+		bl cos
+		lfs f2, float_6p2832_80420fa4(r2)
+		opword 0xFC600818
+		opword 0xC03F0080
+		lfs f0, float_360_80420fa8(r2)
+		opword 0xEC220072
+		opword 0xD0610010
+		opword 0xEC210024
+		bl sin
+		opword 0xFC000818
+		opword 0x80010010
+		opword 0x80610014
+		opword 0x3BC00000
+		opword 0x9001001C
+		opword 0xD0010018
+		opword 0x80010018
+		opword 0x90610020
+		opword 0x90010024
+		opword 0x2C1E0000
+		opword 0x408200A4
+		opword 0xC03F006C
+		opword 0x386100B8
+		opword 0xC05F0070
+		opword 0xC07F0074
+		bl PSMTXTrans
+		opword 0xC01F00B0
+		opword 0x38610058
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x3881001C
+		opword 0xFC000050
+		opword 0xEC210032
+		bl PSMTXRotAxisRad
+		lfs f1, float_2p05_80420fac(r2)
+		opword 0x38610088
+		opword 0xC01F0094
+		opword 0xEC210032
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x388100B8
+		opword 0x38610028
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100B8
+		opword 0x38810058
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100B8
+		opword 0x38810088
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x807F00C4
+		opword 0x38800040
+		bl animPoseSetMaterialFlagOn
+		lwz r0, dat_80420f5c(r2)
+		opword 0x3881000C
+		opword 0x9001000C
+		opword 0x807F00C4
+		bl animPoseSetMaterialEvtColor
+		opword 0x480000A0
+		opword 0xC03F006C
+		opword 0x386100B8
+		opword 0xC05F0070
+		opword 0xC07F0074
+		bl PSMTXTrans
+		opword 0xC01F00B0
+		opword 0x38610058
+		lfs f1, float_deg2rad_80420f70(r2)
+		opword 0x3881001C
+		opword 0xFC000050
+		opword 0xEC210032
+		bl PSMTXRotAxisRad
+		lfs f1, float_2_80420f88(r2)
+		opword 0x38610088
+		opword 0xC01F0094
+		opword 0xEC210032
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x388100B8
+		opword 0x38610028
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100B8
+		opword 0x38810058
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100B8
+		opword 0x38810088
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x807F00C4
+		opword 0x38800040
+		bl animPoseSetMaterialFlagOn
+		lwz r0, dat_80420f60(r2)
+		opword 0x38810008
+		opword 0x90010008
+		opword 0x807F00C4
+		bl animPoseSetMaterialEvtColor
+		opword 0x807F00C4
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00001
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807F00C4
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807F00C4
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x3BDE0001
+		opword 0x2C1E0002
+		opword 0x4180FE6C
+		opword 0xC03F006C
+		opword 0x386100B8
+		opword 0xC05F0070
+		opword 0xC07F0074
+		bl PSMTXTrans
+		lfs f1, float_2p1_80420fb4(r2)
+		opword 0x38610088
+		opword 0xC01F0094
+		opword 0xEC210032
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x388100B8
+		opword 0x38610028
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100B8
+		opword 0x38810088
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x807F00C8
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00001
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807F00C8
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00002
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x807F00C8
+		opword 0x388100B8
+		lfs f1, float_0_80420f84(r2)
+		opword 0x38A00003
+		lfs f2, float_10_80420fb0(r2)
+		bl animPoseDrawMtx
+		opword 0x800100F4
+		opword 0x83E100EC
+		opword 0x83C100E8
+		opword 0x7C0803A6
+		opword 0x382100F0
+	}
+}
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 #pragma opt_propagation off
+#ifdef NONMATCHING
 static const GXColor white255 = { 255, 255, 255, 255 };
+#endif
+#ifdef NONMATCHING
 void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
     Mtx trans;
     Mtx scl;
@@ -1143,7 +3960,7 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
     w = effect->userdata;
     cam = camGetPtr(cameraId);
     PSMTXTrans(trans, w->position.x, w->position.y, w->position.z);
-    PSMTXRotRad(rot, 'y', (-camGetPtr(cameraId)->viewYaw) * 0.017453292f);
+    PSMTXRotRad(rot, 'y', (-camGetPtr(cameraId)->viewYaw) * EXT_LIT(float_deg2rad_80420f70, 0.017453292f));
     PSMTXConcat(trans, rot, mtx);
     PSMTXConcat(cam->view, mtx, mtx);
     GXSetNumTevStages(2);
@@ -1170,42 +3987,42 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     effGetTexObj(0x35, &tex);
     GXLoadTexObj(&tex, GX_TEXMAP0);
-    hw = 64.0f;
-    hh = 704.0f;
-    hw /= 2.0f;
-    hh /= 2.0f;
+    hw = EXT_LIT(float_64_80420f74, 64.0f);
+    hh = EXT_LIT(float_704_80420f78, 704.0f);
+    hw /= EXT_LIT(float_2_80420f88, 2.0f);
+    hh /= EXT_LIT(float_2_80420f88, 2.0f);
     PSMTXTrans(trans, w->pos3.x, w->pos3.y, w->pos3.z);
-    PSMTXScale(scl, 1.0f, hh / ((f32) GXGetTexObjHeight(&tex)), 1.0f);
+    PSMTXScale(scl, EXT_LIT(float_1_80420f80, 1.0f), hh / ((f32) GXGetTexObjHeight(&tex)), EXT_LIT(float_1_80420f80, 1.0f));
     PSMTXConcat(trans, scl, trans);
     GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
     PSMTXTrans(trans, w->pos2.x, w->pos2.y, w->pos2.z);
-    PSMTXScale(scl, w->scale, 1.0f, 1.0f);
+    PSMTXScale(scl, w->scale, EXT_LIT(float_1_80420f80, 1.0f), EXT_LIT(float_1_80420f80, 1.0f));
     PSMTXConcat(trans, scl, trans);
     PSMTXConcat(mtx, trans, trans);
     GXLoadPosMtxImm(trans, 0);
     GXSetTevColor(GX_TEVREG0, white255);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-    GXPosition3f32((-hw) / 2.0f, hh, 0.0f);
+    GXPosition3f32((-hw) / EXT_LIT(float_2_80420f88, 2.0f), hh, EXT_LIT(float_0_80420f84, 0.0f));
     GXColor4u8(255, 255, 255, 255);
-    GXTexCoord2f32(0.0f, 0.0f);
-    GXPosition3f32(hw / 2.0f, hh, 0.0f);
+    GXTexCoord2f32(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
+    GXPosition3f32(hw / EXT_LIT(float_2_80420f88, 2.0f), hh, EXT_LIT(float_0_80420f84, 0.0f));
     GXColor4u8(255, 255, 255, 255);
-    GXTexCoord2f32(2.0f, 0.0f);
-    GXPosition3f32(hw / 2.0f, 0.0f, 0.0f);
+    GXTexCoord2f32(EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_0_80420f84, 0.0f));
+    GXPosition3f32(hw / EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
     GXColor4u8(255, 255, 255, 0);
-    GXTexCoord2f32(2.0f, 1.0f);
-    GXPosition3f32((-hw) / 2.0f, 0.0f, 0.0f);
+    GXTexCoord2f32(EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_1_80420f80, 1.0f));
+    GXPosition3f32((-hw) / EXT_LIT(float_2_80420f88, 2.0f), EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
     GXColor4u8(255, 255, 255, 0);
-    GXTexCoord2f32(0.0f, 1.0f);
+    GXTexCoord2f32(EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_1_80420f80, 1.0f));
     {
         EffFallWork *w2 = effect->userdata;
         if (w2->state > 0) {
             PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
-            PSMTXScale(scl, 0.56f, 0.4f, 0.8f);
+            PSMTXScale(scl, EXT_LIT(float_0p56_80420f8c, 0.56f), EXT_LIT(float_0p4_80420f90, 0.4f), EXT_LIT(float_0p8_80420f94, 0.8f));
             PSMTXConcat(mtx, trans, trans);
             PSMTXConcat(trans, scl, trans);
             GXLoadPosMtxImm(trans, 0);
-            PSMTXTrans(trans, w2->pos3.y / 8.0f, 0.0f, 0.0f);
+            PSMTXTrans(trans, w2->pos3.y / 8.0f, EXT_LIT(float_0_80420f84, 0.0f), EXT_LIT(float_0_80420f84, 0.0f));
             GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
             GXSetTevColor(GX_TEVREG0, (GXColor){255, 255, 255, w2->alpha});
             effGetTexObj(0x37, &tex);
@@ -1229,12 +4046,12 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
             GXCallDisplayList(shibuki_dl_1_3, 0x20);
             PSMTXTrans(trans, w2->pos2.x, w2->pos2.y, w2->pos2.z);
             s = w2->scale;
-            s = s * 0.8f;
-            PSMTXScale(scl, 0.7f * s, 0.5f * s, s);
+            s = s * EXT_LIT(float_0p8_80420f94, 0.8f);
+            PSMTXScale(scl, EXT_LIT(float_0p7_80420f9c, 0.7f) * s, EXT_LIT(float_0p5_80420f7c, 0.5f) * s, s);
             PSMTXConcat(mtx, trans, trans);
             PSMTXConcat(trans, scl, trans);
             GXLoadPosMtxImm(trans, 0);
-            PSMTXTrans(trans, 0.0f, (-w2->pos3.y) / 4.0f, 0.0f);
+            PSMTXTrans(trans, EXT_LIT(float_0_80420f84, 0.0f), (-w2->pos3.y) / 4.0f, EXT_LIT(float_0_80420f84, 0.0f));
             GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
             {
                 static const GXColor white255b = {255, 255, 255, 255};
@@ -1262,9 +4079,507 @@ void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
         }
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
+	char _af_pad[252];
+	asm volatile {
+		opword 0x7C9C2378
+		lis r4, lbl_803ADD20@ha
+		opword 0x83BC000C
+		mr r27, r3
+		addi r30, r4, lbl_803ADD20@l
+		bl camGetPtr
+		opword 0xC03D0004
+		opword 0x7C7F1B78
+		opword 0xC05D0008
+		la r3, _af_pad+192
+		opword 0xC07D000C
+		bl PSMTXTrans
+		opword 0x7F63DB78
+		bl camGetPtr
+		opword 0xC0230114
+		opword 0x38610068
+		lfs f0, float_deg2rad_80420f70(r2)
+		opword 0x38800079
+		opword 0xFC200850
+		opword 0xEC200072
+		bl PSMTXRotRad
+		opword 0x386100C8
+		opword 0x38810068
+		opword 0x38A10038
+		bl PSMTXConcat
+		opword 0x38810038
+		opword 0x387F011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x38600002
+		bl GXSetNumTevStages
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00004
+		bl GXSetTevOrder
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevColorOp
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevAlphaOp
+		opword 0x38600000
+		opword 0x38800000
+		bl GXSetTevOp
+		opword 0x38600001
+		opword 0x388000FF
+		opword 0x38A000FF
+		opword 0x38C000FF
+		bl GXSetTevOrder
+		opword 0x38600001
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevColorOp
+		opword 0x38600001
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevAlphaOp
+		opword 0x38600001
+		opword 0x3880000F
+		opword 0x38A00002
+		opword 0x38C00000
+		opword 0x38E0000F
+		bl GXSetTevColorIn
+		opword 0x38600001
+		opword 0x38800007
+		opword 0x38A00001
+		opword 0x38C00000
+		opword 0x38E00007
+		bl GXSetTevAlphaIn
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00004
+		opword 0x38C0001E
+		opword 0x38E00000
+		opword 0x3900007D
+		bl GXSetTexCoordGen2
+		opword 0x38600001
+		bl GXSetNumChans
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00001
+		opword 0x38E00000
+		opword 0x39000000
+		opword 0x39200002
+		bl GXSetChanCtrl
+		opword 0x38600002
+		bl GXSetCullMode
+		bl GXClearVtxDesc
+		opword 0x38600009
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x3860000B
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x3860000D
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x38800009
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38600000
+		opword 0x3880000B
+		opword 0x38A00001
+		opword 0x38C00005
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38600000
+		opword 0x3880000D
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38810018
+		opword 0x38600035
+		bl effGetTexObj
+		opword 0x38610018
+		opword 0x38800000
+		bl GXLoadTexObj
+		lfs f31, float_64_80420f74(r2)
+		opword 0x386100C8
+		lfs f0, float_0p5_80420f7c(r2)
+		lfs f30, float_704_80420f78(r2)
+		opword 0xEFFF0032
+		opword 0xC03D00B8
+		opword 0xEFDE0032
+		opword 0xC05D00BC
+		opword 0xC07D00C0
+		bl PSMTXTrans
+		opword 0x38610018
+		bl GXGetTexObjHeight
+		opword 0x5464043E
+		opword 0x3C004330
+		lis r3, double_to_int_mask_802fe478@ha
+		opword 0x908100FC
+		addi r4, r3, double_to_int_mask_802fe478@l
+		lfs f1, float_1_80420f80(r2)
+		opword 0x900100F8
+		opword 0x38610098
+		opword 0xC8440000
+		opword 0xFC600890
+		opword 0xC80100F8
+		opword 0xEC001028
+		opword 0xEC5E0024
+		bl PSMTXScale
+		opword 0x386100C8
+		opword 0x38810098
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0xC03D006C
+		opword 0x386100C8
+		opword 0xC05D0070
+		opword 0xC07D0074
+		bl PSMTXTrans
+		lfs f2, float_1_80420f80(r2)
+		opword 0x38610098
+		opword 0xC03D0094
+		opword 0xFC601090
+		bl PSMTXScale
+		opword 0x386100C8
+		opword 0x38810098
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x388100C8
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, dat_80420f64(r2)
+		opword 0x38810014
+		opword 0x38600001
+		opword 0x90010014
+		bl GXSetTevColor
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		bl GXBegin
+		opword 0xFC20F850
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0x3C80CC01
+		opword 0x386000FF
+		opword 0xEC5F0032
+		opword 0x38000000
+		opword 0xEC210032
+		opword 0xD0248000
+		opword 0xD3C48000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0xD0448000
+		opword 0xD3C48000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		lfs f0, float_2_80420f88(r2)
+		opword 0xD0048000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0xD0448000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98048000
+		lfs f0, float_2_80420f88(r2)
+		opword 0xD0048000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0048000
+		opword 0xD0248000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98648000
+		opword 0x98048000
+		lfs f0, float_0_80420f84(r2)
+		opword 0xD0048000
+		lfs f0, float_1_80420f80(r2)
+		opword 0xD0048000
+		opword 0x83FC000C
+		opword 0x801F00A0
+		opword 0x2C000000
+		opword 0x40810388
+		opword 0xC03F006C
+		opword 0x386100C8
+		opword 0xC05F0070
+		opword 0xC07F0074
+		bl PSMTXTrans
+		lfs f1, float_0p56_80420f8c(r2)
+		opword 0x38610098
+		lfs f2, float_0p4_80420f90(r2)
+		lfs f3, float_0p8_80420f94(r2)
+		bl PSMTXScale
+		opword 0x388100C8
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x38810098
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lfs f2, float_0_80420f84(r2)
+		opword 0x386100C8
+		opword 0xC03F00BC
+		lfs f0, float_0p125_80420f98(r2)
+		opword 0xFC601090
+		opword 0xEC210032
+		bl PSMTXTrans
+		opword 0x386100C8
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		lwz r5, dat_80420f68(r2)
+		opword 0x38810010
+		opword 0x801F00A4
+		opword 0x38600001
+		opword 0x90A1000C
+		opword 0x9801000F
+		opword 0x8001000C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0x38810018
+		opword 0x38600037
+		bl effGetTexObj
+		opword 0x38610018
+		opword 0x38800000
+		bl GXLoadTexObj
+		bl GXClearVtxDesc
+		opword 0x38600009
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x38800009
+		opword 0x38A00001
+		opword 0x38C00003
+		opword 0x38E00008
+		bl GXSetVtxAttrFmt
+		opword 0x389E0040
+		opword 0x38600009
+		opword 0x38A00006
+		bl GXSetArray
+		opword 0x3860000A
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000A
+		opword 0x38A00000
+		opword 0x38C00001
+		opword 0x38E00006
+		bl GXSetVtxAttrFmt
+		opword 0x3860000A
+		la r4, shibuki_normal_tbl(r13)
+		opword 0x38A00003
+		bl GXSetArray
+		opword 0x3860000B
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000B
+		opword 0x38A00001
+		opword 0x38C00005
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x3860000B
+		la r4, shibuki_color0_tbl(r13)
+		opword 0x38A00004
+		bl GXSetArray
+		opword 0x3860000D
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000D
+		opword 0x38A00001
+		opword 0x38C00003
+		opword 0x38E0000E
+		bl GXSetVtxAttrFmt
+		opword 0x389E0140
+		opword 0x3860000D
+		opword 0x38A00004
+		bl GXSetArray
+		la r3, shibuki_dl_1_0(r13)
+		opword 0x38800020
+		bl GXCallDisplayList
+		la r3, shibuki_dl_1_1(r13)
+		opword 0x38800020
+		bl GXCallDisplayList
+		la r3, shibuki_dl_1_2(r13)
+		opword 0x38800020
+		bl GXCallDisplayList
+		la r3, shibuki_dl_1_3(r13)
+		opword 0x38800020
+		bl GXCallDisplayList
+		opword 0xC03F006C
+		opword 0x386100C8
+		opword 0xC05F0070
+		opword 0xC07F0074
+		bl PSMTXTrans
+		opword 0xC05F0094
+		opword 0x38610098
+		lfs f0, float_0p8_80420f94(r2)
+		lfs f1, float_0p7_80420f9c(r2)
+		opword 0xEC620032
+		lfs f0, float_0p5_80420f7c(r2)
+		opword 0xEC2100F2
+		opword 0xEC4000F2
+		bl PSMTXScale
+		opword 0x388100C8
+		opword 0x38610038
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x38810098
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100C8
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		opword 0xC01F00BC
+		opword 0x386100C8
+		lfs f1, float_0_80420f84(r2)
+		opword 0xFC400050
+		lfs f0, float_0p25_80420fa0(r2)
+		opword 0xFC600890
+		opword 0xEC420032
+		bl PSMTXTrans
+		opword 0x386100C8
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		lwz r0, dat_80420f6c(r2)
+		opword 0x38810008
+		opword 0x38600001
+		opword 0x90010008
+		bl GXSetTevColor
+		opword 0x38810018
+		opword 0x38600036
+		bl effGetTexObj
+		opword 0x38610018
+		opword 0x38800000
+		bl GXLoadTexObj
+		bl GXClearVtxDesc
+		opword 0x38600009
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x38800009
+		opword 0x38A00001
+		opword 0x38C00003
+		opword 0x38E00008
+		bl GXSetVtxAttrFmt
+		opword 0x389E0040
+		opword 0x38600009
+		opword 0x38A00006
+		bl GXSetArray
+		opword 0x3860000A
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000A
+		opword 0x38A00000
+		opword 0x38C00001
+		opword 0x38E00006
+		bl GXSetVtxAttrFmt
+		opword 0x3860000A
+		la r4, shibuki_normal_tbl(r13)
+		opword 0x38A00003
+		bl GXSetArray
+		opword 0x3860000B
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000B
+		opword 0x38A00001
+		opword 0x38C00005
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x3860000B
+		la r4, shibuki_color0_tbl(r13)
+		opword 0x38A00004
+		bl GXSetArray
+		opword 0x3860000D
+		opword 0x38800002
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x3880000D
+		opword 0x38A00001
+		opword 0x38C00003
+		opword 0x38E0000E
+		bl GXSetVtxAttrFmt
+		opword 0x389E0140
+		opword 0x3860000D
+		opword 0x38A00004
+		bl GXSetArray
+		opword 0x387E01E0
+		opword 0x38800040
+		bl GXCallDisplayList
+		opword 0x387E0220
+		opword 0x38800040
+		bl GXCallDisplayList
+		opword 0x387E0260
+		opword 0x38800040
+		bl GXCallDisplayList
+		opword 0x387E02A0
+		opword 0x38800040
+		bl GXCallDisplayList
+	}
+}
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 s32 effFallCheckHit(EffectEntry* effect) {
     EffFallWork* w = effect->userdata;
     switch (w->type) {
@@ -1290,32 +4605,35 @@ s32 effFallCheckHit(EffectEntry* effect) {
     }
     return 0;
 }
-#endif
+
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on
+__declspec(section ".data") u32 gap_05_803AE094_data[1] = {0};
 
 #ifndef NONMATCHING
-// ASM-STOPGAP: effFallEntry (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-__declspec(section ".rodata") const f32 vec3_802fe418[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fe424[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const u32 dat_802fe430[12] = { 0x430C0000, 0x42200000, 0xC1200000, 0x00000000, 0x42200000, 0xC2200000, 0xC30C0000, 0x42200000, 0xC1200000, 0xC3C80000, 0x42200000, 0xC2200000 };
-__declspec(section ".rodata") const f32 vec3_802fe460[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fe46c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f64 double_to_int_mask_802fe478 = 4503599627370496;
-__declspec(section ".rodata") const f64 double_to_int_802fe480 = 4503601774854144;
-__declspec(section ".rodata") const char str_802FE488[] = "SFX_BTL_STAGE_FALL_BUG1";
-__declspec(section ".rodata") const char str_802FE4A0[] = "SFX_BTL_STAGE_FALL_BUG2";
-__declspec(section ".rodata") const char str_802FE4B8[] = "SFX_BTL_STAGE_DAMAGE_FORK1\000";
-__declspec(section ".rodata") const char str_802FE4D4[] = "SFX_BTL_STAGE_FALL_KOOPA1\000\000";
-__declspec(section ".rodata") const char str_802FE4F0[] = "SFX_BTL_STAGE_FALL_METEOR1\000";
-__declspec(section ".rodata") const char str_802FE50C[] = "SFX_BTL_STAGE_DAMAGE_METEOR2\000\000\000";
-__declspec(section ".rodata") const char str_802FE52C[] = "SFX_BTL_STAGE_DAMAGE_LIGHT1";
-__declspec(section ".rodata") const char str_802FE548[] = "EFF_Baketu\000";
-__declspec(section ".rodata") const char str_802FE554[] = "EFF_Tarai\000\000";
-__declspec(section ".rodata") const char str_802FE560[] = "EFF_koopa\000\000";
-__declspec(section ".rodata") const char str_802FE56C[] = "EFF_inseki\000";
-__declspec(section ".rodata") const char str_802FE578[] = "EFF_light\000\000";
-__declspec(section ".rodata") const char str_802FE584[] = "SFX_BTL_STAGE_FALL_WATER1\000\000";
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".rodata") const f32 vec3_802fe418[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fe424[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const u32 dat_802fe430[12] = {0x430C0000, 0x42200000, 0xC1200000, 0x00000000, 0x42200000, 0xC2200000, 0xC30C0000, 0x42200000, 0xC1200000, 0xC3C80000, 0x42200000, 0xC2200000};
+__declspec(section ".rodata") const f32 vec3_802fe460[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fe46c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f64 double_to_int_mask_802fe478 = 4503599627370496.0;
+__declspec(section ".rodata") const f64 double_to_int_802fe480 = 4503601774854144.0;
+__declspec(section ".rodata") const char str_802FE488[24] = "SFX_BTL_STAGE_FALL_BUG1";
+__declspec(section ".rodata") const char str_802FE4A0[24] = "SFX_BTL_STAGE_FALL_BUG2";
+__declspec(section ".rodata") const char str_802FE4B8[28] = "SFX_BTL_STAGE_DAMAGE_FORK1\0";
+__declspec(section ".rodata") const char str_802FE4D4[28] = "SFX_BTL_STAGE_FALL_KOOPA1\0\0";
+__declspec(section ".rodata") const char str_802FE4F0[28] = "SFX_BTL_STAGE_FALL_METEOR1\0";
+__declspec(section ".rodata") const char str_802FE50C[32] = "SFX_BTL_STAGE_DAMAGE_METEOR2\0\0\0";
+__declspec(section ".rodata") const char str_802FE52C[28] = "SFX_BTL_STAGE_DAMAGE_LIGHT1";
+__declspec(section ".rodata") const char str_802FE548[12] = "EFF_Baketu\0";
+__declspec(section ".rodata") const char str_802FE554[12] = "EFF_Tarai\0\0";
+__declspec(section ".rodata") const char str_802FE560[12] = "EFF_koopa\0\0";
+__declspec(section ".rodata") const char str_802FE56C[12] = "EFF_inseki\0";
+__declspec(section ".rodata") const char str_802FE578[12] = "EFF_light\0\0";
+__declspec(section ".rodata") const char str_802FE584[28] = "SFX_BTL_STAGE_FALL_WATER1\0\0";
 __declspec(section ".sdata2") const u32 dat_80420f48 = 0xFFFFFF00;
 __declspec(section ".sdata2") const u32 dat_80420f4c = 0xFFFFFF00;
 __declspec(section ".sdata2") const u32 dat_80420f50 = 0x000000FF;
@@ -1392,3494 +4710,5 @@ __declspec(section ".sdata2") const f32 float_0p1_8042106c = 0.1f;
 __declspec(section ".sdata2") const f32 float_0p6_80421070 = 0.6f;
 __declspec(section ".sdata2") const f32 float_1p3_80421074 = 1.3f;
 __declspec(section ".sdata2") const f32 float_400_80421078 = 400.0f;
-
-asm s32 effFallCheckHit(EffectEntry* effect) {
-	nofralloc
-	lwz r3, 0xc(r3)
-	lwz r0, 0x0(r3)
-	cmpwi r0, 0x6
-	beq @1
-	bge @2
-	cmpwi r0, 0x2
-	bge @3
-	cmpwi r0, 0x0
-	bge @4
-	b @5
-	@3:
-	cmpwi r0, 0x4
-	bge @4
-	b @6
-	@2:
-	cmpwi r0, 0x8
-	beq @7
-	bge @5
-	b @8
-	@4:
-	lwz r0, 0xa0(r3)
-	cmpwi r0, 0x2
-	blt @5
-	li r3, 0x1
-	blr
-	@6:
-	lwz r0, 0xa0(r3)
-	cmpwi r0, 0x1
-	blt @5
-	li r3, 0x1
-	blr
-	@1:
-	lwz r0, 0xa0(r3)
-	cmpwi r0, 0x2
-	bge @9
-	cmpwi r0, 0x1
-	bne @5
-	lwz r0, 0x8c(r3)
-	cmpwi r0, 0x5a
-	ble @5
-	@9:
-	li r3, 0x1
-	blr
-	@8:
-	lwz r0, 0xa0(r3)
-	cmpwi r0, 0x4
-	blt @5
-	li r3, 0x1
-	blr
-	@7:
-	lwz r0, 0xa0(r3)
-	cmpwi r0, 0x3
-	blt @5
-	li r3, 0x1
-	blr
-	@5:
-	li r3, 0x0
-	blr
-}
-
-void effFallDisp(CameraId cameraId, EffectEntry* effect);
-__declspec(section ".data") static void* jumptable_803AE000[] = {
-    (char*)effFallDisp + 0x214,
-    (char*)effFallDisp + 0x214,
-    (char*)effFallDisp + 0x484,
-    (char*)effFallDisp + 0xB04,
-    (char*)effFallDisp + 0x608,
-    (char*)effFallDisp + 0x608,
-    (char*)effFallDisp + 0x7D4,
-    (char*)effFallDisp + 0xB04,
-    (char*)effFallDisp + 0xA38,
-};
-void effFallMain(EffectEntry* effect);
-__declspec(section ".data") static void* jumptable_803AE024[] = {
-    (char*)effFallMain + 0xF08,
-    (char*)effFallMain + 0x10FC,
-    (char*)effFallMain + 0xF84,
-    (char*)effFallMain + 0x10FC,
-    (char*)effFallMain + 0xF84,
-    (char*)effFallMain + 0x10FC,
-    (char*)effFallMain + 0xF84,
-    (char*)effFallMain + 0x10FC,
-    (char*)effFallMain + 0x1364,
-    (char*)effFallMain + 0x1398,
-};
-void effFallMain(EffectEntry* effect);
-__declspec(section ".data") static void* jumptable_803AE04C[] = {
-    (char*)effFallMain + 0x194,
-    (char*)effFallMain + 0x194,
-    (char*)effFallMain + 0x4B0,
-    (char*)effFallMain + 0x808,
-    (char*)effFallMain + 0x960,
-    (char*)effFallMain + 0x960,
-    (char*)effFallMain + 0xCC4,
-    (char*)effFallMain + 0xEE4,
-    (char*)effFallMain + 0x13C0,
-};
-EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8);
-__declspec(section ".data") static void* jumptable_803AE070[] = {
-    (char*)effFallEntry + 0x278,
-    (char*)effFallEntry + 0x278,
-    (char*)effFallEntry + 0x2D0,
-    (char*)effFallEntry + 0x2FC,
-    (char*)effFallEntry + 0x370,
-    (char*)effFallEntry + 0x370,
-    (char*)effFallEntry + 0x39C,
-    (char*)effFallEntry + 0x3F8,
-    (char*)effFallEntry + 0x41C,
-};
-asm void effFallDispWater(CameraId cameraId, EffectEntry *effect) {
-	nofralloc
-	stwu r1, -0x140(r1)
-	mflr r0
-	stw r0, 0x144(r1)
-	stfd f31, 0x130(r1)
-	psq_st f31, 0x138(r1), 0, 0
-	stfd f30, 0x120(r1)
-	psq_st f30, 0x128(r1), 0, 0
-	stmw r27, 0x10c(r1)
-	mr r28, r4
-	lis r4, lbl_803ADD20@ha
-	lwz r29, 0xc(r28)
-	mr r27, r3
-	addi r30, r4, lbl_803ADD20@l
-	bl camGetPtr
-	lfs f1, 0x4(r29)
-	mr r31, r3
-	lfs f2, 0x8(r29)
-	addi r3, r1, 0xc8
-	lfs f3, 0xc(r29)
-	bl PSMTXTrans
-	mr r3, r27
-	bl camGetPtr
-	lfs f1, 0x114(r3)
-	addi r3, r1, 0x68
-	lfs f0, float_deg2rad_80420f70(r2)
-	li r4, 0x79
-	fneg f1, f1
-	fmuls f1, f0, f1
-	bl PSMTXRotRad
-	addi r3, r1, 0xc8
-	addi r4, r1, 0x68
-	addi r5, r1, 0x38
-	bl PSMTXConcat
-	addi r4, r1, 0x38
-	addi r3, r31, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	li r3, 0x2
-	bl GXSetNumTevStages
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x4
-	bl GXSetTevOrder
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x0
-	li r4, 0x0
-	bl GXSetTevOp
-	li r3, 0x1
-	li r4, 0xff
-	li r5, 0xff
-	li r6, 0xff
-	bl GXSetTevOrder
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x1
-	li r4, 0xf
-	li r5, 0x2
-	li r6, 0x0
-	li r7, 0xf
-	bl GXSetTevColorIn
-	li r3, 0x1
-	li r4, 0x7
-	li r5, 0x1
-	li r6, 0x0
-	li r7, 0x7
-	bl GXSetTevAlphaIn
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	li r3, 0x1
-	bl GXSetNumChans
-	li r3, 0x4
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x1
-	li r7, 0x0
-	li r8, 0x0
-	li r9, 0x2
-	bl GXSetChanCtrl
-	li r3, 0x2
-	bl GXSetCullMode
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xb
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xd
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xb
-	li r5, 0x1
-	li r6, 0x5
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	addi r4, r1, 0x18
-	li r3, 0x35
-	bl effGetTexObj
-	addi r3, r1, 0x18
-	li r4, 0x0
-	bl GXLoadTexObj
-	lfs f31, float_64_80420f74(r2)
-	addi r3, r1, 0xc8
-	lfs f0, float_0p5_80420f7c(r2)
-	lfs f30, float_704_80420f78(r2)
-	fmuls f31, f31, f0
-	lfs f1, 0xb8(r29)
-	fmuls f30, f30, f0
-	lfs f2, 0xbc(r29)
-	lfs f3, 0xc0(r29)
-	bl PSMTXTrans
-	addi r3, r1, 0x18
-	bl GXGetTexObjHeight
-	clrlwi r4, r3, 16
-	lis r0, 0x4330
-	lis r3, double_to_int_mask_802fe478@ha
-	stw r4, 0xfc(r1)
-	addi r4, r3, double_to_int_mask_802fe478@l
-	lfs f1, float_1_80420f80(r2)
-	stw r0, 0xf8(r1)
-	addi r3, r1, 0x98
-	lfd f2, 0x0(r4)
-	fmr f3, f1
-	lfd f0, 0xf8(r1)
-	fsubs f0, f0, f2
-	fdivs f2, f30, f0
-	bl PSMTXScale
-	addi r3, r1, 0xc8
-	addi r4, r1, 0x98
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	lfs f1, 0x6c(r29)
-	addi r3, r1, 0xc8
-	lfs f2, 0x70(r29)
-	lfs f3, 0x74(r29)
-	bl PSMTXTrans
-	lfs f2, float_1_80420f80(r2)
-	addi r3, r1, 0x98
-	lfs f1, 0x94(r29)
-	fmr f3, f2
-	bl PSMTXScale
-	addi r3, r1, 0xc8
-	addi r4, r1, 0x98
-	mr r5, r3
-	bl PSMTXConcat
-	addi r4, r1, 0xc8
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, dat_80420f64(r2)
-	addi r4, r1, 0x14
-	li r3, 0x1
-	stw r0, 0x14(r1)
-	bl GXSetTevColor
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	bl GXBegin
-	fneg f1, f31
-	lfs f0, float_0p5_80420f7c(r2)
-	lis r4, 0xcc01
-	li r3, 0xff
-	fmuls f2, f31, f0
-	li r0, 0x0
-	fmuls f1, f1, f0
-	stfs f1, -0x8000(r4)
-	stfs f30, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stfs f2, -0x8000(r4)
-	stfs f30, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	lfs f0, float_2_80420f88(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stfs f2, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r0, -0x8000(r4)
-	lfs f0, float_2_80420f88(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r4)
-	stfs f1, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r3, -0x8000(r4)
-	stb r0, -0x8000(r4)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r4)
-	lwz r31, 0xc(r28)
-	lwz r0, 0xa0(r31)
-	cmpwi r0, 0x0
-	ble @1
-	lfs f1, 0x6c(r31)
-	addi r3, r1, 0xc8
-	lfs f2, 0x70(r31)
-	lfs f3, 0x74(r31)
-	bl PSMTXTrans
-	lfs f1, float_0p56_80420f8c(r2)
-	addi r3, r1, 0x98
-	lfs f2, float_0p4_80420f90(r2)
-	lfs f3, float_0p8_80420f94(r2)
-	bl PSMTXScale
-	addi r4, r1, 0xc8
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	addi r4, r1, 0x98
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lfs f2, float_0_80420f84(r2)
-	addi r3, r1, 0xc8
-	lfs f1, 0xbc(r31)
-	lfs f0, float_0p125_80420f98(r2)
-	fmr f3, f2
-	fmuls f1, f1, f0
-	bl PSMTXTrans
-	addi r3, r1, 0xc8
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	lwz r5, dat_80420f68(r2)
-	addi r4, r1, 0x10
-	lwz r0, 0xa4(r31)
-	li r3, 0x1
-	stw r5, 0xc(r1)
-	stb r0, 0xf(r1)
-	lwz r0, 0xc(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	addi r4, r1, 0x18
-	li r3, 0x37
-	bl effGetTexObj
-	addi r3, r1, 0x18
-	li r4, 0x0
-	bl GXLoadTexObj
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x3
-	li r7, 0x8
-	bl GXSetVtxAttrFmt
-	addi r4, r30, 0x40
-	li r3, 0x9
-	li r5, 0x6
-	bl GXSetArray
-	li r3, 0xa
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xa
-	li r5, 0x0
-	li r6, 0x1
-	li r7, 0x6
-	bl GXSetVtxAttrFmt
-	li r3, 0xa
-	la r4, shibuki_normal_tbl(r13)
-	li r5, 0x3
-	bl GXSetArray
-	li r3, 0xb
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xb
-	li r5, 0x1
-	li r6, 0x5
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0xb
-	la r4, shibuki_color0_tbl(r13)
-	li r5, 0x4
-	bl GXSetArray
-	li r3, 0xd
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x3
-	li r7, 0xe
-	bl GXSetVtxAttrFmt
-	addi r4, r30, 0x140
-	li r3, 0xd
-	li r5, 0x4
-	bl GXSetArray
-	la r3, shibuki_dl_1_0(r13)
-	li r4, 0x20
-	bl GXCallDisplayList
-	la r3, shibuki_dl_1_1(r13)
-	li r4, 0x20
-	bl GXCallDisplayList
-	la r3, shibuki_dl_1_2(r13)
-	li r4, 0x20
-	bl GXCallDisplayList
-	la r3, shibuki_dl_1_3(r13)
-	li r4, 0x20
-	bl GXCallDisplayList
-	lfs f1, 0x6c(r31)
-	addi r3, r1, 0xc8
-	lfs f2, 0x70(r31)
-	lfs f3, 0x74(r31)
-	bl PSMTXTrans
-	lfs f2, 0x94(r31)
-	addi r3, r1, 0x98
-	lfs f0, float_0p8_80420f94(r2)
-	lfs f1, float_0p7_80420f9c(r2)
-	fmuls f3, f2, f0
-	lfs f0, float_0p5_80420f7c(r2)
-	fmuls f1, f1, f3
-	fmuls f2, f0, f3
-	bl PSMTXScale
-	addi r4, r1, 0xc8
-	addi r3, r1, 0x38
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	addi r4, r1, 0x98
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xc8
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lfs f0, 0xbc(r31)
-	addi r3, r1, 0xc8
-	lfs f1, float_0_80420f84(r2)
-	fneg f2, f0
-	lfs f0, float_0p25_80420fa0(r2)
-	fmr f3, f1
-	fmuls f2, f2, f0
-	bl PSMTXTrans
-	addi r3, r1, 0xc8
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	lwz r0, dat_80420f6c(r2)
-	addi r4, r1, 0x8
-	li r3, 0x1
-	stw r0, 0x8(r1)
-	bl GXSetTevColor
-	addi r4, r1, 0x18
-	li r3, 0x36
-	bl effGetTexObj
-	addi r3, r1, 0x18
-	li r4, 0x0
-	bl GXLoadTexObj
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x3
-	li r7, 0x8
-	bl GXSetVtxAttrFmt
-	addi r4, r30, 0x40
-	li r3, 0x9
-	li r5, 0x6
-	bl GXSetArray
-	li r3, 0xa
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xa
-	li r5, 0x0
-	li r6, 0x1
-	li r7, 0x6
-	bl GXSetVtxAttrFmt
-	li r3, 0xa
-	la r4, shibuki_normal_tbl(r13)
-	li r5, 0x3
-	bl GXSetArray
-	li r3, 0xb
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xb
-	li r5, 0x1
-	li r6, 0x5
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0xb
-	la r4, shibuki_color0_tbl(r13)
-	li r5, 0x4
-	bl GXSetArray
-	li r3, 0xd
-	li r4, 0x2
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x3
-	li r7, 0xe
-	bl GXSetVtxAttrFmt
-	addi r4, r30, 0x140
-	li r3, 0xd
-	li r5, 0x4
-	bl GXSetArray
-	addi r3, r30, 0x1e0
-	li r4, 0x40
-	bl GXCallDisplayList
-	addi r3, r30, 0x220
-	li r4, 0x40
-	bl GXCallDisplayList
-	addi r3, r30, 0x260
-	li r4, 0x40
-	bl GXCallDisplayList
-	addi r3, r30, 0x2a0
-	li r4, 0x40
-	bl GXCallDisplayList
-	@1:
-	psq_l f31, 0x138(r1), 0, 0
-	lfd f31, 0x130(r1)
-	psq_l f30, 0x128(r1), 0, 0
-	lfd f30, 0x120(r1)
-	lmw r27, 0x10c(r1)
-	lwz r0, 0x144(r1)
-	mtlr r0
-	addi r1, r1, 0x140
-	blr
-}
-
-asm void effFallDispInseki(CameraId cameraId, EffectEntry* effect) {
-	nofralloc
-	stwu r1, -0xf0(r1)
-	mflr r0
-	stw r0, 0xf4(r1)
-	stw r31, 0xec(r1)
-	stw r30, 0xe8(r1)
-	mr r30, r3
-	lwz r31, 0xc(r4)
-	bl camGetPtr
-	lfs f1, 0x4(r31)
-	addi r3, r1, 0xb8
-	lfs f2, 0x8(r31)
-	lfs f3, 0xc(r31)
-	bl PSMTXTrans
-	mr r3, r30
-	bl camGetPtr
-	lfs f1, 0x114(r3)
-	addi r3, r1, 0x58
-	lfs f0, float_deg2rad_80420f70(r2)
-	li r4, 0x79
-	fneg f1, f1
-	fmuls f1, f0, f1
-	bl PSMTXRotRad
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x58
-	addi r5, r1, 0x28
-	bl PSMTXConcat
-	lwz r0, 0xc4(r31)
-	cmpwi r0, -0x1
-	beq @1
-	lwz r0, 0xc8(r31)
-	cmpwi r0, -0x1
-	beq @1
-	lfs f1, float_6p2832_80420fa4(r2)
-	lis r3, vec3_802fe46c@ha
-	lfs f0, 0x80(r31)
-	addi r5, r3, vec3_802fe46c@l
-	lwz r4, 0x0(r5)
-	fmuls f1, f1, f0
-	lfs f0, float_360_80420fa8(r2)
-	lwz r3, 0x4(r5)
-	lwz r0, 0x8(r5)
-	fdivs f1, f1, f0
-	stw r4, 0x10(r1)
-	stw r3, 0x14(r1)
-	stw r0, 0x18(r1)
-	bl cos
-	lfs f2, float_6p2832_80420fa4(r2)
-	frsp f3, f1
-	lfs f1, 0x80(r31)
-	lfs f0, float_360_80420fa8(r2)
-	fmuls f1, f2, f1
-	stfs f3, 0x10(r1)
-	fdivs f1, f1, f0
-	bl sin
-	frsp f0, f1
-	lwz r0, 0x10(r1)
-	lwz r3, 0x14(r1)
-	li r30, 0x0
-	stw r0, 0x1c(r1)
-	stfs f0, 0x18(r1)
-	lwz r0, 0x18(r1)
-	stw r3, 0x20(r1)
-	stw r0, 0x24(r1)
-	@2:
-	cmpwi r30, 0x0
-	bne @3
-	lfs f1, 0x6c(r31)
-	addi r3, r1, 0xb8
-	lfs f2, 0x70(r31)
-	lfs f3, 0x74(r31)
-	bl PSMTXTrans
-	lfs f0, 0xb0(r31)
-	addi r3, r1, 0x58
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r4, r1, 0x1c
-	fneg f0, f0
-	fmuls f1, f1, f0
-	bl PSMTXRotAxisRad
-	lfs f1, float_2p05_80420fac(r2)
-	addi r3, r1, 0x88
-	lfs f0, 0x94(r31)
-	fmuls f1, f1, f0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r4, r1, 0xb8
-	addi r3, r1, 0x28
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x58
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x88
-	mr r5, r3
-	bl PSMTXConcat
-	lwz r3, 0xc4(r31)
-	li r4, 0x40
-	bl animPoseSetMaterialFlagOn
-	lwz r0, dat_80420f5c(r2)
-	addi r4, r1, 0xc
-	stw r0, 0xc(r1)
-	lwz r3, 0xc4(r31)
-	bl animPoseSetMaterialEvtColor
-	b @4
-	@3:
-	lfs f1, 0x6c(r31)
-	addi r3, r1, 0xb8
-	lfs f2, 0x70(r31)
-	lfs f3, 0x74(r31)
-	bl PSMTXTrans
-	lfs f0, 0xb0(r31)
-	addi r3, r1, 0x58
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r4, r1, 0x1c
-	fneg f0, f0
-	fmuls f1, f1, f0
-	bl PSMTXRotAxisRad
-	lfs f1, float_2_80420f88(r2)
-	addi r3, r1, 0x88
-	lfs f0, 0x94(r31)
-	fmuls f1, f1, f0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r4, r1, 0xb8
-	addi r3, r1, 0x28
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x58
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x88
-	mr r5, r3
-	bl PSMTXConcat
-	lwz r3, 0xc4(r31)
-	li r4, 0x40
-	bl animPoseSetMaterialFlagOn
-	lwz r0, dat_80420f60(r2)
-	addi r4, r1, 0x8
-	stw r0, 0x8(r1)
-	lwz r3, 0xc4(r31)
-	bl animPoseSetMaterialEvtColor
-	@4:
-	lwz r3, 0xc4(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x1
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0xc4(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0xc4(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	addi r30, r30, 0x1
-	cmpwi r30, 0x2
-	blt @2
-	lfs f1, 0x6c(r31)
-	addi r3, r1, 0xb8
-	lfs f2, 0x70(r31)
-	lfs f3, 0x74(r31)
-	bl PSMTXTrans
-	lfs f1, float_2p1_80420fb4(r2)
-	addi r3, r1, 0x88
-	lfs f0, 0x94(r31)
-	fmuls f1, f1, f0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r4, r1, 0xb8
-	addi r3, r1, 0x28
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xb8
-	addi r4, r1, 0x88
-	mr r5, r3
-	bl PSMTXConcat
-	lwz r3, 0xc8(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x1
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0xc8(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0xc8(r31)
-	addi r4, r1, 0xb8
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	@1:
-	lwz r0, 0xf4(r1)
-	lwz r31, 0xec(r1)
-	lwz r30, 0xe8(r1)
-	mtlr r0
-	addi r1, r1, 0xf0
-	blr
-}
-
-asm void effFallDisp(CameraId cameraId, EffectEntry* effect) {
-	nofralloc
-	stwu r1, -0x1a0(r1)
-	mflr r0
-	stw r0, 0x1a4(r1)
-	stfd f31, 0x190(r1)
-	psq_st f31, 0x198(r1), 0, 0
-	stfd f30, 0x180(r1)
-	psq_st f30, 0x188(r1), 0, 0
-	stfd f29, 0x170(r1)
-	psq_st f29, 0x178(r1), 0, 0
-	stfd f28, 0x160(r1)
-	psq_st f28, 0x168(r1), 0, 0
-	stmw r23, 0x13c(r1)
-	mr r27, r4
-	mr r23, r3
-	lwz r30, 0xc(r4)
-	bl camGetPtr
-	lwz r28, 0x0(r30)
-	mr r31, r3
-	lfs f30, 0x18(r30)
-	addi r3, r1, 0xf0
-	lfs f1, 0x4(r30)
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	mr r3, r23
-	bl camGetPtr
-	lfs f1, 0x114(r3)
-	addi r3, r1, 0x90
-	lfs f0, float_deg2rad_80420f70(r2)
-	li r4, 0x79
-	fneg f1, f1
-	fmuls f1, f0, f1
-	bl PSMTXRotRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	addi r5, r1, 0x60
-	bl PSMTXConcat
-	li r3, 0x1
-	bl GXSetNumChans
-	li r3, 0x4
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x0
-	li r8, 0x0
-	li r9, 0x2
-	bl GXSetChanCtrl
-	li r3, 0x1
-	bl GXSetNumTevStages
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x4
-	bl GXSetTevOrder
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x0
-	li r4, 0x0
-	bl GXSetTevOp
-	li r3, 0x0
-	bl GXSetCullMode
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xd
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	cmpwi r28, 0x2
-	beq @1
-	bge @2
-	cmpwi r28, 0x0
-	bge @3
-	b @2
-	@3:
-	addi r4, r1, 0x40
-	li r3, 0x32
-	bl effGetTexObj
-	addi r3, r1, 0x40
-	li r4, 0x0
-	bl GXLoadTexObj
-	b @2
-	@1:
-	addi r4, r1, 0x40
-	li r3, 0x33
-	bl effGetTexObj
-	addi r3, r1, 0x40
-	li r4, 0x0
-	bl GXLoadTexObj
-	@2:
-	lfs f0, float_6p2832_80420fa4(r2)
-	li r29, 0x1
-	addi r30, r30, 0x68
-	fmuls f31, f0, f30
-	b @4
-	@5:
-	cmplwi r28, 0x8
-	bgt @6
-	lis r3, jumptable_803AE000@ha
-	slwi r0, r28, 2
-	addi r3, r3, jumptable_803AE000@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@7:
-	lfs f29, float_64_80420f74(r2)
-	addi r3, r1, 0xf0
-	lfs f0, float_0p5_80420f7c(r2)
-	lfs f28, float_42p667_80420fb8(r2)
-	fmuls f29, f29, f0
-	lfs f1, 0x4(r30)
-	fmuls f28, f28, f0
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r3, r1, 0x90
-	lfs f0, 0x18(r30)
-	li r4, 0x79
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f0, float_0p5_80420f7c(r2)
-	addi r3, r1, 0x90
-	lfs f1, float_0_80420f84(r2)
-	fmuls f2, f28, f0
-	lfs f0, 0x2c(r30)
-	fmr f3, f1
-	fmuls f2, f2, f0
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r3, r1, 0x90
-	lfs f0, 0x48(r30)
-	li r4, 0x7a
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	fneg f3, f28
-	lfs f2, float_0p5_80420f7c(r2)
-	lfs f1, float_0_80420f84(r2)
-	addi r3, r1, 0x90
-	lfs f0, 0x2c(r30)
-	fmuls f2, f3, f2
-	fmr f3, f1
-	fmuls f2, f2, f0
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f1, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r1, 0x60
-	mr r5, r4
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r31, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xf0
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lwz r5, dat_80420f48(r2)
-	addi r4, r1, 0x24
-	lwz r0, 0x3c(r30)
-	li r3, 0x4
-	stw r5, 0x20(r1)
-	stb r0, 0x23(r1)
-	lwz r0, 0x20(r1)
-	stw r0, 0x24(r1)
-	bl GXSetChanMatColor
-	lfs f1, float_1_80420f80(r2)
-	addi r3, r1, 0xc0
-	lfs f2, float_0p33333_80420fbc(r2)
-	fmr f3, f1
-	bl PSMTXScale
-	lwz r3, 0x28(r30)
-	lis r0, 0x4330
-	lis r4, double_to_int_802fe480@ha
-	lfs f1, float_0_80420f84(r2)
-	xoris r3, r3, 0x8000
-	stw r0, 0x120(r1)
-	lfd f2, double_to_int_802fe480@l(r4)
-	fmr f3, f1
-	stw r3, 0x124(r1)
-	addi r3, r1, 0xf0
-	lfd f0, 0x120(r1)
-	fsubs f2, f0, f2
-	bl PSMTXTrans
-	addi r4, r1, 0xf0
-	addi r3, r1, 0xc0
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xf0
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	bl GXBegin
-	fneg f1, f29
-	lfs f0, float_0p5_80420f7c(r2)
-	lis r3, 0xcc01
-	fmuls f2, f29, f0
-	fmuls f1, f1, f0
-	stfs f1, -0x8000(r3)
-	stfs f28, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	stfs f2, -0x8000(r3)
-	stfs f28, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	stfs f2, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r3)
-	stfs f1, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_80420f80(r2)
-	stfs f0, -0x8000(r3)
-	b @6
-	@8:
-	lfs f1, 0x4(r30)
-	addi r3, r1, 0xf0
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	lfs f1, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r1, 0x60
-	mr r5, r4
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r31, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0xf0
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lwz r5, dat_80420f4c(r2)
-	addi r4, r1, 0x1c
-	lwz r0, 0x3c(r30)
-	li r3, 0x4
-	stw r5, 0x18(r1)
-	stb r0, 0x1b(r1)
-	lwz r0, 0x18(r1)
-	stw r0, 0x1c(r1)
-	bl GXSetChanMatColor
-	addi r3, r1, 0xf0
-	bl PSMTXIdentity
-	addi r3, r1, 0xf0
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r24, 0x0
-	li r25, 0x0
-	lis r26, 0xcc01
-	@9:
-	lwz r6, 0x40(r30)
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	lwz r0, 0x0(r6)
-	add r23, r0, r25
-	bl GXBegin
-	lfs f2, 0x8(r23)
-	addi r24, r24, 0x2
-	lfs f1, 0x4(r23)
-	cmpwi r24, 0x1e
-	lfs f0, 0x0(r23)
-	addi r25, r25, 0x28
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	stfs f2, -0x8000(r26)
-	lfs f1, 0x10(r23)
-	lfs f0, 0xc(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	lfs f2, 0x30(r23)
-	lfs f1, 0x2c(r23)
-	lfs f0, 0x28(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	stfs f2, -0x8000(r26)
-	lfs f1, 0x38(r23)
-	lfs f0, 0x34(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	lfs f2, 0x44(r23)
-	lfs f1, 0x40(r23)
-	lfs f0, 0x3c(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	stfs f2, -0x8000(r26)
-	lfs f1, 0x4c(r23)
-	lfs f0, 0x48(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	lfs f2, 0x1c(r23)
-	lfs f1, 0x18(r23)
-	lfs f0, 0x14(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	stfs f2, -0x8000(r26)
-	lfs f1, 0x24(r23)
-	lfs f0, 0x20(r23)
-	stfs f0, -0x8000(r26)
-	stfs f1, -0x8000(r26)
-	blt @9
-	b @6
-	@10:
-	lfs f0, float_360_80420fa8(r2)
-	lis r3, vec3_802fe460@ha
-	addi r5, r3, vec3_802fe460@l
-	fdivs f28, f31, f0
-	lwz r4, 0x0(r5)
-	lwz r3, 0x4(r5)
-	lwz r0, 0x8(r5)
-	stw r4, 0x28(r1)
-	stw r3, 0x2c(r1)
-	fmr f1, f28
-	stw r0, 0x30(r1)
-	bl cos
-	frsp f0, f1
-	fmr f1, f28
-	stfs f0, 0x28(r1)
-	bl sin
-	frsp f0, f1
-	lwz r0, 0x28(r1)
-	lwz r4, 0x2c(r1)
-	addi r3, r1, 0xf0
-	stw r0, 0x34(r1)
-	stfs f0, 0x30(r1)
-	lwz r0, 0x30(r1)
-	stw r4, 0x38(r1)
-	stw r0, 0x3c(r1)
-	lfs f1, 0x4(r30)
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	lfs f1, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	cmpwi r28, 0x4
-	lfs f1, float_0_80420f84(r2)
-	addi r3, r1, 0xc0
-	li r0, 0x10
-	bne @11
-	li r0, 0x8
-	@11:
-	xoris r4, r0, 0x8000
-	lis r0, 0x4330
-	stw r4, 0x124(r1)
-	lis r5, double_to_int_802fe480@ha
-	lfd f2, double_to_int_802fe480@l(r5)
-	stw r0, 0x120(r1)
-	lfs f3, float_0_80420f84(r2)
-	lfd f0, 0x120(r1)
-	fsubs f2, f0, f2
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f0, 0x48(r30)
-	addi r3, r1, 0x90
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r4, r1, 0x34
-	fneg f0, f0
-	fmuls f1, f1, f0
-	bl PSMTXRotAxisRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	cmpwi r28, 0x4
-	lfs f1, float_0_80420f84(r2)
-	addi r3, r1, 0xc0
-	li r0, 0x10
-	bne @12
-	li r0, 0x8
-	@12:
-	neg r4, r0
-	lis r0, 0x4330
-	xoris r4, r4, 0x8000
-	lis r5, double_to_int_802fe480@ha
-	stw r4, 0x12c(r1)
-	lfd f2, double_to_int_802fe480@l(r5)
-	stw r0, 0x128(r1)
-	lfs f3, float_0_80420f84(r2)
-	lfd f0, 0x128(r1)
-	fsubs f2, f0, f2
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r1, 0x60
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r3, 0x5c(r30)
-	cmpwi r3, -0x1
-	beq @6
-	lfs f1, float_0_80420f84(r2)
-	addi r4, r1, 0xf0
-	lfs f2, float_10_80420fb0(r2)
-	li r5, 0x1
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	b @6
-	@13:
-	lwz r0, 0x5c(r30)
-	cmpwi r0, -0x1
-	beq @6
-	lfs f1, 0x4(r30)
-	addi r3, r1, 0xf0
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	lfs f0, float_180_80420fc0(r2)
-	fcmpo cr0, f30, f0
-	bge @14
-	lfs f1, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	b @15
-	@14:
-	lfs f2, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f3, f2
-	fneg f1, f2
-	bl PSMTXScale
-	@15:
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f0, 0x48(r30)
-	lfs f2, float_0_80420f84(r2)
-	fcmpu cr0, f0, f2
-	beq @16
-	fneg f0, f0
-	lfs f1, float_deg2rad_80420f70(r2)
-	addi r3, r1, 0x90
-	li r4, 0x7a
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	b @17
-	@16:
-	fmr f3, f2
-	lfs f1, float_neg200_80420fc4(r2)
-	addi r3, r1, 0xc0
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f0, 0x4c(r30)
-	addi r3, r1, 0x90
-	lfs f1, float_deg2rad_80420f70(r2)
-	li r4, 0x7a
-	fneg f0, f0
-	fmuls f1, f1, f0
-	bl PSMTXRotRad
-	addi r3, r1, 0xf0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	lfs f2, float_0_80420f84(r2)
-	addi r3, r1, 0xc0
-	lfs f1, float_200_80420fc8(r2)
-	fmr f3, f2
-	bl PSMTXTrans
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	@17:
-	addi r4, r1, 0xf0
-	addi r3, r1, 0x60
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, float_neg82p655_80420fcc(r2)
-	addi r3, r1, 0xc0
-	lfs f2, float_88p8_80420fd0(r2)
-	lfs f3, float_0_80420f84(r2)
-	bl PSMTXTrans
-	addi r4, r1, 0xc0
-	addi r3, r1, 0xf0
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, float_1p03_80420fd4(r2)
-	addi r3, r1, 0x90
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r4, r1, 0x90
-	addi r3, r1, 0xc0
-	mr r5, r4
-	bl PSMTXConcat
-	lfs f1, float_82p655_80420fd8(r2)
-	addi r3, r1, 0xc0
-	lfs f2, float_neg88p8_80420fdc(r2)
-	lfs f3, float_0_80420f84(r2)
-	bl PSMTXTrans
-	addi r4, r1, 0xc0
-	addi r3, r1, 0x90
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r3, 0x5c(r30)
-	li r4, 0x40
-	bl animPoseSetMaterialFlagOn
-	lwz r0, dat_80420f50(r2)
-	addi r4, r1, 0x14
-	stw r0, 0x14(r1)
-	lwz r3, 0x5c(r30)
-	bl animPoseSetMaterialEvtColor
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xc0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x1
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xc0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xc0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	li r4, 0x40
-	bl animPoseSetMaterialFlagOn
-	lwz r0, dat_80420f54(r2)
-	addi r4, r1, 0x10
-	stw r0, 0x10(r1)
-	lwz r3, 0x5c(r30)
-	bl animPoseSetMaterialEvtColor
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x1
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	b @6
-	@18:
-	lwz r0, 0x5c(r30)
-	cmpwi r0, -0x1
-	beq @6
-	lfs f1, 0x4(r30)
-	addi r3, r1, 0xf0
-	lfs f2, 0x8(r30)
-	lfs f3, 0xc(r30)
-	bl PSMTXTrans
-	lfs f1, 0x2c(r30)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	mr r5, r3
-	bl PSMTXConcat
-	addi r4, r1, 0xf0
-	addi r3, r1, 0x60
-	mr r5, r4
-	bl PSMTXConcat
-	lwz r3, 0x5c(r30)
-	li r4, 0x40
-	bl animPoseSetMaterialFlagOn
-	lwz r3, dat_80420f58(r2)
-	addi r4, r1, 0xc
-	lwz r0, 0x3c(r30)
-	stw r3, 0x8(r1)
-	stb r0, 0xb(r1)
-	lwz r0, 0x8(r1)
-	stw r0, 0xc(r1)
-	lwz r3, 0x5c(r30)
-	bl animPoseSetMaterialEvtColor
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x1
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x2
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	lwz r3, 0x5c(r30)
-	addi r4, r1, 0xf0
-	lfs f1, float_0_80420f84(r2)
-	li r5, 0x3
-	lfs f2, float_10_80420fb0(r2)
-	bl animPoseDrawMtx
-	@6:
-	addi r29, r29, 0x1
-	addi r30, r30, 0x68
-	@4:
-	lwz r0, 0x8(r27)
-	cmpw r29, r0
-	blt @5
-	psq_l f31, 0x198(r1), 0, 0
-	lfd f31, 0x190(r1)
-	psq_l f30, 0x188(r1), 0, 0
-	lfd f30, 0x180(r1)
-	psq_l f29, 0x178(r1), 0, 0
-	lfd f29, 0x170(r1)
-	psq_l f28, 0x168(r1), 0, 0
-	lfd f28, 0x160(r1)
-	lmw r23, 0x13c(r1)
-	lwz r0, 0x1a4(r1)
-	mtlr r0
-	addi r1, r1, 0x1a0
-	blr
-}
-
-asm void effFallMain(EffectEntry* effect) {
-	nofralloc
-	stwu r1, -0x120(r1)
-	mflr r0
-	stw r0, 0x124(r1)
-	stfd f31, 0x110(r1)
-	psq_st f31, 0x118(r1), 0, 0
-	stfd f30, 0x100(r1)
-	psq_st f30, 0x108(r1), 0, 0
-	stfd f29, 0xf0(r1)
-	psq_st f29, 0xf8(r1), 0, 0
-	stfd f28, 0xe0(r1)
-	psq_st f28, 0xe8(r1), 0, 0
-	stfd f27, 0xd0(r1)
-	psq_st f27, 0xd8(r1), 0, 0
-	stfd f26, 0xc0(r1)
-	psq_st f26, 0xc8(r1), 0, 0
-	stmw r15, 0x7c(r1)
-	lis r4, vec3_802fe418@ha
-	lwz r26, 0xc(r3)
-	addi r31, r4, vec3_802fe418@l
-	mr r19, r3
-	lwz r4, 0xc(r31)
-	li r22, 0x0
-	lwz r3, 0x10(r31)
-	lwz r0, 0x14(r31)
-	stw r4, 0x8(r1)
-	lfs f0, 0x4(r26)
-	stw r3, 0xc(r1)
-	lfs f31, 0x8(r26)
-	stfs f0, 0x8(r1)
-	lfs f0, 0xc(r26)
-	stw r0, 0x10(r1)
-	lwz r5, 0x8(r1)
-	stfs f31, 0xc(r1)
-	lwz r4, gp(r13)
-	stfs f0, 0x10(r1)
-	lwz r3, 0xc(r1)
-	lwz r0, 0x10(r1)
-	stw r5, 0x14(r1)
-	stw r3, 0x18(r1)
-	stw r0, 0x1c(r1)
-	lwz r3, 0x0(r19)
-	lfs f0, 0x14(r26)
-	lwz r4, 0x14(r4)
-	rlwinm. r0, r3, 0, 29, 29
-	fadds f27, f31, f0
-	lwz r24, 0x0(r26)
-	neg r0, r4
-	lfs f28, 0x10(r26)
-	or r0, r0, r4
-	lfs f2, 0x18(r26)
-	lwz r23, 0x20(r26)
-	srwi r20, r0, 31
-	beq @1
-	rlwinm r0, r3, 0, 30, 28
-	li r16, 0x0
-	stw r0, 0x0(r19)
-	lwz r15, 0xc(r19)
-	b @2
-	@3:
-	lwz r3, 0x5c(r15)
-	cmpwi r3, -0x1
-	beq @4
-	bl animPoseRelease
-	@4:
-	lwz r3, 0x60(r15)
-	cmpwi r3, -0x1
-	beq @5
-	bl animPoseRelease
-	@5:
-	lwz r3, 0x64(r15)
-	bl psndSFXOff
-	addi r16, r16, 0x1
-	addi r15, r15, 0x68
-	@2:
-	lwz r0, 0x8(r19)
-	cmpw r16, r0
-	blt @3
-	mr r3, r19
-	bl effDelete
-	b @6
-	@1:
-	lfs f1, float_6p2832_80420fa4(r2)
-	addi r0, r31, 0x70
-	lfs f0, float_30_80420fe0(r2)
-	addi r29, r31, 0xbc
-	stw r0, 0x6c(r1)
-	addi r0, r31, 0xa0
-	fmuls f30, f1, f2
-	addi r30, r31, 0x88
-	fadds f29, f0, f31
-	stw r0, 0x68(r1)
-	addi r15, r31, 0xd8
-	addi r28, r31, 0xf4
-	addi r27, r31, 0x114
-	li r21, 0x0
-	li r25, 0x1
-	addi r26, r26, 0x68
-	b @7
-	@8:
-	cmplwi r24, 0x8
-	bgt @9
-	lis r3, jumptable_803AE04C@ha
-	slwi r0, r24, 2
-	addi r3, r3, jumptable_803AE04C@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@10:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x3
-	beq @11
-	bge @12
-	cmpwi r0, 0x1
-	beq @13
-	bge @14
-	cmpwi r0, 0x0
-	bge @15
-	b @16
-	@12:
-	cmpwi r0, 0x5
-	beq @17
-	bge @16
-	b @18
-	@15:
-	lwz r3, 0x24(r26)
-	cmpwi r3, 0x0
-	beq @19
-	subi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	@19:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	bne @16
-	lwz r3, 0x38(r26)
-	cmpwi r24, 0x1
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	bne @20
-	lwz r3, 0x6c(r1)
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	b @16
-	@20:
-	cmpwi r25, 0x1
-	bne @16
-	mr r3, r30
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	b @16
-	@13:
-	cmpwi r24, 0x0
-	bne @21
-	cmpwi r25, 0x1
-	ble @21
-	cmpwi r22, 0x0
-	bne @21
-	lwz r4, gp(r13)
-	lis r3, 0xaaab
-	subi r0, r3, 0x5555
-	lwz r3, 0x1c(r4)
-	mulhwu r0, r0, r3
-	srwi r0, r0, 2
-	mulli r0, r0, 0x6
-	subf. r0, r0, r3
-	bne @21
-	mr r3, r30
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	li r22, 0x1
-	@21:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	lfs f3, float_0_80420f84(r2)
-	fadds f0, f1, f0
-	fmr f4, f3
-	stfs f0, 0x8(r26)
-	lfs f1, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f1, f0
-	stfs f0, 0x34(r26)
-	lfs f1, 0x4(r26)
-	lfs f2, 0xc(r26)
-	bl distABf
-	lfs f0, float_0p5_80420f7c(r2)
-	fmuls f0, f28, f0
-	fcmpo cr0, f1, f0
-	bge @22
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f27
-	bge @16
-	stfs f27, 0x8(r26)
-	lfs f0, float_neg0p3_80420fe4(r2)
-	lfs f1, 0x34(r26)
-	fmuls f0, f1, f0
-	stfs f0, 0x34(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @16
-	@22:
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @16
-	stfs f31, 0x8(r26)
-	lfs f0, float_neg0p3_80420fe4(r2)
-	lfs f1, 0x34(r26)
-	fmuls f0, f1, f0
-	stfs f0, 0x34(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @16
-	@14:
-	lfs f2, 0x8(r26)
-	lfs f0, 0x34(r26)
-	lfs f1, float_0_80420f84(r2)
-	fadds f0, f2, f0
-	fmr f2, f1
-	stfs f0, 0x8(r26)
-	lfs f3, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f3, f0
-	stfs f0, 0x34(r26)
-	lfs f3, 0x4(r26)
-	lfs f4, 0xc(r26)
-	bl angleABf
-	lfs f2, float_6p2832_80420fa4(r2)
-	cmpwi r25, 0x1
-	lfs f0, float_360_80420fa8(r2)
-	fmuls f1, f2, f1
-	fdivs f26, f1, f0
-	bne @23
-	fdivs f26, f30, f0
-	@23:
-	fmr f1, f26
-	bl sin
-	frsp f3, f1
-	lfs f2, float_0p5_80420f7c(r2)
-	lfs f0, 0x4(r26)
-	fmr f1, f26
-	fmadds f0, f2, f3, f0
-	stfs f0, 0x4(r26)
-	bl cos
-	frsp f1, f1
-	lfs f2, float_0p5_80420f7c(r2)
-	lfs f0, 0xc(r26)
-	fneg f1, f1
-	fmadds f0, f2, f1, f0
-	stfs f0, 0xc(r26)
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @16
-	stfs f31, 0x8(r26)
-	li r0, 0x0
-	stw r0, 0x24(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @16
-	@11:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x1e
-	ble @16
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @16
-	@18:
-	lwz r3, 0x3c(r26)
-	subi r0, r3, 0xa
-	stw r0, 0x3c(r26)
-	lwz r0, 0x3c(r26)
-	cmpwi r0, 0x0
-	bge @16
-	li r0, 0x0
-	stw r0, 0x3c(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @16
-	@17:
-	addi r21, r21, 0x1
-	@16:
-	lwz r3, gp(r13)
-	lwz r0, 0x1c(r3)
-	extrwi. r0, r0, 1, 29
-	beq @24
-	lwz r3, 0x28(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x28(r26)
-	@24:
-	lwz r0, 0x28(r26)
-	cmpwi r0, 0x3
-	blt @25
-	li r0, 0x0
-	stw r0, 0x28(r26)
-	@25:
-	lwz r4, gp(r13)
-	lis r3, 0x4330
-	xoris r0, r25, 0x8000
-	stw r3, 0x50(r1)
-	lwz r4, 0x1c(r4)
-	stw r0, 0x5c(r1)
-	lfd f3, 0x60(r31)
-	stw r4, 0x54(r1)
-	lfd f1, 0x68(r31)
-	stw r3, 0x58(r1)
-	lfd f2, 0x50(r1)
-	lfd f0, 0x58(r1)
-	fsubs f3, f2, f3
-	lfs f2, float_0p5_80420f7c(r2)
-	fsubs f0, f0, f1
-	fmadds f1, f3, f2, f0
-	bl sin
-	frsp f1, f1
-	lfs f0, float_35_80420fe8(r2)
-	fmuls f0, f0, f1
-	stfs f0, 0x48(r26)
-	b @9
-	@26:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x2
-	beq @27
-	bge @28
-	cmpwi r0, 0x0
-	beq @29
-	bge @30
-	b @31
-	@28:
-	cmpwi r0, 0x4
-	beq @32
-	bge @31
-	b @33
-	@29:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x8(r26)
-	lfs f1, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f1, f0
-	stfs f0, 0x34(r26)
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @31
-	stfs f31, 0x8(r26)
-	li r0, 0x0
-	lwz r3, 0x68(r1)
-	addi r4, r1, 0x14
-	stw r0, 0x24(r26)
-	lwz r5, 0x38(r26)
-	addi r0, r5, 0x1
-	stw r0, 0x38(r26)
-	bl psndSFXOn_3D
-	b @31
-	@30:
-	lwz r3, 0x24(r26)
-	lis r0, 0x4330
-	stw r0, 0x58(r1)
-	xoris r0, r3, 0x8000
-	lfd f2, 0x68(r31)
-	stw r0, 0x5c(r1)
-	lfs f3, float_62p832_80420fec(r2)
-	lfd f1, 0x58(r1)
-	lfs f0, float_60_80420ff0(r2)
-	fsubs f1, f1, f2
-	fmuls f1, f3, f1
-	fdivs f1, f1, f0
-	bl sin
-	lwz r3, 0x24(r26)
-	lis r0, 0x4330
-	stw r0, 0x50(r1)
-	frsp f3, f1
-	xoris r0, r3, 0x8000
-	lfd f1, 0x68(r31)
-	stw r0, 0x54(r1)
-	lfs f2, float_60_80420ff0(r2)
-	lfd f0, 0x50(r1)
-	fsubs f0, f0, f1
-	fsubs f0, f2, f0
-	fmuls f0, f0, f3
-	fdivs f0, f0, f2
-	stfs f0, 0x44(r26)
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x3c
-	ble @31
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @31
-	@27:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x1e
-	ble @31
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @31
-	@33:
-	lwz r3, 0x3c(r26)
-	subi r0, r3, 0xa
-	stw r0, 0x3c(r26)
-	lwz r0, 0x3c(r26)
-	cmpwi r0, 0x0
-	bge @31
-	li r0, 0x0
-	stw r0, 0x3c(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @31
-	@32:
-	addi r21, r21, 0x1
-	@31:
-	li r3, 0x280
-	li r4, 0x3
-	bl smartAlloc
-	stw r3, 0x40(r26)
-	li r0, 0x10
-	lfs f6, float_8p5333_80421000(r2)
-	li r5, 0x0
-	lwz r4, 0x40(r26)
-	lis r3, 0x4330
-	lfd f5, 0x68(r31)
-	lwz r6, 0x0(r4)
-	lfs f4, float_128_80420ffc(r2)
-	lfs f3, float_0_80420f84(r2)
-	lfs f1, float_0p066667_80421004(r2)
-	mtctr r0
-	@34:
-	clrlwi. r4, r5, 31
-	beq @35
-	lfs f0, float_16_80420ff4(r2)
-	b @36
-	@35:
-	lfs f0, float_neg16_80420ff8(r2)
-	@36:
-	srwi r0, r5, 31
-	stw r3, 0x58(r1)
-	add r0, r0, r5
-	cmpwi r4, 0x0
-	srawi r4, r0, 1
-	stfs f0, 0x0(r6)
-	xoris r0, r4, 0x8000
-	stw r0, 0x5c(r1)
-	lfd f0, 0x58(r1)
-	fsubs f0, f0, f5
-	fnmsubs f0, f6, f0, f4
-	stfs f0, 0x4(r6)
-	stfs f3, 0x8(r6)
-	beq @37
-	lfs f2, float_2_80420f88(r2)
-	b @38
-	@37:
-	fmr f2, f3
-	@38:
-	xoris r0, r4, 0x8000
-	addi r5, r5, 0x1
-	stw r0, 0x54(r1)
-	clrlwi. r4, r5, 31
-	stw r3, 0x50(r1)
-	lfd f0, 0x50(r1)
-	stfs f2, 0xc(r6)
-	fsubs f0, f0, f5
-	fmuls f0, f1, f0
-	stfs f0, 0x10(r6)
-	beq @39
-	lfs f0, float_16_80420ff4(r2)
-	b @40
-	@39:
-	lfs f0, float_neg16_80420ff8(r2)
-	@40:
-	srwi r0, r5, 31
-	stw r3, 0x58(r1)
-	add r0, r0, r5
-	cmpwi r4, 0x0
-	srawi r4, r0, 1
-	stfs f0, 0x14(r6)
-	xoris r0, r4, 0x8000
-	stw r0, 0x5c(r1)
-	lfd f0, 0x58(r1)
-	fsubs f0, f0, f5
-	fnmsubs f0, f6, f0, f4
-	stfs f0, 0x18(r6)
-	stfs f3, 0x1c(r6)
-	beq @41
-	lfs f2, float_2_80420f88(r2)
-	b @42
-	@41:
-	fmr f2, f3
-	@42:
-	xoris r0, r4, 0x8000
-	stw r3, 0x50(r1)
-	addi r5, r5, 0x1
-	stw r0, 0x54(r1)
-	lfd f0, 0x50(r1)
-	stfs f2, 0x20(r6)
-	fsubs f0, f0, f5
-	fmuls f0, f1, f0
-	stfs f0, 0x24(r6)
-	addi r6, r6, 0x28
-	bdnz @34
-	lwz r3, 0x40(r26)
-	li r0, 0x8
-	lfs f2, float_600_80421008(r2)
-	li r25, 0x0
-	lwz r3, 0x0(r3)
-	mtctr r0
-	@43:
-	lfs f0, 0x4(r3)
-	addi r25, r25, 0x4
-	lfs f3, 0x44(r26)
-	fmuls f1, f0, f0
-	lfs f0, 0x0(r3)
-	fdivs f1, f1, f2
-	fmadds f0, f3, f1, f0
-	stfs f0, 0x0(r3)
-	lfs f0, 0x18(r3)
-	lfs f3, 0x44(r26)
-	fmuls f1, f0, f0
-	lfs f0, 0x14(r3)
-	fdivs f1, f1, f2
-	fmadds f0, f3, f1, f0
-	stfs f0, 0x14(r3)
-	lfs f0, 0x2c(r3)
-	lfs f3, 0x44(r26)
-	fmuls f1, f0, f0
-	lfs f0, 0x28(r3)
-	fdivs f1, f1, f2
-	fmadds f0, f3, f1, f0
-	stfs f0, 0x28(r3)
-	lfs f0, 0x40(r3)
-	lfs f3, 0x44(r26)
-	fmuls f1, f0, f0
-	lfs f0, 0x3c(r3)
-	fdivs f1, f1, f2
-	fmadds f0, f3, f1, f0
-	stfs f0, 0x3c(r3)
-	addi r3, r3, 0x50
-	bdnz @43
-	lwz r3, 0x40(r26)
-	li r4, 0x280
-	lwz r3, 0x0(r3)
-	bl DCFlushRange
-	b @9
-	@44:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x1
-	beq @45
-	bge @46
-	cmpwi r0, 0x0
-	bge @47
-	b @48
-	@46:
-	cmpwi r0, 0x3
-	bge @48
-	b @49
-	@47:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x8(r26)
-	lfs f1, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f1, f0
-	stfs f0, 0x34(r26)
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @48
-	stfs f31, 0x8(r26)
-	li r0, 0x0
-	stw r0, 0x24(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @48
-	@45:
-	lis r3, 0x6666
-	lwz r4, 0x24(r26)
-	addi r0, r3, 0x6667
-	mulhw r0, r0, r4
-	srawi r0, r0, 2
-	srwi r3, r0, 31
-	add r0, r0, r3
-	mulli r0, r0, 0xa
-	subf. r0, r0, r4
-	bne @50
-	lfs f1, 0x14(r1)
-	li r3, 0x4
-	lfs f2, 0x18(r1)
-	li r4, 0x14
-	lfs f3, 0x1c(r1)
-	lfs f4, float_1_80420f80(r2)
-	bl effWaterDamageN64Entry
-	@50:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpw r0, r23
-	ble @48
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @48
-	@49:
-	lwz r3, 0x3c(r26)
-	lis r0, 0x4330
-	stw r0, 0x58(r1)
-	xoris r0, r3, 0x8000
-	lfd f3, 0x68(r31)
-	stw r0, 0x5c(r1)
-	lfs f2, float_0p9_8042100c(r2)
-	lfd f1, 0x58(r1)
-	lfs f0, float_0p01_80421010(r2)
-	fsubs f1, f1, f3
-	fmuls f1, f1, f2
-	fctiwz f1, f1
-	stfd f1, 0x50(r1)
-	lwz r0, 0x54(r1)
-	stw r0, 0x3c(r26)
-	lfs f1, 0x2c(r26)
-	fmuls f1, f1, f2
-	stfs f1, 0x2c(r26)
-	lfs f1, 0x2c(r26)
-	fcmpo cr0, f1, f0
-	bge @48
-	lwz r3, 0x64(r26)
-	bl psndSFXOff
-	mr r3, r19
-	bl effDelete
-	b @6
-	@48:
-	lfs f1, 0x54(r26)
-	lfs f0, float_0p2_80421014(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0x54(r26)
-	b @9
-	@51:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x3
-	beq @52
-	bge @53
-	cmpwi r0, 0x1
-	beq @54
-	bge @55
-	cmpwi r0, 0x0
-	bge @56
-	b @57
-	@53:
-	cmpwi r0, 0x5
-	beq @58
-	bge @57
-	b @59
-	@56:
-	cmpwi r24, 0x5
-	bne @60
-	mr r4, r20
-	addi r3, r31, 0x130
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @57
-	lwz r0, 0x5c(r26)
-	cmpwi r0, -0x1
-	bne @61
-	mr r4, r20
-	addi r3, r31, 0x130
-	bl animPoseEntry
-	stw r3, 0x5c(r26)
-	la r4, str_80421018(r2)
-	li r5, 0x1
-	lwz r3, 0x5c(r26)
-	bl animPoseSetAnim
-	b @61
-	@60:
-	mr r4, r20
-	addi r3, r31, 0x13c
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @57
-	lwz r0, 0x5c(r26)
-	cmpwi r0, -0x1
-	bne @61
-	mr r4, r20
-	addi r3, r31, 0x13c
-	bl animPoseEntry
-	stw r3, 0x5c(r26)
-	la r4, str_80421018(r2)
-	li r5, 0x1
-	lwz r3, 0x5c(r26)
-	bl animPoseSetAnim
-	@61:
-	lwz r3, 0x24(r26)
-	cmpwi r3, 0x0
-	beq @62
-	subi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	@62:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	bne @57
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @57
-	@54:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	lfs f3, float_0_80420f84(r2)
-	fadds f0, f1, f0
-	fmr f4, f3
-	stfs f0, 0x8(r26)
-	lfs f1, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f1, f0
-	stfs f0, 0x34(r26)
-	lfs f1, 0x4(r26)
-	lfs f2, 0xc(r26)
-	bl distABf
-	lfs f0, float_0p5_80420f7c(r2)
-	fmuls f0, f28, f0
-	fcmpo cr0, f1, f0
-	bge @63
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f27
-	bge @57
-	stfs f27, 0x8(r26)
-	lfs f0, float_neg0p3_80420fe4(r2)
-	lfs f1, 0x34(r26)
-	fmuls f0, f1, f0
-	stfs f0, 0x34(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @57
-	@63:
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @57
-	stfs f31, 0x8(r26)
-	lfs f0, float_neg0p3_80420fe4(r2)
-	lfs f1, 0x34(r26)
-	fmuls f0, f1, f0
-	stfs f0, 0x34(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @57
-	@55:
-	lfs f2, 0x8(r26)
-	lfs f0, 0x34(r26)
-	lfs f1, float_0_80420f84(r2)
-	fadds f0, f2, f0
-	fmr f2, f1
-	stfs f0, 0x8(r26)
-	lfs f3, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f3, f0
-	stfs f0, 0x34(r26)
-	lfs f3, 0x4(r26)
-	lfs f4, 0xc(r26)
-	bl angleABf
-	lfs f2, float_6p2832_80420fa4(r2)
-	cmpwi r25, 0x1
-	lfs f0, float_360_80420fa8(r2)
-	fmuls f1, f2, f1
-	fdivs f26, f1, f0
-	bne @64
-	fdivs f26, f30, f0
-	@64:
-	fmr f1, f26
-	bl sin
-	frsp f3, f1
-	lfs f2, float_2_80420f88(r2)
-	lfs f0, 0x4(r26)
-	fmr f1, f26
-	fmadds f0, f2, f3, f0
-	stfs f0, 0x4(r26)
-	bl cos
-	frsp f1, f1
-	lfs f2, float_2_80420f88(r2)
-	lfs f0, 0xc(r26)
-	fneg f1, f1
-	fmadds f0, f2, f1, f0
-	stfs f0, 0xc(r26)
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @57
-	stfs f31, 0x8(r26)
-	li r0, 0x0
-	lfs f1, float_neg0p5_8042101c(r2)
-	lfs f2, 0x34(r26)
-	lfs f0, float_1_80420f80(r2)
-	fmuls f1, f2, f1
-	stfs f1, 0x34(r26)
-	stfs f31, 0x8(r26)
-	stw r0, 0x24(r26)
-	lfs f1, 0x34(r26)
-	fcmpo cr0, f1, f0
-	bge @57
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @57
-	@52:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x1e
-	ble @57
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @57
-	@59:
-	lwz r3, 0x3c(r26)
-	subi r0, r3, 0xa
-	stw r0, 0x3c(r26)
-	lwz r0, 0x3c(r26)
-	cmpwi r0, 0x0
-	bge @57
-	li r0, 0x0
-	stw r0, 0x3c(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	lwz r3, 0x5c(r26)
-	bl animPoseRelease
-	li r0, -0x1
-	stw r0, 0x5c(r26)
-	b @57
-	@58:
-	addi r21, r21, 0x1
-	@57:
-	cmpwi r24, 0x5
-	beq @65
-	bge @66
-	cmpwi r24, 0x4
-	bge @67
-	b @66
-	@67:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x1
-	ble @66
-	lfs f2, 0x48(r26)
-	lfs f1, float_360_80420fa8(r2)
-	lfs f0, float_10_80420fb0(r2)
-	fsubs f1, f1, f2
-	fdivs f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x48(r26)
-	b @66
-	@65:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x1
-	ble @66
-	lfs f2, 0x48(r26)
-	lfs f1, float_430_80421020(r2)
-	lfs f0, float_10_80420fb0(r2)
-	fsubs f1, f1, f2
-	fdivs f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x48(r26)
-	@66:
-	lwz r3, 0x5c(r26)
-	cmpwi r3, -0x1
-	beq @9
-	bl animPoseMain
-	b @9
-	@68:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x1
-	beq @69
-	bge @70
-	cmpwi r0, 0x0
-	bge @71
-	b @72
-	@70:
-	cmpwi r0, 0x3
-	bge @72
-	b @73
-	@71:
-	mr r4, r20
-	addi r3, r31, 0x148
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @72
-	lwz r0, 0x5c(r26)
-	cmpwi r0, -0x1
-	bne @74
-	mr r4, r20
-	addi r3, r31, 0x148
-	bl animPoseEntry
-	stw r3, 0x5c(r26)
-	la r4, str_80421018(r2)
-	li r5, 0x1
-	lwz r3, 0x5c(r26)
-	bl animPoseSetAnim
-	mr r3, r29
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	@74:
-	lfs f1, 0x4(r26)
-	lfs f0, 0x50(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x4(r26)
-	lfs f1, 0x8(r26)
-	lfs f0, 0x54(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x8(r26)
-	lfs f1, 0xc(r26)
-	lfs f0, 0x58(r26)
-	fadds f0, f1, f0
-	stfs f0, 0xc(r26)
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x1e
-	ble @72
-	li r0, 0x0
-	lfs f4, float_0_80420f84(r2)
-	stw r0, 0x24(r26)
-	li r3, 0x4
-	lwz r4, 0x38(r26)
-	addi r0, r4, 0x1
-	stw r0, 0x38(r26)
-	lfs f1, 0x14(r1)
-	lfs f0, 0x4(r26)
-	lfs f5, 0x18(r1)
-	lfs f2, 0x8(r26)
-	fadds f1, f1, f0
-	lfs f3, 0x1c(r1)
-	lfs f0, 0xc(r26)
-	fadds f2, f5, f2
-	fadds f3, f3, f0
-	bl effKemuri1N64Entry
-	la r3, evt_shake(r13)
-	li r4, 0x0
-	li r5, 0x0
-	bl evtEntry
-	b @72
-	@69:
-	lfs f1, float_30_80420fe0(r2)
-	li r3, 0xb
-	lfs f2, float_neg27_80421024(r2)
-	li r5, 0xb4
-	lwz r4, 0x24(r26)
-	bl intplGetValue
-	stfs f1, 0x48(r26)
-	lfs f0, float_0_80420f84(r2)
-	lfs f1, 0x48(r26)
-	fcmpo cr0, f1, f0
-	bge @75
-	stfs f1, 0x4c(r26)
-	stfs f0, 0x48(r26)
-	@75:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0xb4
-	ble @76
-	li r0, 0x0
-	stw r0, 0x24(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	@76:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x64
-	bne @72
-	mr r3, r29
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	b @72
-	@73:
-	lfs f1, float_neg27_80421024(r2)
-	li r3, 0xb
-	lfs f2, float_80_80421028(r2)
-	li r5, 0xc8
-	lwz r4, 0x24(r26)
-	bl intplGetValue
-	stfs f1, 0x48(r26)
-	lfs f0, float_0_80420f84(r2)
-	lfs f1, 0x48(r26)
-	fcmpo cr0, f1, f0
-	bge @77
-	stfs f1, 0x4c(r26)
-	stfs f0, 0x48(r26)
-	@77:
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0xc8
-	ble @78
-	lwz r3, 0x5c(r26)
-	bl animPoseRelease
-	li r0, -0x1
-	addi r21, r21, 0x1
-	stw r0, 0x5c(r26)
-	@78:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x46
-	bne @72
-	mr r3, r29
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	@72:
-	lwz r3, 0x5c(r26)
-	cmpwi r3, -0x1
-	beq @9
-	bl animPoseMain
-	b @9
-	@79:
-	lwz r0, 0x38(r26)
-	cmplwi r0, 0x9
-	bgt @80
-	lis r3, jumptable_803AE024@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_803AE024@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@81:
-	mr r4, r20
-	addi r3, r31, 0x154
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @80
-	mr r3, r15
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	lwz r0, 0x5c(r26)
-	cmpwi r0, -0x1
-	bne @82
-	mr r4, r20
-	addi r3, r31, 0x154
-	bl animPoseEntry
-	stw r3, 0x5c(r26)
-	la r4, str_80421018(r2)
-	li r5, 0x1
-	lwz r3, 0x5c(r26)
-	bl animPoseSetAnim
-	@82:
-	lwz r0, 0x60(r26)
-	cmpwi r0, -0x1
-	bne @83
-	mr r4, r20
-	addi r3, r31, 0x154
-	bl animPoseEntry
-	stw r3, 0x60(r26)
-	la r4, str_8042102C(r2)
-	li r5, 0x1
-	lwz r3, 0x60(r26)
-	bl animPoseSetAnim
-	@83:
-	lwz r4, 0x38(r26)
-	addi r3, r1, 0x20
-	lwz r16, 0x18(r31)
-	srwi r0, r4, 31
-	lwz r17, 0x1c(r31)
-	add r0, r0, r4
-	lwz r18, 0x20(r31)
-	srawi r0, r0, 1
-	lwz r12, 0x24(r31)
-	lwz r11, 0x28(r31)
-	mulli r0, r0, 0xc
-	lwz r10, 0x2c(r31)
-	lwz r9, 0x30(r31)
-	lwz r8, 0x34(r31)
-	lwz r7, 0x38(r31)
-	lwz r6, 0x3c(r31)
-	lwz r5, 0x40(r31)
-	lwz r4, 0x44(r31)
-	stw r16, 0x20(r1)
-	lfs f0, float_0p4_80420f90(r2)
-	stw r17, 0x24(r1)
-	stw r18, 0x28(r1)
-	stw r12, 0x2c(r1)
-	stw r11, 0x30(r1)
-	stw r10, 0x34(r1)
-	stw r9, 0x38(r1)
-	stw r8, 0x3c(r1)
-	stw r7, 0x40(r1)
-	stw r6, 0x44(r1)
-	stw r5, 0x48(r1)
-	stw r4, 0x4c(r1)
-	lfsx f1, r3, r0
-	stfs f1, 0x50(r26)
-	lwz r4, 0x38(r26)
-	srwi r0, r4, 31
-	add r0, r0, r4
-	srawi r0, r0, 1
-	mulli r4, r0, 0xc
-	addi r0, r4, 0x4
-	lfsx f1, r3, r0
-	stfs f1, 0x54(r26)
-	lwz r4, 0x38(r26)
-	srwi r0, r4, 31
-	add r0, r0, r4
-	srawi r0, r0, 1
-	mulli r4, r0, 0xc
-	addi r0, r4, 0x8
-	lfsx f1, r3, r0
-	stfs f1, 0x58(r26)
-	stfs f0, 0x30(r26)
-	lfs f1, 0x50(r26)
-	lfs f2, 0x58(r26)
-	lfs f3, 0x4(r26)
-	lfs f4, 0xc(r26)
-	bl distABf
-	lfs f0, float_5_80421030(r2)
-	lis r0, 0x4330
-	stw r0, 0x60(r1)
-	fdivs f0, f1, f0
-	lfd f4, 0x68(r31)
-	stw r0, 0x50(r1)
-	lfs f2, float_0p5_80420f7c(r2)
-	fctiwz f0, f0
-	stfd f0, 0x58(r1)
-	lwz r0, 0x5c(r1)
-	stw r0, 0x24(r26)
-	lwz r0, 0x24(r26)
-	lfs f1, 0x54(r26)
-	xoris r0, r0, 0x8000
-	lfs f0, 0x8(r26)
-	stw r0, 0x64(r1)
-	fsubs f1, f1, f0
-	lfs f5, 0x30(r26)
-	lfd f0, 0x60(r1)
-	stw r0, 0x54(r1)
-	fsubs f0, f0, f4
-	lfd f3, 0x50(r1)
-	fdivs f0, f1, f0
-	fsubs f1, f3, f4
-	fmuls f1, f5, f1
-	fmadds f0, f1, f2, f0
-	stfs f0, 0x34(r26)
-	lfs f1, 0x4(r26)
-	lfs f2, 0xc(r26)
-	lfs f3, 0x50(r26)
-	lfs f4, 0x58(r26)
-	bl angleABf
-	stfs f1, 0x18(r26)
-	lfs f0, float_0_80420f84(r2)
-	stfs f0, 0x48(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @80
-	@84:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	lfs f3, float_6p2832_80420fa4(r2)
-	fadds f2, f1, f0
-	lfs f0, float_360_80420fa8(r2)
-	lfs f1, float_3p1416_8042103c(r2)
-	lfs f7, float_0p00761_80421034(r2)
-	stfs f2, 0x8(r26)
-	lfs f6, float_0p16605_80421038(r2)
-	lfs f4, 0x34(r26)
-	lfs f2, 0x30(r26)
-	lfs f5, float_1_80420f80(r2)
-	fsubs f2, f4, f2
-	stfs f2, 0x34(r26)
-	lfs f2, 0x18(r26)
-	fmuls f2, f3, f2
-	fdivs f2, f2, f0
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @85
-	lfs f1, float_1p5708_80421040(r2)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @86
-	fmuls f0, f2, f2
-	fmsubs f7, f7, f0, f6
-	fmadds f7, f7, f0, f5
-	fmuls f7, f7, f2
-	b @87
-	@86:
-	fsubs f0, f2, f1
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f7, f7, f0, f6
-	fmadds f7, f7, f0, f5
-	fmuls f7, f7, f2
-	b @87
-	@85:
-	lfs f0, float_4p7124_80421044(r2)
-	fcmpo cr0, f2, f0
-	bge @88
-	fsubs f2, f2, f1
-	fmuls f0, f2, f2
-	fmsubs f7, f7, f0, f6
-	fmadds f7, f7, f0, f5
-	fmuls f7, f7, f2
-	fneg f7, f7
-	b @87
-	@88:
-	fsubs f0, f2, f0
-	lfs f1, float_1p5708_80421040(r2)
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f7, f7, f0, f6
-	fmadds f7, f7, f0, f5
-	fmuls f7, f7, f2
-	fneg f7, f7
-	@87:
-	lfs f1, float_5_80421030(r2)
-	lfs f0, 0x4(r26)
-	lfs f3, float_6p2832_80420fa4(r2)
-	fmadds f2, f1, f7, f0
-	lfs f0, float_360_80420fa8(r2)
-	lfs f1, float_3p1416_8042103c(r2)
-	lfs f6, float_0p03705_80421048(r2)
-	stfs f2, 0x4(r26)
-	lfs f5, float_0p4967_8042104c(r2)
-	lfs f2, 0x18(r26)
-	lfs f4, float_1_80420f80(r2)
-	fmuls f2, f3, f2
-	fdivs f2, f2, f0
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @89
-	lfs f1, float_1p5708_80421040(r2)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @90
-	fmuls f0, f2, f2
-	fmsubs f6, f6, f0, f5
-	fmadds f6, f6, f0, f4
-	b @91
-	@90:
-	fsubs f0, f2, f1
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f6, f6, f0, f5
-	fmadds f6, f6, f0, f4
-	fneg f6, f6
-	b @91
-	@89:
-	lfs f0, float_4p7124_80421044(r2)
-	fcmpo cr0, f2, f0
-	bge @92
-	fsubs f2, f2, f1
-	fmuls f0, f2, f2
-	fmsubs f6, f6, f0, f5
-	fmadds f6, f6, f0, f4
-	fneg f6, f6
-	b @91
-	@92:
-	fsubs f0, f2, f0
-	lfs f1, float_1p5708_80421040(r2)
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f6, f6, f0, f5
-	fmadds f6, f6, f0, f4
-	@91:
-	fneg f1, f6
-	lfs f2, float_5_80421030(r2)
-	lfs f0, 0xc(r26)
-	fmadds f0, f2, f1, f0
-	stfs f0, 0xc(r26)
-	lwz r3, 0x24(r26)
-	subic. r0, r3, 0x1
-	stw r0, 0x24(r26)
-	bge @93
-	lfs f0, 0x50(r26)
-	stfs f0, 0x4(r26)
-	lfs f0, 0x54(r26)
-	stfs f0, 0x8(r26)
-	lfs f0, 0x58(r26)
-	stfs f0, 0xc(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x2
-	bne @94
-	mr r3, r28
-	addi r4, r1, 0x14
-	bl psndSFXOn_3D
-	stw r3, 0x64(r26)
-	@94:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x8
-	beq @93
-	lfs f1, 0x18(r1)
-	li r3, 0x4
-	lfs f0, 0x8(r26)
-	lfs f6, 0x14(r1)
-	lfs f5, 0x4(r26)
-	fadds f4, f1, f0
-	lfs f2, float_40_80421050(r2)
-	lfs f3, 0x1c(r1)
-	fadds f1, f6, f5
-	lfs f0, 0xc(r26)
-	fsubs f2, f4, f2
-	lfs f4, float_0_80420f84(r2)
-	fadds f3, f3, f0
-	bl effKemuri1N64Entry
-	la r3, evt_shake(r13)
-	li r4, 0x0
-	li r5, 0x0
-	bl evtEntry
-	@93:
-	lfs f2, 0x48(r26)
-	lfs f1, float_360_80420fa8(r2)
-	lfs f0, float_30_80420fe0(r2)
-	fsubs f1, f1, f2
-	fdivs f0, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x48(r26)
-	b @80
-	@95:
-	lwz r3, 0x64(r26)
-	bl psndSFXOff
-	lwz r3, 0x5c(r26)
-	bl animPoseRelease
-	lwz r3, 0x60(r26)
-	bl animPoseRelease
-	li r0, -0x1
-	stw r0, 0x5c(r26)
-	stw r0, 0x60(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @80
-	@96:
-	addi r21, r21, 0x1
-	@80:
-	lwz r3, 0x5c(r26)
-	cmpwi r3, -0x1
-	beq @97
-	bl animPoseMain
-	@97:
-	lwz r3, 0x60(r26)
-	cmpwi r3, -0x1
-	beq @9
-	bl animPoseMain
-	b @9
-	@98:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x4
-	beq @99
-	bge @100
-	cmpwi r0, 0x0
-	beq @101
-	blt @102
-	cmpwi r0, 0x3
-	bge @103
-	b @104
-	@100:
-	cmpwi r0, 0x6
-	beq @105
-	bge @102
-	b @106
-	@101:
-	mr r4, r20
-	addi r3, r31, 0x160
-	li r5, 0x0
-	bl animGroupBaseAsync
-	cmpwi r3, 0x0
-	beq @102
-	mr r4, r20
-	addi r3, r31, 0x160
-	bl animPoseEntry
-	stw r3, 0x5c(r26)
-	la r4, str_80421018(r2)
-	li r5, 0x1
-	lwz r3, 0x5c(r26)
-	bl animPoseSetAnim
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @102
-	@104:
-	lfs f1, 0x8(r26)
-	lfs f0, 0x34(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x8(r26)
-	lfs f1, 0x34(r26)
-	lfs f0, 0x30(r26)
-	fsubs f0, f1, f0
-	stfs f0, 0x34(r26)
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f31
-	bge @107
-	stfs f31, 0x8(r26)
-	li r0, 0x0
-	stw r0, 0x24(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	@107:
-	lwz r0, 0x38(r26)
-	cmpwi r0, 0x1
-	bne @102
-	lfs f0, 0x8(r26)
-	fcmpo cr0, f0, f29
-	bge @102
-	lfs f0, 0x18(r1)
-	li r3, 0x4
-	lfs f4, 0x14(r1)
-	lfs f1, 0x4(r26)
-	fadds f2, f0, f31
-	lfs f3, 0x1c(r1)
-	lfs f0, 0xc(r26)
-	fadds f1, f4, f1
-	lfs f4, float_0_80420f84(r2)
-	fadds f3, f3, f0
-	bl effKemuri1N64Entry
-	la r3, evt_shake(r13)
-	li r4, 0x0
-	li r5, 0x0
-	bl evtEntry
-	lwz r3, 0x5c(r26)
-	la r4, str_80421054(r2)
-	li r5, 0x1
-	bl animPoseSetAnim
-	lwz r5, 0x38(r26)
-	mr r3, r27
-	addi r4, r1, 0x14
-	addi r0, r5, 0x1
-	stw r0, 0x38(r26)
-	bl psndSFXOn_3D
-	b @102
-	@103:
-	lwz r3, 0x5c(r26)
-	bl animPoseGetLoopTimes
-	lfs f0, float_1_80420f80(r2)
-	fcmpo cr0, f1, f0
-	blt @102
-	lwz r3, 0x24(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x24(r26)
-	lwz r3, 0x24(r26)
-	lwz r0, 0x20(r26)
-	cmpw r3, r0
-	ble @102
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @102
-	@99:
-	lwz r3, 0x3c(r26)
-	subi r0, r3, 0xa
-	stw r0, 0x3c(r26)
-	lwz r0, 0x3c(r26)
-	cmpwi r0, 0x0
-	bge @102
-	li r0, 0x0
-	stw r0, 0x3c(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @102
-	@106:
-	lwz r3, 0x5c(r26)
-	bl animPoseRelease
-	li r0, -0x1
-	stw r0, 0x5c(r26)
-	lwz r3, 0x38(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x38(r26)
-	b @102
-	@105:
-	addi r21, r21, 0x1
-	@102:
-	lwz r3, 0x5c(r26)
-	cmpwi r3, -0x1
-	beq @9
-	bl animPoseMain
-	@9:
-	addi r25, r25, 0x1
-	addi r26, r26, 0x68
-	@7:
-	lwz r3, 0x8(r19)
-	cmpw r25, r3
-	blt @8
-	subi r0, r3, 0x1
-	cmpw r21, r0
-	blt @108
-	mr r3, r19
-	bl effDelete
-	b @6
-	@108:
-	cmpwi r24, 0x6
-	beq @109
-	bge @110
-	cmpwi r24, 0x3
-	beq @111
-	bge @112
-	b @109
-	@110:
-	cmpwi r24, 0x8
-	bge @109
-	b @113
-	@111:
-	addi r3, r1, 0x14
-	bl dispCalcZ
-	lis r3, effFallDispWater@ha
-	mr r6, r19
-	addi r5, r3, effFallDispWater@l
-	li r4, 0x2
-	li r3, 0x4
-	bl dispEntry
-	b @6
-	@112:
-	addi r3, r1, 0x14
-	bl dispCalcZ
-	lis r3, effFallDisp@ha
-	mr r6, r19
-	addi r5, r3, effFallDisp@l
-	li r4, 0x0
-	li r3, 0x4
-	bl dispEntry
-	b @6
-	@113:
-	addi r3, r1, 0x14
-	bl dispCalcZ
-	lis r3, effFallDispInseki@ha
-	mr r6, r19
-	addi r5, r3, effFallDispInseki@l
-	li r4, 0x2
-	li r3, 0x4
-	bl dispEntry
-	b @6
-	@109:
-	addi r3, r1, 0x14
-	bl dispCalcZ
-	lis r3, effFallDisp@ha
-	mr r6, r19
-	addi r5, r3, effFallDisp@l
-	li r4, 0x2
-	li r3, 0x4
-	bl dispEntry
-	@6:
-	psq_l f31, 0x118(r1), 0, 0
-	lfd f31, 0x110(r1)
-	psq_l f30, 0x108(r1), 0, 0
-	lfd f30, 0x100(r1)
-	psq_l f29, 0xf8(r1), 0, 0
-	lfd f29, 0xf0(r1)
-	psq_l f28, 0xe8(r1), 0, 0
-	lfd f28, 0xe0(r1)
-	psq_l f27, 0xd8(r1), 0, 0
-	lfd f27, 0xd0(r1)
-	psq_l f26, 0xc8(r1), 0, 0
-	lfd f26, 0xc0(r1)
-	lmw r15, 0x7c(r1)
-	lwz r0, 0x124(r1)
-	mtlr r0
-	addi r1, r1, 0x120
-	blr
-}
-
-asm EffectEntry* effFallEntry(s32 type, f32 x, f32 y, f32 z, f32 arg4, f32 arg5, f32 arg6, s32 arg7, s32 arg8) {
-	nofralloc
-	stwu r1, -0x100(r1)
-	mflr r0
-	stw r0, 0x104(r1)
-	stfd f31, 0xf0(r1)
-	psq_st f31, 0xf8(r1), 0, 0
-	stfd f30, 0xe0(r1)
-	psq_st f30, 0xe8(r1), 0, 0
-	stfd f29, 0xd0(r1)
-	psq_st f29, 0xd8(r1), 0, 0
-	stfd f28, 0xc0(r1)
-	psq_st f28, 0xc8(r1), 0, 0
-	stfd f27, 0xb0(r1)
-	psq_st f27, 0xb8(r1), 0, 0
-	stfd f26, 0xa0(r1)
-	psq_st f26, 0xa8(r1), 0, 0
-	stfd f25, 0x90(r1)
-	psq_st f25, 0x98(r1), 0, 0
-	stfd f24, 0x80(r1)
-	psq_st f24, 0x88(r1), 0, 0
-	stfd f23, 0x70(r1)
-	psq_st f23, 0x78(r1), 0, 0
-	stfd f22, 0x60(r1)
-	psq_st f22, 0x68(r1), 0, 0
-	stmw r23, 0x3c(r1)
-	fmr f24, f1
-	mr r23, r3
-	fmr f25, f2
-	mr r24, r4
-	fmr f26, f3
-	mr r25, r5
-	fmr f31, f4
-	fmr f23, f5
-	fmr f22, f6
-	bl effEntry
-	cmpwi r23, 0x0
-	mr r28, r3
-	addi r4, r24, 0x1
-	beq @1
-	blt @1
-	cmpwi r23, 0x9
-	bge @1
-	b @2
-	b @1
-	@2:
-	li r24, 0x1
-	li r4, 0x2
-	@1:
-	la r0, str_80421058(r2)
-	li r3, 0x3
-	stw r0, 0x14(r28)
-	stw r4, 0x8(r28)
-	lwz r0, 0x8(r28)
-	mulli r4, r0, 0x68
-	bl __memAlloc
-	lis r4, effFallMain@ha
-	stw r3, 0xc(r28)
-	addi r0, r4, effFallMain@l
-	lis r5, str_802FE584@ha
-	stw r0, 0x10(r28)
-	addi r29, r5, str_802FE584@l
-	fctiwz f0, f31
-	lis r4, double_to_int_802fe480@ha
-	lwz r0, 0x0(r28)
-	li r5, 0x0
-	lfd f27, double_to_int_802fe480@l(r4)
-	addi r27, r3, 0x68
-	ori r0, r0, 0x2
-	stfd f0, 0x18(r1)
-	lfs f28, float_3p1416_8042103c(r2)
-	li r26, 0x1
-	stw r0, 0x0(r28)
-	li r0, -0x1
-	lwz r30, 0x1c(r1)
-	lis r31, 0x4330
-	stw r23, 0x0(r3)
-	lfs f29, float_180_80420fc0(r2)
-	stfs f24, 0x4(r3)
-	lfs f30, float_300_80421060(r2)
-	stfs f25, 0x8(r3)
-	stfs f26, 0xc(r3)
-	stfs f31, 0x10(r3)
-	lfs f31, float_0_80420f84(r2)
-	stfs f23, 0x14(r3)
-	stfs f22, 0x18(r3)
-	stw r24, 0x1c(r3)
-	stw r5, 0x24(r3)
-	stw r5, 0x28(r3)
-	stw r25, 0x20(r3)
-	stw r0, 0x5c(r3)
-	stw r0, 0x60(r3)
-	b @3
-	@4:
-	li r3, 0x168
-	bl irand
-	xoris r0, r3, 0x8000
-	stw r31, 0x18(r1)
-	mr r3, r30
-	stw r0, 0x1c(r1)
-	lfd f0, 0x18(r1)
-	fsubs f0, f0, f27
-	fmuls f0, f28, f0
-	fdivs f23, f0, f29
-	bl irand
-	xoris r0, r3, 0x8000
-	stw r31, 0x20(r1)
-	fmr f1, f23
-	stw r0, 0x24(r1)
-	lfd f0, 0x20(r1)
-	fsubs f22, f0, f27
-	bl sin
-	frsp f0, f1
-	fmuls f0, f22, f0
-	stfs f0, 0x4(r27)
-	lwz r3, 0x8(r28)
-	bl irand
-	xoris r0, r3, 0x8000
-	stw r31, 0x28(r1)
-	fmr f1, f23
-	stw r0, 0x2c(r1)
-	lfd f0, 0x28(r1)
-	fsubs f0, f0, f27
-	fadds f0, f30, f0
-	stfs f0, 0x8(r27)
-	bl cos
-	frsp f0, f1
-	li r4, 0x0
-	li r0, 0xff
-	li r3, 0x64
-	fmuls f0, f22, f0
-	stfs f0, 0xc(r27)
-	stw r4, 0x24(r27)
-	stw r4, 0x28(r27)
-	stw r0, 0x3c(r27)
-	stfs f31, 0x48(r27)
-	bl irand
-	li r5, 0x32
-	srwi r4, r3, 31
-	subfc r0, r3, r5
-	li r0, 0xb4
-	srwi r3, r5, 31
-	stw r31, 0x30(r1)
-	subfe r3, r3, r4
-	li r4, 0x0
-	andc r3, r0, r3
-	li r0, -0x1
-	xoris r3, r3, 0x8000
-	cmplwi r23, 0x8
-	stw r3, 0x34(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f27
-	stfs f0, 0x18(r27)
-	stw r4, 0x38(r27)
-	stw r0, 0x5c(r27)
-	stw r0, 0x60(r27)
-	bgt @5
-	lis r3, jumptable_803AE070@ha
-	slwi r0, r23, 2
-	addi r3, r3, jumptable_803AE070@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@6:
-	lfs f1, float_0_80420f84(r2)
-	cmpwi r26, 0x1
-	lfs f0, float_0p2_80421014(r2)
-	stfs f1, 0x34(r27)
-	stfs f0, 0x30(r27)
-	bne @7
-	stfs f1, 0x4(r27)
-	li r0, 0x0
-	stfs f1, 0xc(r27)
-	stw r0, 0x24(r27)
-	b @8
-	@7:
-	lwz r3, 0x8(r28)
-	bl irand
-	addi r0, r3, 0x3c
-	stw r0, 0x24(r27)
-	@8:
-	cmpwi r23, 0x0
-	bne @9
-	lfs f0, float_0p5_80420f7c(r2)
-	b @10
-	@9:
-	lfs f0, float_1p2_80421064(r2)
-	@10:
-	stfs f0, 0x2c(r27)
-	b @5
-	@11:
-	lfs f2, float_0_80420f84(r2)
-	lfs f1, float_1p6_80421068(r2)
-	stfs f2, 0x34(r27)
-	lfs f0, float_0p5_80420f7c(r2)
-	stfs f1, 0x30(r27)
-	stfs f2, 0x4(r27)
-	stfs f2, 0xc(r27)
-	stw r4, 0x24(r27)
-	stfs f2, 0x44(r27)
-	stfs f0, 0x2c(r27)
-	b @5
-	@12:
-	lfs f2, float_0_80420f84(r2)
-	lis r3, vec3_802fe418@ha
-	lfs f0, float_0p1_8042106c(r2)
-	addi r7, r3, vec3_802fe418@l
-	stfs f2, 0x34(r27)
-	mr r3, r29
-	lfs f1, float_200_80420fc8(r2)
-	addi r4, r1, 0x8
-	stfs f0, 0x30(r27)
-	lfs f0, float_1_80420f80(r2)
-	stfs f2, 0x4(r27)
-	stfs f1, 0x8(r27)
-	stfs f2, 0xc(r27)
-	stfs f2, 0x50(r27)
-	stfs f2, 0x54(r27)
-	stfs f2, 0x58(r27)
-	stfs f0, 0x2c(r27)
-	lwz r6, 0x0(r7)
-	lwz r5, 0x4(r7)
-	lwz r0, 0x8(r7)
-	stw r6, 0x8(r1)
-	stw r5, 0xc(r1)
-	stw r0, 0x10(r1)
-	stfs f24, 0x8(r1)
-	stfs f25, 0xc(r1)
-	stfs f26, 0x10(r1)
-	bl psndSFXOn_3D
-	stw r3, 0x64(r27)
-	b @5
-	@13:
-	lfs f2, float_0_80420f84(r2)
-	li r0, 0x0
-	lfs f1, float_0p6_80421070(r2)
-	stfs f2, 0x34(r27)
-	lfs f0, float_1_80420f80(r2)
-	stfs f1, 0x30(r27)
-	stfs f2, 0x4(r27)
-	stfs f2, 0xc(r27)
-	stw r0, 0x24(r27)
-	stfs f0, 0x2c(r27)
-	b @5
-	@14:
-	lfs f3, float_0_80420f84(r2)
-	lfs f0, float_200_80420fc8(r2)
-	stfs f3, 0x4(r27)
-	lfs f2, float_30_80420fe0(r2)
-	stfs f0, 0x8(r27)
-	lfs f0, float_1p3_80421074(r2)
-	stfs f3, 0xc(r27)
-	lfs f1, 0x4(r27)
-	fneg f1, f1
-	fdivs f1, f1, f2
-	stfs f1, 0x50(r27)
-	lfs f1, 0x8(r27)
-	fneg f1, f1
-	fdivs f1, f1, f2
-	stfs f1, 0x54(r27)
-	lfs f1, 0xc(r27)
-	fneg f1, f1
-	fdivs f1, f1, f2
-	stfs f1, 0x58(r27)
-	stfs f0, 0x2c(r27)
-	stfs f2, 0x48(r27)
-	stfs f3, 0x4c(r27)
-	b @5
-	@15:
-	lfs f1, float_400_80421078(r2)
-	lfs f0, float_200_80420fc8(r2)
-	stfs f1, 0x4(r27)
-	lfs f1, float_0_80420f84(r2)
-	stfs f0, 0x8(r27)
-	lfs f0, float_0p5_80420f7c(r2)
-	stfs f1, 0xc(r27)
-	stfs f0, 0x2c(r27)
-	b @5
-	@16:
-	lfs f2, float_0_80420f84(r2)
-	lfs f0, float_0p25_80420fa0(r2)
-	stfs f2, 0x34(r27)
-	lfs f1, float_400_80421078(r2)
-	stfs f0, 0x30(r27)
-	lfs f0, float_1_80420f80(r2)
-	stfs f2, 0x4(r27)
-	stfs f1, 0x8(r27)
-	stfs f2, 0xc(r27)
-	stfs f0, 0x2c(r27)
-	@5:
-	addi r26, r26, 0x1
-	addi r27, r27, 0x68
-	@3:
-	lwz r0, 0x8(r28)
-	cmpw r26, r0
-	blt @4
-	mr r3, r28
-	psq_l f31, 0xf8(r1), 0, 0
-	lfd f31, 0xf0(r1)
-	psq_l f30, 0xe8(r1), 0, 0
-	lfd f30, 0xe0(r1)
-	psq_l f29, 0xd8(r1), 0, 0
-	lfd f29, 0xd0(r1)
-	psq_l f28, 0xc8(r1), 0, 0
-	lfd f28, 0xc0(r1)
-	psq_l f27, 0xb8(r1), 0, 0
-	lfd f27, 0xb0(r1)
-	psq_l f26, 0xa8(r1), 0, 0
-	lfd f26, 0xa0(r1)
-	psq_l f25, 0x98(r1), 0, 0
-	lfd f25, 0x90(r1)
-	psq_l f24, 0x88(r1), 0, 0
-	lfd f24, 0x80(r1)
-	psq_l f23, 0x78(r1), 0, 0
-	lfd f23, 0x70(r1)
-	psq_l f22, 0x68(r1), 0, 0
-	lfd f22, 0x60(r1)
-	lmw r23, 0x3c(r1)
-	lwz r0, 0x104(r1)
-	mtlr r0
-	addi r1, r1, 0x100
-	blr
-}
-// clang-format on
-#endif
-
-// target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_803AE094_data[1] = {0};
 __declspec(section ".sdata2") const u32 gap_09_8042107C_sdata2[1] = {0};
+#endif

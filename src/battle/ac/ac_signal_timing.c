@@ -8,6 +8,46 @@
 #include "pmario_sound.h"
 #include "system.h"
 #include <string.h>
+#ifndef NONMATCHING
+#define EXT_LIT(sym, val) (sym)
+__declspec(section ".rodata") extern const f32 vec3_802fedc8[3];
+__declspec(section ".rodata") extern const f32 vec3_802fedd4[3];
+__declspec(section ".rodata") extern const f32 vec3_802fede0[3];
+__declspec(section ".rodata") extern const f32 vec3_802fedec[3];
+__declspec(section ".rodata") extern const f32 vec3_802fedf8[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee04[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee10[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee1c[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee28[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee34[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee40[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee4c[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee58[3];
+__declspec(section ".rodata") extern const f32 vec3_802fee64[3];
+__declspec(section ".rodata") extern const f64 double_to_int_802fee70;
+__declspec(section ".rodata") extern const char str_802FEE78[12];
+__declspec(section ".rodata") extern const char str_802FEE84[16];
+__declspec(section ".rodata") extern const char str_802FEE94[20];
+__declspec(section ".rodata") extern const char str_802FEEA8[20];
+__declspec(section ".sdata2") extern const u32 dat_804216d0;
+__declspec(section ".sdata2") extern const u32 dat_804216d4;
+__declspec(section ".sdata2") extern const u32 dat_804216d8;
+__declspec(section ".sdata2") extern const u32 dat_804216dc;
+__declspec(section ".sdata2") extern const f32 float_neg200_804216e0;
+__declspec(section ".sdata2") extern const f32 float_70_804216e4;
+__declspec(section ".sdata2") extern const f32 float_1_804216e8;
+__declspec(section ".sdata2") extern const f32 float_neg288_804216ec;
+__declspec(section ".sdata2") extern const f32 float_25_804216f0;
+__declspec(section ".sdata2") extern const f32 float_0_804216f4;
+__declspec(section ".sdata2") extern const f32 float_1p5_804216f8;
+__declspec(section ".sdata2") extern const f32 float_0p5_804216fc;
+__declspec(section ".sdata2") extern const f32 float_15_80421700;
+__declspec(section ".sdata2") extern const f32 float_0p8_80421704;
+__declspec(section ".sdata2") extern const f32 float_0p6_80421708;
+__declspec(section ".sdata2") extern const f32 float_20p8_8042170c;
+__declspec(section ".sdata2") extern const f32 float_neg300_80421710;
+__declspec(section ".sdata2") extern const f32 float_30_80421714;
+#endif
 
 u16 BattleACGetButtonIcon(s32 button, s32 pressed);
 void btlDispTexPlane(u32 id, GXColor color, s32 unk, f32 tX, f32 tY, f32 tZ, f32 sX, f32 sY);
@@ -47,8 +87,14 @@ typedef struct SignalTimingWork {
 #define ST_COUNTDOWN(w) ((w)->actionCommands.countdown)
 #define ST_CONF(work) ((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction))
 
+#ifdef NONMATCHING
 u32 _button_table_4dir[4] = {0x10000, 0x20000, 0x40000, 0x80000};
 u32 _button_table_abxy[4] = {0x100, 0x200, 0x400, 0x800};
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") u32 _button_table_4dir[4] = {0x10000, 0x20000, 0x40000, 0x80000};
+__declspec(section ".sdata") u32 _button_table_abxy[4] = {0x100, 0x200, 0x400, 0x800};
+#endif
 s32 ac_signaltiming_ok_frame_range[7] = {20, 16, 12, 10, 6, 4, 2};
 s32 ac_signaltiming_ok_frame_range_2[7] = {30, 30, 30, 30, 25, 20, 15};
 
@@ -56,7 +102,6 @@ static void actionCommandDisp(f32 x, f32 y);
 s32 _get_ok_frame_range(s32 difficulty);
 
 #pragma dont_inline on
-#ifdef NONMATCHING
 s32 _get_ok_frame_range(s32 difficulty) {
     BattleWork* work = _battleWorkPointer;
     switch (ST_MODE(work)) {
@@ -65,7 +110,6 @@ s32 _get_ok_frame_range(s32 difficulty) {
     }
     return ST_OKBASE(work) + ac_signaltiming_ok_frame_range[difficulty];
 }
-#endif
 
 #pragma dont_inline reset
 #ifdef NONMATCHING
@@ -399,17 +443,565 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   }
   while (loop);
   return 1;
+#endif
+#ifndef NONMATCHING
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+void *memset(void *dest, int ch, size_t count);
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 battleAcMain_SignalTiming(BattleWork *work) {
+	asm volatile {
+		opword 0x9421FFC0
+		opword 0x7C0802A6
+		lis r4, vec3_802fedc8@ha
+		opword 0x90010044
+		addi r4, r4, vec3_802fedc8@l
+		opword 0xBE61000C
+		opword 0x7C741B78
+		opword 0x3B541F4C
+		opword 0x3AE00000
+		opword 0x3B341F20
+		opword 0x80631C90
+		opword 0x88030303
+		opword 0x28000000
+		opword 0x41820008
+		opword 0x3AE00001
+		opword 0x3B8400E0
+		opword 0x3BE400B0
+		opword 0x3BC400BC
+		opword 0x3BA400CC
+		opword 0x80141C9C
+		opword 0x3B000000
+		opword 0x3B600000
+		opword 0x2C0003E9
+		opword 0x41820308
+		opword 0x40800030
+		opword 0x2C000063
+		opword 0x418207C4
+		opword 0x40800010
+		opword 0x2C000000
+		opword 0x41820044
+		opword 0x480007B4
+		opword 0x2C0003E8
+		opword 0x40800250
+		opword 0x2C000065
+		opword 0x408007A4
+		opword 0x480001C8
+		opword 0x2C0003ED
+		opword 0x41820760
+		opword 0x40800014
+		opword 0x2C0003EB
+		opword 0x4182078C
+		opword 0x40800728
+		opword 0x48000718
+		opword 0x2C0003EF
+		opword 0x4080077C
+		opword 0x48000764
+		opword 0x38000001
+		opword 0x7F23CB78
+		opword 0x90141CB8
+		opword 0x38800000
+		opword 0x38A0002C
+		bl memset
+		lfs f1, float_neg300_80421710(r2)
+		opword 0x38800014
+		lfs f0, float_0_804216f4(r2)
+		opword 0x38000000
+		opword 0xD0390014
+		opword 0x7E83A378
+		opword 0xD0190018
+		opword 0x90990020
+		opword 0x901A0000
+		opword 0x901A0004
+		opword 0x901A0010
+		opword 0x901A0008
+		opword 0x901A000C
+		bl BattleActionCommandGetDifficulty
+		opword 0x907A002C
+		opword 0x38600000
+		opword 0x38000005
+		opword 0x38800000
+		opword 0x907A0030
+		opword 0x90741CEC
+		opword 0x7C0903A6
+		opword 0x3804004C
+		opword 0x38840001
+		opword 0x7C7A01AE
+		opword 0x4200FFF4
+		opword 0x80141CD8
+		opword 0x2C000003
+		opword 0x408000D4
+		opword 0x2C000001
+		opword 0x40800008
+		opword 0x480000C8
+		opword 0x3B600000
+		opword 0x3A600000
+		opword 0x480000A4
+		opword 0x3AC00000
+		opword 0x48000084
+		opword 0x80141CD8
+		opword 0x2C000001
+		opword 0x4082001C
+		opword 0x38600004
+		bl irand
+		opword 0x5460103A
+		la r3, _button_table_4dir(r13)
+		opword 0x7C03002E
+		opword 0x48000018
+		opword 0x38600004
+		bl irand
+		opword 0x5460103A
+		la r3, _button_table_abxy(r13)
+		opword 0x7C03002E
+		opword 0x349BFFFF
+		opword 0x7C150378
+		opword 0x38A00001
+		opword 0x38040001
+		opword 0x5483103A
+		opword 0x7C0903A6
+		opword 0x41800024
+		opword 0x38030038
+		opword 0x7C1A002E
+		opword 0x7C00A840
+		opword 0x40820008
+		opword 0x38A00000
+		opword 0x3884FFFF
+		opword 0x3863FFFC
+		opword 0x4200FFE4
+		opword 0x2C050000
+		opword 0x41820008
+		opword 0x3AC00001
+		opword 0x2C160000
+		opword 0x4182FF7C
+		opword 0x38130038
+		opword 0x3A730004
+		opword 0x7EBA012E
+		opword 0x3B7B0001
+		opword 0x80141CC8
+		opword 0x7C1B0000
+		opword 0x4180FF58
+		opword 0x801A0038
+		opword 0x901A0034
+		opword 0x4800003C
+		opword 0x38800100
+		opword 0x38A00000
+		opword 0x909A0034
+		opword 0x7CA32B78
+		opword 0x48000014
+		opword 0x38030038
+		opword 0x38630004
+		opword 0x7C9A012E
+		opword 0x38A50001
+		opword 0x80141CC8
+		opword 0x7C050000
+		opword 0x4180FFE8
+		opword 0x801A0038
+		opword 0x901A0034
+		opword 0x38000063
+		opword 0x90141C9C
+		opword 0x480005DC
+		opword 0xA8741D18
+		opword 0x2C030000
+		opword 0x40810024
+		opword 0x3803FFFF
+		opword 0x38600002
+		opword 0xB0141D18
+		opword 0x380003EA
+		opword 0x3B000001
+		opword 0x90741CB8
+		opword 0x90141C9C
+		opword 0x480005B0
+		opword 0x807A0008
+		opword 0x80141CD0
+		opword 0x7C0301D6
+		opword 0x901A0014
+		opword 0x807A0008
+		opword 0x80141CD0
+		opword 0x38630001
+		opword 0x7C6301D6
+		opword 0x3803FFFF
+		opword 0x901A0018
+		opword 0x801A0014
+		opword 0x901A001C
+		opword 0x807A002C
+		bl _get_ok_frame_range
+		opword 0x809A001C
+		opword 0x3863FFFF
+		opword 0x380003E8
+		opword 0x7C641A14
+		opword 0x907A0020
+		opword 0x90141C9C
+		opword 0x807A000C
+		opword 0x80141CD0
+		opword 0x38630001
+		opword 0x7C6301D6
+		opword 0x3803FFFF
+		opword 0x901A0028
+		opword 0x807A000C
+		opword 0x38030001
+		opword 0x901A000C
+		opword 0x80741CE0
+		opword 0x809A000C
+		opword 0x38030001
+		opword 0x7C040000
+		opword 0x4080002C
+		opword 0x80141C94
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x80741C90
+		opword 0x80030278
+		opword 0x540006F7
+		opword 0x40820034
+		opword 0x7FE3FB78
+		bl psndSFXOn
+		opword 0x48000028
+		opword 0x80141C94
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x80741C90
+		opword 0x80030278
+		opword 0x540006F7
+		opword 0x4082000C
+		opword 0x7FC3F378
+		bl psndSFXOn
+		opword 0x38600000
+		opword 0x380003E9
+		opword 0x907A0024
+		opword 0x90141C9C
+		opword 0x807A0010
+		opword 0x38030001
+		opword 0x901A0010
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x41820010
+		opword 0x38000000
+		opword 0x901A0030
+		opword 0x48000050
+		opword 0x807A0008
+		opword 0x80141CE0
+		opword 0x7C030000
+		opword 0x41800038
+		opword 0x807A0010
+		opword 0x801A001C
+		opword 0x7C030000
+		opword 0x4180001C
+		opword 0x801A0020
+		opword 0x7C030000
+		opword 0x41810010
+		opword 0x38000001
+		opword 0x901A0030
+		opword 0x48000018
+		opword 0x38000000
+		opword 0x901A0030
+		opword 0x4800000C
+		opword 0x38000000
+		opword 0x901A0030
+		opword 0x807A0034
+		opword 0x3AC00000
+		bl BattlePadCheckTrigger
+		opword 0x2C030000
+		opword 0x41820008
+		opword 0x3B600001
+		opword 0x2C1B0000
+		opword 0x41820038
+		opword 0x80141CD8
+		opword 0x2C000002
+		opword 0x41820008
+		opword 0x48000024
+		bl BattlePadGetTrigger
+		opword 0x801A0034
+		opword 0x7C001840
+		opword 0x4082000C
+		opword 0x3AC00001
+		opword 0x48000010
+		opword 0x3AC00000
+		opword 0x48000008
+		opword 0x3AC00001
+		opword 0x2C170000
+		opword 0x41820018
+		opword 0x801A0030
+		opword 0x2C000000
+		opword 0x4182000C
+		opword 0x3B600001
+		opword 0x3AC00001
+		opword 0x809A0000
+		opword 0x807A0004
+		opword 0x80141CC8
+		opword 0x7C641A14
+		opword 0x7C030000
+		opword 0x41800008
+		opword 0x3B600000
+		opword 0x807A0008
+		opword 0x80141CE0
+		opword 0x7C030000
+		opword 0x4180017C
+		opword 0x2C1B0000
+		opword 0x41820174
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x40820168
+		opword 0x38800001
+		opword 0x909A0024
+		opword 0x807A0010
+		opword 0x801A001C
+		opword 0x7C030000
+		opword 0x418000C4
+		opword 0x801A0020
+		opword 0x7C030000
+		opword 0x418100B8
+		opword 0x2C160000
+		opword 0x418200B0
+		opword 0x807A0000
+		opword 0x38030001
+		opword 0x901A0000
+		opword 0x90941CEC
+		opword 0x80BA0008
+		opword 0x80741CE0
+		opword 0x7C051800
+		opword 0x41800044
+		opword 0x80141CC8
+		opword 0x7C001A14
+		opword 0x7C050000
+		opword 0x40800034
+		opword 0x7C632850
+		opword 0x3803004C
+		opword 0x7C9A01AE
+		opword 0x80141C94
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x80741C90
+		opword 0x80030278
+		opword 0x540006F7
+		opword 0x4082000C
+		opword 0x7FA3EB78
+		bl psndSFXOn
+		opword 0x80141CC4
+		opword 0x540006F7
+		opword 0x418200D0
+		opword 0x801A0000
+		opword 0x90141CE8
+		opword 0x80141CB8
+		opword 0x5400003C
+		opword 0x90141CB8
+		opword 0x807A0000
+		opword 0x80141CD4
+		opword 0x7C030000
+		opword 0x41800010
+		opword 0x80141CB8
+		opword 0x60000002
+		opword 0x90141CB8
+		opword 0x380003EA
+		opword 0x3B000001
+		opword 0x90141C9C
+		opword 0x48000090
+		opword 0x809A0008
+		opword 0x80741CE0
+		opword 0x7C041800
+		opword 0x41800080
+		opword 0x80141CC8
+		opword 0x7C001A14
+		opword 0x7C040000
+		opword 0x40800070
+		opword 0x807A0004
+		opword 0x38030001
+		opword 0x901A0004
+		opword 0x807A0010
+		opword 0x801A0014
+		opword 0x7C030000
+		opword 0x4180004C
+		opword 0x80741CE0
+		opword 0x3880FFFF
+		opword 0x801A0008
+		opword 0x7C630050
+		opword 0x3803004C
+		opword 0x7C9A01AE
+		opword 0x80141C94
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x80741C90
+		opword 0x80030278
+		opword 0x540006F7
+		opword 0x4082000C
+		opword 0x7F83E378
+		bl psndSFXOn
+		opword 0x3800FFFF
+		opword 0x90141CEC
+		opword 0x4800000C
+		opword 0x38000000
+		opword 0x901A0024
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x40820088
+		opword 0x807A0010
+		opword 0x801A0020
+		opword 0x7C030000
+		opword 0x40810078
+		opword 0x38000001
+		opword 0x3880FFFF
+		opword 0x901A0024
+		opword 0x90941CEC
+		opword 0x80BA0008
+		opword 0x80741CE0
+		opword 0x7C051800
+		opword 0x41800058
+		opword 0x80141CC8
+		opword 0x7C001A14
+		opword 0x7C050000
+		opword 0x40800048
+		opword 0x807A0004
+		opword 0x38030001
+		opword 0x901A0004
+		opword 0x80741CE0
+		opword 0x801A0008
+		opword 0x7C630050
+		opword 0x3803004C
+		opword 0x7C9A01AE
+		opword 0x80141C94
+		opword 0x540007FF
+		opword 0x41820014
+		opword 0x80741C90
+		opword 0x80030278
+		opword 0x540006F7
+		opword 0x4082000C
+		opword 0x7F83E378
+		bl psndSFXOn
+		opword 0x801A0024
+		opword 0x2C000000
+		opword 0x418200C8
+		opword 0x80741CC8
+		opword 0x80141CE0
+		opword 0x809A0008
+		opword 0x7C030214
+		opword 0x7C040000
+		opword 0x408000B0
+		opword 0x38040001
+		opword 0x901A0008
+		opword 0x80741CC8
+		opword 0x80141CE0
+		opword 0x809A0008
+		opword 0x7C030214
+		opword 0x7C040000
+		opword 0x40800090
+		opword 0x80141CD0
+		opword 0x7C6401D6
+		opword 0x3803FFF6
+		opword 0x901A0014
+		opword 0x807A0008
+		opword 0x80141CD0
+		opword 0x38630001
+		opword 0x7C6301D6
+		opword 0x3803FFFF
+		opword 0x901A0018
+		opword 0x807A0008
+		opword 0x80141CD0
+		opword 0x7C0301D6
+		opword 0x901A001C
+		opword 0x807A002C
+		bl _get_ok_frame_range
+		opword 0x809A001C
+		opword 0x3863FFFF
+		opword 0x38000000
+		opword 0x7C641A14
+		opword 0x907A0020
+		opword 0x901A0024
+		opword 0x809A0008
+		opword 0x80741CE0
+		opword 0x7C041800
+		opword 0x41800028
+		opword 0x80141CC8
+		opword 0x7C001A14
+		opword 0x7C040000
+		opword 0x40800018
+		opword 0x7C032050
+		opword 0x5403103A
+		opword 0x38030038
+		opword 0x7C1A002E
+		opword 0x901A0034
+		opword 0x809A000C
+		opword 0x80141CD0
+		opword 0x807A0010
+		opword 0x7C0401D6
+		opword 0x7C030000
+		opword 0x418000D0
+		opword 0x80741CC8
+		opword 0x80141CE0
+		opword 0x7C030214
+		opword 0x7C040000
+		opword 0x40800010
+		opword 0x380003E8
+		opword 0x90141C9C
+		opword 0x480000B0
+		opword 0x801A0000
+		opword 0x90141CE8
+		opword 0x80141CB8
+		opword 0x5400003C
+		opword 0x90141CB8
+		opword 0x807A0000
+		opword 0x80141CD4
+		opword 0x7C030000
+		opword 0x41800010
+		opword 0x80141CB8
+		opword 0x60000002
+		opword 0x90141CB8
+		opword 0x380003EA
+		opword 0x3B000001
+		opword 0x90141C9C
+		opword 0x48000070
+		opword 0x380003EB
+		opword 0x90141C9C
+		opword 0x48000064
+		opword 0x80B41CC0
+		opword 0x38800000
+		opword 0x3860003C
+		opword 0x380003ED
+		opword 0x60A50001
+		opword 0x90B41CC0
+		opword 0x909A0030
+		opword 0x907A0054
+		opword 0x90141C9C
+		opword 0x4800003C
+		opword 0x807A0054
+		opword 0x3803FFFF
+		opword 0x901A0054
+		opword 0x801A0054
+		opword 0x2C000000
+		opword 0x41810024
+		opword 0x380003EE
+		opword 0x90141C9C
+		opword 0x48000018
+		opword 0x38000000
+		opword 0x90141CA0
+		opword 0x90141CA8
+		opword 0x90141CA4
+		opword 0x90141CAC
+		opword 0x2C180000
+		opword 0x4082F81C
+		opword 0xBA61000C
+		opword 0x38600001
+		opword 0x80010044
+		opword 0x7C0803A6
+		opword 0x38210040
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 s32 battleAcResult_SignalTiming(BattleWork* work) {
     return work->actionCommands.result;
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
+#ifdef NONMATCHING
     BattleActions* ac = &work->actionCommands;
     BattleACDispParams* disp = (BattleACDispParams*)((u8*)ac + 0x290);
 
@@ -441,17 +1033,91 @@ void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
             }
             break;
     }
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x90010014
+		opword 0x93E1000C
+		opword 0x3BE41F20
+		opword 0x80041C9C
+		opword 0x2C0003E8
+		opword 0x40800018
+		opword 0x2C000065
+		opword 0x408000CC
+		opword 0x2C000063
+		opword 0x4080001C
+		opword 0x480000C0
+		opword 0x2C0003EE
+		opword 0x408000B8
+		opword 0x2C0003EC
+		opword 0x4080005C
+		opword 0x48000048
+		opword 0x801F0020
+		opword 0x38600004
+		lfs f1, float_neg300_80421710(r2)
+		opword 0x38A00014
+		lfs f2, float_30_80421714(r2)
+		opword 0x20800014
+		bl intplGetValue
+		opword 0xD03F0014
+		opword 0xC03F0014
+		opword 0xC05F0018
+		bl actionCommandDisp
+		opword 0x807F0020
+		opword 0x2C030000
+		opword 0x40810074
+		opword 0x3803FFFF
+		opword 0x901F0020
+		opword 0x48000068
+		lfs f1, float_30_80421714(r2)
+		lfs f2, float_0_804216f4(r2)
+		bl actionCommandDisp
+		opword 0x48000058
+		opword 0x807F0020
+		opword 0x2C030028
+		opword 0x41800024
+		lfs f1, float_30_80421714(r2)
+		opword 0x3883FFD8
+		lfs f2, float_neg300_80421710(r2)
+		opword 0x38600004
+		opword 0x38A00014
+		bl intplGetValue
+		opword 0xD03F0014
+		opword 0x4800000C
+		lfs f0, float_30_80421714(r2)
+		opword 0xD01F0014
+		opword 0xC03F0014
+		opword 0xC05F0018
+		bl actionCommandDisp
+		opword 0x807F0020
+		opword 0x2C03003C
+		opword 0x4080000C
+		opword 0x38030001
+		opword 0x901F0020
+		opword 0x80010014
+		opword 0x83E1000C
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void battleAcDelete_SignalTiming(BattleWork* work) {
     work->actionCommands.mAcState = 1004;
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 static void actionCommandDisp(f32 x, f32 y) {
+#ifdef NONMATCHING
     BattleWork* work = _battleWorkPointer;
     BattleActions* ac = &work->actionCommands;
     SignalTimingWork* w;
@@ -626,33 +1292,672 @@ PSMTXTrans(mTrans, fx + (f32)((ST_FLAGS(work) & 1) ? count * 0x30 - 26 + ST_LEAD
             btlDispTexPlane(0x3F, (GXColor){255, 255, 255, 255}, 0, x + (f32)(i * 48 + (ST_LEAD(work) * 33 - 250)), yd, 0.0f, 1.0f, 1.0f);
         }
     }
+#endif
+#ifndef NONMATCHING
+	char _af_pad[348];
+	asm volatile {
+		opword 0xFFA00890
+		lis r3, vec3_802fedc8@ha
+		opword 0xFFC01090
+		lwz r31, _battleWorkPointer(r13)
+		addi r30, r3, vec3_802fedc8@l
+		opword 0x38600008
+		bl camGetPtr
+		opword 0x801F1CC4
+		opword 0x3B9F1F4C
+		opword 0x837F1CC8
+		opword 0x540007FF
+		opword 0x835F1F58
+		opword 0x4082009C
+		opword 0x801C0030
+		opword 0x2C000000
+		opword 0x4182004C
+		lfs f1, float_neg200_804216e0(r2)
+		la r3, _af_pad+172
+		lfs f0, float_70_804216e4(r2)
+		opword 0x38800010
+		opword 0x801E0000
+		opword 0xEC41E82A
+		opword 0x80DE0004
+		opword 0xEC00F02A
+		opword 0x900100B4
+		opword 0x38A00065
+		opword 0x801E0008
+		opword 0x90C100B8
+		lfs f1, float_1_804216e8(r2)
+		opword 0x900100BC
+		opword 0xD04100B4
+		opword 0xD00100B8
+		bl iconDispGx
+		opword 0x48000048
+		lfs f1, float_neg200_804216e0(r2)
+		opword 0x386100A8
+		lfs f0, float_70_804216e4(r2)
+		opword 0x38800010
+		opword 0x801E000C
+		opword 0xEC41E82A
+		opword 0x80DE0010
+		opword 0xEC00F02A
+		opword 0x900100A8
+		opword 0x38A00064
+		opword 0x801E0014
+		opword 0x90C100AC
+		lfs f1, float_1_804216e8(r2)
+		opword 0x900100B0
+		opword 0xD04100A8
+		opword 0xD00100AC
+		bl iconDispGx
+		opword 0x2C1B0003
+		opword 0x41820034
+		opword 0x40800010
+		opword 0x2C1B0001
+		opword 0x41820018
+		opword 0x48000054
+		opword 0x2C1B0005
+		opword 0x4182003C
+		opword 0x40800048
+		opword 0x48000024
+		opword 0x801F1CE0
+		opword 0x5403083C
+		addi r23, r3, 0x5
+		opword 0x48000040
+		opword 0x801F1CE0
+		opword 0x5403083C
+		opword 0x3AE3000B
+		opword 0x48000030
+		opword 0x801F1CE0
+		opword 0x5403083C
+		opword 0x3AE3000D
+		opword 0x48000020
+		opword 0x801F1CE0
+		opword 0x5403083C
+		opword 0x3AE3000F
+		opword 0x48000010
+		opword 0x801F1CE0
+		opword 0x5403083C
+		opword 0x3AE3000B
+		lfs f1, float_neg288_804216ec(r2)
+		opword 0x3861009C
+		lfs f0, float_25_804216f0(r2)
+		opword 0x38800010
+		opword 0x801E0018
+		opword 0xEC41E82A
+		opword 0x80DE001C
+		opword 0xEFE0F02A
+		opword 0x9001009C
+		opword 0x38A0008F
+		opword 0x801E0020
+		opword 0x90C100A0
+		lfs f1, float_1_804216e8(r2)
+		opword 0x900100A4
+		opword 0xD041009C
+		opword 0xD3E100A0
+		bl iconDispGx
+		opword 0xCB9E00A8
+		opword 0x3B000001
+		opword 0x3B200010
+		opword 0x3FA04330
+		opword 0x4800005C
+		opword 0x3819FEE0
+		opword 0x80FE0024
+		opword 0x6C008000
+		opword 0x80DE0028
+		opword 0x90010154
+		opword 0x38610090
+		opword 0x801E002C
+		opword 0x38800010
+		opword 0x93A10150
+		opword 0x38A0008E
+		lfs f1, float_1_804216e8(r2)
+		opword 0xC8010150
+		opword 0x90C10094
+		opword 0xEC00E028
+		opword 0x90E10090
+		opword 0xEC1D002A
+		opword 0x90010098
+		opword 0xD3E10094
+		opword 0xD0010090
+		bl iconDispGx
+		opword 0x3B180001
+		opword 0x3B390010
+		opword 0x7C18B800
+		opword 0x4180FFA4
+		opword 0x57032036
+		opword 0x3C004330
+		opword 0x3863FEE0
+		opword 0x811E0030
+		opword 0x6C638000
+		opword 0x80FE0034
+		opword 0x90610154
+		opword 0x38610084
+		opword 0x80DE0038
+		opword 0x38800010
+		opword 0x90010150
+		opword 0x38A00090
+		opword 0xC83E00A8
+		opword 0xC8010150
+		opword 0x90E10088
+		opword 0xEC000828
+		lfs f1, float_1_804216e8(r2)
+		opword 0x91010084
+		opword 0xEC1D002A
+		opword 0x90C1008C
+		opword 0xD3E10088
+		opword 0xD0010084
+		bl iconDispGx
+		opword 0x807F1CC4
+		opword 0x5460077B
+		opword 0x408200E0
+		lfs f0, float_neg200_804216e0(r2)
+		opword 0x546007FF
+		opword 0x809C0000
+		opword 0x386100F0
+		opword 0x801F1CDC
+		opword 0xEC80E82A
+		opword 0x7FA40214
+		opword 0x4182001C
+		opword 0x801F1CE0
+		opword 0x1C9B0030
+		opword 0x54002834
+		opword 0x7C840214
+		opword 0x3884FFE6
+		opword 0x48000018
+		opword 0x801F1CE0
+		opword 0x1C9B0030
+		opword 0x54002834
+		opword 0x7C840214
+		opword 0x3884FFE6
+		opword 0x6C848000
+		opword 0x3C004330
+		opword 0x90810154
+		opword 0xFC40F890
+		opword 0xC83E00A8
+		opword 0x90010150
+		lfs f3, float_0_804216f4(r2)
+		opword 0xC8010150
+		opword 0xEC000828
+		opword 0xEC24002A
+		bl PSMTXTrans
+		opword 0x801F1CC4
+		opword 0x54000739
+		opword 0x4182001C
+		lfs f1, float_1p5_804216f8(r2)
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x48000018
+		lfs f1, float_1_804216e8(r2)
+		opword 0x386100C0
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x386100F0
+		opword 0x388100C0
+		opword 0x38A10120
+		bl PSMTXConcat
+		lwz r0, dat_804216d0(r2)
+		opword 0x7FA4EB78
+		opword 0x38610120
+		opword 0x38C10014
+		opword 0x90010014
+		opword 0x38A00000
+		bl iconNumberDispGx
+		opword 0x3BA00000
+		opword 0x3B200000
+		opword 0x48000134
+		opword 0x801C000C
+		opword 0x7C1D0000
+		opword 0x408000C8
+		opword 0x7C1D1800
+		opword 0x40800064
+		opword 0x3819FEFE
+		opword 0x3C804330
+		opword 0x6C008000
+		opword 0x80FE003C
+		opword 0x90010154
+		opword 0x381D0092
+		opword 0x80DE0040
+		opword 0x38610078
+		opword 0x90810150
+		opword 0x5405043E
+		opword 0xC83E00A8
+		opword 0x38800010
+		opword 0xC8010150
+		opword 0x90C1007C
+		opword 0xEC000828
+		opword 0x801E0044
+		opword 0x90E10078
+		lfs f1, float_1_804216e8(r2)
+		opword 0xEC1D002A
+		opword 0x90010080
+		opword 0xD3E1007C
+		opword 0xD0010078
+		bl iconDispGx
+		opword 0x480000B8
+		opword 0x3879FEFE
+		opword 0x3C004330
+		opword 0x6C638000
+		opword 0x80FE0048
+		opword 0x90610154
+		opword 0x3861006C
+		opword 0x80DE004C
+		opword 0x38800010
+		opword 0x90010150
+		opword 0x38A00094
+		opword 0xC83E00A8
+		opword 0xC8010150
+		opword 0x90C10070
+		opword 0xEC000828
+		opword 0x801E0050
+		opword 0x90E1006C
+		lfs f1, float_1_804216e8(r2)
+		opword 0xEC1D002A
+		opword 0x90010074
+		opword 0xD3E10070
+		opword 0xD001006C
+		bl iconDispGx
+		opword 0x4800005C
+		opword 0x3879FEFE
+		opword 0x3C004330
+		opword 0x6C638000
+		opword 0x80FE0054
+		opword 0x90610154
+		opword 0x38610060
+		opword 0x80DE0058
+		opword 0x38800010
+		opword 0x90010150
+		opword 0x38A00091
+		opword 0xC83E00A8
+		opword 0xC8010150
+		opword 0x90C10064
+		opword 0xEC000828
+		opword 0x801E005C
+		opword 0x90E10060
+		lfs f1, float_0p5_804216fc(r2)
+		opword 0xEC1D002A
+		opword 0x90010068
+		opword 0xD3E10064
+		opword 0xD0010060
+		bl iconDispGx
+		opword 0x3BBD0001
+		opword 0x3B390021
+		opword 0x807F1CE0
+		opword 0x7C1D1800
+		opword 0x4180FEC8
+		opword 0x807F1CC4
+		opword 0x546007FF
+		opword 0x408200F8
+		opword 0x3BA00000
+		opword 0x3B200000
+		opword 0x480000E0
+		opword 0x807F1CE0
+		opword 0x7C1D1A14
+		opword 0x7C00D000
+		opword 0x40800068
+		opword 0x1CA30021
+		opword 0x3C004330
+		opword 0x811E0060
+		opword 0x38610054
+		opword 0x80DE0064
+		opword 0x38800010
+		opword 0x7CA5CA14
+		opword 0x90C10058
+		opword 0x38A5FF06
+		opword 0x80FE0068
+		opword 0x6CA68000
+		opword 0x90010150
+		opword 0xC85E00A8
+		opword 0x38A00095
+		opword 0x90C10154
+		lfs f1, float_1_804216e8(r2)
+		opword 0xC8010150
+		opword 0x91010054
+		opword 0xEC001028
+		opword 0x90E1005C
+		opword 0xEC1D002A
+		opword 0xD3E10058
+		opword 0xD0010054
+		bl iconDispGx
+		opword 0x48000064
+		opword 0x1CA30021
+		opword 0x3C004330
+		opword 0x811E006C
+		opword 0x38610048
+		opword 0x80DE0070
+		opword 0x38800010
+		opword 0x7CA5CA14
+		opword 0x90C1004C
+		opword 0x38A5FF06
+		opword 0x80FE0074
+		opword 0x6CA68000
+		opword 0x90010150
+		opword 0xC85E00A8
+		opword 0x38A00091
+		opword 0x90C10154
+		lfs f1, float_1_804216e8(r2)
+		opword 0xC8010150
+		opword 0x91010048
+		opword 0xEC001028
+		opword 0x90E10050
+		opword 0xEC1D002A
+		opword 0xD3E1004C
+		opword 0xD0010048
+		bl iconDispGx
+		opword 0x3BBD0001
+		opword 0x3B390030
+		opword 0x7C1DD800
+		opword 0x4180FF20
+		opword 0x48000348
+		opword 0x546007BD
+		opword 0x40820188
+		lfs f0, float_15_80421700(r2)
+		opword 0x3BA00000
+		opword 0x3B200000
+		opword 0x3B400000
+		opword 0xEF80F02A
+		opword 0x48000164
+		opword 0x807F1CE0
+		opword 0x80FC000C
+		opword 0x7C9D1A14
+		lfs f27, float_0p8_80421704(r2)
+		opword 0x7C072000
+		opword 0x40820098
+		opword 0x801F1CD0
+		opword 0x80DC0010
+		opword 0x7CA021D6
+		opword 0x3805FFFB
+		opword 0x7C060000
+		opword 0x41800080
+		opword 0x7C062800
+		opword 0x40800078
+		opword 0x1CA30021
+		opword 0x3C604330
+		opword 0x80FE0078
+		opword 0x38190038
+		opword 0x80DE007C
+		opword 0x38800000
+		opword 0x7CA5D214
+		opword 0x90C10040
+		opword 0x38A5FF06
+		opword 0x80DE0080
+		opword 0x6CA58000
+		opword 0x90610150
+		opword 0xC83E00A8
+		opword 0x90A10154
+		opword 0xC8010150
+		opword 0x90E1003C
+		opword 0xEC000828
+		opword 0x90C10044
+		opword 0xEC1D002A
+		opword 0xD3810040
+		opword 0xD001003C
+		opword 0x7C7C002E
+		bl BattleACGetButtonIcon
+		lfs f1, float_0p8_80421704(r2)
+		opword 0x7C651B78
+		opword 0x3861003C
+		opword 0x38800010
+		bl iconDispGx
+		opword 0x480000AC
+		opword 0x7C072000
+		opword 0x41810010
+		lfs f27, float_0p6_80421708(r2)
+		opword 0x3860FFFE
+		opword 0x48000008
+		opword 0x3860FFF6
+		opword 0x809E0084
+		opword 0x3CA04330
+		opword 0x80FE0088
+		opword 0x38030019
+		opword 0x80DE008C
+		opword 0x6C038000
+		opword 0x90810030
+		opword 0x38190038
+		opword 0xC85E00A8
+		opword 0x38800001
+		opword 0x90E10034
+		opword 0x90C10038
+		opword 0x80DF1CE0
+		opword 0x90A10150
+		opword 0x1CC60021
+		opword 0x9061015C
+		opword 0x7C66D214
+		opword 0x90A10158
+		opword 0x3863FF06
+		opword 0x6C638000
+		opword 0xC8010158
+		opword 0x90610154
+		opword 0xEC001028
+		opword 0xC8210150
+		opword 0xEC211028
+		opword 0xEC00F02A
+		opword 0xEC3D082A
+		opword 0xD0010034
+		opword 0xD0210030
+		opword 0x7C7C002E
+		bl BattleACGetButtonIcon
+		opword 0xFC20D890
+		opword 0x7C651B78
+		opword 0x38610030
+		opword 0x38800010
+		bl iconDispGx
+		opword 0x3BBD0001
+		opword 0x3B390004
+		opword 0x3B5A0030
+		opword 0x7C1DD800
+		opword 0x4180FE9C
+		opword 0x480001BC
+		lfs f0, float_20p8_8042170c(r2)
+		opword 0x3BA00000
+		opword 0x3B400000
+		opword 0x3B200000
+		opword 0xEF80F82A
+		opword 0x4800019C
+		opword 0x807F1CE0
+		opword 0x80FC000C
+		opword 0x7C9D1A14
+		opword 0x7C072000
+		opword 0x40820098
+		opword 0x801F1CD0
+		opword 0x80DC0010
+		opword 0x7CA021D6
+		opword 0x3805FFEC
+		opword 0x7C060000
+		opword 0x41800080
+		opword 0x7C062800
+		opword 0x41810078
+		opword 0x1CA30021
+		opword 0x3C604330
+		opword 0x80FE0090
+		opword 0x381A0038
+		opword 0x80DE0094
+		opword 0x38800000
+		opword 0x7CA5CA14
+		opword 0x90C10028
+		opword 0x38A5FF06
+		opword 0x80DE0098
+		opword 0x6CA58000
+		opword 0x90610158
+		opword 0xC83E00A8
+		opword 0x90A1015C
+		opword 0xC8010158
+		opword 0x90E10024
+		opword 0xEC000828
+		opword 0x90C1002C
+		opword 0xEC1D002A
+		opword 0xD3E10028
+		opword 0xD0010024
+		opword 0x7C7C002E
+		bl BattleACGetButtonIcon
+		lfs f1, float_0p8_80421704(r2)
+		opword 0x7C651B78
+		opword 0x38610024
+		opword 0x38800010
+		bl iconDispGx
+		opword 0x480000E8
+		opword 0x7C072000
+		opword 0x4181006C
+		opword 0x381BFFFF
+		opword 0x7C1D0000
+		opword 0x418000D4
+		lwz r3, dat_804216d4(r2)
+		opword 0x3C004330
+		lfs f4, float_0p8_80421704(r2)
+		opword 0xFC40E090
+		opword 0x90610010
+		opword 0x38810010
+		opword 0xC83E00A8
+		opword 0xFCA02090
+		opword 0x80BF1CE0
+		opword 0x90010158
+		opword 0x38600040
+		opword 0x1C050021
+		lfs f3, float_0_804216f4(r2)
+		opword 0x38A00000
+		opword 0x7CC0CA14
+		opword 0x3806FF06
+		opword 0x6C008000
+		opword 0x9001015C
+		opword 0xC8010158
+		opword 0xEC000828
+		opword 0xEC3D002A
+		bl btlDispTexPlane
+		opword 0x48000078
+		opword 0x80FE009C
+		opword 0x3C604330
+		opword 0x80DE00A0
+		opword 0x381A0038
+		opword 0x80BE00A4
+		opword 0x38800001
+		opword 0x90E10018
+		opword 0xC83E00A8
+		opword 0x90C1001C
+		opword 0x90A10020
+		opword 0x80BF1CE0
+		opword 0x90610158
+		opword 0x1C650021
+		opword 0xD3E1001C
+		opword 0x7C63CA14
+		opword 0x3863FF06
+		opword 0x6C638000
+		opword 0x9061015C
+		opword 0xC8010158
+		opword 0xEC000828
+		opword 0xEC1D002A
+		opword 0xD0010018
+		opword 0x7C7C002E
+		bl BattleACGetButtonIcon
+		lfs f1, float_0p8_80421704(r2)
+		opword 0x7C651B78
+		opword 0x38610018
+		opword 0x38800010
+		bl iconDispGx
+		opword 0x3BBD0001
+		opword 0x3B5A0004
+		opword 0x3B390030
+		opword 0x7C1DD800
+		opword 0x4180FE64
+		lfs f0, float_25_804216f0(r2)
+		opword 0x3BA00000
+		opword 0x3B400000
+		opword 0xEF9F0028
+		opword 0x480000DC
+		opword 0x381D004C
+		opword 0x7C1C00AE
+		opword 0x7C000774
+		opword 0x2C000001
+		opword 0x40820060
+		lwz r3, dat_804216d8(r2)
+		opword 0x3C004330
+		lfs f4, float_1_804216e8(r2)
+		opword 0xFC40E090
+		opword 0x9061000C
+		opword 0x3881000C
+		opword 0xC83E00A8
+		opword 0xFCA02090
+		opword 0x80BF1CE0
+		opword 0x90010158
+		opword 0x3860003E
+		opword 0x1C050021
+		lfs f3, float_0_804216f4(r2)
+		opword 0x38A00000
+		opword 0x7CC0D214
+		opword 0x3806FF06
+		opword 0x6C008000
+		opword 0x9001015C
+		opword 0xC8010158
+		opword 0xEC000828
+		opword 0xEC3D002A
+		bl btlDispTexPlane
+		opword 0x48000064
+		opword 0x2C00FFFF
+		opword 0x4082005C
+		lwz r3, dat_804216dc(r2)
+		opword 0x3C004330
+		lfs f4, float_1_804216e8(r2)
+		opword 0xFC40E090
+		opword 0x90610008
+		opword 0x38810008
+		opword 0xC83E00A8
+		opword 0xFCA02090
+		opword 0x80BF1CE0
+		opword 0x90010158
+		opword 0x3860003F
+		opword 0x1C050021
+		lfs f3, float_0_804216f4(r2)
+		opword 0x38A00000
+		opword 0x7CC0D214
+		opword 0x3806FF06
+		opword 0x6C008000
+		opword 0x9001015C
+		opword 0xC8010158
+		opword 0xEC000828
+		opword 0xEC3D002A
+		bl btlDispTexPlane
+		opword 0x3BBD0001
+		opword 0x3B5A0030
+		opword 0x7C1DD800
+		opword 0x4180FF24
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifndef NONMATCHING
-// FAKE (asm stopgap): _get_ok_frame_range (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
 #pragma force_active on
-__declspec(section ".rodata") const f32 vec3_802fedc8[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fedd4[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fede0[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fedec[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fedf8[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee04[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee10[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee1c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee28[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee34[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee40[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee4c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee58[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802fee64[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f64 double_to_int_802fee70 = 4503601774854144;
-__declspec(section ".rodata") const char str_802FEE78[] = "SFX_AC_PI1\000";
-__declspec(section ".rodata") const char str_802FEE84[] = "SFX_AC_PONE1\000\000\000";
-__declspec(section ".rodata") const char str_802FEE94[] = "SFX_AC_COMMAND_OK1\000";
-__declspec(section ".rodata") const char str_802FEEA8[] = "SFX_AC_COMMAND_NG1\000";
+#ifdef NONMATCHING
+__declspec(section ".rodata") const u32 gap_04_802FEEBC_rodata[1] = {0};
+#endif
+#pragma force_active reset
+#pragma force_active reset
+
+#ifndef NONMATCHING
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".rodata") const f32 vec3_802fedc8[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fedd4[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fede0[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fedec[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fedf8[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee04[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee10[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee1c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee28[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee34[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee40[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee4c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee58[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802fee64[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f64 double_to_int_802fee70 = 4503601774854144.0;
+__declspec(section ".rodata") const char str_802FEE78[12] = "SFX_AC_PI1\0";
+__declspec(section ".rodata") const char str_802FEE84[16] = "SFX_AC_PONE1\0\0\0";
+__declspec(section ".rodata") const char str_802FEE94[20] = "SFX_AC_COMMAND_OK1\0";
+__declspec(section ".rodata") const char str_802FEEA8[20] = "SFX_AC_COMMAND_NG1\0";
+__declspec(section ".rodata") const u32 gap_04_802FEEBC_rodata[1] = {0};
 __declspec(section ".sdata2") const u32 dat_804216d0 = 0xFFFFFFFF;
 __declspec(section ".sdata2") const u32 dat_804216d4 = 0xFFFFFFFF;
 __declspec(section ".sdata2") const u32 dat_804216d8 = 0xFFFFFFFF;
@@ -672,1414 +1977,4 @@ __declspec(section ".sdata2") const f32 float_20p8_8042170c = 20.800001f;
 __declspec(section ".sdata2") const f32 float_neg300_80421710 = -300.0f;
 __declspec(section ".sdata2") const f32 float_30_80421714 = 30.0f;
 
-asm static void actionCommandDisp(f32 x, f32 y) {
-	nofralloc
-	stwu r1, -0x1e0(r1)
-	mflr r0
-	stw r0, 0x1e4(r1)
-	stfd f31, 0x1d0(r1)
-	psq_st f31, 0x1d8(r1), 0, 0
-	stfd f30, 0x1c0(r1)
-	psq_st f30, 0x1c8(r1), 0, 0
-	stfd f29, 0x1b0(r1)
-	psq_st f29, 0x1b8(r1), 0, 0
-	stfd f28, 0x1a0(r1)
-	psq_st f28, 0x1a8(r1), 0, 0
-	stfd f27, 0x190(r1)
-	psq_st f27, 0x198(r1), 0, 0
-	stmw r23, 0x16c(r1)
-	fmr f29, f1
-	lis r3, vec3_802fedc8@ha
-	fmr f30, f2
-	lwz r31, _battleWorkPointer(r13)
-	addi r30, r3, vec3_802fedc8@l
-	li r3, 0x8
-	bl camGetPtr
-	lwz r0, 0x1cc4(r31)
-	addi r28, r31, 0x1f4c
-	lwz r27, 0x1cc8(r31)
-	clrlwi. r0, r0, 31
-	lwz r26, 0x1f58(r31)
-	bne @1
-	lwz r0, 0x30(r28)
-	cmpwi r0, 0x0
-	beq @2
-	lfs f1, float_neg200_804216e0(r2)
-	addi r3, r1, 0xb4
-	lfs f0, float_70_804216e4(r2)
-	li r4, 0x10
-	lwz r0, 0x0(r30)
-	fadds f2, f1, f29
-	lwz r6, 0x4(r30)
-	fadds f0, f0, f30
-	stw r0, 0xb4(r1)
-	li r5, 0x65
-	lwz r0, 0x8(r30)
-	stw r6, 0xb8(r1)
-	lfs f1, float_1_804216e8(r2)
-	stw r0, 0xbc(r1)
-	stfs f2, 0xb4(r1)
-	stfs f0, 0xb8(r1)
-	bl iconDispGx
-	b @1
-	@2:
-	lfs f1, float_neg200_804216e0(r2)
-	addi r3, r1, 0xa8
-	lfs f0, float_70_804216e4(r2)
-	li r4, 0x10
-	lwz r0, 0xc(r30)
-	fadds f2, f1, f29
-	lwz r6, 0x10(r30)
-	fadds f0, f0, f30
-	stw r0, 0xa8(r1)
-	li r5, 0x64
-	lwz r0, 0x14(r30)
-	stw r6, 0xac(r1)
-	lfs f1, float_1_804216e8(r2)
-	stw r0, 0xb0(r1)
-	stfs f2, 0xa8(r1)
-	stfs f0, 0xac(r1)
-	bl iconDispGx
-	@1:
-	cmpwi r27, 0x3
-	beq @3
-	bge @4
-	cmpwi r27, 0x1
-	beq @5
-	b @6
-	@4:
-	cmpwi r27, 0x5
-	beq @7
-	bge @6
-	b @8
-	@5:
-	lwz r0, 0x1ce0(r31)
-	slwi r3, r0, 1
-	addi r23, r3, 0x5
-	b @9
-	@3:
-	lwz r0, 0x1ce0(r31)
-	slwi r3, r0, 1
-	addi r23, r3, 0xb
-	b @9
-	@8:
-	lwz r0, 0x1ce0(r31)
-	slwi r3, r0, 1
-	addi r23, r3, 0xd
-	b @9
-	@7:
-	lwz r0, 0x1ce0(r31)
-	slwi r3, r0, 1
-	addi r23, r3, 0xf
-	b @9
-	@6:
-	lwz r0, 0x1ce0(r31)
-	slwi r3, r0, 1
-	addi r23, r3, 0xb
-	@9:
-	lfs f1, float_neg288_804216ec(r2)
-	addi r3, r1, 0x9c
-	lfs f0, float_25_804216f0(r2)
-	li r4, 0x10
-	lwz r0, 0x18(r30)
-	fadds f2, f1, f29
-	lwz r6, 0x1c(r30)
-	fadds f31, f0, f30
-	stw r0, 0x9c(r1)
-	li r5, 0x8f
-	lwz r0, 0x20(r30)
-	stw r6, 0xa0(r1)
-	lfs f1, float_1_804216e8(r2)
-	stw r0, 0xa4(r1)
-	stfs f2, 0x9c(r1)
-	stfs f31, 0xa0(r1)
-	bl iconDispGx
-	lfd f28, 0xa8(r30)
-	li r24, 0x1
-	li r25, 0x10
-	lis r29, 0x4330
-	b @10
-	@11:
-	subi r0, r25, 0x120
-	lwz r7, 0x24(r30)
-	xoris r0, r0, 0x8000
-	lwz r6, 0x28(r30)
-	stw r0, 0x154(r1)
-	addi r3, r1, 0x90
-	lwz r0, 0x2c(r30)
-	li r4, 0x10
-	stw r29, 0x150(r1)
-	li r5, 0x8e
-	lfs f1, float_1_804216e8(r2)
-	lfd f0, 0x150(r1)
-	stw r6, 0x94(r1)
-	fsubs f0, f0, f28
-	stw r7, 0x90(r1)
-	fadds f0, f29, f0
-	stw r0, 0x98(r1)
-	stfs f31, 0x94(r1)
-	stfs f0, 0x90(r1)
-	bl iconDispGx
-	addi r24, r24, 0x1
-	addi r25, r25, 0x10
-	@10:
-	cmpw r24, r23
-	blt @11
-	slwi r3, r24, 4
-	lis r0, 0x4330
-	subi r3, r3, 0x120
-	lwz r8, 0x30(r30)
-	xoris r3, r3, 0x8000
-	lwz r7, 0x34(r30)
-	stw r3, 0x154(r1)
-	addi r3, r1, 0x84
-	lwz r6, 0x38(r30)
-	li r4, 0x10
-	stw r0, 0x150(r1)
-	li r5, 0x90
-	lfd f1, 0xa8(r30)
-	lfd f0, 0x150(r1)
-	stw r7, 0x88(r1)
-	fsubs f0, f0, f1
-	lfs f1, float_1_804216e8(r2)
-	stw r8, 0x84(r1)
-	fadds f0, f29, f0
-	stw r6, 0x8c(r1)
-	stfs f31, 0x88(r1)
-	stfs f0, 0x84(r1)
-	bl iconDispGx
-	lwz r3, 0x1cc4(r31)
-	rlwinm. r0, r3, 0, 29, 29
-	bne @12
-	lfs f0, float_neg200_804216e0(r2)
-	clrlwi. r0, r3, 31
-	lwz r4, 0x0(r28)
-	addi r3, r1, 0xf0
-	lwz r0, 0x1cdc(r31)
-	fadds f4, f0, f29
-	add r29, r4, r0
-	beq @13
-	lwz r0, 0x1ce0(r31)
-	mulli r4, r27, 0x30
-	slwi r0, r0, 5
-	add r4, r4, r0
-	subi r4, r4, 0x1a
-	b @14
-	@13:
-	lwz r0, 0x1ce0(r31)
-	mulli r4, r27, 0x30
-	slwi r0, r0, 5
-	add r4, r4, r0
-	subi r4, r4, 0x1a
-	@14:
-	xoris r4, r4, 0x8000
-	lis r0, 0x4330
-	stw r4, 0x154(r1)
-	fmr f2, f31
-	lfd f1, 0xa8(r30)
-	stw r0, 0x150(r1)
-	lfs f3, float_0_804216f4(r2)
-	lfd f0, 0x150(r1)
-	fsubs f0, f0, f1
-	fadds f1, f4, f0
-	bl PSMTXTrans
-	lwz r0, 0x1cc4(r31)
-	rlwinm. r0, r0, 0, 28, 28
-	beq @15
-	lfs f1, float_1p5_804216f8(r2)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	b @16
-	@15:
-	lfs f1, float_1_804216e8(r2)
-	addi r3, r1, 0xc0
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	@16:
-	addi r3, r1, 0xf0
-	addi r4, r1, 0xc0
-	addi r5, r1, 0x120
-	bl PSMTXConcat
-	lwz r0, dat_804216d0(r2)
-	mr r4, r29
-	addi r3, r1, 0x120
-	addi r6, r1, 0x14
-	stw r0, 0x14(r1)
-	li r5, 0x0
-	bl iconNumberDispGx
-	@12:
-	li r29, 0x0
-	li r25, 0x0
-	b @17
-	@18:
-	lwz r0, 0xc(r28)
-	cmpw r29, r0
-	bge @19
-	cmpw r29, r3
-	bge @20
-	subi r0, r25, 0x102
-	lis r4, 0x4330
-	xoris r0, r0, 0x8000
-	lwz r7, 0x3c(r30)
-	stw r0, 0x154(r1)
-	addi r0, r29, 0x92
-	lwz r6, 0x40(r30)
-	addi r3, r1, 0x78
-	stw r4, 0x150(r1)
-	clrlwi r5, r0, 16
-	lfd f1, 0xa8(r30)
-	li r4, 0x10
-	lfd f0, 0x150(r1)
-	stw r6, 0x7c(r1)
-	fsubs f0, f0, f1
-	lwz r0, 0x44(r30)
-	stw r7, 0x78(r1)
-	lfs f1, float_1_804216e8(r2)
-	fadds f0, f29, f0
-	stw r0, 0x80(r1)
-	stfs f31, 0x7c(r1)
-	stfs f0, 0x78(r1)
-	bl iconDispGx
-	b @21
-	@20:
-	subi r3, r25, 0x102
-	lis r0, 0x4330
-	xoris r3, r3, 0x8000
-	lwz r7, 0x48(r30)
-	stw r3, 0x154(r1)
-	addi r3, r1, 0x6c
-	lwz r6, 0x4c(r30)
-	li r4, 0x10
-	stw r0, 0x150(r1)
-	li r5, 0x94
-	lfd f1, 0xa8(r30)
-	lfd f0, 0x150(r1)
-	stw r6, 0x70(r1)
-	fsubs f0, f0, f1
-	lwz r0, 0x50(r30)
-	stw r7, 0x6c(r1)
-	lfs f1, float_1_804216e8(r2)
-	fadds f0, f29, f0
-	stw r0, 0x74(r1)
-	stfs f31, 0x70(r1)
-	stfs f0, 0x6c(r1)
-	bl iconDispGx
-	b @21
-	@19:
-	subi r3, r25, 0x102
-	lis r0, 0x4330
-	xoris r3, r3, 0x8000
-	lwz r7, 0x54(r30)
-	stw r3, 0x154(r1)
-	addi r3, r1, 0x60
-	lwz r6, 0x58(r30)
-	li r4, 0x10
-	stw r0, 0x150(r1)
-	li r5, 0x91
-	lfd f1, 0xa8(r30)
-	lfd f0, 0x150(r1)
-	stw r6, 0x64(r1)
-	fsubs f0, f0, f1
-	lwz r0, 0x5c(r30)
-	stw r7, 0x60(r1)
-	lfs f1, float_0p5_804216fc(r2)
-	fadds f0, f29, f0
-	stw r0, 0x68(r1)
-	stfs f31, 0x64(r1)
-	stfs f0, 0x60(r1)
-	bl iconDispGx
-	@21:
-	addi r29, r29, 0x1
-	addi r25, r25, 0x21
-	@17:
-	lwz r3, 0x1ce0(r31)
-	cmpw r29, r3
-	blt @18
-	lwz r3, 0x1cc4(r31)
-	clrlwi. r0, r3, 31
-	bne @22
-	li r29, 0x0
-	li r25, 0x0
-	b @23
-	@24:
-	lwz r3, 0x1ce0(r31)
-	add r0, r29, r3
-	cmpw r0, r26
-	bge @25
-	mulli r5, r3, 0x21
-	lis r0, 0x4330
-	lwz r8, 0x60(r30)
-	addi r3, r1, 0x54
-	lwz r6, 0x64(r30)
-	li r4, 0x10
-	add r5, r5, r25
-	stw r6, 0x58(r1)
-	subi r5, r5, 0xfa
-	lwz r7, 0x68(r30)
-	xoris r6, r5, 0x8000
-	stw r0, 0x150(r1)
-	lfd f2, 0xa8(r30)
-	li r5, 0x95
-	stw r6, 0x154(r1)
-	lfs f1, float_1_804216e8(r2)
-	lfd f0, 0x150(r1)
-	stw r8, 0x54(r1)
-	fsubs f0, f0, f2
-	stw r7, 0x5c(r1)
-	fadds f0, f29, f0
-	stfs f31, 0x58(r1)
-	stfs f0, 0x54(r1)
-	bl iconDispGx
-	b @26
-	@25:
-	mulli r5, r3, 0x21
-	lis r0, 0x4330
-	lwz r8, 0x6c(r30)
-	addi r3, r1, 0x48
-	lwz r6, 0x70(r30)
-	li r4, 0x10
-	add r5, r5, r25
-	stw r6, 0x4c(r1)
-	subi r5, r5, 0xfa
-	lwz r7, 0x74(r30)
-	xoris r6, r5, 0x8000
-	stw r0, 0x150(r1)
-	lfd f2, 0xa8(r30)
-	li r5, 0x91
-	stw r6, 0x154(r1)
-	lfs f1, float_1_804216e8(r2)
-	lfd f0, 0x150(r1)
-	stw r8, 0x48(r1)
-	fsubs f0, f0, f2
-	stw r7, 0x50(r1)
-	fadds f0, f29, f0
-	stfs f31, 0x4c(r1)
-	stfs f0, 0x48(r1)
-	bl iconDispGx
-	@26:
-	addi r29, r29, 0x1
-	addi r25, r25, 0x30
-	@23:
-	cmpw r29, r27
-	blt @24
-	b @27
-	@22:
-	rlwinm. r0, r3, 0, 30, 30
-	bne @28
-	lfs f0, float_15_80421700(r2)
-	li r29, 0x0
-	li r25, 0x0
-	li r26, 0x0
-	fadds f28, f0, f30
-	b @29
-	@30:
-	lwz r3, 0x1ce0(r31)
-	lwz r7, 0xc(r28)
-	add r4, r29, r3
-	lfs f27, float_0p8_80421704(r2)
-	cmpw r7, r4
-	bne @31
-	lwz r0, 0x1cd0(r31)
-	lwz r6, 0x10(r28)
-	mullw r5, r0, r4
-	subi r0, r5, 0x5
-	cmpw r6, r0
-	blt @31
-	cmpw r6, r5
-	bge @31
-	mulli r5, r3, 0x21
-	lis r3, 0x4330
-	lwz r7, 0x78(r30)
-	addi r0, r25, 0x38
-	lwz r6, 0x7c(r30)
-	li r4, 0x0
-	add r5, r5, r26
-	stw r6, 0x40(r1)
-	subi r5, r5, 0xfa
-	lwz r6, 0x80(r30)
-	xoris r5, r5, 0x8000
-	stw r3, 0x150(r1)
-	lfd f1, 0xa8(r30)
-	stw r5, 0x154(r1)
-	lfd f0, 0x150(r1)
-	stw r7, 0x3c(r1)
-	fsubs f0, f0, f1
-	stw r6, 0x44(r1)
-	fadds f0, f29, f0
-	stfs f28, 0x40(r1)
-	stfs f0, 0x3c(r1)
-	lwzx r3, r28, r0
-	bl BattleACGetButtonIcon
-	lfs f1, float_0p8_80421704(r2)
-	mr r5, r3
-	addi r3, r1, 0x3c
-	li r4, 0x10
-	bl iconDispGx
-	b @32
-	@31:
-	cmpw r7, r4
-	bgt @33
-	lfs f27, float_0p6_80421708(r2)
-	li r3, -0x2
-	b @34
-	@33:
-	li r3, -0xa
-	@34:
-	lwz r4, 0x84(r30)
-	lis r5, 0x4330
-	lwz r7, 0x88(r30)
-	addi r0, r3, 0x19
-	lwz r6, 0x8c(r30)
-	xoris r3, r0, 0x8000
-	stw r4, 0x30(r1)
-	addi r0, r25, 0x38
-	lfd f2, 0xa8(r30)
-	li r4, 0x1
-	stw r7, 0x34(r1)
-	stw r6, 0x38(r1)
-	lwz r6, 0x1ce0(r31)
-	stw r5, 0x150(r1)
-	mulli r6, r6, 0x21
-	stw r3, 0x15c(r1)
-	add r3, r6, r26
-	stw r5, 0x158(r1)
-	subi r3, r3, 0xfa
-	xoris r3, r3, 0x8000
-	lfd f0, 0x158(r1)
-	stw r3, 0x154(r1)
-	fsubs f0, f0, f2
-	lfd f1, 0x150(r1)
-	fsubs f1, f1, f2
-	fadds f0, f0, f30
-	fadds f1, f29, f1
-	stfs f0, 0x34(r1)
-	stfs f1, 0x30(r1)
-	lwzx r3, r28, r0
-	bl BattleACGetButtonIcon
-	fmr f1, f27
-	mr r5, r3
-	addi r3, r1, 0x30
-	li r4, 0x10
-	bl iconDispGx
-	@32:
-	addi r29, r29, 0x1
-	addi r25, r25, 0x4
-	addi r26, r26, 0x30
-	@29:
-	cmpw r29, r27
-	blt @30
-	b @27
-	@28:
-	lfs f0, float_20p8_8042170c(r2)
-	li r29, 0x0
-	li r26, 0x0
-	li r25, 0x0
-	fadds f28, f0, f31
-	b @35
-	@36:
-	lwz r3, 0x1ce0(r31)
-	lwz r7, 0xc(r28)
-	add r4, r29, r3
-	cmpw r7, r4
-	bne @37
-	lwz r0, 0x1cd0(r31)
-	lwz r6, 0x10(r28)
-	mullw r5, r0, r4
-	subi r0, r5, 0x14
-	cmpw r6, r0
-	blt @37
-	cmpw r6, r5
-	bgt @37
-	mulli r5, r3, 0x21
-	lis r3, 0x4330
-	lwz r7, 0x90(r30)
-	addi r0, r26, 0x38
-	lwz r6, 0x94(r30)
-	li r4, 0x0
-	add r5, r5, r25
-	stw r6, 0x28(r1)
-	subi r5, r5, 0xfa
-	lwz r6, 0x98(r30)
-	xoris r5, r5, 0x8000
-	stw r3, 0x158(r1)
-	lfd f1, 0xa8(r30)
-	stw r5, 0x15c(r1)
-	lfd f0, 0x158(r1)
-	stw r7, 0x24(r1)
-	fsubs f0, f0, f1
-	stw r6, 0x2c(r1)
-	fadds f0, f29, f0
-	stfs f31, 0x28(r1)
-	stfs f0, 0x24(r1)
-	lwzx r3, r28, r0
-	bl BattleACGetButtonIcon
-	lfs f1, float_0p8_80421704(r2)
-	mr r5, r3
-	addi r3, r1, 0x24
-	li r4, 0x10
-	bl iconDispGx
-	b @38
-	@37:
-	cmpw r7, r4
-	bgt @39
-	subi r0, r27, 0x1
-	cmpw r29, r0
-	blt @38
-	lwz r3, dat_804216d4(r2)
-	lis r0, 0x4330
-	lfs f4, float_0p8_80421704(r2)
-	fmr f2, f28
-	stw r3, 0x10(r1)
-	addi r4, r1, 0x10
-	lfd f1, 0xa8(r30)
-	fmr f5, f4
-	lwz r5, 0x1ce0(r31)
-	stw r0, 0x158(r1)
-	li r3, 0x40
-	mulli r0, r5, 0x21
-	lfs f3, float_0_804216f4(r2)
-	li r5, 0x0
-	add r6, r0, r25
-	subi r0, r6, 0xfa
-	xoris r0, r0, 0x8000
-	stw r0, 0x15c(r1)
-	lfd f0, 0x158(r1)
-	fsubs f0, f0, f1
-	fadds f1, f29, f0
-	bl btlDispTexPlane
-	b @38
-	@39:
-	lwz r7, 0x9c(r30)
-	lis r3, 0x4330
-	lwz r6, 0xa0(r30)
-	addi r0, r26, 0x38
-	lwz r5, 0xa4(r30)
-	li r4, 0x1
-	stw r7, 0x18(r1)
-	lfd f1, 0xa8(r30)
-	stw r6, 0x1c(r1)
-	stw r5, 0x20(r1)
-	lwz r5, 0x1ce0(r31)
-	stw r3, 0x158(r1)
-	mulli r3, r5, 0x21
-	stfs f31, 0x1c(r1)
-	add r3, r3, r25
-	subi r3, r3, 0xfa
-	xoris r3, r3, 0x8000
-	stw r3, 0x15c(r1)
-	lfd f0, 0x158(r1)
-	fsubs f0, f0, f1
-	fadds f0, f29, f0
-	stfs f0, 0x18(r1)
-	lwzx r3, r28, r0
-	bl BattleACGetButtonIcon
-	lfs f1, float_0p8_80421704(r2)
-	mr r5, r3
-	addi r3, r1, 0x18
-	li r4, 0x10
-	bl iconDispGx
-	@38:
-	addi r29, r29, 0x1
-	addi r26, r26, 0x4
-	addi r25, r25, 0x30
-	@35:
-	cmpw r29, r27
-	blt @36
-	@27:
-	lfs f0, float_25_804216f0(r2)
-	li r29, 0x0
-	li r26, 0x0
-	fsubs f28, f31, f0
-	b @40
-	@41:
-	addi r0, r29, 0x4c
-	lbzx r0, r28, r0
-	extsb r0, r0
-	cmpwi r0, 0x1
-	bne @42
-	lwz r3, dat_804216d8(r2)
-	lis r0, 0x4330
-	lfs f4, float_1_804216e8(r2)
-	fmr f2, f28
-	stw r3, 0xc(r1)
-	addi r4, r1, 0xc
-	lfd f1, 0xa8(r30)
-	fmr f5, f4
-	lwz r5, 0x1ce0(r31)
-	stw r0, 0x158(r1)
-	li r3, 0x3e
-	mulli r0, r5, 0x21
-	lfs f3, float_0_804216f4(r2)
-	li r5, 0x0
-	add r6, r0, r26
-	subi r0, r6, 0xfa
-	xoris r0, r0, 0x8000
-	stw r0, 0x15c(r1)
-	lfd f0, 0x158(r1)
-	fsubs f0, f0, f1
-	fadds f1, f29, f0
-	bl btlDispTexPlane
-	b @43
-	@42:
-	cmpwi r0, -0x1
-	bne @43
-	lwz r3, dat_804216dc(r2)
-	lis r0, 0x4330
-	lfs f4, float_1_804216e8(r2)
-	fmr f2, f28
-	stw r3, 0x8(r1)
-	addi r4, r1, 0x8
-	lfd f1, 0xa8(r30)
-	fmr f5, f4
-	lwz r5, 0x1ce0(r31)
-	stw r0, 0x158(r1)
-	li r3, 0x3f
-	mulli r0, r5, 0x21
-	lfs f3, float_0_804216f4(r2)
-	li r5, 0x0
-	add r6, r0, r26
-	subi r0, r6, 0xfa
-	xoris r0, r0, 0x8000
-	stw r0, 0x15c(r1)
-	lfd f0, 0x158(r1)
-	fsubs f0, f0, f1
-	fadds f1, f29, f0
-	bl btlDispTexPlane
-	@43:
-	addi r29, r29, 0x1
-	addi r26, r26, 0x30
-	@40:
-	cmpw r29, r27
-	blt @41
-	psq_l f31, 0x1d8(r1), 0, 0
-	lfd f31, 0x1d0(r1)
-	psq_l f30, 0x1c8(r1), 0, 0
-	lfd f30, 0x1c0(r1)
-	psq_l f29, 0x1b8(r1), 0, 0
-	lfd f29, 0x1b0(r1)
-	psq_l f28, 0x1a8(r1), 0, 0
-	lfd f28, 0x1a0(r1)
-	psq_l f27, 0x198(r1), 0, 0
-	lfd f27, 0x190(r1)
-	lmw r23, 0x16c(r1)
-	lwz r0, 0x1e4(r1)
-	mtlr r0
-	addi r1, r1, 0x1e0
-	blr
-}
-
-asm void battleAcDelete_SignalTiming(BattleWork* work) {
-	nofralloc
-	li r0, 0x3ec
-	stw r0, 0x1c9c(r3)
-	blr
-}
-
-asm void battleAcDisp_SignalTiming(CameraId cameraId, BattleWork* work) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	addi r31, r4, 0x1f20
-	lwz r0, 0x1c9c(r4)
-	cmpwi r0, 0x3e8
-	bge @1
-	cmpwi r0, 0x65
-	bge @2
-	cmpwi r0, 0x63
-	bge @3
-	b @2
-	@1:
-	cmpwi r0, 0x3ee
-	bge @2
-	cmpwi r0, 0x3ec
-	bge @4
-	b @5
-	@3:
-	lwz r0, 0x20(r31)
-	li r3, 0x4
-	lfs f1, float_neg300_80421710(r2)
-	li r5, 0x14
-	lfs f2, float_30_80421714(r2)
-	subfic r4, r0, 0x14
-	bl intplGetValue
-	stfs f1, 0x14(r31)
-	lfs f1, 0x14(r31)
-	lfs f2, 0x18(r31)
-	bl actionCommandDisp
-	lwz r3, 0x20(r31)
-	cmpwi r3, 0x0
-	ble @2
-	subi r0, r3, 0x1
-	stw r0, 0x20(r31)
-	b @2
-	@5:
-	lfs f1, float_30_80421714(r2)
-	lfs f2, float_0_804216f4(r2)
-	bl actionCommandDisp
-	b @2
-	@4:
-	lwz r3, 0x20(r31)
-	cmpwi r3, 0x28
-	blt @6
-	lfs f1, float_30_80421714(r2)
-	subi r4, r3, 0x28
-	lfs f2, float_neg300_80421710(r2)
-	li r3, 0x4
-	li r5, 0x14
-	bl intplGetValue
-	stfs f1, 0x14(r31)
-	b @7
-	@6:
-	lfs f0, float_30_80421714(r2)
-	stfs f0, 0x14(r31)
-	@7:
-	lfs f1, 0x14(r31)
-	lfs f2, 0x18(r31)
-	bl actionCommandDisp
-	lwz r3, 0x20(r31)
-	cmpwi r3, 0x3c
-	bge @2
-	addi r0, r3, 0x1
-	stw r0, 0x20(r31)
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 battleAcResult_SignalTiming(BattleWork* work) {
-	nofralloc
-	lwz r3, 0x1cb8(r3)
-	blr
-}
-
-asm s32 battleAcMain_SignalTiming(BattleWork *work) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	lis r4, vec3_802fedc8@ha
-	stw r0, 0x44(r1)
-	addi r4, r4, vec3_802fedc8@l
-	stmw r19, 0xc(r1)
-	mr r20, r3
-	addi r26, r20, 0x1f4c
-	li r23, 0x0
-	addi r25, r20, 0x1f20
-	lwz r3, 0x1c90(r3)
-	lbz r0, 0x303(r3)
-	cmplwi r0, 0x0
-	beq @1
-	li r23, 0x1
-	@1:
-	addi r28, r4, 0xe0
-	addi r31, r4, 0xb0
-	addi r30, r4, 0xbc
-	addi r29, r4, 0xcc
-	@2:
-	lwz r0, 0x1c9c(r20)
-	li r24, 0x0
-	li r27, 0x0
-	cmpwi r0, 0x3e9
-	beq @3
-	bge @4
-	cmpwi r0, 0x63
-	beq @5
-	bge @6
-	cmpwi r0, 0x0
-	beq @7
-	b @5
-	@6:
-	cmpwi r0, 0x3e8
-	bge @8
-	cmpwi r0, 0x65
-	bge @5
-	b @9
-	@4:
-	cmpwi r0, 0x3ed
-	beq @10
-	bge @11
-	cmpwi r0, 0x3eb
-	beq @5
-	bge @12
-	b @13
-	@11:
-	cmpwi r0, 0x3ef
-	bge @5
-	b @14
-	@7:
-	li r0, 0x1
-	mr r3, r25
-	stw r0, 0x1cb8(r20)
-	li r4, 0x0
-	li r5, 0x2c
-	bl memset
-	lfs f1, float_neg300_80421710(r2)
-	li r4, 0x14
-	lfs f0, float_0_804216f4(r2)
-	li r0, 0x0
-	stfs f1, 0x14(r25)
-	mr r3, r20
-	stfs f0, 0x18(r25)
-	stw r4, 0x20(r25)
-	stw r0, 0x0(r26)
-	stw r0, 0x4(r26)
-	stw r0, 0x10(r26)
-	stw r0, 0x8(r26)
-	stw r0, 0xc(r26)
-	bl BattleActionCommandGetDifficulty
-	stw r3, 0x2c(r26)
-	li r3, 0x0
-	li r0, 0x5
-	li r4, 0x0
-	stw r3, 0x30(r26)
-	stw r3, 0x1cec(r20)
-	mtctr r0
-	@15:
-	addi r0, r4, 0x4c
-	addi r4, r4, 0x1
-	stbx r3, r26, r0
-	bdnz @15
-	lwz r0, 0x1cd8(r20)
-	cmpwi r0, 0x3
-	bge @16
-	cmpwi r0, 0x1
-	bge @17
-	b @16
-	@17:
-	li r27, 0x0
-	li r19, 0x0
-	b @18
-	@19:
-	li r22, 0x0
-	b @20
-	@21:
-	lwz r0, 0x1cd8(r20)
-	cmpwi r0, 0x1
-	bne @22
-	li r3, 0x4
-	bl irand
-	slwi r0, r3, 2
-	la r3, _button_table_4dir(r13)
-	lwzx r0, r3, r0
-	b @23
-	@22:
-	li r3, 0x4
-	bl irand
-	slwi r0, r3, 2
-	la r3, _button_table_abxy(r13)
-	lwzx r0, r3, r0
-	@23:
-	subic. r4, r27, 0x1
-	mr r21, r0
-	li r5, 0x1
-	addi r0, r4, 0x1
-	slwi r3, r4, 2
-	mtctr r0
-	blt @24
-	@25:
-	addi r0, r3, 0x38
-	lwzx r0, r26, r0
-	cmplw r0, r21
-	bne @26
-	li r5, 0x0
-	@26:
-	subi r4, r4, 0x1
-	subi r3, r3, 0x4
-	bdnz @25
-	@24:
-	cmpwi r5, 0x0
-	beq @20
-	li r22, 0x1
-	@20:
-	cmpwi r22, 0x0
-	beq @21
-	addi r0, r19, 0x38
-	addi r19, r19, 0x4
-	stwx r21, r26, r0
-	addi r27, r27, 0x1
-	@18:
-	lwz r0, 0x1cc8(r20)
-	cmpw r27, r0
-	blt @19
-	lwz r0, 0x38(r26)
-	stw r0, 0x34(r26)
-	b @27
-	@16:
-	li r4, 0x100
-	li r5, 0x0
-	stw r4, 0x34(r26)
-	mr r3, r5
-	b @28
-	@29:
-	addi r0, r3, 0x38
-	addi r3, r3, 0x4
-	stwx r4, r26, r0
-	addi r5, r5, 0x1
-	@28:
-	lwz r0, 0x1cc8(r20)
-	cmpw r5, r0
-	blt @29
-	lwz r0, 0x38(r26)
-	stw r0, 0x34(r26)
-	@27:
-	li r0, 0x63
-	stw r0, 0x1c9c(r20)
-	b @5
-	@9:
-	lha r3, 0x1d18(r20)
-	cmpwi r3, 0x0
-	ble @30
-	subi r0, r3, 0x1
-	li r3, 0x2
-	sth r0, 0x1d18(r20)
-	li r0, 0x3ea
-	li r24, 0x1
-	stw r3, 0x1cb8(r20)
-	stw r0, 0x1c9c(r20)
-	b @5
-	@30:
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1cd0(r20)
-	mullw r0, r3, r0
-	stw r0, 0x14(r26)
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1cd0(r20)
-	addi r3, r3, 0x1
-	mullw r3, r3, r0
-	subi r0, r3, 0x1
-	stw r0, 0x18(r26)
-	lwz r0, 0x14(r26)
-	stw r0, 0x1c(r26)
-	lwz r3, 0x2c(r26)
-	bl _get_ok_frame_range
-	lwz r4, 0x1c(r26)
-	subi r3, r3, 0x1
-	li r0, 0x3e8
-	add r3, r4, r3
-	stw r3, 0x20(r26)
-	stw r0, 0x1c9c(r20)
-	@8:
-	lwz r3, 0xc(r26)
-	lwz r0, 0x1cd0(r20)
-	addi r3, r3, 0x1
-	mullw r3, r3, r0
-	subi r0, r3, 0x1
-	stw r0, 0x28(r26)
-	lwz r3, 0xc(r26)
-	addi r0, r3, 0x1
-	stw r0, 0xc(r26)
-	lwz r3, 0x1ce0(r20)
-	lwz r4, 0xc(r26)
-	addi r0, r3, 0x1
-	cmpw r4, r0
-	bge @31
-	lwz r0, 0x1c94(r20)
-	clrlwi. r0, r0, 31
-	beq @32
-	lwz r3, 0x1c90(r20)
-	lwz r0, 0x278(r3)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @33
-	@32:
-	mr r3, r31
-	bl psndSFXOn
-	b @33
-	@31:
-	lwz r0, 0x1c94(r20)
-	clrlwi. r0, r0, 31
-	beq @34
-	lwz r3, 0x1c90(r20)
-	lwz r0, 0x278(r3)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @33
-	@34:
-	mr r3, r30
-	bl psndSFXOn
-	@33:
-	li r3, 0x0
-	li r0, 0x3e9
-	stw r3, 0x24(r26)
-	stw r0, 0x1c9c(r20)
-	@3:
-	lwz r3, 0x10(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x10(r26)
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	beq @35
-	li r0, 0x0
-	stw r0, 0x30(r26)
-	b @36
-	@35:
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1ce0(r20)
-	cmpw r3, r0
-	blt @37
-	lwz r3, 0x10(r26)
-	lwz r0, 0x1c(r26)
-	cmpw r3, r0
-	blt @38
-	lwz r0, 0x20(r26)
-	cmpw r3, r0
-	bgt @38
-	li r0, 0x1
-	stw r0, 0x30(r26)
-	b @36
-	@38:
-	li r0, 0x0
-	stw r0, 0x30(r26)
-	b @36
-	@37:
-	li r0, 0x0
-	stw r0, 0x30(r26)
-	@36:
-	lwz r3, 0x34(r26)
-	li r22, 0x0
-	bl BattlePadCheckTrigger
-	cmpwi r3, 0x0
-	beq @39
-	li r27, 0x1
-	@39:
-	cmpwi r27, 0x0
-	beq @40
-	lwz r0, 0x1cd8(r20)
-	cmpwi r0, 0x2
-	beq @41
-	b @42
-	@41:
-	bl BattlePadGetTrigger
-	lwz r0, 0x34(r26)
-	cmplw r0, r3
-	bne @43
-	li r22, 0x1
-	b @40
-	@43:
-	li r22, 0x0
-	b @40
-	@42:
-	li r22, 0x1
-	@40:
-	cmpwi r23, 0x0
-	beq @44
-	lwz r0, 0x30(r26)
-	cmpwi r0, 0x0
-	beq @44
-	li r27, 0x1
-	li r22, 0x1
-	@44:
-	lwz r4, 0x0(r26)
-	lwz r3, 0x4(r26)
-	lwz r0, 0x1cc8(r20)
-	add r3, r4, r3
-	cmpw r3, r0
-	blt @45
-	li r27, 0x0
-	@45:
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1ce0(r20)
-	cmpw r3, r0
-	blt @46
-	cmpwi r27, 0x0
-	beq @46
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	bne @46
-	li r4, 0x1
-	stw r4, 0x24(r26)
-	lwz r3, 0x10(r26)
-	lwz r0, 0x1c(r26)
-	cmpw r3, r0
-	blt @47
-	lwz r0, 0x20(r26)
-	cmpw r3, r0
-	bgt @47
-	cmpwi r22, 0x0
-	beq @47
-	lwz r3, 0x0(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x0(r26)
-	stw r4, 0x1cec(r20)
-	lwz r5, 0x8(r26)
-	lwz r3, 0x1ce0(r20)
-	cmpw r5, r3
-	blt @48
-	lwz r0, 0x1cc8(r20)
-	add r0, r0, r3
-	cmpw r5, r0
-	bge @48
-	subf r3, r3, r5
-	addi r0, r3, 0x4c
-	stbx r4, r26, r0
-	lwz r0, 0x1c94(r20)
-	clrlwi. r0, r0, 31
-	beq @49
-	lwz r3, 0x1c90(r20)
-	lwz r0, 0x278(r3)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @48
-	@49:
-	mr r3, r29
-	bl psndSFXOn
-	@48:
-	lwz r0, 0x1cc4(r20)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @46
-	lwz r0, 0x0(r26)
-	stw r0, 0x1ce8(r20)
-	lwz r0, 0x1cb8(r20)
-	clrrwi r0, r0, 1
-	stw r0, 0x1cb8(r20)
-	lwz r3, 0x0(r26)
-	lwz r0, 0x1cd4(r20)
-	cmpw r3, r0
-	blt @50
-	lwz r0, 0x1cb8(r20)
-	ori r0, r0, 0x2
-	stw r0, 0x1cb8(r20)
-	@50:
-	li r0, 0x3ea
-	li r24, 0x1
-	stw r0, 0x1c9c(r20)
-	b @46
-	@47:
-	lwz r4, 0x8(r26)
-	lwz r3, 0x1ce0(r20)
-	cmpw r4, r3
-	blt @46
-	lwz r0, 0x1cc8(r20)
-	add r0, r0, r3
-	cmpw r4, r0
-	bge @46
-	lwz r3, 0x4(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r26)
-	lwz r3, 0x10(r26)
-	lwz r0, 0x14(r26)
-	cmpw r3, r0
-	blt @51
-	lwz r3, 0x1ce0(r20)
-	li r4, -0x1
-	lwz r0, 0x8(r26)
-	subf r3, r3, r0
-	addi r0, r3, 0x4c
-	stbx r4, r26, r0
-	lwz r0, 0x1c94(r20)
-	clrlwi. r0, r0, 31
-	beq @52
-	lwz r3, 0x1c90(r20)
-	lwz r0, 0x278(r3)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @53
-	@52:
-	mr r3, r28
-	bl psndSFXOn
-	@53:
-	li r0, -0x1
-	stw r0, 0x1cec(r20)
-	b @46
-	@51:
-	li r0, 0x0
-	stw r0, 0x24(r26)
-	@46:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	bne @54
-	lwz r3, 0x10(r26)
-	lwz r0, 0x20(r26)
-	cmpw r3, r0
-	ble @54
-	li r0, 0x1
-	li r4, -0x1
-	stw r0, 0x24(r26)
-	stw r4, 0x1cec(r20)
-	lwz r5, 0x8(r26)
-	lwz r3, 0x1ce0(r20)
-	cmpw r5, r3
-	blt @54
-	lwz r0, 0x1cc8(r20)
-	add r0, r0, r3
-	cmpw r5, r0
-	bge @54
-	lwz r3, 0x4(r26)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r26)
-	lwz r3, 0x1ce0(r20)
-	lwz r0, 0x8(r26)
-	subf r3, r3, r0
-	addi r0, r3, 0x4c
-	stbx r4, r26, r0
-	lwz r0, 0x1c94(r20)
-	clrlwi. r0, r0, 31
-	beq @55
-	lwz r3, 0x1c90(r20)
-	lwz r0, 0x278(r3)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @54
-	@55:
-	mr r3, r28
-	bl psndSFXOn
-	@54:
-	lwz r0, 0x24(r26)
-	cmpwi r0, 0x0
-	beq @56
-	lwz r3, 0x1cc8(r20)
-	lwz r0, 0x1ce0(r20)
-	lwz r4, 0x8(r26)
-	add r0, r3, r0
-	cmpw r4, r0
-	bge @56
-	addi r0, r4, 0x1
-	stw r0, 0x8(r26)
-	lwz r3, 0x1cc8(r20)
-	lwz r0, 0x1ce0(r20)
-	lwz r4, 0x8(r26)
-	add r0, r3, r0
-	cmpw r4, r0
-	bge @56
-	lwz r0, 0x1cd0(r20)
-	mullw r3, r4, r0
-	subi r0, r3, 0xa
-	stw r0, 0x14(r26)
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1cd0(r20)
-	addi r3, r3, 0x1
-	mullw r3, r3, r0
-	subi r0, r3, 0x1
-	stw r0, 0x18(r26)
-	lwz r3, 0x8(r26)
-	lwz r0, 0x1cd0(r20)
-	mullw r0, r3, r0
-	stw r0, 0x1c(r26)
-	lwz r3, 0x2c(r26)
-	bl _get_ok_frame_range
-	lwz r4, 0x1c(r26)
-	subi r3, r3, 0x1
-	li r0, 0x0
-	add r3, r4, r3
-	stw r3, 0x20(r26)
-	stw r0, 0x24(r26)
-	lwz r4, 0x8(r26)
-	lwz r3, 0x1ce0(r20)
-	cmpw r4, r3
-	blt @56
-	lwz r0, 0x1cc8(r20)
-	add r0, r0, r3
-	cmpw r4, r0
-	bge @56
-	subf r0, r3, r4
-	slwi r3, r0, 2
-	addi r0, r3, 0x38
-	lwzx r0, r26, r0
-	stw r0, 0x34(r26)
-	@56:
-	lwz r4, 0xc(r26)
-	lwz r0, 0x1cd0(r20)
-	lwz r3, 0x10(r26)
-	mullw r0, r4, r0
-	cmpw r3, r0
-	blt @5
-	lwz r3, 0x1cc8(r20)
-	lwz r0, 0x1ce0(r20)
-	add r0, r3, r0
-	cmpw r4, r0
-	bge @57
-	li r0, 0x3e8
-	stw r0, 0x1c9c(r20)
-	b @5
-	@57:
-	lwz r0, 0x0(r26)
-	stw r0, 0x1ce8(r20)
-	lwz r0, 0x1cb8(r20)
-	clrrwi r0, r0, 1
-	stw r0, 0x1cb8(r20)
-	lwz r3, 0x0(r26)
-	lwz r0, 0x1cd4(r20)
-	cmpw r3, r0
-	blt @58
-	lwz r0, 0x1cb8(r20)
-	ori r0, r0, 0x2
-	stw r0, 0x1cb8(r20)
-	@58:
-	li r0, 0x3ea
-	li r24, 0x1
-	stw r0, 0x1c9c(r20)
-	b @5
-	@13:
-	li r0, 0x3eb
-	stw r0, 0x1c9c(r20)
-	b @5
-	@12:
-	lwz r5, 0x1cc0(r20)
-	li r4, 0x0
-	li r3, 0x3c
-	li r0, 0x3ed
-	ori r5, r5, 0x1
-	stw r5, 0x1cc0(r20)
-	stw r4, 0x30(r26)
-	stw r3, 0x54(r26)
-	stw r0, 0x1c9c(r20)
-	b @5
-	@10:
-	lwz r3, 0x54(r26)
-	subi r0, r3, 0x1
-	stw r0, 0x54(r26)
-	lwz r0, 0x54(r26)
-	cmpwi r0, 0x0
-	bgt @5
-	li r0, 0x3ee
-	stw r0, 0x1c9c(r20)
-	b @5
-	@14:
-	li r0, 0x0
-	stw r0, 0x1ca0(r20)
-	stw r0, 0x1ca8(r20)
-	stw r0, 0x1ca4(r20)
-	stw r0, 0x1cac(r20)
-	@5:
-	cmpwi r24, 0x0
-	bne @2
-	lmw r19, 0xc(r1)
-	li r3, 0x1
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm s32 _get_ok_frame_range(s32 difficulty) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x1ccc(r4)
-	cmpwi r0, 0x1
-	beq @1
-	b @2
-	@1:
-	slwi r0, r3, 2
-	la r3, ac_signaltiming_ok_frame_range_2(r13)
-	lwz r4, 0x1ce4(r4)
-	lwzx r0, r3, r0
-	add r3, r4, r0
-	blr
-	@2:
-	slwi r0, r3, 2
-	la r3, ac_signaltiming_ok_frame_range(r13)
-	lwz r4, 0x1ce4(r4)
-	lwzx r0, r3, r0
-	add r3, r4, r0
-	blr
-}
-// clang-format on
 #endif
-
-// target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on
-__declspec(section ".rodata") const u32 gap_04_802FEEBC_rodata[1] = {0};
-#pragma force_active reset
-#pragma force_active reset

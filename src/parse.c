@@ -2,12 +2,22 @@
 #include "parse.h"
 #include <string.h>
 #include <stdio.h>
+#ifdef NONMATCHING
+#define EXT_LIT(sym, val) (val)
+#else
+#define EXT_LIT(sym, val) (sym)
+__declspec(section ".sdata2") extern const char str_8041A6B0[3];
+__declspec(section ".sdata2") extern const char str_8041A6B4[3];
+#endif
 
 int sscanf(const char* s, const char* format, ...);
 
 //.bss
+#ifdef NONMATCHING
 static char parsePushBuf[128]; // FAKE: was parsePush's local static (asm cannot name it)
+#endif
 extern ParseWork parse;
+__declspec(section ".data") u8 g5_buf_s405[128];
 
 void parseInit(void* ptr, u32 size) {
 	parse.ptr = ptr;
@@ -16,6 +26,7 @@ void parseInit(void* ptr, u32 size) {
 	parse.end[0] = size;
 }
 
+int strcmp(const char *s1, const char *s2);
 #ifdef NONMATCHING
 BOOL parsePush(const char* tag) {
 	static char buf[128];
@@ -85,20 +96,137 @@ BOOL parsePush(const char* tag) {
 	parse.end[i] = newEnd;
 	return TRUE;
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+BOOL parsePush(const char* tag) {
+	asm {
+		lis r4, parse@ha
+	}
+	asm volatile {
+		addi r31, r4, parse@l
+		opword 0x3BDF0004
+		mr r21, r3
+		opword 0x3BBF002C
+		opword 0x3AC00000
+		opword 0x3B200000
+		opword 0x801F0054
+		opword 0x835F0000
+		opword 0x5400103A
+		opword 0x7F9E002E
+		opword 0x7F7D002E
+		opword 0x48000154
+		opword 0x7CBAE214
+		opword 0x88050000
+		opword 0x2C00003C
+		opword 0x40820140
+		opword 0x88050001
+		opword 0x2C00002F
+		opword 0x40820054
+		opword 0x2C190001
+		opword 0x3AD6FFFF
+		opword 0x40820128
+		opword 0x2C160000
+		opword 0x40820120
+		opword 0x7C1CD850
+		opword 0x7C0903A6
+		opword 0x7C1CD800
+		opword 0x40800024
+		opword 0x88050000
+		opword 0x2C00003E
+		opword 0x4082000C
+		opword 0x3B9C0001
+		opword 0x48000010
+		opword 0x3B9C0001
+		opword 0x38A50001
+		opword 0x4200FFE4
+		opword 0x7F97E378
+		opword 0x3B200002
+		opword 0x480000F0
+		opword 0x2C190000
+		opword 0x408200D8
+		opword 0x2C160000
+		opword 0x408200D0
+		lis r3, g5_buf_s405@ha
+		opword 0x7C1CD850
+		addi r6, r3, g5_buf_s405@l
+		opword 0x7F84E378
+		opword 0x7CA32B78
+		opword 0x38A00000
+		opword 0x7C0903A6
+		opword 0x7C1CD800
+		opword 0x40800058
+		opword 0x88E30000
+		opword 0x7CE00774
+		opword 0x2C000020
+		opword 0x41820028
+		opword 0x2C000009
+		opword 0x41820020
+		opword 0x2C00000A
+		opword 0x41820018
+		opword 0x2C00000D
+		opword 0x41820010
+		opword 0x98E60000
+		opword 0x38C60001
+		opword 0x38A50001
+		opword 0x2C05007F
+		opword 0x4080001C
+		opword 0x88030000
+		opword 0x2C00003E
+		opword 0x41820010
+		opword 0x38840001
+		opword 0x38630001
+		opword 0x4200FFB0
+		lis r3, g5_buf_s405@ha
+		opword 0x38000000
+		addi r3, r3, g5_buf_s405@l
+		opword 0x7EA4AB78
+		opword 0x7C0329AE
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820038
+		opword 0x7C1CD850
+		opword 0x7C7AE214
+		opword 0x7C0903A6
+		opword 0x7C1CD800
+		opword 0x4080001C
+		opword 0x88030000
+		opword 0x2C00003E
+		opword 0x41820010
+		opword 0x3B9C0001
+		opword 0x38630001
+		opword 0x4200FFEC
+		opword 0x3B200001
+		opword 0x3B1C0001
+		opword 0x3AD60001
+		opword 0x3B9C0001
+		opword 0x7C1CD800
+		opword 0x4180FEAC
+		opword 0x2C190002
+		opword 0x4182000C
+		opword 0x38600000
+		opword 0x48000020
+		opword 0x809F0054
+		opword 0x38600001
+		opword 0x38040001
+		opword 0x901F0054
+		opword 0x5400103A
+		opword 0x7F1E012E
+		opword 0x7EFD012E
+	}
+}
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void parsePop(void) {
 	parse.depth--;
 }
-#endif
 
-#ifdef NONMATCHING
 void parsePopNext(void) {
 	parse.depth--;
 	parse.pos[parse.depth] = parse.end[parse.depth + 1];
 }
-#endif
 
 #ifdef NONMATCHING
 BOOL parseGet1Next(s32 type, void* data) {
@@ -183,9 +311,180 @@ BOOL parseGet1Next(s32 type, void* data) {
 	}
 	return TRUE;
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+BOOL parseGet1Next(s32 type, void* data) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x2C030003
+		opword 0x90010024
+		opword 0x93E1001C
+		opword 0x3BE00001
+		opword 0x93C10018
+		opword 0x93A10014
+		opword 0x7C9D2378
+		opword 0x41820008
+		opword 0x48000038
+		opword 0x38600002
+		bl parseGet1Next
+		opword 0x7FFF19D6
+		opword 0x389D0004
+		opword 0x38600002
+		bl parseGet1Next
+		opword 0x7FFF19D6
+		opword 0x389D0008
+		opword 0x38600002
+		bl parseGet1Next
+		opword 0x7FFF19D6
+		opword 0x7FE3FB78
+		opword 0x48000218
+		lis r4, parse@ha
+		opword 0x38A00000
+		addi r7, r4, parse@l
+		opword 0x80070054
+		opword 0x80870000
+		opword 0x5400103A
+		opword 0x7FE70214
+		opword 0x815F0004
+		opword 0x801F002C
+		opword 0x3BFF0004
+		opword 0x480000EC
+		opword 0x7D045214
+		opword 0x89280000
+		opword 0x2C09002F
+		opword 0x40820040
+		opword 0x88E80001
+		opword 0x2C07002F
+		opword 0x40820034
+		opword 0x7CEA0050
+		opword 0x7CE903A6
+		opword 0x7C0A0000
+		opword 0x408000BC
+		opword 0x88E80000
+		opword 0x7CE70774
+		opword 0x28072F6E
+		opword 0x418200AC
+		opword 0x394A0001
+		opword 0x39080001
+		opword 0x4200FFE8
+		opword 0x4800009C
+		opword 0x7D270774
+		opword 0x2C070020
+		opword 0x41820090
+		opword 0x2C070009
+		opword 0x41820088
+		opword 0x2C07000A
+		opword 0x41820080
+		opword 0x2C07000D
+		opword 0x41820078
+		opword 0x7D465378
+		opword 0x394A0001
+		opword 0x7CEA0050
+		opword 0x38A00001
+		opword 0x7CE903A6
+		opword 0x7C0A0000
+		opword 0x40800068
+		opword 0x7D245214
+		opword 0x88E90000
+		opword 0x7CE80774
+		opword 0x2C080020
+		opword 0x41820030
+		opword 0x38E7FFF7
+		opword 0x54E7063E
+		opword 0x28070001
+		opword 0x40810020
+		opword 0x2C08000D
+		opword 0x41820018
+		opword 0x2C08002F
+		opword 0x4082001C
+		opword 0x88E90001
+		opword 0x2C07002F
+		opword 0x40820010
+		opword 0x7D5E5378
+		opword 0x38A00002
+		opword 0x4800001C
+		opword 0x394A0001
+		opword 0x4200FFB0
+		opword 0x48000010
+		opword 0x394A0001
+		opword 0x7C0A0000
+		opword 0x4180FF14
+		opword 0x2C050001
+		opword 0x4181000C
+		opword 0x38600000
+		opword 0x480000EC
+		opword 0x2C030001
+		opword 0x418200AC
+		opword 0x40800010
+		opword 0x2C030000
+		opword 0x40800014
+		opword 0x480000D0
+		opword 0x2C030003
+		opword 0x408000C8
+		opword 0x480000AC
+		opword 0x7CCA3378
+		opword 0x7FA8EB78
+		opword 0x7CA43214
+		opword 0x39600000
+		opword 0x48000064
+		opword 0x88650000
+		opword 0x2C030022
+		opword 0x40820050
+		opword 0x394A0001
+		opword 0x7D074378
+		opword 0x7C6A0050
+		opword 0x7CC45214
+		opword 0x7C6903A6
+		opword 0x7C0A0000
+		opword 0x38A50001
+		opword 0x40800030
+		opword 0x89260000
+		opword 0x2C090022
+		opword 0x41820024
+		opword 0x99270000
+		opword 0x38E70001
+		opword 0x39080001
+		opword 0x396B0001
+		opword 0x394A0001
+		opword 0x38A50001
+		opword 0x38C60001
+		opword 0x4200FFD8
+		opword 0x394A0001
+		opword 0x38A50001
+		opword 0x7C0A0000
+		opword 0x4180FF9C
+		opword 0x38000000
+		opword 0x7C0BE9AE
+		opword 0x915F0000
+		opword 0x48000038
+		opword 0x7FA5EB78
+		opword 0x7C643214
+		la r4, str_8041A6B0(r2)
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x93DF0000
+		opword 0x4800001C
+		opword 0x7FA5EB78
+		opword 0x7C643214
+		la r4, str_8041A6B4(r2)
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x93DF0000
+		opword 0x38600001
+		opword 0x80010024
+		opword 0x83E1001C
+		opword 0x83C10018
+		opword 0x83A10014
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 BOOL parseTagGet1(const char* tag, s32 type, void* data) {
 	BOOL result;
 
@@ -196,400 +495,13 @@ BOOL parseTagGet1(const char* tag, s32 type, void* data) {
 	}
 	return FALSE;
 }
-#endif
 
-#ifndef NONMATCHING
-// ASM-STOPGAP: parsePush (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-__declspec(section ".sdata2") const char str_8041A6B0[4] = "%d\0";
-__declspec(section ".sdata2") const char str_8041A6B4[4] = "%f\0";
-
-asm BOOL parseTagGet1(const char* tag, s32 type, void* data) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r5
-	stw r30, 0x8(r1)
-	mr r30, r4
-	bl parsePush
-	cmpwi r3, 0x0
-	beq @1
-	mr r3, r30
-	mr r4, r31
-	bl parseGet1Next
-	lis r4, parse@ha
-	addi r5, r4, parse@l
-	lwz r4, 0x54(r5)
-	subi r0, r4, 0x1
-	stw r0, 0x54(r5)
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL parseGet1Next(s32 type, void* data) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	cmpwi r3, 0x3
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	li r31, 0x1
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r4
-	beq @1
-	b @2
-	@1:
-	li r3, 0x2
-	bl parseGet1Next
-	mullw r31, r31, r3
-	addi r4, r29, 0x4
-	li r3, 0x2
-	bl parseGet1Next
-	mullw r31, r31, r3
-	addi r4, r29, 0x8
-	li r3, 0x2
-	bl parseGet1Next
-	mullw r31, r31, r3
-	mr r3, r31
-	b @3
-	@2:
-	lis r4, parse@ha
-	li r5, 0x0
-	addi r7, r4, parse@l
-	lwz r0, 0x54(r7)
-	lwz r4, 0x0(r7)
-	slwi r0, r0, 2
-	add r31, r7, r0
-	lwz r10, 0x4(r31)
-	lwz r0, 0x2c(r31)
-	addi r31, r31, 0x4
-	b @4
-	@5:
-	add r8, r4, r10
-	lbz r9, 0x0(r8)
-	cmpwi r9, 0x2f
-	bne @6
-	lbz r7, 0x1(r8)
-	cmpwi r7, 0x2f
-	bne @6
-	subf r7, r10, r0
-	mtctr r7
-	cmpw r10, r0
-	bge @7
-	@8:
-	lbz r7, 0x0(r8)
-	extsb r7, r7
-	cmplwi r7, 0x2f6e
-	beq @7
-	addi r10, r10, 0x1
-	addi r8, r8, 0x1
-	bdnz @8
-	b @7
-	@6:
-	extsb r7, r9
-	cmpwi r7, 0x20
-	beq @7
-	cmpwi r7, 0x9
-	beq @7
-	cmpwi r7, 0xa
-	beq @7
-	cmpwi r7, 0xd
-	beq @7
-	mr r6, r10
-	addi r10, r10, 0x1
-	subf r7, r10, r0
-	li r5, 0x1
-	mtctr r7
-	cmpw r10, r0
-	bge @9
-	@10:
-	add r9, r4, r10
-	lbz r7, 0x0(r9)
-	extsb r8, r7
-	cmpwi r8, 0x20
-	beq @11
-	subi r7, r7, 0x9
-	clrlwi r7, r7, 24
-	cmplwi r7, 0x1
-	ble @11
-	cmpwi r8, 0xd
-	beq @11
-	cmpwi r8, 0x2f
-	bne @12
-	lbz r7, 0x1(r9)
-	cmpwi r7, 0x2f
-	bne @12
-	@11:
-	mr r30, r10
-	li r5, 0x2
-	b @9
-	@12:
-	addi r10, r10, 0x1
-	bdnz @10
-	b @9
-	@7:
-	addi r10, r10, 0x1
-	@4:
-	cmpw r10, r0
-	blt @5
-	@9:
-	cmpwi r5, 0x1
-	bgt @13
-	li r3, 0x0
-	b @3
-	@13:
-	cmpwi r3, 0x1
-	beq @14
-	bge @15
-	cmpwi r3, 0x0
-	bge @16
-	b @17
-	@15:
-	cmpwi r3, 0x3
-	bge @17
-	b @18
-	@16:
-	mr r10, r6
-	mr r8, r29
-	add r5, r4, r6
-	li r11, 0x0
-	b @19
-	@20:
-	lbz r3, 0x0(r5)
-	cmpwi r3, 0x22
-	bne @21
-	addi r10, r10, 0x1
-	mr r7, r8
-	subf r3, r10, r0
-	add r6, r4, r10
-	mtctr r3
-	cmpw r10, r0
-	addi r5, r5, 0x1
-	bge @21
-	@22:
-	lbz r9, 0x0(r6)
-	cmpwi r9, 0x22
-	beq @21
-	stb r9, 0x0(r7)
-	addi r7, r7, 0x1
-	addi r8, r8, 0x1
-	addi r11, r11, 0x1
-	addi r10, r10, 0x1
-	addi r5, r5, 0x1
-	addi r6, r6, 0x1
-	bdnz @22
-	@21:
-	addi r10, r10, 0x1
-	addi r5, r5, 0x1
-	@19:
-	cmpw r10, r0
-	blt @20
-	li r0, 0x0
-	stbx r0, r11, r29
-	stw r10, 0x0(r31)
-	b @17
-	@14:
-	mr r5, r29
-	add r3, r4, r6
-	la r4, str_8041A6B0(r2)
-	crclr 6
-	bl sscanf
-	stw r30, 0x0(r31)
-	b @17
-	@18:
-	mr r5, r29
-	add r3, r4, r6
-	la r4, str_8041A6B4(r2)
-	crclr 6
-	bl sscanf
-	stw r30, 0x0(r31)
-	@17:
-	li r3, 0x1
-	@3:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void parsePopNext(void) {
-	nofralloc
-	lis r3, parse@ha
-	addi r4, r3, parse@l
-	lwz r3, 0x54(r4)
-	subi r0, r3, 0x1
-	slwi r3, r0, 2
-	stw r0, 0x54(r4)
-	add r3, r4, r3
-	lwz r0, 0x30(r3)
-	stw r0, 0x4(r3)
-	blr
-}
-
-asm void parsePop(void) {
-	nofralloc
-	lis r3, parse@ha
-	addi r4, r3, parse@l
-	lwz r3, 0x54(r4)
-	subi r0, r3, 0x1
-	stw r0, 0x54(r4)
-	blr
-}
-
-asm BOOL parsePush(const char* tag) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	lis r4, parse@ha
-	stw r0, 0x44(r1)
-	stmw r21, 0x14(r1)
-	addi r31, r4, parse@l
-	addi r30, r31, 0x4
-	mr r21, r3
-	addi r29, r31, 0x2c
-	li r22, 0x0
-	li r25, 0x0
-	lwz r0, 0x54(r31)
-	lwz r26, 0x0(r31)
-	slwi r0, r0, 2
-	lwzx r28, r30, r0
-	lwzx r27, r29, r0
-	b @1
-	@2:
-	add r5, r26, r28
-	lbz r0, 0x0(r5)
-	cmpwi r0, 0x3c
-	bne @3
-	lbz r0, 0x1(r5)
-	cmpwi r0, 0x2f
-	bne @4
-	cmpwi r25, 0x1
-	subi r22, r22, 0x1
-	bne @3
-	cmpwi r22, 0x0
-	bne @3
-	subf r0, r28, r27
-	mtctr r0
-	cmpw r28, r27
-	bge @5
-	@6:
-	lbz r0, 0x0(r5)
-	cmpwi r0, 0x3e
-	bne @7
-	addi r28, r28, 0x1
-	b @5
-	@7:
-	addi r28, r28, 0x1
-	addi r5, r5, 0x1
-	bdnz @6
-	@5:
-	mr r23, r28
-	li r25, 0x2
-	b @8
-	@4:
-	cmpwi r25, 0x0
-	bne @9
-	cmpwi r22, 0x0
-	bne @9
-	lis r3, parsePushBuf@ha
-	subf r0, r28, r27
-	addi r6, r3, parsePushBuf@l
-	mr r4, r28
-	mr r3, r5
-	li r5, 0x0
-	mtctr r0
-	cmpw r28, r27
-	bge @10
-	@11:
-	lbz r7, 0x0(r3)
-	extsb r0, r7
-	cmpwi r0, 0x20
-	beq @12
-	cmpwi r0, 0x9
-	beq @12
-	cmpwi r0, 0xa
-	beq @12
-	cmpwi r0, 0xd
-	beq @12
-	stb r7, 0x0(r6)
-	addi r6, r6, 0x1
-	addi r5, r5, 0x1
-	@12:
-	cmpwi r5, 0x7f
-	bge @10
-	lbz r0, 0x0(r3)
-	cmpwi r0, 0x3e
-	beq @10
-	addi r4, r4, 0x1
-	addi r3, r3, 0x1
-	bdnz @11
-	@10:
-	lis r3, parsePushBuf@ha
-	li r0, 0x0
-	addi r3, r3, parsePushBuf@l
-	mr r4, r21
-	stbx r0, r3, r5
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @9
-	subf r0, r28, r27
-	add r3, r26, r28
-	mtctr r0
-	cmpw r28, r27
-	bge @13
-	@14:
-	lbz r0, 0x0(r3)
-	cmpwi r0, 0x3e
-	beq @13
-	addi r28, r28, 0x1
-	addi r3, r3, 0x1
-	bdnz @14
-	@13:
-	li r25, 0x1
-	addi r24, r28, 0x1
-	@9:
-	addi r22, r22, 0x1
-	@3:
-	addi r28, r28, 0x1
-	@1:
-	cmpw r28, r27
-	blt @2
-	@8:
-	cmpwi r25, 0x2
-	beq @15
-	li r3, 0x0
-	b @16
-	@15:
-	lwz r4, 0x54(r31)
-	li r3, 0x1
-	addi r0, r4, 0x1
-	stw r0, 0x54(r31)
-	slwi r0, r0, 2
-	stwx r24, r30, r0
-	stwx r23, r29, r0
-	@16:
-	lmw r21, 0x14(r1)
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-// clang-format on
-#endif
 
 ParseWork parse;
+
+#ifndef NONMATCHING
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".sdata2") const char str_8041A6B0[3] = "%d\0";
+__declspec(section ".sdata2") const char str_8041A6B4[3] = "%f\0";
+#endif

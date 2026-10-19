@@ -1,4 +1,9 @@
+#ifdef NONMATCHING
 // FAKE: whole-unit ASM-STOPGAP (C3b 2026-10-18): asm_inline.py + C3b aifix/rodatagen (.rodata/.sdata2/.sdata in target order, mt$544 as file-scope mt_544), unused inlines under NONMATCHING, force_active. C kept under NONMATCHING. See docs/FAKES.md.
+#endif
+#ifndef NONMATCHING
+// FAKE: whole-unit ASM-STOPGAP (C3b 2026-10-18): asm_inline.py + C3b aifix/rodatagen (.rodata/.sdata2/.sdata in target order, mt_544 as file-scope mt_544), unused inlines under NONMATCHING, force_active. C kept under NONMATCHING. See docs/FAKES.md.
+#endif
 #include "evt/evt_cmd.h"
 #include "driver/dispdrv.h"
 #include "driver/hitdrv.h"
@@ -10,6 +15,10 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
+#ifndef NONMATCHING
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 #pragma force_active on
 extern void __div2u();
 __declspec(section ".rodata") const u32 vec3_802f2ff8[3] = {0x00000000, 0xC47A0000, 0x00000000};
@@ -120,6 +129,7 @@ void nannpc_ext_shadow_disp();
 void nannpc_ext_disp();
 s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b);
 void nanNPCOption(void);
+#ifdef NONMATCHING
 USER_FUNC(evt_nannpcwork_flag_onoff);
 USER_FUNC(evt_nannpc_set_color);
 USER_FUNC(evt_nannpc_set_shadow_position);
@@ -138,6 +148,27 @@ USER_FUNC(evt_nannpc_get_position);
 USER_FUNC(evt_nannpc_set_position);
 USER_FUNC(evt_nannpc_set_subfunc);
 USER_FUNC(evt_nannpc_init);
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpcwork_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_color(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_shadow_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_func(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_ppflag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_jump_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_move_position2(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_get_work(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_work(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_dir(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_animtbl(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_size(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_hosei_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_get_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_set_subfunc(EventEntry* event, BOOL isFirstCall);
+s32 evt_nannpc_init(EventEntry* event, BOOL isFirstCall);
+#endif
 
 s32 gap_08_8041899C_sbss;
 NanNPCWork* nanNPCWork;
@@ -150,7 +181,6 @@ void nannpc_ext_main();
 void nannpc_ext_main_sub();
 void nannpc_ext_init();
 
-#ifdef NONMATCHING /* not in the target object (dead code stripped at link) */
 static inline NanNPC* nanNPCSearch(char* name) {
     s32 i;
     NanNPC* p;
@@ -158,7 +188,12 @@ static inline NanNPC* nanNPCSearch(char* name) {
     for (i = 0; i < w->num; i++) {
         p = &w->npc[i];
         if (!((u32)name & 0x80000000)) {
+#ifdef NONMATCHING
             sprintf(makestring, "%06x", name);
+#endif
+#ifndef NONMATCHING
+            sprintf(makestring, EXT_LIT((char*)str_8041C574, "%06x"), name);
+#endif
             name = makestring;
         }
         if (!strcmp((char*)p->name, name)) {
@@ -167,7 +202,6 @@ static inline NanNPC* nanNPCSearch(char* name) {
     }
     return NULL;
 }
-#endif
 
 #ifdef NONMATCHING
 void nanNPCOption(void) {
@@ -284,6 +318,32 @@ void nanNPCOption(void) {
     }
 }
 #endif
+#ifndef NONMATCHING
+void C_VECReflect(const Vec* src, const Vec* normal, Vec* dst);
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
+void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
+void GXSetNumChans(u8 nChans);
+void GXSetNumTevStages(u8 nStages);
+void GXSetNumTexGens(u8 nTexGens);
+void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
+void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
+void GXSetTevColor(GXTevRegID id, GXColor color);
+void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
+void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
+void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
+void PSMTXIdentity(Mtx m);
+void PSVECAdd(const Vec* a, const Vec* b, Vec* ab);
+f32 PSVECDistance(const Vec* a, const Vec* b);
+f32 PSVECDotProduct(const Vec* a, const Vec* b);
+f32 PSVECMag(const Vec* v);
+void PSVECNormalize(const Vec* src, Vec* dst);
+void PSVECScale(const Vec* src, Vec* dst, f32 scale);
+void PSVECSubtract(const Vec* a, const Vec* b, Vec* a_b);
+void *memset(void *dest, int ch, size_t count);
+int strcmp(const char *s1, const char *s2);
+char *strcpy(char *dest, const char *src);
+void nanNPCOption(void);
+#endif
 
 
 #ifdef NONMATCHING
@@ -297,8 +357,11 @@ s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
     return 0;
 }
 #endif
+#ifndef NONMATCHING
+s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b);
+#endif
 
-#ifdef NONMATCHING /* not in the target object (dead code stripped at link) */
+#ifdef NONMATCHING
 static inline void nannpc_loadTev(void) {
     GXSetTevOrder(0, 0, 0, 4);
     GXSetTevColorOp(0, 0, 0, 0, 1, 0);
@@ -311,8 +374,6 @@ static inline void nannpc_loadTev(void) {
     GXSetNumTexGens(1);
     GXSetNumTevStages(1);
 }
-#endif
-#ifdef NONMATCHING
 void nannpc_ext_disp() {
     NanNPCWork* w = nanNPCWork;
     s32 i;
@@ -346,6 +407,9 @@ void nannpc_ext_disp() {
     }
 }
 #endif
+#ifndef NONMATCHING
+void nannpc_ext_disp();
+#endif
 
 #ifdef NONMATCHING
 void nannpc_ext_shadow_disp() {
@@ -356,6 +420,9 @@ void nannpc_ext_shadow_disp() {
     extLoadShadowTev();
     extDrawShadow();
 }
+#endif
+#ifndef NONMATCHING
+void nannpc_ext_shadow_disp();
 #endif
 
 #ifdef NONMATCHING
@@ -372,6 +439,9 @@ void nannpc_ext_init() {
     }
 }
 #endif
+#ifndef NONMATCHING
+void nannpc_ext_init();
+#endif
 
 #ifdef NONMATCHING
 void nannpc_ext_main_sub() {
@@ -384,6 +454,9 @@ void nannpc_ext_main_sub() {
         }
     }
 }
+#endif
+#ifndef NONMATCHING
+void nannpc_ext_main_sub();
 #endif
 
 #ifdef NONMATCHING
@@ -415,6 +488,9 @@ void nannpc_ext_main_sub_fast() {
     }
 }
 #endif
+#ifndef NONMATCHING
+void nannpc_ext_main_sub_fast();
+#endif
 
 #ifdef NONMATCHING
 void nannpc_ext_main() {
@@ -430,6 +506,9 @@ void nannpc_ext_main() {
     }
 }
 #endif
+#ifndef NONMATCHING
+void nannpc_ext_main();
+#endif
 
 #ifdef NONMATCHING
 void nannpc_ext_dispent() {
@@ -441,6 +520,9 @@ void nannpc_ext_dispent() {
         dispEntry(4, 0.0f, 2, nannpc_ext_shadow_disp, 0);
     }
 }
+#endif
+#ifndef NONMATCHING
+void nannpc_ext_dispent();
 #endif
 
 #ifdef NONMATCHING
@@ -508,6 +590,9 @@ USER_FUNC(evt_nannpc_init) {
     return 2;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_nannpc_init(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_subfunc) {
@@ -527,6 +612,9 @@ USER_FUNC(evt_nannpc_set_subfunc) {
     }
     return 2;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_subfunc(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -574,13 +662,68 @@ s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall)
       break;
     }
   }
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
   return 2;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_position(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_position) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_get_position(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_hosei_position(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_size(EventEntry* event, BOOL isFirstCall);
+
+void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl);
+
+s32 evt_nannpc_set_animtbl(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_dir(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_work(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_get_work(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_move_position2(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_jump_position(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_flag_onoff(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_ppflag_onoff(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_func(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_shadow_position(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_nannpc_set_color(EventEntry* event, BOOL isFirstCall);
+
+#pragma force_active on
+#pragma explicit_zero_data on
+s32 evt_nannpcwork_flag_onoff(EventEntry* event, BOOL isFirstCall);
+#pragma explicit_zero_data reset
+#pragma force_active reset
+
+#pragma force_active on
+#pragma explicit_zero_data on
+#pragma explicit_zero_data reset
+#pragma force_active reset
+
+#pragma force_active reset
+
+s32 evt_nannpc_set_position(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     f32 x = evtGetFloat(event, args[1]);
@@ -594,10 +737,13 @@ USER_FUNC(evt_nannpc_set_position) {
     npc->field_30.z = x;
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_get_position) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_get_position(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     evtSetFloat(event, args[1], npc->pos.x);
@@ -605,10 +751,13 @@ USER_FUNC(evt_nannpc_get_position) {
     evtSetFloat(event, args[3], npc->pos.z);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_hosei_position) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_hosei_position(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->hosei.x = evtGetFloat(event, args[1]);
@@ -616,19 +765,20 @@ USER_FUNC(evt_nannpc_set_hosei_position) {
     npc->hosei.z = evtGetFloat(event, args[3]);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_size) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_size(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->sizeX = evtGetFloat(event, args[1]);
     npc->sizeY = evtGetFloat(event, args[2]);
     return 2;
 }
-#endif
 
-#ifdef NONMATCHING
 void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl) {
     s32 n;
     npc->animtbl = tbl;
@@ -645,10 +795,13 @@ void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl) {
         npc->animtbl = NULL;
     }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_animtbl) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_animtbl(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     s16* tbl = (s16*)evtGetValue(event, args[1]);
@@ -668,7 +821,6 @@ USER_FUNC(evt_nannpc_set_animtbl) {
     }
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_dir) {
@@ -676,27 +828,89 @@ USER_FUNC(evt_nannpc_set_dir) {
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->dir = evtGetValue(event, args[1]);
     return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_nannpc_set_dir(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[4];
+	asm volatile {
+		mr r25, r3
+		opword 0x83430018
+		opword 0x809A0000
+		bl evtGetValue
+		opword 0x3BA00000
+		lwz r31, nanNPCWork(r13)
+		opword 0x7C7C1B78
+		opword 0x7FBBEB78
+		opword 0x4800004C
+		opword 0x807F0000
+		opword 0x57800001
+		opword 0x7FC3DA14
+		opword 0x4082001C
+		opword 0x7F85E378
+		la r3, makestring(r13)
+		la r4, str_8041C574(r2)
+		opword 0x4CC63182
+		bl sprintf
+		la r28, makestring(r13)
+		opword 0x7FC3F378
+		opword 0x7F84E378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x3B7B00C0
+		opword 0x3BBD0001
+		opword 0x801F000C
+		opword 0x7C1D0000
+		opword 0x4180FFB0
+		opword 0x3BC00000
+		opword 0x809A0004
+		opword 0x7F23CB78
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061000C
+		lis r4, double_to_int_802f3040@ha
+		lfd f1, double_to_int_802f3040@l(r4)
+		opword 0x38600002
+		stw r0, _af_pad+0(r1)
+		opword 0xC8010008
+		opword 0xEC000828
+		opword 0xD01E0060
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_work) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_work(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     s32 idx = evtGetValue(event, args[1]);
     npc->work[idx] = evtGetValue(event, args[2]);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_get_work) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_get_work(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     evtSetValue(event, args[2], npc->work[evtGetValue(event, args[1])]);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_move_position2) {
@@ -734,7 +948,168 @@ USER_FUNC(evt_nannpc_move_position2) {
     }
     npc->pos = target;
     return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_nannpc_move_position2(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[64];
+	asm volatile {
+		opword 0x7C7A1B78
+		opword 0x7C9B2378
+		opword 0x83830018
+		opword 0x809C0000
+		bl evtGetValue
+		opword 0x3BC00000
+		lwz r29, nanNPCWork(r13)
+		opword 0x7C791B78
+		opword 0x7FD8F378
+		opword 0x4800004C
+		opword 0x807D0000
+		opword 0x57200001
+		opword 0x7FE3C214
+		opword 0x4082001C
+		opword 0x7F25CB78
+		la r3, makestring(r13)
+		la r4, str_8041C574(r2)
+		opword 0x4CC63182
+		bl sprintf
+		la r25, makestring(r13)
+		opword 0x7FE3FB78
+		opword 0x7F24CB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x3B1800C0
+		opword 0x3BDE0001
+		opword 0x801D000C
+		opword 0x7C1E0000
+		opword 0x4180FFB0
+		opword 0x3BE00000
+		lwz r3, gp(r13)
+		opword 0x80030014
+		opword 0x2C000000
+		opword 0x41820010
+		opword 0x83C30038
+		opword 0x83A3003C
+		opword 0x4800000C
+		opword 0x83C30040
+		opword 0x83A30044
+		opword 0x809C0004
+		opword 0x7F43D378
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		stw r3, _af_pad+44(r1)
+		lis r4, double_to_int_802f3040@ha
+		lfd f1, double_to_int_802f3040@l(r4)
+		opword 0x7F43D378
+		opword 0x90010030
+		opword 0xC8010030
+		opword 0xEC000828
+		opword 0xD0010020
+		opword 0x809C0008
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061003C
+		lis r4, double_to_int_802f3040@ha
+		lfd f1, double_to_int_802f3040@l(r4)
+		opword 0x7F43D378
+		opword 0x90010038
+		opword 0xC8010038
+		opword 0xEC000828
+		opword 0xD0010024
+		opword 0x809C000C
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610044
+		lis r4, double_to_int_802f3040@ha
+		lfd f1, double_to_int_802f3040@l(r4)
+		opword 0x7F43D378
+		opword 0x90010040
+		opword 0xC8010040
+		opword 0xEC000828
+		opword 0xD0010028
+		opword 0x809C0010
+		bl evtGetFloat
+		fmr f31, f1
+		opword 0x2C1B0000
+		opword 0x41820024
+		opword 0x93BA019C
+		opword 0x93DA0198
+		opword 0x807F0018
+		opword 0x801F001C
+		opword 0x907F0088
+		opword 0x901F008C
+		opword 0x801F0020
+		opword 0x901F0090
+		opword 0x38610020
+		opword 0x389F0088
+		opword 0x38A10014
+		bl PSVECSubtract
+		opword 0x38610014
+		bl PSVECMag
+		lfs f0, float_1000_8041c580(r2)
+		opword 0x3C608000
+		opword 0x800300F8
+		opword 0x3C601062
+		opword 0xEC000072
+		opword 0x809A019C
+		opword 0x5400F0BE
+		opword 0x38634DD3
+		opword 0x7C030016
+		opword 0x7C84E850
+		opword 0xEC00F824
+		opword 0x7C83FE70
+		opword 0x38A00000
+		opword 0x5406D1BE
+		opword 0xFC00001E
+		opword 0xD8010040
+		lwz r24, 0x44(r1)
+		bl __div2u
+		opword 0x7C9A2378
+		opword 0x3CA04330
+		opword 0x6F438000
+		opword 0x6F008000
+		lis r4, double_to_int_802f3040@ha
+		opword 0x9061003C
+		addi r6, r4, double_to_int_802f3040@l
+		opword 0x38610014
+		opword 0x90A10038
+		opword 0x38810008
+		opword 0xC8460000
+		opword 0xC8010038
+		opword 0x90010034
+		opword 0xEC201028
+		opword 0x90A10030
+		opword 0xC8010030
+		opword 0xEC001028
+		opword 0xEC210024
+		bl PSVECScale
+		opword 0x7C1AC000
+		opword 0x4080001C
+		opword 0x387F0088
+		opword 0x38810008
+		opword 0x38BF0018
+		bl PSVECAdd
+		opword 0x38600000
+		opword 0x48000020
+		opword 0x80810020
+		opword 0x38600002
+		opword 0x80010024
+		opword 0x909F0018
+		opword 0x901F001C
+		opword 0x80010028
+		opword 0x901F0020
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
@@ -772,11 +1147,220 @@ USER_FUNC(evt_nannpc_jump_position) {
     npc->pos.y = y;
     npc->pos.z = z;
     return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_nannpc_jump_position(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[32];
+	asm volatile {
+		opword 0x7C7C1B78
+		opword 0x7C9D2378
+		opword 0x83C30018
+		opword 0x809E0000
+		bl evtGetValue
+		opword 0x3B400000
+		lwz r27, nanNPCWork(r13)
+		opword 0x7C791B78
+		mr r24, r26
+		opword 0x4800004C
+		opword 0x807B0000
+		opword 0x57200001
+		opword 0x7FE3C214
+		opword 0x4082001C
+		opword 0x7F25CB78
+		la r3, makestring(r13)
+		la r4, str_8041C574(r2)
+		opword 0x4CC63182
+		bl sprintf
+		la r25, makestring(r13)
+		opword 0x7FE3FB78
+		opword 0x7F24CB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820008
+		opword 0x4800001C
+		opword 0x3B1800C0
+		opword 0x3B5A0001
+		opword 0x801B000C
+		opword 0x7C1A0000
+		opword 0x4180FFB0
+		opword 0x3BE00000
+		opword 0x809E0004
+		opword 0x7F83E378
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802f3040@ha
+		stw r3, _af_pad+4(r1)
+		addi r5, r4, double_to_int_802f3040@l
+		opword 0x809E0008
+		opword 0x90010008
+		opword 0x7F83E378
+		opword 0xC8250000
+		opword 0xC8010008
+		opword 0xEFE00828
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802f3040@ha
+		opword 0x90610014
+		addi r5, r4, double_to_int_802f3040@l
+		opword 0x809E000C
+		opword 0x90010010
+		opword 0x7F83E378
+		opword 0xC8250000
+		opword 0xC8010010
+		opword 0xEFC00828
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802f3040@ha
+		opword 0x9061001C
+		addi r5, r4, double_to_int_802f3040@l
+		opword 0x809E0010
+		opword 0x90010018
+		opword 0x7F83E378
+		opword 0xC8250000
+		opword 0xC8010018
+		fsubs f29, f0, f1
+		bl evtGetValue
+		opword 0x809E0014
+		opword 0x7C7E1B78
+		opword 0x7F83E378
+		bl evtGetValue
+		opword 0x6C608000
+		opword 0x3C804330
+		opword 0x90010024
+		lis r3, double_to_int_802f3040@ha
+		lfd f2, double_to_int_802f3040@l(r3)
+		opword 0x2C1D0000
+		opword 0x90810020
+		opword 0xC8010020
+		opword 0xEC201028
+		opword 0x41820088
+		lwz r3, gp(r13)
+		lfs f0, float_neg4_8041c57c(r2)
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0xEC000072
+		opword 0x90810008
+		opword 0x907F0054
+		opword 0x901F0050
+		opword 0xC03F0018
+		opword 0xFC20081E
+		opword 0xD8210020
+		opword 0x80010024
+		opword 0x901F0068
+		opword 0xC03F001C
+		opword 0xFC20081E
+		opword 0xD8210018
+		opword 0x8001001C
+		opword 0x901F006C
+		opword 0xC03F0020
+		opword 0xFC20081E
+		opword 0xD8210010
+		opword 0x80010014
+		opword 0x901F0070
+		opword 0xD01C007C
+		opword 0x801F006C
+		opword 0xC01C007C
+		opword 0x6C008000
+		opword 0x9001000C
+		opword 0xC8210008
+		opword 0xEC211028
+		opword 0xEC3E0828
+		opword 0xEC010028
+		opword 0xD01C0080
+		opword 0x3C608000
+		lwz r4, gp(r13)
+		opword 0x800300F8
+		opword 0x3C601062
+		opword 0x38634DD3
+		opword 0x80BF0054
+		opword 0x5400F0BE
+		opword 0x8084003C
+		opword 0x7C030016
+		opword 0x7C652050
+		opword 0x5400D1BE
+		opword 0x7C830396
+		opword 0x7C04F000
+		opword 0x408000E8
+		opword 0x3CC04330
+		opword 0x6C808000
+		opword 0x90010024
+		opword 0x6FC38000
+		lis r5, double_to_int_802f3040@ha
+		opword 0x801F0068
+		opword 0x90C10020
+		opword 0xFC40F890
+		lfd f3, double_to_int_802f3040@l(r5)
+		opword 0x6C008000
+		opword 0xC8010020
+		opword 0x7C982378
+		opword 0x9061001C
+		opword 0xEC201828
+		opword 0x7FC5F378
+		opword 0x90C10018
+		opword 0x38600000
+		opword 0xC8010018
+		opword 0x90010014
+		opword 0xEC001828
+		opword 0x90C10010
+		opword 0xEFC10024
+		opword 0xC8010010
+		opword 0xEC201828
+		bl intplGetValue
+		opword 0xD03F0018
+		opword 0x3C004330
+		lis r3, double_to_int_802f3040@ha
+		opword 0xFC40E890
+		opword 0x80BF0070
+		opword 0x7F04C378
+		opword 0x90010008
+		opword 0x6CA08000
+		lfd f1, double_to_int_802f3040@l(r3)
+		opword 0x9001000C
+		opword 0x7FC5F378
+		opword 0x38600000
+		opword 0xC8010008
+		opword 0xEC200828
+		bl intplGetValue
+		opword 0xD03F0020
+		opword 0x3C004330
+		lis r4, double_to_int_802f3040@ha
+		opword 0x38600000
+		opword 0x80BF006C
+		opword 0x90010028
+		opword 0x6CA08000
+		opword 0xC07C007C
+		opword 0x9001002C
+		opword 0xC05C0080
+		lfd f1, double_to_int_802f3040@l(r4)
+		opword 0xC8010028
+		opword 0xEC4317BA
+		opword 0xEC000828
+		opword 0xEC1E00BA
+		opword 0xD01F001C
+		opword 0x48000014
+		opword 0xD3FF0018
+		opword 0x38600002
+		opword 0xD3DF001C
+		opword 0xD3BF0020
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_flag_onoff) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_flag_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     s32 name = evtGetValue(event, args[0]);
     s32 onoff = evtGetValue(event, args[1]);
@@ -789,10 +1373,13 @@ USER_FUNC(evt_nannpc_flag_onoff) {
     }
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_ppflag_onoff) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_ppflag_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     s32 name = evtGetValue(event, args[0]);
     s32 onoff = evtGetValue(event, args[1]);
@@ -805,29 +1392,38 @@ USER_FUNC(evt_nannpc_ppflag_onoff) {
     }
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_func) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_func(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->func = (void (*)(NanNPC*))evtGetValue(event, args[1]);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_shadow_position) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_shadow_position(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->pose->flags |= 0x10;
     npc->pose->shadowY = evtGetFloat(event, args[1]);
     return 2;
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_nannpc_set_color) {
+#endif
+#ifndef NONMATCHING
+s32 evt_nannpc_set_color(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     NanNPC* npc = nanNPCSearch((char*)evtGetValue(event, args[0]));
     npc->color.r = evtGetValue(event, args[1]);
@@ -836,12 +1432,16 @@ USER_FUNC(evt_nannpc_set_color) {
     npc->color.a = evtGetValue(event, args[4]);
     return 2;
 }
-#endif
 
+#ifdef NONMATCHING
 #pragma force_active on
 #pragma explicit_zero_data on
-#ifdef NONMATCHING
 USER_FUNC(evt_nannpcwork_flag_onoff) {
+#endif
+#ifndef NONMATCHING
+#pragma defer_codegen off
+s32 evt_nannpcwork_flag_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
     s32* args = event->args;
     s32 onoff = evtGetValue(event, args[0]);
     NanNPCWork* w = nanNPCWork;
@@ -853,1303 +1453,15 @@ USER_FUNC(evt_nannpcwork_flag_onoff) {
     }
     return 2;
 }
+#ifdef NONMATCHING
+#pragma explicit_zero_data reset
+#pragma force_active reset
 #endif
-#pragma explicit_zero_data reset
-#pragma force_active reset
-
-#pragma force_active on
-#pragma explicit_zero_data on
-#pragma explicit_zero_data reset
-#pragma force_active reset
 
 #ifndef NONMATCHING
-// ASM-STOPGAP: nanNPCOption (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+#pragma defer_codegen reset
 
-asm s32 evt_nannpcwork_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	mr r28, r3
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	lwz r29, nanNPCWork(r0)
-	mr r31, r3
-	lwz r4, 0x4(r30)
-	mr r3, r28
-	bl evtGetValue
-	cmpwi r31, 0x0
-	clrlwi r4, r3, 16
-	beq @1
-	lwz r3, 0x10(r29)
-	andc r0, r3, r4
-	stw r0, 0x10(r29)
-	b @2
-	@1:
-	lwz r0, 0x10(r29)
-	or r0, r0, r4
-	stw r0, 0x10(r29)
-	@2:
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 evt_nannpc_set_color(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	stb r3, 0xbc(r30)
-	mr r3, r25
-	lwz r4, 0x8(r26)
-	bl evtGetValue
-	stb r3, 0xbd(r30)
-	mr r3, r25
-	lwz r4, 0xc(r26)
-	bl evtGetValue
-	stb r3, 0xbe(r30)
-	mr r3, r25
-	lwz r4, 0x10(r26)
-	bl evtGetValue
-	stb r3, 0xbf(r30)
-	li r3, 0x2
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_shadow_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x10(r30)
-	mr r3, r25
-	lwz r0, 0x0(r4)
-	ori r0, r0, 0x10
-	stw r0, 0x0(r4)
-	lwz r4, 0x4(r26)
-	bl evtGetFloat
-	lwz r4, 0x10(r30)
-	li r3, 0x2
-	stfs f1, 0x8(r4)
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_func(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	stw r3, 0x64(r30)
-	li r3, 0x2
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_ppflag_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r24, 0x10(r1)
-	mr r24, r3
-	lwz r25, 0x18(r3)
-	lwz r4, 0x0(r25)
-	bl evtGetValue
-	lwz r4, 0x4(r25)
-	mr r26, r3
-	mr r3, r24
-	bl evtGetValue
-	li r28, 0x0
-	lwz r30, nanNPCWork(r0)
-	mr r31, r3
-	mr r27, r26
-	mr r26, r28
-	b @1
-	@2:
-	lwz r3, 0x0(r30)
-	clrrwi. r0, r27, 31
-	add r29, r3, r26
-	bne @3
-	mr r5, r27
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r27, makestring(r0)
-	@3:
-	mr r3, r29
-	mr r4, r27
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r26, r26, 0xc0
-	addi r28, r28, 0x1
-	@1:
-	lwz r0, 0xc(r30)
-	cmpw r28, r0
-	blt @2
-	li r29, 0x0
-	@5:
-	lwz r4, 0x8(r25)
-	mr r3, r24
-	bl evtGetValue
-	cmpwi r31, 0x0
-	clrlwi r5, r3, 16
-	beq @6
-	lwz r4, 0x10(r29)
-	lwz r3, 0x0(r4)
-	andc r0, r3, r5
-	stw r0, 0x0(r4)
-	b @7
-	@6:
-	lwz r3, 0x10(r29)
-	lwz r0, 0x0(r3)
-	or r0, r0, r5
-	stw r0, 0x0(r3)
-	@7:
-	lmw r24, 0x10(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r24, 0x10(r1)
-	mr r24, r3
-	lwz r25, 0x18(r3)
-	lwz r4, 0x0(r25)
-	bl evtGetValue
-	lwz r4, 0x4(r25)
-	mr r26, r3
-	mr r3, r24
-	bl evtGetValue
-	li r28, 0x0
-	lwz r30, nanNPCWork(r0)
-	mr r31, r3
-	mr r27, r26
-	mr r26, r28
-	b @1
-	@2:
-	lwz r3, 0x0(r30)
-	clrrwi. r0, r27, 31
-	add r29, r3, r26
-	bne @3
-	mr r5, r27
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r27, makestring(r0)
-	@3:
-	mr r3, r29
-	mr r4, r27
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r26, r26, 0xc0
-	addi r28, r28, 0x1
-	@1:
-	lwz r0, 0xc(r30)
-	cmpw r28, r0
-	blt @2
-	li r29, 0x0
-	@5:
-	lwz r4, 0x8(r25)
-	mr r3, r24
-	bl evtGetValue
-	cmpwi r31, 0x0
-	clrlwi r3, r3, 16
-	beq @6
-	lhz r0, 0x14(r29)
-	andc r0, r0, r3
-	sth r0, 0x14(r29)
-	b @7
-	@6:
-	lhz r0, 0x14(r29)
-	or r0, r0, r3
-	sth r0, 0x14(r29)
-	@7:
-	lmw r24, 0x10(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_jump_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stfd f29, 0x50(r1)
-	psq_st f29, 0x58(r1), 0, 0
-	stmw r24, 0x30(r1)
-	mr r28, r3
-	mr r29, r4
-	lwz r30, 0x18(r3)
-	lwz r4, 0x0(r30)
-	bl evtGetValue
-	li r26, 0x0
-	lwz r27, nanNPCWork(r0)
-	mr r25, r3
-	mr r24, r26
-	b @1
-	@2:
-	lwz r3, 0x0(r27)
-	clrrwi. r0, r25, 31
-	add r31, r3, r24
-	bne @3
-	mr r5, r25
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r25, makestring(r0)
-	@3:
-	mr r3, r31
-	mr r4, r25
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r24, r24, 0xc0
-	addi r26, r26, 0x1
-	@1:
-	lwz r0, 0xc(r27)
-	cmpw r26, r0
-	blt @2
-	li r31, 0x0
-	@5:
-	lwz r4, 0x4(r30)
-	mr r3, r28
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802f3040@ha
-	stw r3, 0xc(r1)
-	addi r5, r4, double_to_int_802f3040@l
-	lwz r4, 0x8(r30)
-	stw r0, 0x8(r1)
-	mr r3, r28
-	lfd f1, 0x0(r5)
-	lfd f0, 0x8(r1)
-	fsubs f31, f0, f1
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802f3040@ha
-	stw r3, 0x14(r1)
-	addi r5, r4, double_to_int_802f3040@l
-	lwz r4, 0xc(r30)
-	stw r0, 0x10(r1)
-	mr r3, r28
-	lfd f1, 0x0(r5)
-	lfd f0, 0x10(r1)
-	fsubs f30, f0, f1
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802f3040@ha
-	stw r3, 0x1c(r1)
-	addi r5, r4, double_to_int_802f3040@l
-	lwz r4, 0x10(r30)
-	stw r0, 0x18(r1)
-	mr r3, r28
-	lfd f1, 0x0(r5)
-	lfd f0, 0x18(r1)
-	fsubs f29, f0, f1
-	bl evtGetValue
-	lwz r4, 0x14(r30)
-	mr r30, r3
-	mr r3, r28
-	bl evtGetValue
-	xoris r0, r3, 0x8000
-	lis r4, 0x4330
-	stw r0, 0x24(r1)
-	lis r3, double_to_int_802f3040@ha
-	lfd f2, double_to_int_802f3040@l(r3)
-	cmpwi r29, 0x0
-	stw r4, 0x20(r1)
-	lfd f0, 0x20(r1)
-	fsubs f1, f0, f2
-	beq @6
-	lwz r3, gp(r0)
-	lfs f0, float_neg4_8041c57c(r0)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	fmuls f0, f0, f1
-	stw r4, 0x8(r1)
-	stw r3, 0x54(r31)
-	stw r0, 0x50(r31)
-	lfs f1, 0x18(r31)
-	fctiwz f1, f1
-	stfd f1, 0x20(r1)
-	lwz r0, 0x24(r1)
-	stw r0, 0x68(r31)
-	lfs f1, 0x1c(r31)
-	fctiwz f1, f1
-	stfd f1, 0x18(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x6c(r31)
-	lfs f1, 0x20(r31)
-	fctiwz f1, f1
-	stfd f1, 0x10(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0x70(r31)
-	stfs f0, 0x7c(r28)
-	lwz r0, 0x6c(r31)
-	lfs f0, 0x7c(r28)
-	xoris r0, r0, 0x8000
-	stw r0, 0xc(r1)
-	lfd f1, 0x8(r1)
-	fsubs f1, f1, f2
-	fsubs f1, f30, f1
-	fsubs f0, f1, f0
-	stfs f0, 0x80(r28)
-	@6:
-	lis r3, 0x8000
-	lwz r4, gp(r0)
-	lwz r0, 0xf8(r3)
-	lis r3, 0x1062
-	addi r3, r3, 0x4dd3
-	lwz r5, 0x54(r31)
-	srwi r0, r0, 2
-	lwz r4, 0x3c(r4)
-	mulhwu r0, r3, r0
-	subf r3, r5, r4
-	srwi r0, r0, 6
-	divwu r4, r3, r0
-	cmpw r4, r30
-	bge @7
-	lis r6, 0x4330
-	xoris r0, r4, 0x8000
-	stw r0, 0x24(r1)
-	xoris r3, r30, 0x8000
-	lis r5, double_to_int_802f3040@ha
-	lwz r0, 0x68(r31)
-	stw r6, 0x20(r1)
-	fmr f2, f31
-	lfd f3, double_to_int_802f3040@l(r5)
-	xoris r0, r0, 0x8000
-	lfd f0, 0x20(r1)
-	mr r24, r4
-	stw r3, 0x1c(r1)
-	fsubs f1, f0, f3
-	mr r5, r30
-	stw r6, 0x18(r1)
-	li r3, 0x0
-	lfd f0, 0x18(r1)
-	stw r0, 0x14(r1)
-	fsubs f0, f0, f3
-	stw r6, 0x10(r1)
-	fdivs f30, f1, f0
-	lfd f0, 0x10(r1)
-	fsubs f1, f0, f3
-	bl intplGetValue
-	stfs f1, 0x18(r31)
-	lis r0, 0x4330
-	lis r3, double_to_int_802f3040@ha
-	fmr f2, f29
-	lwz r5, 0x70(r31)
-	mr r4, r24
-	stw r0, 0x8(r1)
-	xoris r0, r5, 0x8000
-	lfd f1, double_to_int_802f3040@l(r3)
-	stw r0, 0xc(r1)
-	mr r5, r30
-	li r3, 0x0
-	lfd f0, 0x8(r1)
-	fsubs f1, f0, f1
-	bl intplGetValue
-	stfs f1, 0x20(r31)
-	lis r0, 0x4330
-	lis r4, double_to_int_802f3040@ha
-	li r3, 0x0
-	lwz r5, 0x6c(r31)
-	stw r0, 0x28(r1)
-	xoris r0, r5, 0x8000
-	lfs f3, 0x7c(r28)
-	stw r0, 0x2c(r1)
-	lfs f2, 0x80(r28)
-	lfd f1, double_to_int_802f3040@l(r4)
-	lfd f0, 0x28(r1)
-	fmadds f2, f3, f30, f2
-	fsubs f0, f0, f1
-	fmadds f0, f30, f2, f0
-	stfs f0, 0x1c(r31)
-	b @8
-	@7:
-	stfs f31, 0x18(r31)
-	li r3, 0x2
-	stfs f30, 0x1c(r31)
-	stfs f29, 0x20(r31)
-	@8:
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	psq_l f29, 0x58(r1), 0, 0
-	lfd f29, 0x50(r1)
-	lmw r24, 0x30(r1)
-	lwz r0, 0x84(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm s32 evt_nannpc_move_position2(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stmw r24, 0x50(r1)
-	mr r26, r3
-	mr r27, r4
-	lwz r28, 0x18(r3)
-	lwz r4, 0x0(r28)
-	bl evtGetValue
-	li r30, 0x0
-	lwz r29, nanNPCWork(r0)
-	mr r25, r3
-	mr r24, r30
-	b @1
-	@2:
-	lwz r3, 0x0(r29)
-	clrrwi. r0, r25, 31
-	add r31, r3, r24
-	bne @3
-	mr r5, r25
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r25, makestring(r0)
-	@3:
-	mr r3, r31
-	mr r4, r25
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r24, r24, 0xc0
-	addi r30, r30, 0x1
-	@1:
-	lwz r0, 0xc(r29)
-	cmpw r30, r0
-	blt @2
-	li r31, 0x0
-	@5:
-	lwz r3, gp(r0)
-	lwz r0, 0x14(r3)
-	cmpwi r0, 0x0
-	beq @6
-	lwz r30, 0x38(r3)
-	lwz r29, 0x3c(r3)
-	b @7
-	@6:
-	lwz r30, 0x40(r3)
-	lwz r29, 0x44(r3)
-	@7:
-	lwz r4, 0x4(r28)
-	mr r3, r26
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x34(r1)
-	lis r4, double_to_int_802f3040@ha
-	lfd f1, double_to_int_802f3040@l(r4)
-	mr r3, r26
-	stw r0, 0x30(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x20(r1)
-	lwz r4, 0x8(r28)
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x3c(r1)
-	lis r4, double_to_int_802f3040@ha
-	lfd f1, double_to_int_802f3040@l(r4)
-	mr r3, r26
-	stw r0, 0x38(r1)
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x24(r1)
-	lwz r4, 0xc(r28)
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x44(r1)
-	lis r4, double_to_int_802f3040@ha
-	lfd f1, double_to_int_802f3040@l(r4)
-	mr r3, r26
-	stw r0, 0x40(r1)
-	lfd f0, 0x40(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x28(r1)
-	lwz r4, 0x10(r28)
-	bl evtGetFloat
-	fmr f31, f1
-	cmpwi r27, 0x0
-	beq @8
-	stw r29, 0x19c(r26)
-	stw r30, 0x198(r26)
-	lwz r3, 0x18(r31)
-	lwz r0, 0x1c(r31)
-	stw r3, 0x88(r31)
-	stw r0, 0x8c(r31)
-	lwz r0, 0x20(r31)
-	stw r0, 0x90(r31)
-	@8:
-	addi r3, r1, 0x20
-	addi r4, r31, 0x88
-	addi r5, r1, 0x14
-	bl PSVECSubtract
-	addi r3, r1, 0x14
-	bl PSVECMag
-	lfs f0, float_1000_8041c580(r0)
-	lis r3, 0x8000
-	lwz r0, 0xf8(r3)
-	lis r3, 0x1062
-	fmuls f0, f0, f1
-	lwz r4, 0x19c(r26)
-	srwi r0, r0, 2
-	addi r3, r3, 0x4dd3
-	mulhwu r0, r3, r0
-	subf r4, r4, r29
-	fdivs f0, f0, f31
-	srawi r3, r4, 31
-	li r5, 0x0
-	srwi r6, r0, 6
-	fctiwz f0, f0
-	stfd f0, 0x40(r1)
-	lwz r24, 0x44(r1)
-	bl __div2u
-	mr r26, r4
-	lis r5, 0x4330
-	xoris r3, r26, 0x8000
-	xoris r0, r24, 0x8000
-	lis r4, double_to_int_802f3040@ha
-	stw r3, 0x3c(r1)
-	addi r6, r4, double_to_int_802f3040@l
-	addi r3, r1, 0x14
-	stw r5, 0x38(r1)
-	addi r4, r1, 0x8
-	lfd f2, 0x0(r6)
-	lfd f0, 0x38(r1)
-	stw r0, 0x34(r1)
-	fsubs f1, f0, f2
-	stw r5, 0x30(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f2
-	fdivs f1, f1, f0
-	bl PSVECScale
-	cmpw r26, r24
-	bge @9
-	addi r3, r31, 0x88
-	addi r4, r1, 0x8
-	addi r5, r31, 0x18
-	bl PSVECAdd
-	li r3, 0x0
-	b @10
-	@9:
-	lwz r4, 0x20(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	stw r4, 0x18(r31)
-	stw r0, 0x1c(r31)
-	lwz r0, 0x28(r1)
-	stw r0, 0x20(r31)
-	@10:
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	lmw r24, 0x50(r1)
-	lwz r0, 0x84(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm s32 evt_nannpc_get_work(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	slwi r0, r3, 2
-	lwz r4, 0x8(r26)
-	add r5, r30, r0
-	mr r3, r25
-	lwz r5, 0xa4(r5)
-	bl evtSetValue
-	lmw r25, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_work(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	lwz r4, 0x8(r26)
-	mr r31, r3
-	mr r3, r25
-	bl evtGetValue
-	slwi r0, r31, 2
-	add r4, r30, r0
-	stw r3, 0xa4(r4)
-	li r3, 0x2
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_dir(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xc(r1)
-	lis r4, double_to_int_802f3040@ha
-	lfd f1, double_to_int_802f3040@l(r4)
-	li r3, 0x2
-	stw r0, 0x8(r1)
-	lfd f0, 0x8(r1)
-	fsubs f0, f0, f1
-	stfs f0, 0x60(r30)
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_animtbl(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetValue
-	li r4, 0x0
-	stw r3, 0x58(r30)
-	@6:
-	lha r0, 0x0(r3)
-	cmpwi r0, -0x1
-	beq @7
-	addi r3, r3, 0x2
-	addi r4, r4, 0x1
-	b @6
-	@7:
-	sth r4, 0x5c(r30)
-	lha r0, 0x5c(r30)
-	cmpwi r0, 0x0
-	bne @8
-	li r0, 0x0
-	stw r0, 0x58(r30)
-	@8:
-	lmw r25, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl) {
-	nofralloc
-	li r5, 0x0
-	stw r4, 0x58(r3)
-	@1:
-	lha r0, 0x0(r4)
-	cmpwi r0, -0x1
-	beq @2
-	addi r4, r4, 0x2
-	addi r5, r5, 0x1
-	b @1
-	@2:
-	sth r5, 0x5c(r3)
-	lha r0, 0x5c(r3)
-	cmpwi r0, 0x0
-	bnelr
-	li r0, 0x0
-	stw r0, 0x58(r3)
-	blr
-}
-
-asm s32 evt_nannpc_set_size(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetFloat
-	stfs f1, 0x48(r30)
-	mr r3, r25
-	lwz r4, 0x8(r26)
-	bl evtGetFloat
-	stfs f1, 0x4c(r30)
-	li r3, 0x2
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_hosei_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetFloat
-	stfs f1, 0x24(r30)
-	mr r3, r25
-	lwz r4, 0x8(r26)
-	bl evtGetFloat
-	stfs f1, 0x28(r30)
-	mr r3, r25
-	lwz r4, 0xc(r26)
-	bl evtGetFloat
-	stfs f1, 0x2c(r30)
-	li r3, 0x2
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_get_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	lfs f1, 0x18(r30)
-	bl evtSetFloat
-	lwz r4, 0x8(r26)
-	mr r3, r25
-	lfs f1, 0x1c(r30)
-	bl evtSetFloat
-	lwz r4, 0xc(r26)
-	mr r3, r25
-	lfs f1, 0x20(r30)
-	bl evtSetFloat
-	lmw r25, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm s32 evt_nannpc_set_position(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r25, 0x14(r1)
-	mr r25, r3
-	lwz r26, 0x18(r3)
-	lwz r4, 0x0(r26)
-	bl evtGetValue
-	li r29, 0x0
-	lwz r31, nanNPCWork(r0)
-	mr r28, r3
-	mr r27, r29
-	b @1
-	@2:
-	lwz r3, 0x0(r31)
-	clrrwi. r0, r28, 31
-	add r30, r3, r27
-	bne @3
-	mr r5, r28
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
-	crclr 6
-	bl sprintf
-	la r28, makestring(r0)
-	@3:
-	mr r3, r30
-	mr r4, r28
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @4
-	b @5
-	@4:
-	addi r27, r27, 0xc0
-	addi r29, r29, 0x1
-	@1:
-	lwz r0, 0xc(r31)
-	cmpw r29, r0
-	blt @2
-	li r30, 0x0
-	@5:
-	lwz r4, 0x4(r26)
-	mr r3, r25
-	bl evtGetFloat
-	stfs f1, 0x18(r30)
-	mr r3, r25
-	stfs f1, 0x30(r30)
-	lwz r4, 0x8(r26)
-	bl evtGetFloat
-	stfs f1, 0x1c(r30)
-	mr r3, r25
-	stfs f1, 0x34(r30)
-	lwz r4, 0xc(r26)
-	bl evtGetFloat
-	stfs f1, 0x20(r30)
-	li r3, 0x2
-	stfs f1, 0x38(r30)
-	lmw r25, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
 asm s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall) {
 	nofralloc
 	stwu r1, -0x30(r1)
@@ -2165,40 +1477,40 @@ asm s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall) {
 	mr r28, r3
 	mr r3, r23
 	bl evtGetValue
-	lwz r23, nanNPCWork(r0)
+	lwz r23, nanNPCWork(r13)
 	mr r25, r3
 	li r24, 0x0
 	li r26, 0x0
 	clrrwi r29, r3, 31
-	b @1
-	@2:
+	b L_af_1
+L_af_2:
 	lwz r0, 0x0(r23)
 	cmplwi r29, 0x0
 	mr r27, r25
 	add r30, r0, r26
-	bne @3
+	bne L_af_3
 	mr r5, r25
-	la r3, makestring(r0)
-	la r4, str_8041C574(r0)
+	la r3, makestring(r13)
+	la r4, str_8041C574(r2)
 	crclr 6
 	bl sprintf
-	la r27, makestring(r0)
-	@3:
+	la r27, makestring(r13)
+L_af_3:
 	mr r3, r30
 	mr r4, r27
 	bl strcmp
 	lwz r0, 0x10(r30)
 	cmplwi r0, 0x0
-	bne @4
+	bne L_af_4
 	mr r3, r30
 	mr r4, r27
 	bl strcpy
 	slwi r0, r24, 5
 	li r4, 0x0
 	add r0, r28, r0
-	lfs f1, float_32_8041c584(r0)
+	lfs f1, float_32_8041c584(r2)
 	stw r0, 0x10(r30)
-	lfs f0, float_0_8041c588(r0)
+	lfs f0, float_0_8041c588(r2)
 	sth r4, 0x14(r30)
 	sth r4, 0x16(r30)
 	lwz r3, 0x24(r31)
@@ -2229,17 +1541,17 @@ asm s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall) {
 	lwz r3, 0x10(r30)
 	fneg f0, f0
 	stfs f0, 0x4(r3)
-	lwz r0, dat_8041c570(r0)
+	lwz r0, dat_8041c570(r2)
 	stw r0, 0xbc(r30)
-	b @5
-	@4:
+	b L_af_5
+L_af_4:
 	addi r26, r26, 0xc0
 	addi r24, r24, 0x1
-	@1:
+L_af_1:
 	lwz r0, 0xc(r23)
 	cmpw r24, r0
-	blt @2
-	@5:
+	blt L_af_2
+L_af_5:
 	lmw r23, 0xc(r1)
 	li r3, 0x2
 	lwz r0, 0x34(r1)
@@ -2248,1055 +1560,898 @@ asm s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall) {
 	blr
 }
 
-asm s32 evt_nannpc_set_subfunc(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	cmpwi r3, 0x1
-	lwz r30, nanNPCWork(r0)
-	beq @1
-	bge @2
-	cmpwi r3, 0x0
-	bge @3
-	b @4
-	@2:
-	cmpwi r3, 0x3
-	bge @4
-	b @5
-	@3:
-	lwz r4, 0x4(r31)
-	mr r3, r29
-	bl evtGetValue
-	stw r3, 0x14(r30)
-	b @4
-	@1:
-	lwz r4, 0x4(r31)
-	mr r3, r29
-	bl evtGetValue
-	stw r3, 0x18(r30)
-	b @4
-	@5:
-	lwz r4, 0x4(r31)
-	mr r3, r29
-	bl evtGetValue
-	stw r3, 0x1c(r30)
-	@4:
-	lwz r0, 0x24(r1)
-	li r3, 0x2
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void nanNPCOption(void) {
+	char _af_pad[156];
+	asm volatile {
+		lwz r26, nanNPCWork(r13)
+		opword 0x831A0000
+		opword 0x480000D8
+		opword 0xA0180014
+		opword 0x5400077B
+		opword 0x418200C8
+		opword 0x480000AC
+		opword 0x7C18B840
+		opword 0x418200A0
+		opword 0xA0170014
+		opword 0x5400077B
+		opword 0x41820094
+		opword 0x38780018
+		opword 0x38970018
+		bl PSVECDistance
+		opword 0xFFE00890
+		opword 0x38780018
+		opword 0x38970018
+		la r5, _af_pad+136
+		bl PSVECSubtract
+		opword 0xC018004C
+		opword 0xFC1F0040
+		opword 0x4C401382
+		opword 0x40820064
+		opword 0x38610090
+		bl PSVECMag
+		lfs f0, float_0_8041c588(r2)
+		opword 0xFC000800
+		opword 0x4082000C
+		lfs f0, float_1_8041c590(r2)
+		opword 0xD0010090
+		opword 0x38610090
+		opword 0x7C641B78
+		bl PSVECNormalize
+		lfs f0, float_0_8041c588(r2)
+		opword 0x38610090
+		lfs f1, float_0p5_8041c594(r2)
+		opword 0x7C641B78
+		opword 0xD0010094
+		bl PSVECScale
+		opword 0x3878003C
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x3877003C
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSVECSubtract
+		opword 0x3AF700C0
+		opword 0x801A000C
+		opword 0x807A0000
+		opword 0x1C0000C0
+		opword 0x7C030214
+		opword 0x7C170040
+		opword 0x4180FF44
+		opword 0x3B1800C0
+		opword 0x801A000C
+		lwz r23, 0x0(r26)
+		opword 0x1C0000C0
+		opword 0x7C170214
+		opword 0x7C180040
+		opword 0x4180FF18
+		opword 0x48000074
+		opword 0xA0170014
+		opword 0x5400077B
+		opword 0x41820064
+		opword 0x38770030
+		opword 0x38970018
+		opword 0x38A10090
+		bl PSVECSubtract
+		opword 0x38610090
+		bl PSVECMag
+		lfs f2, float_0p8_8041c598(r2)
+		opword 0xC017004C
+		opword 0xEC020032
+		opword 0xFC010040
+		opword 0x40810038
+		opword 0x38610090
+		opword 0x7C641B78
+		bl PSVECNormalize
+		lfs f0, float_0_8041c588(r2)
+		opword 0x38610090
+		lfs f1, float_0p5_8041c594(r2)
+		opword 0x7C641B78
+		opword 0xD0010094
+		bl PSVECScale
+		opword 0x3877003C
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x3AF700C0
+		opword 0x801A000C
+		opword 0x833A0000
+		opword 0x1C0000C0
+		opword 0x7C190214
+		opword 0x7C170040
+		opword 0x4180FF7C
+		opword 0x3BC10038
+		opword 0x3BA10034
+		opword 0x3B81002C
+		opword 0x3B610028
+		opword 0x480002D4
+		opword 0xA0190014
+		opword 0x5400077B
+		opword 0x418202C4
+		opword 0x3879003C
+		bl PSVECMag
+		opword 0xFFE00890
+		lfs f0, float_0_8041c588(r2)
+		opword 0xFC1F0000
+		opword 0x418202AC
+		lfs f0, float_10_8041c59c(r2)
+		opword 0xFC1F0040
+		opword 0x4081001C
+		lfs f0, float_5_8041c5a0(r2)
+		opword 0x3879003C
+		opword 0x7C641B78
+		opword 0xEC20F824
+		bl PSVECScale
+		lfs f31, float_5_8041c5a0(r2)
+		opword 0x8019001C
+		opword 0x3879003C
+		opword 0x80B90018
+		opword 0x3881006C
+		opword 0x90010064
+		opword 0x80190020
+		opword 0xC0210064
+		lfs f0, float_1_8041c590(r2)
+		opword 0x90A10060
+		opword 0xEC01002A
+		opword 0x90010068
+		opword 0xD0010064
+		bl PSVECNormalize
+		opword 0xA0190014
+		opword 0x54000739
+		opword 0x41820028
+		opword 0x38790018
+		opword 0x3899003C
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x3879003C
+		lfs f1, float_0p6_8041c5a4(r2)
+		opword 0x7C641B78
+		bl PSVECScale
+		opword 0x48000224
+		opword 0x8061006C
+		opword 0x38000000
+		opword 0x82E10070
+		opword 0x7F65DB78
+		opword 0x83010074
+		opword 0x7F86E378
+		opword 0x90610084
+		opword 0x7FA9EB78
+		opword 0x80610060
+		opword 0x7FCAF378
+		opword 0x81810064
+		opword 0x38810024
+		opword 0x81610068
+		opword 0x38E10020
+		opword 0x90610078
+		opword 0x39010030
+		opword 0x3BE00001
+		opword 0x38600000
+		opword 0x9181007C
+		opword 0xC0210078
+		opword 0x91610080
+		opword 0xC041007C
+		opword 0x92E10088
+		opword 0xC0610080
+		opword 0x9301008C
+		opword 0x901900B8
+		opword 0x901900B4
+		opword 0xD3E10020
+		opword 0xC0810084
+		opword 0xC0A10088
+		opword 0xC0C1008C
+		bl hitCheckFilter
+		opword 0x907900B4
+		opword 0x801900B4
+		opword 0x28000000
+		opword 0x40820018
+		opword 0x38790018
+		opword 0x3899003C
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x48000168
+		opword 0x80D90018
+		opword 0x38790018
+		opword 0x8019001C
+		opword 0x7C651B78
+		opword 0x3899003C
+		opword 0x90C10048
+		opword 0x9001004C
+		opword 0x80190020
+		opword 0x90010050
+		bl PSVECAdd
+		lfs f1, float_0_8041c588(r2)
+		opword 0xC0190040
+		opword 0xFC010000
+		opword 0x40820008
+		opword 0xD0210034
+		opword 0x38610030
+		opword 0x7C641B78
+		bl PSVECNormalize
+		opword 0x38610084
+		opword 0x38810030
+		opword 0x38A10054
+		bl C_VECReflect
+		opword 0xFC20F890
+		opword 0x38610054
+		opword 0x3899003C
+		bl PSVECScale
+		opword 0x38610084
+		opword 0x38810030
+		opword 0x3BE00000
+		bl PSVECDotProduct
+		opword 0xC0410020
+		opword 0x38610030
+		lfs f0, float_0p1_8041c5a8(r2)
+		opword 0x7C641B78
+		opword 0xEC5F1028
+		opword 0xFC401050
+		opword 0xEC2100BA
+		bl PSVECScale
+		opword 0x38790018
+		opword 0x38810030
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x38790018
+		opword 0x38810048
+		opword 0x38A1003C
+		bl PSVECSubtract
+		opword 0x3861003C
+		bl PSVECMag
+		opword 0xFC400818
+		lfs f0, float_0_8041c588(r2)
+		opword 0xD0210020
+		opword 0xFC020040
+		opword 0x40810094
+		opword 0x3861003C
+		opword 0x7C641B78
+		bl PSVECNormalize
+		lfs f1, float_1_8041c590(r2)
+		opword 0x38810008
+		opword 0xC001004C
+		opword 0x38A1000C
+		opword 0x81010048
+		opword 0x38C10010
+		opword 0x8061004C
+		opword 0xEC41002A
+		opword 0x80010050
+		opword 0x38E10020
+		opword 0x91010078
+		opword 0x39010014
+		opword 0xC0210048
+		opword 0x9061007C
+		opword 0x39210018
+		opword 0xC0610050
+		opword 0x3941001C
+		opword 0x90010080
+		opword 0x38600000
+		opword 0xC081003C
+		opword 0xC0A10040
+		opword 0xC0C10044
+		bl hitCheckFilter
+		opword 0x907900B8
+		opword 0x801900B8
+		opword 0x28000000
+		opword 0x4182001C
+		opword 0x80610048
+		opword 0x8001004C
+		opword 0x90790018
+		opword 0x9019001C
+		opword 0x80010050
+		opword 0x90190020
+		opword 0x2C1F0000
+		opword 0x41820014
+		opword 0x3879003C
+		lfs f1, float_0p6_8041c5a4(r2)
+		opword 0x7C641B78
+		bl PSVECScale
+		opword 0x3B3900C0
+		opword 0x801A000C
+		opword 0x807A0000
+		opword 0x1C0000C0
+		opword 0x7C030214
+		opword 0x7C190040
+		opword 0x4180FD1C
+	}
+}
+#pragma pop
+
+s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
+    if (a->z < b->z) {
+        return 1;
+    }
+    if (a->z > b->z) {
+        return -1;
+    }
+    return 0;
 }
 
-asm s32 evt_nannpc_init(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	lis r5, vec3_802f2ff8@ha
-	stw r0, 0x34(r1)
-	stmw r23, 0xc(r1)
-	mr r25, r4
-	mr r23, r3
-	addi r30, r5, vec3_802f2ff8@l
-	lwz r24, 0x18(r3)
-	lwz r4, 0x0(r24)
-	bl evtGetValue
-	lwz r4, 0x4(r24)
-	mr r28, r3
-	mr r3, r23
-	bl evtGetValue
-	lwz r4, 0x8(r24)
-	mr r31, r3
-	mr r3, r23
-	bl evtGetValue
-	lwz r4, 0xc(r24)
-	mr r27, r3
-	mr r3, r23
-	bl evtGetValue
-	lis r4, nannpc_ext_dispent@ha
-	cmpwi r25, 0x0
-	addi r0, r4, nannpc_ext_dispent@l
-	mr r26, r3
-	mr r25, r0
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	li r3, 0x20
-	bl _mapAlloc
-	stw r3, nanNPCWork(r0)
-	li r4, 0x0
-	li r5, 0x20
-	bl memset
-	lwz r29, nanNPCWork(r0)
-	mr r3, r23
-	lwz r4, 0x10(r24)
-	bl evtGetValue
-	stw r3, 0xc(r29)
-	lwz r0, 0xc(r29)
-	mulli r3, r0, 0xc0
-	bl _mapAlloc
-	stw r3, 0x0(r29)
-	li r4, 0x0
-	lwz r0, 0xc(r29)
-	lwz r3, 0x0(r29)
-	mulli r5, r0, 0xc0
-	bl memset
-	lwz r0, 0xc(r29)
-	slwi r3, r0, 3
-	bl _mapAlloc
-	stw r3, 0x4(r29)
-	li r4, 0x0
-	lwz r0, 0xc(r29)
-	lwz r3, 0x4(r29)
-	slwi r5, r0, 3
-	bl memset
-	li r3, 0x14
-	bl _mapAlloc
-	stw r3, 0x8(r29)
-	li r4, 0x0
-	li r5, 0x14
-	lwz r3, 0x8(r29)
-	bl memset
-	li r4, 0x0
-	lis r3, nannpc_ext_main_sub@ha
-	stw r4, 0x14(r29)
-	addi r0, r3, nannpc_ext_main_sub@l
-	cmplwi r27, 0x0
-	lwz r3, nanNPCWork(r0)
-	stw r0, 0x18(r3)
-	stw r4, 0x1c(r29)
-	bne @3
-	lis r3, nannpc_ext_init@ha
-	addi r0, r3, nannpc_ext_init@l
-	mr r27, r0
-	@3:
-	cmplwi r26, 0x0
-	bne @4
-	lis r3, nannpc_ext_main@ha
-	addi r0, r3, nannpc_ext_main@l
-	mr r26, r0
-	@4:
-	lwz r3, 0xc(r29)
-	mr r4, r28
-	mr r5, r27
-	mr r6, r26
-	mr r7, r25
-	bl extEntry
-	lfs f1, float_32_8041c584(r0)
-	li r6, 0x0
-	lfs f0, float_0_8041c588(r0)
-	li r5, 0x0
-	b @5
-	@6:
-	lwz r0, 0x0(r29)
-	li r4, 0x0
-	addi r6, r6, 0x1
-	add r7, r0, r5
-	addi r5, r5, 0xc0
-	stb r4, 0x0(r7)
-	stw r4, 0x10(r7)
-	sth r4, 0x14(r7)
-	sth r4, 0x16(r7)
-	lwz r3, 0x0(r30)
-	lwz r0, 0x4(r30)
-	stw r3, 0x18(r7)
-	stw r0, 0x1c(r7)
-	lwz r0, 0x8(r30)
-	stw r0, 0x20(r7)
-	lwz r3, 0xc(r30)
-	lwz r0, 0x10(r30)
-	stw r3, 0x30(r7)
-	stw r0, 0x34(r7)
-	lwz r0, 0x14(r30)
-	stw r0, 0x38(r7)
-	lwz r3, 0x18(r30)
-	lwz r0, 0x1c(r30)
-	stw r3, 0x24(r7)
-	stw r0, 0x28(r7)
-	lwz r0, 0x20(r30)
-	stw r0, 0x2c(r7)
-	stfs f1, 0x48(r7)
-	stfs f1, 0x4c(r7)
-	stw r4, 0x54(r7)
-	stw r4, 0x50(r7)
-	stw r4, 0x58(r7)
-	sth r4, 0x5c(r7)
-	sth r4, 0x5e(r7)
-	stfs f0, 0x60(r7)
-	stw r4, 0x64(r7)
-	lwz r0, dat_8041c56c(r0)
-	stw r0, 0xbc(r7)
-	@5:
-	lwz r0, 0xc(r29)
-	cmpw r6, r0
-	blt @6
-	cmplwi r31, 0x0
-	bne @7
-	li r3, 0x2
-	b @2
-	@7:
-	lha r0, 0x0(r31)
-	cmpwi r0, -0x1
-	beq @8
-	lwz r3, 0x8(r29)
-	sth r0, 0x0(r3)
-	lha r0, 0x2(r31)
-	lwz r3, 0x8(r29)
-	sth r0, 0x2(r3)
-	lha r0, 0x4(r31)
-	cmpwi r0, -0x1
-	beq @8
-	lwz r3, 0x8(r29)
-	sth r0, 0x4(r3)
-	lha r0, 0x6(r31)
-	lwz r3, 0x8(r29)
-	sth r0, 0x6(r3)
-	lha r0, 0x8(r31)
-	cmpwi r0, -0x1
-	beq @8
-	lwz r3, 0x8(r29)
-	sth r0, 0x8(r3)
-	lha r0, 0xa(r31)
-	lwz r3, 0x8(r29)
-	sth r0, 0xa(r3)
-	lha r0, 0xc(r31)
-	cmpwi r0, -0x1
-	beq @8
-	lwz r3, 0x8(r29)
-	sth r0, 0xc(r3)
-	lha r0, 0xe(r31)
-	lwz r3, 0x8(r29)
-	sth r0, 0xe(r3)
-	lha r0, 0x10(r31)
-	cmpwi r0, -0x1
-	beq @8
-	lwz r3, 0x8(r29)
-	sth r0, 0x10(r3)
-	lha r0, 0x12(r31)
-	lwz r3, 0x8(r29)
-	sth r0, 0x12(r3)
-	@8:
-	li r3, 0x2
-	@2:
-	lmw r23, 0xc(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void nannpc_ext_disp() {
+	asm volatile {
+		lwz r31, nanNPCWork(r13)
+		opword 0x801F0010
+		opword 0x540007FF
+		opword 0x41820254
+		bl extLoadVertex
+		bl extLoadTexture
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00004
+		bl GXSetTevOrder
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevColorOp
+		opword 0x38600000
+		opword 0x3880000F
+		opword 0x38A00008
+		opword 0x38C00002
+		opword 0x38E0000F
+		bl GXSetTevColorIn
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00001
+		opword 0x39000000
+		bl GXSetTevAlphaOp
+		opword 0x38600000
+		opword 0x38800007
+		opword 0x38A00004
+		opword 0x38C00001
+		opword 0x38E00007
+		bl GXSetTevAlphaIn
+		opword 0x38600000
+		bl GXSetNumChans
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00000
+		opword 0x39000000
+		opword 0x39200002
+		bl GXSetChanCtrl
+		lfs f1, float_0_8041c588(r2)
+		opword 0x38810008
+		lwz r0, dat_8041c568(r2)
+		opword 0x38600000
+		opword 0xFC400890
+		opword 0xFC600890
+		opword 0x90010008
+		opword 0xFC800890
+		bl GXSetFog
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600001
+		bl GXSetNumTevStages
+		bl extGetPoseNum
+		opword 0x34E3FFFF
+		opword 0x1CA700C0
+		opword 0x54E61838
+		opword 0x38670001
+		opword 0x418000EC
+		opword 0x5460F0BF
+		opword 0x7C0903A6
+		opword 0x418200B0
+		opword 0x801F0004
+		opword 0x809F0000
+		opword 0x7D003214
+		opword 0x38C6FFF8
+		opword 0x90E80000
+		opword 0x7C842A14
+		opword 0x38E7FFFF
+		opword 0x38A5FF40
+		opword 0xC0040020
+		opword 0xD0080004
+		opword 0x801F0004
+		opword 0x809F0000
+		opword 0x7D003214
+		opword 0x38C6FFF8
+		opword 0x90E80000
+		opword 0x7C842A14
+		opword 0x38E7FFFF
+		opword 0x38A5FF40
+		opword 0xC0040020
+		opword 0xD0080004
+		opword 0x801F0004
+		opword 0x809F0000
+		opword 0x7D003214
+		opword 0x38C6FFF8
+		opword 0x90E80000
+		opword 0x7C842A14
+		opword 0x38E7FFFF
+		opword 0x38A5FF40
+		opword 0xC0040020
+		opword 0xD0080004
+		opword 0x801F0004
+		opword 0x809F0000
+		opword 0x7D003214
+		opword 0x38C6FFF8
+		opword 0x90E80000
+		opword 0x7C842A14
+		opword 0x38A5FF40
+		opword 0x38E7FFFF
+		opword 0xC0040020
+		opword 0xD0080004
+		opword 0x4200FF60
+		opword 0x70630003
+		opword 0x41820034
+		opword 0x7C6903A6
+		opword 0x801F0004
+		opword 0x809F0000
+		opword 0x7D003214
+		opword 0x38C6FFF8
+		opword 0x90E80000
+		opword 0x7C842A14
+		opword 0x38A5FF40
+		opword 0x38E7FFFF
+		opword 0xC0040020
+		opword 0xD0080004
+		opword 0x4200FFD8
+		lis r4, nannpc_zcompare@ha
+		opword 0x807F0004
+		addi r6, r4, nannpc_zcompare@l
+		opword 0x809F000C
+		opword 0x38A00008
+		bl qqsort
+		bl extGetPoseNum
+		opword 0x3BA3FFFF
+		opword 0x57BE1838
+		opword 0x4800003C
+		opword 0x80BF0004
+		opword 0x3881000C
+		opword 0x80DF0000
+		opword 0x38600001
+		lwzx r28, r5, r30
+		opword 0x1CBC00C0
+		opword 0x380500BC
+		opword 0x7C06002E
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0x7F83E378
+		bl extPoseDraw
+		opword 0x3BDEFFF8
+		opword 0x3BBDFFFF
+		opword 0x2C1D0000
+		opword 0x4080FFC4
+		bl extLoadTextureExit
+		opword 0x4800001C
+		bl extLoadRenderMode
+		bl extLoadVertex
+		bl extLoadTexture
+		bl extLoadTev
+		bl extDraw
+		bl extLoadTextureExit
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void nannpc_ext_shadow_disp() {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		la r3, mt_544(r13)
+		opword 0x90010014
+		bl extLoadShadowMtx
+		bl extLoadShadowRenderMode
+		bl extLoadShadowVertex
+		bl extLoadShadowTev
+		bl extDrawShadow
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void nannpc_ext_init() {
+	asm volatile {
+		bl extGetPosePtr
+		mr r29, r3
+		bl extGetPoseNum
+		lfs f30, float_0_8041c588(r2)
+		opword 0x3BC3FFFF
+		lfs f31, float_neg1000_8041c58c(r2)
+		opword 0x3BE00003
+		opword 0x48000034
+		opword 0x93FD0000
+		opword 0xD3DD0004
+		opword 0x807D000C
+		bl PSMTXIdentity
+		opword 0x807D000C
+		opword 0x3BDEFFFF
+		opword 0xD3C3000C
+		opword 0x807D000C
+		opword 0xD3E3001C
+		opword 0x807D000C
+		opword 0x3BBD0020
+		opword 0xD3C3002C
+		opword 0x2C1E0000
+		opword 0x4080FFCC
+	}
+}
+#pragma pop
+
+void nannpc_ext_main_sub() {
+    s32 i;
+    NanNPCWork* w = nanNPCWork;
+    for (i = extGetPoseNum() - 1; i >= 0; i--) {
+        NanNPC* p = &w->npc[i];
+        if (p->name[0] && p->func) {
+            p->func(p);
+        }
+    }
 }
 
-asm void nannpc_ext_dispent() {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r3, nanNPCWork(r0)
-	lwz r0, 0x10(r3)
-	clrlwi. r0, r0, 31
-	bne @1
-	lis r3, nannpc_ext_disp@ha
-	lfs f1, float_0_8041c588(r0)
-	addi r5, r3, nannpc_ext_disp@l
-	li r4, 0x1
-	li r3, 0x4
-	li r6, 0x0
-	bl dispEntry
-	lis r3, nannpc_ext_shadow_disp@ha
-	lfs f1, float_0_8041c588(r0)
-	addi r5, r3, nannpc_ext_shadow_disp@l
-	li r4, 0x2
-	li r3, 0x4
-	li r6, 0x0
-	bl dispEntry
-	b @2
-	@1:
-	lis r3, nannpc_ext_disp@ha
-	lfs f1, float_0_8041c588(r0)
-	addi r5, r3, nannpc_ext_disp@l
-	li r4, 0x2
-	li r3, 0x4
-	li r6, 0x0
-	bl dispEntry
-	lis r3, nannpc_ext_shadow_disp@ha
-	lfs f1, float_0_8041c588(r0)
-	addi r5, r3, nannpc_ext_shadow_disp@l
-	li r4, 0x2
-	li r3, 0x4
-	li r6, 0x0
-	bl dispEntry
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void nannpc_ext_main_sub_fast() {
+	asm volatile {
+		lwz r28, nanNPCWork(r13)
+		bl extGetPoseNum
+		opword 0x3BC3FFFF
+		opword 0x1FFE00C0
+		opword 0x480000F8
+		opword 0x801C0000
+		opword 0x7FA0FA14
+		opword 0x881D0000
+		opword 0x7C000775
+		opword 0x418200DC
+		opword 0x819D0064
+		opword 0x280C0000
+		opword 0x41820010
+		opword 0x7FA3EB78
+		opword 0x7D8903A6
+		opword 0x4E800421
+		opword 0x80BD0058
+		opword 0x28050000
+		opword 0x41820030
+		opword 0x7C1EF1D6
+		lwz r4, gp(r13)
+		opword 0xA87D005C
+		opword 0x8084001C
+		opword 0x7C840214
+		opword 0x7C041B96
+		opword 0x7C0019D6
+		opword 0x7C002050
+		opword 0x5400083C
+		opword 0x7C0502AE
+		opword 0xB01D005E
+		opword 0xA81D005E
+		opword 0x807D0010
+		opword 0x90030010
+		opword 0xC01D0060
+		opword 0x807D0010
+		opword 0xFC000050
+		opword 0xD0030004
+		opword 0xA01D0014
+		opword 0x540007BD
+		opword 0x41820034
+		opword 0x807D0010
+		lfs f1, float_0_8041c588(r2)
+		opword 0x8063000C
+		lfs f0, float_neg1000_8041c58c(r2)
+		opword 0xD023000C
+		opword 0x807D0010
+		opword 0x8063000C
+		opword 0xD003001C
+		opword 0x807D0010
+		opword 0x8063000C
+		opword 0xD023002C
+		opword 0x48000034
+		opword 0x807D0010
+		opword 0xC01D0018
+		opword 0x8063000C
+		opword 0xD003000C
+		opword 0x807D0010
+		opword 0xC01D001C
+		opword 0x8063000C
+		opword 0xD003001C
+		opword 0x807D0010
+		opword 0xC01D0020
+		opword 0x8063000C
+		opword 0xD003002C
+		opword 0x3BFFFF40
+		opword 0x3BDEFFFF
+		opword 0x2C1E0000
+		opword 0x4080FF08
+	}
+}
+#pragma pop
+
+void nannpc_ext_main() {
+    NanNPCWork* w = nanNPCWork;
+    if (w->func14) {
+        w->func14();
+    }
+    if (w->func18) {
+        w->func18();
+    }
+    if (w->func1c) {
+        w->func1c();
+    }
 }
 
-asm void nannpc_ext_main() {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r31, nanNPCWork(r0)
-	lwz r12, 0x14(r31)
-	cmplwi r12, 0x0
-	beq @1
-	mtctr r12
-	bctrl
-	@1:
-	lwz r12, 0x18(r31)
-	cmplwi r12, 0x0
-	beq @2
-	mtctr r12
-	bctrl
-	@2:
-	lwz r12, 0x1c(r31)
-	cmplwi r12, 0x0
-	beq @3
-	mtctr r12
-	bctrl
-	@3:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void nannpc_ext_dispent() {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x90010014
+		lwz r3, nanNPCWork(r13)
+		opword 0x80030010
+		opword 0x540007FF
+		opword 0x40820040
+		lis r3, nannpc_ext_disp@ha
+		lfs f1, float_0_8041c588(r2)
+		addi r5, r3, nannpc_ext_disp@l
+		opword 0x38800001
+		opword 0x38600004
+		opword 0x38C00000
+		bl dispEntry
+		lis r3, nannpc_ext_shadow_disp@ha
+		lfs f1, float_0_8041c588(r2)
+		addi r5, r3, nannpc_ext_shadow_disp@l
+		opword 0x38800002
+		opword 0x38600004
+		opword 0x38C00000
+		bl dispEntry
+		opword 0x4800003C
+		lis r3, nannpc_ext_disp@ha
+		lfs f1, float_0_8041c588(r2)
+		addi r5, r3, nannpc_ext_disp@l
+		opword 0x38800002
+		opword 0x38600004
+		opword 0x38C00000
+		bl dispEntry
+		lis r3, nannpc_ext_shadow_disp@ha
+		lfs f1, float_0_8041c588(r2)
+		addi r5, r3, nannpc_ext_shadow_disp@l
+		opword 0x38800002
+		opword 0x38600004
+		opword 0x38C00000
+		bl dispEntry
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+}
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+s32 evt_nannpc_init(EventEntry* event, BOOL isFirstCall) {
+	asm {
+		lis r5, vec3_802f2ff8@ha
+	}
+	asm volatile {
+		opword 0x7C992378
+		mr r23, r3
+		addi r30, r5, vec3_802f2ff8@l
+		opword 0x83030018
+		opword 0x80980000
+		bl evtGetValue
+		opword 0x80980004
+		opword 0x7C7C1B78
+		opword 0x7EE3BB78
+		bl evtGetValue
+		opword 0x80980008
+		opword 0x7C7F1B78
+		opword 0x7EE3BB78
+		bl evtGetValue
+		opword 0x8098000C
+		opword 0x7C7B1B78
+		opword 0x7EE3BB78
+		bl evtGetValue
+		lis r4, nannpc_ext_dispent@ha
+		opword 0x2C190000
+		addi r0, r4, nannpc_ext_dispent@l
+		opword 0x7C7A1B78
+		opword 0x7C190378
+		opword 0x4182000C
+		opword 0x38600000
+		opword 0x4800025C
+		opword 0x38600020
+		bl _mapAlloc
+		stw r3, nanNPCWork(r13)
+		opword 0x38800000
+		opword 0x38A00020
+		bl memset
+		lwz r29, nanNPCWork(r13)
+		opword 0x7EE3BB78
+		opword 0x80980010
+		bl evtGetValue
+		opword 0x907D000C
+		opword 0x801D000C
+		opword 0x1C6000C0
+		bl _mapAlloc
+		opword 0x907D0000
+		opword 0x38800000
+		opword 0x801D000C
+		opword 0x807D0000
+		opword 0x1CA000C0
+		bl memset
+		opword 0x801D000C
+		opword 0x54031838
+		bl _mapAlloc
+		opword 0x907D0004
+		opword 0x38800000
+		opword 0x801D000C
+		opword 0x807D0004
+		opword 0x54051838
+		bl memset
+		opword 0x38600014
+		bl _mapAlloc
+		opword 0x907D0008
+		opword 0x38800000
+		opword 0x38A00014
+		opword 0x807D0008
+		bl memset
+		opword 0x38800000
+		lis r3, nannpc_ext_main_sub@ha
+		opword 0x909D0014
+		addi r0, r3, nannpc_ext_main_sub@l
+		opword 0x281B0000
+		lwz r3, nanNPCWork(r13)
+		opword 0x90030018
+		opword 0x909D001C
+		opword 0x40820010
+		lis r3, nannpc_ext_init@ha
+		addi r0, r3, nannpc_ext_init@l
+		opword 0x7C1B0378
+		opword 0x281A0000
+		opword 0x40820010
+		lis r3, nannpc_ext_main@ha
+		addi r0, r3, nannpc_ext_main@l
+		opword 0x7C1A0378
+		opword 0x807D000C
+		opword 0x7F84E378
+		opword 0x7F65DB78
+		opword 0x7F46D378
+		opword 0x7F27CB78
+		bl extEntry
+		lfs f1, float_32_8041c584(r2)
+		opword 0x38C00000
+		lfs f0, float_0_8041c588(r2)
+		opword 0x38A00000
+		opword 0x4800009C
+		opword 0x801D0000
+		opword 0x38800000
+		opword 0x38C60001
+		opword 0x7CE02A14
+		opword 0x38A500C0
+		opword 0x98870000
+		opword 0x90870010
+		opword 0xB0870014
+		opword 0xB0870016
+		opword 0x807E0000
+		opword 0x801E0004
+		opword 0x90670018
+		opword 0x9007001C
+		opword 0x801E0008
+		opword 0x90070020
+		opword 0x807E000C
+		opword 0x801E0010
+		opword 0x90670030
+		opword 0x90070034
+		opword 0x801E0014
+		opword 0x90070038
+		opword 0x807E0018
+		opword 0x801E001C
+		opword 0x90670024
+		opword 0x90070028
+		opword 0x801E0020
+		opword 0x9007002C
+		opword 0xD0270048
+		opword 0xD027004C
+		opword 0x90870054
+		opword 0x90870050
+		opword 0x90870058
+		opword 0xB087005C
+		opword 0xB087005E
+		opword 0xD0070060
+		opword 0x90870064
+		lwz r0, dat_8041c56c(r2)
+		opword 0x900700BC
+		opword 0x801D000C
+		opword 0x7C060000
+		opword 0x4180FF60
+		opword 0x281F0000
+		opword 0x4082000C
+		opword 0x38600002
+		opword 0x480000A8
+		opword 0xA81F0000
+		opword 0x2C00FFFF
+		opword 0x41820098
+		opword 0x807D0008
+		opword 0xB0030000
+		opword 0xA81F0002
+		opword 0x807D0008
+		opword 0xB0030002
+		opword 0xA81F0004
+		opword 0x2C00FFFF
+		opword 0x41820078
+		opword 0x807D0008
+		opword 0xB0030004
+		opword 0xA81F0006
+		opword 0x807D0008
+		opword 0xB0030006
+		opword 0xA81F0008
+		opword 0x2C00FFFF
+		opword 0x41820058
+		opword 0x807D0008
+		opword 0xB0030008
+		opword 0xA81F000A
+		opword 0x807D0008
+		opword 0xB003000A
+		opword 0xA81F000C
+		opword 0x2C00FFFF
+		opword 0x41820038
+		opword 0x807D0008
+		opword 0xB003000C
+		opword 0xA81F000E
+		opword 0x807D0008
+		opword 0xB003000E
+		opword 0xA81F0010
+		opword 0x2C00FFFF
+		opword 0x41820018
+		opword 0x807D0008
+		opword 0xB0030010
+		opword 0xA81F0012
+		opword 0x807D0008
+		opword 0xB0030012
+		opword 0x38600002
+	}
+}
+#pragma pop
+
+s32 evt_nannpc_set_subfunc(EventEntry* event, BOOL isFirstCall) {
+    s32* args = event->args;
+    s32 kind = evtGetValue(event, args[0]);
+    NanNPCWork* w = nanNPCWork;
+    switch (kind) {
+        case 0:
+            w->func14 = (void (*)())evtGetValue(event, args[1]);
+            break;
+        case 1:
+            w->func18 = (void (*)())evtGetValue(event, args[1]);
+            break;
+        case 2:
+            w->func1c = (void (*)())evtGetValue(event, args[1]);
+            break;
+    }
+    return 2;
 }
 
-asm void nannpc_ext_main_sub_fast() {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	lwz r28, nanNPCWork(r0)
-	bl extGetPoseNum
-	subi r30, r3, 0x1
-	mulli r31, r30, 0xc0
-	b @1
-	@2:
-	lwz r0, 0x0(r28)
-	add r29, r0, r31
-	lbz r0, 0x0(r29)
-	extsb. r0, r0
-	beq @3
-	lwz r12, 0x64(r29)
-	cmplwi r12, 0x0
-	beq @4
-	mr r3, r29
-	mtctr r12
-	bctrl
-	@4:
-	lwz r5, 0x58(r29)
-	cmplwi r5, 0x0
-	beq @5
-	mullw r0, r30, r30
-	lwz r4, gp(r0)
-	lha r3, 0x5c(r29)
-	lwz r4, 0x1c(r4)
-	add r4, r4, r0
-	divwu r0, r4, r3
-	mullw r0, r0, r3
-	subf r0, r0, r4
-	slwi r0, r0, 1
-	lhax r0, r5, r0
-	sth r0, 0x5e(r29)
-	@5:
-	lha r0, 0x5e(r29)
-	lwz r3, 0x10(r29)
-	stw r0, 0x10(r3)
-	lfs f0, 0x60(r29)
-	lwz r3, 0x10(r29)
-	fneg f0, f0
-	stfs f0, 0x4(r3)
-	lhz r0, 0x14(r29)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @6
-	lwz r3, 0x10(r29)
-	lfs f1, float_0_8041c588(r0)
-	lwz r3, 0xc(r3)
-	lfs f0, float_neg1000_8041c58c(r0)
-	stfs f1, 0xc(r3)
-	lwz r3, 0x10(r29)
-	lwz r3, 0xc(r3)
-	stfs f0, 0x1c(r3)
-	lwz r3, 0x10(r29)
-	lwz r3, 0xc(r3)
-	stfs f1, 0x2c(r3)
-	b @3
-	@6:
-	lwz r3, 0x10(r29)
-	lfs f0, 0x18(r29)
-	lwz r3, 0xc(r3)
-	stfs f0, 0xc(r3)
-	lwz r3, 0x10(r29)
-	lfs f0, 0x1c(r29)
-	lwz r3, 0xc(r3)
-	stfs f0, 0x1c(r3)
-	lwz r3, 0x10(r29)
-	lfs f0, 0x20(r29)
-	lwz r3, 0xc(r3)
-	stfs f0, 0x2c(r3)
-	@3:
-	subi r31, r31, 0xc0
-	subi r30, r30, 0x1
-	@1:
-	cmpwi r30, 0x0
-	bge @2
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
 
-asm void nannpc_ext_main_sub() {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	lwz r29, nanNPCWork(r0)
-	bl extGetPoseNum
-	subi r30, r3, 0x1
-	mulli r31, r30, 0xc0
-	b @1
-	@2:
-	lwz r0, 0x0(r29)
-	add r3, r0, r31
-	lbz r0, 0x0(r3)
-	extsb. r0, r0
-	beq @3
-	lwz r12, 0x64(r3)
-	cmplwi r12, 0x0
-	beq @3
-	mtctr r12
-	bctrl
-	@3:
-	subi r31, r31, 0xc0
-	subi r30, r30, 0x1
-	@1:
-	cmpwi r30, 0x0
-	bge @2
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void nannpc_ext_init() {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stfd f31, 0x30(r1)
-	psq_st f31, 0x38(r1), 0, 0
-	stfd f30, 0x20(r1)
-	psq_st f30, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	bl extGetPosePtr
-	mr r29, r3
-	bl extGetPoseNum
-	lfs f30, float_0_8041c588(r0)
-	subi r30, r3, 0x1
-	lfs f31, float_neg1000_8041c58c(r0)
-	li r31, 0x3
-	b @1
-	@2:
-	stw r31, 0x0(r29)
-	stfs f30, 0x4(r29)
-	lwz r3, 0xc(r29)
-	bl PSMTXIdentity
-	lwz r3, 0xc(r29)
-	subi r30, r30, 0x1
-	stfs f30, 0xc(r3)
-	lwz r3, 0xc(r29)
-	stfs f31, 0x1c(r3)
-	lwz r3, 0xc(r29)
-	addi r29, r29, 0x20
-	stfs f30, 0x2c(r3)
-	@1:
-	cmpwi r30, 0x0
-	bge @2
-	psq_l f31, 0x38(r1), 0, 0
-	lfd f31, 0x30(r1)
-	psq_l f30, 0x28(r1), 0, 0
-	lfd f30, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r0, 0x44(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void nannpc_ext_shadow_disp() {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	la r3, mt_544(r0)
-	stw r0, 0x14(r1)
-	bl extLoadShadowMtx
-	bl extLoadShadowRenderMode
-	bl extLoadShadowVertex
-	bl extLoadShadowTev
-	bl extDrawShadow
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void nannpc_ext_disp() {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	stw r28, 0x10(r1)
-	lwz r31, nanNPCWork(r0)
-	lwz r0, 0x10(r31)
-	clrlwi. r0, r0, 31
-	beq @1
-	bl extLoadVertex
-	bl extLoadTexture
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x4
-	bl GXSetTevOrder
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x0
-	li r4, 0xf
-	li r5, 0x8
-	li r6, 0x2
-	li r7, 0xf
-	bl GXSetTevColorIn
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x0
-	li r4, 0x7
-	li r5, 0x4
-	li r6, 0x1
-	li r7, 0x7
-	bl GXSetTevAlphaIn
-	li r3, 0x0
-	bl GXSetNumChans
-	li r3, 0x4
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x0
-	li r8, 0x0
-	li r9, 0x2
-	bl GXSetChanCtrl
-	lfs f1, float_0_8041c588(r0)
-	addi r4, r1, 0x8
-	lwz r0, dat_8041c568(r0)
-	li r3, 0x0
-	fmr f2, f1
-	fmr f3, f1
-	stw r0, 0x8(r1)
-	fmr f4, f1
-	bl GXSetFog
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x1
-	bl GXSetNumTevStages
-	bl extGetPoseNum
-	subic. r7, r3, 0x1
-	mulli r5, r7, 0xc0
-	slwi r6, r7, 3
-	addi r3, r7, 0x1
-	blt @2
-	srwi. r0, r3, 2
-	mtctr r0
-	beq @3
-	@4:
-	lwz r0, 0x4(r31)
-	lwz r4, 0x0(r31)
-	add r8, r0, r6
-	subi r6, r6, 0x8
-	stw r7, 0x0(r8)
-	add r4, r4, r5
-	subi r7, r7, 0x1
-	subi r5, r5, 0xc0
-	lfs f0, 0x20(r4)
-	stfs f0, 0x4(r8)
-	lwz r0, 0x4(r31)
-	lwz r4, 0x0(r31)
-	add r8, r0, r6
-	subi r6, r6, 0x8
-	stw r7, 0x0(r8)
-	add r4, r4, r5
-	subi r7, r7, 0x1
-	subi r5, r5, 0xc0
-	lfs f0, 0x20(r4)
-	stfs f0, 0x4(r8)
-	lwz r0, 0x4(r31)
-	lwz r4, 0x0(r31)
-	add r8, r0, r6
-	subi r6, r6, 0x8
-	stw r7, 0x0(r8)
-	add r4, r4, r5
-	subi r7, r7, 0x1
-	subi r5, r5, 0xc0
-	lfs f0, 0x20(r4)
-	stfs f0, 0x4(r8)
-	lwz r0, 0x4(r31)
-	lwz r4, 0x0(r31)
-	add r8, r0, r6
-	subi r6, r6, 0x8
-	stw r7, 0x0(r8)
-	add r4, r4, r5
-	subi r5, r5, 0xc0
-	subi r7, r7, 0x1
-	lfs f0, 0x20(r4)
-	stfs f0, 0x4(r8)
-	bdnz @4
-	andi. r3, r3, 0x3
-	beq @2
-	@3:
-	mtctr r3
-	@5:
-	lwz r0, 0x4(r31)
-	lwz r4, 0x0(r31)
-	add r8, r0, r6
-	subi r6, r6, 0x8
-	stw r7, 0x0(r8)
-	add r4, r4, r5
-	subi r5, r5, 0xc0
-	subi r7, r7, 0x1
-	lfs f0, 0x20(r4)
-	stfs f0, 0x4(r8)
-	bdnz @5
-	@2:
-	lis r4, nannpc_zcompare@ha
-	lwz r3, 0x4(r31)
-	addi r6, r4, nannpc_zcompare@l
-	lwz r4, 0xc(r31)
-	li r5, 0x8
-	bl qqsort
-	bl extGetPoseNum
-	subi r29, r3, 0x1
-	slwi r30, r29, 3
-	b @6
-	@7:
-	lwz r5, 0x4(r31)
-	addi r4, r1, 0xc
-	lwz r6, 0x0(r31)
-	li r3, 0x1
-	lwzx r28, r5, r30
-	mulli r5, r28, 0xc0
-	addi r0, r5, 0xbc
-	lwzx r0, r6, r0
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r28
-	bl extPoseDraw
-	subi r30, r30, 0x8
-	subi r29, r29, 0x1
-	@6:
-	cmpwi r29, 0x0
-	bge @7
-	bl extLoadTextureExit
-	b @8
-	@1:
-	bl extLoadRenderMode
-	bl extLoadVertex
-	bl extLoadTexture
-	bl extLoadTev
-	bl extDraw
-	bl extLoadTextureExit
-	@8:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r29, 0x14(r1)
-	lwz r28, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
-	nofralloc
-	lfs f1, 0x4(r3)
-	lfs f0, 0x4(r4)
-	fcmpo cr0, f1, f0
-	bge @1
-	li r3, 0x1
-	blr
-	@1:
-	ble @2
-	li r3, -0x1
-	blr
-	@2:
-	li r3, 0x0
-	blr
-}
-
-asm void nanNPCOption(void) {
-	nofralloc
-	stwu r1, -0xe0(r1)
-	mflr r0
-	stw r0, 0xe4(r1)
-	stfd f31, 0xd0(r1)
-	psq_st f31, 0xd8(r1), 0, 0
-	stmw r23, 0xac(r1)
-	lwz r26, nanNPCWork(r0)
-	lwz r24, 0x0(r26)
-	b @1
-	@2:
-	lhz r0, 0x14(r24)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @3
-	b @4
-	@5:
-	cmplw r24, r23
-	beq @6
-	lhz r0, 0x14(r23)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @6
-	addi r3, r24, 0x18
-	addi r4, r23, 0x18
-	bl PSVECDistance
-	fmr f31, f1
-	addi r3, r24, 0x18
-	addi r4, r23, 0x18
-	addi r5, r1, 0x90
-	bl PSVECSubtract
-	lfs f0, 0x4c(r24)
-	fcmpo cr0, f31, f0
-	cror eq, lt, eq
-	bne @6
-	addi r3, r1, 0x90
-	bl PSVECMag
-	lfs f0, float_0_8041c588(r0)
-	fcmpu cr0, f0, f1
-	bne @7
-	lfs f0, float_1_8041c590(r0)
-	stfs f0, 0x90(r1)
-	@7:
-	addi r3, r1, 0x90
-	mr r4, r3
-	bl PSVECNormalize
-	lfs f0, float_0_8041c588(r0)
-	addi r3, r1, 0x90
-	lfs f1, float_0p5_8041c594(r0)
-	mr r4, r3
-	stfs f0, 0x94(r1)
-	bl PSVECScale
-	addi r3, r24, 0x3c
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSVECAdd
-	addi r3, r23, 0x3c
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSVECSubtract
-	@6:
-	addi r23, r23, 0xc0
-	@4:
-	lwz r0, 0xc(r26)
-	lwz r3, 0x0(r26)
-	mulli r0, r0, 0xc0
-	add r0, r3, r0
-	cmplw r23, r0
-	blt @5
-	@3:
-	addi r24, r24, 0xc0
-	@1:
-	lwz r0, 0xc(r26)
-	lwz r23, 0x0(r26)
-	mulli r0, r0, 0xc0
-	add r0, r23, r0
-	cmplw r24, r0
-	blt @2
-	b @8
-	@9:
-	lhz r0, 0x14(r23)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @10
-	addi r3, r23, 0x30
-	addi r4, r23, 0x18
-	addi r5, r1, 0x90
-	bl PSVECSubtract
-	addi r3, r1, 0x90
-	bl PSVECMag
-	lfs f2, float_0p8_8041c598(r0)
-	lfs f0, 0x4c(r23)
-	fmuls f0, f2, f0
-	fcmpo cr0, f1, f0
-	ble @10
-	addi r3, r1, 0x90
-	mr r4, r3
-	bl PSVECNormalize
-	lfs f0, float_0_8041c588(r0)
-	addi r3, r1, 0x90
-	lfs f1, float_0p5_8041c594(r0)
-	mr r4, r3
-	stfs f0, 0x94(r1)
-	bl PSVECScale
-	addi r3, r23, 0x3c
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSVECAdd
-	@10:
-	addi r23, r23, 0xc0
-	@8:
-	lwz r0, 0xc(r26)
-	lwz r25, 0x0(r26)
-	mulli r0, r0, 0xc0
-	add r0, r25, r0
-	cmplw r23, r0
-	blt @9
-	addi r30, r1, 0x38
-	addi r29, r1, 0x34
-	addi r28, r1, 0x2c
-	addi r27, r1, 0x28
-	b @11
-	@12:
-	lhz r0, 0x14(r25)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @13
-	addi r3, r25, 0x3c
-	bl PSVECMag
-	fmr f31, f1
-	lfs f0, float_0_8041c588(r0)
-	fcmpu cr0, f31, f0
-	beq @13
-	lfs f0, float_10_8041c59c(r0)
-	fcmpo cr0, f31, f0
-	ble @14
-	lfs f0, float_5_8041c5a0(r0)
-	addi r3, r25, 0x3c
-	mr r4, r3
-	fdivs f1, f0, f31
-	bl PSVECScale
-	lfs f31, float_5_8041c5a0(r0)
-	@14:
-	lwz r0, 0x1c(r25)
-	addi r3, r25, 0x3c
-	lwz r5, 0x18(r25)
-	addi r4, r1, 0x6c
-	stw r0, 0x64(r1)
-	lwz r0, 0x20(r25)
-	lfs f1, 0x64(r1)
-	lfs f0, float_1_8041c590(r0)
-	stw r5, 0x60(r1)
-	fadds f0, f1, f0
-	stw r0, 0x68(r1)
-	stfs f0, 0x64(r1)
-	bl PSVECNormalize
-	lhz r0, 0x14(r25)
-	rlwinm. r0, r0, 0, 28, 28
-	beq @15
-	addi r3, r25, 0x18
-	addi r4, r25, 0x3c
-	mr r5, r3
-	bl PSVECAdd
-	addi r3, r25, 0x3c
-	lfs f1, float_0p6_8041c5a4(r0)
-	mr r4, r3
-	bl PSVECScale
-	b @13
-	@15:
-	lwz r3, 0x6c(r1)
-	li r0, 0x0
-	lwz r23, 0x70(r1)
-	mr r5, r27
-	lwz r24, 0x74(r1)
-	mr r6, r28
-	stw r3, 0x84(r1)
-	mr r9, r29
-	lwz r3, 0x60(r1)
-	mr r10, r30
-	lwz r12, 0x64(r1)
-	addi r4, r1, 0x24
-	lwz r11, 0x68(r1)
-	addi r7, r1, 0x20
-	stw r3, 0x78(r1)
-	addi r8, r1, 0x30
-	li r31, 0x1
-	li r3, 0x0
-	stw r12, 0x7c(r1)
-	lfs f1, 0x78(r1)
-	stw r11, 0x80(r1)
-	lfs f2, 0x7c(r1)
-	stw r23, 0x88(r1)
-	lfs f3, 0x80(r1)
-	stw r24, 0x8c(r1)
-	stw r0, 0xb8(r25)
-	stw r0, 0xb4(r25)
-	stfs f31, 0x20(r1)
-	lfs f4, 0x84(r1)
-	lfs f5, 0x88(r1)
-	lfs f6, 0x8c(r1)
-	bl hitCheckFilter
-	stw r3, 0xb4(r25)
-	lwz r0, 0xb4(r25)
-	cmplwi r0, 0x0
-	bne @16
-	addi r3, r25, 0x18
-	addi r4, r25, 0x3c
-	mr r5, r3
-	bl PSVECAdd
-	b @17
-	@16:
-	lwz r6, 0x18(r25)
-	addi r3, r25, 0x18
-	lwz r0, 0x1c(r25)
-	mr r5, r3
-	addi r4, r25, 0x3c
-	stw r6, 0x48(r1)
-	stw r0, 0x4c(r1)
-	lwz r0, 0x20(r25)
-	stw r0, 0x50(r1)
-	bl PSVECAdd
-	lfs f1, float_0_8041c588(r0)
-	lfs f0, 0x40(r25)
-	fcmpu cr0, f1, f0
-	bne @18
-	stfs f1, 0x34(r1)
-	@18:
-	addi r3, r1, 0x30
-	mr r4, r3
-	bl PSVECNormalize
-	addi r3, r1, 0x84
-	addi r4, r1, 0x30
-	addi r5, r1, 0x54
-	bl C_VECReflect
-	fmr f1, f31
-	addi r3, r1, 0x54
-	addi r4, r25, 0x3c
-	bl PSVECScale
-	addi r3, r1, 0x84
-	addi r4, r1, 0x30
-	li r31, 0x0
-	bl PSVECDotProduct
-	lfs f2, 0x20(r1)
-	addi r3, r1, 0x30
-	lfs f0, float_0p1_8041c5a8(r0)
-	mr r4, r3
-	fsubs f2, f31, f2
-	fneg f2, f2
-	fmadds f1, f1, f2, f0
-	bl PSVECScale
-	addi r3, r25, 0x18
-	addi r4, r1, 0x30
-	mr r5, r3
-	bl PSVECAdd
-	addi r3, r25, 0x18
-	addi r4, r1, 0x48
-	addi r5, r1, 0x3c
-	bl PSVECSubtract
-	addi r3, r1, 0x3c
-	bl PSVECMag
-	frsp f2, f1
-	lfs f0, float_0_8041c588(r0)
-	stfs f1, 0x20(r1)
-	fcmpo cr0, f2, f0
-	ble @17
-	addi r3, r1, 0x3c
-	mr r4, r3
-	bl PSVECNormalize
-	lfs f1, float_1_8041c590(r0)
-	addi r4, r1, 0x8
-	lfs f0, 0x4c(r1)
-	addi r5, r1, 0xc
-	lwz r8, 0x48(r1)
-	addi r6, r1, 0x10
-	lwz r3, 0x4c(r1)
-	fadds f2, f1, f0
-	lwz r0, 0x50(r1)
-	addi r7, r1, 0x20
-	stw r8, 0x78(r1)
-	addi r8, r1, 0x14
-	lfs f1, 0x48(r1)
-	stw r3, 0x7c(r1)
-	addi r9, r1, 0x18
-	lfs f3, 0x50(r1)
-	addi r10, r1, 0x1c
-	stw r0, 0x80(r1)
-	li r3, 0x0
-	lfs f4, 0x3c(r1)
-	lfs f5, 0x40(r1)
-	lfs f6, 0x44(r1)
-	bl hitCheckFilter
-	stw r3, 0xb8(r25)
-	lwz r0, 0xb8(r25)
-	cmplwi r0, 0x0
-	beq @17
-	lwz r3, 0x48(r1)
-	lwz r0, 0x4c(r1)
-	stw r3, 0x18(r25)
-	stw r0, 0x1c(r25)
-	lwz r0, 0x50(r1)
-	stw r0, 0x20(r25)
-	@17:
-	cmpwi r31, 0x0
-	beq @13
-	addi r3, r25, 0x3c
-	lfs f1, float_0p6_8041c5a4(r0)
-	mr r4, r3
-	bl PSVECScale
-	@13:
-	addi r25, r25, 0xc0
-	@11:
-	lwz r0, 0xc(r26)
-	lwz r3, 0x0(r26)
-	mulli r0, r0, 0xc0
-	add r0, r3, r0
-	cmplw r25, r0
-	blt @12
-	psq_l f31, 0xd8(r1), 0, 0
-	lfd f31, 0xd0(r1)
-	lmw r23, 0xac(r1)
-	lwz r0, 0xe4(r1)
-	mtlr r0
-	addi r1, r1, 0xe0
-	blr
-}
-// clang-format on
+// literal pool in target order (asmfake --minimal)
 #endif
+#pragma force_active on
+#ifdef NONMATCHING
+#pragma explicit_zero_data on
+#pragma explicit_zero_data reset
 #pragma force_active reset
+#endif
+
+#ifdef NONMATCHING
+#pragma force_active reset
+#endif

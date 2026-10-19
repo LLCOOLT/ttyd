@@ -24,10 +24,60 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#ifdef NONMATCHING
 #undef EXT_LIT
 #define EXT_LIT(sym, val) (val)
+#endif
+#ifndef NONMATCHING
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013cec[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013cf8[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d04[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d10[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d1c[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d28[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d34[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d40[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d4c[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d58[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d64[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d70[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d7c[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d88[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013d94[3];
+__declspec(section ".rodata") extern const f32 vec3_rsh_00013da0[3];
+__declspec(section ".rodata") extern const f64 double_to_int_mask_rsh_00014480;
+__declspec(section ".rodata") extern const f64 double_to_int_rsh_00014488;
+__declspec(section ".rodata") extern const f32 float_neg5000_rsh_00014494;
+__declspec(section ".rodata") extern const f32 float_neg1_rsh_00014498;
+__declspec(section ".rodata") extern const f32 float_0p00761_rsh_000144a4;
+__declspec(section ".rodata") extern const f32 float_0p16605_rsh_000144a8;
+__declspec(section ".rodata") extern const f32 float_3p1416_rsh_000144ac;
+__declspec(section ".rodata") extern const f32 float_1p5708_rsh_000144b0;
+__declspec(section ".rodata") extern const f32 float_4p7124_rsh_000144b4;
+__declspec(section ".rodata") extern const f32 float_0p03705_rsh_000144b8;
+__declspec(section ".rodata") extern const f32 float_0p4967_rsh_000144bc;
+__declspec(section ".rodata") extern const f32 float_0p2_rsh_0001450c;
+__declspec(section ".rodata") extern const f32 float_neg45_rsh_00014530;
+__declspec(section ".rodata") extern const f32 float_0p1_rsh_00014548;
+__declspec(section ".rodata") extern const f32 float_neg100_rsh_0001454c;
+__declspec(section ".rodata") extern const f32 float_neg1000_rsh_00014560;
+__declspec(section ".rodata") extern const f32 float_neg50_rsh_0001456c;
+__declspec(section ".rodata") extern const f32 float_neg1870_rsh_00014570;
+__declspec(section ".rodata") extern const f32 float_neg500_rsh_000145ac;
+__declspec(section ".rodata") extern const f32 float_115_rsh_000145b0;
+__declspec(section ".rodata") extern const f32 float_70_rsh_000145b4;
+__declspec(section ".rodata") extern const f32 float_neg10_rsh_000145b8;
+__declspec(section ".rodata") extern const u32 gap_03_00004B24_rodata;
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 extern const char zero_rsh_000145bc[];
+#ifdef NONMATCHING
 extern const char str_00004B20[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004B20[];
+#endif
 extern const f64 double_30_rsh_00014598;
 extern const f32 float_0p03_rsh_000144f4[];
 extern const f32 float_0p1_rsh_000144f0[];
@@ -74,6 +124,7 @@ extern const f32 float_65_rsh_0001458c[];
 extern const f32 float_6p2832_rsh_0001449c[];
 extern const f32 float_90_rsh_00014534[];
 extern const f32 zero_rsh_00014490[];
+#ifdef NONMATCHING
 extern const char str_000041D0[];
 extern const char str_000041DC[];
 extern const char str_000041E0[];
@@ -95,7 +146,32 @@ extern const char str_00004314[];
 extern const char str_0000431C[];
 extern const char str_00004324[];
 extern const char str_0000432C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000041D0[];
+extern const char rsh_06_str_000041DC[];
+extern const char rsh_06_str_000041E0[];
+extern const char rsh_06_str_000041E4[];
+extern const char rsh_06_str_000041F0[];
+extern const char rsh_06_str_000041FC[];
+extern const char rsh_06_str_00004200[];
+extern const char rsh_06_str_0000420C[];
+extern const char rsh_06_str_00004210[];
+extern const char rsh_06_str_00004218[];
+extern const char rsh_06_str_0000421C[];
+extern const char rsh_06_str_00004224[];
+extern const char rsh_06_str_00004228[];
+extern const char rsh_06_str_00004230[];
+extern const char rsh_06_str_00004238[];
+extern const char rsh_06_str_00004240[];
+extern const char rsh_06_str_0000430C[];
+extern const char rsh_06_str_00004314[];
+extern const char rsh_06_str_0000431C[];
+extern const char rsh_06_str_00004324[];
+extern const char rsh_06_str_0000432C[];
+#endif
 extern const char str_00004334[];
+#ifdef NONMATCHING
 extern const char str_0000433C[];
 extern const char str_00004344[];
 extern const char str_0000434C[];
@@ -105,7 +181,20 @@ extern const char str_00004364[];
 extern const char str_0000436C[];
 extern const char str_00004374[];
 extern const char str_0000437C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000433C[];
+extern const char rsh_06_str_00004344[];
+extern const char rsh_06_str_0000434C[];
+extern const char rsh_06_str_00004354[];
+extern const char rsh_06_str_0000435C[];
+extern const char rsh_06_str_00004364[];
+extern const char rsh_06_str_0000436C[];
+extern const char rsh_06_str_00004374[];
+extern const char rsh_06_str_0000437C[];
+#endif
 extern const char str_00004384[];
+#ifdef NONMATCHING
 extern const char str_0000438C[];
 extern const char str_00004394[];
 extern const char str_0000439C[];
@@ -116,8 +205,22 @@ extern const char str_000043C4[];
 extern const char str_000043D0[];
 extern const char str_000043DC[];
 extern const char str_000043E8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000438C[];
+extern const char rsh_06_str_00004394[];
+extern const char rsh_06_str_0000439C[];
+extern const char rsh_06_str_000043A4[];
+extern const char rsh_06_str_000043AC[];
+extern const char rsh_06_str_000043B8[];
+extern const char rsh_06_str_000043C4[];
+extern const char rsh_06_str_000043D0[];
+extern const char rsh_06_str_000043DC[];
+extern const char rsh_06_str_000043E8[];
+#endif
 extern const char str_000043F4[];
 extern const char str_00004400[];
+#ifdef NONMATCHING
 extern const char str_0000440C[];
 extern const char str_00004414[];
 extern const char str_0000441C[];
@@ -132,7 +235,25 @@ extern const char str_0000445C[];
 extern const char str_00004464[];
 extern const char str_00004470[];
 extern const char str_0000447C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000440C[];
+extern const char rsh_06_str_00004414[];
+extern const char rsh_06_str_0000441C[];
+extern const char rsh_06_str_00004424[];
+extern const char rsh_06_str_0000442C[];
+extern const char rsh_06_str_00004434[];
+extern const char rsh_06_str_0000443C[];
+extern const char rsh_06_str_00004444[];
+extern const char rsh_06_str_0000444C[];
+extern const char rsh_06_str_00004454[];
+extern const char rsh_06_str_0000445C[];
+extern const char rsh_06_str_00004464[];
+extern const char rsh_06_str_00004470[];
+extern const char rsh_06_str_0000447C[];
+#endif
 extern const char str_00004488[];
+#ifdef NONMATCHING
 extern const char str_00004498[];
 extern const char str_000044A4[];
 extern const char str_000044B4[];
@@ -149,9 +270,34 @@ extern const char str_00004558[];
 extern const char str_00004574[];
 extern const char str_0000458C[];
 extern const char str_000045A4[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004498[];
+extern const char rsh_06_str_000044A4[];
+extern const char rsh_06_str_000044B4[];
+extern const char rsh_06_str_000044BC[];
+extern const char rsh_06_str_000044D4[];
+extern const char rsh_06_str_000044DC[];
+extern const char rsh_06_str_000044F4[];
+extern const char rsh_06_str_000044FC[];
+extern const char rsh_06_str_00004514[];
+extern const char rsh_06_str_00004530[];
+extern const char rsh_06_str_00004538[];
+extern const char rsh_06_str_00004550[];
+extern const char rsh_06_str_00004558[];
+extern const char rsh_06_str_00004574[];
+extern const char rsh_06_str_0000458C[];
+extern const char rsh_06_str_000045A4[];
+#endif
 extern const char str_000045BC[];
+#ifdef NONMATCHING
 extern const char str_000045D8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045D8[];
+#endif
 extern const char str_000045E0[];
+#ifdef NONMATCHING
 extern const char str_000045EC[];
 extern const char str_000045F8[];
 extern const char str_00004604[];
@@ -163,7 +309,22 @@ extern const char str_00004630[];
 extern const char str_00004638[];
 extern const char str_00004644[];
 extern const char str_00004650[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045EC[];
+extern const char rsh_06_str_000045F8[];
+extern const char rsh_06_str_00004604[];
+extern const char rsh_06_str_00004610[];
+extern const char rsh_06_str_00004618[];
+extern const char rsh_06_str_00004620[];
+extern const char rsh_06_str_00004628[];
+extern const char rsh_06_str_00004630[];
+extern const char rsh_06_str_00004638[];
+extern const char rsh_06_str_00004644[];
+extern const char rsh_06_str_00004650[];
+#endif
 extern const char str_0000465C[];
+#ifdef NONMATCHING
 extern const char str_00004668[];
 extern const char str_00004674[];
 extern const char str_0000467C[];
@@ -180,13 +341,42 @@ extern const char str_000046DC[];
 extern const char str_000046E8[];
 extern const char str_000046F8[];
 extern const char str_00004700[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004668[];
+extern const char rsh_06_str_00004674[];
+extern const char rsh_06_str_0000467C[];
+extern const char rsh_06_str_00004684[];
+extern const char rsh_06_str_0000468C[];
+extern const char rsh_06_str_00004698[];
+extern const char rsh_06_str_000046A0[];
+extern const char rsh_06_str_000046A8[];
+extern const char rsh_06_str_000046B4[];
+extern const char rsh_06_str_000046C0[];
+extern const char rsh_06_str_000046C8[];
+extern const char rsh_06_str_000046D0[];
+extern const char rsh_06_str_000046DC[];
+extern const char rsh_06_str_000046E8[];
+extern const char rsh_06_str_000046F8[];
+extern const char rsh_06_str_00004700[];
+#endif
 extern const char str_0000470C[];
+#ifdef NONMATCHING
 extern const char str_00004718[];
 extern const char str_00004724[];
 extern const char str_00004730[];
 extern const char str_00004738[];
 extern const char str_00004740[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004718[];
+extern const char rsh_06_str_00004724[];
+extern const char rsh_06_str_00004730[];
+extern const char rsh_06_str_00004738[];
+extern const char rsh_06_str_00004740[];
+#endif
 extern const char str_0000474C[];
+#ifdef NONMATCHING
 extern const char str_00004754[];
 extern const char str_0000475C[];
 extern const char str_00004764[];
@@ -207,7 +397,31 @@ extern const char str_000047FC[];
 extern const char str_00004804[];
 extern const char str_00004808[];
 extern const char str_00004824[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004754[];
+extern const char rsh_06_str_0000475C[];
+extern const char rsh_06_str_00004764[];
+extern const char rsh_06_str_0000476C[];
+extern const char rsh_06_str_00004774[];
+extern const char rsh_06_str_0000477C[];
+extern const char rsh_06_str_00004784[];
+extern const char rsh_06_str_0000478C[];
+extern const char rsh_06_str_00004794[];
+extern const char rsh_06_str_0000479C[];
+extern const char rsh_06_str_000047B4[];
+extern const char rsh_06_str_000047BC[];
+extern const char rsh_06_str_000047C8[];
+extern const char rsh_06_str_000047D8[];
+extern const char rsh_06_str_000047E4[];
+extern const char rsh_06_str_000047F0[];
+extern const char rsh_06_str_000047FC[];
+extern const char rsh_06_str_00004804[];
+extern const char rsh_06_str_00004808[];
+extern const char rsh_06_str_00004824[];
+#endif
 extern const char str_0000483C[];
+#ifdef NONMATCHING
 extern const char str_00004844[];
 extern const char str_0000484C[];
 extern const char str_00004868[];
@@ -230,11 +444,44 @@ extern const char str_00004938[];
 extern const char str_00004948[];
 extern const char str_00004964[];
 extern const char str_00004970[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004844[];
+extern const char rsh_06_str_0000484C[];
+extern const char rsh_06_str_00004868[];
+extern const char rsh_06_str_00004874[];
+extern const char rsh_06_str_0000488C[];
+extern const char rsh_06_str_00004890[];
+extern const char rsh_06_str_000048A8[];
+extern const char rsh_06_str_000048C0[];
+extern const char rsh_06_str_000048C4[];
+extern const char rsh_06_str_000048C8[];
+extern const char rsh_06_str_000048D0[];
+extern const char rsh_06_str_000048E0[];
+extern const char rsh_06_str_000048F0[];
+extern const char rsh_06_str_00004900[];
+extern const char rsh_06_str_00004918[];
+extern const char rsh_06_str_0000491C[];
+extern const char rsh_06_str_00004920[];
+extern const char rsh_06_str_00004930[];
+extern const char rsh_06_str_00004938[];
+extern const char rsh_06_str_00004948[];
+extern const char rsh_06_str_00004964[];
+extern const char rsh_06_str_00004970[];
+#endif
 extern const char str_00004980[];
+#ifdef NONMATCHING
 extern const char str_00004990[];
 extern const char str_000049A0[];
 extern const char str_000049B0[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004990[];
+extern const char rsh_06_str_000049A0[];
+extern const char rsh_06_str_000049B0[];
+#endif
 extern const char str_000049C0[];
+#ifdef NONMATCHING
 extern const char str_00004A20[];
 extern const char str_00004A40[];
 extern const char str_00004A44[];
@@ -260,7 +507,36 @@ extern const char str_00004314[];
 extern const char str_0000431C[];
 extern const char str_00004324[];
 extern const char str_0000432C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004A20[];
+extern const char rsh_06_str_00004A40[];
+extern const char rsh_06_str_00004A44[];
+extern const char rsh_06_str_00004B00[];
+extern const char rsh_06_str_000041D0[];
+extern const char rsh_06_str_000041DC[];
+extern const char rsh_06_str_000041E0[];
+extern const char rsh_06_str_000041E4[];
+extern const char rsh_06_str_000041F0[];
+extern const char rsh_06_str_000041FC[];
+extern const char rsh_06_str_00004200[];
+extern const char rsh_06_str_0000420C[];
+extern const char rsh_06_str_00004210[];
+extern const char rsh_06_str_00004218[];
+extern const char rsh_06_str_0000421C[];
+extern const char rsh_06_str_00004224[];
+extern const char rsh_06_str_00004228[];
+extern const char rsh_06_str_00004230[];
+extern const char rsh_06_str_00004238[];
+extern const char rsh_06_str_00004240[];
+extern const char rsh_06_str_0000430C[];
+extern const char rsh_06_str_00004314[];
+extern const char rsh_06_str_0000431C[];
+extern const char rsh_06_str_00004324[];
+extern const char rsh_06_str_0000432C[];
+#endif
 extern const char str_00004334[];
+#ifdef NONMATCHING
 extern const char str_0000433C[];
 extern const char str_00004344[];
 extern const char str_0000434C[];
@@ -270,7 +546,20 @@ extern const char str_00004364[];
 extern const char str_0000436C[];
 extern const char str_00004374[];
 extern const char str_0000437C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000433C[];
+extern const char rsh_06_str_00004344[];
+extern const char rsh_06_str_0000434C[];
+extern const char rsh_06_str_00004354[];
+extern const char rsh_06_str_0000435C[];
+extern const char rsh_06_str_00004364[];
+extern const char rsh_06_str_0000436C[];
+extern const char rsh_06_str_00004374[];
+extern const char rsh_06_str_0000437C[];
+#endif
 extern const char str_00004384[];
+#ifdef NONMATCHING
 extern const char str_0000438C[];
 extern const char str_00004394[];
 extern const char str_0000439C[];
@@ -281,8 +570,22 @@ extern const char str_000043C4[];
 extern const char str_000043D0[];
 extern const char str_000043DC[];
 extern const char str_000043E8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000438C[];
+extern const char rsh_06_str_00004394[];
+extern const char rsh_06_str_0000439C[];
+extern const char rsh_06_str_000043A4[];
+extern const char rsh_06_str_000043AC[];
+extern const char rsh_06_str_000043B8[];
+extern const char rsh_06_str_000043C4[];
+extern const char rsh_06_str_000043D0[];
+extern const char rsh_06_str_000043DC[];
+extern const char rsh_06_str_000043E8[];
+#endif
 extern const char str_000043F4[];
 extern const char str_00004400[];
+#ifdef NONMATCHING
 extern const char str_0000440C[];
 extern const char str_00004414[];
 extern const char str_0000441C[];
@@ -297,7 +600,25 @@ extern const char str_0000445C[];
 extern const char str_00004464[];
 extern const char str_00004470[];
 extern const char str_0000447C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000440C[];
+extern const char rsh_06_str_00004414[];
+extern const char rsh_06_str_0000441C[];
+extern const char rsh_06_str_00004424[];
+extern const char rsh_06_str_0000442C[];
+extern const char rsh_06_str_00004434[];
+extern const char rsh_06_str_0000443C[];
+extern const char rsh_06_str_00004444[];
+extern const char rsh_06_str_0000444C[];
+extern const char rsh_06_str_00004454[];
+extern const char rsh_06_str_0000445C[];
+extern const char rsh_06_str_00004464[];
+extern const char rsh_06_str_00004470[];
+extern const char rsh_06_str_0000447C[];
+#endif
 extern const char str_00004488[];
+#ifdef NONMATCHING
 extern const char str_00004498[];
 extern const char str_000044A4[];
 extern const char str_000044B4[];
@@ -314,9 +635,34 @@ extern const char str_00004558[];
 extern const char str_00004574[];
 extern const char str_0000458C[];
 extern const char str_000045A4[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004498[];
+extern const char rsh_06_str_000044A4[];
+extern const char rsh_06_str_000044B4[];
+extern const char rsh_06_str_000044BC[];
+extern const char rsh_06_str_000044D4[];
+extern const char rsh_06_str_000044DC[];
+extern const char rsh_06_str_000044F4[];
+extern const char rsh_06_str_000044FC[];
+extern const char rsh_06_str_00004514[];
+extern const char rsh_06_str_00004530[];
+extern const char rsh_06_str_00004538[];
+extern const char rsh_06_str_00004550[];
+extern const char rsh_06_str_00004558[];
+extern const char rsh_06_str_00004574[];
+extern const char rsh_06_str_0000458C[];
+extern const char rsh_06_str_000045A4[];
+#endif
 extern const char str_000045BC[];
+#ifdef NONMATCHING
 extern const char str_000045D8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045D8[];
+#endif
 extern const char str_000045E0[];
+#ifdef NONMATCHING
 extern const char str_000045EC[];
 extern const char str_000045F8[];
 extern const char str_00004604[];
@@ -328,7 +674,22 @@ extern const char str_00004630[];
 extern const char str_00004638[];
 extern const char str_00004644[];
 extern const char str_00004650[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045EC[];
+extern const char rsh_06_str_000045F8[];
+extern const char rsh_06_str_00004604[];
+extern const char rsh_06_str_00004610[];
+extern const char rsh_06_str_00004618[];
+extern const char rsh_06_str_00004620[];
+extern const char rsh_06_str_00004628[];
+extern const char rsh_06_str_00004630[];
+extern const char rsh_06_str_00004638[];
+extern const char rsh_06_str_00004644[];
+extern const char rsh_06_str_00004650[];
+#endif
 extern const char str_0000465C[];
+#ifdef NONMATCHING
 extern const char str_00004668[];
 extern const char str_00004674[];
 extern const char str_0000467C[];
@@ -345,13 +706,42 @@ extern const char str_000046DC[];
 extern const char str_000046E8[];
 extern const char str_000046F8[];
 extern const char str_00004700[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004668[];
+extern const char rsh_06_str_00004674[];
+extern const char rsh_06_str_0000467C[];
+extern const char rsh_06_str_00004684[];
+extern const char rsh_06_str_0000468C[];
+extern const char rsh_06_str_00004698[];
+extern const char rsh_06_str_000046A0[];
+extern const char rsh_06_str_000046A8[];
+extern const char rsh_06_str_000046B4[];
+extern const char rsh_06_str_000046C0[];
+extern const char rsh_06_str_000046C8[];
+extern const char rsh_06_str_000046D0[];
+extern const char rsh_06_str_000046DC[];
+extern const char rsh_06_str_000046E8[];
+extern const char rsh_06_str_000046F8[];
+extern const char rsh_06_str_00004700[];
+#endif
 extern const char str_0000470C[];
+#ifdef NONMATCHING
 extern const char str_00004718[];
 extern const char str_00004724[];
 extern const char str_00004730[];
 extern const char str_00004738[];
 extern const char str_00004740[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004718[];
+extern const char rsh_06_str_00004724[];
+extern const char rsh_06_str_00004730[];
+extern const char rsh_06_str_00004738[];
+extern const char rsh_06_str_00004740[];
+#endif
 extern const char str_0000474C[];
+#ifdef NONMATCHING
 extern const char str_00004754[];
 extern const char str_0000475C[];
 extern const char str_00004764[];
@@ -372,7 +762,31 @@ extern const char str_000047FC[];
 extern const char str_00004804[];
 extern const char str_00004808[];
 extern const char str_00004824[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004754[];
+extern const char rsh_06_str_0000475C[];
+extern const char rsh_06_str_00004764[];
+extern const char rsh_06_str_0000476C[];
+extern const char rsh_06_str_00004774[];
+extern const char rsh_06_str_0000477C[];
+extern const char rsh_06_str_00004784[];
+extern const char rsh_06_str_0000478C[];
+extern const char rsh_06_str_00004794[];
+extern const char rsh_06_str_0000479C[];
+extern const char rsh_06_str_000047B4[];
+extern const char rsh_06_str_000047BC[];
+extern const char rsh_06_str_000047C8[];
+extern const char rsh_06_str_000047D8[];
+extern const char rsh_06_str_000047E4[];
+extern const char rsh_06_str_000047F0[];
+extern const char rsh_06_str_000047FC[];
+extern const char rsh_06_str_00004804[];
+extern const char rsh_06_str_00004808[];
+extern const char rsh_06_str_00004824[];
+#endif
 extern const char str_0000483C[];
+#ifdef NONMATCHING
 extern const char str_00004844[];
 extern const char str_0000484C[];
 extern const char str_00004868[];
@@ -395,14 +809,47 @@ extern const char str_00004938[];
 extern const char str_00004948[];
 extern const char str_00004964[];
 extern const char str_00004970[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004844[];
+extern const char rsh_06_str_0000484C[];
+extern const char rsh_06_str_00004868[];
+extern const char rsh_06_str_00004874[];
+extern const char rsh_06_str_0000488C[];
+extern const char rsh_06_str_00004890[];
+extern const char rsh_06_str_000048A8[];
+extern const char rsh_06_str_000048C0[];
+extern const char rsh_06_str_000048C4[];
+extern const char rsh_06_str_000048C8[];
+extern const char rsh_06_str_000048D0[];
+extern const char rsh_06_str_000048E0[];
+extern const char rsh_06_str_000048F0[];
+extern const char rsh_06_str_00004900[];
+extern const char rsh_06_str_00004918[];
+extern const char rsh_06_str_0000491C[];
+extern const char rsh_06_str_00004920[];
+extern const char rsh_06_str_00004930[];
+extern const char rsh_06_str_00004938[];
+extern const char rsh_06_str_00004948[];
+extern const char rsh_06_str_00004964[];
+extern const char rsh_06_str_00004970[];
+#endif
 extern const char str_00004980[];
+#ifdef NONMATCHING
 extern const char str_00004990[];
 extern const char str_000049A0[];
 extern const char str_000049B0[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004990[];
+extern const char rsh_06_str_000049A0[];
+extern const char rsh_06_str_000049B0[];
+#endif
 extern const char str_000049C0[];
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
 #pragma force_active reset
+#ifdef NONMATCHING
 extern const char str_000041D0[];
 extern const char str_000041DC[];
 extern const char str_000041E0[];
@@ -424,7 +871,32 @@ extern const char str_00004314[];
 extern const char str_0000431C[];
 extern const char str_00004324[];
 extern const char str_0000432C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000041D0[];
+extern const char rsh_06_str_000041DC[];
+extern const char rsh_06_str_000041E0[];
+extern const char rsh_06_str_000041E4[];
+extern const char rsh_06_str_000041F0[];
+extern const char rsh_06_str_000041FC[];
+extern const char rsh_06_str_00004200[];
+extern const char rsh_06_str_0000420C[];
+extern const char rsh_06_str_00004210[];
+extern const char rsh_06_str_00004218[];
+extern const char rsh_06_str_0000421C[];
+extern const char rsh_06_str_00004224[];
+extern const char rsh_06_str_00004228[];
+extern const char rsh_06_str_00004230[];
+extern const char rsh_06_str_00004238[];
+extern const char rsh_06_str_00004240[];
+extern const char rsh_06_str_0000430C[];
+extern const char rsh_06_str_00004314[];
+extern const char rsh_06_str_0000431C[];
+extern const char rsh_06_str_00004324[];
+extern const char rsh_06_str_0000432C[];
+#endif
 extern const char str_00004334[];
+#ifdef NONMATCHING
 extern const char str_0000433C[];
 extern const char str_00004344[];
 extern const char str_0000434C[];
@@ -434,7 +906,20 @@ extern const char str_00004364[];
 extern const char str_0000436C[];
 extern const char str_00004374[];
 extern const char str_0000437C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000433C[];
+extern const char rsh_06_str_00004344[];
+extern const char rsh_06_str_0000434C[];
+extern const char rsh_06_str_00004354[];
+extern const char rsh_06_str_0000435C[];
+extern const char rsh_06_str_00004364[];
+extern const char rsh_06_str_0000436C[];
+extern const char rsh_06_str_00004374[];
+extern const char rsh_06_str_0000437C[];
+#endif
 extern const char str_00004384[];
+#ifdef NONMATCHING
 extern const char str_0000438C[];
 extern const char str_00004394[];
 extern const char str_0000439C[];
@@ -445,8 +930,22 @@ extern const char str_000043C4[];
 extern const char str_000043D0[];
 extern const char str_000043DC[];
 extern const char str_000043E8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000438C[];
+extern const char rsh_06_str_00004394[];
+extern const char rsh_06_str_0000439C[];
+extern const char rsh_06_str_000043A4[];
+extern const char rsh_06_str_000043AC[];
+extern const char rsh_06_str_000043B8[];
+extern const char rsh_06_str_000043C4[];
+extern const char rsh_06_str_000043D0[];
+extern const char rsh_06_str_000043DC[];
+extern const char rsh_06_str_000043E8[];
+#endif
 extern const char str_000043F4[];
 extern const char str_00004400[];
+#ifdef NONMATCHING
 extern const char str_0000440C[];
 extern const char str_00004414[];
 extern const char str_0000441C[];
@@ -461,7 +960,25 @@ extern const char str_0000445C[];
 extern const char str_00004464[];
 extern const char str_00004470[];
 extern const char str_0000447C[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_0000440C[];
+extern const char rsh_06_str_00004414[];
+extern const char rsh_06_str_0000441C[];
+extern const char rsh_06_str_00004424[];
+extern const char rsh_06_str_0000442C[];
+extern const char rsh_06_str_00004434[];
+extern const char rsh_06_str_0000443C[];
+extern const char rsh_06_str_00004444[];
+extern const char rsh_06_str_0000444C[];
+extern const char rsh_06_str_00004454[];
+extern const char rsh_06_str_0000445C[];
+extern const char rsh_06_str_00004464[];
+extern const char rsh_06_str_00004470[];
+extern const char rsh_06_str_0000447C[];
+#endif
 extern const char str_00004488[];
+#ifdef NONMATCHING
 extern const char str_00004498[];
 extern const char str_000044A4[];
 extern const char str_000044B4[];
@@ -478,9 +995,34 @@ extern const char str_00004558[];
 extern const char str_00004574[];
 extern const char str_0000458C[];
 extern const char str_000045A4[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004498[];
+extern const char rsh_06_str_000044A4[];
+extern const char rsh_06_str_000044B4[];
+extern const char rsh_06_str_000044BC[];
+extern const char rsh_06_str_000044D4[];
+extern const char rsh_06_str_000044DC[];
+extern const char rsh_06_str_000044F4[];
+extern const char rsh_06_str_000044FC[];
+extern const char rsh_06_str_00004514[];
+extern const char rsh_06_str_00004530[];
+extern const char rsh_06_str_00004538[];
+extern const char rsh_06_str_00004550[];
+extern const char rsh_06_str_00004558[];
+extern const char rsh_06_str_00004574[];
+extern const char rsh_06_str_0000458C[];
+extern const char rsh_06_str_000045A4[];
+#endif
 extern const char str_000045BC[];
+#ifdef NONMATCHING
 extern const char str_000045D8[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045D8[];
+#endif
 extern const char str_000045E0[];
+#ifdef NONMATCHING
 extern const char str_000045EC[];
 extern const char str_000045F8[];
 extern const char str_00004604[];
@@ -492,7 +1034,22 @@ extern const char str_00004630[];
 extern const char str_00004638[];
 extern const char str_00004644[];
 extern const char str_00004650[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000045EC[];
+extern const char rsh_06_str_000045F8[];
+extern const char rsh_06_str_00004604[];
+extern const char rsh_06_str_00004610[];
+extern const char rsh_06_str_00004618[];
+extern const char rsh_06_str_00004620[];
+extern const char rsh_06_str_00004628[];
+extern const char rsh_06_str_00004630[];
+extern const char rsh_06_str_00004638[];
+extern const char rsh_06_str_00004644[];
+extern const char rsh_06_str_00004650[];
+#endif
 extern const char str_0000465C[];
+#ifdef NONMATCHING
 extern const char str_00004668[];
 extern const char str_00004674[];
 extern const char str_0000467C[];
@@ -509,13 +1066,42 @@ extern const char str_000046DC[];
 extern const char str_000046E8[];
 extern const char str_000046F8[];
 extern const char str_00004700[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004668[];
+extern const char rsh_06_str_00004674[];
+extern const char rsh_06_str_0000467C[];
+extern const char rsh_06_str_00004684[];
+extern const char rsh_06_str_0000468C[];
+extern const char rsh_06_str_00004698[];
+extern const char rsh_06_str_000046A0[];
+extern const char rsh_06_str_000046A8[];
+extern const char rsh_06_str_000046B4[];
+extern const char rsh_06_str_000046C0[];
+extern const char rsh_06_str_000046C8[];
+extern const char rsh_06_str_000046D0[];
+extern const char rsh_06_str_000046DC[];
+extern const char rsh_06_str_000046E8[];
+extern const char rsh_06_str_000046F8[];
+extern const char rsh_06_str_00004700[];
+#endif
 extern const char str_0000470C[];
+#ifdef NONMATCHING
 extern const char str_00004718[];
 extern const char str_00004724[];
 extern const char str_00004730[];
 extern const char str_00004738[];
 extern const char str_00004740[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004718[];
+extern const char rsh_06_str_00004724[];
+extern const char rsh_06_str_00004730[];
+extern const char rsh_06_str_00004738[];
+extern const char rsh_06_str_00004740[];
+#endif
 extern const char str_0000474C[];
+#ifdef NONMATCHING
 extern const char str_00004754[];
 extern const char str_0000475C[];
 extern const char str_00004764[];
@@ -536,7 +1122,31 @@ extern const char str_000047FC[];
 extern const char str_00004804[];
 extern const char str_00004808[];
 extern const char str_00004824[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004754[];
+extern const char rsh_06_str_0000475C[];
+extern const char rsh_06_str_00004764[];
+extern const char rsh_06_str_0000476C[];
+extern const char rsh_06_str_00004774[];
+extern const char rsh_06_str_0000477C[];
+extern const char rsh_06_str_00004784[];
+extern const char rsh_06_str_0000478C[];
+extern const char rsh_06_str_00004794[];
+extern const char rsh_06_str_0000479C[];
+extern const char rsh_06_str_000047B4[];
+extern const char rsh_06_str_000047BC[];
+extern const char rsh_06_str_000047C8[];
+extern const char rsh_06_str_000047D8[];
+extern const char rsh_06_str_000047E4[];
+extern const char rsh_06_str_000047F0[];
+extern const char rsh_06_str_000047FC[];
+extern const char rsh_06_str_00004804[];
+extern const char rsh_06_str_00004808[];
+extern const char rsh_06_str_00004824[];
+#endif
 extern const char str_0000483C[];
+#ifdef NONMATCHING
 extern const char str_00004844[];
 extern const char str_0000484C[];
 extern const char str_00004868[];
@@ -559,10 +1169,42 @@ extern const char str_00004938[];
 extern const char str_00004948[];
 extern const char str_00004964[];
 extern const char str_00004970[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004844[];
+extern const char rsh_06_str_0000484C[];
+extern const char rsh_06_str_00004868[];
+extern const char rsh_06_str_00004874[];
+extern const char rsh_06_str_0000488C[];
+extern const char rsh_06_str_00004890[];
+extern const char rsh_06_str_000048A8[];
+extern const char rsh_06_str_000048C0[];
+extern const char rsh_06_str_000048C4[];
+extern const char rsh_06_str_000048C8[];
+extern const char rsh_06_str_000048D0[];
+extern const char rsh_06_str_000048E0[];
+extern const char rsh_06_str_000048F0[];
+extern const char rsh_06_str_00004900[];
+extern const char rsh_06_str_00004918[];
+extern const char rsh_06_str_0000491C[];
+extern const char rsh_06_str_00004920[];
+extern const char rsh_06_str_00004930[];
+extern const char rsh_06_str_00004938[];
+extern const char rsh_06_str_00004948[];
+extern const char rsh_06_str_00004964[];
+extern const char rsh_06_str_00004970[];
+#endif
 extern const char str_00004980[];
+#ifdef NONMATCHING
 extern const char str_00004990[];
 extern const char str_000049A0[];
 extern const char str_000049B0[];
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_00004990[];
+extern const char rsh_06_str_000049A0[];
+extern const char rsh_06_str_000049B0[];
+#endif
 extern const char str_000049C0[];
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
@@ -570,7 +1212,12 @@ typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed
 typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
 typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
+#ifdef NONMATCHING
 static s32 bss_pad;
+#endif
+#ifndef NONMATCHING
+static u8 gap_05_00000054_bss[4];  // .bss pad after wp
+#endif
 static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -604,10 +1251,12 @@ void extDrawShadow(void);
 #pragma inline_max_total_size(100000)
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+#ifdef NONMATCHING
 static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
 static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; a = -a; } return a; }
 static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
+#endif
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 s32 nokonokoGetStatus(PartyEntry* party);
@@ -817,6 +1466,7 @@ __declspec(section ".data") s32 fd_rsh_06_one_364[] = {
 };
 
 static s32 ext_moamoa_data[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 0, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 1073741824, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC),
     1082130432, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 1086324736, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 1090519040, (s32)((char*)str_000041D0),
     (s32)((char*)str_000041DC), 1092616192, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 1094713344, (s32)((char*)str_000041D0), (s32)((char*)str_000041DC), 1096810496,
@@ -844,6 +1494,36 @@ static s32 ext_moamoa_data[] = {
     (s32)((char*)str_00004238), (s32)((char*)str_000041FC), 0, (s32)((char*)str_00004238), (s32)((char*)str_000041FC), 1082130432, (s32)((char*)str_00004238), (s32)((char*)str_000041FC),
     1090519040, (s32)((char*)str_00004240), (s32)((char*)str_000041FC), 0, (s32)((char*)str_00004240), (s32)((char*)str_000041FC), 1082130432, (s32)((char*)str_00004240),
     (s32)((char*)str_000041FC), 1090519040, 0, 0, 0,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 0, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1073741824, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC),
+    1082130432, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1086324736, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1090519040, (s32)((char*)rsh_06_str_000041D0),
+    (s32)((char*)rsh_06_str_000041DC), 1092616192, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1094713344, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1096810496,
+    (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1098907648, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1099956224, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC),
+    1101004800, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1102053376, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1103101952, (s32)((char*)rsh_06_str_000041D0),
+    (s32)((char*)rsh_06_str_000041DC), 1104150528, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1105199104, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1106247680,
+    (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1107296256, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1107820544, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC),
+    1108344832, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041DC), 1108869120, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041E0), 0, (s32)((char*)rsh_06_str_000041D0),
+    (s32)((char*)rsh_06_str_000041E0), 1082130432, (s32)((char*)rsh_06_str_000041D0), (s32)((char*)rsh_06_str_000041E0), 1090519040, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 0,
+    (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1073741824, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1082130432, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC),
+    1086324736, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1090519040, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1092616192, (s32)((char*)rsh_06_str_000041E4),
+    (s32)((char*)rsh_06_str_000041DC), 1094713344, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1096810496, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1098907648,
+    (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1099956224, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1101004800, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC),
+    1102053376, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1103101952, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1104150528, (s32)((char*)rsh_06_str_000041E4),
+    (s32)((char*)rsh_06_str_000041DC), 1105199104, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1106247680, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1107296256,
+    (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1107820544, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC), 1108344832, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041DC),
+    1108869120, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041E0), 0, (s32)((char*)rsh_06_str_000041E4), (s32)((char*)rsh_06_str_000041E0), 1082130432, (s32)((char*)rsh_06_str_000041E4),
+    (s32)((char*)rsh_06_str_000041E0), 1090519040, (s32)((char*)rsh_06_str_000041F0), (s32)((char*)rsh_06_str_000041FC), 0, (s32)((char*)rsh_06_str_000041F0), (s32)((char*)rsh_06_str_000041FC), 1082130432,
+    (s32)((char*)rsh_06_str_000041F0), (s32)((char*)rsh_06_str_000041FC), 1090519040, (s32)((char*)rsh_06_str_00004200), (s32)((char*)rsh_06_str_0000420C), 0, (s32)((char*)rsh_06_str_00004200), (s32)((char*)rsh_06_str_0000420C),
+    1082130432, (s32)((char*)rsh_06_str_00004200), (s32)((char*)rsh_06_str_0000420C), 1090519040, (s32)((char*)rsh_06_str_00004210), (s32)((char*)rsh_06_str_00004218), 0, (s32)((char*)rsh_06_str_00004210),
+    (s32)((char*)rsh_06_str_00004218), 1082130432, (s32)((char*)rsh_06_str_00004210), (s32)((char*)rsh_06_str_00004218), 1090519040, (s32)((char*)rsh_06_str_0000421C), (s32)((char*)rsh_06_str_00004224), 0,
+    (s32)((char*)rsh_06_str_0000421C), (s32)((char*)rsh_06_str_00004224), 1082130432, (s32)((char*)rsh_06_str_0000421C), (s32)((char*)rsh_06_str_00004224), 1090519040, (s32)((char*)rsh_06_str_00004228), (s32)((char*)rsh_06_str_000041FC),
+    0, (s32)((char*)rsh_06_str_00004228), (s32)((char*)rsh_06_str_000041FC), 1082130432, (s32)((char*)rsh_06_str_00004228), (s32)((char*)rsh_06_str_000041FC), 1090519040, (s32)((char*)rsh_06_str_00004230),
+    (s32)((char*)rsh_06_str_000041FC), 0, (s32)((char*)rsh_06_str_00004230), (s32)((char*)rsh_06_str_000041FC), 1082130432, (s32)((char*)rsh_06_str_00004230), (s32)((char*)rsh_06_str_000041FC), 1090519040,
+    (s32)((char*)rsh_06_str_00004238), (s32)((char*)rsh_06_str_000041FC), 0, (s32)((char*)rsh_06_str_00004238), (s32)((char*)rsh_06_str_000041FC), 1082130432, (s32)((char*)rsh_06_str_00004238), (s32)((char*)rsh_06_str_000041FC),
+    1090519040, (s32)((char*)rsh_06_str_00004240), (s32)((char*)rsh_06_str_000041FC), 0, (s32)((char*)rsh_06_str_00004240), (s32)((char*)rsh_06_str_000041FC), 1082130432, (s32)((char*)rsh_06_str_00004240),
+    (s32)((char*)rsh_06_str_000041FC), 1090519040, 0, 0, 0,
+#endif
 };
 
 
@@ -903,7 +1583,12 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
+#ifdef NONMATCHING
         if (!strncmp(anim, (char*)str_00004B20, 1)) {
+#endif
+#ifndef NONMATCHING
+        if (!strncmp(anim, (char*)rsh_06_str_00004B20, 1)) {
+#endif
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -911,8 +1596,24 @@ static void moamoa_pose_init(void) {
     wp->numDefs++;
 }
 #pragma dont_inline reset
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXIdentity(Mtx m);
+void PSMTXRotRad(Mtx m, char axis, f32 rad);
+void PSVECAdd(const Vec* a, const Vec* b, Vec* ab);
+f32 PSVECDistance(const Vec* a, const Vec* b);
+void PSVECScale(const Vec* src, Vec* dst, f32 scale);
+void *memset(void *dest, int ch, size_t count);
+int strcmp(const char *s1, const char *s2);
+int strncmp(const char *s1, const char *s2, size_t n);
+void __cvt_ull_flt();
+void __div2u();
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 static void moamoa_pose_main(void) {
+#ifdef NONMATCHING
     f32 t;
     u64 now;
     s32 i;
@@ -934,10 +1635,101 @@ static void moamoa_pose_main(void) {
         }
         pose->frame = def->start + (s32)((def->count - 1) * t);
     }
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	char _af_pad[8];
+	asm volatile {
+		bl extGetPosePtr
+		lis r4, wp@ha
+		lis r7, float_60_rsh_00014578@ha
+		addi r29, r4, wp@l
+		lis r6, float_1000_rsh_0001457c@ha
+		opword 0x813D0000
+		lis r5, float_1_rsh_00014470@ha
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r8, gp@ha
+		opword 0x83090008
+		opword 0x7C791B78
+		lfs f28, float_60_rsh_00014578@l(r7)
+		addi r30, r8, gp@l
+		lfs f29, float_1000_rsh_0001457c@l(r6)
+		opword 0x3B400000
+		lfs f30, float_1_rsh_00014470@l(r5)
+		opword 0x3FE08000
+		lfd f31, double_to_int_rsh_00014488@l(r4)
+		opword 0x3EE04330
+		opword 0x480000BC
+		opword 0x807F00F8
+		opword 0x380003E8
+		opword 0x809E0000
+		opword 0x38A00000
+		opword 0x5463F0BE
+		opword 0xA8F8003C
+		opword 0x7CC30396
+		opword 0x8364003C
+		opword 0x80180044
+		opword 0x83840038
+		opword 0x7C80D810
+		opword 0x80180040
+		opword 0x1CE70028
+		opword 0x7C60E110
+		addi r22, r7, 0x50
+		opword 0x7EC8B214
+		bl __div2u
+		bl __cvt_ull_flt
+		opword 0xEC3C0072
+		opword 0xC016001C
+		opword 0xEC21E824
+		opword 0xEC210024
+		opword 0xFC01F040
+		opword 0x4C411382
+		opword 0x40820014
+		opword 0x93780044
+		lis r3, zero_rsh_00014490@ha
+		lfs f1, zero_rsh_00014490@l(r3)
+		opword 0x93980040
+		opword 0x80760024
+		opword 0x3B5A0001
+		stw r23, _af_pad+0(r1)
+		opword 0x3B180050
+		opword 0x3803FFFF
+		opword 0x80760020
+		opword 0x6C008000
+		opword 0x9001000C
+		opword 0xC8010008
+		opword 0xEC00F828
+		opword 0xEC000072
+		opword 0xFC00001E
+		opword 0xD8010010
+		opword 0x80010014
+		opword 0x7C030214
+		opword 0x90190010
+		opword 0x3B390020
+		opword 0x811D0000
+		opword 0x80080004
+		opword 0x7C1A0000
+		opword 0x4180FF3C
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+static const char* group_tbl[][2] = {
+        {(char*)rsh_06_str_000041D0, (char*)rsh_06_str_000041DC},
+        {(char*)rsh_06_str_000041E4, (char*)rsh_06_str_000041DC},
+        {(char*)rsh_06_str_000041F0, (char*)rsh_06_str_000041FC},
+        {(char*)rsh_06_str_00004200, (char*)rsh_06_str_0000420C},
+        {(char*)rsh_06_str_00004210, (char*)rsh_06_str_00004218},
+        {(char*)rsh_06_str_0000421C, (char*)rsh_06_str_00004224},
+        {(char*)rsh_06_str_00004228, (char*)rsh_06_str_000041FC},
+        {(char*)rsh_06_str_00004230, (char*)rsh_06_str_000041FC},
+        {(char*)rsh_06_str_00004238, (char*)rsh_06_str_000041FC},
+        {(char*)rsh_06_str_00004240, (char*)rsh_06_str_000041FC},
+        {(char*)rsh_06_str_000041D0, (char*)rsh_06_str_000041DC},
+    };
+#endif
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
+#ifdef NONMATCHING
     static const char* group_tbl[][2] = {
         {(char*)str_000041D0, (char*)str_000041DC},
         {(char*)str_000041E4, (char*)str_000041DC},
@@ -951,6 +1743,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
         {(char*)str_00004240, (char*)str_000041FC},
         {(char*)str_000041D0, (char*)str_000041DC},
     };
+#endif
     MoamoaPoseDef* def = wp->defs;
     s32 i;
 
@@ -960,7 +1753,12 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
             anim = group_tbl[moa->kind][1];
         }
         if (moa->kind == 10) {
+#ifdef NONMATCHING
             anim = (char*)str_000048C4;
+#endif
+#ifndef NONMATCHING
+            anim = (char*)rsh_06_str_000048C4;
+#endif
         }
     }
     for (i = 0; i < wp->numDefs; i++, def++) {
@@ -970,12 +1768,22 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     }
     if (i < wp->numDefs && moa->pose != i) {
         if (moa->flags & 4) {
+#ifdef NONMATCHING
             if (strncmp(anim, (char*)str_00004A40, 1)) {
+#endif
+#ifndef NONMATCHING
+            if (strncmp(anim, (char*)rsh_06_str_00004A40, 1)) {
+#endif
                 return;
             }
         }
         if (moa->flags & 0x10) {
+#ifdef NONMATCHING
             if (strncmp(anim, (char*)str_00004A44, 1)) {
+#endif
+#ifndef NONMATCHING
+            if (strncmp(anim, (char*)rsh_06_str_00004A44, 1)) {
+#endif
                 return;
             }
         }
@@ -983,8 +1791,6 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
         moa->startTime = gp->renderTime;
     }
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -997,14 +1803,10 @@ static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall) {
     extReset();
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
@@ -1015,8 +1817,6 @@ static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
@@ -1030,8 +1830,6 @@ static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose;
@@ -1063,12 +1861,15 @@ static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
         pose->flags |= 4;
         moa->flags |= 0x400;
         moa->state = 61;
+#ifdef NONMATCHING
         moamoa_pose_change(moa, (char*)str_000041D0, (char*)str_000041DC);
+#endif
+#ifndef NONMATCHING
+        moamoa_pose_change(moa, (char*)rsh_06_str_000041D0, (char*)rsh_06_str_000041DC);
+#endif
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
@@ -1096,12 +1897,15 @@ static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
                 moa->flags &= ~0x800;
             }
         }
+#ifdef NONMATCHING
         moamoa_pose_change(moa, (char*)str_000041D0, (char*)str_000041DC);
+#endif
+#ifndef NONMATCHING
+        moamoa_pose_change(moa, (char*)rsh_06_str_000041D0, (char*)rsh_06_str_000041DC);
+#endif
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
@@ -1115,8 +1919,6 @@ static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
-#endif
-#ifdef NONMATCHING
 static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
@@ -1129,13 +1931,22 @@ static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
         moa->flags |= 0x200;
         moa->state = 61;
         moa->flags |= 0x800;
+#ifdef NONMATCHING
         moamoa_pose_change(moa, (char*)str_000041D0, (char*)str_000041DC);
+#endif
+#ifndef NONMATCHING
+        moamoa_pose_change(moa, (char*)rsh_06_str_000041D0, (char*)rsh_06_str_000041DC);
+#endif
     }
     return EVT_RETURN_DONE;
 }
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
 #endif
-#ifdef NONMATCHING
 void evalOn(void) {
+#ifdef NONMATCHING
     NpcEntry* npc = npcNameToPtr((char*)str_000047B4);
     AnimationPose* anim;
     Moamoa* moa;
@@ -1194,9 +2005,177 @@ void evalOn(void) {
             }
         }
     }
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	asm {
+		lis r3, rsh_06_str_000047B4@ha
+		addi r3, r3, rsh_06_str_000047B4@l
+	}
+	asm volatile {
+		bl npcNameToPtr
+		opword 0x7C7F1B78
+		opword 0x80630104
+		bl animPoseWorldPositionEvalOn
+		lis r3, wp@ha
+		opword 0x801F0104
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x90030048
+		opword 0x807F0104
+		bl animPoseGetAnimPosePtr
+		opword 0x80C3015C
+		lis r4, vec3_rsh_00013cec@ha
+		opword 0x80030160
+		addi r5, r4, vec3_rsh_00013cec@l
+		opword 0x80E60000
+		opword 0x38600000
+		opword 0x7C0903A6
+		opword 0x2C000000
+		opword 0x40810028
+		opword 0x80850000
+		opword 0x7CC71A14
+		opword 0x80050004
+		opword 0x3863000C
+		opword 0x90860000
+		opword 0x90060004
+		opword 0x80050008
+		opword 0x90060008
+		opword 0x4200FFE0
+		lis r3, dat_80419a28@ha
+		lis r5, g_moamoa_chain_tbl@ha
+		lis r4, wp@ha
+		lwz r28, dat_80419a28@l(r3)
+		addi r26, r5, g_moamoa_chain_tbl@l
+		li r24, 0x0
+		addi r27, r4, wp@l
+		opword 0x3BC00000
+		opword 0x3BA00000
+		opword 0x48000044
+		opword 0x7F3AEA14
+		opword 0x807F0104
+		opword 0x80990000
+		bl animPoseGetGroupIdx
+		opword 0x809B0000
+		opword 0x381E0670
+		opword 0x7C64032E
+		opword 0x807F0104
+		opword 0x80990004
+		bl animPoseGetGroupIdx
+		opword 0x809B0000
+		opword 0x381E0672
+		opword 0x3BDE0004
+		opword 0x3BBD0008
+		opword 0x7C64032E
+		opword 0x3B180001
+		opword 0x7C18E000
+		opword 0x4180FFBC
+		lis r4, wp@ha
+		lis r3, dat_80419a28@ha
+		addi r7, r4, wp@l
+		lwz r6, dat_80419a28@l(r3)
+		opword 0x80870000
+		opword 0x39200000
+		opword 0x81040008
+		opword 0x4800003C
+		opword 0x7C0933D6
+		opword 0x7C0031D6
+		opword 0x7C004850
+		opword 0x39290001
+		opword 0xB0080048
+		opword 0xA8080048
+		opword 0x80A70000
+		opword 0x5403083C
+		opword 0x38830570
+		opword 0x7C6522AE
+		opword 0x38030001
+		opword 0x7C05232E
+		opword 0xB068004A
+		opword 0x39080050
+		opword 0x80870000
+		opword 0x80040004
+		opword 0x7C090000
+		opword 0x4180FFBC
+		lis r3, wp@ha
+		opword 0x80A40008
+		addi r4, r3, wp@l
+		opword 0x38C00000
+		opword 0x4800010C
+		opword 0xA8650048
+		opword 0x7C600735
+		opword 0x41820044
+		opword 0x2C030005
+		opword 0x4182003C
+		opword 0x2C03000A
+		opword 0x41820034
+		opword 0x2C03000F
+		opword 0x4182002C
+		opword 0x2C03001E
+		opword 0x41820024
+		opword 0x2C030022
+		opword 0x4182001C
+		opword 0x2C030026
+		opword 0x41820014
+		opword 0x2C03002A
+		opword 0x4182000C
+		opword 0x2C03002E
+		opword 0x4082000C
+		opword 0x38000001
+		opword 0x9805004C
+		opword 0xA805004A
+		opword 0x2C000000
+		opword 0x408200A4
+		opword 0xA8050048
+		opword 0x2C000003
+		opword 0x4082000C
+		opword 0x38000002
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C000004
+		opword 0x4082000C
+		opword 0x38000003
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C000007
+		opword 0x4082000C
+		opword 0x38000004
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C000008
+		opword 0x4082000C
+		opword 0x38000005
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C000009
+		opword 0x4082000C
+		opword 0x38000006
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C00000C
+		opword 0x4082000C
+		opword 0x38000007
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C00000D
+		opword 0x4082000C
+		opword 0x38000008
+		opword 0x9805004C
+		opword 0xA8050048
+		opword 0x2C00000E
+		opword 0x4082000C
+		opword 0x38000009
+		opword 0x9805004C
+		opword 0x38C60001
+		opword 0x38A50050
+		opword 0x80640000
+		opword 0x80030004
+		opword 0x7C060000
+		opword 0x4180FEEC
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+#endif
 static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
@@ -1209,16 +2188,60 @@ static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     }
     return EVT_RETURN_DONE;
 }
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
 #endif
-#ifdef NONMATCHING
 static f32 randf(f32 min, f32 max) {
+#ifdef NONMATCHING
     f32 r = rand() / float_32767_rsh_000144ec[0];
 
     return r * (max - min) + min;
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFD0
+		opword 0x7C0802A6
+		opword 0x90010034
+		opword 0xDBE10020
+		opword 0xF3E10028
+		opword 0xDBC10010
+		opword 0xF3C10018
+		opword 0xFFC00890
+		opword 0xFFE01090
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061000C
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f3, double_to_int_rsh_00014488@l(r4)
+		opword 0x90010008
+		opword 0xEC1FF028
+		lfs f1, float_32767_rsh_000144ec@l(r3)
+		opword 0xC8410008
+		opword 0xEC421828
+		opword 0xEC220824
+		opword 0xEC21F03A
+		opword 0xE3E10028
+		opword 0xCBE10020
+		opword 0xE3C10018
+		opword 0x80010034
+		opword 0xCBC10010
+		opword 0x7C0803A6
+		opword 0x38210030
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 static void ext_moamoa_init(void) {
+#ifdef NONMATCHING
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -1268,9 +2291,447 @@ static void ext_moamoa_init(void) {
     for (i = 0; i < 600; i++) {
         ext_moamoa_main();
     }
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	char _af_pad[68];
+	asm volatile {
+		opword 0x38600870
+		bl _mapAlloc
+		lis r5, wp@ha
+		opword 0x38800000
+		addi r6, r5, wp@l
+		opword 0x38A00870
+		opword 0x90660000
+		bl memset
+		lis r5, wp@ha
+		lis r3, vec3_rsh_00013cf8@ha
+		addi r7, r3, vec3_rsh_00013cf8@l
+		lis r4, vec3_rsh_00013d04@ha
+		addi r9, r5, wp@l
+		opword 0x80C70000
+		opword 0x81090000
+		lis r3, vec3_rsh_00013d10@ha
+		opword 0x80070004
+		addi r5, r4, vec3_rsh_00013d04@l
+		addi r4, r3, vec3_rsh_00013d10@l
+		opword 0x90C80014
+		opword 0x90080018
+		opword 0x80070008
+		opword 0x9008001C
+		opword 0x80C90000
+		opword 0x80650000
+		opword 0x80050004
+		opword 0x90660020
+		opword 0x90060024
+		opword 0x80050008
+		opword 0x90060028
+		opword 0x80A90000
+		opword 0x80640000
+		opword 0x80040004
+		opword 0x9065002C
+		opword 0x90050030
+		opword 0x80040008
+		opword 0x90050034
+		bl extGetPoseNum
+		lis r4, wp@ha
+		addi r5, r4, wp@l
+		opword 0x80850000
+		opword 0x90640004
+		opword 0x80650000
+		opword 0x80030004
+		opword 0x1C600050
+		bl _mapAlloc
+		lis r5, wp@ha
+		opword 0x38800000
+		addi r6, r5, wp@l
+		opword 0x80A60000
+		opword 0x90650008
+		opword 0x80660000
+		opword 0x80030004
+		opword 0x80630008
+		opword 0x1CA00050
+		bl memset
+		bl moamoa_pose_init
+		bl extGetPosePtr
+		lis r4, wp@ha
+		lis r17, zero_rsh_00014490@ha
+		addi r25, r4, wp@l
+		lis r12, double_to_int_rsh_00014488@ha
+		opword 0x82D90000
+		addi r29, r17, zero_rsh_00014490@l
+		lis r11, float_32767_rsh_000144ec@ha
+		lis r10, float_1000_rsh_0001457c@ha
+		lis r9, float_neg500_rsh_000145ac@ha
+		lis r8, float_215_rsh_00014504@ha
+		lis r7, float_90_rsh_00014534@ha
+		lis r6, float_neg45_rsh_00014530@ha
+		lis r5, float_1E06_rsh_00014594@ha
+		lis r4, float_100_rsh_000144f8@ha
+		lis r19, float_20_rsh_00014580@ha
+		lis r18, float_neg10_rsh_000145b8@ha
+		lis r24, rsh_06_str_000041DC@ha
+		lis r21, rsh_06_str_000041D0@ha
+		lis r20, vec3_rsh_00013d1c@ha
+		lis r17, float_neg1_rsh_00014498@ha
+		opword 0x83F60008
+		addi r26, r24, rsh_06_str_000041DC@l
+		lfd f20, double_to_int_rsh_00014488@l(r12)
+		opword 0x7C771B78
+		lfs f21, float_32767_rsh_000144ec@l(r11)
+		addi r27, r21, rsh_06_str_000041D0@l
+		lfs f22, float_1000_rsh_0001457c@l(r10)
+		addi r22, r17, float_neg1_rsh_00014498@l
+		lfs f23, float_neg500_rsh_000145ac@l(r9)
+		addi r30, r20, vec3_rsh_00013d1c@l
+		lfs f24, float_215_rsh_00014504@l(r8)
+		opword 0x3B000000
+		lfs f25, float_90_rsh_00014534@l(r7)
+		opword 0x3F804330
+		lfs f26, float_neg45_rsh_00014530@l(r6)
+		opword 0xC37D0000
+		lfs f28, float_1E06_rsh_00014594@l(r5)
+		lfs f29, float_100_rsh_000144f8@l(r4)
+		lfs f30, float_20_rsh_00014580@l(r19)
+		lfs f31, float_neg10_rsh_000145b8@l(r18)
+		opword 0x4800050C
+		opword 0x38000000
+		opword 0x7F52D378
+		opword 0xB01F0000
+		opword 0x7F73DB78
+		opword 0xB01F0002
+		opword 0xB01F0004
+		opword 0xA01F0000
+		opword 0x80790000
+		opword 0x54000529
+		opword 0x3A830050
+		opword 0x41820038
+		opword 0x889F004C
+		lis r3, group_tbl@ha
+		addi r0, r3, group_tbl@l
+		opword 0x54831D78
+		opword 0x28040002
+		opword 0x7C601A14
+		opword 0x82630000
+		opword 0x41800008
+		opword 0x82430004
+		opword 0x2804000A
+		opword 0x4082000C
+		lis r3, rsh_06_str_000048C4@ha
+		addi r18, r3, rsh_06_str_000048C4@l
+		opword 0x3AA00000
+		opword 0x48000034
+		opword 0x7E83A378
+		opword 0x7E649B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x7E449378
+		opword 0x38740010
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3AB50001
+		opword 0x3A940028
+		opword 0x80790000
+		opword 0x8003004C
+		opword 0x7C150000
+		opword 0x4180FFC4
+		opword 0x80790000
+		opword 0x8003004C
+		opword 0x7C150000
+		opword 0x40800080
+		opword 0xA81F003C
+		opword 0x7C00A800
+		opword 0x41820074
+		opword 0xA01F0000
+		opword 0x5400077B
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A40@ha
+		opword 0x7E439378
+		addi r4, r4, rsh_06_str_00004A40@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4082004C
+		opword 0xA01F0000
+		opword 0x540006F7
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A44@ha
+		opword 0x7E439378
+		addi r4, r4, rsh_06_str_00004A44@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x40820024
+		lis r3, gp@ha
+		opword 0xB2BF003C
+		addi r3, r3, gp@l
+		opword 0x80630000
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0x907F0044
+		opword 0x901F0040
+		opword 0x80170000
+		opword 0x60000007
+		opword 0x90170000
+		opword 0x8077000C
+		bl PSMTXIdentity
+		bl rand
+		opword 0x6C608000
+		stw r28, _af_pad+40(r1)
+		opword 0x8077000C
+		opword 0x90010034
+		opword 0xC8010030
+		opword 0xEC00A028
+		opword 0xEC00A824
+		opword 0xEC00BDBA
+		opword 0xD003000C
+		opword 0x8077000C
+		opword 0xD303001C
+		bl rand
+		opword 0x6C608000
+		opword 0xC09D0000
+		opword 0x9001003C
+		opword 0x38810020
+		opword 0x8177000C
+		opword 0xFCC02090
+		opword 0x93810038
+		opword 0x38A1001C
+		opword 0xC0B60000
+		opword 0x38C10018
+		opword 0xC8010038
+		opword 0x38E10014
+		opword 0x39010010
+		opword 0xEC00A028
+		opword 0x3921000C
+		opword 0x39410008
+		opword 0x38600000
+		opword 0xEC00A824
+		opword 0xEC00D67A
+		opword 0xD00B002C
+		opword 0xD3610018
+		opword 0xD361001C
+		opword 0xD3610020
+		opword 0xD3810014
+		opword 0x8177000C
+		opword 0xC00B001C
+		opword 0xC02B000C
+		opword 0xEC5D002A
+		opword 0xC06B002C
+		bl hitCheckFilter
+		opword 0x28030000
+		opword 0x41820014
+		opword 0xC001001C
+		opword 0x8077000C
+		opword 0xD003001C
+		opword 0x48000258
+		opword 0x80170000
+		opword 0x60000004
+		opword 0x90170000
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061003C
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010038
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_1000_rsh_0001457c@ha
+		opword 0xC8010038
+		lis r3, float_neg500_rsh_000145ac@ha
+		opword 0xEC600828
+		lfs f0, float_neg500_rsh_000145ac@l(r3)
+		lfs f1, float_1000_rsh_0001457c@l(r4)
+		opword 0x8077000C
+		opword 0xEC431024
+		opword 0xEC02007A
+		opword 0xD003000C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610034
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010030
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_115_rsh_000145b0@ha
+		opword 0xC8010030
+		lis r3, float_100_rsh_000144f8@ha
+		opword 0xEC600828
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		lfs f1, float_115_rsh_000145b0@l(r4)
+		opword 0x8077000C
+		opword 0xEC431024
+		opword 0xEC02007A
+		opword 0xD003001C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610044
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010040
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0050000
+		lis r4, float_5_rsh_00014500@ha
+		opword 0xC8210040
+		lis r3, float_70_rsh_000145b4@ha
+		addi r7, r4, float_5_rsh_00014500@l
+		lis r4, rsh_06_str_000041D0@ha
+		opword 0xEC411028
+		addi r6, r3, float_70_rsh_000145b4@l
+		addi r20, r4, rsh_06_str_000041D0@l
+		lis r3, wp@ha
+		lis r5, rsh_06_str_000041DC@ha
+		opword 0xC0270000
+		opword 0xEC420024
+		opword 0xC0060000
+		opword 0x8097000C
+		addi r3, r3, wp@l
+		addi r21, r5, rsh_06_str_000041DC@l
+		opword 0xEC02007A
+		opword 0xD004002C
+		opword 0xA01F0000
+		opword 0x60000040
+		opword 0xB01F0000
+		opword 0xA01F0000
+		opword 0x80630000
+		opword 0x54000529
+		opword 0x3A630050
+		opword 0x41820038
+		opword 0x889F004C
+		lis r3, group_tbl@ha
+		addi r0, r3, group_tbl@l
+		opword 0x54831D78
+		opword 0x28040002
+		opword 0x7C601A14
+		opword 0x82830000
+		opword 0x41800008
+		opword 0x82A30004
+		opword 0x2804000A
+		opword 0x4082000C
+		lis r3, rsh_06_str_000048C4@ha
+		addi r21, r3, rsh_06_str_000048C4@l
+		lis r3, wp@ha
+		opword 0x3A400000
+		addi r17, r3, wp@l
+		opword 0x48000034
+		opword 0x7E639B78
+		opword 0x7E84A378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x7EA4AB78
+		opword 0x38730010
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3A520001
+		opword 0x3A730028
+		opword 0x80710000
+		opword 0x8003004C
+		opword 0x7C120000
+		opword 0x4180FFC4
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x8003004C
+		opword 0x7C120000
+		opword 0x40800080
+		opword 0xA81F003C
+		opword 0x7C009000
+		opword 0x41820074
+		opword 0xA01F0000
+		opword 0x5400077B
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A40@ha
+		opword 0x7EA3AB78
+		addi r4, r4, rsh_06_str_00004A40@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4082004C
+		opword 0xA01F0000
+		opword 0x540006F7
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A44@ha
+		opword 0x7EA3AB78
+		addi r4, r4, rsh_06_str_00004A44@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x40820024
+		lis r3, gp@ha
+		opword 0xB25F003C
+		addi r3, r3, gp@l
+		opword 0x80630000
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0x907F0044
+		opword 0x901F0040
+		opword 0x809E0000
+		opword 0x807E0004
+		opword 0x801E0008
+		opword 0x90810024
+		opword 0x90610028
+		opword 0x9001002C
+		bl rand
+		opword 0x6C608000
+		opword 0x93810040
+		opword 0x90010044
+		opword 0xC8010040
+		opword 0xEC00A028
+		opword 0xEC00A824
+		opword 0xEC00FFBA
+		opword 0xD0010024
+		bl rand
+		opword 0x6C608000
+		opword 0x93810038
+		opword 0x9001003C
+		opword 0xC8010038
+		opword 0xEC00A028
+		opword 0xEC00A824
+		opword 0xEC00FFBA
+		opword 0xD0010028
+		bl rand
+		opword 0x6C608000
+		opword 0x80610024
+		opword 0x90010034
+		opword 0x3B180001
+		opword 0x80010028
+		opword 0x3AF70020
+		opword 0x93810030
+		opword 0xC8010030
+		opword 0x907F0030
+		opword 0xEC00A028
+		opword 0x901F0034
+		opword 0xEC00A824
+		opword 0xEC00FFBA
+		opword 0xD001002C
+		opword 0x8001002C
+		opword 0x901F0038
+		opword 0x3BFF0050
+		opword 0x80790000
+		opword 0x80030004
+		opword 0x7C180000
+		opword 0x4180FAEC
+		bl evalOn
+		opword 0x3A200000
+		bl ext_moamoa_main
+		opword 0x3A310001
+		opword 0x2C110258
+		opword 0x4180FFF4
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+#endif
 static void ext_disp(CameraId camera, void* param) {
     u16 left, top, right, bottom;
 
@@ -1288,11 +2749,14 @@ static void ext_disp(CameraId camera, void* param) {
     if (camera == CAMERA_OFFSCREEN2) {
         sysWaitDrawSync();
         GXReadBoundingBox(&left, &top, &right, &bottom);
+#ifdef NONMATCHING
         offscreenAddBoundingBox(offscreenNameToId((char*)str_00004B00), left, top, right, bottom);
+#endif
+#ifndef NONMATCHING
+        offscreenAddBoundingBox(offscreenNameToId((char*)rsh_06_str_00004B00), left, top, right, bottom);
+#endif
     }
 }
-#endif
-#ifdef NONMATCHING
 static void ext_shadow_disp(CameraId camera, void* param) {
     static Mtx mt = {
         {8.0f, 0.0f, 0.0f, 0.0f},
@@ -1312,13 +2776,22 @@ static void ext_shadow_disp(CameraId camera, void* param) {
     if (camera == CAMERA_OFFSCREEN2) {
         sysWaitDrawSync();
         GXReadBoundingBox(&left, &top, &right, &bottom);
+#ifdef NONMATCHING
         offscreenAddBoundingBox(offscreenNameToId((char*)str_00004B00), left, top, right, bottom);
+#endif
+#ifndef NONMATCHING
+        offscreenAddBoundingBox(offscreenNameToId((char*)rsh_06_str_00004B00), left, top, right, bottom);
+#endif
     }
 }
-#endif
 #pragma dont_inline on
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
+#ifdef NONMATCHING
     f32 hitX, hitY, hitZ, dist, nx, ny, nz;
     f32 dy;
     f32 d;
@@ -1349,13 +2822,180 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
     moa->flags |= 2;
     pose->flags |= 0x10;
     pose->flags &= ~4;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FF50
+		opword 0x7C0802A6
+		opword 0x900100B4
+		opword 0xDBE100A0
+		opword 0xF3E100A8
+		opword 0xDBC10090
+		opword 0xF3C10098
+		opword 0xDBA10080
+		opword 0xF3A10088
+		opword 0xDB810070
+		opword 0xF3810078
+		opword 0xDB610060
+		opword 0xF3610068
+		opword 0xBFA10054
+		opword 0xFF600890
+		opword 0x2C060000
+		opword 0xFF801090
+		opword 0x7C7D1B78
+		opword 0xFFA01890
+		opword 0x7C9E2378
+		opword 0xFFE02090
+		opword 0x7CBF2B78
+		opword 0xFFC02890
+		opword 0x4182009C
+		lis r4, zero_rsh_00014490@ha
+		lis r3, float_100_rsh_000144f8@ha
+		addi r5, r4, zero_rsh_00014490@l
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		opword 0xC0850000
+		lis r4, float_1E06_rsh_00014594@ha
+		lfs f7, float_1E06_rsh_00014594@l(r4)
+		lis r3, float_neg1_rsh_00014498@ha
+		opword 0xFCC02090
+		lfs f5, float_neg1_rsh_00014498@l(r3)
+		opword 0xEC40E02A
+		opword 0xD0810018
+		opword 0x38810020
+		opword 0x38A1001C
+		opword 0xD081001C
+		opword 0x38C10018
+		opword 0x38E10014
+		opword 0x39010010
+		opword 0xD0810020
+		opword 0x3921000C
+		opword 0x39410008
+		opword 0x38600000
+		opword 0xD0E10014
+		bl hitCheckFilter
+		opword 0x28030000
+		opword 0x41820034
+		opword 0xC001001C
+		lis r3, double_30_rsh_00014598@ha
+		opword 0xEC3C0028
+		lfd f0, double_30_rsh_00014598@l(r3)
+		opword 0xFC200A10
+		opword 0xFC010040
+		opword 0x40810014
+		lis r3, float_0p1_rsh_000144f0@ha
+		lfs f0, float_0p1_rsh_000144f0@l(r3)
+		opword 0xEFFF0028
+		opword 0xEFDE002A
+		opword 0xC381001C
+		lis r3, vec3_rsh_00013d28@ha
+		addi r4, r3, vec3_rsh_00013d28@l
+		opword 0x80040000
+		opword 0x80640004
+		opword 0x90010024
+		opword 0x80040008
+		opword 0x90610028
+		opword 0xD3610024
+		opword 0x9001002C
+		opword 0x80010024
+		opword 0xD3810028
+		opword 0xD3A1002C
+		opword 0x80610028
+		opword 0x901E0008
+		opword 0x8001002C
+		opword 0x907E000C
+		opword 0x901E0010
+		opword 0xD3FE001C
+		opword 0xD3DE0020
+		opword 0x807D000C
+		opword 0xC05E000C
+		opword 0xC003001C
+		opword 0xC023000C
+		opword 0xEFC20028
+		opword 0xC043002C
+		opword 0xC07E0008
+		opword 0xC09E0010
+		bl distABf
+		opword 0x807D000C
+		opword 0xFFE00890
+		opword 0xC07E0008
+		opword 0xC023000C
+		opword 0xC043002C
+		opword 0xC09E0010
+		bl angleABf
+		opword 0xC01E001C
+		opword 0x3CA04330
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_0p5_rsh_000144e8@ha
+		opword 0xEC1F0024
+		addi r6, r4, double_to_int_rsh_00014488@l
+		addi r4, r3, float_0p5_rsh_000144e8@l
+		lis r3, float_180_rsh_00014538@ha
+		opword 0x90A10040
+		opword 0x38000003
+		opword 0xFC40001E
+		lfs f0, float_180_rsh_00014538@l(r3)
+		opword 0xC8860000
+		opword 0xEC00082A
+		opword 0x90A10038
+		opword 0xD8410030
+		opword 0xC0440000
+		opword 0x80610034
+		opword 0xB07E0018
+		opword 0xA87E0018
+		opword 0xC0BE0020
+		opword 0x6C638000
+		opword 0x90610044
+		opword 0xC8210040
+		opword 0x9061003C
+		opword 0xEC212028
+		opword 0xC8610038
+		opword 0xEC3E0824
+		opword 0xEC632028
+		opword 0xEC6500F2
+		opword 0xEC2308BA
+		opword 0xD03E0014
+		opword 0xB01E0002
+		opword 0xB3FE0024
+		opword 0xD01D0004
+		opword 0xA01E0000
+		opword 0x60000002
+		opword 0xB01E0000
+		opword 0x801D0000
+		opword 0x60000010
+		opword 0x901D0000
+		opword 0x801D0000
+		opword 0x540007B8
+		opword 0x901D0000
+		opword 0xE3E100A8
+		opword 0xCBE100A0
+		opword 0xE3C10098
+		opword 0xCBC10090
+		opword 0xE3A10088
+		opword 0xCBA10080
+		opword 0xE3810078
+		opword 0xCB810070
+		opword 0xE3610068
+		opword 0xCB610060
+		opword 0xBBA10054
+		opword 0x800100B4
+		opword 0x7C0803A6
+		opword 0x382100B0
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 #pragma dont_inline reset
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
+#ifdef NONMATCHING
     MarioWork* mario = marioGetPtr();
     CameraEntry* cam;
     f32 range;
@@ -1439,17 +3079,743 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
         }
     }
     return 0;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FF10
+		opword 0x7C0802A6
+		opword 0x900100F4
+		opword 0xDBE100E0
+		opword 0xF3E100E8
+		opword 0xDBC100D0
+		opword 0xF3C100D8
+		opword 0xDBA100C0
+		opword 0xF3A100C8
+		opword 0xBFA100B4
+		opword 0x7C7D1B78
+		opword 0x7C9E2378
+		bl marioGetPtr
+		opword 0x80BD000C
+		lis r4, float_20_rsh_00014580@ha
+		lfs f0, float_20_rsh_00014580@l(r4)
+		opword 0x7C7F1B78
+		opword 0xC045001C
+		opword 0xC0230090
+		opword 0xEC00102A
+		opword 0xFC010040
+		opword 0x4081000C
+		opword 0x38600000
+		opword 0x48000AA0
+		opword 0xC01F01B8
+		opword 0xEC01002A
+		opword 0xFC020040
+		opword 0x4081000C
+		opword 0x38600000
+		opword 0x48000A88
+		opword 0xC025000C
+		opword 0xC045002C
+		opword 0xC07F008C
+		opword 0xC09F0094
+		bl distABf
+		lis r4, float_20_rsh_00014580@ha
+		lis r3, float_0p5_rsh_000144e8@ha
+		opword 0xC05F01B4
+		lfs f3, float_20_rsh_00014580@l(r4)
+		lfs f0, float_0p5_rsh_000144e8@l(r3)
+		opword 0xEC43102A
+		opword 0xEC020032
+		opword 0xFC010040
+		opword 0x40800088
+		opword 0x807D000C
+		lis r4, float_10_rsh_00014584@ha
+		lfs f1, float_10_rsh_00014584@l(r4)
+		opword 0xC003001C
+		opword 0xC05F0090
+		opword 0xEC01002A
+		opword 0xFC020040
+		opword 0x40810068
+		opword 0x807F0000
+		opword 0x5460039D
+		opword 0x4182005C
+		opword 0x546003DF
+		opword 0x40820054
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x80030558
+		opword 0x2C000002
+		opword 0x4080003C
+		opword 0xA01F002E
+		opword 0x28000016
+		opword 0x41820014
+		opword 0x2800001A
+		opword 0x4182000C
+		opword 0x38600005
+		bl marioChgMot
+		lis r4, wp@ha
+		opword 0x38600001
+		lwz r5, wp@l(r4)
+		opword 0x80850558
+		opword 0x38040001
+		opword 0x90050558
+		opword 0x480009CC
+		opword 0x801F0000
+		opword 0x5400039F
+		opword 0x40820018
+		lis r3, wp@ha
+		opword 0x38000000
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x90030558
+		opword 0xA01F002E
+		opword 0x28000012
+		opword 0x40820214
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xA8030040
+		opword 0x2C00000A
+		opword 0x408101FC
+		opword 0x38600004
+		bl camGetPtr
+		lis r4, float_90_rsh_00014534@ha
+		opword 0xC03F01A8
+		lfs f0, float_90_rsh_00014534@l(r4)
+		opword 0xC0430114
+		opword 0xEC010028
+		opword 0xEC20102A
+		bl reviseAngle
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r6, float_0p00761_rsh_000144a4@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xC0050000
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xEC400072
+		lfs f0, float_360_rsh_000144a0@l(r4)
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xECC20024
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0601B2
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC8401B2
+		opword 0x48000070
+		opword 0xEC060828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x40800020
+		opword 0xEC260828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r4, float_35_rsh_00014588@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r5, float_0p03705_rsh_000144b8@ha
+		lfs f2, float_35_rsh_00014588@l(r4)
+		lis r4, float_0p4967_rsh_000144bc@ha
+		opword 0xC01F008C
+		opword 0xFC060840
+		lis r3, float_1_rsh_00014470@ha
+		lfs f5, float_0p03705_rsh_000144b8@l(r5)
+		opword 0xEC62013A
+		lfs f4, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0601B2
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0x48000064
+		opword 0xEC060828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xFCA02850
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x4080001C
+		opword 0xEC060828
+		opword 0xEC000032
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xFCA02850
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xECA52038
+		opword 0xECA5103A
+		lis r3, float_35_rsh_00014588@ha
+		opword 0x809D000C
+		opword 0xC01F0094
+		lfs f2, float_35_rsh_00014588@l(r3)
+		opword 0xC024000C
+		opword 0xEC82017C
+		opword 0xC044002C
+		bl distABf
+		lis r3, float_35_rsh_00014588@ha
+		lfs f0, float_35_rsh_00014588@l(r3)
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x48000790
+		opword 0xA01F002E
+		opword 0x28000013
+		opword 0x40820088
+		opword 0x801F0044
+		opword 0x2C000014
+		opword 0x4082007C
+		lis r3, vec3_rsh_00013d34@ha
+		opword 0x811D000C
+		addi r7, r3, vec3_rsh_00013d34@l
+		opword 0x387F008C
+		opword 0x80C70000
+		opword 0x38810098
+		opword 0x80A70004
+		opword 0x80070008
+		opword 0x90C10050
+		opword 0xC008000C
+		opword 0x90A10054
+		opword 0xC028001C
+		opword 0xD0010050
+		opword 0xC008002C
+		opword 0x90010058
+		opword 0x80C10050
+		opword 0xD0210054
+		opword 0xD0010058
+		opword 0x80A10054
+		opword 0x80010058
+		opword 0x90C10098
+		opword 0x90A1009C
+		opword 0x900100A0
+		bl PSVECDistance
+		lis r3, float_65_rsh_0001458c@ha
+		lfs f0, float_65_rsh_0001458c@l(r3)
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x48000700
+		lis r4, wp@ha
+		lis r3, zero_rsh_00014490@ha
+		addi r4, r4, wp@l
+		lfs f0, zero_rsh_00014490@l(r3)
+		opword 0x80840000
+		opword 0xC024055C
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082007C
+		lis r3, vec3_rsh_00013d40@ha
+		opword 0x811D000C
+		addi r7, r3, vec3_rsh_00013d40@l
+		opword 0x38640564
+		opword 0x80C70000
+		opword 0x3881008C
+		opword 0x80A70004
+		opword 0x80070008
+		opword 0x90C10044
+		opword 0xC008000C
+		opword 0x90A10048
+		opword 0xC028001C
+		opword 0xD0010044
+		opword 0xC008002C
+		opword 0x9001004C
+		opword 0x80C10044
+		opword 0xD0210048
+		opword 0xD001004C
+		opword 0x80A10048
+		opword 0x8001004C
+		opword 0x90C1008C
+		opword 0x90A10090
+		opword 0x90010094
+		bl PSVECDistance
+		lis r3, float_30_rsh_000144dc@ha
+		lfs f0, float_30_rsh_000144dc@l(r3)
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600003
+		opword 0x48000664
+		opword 0x38600000
+		bl partyGetPtr
+		bl nokonokoGetStatus
+		opword 0x2C030002
+		opword 0x40820084
+		lis r3, vec3_rsh_00013d4c@ha
+		opword 0x80FD000C
+		addi r6, r3, vec3_rsh_00013d4c@l
+		opword 0x38600000
+		opword 0x80A60000
+		opword 0x80860004
+		opword 0x80060008
+		opword 0x90A10038
+		opword 0xC007000C
+		opword 0x9081003C
+		opword 0xC027001C
+		opword 0xD0010038
+		opword 0xC007002C
+		opword 0x90010040
+		opword 0x80A10038
+		opword 0xD021003C
+		opword 0xD0010040
+		opword 0x8081003C
+		opword 0x80010040
+		opword 0x90A10080
+		opword 0x90810084
+		opword 0x90010088
+		bl partyGetPtr
+		opword 0x38630058
+		opword 0x38810080
+		bl PSVECDistance
+		lis r3, float_30_rsh_000144dc@ha
+		lfs f0, float_30_rsh_000144dc@l(r3)
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x480005D0
+		opword 0x38600000
+		bl partyGetPtr
+		opword 0x88030031
+		opword 0x2C000003
+		opword 0x40820098
+		opword 0x38600000
+		bl partyGetPtr
+		opword 0x88030039
+		opword 0x28000046
+		opword 0x40820084
+		lis r3, vec3_rsh_00013d58@ha
+		opword 0x80FD000C
+		addi r6, r3, vec3_rsh_00013d58@l
+		opword 0x38600000
+		opword 0x80A60000
+		opword 0x80860004
+		opword 0x80060008
+		opword 0x90A1002C
+		opword 0xC007000C
+		opword 0x90810030
+		opword 0xC027001C
+		opword 0xD001002C
+		opword 0xC007002C
+		opword 0x90010034
+		opword 0x80A1002C
+		opword 0xD0210030
+		opword 0xD0010034
+		opword 0x80810030
+		opword 0x80010034
+		opword 0x90A10074
+		opword 0x90810078
+		opword 0x9001007C
+		bl partyGetPtr
+		opword 0x38630058
+		opword 0x38810074
+		bl PSVECDistance
+		lis r3, float_50_rsh_000144fc@ha
+		lfs f0, float_50_rsh_000144fc@l(r3)
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x38600004
+		opword 0x48000528
+		lis r3, vec3_rsh_00013d64@ha
+		opword 0x817D000C
+		addi r5, r3, vec3_rsh_00013d64@l
+		lis r3, vec3_rsh_00013d70@ha
+		opword 0x80850000
+		addi r9, r3, vec3_rsh_00013d70@l
+		opword 0x80050004
+		lis r3, float_20_rsh_00014580@ha
+		opword 0x81450008
+		addi r6, r3, float_20_rsh_00014580@l
+		opword 0x90810020
+		lis r3, float_0p5_rsh_000144e8@ha
+		opword 0xC01F008C
+		addi r5, r3, float_0p5_rsh_000144e8@l
+		opword 0x90010024
+		opword 0x38610068
+		opword 0xC02B001C
+		opword 0x3881005C
+		opword 0xD0010020
+		opword 0x81090000
+		opword 0xD0210024
+		opword 0x80E90004
+		opword 0x80090008
+		opword 0x90E10018
+		opword 0xC01F0094
+		opword 0x91410028
+		opword 0x81410020
+		opword 0xD0010028
+		opword 0x81210024
+		opword 0x80E10028
+		opword 0xD0210018
+		opword 0xC0460000
+		opword 0x91410068
+		opword 0x80C10018
+		opword 0x9121006C
+		opword 0xC0050000
+		opword 0x90E10070
+		opword 0x91010014
+		opword 0xC06B000C
+		opword 0xC02B002C
+		opword 0x9001001C
+		opword 0xD0610014
+		opword 0xD021001C
+		opword 0x80A10014
+		opword 0x8001001C
+		opword 0x90A1005C
+		opword 0x90C10060
+		opword 0x90010064
+		opword 0xC03F01B4
+		opword 0xEC22082A
+		opword 0xEFE10032
+		bl PSVECDistance
+		opword 0xFC01F840
+		opword 0x4080044C
+		opword 0xC01E0028
+		lis r3, vec3_rsh_00013d7c@ha
+		opword 0x80BD000C
+		addi r7, r3, vec3_rsh_00013d7c@l
+		opword 0x38610068
+		opword 0x3881005C
+		opword 0xD005000C
+		opword 0xC01E002C
+		opword 0x80BD000C
+		opword 0xD005002C
+		opword 0x811D000C
+		opword 0x80C70000
+		opword 0x80A70004
+		opword 0x80070008
+		opword 0x90C10008
+		opword 0xC008000C
+		opword 0x90A1000C
+		opword 0xC028001C
+		opword 0xD0010008
+		opword 0xC008002C
+		opword 0x90010010
+		opword 0x80C10008
+		opword 0xD021000C
+		opword 0xD0010010
+		opword 0x80A1000C
+		opword 0x80010010
+		opword 0x90C1005C
+		opword 0x90A10060
+		opword 0x90010064
+		bl PSVECDistance
+		opword 0xFFA00890
+		opword 0xFC1DF840
+		opword 0x408003C8
+		opword 0x807D000C
+		opword 0xC03F008C
+		opword 0xC05F0094
+		opword 0xC063000C
+		opword 0xC083002C
+		bl angleABf
+		opword 0xFFC00890
+		opword 0xC05F01A0
+		bl compAngle
+		lis r3, float_40_rsh_00014590@ha
+		opword 0xFC200A10
+		lfs f0, float_40_rsh_00014590@l(r3)
+		opword 0xFC010040
+		opword 0x408001D4
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r6, float_0p00761_rsh_000144a4@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		opword 0xC01F01A0
+		opword 0xC0250000
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lis r4, float_360_rsh_000144a0@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		opword 0xEC410032
+		lfs f0, float_360_rsh_000144a0@l(r4)
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xECA20024
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xECA10028
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xECA50828
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xECA10028
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0xFC802050
+		opword 0xECDFE828
+		lis r3, float_6p2832_rsh_0001449c@ha
+		addi r8, r3, float_6p2832_rsh_0001449c@l
+		lis r6, float_0p03705_rsh_000144b8@ha
+		lis r3, float_360_rsh_000144a0@ha
+		opword 0xC0680000
+		opword 0xEC060132
+		addi r7, r3, float_360_rsh_000144a0@l
+		lis r5, float_0p4967_rsh_000144bc@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r4, float_1_rsh_00014470@ha
+		lfs f5, float_0p03705_rsh_000144b8@l(r6)
+		opword 0xFC200050
+		opword 0xC0070000
+		lfs f4, float_0p4967_rsh_000144bc@l(r5)
+		opword 0xD03F0174
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		opword 0xC05F01A0
+		opword 0xEC4300B2
+		lfs f3, float_1_rsh_00014470@l(r4)
+		opword 0xEC420024
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0x48000064
+		opword 0xEC020828
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xFCA02850
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC020040
+		opword 0x4080001C
+		opword 0xEC420828
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xFCA02850
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC020028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xEC060172
+		opword 0xD01F017C
+		opword 0x480001C0
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r6, float_0p00761_rsh_000144a4@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xC0050000
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		opword 0xEC4007B2
+		lfs f0, float_360_rsh_000144a0@l(r4)
+		lis r4, float_1_rsh_00014470@ha
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xECA20024
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xEC250828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x809D000C
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r5, float_0p03705_rsh_000144b8@ha
+		opword 0xC004000C
+		lis r4, float_0p4967_rsh_000144bc@ha
+		opword 0xFC050840
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEC5F013C
+		opword 0xC01F008C
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		opword 0xEC020028
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0xD01F0174
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC050828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x4080001C
+		opword 0xEC050828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x807D000C
+		opword 0xC01F0094
+		opword 0xC023002C
+		opword 0xEC3F093A
+		opword 0xEC010028
+		opword 0xD01F017C
+		opword 0x38600000
+		opword 0xE3E100E8
+		opword 0xCBE100E0
+		opword 0xE3C100D8
+		opword 0xCBC100D0
+		opword 0xE3A100C8
+		opword 0xCBA100C0
+		opword 0xBBA100B4
+		opword 0x800100F4
+		opword 0x7C0803A6
+		opword 0x382100F0
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-#ifdef NONMATCHING  // restored C definition (nmrepair)
+#ifdef NONMATCHING
 __declspec(section ".rodata") static Vec moamoa_zero_vec = {0.0f, 0.0f, 0.0f};
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+extern void* rsh_06_jumptable_000183EC[];
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 static void ext_moamoa_main(void) {
+#ifdef NONMATCHING
     MarioWork* mario = marioGetPtr();
     PartyEntry* party = partyGetPtr(0);
     CameraEntry* cam = camGetPtr(CAMERA_3D);
@@ -1844,12 +4210,3055 @@ static void ext_moamoa_main(void) {
     if (!(wp->flags & 0x18)) {
         mario->unk174.x = ( -cnt ) / float_20_rsh_00014580[0];
     }
+#endif
+#ifndef NONMATCHING
+	char _af_pad[164];
+	asm volatile {
+		bl marioGetPtr
+		opword 0x7C7C1B78
+		opword 0x38600000
+		bl partyGetPtr
+		opword 0x7C751B78
+		opword 0x38600004
+		bl camGetPtr
+		opword 0xA01C002E
+		lis r4, zero_rsh_00014490@ha
+		lfs f31, zero_rsh_00014490@l(r4)
+		opword 0x7C771B78
+		opword 0x28000012
+		opword 0x3B200000
+		opword 0x4082001C
+		lis r3, wp@ha
+		lwz r4, wp@l(r3)
+		opword 0xA8640040
+		opword 0x38030001
+		opword 0xB0040040
+		opword 0x48000018
+		lis r3, wp@ha
+		opword 0x38000000
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xB0030040
+		opword 0xA01C002E
+		opword 0x28000000
+		opword 0x40820038
+		lis r3, wp@ha
+		addi r5, r3, wp@l
+		opword 0x80850000
+		opword 0xA8640042
+		opword 0x38030001
+		opword 0xB0040042
+		opword 0x80650000
+		opword 0xA8030042
+		opword 0x2C0003E8
+		opword 0x40810024
+		opword 0x380003E8
+		opword 0xB0030042
+		opword 0x48000018
+		lis r3, wp@ha
+		opword 0x38000000
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xB0030042
+		opword 0x80150000
+		opword 0x540005EF
+		opword 0x41820020
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xA0030000
+		opword 0x60000010
+		opword 0xB0030000
+		opword 0x4800001C
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xA0030000
+		opword 0x54000734
+		opword 0xB0030000
+		lis r4, float_neg1_rsh_00014498@ha
+		lis r3, wp@ha
+		addi r5, r4, float_neg1_rsh_00014498@l
+		addi r4, r3, wp@l
+		opword 0xC0050000
+		opword 0x80640000
+		opword 0xD003055C
+		opword 0x80640000
+		opword 0xD0030560
+		opword 0x88150031
+		opword 0x2C000005
+		opword 0x40820230
+		opword 0x80150000
+		opword 0x540005EF
+		opword 0x41820224
+		bl cloudGetBreathDir
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xD023055C
+		bl cloudGetBreathDist
+		lis r3, wp@ha
+		lis r4, float_6p2832_rsh_0001449c@ha
+		addi r10, r3, wp@l
+		lis r7, float_0p00761_rsh_000144a4@ha
+		opword 0x80AA0000
+		lis r3, float_360_rsh_000144a0@ha
+		addi r8, r3, float_360_rsh_000144a0@l
+		addi r9, r4, float_6p2832_rsh_0001449c@l
+		opword 0xD0250560
+		lis r3, float_3p1416_rsh_000144ac@ha
+		addi r4, r3, float_3p1416_rsh_000144ac@l
+		lis r6, float_0p16605_rsh_000144a8@ha
+		opword 0x806A0000
+		lis r5, float_1_rsh_00014470@ha
+		opword 0xC0490000
+		opword 0xC023055C
+		opword 0xC0080000
+		opword 0xEC420072
+		opword 0xC0240000
+		lfs f4, float_0p00761_rsh_000144a4@l(r7)
+		lfs f3, float_0p16605_rsh_000144a8@l(r6)
+		opword 0xECA20024
+		lfs f2, float_1_rsh_00014470@l(r5)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r4, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xECA10028
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000054
+		lis r4, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r4)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xECA50828
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0xFC802050
+		opword 0x48000028
+		lis r4, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r4)
+		opword 0xECA10028
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0xFC802050
+		opword 0xC0230560
+		lis r9, wp@ha
+		opword 0xC0150058
+		lis r4, float_6p2832_rsh_0001449c@ha
+		addi r8, r4, float_6p2832_rsh_0001449c@l
+		lis r6, float_0p03705_rsh_000144b8@ha
+		opword 0xEC01013A
+		lis r4, float_360_rsh_000144a0@ha
+		addi r7, r4, float_360_rsh_000144a0@l
+		lis r5, float_0p4967_rsh_000144bc@ha
+		lis r4, float_3p1416_rsh_000144ac@ha
+		addi r10, r9, wp@l
+		opword 0xD0030564
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xC0680000
+		opword 0xC015005C
+		opword 0x812A0000
+		lfs f1, float_3p1416_rsh_000144ac@l(r4)
+		opword 0xD0090568
+		opword 0xC0070000
+		opword 0x80EA0000
+		lfs f5, float_0p03705_rsh_000144b8@l(r6)
+		opword 0xC047055C
+		lfs f4, float_0p4967_rsh_000144bc@l(r5)
+		opword 0xEC4300B2
+		lfs f3, float_1_rsh_00014470@l(r3)
+		opword 0xEC420024
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0x48000064
+		opword 0xEC020828
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xFCA02850
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC020040
+		opword 0x4080001C
+		opword 0xEC420828
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xFCA02850
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC020028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xC0270560
+		opword 0xC0150060
+		opword 0xEC01017C
+		opword 0xD007056C
+		bl extGetPosePtr
+		lis r5, wp@ha
+		lis r4, rsh_06_str_00004A20@ha
+		addi r27, r5, wp@l
+		opword 0x7C7E1B78
+		opword 0x80BB0000
+		addi r24, r4, rsh_06_str_00004A20@l
+		opword 0x3B400000
+		opword 0x3BA00000
+		opword 0x83E50008
+		opword 0x48002A74
+		opword 0x807E000C
+		opword 0xC03C008C
+		opword 0xC05C0094
+		opword 0xC063000C
+		opword 0xC083002C
+		bl angleABf
+		opword 0x807B0000
+		opword 0xD0230550
+		opword 0x807E000C
+		opword 0xC03C008C
+		opword 0xC05C0094
+		opword 0xC063000C
+		opword 0xC083002C
+		bl distABf
+		opword 0x807B0000
+		opword 0xD0230554
+		opword 0xA01F0000
+		opword 0x70000154
+		opword 0x40820044
+		lis r3, float_200_rsh_000144d8@ha
+		opword 0xC03C0090
+		lfs f0, float_200_rsh_000144d8@l(r3)
+		opword 0xFC010040
+		opword 0x40810030
+		lis r4, wp@ha
+		lis r3, float_30_rsh_000144dc@ha
+		addi r4, r4, wp@l
+		lfs f0, float_30_rsh_000144dc@l(r3)
+		opword 0x80840000
+		opword 0xC0240554
+		opword 0xFC010040
+		opword 0x40800010
+		lis r3, float_1_rsh_00014470@ha
+		lfs f0, float_1_rsh_00014470@l(r3)
+		opword 0xEFFF002A
+		opword 0x807B0000
+		opword 0xA0630000
+		opword 0x546007FF
+		opword 0x41820728
+		opword 0x5460077B
+		opword 0x40820720
+		bl marioKeyOffChk
+		opword 0x2C030000
+		opword 0x40820714
+		bl marioCtrlOffChk
+		opword 0x2C030000
+		opword 0x40820708
+		opword 0x2C190000
+		opword 0x40820700
+		opword 0xA01F0000
+		opword 0x70000154
+		opword 0x408206F4
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		bl moamoa_hit_check
+		opword 0x7C751B78
+		opword 0x2C150001
+		opword 0x40820170
+		opword 0xA01F0000
+		lis r4, rsh_06_str_000041E0@ha
+		lis r3, rsh_06_str_000041D0@ha
+		lis r5, wp@ha
+		opword 0x60060004
+		opword 0x38000024
+		opword 0xB0DF0000
+		addi r20, r4, rsh_06_str_000041E0@l
+		addi r25, r3, rsh_06_str_000041D0@l
+		opword 0xB01F0002
+		lwzu r4, wp@l(r5)
+		opword 0xA8640038
+		opword 0x38030001
+		opword 0xB0040038
+		opword 0xA01F0000
+		opword 0x80650000
+		opword 0x54000529
+		opword 0x3AC30050
+		opword 0x41820038
+		opword 0x889F004C
+		lis r3, group_tbl@ha
+		addi r0, r3, group_tbl@l
+		opword 0x54831D78
+		opword 0x28040002
+		opword 0x7C601A14
+		opword 0x83230000
+		opword 0x41800008
+		opword 0x82830004
+		opword 0x2804000A
+		opword 0x4082000C
+		lis r3, rsh_06_str_000048C4@ha
+		addi r20, r3, rsh_06_str_000048C4@l
+		lis r3, wp@ha
+		opword 0x3AA00000
+		addi r17, r3, wp@l
+		opword 0x48000034
+		opword 0x7EC3B378
+		opword 0x7F24CB78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x7E84A378
+		opword 0x38760010
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3AB50001
+		opword 0x3AD60028
+		opword 0x80710000
+		opword 0x8003004C
+		opword 0x7C150000
+		opword 0x4180FFC4
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x8003004C
+		opword 0x7C150000
+		opword 0x40800080
+		opword 0xA81F003C
+		opword 0x7C00A800
+		opword 0x41820074
+		opword 0xA01F0000
+		opword 0x5400077B
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A40@ha
+		opword 0x7E83A378
+		addi r4, r4, rsh_06_str_00004A40@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4082004C
+		opword 0xA01F0000
+		opword 0x540006F7
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A44@ha
+		opword 0x7E83A378
+		addi r4, r4, rsh_06_str_00004A44@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x40820024
+		lis r3, gp@ha
+		opword 0xB2BF003C
+		addi r3, r3, gp@l
+		opword 0x80630000
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0x907F0044
+		opword 0x901F0040
+		opword 0x3B200001
+		opword 0x48000570
+		opword 0x2C150002
+		opword 0x4182000C
+		opword 0x2C150004
+		opword 0x40820178
+		opword 0xA01F0000
+		lis r4, rsh_06_str_000041E0@ha
+		lis r3, rsh_06_str_000041D0@ha
+		lis r5, wp@ha
+		opword 0x6006000C
+		opword 0x3800002F
+		opword 0xB0DF0000
+		addi r18, r4, rsh_06_str_000041E0@l
+		addi r19, r3, rsh_06_str_000041D0@l
+		opword 0xB01F0002
+		lwzu r4, wp@l(r5)
+		opword 0xA8640038
+		opword 0x38030001
+		opword 0xB0040038
+		opword 0xA01F0000
+		opword 0x80650000
+		opword 0x54000529
+		opword 0x3AC30050
+		opword 0x41820038
+		opword 0x889F004C
+		lis r3, group_tbl@ha
+		addi r0, r3, group_tbl@l
+		opword 0x54831D78
+		opword 0x28040002
+		opword 0x7C601A14
+		opword 0x82630000
+		opword 0x41800008
+		opword 0x82430004
+		opword 0x2804000A
+		opword 0x4082000C
+		lis r3, rsh_06_str_000048C4@ha
+		addi r18, r3, rsh_06_str_000048C4@l
+		lis r3, wp@ha
+		opword 0x3A800000
+		addi r17, r3, wp@l
+		opword 0x48000034
+		opword 0x7EC3B378
+		opword 0x7E649B78
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x7E449378
+		opword 0x38760010
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3A940001
+		opword 0x3AD60028
+		opword 0x80710000
+		opword 0x8003004C
+		opword 0x7C140000
+		opword 0x4180FFC4
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x8003004C
+		opword 0x7C140000
+		opword 0x40800080
+		opword 0xA81F003C
+		opword 0x7C00A000
+		opword 0x41820074
+		opword 0xA01F0000
+		opword 0x5400077B
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A40@ha
+		opword 0x7E439378
+		addi r4, r4, rsh_06_str_00004A40@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4082004C
+		opword 0xA01F0000
+		opword 0x540006F7
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A44@ha
+		opword 0x7E439378
+		addi r4, r4, rsh_06_str_00004A44@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x40820024
+		lis r3, gp@ha
+		opword 0xB29F003C
+		addi r3, r3, gp@l
+		opword 0x80630000
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0x907F0044
+		opword 0x901F0040
+		opword 0x2C150004
+		opword 0x418203F4
+		opword 0x3B200001
+		opword 0x480003EC
+		opword 0x2C150003
+		opword 0x408203E4
+		lis r3, wp@ha
+		opword 0xA01F0000
+		addi r4, r3, wp@l
+		opword 0x80E40000
+		opword 0x60050084
+		lis r4, float_0p5_rsh_000144e8@ha
+		opword 0x38000030
+		opword 0xC047055C
+		addi r6, r4, float_0p5_rsh_000144e8@l
+		opword 0xC0270550
+		lis r3, vec3_rsh_00013d88@ha
+		addi r4, r3, vec3_rsh_00013d88@l
+		opword 0xC0060000
+		opword 0xB0BF0000
+		opword 0xEC22082A
+		opword 0xB01F0002
+		fmuls f26, f1, f0
+		opword 0x80640000
+		opword 0x80040004
+		opword 0x907F0008
+		opword 0x901F000C
+		opword 0x80040008
+		opword 0x901F0010
+		bl rand
+		opword 0x6C648000
+		opword 0x3C004330
+		lis r3, float_6p2832_rsh_0001449c@ha
+		stw r4, _af_pad+140(r1)
+		lfs f0, float_6p2832_rsh_0001449c@l(r3)
+		lis r5, double_to_int_rsh_00014488@ha
+		opword 0x90010090
+		lis r3, float_360_rsh_000144a0@ha
+		lfd f3, double_to_int_rsh_00014488@l(r5)
+		opword 0xEC2006B2
+		lfs f0, float_360_rsh_000144a0@l(r3)
+		lis r4, float_32767_rsh_000144ec@ha
+		opword 0xC8410090
+		lis r5, float_0p00761_rsh_000144a4@ha
+		opword 0xEFA10024
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f5, float_0p00761_rsh_000144a4@l(r5)
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEC621828
+		lfs f2, float_32767_rsh_000144ec@l(r4)
+		lis r4, float_0p1_rsh_000144f0@ha
+		addi r6, r4, float_0p1_rsh_000144f0@l
+		opword 0xFC1D0840
+		opword 0xEC431024
+		opword 0xC0060000
+		lis r4, float_0p16605_rsh_000144a8@ha
+		lfs f4, float_0p16605_rsh_000144a8@l(r4)
+		lfs f3, float_1_rsh_00014470@l(r3)
+		opword 0xEFC2003A
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC1D0840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC1D0772
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50772
+		opword 0x48000070
+		opword 0xEC1D0828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC1D0040
+		opword 0x40800020
+		opword 0xEC3D0828
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC1D0028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0xEC1E0172
+		opword 0xD01F0014
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_rsh_00014488@ha
+		opword 0x90610094
+		addi r5, r4, double_to_int_rsh_00014488@l
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010090
+		addi r4, r3, float_32767_rsh_000144ec@l
+		opword 0xC8450000
+		lis r3, float_0p03_rsh_000144f4@ha
+		opword 0xC8210090
+		addi r6, r3, float_0p03_rsh_000144f4@l
+		opword 0xC0040000
+		lis r5, float_0p03705_rsh_000144b8@ha
+		opword 0xEC411028
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_0p4967_rsh_000144bc@ha
+		lis r3, float_1_rsh_00014470@ha
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		opword 0xEC420024
+		opword 0xC0060000
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		opword 0xEC02003A
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0xFC1D0840
+		opword 0xD01F001C
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC1D0840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC1D0772
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC1D0828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC1D0040
+		opword 0x4080001C
+		opword 0xEC1D0828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC1D0028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC002050
+		lis r4, rsh_06_str_000041E0@ha
+		lis r3, rsh_06_str_000041D0@ha
+		opword 0x38000078
+		lis r5, wp@ha
+		addi r21, r4, rsh_06_str_000041E0@l
+		opword 0xEC1E0032
+		addi r20, r3, rsh_06_str_000041D0@l
+		opword 0xD01F0020
+		opword 0xB01F0018
+		lwzu r4, wp@l(r5)
+		opword 0xA8640038
+		opword 0x38030001
+		opword 0xB0040038
+		opword 0xA01F0000
+		opword 0x80650000
+		opword 0x54000529
+		opword 0x3A630050
+		opword 0x41820038
+		opword 0x889F004C
+		lis r3, group_tbl@ha
+		addi r0, r3, group_tbl@l
+		opword 0x54831D78
+		opword 0x28040002
+		opword 0x7C601A14
+		opword 0x82830000
+		opword 0x41800008
+		opword 0x82A30004
+		opword 0x2804000A
+		opword 0x4082000C
+		lis r3, rsh_06_str_000048C4@ha
+		addi r21, r3, rsh_06_str_000048C4@l
+		lis r3, wp@ha
+		opword 0x3A400000
+		addi r22, r3, wp@l
+		opword 0x48000034
+		opword 0x7E639B78
+		opword 0x7E84A378
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820018
+		opword 0x7EA4AB78
+		opword 0x38730010
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4182001C
+		opword 0x3A520001
+		opword 0x3A730028
+		opword 0x80760000
+		opword 0x8003004C
+		opword 0x7C120000
+		opword 0x4180FFC4
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0x8003004C
+		opword 0x7C120000
+		opword 0x40800080
+		opword 0xA81F003C
+		opword 0x7C009000
+		opword 0x41820074
+		opword 0xA01F0000
+		opword 0x5400077B
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A40@ha
+		opword 0x7EA3AB78
+		addi r4, r4, rsh_06_str_00004A40@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x4082004C
+		opword 0xA01F0000
+		opword 0x540006F7
+		opword 0x41820020
+		lis r4, rsh_06_str_00004A44@ha
+		opword 0x7EA3AB78
+		addi r4, r4, rsh_06_str_00004A44@l
+		opword 0x38A00001
+		bl strncmp
+		opword 0x2C030000
+		opword 0x40820024
+		lis r3, gp@ha
+		opword 0xB25F003C
+		addi r3, r3, gp@l
+		opword 0x80630000
+		opword 0x80030038
+		opword 0x8063003C
+		opword 0x907F0044
+		opword 0x901F0040
+		opword 0x3B200001
+		opword 0x809B0000
+		opword 0xA0040000
+		opword 0x540007FF
+		opword 0x418200D4
+		opword 0xA0BF0000
+		opword 0x70A00155
+		opword 0x408200C8
+		opword 0xA07C002E
+		opword 0x28030000
+		opword 0x4182002C
+		opword 0x3803FFFF
+		opword 0x5400043E
+		opword 0x28000001
+		opword 0x4081001C
+		opword 0x3803FFEB
+		opword 0x5400043E
+		opword 0x28000001
+		opword 0x4081000C
+		opword 0x2803001A
+		opword 0x40820064
+		lis r3, float_200_rsh_000144d8@ha
+		opword 0xC03C0090
+		lfs f0, float_200_rsh_000144d8@l(r3)
+		opword 0xFC010040
+		opword 0x40810080
+		lis r3, float_30_rsh_000144dc@ha
+		opword 0xC0240554
+		lfs f0, float_30_rsh_000144dc@l(r3)
+		opword 0xFC010040
+		opword 0x4081006C
+		lis r3, float_100_rsh_000144f8@ha
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		opword 0xFC010040
+		opword 0x4080005C
+		opword 0x57A007FF
+		opword 0x41820054
+		opword 0x54A007BD
+		opword 0x41820010
+		opword 0x38000002
+		opword 0xB01F0024
+		opword 0x48000040
+		opword 0x38000002
+		opword 0xB01F0002
+		opword 0x48000034
+		lis r3, float_50_rsh_000144fc@ha
+		opword 0xC0240554
+		lfs f0, float_50_rsh_000144fc@l(r3)
+		opword 0xFC010040
+		opword 0x40800020
+		opword 0x54A007BD
+		opword 0x41820010
+		opword 0x38000001
+		opword 0xB01F0024
+		opword 0x4800000C
+		opword 0x38000001
+		opword 0xB01F0002
+		opword 0x807B0000
+		opword 0xA0030000
+		opword 0x540007FF
+		opword 0x418200A8
+		opword 0xA01F0000
+		opword 0x70000444
+		opword 0x4082009C
+		lis r4, gp@ha
+		opword 0x80630004
+		addi r4, r4, gp@l
+		opword 0x80840000
+		opword 0x8084001C
+		opword 0x7C041B96
+		opword 0x7C0019D6
+		opword 0x7C002050
+		opword 0x7C1D0040
+		opword 0x40820074
+		opword 0x386003E8
+		bl irand
+		opword 0x2C0300C8
+		opword 0x40800064
+		lis r3, vec3_rsh_00013d94@ha
+		opword 0x80BE000C
+		addi r8, r3, vec3_rsh_00013d94@l
+		opword 0x7F03C378
+		opword 0x80E80000
+		opword 0x38810050
+		opword 0x80C80004
+		opword 0x80080008
+		opword 0x90E1002C
+		opword 0xC005000C
+		opword 0x90C10030
+		opword 0xC025001C
+		opword 0xD001002C
+		opword 0xC005002C
+		opword 0x90010034
+		opword 0x80C1002C
+		opword 0xD0210030
+		opword 0xD0010034
+		opword 0x80A10030
+		opword 0x80010034
+		opword 0x90C10050
+		opword 0x90A10054
+		opword 0x90010058
+		bl psndSFXOn_3D
+		opword 0xA81F0002
+		opword 0x28000041
+		opword 0x41811E8C
+		lis r3, rsh_06_jumptable_000183EC@ha
+		opword 0x5400103A
+		addi r3, r3, rsh_06_jumptable_000183EC@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0xA01F0000
+		opword 0x54000673
+		opword 0x40821E68
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610094
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010090
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0050000
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xC8210090
+		lis r3, zero_rsh_00014490@ha
+		addi r8, r4, float_360_rsh_000144a0@l
+		lis r4, float_6p2832_rsh_0001449c@ha
+		opword 0xEC211028
+		addi r9, r4, float_6p2832_rsh_0001449c@l
+		addi r7, r3, zero_rsh_00014490@l
+		lis r6, float_0p00761_rsh_000144a4@ha
+		lis r5, float_0p16605_rsh_000144a8@ha
+		opword 0xC0480000
+		opword 0xEC210024
+		opword 0xC0070000
+		opword 0xC0690000
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r4, float_1_rsh_00014470@ha
+		lfs f5, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xEC0100BA
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lfs f4, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xEC030032
+		lfs f3, float_1_rsh_00014470@l(r4)
+		opword 0xECC01024
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0601B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA501B2
+		opword 0x48000070
+		opword 0xEC060828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x40800020
+		opword 0xEC260828
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		lis r3, float_3p1416_rsh_000144ac@ha
+		opword 0x80DE000C
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_5_rsh_00014500@ha
+		lfs f2, float_5_rsh_00014500@l(r4)
+		lis r5, float_0p03705_rsh_000144b8@ha
+		opword 0xC006000C
+		opword 0xFC060840
+		lis r4, float_0p4967_rsh_000144bc@ha
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEF62017A
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0601B2
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC060828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x4080001C
+		opword 0xEC060828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		lis r3, float_5_rsh_00014500@ha
+		opword 0xC006002C
+		lfs f1, float_5_rsh_00014500@l(r3)
+		opword 0xEF41013C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610094
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x90010090
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC8210090
+		opword 0xEC211028
+		opword 0xEF810024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061009C
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010098
+		lis r5, float_0p2_rsh_0001450c@ha
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		lis r4, float_0p3_rsh_00014508@ha
+		opword 0xC8210098
+		lis r3, float_0p5_rsh_000144e8@ha
+		lfs f4, float_0p2_rsh_0001450c@l(r5)
+		lis r6, float_215_rsh_00014504@ha
+		opword 0xEC211028
+		lfs f5, float_0p3_rsh_00014508@l(r4)
+		lfs f2, float_215_rsh_00014504@l(r6)
+		opword 0xFC60D090
+		opword 0xEC9C293A
+		opword 0xA8BF0002
+		opword 0xECC10024
+		lfs f0, float_0p5_rsh_000144e8@l(r3)
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		opword 0x38C00000
+		opword 0xFC20D890
+		opword 0xECA6017A
+		bl moamoa_jump
+		opword 0x48001BC8
+		opword 0xA87F0004
+		opword 0x3863FFFF
+		opword 0x7C600735
+		opword 0xB07F0004
+		opword 0x40801BB4
+		opword 0x38000000
+		opword 0xB01F0004
+		opword 0xA87F0002
+		opword 0x38030001
+		opword 0xB01F0002
+		opword 0x48001B9C
+		opword 0x38600003
+		opword 0x80BE000C
+		opword 0x7C1D1BD6
+		lis r4, wp@ha
+		opword 0xC025000C
+		addi r4, r4, wp@l
+		opword 0xC045002C
+		opword 0x80840000
+		opword 0x7C0019D6
+		opword 0x7C00E850
+		opword 0x1E20000C
+		opword 0x7C648A14
+		opword 0xC0630014
+		opword 0xC083001C
+		bl distABf
+		lis r3, wp@ha
+		opword 0x809E000C
+		lwz r0, wp@l(r3)
+		opword 0xFF600890
+		opword 0xC024000C
+		opword 0x7C608A14
+		opword 0xC044002C
+		opword 0xC0630014
+		opword 0xC083001C
+		bl angleABf
+		lis r3, float_31_rsh_00014510@ha
+		lfs f0, float_31_rsh_00014510@l(r3)
+		opword 0xFC1B0040
+		opword 0x4081027C
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r6, float_0p00761_rsh_000144a4@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xC0050000
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xEC400072
+		lfs f0, float_360_rsh_000144a0@l(r4)
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xECA20024
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xEC250828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		lis r3, float_3p1416_rsh_000144ac@ha
+		opword 0x80DE000C
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_30_rsh_000144dc@ha
+		lfs f2, float_30_rsh_000144dc@l(r4)
+		lis r4, float_0p4967_rsh_000144bc@ha
+		opword 0xC006000C
+		opword 0xFC050840
+		lis r5, float_0p03705_rsh_000144b8@ha
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEFA2013A
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC050828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x4080001C
+		opword 0xEC050828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		lis r3, float_30_rsh_000144dc@ha
+		opword 0xC006002C
+		lfs f1, float_30_rsh_000144dc@l(r3)
+		opword 0xEF81013C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x9061009C
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x90010098
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC8210098
+		opword 0xEC211028
+		opword 0xEF610024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x90610094
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x90010090
+		lis r5, zero_rsh_00014490@ha
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xC8210090
+		addi r6, r5, zero_rsh_00014490@l
+		lis r3, float_0p4_rsh_00014518@ha
+		addi r5, r4, float_1_rsh_00014470@l
+		opword 0xEC211028
+		addi r4, r3, float_0p4_rsh_00014518@l
+		opword 0xC0460000
+		lis r3, float_2_rsh_00014514@ha
+		addi r7, r3, float_2_rsh_00014514@l
+		lis r8, float_215_rsh_00014504@ha
+		opword 0xEC610024
+		opword 0xC0250000
+		opword 0xC0040000
+		opword 0x7FC3F378
+		opword 0xC0A70000
+		opword 0x7FE4FB78
+		opword 0xEC9B08BA
+		opword 0xA8BF0002
+		opword 0xEC0300BA
+		lfs f2, float_215_rsh_00014504@l(r8)
+		opword 0xFC20E890
+		opword 0x38C00000
+		opword 0xEC850132
+		opword 0xFC60E090
+		opword 0xECA50032
+		bl moamoa_jump
+		opword 0x480018B0
+		lis r3, rsh_06_str_000047B4@ha
+		addi r3, r3, rsh_06_str_000047B4@l
+		bl npcNameToPtr
+		opword 0x80630104
+		bl animPoseGetAnimPosePtr
+		opword 0xA8FF0048
+		opword 0x3CA04330
+		lis r4, wp@ha
+		opword 0x8063015C
+		addi r6, r4, wp@l
+		opword 0x90A10098
+		opword 0x54E4083C
+		opword 0x81060000
+		opword 0x38040570
+		opword 0xA89F004A
+		opword 0x7C0802AE
+		lis r6, double_to_int_rsh_00014488@ha
+		opword 0x6C848000
+		opword 0x54E7103A
+		opword 0x9081009C
+		opword 0x6C008000
+		lfd f2, double_to_int_rsh_00014488@l(r6)
+		opword 0x7D083A14
+		opword 0xC8010098
+		opword 0x38810044
+		opword 0x90010094
+		opword 0xEC201028
+		opword 0xA8E80672
+		opword 0x90A10090
+		opword 0xA8080670
+		opword 0x1CC7000C
+		opword 0xC8010090
+		opword 0x80630000
+		opword 0xEC001028
+		opword 0x1C00000C
+		opword 0x7E233214
+		opword 0xEF610024
+		opword 0x7C630214
+		opword 0xFC20D890
+		bl PSVECScale
+		lis r4, float_1_rsh_00014470@ha
+		opword 0x7E238B78
+		addi r5, r4, float_1_rsh_00014470@l
+		opword 0x38810014
+		opword 0xC0050000
+		opword 0xEC20D828
+		bl PSVECScale
+		opword 0x38610044
+		opword 0x38810014
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x38610044
+		opword 0x389F0030
+		opword 0x7C651B78
+		bl PSVECAdd
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A0
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC82100A0
+		opword 0xEC211028
+		opword 0xEF610024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		lis r6, float_2_rsh_00014514@ha
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		lis r5, zero_rsh_00014490@ha
+		opword 0xC82100A8
+		lis r4, float_1p5_rsh_0001451c@ha
+		lfs f5, float_2_rsh_00014514@l(r6)
+		lis r3, float_0p8_rsh_00014520@ha
+		opword 0xEC211028
+		lfs f2, zero_rsh_00014490@l(r5)
+		opword 0x38A0003D
+		opword 0x38C00000
+		opword 0xEC610024
+		lfs f1, float_1p5_rsh_0001451c@l(r4)
+		lfs f0, float_0p8_rsh_00014520@l(r3)
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		opword 0xEC9B08BA
+		opword 0xEC0300BA
+		opword 0xC0210044
+		opword 0xC0410048
+		opword 0xEC850132
+		opword 0xC061004C
+		opword 0xECA50032
+		bl moamoa_jump
+		opword 0xA01F0000
+		opword 0x60000200
+		opword 0xB01F0000
+		opword 0x801E0000
+		opword 0x60000004
+		opword 0x901E0000
+		opword 0x48001708
+		lis r3, rsh_06_str_000047B4@ha
+		addi r3, r3, rsh_06_str_000047B4@l
+		bl npcNameToPtr
+		opword 0x80630104
+		bl animPoseGetAnimPosePtr
+		opword 0xA8FF0048
+		opword 0x3CA04330
+		lis r4, wp@ha
+		opword 0x8063015C
+		addi r6, r4, wp@l
+		opword 0x90A100A8
+		opword 0x54E4083C
+		opword 0x81060000
+		opword 0x38040570
+		opword 0xA89F004A
+		opword 0x7C0802AE
+		lis r6, double_to_int_rsh_00014488@ha
+		opword 0x6C848000
+		opword 0x54E7103A
+		opword 0x908100AC
+		opword 0x6C008000
+		lfd f2, double_to_int_rsh_00014488@l(r6)
+		opword 0x7D083A14
+		opword 0xC80100A8
+		opword 0x38810038
+		opword 0x900100A4
+		opword 0xEC201028
+		opword 0xA8E80672
+		opword 0x90A100A0
+		opword 0xA8080670
+		opword 0x1CC7000C
+		opword 0xC80100A0
+		opword 0x80630000
+		opword 0xEC001028
+		opword 0x1C00000C
+		opword 0x7E233214
+		opword 0xEF610024
+		opword 0x7C630214
+		opword 0xFC20D890
+		bl PSVECScale
+		lis r4, float_1_rsh_00014470@ha
+		opword 0x7E238B78
+		addi r5, r4, float_1_rsh_00014470@l
+		opword 0x38810008
+		opword 0xC0050000
+		opword 0xEC20D828
+		bl PSVECScale
+		opword 0x38610038
+		opword 0x38810008
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0x38610038
+		opword 0x389F0030
+		opword 0x7C651B78
+		bl PSVECAdd
+		opword 0xC0010038
+		opword 0x807E000C
+		opword 0xD003000C
+		opword 0xC001003C
+		opword 0x807E000C
+		opword 0xD003001C
+		opword 0xC0010040
+		opword 0x807E000C
+		opword 0xD003002C
+		opword 0x48001604
+		opword 0xA87F0004
+		opword 0x3863FFFF
+		opword 0x7C600735
+		opword 0xB07F0004
+		opword 0x408015F0
+		opword 0x38000000
+		opword 0xB01F0004
+		opword 0xA87F0002
+		opword 0x38030001
+		opword 0xB01F0002
+		opword 0x480015D8
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0250000
+		lis r4, float_200_rsh_000144d8@ha
+		opword 0xC80100A8
+		lis r3, zero_rsh_00014490@ha
+		addi r5, r4, float_200_rsh_000144d8@l
+		opword 0xEC601028
+		addi r4, r3, zero_rsh_00014490@l
+		opword 0xC0450000
+		lis r3, float_300_rsh_00014524@ha
+		opword 0xC0040000
+		opword 0xEC630824
+		lfs f1, float_300_rsh_00014524@l(r3)
+		opword 0xEC0300BA
+		opword 0xD01F001C
+		opword 0xC01F001C
+		opword 0xEC010032
+		opword 0xEF601024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_rsh_00014488@ha
+		opword 0x906100A4
+		addi r5, r4, double_to_int_rsh_00014488@l
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r4, r3, float_32767_rsh_000144ec@l
+		opword 0xC8250000
+		lis r3, zero_rsh_00014490@ha
+		opword 0xC80100A0
+		opword 0x38000000
+		opword 0xC0440000
+		opword 0xEC600828
+		lfs f1, zero_rsh_00014490@l(r3)
+		opword 0xEC1B0828
+		opword 0xEC431024
+		opword 0xEC02083A
+		opword 0xD01F0020
+		opword 0xA87F0002
+		opword 0x38630001
+		opword 0xB07F0002
+		opword 0xB01F0004
+		opword 0xA81F0004
+		opword 0x2C0000C8
+		opword 0x40800010
+		lis r3, float_1_rsh_00014470@ha
+		lfs f1, float_1_rsh_00014470@l(r3)
+		opword 0x48000034
+		opword 0x20600320
+		opword 0x3C004330
+		opword 0x6C638000
+		lis r4, double_to_int_rsh_00014488@ha
+		opword 0x906100AC
+		lis r3, float_600_rsh_00014528@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A8
+		lfs f0, float_600_rsh_00014528@l(r3)
+		opword 0xC82100A8
+		opword 0xEC211028
+		opword 0xEC210024
+		lis r3, zero_rsh_00014490@ha
+		opword 0xFFA00890
+		lfs f0, zero_rsh_00014490@l(r3)
+		opword 0xFC010040
+		opword 0x40800014
+		opword 0xA01F0000
+		opword 0xFFA00090
+		opword 0x60000200
+		opword 0xB01F0000
+		opword 0x38C00003
+		lis r3, gp@ha
+		opword 0x7CBD33D6
+		lwz r4, gp@l(r3)
+		opword 0x3C004330
+		opword 0x900100A8
+		lis r3, double_to_int_mask_rsh_00014480@ha
+		opword 0x8004001C
+		opword 0x7C8531D6
+		opword 0x7C1D0214
+		opword 0x900100AC
+		lis r5, wp@ha
+		lfd f1, double_to_int_mask_rsh_00014480@l(r3)
+		lis r3, float_0p25_rsh_0001452c@ha
+		opword 0xC80100A8
+		opword 0x7C04E850
+		opword 0x1C00000C
+		opword 0xEC200828
+		lfs f0, float_0p25_rsh_0001452c@l(r3)
+		lwz r3, wp@l(r5)
+		opword 0x7C630214
+		opword 0xEC210032
+		opword 0xC3430014
+		opword 0xC3630018
+		opword 0xC383001C
+		bl sin
+		lis r3, gp@ha
+		opword 0x3C004330
+		addi r4, r3, gp@l
+		opword 0xFC400818
+		opword 0x80A40000
+		lis r3, double_to_int_mask_rsh_00014480@ha
+		opword 0xC03F0020
+		addi r4, r3, double_to_int_mask_rsh_00014480@l
+		opword 0x80A5001C
+		opword 0xEC6100B2
+		opword 0x900100A0
+		opword 0x7C1D2A14
+		opword 0xC01F001C
+		opword 0x900100A4
+		lis r3, float_0p25_rsh_0001452c@ha
+		opword 0xC8440000
+		opword 0xEF60DF7A
+		opword 0xC82100A0
+		opword 0xEF5DD0FA
+		lfs f0, float_0p25_rsh_0001452c@l(r3)
+		opword 0xEC211028
+		opword 0xEC210032
+		bl cos
+		opword 0x809E000C
+		lis r3, float_15_rsh_00014474@ha
+		opword 0xC01F0020
+		opword 0xFC800818
+		opword 0xC064000C
+		opword 0xFC200050
+		lfs f2, float_15_rsh_00014474@l(r3)
+		opword 0xEC1A1828
+		opword 0xEC210132
+		opword 0xEC001024
+		opword 0xEC03002A
+		opword 0xEF9DE07A
+		opword 0xD004000C
+		opword 0x807E000C
+		opword 0xC023001C
+		opword 0xEC1B0828
+		opword 0xEC001024
+		opword 0xEC01002A
+		opword 0xD003001C
+		opword 0x807E000C
+		opword 0xC023002C
+		opword 0xEC1C0828
+		opword 0xEC001024
+		opword 0xEC01002A
+		opword 0xD003002C
+		opword 0xA87F0004
+		opword 0x38030001
+		opword 0xB01F0004
+		opword 0x4800136C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		lis r4, float_90_rsh_00014534@ha
+		opword 0xC0050000
+		opword 0xC82100A8
+		lis r3, float_neg45_rsh_00014530@ha
+		addi r9, r4, float_90_rsh_00014534@l
+		lis r4, float_6p2832_rsh_0001449c@ha
+		opword 0xEC211028
+		addi r5, r3, float_neg45_rsh_00014530@l
+		lis r3, wp@ha
+		addi r8, r4, float_6p2832_rsh_0001449c@l
+		addi r6, r3, wp@l
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xEC410024
+		opword 0x81460000
+		opword 0xC0050000
+		lis r3, float_360_rsh_000144a0@ha
+		opword 0xC0290000
+		addi r7, r3, float_360_rsh_000144a0@l
+		opword 0xEC22007A
+		opword 0xC06A0550
+		opword 0xC0480000
+		lis r6, float_0p00761_rsh_000144a4@ha
+		lis r5, float_0p16605_rsh_000144a8@ha
+		opword 0xC0070000
+		opword 0xEC63082A
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		opword 0xC36A0554
+		opword 0xEC4200F2
+		lfs f5, float_0p00761_rsh_000144a4@l(r6)
+		lfs f4, float_0p16605_rsh_000144a8@l(r5)
+		lfs f3, float_1_rsh_00014470@l(r4)
+		opword 0xECC20024
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0601B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA501B2
+		opword 0x48000070
+		opword 0xEC060828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x40800020
+		opword 0xEC260828
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0x80DE000C
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_15_rsh_00014474@ha
+		lfs f2, float_15_rsh_00014474@l(r4)
+		lis r5, float_0p03705_rsh_000144b8@ha
+		opword 0xC006000C
+		opword 0xFC060840
+		lis r4, float_0p4967_rsh_000144bc@ha
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEFA2017A
+		opword 0xC3C6001C
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC060840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0601B2
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC060828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC060040
+		opword 0x4080001C
+		opword 0xEC060828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC060028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		lis r3, float_15_rsh_00014474@ha
+		opword 0xC006002C
+		lfs f1, float_15_rsh_00014474@l(r3)
+		opword 0xEF81013C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, zero_rsh_00014490@ha
+		opword 0xC80100A8
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEC600828
+		lfs f1, zero_rsh_00014490@l(r4)
+		lfs f0, float_1_rsh_00014470@l(r3)
+		opword 0xEC431024
+		opword 0xEF42007A
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0050000
+		lis r4, zero_rsh_00014490@ha
+		opword 0xC82100A0
+		lis r3, float_0p4_rsh_00014518@ha
+		addi r5, r4, zero_rsh_00014490@l
+		opword 0xFC80D090
+		opword 0xEC611028
+		addi r4, r3, float_0p4_rsh_00014518@l
+		opword 0xC0240000
+		lis r3, float_100_rsh_000144f8@ha
+		opword 0xC0450000
+		opword 0xEC630024
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		opword 0xECA308BA
+		opword 0xFC20E890
+		opword 0xFC40F090
+		opword 0xFC60E090
+		opword 0xFC1B0040
+		opword 0x4080000C
+		opword 0xA8BF0002
+		opword 0x48000008
+		opword 0x38A00000
+		opword 0x38C00000
+		bl moamoa_jump
+		opword 0x48001074
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		lis r4, float_90_rsh_00014534@ha
+		lis r3, float_neg45_rsh_00014530@ha
+		opword 0xC82100A8
+		addi r7, r4, float_90_rsh_00014534@l
+		opword 0xC0050000
+		addi r6, r3, float_neg45_rsh_00014530@l
+		opword 0xEC211028
+		lis r3, wp@ha
+		addi r5, r3, wp@l
+		lis r4, float_180_rsh_00014538@ha
+		opword 0x81250000
+		addi r8, r4, float_180_rsh_00014538@l
+		opword 0xEC410024
+		opword 0xC0060000
+		opword 0xC0270000
+		lis r3, float_6p2832_rsh_0001449c@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xEC02007A
+		opword 0xC0890550
+		opword 0xC0680000
+		addi r7, r4, float_360_rsh_000144a0@l
+		opword 0xC0450000
+		lis r3, float_3p1416_rsh_000144ac@ha
+		opword 0xEC84002A
+		lis r6, float_0p00761_rsh_000144a4@ha
+		opword 0xC0070000
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xEC84182A
+		opword 0xC3690554
+		lfs f5, float_0p00761_rsh_000144a4@l(r6)
+		lfs f3, float_1_rsh_00014470@l(r4)
+		opword 0xEC420132
+		lfs f4, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xEC420024
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC020840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA500B2
+		opword 0x48000070
+		opword 0xEC020828
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA500B2
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC020040
+		opword 0x40800020
+		opword 0xEC420828
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA500B2
+		opword 0xFCA02850
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC020028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC410028
+		opword 0xEC0200B2
+		opword 0xECA52038
+		opword 0xECA5183A
+		opword 0xECA500B2
+		opword 0xFCA02850
+		opword 0x809E000C
+		lis r3, float_30_rsh_000144dc@ha
+		lfs f1, float_30_rsh_000144dc@l(r3)
+		opword 0xC004000C
+		opword 0xC3C4001C
+		opword 0xEFA1017A
+		opword 0xC384002C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, zero_rsh_00014490@ha
+		opword 0xC80100A8
+		lis r3, float_1_rsh_00014470@ha
+		lis r5, float_2_rsh_00014514@ha
+		opword 0xEC600828
+		lfs f1, zero_rsh_00014490@l(r4)
+		lfs f0, float_1_rsh_00014470@l(r3)
+		opword 0xEC631024
+		lfs f2, float_2_rsh_00014514@l(r5)
+		opword 0xEC03007A
+		opword 0xEF420032
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r5, r3, float_32767_rsh_000144ec@l
+		lis r6, float_2_rsh_00014514@ha
+		opword 0xC0050000
+		opword 0xC82100A0
+		lis r4, zero_rsh_00014490@ha
+		lis r3, float_0p4_rsh_00014518@ha
+		lfs f4, float_2_rsh_00014514@l(r6)
+		opword 0xEC211028
+		addi r5, r4, zero_rsh_00014490@l
+		addi r4, r3, float_0p4_rsh_00014518@l
+		opword 0xC0450000
+		lis r3, float_100_rsh_000144f8@ha
+		opword 0xEC610024
+		opword 0xC0240000
+		opword 0x7FE4FB78
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		opword 0x7FC3F378
+		opword 0xEC6308BA
+		opword 0xFC20E890
+		opword 0xFC40F090
+		opword 0xECA400F2
+		opword 0xFC60E090
+		opword 0xFC80D090
+		opword 0xFC1B0040
+		opword 0x4080000C
+		opword 0xA8BF0002
+		opword 0x48000008
+		opword 0x38A00000
+		opword 0x38C00000
+		bl moamoa_jump
+		opword 0x48000E10
+		opword 0x807E000C
+		opword 0xC01F0014
+		opword 0xC023001C
+		opword 0xEC01002A
+		opword 0xD003001C
+		opword 0xC03F0014
+		opword 0xC01F0020
+		opword 0xEC010028
+		opword 0xD01F0014
+		opword 0x807E000C
+		opword 0xC07F0008
+		opword 0xC023000C
+		opword 0xC043002C
+		opword 0xC09F0010
+		bl angleABf
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r6, float_0p00761_rsh_000144a4@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xC0050000
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xEC400072
+		lfs f0, float_360_rsh_000144a0@l(r4)
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_1_rsh_00014470@ha
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xECA20024
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xEC250828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x80FE000C
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r5, float_0p4967_rsh_000144bc@ha
+		opword 0xC05F001C
+		lis r6, float_0p03705_rsh_000144b8@ha
+		opword 0xC007000C
+		opword 0xFC050840
+		lis r4, float_1_rsh_00014470@ha
+		lfs f3, float_0p4967_rsh_000144bc@l(r5)
+		opword 0xEC02013A
+		lfs f4, float_0p03705_rsh_000144b8@l(r6)
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xD007000C
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC050828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x4080001C
+		opword 0xEC050828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x807E000C
+		opword 0xFC202050
+		opword 0xC05F001C
+		opword 0xC003002C
+		opword 0xEC02007A
+		opword 0xD003002C
+		opword 0xA87F0018
+		opword 0x3863FFFF
+		opword 0x7C600735
+		opword 0xB07F0018
+		opword 0x40800C08
+		opword 0xC01F0008
+		opword 0x38000000
+		opword 0x807E000C
+		opword 0xD003000C
+		opword 0xC01F000C
+		opword 0x807E000C
+		opword 0xD003001C
+		opword 0xC01F0010
+		opword 0x807E000C
+		opword 0xD003002C
+		opword 0xA07F0000
+		opword 0x546307FA
+		opword 0xB07F0000
+		opword 0x807E0000
+		opword 0x54630734
+		opword 0x907E0000
+		opword 0xB01F0004
+		opword 0xA87F0002
+		opword 0x38030001
+		opword 0xB01F0002
+		opword 0x48000BB4
+		opword 0xA87F0004
+		opword 0x38630001
+		opword 0x7C600734
+		opword 0xB07F0004
+		opword 0x2C000004
+		opword 0x40810B9C
+		opword 0xA81F0024
+		opword 0xB01F0002
+		opword 0x48000B90
+		opword 0xA01F0000
+		opword 0x540007FF
+		opword 0x40820010
+		opword 0xC35C008C
+		opword 0xC37C0094
+		opword 0x48000030
+		opword 0x38600003
+		lis r4, wp@ha
+		opword 0x7C1D1BD6
+		addi r4, r4, wp@l
+		opword 0x80840000
+		opword 0x7C0019D6
+		opword 0x7C00E850
+		opword 0x1C00000C
+		opword 0x7C640214
+		opword 0xC3430014
+		opword 0xC363001C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f4, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A8
+		opword 0xFC40D890
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xFC20D090
+		opword 0xC86100A8
+		opword 0x80BE000C
+		opword 0xECA32028
+		opword 0xC065000C
+		opword 0xC085002C
+		opword 0xEF650024
+		bl angleABf
+		lis r3, float_90_rsh_00014534@ha
+		lis r4, float_neg45_rsh_00014530@ha
+		addi r5, r3, float_90_rsh_00014534@l
+		lfs f0, float_neg45_rsh_00014530@l(r4)
+		opword 0xC0450000
+		lis r3, float_6p2832_rsh_0001449c@ha
+		addi r8, r3, float_6p2832_rsh_0001449c@l
+		lis r4, float_360_rsh_000144a0@ha
+		opword 0xEC1B00BA
+		addi r7, r4, float_360_rsh_000144a0@l
+		lis r6, float_0p00761_rsh_000144a4@ha
+		lis r5, float_0p16605_rsh_000144a8@ha
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xEC41002A
+		opword 0xC0280000
+		opword 0xC0070000
+		lfs f4, float_0p00761_rsh_000144a4@l(r6)
+		opword 0xEC4100B2
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lfs f3, float_0p16605_rsh_000144a8@l(r5)
+		opword 0xECA20024
+		lfs f2, float_1_rsh_00014470@l(r4)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840172
+		opword 0x48000070
+		opword 0xEC050828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x40800020
+		opword 0xEC250828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x80DE000C
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r4, float_15_rsh_00014474@ha
+		lfs f2, float_15_rsh_00014474@l(r4)
+		lis r4, float_0p4967_rsh_000144bc@ha
+		opword 0xC006000C
+		opword 0xFC050840
+		lis r5, float_0p03705_rsh_000144b8@ha
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEFA2013A
+		opword 0xC3C6001C
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC050840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC050172
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC050828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC050040
+		opword 0x4080001C
+		opword 0xEC050828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC050028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		lis r3, float_15_rsh_00014474@ha
+		opword 0xC006002C
+		lfs f1, float_15_rsh_00014474@l(r3)
+		opword 0xEF41013C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A8
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC82100A8
+		opword 0xEC211028
+		opword 0xEF610024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0050000
+		lis r4, zero_rsh_00014490@ha
+		opword 0xC82100A0
+		lis r3, float_1_rsh_00014470@ha
+		lfs f5, zero_rsh_00014490@l(r4)
+		opword 0x7FE4FB78
+		opword 0xEC611028
+		opword 0xA8BF0002
+		opword 0xFC20E890
+		opword 0x38C00001
+		opword 0xFC40F090
+		opword 0x38A50001
+		opword 0xECC30024
+		lfs f0, float_1_rsh_00014470@l(r3)
+		opword 0x7FC3F378
+		opword 0xEC9B017A
+		opword 0xFC60D090
+		opword 0xECA6017A
+		bl moamoa_jump
+		opword 0x4800088C
+		opword 0xA87F0004
+		opword 0x38630001
+		opword 0x7C600734
+		opword 0xB07F0004
+		opword 0x2C00001E
+		opword 0x40800040
+		opword 0x809E000C
+		lis r3, float_0p9_rsh_0001453c@ha
+		lfs f1, float_0p9_rsh_0001453c@l(r3)
+		opword 0xC0040000
+		opword 0xEC000072
+		opword 0xD0040000
+		opword 0x807E000C
+		opword 0xC0030014
+		opword 0xEC000072
+		opword 0xD0030014
+		opword 0x807E000C
+		opword 0xC0030028
+		opword 0xEC000072
+		opword 0xD0030028
+		opword 0x48000838
+		opword 0x38000031
+		opword 0xB01F0002
+		opword 0x4800082C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A8
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC82100A8
+		opword 0xEC211028
+		opword 0xEF610024
+		bl rand
+		lis r5, float_90_rsh_00014534@ha
+		lis r4, float_135_rsh_00014540@ha
+		lfs f0, float_135_rsh_00014540@l(r4)
+		opword 0x6C668000
+		lfs f1, float_90_rsh_00014534@l(r5)
+		opword 0x3C004330
+		lis r3, float_6p2832_rsh_0001449c@ha
+		lis r4, double_to_int_rsh_00014488@ha
+		addi r5, r3, float_6p2832_rsh_0001449c@l
+		opword 0x90C100A4
+		opword 0xEC1B007A
+		addi r6, r4, double_to_int_rsh_00014488@l
+		opword 0x900100A0
+		lis r3, float_360_rsh_000144a0@ha
+		opword 0xC0250000
+		addi r4, r3, float_360_rsh_000144a0@l
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0xEC210032
+		opword 0xC0040000
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC8660000
+		lis r4, float_300_rsh_00014524@ha
+		opword 0xC84100A0
+		opword 0xECE10024
+		addi r6, r4, float_300_rsh_00014524@l
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lis r4, float_0p16605_rsh_000144a8@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEC621828
+		opword 0xC0450000
+		lis r5, float_200_rsh_000144d8@ha
+		opword 0xC0060000
+		addi r7, r5, float_200_rsh_000144d8@l
+		opword 0xFC070840
+		opword 0xEC631024
+		opword 0xC0470000
+		lis r5, float_0p00761_rsh_000144a4@ha
+		lfs f4, float_0p16605_rsh_000144a8@l(r4)
+		lfs f5, float_0p00761_rsh_000144a4@l(r5)
+		opword 0xECC300BA
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC070840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC0701F2
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xECA501F2
+		opword 0x48000070
+		opword 0xEC070828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xECA50072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC070040
+		opword 0x40800020
+		opword 0xEC270828
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xECA50072
+		opword 0xFCA02850
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC070028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xECA52038
+		opword 0xECA5103A
+		opword 0xECA50072
+		opword 0xFCA02850
+		lis r3, float_3p1416_rsh_000144ac@ha
+		opword 0x80DE000C
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r5, float_0p03705_rsh_000144b8@ha
+		opword 0xC006000C
+		lis r4, float_0p4967_rsh_000144bc@ha
+		opword 0xFC070840
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xEFA6017A
+		lfs f4, float_0p03705_rsh_000144b8@l(r5)
+		lfs f3, float_0p4967_rsh_000144bc@l(r4)
+		lfs f2, float_1_rsh_00014470@l(r3)
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC070840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC0701F2
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC070828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC070040
+		opword 0x4080001C
+		opword 0xEC070828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC070028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xC006002C
+		opword 0xEFC6013C
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xC80100A8
+		lis r3, float_5_rsh_00014500@ha
+		opword 0xEC600828
+		lfs f1, float_1_rsh_00014470@l(r4)
+		lfs f0, float_5_rsh_00014500@l(r3)
+		opword 0xEC431024
+		opword 0xEF42007A
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_0p1_rsh_00014548@ha
+		opword 0xC80100A0
+		lis r3, float_0p2_rsh_00014544@ha
+		opword 0x2C1A0000
+		opword 0xEC600828
+		lfs f1, float_0p1_rsh_00014548@l(r4)
+		lfs f0, float_0p2_rsh_00014544@l(r3)
+		opword 0xEC431024
+		opword 0xEF62007A
+		opword 0x40820050
+		lis r3, vec3_rsh_00013da0@ha
+		opword 0x38810020
+		addi r7, r3, vec3_rsh_00013da0@l
+		opword 0x386006C3
+		opword 0x80C70000
+		opword 0x80A70004
+		opword 0x80070008
+		opword 0x90C10020
+		opword 0x90A10024
+		opword 0x90010028
+		opword 0x80BE000C
+		opword 0xC005000C
+		opword 0xD0010020
+		opword 0xC005001C
+		opword 0xD0010024
+		opword 0xC005002C
+		opword 0xD0010028
+		bl psndSFXOn_3D
+		opword 0x3B400001
+		lis r3, float_neg100_rsh_0001454c@ha
+		opword 0xFC20E890
+		lfs f2, float_neg100_rsh_0001454c@l(r3)
+		opword 0xFC60F090
+		opword 0xFC80D090
+		opword 0x7FC3F378
+		opword 0xFCA0D890
+		opword 0x7FE4FB78
+		opword 0x38A00031
+		opword 0x38C00000
+		bl moamoa_jump
+		opword 0x480004DC
+		opword 0xA87F0018
+		opword 0x3863FFFF
+		opword 0x7C600735
+		opword 0xB07F0018
+		opword 0x40810074
+		opword 0xC03F0008
+		opword 0xC01F0014
+		opword 0xEC01002A
+		opword 0xD01F0008
+		opword 0xC03F000C
+		opword 0xC01F001C
+		opword 0xEC01002A
+		opword 0xD01F000C
+		opword 0xC03F0010
+		opword 0xC01F0020
+		opword 0xEC01002A
+		opword 0xD01F0010
+		opword 0x807E000C
+		opword 0xC01F0008
+		opword 0xC023000C
+		opword 0xEC01002A
+		opword 0xD003000C
+		opword 0x807E000C
+		opword 0xC01F000C
+		opword 0xC023001C
+		opword 0xEC01002A
+		opword 0xD003001C
+		opword 0x807E000C
+		opword 0xC01F0010
+		opword 0xC023002C
+		opword 0xEC01002A
+		opword 0xD003002C
+		opword 0x48000458
+		opword 0x38000031
+		opword 0xB01F0002
+		opword 0x4800044C
+		opword 0x807E000C
+		bl PSMTXIdentity
+		lis r3, wp@ha
+		opword 0x3AA002BC
+		addi r22, r3, wp@l
+		bl rand
+		opword 0x7C03ABD6
+		opword 0x80960000
+		opword 0x80840008
+		opword 0x7C00A9D6
+		opword 0x7E401850
+		opword 0x1C120050
+		opword 0x7C840214
+		opword 0xA8640002
+		opword 0x7C600735
+		opword 0x4182000C
+		opword 0x2C030003
+		opword 0x4082FFD0
+		opword 0xA0040000
+		opword 0x54000673
+		opword 0x4082FFC4
+		bl extGetPosePtr
+		opword 0x56402834
+		lis r4, float_215_rsh_00014504@ha
+		opword 0x7CE30214
+		opword 0x80BE000C
+		opword 0x80C7000C
+		opword 0x38000000
+		lfs f0, float_215_rsh_00014504@l(r4)
+		opword 0xC026000C
+		opword 0xD025000C
+		opword 0x807E000C
+		opword 0xD003001C
+		opword 0x8087000C
+		opword 0x807E000C
+		opword 0xC004002C
+		opword 0xD003002C
+		opword 0xB01F0000
+		opword 0xB01F0002
+		opword 0xB01F0004
+		opword 0x480003A8
+		opword 0xA01F0000
+		opword 0x60000020
+		opword 0xB01F0000
+		opword 0x801E0000
+		opword 0x5400003C
+		opword 0x901E0000
+		opword 0x801E0000
+		opword 0x60000004
+		opword 0x901E0000
+		opword 0x48000380
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r3, float_32767_rsh_000144ec@ha
+		lfd f2, double_to_int_rsh_00014488@l(r4)
+		opword 0x900100A8
+		lfs f0, float_32767_rsh_000144ec@l(r3)
+		opword 0xC82100A8
+		opword 0xEC211028
+		opword 0xEF610024
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100A4
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A0
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_1_rsh_00014470@ha
+		opword 0xC80100A0
+		lis r3, float_2_rsh_00014514@ha
+		opword 0x7FA00E70
+		opword 0xEC600828
+		lfs f0, float_2_rsh_00014514@l(r3)
+		lfs f1, float_1_rsh_00014470@l(r4)
+		opword 0x7C600194
+		opword 0xEC431024
+		opword 0xEFC2007A
+		bl irand
+		lis r5, float_90_rsh_00014534@ha
+		lis r4, float_225_rsh_00014550@ha
+		lfs f1, float_90_rsh_00014534@l(r5)
+		lis r7, float_0p00761_rsh_000144a4@ha
+		lfs f0, float_225_rsh_00014550@l(r4)
+		lis r6, float_6p2832_rsh_0001449c@ha
+		lis r5, float_360_rsh_000144a0@ha
+		lis r4, float_3p1416_rsh_000144ac@ha
+		opword 0xEC1B007A
+		lfs f1, float_6p2832_rsh_0001449c@l(r6)
+		lis r6, float_0p16605_rsh_000144a8@ha
+		opword 0xB07F0004
+		lfs f4, float_0p00761_rsh_000144a4@l(r7)
+		opword 0xEC410032
+		lfs f0, float_360_rsh_000144a0@l(r5)
+		lis r5, float_1_rsh_00014470@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r4)
+		opword 0xEFA20024
+		lfs f3, float_0p16605_rsh_000144a8@l(r6)
+		lfs f2, float_1_rsh_00014470@l(r5)
+		opword 0xFC1D0840
+		opword 0x4C401382
+		opword 0x40820048
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC1D0840
+		opword 0x4C401382
+		opword 0x40820018
+		opword 0xEC1D0772
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840772
+		opword 0x48000070
+		opword 0xEC1D0828
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0x48000054
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC1D0040
+		opword 0x40800020
+		opword 0xEC3D0828
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0x48000028
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC1D0028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC210028
+		opword 0xEC010072
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xEC840072
+		opword 0xFC802050
+		opword 0xEC1E0132
+		opword 0xD01F0008
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_rsh_00014488@ha
+		opword 0x906100AC
+		addi r5, r4, double_to_int_rsh_00014488@l
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r4, r3, float_32767_rsh_000144ec@l
+		opword 0xC8450000
+		lis r3, float_1_rsh_00014470@ha
+		opword 0xC82100A8
+		addi r5, r3, float_1_rsh_00014470@l
+		opword 0xC0040000
+		lis r4, float_0p03705_rsh_000144b8@ha
+		opword 0xEC611028
+		lis r3, float_3p1416_rsh_000144ac@ha
+		lfs f1, float_3p1416_rsh_000144ac@l(r3)
+		lis r3, float_0p4967_rsh_000144bc@ha
+		opword 0xC0450000
+		opword 0xEC030024
+		lfs f4, float_0p03705_rsh_000144b8@l(r4)
+		lfs f3, float_0p4967_rsh_000144bc@l(r3)
+		opword 0xEC0010BA
+		opword 0xFC1D0840
+		opword 0xD01F000C
+		opword 0x4C401382
+		opword 0x40820044
+		lis r3, float_1p5708_rsh_000144b0@ha
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xFC1D0840
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0xEC1D0772
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0x48000064
+		opword 0xEC1D0828
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000048
+		lis r3, float_4p7124_rsh_000144b4@ha
+		lfs f0, float_4p7124_rsh_000144b4@l(r3)
+		opword 0xFC1D0040
+		opword 0x4080001C
+		opword 0xEC1D0828
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC802050
+		opword 0x48000020
+		lis r3, float_1p5708_rsh_000144b0@ha
+		opword 0xEC1D0028
+		lfs f1, float_1p5708_rsh_000144b0@l(r3)
+		opword 0xEC010028
+		opword 0xEC000032
+		opword 0xEC841838
+		opword 0xEC84103A
+		opword 0xFC002050
+		opword 0xEC1E0032
+		opword 0xD01F0010
+		opword 0xA87F0002
+		opword 0x38030001
+		opword 0xB01F0002
+		opword 0x480000F4
+		opword 0xA87F0004
+		opword 0x3863FFFF
+		opword 0x7C600735
+		opword 0xB07F0004
+		opword 0x408000E0
+		opword 0xA87F0002
+		opword 0x38030001
+		opword 0xB01F0002
+		opword 0x480000D0
+		lis r3, float_1p1_rsh_00014554@ha
+		lis r4, float_1p02_rsh_00014558@ha
+		addi r6, r3, float_1p1_rsh_00014554@l
+		lis r3, float_0p20944_rsh_0001455c@ha
+		opword 0xC03F0008
+		addi r5, r4, float_1p02_rsh_00014558@l
+		opword 0xC0660000
+		addi r4, r3, float_0p20944_rsh_0001455c@l
+		opword 0xC0050000
+		opword 0x3861005C
+		opword 0xEC4100F2
+		opword 0xC0240000
+		opword 0x38800079
+		opword 0xD05F0008
+		opword 0xC05F000C
+		opword 0xEC020032
+		opword 0xD01F000C
+		opword 0xC01F0010
+		opword 0xEC0000F2
+		opword 0xD01F0010
+		opword 0x80BE000C
+		opword 0xC01F0008
+		opword 0xC045000C
+		opword 0xEC02002A
+		opword 0xD005000C
+		opword 0x80BE000C
+		opword 0xC01F000C
+		opword 0xC045001C
+		opword 0xEC02002A
+		opword 0xD005001C
+		opword 0x80BE000C
+		opword 0xC01F0010
+		opword 0xC045002C
+		opword 0xEC02002A
+		opword 0xD005002C
+		bl PSMTXRotRad
+		opword 0x807E000C
+		opword 0x3881005C
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x801E0000
+		lis r3, float_neg1000_rsh_00014560@ha
+		lfs f0, float_neg1000_rsh_00014560@l(r3)
+		opword 0x540007FA
+		opword 0x901E0000
+		opword 0x807E000C
+		opword 0xC023000C
+		opword 0xFC010040
+		opword 0x4080000C
+		opword 0x3800003E
+		opword 0xB01F0002
+		opword 0xA01F0000
+		opword 0x70000588
+		opword 0x40820074
+		opword 0x80BE000C
+		lis r3, float_250_rsh_00014564@ha
+		opword 0xC0770018
+		opword 0xC045000C
+		lfs f1, float_250_rsh_00014564@l(r3)
+		opword 0xEC031028
+		opword 0xFC000840
+		opword 0x40810028
+		lis r4, float_450_rsh_00014568@ha
+		lis r3, float_neg50_rsh_0001456c@ha
+		lfs f1, float_450_rsh_00014568@l(r4)
+		lfs f0, float_neg50_rsh_0001456c@l(r3)
+		opword 0xEC21102A
+		opword 0xFC010040
+		opword 0x40800038
+		opword 0xD025000C
+		opword 0x48000030
+		opword 0xEC021828
+		opword 0xFC000840
+		opword 0x40810024
+		lis r4, float_450_rsh_00014568@ha
+		lis r3, float_neg1870_rsh_00014570@ha
+		lfs f1, float_450_rsh_00014568@l(r4)
+		lfs f0, float_neg1870_rsh_00014570@l(r3)
+		opword 0xEC220828
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xD025000C
+		opword 0xA01F0000
+		opword 0x70000588
+		opword 0x408201E0
+		opword 0x809E000C
+		lis r3, float_100_rsh_000144f8@ha
+		lfs f0, float_100_rsh_000144f8@l(r3)
+		opword 0xC024000C
+		opword 0xFC010040
+		opword 0x40810060
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_5_rsh_00014500@ha
+		opword 0xC80100A8
+		lis r3, zero_rsh_00014490@ha
+		lis r5, float_100_rsh_000144f8@ha
+		opword 0xEC600828
+		lfs f0, zero_rsh_00014490@l(r3)
+		lfs f1, float_5_rsh_00014500@l(r4)
+		opword 0x807E000C
+		opword 0xEC631024
+		lfs f2, float_100_rsh_000144f8@l(r5)
+		opword 0xEC03007A
+		opword 0xEC02002A
+		opword 0xD003000C
+		opword 0x809E000C
+		lis r3, float_neg1870_rsh_00014570@ha
+		lfs f0, float_neg1870_rsh_00014570@l(r3)
+		opword 0xC024000C
+		opword 0xFC010040
+		opword 0x40800060
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_5_rsh_00014500@ha
+		opword 0xC80100A8
+		lis r3, zero_rsh_00014490@ha
+		lis r5, float_neg1870_rsh_00014570@ha
+		opword 0xEC600828
+		lfs f0, zero_rsh_00014490@l(r3)
+		lfs f1, float_5_rsh_00014500@l(r4)
+		opword 0x807E000C
+		opword 0xEC631024
+		lfs f2, float_neg1870_rsh_00014570@l(r5)
+		opword 0xEC03007A
+		opword 0xEC02002A
+		opword 0xD003000C
+		opword 0xA01F0000
+		opword 0x54000673
+		opword 0x408200EC
+		opword 0x809E000C
+		lis r3, float_45_rsh_00014574@ha
+		lfs f0, float_45_rsh_00014574@l(r3)
+		opword 0xC024002C
+		opword 0xFC010040
+		opword 0x40810060
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_5_rsh_00014500@ha
+		opword 0xC80100A8
+		lis r3, zero_rsh_00014490@ha
+		lis r5, float_45_rsh_00014574@ha
+		opword 0xEC600828
+		lfs f0, zero_rsh_00014490@l(r3)
+		lfs f1, float_5_rsh_00014500@l(r4)
+		opword 0x807E000C
+		opword 0xEC631024
+		lfs f2, float_45_rsh_00014574@l(r5)
+		opword 0xEC03007A
+		opword 0xEC02002A
+		opword 0xD003002C
+		opword 0x809E000C
+		lis r3, float_neg45_rsh_00014530@ha
+		lfs f0, float_neg45_rsh_00014530@l(r3)
+		opword 0xC024002C
+		opword 0xFC010040
+		opword 0x40800060
+		bl rand
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lis r4, double_to_int_rsh_00014488@ha
+		lfd f1, double_to_int_rsh_00014488@l(r4)
+		lis r3, float_32767_rsh_000144ec@ha
+		opword 0x900100A8
+		addi r5, r3, float_32767_rsh_000144ec@l
+		opword 0xC0450000
+		lis r4, float_5_rsh_00014500@ha
+		opword 0xC80100A8
+		lis r3, zero_rsh_00014490@ha
+		lis r5, float_neg45_rsh_00014530@ha
+		opword 0xEC600828
+		lfs f0, zero_rsh_00014490@l(r3)
+		lfs f1, float_5_rsh_00014500@l(r4)
+		opword 0x807E000C
+		opword 0xEC631024
+		lfs f2, float_neg45_rsh_00014530@l(r5)
+		opword 0xEC03007A
+		opword 0xEC02002A
+		opword 0xD003002C
+		opword 0x807E000C
+		opword 0x3BBD0001
+		opword 0xC003000C
+		opword 0xD01F0028
+		opword 0x807E000C
+		opword 0x3BDE0020
+		opword 0xC003002C
+		opword 0xD01F002C
+		opword 0x3BFF0050
+		opword 0x807B0000
+		opword 0x80030004
+		opword 0x7C1D0000
+		opword 0x4180D584
+		bl extGetPosePtr
+		lis r4, wp@ha
+		lis r7, float_60_rsh_00014578@ha
+		addi r25, r4, wp@l
+		lis r6, float_1000_rsh_0001457c@ha
+		opword 0x81390000
+		lis r5, float_1_rsh_00014470@ha
+		lis r4, double_to_int_rsh_00014488@ha
+		lis r8, gp@ha
+		opword 0x82490008
+		opword 0x7C731B78
+		lfs f30, float_60_rsh_00014578@l(r7)
+		addi r24, r8, gp@l
+		lfs f29, float_1000_rsh_0001457c@l(r6)
+		opword 0x3A800000
+		lfs f28, float_1_rsh_00014470@l(r5)
+		opword 0x3EE08000
+		lfd f27, double_to_int_rsh_00014488@l(r4)
+		opword 0x3F404330
+		opword 0x480000BC
+		opword 0x807700F8
+		opword 0x380003E8
+		opword 0x80980000
+		opword 0x38A00000
+		opword 0x5463F0BE
+		opword 0xA912003C
+		opword 0x7CC30396
+		opword 0x82C4003C
+		opword 0x80120044
+		opword 0x82A40038
+		opword 0x7C80B010
+		opword 0x80120040
+		opword 0x1D080028
+		opword 0x7C60A910
+		opword 0x3A280050
+		opword 0x7E278A14
+		bl __div2u
+		bl __cvt_ull_flt
+		opword 0xEC3E0072
+		opword 0xC011001C
+		opword 0xEC21E824
+		opword 0xEC210024
+		opword 0xFC01E040
+		opword 0x4C411382
+		opword 0x40820014
+		opword 0x92D20044
+		lis r3, zero_rsh_00014490@ha
+		lfs f1, zero_rsh_00014490@l(r3)
+		opword 0x92B20040
+		opword 0x80710024
+		opword 0x3A940001
+		opword 0x934100A8
+		opword 0x3A520050
+		opword 0x3803FFFF
+		opword 0x80710020
+		opword 0x6C008000
+		opword 0x900100AC
+		opword 0xC80100A8
+		opword 0xEC00D828
+		opword 0xEC000072
+		opword 0xFC00001E
+		opword 0xD80100A0
+		opword 0x800100A4
+		opword 0x7C030214
+		opword 0x90130010
+		opword 0x3A730020
+		opword 0x80F90000
+		opword 0x80070004
+		opword 0x7C140000
+		opword 0x4180FF3C
+		lis r4, zero_rsh_00014490@ha
+		lis r3, wp@ha
+		lfs f0, zero_rsh_00014490@l(r4)
+		addi r3, r3, wp@l
+		opword 0xD01C0174
+		opword 0xD01C0178
+		opword 0xD01C017C
+		opword 0x80630000
+		opword 0xA0030000
+		opword 0x540006F9
+		opword 0x40820018
+		lis r3, float_20_rsh_00014580@ha
+		opword 0xFC20F850
+		lfs f0, float_20_rsh_00014580@l(r3)
+		opword 0xEC010024
+		opword 0xD01C0174
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 static void ext_moamoa_dispent(void) {
+#ifdef NONMATCHING
     if (wp->flags & 1) {
         dispEntry(CAMERA_3D, zero_rsh_00014490[0], 1, ext_disp, NULL);
         dispEntry(CAMERA_3D, zero_rsh_00014490[0], 2, ext_shadow_disp, NULL);
@@ -1858,23 +7267,159 @@ static void ext_moamoa_dispent(void) {
         dispEntry(CAMERA_OFFSCREEN2, -5000.0f, 1, ext_disp, NULL);
         dispEntry(CAMERA_OFFSCREEN2, -5000.0f, 2, ext_shadow_disp, NULL);
     }
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		lis r3, wp@ha
+		opword 0x90010014
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xA0030000
+		opword 0x540007FF
+		opword 0x4182004C
+		lis r3, zero_rsh_00014490@ha
+		lis r4, ext_disp@ha
+		addi r6, r3, zero_rsh_00014490@l
+		opword 0xC0260000
+		addi r5, r4, ext_disp@l
+		opword 0x38600004
+		opword 0x38800001
+		opword 0x38C00000
+		bl dispEntry
+		lis r3, zero_rsh_00014490@ha
+		lis r4, ext_shadow_disp@ha
+		addi r6, r3, zero_rsh_00014490@l
+		opword 0xC0260000
+		addi r5, r4, ext_shadow_disp@l
+		opword 0x38600004
+		opword 0x38800002
+		opword 0x38C00000
+		bl dispEntry
+		lis r3, wp@ha
+		addi r3, r3, wp@l
+		opword 0x80630000
+		opword 0xA0030000
+		opword 0x540007BD
+		opword 0x4182004C
+		lis r3, float_neg5000_rsh_00014494@ha
+		lis r4, ext_disp@ha
+		addi r6, r3, float_neg5000_rsh_00014494@l
+		opword 0xC0260000
+		addi r5, r4, ext_disp@l
+		opword 0x38600001
+		opword 0x38800001
+		opword 0x38C00000
+		bl dispEntry
+		lis r3, float_neg5000_rsh_00014494@ha
+		lis r4, ext_shadow_disp@ha
+		addi r6, r3, float_neg5000_rsh_00014494@l
+		opword 0xC0260000
+		addi r5, r4, ext_shadow_disp@l
+		opword 0x38600001
+		opword 0x38800002
+		opword 0x38C00000
+		bl dispEntry
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void moamoa_joint_position(Moamoa* moa, Vec* out) {
+#ifdef NONMATCHING
     NpcEntry* npc = npcNameToPtr((char*)str_000047B4);
     AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
     f32 t;
     Vec* a = anim->worldPositions[0] + wp->chainIdx[moa->group][0];
     Vec* b = anim->worldPositions[0] + wp->chainIdx[moa->group][1];
     Vec tmp;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFC0
+		opword 0x7C0802A6
+		opword 0x90010044
+		opword 0xDBE10030
+		opword 0xF3E10038
+		opword 0xBFC10028
+		lis r5, rsh_06_str_000047B4@ha
+		opword 0x7C7E1B78
+		addi r3, r5, rsh_06_str_000047B4@l
+		opword 0x7C9F2378
+		bl npcNameToPtr
+		opword 0x80630104
+		bl animPoseGetAnimPosePtr
+		lis r4, wp@ha
+		opword 0xA91E0048
+		lwz r9, wp@l(r4)
+		opword 0x3CC04330
+		opword 0x5500083C
+		opword 0xA8FE004A
+		opword 0x7C890214
+		opword 0x5508103A
+		opword 0xA8040570
+		opword 0x6CE48000
+		lis r5, double_to_int_rsh_00014488@ha
+		opword 0x9081001C
+		addi r7, r5, double_to_int_rsh_00014488@l
+		opword 0x7D294214
+		opword 0x6C058000
+		opword 0x90C10018
+		opword 0xC8470000
+		opword 0x7FE4FB78
+		opword 0xC8010018
+		opword 0x90A10024
+		opword 0xEC201028
+		opword 0xA9090672
+		opword 0x90C10020
+		opword 0xA8090670
+		opword 0x1D08000C
+		opword 0xC8010020
+		opword 0x8063015C
+		opword 0xEC001028
+		opword 0x1C00000C
+		opword 0x80630000
+		opword 0xEFE10024
+		opword 0x7FC34214
+		opword 0x7C630214
+		opword 0xFC20F890
+		bl PSVECScale
+		lis r4, float_1_rsh_00014470@ha
+		opword 0x7FC3F378
+		addi r5, r4, float_1_rsh_00014470@l
+		opword 0x38810008
+		opword 0xC0050000
+		opword 0xEC20F828
+		bl PSVECScale
+		opword 0x7FE3FB78
+		opword 0x7FE5FB78
+		opword 0x38810008
+		bl PSVECAdd
+		opword 0xE3E10038
+		opword 0xCBE10030
+		opword 0xBBC10028
+		opword 0x80010044
+		opword 0x7C0803A6
+		opword 0x38210040
+	}
+}
+#pragma pop
+#endif
 
+#ifdef NONMATCHING
     t = (f32)moa->order / (f32)wp->chainNum[moa->group];
     PSVECScale(a, out, t);
     PSVECScale(b, &tmp, float_1_rsh_00014470[0] - t);
     PSVECAdd(out, &tmp, out);
 }
-#endif
 
 extern const char str_000041D0[];
 extern const char str_000041DC[];
@@ -1909,7 +7454,26 @@ static Mtx fs_mt = {
         {0.0f, 8.0f, 0.0f, 0.5f},
         {0.0f, 0.0f, 8.0f, 0.0f},
     };
+#endif
+#ifndef NONMATCHING
+extern const char rsh_06_str_000041D0[];
+extern const char rsh_06_str_000041DC[];
+extern const char rsh_06_str_000041E4[];
+extern const char rsh_06_str_000041F0[];
+extern const char rsh_06_str_000041FC[];
+extern const char rsh_06_str_00004200[];
+extern const char rsh_06_str_0000420C[];
+extern const char rsh_06_str_00004210[];
+extern const char rsh_06_str_00004218[];
+extern const char rsh_06_str_0000421C[];
+extern const char rsh_06_str_00004224[];
+extern const char rsh_06_str_00004228[];
+extern const char rsh_06_str_00004230[];
+extern const char rsh_06_str_00004238[];
+extern const char rsh_06_str_00004240[];
+#endif
 static s32 sharinDt[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_0000430C), 0, 0, -229998976, (s32)((char*)str_00004314), 0, 0, -229998976,
     (s32)((char*)str_0000431C), 2, 0, -229998976, (s32)((char*)str_00004324), 1, 1, -229998976,
     (s32)((char*)str_0000432C), 1, 1, -229998976, (s32)((char*)str_00004334), 0, 0, -229998976,
@@ -1923,12 +7487,33 @@ static s32 sharinDt[] = {
     (s32)((char*)str_000043AC), 0, 0, -230001024, (s32)((char*)str_000043B8), 0, 0, -230001024,
     (s32)((char*)str_000043C4), 2, 0, -230001024, (s32)((char*)str_000043D0), 1, 1, -230001024,
     (s32)((char*)str_000043DC), 1, 1, -230001024, (s32)((char*)str_000043E8), 0, 0, -229998976,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)rsh_06_str_0000430C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004314), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000431C), 2, 0, -229998976, (s32)((char*)rsh_06_str_00004324), 1, 1, -229998976,
+    (s32)((char*)rsh_06_str_0000432C), 1, 1, -229998976, (s32)((char*)str_00004334), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000433C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004344), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000434C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004354), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000435C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004364), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000436C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004374), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000437C), 0, 0, -229998976, (s32)((char*)str_00004384), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000438C), 0, 0, -229998976, (s32)((char*)rsh_06_str_00004394), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_0000439C), 0, 0, -229998976, (s32)((char*)rsh_06_str_000043A4), 0, 0, -229998976,
+    (s32)((char*)rsh_06_str_000043AC), 0, 0, -230001024, (s32)((char*)rsh_06_str_000043B8), 0, 0, -230001024,
+    (s32)((char*)rsh_06_str_000043C4), 2, 0, -230001024, (s32)((char*)rsh_06_str_000043D0), 1, 1, -230001024,
+    (s32)((char*)rsh_06_str_000043DC), 1, 1, -230001024, (s32)((char*)rsh_06_str_000043E8), 0, 0, -229998976,
+#endif
     (s32)((char*)str_000043F4), 0, 0, -229998976, (s32)((char*)str_00004400), 0, 0, -229998976,
     0, 0, 0, 0,
 };
 
 static EVT_BEGIN(evt_sharin_main)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(LW(10), FLOAT((0.0f)))
+#endif
     SWITCH(LW(1))
         CASE_EQUAL(0)
         SET_FLOAT_VALUE(LW(11), FLOAT(23.889648f))
@@ -1947,11 +7532,23 @@ static EVT_BEGIN(evt_sharin_main)
         DIVIDE_FLOAT(LW(9), LW(11))
         MULTIPLY_FLOAT(LW(9), FLOAT(57.29492f))
         ADD_FLOAT(LW(10), LW(9))
+#ifdef NONMATCHING
         IF_INT_GREATER(LW(10), FLOAT(360.0f))
             SUBTRACT_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_GREATER(LW(10), FLOAT((360.0f)))
+            SUBTRACT_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
+#ifdef NONMATCHING
         IF_INT_LESS(LW(10), FLOAT(0.0f))
             ADD_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_LESS(LW(10), FLOAT((0.0f)))
+            ADD_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
         SET_FLOAT_VALUE(LW(12), LW(10))
         MULTIPLY_FLOAT(LW(12), LW(3))
@@ -1980,16 +7577,30 @@ static EVT_BEGIN(evt_sharin)
 EVT_END()
 
 static s32 clankDt[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_0000440C), 0, 0, -229979520, -229998976, (s32)((char*)str_00004414), 1, 1,
     -229983104, -229998976, (s32)((char*)str_0000441C), 0, 0, -229979520, -229998976, (s32)((char*)str_00004424),
     1, 1, -229983104, -229998976, (s32)((char*)str_0000442C), 0, 0, -229979520,
     -230001024, (s32)((char*)str_00004434), 1, 1, -229983104, -230001024, (s32)((char*)str_0000443C), 0,
     0, -229979520, -230001024, (s32)((char*)str_00004444), 1, 1, -229983104, -230001024,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)rsh_06_str_0000440C), 0, 0, -229979520, -229998976, (s32)((char*)rsh_06_str_00004414), 1, 1,
+    -229983104, -229998976, (s32)((char*)rsh_06_str_0000441C), 0, 0, -229979520, -229998976, (s32)((char*)rsh_06_str_00004424),
+    1, 1, -229983104, -229998976, (s32)((char*)rsh_06_str_0000442C), 0, 0, -229979520,
+    -230001024, (s32)((char*)rsh_06_str_00004434), 1, 1, -229983104, -230001024, (s32)((char*)rsh_06_str_0000443C), 0,
+    0, -229979520, -230001024, (s32)((char*)rsh_06_str_00004444), 1, 1, -229983104, -230001024,
+#endif
     0, 0, 0, 0, 0,
 };
 
 static EVT_BEGIN(evt_clank_main)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(LW(10), FLOAT((0.0f)))
+#endif
     SWITCH(LW(1))
         CASE_EQUAL(0)
         SET_FLOAT_VALUE(LW(11), FLOAT(23.889648f))
@@ -2008,11 +7619,23 @@ static EVT_BEGIN(evt_clank_main)
         DIVIDE_FLOAT(LW(9), LW(11))
         MULTIPLY_FLOAT(LW(9), FLOAT(57.29492f))
         ADD_FLOAT(LW(10), LW(9))
+#ifdef NONMATCHING
         IF_INT_GREATER(LW(10), FLOAT(360.0f))
             SUBTRACT_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_GREATER(LW(10), FLOAT((360.0f)))
+            SUBTRACT_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
+#ifdef NONMATCHING
         IF_INT_LESS(LW(10), FLOAT(0.0f))
             ADD_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_LESS(LW(10), FLOAT((0.0f)))
+            ADD_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
         SET_FLOAT_VALUE(LW(12), LW(10))
         MULTIPLY_FLOAT(LW(12), LW(4))
@@ -2020,8 +7643,14 @@ static EVT_BEGIN(evt_clank_main)
         MULTIPLY_FLOAT(LW(13), LW(3))
         MULTIPLY_FLOAT(LW(14), LW(3))
         SUBTRACT_FLOAT(LW(14), LW(3))
+#ifdef NONMATCHING
         MULTIPLY_FLOAT(LW(14), FLOAT(-1.0f))
         CALL(evt_mapobj_trans, 1, LW(0), LW(14), LW(13), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+        MULTIPLY_FLOAT(LW(14), FLOAT((-1.0f)))
+        CALL(evt_mapobj_trans, 1, LW(0), LW(14), LW(13), FLOAT((0.0f)))
+#endif
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -2047,8 +7676,14 @@ static EVT_BEGIN(evt_clank)
 EVT_END()
 
 static EVT_BEGIN(evt_bg)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(11), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(LW(10), FLOAT((0.0f)))
+    SET_FLOAT_VALUE(LW(11), FLOAT((0.0f)))
+#endif
     LOOP(0)
         SET_FLOAT_VALUE(LW(0), GW(0))
         ADD_FLOAT(LW(10), LW(0))
@@ -2065,9 +7700,16 @@ static EVT_BEGIN(evt_bg)
         IF_INT_LESS(LW(11), FLOAT(-3600.0f))
             ADD_FLOAT(LW(11), FLOAT(7200.0f))
         END_IF
+#ifdef NONMATCHING
         CALL(evt_mapobj_trans, 1, STRING(((char*)str_0000444C)), LW(10), 0, 0)
         CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004454)), LW(10), 0, 0)
         CALL(evt_mapobj_trans, 1, STRING(((char*)str_0000445C)), LW(11), 0, 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_0000444C)), LW(10), 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004454)), LW(10), 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_0000445C)), LW(11), 0, 0)
+#endif
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -2080,24 +7722,59 @@ static EVT_BEGIN(evt_bg)
 EVT_END()
 
 static EVT_BEGIN(evt_hoshi)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(LW(10), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(LW(10), FLOAT((0.0f)))
+#endif
     LOOP(0)
         SET_FLOAT_VALUE(LW(9), GW(0))
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(9), FLOAT(30.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(9), FLOAT((30.0f)))
+#endif
         MULTIPLY_FLOAT(LW(9), FLOAT(57.29492f))
         ADD_FLOAT(LW(10), LW(9))
+#ifdef NONMATCHING
         IF_INT_GREATER(LW(10), FLOAT(360.0f))
             SUBTRACT_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_GREATER(LW(10), FLOAT((360.0f)))
+            SUBTRACT_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
+#ifdef NONMATCHING
         IF_INT_LESS(LW(10), FLOAT(0.0f))
             ADD_FLOAT(LW(10), FLOAT(360.0f))
+#endif
+#ifndef NONMATCHING
+        IF_INT_LESS(LW(10), FLOAT((0.0f)))
+            ADD_FLOAT(LW(10), FLOAT((360.0f)))
+#endif
         END_IF
+#ifdef NONMATCHING
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_00004464)), LW(10), 0, 0)
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_00004470)), LW(10), 0, 0)
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_0000447C)), LW(10), 0, 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)rsh_06_str_00004464)), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)rsh_06_str_00004470)), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)rsh_06_str_0000447C)), LW(10), 0, 0)
+#endif
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_00004488)), LW(10), 0, 0)
+#ifdef NONMATCHING
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_00004498)), LW(10), 0, 0)
         CALL(evt_mapobj_rotate, 0, STRING(((char*)str_000044A4)), LW(10), 0, 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)rsh_06_str_00004498)), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)rsh_06_str_000044A4)), LW(10), 0, 0)
+#endif
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -2114,51 +7791,129 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
     SET_VALUE(GSWF(3581), 0)
+#ifdef NONMATCHING
     CALL(evt_mapobj_get_position, STRING(((char*)str_000044B4)), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_mapobj_get_position, STRING(((char*)rsh_06_str_000044B4)), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
     WAIT_MS(200)
+#ifdef NONMATCHING
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_000044DC)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_000044DC)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+#endif
         IF_INT_LESS(GSW(0), 339)
+#ifdef NONMATCHING
             CALL(evt_snd_sfxon, STRING(((char*)str_000044FC)), 0)
+#endif
+#ifndef NONMATCHING
+            CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_000044FC)), 0)
+#endif
             ELSE
+#ifdef NONMATCHING
             CALL(evt_snd_sfxon, STRING(((char*)str_00004514)), 0)
+#endif
+#ifndef NONMATCHING
+            CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004514)), 0)
+#endif
         END_IF
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
         CALL(evt_snd_sfxon, STRING(((char*)str_00004538)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004538)), 0)
+#endif
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+#endif
         BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
+#ifdef NONMATCHING
                 CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+                CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+#endif
         BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
+#ifdef NONMATCHING
                 CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+                CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
     BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
         SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+        SET_FLOAT_VALUE(GW(0), FLOAT((0.0f)))
+#endif
         CALL(evt_sub_intpl_msec_init, 11, 0, -1500, 20000)
         LABEL(0)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(0), LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 1)
@@ -2182,7 +7937,12 @@ static EVT_BEGIN(hom_10_evt_resha_start)
         CALL(evt_sub_intpl_msec_init, 11, 0, -1000, 1000)
         LABEL(1)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(1), GW(0))
         ADD_FLOAT(GW(1), LW(0))
         WAIT_FRAMES(1)
@@ -2192,7 +7952,12 @@ static EVT_BEGIN(hom_10_evt_resha_start)
         CALL(evt_sub_intpl_msec_init, 11, -1000, 0, 1000)
         LABEL(2)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(1), GW(0))
         ADD_FLOAT(GW(1), LW(0))
         WAIT_FRAMES(1)
@@ -2212,64 +7977,153 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
     SET_VALUE(GSWF(3581), 0)
+#ifdef NONMATCHING
     CALL(evt_mapobj_get_position, STRING(((char*)str_000044B4)), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_mapobj_get_position, STRING(((char*)rsh_06_str_000044B4)), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
     WAIT_MS(200)
+#ifdef NONMATCHING
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_000044BC)), LW(0), LW(1), LW(2), 0)
+#endif
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_000044DC)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_000044DC)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_00004558)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004558)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
         CALL(evt_snd_sfxon, STRING(((char*)str_00004538)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004538)), 0)
+#endif
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+#endif
         BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
+#ifdef NONMATCHING
                 CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+                CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+#endif
         BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
+#ifdef NONMATCHING
                 CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+                CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+#endif
         BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(LW(0), FLOAT((0.0f)))
+#endif
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
+#ifdef NONMATCHING
                 CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+                CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
     BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
         SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+        SET_FLOAT_VALUE(GW(0), FLOAT((0.0f)))
+#endif
         CALL(evt_sub_intpl_msec_init, 11, 0, 1500, 20000)
         LABEL(0)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(0), LW(0))
         WAIT_FRAMES(1)
         IF_INT_EQUAL(LW(1), 1)
             GOTO(0)
         END_IF
         LOOP(0)
+#ifdef NONMATCHING
             SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
+#endif
+#ifndef NONMATCHING
+            SET_FLOAT_VALUE(GW(0), FLOAT((15.0f)))
+#endif
             WAIT_FRAMES(1)
         END_LOOP
     END_INLINE_EVENT
@@ -2286,7 +8140,12 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         CALL(evt_sub_intpl_msec_init, 11, 0, 1000, 1000)
         LABEL(1)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(1), GW(0))
         ADD_FLOAT(GW(1), LW(0))
         WAIT_FRAMES(1)
@@ -2296,7 +8155,12 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
         CALL(evt_sub_intpl_msec_init, 11, 1000, 0, 1000)
         LABEL(2)
         CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
         DIVIDE_FLOAT(LW(0), FLOAT(100.0f))
+#endif
+#ifndef NONMATCHING
+        DIVIDE_FLOAT(LW(0), FLOAT((100.0f)))
+#endif
         SET_FLOAT_VALUE(GW(1), GW(0))
         ADD_FLOAT(GW(1), LW(0))
         WAIT_FRAMES(1)
@@ -2320,36 +8184,78 @@ EVT_END()
 
 __declspec(section ".data") static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(GW(0), FLOAT((15.0f)))
+    SET_FLOAT_VALUE(GW(1), FLOAT((15.0f)))
+#endif
     RETURN
 EVT_END()
 
 static EVT_BEGIN(stop_1)
     SET_VALUE(GSWF(3583), 1)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(GW(0), FLOAT((0.0f)))
+    SET_FLOAT_VALUE(GW(1), FLOAT((0.0f)))
+#endif
     SET_FLOAT_VALUE(LW(2), FLOAT(3000.0f))
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_00004574)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004574)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_0000458C)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_0000458C)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
         CALL(evt_snd_sfxon, STRING(((char*)str_000045A4)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_000045A4)), 0)
+#endif
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, 3000, 0, 10000)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
     MULTIPLY_FLOAT(LW(0), FLOAT(1.0f))
     CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+    MULTIPLY_FLOAT(LW(0), FLOAT((1.0f)))
+    CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
     SUBTRACT_FLOAT(LW(2), LW(0))
     SET_FLOAT_VALUE(GW(0), LW(2))
     SET_FLOAT_VALUE(GW(1), LW(2))
+#ifdef NONMATCHING
     MULTIPLY_FLOAT(GW(0), FLOAT(-1.0f))
     MULTIPLY_FLOAT(GW(1), FLOAT(-1.0f))
+#endif
+#ifndef NONMATCHING
+    MULTIPLY_FLOAT(GW(0), FLOAT((-1.0f)))
+    MULTIPLY_FLOAT(GW(1), FLOAT((-1.0f)))
+#endif
     SET_FLOAT_VALUE(LW(2), LW(0))
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(1), 1)
@@ -2361,29 +8267,64 @@ EVT_END()
 
 static EVT_BEGIN(stop_2)
     SET_VALUE(GSWF(3583), 1)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(GW(0), FLOAT((0.0f)))
+    SET_FLOAT_VALUE(GW(1), FLOAT((0.0f)))
+#endif
     SET_FLOAT_VALUE(LW(2), FLOAT(-3000.0f))
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
         CALL(evt_snd_sfxon, STRING(((char*)str_00004574)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004574)), 0)
+#endif
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+#endif
         CALL(evt_snd_sfxon, STRING(((char*)str_000045BC)), 0)
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
         CALL(evt_snd_sfxon, STRING(((char*)str_000045A4)), 0)
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+        CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_000045A4)), 0)
+#endif
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, -3000, 0, 10000)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
+#ifdef NONMATCHING
     MULTIPLY_FLOAT(LW(0), FLOAT(1.0f))
     CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), LW(0), 0, 0)
+#endif
+#ifndef NONMATCHING
+    MULTIPLY_FLOAT(LW(0), FLOAT((1.0f)))
+    CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), LW(0), 0, 0)
+#endif
     SUBTRACT_FLOAT(LW(2), LW(0))
     SET_FLOAT_VALUE(GW(0), LW(2))
     SET_FLOAT_VALUE(GW(1), LW(2))
+#ifdef NONMATCHING
     MULTIPLY_FLOAT(GW(0), FLOAT(-1.0f))
     MULTIPLY_FLOAT(GW(1), FLOAT(-1.0f))
+#endif
+#ifndef NONMATCHING
+    MULTIPLY_FLOAT(GW(0), FLOAT((-1.0f)))
+    MULTIPLY_FLOAT(GW(1), FLOAT((-1.0f)))
+#endif
     SET_FLOAT_VALUE(LW(2), LW(0))
     WAIT_FRAMES(1)
     IF_INT_EQUAL(LW(1), 1)
@@ -2395,15 +8336,30 @@ EVT_END()
 
 static EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004530)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004530)))
+#endif
         SPAWN_EVENT(PTR(stop_1))
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044D4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044D4)))
+#endif
         SPAWN_EVENT(PTR(stop_2))
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_000044F4)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_000044F4)))
+#endif
         IF_INT_EQUAL(GSWF(3578), 0)
             SPAWN_EVENT(PTR(stop_1))
             ELSE
@@ -2416,8 +8372,14 @@ EVT_END()
 static EVT_BEGIN(evt_ramp)
     LOOP(0)
         CALL(ramp_r)
+#ifdef NONMATCHING
         CALL(evt_mapobj_rotate, 1, STRING(((char*)str_000044B4)), 0, 0, LW(10))
         CALL(evt_mapobj_rotate, 1, STRING(((char*)str_000045D8)), 0, 0, LW(10))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_rotate, 1, STRING(((char*)rsh_06_str_000044B4)), 0, 0, LW(10))
+        CALL(evt_mapobj_rotate, 1, STRING(((char*)rsh_06_str_000045D8)), 0, 0, LW(10))
+#endif
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -2430,33 +8392,71 @@ static EVT_BEGIN(evt_ramp)
 EVT_END()
 
 static s32 pika_tbl[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_000045E0), (s32)((char*)str_000045EC), (s32)((char*)str_000045F8), (s32)((char*)str_00004604), (s32)((char*)str_00004610), (s32)((char*)str_00004618), (s32)((char*)str_00004620), (s32)((char*)str_00004628),
     (s32)((char*)str_00004630), (s32)((char*)str_00004638), (s32)((char*)str_00004644), (s32)((char*)str_00004650), (s32)((char*)str_0000465C), (s32)((char*)str_00004668), 0,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)str_000045E0), (s32)((char*)rsh_06_str_000045EC), (s32)((char*)rsh_06_str_000045F8), (s32)((char*)rsh_06_str_00004604), (s32)((char*)rsh_06_str_00004610), (s32)((char*)rsh_06_str_00004618), (s32)((char*)rsh_06_str_00004620), (s32)((char*)rsh_06_str_00004628),
+    (s32)((char*)rsh_06_str_00004630), (s32)((char*)rsh_06_str_00004638), (s32)((char*)rsh_06_str_00004644), (s32)((char*)rsh_06_str_00004650), (s32)((char*)str_0000465C), (s32)((char*)rsh_06_str_00004668), 0,
+#endif
 };
 
 __declspec(section ".data") static s32 pika_tbl_rsh_06[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_000045E0), (s32)((char*)str_000045EC), (s32)((char*)str_000045F8), (s32)((char*)str_00004604), (s32)((char*)str_00004610), (s32)((char*)str_00004618), (s32)((char*)str_00004620), (s32)((char*)str_00004628),
     (s32)((char*)str_00004630), 0,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)str_000045E0), (s32)((char*)rsh_06_str_000045EC), (s32)((char*)rsh_06_str_000045F8), (s32)((char*)rsh_06_str_00004604), (s32)((char*)rsh_06_str_00004610), (s32)((char*)rsh_06_str_00004618), (s32)((char*)rsh_06_str_00004620), (s32)((char*)rsh_06_str_00004628),
+    (s32)((char*)rsh_06_str_00004630), 0,
+#endif
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
     SET_VALUE(GSWF(3583), 0)
+#ifdef NONMATCHING
     SET_FLOAT_VALUE(GW(0), FLOAT(0.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
+#endif
+#ifndef NONMATCHING
+    SET_FLOAT_VALUE(GW(0), FLOAT((0.0f)))
+    SET_FLOAT_VALUE(GW(1), FLOAT((0.0f)))
+#endif
     SPAWN_EVENT(PTR(evt_sharin))
     SPAWN_EVENT(PTR(evt_clank))
     SET_VALUE(LF(0), 0)
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004674)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004674)))
+#endif
         SET_VALUE(LF(0), 1)
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_0000467C)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_0000467C)))
+#endif
         SET_VALUE(LF(0), 1)
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_00004684)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_00004684)))
+#endif
         SET_VALUE(LF(0), 1)
     END_IF
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_0000468C)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_0000468C)))
+#endif
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
@@ -2467,7 +8467,12 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
     SET_INT_READ_ADDR(PTR(pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_EQUAL(LW(0), STRING(((char*)str_0000468C)))
+#endif
+#ifndef NONMATCHING
+    IF_STR_EQUAL(LW(0), STRING(((char*)rsh_06_str_0000468C)))
+#endif
         SET_INT_READ_ADDR(PTR(pika_tbl_rsh_06))
     END_IF
     LOOP(0)
@@ -2485,27 +8490,49 @@ EVT_END()
 static EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
     CALL(evt_sub_get_mapname, LW(0))
+#ifdef NONMATCHING
     IF_STR_NOT_EQUAL(LW(0), STRING(((char*)str_0000468C)))
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_00004698)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046A0)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046A8)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046B4)), 1)
+#endif
+#ifndef NONMATCHING
+    IF_STR_NOT_EQUAL(LW(0), STRING(((char*)rsh_06_str_0000468C)))
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_00004698)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046A0)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046A8)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046B4)), 1)
+#endif
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
+#ifdef NONMATCHING
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046C0)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046C8)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046D0)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046DC)), 1)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046C0)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046C8)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046D0)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046DC)), 1)
+#endif
     RETURN
 EVT_END()
 
 static EVT_BEGIN(hom_10_init_evt)
     CALL(evt_snd_bgmoff, 512)
+#ifdef NONMATCHING
     CALL(evt_snd_envon, 272, STRING(((char*)str_000046E8)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_snd_envon, 272, STRING(((char*)rsh_06_str_000046E8)))
+#endif
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
     CALL(evt_party_cont_onoff, 1, 0)
@@ -2517,18 +8544,36 @@ static EVT_BEGIN(hom_10_init_evt)
         CALL_CHILD(PTR(hom_10_evt_resha_start3))
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
+#ifdef NONMATCHING
         CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000046F8)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000046D0)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_00004700)), 1)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000046F8)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000046D0)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_00004700)), 1)
+#endif
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_0000470C)), 1)
+#ifdef NONMATCHING
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_00004718)), 1)
         CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000046DC)), 1)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_00004718)), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000046DC)), 1)
+#endif
         ELSE
         CALL_CHILD(PTR(hom_10_evt_resha_left))
         CALL_CHILD(PTR(hom_10_evt_resha_start4))
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
+#ifdef NONMATCHING
         CALL(evt_mapobj_trans, 1, STRING(((char*)str_00004550)), -1500, 0, 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_mapobj_trans, 1, STRING(((char*)rsh_06_str_00004550)), -1500, 0, 0)
+#endif
     END_IF
     CALL(evt_cam_letter_box_onoff, 1, 1)
     CALL(evt_cam3d_evt_set, LW(0), 300, 1400, LW(0), 125, 0, 0, 11)
@@ -2536,7 +8581,12 @@ static EVT_BEGIN(hom_10_init_evt)
         CALL(evt_seq_wait, 2)
         CALL(evt_cam3d_evt_set, LW(1), 300, 1400, LW(1), 125, 0, 8000, 0)
         WAIT_MS(4000)
+#ifdef NONMATCHING
         CALL(evt_bero_mapchange, STRING(((char*)str_00004724)), STRING(((char*)str_00004730)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_bero_mapchange, STRING(((char*)rsh_06_str_00004724)), STRING(((char*)rsh_06_str_00004730)))
+#endif
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -2550,16 +8600,29 @@ EVT_BEGIN(evt_resha_init)
 EVT_END()
 
 static s32 bero_data_a[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_00004738), 8, 2, 100000, 0, 0, -1, 0,
     -1, 0, (s32)((char*)str_00004740), (s32)((char*)str_00004738), 65537, 0, 0, 0,
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)rsh_06_str_00004738), 8, 2, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)((char*)rsh_06_str_00004740), (s32)((char*)rsh_06_str_00004738), 65537, 0, 0, 0,
+#endif
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
 };
 
 static EVT_BEGIN(evt_moamoa_init)
+#ifdef NONMATCHING
     CALL(evt_npc_entry, STRING(((char*)str_0000474C)), STRING(((char*)str_000041D0)))
     CALL(evt_npc_entry, STRING(((char*)str_00004754)), STRING(((char*)str_000041E4)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_entry, STRING(((char*)str_0000474C)), STRING(((char*)rsh_06_str_000041D0)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004754)), STRING(((char*)rsh_06_str_000041E4)))
+#endif
     CALL(evt_npc_set_position, STRING(((char*)str_0000474C)), 0, -1000, 0)
+#ifdef NONMATCHING
     CALL(evt_npc_set_position, STRING(((char*)str_00004754)), 0, -1000, 0)
     CALL(evt_npc_entry, STRING(((char*)str_0000475C)), STRING(((char*)str_000041F0)))
     CALL(evt_npc_entry, STRING(((char*)str_00004764)), STRING(((char*)str_00004200)))
@@ -2588,6 +8651,37 @@ static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_snd_sfxon, STRING(((char*)str_0000479C)), GW(2))
     CALL(evt_npc_entry, STRING(((char*)str_000047B4)), STRING(((char*)str_000047BC)))
     CALL(evt_npc_set_position, STRING(((char*)str_000047B4)), 0, -1000, 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004754)), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000475C)), STRING(((char*)rsh_06_str_000041F0)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004764)), STRING(((char*)rsh_06_str_00004200)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000476C)), STRING(((char*)rsh_06_str_00004210)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004774)), STRING(((char*)rsh_06_str_0000421C)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000477C)), STRING(((char*)rsh_06_str_00004228)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004784)), STRING(((char*)rsh_06_str_00004230)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000478C)), STRING(((char*)rsh_06_str_00004238)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004794)), STRING(((char*)rsh_06_str_00004240)))
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000475C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004764)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000476C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004774)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000477C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004784)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000478C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004794)), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000475C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004764)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000476C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004774)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000477C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004784)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000478C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004794)), 2048)
+    CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_0000479C)), GW(2))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_000047BC)))
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_000047B4)), 0, -1000, 0)
+#endif
     CALL(evt_ext_entry, 700, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), PTR(ext_moamoa_dispent))
     CALL(evt_moamoa_flag_onoff, 1, 1)
     BEGIN_INLINE_EVENT
@@ -2607,6 +8701,7 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_mario_normalize)
     CALL(evt_moamoa_flag_onoff, 1, 8)
     CALL(evt_moamoa_flag_onoff, 1, 4)
+#ifdef NONMATCHING
     CALL(evt_msg_print, 0, STRING(((char*)str_000047C8)), 0, 0)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000047D8)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)str_000047E4)), 1)
@@ -2615,14 +8710,40 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_npc_set_position, STRING(((char*)str_000047B4)), 10, 190, 0)
     CALL(evt_npc_pera_onoff, STRING(((char*)str_000047B4)), 0)
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_00004804)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print, 0, STRING(((char*)rsh_06_str_000047C8)), 0, 0)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000047D8)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000047E4)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000047F0)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)rsh_06_str_000047FC)), 1)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_000047B4)), 10, 190, 0)
+    CALL(evt_npc_pera_onoff, STRING(((char*)rsh_06_str_000047B4)), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_00004804)))
+#endif
     CALL(evt_snd_sfxoff, GW(2))
+#ifdef NONMATCHING
     CALL(evt_snd_sfxon, STRING(((char*)str_00004808)), GW(2))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_00004808)), GW(2))
+#endif
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
+#ifdef NONMATCHING
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004824)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004824)), LW(0), LW(1), LW(2), 0)
+#endif
         CALL(evt_eff_fukidashi, 0, STRING(((char*)str_0000483C)), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+#ifdef NONMATCHING
         CALL(evt_eff_fukidashi, 3, STRING(((char*)str_00004844)), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_eff_fukidashi, 3, STRING(((char*)rsh_06_str_00004844)), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+#endif
         WAIT_MS(1000)
         CALL(evt_mario_set_dir, 90, 200, 0)
         CALL(evt_party_set_dir, 0, 90, 200)
@@ -2631,98 +8752,220 @@ EVT_BEGIN(evt_great_moamoa)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(15)
+#ifdef NONMATCHING
             CALL(evt_snd_sfxon, STRING(((char*)str_0000484C)), 0)
+#endif
+#ifndef NONMATCHING
+            CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_0000484C)), 0)
+#endif
             WAIT_MS(500)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_moamoa_fusion)
     CALL(evt_snd_sfxoff, GW(2))
+#ifdef NONMATCHING
     CALL(evt_snd_sfxon, STRING(((char*)str_0000479C)), GW(2))
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_00004868)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000047D8)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000047E4)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000047F0)), 1)
     CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)str_000047FC)), 1)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_snd_sfxon, STRING(((char*)rsh_06_str_0000479C)), GW(2))
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_00004868)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000047D8)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000047E4)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000047F0)), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)rsh_06_str_000047FC)), 1)
+#endif
     WAIT_MS(2000)
     CALL(evt_moamoa_kind_onoff, 1, 0)
     BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
         CALL(evt_npc_get_position, STRING(((char*)str_000047B4)), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_npc_get_position, STRING(((char*)rsh_06_str_000047B4)), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
         WAIT_MS(800)
+#ifdef NONMATCHING
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
         WAIT_MS(800)
+#ifdef NONMATCHING
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
         WAIT_MS(800)
+#ifdef NONMATCHING
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004874)), LW(0), LW(1), LW(2), 0)
+#endif
     END_INLINE_EVENT
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_0000488C)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_0000488C)))
+#endif
     CALL(npc_anim_wait)
     CALL(evt_cam3d_evt_set, 10, 335, 369, 10, 265, -25, 1000, 11)
     CALL(evt_moamoa_kind_onoff, 1, 1)
     BEGIN_INLINE_EVENT
+#ifdef NONMATCHING
         CALL(evt_npc_get_position, STRING(((char*)str_000047B4)), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004890)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_npc_get_position, STRING(((char*)rsh_06_str_000047B4)), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004890)), LW(0), LW(1), LW(2), 0)
+#endif
     END_INLINE_EVENT
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_0000420C)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_0000420C)))
+#endif
     WAIT_MS(2000)
     BEGIN_INLINE_EVENT
         WAIT_MS(1700)
+#ifdef NONMATCHING
         CALL(evt_npc_get_position, STRING(((char*)str_000047B4)), LW(0), LW(1), LW(2))
         CALL(evt_snd_sfxon_3d, STRING(((char*)str_000048A8)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+        CALL(evt_npc_get_position, STRING(((char*)rsh_06_str_000047B4)), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_000048A8)), LW(0), LW(1), LW(2), 0)
+#endif
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_cam3d_evt_set, 10, 300, 450, 10, 300, -25, 1000, 11)
     END_INLINE_EVENT
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_000048C0)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_000048C0)))
+#endif
     CALL(npc_anim_wait)
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_000048C4)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_000048C4)))
+#endif
     WAIT_MS(1000)
     CALL(evt_mario_set_pos, -160, 215, 0)
     CALL(evt_party_set_pos, 0, -200, 215, -10)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_dir, 0, 90, 0)
     CALL(evt_mario_dispflag_onoff, 1, 2)
+#ifdef NONMATCHING
     CALL(evt_mario_set_pose, STRING(((char*)str_000048C8)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_mario_set_pose, STRING(((char*)rsh_06_str_000048C8)))
+#endif
     CALL(evt_cam3d_evt_set, -180, 308, 270, -180, 255, -25, 0, 11)
     WAIT_MS(500)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)
+#ifdef NONMATCHING
     CALL(evt_msg_print_party, STRING(((char*)str_000048D0)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print_party, STRING(((char*)rsh_06_str_000048D0)))
+#endif
     WAIT_MS(300)
     CALL(evt_party_run, 0)
     CALL(evt_cam3d_evt_set, 10, 498, 467, 10, 410, -25, 0, 11)
     WAIT_FRAMES(1)
+#ifdef NONMATCHING
     CALL(evt_msg_print, 0, STRING(((char*)str_000048E0)), 0, 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print, 0, STRING(((char*)rsh_06_str_000048E0)), 0, 0)
+#endif
     WAIT_MS(300)
+#ifdef NONMATCHING
     CALL(evt_msg_print, 0, STRING(((char*)str_000048F0)), 0, 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print, 0, STRING(((char*)rsh_06_str_000048F0)), 0, 0)
+#endif
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 1000, 20, 841, -50, 200, -66, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_cam3d_evt_set, -440, 230, 180, 5, 300, -36, 4000, 11)
     WAIT_MS(4000)
     WAIT_MS(500)
+#ifdef NONMATCHING
     CALL(evt_npc_get_position, STRING(((char*)str_000047B4)), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004900)), LW(0), LW(1), LW(2), 0)
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_00004918)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_get_position, STRING(((char*)rsh_06_str_000047B4)), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004900)), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_00004918)))
+#endif
     CALL(npc_anim_wait)
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_0000491C)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_0000491C)))
+#endif
     WAIT_MS(500)
+#ifdef NONMATCHING
     CALL(evt_msg_print, 0, STRING(((char*)str_00004920)), 0, 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print, 0, STRING(((char*)rsh_06_str_00004920)), 0, 0)
+#endif
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -100, 488, 1370, -100, 245, -8, 4000, 11)
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, GW(2))
+#ifdef NONMATCHING
     CALL(evt_npc_set_battle_info, STRING(((char*)str_000047B4)), 1)
     CALL(evt_npc_battle_start, STRING(((char*)str_000047B4)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_battle_info, STRING(((char*)rsh_06_str_000047B4)), 1)
+    CALL(evt_npc_battle_start, STRING(((char*)rsh_06_str_000047B4)))
+#endif
     CALL(evt_npc_wait_battle_end)
     CALL(evt_cam3d_evt_set, -50, 355, 534, -50, 260, -8, 0, 11)
+#ifdef NONMATCHING
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_00004804)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_00004804)))
+#endif
     CALL(evt_mario_dispflag_onoff, 0, 2)
+#ifdef NONMATCHING
     CALL(evt_mario_set_pose, STRING(((char*)str_00004930)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_mario_set_pose, STRING(((char*)rsh_06_str_00004930)))
+#endif
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(0), -25)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
+#ifdef NONMATCHING
     CALL(evt_npc_flag_onoff, 0, STRING(((char*)str_0000475C)), 2048)
     CALL(evt_npc_flag_onoff, 0, STRING(((char*)str_00004764)), 2048)
     CALL(evt_npc_flag_onoff, 0, STRING(((char*)str_0000476C)), 2048)
@@ -2755,41 +8998,114 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_npc_set_anim, STRING(((char*)str_0000478C)), STRING(((char*)str_00004804)))
     CALL(evt_npc_set_anim, STRING(((char*)str_00004794)), STRING(((char*)str_00004804)))
     CALL(evt_npc_set_anim, STRING(((char*)str_0000476C)), STRING(((char*)str_00004804)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_0000475C)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_00004764)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_0000476C)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_00004774)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_0000477C)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_00004784)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_0000478C)), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)rsh_06_str_00004794)), 2048)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000475C)), 0, 215, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004764)), 0, 215, 1)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004774)), 0, 215, 2)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000477C)), 0, 215, 3)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004784)), 0, 215, 4)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000478C)), 0, 215, 5)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004794)), 0, 215, 6)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000476C)), 20, 215, 7)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_0000475C)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_00004764)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_00004774)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_0000477C)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_00004784)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_0000478C)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_00004794)), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)rsh_06_str_0000476C)), 270)
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_0000475C)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_00004764)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_00004774)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_0000477C)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_00004784)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_0000478C)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_00004794)), STRING(((char*)rsh_06_str_00004804)))
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_0000476C)), STRING(((char*)rsh_06_str_00004804)))
+#endif
     CALL(evt_moamoa_kind_onoff, 0, 0)
+#ifdef NONMATCHING
     CALL(evt_msg_print, 0, STRING(((char*)str_00004938)), 0, STRING(((char*)str_000047B4)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_msg_print, 0, STRING(((char*)rsh_06_str_00004938)), 0, STRING(((char*)rsh_06_str_000047B4)))
+#endif
     WAIT_MS(500)
+#ifdef NONMATCHING
     CALL(evt_npc_get_position, STRING(((char*)str_000047B4)), LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING(((char*)str_00004948)), LW(0), LW(1), LW(2), 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_get_position, STRING(((char*)rsh_06_str_000047B4)), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)rsh_06_str_00004948)), LW(0), LW(1), LW(2), 0)
+#endif
     CALL(evt_moamoa_blow)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, -150, 485, 1469, -150, 225, -8, 4000, 11)
     WAIT_MS(4000)
     BEGIN_INLINE_EVENT
         LOOP(0)
+#ifdef NONMATCHING
             CALL(evt_npc_reverse_ry, STRING(((char*)str_0000476C)))
+#endif
+#ifndef NONMATCHING
+            CALL(evt_npc_reverse_ry, STRING(((char*)rsh_06_str_0000476C)))
+#endif
             WAIT_MS(1500)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(0)
+#ifdef NONMATCHING
             CALL(evt_npc_reverse_ry, STRING(((char*)str_00004794)))
+#endif
+#ifndef NONMATCHING
+            CALL(evt_npc_reverse_ry, STRING(((char*)rsh_06_str_00004794)))
+#endif
             WAIT_MS(1000)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
     SET_VALUE(GSW(0), 332)
+#ifdef NONMATCHING
     CALL(evt_bero_mapchange, STRING(((char*)str_00004964)), STRING(((char*)str_00004738)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_bero_mapchange, STRING(((char*)rsh_06_str_00004964)), STRING(((char*)rsh_06_str_00004738)))
+#endif
     RETURN
 EVT_END()
 
 __declspec(section ".data") s32 pose_name[] = {
+#ifdef NONMATCHING
     (s32)((char*)str_00004804), (s32)((char*)str_0000488C), (s32)((char*)str_000041DC), (s32)((char*)str_0000420C), (s32)((char*)str_000048C0), (s32)((char*)str_000048C4), (s32)((char*)str_00004918), (s32)((char*)str_0000491C),
+#endif
+#ifndef NONMATCHING
+    (s32)((char*)rsh_06_str_00004804), (s32)((char*)rsh_06_str_0000488C), (s32)((char*)rsh_06_str_000041DC), (s32)((char*)rsh_06_str_0000420C), (s32)((char*)rsh_06_str_000048C0), (s32)((char*)rsh_06_str_000048C4), (s32)((char*)rsh_06_str_00004918), (s32)((char*)rsh_06_str_0000491C),
+#endif
 };
 
 EVT_BEGIN(moamoa_debug)
+#ifdef NONMATCHING
     CALL(evt_npc_entry, STRING(((char*)str_0000474C)), STRING(((char*)str_000041D0)))
     CALL(evt_npc_entry, STRING(((char*)str_00004754)), STRING(((char*)str_000041E4)))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_entry, STRING(((char*)str_0000474C)), STRING(((char*)rsh_06_str_000041D0)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004754)), STRING(((char*)rsh_06_str_000041E4)))
+#endif
     CALL(evt_npc_set_position, STRING(((char*)str_0000474C)), 0, -1000, 0)
+#ifdef NONMATCHING
     CALL(evt_npc_set_position, STRING(((char*)str_00004754)), 0, -1000, 0)
     CALL(evt_npc_entry, STRING(((char*)str_0000475C)), STRING(((char*)str_000041F0)))
     CALL(evt_npc_entry, STRING(((char*)str_00004764)), STRING(((char*)str_00004200)))
@@ -2817,14 +9133,52 @@ EVT_BEGIN(moamoa_debug)
     CALL(evt_npc_flag_onoff, 1, STRING(((char*)str_00004794)), 2048)
     CALL(evt_npc_entry, STRING(((char*)str_000047B4)), STRING(((char*)str_000047BC)))
     CALL(evt_npc_set_position, STRING(((char*)str_000047B4)), 0, -1000, 0)
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004754)), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000475C)), STRING(((char*)rsh_06_str_000041F0)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004764)), STRING(((char*)rsh_06_str_00004200)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000476C)), STRING(((char*)rsh_06_str_00004210)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004774)), STRING(((char*)rsh_06_str_0000421C)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000477C)), STRING(((char*)rsh_06_str_00004228)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004784)), STRING(((char*)rsh_06_str_00004230)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_0000478C)), STRING(((char*)rsh_06_str_00004238)))
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_00004794)), STRING(((char*)rsh_06_str_00004240)))
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000475C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004764)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000476C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004774)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000477C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004784)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_0000478C)), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_00004794)), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000475C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004764)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000476C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004774)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000477C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004784)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_0000478C)), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)rsh_06_str_00004794)), 2048)
+    CALL(evt_npc_entry, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_000047BC)))
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_000047B4)), 0, -1000, 0)
+#endif
     CALL(evt_ext_entry, 700, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), PTR(ext_moamoa_dispent))
     CALL(evt_moamoa_flag_onoff, 1, 1)
     CALL(evt_moamoa_flag_onoff, 1, 4)
     CALL(evt_moamoa_fusion_debug)
+#ifdef NONMATCHING
     CALL(evt_npc_set_position, STRING(((char*)str_000047B4)), 10, 190, 0)
     CALL(evt_npc_pera_onoff, STRING(((char*)str_000047B4)), 0)
     CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), STRING(((char*)str_000048C4)))
     CALL(evt_npc_set_scale, STRING(((char*)str_000047B4)), FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+#endif
+#ifndef NONMATCHING
+    CALL(evt_npc_set_position, STRING(((char*)rsh_06_str_000047B4)), 10, 190, 0)
+    CALL(evt_npc_pera_onoff, STRING(((char*)rsh_06_str_000047B4)), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), STRING(((char*)rsh_06_str_000048C4)))
+    CALL(evt_npc_set_scale, STRING(((char*)rsh_06_str_000047B4)), FLOAT((1.0f)), FLOAT((1.0f)), FLOAT((1.0f)))
+#endif
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(0)
@@ -2838,7 +9192,12 @@ EVT_BEGIN(moamoa_debug)
                 LOOP(LW(1))
                     READ_INT(LW(2))
                 END_LOOP
+#ifdef NONMATCHING
                 CALL(evt_npc_set_anim, STRING(((char*)str_000047B4)), LW(2))
+#endif
+#ifndef NONMATCHING
+                CALL(evt_npc_set_anim, STRING(((char*)rsh_06_str_000047B4)), LW(2))
+#endif
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
@@ -2850,28 +9209,58 @@ EVT_BEGIN(rsh_06_init_evt)
     CALL_CHILD(PTR(evt_resha_init))
     SWITCH(GSW(0))
         CASE_BETWEEN(284, 286)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_00004970)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_00004970)))
+#endif
         CALL(evt_snd_envon, 272, STRING(((char*)str_00004980)))
         CASE_BETWEEN(304, 309)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_00004970)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_00004970)))
+#endif
         CALL(evt_snd_envon, 272, STRING(((char*)str_00004980)))
         CASE_BETWEEN(310, 325)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_00004990)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_00004990)))
+#endif
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         CASE_BETWEEN(327, 328)
         CALL(evt_snd_bgmoff, 512)
         CALL(evt_snd_envon, 272, STRING(((char*)str_00004980)))
         CASE_BETWEEN(329, 331)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_000049A0)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_000049A0)))
+#endif
         CALL(evt_snd_envon, 272, STRING(((char*)str_00004980)))
         CASE_BETWEEN(334, 344)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_000049B0)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_000049B0)))
+#endif
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         CASE_DEFAULT
         CALL(evt_snd_bgmoff, 512)
+#ifdef NONMATCHING
         CALL(evt_snd_envon, 272, STRING(((char*)str_000046E8)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_envon, 272, STRING(((char*)rsh_06_str_000046E8)))
+#endif
     END_SWITCH
     RETURN
 EVT_END()
@@ -2896,7 +9285,12 @@ EVT_END()
 EVT_BEGIN(rsh_06_init_evt_nidome)
     CALL_CHILD(PTR(evt_resha_init))
     IF_INT_EQUAL(GSWF(3460), 1)
+#ifdef NONMATCHING
         CALL(evt_snd_bgmon, 512, STRING(((char*)str_000049B0)))
+#endif
+#ifndef NONMATCHING
+        CALL(evt_snd_bgmon, 512, STRING(((char*)rsh_06_str_000049B0)))
+#endif
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         ELSE
@@ -2906,7 +9300,12 @@ EVT_BEGIN(rsh_06_init_evt_nidome)
             CALL(evt_snd_bgmoff, 26624)
             ELSE
             CALL(evt_snd_bgmoff, 512)
+#ifdef NONMATCHING
             CALL(evt_snd_envon, 272, STRING(((char*)str_000046E8)))
+#endif
+#ifndef NONMATCHING
+            CALL(evt_snd_envon, 272, STRING(((char*)rsh_06_str_000046E8)))
+#endif
         END_IF
     END_IF
     RETURN
@@ -2923,6448 +9322,481 @@ EVT_END()
 
 
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
+#ifdef NONMATCHING
     f32 amp = __fabsf(evtGetFloat(event, GW(0)));
     f32 wave = sin(gp->retraceCount / float_15_rsh_00014474[0]);
 
     evtSetFloat(event, LW(10), float_1p8_rsh_00014478[0] * amp * wave);
     return EVT_RETURN_DONE;
-}
 #endif
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFD0
+		opword 0x7C0802A6
+		opword 0x90010034
+		opword 0xDBE10020
+		opword 0xF3E10028
+		opword 0x93E1001C
+		opword 0x3C80FD05
+		opword 0x7C7F1B78
+		opword 0x38840F80
+		bl evtGetFloat
+		lis r3, gp@ha
+		opword 0x3C004330
+		addi r4, r3, gp@l
+		opword 0x90010008
+		opword 0x80A40000
+		lis r3, double_to_int_mask_rsh_00014480@ha
+		addi r4, r3, double_to_int_mask_rsh_00014480@l
+		opword 0xFFE00A10
+		opword 0x8005001C
+		lis r3, float_15_rsh_00014474@ha
+		opword 0xC8440000
+		opword 0x9001000C
+		lfs f0, float_15_rsh_00014474@l(r3)
+		opword 0xC8210008
+		opword 0xEC211028
+		opword 0xEC210024
+		bl sin
+		lis r3, float_1p8_rsh_00014478@ha
+		opword 0x3C80FE36
+		lfs f0, float_1p8_rsh_00014478@l(r3)
+		opword 0xFC200818
+		opword 0x7FE3FB78
+		opword 0x38843C8A
+		opword 0xEC0007F2
+		opword 0xEC200072
+		bl evtSetFloat
+		opword 0x38600002
+		opword 0xE3E10028
+		opword 0x80010034
+		opword 0xCBE10020
+		opword 0x83E1001C
+		opword 0x7C0803A6
+		opword 0x38210030
+	}
+#endif
+}
+#ifndef NONMATCHING
+#pragma pop
+#endif
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
-#endif
-#ifdef NONMATCHING
 s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall) {
+#ifdef NONMATCHING
     NpcEntry* npc = npcNameToPtr((char*)str_000047B4);
+#endif
+#ifndef NONMATCHING
+    NpcEntry* npc = npcNameToPtr((char*)rsh_06_str_000047B4);
+#endif
 
     if (animPoseGetLoopTimes(npc->poseId) >= float_1_rsh_00014470[0]) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
 }
-#endif
 
 void __cvt_ull_flt();
 void __div2u();
+
 #ifndef NONMATCHING
-// FAKE (asm stopgap, asmfake.py --whole): moamoa_pose_init (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+
+// literal pool in target order (asmfake --minimal)
 #pragma force_active on
-void jt_00009330(void);
-void jt_00009E38(void);
-void jt_0000A130(void);
-void jt_0000A394(void);
-void jt_0000A5F0(void);
-void jt_0000B1A0(void);
-void jt_000095DC(void);
-void jt_00009608(void);
-void jt_0000A614(void);
-void jt_0000A918(void);
-void jt_0000A978(void);
-void jt_0000ACC8(void);
-void jt_0000AD58(void);
-void jt_00009BA0(void);
-void jt_00009BCC(void);
-void jt_00009C94(void);
-void jt_00009A9C(void);
-void jt_0000ADFC(void);
-void jt_0000AE24(void);
-void jt_0000B0B0(void);
-void jt_0000B0D4(void);
-__declspec(section ".data") void* jumptable_000183EC[66] = {jt_00009330, jt_00009E38, jt_0000A130, jt_0000A394, jt_0000A5F0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_000095DC, jt_00009608, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000A614, jt_0000A614, jt_0000A614, jt_0000A918, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000A978, jt_0000ACC8, jt_0000AD58, jt_00009BA0, jt_00009BCC, jt_00009C94, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_0000B1A0, jt_00009A9C, jt_0000ADFC, jt_0000AE24, jt_0000B0B0, jt_0000B0D4};
-#pragma force_active on
-__declspec(section ".rodata") const char str_000041D0[] = "c_n_moa_a\000\000";
-__declspec(section ".rodata") const char str_000041DC[] = "S_1";
-__declspec(section ".rodata") const char str_000041E0[] = "D_1";
-__declspec(section ".rodata") const char str_000041E4[] = "c_n_moa_b\000\000";
-__declspec(section ".rodata") const char str_000041F0[] = "c_kinodebu\000";
-__declspec(section ".rodata") const char str_000041FC[] = "G_1";
-__declspec(section ".rodata") const char str_00004200[] = "c_puku_c\000\000\000";
-__declspec(section ".rodata") const char str_0000420C[] = "U_1";
-__declspec(section ".rodata") const char str_00004210[] = "c_powan";
-__declspec(section ".rodata") const char str_00004218[] = "O_1";
-__declspec(section ".rodata") const char str_0000421C[] = "c_smoko";
-__declspec(section ".rodata") const char str_00004224[] = "T_2";
-__declspec(section ".rodata") const char str_00004228[] = "c_rose\000";
-__declspec(section ".rodata") const char str_00004230[] = "c_papab";
-__declspec(section ".rodata") const char str_00004238[] = "c_mamab";
-__declspec(section ".rodata") const char str_00004240[] = "c_konari\000\000\000";
-__declspec(section ".rodata") const f32 vec3_rsh_00013cec[3] = { 0.0f, -1000.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013cf8[3] = { 10.0f, 215.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d04[3] = { 10.0f, 215.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d10[3] = { 10.0f, 215.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d1c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d28[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d34[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d40[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d4c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d58[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d64[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d70[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d7c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d88[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013d94[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_rsh_00013da0[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const char str_0000430C[] = "sha_1_1";
-__declspec(section ".rodata") const char str_00004314[] = "sha_1_2";
-__declspec(section ".rodata") const char str_0000431C[] = "sha_1_3";
-__declspec(section ".rodata") const char str_00004324[] = "sha_1_4";
-__declspec(section ".rodata") const char str_0000432C[] = "sha_1_5";
-__declspec(section ".rodata") const char str_00004334[] = "sha_2_1";
-__declspec(section ".rodata") const char str_0000433C[] = "sha_2_2";
-__declspec(section ".rodata") const char str_00004344[] = "sha_2_3";
-__declspec(section ".rodata") const char str_0000434C[] = "sha_3_1";
-__declspec(section ".rodata") const char str_00004354[] = "sha_3_2";
-__declspec(section ".rodata") const char str_0000435C[] = "sha_3_3";
-__declspec(section ".rodata") const char str_00004364[] = "sha_4_1";
-__declspec(section ".rodata") const char str_0000436C[] = "sha_4_2";
-__declspec(section ".rodata") const char str_00004374[] = "sha_4_3";
-__declspec(section ".rodata") const char str_0000437C[] = "sha_5_1";
-__declspec(section ".rodata") const char str_00004384[] = "sha_5_2";
-__declspec(section ".rodata") const char str_0000438C[] = "sha_5_3";
-__declspec(section ".rodata") const char str_00004394[] = "sha_6_1";
-__declspec(section ".rodata") const char str_0000439C[] = "sha_6_2";
-__declspec(section ".rodata") const char str_000043A4[] = "sha_6_3";
-__declspec(section ".rodata") const char str_000043AC[] = "sha_1_1_c\000\000";
-__declspec(section ".rodata") const char str_000043B8[] = "sha_1_2_c\000\000";
-__declspec(section ".rodata") const char str_000043C4[] = "sha_1_3_c\000\000";
-__declspec(section ".rodata") const char str_000043D0[] = "sha_1_4_c\000\000";
-__declspec(section ".rodata") const char str_000043DC[] = "sha_1_5_c\000\000";
-__declspec(section ".rodata") const char str_000043E8[] = "sha_6_1_c\000\000";
-__declspec(section ".rodata") const char str_000043F4[] = "sha_6_2_c\000\000";
-__declspec(section ".rodata") const char str_00004400[] = "sha_6_3_c\000\000";
-__declspec(section ".rodata") const char str_0000440C[] = "bou_1\000\000";
-__declspec(section ".rodata") const char str_00004414[] = "bou_2\000\000";
-__declspec(section ".rodata") const char str_0000441C[] = "bou_3\000\000";
-__declspec(section ".rodata") const char str_00004424[] = "bou_4\000\000";
-__declspec(section ".rodata") const char str_0000442C[] = "bou_1_c";
-__declspec(section ".rodata") const char str_00004434[] = "bou_2_c";
-__declspec(section ".rodata") const char str_0000443C[] = "bou_3_c";
-__declspec(section ".rodata") const char str_00004444[] = "bou_4_c";
-__declspec(section ".rodata") const char str_0000444C[] = "jimen\000\000";
-__declspec(section ".rodata") const char str_00004454[] = "yama\000\000\000";
-__declspec(section ".rodata") const char str_0000445C[] = "iwayama";
-__declspec(section ".rodata") const char str_00004464[] = "hosi_right\000";
-__declspec(section ".rodata") const char str_00004470[] = "hosi_left\000\000";
-__declspec(section ".rodata") const char str_0000447C[] = "hosi_center";
-__declspec(section ".rodata") const char str_00004488[] = "hosi_right_c\000\000\000";
-__declspec(section ".rodata") const char str_00004498[] = "hosi_left_c";
-__declspec(section ".rodata") const char str_000044A4[] = "hosi_center_c\000\000";
-__declspec(section ".rodata") const char str_000044B4[] = "ranpu\000\000";
-__declspec(section ".rodata") const char str_000044BC[] = "SFX_STG6_TRAIN_BELL1\000\000\000";
-__declspec(section ".rodata") const char str_000044D4[] = "gor_04\000";
-__declspec(section ".rodata") const char str_000044DC[] = "SFX_STG6_TRAIN_MOVE1\000\000\000";
-__declspec(section ".rodata") const char str_000044F4[] = "hom_00\000";
-__declspec(section ".rodata") const char str_000044FC[] = "SFX_STG6_TRAIN_MOVE1_2\000";
-__declspec(section ".rodata") const char str_00004514[] = "SFX_STG6_TRAIN_MOVE1_2_2\000\000\000";
-__declspec(section ".rodata") const char str_00004530[] = "pik_00\000";
-__declspec(section ".rodata") const char str_00004538[] = "SFX_STG6_TRAIN_MOVE1_3\000";
-__declspec(section ".rodata") const char str_00004550[] = "train\000\000";
-__declspec(section ".rodata") const char str_00004558[] = "SFX_STG6_TRAIN_MOVE1_2_3\000\000\000";
-__declspec(section ".rodata") const char str_00004574[] = "SFX_STG6_TRAIN_MOVE2\000\000\000";
-__declspec(section ".rodata") const char str_0000458C[] = "SFX_STG6_TRAIN_MOVE2_2\000";
-__declspec(section ".rodata") const char str_000045A4[] = "SFX_STG6_TRAIN_MOVE2_3\000";
-__declspec(section ".rodata") const char str_000045BC[] = "SFX_STG6_TRAIN_MOVE2_2_2\000\000\000";
-__declspec(section ".rodata") const char str_000045D8[] = "ranpu_c";
-__declspec(section ".rodata") const char str_000045E0[] = "pika_1_1\000\000\000";
-__declspec(section ".rodata") const char str_000045EC[] = "pika_1_2\000\000\000";
-__declspec(section ".rodata") const char str_000045F8[] = "pika_1_3\000\000\000";
-__declspec(section ".rodata") const char str_00004604[] = "pika_1_4\000\000\000";
-__declspec(section ".rodata") const char str_00004610[] = "pika_2\000";
-__declspec(section ".rodata") const char str_00004618[] = "pika_3\000";
-__declspec(section ".rodata") const char str_00004620[] = "pika_4\000";
-__declspec(section ".rodata") const char str_00004628[] = "pika_5\000";
-__declspec(section ".rodata") const char str_00004630[] = "pika_6\000";
-__declspec(section ".rodata") const char str_00004638[] = "pika_1_1_c\000";
-__declspec(section ".rodata") const char str_00004644[] = "pika_1_2_c\000";
-__declspec(section ".rodata") const char str_00004650[] = "pika_1_3_c\000";
-__declspec(section ".rodata") const char str_0000465C[] = "pika_1_4_c\000";
-__declspec(section ".rodata") const char str_00004668[] = "pika_6_c\000\000\000";
-__declspec(section ".rodata") const char str_00004674[] = "hom_10\000";
-__declspec(section ".rodata") const char str_0000467C[] = "hom_11\000";
-__declspec(section ".rodata") const char str_00004684[] = "hom_12\000";
-__declspec(section ".rodata") const char str_0000468C[] = "rsh_06_a\000\000\000";
-__declspec(section ".rodata") const char str_00004698[] = "train_7";
-__declspec(section ".rodata") const char str_000046A0[] = "train_8";
-__declspec(section ".rodata") const char str_000046A8[] = "renketu_6\000\000";
-__declspec(section ".rodata") const char str_000046B4[] = "renketu_7\000\000";
-__declspec(section ".rodata") const char str_000046C0[] = "train_1";
-__declspec(section ".rodata") const char str_000046C8[] = "train_6";
-__declspec(section ".rodata") const char str_000046D0[] = "renketu_1\000\000";
-__declspec(section ".rodata") const char str_000046DC[] = "renketu_5\000\000";
-__declspec(section ".rodata") const char str_000046E8[] = "ENV_STG6_RSH2\000\000";
-__declspec(section ".rodata") const char str_000046F8[] = "renketu";
-__declspec(section ".rodata") const char str_00004700[] = "renketu_2\000\000";
-__declspec(section ".rodata") const char str_0000470C[] = "renketu_3\000\000";
-__declspec(section ".rodata") const char str_00004718[] = "renketu_4\000\000";
-__declspec(section ".rodata") const char str_00004724[] = "rsh_02_a\000\000\000";
-__declspec(section ".rodata") const char str_00004730[] = "nidome\000";
-__declspec(section ".rodata") const char str_00004738[] = "w_bero\000";
-__declspec(section ".rodata") const char str_00004740[] = "rsh_05_a\000\000\000";
-__declspec(section ".rodata") const char str_0000474C[] = "moa_a\000\000";
-__declspec(section ".rodata") const char str_00004754[] = "moa_b\000\000";
-__declspec(section ".rodata") const char str_0000475C[] = "kinopio";
-__declspec(section ".rodata") const char str_00004764[] = "cook\000\000\000";
-__declspec(section ".rodata") const char str_0000476C[] = "powan\000\000";
-__declspec(section ".rodata") const char str_00004774[] = "sarary\000";
-__declspec(section ".rodata") const char str_0000477C[] = "rose\000\000\000";
-__declspec(section ".rodata") const char str_00004784[] = "papa\000\000\000";
-__declspec(section ".rodata") const char str_0000478C[] = "mama\000\000\000";
-__declspec(section ".rodata") const char str_00004794[] = "konari\000";
-__declspec(section ".rodata") const char str_0000479C[] = "SFX_STG6_MOAMOA_VOICE2\000";
-__declspec(section ".rodata") const char str_000047B4[] = "base\000\000\000";
-__declspec(section ".rodata") const char str_000047BC[] = "c_g_moamoa\000";
-__declspec(section ".rodata") const char str_000047C8[] = "stg6_rsh_244\000\000\000";
-__declspec(section ".rodata") const char str_000047D8[] = "group339\000\000\000";
-__declspec(section ".rodata") const char str_000047E4[] = "group340\000\000\000";
-__declspec(section ".rodata") const char str_000047F0[] = "group341\000\000\000";
-__declspec(section ".rodata") const char str_000047FC[] = "senro\000\000";
-__declspec(section ".rodata") const char str_00004804[] = "Z_1";
-__declspec(section ".rodata") const char str_00004808[] = "SFX_STG6_MOA_TOGETHER_MOVE1";
-__declspec(section ".rodata") const char str_00004824[] = "SFX_VOICE_MARIO_FIND1_3";
-__declspec(section ".rodata") const char str_0000483C[] = "eff0\000\000\000";
-__declspec(section ".rodata") const char str_00004844[] = "eff1\000\000\000";
-__declspec(section ".rodata") const char str_0000484C[] = "SFX_STG6_MOA_TOGETHER_MOVE2";
-__declspec(section ".rodata") const char str_00004868[] = "group166\000\000\000";
-__declspec(section ".rodata") const char str_00004874[] = "SFX_STG6_MOAMOA_G_LEG1\000";
-__declspec(section ".rodata") const char str_0000488C[] = "H_1";
-__declspec(section ".rodata") const char str_00004890[] = "SFX_STG6_MOAMOA_G_LEG2\000";
-__declspec(section ".rodata") const char str_000048A8[] = "SFX_STG6_MOAMOA_G_LEG3\000";
-__declspec(section ".rodata") const char str_000048C0[] = "H_2";
-__declspec(section ".rodata") const char str_000048C4[] = "S_2";
-__declspec(section ".rodata") const char str_000048C8[] = "M_I_Y\000\000";
-__declspec(section ".rodata") const char str_000048D0[] = "stg6_rsh_245\000\000\000";
-__declspec(section ".rodata") const char str_000048E0[] = "stg6_rsh_246_02";
-__declspec(section ".rodata") const char str_000048F0[] = "stg6_rsh_246_03";
-__declspec(section ".rodata") const char str_00004900[] = "SFX_STG6_MOAMOA_G_LEG4\000";
-__declspec(section ".rodata") const char str_00004918[] = "P_1";
-__declspec(section ".rodata") const char str_0000491C[] = "S_3";
-__declspec(section ".rodata") const char str_00004920[] = "stg6_rsh_246_01";
-__declspec(section ".rodata") const char str_00004930[] = "M_S_1\000\000";
-__declspec(section ".rodata") const char str_00004938[] = "stg6_rsh_247\000\000\000";
-__declspec(section ".rodata") const char str_00004948[] = "SFX_STG6_MOAMOA_G_ESCAPE1\000\000";
-__declspec(section ".rodata") const char str_00004964[] = "rsh_01_a\000\000\000";
-__declspec(section ".rodata") const char str_00004970[] = "BGM_EVT_POWAN1\000";
-__declspec(section ".rodata") const char str_00004980[] = "ENV_STG6_RSH1_3";
-__declspec(section ".rodata") const char str_00004990[] = "BGM_STG6_HOM1\000\000";
-__declspec(section ".rodata") const char str_000049A0[] = "BGM_EVT_DANGER4";
-__declspec(section ".rodata") const char str_000049B0[] = "BGM_STG6_PIK1\000\000";
-__declspec(section ".rodata") const char str_000049C0[] = "BGM_STG0_GOR1\000\000";
-__declspec(section ".rodata") const f32 float_1_rsh_00014470[1] = { 1.0f };
-__declspec(section ".rodata") const f32 float_15_rsh_00014474[1] = { 15.0f };
-__declspec(section ".rodata") const f32 float_1p8_rsh_00014478[1] = { 1.8f };
-__declspec(section ".rodata") const f64 double_to_int_mask_rsh_00014480 = 4503599627370496;
-__declspec(section ".rodata") const f64 double_to_int_rsh_00014488 = 4503601774854144;
-__declspec(section ".rodata") const f32 zero_rsh_00014490[1] = { 0.0f };
-__declspec(section ".rodata") const f32 float_neg5000_rsh_00014494[1] = { -5000.0f };
-__declspec(section ".rodata") const f32 float_neg1_rsh_00014498[1] = { -1.0f };
-__declspec(section ".rodata") const f32 float_6p2832_rsh_0001449c[1] = { 6.2831855f };
-__declspec(section ".rodata") const f32 float_360_rsh_000144a0[1] = { 360.0f };
-__declspec(section ".rodata") const f32 float_0p00761_rsh_000144a4[1] = { 0.00761f };
-__declspec(section ".rodata") const f32 float_0p16605_rsh_000144a8[1] = { 0.16605f };
-__declspec(section ".rodata") const f32 float_3p1416_rsh_000144ac[1] = { 3.1415927f };
-__declspec(section ".rodata") const f32 float_1p5708_rsh_000144b0[1] = { 1.5707964f };
-__declspec(section ".rodata") const f32 float_4p7124_rsh_000144b4[1] = { 4.712389f };
-__declspec(section ".rodata") const f32 float_0p03705_rsh_000144b8[1] = { 0.03705f };
-__declspec(section ".rodata") const f32 float_0p4967_rsh_000144bc[1] = { 0.4967f };
-__declspec(section ".rodata") const char str_00004A20[] = "SFX_STG6_MOAMOA_VOICE1\000";
-__declspec(section ".rodata") const f32 float_200_rsh_000144d8[1] = { 200.0f };
-__declspec(section ".rodata") const f32 float_30_rsh_000144dc[1] = { 30.0f };
-__declspec(section ".rodata") const char str_00004A40[] = "D\000\000";
-__declspec(section ".rodata") const char str_00004A44[] = "R\000\000";
-__declspec(section ".rodata") const f32 float_0p5_rsh_000144e8[1] = { 0.5f };
-__declspec(section ".rodata") const f32 float_32767_rsh_000144ec[1] = { 32767.0f };
-__declspec(section ".rodata") const f32 float_0p1_rsh_000144f0[1] = { 0.1f };
-__declspec(section ".rodata") const f32 float_0p03_rsh_000144f4[1] = { 0.03f };
-__declspec(section ".rodata") const f32 float_100_rsh_000144f8[1] = { 100.0f };
-__declspec(section ".rodata") const f32 float_50_rsh_000144fc[1] = { 50.0f };
-__declspec(section ".rodata") const f32 float_5_rsh_00014500[1] = { 5.0f };
-__declspec(section ".rodata") const f32 float_215_rsh_00014504[1] = { 215.0f };
-__declspec(section ".rodata") const f32 float_0p3_rsh_00014508[1] = { 0.3f };
-__declspec(section ".rodata") const f32 float_0p2_rsh_0001450c[1] = { 0.19999999f };
-__declspec(section ".rodata") const f32 float_31_rsh_00014510[1] = { 31.0f };
-__declspec(section ".rodata") const f32 float_2_rsh_00014514[1] = { 2.0f };
-__declspec(section ".rodata") const f32 float_0p4_rsh_00014518[1] = { 0.4f };
-__declspec(section ".rodata") const f32 float_1p5_rsh_0001451c[1] = { 1.5f };
-__declspec(section ".rodata") const f32 float_0p8_rsh_00014520[1] = { 0.8f };
-__declspec(section ".rodata") const f32 float_300_rsh_00014524[1] = { 300.0f };
-__declspec(section ".rodata") const f32 float_600_rsh_00014528[1] = { 600.0f };
-__declspec(section ".rodata") const f32 float_0p25_rsh_0001452c[1] = { 0.25f };
-__declspec(section ".rodata") const f32 float_neg45_rsh_00014530[1] = { -45.0f };
-__declspec(section ".rodata") const f32 float_90_rsh_00014534[1] = { 90.0f };
-__declspec(section ".rodata") const f32 float_180_rsh_00014538[1] = { 180.0f };
-__declspec(section ".rodata") const f32 float_0p9_rsh_0001453c[1] = { 0.9f };
-__declspec(section ".rodata") const f32 float_135_rsh_00014540[1] = { 135.0f };
-__declspec(section ".rodata") const f32 float_0p2_rsh_00014544[1] = { 0.2f };
-__declspec(section ".rodata") const f32 float_0p1_rsh_00014548[1] = { 0.10000001f };
-__declspec(section ".rodata") const f32 float_neg100_rsh_0001454c[1] = { -100.0f };
-__declspec(section ".rodata") const f32 float_225_rsh_00014550[1] = { 225.0f };
-__declspec(section ".rodata") const f32 float_1p1_rsh_00014554[1] = { 1.1f };
-__declspec(section ".rodata") const f32 float_1p02_rsh_00014558[1] = { 1.02f };
-__declspec(section ".rodata") const f32 float_0p20944_rsh_0001455c[1] = { 0.20943952f };
-__declspec(section ".rodata") const f32 float_neg1000_rsh_00014560[1] = { -1000.0f };
-__declspec(section ".rodata") const f32 float_250_rsh_00014564[1] = { 250.0f };
-__declspec(section ".rodata") const f32 float_450_rsh_00014568[1] = { 450.0f };
-__declspec(section ".rodata") const f32 float_neg50_rsh_0001456c[1] = { -50.0f };
-__declspec(section ".rodata") const f32 float_neg1870_rsh_00014570[1] = { -1870.0f };
-__declspec(section ".rodata") const f32 float_45_rsh_00014574[1] = { 45.0f };
-__declspec(section ".rodata") const f32 float_60_rsh_00014578[1] = { 60.0f };
-__declspec(section ".rodata") const f32 float_1000_rsh_0001457c[1] = { 1000.0f };
-__declspec(section ".rodata") const f32 float_20_rsh_00014580[1] = { 20.0f };
-__declspec(section ".rodata") const f32 float_10_rsh_00014584[1] = { 10.0f };
-__declspec(section ".rodata") const f32 float_35_rsh_00014588[1] = { 35.0f };
-__declspec(section ".rodata") const f32 float_65_rsh_0001458c[1] = { 65.0f };
-__declspec(section ".rodata") const f32 float_40_rsh_00014590[1] = { 40.0f };
-__declspec(section ".rodata") const f32 float_1E06_rsh_00014594[1] = { 1000000.0f };
-__declspec(section ".rodata") const f64 double_30_rsh_00014598 = 30;
-__declspec(section ".rodata") const char str_00004B00[] = "offscreen\000\000";
-__declspec(section ".rodata") const f32 float_neg500_rsh_000145ac[1] = { -500.0f };
-__declspec(section ".rodata") const f32 float_115_rsh_000145b0[1] = { 115.0f };
-__declspec(section ".rodata") const f32 float_70_rsh_000145b4[1] = { 70.0f };
-__declspec(section ".rodata") const f32 float_neg10_rsh_000145b8[1] = { -10.0f };
-__declspec(section ".rodata") const char zero_rsh_000145bc[4] = {0};
-__declspec(section ".rodata") const char str_00004B20[] = "J\000\000";
-__declspec(section ".rodata") const u32 gap_03_00004B24_rodata[1] = { 0x00000000 };
-#pragma force_active reset
-s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall);
-static void resha_tev(MapTevCallbackInfo* info);
-static s32 ramp_r(EventEntry* event, BOOL isFirstCall);
-void moamoa_joint_position(Moamoa* moa, Vec* out);
-static void ext_moamoa_dispent(void);
-static void ext_moamoa_main(void);
-static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
-static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
-static void ext_shadow_disp(CameraId camera, void* param);
-static void ext_disp(CameraId camera, void* param);
-static void ext_moamoa_init(void);
-static f32 randf(f32 min, f32 max);
-static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
-void evalOn(void);
-static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
-static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
-static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
-static void moamoa_pose_main(void);
-static void moamoa_pose_init(void);
+__declspec(section ".rodata") const char rsh_06_str_000041D0[12] = "c_n_moa_a\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000041DC[4] = "S_1";
+__declspec(section ".rodata") const char rsh_06_str_000041E0[4] = "D_1";
+__declspec(section ".rodata") const char rsh_06_str_000041E4[12] = "c_n_moa_b\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000041F0[12] = "c_kinodebu\0";
+__declspec(section ".rodata") const char rsh_06_str_000041FC[4] = "G_1";
+__declspec(section ".rodata") const char rsh_06_str_00004200[12] = "c_puku_c\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000420C[4] = "U_1";
+__declspec(section ".rodata") const char rsh_06_str_00004210[8] = "c_powan";
+__declspec(section ".rodata") const char rsh_06_str_00004218[4] = "O_1";
+__declspec(section ".rodata") const char rsh_06_str_0000421C[8] = "c_smoko";
+__declspec(section ".rodata") const char rsh_06_str_00004224[4] = "T_2";
+__declspec(section ".rodata") const char rsh_06_str_00004228[8] = "c_rose\0";
+__declspec(section ".rodata") const char rsh_06_str_00004230[8] = "c_papab";
+__declspec(section ".rodata") const char rsh_06_str_00004238[8] = "c_mamab";
+__declspec(section ".rodata") const char rsh_06_str_00004240[12] = "c_konari\0\0\0";
+__declspec(section ".rodata") const f32 vec3_rsh_00013cec[3] = {0.0f, -1000.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013cf8[3] = {10.0f, 215.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d04[3] = {10.0f, 215.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d10[3] = {10.0f, 215.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d1c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d28[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d34[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d40[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d4c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d58[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d64[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d70[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d7c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d88[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013d94[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_rsh_00013da0[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const char rsh_06_str_0000430C[8] = "sha_1_1";
+__declspec(section ".rodata") const char rsh_06_str_00004314[8] = "sha_1_2";
+__declspec(section ".rodata") const char rsh_06_str_0000431C[8] = "sha_1_3";
+__declspec(section ".rodata") const char rsh_06_str_00004324[8] = "sha_1_4";
+__declspec(section ".rodata") const char rsh_06_str_0000432C[8] = "sha_1_5";
+__declspec(section ".rodata") const char str_00004334[8] = "sha_2_1";
+__declspec(section ".rodata") const char rsh_06_str_0000433C[8] = "sha_2_2";
+__declspec(section ".rodata") const char rsh_06_str_00004344[8] = "sha_2_3";
+__declspec(section ".rodata") const char rsh_06_str_0000434C[8] = "sha_3_1";
+__declspec(section ".rodata") const char rsh_06_str_00004354[8] = "sha_3_2";
+__declspec(section ".rodata") const char rsh_06_str_0000435C[8] = "sha_3_3";
+__declspec(section ".rodata") const char rsh_06_str_00004364[8] = "sha_4_1";
+__declspec(section ".rodata") const char rsh_06_str_0000436C[8] = "sha_4_2";
+__declspec(section ".rodata") const char rsh_06_str_00004374[8] = "sha_4_3";
+__declspec(section ".rodata") const char rsh_06_str_0000437C[8] = "sha_5_1";
+__declspec(section ".rodata") const char str_00004384[8] = "sha_5_2";
+__declspec(section ".rodata") const char rsh_06_str_0000438C[8] = "sha_5_3";
+__declspec(section ".rodata") const char rsh_06_str_00004394[8] = "sha_6_1";
+__declspec(section ".rodata") const char rsh_06_str_0000439C[8] = "sha_6_2";
+__declspec(section ".rodata") const char rsh_06_str_000043A4[8] = "sha_6_3";
+__declspec(section ".rodata") const char rsh_06_str_000043AC[12] = "sha_1_1_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000043B8[12] = "sha_1_2_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000043C4[12] = "sha_1_3_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000043D0[12] = "sha_1_4_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000043DC[12] = "sha_1_5_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000043E8[12] = "sha_6_1_c\0\0";
+__declspec(section ".rodata") const char str_000043F4[12] = "sha_6_2_c\0\0";
+__declspec(section ".rodata") const char str_00004400[12] = "sha_6_3_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000440C[8] = "bou_1\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004414[8] = "bou_2\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000441C[8] = "bou_3\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004424[8] = "bou_4\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000442C[8] = "bou_1_c";
+__declspec(section ".rodata") const char rsh_06_str_00004434[8] = "bou_2_c";
+__declspec(section ".rodata") const char rsh_06_str_0000443C[8] = "bou_3_c";
+__declspec(section ".rodata") const char rsh_06_str_00004444[8] = "bou_4_c";
+__declspec(section ".rodata") const char rsh_06_str_0000444C[8] = "jimen\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004454[8] = "yama\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000445C[8] = "iwayama";
+__declspec(section ".rodata") const char rsh_06_str_00004464[12] = "hosi_right\0";
+__declspec(section ".rodata") const char rsh_06_str_00004470[12] = "hosi_left\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000447C[12] = "hosi_center";
+__declspec(section ".rodata") const char str_00004488[16] = "hosi_right_c\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004498[12] = "hosi_left_c";
+__declspec(section ".rodata") const char rsh_06_str_000044A4[16] = "hosi_center_c\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000044B4[8] = "ranpu\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000044BC[24] = "SFX_STG6_TRAIN_BELL1\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000044D4[8] = "gor_04\0";
+__declspec(section ".rodata") const char rsh_06_str_000044DC[24] = "SFX_STG6_TRAIN_MOVE1\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000044F4[8] = "hom_00\0";
+__declspec(section ".rodata") const char rsh_06_str_000044FC[24] = "SFX_STG6_TRAIN_MOVE1_2\0";
+__declspec(section ".rodata") const char rsh_06_str_00004514[28] = "SFX_STG6_TRAIN_MOVE1_2_2\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004530[8] = "pik_00\0";
+__declspec(section ".rodata") const char rsh_06_str_00004538[24] = "SFX_STG6_TRAIN_MOVE1_3\0";
+__declspec(section ".rodata") const char rsh_06_str_00004550[8] = "train\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004558[28] = "SFX_STG6_TRAIN_MOVE1_2_3\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004574[24] = "SFX_STG6_TRAIN_MOVE2\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000458C[24] = "SFX_STG6_TRAIN_MOVE2_2\0";
+__declspec(section ".rodata") const char rsh_06_str_000045A4[24] = "SFX_STG6_TRAIN_MOVE2_3\0";
+__declspec(section ".rodata") const char str_000045BC[28] = "SFX_STG6_TRAIN_MOVE2_2_2\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000045D8[8] = "ranpu_c";
+__declspec(section ".rodata") const char str_000045E0[12] = "pika_1_1\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000045EC[12] = "pika_1_2\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000045F8[12] = "pika_1_3\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004604[12] = "pika_1_4\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004610[8] = "pika_2\0";
+__declspec(section ".rodata") const char rsh_06_str_00004618[8] = "pika_3\0";
+__declspec(section ".rodata") const char rsh_06_str_00004620[8] = "pika_4\0";
+__declspec(section ".rodata") const char rsh_06_str_00004628[8] = "pika_5\0";
+__declspec(section ".rodata") const char rsh_06_str_00004630[8] = "pika_6\0";
+__declspec(section ".rodata") const char rsh_06_str_00004638[12] = "pika_1_1_c\0";
+__declspec(section ".rodata") const char rsh_06_str_00004644[12] = "pika_1_2_c\0";
+__declspec(section ".rodata") const char rsh_06_str_00004650[12] = "pika_1_3_c\0";
+__declspec(section ".rodata") const char str_0000465C[12] = "pika_1_4_c\0";
+__declspec(section ".rodata") const char rsh_06_str_00004668[12] = "pika_6_c\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004674[8] = "hom_10\0";
+__declspec(section ".rodata") const char rsh_06_str_0000467C[8] = "hom_11\0";
+__declspec(section ".rodata") const char rsh_06_str_00004684[8] = "hom_12\0";
+__declspec(section ".rodata") const char rsh_06_str_0000468C[12] = "rsh_06_a\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004698[8] = "train_7";
+__declspec(section ".rodata") const char rsh_06_str_000046A0[8] = "train_8";
+__declspec(section ".rodata") const char rsh_06_str_000046A8[12] = "renketu_6\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000046B4[12] = "renketu_7\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000046C0[8] = "train_1";
+__declspec(section ".rodata") const char rsh_06_str_000046C8[8] = "train_6";
+__declspec(section ".rodata") const char rsh_06_str_000046D0[12] = "renketu_1\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000046DC[12] = "renketu_5\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000046E8[16] = "ENV_STG6_RSH2\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000046F8[8] = "renketu";
+__declspec(section ".rodata") const char rsh_06_str_00004700[12] = "renketu_2\0\0";
+__declspec(section ".rodata") const char str_0000470C[12] = "renketu_3\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004718[12] = "renketu_4\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004724[12] = "rsh_02_a\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004730[8] = "nidome\0";
+__declspec(section ".rodata") const char rsh_06_str_00004738[8] = "w_bero\0";
+__declspec(section ".rodata") const char rsh_06_str_00004740[12] = "rsh_05_a\0\0\0";
+__declspec(section ".rodata") const char str_0000474C[8] = "moa_a\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004754[8] = "moa_b\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000475C[8] = "kinopio";
+__declspec(section ".rodata") const char rsh_06_str_00004764[8] = "cook\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000476C[8] = "powan\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004774[8] = "sarary\0";
+__declspec(section ".rodata") const char rsh_06_str_0000477C[8] = "rose\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004784[8] = "papa\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000478C[8] = "mama\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004794[8] = "konari\0";
+__declspec(section ".rodata") const char rsh_06_str_0000479C[24] = "SFX_STG6_MOAMOA_VOICE2\0";
+__declspec(section ".rodata") const char rsh_06_str_000047B4[8] = "base\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000047BC[12] = "c_g_moamoa\0";
+__declspec(section ".rodata") const char rsh_06_str_000047C8[16] = "stg6_rsh_244\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000047D8[12] = "group339\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000047E4[12] = "group340\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000047F0[12] = "group341\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000047FC[8] = "senro\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004804[4] = "Z_1";
+__declspec(section ".rodata") const char rsh_06_str_00004808[28] = "SFX_STG6_MOA_TOGETHER_MOVE1";
+__declspec(section ".rodata") const char rsh_06_str_00004824[24] = "SFX_VOICE_MARIO_FIND1_3";
+__declspec(section ".rodata") const char str_0000483C[8] = "eff0\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004844[8] = "eff1\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_0000484C[28] = "SFX_STG6_MOA_TOGETHER_MOVE2";
+__declspec(section ".rodata") const char rsh_06_str_00004868[12] = "group166\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004874[24] = "SFX_STG6_MOAMOA_G_LEG1\0";
+__declspec(section ".rodata") const char rsh_06_str_0000488C[4] = "H_1";
+__declspec(section ".rodata") const char rsh_06_str_00004890[24] = "SFX_STG6_MOAMOA_G_LEG2\0";
+__declspec(section ".rodata") const char rsh_06_str_000048A8[24] = "SFX_STG6_MOAMOA_G_LEG3\0";
+__declspec(section ".rodata") const char rsh_06_str_000048C0[4] = "H_2";
+__declspec(section ".rodata") const char rsh_06_str_000048C4[4] = "S_2";
+__declspec(section ".rodata") const char rsh_06_str_000048C8[8] = "M_I_Y\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000048D0[16] = "stg6_rsh_245\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000048E0[16] = "stg6_rsh_246_02";
+__declspec(section ".rodata") const char rsh_06_str_000048F0[16] = "stg6_rsh_246_03";
+__declspec(section ".rodata") const char rsh_06_str_00004900[24] = "SFX_STG6_MOAMOA_G_LEG4\0";
+__declspec(section ".rodata") const char rsh_06_str_00004918[4] = "P_1";
+__declspec(section ".rodata") const char rsh_06_str_0000491C[4] = "S_3";
+__declspec(section ".rodata") const char rsh_06_str_00004920[16] = "stg6_rsh_246_01";
+__declspec(section ".rodata") const char rsh_06_str_00004930[8] = "M_S_1\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004938[16] = "stg6_rsh_247\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004948[28] = "SFX_STG6_MOAMOA_G_ESCAPE1\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004964[12] = "rsh_01_a\0\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004970[16] = "BGM_EVT_POWAN1\0";
+__declspec(section ".rodata") const char str_00004980[16] = "ENV_STG6_RSH1_3";
+__declspec(section ".rodata") const char rsh_06_str_00004990[16] = "BGM_STG6_HOM1\0\0";
+__declspec(section ".rodata") const char rsh_06_str_000049A0[16] = "BGM_EVT_DANGER4";
+__declspec(section ".rodata") const char rsh_06_str_000049B0[16] = "BGM_STG6_PIK1\0\0";
+__declspec(section ".rodata") const char str_000049C0[16] = "BGM_STG0_GOR1\0\0";
+__declspec(section ".rodata") const f32 float_1_rsh_00014470[1] = {1.0f};
+__declspec(section ".rodata") const f32 float_15_rsh_00014474[1] = {15.0f};
+__declspec(section ".rodata") const f32 float_1p8_rsh_00014478[1] = {1.8f};
+__declspec(section ".rodata") const f64 double_to_int_mask_rsh_00014480 = 4503599627370496.0;
+__declspec(section ".rodata") const f64 double_to_int_rsh_00014488 = 4503601774854144.0;
+__declspec(section ".rodata") const f32 zero_rsh_00014490[1] = {0.0f};
+__declspec(section ".rodata") const f32 float_neg5000_rsh_00014494 = -5000.0f;
+__declspec(section ".rodata") const f32 float_neg1_rsh_00014498 = -1.0f;
+__declspec(section ".rodata") const f32 float_6p2832_rsh_0001449c[1] = {6.2831855f};
+__declspec(section ".rodata") const f32 float_360_rsh_000144a0[1] = {360.0f};
+__declspec(section ".rodata") const f32 float_0p00761_rsh_000144a4 = 0.00761f;
+__declspec(section ".rodata") const f32 float_0p16605_rsh_000144a8 = 0.16605f;
+__declspec(section ".rodata") const f32 float_3p1416_rsh_000144ac = 3.1415927f;
+__declspec(section ".rodata") const f32 float_1p5708_rsh_000144b0 = 1.5707964f;
+__declspec(section ".rodata") const f32 float_4p7124_rsh_000144b4 = 4.712389f;
+__declspec(section ".rodata") const f32 float_0p03705_rsh_000144b8 = 0.03705f;
+__declspec(section ".rodata") const f32 float_0p4967_rsh_000144bc = 0.4967f;
+__declspec(section ".rodata") const char rsh_06_str_00004A20[24] = "SFX_STG6_MOAMOA_VOICE1\0";
+__declspec(section ".rodata") const f32 float_200_rsh_000144d8[1] = {200.0f};
+__declspec(section ".rodata") const f32 float_30_rsh_000144dc[1] = {30.0f};
+__declspec(section ".rodata") const char rsh_06_str_00004A40[4] = "D\0\0";
+__declspec(section ".rodata") const char rsh_06_str_00004A44[4] = "R\0\0";
+__declspec(section ".rodata") const f32 float_0p5_rsh_000144e8[1] = {0.5f};
+__declspec(section ".rodata") const f32 float_32767_rsh_000144ec[1] = {32767.0f};
+__declspec(section ".rodata") const f32 float_0p1_rsh_000144f0[1] = {0.1f};
+__declspec(section ".rodata") const f32 float_0p03_rsh_000144f4[1] = {0.03f};
+__declspec(section ".rodata") const f32 float_100_rsh_000144f8[1] = {100.0f};
+__declspec(section ".rodata") const f32 float_50_rsh_000144fc[1] = {50.0f};
+__declspec(section ".rodata") const f32 float_5_rsh_00014500[1] = {5.0f};
+__declspec(section ".rodata") const f32 float_215_rsh_00014504[1] = {215.0f};
+__declspec(section ".rodata") const f32 float_0p3_rsh_00014508[1] = {0.3f};
+__declspec(section ".rodata") const f32 float_0p2_rsh_0001450c = 0.19999999f;
+__declspec(section ".rodata") const f32 float_31_rsh_00014510[1] = {31.0f};
+__declspec(section ".rodata") const f32 float_2_rsh_00014514[1] = {2.0f};
+__declspec(section ".rodata") const f32 float_0p4_rsh_00014518[1] = {0.4f};
+__declspec(section ".rodata") const f32 float_1p5_rsh_0001451c[1] = {1.5f};
+__declspec(section ".rodata") const f32 float_0p8_rsh_00014520[1] = {0.8f};
+__declspec(section ".rodata") const f32 float_300_rsh_00014524[1] = {300.0f};
+__declspec(section ".rodata") const f32 float_600_rsh_00014528[1] = {600.0f};
+__declspec(section ".rodata") const f32 float_0p25_rsh_0001452c[1] = {0.25f};
+__declspec(section ".rodata") const f32 float_neg45_rsh_00014530 = -45.0f;
+__declspec(section ".rodata") const f32 float_90_rsh_00014534[1] = {90.0f};
+__declspec(section ".rodata") const f32 float_180_rsh_00014538[1] = {180.0f};
+__declspec(section ".rodata") const f32 float_0p9_rsh_0001453c[1] = {0.9f};
+__declspec(section ".rodata") const f32 float_135_rsh_00014540[1] = {135.0f};
+__declspec(section ".rodata") const f32 float_0p2_rsh_00014544[1] = {0.2f};
+__declspec(section ".rodata") const f32 float_0p1_rsh_00014548 = 0.10000001f;
+__declspec(section ".rodata") const f32 float_neg100_rsh_0001454c = -100.0f;
+__declspec(section ".rodata") const f32 float_225_rsh_00014550[1] = {225.0f};
+__declspec(section ".rodata") const f32 float_1p1_rsh_00014554[1] = {1.1f};
+__declspec(section ".rodata") const f32 float_1p02_rsh_00014558[1] = {1.02f};
+__declspec(section ".rodata") const f32 float_0p20944_rsh_0001455c[1] = {0.20943952f};
+__declspec(section ".rodata") const f32 float_neg1000_rsh_00014560 = -1000.0f;
+__declspec(section ".rodata") const f32 float_250_rsh_00014564[1] = {250.0f};
+__declspec(section ".rodata") const f32 float_450_rsh_00014568[1] = {450.0f};
+__declspec(section ".rodata") const f32 float_neg50_rsh_0001456c = -50.0f;
+__declspec(section ".rodata") const f32 float_neg1870_rsh_00014570 = -1870.0f;
+__declspec(section ".rodata") const f32 float_45_rsh_00014574[1] = {45.0f};
+__declspec(section ".rodata") const f32 float_60_rsh_00014578[1] = {60.0f};
+__declspec(section ".rodata") const f32 float_1000_rsh_0001457c[1] = {1000.0f};
+__declspec(section ".rodata") const f32 float_20_rsh_00014580[1] = {20.0f};
+__declspec(section ".rodata") const f32 float_10_rsh_00014584[1] = {10.0f};
+__declspec(section ".rodata") const f32 float_35_rsh_00014588[1] = {35.0f};
+__declspec(section ".rodata") const f32 float_65_rsh_0001458c[1] = {65.0f};
+__declspec(section ".rodata") const f32 float_40_rsh_00014590[1] = {40.0f};
+__declspec(section ".rodata") const f32 float_1E06_rsh_00014594[1] = {1000000.0f};
+__declspec(section ".rodata") const f64 double_30_rsh_00014598 = 30.0;
+__declspec(section ".rodata") const char rsh_06_str_00004B00[12] = "offscreen\0\0";
+__declspec(section ".rodata") const f32 float_neg500_rsh_000145ac = -500.0f;
+__declspec(section ".rodata") const f32 float_115_rsh_000145b0 = 115.0f;
+__declspec(section ".rodata") const f32 float_70_rsh_000145b4 = 70.0f;
+__declspec(section ".rodata") const f32 float_neg10_rsh_000145b8 = -10.0f;
+__declspec(section ".rodata") const char zero_rsh_000145bc[1] = { (char)0x00000000 };
+__declspec(section ".rodata") const char rsh_06_str_00004B20[4] = "J\0\0";
+__declspec(section ".rodata") const u32 gap_03_00004B24_rodata = 0x00000000;
 
-asm s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r3, str_000047B4@ha
-	stw r0, 0x14(r1)
-	addi r3, r3, str_000047B4@l
-	bl npcNameToPtr
-	lwz r3, 0x104(r3)
-	bl animPoseGetLoopTimes
-	lis r3, float_1_rsh_00014470@ha
-	lfs f0, float_1_rsh_00014470@l(r3)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @1
-	li r3, 0x2
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static void resha_tev(MapTevCallbackInfo* info) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	mr r4, r3
-	li r3, 0x7
-	stw r0, 0x14(r1)
-	bl envAddTev
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x20(r1)
-	psq_st f31, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	lis r4, 0xfd05
-	mr r31, r3
-	addi r4, r4, 0xf80
-	bl evtGetFloat
-	lis r3, gp@ha
-	lis r0, 0x4330
-	addi r4, r3, gp@l
-	stw r0, 0x8(r1)
-	lwz r5, 0x0(r4)
-	lis r3, double_to_int_mask_rsh_00014480@ha
-	addi r4, r3, double_to_int_mask_rsh_00014480@l
-	fabs f31, f1
-	lwz r0, 0x1c(r5)
-	lis r3, float_15_rsh_00014474@ha
-	lfd f2, 0x0(r4)
-	stw r0, 0xc(r1)
-	lfs f0, float_15_rsh_00014474@l(r3)
-	lfd f1, 0x8(r1)
-	fsubs f1, f1, f2
-	fdivs f1, f1, f0
-	bl sin
-	lis r3, float_1p8_rsh_00014478@ha
-	lis r4, 0xfe36
-	lfs f0, float_1p8_rsh_00014478@l(r3)
-	frsp f1, f1
-	mr r3, r31
-	addi r4, r4, 0x3c8a
-	fmuls f0, f0, f31
-	fmuls f1, f0, f1
-	bl evtSetFloat
-	li r3, 0x2
-	psq_l f31, 0x28(r1), 0, 0
-	lwz r0, 0x34(r1)
-	lfd f31, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void moamoa_joint_position(Moamoa* moa, Vec* out) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stfd f31, 0x30(r1)
-	psq_st f31, 0x38(r1), 0, 0
-	stmw r30, 0x28(r1)
-	lis r5, str_000047B4@ha
-	mr r30, r3
-	addi r3, r5, str_000047B4@l
-	mr r31, r4
-	bl npcNameToPtr
-	lwz r3, 0x104(r3)
-	bl animPoseGetAnimPosePtr
-	lis r4, wp@ha
-	lha r8, 0x48(r30)
-	lwz r9, wp@l(r4)
-	lis r6, 0x4330
-	slwi r0, r8, 1
-	lha r7, 0x4a(r30)
-	add r4, r9, r0
-	slwi r8, r8, 2
-	lha r0, 0x570(r4)
-	xoris r4, r7, 0x8000
-	lis r5, double_to_int_rsh_00014488@ha
-	stw r4, 0x1c(r1)
-	addi r7, r5, double_to_int_rsh_00014488@l
-	add r9, r9, r8
-	xoris r5, r0, 0x8000
-	stw r6, 0x18(r1)
-	lfd f2, 0x0(r7)
-	mr r4, r31
-	lfd f0, 0x18(r1)
-	stw r5, 0x24(r1)
-	fsubs f1, f0, f2
-	lha r8, 0x672(r9)
-	stw r6, 0x20(r1)
-	lha r0, 0x670(r9)
-	mulli r8, r8, 0xc
-	lfd f0, 0x20(r1)
-	lwz r3, 0x15c(r3)
-	fsubs f0, f0, f2
-	mulli r0, r0, 0xc
-	lwz r3, 0x0(r3)
-	fdivs f31, f1, f0
-	add r30, r3, r8
-	add r3, r3, r0
-	fmr f1, f31
-	bl PSVECScale
-	lis r4, float_1_rsh_00014470@ha
-	mr r3, r30
-	addi r5, r4, float_1_rsh_00014470@l
-	addi r4, r1, 0x8
-	lfs f0, 0x0(r5)
-	fsubs f1, f0, f31
-	bl PSVECScale
-	mr r3, r31
-	mr r5, r31
-	addi r4, r1, 0x8
-	bl PSVECAdd
-	psq_l f31, 0x38(r1), 0, 0
-	lfd f31, 0x30(r1)
-	lmw r30, 0x28(r1)
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm static void ext_moamoa_dispent(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r3, wp@ha
-	stw r0, 0x14(r1)
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lhz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @1
-	lis r3, zero_rsh_00014490@ha
-	lis r4, ext_disp@ha
-	addi r6, r3, zero_rsh_00014490@l
-	lfs f1, 0x0(r6)
-	addi r5, r4, ext_disp@l
-	li r3, 0x4
-	li r4, 0x1
-	li r6, 0x0
-	bl dispEntry
-	lis r3, zero_rsh_00014490@ha
-	lis r4, ext_shadow_disp@ha
-	addi r6, r3, zero_rsh_00014490@l
-	lfs f1, 0x0(r6)
-	addi r5, r4, ext_shadow_disp@l
-	li r3, 0x4
-	li r4, 0x2
-	li r6, 0x0
-	bl dispEntry
-	@1:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lhz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @2
-	lis r3, float_neg5000_rsh_00014494@ha
-	lis r4, ext_disp@ha
-	addi r6, r3, float_neg5000_rsh_00014494@l
-	lfs f1, 0x0(r6)
-	addi r5, r4, ext_disp@l
-	li r3, 0x1
-	li r4, 0x1
-	li r6, 0x0
-	bl dispEntry
-	lis r3, float_neg5000_rsh_00014494@ha
-	lis r4, ext_shadow_disp@ha
-	addi r6, r3, float_neg5000_rsh_00014494@l
-	lfs f1, 0x0(r6)
-	addi r5, r4, ext_shadow_disp@l
-	li r3, 0x1
-	li r4, 0x2
-	li r6, 0x0
-	bl dispEntry
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static void ext_moamoa_main(void) {
-	nofralloc
-	stwu r1, -0x150(r1)
-	mflr r0
-	stw r0, 0x154(r1)
-	stfd f31, 0x140(r1)
-	psq_st f31, 0x148(r1), 0, 0
-	stfd f30, 0x130(r1)
-	psq_st f30, 0x138(r1), 0, 0
-	stfd f29, 0x120(r1)
-	psq_st f29, 0x128(r1), 0, 0
-	stfd f28, 0x110(r1)
-	psq_st f28, 0x118(r1), 0, 0
-	stfd f27, 0x100(r1)
-	psq_st f27, 0x108(r1), 0, 0
-	stfd f26, 0xf0(r1)
-	psq_st f26, 0xf8(r1), 0, 0
-	stmw r17, 0xb4(r1)
-	bl marioGetPtr
-	mr r28, r3
-	li r3, 0x0
-	bl partyGetPtr
-	mr r21, r3
-	li r3, 0x4
-	bl camGetPtr
-	lhz r0, 0x2e(r28)
-	lis r4, zero_rsh_00014490@ha
-	lfs f31, zero_rsh_00014490@l(r4)
-	mr r23, r3
-	cmplwi r0, 0x12
-	li r25, 0x0
-	bne @1
-	lis r3, wp@ha
-	lwz r4, wp@l(r3)
-	lha r3, 0x40(r4)
-	addi r0, r3, 0x1
-	sth r0, 0x40(r4)
-	b @2
-	@1:
-	lis r3, wp@ha
-	li r0, 0x0
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	sth r0, 0x40(r3)
-	@2:
-	lhz r0, 0x2e(r28)
-	cmplwi r0, 0x0
-	bne @3
-	lis r3, wp@ha
-	addi r5, r3, wp@l
-	lwz r4, 0x0(r5)
-	lha r3, 0x42(r4)
-	addi r0, r3, 0x1
-	sth r0, 0x42(r4)
-	lwz r3, 0x0(r5)
-	lha r0, 0x42(r3)
-	cmpwi r0, 0x3e8
-	ble @4
-	li r0, 0x3e8
-	sth r0, 0x42(r3)
-	b @4
-	@3:
-	lis r3, wp@ha
-	li r0, 0x0
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	sth r0, 0x42(r3)
-	@4:
-	lwz r0, 0x0(r21)
-	rlwinm. r0, r0, 0, 23, 23
-	beq @5
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x10
-	sth r0, 0x0(r3)
-	b @6
-	@5:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 28, 26
-	sth r0, 0x0(r3)
-	@6:
-	lis r4, float_neg1_rsh_00014498@ha
-	lis r3, wp@ha
-	addi r5, r4, float_neg1_rsh_00014498@l
-	addi r4, r3, wp@l
-	lfs f0, 0x0(r5)
-	lwz r3, 0x0(r4)
-	stfs f0, 0x55c(r3)
-	lwz r3, 0x0(r4)
-	stfs f0, 0x560(r3)
-	lbz r0, 0x31(r21)
-	cmpwi r0, 0x5
-	bne @7
-	lwz r0, 0x0(r21)
-	rlwinm. r0, r0, 0, 23, 23
-	beq @7
-	bl cloudGetBreathDir
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	stfs f1, 0x55c(r3)
-	bl cloudGetBreathDist
-	lis r3, wp@ha
-	lis r4, float_6p2832_rsh_0001449c@ha
-	addi r10, r3, wp@l
-	lis r7, float_0p00761_rsh_000144a4@ha
-	lwz r5, 0x0(r10)
-	lis r3, float_360_rsh_000144a0@ha
-	addi r8, r3, float_360_rsh_000144a0@l
-	addi r9, r4, float_6p2832_rsh_0001449c@l
-	stfs f1, 0x560(r5)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	addi r4, r3, float_3p1416_rsh_000144ac@l
-	lis r6, float_0p16605_rsh_000144a8@ha
-	lwz r3, 0x0(r10)
-	lis r5, float_1_rsh_00014470@ha
-	lfs f2, 0x0(r9)
-	lfs f1, 0x55c(r3)
-	lfs f0, 0x0(r8)
-	fmuls f2, f2, f1
-	lfs f1, 0x0(r4)
-	lfs f4, float_0p00761_rsh_000144a4@l(r7)
-	lfs f3, float_0p16605_rsh_000144a8@l(r6)
-	fdivs f5, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r5)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @8
-	lis r4, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @9
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @10
-	@9:
-	fsubs f0, f5, f1
-	fsubs f5, f1, f0
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @10
-	@8:
-	lis r4, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r4)
-	fcmpo cr0, f5, f0
-	bge @11
-	fsubs f5, f5, f1
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	fneg f4, f4
-	b @10
-	@11:
-	lis r4, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r4)
-	fsubs f5, f1, f0
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	fneg f4, f4
-	@10:
-	lfs f1, 0x560(r3)
-	lis r9, wp@ha
-	lfs f0, 0x58(r21)
-	lis r4, float_6p2832_rsh_0001449c@ha
-	addi r8, r4, float_6p2832_rsh_0001449c@l
-	lis r6, float_0p03705_rsh_000144b8@ha
-	fmadds f0, f1, f4, f0
-	lis r4, float_360_rsh_000144a0@ha
-	addi r7, r4, float_360_rsh_000144a0@l
-	lis r5, float_0p4967_rsh_000144bc@ha
-	lis r4, float_3p1416_rsh_000144ac@ha
-	addi r10, r9, wp@l
-	stfs f0, 0x564(r3)
-	lis r3, float_1_rsh_00014470@ha
-	lfs f3, 0x0(r8)
-	lfs f0, 0x5c(r21)
-	lwz r9, 0x0(r10)
-	lfs f1, float_3p1416_rsh_000144ac@l(r4)
-	stfs f0, 0x568(r9)
-	lfs f0, 0x0(r7)
-	lwz r7, 0x0(r10)
-	lfs f5, float_0p03705_rsh_000144b8@l(r6)
-	lfs f2, 0x55c(r7)
-	lfs f4, float_0p4967_rsh_000144bc@l(r5)
-	fmuls f2, f3, f2
-	lfs f3, float_1_rsh_00014470@l(r3)
-	fdivs f2, f2, f0
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @12
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @13
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	b @14
-	@13:
-	fsubs f0, f2, f1
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fneg f5, f5
-	b @14
-	@12:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f2, f0
-	bge @15
-	fsubs f2, f2, f1
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fneg f5, f5
-	b @14
-	@15:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f2, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	@14:
-	lfs f1, 0x560(r7)
-	lfs f0, 0x60(r21)
-	fnmsubs f0, f1, f5, f0
-	stfs f0, 0x56c(r7)
-	@7:
-	bl extGetPosePtr
-	lis r5, wp@ha
-	lis r4, str_00004A20@ha
-	addi r27, r5, wp@l
-	mr r30, r3
-	lwz r5, 0x0(r27)
-	addi r24, r4, str_00004A20@l
-	li r26, 0x0
-	li r29, 0x0
-	lwz r31, 0x8(r5)
-	b @16
-	@17:
-	lwz r3, 0xc(r30)
-	lfs f1, 0x8c(r28)
-	lfs f2, 0x94(r28)
-	lfs f3, 0xc(r3)
-	lfs f4, 0x2c(r3)
-	bl angleABf
-	lwz r3, 0x0(r27)
-	stfs f1, 0x550(r3)
-	lwz r3, 0xc(r30)
-	lfs f1, 0x8c(r28)
-	lfs f2, 0x94(r28)
-	lfs f3, 0xc(r3)
-	lfs f4, 0x2c(r3)
-	bl distABf
-	lwz r3, 0x0(r27)
-	stfs f1, 0x554(r3)
-	lhz r0, 0x0(r31)
-	andi. r0, r0, 0x154
-	bne @18
-	lis r3, float_200_rsh_000144d8@ha
-	lfs f1, 0x90(r28)
-	lfs f0, float_200_rsh_000144d8@l(r3)
-	fcmpo cr0, f1, f0
-	ble @18
-	lis r4, wp@ha
-	lis r3, float_30_rsh_000144dc@ha
-	addi r4, r4, wp@l
-	lfs f0, float_30_rsh_000144dc@l(r3)
-	lwz r4, 0x0(r4)
-	lfs f1, 0x554(r4)
-	fcmpo cr0, f1, f0
-	bge @18
-	lis r3, float_1_rsh_00014470@ha
-	lfs f0, float_1_rsh_00014470@l(r3)
-	fadds f31, f31, f0
-	@18:
-	lwz r3, 0x0(r27)
-	lhz r3, 0x0(r3)
-	clrlwi. r0, r3, 31
-	beq @19
-	rlwinm. r0, r3, 0, 29, 29
-	bne @19
-	bl marioKeyOffChk
-	cmpwi r3, 0x0
-	bne @19
-	bl marioCtrlOffChk
-	cmpwi r3, 0x0
-	bne @19
-	cmpwi r25, 0x0
-	bne @19
-	lhz r0, 0x0(r31)
-	andi. r0, r0, 0x154
-	bne @19
-	mr r3, r30
-	mr r4, r31
-	bl moamoa_hit_check
-	mr r21, r3
-	cmpwi r21, 0x1
-	bne @20
-	lhz r0, 0x0(r31)
-	lis r4, str_000041E0@ha
-	lis r3, str_000041D0@ha
-	lis r5, wp@ha
-	ori r6, r0, 0x4
-	li r0, 0x24
-	sth r6, 0x0(r31)
-	addi r20, r4, str_000041E0@l
-	addi r25, r3, str_000041D0@l
-	sth r0, 0x2(r31)
-	lwzu r4, wp@l(r5)
-	lha r3, 0x38(r4)
-	addi r0, r3, 0x1
-	sth r0, 0x38(r4)
-	lhz r0, 0x0(r31)
-	lwz r3, 0x0(r5)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r22, r3, 0x50
-	beq @21
-	lbz r4, 0x4c(r31)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r25, 0x0(r3)
-	blt @22
-	lwz r20, 0x4(r3)
-	@22:
-	cmplwi r4, 0xa
-	bne @21
-	lis r3, str_000048C4@ha
-	addi r20, r3, str_000048C4@l
-	@21:
-	lis r3, wp@ha
-	li r21, 0x0
-	addi r17, r3, wp@l
-	b @23
-	@24:
-	mr r3, r22
-	mr r4, r25
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @25
-	mr r4, r20
-	addi r3, r22, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @26
-	@25:
-	addi r21, r21, 0x1
-	addi r22, r22, 0x28
-	@23:
-	lwz r3, 0x0(r17)
-	lwz r0, 0x4c(r3)
-	cmpw r21, r0
-	blt @24
-	@26:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4c(r3)
-	cmpw r21, r0
-	bge @27
-	lha r0, 0x3c(r31)
-	cmpw r0, r21
-	beq @27
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @28
-	lis r4, str_00004A40@ha
-	mr r3, r20
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @27
-	@28:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @29
-	lis r4, str_00004A44@ha
-	mr r3, r20
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @27
-	@29:
-	lis r3, gp@ha
-	sth r21, 0x3c(r31)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r31)
-	stw r0, 0x40(r31)
-	@27:
-	li r25, 0x1
-	b @19
-	@20:
-	cmpwi r21, 0x2
-	beq @30
-	cmpwi r21, 0x4
-	bne @31
-	@30:
-	lhz r0, 0x0(r31)
-	lis r4, str_000041E0@ha
-	lis r3, str_000041D0@ha
-	lis r5, wp@ha
-	ori r6, r0, 0xc
-	li r0, 0x2f
-	sth r6, 0x0(r31)
-	addi r18, r4, str_000041E0@l
-	addi r19, r3, str_000041D0@l
-	sth r0, 0x2(r31)
-	lwzu r4, wp@l(r5)
-	lha r3, 0x38(r4)
-	addi r0, r3, 0x1
-	sth r0, 0x38(r4)
-	lhz r0, 0x0(r31)
-	lwz r3, 0x0(r5)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r22, r3, 0x50
-	beq @32
-	lbz r4, 0x4c(r31)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r19, 0x0(r3)
-	blt @33
-	lwz r18, 0x4(r3)
-	@33:
-	cmplwi r4, 0xa
-	bne @32
-	lis r3, str_000048C4@ha
-	addi r18, r3, str_000048C4@l
-	@32:
-	lis r3, wp@ha
-	li r20, 0x0
-	addi r17, r3, wp@l
-	b @34
-	@35:
-	mr r3, r22
-	mr r4, r19
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @36
-	mr r4, r18
-	addi r3, r22, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @37
-	@36:
-	addi r20, r20, 0x1
-	addi r22, r22, 0x28
-	@34:
-	lwz r3, 0x0(r17)
-	lwz r0, 0x4c(r3)
-	cmpw r20, r0
-	blt @35
-	@37:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4c(r3)
-	cmpw r20, r0
-	bge @38
-	lha r0, 0x3c(r31)
-	cmpw r0, r20
-	beq @38
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @39
-	lis r4, str_00004A40@ha
-	mr r3, r18
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @38
-	@39:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @40
-	lis r4, str_00004A44@ha
-	mr r3, r18
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @38
-	@40:
-	lis r3, gp@ha
-	sth r20, 0x3c(r31)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r31)
-	stw r0, 0x40(r31)
-	@38:
-	cmpwi r21, 0x4
-	beq @19
-	li r25, 0x1
-	b @19
-	@31:
-	cmpwi r21, 0x3
-	bne @19
-	lis r3, wp@ha
-	lhz r0, 0x0(r31)
-	addi r4, r3, wp@l
-	lwz r7, 0x0(r4)
-	ori r5, r0, 0x84
-	lis r4, float_0p5_rsh_000144e8@ha
-	li r0, 0x30
-	lfs f2, 0x55c(r7)
-	addi r6, r4, float_0p5_rsh_000144e8@l
-	lfs f1, 0x550(r7)
-	lis r3, vec3_rsh_00013d88@ha
-	addi r4, r3, vec3_rsh_00013d88@l
-	lfs f0, 0x0(r6)
-	sth r5, 0x0(r31)
-	fadds f1, f2, f1
-	sth r0, 0x2(r31)
-	fmuls f26, f1, f0
-	lwz r3, 0x0(r4)
-	lwz r0, 0x4(r4)
-	stw r3, 0x8(r31)
-	stw r0, 0xc(r31)
-	lwz r0, 0x8(r4)
-	stw r0, 0x10(r31)
-	bl rand
-	xoris r4, r3, 0x8000
-	lis r0, 0x4330
-	lis r3, float_6p2832_rsh_0001449c@ha
-	stw r4, 0x94(r1)
-	lfs f0, float_6p2832_rsh_0001449c@l(r3)
-	lis r5, double_to_int_rsh_00014488@ha
-	stw r0, 0x90(r1)
-	lis r3, float_360_rsh_000144a0@ha
-	lfd f3, double_to_int_rsh_00014488@l(r5)
-	fmuls f1, f0, f26
-	lfs f0, float_360_rsh_000144a0@l(r3)
-	lis r4, float_32767_rsh_000144ec@ha
-	lfd f2, 0x90(r1)
-	lis r5, float_0p00761_rsh_000144a4@ha
-	fdivs f29, f1, f0
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f5, float_0p00761_rsh_000144a4@l(r5)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r3, float_1_rsh_00014470@ha
-	fsubs f3, f2, f3
-	lfs f2, float_32767_rsh_000144ec@l(r4)
-	lis r4, float_0p1_rsh_000144f0@ha
-	addi r6, r4, float_0p1_rsh_000144f0@l
-	fcmpo cr0, f29, f1
-	fdivs f2, f3, f2
-	lfs f0, 0x0(r6)
-	lis r4, float_0p16605_rsh_000144a8@ha
-	lfs f4, float_0p16605_rsh_000144a8@l(r4)
-	lfs f3, float_1_rsh_00014470@l(r3)
-	fmadds f30, f2, f0, f0
-	cror eq, lt, eq
-	bne @41
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f29, f1
-	cror eq, lt, eq
-	bne @42
-	fmuls f0, f29, f29
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f29
-	b @43
-	@42:
-	fsubs f0, f29, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	b @43
-	@41:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f29, f0
-	bge @44
-	fsubs f1, f29, f1
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	b @43
-	@44:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f29, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	@43:
-	fmuls f0, f30, f5
-	stfs f0, 0x14(r31)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_rsh_00014488@ha
-	stw r3, 0x94(r1)
-	addi r5, r4, double_to_int_rsh_00014488@l
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x90(r1)
-	addi r4, r3, float_32767_rsh_000144ec@l
-	lfd f2, 0x0(r5)
-	lis r3, float_0p03_rsh_000144f4@ha
-	lfd f1, 0x90(r1)
-	addi r6, r3, float_0p03_rsh_000144f4@l
-	lfs f0, 0x0(r4)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	fsubs f2, f1, f2
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lis r3, float_1_rsh_00014470@ha
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	fdivs f2, f2, f0
-	lfs f0, 0x0(r6)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	fmadds f0, f2, f0, f0
-	lfs f2, float_1_rsh_00014470@l(r3)
-	fcmpo cr0, f29, f1
-	stfs f0, 0x1c(r31)
-	cror eq, lt, eq
-	bne @45
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f29, f1
-	cror eq, lt, eq
-	bne @46
-	fmuls f0, f29, f29
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @47
-	@46:
-	fsubs f0, f29, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @47
-	@45:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f29, f0
-	bge @48
-	fsubs f0, f29, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @47
-	@48:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f29, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@47:
-	fneg f0, f4
-	lis r4, str_000041E0@ha
-	lis r3, str_000041D0@ha
-	li r0, 0x78
-	lis r5, wp@ha
-	addi r21, r4, str_000041E0@l
-	fmuls f0, f30, f0
-	addi r20, r3, str_000041D0@l
-	stfs f0, 0x20(r31)
-	sth r0, 0x18(r31)
-	lwzu r4, wp@l(r5)
-	lha r3, 0x38(r4)
-	addi r0, r3, 0x1
-	sth r0, 0x38(r4)
-	lhz r0, 0x0(r31)
-	lwz r3, 0x0(r5)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r19, r3, 0x50
-	beq @49
-	lbz r4, 0x4c(r31)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r20, 0x0(r3)
-	blt @50
-	lwz r21, 0x4(r3)
-	@50:
-	cmplwi r4, 0xa
-	bne @49
-	lis r3, str_000048C4@ha
-	addi r21, r3, str_000048C4@l
-	@49:
-	lis r3, wp@ha
-	li r18, 0x0
-	addi r22, r3, wp@l
-	b @51
-	@52:
-	mr r3, r19
-	mr r4, r20
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @53
-	mr r4, r21
-	addi r3, r19, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @54
-	@53:
-	addi r18, r18, 0x1
-	addi r19, r19, 0x28
-	@51:
-	lwz r3, 0x0(r22)
-	lwz r0, 0x4c(r3)
-	cmpw r18, r0
-	blt @52
-	@54:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4c(r3)
-	cmpw r18, r0
-	bge @55
-	lha r0, 0x3c(r31)
-	cmpw r0, r18
-	beq @55
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @56
-	lis r4, str_00004A40@ha
-	mr r3, r21
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @55
-	@56:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @57
-	lis r4, str_00004A44@ha
-	mr r3, r21
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @55
-	@57:
-	lis r3, gp@ha
-	sth r18, 0x3c(r31)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r31)
-	stw r0, 0x40(r31)
-	@55:
-	li r25, 0x1
-	@19:
-	lwz r4, 0x0(r27)
-	lhz r0, 0x0(r4)
-	clrlwi. r0, r0, 31
-	beq @58
-	lhz r5, 0x0(r31)
-	andi. r0, r5, 0x155
-	bne @58
-	lhz r3, 0x2e(r28)
-	cmplwi r3, 0x0
-	beq @59
-	subi r0, r3, 0x1
-	clrlwi r0, r0, 16
-	cmplwi r0, 0x1
-	ble @59
-	subi r0, r3, 0x15
-	clrlwi r0, r0, 16
-	cmplwi r0, 0x1
-	ble @59
-	cmplwi r3, 0x1a
-	bne @60
-	@59:
-	lis r3, float_200_rsh_000144d8@ha
-	lfs f1, 0x90(r28)
-	lfs f0, float_200_rsh_000144d8@l(r3)
-	fcmpo cr0, f1, f0
-	ble @58
-	lis r3, float_30_rsh_000144dc@ha
-	lfs f1, 0x554(r4)
-	lfs f0, float_30_rsh_000144dc@l(r3)
-	fcmpo cr0, f1, f0
-	ble @58
-	lis r3, float_100_rsh_000144f8@ha
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	fcmpo cr0, f1, f0
-	bge @58
-	clrlwi. r0, r29, 31
-	beq @58
-	rlwinm. r0, r5, 0, 30, 30
-	beq @61
-	li r0, 0x2
-	sth r0, 0x24(r31)
-	b @58
-	@61:
-	li r0, 0x2
-	sth r0, 0x2(r31)
-	b @58
-	@60:
-	lis r3, float_50_rsh_000144fc@ha
-	lfs f1, 0x554(r4)
-	lfs f0, float_50_rsh_000144fc@l(r3)
-	fcmpo cr0, f1, f0
-	bge @58
-	rlwinm. r0, r5, 0, 30, 30
-	beq @62
-	li r0, 0x1
-	sth r0, 0x24(r31)
-	b @58
-	@62:
-	li r0, 0x1
-	sth r0, 0x2(r31)
-	@58:
-	lwz r3, 0x0(r27)
-	lhz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @63
-	lhz r0, 0x0(r31)
-	andi. r0, r0, 0x444
-	bne @63
-	lis r4, gp@ha
-	lwz r3, 0x4(r3)
-	addi r4, r4, gp@l
-	lwz r4, 0x0(r4)
-	lwz r4, 0x1c(r4)
-	divwu r0, r4, r3
-	mullw r0, r0, r3
-	subf r0, r0, r4
-	cmplw r29, r0
-	bne @63
-	li r3, 0x3e8
-	bl irand
-	cmpwi r3, 0xc8
-	bge @63
-	lis r3, vec3_rsh_00013d94@ha
-	lwz r5, 0xc(r30)
-	addi r8, r3, vec3_rsh_00013d94@l
-	mr r3, r24
-	lwz r7, 0x0(r8)
-	addi r4, r1, 0x50
-	lwz r6, 0x4(r8)
-	lwz r0, 0x8(r8)
-	stw r7, 0x2c(r1)
-	lfs f0, 0xc(r5)
-	stw r6, 0x30(r1)
-	lfs f1, 0x1c(r5)
-	stfs f0, 0x2c(r1)
-	lfs f0, 0x2c(r5)
-	stw r0, 0x34(r1)
-	lwz r6, 0x2c(r1)
-	stfs f1, 0x30(r1)
-	stfs f0, 0x34(r1)
-	lwz r5, 0x30(r1)
-	lwz r0, 0x34(r1)
-	stw r6, 0x50(r1)
-	stw r5, 0x54(r1)
-	stw r0, 0x58(r1)
-	bl psndSFXOn_3D
-	@63:
-	lha r0, 0x2(r31)
-	cmplwi r0, 0x41
-	bgt @64
-	lis r3, jumptable_000183EC@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_000183EC@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@65:
-	entry jt_00009330
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @64
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x94(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x90(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f0, 0x0(r5)
-	lis r4, float_360_rsh_000144a0@ha
-	lfd f1, 0x90(r1)
-	lis r3, zero_rsh_00014490@ha
-	addi r8, r4, float_360_rsh_000144a0@l
-	lis r4, float_6p2832_rsh_0001449c@ha
-	fsubs f1, f1, f2
-	addi r9, r4, float_6p2832_rsh_0001449c@l
-	addi r7, r3, zero_rsh_00014490@l
-	lis r6, float_0p00761_rsh_000144a4@ha
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lfs f2, 0x0(r8)
-	fdivs f1, f1, f0
-	lfs f0, 0x0(r7)
-	lfs f3, 0x0(r9)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r4, float_1_rsh_00014470@ha
-	lfs f5, float_0p00761_rsh_000144a4@l(r6)
-	fmadds f0, f1, f2, f0
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lfs f4, float_0p16605_rsh_000144a8@l(r5)
-	fmuls f0, f3, f0
-	lfs f3, float_1_rsh_00014470@l(r4)
-	fdivs f6, f0, f2
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @66
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @67
-	fmuls f0, f6, f6
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f6
-	b @68
-	@67:
-	fsubs f0, f6, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	b @68
-	@66:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @69
-	fsubs f1, f6, f1
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	b @68
-	@69:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	@68:
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lwz r6, 0xc(r30)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_5_rsh_00014500@ha
-	lfs f2, float_5_rsh_00014500@l(r4)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lfs f0, 0xc(r6)
-	fcmpo cr0, f6, f1
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lis r3, float_1_rsh_00014470@ha
-	fmadds f27, f2, f5, f0
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @70
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @71
-	fmuls f0, f6, f6
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @72
-	@71:
-	fsubs f0, f6, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @72
-	@70:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @73
-	fsubs f0, f6, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @72
-	@73:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@72:
-	lis r3, float_5_rsh_00014500@ha
-	lfs f0, 0x2c(r6)
-	lfs f1, float_5_rsh_00014500@l(r3)
-	fnmsubs f26, f1, f4, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x94(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0x90(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0x90(r1)
-	fsubs f1, f1, f2
-	fdivs f28, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x9c(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x98(r1)
-	lis r5, float_0p2_rsh_0001450c@ha
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lis r4, float_0p3_rsh_00014508@ha
-	lfd f1, 0x98(r1)
-	lis r3, float_0p5_rsh_000144e8@ha
-	lfs f4, float_0p2_rsh_0001450c@l(r5)
-	lis r6, float_215_rsh_00014504@ha
-	fsubs f1, f1, f2
-	lfs f5, float_0p3_rsh_00014508@l(r4)
-	lfs f2, float_215_rsh_00014504@l(r6)
-	fmr f3, f26
-	fmadds f4, f28, f4, f5
-	lha r5, 0x2(r31)
-	fdivs f6, f1, f0
-	lfs f0, float_0p5_rsh_000144e8@l(r3)
-	mr r3, r30
-	mr r4, r31
-	li r6, 0x0
-	fmr f1, f27
-	fmadds f5, f6, f5, f0
-	bl moamoa_jump
-	b @64
-	@74:
-	entry jt_000095DC
-	lha r3, 0x4(r31)
-	subi r3, r3, 0x1
-	extsh. r0, r3
-	sth r3, 0x4(r31)
-	bge @64
-	li r0, 0x0
-	sth r0, 0x4(r31)
-	lha r3, 0x2(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x2(r31)
-	b @64
-	@75:
-	entry jt_00009608
-	li r3, 0x3
-	lwz r5, 0xc(r30)
-	divw r0, r29, r3
-	lis r4, wp@ha
-	lfs f1, 0xc(r5)
-	addi r4, r4, wp@l
-	lfs f2, 0x2c(r5)
-	lwz r4, 0x0(r4)
-	mullw r0, r0, r3
-	subf r0, r0, r29
-	mulli r17, r0, 0xc
-	add r3, r4, r17
-	lfs f3, 0x14(r3)
-	lfs f4, 0x1c(r3)
-	bl distABf
-	lis r3, wp@ha
-	lwz r4, 0xc(r30)
-	lwz r0, wp@l(r3)
-	fmr f27, f1
-	lfs f1, 0xc(r4)
-	add r3, r0, r17
-	lfs f2, 0x2c(r4)
-	lfs f3, 0x14(r3)
-	lfs f4, 0x1c(r3)
-	bl angleABf
-	lis r3, float_31_rsh_00014510@ha
-	lfs f0, float_31_rsh_00014510@l(r3)
-	fcmpo cr0, f27, f0
-	ble @76
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r6, float_0p00761_rsh_000144a4@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	lfs f0, 0x0(r5)
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	fmuls f2, f0, f1
-	lfs f0, float_360_rsh_000144a0@l(r4)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f5, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @77
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @78
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @79
-	@78:
-	fsubs f0, f5, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @79
-	@77:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @80
-	fsubs f1, f5, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @79
-	@80:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@79:
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lwz r6, 0xc(r30)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_30_rsh_000144dc@ha
-	lfs f2, float_30_rsh_000144dc@l(r4)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lfs f0, 0xc(r6)
-	fcmpo cr0, f5, f1
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lis r3, float_1_rsh_00014470@ha
-	fmadds f29, f2, f4, f0
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @81
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @82
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @83
-	@82:
-	fsubs f0, f5, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @83
-	@81:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @84
-	fsubs f0, f5, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @83
-	@84:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@83:
-	lis r3, float_30_rsh_000144dc@ha
-	lfs f0, 0x2c(r6)
-	lfs f1, float_30_rsh_000144dc@l(r3)
-	fnmsubs f28, f1, f4, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x9c(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0x98(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0x98(r1)
-	fsubs f1, f1, f2
-	fdivs f27, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x94(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x90(r1)
-	lis r5, zero_rsh_00014490@ha
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	lfd f1, 0x90(r1)
-	addi r6, r5, zero_rsh_00014490@l
-	lis r3, float_0p4_rsh_00014518@ha
-	addi r5, r4, float_1_rsh_00014470@l
-	fsubs f1, f1, f2
-	addi r4, r3, float_0p4_rsh_00014518@l
-	lfs f2, 0x0(r6)
-	lis r3, float_2_rsh_00014514@ha
-	addi r7, r3, float_2_rsh_00014514@l
-	lis r8, float_215_rsh_00014504@ha
-	fdivs f3, f1, f0
-	lfs f1, 0x0(r5)
-	lfs f0, 0x0(r4)
-	mr r3, r30
-	lfs f5, 0x0(r7)
-	mr r4, r31
-	fmadds f4, f27, f2, f1
-	lha r5, 0x2(r31)
-	fmadds f0, f3, f2, f0
-	lfs f2, float_215_rsh_00014504@l(r8)
-	fmr f1, f29
-	li r6, 0x0
-	fmuls f4, f5, f4
-	fmr f3, f28
-	fmuls f5, f5, f0
-	bl moamoa_jump
-	b @64
-	@76:
-	lis r3, str_000047B4@ha
-	addi r3, r3, str_000047B4@l
-	bl npcNameToPtr
-	lwz r3, 0x104(r3)
-	bl animPoseGetAnimPosePtr
-	lha r7, 0x48(r31)
-	lis r5, 0x4330
-	lis r4, wp@ha
-	lwz r3, 0x15c(r3)
-	addi r6, r4, wp@l
-	stw r5, 0x98(r1)
-	slwi r4, r7, 1
-	lwz r8, 0x0(r6)
-	addi r0, r4, 0x570
-	lha r4, 0x4a(r31)
-	lhax r0, r8, r0
-	lis r6, double_to_int_rsh_00014488@ha
-	xoris r4, r4, 0x8000
-	slwi r7, r7, 2
-	stw r4, 0x9c(r1)
-	xoris r0, r0, 0x8000
-	lfd f2, double_to_int_rsh_00014488@l(r6)
-	add r8, r8, r7
-	lfd f0, 0x98(r1)
-	addi r4, r1, 0x44
-	stw r0, 0x94(r1)
-	fsubs f1, f0, f2
-	lha r7, 0x672(r8)
-	stw r5, 0x90(r1)
-	lha r0, 0x670(r8)
-	mulli r6, r7, 0xc
-	lfd f0, 0x90(r1)
-	lwz r3, 0x0(r3)
-	fsubs f0, f0, f2
-	mulli r0, r0, 0xc
-	add r17, r3, r6
-	fdivs f27, f1, f0
-	add r3, r3, r0
-	fmr f1, f27
-	bl PSVECScale
-	lis r4, float_1_rsh_00014470@ha
-	mr r3, r17
-	addi r5, r4, float_1_rsh_00014470@l
-	addi r4, r1, 0x14
-	lfs f0, 0x0(r5)
-	fsubs f1, f0, f27
-	bl PSVECScale
-	addi r3, r1, 0x44
-	addi r4, r1, 0x14
-	mr r5, r3
-	bl PSVECAdd
-	addi r3, r1, 0x44
-	addi r4, r31, 0x30
-	mr r5, r3
-	bl PSVECAdd
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa0(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0xa0(r1)
-	fsubs f1, f1, f2
-	fdivs f27, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	lis r6, float_2_rsh_00014514@ha
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lis r5, zero_rsh_00014490@ha
-	lfd f1, 0xa8(r1)
-	lis r4, float_1p5_rsh_0001451c@ha
-	lfs f5, float_2_rsh_00014514@l(r6)
-	lis r3, float_0p8_rsh_00014520@ha
-	fsubs f1, f1, f2
-	lfs f2, zero_rsh_00014490@l(r5)
-	li r5, 0x3d
-	li r6, 0x0
-	fdivs f3, f1, f0
-	lfs f1, float_1p5_rsh_0001451c@l(r4)
-	lfs f0, float_0p8_rsh_00014520@l(r3)
-	mr r3, r30
-	mr r4, r31
-	fmadds f4, f27, f2, f1
-	fmadds f0, f3, f2, f0
-	lfs f1, 0x44(r1)
-	lfs f2, 0x48(r1)
-	fmuls f4, f5, f4
-	lfs f3, 0x4c(r1)
-	fmuls f5, f5, f0
-	bl moamoa_jump
-	lhz r0, 0x0(r31)
-	ori r0, r0, 0x200
-	sth r0, 0x0(r31)
-	lwz r0, 0x0(r30)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r30)
-	b @64
-	@85:
-	entry jt_00009A9C
-	lis r3, str_000047B4@ha
-	addi r3, r3, str_000047B4@l
-	bl npcNameToPtr
-	lwz r3, 0x104(r3)
-	bl animPoseGetAnimPosePtr
-	lha r7, 0x48(r31)
-	lis r5, 0x4330
-	lis r4, wp@ha
-	lwz r3, 0x15c(r3)
-	addi r6, r4, wp@l
-	stw r5, 0xa8(r1)
-	slwi r4, r7, 1
-	lwz r8, 0x0(r6)
-	addi r0, r4, 0x570
-	lha r4, 0x4a(r31)
-	lhax r0, r8, r0
-	lis r6, double_to_int_rsh_00014488@ha
-	xoris r4, r4, 0x8000
-	slwi r7, r7, 2
-	stw r4, 0xac(r1)
-	xoris r0, r0, 0x8000
-	lfd f2, double_to_int_rsh_00014488@l(r6)
-	add r8, r8, r7
-	lfd f0, 0xa8(r1)
-	addi r4, r1, 0x38
-	stw r0, 0xa4(r1)
-	fsubs f1, f0, f2
-	lha r7, 0x672(r8)
-	stw r5, 0xa0(r1)
-	lha r0, 0x670(r8)
-	mulli r6, r7, 0xc
-	lfd f0, 0xa0(r1)
-	lwz r3, 0x0(r3)
-	fsubs f0, f0, f2
-	mulli r0, r0, 0xc
-	add r17, r3, r6
-	fdivs f27, f1, f0
-	add r3, r3, r0
-	fmr f1, f27
-	bl PSVECScale
-	lis r4, float_1_rsh_00014470@ha
-	mr r3, r17
-	addi r5, r4, float_1_rsh_00014470@l
-	addi r4, r1, 0x8
-	lfs f0, 0x0(r5)
-	fsubs f1, f0, f27
-	bl PSVECScale
-	addi r3, r1, 0x38
-	addi r4, r1, 0x8
-	mr r5, r3
-	bl PSVECAdd
-	addi r3, r1, 0x38
-	addi r4, r31, 0x30
-	mr r5, r3
-	bl PSVECAdd
-	lfs f0, 0x38(r1)
-	lwz r3, 0xc(r30)
-	stfs f0, 0xc(r3)
-	lfs f0, 0x3c(r1)
-	lwz r3, 0xc(r30)
-	stfs f0, 0x1c(r3)
-	lfs f0, 0x40(r1)
-	lwz r3, 0xc(r30)
-	stfs f0, 0x2c(r3)
-	b @64
-	@86:
-	entry jt_00009BA0
-	lha r3, 0x4(r31)
-	subi r3, r3, 0x1
-	extsh. r0, r3
-	sth r3, 0x4(r31)
-	bge @64
-	li r0, 0x0
-	sth r0, 0x4(r31)
-	lha r3, 0x2(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x2(r31)
-	b @64
-	@87:
-	entry jt_00009BCC
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f1, 0x0(r5)
-	lis r4, float_200_rsh_000144d8@ha
-	lfd f0, 0xa8(r1)
-	lis r3, zero_rsh_00014490@ha
-	addi r5, r4, float_200_rsh_000144d8@l
-	fsubs f3, f0, f2
-	addi r4, r3, zero_rsh_00014490@l
-	lfs f2, 0x0(r5)
-	lis r3, float_300_rsh_00014524@ha
-	lfs f0, 0x0(r4)
-	fdivs f3, f3, f1
-	lfs f1, float_300_rsh_00014524@l(r3)
-	fmadds f0, f3, f2, f0
-	stfs f0, 0x1c(r31)
-	lfs f0, 0x1c(r31)
-	fmuls f0, f1, f0
-	fdivs f27, f0, f2
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_rsh_00014488@ha
-	stw r3, 0xa4(r1)
-	addi r5, r4, double_to_int_rsh_00014488@l
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r4, r3, float_32767_rsh_000144ec@l
-	lfd f1, 0x0(r5)
-	lis r3, zero_rsh_00014490@ha
-	lfd f0, 0xa0(r1)
-	li r0, 0x0
-	lfs f2, 0x0(r4)
-	fsubs f3, f0, f1
-	lfs f1, zero_rsh_00014490@l(r3)
-	fsubs f0, f27, f1
-	fdivs f2, f3, f2
-	fmadds f0, f2, f0, f1
-	stfs f0, 0x20(r31)
-	lha r3, 0x2(r31)
-	addi r3, r3, 0x1
-	sth r3, 0x2(r31)
-	sth r0, 0x4(r31)
-	@88:
-	entry jt_00009C94
-	lha r0, 0x4(r31)
-	cmpwi r0, 0xc8
-	bge @89
-	lis r3, float_1_rsh_00014470@ha
-	lfs f1, float_1_rsh_00014470@l(r3)
-	b @90
-	@89:
-	subfic r3, r0, 0x320
-	lis r0, 0x4330
-	xoris r3, r3, 0x8000
-	lis r4, double_to_int_rsh_00014488@ha
-	stw r3, 0xac(r1)
-	lis r3, float_600_rsh_00014528@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa8(r1)
-	lfs f0, float_600_rsh_00014528@l(r3)
-	lfd f1, 0xa8(r1)
-	fsubs f1, f1, f2
-	fdivs f1, f1, f0
-	@90:
-	lis r3, zero_rsh_00014490@ha
-	fmr f29, f1
-	lfs f0, zero_rsh_00014490@l(r3)
-	fcmpo cr0, f1, f0
-	bge @91
-	lhz r0, 0x0(r31)
-	fmr f29, f0
-	ori r0, r0, 0x200
-	sth r0, 0x0(r31)
-	@91:
-	li r6, 0x3
-	lis r3, gp@ha
-	divw r5, r29, r6
-	lwz r4, gp@l(r3)
-	lis r0, 0x4330
-	stw r0, 0xa8(r1)
-	lis r3, double_to_int_mask_rsh_00014480@ha
-	lwz r0, 0x1c(r4)
-	mullw r4, r5, r6
-	add r0, r29, r0
-	stw r0, 0xac(r1)
-	lis r5, wp@ha
-	lfd f1, double_to_int_mask_rsh_00014480@l(r3)
-	lis r3, float_0p25_rsh_0001452c@ha
-	lfd f0, 0xa8(r1)
-	subf r0, r4, r29
-	mulli r0, r0, 0xc
-	fsubs f1, f0, f1
-	lfs f0, float_0p25_rsh_0001452c@l(r3)
-	lwz r3, wp@l(r5)
-	add r3, r3, r0
-	fmuls f1, f1, f0
-	lfs f26, 0x14(r3)
-	lfs f27, 0x18(r3)
-	lfs f28, 0x1c(r3)
-	bl sin
-	lis r3, gp@ha
-	lis r0, 0x4330
-	addi r4, r3, gp@l
-	frsp f2, f1
-	lwz r5, 0x0(r4)
-	lis r3, double_to_int_mask_rsh_00014480@ha
-	lfs f1, 0x20(r31)
-	addi r4, r3, double_to_int_mask_rsh_00014480@l
-	lwz r5, 0x1c(r5)
-	fmuls f3, f1, f2
-	stw r0, 0xa0(r1)
-	add r0, r29, r5
-	lfs f0, 0x1c(r31)
-	stw r0, 0xa4(r1)
-	lis r3, float_0p25_rsh_0001452c@ha
-	lfd f2, 0x0(r4)
-	fmadds f27, f0, f29, f27
-	lfd f1, 0xa0(r1)
-	fmadds f26, f29, f3, f26
-	lfs f0, float_0p25_rsh_0001452c@l(r3)
-	fsubs f1, f1, f2
-	fmuls f1, f1, f0
-	bl cos
-	lwz r4, 0xc(r30)
-	lis r3, float_15_rsh_00014474@ha
-	lfs f0, 0x20(r31)
-	frsp f4, f1
-	lfs f3, 0xc(r4)
-	fneg f1, f0
-	lfs f2, float_15_rsh_00014474@l(r3)
-	fsubs f0, f26, f3
-	fmuls f1, f1, f4
-	fdivs f0, f0, f2
-	fadds f0, f3, f0
-	fmadds f28, f29, f1, f28
-	stfs f0, 0xc(r4)
-	lwz r3, 0xc(r30)
-	lfs f1, 0x1c(r3)
-	fsubs f0, f27, f1
-	fdivs f0, f0, f2
-	fadds f0, f1, f0
-	stfs f0, 0x1c(r3)
-	lwz r3, 0xc(r30)
-	lfs f1, 0x2c(r3)
-	fsubs f0, f28, f1
-	fdivs f0, f0, f2
-	fadds f0, f1, f0
-	stfs f0, 0x2c(r3)
-	lha r3, 0x4(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x4(r31)
-	b @64
-	@92:
-	entry jt_00009E38
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lis r4, float_90_rsh_00014534@ha
-	lfs f0, 0x0(r5)
-	lfd f1, 0xa8(r1)
-	lis r3, float_neg45_rsh_00014530@ha
-	addi r9, r4, float_90_rsh_00014534@l
-	lis r4, float_6p2832_rsh_0001449c@ha
-	fsubs f1, f1, f2
-	addi r5, r3, float_neg45_rsh_00014530@l
-	lis r3, wp@ha
-	addi r8, r4, float_6p2832_rsh_0001449c@l
-	addi r6, r3, wp@l
-	lis r4, float_1_rsh_00014470@ha
-	fdivs f2, f1, f0
-	lwz r10, 0x0(r6)
-	lfs f0, 0x0(r5)
-	lis r3, float_360_rsh_000144a0@ha
-	lfs f1, 0x0(r9)
-	addi r7, r3, float_360_rsh_000144a0@l
-	fmadds f1, f2, f1, f0
-	lfs f3, 0x550(r10)
-	lfs f2, 0x0(r8)
-	lis r6, float_0p00761_rsh_000144a4@ha
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lfs f0, 0x0(r7)
-	fadds f3, f3, f1
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lfs f27, 0x554(r10)
-	fmuls f2, f2, f3
-	lfs f5, float_0p00761_rsh_000144a4@l(r6)
-	lfs f4, float_0p16605_rsh_000144a8@l(r5)
-	lfs f3, float_1_rsh_00014470@l(r4)
-	fdivs f6, f2, f0
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @93
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @94
-	fmuls f0, f6, f6
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f6
-	b @95
-	@94:
-	fsubs f0, f6, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	b @95
-	@93:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @96
-	fsubs f1, f6, f1
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	b @95
-	@96:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f1
-	fneg f5, f5
-	@95:
-	lwz r6, 0xc(r30)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_15_rsh_00014474@ha
-	lfs f2, float_15_rsh_00014474@l(r4)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lfs f0, 0xc(r6)
-	fcmpo cr0, f6, f1
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lis r3, float_1_rsh_00014470@ha
-	fmadds f29, f2, f5, f0
-	lfs f30, 0x1c(r6)
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @97
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @98
-	fmuls f0, f6, f6
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @99
-	@98:
-	fsubs f0, f6, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @99
-	@97:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @L100
-	fsubs f0, f6, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @99
-	@L100:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@99:
-	lis r3, float_15_rsh_00014474@ha
-	lfs f0, 0x2c(r6)
-	lfs f1, float_15_rsh_00014474@l(r3)
-	fnmsubs f28, f1, f4, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, zero_rsh_00014490@ha
-	lfd f0, 0xa8(r1)
-	lis r3, float_1_rsh_00014470@ha
-	fsubs f3, f0, f1
-	lfs f1, zero_rsh_00014490@l(r4)
-	lfs f0, float_1_rsh_00014470@l(r3)
-	fdivs f2, f3, f2
-	fmadds f26, f2, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f0, 0x0(r5)
-	lis r4, zero_rsh_00014490@ha
-	lfd f1, 0xa0(r1)
-	lis r3, float_0p4_rsh_00014518@ha
-	addi r5, r4, zero_rsh_00014490@l
-	fmr f4, f26
-	fsubs f3, f1, f2
-	addi r4, r3, float_0p4_rsh_00014518@l
-	lfs f1, 0x0(r4)
-	lis r3, float_100_rsh_000144f8@ha
-	lfs f2, 0x0(r5)
-	fdivs f3, f3, f0
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	mr r3, r30
-	mr r4, r31
-	fmadds f5, f3, f2, f1
-	fmr f1, f29
-	fmr f2, f30
-	fmr f3, f28
-	fcmpo cr0, f27, f0
-	bge @L101
-	lha r5, 0x2(r31)
-	b @L102
-	@L101:
-	li r5, 0x0
-	@L102:
-	li r6, 0x0
-	bl moamoa_jump
-	b @64
-	@L103:
-	entry jt_0000A130
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lis r4, float_90_rsh_00014534@ha
-	lis r3, float_neg45_rsh_00014530@ha
-	lfd f1, 0xa8(r1)
-	addi r7, r4, float_90_rsh_00014534@l
-	lfs f0, 0x0(r5)
-	addi r6, r3, float_neg45_rsh_00014530@l
-	fsubs f1, f1, f2
-	lis r3, wp@ha
-	addi r5, r3, wp@l
-	lis r4, float_180_rsh_00014538@ha
-	lwz r9, 0x0(r5)
-	addi r8, r4, float_180_rsh_00014538@l
-	fdivs f2, f1, f0
-	lfs f0, 0x0(r6)
-	lfs f1, 0x0(r7)
-	lis r3, float_6p2832_rsh_0001449c@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	fmadds f0, f2, f1, f0
-	lfs f4, 0x550(r9)
-	lfs f3, 0x0(r8)
-	addi r7, r4, float_360_rsh_000144a0@l
-	lfs f2, 0x0(r5)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	fadds f4, f4, f0
-	lis r6, float_0p00761_rsh_000144a4@ha
-	lfs f0, 0x0(r7)
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	fadds f4, f4, f3
-	lfs f27, 0x554(r9)
-	lfs f5, float_0p00761_rsh_000144a4@l(r6)
-	lfs f3, float_1_rsh_00014470@l(r4)
-	fmuls f2, f2, f4
-	lfs f4, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f2, f2, f0
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @L104
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @L105
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f2
-	b @L106
-	@L105:
-	fsubs f0, f2, f1
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f2
-	b @L106
-	@L104:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f2, f0
-	bge @L107
-	fsubs f2, f2, f1
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f2
-	fneg f5, f5
-	b @L106
-	@L107:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f2, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fmuls f5, f5, f2
-	fneg f5, f5
-	@L106:
-	lwz r4, 0xc(r30)
-	lis r3, float_30_rsh_000144dc@ha
-	lfs f1, float_30_rsh_000144dc@l(r3)
-	lfs f0, 0xc(r4)
-	lfs f30, 0x1c(r4)
-	fmadds f29, f1, f5, f0
-	lfs f28, 0x2c(r4)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, zero_rsh_00014490@ha
-	lfd f0, 0xa8(r1)
-	lis r3, float_1_rsh_00014470@ha
-	lis r5, float_2_rsh_00014514@ha
-	fsubs f3, f0, f1
-	lfs f1, zero_rsh_00014490@l(r4)
-	lfs f0, float_1_rsh_00014470@l(r3)
-	fdivs f3, f3, f2
-	lfs f2, float_2_rsh_00014514@l(r5)
-	fmadds f0, f3, f1, f0
-	fmuls f26, f2, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lis r6, float_2_rsh_00014514@ha
-	lfs f0, 0x0(r5)
-	lfd f1, 0xa0(r1)
-	lis r4, zero_rsh_00014490@ha
-	lis r3, float_0p4_rsh_00014518@ha
-	lfs f4, float_2_rsh_00014514@l(r6)
-	fsubs f1, f1, f2
-	addi r5, r4, zero_rsh_00014490@l
-	addi r4, r3, float_0p4_rsh_00014518@l
-	lfs f2, 0x0(r5)
-	lis r3, float_100_rsh_000144f8@ha
-	fdivs f3, f1, f0
-	lfs f1, 0x0(r4)
-	mr r4, r31
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	mr r3, r30
-	fmadds f3, f3, f2, f1
-	fmr f1, f29
-	fmr f2, f30
-	fmuls f5, f4, f3
-	fmr f3, f28
-	fmr f4, f26
-	fcmpo cr0, f27, f0
-	bge @L108
-	lha r5, 0x2(r31)
-	b @L109
-	@L108:
-	li r5, 0x0
-	@L109:
-	li r6, 0x0
-	bl moamoa_jump
-	b @64
-	@L110:
-	entry jt_0000A394
-	lwz r3, 0xc(r30)
-	lfs f0, 0x14(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x1c(r3)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x20(r31)
-	fsubs f0, f1, f0
-	stfs f0, 0x14(r31)
-	lwz r3, 0xc(r30)
-	lfs f3, 0x8(r31)
-	lfs f1, 0xc(r3)
-	lfs f2, 0x2c(r3)
-	lfs f4, 0x10(r31)
-	bl angleABf
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r6, float_0p00761_rsh_000144a4@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	lfs f0, 0x0(r5)
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	fmuls f2, f0, f1
-	lfs f0, float_360_rsh_000144a0@l(r4)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f5, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L111
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L112
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @L113
-	@L112:
-	fsubs f0, f5, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @L113
-	@L111:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @L114
-	fsubs f1, f5, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @L113
-	@L114:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@L113:
-	lwz r7, 0xc(r30)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r5, float_0p4967_rsh_000144bc@ha
-	lfs f2, 0x1c(r31)
-	lis r6, float_0p03705_rsh_000144b8@ha
-	lfs f0, 0xc(r7)
-	fcmpo cr0, f5, f1
-	lis r4, float_1_rsh_00014470@ha
-	lfs f3, float_0p4967_rsh_000144bc@l(r5)
-	fmadds f0, f2, f4, f0
-	lfs f4, float_0p03705_rsh_000144b8@l(r6)
-	lfs f2, float_1_rsh_00014470@l(r4)
-	stfs f0, 0xc(r7)
-	cror eq, lt, eq
-	bne @L115
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L116
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @L117
-	@L116:
-	fsubs f0, f5, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L117
-	@L115:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @L118
-	fsubs f0, f5, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L117
-	@L118:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@L117:
-	lwz r3, 0xc(r30)
-	fneg f1, f4
-	lfs f2, 0x1c(r31)
-	lfs f0, 0x2c(r3)
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x2c(r3)
-	lha r3, 0x18(r31)
-	subi r3, r3, 0x1
-	extsh. r0, r3
-	sth r3, 0x18(r31)
-	bge @64
-	lfs f0, 0x8(r31)
-	li r0, 0x0
-	lwz r3, 0xc(r30)
-	stfs f0, 0xc(r3)
-	lfs f0, 0xc(r31)
-	lwz r3, 0xc(r30)
-	stfs f0, 0x1c(r3)
-	lfs f0, 0x10(r31)
-	lwz r3, 0xc(r30)
-	stfs f0, 0x2c(r3)
-	lhz r3, 0x0(r31)
-	rlwinm r3, r3, 0, 31, 29
-	sth r3, 0x0(r31)
-	lwz r3, 0x0(r30)
-	rlwinm r3, r3, 0, 28, 26
-	stw r3, 0x0(r30)
-	sth r0, 0x4(r31)
-	lha r3, 0x2(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x2(r31)
-	b @64
-	@L119:
-	entry jt_0000A5F0
-	lha r3, 0x4(r31)
-	addi r3, r3, 0x1
-	extsh r0, r3
-	sth r3, 0x4(r31)
-	cmpwi r0, 0x4
-	ble @64
-	lha r0, 0x24(r31)
-	sth r0, 0x2(r31)
-	b @64
-	@L120:
-	entry jt_0000A614
-	lhz r0, 0x0(r31)
-	clrlwi. r0, r0, 31
-	bne @L121
-	lfs f26, 0x8c(r28)
-	lfs f27, 0x94(r28)
-	b @L122
-	@L121:
-	li r3, 0x3
-	lis r4, wp@ha
-	divw r0, r29, r3
-	addi r4, r4, wp@l
-	lwz r4, 0x0(r4)
-	mullw r0, r0, r3
-	subf r0, r0, r29
-	mulli r0, r0, 0xc
-	add r3, r4, r0
-	lfs f26, 0x14(r3)
-	lfs f27, 0x1c(r3)
-	@L122:
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f4, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa8(r1)
-	fmr f2, f27
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	fmr f1, f26
-	lfd f3, 0xa8(r1)
-	lwz r5, 0xc(r30)
-	fsubs f5, f3, f4
-	lfs f3, 0xc(r5)
-	lfs f4, 0x2c(r5)
-	fdivs f27, f5, f0
-	bl angleABf
-	lis r3, float_90_rsh_00014534@ha
-	lis r4, float_neg45_rsh_00014530@ha
-	addi r5, r3, float_90_rsh_00014534@l
-	lfs f0, float_neg45_rsh_00014530@l(r4)
-	lfs f2, 0x0(r5)
-	lis r3, float_6p2832_rsh_0001449c@ha
-	addi r8, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	fmadds f0, f27, f2, f0
-	addi r7, r4, float_360_rsh_000144a0@l
-	lis r6, float_0p00761_rsh_000144a4@ha
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r4, float_1_rsh_00014470@ha
-	fadds f2, f1, f0
-	lfs f1, 0x0(r8)
-	lfs f0, 0x0(r7)
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	fmuls f2, f1, f2
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f5, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L123
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L124
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @L125
-	@L124:
-	fsubs f0, f5, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @L125
-	@L123:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @L126
-	fsubs f1, f5, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @L125
-	@L126:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@L125:
-	lwz r6, 0xc(r30)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_15_rsh_00014474@ha
-	lfs f2, float_15_rsh_00014474@l(r4)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lfs f0, 0xc(r6)
-	fcmpo cr0, f5, f1
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lis r3, float_1_rsh_00014470@ha
-	fmadds f29, f2, f4, f0
-	lfs f30, 0x1c(r6)
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @L127
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @L128
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @L129
-	@L128:
-	fsubs f0, f5, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L129
-	@L127:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @L130
-	fsubs f0, f5, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L129
-	@L130:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@L129:
-	lis r3, float_15_rsh_00014474@ha
-	lfs f0, 0x2c(r6)
-	lfs f1, float_15_rsh_00014474@l(r3)
-	fnmsubs f26, f1, f4, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa8(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0xa8(r1)
-	fsubs f1, f1, f2
-	fdivs f27, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f0, 0x0(r5)
-	lis r4, zero_rsh_00014490@ha
-	lfd f1, 0xa0(r1)
-	lis r3, float_1_rsh_00014470@ha
-	lfs f5, zero_rsh_00014490@l(r4)
-	mr r4, r31
-	fsubs f3, f1, f2
-	lha r5, 0x2(r31)
-	fmr f1, f29
-	li r6, 0x1
-	fmr f2, f30
-	addi r5, r5, 0x1
-	fdivs f6, f3, f0
-	lfs f0, float_1_rsh_00014470@l(r3)
-	mr r3, r30
-	fmadds f4, f27, f5, f0
-	fmr f3, f26
-	fmadds f5, f6, f5, f0
-	bl moamoa_jump
-	b @64
-	@L131:
-	entry jt_0000A918
-	lha r3, 0x4(r31)
-	addi r3, r3, 0x1
-	extsh r0, r3
-	sth r3, 0x4(r31)
-	cmpwi r0, 0x1e
-	bge @L132
-	lwz r4, 0xc(r30)
-	lis r3, float_0p9_rsh_0001453c@ha
-	lfs f1, float_0p9_rsh_0001453c@l(r3)
-	lfs f0, 0x0(r4)
-	fmuls f0, f0, f1
-	stfs f0, 0x0(r4)
-	lwz r3, 0xc(r30)
-	lfs f0, 0x14(r3)
-	fmuls f0, f0, f1
-	stfs f0, 0x14(r3)
-	lwz r3, 0xc(r30)
-	lfs f0, 0x28(r3)
-	fmuls f0, f0, f1
-	stfs f0, 0x28(r3)
-	b @64
-	@L132:
-	li r0, 0x31
-	sth r0, 0x2(r31)
-	b @64
-	@L133:
-	entry jt_0000A978
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa8(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0xa8(r1)
-	fsubs f1, f1, f2
-	fdivs f27, f1, f0
-	bl rand
-	lis r5, float_90_rsh_00014534@ha
-	lis r4, float_135_rsh_00014540@ha
-	lfs f0, float_135_rsh_00014540@l(r4)
-	xoris r6, r3, 0x8000
-	lfs f1, float_90_rsh_00014534@l(r5)
-	lis r0, 0x4330
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r4, double_to_int_rsh_00014488@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	stw r6, 0xa4(r1)
-	fmadds f0, f27, f1, f0
-	addi r6, r4, double_to_int_rsh_00014488@l
-	stw r0, 0xa0(r1)
-	lis r3, float_360_rsh_000144a0@ha
-	lfs f1, 0x0(r5)
-	addi r4, r3, float_360_rsh_000144a0@l
-	lis r3, float_32767_rsh_000144ec@ha
-	fmuls f1, f1, f0
-	lfs f0, 0x0(r4)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfd f3, 0x0(r6)
-	lis r4, float_300_rsh_00014524@ha
-	lfd f2, 0xa0(r1)
-	fdivs f7, f1, f0
-	addi r6, r4, float_300_rsh_00014524@l
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r4, float_0p16605_rsh_000144a8@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r3, float_1_rsh_00014470@ha
-	fsubs f3, f2, f3
-	lfs f2, 0x0(r5)
-	lis r5, float_200_rsh_000144d8@ha
-	lfs f0, 0x0(r6)
-	addi r7, r5, float_200_rsh_000144d8@l
-	fcmpo cr0, f7, f1
-	fdivs f3, f3, f2
-	lfs f2, 0x0(r7)
-	lis r5, float_0p00761_rsh_000144a4@ha
-	lfs f4, float_0p16605_rsh_000144a8@l(r4)
-	lfs f5, float_0p00761_rsh_000144a4@l(r5)
-	fmadds f6, f3, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @L134
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f7, f1
-	cror eq, lt, eq
-	bne @L135
-	fmuls f0, f7, f7
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fmuls f5, f5, f7
-	b @L136
-	@L135:
-	fsubs f0, f7, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fmuls f5, f5, f1
-	b @L136
-	@L134:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f7, f0
-	bge @L137
-	fsubs f1, f7, f1
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fmuls f5, f5, f1
-	fneg f5, f5
-	b @L136
-	@L137:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f7, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fmuls f5, f5, f1
-	fneg f5, f5
-	@L136:
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lwz r6, 0xc(r30)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lfs f0, 0xc(r6)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	fcmpo cr0, f7, f1
-	lis r3, float_1_rsh_00014470@ha
-	fmadds f29, f6, f5, f0
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @L138
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f7, f1
-	cror eq, lt, eq
-	bne @L139
-	fmuls f0, f7, f7
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @L140
-	@L139:
-	fsubs f0, f7, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L140
-	@L138:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f7, f0
-	bge @L141
-	fsubs f0, f7, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L140
-	@L141:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f7, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@L140:
-	lfs f0, 0x2c(r6)
-	fnmsubs f30, f6, f4, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_1_rsh_00014470@ha
-	lfd f0, 0xa8(r1)
-	lis r3, float_5_rsh_00014500@ha
-	fsubs f3, f0, f1
-	lfs f1, float_1_rsh_00014470@l(r4)
-	lfs f0, float_5_rsh_00014500@l(r3)
-	fdivs f2, f3, f2
-	fmadds f26, f2, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_0p1_rsh_00014548@ha
-	lfd f0, 0xa0(r1)
-	lis r3, float_0p2_rsh_00014544@ha
-	cmpwi r26, 0x0
-	fsubs f3, f0, f1
-	lfs f1, float_0p1_rsh_00014548@l(r4)
-	lfs f0, float_0p2_rsh_00014544@l(r3)
-	fdivs f2, f3, f2
-	fmadds f27, f2, f1, f0
-	bne @L142
-	lis r3, vec3_rsh_00013da0@ha
-	addi r4, r1, 0x20
-	addi r7, r3, vec3_rsh_00013da0@l
-	li r3, 0x6c3
-	lwz r6, 0x0(r7)
-	lwz r5, 0x4(r7)
-	lwz r0, 0x8(r7)
-	stw r6, 0x20(r1)
-	stw r5, 0x24(r1)
-	stw r0, 0x28(r1)
-	lwz r5, 0xc(r30)
-	lfs f0, 0xc(r5)
-	stfs f0, 0x20(r1)
-	lfs f0, 0x1c(r5)
-	stfs f0, 0x24(r1)
-	lfs f0, 0x2c(r5)
-	stfs f0, 0x28(r1)
-	bl psndSFXOn_3D
-	li r26, 0x1
-	@L142:
-	lis r3, float_neg100_rsh_0001454c@ha
-	fmr f1, f29
-	lfs f2, float_neg100_rsh_0001454c@l(r3)
-	fmr f3, f30
-	fmr f4, f26
-	mr r3, r30
-	fmr f5, f27
-	mr r4, r31
-	li r5, 0x31
-	li r6, 0x0
-	bl moamoa_jump
-	b @64
-	@L143:
-	entry jt_0000ACC8
-	lha r3, 0x18(r31)
-	subi r3, r3, 0x1
-	extsh. r0, r3
-	sth r3, 0x18(r31)
-	ble @L144
-	lfs f1, 0x8(r31)
-	lfs f0, 0x14(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x8(r31)
-	lfs f1, 0xc(r31)
-	lfs f0, 0x1c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0xc(r31)
-	lfs f1, 0x10(r31)
-	lfs f0, 0x20(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x10(r31)
-	lwz r3, 0xc(r30)
-	lfs f0, 0x8(r31)
-	lfs f1, 0xc(r3)
-	fadds f0, f1, f0
-	stfs f0, 0xc(r3)
-	lwz r3, 0xc(r30)
-	lfs f0, 0xc(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x1c(r3)
-	lwz r3, 0xc(r30)
-	lfs f0, 0x10(r31)
-	lfs f1, 0x2c(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x2c(r3)
-	b @64
-	@L144:
-	li r0, 0x31
-	sth r0, 0x2(r31)
-	b @64
-	@L145:
-	entry jt_0000AD58
-	lwz r3, 0xc(r30)
-	bl PSMTXIdentity
-	lis r3, wp@ha
-	li r21, 0x2bc
-	addi r22, r3, wp@l
-	@L146:
-	bl rand
-	divw r0, r3, r21
-	lwz r4, 0x0(r22)
-	lwz r4, 0x8(r4)
-	mullw r0, r0, r21
-	subf r18, r0, r3
-	mulli r0, r18, 0x50
-	add r4, r4, r0
-	lha r3, 0x2(r4)
-	extsh. r0, r3
-	beq @L147
-	cmpwi r3, 0x3
-	bne @L146
-	@L147:
-	lhz r0, 0x0(r4)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @L146
-	bl extGetPosePtr
-	slwi r0, r18, 5
-	lis r4, float_215_rsh_00014504@ha
-	add r7, r3, r0
-	lwz r5, 0xc(r30)
-	lwz r6, 0xc(r7)
-	li r0, 0x0
-	lfs f0, float_215_rsh_00014504@l(r4)
-	lfs f1, 0xc(r6)
-	stfs f1, 0xc(r5)
-	lwz r3, 0xc(r30)
-	stfs f0, 0x1c(r3)
-	lwz r4, 0xc(r7)
-	lwz r3, 0xc(r30)
-	lfs f0, 0x2c(r4)
-	stfs f0, 0x2c(r3)
-	sth r0, 0x0(r31)
-	sth r0, 0x2(r31)
-	sth r0, 0x4(r31)
-	b @64
-	@L148:
-	entry jt_0000ADFC
-	lhz r0, 0x0(r31)
-	ori r0, r0, 0x20
-	sth r0, 0x0(r31)
-	lwz r0, 0x0(r30)
-	clrrwi r0, r0, 1
-	stw r0, 0x0(r30)
-	lwz r0, 0x0(r30)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r30)
-	b @64
-	@L149:
-	entry jt_0000AE24
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0xa8(r1)
-	lfs f0, float_32767_rsh_000144ec@l(r3)
-	lfd f1, 0xa8(r1)
-	fsubs f1, f1, f2
-	fdivs f27, f1, f0
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xa4(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa0(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_1_rsh_00014470@ha
-	lfd f0, 0xa0(r1)
-	lis r3, float_2_rsh_00014514@ha
-	srawi r0, r29, 1
-	fsubs f3, f0, f1
-	lfs f0, float_2_rsh_00014514@l(r3)
-	lfs f1, float_1_rsh_00014470@l(r4)
-	addze r3, r0
-	fdivs f2, f3, f2
-	fmadds f30, f2, f1, f0
-	bl irand
-	lis r5, float_90_rsh_00014534@ha
-	lis r4, float_225_rsh_00014550@ha
-	lfs f1, float_90_rsh_00014534@l(r5)
-	lis r7, float_0p00761_rsh_000144a4@ha
-	lfs f0, float_225_rsh_00014550@l(r4)
-	lis r6, float_6p2832_rsh_0001449c@ha
-	lis r5, float_360_rsh_000144a0@ha
-	lis r4, float_3p1416_rsh_000144ac@ha
-	fmadds f0, f27, f1, f0
-	lfs f1, float_6p2832_rsh_0001449c@l(r6)
-	lis r6, float_0p16605_rsh_000144a8@ha
-	sth r3, 0x4(r31)
-	lfs f4, float_0p00761_rsh_000144a4@l(r7)
-	fmuls f2, f1, f0
-	lfs f0, float_360_rsh_000144a0@l(r5)
-	lis r5, float_1_rsh_00014470@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r4)
-	fdivs f29, f2, f0
-	lfs f3, float_0p16605_rsh_000144a8@l(r6)
-	lfs f2, float_1_rsh_00014470@l(r5)
-	fcmpo cr0, f29, f1
-	cror eq, lt, eq
-	bne @L150
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f29, f1
-	cror eq, lt, eq
-	bne @L151
-	fmuls f0, f29, f29
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f29
-	b @L152
-	@L151:
-	fsubs f0, f29, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @L152
-	@L150:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f29, f0
-	bge @L153
-	fsubs f1, f29, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @L152
-	@L153:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f29, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@L152:
-	fmuls f0, f30, f4
-	stfs f0, 0x8(r31)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_rsh_00014488@ha
-	stw r3, 0xac(r1)
-	addi r5, r4, double_to_int_rsh_00014488@l
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r4, r3, float_32767_rsh_000144ec@l
-	lfd f2, 0x0(r5)
-	lis r3, float_1_rsh_00014470@ha
-	lfd f1, 0xa8(r1)
-	addi r5, r3, float_1_rsh_00014470@l
-	lfs f0, 0x0(r4)
-	lis r4, float_0p03705_rsh_000144b8@ha
-	fsubs f3, f1, f2
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r3, float_0p4967_rsh_000144bc@ha
-	lfs f2, 0x0(r5)
-	fdivs f0, f3, f0
-	lfs f4, float_0p03705_rsh_000144b8@l(r4)
-	lfs f3, float_0p4967_rsh_000144bc@l(r3)
-	fmadds f0, f0, f2, f2
-	fcmpo cr0, f29, f1
-	stfs f0, 0xc(r31)
-	cror eq, lt, eq
-	bne @L154x
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f29, f1
-	cror eq, lt, eq
-	bne @L155
-	fmuls f0, f29, f29
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @L156
-	@L155:
-	fsubs f0, f29, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L156
-	@L154x:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f29, f0
-	bge @L157
-	fsubs f0, f29, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @L156
-	@L157:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f29, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@L156:
-	fneg f0, f4
-	fmuls f0, f30, f0
-	stfs f0, 0x10(r31)
-	lha r3, 0x2(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x2(r31)
-	b @64
-	@L158:
-	entry jt_0000B0B0
-	lha r3, 0x4(r31)
-	subi r3, r3, 0x1
-	extsh. r0, r3
-	sth r3, 0x4(r31)
-	bge @64
-	lha r3, 0x2(r31)
-	addi r0, r3, 0x1
-	sth r0, 0x2(r31)
-	b @64
-	@L159:
-	entry jt_0000B0D4
-	lis r3, float_1p1_rsh_00014554@ha
-	lis r4, float_1p02_rsh_00014558@ha
-	addi r6, r3, float_1p1_rsh_00014554@l
-	lis r3, float_0p20944_rsh_0001455c@ha
-	lfs f1, 0x8(r31)
-	addi r5, r4, float_1p02_rsh_00014558@l
-	lfs f3, 0x0(r6)
-	addi r4, r3, float_0p20944_rsh_0001455c@l
-	lfs f0, 0x0(r5)
-	addi r3, r1, 0x5c
-	fmuls f2, f1, f3
-	lfs f1, 0x0(r4)
-	li r4, 0x79
-	stfs f2, 0x8(r31)
-	lfs f2, 0xc(r31)
-	fmuls f0, f2, f0
-	stfs f0, 0xc(r31)
-	lfs f0, 0x10(r31)
-	fmuls f0, f0, f3
-	stfs f0, 0x10(r31)
-	lwz r5, 0xc(r30)
-	lfs f0, 0x8(r31)
-	lfs f2, 0xc(r5)
-	fadds f0, f2, f0
-	stfs f0, 0xc(r5)
-	lwz r5, 0xc(r30)
-	lfs f0, 0xc(r31)
-	lfs f2, 0x1c(r5)
-	fadds f0, f2, f0
-	stfs f0, 0x1c(r5)
-	lwz r5, 0xc(r30)
-	lfs f0, 0x10(r31)
-	lfs f2, 0x2c(r5)
-	fadds f0, f2, f0
-	stfs f0, 0x2c(r5)
-	bl PSMTXRotRad
-	lwz r3, 0xc(r30)
-	addi r4, r1, 0x5c
-	mr r5, r3
-	bl PSMTXConcat
-	lwz r0, 0x0(r30)
-	lis r3, float_neg1000_rsh_00014560@ha
-	lfs f0, float_neg1000_rsh_00014560@l(r3)
-	rlwinm r0, r0, 0, 31, 29
-	stw r0, 0x0(r30)
-	lwz r3, 0xc(r30)
-	lfs f1, 0xc(r3)
-	fcmpo cr0, f1, f0
-	bge @64
-	li r0, 0x3e
-	sth r0, 0x2(r31)
-	@64:
-	entry jt_0000B1A0
-	lhz r0, 0x0(r31)
-	andi. r0, r0, 0x588
-	bne @L160
-	lwz r5, 0xc(r30)
-	lis r3, float_250_rsh_00014564@ha
-	lfs f3, 0x18(r23)
-	lfs f2, 0xc(r5)
-	lfs f1, float_250_rsh_00014564@l(r3)
-	fsubs f0, f3, f2
-	fcmpo cr0, f0, f1
-	ble @L161
-	lis r4, float_450_rsh_00014568@ha
-	lis r3, float_neg50_rsh_0001456c@ha
-	lfs f1, float_450_rsh_00014568@l(r4)
-	lfs f0, float_neg50_rsh_0001456c@l(r3)
-	fadds f1, f1, f2
-	fcmpo cr0, f1, f0
-	bge @L160
-	stfs f1, 0xc(r5)
-	b @L160
-	@L161:
-	fsubs f0, f2, f3
-	fcmpo cr0, f0, f1
-	ble @L160
-	lis r4, float_450_rsh_00014568@ha
-	lis r3, float_neg1870_rsh_00014570@ha
-	lfs f1, float_450_rsh_00014568@l(r4)
-	lfs f0, float_neg1870_rsh_00014570@l(r3)
-	fsubs f1, f2, f1
-	fcmpo cr0, f1, f0
-	ble @L160
-	stfs f1, 0xc(r5)
-	@L160:
-	lhz r0, 0x0(r31)
-	andi. r0, r0, 0x588
-	bne @L162
-	lwz r4, 0xc(r30)
-	lis r3, float_100_rsh_000144f8@ha
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	lfs f1, 0xc(r4)
-	fcmpo cr0, f1, f0
-	ble @L163
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_5_rsh_00014500@ha
-	lfd f0, 0xa8(r1)
-	lis r3, zero_rsh_00014490@ha
-	lis r5, float_100_rsh_000144f8@ha
-	fsubs f3, f0, f1
-	lfs f0, zero_rsh_00014490@l(r3)
-	lfs f1, float_5_rsh_00014500@l(r4)
-	lwz r3, 0xc(r30)
-	fdivs f3, f3, f2
-	lfs f2, float_100_rsh_000144f8@l(r5)
-	fmadds f0, f3, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0xc(r3)
-	@L163:
-	lwz r4, 0xc(r30)
-	lis r3, float_neg1870_rsh_00014570@ha
-	lfs f0, float_neg1870_rsh_00014570@l(r3)
-	lfs f1, 0xc(r4)
-	fcmpo cr0, f1, f0
-	bge @L164
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_5_rsh_00014500@ha
-	lfd f0, 0xa8(r1)
-	lis r3, zero_rsh_00014490@ha
-	lis r5, float_neg1870_rsh_00014570@ha
-	fsubs f3, f0, f1
-	lfs f0, zero_rsh_00014490@l(r3)
-	lfs f1, float_5_rsh_00014500@l(r4)
-	lwz r3, 0xc(r30)
-	fdivs f3, f3, f2
-	lfs f2, float_neg1870_rsh_00014570@l(r5)
-	fmadds f0, f3, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0xc(r3)
-	@L164:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @L162
-	lwz r4, 0xc(r30)
-	lis r3, float_45_rsh_00014574@ha
-	lfs f0, float_45_rsh_00014574@l(r3)
-	lfs f1, 0x2c(r4)
-	fcmpo cr0, f1, f0
-	ble @L165
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_5_rsh_00014500@ha
-	lfd f0, 0xa8(r1)
-	lis r3, zero_rsh_00014490@ha
-	lis r5, float_45_rsh_00014574@ha
-	fsubs f3, f0, f1
-	lfs f0, zero_rsh_00014490@l(r3)
-	lfs f1, float_5_rsh_00014500@l(r4)
-	lwz r3, 0xc(r30)
-	fdivs f3, f3, f2
-	lfs f2, float_45_rsh_00014574@l(r5)
-	fmadds f0, f3, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x2c(r3)
-	@L165:
-	lwz r4, 0xc(r30)
-	lis r3, float_neg45_rsh_00014530@ha
-	lfs f0, float_neg45_rsh_00014530@l(r3)
-	lfs f1, 0x2c(r4)
-	fcmpo cr0, f1, f0
-	bge @L162
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0xa8(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_5_rsh_00014500@ha
-	lfd f0, 0xa8(r1)
-	lis r3, zero_rsh_00014490@ha
-	lis r5, float_neg45_rsh_00014530@ha
-	fsubs f3, f0, f1
-	lfs f0, zero_rsh_00014490@l(r3)
-	lfs f1, float_5_rsh_00014500@l(r4)
-	lwz r3, 0xc(r30)
-	fdivs f3, f3, f2
-	lfs f2, float_neg45_rsh_00014530@l(r5)
-	fmadds f0, f3, f1, f0
-	fadds f0, f2, f0
-	stfs f0, 0x2c(r3)
-	@L162:
-	lwz r3, 0xc(r30)
-	addi r29, r29, 0x1
-	lfs f0, 0xc(r3)
-	stfs f0, 0x28(r31)
-	lwz r3, 0xc(r30)
-	addi r30, r30, 0x20
-	lfs f0, 0x2c(r3)
-	stfs f0, 0x2c(r31)
-	addi r31, r31, 0x50
-	@16:
-	lwz r3, 0x0(r27)
-	lwz r0, 0x4(r3)
-	cmpw r29, r0
-	blt @17
-	bl extGetPosePtr
-	lis r4, wp@ha
-	lis r7, float_60_rsh_00014578@ha
-	addi r25, r4, wp@l
-	lis r6, float_1000_rsh_0001457c@ha
-	lwz r9, 0x0(r25)
-	lis r5, float_1_rsh_00014470@ha
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r8, gp@ha
-	lwz r18, 0x8(r9)
-	mr r19, r3
-	lfs f30, float_60_rsh_00014578@l(r7)
-	addi r24, r8, gp@l
-	lfs f29, float_1000_rsh_0001457c@l(r6)
-	li r20, 0x0
-	lfs f28, float_1_rsh_00014470@l(r5)
-	lis r23, 0x8000
-	lfd f27, double_to_int_rsh_00014488@l(r4)
-	lis r26, 0x4330
-	b @L166
-	@L167:
-	lwz r3, 0xf8(r23)
-	li r0, 0x3e8
-	lwz r4, 0x0(r24)
-	li r5, 0x0
-	srwi r3, r3, 2
-	lha r8, 0x3c(r18)
-	divwu r6, r3, r0
-	lwz r22, 0x3c(r4)
-	lwz r0, 0x44(r18)
-	lwz r21, 0x38(r4)
-	subfc r4, r0, r22
-	lwz r0, 0x40(r18)
-	mulli r8, r8, 0x28
-	subfe r3, r0, r21
-	addi r17, r8, 0x50
-	add r17, r7, r17
-	bl __div2u
-	bl __cvt_ull_flt
-	fmuls f1, f30, f1
-	lfs f0, 0x1c(r17)
-	fdivs f1, f1, f29
-	fdivs f1, f1, f0
-	fcmpo cr0, f1, f28
-	cror eq, gt, eq
-	bne @L168
-	stw r22, 0x44(r18)
-	lis r3, zero_rsh_00014490@ha
-	lfs f1, zero_rsh_00014490@l(r3)
-	stw r21, 0x40(r18)
-	@L168:
-	lwz r3, 0x24(r17)
-	addi r20, r20, 0x1
-	stw r26, 0xa8(r1)
-	addi r18, r18, 0x50
-	subi r0, r3, 0x1
-	lwz r3, 0x20(r17)
-	xoris r0, r0, 0x8000
-	stw r0, 0xac(r1)
-	lfd f0, 0xa8(r1)
-	fsubs f0, f0, f27
-	fmuls f0, f0, f1
-	fctiwz f0, f0
-	stfd f0, 0xa0(r1)
-	lwz r0, 0xa4(r1)
-	add r0, r3, r0
-	stw r0, 0x10(r19)
-	addi r19, r19, 0x20
-	@L166:
-	lwz r7, 0x0(r25)
-	lwz r0, 0x4(r7)
-	cmpw r20, r0
-	blt @L167
-	lis r4, zero_rsh_00014490@ha
-	lis r3, wp@ha
-	lfs f0, zero_rsh_00014490@l(r4)
-	addi r3, r3, wp@l
-	stfs f0, 0x174(r28)
-	stfs f0, 0x178(r28)
-	stfs f0, 0x17c(r28)
-	lwz r3, 0x0(r3)
-	lhz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 27, 28
-	bne @L169
-	lis r3, float_20_rsh_00014580@ha
-	fneg f1, f31
-	lfs f0, float_20_rsh_00014580@l(r3)
-	fdivs f0, f1, f0
-	stfs f0, 0x174(r28)
-	@L169:
-	psq_l f31, 0x148(r1), 0, 0
-	lfd f31, 0x140(r1)
-	psq_l f30, 0x138(r1), 0, 0
-	lfd f30, 0x130(r1)
-	psq_l f29, 0x128(r1), 0, 0
-	lfd f29, 0x120(r1)
-	psq_l f28, 0x118(r1), 0, 0
-	lfd f28, 0x110(r1)
-	psq_l f27, 0x108(r1), 0, 0
-	lfd f27, 0x100(r1)
-	psq_l f26, 0xf8(r1), 0, 0
-	lfd f26, 0xf0(r1)
-	lmw r17, 0xb4(r1)
-	lwz r0, 0x154(r1)
-	mtlr r0
-	addi r1, r1, 0x150
-	blr
-}
-
-asm static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
-	nofralloc
-	stwu r1, -0xf0(r1)
-	mflr r0
-	stw r0, 0xf4(r1)
-	stfd f31, 0xe0(r1)
-	psq_st f31, 0xe8(r1), 0, 0
-	stfd f30, 0xd0(r1)
-	psq_st f30, 0xd8(r1), 0, 0
-	stfd f29, 0xc0(r1)
-	psq_st f29, 0xc8(r1), 0, 0
-	stmw r29, 0xb4(r1)
-	mr r29, r3
-	mr r30, r4
-	bl marioGetPtr
-	lwz r5, 0xc(r29)
-	lis r4, float_20_rsh_00014580@ha
-	lfs f0, float_20_rsh_00014580@l(r4)
-	mr r31, r3
-	lfs f2, 0x1c(r5)
-	lfs f1, 0x90(r3)
-	fadds f0, f0, f2
-	fcmpo cr0, f1, f0
-	ble @1
-	li r3, 0x0
-	b @2
-	@1:
-	lfs f0, 0x1b8(r31)
-	fadds f0, f1, f0
-	fcmpo cr0, f2, f0
-	ble @3
-	li r3, 0x0
-	b @2
-	@3:
-	lfs f1, 0xc(r5)
-	lfs f2, 0x2c(r5)
-	lfs f3, 0x8c(r31)
-	lfs f4, 0x94(r31)
-	bl distABf
-	lis r4, float_20_rsh_00014580@ha
-	lis r3, float_0p5_rsh_000144e8@ha
-	lfs f2, 0x1b4(r31)
-	lfs f3, float_20_rsh_00014580@l(r4)
-	lfs f0, float_0p5_rsh_000144e8@l(r3)
-	fadds f2, f3, f2
-	fmuls f0, f2, f0
-	fcmpo cr0, f1, f0
-	bge @4
-	lwz r3, 0xc(r29)
-	lis r4, float_10_rsh_00014584@ha
-	lfs f1, float_10_rsh_00014584@l(r4)
-	lfs f0, 0x1c(r3)
-	lfs f2, 0x90(r31)
-	fadds f0, f1, f0
-	fcmpo cr0, f2, f0
-	ble @4
-	lwz r3, 0x0(r31)
-	rlwinm. r0, r3, 0, 14, 14
-	beq @4
-	rlwinm. r0, r3, 0, 15, 15
-	bne @4
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x558(r3)
-	cmpwi r0, 0x2
-	bge @4
-	lhz r0, 0x2e(r31)
-	cmplwi r0, 0x16
-	beq @5
-	cmplwi r0, 0x1a
-	beq @5
-	li r3, 0x5
-	bl marioChgMot
-	@5:
-	lis r4, wp@ha
-	li r3, 0x1
-	lwz r5, wp@l(r4)
-	lwz r4, 0x558(r5)
-	addi r0, r4, 0x1
-	stw r0, 0x558(r5)
-	b @2
-	@4:
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 14, 15
-	bne @6
-	lis r3, wp@ha
-	li r0, 0x0
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	stw r0, 0x558(r3)
-	@6:
-	lhz r0, 0x2e(r31)
-	cmplwi r0, 0x12
-	bne @7
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lha r0, 0x40(r3)
-	cmpwi r0, 0xa
-	ble @7
-	li r3, 0x4
-	bl camGetPtr
-	lis r4, float_90_rsh_00014534@ha
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_90_rsh_00014534@l(r4)
-	lfs f2, 0x114(r3)
-	fsubs f0, f1, f0
-	fadds f1, f0, f2
-	bl reviseAngle
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r6, float_0p00761_rsh_000144a4@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	lfs f0, 0x0(r5)
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	fmuls f2, f0, f1
-	lfs f0, float_360_rsh_000144a0@l(r4)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f6, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @8
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @9
-	fmuls f0, f6, f6
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f6
-	b @10
-	@9:
-	fsubs f0, f6, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @10
-	@8:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @11
-	fsubs f1, f6, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @10
-	@11:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@10:
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r4, float_35_rsh_00014588@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lfs f2, float_35_rsh_00014588@l(r4)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	lfs f0, 0x8c(r31)
-	fcmpo cr0, f6, f1
-	lis r3, float_1_rsh_00014470@ha
-	lfs f5, float_0p03705_rsh_000144b8@l(r5)
-	fmadds f3, f2, f4, f0
-	lfs f4, float_0p4967_rsh_000144bc@l(r4)
-	lfs f2, float_1_rsh_00014470@l(r3)
-	cror eq, lt, eq
-	bne @12
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f6, f1
-	cror eq, lt, eq
-	bne @13
-	fmuls f0, f6, f6
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	b @14
-	@13:
-	fsubs f0, f6, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fneg f5, f5
-	b @14
-	@12:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f6, f0
-	bge @15
-	fsubs f0, f6, f1
-	fmuls f0, f0, f0
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	fneg f5, f5
-	b @14
-	@15:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f6, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f2
-	@14:
-	lis r3, float_35_rsh_00014588@ha
-	lwz r4, 0xc(r29)
-	lfs f0, 0x94(r31)
-	lfs f2, float_35_rsh_00014588@l(r3)
-	lfs f1, 0xc(r4)
-	fnmsubs f4, f2, f5, f0
-	lfs f2, 0x2c(r4)
-	bl distABf
-	lis r3, float_35_rsh_00014588@ha
-	lfs f0, float_35_rsh_00014588@l(r3)
-	fcmpo cr0, f1, f0
-	bge @7
-	li r3, 0x2
-	b @2
-	@7:
-	lhz r0, 0x2e(r31)
-	cmplwi r0, 0x13
-	bne @16
-	lwz r0, 0x44(r31)
-	cmpwi r0, 0x14
-	bne @16
-	lis r3, vec3_rsh_00013d34@ha
-	lwz r8, 0xc(r29)
-	addi r7, r3, vec3_rsh_00013d34@l
-	addi r3, r31, 0x8c
-	lwz r6, 0x0(r7)
-	addi r4, r1, 0x98
-	lwz r5, 0x4(r7)
-	lwz r0, 0x8(r7)
-	stw r6, 0x50(r1)
-	lfs f0, 0xc(r8)
-	stw r5, 0x54(r1)
-	lfs f1, 0x1c(r8)
-	stfs f0, 0x50(r1)
-	lfs f0, 0x2c(r8)
-	stw r0, 0x58(r1)
-	lwz r6, 0x50(r1)
-	stfs f1, 0x54(r1)
-	stfs f0, 0x58(r1)
-	lwz r5, 0x54(r1)
-	lwz r0, 0x58(r1)
-	stw r6, 0x98(r1)
-	stw r5, 0x9c(r1)
-	stw r0, 0xa0(r1)
-	bl PSVECDistance
-	lis r3, float_65_rsh_0001458c@ha
-	lfs f0, float_65_rsh_0001458c@l(r3)
-	fcmpo cr0, f1, f0
-	bge @16
-	li r3, 0x2
-	b @2
-	@16:
-	lis r4, wp@ha
-	lis r3, zero_rsh_00014490@ha
-	addi r4, r4, wp@l
-	lfs f0, zero_rsh_00014490@l(r3)
-	lwz r4, 0x0(r4)
-	lfs f1, 0x55c(r4)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @17
-	lis r3, vec3_rsh_00013d40@ha
-	lwz r8, 0xc(r29)
-	addi r7, r3, vec3_rsh_00013d40@l
-	addi r3, r4, 0x564
-	lwz r6, 0x0(r7)
-	addi r4, r1, 0x8c
-	lwz r5, 0x4(r7)
-	lwz r0, 0x8(r7)
-	stw r6, 0x44(r1)
-	lfs f0, 0xc(r8)
-	stw r5, 0x48(r1)
-	lfs f1, 0x1c(r8)
-	stfs f0, 0x44(r1)
-	lfs f0, 0x2c(r8)
-	stw r0, 0x4c(r1)
-	lwz r6, 0x44(r1)
-	stfs f1, 0x48(r1)
-	stfs f0, 0x4c(r1)
-	lwz r5, 0x48(r1)
-	lwz r0, 0x4c(r1)
-	stw r6, 0x8c(r1)
-	stw r5, 0x90(r1)
-	stw r0, 0x94(r1)
-	bl PSVECDistance
-	lis r3, float_30_rsh_000144dc@ha
-	lfs f0, float_30_rsh_000144dc@l(r3)
-	fcmpo cr0, f1, f0
-	bge @17
-	li r3, 0x3
-	b @2
-	@17:
-	li r3, 0x0
-	bl partyGetPtr
-	bl nokonokoGetStatus
-	cmpwi r3, 0x2
-	bne @18
-	lis r3, vec3_rsh_00013d4c@ha
-	lwz r7, 0xc(r29)
-	addi r6, r3, vec3_rsh_00013d4c@l
-	li r3, 0x0
-	lwz r5, 0x0(r6)
-	lwz r4, 0x4(r6)
-	lwz r0, 0x8(r6)
-	stw r5, 0x38(r1)
-	lfs f0, 0xc(r7)
-	stw r4, 0x3c(r1)
-	lfs f1, 0x1c(r7)
-	stfs f0, 0x38(r1)
-	lfs f0, 0x2c(r7)
-	stw r0, 0x40(r1)
-	lwz r5, 0x38(r1)
-	stfs f1, 0x3c(r1)
-	stfs f0, 0x40(r1)
-	lwz r4, 0x3c(r1)
-	lwz r0, 0x40(r1)
-	stw r5, 0x80(r1)
-	stw r4, 0x84(r1)
-	stw r0, 0x88(r1)
-	bl partyGetPtr
-	addi r3, r3, 0x58
-	addi r4, r1, 0x80
-	bl PSVECDistance
-	lis r3, float_30_rsh_000144dc@ha
-	lfs f0, float_30_rsh_000144dc@l(r3)
-	fcmpo cr0, f1, f0
-	bge @18
-	li r3, 0x2
-	b @2
-	@18:
-	li r3, 0x0
-	bl partyGetPtr
-	lbz r0, 0x31(r3)
-	cmpwi r0, 0x3
-	bne @19
-	li r3, 0x0
-	bl partyGetPtr
-	lbz r0, 0x39(r3)
-	cmplwi r0, 0x46
-	bne @19
-	lis r3, vec3_rsh_00013d58@ha
-	lwz r7, 0xc(r29)
-	addi r6, r3, vec3_rsh_00013d58@l
-	li r3, 0x0
-	lwz r5, 0x0(r6)
-	lwz r4, 0x4(r6)
-	lwz r0, 0x8(r6)
-	stw r5, 0x2c(r1)
-	lfs f0, 0xc(r7)
-	stw r4, 0x30(r1)
-	lfs f1, 0x1c(r7)
-	stfs f0, 0x2c(r1)
-	lfs f0, 0x2c(r7)
-	stw r0, 0x34(r1)
-	lwz r5, 0x2c(r1)
-	stfs f1, 0x30(r1)
-	stfs f0, 0x34(r1)
-	lwz r4, 0x30(r1)
-	lwz r0, 0x34(r1)
-	stw r5, 0x74(r1)
-	stw r4, 0x78(r1)
-	stw r0, 0x7c(r1)
-	bl partyGetPtr
-	addi r3, r3, 0x58
-	addi r4, r1, 0x74
-	bl PSVECDistance
-	lis r3, float_50_rsh_000144fc@ha
-	lfs f0, float_50_rsh_000144fc@l(r3)
-	fcmpo cr0, f1, f0
-	bge @19
-	li r3, 0x4
-	b @2
-	@19:
-	lis r3, vec3_rsh_00013d64@ha
-	lwz r11, 0xc(r29)
-	addi r5, r3, vec3_rsh_00013d64@l
-	lis r3, vec3_rsh_00013d70@ha
-	lwz r4, 0x0(r5)
-	addi r9, r3, vec3_rsh_00013d70@l
-	lwz r0, 0x4(r5)
-	lis r3, float_20_rsh_00014580@ha
-	lwz r10, 0x8(r5)
-	addi r6, r3, float_20_rsh_00014580@l
-	stw r4, 0x20(r1)
-	lis r3, float_0p5_rsh_000144e8@ha
-	lfs f0, 0x8c(r31)
-	addi r5, r3, float_0p5_rsh_000144e8@l
-	stw r0, 0x24(r1)
-	addi r3, r1, 0x68
-	lfs f1, 0x1c(r11)
-	addi r4, r1, 0x5c
-	stfs f0, 0x20(r1)
-	lwz r8, 0x0(r9)
-	stfs f1, 0x24(r1)
-	lwz r7, 0x4(r9)
-	lwz r0, 0x8(r9)
-	stw r7, 0x18(r1)
-	lfs f0, 0x94(r31)
-	stw r10, 0x28(r1)
-	lwz r10, 0x20(r1)
-	stfs f0, 0x28(r1)
-	lwz r9, 0x24(r1)
-	lwz r7, 0x28(r1)
-	stfs f1, 0x18(r1)
-	lfs f2, 0x0(r6)
-	stw r10, 0x68(r1)
-	lwz r6, 0x18(r1)
-	stw r9, 0x6c(r1)
-	lfs f0, 0x0(r5)
-	stw r7, 0x70(r1)
-	stw r8, 0x14(r1)
-	lfs f3, 0xc(r11)
-	lfs f1, 0x2c(r11)
-	stw r0, 0x1c(r1)
-	stfs f3, 0x14(r1)
-	stfs f1, 0x1c(r1)
-	lwz r5, 0x14(r1)
-	lwz r0, 0x1c(r1)
-	stw r5, 0x5c(r1)
-	stw r6, 0x60(r1)
-	stw r0, 0x64(r1)
-	lfs f1, 0x1b4(r31)
-	fadds f1, f2, f1
-	fmuls f31, f1, f0
-	bl PSVECDistance
-	fcmpo cr0, f1, f31
-	bge @20
-	lfs f0, 0x28(r30)
-	lis r3, vec3_rsh_00013d7c@ha
-	lwz r5, 0xc(r29)
-	addi r7, r3, vec3_rsh_00013d7c@l
-	addi r3, r1, 0x68
-	addi r4, r1, 0x5c
-	stfs f0, 0xc(r5)
-	lfs f0, 0x2c(r30)
-	lwz r5, 0xc(r29)
-	stfs f0, 0x2c(r5)
-	lwz r8, 0xc(r29)
-	lwz r6, 0x0(r7)
-	lwz r5, 0x4(r7)
-	lwz r0, 0x8(r7)
-	stw r6, 0x8(r1)
-	lfs f0, 0xc(r8)
-	stw r5, 0xc(r1)
-	lfs f1, 0x1c(r8)
-	stfs f0, 0x8(r1)
-	lfs f0, 0x2c(r8)
-	stw r0, 0x10(r1)
-	lwz r6, 0x8(r1)
-	stfs f1, 0xc(r1)
-	stfs f0, 0x10(r1)
-	lwz r5, 0xc(r1)
-	lwz r0, 0x10(r1)
-	stw r6, 0x5c(r1)
-	stw r5, 0x60(r1)
-	stw r0, 0x64(r1)
-	bl PSVECDistance
-	fmr f29, f1
-	fcmpo cr0, f29, f31
-	bge @20
-	lwz r3, 0xc(r29)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x94(r31)
-	lfs f3, 0xc(r3)
-	lfs f4, 0x2c(r3)
-	bl angleABf
-	fmr f30, f1
-	lfs f2, 0x1a0(r31)
-	bl compAngle
-	lis r3, float_40_rsh_00014590@ha
-	fabs f1, f1
-	lfs f0, float_40_rsh_00014590@l(r3)
-	fcmpo cr0, f1, f0
-	bge @21
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r6, float_0p00761_rsh_000144a4@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lfs f0, 0x1a0(r31)
-	lfs f1, 0x0(r5)
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lis r4, float_360_rsh_000144a0@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	fmuls f2, f1, f0
-	lfs f0, float_360_rsh_000144a0@l(r4)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r4, float_1_rsh_00014470@ha
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	fdivs f5, f2, f0
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @22
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @23
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @24
-	@23:
-	fsubs f0, f5, f1
-	fsubs f5, f1, f0
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @24
-	@22:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @25
-	fsubs f5, f5, f1
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	fneg f4, f4
-	b @24
-	@25:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f5, f1, f0
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	fneg f4, f4
-	@24:
-	fsubs f6, f31, f29
-	lis r3, float_6p2832_rsh_0001449c@ha
-	addi r8, r3, float_6p2832_rsh_0001449c@l
-	lis r6, float_0p03705_rsh_000144b8@ha
-	lis r3, float_360_rsh_000144a0@ha
-	lfs f3, 0x0(r8)
-	fmuls f0, f6, f4
-	addi r7, r3, float_360_rsh_000144a0@l
-	lis r5, float_0p4967_rsh_000144bc@ha
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r4, float_1_rsh_00014470@ha
-	lfs f5, float_0p03705_rsh_000144b8@l(r6)
-	fneg f1, f0
-	lfs f0, 0x0(r7)
-	lfs f4, float_0p4967_rsh_000144bc@l(r5)
-	stfs f1, 0x174(r31)
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lfs f2, 0x1a0(r31)
-	fmuls f2, f3, f2
-	lfs f3, float_1_rsh_00014470@l(r4)
-	fdivs f2, f2, f0
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @26
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f2, f1
-	cror eq, lt, eq
-	bne @27
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	b @28
-	@27:
-	fsubs f0, f2, f1
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fneg f5, f5
-	b @28
-	@26:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f2, f0
-	bge @29
-	fsubs f2, f2, f1
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	fneg f5, f5
-	b @28
-	@29:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f2, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f2, f1, f0
-	fmuls f0, f2, f2
-	fmsubs f5, f5, f0, f4
-	fmadds f5, f5, f0, f3
-	@28:
-	fmuls f0, f6, f5
-	stfs f0, 0x17c(r31)
-	b @20
-	@21:
-	lis r3, float_6p2832_rsh_0001449c@ha
-	lis r6, float_0p00761_rsh_000144a4@ha
-	addi r5, r3, float_6p2832_rsh_0001449c@l
-	lis r4, float_360_rsh_000144a0@ha
-	lfs f0, 0x0(r5)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lis r5, float_0p16605_rsh_000144a8@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	fmuls f2, f0, f30
-	lfs f0, float_360_rsh_000144a0@l(r4)
-	lis r4, float_1_rsh_00014470@ha
-	lfs f4, float_0p00761_rsh_000144a4@l(r6)
-	lfs f3, float_0p16605_rsh_000144a8@l(r5)
-	fdivs f5, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r4)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @30
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @31
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f5
-	b @32
-	@31:
-	fsubs f0, f5, f1
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	b @32
-	@30:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @33
-	fsubs f1, f5, f1
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	b @32
-	@33:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f1, f1, f0
-	fmuls f0, f1, f1
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fmuls f4, f4, f1
-	fneg f4, f4
-	@32:
-	lwz r4, 0xc(r29)
-	lis r3, float_3p1416_rsh_000144ac@ha
-	lfs f1, float_3p1416_rsh_000144ac@l(r3)
-	lis r5, float_0p03705_rsh_000144b8@ha
-	lfs f0, 0xc(r4)
-	lis r4, float_0p4967_rsh_000144bc@ha
-	fcmpo cr0, f5, f1
-	lis r3, float_1_rsh_00014470@ha
-	fnmsubs f2, f31, f4, f0
-	lfs f0, 0x8c(r31)
-	lfs f4, float_0p03705_rsh_000144b8@l(r5)
-	lfs f3, float_0p4967_rsh_000144bc@l(r4)
-	fsubs f0, f2, f0
-	lfs f2, float_1_rsh_00014470@l(r3)
-	stfs f0, 0x174(r31)
-	cror eq, lt, eq
-	bne @34
-	lis r3, float_1p5708_rsh_000144b0@ha
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fcmpo cr0, f5, f1
-	cror eq, lt, eq
-	bne @35
-	fmuls f0, f5, f5
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	b @36
-	@35:
-	fsubs f0, f5, f1
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @36
-	@34:
-	lis r3, float_4p7124_rsh_000144b4@ha
-	lfs f0, float_4p7124_rsh_000144b4@l(r3)
-	fcmpo cr0, f5, f0
-	bge @37
-	fsubs f0, f5, f1
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	fneg f4, f4
-	b @36
-	@37:
-	lis r3, float_1p5708_rsh_000144b0@ha
-	fsubs f0, f5, f0
-	lfs f1, float_1p5708_rsh_000144b0@l(r3)
-	fsubs f0, f1, f0
-	fmuls f0, f0, f0
-	fmsubs f4, f4, f0, f3
-	fmadds f4, f4, f0, f2
-	@36:
-	lwz r3, 0xc(r29)
-	lfs f0, 0x94(r31)
-	lfs f1, 0x2c(r3)
-	fmadds f1, f31, f4, f1
-	fsubs f0, f1, f0
-	stfs f0, 0x17c(r31)
-	@20:
-	li r3, 0x0
-	@2:
-	psq_l f31, 0xe8(r1), 0, 0
-	lfd f31, 0xe0(r1)
-	psq_l f30, 0xd8(r1), 0, 0
-	lfd f30, 0xd0(r1)
-	psq_l f29, 0xc8(r1), 0, 0
-	lfd f29, 0xc0(r1)
-	lmw r29, 0xb4(r1)
-	lwz r0, 0xf4(r1)
-	mtlr r0
-	addi r1, r1, 0xf0
-	blr
-}
-
-asm static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
-	nofralloc
-	stwu r1, -0xb0(r1)
-	mflr r0
-	stw r0, 0xb4(r1)
-	stfd f31, 0xa0(r1)
-	psq_st f31, 0xa8(r1), 0, 0
-	stfd f30, 0x90(r1)
-	psq_st f30, 0x98(r1), 0, 0
-	stfd f29, 0x80(r1)
-	psq_st f29, 0x88(r1), 0, 0
-	stfd f28, 0x70(r1)
-	psq_st f28, 0x78(r1), 0, 0
-	stfd f27, 0x60(r1)
-	psq_st f27, 0x68(r1), 0, 0
-	stmw r29, 0x54(r1)
-	fmr f27, f1
-	cmpwi r6, 0x0
-	fmr f28, f2
-	mr r29, r3
-	fmr f29, f3
-	mr r30, r4
-	fmr f31, f4
-	mr r31, r5
-	fmr f30, f5
-	beq @1
-	lis r4, zero_rsh_00014490@ha
-	lis r3, float_100_rsh_000144f8@ha
-	addi r5, r4, zero_rsh_00014490@l
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	lfs f4, 0x0(r5)
-	lis r4, float_1E06_rsh_00014594@ha
-	lfs f7, float_1E06_rsh_00014594@l(r4)
-	lis r3, float_neg1_rsh_00014498@ha
-	fmr f6, f4
-	lfs f5, float_neg1_rsh_00014498@l(r3)
-	fadds f2, f0, f28
-	stfs f4, 0x18(r1)
-	addi r4, r1, 0x20
-	addi r5, r1, 0x1c
-	stfs f4, 0x1c(r1)
-	addi r6, r1, 0x18
-	addi r7, r1, 0x14
-	addi r8, r1, 0x10
-	stfs f4, 0x20(r1)
-	addi r9, r1, 0xc
-	addi r10, r1, 0x8
-	li r3, 0x0
-	stfs f7, 0x14(r1)
-	bl hitCheckFilter
-	cmplwi r3, 0x0
-	beq @1
-	lfs f0, 0x1c(r1)
-	lis r3, double_30_rsh_00014598@ha
-	fsubs f1, f28, f0
-	lfd f0, double_30_rsh_00014598@l(r3)
-	fabs f1, f1
-	fcmpo cr0, f1, f0
-	ble @2
-	lis r3, float_0p1_rsh_000144f0@ha
-	lfs f0, float_0p1_rsh_000144f0@l(r3)
-	fsubs f31, f31, f0
-	fadds f30, f30, f0
-	@2:
-	lfs f28, 0x1c(r1)
-	@1:
-	lis r3, vec3_rsh_00013d28@ha
-	addi r4, r3, vec3_rsh_00013d28@l
-	lwz r0, 0x0(r4)
-	lwz r3, 0x4(r4)
-	stw r0, 0x24(r1)
-	lwz r0, 0x8(r4)
-	stw r3, 0x28(r1)
-	stfs f27, 0x24(r1)
-	stw r0, 0x2c(r1)
-	lwz r0, 0x24(r1)
-	stfs f28, 0x28(r1)
-	stfs f29, 0x2c(r1)
-	lwz r3, 0x28(r1)
-	stw r0, 0x8(r30)
-	lwz r0, 0x2c(r1)
-	stw r3, 0xc(r30)
-	stw r0, 0x10(r30)
-	stfs f31, 0x1c(r30)
-	stfs f30, 0x20(r30)
-	lwz r3, 0xc(r29)
-	lfs f2, 0xc(r30)
-	lfs f0, 0x1c(r3)
-	lfs f1, 0xc(r3)
-	fsubs f30, f2, f0
-	lfs f2, 0x2c(r3)
-	lfs f3, 0x8(r30)
-	lfs f4, 0x10(r30)
-	bl distABf
-	lwz r3, 0xc(r29)
-	fmr f31, f1
-	lfs f3, 0x8(r30)
-	lfs f1, 0xc(r3)
-	lfs f2, 0x2c(r3)
-	lfs f4, 0x10(r30)
-	bl angleABf
-	lfs f0, 0x1c(r30)
-	lis r5, 0x4330
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_0p5_rsh_000144e8@ha
-	fdivs f0, f31, f0
-	addi r6, r4, double_to_int_rsh_00014488@l
-	addi r4, r3, float_0p5_rsh_000144e8@l
-	lis r3, float_180_rsh_00014538@ha
-	stw r5, 0x40(r1)
-	li r0, 0x3
-	fctiwz f2, f0
-	lfs f0, float_180_rsh_00014538@l(r3)
-	lfd f4, 0x0(r6)
-	fadds f0, f0, f1
-	stw r5, 0x38(r1)
-	stfd f2, 0x30(r1)
-	lfs f2, 0x0(r4)
-	lwz r3, 0x34(r1)
-	sth r3, 0x18(r30)
-	lha r3, 0x18(r30)
-	lfs f5, 0x20(r30)
-	xoris r3, r3, 0x8000
-	stw r3, 0x44(r1)
-	lfd f1, 0x40(r1)
-	stw r3, 0x3c(r1)
-	fsubs f1, f1, f4
-	lfd f3, 0x38(r1)
-	fdivs f1, f30, f1
-	fsubs f3, f3, f4
-	fmuls f3, f5, f3
-	fmadds f1, f3, f2, f1
-	stfs f1, 0x14(r30)
-	sth r0, 0x2(r30)
-	sth r31, 0x24(r30)
-	stfs f0, 0x4(r29)
-	lhz r0, 0x0(r30)
-	ori r0, r0, 0x2
-	sth r0, 0x0(r30)
-	lwz r0, 0x0(r29)
-	ori r0, r0, 0x10
-	stw r0, 0x0(r29)
-	lwz r0, 0x0(r29)
-	rlwinm r0, r0, 0, 30, 28
-	stw r0, 0x0(r29)
-	psq_l f31, 0xa8(r1), 0, 0
-	lfd f31, 0xa0(r1)
-	psq_l f30, 0x98(r1), 0, 0
-	lfd f30, 0x90(r1)
-	psq_l f29, 0x88(r1), 0, 0
-	lfd f29, 0x80(r1)
-	psq_l f28, 0x78(r1), 0, 0
-	lfd f28, 0x70(r1)
-	psq_l f27, 0x68(r1), 0, 0
-	lfd f27, 0x60(r1)
-	lmw r29, 0x54(r1)
-	lwz r0, 0xb4(r1)
-	mtlr r0
-	addi r1, r1, 0xb0
-	blr
-}
-
-asm static void ext_shadow_disp(CameraId camera, void* param) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	cmpwi r31, 0x1
-	bne @1
-	bl GXClearBoundingBox
-	@1:
-	lis r3, fs_mt@ha
-	addi r3, r3, fs_mt@l
-	bl extLoadShadowMtx
-	bl extLoadShadowRenderMode
-	bl extLoadShadowVertex
-	bl extLoadShadowTev
-	bl extDrawShadow
-	cmpwi r31, 0x1
-	bne @2
-	bl sysWaitDrawSync
-	addi r3, r1, 0xe
-	addi r4, r1, 0xc
-	addi r5, r1, 0xa
-	addi r6, r1, 0x8
-	bl GXReadBoundingBox
-	lis r3, str_00004B00@ha
-	addi r3, r3, str_00004B00@l
-	bl offscreenNameToId
-	lhz r4, 0xe(r1)
-	lhz r5, 0xc(r1)
-	lhz r6, 0xa(r1)
-	lhz r7, 0x8(r1)
-	bl offscreenAddBoundingBox
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm static void ext_disp(CameraId camera, void* param) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	cmpwi r31, 0x1
-	bne @1
-	bl GXClearBoundingBox
-	@1:
-	bl extLoadRenderMode
-	bl extLoadVertex
-	bl extLoadTexture
-	bl extLoadTev
-	bl extDraw
-	bl extLoadTextureExit
-	li r3, 0x0
-	bl GXSetNumIndStages
-	li r3, 0x0
-	bl GXSetTevDirect
-	cmpwi r31, 0x1
-	bne @2
-	bl sysWaitDrawSync
-	addi r3, r1, 0xe
-	addi r4, r1, 0xc
-	addi r5, r1, 0xa
-	addi r6, r1, 0x8
-	bl GXReadBoundingBox
-	lis r3, str_00004B00@ha
-	addi r3, r3, str_00004B00@l
-	bl offscreenNameToId
-	lhz r4, 0xe(r1)
-	lhz r5, 0xc(r1)
-	lhz r6, 0xa(r1)
-	lhz r7, 0x8(r1)
-	bl offscreenAddBoundingBox
-	@2:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm static void ext_moamoa_init(void) {
-	nofralloc
-	stwu r1, -0x150(r1)
-	mflr r0
-	stw r0, 0x154(r1)
-	stfd f31, 0x140(r1)
-	psq_st f31, 0x148(r1), 0, 0
-	stfd f30, 0x130(r1)
-	psq_st f30, 0x138(r1), 0, 0
-	stfd f29, 0x120(r1)
-	psq_st f29, 0x128(r1), 0, 0
-	stfd f28, 0x110(r1)
-	psq_st f28, 0x118(r1), 0, 0
-	stfd f27, 0x100(r1)
-	psq_st f27, 0x108(r1), 0, 0
-	stfd f26, 0xf0(r1)
-	psq_st f26, 0xf8(r1), 0, 0
-	stfd f25, 0xe0(r1)
-	psq_st f25, 0xe8(r1), 0, 0
-	stfd f24, 0xd0(r1)
-	psq_st f24, 0xd8(r1), 0, 0
-	stfd f23, 0xc0(r1)
-	psq_st f23, 0xc8(r1), 0, 0
-	stfd f22, 0xb0(r1)
-	psq_st f22, 0xb8(r1), 0, 0
-	stfd f21, 0xa0(r1)
-	psq_st f21, 0xa8(r1), 0, 0
-	stfd f20, 0x90(r1)
-	psq_st f20, 0x98(r1), 0, 0
-	stmw r17, 0x54(r1)
-	li r3, 0x870
-	bl _mapAlloc
-	lis r5, wp@ha
-	li r4, 0x0
-	addi r6, r5, wp@l
-	li r5, 0x870
-	stw r3, 0x0(r6)
-	bl memset
-	lis r5, wp@ha
-	lis r3, vec3_rsh_00013cf8@ha
-	addi r7, r3, vec3_rsh_00013cf8@l
-	lis r4, vec3_rsh_00013d04@ha
-	addi r9, r5, wp@l
-	lwz r6, 0x0(r7)
-	lwz r8, 0x0(r9)
-	lis r3, vec3_rsh_00013d10@ha
-	lwz r0, 0x4(r7)
-	addi r5, r4, vec3_rsh_00013d04@l
-	addi r4, r3, vec3_rsh_00013d10@l
-	stw r6, 0x14(r8)
-	stw r0, 0x18(r8)
-	lwz r0, 0x8(r7)
-	stw r0, 0x1c(r8)
-	lwz r6, 0x0(r9)
-	lwz r3, 0x0(r5)
-	lwz r0, 0x4(r5)
-	stw r3, 0x20(r6)
-	stw r0, 0x24(r6)
-	lwz r0, 0x8(r5)
-	stw r0, 0x28(r6)
-	lwz r5, 0x0(r9)
-	lwz r3, 0x0(r4)
-	lwz r0, 0x4(r4)
-	stw r3, 0x2c(r5)
-	stw r0, 0x30(r5)
-	lwz r0, 0x8(r4)
-	stw r0, 0x34(r5)
-	bl extGetPoseNum
-	lis r4, wp@ha
-	addi r5, r4, wp@l
-	lwz r4, 0x0(r5)
-	stw r3, 0x4(r4)
-	lwz r3, 0x0(r5)
-	lwz r0, 0x4(r3)
-	mulli r3, r0, 0x50
-	bl _mapAlloc
-	lis r5, wp@ha
-	li r4, 0x0
-	addi r6, r5, wp@l
-	lwz r5, 0x0(r6)
-	stw r3, 0x8(r5)
-	lwz r3, 0x0(r6)
-	lwz r0, 0x4(r3)
-	lwz r3, 0x8(r3)
-	mulli r5, r0, 0x50
-	bl memset
-	bl moamoa_pose_init
-	bl extGetPosePtr
-	lis r4, wp@ha
-	lis r17, zero_rsh_00014490@ha
-	addi r25, r4, wp@l
-	lis r12, double_to_int_rsh_00014488@ha
-	lwz r22, 0x0(r25)
-	addi r29, r17, zero_rsh_00014490@l
-	lis r11, float_32767_rsh_000144ec@ha
-	lis r10, float_1000_rsh_0001457c@ha
-	lis r9, float_neg500_rsh_000145ac@ha
-	lis r8, float_215_rsh_00014504@ha
-	lis r7, float_90_rsh_00014534@ha
-	lis r6, float_neg45_rsh_00014530@ha
-	lis r5, float_1E06_rsh_00014594@ha
-	lis r4, float_100_rsh_000144f8@ha
-	lis r19, float_20_rsh_00014580@ha
-	lis r18, float_neg10_rsh_000145b8@ha
-	lis r24, str_000041DC@ha
-	lis r21, str_000041D0@ha
-	lis r20, vec3_rsh_00013d1c@ha
-	lis r17, float_neg1_rsh_00014498@ha
-	lwz r31, 0x8(r22)
-	addi r26, r24, str_000041DC@l
-	lfd f20, double_to_int_rsh_00014488@l(r12)
-	mr r23, r3
-	lfs f21, float_32767_rsh_000144ec@l(r11)
-	addi r27, r21, str_000041D0@l
-	lfs f22, float_1000_rsh_0001457c@l(r10)
-	addi r22, r17, float_neg1_rsh_00014498@l
-	lfs f23, float_neg500_rsh_000145ac@l(r9)
-	addi r30, r20, vec3_rsh_00013d1c@l
-	lfs f24, float_215_rsh_00014504@l(r8)
-	li r24, 0x0
-	lfs f25, float_90_rsh_00014534@l(r7)
-	lis r28, 0x4330
-	lfs f26, float_neg45_rsh_00014530@l(r6)
-	lfs f27, 0x0(r29)
-	lfs f28, float_1E06_rsh_00014594@l(r5)
-	lfs f29, float_100_rsh_000144f8@l(r4)
-	lfs f30, float_20_rsh_00014580@l(r19)
-	lfs f31, float_neg10_rsh_000145b8@l(r18)
-	b @1
-	@2:
-	li r0, 0x0
-	mr r18, r26
-	sth r0, 0x0(r31)
-	mr r19, r27
-	sth r0, 0x2(r31)
-	sth r0, 0x4(r31)
-	lhz r0, 0x0(r31)
-	lwz r3, 0x0(r25)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r20, r3, 0x50
-	beq @3
-	lbz r4, 0x4c(r31)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r19, 0x0(r3)
-	blt @4
-	lwz r18, 0x4(r3)
-	@4:
-	cmplwi r4, 0xa
-	bne @3
-	lis r3, str_000048C4@ha
-	addi r18, r3, str_000048C4@l
-	@3:
-	li r21, 0x0
-	b @5
-	@6:
-	mr r3, r20
-	mr r4, r19
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @7
-	mr r4, r18
-	addi r3, r20, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @8
-	@7:
-	addi r21, r21, 0x1
-	addi r20, r20, 0x28
-	@5:
-	lwz r3, 0x0(r25)
-	lwz r0, 0x4c(r3)
-	cmpw r21, r0
-	blt @6
-	@8:
-	lwz r3, 0x0(r25)
-	lwz r0, 0x4c(r3)
-	cmpw r21, r0
-	bge @9
-	lha r0, 0x3c(r31)
-	cmpw r0, r21
-	beq @9
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @10
-	lis r4, str_00004A40@ha
-	mr r3, r18
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @9
-	@10:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @11
-	lis r4, str_00004A44@ha
-	mr r3, r18
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @9
-	@11:
-	lis r3, gp@ha
-	sth r21, 0x3c(r31)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r31)
-	stw r0, 0x40(r31)
-	@9:
-	lwz r0, 0x0(r23)
-	ori r0, r0, 0x7
-	stw r0, 0x0(r23)
-	lwz r3, 0xc(r23)
-	bl PSMTXIdentity
-	bl rand
-	xoris r0, r3, 0x8000
-	stw r28, 0x30(r1)
-	lwz r3, 0xc(r23)
-	stw r0, 0x34(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f20
-	fdivs f0, f0, f21
-	fmadds f0, f0, f22, f23
-	stfs f0, 0xc(r3)
-	lwz r3, 0xc(r23)
-	stfs f24, 0x1c(r3)
-	bl rand
-	xoris r0, r3, 0x8000
-	lfs f4, 0x0(r29)
-	stw r0, 0x3c(r1)
-	addi r4, r1, 0x20
-	lwz r11, 0xc(r23)
-	fmr f6, f4
-	stw r28, 0x38(r1)
-	addi r5, r1, 0x1c
-	lfs f5, 0x0(r22)
-	addi r6, r1, 0x18
-	lfd f0, 0x38(r1)
-	addi r7, r1, 0x14
-	addi r8, r1, 0x10
-	fsubs f0, f0, f20
-	addi r9, r1, 0xc
-	addi r10, r1, 0x8
-	li r3, 0x0
-	fdivs f0, f0, f21
-	fmadds f0, f0, f25, f26
-	stfs f0, 0x2c(r11)
-	stfs f27, 0x18(r1)
-	stfs f27, 0x1c(r1)
-	stfs f27, 0x20(r1)
-	stfs f28, 0x14(r1)
-	lwz r11, 0xc(r23)
-	lfs f0, 0x1c(r11)
-	lfs f1, 0xc(r11)
-	fadds f2, f29, f0
-	lfs f3, 0x2c(r11)
-	bl hitCheckFilter
-	cmplwi r3, 0x0
-	beq @12
-	lfs f0, 0x1c(r1)
-	lwz r3, 0xc(r23)
-	stfs f0, 0x1c(r3)
-	b @13
-	@12:
-	lwz r0, 0x0(r23)
-	ori r0, r0, 0x4
-	stw r0, 0x0(r23)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x3c(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x38(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_1000_rsh_0001457c@ha
-	lfd f0, 0x38(r1)
-	lis r3, float_neg500_rsh_000145ac@ha
-	fsubs f3, f0, f1
-	lfs f0, float_neg500_rsh_000145ac@l(r3)
-	lfs f1, float_1000_rsh_0001457c@l(r4)
-	lwz r3, 0xc(r23)
-	fdivs f2, f3, f2
-	fmadds f0, f2, f1, f0
-	stfs f0, 0xc(r3)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x34(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f1, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x30(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f2, 0x0(r5)
-	lis r4, float_115_rsh_000145b0@ha
-	lfd f0, 0x30(r1)
-	lis r3, float_100_rsh_000144f8@ha
-	fsubs f3, f0, f1
-	lfs f0, float_100_rsh_000144f8@l(r3)
-	lfs f1, float_115_rsh_000145b0@l(r4)
-	lwz r3, 0xc(r23)
-	fdivs f2, f3, f2
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x1c(r3)
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x44(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lfd f2, double_to_int_rsh_00014488@l(r4)
-	lis r3, float_32767_rsh_000144ec@ha
-	stw r0, 0x40(r1)
-	addi r5, r3, float_32767_rsh_000144ec@l
-	lfs f0, 0x0(r5)
-	lis r4, float_5_rsh_00014500@ha
-	lfd f1, 0x40(r1)
-	lis r3, float_70_rsh_000145b4@ha
-	addi r7, r4, float_5_rsh_00014500@l
-	lis r4, str_000041D0@ha
-	fsubs f2, f1, f2
-	addi r6, r3, float_70_rsh_000145b4@l
-	addi r20, r4, str_000041D0@l
-	lis r3, wp@ha
-	lis r5, str_000041DC@ha
-	lfs f1, 0x0(r7)
-	fdivs f2, f2, f0
-	lfs f0, 0x0(r6)
-	lwz r4, 0xc(r23)
-	addi r3, r3, wp@l
-	addi r21, r5, str_000041DC@l
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x2c(r4)
-	lhz r0, 0x0(r31)
-	ori r0, r0, 0x40
-	sth r0, 0x0(r31)
-	lhz r0, 0x0(r31)
-	lwz r3, 0x0(r3)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r19, r3, 0x50
-	beq @14
-	lbz r4, 0x4c(r31)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r20, 0x0(r3)
-	blt @15
-	lwz r21, 0x4(r3)
-	@15:
-	cmplwi r4, 0xa
-	bne @14
-	lis r3, str_000048C4@ha
-	addi r21, r3, str_000048C4@l
-	@14:
-	lis r3, wp@ha
-	li r18, 0x0
-	addi r17, r3, wp@l
-	b @16
-	@17:
-	mr r3, r19
-	mr r4, r20
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @18
-	mr r4, r21
-	addi r3, r19, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @19
-	@18:
-	addi r18, r18, 0x1
-	addi r19, r19, 0x28
-	@16:
-	lwz r3, 0x0(r17)
-	lwz r0, 0x4c(r3)
-	cmpw r18, r0
-	blt @17
-	@19:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4c(r3)
-	cmpw r18, r0
-	bge @13
-	lha r0, 0x3c(r31)
-	cmpw r0, r18
-	beq @13
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @20
-	lis r4, str_00004A40@ha
-	mr r3, r21
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @13
-	@20:
-	lhz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @21
-	lis r4, str_00004A44@ha
-	mr r3, r21
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @13
-	@21:
-	lis r3, gp@ha
-	sth r18, 0x3c(r31)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r31)
-	stw r0, 0x40(r31)
-	@13:
-	lwz r4, 0x0(r30)
-	lwz r3, 0x4(r30)
-	lwz r0, 0x8(r30)
-	stw r4, 0x24(r1)
-	stw r3, 0x28(r1)
-	stw r0, 0x2c(r1)
-	bl rand
-	xoris r0, r3, 0x8000
-	stw r28, 0x40(r1)
-	stw r0, 0x44(r1)
-	lfd f0, 0x40(r1)
-	fsubs f0, f0, f20
-	fdivs f0, f0, f21
-	fmadds f0, f0, f30, f31
-	stfs f0, 0x24(r1)
-	bl rand
-	xoris r0, r3, 0x8000
-	stw r28, 0x38(r1)
-	stw r0, 0x3c(r1)
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f20
-	fdivs f0, f0, f21
-	fmadds f0, f0, f30, f31
-	stfs f0, 0x28(r1)
-	bl rand
-	xoris r0, r3, 0x8000
-	lwz r3, 0x24(r1)
-	stw r0, 0x34(r1)
-	addi r24, r24, 0x1
-	lwz r0, 0x28(r1)
-	addi r23, r23, 0x20
-	stw r28, 0x30(r1)
-	lfd f0, 0x30(r1)
-	stw r3, 0x30(r31)
-	fsubs f0, f0, f20
-	stw r0, 0x34(r31)
-	fdivs f0, f0, f21
-	fmadds f0, f0, f30, f31
-	stfs f0, 0x2c(r1)
-	lwz r0, 0x2c(r1)
-	stw r0, 0x38(r31)
-	addi r31, r31, 0x50
-	@1:
-	lwz r3, 0x0(r25)
-	lwz r0, 0x4(r3)
-	cmpw r24, r0
-	blt @2
-	bl evalOn
-	li r17, 0x0
-	@22:
-	bl ext_moamoa_main
-	addi r17, r17, 0x1
-	cmpwi r17, 0x258
-	blt @22
-	psq_l f31, 0x148(r1), 0, 0
-	lfd f31, 0x140(r1)
-	psq_l f30, 0x138(r1), 0, 0
-	lfd f30, 0x130(r1)
-	psq_l f29, 0x128(r1), 0, 0
-	lfd f29, 0x120(r1)
-	psq_l f28, 0x118(r1), 0, 0
-	lfd f28, 0x110(r1)
-	psq_l f27, 0x108(r1), 0, 0
-	lfd f27, 0x100(r1)
-	psq_l f26, 0xf8(r1), 0, 0
-	lfd f26, 0xf0(r1)
-	psq_l f25, 0xe8(r1), 0, 0
-	lfd f25, 0xe0(r1)
-	psq_l f24, 0xd8(r1), 0, 0
-	lfd f24, 0xd0(r1)
-	psq_l f23, 0xc8(r1), 0, 0
-	lfd f23, 0xc0(r1)
-	psq_l f22, 0xb8(r1), 0, 0
-	lfd f22, 0xb0(r1)
-	psq_l f21, 0xa8(r1), 0, 0
-	lfd f21, 0xa0(r1)
-	psq_l f20, 0x98(r1), 0, 0
-	lfd f20, 0x90(r1)
-	lmw r17, 0x54(r1)
-	lwz r0, 0x154(r1)
-	mtlr r0
-	addi r1, r1, 0x150
-	blr
-}
-
-asm static f32 randf(f32 min, f32 max) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x20(r1)
-	psq_st f31, 0x28(r1), 0, 0
-	stfd f30, 0x10(r1)
-	psq_st f30, 0x18(r1), 0, 0
-	fmr f30, f1
-	fmr f31, f2
-	bl rand
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xc(r1)
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r3, float_32767_rsh_000144ec@ha
-	lfd f3, double_to_int_rsh_00014488@l(r4)
-	stw r0, 0x8(r1)
-	fsubs f0, f31, f30
-	lfs f1, float_32767_rsh_000144ec@l(r3)
-	lfd f2, 0x8(r1)
-	fsubs f2, f2, f3
-	fdivs f1, f2, f1
-	fmadds f1, f1, f0, f30
-	psq_l f31, 0x28(r1), 0, 0
-	lfd f31, 0x20(r1)
-	psq_l f30, 0x18(r1), 0, 0
-	lwz r0, 0x34(r1)
-	lfd f30, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	lis r5, wp@ha
-	subfic r4, r3, 0x1
-	addi r8, r5, wp@l
-	slwi r0, r3, 1
-	lwz r5, 0x0(r8)
-	mulli r4, r4, 0xc
-	cmpwi r3, 0x0
-	addi r9, r5, 0x14
-	add r6, r9, r4
-	li r4, 0x64
-	mulli r7, r3, 0xc
-	lwz r5, 0x0(r6)
-	lwz r3, 0x4(r6)
-	add r7, r9, r7
-	stw r5, 0x0(r7)
-	stw r3, 0x4(r7)
-	lwz r3, 0x8(r6)
-	stw r3, 0x8(r7)
-	lwz r3, 0x0(r8)
-	add r3, r3, r0
-	sth r4, 0x3a(r3)
-	bne @1
-	lwz r3, 0x0(r8)
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x1000
-	sth r0, 0x0(r3)
-	b @2
-	@1:
-	lwz r3, 0x0(r8)
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x2000
-	sth r0, 0x0(r3)
-	@2:
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void evalOn(void) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	lis r3, str_000047B4@ha
-	stw r0, 0x34(r1)
-	addi r3, r3, str_000047B4@l
-	stmw r24, 0x10(r1)
-	bl npcNameToPtr
-	mr r31, r3
-	lwz r3, 0x104(r3)
-	bl animPoseWorldPositionEvalOn
-	lis r3, wp@ha
-	lwz r0, 0x104(r31)
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	stw r0, 0x48(r3)
-	lwz r3, 0x104(r31)
-	bl animPoseGetAnimPosePtr
-	lwz r6, 0x15c(r3)
-	lis r4, vec3_rsh_00013cec@ha
-	lwz r0, 0x160(r3)
-	addi r5, r4, vec3_rsh_00013cec@l
-	lwz r7, 0x0(r6)
-	li r3, 0x0
-	mtctr r0
-	cmpwi r0, 0x0
-	ble @1
-	@2:
-	lwz r4, 0x0(r5)
-	add r6, r7, r3
-	lwz r0, 0x4(r5)
-	addi r3, r3, 0xc
-	stw r4, 0x0(r6)
-	stw r0, 0x4(r6)
-	lwz r0, 0x8(r5)
-	stw r0, 0x8(r6)
-	bdnz @2
-	@1:
-	lis r3, dat_80419a28@ha
-	lis r5, g_moamoa_chain_tbl@ha
-	lis r4, wp@ha
-	lwz r28, dat_80419a28@l(r3)
-	addi r26, r5, g_moamoa_chain_tbl@l
-	li r24, 0x0
-	addi r27, r4, wp@l
-	li r30, 0x0
-	li r29, 0x0
-	b @3
-	@4:
-	add r25, r26, r29
-	lwz r3, 0x104(r31)
-	lwz r4, 0x0(r25)
-	bl animPoseGetGroupIdx
-	lwz r4, 0x0(r27)
-	addi r0, r30, 0x670
-	sthx r3, r4, r0
-	lwz r3, 0x104(r31)
-	lwz r4, 0x4(r25)
-	bl animPoseGetGroupIdx
-	lwz r4, 0x0(r27)
-	addi r0, r30, 0x672
-	addi r30, r30, 0x4
-	addi r29, r29, 0x8
-	sthx r3, r4, r0
-	addi r24, r24, 0x1
-	@3:
-	cmpw r24, r28
-	blt @4
-	lis r4, wp@ha
-	lis r3, dat_80419a28@ha
-	addi r7, r4, wp@l
-	lwz r6, dat_80419a28@l(r3)
-	lwz r4, 0x0(r7)
-	li r9, 0x0
-	lwz r8, 0x8(r4)
-	b @5
-	@6:
-	divw r0, r9, r6
-	mullw r0, r0, r6
-	subf r0, r0, r9
-	addi r9, r9, 0x1
-	sth r0, 0x48(r8)
-	lha r0, 0x48(r8)
-	lwz r5, 0x0(r7)
-	slwi r3, r0, 1
-	addi r4, r3, 0x570
-	lhax r3, r5, r4
-	addi r0, r3, 0x1
-	sthx r0, r5, r4
-	sth r3, 0x4a(r8)
-	addi r8, r8, 0x50
-	@5:
-	lwz r4, 0x0(r7)
-	lwz r0, 0x4(r4)
-	cmpw r9, r0
-	blt @6
-	lis r3, wp@ha
-	lwz r5, 0x8(r4)
-	addi r4, r3, wp@l
-	li r6, 0x0
-	b @7
-	@8:
-	lha r3, 0x48(r5)
-	extsh. r0, r3
-	beq @9
-	cmpwi r3, 0x5
-	beq @9
-	cmpwi r3, 0xa
-	beq @9
-	cmpwi r3, 0xf
-	beq @9
-	cmpwi r3, 0x1e
-	beq @9
-	cmpwi r3, 0x22
-	beq @9
-	cmpwi r3, 0x26
-	beq @9
-	cmpwi r3, 0x2a
-	beq @9
-	cmpwi r3, 0x2e
-	bne @10
-	@9:
-	li r0, 0x1
-	stb r0, 0x4c(r5)
-	@10:
-	lha r0, 0x4a(r5)
-	cmpwi r0, 0x0
-	bne @11
-	lha r0, 0x48(r5)
-	cmpwi r0, 0x3
-	bne @12
-	li r0, 0x2
-	stb r0, 0x4c(r5)
-	@12:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0x4
-	bne @13
-	li r0, 0x3
-	stb r0, 0x4c(r5)
-	@13:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0x7
-	bne @14
-	li r0, 0x4
-	stb r0, 0x4c(r5)
-	@14:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0x8
-	bne @15
-	li r0, 0x5
-	stb r0, 0x4c(r5)
-	@15:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0x9
-	bne @16
-	li r0, 0x6
-	stb r0, 0x4c(r5)
-	@16:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0xc
-	bne @17
-	li r0, 0x7
-	stb r0, 0x4c(r5)
-	@17:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0xd
-	bne @18
-	li r0, 0x8
-	stb r0, 0x4c(r5)
-	@18:
-	lha r0, 0x48(r5)
-	cmpwi r0, 0xe
-	bne @11
-	li r0, 0x9
-	stb r0, 0x4c(r5)
-	@11:
-	addi r6, r6, 0x1
-	addi r5, r5, 0x50
-	@7:
-	lwz r3, 0x0(r4)
-	lwz r0, 0x4(r3)
-	cmpw r6, r0
-	blt @8
-	lmw r24, 0x10(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stmw r22, 0x8(r1)
-	bl extGetPosePtr
-	lis r4, wp@ha
-	lis r5, str_000041DC@ha
-	addi r29, r4, wp@l
-	mr r24, r3
-	lwz r6, 0x0(r29)
-	lis r4, str_000041D0@ha
-	addi r30, r5, str_000041DC@l
-	li r25, 0x0
-	lwz r23, 0x8(r6)
-	addi r31, r4, str_000041D0@l
-	b @1
-	@2:
-	lwz r3, 0x0(r24)
-	li r0, 0x3d
-	mr r26, r30
-	mr r27, r31
-	ori r3, r3, 0x4
-	stw r3, 0x0(r24)
-	lhz r3, 0x0(r23)
-	ori r3, r3, 0x400
-	sth r3, 0x0(r23)
-	lhz r3, 0x0(r23)
-	ori r3, r3, 0x100
-	sth r3, 0x0(r23)
-	lhz r3, 0x0(r23)
-	ori r3, r3, 0x200
-	sth r3, 0x0(r23)
-	sth r0, 0x2(r23)
-	lhz r0, 0x0(r23)
-	ori r0, r0, 0x800
-	sth r0, 0x0(r23)
-	lhz r0, 0x0(r23)
-	lwz r3, 0x0(r29)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r22, r3, 0x50
-	beq @3
-	lbz r4, 0x4c(r23)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r27, 0x0(r3)
-	blt @4
-	lwz r26, 0x4(r3)
-	@4:
-	cmplwi r4, 0xa
-	bne @3
-	lis r3, str_000048C4@ha
-	addi r26, r3, str_000048C4@l
-	@3:
-	li r28, 0x0
-	b @5
-	@6:
-	mr r3, r22
-	mr r4, r27
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @7
-	mr r4, r26
-	addi r3, r22, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @8
-	@7:
-	addi r28, r28, 0x1
-	addi r22, r22, 0x28
-	@5:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r28, r0
-	blt @6
-	@8:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r28, r0
-	bge @9
-	lha r0, 0x3c(r23)
-	cmpw r0, r28
-	beq @9
-	lhz r0, 0x0(r23)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @10
-	lis r4, str_00004A40@ha
-	mr r3, r26
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @9
-	@10:
-	lhz r0, 0x0(r23)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @11
-	lis r4, str_00004A44@ha
-	mr r3, r26
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @9
-	@11:
-	lis r3, gp@ha
-	sth r28, 0x3c(r23)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r23)
-	stw r0, 0x40(r23)
-	@9:
-	addi r25, r25, 0x1
-	addi r24, r24, 0x20
-	addi r23, r23, 0x50
-	@1:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4(r3)
-	cmpw r25, r0
-	blt @2
-	lmw r22, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	bl extGetPosePtr
-	lis r3, wp@ha
-	li r6, 0x0
-	addi r5, r3, wp@l
-	li r4, 0x3f
-	lwz r3, 0x0(r5)
-	lwz r7, 0x8(r3)
-	b @1
-	@2:
-	lhz r0, 0x0(r7)
-	addi r6, r6, 0x1
-	rlwinm r0, r0, 0, 22, 20
-	sth r0, 0x0(r7)
-	sth r4, 0x2(r7)
-	addi r7, r7, 0x50
-	@1:
-	lwz r3, 0x0(r5)
-	lwz r0, 0x4(r3)
-	cmpw r6, r0
-	blt @2
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stmw r21, 0x14(r1)
-	mr r22, r3
-	lwz r21, 0x18(r3)
-	lwz r4, 0x0(r21)
-	bl evtGetValue
-	lwz r4, 0x4(r21)
-	mr r27, r3
-	mr r3, r22
-	bl evtGetValue
-	mr r28, r3
-	bl extGetPosePtr
-	lis r3, wp@ha
-	lis r4, str_000041DC@ha
-	addi r29, r3, wp@l
-	lis r3, str_000041D0@ha
-	lwz r5, 0x0(r29)
-	addi r30, r4, str_000041DC@l
-	addi r31, r3, str_000041D0@l
-	li r24, 0x0
-	lwz r23, 0x8(r5)
-	b @1
-	@2:
-	cmpwi r27, 0x0
-	beq @3
-	cmpwi r28, 0x0
-	bne @4
-	lbz r0, 0x4c(r23)
-	cmplwi r0, 0x1
-	bne @5
-	lhz r0, 0x0(r23)
-	ori r0, r0, 0x800
-	sth r0, 0x0(r23)
-	b @5
-	@4:
-	lhz r0, 0x0(r23)
-	ori r0, r0, 0x800
-	sth r0, 0x0(r23)
-	b @5
-	@3:
-	cmpwi r28, 0x0
-	bne @6
-	lbz r0, 0x4c(r23)
-	cmplwi r0, 0x1
-	beq @5
-	lhz r0, 0x0(r23)
-	rlwinm r0, r0, 0, 21, 19
-	sth r0, 0x0(r23)
-	b @5
-	@6:
-	lhz r0, 0x0(r23)
-	rlwinm r0, r0, 0, 21, 19
-	sth r0, 0x0(r23)
-	@5:
-	lhz r0, 0x0(r23)
-	mr r25, r30
-	lwz r3, 0x0(r29)
-	mr r21, r31
-	rlwinm. r0, r0, 0, 20, 20
-	addi r22, r3, 0x50
-	beq @7
-	lbz r4, 0x4c(r23)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r21, 0x0(r3)
-	blt @8
-	lwz r25, 0x4(r3)
-	@8:
-	cmplwi r4, 0xa
-	bne @7
-	lis r3, str_000048C4@ha
-	addi r25, r3, str_000048C4@l
-	@7:
-	li r26, 0x0
-	b @9
-	@10:
-	mr r3, r22
-	mr r4, r21
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @11
-	mr r4, r25
-	addi r3, r22, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @12
-	@11:
-	addi r26, r26, 0x1
-	addi r22, r22, 0x28
-	@9:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r26, r0
-	blt @10
-	@12:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r26, r0
-	bge @13
-	lha r0, 0x3c(r23)
-	cmpw r0, r26
-	beq @13
-	lhz r0, 0x0(r23)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @14
-	lis r4, str_00004A40@ha
-	mr r3, r25
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @13
-	@14:
-	lhz r0, 0x0(r23)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @15
-	lis r4, str_00004A44@ha
-	mr r3, r25
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @13
-	@15:
-	lis r3, gp@ha
-	sth r26, 0x3c(r23)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r23)
-	stw r0, 0x40(r23)
-	@13:
-	addi r24, r24, 0x1
-	addi r23, r23, 0x50
-	@1:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4(r3)
-	cmpw r24, r0
-	blt @2
-	lmw r21, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	cmpwi r4, 0x0
-	stw r0, 0x34(r1)
-	stmw r22, 0x8(r1)
-	beq @1
-	bl extGetPosePtr
-	lis r5, wp@ha
-	lis r4, float_1_rsh_00014470@ha
-	addi r6, r5, wp@l
-	lfs f0, float_1_rsh_00014470@l(r4)
-	lwz r5, 0x0(r6)
-	lwz r7, 0x8(r5)
-	li r5, 0x0
-	b @2
-	@3:
-	lwz r4, 0xc(r3)
-	li r0, 0xe
-	cmpwi r5, 0x64
-	stfs f0, 0x28(r4)
-	lwz r4, 0xc(r3)
-	stfs f0, 0x14(r4)
-	lwz r4, 0xc(r3)
-	stfs f0, 0x0(r4)
-	sth r0, 0x24(r7)
-	sth r0, 0x2(r7)
-	bge @4
-	li r4, 0x64
-	divw r0, r5, r4
-	mullw r0, r0, r4
-	subf r0, r0, r5
-	b @5
-	@4:
-	li r4, 0x3c
-	divw r0, r5, r4
-	mullw r0, r0, r4
-	subf r4, r0, r5
-	addi r0, r4, 0x64
-	@5:
-	sth r0, 0x4(r7)
-	addi r5, r5, 0x1
-	addi r3, r3, 0x20
-	lhz r0, 0x0(r7)
-	ori r0, r0, 0x100
-	sth r0, 0x0(r7)
-	addi r7, r7, 0x50
-	@2:
-	lwz r4, 0x0(r6)
-	lwz r0, 0x4(r4)
-	cmpw r5, r0
-	blt @3
-	@1:
-	bl extGetPosePtr
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4(r3)
-	lwz r3, 0x8(r3)
-	mtctr r0
-	cmpwi r0, 0x0
-	ble @6
-	@7:
-	lhz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 22, 22
-	bne @8
-	li r3, 0x0
-	b @9
-	@8:
-	addi r3, r3, 0x50
-	bdnz @7
-	@6:
-	bl extGetPosePtr
-	lis r4, wp@ha
-	lis r5, str_000041DC@ha
-	addi r29, r4, wp@l
-	mr r25, r3
-	lwz r6, 0x0(r29)
-	lis r4, str_000041D0@ha
-	addi r30, r5, str_000041DC@l
-	li r23, 0x0
-	lwz r24, 0x8(r6)
-	addi r31, r4, str_000041D0@l
-	b @10
-	@11:
-	lwz r3, 0x0(r25)
-	li r0, 0x3d
-	mr r26, r30
-	mr r27, r31
-	ori r3, r3, 0x4
-	stw r3, 0x0(r25)
-	lhz r3, 0x0(r24)
-	ori r3, r3, 0x400
-	sth r3, 0x0(r24)
-	sth r0, 0x2(r24)
-	lhz r0, 0x0(r24)
-	lwz r3, 0x0(r29)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r22, r3, 0x50
-	beq @12
-	lbz r4, 0x4c(r24)
-	lis r3, fs_group_tbl@ha
-	addi r0, r3, fs_group_tbl@l
-	clrlslwi r3, r4, 24, 3
-	cmplwi r4, 0x2
-	add r3, r0, r3
-	lwz r27, 0x0(r3)
-	blt @13
-	lwz r26, 0x4(r3)
-	@13:
-	cmplwi r4, 0xa
-	bne @12
-	lis r3, str_000048C4@ha
-	addi r26, r3, str_000048C4@l
-	@12:
-	li r28, 0x0
-	b @14
-	@15:
-	mr r3, r22
-	mr r4, r27
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @16
-	mr r4, r26
-	addi r3, r22, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @17
-	@16:
-	addi r28, r28, 0x1
-	addi r22, r22, 0x28
-	@14:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r28, r0
-	blt @15
-	@17:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4c(r3)
-	cmpw r28, r0
-	bge @18
-	lha r0, 0x3c(r24)
-	cmpw r0, r28
-	beq @18
-	lhz r0, 0x0(r24)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @19
-	lis r4, str_00004A40@ha
-	mr r3, r26
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @18
-	@19:
-	lhz r0, 0x0(r24)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @20
-	lis r4, str_00004A44@ha
-	mr r3, r26
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @18
-	@20:
-	lis r3, gp@ha
-	sth r28, 0x3c(r24)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r24)
-	stw r0, 0x40(r24)
-	@18:
-	addi r23, r23, 0x1
-	addi r25, r25, 0x20
-	addi r24, r24, 0x50
-	@10:
-	lwz r3, 0x0(r29)
-	lwz r0, 0x4(r3)
-	cmpw r23, r0
-	blt @11
-	li r3, 0x2
-	@9:
-	lmw r22, 0x8(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl extGetPosePtr
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4(r3)
-	lwz r3, 0x8(r3)
-	mtctr r0
-	cmpwi r0, 0x0
-	ble @1
-	@2:
-	lhz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 26, 26
-	bne @3
-	li r3, 0x0
-	b @4
-	@3:
-	addi r3, r3, 0x50
-	bdnz @2
-	@1:
-	li r3, 0x2
-	@4:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl extGetPosePtr
-	lis r4, zero_rsh_00014490@ha
-	li r6, 0x0
-	addi r5, r4, zero_rsh_00014490@l
-	lis r4, wp@ha
-	lfs f0, 0x0(r5)
-	addi r5, r4, wp@l
-	b @1
-	@2:
-	stfs f0, 0x14(r3)
-	addi r6, r6, 0x1
-	stfs f0, 0x1c(r3)
-	addi r3, r3, 0x20
-	@1:
-	lwz r4, 0x0(r5)
-	lwz r0, 0x4(r4)
-	cmpw r6, r0
-	blt @2
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl extReset
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	cmpwi r31, 0x0
-	beq @1
-	lis r4, wp@ha
-	addi r4, r4, wp@l
-	lwz r4, 0x0(r4)
-	lhz r0, 0x0(r4)
-	or r0, r0, r3
-	sth r0, 0x0(r4)
-	b @2
-	@1:
-	lis r4, wp@ha
-	addi r4, r4, wp@l
-	lwz r4, 0x0(r4)
-	lhz r0, 0x0(r4)
-	andc r0, r0, r3
-	sth r0, 0x0(r4)
-	@2:
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r26, 0x8(r1)
-	mr r29, r3
-	lis r3, wp@ha
-	mr r26, r4
-	addi r3, r3, wp@l
-	mr r30, r5
-	lhz r0, 0x0(r29)
-	lwz r3, 0x0(r3)
-	rlwinm. r0, r0, 0, 20, 20
-	addi r27, r3, 0x50
-	beq @1
-	lbz r0, 0x4c(r29)
-	lis r3, fs_group_tbl@ha
-	addi r3, r3, fs_group_tbl@l
-	clrlslwi r4, r0, 24, 3
-	cmplwi r0, 0x2
-	lwzx r26, r3, r4
-	blt @2
-	add r3, r3, r4
-	lwz r30, 0x4(r3)
-	@2:
-	cmplwi r0, 0xa
-	bne @1
-	lis r3, str_000048C4@ha
-	addi r0, r3, str_000048C4@l
-	mr r30, r0
-	@1:
-	lis r3, wp@ha
-	li r31, 0x0
-	addi r28, r3, wp@l
-	b @3
-	@4:
-	mr r3, r27
-	mr r4, r26
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @5
-	mr r4, r30
-	addi r3, r27, 0x10
-	bl strcmp
-	cmpwi r3, 0x0
-	beq @6
-	@5:
-	addi r31, r31, 0x1
-	addi r27, r27, 0x28
-	@3:
-	lwz r3, 0x0(r28)
-	lwz r0, 0x4c(r3)
-	cmpw r31, r0
-	blt @4
-	@6:
-	lis r3, wp@ha
-	addi r3, r3, wp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x4c(r3)
-	cmpw r31, r0
-	bge @7
-	lha r0, 0x3c(r29)
-	cmpw r0, r31
-	beq @7
-	lhz r0, 0x0(r29)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @8
-	lis r4, str_00004A40@ha
-	mr r3, r30
-	addi r4, r4, str_00004A40@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @7
-	@8:
-	lhz r0, 0x0(r29)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @9
-	lis r4, str_00004A44@ha
-	mr r3, r30
-	addi r4, r4, str_00004A44@l
-	li r5, 0x1
-	bl strncmp
-	cmpwi r3, 0x0
-	bne @7
-	@9:
-	lis r3, gp@ha
-	sth r31, 0x3c(r29)
-	addi r3, r3, gp@l
-	lwz r3, 0x0(r3)
-	lwz r0, 0x38(r3)
-	lwz r3, 0x3c(r3)
-	stw r3, 0x44(r29)
-	stw r0, 0x40(r29)
-	@7:
-	lmw r26, 0x8(r1)
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm static void moamoa_pose_main(void) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stfd f29, 0x50(r1)
-	psq_st f29, 0x58(r1), 0, 0
-	stfd f28, 0x40(r1)
-	psq_st f28, 0x48(r1), 0, 0
-	stmw r22, 0x18(r1)
-	bl extGetPosePtr
-	lis r4, wp@ha
-	lis r7, float_60_rsh_00014578@ha
-	addi r29, r4, wp@l
-	lis r6, float_1000_rsh_0001457c@ha
-	lwz r9, 0x0(r29)
-	lis r5, float_1_rsh_00014470@ha
-	lis r4, double_to_int_rsh_00014488@ha
-	lis r8, gp@ha
-	lwz r24, 0x8(r9)
-	mr r25, r3
-	lfs f28, float_60_rsh_00014578@l(r7)
-	addi r30, r8, gp@l
-	lfs f29, float_1000_rsh_0001457c@l(r6)
-	li r26, 0x0
-	lfs f30, float_1_rsh_00014470@l(r5)
-	lis r31, 0x8000
-	lfd f31, double_to_int_rsh_00014488@l(r4)
-	lis r23, 0x4330
-	b @1
-	@2:
-	lwz r3, 0xf8(r31)
-	li r0, 0x3e8
-	lwz r4, 0x0(r30)
-	li r5, 0x0
-	srwi r3, r3, 2
-	lha r7, 0x3c(r24)
-	divwu r6, r3, r0
-	lwz r27, 0x3c(r4)
-	lwz r0, 0x44(r24)
-	lwz r28, 0x38(r4)
-	subfc r4, r0, r27
-	lwz r0, 0x40(r24)
-	mulli r7, r7, 0x28
-	subfe r3, r0, r28
-	addi r22, r7, 0x50
-	add r22, r8, r22
-	bl __div2u
-	bl __cvt_ull_flt
-	fmuls f1, f28, f1
-	lfs f0, 0x1c(r22)
-	fdivs f1, f1, f29
-	fdivs f1, f1, f0
-	fcmpo cr0, f1, f30
-	cror eq, gt, eq
-	bne @3
-	stw r27, 0x44(r24)
-	lis r3, zero_rsh_00014490@ha
-	lfs f1, zero_rsh_00014490@l(r3)
-	stw r28, 0x40(r24)
-	@3:
-	lwz r3, 0x24(r22)
-	addi r26, r26, 0x1
-	stw r23, 0x8(r1)
-	addi r24, r24, 0x50
-	subi r0, r3, 0x1
-	lwz r3, 0x20(r22)
-	xoris r0, r0, 0x8000
-	stw r0, 0xc(r1)
-	lfd f0, 0x8(r1)
-	fsubs f0, f0, f31
-	fmuls f0, f0, f1
-	fctiwz f0, f0
-	stfd f0, 0x10(r1)
-	lwz r0, 0x14(r1)
-	add r0, r3, r0
-	stw r0, 0x10(r25)
-	addi r25, r25, 0x20
-	@1:
-	lwz r8, 0x0(r29)
-	lwz r0, 0x4(r8)
-	cmpw r26, r0
-	blt @2
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	psq_l f29, 0x58(r1), 0, 0
-	lfd f29, 0x50(r1)
-	psq_l f28, 0x48(r1), 0, 0
-	lfd f28, 0x40(r1)
-	lmw r22, 0x18(r1)
-	lwz r0, 0x84(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-// clang-format on
+// jumptables last, as the target emitted them with their functions
+__declspec(section ".data") void* rsh_06_jumptable_000183EC[] = {
+    (char*)ext_moamoa_main + 0xD38,
+    (char*)ext_moamoa_main + 0x1840,
+    (char*)ext_moamoa_main + 0x1B38,
+    (char*)ext_moamoa_main + 0x1D9C,
+    (char*)ext_moamoa_main + 0x1FF8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0xFE4,
+    (char*)ext_moamoa_main + 0x1010,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x201C,
+    (char*)ext_moamoa_main + 0x201C,
+    (char*)ext_moamoa_main + 0x201C,
+    (char*)ext_moamoa_main + 0x2320,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2380,
+    (char*)ext_moamoa_main + 0x26D0,
+    (char*)ext_moamoa_main + 0x2760,
+    (char*)ext_moamoa_main + 0x15A8,
+    (char*)ext_moamoa_main + 0x15D4,
+    (char*)ext_moamoa_main + 0x169C,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x2BA8,
+    (char*)ext_moamoa_main + 0x14A4,
+    (char*)ext_moamoa_main + 0x2804,
+    (char*)ext_moamoa_main + 0x282C,
+    (char*)ext_moamoa_main + 0x2AB8,
+    (char*)ext_moamoa_main + 0x2ADC,
+};
 #endif
-
 // target pad words (G5: section sizes must match or later DOL addresses shift)
 #pragma force_active on
 __declspec(section ".data") u32 gap_04_000184F4_data[1] = {0};
 #pragma force_active reset
+
+#ifdef NONMATCHING // all-C link: pool objects the C names, defined on the asm side only
+__declspec(section ".data") const f64 double_30_rsh_00014598 = 30.0;
+__declspec(section ".data") const f32 float_0p03_rsh_000144f4[1] = {0.03f};
+__declspec(section ".data") const f32 float_0p1_rsh_000144f0[1] = {0.1f};
+__declspec(section ".data") const f32 float_0p20944_rsh_0001455c[1] = {0.20943952f};
+__declspec(section ".data") const f32 float_0p25_rsh_0001452c[1] = {0.25f};
+__declspec(section ".data") const f32 float_0p2_rsh_00014544[1] = {0.2f};
+__declspec(section ".data") const f32 float_0p3_rsh_00014508[1] = {0.3f};
+__declspec(section ".data") const f32 float_0p4_rsh_00014518[1] = {0.4f};
+__declspec(section ".data") const f32 float_0p5_rsh_000144e8[1] = {0.5f};
+__declspec(section ".data") const f32 float_0p8_rsh_00014520[1] = {0.8f};
+__declspec(section ".data") const f32 float_0p9_rsh_0001453c[1] = {0.9f};
+__declspec(section ".data") const f32 float_1000_rsh_0001457c[1] = {1000.0f};
+__declspec(section ".data") const f32 float_100_rsh_000144f8[1] = {100.0f};
+__declspec(section ".data") const f32 float_10_rsh_00014584[1] = {10.0f};
+__declspec(section ".data") const f32 float_135_rsh_00014540[1] = {135.0f};
+__declspec(section ".data") const f32 float_15_rsh_00014474[1] = {15.0f};
+__declspec(section ".data") const f32 float_180_rsh_00014538[1] = {180.0f};
+__declspec(section ".data") const f32 float_1E06_rsh_00014594[1] = {1000000.0f};
+__declspec(section ".data") const f32 float_1_rsh_00014470[1] = {1.0f};
+__declspec(section ".data") const f32 float_1p02_rsh_00014558[1] = {1.02f};
+__declspec(section ".data") const f32 float_1p1_rsh_00014554[1] = {1.1f};
+__declspec(section ".data") const f32 float_1p5_rsh_0001451c[1] = {1.5f};
+__declspec(section ".data") const f32 float_1p8_rsh_00014478[1] = {1.8f};
+__declspec(section ".data") const f32 float_200_rsh_000144d8[1] = {200.0f};
+__declspec(section ".data") const f32 float_20_rsh_00014580[1] = {20.0f};
+__declspec(section ".data") const f32 float_215_rsh_00014504[1] = {215.0f};
+__declspec(section ".data") const f32 float_225_rsh_00014550[1] = {225.0f};
+__declspec(section ".data") const f32 float_250_rsh_00014564[1] = {250.0f};
+__declspec(section ".data") const f32 float_2_rsh_00014514[1] = {2.0f};
+__declspec(section ".data") const f32 float_300_rsh_00014524[1] = {300.0f};
+__declspec(section ".data") const f32 float_30_rsh_000144dc[1] = {30.0f};
+__declspec(section ".data") const f32 float_31_rsh_00014510[1] = {31.0f};
+__declspec(section ".data") const f32 float_32767_rsh_000144ec[1] = {32767.0f};
+__declspec(section ".data") const f32 float_35_rsh_00014588[1] = {35.0f};
+__declspec(section ".data") const f32 float_360_rsh_000144a0[1] = {360.0f};
+__declspec(section ".data") const f32 float_40_rsh_00014590[1] = {40.0f};
+__declspec(section ".data") const f32 float_450_rsh_00014568[1] = {450.0f};
+__declspec(section ".data") const f32 float_45_rsh_00014574[1] = {45.0f};
+__declspec(section ".data") const f32 float_50_rsh_000144fc[1] = {50.0f};
+__declspec(section ".data") const f32 float_5_rsh_00014500[1] = {5.0f};
+__declspec(section ".data") const f32 float_600_rsh_00014528[1] = {600.0f};
+__declspec(section ".data") const f32 float_60_rsh_00014578[1] = {60.0f};
+__declspec(section ".data") const f32 float_65_rsh_0001458c[1] = {65.0f};
+__declspec(section ".data") const f32 float_6p2832_rsh_0001449c[1] = {6.2831855f};
+__declspec(section ".data") const f32 float_90_rsh_00014534[1] = {90.0f};
+__declspec(section ".data") const char str_00004334[8] = "sha_2_1";
+__declspec(section ".data") const char str_00004384[8] = "sha_5_2";
+__declspec(section ".data") const char str_000043F4[12] = "sha_6_2_c\0\0";
+__declspec(section ".data") const char str_00004400[12] = "sha_6_3_c\0\0";
+__declspec(section ".data") const char str_00004488[16] = "hosi_right_c\0\0\0";
+__declspec(section ".data") const char str_000045BC[28] = "SFX_STG6_TRAIN_MOVE2_2_2\0\0\0";
+__declspec(section ".data") const char str_000045E0[12] = "pika_1_1\0\0\0";
+__declspec(section ".data") const char str_0000465C[12] = "pika_1_4_c\0";
+__declspec(section ".data") const char str_0000470C[12] = "renketu_3\0\0";
+__declspec(section ".data") const char str_0000474C[8] = "moa_a\0\0";
+__declspec(section ".data") const char str_0000483C[8] = "eff0\0\0\0";
+__declspec(section ".data") const char str_00004980[16] = "ENV_STG6_RSH1_3";
+__declspec(section ".data") const char str_000049C0[16] = "BGM_STG0_GOR1\0\0";
+__declspec(section ".data") const f32 zero_rsh_00014490[1] = {0.0f};
+__declspec(section ".data") const char zero_rsh_000145bc[1] = { (char)0x00000000 };
+#endif

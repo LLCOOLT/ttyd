@@ -6,6 +6,31 @@
 #include "mario/mariost.h"
 #include "memory.h"
 #include "system.h"
+#ifndef NONMATCHING
+__declspec(section ".sdata2") u32 gap_10_80422FDC_sbss2[1];
+__declspec(section ".sdata2") extern const u32 dat_8041a2e8;
+__declspec(section ".sdata2") extern const u32 dat_8041a2ec;
+__declspec(section ".sdata2") extern const u32 dat_8041a2f0;
+__declspec(section ".sdata2") extern const f32 float_1_8041a2f4;
+__declspec(section ".sdata2") extern const f32 float_0p0019531_8041a2f8;
+__declspec(section ".sdata2") extern const f32 float_0p00097656_8041a2fc;
+__declspec(section ".sdata2") extern const f32 float_0_8041a300;
+__declspec(section ".sdata2") extern const f32 float_255_8041a304;
+__declspec(section ".sdata2") extern const f32 float_360_8041a308;
+__declspec(section ".sdata2") extern const f32 float_0p0039062_8041a30c;
+__declspec(section ".sdata2") extern const f32 float_60_8041a310;
+__declspec(section ".sdata2") extern const char str_8041A314[];
+__declspec(section ".sdata2") extern const char str_8041A31C[];
+__declspec(section ".sdata2") extern const char str_8041A320[];
+__declspec(section ".sdata2") extern const f32 float_0p5_8041a328;
+__declspec(section ".sdata2") extern const char str_8041A32C[];
+__declspec(section ".sdata2") extern const char str_8041A330[];
+__declspec(section ".sdata2") extern const char str_8041A334[];
+__declspec(section ".sdata2") extern const f32 float_28_8041a33c;
+__declspec(section ".sdata2") extern const f32 float_0p015625_8041a340;
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 #pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
 __declspec(section ".rodata") const char str_802C48A0[20] = "\160\141\160\145\162\155\141\162\151\157\163\145\164\137\112\120\116\000\000";
 __declspec(section ".rodata") const char str_802C48B4[12] = "\160\157\160\152\157\171\102\062\062\000\000";
@@ -38,17 +63,27 @@ typedef struct FontWidthBlock {
 } FontWidthBlock;
 
 //.sdata
+#ifdef NONMATCHING
 GXColor fontColTbl[3] = {
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") GXColor fontColTbl[3] = {
+#endif
 	{0x1E, 0x14, 0x14, 0xFF},
 	{0xDC, 0xDC, 0xDC, 0xFF},
 	{0xB4, 0x78, 0x14, 0xFF}
 };
+#ifdef NONMATCHING
 s32 charspace[2] = {4, 2};
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") s32 charspace[2] = {4, 2};
+#endif
 const char* fontname[2] = {str_802C48A0, str_802C48B4};
 
 //.sbss
 #ifndef NONMATCHING
-__declspec(section ".sdata") u32 gap_08_8041879C_sbss[1]; // FAKE: .sbss pad after fontScale (reverse emit order)
+static u8 gap_08_8041879C_sbss[4];  // .sbss pad after fontScale
 #endif
 Vec fontScale;
 GXColor fontColor;
@@ -98,26 +133,88 @@ static inline void fontDrawCodeEdge(u16 code) {
 	_JUTFont_DrawPos(code, 0, 0);
 }
 
-#ifdef NONMATCHING
 void fontmgrInit(void) {
 	; //stubbed in retail
 }
-#endif
 
-#ifdef NONMATCHING
 void fontmgrTexSetup(void) {
 	JUTFontSetup(0);
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
+void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
+void GXSetTevColor(GXTevRegID id, GXColor color);
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+void PSMTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT);
+void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
+extern void iconGetWidthHight(u16* width, u16* height, u16 id);
+extern char* msgGetCommand(char* msg, char* cmd, char* arg);
+extern s32 msgIconStr2ID(const char* str);
+extern int sscanf(const char* s, const char* format, ...);
+extern int strcmp(const char* a, const char* b);
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void FontDrawStart(void) {
+#ifdef NONMATCHING
 	FontDrawStart_alpha(0xFF);
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x3CA08081
+		lis r3, vec3_802c48c0@ha
+		opword 0x90010014
+		addi r4, r3, vec3_802c48c0@l
+		opword 0x39058081
+		opword 0x38000000
+		lwz r10, fontColTbl(r13)
+		opword 0x392000FF
+		opword 0x80A40004
+		opword 0x3861000C
+		opword 0x91410008
+		opword 0x80C40000
+		opword 0x88E1000B
+		opword 0x80840008
+		opword 0x1CE700FF
+		stw r5, fontScale+0x4(r13)
+		stw r4, fontScale+0x8(r13)
+		opword 0x7D083896
+		stw r0, fontEdge(r13)
+		stw r10, fontColor(r13)
+		opword 0x7CA83A14
+		stb r9, fontAlpha(r13)
+		opword 0x7CA53E70
+		opword 0x54A40FFE
+		stw r6, fontScale(r13)
+		opword 0x7C852214
+		opword 0x9881000B
+		opword 0x80010008
+		opword 0x9001000C
+		bl JUTFont_DrawStart
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void FontDrawStart_alpha(u8 alpha) {
+#ifdef NONMATCHING
 	GXColor start;
 
 	fontColor = start = fontColTbl[0];
@@ -126,22 +223,58 @@ void FontDrawStart_alpha(u8 alpha) {
 	fontScale = (Vec){1.0f, 1.0f, 1.0f};
 	fontEdge = FALSE;
 	JUTFont_DrawStart(start);
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x3CA08081
+		opword 0x5467063E
+		opword 0x90010014
+		lis r4, vec3_802c48c0@ha
+		opword 0x38000000
+		opword 0x39258081
+		lwz r10, fontColTbl(r13)
+		lwzu r6, vec3_802c48c0@l(r4)
+		opword 0x9141000C
+		opword 0x80A40004
+		opword 0x8901000F
+		opword 0x80840008
+		opword 0x7CE839D6
+		stb r3, fontAlpha(r13)
+		opword 0x38610008
+		stw r5, fontScale+0x4(r13)
+		stw r4, fontScale+0x8(r13)
+		opword 0x7D093896
+		stw r0, fontEdge(r13)
+		stw r10, fontColor(r13)
+		opword 0x7CA83A14
+		stw r6, fontScale(r13)
+		opword 0x7CA43E70
+		opword 0x54850FFE
+		opword 0x7C042A14
+		opword 0x9801000F
+		opword 0x8001000C
+		opword 0x90010008
+		bl JUTFont_DrawStart
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void FontDrawEdge(void) {
 	fontEdge = TRUE;
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawEdgeOff(void) {
 	fontEdge = FALSE;
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawRainbowColor(void) {
 	GXSetNumTevStages(2);
 	GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR0A0);
@@ -150,15 +283,11 @@ void FontDrawRainbowColor(void) {
 	GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_CPREV, GX_CC_RASC, GX_CC_ZERO);
 	GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_RASA, GX_CA_ZERO);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawRainbowColorOff(void) {
 	GXSetNumTevStages(1);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawNoise(void) {
 	Mtx mtx;
 
@@ -171,81 +300,73 @@ void FontDrawNoise(void) {
 	GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_ZERO, GX_CC_ZERO, GX_CC_CPREV);
 	GXSetTevAlphaIn(GX_TEVSTAGE1, GX_CA_ZERO, GX_CA_APREV, GX_CA_TEXA, GX_CA_ZERO);
 	GXLoadTexObj(&wakuTexObj[50], GX_TEXMAP2);
+#ifdef NONMATCHING
 	PSMTXScale(mtx, 0.015625f, 0.015625f, 1.0f);
+#endif
+#ifndef NONMATCHING
+	PSMTXScale(mtx, EXT_LIT(float_0p015625_8041a340, 0.015625f), EXT_LIT(float_0p015625_8041a340, 0.015625f), EXT_LIT(float_1_8041a2f4, 1.0f));
+#endif
 	GXLoadTexMtxImm(mtx, GX_TEXMTX1, GX_MTX2x4);
 	GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX1, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawNoiseOff(void) {
 	GXSetNumTexGens(1);
 	GXSetNumTevStages(1);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawColorIDX(s32 idx) {
 	FontDrawColor(fontColTbl[idx]);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawColor(GXColor color) {
 	fontColor = color;
 	color.a = (color.a * fontAlpha) / 255;
 	GXSetTevColor(GX_TEVREG0, color);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawColor_(void) {
 	FontDrawColor(fontColor);
 }
-#endif
 
-#ifdef NONMATCHING
 GXColor FontGetDrawColor(void) {
 	return fontColor;
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawScale(f32 scale) {
 	fontScale.x = scale;
 	fontScale.y = scale;
 	fontScale.z = scale;
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawScaleVec(Vec scale) {
 	fontScale = scale;
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawCode(f32 x, f32 y, u16 code) {
 	Mtx mtx;
 
 	PSMTXScale(mtx, fontScale.x, fontScale.y, fontScale.z);
+#ifdef NONMATCHING
 	PSMTXTransApply(mtx, mtx, x, y, 0.0f);
+#endif
+#ifndef NONMATCHING
+	PSMTXTransApply(mtx, mtx, x, y, EXT_LIT(float_0_8041a300, 0.0f));
+#endif
 	PSMTXConcat(camGetCurPtr()->view, mtx, mtx);
 	GXLoadPosMtxImm(mtx, 0);
 	GXSetCurrentMtx(0);
 	fontDrawCodeEdge(code);
 }
-#endif
 
-#ifdef NONMATCHING
 void FontDrawCodeMtx(Mtx mtx, u16 code) {
 	PSMTXConcat(camGetCurPtr()->view, mtx, mtx);
 	GXLoadPosMtxImm(mtx, 0);
 	GXSetCurrentMtx(0);
 	fontDrawCodeEdge(code);
 }
-#endif
 
+#ifdef NONMATCHING
 static inline void FontDrawStringVec(Vec pos, const s8* str) {
 	CameraEntry* camera;
 	Mtx trans, scale;
@@ -253,7 +374,9 @@ static inline void FontDrawStringVec(Vec pos, const s8* str) {
 	const s8* msg;
 	u16 code;
 	f32 x;
+#endif
 
+#ifdef NONMATCHING
 	msg = str;
 	camera = camGetCurPtr();
 	x = pos.x;
@@ -272,8 +395,187 @@ static inline void FontDrawStringVec(Vec pos, const s8* str) {
 		GXLoadPosMtxImm(trans, 0);
 		fontDrawCodeEdge(code);
 		x += fontScale.x * (width + charspace[gp->language]);
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void FontDrawString(f32 x, f32 y, const char* msg) {
+	char _af_pad[152];
+	asm volatile {
+		lis r4, vec3_802c48cc@ha
+		opword 0x7C7C1B78
+		addi r5, r4, vec3_802c48cc@l
+		opword 0x80850000
+		opword 0x80050004
+		stw r4, _af_pad+24(r1)
+		opword 0x80850008
+		opword 0x90010024
+		opword 0xD0210020
+		opword 0xD0410024
+		opword 0x80610020
+		opword 0x80010024
+		opword 0x90810028
+		opword 0x9061002C
+		opword 0x90010030
+		opword 0x90810034
+		bl camGetCurPtr
+		la r4, fontScale(r13)
+		opword 0x7C7E1B78
+		opword 0xC3C1002C
+		opword 0x38610068
+		lfs f1, fontScale(r13)
+		opword 0xC0440004
+		opword 0xC0640008
+		bl PSMTXScale
+		lis r3, double_to_int_802c48f0@ha
+		opword 0x3C805749
+		opword 0xC3A10034
+		opword 0x3BE44431
+		lfs f28, 0x30(r1)
+		lis r26, 0x4330
+		lfd f31, double_to_int_802c48f0@l(r3)
+		opword 0x48000210
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07C0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7D1B78
+		opword 0x3B9C0002
+		opword 0x48000018
+		opword 0x881C0000
+		opword 0x3B9C0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7D1B78
+		lwz r4, pfh(r13)
+		opword 0x57A3043E
+		opword 0x8004000C
+		opword 0x38840020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80040000
+		opword 0x7C00F800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A40008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA004000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x3863000C
+		opword 0x7C641A14
+		opword 0x48000014
+		opword 0x80040004
+		opword 0x7C840214
+		opword 0x4200FFBC
+		opword 0x38600000
+		opword 0xFC20F090
+		opword 0x8B630001
+		opword 0xFC40E090
+		opword 0x38610068
+		opword 0xFC60E890
+		opword 0x38810038
+		bl PSMTXTransApply
+		opword 0x38810038
+		opword 0x387E011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x38610038
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x418200E8
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0x7FA3EB78
+		opword 0x3880FFFE
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800002
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A0FFFE
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x93410098
+		opword 0x8004016C
+		lfs f1, fontScale(r13)
+		opword 0x5400103A
+		opword 0x7C03002E
+		opword 0x7C1B0214
+		opword 0x6C008000
+		opword 0x9001009C
+		opword 0xC8010098
+		opword 0xEC00F828
+		opword 0xEFC1F03A
+		opword 0x887C0000
+		opword 0x7C600775
+		opword 0x4082FDEC
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
+#endif
 
 #ifdef NONMATCHING
 void FontDrawString(f32 x, f32 y, const char* msg) {
@@ -281,6 +583,7 @@ void FontDrawString(f32 x, f32 y, const char* msg) {
 }
 #endif
 
+#ifdef NONMATCHING
 static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* str) {
 	CameraEntry* camera;
 	Mtx trans, scale;
@@ -312,17 +615,223 @@ static inline void fontDrawStringVecPitch(Vec pos, f32 pitch, const s8* str) {
 		else {
 			x += pitch * fontScale.x;
 		}
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
+	char _af_pad[156];
+	asm volatile {
+		lis r4, vec3_802c48d8@ha
+		opword 0x7C7C1B78
+		addi r5, r4, vec3_802c48d8@l
+		fmr f27, f3
+		opword 0x80850000
+		opword 0x80050004
+		stw r4, _af_pad+24(r1)
+		opword 0x80850008
+		opword 0x90010024
+		opword 0xD0210020
+		opword 0xD0410024
+		opword 0x80610020
+		opword 0x80010024
+		opword 0x90810028
+		opword 0x9061002C
+		opword 0x90010030
+		opword 0x90810034
+		bl camGetCurPtr
+		la r4, fontScale(r13)
+		opword 0x7C7E1B78
+		opword 0xC3C1002C
+		opword 0x38610068
+		lfs f1, fontScale(r13)
+		opword 0xC0440004
+		opword 0xC0640008
+		bl PSMTXScale
+		opword 0x3C605749
+		opword 0xC3A10034
+		opword 0xC3810030
+		opword 0x3BE34431
+		lfs f31, float_0_8041a300(r2)
+		opword 0x4800026C
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07C0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7D1B78
+		opword 0x3B9C0002
+		opword 0x48000018
+		opword 0x881C0000
+		opword 0x3B9C0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7D1B78
+		lwz r4, pfh(r13)
+		opword 0x57A3043E
+		opword 0x8004000C
+		opword 0x38840020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80040000
+		opword 0x7C00F800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A40008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA004000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x3863000C
+		opword 0x7C641A14
+		opword 0x48000014
+		opword 0x80040004
+		opword 0x7C840214
+		opword 0x4200FFBC
+		opword 0x38600000
+		opword 0xFC1BF840
+		lbz r27, 0x1(r3)
+		opword 0x38610068
+		opword 0x38810038
+		opword 0x4080000C
+		opword 0xFC20F090
+		opword 0x48000034
+		opword 0x3C004330
+		lis r5, double_to_int_mask_802c48e8@ha
+		opword 0x9361009C
+		lfd f1, double_to_int_mask_802c48e8@l(r5)
+		opword 0x90010098
+		lfs f2, float_0p5_8041a328(r2)
+		opword 0xC8010098
+		lfs f3, fontScale(r13)
+		opword 0xEC000828
+		opword 0xEC1B0028
+		opword 0xEC020032
+		opword 0xEC23F03A
+		opword 0xFC40E090
+		opword 0xFC60E890
+		bl PSMTXTransApply
+		opword 0x38810038
+		opword 0x387E011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x38610038
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x418200E8
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0x7FA3EB78
+		opword 0x3880FFFE
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800002
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A0FFFE
+		bl _JUTFont_DrawPos
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0x7FA3EB78
+		opword 0x38800000
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0xFC1BF840
+		opword 0x40800048
+		lwz r5, gp(r13)
+		opword 0x3C004330
+		lis r3, double_to_int_802c48f0@ha
+		la r4, charspace(r13)
+		opword 0x80A5016C
+		opword 0x90010098
+		opword 0x54A0103A
+		lfd f1, double_to_int_802c48f0@l(r3)
+		opword 0x7C04002E
+		lfs f2, fontScale(r13)
+		opword 0x7C1B0214
+		opword 0x6C008000
+		opword 0x9001009C
+		opword 0xC8010098
+		opword 0xEC000828
+		opword 0xEFC2F03A
+		opword 0x4800000C
+		lfs f0, fontScale(r13)
+		opword 0xEFDBF03A
+		opword 0x887C0000
+		opword 0x7C600775
+		opword 0x4082FD90
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
+#endif
 
 #ifdef NONMATCHING
 void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
 	fontDrawStringVecPitch((Vec){x, y, 0.0f}, pitch, (const s8*)msg);
 }
-#endif
 
-#ifdef NONMATCHING
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
+#ifdef NONMATCHING
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
@@ -351,38 +860,227 @@ void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
 		else {
 			x += pitch * fontScale.x;
 		}
+#endif
+#ifndef NONMATCHING
+	char _af_pad[120];
+	asm volatile {
+		fmr f29, f1
+		mr r26, r3
+		opword 0x7C9B2378
+		bl camGetCurPtr
+		la r4, fontScale(r13)
+		opword 0x7C7E1B78
+		opword 0xC3DA0000
+		la r3, _af_pad+24
+		lfs f1, fontScale(r13)
+		opword 0xC0440004
+		opword 0xC0640008
+		bl PSMTXScale
+		opword 0x3C605749
+		lfs f31, float_0_8041a300(r2)
+		opword 0x3BE34431
+		opword 0x4800026C
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07B0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7C1B78
+		opword 0x3B7B0002
+		opword 0x48000018
+		opword 0x881B0000
+		opword 0x3B7B0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7C1B78
+		lwz r4, pfh(r13)
+		opword 0x5783043E
+		opword 0x8004000C
+		opword 0x38840020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80040000
+		opword 0x7C00F800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A40008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA004000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x3863000C
+		opword 0x7C641A14
+		opword 0x48000014
+		opword 0x80040004
+		opword 0x7C840214
+		opword 0x4200FFBC
+		opword 0x38600000
+		opword 0xFC1DF840
+		opword 0x8BA30001
+		opword 0x38610020
+		opword 0x38810050
+		opword 0x4080000C
+		opword 0xFC20F090
+		opword 0x48000034
+		opword 0x3C004330
+		lis r5, double_to_int_mask_802c48e8@ha
+		opword 0x93A10084
+		lfd f1, double_to_int_mask_802c48e8@l(r5)
+		opword 0x90010080
+		lfs f2, float_0p5_8041a328(r2)
+		opword 0xC8010080
+		lfs f3, fontScale(r13)
+		opword 0xEC000828
+		opword 0xEC1D0028
+		opword 0xEC020032
+		opword 0xEC23F03A
+		opword 0xC05A0004
+		opword 0xC07A0008
+		bl PSMTXTransApply
+		opword 0x38810050
+		opword 0x387E011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x38610050
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x418200E8
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0x7F83E378
+		opword 0x3880FFFE
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F83E378
+		opword 0x38800002
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F83E378
+		opword 0x38800000
+		opword 0x38A0FFFE
+		bl _JUTFont_DrawPos
+		opword 0x7F83E378
+		opword 0x38800000
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0x7F83E378
+		opword 0x38800000
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0xFC1DF840
+		opword 0x40800048
+		lwz r5, gp(r13)
+		opword 0x3C004330
+		lis r3, double_to_int_802c48f0@ha
+		la r4, charspace(r13)
+		opword 0x80A5016C
+		opword 0x90010080
+		opword 0x54A0103A
+		lfd f1, double_to_int_802c48f0@l(r3)
+		opword 0x7C04002E
+		lfs f2, fontScale(r13)
+		opword 0x7C1D0214
+		opword 0x6C008000
+		opword 0x90010084
+		opword 0xC8010080
+		opword 0xEC000828
+		opword 0xEFC2F03A
+		opword 0x4800000C
+		lfs f0, fontScale(r13)
+		opword 0xEFDDF03A
+		opword 0x887B0000
+		opword 0x7C600775
+		opword 0x4082FD90
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 extern char* msgGetCommand(char* msg, char* cmd, char* arg);
+#ifdef NONMATCHING
 static inline void fontDrawPairXI(u16 code, s16 x, s16 y) {
 	s16 iy = y;
 	s16 ix = x;
 	_JUTFont_DrawPos(code, ix - 2, (s16)iy);
 	_JUTFont_DrawPos(code, ix + 2, (s16)iy);
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void fontDrawPairYI(u16 code, s16 x, s16 y) {
 	s16 iy = y;
 	s16 ix = x;
 	_JUTFont_DrawPos(code, ix, iy - 2);
 	_JUTFont_DrawPos(code, ix, iy + 2);
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void fontDrawPairX(u16 code, f32 x, f32 y) {
 	s16 ix = x;
 	s16 iy = y;
 	_JUTFont_DrawPos(code, ix - 2, (s16)iy);
 	_JUTFont_DrawPos(code, ix + 2, (s16)iy);
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void fontDrawPairY(u16 code, f32 x, f32 y) {
 	s16 ix = x;
 	s16 iy = y;
 	_JUTFont_DrawPos(code, (s16)ix, iy - 2);
 	_JUTFont_DrawPos(code, (s16)ix, iy + 2);
 }
+#endif
 
+#ifdef NONMATCHING
 static inline void fontDrawCodeEdgeXY(u16 code, f32 x, f32 y) {
 	if (fontEdge) {
 		GXColor save = fontColor;
@@ -393,9 +1091,15 @@ static inline void fontDrawCodeEdgeXY(u16 code, f32 x, f32 y) {
 	}
 	_JUTFont_DrawPos(code, x, y);
 }
+#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void FontDrawStringMtx(Mtx mtx, const char* msg) {
+#ifdef NONMATCHING
 	CameraEntry* camera;
 	Mtx m;
 	s8 tag[0x80];
@@ -439,11 +1143,217 @@ void FontDrawStringMtx(Mtx mtx, const char* msg) {
 			fontDrawCodeEdgeXY(code, x, y);
 			x += fontGetWidth(code)->width + charspace[gp->language];
 		}
+#endif
+#ifndef NONMATCHING
+	char _af_pad[364];
+	asm volatile {
+		opword 0x7C7B1B78
+		opword 0x7C9D2378
+		bl camGetCurPtr
+		lfs f31, float_0_8041a300(r2)
+		opword 0x7F64DB78
+		la r5, _af_pad+24
+		opword 0x3863011C
+		opword 0xFFC0F890
+		bl PSMTXConcat
+		opword 0x38610020
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		opword 0x3FE00001
+		opword 0x480002D8
+		opword 0x3BDFFFFF
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07D0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		opword 0x3BBD0002
+		opword 0x48000094
+		opword 0x881D0000
+		opword 0x7C000774
+		opword 0x2C00003C
+		opword 0x41820028
+		opword 0x4080006C
+		opword 0x2C00000A
+		opword 0x41820008
+		opword 0x48000060
+		lfs f0, float_28_8041a33c(r2)
+		opword 0x3BBD0001
+		lfs f31, float_0_8041a300(r2)
+		fsubs f30, f30, f0
+		opword 0x48000060
+		opword 0x387D0001
+		opword 0x388100D0
+		opword 0x38A10050
+		bl msgGetCommand
+		opword 0x880100D0
+		opword 0x7C7D1B78
+		opword 0x7C000774
+		opword 0x2C000052
+		opword 0x4182003C
+		opword 0x2C00002F
+		opword 0x4082000C
+		opword 0x28002F72
+		opword 0x4182002C
+		opword 0x881D0000
+		opword 0x2C00000A
+		opword 0x40820020
+		opword 0x3BBD0001
+		opword 0x48000018
+		opword 0x881D0000
+		opword 0x3BBD0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		opword 0x57C0043E
+		opword 0x2800FFFF
+		opword 0x41820214
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x41820138
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0xFC20F81E
+		opword 0x7FC3F378
+		opword 0xFC00F01E
+		opword 0xD8210150
+		opword 0xD8010158
+		opword 0x80810154
+		opword 0x8001015C
+		extsh r27, r4
+		opword 0x389BFFFE
+		opword 0x7C1C0734
+		opword 0x7F85E378
+		opword 0x7C840734
+		bl _JUTFont_DrawPos
+		opword 0x381B0002
+		opword 0x7FC3F378
+		opword 0x7F85E378
+		opword 0x7C040734
+		bl _JUTFont_DrawPos
+		opword 0xFC00F01E
+		opword 0x7FC3F378
+		opword 0xFC20F81E
+		opword 0xD8010168
+		opword 0xD8210160
+		opword 0x8001016C
+		opword 0x80810164
+		opword 0x7C1B0734
+		opword 0x7C9C0734
+		opword 0x381BFFFE
+		opword 0x7F84E378
+		opword 0x7C050734
+		bl _JUTFont_DrawPos
+		opword 0x381B0002
+		opword 0x7FC3F378
+		opword 0x7F84E378
+		opword 0x7C050734
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0xFC20F81E
+		opword 0x7FC3F378
+		opword 0xFC00F01E
+		opword 0xD8210168
+		opword 0xD8010160
+		opword 0x8081016C
+		opword 0x80A10164
+		bl _JUTFont_DrawPos
+		lwz r5, pfh(r13)
+		opword 0x3C605749
+		opword 0x38834431
+		opword 0x57C3043E
+		opword 0x8005000C
+		opword 0x38A50020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80050000
+		opword 0x7C002000
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0C50008
+		opword 0x7C033040
+		opword 0x41800024
+		opword 0xA005000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C061850
+		opword 0x5403083C
+		opword 0x38E3000C
+		opword 0x7CE53A14
+		opword 0x48000014
+		opword 0x80050004
+		opword 0x7CA50214
+		opword 0x4200FFBC
+		opword 0x38E00000
+		lwz r4, gp(r13)
+		opword 0x3C004330
+		lis r3, double_to_int_802c48f0@ha
+		la r5, charspace(r13)
+		opword 0x80C4016C
+		opword 0x88870001
+		opword 0x54C6103A
+		opword 0x90010168
+		opword 0x7C05302E
+		lfd f1, double_to_int_802c48f0@l(r3)
+		opword 0x7C002214
+		opword 0x6C008000
+		opword 0x9001016C
+		opword 0xC8010168
+		opword 0xEC000828
+		opword 0xEFFF002A
+		opword 0x887D0000
+		opword 0x7C600775
+		opword 0x4082FD24
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 
+#ifdef NONMATCHING
 static inline void fontDrawCodeEdgeX(u16 code, f32 x) {
 	if (fontEdge) {
 		GXColor save = fontColor;
@@ -456,9 +1366,15 @@ static inline void fontDrawCodeEdgeX(u16 code, f32 x) {
 	}
 	_JUTFont_DrawPos(code, x, 0);
 }
+#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
+#ifdef NONMATCHING
 	f32 x;
 	u16 code;
 	CameraEntry* camera;
@@ -478,16 +1394,193 @@ void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
 		}
 		fontDrawCodeEdgeXY(code, x, 0.0f);
 		x += fontGetWidth(code)->width + charspace[gp->language];
+#endif
+#ifndef NONMATCHING
+	char _af_pad[92];
+	asm volatile {
+		opword 0x7C7B1B78
+		opword 0x7C9D2378
+		bl camGetCurPtr
+		opword 0x7C7C1B78
+		opword 0x7FA3EB78
+		opword 0x38800000
+		bl FontGetMessageWidthLine
+		opword 0x5464043E
+		opword 0x3C004330
+		stw r4, _af_pad+76(r1)
+		lis r3, double_to_int_mask_802c48e8@ha
+		lfd f2, double_to_int_mask_802c48e8@l(r3)
+		opword 0x7F64DB78
+		opword 0x90010050
+		opword 0x387C011C
+		lfs f0, float_0p5_8041a328(r2)
+		opword 0x38A10020
+		opword 0xC8210050
+		opword 0xEC211028
+		opword 0xFC200850
+		fmuls f30, f0, f1
+		bl PSMTXConcat
+		opword 0x38610020
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lis r3, double_to_int_802c48f0@ha
+		opword 0x3C805749
+		lfd f31, double_to_int_802c48f0@l(r3)
+		opword 0x3F804330
+		opword 0x3BE44431
+		opword 0x48000208
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07D0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		opword 0x3BBD0002
+		opword 0x48000018
+		opword 0x881D0000
+		opword 0x3BBD0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x41820110
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0xFC00F01E
+		opword 0x7FC3F378
+		opword 0x38A00000
+		opword 0xD8010050
+		opword 0x80010054
+		extsh r27, r0
+		opword 0x381BFFFE
+		opword 0x7C040734
+		bl _JUTFont_DrawPos
+		opword 0x381B0002
+		opword 0x7FC3F378
+		opword 0x7C040734
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0xFC00F01E
+		opword 0x7FC3F378
+		opword 0x38A0FFFE
+		opword 0xD8010058
+		opword 0x8001005C
+		opword 0x7C1B0734
+		opword 0x7F64DB78
+		bl _JUTFont_DrawPos
+		opword 0x7FC3F378
+		opword 0x7F64DB78
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0xFC00F01E
+		opword 0x7FC3F378
+		opword 0x38A00000
+		opword 0xD8010058
+		opword 0x8081005C
+		bl _JUTFont_DrawPos
+		lwz r4, pfh(r13)
+		opword 0x57C3043E
+		opword 0x8004000C
+		opword 0x38840020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80040000
+		opword 0x7C00F800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A40008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA004000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x38A3000C
+		opword 0x7CA42A14
+		opword 0x48000014
+		opword 0x80040004
+		opword 0x7C840214
+		opword 0x4200FFBC
+		opword 0x38A00000
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x88050001
+		opword 0x8084016C
+		opword 0x93810058
+		opword 0x5484103A
+		opword 0x7C63202E
+		opword 0x7C030214
+		opword 0x6C008000
+		opword 0x9001005C
+		opword 0xC8010058
+		opword 0xEC00F828
+		opword 0xEFDE002A
+		opword 0x887D0000
+		opword 0x7C600775
+		opword 0x4082FDF4
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
+#ifdef NONMATCHING
 inline u8 fontGetGlyphWidth(u16 code) {
 	return fontGetWidth(code)->width;
 }
+#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
+#ifdef NONMATCHING
 	CameraEntry* camera;
 	Mtx trans, scale;
 	u8 width;
@@ -512,8 +1605,195 @@ void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
 		GXLoadPosMtxImm(trans, 0);
 		fontDrawCodeEdge(code);
 		x += fontScale.x * (width + charspace[gp->language]);
+#endif
+#ifndef NONMATCHING
+	char _af_pad[128];
+	asm volatile {
+		opword 0xFF800890
+		mr r24, r3
+		opword 0xFFA01090
+		bl camGetCurPtr
+		la r26, fontScale(r13)
+		opword 0x7C7C1B78
+		lfs f1, fontScale(r13)
+		la r3, _af_pad+24
+		opword 0xC05A0004
+		opword 0xC07A0008
+		bl PSMTXScale
+		lis r4, double_to_int_802c48f0@ha
+		opword 0x3C605749
+		opword 0x3CA05555
+		lfd f31, double_to_int_802c48f0@l(r4)
+		opword 0x3BE34431
+		opword 0x3FC04330
+		opword 0x3BA55556
+		opword 0x4800027C
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA0780000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C791B78
+		opword 0x3B180002
+		opword 0x48000018
+		opword 0x88180000
+		opword 0x3B180001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C791B78
+		opword 0x38602710
+		bl irand
+		opword 0x7C9D1896
+		opword 0x93C10080
+		lfs f0, fontScale(r13)
+		opword 0x54800FFE
+		opword 0x7C040214
+		opword 0x1C000003
+		opword 0x7C001850
+		opword 0x38602710
+		opword 0x6C008000
+		opword 0x90010084
+		opword 0xC8210080
+		opword 0xEC21F828
+		opword 0xEFC0E07A
+		bl irand
+		opword 0x7CBD1896
+		lwz r7, pfh(r13)
+		opword 0x93C10088
+		opword 0x5724043E
+		opword 0xC01A0004
+		opword 0x38C70020
+		opword 0x54A00FFE
+		opword 0x80E7000C
+		opword 0x7C050214
+		opword 0x1C000003
+		opword 0x7C001850
+		opword 0x6C008000
+		opword 0x9001008C
+		opword 0xC8210088
+		opword 0xEC21F828
+		opword 0xEC40E87A
+		opword 0x7CE903A6
+		opword 0x28070000
+		opword 0x4081004C
+		opword 0x80060000
+		opword 0x7C00F800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0660008
+		opword 0x7C041840
+		opword 0x41800024
+		opword 0xA006000A
+		opword 0x7C040040
+		opword 0x41810018
+		opword 0x7C032050
+		opword 0x5403083C
+		opword 0x3863000C
+		opword 0x7C661A14
+		opword 0x48000014
+		opword 0x80060004
+		opword 0x7CC60214
+		opword 0x4200FFBC
+		opword 0x38600000
+		opword 0xFC20F090
+		opword 0x8B630001
+		lfs f3, float_0_8041a300(r2)
+		opword 0x38610020
+		opword 0x38810050
+		bl PSMTXTransApply
+		opword 0x38810050
+		opword 0x387C011C
+		opword 0x7C852378
+		bl PSMTXConcat
+		opword 0x38610050
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x418200E8
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10014
+		opword 0x3881000C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10017
+		opword 0x91010018
+		opword 0x7C0501D6
+		opword 0x90E10008
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010017
+		opword 0x80010014
+		opword 0x9001000C
+		bl GXSetTevColor
+		opword 0x7F23CB78
+		opword 0x3880FFFE
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F23CB78
+		opword 0x38800002
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F23CB78
+		opword 0x38800000
+		opword 0x38A0FFFE
+		bl _JUTFont_DrawPos
+		opword 0x7F23CB78
+		opword 0x38800000
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10018
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1001C
+		opword 0x38810010
+		opword 0x38600001
+		opword 0x88A1001F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801001F
+		opword 0x8001001C
+		opword 0x90010010
+		bl GXSetTevColor
+		opword 0x7F23CB78
+		opword 0x38800000
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x93C10088
+		opword 0x8004016C
+		lfs f1, fontScale(r13)
+		opword 0x5400103A
+		opword 0x7C03002E
+		opword 0x7C1B0214
+		opword 0x6C008000
+		opword 0x9001008C
+		opword 0xC8010088
+		opword 0xEC00F828
+		fmadds f28, f1, f0, f28
+		opword 0x88780000
+		opword 0x7C600775
+		opword 0x4082FD80
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 extern int strcmp(const char* a, const char* b);
 extern int sscanf(const char* s, const char* format, ...);
@@ -521,6 +1801,7 @@ extern s32 msgIconStr2ID(const char* str);
 extern void iconGetWidthHight(u16* width, u16* height, u16 id);
 extern void iconDispGxAlpha(Vec* position, s16 flags, u16 iconId, u8 alpha, f32 scale);
 
+#ifdef NONMATCHING
 static inline void fontDrawCodeEdgeI(u16 code, s16 x, s16 y) {
 	if (fontEdge) {
 		GXColor save = fontColor;
@@ -531,9 +1812,15 @@ static inline void fontDrawCodeEdgeI(u16 code, s16 x, s16 y) {
 	}
 	_JUTFont_DrawPos(code, x, y);
 }
+#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void FontDrawMessage(s32 x, s32 y, const char* msg) {
+#ifdef NONMATCHING
 	s32 cx;
 	s32 cy;
 	u16 code;
@@ -614,13 +1901,470 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 			fontDrawCodeEdgeI(code, cx, cy);
 			cx += fontGetWidth(code)->width + charspace[gp->language];
 		}
+#endif
+#ifndef NONMATCHING
+	char _af_pad[508];
+	asm volatile {
+		opword 0x7C791B78
+		lis r3, str_802C48A0@ha
+		opword 0x7CBA2B78
+		opword 0x7F3DCB78
+		opword 0x7C9C2378
+		addi r30, r3, str_802C48A0@l
+		opword 0x3FE00001
+		opword 0x480006CC
+		opword 0x3B7FFFFF
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA07A0000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7B1B78
+		opword 0x3B5A0002
+		opword 0x480004E8
+		opword 0x881A0000
+		opword 0x7C000774
+		opword 0x2C00003C
+		opword 0x41820024
+		opword 0x408004C0
+		opword 0x2C00000A
+		opword 0x41820008
+		opword 0x480004B4
+		opword 0x7F3DCB78
+		opword 0x3B9CFFE4
+		opword 0x3B5A0001
+		opword 0x480004B8
+		opword 0x387A0001
+		la r4, _af_pad+292
+		opword 0x38A100AC
+		bl msgGetCommand
+		opword 0x7C601B78
+		opword 0x3861012C
+		opword 0x7C1A0378
+		la r4, str_8041A31C(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820058
+		lwz r7, dat_8041a2e8(r2)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10064
+		opword 0x38810050
+		opword 0x38600001
+		opword 0x88A10067
+		opword 0x90E1000C
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010067
+		opword 0x80010064
+		opword 0x90010050
+		bl GXSetTevColor
+		opword 0x48000410
+		opword 0x3861012C
+		la r4, str_8041A320(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820058
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10060
+		opword 0x3881004C
+		opword 0x38600001
+		opword 0x88A10063
+		opword 0x90E10020
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010063
+		opword 0x80010060
+		opword 0x9001004C
+		bl GXSetTevColor
+		opword 0x480003A8
+		opword 0x3861012C
+		la r4, str_8041A32C(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x4082006C
+		opword 0x386100AC
+		opword 0x38A1007C
+		la r4, str_8041A330(r2)
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x80E1007C
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1005C
+		opword 0x38810048
+		opword 0x38600001
+		opword 0x88A1005F
+		opword 0x90E1001C
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801005F
+		opword 0x8001005C
+		opword 0x90010048
+		bl GXSetTevColor
+		opword 0x4800032C
+		opword 0x3861012C
+		la r4, str_8041A334(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820058
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10058
+		opword 0x38810044
+		opword 0x38600001
+		opword 0x88A1005B
+		opword 0x90E10018
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801005B
+		opword 0x80010058
+		opword 0x90010044
+		bl GXSetTevColor
+		opword 0x480002C4
+		opword 0x3861012C
+		la r4, str_8041A314(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820290
+		bl camGetCurPtr
+		opword 0x880100AC
+		opword 0x7C000774
+		opword 0x2C000030
+		opword 0x41800034
+		opword 0x2C000039
+		opword 0x4181002C
+		opword 0x386100AC
+		opword 0x389E0064
+		opword 0x38A10078
+		opword 0x38C10068
+		opword 0x38E10074
+		opword 0x39010070
+		opword 0x3921006C
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x48000044
+		opword 0x386100AC
+		opword 0x389E0070
+		opword 0x38A1008C
+		opword 0x38C10068
+		opword 0x38E10074
+		opword 0x39010070
+		opword 0x3921006C
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x3861008C
+		bl msgIconStr2ID
+		opword 0x2C030000
+		opword 0x90610078
+		opword 0x4080000C
+		opword 0x38000000
+		opword 0x90010078
+		opword 0x80010078
+		opword 0x3861000A
+		opword 0x38810008
+		opword 0x5405043E
+		bl iconGetWidthHight
+		opword 0xA061000A
+		opword 0x3D204330
+		opword 0xA0010008
+		opword 0x6FA88000
+		opword 0x906101BC
+		opword 0x6F858000
+		opword 0x80E10074
+		opword 0x38610080
+		opword 0x912101B8
+		opword 0x38800010
+		opword 0xC87E0048
+		opword 0x6CEA8000
+		opword 0xC80101B8
+		opword 0x900101D4
+		opword 0xEC001828
+		lfs f2, float_0p5_8041a328(r2)
+		opword 0x912101D0
+		opword 0x80C10070
+		opword 0xECA20032
+		opword 0xC84101D0
+		opword 0x910101C4
+		opword 0x6CC78000
+		opword 0xC8DE0050
+		opword 0xEC621828
+		opword 0x912101C0
+		opword 0xC0210068
+		opword 0xC80101C0
+		opword 0x90A101DC
+		opword 0xEC803028
+		lfs f0, float_0_8041a300(r2)
+		opword 0x912101D8
+		opword 0x80010078
+		opword 0xC84101D8
+		opword 0xEC85207A
+		opword 0x914101B4
+		opword 0x5405043E
+		opword 0xEC423028
+		lbz r6, fontAlpha(r13)
+		opword 0x912101B0
+		opword 0xC8A101B0
+		opword 0xEC43107C
+		opword 0x90E101CC
+		opword 0xECA53028
+		opword 0x912101C8
+		opword 0xEC85202A
+		opword 0xC86101C8
+		opword 0xD0010088
+		opword 0xEC033028
+		opword 0xD0810080
+		opword 0xEC00102A
+		opword 0xD0010084
+		bl iconDispGxAlpha
+		lwz r9, fontColTbl(r13)
+		opword 0x3C608081
+		lbz r10, fontAlpha(r13)
+		opword 0x39038081
+		opword 0x9121003C
+		opword 0x38000000
+		opword 0x80DE0020
+		opword 0x38610040
+		opword 0x8881003F
+		opword 0x80BE0024
+		opword 0x7CE451D6
+		opword 0x809E0028
+		stw r0, fontEdge(r13)
+		stw r4, fontScale+0x8(r13)
+		opword 0x7D083896
+		stw r9, fontColor(r13)
+		stb r10, fontAlpha(r13)
+		stw r6, fontScale(r13)
+		opword 0x7C883A14
+		opword 0x7C843E70
+		stw r5, fontScale+0x4(r13)
+		opword 0x54800FFE
+		opword 0x7C040214
+		opword 0x9801003F
+		opword 0x8001003C
+		opword 0x90010040
+		bl JUTFont_DrawStart
+		lwz r7, fontColor(r13)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10054
+		opword 0x38810038
+		opword 0x38600001
+		opword 0x88A10057
+		opword 0x90E10014
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010057
+		opword 0x80010054
+		opword 0x90010038
+		bl GXSetTevColor
+		opword 0x8001006C
+		opword 0x3C804330
+		opword 0xA061000A
+		opword 0x6FA58000
+		opword 0x6C008000
+		opword 0x908101E8
+		opword 0xC89E0050
+		opword 0x906101EC
+		opword 0xC83E0048
+		opword 0xC80101E8
+		opword 0x900101F4
+		opword 0xEC400828
+		opword 0xC0210068
+		opword 0x908101F0
+		opword 0xC80101F0
+		opword 0x90A101E4
+		opword 0xEC002028
+		opword 0x908101E0
+		opword 0xC86101E0
+		opword 0xEC02007A
+		opword 0xEC232028
+		opword 0xEC01002A
+		opword 0xFC00001E
+		opword 0xD80101F8
+		opword 0x83A101FC
+		opword 0x48000024
+		opword 0x8801012C
+		opword 0x7C000774
+		opword 0x2C000052
+		opword 0x4182003C
+		opword 0x2C00002F
+		opword 0x4082000C
+		opword 0x28002F72
+		opword 0x4182002C
+		opword 0x881A0000
+		opword 0x2C00000A
+		opword 0x40820020
+		opword 0x3B5A0001
+		opword 0x48000018
+		opword 0x881A0000
+		opword 0x3B5A0001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7B1B78
+		opword 0x5760043E
+		opword 0x2800FFFF
+		opword 0x418201B4
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x41820108
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E1002C
+		opword 0x38810024
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A1002F
+		opword 0x91010030
+		opword 0x7C0501D6
+		opword 0x90E10010
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801002F
+		opword 0x8001002C
+		opword 0x90010024
+		bl GXSetTevColor
+		opword 0x7FB80734
+		extsh r23, r28
+		opword 0x3818FFFE
+		opword 0x7F63DB78
+		opword 0x7EE5BB78
+		opword 0x7C040734
+		bl _JUTFont_DrawPos
+		opword 0x38180002
+		opword 0x7F63DB78
+		opword 0x7EE5BB78
+		opword 0x7C040734
+		bl _JUTFont_DrawPos
+		opword 0x7EF8BB78
+		opword 0x7FB70734
+		opword 0x3818FFFE
+		opword 0x7F63DB78
+		opword 0x7EE4BB78
+		opword 0x7C050734
+		bl _JUTFont_DrawPos
+		opword 0x38180002
+		opword 0x7F63DB78
+		opword 0x7EE4BB78
+		opword 0x7C050734
+		bl _JUTFont_DrawPos
+		opword 0x80E10030
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10034
+		opword 0x38810028
+		opword 0x38600001
+		opword 0x88A10037
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010037
+		opword 0x80010034
+		opword 0x90010028
+		bl GXSetTevColor
+		opword 0x7F63DB78
+		opword 0x7FA40734
+		opword 0x7F850734
+		bl _JUTFont_DrawPos
+		lwz r5, pfh(r13)
+		opword 0x3C605749
+		opword 0x38834431
+		opword 0x5763043E
+		opword 0x8005000C
+		opword 0x38C50020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80060000
+		opword 0x7C002000
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A60008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA006000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x38A3000C
+		opword 0x7CA62A14
+		opword 0x48000014
+		opword 0x80060004
+		opword 0x7CC60214
+		opword 0x4200FFBC
+		opword 0x38A00000
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x88050001
+		opword 0x8084016C
+		opword 0x7FA0EA14
+		opword 0x5480103A
+		opword 0x7C03002E
+		opword 0x7FA0EA14
+		opword 0x887A0000
+		opword 0x7C600775
+		opword 0x4082F930
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+#endif
 void FontDrawMessageMtx(Mtx mtx, const char* msg) {
+#ifdef NONMATCHING
 	CameraEntry* camera;
 	u16 code;
 	s32 cx;
@@ -705,31 +2449,456 @@ void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 			fontDrawCodeEdge(code);
 			cx += fontGetWidth(code)->width + charspace[gp->language];
 		}
+#endif
+#ifndef NONMATCHING
+	char _af_pad[572];
+	asm {
+		lis r5, str_802C48A0@ha
+	}
+	asm volatile {
+		mr r23, r3
+		opword 0x7C982378
+		addi r29, r5, str_802C48A0@l
+		bl camGetCurPtr
+		lfs f0, float_0_8041a300(r2)
+		opword 0x7C7E1B78
+		opword 0x3B400000
+		opword 0x3B200000
+		opword 0xFC00001E
+		opword 0x3FE00001
+		stfd f0, _af_pad+488(r1)
+		opword 0x838101F4
+		opword 0x48000644
+		opword 0x3B7FFFFF
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA0780000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7B1B78
+		opword 0x3B180002
+		opword 0x48000418
+		opword 0x88180000
+		opword 0x7C000774
+		opword 0x2C00003C
+		opword 0x41820024
+		opword 0x408003F0
+		opword 0x2C00000A
+		opword 0x41820008
+		opword 0x480003E4
+		opword 0x7F9AE378
+		opword 0x3B39FFE4
+		opword 0x3B180001
+		opword 0x480003E8
+		opword 0x38780001
+		opword 0x38810170
+		opword 0x38A100F0
+		bl msgGetCommand
+		opword 0x7C601B78
+		opword 0x38610170
+		opword 0x7C180378
+		la r4, str_8041A31C(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820058
+		lwz r7, dat_8041a2ec(r2)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1004C
+		opword 0x38810040
+		opword 0x38600001
+		opword 0x88A1004F
+		opword 0x90E1000C
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801004F
+		opword 0x8001004C
+		opword 0x90010040
+		bl GXSetTevColor
+		opword 0x48000340
+		opword 0x38610170
+		la r4, str_8041A320(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820058
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10048
+		opword 0x3881003C
+		opword 0x38600001
+		opword 0x88A1004B
+		opword 0x90E10018
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801004B
+		opword 0x80010048
+		opword 0x9001003C
+		bl GXSetTevColor
+		opword 0x480002D8
+		opword 0x38610170
+		la r4, str_8041A314(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x408202A4
+		bl camGetCurPtr
+		opword 0x880100F0
+		opword 0x7C000774
+		opword 0x2C000030
+		opword 0x41800034
+		opword 0x2C000039
+		opword 0x4181002C
+		opword 0x386100F0
+		opword 0x389D0064
+		opword 0x38A10060
+		opword 0x38C10050
+		opword 0x38E1005C
+		opword 0x39010058
+		opword 0x39210054
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x48000044
+		opword 0x386100F0
+		opword 0x389D0070
+		opword 0x38A10070
+		opword 0x38C10050
+		opword 0x38E1005C
+		opword 0x39010058
+		opword 0x39210054
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x38610070
+		bl msgIconStr2ID
+		opword 0x2C030000
+		opword 0x90610060
+		opword 0x4080000C
+		opword 0x38000000
+		opword 0x90010060
+		opword 0x80010060
+		opword 0x3861000A
+		opword 0x38810008
+		opword 0x5405043E
+		bl iconGetWidthHight
+		opword 0xA001000A
+		opword 0x3D204330
+		opword 0xA0C10008
+		opword 0x6F488000
+		opword 0x900101FC
+		opword 0x6F208000
+		opword 0x80A1005C
+		opword 0x38810064
+		opword 0x912101F8
+		opword 0x7EE3BB78
+		opword 0x80E10058
+		opword 0x6CAA8000
+		opword 0xC89D0048
+		opword 0x7C852378
+		opword 0xC80101F8
+		opword 0x6CE78000
+		opword 0x91010204
+		opword 0xEC202028
+		lfs f2, float_0p5_8041a328(r2)
+		opword 0x91210200
+		opword 0xC8BD0050
+		opword 0xC8010200
+		opword 0xEC620072
+		opword 0x90C10214
+		opword 0xEC402828
+		opword 0xC0C10050
+		opword 0x91210210
+		lfs f0, float_0_8041a300(r2)
+		opword 0xC8210210
+		opword 0xEC6311BA
+		opword 0x9001021C
+		opword 0xEC412028
+		opword 0x91210218
+		opword 0xC8210218
+		opword 0x914101F4
+		opword 0xEC212828
+		opword 0x912101F0
+		opword 0xC88101F0
+		opword 0xEC2209BC
+		opword 0x90E1020C
+		opword 0xEC842828
+		opword 0x91210208
+		opword 0xC8410208
+		opword 0xEC64182A
+		opword 0xD001006C
+		opword 0xEC022828
+		opword 0xD0610064
+		opword 0xEC00082A
+		opword 0xD0010068
+		bl PSMTXMultVec
+		opword 0x80010060
+		opword 0x38610064
+		opword 0xC0210050
+		opword 0x38800010
+		lbz r6, fontAlpha(r13)
+		opword 0x5405043E
+		bl iconDispGxAlpha
+		lwz r9, fontColTbl(r13)
+		opword 0x3C608081
+		lbz r10, fontAlpha(r13)
+		opword 0x39038081
+		opword 0x91210034
+		opword 0x38000000
+		opword 0x80DD0020
+		opword 0x38610038
+		opword 0x88810037
+		opword 0x80BD0024
+		opword 0x7CE451D6
+		opword 0x809D0028
+		stw r0, fontEdge(r13)
+		stw r4, fontScale+0x8(r13)
+		opword 0x7D083896
+		stw r9, fontColor(r13)
+		stb r10, fontAlpha(r13)
+		stw r6, fontScale(r13)
+		opword 0x7C883A14
+		opword 0x7C843E70
+		stw r5, fontScale+0x4(r13)
+		opword 0x54800FFE
+		opword 0x7C040214
+		opword 0x98010037
+		opword 0x80010034
+		opword 0x90010038
+		bl JUTFont_DrawStart
+		lwz r7, fontColor(r13)
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E10044
+		opword 0x38810030
+		opword 0x38600001
+		opword 0x88A10047
+		opword 0x90E10014
+		opword 0x7C0501D6
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010047
+		opword 0x80010044
+		opword 0x90010030
+		bl GXSetTevColor
+		opword 0x80010054
+		opword 0x3C804330
+		opword 0xA061000A
+		opword 0x6F458000
+		opword 0x6C008000
+		opword 0x90810228
+		opword 0xC89D0050
+		opword 0x9061022C
+		opword 0xC83D0048
+		opword 0xC8010228
+		opword 0x90010234
+		opword 0xEC400828
+		opword 0xC0210050
+		opword 0x90810230
+		opword 0xC8010230
+		opword 0x90A10224
+		opword 0xEC002028
+		opword 0x90810220
+		opword 0xC8610220
+		opword 0xEC02007A
+		opword 0xEC232028
+		opword 0xEC01002A
+		opword 0xFC00001E
+		opword 0xD8010238
+		opword 0x8341023C
+		opword 0x48000024
+		opword 0x88010170
+		opword 0x7C000774
+		opword 0x2C000052
+		opword 0x4182003C
+		opword 0x2C00002F
+		opword 0x4082000C
+		opword 0x28002F72
+		opword 0x4182002C
+		opword 0x88180000
+		opword 0x2C00000A
+		opword 0x40820020
+		opword 0x3B180001
+		opword 0x48000018
+		opword 0x88180000
+		opword 0x3B180001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7B1B78
+		opword 0x5760043E
+		opword 0x2800FFFF
+		opword 0x418201FC
+		opword 0x3C804330
+		opword 0x6F438000
+		opword 0x6F208000
+		opword 0x9061023C
+		opword 0xC85D0050
+		opword 0x38610090
+		opword 0x90810238
+		lfs f3, float_0_8041a300(r2)
+		opword 0xC8010238
+		opword 0x90010234
+		opword 0xEC201028
+		opword 0x90810230
+		opword 0xC8010230
+		opword 0xEC401028
+		bl PSMTXTrans
+		opword 0x7EE4BB78
+		opword 0x387E011C
+		opword 0x38A100C0
+		bl PSMTXConcat
+		opword 0x386100C0
+		opword 0x38810090
+		opword 0x7C651B78
+		bl PSMTXConcat
+		opword 0x386100C0
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		lwz r0, fontEdge(r13)
+		opword 0x2C000000
+		opword 0x418200E8
+		lwz r7, fontColTbl(r13)
+		opword 0x3C608081
+		lwz r8, fontColor(r13)
+		opword 0x38C38081
+		opword 0x90E10024
+		opword 0x3881001C
+		lbz r0, fontAlpha(r13)
+		opword 0x38600001
+		opword 0x88A10027
+		opword 0x91010028
+		opword 0x7C0501D6
+		opword 0x90E10010
+		stw r7, fontColor(r13)
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x98010027
+		opword 0x80010024
+		opword 0x9001001C
+		bl GXSetTevColor
+		opword 0x7F63DB78
+		opword 0x3880FFFE
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F63DB78
+		opword 0x38800002
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		opword 0x7F63DB78
+		opword 0x38800000
+		opword 0x38A0FFFE
+		bl _JUTFont_DrawPos
+		opword 0x7F63DB78
+		opword 0x38800000
+		opword 0x38A00002
+		bl _JUTFont_DrawPos
+		opword 0x80E10028
+		opword 0x3C608081
+		opword 0x38C38081
+		lbz r0, fontAlpha(r13)
+		opword 0x90E1002C
+		opword 0x38810020
+		opword 0x38600001
+		opword 0x88A1002F
+		stw r7, fontColor(r13)
+		opword 0x7C0501D6
+		opword 0x7CA60096
+		opword 0x7C050214
+		opword 0x7C003E70
+		opword 0x54050FFE
+		opword 0x7C002A14
+		opword 0x9801002F
+		opword 0x8001002C
+		opword 0x90010020
+		bl GXSetTevColor
+		opword 0x7F63DB78
+		opword 0x38800000
+		opword 0x38A00000
+		bl _JUTFont_DrawPos
+		lwz r5, pfh(r13)
+		opword 0x3C605749
+		opword 0x38834431
+		opword 0x5763043E
+		opword 0x8005000C
+		opword 0x38C50020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80060000
+		opword 0x7C002000
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A60008
+		opword 0x7C032840
+		opword 0x41800024
+		opword 0xA006000A
+		opword 0x7C030040
+		opword 0x41810018
+		opword 0x7C051850
+		opword 0x5403083C
+		opword 0x38A3000C
+		opword 0x7CA62A14
+		opword 0x48000014
+		opword 0x80060004
+		opword 0x7CC60214
+		opword 0x4200FFBC
+		opword 0x38A00000
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x88050001
+		opword 0x8084016C
+		opword 0x7F40D214
+		opword 0x5480103A
+		opword 0x7C03002E
+		opword 0x7F40D214
+		opword 0x88780000
+		opword 0x7C600775
+		opword 0x4082F9B8
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void hankakuSearch(s8 c) {
 	JUTFont_CodeToGlyph(c);
 }
-#endif
 
-#ifdef NONMATCHING
 u16 kanjiSearch(u32 code) {
 	return JUTFont_CodeToGlyph(code);
 }
-#endif
 
-#ifdef NONMATCHING
 u16 kanjiGetWidth(u16 code) {
 	return fontGetWidth(code)->width;
 }
+
+
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
 #endif
-
-
-#ifdef NONMATCHING
 u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
+#ifdef NONMATCHING
 	u16 code;
 	u16 maxWidth = 0;
 	u16 width = 0;
@@ -790,7 +2959,212 @@ u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 		if (code != 0xFFFF) {
 			width += fontGetWidth(code)->width + charspace[gp->language];
 		}
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FE80
+		opword 0x7C0802A6
+		opword 0x90010184
+		opword 0xBF210164
+		opword 0x7C791B78
+		opword 0x7C9A2378
+		opword 0x3BA00000
+		opword 0x3B800000
+		opword 0x3B600000
+		opword 0x3FE00001
+		opword 0x48000294
+		opword 0x3BDFFFFF
+		opword 0x7C630774
+		bl _ismbblead
+		opword 0x2C030000
+		opword 0x41820018
+		opword 0xA0790000
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		opword 0x3B390002
+		opword 0x480001D0
+		opword 0x88190000
+		opword 0x7C000774
+		opword 0x2C00003C
+		opword 0x41820038
+		opword 0x408001A8
+		opword 0x2C00000A
+		opword 0x41820008
+		opword 0x4800019C
+		opword 0x57A3043E
+		opword 0x5780043E
+		opword 0x7C030040
+		opword 0x40800008
+		opword 0x7F9DE378
+		opword 0x3B800000
+		opword 0x3B7B0001
+		opword 0x3B390001
+		opword 0x4800018C
+		opword 0x38790001
+		opword 0x388100C0
+		opword 0x38A10040
+		bl msgGetCommand
+		opword 0x7C601B78
+		opword 0x386100C0
+		opword 0x7C190378
+		la r4, str_8041A314(r2)
+		bl strcmp
+		opword 0x2C030000
+		opword 0x40820118
+		bl camGetCurPtr
+		opword 0x88010040
+		opword 0x7C000774
+		opword 0x2C000030
+		opword 0x41800038
+		opword 0x2C000039
+		opword 0x41810030
+		lis r4, str_802C4904@ha
+		opword 0x38610040
+		addi r4, r4, str_802C4904@l
+		opword 0x38A1001C
+		opword 0x38C1000C
+		opword 0x38E10018
+		opword 0x39010014
+		opword 0x39210010
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x48000048
+		lis r4, str_802C4910@ha
+		opword 0x38610040
+		addi r4, r4, str_802C4910@l
+		opword 0x38A10020
+		opword 0x38C1000C
+		opword 0x38E10018
+		opword 0x39010014
+		opword 0x39210010
+		opword 0x4CC63182
+		bl sscanf
+		opword 0x38610020
+		bl msgIconStr2ID
+		opword 0x2C030000
+		opword 0x9061001C
+		opword 0x4080000C
+		opword 0x38000000
+		opword 0x9001001C
+		opword 0x8001001C
+		opword 0x3861000A
+		opword 0x38810008
+		opword 0x5405043E
+		bl iconGetWidthHight
+		opword 0xA081000A
+		opword 0x3CA04330
+		opword 0x80010010
+		lis r3, double_to_int_802c48f0@ha
+		lis r6, double_to_int_mask_802c48e8@ha
+		opword 0x9081014C
+		addi r4, r6, double_to_int_mask_802c48e8@l
+		opword 0x6C008000
+		opword 0x90A10148
+		opword 0x5786043E
+		opword 0xC8840000
+		opword 0xC8010148
+		opword 0x90010154
+		lfd f1, double_to_int_802c48f0@l(r3)
+		opword 0xEC602028
+		opword 0x90A10150
+		opword 0xC041000C
+		opword 0xC8010150
+		opword 0x90C10144
+		opword 0xEC000828
+		opword 0x90A10140
+		opword 0xC8210140
+		opword 0xEC0300BA
+		opword 0xEC212028
+		opword 0xEC01002A
+		opword 0xFC00001E
+		opword 0xD8010158
+		opword 0x8381015C
+		opword 0x48000024
+		opword 0x880100C0
+		opword 0x7C000774
+		opword 0x2C000052
+		opword 0x4182003C
+		opword 0x2C00002F
+		opword 0x4082000C
+		opword 0x28002F72
+		opword 0x4182002C
+		opword 0x88190000
+		opword 0x2C00000A
+		opword 0x40820020
+		opword 0x3B390001
+		opword 0x48000018
+		opword 0x88190000
+		opword 0x3B390001
+		opword 0x7C030774
+		bl JUTFont_CodeToGlyph
+		opword 0x7C7E1B78
+		opword 0x57C4043E
+		opword 0x2804FFFF
+		opword 0x41820094
+		lwz r5, pfh(r13)
+		opword 0x3C605749
+		opword 0x38634431
+		opword 0x8005000C
+		opword 0x38C50020
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80060000
+		opword 0x7C001800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0A60008
+		opword 0x7C042840
+		opword 0x41800024
+		opword 0xA006000A
+		opword 0x7C040040
+		opword 0x41810018
+		opword 0x7C052050
+		opword 0x5403083C
+		opword 0x38A3000C
+		opword 0x7CA62A14
+		opword 0x48000014
+		opword 0x80060004
+		opword 0x7CC60214
+		opword 0x4200FFBC
+		opword 0x38A00000
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x88050001
+		opword 0x8084016C
+		opword 0x7C00E214
+		opword 0x5484103A
+		opword 0x7C63202E
+		opword 0x7C030214
+		opword 0x541C043E
+		opword 0x88790000
+		opword 0x7C600775
+		opword 0x4082FD68
+		opword 0x57A3043E
+		opword 0x5780043E
+		opword 0x7C030040
+		opword 0x40800008
+		opword 0x7F9DE378
+		opword 0x57A0043F
+		opword 0x41820020
+		lwz r4, gp(r13)
+		la r3, charspace(r13)
+		opword 0x8004016C
+		opword 0x5400103A
+		opword 0x7C03002E
+		opword 0x7C00E850
+		opword 0x541D043E
+		opword 0x281A0000
+		opword 0x41820008
+		opword 0xB37A0000
+		opword 0x7FA3EB78
+		opword 0xBB210164
+		opword 0x80010184
+		opword 0x7C0803A6
+		opword 0x38210180
+#endif
 	}
+#ifdef NONMATCHING
 	if (maxWidth < width) {
 		maxWidth = width;
 	}
@@ -803,17 +3177,23 @@ u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 		*lines = lineCount;
 	}
 	return maxWidth;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 u16 FontGetMessageWidth(const char* message) {
 	return FontGetMessageWidthLine(message, NULL);
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 GXColor HSV2RGB(GXColor hsv) {
+#ifdef NONMATCHING
 	f32 h, s, v, f, p, q, r, g, b;
 	s32 i;
 	GXColor out;
@@ -825,7 +3205,150 @@ GXColor HSV2RGB(GXColor hsv) {
 	f = h - i;
 	if (!(i & 1)) {
 		f = 1.0f - f;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FF60
+		opword 0x7C0802A6
+		opword 0x900100A4
+		opword 0xDBE10090
+		opword 0xF3E10098
+		opword 0xDBC10080
+		opword 0xF3C10088
+		opword 0xDBA10070
+		opword 0xF3A10078
+		opword 0xDB810060
+		opword 0xF3810068
+		opword 0xDB610050
+		opword 0xF3610058
+		opword 0xDB410040
+		opword 0xF3410048
+		opword 0x93E1003C
+		opword 0x7C7F1B78
+		opword 0x3C604330
+		opword 0x881F0000
+		lis r4, double_to_int_mask_802c48e8@ha
+		opword 0x88BF0001
+		opword 0x90010024
+		opword 0x881F0002
+		opword 0x90610020
+		lfd f5, double_to_int_mask_802c48e8@l(r4)
+		opword 0xC8010020
+		lfs f3, float_360_8041a308(r2)
+		opword 0xEC402828
+		lfs f1, float_0p0039062_8041a30c(r2)
+		opword 0x90A10014
+		lfs f0, float_60_8041a310(r2)
+		opword 0xEC4300B2
+		opword 0x90610010
+		lfs f3, float_255_8041a304(r2)
+		opword 0x9001001C
+		opword 0xEC220072
+		opword 0xC8810010
+		opword 0x90610018
+		opword 0xEC442828
+		opword 0xEF810024
+		opword 0xC8010018
+		opword 0xEC002828
+		opword 0xEF621824
+		opword 0xEF401824
+		opword 0xFC20E090
+		bl floor
+		opword 0xFC00081E
+		lis r3, double_to_int_802c48f0@ha
+		opword 0x3C004330
+		lfd f1, double_to_int_802c48f0@l(r3)
+		opword 0x90010030
+		opword 0xD8010028
+		opword 0x8081002C
+		opword 0x6C838000
+		opword 0x548007FF
+		opword 0x90610034
+		opword 0xC8010030
+		opword 0xEC000828
+		opword 0xEC5C0028
+		opword 0x4082000C
+		lfs f0, float_1_8041a2f4(r2)
+		opword 0xEC401028
+		lfs f0, float_1_8041a2f4(r2)
+		opword 0x2C040003
+		opword 0xEC20D828
+		opword 0xEC1B00BC
+		opword 0xEC3A0072
+		opword 0xEC1A0032
+		opword 0x41820060
+		opword 0x4080001C
+		opword 0x2C040001
+		opword 0x41820034
+		opword 0x40800040
+		opword 0x2C040000
+		opword 0x40800018
+		opword 0x48000070
+		opword 0x2C040005
+		opword 0x4182005C
+		opword 0x40800064
+		opword 0x48000044
+		opword 0xFFE0D090
+		opword 0xFFC00090
+		opword 0xFFA00890
+		opword 0x48000050
+		opword 0xFFE00090
+		opword 0xFFC0D090
+		opword 0xFFA00890
+		opword 0x48000040
+		opword 0xFFE00890
+		opword 0xFFC0D090
+		opword 0xFFA00090
+		opword 0x48000030
+		opword 0xFFE00890
+		opword 0xFFC00090
+		opword 0xFFA0D090
+		opword 0x48000020
+		opword 0xFFE00090
+		opword 0xFFC00890
+		opword 0xFFA0D090
+		opword 0x48000010
+		opword 0xFFE0D090
+		opword 0xFFC00890
+		opword 0xFFA00090
+		lfs f0, float_255_8041a304(r2)
+		opword 0x881F0003
+		opword 0xEC4007F2
+		opword 0xEC2007B2
+		opword 0x9801000B
+		opword 0xEC000772
+		opword 0xFC40101E
+		opword 0xFC20081E
+		opword 0xFC00001E
+		opword 0xD8410030
+		opword 0xD8210028
+		opword 0x80810034
+		opword 0xD8010020
+		opword 0x8061002C
+		opword 0x80010024
+		opword 0x98810008
+		opword 0x98610009
+		opword 0x9801000A
+		opword 0x80610008
+		opword 0xE3E10098
+		opword 0xCBE10090
+		opword 0xE3C10088
+		opword 0xCBC10080
+		opword 0xE3A10078
+		opword 0xCBA10070
+		opword 0xE3810068
+		opword 0xCB810060
+		opword 0xE3610058
+		opword 0xCB610050
+		opword 0xE3410048
+		opword 0xCB410040
+		opword 0x800100A4
+		opword 0x83E1003C
+		opword 0x7C0803A6
+		opword 0x382100A0
+#endif
 	}
+#ifdef NONMATCHING
 	p = v * (1.0f - s);
 	q = v * (1.0f - s * f);
 	switch (i) {
@@ -841,10 +3364,12 @@ GXColor HSV2RGB(GXColor hsv) {
 	out.g = 255.0f * g;
 	out.b = 255.0f * b;
 	return out;
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void JUTFontSetup(u16 font) {
 	u32 size;
 	DVDEntry* dvd;
@@ -877,23 +3402,24 @@ void JUTFontSetup(u16 font) {
 		}
 		GXInitTexObj(&fgTexObj, &blockGlyph[1], blockGlyph->sheetwidth, blockGlyph->sheetheight,
 			GX_TF_I4, GX_CLAMP, GX_CLAMP, GX_FALSE);
+#ifdef NONMATCHING
 		GXInitTexObjLOD(&fgTexObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+#endif
+#ifndef NONMATCHING
+		GXInitTexObjLOD(&fgTexObj, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041a300, 0.0f), EXT_LIT(float_0_8041a300, 0.0f), EXT_LIT(float_0_8041a300, 0.0f), GX_FALSE, GX_FALSE, GX_ANISO_1);
+#endif
 		fontGetWidth(JUTFont_CodeToGlyph(' '))->width = 7;
 		fontGetWidth(JUTFont_CodeToGlyph(0x8140))->width = 9;
 	}
 }
-#endif
 
-#ifdef NONMATCHING
 void JUTFont_Free(void) {
 	if (pfh) {
 		__memFree(HEAP_DEFAULT, pfh);
 		pfh = NULL;
 	}
 }
-#endif
 
-#ifdef NONMATCHING
 u16 JUTFont_CodeToGlyph(u32 code) {
 	BinaryFontMap* map;
 	u32 blockcount;
@@ -964,9 +3490,7 @@ u16 JUTFont_CodeToGlyph(u32 code) {
 	}
 	return glyph;
 }
-#endif
 
-#ifdef NONMATCHING
 void JUTFont_DrawStart(GXColor color) {
 	CameraEntry* camera;
 	Mtx mtx;
@@ -998,21 +3522,35 @@ void JUTFont_DrawStart(GXColor color) {
 	GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_ZERO, GX_CC_C0, (GXTevColorArg)0xC, GX_CC_ZERO);
 	GXSetTevAlphaIn(GX_TEVSTAGE0, GX_CA_ZERO, GX_CA_A0, GX_CA_TEXA, GX_CA_ZERO);
 	GXLoadTexObj(&fgTexObj, GX_TEXMAP0);
+#ifdef NONMATCHING
 	PSMTXScale(mtx, 0.001953125f, 0.0009765625f, 1.0f);
+#endif
+#ifndef NONMATCHING
+	PSMTXScale(mtx, EXT_LIT(float_0p0019531_8041a2f8, 0.001953125f), EXT_LIT(float_0p00097656_8041a2fc, 0.0009765625f), EXT_LIT(float_1_8041a2f4, 1.0f));
+#endif
 	GXLoadTexMtxImm(mtx, GX_TEXMTX0, GX_MTX2x4);
 	GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
 	GXLoadPosMtxImm(camera->view, 0);
 	GXSetCurrentMtx(0);
+#ifdef NONMATCHING
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
-}
 #endif
+#ifndef NONMATCHING
+	GXSetFog(GX_FOG_NONE, EXT_LIT(float_0_8041a300, 0.0f), EXT_LIT(float_0_8041a300, 0.0f), EXT_LIT(float_0_8041a300, 0.0f), EXT_LIT(float_0_8041a300, 0.0f), (GXColor){0, 0, 0, 0});
+#endif
+}
 
 
 
 
 #pragma opt_lifetimes off
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
+#ifdef NONMATCHING
 	s16 x0, y0, y1;
 	s32 x1;
 	GXColor hsv;
@@ -1092,18 +3630,332 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	GXColor4u8(c.r, c.g, c.b, c.a);
 	GXTexCoord2u16(u0, v1);
 	GXTexCoord2u8(n0, t1);
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FEC0
+		opword 0x7C0802A6
+		opword 0x90010144
+		opword 0xDBE10130
+		opword 0xF3E10138
+		opword 0xDBC10120
+		opword 0xF3C10128
+		opword 0xDBA10110
+		opword 0xF3A10118
+		opword 0xDB810100
+		opword 0xF3810108
+		opword 0xDB6100F0
+		opword 0xF36100F8
+		opword 0xBEA100C4
+		lwz r7, pfh(r13)
+		opword 0x3CC05749
+		opword 0x7C9A2378
+		opword 0x7CB52B78
+		opword 0x8007000C
+		opword 0x39070020
+		opword 0x38A64431
+		opword 0x5464043E
+		opword 0x7C0903A6
+		opword 0x28000000
+		opword 0x4081004C
+		opword 0x80080000
+		opword 0x7C002800
+		opword 0x41820008
+		opword 0x48000030
+		opword 0xA0C80008
+		opword 0x7C043040
+		opword 0x41800024
+		opword 0xA008000A
+		opword 0x7C040040
+		opword 0x41810018
+		opword 0x7C062050
+		opword 0x5404083C
+		opword 0x38E4000C
+		opword 0x7CE83A14
+		opword 0x48000014
+		opword 0x80080004
+		opword 0x7D080214
+		opword 0x4200FFBC
+		opword 0x38E00000
+		lwz r6, blockGlyph(r13)
+		opword 0x3D204330
+		opword 0x8AE70001
+		opword 0x5460043E
+		opword 0xA0A60008
+		lis r4, double_to_int_mask_802c48e8@ha
+		opword 0xA2C60016
+		lis r3, double_to_int_802c48f0@ha
+		opword 0x7D850050
+		opword 0x88070000
+		opword 0x7F2CB3D6
+		addi r7, r3, double_to_int_802c48f0@l
+		opword 0xA1660018
+		opword 0x38600080
+		opword 0xA0A6000E
+		opword 0xA0C6000C
+		opword 0x7D595BD6
+		lfd f5, double_to_int_mask_802c48e8@l(r4)
+		opword 0x90A10024
+		opword 0x7F28CB78
+		opword 0xC8470000
+		opword 0x38800000
+		opword 0x91210020
+		opword 0x7CE8B1D6
+		opword 0x38A00004
+		opword 0x90C10034
+		opword 0xC8010020
+		opword 0x91210030
+		opword 0x7CC76050
+		opword 0x6CC68000
+		opword 0xC8210030
+		opword 0x90C1002C
+		opword 0xEFE02828
+		opword 0x7CCA59D6
+		lfs f0, float_1_8041a2f4(r2)
+		opword 0x91210028
+		opword 0xEC612828
+		opword 0xEF9F0032
+		opword 0xC8210028
+		opword 0x9001003C
+		opword 0xEC811028
+		opword 0x7F26C850
+		opword 0x91210038
+		opword 0xC8210038
+		opword 0x92E1004C
+		opword 0xEC412828
+		opword 0x91210048
+		opword 0xC8210048
+		opword 0xEFC410FA
+		opword 0x92E10044
+		opword 0xEC212828
+		opword 0x91210040
+		opword 0xC8410040
+		opword 0xEFA10032
+		opword 0xEF622828
+		bl GXBegin
+		opword 0x38600040
+		bl irand
+		opword 0x5478063E
+		opword 0x38600040
+		bl irand
+		opword 0x3CA04330
+		opword 0x6F208000
+		opword 0x90010064
+		lis r6, double_to_int_802c48f0@ha
+		opword 0x7F560734
+		lfd f3, double_to_int_802c48f0@l(r6)
+		opword 0x90A10060
+		opword 0x6EC08000
+		opword 0x38D5FFFF
+		lwz r4, gp(r13)
+		opword 0xC8010060
+		opword 0x5477063E
+		opword 0x90010054
+		opword 0x7CDC0734
+		opword 0xEC001828
+		opword 0x8004001C
+		opword 0x90A10050
+		opword 0x3CA0CC01
+		lfs f1, float_1_8041a2f4(r2)
+		opword 0x54030DFC
+		lwz r0, dat_8041a2f0(r2)
+		opword 0xEC0007F2
+		opword 0xC8410050
+		opword 0x7C63B050
+		opword 0xB3458000
+		opword 0x5479063E
+		opword 0xEC01002A
+		opword 0xEC421828
+		opword 0x9001001C
+		opword 0x7F56CA14
+		opword 0x38800000
+		opword 0xFC00001E
+		opword 0xEC22E82A
+		opword 0xB0C58000
+		opword 0x38610014
+		opword 0xFC20081E
+		opword 0x9B41001C
+		opword 0xD8010068
+		opword 0x8001001C
+		opword 0xD8210058
+		opword 0x82A1006C
+		opword 0xB0858000
+		opword 0x8361005C
+		opword 0x90010014
+		bl HSV2RGB
+		opword 0x90610018
+		opword 0xFC00F01E
+		opword 0x7F7E0734
+		opword 0x3CC0CC01
+		opword 0x88810018
+		opword 0x7FBECA14
+		opword 0x88610019
+		opword 0x98868000
+		opword 0x38000000
+		opword 0x8881001A
+		opword 0x56BF043E
+		opword 0x98668000
+		opword 0x38610010
+		opword 0x88A1001B
+		opword 0x98868000
+		opword 0xD8010070
+		opword 0x80810074
+		opword 0x98A68000
+		opword 0x5499043E
+		opword 0xB0868000
+		opword 0xB2A68000
+		opword 0x9B068000
+		opword 0x9AE68000
+		opword 0xB3668000
+		opword 0xB3868000
+		opword 0x9BA1001C
+		opword 0xB0068000
+		opword 0x8001001C
+		opword 0x90010010
+		bl HSV2RGB
+		opword 0x3CA04330
+		opword 0x90610018
+		lis r3, double_to_int_mask_802c48e8@ha
+		opword 0xEC5ED82A
+		opword 0x93010084
+		opword 0x3D20CC01
+		lfd f1, double_to_int_mask_802c48e8@l(r3)
+		opword 0x6F838000
+		opword 0x90A10080
+		opword 0x88010018
+		opword 0xFC40101E
+		opword 0xC8010080
+		lis r4, double_to_int_802c48f0@ha
+		opword 0x98098000
+		opword 0x38000000
+		opword 0xEC000828
+		opword 0x89010019
+		opword 0x90610094
+		opword 0x3861000C
+		opword 0xEC00E82A
+		opword 0x88E1001A
+		opword 0xD8410078
+		lfd f1, double_to_int_802c48f0@l(r4)
+		opword 0x90A10090
+		opword 0xFC40001E
+		opword 0x80C1007C
+		opword 0x99098000
+		opword 0xC8010090
+		opword 0x54DC043E
+		opword 0xD8410088
+		opword 0xEC000828
+		opword 0x88A1001B
+		opword 0x98E98000
+		opword 0x8081008C
+		opword 0x98A98000
+		opword 0xEC00E028
+		opword 0x549B063E
+		opword 0xB0C98000
+		opword 0xFC00001E
+		opword 0xB3E98000
+		opword 0x98898000
+		opword 0x9AE98000
+		opword 0xD8010098
+		opword 0x8081009C
+		opword 0xB3C98000
+		opword 0x7C9E0734
+		opword 0xB0898000
+		opword 0x9BA1001C
+		opword 0xB0098000
+		opword 0x8001001C
+		opword 0x9001000C
+		bl HSV2RGB
+		opword 0x3C804330
+		opword 0x7FE0FB78
+		opword 0x900100A4
+		lis r5, double_to_int_mask_802c48e8@ha
+		lfd f2, double_to_int_mask_802c48e8@l(r5)
+		opword 0x3CE0CC01
+		opword 0x908100A0
+		opword 0x38000000
+		opword 0x90610018
+		opword 0x38610008
+		opword 0xC80100A0
+		opword 0x908100B0
+		opword 0xEC001028
+		opword 0x89010018
+		opword 0x92E100B4
+		opword 0x88C10019
+		opword 0xEC20F82A
+		opword 0xC80100B0
+		opword 0x99078000
+		opword 0xEC001028
+		opword 0x88A1001A
+		opword 0x98C78000
+		opword 0xFC20081E
+		opword 0x8881001B
+		opword 0x98A78000
+		opword 0xEC00E02A
+		opword 0x98878000
+		opword 0xD82100A8
+		opword 0xFC00001E
+		opword 0x808100AC
+		opword 0xB3878000
+		opword 0x5495043E
+		opword 0xB0878000
+		opword 0xD80100B8
+		opword 0x808100BC
+		opword 0x9B678000
+		opword 0x5497063E
+		opword 0x98878000
+		opword 0xB2C78000
+		opword 0xB3C78000
+		opword 0x9B41001C
+		opword 0xB0078000
+		opword 0x8001001C
+		opword 0x90010008
+		bl HSV2RGB
+		opword 0x90610018
+		opword 0x3C80CC01
+		opword 0x88610018
+		opword 0x88010019
+		opword 0x98648000
+		opword 0x8861001A
+		opword 0x98048000
+		opword 0x8801001B
+		opword 0x98648000
+		opword 0x98048000
+		opword 0xB3248000
+		opword 0xB2A48000
+		opword 0x9B048000
+		opword 0x9AE48000
+		opword 0xE3E10138
+		opword 0xCBE10130
+		opword 0xE3C10128
+		opword 0xCBC10120
+		opword 0xE3A10118
+		opword 0xCBA10110
+		opword 0xE3810108
+		opword 0xCB810100
+		opword 0xE36100F8
+		opword 0xCB6100F0
+		opword 0xBAA100C4
+		opword 0x80010144
+		opword 0x7C0803A6
+		opword 0x38210140
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #pragma opt_lifetimes reset
 #pragma opt_common_subs reset
 
-#ifndef NONMATCHING
-// ASM-STOPGAP: fontmgrInit (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
 #pragma force_active on
-#pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
+__declspec(section ".sdata") u32 gap_07_8041036C_sdata[1] = {0};
+#ifndef NONMATCHING
+
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
 __declspec(section ".sdata2") const u32 dat_8041a2e8 = 0xE00000FF;
 __declspec(section ".sdata2") const u32 dat_8041a2ec = 0xE00000FF;
 __declspec(section ".sdata2") const u32 dat_8041a2f0 = 0x00AAFFFF;
@@ -1124,4271 +3976,5 @@ __declspec(section ".sdata2") const char str_8041A330[4] = "%x\0";
 __declspec(section ".sdata2") const char str_8041A334[8] = "/col\0\0\0";
 __declspec(section ".sdata2") const f32 float_28_8041a33c = 28.0f;
 __declspec(section ".sdata2") const f32 float_0p015625_8041a340 = 0.015625f;
-
-__declspec(section ".sdata2") u32 gap_10_80422FDC_sbss2[1]; // FAKE: .sbss2 pad after unk_80422fd8 (reverse emit order)
-__declspec(section ".sdata2") const u32 unk_80422fd8;
-void DVDMgrClose(DVDEntry* entry);
-u32 DVDMgrGetLength(DVDEntry* entry);
-DVDEntry* DVDMgrOpen(const char* path, u8 priority, u16 unknown);
-s32 DVDMgrRead(DVDEntry* entry, void* address, u32 size, s32 offset);
-u16 FontGetMessageWidthLine(const char* msg, u16* lines);
-void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
-void GXClearVtxDesc(void);
-void GXInitTexObj(GXTexObj* obj, void* image_ptr, u16 width, u16 height, GXTexFmt format, GXTexWrapMode wrap_s, GXTexWrapMode wrap_t, u8 mipmap);
-void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
-    f32 min_lod, f32 max_lod, f32 lod_bias, GXBool bias_clamp,
-    GXBool do_edge_lod, GXAnisotropy max_aniso);
-void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
-void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
-void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
-void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1);
-void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
-void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
-void GXSetCullMode(GXCullMode mode);
-void GXSetCurrentMtx(u32 id);
-void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
-void GXSetNumChans(u8 nChans);
-void GXSetNumTevStages(u8 nStages);
-void GXSetNumTexGens(u8 nTexGens);
-void GXSetTevAlphaIn(GXTevStageID stage, GXTevAlphaArg a, GXTevAlphaArg b, GXTevAlphaArg c, GXTevAlphaArg d);
-void GXSetTevAlphaOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevColor(GXTevRegID id, GXColor color);
-void GXSetTevColorIn(GXTevStageID stage, GXTevColorArg a, GXTevColorArg b, GXTevColorArg c, GXTevColorArg d);
-void GXSetTevColorOp(GXTevStageID stage, GXTevOp op, GXTevBias bias, GXTevScale scale, GXBool clamp, GXTevRegID out_reg);
-void GXSetTevKAlphaSel(GXTevStageID stage, GXTevKAlphaSel sel);
-void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
-void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
-void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
-void GXSetVtxDesc(GXAttr attr, GXAttrType type);
-void GXSetZCompLoc(GXBool before_tex);
-void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable);
-void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
-void PSMTXMultVec(const Mtx m, const Vec* src, Vec* dst);
-void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
-void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
-void PSMTXTransApply(const Mtx src, Mtx dst, f32 xT, f32 yT, f32 zT);
-void __GXSetIndirectMask(u32 mask);
-void* __memAlloc(HEAP_TYPE heap, u32 size);
-void __memFree(HEAP_TYPE heap, void* ptr);
-BOOL _ismbblead(u32 a1);
-CameraEntry* camGetCurPtr(void);
-const char* getMarioStDvdRoot(void);
-s32 irand(s32 scalar);
-asm void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
-	nofralloc
-	stwu r1, -0x140(r1)
-	mflr r0
-	stw r0, 0x144(r1)
-	stfd f31, 0x130(r1)
-	psq_st f31, 0x138(r1), 0, 0
-	stfd f30, 0x120(r1)
-	psq_st f30, 0x128(r1), 0, 0
-	stfd f29, 0x110(r1)
-	psq_st f29, 0x118(r1), 0, 0
-	stfd f28, 0x100(r1)
-	psq_st f28, 0x108(r1), 0, 0
-	stfd f27, 0xf0(r1)
-	psq_st f27, 0xf8(r1), 0, 0
-	stmw r21, 0xc4(r1)
-	lwz r7, pfh(r13)
-	lis r6, 0x5749
-	mr r26, r4
-	mr r21, r5
-	lwz r0, 0xc(r7)
-	addi r8, r7, 0x20
-	addi r5, r6, 0x4431
-	clrlwi r4, r3, 16
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @1
-	@2:
-	lwz r0, 0x0(r8)
-	cmpw r0, r5
-	beq @3
-	b @4
-	@3:
-	lhz r6, 0x8(r8)
-	cmplw r4, r6
-	blt @4
-	lhz r0, 0xa(r8)
-	cmplw r4, r0
-	bgt @4
-	subf r0, r6, r4
-	slwi r4, r0, 1
-	addi r7, r4, 0xc
-	add r7, r8, r7
-	b @5
-	@4:
-	lwz r0, 0x4(r8)
-	add r8, r8, r0
-	bdnz @2
-	@1:
-	li r7, 0x0
-	@5:
-	lwz r6, blockGlyph(r13)
-	lis r9, 0x4330
-	lbz r23, 0x1(r7)
-	clrlwi r0, r3, 16
-	lhz r5, 0x8(r6)
-	lis r4, double_to_int_mask_802c48e8@ha
-	lhz r22, 0x16(r6)
-	lis r3, double_to_int_802c48f0@ha
-	subf r12, r5, r0
-	lbz r0, 0x0(r7)
-	divw r25, r12, r22
-	addi r7, r3, double_to_int_802c48f0@l
-	lhz r11, 0x18(r6)
-	li r3, 0x80
-	lhz r5, 0xe(r6)
-	lhz r6, 0xc(r6)
-	divw r10, r25, r11
-	lfd f5, double_to_int_mask_802c48e8@l(r4)
-	stw r5, 0x24(r1)
-	mr r8, r25
-	lfd f2, 0x0(r7)
-	li r4, 0x0
-	stw r9, 0x20(r1)
-	mullw r7, r8, r22
-	li r5, 0x4
-	stw r6, 0x34(r1)
-	lfd f0, 0x20(r1)
-	stw r9, 0x30(r1)
-	subf r6, r7, r12
-	xoris r6, r6, 0x8000
-	lfd f1, 0x30(r1)
-	stw r6, 0x2c(r1)
-	fsubs f31, f0, f5
-	mullw r6, r10, r11
-	lfs f0, float_1_8041a2f4(r2)
-	stw r9, 0x28(r1)
-	fsubs f3, f1, f5
-	fmuls f28, f31, f0
-	lfd f1, 0x28(r1)
-	stw r0, 0x3c(r1)
-	fsubs f4, f1, f2
-	subf r25, r6, r25
-	stw r9, 0x38(r1)
-	lfd f1, 0x38(r1)
-	stw r23, 0x4c(r1)
-	fsubs f2, f1, f5
-	stw r9, 0x48(r1)
-	lfd f1, 0x48(r1)
-	fmadds f30, f4, f3, f2
-	stw r23, 0x44(r1)
-	fsubs f1, f1, f5
-	stw r9, 0x40(r1)
-	lfd f2, 0x40(r1)
-	fmuls f29, f1, f0
-	fsubs f27, f2, f5
-	bl GXBegin
-	li r3, 0x40
-	bl irand
-	clrlwi r24, r3, 24
-	li r3, 0x40
-	bl irand
-	lis r5, 0x4330
-	xoris r0, r25, 0x8000
-	stw r0, 0x64(r1)
-	lis r6, double_to_int_802c48f0@ha
-	extsh r22, r26
-	lfd f3, double_to_int_802c48f0@l(r6)
-	stw r5, 0x60(r1)
-	xoris r0, r22, 0x8000
-	subi r6, r21, 0x1
-	lwz r4, gp(r13)
-	lfd f0, 0x60(r1)
-	clrlwi r23, r3, 24
-	stw r0, 0x54(r1)
-	extsh r28, r6
-	fsubs f0, f0, f3
-	lwz r0, 0x1c(r4)
-	stw r5, 0x50(r1)
-	lis r5, 0xcc01
-	lfs f1, float_1_8041a2f4(r2)
-	clrlslwi r3, r0, 24, 1
-	lwz r0, dat_8041a2f0(r2)
-	fmuls f0, f0, f31
-	lfd f2, 0x50(r1)
-	subf r3, r3, r22
-	sth r26, -0x8000(r5)
-	clrlwi r25, r3, 24
-	fadds f0, f1, f0
-	fsubs f2, f2, f3
-	stw r0, 0x1c(r1)
-	add r26, r22, r25
-	li r4, 0x0
-	fctiwz f0, f0
-	fadds f1, f2, f29
-	sth r6, -0x8000(r5)
-	addi r3, r1, 0x14
-	fctiwz f1, f1
-	stb r26, 0x1c(r1)
-	stfd f0, 0x68(r1)
-	lwz r0, 0x1c(r1)
-	stfd f1, 0x58(r1)
-	lwz r21, 0x6c(r1)
-	sth r4, -0x8000(r5)
-	lwz r27, 0x5c(r1)
-	stw r0, 0x14(r1)
-	bl HSV2RGB
-	stw r3, 0x18(r1)
-	fctiwz f0, f30
-	extsh r30, r27
-	lis r6, 0xcc01
-	lbz r4, 0x18(r1)
-	add r29, r30, r25
-	lbz r3, 0x19(r1)
-	stb r4, -0x8000(r6)
-	li r0, 0x0
-	lbz r4, 0x1a(r1)
-	clrlwi r31, r21, 16
-	stb r3, -0x8000(r6)
-	addi r3, r1, 0x10
-	lbz r5, 0x1b(r1)
-	stb r4, -0x8000(r6)
-	stfd f0, 0x70(r1)
-	lwz r4, 0x74(r1)
-	stb r5, -0x8000(r6)
-	clrlwi r25, r4, 16
-	sth r4, -0x8000(r6)
-	sth r21, -0x8000(r6)
-	stb r24, -0x8000(r6)
-	stb r23, -0x8000(r6)
-	sth r27, -0x8000(r6)
-	sth r28, -0x8000(r6)
-	stb r29, 0x1c(r1)
-	sth r0, -0x8000(r6)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl HSV2RGB
-	lis r5, 0x4330
-	stw r3, 0x18(r1)
-	lis r3, double_to_int_mask_802c48e8@ha
-	fadds f2, f30, f27
-	stw r24, 0x84(r1)
-	lis r9, 0xcc01
-	lfd f1, double_to_int_mask_802c48e8@l(r3)
-	xoris r3, r28, 0x8000
-	stw r5, 0x80(r1)
-	lbz r0, 0x18(r1)
-	fctiwz f2, f2
-	lfd f0, 0x80(r1)
-	lis r4, double_to_int_802c48f0@ha
-	stb r0, -0x8000(r9)
-	li r0, 0x0
-	fsubs f0, f0, f1
-	lbz r8, 0x19(r1)
-	stw r3, 0x94(r1)
-	addi r3, r1, 0xc
-	fadds f0, f0, f29
-	lbz r7, 0x1a(r1)
-	stfd f2, 0x78(r1)
-	lfd f1, double_to_int_802c48f0@l(r4)
-	stw r5, 0x90(r1)
-	fctiwz f2, f0
-	lwz r6, 0x7c(r1)
-	stb r8, -0x8000(r9)
-	lfd f0, 0x90(r1)
-	clrlwi r28, r6, 16
-	stfd f2, 0x88(r1)
-	fsubs f0, f0, f1
-	lbz r5, 0x1b(r1)
-	stb r7, -0x8000(r9)
-	lwz r4, 0x8c(r1)
-	stb r5, -0x8000(r9)
-	fsubs f0, f0, f28
-	clrlwi r27, r4, 24
-	sth r6, -0x8000(r9)
-	fctiwz f0, f0
-	sth r31, -0x8000(r9)
-	stb r4, -0x8000(r9)
-	stb r23, -0x8000(r9)
-	stfd f0, 0x98(r1)
-	lwz r4, 0x9c(r1)
-	sth r30, -0x8000(r9)
-	extsh r30, r4
-	sth r4, -0x8000(r9)
-	stb r29, 0x1c(r1)
-	sth r0, -0x8000(r9)
-	lwz r0, 0x1c(r1)
-	stw r0, 0xc(r1)
-	bl HSV2RGB
-	lis r4, 0x4330
-	mr r0, r31
-	stw r0, 0xa4(r1)
-	lis r5, double_to_int_mask_802c48e8@ha
-	lfd f2, double_to_int_mask_802c48e8@l(r5)
-	lis r7, 0xcc01
-	stw r4, 0xa0(r1)
-	li r0, 0x0
-	stw r3, 0x18(r1)
-	addi r3, r1, 0x8
-	lfd f0, 0xa0(r1)
-	stw r4, 0xb0(r1)
-	fsubs f0, f0, f2
-	lbz r8, 0x18(r1)
-	stw r23, 0xb4(r1)
-	lbz r6, 0x19(r1)
-	fadds f1, f0, f31
-	lfd f0, 0xb0(r1)
-	stb r8, -0x8000(r7)
-	fsubs f0, f0, f2
-	lbz r5, 0x1a(r1)
-	stb r6, -0x8000(r7)
-	fctiwz f1, f1
-	lbz r4, 0x1b(r1)
-	stb r5, -0x8000(r7)
-	fadds f0, f0, f28
-	stb r4, -0x8000(r7)
-	stfd f1, 0xa8(r1)
-	fctiwz f0, f0
-	lwz r4, 0xac(r1)
-	sth r28, -0x8000(r7)
-	clrlwi r21, r4, 16
-	sth r4, -0x8000(r7)
-	stfd f0, 0xb8(r1)
-	lwz r4, 0xbc(r1)
-	stb r27, -0x8000(r7)
-	clrlwi r23, r4, 24
-	stb r4, -0x8000(r7)
-	sth r22, -0x8000(r7)
-	sth r30, -0x8000(r7)
-	stb r26, 0x1c(r1)
-	sth r0, -0x8000(r7)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x8(r1)
-	bl HSV2RGB
-	stw r3, 0x18(r1)
-	lis r4, 0xcc01
-	lbz r3, 0x18(r1)
-	lbz r0, 0x19(r1)
-	stb r3, -0x8000(r4)
-	lbz r3, 0x1a(r1)
-	stb r0, -0x8000(r4)
-	lbz r0, 0x1b(r1)
-	stb r3, -0x8000(r4)
-	stb r0, -0x8000(r4)
-	sth r25, -0x8000(r4)
-	sth r21, -0x8000(r4)
-	stb r24, -0x8000(r4)
-	stb r23, -0x8000(r4)
-	psq_l f31, 0x138(r1), 0, 0
-	lfd f31, 0x130(r1)
-	psq_l f30, 0x128(r1), 0, 0
-	lfd f30, 0x120(r1)
-	psq_l f29, 0x118(r1), 0, 0
-	lfd f29, 0x110(r1)
-	psq_l f28, 0x108(r1), 0, 0
-	lfd f28, 0x100(r1)
-	psq_l f27, 0xf8(r1), 0, 0
-	lfd f27, 0xf0(r1)
-	lmw r21, 0xc4(r1)
-	lwz r0, 0x144(r1)
-	mtlr r0
-	addi r1, r1, 0x140
-	blr
-}
-
-asm void JUTFont_DrawStart(GXColor color) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stw r31, 0x4c(r1)
-	stw r30, 0x48(r1)
-	mr r30, r3
-	bl camGetCurPtr
-	mr r31, r3
-	li r3, 0x0
-	bl __GXSetIndirectMask
-	li r3, 0x0
-	bl GXSetCullMode
-	li r3, 0x1
-	bl GXSetZCompLoc
-	li r3, 0x7
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x7
-	li r7, 0x0
-	bl GXSetAlphaCompare
-	li r3, 0x1
-	li r4, 0x4
-	li r5, 0x5
-	li r6, 0x7
-	bl GXSetBlendMode
-	li r3, 0x1
-	li r4, 0x7
-	li r5, 0x0
-	bl GXSetZMode
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xb
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xd
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xe
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x3
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xb
-	li r5, 0x1
-	li r6, 0x5
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x2
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xe
-	li r5, 0x1
-	li r6, 0x0
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x4
-	li r4, 0x0
-	li r5, 0x1
-	li r6, 0x1
-	li r7, 0x0
-	li r8, 0x0
-	li r9, 0x2
-	bl GXSetChanCtrl
-	li r3, 0x1
-	bl GXSetNumChans
-	li r3, 0x1
-	bl GXSetNumTexGens
-	lwz r0, 0x0(r30)
-	addi r4, r1, 0xc
-	li r3, 0x1
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	li r3, 0x1
-	bl GXSetNumTevStages
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0xff
-	bl GXSetTevOrder
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x0
-	li r4, 0xf
-	li r5, 0x2
-	li r6, 0xc
-	li r7, 0xf
-	bl GXSetTevColorIn
-	li r3, 0x0
-	li r4, 0x7
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x7
-	bl GXSetTevAlphaIn
-	la r3, fgTexObj(r13)
-	li r4, 0x0
-	bl GXLoadTexObj
-	lfs f1, float_0p0019531_8041a2f8(r2)
-	addi r3, r1, 0x10
-	lfs f2, float_0p00097656_8041a2fc(r2)
-	lfs f3, float_1_8041a2f4(r2)
-	bl PSMTXScale
-	addi r3, r1, 0x10
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	addi r3, r31, 0x11c
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lfs f1, float_0_8041a300(r2)
-	addi r4, r1, 0x8
-	lwz r0, unk_80422fd8(r2)
-	li r3, 0x0
-	fmr f2, f1
-	fmr f3, f1
-	stw r0, 0x8(r1)
-	fmr f4, f1
-	bl GXSetFog
-	lwz r0, 0x54(r1)
-	lwz r31, 0x4c(r1)
-	lwz r30, 0x48(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm u16 JUTFont_CodeToGlyph(u32 code) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	clrlwi r4, r3, 16
-	lwz r6, pfh(r13)
-	lwz r5, pfi(r13)
-	lwz r0, 0xc(r6)
-	addi r6, r6, 0x20
-	lhz r7, 0x12(r5)
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @1
-	@2:
-	lwz r5, 0x0(r6)
-	subis r0, r5, 0x4d41
-	cmplwi r0, 0x5031
-	bne @3
-	lhz r5, 0xa(r6)
-	cmplw r4, r5
-	blt @3
-	lhz r0, 0xc(r6)
-	cmplw r4, r0
-	bgt @3
-	lhz r0, 0x8(r6)
-	cmpwi r0, 0x2
-	beq @4
-	bge @5
-	cmpwi r0, 0x0
-	beq @6
-	bge @7
-	b @1
-	@5:
-	cmpwi r0, 0x4
-	bge @1
-	b @8
-	@6:
-	subf r0, r5, r3
-	clrlwi r7, r0, 16
-	b @1
-	@7:
-	sth r3, 0x8(r1)
-	lbz r3, 0x9(r1)
-	lbz r4, 0x8(r1)
-	cmplwi r3, 0x80
-	blt @9
-	subi r5, r3, 0x41
-	b @10
-	@9:
-	subi r5, r3, 0x40
-	@10:
-	lhz r0, 0xe(r6)
-	cmplwi r0, 0x0
-	bne @11
-	subi r0, r4, 0x88
-	mulli r3, r0, 0xbc
-	addi r0, r3, 0x2be
-	add r0, r5, r0
-	clrlwi r7, r0, 16
-	b @1
-	@11:
-	subi r0, r4, 0x88
-	lhz r4, 0x10(r6)
-	mulli r3, r0, 0xbc
-	subi r0, r3, 0x5e
-	add r0, r0, r4
-	add r0, r5, r0
-	clrlwi r7, r0, 16
-	b @1
-	@4:
-	subf r0, r5, r4
-	slwi r0, r0, 1
-	add r3, r6, r0
-	lhz r7, 0x10(r3)
-	b @1
-	@8:
-	lhz r5, 0xe(r6)
-	clrlwi r3, r3, 16
-	li r8, 0x0
-	b @12
-	@13:
-	add r4, r8, r5
-	srwi r0, r4, 31
-	add r0, r0, r4
-	srawi r9, r0, 1
-	slwi r4, r9, 2
-	addi r0, r4, 0x10
-	lhzx r0, r6, r0
-	cmplw r3, r0
-	bne @14
-	add r3, r6, r4
-	lhz r7, 0x12(r3)
-	b @1
-	@14:
-	bge @15
-	subi r5, r9, 0x1
-	b @12
-	@15:
-	addi r8, r9, 0x1
-	@12:
-	cmpw r5, r8
-	bge @13
-	b @1
-	@3:
-	lwz r0, 0x4(r6)
-	add r6, r6, r0
-	bdnz @2
-	@1:
-	mr r3, r7
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void JUTFont_Free(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, pfh(r13)
-	cmplwi r4, 0x0
-	beq @1
-	li r3, 0x0
-	bl __memFree
-	li r0, 0x0
-	stw r0, pfh(r13)
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void JUTFontSetup(u16 font) {
-	nofralloc
-	stwu r1, -0x90(r1)
-	mflr r0
-	stw r0, 0x94(r1)
-	stw r31, 0x8c(r1)
-	stw r30, 0x88(r1)
-	mr r30, r3
-	lwz r0, pfh(r13)
-	cmplwi r0, 0x0
-	bne @1
-	bl getMarioStDvdRoot
-	clrlslwi r0, r30, 16, 2
-	la r5, fontname(r13)
-	lis r4, str_802C48F8@ha
-	lwzx r6, r5, r0
-	mr r5, r3
-	addi r3, r1, 0x8
-	addi r4, r4, str_802C48F8@l
-	crclr 6
-	bl sprintf
-	addi r3, r1, 0x8
-	li r4, 0x2
-	li r5, 0x0
-	bl DVDMgrOpen
-	mr r30, r3
-	bl DVDMgrGetLength
-	mr r4, r3
-	li r3, 0x0
-	addi r0, r4, 0x1f
-	clrrwi r31, r0, 5
-	mr r4, r31
-	bl __memAlloc
-	mr r4, r3
-	mr r3, r30
-	stw r4, pfh(r13)
-	mr r5, r31
-	li r6, 0x0
-	bl DVDMgrRead
-	mr r3, r30
-	bl DVDMgrClose
-	lwz r6, pfh(r13)
-	lis r3, 0x4d41
-	addi r4, r3, 0x5031
-	li r8, 0x0
-	addi r7, r6, 0x20
-	b @2
-	@3:
-	lwz r5, 0x0(r7)
-	cmpw r5, r4
-	beq @4
-	bge @5
-	lis r3, 0x494e
-	addi r0, r3, 0x4631
-	cmpw r5, r0
-	beq @6
-	bge @4
-	lis r3, 0x474c
-	addi r0, r3, 0x5931
-	cmpw r5, r0
-	beq @7
-	b @4
-	@5:
-	lis r3, 0x5749
-	addi r0, r3, 0x4431
-	cmpw r5, r0
-	beq @4
-	b @4
-	@6:
-	stw r7, pfi(r13)
-	b @4
-	@7:
-	stw r7, blockGlyph(r13)
-	@4:
-	lwz r0, 0x4(r7)
-	addi r8, r8, 0x1
-	add r7, r7, r0
-	@2:
-	lwz r0, 0xc(r6)
-	cmplw r8, r0
-	blt @3
-	lwz r6, blockGlyph(r13)
-	la r3, fgTexObj(r13)
-	li r7, 0x0
-	li r8, 0x0
-	lhz r5, 0x1a(r6)
-	addi r4, r6, 0x20
-	lhz r6, 0x1c(r6)
-	li r9, 0x0
-	li r10, 0x0
-	bl GXInitTexObj
-	lfs f1, float_0_8041a300(r2)
-	la r3, fgTexObj(r13)
-	li r4, 0x1
-	li r5, 0x1
-	fmr f2, f1
-	li r6, 0x0
-	fmr f3, f1
-	li r7, 0x0
-	li r8, 0x0
-	bl GXInitTexObjLOD
-	li r3, 0x20
-	bl JUTFont_CodeToGlyph
-	lwz r5, pfh(r13)
-	lis r4, 0x5749
-	addi r4, r4, 0x4431
-	clrlwi r3, r3, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @8
-	@9:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @10
-	b @11
-	@10:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @11
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @11
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r4, r3, 0xc
-	add r4, r5, r4
-	b @12
-	@11:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @9
-	@8:
-	li r4, 0x0
-	@12:
-	li r0, 0x7
-	lis r3, 0x1
-	stb r0, 0x1(r4)
-	subi r3, r3, 0x7ec0
-	bl JUTFont_CodeToGlyph
-	lwz r5, pfh(r13)
-	lis r4, 0x5749
-	addi r4, r4, 0x4431
-	clrlwi r3, r3, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @13
-	@14:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @15
-	b @16
-	@15:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @16
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @16
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r5, r3
-	b @17
-	@16:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @14
-	@13:
-	li r3, 0x0
-	@17:
-	li r0, 0x9
-	stb r0, 0x1(r3)
-	@1:
-	lwz r0, 0x94(r1)
-	lwz r31, 0x8c(r1)
-	lwz r30, 0x88(r1)
-	mtlr r0
-	addi r1, r1, 0x90
-	blr
-}
-
-asm GXColor HSV2RGB(GXColor hsv) {
-	nofralloc
-	stwu r1, -0xa0(r1)
-	mflr r0
-	stw r0, 0xa4(r1)
-	stfd f31, 0x90(r1)
-	psq_st f31, 0x98(r1), 0, 0
-	stfd f30, 0x80(r1)
-	psq_st f30, 0x88(r1), 0, 0
-	stfd f29, 0x70(r1)
-	psq_st f29, 0x78(r1), 0, 0
-	stfd f28, 0x60(r1)
-	psq_st f28, 0x68(r1), 0, 0
-	stfd f27, 0x50(r1)
-	psq_st f27, 0x58(r1), 0, 0
-	stfd f26, 0x40(r1)
-	psq_st f26, 0x48(r1), 0, 0
-	stw r31, 0x3c(r1)
-	mr r31, r3
-	lis r3, 0x4330
-	lbz r0, 0x0(r31)
-	lis r4, double_to_int_mask_802c48e8@ha
-	lbz r5, 0x1(r31)
-	stw r0, 0x24(r1)
-	lbz r0, 0x2(r31)
-	stw r3, 0x20(r1)
-	lfd f5, double_to_int_mask_802c48e8@l(r4)
-	lfd f0, 0x20(r1)
-	lfs f3, float_360_8041a308(r2)
-	fsubs f2, f0, f5
-	lfs f1, float_0p0039062_8041a30c(r2)
-	stw r5, 0x14(r1)
-	lfs f0, float_60_8041a310(r2)
-	fmuls f2, f3, f2
-	stw r3, 0x10(r1)
-	lfs f3, float_255_8041a304(r2)
-	stw r0, 0x1c(r1)
-	fmuls f1, f2, f1
-	lfd f4, 0x10(r1)
-	stw r3, 0x18(r1)
-	fsubs f2, f4, f5
-	fdivs f28, f1, f0
-	lfd f0, 0x18(r1)
-	fsubs f0, f0, f5
-	fdivs f27, f2, f3
-	fdivs f26, f0, f3
-	fmr f1, f28
-	bl floor
-	fctiwz f0, f1
-	lis r3, double_to_int_802c48f0@ha
-	lis r0, 0x4330
-	lfd f1, double_to_int_802c48f0@l(r3)
-	stw r0, 0x30(r1)
-	stfd f0, 0x28(r1)
-	lwz r4, 0x2c(r1)
-	xoris r3, r4, 0x8000
-	clrlwi. r0, r4, 31
-	stw r3, 0x34(r1)
-	lfd f0, 0x30(r1)
-	fsubs f0, f0, f1
-	fsubs f2, f28, f0
-	bne @1
-	lfs f0, float_1_8041a2f4(r2)
-	fsubs f2, f0, f2
-	@1:
-	lfs f0, float_1_8041a2f4(r2)
-	cmpwi r4, 0x3
-	fsubs f1, f0, f27
-	fnmsubs f0, f27, f2, f0
-	fmuls f1, f26, f1
-	fmuls f0, f26, f0
-	beq @2
-	bge @3
-	cmpwi r4, 0x1
-	beq @4
-	bge @5
-	cmpwi r4, 0x0
-	bge @6
-	b @7
-	@3:
-	cmpwi r4, 0x5
-	beq @8
-	bge @7
-	b @9
-	@6:
-	fmr f31, f26
-	fmr f30, f0
-	fmr f29, f1
-	b @7
-	@4:
-	fmr f31, f0
-	fmr f30, f26
-	fmr f29, f1
-	b @7
-	@5:
-	fmr f31, f1
-	fmr f30, f26
-	fmr f29, f0
-	b @7
-	@2:
-	fmr f31, f1
-	fmr f30, f0
-	fmr f29, f26
-	b @7
-	@9:
-	fmr f31, f0
-	fmr f30, f1
-	fmr f29, f26
-	b @7
-	@8:
-	fmr f31, f26
-	fmr f30, f1
-	fmr f29, f0
-	@7:
-	lfs f0, float_255_8041a304(r2)
-	lbz r0, 0x3(r31)
-	fmuls f2, f0, f31
-	fmuls f1, f0, f30
-	stb r0, 0xb(r1)
-	fmuls f0, f0, f29
-	fctiwz f2, f2
-	fctiwz f1, f1
-	fctiwz f0, f0
-	stfd f2, 0x30(r1)
-	stfd f1, 0x28(r1)
-	lwz r4, 0x34(r1)
-	stfd f0, 0x20(r1)
-	lwz r3, 0x2c(r1)
-	lwz r0, 0x24(r1)
-	stb r4, 0x8(r1)
-	stb r3, 0x9(r1)
-	stb r0, 0xa(r1)
-	lwz r3, 0x8(r1)
-	psq_l f31, 0x98(r1), 0, 0
-	lfd f31, 0x90(r1)
-	psq_l f30, 0x88(r1), 0, 0
-	lfd f30, 0x80(r1)
-	psq_l f29, 0x78(r1), 0, 0
-	lfd f29, 0x70(r1)
-	psq_l f28, 0x68(r1), 0, 0
-	lfd f28, 0x60(r1)
-	psq_l f27, 0x58(r1), 0, 0
-	lfd f27, 0x50(r1)
-	psq_l f26, 0x48(r1), 0, 0
-	lfd f26, 0x40(r1)
-	lwz r0, 0xa4(r1)
-	lwz r31, 0x3c(r1)
-	mtlr r0
-	addi r1, r1, 0xa0
-	blr
-}
-
-asm u16 FontGetMessageWidth(const char* message) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x0
-	stw r0, 0x14(r1)
-	bl FontGetMessageWidthLine
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
-	nofralloc
-	stwu r1, -0x180(r1)
-	mflr r0
-	stw r0, 0x184(r1)
-	stmw r25, 0x164(r1)
-	mr r25, r3
-	mr r26, r4
-	li r29, 0x0
-	li r28, 0x0
-	li r27, 0x0
-	lis r31, 0x1
-	b @1
-	@2:
-	subi r30, r31, 0x1
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r25)
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	addi r25, r25, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r25)
-	extsb r0, r0
-	cmpwi r0, 0x3c
-	beq @5
-	bge @6
-	cmpwi r0, 0xa
-	beq @7
-	b @6
-	@7:
-	clrlwi r3, r29, 16
-	clrlwi r0, r28, 16
-	cmplw r3, r0
-	bge @8
-	mr r29, r28
-	@8:
-	li r28, 0x0
-	addi r27, r27, 0x1
-	addi r25, r25, 0x1
-	b @4
-	@5:
-	addi r3, r25, 0x1
-	addi r4, r1, 0xc0
-	addi r5, r1, 0x40
-	bl msgGetCommand
-	mr r0, r3
-	addi r3, r1, 0xc0
-	mr r25, r0
-	la r4, str_8041A314(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @9
-	bl camGetCurPtr
-	lbz r0, 0x40(r1)
-	extsb r0, r0
-	cmpwi r0, 0x30
-	blt @10
-	cmpwi r0, 0x39
-	bgt @10
-	lis r4, str_802C4904@ha
-	addi r3, r1, 0x40
-	addi r4, r4, str_802C4904@l
-	addi r5, r1, 0x1c
-	addi r6, r1, 0xc
-	addi r7, r1, 0x18
-	addi r8, r1, 0x14
-	addi r9, r1, 0x10
-	crclr 6
-	bl sscanf
-	b @11
-	@10:
-	lis r4, str_802C4910@ha
-	addi r3, r1, 0x40
-	addi r4, r4, str_802C4910@l
-	addi r5, r1, 0x20
-	addi r6, r1, 0xc
-	addi r7, r1, 0x18
-	addi r8, r1, 0x14
-	addi r9, r1, 0x10
-	crclr 6
-	bl sscanf
-	addi r3, r1, 0x20
-	bl msgIconStr2ID
-	cmpwi r3, 0x0
-	stw r3, 0x1c(r1)
-	bge @11
-	li r0, 0x0
-	stw r0, 0x1c(r1)
-	@11:
-	lwz r0, 0x1c(r1)
-	addi r3, r1, 0xa
-	addi r4, r1, 0x8
-	clrlwi r5, r0, 16
-	bl iconGetWidthHight
-	lhz r4, 0xa(r1)
-	lis r5, 0x4330
-	lwz r0, 0x10(r1)
-	lis r3, double_to_int_802c48f0@ha
-	lis r6, double_to_int_mask_802c48e8@ha
-	stw r4, 0x14c(r1)
-	addi r4, r6, double_to_int_mask_802c48e8@l
-	xoris r0, r0, 0x8000
-	stw r5, 0x148(r1)
-	clrlwi r6, r28, 16
-	lfd f4, 0x0(r4)
-	lfd f0, 0x148(r1)
-	stw r0, 0x154(r1)
-	lfd f1, double_to_int_802c48f0@l(r3)
-	fsubs f3, f0, f4
-	stw r5, 0x150(r1)
-	lfs f2, 0xc(r1)
-	lfd f0, 0x150(r1)
-	stw r6, 0x144(r1)
-	fsubs f0, f0, f1
-	stw r5, 0x140(r1)
-	lfd f1, 0x140(r1)
-	fmadds f0, f3, f2, f0
-	fsubs f1, f1, f4
-	fadds f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x158(r1)
-	lwz r28, 0x15c(r1)
-	b @12
-	@9:
-	lbz r0, 0xc0(r1)
-	extsb r0, r0
-	cmpwi r0, 0x52
-	beq @4
-	cmpwi r0, 0x2f
-	bne @12
-	cmplwi r0, 0x2f72
-	beq @4
-	@12:
-	lbz r0, 0x0(r25)
-	cmpwi r0, 0xa
-	bne @4
-	addi r25, r25, 0x1
-	b @4
-	@6:
-	lbz r0, 0x0(r25)
-	addi r25, r25, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	@4:
-	clrlwi r4, r30, 16
-	cmplwi r4, 0xffff
-	beq @1
-	lwz r5, pfh(r13)
-	lis r3, 0x5749
-	addi r3, r3, 0x4431
-	lwz r0, 0xc(r5)
-	addi r6, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @13
-	@14:
-	lwz r0, 0x0(r6)
-	cmpw r0, r3
-	beq @15
-	b @16
-	@15:
-	lhz r5, 0x8(r6)
-	cmplw r4, r5
-	blt @16
-	lhz r0, 0xa(r6)
-	cmplw r4, r0
-	bgt @16
-	subf r0, r5, r4
-	slwi r3, r0, 1
-	addi r5, r3, 0xc
-	add r5, r6, r5
-	b @17
-	@16:
-	lwz r0, 0x4(r6)
-	add r6, r6, r0
-	bdnz @14
-	@13:
-	li r5, 0x0
-	@17:
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	lbz r0, 0x1(r5)
-	lwz r4, 0x16c(r4)
-	add r0, r0, r28
-	slwi r4, r4, 2
-	lwzx r3, r3, r4
-	add r0, r3, r0
-	clrlwi r28, r0, 16
-	@1:
-	lbz r3, 0x0(r25)
-	extsb. r0, r3
-	bne @2
-	clrlwi r3, r29, 16
-	clrlwi r0, r28, 16
-	cmplw r3, r0
-	bge @18
-	mr r29, r28
-	@18:
-	clrlwi. r0, r29, 16
-	beq @19
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	lwz r0, 0x16c(r4)
-	slwi r0, r0, 2
-	lwzx r0, r3, r0
-	subf r0, r0, r29
-	clrlwi r29, r0, 16
-	@19:
-	cmplwi r26, 0x0
-	beq @20
-	sth r27, 0x0(r26)
-	@20:
-	mr r3, r29
-	lmw r25, 0x164(r1)
-	lwz r0, 0x184(r1)
-	mtlr r0
-	addi r1, r1, 0x180
-	blr
-}
-
-asm u16 kanjiGetWidth(u16 code) {
-	nofralloc
-	lwz r5, pfh(r13)
-	lis r4, 0x5749
-	addi r4, r4, 0x4431
-	clrlwi r3, r3, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @1
-	@2:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @3
-	b @4
-	@3:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @4
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @4
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r5, r3
-	b @5
-	@4:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @2
-	@1:
-	li r3, 0x0
-	@5:
-	lbz r3, 0x1(r3)
-	blr
-}
-
-asm u16 kanjiSearch(u32 code) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl JUTFont_CodeToGlyph
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void hankakuSearch(s8 c) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	extsb r3, r3
-	stw r0, 0x14(r1)
-	bl JUTFont_CodeToGlyph
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawMessageMtx(Mtx mtx, const char* msg) {
-	nofralloc
-	stwu r1, -0x270(r1)
-	mflr r0
-	lis r5, str_802C48A0@ha
-	stw r0, 0x274(r1)
-	stmw r23, 0x24c(r1)
-	mr r23, r3
-	mr r24, r4
-	addi r29, r5, str_802C48A0@l
-	bl camGetCurPtr
-	lfs f0, float_0_8041a300(r2)
-	mr r30, r3
-	li r26, 0x0
-	li r25, 0x0
-	fctiwz f0, f0
-	lis r31, 0x1
-	stfd f0, 0x1f0(r1)
-	lwz r28, 0x1f4(r1)
-	b @1
-	@2:
-	subi r27, r31, 0x1
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r24)
-	bl JUTFont_CodeToGlyph
-	mr r27, r3
-	addi r24, r24, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r24)
-	extsb r0, r0
-	cmpwi r0, 0x3c
-	beq @5
-	bge @6
-	cmpwi r0, 0xa
-	beq @7
-	b @6
-	@7:
-	mr r26, r28
-	subi r25, r25, 0x1c
-	addi r24, r24, 0x1
-	b @4
-	@5:
-	addi r3, r24, 0x1
-	addi r4, r1, 0x170
-	addi r5, r1, 0xf0
-	bl msgGetCommand
-	mr r0, r3
-	addi r3, r1, 0x170
-	mr r24, r0
-	la r4, str_8041A31C(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @8
-	lwz r7, dat_8041a2ec(r2)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x4c(r1)
-	addi r4, r1, 0x40
-	li r3, 0x1
-	lbz r5, 0x4f(r1)
-	stw r7, 0xc(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x4f(r1)
-	lwz r0, 0x4c(r1)
-	stw r0, 0x40(r1)
-	bl GXSetTevColor
-	b @9
-	@8:
-	addi r3, r1, 0x170
-	la r4, str_8041A320(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @10
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x48(r1)
-	addi r4, r1, 0x3c
-	li r3, 0x1
-	lbz r5, 0x4b(r1)
-	stw r7, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x4b(r1)
-	lwz r0, 0x48(r1)
-	stw r0, 0x3c(r1)
-	bl GXSetTevColor
-	b @9
-	@10:
-	addi r3, r1, 0x170
-	la r4, str_8041A314(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @11
-	bl camGetCurPtr
-	lbz r0, 0xf0(r1)
-	extsb r0, r0
-	cmpwi r0, 0x30
-	blt @12
-	cmpwi r0, 0x39
-	bgt @12
-	addi r3, r1, 0xf0
-	addi r4, r29, 0x64
-	addi r5, r1, 0x60
-	addi r6, r1, 0x50
-	addi r7, r1, 0x5c
-	addi r8, r1, 0x58
-	addi r9, r1, 0x54
-	crclr 6
-	bl sscanf
-	b @13
-	@12:
-	addi r3, r1, 0xf0
-	addi r4, r29, 0x70
-	addi r5, r1, 0x70
-	addi r6, r1, 0x50
-	addi r7, r1, 0x5c
-	addi r8, r1, 0x58
-	addi r9, r1, 0x54
-	crclr 6
-	bl sscanf
-	addi r3, r1, 0x70
-	bl msgIconStr2ID
-	cmpwi r3, 0x0
-	stw r3, 0x60(r1)
-	bge @13
-	li r0, 0x0
-	stw r0, 0x60(r1)
-	@13:
-	lwz r0, 0x60(r1)
-	addi r3, r1, 0xa
-	addi r4, r1, 0x8
-	clrlwi r5, r0, 16
-	bl iconGetWidthHight
-	lhz r0, 0xa(r1)
-	lis r9, 0x4330
-	lhz r6, 0x8(r1)
-	xoris r8, r26, 0x8000
-	stw r0, 0x1fc(r1)
-	xoris r0, r25, 0x8000
-	lwz r5, 0x5c(r1)
-	addi r4, r1, 0x64
-	stw r9, 0x1f8(r1)
-	mr r3, r23
-	lwz r7, 0x58(r1)
-	xoris r10, r5, 0x8000
-	lfd f4, 0x48(r29)
-	mr r5, r4
-	lfd f0, 0x1f8(r1)
-	xoris r7, r7, 0x8000
-	stw r8, 0x204(r1)
-	fsubs f1, f0, f4
-	lfs f2, float_0p5_8041a328(r2)
-	stw r9, 0x200(r1)
-	lfd f5, 0x50(r29)
-	lfd f0, 0x200(r1)
-	fmuls f3, f2, f1
-	stw r6, 0x214(r1)
-	fsubs f2, f0, f5
-	lfs f6, 0x50(r1)
-	stw r9, 0x210(r1)
-	lfs f0, float_0_8041a300(r2)
-	lfd f1, 0x210(r1)
-	fmadds f3, f3, f6, f2
-	stw r0, 0x21c(r1)
-	fsubs f2, f1, f4
-	stw r9, 0x218(r1)
-	lfd f1, 0x218(r1)
-	stw r10, 0x1f4(r1)
-	fsubs f1, f1, f5
-	stw r9, 0x1f0(r1)
-	lfd f4, 0x1f0(r1)
-	fnmsubs f1, f2, f6, f1
-	stw r7, 0x20c(r1)
-	fsubs f4, f4, f5
-	stw r9, 0x208(r1)
-	lfd f2, 0x208(r1)
-	fadds f3, f4, f3
-	stfs f0, 0x6c(r1)
-	fsubs f0, f2, f5
-	stfs f3, 0x64(r1)
-	fadds f0, f0, f1
-	stfs f0, 0x68(r1)
-	bl PSMTXMultVec
-	lwz r0, 0x60(r1)
-	addi r3, r1, 0x64
-	lfs f1, 0x50(r1)
-	li r4, 0x10
-	lbz r6, fontAlpha(r13)
-	clrlwi r5, r0, 16
-	bl iconDispGxAlpha
-	lwz r9, fontColTbl(r13)
-	lis r3, 0x8081
-	lbz r10, fontAlpha(r13)
-	subi r8, r3, 0x7f7f
-	stw r9, 0x34(r1)
-	li r0, 0x0
-	lwz r6, 0x20(r29)
-	addi r3, r1, 0x38
-	lbz r4, 0x37(r1)
-	lwz r5, 0x24(r29)
-	mullw r7, r4, r10
-	lwz r4, 0x28(r29)
-	stw r0, fontEdge(r13)
-	stw r4, fontScale+0x8(r13)
-	mulhw r8, r8, r7
-	stw r9, fontColor(r13)
-	stb r10, fontAlpha(r13)
-	stw r6, fontScale(r13)
-	add r4, r8, r7
-	srawi r4, r4, 7
-	stw r5, fontScale+0x4(r13)
-	srwi r0, r4, 31
-	add r0, r4, r0
-	stb r0, 0x37(r1)
-	lwz r0, 0x34(r1)
-	stw r0, 0x38(r1)
-	bl JUTFont_DrawStart
-	lwz r7, fontColor(r13)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x44(r1)
-	addi r4, r1, 0x30
-	li r3, 0x1
-	lbz r5, 0x47(r1)
-	stw r7, 0x14(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x47(r1)
-	lwz r0, 0x44(r1)
-	stw r0, 0x30(r1)
-	bl GXSetTevColor
-	lwz r0, 0x54(r1)
-	lis r4, 0x4330
-	lhz r3, 0xa(r1)
-	xoris r5, r26, 0x8000
-	xoris r0, r0, 0x8000
-	stw r4, 0x228(r1)
-	lfd f4, 0x50(r29)
-	stw r3, 0x22c(r1)
-	lfd f1, 0x48(r29)
-	lfd f0, 0x228(r1)
-	stw r0, 0x234(r1)
-	fsubs f2, f0, f1
-	lfs f1, 0x50(r1)
-	stw r4, 0x230(r1)
-	lfd f0, 0x230(r1)
-	stw r5, 0x224(r1)
-	fsubs f0, f0, f4
-	stw r4, 0x220(r1)
-	lfd f3, 0x220(r1)
-	fmadds f0, f2, f1, f0
-	fsubs f1, f3, f4
-	fadds f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x238(r1)
-	lwz r26, 0x23c(r1)
-	b @9
-	@11:
-	lbz r0, 0x170(r1)
-	extsb r0, r0
-	cmpwi r0, 0x52
-	beq @4
-	cmpwi r0, 0x2f
-	bne @9
-	cmplwi r0, 0x2f72
-	beq @4
-	@9:
-	lbz r0, 0x0(r24)
-	cmpwi r0, 0xa
-	bne @4
-	addi r24, r24, 0x1
-	b @4
-	@6:
-	lbz r0, 0x0(r24)
-	addi r24, r24, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r27, r3
-	@4:
-	clrlwi r0, r27, 16
-	cmplwi r0, 0xffff
-	beq @1
-	lis r4, 0x4330
-	xoris r3, r26, 0x8000
-	xoris r0, r25, 0x8000
-	stw r3, 0x23c(r1)
-	lfd f2, 0x50(r29)
-	addi r3, r1, 0x90
-	stw r4, 0x238(r1)
-	lfs f3, float_0_8041a300(r2)
-	lfd f0, 0x238(r1)
-	stw r0, 0x234(r1)
-	fsubs f1, f0, f2
-	stw r4, 0x230(r1)
-	lfd f0, 0x230(r1)
-	fsubs f2, f0, f2
-	bl PSMTXTrans
-	mr r4, r23
-	addi r3, r30, 0x11c
-	addi r5, r1, 0xc0
-	bl PSMTXConcat
-	addi r3, r1, 0xc0
-	addi r4, r1, 0x90
-	mr r5, r3
-	bl PSMTXConcat
-	addi r3, r1, 0xc0
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @14
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x24(r1)
-	addi r4, r1, 0x1c
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x27(r1)
-	stw r8, 0x28(r1)
-	mullw r0, r5, r0
-	stw r7, 0x10(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x27(r1)
-	lwz r0, 0x24(r1)
-	stw r0, 0x1c(r1)
-	bl GXSetTevColor
-	mr r3, r27
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r27
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r27
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r27
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x28(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x2c(r1)
-	addi r4, r1, 0x20
-	li r3, 0x1
-	lbz r5, 0x2f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x2f(r1)
-	lwz r0, 0x2c(r1)
-	stw r0, 0x20(r1)
-	bl GXSetTevColor
-	@14:
-	mr r3, r27
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	lwz r5, pfh(r13)
-	lis r3, 0x5749
-	addi r4, r3, 0x4431
-	clrlwi r3, r27, 16
-	lwz r0, 0xc(r5)
-	addi r6, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @15
-	@16:
-	lwz r0, 0x0(r6)
-	cmpw r0, r4
-	beq @17
-	b @18
-	@17:
-	lhz r5, 0x8(r6)
-	cmplw r3, r5
-	blt @18
-	lhz r0, 0xa(r6)
-	cmplw r3, r0
-	bgt @18
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r5, r3, 0xc
-	add r5, r6, r5
-	b @19
-	@18:
-	lwz r0, 0x4(r6)
-	add r6, r6, r0
-	bdnz @16
-	@15:
-	li r5, 0x0
-	@19:
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	lbz r0, 0x1(r5)
-	lwz r4, 0x16c(r4)
-	add r26, r0, r26
-	slwi r0, r4, 2
-	lwzx r0, r3, r0
-	add r26, r0, r26
-	@1:
-	lbz r3, 0x0(r24)
-	extsb. r0, r3
-	bne @2
-	lmw r23, 0x24c(r1)
-	lwz r0, 0x274(r1)
-	mtlr r0
-	addi r1, r1, 0x270
-	blr
-}
-
-asm void FontDrawMessage(s32 x, s32 y, const char* msg) {
-	nofralloc
-	stwu r1, -0x230(r1)
-	mflr r0
-	stw r0, 0x234(r1)
-	stmw r23, 0x20c(r1)
-	mr r25, r3
-	lis r3, str_802C48A0@ha
-	mr r26, r5
-	mr r29, r25
-	mr r28, r4
-	addi r30, r3, str_802C48A0@l
-	lis r31, 0x1
-	b @1
-	@2:
-	subi r27, r31, 0x1
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r26)
-	bl JUTFont_CodeToGlyph
-	mr r27, r3
-	addi r26, r26, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r26)
-	extsb r0, r0
-	cmpwi r0, 0x3c
-	beq @5
-	bge @6
-	cmpwi r0, 0xa
-	beq @7
-	b @6
-	@7:
-	mr r29, r25
-	subi r28, r28, 0x1c
-	addi r26, r26, 0x1
-	b @4
-	@5:
-	addi r3, r26, 0x1
-	addi r4, r1, 0x12c
-	addi r5, r1, 0xac
-	bl msgGetCommand
-	mr r0, r3
-	addi r3, r1, 0x12c
-	mr r26, r0
-	la r4, str_8041A31C(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @8
-	lwz r7, dat_8041a2e8(r2)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x64(r1)
-	addi r4, r1, 0x50
-	li r3, 0x1
-	lbz r5, 0x67(r1)
-	stw r7, 0xc(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x67(r1)
-	lwz r0, 0x64(r1)
-	stw r0, 0x50(r1)
-	bl GXSetTevColor
-	b @9
-	@8:
-	addi r3, r1, 0x12c
-	la r4, str_8041A320(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @10
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x60(r1)
-	addi r4, r1, 0x4c
-	li r3, 0x1
-	lbz r5, 0x63(r1)
-	stw r7, 0x20(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x63(r1)
-	lwz r0, 0x60(r1)
-	stw r0, 0x4c(r1)
-	bl GXSetTevColor
-	b @9
-	@10:
-	addi r3, r1, 0x12c
-	la r4, str_8041A32C(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @11
-	addi r3, r1, 0xac
-	addi r5, r1, 0x7c
-	la r4, str_8041A330(r2)
-	crclr 6
-	bl sscanf
-	lwz r7, 0x7c(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x5c(r1)
-	addi r4, r1, 0x48
-	li r3, 0x1
-	lbz r5, 0x5f(r1)
-	stw r7, 0x1c(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x5f(r1)
-	lwz r0, 0x5c(r1)
-	stw r0, 0x48(r1)
-	bl GXSetTevColor
-	b @9
-	@11:
-	addi r3, r1, 0x12c
-	la r4, str_8041A334(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @12
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x58(r1)
-	addi r4, r1, 0x44
-	li r3, 0x1
-	lbz r5, 0x5b(r1)
-	stw r7, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x5b(r1)
-	lwz r0, 0x58(r1)
-	stw r0, 0x44(r1)
-	bl GXSetTevColor
-	b @9
-	@12:
-	addi r3, r1, 0x12c
-	la r4, str_8041A314(r2)
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @13
-	bl camGetCurPtr
-	lbz r0, 0xac(r1)
-	extsb r0, r0
-	cmpwi r0, 0x30
-	blt @14
-	cmpwi r0, 0x39
-	bgt @14
-	addi r3, r1, 0xac
-	addi r4, r30, 0x64
-	addi r5, r1, 0x78
-	addi r6, r1, 0x68
-	addi r7, r1, 0x74
-	addi r8, r1, 0x70
-	addi r9, r1, 0x6c
-	crclr 6
-	bl sscanf
-	b @15
-	@14:
-	addi r3, r1, 0xac
-	addi r4, r30, 0x70
-	addi r5, r1, 0x8c
-	addi r6, r1, 0x68
-	addi r7, r1, 0x74
-	addi r8, r1, 0x70
-	addi r9, r1, 0x6c
-	crclr 6
-	bl sscanf
-	addi r3, r1, 0x8c
-	bl msgIconStr2ID
-	cmpwi r3, 0x0
-	stw r3, 0x78(r1)
-	bge @15
-	li r0, 0x0
-	stw r0, 0x78(r1)
-	@15:
-	lwz r0, 0x78(r1)
-	addi r3, r1, 0xa
-	addi r4, r1, 0x8
-	clrlwi r5, r0, 16
-	bl iconGetWidthHight
-	lhz r3, 0xa(r1)
-	lis r9, 0x4330
-	lhz r0, 0x8(r1)
-	xoris r8, r29, 0x8000
-	stw r3, 0x1bc(r1)
-	xoris r5, r28, 0x8000
-	lwz r7, 0x74(r1)
-	addi r3, r1, 0x80
-	stw r9, 0x1b8(r1)
-	li r4, 0x10
-	lfd f3, 0x48(r30)
-	xoris r10, r7, 0x8000
-	lfd f0, 0x1b8(r1)
-	stw r0, 0x1d4(r1)
-	fsubs f0, f0, f3
-	lfs f2, float_0p5_8041a328(r2)
-	stw r9, 0x1d0(r1)
-	lwz r6, 0x70(r1)
-	fmuls f5, f2, f0
-	lfd f2, 0x1d0(r1)
-	stw r8, 0x1c4(r1)
-	xoris r7, r6, 0x8000
-	lfd f6, 0x50(r30)
-	fsubs f3, f2, f3
-	stw r9, 0x1c0(r1)
-	lfs f1, 0x68(r1)
-	lfd f0, 0x1c0(r1)
-	stw r5, 0x1dc(r1)
-	fsubs f4, f0, f6
-	lfs f0, float_0_8041a300(r2)
-	stw r9, 0x1d8(r1)
-	lwz r0, 0x78(r1)
-	lfd f2, 0x1d8(r1)
-	fmadds f4, f5, f1, f4
-	stw r10, 0x1b4(r1)
-	clrlwi r5, r0, 16
-	fsubs f2, f2, f6
-	lbz r6, fontAlpha(r13)
-	stw r9, 0x1b0(r1)
-	lfd f5, 0x1b0(r1)
-	fnmsubs f2, f3, f1, f2
-	stw r7, 0x1cc(r1)
-	fsubs f5, f5, f6
-	stw r9, 0x1c8(r1)
-	fadds f4, f5, f4
-	lfd f3, 0x1c8(r1)
-	stfs f0, 0x88(r1)
-	fsubs f0, f3, f6
-	stfs f4, 0x80(r1)
-	fadds f0, f0, f2
-	stfs f0, 0x84(r1)
-	bl iconDispGxAlpha
-	lwz r9, fontColTbl(r13)
-	lis r3, 0x8081
-	lbz r10, fontAlpha(r13)
-	subi r8, r3, 0x7f7f
-	stw r9, 0x3c(r1)
-	li r0, 0x0
-	lwz r6, 0x20(r30)
-	addi r3, r1, 0x40
-	lbz r4, 0x3f(r1)
-	lwz r5, 0x24(r30)
-	mullw r7, r4, r10
-	lwz r4, 0x28(r30)
-	stw r0, fontEdge(r13)
-	stw r4, fontScale+0x8(r13)
-	mulhw r8, r8, r7
-	stw r9, fontColor(r13)
-	stb r10, fontAlpha(r13)
-	stw r6, fontScale(r13)
-	add r4, r8, r7
-	srawi r4, r4, 7
-	stw r5, fontScale+0x4(r13)
-	srwi r0, r4, 31
-	add r0, r4, r0
-	stb r0, 0x3f(r1)
-	lwz r0, 0x3c(r1)
-	stw r0, 0x40(r1)
-	bl JUTFont_DrawStart
-	lwz r7, fontColor(r13)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x54(r1)
-	addi r4, r1, 0x38
-	li r3, 0x1
-	lbz r5, 0x57(r1)
-	stw r7, 0x14(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x57(r1)
-	lwz r0, 0x54(r1)
-	stw r0, 0x38(r1)
-	bl GXSetTevColor
-	lwz r0, 0x6c(r1)
-	lis r4, 0x4330
-	lhz r3, 0xa(r1)
-	xoris r5, r29, 0x8000
-	xoris r0, r0, 0x8000
-	stw r4, 0x1e8(r1)
-	lfd f4, 0x50(r30)
-	stw r3, 0x1ec(r1)
-	lfd f1, 0x48(r30)
-	lfd f0, 0x1e8(r1)
-	stw r0, 0x1f4(r1)
-	fsubs f2, f0, f1
-	lfs f1, 0x68(r1)
-	stw r4, 0x1f0(r1)
-	lfd f0, 0x1f0(r1)
-	stw r5, 0x1e4(r1)
-	fsubs f0, f0, f4
-	stw r4, 0x1e0(r1)
-	lfd f3, 0x1e0(r1)
-	fmadds f0, f2, f1, f0
-	fsubs f1, f3, f4
-	fadds f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x1f8(r1)
-	lwz r29, 0x1fc(r1)
-	b @9
-	@13:
-	lbz r0, 0x12c(r1)
-	extsb r0, r0
-	cmpwi r0, 0x52
-	beq @4
-	cmpwi r0, 0x2f
-	bne @9
-	cmplwi r0, 0x2f72
-	beq @4
-	@9:
-	lbz r0, 0x0(r26)
-	cmpwi r0, 0xa
-	bne @4
-	addi r26, r26, 0x1
-	b @4
-	@6:
-	lbz r0, 0x0(r26)
-	addi r26, r26, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r27, r3
-	@4:
-	clrlwi r0, r27, 16
-	cmplwi r0, 0xffff
-	beq @1
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @16
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x2c(r1)
-	addi r4, r1, 0x24
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x2f(r1)
-	stw r8, 0x30(r1)
-	mullw r0, r5, r0
-	stw r7, 0x10(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x2f(r1)
-	lwz r0, 0x2c(r1)
-	stw r0, 0x24(r1)
-	bl GXSetTevColor
-	extsh r24, r29
-	extsh r23, r28
-	subi r0, r24, 0x2
-	mr r3, r27
-	mr r5, r23
-	extsh r4, r0
-	bl _JUTFont_DrawPos
-	addi r0, r24, 0x2
-	mr r3, r27
-	mr r5, r23
-	extsh r4, r0
-	bl _JUTFont_DrawPos
-	mr r24, r23
-	extsh r23, r29
-	subi r0, r24, 0x2
-	mr r3, r27
-	mr r4, r23
-	extsh r5, r0
-	bl _JUTFont_DrawPos
-	addi r0, r24, 0x2
-	mr r3, r27
-	mr r4, r23
-	extsh r5, r0
-	bl _JUTFont_DrawPos
-	lwz r7, 0x30(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x34(r1)
-	addi r4, r1, 0x28
-	li r3, 0x1
-	lbz r5, 0x37(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x37(r1)
-	lwz r0, 0x34(r1)
-	stw r0, 0x28(r1)
-	bl GXSetTevColor
-	@16:
-	mr r3, r27
-	extsh r4, r29
-	extsh r5, r28
-	bl _JUTFont_DrawPos
-	lwz r5, pfh(r13)
-	lis r3, 0x5749
-	addi r4, r3, 0x4431
-	clrlwi r3, r27, 16
-	lwz r0, 0xc(r5)
-	addi r6, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @17
-	@18:
-	lwz r0, 0x0(r6)
-	cmpw r0, r4
-	beq @19
-	b @20
-	@19:
-	lhz r5, 0x8(r6)
-	cmplw r3, r5
-	blt @20
-	lhz r0, 0xa(r6)
-	cmplw r3, r0
-	bgt @20
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r5, r3, 0xc
-	add r5, r6, r5
-	b @21
-	@20:
-	lwz r0, 0x4(r6)
-	add r6, r6, r0
-	bdnz @18
-	@17:
-	li r5, 0x0
-	@21:
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	lbz r0, 0x1(r5)
-	lwz r4, 0x16c(r4)
-	add r29, r0, r29
-	slwi r0, r4, 2
-	lwzx r0, r3, r0
-	add r29, r0, r29
-	@1:
-	lbz r3, 0x0(r26)
-	extsb. r0, r3
-	bne @2
-	lmw r23, 0x20c(r1)
-	lwz r0, 0x234(r1)
-	mtlr r0
-	addi r1, r1, 0x230
-	blr
-}
-
-asm void FontDrawStringShake(f32 x, f32 y, const s8* msg) {
-	nofralloc
-	stwu r1, -0xf0(r1)
-	mflr r0
-	stw r0, 0xf4(r1)
-	stfd f31, 0xe0(r1)
-	psq_st f31, 0xe8(r1), 0, 0
-	stfd f30, 0xd0(r1)
-	psq_st f30, 0xd8(r1), 0, 0
-	stfd f29, 0xc0(r1)
-	psq_st f29, 0xc8(r1), 0, 0
-	stfd f28, 0xb0(r1)
-	psq_st f28, 0xb8(r1), 0, 0
-	stmw r24, 0x90(r1)
-	fmr f28, f1
-	mr r24, r3
-	fmr f29, f2
-	bl camGetCurPtr
-	la r26, fontScale(r13)
-	mr r28, r3
-	lfs f1, fontScale(r13)
-	addi r3, r1, 0x20
-	lfs f2, 0x4(r26)
-	lfs f3, 0x8(r26)
-	bl PSMTXScale
-	lis r4, double_to_int_802c48f0@ha
-	lis r3, 0x5749
-	lis r5, 0x5555
-	lfd f31, double_to_int_802c48f0@l(r4)
-	addi r31, r3, 0x4431
-	lis r30, 0x4330
-	addi r29, r5, 0x5556
-	b @1
-	@2:
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r24)
-	bl JUTFont_CodeToGlyph
-	mr r25, r3
-	addi r24, r24, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r24)
-	addi r24, r24, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r25, r3
-	@4:
-	li r3, 0x2710
-	bl irand
-	mulhw r4, r29, r3
-	stw r30, 0x80(r1)
-	lfs f0, fontScale(r13)
-	srwi r0, r4, 31
-	add r0, r4, r0
-	mulli r0, r0, 0x3
-	subf r0, r0, r3
-	li r3, 0x2710
-	xoris r0, r0, 0x8000
-	stw r0, 0x84(r1)
-	lfd f1, 0x80(r1)
-	fsubs f1, f1, f31
-	fmadds f30, f0, f1, f28
-	bl irand
-	mulhw r5, r29, r3
-	lwz r7, pfh(r13)
-	stw r30, 0x88(r1)
-	clrlwi r4, r25, 16
-	lfs f0, 0x4(r26)
-	addi r6, r7, 0x20
-	srwi r0, r5, 31
-	lwz r7, 0xc(r7)
-	add r0, r5, r0
-	mulli r0, r0, 0x3
-	subf r0, r0, r3
-	xoris r0, r0, 0x8000
-	stw r0, 0x8c(r1)
-	lfd f1, 0x88(r1)
-	fsubs f1, f1, f31
-	fmadds f2, f0, f1, f29
-	mtctr r7
-	cmplwi r7, 0x0
-	ble @5
-	@6:
-	lwz r0, 0x0(r6)
-	cmpw r0, r31
-	beq @7
-	b @8
-	@7:
-	lhz r3, 0x8(r6)
-	cmplw r4, r3
-	blt @8
-	lhz r0, 0xa(r6)
-	cmplw r4, r0
-	bgt @8
-	subf r0, r3, r4
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r6, r3
-	b @9
-	@8:
-	lwz r0, 0x4(r6)
-	add r6, r6, r0
-	bdnz @6
-	@5:
-	li r3, 0x0
-	@9:
-	fmr f1, f30
-	lbz r27, 0x1(r3)
-	lfs f3, float_0_8041a300(r2)
-	addi r3, r1, 0x20
-	addi r4, r1, 0x50
-	bl PSMTXTransApply
-	addi r4, r1, 0x50
-	addi r3, r28, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0x50
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @10
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r25
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r25
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r25
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r25
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@10:
-	mr r3, r25
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	stw r30, 0x88(r1)
-	lwz r0, 0x16c(r4)
-	lfs f1, fontScale(r13)
-	slwi r0, r0, 2
-	lwzx r0, r3, r0
-	add r0, r27, r0
-	xoris r0, r0, 0x8000
-	stw r0, 0x8c(r1)
-	lfd f0, 0x88(r1)
-	fsubs f0, f0, f31
-	fmadds f28, f1, f0, f28
-	@1:
-	lbz r3, 0x0(r24)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0xe8(r1), 0, 0
-	lfd f31, 0xe0(r1)
-	psq_l f30, 0xd8(r1), 0, 0
-	lfd f30, 0xd0(r1)
-	psq_l f29, 0xc8(r1), 0, 0
-	lfd f29, 0xc0(r1)
-	psq_l f28, 0xb8(r1), 0, 0
-	lfd f28, 0xb0(r1)
-	lmw r24, 0x90(r1)
-	lwz r0, 0xf4(r1)
-	mtlr r0
-	addi r1, r1, 0xf0
-	blr
-}
-
-asm void FontDrawStringCenterMtx(Mtx mtx, const s8* msg) {
-	nofralloc
-	stwu r1, -0xa0(r1)
-	mflr r0
-	stw r0, 0xa4(r1)
-	stfd f31, 0x90(r1)
-	psq_st f31, 0x98(r1), 0, 0
-	stfd f30, 0x80(r1)
-	psq_st f30, 0x88(r1), 0, 0
-	stmw r27, 0x6c(r1)
-	mr r27, r3
-	mr r29, r4
-	bl camGetCurPtr
-	mr r28, r3
-	mr r3, r29
-	li r4, 0x0
-	bl FontGetMessageWidthLine
-	clrlwi r4, r3, 16
-	lis r0, 0x4330
-	stw r4, 0x54(r1)
-	lis r3, double_to_int_mask_802c48e8@ha
-	lfd f2, double_to_int_mask_802c48e8@l(r3)
-	mr r4, r27
-	stw r0, 0x50(r1)
-	addi r3, r28, 0x11c
-	lfs f0, float_0p5_8041a328(r2)
-	addi r5, r1, 0x20
-	lfd f1, 0x50(r1)
-	fsubs f1, f1, f2
-	fneg f1, f1
-	fmuls f30, f0, f1
-	bl PSMTXConcat
-	addi r3, r1, 0x20
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lis r3, double_to_int_802c48f0@ha
-	lis r4, 0x5749
-	lfd f31, double_to_int_802c48f0@l(r3)
-	lis r28, 0x4330
-	addi r31, r4, 0x4431
-	b @1
-	@2:
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r29)
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	addi r29, r29, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r29)
-	addi r29, r29, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	@4:
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @5
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	fctiwz f0, f30
-	mr r3, r30
-	li r5, 0x0
-	stfd f0, 0x50(r1)
-	lwz r0, 0x54(r1)
-	extsh r27, r0
-	subi r0, r27, 0x2
-	extsh r4, r0
-	bl _JUTFont_DrawPos
-	addi r0, r27, 0x2
-	mr r3, r30
-	extsh r4, r0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	fctiwz f0, f30
-	mr r3, r30
-	li r5, -0x2
-	stfd f0, 0x58(r1)
-	lwz r0, 0x5c(r1)
-	extsh r27, r0
-	mr r4, r27
-	bl _JUTFont_DrawPos
-	mr r3, r30
-	mr r4, r27
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@5:
-	fctiwz f0, f30
-	mr r3, r30
-	li r5, 0x0
-	stfd f0, 0x58(r1)
-	lwz r4, 0x5c(r1)
-	bl _JUTFont_DrawPos
-	lwz r4, pfh(r13)
-	clrlwi r3, r30, 16
-	lwz r0, 0xc(r4)
-	addi r4, r4, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @6
-	@7:
-	lwz r0, 0x0(r4)
-	cmpw r0, r31
-	beq @8
-	b @9
-	@8:
-	lhz r5, 0x8(r4)
-	cmplw r3, r5
-	blt @9
-	lhz r0, 0xa(r4)
-	cmplw r3, r0
-	bgt @9
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r5, r3, 0xc
-	add r5, r4, r5
-	b @10
-	@9:
-	lwz r0, 0x4(r4)
-	add r4, r4, r0
-	bdnz @7
-	@6:
-	li r5, 0x0
-	@10:
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	lbz r0, 0x1(r5)
-	lwz r4, 0x16c(r4)
-	stw r28, 0x58(r1)
-	slwi r4, r4, 2
-	lwzx r3, r3, r4
-	add r0, r3, r0
-	xoris r0, r0, 0x8000
-	stw r0, 0x5c(r1)
-	lfd f0, 0x58(r1)
-	fsubs f0, f0, f31
-	fadds f30, f30, f0
-	@1:
-	lbz r3, 0x0(r29)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0x98(r1), 0, 0
-	lfd f31, 0x90(r1)
-	psq_l f30, 0x88(r1), 0, 0
-	lfd f30, 0x80(r1)
-	lmw r27, 0x6c(r1)
-	lwz r0, 0xa4(r1)
-	mtlr r0
-	addi r1, r1, 0xa0
-	blr
-}
-
-asm void FontDrawStringMtx(Mtx mtx, const char* msg) {
-	nofralloc
-	stwu r1, -0x1b0(r1)
-	mflr r0
-	stw r0, 0x1b4(r1)
-	stfd f31, 0x1a0(r1)
-	psq_st f31, 0x1a8(r1), 0, 0
-	stfd f30, 0x190(r1)
-	psq_st f30, 0x198(r1), 0, 0
-	stmw r27, 0x17c(r1)
-	mr r27, r3
-	mr r29, r4
-	bl camGetCurPtr
-	lfs f31, float_0_8041a300(r2)
-	mr r4, r27
-	addi r5, r1, 0x20
-	addi r3, r3, 0x11c
-	fmr f30, f31
-	bl PSMTXConcat
-	addi r3, r1, 0x20
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lis r31, 0x1
-	b @1
-	@2:
-	subi r30, r31, 0x1
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r29)
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	addi r29, r29, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r29)
-	extsb r0, r0
-	cmpwi r0, 0x3c
-	beq @5
-	bge @6
-	cmpwi r0, 0xa
-	beq @7
-	b @6
-	@7:
-	lfs f0, float_28_8041a33c(r2)
-	addi r29, r29, 0x1
-	lfs f31, float_0_8041a300(r2)
-	fsubs f30, f30, f0
-	b @4
-	@5:
-	addi r3, r29, 0x1
-	addi r4, r1, 0xd0
-	addi r5, r1, 0x50
-	bl msgGetCommand
-	lbz r0, 0xd0(r1)
-	mr r29, r3
-	extsb r0, r0
-	cmpwi r0, 0x52
-	beq @4
-	cmpwi r0, 0x2f
-	bne @8
-	cmplwi r0, 0x2f72
-	beq @4
-	@8:
-	lbz r0, 0x0(r29)
-	cmpwi r0, 0xa
-	bne @4
-	addi r29, r29, 0x1
-	b @4
-	@6:
-	lbz r0, 0x0(r29)
-	addi r29, r29, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r30, r3
-	@4:
-	clrlwi r0, r30, 16
-	cmplwi r0, 0xffff
-	beq @1
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @9
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	fctiwz f1, f31
-	mr r3, r30
-	fctiwz f0, f30
-	stfd f1, 0x150(r1)
-	stfd f0, 0x158(r1)
-	lwz r4, 0x154(r1)
-	lwz r0, 0x15c(r1)
-	extsh r27, r4
-	subi r4, r27, 0x2
-	extsh r28, r0
-	mr r5, r28
-	extsh r4, r4
-	bl _JUTFont_DrawPos
-	addi r0, r27, 0x2
-	mr r3, r30
-	mr r5, r28
-	extsh r4, r0
-	bl _JUTFont_DrawPos
-	fctiwz f0, f30
-	mr r3, r30
-	fctiwz f1, f31
-	stfd f0, 0x168(r1)
-	stfd f1, 0x160(r1)
-	lwz r0, 0x16c(r1)
-	lwz r4, 0x164(r1)
-	extsh r27, r0
-	extsh r28, r4
-	subi r0, r27, 0x2
-	mr r4, r28
-	extsh r5, r0
-	bl _JUTFont_DrawPos
-	addi r0, r27, 0x2
-	mr r3, r30
-	mr r4, r28
-	extsh r5, r0
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@9:
-	fctiwz f1, f31
-	mr r3, r30
-	fctiwz f0, f30
-	stfd f1, 0x168(r1)
-	stfd f0, 0x160(r1)
-	lwz r4, 0x16c(r1)
-	lwz r5, 0x164(r1)
-	bl _JUTFont_DrawPos
-	lwz r5, pfh(r13)
-	lis r3, 0x5749
-	addi r4, r3, 0x4431
-	clrlwi r3, r30, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @10
-	@11:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @12
-	b @13
-	@12:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @13
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @13
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r7, r3, 0xc
-	add r7, r5, r7
-	b @14
-	@13:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @11
-	@10:
-	li r7, 0x0
-	@14:
-	lwz r4, gp(r13)
-	lis r0, 0x4330
-	lis r3, double_to_int_802c48f0@ha
-	la r5, charspace(r13)
-	lwz r6, 0x16c(r4)
-	lbz r4, 0x1(r7)
-	slwi r6, r6, 2
-	stw r0, 0x168(r1)
-	lwzx r0, r5, r6
-	lfd f1, double_to_int_802c48f0@l(r3)
-	add r0, r0, r4
-	xoris r0, r0, 0x8000
-	stw r0, 0x16c(r1)
-	lfd f0, 0x168(r1)
-	fsubs f0, f0, f1
-	fadds f31, f31, f0
-	@1:
-	lbz r3, 0x0(r29)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0x1a8(r1), 0, 0
-	lfd f31, 0x1a0(r1)
-	psq_l f30, 0x198(r1), 0, 0
-	lfd f30, 0x190(r1)
-	lmw r27, 0x17c(r1)
-	lwz r0, 0x1b4(r1)
-	mtlr r0
-	addi r1, r1, 0x1b0
-	blr
-}
-
-asm void FontDrawStringVecPitch(Vec pos, f32 pitch, const s8* msg) {
-	nofralloc
-	stwu r1, -0xd0(r1)
-	mflr r0
-	stw r0, 0xd4(r1)
-	stfd f31, 0xc0(r1)
-	psq_st f31, 0xc8(r1), 0, 0
-	stfd f30, 0xb0(r1)
-	psq_st f30, 0xb8(r1), 0, 0
-	stfd f29, 0xa0(r1)
-	psq_st f29, 0xa8(r1), 0, 0
-	stmw r26, 0x88(r1)
-	fmr f29, f1
-	mr r26, r3
-	mr r27, r4
-	bl camGetCurPtr
-	la r4, fontScale(r13)
-	mr r30, r3
-	lfs f30, 0x0(r26)
-	addi r3, r1, 0x20
-	lfs f1, fontScale(r13)
-	lfs f2, 0x4(r4)
-	lfs f3, 0x8(r4)
-	bl PSMTXScale
-	lis r3, 0x5749
-	lfs f31, float_0_8041a300(r2)
-	addi r31, r3, 0x4431
-	b @1
-	@2:
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r27)
-	bl JUTFont_CodeToGlyph
-	mr r28, r3
-	addi r27, r27, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r27)
-	addi r27, r27, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r28, r3
-	@4:
-	lwz r4, pfh(r13)
-	clrlwi r3, r28, 16
-	lwz r0, 0xc(r4)
-	addi r4, r4, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @5
-	@6:
-	lwz r0, 0x0(r4)
-	cmpw r0, r31
-	beq @7
-	b @8
-	@7:
-	lhz r5, 0x8(r4)
-	cmplw r3, r5
-	blt @8
-	lhz r0, 0xa(r4)
-	cmplw r3, r0
-	bgt @8
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r4, r3
-	b @9
-	@8:
-	lwz r0, 0x4(r4)
-	add r4, r4, r0
-	bdnz @6
-	@5:
-	li r3, 0x0
-	@9:
-	fcmpo cr0, f29, f31
-	lbz r29, 0x1(r3)
-	addi r3, r1, 0x20
-	addi r4, r1, 0x50
-	bge @10
-	fmr f1, f30
-	b @11
-	@10:
-	lis r0, 0x4330
-	lis r5, double_to_int_mask_802c48e8@ha
-	stw r29, 0x84(r1)
-	lfd f1, double_to_int_mask_802c48e8@l(r5)
-	stw r0, 0x80(r1)
-	lfs f2, float_0p5_8041a328(r2)
-	lfd f0, 0x80(r1)
-	lfs f3, fontScale(r13)
-	fsubs f0, f0, f1
-	fsubs f0, f29, f0
-	fmuls f0, f2, f0
-	fmadds f1, f3, f0, f30
-	@11:
-	lfs f2, 0x4(r26)
-	lfs f3, 0x8(r26)
-	bl PSMTXTransApply
-	addi r4, r1, 0x50
-	addi r3, r30, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0x50
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @12
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r28
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r28
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r28
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r28
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@12:
-	mr r3, r28
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	fcmpo cr0, f29, f31
-	bge @13
-	lwz r5, gp(r13)
-	lis r0, 0x4330
-	lis r3, double_to_int_802c48f0@ha
-	la r4, charspace(r13)
-	lwz r5, 0x16c(r5)
-	stw r0, 0x80(r1)
-	slwi r0, r5, 2
-	lfd f1, double_to_int_802c48f0@l(r3)
-	lwzx r0, r4, r0
-	lfs f2, fontScale(r13)
-	add r0, r29, r0
-	xoris r0, r0, 0x8000
-	stw r0, 0x84(r1)
-	lfd f0, 0x80(r1)
-	fsubs f0, f0, f1
-	fmadds f30, f2, f0, f30
-	b @1
-	@13:
-	lfs f0, fontScale(r13)
-	fmadds f30, f29, f0, f30
-	@1:
-	lbz r3, 0x0(r27)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0xc8(r1), 0, 0
-	lfd f31, 0xc0(r1)
-	psq_l f30, 0xb8(r1), 0, 0
-	lfd f30, 0xb0(r1)
-	psq_l f29, 0xa8(r1), 0, 0
-	lfd f29, 0xa0(r1)
-	lmw r26, 0x88(r1)
-	lwz r0, 0xd4(r1)
-	mtlr r0
-	addi r1, r1, 0xd0
-	blr
-}
-
-asm void FontDrawStringPitch(f32 x, f32 y, f32 pitch, const char* msg) {
-	nofralloc
-	stwu r1, -0x110(r1)
-	mflr r0
-	stw r0, 0x114(r1)
-	stfd f31, 0x100(r1)
-	psq_st f31, 0x108(r1), 0, 0
-	stfd f30, 0xf0(r1)
-	psq_st f30, 0xf8(r1), 0, 0
-	stfd f29, 0xe0(r1)
-	psq_st f29, 0xe8(r1), 0, 0
-	stfd f28, 0xd0(r1)
-	psq_st f28, 0xd8(r1), 0, 0
-	stfd f27, 0xc0(r1)
-	psq_st f27, 0xc8(r1), 0, 0
-	stmw r27, 0xac(r1)
-	lis r4, vec3_802c48d8@ha
-	mr r28, r3
-	addi r5, r4, vec3_802c48d8@l
-	fmr f27, f3
-	lwz r4, 0x0(r5)
-	lwz r0, 0x4(r5)
-	stw r4, 0x20(r1)
-	lwz r4, 0x8(r5)
-	stw r0, 0x24(r1)
-	stfs f1, 0x20(r1)
-	stfs f2, 0x24(r1)
-	lwz r3, 0x20(r1)
-	lwz r0, 0x24(r1)
-	stw r4, 0x28(r1)
-	stw r3, 0x2c(r1)
-	stw r0, 0x30(r1)
-	stw r4, 0x34(r1)
-	bl camGetCurPtr
-	la r4, fontScale(r13)
-	mr r30, r3
-	lfs f30, 0x2c(r1)
-	addi r3, r1, 0x68
-	lfs f1, fontScale(r13)
-	lfs f2, 0x4(r4)
-	lfs f3, 0x8(r4)
-	bl PSMTXScale
-	lis r3, 0x5749
-	lfs f29, 0x34(r1)
-	lfs f28, 0x30(r1)
-	addi r31, r3, 0x4431
-	lfs f31, float_0_8041a300(r2)
-	b @1
-	@2:
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r28)
-	bl JUTFont_CodeToGlyph
-	mr r29, r3
-	addi r28, r28, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r28)
-	addi r28, r28, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r29, r3
-	@4:
-	lwz r4, pfh(r13)
-	clrlwi r3, r29, 16
-	lwz r0, 0xc(r4)
-	addi r4, r4, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @5
-	@6:
-	lwz r0, 0x0(r4)
-	cmpw r0, r31
-	beq @7
-	b @8
-	@7:
-	lhz r5, 0x8(r4)
-	cmplw r3, r5
-	blt @8
-	lhz r0, 0xa(r4)
-	cmplw r3, r0
-	bgt @8
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r4, r3
-	b @9
-	@8:
-	lwz r0, 0x4(r4)
-	add r4, r4, r0
-	bdnz @6
-	@5:
-	li r3, 0x0
-	@9:
-	fcmpo cr0, f27, f31
-	lbz r27, 0x1(r3)
-	addi r3, r1, 0x68
-	addi r4, r1, 0x38
-	bge @10
-	fmr f1, f30
-	b @11
-	@10:
-	lis r0, 0x4330
-	lis r5, double_to_int_mask_802c48e8@ha
-	stw r27, 0x9c(r1)
-	lfd f1, double_to_int_mask_802c48e8@l(r5)
-	stw r0, 0x98(r1)
-	lfs f2, float_0p5_8041a328(r2)
-	lfd f0, 0x98(r1)
-	lfs f3, fontScale(r13)
-	fsubs f0, f0, f1
-	fsubs f0, f27, f0
-	fmuls f0, f2, f0
-	fmadds f1, f3, f0, f30
-	@11:
-	fmr f2, f28
-	fmr f3, f29
-	bl PSMTXTransApply
-	addi r4, r1, 0x38
-	addi r3, r30, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0x38
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @12
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r29
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@12:
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	fcmpo cr0, f27, f31
-	bge @13
-	lwz r5, gp(r13)
-	lis r0, 0x4330
-	lis r3, double_to_int_802c48f0@ha
-	la r4, charspace(r13)
-	lwz r5, 0x16c(r5)
-	stw r0, 0x98(r1)
-	slwi r0, r5, 2
-	lfd f1, double_to_int_802c48f0@l(r3)
-	lwzx r0, r4, r0
-	lfs f2, fontScale(r13)
-	add r0, r27, r0
-	xoris r0, r0, 0x8000
-	stw r0, 0x9c(r1)
-	lfd f0, 0x98(r1)
-	fsubs f0, f0, f1
-	fmadds f30, f2, f0, f30
-	b @1
-	@13:
-	lfs f0, fontScale(r13)
-	fmadds f30, f27, f0, f30
-	@1:
-	lbz r3, 0x0(r28)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0x108(r1), 0, 0
-	lfd f31, 0x100(r1)
-	psq_l f30, 0xf8(r1), 0, 0
-	lfd f30, 0xf0(r1)
-	psq_l f29, 0xe8(r1), 0, 0
-	lfd f29, 0xe0(r1)
-	psq_l f28, 0xd8(r1), 0, 0
-	lfd f28, 0xd0(r1)
-	psq_l f27, 0xc8(r1), 0, 0
-	lfd f27, 0xc0(r1)
-	lmw r27, 0xac(r1)
-	lwz r0, 0x114(r1)
-	mtlr r0
-	addi r1, r1, 0x110
-	blr
-}
-
-asm void FontDrawString(f32 x, f32 y, const char* msg) {
-	nofralloc
-	stwu r1, -0x100(r1)
-	mflr r0
-	stw r0, 0x104(r1)
-	stfd f31, 0xf0(r1)
-	psq_st f31, 0xf8(r1), 0, 0
-	stfd f30, 0xe0(r1)
-	psq_st f30, 0xe8(r1), 0, 0
-	stfd f29, 0xd0(r1)
-	psq_st f29, 0xd8(r1), 0, 0
-	stfd f28, 0xc0(r1)
-	psq_st f28, 0xc8(r1), 0, 0
-	stmw r26, 0xa8(r1)
-	lis r4, vec3_802c48cc@ha
-	mr r28, r3
-	addi r5, r4, vec3_802c48cc@l
-	lwz r4, 0x0(r5)
-	lwz r0, 0x4(r5)
-	stw r4, 0x20(r1)
-	lwz r4, 0x8(r5)
-	stw r0, 0x24(r1)
-	stfs f1, 0x20(r1)
-	stfs f2, 0x24(r1)
-	lwz r3, 0x20(r1)
-	lwz r0, 0x24(r1)
-	stw r4, 0x28(r1)
-	stw r3, 0x2c(r1)
-	stw r0, 0x30(r1)
-	stw r4, 0x34(r1)
-	bl camGetCurPtr
-	la r4, fontScale(r13)
-	mr r30, r3
-	lfs f30, 0x2c(r1)
-	addi r3, r1, 0x68
-	lfs f1, fontScale(r13)
-	lfs f2, 0x4(r4)
-	lfs f3, 0x8(r4)
-	bl PSMTXScale
-	lis r3, double_to_int_802c48f0@ha
-	lis r4, 0x5749
-	lfs f29, 0x34(r1)
-	addi r31, r4, 0x4431
-	lfs f28, 0x30(r1)
-	lis r26, 0x4330
-	lfd f31, double_to_int_802c48f0@l(r3)
-	b @1
-	@2:
-	extsb r3, r3
-	bl _ismbblead
-	cmpwi r3, 0x0
-	beq @3
-	lhz r3, 0x0(r28)
-	bl JUTFont_CodeToGlyph
-	mr r29, r3
-	addi r28, r28, 0x2
-	b @4
-	@3:
-	lbz r0, 0x0(r28)
-	addi r28, r28, 0x1
-	extsb r3, r0
-	bl JUTFont_CodeToGlyph
-	mr r29, r3
-	@4:
-	lwz r4, pfh(r13)
-	clrlwi r3, r29, 16
-	lwz r0, 0xc(r4)
-	addi r4, r4, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @5
-	@6:
-	lwz r0, 0x0(r4)
-	cmpw r0, r31
-	beq @7
-	b @8
-	@7:
-	lhz r5, 0x8(r4)
-	cmplw r3, r5
-	blt @8
-	lhz r0, 0xa(r4)
-	cmplw r3, r0
-	bgt @8
-	subf r0, r5, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r4, r3
-	b @9
-	@8:
-	lwz r0, 0x4(r4)
-	add r4, r4, r0
-	bdnz @6
-	@5:
-	li r3, 0x0
-	@9:
-	fmr f1, f30
-	lbz r27, 0x1(r3)
-	fmr f2, f28
-	addi r3, r1, 0x68
-	fmr f3, f29
-	addi r4, r1, 0x38
-	bl PSMTXTransApply
-	addi r4, r1, 0x38
-	addi r3, r30, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0x38
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @10
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r29
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@10:
-	mr r3, r29
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	lwz r4, gp(r13)
-	la r3, charspace(r13)
-	stw r26, 0x98(r1)
-	lwz r0, 0x16c(r4)
-	lfs f1, fontScale(r13)
-	slwi r0, r0, 2
-	lwzx r0, r3, r0
-	add r0, r27, r0
-	xoris r0, r0, 0x8000
-	stw r0, 0x9c(r1)
-	lfd f0, 0x98(r1)
-	fsubs f0, f0, f31
-	fmadds f30, f1, f0, f30
-	@1:
-	lbz r3, 0x0(r28)
-	extsb. r0, r3
-	bne @2
-	psq_l f31, 0xf8(r1), 0, 0
-	lfd f31, 0xf0(r1)
-	psq_l f30, 0xe8(r1), 0, 0
-	lfd f30, 0xe0(r1)
-	psq_l f29, 0xd8(r1), 0, 0
-	lfd f29, 0xd0(r1)
-	psq_l f28, 0xc8(r1), 0, 0
-	lfd f28, 0xc0(r1)
-	lmw r26, 0xa8(r1)
-	lwz r0, 0x104(r1)
-	mtlr r0
-	addi r1, r1, 0x100
-	blr
-}
-
-asm void FontDrawCodeMtx(Mtx mtx, u16 code) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stw r31, 0x2c(r1)
-	mr r31, r4
-	stw r30, 0x28(r1)
-	mr r30, r3
-	bl camGetCurPtr
-	mr r4, r30
-	mr r5, r30
-	addi r3, r3, 0x11c
-	bl PSMTXConcat
-	mr r3, r30
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @1
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r31
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@1:
-	mr r3, r31
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	lwz r0, 0x34(r1)
-	lwz r31, 0x2c(r1)
-	lwz r30, 0x28(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void FontDrawCode(f32 x, f32 y, u16 code) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stw r31, 0x5c(r1)
-	fmr f30, f1
-	la r4, fontScale(r13)
-	fmr f31, f2
-	lfs f1, fontScale(r13)
-	mr r31, r3
-	lfs f2, 0x4(r4)
-	lfs f3, 0x8(r4)
-	addi r3, r1, 0x20
-	bl PSMTXScale
-	fmr f1, f30
-	addi r3, r1, 0x20
-	fmr f2, f31
-	lfs f3, float_0_8041a300(r2)
-	mr r4, r3
-	bl PSMTXTransApply
-	bl camGetCurPtr
-	addi r4, r1, 0x20
-	addi r3, r3, 0x11c
-	mr r5, r4
-	bl PSMTXConcat
-	addi r3, r1, 0x20
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lwz r0, fontEdge(r13)
-	cmpwi r0, 0x0
-	beq @1
-	lwz r7, fontColTbl(r13)
-	lis r3, 0x8081
-	lwz r8, fontColor(r13)
-	subi r6, r3, 0x7f7f
-	stw r7, 0x14(r1)
-	addi r4, r1, 0xc
-	lbz r0, fontAlpha(r13)
-	li r3, 0x1
-	lbz r5, 0x17(r1)
-	stw r8, 0x18(r1)
-	mullw r0, r5, r0
-	stw r7, 0x8(r1)
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x17(r1)
-	lwz r0, 0x14(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	mr r3, r31
-	li r4, -0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x2
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x0
-	li r5, -0x2
-	bl _JUTFont_DrawPos
-	mr r3, r31
-	li r4, 0x0
-	li r5, 0x2
-	bl _JUTFont_DrawPos
-	lwz r7, 0x18(r1)
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x1c(r1)
-	addi r4, r1, 0x10
-	li r3, 0x1
-	lbz r5, 0x1f(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x1f(r1)
-	lwz r0, 0x1c(r1)
-	stw r0, 0x10(r1)
-	bl GXSetTevColor
-	@1:
-	mr r3, r31
-	li r4, 0x0
-	li r5, 0x0
-	bl _JUTFont_DrawPos
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	lwz r0, 0x84(r1)
-	lwz r31, 0x5c(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm void FontDrawScaleVec(Vec scale) {
-	nofralloc
-	lwz r5, 0x0(r3)
-	lwz r4, 0x4(r3)
-	lwz r0, 0x8(r3)
-	stw r5, fontScale(r13)
-	stw r4, fontScale+0x4(r13)
-	stw r0, fontScale+0x8(r13)
-	blr
-}
-
-asm void FontDrawScale(f32 scale) {
-	nofralloc
-	la r3, fontScale(r13)
-	stfs f1, fontScale(r13)
-	stfs f1, 0x4(r3)
-	stfs f1, 0x8(r3)
-	blr
-}
-
-asm GXColor FontGetDrawColor(void) {
-	nofralloc
-	lwz r3, fontColor(r13)
-	blr
-}
-
-asm void FontDrawColor_(void) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	lis r3, 0x8081
-	stw r0, 0x24(r1)
-	subi r6, r3, 0x7f7f
-	addi r4, r1, 0xc
-	li r3, 0x1
-	lwz r7, fontColor(r13)
-	lbz r0, fontAlpha(r13)
-	stw r7, 0x10(r1)
-	lbz r5, 0x13(r1)
-	stw r7, 0x8(r1)
-	mullw r0, r5, r0
-	stw r7, fontColor(r13)
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x13(r1)
-	lwz r0, 0x10(r1)
-	stw r0, 0xc(r1)
-	bl GXSetTevColor
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void FontDrawColor(GXColor color) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r4, 0x8081
-	lbz r5, 0x3(r3)
-	stw r0, 0x14(r1)
-	subi r6, r4, 0x7f7f
-	lwz r7, 0x0(r3)
-	addi r4, r1, 0x8
-	lbz r0, fontAlpha(r13)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0x3(r3)
-	lwz r0, 0x0(r3)
-	li r3, 0x1
-	stw r0, 0x8(r1)
-	bl GXSetTevColor
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawColorIDX(s32 idx) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	slwi r0, r3, 2
-	la r3, fontColTbl(r13)
-	addi r4, r1, 0x8
-	lwzx r7, r3, r0
-	lis r3, 0x8081
-	subi r6, r3, 0x7f7f
-	lbz r0, fontAlpha(r13)
-	stw r7, 0xc(r1)
-	li r3, 0x1
-	lbz r5, 0xf(r1)
-	stw r7, fontColor(r13)
-	mullw r0, r5, r0
-	mulhw r5, r6, r0
-	add r0, r5, r0
-	srawi r0, r0, 7
-	srwi r5, r0, 31
-	add r0, r0, r5
-	stb r0, 0xf(r1)
-	lwz r0, 0xc(r1)
-	stw r0, 0x8(r1)
-	bl GXSetTevColor
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawNoiseOff(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r3, 0x1
-	stw r0, 0x14(r1)
-	bl GXSetNumTexGens
-	li r3, 0x1
-	bl GXSetNumTevStages
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawNoise(void) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	li r3, 0x2
-	stw r0, 0x44(r1)
-	bl GXSetNumTexGens
-	li r3, 0x2
-	bl GXSetNumTevStages
-	li r3, 0x1
-	li r4, 0x0
-	bl GXSetTevKAlphaSel
-	li r3, 0x1
-	li r4, 0x1
-	li r5, 0x2
-	li r6, 0xff
-	bl GXSetTevOrder
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x1
-	li r4, 0xf
-	li r5, 0xf
-	li r6, 0xf
-	li r7, 0x0
-	bl GXSetTevColorIn
-	li r3, 0x1
-	li r4, 0x7
-	li r5, 0x0
-	li r6, 0x4
-	li r7, 0x7
-	bl GXSetTevAlphaIn
-	lwz r3, wakuTexObj(r13)
-	li r4, 0x2
-	addi r3, r3, 0x640
-	bl GXLoadTexObj
-	lfs f1, float_0p015625_8041a340(r2)
-	addi r3, r1, 0x8
-	lfs f3, float_1_8041a2f4(r2)
-	fmr f2, f1
-	bl PSMTXScale
-	addi r3, r1, 0x8
-	li r4, 0x21
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x1
-	li r4, 0x1
-	li r5, 0x5
-	li r6, 0x21
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	lwz r0, 0x44(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void FontDrawRainbowColorOff(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r3, 0x1
-	stw r0, 0x14(r1)
-	bl GXSetNumTevStages
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawRainbowColor(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r3, 0x2
-	stw r0, 0x14(r1)
-	bl GXSetNumTevStages
-	li r3, 0x1
-	li r4, 0xff
-	li r5, 0xff
-	li r6, 0x4
-	bl GXSetTevOrder
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevColorOp
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x1
-	li r8, 0x0
-	bl GXSetTevAlphaOp
-	li r3, 0x1
-	li r4, 0xf
-	li r5, 0x0
-	li r6, 0xa
-	li r7, 0xf
-	bl GXSetTevColorIn
-	li r3, 0x1
-	li r4, 0x7
-	li r5, 0x0
-	li r6, 0x5
-	li r7, 0x7
-	bl GXSetTevAlphaIn
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawEdgeOff(void) {
-	nofralloc
-	li r0, 0x0
-	stw r0, fontEdge(r13)
-	blr
-}
-
-asm void FontDrawEdge(void) {
-	nofralloc
-	li r0, 0x1
-	stw r0, fontEdge(r13)
-	blr
-}
-
-asm void FontDrawStart_alpha(u8 alpha) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r5, 0x8081
-	clrlwi r7, r3, 24
-	stw r0, 0x14(r1)
-	lis r4, vec3_802c48c0@ha
-	li r0, 0x0
-	subi r9, r5, 0x7f7f
-	lwz r10, fontColTbl(r13)
-	lwzu r6, vec3_802c48c0@l(r4)
-	stw r10, 0xc(r1)
-	lwz r5, 0x4(r4)
-	lbz r8, 0xf(r1)
-	lwz r4, 0x8(r4)
-	mullw r7, r8, r7
-	stb r3, fontAlpha(r13)
-	addi r3, r1, 0x8
-	stw r5, fontScale+0x4(r13)
-	stw r4, fontScale+0x8(r13)
-	mulhw r8, r9, r7
-	stw r0, fontEdge(r13)
-	stw r10, fontColor(r13)
-	add r5, r8, r7
-	stw r6, fontScale(r13)
-	srawi r4, r5, 7
-	srwi r5, r4, 31
-	add r0, r4, r5
-	stb r0, 0xf(r1)
-	lwz r0, 0xc(r1)
-	stw r0, 0x8(r1)
-	bl JUTFont_DrawStart
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void FontDrawStart(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r5, 0x8081
-	lis r3, vec3_802c48c0@ha
-	stw r0, 0x14(r1)
-	addi r4, r3, vec3_802c48c0@l
-	subi r8, r5, 0x7f7f
-	li r0, 0x0
-	lwz r10, fontColTbl(r13)
-	li r9, 0xff
-	lwz r5, 0x4(r4)
-	addi r3, r1, 0xc
-	stw r10, 0x8(r1)
-	lwz r6, 0x0(r4)
-	lbz r7, 0xb(r1)
-	lwz r4, 0x8(r4)
-	mulli r7, r7, 0xff
-	stw r5, fontScale+0x4(r13)
-	stw r4, fontScale+0x8(r13)
-	mulhw r8, r8, r7
-	stw r0, fontEdge(r13)
-	stw r10, fontColor(r13)
-	add r5, r8, r7
-	stb r9, fontAlpha(r13)
-	srawi r5, r5, 7
-	srwi r4, r5, 31
-	stw r6, fontScale(r13)
-	add r4, r5, r4
-	stb r4, 0xb(r1)
-	lwz r0, 0x8(r1)
-	stw r0, 0xc(r1)
-	bl JUTFont_DrawStart
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void fontmgrTexSetup(void) {
-	nofralloc
-	stwu r1, -0x90(r1)
-	mflr r0
-	stw r0, 0x94(r1)
-	stw r31, 0x8c(r1)
-	stw r30, 0x88(r1)
-	lwz r0, pfh(r13)
-	cmplwi r0, 0x0
-	bne @1
-	bl getMarioStDvdRoot
-	lis r4, str_802C48F8@ha
-	lwz r6, fontname(r13)
-	mr r5, r3
-	addi r3, r1, 0x8
-	addi r4, r4, str_802C48F8@l
-	crclr 6
-	bl sprintf
-	addi r3, r1, 0x8
-	li r4, 0x2
-	li r5, 0x0
-	bl DVDMgrOpen
-	mr r31, r3
-	bl DVDMgrGetLength
-	mr r4, r3
-	li r3, 0x0
-	addi r0, r4, 0x1f
-	clrrwi r30, r0, 5
-	mr r4, r30
-	bl __memAlloc
-	mr r4, r3
-	mr r3, r31
-	stw r4, pfh(r13)
-	mr r5, r30
-	li r6, 0x0
-	bl DVDMgrRead
-	mr r3, r31
-	bl DVDMgrClose
-	lwz r8, pfh(r13)
-	lis r3, 0x4d41
-	addi r4, r3, 0x5031
-	li r6, 0x0
-	addi r7, r8, 0x20
-	b @2
-	@3:
-	lwz r5, 0x0(r7)
-	cmpw r5, r4
-	beq @4
-	bge @5
-	lis r3, 0x494e
-	addi r0, r3, 0x4631
-	cmpw r5, r0
-	beq @6
-	bge @4
-	lis r3, 0x474c
-	addi r0, r3, 0x5931
-	cmpw r5, r0
-	beq @7
-	b @4
-	@5:
-	lis r3, 0x5749
-	addi r0, r3, 0x4431
-	cmpw r5, r0
-	beq @4
-	b @4
-	@6:
-	stw r7, pfi(r13)
-	b @4
-	@7:
-	stw r7, blockGlyph(r13)
-	@4:
-	lwz r0, 0x4(r7)
-	addi r6, r6, 0x1
-	add r7, r7, r0
-	@2:
-	lwz r0, 0xc(r8)
-	cmplw r6, r0
-	blt @3
-	lwz r6, blockGlyph(r13)
-	la r3, fgTexObj(r13)
-	li r7, 0x0
-	li r8, 0x0
-	lhz r5, 0x1a(r6)
-	addi r4, r6, 0x20
-	lhz r6, 0x1c(r6)
-	li r9, 0x0
-	li r10, 0x0
-	bl GXInitTexObj
-	lfs f1, float_0_8041a300(r2)
-	la r3, fgTexObj(r13)
-	li r4, 0x1
-	li r5, 0x1
-	fmr f2, f1
-	li r6, 0x0
-	fmr f3, f1
-	li r7, 0x0
-	li r8, 0x0
-	bl GXInitTexObjLOD
-	li r3, 0x20
-	bl JUTFont_CodeToGlyph
-	lwz r5, pfh(r13)
-	lis r4, 0x5749
-	addi r4, r4, 0x4431
-	clrlwi r3, r3, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @8
-	@9:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @10
-	b @11
-	@10:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @11
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @11
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r4, r3, 0xc
-	add r4, r5, r4
-	b @12
-	@11:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @9
-	@8:
-	li r4, 0x0
-	@12:
-	li r0, 0x7
-	lis r3, 0x1
-	stb r0, 0x1(r4)
-	subi r3, r3, 0x7ec0
-	bl JUTFont_CodeToGlyph
-	lwz r5, pfh(r13)
-	lis r4, 0x5749
-	addi r4, r4, 0x4431
-	clrlwi r3, r3, 16
-	lwz r0, 0xc(r5)
-	addi r5, r5, 0x20
-	mtctr r0
-	cmplwi r0, 0x0
-	ble @13
-	@14:
-	lwz r0, 0x0(r5)
-	cmpw r0, r4
-	beq @15
-	b @16
-	@15:
-	lhz r6, 0x8(r5)
-	cmplw r3, r6
-	blt @16
-	lhz r0, 0xa(r5)
-	cmplw r3, r0
-	bgt @16
-	subf r0, r6, r3
-	slwi r3, r0, 1
-	addi r3, r3, 0xc
-	add r3, r5, r3
-	b @17
-	@16:
-	lwz r0, 0x4(r5)
-	add r5, r5, r0
-	bdnz @14
-	@13:
-	li r3, 0x0
-	@17:
-	li r0, 0x9
-	stb r0, 0x1(r3)
-	@1:
-	lwz r0, 0x94(r1)
-	lwz r31, 0x8c(r1)
-	lwz r30, 0x88(r1)
-	mtlr r0
-	addi r1, r1, 0x90
-	blr
-}
-
-asm void fontmgrInit(void) {
-	nofralloc
-	blr
-}
-// clang-format on
 #endif
-
-// target pad words (G5: section sizes must match or later DOL addresses shift)
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_07_8041036C_sdata[1] = {0};
 __declspec(section ".sdata2") const u32 gap_09_8041A344_sdata2[1] = {0};

@@ -8,6 +8,78 @@
 #include "manager/evtmgr_cmd.h"
 #include "system.h"
 #include <string.h>
+#ifndef NONMATCHING
+#include "mario/mario_pouch.h"
+__declspec(section ".rodata") extern const f32 vec3_802efc40[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc4c[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc58[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc64[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc70[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc7c[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc88[3];
+__declspec(section ".rodata") extern const f32 vec3_802efc94[3];
+__declspec(section ".rodata") extern const f32 vec3_802efca0[3];
+__declspec(section ".rodata") extern const f64 double_to_int_802efcb0;
+__declspec(section ".rodata") extern const char str_802EFCB8[];
+__declspec(section ".rodata") extern const char str_802EFCCC[];
+__declspec(section ".rodata") extern const char str_802EFCE8[];
+__declspec(section ".rodata") extern const char str_802EFD04[];
+__declspec(section ".rodata") extern const char str_802EFD14[];
+__declspec(section ".rodata") extern const char str_802EFD28[];
+__declspec(section ".rodata") extern const char str_802EFD40[];
+__declspec(section ".rodata") extern const char str_802EFD54[];
+__declspec(section ".rodata") extern const u32 gap_04_802EFD6C_rodata;
+__declspec(section ".rodata") extern const f64 double_20_802efd70;
+__declspec(section ".rodata") extern const f64 double_1_802efd78;
+__declspec(section ".rodata") extern const char str_802EFD80[];
+__declspec(section ".rodata") extern const char str_802EFDA0[];
+__declspec(section ".rodata") extern const char str_802EFDB8[];
+__declspec(section ".rodata") extern const char str_802EFDD4[];
+__declspec(section ".rodata") extern const char str_802EFDF0[];
+__declspec(section ".rodata") extern const char str_802EFE18[];
+__declspec(section ".rodata") extern const char str_802EFE34[];
+__declspec(section ".rodata") extern const char str_802EFE4C[];
+__declspec(section ".rodata") extern const char str_802EFE64[];
+__declspec(section ".rodata") extern const char str_802EFE78[];
+__declspec(section ".rodata") extern const char str_802EFE8C[];
+__declspec(section ".rodata") extern const char str_802EFEA0[];
+__declspec(section ".rodata") extern const u32 gap_04_802EFEB4_rodata;
+__declspec(section ".sdata2") extern const f32 float_2_8041c450;
+__declspec(section ".sdata2") extern const f32 float_0_8041c454;
+__declspec(section ".sdata2") extern const f32 float_0p25_8041c458;
+__declspec(section ".sdata2") extern const f32 float_600_8041c45c;
+__declspec(section ".sdata2") extern const f32 float_0p5_8041c460;
+__declspec(section ".sdata2") extern const f32 float_100_8041c464;
+__declspec(section ".sdata2") extern const f32 float_neg100_8041c468;
+__declspec(section ".sdata2") extern const f32 float_1p5_8041c46c;
+__declspec(section ".sdata2") extern const f32 float_1_8041c470;
+__declspec(section ".sdata2") extern const f32 float_15_8041c474;
+__declspec(section ".sdata2") extern const f32 float_5_8041c478;
+__declspec(section ".sdata2") extern const f32 float_200_8041c47c;
+__declspec(section ".sdata2") extern const f32 float_110_8041c480;
+__declspec(section ".sdata2") extern const f32 float_750_8041c484;
+__declspec(section ".sdata2") extern const f32 float_60_8041c488;
+__declspec(section ".sdata2") extern const f32 float_160_8041c48c;
+__declspec(section ".sdata2") extern const f32 float_neg750_8041c490;
+__declspec(section ".sdata2") extern const f32 float_400_8041c494;
+__declspec(section ".sdata2") extern const f32 float_neg617_8041c498;
+__declspec(section ".sdata2") extern const f32 float_830_8041c49c;
+__declspec(section ".sdata2") extern const f32 float_920_8041c4a0;
+__declspec(section ".sdata2") extern const f32 float_1000_8041c4a4;
+__declspec(section ".sdata2") extern const f32 float_50_8041c4a8;
+__declspec(section ".sdata2") extern const f32 float_24_8041c4ac;
+__declspec(section ".sdata2") extern const f32 float_9_8041c4b0;
+__declspec(section ".sdata2") extern const f32 float_80_8041c4b4;
+__declspec(section ".sdata2") extern const f32 float_10_8041c4b8;
+__declspec(section ".sdata2") extern const f32 float_1Eneg05_8041c4bc;
+__declspec(section ".sdata2") extern const f32 float_neg30_8041c4c0;
+__declspec(section ".sdata2") extern const f32 float_125_8041c4c4;
+__declspec(section ".sdata2") extern const f32 float_500_8041c4c8;
+__declspec(section ".sdata2") extern const f32 float_20_8041c4cc;
+__declspec(section ".sdata2") extern const f32 float_350_8041c4d0;
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 
 extern BattleWork *_battleWorkPointer;
 double sqrt(double);
@@ -28,7 +100,18 @@ void battleCameraMoveTo(s32 mode, s32 clamp, f32 x, f32 y, f32 z, f32 atX, f32 a
 void battleCameraInit(void) {
   BattleWork *wp = _battleWorkPointer;
   BattleCameraWork *camera;
+#endif
+#ifndef NONMATCHING
+void *memset(void *dest, int ch, size_t count);
+char *strcpy(char *dest, const char *src);
+void btl_camera_add_zoom(s32 pri, f32 zoom);
+void btl_camera_set_zoom(s32 pri, f32 zoom);
+void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type);
+void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type);
+void battleCameraInit(void);
+#endif
 
+#ifdef NONMATCHING
   camera = &wp->cameraWork;
   memset(camera, 0, sizeof(BattleCameraWork));
   camera->flags = 0;
@@ -57,9 +140,7 @@ void battleCameraInit(void) {
   camera->position = (Vec){0.0f, 0.0f, 0.0f};
   camera->unk4 = 0;
 }
-#endif
 
-#ifdef NONMATCHING
 void battleCameraMain(void) {
   CameraEntry* cam = camGetPtr(4);
   BattleWork* wp = _battleWorkPointer;
@@ -554,15 +635,25 @@ void battleCameraMain(void) {
   }
 }
 #endif
+#ifndef NONMATCHING
+void battleCameraMain(void);
+extern void* jumptable_80362040[];
+void battleCameraMain(void);
+#endif
 
-#ifdef NONMATCHING
 void battleCameraMoveTo(s32 mode, s32 clamp, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ,
+#ifdef NONMATCHING
                         f32* dX, f32* dY, f32* dZ, f32* dAtX, f32* dAtY, f32* dAtZ) {
   CameraEntry* cam = camGetPtr(4);
   BattleWork* wp = _battleWorkPointer;
   BattleUnit* mario = BattleGetMarioPtr(wp);
   f32 half;
+#endif
+#ifndef NONMATCHING
+                        f32* dX, f32* dY, f32* dZ, f32* dAtX, f32* dAtY, f32* dAtZ);
+#endif
 
+#ifdef NONMATCHING
   if (wp->cameraWork.moveSpeedLv < 0 || wp->cameraWork.moveSpeedLv >= 5) {
     wp->cameraWork.moveSpeedLv = 1;
   }
@@ -728,6 +819,9 @@ void battleCameraMoveTo(s32 mode, s32 clamp, f32 x, f32 y, f32 z, f32 atX, f32 a
   }
 }
 #endif
+#ifndef NONMATCHING
+f32 battleCameraGetPosMoveSpeed(void);
+#endif
 
 #ifdef NONMATCHING
 f32 battleCameraGetPosMoveSpeed(void) {
@@ -738,11 +832,17 @@ f32 battleCameraGetPosMoveSpeed(void) {
   return sqrt(x * x + y * y + z * z);
 }
 #endif
+#ifndef NONMATCHING
+void btl_camera_set_prilimit(s32 pri);
+#endif
 
 #ifdef NONMATCHING
 void btl_camera_set_prilimit(s32 pri) {
   _battleWorkPointer->cameraWork.priLimit = pri;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_btl_camera_set_prilimit(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -750,6 +850,9 @@ USER_FUNC(evt_btl_camera_set_prilimit) {
   btl_camera_set_prilimit(evtGetValue(event, event->args[0]));
   return 2;
 }
+#endif
+#ifndef NONMATCHING
+void btl_camera_set_mode(s32 pri, s32 mode);
 #endif
 
 #ifdef NONMATCHING
@@ -768,6 +871,9 @@ void btl_camera_set_mode(s32 pri, s32 mode) {
   }
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_btl_camera_set_mode(EventEntry* event, BOOL isFirstCall);
+#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_mode) {
@@ -777,6 +883,9 @@ USER_FUNC(evt_btl_camera_set_mode) {
   btl_camera_set_mode(pri, val);
   return 2;
 }
+#endif
+#ifndef NONMATCHING
+s32 evt_btl_camera_set_homing_unit(EventEntry* event, BOOL isFirstCall);
 #endif
 
 #ifdef NONMATCHING
@@ -811,9 +920,7 @@ USER_FUNC(evt_btl_camera_set_homing_unit) {
   }
   return 2;
 }
-#endif
 
-#ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   s32* args = event->args;
   BattleWork* wp;
@@ -849,6 +956,9 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   return 2;
 }
 #endif
+#ifndef NONMATCHING
+s32 evt_btl_camera_set_homing_unitparts(EventEntry* event, BOOL isFirstCall);
+#endif
 
 
 #ifdef NONMATCHING
@@ -862,7 +972,12 @@ USER_FUNC(evt_btl_camera_set_homing_unit_audience) {
   BattleUnitPart* part;
   Vec pos;
   Vec hit;
+#endif
+#ifndef NONMATCHING
+s32 evt_btl_camera_set_homing_unit_audience(EventEntry* event, BOOL isFirstCall);
+#endif
 
+#ifdef NONMATCHING
   pri = evtGetValue(event, args[0]);
   unit = evtGetValue(event, args[1]);
   parts = evtGetValue(event, args[2]);
@@ -885,26 +1000,302 @@ USER_FUNC(evt_btl_camera_set_homing_unit_audience) {
     wp->cameraWork.homingOffset2 = (Vec){m->position.x, m->position.y, m->position.z};
   }
   return 2;
+#endif
+#ifndef NONMATCHING
+void btl_camera_set_zoom(s32 pri, f32 zoom);
+
+void btl_camera_add_zoom(s32 pri, f32 zoom);
+
+s32 evt_btl_camera_set_zoom(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_btl_camera_add_zoom(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_set_moveSpeedLv(s32 pri, s32 lv);
+
+void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv);
+
+s32 evt_btl_camera_set_moveSpeedLv(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_btl_camera_set_zoomSpeedLv(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_set_moveto(s32 pri, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ, s32 frames,
+                           s32 type);
+
+s32 evt_btl_camera_set_moveto(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type);
+
+s32 evt_btl_camera_shake_w(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type);
+
+s32 evt_btl_camera_shake_h(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_noshake(s32 pri);
+
+s32 evt_btl_camera_noshake(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_nomove_x_onoff(s32 pri, s32 on);
+
+s32 evt_btl_camera_nomove_x_onoff(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_nomove_y_onoff(s32 pri, s32 on);
+
+s32 evt_btl_camera_nomove_y_onoff(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_nomove_z_onoff(s32 pri, s32 on);
+
+s32 evt_btl_camera_nomove_z_onoff(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z);
+
+s32 evt_btl_camera_set_posoffset(EventEntry* event, BOOL isFirstCall);
+
+void btl_camera_off_posoffset_manual(s32 pri);
+
+s32 evt_btl_camera_off_posoffset_manual(EventEntry* event, BOOL isFirstCall);
+
+s32 evt_btl_camera_wait_move_end(EventEntry* event, BOOL isFirstCall);
+
+
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_btl_camera_set_homing_unitparts(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[52];
+	asm volatile {
+		opword 0x7C7D1B78
+		opword 0x83830018
+		opword 0x809C0000
+		bl evtGetValue
+		opword 0x809C0004
+		opword 0x7C7A1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x809C0008
+		mr r25, r3
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x809C000C
+		opword 0x7C7B1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x809C0010
+		opword 0x7C7E1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		lwz r31, _battleWorkPointer(r13)
+		opword 0x7C7C1B78
+		opword 0x801F275C
+		opword 0x7C1A0000
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x4800013C
+		opword 0x7FA3EB78
+		opword 0x7F24CB78
+		bl BattleTransID
+		opword 0x907F2764
+		opword 0x7FE3FB78
+		opword 0x937F276C
+		opword 0x809F2764
+		bl BattleGetUnitPtr
+		opword 0x7C7A1B78
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		la r5, _af_pad+40
+		opword 0x38C10034
+		opword 0x7F43D378
+		opword 0x3881002C
+		bl BtlUnit_GetHomePos
+		lis r3, vec3_802efc7c@ha
+		opword 0xC041002C
+		addi r4, r3, vec3_802efc7c@l
+		opword 0xC0210030
+		opword 0x80040000
+		opword 0x2C1EFFFF
+		opword 0x80640004
+		opword 0x90010014
+		opword 0x80040008
+		opword 0x90610018
+		opword 0xC0010034
+		opword 0xD0410014
+		opword 0x9001001C
+		opword 0x80010014
+		opword 0xD0210018
+		opword 0xD001001C
+		opword 0x80610018
+		opword 0x901F2810
+		opword 0x8001001C
+		opword 0x907F2814
+		opword 0x901F2818
+		opword 0x4182009C
+		opword 0x7FA3EB78
+		opword 0x7FC4F378
+		bl BattleTransID
+		opword 0x907F2768
+		opword 0x7FE3FB78
+		opword 0x939F2770
+		opword 0x809F2768
+		bl BattleGetUnitPtr
+		opword 0x7C7A1B78
+		opword 0x807F2768
+		opword 0x809F2770
+		bl BattleGetUnitPartsPtr
+		opword 0x7C641B78
+		opword 0x38C10024
+		opword 0x38E10028
+		opword 0x7F43D378
+		opword 0x38A10020
+		bl BtlUnit_GetHitPos
+		lis r3, vec3_802efc88@ha
+		opword 0xC0410020
+		addi r4, r3, vec3_802efc88@l
+		opword 0xC0210024
+		opword 0x80040000
+		opword 0x80640004
+		opword 0x90010008
+		opword 0x80040008
+		opword 0x9061000C
+		opword 0xC0010028
+		opword 0xD0410008
+		opword 0x90010010
+		opword 0x80010008
+		opword 0xD021000C
+		opword 0xD0010010
+		opword 0x8061000C
+		opword 0x901F281C
+		opword 0x80010010
+		opword 0x907F2820
+		opword 0x901F2824
+		opword 0x38600002
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
+
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+s32 evt_btl_camera_set_homing_unit_audience(EventEntry* event, BOOL isFirstCall) {
+	char _af_pad[52];
+	asm volatile {
+		mr r25, r3
+		opword 0x83830018
+		opword 0x809C0000
+		bl evtGetValue
+		opword 0x809C0004
+		opword 0x7C7B1B78
+		opword 0x7F23CB78
+		bl evtGetValue
+		opword 0x809C0008
+		opword 0x7C7A1B78
+		opword 0x7F23CB78
+		bl evtGetValue
+		opword 0x809C000C
+		opword 0x7C7C1B78
+		opword 0x7F23CB78
+		bl evtGetValue
+		lwz r30, _battleWorkPointer(r13)
+		opword 0x7C7F1B78
+		bl BattleAudienceBaseGetPtr
+		opword 0x801E275C
+		opword 0x7C7D1B78
+		opword 0x7C1B0000
+		opword 0x4080000C
+		opword 0x38600002
+		opword 0x48000120
+		opword 0x7F23CB78
+		opword 0x7F44D378
+		bl BattleTransID
+		opword 0x907E2764
+		opword 0x7FC3F378
+		opword 0x939E276C
+		opword 0x809E2764
+		bl BattleGetUnitPtr
+		opword 0x7C601B78
+		opword 0x807E2764
+		opword 0x809E276C
+		opword 0x7C1A0378
+		bl BattleGetUnitPartsPtr
+		opword 0x7C601B78
+		la r5, _af_pad+40
+		opword 0x38C10034
+		opword 0x7F43D378
+		opword 0x7C1B0378
+		opword 0x3881002C
+		bl BtlUnit_GetPos
+		opword 0x7F43D378
+		opword 0x7F64DB78
+		opword 0x38A10020
+		opword 0x38C10024
+		opword 0x38E10028
+		bl BtlUnit_GetHitPos
+		lis r4, vec3_802efc94@ha
+		lis r3, vec3_802efca0@ha
+		addi r7, r4, vec3_802efc94@l
+		opword 0xC001002C
+		opword 0x80070000
+		opword 0x1C9F0134
+		opword 0x80A70004
+		addi r6, r3, vec3_802efca0@l
+		opword 0x90010014
+		opword 0x38600002
+		opword 0x80070008
+		opword 0xD0010014
+		opword 0x38E401BC
+		opword 0xC0210030
+		opword 0x7CFD3A14
+		opword 0x90A10018
+		opword 0xC0010034
+		opword 0x9001001C
+		opword 0x80010014
+		opword 0xD0210018
+		opword 0xD001001C
+		opword 0x80810018
+		opword 0x901E2810
+		opword 0x8001001C
+		opword 0x909E2814
+		opword 0x901E2818
+		opword 0x93FE2774
+		opword 0x80A60000
+		opword 0x80860004
+		opword 0x80060008
+		opword 0x90A10008
+		opword 0xC0070048
+		opword 0x9081000C
+		opword 0xC027004C
+		opword 0xD0010008
+		opword 0xC0070050
+		opword 0x90010010
+		opword 0x80010008
+		opword 0xD021000C
+		opword 0xD0010010
+		opword 0x8081000C
+		opword 0x901E281C
+		opword 0x80010010
+		opword 0x909E2820
+		opword 0x901E2824
+	}
+}
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_set_zoom(s32 pri, f32 zoom) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
     wp->cameraWork.zoom = zoom;
   }
 }
-#endif
 
-#ifdef NONMATCHING
 void btl_camera_add_zoom(s32 pri, f32 zoom) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
     wp->cameraWork.zoom += zoom;
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_zoom) {
@@ -912,7 +1303,49 @@ USER_FUNC(evt_btl_camera_set_zoom) {
   s32 pri = evtGetValue(event, args[0]);
   btl_camera_set_zoom(pri, (s32)evtGetFloat(event, args[1]));
   return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_btl_camera_set_zoom(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0xBFC10018
+		opword 0x7C7E1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7F1B78
+		opword 0x7FC3F378
+		bl evtGetFloat
+		opword 0xFC00081E
+		opword 0x3C004330
+		lis r3, double_to_int_802efcb0@ha
+		opword 0x90010010
+		addi r4, r3, double_to_int_802efcb0@l
+		opword 0xD8010008
+		opword 0xC8240000
+		opword 0x7FE3FB78
+		opword 0x8001000C
+		opword 0x6C008000
+		opword 0x90010014
+		opword 0xC8010010
+		opword 0xEC200828
+		bl btl_camera_set_zoom
+		opword 0xBBC10018
+		opword 0x38600002
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 #ifdef NONMATCHING
@@ -921,10 +1354,51 @@ USER_FUNC(evt_btl_camera_add_zoom) {
   s32 pri = evtGetValue(event, args[0]);
   btl_camera_add_zoom(pri, (s32)evtGetFloat(event, args[1]));
   return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_btl_camera_add_zoom(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0xBFC10018
+		opword 0x7C7E1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7F1B78
+		opword 0x7FC3F378
+		bl evtGetFloat
+		opword 0xFC00081E
+		opword 0x3C004330
+		lis r3, double_to_int_802efcb0@ha
+		opword 0x90010010
+		addi r4, r3, double_to_int_802efcb0@l
+		opword 0xD8010008
+		opword 0xC8240000
+		opword 0x7FE3FB78
+		opword 0x8001000C
+		opword 0x6C008000
+		opword 0x90010014
+		opword 0xC8010010
+		opword 0xEC200828
+		bl btl_camera_add_zoom
+		opword 0xBBC10018
+		opword 0x38600002
+		opword 0x80010024
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_set_moveSpeedLv(s32 pri, s32 lv) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -936,9 +1410,7 @@ void btl_camera_set_moveSpeedLv(s32 pri, s32 lv) {
     wp->cameraWork.zoomSpeedLv = wp->cameraWork.moveSpeedLv;
   }
 }
-#endif
 
-#ifdef NONMATCHING
 void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -949,29 +1421,41 @@ void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_moveSpeedLv) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_set_moveSpeedLv(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_set_moveSpeedLv(pri, val);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_zoomSpeedLv) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_set_zoomSpeedLv(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_set_zoomSpeedLv(pri, val);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_set_moveto(s32 pri, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ, s32 frames,
                            s32 type) {
   BattleWork* wp = _battleWorkPointer;
@@ -994,10 +1478,14 @@ void btl_camera_set_moveto(s32 pri, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 a
     wp->cameraWork.moveToType = type;
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_moveto) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_set_moveto(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 x = evtGetFloat(event, args[1]);
@@ -1010,9 +1498,10 @@ USER_FUNC(evt_btl_camera_set_moveto) {
   btl_camera_set_moveto(pri, x, y, z, atX, atY, atZ, frames, evtGetValue(event, args[8]));
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1027,7 +1516,6 @@ void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_shake_w) {
@@ -1038,10 +1526,79 @@ USER_FUNC(evt_btl_camera_shake_w) {
   s32 frames = evtGetValue(event, args[3]);
   btl_camera_shake_w(pri, a, b, frames, evtGetValue(event, args[4]));
   return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_btl_camera_shake_w(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFB0
+		opword 0x7C0802A6
+		opword 0x90010054
+		opword 0xDBE10040
+		opword 0xF3E10048
+		opword 0xDBC10030
+		opword 0xF3C10038
+		opword 0xBFA10024
+		opword 0x7C7D1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7E1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802efcb0@ha
+		opword 0x9061000C
+		addi r5, r4, double_to_int_802efcb0@l
+		opword 0x809F0008
+		opword 0x90010008
+		opword 0x7FA3EB78
+		opword 0xC8250000
+		opword 0xC8010008
+		opword 0xEFE00828
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802efcb0@ha
+		opword 0x90610014
+		addi r5, r4, double_to_int_802efcb0@l
+		opword 0x809F000C
+		opword 0x90010010
+		opword 0x7FA3EB78
+		opword 0xC8250000
+		opword 0xC8010010
+		opword 0xEFC00828
+		bl evtGetValue
+		opword 0x809F0010
+		opword 0x7C7F1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0xFC20F890
+		opword 0x7C651B78
+		opword 0xFC40F090
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		bl btl_camera_shake_w
+		opword 0x38600002
+		opword 0xE3E10048
+		opword 0xCBE10040
+		opword 0xE3C10038
+		opword 0xCBC10030
+		opword 0xBBA10024
+		opword 0x80010054
+		opword 0x7C0803A6
+		opword 0x38210050
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1056,7 +1613,6 @@ void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_shake_h) {
@@ -1067,10 +1623,79 @@ USER_FUNC(evt_btl_camera_shake_h) {
   s32 frames = evtGetValue(event, args[3]);
   btl_camera_shake_h(pri, a, b, frames, evtGetValue(event, args[4]));
   return 2;
+#endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_btl_camera_shake_h(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFB0
+		opword 0x7C0802A6
+		opword 0x90010054
+		opword 0xDBE10040
+		opword 0xF3E10048
+		opword 0xDBC10030
+		opword 0xF3C10038
+		opword 0xBFA10024
+		opword 0x7C7D1B78
+		opword 0x83E30018
+		opword 0x809F0000
+		bl evtGetValue
+		opword 0x809F0004
+		opword 0x7C7E1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802efcb0@ha
+		opword 0x9061000C
+		addi r5, r4, double_to_int_802efcb0@l
+		opword 0x809F0008
+		opword 0x90010008
+		opword 0x7FA3EB78
+		opword 0xC8250000
+		opword 0xC8010008
+		opword 0xEFE00828
+		bl evtGetValue
+		opword 0x6C638000
+		opword 0x3C004330
+		lis r4, double_to_int_802efcb0@ha
+		opword 0x90610014
+		addi r5, r4, double_to_int_802efcb0@l
+		opword 0x809F000C
+		opword 0x90010010
+		opword 0x7FA3EB78
+		opword 0xC8250000
+		opword 0xC8010010
+		opword 0xEFC00828
+		bl evtGetValue
+		opword 0x809F0010
+		opword 0x7C7F1B78
+		opword 0x7FA3EB78
+		bl evtGetValue
+		opword 0xFC20F890
+		opword 0x7C651B78
+		opword 0xFC40F090
+		opword 0x7FC3F378
+		opword 0x7FE4FB78
+		bl btl_camera_shake_h
+		opword 0x38600002
+		opword 0xE3E10048
+		opword 0xCBE10040
+		opword 0xE3C10038
+		opword 0xCBC10030
+		opword 0xBBA10024
+		opword 0x80010054
+		opword 0x7C0803A6
+		opword 0x38210050
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_noshake(s32 pri) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1078,16 +1703,21 @@ void btl_camera_noshake(s32 pri) {
     wp->cameraWork.flags &= ~2;
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_noshake) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_noshake(EventEntry* event, BOOL isFirstCall) {
+#endif
   btl_camera_noshake(evtGetValue(event, event->args[0]));
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_nomove_x_onoff(s32 pri, s32 on) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1098,19 +1728,24 @@ void btl_camera_nomove_x_onoff(s32 pri, s32 on) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_nomove_x_onoff) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_nomove_x_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_x_onoff(pri, val);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_nomove_y_onoff(s32 pri, s32 on) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1121,19 +1756,24 @@ void btl_camera_nomove_y_onoff(s32 pri, s32 on) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_nomove_y_onoff) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_nomove_y_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_y_onoff(pri, val);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_nomove_z_onoff(s32 pri, s32 on) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1144,19 +1784,24 @@ void btl_camera_nomove_z_onoff(s32 pri, s32 on) {
     }
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_nomove_z_onoff) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_nomove_z_onoff(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   s32 val = evtGetValue(event, args[1]);
   btl_camera_nomove_z_onoff(pri, val);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
@@ -1166,10 +1811,14 @@ void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z) {
     wp->cameraWork.position.z = z;
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_set_posoffset) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_set_posoffset(EventEntry* event, BOOL isFirstCall) {
+#endif
   s32* args = event->args;
   s32 pri = evtGetValue(event, args[0]);
   f32 x = evtGetFloat(event, args[1]);
@@ -1178,25 +1827,39 @@ USER_FUNC(evt_btl_camera_set_posoffset) {
   btl_camera_set_posoffset(pri, x, y, z);
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
-#ifdef NONMATCHING
 void btl_camera_off_posoffset_manual(s32 pri) {
   BattleWork* wp = _battleWorkPointer;
   if (pri >= wp->cameraWork.priLimit) {
     wp->cameraWork.flags &= ~0x20;
+#ifdef NONMATCHING
     wp->cameraWork.position.x = 0.0f;
     wp->cameraWork.position.y = 0.0f;
     wp->cameraWork.position.z = 0.0f;
+#endif
+#ifndef NONMATCHING
+    wp->cameraWork.position.x = EXT_LIT(float_0_8041c454, 0.0f);
+    wp->cameraWork.position.y = EXT_LIT(float_0_8041c454, 0.0f);
+    wp->cameraWork.position.z = EXT_LIT(float_0_8041c454, 0.0f);
+#endif
   }
 }
-#endif
 
 #ifdef NONMATCHING
 USER_FUNC(evt_btl_camera_off_posoffset_manual) {
+#endif
+#ifndef NONMATCHING
+#pragma dont_inline on
+s32 evt_btl_camera_off_posoffset_manual(EventEntry* event, BOOL isFirstCall) {
+#endif
   btl_camera_off_posoffset_manual(evtGetValue(event, event->args[0]));
   return 2;
 }
+#ifndef NONMATCHING
+#pragma dont_inline reset
 #endif
 
 #ifdef NONMATCHING
@@ -1204,1158 +1867,35 @@ USER_FUNC(evt_btl_camera_wait_move_end) {
   if (battleCameraGetPosMoveSpeed() >= 2.0f) {
     return 0;
   }
-  return 2;
-}
 #endif
-
 #ifndef NONMATCHING
-// ASM-STOPGAP: battleCameraInit (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
-#pragma force_active on
-#pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
-__declspec(section ".rodata") const f32 vec3_802efc40[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc4c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc58[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc64[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc70[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc7c[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc88[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efc94[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f32 vec3_802efca0[3] = { 0.0f, 0.0f, 0.0f };
-__declspec(section ".rodata") const f64 double_to_int_802efcb0 = 4503601774854144;
-__declspec(section ".rodata") const char str_802EFCB8[] = "\202\251\202\337\202\347\201@\202\305\202\323\202\247\202\351\202\306\000";
-__declspec(section ".rodata") const char str_802EFCCC[] = "\202\251\202\337\202\347\201@\202\305\202\323\202\247\202\351\202\306\203Y\201[\203\200\000\000\000";
-__declspec(section ".rodata") const char str_802EFCE8[] = "\202\251\202\337\202\347\201@\202\251\201[\202\273\202\351\202\252\202\244\202\246\202\311\000\000\000";
-__declspec(section ".rodata") const char str_802EFD04[] = "\202\251\202\337\202\347\201@\202\323\202\350\201[\000";
-__declspec(section ".rodata") const char str_802EFD14[] = "\202\251\202\337\202\347\201@\202\324\202\275\202\242\202\244\202\347\000";
-__declspec(section ".rodata") const char str_802EFD28[] = "\202\251\202\337\202\347\201@\202\324\202\275\202\242\202\244\202\347\202Q\000\000\000";
-__declspec(section ".rodata") const char str_802EFD40[] = "\202\251\202\337\202\347\201@\202\251\202\361\202\253\202\341\202\255\000";
-__declspec(section ".rodata") const char str_802EFD54[] = "\202\251\202\337\202\347\201@\202\344\202\311\202\301\202\306\202\302\202\242\202\321\000";
-__declspec(section ".rodata") const u32 gap_04_802EFD6C_rodata[1] = { 0x00000000 };
-__declspec(section ".rodata") const f64 double_20_802efd70 = 20;
-__declspec(section ".rodata") const f64 double_1_802efd78 = 1;
-__declspec(section ".rodata") const char str_802EFD80[] = "\202\251\202\337\202\347\201@\202Q\202\344\202\311\202\301\202\306\202\251\202\361\202\302\202\242\202\321\000\000\000";
-__declspec(section ".rodata") const char str_802EFDA0[] = "\202\251\202\337\202\347\201@\202\317\201[\202\302\202\302\202\242\202\321\000\000\000";
-__declspec(section ".rodata") const char str_802EFDB8[] = "\202\251\202\337\202\347\201@\202Q\202\317\201[\202\302\202\251\202\361\202\302\202\242\202\321\000";
-__declspec(section ".rodata") const char str_802EFDD4[] = "\202\251\202\337\202\347\201@\202\251\202\361\202\253\202\341\202\255\202\302\202\242\202\321\000\000\000";
-__declspec(section ".rodata") const char str_802EFDF0[] = "\202\251\202\337\202\347\201@\202\344\202\311\202\301\202\306\202\251\202\361\202\253\202\341\202\255\202\251\202\361\202\302\202\242\202\321\000\000\000";
-__declspec(section ".rodata") const char str_802EFE18[] = "\202\251\202\337\202\347\201@\202\323\202\302\202\244\202\311\202\315\202\242\202\301\202\275\000\000\000";
-__declspec(section ".rodata") const char str_802EFE34[] = "\202\251\202\337\202\347\201@\202\244\202\334\202\255\202\315\202\242\202\301\202\275\000";
-__declspec(section ".rodata") const char str_802EFE4C[] = "\202\251\202\337\202\347\201@\202\276\202\337\202\311\202\315\202\242\202\301\202\275\000";
-__declspec(section ".rodata") const char str_802EFE64[] = "\202\251\202\337\202\347\201@\202\265\202\345\202\244\202\350\000\000\000";
-__declspec(section ".rodata") const char str_802EFE78[] = "\202\251\202\337\202\347\201@\202\315\202\242\202\332\202\255\000\000\000";
-__declspec(section ".rodata") const char str_802EFE8C[] = "\202\251\202\337\202\347\201@\202\311\202\260\202\304\202\351\000\000\000";
-__declspec(section ".rodata") const char str_802EFEA0[] = "\202\251\202\337\202\347\201@\202\250\202\251\202\265\202\242\000\000\000";
-__declspec(section ".rodata") const u32 gap_04_802EFEB4_rodata[1] = { 0x00000000 };
-__declspec(section ".sdata2") const f32 float_2_8041c450 = 2.0f;
-__declspec(section ".sdata2") const f32 float_0_8041c454 = 0.0f;
-__declspec(section ".sdata2") const f32 float_0p25_8041c458 = 0.25f;
-__declspec(section ".sdata2") const f32 float_600_8041c45c = 600.0f;
-__declspec(section ".sdata2") const f32 float_0p5_8041c460 = 0.5f;
-__declspec(section ".sdata2") const f32 float_100_8041c464 = 100.0f;
-__declspec(section ".sdata2") const f32 float_neg100_8041c468 = -100.0f;
-__declspec(section ".sdata2") const f32 float_1p5_8041c46c = 1.5f;
-__declspec(section ".sdata2") const f32 float_1_8041c470 = 1.0f;
-__declspec(section ".sdata2") const f32 float_15_8041c474 = 15.0f;
-__declspec(section ".sdata2") const f32 float_5_8041c478 = 5.0f;
-__declspec(section ".sdata2") const f32 float_200_8041c47c = 200.0f;
-__declspec(section ".sdata2") const f32 float_110_8041c480 = 110.0f;
-__declspec(section ".sdata2") const f32 float_750_8041c484 = 750.0f;
-__declspec(section ".sdata2") const f32 float_60_8041c488 = 60.0f;
-__declspec(section ".sdata2") const f32 float_160_8041c48c = 160.0f;
-__declspec(section ".sdata2") const f32 float_neg750_8041c490 = -750.0f;
-__declspec(section ".sdata2") const f32 float_400_8041c494 = 400.0f;
-__declspec(section ".sdata2") const f32 float_neg617_8041c498 = -617.0f;
-__declspec(section ".sdata2") const f32 float_830_8041c49c = 830.0f;
-__declspec(section ".sdata2") const f32 float_920_8041c4a0 = 920.0f;
-__declspec(section ".sdata2") const f32 float_1000_8041c4a4 = 1000.0f;
-__declspec(section ".sdata2") const f32 float_50_8041c4a8 = 50.0f;
-__declspec(section ".sdata2") const f32 float_24_8041c4ac = 24.0f;
-__declspec(section ".sdata2") const f32 float_9_8041c4b0 = 9.0f;
-__declspec(section ".sdata2") const f32 float_80_8041c4b4 = 80.0f;
-__declspec(section ".sdata2") const f32 float_10_8041c4b8 = 10.0f;
-__declspec(section ".sdata2") const f32 float_1Eneg05_8041c4bc = 0.00001f;
-__declspec(section ".sdata2") const f32 float_neg30_8041c4c0 = -30.0f;
-__declspec(section ".sdata2") const f32 float_125_8041c4c4 = 125.0f;
-__declspec(section ".sdata2") const f32 float_500_8041c4c8 = 500.0f;
-__declspec(section ".sdata2") const f32 float_20_8041c4cc = 20.0f;
-__declspec(section ".sdata2") const f32 float_350_8041c4d0 = 350.0f;
-
-BattleAudience* BattleAudienceBaseGetPtr(void);
-BattleUnit* BattleGetMarioPtr(BattleWork* work);
-BattleUnit* BattleGetPartyPtr(BattleWork* wp);
-BattleUnitPart* BattleGetUnitPartsPtr(s32 index, s32 partNum);
-BattleUnit* BattleGetUnitPtr(BattleWork* wp, s32 index);
-s32 BattleTransID(EventEntry* event, s32 type);
-s32 BtlUnit_GetBodyPartsId(BattleUnit* unit);
-s32 BtlUnit_GetHeight(BattleUnit* unit);
-void BtlUnit_GetHitPos(BattleUnit* unit, BattleUnitPart* part, f32* x, f32* y, f32* z);
-void BtlUnit_GetHomePos(BattleUnit* unit, f32* x, f32* y, f32* z);
-void BtlUnit_GetPartsWorldPos(BattleUnitPart* part, f32* x, f32* y, f32* z);
-void BtlUnit_GetPos(BattleUnit* unit, f32* x, f32* y, f32* z);
-s32 BtlUnit_GetWidth(BattleUnit* unit);
-void _restfpr_26();
-void _savefpr_26();
-void btl_camera_add_zoom(s32 pri, f32 zoom);
-void btl_camera_noshake(s32 pri);
-void btl_camera_off_posoffset_manual(s32 pri);
-void btl_camera_set_moveSpeedLv(s32 pri, s32 lv);
-void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z);
-void btl_camera_set_prilimit(s32 pri);
-void btl_camera_set_zoom(s32 pri, f32 zoom);
-void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv);
-void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type);
-void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type);
-CameraEntry* camGetPtr(CameraId cameraId);
-f32 evtGetFloat(EventEntry* entry, s32 index);
-s32 evtGetValue(EventEntry* entry, s32 index);
-f32 intplGetValue(s32 mode, s32 currStep, s32 steps, f32 start, f32 end);
-void *memset(void *dest, int ch, size_t count);
-void padRumbleOff(u32 chan);
-void padRumbleOn(u32 chan);
-PouchData* pouchGetPtr(void);
-char *strcpy(char *dest, const char *src);
-asm s32 evt_btl_camera_wait_move_end(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl battleCameraGetPosMoveSpeed
-	lfs f0, float_2_8041c450(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @1
-	li r3, 0x0
-	b @2
-	@1:
-	li r3, 0x2
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+#pragma defer_codegen off
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+s32 evt_btl_camera_wait_move_end(EventEntry* event, BOOL isFirstCall) {
+	asm volatile {
+		opword 0x9421FFF0
+		opword 0x7C0802A6
+		opword 0x90010014
+		bl battleCameraGetPosMoveSpeed
+		lfs f0, float_2_8041c450(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082000C
+		opword 0x38600000
+		opword 0x48000008
+		opword 0x38600002
+		opword 0x80010014
+		opword 0x7C0803A6
+		opword 0x38210010
+	}
 }
+#pragma pop
 
-asm s32 evt_btl_camera_off_posoffset_manual(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	bl btl_camera_off_posoffset_manual
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
+#pragma defer_codegen reset
 
-void battleCameraMain(void);
-__declspec(section ".data") static void* jumptable_80362040[] = {
-    (char*)battleCameraMain + 0x100,
-    (char*)battleCameraMain + 0x14C,
-    (char*)battleCameraMain + 0x1A8,
-    (char*)battleCameraMain + 0x1F0,
-    (char*)battleCameraMain + 0x320,
-    (char*)battleCameraMain + 0x36C,
-    (char*)battleCameraMain + 0x3B8,
-    (char*)battleCameraMain + 0x450,
-    (char*)battleCameraMain + 0x5AC,
-    (char*)battleCameraMain + 0x7D8,
-    (char*)battleCameraMain + 0x964,
-    (char*)battleCameraMain + 0xAD8,
-    (char*)battleCameraMain + 0xD24,
-    (char*)battleCameraMain + 0xD84,
-    (char*)battleCameraMain + 0xEF8,
-    (char*)battleCameraMain + 0xFFC,
-    (char*)battleCameraMain + 0x1054,
-    (char*)battleCameraMain + 0x10AC,
-    (char*)battleCameraMain + 0x10AC,
-    (char*)battleCameraMain + 0x11C0,
-    (char*)battleCameraMain + 0x11D0,
-};
-asm void btl_camera_off_posoffset_manual(s32 pri) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r4)
-	cmpw r3, r0
-	bltlr
-	lwz r0, 0x2754(r4)
-	lfs f0, float_0_8041c454(r2)
-	rlwinm r0, r0, 0, 27, 25
-	stw r0, 0x2754(r4)
-	stfs f0, 0x27b0(r4)
-	stfs f0, 0x27b4(r4)
-	stfs f0, 0x27b8(r4)
-	blr
-}
-
-asm s32 evt_btl_camera_set_posoffset(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x28(r1)
-	stfd f30, 0x20(r1)
-	stmw r29, 0x14(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetFloat
-	fmr f31, f1
-	lwz r4, 0x8(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f30, f1
-	lwz r4, 0xc(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f0, f1
-	mr r3, r30
-	fmr f1, f31
-	fmr f2, f30
-	fmr f3, f0
-	bl btl_camera_set_posoffset
-	lfd f31, 0x28(r1)
-	li r3, 0x2
-	lfd f30, 0x20(r1)
-	lmw r29, 0x14(r1)
-	lwz r0, 0x34(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void btl_camera_set_posoffset(s32 pri, f32 x, f32 y, f32 z) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r4)
-	cmpw r3, r0
-	bltlr
-	lwz r0, 0x2754(r4)
-	ori r0, r0, 0x20
-	stw r0, 0x2754(r4)
-	stfs f1, 0x27b0(r4)
-	stfs f2, 0x27b4(r4)
-	stfs f3, 0x27b8(r4)
-	blr
-}
-
-asm s32 evt_btl_camera_nomove_z_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_nomove_z_onoff
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_nomove_z_onoff(s32 pri, s32 on) {
-	nofralloc
-	lwz r5, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r5)
-	cmpw r3, r0
-	bltlr
-	cmpwi r4, 0x1
-	bne @1
-	lwz r0, 0x2754(r5)
-	ori r0, r0, 0x10
-	stw r0, 0x2754(r5)
-	blr
-	@1:
-	lwz r0, 0x2754(r5)
-	rlwinm r0, r0, 0, 28, 26
-	stw r0, 0x2754(r5)
-	blr
-}
-
-asm s32 evt_btl_camera_nomove_y_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_nomove_y_onoff
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_nomove_y_onoff(s32 pri, s32 on) {
-	nofralloc
-	lwz r5, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r5)
-	cmpw r3, r0
-	bltlr
-	cmpwi r4, 0x1
-	bne @1
-	lwz r0, 0x2754(r5)
-	ori r0, r0, 0x8
-	stw r0, 0x2754(r5)
-	blr
-	@1:
-	lwz r0, 0x2754(r5)
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x2754(r5)
-	blr
-}
-
-asm s32 evt_btl_camera_nomove_x_onoff(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_nomove_x_onoff
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_nomove_x_onoff(s32 pri, s32 on) {
-	nofralloc
-	lwz r5, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r5)
-	cmpw r3, r0
-	bltlr
-	cmpwi r4, 0x1
-	bne @1
-	lwz r0, 0x2754(r5)
-	ori r0, r0, 0x4
-	stw r0, 0x2754(r5)
-	blr
-	@1:
-	lwz r0, 0x2754(r5)
-	rlwinm r0, r0, 0, 30, 28
-	stw r0, 0x2754(r5)
-	blr
-}
-
-asm s32 evt_btl_camera_noshake(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	bl btl_camera_noshake
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_noshake(s32 pri) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r4)
-	cmpw r3, r0
-	bltlr
-	lwz r0, 0x2754(r4)
-	clrrwi r0, r0, 1
-	stw r0, 0x2754(r4)
-	lwz r0, 0x2754(r4)
-	rlwinm r0, r0, 0, 31, 29
-	stw r0, 0x2754(r4)
-	blr
-}
-
-asm s32 evt_btl_camera_shake_h(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stfd f31, 0x40(r1)
-	psq_st f31, 0x48(r1), 0, 0
-	stfd f30, 0x30(r1)
-	psq_st f30, 0x38(r1), 0, 0
-	stmw r29, 0x24(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802efcb0@ha
-	stw r3, 0xc(r1)
-	addi r5, r4, double_to_int_802efcb0@l
-	lwz r4, 0x8(r31)
-	stw r0, 0x8(r1)
-	mr r3, r29
-	lfd f1, 0x0(r5)
-	lfd f0, 0x8(r1)
-	fsubs f31, f0, f1
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802efcb0@ha
-	stw r3, 0x14(r1)
-	addi r5, r4, double_to_int_802efcb0@l
-	lwz r4, 0xc(r31)
-	stw r0, 0x10(r1)
-	mr r3, r29
-	lfd f1, 0x0(r5)
-	lfd f0, 0x10(r1)
-	fsubs f30, f0, f1
-	bl evtGetValue
-	lwz r4, 0x10(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	fmr f1, f31
-	mr r5, r3
-	fmr f2, f30
-	mr r3, r30
-	mr r4, r31
-	bl btl_camera_shake_h
-	li r3, 0x2
-	psq_l f31, 0x48(r1), 0, 0
-	lfd f31, 0x40(r1)
-	psq_l f30, 0x38(r1), 0, 0
-	lfd f30, 0x30(r1)
-	lmw r29, 0x24(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void btl_camera_shake_h(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r6, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r6)
-	cmpw r3, r0
-	blt @1
-	lwz r0, 0x2754(r6)
-	ori r0, r0, 0x2
-	stw r0, 0x2754(r6)
-	stfs f1, 0x2848(r6)
-	stfs f2, 0x284c(r6)
-	stw r5, 0x282c(r6)
-	stw r4, 0x2834(r6)
-	stw r4, 0x283c(r6)
-	lwz r0, 0x2754(r6)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @1
-	li r3, 0x0
-	bl padRumbleOn
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 evt_btl_camera_shake_w(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	stfd f31, 0x40(r1)
-	psq_st f31, 0x48(r1), 0, 0
-	stfd f30, 0x30(r1)
-	psq_st f30, 0x38(r1), 0, 0
-	stmw r29, 0x24(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802efcb0@ha
-	stw r3, 0xc(r1)
-	addi r5, r4, double_to_int_802efcb0@l
-	lwz r4, 0x8(r31)
-	stw r0, 0x8(r1)
-	mr r3, r29
-	lfd f1, 0x0(r5)
-	lfd f0, 0x8(r1)
-	fsubs f31, f0, f1
-	bl evtGetValue
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	lis r4, double_to_int_802efcb0@ha
-	stw r3, 0x14(r1)
-	addi r5, r4, double_to_int_802efcb0@l
-	lwz r4, 0xc(r31)
-	stw r0, 0x10(r1)
-	mr r3, r29
-	lfd f1, 0x0(r5)
-	lfd f0, 0x10(r1)
-	fsubs f30, f0, f1
-	bl evtGetValue
-	lwz r4, 0x10(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	fmr f1, f31
-	mr r5, r3
-	fmr f2, f30
-	mr r3, r30
-	mr r4, r31
-	bl btl_camera_shake_w
-	li r3, 0x2
-	psq_l f31, 0x48(r1), 0, 0
-	lfd f31, 0x40(r1)
-	psq_l f30, 0x38(r1), 0, 0
-	lfd f30, 0x30(r1)
-	lmw r29, 0x24(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void btl_camera_shake_w(s32 pri, f32 a, f32 b, s32 frames, s32 type) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r6, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r6)
-	cmpw r3, r0
-	blt @1
-	lwz r0, 0x2754(r6)
-	ori r0, r0, 0x1
-	stw r0, 0x2754(r6)
-	stfs f1, 0x2840(r6)
-	stfs f2, 0x2844(r6)
-	stw r5, 0x2828(r6)
-	stw r4, 0x2830(r6)
-	stw r4, 0x2838(r6)
-	lwz r0, 0x2754(r6)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @1
-	li r3, 0x0
-	bl padRumbleOn
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 evt_btl_camera_set_moveto(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	stw r0, 0x54(r1)
-	addi r11, r1, 0x50
-	bl _savefpr_26
-	stmw r29, 0x14(r1)
-	mr r29, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetFloat
-	fmr f31, f1
-	lwz r4, 0x8(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f30, f1
-	lwz r4, 0xc(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f29, f1
-	lwz r4, 0x10(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f28, f1
-	lwz r4, 0x14(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f27, f1
-	lwz r4, 0x18(r31)
-	mr r3, r29
-	bl evtGetFloat
-	fmr f26, f1
-	lwz r4, 0x1c(r31)
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x20(r31)
-	mr r31, r3
-	mr r3, r29
-	bl evtGetValue
-	fmr f1, f31
-	mr r5, r3
-	fmr f2, f30
-	mr r3, r30
-	fmr f3, f29
-	mr r4, r31
-	fmr f4, f28
-	fmr f5, f27
-	fmr f6, f26
-	bl btl_camera_set_moveto
-	li r3, 0x2
-	addi r11, r1, 0x50
-	bl _restfpr_26
-	lmw r29, 0x14(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void btl_camera_set_moveto(s32 pri, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ, s32 frames,
-                           s32 type) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stfd f29, 0x50(r1)
-	psq_st f29, 0x58(r1), 0, 0
-	stfd f28, 0x40(r1)
-	psq_st f28, 0x48(r1), 0, 0
-	stfd f27, 0x30(r1)
-	psq_st f27, 0x38(r1), 0, 0
-	stfd f26, 0x20(r1)
-	psq_st f26, 0x28(r1), 0, 0
-	stmw r28, 0x10(r1)
-	fmr f26, f1
-	mr r28, r3
-	fmr f27, f2
-	lwz r31, _battleWorkPointer(r13)
-	fmr f28, f3
-	mr r29, r4
-	fmr f29, f4
-	mr r30, r5
-	fmr f30, f5
-	li r3, 0x4
-	fmr f31, f6
-	bl camGetPtr
-	lwz r0, 0x275c(r31)
-	cmpw r28, r0
-	blt @1
-	lfs f0, 0xc(r3)
-	stfs f0, 0x27e0(r31)
-	lfs f0, 0x10(r3)
-	stfs f0, 0x27e4(r31)
-	lfs f0, 0x14(r3)
-	stfs f0, 0x27e8(r31)
-	stfs f26, 0x27ec(r31)
-	stfs f27, 0x27f0(r31)
-	stfs f28, 0x27f4(r31)
-	lfs f0, 0x18(r3)
-	stfs f0, 0x27f8(r31)
-	lfs f0, 0x1c(r3)
-	stfs f0, 0x27fc(r31)
-	lfs f0, 0x20(r3)
-	stfs f0, 0x2800(r31)
-	stfs f29, 0x2804(r31)
-	stfs f30, 0x2808(r31)
-	stfs f31, 0x280c(r31)
-	stw r29, 0x27d8(r31)
-	stw r29, 0x27dc(r31)
-	stw r30, 0x27d4(r31)
-	@1:
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	psq_l f29, 0x58(r1), 0, 0
-	lfd f29, 0x50(r1)
-	psq_l f28, 0x48(r1), 0, 0
-	lfd f28, 0x40(r1)
-	psq_l f27, 0x38(r1), 0, 0
-	lfd f27, 0x30(r1)
-	psq_l f26, 0x28(r1), 0, 0
-	lfd f26, 0x20(r1)
-	lmw r28, 0x10(r1)
-	lwz r0, 0x84(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm s32 evt_btl_camera_set_zoomSpeedLv(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_set_zoomSpeedLv
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 evt_btl_camera_set_moveSpeedLv(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_set_moveSpeedLv
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_set_zoomSpeedLv(s32 pri, s32 lv) {
-	nofralloc
-	lwz r5, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r5)
-	cmpw r3, r0
-	bltlr
-	cmpwi r4, 0x0
-	blt @1
-	cmpwi r4, 0x5
-	bgt @1
-	sth r4, 0x277e(r5)
-	blr
-	@1:
-	li r0, 0x1
-	sth r0, 0x277e(r5)
-	blr
-}
-
-asm void btl_camera_set_moveSpeedLv(s32 pri, s32 lv) {
-	nofralloc
-	lwz r5, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r5)
-	cmpw r3, r0
-	bltlr
-	cmpwi r4, 0x0
-	blt @1
-	cmpwi r4, 0x5
-	bgt @1
-	sth r4, 0x277c(r5)
-	b @2
-	@1:
-	li r0, 0x1
-	sth r0, 0x277c(r5)
-	@2:
-	lha r0, 0x277c(r5)
-	sth r0, 0x277e(r5)
-	blr
-}
-
-asm s32 evt_btl_camera_add_zoom(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r30, 0x18(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetFloat
-	fctiwz f0, f1
-	lis r0, 0x4330
-	lis r3, double_to_int_802efcb0@ha
-	stw r0, 0x10(r1)
-	addi r4, r3, double_to_int_802efcb0@l
-	stfd f0, 0x8(r1)
-	lfd f1, 0x0(r4)
-	mr r3, r31
-	lwz r0, 0xc(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x14(r1)
-	lfd f0, 0x10(r1)
-	fsubs f1, f0, f1
-	bl btl_camera_add_zoom
-	lmw r30, 0x18(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 evt_btl_camera_set_zoom(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stmw r30, 0x18(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetFloat
-	fctiwz f0, f1
-	lis r0, 0x4330
-	lis r3, double_to_int_802efcb0@ha
-	stw r0, 0x10(r1)
-	addi r4, r3, double_to_int_802efcb0@l
-	stfd f0, 0x8(r1)
-	lfd f1, 0x0(r4)
-	mr r3, r31
-	lwz r0, 0xc(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x14(r1)
-	lfd f0, 0x10(r1)
-	fsubs f1, f0, f1
-	bl btl_camera_set_zoom
-	lmw r30, 0x18(r1)
-	li r3, 0x2
-	lwz r0, 0x24(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void btl_camera_add_zoom(s32 pri, f32 zoom) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r4)
-	cmpw r3, r0
-	bltlr
-	lfs f0, 0x2778(r4)
-	fadds f0, f0, f1
-	stfs f0, 0x2778(r4)
-	blr
-}
-
-asm void btl_camera_set_zoom(s32 pri, f32 zoom) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r4)
-	cmpw r3, r0
-	bltlr
-	stfs f1, 0x2778(r4)
-	blr
-}
-
-asm s32 evt_btl_camera_set_homing_unit_audience(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stmw r25, 0x44(r1)
-	mr r25, r3
-	lwz r28, 0x18(r3)
-	lwz r4, 0x0(r28)
-	bl evtGetValue
-	lwz r4, 0x4(r28)
-	mr r27, r3
-	mr r3, r25
-	bl evtGetValue
-	lwz r4, 0x8(r28)
-	mr r26, r3
-	mr r3, r25
-	bl evtGetValue
-	lwz r4, 0xc(r28)
-	mr r28, r3
-	mr r3, r25
-	bl evtGetValue
-	lwz r30, _battleWorkPointer(r13)
-	mr r31, r3
-	bl BattleAudienceBaseGetPtr
-	lwz r0, 0x275c(r30)
-	mr r29, r3
-	cmpw r27, r0
-	bge @1
-	li r3, 0x2
-	b @2
-	@1:
-	mr r3, r25
-	mr r4, r26
-	bl BattleTransID
-	stw r3, 0x2764(r30)
-	mr r3, r30
-	stw r28, 0x276c(r30)
-	lwz r4, 0x2764(r30)
-	bl BattleGetUnitPtr
-	mr r0, r3
-	lwz r3, 0x2764(r30)
-	lwz r4, 0x276c(r30)
-	mr r26, r0
-	bl BattleGetUnitPartsPtr
-	mr r0, r3
-	addi r5, r1, 0x30
-	addi r6, r1, 0x34
-	mr r3, r26
-	mr r27, r0
-	addi r4, r1, 0x2c
-	bl BtlUnit_GetPos
-	mr r3, r26
-	mr r4, r27
-	addi r5, r1, 0x20
-	addi r6, r1, 0x24
-	addi r7, r1, 0x28
-	bl BtlUnit_GetHitPos
-	lis r4, vec3_802efc94@ha
-	lis r3, vec3_802efca0@ha
-	addi r7, r4, vec3_802efc94@l
-	lfs f0, 0x2c(r1)
-	lwz r0, 0x0(r7)
-	mulli r4, r31, 0x134
-	lwz r5, 0x4(r7)
-	addi r6, r3, vec3_802efca0@l
-	stw r0, 0x14(r1)
-	li r3, 0x2
-	lwz r0, 0x8(r7)
-	stfs f0, 0x14(r1)
-	addi r7, r4, 0x1bc
-	lfs f1, 0x30(r1)
-	add r7, r29, r7
-	stw r5, 0x18(r1)
-	lfs f0, 0x34(r1)
-	stw r0, 0x1c(r1)
-	lwz r0, 0x14(r1)
-	stfs f1, 0x18(r1)
-	stfs f0, 0x1c(r1)
-	lwz r4, 0x18(r1)
-	stw r0, 0x2810(r30)
-	lwz r0, 0x1c(r1)
-	stw r4, 0x2814(r30)
-	stw r0, 0x2818(r30)
-	stw r31, 0x2774(r30)
-	lwz r5, 0x0(r6)
-	lwz r4, 0x4(r6)
-	lwz r0, 0x8(r6)
-	stw r5, 0x8(r1)
-	lfs f0, 0x48(r7)
-	stw r4, 0xc(r1)
-	lfs f1, 0x4c(r7)
-	stfs f0, 0x8(r1)
-	lfs f0, 0x50(r7)
-	stw r0, 0x10(r1)
-	lwz r0, 0x8(r1)
-	stfs f1, 0xc(r1)
-	stfs f0, 0x10(r1)
-	lwz r4, 0xc(r1)
-	stw r0, 0x281c(r30)
-	lwz r0, 0x10(r1)
-	stw r4, 0x2820(r30)
-	stw r0, 0x2824(r30)
-	@2:
-	lmw r25, 0x44(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
-asm s32 evt_btl_camera_set_homing_unitparts(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x60(r1)
-	mflr r0
-	stw r0, 0x64(r1)
-	stmw r25, 0x44(r1)
-	mr r29, r3
-	lwz r28, 0x18(r3)
-	lwz r4, 0x0(r28)
-	bl evtGetValue
-	lwz r4, 0x4(r28)
-	mr r26, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x8(r28)
-	mr r25, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0xc(r28)
-	mr r27, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r4, 0x10(r28)
-	mr r30, r3
-	mr r3, r29
-	bl evtGetValue
-	lwz r31, _battleWorkPointer(r13)
-	mr r28, r3
-	lwz r0, 0x275c(r31)
-	cmpw r26, r0
-	bge @1
-	li r3, 0x2
-	b @2
-	@1:
-	mr r3, r29
-	mr r4, r25
-	bl BattleTransID
-	stw r3, 0x2764(r31)
-	mr r3, r31
-	stw r27, 0x276c(r31)
-	lwz r4, 0x2764(r31)
-	bl BattleGetUnitPtr
-	mr r26, r3
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	addi r5, r1, 0x30
-	addi r6, r1, 0x34
-	mr r3, r26
-	addi r4, r1, 0x2c
-	bl BtlUnit_GetHomePos
-	lis r3, vec3_802efc7c@ha
-	lfs f2, 0x2c(r1)
-	addi r4, r3, vec3_802efc7c@l
-	lfs f1, 0x30(r1)
-	lwz r0, 0x0(r4)
-	cmpwi r30, -0x1
-	lwz r3, 0x4(r4)
-	stw r0, 0x14(r1)
-	lwz r0, 0x8(r4)
-	stw r3, 0x18(r1)
-	lfs f0, 0x34(r1)
-	stfs f2, 0x14(r1)
-	stw r0, 0x1c(r1)
-	lwz r0, 0x14(r1)
-	stfs f1, 0x18(r1)
-	stfs f0, 0x1c(r1)
-	lwz r3, 0x18(r1)
-	stw r0, 0x2810(r31)
-	lwz r0, 0x1c(r1)
-	stw r3, 0x2814(r31)
-	stw r0, 0x2818(r31)
-	beq @3
-	mr r3, r29
-	mr r4, r30
-	bl BattleTransID
-	stw r3, 0x2768(r31)
-	mr r3, r31
-	stw r28, 0x2770(r31)
-	lwz r4, 0x2768(r31)
-	bl BattleGetUnitPtr
-	mr r26, r3
-	lwz r3, 0x2768(r31)
-	lwz r4, 0x2770(r31)
-	bl BattleGetUnitPartsPtr
-	mr r4, r3
-	addi r6, r1, 0x24
-	addi r7, r1, 0x28
-	mr r3, r26
-	addi r5, r1, 0x20
-	bl BtlUnit_GetHitPos
-	lis r3, vec3_802efc88@ha
-	lfs f2, 0x20(r1)
-	addi r4, r3, vec3_802efc88@l
-	lfs f1, 0x24(r1)
-	lwz r0, 0x0(r4)
-	lwz r3, 0x4(r4)
-	stw r0, 0x8(r1)
-	lwz r0, 0x8(r4)
-	stw r3, 0xc(r1)
-	lfs f0, 0x28(r1)
-	stfs f2, 0x8(r1)
-	stw r0, 0x10(r1)
-	lwz r0, 0x8(r1)
-	stfs f1, 0xc(r1)
-	stfs f0, 0x10(r1)
-	lwz r3, 0xc(r1)
-	stw r0, 0x281c(r31)
-	lwz r0, 0x10(r1)
-	stw r3, 0x2820(r31)
-	stw r0, 0x2824(r31)
-	@3:
-	li r3, 0x2
-	@2:
-	lmw r25, 0x44(r1)
-	lwz r0, 0x64(r1)
-	mtlr r0
-	addi r1, r1, 0x60
-	blr
-}
-
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
 asm s32 evt_btl_camera_set_homing_unit(EventEntry* event, BOOL isFirstCall) {
 	nofralloc
 	stwu r1, -0x50(r1)
@@ -2414,7 +1954,7 @@ asm s32 evt_btl_camera_set_homing_unit(EventEntry* event, BOOL isFirstCall) {
 	lwz r0, 0x1c(r1)
 	stw r3, 0x2814(r31)
 	stw r0, 0x2818(r31)
-	beq @1
+	beq L_af_1
 	mr r3, r30
 	mr r4, r28
 	bl BattleTransID
@@ -2454,7 +1994,7 @@ asm s32 evt_btl_camera_set_homing_unit(EventEntry* event, BOOL isFirstCall) {
 	lwz r0, 0x10(r1)
 	stw r3, 0x2820(r31)
 	stw r0, 0x2824(r31)
-	@1:
+L_af_1:
 	lmw r28, 0x40(r1)
 	li r3, 0x2
 	lwz r0, 0x54(r1)
@@ -2463,2211 +2003,2085 @@ asm s32 evt_btl_camera_set_homing_unit(EventEntry* event, BOOL isFirstCall) {
 	blr
 }
 
-asm s32 evt_btl_camera_set_mode(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	mr r30, r3
-	lwz r31, 0x18(r3)
-	lwz r4, 0x0(r31)
-	bl evtGetValue
-	lwz r4, 0x4(r31)
-	mr r31, r3
-	mr r3, r30
-	bl evtGetValue
-	mr r0, r3
-	mr r3, r31
-	mr r4, r0
-	bl btl_camera_set_mode
-	lmw r30, 0x8(r1)
-	li r3, 0x2
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void battleCameraInit(void) {
+	asm {
+		li r4, 0x0
+		li r5, 0x104
+	}
+	asm volatile {
+		lwz r31, _battleWorkPointer(r13)
+		addi r30, r31, 0x2754
+		opword 0x7FC3F378
+		bl memset
+		opword 0x38000000
+		opword 0x901E0000
+		opword 0x807F2738
+		opword 0x80030008
+		opword 0x2C000009
+		opword 0x41820024
+		opword 0x40800034
+		opword 0x2C000000
+		opword 0x41820024
+		opword 0x40800008
+		opword 0x48000024
+		opword 0x3800000F
+		opword 0x901E000C
+		opword 0x48000018
+		opword 0x38000010
+		opword 0x901E000C
+		opword 0x4800000C
+		opword 0x3800000E
+		opword 0x901E000C
+		opword 0x38A00000
+		lis r3, vec3_802efc40@ha
+		opword 0x90BE0008
+		opword 0x38000001
+		lfs f0, float_0_8041c454(r2)
+		addi r4, r3, vec3_802efc40@l
+		opword 0xD01E0024
+		opword 0xB01E0028
+		opword 0xB01E002A
+		opword 0x80640000
+		opword 0x80040004
+		opword 0x907E005C
+		opword 0x901E0060
+		opword 0x80040008
+		opword 0x901E0064
+		opword 0x90BE0004
+	}
 }
+#pragma pop
 
-asm void btl_camera_set_mode(s32 pri, s32 mode) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	lwz r31, _battleWorkPointer(r13)
-	lwz r0, 0x275c(r31)
-	cmpw r3, r0
-	blt @1
-	stw r4, 0x2760(r31)
-	li r5, 0x1
-	lfs f0, float_0_8041c454(r2)
-	li r0, 0x0
-	li r3, 0x0
-	li r4, 0x0
-	stfs f0, 0x2778(r31)
-	sth r5, 0x277c(r31)
-	sth r5, 0x277e(r31)
-	stw r0, 0x2758(r31)
-	bl btl_camera_nomove_x_onoff
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_nomove_y_onoff
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_nomove_z_onoff
-	lwz r0, 0x2754(r31)
-	rlwinm r0, r0, 0, 27, 25
-	stw r0, 0x2754(r31)
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void battleCameraMain(void) {
+	char _af_pad[180];
+	asm volatile {
+		lis r4, vec3_802efc40@ha
+		opword 0x38600004
+		addi r29, r4, vec3_802efc40@l
+		bl camGetPtr
+		lwz r31, _battleWorkPointer(r13)
+		opword 0x7C7E1B78
+		bl BattleAudienceBaseGetPtr
+		lfs f30, float_0_8041c454(r2)
+		opword 0x7C7C1B78
+		opword 0x7FE3FB78
+		bl BattleGetMarioPtr
+		lfs f0, float_0_8041c454(r2)
+		stfs f0, _af_pad+44(r1)
+		opword 0xD0010030
+		opword 0xD001002C
+		opword 0xD0010028
+		opword 0xD0010024
+		opword 0xD0010020
+		opword 0x801F2760
+		opword 0x2C000003
+		opword 0x4182000C
+		opword 0x38000000
+		opword 0x901F27D8
+		opword 0xC01F2780
+		opword 0xD01E000C
+		opword 0xC01F2784
+		opword 0xD01E0010
+		opword 0xC01F2788
+		opword 0xD01E0014
+		opword 0xC01F2798
+		opword 0xD01E0018
+		opword 0xC01F279C
+		opword 0xD01E001C
+		opword 0xC01F27A0
+		opword 0xD01E0020
+		opword 0xC01E000C
+		opword 0xD01F278C
+		opword 0xC01E0010
+		opword 0xD01F2790
+		opword 0xC01E0014
+		opword 0xD01F2794
+		opword 0xC01E0018
+		opword 0xD01F27A4
+		opword 0xC01E001C
+		opword 0xD01F27A8
+		opword 0xC01E0020
+		opword 0xD01F27AC
+		opword 0x801F2760
+		opword 0x28000014
+		opword 0x41811144
+		lis r3, jumptable_80362040@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_80362040@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38A10034
+		lfs f2, float_110_8041c480(r2)
+		opword 0x38C10030
+		opword 0xFC800890
+		lfs f3, float_750_8041c484(r2)
+		opword 0xFCC00890
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0078
+		bl strcpy
+		opword 0x480010EC
+		lfs f2, float_0p5_8041c460(r2)
+		opword 0x38A10034
+		opword 0xC01F2778
+		opword 0x38C10030
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38E1002C
+		opword 0xECC20032
+		lfs f0, float_750_8041c484(r2)
+		opword 0xFC800890
+		lfs f2, float_110_8041c480(r2)
+		lfs f5, float_60_8041c488(r2)
+		opword 0x39010028
+		opword 0xEC603028
+		opword 0x39210024
+		opword 0xFCC03050
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D008C
+		bl strcpy
+		opword 0x48001090
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38A10034
+		lfs f2, float_160_8041c48c(r2)
+		opword 0x38C10030
+		opword 0xFC800890
+		lfs f3, float_750_8041c484(r2)
+		opword 0xFCC00890
+		lfs f5, float_110_8041c480(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D00A8
+		bl strcpy
+		opword 0x807F27D8
+		opword 0x2C030000
+		opword 0x40810118
+		opword 0xAB9F277C
+		opword 0x3803FFFF
+		opword 0x901F27D8
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F27E0
+		opword 0x7C802850
+		opword 0xC05F27EC
+		bl intplGetValue
+		opword 0xD021005C
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F27E4
+		opword 0x7C802850
+		opword 0xC05F27F0
+		bl intplGetValue
+		opword 0xD0210060
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F27E8
+		opword 0x7C802850
+		opword 0xC05F27F4
+		bl intplGetValue
+		opword 0xD0210064
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F27F8
+		opword 0x7C802850
+		opword 0xC05F2804
+		bl intplGetValue
+		opword 0xFFE00890
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F27FC
+		opword 0x7C802850
+		opword 0xC05F2808
+		bl intplGetValue
+		opword 0xFFC00890
+		opword 0x80BF27DC
+		opword 0x801F27D8
+		opword 0x807F27D4
+		opword 0xC03F2800
+		opword 0x7C802850
+		opword 0xC05F280C
+		bl intplGetValue
+		opword 0x38000003
+		opword 0xFC80F890
+		opword 0xB01F277C
+		opword 0xFCA0F090
+		opword 0xFCC00890
+		opword 0x38A10034
+		opword 0xB01F277E
+		opword 0x38C10030
+		opword 0x38E1002C
+		opword 0xC021005C
+		opword 0xC0410060
+		opword 0x39010028
+		opword 0xC0610064
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800000
+		bl battleCameraMoveTo
+		opword 0xB39F277C
+		opword 0x38610068
+		opword 0x389D00C4
+		bl strcpy
+		opword 0x48000F18
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38A10034
+		lfs f2, float_110_8041c480(r2)
+		opword 0x38C10030
+		opword 0xFC800890
+		lfs f3, float_neg750_8041c490(r2)
+		opword 0xFCC00890
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D00D4
+		bl strcpy
+		opword 0x48000ECC
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38A10034
+		lfs f2, float_400_8041c494(r2)
+		opword 0x38C10030
+		opword 0xFC800890
+		lfs f3, float_neg617_8041c498(r2)
+		opword 0xFCC00890
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D00E8
+		bl strcpy
+		opword 0x48000E80
+		bl pouchGetPtr
+		opword 0xA8030088
+		opword 0x2C000002
+		opword 0x41820034
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x41820018
+		opword 0x4080001C
+		opword 0x4800002C
+		opword 0x2C000004
+		opword 0x40800024
+		opword 0x4800001C
+		lfs f30, float_750_8041c484(r2)
+		opword 0x48000018
+		lfs f30, float_830_8041c49c(r2)
+		opword 0x48000010
+		lfs f30, float_920_8041c4a0(r2)
+		opword 0x48000008
+		lfs f30, float_1000_8041c4a4(r2)
+		lfs f1, float_0_8041c454(r2)
+		opword 0xFC60F090
+		lfs f2, float_110_8041c480(r2)
+		opword 0x38A10034
+		opword 0xFC800890
+		lfs f5, float_60_8041c488(r2)
+		opword 0xFCC00890
+		opword 0x38C10030
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0100
+		bl strcpy
+		opword 0x48000DE8
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x7C7C1B79
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x48000DC4
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x38A10060
+		opword 0x7F83E378
+		opword 0x3881005C
+		opword 0x38C10064
+		bl BtlUnit_GetPos
+		opword 0x7F83E378
+		bl BtlUnit_GetHeight
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		opword 0x7F83E378
+		opword 0xC87D0070
+		opword 0x900100A8
+		lfs f2, float_50_8041c4a8(r2)
+		opword 0xC80100A8
+		lfs f1, float_0p5_8041c460(r2)
+		opword 0xEC601828
+		opword 0xC0010060
+		opword 0xEC431028
+		opword 0xEC220072
+		opword 0xEC00082A
+		opword 0xD0010060
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100B4
+		opword 0xC87D0070
+		opword 0x900100B0
+		lfs f1, float_24_8041c4ac(r2)
+		opword 0xC84100B0
+		lfs f0, float_0_8041c454(r2)
+		opword 0xEC421828
+		opword 0xEC220828
+		opword 0xFC010040
+		opword 0x40800008
+		opword 0xFC200090
+		opword 0xC0BF2778
+		lfs f0, float_1p5_8041c46c(r2)
+		opword 0xC0610060
+		opword 0xECA0287C
+		lfs f0, float_100_8041c464(r2)
+		lfs f1, float_9_8041c4b0(r2)
+		opword 0xFC401890
+		opword 0xFC030040
+		opword 0xFCC02850
+		opword 0xECE60824
+		opword 0x40810008
+		opword 0xFC600090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC020040
+		opword 0x40800008
+		opword 0xFC600090
+		lfs f1, float_110_8041c480(r2)
+		opword 0x38A10034
+		lfs f0, float_60_8041c488(r2)
+		opword 0x38C10030
+		opword 0xEC41182A
+		opword 0xC021005C
+		opword 0xEC00182A
+		lfs f3, float_750_8041c484(r2)
+		opword 0xFC800890
+		opword 0x38E1002C
+		opword 0xEC632828
+		opword 0x39010028
+		opword 0xEC42382A
+		opword 0x39210024
+		opword 0xECA0382A
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0114
+		bl strcpy
+		opword 0x48000C8C
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x809F2768
+		opword 0x7C7A1B78
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x281A0000
+		opword 0x7C7C1B78
+		opword 0x4182000C
+		opword 0x281C0000
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x48000C4C
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x807F2768
+		opword 0x809F2770
+		bl BattleGetUnitPartsPtr
+		opword 0x7C7B1B78
+		opword 0x38A10060
+		opword 0x7F43D378
+		opword 0x3881005C
+		opword 0x38C10064
+		bl BtlUnit_GetPos
+		opword 0x7F83E378
+		opword 0x7F64DB78
+		opword 0x38A10050
+		opword 0x38C10054
+		opword 0x38E10058
+		bl BtlUnit_GetHitPos
+		opword 0x7F43D378
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100B4
+		opword 0x7F83E378
+		opword 0xC85D0070
+		opword 0x900100B0
+		lfs f0, float_24_8041c4ac(r2)
+		opword 0xC82100B0
+		opword 0xEC211028
+		opword 0xEFC10028
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lfs f0, float_0_8041c454(r2)
+		opword 0x900100A8
+		opword 0xC87D0070
+		opword 0xFC1E0040
+		opword 0xC84100A8
+		lfs f1, float_24_8041c4ac(r2)
+		opword 0xEC421828
+		opword 0xEC620828
+		opword 0x40800008
+		opword 0xFFC00090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC030040
+		opword 0x40800008
+		opword 0xFC600090
+		opword 0xC0DF281C
+		opword 0xC01F2810
+		opword 0xC0410050
+		opword 0xC021005C
+		opword 0xEC860028
+		lfs f0, float_0_8041c454(r2)
+		opword 0xEC220828
+		opword 0xFC002000
+		opword 0x4082000C
+		lfs f8, float_0p5_8041c460(r2)
+		opword 0x48000008
+		opword 0xED012024
+		lfs f0, float_1_8041c470(r2)
+		opword 0xFC080040
+		opword 0x40810008
+		opword 0xFD000090
+		lfs f0, float_0p5_8041c460(r2)
+		opword 0xFC080040
+		opword 0x40800008
+		opword 0xFD000090
+		lfs f1, float_2_8041c450(r2)
+		opword 0xEC5E182A
+		opword 0xC01F2778
+		lfs f3, float_1_8041c470(r2)
+		opword 0xEC010032
+		lfs f1, float_1p5_8041c46c(r2)
+		opword 0xECE34028
+		opword 0xC0BF2820
+		lfs f4, float_80_8041c4b4(r2)
+		opword 0xEC2100BC
+		opword 0xC0610060
+		opword 0xEC852024
+		lfs f2, float_10_8041c4b8(r2)
+		lfs f0, float_100_8041c464(r2)
+		opword 0xED470072
+		opword 0xEC632828
+		opword 0xEC2701B2
+		opword 0xFCC05050
+		opword 0xED2400F2
+		opword 0xED661024
+		opword 0xFC090040
+		opword 0x40810008
+		opword 0xFD200090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC090040
+		opword 0x40800008
+		opword 0xFD200090
+		opword 0xC81D0138
+		opword 0xFC800890
+		lfs f2, float_750_8041c484(r2)
+		opword 0x38A10034
+		opword 0xFC604028
+		opword 0xC91D0130
+		lfs f5, float_110_8041c480(r2)
+		lfs f0, float_60_8041c488(r2)
+		opword 0x38C10030
+		opword 0xFCE01850
+		opword 0xEC625028
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0xFCE849FA
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		opword 0xFCE03818
+		opword 0xEC45382A
+		opword 0xEC00382A
+		opword 0xEC42582A
+		opword 0xECA0582A
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0140
+		bl strcpy
+		opword 0x48000A60
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x809F2768
+		opword 0x7C7B1B78
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x281B0000
+		opword 0x7C7A1B78
+		opword 0x4182000C
+		opword 0x281A0000
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x48000A20
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x807F2768
+		opword 0x809F2770
+		bl BattleGetUnitPartsPtr
+		opword 0x7C791B78
+		opword 0x38A10060
+		opword 0x7F63DB78
+		opword 0x3881005C
+		opword 0x38C10064
+		bl BtlUnit_GetPos
+		opword 0x38C10054
+		opword 0x7F43D378
+		opword 0x7F24CB78
+		opword 0x38A10050
+		opword 0x38E10058
+		bl BtlUnit_GetHitPos
+		opword 0x7F63DB78
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100B4
+		opword 0x7F43D378
+		opword 0xC85D0070
+		opword 0x900100B0
+		lfs f0, float_24_8041c4ac(r2)
+		opword 0xC82100B0
+		opword 0xEC211028
+		opword 0xEFC10028
+		bl BtlUnit_GetWidth
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC1E0040
+		opword 0x40800008
+		opword 0xFFC00090
+		lfs f1, float_2_8041c450(r2)
+		opword 0xC01F2778
+		lfs f3, float_1p5_8041c46c(r2)
+		opword 0xECE10032
+		lfs f1, float_10_8041c4b8(r2)
+		opword 0xC0410060
+		opword 0xC0010054
+		opword 0xECE33FBC
+		lfs f3, float_0p5_8041c460(r2)
+		opword 0xEC42002A
+		lfs f0, float_50_8041c4a8(r2)
+		opword 0xFCC03850
+		opword 0xEC4300B2
+		opword 0xED060824
+		opword 0xFC020040
+		opword 0x40810008
+		opword 0xFFE00090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC020040
+		opword 0x40800008
+		opword 0xFFE00090
+		opword 0xC061005C
+		opword 0x38A10034
+		opword 0xC0410050
+		opword 0x38C10030
+		lfs f0, float_60_8041c488(r2)
+		opword 0x38E1002C
+		opword 0xEC83102A
+		lfs f1, float_110_8041c480(r2)
+		lfs f5, float_0p5_8041c460(r2)
+		opword 0xEC00F82A
+		opword 0xEC41F82A
+		lfs f3, float_750_8041c484(r2)
+		opword 0xEC250132
+		opword 0x39010028
+		opword 0xEC42402A
+		opword 0x39210024
+		opword 0xEC633828
+		opword 0x39410020
+		opword 0xFC800890
+		opword 0x38600001
+		opword 0xECA0402A
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0114
+		bl strcpy
+		opword 0x480008D4
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x7C7B1B79
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x480008B0
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x7C641B79
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x4800088C
+		opword 0x38C10060
+		opword 0x7F63DB78
+		opword 0x38A1005C
+		opword 0x38E10064
+		bl BtlUnit_GetHitPos
+		opword 0x7F63DB78
+		bl BtlUnit_GetHeight
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100B4
+		opword 0x7F63DB78
+		opword 0xC87D0070
+		opword 0x900100B0
+		lfs f2, float_50_8041c4a8(r2)
+		opword 0xC80100B0
+		lfs f1, float_0p5_8041c460(r2)
+		opword 0xEC601828
+		opword 0xC0010060
+		opword 0xEC431028
+		opword 0xEC220072
+		opword 0xEC00082A
+		opword 0xD0010060
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		opword 0xC87D0070
+		opword 0x900100A8
+		lfs f1, float_24_8041c4ac(r2)
+		opword 0xC84100A8
+		lfs f0, float_0_8041c454(r2)
+		opword 0xEC421828
+		opword 0xEC220828
+		opword 0xFC010040
+		opword 0x40800008
+		opword 0xFC200090
+		opword 0xC0BF2778
+		lfs f0, float_1p5_8041c46c(r2)
+		opword 0xC0610060
+		opword 0xECA0287C
+		lfs f0, float_100_8041c464(r2)
+		lfs f1, float_9_8041c4b0(r2)
+		opword 0xFC401890
+		opword 0xFC030040
+		opword 0xFCC02850
+		opword 0xECE60824
+		opword 0x40810008
+		opword 0xFC600090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC020040
+		opword 0x40800008
+		opword 0xFC600090
+		lfs f1, float_110_8041c480(r2)
+		opword 0x38A10034
+		lfs f0, float_60_8041c488(r2)
+		opword 0x38C10030
+		opword 0xEC41182A
+		opword 0xC021005C
+		opword 0xEC00182A
+		lfs f3, float_750_8041c484(r2)
+		opword 0xFC800890
+		opword 0x38E1002C
+		opword 0xEC632828
+		opword 0x39010028
+		opword 0xEC42382A
+		opword 0x39210024
+		opword 0xECA0382A
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0160
+		bl strcpy
+		opword 0x48000760
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x809F2768
+		opword 0x7C7B1B78
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x281B0000
+		opword 0x7C7C1B78
+		opword 0x4182000C
+		opword 0x281C0000
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x48000720
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x7C7A1B78
+		opword 0x807F2768
+		opword 0x809F2770
+		bl BattleGetUnitPartsPtr
+		opword 0x281A0000
+		opword 0x7C791B78
+		opword 0x4182000C
+		opword 0x28190000
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x480006E0
+		opword 0x38A10060
+		opword 0x7F43D378
+		opword 0x3881005C
+		opword 0x38C10064
+		bl BtlUnit_GetPartsWorldPos
+		opword 0x7F83E378
+		opword 0x7F24CB78
+		opword 0x38A10050
+		opword 0x38C10054
+		opword 0x38E10058
+		bl BtlUnit_GetHitPos
+		opword 0x7F63DB78
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100B4
+		opword 0x7F83E378
+		opword 0xC85D0070
+		opword 0x900100B0
+		lfs f0, float_24_8041c4ac(r2)
+		opword 0xC82100B0
+		opword 0xEC211028
+		opword 0xEFC10028
+		bl BtlUnit_GetWidth
+		opword 0x6C638000
+		opword 0x3C004330
+		opword 0x906100AC
+		lfs f0, float_0_8041c454(r2)
+		opword 0x900100A8
+		opword 0xC87D0070
+		opword 0xFC1E0040
+		opword 0xC84100A8
+		lfs f1, float_24_8041c4ac(r2)
+		opword 0xEC421828
+		opword 0xEC620828
+		opword 0x40800008
+		opword 0xFFC00090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC030040
+		opword 0x40800008
+		opword 0xFC600090
+		opword 0xC0DF281C
+		opword 0xC01F2810
+		opword 0xC0410050
+		opword 0xC021005C
+		opword 0xEC860028
+		lfs f0, float_0_8041c454(r2)
+		opword 0xEC220828
+		opword 0xFC002000
+		opword 0x40820008
+		lfs f4, float_1Eneg05_8041c4bc(r2)
+		opword 0xED012024
+		lfs f0, float_1_8041c470(r2)
+		opword 0xFC080040
+		opword 0x40810008
+		opword 0xFD000090
+		lfs f0, float_0p5_8041c460(r2)
+		opword 0xFC080040
+		opword 0x40800008
+		opword 0xFD000090
+		lfs f1, float_2_8041c450(r2)
+		opword 0xEC5E182A
+		opword 0xC01F2778
+		lfs f3, float_1_8041c470(r2)
+		opword 0xEC010032
+		lfs f1, float_1p5_8041c46c(r2)
+		opword 0xECE34028
+		opword 0xC0BF2820
+		lfs f4, float_80_8041c4b4(r2)
+		opword 0xEC2100BC
+		opword 0xC0610060
+		opword 0xEC852024
+		lfs f2, float_10_8041c4b8(r2)
+		lfs f0, float_100_8041c464(r2)
+		opword 0xED470072
+		opword 0xEC632828
+		opword 0xEC2701B2
+		opword 0xFCC05050
+		opword 0xED2400F2
+		opword 0xED661024
+		opword 0xFC090040
+		opword 0x40810008
+		opword 0xFD200090
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC090040
+		opword 0x40800008
+		opword 0xFD200090
+		opword 0xC81D0138
+		opword 0xFC800890
+		lfs f2, float_750_8041c484(r2)
+		opword 0x38A10034
+		opword 0xFC604028
+		opword 0xC91D0130
+		lfs f5, float_110_8041c480(r2)
+		lfs f0, float_60_8041c488(r2)
+		opword 0x38C10030
+		opword 0xFCE01850
+		opword 0xEC625028
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0xFCE849FA
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		opword 0xFCE03818
+		opword 0xEC45382A
+		opword 0xEC00382A
+		opword 0xEC42582A
+		opword 0xECA0582A
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0178
+		bl strcpy
+		opword 0x48000514
+		opword 0x801F2774
+		opword 0x38A10034
+		lfs f0, float_400_8041c494(r2)
+		opword 0x38C10030
+		opword 0x1C600134
+		lfs f2, float_200_8041c47c(r2)
+		lfs f5, float_0_8041c454(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x386301BC
+		opword 0x7C7C1A14
+		opword 0x39210024
+		opword 0xC0C30050
+		opword 0x39410020
+		opword 0xC0230048
+		opword 0x38600001
+		opword 0xEC60302A
+		opword 0x38800000
+		opword 0xFC800890
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0194
+		bl strcpy
+		opword 0x480004B4
+		opword 0x809F2764
+		opword 0x7FE3FB78
+		bl BattleGetUnitPtr
+		opword 0x7C7B1B79
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x48000490
+		opword 0x807F2764
+		opword 0x809F276C
+		bl BattleGetUnitPartsPtr
+		opword 0x28030000
+		opword 0x40820014
+		opword 0x38600000
+		opword 0x38800000
+		bl btl_camera_set_mode
+		opword 0x4800046C
+		opword 0x3800000A
+		opword 0x38A10060
+		opword 0x901F2774
+		opword 0x7F63DB78
+		opword 0x3881005C
+		opword 0x38C10064
+		opword 0xC03F281C
+		opword 0xC01F2810
+		opword 0xEFC10028
+		bl BtlUnit_GetPos
+		lfs f0, float_0_8041c454(r2)
+		opword 0xC07F281C
+		opword 0xC021005C
+		opword 0xFC00F000
+		opword 0xEC030828
+		opword 0x4082000C
+		lfs f7, float_0p5_8041c460(r2)
+		opword 0x48000008
+		opword 0xECE0F024
+		lfs f0, float_1_8041c470(r2)
+		opword 0xFC070040
+		opword 0x40810008
+		opword 0xFCE00090
+		lfs f0, float_0p5_8041c460(r2)
+		opword 0xFC070040
+		opword 0x40800008
+		opword 0xFCE00090
+		opword 0xC0410060
+		opword 0xC01F2814
+		lfs f1, float_1_8041c470(r2)
+		opword 0xECA20028
+		lfs f0, float_100_8041c464(r2)
+		opword 0xEC813828
+		lfs f2, float_2_8041c450(r2)
+		opword 0xC03F2778
+		opword 0xECA50028
+		lfs f0, float_0_8041c454(r2)
+		opword 0xECC20072
+		opword 0xEC2400F2
+		opword 0xFC050040
+		opword 0x40810008
+		opword 0xFCA00090
+		lfs f0, float_neg30_8041c4c0(r2)
+		opword 0xFC050040
+		opword 0x40800008
+		opword 0xFCA00090
+		opword 0xC85D0138
+		opword 0xECC401B2
+		lfs f0, float_125_8041c4c4(r2)
+		opword 0xFC800890
+		opword 0xFC623828
+		lfs f2, float_750_8041c484(r2)
+		opword 0xECE02828
+		lfs f5, float_110_8041c480(r2)
+		opword 0x38A10034
+		opword 0xFD001850
+		opword 0xEC623028
+		lfs f0, float_60_8041c488(r2)
+		opword 0xFCC03050
+		opword 0x38C10030
+		opword 0xFCE801F2
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0xFCE03818
+		opword 0x38800001
+		opword 0xEC45382A
+		opword 0xECA0382A
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D01B0
+		bl strcpy
+		opword 0x48000340
+		opword 0x807F2758
+		opword 0x38030001
+		opword 0x901F2758
+		opword 0x801F2758
+		opword 0x2C000001
+		opword 0x40820098
+		bl pouchGetPtr
+		opword 0xA8030088
+		opword 0x2C000002
+		opword 0x41820034
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x41820018
+		opword 0x4080001C
+		opword 0x4800002C
+		opword 0x2C000004
+		opword 0x40800024
+		opword 0x4800001C
+		lfs f30, float_750_8041c484(r2)
+		opword 0x48000018
+		lfs f30, float_830_8041c49c(r2)
+		opword 0x48000010
+		lfs f30, float_920_8041c4a0(r2)
+		opword 0x48000008
+		lfs f30, float_1000_8041c4a4(r2)
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38000003
+		opword 0xB01F277C
+		opword 0xFC60F090
+		opword 0xFC800890
+		lfs f2, float_110_8041c480(r2)
+		opword 0xFCC00890
+		opword 0xB01F277E
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38A10034
+		opword 0x38C10030
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x801F2758
+		opword 0x2C00000A
+		opword 0x40820040
+		opword 0x38000000
+		opword 0x38600000
+		opword 0x901F2758
+		opword 0x38800003
+		bl btl_camera_set_mode
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38600000
+		lfs f2, float_110_8041c480(r2)
+		opword 0x38800078
+		opword 0xFC800890
+		lfs f3, float_750_8041c484(r2)
+		opword 0xFCC00890
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38A00004
+		bl btl_camera_set_moveto
+		opword 0x38610068
+		opword 0x389D01D8
+		bl strcpy
+		opword 0x4800023C
+		lfs f1, float_0_8041c454(r2)
+		opword 0x38000003
+		opword 0xB01F277C
+		opword 0x38A10034
+		opword 0xFC800890
+		lfs f2, float_110_8041c480(r2)
+		opword 0xFCC00890
+		opword 0xB01F277E
+		lfs f3, float_500_8041c4c8(r2)
+		opword 0x38C10030
+		lfs f5, float_60_8041c488(r2)
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D01F4
+		bl strcpy
+		opword 0x480001E4
+		lfs f1, float_neg100_8041c468(r2)
+		opword 0x38000003
+		opword 0xB01F277C
+		opword 0x38A10034
+		opword 0xFC800890
+		lfs f2, float_110_8041c480(r2)
+		opword 0xB01F277E
+		opword 0x38C10030
+		lfs f3, float_500_8041c4c8(r2)
+		opword 0x38E1002C
+		lfs f5, float_60_8041c488(r2)
+		opword 0x39010028
+		lfs f6, float_0_8041c454(r2)
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D020C
+		bl strcpy
+		opword 0x4800018C
+		opword 0x7FE3FB78
+		bl BattleGetMarioPtr
+		opword 0x7C601B78
+		opword 0x7FE3FB78
+		opword 0x7C190378
+		bl BattleGetPartyPtr
+		opword 0x7C7A1B79
+		opword 0x41820078
+		opword 0x7F23CB78
+		opword 0x3881001C
+		opword 0x38A10018
+		opword 0x38C10014
+		bl BtlUnit_GetHomePos
+		opword 0x7F43D378
+		opword 0x38810010
+		opword 0x38A1000C
+		opword 0x38C10008
+		bl BtlUnit_GetHomePos
+		opword 0xC061001C
+		opword 0xC0410010
+		opword 0xC0210018
+		opword 0xC001000C
+		opword 0xEC83102A
+		lfs f5, float_0p5_8041c460(r2)
+		opword 0xEC61002A
+		opword 0x801F2760
+		opword 0xC0410014
+		opword 0xEC250132
+		opword 0xC0010008
+		opword 0x2C000012
+		opword 0xEC02002A
+		opword 0xECC500F2
+		opword 0xECA50032
+		opword 0x40820030
+		lfs f0, float_20_8041c4cc(r2)
+		opword 0xECC60028
+		opword 0x48000024
+		opword 0x7F23CB78
+		opword 0x3881001C
+		opword 0x38A10018
+		opword 0x38C10014
+		bl BtlUnit_GetHomePos
+		opword 0xC021001C
+		opword 0xC0C10018
+		opword 0xC0A10014
+		lfs f2, float_100_8041c464(r2)
+		opword 0x38000001
+		lfs f3, float_350_8041c4d0(r2)
+		opword 0xFC800890
+		opword 0xB01F277C
+		opword 0xEC42302A
+		lfs f0, float_50_8041c4a8(r2)
+		opword 0xEC63282A
+		opword 0xB01F277E
+		opword 0xECA0302A
+		lfs f6, float_0_8041c454(r2)
+		opword 0x38A10034
+		opword 0x38C10030
+		opword 0x38E1002C
+		opword 0x39010028
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D0224
+		bl strcpy
+		opword 0x48000078
+		opword 0x38610068
+		opword 0x389D0238
+		bl strcpy
+		opword 0x48000068
+		lfs f1, float_neg100_8041c468(r2)
+		opword 0x38000002
+		opword 0xB01F277C
+		opword 0x38A10034
+		opword 0xFC800890
+		lfs f2, float_100_8041c464(r2)
+		opword 0xB01F277E
+		opword 0x38C10030
+		lfs f3, float_400_8041c494(r2)
+		opword 0x38E1002C
+		lfs f5, float_50_8041c4a8(r2)
+		opword 0x39010028
+		lfs f6, float_0_8041c454(r2)
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600001
+		opword 0x38800001
+		bl battleCameraMoveTo
+		opword 0x38610068
+		opword 0x389D024C
+		bl strcpy
+		opword 0x48000010
+		opword 0x38610068
+		opword 0x389D0260
+		bl strcpy
+		opword 0xC03E0014
+		lfs f0, float_1000_8041c4a4(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820008
+		opword 0xD01E0014
+		opword 0x801F2754
+		opword 0x5400077B
+		opword 0x41820020
+		opword 0xC03F278C
+		lfs f0, float_0_8041c454(r2)
+		opword 0xD03E000C
+		opword 0xC03F27A4
+		opword 0xD03E0018
+		opword 0xD0010034
+		opword 0xD0010028
+		opword 0x801F2754
+		opword 0x54000739
+		opword 0x41820020
+		opword 0xC03F2790
+		lfs f0, float_0_8041c454(r2)
+		opword 0xD03E0010
+		opword 0xC03F27A8
+		opword 0xD03E001C
+		opword 0xD0010030
+		opword 0xD0010024
+		opword 0x801F2754
+		opword 0x540006F7
+		opword 0x41820020
+		opword 0xC03F2794
+		lfs f0, float_0_8041c454(r2)
+		opword 0xD03E0014
+		opword 0xC03F27AC
+		opword 0xD03E0020
+		opword 0xD001002C
+		opword 0xD0010020
+		opword 0xC01E000C
+		opword 0xD01F2780
+		opword 0xC01E0010
+		opword 0xD01F2784
+		opword 0xC01E0014
+		opword 0xD01F2788
+		opword 0xC01E0018
+		opword 0xD01F2798
+		opword 0xC01E001C
+		opword 0xD01F279C
+		opword 0xC01E0020
+		opword 0xD01F27A0
+		opword 0x801D000C
+		opword 0x807D0010
+		opword 0x90010044
+		opword 0xC0010034
+		opword 0x801D0014
+		opword 0xD0010044
+		opword 0xC0210030
+		opword 0x90610048
+		opword 0xC001002C
+		opword 0x9001004C
+		opword 0x80010044
+		opword 0xD0210048
+		opword 0xD001004C
+		opword 0x80610048
+		opword 0x901F27BC
+		opword 0x8001004C
+		opword 0x907F27C0
+		opword 0x901F27C4
+		opword 0x809D0018
+		opword 0x807D001C
+		opword 0x801D0020
+		opword 0x90810038
+		opword 0xC0010028
+		opword 0x9061003C
+		opword 0xC0210024
+		opword 0xD0010038
+		opword 0xC0010020
+		opword 0x90010040
+		opword 0x80010038
+		opword 0xD021003C
+		opword 0xD0010040
+		opword 0x8061003C
+		opword 0x901F27C8
+		opword 0x80010040
+		opword 0x907F27CC
+		opword 0x901F27D0
+		opword 0x807F2754
+		opword 0x546007FF
+		opword 0x40820014
+		opword 0x546007BD
+		opword 0x4082000C
+		opword 0x38600000
+		bl padRumbleOff
+		opword 0x801F2754
+		opword 0x54000673
+		opword 0x4182000C
+		opword 0x38600000
+		bl padRumbleOff
+		opword 0x801F2754
+		opword 0x540007FF
+		opword 0x41820128
+		lha r25, 0x277c(r31)
+		opword 0x38000003
+		opword 0xAB5F277E
+		opword 0x809F2838
+		opword 0x807F2830
+		opword 0xB01F277C
+		opword 0x7C641850
+		opword 0x547B07BC
+		opword 0xB01F277E
+		opword 0x80BF2830
+		opword 0x801F2838
+		opword 0x807F2828
+		opword 0x7C002850
+		opword 0xC03F2840
+		opword 0x7C000E70
+		opword 0xC05F2844
+		opword 0x7C800194
+		opword 0x7CA00E70
+		opword 0x7CA00194
+		bl intplGetValue
+		opword 0xD03F2850
+		opword 0x801F2838
+		opword 0x2C000000
+		opword 0x408100A4
+		opword 0x2C1B0000
+		opword 0x40820050
+		opword 0xC07F2850
+		opword 0x38A10034
+		opword 0xC03E000C
+		opword 0x38C10030
+		opword 0xC01E0018
+		opword 0x38E1002C
+		opword 0xEC21182A
+		opword 0xC05E0010
+		opword 0xEC80182A
+		opword 0xC07E0014
+		opword 0xC0BE001C
+		opword 0x39010028
+		opword 0xC0DE0020
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800000
+		bl battleCameraMoveTo
+		opword 0x48000060
+		opword 0xC07F2850
+		opword 0x38A10034
+		opword 0xC03E000C
+		opword 0x38C10030
+		opword 0xC01E0018
+		opword 0x38E1002C
+		opword 0xEC211828
+		opword 0xC05E0010
+		opword 0xEC801828
+		opword 0xC07E0014
+		opword 0xC0BE001C
+		opword 0x39010028
+		opword 0xC0DE0020
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800000
+		bl battleCameraMoveTo
+		opword 0x48000014
+		opword 0x40820010
+		opword 0x801F2754
+		opword 0x5400003C
+		opword 0x901F2754
+		opword 0xB33F277C
+		opword 0xB35F277E
+		opword 0x807F2838
+		opword 0x3803FFFF
+		opword 0x901F2838
+		opword 0x801F2754
+		opword 0x540007BD
+		opword 0x41820128
+		opword 0xAB3F277C
+		opword 0x38000003
+		opword 0xAB5F277E
+		opword 0x809F283C
+		opword 0x807F2834
+		opword 0xB01F277C
+		opword 0x7C641850
+		opword 0x547B07BC
+		opword 0xB01F277E
+		opword 0x80BF2834
+		opword 0x801F283C
+		opword 0x807F282C
+		opword 0x7C002850
+		opword 0xC03F2848
+		opword 0x7C000E70
+		opword 0xC05F284C
+		opword 0x7C800194
+		opword 0x7CA00E70
+		opword 0x7CA00194
+		bl intplGetValue
+		opword 0xD03F2854
+		opword 0x801F283C
+		opword 0x2C000000
+		opword 0x408100A4
+		opword 0x2C1B0000
+		opword 0x40820050
+		opword 0xC07F2854
+		opword 0x38A10034
+		opword 0xC03E0010
+		opword 0x38C10030
+		opword 0xC01E001C
+		opword 0x38E1002C
+		opword 0xEC41182A
+		opword 0xC03E000C
+		opword 0xECA0182A
+		opword 0xC07E0014
+		opword 0xC09E0018
+		opword 0x39010028
+		opword 0xC0DE0020
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800000
+		bl battleCameraMoveTo
+		opword 0x48000060
+		opword 0xC07F2854
+		opword 0x38A10034
+		opword 0xC03E0010
+		opword 0x38C10030
+		opword 0xC01E001C
+		opword 0x38E1002C
+		opword 0xEC411828
+		opword 0xC03E000C
+		opword 0xECA01828
+		opword 0xC07E0014
+		opword 0xC09E0018
+		opword 0x39010028
+		opword 0xC0DE0020
+		opword 0x39210024
+		opword 0x39410020
+		opword 0x38600000
+		opword 0x38800000
+		bl battleCameraMoveTo
+		opword 0x48000014
+		opword 0x40820010
+		opword 0x801F2754
+		opword 0x540007FA
+		opword 0x901F2754
+		opword 0xB33F277C
+		opword 0xB35F277E
+		opword 0x807F283C
+		opword 0x3803FFFF
+		opword 0x901F283C
+	}
 }
+#pragma pop
 
-asm s32 evt_btl_camera_set_prilimit(EventEntry* event, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r4, 0x18(r3)
-	lwz r4, 0x0(r4)
-	bl evtGetValue
-	bl btl_camera_set_prilimit
-	lwz r0, 0x14(r1)
-	li r3, 0x2
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void btl_camera_set_prilimit(s32 pri) {
-	nofralloc
-	lwz r4, _battleWorkPointer(r13)
-	stw r3, 0x275c(r4)
-	blr
-}
-
-asm f32 battleCameraGetPosMoveSpeed(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r3, _battleWorkPointer(r13)
-	lfs f0, 0x27c0(r3)
-	lfs f1, 0x27bc(r3)
-	fmuls f0, f0, f0
-	lfs f2, 0x27c4(r3)
-	fmadds f0, f1, f1, f0
-	fmadds f1, f2, f2, f0
-	bl sqrt
-	lwz r0, 0x14(r1)
-	frsp f1, f1
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void battleCameraMoveTo(s32 mode, s32 clamp, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ,
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void battleCameraMoveTo(s32 mode, s32 clamp, f32 x, f32 y, f32 z, f32 atX, f32 atY, f32 atZ,
                         f32* dX, f32* dY, f32* dZ, f32* dAtX, f32* dAtY, f32* dAtZ) {
-	nofralloc
-	stwu r1, -0x90(r1)
-	mflr r0
-	stw r0, 0x94(r1)
-	stfd f31, 0x80(r1)
-	psq_st f31, 0x88(r1), 0, 0
-	stfd f30, 0x70(r1)
-	psq_st f30, 0x78(r1), 0, 0
-	stfd f29, 0x60(r1)
-	psq_st f29, 0x68(r1), 0, 0
-	stfd f28, 0x50(r1)
-	psq_st f28, 0x58(r1), 0, 0
-	stfd f27, 0x40(r1)
-	psq_st f27, 0x48(r1), 0, 0
-	stfd f26, 0x30(r1)
-	psq_st f26, 0x38(r1), 0, 0
-	stmw r22, 0x8(r1)
-	fmr f26, f1
-	mr r22, r3
-	fmr f27, f2
-	mr r23, r4
-	fmr f28, f3
-	mr r24, r5
-	fmr f29, f4
-	mr r25, r6
-	fmr f30, f5
-	mr r26, r7
-	fmr f31, f6
-	mr r27, r8
-	mr r28, r9
-	mr r29, r10
-	li r3, 0x4
-	bl camGetPtr
-	lwz r30, _battleWorkPointer(r13)
-	mr r31, r3
-	mr r3, r30
-	bl BattleGetMarioPtr
-	lha r4, 0x277c(r30)
-	extsh. r0, r4
-	blt @1
-	cmpwi r4, 0x5
-	blt @2
-	@1:
-	li r0, 0x1
-	sth r0, 0x277c(r30)
-	@2:
-	lha r4, 0x277e(r30)
-	extsh. r0, r4
-	blt @3
-	cmpwi r4, 0x6
-	blt @4
-	@3:
-	li r0, 0x1
-	sth r0, 0x277e(r30)
-	@4:
-	cmpwi r22, 0x1
-	bne @5
-	lwz r0, 0xef4(r30)
-	rlwinm. r0, r0, 0, 23, 23
-	beq @6
-	lfs f3, 0x38(r3)
-	lfs f0, float_0_8041c454(r2)
-	fneg f1, f3
-	lfs f2, float_0p25_8041c458(r2)
-	fadds f26, f26, f0
-	fadds f28, f28, f3
-	fmuls f1, f2, f1
-	fadds f29, f29, f0
-	fadds f31, f31, f3
-	fadds f27, f27, f1
-	fadds f30, f30, f1
-	@6:
-	lfs f0, 0x27b0(r30)
-	lfs f1, 0x27b4(r30)
-	lfs f2, 0x27b8(r30)
-	fadds f26, f26, f0
-	fadds f27, f27, f1
-	fadds f28, f28, f2
-	fadds f29, f29, f0
-	fadds f30, f30, f1
-	fadds f31, f31, f2
-	@5:
-	lfs f0, float_600_8041c45c(r2)
-	lfs f1, float_0p5_8041c460(r2)
-	fsubs f2, f0, f28
-	lfs f0, float_0_8041c454(r2)
-	fmuls f2, f2, f1
-	fcmpo cr0, f2, f0
-	bge @7
-	fmr f2, f0
-	@7:
-	cmpwi r23, 0x1
-	bne @8
-	lfs f0, float_100_8041c464(r2)
-	fadds f1, f0, f2
-	fcmpo cr0, f26, f1
-	ble @9
-	fmr f26, f1
-	@9:
-	lfs f0, float_neg100_8041c468(r2)
-	fsubs f0, f0, f2
-	fcmpo cr0, f26, f0
-	bge @10
-	fmr f26, f0
-	@10:
-	fcmpo cr0, f29, f1
-	ble @11
-	fmr f29, f1
-	@11:
-	fcmpo cr0, f29, f0
-	bge @8
-	fmr f29, f0
-	@8:
-	lha r0, 0x277c(r30)
-	cmpwi r0, 0x3
-	beq @12
-	bge @13
-	cmpwi r0, 0x1
-	beq @14
-	bge @15
-	cmpwi r0, 0x0
-	bge @16
-	b @17
-	@13:
-	cmpwi r0, 0x5
-	beq @18
-	bge @17
-	b @19
-	@16:
-	lfs f0, 0xc(r31)
-	lfs f3, float_1p5_8041c46c(r2)
-	fsubs f2, f26, f0
-	lfs f1, float_0_8041c454(r2)
-	lfs f0, float_1_8041c470(r2)
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	b @17
-	@14:
-	lfs f0, 0xc(r31)
-	lfs f3, float_15_8041c474(r2)
-	fsubs f2, f26, f0
-	lfs f1, float_0_8041c454(r2)
-	lfs f0, float_1_8041c470(r2)
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x14(r31)
-	lfs f2, 0x0(r26)
-	fadds f2, f3, f2
-	stfs f2, 0x14(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	b @17
-	@15:
-	lfs f0, 0xc(r31)
-	lfs f3, float_5_8041c478(r2)
-	fsubs f2, f26, f0
-	lfs f1, float_0_8041c454(r2)
-	lfs f0, float_1_8041c470(r2)
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	b @17
-	@12:
-	lfs f0, 0xc(r31)
-	lfs f1, float_0_8041c454(r2)
-	fsubs f2, f26, f0
-	lfs f0, float_1_8041c470(r2)
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	b @17
-	@19:
-	lfs f0, 0xc(r31)
-	lfs f3, float_200_8041c47c(r2)
-	fsubs f2, f26, f0
-	lfs f1, float_0_8041c454(r2)
-	lfs f0, float_1_8041c470(r2)
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	b @17
-	@18:
-	lfs f0, 0xc(r31)
-	lfs f3, float_100_8041c464(r2)
-	fsubs f2, f26, f0
-	lfs f1, float_0_8041c454(r2)
-	lfs f0, float_1_8041c470(r2)
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r24)
-	lfs f2, 0x10(r31)
-	fsubs f2, f27, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r25)
-	lfs f2, 0x18(r31)
-	fsubs f2, f29, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r27)
-	lfs f2, 0x1c(r31)
-	fsubs f2, f30, f2
-	fdivs f2, f2, f3
-	stfs f2, 0x0(r28)
-	lfs f3, 0xc(r31)
-	lfs f2, 0x0(r24)
-	fadds f2, f3, f2
-	stfs f2, 0xc(r31)
-	lfs f3, 0x10(r31)
-	lfs f2, 0x0(r25)
-	fadds f2, f3, f2
-	stfs f2, 0x10(r31)
-	lfs f3, 0x18(r31)
-	lfs f2, 0x0(r27)
-	fadds f2, f3, f2
-	stfs f2, 0x18(r31)
-	lfs f3, 0x1c(r31)
-	lfs f2, 0x0(r28)
-	fadds f2, f3, f2
-	stfs f2, 0x1c(r31)
-	stfs f1, 0x24(r31)
-	stfs f0, 0x28(r31)
-	stfs f1, 0x2c(r31)
-	@17:
-	lha r0, 0x277e(r30)
-	cmpwi r0, 0x3
-	beq @20
-	bge @21
-	cmpwi r0, 0x1
-	beq @22
-	bge @23
-	cmpwi r0, 0x0
-	bge @24
-	b @25
-	@21:
-	cmpwi r0, 0x5
-	beq @26
-	bge @25
-	b @27
-	@24:
-	lfs f0, 0x14(r31)
-	lfs f1, float_1p5_8041c46c(r2)
-	fsubs f0, f28, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	b @25
-	@22:
-	lfs f0, 0x14(r31)
-	lfs f1, float_15_8041c474(r2)
-	fsubs f0, f28, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	b @25
-	@23:
-	lfs f0, 0x14(r31)
-	lfs f1, float_5_8041c478(r2)
-	fsubs f0, f28, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	b @25
-	@20:
-	lfs f0, 0x14(r31)
-	fsubs f0, f28, f0
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	b @25
-	@27:
-	lfs f0, 0x14(r31)
-	lfs f1, float_200_8041c47c(r2)
-	fsubs f0, f28, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	b @25
-	@26:
-	lfs f0, 0x14(r31)
-	lfs f1, float_100_8041c464(r2)
-	fsubs f0, f28, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r26)
-	lfs f0, 0x20(r31)
-	fsubs f0, f31, f0
-	fdivs f0, f0, f1
-	stfs f0, 0x0(r29)
-	lfs f1, 0x14(r31)
-	lfs f0, 0x0(r26)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r31)
-	lfs f1, 0x20(r31)
-	lfs f0, 0x0(r29)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r31)
-	@25:
-	psq_l f31, 0x88(r1), 0, 0
-	lfd f31, 0x80(r1)
-	psq_l f30, 0x78(r1), 0, 0
-	lfd f30, 0x70(r1)
-	psq_l f29, 0x68(r1), 0, 0
-	lfd f29, 0x60(r1)
-	psq_l f28, 0x58(r1), 0, 0
-	lfd f28, 0x50(r1)
-	psq_l f27, 0x48(r1), 0, 0
-	lfd f27, 0x40(r1)
-	psq_l f26, 0x38(r1), 0, 0
-	lfd f26, 0x30(r1)
-	lmw r22, 0x8(r1)
-	lwz r0, 0x94(r1)
-	mtlr r0
-	addi r1, r1, 0x90
-	blr
+	asm volatile {
+		opword 0xFF400890
+		mr r22, r3
+		opword 0xFF601090
+		opword 0x7C972378
+		opword 0xFF801890
+		opword 0x7CB82B78
+		opword 0xFFA02090
+		opword 0x7CD93378
+		opword 0xFFC02890
+		opword 0x7CFA3B78
+		opword 0xFFE03090
+		opword 0x7D1B4378
+		opword 0x7D3C4B78
+		opword 0x7D5D5378
+		opword 0x38600004
+		bl camGetPtr
+		lwz r30, _battleWorkPointer(r13)
+		opword 0x7C7F1B78
+		opword 0x7FC3F378
+		bl BattleGetMarioPtr
+		opword 0xA89E277C
+		opword 0x7C800735
+		opword 0x4180000C
+		opword 0x2C040005
+		opword 0x4180000C
+		opword 0x38000001
+		opword 0xB01E277C
+		opword 0xA89E277E
+		opword 0x7C800735
+		opword 0x4180000C
+		opword 0x2C040006
+		opword 0x4180000C
+		opword 0x38000001
+		opword 0xB01E277E
+		opword 0x2C160001
+		opword 0x40820060
+		opword 0x801E0EF4
+		opword 0x540005EF
+		opword 0x41820030
+		opword 0xC0630038
+		lfs f0, float_0_8041c454(r2)
+		opword 0xFC201850
+		lfs f2, float_0p25_8041c458(r2)
+		fadds f26, f26, f0
+		opword 0xEF9C182A
+		opword 0xEC220072
+		opword 0xEFBD002A
+		opword 0xEFFF182A
+		opword 0xEF7B082A
+		opword 0xEFDE082A
+		opword 0xC01E27B0
+		opword 0xC03E27B4
+		opword 0xC05E27B8
+		opword 0xEF5A002A
+		opword 0xEF7B082A
+		opword 0xEF9C102A
+		opword 0xEFBD002A
+		opword 0xEFDE082A
+		opword 0xEFFF102A
+		lfs f0, float_600_8041c45c(r2)
+		lfs f1, float_0p5_8041c460(r2)
+		opword 0xEC40E028
+		lfs f0, float_0_8041c454(r2)
+		opword 0xEC420072
+		opword 0xFC020040
+		opword 0x40800008
+		opword 0xFC400090
+		opword 0x2C170001
+		opword 0x40820044
+		lfs f0, float_100_8041c464(r2)
+		opword 0xEC20102A
+		opword 0xFC1A0840
+		opword 0x40810008
+		opword 0xFF400890
+		lfs f0, float_neg100_8041c468(r2)
+		opword 0xEC001028
+		opword 0xFC1A0040
+		opword 0x40800008
+		opword 0xFF400090
+		opword 0xFC1D0840
+		opword 0x40810008
+		opword 0xFFA00890
+		opword 0xFC1D0040
+		opword 0x40800008
+		opword 0xFFA00090
+		opword 0xA81E277C
+		opword 0x2C000003
+		opword 0x41820214
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x418200C0
+		opword 0x40800168
+		opword 0x2C000000
+		opword 0x40800018
+		opword 0x480003B4
+		opword 0x2C000005
+		opword 0x41820314
+		opword 0x408003A8
+		opword 0x48000270
+		opword 0xC01F000C
+		lfs f3, float_1p5_8041c46c(r2)
+		opword 0xEC5A0028
+		lfs f1, float_0_8041c454(r2)
+		lfs f0, float_1_8041c470(r2)
+		opword 0xEC421824
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xEC421824
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xEC421824
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xEC421824
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0x48000308
+		opword 0xC01F000C
+		lfs f3, float_15_8041c474(r2)
+		opword 0xEC5A0028
+		lfs f1, float_0_8041c454(r2)
+		lfs f0, float_1_8041c470(r2)
+		opword 0xEC421824
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xEC421824
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xEC421824
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xEC421824
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0014
+		opword 0xC05A0000
+		opword 0xEC43102A
+		opword 0xD05F0014
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0x4800025C
+		opword 0xC01F000C
+		lfs f3, float_5_8041c478(r2)
+		opword 0xEC5A0028
+		lfs f1, float_0_8041c454(r2)
+		lfs f0, float_1_8041c470(r2)
+		opword 0xEC421824
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xEC421824
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xEC421824
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xEC421824
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0x480001C0
+		opword 0xC01F000C
+		lfs f1, float_0_8041c454(r2)
+		opword 0xEC5A0028
+		lfs f0, float_1_8041c470(r2)
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0x48000138
+		opword 0xC01F000C
+		lfs f3, float_200_8041c47c(r2)
+		opword 0xEC5A0028
+		lfs f1, float_0_8041c454(r2)
+		lfs f0, float_1_8041c470(r2)
+		opword 0xEC421824
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xEC421824
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xEC421824
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xEC421824
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0x4800009C
+		opword 0xC01F000C
+		lfs f3, float_100_8041c464(r2)
+		opword 0xEC5A0028
+		lfs f1, float_0_8041c454(r2)
+		lfs f0, float_1_8041c470(r2)
+		opword 0xEC421824
+		opword 0xD0580000
+		opword 0xC05F0010
+		opword 0xEC5B1028
+		opword 0xEC421824
+		opword 0xD0590000
+		opword 0xC05F0018
+		opword 0xEC5D1028
+		opword 0xEC421824
+		opword 0xD05B0000
+		opword 0xC05F001C
+		opword 0xEC5E1028
+		opword 0xEC421824
+		opword 0xD05C0000
+		opword 0xC07F000C
+		opword 0xC0580000
+		opword 0xEC43102A
+		opword 0xD05F000C
+		opword 0xC07F0010
+		opword 0xC0590000
+		opword 0xEC43102A
+		opword 0xD05F0010
+		opword 0xC07F0018
+		opword 0xC05B0000
+		opword 0xEC43102A
+		opword 0xD05F0018
+		opword 0xC07F001C
+		opword 0xC05C0000
+		opword 0xEC43102A
+		opword 0xD05F001C
+		opword 0xD03F0024
+		opword 0xD01F0028
+		opword 0xD03F002C
+		opword 0xA81E277E
+		opword 0x2C000003
+		opword 0x41820108
+		opword 0x4080001C
+		opword 0x2C000001
+		opword 0x4182006C
+		opword 0x408000B0
+		opword 0x2C000000
+		opword 0x40800018
+		opword 0x480001B4
+		opword 0x2C000005
+		opword 0x41820168
+		opword 0x408001A8
+		opword 0x48000118
+		opword 0xC01F0014
+		lfs f1, float_1p5_8041c46c(r2)
+		opword 0xEC1C0028
+		opword 0xEC000824
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xEC000824
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+		opword 0x4800015C
+		opword 0xC01F0014
+		lfs f1, float_15_8041c474(r2)
+		opword 0xEC1C0028
+		opword 0xEC000824
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xEC000824
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+		opword 0x48000114
+		opword 0xC01F0014
+		lfs f1, float_5_8041c478(r2)
+		opword 0xEC1C0028
+		opword 0xEC000824
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xEC000824
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+		opword 0x480000CC
+		opword 0xC01F0014
+		opword 0xEC1C0028
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+		opword 0x48000090
+		opword 0xC01F0014
+		lfs f1, float_200_8041c47c(r2)
+		opword 0xEC1C0028
+		opword 0xEC000824
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xEC000824
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+		opword 0x48000048
+		opword 0xC01F0014
+		lfs f1, float_100_8041c464(r2)
+		opword 0xEC1C0028
+		opword 0xEC000824
+		opword 0xD01A0000
+		opword 0xC01F0020
+		opword 0xEC1F0028
+		opword 0xEC000824
+		opword 0xD01D0000
+		opword 0xC03F0014
+		opword 0xC01A0000
+		opword 0xEC01002A
+		opword 0xD01F0014
+		opword 0xC03F0020
+		opword 0xC01D0000
+		opword 0xEC01002A
+		opword 0xD01F0020
+	}
+}
+#pragma pop
+
+f32 battleCameraGetPosMoveSpeed(void) {
+  BattleWork* wp = _battleWorkPointer;
+  f32 x = wp->cameraWork.moveSpeed.x;
+  f32 y = wp->cameraWork.moveSpeed.y;
+  f32 z = wp->cameraWork.moveSpeed.z;
+  return sqrt(x * x + y * y + z * z);
 }
 
-asm void battleCameraMain(void) {
-	nofralloc
-	stwu r1, -0x100(r1)
-	mflr r0
-	stw r0, 0x104(r1)
-	stfd f31, 0xf0(r1)
-	psq_st f31, 0xf8(r1), 0, 0
-	stfd f30, 0xe0(r1)
-	psq_st f30, 0xe8(r1), 0, 0
-	stmw r25, 0xc4(r1)
-	lis r4, vec3_802efc40@ha
-	li r3, 0x4
-	addi r29, r4, vec3_802efc40@l
-	bl camGetPtr
-	lwz r31, _battleWorkPointer(r13)
-	mr r30, r3
-	bl BattleAudienceBaseGetPtr
-	lfs f30, float_0_8041c454(r2)
-	mr r28, r3
-	mr r3, r31
-	bl BattleGetMarioPtr
-	lfs f0, float_0_8041c454(r2)
-	stfs f0, 0x34(r1)
-	stfs f0, 0x30(r1)
-	stfs f0, 0x2c(r1)
-	stfs f0, 0x28(r1)
-	stfs f0, 0x24(r1)
-	stfs f0, 0x20(r1)
-	lwz r0, 0x2760(r31)
-	cmpwi r0, 0x3
-	beq @1
-	li r0, 0x0
-	stw r0, 0x27d8(r31)
-	@1:
-	lfs f0, 0x2780(r31)
-	stfs f0, 0xc(r30)
-	lfs f0, 0x2784(r31)
-	stfs f0, 0x10(r30)
-	lfs f0, 0x2788(r31)
-	stfs f0, 0x14(r30)
-	lfs f0, 0x2798(r31)
-	stfs f0, 0x18(r30)
-	lfs f0, 0x279c(r31)
-	stfs f0, 0x1c(r30)
-	lfs f0, 0x27a0(r31)
-	stfs f0, 0x20(r30)
-	lfs f0, 0xc(r30)
-	stfs f0, 0x278c(r31)
-	lfs f0, 0x10(r30)
-	stfs f0, 0x2790(r31)
-	lfs f0, 0x14(r30)
-	stfs f0, 0x2794(r31)
-	lfs f0, 0x18(r30)
-	stfs f0, 0x27a4(r31)
-	lfs f0, 0x1c(r30)
-	stfs f0, 0x27a8(r31)
-	lfs f0, 0x20(r30)
-	stfs f0, 0x27ac(r31)
-	lwz r0, 0x2760(r31)
-	cmplwi r0, 0x14
-	bgt @2
-	lis r3, jumptable_80362040@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_80362040@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@3:
-	lfs f1, float_0_8041c454(r2)
-	addi r5, r1, 0x34
-	lfs f2, float_110_8041c480(r2)
-	addi r6, r1, 0x30
-	fmr f4, f1
-	lfs f3, float_750_8041c484(r2)
-	fmr f6, f1
-	lfs f5, float_60_8041c488(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x78
-	bl strcpy
-	b @4
-	@5:
-	lfs f2, float_0p5_8041c460(r2)
-	addi r5, r1, 0x34
-	lfs f0, 0x2778(r31)
-	addi r6, r1, 0x30
-	lfs f1, float_0_8041c454(r2)
-	addi r7, r1, 0x2c
-	fmuls f6, f2, f0
-	lfs f0, float_750_8041c484(r2)
-	fmr f4, f1
-	lfs f2, float_110_8041c480(r2)
-	lfs f5, float_60_8041c488(r2)
-	addi r8, r1, 0x28
-	fsubs f3, f0, f6
-	addi r9, r1, 0x24
-	fneg f6, f6
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x8c
-	bl strcpy
-	b @4
-	@6:
-	lfs f1, float_0_8041c454(r2)
-	addi r5, r1, 0x34
-	lfs f2, float_160_8041c48c(r2)
-	addi r6, r1, 0x30
-	fmr f4, f1
-	lfs f3, float_750_8041c484(r2)
-	fmr f6, f1
-	lfs f5, float_110_8041c480(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0xa8
-	bl strcpy
-	@7:
-	lwz r3, 0x27d8(r31)
-	cmpwi r3, 0x0
-	ble @8
-	lha r28, 0x277c(r31)
-	subi r0, r3, 0x1
-	stw r0, 0x27d8(r31)
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x27e0(r31)
-	subf r4, r0, r5
-	lfs f2, 0x27ec(r31)
-	bl intplGetValue
-	stfs f1, 0x5c(r1)
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x27e4(r31)
-	subf r4, r0, r5
-	lfs f2, 0x27f0(r31)
-	bl intplGetValue
-	stfs f1, 0x60(r1)
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x27e8(r31)
-	subf r4, r0, r5
-	lfs f2, 0x27f4(r31)
-	bl intplGetValue
-	stfs f1, 0x64(r1)
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x27f8(r31)
-	subf r4, r0, r5
-	lfs f2, 0x2804(r31)
-	bl intplGetValue
-	fmr f31, f1
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x27fc(r31)
-	subf r4, r0, r5
-	lfs f2, 0x2808(r31)
-	bl intplGetValue
-	fmr f30, f1
-	lwz r5, 0x27dc(r31)
-	lwz r0, 0x27d8(r31)
-	lwz r3, 0x27d4(r31)
-	lfs f1, 0x2800(r31)
-	subf r4, r0, r5
-	lfs f2, 0x280c(r31)
-	bl intplGetValue
-	li r0, 0x3
-	fmr f4, f31
-	sth r0, 0x277c(r31)
-	fmr f5, f30
-	fmr f6, f1
-	addi r5, r1, 0x34
-	sth r0, 0x277e(r31)
-	addi r6, r1, 0x30
-	addi r7, r1, 0x2c
-	lfs f1, 0x5c(r1)
-	lfs f2, 0x60(r1)
-	addi r8, r1, 0x28
-	lfs f3, 0x64(r1)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x0
-	bl battleCameraMoveTo
-	sth r28, 0x277c(r31)
-	@8:
-	addi r3, r1, 0x68
-	addi r4, r29, 0xc4
-	bl strcpy
-	b @4
-	@9:
-	lfs f1, float_0_8041c454(r2)
-	addi r5, r1, 0x34
-	lfs f2, float_110_8041c480(r2)
-	addi r6, r1, 0x30
-	fmr f4, f1
-	lfs f3, float_neg750_8041c490(r2)
-	fmr f6, f1
-	lfs f5, float_60_8041c488(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0xd4
-	bl strcpy
-	b @4
-	@10:
-	lfs f1, float_0_8041c454(r2)
-	addi r5, r1, 0x34
-	lfs f2, float_400_8041c494(r2)
-	addi r6, r1, 0x30
-	fmr f4, f1
-	lfs f3, float_neg617_8041c498(r2)
-	fmr f6, f1
-	lfs f5, float_60_8041c488(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0xe8
-	bl strcpy
-	b @4
-	@11:
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x2
-	beq @12
-	bge @13
-	cmpwi r0, 0x0
-	beq @14
-	bge @15
-	b @16
-	@13:
-	cmpwi r0, 0x4
-	bge @16
-	b @17
-	@14:
-	lfs f30, float_750_8041c484(r2)
-	b @16
-	@15:
-	lfs f30, float_830_8041c49c(r2)
-	b @16
-	@12:
-	lfs f30, float_920_8041c4a0(r2)
-	b @16
-	@17:
-	lfs f30, float_1000_8041c4a4(r2)
-	@16:
-	lfs f1, float_0_8041c454(r2)
-	fmr f3, f30
-	lfs f2, float_110_8041c480(r2)
-	addi r5, r1, 0x34
-	fmr f4, f1
-	lfs f5, float_60_8041c488(r2)
-	fmr f6, f1
-	addi r6, r1, 0x30
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x100
-	bl strcpy
-	b @4
-	@18:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	mr. r28, r3
-	bne @19
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@19:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	addi r5, r1, 0x60
-	mr r3, r28
-	addi r4, r1, 0x5c
-	addi r6, r1, 0x64
-	bl BtlUnit_GetPos
-	mr r3, r28
-	bl BtlUnit_GetHeight
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	mr r3, r28
-	lfd f3, 0x70(r29)
-	stw r0, 0xa8(r1)
-	lfs f2, float_50_8041c4a8(r2)
-	lfd f0, 0xa8(r1)
-	lfs f1, float_0p5_8041c460(r2)
-	fsubs f3, f0, f3
-	lfs f0, 0x60(r1)
-	fsubs f2, f3, f2
-	fmuls f1, f2, f1
-	fadds f0, f0, f1
-	stfs f0, 0x60(r1)
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xb4(r1)
-	lfd f3, 0x70(r29)
-	stw r0, 0xb0(r1)
-	lfs f1, float_24_8041c4ac(r2)
-	lfd f2, 0xb0(r1)
-	lfs f0, float_0_8041c454(r2)
-	fsubs f2, f2, f3
-	fsubs f1, f2, f1
-	fcmpo cr0, f1, f0
-	bge @20
-	fmr f1, f0
-	@20:
-	lfs f5, 0x2778(r31)
-	lfs f0, float_1p5_8041c46c(r2)
-	lfs f3, 0x60(r1)
-	fnmsubs f5, f0, f1, f5
-	lfs f0, float_100_8041c464(r2)
-	lfs f1, float_9_8041c4b0(r2)
-	fmr f2, f3
-	fcmpo cr0, f3, f0
-	fneg f6, f5
-	fdivs f7, f6, f1
-	ble @21
-	fmr f3, f0
-	@21:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f2, f0
-	bge @22
-	fmr f3, f0
-	@22:
-	lfs f1, float_110_8041c480(r2)
-	addi r5, r1, 0x34
-	lfs f0, float_60_8041c488(r2)
-	addi r6, r1, 0x30
-	fadds f2, f1, f3
-	lfs f1, 0x5c(r1)
-	fadds f0, f0, f3
-	lfs f3, float_750_8041c484(r2)
-	fmr f4, f1
-	addi r7, r1, 0x2c
-	fsubs f3, f3, f5
-	addi r8, r1, 0x28
-	fadds f2, f2, f7
-	addi r9, r1, 0x24
-	fadds f5, f0, f7
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x114
-	bl strcpy
-	b @4
-	@23:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	lwz r4, 0x2768(r31)
-	mr r26, r3
-	mr r3, r31
-	bl BattleGetUnitPtr
-	cmplwi r26, 0x0
-	mr r28, r3
-	beq @24
-	cmplwi r28, 0x0
-	bne @25
-	@24:
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@25:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	lwz r3, 0x2768(r31)
-	lwz r4, 0x2770(r31)
-	bl BattleGetUnitPartsPtr
-	mr r27, r3
-	addi r5, r1, 0x60
-	mr r3, r26
-	addi r4, r1, 0x5c
-	addi r6, r1, 0x64
-	bl BtlUnit_GetPos
-	mr r3, r28
-	mr r4, r27
-	addi r5, r1, 0x50
-	addi r6, r1, 0x54
-	addi r7, r1, 0x58
-	bl BtlUnit_GetHitPos
-	mr r3, r26
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xb4(r1)
-	mr r3, r28
-	lfd f2, 0x70(r29)
-	stw r0, 0xb0(r1)
-	lfs f0, float_24_8041c4ac(r2)
-	lfd f1, 0xb0(r1)
-	fsubs f1, f1, f2
-	fsubs f30, f1, f0
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lfs f0, float_0_8041c454(r2)
-	stw r0, 0xa8(r1)
-	lfd f3, 0x70(r29)
-	fcmpo cr0, f30, f0
-	lfd f2, 0xa8(r1)
-	lfs f1, float_24_8041c4ac(r2)
-	fsubs f2, f2, f3
-	fsubs f3, f2, f1
-	bge @26
-	fmr f30, f0
-	@26:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f3, f0
-	bge @27
-	fmr f3, f0
-	@27:
-	lfs f6, 0x281c(r31)
-	lfs f0, 0x2810(r31)
-	lfs f2, 0x50(r1)
-	lfs f1, 0x5c(r1)
-	fsubs f4, f6, f0
-	lfs f0, float_0_8041c454(r2)
-	fsubs f1, f2, f1
-	fcmpu cr0, f0, f4
-	bne @28
-	lfs f8, float_0p5_8041c460(r2)
-	b @29
-	@28:
-	fdivs f8, f1, f4
-	@29:
-	lfs f0, float_1_8041c470(r2)
-	fcmpo cr0, f8, f0
-	ble @30
-	fmr f8, f0
-	@30:
-	lfs f0, float_0p5_8041c460(r2)
-	fcmpo cr0, f8, f0
-	bge @31
-	fmr f8, f0
-	@31:
-	lfs f1, float_2_8041c450(r2)
-	fadds f2, f30, f3
-	lfs f0, 0x2778(r31)
-	lfs f3, float_1_8041c470(r2)
-	fmuls f0, f1, f0
-	lfs f1, float_1p5_8041c46c(r2)
-	fsubs f7, f3, f8
-	lfs f5, 0x2820(r31)
-	lfs f4, float_80_8041c4b4(r2)
-	fnmsubs f1, f1, f2, f0
-	lfs f3, 0x60(r1)
-	fdivs f4, f5, f4
-	lfs f2, float_10_8041c4b8(r2)
-	lfs f0, float_100_8041c464(r2)
-	fmuls f10, f7, f1
-	fsubs f3, f3, f5
-	fmuls f1, f7, f6
-	fneg f6, f10
-	fmuls f9, f4, f3
-	fdivs f11, f6, f2
-	fcmpo cr0, f9, f0
-	ble @32
-	fmr f9, f0
-	@32:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f9, f0
-	bge @33
-	fmr f9, f0
-	@33:
-	lfd f0, 0x138(r29)
-	fmr f4, f1
-	lfs f2, float_750_8041c484(r2)
-	addi r5, r1, 0x34
-	fsub f3, f0, f8
-	lfd f8, 0x130(r29)
-	lfs f5, float_110_8041c480(r2)
-	lfs f0, float_60_8041c488(r2)
-	addi r6, r1, 0x30
-	fneg f7, f3
-	fsubs f3, f2, f10
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	fmadd f7, f8, f7, f9
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	frsp f7, f7
-	fadds f2, f5, f7
-	fadds f0, f0, f7
-	fadds f2, f2, f11
-	fadds f5, f0, f11
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x140
-	bl strcpy
-	b @4
-	@34:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	lwz r4, 0x2768(r31)
-	mr r27, r3
-	mr r3, r31
-	bl BattleGetUnitPtr
-	cmplwi r27, 0x0
-	mr r26, r3
-	beq @35
-	cmplwi r26, 0x0
-	bne @36
-	@35:
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@36:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	lwz r3, 0x2768(r31)
-	lwz r4, 0x2770(r31)
-	bl BattleGetUnitPartsPtr
-	mr r25, r3
-	addi r5, r1, 0x60
-	mr r3, r27
-	addi r4, r1, 0x5c
-	addi r6, r1, 0x64
-	bl BtlUnit_GetPos
-	addi r6, r1, 0x54
-	mr r3, r26
-	mr r4, r25
-	addi r5, r1, 0x50
-	addi r7, r1, 0x58
-	bl BtlUnit_GetHitPos
-	mr r3, r27
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xb4(r1)
-	mr r3, r26
-	lfd f2, 0x70(r29)
-	stw r0, 0xb0(r1)
-	lfs f0, float_24_8041c4ac(r2)
-	lfd f1, 0xb0(r1)
-	fsubs f1, f1, f2
-	fsubs f30, f1, f0
-	bl BtlUnit_GetWidth
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f30, f0
-	bge @37
-	fmr f30, f0
-	@37:
-	lfs f1, float_2_8041c450(r2)
-	lfs f0, 0x2778(r31)
-	lfs f3, float_1p5_8041c46c(r2)
-	fmuls f7, f1, f0
-	lfs f1, float_10_8041c4b8(r2)
-	lfs f2, 0x60(r1)
-	lfs f0, 0x54(r1)
-	fnmsubs f7, f3, f30, f7
-	lfs f3, float_0p5_8041c460(r2)
-	fadds f2, f2, f0
-	lfs f0, float_50_8041c4a8(r2)
-	fneg f6, f7
-	fmuls f2, f3, f2
-	fdivs f8, f6, f1
-	fcmpo cr0, f2, f0
-	ble @38
-	fmr f31, f0
-	@38:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f2, f0
-	bge @39
-	fmr f31, f0
-	@39:
-	lfs f3, 0x5c(r1)
-	addi r5, r1, 0x34
-	lfs f2, 0x50(r1)
-	addi r6, r1, 0x30
-	lfs f0, float_60_8041c488(r2)
-	addi r7, r1, 0x2c
-	fadds f4, f3, f2
-	lfs f1, float_110_8041c480(r2)
-	lfs f5, float_0p5_8041c460(r2)
-	fadds f0, f0, f31
-	fadds f2, f1, f31
-	lfs f3, float_750_8041c484(r2)
-	fmuls f1, f5, f4
-	addi r8, r1, 0x28
-	fadds f2, f2, f8
-	addi r9, r1, 0x24
-	fsubs f3, f3, f7
-	addi r10, r1, 0x20
-	fmr f4, f1
-	li r3, 0x1
-	fadds f5, f0, f8
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x114
-	bl strcpy
-	b @4
-	@40:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	mr. r27, r3
-	bne @41
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@41:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	mr. r4, r3
-	bne @42
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@42:
-	addi r6, r1, 0x60
-	mr r3, r27
-	addi r5, r1, 0x5c
-	addi r7, r1, 0x64
-	bl BtlUnit_GetHitPos
-	mr r3, r27
-	bl BtlUnit_GetHeight
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xb4(r1)
-	mr r3, r27
-	lfd f3, 0x70(r29)
-	stw r0, 0xb0(r1)
-	lfs f2, float_50_8041c4a8(r2)
-	lfd f0, 0xb0(r1)
-	lfs f1, float_0p5_8041c460(r2)
-	fsubs f3, f0, f3
-	lfs f0, 0x60(r1)
-	fsubs f2, f3, f2
-	fmuls f1, f2, f1
-	fadds f0, f0, f1
-	stfs f0, 0x60(r1)
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lfd f3, 0x70(r29)
-	stw r0, 0xa8(r1)
-	lfs f1, float_24_8041c4ac(r2)
-	lfd f2, 0xa8(r1)
-	lfs f0, float_0_8041c454(r2)
-	fsubs f2, f2, f3
-	fsubs f1, f2, f1
-	fcmpo cr0, f1, f0
-	bge @43
-	fmr f1, f0
-	@43:
-	lfs f5, 0x2778(r31)
-	lfs f0, float_1p5_8041c46c(r2)
-	lfs f3, 0x60(r1)
-	fnmsubs f5, f0, f1, f5
-	lfs f0, float_100_8041c464(r2)
-	lfs f1, float_9_8041c4b0(r2)
-	fmr f2, f3
-	fcmpo cr0, f3, f0
-	fneg f6, f5
-	fdivs f7, f6, f1
-	ble @44
-	fmr f3, f0
-	@44:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f2, f0
-	bge @45
-	fmr f3, f0
-	@45:
-	lfs f1, float_110_8041c480(r2)
-	addi r5, r1, 0x34
-	lfs f0, float_60_8041c488(r2)
-	addi r6, r1, 0x30
-	fadds f2, f1, f3
-	lfs f1, 0x5c(r1)
-	fadds f0, f0, f3
-	lfs f3, float_750_8041c484(r2)
-	fmr f4, f1
-	addi r7, r1, 0x2c
-	fsubs f3, f3, f5
-	addi r8, r1, 0x28
-	fadds f2, f2, f7
-	addi r9, r1, 0x24
-	fadds f5, f0, f7
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x160
-	bl strcpy
-	b @4
-	@46:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	lwz r4, 0x2768(r31)
-	mr r27, r3
-	mr r3, r31
-	bl BattleGetUnitPtr
-	cmplwi r27, 0x0
-	mr r28, r3
-	beq @47
-	cmplwi r28, 0x0
-	bne @48
-	@47:
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@48:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	mr r26, r3
-	lwz r3, 0x2768(r31)
-	lwz r4, 0x2770(r31)
-	bl BattleGetUnitPartsPtr
-	cmplwi r26, 0x0
-	mr r25, r3
-	beq @49
-	cmplwi r25, 0x0
-	bne @50
-	@49:
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@50:
-	addi r5, r1, 0x60
-	mr r3, r26
-	addi r4, r1, 0x5c
-	addi r6, r1, 0x64
-	bl BtlUnit_GetPartsWorldPos
-	mr r3, r28
-	mr r4, r25
-	addi r5, r1, 0x50
-	addi r6, r1, 0x54
-	addi r7, r1, 0x58
-	bl BtlUnit_GetHitPos
-	mr r3, r27
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xb4(r1)
-	mr r3, r28
-	lfd f2, 0x70(r29)
-	stw r0, 0xb0(r1)
-	lfs f0, float_24_8041c4ac(r2)
-	lfd f1, 0xb0(r1)
-	fsubs f1, f1, f2
-	fsubs f30, f1, f0
-	bl BtlUnit_GetWidth
-	xoris r3, r3, 0x8000
-	lis r0, 0x4330
-	stw r3, 0xac(r1)
-	lfs f0, float_0_8041c454(r2)
-	stw r0, 0xa8(r1)
-	lfd f3, 0x70(r29)
-	fcmpo cr0, f30, f0
-	lfd f2, 0xa8(r1)
-	lfs f1, float_24_8041c4ac(r2)
-	fsubs f2, f2, f3
-	fsubs f3, f2, f1
-	bge @51
-	fmr f30, f0
-	@51:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f3, f0
-	bge @52
-	fmr f3, f0
-	@52:
-	lfs f6, 0x281c(r31)
-	lfs f0, 0x2810(r31)
-	lfs f2, 0x50(r1)
-	lfs f1, 0x5c(r1)
-	fsubs f4, f6, f0
-	lfs f0, float_0_8041c454(r2)
-	fsubs f1, f2, f1
-	fcmpu cr0, f0, f4
-	bne @53
-	lfs f4, float_1Eneg05_8041c4bc(r2)
-	@53:
-	fdivs f8, f1, f4
-	lfs f0, float_1_8041c470(r2)
-	fcmpo cr0, f8, f0
-	ble @54
-	fmr f8, f0
-	@54:
-	lfs f0, float_0p5_8041c460(r2)
-	fcmpo cr0, f8, f0
-	bge @55
-	fmr f8, f0
-	@55:
-	lfs f1, float_2_8041c450(r2)
-	fadds f2, f30, f3
-	lfs f0, 0x2778(r31)
-	lfs f3, float_1_8041c470(r2)
-	fmuls f0, f1, f0
-	lfs f1, float_1p5_8041c46c(r2)
-	fsubs f7, f3, f8
-	lfs f5, 0x2820(r31)
-	lfs f4, float_80_8041c4b4(r2)
-	fnmsubs f1, f1, f2, f0
-	lfs f3, 0x60(r1)
-	fdivs f4, f5, f4
-	lfs f2, float_10_8041c4b8(r2)
-	lfs f0, float_100_8041c464(r2)
-	fmuls f10, f7, f1
-	fsubs f3, f3, f5
-	fmuls f1, f7, f6
-	fneg f6, f10
-	fmuls f9, f4, f3
-	fdivs f11, f6, f2
-	fcmpo cr0, f9, f0
-	ble @56
-	fmr f9, f0
-	@56:
-	lfs f0, float_0_8041c454(r2)
-	fcmpo cr0, f9, f0
-	bge @57
-	fmr f9, f0
-	@57:
-	lfd f0, 0x138(r29)
-	fmr f4, f1
-	lfs f2, float_750_8041c484(r2)
-	addi r5, r1, 0x34
-	fsub f3, f0, f8
-	lfd f8, 0x130(r29)
-	lfs f5, float_110_8041c480(r2)
-	lfs f0, float_60_8041c488(r2)
-	addi r6, r1, 0x30
-	fneg f7, f3
-	fsubs f3, f2, f10
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	fmadd f7, f8, f7, f9
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	frsp f7, f7
-	fadds f2, f5, f7
-	fadds f0, f0, f7
-	fadds f2, f2, f11
-	fadds f5, f0, f11
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x178
-	bl strcpy
-	b @4
-	@58:
-	lwz r0, 0x2774(r31)
-	addi r5, r1, 0x34
-	lfs f0, float_400_8041c494(r2)
-	addi r6, r1, 0x30
-	mulli r3, r0, 0x134
-	lfs f2, float_200_8041c47c(r2)
-	lfs f5, float_0_8041c454(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r3, r3, 0x1bc
-	add r3, r28, r3
-	addi r9, r1, 0x24
-	lfs f6, 0x50(r3)
-	addi r10, r1, 0x20
-	lfs f1, 0x48(r3)
-	li r3, 0x1
-	fadds f3, f0, f6
-	li r4, 0x0
-	fmr f4, f1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x194
-	bl strcpy
-	b @4
-	@59:
-	lwz r4, 0x2764(r31)
-	mr r3, r31
-	bl BattleGetUnitPtr
-	mr. r27, r3
-	bne @60
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@60:
-	lwz r3, 0x2764(r31)
-	lwz r4, 0x276c(r31)
-	bl BattleGetUnitPartsPtr
-	cmplwi r3, 0x0
-	bne @61
-	li r3, 0x0
-	li r4, 0x0
-	bl btl_camera_set_mode
-	b @4
-	@61:
-	li r0, 0xa
-	addi r5, r1, 0x60
-	stw r0, 0x2774(r31)
-	mr r3, r27
-	addi r4, r1, 0x5c
-	addi r6, r1, 0x64
-	lfs f1, 0x281c(r31)
-	lfs f0, 0x2810(r31)
-	fsubs f30, f1, f0
-	bl BtlUnit_GetPos
-	lfs f0, float_0_8041c454(r2)
-	lfs f3, 0x281c(r31)
-	lfs f1, 0x5c(r1)
-	fcmpu cr0, f0, f30
-	fsubs f0, f3, f1
-	bne @62
-	lfs f7, float_0p5_8041c460(r2)
-	b @63
-	@62:
-	fdivs f7, f0, f30
-	@63:
-	lfs f0, float_1_8041c470(r2)
-	fcmpo cr0, f7, f0
-	ble @64
-	fmr f7, f0
-	@64:
-	lfs f0, float_0p5_8041c460(r2)
-	fcmpo cr0, f7, f0
-	bge @65
-	fmr f7, f0
-	@65:
-	lfs f2, 0x60(r1)
-	lfs f0, 0x2814(r31)
-	lfs f1, float_1_8041c470(r2)
-	fsubs f5, f2, f0
-	lfs f0, float_100_8041c464(r2)
-	fsubs f4, f1, f7
-	lfs f2, float_2_8041c450(r2)
-	lfs f1, 0x2778(r31)
-	fsubs f5, f5, f0
-	lfs f0, float_0_8041c454(r2)
-	fmuls f6, f2, f1
-	fmuls f1, f4, f3
-	fcmpo cr0, f5, f0
-	ble @66
-	fmr f5, f0
-	@66:
-	lfs f0, float_neg30_8041c4c0(r2)
-	fcmpo cr0, f5, f0
-	bge @67
-	fmr f5, f0
-	@67:
-	lfd f2, 0x138(r29)
-	fmuls f6, f4, f6
-	lfs f0, float_125_8041c4c4(r2)
-	fmr f4, f1
-	fsub f3, f2, f7
-	lfs f2, float_750_8041c484(r2)
-	fsubs f7, f0, f5
-	lfs f5, float_110_8041c480(r2)
-	addi r5, r1, 0x34
-	fneg f8, f3
-	fsubs f3, f2, f6
-	lfs f0, float_60_8041c488(r2)
-	fneg f6, f6
-	addi r6, r1, 0x30
-	fmul f7, f8, f7
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	frsp f7, f7
-	li r4, 0x1
-	fadds f2, f5, f7
-	fadds f5, f0, f7
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x1b0
-	bl strcpy
-	b @4
-	@68:
-	lwz r3, 0x2758(r31)
-	addi r0, r3, 0x1
-	stw r0, 0x2758(r31)
-	lwz r0, 0x2758(r31)
-	cmpwi r0, 0x1
-	bne @69
-	bl pouchGetPtr
-	lha r0, 0x88(r3)
-	cmpwi r0, 0x2
-	beq @70
-	bge @71
-	cmpwi r0, 0x0
-	beq @72
-	bge @73
-	b @74
-	@71:
-	cmpwi r0, 0x4
-	bge @74
-	b @75
-	@72:
-	lfs f30, float_750_8041c484(r2)
-	b @74
-	@73:
-	lfs f30, float_830_8041c49c(r2)
-	b @74
-	@70:
-	lfs f30, float_920_8041c4a0(r2)
-	b @74
-	@75:
-	lfs f30, float_1000_8041c4a4(r2)
-	@74:
-	lfs f1, float_0_8041c454(r2)
-	li r0, 0x3
-	sth r0, 0x277c(r31)
-	fmr f3, f30
-	fmr f4, f1
-	lfs f2, float_110_8041c480(r2)
-	fmr f6, f1
-	sth r0, 0x277e(r31)
-	lfs f5, float_60_8041c488(r2)
-	addi r5, r1, 0x34
-	addi r6, r1, 0x30
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	@69:
-	lwz r0, 0x2758(r31)
-	cmpwi r0, 0xa
-	bne @76
-	li r0, 0x0
-	li r3, 0x0
-	stw r0, 0x2758(r31)
-	li r4, 0x3
-	bl btl_camera_set_mode
-	lfs f1, float_0_8041c454(r2)
-	li r3, 0x0
-	lfs f2, float_110_8041c480(r2)
-	li r4, 0x78
-	fmr f4, f1
-	lfs f3, float_750_8041c484(r2)
-	fmr f6, f1
-	lfs f5, float_60_8041c488(r2)
-	li r5, 0x4
-	bl btl_camera_set_moveto
-	@76:
-	addi r3, r1, 0x68
-	addi r4, r29, 0x1d8
-	bl strcpy
-	b @4
-	@77:
-	lfs f1, float_0_8041c454(r2)
-	li r0, 0x3
-	sth r0, 0x277c(r31)
-	addi r5, r1, 0x34
-	fmr f4, f1
-	lfs f2, float_110_8041c480(r2)
-	fmr f6, f1
-	sth r0, 0x277e(r31)
-	lfs f3, float_500_8041c4c8(r2)
-	addi r6, r1, 0x30
-	lfs f5, float_60_8041c488(r2)
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x1f4
-	bl strcpy
-	b @4
-	@78:
-	lfs f1, float_neg100_8041c468(r2)
-	li r0, 0x3
-	sth r0, 0x277c(r31)
-	addi r5, r1, 0x34
-	fmr f4, f1
-	lfs f2, float_110_8041c480(r2)
-	sth r0, 0x277e(r31)
-	addi r6, r1, 0x30
-	lfs f3, float_500_8041c4c8(r2)
-	addi r7, r1, 0x2c
-	lfs f5, float_60_8041c488(r2)
-	addi r8, r1, 0x28
-	lfs f6, float_0_8041c454(r2)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x20c
-	bl strcpy
-	b @4
-	@79:
-	mr r3, r31
-	bl BattleGetMarioPtr
-	mr r0, r3
-	mr r3, r31
-	mr r25, r0
-	bl BattleGetPartyPtr
-	mr. r26, r3
-	beq @80
-	mr r3, r25
-	addi r4, r1, 0x1c
-	addi r5, r1, 0x18
-	addi r6, r1, 0x14
-	bl BtlUnit_GetHomePos
-	mr r3, r26
-	addi r4, r1, 0x10
-	addi r5, r1, 0xc
-	addi r6, r1, 0x8
-	bl BtlUnit_GetHomePos
-	lfs f3, 0x1c(r1)
-	lfs f2, 0x10(r1)
-	lfs f1, 0x18(r1)
-	lfs f0, 0xc(r1)
-	fadds f4, f3, f2
-	lfs f5, float_0p5_8041c460(r2)
-	fadds f3, f1, f0
-	lwz r0, 0x2760(r31)
-	lfs f2, 0x14(r1)
-	fmuls f1, f5, f4
-	lfs f0, 0x8(r1)
-	cmpwi r0, 0x12
-	fadds f0, f2, f0
-	fmuls f6, f5, f3
-	fmuls f5, f5, f0
-	bne @81
-	lfs f0, float_20_8041c4cc(r2)
-	fsubs f6, f6, f0
-	b @81
-	@80:
-	mr r3, r25
-	addi r4, r1, 0x1c
-	addi r5, r1, 0x18
-	addi r6, r1, 0x14
-	bl BtlUnit_GetHomePos
-	lfs f1, 0x1c(r1)
-	lfs f6, 0x18(r1)
-	lfs f5, 0x14(r1)
-	@81:
-	lfs f2, float_100_8041c464(r2)
-	li r0, 0x1
-	lfs f3, float_350_8041c4d0(r2)
-	fmr f4, f1
-	sth r0, 0x277c(r31)
-	fadds f2, f2, f6
-	lfs f0, float_50_8041c4a8(r2)
-	fadds f3, f3, f5
-	sth r0, 0x277e(r31)
-	fadds f5, f0, f6
-	lfs f6, float_0_8041c454(r2)
-	addi r5, r1, 0x34
-	addi r6, r1, 0x30
-	addi r7, r1, 0x2c
-	addi r8, r1, 0x28
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x224
-	bl strcpy
-	b @4
-	@82:
-	addi r3, r1, 0x68
-	addi r4, r29, 0x238
-	bl strcpy
-	b @4
-	@83:
-	lfs f1, float_neg100_8041c468(r2)
-	li r0, 0x2
-	sth r0, 0x277c(r31)
-	addi r5, r1, 0x34
-	fmr f4, f1
-	lfs f2, float_100_8041c464(r2)
-	sth r0, 0x277e(r31)
-	addi r6, r1, 0x30
-	lfs f3, float_400_8041c494(r2)
-	addi r7, r1, 0x2c
-	lfs f5, float_50_8041c4a8(r2)
-	addi r8, r1, 0x28
-	lfs f6, float_0_8041c454(r2)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x1
-	li r4, 0x1
-	bl battleCameraMoveTo
-	addi r3, r1, 0x68
-	addi r4, r29, 0x24c
-	bl strcpy
-	b @4
-	@2:
-	addi r3, r1, 0x68
-	addi r4, r29, 0x260
-	bl strcpy
-	@4:
-	lfs f1, 0x14(r30)
-	lfs f0, float_1000_8041c4a4(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @84
-	stfs f0, 0x14(r30)
-	@84:
-	lwz r0, 0x2754(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	beq @85
-	lfs f1, 0x278c(r31)
-	lfs f0, float_0_8041c454(r2)
-	stfs f1, 0xc(r30)
-	lfs f1, 0x27a4(r31)
-	stfs f1, 0x18(r30)
-	stfs f0, 0x34(r1)
-	stfs f0, 0x28(r1)
-	@85:
-	lwz r0, 0x2754(r31)
-	rlwinm. r0, r0, 0, 28, 28
-	beq @86
-	lfs f1, 0x2790(r31)
-	lfs f0, float_0_8041c454(r2)
-	stfs f1, 0x10(r30)
-	lfs f1, 0x27a8(r31)
-	stfs f1, 0x1c(r30)
-	stfs f0, 0x30(r1)
-	stfs f0, 0x24(r1)
-	@86:
-	lwz r0, 0x2754(r31)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @87
-	lfs f1, 0x2794(r31)
-	lfs f0, float_0_8041c454(r2)
-	stfs f1, 0x14(r30)
-	lfs f1, 0x27ac(r31)
-	stfs f1, 0x20(r30)
-	stfs f0, 0x2c(r1)
-	stfs f0, 0x20(r1)
-	@87:
-	lfs f0, 0xc(r30)
-	stfs f0, 0x2780(r31)
-	lfs f0, 0x10(r30)
-	stfs f0, 0x2784(r31)
-	lfs f0, 0x14(r30)
-	stfs f0, 0x2788(r31)
-	lfs f0, 0x18(r30)
-	stfs f0, 0x2798(r31)
-	lfs f0, 0x1c(r30)
-	stfs f0, 0x279c(r31)
-	lfs f0, 0x20(r30)
-	stfs f0, 0x27a0(r31)
-	lwz r0, 0xc(r29)
-	lwz r3, 0x10(r29)
-	stw r0, 0x44(r1)
-	lfs f0, 0x34(r1)
-	lwz r0, 0x14(r29)
-	stfs f0, 0x44(r1)
-	lfs f1, 0x30(r1)
-	stw r3, 0x48(r1)
-	lfs f0, 0x2c(r1)
-	stw r0, 0x4c(r1)
-	lwz r0, 0x44(r1)
-	stfs f1, 0x48(r1)
-	stfs f0, 0x4c(r1)
-	lwz r3, 0x48(r1)
-	stw r0, 0x27bc(r31)
-	lwz r0, 0x4c(r1)
-	stw r3, 0x27c0(r31)
-	stw r0, 0x27c4(r31)
-	lwz r4, 0x18(r29)
-	lwz r3, 0x1c(r29)
-	lwz r0, 0x20(r29)
-	stw r4, 0x38(r1)
-	lfs f0, 0x28(r1)
-	stw r3, 0x3c(r1)
-	lfs f1, 0x24(r1)
-	stfs f0, 0x38(r1)
-	lfs f0, 0x20(r1)
-	stw r0, 0x40(r1)
-	lwz r0, 0x38(r1)
-	stfs f1, 0x3c(r1)
-	stfs f0, 0x40(r1)
-	lwz r3, 0x3c(r1)
-	stw r0, 0x27c8(r31)
-	lwz r0, 0x40(r1)
-	stw r3, 0x27cc(r31)
-	stw r0, 0x27d0(r31)
-	lwz r3, 0x2754(r31)
-	clrlwi. r0, r3, 31
-	bne @88
-	rlwinm. r0, r3, 0, 30, 30
-	bne @88
-	li r3, 0x0
-	bl padRumbleOff
-	@88:
-	lwz r0, 0x2754(r31)
-	rlwinm. r0, r0, 0, 25, 25
-	beq @89
-	li r3, 0x0
-	bl padRumbleOff
-	@89:
-	lwz r0, 0x2754(r31)
-	clrlwi. r0, r0, 31
-	beq @90
-	lha r25, 0x277c(r31)
-	li r0, 0x3
-	lha r26, 0x277e(r31)
-	lwz r4, 0x2838(r31)
-	lwz r3, 0x2830(r31)
-	sth r0, 0x277c(r31)
-	subf r3, r4, r3
-	rlwinm r27, r3, 0, 30, 30
-	sth r0, 0x277e(r31)
-	lwz r5, 0x2830(r31)
-	lwz r0, 0x2838(r31)
-	lwz r3, 0x2828(r31)
-	subf r0, r0, r5
-	lfs f1, 0x2840(r31)
-	srawi r0, r0, 1
-	lfs f2, 0x2844(r31)
-	addze r4, r0
-	srawi r0, r5, 1
-	addze r5, r0
-	bl intplGetValue
-	stfs f1, 0x2850(r31)
-	lwz r0, 0x2838(r31)
-	cmpwi r0, 0x0
-	ble @91
-	cmpwi r27, 0x0
-	bne @92
-	lfs f3, 0x2850(r31)
-	addi r5, r1, 0x34
-	lfs f1, 0xc(r30)
-	addi r6, r1, 0x30
-	lfs f0, 0x18(r30)
-	addi r7, r1, 0x2c
-	fadds f1, f1, f3
-	lfs f2, 0x10(r30)
-	fadds f4, f0, f3
-	lfs f3, 0x14(r30)
-	lfs f5, 0x1c(r30)
-	addi r8, r1, 0x28
-	lfs f6, 0x20(r30)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x0
-	bl battleCameraMoveTo
-	b @93
-	@92:
-	lfs f3, 0x2850(r31)
-	addi r5, r1, 0x34
-	lfs f1, 0xc(r30)
-	addi r6, r1, 0x30
-	lfs f0, 0x18(r30)
-	addi r7, r1, 0x2c
-	fsubs f1, f1, f3
-	lfs f2, 0x10(r30)
-	fsubs f4, f0, f3
-	lfs f3, 0x14(r30)
-	lfs f5, 0x1c(r30)
-	addi r8, r1, 0x28
-	lfs f6, 0x20(r30)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x0
-	bl battleCameraMoveTo
-	b @93
-	@91:
-	bne @93
-	lwz r0, 0x2754(r31)
-	clrrwi r0, r0, 1
-	stw r0, 0x2754(r31)
-	@93:
-	sth r25, 0x277c(r31)
-	sth r26, 0x277e(r31)
-	lwz r3, 0x2838(r31)
-	subi r0, r3, 0x1
-	stw r0, 0x2838(r31)
-	@90:
-	lwz r0, 0x2754(r31)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @94
-	lha r25, 0x277c(r31)
-	li r0, 0x3
-	lha r26, 0x277e(r31)
-	lwz r4, 0x283c(r31)
-	lwz r3, 0x2834(r31)
-	sth r0, 0x277c(r31)
-	subf r3, r4, r3
-	rlwinm r27, r3, 0, 30, 30
-	sth r0, 0x277e(r31)
-	lwz r5, 0x2834(r31)
-	lwz r0, 0x283c(r31)
-	lwz r3, 0x282c(r31)
-	subf r0, r0, r5
-	lfs f1, 0x2848(r31)
-	srawi r0, r0, 1
-	lfs f2, 0x284c(r31)
-	addze r4, r0
-	srawi r0, r5, 1
-	addze r5, r0
-	bl intplGetValue
-	stfs f1, 0x2854(r31)
-	lwz r0, 0x283c(r31)
-	cmpwi r0, 0x0
-	ble @95
-	cmpwi r27, 0x0
-	bne @96
-	lfs f3, 0x2854(r31)
-	addi r5, r1, 0x34
-	lfs f1, 0x10(r30)
-	addi r6, r1, 0x30
-	lfs f0, 0x1c(r30)
-	addi r7, r1, 0x2c
-	fadds f2, f1, f3
-	lfs f1, 0xc(r30)
-	fadds f5, f0, f3
-	lfs f3, 0x14(r30)
-	lfs f4, 0x18(r30)
-	addi r8, r1, 0x28
-	lfs f6, 0x20(r30)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x0
-	bl battleCameraMoveTo
-	b @97
-	@96:
-	lfs f3, 0x2854(r31)
-	addi r5, r1, 0x34
-	lfs f1, 0x10(r30)
-	addi r6, r1, 0x30
-	lfs f0, 0x1c(r30)
-	addi r7, r1, 0x2c
-	fsubs f2, f1, f3
-	lfs f1, 0xc(r30)
-	fsubs f5, f0, f3
-	lfs f3, 0x14(r30)
-	lfs f4, 0x18(r30)
-	addi r8, r1, 0x28
-	lfs f6, 0x20(r30)
-	addi r9, r1, 0x24
-	addi r10, r1, 0x20
-	li r3, 0x0
-	li r4, 0x0
-	bl battleCameraMoveTo
-	b @97
-	@95:
-	bne @97
-	lwz r0, 0x2754(r31)
-	rlwinm r0, r0, 0, 31, 29
-	stw r0, 0x2754(r31)
-	@97:
-	sth r25, 0x277c(r31)
-	sth r26, 0x277e(r31)
-	lwz r3, 0x283c(r31)
-	subi r0, r3, 0x1
-	stw r0, 0x283c(r31)
-	@94:
-	psq_l f31, 0xf8(r1), 0, 0
-	lfd f31, 0xf0(r1)
-	psq_l f30, 0xe8(r1), 0, 0
-	lfd f30, 0xe0(r1)
-	lmw r25, 0xc4(r1)
-	lwz r0, 0x104(r1)
-	mtlr r0
-	addi r1, r1, 0x100
-	blr
+void btl_camera_set_prilimit(s32 pri) {
+  _battleWorkPointer->cameraWork.priLimit = pri;
 }
 
-asm void battleCameraInit(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x0
-	li r5, 0x104
-	stw r0, 0x14(r1)
-	stmw r30, 0x8(r1)
-	lwz r31, _battleWorkPointer(r13)
-	addi r30, r31, 0x2754
-	mr r3, r30
-	bl memset
-	li r0, 0x0
-	stw r0, 0x0(r30)
-	lwz r3, 0x2738(r31)
-	lwz r0, 0x8(r3)
-	cmpwi r0, 0x9
-	beq @1
-	bge @2
-	cmpwi r0, 0x0
-	beq @3
-	bge @4
-	b @2
-	@4:
-	li r0, 0xf
-	stw r0, 0xc(r30)
-	b @2
-	@1:
-	li r0, 0x10
-	stw r0, 0xc(r30)
-	b @2
-	@3:
-	li r0, 0xe
-	stw r0, 0xc(r30)
-	@2:
-	li r5, 0x0
-	lis r3, vec3_802efc40@ha
-	stw r5, 0x8(r30)
-	li r0, 0x1
-	lfs f0, float_0_8041c454(r2)
-	addi r4, r3, vec3_802efc40@l
-	stfs f0, 0x24(r30)
-	sth r0, 0x28(r30)
-	sth r0, 0x2a(r30)
-	lwz r3, 0x0(r4)
-	lwz r0, 0x4(r4)
-	stw r3, 0x5c(r30)
-	stw r0, 0x60(r30)
-	lwz r0, 0x8(r4)
-	stw r0, 0x64(r30)
-	stw r5, 0x4(r30)
-	lmw r30, 0x8(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
+#pragma dont_inline on
+s32 evt_btl_camera_set_prilimit(EventEntry* event, BOOL isFirstCall) {
+  btl_camera_set_prilimit(evtGetValue(event, event->args[0]));
+#endif
+  return 2;
 }
-// clang-format on
+#ifndef NONMATCHING
+#pragma dont_inline reset
+
+#pragma dont_inline on
+void btl_camera_set_mode(s32 pri, s32 mode) {
+  BattleWork* wp = _battleWorkPointer;
+  if (pri >= wp->cameraWork.priLimit) {
+    wp->cameraWork.mode = mode;
+    wp->cameraWork.zoom = EXT_LIT(float_0_8041c454, 0.0f);
+    wp->cameraWork.moveSpeedLv = 1;
+    wp->cameraWork.zoomSpeedLv = 1;
+    wp->cameraWork.unk4 = 0;
+    btl_camera_nomove_x_onoff(0, 0);
+    btl_camera_nomove_y_onoff(0, 0);
+    btl_camera_nomove_z_onoff(0, 0);
+    wp->cameraWork.flags &= ~0x20;
+  }
+}
+#pragma dont_inline reset
+
+#pragma dont_inline on
+s32 evt_btl_camera_set_mode(EventEntry* event, BOOL isFirstCall) {
+  s32* args = event->args;
+  s32 pri = evtGetValue(event, args[0]);
+  s32 val = evtGetValue(event, args[1]);
+  btl_camera_set_mode(pri, val);
+  return 2;
+}
+#pragma dont_inline reset
 #endif
 
+
+#ifndef NONMATCHING
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
+__declspec(section ".rodata") const f32 vec3_802efc40[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc4c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc58[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc64[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc70[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc7c[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc88[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efc94[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f32 vec3_802efca0[3] = {0.0f, 0.0f, 0.0f};
+__declspec(section ".rodata") const f64 double_to_int_802efcb0 = 4503601774854144.0;
+__declspec(section ".rodata") const char str_802EFCB8[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xc5\x82\xd3\x82\xa7\x82\xe9\x82\xc6\0";
+__declspec(section ".rodata") const char str_802EFCCC[28] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xc5\x82\xd3\x82\xa7\x82\xe9\x82\xc6\x83Y\x81[\x83\x80\0\0\0";
+__declspec(section ".rodata") const char str_802EFCE8[28] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xa9\x81[\x82\xbb\x82\xe9\x82\xaa\x82\xa4\x82\xa6\x82\xc9\0\0\0";
+__declspec(section ".rodata") const char str_802EFD04[16] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xd3\x82\xe8\x81[\0";
+__declspec(section ".rodata") const char str_802EFD14[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xd4\x82\xbd\x82\xa2\x82\xa4\x82\xe7\0";
+__declspec(section ".rodata") const char str_802EFD28[24] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xd4\x82\xbd\x82\xa2\x82\xa4\x82\xe7\x82Q\0\0\0";
+__declspec(section ".rodata") const char str_802EFD40[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xa9\x82\xf1\x82\xab\x82\xe1\x82\xad\0";
+__declspec(section ".rodata") const char str_802EFD54[24] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xe4\x82\xc9\x82\xc1\x82\xc6\x82\xc2\x82\xa2\x82\xd1\0";
+__declspec(section ".rodata") const u32 gap_04_802EFD6C_rodata = 0x00000000;
+__declspec(section ".rodata") const f64 double_20_802efd70 = 20.0;
+__declspec(section ".rodata") const f64 double_1_802efd78 = 1.0;
+__declspec(section ".rodata") const char str_802EFD80[32] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82Q\x82\xe4\x82\xc9\x82\xc1\x82\xc6\x82\xa9\x82\xf1\x82\xc2\x82\xa2\x82\xd1\0\0\0";
+__declspec(section ".rodata") const char str_802EFDA0[24] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xcf\x81[\x82\xc2\x82\xc2\x82\xa2\x82\xd1\0\0\0";
+__declspec(section ".rodata") const char str_802EFDB8[28] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82Q\x82\xcf\x81[\x82\xc2\x82\xa9\x82\xf1\x82\xc2\x82\xa2\x82\xd1\0";
+__declspec(section ".rodata") const char str_802EFDD4[28] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xa9\x82\xf1\x82\xab\x82\xe1\x82\xad\x82\xc2\x82\xa2\x82\xd1\0\0\0";
+__declspec(section ".rodata") const char str_802EFDF0[40] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xe4\x82\xc9\x82\xc1\x82\xc6\x82\xa9\x82\xf1\x82\xab\x82\xe1\x82\xad\x82\xa9\x82\xf1\x82\xc2\x82\xa2\x82\xd1\0\0\0";
+__declspec(section ".rodata") const char str_802EFE18[28] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xd3\x82\xc2\x82\xa4\x82\xc9\x82\xcd\x82\xa2\x82\xc1\x82\xbd\0\0\0";
+__declspec(section ".rodata") const char str_802EFE34[24] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xa4\x82\xdc\x82\xad\x82\xcd\x82\xa2\x82\xc1\x82\xbd\0";
+__declspec(section ".rodata") const char str_802EFE4C[24] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xbe\x82\xdf\x82\xc9\x82\xcd\x82\xa2\x82\xc1\x82\xbd\0";
+__declspec(section ".rodata") const char str_802EFE64[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xb5\x82\xe5\x82\xa4\x82\xe8\0\0\0";
+__declspec(section ".rodata") const char str_802EFE78[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xcd\x82\xa2\x82\xda\x82\xad\0\0\0";
+__declspec(section ".rodata") const char str_802EFE8C[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xc9\x82\xb0\x82\xc4\x82\xe9\0\0\0";
+__declspec(section ".rodata") const char str_802EFEA0[20] = "\x82\xa9\x82\xdf\x82\xe7\x81@\x82\xa8\x82\xa9\x82\xb5\x82\xa2\0\0\0";
+__declspec(section ".rodata") const u32 gap_04_802EFEB4_rodata = 0x00000000;
+__declspec(section ".sdata2") const f32 float_2_8041c450 = 2.0f;
+__declspec(section ".sdata2") const f32 float_0_8041c454 = 0.0f;
+__declspec(section ".sdata2") const f32 float_0p25_8041c458 = 0.25f;
+__declspec(section ".sdata2") const f32 float_600_8041c45c = 600.0f;
+__declspec(section ".sdata2") const f32 float_0p5_8041c460 = 0.5f;
+__declspec(section ".sdata2") const f32 float_100_8041c464 = 100.0f;
+__declspec(section ".sdata2") const f32 float_neg100_8041c468 = -100.0f;
+__declspec(section ".sdata2") const f32 float_1p5_8041c46c = 1.5f;
+__declspec(section ".sdata2") const f32 float_1_8041c470 = 1.0f;
+__declspec(section ".sdata2") const f32 float_15_8041c474 = 15.0f;
+__declspec(section ".sdata2") const f32 float_5_8041c478 = 5.0f;
+__declspec(section ".sdata2") const f32 float_200_8041c47c = 200.0f;
+__declspec(section ".sdata2") const f32 float_110_8041c480 = 110.0f;
+__declspec(section ".sdata2") const f32 float_750_8041c484 = 750.0f;
+__declspec(section ".sdata2") const f32 float_60_8041c488 = 60.0f;
+__declspec(section ".sdata2") const f32 float_160_8041c48c = 160.0f;
+__declspec(section ".sdata2") const f32 float_neg750_8041c490 = -750.0f;
+__declspec(section ".sdata2") const f32 float_400_8041c494 = 400.0f;
+__declspec(section ".sdata2") const f32 float_neg617_8041c498 = -617.0f;
+__declspec(section ".sdata2") const f32 float_830_8041c49c = 830.0f;
+__declspec(section ".sdata2") const f32 float_920_8041c4a0 = 920.0f;
+__declspec(section ".sdata2") const f32 float_1000_8041c4a4 = 1000.0f;
+__declspec(section ".sdata2") const f32 float_50_8041c4a8 = 50.0f;
+__declspec(section ".sdata2") const f32 float_24_8041c4ac = 24.0f;
+__declspec(section ".sdata2") const f32 float_9_8041c4b0 = 9.0f;
+__declspec(section ".sdata2") const f32 float_80_8041c4b4 = 80.0f;
+__declspec(section ".sdata2") const f32 float_10_8041c4b8 = 10.0f;
+__declspec(section ".sdata2") const f32 float_1Eneg05_8041c4bc = 0.00001f;
+__declspec(section ".sdata2") const f32 float_neg30_8041c4c0 = -30.0f;
+__declspec(section ".sdata2") const f32 float_125_8041c4c4 = 125.0f;
+__declspec(section ".sdata2") const f32 float_500_8041c4c8 = 500.0f;
+__declspec(section ".sdata2") const f32 float_20_8041c4cc = 20.0f;
+__declspec(section ".sdata2") const f32 float_350_8041c4d0 = 350.0f;
+__declspec(section ".sdata2") const u32 gap_09_8041C4D4_sdata2[1] = {0};
+
+// jumptables last, as the target emitted them with their functions
+__declspec(section ".data") void* jumptable_80362040[] = {
+    (char*)battleCameraMain + 0x100,
+    (char*)battleCameraMain + 0x14C,
+    (char*)battleCameraMain + 0x1A8,
+    (char*)battleCameraMain + 0x1F0,
+    (char*)battleCameraMain + 0x320,
+    (char*)battleCameraMain + 0x36C,
+    (char*)battleCameraMain + 0x3B8,
+    (char*)battleCameraMain + 0x450,
+    (char*)battleCameraMain + 0x5AC,
+    (char*)battleCameraMain + 0x7D8,
+    (char*)battleCameraMain + 0x964,
+    (char*)battleCameraMain + 0xAD8,
+    (char*)battleCameraMain + 0xD24,
+    (char*)battleCameraMain + 0xD84,
+    (char*)battleCameraMain + 0xEF8,
+    (char*)battleCameraMain + 0xFFC,
+    (char*)battleCameraMain + 0x1054,
+    (char*)battleCameraMain + 0x10AC,
+    (char*)battleCameraMain + 0x10AC,
+    (char*)battleCameraMain + 0x11C0,
+    (char*)battleCameraMain + 0x11D0,
+};
+#endif
 // target pad words (G5: section sizes must match or later DOL addresses shift)
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_80362094_data[1] = {0};
+#ifdef NONMATCHING
 __declspec(section ".sdata2") const u32 gap_09_8041C4D4_sdata2[1] = {0};
+#endif
+#ifndef NONMATCHING
+#pragma force_active reset
+#endif

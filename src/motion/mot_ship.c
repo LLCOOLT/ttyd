@@ -14,6 +14,68 @@
 #include "system.h"
 #include <string.h>
 #include "mario/mariost.h"
+#ifndef NONMATCHING
+__declspec(section ".rodata") extern const f64 double_to_int_802c5e50;
+__declspec(section ".sdata2") extern const f32 float_40_8041ad98;
+__declspec(section ".sdata2") extern const f32 float_20_8041ad9c;
+__declspec(section ".sdata2") extern const f32 float_0_8041ada0;
+__declspec(section ".sdata2") extern const f32 float_neg1_8041ada4;
+__declspec(section ".sdata2") extern const f32 float_0p5_8041ada8;
+__declspec(section ".sdata2") extern const f32 float_100_8041adac;
+__declspec(section ".sdata2") extern const f32 float_90_8041adb0;
+__declspec(section ".sdata2") extern const f32 float_15_8041adb4;
+__declspec(section ".sdata2") extern const f32 float_50_8041adb8;
+__declspec(section ".sdata2") extern const f32 float_30p303_8041adbc;
+__declspec(section ".sdata2") extern const f32 float_180_8041adc0;
+__declspec(section ".sdata2") extern const f32 float_3p1416_8041adc4;
+__declspec(section ".sdata2") extern const f32 float_1_8041adc8;
+__declspec(section ".sdata2") extern const f32 float_0p01_8041adcc;
+__declspec(section ".sdata2") extern const f32 float_0p2_8041add0;
+__declspec(section ".sdata2") extern const f32 float_neg0p1_8041add4;
+__declspec(section ".sdata2") extern const f32 float_neg0p2_8041add8;
+__declspec(section ".sdata2") extern const f32 float_0p024_8041addc;
+__declspec(section ".sdata2") extern const f32 float_neg0p004_8041ade0;
+__declspec(section ".sdata2") extern const f32 float_4p25_8041ade4;
+__declspec(section ".sdata2") extern const f32 float_30_8041ade8;
+__declspec(section ".sdata2") extern const f32 float_neg30_8041adec;
+__declspec(section ".sdata2") extern const f32 float_0p125_8041adf0;
+__declspec(section ".sdata2") extern const f32 float_270_8041adf4;
+__declspec(section ".sdata2") extern const f32 float_neg270_8041adf8;
+__declspec(section ".sdata2") extern const char str_8041ADFC[];
+__declspec(section ".sdata2") extern const f32 float_1024_8041ae04;
+__declspec(section ".sdata2") extern const f32 float_1260_8041ae08;
+__declspec(section ".sdata2") extern const f32 float_neg1080_8041ae0c;
+__declspec(section ".sdata2") extern const f32 float_neg15_8041ae10;
+__declspec(section ".sdata2") extern const f32 float_0p1_8041ae14;
+__declspec(section ".sdata2") extern const f32 float_1620_8041ae18;
+__declspec(section ".sdata2") extern const f32 float_neg1440_8041ae1c;
+__declspec(section ".sdata2") extern const f32 float_36_8041ae20;
+__declspec(section ".sdata2") extern const f32 float_306_8041ae24;
+__declspec(section ".sdata2") extern const f32 float_neg0p4_8041ae28;
+__declspec(section ".sdata2") extern const f32 float_neg18_8041ae2c;
+__declspec(section ".sdata2") extern const f32 float_1p6_8041ae30;
+__declspec(section ".sdata2") extern const f32 float_2p8_8041ae34;
+__declspec(section ".sdata2") extern const f32 float_10_8041ae38;
+__declspec(section ".sdata2") extern const f32 float_2_8041ae3c;
+__declspec(section ".sdata2") extern const f32 float_80_8041ae40;
+__declspec(section ".sdata2") extern const f32 float_neg20_8041ae44;
+__declspec(section ".sdata2") extern const f32 float_360_8041ae48;
+__declspec(section ".sdata2") extern const f32 float_0p05_8041ae4c;
+__declspec(section ".sdata2") extern const f32 float_neg0p005_8041ae50;
+__declspec(section ".sdata2") extern const f32 float_neg360_8041ae54;
+__declspec(section ".sdata2") extern const f32 float_4_8041ae58;
+__declspec(section ".sdata2") extern const f32 float_neg4_8041ae5c;
+__declspec(section ".sdata2") extern const f32 float_540_8041ae60;
+__declspec(section ".sdata2") extern const f32 float_37_8041ae64;
+__declspec(section ".sdata2") extern const f32 float_neg13_8041ae68;
+__declspec(section ".sdata2") extern const f32 float_3_8041ae6c;
+__declspec(section ".sdata2") extern const f32 float_0p3_8041ae70;
+__declspec(section ".sdata2") extern const f32 float_0p6_8041ae74;
+__declspec(section ".sdata2") extern const f32 float_neg7_8041ae78;
+__declspec(section ".sdata2") extern const f32 float_260_8041ae7c;
+#define EXT_LIT(sym, val) (sym)
+
+#endif
 extern const char str_802C5E00[];
 extern const char str_802C5E14[];
 extern const char str_802C5E24[];
@@ -62,8 +124,14 @@ CALL(evt_snd_sfxon_3d, STRING((char*)str_802C5E14), LW(0), LW(1), LW(2), 0)
 RETURN
 EVT_END()
 
+#ifdef NONMATCHING
 f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
 const char* paper_ship[4] = {(char*)str_802C5E24, (char*)str_802C5E2C, (char*)str_802C5E38, (char*)str_802C5E44};
+#endif
+#ifndef NONMATCHING
+__declspec(section ".sdata") f32 shipData[6] = {-0.05f, -0.7f, 0.02f, 0.02f, 2.0f, 0.01f};
+__declspec(section ".sdata") const char* paper_ship[4] = {(char*)str_802C5E24, (char*)str_802C5E2C, (char*)str_802C5E38, (char*)str_802C5E44};
+#endif
 
 void sincosf(f32* s, f32* c, f32 a);
 
@@ -119,6 +187,7 @@ double sin(double);
 double cos(double);
 void shipMove(void);
 #define EFFP() (*(void**)((u8*)*(void**)((u8*)marioGetPtr()->motStruct + 0x24) + 0xC))
+#ifdef NONMATCHING
 #define SHIP_EFF()                                                                                                 \
 	{                                                                                                              \
 		f30 = MSF(m, 0x180);                                                                                       \
@@ -148,8 +217,39 @@ void shipMove(void);
 			MSF(EFFP(), 0x14) = f31;                                                                               \
 		}                                                                                                          \
 	}
+#endif
+#ifndef NONMATCHING
+#define SHIP_EFF()                                                                                                 \
+	{                                                                                                              \
+		f30 = MSF(m, 0x180);                                                                                       \
+		{                                                                                                          \
+			MarioWork* mm = marioGetPtr();                                                                         \
+			f32 zz = EXT_LIT(float_0_8041ada0, 0.0f);                                                                                         \
+			if (EXT_LIT(float_0_8041ada0, 0.0f) == f30) {                                                                                     \
+				s32 c;                                                                                             \
+				marioGetPtr();                                                                                     \
+				c = (MSOF(8) > EXT_LIT(float_180_8041adc0, 180.0f)) ? 0 : 1;                                                                    \
+				f30 = c ? EXT_LIT(float_0p3_8041ae70, 0.3f) : EXT_LIT(float_0p6_8041ae74, 0.6f);                                                                             \
+				{                                                                                                  \
+					f32* ms = (f32*)marioGetPtr()->motStruct;                                                      \
+					f32 old = ms[4];                                                                               \
+					ms[4] = old + EXT_LIT(float_0p1_8041ae14, 0.1f) * (f30 - MSOF(0x10));                                                       \
+				}                                                                                                  \
+				f30 = MSOF(0x10);                                                                                  \
+			}                                                                                                      \
+			f31 = mm->position.x;                                                                                  \
+			MSF(EFFP(), 4) = f31;                                                                                  \
+			f31 = mm->position.y + zz;                                                                           \
+			MSF(EFFP(), 8) = f31;                                                                                  \
+			f31 = mm->position.z;                                                                                  \
+			MSF(EFFP(), 0xc) = f31;                                                                                \
+			MSF(EFFP(), 0x10) = f30;                                                                               \
+			f31 = MSF(mm, 0x1a8);                                                                                  \
+			MSF(EFFP(), 0x14) = f31;                                                                               \
+		}                                                                                                          \
+	}
+#endif
 
-#ifdef NONMATCHING
 s32 N_marioShipGetDir(void) {
 	marioGetPtr();
 	if (marioGetPtr()->motStruct != NULL) {
@@ -157,9 +257,7 @@ s32 N_marioShipGetDir(void) {
 	}
 	return 0;
 }
-#endif
 
-#ifdef NONMATCHING
 s32 marioShipChanging(void) {
 	MarioWork* m = marioGetPtr();
 	if (m->currMotionId != MARIO_MOTION_SHIP) {
@@ -176,9 +274,7 @@ s32 marioShipChanging(void) {
 	}
 	return 0;
 }
-#endif
 
-#ifdef NONMATCHING
 void marioSetSwirlPower(s32 msec, f32 a, f32 b) {
 	s32 t;
 	marioGetPtr();
@@ -187,57 +283,105 @@ void marioSetSwirlPower(s32 msec, f32 a, f32 b) {
 	((ShipWork*)marioGetPtr()->motStruct)->swirlX = a;
 	((ShipWork*)marioGetPtr()->motStruct)->swirlY = b;
 }
-#endif
 
-#ifdef NONMATCHING
 BOOL marioChkSwirlPower(void) {
 	marioGetPtr();
 	return ((ShipWork*)marioGetPtr()->motStruct)->swirlTime != 0;
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+void *memset(void *dest, int ch, size_t count);
+int psndSFX_pos();
+int strcmp(const char *s1, const char *s2);
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void marioShipForceStop(void) {
+#ifdef NONMATCHING
 	f32 a = 0.0f;
 	f32 b;
 	marioGetPtr();
 	b = 0.0f;
 	((ShipDir*)marioGetPtr()->motStruct)->dispX = a;
 	((ShipDir*)marioGetPtr()->motStruct)->dispY = b;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		bl marioGetPtr
+		lfs f30, float_0_8041ada0(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0xD3C30014
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30018
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void marioShipSetDispDir(void) {
+#ifdef NONMATCHING
 	f32 a = 0.0f;
 	f32 b;
 	marioGetPtr();
 	b = 0.0f;
 	((ShipDir*)marioGetPtr()->motStruct)->dispX = a;
 	((ShipDir*)marioGetPtr()->motStruct)->dispY = b;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		bl marioGetPtr
+		lfs f30, float_0_8041ada0(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0xD3C30014
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30018
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 BOOL marioChkShipPlace(HitEntry* hit) {
 	return (hitGetAttr(hit) & 0x3C000) != 0;
 }
-#endif
 
-#ifdef NONMATCHING
 void marioForceShipAnime(void) {
 	MarioWork* m = marioGetPtr();
 	marioPaperOff();
 	marioChgPaper(NULL);
 	marioPaperOn(paper_ship[marioGetColor()]);
 	marioChgPaper((char*)str_802C5E70);
+#ifdef NONMATCHING
 	marioChgPose("M_Z_1");
+#endif
+#ifndef NONMATCHING
+	marioChgPose(EXT_LIT((char*)str_8041ADFC, "M_Z_1"));
+#endif
 	m->dispFlags |= 8;
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void marioReInit_ship(void) {
+#ifdef NONMATCHING
 	MarioWork* m = marioGetPtr();
 	void* p;
 	s32 t, u;
@@ -280,10 +424,112 @@ void marioReInit_ship(void) {
 	u = m->camId;
 	*(s32*)((u8*)*(void**)((u8*)*(void**)((u8*)marioGetPtr()->motStruct + 0x24) + 0xC) + 0x48) = u;
 	allPartyForceRideOn();
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		bl marioGetPtr
+		opword 0x7C7F1B78
+		opword 0x38600000
+		opword 0x801F000C
+		opword 0x38800048
+		opword 0x5400003C
+		opword 0x901F000C
+		bl __memAlloc
+		opword 0x7C7D1B78
+		bl marioGetPtr
+		opword 0x93A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x38800000
+		opword 0x38A00048
+		bl memset
+		opword 0x38000019
+		lfs f1, float_neg15_8041ae10(r2)
+		opword 0xB01F002E
+		opword 0x38000032
+		lfs f0, float_40_8041ad98(r2)
+		opword 0xD03F009C
+		opword 0x901F0044
+		opword 0xD01F01B4
+		opword 0xD01F01B8
+		bl marioGetColor
+		opword 0x5460103A
+		la r3, paper_ship(r13)
+		opword 0x7C63002E
+		bl marioPaperOn
+		lis r3, str_802C5E60@ha
+		addi r3, r3, str_802C5E60@l
+		bl marioChgPaper
+		la r3, str_8041ADFC(r2)
+		bl marioChgPose
+		opword 0x807F0004
+		opword 0x38000058
+		opword 0x60630008
+		opword 0x907F0004
+		opword 0x901F02A4
+		opword 0x807F02A4
+		bl marioSetPaperAnimeLocalTime
+		li r29, -0x1
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x3BC00000
+		opword 0x93A30038
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0x93C30000
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_0_8041ada0(r2)
+		opword 0xD3E30004
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0xD3C30014
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_0_8041ada0(r2)
+		opword 0xD3E30018
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0xD3C3001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_0_8041ada0(r2)
+		opword 0xD3E30020
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_4p25_8041ade4(r2)
+		opword 0xD3C30008
+		bl marioGetPtr
+		lfs f1, float_0_8041ada0(r2)
+		opword 0x80830288
+		opword 0x38600000
+		opword 0xFC400890
+		opword 0xFC600890
+		opword 0xD3E4000C
+		opword 0xFC800890
+		opword 0xFCA00890
+		bl effFunemizuEntry
+		opword 0x7C7E1B78
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93C30024
+		opword 0x83FF0134
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0x93E30048
+		bl allPartyForceRideOn
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void mot_ship_post(void) {
 	MarioWork* m = marioGetPtr();
 	s32 t;
@@ -291,8 +537,14 @@ void mot_ship_post(void) {
 	if (m->dispFlags & 0x40000000) {
 		marioPaperOff();
 	}
+#ifdef NONMATCHING
 	m->wPlayerCollisionBox.x = 20.0f;
 	m->wPlayerCollisionBox.y = 37.0f;
+#endif
+#ifndef NONMATCHING
+	m->wPlayerCollisionBox.x = EXT_LIT(float_20_8041ad9c, 20.0f);
+	m->wPlayerCollisionBox.y = EXT_LIT(float_37_8041ae64, 37.0f);
+#endif
 	marioGetPtr();
 	if (marioGetPtr()->motStruct != NULL) {
 		if ((u32)MSO(0x38) != 0xFFFFFFFFU) {
@@ -311,10 +563,70 @@ void mot_ship_post(void) {
 		marioGetPtr()->motStruct = (void*)t;
 	}
 }
-#endif
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+void mot_ship(void);
+__declspec(section ".data") static void* jumptable_8030ECF8[] = {
+    (char*)mot_ship + 0x108,
+    (char*)mot_ship + 0x26C,
+    (char*)mot_ship + 0x480,
+    (char*)mot_ship + 0x558,
+    (char*)mot_ship + 0x5C8,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x6EC,
+    (char*)mot_ship + 0x9FC,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0xBF0,
+    (char*)mot_ship + 0xC18,
+    (char*)mot_ship + 0xCD8,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0xCF0,
+    (char*)mot_ship + 0xEB0,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0xFDC,
+    (char*)mot_ship + 0x10FC,
+    (char*)mot_ship + 0x119C,
+    (char*)mot_ship + 0x1264,
+    (char*)mot_ship + 0x13D8,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x158C,
+    (char*)mot_ship + 0x1A80,
+    (char*)mot_ship + 0x1594,
+};
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+#endif
 void mot_ship(void) {
+#ifdef NONMATCHING
 	MarioWork* m = marioGetPtr();
 	MarioWork* m2;
 	s32 r29, r27;
@@ -954,24 +1266,1724 @@ void mot_ship(void) {
 			}
 		}
 		break;
+#endif
+#ifndef NONMATCHING
+	char _af_pad[76];
+	asm volatile {
+		lis r3, str_802C5E00@ha
+		addi r30, r3, str_802C5E00@l
+		bl marioGetPtr
+		opword 0x7C7F1B78
+		opword 0x8063000C
+		opword 0x546007FF
+		opword 0x418200AC
+		opword 0x5460003C
+		opword 0x38600000
+		opword 0x901F000C
+		opword 0x38800048
+		opword 0x801F0000
+		opword 0x54000416
+		opword 0x901F0000
+		bl __memAlloc
+		opword 0x7C7C1B78
+		bl marioGetPtr
+		opword 0x93830288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x38800000
+		opword 0x38A00048
+		bl memset
+		opword 0x3B80FFFF
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_0_8041ada0(r2)
+		opword 0x93830038
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_0_8041ada0(r2)
+		opword 0xD3C30020
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_4p25_8041ade4(r2)
+		opword 0xD3E30008
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x38000000
+		opword 0xD3C3000C
+		opword 0x901F0044
+		opword 0x801F000C
+		opword 0x5400077B
+		opword 0x40820018
+		opword 0x38600008
+		bl camGetPtr
+		opword 0xA0030000
+		opword 0x60000200
+		opword 0xB0030000
+		opword 0x801F0044
+		opword 0x28000034
+		opword 0x41811994
+		lis r3, jumptable_8030ECF8@ha
+		opword 0x5400103A
+		addi r3, r3, jumptable_8030ECF8@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		opword 0x389F008C
+		opword 0x3860018D
+		bl psndSFXOn_3D
+		opword 0x389F008C
+		opword 0x386000AF
+		bl psndSFXOn_3D
+		bl marioCamZoomUp
+		bl marioPreJump
+		opword 0x387E0058
+		bl marioChgPose
+		bl camFollowYOff
+		opword 0x809F0004
+		opword 0x38600000
+		opword 0x38000001
+		lfs f30, float_0_8041ada0(r2)
+		opword 0x60840100
+		opword 0x909F0004
+		opword 0x907F0048
+		opword 0x901F0044
+		opword 0xB07F0050
+		opword 0xB07F0052
+		opword 0xD3DF0180
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C3001C
+		opword 0xC03F008C
+		opword 0xC05F0090
+		opword 0xC07F0094
+		bl N_marioSetBottomlessRespawnPosOnBeroEntry
+		opword 0x83BF01E8
+		bl marioGetPtr
+		opword 0x7C7C1B78
+		opword 0x7FA3EB78
+		bl hitGetAttr
+		opword 0x54600463
+		opword 0x3BA00000
+		opword 0x41820054
+		opword 0x807C01E8
+		bl hitGetName
+		la r4, _af_pad+20
+		bl hitObjGetPos
+		opword 0xC03C008C
+		opword 0xC05C0094
+		opword 0xC061001C
+		opword 0xC0810024
+		bl angleABf
+		opword 0xC01C0198
+		opword 0xEC210028
+		bl revise360
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082000C
+		opword 0x3BA00002
+		opword 0x48000080
+		opword 0x3BA00001
+		opword 0x48000078
+		opword 0x54600421
+		opword 0x41820054
+		opword 0x807C01E8
+		bl hitGetName
+		opword 0x38810028
+		bl hitObjGetPos
+		opword 0xC03C008C
+		opword 0xC05C0094
+		opword 0xC0610028
+		opword 0xC0810030
+		bl angleABf
+		opword 0xC01C0198
+		opword 0xEC210028
+		bl revise360
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082000C
+		opword 0x3BA00002
+		opword 0x48000028
+		opword 0x3BA00001
+		opword 0x48000020
+		opword 0x546003DF
+		opword 0x4182000C
+		opword 0x3BA00002
+		opword 0x48000010
+		opword 0x5460039D
+		opword 0x41820008
+		opword 0x3BA00001
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93A30000
+		bl marioMakeJumpPara
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f31, float_30_8041ade8(r2)
+		opword 0x48000008
+		lfs f31, float_neg30_8041adec(r2)
+		bl marioGetPtr
+		opword 0x83830288
+		opword 0xC3DC001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p125_8041adf0(r2)
+		opword 0xC023001C
+		opword 0xEC3F0828
+		opword 0xEC00F07A
+		opword 0xD01C001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820030
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_30_8041ade8(r2)
+		opword 0xC003001C
+		opword 0xFC00F040
+		opword 0x4C411382
+		opword 0x4082003C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C3001C
+		opword 0x4800002C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_neg30_8041adec(r2)
+		opword 0xC003001C
+		opword 0xFC00F040
+		opword 0x4C401382
+		opword 0x40820010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C3001C
+		bl marioGetPtr
+		opword 0x80630288
+		li r27, 0x0
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820020
+		opword 0xC03F01A8
+		lfs f0, float_270_8041adf4(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820024
+		opword 0x3B600001
+		opword 0x4800001C
+		opword 0xC03F01A8
+		lfs f0, float_neg270_8041adf8(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0x3B600001
+		opword 0x2C1B0000
+		opword 0x418200CC
+		opword 0x38600002
+		opword 0x38000014
+		opword 0x907F0044
+		opword 0x901F0048
+		bl marioGetColor
+		opword 0x5460103A
+		la r3, paper_ship(r13)
+		opword 0x7C63002E
+		bl marioPaperOn
+		opword 0x387E0060
+		bl marioChgPaper
+		la r3, str_8041ADFC(r2)
+		bl marioChgPose
+		opword 0x801F0004
+		lfs f30, float_15_8041adb4(r2)
+		opword 0x60000008
+		opword 0x901F0004
+		bl marioGetPtr
+		opword 0x80A30288
+		lis r3, sound_evt@ha
+		addi r3, r3, sound_evt@l
+		opword 0x38800000
+		opword 0xD3C50020
+		opword 0x38A00000
+		bl evtEntry
+		lfs f1, float_1024_8041ae04(r2)
+		opword 0xC01F008C
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010038
+		opword 0x8081003C
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x9003009C
+		opword 0xC01F0090
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010040
+		opword 0x80810044
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x900300A0
+		opword 0xC01F0094
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010048
+		opword 0x8081004C
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x900300A4
+		opword 0xC03F007C
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xFC010040
+		opword 0x40811620
+		opword 0xC01F0090
+		opword 0xEC00082A
+		opword 0xD01F0090
+		opword 0x801F0000
+		opword 0x54000416
+		opword 0x901F0000
+		opword 0x48001604
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_1_8041adc8(r2)
+		opword 0x48000008
+		lfs f30, float_neg1_8041ada4(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030020
+		opword 0xEFE007B2
+		bl marioGetPtr
+		opword 0x83830288
+		opword 0xC3DC001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p125_8041adf0(r2)
+		opword 0xC023001C
+		opword 0xEC3F0828
+		opword 0xEC00F07A
+		opword 0xD01C001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x3B600000
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820020
+		opword 0xC03F01A8
+		lfs f0, float_1260_8041ae08(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820024
+		opword 0x3B600001
+		opword 0x4800001C
+		opword 0xC03F01A8
+		lfs f0, float_neg1080_8041ae0c(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0x3B600001
+		opword 0x2C1B0000
+		opword 0x41821540
+		opword 0x38600028
+		opword 0x38000003
+		opword 0x907F0048
+		opword 0x901F0044
+		opword 0x4800152C
+		opword 0x801F0048
+		opword 0x2C00000E
+		opword 0x40820008
+		bl allPartyRideShip
+		opword 0x801F0048
+		opword 0x2C000014
+		opword 0x40820010
+		opword 0x38600384
+		bl marioCamZoomOffReq2
+		bl camFollowYOn
+		opword 0x807F0048
+		opword 0x3403FFFF
+		opword 0x901F0048
+		opword 0x4181000C
+		opword 0x38000004
+		opword 0x901F0044
+		opword 0xC05F009C
+		lfs f1, float_neg15_8041ae10(r2)
+		opword 0xFC020840
+		opword 0x40810024
+		lfs f0, float_1_8041adc8(r2)
+		opword 0xEC020028
+		opword 0xD01F009C
+		opword 0xC01F009C
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0xD03F009C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_1_8041adc8(r2)
+		opword 0x48000008
+		lfs f30, float_neg1_8041ada4(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030020
+		opword 0xEFE007B2
+		bl marioGetPtr
+		opword 0x83830288
+		opword 0xC3DC001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p125_8041adf0(r2)
+		opword 0xC023001C
+		opword 0xEC3F0828
+		opword 0xEC00F07A
+		opword 0xD01C001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p1_8041ae14(r2)
+		opword 0xC0230020
+		opword 0xEC010028
+		opword 0xD0030020
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_1_8041adc8(r2)
+		opword 0xC0030020
+		opword 0xFC00F040
+		opword 0x4C401382
+		opword 0x40820010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C30020
+		opword 0x3B600000
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820024
+		opword 0xC03F01A8
+		lfs f0, float_1620_8041ae18(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082002C
+		opword 0xD01F01A8
+		opword 0x3B600001
+		opword 0x48000020
+		opword 0xC03F01A8
+		lfs f0, float_neg1440_8041ae1c(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x4082000C
+		opword 0xD01F01A8
+		opword 0x3B600001
+		opword 0x2C1B0000
+		opword 0x418213B0
+		opword 0x801F0044
+		opword 0x2C000004
+		opword 0x408213A4
+		opword 0x3800000A
+		opword 0x901F0044
+		opword 0x48001398
+		opword 0x801F0004
+		opword 0x5400062C
+		opword 0x901F0004
+		opword 0xC03F01A8
+		bl revise360
+		opword 0xD03F01A8
+		lfs f0, float_40_8041ad98(r2)
+		opword 0xD01F01B4
+		opword 0xD01F01B8
+		bl marioGetPtr
+		opword 0x83830288
+		opword 0x837F01E8
+		bl marioGetPtr
+		opword 0x7C7D1B78
+		opword 0x7F63DB78
+		bl hitGetName
+		opword 0x38810010
+		bl hitObjGetPos
+		lfs f5, float_100_8041adac(r2)
+		opword 0x3C004330
+		opword 0xC0210010
+		opword 0x3B600000
+		lfs f2, float_0p5_8041ada8(r2)
+		opword 0xC0010018
+		opword 0xEC65107A
+		opword 0xC03D0090
+		opword 0xEC45103A
+		lfs f0, float_15_8041adb4(r2)
+		opword 0x90010040
+		opword 0xEC832824
+		opword 0x90010050
+		opword 0xC87E0050
+		opword 0xEC422824
+		opword 0xFC80201E
+		opword 0xFC40101E
+		opword 0xEC010028
+		opword 0xD8810048
+		opword 0xD8410038
+		opword 0x8061004C
+		opword 0x8001003C
+		opword 0x6C638000
+		opword 0xD01C0040
+		opword 0x6C008000
+		opword 0x90610044
+		opword 0x807D01E8
+		opword 0x90010054
+		opword 0xC8210040
+		opword 0xC8010050
+		opword 0xEFE11828
+		opword 0xEFC01828
+		bl hitGetAttr
+		opword 0x54600463
+		opword 0x4182000C
+		opword 0x3B600001
+		opword 0x48000030
+		opword 0x54600421
+		opword 0x4182000C
+		opword 0x3B600002
+		opword 0x48000020
+		opword 0x546003DF
+		opword 0x4182000C
+		opword 0x3B600003
+		opword 0x48000010
+		opword 0x5460039D
+		opword 0x41820008
+		opword 0x3B600004
+		opword 0x2C1B0001
+		opword 0x40820020
+		lfs f1, float_50_8041adb8(r2)
+		lfs f0, float_30p303_8041adbc(r2)
+		opword 0xEC3E0828
+		opword 0xD3FC003C
+		opword 0xEC010028
+		opword 0xD01C0044
+		opword 0x48000078
+		opword 0x2C1B0002
+		opword 0x40820020
+		lfs f0, float_50_8041adb8(r2)
+		lfs f1, float_30p303_8041adbc(r2)
+		opword 0xEC00F02A
+		opword 0xD3FC003C
+		opword 0xEC01002A
+		opword 0xD01C0044
+		opword 0x48000054
+		opword 0x2C1B0003
+		opword 0x40820020
+		lfs f1, float_50_8041adb8(r2)
+		lfs f0, float_30p303_8041adbc(r2)
+		opword 0xEC3F0828
+		opword 0xEC010028
+		opword 0xD01C003C
+		opword 0xD3DC0044
+		opword 0x48000030
+		opword 0x2C1B0004
+		opword 0x40820020
+		lfs f0, float_50_8041adb8(r2)
+		lfs f1, float_30p303_8041adbc(r2)
+		opword 0xEC00F82A
+		opword 0xEC01002A
+		opword 0xD01C003C
+		opword 0xD3DC0044
+		opword 0x4800000C
+		opword 0xD3FC003C
+		opword 0xD3DC0044
+		bl marioGetPtr
+		opword 0x83A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC05D0044
+		opword 0xC023003C
+		opword 0xC07F008C
+		opword 0xC09F0094
+		bl distABf
+		lfs f0, float_0p1_8041ae14(r2)
+		opword 0x2C1B0003
+		opword 0xEFC00072
+		opword 0x41820054
+		opword 0x40800014
+		opword 0x2C1B0001
+		opword 0x41820018
+		opword 0x4080002C
+		opword 0x4800006C
+		opword 0x2C1B0005
+		opword 0x40800064
+		opword 0x4800004C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030044
+		opword 0xEC00F028
+		opword 0xD0030044
+		opword 0x48000048
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030044
+		opword 0xEC00F02A
+		opword 0xD0030044
+		opword 0x48000030
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC003003C
+		opword 0xEC00F028
+		opword 0xD003003C
+		opword 0x48000018
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC003003C
+		opword 0xEC00F02A
+		opword 0xD003003C
+		bl marioGetPtr
+		opword 0x83A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC03F008C
+		opword 0xC05F0094
+		opword 0xC063003C
+		opword 0xC09D0044
+		bl distABf
+		lfs f0, float_36_8041ae20(r2)
+		opword 0xEC010024
+		opword 0xD01F0180
+		bl marioGetPtr
+		opword 0x83A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC03F008C
+		opword 0xC05F0094
+		opword 0xC063003C
+		opword 0xC09D0044
+		bl angleABf
+		opword 0xD03F01A0
+		opword 0xC01F01A0
+		opword 0xD01F019C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3C30040
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C30004
+		bl marioGetPtr
+		opword 0x80830288
+		opword 0x38600024
+		opword 0xC01F0090
+		opword 0x3800000B
+		opword 0xC0240040
+		lfs f2, float_0_8041ada0(r2)
+		opword 0xEC210028
+		lfs f0, float_306_8041ae24(r2)
+		opword 0xD05F007C
+		opword 0xEC21082A
+		opword 0xEC010024
+		opword 0xD01F0080
+		opword 0xD05F0084
+		opword 0xD05F0088
+		opword 0x907F0048
+		opword 0x901F0044
+		opword 0x48001088
+		opword 0xC03F0180
+		opword 0x387F008C
+		opword 0xC05F01A0
+		opword 0x389F0094
+		bl movePos
+		opword 0xC03F0090
+		opword 0xC01F007C
+		opword 0xEC01002A
+		opword 0xD01F0090
+		bl marioMakeJumpPara
+		opword 0xC3DF007C
+		bl marioGetPtr
+		lfs f0, float_20_8041ad9c(r2)
+		opword 0x7C7D1B78
+		opword 0xFC20F090
+		opword 0x3861000C
+		opword 0xD01D01B4
+		bl marioChkLandon
+		lfs f0, float_40_8041ad98(r2)
+		opword 0x28030000
+		opword 0xD01D01B4
+		opword 0x41820088
+		opword 0xC05D0090
+		opword 0xC001000C
+		lfs f1, float_0_8041ada0(r2)
+		opword 0xEC020028
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x41820014
+		opword 0xEC00F02A
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x4082005C
+		opword 0x907D01E4
+		opword 0xC001000C
+		opword 0xD01D0090
+		opword 0x801D0000
+		opword 0x54000416
+		opword 0x901D0000
+		opword 0xC03D008C
+		opword 0xC05D0094
+		opword 0xC07D011C
+		opword 0xC09D0124
+		bl distABf
+		opword 0xFC000A10
+		opword 0x38000000
+		opword 0xD01D0128
+		opword 0x807D0000
+		opword 0x5463066E
+		opword 0x907D0000
+		opword 0xB01D0050
+		opword 0xB01D0052
+		bl camFollowYOn
+		opword 0x38000001
+		opword 0x48000008
+		opword 0x38000000
+		opword 0x2C000000
+		opword 0x41820FA0
+		lfs f30, float_0_8041ada0(r2)
+		opword 0xD3DF007C
+		opword 0xD3DF0080
+		opword 0xD3DF0084
+		opword 0xD3DF0088
+		opword 0xD3DF0180
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3C3001C
+		opword 0x801F0000
+		opword 0x54000416
+		opword 0x901F0000
+		opword 0xC03F01A8
+		bl revise360
+		opword 0xD03F01A8
+		opword 0xC01F01A8
+		opword 0xD01F01AC
+		opword 0xC03F01A8
+		bl toMovedir
+		opword 0xD03F01A0
+		opword 0x389F008C
+		opword 0x3860018F
+		opword 0xC01F01A0
+		opword 0xD01F019C
+		opword 0x801F0004
+		opword 0x5400062C
+		opword 0x901F0004
+		opword 0x801F0004
+		opword 0x60001000
+		opword 0x901F0004
+		bl psndSFXOn_3D
+		lfs f1, float_0_8041ada0(r2)
+		opword 0x38600000
+		opword 0xFC400890
+		opword 0xFC600890
+		opword 0xFC800890
+		opword 0xFCA00890
+		bl effFunemizuEntry
+		opword 0x7C7D1B78
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93A30024
+		opword 0x83BF0134
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f30, float_0_8041ada0(r2)
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0x93A30048
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_4p25_8041ade4(r2)
+		opword 0xD3C30008
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x38000032
+		opword 0xD3E3000C
+		opword 0x901F0044
+		opword 0x801F000C
+		opword 0x5400077B
+		opword 0x40820EAC
+		opword 0x38600008
+		bl camGetPtr
+		opword 0xA0030000
+		opword 0x540005EA
+		opword 0xB0030000
+		opword 0x48000E94
+		opword 0x801F000C
+		opword 0x5400077B
+		opword 0x40820018
+		opword 0x38600008
+		bl camGetPtr
+		opword 0xA0030000
+		opword 0x60000200
+		opword 0xB0030000
+		opword 0x3800001F
+		opword 0x901F0044
+		opword 0xC05F009C
+		lfs f1, float_neg0p4_8041ae28(r2)
+		lfs f0, float_neg18_8041ae2c(r2)
+		opword 0xEC22082A
+		opword 0xD03F009C
+		opword 0xC03F009C
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820014
+		opword 0x38600004
+		opword 0x38000020
+		opword 0x907F0048
+		opword 0x901F0044
+		lfs f30, float_1p6_8041ae30(r2)
+		bl marioGetPtr
+		opword 0x7C7D1B78
+		opword 0xC3E3008C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30004
+		opword 0xC03D0090
+		opword 0xEFE1002A
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30008
+		opword 0xC3FD0094
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E3000C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3C30010
+		opword 0xC3FD01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30014
+		opword 0x48000DAC
+		opword 0x807F0048
+		opword 0x3403FFFF
+		opword 0x901F0048
+		opword 0x41810D9C
+		opword 0x38000028
+		opword 0x901F0044
+		bl marioGetPtr
+		bl marioGetPtr
+		opword 0x80030288
+		opword 0x28000000
+		opword 0x4182003C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820024
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		bl psndSFXOff
+		opword 0x3BA0FFFF
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93A30038
+		bl camFollowYOff
+		opword 0x801F0004
+		opword 0x54000524
+		opword 0x901F0004
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3E30040
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_2p8_8041ae34(r2)
+		opword 0xD3E30004
+		opword 0xD01F0180
+		bl marioGetPtr
+		opword 0x83A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC03F008C
+		opword 0xC05F0094
+		opword 0xC063003C
+		opword 0xC09D0044
+		bl distABf
+		lfs f0, float_2_8041ae3c(r2)
+		opword 0xC05F0180
+		opword 0xEC600072
+		lfs f1, float_10_8041ae38(r2)
+		lfs f0, float_0p5_8041ada8(r2)
+		opword 0xEC431024
+		opword 0xEC0100BA
+		opword 0xEC000824
+		opword 0xFC00001E
+		opword 0xD8010050
+		opword 0x83610054
+		bl marioGetPtr
+		opword 0x83A30288
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC03F008C
+		opword 0xC05F0094
+		opword 0xC063003C
+		opword 0xC09D0044
+		bl angleABf
+		opword 0xD03F01A0
+		opword 0xC01F01A0
+		opword 0xD01F019C
+		opword 0x801F000C
+		opword 0x5403BFFE
+		opword 0x3BA30001
+		bl marioGetPtr
+		opword 0x3C804330
+		opword 0x6F608000
+		opword 0x9001004C
+		opword 0x38000029
+		opword 0x80630288
+		opword 0x90810048
+		opword 0xC89E0050
+		opword 0xC8010048
+		lfs f5, float_0p5_8041ada8(r2)
+		opword 0xEC002028
+		lfs f3, float_80_8041ae40(r2)
+		opword 0x93A30000
+		lfs f1, float_0_8041ada0(r2)
+		opword 0xECC50032
+		opword 0x90810038
+		opword 0xEC4631B8
+		opword 0xEC05302A
+		opword 0xEC431024
+		opword 0xEC6201B2
+		opword 0xFC00001E
+		opword 0xFC401050
+		opword 0xD07F007C
+		opword 0xD05F0080
+		opword 0xD8010040
+		opword 0xD03F0084
+		opword 0x80610044
+		opword 0xD03F0088
+		opword 0x7C630734
+		opword 0x907F0048
+		opword 0x901F0044
+		opword 0x807F0048
+		opword 0xC03F009C
+		opword 0x38030058
+		opword 0x6C008000
+		opword 0x9001003C
+		opword 0xC8010038
+		opword 0xEC002028
+		opword 0xEC010024
+		opword 0xFC000210
+		opword 0xD01F02B0
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		bl effDelete
+		opword 0x48000BD4
+		opword 0xC03F0180
+		opword 0x387F008C
+		opword 0xC05F01A0
+		opword 0x389F0094
+		bl movePos
+		opword 0xC03F0090
+		opword 0xC01F007C
+		opword 0xEC01002A
+		opword 0xD01F0090
+		bl marioMakeJumpPara
+		opword 0xC05F009C
+		opword 0xC03F02B0
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xEC22082A
+		opword 0xD03F009C
+		opword 0xC03F009C
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xD01F009C
+		opword 0x807F0048
+		opword 0x3403FFFF
+		opword 0x901F0048
+		opword 0x41810B78
+		opword 0x387E0060
+		bl marioChgPaper
+		la r3, str_8041ADFC(r2)
+		bl marioChgPose
+		opword 0x38000058
+		opword 0x901F02A4
+		opword 0x807F02A4
+		bl marioSetPaperAnimeLocalTime
+		lfs f31, float_0_8041ada0(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E3001C
+		opword 0x801F0004
+		opword 0x60000100
+		opword 0x901F0004
+		bl marioAdjustMoveDir
+		opword 0x3800002B
+		opword 0x389F008C
+		opword 0x901F0044
+		opword 0x38600192
+		bl psndSFXOn_3D
+		lis r3, sound_evt2@ha
+		opword 0x38800000
+		addi r3, r3, sound_evt2@l
+		opword 0x38A00000
+		bl evtEntry
+		lfs f1, float_1024_8041ae04(r2)
+		opword 0xC01F008C
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010050
+		opword 0x80810054
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x9003009C
+		opword 0xC01F0090
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010048
+		opword 0x8081004C
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x900300A0
+		opword 0xC01F0094
+		opword 0xEC010032
+		opword 0xFC00001E
+		opword 0xD8010040
+		opword 0x80810044
+		opword 0x3C84F24A
+		opword 0x38047A80
+		opword 0x900300A4
+		opword 0x48000AA8
+		opword 0xC05F009C
+		opword 0xC03F02B0
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xEC22082A
+		opword 0xD03F009C
+		opword 0xC03F009C
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xD01F009C
+		opword 0x807F02A4
+		bl marioSetPaperAnimeLocalTime
+		opword 0x807F02A4
+		opword 0x3803FFFF
+		opword 0x2C00002C
+		opword 0x901F02A4
+		opword 0x41800A68
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_20_8041ad9c(r2)
+		opword 0x48000008
+		lfs f30, float_neg20_8041ae44(r2)
+		bl marioGetPtr
+		opword 0x83A30288
+		opword 0xC3FD001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p125_8041adf0(r2)
+		opword 0xC023001C
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01D001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820030
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_20_8041ad9c(r2)
+		opword 0xC003001C
+		opword 0xFC00F840
+		opword 0x4C411382
+		opword 0x4082003C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E3001C
+		opword 0x4800002C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_neg20_8041ae44(r2)
+		opword 0xC003001C
+		opword 0xFC00F840
+		opword 0x4C401382
+		opword 0x40820010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E3001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		opword 0x801F02A4
+		opword 0x2C00002C
+		opword 0x40820994
+		opword 0x3800002C
+		opword 0x901F0044
+		opword 0x48000988
+		opword 0xC05F009C
+		opword 0xC03F02B0
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xEC22082A
+		opword 0xD03F009C
+		opword 0xC03F009C
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xD01F009C
+		opword 0x807F02A4
+		bl marioSetPaperAnimeLocalTime
+		opword 0x807F02A4
+		opword 0x3403FFFF
+		opword 0x901F02A4
+		opword 0x4181004C
+		opword 0x38000000
+		opword 0x3860002D
+		opword 0x901F02A4
+		opword 0x38000006
+		opword 0x907F0044
+		opword 0x901F0048
+		opword 0xC03F01A8
+		bl revise360
+		opword 0xD03F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007BD
+		opword 0x41820014
+		opword 0xC03F01A8
+		lfs f0, float_360_8041ae48(r2)
+		opword 0xEC010028
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		opword 0x480008E8
+		opword 0x807F02A4
+		bl marioSetPaperAnimeLocalTime
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_1_8041adc8(r2)
+		opword 0x48000008
+		lfs f30, float_neg1_8041ada4(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030020
+		opword 0xEFC007B2
+		bl marioGetPtr
+		opword 0x83A30288
+		opword 0xC3FD001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p05_8041ae4c(r2)
+		opword 0xC023001C
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01D001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_neg0p005_8041ae50(r2)
+		opword 0xC0230020
+		opword 0xEC01002A
+		opword 0xD0030020
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_10_8041ae38(r2)
+		opword 0xC0030020
+		opword 0xFC00F840
+		opword 0x4C401382
+		opword 0x40820010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30020
+		opword 0x807F0048
+		opword 0x3403FFFF
+		opword 0x901F0048
+		opword 0x41810820
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_1_8041adc8(r2)
+		opword 0x48000008
+		lfs f30, float_neg1_8041ada4(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030020
+		opword 0xEFC007B2
+		bl marioGetPtr
+		opword 0x83A30288
+		opword 0xC3FD001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p05_8041ae4c(r2)
+		opword 0xC023001C
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01D001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_neg0p005_8041ae50(r2)
+		opword 0xC0230020
+		opword 0xEC01002A
+		opword 0xD0030020
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f31, float_10_8041ae38(r2)
+		opword 0xC0030020
+		opword 0xFC00F840
+		opword 0x4C401382
+		opword 0x40820010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30020
+		opword 0x3B600000
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820028
+		opword 0xC03F01A8
+		lfs f0, float_360_8041ae48(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x40820034
+		bl revise360
+		opword 0xD03F01A8
+		opword 0x3B600001
+		opword 0x48000024
+		opword 0xC03F01A8
+		lfs f0, float_neg360_8041ae54(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820010
+		bl revise360
+		opword 0xD03F01A8
+		opword 0x3B600001
+		opword 0x2C1B0000
+		opword 0x4182070C
+		opword 0xC03F01A8
+		bl revise360
+		opword 0xD03F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007BD
+		opword 0x41820014
+		opword 0xC03F01A8
+		lfs f0, float_360_8041ae48(r2)
+		opword 0xEC010028
+		opword 0xD01F01A8
+		bl marioPaperOff
+		opword 0x801F0004
+		opword 0x387E0058
+		opword 0x54000776
+		opword 0x901F0004
+		bl marioChgPose
+		opword 0x3800002F
+		lfs f31, float_10_8041ae38(r2)
+		opword 0x901F0044
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30020
+		opword 0x3B600000
+		bl marioGetPtr
+		bl marioGetPtr
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x4182000C
+		lfs f30, float_4_8041ae58(r2)
+		opword 0x48000008
+		lfs f30, float_neg4_8041ae5c(r2)
+		bl marioGetPtr
+		opword 0x83A30288
+		opword 0xC3FD001C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p05_8041ae4c(r2)
+		opword 0xC023001C
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01D001C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC01F01A8
+		opword 0xC023001C
+		opword 0xEC00082A
+		opword 0xD01F01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030000
+		opword 0x540007FF
+		opword 0x41820024
+		opword 0xC03F01A8
+		lfs f0, float_540_8041ae60(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x4082002C
+		opword 0xD01F01A8
+		opword 0x3B600001
+		opword 0x48000020
+		opword 0xC03F01A8
+		lfs f0, float_neg360_8041ae54(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x4082000C
+		opword 0xD01F01A8
+		opword 0x3B600001
+		opword 0x801F0044
+		opword 0x2C00002F
+		opword 0x408205E4
+		opword 0x2C1B0000
+		opword 0x418205DC
+		opword 0xC03F01A8
+		bl revise360
+		opword 0xD03F01A8
+		opword 0xC01F01A8
+		opword 0xD01F01AC
+		opword 0xC03F01A8
+		bl toMovedir
+		opword 0xD03F019C
+		opword 0x3860000A
+		lfs f2, float_20_8041ad9c(r2)
+		opword 0xC01F019C
+		lfs f1, float_37_8041ae64(r2)
+		opword 0xD01F01A0
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x801F0004
+		opword 0x5400062C
+		opword 0x901F0004
+		opword 0xD05F01B4
+		opword 0xD03F01B8
+		opword 0xD01F007C
+		opword 0xD01F0080
+		opword 0xD01F0084
+		opword 0xD01F0088
+		opword 0xD01F0180
+		opword 0x801F0000
+		opword 0x54000416
+		opword 0x901F0000
+		opword 0xD01F009C
+		bl marioChgMot
+		bl marioSetFallPara
+		bl allPartyRideOff
+		opword 0xC03F008C
+		opword 0xC05F0090
+		opword 0xC07F0094
+		bl N_marioSetBottomlessRespawnPosOnBeroEntry
+		bl N_marioReloadMapOnBottomlessOff
+		bl marioGetPtr
+		opword 0x80030288
+		opword 0x28000000
+		opword 0x41820024
+		bl marioGetPtr
+		opword 0x7C641B78
+		opword 0x38600000
+		opword 0x80840288
+		bl __memFree
+		opword 0x3BA00000
+		bl marioGetPtr
+		opword 0x93A30288
+		opword 0x801F000C
+		opword 0x5400077B
+		opword 0x40820510
+		opword 0x38600008
+		bl camGetPtr
+		opword 0xA0030000
+		opword 0x540005EA
+		opword 0xB0030000
+		opword 0x480004F8
+		opword 0x38000034
+		opword 0x901F0044
+		opword 0x801F01E4
+		opword 0x28000000
+		opword 0x41820068
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3E3000C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030008
+		opword 0xEC20F828
+		bl revise360
+		opword 0xFFE00890
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3E30008
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f1, float_3p1416_8041adc4(r2)
+		opword 0xC0430008
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xEC2100B2
+		opword 0xEC210024
+		bl sin
+		opword 0xFC400818
+		lfs f1, float_3_8041ae6c(r2)
+		lfs f0, float_neg13_8041ae68(r2)
+		opword 0xEC0100BA
+		opword 0xD01F009C
+		opword 0x801F0000
+		opword 0x540006B5
+		opword 0x4182010C
+		opword 0xC3DF0180
+		bl marioGetPtr
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x7C7E1B78
+		opword 0xFC1E0000
+		opword 0x40820074
+		bl marioGetPtr
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xC0230008
+		opword 0xFC010040
+		opword 0x4081000C
+		opword 0x38000000
+		opword 0x48000008
+		opword 0x38000001
+		opword 0x2C000000
+		opword 0x4182000C
+		lfs f30, float_0p3_8041ae70(r2)
+		opword 0x48000008
+		lfs f30, float_0p6_8041ae74(r2)
+		bl marioGetPtr
+		opword 0x83A30288
+		opword 0xC3FD0010
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p1_8041ae14(r2)
+		opword 0xC0230010
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01D0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3C30010
+		opword 0xC3FE008C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30004
+		opword 0xC03E0090
+		opword 0xEFE1002A
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30008
+		opword 0xC3FE0094
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E3000C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3C30010
+		opword 0xC3FE01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30014
+		opword 0x4800036C
+		opword 0x801F01E4
+		opword 0x28000000
+		opword 0x40820010
+		opword 0x38000000
+		opword 0x981F024E
+		opword 0x981F024F
+		bl shipMove
+		opword 0x801F0000
+		opword 0x5400039D
+		opword 0x418200F4
+		bl marioMakeJumpPara
+		opword 0xC03F007C
+		lfs f0, float_neg7_8041ae78(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0xD01F007C
+		opword 0xC3DF007C
+		bl marioGetPtr
+		lfs f0, float_20_8041ad9c(r2)
+		opword 0x7C7D1B78
+		opword 0xFC20F090
+		opword 0x38610008
+		opword 0xD01D01B4
+		bl marioChkLandon
+		lfs f0, float_40_8041ad98(r2)
+		opword 0x28030000
+		opword 0xD01D01B4
+		opword 0x41820088
+		opword 0xC05D0090
+		opword 0xC0010008
+		lfs f1, float_0_8041ada0(r2)
+		opword 0xEC020028
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x41820014
+		opword 0xEC00F02A
+		opword 0xFC000840
+		opword 0x4C401382
+		opword 0x4082005C
+		opword 0x907D01E4
+		opword 0xC0010008
+		opword 0xD01D0090
+		opword 0x801D0000
+		opword 0x54000416
+		opword 0x901D0000
+		opword 0xC03D008C
+		opword 0xC05D0094
+		opword 0xC07D011C
+		opword 0xC09D0124
+		bl distABf
+		opword 0xFC000A10
+		opword 0x38000000
+		opword 0xD01D0128
+		opword 0x807D0000
+		opword 0x5463066E
+		opword 0x907D0000
+		opword 0xB01D0050
+		opword 0xB01D0052
+		bl camFollowYOn
+		opword 0x38000001
+		opword 0x48000008
+		opword 0x38000000
+		opword 0x2C000000
+		opword 0x4082001C
+		opword 0xC03F0090
+		opword 0xC01F007C
+		opword 0xEC01002A
+		opword 0xD01F0090
+		opword 0x48000008
+		bl marioClearJumpPara
+		lwz r3, gp(r13)
+		opword 0x389E0068
+		opword 0x3863012C
+		bl strcmp
+		opword 0x2C030000
+		opword 0x408200C8
+		opword 0xC03F0090
+		lfs f0, float_260_8041ae7c(r2)
+		opword 0xFC010040
+		opword 0x4C401382
+		opword 0x408200B4
+		lfs f0, float_50_8041adb8(r2)
+		opword 0xFC010040
+		opword 0x4C411382
+		opword 0x408200A4
+		lfs f2, float_10_8041ae38(r2)
+		opword 0x3C004330
+		opword 0xC09F0214
+		lfs f0, float_0p5_8041ada8(r2)
+		opword 0x90010048
+		opword 0xEC02013A
+		opword 0xC83E0050
+		lfs f3, float_0_8041ada0(r2)
+		opword 0xFC00001E
+		opword 0xD8010050
+		opword 0x80010054
+		opword 0x6C008000
+		opword 0x9001004C
+		opword 0xC8010048
+		opword 0xEC000828
+		opword 0xEC001024
+		opword 0xFC030000
+		opword 0x4182005C
+		lfs f1, float_3p1416_8041adc4(r2)
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xEC210132
+		opword 0xEC210024
+		bl sin
+		opword 0xFC600818
+		lfs f1, float_2_8041ae3c(r2)
+		opword 0xC01F0090
+		lfs f2, float_3p1416_8041adc4(r2)
+		opword 0xEC2100FA
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xD03F0090
+		opword 0xC03F0214
+		opword 0xEC220072
+		opword 0xEC210024
+		bl cos
+		opword 0xFC200818
+		lfs f2, float_2_8041ae3c(r2)
+		opword 0xC01F0094
+		opword 0xFC200850
+		opword 0xEC02007A
+		opword 0xD01F0094
+		opword 0x38000000
+		opword 0x901F01E0
+		opword 0x901F01DC
+		opword 0x901F01EC
+		opword 0x901F01F0
+		opword 0xC03F0180
+		opword 0xC05F01A0
+		bl marioCheckWallShip
+		opword 0xC03F0180
+		lfs f0, float_0p5_8041ada8(r2)
+		opword 0xFC010040
+		opword 0x40800014
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x38000032
+		opword 0xD01F0180
+		opword 0x901F0044
+		opword 0xC3DF0180
+		bl marioGetPtr
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x7C7D1B78
+		opword 0xFC1E0000
+		opword 0x40820074
+		bl marioGetPtr
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xC0230008
+		opword 0xFC010040
+		opword 0x4081000C
+		opword 0x38000000
+		opword 0x48000008
+		opword 0x38000001
+		opword 0x2C000000
+		opword 0x4182000C
+		lfs f30, float_0p3_8041ae70(r2)
+		opword 0x48000008
+		lfs f30, float_0p6_8041ae74(r2)
+		bl marioGetPtr
+		opword 0x83C30288
+		opword 0xC3FE0010
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0p1_8041ae14(r2)
+		opword 0xC0230010
+		opword 0xEC3E0828
+		opword 0xEC00F87A
+		opword 0xD01E0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3C30010
+		opword 0xC3FD008C
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30004
+		opword 0xC03D0090
+		opword 0xEFE1002A
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30008
+		opword 0xC3FD0094
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E3000C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3C30010
+		opword 0xC3FD01A8
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630024
+		opword 0x8063000C
+		opword 0xD3E30014
+		opword 0xA01F0248
+		opword 0x70000A00
+		opword 0x41820024
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x3863003C
+		bl checkHarbor
+		opword 0x2C030000
+		opword 0x4182000C
+		opword 0x3800001E
+		opword 0x901F0044
+#endif
 	}
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
-#ifdef NONMATCHING
 void marioShipChgFall(void) {
 	MarioWork* m = marioGetPtr();
 	if (!(m->flags & 0x20000)) {
 		m->flags |= 0x20000;
+#ifdef NONMATCHING
 		*(f32*)((u8*)m + 0x7C) = -0.1f;
 		*(f32*)((u8*)m + 0x80) = -0.2f;
 		*(f32*)((u8*)m + 0x84) = 0.024f;
 		*(f32*)((u8*)m + 0x88) = -0.004f;
+#endif
+#ifndef NONMATCHING
+		*(f32*)((u8*)m + 0x7C) = EXT_LIT(float_neg0p1_8041add4, -0.1f);
+		*(f32*)((u8*)m + 0x80) = EXT_LIT(float_neg0p2_8041add8, -0.2f);
+		*(f32*)((u8*)m + 0x84) = EXT_LIT(float_0p024_8041addc, 0.024f);
+		*(f32*)((u8*)m + 0x88) = EXT_LIT(float_neg0p004_8041ade0, -0.004f);
+#endif
 	}
 }
-#endif
 
-#ifdef NONMATCHING
 BOOL marioChkShipMoveMode(void) {
 	MarioWork* m = marioGetPtr();
 	if (m->currMotionId != MARIO_MOTION_SHIP) {
@@ -982,7 +2994,6 @@ BOOL marioChkShipMoveMode(void) {
 	}
 	return FALSE;
 }
-#endif
 
 double sin(double);
 double cos(double);
@@ -1152,15 +3163,328 @@ void shipMove(void)
     psndSFX_pos(*((s32 *) (((u8 *) marioGetPtr()->motStruct) + 0x38)), (Vec *) (((u8 *) m) + 0x8C));
   }
   *((f32 *) (((u8 *) m) + 0x18C)) = len;
-}
 #endif
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void shipMove(void) {
+	char _af_pad[8];
+	asm volatile {
+		bl marioGetPtr
+		opword 0x7C7F1B78
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xC3C30190
+		stfs f0, _af_pad+4(r1)
+		opword 0xD001000C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030030
+		opword 0x2C000000
+		opword 0x41820110
+		bl marioGetPtr
+		opword 0x80830288
+		opword 0x80640030
+		opword 0x3803FFFF
+		opword 0x90040030
+		bl marioGetPtr
+		opword 0x83C30288
+		bl marioGetPtr
+		opword 0x80A30288
+		opword 0x3861000C
+		opword 0xC05E0028
+		opword 0x38810008
+		opword 0xC025002C
+		bl movePos
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC001000C
+		opword 0xC0230014
+		opword 0xEC01002A
+		opword 0xD0030014
+		bl marioGetPtr
+		opword 0x80630288
+		la r30, shipData(r13)
+		opword 0xC0010008
+		opword 0xC0230018
+		opword 0xEC01002A
+		opword 0xD0030018
+		opword 0xC37E0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030014
+		opword 0xFC00D840
+		opword 0x40810014
+		opword 0xC37E0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3630014
+		bl marioGetPtr
+		opword 0xC01E0010
+		opword 0x80630288
+		opword 0xFF600050
+		opword 0xC0030014
+		opword 0xFC00D840
+		opword 0x40800010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3630014
+		opword 0xC37E0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC0030018
+		opword 0xFC00D840
+		opword 0x40810014
+		opword 0xC37E0010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3630018
+		bl marioGetPtr
+		opword 0xC01E0010
+		opword 0x80630288
+		opword 0xFF600050
+		opword 0xC0030018
+		opword 0xFC00D840
+		opword 0x40800010
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3630018
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xC3830014
+		bl marioGetPtr
+		opword 0xC03F0190
+		lfs f0, float_0_8041ada0(r2)
+		opword 0x80630288
+		opword 0xFC010000
+		opword 0xC3630018
+		opword 0x4182004C
+		lfs f2, float_3p1416_8041adc4(r2)
+		opword 0xC03F0194
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xEC220072
+		opword 0xEC210024
+		bl sin
+		lfs f2, float_3p1416_8041adc4(r2)
+		opword 0xFC600818
+		opword 0xC03F0194
+		lfs f0, float_180_8041adc0(r2)
+		opword 0xEC220072
+		fmuls f26, f30, f3
+		opword 0xEC210024
+		bl cos
+		opword 0xFC000818
+		opword 0xFC000050
+		opword 0xEFBE0032
+		opword 0x4800000C
+		opword 0xFF40E090
+		opword 0xFFA0D890
+		lfs f0, float_0_8041ada0(r2)
+		la r30, shipData(r13)
+		opword 0xC3FE0010
+		opword 0xFC1E0000
+		opword 0x40820018
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80030030
+		opword 0x2C000000
+		opword 0x418200C4
+		opword 0xFC1AE040
+		opword 0x40810030
+		lfs f1, float_1_8041adc8(r2)
+		la r3, shipData(r13)
+		opword 0xC003000C
+		opword 0xEC21D02A
+		opword 0xEC21E028
+		opword 0xEF81E03A
+		opword 0xFC1CF840
+		opword 0x4C411382
+		opword 0x40820038
+		opword 0xFF80F890
+		opword 0x48000030
+		lfs f1, float_1_8041adc8(r2)
+		la r3, shipData(r13)
+		opword 0xC003000C
+		opword 0xFC40F850
+		opword 0xEC3A0828
+		opword 0xEC21E028
+		opword 0xEF81E03A
+		opword 0xFC1C1040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0xFF801090
+		opword 0xFC1DD840
+		opword 0x40810030
+		lfs f1, float_1_8041adc8(r2)
+		la r3, shipData(r13)
+		opword 0xC003000C
+		opword 0xEC21E82A
+		opword 0xEC21D828
+		opword 0xEF61D83A
+		opword 0xFC1BF840
+		opword 0x4C411382
+		opword 0x40820038
+		opword 0xFF60F890
+		opword 0x48000030
+		lfs f1, float_1_8041adc8(r2)
+		la r3, shipData(r13)
+		opword 0xC003000C
+		opword 0xFC40F850
+		opword 0xEC3D0828
+		opword 0xEC21D828
+		opword 0xEF61D83A
+		opword 0xFC1B1040
+		opword 0x4C401382
+		opword 0x40820008
+		opword 0xFF601090
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xFC1E0000
+		opword 0x40820058
+		opword 0x801F01F0
+		lfs f0, shipData(r13)
+		opword 0x28000000
+		opword 0x4182000C
+		la r3, shipData(r13)
+		opword 0xC0030004
+		opword 0xFC600210
+		lfs f0, float_0p01_8041adcc(r2)
+		opword 0xFC40E050
+		opword 0xFC20D850
+		opword 0xEF82E0FA
+		opword 0xEF61D8FA
+		opword 0xFC20E210
+		opword 0xFC010040
+		opword 0x40800008
+		lfs f28, float_0_8041ada0(r2)
+		opword 0xFC20DA10
+		lfs f0, float_0p01_8041adcc(r2)
+		opword 0xFC010040
+		opword 0x40800008
+		lfs f27, float_0_8041ada0(r2)
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3830014
+		bl marioGetPtr
+		lfs f1, float_0_8041ada0(r2)
+		opword 0xFC60E090
+		opword 0x80630288
+		opword 0xFC80D890
+		opword 0xFC400890
+		opword 0xD3630018
+		bl distABf
+		lfs f28, float_0_8041ada0(r2)
+		opword 0xFFA00890
+		opword 0xFC1EE000
+		opword 0x4182001C
+		opword 0xC01E0010
+		opword 0xFC1D0040
+		opword 0x4C411382
+		opword 0x4082003C
+		opword 0xFFA00090
+		opword 0x48000034
+		la r3, shipData(r13)
+		opword 0xC0030014
+		opword 0xFC1D0040
+		opword 0x40800024
+		opword 0xFFA0E090
+		bl marioGetPtr
+		opword 0x80630288
+		lfs f27, float_0_8041ada0(r2)
+		opword 0xD3830014
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0xD3630018
+		lfs f0, float_0_8041ada0(r2)
+		opword 0xD3BF0180
+		opword 0xFC1D0000
+		opword 0x4182002C
+		bl marioGetPtr
+		opword 0x83C30288
+		bl marioGetPtr
+		lfs f1, float_0_8041ada0(r2)
+		opword 0x80630288
+		opword 0xFC400890
+		opword 0xC09E0018
+		opword 0xC0630014
+		bl angleABf
+		opword 0xD03F01A0
+		lfs f0, float_1_8041adc8(r2)
+		opword 0xFC1D0040
+		opword 0x4C411382
+		opword 0x40820054
+		bl marioGetPtr
+		opword 0x7C7E1B78
+		bl marioGetPtr
+		opword 0x80030288
+		opword 0x28000000
+		opword 0x41820098
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x40820080
+		opword 0x389E008C
+		opword 0x38600190
+		bl psndSFXOn_3D
+		opword 0x7C7E1B78
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93C30038
+		opword 0x48000060
+		lfs f0, float_0p2_8041add0(r2)
+		opword 0xFC1D0040
+		opword 0x4C401382
+		opword 0x40820050
+		bl marioGetPtr
+		bl marioGetPtr
+		opword 0x80030288
+		opword 0x28000000
+		opword 0x4182003C
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820024
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		bl psndSFXOff
+		opword 0x3BC0FFFF
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x93C30038
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x80630038
+		opword 0x3C030001
+		opword 0x2800FFFF
+		opword 0x41820018
+		bl marioGetPtr
+		opword 0x80630288
+		opword 0x389F008C
+		opword 0x80630038
+		bl psndSFX_pos
+		opword 0xD3BF018C
+	}
+#endif
+}
 #ifdef NONMATCHING
 void shipStrippedPool(f32* p) { p[0] = 15.0f; p[1] = 50.0f; p[2] = 30.30303f; p[3] = 180.0f; p[4] = 3.1415927f; }
 #endif
+#ifndef NONMATCHING
+#pragma pop
+#endif
 
 
-#ifdef NONMATCHING
+#ifndef NONMATCHING
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+#endif
 BOOL checkHarbor(Vec* out) {
+#ifdef NONMATCHING
 	f32 ix, iy, iz;
 	f32 tx, ty, tz, sn, cs, hx, hy, hz, dist, nx, ny, nz;
 	Vec p1, p2, p3;
@@ -1170,7 +3494,327 @@ BOOL checkHarbor(Vec* out) {
 	HARBOR_PROBE(90.0f + m->displayDirection, p2)
 	HARBOR_PROBE(m->displayDirection - 90.0f, p3)
 	return FALSE;
+#endif
+#ifndef NONMATCHING
+	asm volatile {
+		opword 0x9421FF70
+		opword 0x7C0802A6
+		opword 0x90010094
+		opword 0x93E1008C
+		opword 0x7C7F1B78
+		opword 0x93C10088
+		opword 0x93A10084
+		opword 0x93810080
+		bl marioGetPtr
+		opword 0x7C7E1B78
+		opword 0xC02301A8
+		bl toMovedir
+		opword 0x38610028
+		opword 0x38810024
+		bl sincosf
+		lfs f7, float_40_8041ad98(r2)
+		opword 0x38810020
+		opword 0xC0210028
+		opword 0x38A1001C
+		opword 0xC01E008C
+		opword 0x38C10018
+		lfs f4, float_0_8041ada0(r2)
+		opword 0x38E10014
+		opword 0xEC27007A
+		opword 0xC0A10024
+		opword 0xC07E0094
+		opword 0xFCC02090
+		opword 0xC01E0090
+		opword 0x39010010
+		lfs f2, float_20_8041ad9c(r2)
+		opword 0xEC67197A
+		opword 0xD0E10014
+		opword 0x3921000C
+		opword 0xEC42002A
+		lfs f5, float_neg1_8041ada4(r2)
+		opword 0x39410008
+		opword 0x38600000
+		bl hitCheckFilter
+		opword 0x7C7C1B79
+		opword 0x41820110
+		opword 0x3BA00000
+		bl hitGetAttr
+		opword 0x54600463
+		opword 0x4182000C
+		opword 0x3BA00001
+		opword 0x48000030
+		opword 0x54600421
+		opword 0x4182000C
+		opword 0x3BA00002
+		opword 0x48000020
+		opword 0x546003DF
+		opword 0x4182000C
+		opword 0x3BA00003
+		opword 0x48000010
+		opword 0x5460039D
+		opword 0x41820008
+		opword 0x3BA00004
+		opword 0x2C1D0000
+		opword 0x418200C4
+		opword 0x7F83E378
+		bl hitGetName
+		opword 0x38810044
+		bl hitObjGetPos
+		lfs f4, float_100_8041adac(r2)
+		opword 0x3C004330
+		lfs f3, float_0p5_8041ada8(r2)
+		lis r3, double_to_int_802c5e50@ha
+		opword 0xC0010044
+		addi r4, r3, double_to_int_802c5e50@l
+		opword 0xC0410048
+		opword 0x38600001
+		opword 0xEC04183A
+		opword 0xC021004C
+		opword 0xEC4418BA
+		opword 0x90010078
+		opword 0xEC24187A
+		opword 0xC8640000
+		opword 0xEC002024
+		opword 0x90010058
+		opword 0x90010068
+		opword 0xEC422024
+		opword 0xEC212024
+		opword 0xFC00001E
+		opword 0xFC40101E
+		opword 0xFC20081E
+		opword 0xD8010070
+		opword 0xD8410050
+		opword 0x80010074
+		opword 0xD8210060
+		opword 0x6C008000
+		opword 0x80810054
+		opword 0x9001007C
+		opword 0x6C848000
+		opword 0x80010064
+		opword 0x9081005C
+		opword 0xC8010078
+		opword 0x6C008000
+		opword 0x9001006C
+		opword 0xEC001828
+		opword 0xC8410058
+		opword 0xC8210068
+		opword 0xEC421828
+		opword 0xD01F0000
+		opword 0xEC011828
+		opword 0xD05F0004
+		opword 0xD01F0008
+		opword 0x48000320
+		lfs f1, float_90_8041adb0(r2)
+		opword 0xC01E01A8
+		opword 0xEC21002A
+		bl toMovedir
+		opword 0x38610028
+		opword 0x38810024
+		bl sincosf
+		lfs f7, float_40_8041ad98(r2)
+		opword 0x38810020
+		opword 0xC0210028
+		opword 0x38A1001C
+		opword 0xC01E008C
+		opword 0x38C10018
+		lfs f4, float_0_8041ada0(r2)
+		opword 0x38E10014
+		opword 0xEC27007A
+		opword 0xC0A10024
+		opword 0xC07E0094
+		opword 0xFCC02090
+		opword 0xC01E0090
+		opword 0x39010010
+		lfs f2, float_20_8041ad9c(r2)
+		opword 0xEC67197A
+		opword 0xD0E10014
+		opword 0x3921000C
+		opword 0xEC42002A
+		lfs f5, float_neg1_8041ada4(r2)
+		opword 0x39410008
+		opword 0x38600000
+		bl hitCheckFilter
+		opword 0x7C7C1B79
+		opword 0x41820110
+		opword 0x3BA00000
+		bl hitGetAttr
+		opword 0x54600463
+		opword 0x4182000C
+		opword 0x3BA00001
+		opword 0x48000030
+		opword 0x54600421
+		opword 0x4182000C
+		opword 0x3BA00002
+		opword 0x48000020
+		opword 0x546003DF
+		opword 0x4182000C
+		opword 0x3BA00003
+		opword 0x48000010
+		opword 0x5460039D
+		opword 0x41820008
+		opword 0x3BA00004
+		opword 0x2C1D0000
+		opword 0x418200C4
+		opword 0x7F83E378
+		bl hitGetName
+		opword 0x38810038
+		bl hitObjGetPos
+		lfs f4, float_100_8041adac(r2)
+		opword 0x3C004330
+		lfs f3, float_0p5_8041ada8(r2)
+		lis r3, double_to_int_802c5e50@ha
+		opword 0xC0010038
+		addi r4, r3, double_to_int_802c5e50@l
+		opword 0xC041003C
+		opword 0x38600001
+		opword 0xEC04183A
+		opword 0xC0210040
+		opword 0xEC4418BA
+		opword 0x90010050
+		opword 0xEC24187A
+		opword 0xC8640000
+		opword 0xEC002024
+		opword 0x90010070
+		opword 0x90010060
+		opword 0xEC422024
+		opword 0xEC212024
+		opword 0xFC00001E
+		opword 0xFC40101E
+		opword 0xFC20081E
+		opword 0xD8010058
+		opword 0xD8410078
+		opword 0x8001005C
+		opword 0xD8210068
+		opword 0x6C008000
+		opword 0x8081007C
+		opword 0x90010054
+		opword 0x6C848000
+		opword 0x8001006C
+		opword 0x90810074
+		opword 0xC8010050
+		opword 0x6C008000
+		opword 0x90010064
+		opword 0xEC001828
+		opword 0xC8410070
+		opword 0xC8210060
+		opword 0xEC421828
+		opword 0xD01F0000
+		opword 0xEC011828
+		opword 0xD05F0004
+		opword 0xD01F0008
+		opword 0x48000194
+		opword 0xC03E01A8
+		lfs f0, float_90_8041adb0(r2)
+		opword 0xEC210028
+		bl toMovedir
+		opword 0x38610028
+		opword 0x38810024
+		bl sincosf
+		lfs f7, float_40_8041ad98(r2)
+		opword 0x38810020
+		opword 0xC0210028
+		opword 0x38A1001C
+		opword 0xC01E008C
+		opword 0x38C10018
+		lfs f4, float_0_8041ada0(r2)
+		opword 0x38E10014
+		opword 0xEC27007A
+		opword 0xC0A10024
+		opword 0xC07E0094
+		opword 0xFCC02090
+		opword 0xC01E0090
+		opword 0x39010010
+		lfs f2, float_20_8041ad9c(r2)
+		opword 0xEC67197A
+		opword 0xD0E10014
+		opword 0x3921000C
+		opword 0xEC42002A
+		lfs f5, float_neg1_8041ada4(r2)
+		opword 0x39410008
+		opword 0x38600000
+		bl hitCheckFilter
+		opword 0x7C7E1B79
+		opword 0x41820110
+		opword 0x3BA00000
+		bl hitGetAttr
+		opword 0x54600463
+		opword 0x4182000C
+		opword 0x3BA00001
+		opword 0x48000030
+		opword 0x54600421
+		opword 0x4182000C
+		opword 0x3BA00002
+		opword 0x48000020
+		opword 0x546003DF
+		opword 0x4182000C
+		opword 0x3BA00003
+		opword 0x48000010
+		opword 0x5460039D
+		opword 0x41820008
+		opword 0x3BA00004
+		opword 0x2C1D0000
+		opword 0x418200C4
+		opword 0x7FC3F378
+		bl hitGetName
+		opword 0x3881002C
+		bl hitObjGetPos
+		lfs f4, float_100_8041adac(r2)
+		opword 0x3C004330
+		lfs f3, float_0p5_8041ada8(r2)
+		lis r3, double_to_int_802c5e50@ha
+		opword 0xC001002C
+		addi r4, r3, double_to_int_802c5e50@l
+		opword 0xC0410030
+		opword 0x38600001
+		opword 0xEC04183A
+		opword 0xC0210034
+		opword 0xEC4418BA
+		opword 0x90010050
+		opword 0xEC24187A
+		opword 0xC8640000
+		opword 0xEC002024
+		opword 0x90010070
+		opword 0x90010060
+		opword 0xEC422024
+		opword 0xEC212024
+		opword 0xFC00001E
+		opword 0xFC40101E
+		opword 0xFC20081E
+		opword 0xD8010058
+		opword 0xD8410078
+		opword 0x8001005C
+		opword 0xD8210068
+		opword 0x6C008000
+		opword 0x8081007C
+		opword 0x90010054
+		opword 0x6C848000
+		opword 0x8001006C
+		opword 0x90810074
+		opword 0xC8010050
+		opword 0x6C008000
+		opword 0x90010064
+		opword 0xEC001828
+		opword 0xC8410070
+		opword 0xC8210060
+		opword 0xEC421828
+		opword 0xD01F0000
+		opword 0xEC011828
+		opword 0xD05F0004
+		opword 0xD01F0008
+		opword 0x48000008
+		opword 0x38600000
+		opword 0x80010094
+		opword 0x83E1008C
+		opword 0x83C10088
+		opword 0x83A10084
+		opword 0x83810080
+		opword 0x7C0803A6
+		opword 0x38210090
+	}
+#endif
 }
+#ifndef NONMATCHING
+#pragma pop
 #endif
 
 
@@ -1190,25 +3834,21 @@ BOOL marioChkSwirlPower(void);
 void marioSetSwirlPower(s32 msec, f32 a, f32 b);
 s32 marioShipChanging(void);
 s32 N_marioShipGetDir(void);
+
 #ifndef NONMATCHING
-// ASM-STOPGAP: N_marioShipGetDir (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+// literal pool in target order (asmfake --minimal)
 #pragma force_active on
-__declspec(section ".rodata") const char str_802C5E00[] = "SFX_MARIO_SHIP1_1\000\000";
-#pragma force_active on
+__declspec(section ".rodata") const char str_802C5E00[] = "SFX_MARIO_SHIP1_1\0\0";
 __declspec(section ".rodata") const char str_802C5E14[] = "SFX_MARIO_SHIP2";
-__declspec(section ".rodata") const char str_802C5E24[] = "p_hune\000";
-__declspec(section ".rodata") const char str_802C5E2C[] = "p_hune_g\000\000\000";
-__declspec(section ".rodata") const char str_802C5E38[] = "p_hune_y\000\000\000";
-__declspec(section ".rodata") const char str_802C5E44[] = "p_hune_v\000\000\000";
-__declspec(section ".rodata") const f64 double_to_int_802c5e50 = 4503601774854144;
-__declspec(section ".rodata") const char str_802C5E58[] = "M_J_1B\000";
+__declspec(section ".rodata") const char str_802C5E24[] = "p_hune\0";
+__declspec(section ".rodata") const char str_802C5E2C[] = "p_hune_g\0\0\0";
+__declspec(section ".rodata") const char str_802C5E38[] = "p_hune_y\0\0\0";
+__declspec(section ".rodata") const char str_802C5E44[] = "p_hune_v\0\0\0";
+__declspec(section ".rodata") const f64 double_to_int_802c5e50 = 4503601774854144.0;
+__declspec(section ".rodata") const char str_802C5E58[] = "M_J_1B\0";
 __declspec(section ".rodata") const char str_802C5E60[] = "PM_H_1A";
-__declspec(section ".rodata") const char str_802C5E68[] = "dou_03\000";
+__declspec(section ".rodata") const char str_802C5E68[] = "dou_03\0";
 __declspec(section ".rodata") const char str_802C5E70[] = "PM_H_1B";
-#pragma force_active reset
-#pragma force_active on
 __declspec(section ".sdata2") const f32 float_40_8041ad98 = 40.0f;
 __declspec(section ".sdata2") const f32 float_20_8041ad9c = 20.0f;
 __declspec(section ".sdata2") const f32 float_0_8041ada0 = 0.0f;
@@ -1234,7 +3874,7 @@ __declspec(section ".sdata2") const f32 float_neg30_8041adec = -30.0f;
 __declspec(section ".sdata2") const f32 float_0p125_8041adf0 = 0.125f;
 __declspec(section ".sdata2") const f32 float_270_8041adf4 = 270.0f;
 __declspec(section ".sdata2") const f32 float_neg270_8041adf8 = -270.0f;
-__declspec(section ".sdata2") const char str_8041ADFC[8] = "M_Z_1\0\0";
+__declspec(section ".sdata2") const char str_8041ADFC[] = "M_Z_1\0\0";
 __declspec(section ".sdata2") const f32 float_1024_8041ae04 = 1024.0f;
 __declspec(section ".sdata2") const f32 float_1260_8041ae08 = 1260.0f;
 __declspec(section ".sdata2") const f32 float_neg1080_8041ae0c = -1080.0f;
@@ -1267,3070 +3907,4 @@ __declspec(section ".sdata2") const f32 float_0p6_8041ae74 = 0.6f;
 __declspec(section ".sdata2") const f32 float_neg7_8041ae78 = -7.0f;
 __declspec(section ".sdata2") const f32 float_260_8041ae7c = 260.0f;
 
-void* __memAlloc(HEAP_TYPE heap, u32 size);
-void __memFree(HEAP_TYPE heap, void* ptr);
-void camFollowYOff(void);
-void camFollowYOn(void);
-CameraEntry* camGetPtr(CameraId cameraId);
-void effDelete(EffectEntry* effect);
-EventEntry* evtEntry(void* evtCode, u8 priority, u8 flags);
-HitEntry* hitCheckFilter(HitFilterCallback callback, f32* hitX, f32* hitY, f32* hitZ, f32* distance, f32* hitNX,
-                         f32* hitNY, f32* hitNZ, f32 x, f32 y, f32 z, f32 nx, f32 ny, f32 nz);
-s32 hitGetAttr(HitEntry* hit);
-const char* hitGetName(HitEntry* hit);
-void hitObjGetPos(const char* name, Vec* position);
-void marioAdjustMoveDir(void);
-void marioCamZoomOffReq2(s32);
-BOOL marioCamZoomUp(void);
-void marioChgMot(MarioMotion);
-void marioChgPaper(const char* name);
-void marioChgPose(const char* name);
-s32 marioGetColor(void);
-MarioWork* marioGetPtr(void);
-void marioOfsRotReset(void);
-BOOL marioPaperOn(const char* name);
-void marioSetPaperAnimeLocalTime(s32 frames);
-void *memset(void *dest, int ch, size_t count);
-void psndSFXOff(s32 id);
-s32 psndSFXOn_3D(const char* name, Vec* position);
-void psndSFX_pos();
-f32 revise360(f32 angle);
-int strcmp(const char *s1, const char *s2);
-s32 sysMsec2Frame(s32 msec);
-f32 toMovedir(f32 angle);
-asm BOOL checkHarbor(Vec* out) {
-	nofralloc
-	stwu r1, -0x90(r1)
-	mflr r0
-	stw r0, 0x94(r1)
-	stw r31, 0x8c(r1)
-	mr r31, r3
-	stw r30, 0x88(r1)
-	stw r29, 0x84(r1)
-	stw r28, 0x80(r1)
-	bl marioGetPtr
-	mr r30, r3
-	lfs f1, 0x1a8(r3)
-	bl toMovedir
-	addi r3, r1, 0x28
-	addi r4, r1, 0x24
-	bl sincosf
-	lfs f7, float_40_8041ad98(r2)
-	addi r4, r1, 0x20
-	lfs f1, 0x28(r1)
-	addi r5, r1, 0x1c
-	lfs f0, 0x8c(r30)
-	addi r6, r1, 0x18
-	lfs f4, float_0_8041ada0(r2)
-	addi r7, r1, 0x14
-	fmadds f1, f7, f1, f0
-	lfs f5, 0x24(r1)
-	lfs f3, 0x94(r30)
-	fmr f6, f4
-	lfs f0, 0x90(r30)
-	addi r8, r1, 0x10
-	lfs f2, float_20_8041ad9c(r2)
-	fmadds f3, f7, f5, f3
-	stfs f7, 0x14(r1)
-	addi r9, r1, 0xc
-	fadds f2, f2, f0
-	lfs f5, float_neg1_8041ada4(r2)
-	addi r10, r1, 0x8
-	li r3, 0x0
-	bl hitCheckFilter
-	mr. r28, r3
-	beq @1
-	li r29, 0x0
-	bl hitGetAttr
-	rlwinm. r0, r3, 0, 17, 17
-	beq @2
-	li r29, 0x1
-	b @3
-	@2:
-	rlwinm. r0, r3, 0, 16, 16
-	beq @4
-	li r29, 0x2
-	b @3
-	@4:
-	rlwinm. r0, r3, 0, 15, 15
-	beq @5
-	li r29, 0x3
-	b @3
-	@5:
-	rlwinm. r0, r3, 0, 14, 14
-	beq @3
-	li r29, 0x4
-	@3:
-	cmpwi r29, 0x0
-	beq @1
-	mr r3, r28
-	bl hitGetName
-	addi r4, r1, 0x44
-	bl hitObjGetPos
-	lfs f4, float_100_8041adac(r2)
-	lis r0, 0x4330
-	lfs f3, float_0p5_8041ada8(r2)
-	lis r3, double_to_int_802c5e50@ha
-	lfs f0, 0x44(r1)
-	addi r4, r3, double_to_int_802c5e50@l
-	lfs f2, 0x48(r1)
-	li r3, 0x1
-	fmadds f0, f4, f0, f3
-	lfs f1, 0x4c(r1)
-	fmadds f2, f4, f2, f3
-	stw r0, 0x78(r1)
-	fmadds f1, f4, f1, f3
-	lfd f3, 0x0(r4)
-	fdivs f0, f0, f4
-	stw r0, 0x58(r1)
-	stw r0, 0x68(r1)
-	fdivs f2, f2, f4
-	fdivs f1, f1, f4
-	fctiwz f0, f0
-	fctiwz f2, f2
-	fctiwz f1, f1
-	stfd f0, 0x70(r1)
-	stfd f2, 0x50(r1)
-	lwz r0, 0x74(r1)
-	stfd f1, 0x60(r1)
-	xoris r0, r0, 0x8000
-	lwz r4, 0x54(r1)
-	stw r0, 0x7c(r1)
-	xoris r4, r4, 0x8000
-	lwz r0, 0x64(r1)
-	stw r4, 0x5c(r1)
-	lfd f0, 0x78(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x6c(r1)
-	fsubs f0, f0, f3
-	lfd f2, 0x58(r1)
-	lfd f1, 0x68(r1)
-	fsubs f2, f2, f3
-	stfs f0, 0x0(r31)
-	fsubs f0, f1, f3
-	stfs f2, 0x4(r31)
-	stfs f0, 0x8(r31)
-	b @6
-	@1:
-	lfs f1, float_90_8041adb0(r2)
-	lfs f0, 0x1a8(r30)
-	fadds f1, f1, f0
-	bl toMovedir
-	addi r3, r1, 0x28
-	addi r4, r1, 0x24
-	bl sincosf
-	lfs f7, float_40_8041ad98(r2)
-	addi r4, r1, 0x20
-	lfs f1, 0x28(r1)
-	addi r5, r1, 0x1c
-	lfs f0, 0x8c(r30)
-	addi r6, r1, 0x18
-	lfs f4, float_0_8041ada0(r2)
-	addi r7, r1, 0x14
-	fmadds f1, f7, f1, f0
-	lfs f5, 0x24(r1)
-	lfs f3, 0x94(r30)
-	fmr f6, f4
-	lfs f0, 0x90(r30)
-	addi r8, r1, 0x10
-	lfs f2, float_20_8041ad9c(r2)
-	fmadds f3, f7, f5, f3
-	stfs f7, 0x14(r1)
-	addi r9, r1, 0xc
-	fadds f2, f2, f0
-	lfs f5, float_neg1_8041ada4(r2)
-	addi r10, r1, 0x8
-	li r3, 0x0
-	bl hitCheckFilter
-	mr. r28, r3
-	beq @7
-	li r29, 0x0
-	bl hitGetAttr
-	rlwinm. r0, r3, 0, 17, 17
-	beq @8
-	li r29, 0x1
-	b @9
-	@8:
-	rlwinm. r0, r3, 0, 16, 16
-	beq @10
-	li r29, 0x2
-	b @9
-	@10:
-	rlwinm. r0, r3, 0, 15, 15
-	beq @11
-	li r29, 0x3
-	b @9
-	@11:
-	rlwinm. r0, r3, 0, 14, 14
-	beq @9
-	li r29, 0x4
-	@9:
-	cmpwi r29, 0x0
-	beq @7
-	mr r3, r28
-	bl hitGetName
-	addi r4, r1, 0x38
-	bl hitObjGetPos
-	lfs f4, float_100_8041adac(r2)
-	lis r0, 0x4330
-	lfs f3, float_0p5_8041ada8(r2)
-	lis r3, double_to_int_802c5e50@ha
-	lfs f0, 0x38(r1)
-	addi r4, r3, double_to_int_802c5e50@l
-	lfs f2, 0x3c(r1)
-	li r3, 0x1
-	fmadds f0, f4, f0, f3
-	lfs f1, 0x40(r1)
-	fmadds f2, f4, f2, f3
-	stw r0, 0x50(r1)
-	fmadds f1, f4, f1, f3
-	lfd f3, 0x0(r4)
-	fdivs f0, f0, f4
-	stw r0, 0x70(r1)
-	stw r0, 0x60(r1)
-	fdivs f2, f2, f4
-	fdivs f1, f1, f4
-	fctiwz f0, f0
-	fctiwz f2, f2
-	fctiwz f1, f1
-	stfd f0, 0x58(r1)
-	stfd f2, 0x78(r1)
-	lwz r0, 0x5c(r1)
-	stfd f1, 0x68(r1)
-	xoris r0, r0, 0x8000
-	lwz r4, 0x7c(r1)
-	stw r0, 0x54(r1)
-	xoris r4, r4, 0x8000
-	lwz r0, 0x6c(r1)
-	stw r4, 0x74(r1)
-	lfd f0, 0x50(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x64(r1)
-	fsubs f0, f0, f3
-	lfd f2, 0x70(r1)
-	lfd f1, 0x60(r1)
-	fsubs f2, f2, f3
-	stfs f0, 0x0(r31)
-	fsubs f0, f1, f3
-	stfs f2, 0x4(r31)
-	stfs f0, 0x8(r31)
-	b @6
-	@7:
-	lfs f1, 0x1a8(r30)
-	lfs f0, float_90_8041adb0(r2)
-	fsubs f1, f1, f0
-	bl toMovedir
-	addi r3, r1, 0x28
-	addi r4, r1, 0x24
-	bl sincosf
-	lfs f7, float_40_8041ad98(r2)
-	addi r4, r1, 0x20
-	lfs f1, 0x28(r1)
-	addi r5, r1, 0x1c
-	lfs f0, 0x8c(r30)
-	addi r6, r1, 0x18
-	lfs f4, float_0_8041ada0(r2)
-	addi r7, r1, 0x14
-	fmadds f1, f7, f1, f0
-	lfs f5, 0x24(r1)
-	lfs f3, 0x94(r30)
-	fmr f6, f4
-	lfs f0, 0x90(r30)
-	addi r8, r1, 0x10
-	lfs f2, float_20_8041ad9c(r2)
-	fmadds f3, f7, f5, f3
-	stfs f7, 0x14(r1)
-	addi r9, r1, 0xc
-	fadds f2, f2, f0
-	lfs f5, float_neg1_8041ada4(r2)
-	addi r10, r1, 0x8
-	li r3, 0x0
-	bl hitCheckFilter
-	mr. r30, r3
-	beq @12
-	li r29, 0x0
-	bl hitGetAttr
-	rlwinm. r0, r3, 0, 17, 17
-	beq @13
-	li r29, 0x1
-	b @14
-	@13:
-	rlwinm. r0, r3, 0, 16, 16
-	beq @15
-	li r29, 0x2
-	b @14
-	@15:
-	rlwinm. r0, r3, 0, 15, 15
-	beq @16
-	li r29, 0x3
-	b @14
-	@16:
-	rlwinm. r0, r3, 0, 14, 14
-	beq @14
-	li r29, 0x4
-	@14:
-	cmpwi r29, 0x0
-	beq @12
-	mr r3, r30
-	bl hitGetName
-	addi r4, r1, 0x2c
-	bl hitObjGetPos
-	lfs f4, float_100_8041adac(r2)
-	lis r0, 0x4330
-	lfs f3, float_0p5_8041ada8(r2)
-	lis r3, double_to_int_802c5e50@ha
-	lfs f0, 0x2c(r1)
-	addi r4, r3, double_to_int_802c5e50@l
-	lfs f2, 0x30(r1)
-	li r3, 0x1
-	fmadds f0, f4, f0, f3
-	lfs f1, 0x34(r1)
-	fmadds f2, f4, f2, f3
-	stw r0, 0x50(r1)
-	fmadds f1, f4, f1, f3
-	lfd f3, 0x0(r4)
-	fdivs f0, f0, f4
-	stw r0, 0x70(r1)
-	stw r0, 0x60(r1)
-	fdivs f2, f2, f4
-	fdivs f1, f1, f4
-	fctiwz f0, f0
-	fctiwz f2, f2
-	fctiwz f1, f1
-	stfd f0, 0x58(r1)
-	stfd f2, 0x78(r1)
-	lwz r0, 0x5c(r1)
-	stfd f1, 0x68(r1)
-	xoris r0, r0, 0x8000
-	lwz r4, 0x7c(r1)
-	stw r0, 0x54(r1)
-	xoris r4, r4, 0x8000
-	lwz r0, 0x6c(r1)
-	stw r4, 0x74(r1)
-	lfd f0, 0x50(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x64(r1)
-	fsubs f0, f0, f3
-	lfd f2, 0x70(r1)
-	lfd f1, 0x60(r1)
-	fsubs f2, f2, f3
-	stfs f0, 0x0(r31)
-	fsubs f0, f1, f3
-	stfs f2, 0x4(r31)
-	stfs f0, 0x8(r31)
-	b @6
-	@12:
-	li r3, 0x0
-	@6:
-	lwz r0, 0x94(r1)
-	lwz r31, 0x8c(r1)
-	lwz r30, 0x88(r1)
-	lwz r29, 0x84(r1)
-	lwz r28, 0x80(r1)
-	mtlr r0
-	addi r1, r1, 0x90
-	blr
-}
-
-void mot_ship(void);
-#pragma force_active on
-__declspec(section ".data") static void* jumptable_8030ECF8[] = {
-    (char*)mot_ship + 0x108,
-    (char*)mot_ship + 0x26C,
-    (char*)mot_ship + 0x480,
-    (char*)mot_ship + 0x558,
-    (char*)mot_ship + 0x5C8,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x6EC,
-    (char*)mot_ship + 0x9FC,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0xBF0,
-    (char*)mot_ship + 0xC18,
-    (char*)mot_ship + 0xCD8,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0xCF0,
-    (char*)mot_ship + 0xEB0,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0xFDC,
-    (char*)mot_ship + 0x10FC,
-    (char*)mot_ship + 0x119C,
-    (char*)mot_ship + 0x1264,
-    (char*)mot_ship + 0x13D8,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x158C,
-    (char*)mot_ship + 0x1A80,
-    (char*)mot_ship + 0x1594,
-};
-asm void shipMove(void) {
-	nofralloc
-	stwu r1, -0x80(r1)
-	mflr r0
-	stw r0, 0x84(r1)
-	stfd f31, 0x70(r1)
-	psq_st f31, 0x78(r1), 0, 0
-	stfd f30, 0x60(r1)
-	psq_st f30, 0x68(r1), 0, 0
-	stfd f29, 0x50(r1)
-	psq_st f29, 0x58(r1), 0, 0
-	stfd f28, 0x40(r1)
-	psq_st f28, 0x48(r1), 0, 0
-	stfd f27, 0x30(r1)
-	psq_st f27, 0x38(r1), 0, 0
-	stfd f26, 0x20(r1)
-	psq_st f26, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	bl marioGetPtr
-	mr r31, r3
-	lfs f0, float_0_8041ada0(r2)
-	lfs f30, 0x190(r3)
-	stfs f0, 0xc(r1)
-	stfs f0, 0xc(r1)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x30(r3)
-	cmpwi r0, 0x0
-	beq @1
-	bl marioGetPtr
-	lwz r4, 0x288(r3)
-	lwz r3, 0x30(r4)
-	subi r0, r3, 0x1
-	stw r0, 0x30(r4)
-	bl marioGetPtr
-	lwz r30, 0x288(r3)
-	bl marioGetPtr
-	lwz r5, 0x288(r3)
-	addi r3, r1, 0xc
-	lfs f2, 0x28(r30)
-	addi r4, r1, 0x8
-	lfs f1, 0x2c(r5)
-	bl movePos
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0xc(r1)
-	lfs f1, 0x14(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	la r30, shipData(r13)
-	lfs f0, 0x8(r1)
-	lfs f1, 0x18(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x18(r3)
-	lfs f27, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x14(r3)
-	fcmpo cr0, f0, f27
-	ble @2
-	lfs f27, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f27, 0x14(r3)
-	@2:
-	bl marioGetPtr
-	lfs f0, 0x10(r30)
-	lwz r3, 0x288(r3)
-	fneg f27, f0
-	lfs f0, 0x14(r3)
-	fcmpo cr0, f0, f27
-	bge @3
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f27, 0x14(r3)
-	@3:
-	lfs f27, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x18(r3)
-	fcmpo cr0, f0, f27
-	ble @4
-	lfs f27, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f27, 0x18(r3)
-	@4:
-	bl marioGetPtr
-	lfs f0, 0x10(r30)
-	lwz r3, 0x288(r3)
-	fneg f27, f0
-	lfs f0, 0x18(r3)
-	fcmpo cr0, f0, f27
-	bge @1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f27, 0x18(r3)
-	@1:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f28, 0x14(r3)
-	bl marioGetPtr
-	lfs f1, 0x190(r31)
-	lfs f0, float_0_8041ada0(r2)
-	lwz r3, 0x288(r3)
-	fcmpu cr0, f1, f0
-	lfs f27, 0x18(r3)
-	beq @5
-	lfs f2, float_3p1416_8041adc4(r2)
-	lfs f1, 0x194(r31)
-	lfs f0, float_180_8041adc0(r2)
-	fmuls f1, f2, f1
-	fdivs f1, f1, f0
-	bl sin
-	lfs f2, float_3p1416_8041adc4(r2)
-	frsp f3, f1
-	lfs f1, 0x194(r31)
-	lfs f0, float_180_8041adc0(r2)
-	fmuls f1, f2, f1
-	fmuls f26, f30, f3
-	fdivs f1, f1, f0
-	bl cos
-	frsp f0, f1
-	fneg f0, f0
-	fmuls f29, f30, f0
-	b @6
-	@5:
-	fmr f26, f28
-	fmr f29, f27
-	@6:
-	lfs f0, float_0_8041ada0(r2)
-	la r30, shipData(r13)
-	lfs f31, 0x10(r30)
-	fcmpu cr0, f30, f0
-	bne @7
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x30(r3)
-	cmpwi r0, 0x0
-	beq @8
-	@7:
-	fcmpo cr0, f26, f28
-	ble @9
-	lfs f1, float_1_8041adc8(r2)
-	la r3, shipData(r13)
-	lfs f0, 0xc(r3)
-	fadds f1, f1, f26
-	fsubs f1, f1, f28
-	fmadds f28, f1, f0, f28
-	fcmpo cr0, f28, f31
-	cror eq, gt, eq
-	bne @10
-	fmr f28, f31
-	b @10
-	@9:
-	lfs f1, float_1_8041adc8(r2)
-	la r3, shipData(r13)
-	lfs f0, 0xc(r3)
-	fneg f2, f31
-	fsubs f1, f26, f1
-	fsubs f1, f1, f28
-	fmadds f28, f1, f0, f28
-	fcmpo cr0, f28, f2
-	cror eq, lt, eq
-	bne @10
-	fmr f28, f2
-	@10:
-	fcmpo cr0, f29, f27
-	ble @11
-	lfs f1, float_1_8041adc8(r2)
-	la r3, shipData(r13)
-	lfs f0, 0xc(r3)
-	fadds f1, f1, f29
-	fsubs f1, f1, f27
-	fmadds f27, f1, f0, f27
-	fcmpo cr0, f27, f31
-	cror eq, gt, eq
-	bne @8
-	fmr f27, f31
-	b @8
-	@11:
-	lfs f1, float_1_8041adc8(r2)
-	la r3, shipData(r13)
-	lfs f0, 0xc(r3)
-	fneg f2, f31
-	fsubs f1, f29, f1
-	fsubs f1, f1, f27
-	fmadds f27, f1, f0, f27
-	fcmpo cr0, f27, f2
-	cror eq, lt, eq
-	bne @8
-	fmr f27, f2
-	@8:
-	lfs f0, float_0_8041ada0(r2)
-	fcmpu cr0, f30, f0
-	bne @12
-	lwz r0, 0x1f0(r31)
-	lfs f0, shipData(r13)
-	cmplwi r0, 0x0
-	beq @13
-	la r3, shipData(r13)
-	lfs f0, 0x4(r3)
-	@13:
-	fabs f3, f0
-	lfs f0, float_0p01_8041adcc(r2)
-	fneg f2, f28
-	fneg f1, f27
-	fmadds f28, f2, f3, f28
-	fmadds f27, f1, f3, f27
-	fabs f1, f28
-	fcmpo cr0, f1, f0
-	bge @14
-	lfs f28, float_0_8041ada0(r2)
-	@14:
-	fabs f1, f27
-	lfs f0, float_0p01_8041adcc(r2)
-	fcmpo cr0, f1, f0
-	bge @12
-	lfs f27, float_0_8041ada0(r2)
-	@12:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f28, 0x14(r3)
-	bl marioGetPtr
-	lfs f1, float_0_8041ada0(r2)
-	fmr f3, f28
-	lwz r3, 0x288(r3)
-	fmr f4, f27
-	fmr f2, f1
-	stfs f27, 0x18(r3)
-	bl distABf
-	lfs f28, float_0_8041ada0(r2)
-	fmr f29, f1
-	fcmpu cr0, f30, f28
-	beq @15
-	lfs f0, 0x10(r30)
-	fcmpo cr0, f29, f0
-	cror eq, gt, eq
-	bne @16
-	fmr f29, f0
-	b @16
-	@15:
-	la r3, shipData(r13)
-	lfs f0, 0x14(r3)
-	fcmpo cr0, f29, f0
-	bge @16
-	fmr f29, f28
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f27, float_0_8041ada0(r2)
-	stfs f28, 0x14(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f27, 0x18(r3)
-	@16:
-	lfs f0, float_0_8041ada0(r2)
-	stfs f29, 0x180(r31)
-	fcmpu cr0, f29, f0
-	beq @17
-	bl marioGetPtr
-	lwz r30, 0x288(r3)
-	bl marioGetPtr
-	lfs f1, float_0_8041ada0(r2)
-	lwz r3, 0x288(r3)
-	fmr f2, f1
-	lfs f4, 0x18(r30)
-	lfs f3, 0x14(r3)
-	bl angleABf
-	stfs f1, 0x1a0(r31)
-	@17:
-	lfs f0, float_1_8041adc8(r2)
-	fcmpo cr0, f29, f0
-	cror eq, gt, eq
-	bne @18
-	bl marioGetPtr
-	mr r30, r3
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @19
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	bne @19
-	addi r4, r30, 0x8c
-	li r3, 0x190
-	bl psndSFXOn_3D
-	mr r30, r3
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r30, 0x38(r3)
-	b @19
-	@18:
-	lfs f0, float_0p2_8041add0(r2)
-	fcmpo cr0, f29, f0
-	cror eq, lt, eq
-	bne @19
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @19
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @19
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	bl psndSFXOff
-	li r30, -0x1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r30, 0x38(r3)
-	@19:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @20
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	addi r4, r31, 0x8c
-	lwz r3, 0x38(r3)
-	bl psndSFX_pos
-	@20:
-	stfs f29, 0x18c(r31)
-	psq_l f31, 0x78(r1), 0, 0
-	lfd f31, 0x70(r1)
-	psq_l f30, 0x68(r1), 0, 0
-	lfd f30, 0x60(r1)
-	psq_l f29, 0x58(r1), 0, 0
-	lfd f29, 0x50(r1)
-	psq_l f28, 0x48(r1), 0, 0
-	lfd f28, 0x40(r1)
-	psq_l f27, 0x38(r1), 0, 0
-	lfd f27, 0x30(r1)
-	psq_l f26, 0x28(r1), 0, 0
-	lfd f26, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	lwz r0, 0x84(r1)
-	lwz r30, 0x18(r1)
-	mtlr r0
-	addi r1, r1, 0x80
-	blr
-}
-
-asm BOOL marioChkShipMoveMode(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lhz r0, 0x2e(r3)
-	cmplwi r0, 0x19
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r0, 0x44(r3)
-	cmpwi r0, 0x32
-	blt @3
-	cmpwi r0, 0x34
-	bgt @3
-	li r3, 0x1
-	b @2
-	@3:
-	li r3, 0x0
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void marioShipChgFall(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lwz r4, 0x0(r3)
-	rlwinm. r0, r4, 0, 14, 14
-	bne @1
-	oris r0, r4, 0x2
-	lfs f1, float_neg0p1_8041add4(r2)
-	stw r0, 0x0(r3)
-	lfs f0, float_neg0p2_8041add8(r2)
-	stfs f1, 0x7c(r3)
-	lfs f1, float_0p024_8041addc(r2)
-	stfs f0, 0x80(r3)
-	lfs f0, float_neg0p004_8041ade0(r2)
-	stfs f1, 0x84(r3)
-	stfs f0, 0x88(r3)
-	@1:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void mot_ship(void) {
-	nofralloc
-	stwu r1, -0x90(r1)
-	mflr r0
-	stw r0, 0x94(r1)
-	stfd f31, 0x80(r1)
-	psq_st f31, 0x88(r1), 0, 0
-	stfd f30, 0x70(r1)
-	psq_st f30, 0x78(r1), 0, 0
-	stmw r27, 0x5c(r1)
-	lis r3, str_802C5E00@ha
-	addi r30, r3, str_802C5E00@l
-	bl marioGetPtr
-	mr r31, r3
-	lwz r3, 0xc(r3)
-	clrlwi. r0, r3, 31
-	beq @1
-	clrrwi r0, r3, 1
-	li r3, 0x0
-	stw r0, 0xc(r31)
-	li r4, 0x48
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r31)
-	bl __memAlloc
-	mr r28, r3
-	bl marioGetPtr
-	stw r28, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r4, 0x0
-	li r5, 0x48
-	bl memset
-	li r28, -0x1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_0_8041ada0(r2)
-	stw r28, 0x38(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stfs f30, 0x20(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_4p25_8041ade4(r2)
-	stfs f31, 0x8(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r0, 0x0
-	stfs f30, 0xc(r3)
-	stw r0, 0x44(r31)
-	lwz r0, 0xc(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	bne @1
-	li r3, 0x8
-	bl camGetPtr
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x200
-	sth r0, 0x0(r3)
-	@1:
-	lwz r0, 0x44(r31)
-	cmplwi r0, 0x34
-	bgt @2
-	lis r3, jumptable_8030ECF8@ha
-	slwi r0, r0, 2
-	addi r3, r3, jumptable_8030ECF8@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@3:
-	addi r4, r31, 0x8c
-	li r3, 0x18d
-	bl psndSFXOn_3D
-	addi r4, r31, 0x8c
-	li r3, 0xaf
-	bl psndSFXOn_3D
-	bl marioCamZoomUp
-	bl marioPreJump
-	addi r3, r30, 0x58
-	bl marioChgPose
-	bl camFollowYOff
-	lwz r4, 0x4(r31)
-	li r3, 0x0
-	li r0, 0x1
-	lfs f30, float_0_8041ada0(r2)
-	ori r4, r4, 0x100
-	stw r4, 0x4(r31)
-	stw r3, 0x48(r31)
-	stw r0, 0x44(r31)
-	sth r3, 0x50(r31)
-	sth r3, 0x52(r31)
-	stfs f30, 0x180(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x1c(r3)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x90(r31)
-	lfs f3, 0x94(r31)
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	lwz r29, 0x1e8(r31)
-	bl marioGetPtr
-	mr r28, r3
-	mr r3, r29
-	bl hitGetAttr
-	rlwinm. r0, r3, 0, 17, 17
-	li r29, 0x0
-	beq @4
-	lwz r3, 0x1e8(r28)
-	bl hitGetName
-	addi r4, r1, 0x1c
-	bl hitObjGetPos
-	lfs f1, 0x8c(r28)
-	lfs f2, 0x94(r28)
-	lfs f3, 0x1c(r1)
-	lfs f4, 0x24(r1)
-	bl angleABf
-	lfs f0, 0x198(r28)
-	fsubs f1, f1, f0
-	bl revise360
-	lfs f0, float_180_8041adc0(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @5
-	li r29, 0x2
-	b @6
-	@5:
-	li r29, 0x1
-	b @6
-	@4:
-	rlwinm. r0, r3, 0, 16, 16
-	beq @7
-	lwz r3, 0x1e8(r28)
-	bl hitGetName
-	addi r4, r1, 0x28
-	bl hitObjGetPos
-	lfs f1, 0x8c(r28)
-	lfs f2, 0x94(r28)
-	lfs f3, 0x28(r1)
-	lfs f4, 0x30(r1)
-	bl angleABf
-	lfs f0, 0x198(r28)
-	fsubs f1, f1, f0
-	bl revise360
-	lfs f0, float_180_8041adc0(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @8
-	li r29, 0x2
-	b @6
-	@8:
-	li r29, 0x1
-	b @6
-	@7:
-	rlwinm. r0, r3, 0, 15, 15
-	beq @9
-	li r29, 0x2
-	b @6
-	@9:
-	rlwinm. r0, r3, 0, 14, 14
-	beq @6
-	li r29, 0x1
-	@6:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r29, 0x0(r3)
-	@10:
-	bl marioMakeJumpPara
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @11
-	lfs f31, float_30_8041ade8(r2)
-	b @12
-	@11:
-	lfs f31, float_neg30_8041adec(r2)
-	@12:
-	bl marioGetPtr
-	lwz r28, 0x288(r3)
-	lfs f30, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p125_8041adf0(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f31, f1
-	fmadds f0, f0, f1, f30
-	stfs f0, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @13
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_30_8041ade8(r2)
-	lfs f0, 0x1c(r3)
-	fcmpo cr0, f0, f30
-	cror eq, gt, eq
-	bne @14
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x1c(r3)
-	b @14
-	@13:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_neg30_8041adec(r2)
-	lfs f0, 0x1c(r3)
-	fcmpo cr0, f0, f30
-	cror eq, lt, eq
-	bne @14
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x1c(r3)
-	@14:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r27, 0x0
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @15
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_270_8041adf4(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @16
-	li r27, 0x1
-	b @16
-	@15:
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_neg270_8041adf8(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @16
-	li r27, 0x1
-	@16:
-	cmpwi r27, 0x0
-	beq @17
-	li r3, 0x2
-	li r0, 0x14
-	stw r3, 0x44(r31)
-	stw r0, 0x48(r31)
-	bl marioGetColor
-	slwi r0, r3, 2
-	la r3, paper_ship(r13)
-	lwzx r3, r3, r0
-	bl marioPaperOn
-	addi r3, r30, 0x60
-	bl marioChgPaper
-	la r3, str_8041ADFC(r2)
-	bl marioChgPose
-	lwz r0, 0x4(r31)
-	lfs f30, float_15_8041adb4(r2)
-	ori r0, r0, 0x8
-	stw r0, 0x4(r31)
-	bl marioGetPtr
-	lwz r5, 0x288(r3)
-	lis r3, sound_evt@ha
-	addi r3, r3, sound_evt@l
-	li r4, 0x0
-	stfs f30, 0x20(r5)
-	li r5, 0x0
-	bl evtEntry
-	lfs f1, float_1024_8041ae04(r2)
-	lfs f0, 0x8c(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x38(r1)
-	lwz r4, 0x3c(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0x9c(r3)
-	lfs f0, 0x90(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x40(r1)
-	lwz r4, 0x44(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0xa0(r3)
-	lfs f0, 0x94(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x48(r1)
-	lwz r4, 0x4c(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0xa4(r3)
-	@17:
-	lfs f1, 0x7c(r31)
-	lfs f0, float_0_8041ada0(r2)
-	fcmpo cr0, f1, f0
-	ble @2
-	lfs f0, 0x90(r31)
-	fadds f0, f0, f1
-	stfs f0, 0x90(r31)
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r31)
-	b @2
-	@18:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @19
-	lfs f30, float_1_8041adc8(r2)
-	b @20
-	@19:
-	lfs f30, float_neg1_8041ada4(r2)
-	@20:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x20(r3)
-	fmuls f31, f0, f30
-	bl marioGetPtr
-	lwz r28, 0x288(r3)
-	lfs f30, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p125_8041adf0(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f31, f1
-	fmadds f0, f0, f1, f30
-	stfs f0, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r27, 0x0
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @21
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_1260_8041ae08(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @22
-	li r27, 0x1
-	b @22
-	@21:
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_neg1080_8041ae0c(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @22
-	li r27, 0x1
-	@22:
-	cmpwi r27, 0x0
-	beq @2
-	li r3, 0x28
-	li r0, 0x3
-	stw r3, 0x48(r31)
-	stw r0, 0x44(r31)
-	b @2
-	@23:
-	lwz r0, 0x48(r31)
-	cmpwi r0, 0xe
-	bne @24
-	bl allPartyRideShip
-	@24:
-	lwz r0, 0x48(r31)
-	cmpwi r0, 0x14
-	bne @25
-	li r3, 0x384
-	bl marioCamZoomOffReq2
-	bl camFollowYOn
-	@25:
-	lwz r3, 0x48(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x48(r31)
-	bgt @26
-	li r0, 0x4
-	stw r0, 0x44(r31)
-	@26:
-	lfs f2, 0x9c(r31)
-	lfs f1, float_neg15_8041ae10(r2)
-	fcmpo cr0, f2, f1
-	ble @27
-	lfs f0, float_1_8041adc8(r2)
-	fsubs f0, f2, f0
-	stfs f0, 0x9c(r31)
-	lfs f0, 0x9c(r31)
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @27
-	stfs f1, 0x9c(r31)
-	@27:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @28
-	lfs f30, float_1_8041adc8(r2)
-	b @29
-	@28:
-	lfs f30, float_neg1_8041ada4(r2)
-	@29:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x20(r3)
-	fmuls f31, f0, f30
-	bl marioGetPtr
-	lwz r28, 0x288(r3)
-	lfs f30, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p125_8041adf0(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f31, f1
-	fmadds f0, f0, f1, f30
-	stfs f0, 0x1c(r28)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p1_8041ae14(r2)
-	lfs f1, 0x20(r3)
-	fsubs f0, f1, f0
-	stfs f0, 0x20(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_1_8041adc8(r2)
-	lfs f0, 0x20(r3)
-	fcmpo cr0, f0, f30
-	cror eq, lt, eq
-	bne @30
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x20(r3)
-	@30:
-	li r27, 0x0
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @31
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_1620_8041ae18(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @32
-	stfs f0, 0x1a8(r31)
-	li r27, 0x1
-	b @32
-	@31:
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_neg1440_8041ae1c(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @32
-	stfs f0, 0x1a8(r31)
-	li r27, 0x1
-	@32:
-	cmpwi r27, 0x0
-	beq @2
-	lwz r0, 0x44(r31)
-	cmpwi r0, 0x4
-	bne @2
-	li r0, 0xa
-	stw r0, 0x44(r31)
-	b @2
-	@33:
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x4(r31)
-	lfs f1, 0x1a8(r31)
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	lfs f0, float_40_8041ad98(r2)
-	stfs f0, 0x1b4(r31)
-	stfs f0, 0x1b8(r31)
-	bl marioGetPtr
-	lwz r28, 0x288(r3)
-	lwz r27, 0x1e8(r31)
-	bl marioGetPtr
-	mr r29, r3
-	mr r3, r27
-	bl hitGetName
-	addi r4, r1, 0x10
-	bl hitObjGetPos
-	lfs f5, float_100_8041adac(r2)
-	lis r0, 0x4330
-	lfs f1, 0x10(r1)
-	li r27, 0x0
-	lfs f2, float_0p5_8041ada8(r2)
-	lfs f0, 0x18(r1)
-	fmadds f3, f5, f1, f2
-	lfs f1, 0x90(r29)
-	fmadds f2, f5, f0, f2
-	lfs f0, float_15_8041adb4(r2)
-	stw r0, 0x40(r1)
-	fdivs f4, f3, f5
-	stw r0, 0x50(r1)
-	lfd f3, 0x50(r30)
-	fdivs f2, f2, f5
-	fctiwz f4, f4
-	fctiwz f2, f2
-	fsubs f0, f1, f0
-	stfd f4, 0x48(r1)
-	stfd f2, 0x38(r1)
-	lwz r3, 0x4c(r1)
-	lwz r0, 0x3c(r1)
-	xoris r3, r3, 0x8000
-	stfs f0, 0x40(r28)
-	xoris r0, r0, 0x8000
-	stw r3, 0x44(r1)
-	lwz r3, 0x1e8(r29)
-	stw r0, 0x54(r1)
-	lfd f1, 0x40(r1)
-	lfd f0, 0x50(r1)
-	fsubs f31, f1, f3
-	fsubs f30, f0, f3
-	bl hitGetAttr
-	rlwinm. r0, r3, 0, 17, 17
-	beq @34
-	li r27, 0x1
-	b @35
-	@34:
-	rlwinm. r0, r3, 0, 16, 16
-	beq @36
-	li r27, 0x2
-	b @35
-	@36:
-	rlwinm. r0, r3, 0, 15, 15
-	beq @37
-	li r27, 0x3
-	b @35
-	@37:
-	rlwinm. r0, r3, 0, 14, 14
-	beq @35
-	li r27, 0x4
-	@35:
-	cmpwi r27, 0x1
-	bne @38
-	lfs f1, float_50_8041adb8(r2)
-	lfs f0, float_30p303_8041adbc(r2)
-	fsubs f1, f30, f1
-	stfs f31, 0x3c(r28)
-	fsubs f0, f1, f0
-	stfs f0, 0x44(r28)
-	b @39
-	@38:
-	cmpwi r27, 0x2
-	bne @40
-	lfs f0, float_50_8041adb8(r2)
-	lfs f1, float_30p303_8041adbc(r2)
-	fadds f0, f0, f30
-	stfs f31, 0x3c(r28)
-	fadds f0, f1, f0
-	stfs f0, 0x44(r28)
-	b @39
-	@40:
-	cmpwi r27, 0x3
-	bne @41
-	lfs f1, float_50_8041adb8(r2)
-	lfs f0, float_30p303_8041adbc(r2)
-	fsubs f1, f31, f1
-	fsubs f0, f1, f0
-	stfs f0, 0x3c(r28)
-	stfs f30, 0x44(r28)
-	b @39
-	@41:
-	cmpwi r27, 0x4
-	bne @42
-	lfs f0, float_50_8041adb8(r2)
-	lfs f1, float_30p303_8041adbc(r2)
-	fadds f0, f0, f31
-	fadds f0, f1, f0
-	stfs f0, 0x3c(r28)
-	stfs f30, 0x44(r28)
-	b @39
-	@42:
-	stfs f31, 0x3c(r28)
-	stfs f30, 0x44(r28)
-	@39:
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f2, 0x44(r29)
-	lfs f1, 0x3c(r3)
-	lfs f3, 0x8c(r31)
-	lfs f4, 0x94(r31)
-	bl distABf
-	lfs f0, float_0p1_8041ae14(r2)
-	cmpwi r27, 0x3
-	fmuls f30, f0, f1
-	beq @43
-	bge @44
-	cmpwi r27, 0x1
-	beq @45
-	bge @46
-	b @47
-	@44:
-	cmpwi r27, 0x5
-	bge @47
-	b @48
-	@45:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x44(r3)
-	fsubs f0, f0, f30
-	stfs f0, 0x44(r3)
-	b @47
-	@46:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x44(r3)
-	fadds f0, f0, f30
-	stfs f0, 0x44(r3)
-	b @47
-	@43:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x3c(r3)
-	fsubs f0, f0, f30
-	stfs f0, 0x3c(r3)
-	b @47
-	@48:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x3c(r3)
-	fadds f0, f0, f30
-	stfs f0, 0x3c(r3)
-	@47:
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x94(r31)
-	lfs f3, 0x3c(r3)
-	lfs f4, 0x44(r29)
-	bl distABf
-	lfs f0, float_36_8041ae20(r2)
-	fdivs f0, f1, f0
-	stfs f0, 0x180(r31)
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x94(r31)
-	lfs f3, 0x3c(r3)
-	lfs f4, 0x44(r29)
-	bl angleABf
-	stfs f1, 0x1a0(r31)
-	lfs f0, 0x1a0(r31)
-	stfs f0, 0x19c(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, 0x40(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x4(r3)
-	bl marioGetPtr
-	lwz r4, 0x288(r3)
-	li r3, 0x24
-	lfs f0, 0x90(r31)
-	li r0, 0xb
-	lfs f1, 0x40(r4)
-	lfs f2, float_0_8041ada0(r2)
-	fsubs f1, f1, f0
-	lfs f0, float_306_8041ae24(r2)
-	stfs f2, 0x7c(r31)
-	fadds f1, f1, f1
-	fdivs f0, f1, f0
-	stfs f0, 0x80(r31)
-	stfs f2, 0x84(r31)
-	stfs f2, 0x88(r31)
-	stw r3, 0x48(r31)
-	stw r0, 0x44(r31)
-	b @2
-	@49:
-	lfs f1, 0x180(r31)
-	addi r3, r31, 0x8c
-	lfs f2, 0x1a0(r31)
-	addi r4, r31, 0x94
-	bl movePos
-	lfs f1, 0x90(r31)
-	lfs f0, 0x7c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x90(r31)
-	bl marioMakeJumpPara
-	lfs f30, 0x7c(r31)
-	bl marioGetPtr
-	lfs f0, float_20_8041ad9c(r2)
-	mr r29, r3
-	fmr f1, f30
-	addi r3, r1, 0xc
-	stfs f0, 0x1b4(r29)
-	bl marioChkLandon
-	lfs f0, float_40_8041ad98(r2)
-	cmplwi r3, 0x0
-	stfs f0, 0x1b4(r29)
-	beq @50
-	lfs f2, 0x90(r29)
-	lfs f0, 0xc(r1)
-	lfs f1, float_0_8041ada0(r2)
-	fsubs f0, f2, f0
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	beq @51
-	fadds f0, f0, f30
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @50
-	@51:
-	stw r3, 0x1e4(r29)
-	lfs f0, 0xc(r1)
-	stfs f0, 0x90(r29)
-	lwz r0, 0x0(r29)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r29)
-	lfs f1, 0x8c(r29)
-	lfs f2, 0x94(r29)
-	lfs f3, 0x11c(r29)
-	lfs f4, 0x124(r29)
-	bl distABf
-	fabs f0, f1
-	li r0, 0x0
-	stfs f0, 0x128(r29)
-	lwz r3, 0x0(r29)
-	rlwinm r3, r3, 0, 25, 23
-	stw r3, 0x0(r29)
-	sth r0, 0x50(r29)
-	sth r0, 0x52(r29)
-	bl camFollowYOn
-	li r0, 0x1
-	b @52
-	@50:
-	li r0, 0x0
-	@52:
-	cmpwi r0, 0x0
-	beq @2
-	lfs f30, float_0_8041ada0(r2)
-	stfs f30, 0x7c(r31)
-	stfs f30, 0x80(r31)
-	stfs f30, 0x84(r31)
-	stfs f30, 0x88(r31)
-	stfs f30, 0x180(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x1c(r3)
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r31)
-	lfs f1, 0x1a8(r31)
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	lfs f0, 0x1a8(r31)
-	stfs f0, 0x1ac(r31)
-	lfs f1, 0x1a8(r31)
-	bl toMovedir
-	stfs f1, 0x1a0(r31)
-	addi r4, r31, 0x8c
-	li r3, 0x18f
-	lfs f0, 0x1a0(r31)
-	stfs f0, 0x19c(r31)
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x4(r31)
-	lwz r0, 0x4(r31)
-	ori r0, r0, 0x1000
-	stw r0, 0x4(r31)
-	bl psndSFXOn_3D
-	lfs f1, float_0_8041ada0(r2)
-	li r3, 0x0
-	fmr f2, f1
-	fmr f3, f1
-	fmr f4, f1
-	fmr f5, f1
-	bl effFunemizuEntry
-	mr r29, r3
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r29, 0x24(r3)
-	lwz r29, 0x134(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_0_8041ada0(r2)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stw r29, 0x48(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_4p25_8041ade4(r2)
-	stfs f30, 0x8(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r0, 0x32
-	stfs f31, 0xc(r3)
-	stw r0, 0x44(r31)
-	lwz r0, 0xc(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	bne @2
-	li r3, 0x8
-	bl camGetPtr
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 23, 21
-	sth r0, 0x0(r3)
-	b @2
-	@53:
-	lwz r0, 0xc(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	bne @54
-	li r3, 0x8
-	bl camGetPtr
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x200
-	sth r0, 0x0(r3)
-	@54:
-	li r0, 0x1f
-	stw r0, 0x44(r31)
-	@55:
-	lfs f2, 0x9c(r31)
-	lfs f1, float_neg0p4_8041ae28(r2)
-	lfs f0, float_neg18_8041ae2c(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x9c(r31)
-	lfs f1, 0x9c(r31)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @56
-	li r3, 0x4
-	li r0, 0x20
-	stw r3, 0x48(r31)
-	stw r0, 0x44(r31)
-	@56:
-	lfs f30, float_1p6_8041ae30(r2)
-	bl marioGetPtr
-	mr r29, r3
-	lfs f31, 0x8c(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0_8041ada0(r2)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x4(r3)
-	lfs f1, 0x90(r29)
-	fadds f31, f1, f0
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x8(r3)
-	lfs f31, 0x94(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0xc(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f30, 0x10(r3)
-	lfs f31, 0x1a8(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x14(r3)
-	b @2
-	@57:
-	lwz r3, 0x48(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x48(r31)
-	bgt @2
-	li r0, 0x28
-	stw r0, 0x44(r31)
-	@58:
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @59
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @59
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	bl psndSFXOff
-	li r29, -0x1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r29, 0x38(r3)
-	@59:
-	bl camFollowYOff
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 20, 18
-	stw r0, 0x4(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, 0x40(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_2p8_8041ae34(r2)
-	stfs f31, 0x4(r3)
-	stfs f0, 0x180(r31)
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x94(r31)
-	lfs f3, 0x3c(r3)
-	lfs f4, 0x44(r29)
-	bl distABf
-	lfs f0, float_2_8041ae3c(r2)
-	lfs f2, 0x180(r31)
-	fmuls f3, f0, f1
-	lfs f1, float_10_8041ae38(r2)
-	lfs f0, float_0p5_8041ada8(r2)
-	fdivs f2, f3, f2
-	fmadds f0, f1, f2, f0
-	fdivs f0, f0, f1
-	fctiwz f0, f0
-	stfd f0, 0x50(r1)
-	lwz r27, 0x54(r1)
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x94(r31)
-	lfs f3, 0x3c(r3)
-	lfs f4, 0x44(r29)
-	bl angleABf
-	stfs f1, 0x1a0(r31)
-	lfs f0, 0x1a0(r31)
-	stfs f0, 0x19c(r31)
-	lwz r0, 0xc(r31)
-	extrwi r3, r0, 1, 22
-	addi r29, r3, 0x1
-	bl marioGetPtr
-	lis r4, 0x4330
-	xoris r0, r27, 0x8000
-	stw r0, 0x4c(r1)
-	li r0, 0x29
-	lwz r3, 0x288(r3)
-	stw r4, 0x48(r1)
-	lfd f4, 0x50(r30)
-	lfd f0, 0x48(r1)
-	lfs f5, float_0p5_8041ada8(r2)
-	fsubs f0, f0, f4
-	lfs f3, float_80_8041ae40(r2)
-	stw r29, 0x0(r3)
-	lfs f1, float_0_8041ada0(r2)
-	fmuls f6, f5, f0
-	stw r4, 0x38(r1)
-	fmsubs f2, f6, f6, f6
-	fadds f0, f5, f6
-	fdivs f2, f3, f2
-	fmuls f3, f2, f6
-	fctiwz f0, f0
-	fneg f2, f2
-	stfs f3, 0x7c(r31)
-	stfs f2, 0x80(r31)
-	stfd f0, 0x40(r1)
-	stfs f1, 0x84(r31)
-	lwz r3, 0x44(r1)
-	stfs f1, 0x88(r31)
-	extsh r3, r3
-	stw r3, 0x48(r31)
-	stw r0, 0x44(r31)
-	lwz r3, 0x48(r31)
-	lfs f1, 0x9c(r31)
-	addi r0, r3, 0x58
-	xoris r0, r0, 0x8000
-	stw r0, 0x3c(r1)
-	lfd f0, 0x38(r1)
-	fsubs f0, f0, f4
-	fdivs f0, f1, f0
-	fabs f0, f0
-	stfs f0, 0x2b0(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	bl effDelete
-	b @2
-	@60:
-	lfs f1, 0x180(r31)
-	addi r3, r31, 0x8c
-	lfs f2, 0x1a0(r31)
-	addi r4, r31, 0x94
-	bl movePos
-	lfs f1, 0x90(r31)
-	lfs f0, 0x7c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x90(r31)
-	bl marioMakeJumpPara
-	lfs f2, 0x9c(r31)
-	lfs f1, 0x2b0(r31)
-	lfs f0, float_0_8041ada0(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x9c(r31)
-	lfs f1, 0x9c(r31)
-	fcmpo cr0, f1, f0
-	ble @61
-	stfs f0, 0x9c(r31)
-	@61:
-	lwz r3, 0x48(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x48(r31)
-	bgt @2
-	addi r3, r30, 0x60
-	bl marioChgPaper
-	la r3, str_8041ADFC(r2)
-	bl marioChgPose
-	li r0, 0x58
-	stw r0, 0x2a4(r31)
-	lwz r3, 0x2a4(r31)
-	bl marioSetPaperAnimeLocalTime
-	lfs f31, float_0_8041ada0(r2)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x1c(r3)
-	lwz r0, 0x4(r31)
-	ori r0, r0, 0x100
-	stw r0, 0x4(r31)
-	bl marioAdjustMoveDir
-	li r0, 0x2b
-	addi r4, r31, 0x8c
-	stw r0, 0x44(r31)
-	li r3, 0x192
-	bl psndSFXOn_3D
-	lis r3, sound_evt2@ha
-	li r4, 0x0
-	addi r3, r3, sound_evt2@l
-	li r5, 0x0
-	bl evtEntry
-	lfs f1, float_1024_8041ae04(r2)
-	lfs f0, 0x8c(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x50(r1)
-	lwz r4, 0x54(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0x9c(r3)
-	lfs f0, 0x90(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x48(r1)
-	lwz r4, 0x4c(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0xa0(r3)
-	lfs f0, 0x94(r31)
-	fmuls f0, f1, f0
-	fctiwz f0, f0
-	stfd f0, 0x40(r1)
-	lwz r4, 0x44(r1)
-	subis r4, r4, 0xdb6
-	addi r0, r4, 0x7a80
-	stw r0, 0xa4(r3)
-	b @2
-	@62:
-	lfs f2, 0x9c(r31)
-	lfs f1, 0x2b0(r31)
-	lfs f0, float_0_8041ada0(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x9c(r31)
-	lfs f1, 0x9c(r31)
-	fcmpo cr0, f1, f0
-	ble @63
-	stfs f0, 0x9c(r31)
-	@63:
-	lwz r3, 0x2a4(r31)
-	bl marioSetPaperAnimeLocalTime
-	lwz r3, 0x2a4(r31)
-	subi r0, r3, 0x1
-	cmpwi r0, 0x2c
-	stw r0, 0x2a4(r31)
-	blt @2
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @64
-	lfs f30, float_20_8041ad9c(r2)
-	b @65
-	@64:
-	lfs f30, float_neg20_8041ae44(r2)
-	@65:
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	lfs f31, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p125_8041adf0(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @66
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_20_8041ad9c(r2)
-	lfs f0, 0x1c(r3)
-	fcmpo cr0, f0, f31
-	cror eq, gt, eq
-	bne @67
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x1c(r3)
-	b @67
-	@66:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_neg20_8041ae44(r2)
-	lfs f0, 0x1c(r3)
-	fcmpo cr0, f0, f31
-	cror eq, lt, eq
-	bne @67
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x1c(r3)
-	@67:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	lwz r0, 0x2a4(r31)
-	cmpwi r0, 0x2c
-	bne @2
-	li r0, 0x2c
-	stw r0, 0x44(r31)
-	b @2
-	@68:
-	lfs f2, 0x9c(r31)
-	lfs f1, 0x2b0(r31)
-	lfs f0, float_0_8041ada0(r2)
-	fadds f1, f2, f1
-	stfs f1, 0x9c(r31)
-	lfs f1, 0x9c(r31)
-	fcmpo cr0, f1, f0
-	ble @69
-	stfs f0, 0x9c(r31)
-	@69:
-	lwz r3, 0x2a4(r31)
-	bl marioSetPaperAnimeLocalTime
-	lwz r3, 0x2a4(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x2a4(r31)
-	bgt @70
-	li r0, 0x0
-	li r3, 0x2d
-	stw r0, 0x2a4(r31)
-	li r0, 0x6
-	stw r3, 0x44(r31)
-	stw r0, 0x48(r31)
-	lfs f1, 0x1a8(r31)
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @70
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_360_8041ae48(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0x1a8(r31)
-	@70:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	b @2
-	@71:
-	lwz r3, 0x2a4(r31)
-	bl marioSetPaperAnimeLocalTime
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @72
-	lfs f30, float_1_8041adc8(r2)
-	b @73
-	@72:
-	lfs f30, float_neg1_8041ada4(r2)
-	@73:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x20(r3)
-	fmuls f30, f0, f30
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	lfs f31, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p05_8041ae4c(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_neg0p005_8041ae50(r2)
-	lfs f1, 0x20(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_10_8041ae38(r2)
-	lfs f0, 0x20(r3)
-	fcmpo cr0, f0, f31
-	cror eq, lt, eq
-	bne @74
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x20(r3)
-	@74:
-	lwz r3, 0x48(r31)
-	subic. r0, r3, 0x1
-	stw r0, 0x48(r31)
-	bgt @2
-	@75:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @76
-	lfs f30, float_1_8041adc8(r2)
-	b @77
-	@76:
-	lfs f30, float_neg1_8041ada4(r2)
-	@77:
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x20(r3)
-	fmuls f30, f0, f30
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	lfs f31, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p05_8041ae4c(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_neg0p005_8041ae50(r2)
-	lfs f1, 0x20(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x20(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_10_8041ae38(r2)
-	lfs f0, 0x20(r3)
-	fcmpo cr0, f0, f31
-	cror eq, lt, eq
-	bne @78
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x20(r3)
-	@78:
-	li r27, 0x0
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @79
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_360_8041ae48(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @80
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	li r27, 0x1
-	b @80
-	@79:
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_neg360_8041ae54(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @80
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	li r27, 0x1
-	@80:
-	cmpwi r27, 0x0
-	beq @2
-	lfs f1, 0x1a8(r31)
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 30, 30
-	beq @81
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_360_8041ae48(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0x1a8(r31)
-	@81:
-	bl marioPaperOff
-	lwz r0, 0x4(r31)
-	addi r3, r30, 0x58
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x4(r31)
-	bl marioChgPose
-	li r0, 0x2f
-	lfs f31, float_10_8041ae38(r2)
-	stw r0, 0x44(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x20(r3)
-	@82:
-	li r27, 0x0
-	bl marioGetPtr
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @83
-	lfs f30, float_4_8041ae58(r2)
-	b @84
-	@83:
-	lfs f30, float_neg4_8041ae5c(r2)
-	@84:
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	lfs f31, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p05_8041ae4c(r2)
-	lfs f1, 0x1c(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x1c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x1a8(r31)
-	lfs f1, 0x1c(r3)
-	fadds f0, f0, f1
-	stfs f0, 0x1a8(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @85
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_540_8041ae60(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @86
-	stfs f0, 0x1a8(r31)
-	li r27, 0x1
-	b @86
-	@85:
-	lfs f1, 0x1a8(r31)
-	lfs f0, float_neg360_8041ae54(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @86
-	stfs f0, 0x1a8(r31)
-	li r27, 0x1
-	@86:
-	lwz r0, 0x44(r31)
-	cmpwi r0, 0x2f
-	bne @2
-	cmpwi r27, 0x0
-	beq @2
-	lfs f1, 0x1a8(r31)
-	bl revise360
-	stfs f1, 0x1a8(r31)
-	lfs f0, 0x1a8(r31)
-	stfs f0, 0x1ac(r31)
-	lfs f1, 0x1a8(r31)
-	bl toMovedir
-	stfs f1, 0x19c(r31)
-	li r3, 0xa
-	lfs f2, float_20_8041ad9c(r2)
-	lfs f0, 0x19c(r31)
-	lfs f1, float_37_8041ae64(r2)
-	stfs f0, 0x1a0(r31)
-	lfs f0, float_0_8041ada0(r2)
-	lwz r0, 0x4(r31)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x4(r31)
-	stfs f2, 0x1b4(r31)
-	stfs f1, 0x1b8(r31)
-	stfs f0, 0x7c(r31)
-	stfs f0, 0x80(r31)
-	stfs f0, 0x84(r31)
-	stfs f0, 0x88(r31)
-	stfs f0, 0x180(r31)
-	lwz r0, 0x0(r31)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r31)
-	stfs f0, 0x9c(r31)
-	bl marioChgMot
-	bl marioSetFallPara
-	bl allPartyRideOff
-	lfs f1, 0x8c(r31)
-	lfs f2, 0x90(r31)
-	lfs f3, 0x94(r31)
-	bl N_marioSetBottomlessRespawnPosOnBeroEntry
-	bl N_marioReloadMapOnBottomlessOff
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @87
-	bl marioGetPtr
-	mr r4, r3
-	li r3, 0x0
-	lwz r4, 0x288(r4)
-	bl __memFree
-	li r29, 0x0
-	bl marioGetPtr
-	stw r29, 0x288(r3)
-	@87:
-	lwz r0, 0xc(r31)
-	rlwinm. r0, r0, 0, 29, 29
-	bne @2
-	li r3, 0x8
-	bl camGetPtr
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 23, 21
-	sth r0, 0x0(r3)
-	b @2
-	@88:
-	li r0, 0x34
-	stw r0, 0x44(r31)
-	@89:
-	lwz r0, 0x1e4(r31)
-	cmplwi r0, 0x0
-	beq @90
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, 0xc(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, 0x8(r3)
-	fsubs f1, f0, f31
-	bl revise360
-	fmr f31, f1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x8(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f1, float_3p1416_8041adc4(r2)
-	lfs f2, 0x8(r3)
-	lfs f0, float_180_8041adc0(r2)
-	fmuls f1, f1, f2
-	fdivs f1, f1, f0
-	bl sin
-	frsp f2, f1
-	lfs f1, float_3_8041ae6c(r2)
-	lfs f0, float_neg13_8041ae68(r2)
-	fmadds f0, f1, f2, f0
-	stfs f0, 0x9c(r31)
-	@90:
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 26, 26
-	beq @91
-	lfs f30, 0x180(r31)
-	bl marioGetPtr
-	lfs f0, float_0_8041ada0(r2)
-	mr r30, r3
-	fcmpu cr0, f30, f0
-	bne @92
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_180_8041adc0(r2)
-	lfs f1, 0x8(r3)
-	fcmpo cr0, f1, f0
-	ble @93
-	li r0, 0x0
-	b @94
-	@93:
-	li r0, 0x1
-	@94:
-	cmpwi r0, 0x0
-	beq @95
-	lfs f30, float_0p3_8041ae70(r2)
-	b @96
-	@95:
-	lfs f30, float_0p6_8041ae74(r2)
-	@96:
-	bl marioGetPtr
-	lwz r29, 0x288(r3)
-	lfs f31, 0x10(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p1_8041ae14(r2)
-	lfs f1, 0x10(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x10(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, 0x10(r3)
-	@92:
-	lfs f31, 0x8c(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0_8041ada0(r2)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x4(r3)
-	lfs f1, 0x90(r30)
-	fadds f31, f1, f0
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x8(r3)
-	lfs f31, 0x94(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0xc(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f30, 0x10(r3)
-	lfs f31, 0x1a8(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x14(r3)
-	b @2
-	@91:
-	lwz r0, 0x1e4(r31)
-	cmplwi r0, 0x0
-	bne @97
-	li r0, 0x0
-	stb r0, 0x24e(r31)
-	stb r0, 0x24f(r31)
-	@97:
-	bl shipMove
-	lwz r0, 0x0(r31)
-	rlwinm. r0, r0, 0, 14, 14
-	beq @98
-	bl marioMakeJumpPara
-	lfs f1, 0x7c(r31)
-	lfs f0, float_neg7_8041ae78(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @99
-	stfs f0, 0x7c(r31)
-	@99:
-	lfs f30, 0x7c(r31)
-	bl marioGetPtr
-	lfs f0, float_20_8041ad9c(r2)
-	mr r29, r3
-	fmr f1, f30
-	addi r3, r1, 0x8
-	stfs f0, 0x1b4(r29)
-	bl marioChkLandon
-	lfs f0, float_40_8041ad98(r2)
-	cmplwi r3, 0x0
-	stfs f0, 0x1b4(r29)
-	beq @100
-	lfs f2, 0x90(r29)
-	lfs f0, 0x8(r1)
-	lfs f1, float_0_8041ada0(r2)
-	fsubs f0, f2, f0
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	beq @101
-	fadds f0, f0, f30
-	fcmpo cr0, f0, f1
-	cror eq, lt, eq
-	bne @100
-	@101:
-	stw r3, 0x1e4(r29)
-	lfs f0, 0x8(r1)
-	stfs f0, 0x90(r29)
-	lwz r0, 0x0(r29)
-	rlwinm r0, r0, 0, 16, 11
-	stw r0, 0x0(r29)
-	lfs f1, 0x8c(r29)
-	lfs f2, 0x94(r29)
-	lfs f3, 0x11c(r29)
-	lfs f4, 0x124(r29)
-	bl distABf
-	fabs f0, f1
-	li r0, 0x0
-	stfs f0, 0x128(r29)
-	lwz r3, 0x0(r29)
-	rlwinm r3, r3, 0, 25, 23
-	stw r3, 0x0(r29)
-	sth r0, 0x50(r29)
-	sth r0, 0x52(r29)
-	bl camFollowYOn
-	li r0, 0x1
-	b @102
-	@100:
-	li r0, 0x0
-	@102:
-	cmpwi r0, 0x0
-	bne @103
-	lfs f1, 0x90(r31)
-	lfs f0, 0x7c(r31)
-	fadds f0, f1, f0
-	stfs f0, 0x90(r31)
-	b @103
-	@98:
-	bl marioClearJumpPara
-	@103:
-	lwz r3, gp(r13)
-	addi r4, r30, 0x68
-	addi r3, r3, 0x12c
-	bl strcmp
-	cmpwi r3, 0x0
-	bne @104
-	lfs f1, 0x90(r31)
-	lfs f0, float_260_8041ae7c(r2)
-	fcmpo cr0, f1, f0
-	cror eq, lt, eq
-	bne @104
-	lfs f0, float_50_8041adb8(r2)
-	fcmpo cr0, f1, f0
-	cror eq, gt, eq
-	bne @104
-	lfs f2, float_10_8041ae38(r2)
-	lis r0, 0x4330
-	lfs f4, 0x214(r31)
-	lfs f0, float_0p5_8041ada8(r2)
-	stw r0, 0x48(r1)
-	fmadds f0, f2, f4, f0
-	lfd f1, 0x50(r30)
-	lfs f3, float_0_8041ada0(r2)
-	fctiwz f0, f0
-	stfd f0, 0x50(r1)
-	lwz r0, 0x54(r1)
-	xoris r0, r0, 0x8000
-	stw r0, 0x4c(r1)
-	lfd f0, 0x48(r1)
-	fsubs f0, f0, f1
-	fdivs f0, f0, f2
-	fcmpu cr0, f3, f0
-	beq @104
-	lfs f1, float_3p1416_8041adc4(r2)
-	lfs f0, float_180_8041adc0(r2)
-	fmuls f1, f1, f4
-	fdivs f1, f1, f0
-	bl sin
-	frsp f3, f1
-	lfs f1, float_2_8041ae3c(r2)
-	lfs f0, 0x90(r31)
-	lfs f2, float_3p1416_8041adc4(r2)
-	fmadds f1, f1, f3, f0
-	lfs f0, float_180_8041adc0(r2)
-	stfs f1, 0x90(r31)
-	lfs f1, 0x214(r31)
-	fmuls f1, f2, f1
-	fdivs f1, f1, f0
-	bl cos
-	frsp f1, f1
-	lfs f2, float_2_8041ae3c(r2)
-	lfs f0, 0x94(r31)
-	fneg f1, f1
-	fmadds f0, f2, f1, f0
-	stfs f0, 0x94(r31)
-	@104:
-	li r0, 0x0
-	stw r0, 0x1e0(r31)
-	stw r0, 0x1dc(r31)
-	stw r0, 0x1ec(r31)
-	stw r0, 0x1f0(r31)
-	lfs f1, 0x180(r31)
-	lfs f2, 0x1a0(r31)
-	bl marioCheckWallShip
-	lfs f1, 0x180(r31)
-	lfs f0, float_0p5_8041ada8(r2)
-	fcmpo cr0, f1, f0
-	bge @105
-	lfs f0, float_0_8041ada0(r2)
-	li r0, 0x32
-	stfs f0, 0x180(r31)
-	stw r0, 0x44(r31)
-	@105:
-	lfs f30, 0x180(r31)
-	bl marioGetPtr
-	lfs f0, float_0_8041ada0(r2)
-	mr r29, r3
-	fcmpu cr0, f30, f0
-	bne @106
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_180_8041adc0(r2)
-	lfs f1, 0x8(r3)
-	fcmpo cr0, f1, f0
-	ble @107
-	li r0, 0x0
-	b @108
-	@107:
-	li r0, 0x1
-	@108:
-	cmpwi r0, 0x0
-	beq @109
-	lfs f30, float_0p3_8041ae70(r2)
-	b @110
-	@109:
-	lfs f30, float_0p6_8041ae74(r2)
-	@110:
-	bl marioGetPtr
-	lwz r30, 0x288(r3)
-	lfs f31, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0p1_8041ae14(r2)
-	lfs f1, 0x10(r3)
-	fsubs f1, f30, f1
-	fmadds f0, f0, f1, f31
-	stfs f0, 0x10(r30)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, 0x10(r3)
-	@106:
-	lfs f31, 0x8c(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f0, float_0_8041ada0(r2)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x4(r3)
-	lfs f1, 0x90(r29)
-	fadds f31, f1, f0
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x8(r3)
-	lfs f31, 0x94(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0xc(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f30, 0x10(r3)
-	lfs f31, 0x1a8(r29)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stfs f31, 0x14(r3)
-	lhz r0, 0x248(r31)
-	andi. r0, r0, 0xa00
-	beq @2
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	addi r3, r3, 0x3c
-	bl checkHarbor
-	cmpwi r3, 0x0
-	beq @2
-	li r0, 0x1e
-	stw r0, 0x44(r31)
-	@2:
-	psq_l f31, 0x88(r1), 0, 0
-	lfd f31, 0x80(r1)
-	psq_l f30, 0x78(r1), 0, 0
-	lfd f30, 0x70(r1)
-	lmw r27, 0x5c(r1)
-	lwz r0, 0x94(r1)
-	mtlr r0
-	addi r1, r1, 0x90
-	blr
-}
-
-asm void mot_ship_post(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	stw r30, 0x8(r1)
-	bl marioGetPtr
-	mr r30, r3
-	bl allPartyRideOff
-	lwz r0, 0x4(r30)
-	rlwinm. r0, r0, 0, 1, 1
-	beq @1
-	bl marioPaperOff
-	@1:
-	lfs f1, float_20_8041ad9c(r2)
-	lfs f0, float_37_8041ae64(r2)
-	stfs f1, 0x1b4(r30)
-	stfs f0, 0x1b8(r30)
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @2
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	addis r0, r3, 0x1
-	cmplwi r0, 0xffff
-	beq @2
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x38(r3)
-	bl psndSFXOff
-	li r31, -0x1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r31, 0x38(r3)
-	@2:
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 30, 28
-	stw r0, 0x4(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 24, 22
-	stw r0, 0x4(r30)
-	lwz r0, 0x4(r30)
-	rlwinm r0, r0, 0, 29, 27
-	stw r0, 0x4(r30)
-	bl marioOfsRotReset
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @3
-	bl marioGetPtr
-	mr r4, r3
-	li r3, 0x0
-	lwz r4, 0x288(r4)
-	bl __memFree
-	li r31, 0x0
-	bl marioGetPtr
-	stw r31, 0x288(r3)
-	@3:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	lwz r30, 0x8(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void marioReInit_ship(void) {
-	nofralloc
-	stwu r1, -0x40(r1)
-	mflr r0
-	stw r0, 0x44(r1)
-	stfd f31, 0x30(r1)
-	psq_st f31, 0x38(r1), 0, 0
-	stfd f30, 0x20(r1)
-	psq_st f30, 0x28(r1), 0, 0
-	stw r31, 0x1c(r1)
-	stw r30, 0x18(r1)
-	stw r29, 0x14(r1)
-	bl marioGetPtr
-	mr r31, r3
-	li r3, 0x0
-	lwz r0, 0xc(r31)
-	li r4, 0x48
-	clrrwi r0, r0, 1
-	stw r0, 0xc(r31)
-	bl __memAlloc
-	mr r29, r3
-	bl marioGetPtr
-	stw r29, 0x288(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r4, 0x0
-	li r5, 0x48
-	bl memset
-	li r0, 0x19
-	lfs f1, float_neg15_8041ae10(r2)
-	sth r0, 0x2e(r31)
-	li r0, 0x32
-	lfs f0, float_40_8041ad98(r2)
-	stfs f1, 0x9c(r31)
-	stw r0, 0x44(r31)
-	stfs f0, 0x1b4(r31)
-	stfs f0, 0x1b8(r31)
-	bl marioGetColor
-	slwi r0, r3, 2
-	la r3, paper_ship(r13)
-	lwzx r3, r3, r0
-	bl marioPaperOn
-	lis r3, str_802C5E60@ha
-	addi r3, r3, str_802C5E60@l
-	bl marioChgPaper
-	la r3, str_8041ADFC(r2)
-	bl marioChgPose
-	lwz r3, 0x4(r31)
-	li r0, 0x58
-	ori r3, r3, 0x8
-	stw r3, 0x4(r31)
-	stw r0, 0x2a4(r31)
-	lwz r3, 0x2a4(r31)
-	bl marioSetPaperAnimeLocalTime
-	li r29, -0x1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	li r30, 0x0
-	stw r29, 0x38(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stw r30, 0x0(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_0_8041ada0(r2)
-	stfs f31, 0x4(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stfs f30, 0x14(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_0_8041ada0(r2)
-	stfs f31, 0x18(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stfs f30, 0x1c(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f30, float_0_8041ada0(r2)
-	stfs f31, 0x20(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_4p25_8041ade4(r2)
-	stfs f30, 0x8(r3)
-	bl marioGetPtr
-	lfs f1, float_0_8041ada0(r2)
-	lwz r4, 0x288(r3)
-	li r3, 0x0
-	fmr f2, f1
-	fmr f3, f1
-	stfs f31, 0xc(r4)
-	fmr f4, f1
-	fmr f5, f1
-	bl effFunemizuEntry
-	mr r30, r3
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r30, 0x24(r3)
-	lwz r31, 0x134(r31)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x24(r3)
-	lwz r3, 0xc(r3)
-	stw r31, 0x48(r3)
-	bl allPartyForceRideOn
-	psq_l f31, 0x38(r1), 0, 0
-	lfd f31, 0x30(r1)
-	psq_l f30, 0x28(r1), 0, 0
-	lfd f30, 0x20(r1)
-	lwz r31, 0x1c(r1)
-	lwz r30, 0x18(r1)
-	lwz r0, 0x44(r1)
-	lwz r29, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x40
-	blr
-}
-
-asm void marioForceShipAnime(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	bl marioGetPtr
-	mr r31, r3
-	bl marioPaperOff
-	li r3, 0x0
-	bl marioChgPaper
-	bl marioGetColor
-	slwi r0, r3, 2
-	la r3, paper_ship(r13)
-	lwzx r3, r3, r0
-	bl marioPaperOn
-	lis r3, str_802C5E70@ha
-	addi r3, r3, str_802C5E70@l
-	bl marioChgPaper
-	la r3, str_8041ADFC(r2)
-	bl marioChgPose
-	lwz r0, 0x4(r31)
-	ori r0, r0, 0x8
-	stw r0, 0x4(r31)
-	lwz r31, 0xc(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm BOOL marioChkShipPlace(HitEntry* hit) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl hitGetAttr
-	rlwinm r3, r3, 0, 14, 17
-	neg r0, r3
-	or r0, r0, r3
-	srwi r3, r0, 31
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void marioShipSetDispDir(void) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x20(r1)
-	psq_st f31, 0x28(r1), 0, 0
-	stfd f30, 0x10(r1)
-	psq_st f30, 0x18(r1), 0, 0
-	bl marioGetPtr
-	lfs f30, float_0_8041ada0(r2)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stfs f30, 0x14(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x18(r3)
-	psq_l f31, 0x28(r1), 0, 0
-	lfd f31, 0x20(r1)
-	psq_l f30, 0x18(r1), 0, 0
-	lwz r0, 0x34(r1)
-	lfd f30, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm void marioShipForceStop(void) {
-	nofralloc
-	stwu r1, -0x30(r1)
-	mflr r0
-	stw r0, 0x34(r1)
-	stfd f31, 0x20(r1)
-	psq_st f31, 0x28(r1), 0, 0
-	stfd f30, 0x10(r1)
-	psq_st f30, 0x18(r1), 0, 0
-	bl marioGetPtr
-	lfs f30, float_0_8041ada0(r2)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lfs f31, float_0_8041ada0(r2)
-	stfs f30, 0x14(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x18(r3)
-	psq_l f31, 0x28(r1), 0, 0
-	lfd f31, 0x20(r1)
-	psq_l f30, 0x18(r1), 0, 0
-	lwz r0, 0x34(r1)
-	lfd f30, 0x10(r1)
-	mtlr r0
-	addi r1, r1, 0x30
-	blr
-}
-
-asm BOOL marioChkSwirlPower(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r3, 0x30(r3)
-	neg r0, r3
-	or r0, r0, r3
-	srwi r3, r0, 31
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void marioSetSwirlPower(s32 msec, f32 a, f32 b) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stfd f31, 0x18(r1)
-	fmr f31, f2
-	stfd f30, 0x10(r1)
-	fmr f30, f1
-	stw r31, 0xc(r1)
-	mr r31, r3
-	bl marioGetPtr
-	mr r3, r31
-	bl sysMsec2Frame
-	mr r31, r3
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stw r31, 0x30(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f30, 0x2c(r3)
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	stfs f31, 0x28(r3)
-	lwz r0, 0x24(r1)
-	lfd f31, 0x18(r1)
-	lfd f30, 0x10(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm s32 marioShipChanging(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	lhz r0, 0x2e(r3)
-	cmplwi r0, 0x19
-	beq @1
-	li r3, 0x0
-	b @2
-	@1:
-	lwz r0, 0x44(r3)
-	cmpwi r0, 0xa
-	bne @3
-	li r3, 0x2
-	b @2
-	@3:
-	cmpwi r0, 0x0
-	blt @4
-	cmpwi r0, 0xc
-	ble @5
-	@4:
-	cmpwi r0, 0x1e
-	blt @6
-	cmpwi r0, 0x30
-	bgt @6
-	@5:
-	li r3, 0x1
-	b @2
-	@6:
-	cmpwi r0, 0x32
-	beq @7
-	cmpwi r0, 0x34
-	bne @8
-	@7:
-	li r3, 0x3
-	b @2
-	@8:
-	li r3, 0x0
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 N_marioShipGetDir(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	bl marioGetPtr
-	bl marioGetPtr
-	lwz r0, 0x288(r3)
-	cmplwi r0, 0x0
-	beq @1
-	bl marioGetPtr
-	lwz r3, 0x288(r3)
-	lwz r0, 0x0(r3)
-	extrwi r3, r0, 1, 30
-	b @2
-	@1:
-	li r3, 0x0
-	@2:
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-// clang-format on
 #endif

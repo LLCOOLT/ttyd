@@ -25,6 +25,81 @@
 #include "driver/icondrv.h"
 #include "win/win_main.h"
 #include "sdk/texPalette.h"
+#ifdef NONMATCHING
+#define EXT_LIT(sym, val) (val)
+#else
+#define EXT_LIT(sym, val) (sym)
+__declspec(section ".sdata2") extern const u32 dat_8041bd68;
+__declspec(section ".sdata2") extern const u32 dat_8041bd6c;
+__declspec(section ".sdata2") extern const u32 dat_8041bd70;
+__declspec(section ".sdata2") extern const u32 dat_8041bd74;
+__declspec(section ".sdata2") extern const u32 dat_8041bd78;
+__declspec(section ".sdata2") extern const u32 dat_8041bd7c;
+__declspec(section ".sdata2") extern const u32 dat_8041bd80;
+__declspec(section ".sdata2") extern const u32 dat_8041bd84;
+__declspec(section ".sdata2") extern const u32 dat_8041bd88;
+__declspec(section ".sdata2") extern const u32 dat_8041bd8c;
+__declspec(section ".sdata2") extern const u32 dat_8041bd90;
+__declspec(section ".sdata2") extern const u32 dat_8041bd94;
+__declspec(section ".sdata2") extern const u32 dat_8041bd98;
+__declspec(section ".sdata2") extern const u32 dat_8041bd9c;
+__declspec(section ".sdata2") extern const u32 dat_8041bda0;
+__declspec(section ".sdata2") extern const u32 dat_8041bda4;
+__declspec(section ".sdata2") extern const u32 dat_8041bda8;
+__declspec(section ".sdata2") extern const u32 dat_8041bdac;
+__declspec(section ".sdata2") extern const u32 dat_8041bdb0;
+__declspec(section ".sdata2") extern const u32 dat_8041bdb4;
+__declspec(section ".sdata2") extern const u32 dat_8041bdb8;
+__declspec(section ".sdata2") extern const u32 dat_8041bdbc;
+__declspec(section ".sdata2") extern const u32 dat_8041bdc0;
+__declspec(section ".sdata2") extern const u32 dat_8041bdc4;
+__declspec(section ".sdata2") extern const u32 dat_8041bdc8;
+__declspec(section ".sdata2") extern const u32 dat_8041bdcc;
+__declspec(section ".sdata2") extern const u32 dat_8041bdd0;
+__declspec(section ".sdata2") extern const u32 dat_8041bdd4;
+__declspec(section ".sdata2") extern const u32 dat_8041bdd8;
+__declspec(section ".sdata2") extern const char str_8041BDDC[8];
+__declspec(section ".sdata2") extern const f32 float_0_8041bde4;
+__declspec(section ".sdata2") extern const f32 float_1_8041bde8;
+__declspec(section ".sdata2") extern const f32 float_neg304_8041bdec;
+__declspec(section ".sdata2") extern const f32 float_240_8041bdf0;
+__declspec(section ".sdata2") extern const f32 float_neg240_8041bdf4;
+__declspec(section ".sdata2") extern const f32 float_neg272_8041bdf8;
+__declspec(section ".sdata2") extern const f32 float_272_8041bdfc;
+__declspec(section ".sdata2") extern const f32 float_304_8041be00;
+__declspec(section ".sdata2") extern const f32 float_60_8041be04;
+__declspec(section ".sdata2") extern const f32 float_neg250_8041be08;
+__declspec(section ".sdata2") extern const f32 float_200_8041be0c;
+__declspec(section ".sdata2") extern const f32 float_500_8041be10;
+__declspec(section ".sdata2") extern const f32 float_40_8041be14;
+__declspec(section ".sdata2") extern const f32 float_20_8041be18;
+__declspec(section ".sdata2") extern const f32 float_0p6_8041be1c;
+__declspec(section ".sdata2") extern const f32 float_100_8041be20;
+__declspec(section ".sdata2") extern const f32 float_84_8041be24;
+__declspec(section ".sdata2") extern const f32 float_0p5_8041be28;
+__declspec(section ".sdata2") extern const f32 float_12_8041be2c;
+__declspec(section ".sdata2") extern const f32 float_70_8041be30;
+__declspec(section ".sdata2") extern const char str_8041BE34[8];
+__declspec(section ".sdata2") extern const f32 float_30_8041be3c;
+__declspec(section ".sdata2") extern const char str_8041BE40[4];
+__declspec(section ".sdata2") extern const f32 float_8_8041be44;
+__declspec(section ".sdata2") extern const f32 float_22_8041be48;
+__declspec(section ".sdata2") extern const f32 float_1p5_8041be4c;
+__declspec(section ".sdata2") extern const f32 float_106_8041be50;
+__declspec(section ".sdata2") extern const f32 float_52_8041be54;
+__declspec(section ".sdata2") extern const f32 float_0p05_8041be58;
+__declspec(section ".sdata2") extern const f32 float_120_8041be5c;
+__declspec(section ".sdata2") extern const f32 float_140_8041be60;
+__declspec(section ".sdata2") extern const f32 float_neg150_8041be64;
+__declspec(section ".sdata2") extern const f32 float_300_8041be68;
+__declspec(section ".sdata2") extern const f32 float_50_8041be6c;
+__declspec(section ".sdata2") extern const f32 float_2_8041be70;
+__declspec(section ".sdata2") extern const f32 float_neg74_8041be74;
+__declspec(section ".sdata2") extern const f32 float_4_8041be78;
+__declspec(section ".sdata2") extern const f32 float_0p25_8041be7c;
+__declspec(section ".sdata2") extern const f32 float_0p125_8041be80;
+__declspec(section ".sdata2") extern const f32 float_1000_8041be84;
+#endif
 #pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
 __declspec(section ".rodata") const f32 vec3_802ed670[3] = { 0.0f, 0.0f, 0.0f };
 __declspec(section ".rodata") const f32 vec3_802ed67c[3] = { 1.0f, 1.0f, 1.0f };
@@ -158,7 +233,9 @@ BOOL nameEntPrepare(void);
 BOOL nameEntIsCancel(void);
 double sin(double);
 double fmod(double, double);
+#ifdef NONMATCHING
 static inline float fabsf(float x) { return (float)__fabs(x); }
+#endif
 void winTexInit_x2(TEXPalette* texture);
 void winTexSet_x2(u32 id1, u32 id2, Vec translate, Vec scale, GXColor color);
 void winTexSetRot(u32 id, Vec translate, Vec scale, GXColor color, f32 rot);
@@ -219,29 +296,24 @@ extern s32 stone_id[];
 static s32 evt_shake[12];
 extern s32 evt_continue[];
 
-#ifdef NONMATCHING
 s32 unk_800f2398(EventEntry* evt, BOOL isFirstCall) {
     fadeReset(4);
     wp->unk48 = evt->printWindowId;
     return 2;
 }
-#endif
 
-#ifdef NONMATCHING
 void seq_loadInit(SequenceWork* seq) {
     memset(wp, 0, sizeof(LoadWork));
 }
-#endif
 
-#ifdef NONMATCHING
 void seq_loadExit(SequenceWork* seq) {
     if (wp->file != NULL) {
         fileFree(wp->file);
     }
     wp->file = NULL;
 }
-#endif
 
+#ifdef NONMATCHING
 static inline BOOL loadStart(void) {
     if (fileAsyncf(4, NULL, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot()) != 0U) {
         wp->file = fileAllocf(4, "%s/w/jp/name.tpl\0\0\0", getMarioStDvdRoot());
@@ -249,7 +321,52 @@ static inline BOOL loadStart(void) {
     }
     return FALSE;
 }
+#endif
 
+void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
+void GXClearVtxDesc(void);
+void GXGetProjectionv(f32* ptr);
+u16 GXGetTexObjHeight(const GXTexObj* to);
+u16 GXGetTexObjWidth(const GXTexObj* to);
+void GXGetViewportv(f32* vp);
+void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
+    f32 min_lod, f32 max_lod, f32 lod_bias, GXBool bias_clamp,
+    GXBool do_edge_lod, GXAnisotropy max_aniso);
+void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
+void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
+void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
+void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1);
+void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
+void GXSetCullMode(GXCullMode mode);
+void GXSetCurrentMtx(u32 id);
+void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
+void GXSetNumChans(u8 nChans);
+void GXSetNumTevStages(u8 nStages);
+void GXSetNumTexGens(u8 nTexGens);
+void GXSetProjection(const f32 mtx[4][4], GXProjectionType type);
+void GXSetProjectionv(const f32* ptr);
+void GXSetTevOp(GXTevStageID id, GXTevMode mode);
+void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
+void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
+void GXSetVtxDesc(GXAttr attr, GXAttrType type);
+void GXSetZCompLoc(GXBool before_tex);
+void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable);
+u32 OSGetSoundMode(void);
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+int __div2i();
+int __div2u();
+int __mod2u();
+int sprintf(char *s, const char *format, ...);
+int strcat();
+char *strcpy(char *dest, const char *src);
+size_t strlen(const char *s);
+int winZenkakuStr();
+extern void* jumptable_8034A058[25];
 #ifdef NONMATCHING
 void seq_loadMain(SequenceWork* seq) {
     switch (seq->state) {
@@ -309,6 +426,187 @@ void seq_loadMain(SequenceWork* seq) {
             break;
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs repeated mnemonic loads
+void seq_loadMain(SequenceWork* seq) {
+	asm volatile {
+		opword 0x9421FFE0
+		opword 0x7C0802A6
+		opword 0x90010024
+		opword 0x93E1001C
+		opword 0x7C7F1B78
+		opword 0x80030004
+		opword 0x2C000002
+		opword 0x41820100
+		opword 0x40800014
+		opword 0x2C000000
+		opword 0x4182001C
+		opword 0x40800088
+		opword 0x48000270
+		opword 0x2C000004
+		opword 0x41820264
+		opword 0x40800264
+		opword 0x48000234
+		bl getMarioStDvdRoot
+		lis r4, str_802EDA34@ha
+		opword 0x7C661B78
+		addi r5, r4, str_802EDA34@l
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x4CC63182
+		bl fileAsyncf
+		opword 0x28030000
+		opword 0x41820030
+		bl getMarioStDvdRoot
+		lis r4, str_802EDA34@ha
+		opword 0x7C651B78
+		addi r4, r4, str_802EDA34@l
+		opword 0x38600004
+		opword 0x4CC63182
+		bl fileAllocf
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0x90640004
+		opword 0x48000008
+		opword 0x38000000
+		opword 0x2C000000
+		opword 0x41820200
+		opword 0x807F0004
+		opword 0x38030001
+		opword 0x901F0004
+		opword 0x480001F0
+		lis r3, evt_memcard_check@ha
+		opword 0x38800000
+		addi r3, r3, evt_memcard_check@l
+		opword 0x38A00000
+		opword 0x38C00000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x9064003C
+		lwz r4, wp(r13)
+		opword 0xA0640000
+		opword 0x54600631
+		opword 0x4182002C
+		opword 0x5463066E
+		opword 0x38000001
+		opword 0xB0640000
+		lwz r3, wp(r13)
+		opword 0x8063003C
+		opword 0x900300C4
+		lwz r3, wp(r13)
+		opword 0x80030048
+		opword 0x8063003C
+		opword 0x90030178
+		opword 0x807F0004
+		opword 0x38030001
+		opword 0x901F0004
+		opword 0x48000188
+		lwz r3, wp(r13)
+		opword 0x8063003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x40820170
+		opword 0x3C80FAA3
+		opword 0x38600000
+		opword 0x3884B580
+		bl evtGetValue
+		opword 0x2C030001
+		opword 0x41820018
+		opword 0x38600001
+		opword 0x38800000
+		opword 0x38A00000
+		bl seqSetSeq
+		opword 0x48000144
+		lwz r3, wp(r13)
+		opword 0x38800000
+		opword 0x9083003C
+		opword 0x807F0004
+		opword 0x38030001
+		opword 0x901F0004
+		lwz r3, wp(r13)
+		opword 0x90830018
+		bl cardGetCode
+		lwz r4, wp(r13)
+		opword 0x9064001C
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x540006B0
+		opword 0xB0030000
+		bl OSGetSoundMode
+		opword 0x28030000
+		opword 0x40820024
+		opword 0x38600000
+		bl SoundSetOutputMode
+		lwz r3, gp(r13)
+		opword 0x38000000
+		opword 0x90031274
+		lwz r3, wp(r13)
+		opword 0x90030040
+		opword 0x48000038
+		opword 0x38600001
+		bl SoundSetOutputMode
+		lwz r3, gp(r13)
+		opword 0x80031274
+		opword 0x2C000000
+		opword 0x40820014
+		lwz r3, wp(r13)
+		opword 0x38000001
+		opword 0x90030040
+		opword 0x48000010
+		lwz r3, wp(r13)
+		opword 0x38000002
+		opword 0x90030040
+		lwz r5, gp(r13)
+		lis r3, win_dt@ha
+		lwz r4, wp(r13)
+		addi r3, r3, win_dt@l
+		opword 0x80051294
+		opword 0x7C000034
+		opword 0x5400D97E
+		opword 0x90040044
+		lwz r4, wp(r13)
+		opword 0x80040040
+		opword 0x90040024
+		lwz r4, wp(r13)
+		opword 0x80040044
+		opword 0x90040028
+		lwz r5, gp(r13)
+		lwz r4, wp(r13)
+		opword 0x800511B8
+		opword 0x90040020
+		lwz r4, wp(r13)
+		opword 0x80040020
+		opword 0x1C00001C
+		opword 0x7C03042E
+		opword 0xD0040008
+		lwz r4, wp(r13)
+		opword 0x80040020
+		opword 0x1C00001C
+		opword 0x7C630214
+		opword 0xC0030004
+		opword 0xD004000C
+		opword 0x48000030
+		lwz r0, dat_8041bd68(r2)
+		opword 0x38A10008
+		opword 0x3860001C
+		opword 0x38800000
+		opword 0x90010008
+		bl fadeEntry
+		opword 0x807F0004
+		opword 0x38030001
+		opword 0x901F0004
+		opword 0x48000008
+		bl loadMain
+		opword 0x80010024
+		opword 0x83E1001C
+		opword 0x7C0803A6
+		opword 0x38210020
+	}
+}
+#pragma pop
 #endif
 
 #define SFX(id) psndSFXOn((const char*)(id))
@@ -774,8 +1072,8 @@ void loadMain(SequenceWork* seq) {
                 }
                 psndENVOn(0x110, (const char*)0x75);
             }
-            wp->tx = -74.0f;
-            wp->ty = 4.0f + (50.0f - 50.0f * wp->unk24);
+            wp->tx = EXT_LIT(float_neg74_8041be74, -74.0f);
+            wp->ty = EXT_LIT(float_4_8041be78, 4.0f) + (EXT_LIT(float_50_8041be6c, 50.0f) - 50.0f * wp->unk24);
             break;
         case 0xc8:
             wp->flags |= 1;
@@ -806,19 +1104,1340 @@ void loadMain(SequenceWork* seq) {
             if (wp->unk28 < 0) {
                 wp->unk28 = 1;
             }
-            wp->tx = -74.0f;
-            wp->ty = 4.0f + (30.0f - 50.0f * wp->unk28);
+            wp->tx = EXT_LIT(float_neg74_8041be74, -74.0f);
+            wp->ty = EXT_LIT(float_4_8041be78, 4.0f) + (EXT_LIT(float_30_8041be3c, 30.0f) - 50.0f * wp->unk28);
             break;
     }
-    wp->x += (wp->tx - wp->x) / 4.0f;
-    wp->y += (wp->ty - wp->y) / 4.0f;
+    wp->x += (wp->tx - wp->x) / EXT_LIT(float_4_8041be78, 4.0f);
+    wp->y += (wp->ty - wp->y) / EXT_LIT(float_4_8041be78, 4.0f);
     { f32 s = 2.0f * (f32)sin(gp->retraceCount / 8.0f); wp->x += __fabsf(s); }
-    dispEntry(CAMERA_3D, 1000.0f, 0, loadDraw, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_1000_8041be84, 1000.0f), 0, loadDraw, NULL);
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void loadMain(SequenceWork* seq) {
+	char _af_pad[32];
+	asm {
+		lis r5, lbl_80349DE8@ha
+		lis r4, vec3_802ed670@ha
+	}
+	asm volatile {
+		opword 0x7C7A1B78
+		opword 0x38600000
+		addi r29, r5, lbl_80349DE8@l
+		addi r30, r4, vec3_802ed670@l
+		bl keyGetButtonTrg
+		opword 0x7C601B78
+		opword 0x38600000
+		opword 0x7C1C0378
+		bl keyGetButtonRep
+		opword 0x38600000
+		bl keyGetDirRep
+		opword 0x7C7B1B78
+		bl cardGetCode
+		opword 0x7C7F1B78
+		bl cardIsExec
+		opword 0x2C030000
+		opword 0x40820010
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x4082000C
+		opword 0x3B800000
+		opword 0x3B600000
+		lwz r3, wp(r13)
+		opword 0x8003001C
+		opword 0x7C00F800
+		opword 0x4182000C
+		opword 0x3B800000
+		opword 0x3B600000
+		opword 0x93E3001C
+		li r24, 0x0
+		opword 0x3B200000
+		bl cardGetFilePtr
+		opword 0x38192000
+		opword 0x7C63022E
+		opword 0x546007FF
+		opword 0x4182001C
+		opword 0x546007BD
+		opword 0x40820014
+		opword 0x3B180001
+		opword 0x3B394000
+		opword 0x2C180004
+		opword 0x4180FFD8
+		opword 0x2C180004
+		opword 0x40800018
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x54000734
+		opword 0xB0030000
+		opword 0x48000014
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x60000010
+		opword 0xB0030000
+		lwz r3, wp(r13)
+		opword 0x3B000000
+		opword 0x7F19C378
+		opword 0xA0030000
+		opword 0x540006F2
+		opword 0xB0030000
+		bl cardGetFilePtr
+		opword 0x38192000
+		opword 0x7C63022E
+		opword 0x546007FF
+		opword 0x4082000C
+		opword 0x546007BD
+		opword 0x41820014
+		opword 0x3B180001
+		opword 0x3B394000
+		opword 0x2C180004
+		opword 0x4180FFD8
+		opword 0x2C180004
+		opword 0x41800014
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x60000020
+		opword 0xB0030000
+		lwz r6, wp(r13)
+		opword 0x80660018
+		opword 0x2C030021
+		opword 0x4182062C
+		opword 0x40800078
+		opword 0x2C030015
+		opword 0x41820480
+		opword 0x4080003C
+		opword 0x2C03000A
+		opword 0x418203D8
+		opword 0x4080001C
+		opword 0x2C030001
+		opword 0x418200CC
+		opword 0x40801268
+		opword 0x2C030000
+		opword 0x408000B8
+		opword 0x4800125C
+		opword 0x2C030014
+		opword 0x40800400
+		opword 0x2C03000C
+		opword 0x4080124C
+		opword 0x480003D4
+		opword 0x2C03001E
+		opword 0x41820550
+		opword 0x4080001C
+		opword 0x2C030018
+		opword 0x41820518
+		opword 0x40801230
+		opword 0x2C030017
+		opword 0x408004C0
+		opword 0x48000480
+		opword 0x2C030020
+		opword 0x40800578
+		opword 0x48000554
+		opword 0x2C030033
+		opword 0x41820B8C
+		opword 0x4080003C
+		opword 0x2C030029
+		opword 0x418208F0
+		opword 0x4080001C
+		opword 0x2C030023
+		opword 0x41820718
+		opword 0x418005F0
+		opword 0x2C030028
+		opword 0x40800734
+		opword 0x480011E8
+		opword 0x2C030032
+		opword 0x40800990
+		opword 0x2C03002B
+		opword 0x408011D8
+		opword 0x48000910
+		opword 0x2C030064
+		opword 0x41820DE4
+		opword 0x40800014
+		opword 0x2C030035
+		opword 0x41820D64
+		opword 0x408011BC
+		opword 0x48000CFC
+		opword 0x2C0300C8
+		opword 0x41821034
+		opword 0x480011AC
+		opword 0x38030001
+		opword 0x90060018
+		opword 0x387E0360
+		bl msgSearch
+		lwz r4, wp(r13)
+		opword 0x576004E7
+		opword 0x90640038
+		lwz r4, wp(r13)
+		opword 0x83E40020
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x387D0040
+		opword 0x7C630214
+		opword 0x88030018
+		opword 0x90040020
+		opword 0x48000258
+		opword 0x576004A5
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x387D0040
+		opword 0x7C630214
+		opword 0x88030019
+		opword 0x90040020
+		opword 0x48000238
+		opword 0x57600463
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x387D0040
+		opword 0x7C630214
+		opword 0x8803001A
+		opword 0x90040020
+		opword 0x48000218
+		opword 0x57600421
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x387D0040
+		opword 0x7C630214
+		opword 0x8803001B
+		opword 0x90040020
+		opword 0x480001F8
+		opword 0x578005EF
+		opword 0x418201D4
+		bl cardGetFilePtr
+		lwz r6, wp(r13)
+		opword 0x80A60020
+		opword 0x54A47022
+		opword 0x2C050006
+		opword 0x38042000
+		opword 0x7C63022E
+		opword 0x41820164
+		opword 0x4080001C
+		opword 0x2C050004
+		opword 0x41820068
+		opword 0x408000DC
+		opword 0x2C050000
+		opword 0x40800018
+		opword 0x480001B4
+		opword 0x2C050008
+		opword 0x41820178
+		opword 0x408001A8
+		opword 0x48000150
+		opword 0x546007BD
+		opword 0x41820010
+		opword 0x38600013
+		bl psndSFXOn
+		opword 0x48000190
+		opword 0x546007FF
+		opword 0x41820018
+		opword 0x3800001E
+		opword 0x38600012
+		opword 0x90060018
+		bl psndSFXOn
+		opword 0x48000174
+		opword 0x38000014
+		opword 0x38600012
+		opword 0x90060018
+		bl psndSFXOn
+		opword 0x48000160
+		opword 0xA0060000
+		opword 0x540006F7
+		opword 0x40820154
+		opword 0x3B400000
+		opword 0x7F59D378
+		bl cardGetFilePtr
+		opword 0x38192000
+		opword 0x7C63022E
+		opword 0x546007FF
+		opword 0x4182001C
+		opword 0x546007BD
+		opword 0x40820014
+		opword 0x3B5A0001
+		opword 0x3B394000
+		opword 0x2C1A0004
+		opword 0x4180FFD8
+		opword 0x2C1A0004
+		opword 0x40800028
+		opword 0x38600012
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x38800000
+		opword 0x38000028
+		opword 0x90830020
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x480000F4
+		opword 0x38600013
+		bl psndSFXOn
+		opword 0x480000E8
+		opword 0xA0060000
+		opword 0x540006B5
+		opword 0x408200DC
+		opword 0x3B400000
+		opword 0x7F59D378
+		bl cardGetFilePtr
+		opword 0x38192000
+		opword 0x7C63022E
+		opword 0x546007BD
+		opword 0x4082000C
+		opword 0x546007FF
+		opword 0x41820014
+		opword 0x3B5A0001
+		opword 0x3B394000
+		opword 0x2C1A0004
+		opword 0x4180FFD8
+		opword 0x2C1A0004
+		opword 0x40800028
+		opword 0x38600012
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x38800000
+		opword 0x38000032
+		opword 0x90830020
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x4800007C
+		opword 0x38600013
+		bl psndSFXOn
+		opword 0x48000070
+		opword 0x38600013
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x3800000A
+		opword 0x90030018
+		opword 0x48000058
+		opword 0x38600012
+		bl psndSFXOn
+		opword 0x38600800
+		bl psndBGMOff
+		lwz r3, wp(r13)
+		opword 0x38000064
+		opword 0x90030018
+		opword 0x48000038
+		opword 0x38600012
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x380000C8
+		opword 0x90030018
+		opword 0x48000020
+		opword 0x578005AD
+		opword 0x41820018
+		opword 0x38600013
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x3800000A
+		opword 0x90030018
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1F0000
+		opword 0x41820020
+		opword 0x2C000004
+		opword 0x40800010
+		opword 0x38600009
+		bl psndSFXOn
+		opword 0x4800000C
+		opword 0x38600005
+		bl psndSFXOn
+		lwz r5, wp(r13)
+		opword 0x389D0040
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0x7C24042E
+		opword 0xC0030008
+		opword 0xEC01002A
+		opword 0xD0050010
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0xC0230004
+		opword 0xC003000C
+		opword 0xEC01002A
+		opword 0xD0050014
+		opword 0x48000EA4
+		lwz r0, dat_8041bd6c(r2)
+		la r5, _af_pad+20
+		opword 0x3860001B
+		opword 0x38800000
+		opword 0x9001001C
+		bl fadeEntry
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000E78
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x41820E6C
+		opword 0x38600001
+		opword 0x38800000
+		opword 0x38A00000
+		bl seqSetSeq
+		opword 0x48000E58
+		opword 0xA0060000
+		lis r3, evt_memcard_start@ha
+		addi r3, r3, evt_memcard_start@l
+		opword 0x38800000
+		opword 0x60000040
+		opword 0x38A00000
+		opword 0xB0060000
+		opword 0x38C00000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x9064003C
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x8063003C
+		opword 0x9003009C
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000E08
+		opword 0x8066003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x40820DF4
+		lwz r5, wp(r13)
+		opword 0x3C60FD05
+		opword 0x38830F80
+		opword 0xA0050000
+		opword 0x38600000
+		opword 0x540006B0
+		opword 0xB0050000
+		bl evtGetValue
+		opword 0x2C030001
+		opword 0x40820018
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000DB8
+		lwz r3, wp(r13)
+		opword 0x38000001
+		opword 0x90030018
+		opword 0x48000DA8
+		lwz r0, dat_8041bd70(r2)
+		opword 0x38A10018
+		opword 0x3860001B
+		opword 0x38800000
+		opword 0x90010018
+		bl fadeEntry
+		opword 0x38600200
+		opword 0x388007D0
+		opword 0x38A00000
+		bl psndBGMOff_f_d
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000D6C
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x41820D60
+		lwz r7, wp(r13)
+		la r3, evt_continue(r13)
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0xA0070000
+		opword 0x38C00000
+		opword 0x60000040
+		opword 0xB0070000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x9064003C
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000D20
+		opword 0x8066003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x40820D0C
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x540006B0
+		opword 0xB0030000
+		bl continueGame
+		opword 0x48000CF4
+		lwz r0, dat_8041bd74(r2)
+		opword 0x38A10014
+		opword 0x3860001B
+		opword 0x38800000
+		opword 0x90010014
+		bl fadeEntry
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000CC8
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x41820CBC
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000CA8
+		bl nameEntPrepare
+		opword 0x2C030000
+		opword 0x41820C9C
+		opword 0x38600000
+		bl nameEntOn
+		lwz r0, dat_8041bd78(r2)
+		opword 0x38A10010
+		opword 0x3860001C
+		opword 0x38800000
+		opword 0x90010010
+		bl fadeEntry
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000C68
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x41820C5C
+		bl nameEntWait
+		opword 0x2C030000
+		opword 0x40820C50
+		lwz r0, dat_8041bd7c(r2)
+		opword 0x38A1000C
+		opword 0x38600018
+		opword 0x38800000
+		opword 0x9001000C
+		bl fadeEntry
+		bl nameEntIsCancel
+		opword 0x2C030000
+		opword 0x40820014
+		opword 0x38600200
+		opword 0x38800BB8
+		opword 0x38A00000
+		bl psndBGMOff_f_d
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000C08
+		bl fadeIsFinish
+		opword 0x2C030000
+		opword 0x41820BFC
+		bl nameEntOff
+		bl nameEntIsCancel
+		opword 0x2C030000
+		opword 0x4182002C
+		lwz r0, dat_8041bd80(r2)
+		opword 0x38A10008
+		opword 0x3860001C
+		opword 0x38800000
+		opword 0x90010008
+		bl fadeEntry
+		lwz r3, wp(r13)
+		opword 0x38000001
+		opword 0x90030018
+		opword 0x48000BC4
+		bl nameEntGetName
+		lwz r5, gp(r13)
+		opword 0x7C641B78
+		opword 0x386511BC
+		bl strcpy
+		lwz r4, wp(r13)
+		lwz r3, gp(r13)
+		opword 0x80040020
+		opword 0x900311B8
+		bl stg0_00_init
+		lwz r4, wp(r13)
+		lwz r3, gp(r13)
+		opword 0x80040020
+		opword 0x900311D0
+		bl marioPartyKill
+		bl marioGetPtr
+		opword 0x38800000
+		opword 0x38000019
+		opword 0x98830243
+		opword 0x98830244
+		lwz r3, gp(r13)
+		opword 0x90830110
+		lwz r3, gp(r13)
+		opword 0x90030108
+		bl swInit
+		opword 0x38600000
+		opword 0x38800000
+		bl swByteSet
+		opword 0x2C1F0000
+		opword 0x40820058
+		lwz r4, wp(r13)
+		lis r3, evt_memcard_save@ha
+		lwz r6, gp(r13)
+		addi r3, r3, evt_memcard_save@l
+		opword 0x80040020
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x900611D0
+		opword 0x38C00000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x38000017
+		opword 0x9064003C
+		lwz r3, wp(r13)
+		opword 0x8063003C
+		opword 0x9003009C
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000AF8
+		opword 0x389E02C0
+		opword 0x38BE02C8
+		opword 0x38600003
+		bl seqSetSeq
+		opword 0x48000AE4
+		opword 0x8066003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x40820AD0
+		opword 0x389E02C0
+		opword 0x38BE02C8
+		opword 0x38600003
+		bl seqSetSeq
+		opword 0x48000ABC
+		opword 0x387E0374
+		bl msgSearch
+		lwz r4, wp(r13)
+		opword 0x576004E7
+		opword 0x90640038
+		lwz r3, wp(r13)
+		opword 0x83E30020
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x88040018
+		opword 0x90030020
+		opword 0x48000108
+		opword 0x576004A5
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x88040019
+		opword 0x90030020
+		opword 0x480000E8
+		opword 0x57600463
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x8804001A
+		opword 0x90030020
+		opword 0x480000C8
+		opword 0x57600421
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x8804001B
+		opword 0x90030020
+		opword 0x480000A8
+		opword 0x578005EF
+		opword 0x4182007C
+		opword 0x2C1F0004
+		opword 0x40800054
+		bl cardGetFilePtr
+		lwz r4, wp(r13)
+		opword 0x80040020
+		opword 0x54047022
+		opword 0x38042000
+		opword 0x7C63022E
+		opword 0x546007BD
+		opword 0x4082000C
+		opword 0x546007FF
+		opword 0x40820020
+		opword 0x38600012
+		bl psndSFXOn
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000054
+		opword 0x38600013
+		bl psndSFXOn
+		opword 0x48000048
+		opword 0x38800004
+		opword 0x38000001
+		opword 0x90830020
+		opword 0x38600013
+		lwz r4, wp(r13)
+		opword 0x90040018
+		bl psndSFXOn
+		opword 0x48000028
+		opword 0x578005AD
+		opword 0x41820020
+		opword 0x38800004
+		opword 0x38000001
+		opword 0x90830020
+		opword 0x38600013
+		lwz r4, wp(r13)
+		opword 0x90040018
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1F0000
+		opword 0x41820014
+		opword 0x2C000004
+		opword 0x4080000C
+		opword 0x38600009
+		bl psndSFXOn
+		lwz r5, wp(r13)
+		opword 0x389D013C
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0x7C24042E
+		opword 0xC0030008
+		opword 0xEC01002A
+		opword 0xD0050010
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0xC0230004
+		opword 0xC003000C
+		opword 0xEC01002A
+		opword 0xD0050014
+		opword 0x48000918
+		opword 0xA0060000
+		lis r3, evt_memcard_delete@ha
+		addi r3, r3, evt_memcard_delete@l
+		opword 0x38800000
+		opword 0x60000040
+		opword 0x38A00000
+		opword 0xB0060000
+		opword 0x38C00000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x9064003C
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x8063003C
+		opword 0x9003009C
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x480008C8
+		opword 0x8066003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x408208B4
+		opword 0x3C80FAA3
+		opword 0x38600000
+		opword 0x3884B580
+		bl evtGetValue
+		opword 0x2C030000
+		opword 0x40820030
+		lwz r5, wp(r13)
+		opword 0x38800004
+		opword 0x38000001
+		opword 0xA0650000
+		opword 0x546306B0
+		opword 0xB0650000
+		lwz r3, wp(r13)
+		opword 0x90830020
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x48000870
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0xA0640000
+		opword 0x60630080
+		opword 0xB0640000
+		opword 0x901A0004
+		opword 0x480008F0
+		opword 0x387E0390
+		bl msgSearch
+		lwz r4, wp(r13)
+		opword 0x576004E7
+		opword 0x90640038
+		lwz r3, wp(r13)
+		opword 0x83E30020
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x88040018
+		opword 0x90030020
+		opword 0x48000130
+		opword 0x576004A5
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x88040019
+		opword 0x90030020
+		opword 0x48000110
+		opword 0x57600463
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x8804001A
+		opword 0x90030020
+		opword 0x480000F0
+		opword 0x57600421
+		opword 0x4182001C
+		opword 0x1C1F001C
+		opword 0x389D013C
+		opword 0x7C840214
+		opword 0x8804001B
+		opword 0x90030020
+		opword 0x480000D0
+		opword 0x578005EF
+		opword 0x418200A4
+		opword 0x2C1F0004
+		opword 0x4080007C
+		bl cardGetFilePtr
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x54047022
+		opword 0x38042000
+		opword 0x7C63022E
+		opword 0x546007BD
+		opword 0x408200A0
+		opword 0x546007FF
+		opword 0x40820098
+		opword 0x38000033
+		opword 0x38600012
+		opword 0x90050018
+		lwz r4, wp(r13)
+		opword 0x80040020
+		opword 0x90040030
+		lwz r5, wp(r13)
+		opword 0x80850030
+		opword 0x38840001
+		opword 0x5480F002
+		opword 0x54840FFE
+		opword 0x7C040050
+		opword 0x5400103E
+		opword 0x7C002214
+		opword 0x90050034
+		lwz r4, wp(r13)
+		opword 0x80040034
+		opword 0x90040020
+		bl psndSFXOn
+		opword 0x48000048
+		opword 0x38800005
+		opword 0x38000001
+		opword 0x90830020
+		opword 0x38600013
+		lwz r4, wp(r13)
+		opword 0x90040018
+		bl psndSFXOn
+		opword 0x48000028
+		opword 0x578005AD
+		opword 0x41820020
+		opword 0x38800005
+		opword 0x38000001
+		opword 0x90830020
+		opword 0x38600013
+		lwz r4, wp(r13)
+		opword 0x90040018
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1F0000
+		opword 0x41820014
+		opword 0x2C000004
+		opword 0x4080000C
+		opword 0x38600009
+		bl psndSFXOn
+		lwz r5, wp(r13)
+		opword 0x389D013C
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0x7C24042E
+		opword 0xC0030008
+		opword 0xEC01002A
+		opword 0xD0050010
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0xC0230004
+		opword 0xC003000C
+		opword 0xEC01002A
+		opword 0xD0050014
+		opword 0x48000688
+		opword 0x387E03AC
+		bl msgSearch
+		lwz r4, wp(r13)
+		opword 0x576004E7
+		opword 0x90640038
+		lwz r5, wp(r13)
+		opword 0x83E50020
+		opword 0x41820038
+		opword 0x389D0200
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C60001C
+		opword 0x38030018
+		opword 0x7C0400AE
+		opword 0x90050020
+		lwz r5, wp(r13)
+		opword 0x80650020
+		opword 0x80050030
+		opword 0x7C030000
+		opword 0x4182FFD8
+		opword 0x48000104
+		opword 0x576004A5
+		opword 0x41820038
+		opword 0x389D0200
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C60001C
+		opword 0x38030019
+		opword 0x7C0400AE
+		opword 0x90050020
+		lwz r5, wp(r13)
+		opword 0x80650020
+		opword 0x80050030
+		opword 0x7C030000
+		opword 0x4182FFD8
+		opword 0x480000C8
+		opword 0x57600463
+		opword 0x41820038
+		opword 0x389D0200
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C60001C
+		opword 0x3803001A
+		opword 0x7C0400AE
+		opword 0x90050020
+		lwz r5, wp(r13)
+		opword 0x80650020
+		opword 0x80050030
+		opword 0x7C030000
+		opword 0x4182FFD8
+		opword 0x4800008C
+		opword 0x57600421
+		opword 0x41820038
+		opword 0x389D0200
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C60001C
+		opword 0x3803001B
+		opword 0x7C0400AE
+		opword 0x90050020
+		lwz r5, wp(r13)
+		opword 0x80650020
+		opword 0x80050030
+		opword 0x7C030000
+		opword 0x4182FFD8
+		opword 0x48000050
+		opword 0x578005EF
+		opword 0x41820024
+		opword 0x38000034
+		opword 0x38600012
+		opword 0x90050018
+		lwz r4, wp(r13)
+		opword 0x80040020
+		opword 0x90040034
+		bl psndSFXOn
+		opword 0x48000028
+		opword 0x578005AD
+		opword 0x41820020
+		opword 0x80850030
+		opword 0x38000032
+		opword 0x38600013
+		opword 0x90850020
+		lwz r4, wp(r13)
+		opword 0x90040018
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1F0000
+		opword 0x41820014
+		opword 0x2C000004
+		opword 0x4080000C
+		opword 0x38600009
+		bl psndSFXOn
+		lwz r3, wp(r13)
+		opword 0x389D013C
+		opword 0x80030020
+		opword 0x90030034
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0x7C24042E
+		opword 0xC0030008
+		opword 0xEC01002A
+		opword 0xD0050010
+		lwz r5, wp(r13)
+		opword 0x80050020
+		opword 0x1C00001C
+		opword 0x7C640214
+		opword 0xC0230004
+		opword 0xC003000C
+		opword 0xEC01002A
+		opword 0xD0050014
+		opword 0x480004C0
+		opword 0xA0060000
+		lis r3, evt_memcard_copy@ha
+		addi r3, r3, evt_memcard_copy@l
+		opword 0x38800000
+		opword 0x60000040
+		opword 0x38A00000
+		opword 0xB0060000
+		opword 0x38C00000
+		bl evtEntryType
+		lwz r4, wp(r13)
+		opword 0x9064003C
+		lwz r3, wp(r13)
+		opword 0x80030030
+		opword 0x8063003C
+		opword 0x9003009C
+		lwz r3, wp(r13)
+		opword 0x80030034
+		opword 0x8063003C
+		opword 0x900300A0
+		lwz r4, wp(r13)
+		opword 0x80640018
+		opword 0x38030001
+		opword 0x90040018
+		opword 0x48000460
+		opword 0x8066003C
+		opword 0x8063015C
+		bl evtCheckID
+		opword 0x2C030000
+		opword 0x4082044C
+		opword 0x3C80FAA3
+		opword 0x38600000
+		opword 0x3884B580
+		bl evtGetValue
+		opword 0x2C030000
+		opword 0x40820030
+		lwz r5, wp(r13)
+		opword 0x38800005
+		opword 0x38000001
+		opword 0xA0650000
+		opword 0x546306B0
+		opword 0xB0650000
+		lwz r3, wp(r13)
+		opword 0x90830020
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x48000408
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0xA0640000
+		opword 0x60630080
+		opword 0xB0640000
+		opword 0x901A0004
+		opword 0x48000488
+		opword 0xA0660000
+		opword 0x576004E7
+		opword 0x60600001
+		opword 0xB0060000
+		lwz r4, wp(r13)
+		opword 0x83240024
+		opword 0x41820018
+		opword 0x3819FFFF
+		opword 0x38600005
+		opword 0x90040024
+		bl psndSFXOn
+		opword 0x48000168
+		opword 0x576004A5
+		opword 0x41820018
+		opword 0x38190001
+		opword 0x38600005
+		opword 0x90040024
+		bl psndSFXOn
+		opword 0x4800014C
+		opword 0x578005EF
+		opword 0x418200D4
+		opword 0x2C190001
+		opword 0x41820038
+		opword 0x40800010
+		opword 0x2C190000
+		opword 0x40800014
+		opword 0x48000054
+		opword 0x2C190003
+		opword 0x4080004C
+		opword 0x48000034
+		opword 0x38600000
+		bl OSSetSoundMode
+		lwz r3, gp(r13)
+		opword 0x38000000
+		opword 0x90031274
+		opword 0x48000030
+		opword 0x38600001
+		bl OSSetSoundMode
+		lwz r3, gp(r13)
+		opword 0x38000000
+		opword 0x90031274
+		opword 0x48000018
+		opword 0x38600001
+		bl OSSetSoundMode
+		lwz r3, gp(r13)
+		opword 0x38000001
+		opword 0x90031274
+		bl OSGetSoundMode
+		opword 0x28030000
+		opword 0x40820010
+		opword 0x38600000
+		bl SoundSetOutputMode
+		opword 0x4800000C
+		opword 0x38600001
+		bl SoundSetOutputMode
+		opword 0x38600012
+		bl psndSFXOn
+		opword 0x386000A0
+		opword 0x38800000
+		bl psndBGMOn
+		opword 0x38600200
+		bl psndENVOff
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0x80640024
+		opword 0x90640040
+		lwz r4, wp(r13)
+		opword 0xA0640000
+		opword 0x5463043C
+		opword 0xB0640000
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x480002C8
+		opword 0x578005AD
+		opword 0x4182006C
+		opword 0x38600013
+		bl psndSFXOn
+		opword 0x386000A0
+		opword 0x38800000
+		bl psndBGMOn
+		opword 0x38600200
+		bl psndENVOff
+		lwz r3, wp(r13)
+		opword 0x80030040
+		opword 0x90030024
+		bl OSGetSoundMode
+		opword 0x28030000
+		opword 0x40820010
+		opword 0x38600000
+		bl SoundSetOutputMode
+		opword 0x4800000C
+		opword 0x38600001
+		bl SoundSetOutputMode
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0xA0640000
+		opword 0x5463043C
+		opword 0xB0640000
+		lwz r3, wp(r13)
+		opword 0x90030018
+		opword 0x48000258
+		lwz r3, wp(r13)
+		opword 0x80030024
+		opword 0x2C000003
+		opword 0x4180000C
+		opword 0x38000000
+		opword 0x90030024
+		lwz r3, wp(r13)
+		opword 0x80030024
+		opword 0x2C000000
+		opword 0x4080000C
+		opword 0x38000002
+		opword 0x90030024
+		lwz r3, wp(r13)
+		opword 0x80030024
+		opword 0x7C00C800
+		opword 0x41820054
+		opword 0x2C000001
+		opword 0x4182002C
+		opword 0x40800010
+		opword 0x2C000000
+		opword 0x40800014
+		opword 0x48000030
+		opword 0x2C000003
+		opword 0x40800028
+		opword 0x4800001C
+		opword 0x38600000
+		bl SoundSetOutputMode
+		opword 0x48000018
+		opword 0x38600001
+		bl SoundSetOutputMode
+		opword 0x4800000C
+		opword 0x38600002
+		bl SoundSetOutputMode
+		opword 0x38600110
+		opword 0x38800075
+		bl psndENVOn
+		lfs f0, float_neg74_8041be74(r2)
+		opword 0x3C004330
+		lwz r3, wp(r13)
+		opword 0x90010020
+		opword 0xC83E0358
+		opword 0xD0030010
+		lfs f2, float_50_8041be6c(r2)
+		lwz r3, wp(r13)
+		lfs f3, float_4_8041be78(r2)
+		opword 0x80030024
+		opword 0x6C008000
+		opword 0x90010024
+		opword 0xC8010020
+		opword 0xEC000828
+		opword 0xEC02103C
+		opword 0xEC03002A
+		opword 0xD0030014
+		opword 0x48000180
+		opword 0xA0660000
+		opword 0x576004E7
+		opword 0x60600001
+		opword 0xB0060000
+		opword 0x41820020
+		lwz r5, wp(r13)
+		opword 0x38600005
+		opword 0x80850028
+		opword 0x3804FFFF
+		opword 0x90050028
+		bl psndSFXOn
+		opword 0x480000D8
+		opword 0x576004A5
+		opword 0x41820020
+		lwz r5, wp(r13)
+		opword 0x38600005
+		opword 0x80850028
+		opword 0x38040001
+		opword 0x90050028
+		bl psndSFXOn
+		opword 0x480000B4
+		opword 0x578005EF
+		opword 0x41820074
+		lwz r5, wp(r13)
+		opword 0x38600012
+		lwz r4, gp(r13)
+		opword 0x80050028
+		opword 0x7C000034
+		opword 0x5400D97E
+		opword 0x90041294
+		bl psndSFXOn
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0x80640028
+		opword 0x90640044
+		lwz r4, wp(r13)
+		opword 0xA0640000
+		opword 0x5463043C
+		opword 0xB0640000
+		lwz r3, wp(r13)
+		opword 0x90030018
+		lwz r3, gp(r13)
+		opword 0x80031294
+		opword 0x2C000000
+		opword 0x41820054
+		la r3, evt_shake(r13)
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		bl evtEntryType
+		opword 0x4800003C
+		opword 0x578005AD
+		opword 0x41820034
+		opword 0x38600013
+		bl psndSFXOn
+		lwz r4, wp(r13)
+		opword 0x38000001
+		opword 0x80640044
+		opword 0x90640028
+		lwz r4, wp(r13)
+		opword 0xA0640000
+		opword 0x5463043C
+		opword 0xB0640000
+		lwz r3, wp(r13)
+		opword 0x90030018
+		lwz r3, wp(r13)
+		opword 0x80030028
+		opword 0x2C000002
+		opword 0x4180000C
+		opword 0x38000000
+		opword 0x90030028
+		lwz r3, wp(r13)
+		opword 0x80030028
+		opword 0x2C000000
+		opword 0x4080000C
+		opword 0x38000001
+		opword 0x90030028
+		lfs f0, float_neg74_8041be74(r2)
+		opword 0x3C004330
+		lwz r3, wp(r13)
+		opword 0x90010020
+		opword 0xC85E0358
+		opword 0xD0030010
+		lfs f3, float_50_8041be6c(r2)
+		lwz r3, wp(r13)
+		lfs f0, float_30_8041be3c(r2)
+		opword 0x80030028
+		lfs f4, float_4_8041be78(r2)
+		opword 0x6C008000
+		opword 0x90010024
+		opword 0xC8210020
+		opword 0xEC211028
+		opword 0xEC03007C
+		opword 0xEC04002A
+		opword 0xD0030014
+		lwz r3, wp(r13)
+		opword 0x3C004330
+		lfs f4, float_0p25_8041be7c(r2)
+		opword 0xC0030010
+		opword 0xC0630008
+		opword 0x90010020
+		opword 0xEC201828
+		opword 0xC85E0350
+		lfs f0, float_0p125_8041be80(r2)
+		opword 0xEC21193A
+		opword 0xD0230008
+		lwz r3, wp(r13)
+		opword 0xC0230014
+		opword 0xC063000C
+		opword 0xEC211828
+		opword 0xEC21193A
+		opword 0xD023000C
+		lwz r3, gp(r13)
+		opword 0x8003001C
+		opword 0x90010024
+		opword 0xC8210020
+		opword 0xEC211028
+		opword 0xEC210032
+		bl sin
+		opword 0xFC400818
+		lfs f0, float_2_8041be70(r2)
+		lis r3, loadDraw@ha
+		lwz r7, wp(r13)
+		addi r5, r3, loadDraw@l
+		lfs f1, float_1000_8041be84(r2)
+		opword 0xEC0000B2
+		opword 0xC0470008
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x38C00000
+		opword 0xFC000210
+		opword 0xEC02002A
+		opword 0xD0070008
+		bl dispEntry
+	}
+}
+#pragma pop
 #endif
 
 #define GXFIFO_F32 (*(volatile f32*)0xCC008000)
 
+#ifdef NONMATCHING
 static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     GXTexObj obj;
     Mtx m;
@@ -826,36 +2445,37 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     f64 h;
 
     TEXGetGXTexObjFromPalette(*wp->file->data, &obj, id);
-    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&obj, GX_TEXMAP0);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     h = __fabs(y0 - y1);
     w = __fabs(x1 - x0);
-    PSMTXScale(m, (f32)w / GXGetTexObjWidth(&obj), (f32)h / GXGetTexObjHeight(&obj), 1.0f);
+    PSMTXScale(m, (f32)w / GXGetTexObjWidth(&obj), (f32)h / GXGetTexObjHeight(&obj), EXT_LIT(float_1_8041bde8, 1.0f));
     GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXFIFO_F32 = x0;
     GXFIFO_F32 = y0;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
     GXFIFO_F32 = x0;
     GXFIFO_F32 = y1;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
     GXFIFO_F32 = x1;
     GXFIFO_F32 = y1;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
-    GXFIFO_F32 = 1.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
     GXFIFO_F32 = x1;
     GXFIFO_F32 = y0;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
-    GXFIFO_F32 = 0.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
 }
+#endif
 
 #ifdef NONMATCHING
 void loadDraw(CameraId camera, void* param) {
@@ -893,7 +2513,7 @@ void loadDraw(CameraId camera, void* param) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){255, 255, 255, 255});
+    GXSetFog(GX_FOG_NONE, EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), (GXColor){255, 255, 255, 255});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -907,9 +2527,9 @@ void loadDraw(CameraId camera, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    loadDrawBg(0x35, -304.0f, 240.0f, -272.0f, -240.0f);
-    loadDrawBg(0x34, -272.0f, 240.0f, 272.0f, -240.0f);
-    loadDrawBg(0x36, 272.0f, 240.0f, 304.0f, -240.0f);
+    loadDrawBg(0x35, EXT_LIT(float_neg304_8041bdec, -304.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
+    loadDrawBg(0x34, EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
+    loadDrawBg(0x36, EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_304_8041be00, 304.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
 
     win1 = win = win_dt;
     for (i = 0; i < 9; i++) {
@@ -933,20 +2553,20 @@ void loadDraw(CameraId camera, void* param) {
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                winTexSet(0xe, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(0xe, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 winTexInit(*wp->file->data);
-                winTexSet(win[i].unk10, (Vec){win[i].x, 60.0f + win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(win[i].unk10, (Vec){win[i].x, EXT_LIT(float_60_8041be04, 60.0f) + win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
         }
     }
 
-    windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, -250.0f, 200.0f, 500.0f, 40.0f, 20.0f);
+    windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, EXT_LIT(float_neg250_8041be08, -250.0f), EXT_LIT(float_200_8041be0c, 200.0f), EXT_LIT(float_500_8041be10, 500.0f), EXT_LIT(float_40_8041be14, 40.0f), EXT_LIT(float_20_8041be18, 20.0f));
     FontDrawStart();
     {
         const char* msg = wp->msg;
@@ -970,25 +2590,25 @@ void loadDraw(CameraId camera, void* param) {
         if (i == wp->slot) {
             FontDrawColor((GXColor){255, 255, 255, 255});
         }
-        FontDrawScale(0.6f);
+        FontDrawScale(EXT_LIT(float_0p6_8041be1c, 0.6f));
         FontDrawEdge();
         sprintf(buf, str_802ED960, winZenkakuStr(i + 1));
-        FontDrawString(win1->x - 100.0f, 84.0f + win1->y, buf);
+        FontDrawString(win1->x - 100.0f, EXT_LIT(float_84_8041be24, 84.0f) + win1->y, buf);
         FontDrawEdgeOff();
-        FontDrawScale(1.0f);
+        FontDrawScale(EXT_LIT(float_1_8041bde8, 1.0f));
         FontDrawColor((GXColor){32, 32, 32, 255});
         if (i == wp->slot) {
             FontDrawColor((GXColor){0, 0, 0, 255});
         }
         if (flags & 2) {
             str = str_802ED96C;
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
         } else if (flags & 1) {
             str = str_802ED97C;
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
         } else if (gsw0 == 0) {
             str = str_802ED98C;
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
             if (strlen(name) != 0) {
                 FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
@@ -1006,18 +2626,18 @@ void loadDraw(CameraId camera, void* param) {
                 FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
             sprintf(buf2, str_802ED998, winZenkakuStr(level));
-            FontDrawString(win1->x - FontGetMessageWidth(buf2) / 2.0f, 30.0f + win1->y, buf2);
+            FontDrawString(win1->x - FontGetMessageWidth(buf2) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_30_8041be3c, 30.0f) + win1->y, buf2);
             strcpy(buf2, str_802ED9A4);
             strcat(buf2, unk_8016af5c(hours, 2));
             strcat(buf2, " ");
             strcat(buf2, unk_8016af5c(mins, 2));
             w = FontGetMessageWidth(buf2);
-            FontDrawString(win1->x - w / 2.0f, win1->y, buf2);
+            FontDrawString(win1->x - w / EXT_LIT(float_2_8041be70, 2.0f), win1->y, buf2);
             strcpy(buf2, str_802ED9A4);
             strcat(buf2, unk_8016af5c(hours, 2));
             x = FontGetMessageWidth(buf2);
-            PSMTXTrans(m, 8.0f + (x + (win1->x - w / 2.0f)), 1.0f + (win1->y - 22.0f), 0.0f);
-            PSMTXScale(s, 1.5f, 1.5f, 1.5f);
+            PSMTXTrans(m, EXT_LIT(float_8_8041be44, 8.0f) + (x + (win1->x - w / EXT_LIT(float_2_8041be70, 2.0f))), EXT_LIT(float_1_8041bde8, 1.0f) + (win1->y - 22.0f), EXT_LIT(float_0_8041bde4, 0.0f));
+            PSMTXScale(s, EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f));
             PSMTXConcat(m, s, m);
             iconDispGxCol(m, 0, 0x201, (GXColor){0, 0, 0, 255});
             py = &win1->y;
@@ -1035,46 +2655,46 @@ void loadDraw(CameraId camera, void* param) {
     } else {
         wp->alpha -= 0.05f;
     }
-    if (wp->alpha < 0.0f) {
+    if (wp->alpha < EXT_LIT(float_0_8041bde4, 0.0f)) {
         wp->alpha = 0.0f;
     }
-    if (wp->alpha > 1.0f) {
+    if (wp->alpha > EXT_LIT(float_1_8041bde8, 1.0f)) {
         wp->alpha = 1.0f;
     }
     nameMaskGX(wp->alpha);
 
     if (wp->unk18 >= 100 && wp->unk18 < 200) {
         winTexInit(*wp->file->data);
-        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet(0xf, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        winTexSet_x2(0x13, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet_x2(0x13, 0x1f, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_100_8041be20, 100.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         for (i = 0; i < 3; i++) {
             if (i == wp->unk24) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 50 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x15, 0x33, (Vec){-4.0f, 54 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){-4.0f, 54 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x15, 0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 50 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             }
         }
     }
 
     if (wp->unk18 >= 200 && wp->unk18 < 300) {
         winTexInit(*wp->file->data);
-        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet(0xf, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        winTexSet_x2(0x14, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet_x2(0x14, 0x1f, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_100_8041be20, 100.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         for (i = 0; i < 2; i++) {
             if (i == wp->unk28) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 30 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x18, 0x33, (Vec){-4.0f, 34 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){-4.0f, 34 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x18, 0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 30 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             }
         }
     }
@@ -1094,31 +2714,1650 @@ void loadDraw(CameraId camera, void* param) {
             f32 r1 = wp->unk34 / 2;
             if (r0 == r1) {
                 cx = 0.0f;
-                cy = 120.0f - 140.0f * r0;
+                cy = EXT_LIT(float_120_8041be5c, 120.0f) - 140.0f * r0;
             } else {
                 cx = -150.0f + 300.0f * c0;
-                cy = 50.0f;
+                cy = EXT_LIT(float_50_8041be6c, 50.0f);
             }
         } else {
             cx = 0.0f;
-            cy = 50.0f;
+            cy = EXT_LIT(float_50_8041be6c, 50.0f);
         }
-        cy -= 40.0f;
+        cy -= EXT_LIT(float_40_8041be14, 40.0f);
         winTexInit(*wp->file->data);
-        winTexSetRot(0x1d, (Vec){2.0f + cx, cy - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
-        winTexSetRot(0x1d, (Vec){cx, cy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, angle[wp->unk30][wp->unk34]);
+        winTexSetRot(0x1d, (Vec){EXT_LIT(float_2_8041be70, 2.0f) + cx, cy - 2.0f, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
+        winTexSetRot(0x1d, (Vec){cx, cy, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, white, angle[wp->unk30][wp->unk34]);
     }
 
     if (!(wp->flags & 0x40)) {
         winTexInit(*wp->file->data);
-        winTexSet(0, (Vec){2.0f + wp->x, wp->y - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128});
-        winTexSet(0, (Vec){wp->x, wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        winTexSet(0, (Vec){EXT_LIT(float_2_8041be70, 2.0f) + wp->x, wp->y - 2.0f, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 128});
+        winTexSet(0, (Vec){wp->x, wp->y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, white);
     }
 
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
     GXSetProjectionv(proj);
     *camGetCurPtr() = saved;
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // else MWCC CSEs/drops repeated mnemonic loads
+void loadDraw(CameraId camera, void* param) {
+	char _af_pad[2080];
+	asm volatile {
+		lis r4, vec3_802ed670@ha
+		opword 0x38600008
+		addi r30, r4, vec3_802ed670@l
+		bl camGetPtr
+		lwz r4, dat_8041bd84(r2)
+		opword 0x7C791B78
+		lwz r0, dat_8041bd88(r2)
+		stw r4, _af_pad+112(r1)
+		lwz r3, wp(r13)
+		opword 0x90010074
+		lwz r0, dat_8041bd8c(r2)
+		opword 0x80630018
+		opword 0x90010070
+		opword 0x2C030020
+		opword 0x4180000C
+		opword 0x2C030028
+		opword 0x418018E4
+		opword 0x3861034C
+		bl GXGetViewportv
+		opword 0x38610330
+		bl GXGetProjectionv
+		opword 0x8099019C
+		opword 0x3879015C
+		bl GXSetProjection
+		bl camGetCurPtr
+		opword 0x3800004C
+		opword 0x38A10594
+		opword 0x3883FFFC
+		opword 0x7C0903A6
+		opword 0x80640004
+		opword 0x84040008
+		opword 0x90650004
+		opword 0x94050008
+		opword 0x4200FFF0
+		bl camGetCurPtr
+		opword 0x3800004C
+		opword 0x38A3FFFC
+		opword 0x3899FFFC
+		opword 0x7C0903A6
+		opword 0x80640004
+		opword 0x84040008
+		opword 0x90650004
+		opword 0x94050008
+		opword 0x4200FFF0
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00000
+		opword 0x38C00000
+		bl GXSetBlendMode
+		opword 0x38600000
+		bl GXSetZCompLoc
+		opword 0x38600006
+		opword 0x38800080
+		opword 0x38A00001
+		opword 0x38C00000
+		opword 0x38E00000
+		bl GXSetAlphaCompare
+		opword 0x38600000
+		opword 0x38800007
+		opword 0x38A00000
+		bl GXSetZMode
+		lfs f1, float_0_8041bde4(r2)
+		opword 0x38810068
+		lwz r0, dat_8041bd90(r2)
+		opword 0x38600000
+		opword 0xFC400890
+		opword 0xFC600890
+		opword 0x90010068
+		opword 0xFC800890
+		bl GXSetFog
+		opword 0x38600000
+		bl GXSetNumChans
+		opword 0x38600004
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C00000
+		opword 0x38E00000
+		opword 0x39000000
+		opword 0x39200002
+		bl GXSetChanCtrl
+		opword 0x38600001
+		bl GXSetNumTevStages
+		opword 0x38600000
+		opword 0x38800000
+		opword 0x38A00000
+		opword 0x38C000FF
+		bl GXSetTevOrder
+		opword 0x38600000
+		opword 0x38800003
+		bl GXSetTevOp
+		opword 0x38600000
+		bl GXSetCullMode
+		bl GXClearVtxDesc
+		opword 0x38600009
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x3860000D
+		opword 0x38800001
+		bl GXSetVtxDesc
+		opword 0x38600000
+		opword 0x38800009
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x38600000
+		opword 0x3880000D
+		opword 0x38A00001
+		opword 0x38C00004
+		opword 0x38E00000
+		bl GXSetVtxAttrFmt
+		opword 0x3879011C
+		opword 0x38800000
+		bl GXLoadPosMtxImm
+		opword 0x38600000
+		bl GXSetCurrentMtx
+		lwz r3, wp(r13)
+		opword 0x388102F0
+		opword 0x38A00035
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl TEXGetGXTexObjFromPalette
+		lfs f1, float_0_8041bde4(r2)
+		opword 0x386102F0
+		opword 0x38800001
+		opword 0x38A00001
+		opword 0xFC400890
+		opword 0x38C00000
+		opword 0xFC600890
+		opword 0x38E00000
+		opword 0x39000000
+		bl GXInitTexObjLOD
+		opword 0x386102F0
+		opword 0x38800000
+		bl GXLoadTexObj
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00004
+		opword 0x38C0001E
+		opword 0x38E00000
+		opword 0x3900007D
+		bl GXSetTexCoordGen2
+		opword 0xC83E02D8
+		opword 0x386102F0
+		opword 0xC81E02E0
+		opword 0xFFC00A10
+		opword 0xFFE00210
+		bl GXGetTexObjHeight
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x906107FC
+		opword 0xFC00F018
+		opword 0xC85E0350
+		opword 0x386102F0
+		opword 0x900107F8
+		opword 0xC82107F8
+		opword 0xEC211028
+		opword 0xEFC00824
+		bl GXGetTexObjWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610804
+		opword 0xFC00F818
+		opword 0xC89E0350
+		opword 0xFC40F090
+		opword 0x90010800
+		opword 0x386103C4
+		lfs f3, float_1_8041bde8(r2)
+		opword 0xC8210800
+		opword 0xEC212028
+		opword 0xEC200824
+		bl PSMTXScale
+		opword 0x386103C4
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		bl GXBegin
+		lfs f0, float_neg304_8041bdec(r2)
+		opword 0x3C60CC01
+		opword 0x388102D0
+		opword 0x38A00034
+		opword 0xD0038000
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_neg304_8041bdec(r2)
+		opword 0xD0038000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_neg272_8041bdf8(r2)
+		opword 0xD0038000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_neg272_8041bdf8(r2)
+		opword 0xD0038000
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl TEXGetGXTexObjFromPalette
+		lfs f1, float_0_8041bde4(r2)
+		opword 0x386102D0
+		opword 0x38800001
+		opword 0x38A00001
+		opword 0xFC400890
+		opword 0x38C00000
+		opword 0xFC600890
+		opword 0x38E00000
+		opword 0x39000000
+		bl GXInitTexObjLOD
+		opword 0x386102D0
+		opword 0x38800000
+		bl GXLoadTexObj
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00004
+		opword 0x38C0001E
+		opword 0x38E00000
+		opword 0x3900007D
+		bl GXSetTexCoordGen2
+		opword 0xC83E02D8
+		opword 0x386102D0
+		opword 0xC81E02E8
+		opword 0xFFC00A10
+		opword 0xFFE00210
+		bl GXGetTexObjHeight
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x9061080C
+		opword 0xFC00F018
+		opword 0xC85E0350
+		opword 0x386102D0
+		opword 0x90010808
+		opword 0xC8210808
+		opword 0xEC211028
+		opword 0xEFC00824
+		bl GXGetTexObjWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610814
+		opword 0xFC00F818
+		opword 0xC89E0350
+		opword 0xFC40F090
+		opword 0x90010810
+		opword 0x38610394
+		lfs f3, float_1_8041bde8(r2)
+		opword 0xC8210810
+		opword 0xEC212028
+		opword 0xEC200824
+		bl PSMTXScale
+		opword 0x38610394
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		bl GXBegin
+		lfs f0, float_neg272_8041bdf8(r2)
+		opword 0x3C60CC01
+		opword 0x388102B0
+		opword 0x38A00036
+		opword 0xD0038000
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_neg272_8041bdf8(r2)
+		opword 0xD0038000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_272_8041bdfc(r2)
+		opword 0xD0038000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_272_8041bdfc(r2)
+		opword 0xD0038000
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0038000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0038000
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl TEXGetGXTexObjFromPalette
+		lfs f1, float_0_8041bde4(r2)
+		opword 0x386102B0
+		opword 0x38800001
+		opword 0x38A00001
+		opword 0xFC400890
+		opword 0x38C00000
+		opword 0xFC600890
+		opword 0x38E00000
+		opword 0x39000000
+		bl GXInitTexObjLOD
+		opword 0x386102B0
+		opword 0x38800000
+		bl GXLoadTexObj
+		opword 0x38600001
+		bl GXSetNumTexGens
+		opword 0x38600000
+		opword 0x38800001
+		opword 0x38A00004
+		opword 0x38C0001E
+		opword 0x38E00000
+		opword 0x3900007D
+		bl GXSetTexCoordGen2
+		opword 0xC83E02D8
+		opword 0x386102B0
+		opword 0xC81E02E0
+		opword 0xFFC00A10
+		opword 0xFFE00210
+		bl GXGetTexObjHeight
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x9061081C
+		opword 0xFC00F018
+		opword 0xC85E0350
+		opword 0x386102B0
+		opword 0x90010818
+		opword 0xC8210818
+		opword 0xEC211028
+		opword 0xEFC00824
+		bl GXGetTexObjWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0xFC00F818
+		opword 0xC89E0350
+		opword 0xFC40F090
+		opword 0x90010820
+		opword 0x38610364
+		lfs f3, float_1_8041bde8(r2)
+		opword 0xC8210820
+		opword 0xEC212028
+		opword 0xEC200824
+		bl PSMTXScale
+		opword 0x38610364
+		opword 0x3880001E
+		opword 0x38A00001
+		bl GXLoadTexMtxImm
+		opword 0x38600080
+		opword 0x38800000
+		opword 0x38A00004
+		bl GXBegin
+		lfs f0, float_272_8041bdfc(r2)
+		opword 0x3C80CC01
+		lis r3, win_dt@ha
+		opword 0x3AE00000
+		opword 0xD0048000
+		addi r28, r3, win_dt@l
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0x7F99E378
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_272_8041bdfc(r2)
+		opword 0xD0048000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0048000
+		lfs f0, float_304_8041be00(r2)
+		opword 0xD0048000
+		lfs f0, float_neg240_8041bdf4(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0048000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0048000
+		lfs f0, float_304_8041be00(r2)
+		opword 0xD0048000
+		lfs f0, float_240_8041bdf0(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xD0048000
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xD0048000
+		lwz r4, wp(r13)
+		opword 0x80610074
+		opword 0x80040020
+		opword 0x9061006C
+		opword 0x7C170000
+		opword 0x4082000C
+		opword 0x80010078
+		opword 0x9001006C
+		opword 0x80040018
+		opword 0x2C000033
+		opword 0x40820024
+		opword 0x80040030
+		opword 0x7C170000
+		opword 0x41820010
+		opword 0x80040034
+		opword 0x7C170000
+		opword 0x4082000C
+		opword 0x80010078
+		opword 0x9001006C
+		opword 0x2C170004
+		opword 0x40820018
+		opword 0xA0040000
+		opword 0x540006F7
+		opword 0x4182000C
+		opword 0x80010070
+		opword 0x9001006C
+		opword 0x2C170005
+		opword 0x40820018
+		opword 0xA0040000
+		opword 0x540006B5
+		opword 0x4182000C
+		opword 0x80010070
+		opword 0x9001006C
+		opword 0x80190010
+		opword 0x2C00000E
+		opword 0x4080012C
+		opword 0x2C00000A
+		opword 0x40800008
+		opword 0x48000120
+		lwz r3, wp(r13)
+		opword 0x380000FE
+		opword 0x9801006F
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		opword 0x807E0000
+		opword 0x388102A4
+		opword 0x801E0004
+		opword 0x38A1028C
+		opword 0x90610298
+		opword 0x38C10064
+		opword 0xC0390000
+		opword 0x3860000E
+		opword 0x9001029C
+		opword 0xC0190004
+		opword 0x811E0008
+		opword 0xD0210298
+		opword 0x8181006C
+		opword 0xD001029C
+		opword 0x817E000C
+		opword 0x815E0010
+		opword 0x813E0014
+		opword 0x80E10298
+		opword 0x8001029C
+		opword 0x91810064
+		opword 0x9161028C
+		opword 0x91410290
+		opword 0x91210294
+		opword 0x910102A0
+		opword 0x90E102A4
+		opword 0x900102A8
+		opword 0x910102AC
+		bl winTexSet
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		lfs f1, float_60_8041be04(r2)
+		opword 0x38810280
+		opword 0xC0190004
+		opword 0x38A10268
+		opword 0x807E0018
+		opword 0x38C10060
+		opword 0x801E001C
+		opword 0xEC01002A
+		opword 0x90610274
+		opword 0xC0390000
+		opword 0x90010278
+		opword 0x811E0020
+		opword 0xD0210274
+		opword 0x8061006C
+		opword 0xD0010278
+		opword 0x817E0024
+		opword 0x815E0028
+		opword 0x813E002C
+		opword 0x80E10274
+		opword 0x80010278
+		opword 0x90610060
+		opword 0x80790010
+		opword 0x91610268
+		opword 0x9141026C
+		opword 0x91210270
+		opword 0x9101027C
+		opword 0x90E10280
+		opword 0x90010284
+		opword 0x91010288
+		bl winTexSet
+		opword 0x48000088
+		opword 0x80640004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		opword 0x807E0030
+		opword 0x38A1025C
+		opword 0x801E0034
+		opword 0x38C10244
+		opword 0x90610250
+		opword 0x38E1005C
+		opword 0xC0390000
+		opword 0x90010254
+		opword 0xC0190004
+		opword 0x813E0038
+		opword 0xD0210250
+		opword 0x8061006C
+		opword 0xD0010254
+		opword 0x809E003C
+		opword 0x817E0040
+		opword 0x815E0044
+		opword 0x81010250
+		opword 0x80010254
+		opword 0x9061005C
+		opword 0x80790010
+		opword 0x90810244
+		opword 0x80990014
+		opword 0x91610248
+		opword 0x9141024C
+		opword 0x91210258
+		opword 0x9101025C
+		opword 0x90010260
+		opword 0x91210264
+		bl winTexSet_x2
+		opword 0x3AF70001
+		opword 0x3B39001C
+		opword 0x2C170009
+		opword 0x4180FDB8
+		lwz r0, dat_8041bd94(r2)
+		opword 0x38810058
+		lfs f1, float_neg250_8041be08(r2)
+		opword 0x38600000
+		opword 0x90010058
+		lfs f2, float_200_8041be0c(r2)
+		lfs f3, float_500_8041be10(r2)
+		lfs f4, float_40_8041be14(r2)
+		lfs f5, float_20_8041be18(r2)
+		bl windowDispGX_Waku_col
+		bl FontDrawStart
+		lwz r3, wp(r13)
+		opword 0x82830038
+		opword 0x7E83A378
+		bl FontGetMessageWidth
+		opword 0x5460043E
+		opword 0x7E85A378
+		opword 0x7C6000D0
+		opword 0x388000C0
+		opword 0x54600FFE
+		opword 0x7C001A14
+		opword 0x7C030E70
+		bl FontDrawMessage
+		opword 0x3B600000
+		lfs f30, float_100_8041be20(r2)
+		lfs f31, float_84_8041be24(r2)
+		opword 0x7F7DDB78
+		bl cardGetFilePtr
+		opword 0x389D2000
+		opword 0x7C832214
+		opword 0xA2C40000
+		opword 0x3B2411C4
+		opword 0xAAE4146A
+		opword 0x83040028
+		opword 0x82A4002C
+		opword 0xA344146C
+		opword 0x8284017C
+		bl FontDrawStart
+		lwz r0, dat_8041bd98(r2)
+		opword 0x38610054
+		opword 0x90010054
+		bl FontDrawColor
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1B0000
+		opword 0x40820014
+		lwz r0, dat_8041bd9c(r2)
+		opword 0x38610050
+		opword 0x90010050
+		bl FontDrawColor
+		lfs f1, float_0p6_8041be1c(r2)
+		bl FontDrawScale
+		bl FontDrawEdge
+		opword 0x387B0001
+		bl winZenkakuStr
+		opword 0x7C651B78
+		opword 0x38610310
+		opword 0x389E02F0
+		opword 0x4CC63182
+		bl sprintf
+		opword 0xC03C0000
+		opword 0x38610310
+		opword 0xC01C0004
+		opword 0xEC21F028
+		opword 0xEC5F002A
+		bl FontDrawString
+		bl FontDrawEdgeOff
+		lfs f1, float_1_8041bde8(r2)
+		bl FontDrawScale
+		lwz r0, dat_8041bda0(r2)
+		opword 0x3861004C
+		opword 0x9001004C
+		bl FontDrawColor
+		lwz r3, wp(r13)
+		opword 0x80030020
+		opword 0x7C1B0000
+		opword 0x40820014
+		lwz r0, dat_8041bda4(r2)
+		opword 0x38610048
+		opword 0x90010048
+		bl FontDrawColor
+		opword 0x56C007BD
+		opword 0x41820050
+		opword 0x3A9E02FC
+		opword 0x7E83A378
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x7E83A378
+		opword 0xC85E0350
+		opword 0x90010820
+		lfs f3, float_0p5_8041be28(r2)
+		opword 0xC8010820
+		opword 0xC03C0000
+		opword 0xEC801028
+		lfs f2, float_12_8041be2c(r2)
+		opword 0xC01C0004
+		opword 0xEC2408FC
+		opword 0xEC42002A
+		bl FontDrawString
+		opword 0x48000440
+		opword 0x56C007FF
+		opword 0x41820050
+		opword 0x3A9E030C
+		opword 0x7E83A378
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x7E83A378
+		opword 0xC85E0350
+		opword 0x90010820
+		lfs f3, float_0p5_8041be28(r2)
+		opword 0xC8010820
+		opword 0xC03C0000
+		opword 0xEC801028
+		lfs f2, float_12_8041be2c(r2)
+		opword 0xC01C0004
+		opword 0xEC2408FC
+		opword 0xEC42002A
+		bl FontDrawString
+		opword 0x480003EC
+		opword 0x2C140000
+		opword 0x408200A4
+		opword 0x3A9E031C
+		opword 0x7E83A378
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x7E83A378
+		opword 0xC85E0350
+		opword 0x90010820
+		lfs f3, float_0p5_8041be28(r2)
+		opword 0xC8010820
+		opword 0xC03C0000
+		opword 0xEC801028
+		lfs f2, float_12_8041be2c(r2)
+		opword 0xC01C0004
+		opword 0xEC2408FC
+		opword 0xEC42002A
+		bl FontDrawString
+		opword 0x7F23CB78
+		bl strlen
+		opword 0x28030000
+		opword 0x4182038C
+		opword 0x7F23CB78
+		bl FontGetMessageWidth
+		opword 0x5463FC7E
+		opword 0x3C004330
+		opword 0x6C638000
+		opword 0x90010820
+		opword 0xC85E0358
+		opword 0x90610824
+		opword 0x7F23CB78
+		opword 0xC07C0000
+		opword 0xC8010820
+		lfs f1, float_70_8041be30(r2)
+		opword 0xEC801028
+		opword 0xC01C0004
+		opword 0xEC41002A
+		opword 0xEC232028
+		bl FontDrawString
+		opword 0x48000344
+		la r3, str_8041BE34(r2)
+		bl FontGetMessageWidth
+		opword 0x3C808000
+		opword 0x7F03C378
+		opword 0x800400F8
+		opword 0x7EA4AB78
+		opword 0x38A00000
+		opword 0x5406F0BE
+		bl __div2i
+		opword 0x3CA00005
+		opword 0x7C872378
+		opword 0x38057E3F
+		opword 0x38C00000
+		opword 0x7C651B78
+		opword 0x7C070010
+		opword 0x7C053110
+		opword 0x7C1FF910
+		opword 0x7C0000D1
+		opword 0x41820010
+		opword 0x3A800063
+		opword 0x3AA0003B
+		opword 0x48000040
+		opword 0x7CF53B78
+		opword 0x7CB42B78
+		opword 0x38A00000
+		opword 0x38C00E10
+		bl __div2u
+		opword 0x7E83A378
+		opword 0x7C942378
+		opword 0x7EA4AB78
+		opword 0x38A00000
+		opword 0x38C00E10
+		bl __mod2u
+		opword 0x38A00000
+		opword 0x38C0003C
+		bl __div2u
+		opword 0x7C952378
+		opword 0x7F23CB78
+		bl strlen
+		opword 0x28030000
+		opword 0x41820048
+		opword 0x7F23CB78
+		bl FontGetMessageWidth
+		opword 0x5463FC7E
+		opword 0x3C004330
+		opword 0x6C638000
+		opword 0x90010820
+		opword 0xC85E0358
+		opword 0x90610824
+		opword 0x7F23CB78
+		opword 0xC07C0000
+		opword 0xC8010820
+		lfs f1, float_70_8041be30(r2)
+		opword 0xEC801028
+		opword 0xC01C0004
+		opword 0xEC41002A
+		opword 0xEC232028
+		bl FontDrawString
+		opword 0x7EE3BB78
+		bl winZenkakuStr
+		opword 0x7C651B78
+		opword 0x38610494
+		opword 0x389E0328
+		opword 0x4CC63182
+		bl sprintf
+		opword 0x38610494
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x38610494
+		opword 0xC85E0350
+		opword 0x90010820
+		lfs f3, float_0p5_8041be28(r2)
+		opword 0xC8010820
+		opword 0xC03C0000
+		opword 0xEC801028
+		lfs f2, float_30_8041be3c(r2)
+		opword 0xC01C0004
+		opword 0xEC2408FC
+		opword 0xEC42002A
+		bl FontDrawString
+		opword 0x38610494
+		opword 0x389E0334
+		bl strcpy
+		opword 0x7E83A378
+		opword 0x38800002
+		bl unk_8016af5c
+		opword 0x7C641B78
+		opword 0x38610494
+		bl strcat
+		opword 0x38610494
+		la r4, str_8041BE40(r2)
+		bl strcat
+		opword 0x7EA3AB78
+		opword 0x38800002
+		bl unk_8016af5c
+		opword 0x7C641B78
+		opword 0x38610494
+		bl strcat
+		opword 0x38610494
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x9061081C
+		opword 0x38610494
+		opword 0xC87E0350
+		opword 0x90010818
+		lfs f0, float_0p5_8041be28(r2)
+		opword 0xC8410818
+		opword 0xC03C0000
+		opword 0xEC621828
+		opword 0xC05C0004
+		fmuls f29, f3, f0
+		opword 0xEC21E828
+		bl FontDrawString
+		opword 0x38610494
+		opword 0x389E0334
+		bl strcpy
+		opword 0x7E83A378
+		opword 0x38800002
+		bl unk_8016af5c
+		opword 0x7C641B78
+		opword 0x38610494
+		bl strcat
+		opword 0x38610494
+		bl FontGetMessageWidth
+		opword 0x5463043E
+		opword 0x3C004330
+		opword 0x90610814
+		opword 0x38610464
+		opword 0xC01C0000
+		opword 0x90010810
+		opword 0xC87E0350
+		opword 0xEC40E828
+		opword 0xC8010810
+		opword 0xC03C0004
+		opword 0xEC601828
+		lfs f0, float_22_8041be48(r2)
+		lfs f5, float_8_8041be44(r2)
+		opword 0xEC010028
+		lfs f1, float_1_8041bde8(r2)
+		opword 0xEC83102A
+		lfs f3, float_0_8041bde4(r2)
+		opword 0xEC41002A
+		opword 0xEC25202A
+		bl PSMTXTrans
+		lfs f1, float_1p5_8041be4c(r2)
+		opword 0x38610434
+		opword 0xFC400890
+		opword 0xFC600890
+		bl PSMTXScale
+		opword 0x38610464
+		opword 0x38810434
+		opword 0x7C651B78
+		bl PSMTXConcat
+		lwz r0, dat_8041bda8(r2)
+		opword 0x38610464
+		opword 0x38C10044
+		opword 0x38800000
+		opword 0x90010044
+		opword 0x38A00201
+		bl iconDispGxCol
+		opword 0x3AFC0004
+		opword 0x3AC00000
+		opword 0x3B200000
+		la r24, stone_id(r13)
+		opword 0x38160001
+		opword 0x38600001
+		opword 0x7C600030
+		opword 0x7F400039
+		opword 0x41820080
+		opword 0x6F238000
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x38610464
+		opword 0xC07C0000
+		opword 0x90010820
+		lfs f1, float_106_8041be50(r2)
+		opword 0xC85E0358
+		opword 0xC8010820
+		opword 0xECA30828
+		opword 0xC0370000
+		opword 0xEC801028
+		lfs f0, float_52_8041be54(r2)
+		lfs f3, float_0_8041bde4(r2)
+		opword 0xEC410028
+		opword 0xEC25202A
+		bl PSMTXTrans
+		lwz r3, wp(r13)
+		opword 0x38810074
+		opword 0x80030020
+		opword 0x7C1B0000
+		opword 0x40820008
+		opword 0x38810078
+		opword 0x80840000
+		opword 0x38610464
+		opword 0x80180000
+		opword 0x38C10040
+		opword 0x90810040
+		opword 0x38800000
+		opword 0x5405043E
+		bl iconDispGxCol
+		opword 0x3AD60001
+		opword 0x3B180004
+		opword 0x2C160007
+		opword 0x3B390020
+		opword 0x4180FF60
+		opword 0x3B7B0001
+		opword 0x3B9C001C
+		opword 0x2C1B0004
+		opword 0x3BBD4000
+		opword 0x4180FA88
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x540007FF
+		opword 0x41820018
+		opword 0xC023002C
+		lfs f0, float_0p05_8041be58(r2)
+		opword 0xEC01002A
+		opword 0xD003002C
+		opword 0x48000014
+		opword 0xC023002C
+		lfs f0, float_0p05_8041be58(r2)
+		opword 0xEC010028
+		opword 0xD003002C
+		lwz r3, wp(r13)
+		lfs f0, float_0_8041bde4(r2)
+		opword 0xC023002C
+		opword 0xFC010040
+		opword 0x40800008
+		opword 0xD003002C
+		lwz r3, wp(r13)
+		lfs f0, float_1_8041bde8(r2)
+		opword 0xC023002C
+		opword 0xFC010040
+		opword 0x40810008
+		opword 0xD003002C
+		lwz r3, wp(r13)
+		opword 0xC023002C
+		bl nameMaskGX
+		lwz r3, wp(r13)
+		opword 0x80030018
+		opword 0x2C000064
+		opword 0x418002B4
+		opword 0x2C0000C8
+		opword 0x408002AC
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		lwz r12, dat_8041bdac(r2)
+		opword 0x38810238
+		opword 0x817E0054
+		opword 0x38A1022C
+		opword 0x815E0058
+		opword 0x38C1003C
+		opword 0x813E005C
+		opword 0x3860000F
+		opword 0x811E0048
+		opword 0x80FE004C
+		opword 0x801E0050
+		opword 0x9181003C
+		opword 0x9161022C
+		opword 0x91410230
+		opword 0x91210234
+		opword 0x91010238
+		opword 0x90E1023C
+		opword 0x90010240
+		bl winTexSet
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		lwz r20, dat_8041bdb0(r2)
+		opword 0x38A10220
+		opword 0x819E006C
+		opword 0x38C10214
+		opword 0x817E0070
+		opword 0x38E10038
+		opword 0x815E0074
+		opword 0x38600013
+		opword 0x813E0060
+		opword 0x3880001F
+		opword 0x811E0064
+		opword 0x801E0068
+		opword 0x92810038
+		opword 0x91810214
+		opword 0x91610218
+		opword 0x9141021C
+		opword 0x91210220
+		opword 0x91010224
+		opword 0x90010228
+		bl winTexSet_x2
+		opword 0x3B000000
+		opword 0x7F17C378
+		lwz r3, wp(r13)
+		opword 0x80030024
+		opword 0x7C180000
+		opword 0x40820130
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		opword 0x20170032
+		opword 0x811E0078
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x38810208
+		opword 0x80FE0080
+		opword 0x38A101F0
+		opword 0x90010820
+		opword 0x38C10034
+		opword 0x801E007C
+		opword 0x38600033
+		opword 0xC83E0358
+		opword 0xC8010820
+		opword 0x90010200
+		opword 0xEC000828
+		lwz r12, dat_8041bdb4(r2)
+		opword 0x817E0084
+		opword 0x815E0088
+		opword 0xD0010200
+		opword 0x813E008C
+		opword 0x80010200
+		opword 0x91810034
+		opword 0x916101F0
+		opword 0x914101F4
+		opword 0x912101F8
+		opword 0x910101FC
+		opword 0x90E10204
+		opword 0x91010208
+		opword 0x9001020C
+		opword 0x90E10210
+		bl winTexSet
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		opword 0x20170036
+		opword 0x813E0090
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x9061081C
+		opword 0x38780015
+		opword 0x811E0098
+		opword 0x38A101E4
+		opword 0x90010818
+		opword 0x38C101CC
+		opword 0x801E0094
+		opword 0x38E10030
+		opword 0xC83E0358
+		opword 0x38800033
+		opword 0xC8010818
+		opword 0x900101DC
+		opword 0xEC000828
+		lwz r20, dat_8041bdb8(r2)
+		opword 0x819E009C
+		opword 0x817E00A0
+		opword 0xD00101DC
+		opword 0x815E00A4
+		opword 0x800101DC
+		opword 0x92810030
+		opword 0x918101CC
+		opword 0x916101D0
+		opword 0x914101D4
+		opword 0x912101D8
+		opword 0x910101E0
+		opword 0x912101E4
+		opword 0x900101E8
+		opword 0x910101EC
+		bl winTexSet_x2
+		opword 0x48000098
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		opword 0x20170032
+		opword 0x813E00A8
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x38780015
+		opword 0x811E00B0
+		opword 0x38A101C0
+		opword 0x90010820
+		opword 0x38C101A8
+		opword 0x801E00AC
+		opword 0x38E1002C
+		opword 0xC83E0358
+		opword 0x38800033
+		opword 0xC8010820
+		opword 0x900101B8
+		opword 0xEC000828
+		lwz r20, dat_8041bdbc(r2)
+		opword 0x819E00B4
+		opword 0x817E00B8
+		opword 0xD00101B8
+		opword 0x815E00BC
+		opword 0x800101B8
+		opword 0x9281002C
+		opword 0x918101A8
+		opword 0x916101AC
+		opword 0x914101B0
+		opword 0x912101B4
+		opword 0x910101BC
+		opword 0x912101C0
+		opword 0x900101C4
+		opword 0x910101C8
+		bl winTexSet_x2
+		opword 0x3B180001
+		opword 0x3AF70032
+		opword 0x2C180003
+		opword 0x4180FE24
+		lwz r3, wp(r13)
+		opword 0x80030018
+		opword 0x2C0000C8
+		opword 0x418002B4
+		opword 0x2C00012C
+		opword 0x408002AC
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		lwz r12, dat_8041bdc0(r2)
+		opword 0x3881019C
+		opword 0x817E00CC
+		opword 0x38A10190
+		opword 0x815E00D0
+		opword 0x38C10028
+		opword 0x813E00D4
+		opword 0x3860000F
+		opword 0x811E00C0
+		opword 0x80FE00C4
+		opword 0x801E00C8
+		opword 0x91810028
+		opword 0x91610190
+		opword 0x91410194
+		opword 0x91210198
+		opword 0x9101019C
+		opword 0x90E101A0
+		opword 0x900101A4
+		bl winTexSet
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		lwz r20, dat_8041bdc4(r2)
+		opword 0x38A10184
+		opword 0x819E00E4
+		opword 0x38C10178
+		opword 0x817E00E8
+		opword 0x38E10024
+		opword 0x815E00EC
+		opword 0x38600014
+		opword 0x813E00D8
+		opword 0x3880001F
+		opword 0x811E00DC
+		opword 0x801E00E0
+		opword 0x92810024
+		opword 0x91810178
+		opword 0x9161017C
+		opword 0x91410180
+		opword 0x91210184
+		opword 0x91010188
+		opword 0x9001018C
+		bl winTexSet_x2
+		opword 0x3B000000
+		opword 0x7F17C378
+		lwz r3, wp(r13)
+		opword 0x80030028
+		opword 0x7C180000
+		opword 0x40820130
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		opword 0x2017001E
+		opword 0x811E00F0
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x3881016C
+		opword 0x80FE00F8
+		opword 0x38A10154
+		opword 0x90010820
+		opword 0x38C10020
+		opword 0x801E00F4
+		opword 0x38600033
+		opword 0xC83E0358
+		opword 0xC8010820
+		opword 0x90010164
+		opword 0xEC000828
+		lwz r12, dat_8041bdc8(r2)
+		opword 0x817E00FC
+		opword 0x815E0100
+		opword 0xD0010164
+		opword 0x813E0104
+		opword 0x80010164
+		opword 0x91810020
+		opword 0x91610154
+		opword 0x91410158
+		opword 0x9121015C
+		opword 0x91010160
+		opword 0x90E10168
+		opword 0x9101016C
+		opword 0x90010170
+		opword 0x90E10174
+		bl winTexSet
+		lwz r3, wp(r13)
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		opword 0x20170022
+		opword 0x813E0108
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x9061081C
+		opword 0x38780018
+		opword 0x811E0110
+		opword 0x38A10148
+		opword 0x90010818
+		opword 0x38C10130
+		opword 0x801E010C
+		opword 0x38E1001C
+		opword 0xC83E0358
+		opword 0x38800033
+		opword 0xC8010818
+		opword 0x90010140
+		opword 0xEC000828
+		lwz r20, dat_8041bdcc(r2)
+		opword 0x819E0114
+		opword 0x817E0118
+		opword 0xD0010140
+		opword 0x815E011C
+		opword 0x80010140
+		opword 0x9281001C
+		opword 0x91810130
+		opword 0x91610134
+		opword 0x91410138
+		opword 0x9121013C
+		opword 0x91010144
+		opword 0x91210148
+		opword 0x9001014C
+		opword 0x91010150
+		bl winTexSet_x2
+		opword 0x48000098
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit_x2
+		opword 0x2017001E
+		opword 0x813E0120
+		opword 0x6C038000
+		opword 0x3C004330
+		opword 0x90610824
+		opword 0x38780018
+		opword 0x811E0128
+		opword 0x38A10124
+		opword 0x90010820
+		opword 0x38C1010C
+		opword 0x801E0124
+		opword 0x38E10018
+		opword 0xC83E0358
+		opword 0x38800033
+		opword 0xC8010820
+		opword 0x9001011C
+		opword 0xEC000828
+		lwz r20, dat_8041bdd0(r2)
+		opword 0x819E012C
+		opword 0x817E0130
+		opword 0xD001011C
+		opword 0x815E0134
+		opword 0x8001011C
+		opword 0x92810018
+		opword 0x9181010C
+		opword 0x91610110
+		opword 0x91410114
+		opword 0x91210118
+		opword 0x91010120
+		opword 0x91210124
+		opword 0x90010128
+		opword 0x9101012C
+		bl winTexSet_x2
+		opword 0x3B180001
+		opword 0x3AF70032
+		opword 0x2C180002
+		opword 0x4180FE24
+		lwz r4, wp(r13)
+		opword 0x80040018
+		opword 0x2C000033
+		opword 0x408202A4
+		opword 0x80040034
+		opword 0x2C000004
+		opword 0x40800298
+		opword 0x837E0138
+		opword 0x5400103A
+		opword 0x835E013C
+		opword 0x386103F4
+		opword 0x833E0140
+		opword 0x831E0144
+		opword 0x82FE0148
+		opword 0x82DE014C
+		opword 0x82BE0150
+		opword 0x829E0154
+		opword 0x819E0158
+		opword 0x817E015C
+		opword 0x815E0160
+		opword 0x813E0164
+		opword 0x811E0168
+		opword 0x80FE016C
+		opword 0x80DE0170
+		opword 0x80BE0174
+		opword 0x80840030
+		opword 0x936103F4
+		opword 0x54842036
+		opword 0xC85E0348
+		opword 0x934103F8
+		opword 0x7C040214
+		opword 0x932103FC
+		opword 0x93010400
+		opword 0x92E10404
+		opword 0x92C10408
+		opword 0x92A1040C
+		opword 0x92810410
+		opword 0x91810414
+		opword 0x91610418
+		opword 0x9141041C
+		opword 0x91210420
+		opword 0x91010424
+		opword 0x90E10428
+		opword 0x90C1042C
+		opword 0x90A10430
+		opword 0x7C23042E
+		bl fmod
+		opword 0xFC000818
+		lfs f3, float_0_8041bde4(r2)
+		opword 0xFC001800
+		opword 0x408200A8
+		lwz r3, wp(r13)
+		opword 0x3CA04330
+		opword 0x90A10818
+		opword 0x80030030
+		opword 0x80630034
+		opword 0x54070FFE
+		opword 0x540607FE
+		opword 0x7C870214
+		opword 0x54600FFE
+		opword 0x7C840E70
+		opword 0x7CC63A78
+		opword 0x7C001A14
+		opword 0x90A10810
+		opword 0x7C000E70
+		opword 0x6C838000
+		opword 0x6C008000
+		opword 0x9061081C
+		opword 0x7C673050
+		opword 0xC85E0358
+		opword 0x90010814
+		opword 0x6C608000
+		opword 0xC8210818
+		opword 0xC8010810
+		opword 0x90010824
+		opword 0xEC811028
+		opword 0xEC001028
+		opword 0x90A10820
+		opword 0xC8210820
+		opword 0xFC040000
+		opword 0xEC411028
+		opword 0x40820018
+		lfs f1, float_140_8041be60(r2)
+		opword 0xFFA01890
+		lfs f0, float_120_8041be5c(r2)
+		opword 0xEFC1013C
+		opword 0x48000020
+		lfs f1, float_300_8041be68(r2)
+		lfs f0, float_neg150_8041be64(r2)
+		lfs f30, float_50_8041be6c(r2)
+		opword 0xEFA100BA
+		opword 0x4800000C
+		opword 0xFFA01890
+		lfs f30, float_50_8041be6c(r2)
+		lwz r3, wp(r13)
+		lfs f0, float_40_8041be14(r2)
+		opword 0x80630004
+		opword 0xEFDE0028
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		lfs f0, float_2_8041be70(r2)
+		opword 0x38E103F4
+		opword 0x807E0178
+		opword 0x38810100
+		opword 0x801E017C
+		opword 0xEC20E82A
+		opword 0x906100F4
+		opword 0xEC1E0028
+		opword 0x813E0180
+		opword 0x38A100E8
+		opword 0x900100F8
+		lwz r20, dat_8041bdd4(r2)
+		opword 0x38C10014
+		opword 0xD02100F4
+		opword 0x3860001D
+		opword 0x819E0184
+		opword 0xD00100F8
+		opword 0x817E0188
+		opword 0x815E018C
+		opword 0x810100F4
+		opword 0x800100F8
+		opword 0x92810014
+		lwz r20, wp(r13)
+		opword 0x918100E8
+		opword 0x916100EC
+		opword 0x914100F0
+		opword 0x91010100
+		opword 0x90010104
+		opword 0x91210108
+		opword 0x81140030
+		opword 0x80140034
+		opword 0x55082036
+		opword 0x912100FC
+		opword 0x5400103A
+		opword 0x7C080214
+		opword 0x7C27042E
+		bl winTexSetRot
+		opword 0x807E0190
+		opword 0x38E103F4
+		opword 0x801E0194
+		opword 0x388100DC
+		opword 0x906100D0
+		opword 0x38A100C4
+		opword 0x813E0198
+		opword 0x38C10010
+		opword 0x900100D4
+		opword 0x3860001D
+		opword 0x82810078
+		opword 0xD3A100D0
+		opword 0x819E019C
+		opword 0xD3C100D4
+		opword 0x817E01A0
+		opword 0x815E01A4
+		opword 0x810100D0
+		opword 0x800100D4
+		opword 0x92810010
+		lwz r20, wp(r13)
+		opword 0x918100C4
+		opword 0x916100C8
+		opword 0x914100CC
+		opword 0x910100DC
+		opword 0x900100E0
+		opword 0x912100E4
+		opword 0x81140030
+		opword 0x80140034
+		opword 0x55082036
+		opword 0x912100D8
+		opword 0x5400103A
+		opword 0x7C080214
+		opword 0x7C27042E
+		bl winTexSetRot
+		lwz r3, wp(r13)
+		opword 0xA0030000
+		opword 0x54000673
+		opword 0x40820108
+		opword 0x80630004
+		opword 0x806300A0
+		opword 0x80630000
+		bl winTexInit
+		lwz r0, dat_8041bdd8(r2)
+		opword 0x388100B8
+		opword 0x815E01B4
+		opword 0x38A100A0
+		opword 0x813E01B8
+		opword 0x38C1000C
+		opword 0x811E01BC
+		opword 0x38600000
+		opword 0x9001000C
+		opword 0x80FE01A8
+		opword 0x801E01AC
+		opword 0x914100A0
+		lwz r10, wp(r13)
+		opword 0x912100A4
+		lfs f2, float_2_8041be70(r2)
+		opword 0x910100A8
+		opword 0x811E01B0
+		opword 0xC02A0008
+		opword 0xC00A000C
+		opword 0xEC22082A
+		opword 0x90E100AC
+		opword 0xEC001028
+		opword 0x900100B0
+		opword 0xD02100AC
+		opword 0xD00100B0
+		opword 0x80E100AC
+		opword 0x800100B0
+		opword 0x910100B4
+		opword 0x90E100B8
+		opword 0x900100BC
+		opword 0x910100C0
+		bl winTexSet
+		opword 0x81010078
+		opword 0x38810094
+		opword 0x817E01CC
+		opword 0x38A1007C
+		opword 0x815E01D0
+		opword 0x38C10008
+		opword 0x813E01D4
+		opword 0x38600000
+		opword 0x80FE01C0
+		opword 0x801E01C4
+		opword 0x91010008
+		lwz r12, wp(r13)
+		opword 0x811E01C8
+		opword 0x9161007C
+		opword 0x91410080
+		opword 0x91210084
+		opword 0x90E10088
+		opword 0xC02C0008
+		opword 0xC00C000C
+		opword 0x9001008C
+		opword 0xD0210088
+		opword 0xD001008C
+		opword 0x80E10088
+		opword 0x8001008C
+		opword 0x91010090
+		opword 0x90E10094
+		opword 0x90010098
+		opword 0x9101009C
+		bl winTexSet
+		opword 0xC021034C
+		opword 0xC0410350
+		opword 0xC0610354
+		opword 0xC0810358
+		opword 0xC0A1035C
+		opword 0xC0C10360
+		bl GXSetViewport
+		opword 0x38610330
+		bl GXSetProjectionv
+		bl camGetCurPtr
+		opword 0x3800004C
+		opword 0x38A3FFFC
+		opword 0x38810594
+		opword 0x7C0903A6
+		opword 0x80640004
+		opword 0x84040008
+		opword 0x90650004
+		opword 0x94050008
+		opword 0x4200FFF0
+	}
+}
+#pragma pop
 #endif
 
 __declspec(section ".sdata") s32 stone_id[7] = {0x197, 0x198, 0x19A, 0x19C, 0x19D, 0x199, 0x19B};
@@ -1136,13 +4375,6 @@ __declspec(section ".sdata") s32 evt_continue[] = {
     0x0002005B, (s32)evt_sub_animgroup_async, (s32)str_802ED870,
     0x00000002, 0x00000001,
 };
-#ifndef NONMATCHING
-extern void strcat(void);
-extern void __mod2u(void);
-extern void __div2u(void);
-extern void __div2i(void);
-extern void winZenkakuStr(void);
-#endif
 #pragma force_active on
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
@@ -1304,6 +4536,348 @@ void continueGame(void) {
             break;
     }
 }
+#else
+// FAKE (asmfake --minimal): target code as opwords; the C above is the NONMATCHING version
+#pragma push
+#pragma optimization_level 0  // lets the prologue scheduler run
+void continueGame(void) {
+	asm {
+		lis r4, vec3_802ed670@ha
+	}
+	asm volatile {
+		addi r31, r4, vec3_802ed670@l
+		lwz r3, wp(r13)
+		opword 0x80630020
+		bl cardCopy2Main
+		lwz r4, wp(r13)
+		lwz r3, gp(r13)
+		opword 0x80040020
+		opword 0x900311D0
+		lwz r4, wp(r13)
+		lwz r3, gp(r13)
+		opword 0x80040020
+		opword 0x900311B8
+		bl marioPartyKill
+		bl marioGetPtr
+		opword 0x38000000
+		opword 0x98030243
+		opword 0x98030244
+		opword 0x38600004
+		bl psndSetFlag
+		lwz r3, gp(r13)
+		opword 0x806311E0
+		bl marioPartyEntry
+		lwz r3, gp(r13)
+		opword 0x806311E4
+		bl marioPartyEntry
+		opword 0x38600004
+		bl psndClearFlag
+		bl countDownSaveReStart
+		lwz r4, gp(r13)
+		opword 0x38600004
+		opword 0x80040000
+		opword 0x60000001
+		opword 0x90040000
+		bl swByteGet
+		opword 0x28030018
+		opword 0x4181049C
+		lis r4, jumptable_8034A058@ha
+		opword 0x5460103A
+		addi r3, r4, jumptable_8034A058@l
+		opword 0x7C03002E
+		opword 0x7C0903A6
+		opword 0x4E800420
+		lwz r4, gp(r13)
+		opword 0x38A00000
+		opword 0x3800001C
+		opword 0x38600003
+		opword 0x90A40110
+		opword 0x38A00000
+		lwz r4, gp(r13)
+		opword 0x90040108
+		lwz r4, gp(r13)
+		opword 0x3884012C
+		bl seqSetSeq
+		opword 0x48000454
+		lwz r3, gp(r13)
+		opword 0x38A0003D
+		opword 0x38000038
+		opword 0x389F0214
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000428
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F021C
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480003FC
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0224
+		opword 0x90A30110
+		opword 0x38BF022C
+		opword 0x38600003
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480003D0
+		lwz r3, gp(r13)
+		opword 0x38A0003D
+		opword 0x38000038
+		opword 0x389F0214
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480003A4
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0238
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000378
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0240
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x4800034C
+		lwz r3, gp(r13)
+		opword 0x38A0003D
+		opword 0x38000038
+		opword 0x389F0214
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000320
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0248
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480002F4
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0250
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480002C8
+		lwz r3, gp(r13)
+		opword 0x38A00000
+		opword 0x3800001C
+		opword 0x389F0258
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x4800029C
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0260
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000270
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0258
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000244
+		lwz r3, gp(r13)
+		opword 0x38A00000
+		opword 0x3800001C
+		opword 0x389F0268
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000218
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0258
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480001EC
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0270
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480001C0
+		lwz r3, gp(r13)
+		opword 0x38A00000
+		opword 0x3800001C
+		opword 0x389F0278
+		opword 0x90A30110
+		opword 0x38600003
+		la r5, str_8041BDDC(r2)
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000194
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0280
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000168
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F0260
+		opword 0x90A30110
+		opword 0x38BF0288
+		opword 0x38600003
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x4800013C
+		lwz r3, gp(r13)
+		opword 0x38A0003E
+		opword 0x3800003A
+		opword 0x389F0298
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x48000110
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F02A0
+		opword 0x90A30110
+		opword 0x38BF02A8
+		opword 0x38600003
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480000E4
+		lwz r3, gp(r13)
+		opword 0x38A0003C
+		opword 0x38000036
+		opword 0x389F02B0
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x480000B8
+		lwz r3, gp(r13)
+		opword 0x38A00000
+		opword 0x3800001C
+		opword 0x389F02B8
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+		opword 0x4800008C
+		bl stg0_00_init
+		lwz r4, wp(r13)
+		lwz r3, gp(r13)
+		opword 0x80040020
+		opword 0x900311D0
+		bl marioPartyKill
+		bl marioGetPtr
+		opword 0x38800000
+		opword 0x38000019
+		opword 0x98830243
+		opword 0x98830244
+		lwz r3, gp(r13)
+		opword 0x90830110
+		lwz r3, gp(r13)
+		opword 0x90030108
+		bl swInit
+		opword 0x38600000
+		opword 0x38800000
+		bl swByteSet
+		opword 0x389F02C0
+		opword 0x38BF02C8
+		opword 0x38600003
+		bl seqSetSeq
+		opword 0x4800002C
+		lwz r3, gp(r13)
+		opword 0x38A0003D
+		opword 0x38000038
+		opword 0x389F0214
+		opword 0x90A30110
+		opword 0x38600003
+		opword 0x38A00000
+		lwz r6, gp(r13)
+		opword 0x90060108
+		bl seqSetSeq
+	}
+}
+#pragma pop
 #endif
 #pragma defer_codegen reset
 
@@ -1337,9 +4911,8 @@ __declspec(section ".data") void* jumptable_8034A058[25] = { (char*)continueGame
 __declspec(section ".data") u32 gap_05_8034A0BC_data[1] = {0};
 
 #ifndef NONMATCHING
-// ASM-STOPGAP: unk_800f2398 (and the functions before it in the target order, see asm_inline.py) are the
-// target code until the C in the NONMATCHING branch matches.
-// clang-format off
+// literal pool in target order (asmfake --minimal)
+#pragma force_active on
 __declspec(section ".sdata2") const u32 dat_8041bd68 = 0x000000FF;
 __declspec(section ".sdata2") const u32 dat_8041bd6c = 0x000000FF;
 __declspec(section ".sdata2") const u32 dat_8041bd70 = 0x000000FF;
@@ -1410,3750 +4983,4 @@ __declspec(section ".sdata2") const f32 float_4_8041be78 = 4.0f;
 __declspec(section ".sdata2") const f32 float_0p25_8041be7c = 0.25f;
 __declspec(section ".sdata2") const f32 float_0p125_8041be80 = 0.125f;
 __declspec(section ".sdata2") const f32 float_1000_8041be84 = 1000.0f;
-
-asm void continueGame(void) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	lis r4, vec3_802ed670@ha
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	addi r31, r4, vec3_802ed670@l
-	lwz r3, wp(r13)
-	lwz r3, 0x20(r3)
-	bl cardCopy2Main
-	lwz r4, wp(r13)
-	lwz r3, gp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x11d0(r3)
-	lwz r4, wp(r13)
-	lwz r3, gp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x11b8(r3)
-	bl marioPartyKill
-	bl marioGetPtr
-	li r0, 0x0
-	stb r0, 0x243(r3)
-	stb r0, 0x244(r3)
-	li r3, 0x4
-	bl psndSetFlag
-	lwz r3, gp(r13)
-	lwz r3, 0x11e0(r3)
-	bl marioPartyEntry
-	lwz r3, gp(r13)
-	lwz r3, 0x11e4(r3)
-	bl marioPartyEntry
-	li r3, 0x4
-	bl psndClearFlag
-	bl countDownSaveReStart
-	lwz r4, gp(r13)
-	li r3, 0x4
-	lwz r0, 0x0(r4)
-	ori r0, r0, 0x1
-	stw r0, 0x0(r4)
-	bl swByteGet
-	cmplwi r3, 0x18
-	bgt @1
-	lis r4, jumptable_8034A058@ha
-	slwi r0, r3, 2
-	addi r3, r4, jumptable_8034A058@l
-	lwzx r0, r3, r0
-	mtctr r0
-	bctr
-	@2:
-	lwz r4, gp(r13)
-	li r5, 0x0
-	li r0, 0x1c
-	li r3, 0x3
-	stw r5, 0x110(r4)
-	li r5, 0x0
-	lwz r4, gp(r13)
-	stw r0, 0x108(r4)
-	lwz r4, gp(r13)
-	addi r4, r4, 0x12c
-	bl seqSetSeq
-	b @1
-	@3:
-	lwz r3, gp(r13)
-	li r5, 0x3d
-	li r0, 0x38
-	addi r4, r31, 0x214
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@4:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x21c
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@5:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x224
-	stw r5, 0x110(r3)
-	addi r5, r31, 0x22c
-	li r3, 0x3
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@6:
-	lwz r3, gp(r13)
-	li r5, 0x3d
-	li r0, 0x38
-	addi r4, r31, 0x214
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@7:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x238
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@8:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x240
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@9:
-	lwz r3, gp(r13)
-	li r5, 0x3d
-	li r0, 0x38
-	addi r4, r31, 0x214
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@10:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x248
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@11:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x250
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@12:
-	lwz r3, gp(r13)
-	li r5, 0x0
-	li r0, 0x1c
-	addi r4, r31, 0x258
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@13:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x260
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@14:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x258
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@15:
-	lwz r3, gp(r13)
-	li r5, 0x0
-	li r0, 0x1c
-	addi r4, r31, 0x268
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@16:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x258
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@17:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x270
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@18:
-	lwz r3, gp(r13)
-	li r5, 0x0
-	li r0, 0x1c
-	addi r4, r31, 0x278
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	la r5, str_8041BDDC(r2)
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@19:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x280
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@20:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x260
-	stw r5, 0x110(r3)
-	addi r5, r31, 0x288
-	li r3, 0x3
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@21:
-	lwz r3, gp(r13)
-	li r5, 0x3e
-	li r0, 0x3a
-	addi r4, r31, 0x298
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@22:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x2a0
-	stw r5, 0x110(r3)
-	addi r5, r31, 0x2a8
-	li r3, 0x3
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@23:
-	lwz r3, gp(r13)
-	li r5, 0x3c
-	li r0, 0x36
-	addi r4, r31, 0x2b0
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@24:
-	lwz r3, gp(r13)
-	li r5, 0x0
-	li r0, 0x1c
-	addi r4, r31, 0x2b8
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	b @1
-	@25:
-	bl stg0_00_init
-	lwz r4, wp(r13)
-	lwz r3, gp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x11d0(r3)
-	bl marioPartyKill
-	bl marioGetPtr
-	li r4, 0x0
-	li r0, 0x19
-	stb r4, 0x243(r3)
-	stb r4, 0x244(r3)
-	lwz r3, gp(r13)
-	stw r4, 0x110(r3)
-	lwz r3, gp(r13)
-	stw r0, 0x108(r3)
-	bl swInit
-	li r3, 0x0
-	li r4, 0x0
-	bl swByteSet
-	addi r4, r31, 0x2c0
-	addi r5, r31, 0x2c8
-	li r3, 0x3
-	bl seqSetSeq
-	b @1
-	@26:
-	lwz r3, gp(r13)
-	li r5, 0x3d
-	li r0, 0x38
-	addi r4, r31, 0x214
-	stw r5, 0x110(r3)
-	li r3, 0x3
-	li r5, 0x0
-	lwz r6, gp(r13)
-	stw r0, 0x108(r6)
-	bl seqSetSeq
-	@1:
-	lwz r0, 0x14(r1)
-	lwz r31, 0xc(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void loadDraw(CameraId camera, void* param) {
-	nofralloc
-	stwu r1, -0x890(r1)
-	mflr r0
-	stw r0, 0x894(r1)
-	stfd f31, 0x880(r1)
-	psq_st f31, -0x778(r1), 0, 0
-	stfd f30, 0x870(r1)
-	psq_st f30, -0x788(r1), 0, 0
-	stfd f29, 0x860(r1)
-	psq_st f29, -0x798(r1), 0, 0
-	stmw r20, 0x830(r1)
-	lis r4, vec3_802ed670@ha
-	li r3, 0x8
-	addi r30, r4, vec3_802ed670@l
-	bl camGetPtr
-	lwz r4, dat_8041bd84(r2)
-	mr r25, r3
-	lwz r0, dat_8041bd88(r2)
-	stw r4, 0x78(r1)
-	lwz r3, wp(r13)
-	stw r0, 0x74(r1)
-	lwz r0, dat_8041bd8c(r2)
-	lwz r3, 0x18(r3)
-	stw r0, 0x70(r1)
-	cmpwi r3, 0x20
-	blt @1
-	cmpwi r3, 0x28
-	blt @2
-	@1:
-	addi r3, r1, 0x34c
-	bl GXGetViewportv
-	addi r3, r1, 0x330
-	bl GXGetProjectionv
-	lwz r4, 0x19c(r25)
-	addi r3, r25, 0x15c
-	bl GXSetProjection
-	bl camGetCurPtr
-	li r0, 0x4c
-	addi r5, r1, 0x594
-	subi r4, r3, 0x4
-	mtctr r0
-	@3:
-	lwz r3, 0x4(r4)
-	lwzu r0, 0x8(r4)
-	stw r3, 0x4(r5)
-	stwu r0, 0x8(r5)
-	bdnz @3
-	bl camGetCurPtr
-	li r0, 0x4c
-	subi r5, r3, 0x4
-	subi r4, r25, 0x4
-	mtctr r0
-	@4:
-	lwz r3, 0x4(r4)
-	lwzu r0, 0x8(r4)
-	stw r3, 0x4(r5)
-	stwu r0, 0x8(r5)
-	bdnz @4
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x0
-	li r6, 0x0
-	bl GXSetBlendMode
-	li r3, 0x0
-	bl GXSetZCompLoc
-	li r3, 0x6
-	li r4, 0x80
-	li r5, 0x1
-	li r6, 0x0
-	li r7, 0x0
-	bl GXSetAlphaCompare
-	li r3, 0x0
-	li r4, 0x7
-	li r5, 0x0
-	bl GXSetZMode
-	lfs f1, float_0_8041bde4(r2)
-	addi r4, r1, 0x68
-	lwz r0, dat_8041bd90(r2)
-	li r3, 0x0
-	fmr f2, f1
-	fmr f3, f1
-	stw r0, 0x68(r1)
-	fmr f4, f1
-	bl GXSetFog
-	li r3, 0x0
-	bl GXSetNumChans
-	li r3, 0x4
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	li r7, 0x0
-	li r8, 0x0
-	li r9, 0x2
-	bl GXSetChanCtrl
-	li r3, 0x1
-	bl GXSetNumTevStages
-	li r3, 0x0
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0xff
-	bl GXSetTevOrder
-	li r3, 0x0
-	li r4, 0x3
-	bl GXSetTevOp
-	li r3, 0x0
-	bl GXSetCullMode
-	bl GXClearVtxDesc
-	li r3, 0x9
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0xd
-	li r4, 0x1
-	bl GXSetVtxDesc
-	li r3, 0x0
-	li r4, 0x9
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	li r3, 0x0
-	li r4, 0xd
-	li r5, 0x1
-	li r6, 0x4
-	li r7, 0x0
-	bl GXSetVtxAttrFmt
-	addi r3, r25, 0x11c
-	li r4, 0x0
-	bl GXLoadPosMtxImm
-	li r3, 0x0
-	bl GXSetCurrentMtx
-	lwz r3, wp(r13)
-	addi r4, r1, 0x2f0
-	li r5, 0x35
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl TEXGetGXTexObjFromPalette
-	lfs f1, float_0_8041bde4(r2)
-	addi r3, r1, 0x2f0
-	li r4, 0x1
-	li r5, 0x1
-	fmr f2, f1
-	li r6, 0x0
-	fmr f3, f1
-	li r7, 0x0
-	li r8, 0x0
-	bl GXInitTexObjLOD
-	addi r3, r1, 0x2f0
-	li r4, 0x0
-	bl GXLoadTexObj
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	lfd f1, 0x2d8(r30)
-	addi r3, r1, 0x2f0
-	lfd f0, 0x2e0(r30)
-	fabs f30, f1
-	fabs f31, f0
-	bl GXGetTexObjHeight
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x7fc(r1)
-	frsp f0, f30
-	lfd f2, 0x350(r30)
-	addi r3, r1, 0x2f0
-	stw r0, 0x7f8(r1)
-	lfd f1, 0x7f8(r1)
-	fsubs f1, f1, f2
-	fdivs f30, f0, f1
-	bl GXGetTexObjWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x804(r1)
-	frsp f0, f31
-	lfd f4, 0x350(r30)
-	fmr f2, f30
-	stw r0, 0x800(r1)
-	addi r3, r1, 0x3c4
-	lfs f3, float_1_8041bde8(r2)
-	lfd f1, 0x800(r1)
-	fsubs f1, f1, f4
-	fdivs f1, f0, f1
-	bl PSMTXScale
-	addi r3, r1, 0x3c4
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	bl GXBegin
-	lfs f0, float_neg304_8041bdec(r2)
-	lis r3, 0xcc01
-	addi r4, r1, 0x2d0
-	li r5, 0x34
-	stfs f0, -0x8000(r3)
-	lfs f0, float_240_8041bdf0(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg304_8041bdec(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg272_8041bdf8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg272_8041bdf8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_240_8041bdf0(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl TEXGetGXTexObjFromPalette
-	lfs f1, float_0_8041bde4(r2)
-	addi r3, r1, 0x2d0
-	li r4, 0x1
-	li r5, 0x1
-	fmr f2, f1
-	li r6, 0x0
-	fmr f3, f1
-	li r7, 0x0
-	li r8, 0x0
-	bl GXInitTexObjLOD
-	addi r3, r1, 0x2d0
-	li r4, 0x0
-	bl GXLoadTexObj
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	lfd f1, 0x2d8(r30)
-	addi r3, r1, 0x2d0
-	lfd f0, 0x2e8(r30)
-	fabs f30, f1
-	fabs f31, f0
-	bl GXGetTexObjHeight
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x80c(r1)
-	frsp f0, f30
-	lfd f2, 0x350(r30)
-	addi r3, r1, 0x2d0
-	stw r0, 0x808(r1)
-	lfd f1, 0x808(r1)
-	fsubs f1, f1, f2
-	fdivs f30, f0, f1
-	bl GXGetTexObjWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x814(r1)
-	frsp f0, f31
-	lfd f4, 0x350(r30)
-	fmr f2, f30
-	stw r0, 0x810(r1)
-	addi r3, r1, 0x394
-	lfs f3, float_1_8041bde8(r2)
-	lfd f1, 0x810(r1)
-	fsubs f1, f1, f4
-	fdivs f1, f0, f1
-	bl PSMTXScale
-	addi r3, r1, 0x394
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	bl GXBegin
-	lfs f0, float_neg272_8041bdf8(r2)
-	lis r3, 0xcc01
-	addi r4, r1, 0x2b0
-	li r5, 0x36
-	stfs f0, -0x8000(r3)
-	lfs f0, float_240_8041bdf0(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg272_8041bdf8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_272_8041bdfc(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_272_8041bdfc(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_240_8041bdf0(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r3)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r3)
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl TEXGetGXTexObjFromPalette
-	lfs f1, float_0_8041bde4(r2)
-	addi r3, r1, 0x2b0
-	li r4, 0x1
-	li r5, 0x1
-	fmr f2, f1
-	li r6, 0x0
-	fmr f3, f1
-	li r7, 0x0
-	li r8, 0x0
-	bl GXInitTexObjLOD
-	addi r3, r1, 0x2b0
-	li r4, 0x0
-	bl GXLoadTexObj
-	li r3, 0x1
-	bl GXSetNumTexGens
-	li r3, 0x0
-	li r4, 0x1
-	li r5, 0x4
-	li r6, 0x1e
-	li r7, 0x0
-	li r8, 0x7d
-	bl GXSetTexCoordGen2
-	lfd f1, 0x2d8(r30)
-	addi r3, r1, 0x2b0
-	lfd f0, 0x2e0(r30)
-	fabs f30, f1
-	fabs f31, f0
-	bl GXGetTexObjHeight
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x81c(r1)
-	frsp f0, f30
-	lfd f2, 0x350(r30)
-	addi r3, r1, 0x2b0
-	stw r0, 0x818(r1)
-	lfd f1, 0x818(r1)
-	fsubs f1, f1, f2
-	fdivs f30, f0, f1
-	bl GXGetTexObjWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	frsp f0, f31
-	lfd f4, 0x350(r30)
-	fmr f2, f30
-	stw r0, 0x820(r1)
-	addi r3, r1, 0x364
-	lfs f3, float_1_8041bde8(r2)
-	lfd f1, 0x820(r1)
-	fsubs f1, f1, f4
-	fdivs f1, f0, f1
-	bl PSMTXScale
-	addi r3, r1, 0x364
-	li r4, 0x1e
-	li r5, 0x1
-	bl GXLoadTexMtxImm
-	li r3, 0x80
-	li r4, 0x0
-	li r5, 0x4
-	bl GXBegin
-	lfs f0, float_272_8041bdfc(r2)
-	lis r4, 0xcc01
-	lis r3, win_dt@ha
-	li r23, 0x0
-	stfs f0, -0x8000(r4)
-	addi r28, r3, win_dt@l
-	lfs f0, float_240_8041bdf0(r2)
-	mr r25, r28
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_272_8041bdfc(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_304_8041be00(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_neg240_8041bdf4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_304_8041be00(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_240_8041bdf0(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_1_8041bde8(r2)
-	stfs f0, -0x8000(r4)
-	lfs f0, float_0_8041bde4(r2)
-	stfs f0, -0x8000(r4)
-	@5:
-	lwz r4, wp(r13)
-	lwz r3, 0x74(r1)
-	lwz r0, 0x20(r4)
-	stw r3, 0x6c(r1)
-	cmpw r23, r0
-	bne @6
-	lwz r0, 0x78(r1)
-	stw r0, 0x6c(r1)
-	@6:
-	lwz r0, 0x18(r4)
-	cmpwi r0, 0x33
-	bne @7
-	lwz r0, 0x30(r4)
-	cmpw r23, r0
-	beq @8
-	lwz r0, 0x34(r4)
-	cmpw r23, r0
-	bne @7
-	@8:
-	lwz r0, 0x78(r1)
-	stw r0, 0x6c(r1)
-	@7:
-	cmpwi r23, 0x4
-	bne @9
-	lhz r0, 0x0(r4)
-	rlwinm. r0, r0, 0, 27, 27
-	beq @9
-	lwz r0, 0x70(r1)
-	stw r0, 0x6c(r1)
-	@9:
-	cmpwi r23, 0x5
-	bne @10
-	lhz r0, 0x0(r4)
-	rlwinm. r0, r0, 0, 26, 26
-	beq @10
-	lwz r0, 0x70(r1)
-	stw r0, 0x6c(r1)
-	@10:
-	lwz r0, 0x10(r25)
-	cmpwi r0, 0xe
-	bge @11
-	cmpwi r0, 0xa
-	bge @12
-	b @11
-	@12:
-	lwz r3, wp(r13)
-	li r0, 0xfe
-	stb r0, 0x6f(r1)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lwz r3, 0x0(r30)
-	addi r4, r1, 0x2a4
-	lwz r0, 0x4(r30)
-	addi r5, r1, 0x28c
-	stw r3, 0x298(r1)
-	addi r6, r1, 0x64
-	lfs f1, 0x0(r25)
-	li r3, 0xe
-	stw r0, 0x29c(r1)
-	lfs f0, 0x4(r25)
-	lwz r8, 0x8(r30)
-	stfs f1, 0x298(r1)
-	lwz r12, 0x6c(r1)
-	stfs f0, 0x29c(r1)
-	lwz r11, 0xc(r30)
-	lwz r10, 0x10(r30)
-	lwz r9, 0x14(r30)
-	lwz r7, 0x298(r1)
-	lwz r0, 0x29c(r1)
-	stw r12, 0x64(r1)
-	stw r11, 0x28c(r1)
-	stw r10, 0x290(r1)
-	stw r9, 0x294(r1)
-	stw r8, 0x2a0(r1)
-	stw r7, 0x2a4(r1)
-	stw r0, 0x2a8(r1)
-	stw r8, 0x2ac(r1)
-	bl winTexSet
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lfs f1, float_60_8041be04(r2)
-	addi r4, r1, 0x280
-	lfs f0, 0x4(r25)
-	addi r5, r1, 0x268
-	lwz r3, 0x18(r30)
-	addi r6, r1, 0x60
-	lwz r0, 0x1c(r30)
-	fadds f0, f1, f0
-	stw r3, 0x274(r1)
-	lfs f1, 0x0(r25)
-	stw r0, 0x278(r1)
-	lwz r8, 0x20(r30)
-	stfs f1, 0x274(r1)
-	lwz r3, 0x6c(r1)
-	stfs f0, 0x278(r1)
-	lwz r11, 0x24(r30)
-	lwz r10, 0x28(r30)
-	lwz r9, 0x2c(r30)
-	lwz r7, 0x274(r1)
-	lwz r0, 0x278(r1)
-	stw r3, 0x60(r1)
-	lwz r3, 0x10(r25)
-	stw r11, 0x268(r1)
-	stw r10, 0x26c(r1)
-	stw r9, 0x270(r1)
-	stw r8, 0x27c(r1)
-	stw r7, 0x280(r1)
-	stw r0, 0x284(r1)
-	stw r8, 0x288(r1)
-	bl winTexSet
-	b @13
-	@11:
-	lwz r3, 0x4(r4)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	lwz r3, 0x30(r30)
-	addi r5, r1, 0x25c
-	lwz r0, 0x34(r30)
-	addi r6, r1, 0x244
-	stw r3, 0x250(r1)
-	addi r7, r1, 0x5c
-	lfs f1, 0x0(r25)
-	stw r0, 0x254(r1)
-	lfs f0, 0x4(r25)
-	lwz r9, 0x38(r30)
-	stfs f1, 0x250(r1)
-	lwz r3, 0x6c(r1)
-	stfs f0, 0x254(r1)
-	lwz r4, 0x3c(r30)
-	lwz r11, 0x40(r30)
-	lwz r10, 0x44(r30)
-	lwz r8, 0x250(r1)
-	lwz r0, 0x254(r1)
-	stw r3, 0x5c(r1)
-	lwz r3, 0x10(r25)
-	stw r4, 0x244(r1)
-	lwz r4, 0x14(r25)
-	stw r11, 0x248(r1)
-	stw r10, 0x24c(r1)
-	stw r9, 0x258(r1)
-	stw r8, 0x25c(r1)
-	stw r0, 0x260(r1)
-	stw r9, 0x264(r1)
-	bl winTexSet_x2
-	@13:
-	addi r23, r23, 0x1
-	addi r25, r25, 0x1c
-	cmpwi r23, 0x9
-	blt @5
-	lwz r0, dat_8041bd94(r2)
-	addi r4, r1, 0x58
-	lfs f1, float_neg250_8041be08(r2)
-	li r3, 0x0
-	stw r0, 0x58(r1)
-	lfs f2, float_200_8041be0c(r2)
-	lfs f3, float_500_8041be10(r2)
-	lfs f4, float_40_8041be14(r2)
-	lfs f5, float_20_8041be18(r2)
-	bl windowDispGX_Waku_col
-	bl FontDrawStart
-	lwz r3, wp(r13)
-	lwz r20, 0x38(r3)
-	mr r3, r20
-	bl FontGetMessageWidth
-	clrlwi r0, r3, 16
-	mr r5, r20
-	neg r3, r0
-	li r4, 0xc0
-	srwi r0, r3, 31
-	add r0, r0, r3
-	srawi r3, r0, 1
-	bl FontDrawMessage
-	li r27, 0x0
-	lfs f30, float_100_8041be20(r2)
-	lfs f31, float_84_8041be24(r2)
-	mr r29, r27
-	@14:
-	bl cardGetFilePtr
-	addi r4, r29, 0x2000
-	add r4, r3, r4
-	lhz r22, 0x0(r4)
-	addi r25, r4, 0x11c4
-	lha r23, 0x146a(r4)
-	lwz r24, 0x28(r4)
-	lwz r21, 0x2c(r4)
-	lhz r26, 0x146c(r4)
-	lwz r20, 0x17c(r4)
-	bl FontDrawStart
-	lwz r0, dat_8041bd98(r2)
-	addi r3, r1, 0x54
-	stw r0, 0x54(r1)
-	bl FontDrawColor
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r27, r0
-	bne @15
-	lwz r0, dat_8041bd9c(r2)
-	addi r3, r1, 0x50
-	stw r0, 0x50(r1)
-	bl FontDrawColor
-	@15:
-	lfs f1, float_0p6_8041be1c(r2)
-	bl FontDrawScale
-	bl FontDrawEdge
-	addi r3, r27, 0x1
-	bl winZenkakuStr
-	mr r5, r3
-	addi r3, r1, 0x310
-	addi r4, r30, 0x2f0
-	crclr 6
-	bl sprintf
-	lfs f1, 0x0(r28)
-	addi r3, r1, 0x310
-	lfs f0, 0x4(r28)
-	fsubs f1, f1, f30
-	fadds f2, f31, f0
-	bl FontDrawString
-	bl FontDrawEdgeOff
-	lfs f1, float_1_8041bde8(r2)
-	bl FontDrawScale
-	lwz r0, dat_8041bda0(r2)
-	addi r3, r1, 0x4c
-	stw r0, 0x4c(r1)
-	bl FontDrawColor
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r27, r0
-	bne @16
-	lwz r0, dat_8041bda4(r2)
-	addi r3, r1, 0x48
-	stw r0, 0x48(r1)
-	bl FontDrawColor
-	@16:
-	rlwinm. r0, r22, 0, 30, 30
-	beq @17
-	addi r20, r30, 0x2fc
-	mr r3, r20
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	mr r3, r20
-	lfd f2, 0x350(r30)
-	stw r0, 0x820(r1)
-	lfs f3, float_0p5_8041be28(r2)
-	lfd f0, 0x820(r1)
-	lfs f1, 0x0(r28)
-	fsubs f4, f0, f2
-	lfs f2, float_12_8041be2c(r2)
-	lfs f0, 0x4(r28)
-	fnmsubs f1, f4, f3, f1
-	fadds f2, f2, f0
-	bl FontDrawString
-	b @18
-	@17:
-	clrlwi. r0, r22, 31
-	beq @19
-	addi r20, r30, 0x30c
-	mr r3, r20
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	mr r3, r20
-	lfd f2, 0x350(r30)
-	stw r0, 0x820(r1)
-	lfs f3, float_0p5_8041be28(r2)
-	lfd f0, 0x820(r1)
-	lfs f1, 0x0(r28)
-	fsubs f4, f0, f2
-	lfs f2, float_12_8041be2c(r2)
-	lfs f0, 0x4(r28)
-	fnmsubs f1, f4, f3, f1
-	fadds f2, f2, f0
-	bl FontDrawString
-	b @18
-	@19:
-	cmpwi r20, 0x0
-	bne @20
-	addi r20, r30, 0x31c
-	mr r3, r20
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	mr r3, r20
-	lfd f2, 0x350(r30)
-	stw r0, 0x820(r1)
-	lfs f3, float_0p5_8041be28(r2)
-	lfd f0, 0x820(r1)
-	lfs f1, 0x0(r28)
-	fsubs f4, f0, f2
-	lfs f2, float_12_8041be2c(r2)
-	lfs f0, 0x4(r28)
-	fnmsubs f1, f4, f3, f1
-	fadds f2, f2, f0
-	bl FontDrawString
-	mr r3, r25
-	bl strlen
-	cmplwi r3, 0x0
-	beq @18
-	mr r3, r25
-	bl FontGetMessageWidth
-	extrwi r3, r3, 15, 16
-	lis r0, 0x4330
-	xoris r3, r3, 0x8000
-	stw r0, 0x820(r1)
-	lfd f2, 0x358(r30)
-	stw r3, 0x824(r1)
-	mr r3, r25
-	lfs f3, 0x0(r28)
-	lfd f0, 0x820(r1)
-	lfs f1, float_70_8041be30(r2)
-	fsubs f4, f0, f2
-	lfs f0, 0x4(r28)
-	fadds f2, f1, f0
-	fsubs f1, f3, f4
-	bl FontDrawString
-	b @18
-	@20:
-	la r3, str_8041BE34(r2)
-	bl FontGetMessageWidth
-	lis r4, 0x8000
-	mr r3, r24
-	lwz r0, 0xf8(r4)
-	mr r4, r21
-	li r5, 0x0
-	srwi r6, r0, 2
-	bl __div2i
-	lis r5, 0x5
-	mr r7, r4
-	addi r0, r5, 0x7e3f
-	li r6, 0x0
-	mr r5, r3
-	subfc r0, r7, r0
-	subfe r0, r5, r6
-	subfe r0, r31, r31
-	neg. r0, r0
-	beq @21
-	li r20, 0x63
-	li r21, 0x3b
-	b @22
-	@21:
-	mr r21, r7
-	mr r20, r5
-	li r5, 0x0
-	li r6, 0xe10
-	bl __div2u
-	mr r3, r20
-	mr r20, r4
-	mr r4, r21
-	li r5, 0x0
-	li r6, 0xe10
-	bl __mod2u
-	li r5, 0x0
-	li r6, 0x3c
-	bl __div2u
-	mr r21, r4
-	@22:
-	mr r3, r25
-	bl strlen
-	cmplwi r3, 0x0
-	beq @23
-	mr r3, r25
-	bl FontGetMessageWidth
-	extrwi r3, r3, 15, 16
-	lis r0, 0x4330
-	xoris r3, r3, 0x8000
-	stw r0, 0x820(r1)
-	lfd f2, 0x358(r30)
-	stw r3, 0x824(r1)
-	mr r3, r25
-	lfs f3, 0x0(r28)
-	lfd f0, 0x820(r1)
-	lfs f1, float_70_8041be30(r2)
-	fsubs f4, f0, f2
-	lfs f0, 0x4(r28)
-	fadds f2, f1, f0
-	fsubs f1, f3, f4
-	bl FontDrawString
-	@23:
-	mr r3, r23
-	bl winZenkakuStr
-	mr r5, r3
-	addi r3, r1, 0x494
-	addi r4, r30, 0x328
-	crclr 6
-	bl sprintf
-	addi r3, r1, 0x494
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r3, r1, 0x494
-	lfd f2, 0x350(r30)
-	stw r0, 0x820(r1)
-	lfs f3, float_0p5_8041be28(r2)
-	lfd f0, 0x820(r1)
-	lfs f1, 0x0(r28)
-	fsubs f4, f0, f2
-	lfs f2, float_30_8041be3c(r2)
-	lfs f0, 0x4(r28)
-	fnmsubs f1, f4, f3, f1
-	fadds f2, f2, f0
-	bl FontDrawString
-	addi r3, r1, 0x494
-	addi r4, r30, 0x334
-	bl strcpy
-	mr r3, r20
-	li r4, 0x2
-	bl unk_8016af5c
-	mr r4, r3
-	addi r3, r1, 0x494
-	bl strcat
-	addi r3, r1, 0x494
-	la r4, str_8041BE40(r2)
-	bl strcat
-	mr r3, r21
-	li r4, 0x2
-	bl unk_8016af5c
-	mr r4, r3
-	addi r3, r1, 0x494
-	bl strcat
-	addi r3, r1, 0x494
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x81c(r1)
-	addi r3, r1, 0x494
-	lfd f3, 0x350(r30)
-	stw r0, 0x818(r1)
-	lfs f0, float_0p5_8041be28(r2)
-	lfd f2, 0x818(r1)
-	lfs f1, 0x0(r28)
-	fsubs f3, f2, f3
-	lfs f2, 0x4(r28)
-	fmuls f29, f3, f0
-	fsubs f1, f1, f29
-	bl FontDrawString
-	addi r3, r1, 0x494
-	addi r4, r30, 0x334
-	bl strcpy
-	mr r3, r20
-	li r4, 0x2
-	bl unk_8016af5c
-	mr r4, r3
-	addi r3, r1, 0x494
-	bl strcat
-	addi r3, r1, 0x494
-	bl FontGetMessageWidth
-	clrlwi r3, r3, 16
-	lis r0, 0x4330
-	stw r3, 0x814(r1)
-	addi r3, r1, 0x464
-	lfs f0, 0x0(r28)
-	stw r0, 0x810(r1)
-	lfd f3, 0x350(r30)
-	fsubs f2, f0, f29
-	lfd f0, 0x810(r1)
-	lfs f1, 0x4(r28)
-	fsubs f3, f0, f3
-	lfs f0, float_22_8041be48(r2)
-	lfs f5, float_8_8041be44(r2)
-	fsubs f0, f1, f0
-	lfs f1, float_1_8041bde8(r2)
-	fadds f4, f3, f2
-	lfs f3, float_0_8041bde4(r2)
-	fadds f2, f1, f0
-	fadds f1, f5, f4
-	bl PSMTXTrans
-	lfs f1, float_1p5_8041be4c(r2)
-	addi r3, r1, 0x434
-	fmr f2, f1
-	fmr f3, f1
-	bl PSMTXScale
-	addi r3, r1, 0x464
-	addi r4, r1, 0x434
-	mr r5, r3
-	bl PSMTXConcat
-	lwz r0, dat_8041bda8(r2)
-	addi r3, r1, 0x464
-	addi r6, r1, 0x44
-	li r4, 0x0
-	stw r0, 0x44(r1)
-	li r5, 0x201
-	bl iconDispGxCol
-	addi r23, r28, 0x4
-	li r22, 0x0
-	li r25, 0x0
-	la r24, stone_id(r13)
-	@24:
-	addi r0, r22, 0x1
-	li r3, 0x1
-	slw r0, r3, r0
-	and. r0, r26, r0
-	beq @25
-	xoris r3, r25, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r3, r1, 0x464
-	lfs f3, 0x0(r28)
-	stw r0, 0x820(r1)
-	lfs f1, float_106_8041be50(r2)
-	lfd f2, 0x358(r30)
-	lfd f0, 0x820(r1)
-	fsubs f5, f3, f1
-	lfs f1, 0x0(r23)
-	fsubs f4, f0, f2
-	lfs f0, float_52_8041be54(r2)
-	lfs f3, float_0_8041bde4(r2)
-	fsubs f2, f1, f0
-	fadds f1, f5, f4
-	bl PSMTXTrans
-	lwz r3, wp(r13)
-	addi r4, r1, 0x74
-	lwz r0, 0x20(r3)
-	cmpw r27, r0
-	bne @26
-	addi r4, r1, 0x78
-	@26:
-	lwz r4, 0x0(r4)
-	addi r3, r1, 0x464
-	lwz r0, 0x0(r24)
-	addi r6, r1, 0x40
-	stw r4, 0x40(r1)
-	li r4, 0x0
-	clrlwi r5, r0, 16
-	bl iconDispGxCol
-	@25:
-	addi r22, r22, 0x1
-	addi r24, r24, 0x4
-	cmpwi r22, 0x7
-	addi r25, r25, 0x20
-	blt @24
-	@18:
-	addi r27, r27, 0x1
-	addi r28, r28, 0x1c
-	cmpwi r27, 0x4
-	addi r29, r29, 0x4000
-	blt @14
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	clrlwi. r0, r0, 31
-	beq @27
-	lfs f1, 0x2c(r3)
-	lfs f0, float_0p05_8041be58(r2)
-	fadds f0, f1, f0
-	stfs f0, 0x2c(r3)
-	b @28
-	@27:
-	lfs f1, 0x2c(r3)
-	lfs f0, float_0p05_8041be58(r2)
-	fsubs f0, f1, f0
-	stfs f0, 0x2c(r3)
-	@28:
-	lwz r3, wp(r13)
-	lfs f0, float_0_8041bde4(r2)
-	lfs f1, 0x2c(r3)
-	fcmpo cr0, f1, f0
-	bge @29
-	stfs f0, 0x2c(r3)
-	@29:
-	lwz r3, wp(r13)
-	lfs f0, float_1_8041bde8(r2)
-	lfs f1, 0x2c(r3)
-	fcmpo cr0, f1, f0
-	ble @30
-	stfs f0, 0x2c(r3)
-	@30:
-	lwz r3, wp(r13)
-	lfs f1, 0x2c(r3)
-	bl nameMaskGX
-	lwz r3, wp(r13)
-	lwz r0, 0x18(r3)
-	cmpwi r0, 0x64
-	blt @31
-	cmpwi r0, 0xc8
-	bge @31
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lwz r12, dat_8041bdac(r2)
-	addi r4, r1, 0x238
-	lwz r11, 0x54(r30)
-	addi r5, r1, 0x22c
-	lwz r10, 0x58(r30)
-	addi r6, r1, 0x3c
-	lwz r9, 0x5c(r30)
-	li r3, 0xf
-	lwz r8, 0x48(r30)
-	lwz r7, 0x4c(r30)
-	lwz r0, 0x50(r30)
-	stw r12, 0x3c(r1)
-	stw r11, 0x22c(r1)
-	stw r10, 0x230(r1)
-	stw r9, 0x234(r1)
-	stw r8, 0x238(r1)
-	stw r7, 0x23c(r1)
-	stw r0, 0x240(r1)
-	bl winTexSet
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	lwz r20, dat_8041bdb0(r2)
-	addi r5, r1, 0x220
-	lwz r12, 0x6c(r30)
-	addi r6, r1, 0x214
-	lwz r11, 0x70(r30)
-	addi r7, r1, 0x38
-	lwz r10, 0x74(r30)
-	li r3, 0x13
-	lwz r9, 0x60(r30)
-	li r4, 0x1f
-	lwz r8, 0x64(r30)
-	lwz r0, 0x68(r30)
-	stw r20, 0x38(r1)
-	stw r12, 0x214(r1)
-	stw r11, 0x218(r1)
-	stw r10, 0x21c(r1)
-	stw r9, 0x220(r1)
-	stw r8, 0x224(r1)
-	stw r0, 0x228(r1)
-	bl winTexSet_x2
-	li r24, 0x0
-	mr r23, r24
-	@32:
-	lwz r3, wp(r13)
-	lwz r0, 0x24(r3)
-	cmpw r24, r0
-	bne @33
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	subfic r0, r23, 0x32
-	lwz r8, 0x78(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r4, r1, 0x208
-	lwz r7, 0x80(r30)
-	addi r5, r1, 0x1f0
-	stw r0, 0x820(r1)
-	addi r6, r1, 0x34
-	lwz r0, 0x7c(r30)
-	li r3, 0x33
-	lfd f1, 0x358(r30)
-	lfd f0, 0x820(r1)
-	stw r0, 0x200(r1)
-	fsubs f0, f0, f1
-	lwz r12, dat_8041bdb4(r2)
-	lwz r11, 0x84(r30)
-	lwz r10, 0x88(r30)
-	stfs f0, 0x200(r1)
-	lwz r9, 0x8c(r30)
-	lwz r0, 0x200(r1)
-	stw r12, 0x34(r1)
-	stw r11, 0x1f0(r1)
-	stw r10, 0x1f4(r1)
-	stw r9, 0x1f8(r1)
-	stw r8, 0x1fc(r1)
-	stw r7, 0x204(r1)
-	stw r8, 0x208(r1)
-	stw r0, 0x20c(r1)
-	stw r7, 0x210(r1)
-	bl winTexSet
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	subfic r0, r23, 0x36
-	lwz r9, 0x90(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x81c(r1)
-	addi r3, r24, 0x15
-	lwz r8, 0x98(r30)
-	addi r5, r1, 0x1e4
-	stw r0, 0x818(r1)
-	addi r6, r1, 0x1cc
-	lwz r0, 0x94(r30)
-	addi r7, r1, 0x30
-	lfd f1, 0x358(r30)
-	li r4, 0x33
-	lfd f0, 0x818(r1)
-	stw r0, 0x1dc(r1)
-	fsubs f0, f0, f1
-	lwz r20, dat_8041bdb8(r2)
-	lwz r12, 0x9c(r30)
-	lwz r11, 0xa0(r30)
-	stfs f0, 0x1dc(r1)
-	lwz r10, 0xa4(r30)
-	lwz r0, 0x1dc(r1)
-	stw r20, 0x30(r1)
-	stw r12, 0x1cc(r1)
-	stw r11, 0x1d0(r1)
-	stw r10, 0x1d4(r1)
-	stw r9, 0x1d8(r1)
-	stw r8, 0x1e0(r1)
-	stw r9, 0x1e4(r1)
-	stw r0, 0x1e8(r1)
-	stw r8, 0x1ec(r1)
-	bl winTexSet_x2
-	b @34
-	@33:
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	subfic r0, r23, 0x32
-	lwz r9, 0xa8(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r3, r24, 0x15
-	lwz r8, 0xb0(r30)
-	addi r5, r1, 0x1c0
-	stw r0, 0x820(r1)
-	addi r6, r1, 0x1a8
-	lwz r0, 0xac(r30)
-	addi r7, r1, 0x2c
-	lfd f1, 0x358(r30)
-	li r4, 0x33
-	lfd f0, 0x820(r1)
-	stw r0, 0x1b8(r1)
-	fsubs f0, f0, f1
-	lwz r20, dat_8041bdbc(r2)
-	lwz r12, 0xb4(r30)
-	lwz r11, 0xb8(r30)
-	stfs f0, 0x1b8(r1)
-	lwz r10, 0xbc(r30)
-	lwz r0, 0x1b8(r1)
-	stw r20, 0x2c(r1)
-	stw r12, 0x1a8(r1)
-	stw r11, 0x1ac(r1)
-	stw r10, 0x1b0(r1)
-	stw r9, 0x1b4(r1)
-	stw r8, 0x1bc(r1)
-	stw r9, 0x1c0(r1)
-	stw r0, 0x1c4(r1)
-	stw r8, 0x1c8(r1)
-	bl winTexSet_x2
-	@34:
-	addi r24, r24, 0x1
-	addi r23, r23, 0x32
-	cmpwi r24, 0x3
-	blt @32
-	@31:
-	lwz r3, wp(r13)
-	lwz r0, 0x18(r3)
-	cmpwi r0, 0xc8
-	blt @35
-	cmpwi r0, 0x12c
-	bge @35
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lwz r12, dat_8041bdc0(r2)
-	addi r4, r1, 0x19c
-	lwz r11, 0xcc(r30)
-	addi r5, r1, 0x190
-	lwz r10, 0xd0(r30)
-	addi r6, r1, 0x28
-	lwz r9, 0xd4(r30)
-	li r3, 0xf
-	lwz r8, 0xc0(r30)
-	lwz r7, 0xc4(r30)
-	lwz r0, 0xc8(r30)
-	stw r12, 0x28(r1)
-	stw r11, 0x190(r1)
-	stw r10, 0x194(r1)
-	stw r9, 0x198(r1)
-	stw r8, 0x19c(r1)
-	stw r7, 0x1a0(r1)
-	stw r0, 0x1a4(r1)
-	bl winTexSet
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	lwz r20, dat_8041bdc4(r2)
-	addi r5, r1, 0x184
-	lwz r12, 0xe4(r30)
-	addi r6, r1, 0x178
-	lwz r11, 0xe8(r30)
-	addi r7, r1, 0x24
-	lwz r10, 0xec(r30)
-	li r3, 0x14
-	lwz r9, 0xd8(r30)
-	li r4, 0x1f
-	lwz r8, 0xdc(r30)
-	lwz r0, 0xe0(r30)
-	stw r20, 0x24(r1)
-	stw r12, 0x178(r1)
-	stw r11, 0x17c(r1)
-	stw r10, 0x180(r1)
-	stw r9, 0x184(r1)
-	stw r8, 0x188(r1)
-	stw r0, 0x18c(r1)
-	bl winTexSet_x2
-	li r24, 0x0
-	mr r23, r24
-	@36:
-	lwz r3, wp(r13)
-	lwz r0, 0x28(r3)
-	cmpw r24, r0
-	bne @37
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	subfic r0, r23, 0x1e
-	lwz r8, 0xf0(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r4, r1, 0x16c
-	lwz r7, 0xf8(r30)
-	addi r5, r1, 0x154
-	stw r0, 0x820(r1)
-	addi r6, r1, 0x20
-	lwz r0, 0xf4(r30)
-	li r3, 0x33
-	lfd f1, 0x358(r30)
-	lfd f0, 0x820(r1)
-	stw r0, 0x164(r1)
-	fsubs f0, f0, f1
-	lwz r12, dat_8041bdc8(r2)
-	lwz r11, 0xfc(r30)
-	lwz r10, 0x100(r30)
-	stfs f0, 0x164(r1)
-	lwz r9, 0x104(r30)
-	lwz r0, 0x164(r1)
-	stw r12, 0x20(r1)
-	stw r11, 0x154(r1)
-	stw r10, 0x158(r1)
-	stw r9, 0x15c(r1)
-	stw r8, 0x160(r1)
-	stw r7, 0x168(r1)
-	stw r8, 0x16c(r1)
-	stw r0, 0x170(r1)
-	stw r7, 0x174(r1)
-	bl winTexSet
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	subfic r0, r23, 0x22
-	lwz r9, 0x108(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x81c(r1)
-	addi r3, r24, 0x18
-	lwz r8, 0x110(r30)
-	addi r5, r1, 0x148
-	stw r0, 0x818(r1)
-	addi r6, r1, 0x130
-	lwz r0, 0x10c(r30)
-	addi r7, r1, 0x1c
-	lfd f1, 0x358(r30)
-	li r4, 0x33
-	lfd f0, 0x818(r1)
-	stw r0, 0x140(r1)
-	fsubs f0, f0, f1
-	lwz r20, dat_8041bdcc(r2)
-	lwz r12, 0x114(r30)
-	lwz r11, 0x118(r30)
-	stfs f0, 0x140(r1)
-	lwz r10, 0x11c(r30)
-	lwz r0, 0x140(r1)
-	stw r20, 0x1c(r1)
-	stw r12, 0x130(r1)
-	stw r11, 0x134(r1)
-	stw r10, 0x138(r1)
-	stw r9, 0x13c(r1)
-	stw r8, 0x144(r1)
-	stw r9, 0x148(r1)
-	stw r0, 0x14c(r1)
-	stw r8, 0x150(r1)
-	bl winTexSet_x2
-	b @38
-	@37:
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit_x2
-	subfic r0, r23, 0x1e
-	lwz r9, 0x120(r30)
-	xoris r3, r0, 0x8000
-	lis r0, 0x4330
-	stw r3, 0x824(r1)
-	addi r3, r24, 0x18
-	lwz r8, 0x128(r30)
-	addi r5, r1, 0x124
-	stw r0, 0x820(r1)
-	addi r6, r1, 0x10c
-	lwz r0, 0x124(r30)
-	addi r7, r1, 0x18
-	lfd f1, 0x358(r30)
-	li r4, 0x33
-	lfd f0, 0x820(r1)
-	stw r0, 0x11c(r1)
-	fsubs f0, f0, f1
-	lwz r20, dat_8041bdd0(r2)
-	lwz r12, 0x12c(r30)
-	lwz r11, 0x130(r30)
-	stfs f0, 0x11c(r1)
-	lwz r10, 0x134(r30)
-	lwz r0, 0x11c(r1)
-	stw r20, 0x18(r1)
-	stw r12, 0x10c(r1)
-	stw r11, 0x110(r1)
-	stw r10, 0x114(r1)
-	stw r9, 0x118(r1)
-	stw r8, 0x120(r1)
-	stw r9, 0x124(r1)
-	stw r0, 0x128(r1)
-	stw r8, 0x12c(r1)
-	bl winTexSet_x2
-	@38:
-	addi r24, r24, 0x1
-	addi r23, r23, 0x32
-	cmpwi r24, 0x2
-	blt @36
-	@35:
-	lwz r4, wp(r13)
-	lwz r0, 0x18(r4)
-	cmpwi r0, 0x33
-	bne @39
-	lwz r0, 0x34(r4)
-	cmpwi r0, 0x4
-	bge @39
-	lwz r27, 0x138(r30)
-	slwi r0, r0, 2
-	lwz r26, 0x13c(r30)
-	addi r3, r1, 0x3f4
-	lwz r25, 0x140(r30)
-	lwz r24, 0x144(r30)
-	lwz r23, 0x148(r30)
-	lwz r22, 0x14c(r30)
-	lwz r21, 0x150(r30)
-	lwz r20, 0x154(r30)
-	lwz r12, 0x158(r30)
-	lwz r11, 0x15c(r30)
-	lwz r10, 0x160(r30)
-	lwz r9, 0x164(r30)
-	lwz r8, 0x168(r30)
-	lwz r7, 0x16c(r30)
-	lwz r6, 0x170(r30)
-	lwz r5, 0x174(r30)
-	lwz r4, 0x30(r4)
-	stw r27, 0x3f4(r1)
-	slwi r4, r4, 4
-	lfd f2, 0x348(r30)
-	stw r26, 0x3f8(r1)
-	add r0, r4, r0
-	stw r25, 0x3fc(r1)
-	stw r24, 0x400(r1)
-	stw r23, 0x404(r1)
-	stw r22, 0x408(r1)
-	stw r21, 0x40c(r1)
-	stw r20, 0x410(r1)
-	stw r12, 0x414(r1)
-	stw r11, 0x418(r1)
-	stw r10, 0x41c(r1)
-	stw r9, 0x420(r1)
-	stw r8, 0x424(r1)
-	stw r7, 0x428(r1)
-	stw r6, 0x42c(r1)
-	stw r5, 0x430(r1)
-	lfsx f1, r3, r0
-	bl fmod
-	frsp f0, f1
-	lfs f3, float_0_8041bde4(r2)
-	fcmpu cr0, f0, f3
-	bne @40
-	lwz r3, wp(r13)
-	lis r5, 0x4330
-	stw r5, 0x818(r1)
-	lwz r0, 0x30(r3)
-	lwz r3, 0x34(r3)
-	srwi r7, r0, 31
-	clrlwi r6, r0, 31
-	add r4, r7, r0
-	srwi r0, r3, 31
-	srawi r4, r4, 1
-	xor r6, r6, r7
-	add r0, r0, r3
-	stw r5, 0x810(r1)
-	srawi r0, r0, 1
-	xoris r3, r4, 0x8000
-	xoris r0, r0, 0x8000
-	stw r3, 0x81c(r1)
-	subf r3, r7, r6
-	lfd f2, 0x358(r30)
-	stw r0, 0x814(r1)
-	xoris r0, r3, 0x8000
-	lfd f1, 0x818(r1)
-	lfd f0, 0x810(r1)
-	stw r0, 0x824(r1)
-	fsubs f4, f1, f2
-	fsubs f0, f0, f2
-	stw r5, 0x820(r1)
-	lfd f1, 0x820(r1)
-	fcmpu cr0, f4, f0
-	fsubs f2, f1, f2
-	bne @41
-	lfs f1, float_140_8041be60(r2)
-	fmr f29, f3
-	lfs f0, float_120_8041be5c(r2)
-	fnmsubs f30, f1, f4, f0
-	b @42
-	@41:
-	lfs f1, float_300_8041be68(r2)
-	lfs f0, float_neg150_8041be64(r2)
-	lfs f30, float_50_8041be6c(r2)
-	fmadds f29, f1, f2, f0
-	b @42
-	@40:
-	fmr f29, f3
-	lfs f30, float_50_8041be6c(r2)
-	@42:
-	lwz r3, wp(r13)
-	lfs f0, float_40_8041be14(r2)
-	lwz r3, 0x4(r3)
-	fsubs f30, f30, f0
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lfs f0, float_2_8041be70(r2)
-	addi r7, r1, 0x3f4
-	lwz r3, 0x178(r30)
-	addi r4, r1, 0x100
-	lwz r0, 0x17c(r30)
-	fadds f1, f0, f29
-	stw r3, 0xf4(r1)
-	fsubs f0, f30, f0
-	lwz r9, 0x180(r30)
-	addi r5, r1, 0xe8
-	stw r0, 0xf8(r1)
-	lwz r20, dat_8041bdd4(r2)
-	addi r6, r1, 0x14
-	stfs f1, 0xf4(r1)
-	li r3, 0x1d
-	lwz r12, 0x184(r30)
-	stfs f0, 0xf8(r1)
-	lwz r11, 0x188(r30)
-	lwz r10, 0x18c(r30)
-	lwz r8, 0xf4(r1)
-	lwz r0, 0xf8(r1)
-	stw r20, 0x14(r1)
-	lwz r20, wp(r13)
-	stw r12, 0xe8(r1)
-	stw r11, 0xec(r1)
-	stw r10, 0xf0(r1)
-	stw r8, 0x100(r1)
-	stw r0, 0x104(r1)
-	stw r9, 0x108(r1)
-	lwz r8, 0x30(r20)
-	lwz r0, 0x34(r20)
-	slwi r8, r8, 4
-	stw r9, 0xfc(r1)
-	slwi r0, r0, 2
-	add r0, r8, r0
-	lfsx f1, r7, r0
-	bl winTexSetRot
-	lwz r3, 0x190(r30)
-	addi r7, r1, 0x3f4
-	lwz r0, 0x194(r30)
-	addi r4, r1, 0xdc
-	stw r3, 0xd0(r1)
-	addi r5, r1, 0xc4
-	lwz r9, 0x198(r30)
-	addi r6, r1, 0x10
-	stw r0, 0xd4(r1)
-	li r3, 0x1d
-	lwz r20, 0x78(r1)
-	stfs f29, 0xd0(r1)
-	lwz r12, 0x19c(r30)
-	stfs f30, 0xd4(r1)
-	lwz r11, 0x1a0(r30)
-	lwz r10, 0x1a4(r30)
-	lwz r8, 0xd0(r1)
-	lwz r0, 0xd4(r1)
-	stw r20, 0x10(r1)
-	lwz r20, wp(r13)
-	stw r12, 0xc4(r1)
-	stw r11, 0xc8(r1)
-	stw r10, 0xcc(r1)
-	stw r8, 0xdc(r1)
-	stw r0, 0xe0(r1)
-	stw r9, 0xe4(r1)
-	lwz r8, 0x30(r20)
-	lwz r0, 0x34(r20)
-	slwi r8, r8, 4
-	stw r9, 0xd8(r1)
-	slwi r0, r0, 2
-	add r0, r8, r0
-	lfsx f1, r7, r0
-	bl winTexSetRot
-	@39:
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	rlwinm. r0, r0, 0, 25, 25
-	bne @43
-	lwz r3, 0x4(r3)
-	lwz r3, 0xa0(r3)
-	lwz r3, 0x0(r3)
-	bl winTexInit
-	lwz r0, dat_8041bdd8(r2)
-	addi r4, r1, 0xb8
-	lwz r10, 0x1b4(r30)
-	addi r5, r1, 0xa0
-	lwz r9, 0x1b8(r30)
-	addi r6, r1, 0xc
-	lwz r8, 0x1bc(r30)
-	li r3, 0x0
-	stw r0, 0xc(r1)
-	lwz r7, 0x1a8(r30)
-	lwz r0, 0x1ac(r30)
-	stw r10, 0xa0(r1)
-	lwz r10, wp(r13)
-	stw r9, 0xa4(r1)
-	lfs f2, float_2_8041be70(r2)
-	stw r8, 0xa8(r1)
-	lwz r8, 0x1b0(r30)
-	lfs f1, 0x8(r10)
-	lfs f0, 0xc(r10)
-	fadds f1, f2, f1
-	stw r7, 0xac(r1)
-	fsubs f0, f0, f2
-	stw r0, 0xb0(r1)
-	stfs f1, 0xac(r1)
-	stfs f0, 0xb0(r1)
-	lwz r7, 0xac(r1)
-	lwz r0, 0xb0(r1)
-	stw r8, 0xb4(r1)
-	stw r7, 0xb8(r1)
-	stw r0, 0xbc(r1)
-	stw r8, 0xc0(r1)
-	bl winTexSet
-	lwz r8, 0x78(r1)
-	addi r4, r1, 0x94
-	lwz r11, 0x1cc(r30)
-	addi r5, r1, 0x7c
-	lwz r10, 0x1d0(r30)
-	addi r6, r1, 0x8
-	lwz r9, 0x1d4(r30)
-	li r3, 0x0
-	lwz r7, 0x1c0(r30)
-	lwz r0, 0x1c4(r30)
-	stw r8, 0x8(r1)
-	lwz r12, wp(r13)
-	lwz r8, 0x1c8(r30)
-	stw r11, 0x7c(r1)
-	stw r10, 0x80(r1)
-	stw r9, 0x84(r1)
-	stw r7, 0x88(r1)
-	lfs f1, 0x8(r12)
-	lfs f0, 0xc(r12)
-	stw r0, 0x8c(r1)
-	stfs f1, 0x88(r1)
-	stfs f0, 0x8c(r1)
-	lwz r7, 0x88(r1)
-	lwz r0, 0x8c(r1)
-	stw r8, 0x90(r1)
-	stw r7, 0x94(r1)
-	stw r0, 0x98(r1)
-	stw r8, 0x9c(r1)
-	bl winTexSet
-	@43:
-	lfs f1, 0x34c(r1)
-	lfs f2, 0x350(r1)
-	lfs f3, 0x354(r1)
-	lfs f4, 0x358(r1)
-	lfs f5, 0x35c(r1)
-	lfs f6, 0x360(r1)
-	bl GXSetViewport
-	addi r3, r1, 0x330
-	bl GXSetProjectionv
-	bl camGetCurPtr
-	li r0, 0x4c
-	subi r5, r3, 0x4
-	addi r4, r1, 0x594
-	mtctr r0
-	@44:
-	lwz r3, 0x4(r4)
-	lwzu r0, 0x8(r4)
-	stw r3, 0x4(r5)
-	stwu r0, 0x8(r5)
-	bdnz @44
-	@2:
-	psq_l f31, -0x778(r1), 0, 0
-	lfd f31, 0x880(r1)
-	psq_l f30, -0x788(r1), 0, 0
-	lfd f30, 0x870(r1)
-	psq_l f29, -0x798(r1), 0, 0
-	lfd f29, 0x860(r1)
-	lmw r20, 0x830(r1)
-	lwz r0, 0x894(r1)
-	mtlr r0
-	addi r1, r1, 0x890
-	blr
-}
-
-asm void loadMain(SequenceWork* seq) {
-	nofralloc
-	stwu r1, -0x50(r1)
-	mflr r0
-	lis r5, lbl_80349DE8@ha
-	lis r4, vec3_802ed670@ha
-	stw r0, 0x54(r1)
-	stmw r24, 0x30(r1)
-	mr r26, r3
-	li r3, 0x0
-	addi r29, r5, lbl_80349DE8@l
-	addi r30, r4, vec3_802ed670@l
-	bl keyGetButtonTrg
-	mr r0, r3
-	li r3, 0x0
-	mr r28, r0
-	bl keyGetButtonRep
-	li r3, 0x0
-	bl keyGetDirRep
-	mr r27, r3
-	bl cardGetCode
-	mr r31, r3
-	bl cardIsExec
-	cmpwi r3, 0x0
-	bne @1
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	bne @2
-	@1:
-	li r28, 0x0
-	li r27, 0x0
-	@2:
-	lwz r3, wp(r13)
-	lwz r0, 0x1c(r3)
-	cmpw r0, r31
-	beq @3
-	li r28, 0x0
-	li r27, 0x0
-	@3:
-	stw r31, 0x1c(r3)
-	li r24, 0x0
-	li r25, 0x0
-	@4:
-	bl cardGetFilePtr
-	addi r0, r25, 0x2000
-	lhzx r3, r3, r0
-	clrlwi. r0, r3, 31
-	beq @5
-	rlwinm. r0, r3, 0, 30, 30
-	bne @5
-	addi r24, r24, 0x1
-	addi r25, r25, 0x4000
-	cmpwi r24, 0x4
-	blt @4
-	@5:
-	cmpwi r24, 0x4
-	bge @6
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 28, 26
-	sth r0, 0x0(r3)
-	b @7
-	@6:
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x10
-	sth r0, 0x0(r3)
-	@7:
-	lwz r3, wp(r13)
-	li r24, 0x0
-	mr r25, r24
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 27, 25
-	sth r0, 0x0(r3)
-	@8:
-	bl cardGetFilePtr
-	addi r0, r25, 0x2000
-	lhzx r3, r3, r0
-	clrlwi. r0, r3, 31
-	bne @9
-	rlwinm. r0, r3, 0, 30, 30
-	beq @10
-	@9:
-	addi r24, r24, 0x1
-	addi r25, r25, 0x4000
-	cmpwi r24, 0x4
-	blt @8
-	@10:
-	cmpwi r24, 0x4
-	blt @11
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	ori r0, r0, 0x20
-	sth r0, 0x0(r3)
-	@11:
-	lwz r6, wp(r13)
-	lwz r3, 0x18(r6)
-	cmpwi r3, 0x21
-	beq @12
-	bge @13
-	cmpwi r3, 0x15
-	beq @14
-	bge @15
-	cmpwi r3, 0xa
-	beq @16
-	bge @17
-	cmpwi r3, 0x1
-	beq @18
-	bge @19
-	cmpwi r3, 0x0
-	bge @20
-	b @19
-	@17:
-	cmpwi r3, 0x14
-	bge @21
-	cmpwi r3, 0xc
-	bge @19
-	b @22
-	@15:
-	cmpwi r3, 0x1e
-	beq @23
-	bge @24
-	cmpwi r3, 0x18
-	beq @25
-	bge @19
-	cmpwi r3, 0x17
-	bge @26
-	b @27
-	@24:
-	cmpwi r3, 0x20
-	bge @28
-	b @29
-	@13:
-	cmpwi r3, 0x33
-	beq @30
-	bge @31
-	cmpwi r3, 0x29
-	beq @32
-	bge @33
-	cmpwi r3, 0x23
-	beq @34
-	blt @35
-	cmpwi r3, 0x28
-	bge @36
-	b @19
-	@33:
-	cmpwi r3, 0x32
-	bge @37
-	cmpwi r3, 0x2b
-	bge @19
-	b @38
-	@31:
-	cmpwi r3, 0x64
-	beq @39
-	bge @40
-	cmpwi r3, 0x35
-	beq @41
-	bge @19
-	b @42
-	@40:
-	cmpwi r3, 0xc8
-	beq @43
-	b @19
-	@20:
-	addi r0, r3, 0x1
-	stw r0, 0x18(r6)
-	@18:
-	addi r3, r30, 0x360
-	bl msgSearch
-	lwz r4, wp(r13)
-	rlwinm. r0, r27, 0, 19, 19
-	stw r3, 0x38(r4)
-	lwz r4, wp(r13)
-	lwz r31, 0x20(r4)
-	beq @44
-	mulli r0, r31, 0x1c
-	addi r3, r29, 0x40
-	add r3, r3, r0
-	lbz r0, 0x18(r3)
-	stw r0, 0x20(r4)
-	b @45
-	@44:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @46
-	mulli r0, r31, 0x1c
-	addi r3, r29, 0x40
-	add r3, r3, r0
-	lbz r0, 0x19(r3)
-	stw r0, 0x20(r4)
-	b @45
-	@46:
-	rlwinm. r0, r27, 0, 17, 17
-	beq @47
-	mulli r0, r31, 0x1c
-	addi r3, r29, 0x40
-	add r3, r3, r0
-	lbz r0, 0x1a(r3)
-	stw r0, 0x20(r4)
-	b @45
-	@47:
-	rlwinm. r0, r27, 0, 16, 16
-	beq @48
-	mulli r0, r31, 0x1c
-	addi r3, r29, 0x40
-	add r3, r3, r0
-	lbz r0, 0x1b(r3)
-	stw r0, 0x20(r4)
-	b @45
-	@48:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @49
-	bl cardGetFilePtr
-	lwz r6, wp(r13)
-	lwz r5, 0x20(r6)
-	slwi r4, r5, 14
-	cmpwi r5, 0x6
-	addi r0, r4, 0x2000
-	lhzx r3, r3, r0
-	beq @50
-	bge @51
-	cmpwi r5, 0x4
-	beq @52
-	bge @53
-	cmpwi r5, 0x0
-	bge @54
-	b @45
-	@51:
-	cmpwi r5, 0x8
-	beq @55
-	bge @45
-	b @56
-	@54:
-	rlwinm. r0, r3, 0, 30, 30
-	beq @57
-	li r3, 0x13
-	bl psndSFXOn
-	b @45
-	@57:
-	clrlwi. r0, r3, 31
-	beq @58
-	li r0, 0x1e
-	li r3, 0x12
-	stw r0, 0x18(r6)
-	bl psndSFXOn
-	b @45
-	@58:
-	li r0, 0x14
-	li r3, 0x12
-	stw r0, 0x18(r6)
-	bl psndSFXOn
-	b @45
-	@52:
-	lhz r0, 0x0(r6)
-	rlwinm. r0, r0, 0, 27, 27
-	bne @45
-	li r26, 0x0
-	mr r25, r26
-	@59:
-	bl cardGetFilePtr
-	addi r0, r25, 0x2000
-	lhzx r3, r3, r0
-	clrlwi. r0, r3, 31
-	beq @60
-	rlwinm. r0, r3, 0, 30, 30
-	bne @60
-	addi r26, r26, 0x1
-	addi r25, r25, 0x4000
-	cmpwi r26, 0x4
-	blt @59
-	@60:
-	cmpwi r26, 0x4
-	bge @61
-	li r3, 0x12
-	bl psndSFXOn
-	lwz r3, wp(r13)
-	li r4, 0x0
-	li r0, 0x28
-	stw r4, 0x20(r3)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @45
-	@61:
-	li r3, 0x13
-	bl psndSFXOn
-	b @45
-	@53:
-	lhz r0, 0x0(r6)
-	rlwinm. r0, r0, 0, 26, 26
-	bne @45
-	li r26, 0x0
-	mr r25, r26
-	@62:
-	bl cardGetFilePtr
-	addi r0, r25, 0x2000
-	lhzx r3, r3, r0
-	rlwinm. r0, r3, 0, 30, 30
-	bne @63
-	clrlwi. r0, r3, 31
-	beq @64
-	@63:
-	addi r26, r26, 0x1
-	addi r25, r25, 0x4000
-	cmpwi r26, 0x4
-	blt @62
-	@64:
-	cmpwi r26, 0x4
-	bge @65
-	li r3, 0x12
-	bl psndSFXOn
-	lwz r3, wp(r13)
-	li r4, 0x0
-	li r0, 0x32
-	stw r4, 0x20(r3)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @45
-	@65:
-	li r3, 0x13
-	bl psndSFXOn
-	b @45
-	@50:
-	li r3, 0x13
-	bl psndSFXOn
-	lwz r3, wp(r13)
-	li r0, 0xa
-	stw r0, 0x18(r3)
-	b @45
-	@56:
-	li r3, 0x12
-	bl psndSFXOn
-	li r3, 0x800
-	bl psndBGMOff
-	lwz r3, wp(r13)
-	li r0, 0x64
-	stw r0, 0x18(r3)
-	b @45
-	@55:
-	li r3, 0x12
-	bl psndSFXOn
-	lwz r3, wp(r13)
-	li r0, 0xc8
-	stw r0, 0x18(r3)
-	b @45
-	@49:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @45
-	li r3, 0x13
-	bl psndSFXOn
-	lwz r3, wp(r13)
-	li r0, 0xa
-	stw r0, 0x18(r3)
-	@45:
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r31, r0
-	beq @66
-	cmpwi r0, 0x4
-	bge @67
-	li r3, 0x9
-	bl psndSFXOn
-	b @66
-	@67:
-	li r3, 0x5
-	bl psndSFXOn
-	@66:
-	lwz r5, wp(r13)
-	addi r4, r29, 0x40
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfsx f1, r4, r0
-	lfs f0, 0x8(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x10(r5)
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfs f1, 0x4(r3)
-	lfs f0, 0xc(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r5)
-	b @19
-	@16:
-	lwz r0, dat_8041bd6c(r2)
-	addi r5, r1, 0x1c
-	li r3, 0x1b
-	li r4, 0x0
-	stw r0, 0x1c(r1)
-	bl fadeEntry
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@22:
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	beq @19
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	bl seqSetSeq
-	b @19
-	@21:
-	lhz r0, 0x0(r6)
-	lis r3, evt_memcard_start@ha
-	addi r3, r3, evt_memcard_start@l
-	li r4, 0x0
-	ori r0, r0, 0x40
-	li r5, 0x0
-	sth r0, 0x0(r6)
-	li r6, 0x0
-	bl evtEntryType
-	lwz r4, wp(r13)
-	stw r3, 0x3c(r4)
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	lwz r3, 0x3c(r3)
-	stw r0, 0x9c(r3)
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@14:
-	lwz r3, 0x3c(r6)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @19
-	lwz r5, wp(r13)
-	lis r3, 0xfd05
-	addi r4, r3, 0xf80
-	lhz r0, 0x0(r5)
-	li r3, 0x0
-	rlwinm r0, r0, 0, 26, 24
-	sth r0, 0x0(r5)
-	bl evtGetValue
-	cmpwi r3, 0x1
-	bne @68
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@68:
-	lwz r3, wp(r13)
-	li r0, 0x1
-	stw r0, 0x18(r3)
-	b @19
-	@27:
-	lwz r0, dat_8041bd70(r2)
-	addi r5, r1, 0x18
-	li r3, 0x1b
-	li r4, 0x0
-	stw r0, 0x18(r1)
-	bl fadeEntry
-	li r3, 0x200
-	li r4, 0x7d0
-	li r5, 0x0
-	bl psndBGMOff_f_d
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@26:
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	beq @19
-	lwz r7, wp(r13)
-	la r3, evt_continue(r13)
-	li r4, 0x0
-	li r5, 0x0
-	lhz r0, 0x0(r7)
-	li r6, 0x0
-	ori r0, r0, 0x40
-	sth r0, 0x0(r7)
-	bl evtEntryType
-	lwz r4, wp(r13)
-	stw r3, 0x3c(r4)
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@25:
-	lwz r3, 0x3c(r6)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @19
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 26, 24
-	sth r0, 0x0(r3)
-	bl continueGame
-	b @19
-	@23:
-	lwz r0, dat_8041bd74(r2)
-	addi r5, r1, 0x14
-	li r3, 0x1b
-	li r4, 0x0
-	stw r0, 0x14(r1)
-	bl fadeEntry
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@29:
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	beq @19
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@28:
-	bl nameEntPrepare
-	cmpwi r3, 0x0
-	beq @19
-	li r3, 0x0
-	bl nameEntOn
-	lwz r0, dat_8041bd78(r2)
-	addi r5, r1, 0x10
-	li r3, 0x1c
-	li r4, 0x0
-	stw r0, 0x10(r1)
-	bl fadeEntry
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@12:
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	beq @19
-	bl nameEntWait
-	cmpwi r3, 0x0
-	bne @19
-	lwz r0, dat_8041bd7c(r2)
-	addi r5, r1, 0xc
-	li r3, 0x18
-	li r4, 0x0
-	stw r0, 0xc(r1)
-	bl fadeEntry
-	bl nameEntIsCancel
-	cmpwi r3, 0x0
-	bne @69
-	li r3, 0x200
-	li r4, 0xbb8
-	li r5, 0x0
-	bl psndBGMOff_f_d
-	@69:
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@35:
-	bl fadeIsFinish
-	cmpwi r3, 0x0
-	beq @19
-	bl nameEntOff
-	bl nameEntIsCancel
-	cmpwi r3, 0x0
-	beq @70
-	lwz r0, dat_8041bd80(r2)
-	addi r5, r1, 0x8
-	li r3, 0x1c
-	li r4, 0x0
-	stw r0, 0x8(r1)
-	bl fadeEntry
-	lwz r3, wp(r13)
-	li r0, 0x1
-	stw r0, 0x18(r3)
-	b @19
-	@70:
-	bl nameEntGetName
-	lwz r5, gp(r13)
-	mr r4, r3
-	addi r3, r5, 0x11bc
-	bl strcpy
-	lwz r4, wp(r13)
-	lwz r3, gp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x11b8(r3)
-	bl stg0_00_init
-	lwz r4, wp(r13)
-	lwz r3, gp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x11d0(r3)
-	bl marioPartyKill
-	bl marioGetPtr
-	li r4, 0x0
-	li r0, 0x19
-	stb r4, 0x243(r3)
-	stb r4, 0x244(r3)
-	lwz r3, gp(r13)
-	stw r4, 0x110(r3)
-	lwz r3, gp(r13)
-	stw r0, 0x108(r3)
-	bl swInit
-	li r3, 0x0
-	li r4, 0x0
-	bl swByteSet
-	cmpwi r31, 0x0
-	bne @71
-	lwz r4, wp(r13)
-	lis r3, evt_memcard_save@ha
-	lwz r6, gp(r13)
-	addi r3, r3, evt_memcard_save@l
-	lwz r0, 0x20(r4)
-	li r4, 0x0
-	li r5, 0x0
-	stw r0, 0x11d0(r6)
-	li r6, 0x0
-	bl evtEntryType
-	lwz r4, wp(r13)
-	li r0, 0x17
-	stw r3, 0x3c(r4)
-	lwz r3, wp(r13)
-	lwz r3, 0x3c(r3)
-	stw r0, 0x9c(r3)
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@71:
-	addi r4, r30, 0x2c0
-	addi r5, r30, 0x2c8
-	li r3, 0x3
-	bl seqSetSeq
-	b @19
-	@34:
-	lwz r3, 0x3c(r6)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @19
-	addi r4, r30, 0x2c0
-	addi r5, r30, 0x2c8
-	li r3, 0x3
-	bl seqSetSeq
-	b @19
-	@36:
-	addi r3, r30, 0x374
-	bl msgSearch
-	lwz r4, wp(r13)
-	rlwinm. r0, r27, 0, 19, 19
-	stw r3, 0x38(r4)
-	lwz r3, wp(r13)
-	lwz r31, 0x20(r3)
-	beq @72
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x18(r4)
-	stw r0, 0x20(r3)
-	b @73
-	@72:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @74
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x19(r4)
-	stw r0, 0x20(r3)
-	b @73
-	@74:
-	rlwinm. r0, r27, 0, 17, 17
-	beq @75
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x1a(r4)
-	stw r0, 0x20(r3)
-	b @73
-	@75:
-	rlwinm. r0, r27, 0, 16, 16
-	beq @76
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x1b(r4)
-	stw r0, 0x20(r3)
-	b @73
-	@76:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @77
-	cmpwi r31, 0x4
-	bge @78
-	bl cardGetFilePtr
-	lwz r4, wp(r13)
-	lwz r0, 0x20(r4)
-	slwi r4, r0, 14
-	addi r0, r4, 0x2000
-	lhzx r3, r3, r0
-	rlwinm. r0, r3, 0, 30, 30
-	bne @79
-	clrlwi. r0, r3, 31
-	bne @80
-	@79:
-	li r3, 0x12
-	bl psndSFXOn
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @73
-	@80:
-	li r3, 0x13
-	bl psndSFXOn
-	b @73
-	@78:
-	li r4, 0x4
-	li r0, 0x1
-	stw r4, 0x20(r3)
-	li r3, 0x13
-	lwz r4, wp(r13)
-	stw r0, 0x18(r4)
-	bl psndSFXOn
-	b @73
-	@77:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @73
-	li r4, 0x4
-	li r0, 0x1
-	stw r4, 0x20(r3)
-	li r3, 0x13
-	lwz r4, wp(r13)
-	stw r0, 0x18(r4)
-	bl psndSFXOn
-	@73:
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r31, r0
-	beq @81
-	cmpwi r0, 0x4
-	bge @81
-	li r3, 0x9
-	bl psndSFXOn
-	@81:
-	lwz r5, wp(r13)
-	addi r4, r29, 0x13c
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfsx f1, r4, r0
-	lfs f0, 0x8(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x10(r5)
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfs f1, 0x4(r3)
-	lfs f0, 0xc(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r5)
-	b @19
-	@32:
-	lhz r0, 0x0(r6)
-	lis r3, evt_memcard_delete@ha
-	addi r3, r3, evt_memcard_delete@l
-	li r4, 0x0
-	ori r0, r0, 0x40
-	li r5, 0x0
-	sth r0, 0x0(r6)
-	li r6, 0x0
-	bl evtEntryType
-	lwz r4, wp(r13)
-	stw r3, 0x3c(r4)
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	lwz r3, 0x3c(r3)
-	stw r0, 0x9c(r3)
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@38:
-	lwz r3, 0x3c(r6)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @19
-	lis r4, 0xfaa3
-	li r3, 0x0
-	subi r4, r4, 0x4a80
-	bl evtGetValue
-	cmpwi r3, 0x0
-	bne @82
-	lwz r5, wp(r13)
-	li r4, 0x4
-	li r0, 0x1
-	lhz r3, 0x0(r5)
-	rlwinm r3, r3, 0, 26, 24
-	sth r3, 0x0(r5)
-	lwz r3, wp(r13)
-	stw r4, 0x20(r3)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @19
-	@82:
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lhz r3, 0x0(r4)
-	ori r3, r3, 0x80
-	sth r3, 0x0(r4)
-	stw r0, 0x4(r26)
-	b @83
-	@37:
-	addi r3, r30, 0x390
-	bl msgSearch
-	lwz r4, wp(r13)
-	rlwinm. r0, r27, 0, 19, 19
-	stw r3, 0x38(r4)
-	lwz r3, wp(r13)
-	lwz r31, 0x20(r3)
-	beq @84
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x18(r4)
-	stw r0, 0x20(r3)
-	b @85
-	@84:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @86
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x19(r4)
-	stw r0, 0x20(r3)
-	b @85
-	@86:
-	rlwinm. r0, r27, 0, 17, 17
-	beq @87
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x1a(r4)
-	stw r0, 0x20(r3)
-	b @85
-	@87:
-	rlwinm. r0, r27, 0, 16, 16
-	beq @88
-	mulli r0, r31, 0x1c
-	addi r4, r29, 0x13c
-	add r4, r4, r0
-	lbz r0, 0x1b(r4)
-	stw r0, 0x20(r3)
-	b @85
-	@88:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @89
-	cmpwi r31, 0x4
-	bge @90
-	bl cardGetFilePtr
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	slwi r4, r0, 14
-	addi r0, r4, 0x2000
-	lhzx r3, r3, r0
-	rlwinm. r0, r3, 0, 30, 30
-	bne @85
-	clrlwi. r0, r3, 31
-	bne @85
-	li r0, 0x33
-	li r3, 0x12
-	stw r0, 0x18(r5)
-	lwz r4, wp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x30(r4)
-	lwz r5, wp(r13)
-	lwz r4, 0x30(r5)
-	addi r4, r4, 0x1
-	slwi r0, r4, 30
-	srwi r4, r4, 31
-	subf r0, r4, r0
-	rotlwi r0, r0, 2
-	add r0, r0, r4
-	stw r0, 0x34(r5)
-	lwz r4, wp(r13)
-	lwz r0, 0x34(r4)
-	stw r0, 0x20(r4)
-	bl psndSFXOn
-	b @85
-	@90:
-	li r4, 0x5
-	li r0, 0x1
-	stw r4, 0x20(r3)
-	li r3, 0x13
-	lwz r4, wp(r13)
-	stw r0, 0x18(r4)
-	bl psndSFXOn
-	b @85
-	@89:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @85
-	li r4, 0x5
-	li r0, 0x1
-	stw r4, 0x20(r3)
-	li r3, 0x13
-	lwz r4, wp(r13)
-	stw r0, 0x18(r4)
-	bl psndSFXOn
-	@85:
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r31, r0
-	beq @91
-	cmpwi r0, 0x4
-	bge @91
-	li r3, 0x9
-	bl psndSFXOn
-	@91:
-	lwz r5, wp(r13)
-	addi r4, r29, 0x13c
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfsx f1, r4, r0
-	lfs f0, 0x8(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x10(r5)
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfs f1, 0x4(r3)
-	lfs f0, 0xc(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r5)
-	b @19
-	@30:
-	addi r3, r30, 0x3ac
-	bl msgSearch
-	lwz r4, wp(r13)
-	rlwinm. r0, r27, 0, 19, 19
-	stw r3, 0x38(r4)
-	lwz r5, wp(r13)
-	lwz r31, 0x20(r5)
-	beq @92
-	addi r4, r29, 0x200
-	@93:
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r3, r0, 0x1c
-	addi r0, r3, 0x18
-	lbzx r0, r4, r0
-	stw r0, 0x20(r5)
-	lwz r5, wp(r13)
-	lwz r3, 0x20(r5)
-	lwz r0, 0x30(r5)
-	cmpw r3, r0
-	beq @93
-	b @94
-	@92:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @95
-	addi r4, r29, 0x200
-	@96:
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r3, r0, 0x1c
-	addi r0, r3, 0x19
-	lbzx r0, r4, r0
-	stw r0, 0x20(r5)
-	lwz r5, wp(r13)
-	lwz r3, 0x20(r5)
-	lwz r0, 0x30(r5)
-	cmpw r3, r0
-	beq @96
-	b @94
-	@95:
-	rlwinm. r0, r27, 0, 17, 17
-	beq @97
-	addi r4, r29, 0x200
-	@98:
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r3, r0, 0x1c
-	addi r0, r3, 0x1a
-	lbzx r0, r4, r0
-	stw r0, 0x20(r5)
-	lwz r5, wp(r13)
-	lwz r3, 0x20(r5)
-	lwz r0, 0x30(r5)
-	cmpw r3, r0
-	beq @98
-	b @94
-	@97:
-	rlwinm. r0, r27, 0, 16, 16
-	beq @99
-	addi r4, r29, 0x200
-	@100:
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r3, r0, 0x1c
-	addi r0, r3, 0x1b
-	lbzx r0, r4, r0
-	stw r0, 0x20(r5)
-	lwz r5, wp(r13)
-	lwz r3, 0x20(r5)
-	lwz r0, 0x30(r5)
-	cmpw r3, r0
-	beq @100
-	b @94
-	@99:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @101
-	li r0, 0x34
-	li r3, 0x12
-	stw r0, 0x18(r5)
-	lwz r4, wp(r13)
-	lwz r0, 0x20(r4)
-	stw r0, 0x34(r4)
-	bl psndSFXOn
-	b @94
-	@101:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @94
-	lwz r4, 0x30(r5)
-	li r0, 0x32
-	li r3, 0x13
-	stw r4, 0x20(r5)
-	lwz r4, wp(r13)
-	stw r0, 0x18(r4)
-	bl psndSFXOn
-	@94:
-	lwz r3, wp(r13)
-	lwz r0, 0x20(r3)
-	cmpw r31, r0
-	beq @102
-	cmpwi r0, 0x4
-	bge @102
-	li r3, 0x9
-	bl psndSFXOn
-	@102:
-	lwz r3, wp(r13)
-	addi r4, r29, 0x13c
-	lwz r0, 0x20(r3)
-	stw r0, 0x34(r3)
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfsx f1, r4, r0
-	lfs f0, 0x8(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x10(r5)
-	lwz r5, wp(r13)
-	lwz r0, 0x20(r5)
-	mulli r0, r0, 0x1c
-	add r3, r4, r0
-	lfs f1, 0x4(r3)
-	lfs f0, 0xc(r3)
-	fadds f0, f1, f0
-	stfs f0, 0x14(r5)
-	b @19
-	@42:
-	lhz r0, 0x0(r6)
-	lis r3, evt_memcard_copy@ha
-	addi r3, r3, evt_memcard_copy@l
-	li r4, 0x0
-	ori r0, r0, 0x40
-	li r5, 0x0
-	sth r0, 0x0(r6)
-	li r6, 0x0
-	bl evtEntryType
-	lwz r4, wp(r13)
-	stw r3, 0x3c(r4)
-	lwz r3, wp(r13)
-	lwz r0, 0x30(r3)
-	lwz r3, 0x3c(r3)
-	stw r0, 0x9c(r3)
-	lwz r3, wp(r13)
-	lwz r0, 0x34(r3)
-	lwz r3, 0x3c(r3)
-	stw r0, 0xa0(r3)
-	lwz r4, wp(r13)
-	lwz r3, 0x18(r4)
-	addi r0, r3, 0x1
-	stw r0, 0x18(r4)
-	b @19
-	@41:
-	lwz r3, 0x3c(r6)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @19
-	lis r4, 0xfaa3
-	li r3, 0x0
-	subi r4, r4, 0x4a80
-	bl evtGetValue
-	cmpwi r3, 0x0
-	bne @103
-	lwz r5, wp(r13)
-	li r4, 0x5
-	li r0, 0x1
-	lhz r3, 0x0(r5)
-	rlwinm r3, r3, 0, 26, 24
-	sth r3, 0x0(r5)
-	lwz r3, wp(r13)
-	stw r4, 0x20(r3)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @19
-	@103:
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lhz r3, 0x0(r4)
-	ori r3, r3, 0x80
-	sth r3, 0x0(r4)
-	stw r0, 0x4(r26)
-	b @83
-	@39:
-	lhz r3, 0x0(r6)
-	rlwinm. r0, r27, 0, 19, 19
-	ori r0, r3, 0x1
-	sth r0, 0x0(r6)
-	lwz r4, wp(r13)
-	lwz r25, 0x24(r4)
-	beq @104
-	subi r0, r25, 0x1
-	li r3, 0x5
-	stw r0, 0x24(r4)
-	bl psndSFXOn
-	b @105
-	@104:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @106
-	addi r0, r25, 0x1
-	li r3, 0x5
-	stw r0, 0x24(r4)
-	bl psndSFXOn
-	b @105
-	@106:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @107
-	cmpwi r25, 0x1
-	beq @108
-	bge @109
-	cmpwi r25, 0x0
-	bge @110
-	b @111
-	@109:
-	cmpwi r25, 0x3
-	bge @111
-	b @112
-	@110:
-	li r3, 0x0
-	bl OSSetSoundMode
-	lwz r3, gp(r13)
-	li r0, 0x0
-	stw r0, 0x1274(r3)
-	b @111
-	@108:
-	li r3, 0x1
-	bl OSSetSoundMode
-	lwz r3, gp(r13)
-	li r0, 0x0
-	stw r0, 0x1274(r3)
-	b @111
-	@112:
-	li r3, 0x1
-	bl OSSetSoundMode
-	lwz r3, gp(r13)
-	li r0, 0x1
-	stw r0, 0x1274(r3)
-	@111:
-	bl OSGetSoundMode
-	cmplwi r3, 0x0
-	bne @113
-	li r3, 0x0
-	bl SoundSetOutputMode
-	b @114
-	@113:
-	li r3, 0x1
-	bl SoundSetOutputMode
-	@114:
-	li r3, 0x12
-	bl psndSFXOn
-	li r3, 0xa0
-	li r4, 0x0
-	bl psndBGMOn
-	li r3, 0x200
-	bl psndENVOff
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lwz r3, 0x24(r4)
-	stw r3, 0x40(r4)
-	lwz r4, wp(r13)
-	lhz r3, 0x0(r4)
-	rlwinm r3, r3, 0, 16, 30
-	sth r3, 0x0(r4)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @19
-	@107:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @105
-	li r3, 0x13
-	bl psndSFXOn
-	li r3, 0xa0
-	li r4, 0x0
-	bl psndBGMOn
-	li r3, 0x200
-	bl psndENVOff
-	lwz r3, wp(r13)
-	lwz r0, 0x40(r3)
-	stw r0, 0x24(r3)
-	bl OSGetSoundMode
-	cmplwi r3, 0x0
-	bne @115
-	li r3, 0x0
-	bl SoundSetOutputMode
-	b @116
-	@115:
-	li r3, 0x1
-	bl SoundSetOutputMode
-	@116:
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lhz r3, 0x0(r4)
-	rlwinm r3, r3, 0, 16, 30
-	sth r3, 0x0(r4)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	b @19
-	@105:
-	lwz r3, wp(r13)
-	lwz r0, 0x24(r3)
-	cmpwi r0, 0x3
-	blt @117
-	li r0, 0x0
-	stw r0, 0x24(r3)
-	@117:
-	lwz r3, wp(r13)
-	lwz r0, 0x24(r3)
-	cmpwi r0, 0x0
-	bge @118
-	li r0, 0x2
-	stw r0, 0x24(r3)
-	@118:
-	lwz r3, wp(r13)
-	lwz r0, 0x24(r3)
-	cmpw r0, r25
-	beq @119
-	cmpwi r0, 0x1
-	beq @120
-	bge @121
-	cmpwi r0, 0x0
-	bge @122
-	b @123
-	@121:
-	cmpwi r0, 0x3
-	bge @123
-	b @124
-	@122:
-	li r3, 0x0
-	bl SoundSetOutputMode
-	b @123
-	@120:
-	li r3, 0x1
-	bl SoundSetOutputMode
-	b @123
-	@124:
-	li r3, 0x2
-	bl SoundSetOutputMode
-	@123:
-	li r3, 0x110
-	li r4, 0x75
-	bl psndENVOn
-	@119:
-	lfs f0, float_neg74_8041be74(r2)
-	lis r0, 0x4330
-	lwz r3, wp(r13)
-	stw r0, 0x20(r1)
-	lfd f1, 0x358(r30)
-	stfs f0, 0x10(r3)
-	lfs f2, float_50_8041be6c(r2)
-	lwz r3, wp(r13)
-	lfs f3, float_4_8041be78(r2)
-	lwz r0, 0x24(r3)
-	xoris r0, r0, 0x8000
-	stw r0, 0x24(r1)
-	lfd f0, 0x20(r1)
-	fsubs f0, f0, f1
-	fnmsubs f0, f2, f0, f2
-	fadds f0, f3, f0
-	stfs f0, 0x14(r3)
-	b @19
-	@43:
-	lhz r3, 0x0(r6)
-	rlwinm. r0, r27, 0, 19, 19
-	ori r0, r3, 0x1
-	sth r0, 0x0(r6)
-	beq @125
-	lwz r5, wp(r13)
-	li r3, 0x5
-	lwz r4, 0x28(r5)
-	subi r0, r4, 0x1
-	stw r0, 0x28(r5)
-	bl psndSFXOn
-	b @126
-	@125:
-	rlwinm. r0, r27, 0, 18, 18
-	beq @127
-	lwz r5, wp(r13)
-	li r3, 0x5
-	lwz r4, 0x28(r5)
-	addi r0, r4, 0x1
-	stw r0, 0x28(r5)
-	bl psndSFXOn
-	b @126
-	@127:
-	rlwinm. r0, r28, 0, 23, 23
-	beq @128
-	lwz r5, wp(r13)
-	li r3, 0x12
-	lwz r4, gp(r13)
-	lwz r0, 0x28(r5)
-	cntlzw r0, r0
-	srwi r0, r0, 5
-	stw r0, 0x1294(r4)
-	bl psndSFXOn
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lwz r3, 0x28(r4)
-	stw r3, 0x44(r4)
-	lwz r4, wp(r13)
-	lhz r3, 0x0(r4)
-	rlwinm r3, r3, 0, 16, 30
-	sth r3, 0x0(r4)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	lwz r3, gp(r13)
-	lwz r0, 0x1294(r3)
-	cmpwi r0, 0x0
-	beq @126
-	la r3, evt_shake(r13)
-	li r4, 0x0
-	li r5, 0x0
-	li r6, 0x0
-	bl evtEntryType
-	b @126
-	@128:
-	rlwinm. r0, r28, 0, 22, 22
-	beq @126
-	li r3, 0x13
-	bl psndSFXOn
-	lwz r4, wp(r13)
-	li r0, 0x1
-	lwz r3, 0x44(r4)
-	stw r3, 0x28(r4)
-	lwz r4, wp(r13)
-	lhz r3, 0x0(r4)
-	rlwinm r3, r3, 0, 16, 30
-	sth r3, 0x0(r4)
-	lwz r3, wp(r13)
-	stw r0, 0x18(r3)
-	@126:
-	lwz r3, wp(r13)
-	lwz r0, 0x28(r3)
-	cmpwi r0, 0x2
-	blt @129
-	li r0, 0x0
-	stw r0, 0x28(r3)
-	@129:
-	lwz r3, wp(r13)
-	lwz r0, 0x28(r3)
-	cmpwi r0, 0x0
-	bge @130
-	li r0, 0x1
-	stw r0, 0x28(r3)
-	@130:
-	lfs f0, float_neg74_8041be74(r2)
-	lis r0, 0x4330
-	lwz r3, wp(r13)
-	stw r0, 0x20(r1)
-	lfd f2, 0x358(r30)
-	stfs f0, 0x10(r3)
-	lfs f3, float_50_8041be6c(r2)
-	lwz r3, wp(r13)
-	lfs f0, float_30_8041be3c(r2)
-	lwz r0, 0x28(r3)
-	lfs f4, float_4_8041be78(r2)
-	xoris r0, r0, 0x8000
-	stw r0, 0x24(r1)
-	lfd f1, 0x20(r1)
-	fsubs f1, f1, f2
-	fnmsubs f0, f3, f1, f0
-	fadds f0, f4, f0
-	stfs f0, 0x14(r3)
-	@19:
-	lwz r3, wp(r13)
-	lis r0, 0x4330
-	lfs f4, float_0p25_8041be7c(r2)
-	lfs f0, 0x10(r3)
-	lfs f3, 0x8(r3)
-	stw r0, 0x20(r1)
-	fsubs f1, f0, f3
-	lfd f2, 0x350(r30)
-	lfs f0, float_0p125_8041be80(r2)
-	fmadds f1, f1, f4, f3
-	stfs f1, 0x8(r3)
-	lwz r3, wp(r13)
-	lfs f1, 0x14(r3)
-	lfs f3, 0xc(r3)
-	fsubs f1, f1, f3
-	fmadds f1, f1, f4, f3
-	stfs f1, 0xc(r3)
-	lwz r3, gp(r13)
-	lwz r0, 0x1c(r3)
-	stw r0, 0x24(r1)
-	lfd f1, 0x20(r1)
-	fsubs f1, f1, f2
-	fmuls f1, f1, f0
-	bl sin
-	frsp f2, f1
-	lfs f0, float_2_8041be70(r2)
-	lis r3, loadDraw@ha
-	lwz r7, wp(r13)
-	addi r5, r3, loadDraw@l
-	lfs f1, float_1000_8041be84(r2)
-	fmuls f0, f0, f2
-	lfs f2, 0x8(r7)
-	li r3, 0x4
-	li r4, 0x0
-	li r6, 0x0
-	fabs f0, f0
-	fadds f0, f2, f0
-	stfs f0, 0x8(r7)
-	bl dispEntry
-	@83:
-	lmw r24, 0x30(r1)
-	lwz r0, 0x54(r1)
-	mtlr r0
-	addi r1, r1, 0x50
-	blr
-}
-
-asm void seq_loadMain(SequenceWork* seq) {
-	nofralloc
-	stwu r1, -0x20(r1)
-	mflr r0
-	stw r0, 0x24(r1)
-	stw r31, 0x1c(r1)
-	mr r31, r3
-	lwz r0, 0x4(r3)
-	cmpwi r0, 0x2
-	beq @1
-	bge @2
-	cmpwi r0, 0x0
-	beq @3
-	bge @4
-	b @5
-	@2:
-	cmpwi r0, 0x4
-	beq @6
-	bge @5
-	b @7
-	@3:
-	bl getMarioStDvdRoot
-	lis r4, str_802EDA34@ha
-	mr r6, r3
-	addi r5, r4, str_802EDA34@l
-	li r3, 0x4
-	li r4, 0x0
-	crclr 6
-	bl fileAsyncf
-	cmplwi r3, 0x0
-	beq @8
-	bl getMarioStDvdRoot
-	lis r4, str_802EDA34@ha
-	mr r5, r3
-	addi r4, r4, str_802EDA34@l
-	li r3, 0x4
-	crclr 6
-	bl fileAllocf
-	lwz r4, wp(r13)
-	li r0, 0x1
-	stw r3, 0x4(r4)
-	b @9
-	@8:
-	li r0, 0x0
-	@9:
-	cmpwi r0, 0x0
-	beq @5
-	lwz r3, 0x4(r31)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r31)
-	b @5
-	@4:
-	lis r3, evt_memcard_check@ha
-	li r4, 0x0
-	addi r3, r3, evt_memcard_check@l
-	li r5, 0x0
-	li r6, 0x0
-	bl evtEntryType
-	lwz r4, wp(r13)
-	stw r3, 0x3c(r4)
-	lwz r4, wp(r13)
-	lhz r3, 0x0(r4)
-	rlwinm. r0, r3, 0, 24, 24
-	beq @10
-	rlwinm r3, r3, 0, 25, 23
-	li r0, 0x1
-	sth r3, 0x0(r4)
-	lwz r3, wp(r13)
-	lwz r3, 0x3c(r3)
-	stw r0, 0xc4(r3)
-	lwz r3, wp(r13)
-	lwz r0, 0x48(r3)
-	lwz r3, 0x3c(r3)
-	stw r0, 0x178(r3)
-	@10:
-	lwz r3, 0x4(r31)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r31)
-	b @5
-	@1:
-	lwz r3, wp(r13)
-	lwz r3, 0x3c(r3)
-	lwz r3, 0x15c(r3)
-	bl evtCheckID
-	cmpwi r3, 0x0
-	bne @5
-	lis r4, 0xfaa3
-	li r3, 0x0
-	subi r4, r4, 0x4a80
-	bl evtGetValue
-	cmpwi r3, 0x1
-	beq @11
-	li r3, 0x1
-	li r4, 0x0
-	li r5, 0x0
-	bl seqSetSeq
-	b @5
-	@11:
-	lwz r3, wp(r13)
-	li r4, 0x0
-	stw r4, 0x3c(r3)
-	lwz r3, 0x4(r31)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r31)
-	lwz r3, wp(r13)
-	stw r4, 0x18(r3)
-	bl cardGetCode
-	lwz r4, wp(r13)
-	stw r3, 0x1c(r4)
-	lwz r3, wp(r13)
-	lhz r0, 0x0(r3)
-	rlwinm r0, r0, 0, 26, 24
-	sth r0, 0x0(r3)
-	bl OSGetSoundMode
-	cmplwi r3, 0x0
-	bne @12
-	li r3, 0x0
-	bl SoundSetOutputMode
-	lwz r3, gp(r13)
-	li r0, 0x0
-	stw r0, 0x1274(r3)
-	lwz r3, wp(r13)
-	stw r0, 0x40(r3)
-	b @13
-	@12:
-	li r3, 0x1
-	bl SoundSetOutputMode
-	lwz r3, gp(r13)
-	lwz r0, 0x1274(r3)
-	cmpwi r0, 0x0
-	bne @14
-	lwz r3, wp(r13)
-	li r0, 0x1
-	stw r0, 0x40(r3)
-	b @13
-	@14:
-	lwz r3, wp(r13)
-	li r0, 0x2
-	stw r0, 0x40(r3)
-	@13:
-	lwz r5, gp(r13)
-	lis r3, win_dt@ha
-	lwz r4, wp(r13)
-	addi r3, r3, win_dt@l
-	lwz r0, 0x1294(r5)
-	cntlzw r0, r0
-	srwi r0, r0, 5
-	stw r0, 0x44(r4)
-	lwz r4, wp(r13)
-	lwz r0, 0x40(r4)
-	stw r0, 0x24(r4)
-	lwz r4, wp(r13)
-	lwz r0, 0x44(r4)
-	stw r0, 0x28(r4)
-	lwz r5, gp(r13)
-	lwz r4, wp(r13)
-	lwz r0, 0x11b8(r5)
-	stw r0, 0x20(r4)
-	lwz r4, wp(r13)
-	lwz r0, 0x20(r4)
-	mulli r0, r0, 0x1c
-	lfsx f0, r3, r0
-	stfs f0, 0x8(r4)
-	lwz r4, wp(r13)
-	lwz r0, 0x20(r4)
-	mulli r0, r0, 0x1c
-	add r3, r3, r0
-	lfs f0, 0x4(r3)
-	stfs f0, 0xc(r4)
-	b @5
-	@7:
-	lwz r0, dat_8041bd68(r2)
-	addi r5, r1, 0x8
-	li r3, 0x1c
-	li r4, 0x0
-	stw r0, 0x8(r1)
-	bl fadeEntry
-	lwz r3, 0x4(r31)
-	addi r0, r3, 0x1
-	stw r0, 0x4(r31)
-	b @5
-	@6:
-	bl loadMain
-	@5:
-	lwz r0, 0x24(r1)
-	lwz r31, 0x1c(r1)
-	mtlr r0
-	addi r1, r1, 0x20
-	blr
-}
-
-asm void seq_loadExit(SequenceWork* seq) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	lwz r3, wp(r13)
-	lwz r3, 0x4(r3)
-	cmplwi r3, 0x0
-	beq @1
-	bl fileFree
-	@1:
-	lwz r3, wp(r13)
-	li r0, 0x0
-	stw r0, 0x4(r3)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm void seq_loadInit(SequenceWork* seq) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	li r4, 0x0
-	li r5, 0x4c
-	stw r0, 0x14(r1)
-	lwz r3, wp(r13)
-	bl memset
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-
-asm s32 unk_800f2398(EventEntry* evt, BOOL isFirstCall) {
-	nofralloc
-	stwu r1, -0x10(r1)
-	mflr r0
-	stw r0, 0x14(r1)
-	stw r31, 0xc(r1)
-	mr r31, r3
-	li r3, 0x4
-	bl fadeReset
-	lwz r0, 0x178(r31)
-	li r3, 0x2
-	lwz r4, wp(r13)
-	stw r0, 0x48(r4)
-	lwz r31, 0xc(r1)
-	lwz r0, 0x14(r1)
-	mtlr r0
-	addi r1, r1, 0x10
-	blr
-}
-// clang-format on
 #endif
