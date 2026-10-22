@@ -3632,7 +3632,7 @@ USER_FUNC(stonechangertn) {
 USER_FUNC(unk_gor_0000574c) {
     s32* args = event->args;
 
-    evtSetFloat(event, args[0], marioGetPtr()->unk1AC);
+    evtSetFloat(event, args[0], marioGetPtr()->displayDirectionTarget);
     return EVT_RETURN_DONE;
 }
 
@@ -3644,7 +3644,7 @@ USER_FUNC(status_gauge_force_off) {
 USER_FUNC(set_talk_memory_ry) {
     NpcEntry* npc = npcNameToPtr("\203T\203\223\203_\201[\203X");
 
-    npc->field_148 = 270.0f;
+    npc->savedDirection = 270.0f;
     return EVT_RETURN_DONE;
 }
 
@@ -3731,7 +3731,7 @@ static USER_FUNC(set_depthPlaneOffset) {
     s32* args = event->args;
     ImageEntry* img = imgNameToPtr((const char*)evtGetValue(event, args[0]), gp->inBattle != 0);
 
-    img->field_0x11C = evtGetFloat(event, args[1]);
+    img->offsetZ = evtGetFloat(event, args[1]);
     return EVT_RETURN_DONE;
 }
 

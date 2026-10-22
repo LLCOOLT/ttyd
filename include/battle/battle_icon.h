@@ -8,8 +8,8 @@ typedef struct BattleWorkIcon {
 	u16 iconId; //0x2
 	s32 index; //0x4, TODO: rename?
 	Vec position; //0x8
-	f32 field_0x14; //0x14, prob X, TODO
-	f32 field_0x18; //0x18
+	f32 scale; //0x14, init 1.0; iconSetScale(scale * scaleMul)
+	f32 scaleMul; //0x18, init 1.0
 	IconEntry* base; //0x1C
 	Vec jumpStart; //0x20
 	Vec jumpPos; //0x2C

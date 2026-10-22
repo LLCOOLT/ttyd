@@ -12,7 +12,7 @@ static inline s32 _caseEntry(s32 conditionId, BOOL flag, const char* hitObjName,
     if (flag) {
         conditionId |= 0x8000;
     }
-    ptr->activeConditionId = conditionId;
+    ptr->conditionId = conditionId;
     ptr->hitObjName = hitObjName;
     ptr->swFlag = swFlag;
     ptr->activeFunc = NULL;
@@ -35,7 +35,7 @@ static inline s32 _evtCaseEntry(EventEntry* event, s32 conditionId, BOOL flag,
     if (flag) {
         conditionId |= 0x8000;
     }
-    ptr->activeConditionId = conditionId;
+    ptr->conditionId = conditionId;
     ptr->hitObjName = hitObjName;
     ptr->swFlag = swFlag;
     ptr->activeFunc = NULL;

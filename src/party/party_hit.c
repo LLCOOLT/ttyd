@@ -19,14 +19,15 @@ extern double cos(double);
 extern f32 partyGetHeight(PartyEntry* party);
 extern f32 partyToMovedir(PartyEntry* party, f32 angle);
 
-
 extern HitEntry* marioHitCheckVec(Vec* pos, Vec* dir, Vec* outPos, Vec* outNrm, f32* dist);
 extern s32 yoshiGetStatus(void);
 
 #define PF(p, off) (*(f32*)((u8*)(p) + (off)))
 
 extern void partyChgMot(PartyEntry* party, s32 mot);
+HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth);
 extern HitEntry* partySearchGround(PartyEntry* party, f32 a, f32 b);
+HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDist, f32* outAng);
 extern HitEntry* partyChkFrontStep(PartyEntry* party, f32 a, f32* x, f32* y, f32* z);
 
 BOOL chkfilter(HitCheckQuery* query, HitEntry* entry) {
@@ -155,7 +156,6 @@ HitEntry* partyHitCheck(PartyEntry* party, Vec* pos, Vec* dir, Vec* outPos, Vec*
     return partyHitCheckInl(party, pos, dir, outPos, outNrm, dist);
 }
 
-
 static inline f32 partyNrmTo(Vec* n) {
     return angleABf(0.0f, 0.0f, party_sqrtf(n->x * n->x + n->z * n->z), -n->y);
 }
@@ -171,7 +171,7 @@ void partyChkGnd(PartyEntry* party) {
 
     if (!(party->flags & 0x2000000)) {
         attr = 0;
-        hit = partySearchGround(party, 11.0f, PF(party, 0x114));
+        hit = partySearchGround(party, 11.0f, party->velY);
         if (hit) {
             attr = hitGetAttr(hit);
             if (attr & 0x200) {
@@ -183,7 +183,7 @@ void partyChkGnd(PartyEntry* party) {
         if (hit == NULL) {
             party->flags &= ~0x2;
             partyChgMot(party, 3);
-            PF(party, 0x11C) = -1.0f;
+            party->gravity = -1.0f;
         } else {
             party->flags |= 0x2;
             if (attr & 0x100) {
@@ -197,7 +197,7 @@ void partyChkGnd(PartyEntry* party) {
             partyChkFrontStep(party, 11.0f, &a, &b, &c);
             if (a - party->position.y >= 5.0f && PF(party, 0xE0) <= 30.0f) {
                 PF(party, 0x120) = a;
-                if (PF(party, 0x104)) {
+                if (party->moveSpeed) {
                     partyChgMot(party, 6);
                 }
             }
@@ -238,10 +238,10 @@ HitEntry* partySearchGround(PartyEntry* party, f32 range, f32 depth) {
     }
     PF(party, 0xE4) = party->position.y;
     PF(party, 0xE8) = -1.0f;
-    if (PF(party, 0x104)) {
-        rad = PF(party, 0x100);
+    if (party->moveSpeed) {
+        rad = party->targetDir;
     } else {
-        rad = partyToMovedir(party, PF(party, 0x10C));
+        rad = partyToMovedir(party, party->displayDirection);
     }
     rad = 3.1415927f * rad / 180.0f;
     nsz = (f32)sin(rad); sx = 0.375f * (party->width * nsz); nsz = (f32)cos(rad); sz = 0.375f * (party->width * -nsz);
@@ -325,10 +325,10 @@ HitEntry* partyChkFrontStep(PartyEntry* party, f32 range, f32* outY, f32* outDis
     h = partyGetHeight(party);
     *outY = party->position.y;
     *outDist = -1.0f;
-    if (PF(party, 0x104)) {
-        ang = PF(party, 0x100);
+    if (party->moveSpeed) {
+        ang = party->targetDir;
     } else {
-        ang = toMovedir(PF(party, 0x10C));
+        ang = toMovedir(party->displayDirection);
     }
     ang = revise360((s32)(0.5f + ang));
     dx = 0.265f * party->width;
@@ -597,9 +597,11 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     ly = py;
     t = (Vec){lx, ly, lz};
     d0 = best;
+    // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
     if ((t.z && t.z) && t.z)
     {
     }
+    // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
     new_var = 10.0f;
     hit = hitCheckFilter((void *) 0, &hx0, &hy0, &hz0, &d0, &nx0, &ny0, &nz0, t.x, t.y + new_var, t.z, zero, one, zero);
     if (hit && (best >= d0))
@@ -613,7 +615,11 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
     ly = py;
     lz = pz - ox;
     t = (Vec){lx, ly, lz};
+    // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
+    if ((t.z && t.z) && t.z) { }
     d1 = best;
+    // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
+    new_var = 10.0f;
     hit = hitCheckFilter((void *) 0, &hx1, &hy1, &hz1, &d1, &nx1, &ny1, &nz1, t.x, t.y + new_var, t.z, zero, one, zero);
     if (hit && (best >= d1))
     {
@@ -625,8 +631,10 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
       ly = py;
       lz = pz + oz;
       t = (Vec){lx, ly, lz};
+      // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
       if ((t.z && t.z) && t.z) { }
       d2 = best;
+      // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
       new_var = 10.0f;
       hit = hitCheckFilter((void *) 0, &hx2, &hy2, &hz2, &d2, &nx2, &ny2, &nz2, t.x, t.y + new_var, t.z, zero, one, zero);
       if (hit && (best >= d2))
@@ -639,7 +647,11 @@ void partySearchHead(PartyEntry *party, Vec *pos, f32 *dist, f32 angle)
         ly = py;
         lz = pz - oz;
         t = (Vec){lx, ly, lz};
+        // FAKE: empty barrier (no code) steers scheduling of the 10.0f + t.y argument
+        if ((t.z && t.z) && t.z) { }
         d3 = best;
+        // FAKE: new_var reloaded with the same 10.0f (permuter idiom)
+        new_var = 10.0f;
         hit = hitCheckFilter((void *) 0, &hx3, &hy3, &hz3, &d3, &nx3, &ny3, &nz3, t.x, t.y + new_var, t.z, zero, one, zero);
         if (hit && (best >= d3))
         {
@@ -672,3 +684,4 @@ void partyHitStrippedPool(f32* f, s32 i) {
     f[4] = 100.0f;
     f[5] = (f32)i;
 }
+

@@ -61,9 +61,9 @@ EVT_END()
 
 static inline void planeSetSpd(f32 a, f32 b, f32 c) {
 	MarioWork* m = marioGetPtr();
-	MW(m, 0x148, f32) = a;
-	MW(m, 0x158, f32) = b;
-	MW(m, 0x68, f32) = c;
+	m->camShiftTargetZ = a;
+	m->camShiftRate.z = b;
+	m->field_68 = c;
 	MW(m, 0x6c, Vec) = (Vec){0.0f, 40.0f, 0.0f};
 }
 
@@ -79,15 +79,15 @@ static inline void planeSfxOff(void) {
 
 static inline void planeReset(void) {
 	MarioWork* m = marioGetPtr();
-	MW(m, 0x1b4, f32) = 20.0f;
-	MW(m, 0x1b8, f32) = 37.0f;
+	m->wPlayerCollisionBox.x = 20.0f;
+	m->wPlayerCollisionBox.y = 37.0f;
 	MW(m, 0xbc, Vec) = (Vec){0.0f, 0.0f, 0.0f};
 	MW(m, 0xb0, Vec) = (Vec){0.0f, 0.0f, 0.0f};
 	MW(m, 0x98, Vec) = (Vec){0.0f, 0.0f, 0.0f};
 	marioPaperOff();
 	marioChgPaper(NULL);
 	MW(m, 4, u32) &= ~0x8;
-	MW(m, 0, u32) |= 0x80;
+	m->flags |= 0x80;
 	marioAdjustMoveDir();
 	MW(m, 4, u32) &= ~0x100;
 }
@@ -99,7 +99,7 @@ static inline BOOL planeCancel(void) {
 	}
 	if ((s32)m->currSubMotionId >= 12 && (s32)m->currSubMotionId < 20) {
 		m->currSubMotionId = 50;
-		MW(m, 0x2ac, f32) = MW(m, 0x90, f32);
+		MW(m, 0x2ac, f32) = m->position.y;
 		return TRUE;
 	}
 	return FALSE;
@@ -136,7 +136,7 @@ BOOL mario_plane_cancel(void) {
 	}
 	if ((s32)mp->currSubMotionId >= 12 && (s32)mp->currSubMotionId < 20) {
 		mp->currSubMotionId = 50;
-		MW(mp, 0x2ac, f32) = MW(mp, 0x90, f32);
+		MW(mp, 0x2ac, f32) = mp->position.y;
 		return TRUE;
 	}
 	return FALSE;
@@ -191,25 +191,25 @@ void mot_plane(void) {
 		marioChgPose("M_J_1B");
 		MW(mp, 4, u32) |= 0x100;
 		mp->currSubMotionId = 1;
-		MW(mp, 0x50, s16) = 0;
-		MW(mp, 0x180, f32) = 0.0f;
+		mp->airTimer = 0;
+		mp->baseSpeed = 0.0f;
 		MW(mp, 0x2a4, f32) = 0.0f;
-		MW(mp, 0x2a8, f32) = MW(mp, 0x90, f32);
+		mp->wCamVal1 = mp->position.y;
 		MW(mp, 0x2ac, f32) = 0.0f;
-		MD(0, u32) = (hitGetAttr(MW(mp, 0x1e8, HitEntry*)) >> 4) & 1;
+		MD(0, u32) = (hitGetAttr(mp->hitobjJumpFrom) >> 4) & 1;
 		SFX3D(0x17d, &mp->position);
 		SFX3D(0xaf, &mp->position);
 	case 1:
 		marioMakeJumpPara();
 		planeRoll1(mp, 0.125f, 30.0f);
 		done = FALSE;
-		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
+		mp->displayDirection += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
-			if (MW(mp, 0x1a8, f32) >= 630.0f) {
+			if (mp->displayDirection >= 630.0f) {
 				done = TRUE;
 			}
 		} else {
-			if (MW(mp, 0x1a8, f32) <= -630.0f) {
+			if (mp->displayDirection <= -630.0f) {
 				done = TRUE;
 			}
 		}
@@ -220,31 +220,31 @@ void mot_plane(void) {
 			marioChgPaper("PM_P_1A");
 			marioChgPose("M_Z_1");
 			MW(mp, 4, u32) |= 8;
-			animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
+			animPoseSetLocalTime(mp->paperPoseId, 0.0f);
 			animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
 			evt = evtEntry(sound_evt, 0, 0);
-			MW(evt, 0x9c, s32) = (s32)(1024.0f * MW(mp, 0x8c, f32)) + -230000000;
-			MW(evt, 0xa0, s32) = (s32)(1024.0f * MW(mp, 0x90, f32)) + -230000000;
-			MW(evt, 0xa4, s32) = (s32)(1024.0f * MW(mp, 0x94, f32)) + -230000000;
+			MW(evt, 0x9c, s32) = (s32)(1024.0f * mp->position.x) + -230000000;
+			MW(evt, 0xa0, s32) = (s32)(1024.0f * mp->position.y) + -230000000;
+			MW(evt, 0xa4, s32) = (s32)(1024.0f * mp->position.z) + -230000000;
 		}
-		if (MW(mp, 0x7c, f32) > 0.0f) {
-			MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
+		if (mp->jumpVelocityY > 0.0f) {
+			mp->position.y += mp->jumpVelocityY;
 		}
 		break;
 	case 2:
-		animPoseSetLocalTime(MW(mp, 0x23c, s32), 0.0f);
+		animPoseSetLocalTime(mp->paperPoseId, 0.0f);
 		animPoseSetLocalTime(((s32*)((u8*)mp + 0x228))[marioAnimeId()], 0.0f);
 		planeRoll1(mp, 0.125f, 30.0f);
 		done = FALSE;
-		MW(mp, 0x1a8, f32) += MW(mp, 0x2a4, f32);
+		mp->displayDirection += MW(mp, 0x2a4, f32);
 		if (MD(0, u32) & 1) {
-			if (MW(mp, 0x1a8, f32) >= 1260.0f) {
-				MW(mp, 0x1a8, f32) = 1260.0f;
+			if (mp->displayDirection >= 1260.0f) {
+				mp->displayDirection = 1260.0f;
 				done = TRUE;
 			}
 		} else {
-			if (MW(mp, 0x1a8, f32) <= -1080.0f) {
-				MW(mp, 0x1a8, f32) = -1080.0f;
+			if (mp->displayDirection <= -1080.0f) {
+				mp->displayDirection = -1080.0f;
 				done = TRUE;
 			}
 		}
@@ -268,29 +268,29 @@ void mot_plane(void) {
 		MD(0x14, f32) = 0.0f;
 		MD(0x10, f32) = 0.0f;
 		if (MD(0, u32) & 1) {
-			MW(mp, 0xb0, f32) = planeData[33];
-			MW(mp, 0x98, f32) = planeData[34];
+			mp->rotOfs.x = planeData[33];
+			mp->dispOfs.x = planeData[34];
 		} else {
-			MW(mp, 0xb0, f32) = planeData[35];
-			MW(mp, 0x98, f32) = planeData[36];
+			mp->rotOfs.x = planeData[35];
+			mp->dispOfs.x = planeData[36];
 		}
-		MW(mp, 0x1b4, f32) = 20.0f;
-		MW(mp, 0x1b8, f32) = 12.333333f;
-		MW(mp, 0x180, f32) = __fabsf(0.02f * MW(mp, 0x24e, s8));
+		mp->wPlayerCollisionBox.x = 20.0f;
+		mp->wPlayerCollisionBox.y = 12.333333f;
+		mp->baseSpeed = __fabsf(0.02f * MW(mp, 0x24e, s8));
 		mp->currSubMotionId = 12;
-		MW(mp, 0x180, f32) = 1.0f;
+		mp->baseSpeed = 1.0f;
 		MD(0x10, f32) = 2.0f;
 		{
 			MarioWork* m = marioGetPtr();
-			MW(m, 0x148, f32) = 0.0f;
-			MW(m, 0x158, f32) = 0.004f;
+			m->camShiftTargetZ = 0.0f;
+			m->camShiftRate.z = 0.004f;
 		}
-		MW(mp, 0x138, f32) = 70.0f * ((MD(0, u32) & 1) ? -1.0f : 1.0f);
-		MW(mp, 0x140, f32) = -70.0f;
+		mp->camShiftTargetX = 70.0f * ((MD(0, u32) & 1) ? -1.0f : 1.0f);
+		mp->camShiftTargetY = -70.0f;
 		break;
 	}
-	if (MW(mp, 0x90, f32) < 100.0f) {
-		MW(mp, 0x140, f32) = __fabsf(planeData[38]);
+	if (mp->position.y < 100.0f) {
+		mp->camShiftTargetY = __fabsf(planeData[38]);
 	}
 	flyMain();
 	if (marioKeyOffChk() && !(mp->trigFlags & 4)) {
@@ -300,10 +300,10 @@ void mot_plane(void) {
 	}
 	if ((s32)mp->currSubMotionId == 20 || (s32)mp->currSubMotionId == 30) {
 		camFollowYOff();
-		MW(mp, 0x140, f32) = 0.0f;
-		MW(mp, 0x138, f32) = 0.0f;
+		mp->camShiftTargetY = 0.0f;
+		mp->camShiftTargetX = 0.0f;
 		marioClearJumpPara();
-		MW(mp, 0x180, f32) = 0.0f;
+		mp->baseSpeed = 0.0f;
 		planeSfxOff();
 		planeReset();
 		allPartyRideOff2();
@@ -326,13 +326,13 @@ void mot_plane(void) {
 		}
 		planeReset();
 		marioChgPose("M_J_1C\0");
-		MW(mp, 0x90, f32) = 1.0f + (MW(mp, 0x2ac, f32) - 37.0f);
-		MW(mp, 0x180, f32) = 0.0f;
+		mp->position.y = 1.0f + (MW(mp, 0x2ac, f32) - 37.0f);
+		mp->baseSpeed = 0.0f;
 		marioSetFallPara();
-		MW(mp, 0x7c, f32) = 0.0f;
-		MW(mp, 0x80, f32) *= 0.5f;
-		MW(mp, 0x84, f32) *= 0.5f;
-		MW(mp, 0x88, f32) *= 0.5f;
+		mp->jumpVelocityY = 0.0f;
+		mp->jumpAccelerationY *= 0.5f;
+		mp->jumpJerkY *= 0.5f;
+		mp->jumpSnapY *= 0.5f;
 		mp->currSubMotionId = 90;
 		MW(mp, 4, u32) |= 0x100;
 		allPartyRideOff2();
@@ -342,7 +342,7 @@ void mot_plane(void) {
 		MW(mp, 0x48, s32) = sysMsec2Frame(520);
 		mp->currSubMotionId = 61;
 	case 61:
-		if (MW(mp, 0x180, f32) > 1.0f) {
+		if (mp->baseSpeed > 1.0f) {
 			mp->currSubMotionId = 14;
 			break;
 		}
@@ -369,27 +369,27 @@ void mot_plane(void) {
 		planeSfxOff();
 		planeReset();
 		MW(mp, 4, u32) &= ~0x100;
-		MW(mp, 0x180, f32) = 0.0f;
+		mp->baseSpeed = 0.0f;
 		MW(mp, 0x2a4, f32) = 0.0f;
-		MW(mp, 0x90, f32) = 1.0f + MW(mp, 0x2ac, f32);
+		mp->position.y = 1.0f + MW(mp, 0x2ac, f32);
 		marioPreJump();
-		MW(mp, 0x7c, f32) *= 0.5f;
+		mp->jumpVelocityY *= 0.5f;
 		marioChgPose("M_J_1B");
 		mp->currSubMotionId = 80;
 		SFX3D(0x180, &MW(mp, 0x8c, Vec));
 		allPartyRideOff2();
 	case 80:
 		planeRoll2(mp, 0.3f, 28.0f);
-		MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
+		mp->displayDirection = revise360(mp->displayDirection + MW(mp, 0x2a4, f32));
 		marioMakeJumpPara();
-		MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
+		mp->position.y += mp->jumpVelocityY;
 		marioChkOverhead();
-		if (MW(mp, 0x7c, f32) < 0.0f || MW(mp, 0x1f4, void*) != NULL) {
+		if (mp->jumpVelocityY < 0.0f || mp->hitobjHead != NULL) {
 			marioSetFallPara();
-			MW(mp, 0x7c, f32) *= 0.5f;
-			MW(mp, 0x80, f32) *= 0.5f;
-			MW(mp, 0x84, f32) *= 0.5f;
-			MW(mp, 0x88, f32) *= 0.5f;
+			mp->jumpVelocityY *= 0.5f;
+			mp->jumpAccelerationY *= 0.5f;
+			mp->jumpJerkY *= 0.5f;
+			mp->jumpSnapY *= 0.5f;
 			mp->currSubMotionId = 90;
 			MW(mp, 4, u32) |= 0x100;
 			MW(mp, 0x48, s32) = 20;
@@ -398,69 +398,69 @@ void mot_plane(void) {
 	case 90:
 		if (MW(mp, 0x48, s32) > 0) {
 			planeRoll2(mp, 0.3f, 28.0f);
-			MW(mp, 0x1a8, f32) = revise360(MW(mp, 0x1a8, f32) + MW(mp, 0x2a4, f32));
+			mp->displayDirection = revise360(mp->displayDirection + MW(mp, 0x2a4, f32));
 			if (--MW(mp, 0x48, s32) <= 0) {
 				MW(mp, 4, u32) &= ~0x100;
 			}
 		}
 		marioMakeJumpPara();
-		if (MW(mp, 0x7c, f32) <= -20.0f) {
-			MW(mp, 0x7c, f32) = -20.0f;
+		if (mp->jumpVelocityY <= -20.0f) {
+			mp->jumpVelocityY = -20.0f;
 		}
 		{
 			HitEntry* hit;
-			MW(mp, 0x1e4, HitEntry*) = NULL;
-			hit = marioSearchGround(&y, &b, &c, MW(mp, 0x7c, f32), MW(mp, 0x7c, f32));
+			mp->hitobjStandOn = NULL;
+			hit = marioSearchGround(&y, &b, &c, mp->jumpVelocityY, mp->jumpVelocityY);
 			if (hit != NULL) {
-				MW(mp, 0x90, f32) = y;
-				MW(mp, 0x1e4, HitEntry*) = hit;
+				mp->position.y = y;
+				mp->hitobjStandOn = hit;
 			} else {
-				MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
+				mp->position.y += mp->jumpVelocityY;
 			}
 		}
-		if (MW(mp, 0x1e4, HitEntry*) != NULL) {
+		if (mp->hitobjStandOn != NULL) {
 			camFollowYOn();
 			allPartyRideOff2();
-			MW(mp, 0x50, s16) = 0;
-			MW(mp, 0x52, s16) = 0;
-			MW(mp, 0, u32) &= ~0x80;
+			mp->airTimer = 0;
+			mp->jumpPeakAirTime = 0;
+			mp->flags &= ~0x80;
 			marioAdjustMoveDir();
 			planeReset();
 			if (mp->motStruct != NULL) {
 				__memFree(HEAP_DEFAULT, mp->motStruct);
 				mp->motStruct = NULL;
 			}
-			MW(mp, 0x138, f32) = 0.0f;
-			MW(mp, 0x140, f32) = 0.0f;
+			mp->camShiftTargetX = 0.0f;
+			mp->camShiftTargetY = 0.0f;
 			marioChgMot(0);
 		}
 		break;
 	case 70: {
 		Vec p;
-		set_damage_root_ypos(MW(mp, 0x90, f32));
+		set_damage_root_ypos(mp->position.y);
 		p = MW(mp, 0x8c, Vec);
 		marioSetSplash(0, &p);
 		MW(mp, 0x48, s32) = 16;
 		mp->currSubMotionId = 71;
-		MW(mp, 0x7c, f32) = -2.0f;
-		MW(mp, 0x80, f32) = 0.0f;
-		MW(mp, 0x84, f32) = 0.0f;
-		MW(mp, 0x88, f32) = 0.0f;
+		mp->jumpVelocityY = -2.0f;
+		mp->jumpAccelerationY = 0.0f;
+		mp->jumpJerkY = 0.0f;
+		mp->jumpSnapY = 0.0f;
 		camFollowYOff();
 	}
 	case 71:
 		marioMakeJumpPara();
-		MW(mp, 0x90, f32) += MW(mp, 0x7c, f32);
-		if (MW(mp, 0x90, f32) >= MW(mp, 0x2ac, f32) - 100.0f) {
+		mp->position.y += mp->jumpVelocityY;
+		if (mp->position.y >= MW(mp, 0x2ac, f32) - 100.0f) {
 			break;
 		}
 		mp->currSubMotionId = 72;
 	case 72:
-		MW(mp, 0x140, f32) = 0.0f;
-		MW(mp, 0x138, f32) = 0.0f;
+		mp->camShiftTargetY = 0.0f;
+		mp->camShiftTargetX = 0.0f;
 		marioClearJumpPara();
 		planeSfxOff();
-		MW(mp, 0x180, f32) = 0.0f;
+		mp->baseSpeed = 0.0f;
 		planeReset();
 		allPartyRideOff2();
 		marioSetFallPara();
@@ -468,7 +468,7 @@ void mot_plane(void) {
 		marioChgMot(0x1f);
 	}
 	marioUpdateCamCollision(MW(mp, 0x8c, Vec));
-	MW(mp, 0x18c, f32) = MW(mp, 0x180, f32);
+	MW(mp, 0x18c, f32) = mp->baseSpeed;
 }
 
 
@@ -483,7 +483,7 @@ void marioSearchUnder(void);
 static inline BOOL planeChkUnder(void) {
 	BOOL ret = FALSE;
 	MarioWork* m = marioGetPtr();
-	if (MW(m, 0x1f8, HitEntry*) != NULL && (hitGetAttr(MW(m, 0x1f8, HitEntry*)) & 0x38)) {
+	if (m->hitobjUnder != NULL && (hitGetAttr(m->hitobjUnder) & 0x38)) {
 		ret = TRUE;
 	}
 	return ret;
@@ -501,7 +501,7 @@ static void flyMain(void) {
 	mp = marioGetPtr();
 	switch (mp->currSubMotionId) {
 	case 12:
-		if (MW(mp, 0x2a8, f32) >= MW(mp, 0x90, f32)) {
+		if (mp->wCamVal1 >= mp->position.y) {
 			mp->currSubMotionId = 14;
 		}
 		{
@@ -511,10 +511,10 @@ static void flyMain(void) {
 			}
 		}
 	case 14:
-		if (MW(mp, 0x9c, f32) > planeData[38]) {
-			MW(mp, 0x9c, f32) -= 2.0f;
-			MW(mp, 0xb4, f32) += 2.0f;
-			MW(mp, 0x90, f32) += 2.0f;
+		if (mp->dispOfs.y > planeData[38]) {
+			mp->dispOfs.y -= 2.0f;
+			mp->rotOfs.y += 2.0f;
+			mp->position.y += 2.0f;
 		} else {
 			mp->currSubMotionId = 15;
 		}
@@ -523,14 +523,14 @@ static void flyMain(void) {
 	if ((s32)mp->currSubMotionId != 15) {
 		return;
 	}
-	if (MW(mp, 0x248, u16) & 0x100) {
+	if (mp->buttonBuffer & 0x100) {
 		mp->currSubMotionId = 51;
-		MW(mp, 0x2ac, f32) = MW(mp, 0x90, f32);
+		MW(mp, 0x2ac, f32) = mp->position.y;
 		return;
 	}
-	if (MW(mp, 0x248, u16) & 0x200) {
+	if (mp->buttonBuffer & 0x200) {
 		mp->currSubMotionId = 51;
-		MW(mp, 0x2ac, f32) = MW(mp, 0x90, f32);
+		MW(mp, 0x2ac, f32) = mp->position.y;
 		return;
 	}
 	D(8) = revise360(D(0xc) * planeData[14] + D(8));
@@ -554,7 +554,7 @@ static void flyMain(void) {
 	if (t >= 90.0f && t <= 270.0f) {
 		flag = TRUE;
 	}
-	MW(mp, 0x1a8, f32) = revise360(flag ? -t - 90.0f : 270.0f - t);
+	mp->displayDirection = revise360(flag ? -t - 90.0f : 270.0f - t);
 	if (STICK != 0) {
 		if (SPD) {
 			a = __fabsf((f32)STICK);
@@ -710,21 +710,21 @@ static void flyMain(void) {
 	if (SPD >= planeData[0]) {
 		SPD = planeData[0];
 	}
-	MW(mp, 0x90, f32) += D(0x18);
-	MW(mp, 0x90, f32) -= planeData[29];
-	MW(mp, 0xc4, f32) = revise360(-D(4));
-	MW(mp, 0x1a0, f32) = D(8);
-	sincosf(&s, &c, MW(mp, 0x1a0, f32));
-	MW(mp, 0x94, f32) += SPD * c;
+	mp->position.y += D(0x18);
+	mp->position.y -= planeData[29];
+	mp->rot.z = revise360(-D(4));
+	mp->directionView = D(8);
+	sincosf(&s, &c, mp->directionView);
+	mp->position.z += SPD * c;
 	sincosf(&s2, &c2, 90.0f + D(4));
-	MW(mp, 0x90, f32) += (SPD * c2) * ((c2 >= 0.0f) ? planeData[31] : planeData[32]);
-	MW(mp, 0x8c, f32) += s2 * (SPD * s);
+	mp->position.y += (SPD * c2) * ((c2 >= 0.0f) ? planeData[31] : planeData[32]);
+	mp->position.x += s2 * (SPD * s);
 	if (SPD <= planeData[16]) {
 		n = sysMsec2Frame(1000.0f * planeData[17]);
 		if (MD(0, u32) & 1) {
 			if ((f32)STICK < 0.0f) {
 				if (++MD(0x20, s32) >= n) {
-					MW(mp, 0x2ac, f32) = MW(mp, 0x90, f32);
+					MW(mp, 0x2ac, f32) = mp->position.y;
 					mp->currSubMotionId = 60;
 					return;
 				}
@@ -732,7 +732,7 @@ static void flyMain(void) {
 		} else {
 			if ((f32)STICK > 0.0f) {
 				if (++MD(0x20, s32) >= n) {
-					MW(mp, 0x2ac, f32) = MW(mp, 0x90, f32);
+					MW(mp, 0x2ac, f32) = mp->position.y;
 					mp->currSubMotionId = 60;
 					return;
 				}
@@ -741,18 +741,18 @@ static void flyMain(void) {
 	} else {
 		MD(0x20, s32) = 0;
 	}
-	MW(mp, 0x1f8, HitEntry*) = ((HitEntry * (*)(void)) marioSearchUnder)();
+	mp->hitobjUnder = ((HitEntry * (*)(void)) marioSearchUnder)();
 	if (chkCollision(&MW(mp, 0x2ac, f32))) {
-		if (MW(mp, 0x1f4, HitEntry*) != NULL) {
+		if (mp->hitobjHead != NULL) {
 			mp->currSubMotionId = 40;
 		} else {
 			HitEntry* h = NULL;
 			mp->currSubMotionId = 50;
-			if (MW(mp, 0x1e0, HitEntry*) != NULL) {
-				h = MW(mp, 0x1e0, HitEntry*);
+			if (mp->hitobjFront != NULL) {
+				h = mp->hitobjFront;
 			}
-			if (MW(mp, 0x1e4, HitEntry*) != NULL) {
-				h = MW(mp, 0x1e4, HitEntry*);
+			if (mp->hitobjStandOn != NULL) {
+				h = mp->hitobjStandOn;
 			}
 			if (h != NULL && (hitGetAttr(h) & 0x200)) {
 				mp->currSubMotionId = 70;
@@ -766,8 +766,8 @@ void mot_plane_post(void) {
 	camFollowYOn();
 	planeSfxOff();
 	planeReset();
-	MW(mp, 0x138, f32) = 0.0f;
-	MW(mp, 0x140, f32) = 0.0f;
+	mp->camShiftTargetX = 0.0f;
+	mp->camShiftTargetY = 0.0f;
 	if (mp->motStruct != NULL) {
 		__memFree(HEAP_DEFAULT, mp->motStruct);
 		mp->motStruct = NULL;
@@ -794,19 +794,19 @@ BOOL chkCollision(f32* outY) {
 	sincosf(&s0, &c0, 90.0f + MD(4, f32));
 	sincosf(&s1, &c1, MD(8, f32));
 	{
-		x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32)); y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32)); z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
+		x = mp->rotOfs.x + (mp->position.x + mp->dispOfs.x); y = mp->rotOfs.y + (mp->position.y + mp->dispOfs.y); z = mp->rotOfs.z + (mp->position.z + mp->dispOfs.z);
 		x += s1 * c0 * r; y += -s0 * r; z += c1 * c0 * r;
 		v = (Vec){x, y, z};
 	}
 	MD(0x3c, Vec) = v;
 	sincosf(&s2, &c2, MD(0xc, f32));
 	sincosf(&s0, &c0, MD(4, f32));
-	MW(mp, 0x1e0, HitEntry*) = NULL;
+	mp->hitobjFront = NULL;
 	r = planeData[40];
 	sincosf(&s1, &c1, MD(8, f32));
-	x = MW(mp, 0xb0, f32) + (MW(mp, 0x8c, f32) + MW(mp, 0x98, f32));
-	y = MW(mp, 0xb4, f32) + (MW(mp, 0x90, f32) + MW(mp, 0x9c, f32));
-	z = MW(mp, 0xb8, f32) + (MW(mp, 0x94, f32) + MW(mp, 0xa0, f32));
+	x = mp->rotOfs.x + (mp->position.x + mp->dispOfs.x);
+	y = mp->rotOfs.y + (mp->position.y + mp->dispOfs.y);
+	z = mp->rotOfs.z + (mp->position.z + mp->dispOfs.z);
 	x += r * (s1 * -c0);
 	z += r * (c1 * -c0);
 	y += s0 * r;
@@ -821,21 +821,21 @@ BOOL chkCollision(f32* outY) {
 	x = MD(0x30, f32) - 10.0f * s1;
 	y = MD(0x34, f32);
 	z = MD(0x38, f32) - 10.0f * c1;
-	dist = 10.0f + MW(mp, 0x180, f32);
+	dist = 10.0f + mp->baseSpeed;
 	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y,
 	                    z, s1, 0.0f, c1);
 	if (hit != NULL) {
-		MW(mp, 0x1e0, HitEntry*) = hit;
+		mp->hitobjFront = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
 	x = MD(0x3c, f32);
 	y = MD(0x40, f32);
 	z = MD(0x44, f32);
-	dist = MW(mp, 0x180, f32);
+	dist = mp->baseSpeed;
 	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, s1, 0.0f, c1);
 	if (hit != NULL) {
-		MW(mp, 0x1e0, HitEntry*) = hit;
+		mp->hitobjFront = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
@@ -843,11 +843,11 @@ BOOL chkCollision(f32* outY) {
 	x = MD(0x30, f32);
 	y = MD(0x34, f32);
 	z = MD(0x38, f32);
-	MW(mp, 0x1e4, HitEntry*) = NULL;
+	mp->hitobjStandOn = NULL;
 	dist = 10.1f;
 	hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + r, z, 0.0f, -1.0f, 0.0f);
 	if (hit != NULL) {
-		MW(mp, 0x1e4, HitEntry*) = hit;
+		mp->hitobjStandOn = hit;
 		ret = TRUE;
 		*outY = oy;
 	}
@@ -855,11 +855,11 @@ BOOL chkCollision(f32* outY) {
 		x = MD(0x3c, f32);
 		y = MD(0x40, f32);
 		z = MD(0x44, f32);
-		MW(mp, 0x1e4, HitEntry*) = NULL;
+		mp->hitobjStandOn = NULL;
 		dist = 10.1f;
 		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y + r, z, 0.0f, -1.0f, 0.0f);
 		if (hit != NULL) {
-			MW(mp, 0x1e4, HitEntry*) = hit;
+			mp->hitobjStandOn = hit;
 			ret = TRUE;
 			*outY = oy;
 		}
@@ -870,20 +870,20 @@ BOOL chkCollision(f32* outY) {
 		PSVECNormalize(&dir, &dir);
 		hit = marioHitCheckVec(&MD(0x30, Vec), &dir, &hpos, NULL, &dist);
 		if (hit != NULL) {
-			MW(mp, 0x1e4, HitEntry*) = hit;
+			mp->hitobjStandOn = hit;
 			ret = TRUE;
 			*outY = hpos.y;
 		}
 	}
-	MW(mp, 0x1f4, HitEntry*) = NULL;
-	if (MW(mp, 0x1e4, HitEntry*) == NULL) {
+	mp->hitobjHead = NULL;
+	if (mp->hitobjStandOn == NULL) {
 		x = MD(0x30, f32);
 		y = MD(0x34, f32);
 		z = MD(0x38, f32);
 		dist = 2.0f;
 		hit = marioHitCheck(&ox, &oy, &oz, &dist, &nx, &ny, &nz, x, y, z, 0.0f, 1.0f, 0.0f);
 		if (hit != NULL) {
-			MW(mp, 0x1f4, HitEntry*) = hit;
+			mp->hitobjHead = hit;
 			ret = TRUE;
 			*outY = oy;
 		}

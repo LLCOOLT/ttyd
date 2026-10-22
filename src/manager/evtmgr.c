@@ -320,8 +320,8 @@ EventEntry* evtChildEntry(EventEntry* parent, void* evtCode, u8 flags) {
 	entry->selectWindowId = parent->selectWindowId;
 	entry->printWindowId = parent->printWindowId;
 	entry->printWindowFlags = parent->printWindowFlags;
-	entry->unk184 = parent->unk184;
-	entry->unk18C = parent->unk18C;
+	entry->msgPos = parent->msgPos;
+	entry->msgPosZ = parent->msgPosZ;
 	entry->msgPriority = parent->msgPriority;
 
 	for (i = 0; i < 16; i++) {
@@ -512,8 +512,8 @@ void evtDelete(EventEntry* entry) {
 			waiting->selectWindowId = entry->selectWindowId;
 			waiting->printWindowId = entry->printWindowId;
 			waiting->printWindowFlags = entry->printWindowFlags;
-			waiting->unk184 = entry->unk184;
-			waiting->unk18C = entry->unk18C;
+			waiting->msgPos = entry->msgPos;
+			waiting->msgPosZ = entry->msgPosZ;
 			waiting->msgPriority = entry->msgPriority;
 		}
 		entry->flags &= ~EVENT_ACTIVE;

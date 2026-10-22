@@ -157,7 +157,7 @@ s32 battleAcMain_ShotTarget(BattleWork* work) {
                     cw->inRange = 0;
                 }
                 cw->frame--;
-                if ((ac->field_0x4 & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+                if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
                     if (irand(100) >= 0) {
                         ac->result = 0;
                     } else {

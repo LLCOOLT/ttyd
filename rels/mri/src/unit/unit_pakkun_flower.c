@@ -283,7 +283,7 @@ static USER_FUNC(shadow_scale_memory) {
     BattleUnit* unit = BattleGetUnitPtr(_battleWorkPointer, id);
     BattleUnitPart* part = BtlUnit_GetPartsPtr(unit, 1);
 
-    unit->work[0] = part->field_0x78;
+    unit->work[0] = part->shadowScale;
     return EVT_RETURN_DONE;
 }
 
@@ -295,7 +295,7 @@ static USER_FUNC(shadow_scale_small) {
     if (isFirstCall) {
         unit->work[1] = 0;
     }
-    part->field_0x78 = intplGetValue(unit->work[0], 0.0f, 0, unit->work[1], 15);
+    part->shadowScale = intplGetValue(unit->work[0], 0.0f, 0, unit->work[1], 15);
     if (unit->work[1] >= 15) {
         return EVT_RETURN_DONE;
     }
@@ -311,7 +311,7 @@ static USER_FUNC(shadow_scale_return) {
     if (isFirstCall) {
         unit->work[1] = 0;
     }
-    part->field_0x78 = intplGetValue(0.0f, unit->work[0], 0, unit->work[1], 15);
+    part->shadowScale = intplGetValue(0.0f, unit->work[0], 0, unit->work[1], 15);
     if (unit->work[1] >= 15) {
         return EVT_RETURN_DONE;
     }

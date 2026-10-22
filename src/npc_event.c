@@ -38,7 +38,7 @@ USER_FUNC(mahoon_get_groupname) {
 USER_FUNC(npc_check_wall_stop) {
     s32* args = event->args;
     NpcEntry* npc = evtNpcNameToPtr(event, "me");
-    if (npc->field_2FC) {
+    if (npc->wallHit) {
         evtSetValue(event, args[0], 1);
     } else {
         evtSetValue(event, args[0], 0);
@@ -3851,7 +3851,7 @@ USER_FUNC(zakoEntryDokan) {
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
         hn = hitGetName(marioGetPtr()->hitobjJumpFrom);
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
-        hn = hitGetName(marioGetPtr()->field_0x1E0);
+        hn = hitGetName(marioGetPtr()->hitobjFront);
         if (hn && !strcmp(hn, nm3)) return EVT_RETURN_DONE;
     }
     for (i = 0; i < 3; i++) {

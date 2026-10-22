@@ -17,13 +17,13 @@ void mot_yoshi(void) {
         mario->airTimer = 0;
         mario->currSubMotionId = 0;
         mario->baseSpeed = 0.0f;
-        mario->field_0x1DC = 0;
-        mario->field_0x1E0 = 0;
+        mario->hitobjFrontA = 0;
+        mario->hitobjFront = 0;
         mario->hitobjStandOn = NULL;
         mario->hitobjPush = NULL;
-        mario->field_0x1F0 = 0;
-        mario->field_0x1F4 = 0;
-        mario->field_0x1F8 = 0;
+        mario->hitobjWall = 0;
+        mario->hitobjHead = 0;
+        mario->hitobjUnder = 0;
     }
 }
 
@@ -40,6 +40,6 @@ void mot_yoshi_post(void) {
     bero_clear_Offset();
     mario->dispFlags &= ~4;
     mario->dispFlags &= ~0x1000;
-    mario->field_0x98 = (Vec){ 0.0f, 0.0f, 0.0f };
-    mario->field_0xA4 = (Vec){ 0.0f, 0.0f, 0.0f };
+    mario->dispOfs = (Vec){ 0.0f, 0.0f, 0.0f };
+    mario->dispOfs2 = (Vec){ 0.0f, 0.0f, 0.0f };
 }

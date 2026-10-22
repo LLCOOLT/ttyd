@@ -242,8 +242,8 @@ static USER_FUNC(paper_on) {
 		}
 		event->userdata[0]++;
 	}
-	mario->unk1AC = amount;
-	mario->unk1A8 = amount;
+	mario->displayDirectionTarget = amount;
+	mario->displayDirection = amount;
 	return 0;
 }
 

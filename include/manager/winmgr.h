@@ -57,14 +57,14 @@ typedef struct WinMgrSelect {
 	s32 state; //0x8
 	s32 cursor; //0xC
 	s32 scrollTop; //0x10
-	f32 field_0x14; //0x14
-	f32 field_0x18; //0x18
-	f32 field_0x1C; //0x1C
+	f32 cursorX; //0x14, hand cursor (icon 0x1F0) x, eased toward the selected row
+	f32 cursorY; //0x18, hand cursor y
+	f32 scrollY; //0x1C, list scroll offset, eased toward 24 * scrollTop
 	s32 numDescriptors; //0x20
 	s32 descriptorId[3]; //0x24
 	WinMgrSelectItem* items; //0x30
 	s32 numItems; //0x34
-	s32 field_0x38; //0x38
+	s32 newItem; //0x38, item being picked up when the bag is full (row 0 above a divider; picking it returns -1)
 } WinMgrSelect;
 
 void winMgrInit(void);

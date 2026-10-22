@@ -441,7 +441,6 @@ void effGonbabaBreathDisp(CameraId cameraId, EffectEntry *effect)
   GXTexObj texObj;
   s32 i;
   s32 j;
-  float new_var;
   CameraEntry *cam;
   s32 type;
   s32 alpha;

@@ -179,7 +179,9 @@ struct BattleWork {
     u32 flags;                          // 0xEF4
     s32 dispFlags;                      // 0xEF8
     s32 ruleDispTimer;                  // 0xEFC
-    u8 field_F00[0xF0C - 0xF00];        // 0xF00
+    s32 stockExp;                       // 0xF00, BattleStoreExp/BattleGetStockExp
+    s32 stockExpDisp;                   // 0xF04, counts up to stockExp in BattleStockExpDisp
+    s32 stockExpTimer;                  // 0xF08, frame counter for that count-up
     s32 seqInitValue;                   // 0xF0C
     s32 seqFirstActValue;               // 0xF10
     s32 seqTurnValue;                   // 0xF14
@@ -202,7 +204,10 @@ struct BattleWork {
     FieldBattleInfo* fbatInfo;          // 0x2738
     s32 statusWindowOff;                // 0x273C
     s32 lectureMode;                    // 0x2740
-    u8 field_2744[0x2754 - 0x2744];     // 0x2744
+    s32 statusWindowSystemOn;           // 0x2744, BattleStatusWindowSystemOn/Off
+    s32 statusWindowEventOn;            // 0x2748, BattleStatusWindowEventOn/Off
+    s32 statusWindowAPRecoveryOn;       // 0x274C, BattleStatusWindowAPRecoveryOn/Off
+    s32 field_2750;                     // 0x2750
     BattleCameraWork cameraWork;        // 0x2754
     BattleAudience audience;            // 0x2858
     u8 field_1616C[0x162A0 - 0x1616C];  // 0x1616C

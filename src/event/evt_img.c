@@ -24,8 +24,8 @@ USER_FUNC(evt_img_set_position) {
     f32 x = evtGetFloat(event, args[1]);
     f32 y = evtGetFloat(event, args[2]);
     ImageEntry* img = imgNameToPtr(name, gp->inBattle != 0);
-    img->field_0xE8 = x;
-    img->field_0xEC = y;
+    img->offsetX = x;
+    img->offsetY = y;
     return EVT_RETURN_DONE;
 }
 
@@ -47,7 +47,7 @@ USER_FUNC(evt_img_set_paper_anim) {
     s32 anim = evtGetValue(event, args[1]);
     s32 group = gp->inBattle != 0;
     ImageEntry* img = imgNameToPtr(name, group);
-    img->field_0x108 = anim;
+    img->animName = anim;
     *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
     return EVT_RETURN_DONE;
 }
@@ -80,15 +80,15 @@ USER_FUNC(evt_img_alloc_capture) {
     w += w & 1;
     h += h & 1;
     for (i = 0; i < 3; i++) {
-        if (i != shadowId && (img->shadows[i].flags & 4) && (img->field_0xE4 != (u16)w || img->field_0xE6 != (u16)h)) {
+        if (i != shadowId && (img->shadows[i].flags & 4) && (img->width != (u16)w || img->height != (u16)h)) {
             return EVT_RETURN_DONE;
         }
     }
     if (x == 0 && y == 0 && w == 0 && h == 0 && offId != -1) {
-        img->field_0xE4 = 0;
-        img->field_0xE6 = 0;
-        sh->field_0x4 = 0;
-        sh->field_0x6 = 0;
+        img->width = 0;
+        img->height = 0;
+        sh->x = 0;
+        sh->y = 0;
         if (shadowId == 2) {
             sh->field_0x14 = 39;
             sh->field_0x18 = 1;
@@ -102,10 +102,10 @@ USER_FUNC(evt_img_alloc_capture) {
             x + w > DEMOGetRenderModeObj()->fbWidth || y + h > DEMOGetRenderModeObj()->efbHeight) {
             return EVT_RETURN_DONE;
         }
-        img->field_0xE4 = w;
-        img->field_0xE6 = h;
-        sh->field_0x4 = x;
-        sh->field_0x6 = y;
+        img->width = w;
+        img->height = h;
+        sh->x = x;
+        sh->y = y;
         if (shadowId == 2) {
             sh->field_0x14 = 39;
             sh->field_0x18 = 1;
@@ -177,7 +177,7 @@ USER_FUNC(evt_img_wait_animend) {
     if (isFirstCall) {
         return EVT_RETURN_BLOCK;
     }
-    if (img->field_0x118 < 1.0f) {
+    if (img->loopTimes < 1.0f) {
         return EVT_RETURN_BLOCK;
     }
     return EVT_RETURN_DONE;

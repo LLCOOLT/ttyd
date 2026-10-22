@@ -22,17 +22,40 @@ def badge(label, value, color="blue"):
     return f"https://img.shields.io/badge/{label}-{text}-{color}"
 
 
+def true_c(report):
+    """True C figures (L 2026-10-19): the report counts asm stand-ins as matched, so lead with C-only numbers.
+    Uses scratch/true_c.py when present; returns {} otherwise."""
+    try:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("true_c", os.path.join(ROOT, "scratch", "true_c.py"))
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        return mod.stats(report)
+    except Exception as e:
+        print(f"true C stats unavailable: {e}")
+        return {}
+
+
 def main():
     report = json.load(open(REPORT, encoding="utf-8"))
     total = report["measures"]
     cats = {c["name"]: c["measures"] for c in report.get("categories", [])}
     readme = open(README, encoding="utf-8").read()
+    tc = true_c(report)
 
+    # L 2026-10-19: badges lead with true C; the report's figures (asm stand-ins counted as matched) are labelled "Build"
     badges = {
-        "Progress": badge("Code", pct(total, "matched_code_percent")),
-        "DOL Progress": badge("DOL", pct(cats.get("DOL", {}), "matched_code_percent")),
-        "RELs Progress": badge("RELs", pct(cats.get("Modules", {}), "matched_code_percent")),
-        "Linked Progress": badge("Linked", pct(total, "complete_code_percent"), "green"),
+        "Progress": badge("Code", tc["true_code"]) if tc.get("asm_fns", 1) == 0
+        else badge("C%20exact", tc["c_exact_code"]) if "c_exact_code" in tc
+        else badge("True%20C%20exact", tc["true_code"]) if "true_code" in tc
+        else badge("Build", pct(total, "matched_code_percent")),
+        "DOL Progress": badge("Functions", 100.0 * tc["true_fns"] / tc["total_fns"]) if tc.get("asm_fns", 1) == 0
+        else badge("True%20C%20fuzzy", tc["true_fuzzy"]) if "true_fuzzy" in tc
+        else badge("DOL", pct(cats.get("DOL", {}), "matched_code_percent")),
+        "RELs Progress": badge("Data", tc["true_data"]) if tc.get("asm_fns", 1) == 0 and "true_data" in tc
+        else badge("Build%20(with%20asm%20stand--ins)", pct(total, "matched_code_percent"), "lightgrey"),
+        "Linked Progress": badge("Linked", pct(total, "complete_code_percent")) if tc.get("asm_fns", 1) == 0
+        else badge("Build%20linked", pct(total, "complete_code_percent"), "lightgrey"),
     }
     for name, url in badges.items():
         line = f"[{name}]: {url}"
@@ -55,9 +78,40 @@ def main():
             f"| {name} | {pct(m, 'matched_code_percent'):.2f}% | {pct(m, 'complete_code_percent'):.2f}% "
             f"| {units} | {funcs} |"
         )
+    head = ""
+    pure_c = tc.get("asm_fns", 1) == 0  # L 2026-10-21: asm stand-ins removed; every figure is C
+    if pure_c:
+        head = (
+            "**Progress** (all source is C; units whose C does not match yet are built from the original code, "
+            "so the build stays byte-identical):\n\n"
+            "| Measure | Value |\n|---|---|\n"
+            f"| **Code matched by C** (by code size) | **{tc['true_code']:.2f}%** |\n"
+            f"| **Functions matched by C** | **{tc['true_fns']} / {tc['total_fns']}** ({100.0 * tc['true_fns'] / tc['total_fns']:.1f}%) |\n"
+            f"| Files linked from C | {total.get('complete_units')} / {total.get('total_units')} ({pct(total, 'complete_code_percent'):.2f}% of code) |\n"
+            + (f"| Fuzzy match | {tc['true_fuzzy']:.2f}% |\n" if "true_fuzzy" in tc else "")
+            + (f"| Data, exact (bytes + where each relocation points; objdiff's name-paired figure is {tc['objdiff_data']:.2f}%) | {tc['true_data']:.2f}% |\n" if "true_data" in tc else "")
+            + "\n"
+        )
+    elif "true_code" in tc:
+        head = (
+            "**True C progress** (asm stand-ins are not counted as matched):\n\n"
+            "| Measure | Value |\n|---|---|\n"
+            + (f"| **C exact** (by code size; includes C that matches but is still built from asm) | **{tc['c_exact_code']:.2f}%** |\n"
+               f"| **C exact functions** | **{tc['c_exact_fns']} / {tc['total_fns']}** ({100.0 * tc['c_exact_fns'] / tc['total_fns']:.1f}%) |\n"
+               if "c_exact_code" in tc else "")
+            + f"| C in the build, exact (by code size) | {tc['true_code']:.2f}% |\n"
+            + (f"| True C, fuzzy (asm stand-ins scored by their C) | {tc['true_fuzzy']:.2f}% |\n" if "true_fuzzy" in tc else "")
+            + (f"| Data, exact (bytes + where each relocation points; objdiff's name-paired figure is {tc['objdiff_data']:.2f}%) | {tc['true_data']:.2f}% |\n" if "true_data" in tc else "")
+            + f"| Functions built from exact C | {tc['c_fns']} / {tc['total_fns']} |\n"
+            f"| Functions still asm stand-ins | {tc['asm_fns']}"
+            + (f" ({tc['needed_fns']} needed, {tc['paved_fns']} over matching C) |\n\n" if "needed_fns" in tc else " |\n\n")
+        )
     section = (
         "<!-- progress-start -->\n"
-        "Current status (generated by `tools/update_readme.py` from the build report):\n\n"
+        + head
+        + ("Per category (generated by `tools/update_readme.py`):\n\n" if pure_c else
+           "Build report (generated by `tools/update_readme.py`). These columns count asm stand-ins as matched, "
+           "so they show that the build is complete and byte-identical, not C progress:\n\n")
         + "\n".join(table)
         + "\n<!-- progress-end -->"
     )
@@ -67,7 +121,8 @@ def main():
         anchor = "A work-in-progress decompilation of Paper Mario: The Thousand-Year Door.\n"
         readme = readme.replace(anchor, anchor + "\n" + section + "\n", 1)
     open(README, "w", encoding="utf-8", newline="\n").write(readme)
-    print(f"README updated: code {pct(total, 'matched_code_percent'):.2f}%, "
+    print(f"README updated: true C {tc.get('true_code', 0):.2f}% exact / {tc.get('true_fuzzy', 0):.2f}% fuzzy, "
+          f"build {pct(total, 'matched_code_percent'):.2f}%, "
           f"linked {total.get('complete_units')} / {total.get('total_units')} files")
 
 

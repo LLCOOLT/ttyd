@@ -51,23 +51,23 @@ USER_FUNC(lect_cam_save) {
     stPt = camera->cameraPos;
     stAt = camera->cameraAt;
     stMpos = mario->position;
-    stMdir1 = mario->unk1A8;
-    stMdir2 = mario->unk1AC;
+    stMdir1 = mario->displayDirection;
+    stMdir2 = mario->displayDirectionTarget;
     stMdir3 = mario->directionView;
-    stMdir4 = mario->unk19C;
+    stMdir4 = mario->moveDirection;
     if (party) {
         stPpos = party->position;
-        stPdir1 = party->field_10C;
-        stPdir2 = party->field_110;
-        stPdir3 = party->field_100;
-        stPdir4 = party->field_FC;
+        stPdir1 = party->displayDirection;
+        stPdir2 = party->displayDirectionTarget;
+        stPdir3 = party->targetDir;
+        stPdir4 = party->moveDir;
     }
     if (extra) {
         stXpos = extra->position;
-        stXdir1 = extra->field_10C;
-        stXdir2 = extra->field_110;
-        stXdir3 = extra->field_100;
-        stXdir4 = extra->field_FC;
+        stXdir1 = extra->displayDirection;
+        stXdir2 = extra->displayDirectionTarget;
+        stXdir3 = extra->targetDir;
+        stXdir4 = extra->moveDir;
     }
     return EVT_RETURN_DONE;
 }
@@ -96,23 +96,23 @@ USER_FUNC(lect_cam_load) {
     camera->curveA = 11;
 
     mario->position = stMpos;
-    mario->unk1A8 = stMdir1;
-    mario->unk1AC = stMdir2;
+    mario->displayDirection = stMdir1;
+    mario->displayDirectionTarget = stMdir2;
     mario->directionView = stMdir3;
-    mario->unk19C = stMdir4;
+    mario->moveDirection = stMdir4;
     if (party) {
         party->position = stPpos;
-        party->field_10C = stPdir1;
-        party->field_110 = stPdir2;
-        party->field_100 = stPdir3;
-        party->field_FC = stPdir4;
+        party->displayDirection = stPdir1;
+        party->displayDirectionTarget = stPdir2;
+        party->targetDir = stPdir3;
+        party->moveDir = stPdir4;
     }
     if (extra) {
         extra->position = stXpos;
-        extra->field_10C = stXdir1;
-        extra->field_110 = stXdir2;
-        extra->field_100 = stXdir3;
-        extra->field_FC = stXdir4;
+        extra->displayDirection = stXdir1;
+        extra->displayDirectionTarget = stXdir2;
+        extra->targetDir = stXdir3;
+        extra->moveDir = stXdir4;
     }
     return EVT_RETURN_DONE;
 }

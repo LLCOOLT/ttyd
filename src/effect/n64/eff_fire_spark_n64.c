@@ -45,7 +45,6 @@ EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
                                   f32 scale, f32 speedY, f32 speedZ) {
     EffectEntry* effect;
     EffFireSparkN64Work* work;
-    EffectEntry* new_var;
     f32 h = 0.5f;
     f32 step;
     s32 i;
@@ -56,8 +55,7 @@ EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFireSparkN64Work) * count);
     effect->userdata = work;
     effect->callback = effFireSparkMain;
-    new_var = effect;
-    new_var->flags |= 2;
+    effect->flags |= 2;
     work->type = type;
     work->frame = 0;
     if (lifetime <= 0) {
@@ -87,7 +85,7 @@ EffectEntry* effFireSparkN64Entry(s32 type, s32 count, s32 lifetime, f32 x, f32 
     for (i = 1; i < count; i++, work++) {
         work->index = (s32)(-(f32)i * step) - 1;
     }
-    return new_var;
+    return effect;
 }
 
 void effFireSparkMain(EffectEntry* effect) {

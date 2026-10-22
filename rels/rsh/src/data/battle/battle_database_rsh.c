@@ -163,7 +163,7 @@ USER_FUNC(_set_offset) {
     s32 amp = evtGetValue(event, args[4]);
     BattleStageObject* obj = BattleSearchObjectPtr(name);
 
-    obj->field_0x10.x = base + amp * step / total;
+    obj->positionOffset.x = base + amp * step / total;
     step--;
     if (step < 0) {
         step = total;

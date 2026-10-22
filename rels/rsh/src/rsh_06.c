@@ -23,25 +23,36 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#undef EXT_LIT
+#define EXT_LIT(sym, val) (val)
+// target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
+#pragma force_active on
+#pragma force_active reset
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; Vec field_0x30; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; Vec jitter; s16 pose; u8 field_0x3e[2]; OSTime startTime; s16 group; s16 order; u8 kind; u8 field_0x4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; void* escapeEvt; s32 animPoseId; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; s16 chainNum[128]; s16 chainIdx[128][2]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
-static MoamoaWork* wp;
 static s32 bss_pad;
+static MoamoaWork* wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
 void extReset(void);
 int rand(void);
 static f32 randf(f32 min, f32 max);
+static f32 randf(f32 min, f32 max);
+static void moamoa_pose_init(void);
 static void moamoa_pose_init(void);
 static void moamoa_pose_main(void);
+static void moamoa_pose_main(void);
+static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 extern const char* g_moamoa_chain_tbl[][2];
 extern const s32 dat_80419a28;
 void evalOn(void);
+void evalOn(void);
+static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 void extLoadRenderMode(void);
 void extLoadVertex(void);
@@ -68,73 +79,87 @@ f32 cloudGetBreathDist(void);
 double sin(double x);
 double cos(double x);
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
+static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
+static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 void moamoa_joint_position(Moamoa* moa, Vec* out);
+void moamoa_joint_position(Moamoa* moa, Vec* out);
+static void ext_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
 static void ext_shadow_disp(CameraId camera, void* param);
+static void ext_shadow_disp(CameraId camera, void* param);
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_bero_mapchange);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam_letter_box_onoff);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_key_get_buttontrg);
-USER_FUNC(evt_map_set_tevcallback);
-USER_FUNC(evt_mapobj_flag_onoff);
-USER_FUNC(evt_mapobj_get_position);
-USER_FUNC(evt_mapobj_rotate);
-USER_FUNC(evt_mapobj_trans);
-USER_FUNC(evt_mario_cont_onoff);
-USER_FUNC(evt_mario_dispflag_onoff);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-USER_FUNC(evt_mario_set_pos);
-USER_FUNC(evt_mario_set_pose);
-static USER_FUNC(evt_moamoa_blow);
-static USER_FUNC(evt_moamoa_flag_onoff);
-static USER_FUNC(evt_moamoa_fusion);
-static USER_FUNC(evt_moamoa_fusion_debug);
-static USER_FUNC(evt_moamoa_kind_onoff);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_party);
-USER_FUNC(evt_npc_battle_start);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_pera_onoff);
-USER_FUNC(evt_npc_reverse_ry);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_battle_info);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_scale);
-USER_FUNC(evt_npc_wait_battle_end);
-USER_FUNC(evt_party_cont_onoff);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_set_pos);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxoff);
-USER_FUNC(evt_snd_sfxon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_mapname);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_get_stopwatch);
-USER_FUNC(evt_sub_get_system_flag);
-USER_FUNC(evt_sub_intpl_msec_get_value);
-USER_FUNC(evt_sub_intpl_msec_init);
-USER_FUNC(npc_anim_wait);
-static USER_FUNC(ramp_r);
+s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
+s32 evt_bero_mapchange(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam_letter_box_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall);
+s32 evt_ext_entry(EventEntry* event, BOOL isFirstCall);
+s32 evt_key_get_buttontrg(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_set_tevcallback(EventEntry* event, BOOL isFirstCall);
+s32 evt_mapobj_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mapobj_get_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_mapobj_rotate(EventEntry* event, BOOL isFirstCall);
+s32 evt_mapobj_trans(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_cont_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_dispflag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_normalize(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_dir(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_pose(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
+s32 evt_msg_print_party(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_battle_start(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_pera_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_reverse_ry(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_anim(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_battle_info(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_ry(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_scale(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_wait_battle_end(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_cont_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_set_dir(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_set_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
+s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_envoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_sfxoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_sfxon(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_mapname(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_sincos(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_stopwatch(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_system_flag(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_intpl_msec_get_value(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_intpl_msec_init(EventEntry* event, BOOL isFirstCall);
+s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall);
+s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall);
+static s32 ramp_r(EventEntry* event, BOOL isFirstCall);
+static s32 ramp_r(EventEntry* event, BOOL isFirstCall);
+static void resha_tev(MapTevCallbackInfo* info);
 static void resha_tev(MapTevCallbackInfo* info);
 void moamoa_joint_position(Moamoa* moa, Vec* out);
+static void ext_moamoa_dispent(void);
 static void ext_moamoa_dispent(void);
 static void ext_moamoa_main(void);
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
@@ -142,12 +167,17 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
 static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
 static void ext_moamoa_init(void);
+static void ext_moamoa_init(void);
 static f32 randf(f32 min, f32 max);
-static USER_FUNC(evt_moamoa_target_off);
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
 void evalOn(void);
-static USER_FUNC(evt_moamoa_end_wait);
-static USER_FUNC(evt_moamoa_ry_reset);
-static USER_FUNC(evt_moamoa_exit);
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
@@ -179,14 +209,14 @@ static s32 evt_bg[81];
 static s32 evt_hoshi[88];
 static s32 hom_10_evt_resha_start[244];
 static s32 hom_10_evt_resha_start2[259];
-static __declspec(section ".data") s32 hom_10_evt_resha_start3[11];
-static __declspec(section ".data") s32 hom_10_evt_resha_start4[11];
+__declspec(section ".data") static s32 hom_10_evt_resha_start3[11];
+__declspec(section ".data") static s32 hom_10_evt_resha_start4[11];
 static s32 stop_1[90];
 static s32 stop_2[90];
 static s32 hom_10_evt_resha_stop[36];
 static s32 evt_ramp[33];
 static s32 pika_tbl[15];
-static __declspec(section ".data") s32 pika_tbl_rsh_06[10];
+__declspec(section ".data") static s32 pika_tbl_rsh_06[10];
 static s32 hom_10_evt_resha_sub[102];
 static s32 hom_10_evt_resha_right[35];
 static s32 hom_10_evt_resha_left[28];
@@ -251,64 +281,40 @@ __declspec(section ".data") s32 fd_rsh_06_one_364[] = {
 };
 
 static s32 ext_moamoa_data[] = {
-    (s32)"c_n_moa_a", (s32)"S_1", 0, (s32)"c_n_moa_a", (s32)"S_1", 1073741824, (s32)"c_n_moa_a", (s32)"S_1",
-    1082130432, (s32)"c_n_moa_a", (s32)"S_1", 1086324736, (s32)"c_n_moa_a", (s32)"S_1", 1090519040, (s32)"c_n_moa_a",
-    (s32)"S_1", 1092616192, (s32)"c_n_moa_a", (s32)"S_1", 1094713344, (s32)"c_n_moa_a", (s32)"S_1", 1096810496,
-    (s32)"c_n_moa_a", (s32)"S_1", 1098907648, (s32)"c_n_moa_a", (s32)"S_1", 1099956224, (s32)"c_n_moa_a", (s32)"S_1",
-    1101004800, (s32)"c_n_moa_a", (s32)"S_1", 1102053376, (s32)"c_n_moa_a", (s32)"S_1", 1103101952, (s32)"c_n_moa_a",
-    (s32)"S_1", 1104150528, (s32)"c_n_moa_a", (s32)"S_1", 1105199104, (s32)"c_n_moa_a", (s32)"S_1", 1106247680,
-    (s32)"c_n_moa_a", (s32)"S_1", 1107296256, (s32)"c_n_moa_a", (s32)"S_1", 1107820544, (s32)"c_n_moa_a", (s32)"S_1",
-    1108344832, (s32)"c_n_moa_a", (s32)"S_1", 1108869120, (s32)"c_n_moa_a", (s32)"D_1", 0, (s32)"c_n_moa_a",
-    (s32)"D_1", 1082130432, (s32)"c_n_moa_a", (s32)"D_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 0,
-    (s32)"c_n_moa_b", (s32)"S_1", 1073741824, (s32)"c_n_moa_b", (s32)"S_1", 1082130432, (s32)"c_n_moa_b", (s32)"S_1",
-    1086324736, (s32)"c_n_moa_b", (s32)"S_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 1092616192, (s32)"c_n_moa_b",
-    (s32)"S_1", 1094713344, (s32)"c_n_moa_b", (s32)"S_1", 1096810496, (s32)"c_n_moa_b", (s32)"S_1", 1098907648,
-    (s32)"c_n_moa_b", (s32)"S_1", 1099956224, (s32)"c_n_moa_b", (s32)"S_1", 1101004800, (s32)"c_n_moa_b", (s32)"S_1",
-    1102053376, (s32)"c_n_moa_b", (s32)"S_1", 1103101952, (s32)"c_n_moa_b", (s32)"S_1", 1104150528, (s32)"c_n_moa_b",
-    (s32)"S_1", 1105199104, (s32)"c_n_moa_b", (s32)"S_1", 1106247680, (s32)"c_n_moa_b", (s32)"S_1", 1107296256,
-    (s32)"c_n_moa_b", (s32)"S_1", 1107820544, (s32)"c_n_moa_b", (s32)"S_1", 1108344832, (s32)"c_n_moa_b", (s32)"S_1",
-    1108869120, (s32)"c_n_moa_b", (s32)"D_1", 0, (s32)"c_n_moa_b", (s32)"D_1", 1082130432, (s32)"c_n_moa_b",
-    (s32)"D_1", 1090519040, (s32)"c_kinodebu", (s32)"G_1", 0, (s32)"c_kinodebu", (s32)"G_1", 1082130432,
-    (s32)"c_kinodebu", (s32)"G_1", 1090519040, (s32)"c_puku_c", (s32)"U_1", 0, (s32)"c_puku_c", (s32)"U_1",
-    1082130432, (s32)"c_puku_c", (s32)"U_1", 1090519040, (s32)"c_powan", (s32)"O_1", 0, (s32)"c_powan",
-    (s32)"O_1", 1082130432, (s32)"c_powan", (s32)"O_1", 1090519040, (s32)"c_smoko", (s32)"T_2", 0,
-    (s32)"c_smoko", (s32)"T_2", 1082130432, (s32)"c_smoko", (s32)"T_2", 1090519040, (s32)"c_rose", (s32)"G_1",
-    0, (s32)"c_rose", (s32)"G_1", 1082130432, (s32)"c_rose", (s32)"G_1", 1090519040, (s32)"c_papab",
-    (s32)"G_1", 0, (s32)"c_papab", (s32)"G_1", 1082130432, (s32)"c_papab", (s32)"G_1", 1090519040,
-    (s32)"c_mamab", (s32)"G_1", 0, (s32)"c_mamab", (s32)"G_1", 1082130432, (s32)"c_mamab", (s32)"G_1",
-    1090519040, (s32)"c_konari", (s32)"G_1", 0, (s32)"c_konari", (s32)"G_1", 1082130432, (s32)"c_konari",
-    (s32)"G_1", 1090519040, 0, 0, 0,
+    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 0, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
+    1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1086324736, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_a"),
+    (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1096810496,
+    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1098907648, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
+    1101004800, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1102053376, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_a"),
+    (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1106247680,
+    (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107296256, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"),
+    1108344832, (s32)((char*)"c_n_moa_a"), (s32)((char*)"S_1"), 1108869120, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_a"),
+    (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_a"), (s32)((char*)"D_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 0,
+    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1073741824, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1082130432, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
+    1086324736, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1090519040, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1092616192, (s32)((char*)"c_n_moa_b"),
+    (s32)((char*)"S_1"), 1094713344, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1096810496, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1098907648,
+    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1099956224, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1101004800, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
+    1102053376, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1103101952, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1104150528, (s32)((char*)"c_n_moa_b"),
+    (s32)((char*)"S_1"), 1105199104, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1106247680, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107296256,
+    (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1107820544, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"), 1108344832, (s32)((char*)"c_n_moa_b"), (s32)((char*)"S_1"),
+    1108869120, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 0, (s32)((char*)"c_n_moa_b"), (s32)((char*)"D_1"), 1082130432, (s32)((char*)"c_n_moa_b"),
+    (s32)((char*)"D_1"), 1090519040, (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 1082130432,
+    (s32)((char*)"c_kinodebu"), (s32)((char*)"G_1"), 1090519040, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"), 0, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"),
+    1082130432, (s32)((char*)"c_puku_c"), (s32)((char*)"U_1"), 1090519040, (s32)((char*)"c_powan"), (s32)((char*)"O_1"), 0, (s32)((char*)"c_powan"),
+    (s32)((char*)"O_1"), 1082130432, (s32)((char*)"c_powan"), (s32)((char*)"O_1"), 1090519040, (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 0,
+    (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 1082130432, (s32)((char*)"c_smoko"), (s32)((char*)"T_2"), 1090519040, (s32)((char*)"c_rose"), (s32)((char*)"G_1"),
+    0, (s32)((char*)"c_rose"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_rose"), (s32)((char*)"G_1"), 1090519040, (s32)((char*)"c_papab"),
+    (s32)((char*)"G_1"), 0, (s32)((char*)"c_papab"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_papab"), (s32)((char*)"G_1"), 1090519040,
+    (s32)((char*)"c_mamab"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_mamab"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_mamab"), (s32)((char*)"G_1"),
+    1090519040, (s32)((char*)"c_konari"), (s32)((char*)"G_1"), 0, (s32)((char*)"c_konari"), (s32)((char*)"G_1"), 1082130432, (s32)((char*)"c_konari"),
+    (s32)((char*)"G_1"), 1090519040, 0, 0, 0,
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 int rand(void);
 
-
-
-
-
-
-
 double sin(double x);
 
-
 void envAddTev(s32 type, MapTevCallbackInfo* info);
-
-
-
-
 
 #pragma dont_inline on
 static void moamoa_pose_init(void) {
@@ -337,7 +343,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, "J", 1)) {
+        if (!strncmp(anim, (char*)"J", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -370,17 +376,17 @@ static void moamoa_pose_main(void) {
 }
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim) {
     static const char* group_tbl[][2] = {
-        {"c_n_moa_a", "S_1"},
-        {"c_n_moa_b", "S_1"},
-        {"c_kinodebu", "G_1"},
-        {"c_puku_c", "U_1"},
-        {"c_powan", "O_1"},
-        {"c_smoko", "T_2"},
-        {"c_rose", "G_1"},
-        {"c_papab", "G_1"},
-        {"c_mamab", "G_1"},
-        {"c_konari", "G_1"},
-        {"c_n_moa_a", "S_1"},
+        {(char*)"c_n_moa_a", (char*)"S_1"},
+        {(char*)"c_n_moa_b", (char*)"S_1"},
+        {(char*)"c_kinodebu", (char*)"G_1"},
+        {(char*)"c_puku_c", (char*)"U_1"},
+        {(char*)"c_powan", (char*)"O_1"},
+        {(char*)"c_smoko", (char*)"T_2"},
+        {(char*)"c_rose", (char*)"G_1"},
+        {(char*)"c_papab", (char*)"G_1"},
+        {(char*)"c_mamab", (char*)"G_1"},
+        {(char*)"c_konari", (char*)"G_1"},
+        {(char*)"c_n_moa_a", (char*)"S_1"},
     };
     MoamoaPoseDef* def = wp->defs;
     s32 i;
@@ -391,7 +397,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
             anim = group_tbl[moa->kind][1];
         }
         if (moa->kind == 10) {
-            anim = "S_2";
+            anim = (char*)"S_2";
         }
     }
     for (i = 0; i < wp->numDefs; i++, def++) {
@@ -401,12 +407,12 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
     }
     if (i < wp->numDefs && moa->pose != i) {
         if (moa->flags & 4) {
-            if (strncmp(anim, "D", 1)) {
+            if (strncmp(anim, (char*)"D", 1)) {
                 return;
             }
         }
         if (moa->flags & 0x10) {
-            if (strncmp(anim, "R", 1)) {
+            if (strncmp(anim, (char*)"R", 1)) {
                 return;
             }
         }
@@ -414,7 +420,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
         moa->startTime = gp->renderTime;
     }
 }
-static USER_FUNC(evt_moamoa_flag_onoff) {
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
@@ -426,11 +432,11 @@ static USER_FUNC(evt_moamoa_flag_onoff) {
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_exit) {
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall) {
     extReset();
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_ry_reset) {
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
 
@@ -440,7 +446,7 @@ static USER_FUNC(evt_moamoa_ry_reset) {
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_end_wait) {
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
 
@@ -453,7 +459,7 @@ static USER_FUNC(evt_moamoa_end_wait) {
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_fusion) {
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -484,11 +490,11 @@ static USER_FUNC(evt_moamoa_fusion) {
         pose->flags |= 4;
         moa->flags |= 0x400;
         moa->state = 61;
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_kind_onoff) {
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
@@ -515,11 +521,11 @@ static USER_FUNC(evt_moamoa_kind_onoff) {
                 moa->flags &= ~0x800;
             }
         }
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_blow) {
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
 
@@ -532,7 +538,7 @@ static USER_FUNC(evt_moamoa_blow) {
     }
     return EVT_RETURN_DONE;
 }
-static USER_FUNC(evt_moamoa_fusion_debug) {
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
     Moamoa* moa = wp->moa;
@@ -544,7 +550,7 @@ static USER_FUNC(evt_moamoa_fusion_debug) {
         moa->flags |= 0x200;
         moa->state = 61;
         moa->flags |= 0x800;
-        moamoa_pose_change(moa, "c_n_moa_a", "S_1");
+        moamoa_pose_change(moa, (char*)"c_n_moa_a", (char*)"S_1");
     }
     return EVT_RETURN_DONE;
 }
@@ -608,7 +614,7 @@ void evalOn(void) {
         }
     }
 }
-static USER_FUNC(evt_moamoa_target_off) {
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
     wp->target[i] = wp->target[1 - i];
@@ -669,7 +675,7 @@ static void ext_moamoa_init(void) {
         v.x = randf(-10.0f, 10.0f);
         v.y = randf(-10.0f, 10.0f);
         v.z = randf(-10.0f, 10.0f);
-        moa->field_0x30 = v;
+        moa->jitter = v;
     }
     evalOn();
     for (i = 0; i < 600; i++) {
@@ -693,7 +699,7 @@ static void ext_disp(CameraId camera, void* param) {
     if (camera == CAMERA_OFFSCREEN2) {
         sysWaitDrawSync();
         GXReadBoundingBox(&left, &top, &right, &bottom);
-        offscreenAddBoundingBox(offscreenNameToId("offscreen"), left, top, right, bottom);
+        offscreenAddBoundingBox(offscreenNameToId((char*)"offscreen"), left, top, right, bottom);
     }
 }
 static void ext_shadow_disp(CameraId camera, void* param) {
@@ -715,7 +721,7 @@ static void ext_shadow_disp(CameraId camera, void* param) {
     if (camera == CAMERA_OFFSCREEN2) {
         sysWaitDrawSync();
         GXReadBoundingBox(&left, &top, &right, &bottom);
-        offscreenAddBoundingBox(offscreenNameToId("offscreen"), left, top, right, bottom);
+        offscreenAddBoundingBox(offscreenNameToId((char*)"offscreen"), left, top, right, bottom);
     }
 }
 #pragma dont_inline on
@@ -771,21 +777,21 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
-        && wp->field_0x558 < 2) {
+        && wp->bounceCount < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
             marioChgMot(5);
         }
-        wp->field_0x558++;
+        wp->bounceCount++;
         return 1;
     }
     if (!(mario->flags & 0x30000)) {
-        wp->field_0x558 = 0;
+        wp->bounceCount = 0;
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
         cam = camGetPtr(CAMERA_3D);
         {
             f32 yaw = cam->viewYaw;
-            rad = reviseAngle((mario->unk1A8 - 90.0f) + yaw);
+            rad = reviseAngle((mario->displayDirection - 90.0f) + yaw);
         }
         angle = 35.0f * moa_sin((6.2831855f * rad) / 360.0f) + mario->position.x;
         dist = mario->position.z - 35.0f * moa_cos((6.2831855f * rad) / 360.0f);
@@ -821,8 +827,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     { f32 (*m)[4] = pose->mtx; f = (Vec){m[0][3], m[1][3], m[2][3]}; }
     range = (20.0f + mario->wPlayerCollisionBox.x) / 2;
     if (PSVECDistance(&e, &f) < range) {
-        pose->mtx[0][3] = moa->field_0x28;
-        pose->mtx[2][3] = moa->field_0x2c;
+        pose->mtx[0][3] = moa->lastX;
+        pose->mtx[2][3] = moa->lastZ;
         { f32 (*m)[4] = pose->mtx; f = (Vec){m[0][3], m[1][3], m[2][3]}; }
         dist = PSVECDistance(&e, &f);
         if (dist < range) {
@@ -882,12 +888,12 @@ static void ext_moamoa_main(void) {
         wp->field_0x40 = 0;
     }
     if (mario->currMotionId == 0) {
-        wp->field_0x42++;
-        if (wp->field_0x42 > 1000) {
-            wp->field_0x42 = 1000;
+        wp->idleFrames++;
+        if (wp->idleFrames > 1000) {
+            wp->idleFrames = 1000;
         }
     } else {
-        wp->field_0x42 = 0;
+        wp->idleFrames = 0;
     }
     if (party->flags & 0x100) {
         wp->flags |= 0x10;
@@ -919,13 +925,13 @@ static void ext_moamoa_main(void) {
             if (ret == 1) {
                 m->flags |= 4;
                 m->state = 36;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(m, "c_n_moa_a", "D_1");
                 hit = 1;
             } else if (( ret == 2 ) || ( ret == 4) ) {
                 m->flags |= 0xc;
                 m->state = 47;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(m, "c_n_moa_a", "D_1");
                 if (ret != 4) {
                     hit = 1;
@@ -942,7 +948,7 @@ static void ext_moamoa_main(void) {
                 m->speed = randf(0.03f, 0.06f);
                 m->gravity = spd * ( -moa_cosx(rad)) ; }
                 m->jumpTimer = 120;
-                wp->field_0x38++;
+                wp->hitCount++;
                 moamoa_pose_change(m, "c_n_moa_a", "D_1");
                 hit = 1;
             }
@@ -999,7 +1005,7 @@ static void ext_moamoa_main(void) {
                     moamoa_jump(pose, m, m->state, 0, x1, 215.0f, z1, 2.0f * y, 2.0f * (( r2 * z0 ) + 0.4f)); }
                 } else {
                     moamoa_joint_position(m, &jv);
-                    PSVECAdd(&jv, &m->field_0x30, &jv);
+                    PSVECAdd(&jv, &m->jitter, &jv);
                     { f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; f32 z0 = 0.0f; moamoa_jump(pose, m, 61, 0, jv.x, jv.y, jv.z, 2.0f * (( r1 * z0 ) + 1.5f), 2.0f * (( r2 * z0 ) + 0.8f)); }
                     m->flags |= 0x200;
                     pose->flags |= 4;
@@ -1007,7 +1013,7 @@ static void ext_moamoa_main(void) {
                 break;
             case 61:
                 moamoa_joint_position(m, &pv);
-                PSVECAdd(&pv, &m->field_0x30, &pv);
+                PSVECAdd(&pv, &m->jitter, &pv);
                 pose->mtx[0][3] = pv.x;
                 pose->mtx[1][3] = pv.y;
                 pose->mtx[2][3] = pv.z;
@@ -1053,9 +1059,9 @@ static void ext_moamoa_main(void) {
                 x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                 d = wp->dist;
                 y = pose->mtx[1][3];
-                z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
+                dist = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
                 { f32 k; f32 r1 = rand() / 32767.0f; spd = r1 * (k = 1.0f - 1.0f) + 1.0f;
-                moamoa_jump(pose, m, d < 100.0f ? m->state : 0, 0, x, y, z, spd, randf(0.4f, 0.4f)); }
+                moamoa_jump(pose, m, d < 100.0f ? m->state : 0, 0, x, y, dist, spd, randf(0.4f, 0.4f)); }
                 }
                 break;
             case 2:
@@ -1066,9 +1072,9 @@ static void ext_moamoa_main(void) {
                 f32 rad = 6.2831855f * a / 360.0f;
                 x = pose->mtx[0][3] + 30.0f * moa_sinx(rad);
                 }
-                y = pose->mtx[1][3];
+                tx = pose->mtx[1][3];
                 z = pose->mtx[2][3];
-                { f32 a1 = 2.0f * randf(1.0f, 1.0f); f32 a2 = 2.0f * randf(0.4f, 0.4f); moamoa_jump(pose, m, d < 100.0f ? m->state : 0, 0, x, y, z, a1, a2); }
+                { f32 a1 = 2.0f * randf(1.0f, 1.0f); f32 a2 = 2.0f * randf(0.4f, 0.4f); moamoa_jump(pose, m, d < 100.0f ? m->state : 0, 0, x, tx, z, a1, a2); }
                 break;
             case 3:
                 pose->mtx[1][3] += m->vy;
@@ -1093,6 +1099,10 @@ static void ext_moamoa_main(void) {
                 break;
             case 36:
             case 37:
+      {
+        f32 y;
+        f32 x;
+        f32 z;
             case 38:
                 if (!(m->flags & 1)) {
                     tx = mario->position.x;
@@ -1110,6 +1120,7 @@ static void ext_moamoa_main(void) {
                 }
                 { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; k = 1.0f - 1.0f; moamoa_jump(pose, m, m->state + 1, 1, x, y, z, r1 * k + 1.0f, r2 * k + 1.0f); }
                 break;
+      }
             case 39:
                 if (( ++m->timer ) < 30) {
                     pose->mtx[0][0] *= 0.9f;
@@ -1122,7 +1133,7 @@ static void ext_moamoa_main(void) {
             case 47:
                 { f32 rad, d; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f;
                 rad = 6.2831855f * (r1 * (225.0f - 135.0f) + 135.0f) / 360.0f;
-                d = r2 * (500.0f - 200.0f) + 200.0f;
+                d = r2 * (500.0f - 300.0f) + 300.0f;
                 x5 = pose->mtx[0][3] + d * moa_sinx(rad);
                 z5 = pose->mtx[2][3] - d * moa_cosx(rad); }
                 { f32 k; f32 r1 = rand() / 32767.0f; ty = r1 * (k = 6.0f - 5.0f) + 5.0f; }
@@ -1229,8 +1240,8 @@ static void ext_moamoa_main(void) {
                 }
             }
         }
-        m->field_0x28 = pose->mtx[0][3];
-        m->field_0x2c = pose->mtx[2][3];
+        m->lastX = pose->mtx[0][3];
+        m->lastZ = pose->mtx[2][3];
     }
     moamoa_pose_main();
     mario->unk174.x = 0.0f;
@@ -1253,7 +1264,7 @@ static void ext_moamoa_dispent(void) {
     }
 }
 void moamoa_joint_position(Moamoa* moa, Vec* out) {
-    NpcEntry* npc = npcNameToPtr("base");
+    NpcEntry* npc = npcNameToPtr((char*)"base");
     AnimationPose* anim = animPoseGetAnimPosePtr(npc->poseId);
     f32 t;
     Vec* a = anim->worldPositions[0] + wp->chainIdx[moa->group][0];
@@ -1267,20 +1278,20 @@ void moamoa_joint_position(Moamoa* moa, Vec* out) {
 }
 
 static s32 sharinDt[] = {
-    (s32)"sha_1_1", 0, 0, -229998976, (s32)"sha_1_2", 0, 0, -229998976,
-    (s32)"sha_1_3", 2, 0, -229998976, (s32)"sha_1_4", 1, 1, -229998976,
-    (s32)"sha_1_5", 1, 1, -229998976, (s32)"sha_2_1", 0, 0, -229998976,
-    (s32)"sha_2_2", 0, 0, -229998976, (s32)"sha_2_3", 0, 0, -229998976,
-    (s32)"sha_3_1", 0, 0, -229998976, (s32)"sha_3_2", 0, 0, -229998976,
-    (s32)"sha_3_3", 0, 0, -229998976, (s32)"sha_4_1", 0, 0, -229998976,
-    (s32)"sha_4_2", 0, 0, -229998976, (s32)"sha_4_3", 0, 0, -229998976,
-    (s32)"sha_5_1", 0, 0, -229998976, (s32)"sha_5_2", 0, 0, -229998976,
-    (s32)"sha_5_3", 0, 0, -229998976, (s32)"sha_6_1", 0, 0, -229998976,
-    (s32)"sha_6_2", 0, 0, -229998976, (s32)"sha_6_3", 0, 0, -229998976,
-    (s32)"sha_1_1_c", 0, 0, -230001024, (s32)"sha_1_2_c", 0, 0, -230001024,
-    (s32)"sha_1_3_c", 2, 0, -230001024, (s32)"sha_1_4_c", 1, 1, -230001024,
-    (s32)"sha_1_5_c", 1, 1, -230001024, (s32)"sha_6_1_c", 0, 0, -229998976,
-    (s32)"sha_6_2_c", 0, 0, -229998976, (s32)"sha_6_3_c", 0, 0, -229998976,
+    (s32)((char*)"sha_1_1"), 0, 0, -229998976, (s32)((char*)"sha_1_2"), 0, 0, -229998976,
+    (s32)((char*)"sha_1_3"), 2, 0, -229998976, (s32)((char*)"sha_1_4"), 1, 1, -229998976,
+    (s32)((char*)"sha_1_5"), 1, 1, -229998976, (s32)((char*)"sha_2_1"), 0, 0, -229998976,
+    (s32)((char*)"sha_2_2"), 0, 0, -229998976, (s32)((char*)"sha_2_3"), 0, 0, -229998976,
+    (s32)((char*)"sha_3_1"), 0, 0, -229998976, (s32)((char*)"sha_3_2"), 0, 0, -229998976,
+    (s32)((char*)"sha_3_3"), 0, 0, -229998976, (s32)((char*)"sha_4_1"), 0, 0, -229998976,
+    (s32)((char*)"sha_4_2"), 0, 0, -229998976, (s32)((char*)"sha_4_3"), 0, 0, -229998976,
+    (s32)((char*)"sha_5_1"), 0, 0, -229998976, (s32)((char*)"sha_5_2"), 0, 0, -229998976,
+    (s32)((char*)"sha_5_3"), 0, 0, -229998976, (s32)((char*)"sha_6_1"), 0, 0, -229998976,
+    (s32)((char*)"sha_6_2"), 0, 0, -229998976, (s32)((char*)"sha_6_3"), 0, 0, -229998976,
+    (s32)((char*)"sha_1_1_c"), 0, 0, -230001024, (s32)((char*)"sha_1_2_c"), 0, 0, -230001024,
+    (s32)((char*)"sha_1_3_c"), 2, 0, -230001024, (s32)((char*)"sha_1_4_c"), 1, 1, -230001024,
+    (s32)((char*)"sha_1_5_c"), 1, 1, -230001024, (s32)((char*)"sha_6_1_c"), 0, 0, -229998976,
+    (s32)((char*)"sha_6_2_c"), 0, 0, -229998976, (s32)((char*)"sha_6_3_c"), 0, 0, -229998976,
     0, 0, 0, 0,
 };
 
@@ -1337,11 +1348,11 @@ static EVT_BEGIN(evt_sharin)
 EVT_END()
 
 static s32 clankDt[] = {
-    (s32)"bou_1", 0, 0, -229979520, -229998976, (s32)"bou_2", 1, 1,
-    -229983104, -229998976, (s32)"bou_3", 0, 0, -229979520, -229998976, (s32)"bou_4",
-    1, 1, -229983104, -229998976, (s32)"bou_1_c", 0, 0, -229979520,
-    -230001024, (s32)"bou_2_c", 1, 1, -229983104, -230001024, (s32)"bou_3_c", 0,
-    0, -229979520, -230001024, (s32)"bou_4_c", 1, 1, -229983104, -230001024,
+    (s32)((char*)"bou_1"), 0, 0, -229979520, -229998976, (s32)((char*)"bou_2"), 1, 1,
+    -229983104, -229998976, (s32)((char*)"bou_3"), 0, 0, -229979520, -229998976, (s32)((char*)"bou_4"),
+    1, 1, -229983104, -229998976, (s32)((char*)"bou_1_c"), 0, 0, -229979520,
+    -230001024, (s32)((char*)"bou_2_c"), 1, 1, -229983104, -230001024, (s32)((char*)"bou_3_c"), 0,
+    0, -229979520, -230001024, (s32)((char*)"bou_4_c"), 1, 1, -229983104, -230001024,
     0, 0, 0, 0, 0,
 };
 
@@ -1422,9 +1433,9 @@ static EVT_BEGIN(evt_bg)
         IF_INT_LESS(LW(11), FLOAT(-3600.0f))
             ADD_FLOAT(LW(11), FLOAT(7200.0f))
         END_IF
-        CALL(evt_mapobj_trans, 1, STRING("jimen"), LW(10), 0, 0)
-        CALL(evt_mapobj_trans, 1, STRING("yama"), LW(10), 0, 0)
-        CALL(evt_mapobj_trans, 1, STRING("iwayama"), LW(11), 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)"jimen")), LW(10), 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)"yama")), LW(10), 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)"iwayama")), LW(11), 0, 0)
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -1449,12 +1460,12 @@ static EVT_BEGIN(evt_hoshi)
         IF_INT_LESS(LW(10), FLOAT(0.0f))
             ADD_FLOAT(LW(10), FLOAT(360.0f))
         END_IF
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_right"), LW(10), 0, 0)
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_left"), LW(10), 0, 0)
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_center"), LW(10), 0, 0)
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_right_c"), LW(10), 0, 0)
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_left_c"), LW(10), 0, 0)
-        CALL(evt_mapobj_rotate, 0, STRING("hosi_center_c"), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_right")), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_left")), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_center")), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_right_c")), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_left_c")), LW(10), 0, 0)
+        CALL(evt_mapobj_rotate, 0, STRING(((char*)"hosi_center_c")), LW(10), 0, 0)
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -1471,41 +1482,41 @@ static EVT_BEGIN(hom_10_evt_resha_start)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
     SET_VALUE(GSWF(3581), 0)
-    CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mapobj_get_position, STRING(((char*)"ranpu")), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_TRAIN_BELL1")), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_TRAIN_BELL1")), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
         IF_INT_LESS(GSW(0), 339)
-            CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2"), 0)
+            CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1_2")), 0)
             ELSE
-            CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2_2"), 0)
+            CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1_2_2")), 0)
         END_IF
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_3"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1_3")), 0)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
-                CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+                CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
-                CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+                CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
@@ -1569,47 +1580,47 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     SET_VALUE(GSWF(3579), 0)
     SET_VALUE(GSWF(3580), 0)
     SET_VALUE(GSWF(3581), 0)
-    CALL(evt_mapobj_get_position, STRING("ranpu"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_mapobj_get_position, STRING(((char*)"ranpu")), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_TRAIN_BELL1")), LW(0), LW(1), LW(2), 0)
     WAIT_MS(200)
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_TRAIN_BELL1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_TRAIN_BELL1")), LW(0), LW(1), LW(2), 0)
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_2_3"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1_2_3")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE1_3"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE1_3")), 0)
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
-                CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+                CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
-                CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+                CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
         BEGIN_INLINE_EVENT
             SET_FLOAT_VALUE(LW(0), FLOAT(0.0f))
             LOOP(0)
                 ADD_FLOAT(LW(0), GW(0))
-                CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+                CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
                 WAIT_FRAMES(1)
             END_LOOP
         END_INLINE_EVENT
@@ -1668,14 +1679,14 @@ static EVT_BEGIN(hom_10_evt_resha_start2)
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start3)
+__declspec(section ".data") static EVT_BEGIN(hom_10_evt_resha_start3)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(-15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(-15.0f))
     RETURN
 EVT_END()
 
-static __declspec(section ".data") EVT_BEGIN(hom_10_evt_resha_start4)
+__declspec(section ".data") static EVT_BEGIN(hom_10_evt_resha_start4)
     SET_VALUE(GSWF(3583), 1)
     SET_FLOAT_VALUE(GW(0), FLOAT(15.0f))
     SET_FLOAT_VALUE(GW(1), FLOAT(15.0f))
@@ -1688,20 +1699,20 @@ static EVT_BEGIN(stop_1)
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(2), FLOAT(3000.0f))
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2_2"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2_2")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2_3"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2_3")), 0)
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, 3000, 0, 10000)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
     MULTIPLY_FLOAT(LW(0), FLOAT(1.0f))
-    CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+    CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
     SUBTRACT_FLOAT(LW(2), LW(0))
     SET_FLOAT_VALUE(GW(0), LW(2))
     SET_FLOAT_VALUE(GW(1), LW(2))
@@ -1722,20 +1733,20 @@ static EVT_BEGIN(stop_2)
     SET_FLOAT_VALUE(GW(1), FLOAT(0.0f))
     SET_FLOAT_VALUE(LW(2), FLOAT(-3000.0f))
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2_2_2"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2_2_2")), 0)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
-        CALL(evt_snd_sfxon, STRING("SFX_STG6_TRAIN_MOVE2_3"), 0)
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
+        CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_TRAIN_MOVE2_3")), 0)
     END_IF
     CALL(evt_sub_intpl_msec_init, 11, -3000, 0, 10000)
     LABEL(0)
     CALL(evt_sub_intpl_msec_get_value)
     MULTIPLY_FLOAT(LW(0), FLOAT(1.0f))
-    CALL(evt_mapobj_trans, 1, STRING("train"), LW(0), 0, 0)
+    CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), LW(0), 0, 0)
     SUBTRACT_FLOAT(LW(2), LW(0))
     SET_FLOAT_VALUE(GW(0), LW(2))
     SET_FLOAT_VALUE(GW(1), LW(2))
@@ -1752,15 +1763,15 @@ EVT_END()
 
 static EVT_BEGIN(hom_10_evt_resha_stop)
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("pik_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"pik_00")))
         SPAWN_EVENT(PTR(stop_1))
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("gor_04"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"gor_04")))
         SPAWN_EVENT(PTR(stop_2))
     END_IF
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("hom_00"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_00")))
         IF_INT_EQUAL(GSWF(3578), 0)
             SPAWN_EVENT(PTR(stop_1))
             ELSE
@@ -1773,8 +1784,8 @@ EVT_END()
 static EVT_BEGIN(evt_ramp)
     LOOP(0)
         CALL(ramp_r)
-        CALL(evt_mapobj_rotate, 1, STRING("ranpu"), 0, 0, LW(10))
-        CALL(evt_mapobj_rotate, 1, STRING("ranpu_c"), 0, 0, LW(10))
+        CALL(evt_mapobj_rotate, 1, STRING(((char*)"ranpu")), 0, 0, LW(10))
+        CALL(evt_mapobj_rotate, 1, STRING(((char*)"ranpu_c")), 0, 0, LW(10))
         WAIT_FRAMES(1)
         LOOP(0)
             IF_INT_EQUAL(GSWF(3583), 1)
@@ -1787,13 +1798,13 @@ static EVT_BEGIN(evt_ramp)
 EVT_END()
 
 static s32 pika_tbl[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", (s32)"pika_1_1_c", (s32)"pika_1_2_c", (s32)"pika_1_3_c", (s32)"pika_1_4_c", (s32)"pika_6_c", 0,
+    (s32)((char*)"pika_1_1"), (s32)((char*)"pika_1_2"), (s32)((char*)"pika_1_3"), (s32)((char*)"pika_1_4"), (s32)((char*)"pika_2"), (s32)((char*)"pika_3"), (s32)((char*)"pika_4"), (s32)((char*)"pika_5"),
+    (s32)((char*)"pika_6"), (s32)((char*)"pika_1_1_c"), (s32)((char*)"pika_1_2_c"), (s32)((char*)"pika_1_3_c"), (s32)((char*)"pika_1_4_c"), (s32)((char*)"pika_6_c"), 0,
 };
 
-static __declspec(section ".data") s32 pika_tbl_rsh_06[] = {
-    (s32)"pika_1_1", (s32)"pika_1_2", (s32)"pika_1_3", (s32)"pika_1_4", (s32)"pika_2", (s32)"pika_3", (s32)"pika_4", (s32)"pika_5",
-    (s32)"pika_6", 0,
+__declspec(section ".data") static s32 pika_tbl_rsh_06[] = {
+    (s32)((char*)"pika_1_1"), (s32)((char*)"pika_1_2"), (s32)((char*)"pika_1_3"), (s32)((char*)"pika_1_4"), (s32)((char*)"pika_2"), (s32)((char*)"pika_3"), (s32)((char*)"pika_4"), (s32)((char*)"pika_5"),
+    (s32)((char*)"pika_6"), 0,
 };
 
 static EVT_BEGIN(hom_10_evt_resha_sub)
@@ -1804,16 +1815,16 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     SPAWN_EVENT(PTR(evt_clank))
     SET_VALUE(LF(0), 0)
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("hom_10"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_10")))
         SET_VALUE(LF(0), 1)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_11"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_11")))
         SET_VALUE(LF(0), 1)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("hom_12"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"hom_12")))
         SET_VALUE(LF(0), 1)
     END_IF
-    IF_STR_EQUAL(LW(0), STRING("rsh_06_a"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"rsh_06_a")))
         SET_VALUE(LF(0), 1)
     END_IF
     IF_INT_EQUAL(LF(0), 1)
@@ -1824,7 +1835,7 @@ static EVT_BEGIN(hom_10_evt_resha_sub)
     CALL(evt_map_set_tevcallback, 1, PTR(resha_tev))
     SET_INT_READ_ADDR(PTR(pika_tbl))
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_EQUAL(LW(0), STRING("rsh_06_a"))
+    IF_STR_EQUAL(LW(0), STRING(((char*)"rsh_06_a")))
         SET_INT_READ_ADDR(PTR(pika_tbl_rsh_06))
     END_IF
     LOOP(0)
@@ -1842,27 +1853,27 @@ EVT_END()
 static EVT_BEGIN(hom_10_evt_resha_right)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
     CALL(evt_sub_get_mapname, LW(0))
-    IF_STR_NOT_EQUAL(LW(0), STRING("rsh_06_a"))
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_7"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_8"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_6"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_7"), 1)
+    IF_STR_NOT_EQUAL(LW(0), STRING(((char*)"rsh_06_a")))
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"train_7")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"train_8")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"renketu_6")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"renketu_7")), 1)
     END_IF
     RETURN
 EVT_END()
 
 static EVT_BEGIN(hom_10_evt_resha_left)
     CALL_CHILD(PTR(hom_10_evt_resha_sub))
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("train_6"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_1"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu_5"), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"train_1")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"train_6")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"renketu_1")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"renketu_5")), 1)
     RETURN
 EVT_END()
 
 static EVT_BEGIN(hom_10_init_evt)
     CALL(evt_snd_bgmoff, 512)
-    CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH2"))
+    CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH2")))
     CALL(evt_mario_cont_onoff, 0)
     CALL(evt_party_cont_onoff, 0, 0)
     CALL(evt_party_cont_onoff, 1, 0)
@@ -1874,18 +1885,18 @@ static EVT_BEGIN(hom_10_init_evt)
         CALL_CHILD(PTR(hom_10_evt_resha_start3))
         SET_VALUE(LW(0), 500)
         SET_VALUE(LW(1), -500)
-        CALL(evt_mapobj_flag_onoff, 1, 1, STRING("renketu"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_1"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_2"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_3"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_4"), 1)
-        CALL(evt_mapobj_flag_onoff, 1, 0, STRING("renketu_5"), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"renketu")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"renketu_1")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"renketu_2")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"renketu_3")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"renketu_4")), 1)
+        CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"renketu_5")), 1)
         ELSE
         CALL_CHILD(PTR(hom_10_evt_resha_left))
         CALL_CHILD(PTR(hom_10_evt_resha_start4))
         SET_VALUE(LW(0), 0)
         SET_VALUE(LW(1), 1000)
-        CALL(evt_mapobj_trans, 1, STRING("train"), -1500, 0, 0)
+        CALL(evt_mapobj_trans, 1, STRING(((char*)"train")), -1500, 0, 0)
     END_IF
     CALL(evt_cam_letter_box_onoff, 1, 1)
     CALL(evt_cam3d_evt_set, LW(0), 300, 1400, LW(0), 125, 0, 0, 11)
@@ -1893,7 +1904,7 @@ static EVT_BEGIN(hom_10_init_evt)
         CALL(evt_seq_wait, 2)
         CALL(evt_cam3d_evt_set, LW(1), 300, 1400, LW(1), 125, 0, 8000, 0)
         WAIT_MS(4000)
-        CALL(evt_bero_mapchange, STRING("rsh_02_a"), STRING("nidome"))
+        CALL(evt_bero_mapchange, STRING(((char*)"rsh_02_a")), STRING(((char*)"nidome")))
     END_INLINE_EVENT
     RETURN
 EVT_END()
@@ -1907,44 +1918,44 @@ EVT_BEGIN(evt_resha_init)
 EVT_END()
 
 static s32 bero_data_a[] = {
-    (s32)"w_bero", 8, 2, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_05_a", (s32)"w_bero", 65537, 0, 0, 0,
+    (s32)((char*)"w_bero"), 8, 2, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)((char*)"rsh_05_a"), (s32)((char*)"w_bero"), 65537, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0,
 };
 
 static EVT_BEGIN(evt_moamoa_init)
-    CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
-    CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
-    CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
-    CALL(evt_npc_entry, STRING("kinopio"), STRING("c_kinodebu"))
-    CALL(evt_npc_entry, STRING("cook"), STRING("c_puku_c"))
-    CALL(evt_npc_entry, STRING("powan"), STRING("c_powan"))
-    CALL(evt_npc_entry, STRING("sarary"), STRING("c_smoko"))
-    CALL(evt_npc_entry, STRING("rose"), STRING("c_rose"))
-    CALL(evt_npc_entry, STRING("papa"), STRING("c_papab"))
-    CALL(evt_npc_entry, STRING("mama"), STRING("c_mamab"))
-    CALL(evt_npc_entry, STRING("konari"), STRING("c_konari"))
-    CALL(evt_npc_set_position, STRING("kinopio"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("cook"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("powan"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("sarary"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("rose"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("papa"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("mama"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("konari"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("kinopio"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("cook"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("powan"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("sarary"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("rose"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("papa"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("mama"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("konari"), 2048)
-    CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), GW(2))
-    CALL(evt_npc_entry, STRING("base"), STRING("c_g_moamoa"))
-    CALL(evt_npc_set_position, STRING("base"), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)"moa_a")), STRING(((char*)"c_n_moa_a")))
+    CALL(evt_npc_entry, STRING(((char*)"moa_b")), STRING(((char*)"c_n_moa_b")))
+    CALL(evt_npc_set_position, STRING(((char*)"moa_a")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"moa_b")), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)"kinopio")), STRING(((char*)"c_kinodebu")))
+    CALL(evt_npc_entry, STRING(((char*)"cook")), STRING(((char*)"c_puku_c")))
+    CALL(evt_npc_entry, STRING(((char*)"powan")), STRING(((char*)"c_powan")))
+    CALL(evt_npc_entry, STRING(((char*)"sarary")), STRING(((char*)"c_smoko")))
+    CALL(evt_npc_entry, STRING(((char*)"rose")), STRING(((char*)"c_rose")))
+    CALL(evt_npc_entry, STRING(((char*)"papa")), STRING(((char*)"c_papab")))
+    CALL(evt_npc_entry, STRING(((char*)"mama")), STRING(((char*)"c_mamab")))
+    CALL(evt_npc_entry, STRING(((char*)"konari")), STRING(((char*)"c_konari")))
+    CALL(evt_npc_set_position, STRING(((char*)"kinopio")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"cook")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"powan")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"sarary")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"rose")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"papa")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"mama")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"konari")), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"kinopio")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"cook")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"powan")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"sarary")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"rose")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"papa")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"mama")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"konari")), 2048)
+    CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_MOAMOA_VOICE2")), GW(2))
+    CALL(evt_npc_entry, STRING(((char*)"base")), STRING(((char*)"c_g_moamoa")))
+    CALL(evt_npc_set_position, STRING(((char*)"base")), 0, -1000, 0)
     CALL(evt_ext_entry, 700, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), PTR(ext_moamoa_dispent))
     CALL(evt_moamoa_flag_onoff, 1, 1)
     BEGIN_INLINE_EVENT
@@ -1964,22 +1975,22 @@ EVT_BEGIN(evt_great_moamoa)
     CALL(evt_mario_normalize)
     CALL(evt_moamoa_flag_onoff, 1, 8)
     CALL(evt_moamoa_flag_onoff, 1, 4)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_244"), 0, 0)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group339"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group340"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("group341"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 1, STRING("senro"), 1)
-    CALL(evt_npc_set_position, STRING("base"), 10, 190, 0)
-    CALL(evt_npc_pera_onoff, STRING("base"), 0)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("Z_1"))
+    CALL(evt_msg_print, 0, STRING(((char*)"stg6_rsh_244")), 0, 0)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"group339")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"group340")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"group341")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 1, STRING(((char*)"senro")), 1)
+    CALL(evt_npc_set_position, STRING(((char*)"base")), 10, 190, 0)
+    CALL(evt_npc_pera_onoff, STRING(((char*)"base")), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"Z_1")))
     CALL(evt_snd_sfxoff, GW(2))
-    CALL(evt_snd_sfxon, STRING("SFX_STG6_MOA_TOGETHER_MOVE1"), GW(2))
+    CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_MOA_TOGETHER_MOVE1")), GW(2))
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_FIND1_3"), LW(0), LW(1), LW(2), 0)
-        CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
-        CALL(evt_eff_fukidashi, 3, STRING("eff1"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_VOICE_MARIO_FIND1_3")), LW(0), LW(1), LW(2), 0)
+        CALL(evt_eff_fukidashi, 0, STRING(((char*)"eff0")), 0, 0, 0, 0, 0, 0, 0, 0, 0)
+        CALL(evt_eff_fukidashi, 3, STRING(((char*)"eff1")), 0, 0, 0, 0, 0, 0, 0, 0, 0)
         WAIT_MS(1000)
         CALL(evt_mario_set_dir, 90, 200, 0)
         CALL(evt_party_set_dir, 0, 90, 200)
@@ -1988,200 +1999,200 @@ EVT_BEGIN(evt_great_moamoa)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(15)
-            CALL(evt_snd_sfxon, STRING("SFX_STG6_MOA_TOGETHER_MOVE2"), 0)
+            CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_MOA_TOGETHER_MOVE2")), 0)
             WAIT_MS(500)
         END_LOOP
     END_INLINE_EVENT
     CALL(evt_moamoa_fusion)
     CALL(evt_snd_sfxoff, GW(2))
-    CALL(evt_snd_sfxon, STRING("SFX_STG6_MOAMOA_VOICE2"), GW(2))
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group166"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group339"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group340"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("group341"), 1)
-    CALL(evt_mapobj_flag_onoff, 1, 0, STRING("senro"), 1)
+    CALL(evt_snd_sfxon, STRING(((char*)"SFX_STG6_MOAMOA_VOICE2")), GW(2))
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"group166")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"group339")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"group340")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"group341")), 1)
+    CALL(evt_mapobj_flag_onoff, 1, 0, STRING(((char*)"senro")), 1)
     WAIT_MS(2000)
     CALL(evt_moamoa_kind_onoff, 1, 0)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_npc_get_position, STRING(((char*)"base")), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG1")), LW(0), LW(1), LW(2), 0)
         WAIT_MS(800)
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG1")), LW(0), LW(1), LW(2), 0)
         WAIT_MS(800)
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG1")), LW(0), LW(1), LW(2), 0)
         WAIT_MS(800)
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG1"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG1")), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_set_anim, STRING("base"), STRING("H_1"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"H_1")))
     CALL(npc_anim_wait)
     CALL(evt_cam3d_evt_set, 10, 335, 369, 10, 265, -25, 1000, 11)
     CALL(evt_moamoa_kind_onoff, 1, 1)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG2"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_npc_get_position, STRING(((char*)"base")), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG2")), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
-    CALL(evt_npc_set_anim, STRING("base"), STRING("U_1"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"U_1")))
     WAIT_MS(2000)
     BEGIN_INLINE_EVENT
         WAIT_MS(1700)
-        CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
-        CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG3"), LW(0), LW(1), LW(2), 0)
+        CALL(evt_npc_get_position, STRING(((char*)"base")), LW(0), LW(1), LW(2))
+        CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG3")), LW(0), LW(1), LW(2), 0)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         WAIT_MS(1000)
         CALL(evt_cam3d_evt_set, 10, 300, 450, 10, 300, -25, 1000, 11)
     END_INLINE_EVENT
-    CALL(evt_npc_set_anim, STRING("base"), STRING("H_2"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"H_2")))
     CALL(npc_anim_wait)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("S_2"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"S_2")))
     WAIT_MS(1000)
     CALL(evt_mario_set_pos, -160, 215, 0)
     CALL(evt_party_set_pos, 0, -200, 215, -10)
     CALL(evt_mario_set_dir, 90, 0, 0)
     CALL(evt_party_set_dir, 0, 90, 0)
     CALL(evt_mario_dispflag_onoff, 1, 2)
-    CALL(evt_mario_set_pose, STRING("M_I_Y"))
+    CALL(evt_mario_set_pose, STRING(((char*)"M_I_Y")))
     CALL(evt_cam3d_evt_set, -180, 308, 270, -180, 255, -25, 0, 11)
     WAIT_MS(500)
     CALL(evt_party_stop, 0)
     WAIT_MS(300)
-    CALL(evt_msg_print_party, STRING("stg6_rsh_245"))
+    CALL(evt_msg_print_party, STRING(((char*)"stg6_rsh_245")))
     WAIT_MS(300)
     CALL(evt_party_run, 0)
     CALL(evt_cam3d_evt_set, 10, 498, 467, 10, 410, -25, 0, 11)
     WAIT_FRAMES(1)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_246_02"), 0, 0)
+    CALL(evt_msg_print, 0, STRING(((char*)"stg6_rsh_246_02")), 0, 0)
     WAIT_MS(300)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_246_03"), 0, 0)
+    CALL(evt_msg_print, 0, STRING(((char*)"stg6_rsh_246_03")), 0, 0)
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, 1000, 20, 841, -50, 200, -66, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_cam3d_evt_set, -440, 230, 180, 5, 300, -36, 4000, 11)
     WAIT_MS(4000)
     WAIT_MS(500)
-    CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_LEG4"), LW(0), LW(1), LW(2), 0)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("P_1"))
+    CALL(evt_npc_get_position, STRING(((char*)"base")), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_LEG4")), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"P_1")))
     CALL(npc_anim_wait)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("S_3"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"S_3")))
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_246_01"), 0, 0)
+    CALL(evt_msg_print, 0, STRING(((char*)"stg6_rsh_246_01")), 0, 0)
     WAIT_MS(300)
     CALL(evt_cam3d_evt_set, -100, 488, 1370, -100, 245, -8, 4000, 11)
     WAIT_MS(2000)
     CALL(evt_snd_sfxoff, GW(2))
-    CALL(evt_npc_set_battle_info, STRING("base"), 1)
-    CALL(evt_npc_battle_start, STRING("base"))
+    CALL(evt_npc_set_battle_info, STRING(((char*)"base")), 1)
+    CALL(evt_npc_battle_start, STRING(((char*)"base")))
     CALL(evt_npc_wait_battle_end)
     CALL(evt_cam3d_evt_set, -50, 355, 534, -50, 260, -8, 0, 11)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("Z_1"))
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"Z_1")))
     CALL(evt_mario_dispflag_onoff, 0, 2)
-    CALL(evt_mario_set_pose, STRING("M_S_1"))
+    CALL(evt_mario_set_pose, STRING(((char*)"M_S_1")))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     ADD(LW(0), -25)
     CALL(evt_party_set_pos, 0, LW(0), LW(1), LW(2))
-    CALL(evt_npc_flag_onoff, 0, STRING("kinopio"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("cook"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("powan"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("sarary"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("rose"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("papa"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("mama"), 2048)
-    CALL(evt_npc_flag_onoff, 0, STRING("konari"), 2048)
-    CALL(evt_npc_set_position, STRING("kinopio"), 0, 215, 0)
-    CALL(evt_npc_set_position, STRING("cook"), 0, 215, 1)
-    CALL(evt_npc_set_position, STRING("sarary"), 0, 215, 2)
-    CALL(evt_npc_set_position, STRING("rose"), 0, 215, 3)
-    CALL(evt_npc_set_position, STRING("papa"), 0, 215, 4)
-    CALL(evt_npc_set_position, STRING("mama"), 0, 215, 5)
-    CALL(evt_npc_set_position, STRING("konari"), 0, 215, 6)
-    CALL(evt_npc_set_position, STRING("powan"), 20, 215, 7)
-    CALL(evt_npc_set_ry, STRING("kinopio"), 270)
-    CALL(evt_npc_set_ry, STRING("cook"), 270)
-    CALL(evt_npc_set_ry, STRING("sarary"), 270)
-    CALL(evt_npc_set_ry, STRING("rose"), 270)
-    CALL(evt_npc_set_ry, STRING("papa"), 270)
-    CALL(evt_npc_set_ry, STRING("mama"), 270)
-    CALL(evt_npc_set_ry, STRING("konari"), 270)
-    CALL(evt_npc_set_ry, STRING("powan"), 270)
-    CALL(evt_npc_set_anim, STRING("kinopio"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("cook"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("sarary"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("rose"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("papa"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("mama"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("konari"), STRING("Z_1"))
-    CALL(evt_npc_set_anim, STRING("powan"), STRING("Z_1"))
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"kinopio")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"cook")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"powan")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"sarary")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"rose")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"papa")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"mama")), 2048)
+    CALL(evt_npc_flag_onoff, 0, STRING(((char*)"konari")), 2048)
+    CALL(evt_npc_set_position, STRING(((char*)"kinopio")), 0, 215, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"cook")), 0, 215, 1)
+    CALL(evt_npc_set_position, STRING(((char*)"sarary")), 0, 215, 2)
+    CALL(evt_npc_set_position, STRING(((char*)"rose")), 0, 215, 3)
+    CALL(evt_npc_set_position, STRING(((char*)"papa")), 0, 215, 4)
+    CALL(evt_npc_set_position, STRING(((char*)"mama")), 0, 215, 5)
+    CALL(evt_npc_set_position, STRING(((char*)"konari")), 0, 215, 6)
+    CALL(evt_npc_set_position, STRING(((char*)"powan")), 20, 215, 7)
+    CALL(evt_npc_set_ry, STRING(((char*)"kinopio")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"cook")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"sarary")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"rose")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"papa")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"mama")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"konari")), 270)
+    CALL(evt_npc_set_ry, STRING(((char*)"powan")), 270)
+    CALL(evt_npc_set_anim, STRING(((char*)"kinopio")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"cook")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"sarary")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"rose")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"papa")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"mama")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"konari")), STRING(((char*)"Z_1")))
+    CALL(evt_npc_set_anim, STRING(((char*)"powan")), STRING(((char*)"Z_1")))
     CALL(evt_moamoa_kind_onoff, 0, 0)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_247"), 0, STRING("base"))
+    CALL(evt_msg_print, 0, STRING(((char*)"stg6_rsh_247")), 0, STRING(((char*)"base")))
     WAIT_MS(500)
-    CALL(evt_npc_get_position, STRING("base"), LW(0), LW(1), LW(2))
-    CALL(evt_snd_sfxon_3d, STRING("SFX_STG6_MOAMOA_G_ESCAPE1"), LW(0), LW(1), LW(2), 0)
+    CALL(evt_npc_get_position, STRING(((char*)"base")), LW(0), LW(1), LW(2))
+    CALL(evt_snd_sfxon_3d, STRING(((char*)"SFX_STG6_MOAMOA_G_ESCAPE1")), LW(0), LW(1), LW(2), 0)
     CALL(evt_moamoa_blow)
     WAIT_MS(2000)
     CALL(evt_cam3d_evt_set, -150, 485, 1469, -150, 225, -8, 4000, 11)
     WAIT_MS(4000)
     BEGIN_INLINE_EVENT
         LOOP(0)
-            CALL(evt_npc_reverse_ry, STRING("powan"))
+            CALL(evt_npc_reverse_ry, STRING(((char*)"powan")))
             WAIT_MS(1500)
         END_LOOP
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         LOOP(0)
-            CALL(evt_npc_reverse_ry, STRING("konari"))
+            CALL(evt_npc_reverse_ry, STRING(((char*)"konari")))
             WAIT_MS(1000)
         END_LOOP
     END_INLINE_EVENT
     WAIT_MS(2000)
     SET_VALUE(GSW(0), 332)
-    CALL(evt_bero_mapchange, STRING("rsh_01_a"), STRING("w_bero"))
+    CALL(evt_bero_mapchange, STRING(((char*)"rsh_01_a")), STRING(((char*)"w_bero")))
     RETURN
 EVT_END()
 
 __declspec(section ".data") s32 pose_name[] = {
-    (s32)"Z_1", (s32)"H_1", (s32)"S_1", (s32)"U_1", (s32)"H_2", (s32)"S_2", (s32)"P_1", (s32)"S_3",
+    (s32)((char*)"Z_1"), (s32)((char*)"H_1"), (s32)((char*)"S_1"), (s32)((char*)"U_1"), (s32)((char*)"H_2"), (s32)((char*)"S_2"), (s32)((char*)"P_1"), (s32)((char*)"S_3"),
 };
 
 EVT_BEGIN(moamoa_debug)
-    CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
-    CALL(evt_npc_entry, STRING("moa_b"), STRING("c_n_moa_b"))
-    CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("moa_b"), 0, -1000, 0)
-    CALL(evt_npc_entry, STRING("kinopio"), STRING("c_kinodebu"))
-    CALL(evt_npc_entry, STRING("cook"), STRING("c_puku_c"))
-    CALL(evt_npc_entry, STRING("powan"), STRING("c_powan"))
-    CALL(evt_npc_entry, STRING("sarary"), STRING("c_smoko"))
-    CALL(evt_npc_entry, STRING("rose"), STRING("c_rose"))
-    CALL(evt_npc_entry, STRING("papa"), STRING("c_papab"))
-    CALL(evt_npc_entry, STRING("mama"), STRING("c_mamab"))
-    CALL(evt_npc_entry, STRING("konari"), STRING("c_konari"))
-    CALL(evt_npc_set_position, STRING("kinopio"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("cook"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("powan"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("sarary"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("rose"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("papa"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("mama"), 0, -1000, 0)
-    CALL(evt_npc_set_position, STRING("konari"), 0, -1000, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("kinopio"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("cook"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("powan"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("sarary"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("rose"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("papa"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("mama"), 2048)
-    CALL(evt_npc_flag_onoff, 1, STRING("konari"), 2048)
-    CALL(evt_npc_entry, STRING("base"), STRING("c_g_moamoa"))
-    CALL(evt_npc_set_position, STRING("base"), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)"moa_a")), STRING(((char*)"c_n_moa_a")))
+    CALL(evt_npc_entry, STRING(((char*)"moa_b")), STRING(((char*)"c_n_moa_b")))
+    CALL(evt_npc_set_position, STRING(((char*)"moa_a")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"moa_b")), 0, -1000, 0)
+    CALL(evt_npc_entry, STRING(((char*)"kinopio")), STRING(((char*)"c_kinodebu")))
+    CALL(evt_npc_entry, STRING(((char*)"cook")), STRING(((char*)"c_puku_c")))
+    CALL(evt_npc_entry, STRING(((char*)"powan")), STRING(((char*)"c_powan")))
+    CALL(evt_npc_entry, STRING(((char*)"sarary")), STRING(((char*)"c_smoko")))
+    CALL(evt_npc_entry, STRING(((char*)"rose")), STRING(((char*)"c_rose")))
+    CALL(evt_npc_entry, STRING(((char*)"papa")), STRING(((char*)"c_papab")))
+    CALL(evt_npc_entry, STRING(((char*)"mama")), STRING(((char*)"c_mamab")))
+    CALL(evt_npc_entry, STRING(((char*)"konari")), STRING(((char*)"c_konari")))
+    CALL(evt_npc_set_position, STRING(((char*)"kinopio")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"cook")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"powan")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"sarary")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"rose")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"papa")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"mama")), 0, -1000, 0)
+    CALL(evt_npc_set_position, STRING(((char*)"konari")), 0, -1000, 0)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"kinopio")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"cook")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"powan")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"sarary")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"rose")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"papa")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"mama")), 2048)
+    CALL(evt_npc_flag_onoff, 1, STRING(((char*)"konari")), 2048)
+    CALL(evt_npc_entry, STRING(((char*)"base")), STRING(((char*)"c_g_moamoa")))
+    CALL(evt_npc_set_position, STRING(((char*)"base")), 0, -1000, 0)
     CALL(evt_ext_entry, 700, PTR(ext_moamoa_data), PTR(ext_moamoa_init), PTR(ext_moamoa_main), PTR(ext_moamoa_dispent))
     CALL(evt_moamoa_flag_onoff, 1, 1)
     CALL(evt_moamoa_flag_onoff, 1, 4)
     CALL(evt_moamoa_fusion_debug)
-    CALL(evt_npc_set_position, STRING("base"), 10, 190, 0)
-    CALL(evt_npc_pera_onoff, STRING("base"), 0)
-    CALL(evt_npc_set_anim, STRING("base"), STRING("S_2"))
-    CALL(evt_npc_set_scale, STRING("base"), FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
+    CALL(evt_npc_set_position, STRING(((char*)"base")), 10, 190, 0)
+    CALL(evt_npc_pera_onoff, STRING(((char*)"base")), 0)
+    CALL(evt_npc_set_anim, STRING(((char*)"base")), STRING(((char*)"S_2")))
+    CALL(evt_npc_set_scale, STRING(((char*)"base")), FLOAT(1.0f), FLOAT(1.0f), FLOAT(1.0f))
     BEGIN_INLINE_EVENT
         SET_VALUE(LW(0), 0)
         LOOP(0)
@@ -2195,7 +2206,7 @@ EVT_BEGIN(moamoa_debug)
                 LOOP(LW(1))
                     READ_INT(LW(2))
                 END_LOOP
-                CALL(evt_npc_set_anim, STRING("base"), LW(2))
+                CALL(evt_npc_set_anim, STRING(((char*)"base")), LW(2))
             END_IF
             WAIT_FRAMES(1)
         END_LOOP
@@ -2207,28 +2218,28 @@ EVT_BEGIN(rsh_06_init_evt)
     CALL_CHILD(PTR(evt_resha_init))
     SWITCH(GSW(0))
         CASE_BETWEEN(284, 286)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_3"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_EVT_POWAN1")))
+        CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH1_3")))
         CASE_BETWEEN(304, 309)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_POWAN1"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_3"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_EVT_POWAN1")))
+        CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH1_3")))
         CASE_BETWEEN(310, 325)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_HOM1"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_STG6_HOM1")))
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         CASE_BETWEEN(327, 328)
         CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_3"))
+        CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH1_3")))
         CASE_BETWEEN(329, 331)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_EVT_DANGER4"))
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH1_3"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_EVT_DANGER4")))
+        CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH1_3")))
         CASE_BETWEEN(334, 344)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_STG6_PIK1")))
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         CASE_DEFAULT
         CALL(evt_snd_bgmoff, 512)
-        CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH2"))
+        CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH2")))
     END_SWITCH
     RETURN
 EVT_END()
@@ -2253,17 +2264,17 @@ EVT_END()
 EVT_BEGIN(rsh_06_init_evt_nidome)
     CALL_CHILD(PTR(evt_resha_init))
     IF_INT_EQUAL(GSWF(3460), 1)
-        CALL(evt_snd_bgmon, 512, STRING("BGM_STG6_PIK1"))
+        CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_STG6_PIK1")))
         CALL(evt_snd_envoff, 512)
         CALL(evt_snd_bgmoff, 26624)
         ELSE
         IF_INT_EQUAL(GSWF(3461), 1)
-            CALL(evt_snd_bgmon, 512, STRING("BGM_STG0_GOR1"))
+            CALL(evt_snd_bgmon, 512, STRING(((char*)"BGM_STG0_GOR1")))
             CALL(evt_snd_envoff, 512)
             CALL(evt_snd_bgmoff, 26624)
             ELSE
             CALL(evt_snd_bgmoff, 512)
-            CALL(evt_snd_envon, 272, STRING("ENV_STG6_RSH2"))
+            CALL(evt_snd_envon, 272, STRING(((char*)"ENV_STG6_RSH2")))
         END_IF
     END_IF
     RETURN
@@ -2277,10 +2288,7 @@ __declspec(section ".data") EVT_BEGIN(rsh_06_a_init_evt_nidome)
     RETURN
 EVT_END()
 
-
-
-
-static USER_FUNC(ramp_r) {
+static s32 ramp_r(EventEntry* event, BOOL isFirstCall) {
     f32 amp = __fabsf(evtGetFloat(event, GW(0)));
     f32 wave = sin(gp->retraceCount / 15.0f);
 
@@ -2290,11 +2298,21 @@ static USER_FUNC(ramp_r) {
 static void resha_tev(MapTevCallbackInfo* info) {
     envAddTev(7, info);
 }
-USER_FUNC(npc_anim_wait) {
-    NpcEntry* npc = npcNameToPtr("base");
+s32 npc_anim_wait(EventEntry* event, BOOL isFirstCall) {
+    NpcEntry* npc = npcNameToPtr((char*)"base");
 
     if (animPoseGetLoopTimes(npc->poseId) >= 1.0f) {
         return EVT_RETURN_DONE;
     }
     return EVT_RETURN_BLOCK;
 }
+
+void __cvt_ull_flt();
+void __div2u();
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_000184F4_data[1] = {0};
+#pragma force_active reset
+
+

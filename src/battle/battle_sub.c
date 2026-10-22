@@ -78,7 +78,7 @@ f32 intpl_sub(s32 mode, s32 cur, s32 steps, f32 start, f32 end) {
 			return (start + diff) - (diff * ((steps - cur) * ((steps - cur) * ((steps - cur) * (steps - cur))))) / (steps * (steps * (steps * steps)));
 		case 10:
 			c = cos(4.0f * (3.141592f * ((f32)(cur * cur) / (f32)steps)) / 40.0f);
-			new_var = (f32)(steps - cur);
+			new_var = (f32)(steps - cur); // FAKE: half-used temp; direct expr and a rem temp used twice both differ
 			c = ((f32)(steps - cur) * (new_var * c)) / ((f32)steps * (f32)steps);
 			if (c < 0.0f) {
 				c = -c;

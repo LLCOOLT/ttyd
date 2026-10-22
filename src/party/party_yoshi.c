@@ -77,8 +77,8 @@ f32 ofs_PYS_F_1[10] = {0.0f, 0.0f, 0.433f, 0.557f, 0.512f, 0.0f, 0.0f, 0.433f, 0
     P_F32(mario, 0xF4) = (party)->position.z;                       \
     P_F32(mario, 0x8C) = (party)->position.x;                       \
     P_F32(mario, 0x94) = (party)->position.z;                       \
-    P_F32(mario, 0x1A8) = (party)->field_10C;                       \
-    P_F32(mario, 0x1AC) = (party)->field_110;
+    P_F32(mario, 0x1A8) = (party)->displayDirection;                       \
+    P_F32(mario, 0x1AC) = (party)->displayDirectionTarget;
 void unk_800b474c(PartyEntry* party);
 
 #define P_S8(p, off) (*(s8*)((u8*)(p) + (off)))
@@ -167,7 +167,7 @@ void marioRideYoshi(void) {
     party->field_8 &= ~4;
     party->field_8 &= ~2;
     party->flags |= 0x100;
-    party->field_34 = 3;
+    party->runMode = 3;
     party->useMotionId = 11;
     if (party->useStruct == NULL) {
         party->useStruct = __memAlloc(HEAP_DEFAULT, sizeof(YoshiWork));
@@ -198,8 +198,8 @@ static inline void L_resetOfs(PartyEntry* party) {
 
     MarioWork* player = party->playerPtr;
 
-    player->field_0x98 = (Vec){0.0f, 0.0f, 0.0f};
-    player->field_0xA4 = (Vec){0.0f, 0.0f, 0.0f};
+    player->dispOfs = (Vec){0.0f, 0.0f, 0.0f};
+    player->dispOfs2 = (Vec){0.0f, 0.0f, 0.0f};
     extra = partyGetPtr(marioGetExtraPartyId());
     if (extra) {
         *(Vec*)extra->field_7C = (Vec){0.0f, 0.0f, 0.0f};
@@ -217,16 +217,16 @@ static inline u32 L_chgMotion(PartyEntry* party, u8 motion) {
 static inline void L_fall(PartyEntry* party) {
     if (!(party->flags & 0x20)) {
         party->flags |= 0x20;
-        P_F32(party, 0x11C) = -0.4f;
+        party->gravity = -0.4f;
         P_F32(party, 0x174) = -0.4f;
         P_F32(party, 0x178) = 0.0f;
-        P_F32(party, 0x118) = 0.0f;
+        party->accelY = 0.0f;
     }
-    P_F32(party, 0x178) += P_F32(party, 0x118);
+    P_F32(party, 0x178) += party->accelY;
     P_F32(party, 0x174) += P_F32(party, 0x178);
-    P_F32(party, 0x11C) += P_F32(party, 0x174);
-    if (P_F32(party, 0x11C) < -15.0f) {
-        P_F32(party, 0x11C) = -15.0f;
+    party->gravity += P_F32(party, 0x174);
+    if (party->gravity < -15.0f) {
+        party->gravity = -15.0f;
     }
 }
 
@@ -255,7 +255,7 @@ void marioYoshiForceCancel(void) {
             return;
         }
     }
-    if (party->field_34 != 8 && party->field_34 != 0xd) {
+    if (party->runMode != 8 && party->runMode != 0xd) {
         partyChgRunMode(party, 2);
         party->field_3A[1] = 0;
     }
@@ -314,19 +314,19 @@ void unk_800b474c(PartyEntry* party) {
 void unk_800b45e0(PartyEntry* party) {
     MarioWork* mario = party->playerPtr;
 
-    if (!strcmp(party->field_18, "PYS_S_2")) {
+    if (!strcmp(party->animName, "PYS_S_2")) {
         if (++MARIO_U16(mario, 0x28) >= 52) {
             MARIO_U16(mario, 0x28) = 0;
         }
         party->field_20 = MARIO_U16(mario, 0x28);
         animPoseSetLocalTime(party->paperAnimGroup, MARIO_U16(mario, 0x28));
-    } else if (!strcmp(party->field_18, "PYS_R_2")) {
+    } else if (!strcmp(party->animName, "PYS_R_2")) {
         if (++MARIO_U16(mario, 0x28) >= 10) {
             MARIO_U16(mario, 0x28) = 0;
         }
         party->field_20 = MARIO_U16(mario, 0x28);
         animPoseSetLocalTime(party->paperAnimGroup, MARIO_U16(mario, 0x28));
-    } else if (!strcmp(party->field_18, "PYS_F_1")) {
+    } else if (!strcmp(party->animName, "PYS_F_1")) {
         if (++MARIO_U16(mario, 0x28) >= 10) {
             MARIO_U16(mario, 0x28) = 0;
         }
@@ -338,7 +338,7 @@ void unk_800b45e0(PartyEntry* party) {
 void yoshi_init(PartyEntry* party) {
     party->field_32[1] = 4;
     party->field_32[0] = 0;
-    party->field_F0 = 26.0f;
+    party->height = 26.0f;
     party->width = 20.0f;
     party->yoshiPsndSFXId = -1;
 }
@@ -348,11 +348,11 @@ static inline f32 L_getOfs(PartyEntry* party) {
     MarioWork* p = party->playerPtr;
     f32 ofs = 0.0f;
 
-    if (!strcmp(party->field_18, "PYS_S_2")) {
+    if (!strcmp(party->animName, "PYS_S_2")) {
         ofs += 2.0f * ofs_PYS_S_2[MARIO_U16(p, 0x28)];
-    } else if (!strcmp(party->field_18, "PYS_R_2")) {
+    } else if (!strcmp(party->animName, "PYS_R_2")) {
         ofs += 2.0f * ofs_PYS_R_2[MARIO_U16(p, 0x28)];
-    } else if (!strcmp(party->field_18, "PYS_F_1")) {
+    } else if (!strcmp(party->animName, "PYS_F_1")) {
         ofs += 2.0f * ofs_PYS_F_1[MARIO_U16(p, 0x28)];
     }
     return ofs;
@@ -370,7 +370,7 @@ void yoshi_use(PartyEntry* party) {
     f32 ox;
     f32 oz;
 
-    if (!P_S8(mario, 0x39)) {
+    if (!mario->keyOffCount) {
         partyUpdateKeyData(party);
     } else {
         L_partyClearCont(party);
@@ -394,8 +394,8 @@ void yoshi_use(PartyEntry* party) {
         } else {
             party->useMotionId = 4;
         }
-        P_S32(party, 0x24) = 3;
-        P_F32(mario, 0x180) = 0.0f;
+        party->moveFrames = 3;
+        mario->baseSpeed = 0.0f;
         P_F32(mario, 0x2A4) = 0.0f;
         P_F32(mario, 0x2A0) = 0.0f;
         P_F32(mario, 0x2B0) = 0.0f;
@@ -405,7 +405,7 @@ void yoshi_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 0:
-            if (--P_S32(party, 0x24) > 0) {
+            if (--party->moveFrames > 0) {
                 if (!marioKeyOffChk() && mario->hitobjStandOn) {
                     return;
                 }
@@ -416,7 +416,7 @@ void yoshi_use(PartyEntry* party) {
                         party->useStruct = NULL;
                     }
                 }
-                if (party->field_34 != 8 && party->field_34 != 0xd) {
+                if (party->runMode != 8 && party->runMode != 0xd) {
                     partyChgRunMode(party, 2);
                     party->field_3A[1] = 0;
                 }
@@ -424,36 +424,36 @@ void yoshi_use(PartyEntry* party) {
             }
             party->useMotionId = 4;
         case 4:
-            P_F32(mario, 0x1A0) = P_F32(mario, 0x1A0) <= 180.0f ? 90.0f : 270.0f;
-            P_F32(mario, 0x19C) = P_F32(mario, 0x1A0);
+            mario->directionView = mario->directionView <= 180.0f ? 90.0f : 270.0f;
+            mario->moveDirection = mario->directionView;
             *(Vec*)((u8*)party + 0x94) = *(Vec*)((u8*)mario + 0x8C);
-            P_S32(party, 0x24) = 4;
-            P_F32(party, 0x114) = 0.0f;
-            P_F32(party, 0x11C) = 0.0f;
+            party->moveFrames = 4;
+            party->velY = 0.0f;
+            party->gravity = 0.0f;
             P_F32(party, 0x174) = 0.0f;
             P_F32(party, 0x178) = 0.0f;
-            P_F32(party, 0x118) = 0.0f;
-            party->field_100 = angleABf(party->position.x, party->position.z, P_F32(party, 0x94), P_F32(party, 0x9C));
-            party->field_104 = distABf(party->position.x, party->position.z, P_F32(party, 0x94), P_F32(party, 0x9C)) / P_S32(party, 0x24);
+            party->accelY = 0.0f;
+            party->targetDir = angleABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z);
+            party->moveSpeed = distABf(party->position.x, party->position.z, party->moveTarget.x, party->moveTarget.z) / party->moveFrames;
             party->useMotionId = 5;
         case 5:
             *(Vec*)((u8*)party + 0x94) = *(Vec*)((u8*)mario + 0x8C);
-            party->position.x += (P_F32(party, 0x94) - party->position.x) / P_S32(party, 0x24);
-            party->position.y += (P_F32(party, 0x98) - party->position.y) / P_S32(party, 0x24);
-            party->position.z += (P_F32(party, 0x9C) - party->position.z) / P_S32(party, 0x24);
-            if (--P_S32(party, 0x24) != 0) {
+            party->position.x += (party->moveTarget.x - party->position.x) / party->moveFrames;
+            party->position.y += (party->moveTarget.y - party->position.y) / party->moveFrames;
+            party->position.z += (party->moveTarget.z - party->position.z) / party->moveFrames;
+            if (--party->moveFrames != 0) {
                 searchGround(party);
                 ADD_OFS(party);
                 return;
             }
             mario->trigFlags |= 0x20000;
             marioChgSmallJumpMotion();
-            P_F32(mario, 0x180) = 0.0f;
-            party->field_FC = P_F32(mario, 0x19C);
-            party->field_100 = P_F32(mario, 0x1A0);
-            party->field_110 = P_F32(mario, 0x1AC);
-            party->field_10C = P_F32(mario, 0x1A8);
-            party->field_104 = 0.0f;
+            mario->baseSpeed = 0.0f;
+            party->moveDir = mario->moveDirection;
+            party->targetDir = mario->directionView;
+            party->displayDirectionTarget = mario->displayDirectionTarget;
+            party->displayDirection = mario->displayDirection;
+            party->moveSpeed = 0.0f;
             party->useMotionId = 7;
             ADD_OFS(party);
             partyChkGnd(party);
@@ -491,13 +491,13 @@ void yoshi_use(PartyEntry* party) {
             marioChgMot(0x1A);
             partyChgPose(party, "PYS_H_1");
             marioChgPose("M_Y_1");
-            party->field_104 = 0.0f;
-            P_F32(party, 0x128) = 0.0f;
-            party->position.x = P_F32(mario, 0x8C);
-            party->position.y = P_F32(mario, 0x90);
-            party->position.z = P_F32(mario, 0x94);
-            P_F32(mario, 0xEC) = party->position.x;
-            P_F32(mario, 0xF4) = party->position.z;
+            party->moveSpeed = 0.0f;
+            party->moveDistance = 0.0f;
+            party->position.x = mario->position.x;
+            party->position.y = mario->position.y;
+            party->position.z = mario->position.z;
+            mario->camTarget.x = party->position.x;
+            mario->camTarget.z = party->position.z;
             party->useMotionId = 12;
             *(Vec*)((u8*)mario + 0x11C) = party->position;
             break;
@@ -511,20 +511,20 @@ void yoshi_use(PartyEntry* party) {
                 P_PTR(party, 0x12C) = NULL;
                 P_PTR(party, 0x134) = NULL;
                 P_PTR(party, 0x140) = NULL;
-                mario->field_0x1E0 = NULL;
+                mario->hitobjFront = NULL;
                 mario->hitobjPush = NULL;
-                mario->field_0x1F0 = NULL;
+                mario->hitobjWall = NULL;
                 P_PTR(mario, 0x1F4) = NULL;
-                dir = P_F32(mario, 0x1A0);
-                spd = P_F32(mario, 0x180);
+                dir = mario->directionView;
+                spd = mario->baseSpeed;
                 L_searchHead(party);
                 checkWall(party, spd, dir);
                 SYNC_MARIO(mario, party);
                 party_ride_yoshi_force_move();
                 *(Vec*)((u8*)mario + 0x11C) = party->position;
                 searchGround(party);
-                if (--P_S16(mario, 0x4E) <= 0) {
-                    P_S16(mario, 0x4E) = 0;
+                if (--mario->forceMoveTimer <= 0) {
+                    mario->forceMoveTimer = 0;
                     mario->flags &= ~0x20;
                 }
                 YW(party)->count++;
@@ -533,13 +533,13 @@ void yoshi_use(PartyEntry* party) {
                 }
                 break;
             }
-            if (party->field_34 == 8) {
+            if (party->runMode == 8) {
                 break;
             }
             if (yoshiGetStatus() == 1) {
-                P_F32(party, 0xAC) = P_F32(mario, 0x174);
-                P_F32(party, 0xB0) = P_F32(mario, 0x178);
-                P_F32(party, 0xB4) = P_F32(mario, 0x17C);
+                party->field_AC = mario->unk174.x;
+                P_F32(party, 0xB0) = mario->unk174.y;
+                party->field_B4 = mario->unk174.z;
             }
             if (party->flags & 2) {
                 if (!(party->flags & 0x80000000)) {
@@ -553,15 +553,15 @@ void yoshi_use(PartyEntry* party) {
                 }
             }
             if (party->flags & 0x80000000) {
-                angle = P_F32(mario, 0x1A0);
+                angle = mario->directionView;
                 speed = evt_yoshi_spd;
             } else {
                 L_getStick(party, &angle, &speed);
             }
             if (speed > 0.0f) {
-                party->field_104 = speed;
-                party->field_100 = angle;
-                party->field_FC = angle;
+                party->moveSpeed = speed;
+                party->targetDir = angle;
+                party->moveDir = angle;
                 marioChgPose("M_Y_2");
                 partyChgPose(party, "PYS_R_2");
                 YW(party)->count++;
@@ -569,23 +569,23 @@ void yoshi_use(PartyEntry* party) {
                     psndSFXOn_3D(0x940, &party->position);
                 }
             } else {
-                if (strcmp(party->field_18, "PYS_S_2")) {
+                if (strcmp(party->animName, "PYS_S_2")) {
                     MARIO_U16(mario, 0x28) = 0;
                 }
                 partyChgPose(party, "PYS_S_2");
-                party->field_104 = 0.0f;
+                party->moveSpeed = 0.0f;
                 YW(party)->count = 0;
             }
             inertia(party);
-            party->position.x = P_F32(mario, 0x8C);
-            party->position.z = P_F32(mario, 0x94);
+            party->position.x = mario->position.x;
+            party->position.z = mario->position.z;
             P_PTR(party, 0x12C) = NULL;
             P_PTR(party, 0x134) = NULL;
-            mario->field_0x1E0 = NULL;
+            mario->hitobjFront = NULL;
             mario->hitobjPush = NULL;
-            mario->field_0x1F0 = NULL;
-            dir = party->field_100;
-            spd = party->field_104;
+            mario->hitobjWall = NULL;
+            dir = party->targetDir;
+            spd = party->moveSpeed;
             L_searchHead(party);
             checkWall(party, spd, dir);
             SYNC_MARIO(mario, party);
@@ -601,9 +601,9 @@ void yoshi_use(PartyEntry* party) {
         case 100:
             L_resetOfs(party);
             marioChgSmallJumpMotion();
-            P_F32(mario, 0x180) = 0.0f;
+            mario->baseSpeed = 0.0f;
             partyChgPose(party, "PYS_H_2");
-            party->field_104 = 0.0f;
+            party->moveSpeed = 0.0f;
             party->useMotionId = 101;
             ADD_OFS(party);
             partyChkGnd(party);
@@ -615,7 +615,7 @@ void yoshi_use(PartyEntry* party) {
                 return;
             }
             party->flags &= ~0x100;
-            if (party->field_34 != 8) {
+            if (party->runMode != 8) {
                 partyChgRunMode(party, 2);
                 party->field_3A[1] = 0;
             }
@@ -631,15 +631,15 @@ void yoshi_use(PartyEntry* party) {
     switch (party->useMotionId) {
         case 40:
             party->flags |= 0x40;
-            P_F32(party, 0x114) = 0.0f;
-            P_F32(party, 0x118) = 0.0f;
-            P_F32(party, 0x11C) = 0.0f;
-            P_S32(party, 0x24) = 3;
-            P_F32(party, 0x114) = (P_F32(party, 0x120) - party->position.y) / P_S32(party, 0x24);
+            party->velY = 0.0f;
+            party->accelY = 0.0f;
+            party->gravity = 0.0f;
+            party->moveFrames = 3;
+            party->velY = (P_F32(party, 0x120) - party->position.y) / party->moveFrames;
             party->useMotionId = 41;
         case 41:
-            party->position.y += P_F32(party, 0x114);
-            if (--P_S32(party, 0x24) <= 0) {
+            party->position.y += party->velY;
+            if (--party->moveFrames <= 0) {
                 party->flags &= ~0x40;
                 party->useMotionId = 13;
             }
@@ -648,22 +648,22 @@ void yoshi_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 20:
-            YW(party)->dir = (P_F32(mario, 0x1A8) >= 90.0f && P_F32(mario, 0x1A8) <= 270.0f) ? 1 : -1;
+            YW(party)->dir = (mario->displayDirection >= 90.0f && mario->displayDirection <= 270.0f) ? 1 : -1;
             mario->hitobjJumpFrom = mario->hitobjStandOn;
             mario->hitobjStandOn = NULL;
             *(Vec*)((u8*)mario + 0x11C) = party->position;
             partyChgPose(party, "PYS_F_1");
             marioChgPose("M_Y_3");
-            P_S16(mario, 0x50) = 0;
+            mario->airTimer = 0;
             party->useMotionId = 21;
-            party->field_104 += -0.01f;
-            if (party->field_104 <= 0.0f) {
-                party->field_104 = 0.0f;
+            party->moveSpeed += -0.01f;
+            if (party->moveSpeed <= 0.0f) {
+                party->moveSpeed = 0.0f;
             }
             YW(party)->angle = 1.0f;
             P_F32(mario, 0x2A0) = sin(3.141592653589793f * YW(party)->angle / 180.0f);
             P_F32(mario, 0x2A4) = 0.0f;
-            P_F32(mario, 0x2A8) = party->position.y;
+            mario->wCamVal1 = party->position.y;
             party->yoshiPsndSFXId = psndSFXOn_3D(0x941, &party->position);
         case 21:
             {
@@ -682,13 +682,13 @@ void yoshi_use(PartyEntry* party) {
                 f32 x = party->position.x;
                 f32 z = party->position.z;
                 if (YW(party)->effect == NULL) {
-                    YW(party)->effect = effSweatN64Entry(1, x, y, z, 1.0f, 70.0f * (party->field_110 == 180.0f ? -1.0f : 1.0f), 0x16);
+                    YW(party)->effect = effSweatN64Entry(1, x, y, z, 1.0f, 70.0f * (party->displayDirectionTarget == 180.0f ? -1.0f : 1.0f), 0x16);
                     YW(party)->timer = 20;
                 }
             }
             hit = partySearchGround(party, 11.0f, 11.0f);
             if (hit == NULL) {
-                party->position.y = P_F32(mario, 0x2A8) + P_F32(mario, 0x2A4);
+                party->position.y = mario->wCamVal1 + P_F32(mario, 0x2A4);
             } else {
                 attr = hitGetAttr(hit);
                 if (attr & 0x200) {
@@ -702,27 +702,27 @@ void yoshi_use(PartyEntry* party) {
                     }
                 }
                 L_sweatEntry(party, NULL);
-                P_F32(mario, 0x2A8) = P_F32(party, 0xE4);
+                mario->wCamVal1 = P_F32(party, 0xE4);
                 party->position.y = P_F32(party, 0xE4) + P_F32(mario, 0x2A4);
             }
-            party->position.x = P_F32(mario, 0x8C);
-            party->position.z = P_F32(mario, 0x94);
+            party->position.x = mario->position.x;
+            party->position.z = mario->position.z;
             if (party->flags & 0x80000000) {
                 f32 s = evt_yoshi_spd;
-                angle = P_F32(mario, 0x1A0);
+                angle = mario->directionView;
                 speed = s;
-                party->field_104 = s;
+                party->moveSpeed = s;
             } else {
                 L_getStick(party, &angle, &speed);
                 L_yoshiFlyMove(party);
             }
             P_PTR(party, 0x12C) = NULL;
             P_PTR(party, 0x134) = NULL;
-            dir = party->field_100;
-            spd = party->field_104;
+            dir = party->targetDir;
+            spd = party->moveSpeed;
             L_searchHead(party);
             checkWall(party, spd, dir);
-            if (party->field_138 == NULL && P_S16(mario, 0x50) >= 10) {
+            if (party->field_138 == NULL && mario->airTimer >= 10) {
                 searchGround2(party);
                 if (party->field_138) {
                     mario->hitobjJumpFrom = NULL;
@@ -738,7 +738,7 @@ void yoshi_use(PartyEntry* party) {
                     if (party->flags & 0x80000000) {
                         evt_yoshi_spd = 0.0f;
                         evt_yoshi_frm = -1;
-                        party->field_104 = 0.0f;
+                        party->moveSpeed = 0.0f;
                         party->useMotionId = 52;
                     }
                     break;
@@ -746,18 +746,18 @@ void yoshi_use(PartyEntry* party) {
                 YW(party)->dir = 0;
             }
             SYNC_MARIO(mario, party);
-            P_S16(mario, 0x50)++;
-            if (P_S16(mario, 0x50) > 14) {
+            mario->airTimer++;
+            if (mario->airTimer > 14) {
                 if (party->flags & 0x80000000) {
-                    if (P_S16(mario, 0x50) > 68) {
+                    if (mario->airTimer > 68) {
                         evt_yoshi_frm = 0;
-                        P_F32(party, 0x114) = 0.0f;
-                        P_F32(party, 0x11C) = -1.0f;
+                        party->velY = 0.0f;
+                        party->gravity = -1.0f;
                         party->useMotionId = 50;
                     }
-                } else if (P_S16(mario, 0x50) > 68 || !(MARIO_U16(party, 0x150) & 0x100) || marioKeyOffChk()) {
-                    P_F32(party, 0x114) = 0.0f;
-                    P_F32(party, 0x11C) = -1.0f;
+                } else if (mario->airTimer > 68 || !(MARIO_U16(party, 0x150) & 0x100) || marioKeyOffChk()) {
+                    party->velY = 0.0f;
+                    party->gravity = -1.0f;
                     party->useMotionId = 50;
                 }
             }
@@ -768,10 +768,10 @@ void yoshi_use(PartyEntry* party) {
     if (party->useMotionId == 13 || yoshiGetStatus() == 3 || yoshiGetStatus() == 4 || yoshiGetStatus() == 2) {
         ox = 0.0f;
         oz = 0.0f;
-        movePos(&ox, &oz, -6.0f, toMovedir(party->field_10C));
-        P_F32(mario, 0x98) = ox;
-        P_F32(mario, 0xA0) = oz;
-        P_F32(mario, 0xA8) = 8.0f + L_getOfs(party);
+        movePos(&ox, &oz, -6.0f, toMovedir(party->displayDirection));
+        mario->dispOfs.x = ox;
+        mario->dispOfs.z = oz;
+        mario->dispOfs2.y = 8.0f + L_getOfs(party);
         extra = partyGetPtr(marioGetExtraPartyId());
         if (extra) {
             P_F32(extra, 0x80) = L_getOfs(party);
@@ -780,92 +780,92 @@ void yoshi_use(PartyEntry* party) {
 
     switch (party->useMotionId) {
         case 60:
-            party->field_104 = 0.0f;
+            party->moveSpeed = 0.0f;
             party->flags &= ~0x20;
             party->flags |= 0x10;
-            P_S16(mario, 0x50) = 0;
-            P_S16(mario, 0x52) = 0;
+            mario->airTimer = 0;
+            mario->jumpPeakAirTime = 0;
             P_PTR(party, 0x13C) = party->field_138;
             L_sweatEntry(party, NULL);
             mario->hitobjStandOn = NULL;
             *(Vec*)((u8*)mario + 0x11C) = *(Vec*)((u8*)mario + 0x8C);
             jumpheight = 100.0f;
-            P_F32(mario, 0x128) = 0.0f;
+            mario->jumpDistance = 0.0f;
             party->useMotionId = 61;
-            P_S32(party, 0x24) = 0;
-            P_F32(party, 0x11C) = marioJumpStandData[0];
+            party->moveFrames = 0;
+            party->gravity = marioJumpStandData[0];
             P_F32(party, 0x174) = marioJumpStandData[1];
             P_F32(party, 0x178) = marioJumpStandData[2];
-            P_F32(party, 0x118) = marioJumpStandData[3];
+            party->accelY = marioJumpStandData[3];
         case 61:
             {
-                f32 prev = P_F32(party, 0x11C);
-                P_F32(party, 0x178) += P_F32(party, 0x118);
+                f32 prev = party->gravity;
+                P_F32(party, 0x178) += party->accelY;
                 P_F32(party, 0x174) += P_F32(party, 0x178);
-                P_F32(party, 0x11C) += P_F32(party, 0x174);
-                if (prev >= P_F32(party, 0x11C)) {
+                party->gravity += P_F32(party, 0x174);
+                if (prev >= party->gravity) {
                     party->useMotionId = 62;
                 }
             }
-            party->position.y += P_F32(party, 0x11C);
-            P_F32(mario, 0x128) += P_F32(party, 0x11C);
+            party->position.y += party->gravity;
+            mario->jumpDistance += party->gravity;
             break;
         case 62:
-            party->position.y += P_F32(party, 0x11C);
-            P_F32(mario, 0x128) += P_F32(party, 0x11C);
-            if (P_F32(mario, 0x128) >= 0.7f * marioGetJumpHeight()) {
+            party->position.y += party->gravity;
+            mario->jumpDistance += party->gravity;
+            if (mario->jumpDistance >= 0.7f * marioGetJumpHeight()) {
                 party->useMotionId = 63;
             }
             break;
         case 63:
-            P_F32(party, 0x11C) += 0.125f * (-1.0f - P_F32(party, 0x11C));
-            party->position.y += P_F32(party, 0x11C);
-            P_F32(mario, 0x128) += P_F32(party, 0x11C);
-            if (P_F32(party, 0x11C) <= 0.0f) {
+            party->gravity += 0.125f * (-1.0f - party->gravity);
+            party->position.y += party->gravity;
+            mario->jumpDistance += party->gravity;
+            if (party->gravity <= 0.0f) {
                 party->useMotionId = 64;
                 marioSetPeakYpos();
-                P_F32(party, 0x11C) = -0.4f;
+                party->gravity = -0.4f;
                 P_F32(party, 0x174) = -0.4f;
                 P_F32(party, 0x178) = 0.0f;
-                P_F32(party, 0x118) = 0.0f;
+                party->accelY = 0.0f;
                 party->flags &= ~0x10;
                 party->flags |= 0x20;
                 party->useMotionId = 64;
             }
             break;
         case 64:
-            P_F32(party, 0x178) += P_F32(party, 0x118);
+            P_F32(party, 0x178) += party->accelY;
             P_F32(party, 0x174) += P_F32(party, 0x178);
-            P_F32(party, 0x11C) += P_F32(party, 0x174);
-            if (P_F32(party, 0x11C) <= 0.0f) {
+            party->gravity += P_F32(party, 0x174);
+            if (party->gravity <= 0.0f) {
                 marioSetPeakYpos();
-                P_F32(party, 0x11C) = -0.4f;
+                party->gravity = -0.4f;
                 P_F32(party, 0x174) = -0.4f;
                 P_F32(party, 0x178) = 0.0f;
-                P_F32(party, 0x118) = 0.0f;
+                party->accelY = 0.0f;
                 party->flags &= ~0x10;
                 party->flags |= 0x20;
                 party->useMotionId = 65;
             }
-            party->position.y += P_F32(party, 0x11C);
+            party->position.y += party->gravity;
             break;
         case 65:
-            if (--P_S32(party, 0x24) <= 0) {
-                party->field_104 = 0.0f;
-                P_F32(party, 0x114) = 0.0f;
-                P_F32(party, 0x11C) = -1.0f;
+            if (--party->moveFrames <= 0) {
+                party->moveSpeed = 0.0f;
+                party->velY = 0.0f;
+                party->gravity = -1.0f;
                 party->useMotionId = 50;
             }
             break;
     }
 
     if (party->useMotionId >= 64 && party->useMotionId <= 65) {
-        P_S16(mario, 0x50)++;
+        mario->airTimer++;
         searchGround(party);
         if (party->field_138) {
             mario->hitobjJumpFrom = NULL;
-            P_F32(party, 0x114) = 0.0f;
-            P_F32(party, 0x11C) = -1.0f;
+            party->velY = 0.0f;
+            party->gravity = -1.0f;
             party->useMotionId = 50;
         }
     }
@@ -873,13 +873,13 @@ void yoshi_use(PartyEntry* party) {
     switch (party->useMotionId) {
         case 50:
         case 51:
-            party->position.x = P_F32(mario, 0x8C);
-            party->position.z = P_F32(mario, 0x94);
+            party->position.x = mario->position.x;
+            party->position.z = mario->position.z;
             if (party->flags & 0x80000000) {
                 f32 s = evt_yoshi_spd;
-                angle = P_F32(mario, 0x1A0);
+                angle = mario->directionView;
                 speed = s;
-                party->field_104 = s;
+                party->moveSpeed = s;
             } else {
                 L_getStick(party, &angle, &speed);
                 L_yoshiFlyMove(party);
@@ -898,11 +898,11 @@ void yoshi_use(PartyEntry* party) {
             }
             P_PTR(party, 0x12C) = NULL;
             P_PTR(party, 0x134) = NULL;
-            mario->field_0x1E0 = NULL;
+            mario->hitobjFront = NULL;
             mario->hitobjPush = NULL;
-            mario->field_0x1F0 = NULL;
-            dir = party->field_100;
-            spd = party->field_104;
+            mario->hitobjWall = NULL;
+            dir = party->targetDir;
+            spd = party->moveSpeed;
             L_searchHead(party);
             checkWall(party, spd, dir);
             searchGround(party);
@@ -917,7 +917,7 @@ void yoshi_use(PartyEntry* party) {
                 if (party->flags & 0x80000000) {
                     evt_yoshi_spd = 0.0f;
                     evt_yoshi_frm = -1;
-                    party->field_104 = 0.0f;
+                    party->moveSpeed = 0.0f;
                     party->useMotionId = 52;
                 }
             }
@@ -965,10 +965,10 @@ void yoshi_use(PartyEntry* party) {
         return;
     }
     ADD_OFS(party);
-    P_F32(mario, 0xEC) = party->position.x;
-    P_F32(mario, 0xF4) = party->position.z;
-    P_F32(mario, 0x1A8) = party->field_10C;
-    P_F32(mario, 0x1AC) = party->field_110;
+    mario->camTarget.x = party->position.x;
+    mario->camTarget.z = party->position.z;
+    mario->displayDirection = party->displayDirection;
+    mario->displayDirectionTarget = party->displayDirectionTarget;
     *(Vec*)((u8*)mario + 0x8C) = party->position;
     {
         Vec cam = party->position;
@@ -996,10 +996,10 @@ void L_yoshiFlyMove(PartyEntry* party) {
     if (spd < 0.01f) {
         spd = 0.0f;
     }
-    party->field_104 = spd;
+    party->moveSpeed = spd;
     if (spd) {
-        party->field_100 = revise360(z + P_F32(party, 0xF8));
-        party->field_FC = revise360(z + P_F32(party, 0xF8));
+        party->targetDir = revise360(z + P_F32(party, 0xF8));
+        party->moveDir = revise360(z + P_F32(party, 0xF8));
     }
     P_F32(mario, 0x18C) = spd;
 }
@@ -1017,7 +1017,7 @@ void inertia(PartyEntry* party) {
 
     if (!sx) {
         k = -0.07f;
-        if (mario->field_0x1F0) {
+        if (mario->hitobjWall) {
             if (lim) {
             }
             k = -0.5f;
@@ -1076,7 +1076,7 @@ void searchGround(PartyEntry* party) {
     mario = party->playerPtr;
     hit = NULL;
     if (!(party->flags & 0x2000000)) {
-        range = __fabsf(P_F32(party, 0x11C));
+        range = __fabsf(party->gravity);
         if (range < 1.0f) {
             range = 1.0f;
         }
@@ -1097,20 +1097,20 @@ void searchGround(PartyEntry* party) {
             marioSetSplash(0, &pos);
             L_sweatEntry(party, NULL);
             L_fall(party);
-            party->position.y += P_F32(party, 0x11C);
-            set_damage_root_ypos(P_F32(mario, 0x90) - 8.0f);
+            party->position.y += party->gravity;
+            set_damage_root_ypos(mario->position.y - 8.0f);
             L_resetOfs(party);
             party->flags |= 0x2000000;
-            if (P_F32(party, 0x11C) <= -6.0f) {
-                P_F32(party, 0x11C) = -6.0f;
+            if (party->gravity <= -6.0f) {
+                party->gravity = -6.0f;
                 P_F32(party, 0x174) = 0.0f;
                 P_F32(party, 0x178) = 0.0f;
-                P_F32(party, 0x118) = 0.0f;
+                party->accelY = 0.0f;
             }
-            P_F32(mario, 0x7C) = P_F32(party, 0x11C);
-            P_F32(mario, 0x80) = P_F32(party, 0x174);
-            P_F32(mario, 0x84) = P_F32(party, 0x178);
-            P_F32(mario, 0x88) = P_F32(party, 0x118);
+            mario->jumpVelocityY = party->gravity;
+            mario->jumpAccelerationY = P_F32(party, 0x174);
+            mario->jumpJerkY = P_F32(party, 0x178);
+            mario->jumpSnapY = party->accelY;
             marioChgMot(0x1F);
             return;
         }
@@ -1133,7 +1133,7 @@ void searchGround(PartyEntry* party) {
             diff = stepY - party->position.y;
             if (step && diff <= 11.0f && diff >= 5.0f && P_F32(party, 0xE0) <= 30.0f) {
                 P_F32(party, 0x120) = stepY;
-                if (party->field_104) {
+                if (party->moveSpeed) {
                     if (L_chgMotion(party, 40)) {
                         return;
                     }
@@ -1145,13 +1145,13 @@ void searchGround(PartyEntry* party) {
     if (hit == NULL) {
         party->flags &= ~2;
         L_fall(party);
-        party->position.y += P_F32(party, 0x11C);
+        party->position.y += party->gravity;
     } else {
         party->flags |= 2;
         if (party->flags & 0x20) {
             party->flags &= ~0x70;
             mario->flags &= ~0xF0000;
-            P_F32(party, 0x114) = 0.0f;
+            party->velY = 0.0f;
             party->position.y = groundY;
             if (party->yoshiPsndSFXId != -1) {
                 psndSFXOff(party->yoshiPsndSFXId);
@@ -1180,17 +1180,17 @@ void searchGround2(PartyEntry* party) {
         Vec pos = party->position;
         marioSetSplash(0, &pos);
         L_sweatEntry(party, NULL);
-        P_F32(party, 0x11C) = -0.4f;
+        party->gravity = -0.4f;
         P_F32(party, 0x174) = -0.4f;
         P_F32(party, 0x178) = 0.0f;
-        P_F32(party, 0x118) = 0.0f;
-        P_F32(party, 0x178) += P_F32(party, 0x118);
+        party->accelY = 0.0f;
+        P_F32(party, 0x178) += party->accelY;
         P_F32(party, 0x174) += P_F32(party, 0x178);
-        P_F32(party, 0x11C) += P_F32(party, 0x174);
-        if (P_F32(party, 0x11C) < -15.0f) {
-            P_F32(party, 0x11C) = -15.0f;
+        party->gravity += P_F32(party, 0x174);
+        if (party->gravity < -15.0f) {
+            party->gravity = -15.0f;
         }
-        party->position.y += P_F32(party, 0x11C);
+        party->position.y += party->gravity;
         party->useMotionId = 70;
         return;
     }
@@ -1198,7 +1198,7 @@ void searchGround2(PartyEntry* party) {
         unk_800b474c(party);
     }
     party->flags |= 2;
-    P_F32(party, 0x114) = 0.0f;
+    party->velY = 0.0f;
     party->position.y = P_F32(party, 0xE4);
     party->flags &= ~0x70;
     mario->flags &= ~0xF0000;
@@ -1224,16 +1224,16 @@ void checkWall(PartyEntry* party, f32 spd, f32 dir) {
     hit = partySearchWallFront(party, &pos, spd, dir);
     if (hit) {
         P_PTR(party, 0x12C) = hit;
-        mario->field_0x1E0 = hit;
+        mario->hitobjFront = hit;
         if (spd) {
             if ((party->flags & 0x100) && marioChkBero(hit) == TRUE) {
                 P_PTR(party, 0x134) = hit;
                 mario->hitobjPush = hit;
-                mario->field_0x1F0 = hit;
+                mario->hitobjWall = hit;
             } else {
                 P_PTR(party, 0x134) = NULL;
                 mario->hitobjPush = NULL;
-                mario->field_0x1F0 = NULL;
+                mario->hitobjWall = NULL;
             }
         }
         if (hitGetAttr(hit) & 0x800) {
@@ -1247,25 +1247,25 @@ void checkWall(PartyEntry* party, f32 spd, f32 dir) {
         party->position = pos;
     } else if (!spd) {
         pos = party->position;
-        hit = partySearchWallFront(party, &pos, spd, party->field_100);
+        hit = partySearchWallFront(party, &pos, spd, party->targetDir);
         P_PTR(party, 0x12C) = hit;
-        mario->field_0x1E0 = hit;
+        mario->hitobjFront = hit;
         if (hit == NULL) {
-            f32 d = toMovedir(party->field_10C);
+            f32 d = toMovedir(party->displayDirection);
             pos = party->position;
             hit = partySearchWallFront(party, &pos, spd, d);
             P_PTR(party, 0x12C) = hit;
-            mario->field_0x1E0 = hit;
+            mario->hitobjFront = hit;
         }
         if (MARIO_U16(party, 0x152) & 0x100) {
             pos = party->position;
-            hit = partySearchWallFront(party, &pos, spd, party->field_100);
+            hit = partySearchWallFront(party, &pos, spd, party->targetDir);
             if (hit == NULL) {
                 P_PTR(party, 0x130) = hit;
-                mario->field_0x1DC = hit;
+                mario->hitobjFrontA = hit;
             } else {
                 P_PTR(party, 0x130) = P_PTR(party, 0x12C);
-                mario->field_0x1DC = P_PTR(party, 0x12C);
+                mario->hitobjFrontA = P_PTR(party, 0x12C);
             }
         }
         hit = dou10_yoko_yari2(&work1);
@@ -1290,9 +1290,9 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
     f32 dist;
     f32 ang;
 
-    if (P_S8(mario, 0x39)) {
+    if (mario->keyOffCount) {
         *speed = 0.0f;
-        *angle = party->field_FC;
+        *angle = party->moveDir;
         return;
     }
     y = -P_S8(party, 0x159);
@@ -1303,7 +1303,7 @@ void L_getStick(PartyEntry* party, f32* angle, f32* speed) {
     }
     ang = angleABf(0.0f, 0.0f, x, -y);
     if (!dist) {
-        ang = party->field_FC;
+        ang = party->moveDir;
     }
     *angle = revise360(ang + P_F32(party, 0xF8));
     if (dist > 0.0f) {

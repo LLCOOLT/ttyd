@@ -1087,7 +1087,7 @@ USER_FUNC(_make_counterset_weapon) {
     src = (void*)evtGetValue(event, index);
     value = evtGetValue(event, args[1]);
     memcpy(weapon, src, sizeof(BattleWeapon));
-    weapon->field_0xA7 = value;
+    weapon->holdFastTime = value;
     evtSetValue(event, index, (s32)weapon);
     return EVT_RETURN_DONE;
 }
@@ -1148,7 +1148,7 @@ USER_FUNC(_judge_on_stage) {
     id = BattleTransID(event, id);
     index = args[1];
     BtlUnit_GetPos(BattleGetUnitPtr(wp, id), &x, &y, &z);
-    if (__fabs(x) < 40.0f + stage->field_0xB24) {
+    if (__fabs(x) < 40.0f + stage->stageSizeX) {
         evtSetValue(event, index, TRUE);
     } else {
         evtSetValue(event, index, FALSE);

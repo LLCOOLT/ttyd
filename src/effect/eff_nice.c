@@ -9,6 +9,7 @@
 #include "system.h"
 #include <dolphin/gx.h>
 
+
 extern GlobalWork* gp;
 
 //.sdata
@@ -34,9 +35,6 @@ static const char** anim_tbl[2] = { anim_jp, anim_us };
 s32 acrobat_jp[] = {179, 180, 181, 182, 183, 184, 185};
 s32 acrobat_us[] = {183, 184, 185, 186, 187, 188}; //includes nonexistant textures
 s32* acrobat_tbl[2] = { acrobat_jp, acrobat_us };
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_07_80411CDC_sdata[1] = {0};
-#pragma force_active reset
  // unreferenced zero word in target
 
 //forward declarations
@@ -102,9 +100,9 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 	userdata->position.x = x;
 	userdata->position.y = y;
 	userdata->position.z = z;
-	userdata->field_0x10 = 1.0f;
-	userdata->field_0x14 = 1.0f;
-	userdata->field_0x18 = 1.0f;
+	userdata->scaleX = 1.0f;
+	userdata->scaleY = 1.0f;
+	userdata->scaleZ = 1.0f;
 	userdata->field_0x1C = 1.0f;
 	userdata->poseId = -1;
 	switch (type) {
@@ -114,11 +112,11 @@ EffectEntry* effNiceEntry(s32 type, f32 x, f32 y, f32 z) {
 			ptr->position.x = 1000.0f;
 			ptr->position.y = 0.0f;
 			ptr->position.z = 0.0f;
-			ptr->field_0x10 = 1.0f;
-			ptr->field_0x14 = 1.0f;
-			ptr->field_0x18 = 1.0f;
-			ptr->field_0x28 = 0;
-			ptr->field_0x20 = 0;
+			ptr->scaleX = 1.0f;
+			ptr->scaleY = 1.0f;
+			ptr->scaleZ = 1.0f;
+			ptr->state = 0;
+			ptr->timer = 0;
 		}
 		break;
 	default:
@@ -255,85 +253,83 @@ void acrobatMain(EffectEntry* effect) {
 	pos = tmp;
 	for (i = 1, wp++; i < effect->count; i++, wp++) {
 		char* sfx2 = "SFX_SYSTEM_ACROBAT1";
-		s32 i12 = i * 12;
-		s32 i4 = i * 4;
-		switch (wp->field_0x28) {
+		switch (wp->state) {
 		case 0:
-			wp->field_0x20 = i4;
-			wp->field_0x28++;
+			wp->timer = i * 4;
+			wp->state++;
 			if (i == 1) {
 				psndSFXOn(sfx2);
 			}
 			break;
 		case 1:
-			wp->field_0x20--;
-			if (wp->field_0x20 < 0) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer--;
+			if (wp->timer < 0) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 2:
-			wp->field_0x20++;
-			wp->position.x = intplGetValue(12, wp->field_0x20, 30, 500.0f, i4);
-			if (wp->field_0x20 >= 30) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			wp->position.x = intplGetValue(12, wp->timer, 30, 500.0f, i * 4);
+			if (wp->timer >= 30) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 3:
-			wp->field_0x20++;
-			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 8, 1.0f, 0.4f);
-			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 1.5f, wp->field_0x20, 8);
-			if (wp->field_0x20 >= 8) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			wp->scaleX = intplGetValue(12, wp->timer, 8, 1.0f, 0.4f);
+			wp->scaleY = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 1.5f, wp->timer, 8);
+			if (wp->timer >= 8) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 4:
-			wp->field_0x20++;
-			if (wp->field_0x20 > (effect->count - i - 1) * 4) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			if (wp->timer > (effect->count - i - 1) * 4) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 5:
-			wp->field_0x20++;
-			wp->position.x = intplGetValue(8, wp->field_0x20, 30, i4, i12);
-			wp->field_0x10 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.2f, 1.0f, wp->field_0x20, 30);
-			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.5f, 1.0f, wp->field_0x20, 30);
-			if (wp->field_0x20 >= 30) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			wp->position.x = intplGetValue(8, wp->timer, 30, i * 4, i * 12);
+			wp->scaleX = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.2f, 1.0f, wp->timer, 30);
+			wp->scaleY = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.5f, 1.0f, wp->timer, 30);
+			if (wp->timer >= 30) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 6:
-			wp->field_0x20++;
-			if (wp->field_0x20 > 16) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			if (wp->timer > 16) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 7:
-			wp->field_0x20++;
-			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 15, 1.0f, 1.5f);
-			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 0.1f, wp->field_0x20, 15);
-			if (wp->field_0x20 >= 15) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			wp->scaleX = intplGetValue(12, wp->timer, 15, 1.0f, 1.5f);
+			wp->scaleY = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 1.0f, 0.1f, wp->timer, 15);
+			if (wp->timer >= 15) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 8:
-			wp->field_0x20++;
-			wp->field_0x10 = intplGetValue(12, wp->field_0x20, 15, 1.5f, 0.1f);
-			wp->field_0x14 = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.1f, 2.0f, wp->field_0x20, 15);
-			if (wp->field_0x20 >= 15) {
-				wp->field_0x20 = 0;
-				wp->field_0x28++;
+			wp->timer++;
+			wp->scaleX = intplGetValue(12, wp->timer, 15, 1.5f, 0.1f);
+			wp->scaleY = ((f32 (*)(s32, f32, f32, s32, s32))intplGetValue)(12, 0.1f, 2.0f, wp->timer, 15);
+			if (wp->timer >= 15) {
+				wp->timer = 0;
+				wp->state++;
 			}
 			break;
 		case 9:
 			done++;
-			wp->field_0x10 = wp->field_0x14 = wp->field_0x18 = 0.0f;
+			wp->scaleX = wp->scaleY = wp->scaleZ = 0.0f;
 			break;
 		}
 	}
@@ -385,7 +381,7 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 	half = size; half *= 0.5f;
 	wp++;
 	for (i = 1; i < effect->count; i++, wp++) {
-		if (wp->field_0x28 < 6) {
+		if (wp->state < 6) {
 			ofsX = size / 2.0f;
 			ofsY = 0.0f;
 		} else {
@@ -394,7 +390,7 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 		}
 		PSMTXTrans(trans, wp->position.x, wp->position.y, wp->position.z);
 		PSMTXTrans(rot, ofsX, ofsY, 0.0f);
-		PSMTXScale(scale, wp->field_0x10, wp->field_0x14, wp->field_0x18);
+		PSMTXScale(scale, wp->scaleX, wp->scaleY, wp->scaleZ);
 		PSMTXConcat(rot, scale, scale);
 		PSMTXTrans(rot, -ofsX, -ofsY, 0.0f);
 		PSMTXConcat(scale, rot, scale);
@@ -416,3 +412,4 @@ void effAcrobatDisp(CameraId cameraId, void* param) {
 		GXTexCoord2f32(0.0f, 1.0f);
 	}
 }
+

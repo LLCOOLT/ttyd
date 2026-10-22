@@ -144,10 +144,10 @@ USER_FUNC(bress) {
         event->userdata[0] = 30;
         event->userdata[1] = 30;
         event->userdata[2] = 30;
-        event->field_84 = (u32)(timers = _mapAlloc(npcWork->total * sizeof(s32)));
+        event->userdata3 = (u32)(timers = _mapAlloc(npcWork->total * sizeof(s32)));
         memset(timers, 0, npcWork->total * sizeof(s32));
     }
-    timers = (s32*)event->field_84;
+    timers = (s32*)event->userdata3;
     if (event->userdata[0] != 0) {
         event->userdata[0]--;
     }
@@ -164,13 +164,13 @@ USER_FUNC(bress) {
     }
     if (mario != NULL && event->userdata[0] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8) &&
         vivianGetStatus() != 2) {
-        effMistEntry(4, 30, mario->position.x, 24.0f + mario->position.y, mario->position.z, 270.0f - mario->unk1A8);
+        effMistEntry(4, 30, mario->position.x, 24.0f + mario->position.y, mario->position.z, 270.0f - mario->displayDirection);
         event->userdata[0] = irand(60) + 60;
     }
     if (party != NULL && event->userdata[1] == 0 && !marioChkSts(4) && !marioChkSts(0x10) && !marioChkSts(8) &&
         vivianGetStatus() != 2) {
         effMistEntry(4, 30, party->position.x, party->position.y + offset[party->currentMemberId], party->position.z,
-                     270.0f - party->field_10C);
+                     270.0f - party->displayDirection);
         event->userdata[1] = irand(60) + 60;
     }
     if (party2 != NULL && event->userdata[2] == 0) {
@@ -180,7 +180,7 @@ USER_FUNC(bress) {
         if ((npc->flags & 1) && timers[i] == 0) {
             AnimationPose* pose = animPoseGetAnimPosePtr(npc->poseId);
             effMistEntry(4, 30, npc->position.x, npc->height / 2 + npc->position.y, npc->position.z,
-                         270.0f - pose->field_0x7C);
+                         270.0f - pose->peraTargetRotY);
             timers[i] = irand(60) + 60;
         }
     }

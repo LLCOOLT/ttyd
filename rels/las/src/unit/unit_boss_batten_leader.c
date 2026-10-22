@@ -567,7 +567,7 @@ USER_FUNC(evt_eff_firechange00) {
     pos.y = ((f32*)eff->userdata)[15];
     pos.z = 0.0f;
     if (isFirstCall) {
-        event->field_84 = 0;
+        event->userdata3 = 0;
         if (mode == 0) {
             PSVECSubtract(&target, &pos, &nowv);
             PSVECNormalize(&nowv, &nowv);
@@ -581,7 +581,7 @@ USER_FUNC(evt_eff_firechange00) {
             ((s32*)eff->userdata)[12] = 20;
         }
     }
-    switch (event->field_84) {
+    switch (event->userdata3) {
         case 0:
             break;
         case 1:
@@ -624,11 +624,11 @@ USER_FUNC(evt_eff_firechange00) {
     }
     ((f32*)eff->userdata)[14] = pos.x;
     ((f32*)eff->userdata)[15] = pos.y;
-    switch (event->field_84) {
+    switch (event->userdata3) {
         case 0:
             if (PSVECSquareDistance(&pos, &target) < 225.0f) {
                 if (mode) {
-                    event->field_84 = 1;
+                    event->userdata3 = 1;
                 } else {
                     return 1;
                 }
@@ -2127,7 +2127,7 @@ USER_FUNC(btl_hitoffsetx) {
     part = BattleGetUnitPartsPtr(id, partNo);
 
 
-    part->field_0x1A0 = evtGetValue(event, args[2]);
+    part->hitOffsetX = evtGetValue(event, args[2]);
     return EVT_RETURN_DONE;
 }
 static USER_FUNC(_set_draw_callback) {

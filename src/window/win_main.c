@@ -400,18 +400,18 @@ void winMain(void) {
                 base = winPartyDt;
                 n = 0;
                 for (i = 0, p = base; i < 7; i++, p++) {
-                    if (partyId == p->field_0x0) {
+                    if (partyId == p->partyId) {
                         list[n++] = p;
                     }
                 }
                 for (i = 0; i < 7; i++, base++) {
-                    if (partyId != base->field_0x0) {
+                    if (partyId != base->partyId) {
                         list[n++] = base;
                     }
                 }
                 wp->currentEvent = evtEntryType(evt_item_use, 0, 0, 0);
                 wp->currentEvent->lwData[10] = wp->itemId;
-                wp->currentEvent->lwData[11] = wp->itemTarget == 0 ? 0 : list[wp->itemTarget - 1]->field_0x0;
+                wp->currentEvent->lwData[11] = wp->itemTarget == 0 ? 0 : list[wp->itemTarget - 1]->partyId;
                 psndClearFlag(0x80);
                 wp->menuState++;
                 pouchRemoveItemIndex(wp->itemId, wp->itemIdx);
@@ -822,8 +822,8 @@ USER_FUNC(itemUseFunc) {
                 cnt = 300;
                 break;
             }
-            eff = effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 0, *(u8*)&item->hp_restored);
-            ((f32*)eff->userdata)[0x10] = -party->field_F0 * HALF_F;
+            eff = effRecoveryEntry(party->position.x, party->position.y + party->height, party->position.z, 0, *(u8*)&item->hp_restored);
+            ((f32*)eff->userdata)[0x10] = -party->height * HALF_F;
             cnt++;
             break;
         case 230:
@@ -837,7 +837,7 @@ USER_FUNC(itemUseFunc) {
                 cnt = 999;
                 break;
             }
-            effRecoveryEntry(party->position.x, party->position.y + party->field_F0, party->position.z, 1, *(u8*)&item->fp_restored);
+            effRecoveryEntry(party->position.x, party->position.y + party->height, party->position.z, 1, *(u8*)&item->fp_restored);
             cnt++;
             break;
         case 330:

@@ -909,7 +909,7 @@ USER_FUNC(img_alpha) {
     PSMTXScale(scale, 0.9f, 0.9f, 0.9f);
     PSMTXRotRad(rot, 'x', -0.5235988f);
     PSMTXConcat(trans, scale, trans);
-    PSMTXConcat(trans, rot, img->field_0x120);
+    PSMTXConcat(trans, rot, img->mtx);
     return EVT_RETURN_DONE;
 }
 
@@ -1030,7 +1030,7 @@ void tiz_broken_draw(CameraId cameraId, void* param) {
 USER_FUNC(tiz_broken) {
     s32 x;
     s32 y;
-    float new_var;
+    f32 inv;
     s32 done = 0;
     BrokenPiece* p;
     BrokenPiece* q;
@@ -1068,8 +1068,8 @@ USER_FUNC(tiz_broken) {
                 }
                 if (dx || dy) {
                     len = tb_sqrtf(dx * dx + dy * dy);
-                    new_var = dx / len;
-                    nx = new_var;
+                    inv = dx / len; // FAKE: copy temp; plain nx = dx / len changes regalloc (+4 B)
+                    nx = inv;
                     ny = dy / len;
                 } else {
                     nx = ny = len = 0.0f;

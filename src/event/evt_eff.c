@@ -162,55 +162,47 @@ extern EffectEntry* effMajinaiEntry(s32, f32, f32, f32);
 
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
-	s32* a2;
-	s32* f2;
-
-	EffectEntry* entry;
+	s32* p;
 	const char* effName;
+	s32 int2, int3, int4, int5, int6, int7, int8, int9;
 	const char* effSet;
-	s32 int2, int3, int4, int5, int6, int7, int8, int9,
-		int10, int11, int12, int13, int14;
+	s32 int10, int11, int12, int13, int14;
+	EffectEntry* entry;
 	f32 float2, float3, float4, float5, float6, float7, float8,
 		float9, float10, float11, float12, float13, float14;
 
 	effName = (const char*)evtGetValue(event, args[0]);
-	//these are probably storing different typecasts, s32 and u32
 	evtGetValue(event, args[0]);
 	evtGetValue(event, args[0]);
-	a2 = args + 2;
-	f2 = a2;
 	effSet = (const char*)evtGetValue(event, args[1]);
 	evtGetValue(event, args[1]);
-
 	evtGetValue(event, args[1]);
-	int2 = evtGetValue(event, *a2++);
-	int3 = evtGetValue(event, *a2++); //unused
-	int4 = evtGetValue(event, *a2++); //unused
-	int5 = evtGetValue(event, *a2++); //unused
-
-	int6 = evtGetValue(event, *a2++);
-	int7 = evtGetValue(event, *a2++);
-	int8 = evtGetValue(event, *a2++);
-	int9 = evtGetValue(event, *a2++);
-	int10 = evtGetValue(event, *a2++);
-	int11 = evtGetValue(event, *a2++);
-	int12 = evtGetValue(event, *a2++); //unused
-	int13 = evtGetValue(event, *a2++); //unused
-	int14 = evtGetValue(event, *a2++); //unused
-
-	float2 = evtGetFloat(event, *f2++); //unused
-	float3 = evtGetFloat(event, *f2++);
-	float4 = evtGetFloat(event, *f2++);
-	float5 = evtGetFloat(event, *f2++);
-	float6 = evtGetFloat(event, *f2++);
-	float7 = evtGetFloat(event, *f2++);
-	float8 = evtGetFloat(event, *f2++);
-	float9 = evtGetFloat(event, *f2++);
-	float10 = evtGetFloat(event, *f2++);
-	float11 = evtGetFloat(event, *f2++);
-	float12 = evtGetFloat(event, *f2++);
-	float13 = evtGetFloat(event, *f2++);
-	float14 = evtGetFloat(event, *f2++);
+	int2 = evtGetValue(event, args[2]);
+	int3 = evtGetValue(event, args[3]);
+	int4 = evtGetValue(event, args[4]);
+	int5 = evtGetValue(event, args[5]);
+	int6 = evtGetValue(event, args[6]);
+	int7 = evtGetValue(event, args[7]);
+	int8 = evtGetValue(event, args[8]);
+	int9 = evtGetValue(event, args[9]);
+	int10 = evtGetValue(event, args[10]);
+	int11 = evtGetValue(event, args[11]);
+	int12 = evtGetValue(event, args[12]);
+	int13 = evtGetValue(event, args[13]);
+	int14 = evtGetValue(event, args[14]);
+	float2 = evtGetFloat(event, args[2]);
+	float3 = evtGetFloat(event, args[3]);
+	float4 = evtGetFloat(event, args[4]);
+	float5 = evtGetFloat(event, args[5]);
+	float6 = evtGetFloat(event, args[6]);
+	float7 = evtGetFloat(event, args[7]);
+	float8 = evtGetFloat(event, args[8]);
+	float9 = evtGetFloat(event, args[9]);
+	float10 = evtGetFloat(event, args[10]);
+	float11 = evtGetFloat(event, args[11]);
+	float12 = evtGetFloat(event, args[12]);
+	float13 = evtGetFloat(event, args[13]);
+	float14 = evtGetFloat(event, args[14]);
 
 	entry = NULL;
 	switch (effGetSet(effSet)->id) {
@@ -384,9 +376,6 @@ USER_FUNC(evt_eff) {
 	return EVT_RETURN_DONE;
 }
 
-
-
-
 #pragma push
 #pragma optimization_level 2
 s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
@@ -436,9 +425,9 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   evtGetValue(event, args[0]);
   pi = args + 2;
   effSet = (const char *) evtGetValue(event, args[1]);
-  pf = pi;
-  u1a = evtGetValue(event, args[1]);
   pr = pi;
+  u1a = evtGetValue(event, args[1]);
+  pf = pi;
   u1b = evtGetValue(event, args[1]);
   int2 = evtGetValue(event, *(pi++));
   int3 = evtGetValue(event, *(pi++));
@@ -728,7 +717,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
       break;
 
     case 65:
-      effect = effCrystalN64Entry(new_var, int7, float3, float4, float5, float6);
+      effect = effCrystalN64Entry(int2, int7, float3, float4, float5, float6);
       break;
 
     case 66:
@@ -973,3 +962,4 @@ USER_FUNC(evt_eff_fukidashi) {
 	return EVT_RETURN_DONE;
 }
 #pragma pop
+

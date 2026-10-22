@@ -108,20 +108,20 @@ BOOL marioSetDirEventMain(void) {
     if (frames > 0) {
         target = revise360(270.0f - MW(mp, 0x294, f32));
         target = (target - MW(mp, 0x290, f32)) * ((f32)MW(mp, 0x29C, s32) / (f32)frames);
-        mp->unk1A8 = revise360(MW(mp, 0x290, f32) + target);
-        mp->unk1AC = mp->unk1A8;
-        mp->directionView = toMovedirSimple(mp->unk1A8);
-        mp->unk19C = mp->directionView;
+        mp->displayDirection = revise360(MW(mp, 0x290, f32) + target);
+        mp->displayDirectionTarget = mp->displayDirection;
+        mp->directionView = toMovedirSimple(mp->displayDirection);
+        mp->moveDirection = mp->directionView;
         if (++MW(mp, 0x29C, s32) > frames) {
             mp->dispFlags &= ~0x8000;
             return TRUE;
         }
         return FALSE;
     } else {
-        mp->unk1A8 = revise360(270.0f - MW(mp, 0x294, f32));
-        mp->unk1AC = mp->unk1A8;
-        mp->directionView = toMovedirSimple(mp->unk1A8);
-        mp->unk19C = mp->directionView;
+        mp->displayDirection = revise360(270.0f - MW(mp, 0x294, f32));
+        mp->displayDirectionTarget = mp->displayDirection;
+        mp->directionView = toMovedirSimple(mp->displayDirection);
+        mp->moveDirection = mp->directionView;
         mp->dispFlags &= ~0x8000;
         return TRUE;
     }
@@ -150,28 +150,28 @@ BOOL marioChkPlanePlace(HitEntry* hit) {
 
 void marioSetPeakYpos(void) {
     MarioWork* mp = marioGetPtr();
-    MW(mp, 0x12C, f32) = mp->position.y;
+    mp->jumpPeakY = mp->position.y;
 }
 
 void marioAdjustMoveDir(void) {
     MarioWork* mp = marioGetPtr();
 
-    if (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) {
-        mp->unk19C = toMovedir(90.0f);
-        mp->directionView = mp->unk19C;
-        mp->unk1A8 = 180.0f;
-        mp->unk1AC = 180.0f;
+    if (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) {
+        mp->moveDirection = toMovedir(90.0f);
+        mp->directionView = mp->moveDirection;
+        mp->displayDirection = 180.0f;
+        mp->displayDirectionTarget = 180.0f;
     } else {
-        mp->unk19C = toMovedir(90.0f);
-        mp->directionView = mp->unk19C;
-        mp->unk1A8 = 0.0f;
-        mp->unk1AC = 0.0f;
+        mp->moveDirection = toMovedir(90.0f);
+        mp->directionView = mp->moveDirection;
+        mp->displayDirection = 0.0f;
+        mp->displayDirectionTarget = 0.0f;
     }
 }
 
 f32 marioGetDispDir(void) {
     MarioWork* mp = marioGetPtr();
-    return revise360(mp->unk1A8 - 90.0f + mp->targetYaw);
+    return revise360(mp->displayDirection - 90.0f + mp->targetYaw);
 }
 
 f32 revise360(f32 angle) {
@@ -188,11 +188,11 @@ f32 toMovedir(f32 angle) {
     MarioWork* mp = marioGetPtr();
 
     if (mp->flags & 0x100000) {
-        if (mp->unk1A8 == 280.0f || mp->unk1A8 == 460.0f) {
+        if (mp->displayDirection == 280.0f || mp->displayDirection == 460.0f) {
             angle = 0.0f;
-        } else if (mp->unk1A8 == 260.0f || mp->unk1A8 == 440.0f) {
+        } else if (mp->displayDirection == 260.0f || mp->displayDirection == 440.0f) {
             angle = 180.0f;
-        } else if (revise360(mp->unk1A8) >= 180.0f) {
+        } else if (revise360(mp->displayDirection) >= 180.0f) {
             angle = 0.0f;
         } else {
             angle = 180.0f;
@@ -204,14 +204,14 @@ f32 toMovedir(f32 angle) {
 }
 
 f32 partyToMovedir(PartyEntry* party, f32 angle) {
-    void* cam = MW(party, 0x160, void*);
+    void* cam = party->playerPtr;
 
-    if (MW(party, 0x0, u32) & 0x1000) {
-        if (MW(party, 0x10C, f32) == 280.0f || MW(party, 0x10C, f32) == 460.0f) {
+    if (party->flags & 0x1000) {
+        if (party->displayDirection == 280.0f || party->displayDirection == 460.0f) {
             angle = 0.0f;
-        } else if (MW(party, 0x10C, f32) == 260.0f || MW(party, 0x10C, f32) == 440.0f) {
+        } else if (party->displayDirection == 260.0f || party->displayDirection == 440.0f) {
             angle = 180.0f;
-        } else if (revise360(MW(party, 0x10C, f32)) >= 180.0f) {
+        } else if (revise360(party->displayDirection) >= 180.0f) {
             angle = 0.0f;
         } else {
             angle = 180.0f;
@@ -238,11 +238,11 @@ f32 toMovedir2(f32 angle, f32 ofs) {
     MarioWork* mp = marioGetPtr();
 
     if (mp->flags & 0x100000) {
-        if (mp->unk1A8 == 280.0f || mp->unk1A8 == 460.0f) {
+        if (mp->displayDirection == 280.0f || mp->displayDirection == 460.0f) {
             angle = 0.0f;
-        } else if (mp->unk1A8 == 260.0f || mp->unk1A8 == 440.0f) {
+        } else if (mp->displayDirection == 260.0f || mp->displayDirection == 440.0f) {
             angle = 180.0f;
-        } else if (revise360(mp->unk1A8) >= 180.0f) {
+        } else if (revise360(mp->displayDirection) >= 180.0f) {
             angle = 0.0f;
         } else {
             angle = 180.0f;
@@ -275,7 +275,7 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
     MarioWork* mp = marioGetPtr();
 
     mp->flags |= 0x20;
-    mp->unk19C = dir;
+    mp->moveDirection = dir;
     mp->directionView = dir;
     mp->forceMoveTimer = time;
     mp->baseSpeed = speed;
@@ -283,7 +283,7 @@ void marioSetForceMove(f32 dir, s32 time, f32 speed) {
         return;
     } else {
             marioChgMot(speed > mp->mBaseWalkSpeed ? MARIO_MOTION_DASH : MARIO_MOTION_WALK);
-            mp->unk19C = dir;
+            mp->moveDirection = dir;
             mp->directionView = dir;
             mp->forceMoveTimer = time;
             mp->baseSpeed = speed;
@@ -305,13 +305,13 @@ void marioUpdateKeyData(void) {
     MW(mp, 0x255, u8) = 0;
     mask = MW(mp, 0x284, u32) ? MW(mp, 0x284, u32) : 0xFFFFFFFF;
     MW(mp, 0x246, u16) = gp->button[0] & mask;
-    MW(mp, 0x248, u16) = gp->buttonNew[0] & mask;
+    mp->buttonBuffer = gp->buttonNew[0] & mask;
     MW(mp, 0x24A, u16) = gp->buttonRepeat[0] & mask;
     MW(mp, 0x24C, u16) = gp->buttonUp[0] & mask;
     if (!(mp->flags & 0xE)) {
         if (mp->trigFlags & 0x08000000) {
-            MW(mp, 0x24E, u8) = 0;
-            MW(mp, 0x24F, u8) = 0;
+            mp->wStickDir1 = 0;
+            mp->wStickDir2 = 0;
         }
         if (mp->trigFlags & 0x04000000) {
             MW(mp, 0x250, u8) = 0;
@@ -327,8 +327,8 @@ void marioUpdateKeyData(void) {
         }
     }
     if ((mp->flags & 0xE) || !marioChkKey()) {
-        MW(mp, 0x24E, u8) = 0;
-        MW(mp, 0x24F, u8) = 0;
+        mp->wStickDir1 = 0;
+        mp->wStickDir2 = 0;
         MW(mp, 0x250, u8) = 0;
         MW(mp, 0x251, u8) = 0;
         MW(mp, 0x252, u8) = 0;
@@ -337,7 +337,7 @@ void marioUpdateKeyData(void) {
         MW(mp, 0x255, u8) = 0;
         if (!MW(mp, 0x284, u32)) {
             MW(mp, 0x246, u16) = 0;
-            MW(mp, 0x248, u16) = 0;
+            mp->buttonBuffer = 0;
             MW(mp, 0x24A, u16) = 0;
             MW(mp, 0x24C, u16) = 0;
         }
@@ -374,7 +374,7 @@ void marioGetStick(f32* dir, f32* mag) {
     }
     a = angleABf(0.0f, 0.0f, x, y);
     if (!m) {
-        a = mp->unk19C;
+        a = mp->moveDirection;
     }
     *dir = revise360(a + mp->targetYaw);
     *mag = m;

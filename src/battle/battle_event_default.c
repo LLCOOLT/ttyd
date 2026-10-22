@@ -1093,8 +1093,8 @@ USER_FUNC(_get_heart_suitoru_point) {
     point = 0;
     if (unit) {
         point = unit->badgesEquipped.HpDrain;
-        if (point > BTL_UNIT_280(unit)) {
-            point = BTL_UNIT_280(unit);
+        if (point > unit->totalDamageDealt) {
+            point = unit->totalDamageDealt;
         }
     }
     evtSetValue(event, out, point);
@@ -1114,8 +1114,8 @@ USER_FUNC(_get_flower_suitoru_point) {
     point = 0;
     if (unit) {
         point = unit->badgesEquipped.FpDrain;
-        if (point > BTL_UNIT_280(unit)) {
-            point = BTL_UNIT_280(unit);
+        if (point > unit->totalDamageDealt) {
+            point = unit->totalDamageDealt;
         }
     }
     evtSetValue(event, out, point);

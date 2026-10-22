@@ -6,14 +6,14 @@
 
 typedef struct ItemEntry {
 	u16 flags; //0x0
-	u16 field_0x2; //0x2, entry type
+	u16 type; //0x2, entry type (itemEntry arg)
 	s32 itemId; //0x4
 	s32 evtId; //0x8, TODO: better name?
 	char name[0x10]; //0xC
 	EffectEntry* effect; //0x1C
-	s32 field_0x20; //0x20
+	s32 evtCode; //0x20, event script run on pickup (evtEntry)
 	u16 mode; //0x24
-	u16 field_0x26; //0x26
+	u16 subState; //0x26, per-sequence state
 	s32 winId[3]; //0x28
 	u8 field_0x34[0x38 - 0x34]; //0x34
 	u32 flags2; //0x38
@@ -26,15 +26,15 @@ typedef struct ItemEntry {
 	f32 velocityY; //0x58
 	u8 field_0x5C[0x60 - 0x5C]; //0x5C
 	s64 airTime; //0x60
-	OSTime field_0x68; //0x68
-	OSTime field_0x70; //0x70
+	OSTime baseTime; //0x68, timestamp elapsed time is measured from
+	OSTime curTime; //0x70
 	s64 timer; //0x78
-	f32 field_0x80; //0x80, bounce factor
-	f32 field_0x84; //0x84, gravity scale
-	s32 field_0x88; //0x88, max bounces
-	s32 field_0x8C; //0x8C, bounce count
-	s32 field_0x90; //0x90
-	f32 field_0x94; //0x94
+	f32 bounceFactor; //0x80
+	f32 gravityScale; //0x84
+	s32 maxBounces; //0x88
+	s32 bounceCount; //0x8C
+	s32 savedDirection; //0x90
+	f32 savedSpeed; //0x94
 } ItemEntry;
 
 typedef struct ItemWork {

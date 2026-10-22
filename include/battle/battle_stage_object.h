@@ -16,13 +16,13 @@ typedef struct BattleStageObjectData {
 typedef struct BattleStageObject {
 	s32 id; //0x0
 	Vec mPosition; //0x4
-	Vec field_0x10; //0x10, mPositionOffset1?
+	Vec positionOffset; //0x10, added to mPosition for mapObjTranslate
 	Vec mRotation; //0x1C
-	Vec field_0x28; //0x28, mPositionOffset2?
-	Vec field_0x34; //0x34, mPositionTemp?
-	Vec field_0x40; //0x40, mPositionOffset1Temp?
-	Vec field_0x4C; //0x4C, mRotationTemp?
-	Vec field_0x58; //0x58, mPositionOffset2Temp?
+	Vec positionOffset2; //0x28, second offset (btlevtcmd stage-object position)
+	Vec prevPosition; //0x34, change detection
+	Vec prevPositionOffset; //0x40
+	Vec prevRotation; //0x4C
+	Vec prevPositionOffset2; //0x58
 	BattleStageObjectData* data; //0x64
 	u32 mFlags; //0x68
 	u32 mBattleUnitIdx; //0x6C

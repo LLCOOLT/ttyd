@@ -6,6 +6,7 @@
 #include <dolphin/gx.h>
 #include <dolphin/mtx.h>
 
+
 typedef struct EffKemuri12N64Work {
     u16 type;       // 0x0
     u8 pad_2[2];    // 0x2
@@ -217,3 +218,4 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry *effect)
 
 }
 #pragma opt_propagation reset
+

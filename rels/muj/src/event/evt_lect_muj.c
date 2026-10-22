@@ -702,7 +702,7 @@ static USER_FUNC(lect_itemget_kesan) {
         return EVT_RETURN_DONE;
     }
     pos = party->position;
-    pos.y += party->field_F0 / 2;
+    pos.y += party->height / 2;
     PSVECSubtract(&pos, &cam->cameraPos, &dir);
     PSVECNormalize(&dir, &dir);
     PSVECScale(&dir, &dir, dist);
@@ -774,7 +774,7 @@ static USER_FUNC(set_dir) {
 
     if (party != NULL) {
         s32 angle = dir > 180 ? 270 : 90;
-        party->field_110 = party->field_10C = 270 - angle;
+        party->displayDirectionTarget = party->displayDirection = 270 - angle;
     }
     return EVT_RETURN_DONE;
 }

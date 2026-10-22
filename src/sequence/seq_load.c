@@ -24,6 +24,7 @@
 #include "driver/icondrv.h"
 #include "win/win_main.h"
 #include "sdk/texPalette.h"
+#define EXT_LIT(sym, val) (val)
 
 typedef struct LoadWork {
     u16 flags;          // 0x0
@@ -89,7 +90,6 @@ void FontDrawEdgeOff(void);
 void loadMain(SequenceWork* seq);
 void loadDraw(CameraId camera, void* param);
 void continueGame(void);
-
 
 __declspec(section ".data") f32 lbl_80349DE8[] = { -1.0f, 1.0f };
 __declspec(section ".data") static f32 negone_one_374[] = { -1.0f, 1.0f };
@@ -162,6 +162,49 @@ static inline BOOL loadStart(void) {
     return FALSE;
 }
 
+void GXBegin(GXPrimitive type, GXVtxFmt vtxfmt, u16 nverts);
+void GXClearVtxDesc(void);
+void GXGetProjectionv(f32* ptr);
+u16 GXGetTexObjHeight(const GXTexObj* to);
+u16 GXGetTexObjWidth(const GXTexObj* to);
+void GXGetViewportv(f32* vp);
+void GXInitTexObjLOD(GXTexObj* obj, GXTexFilter min_filt, GXTexFilter mag_filt,
+    f32 min_lod, f32 max_lod, f32 lod_bias, GXBool bias_clamp,
+    GXBool do_edge_lod, GXAnisotropy max_aniso);
+void GXLoadPosMtxImm(const f32 mtx[3][4], u32 id);
+void GXLoadTexMtxImm(const f32 mtx[][4], u32 id, GXTexMtxType type);
+void GXLoadTexObj(GXTexObj* obj, GXTexMapID id);
+void GXSetAlphaCompare(GXCompare comp0, u8 ref0, GXAlphaOp op, GXCompare comp1, u8 ref1);
+void GXSetBlendMode(GXBlendMode type, GXBlendFactor src_factor, GXBlendFactor dst_factor, GXLogicOp op);
+void GXSetChanCtrl(GXChannelID chan, GXBool enable, GXColorSrc amb_src, GXColorSrc mat_src, u32 light_mask, GXDiffuseFn diff_fn, GXAttnFn attn_fn);
+void GXSetCullMode(GXCullMode mode);
+void GXSetCurrentMtx(u32 id);
+void GXSetFog(GXFogType type, f32 startz, f32 endz, f32 nearz, f32 farz, GXColor color);
+void GXSetNumChans(u8 nChans);
+void GXSetNumTevStages(u8 nStages);
+void GXSetNumTexGens(u8 nTexGens);
+void GXSetProjection(const f32 mtx[4][4], GXProjectionType type);
+void GXSetProjectionv(const f32* ptr);
+void GXSetTevOp(GXTevStageID id, GXTevMode mode);
+void GXSetTevOrder(GXTevStageID stage, GXTexCoordID coord, GXTexMapID map, GXChannelID color);
+void GXSetTexCoordGen2(GXTexCoordID dst_coord, GXTexGenType func, GXTexGenSrc src_param, u32 mtx, GXBool normalize, u32 pt_texmtx);
+void GXSetViewport(f32 left, f32 top, f32 wd, f32 ht, f32 nearz, f32 farz);
+void GXSetVtxAttrFmt(GXVtxFmt vtxfmt, GXAttr attr, GXCompCnt cnt, GXCompType type, u8 frac);
+void GXSetVtxDesc(GXAttr attr, GXAttrType type);
+void GXSetZCompLoc(GXBool before_tex);
+void GXSetZMode(GXBool compare_enable, GXCompare func, GXBool update_enable);
+u32 OSGetSoundMode(void);
+void PSMTXConcat(const Mtx a, const Mtx b, Mtx ab);
+void PSMTXScale(Mtx m, f32 xS, f32 yS, f32 zS);
+void PSMTXTrans(Mtx m, f32 xT, f32 yT, f32 zT);
+int __div2i();
+int __div2u();
+int __mod2u();
+int sprintf(char *s, const char *format, ...);
+int strcat();
+char *strcpy(char *dest, const char *src);
+size_t strlen(const char *s);
+int winZenkakuStr();
 void seq_loadMain(SequenceWork* seq) {
     switch (seq->state) {
         case 0:
@@ -200,10 +243,10 @@ void seq_loadMain(SequenceWork* seq) {
                             wp->unk40 = 2;
                         }
                     }
-                    wp->unk44 = gp->unk1294 == 0;
+                    wp->unk44 = gp->rumbleEnabled == 0;
                     wp->unk24 = wp->unk40;
                     wp->unk28 = wp->unk44;
-                    wp->slot = gp->unk11B8;
+                    wp->slot = gp->lastSlot;
                     wp->x = win_dt[wp->slot].x;
                     wp->y = win_dt[wp->slot].y;
                 }
@@ -437,7 +480,7 @@ void loadMain(SequenceWork* seq) {
                     wp->unk18 = 1;
                 } else {
                     strcpy((char*)gp->field_0x11BC, nameEntGetName());
-                    gp->unk11B8 = wp->slot;
+                    gp->lastSlot = wp->slot;
                     stg0_00_init();
                     gp->saveSlot = wp->slot;
                     marioPartyKill();
@@ -683,8 +726,8 @@ void loadMain(SequenceWork* seq) {
                 }
                 psndENVOn(0x110, (const char*)0x75);
             }
-            wp->tx = -74.0f;
-            wp->ty = 4.0f + (50.0f - 50.0f * wp->unk24);
+            wp->tx = EXT_LIT(float_neg74_8041be74, -74.0f);
+            wp->ty = EXT_LIT(float_4_8041be78, 4.0f) + (EXT_LIT(float_50_8041be6c, 50.0f) - 50.0f * wp->unk24);
             break;
         case 0xc8:
             wp->flags |= 1;
@@ -695,12 +738,12 @@ void loadMain(SequenceWork* seq) {
                 wp->unk28++;
                 SFX(5);
             } else if (trg & 0x100) {
-                gp->unk1294 = wp->unk28 == 0;
+                gp->rumbleEnabled = wp->unk28 == 0;
                 SFX(0x12);
                 wp->unk44 = wp->unk28;
                 wp->flags &= ~1;
                 wp->unk18 = 1;
-                if (gp->unk1294) {
+                if (gp->rumbleEnabled) {
                     evtEntryType(evt_shake, 0, 0, 0);
                 }
             } else if (trg & 0x200) {
@@ -715,14 +758,14 @@ void loadMain(SequenceWork* seq) {
             if (wp->unk28 < 0) {
                 wp->unk28 = 1;
             }
-            wp->tx = -74.0f;
-            wp->ty = 4.0f + (30.0f - 50.0f * wp->unk28);
+            wp->tx = EXT_LIT(float_neg74_8041be74, -74.0f);
+            wp->ty = EXT_LIT(float_4_8041be78, 4.0f) + (EXT_LIT(float_30_8041be3c, 30.0f) - 50.0f * wp->unk28);
             break;
     }
-    wp->x += (wp->tx - wp->x) / 4.0f;
-    wp->y += (wp->ty - wp->y) / 4.0f;
+    wp->x += (wp->tx - wp->x) / EXT_LIT(float_4_8041be78, 4.0f);
+    wp->y += (wp->ty - wp->y) / EXT_LIT(float_4_8041be78, 4.0f);
     { f32 s = 2.0f * (f32)sin(gp->retraceCount / 8.0f); wp->x += __fabsf(s); }
-    dispEntry(CAMERA_3D, 1000.0f, 0, loadDraw, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_1000_8041be84, 1000.0f), 0, loadDraw, NULL);
 }
 
 #define GXFIFO_F32 (*(volatile f32*)0xCC008000)
@@ -734,35 +777,35 @@ static inline void loadDrawBg(u32 id, f32 x0, f32 y0, f32 x1, f32 y1) {
     f64 h;
 
     TEXGetGXTexObjFromPalette(*wp->file->data, &obj, id);
-    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&obj, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&obj, GX_TEXMAP0);
     GXSetNumTexGens(1);
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     h = __fabs(y0 - y1);
     w = __fabs(x1 - x0);
-    PSMTXScale(m, (f32)w / GXGetTexObjWidth(&obj), (f32)h / GXGetTexObjHeight(&obj), 1.0f);
+    PSMTXScale(m, (f32)w / GXGetTexObjWidth(&obj), (f32)h / GXGetTexObjHeight(&obj), EXT_LIT(float_1_8041bde8, 1.0f));
     GXLoadTexMtxImm(m, GX_TEXMTX0, GX_MTX2x4);
     GXBegin(GX_QUADS, GX_VTXFMT0, 4);
     GXFIFO_F32 = x0;
     GXFIFO_F32 = y0;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
     GXFIFO_F32 = x0;
     GXFIFO_F32 = y1;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
     GXFIFO_F32 = x1;
     GXFIFO_F32 = y1;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
-    GXFIFO_F32 = 1.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
     GXFIFO_F32 = x1;
     GXFIFO_F32 = y0;
-    GXFIFO_F32 = 0.0f;
-    GXFIFO_F32 = 1.0f;
-    GXFIFO_F32 = 0.0f;
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
+    GXFIFO_F32 = EXT_LIT(float_1_8041bde8, 1.0f);
+    GXFIFO_F32 = EXT_LIT(float_0_8041bde4, 0.0f);
 }
 
 void loadDraw(CameraId camera, void* param) {
@@ -800,7 +843,7 @@ void loadDraw(CameraId camera, void* param) {
     GXSetZCompLoc(GX_FALSE);
     GXSetAlphaCompare(GX_GEQUAL, 0x80, GX_AOP_OR, GX_NEVER, 0);
     GXSetZMode(GX_FALSE, GX_ALWAYS, GX_FALSE);
-    GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){255, 255, 255, 255});
+    GXSetFog(GX_FOG_NONE, EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), (GXColor){255, 255, 255, 255});
     GXSetNumChans(0);
     GXSetChanCtrl(GX_COLOR0A0, GX_FALSE, GX_SRC_REG, GX_SRC_REG, GX_LIGHT_NULL, GX_DF_NONE, GX_AF_NONE);
     GXSetNumTevStages(1);
@@ -814,9 +857,9 @@ void loadDraw(CameraId camera, void* param) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
     GXLoadPosMtxImm(cam->view, GX_PNMTX0);
     GXSetCurrentMtx(GX_PNMTX0);
-    loadDrawBg(0x35, -304.0f, 240.0f, -272.0f, -240.0f);
-    loadDrawBg(0x34, -272.0f, 240.0f, 272.0f, -240.0f);
-    loadDrawBg(0x36, 272.0f, 240.0f, 304.0f, -240.0f);
+    loadDrawBg(0x35, EXT_LIT(float_neg304_8041bdec, -304.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
+    loadDrawBg(0x34, EXT_LIT(float_neg272_8041bdf8, -272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
+    loadDrawBg(0x36, EXT_LIT(float_272_8041bdfc, 272.0f), EXT_LIT(float_240_8041bdf0, 240.0f), EXT_LIT(float_304_8041be00, 304.0f), EXT_LIT(float_neg240_8041bdf4, -240.0f));
 
     win1 = win = win_dt;
     for (i = 0; i < 9; i++) {
@@ -840,20 +883,20 @@ void loadDraw(CameraId camera, void* param) {
             case 13: {
                 col.a = 0xfe;
                 winTexInit(*wp->file->data);
-                winTexSet(0xe, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(0xe, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 winTexInit(*wp->file->data);
-                winTexSet(win[i].unk10, (Vec){win[i].x, 60.0f + win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet(win[i].unk10, (Vec){win[i].x, EXT_LIT(float_60_8041be04, 60.0f) + win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
             default: {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, col);
+                winTexSet_x2(win[i].unk10, win[i].unk14, (Vec){win[i].x, win[i].y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, col);
                 break;
             }
         }
     }
 
-    windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, -250.0f, 200.0f, 500.0f, 40.0f, 20.0f);
+    windowDispGX_Waku_col(0, (GXColor){255, 255, 255, 255}, EXT_LIT(float_neg250_8041be08, -250.0f), EXT_LIT(float_200_8041be0c, 200.0f), EXT_LIT(float_500_8041be10, 500.0f), EXT_LIT(float_40_8041be14, 40.0f), EXT_LIT(float_20_8041be18, 20.0f));
     FontDrawStart();
     {
         const char* msg = wp->msg;
@@ -877,25 +920,25 @@ void loadDraw(CameraId camera, void* param) {
         if (i == wp->slot) {
             FontDrawColor((GXColor){255, 255, 255, 255});
         }
-        FontDrawScale(0.6f);
+        FontDrawScale(EXT_LIT(float_0p6_8041be1c, 0.6f));
         FontDrawEdge();
-        sprintf(buf, "\x83\x66\x81\x5b\x83\x5e%s", winZenkakuStr(i + 1));
-        FontDrawString(win1->x - 100.0f, 84.0f + win1->y, buf);
+        sprintf(buf, "\203f\201[\203^%s", winZenkakuStr(i + 1));
+        FontDrawString(win1->x - 100.0f, EXT_LIT(float_84_8041be24, 84.0f) + win1->y, buf);
         FontDrawEdgeOff();
-        FontDrawScale(1.0f);
+        FontDrawScale(EXT_LIT(float_1_8041bde8, 1.0f));
         FontDrawColor((GXColor){32, 32, 32, 255});
         if (i == wp->slot) {
             FontDrawColor((GXColor){0, 0, 0, 255});
         }
         if (flags & 2) {
-            str = "\x82\xb1\x82\xed\x82\xea\x82\xc4\x82\xa2\x82\xdc\x82\xb7";
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            str = "\202\261\202\355\202\352\202\304\202\242\202\334\202\267";
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
         } else if (flags & 1) {
-            str = "\x83\x6a\x83\x85\x81\x5b\x83\x51\x81\x5b\x83\x80";
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            str = "\203j\203\205\201[\203Q\201[\203\200";
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
         } else if (gsw0 == 0) {
-            str = "\x82\xcd\x82\xb6\x82\xdf\x82\xa9\x82\xe7";
-            FontDrawString(win1->x - FontGetMessageWidth(str) / 2.0f, 12.0f + win1->y, str);
+            str = "\202\315\202\266\202\337\202\251\202\347";
+            FontDrawString(win1->x - FontGetMessageWidth(str) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_12_8041be2c, 12.0f) + win1->y, str);
             if (strlen(name) != 0) {
                 FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
@@ -912,19 +955,19 @@ void loadDraw(CameraId camera, void* param) {
             if (strlen(name) != 0) {
                 FontDrawString(win1->x - FontGetMessageWidth(name) / 2, 70.0f + win1->y, name);
             }
-            sprintf(buf2, "\x83\x8c\x83\x78\x83\x8b\x81\x40%s", winZenkakuStr(level));
-            FontDrawString(win1->x - FontGetMessageWidth(buf2) / 2.0f, 30.0f + win1->y, buf2);
-            strcpy(buf2, "\x83\x76\x83\x8c\x83\x43\x82\xb6\x82\xa9\x82\xf1\x81\x40");
+            sprintf(buf2, "\203\214\203x\203\213\201@%s", winZenkakuStr(level));
+            FontDrawString(win1->x - FontGetMessageWidth(buf2) / EXT_LIT(float_2_8041be70, 2.0f), EXT_LIT(float_30_8041be3c, 30.0f) + win1->y, buf2);
+            strcpy(buf2, "\203v\203\214\203C\202\266\202\251\202\361\201@");
             strcat(buf2, unk_8016af5c(hours, 2));
             strcat(buf2, " ");
             strcat(buf2, unk_8016af5c(mins, 2));
             w = FontGetMessageWidth(buf2);
-            FontDrawString(win1->x - w / 2.0f, win1->y, buf2);
-            strcpy(buf2, "\x83\x76\x83\x8c\x83\x43\x82\xb6\x82\xa9\x82\xf1\x81\x40");
+            FontDrawString(win1->x - w / EXT_LIT(float_2_8041be70, 2.0f), win1->y, buf2);
+            strcpy(buf2, "\203v\203\214\203C\202\266\202\251\202\361\201@");
             strcat(buf2, unk_8016af5c(hours, 2));
             x = FontGetMessageWidth(buf2);
-            PSMTXTrans(m, 8.0f + (x + (win1->x - w / 2.0f)), 1.0f + (win1->y - 22.0f), 0.0f);
-            PSMTXScale(s, 1.5f, 1.5f, 1.5f);
+            PSMTXTrans(m, EXT_LIT(float_8_8041be44, 8.0f) + (x + (win1->x - w / EXT_LIT(float_2_8041be70, 2.0f))), EXT_LIT(float_1_8041bde8, 1.0f) + (win1->y - 22.0f), EXT_LIT(float_0_8041bde4, 0.0f));
+            PSMTXScale(s, EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f), EXT_LIT(float_1p5_8041be4c, 1.5f));
             PSMTXConcat(m, s, m);
             iconDispGxCol(m, 0, 0x201, (GXColor){0, 0, 0, 255});
             py = &win1->y;
@@ -942,46 +985,46 @@ void loadDraw(CameraId camera, void* param) {
     } else {
         wp->alpha -= 0.05f;
     }
-    if (wp->alpha < 0.0f) {
+    if (wp->alpha < EXT_LIT(float_0_8041bde4, 0.0f)) {
         wp->alpha = 0.0f;
     }
-    if (wp->alpha > 1.0f) {
+    if (wp->alpha > EXT_LIT(float_1_8041bde8, 1.0f)) {
         wp->alpha = 1.0f;
     }
     nameMaskGX(wp->alpha);
 
     if (wp->unk18 >= 100 && wp->unk18 < 200) {
         winTexInit(*wp->file->data);
-        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet(0xf, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        winTexSet_x2(0x13, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet_x2(0x13, 0x1f, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_100_8041be20, 100.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         for (i = 0; i < 3; i++) {
             if (i == wp->unk24) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 50 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x15, 0x33, (Vec){-4.0f, 54 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){-4.0f, 54 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x15, 0x33, (Vec){0.0f, 50 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x15, 0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 50 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             }
         }
     }
 
     if (wp->unk18 >= 200 && wp->unk18 < 300) {
         winTexInit(*wp->file->data);
-        winTexSet(0xf, (Vec){0.0f, 0.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet(0xf, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         winTexInit_x2(*wp->file->data);
-        winTexSet_x2(0x14, 0x1f, (Vec){0.0f, 100.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+        winTexSet_x2(0x14, 0x1f, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), EXT_LIT(float_100_8041be20, 100.0f), EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
         for (i = 0; i < 2; i++) {
             if (i == wp->unk28) {
                 winTexInit(*wp->file->data);
-                winTexSet(0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 64});
+                winTexSet(0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 30 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 64});
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x18, 0x33, (Vec){-4.0f, 34 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){-4.0f, 34 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             } else {
                 winTexInit_x2(*wp->file->data);
-                winTexSet_x2(i + 0x18, 0x33, (Vec){0.0f, 30 - i * 50, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){255, 255, 255, 255});
+                winTexSet_x2(i + 0x18, 0x33, (Vec){EXT_LIT(float_0_8041bde4, 0.0f), 30 - i * 50, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){255, 255, 255, 255});
             }
         }
     }
@@ -1001,25 +1044,25 @@ void loadDraw(CameraId camera, void* param) {
             f32 r1 = wp->unk34 / 2;
             if (r0 == r1) {
                 cx = 0.0f;
-                cy = 120.0f - 140.0f * r0;
+                cy = EXT_LIT(float_120_8041be5c, 120.0f) - 140.0f * r0;
             } else {
                 cx = -150.0f + 300.0f * c0;
-                cy = 50.0f;
+                cy = EXT_LIT(float_50_8041be6c, 50.0f);
             }
         } else {
             cx = 0.0f;
-            cy = 50.0f;
+            cy = EXT_LIT(float_50_8041be6c, 50.0f);
         }
-        cy -= 40.0f;
+        cy -= EXT_LIT(float_40_8041be14, 40.0f);
         winTexInit(*wp->file->data);
-        winTexSetRot(0x1d, (Vec){2.0f + cx, cy - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
-        winTexSetRot(0x1d, (Vec){cx, cy, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white, angle[wp->unk30][wp->unk34]);
+        winTexSetRot(0x1d, (Vec){EXT_LIT(float_2_8041be70, 2.0f) + cx, cy - 2.0f, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 128}, angle[wp->unk30][wp->unk34]);
+        winTexSetRot(0x1d, (Vec){cx, cy, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, white, angle[wp->unk30][wp->unk34]);
     }
 
     if (!(wp->flags & 0x40)) {
         winTexInit(*wp->file->data);
-        winTexSet(0, (Vec){2.0f + wp->x, wp->y - 2.0f, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, (GXColor){0, 0, 0, 128});
-        winTexSet(0, (Vec){wp->x, wp->y, 0.0f}, (Vec){1.0f, 1.0f, 1.0f}, white);
+        winTexSet(0, (Vec){EXT_LIT(float_2_8041be70, 2.0f) + wp->x, wp->y - 2.0f, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, (GXColor){0, 0, 0, 128});
+        winTexSet(0, (Vec){wp->x, wp->y, EXT_LIT(float_0_8041bde4, 0.0f)}, (Vec){EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f), EXT_LIT(float_1_8041bde8, 1.0f)}, white);
     }
 
     GXSetViewport(vp[0], vp[1], vp[2], vp[3], vp[4], vp[5]);
@@ -1043,17 +1086,15 @@ __declspec(section ".sdata") s32 evt_continue[] = {
     0x00000002, 0x00000001,
 };
 #pragma force_active on
-#pragma force_active reset
 #pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80410C9C_sdata[1] = {0};
-#pragma force_active reset
 
-#pragma defer_codegen off
 #pragma force_active on
+#pragma defer_codegen off
 void continueGame(void) {
     cardCopy2Main(wp->slot);
     gp->saveSlot = wp->slot;
-    gp->unk11B8 = wp->slot;
+    gp->lastSlot = wp->slot;
     marioPartyKill();
     {
         MarioWork* m = marioGetPtr();
@@ -1208,4 +1249,4 @@ void continueGame(void) {
 
 #pragma force_active on
 __declspec(section ".data") u32 gap_05_8034A0BC_data[1] = {0};
-#pragma force_active reset
+

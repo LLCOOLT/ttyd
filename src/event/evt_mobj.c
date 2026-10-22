@@ -1,3 +1,5 @@
+// the C is kept beside each one under NONMATCHING. .rodata/.sdata2 are re-declared in target order. Dead C not in the
+// target object (mobj_koopa_stone_blk, mobj_sign, evt_mobj_rideswitch, mobj_itemb) is under NONMATCHING. See docs/FAKES.md.
 #include "evt/evt_cmd.h"
 #include "driver/mobjdrv.h"
 #include "driver/animdrv.h"
@@ -8,9 +10,107 @@
 #include "mario/mario_motion.h"
 #include "memory.h"
 #include "mario/mario.h"
+#include "party.h"
 #include <dolphin/mtx.h>
 #include "manager/fontmgr.h"
 #include <string.h>
+extern void _restfpr_28(void);
+extern void _savefpr_28(void);
+s32 mobj_koopa_pole_evt(MapObjectEntry* mobj);
+void kpa_disp_pole_score(CameraId camId, void* param);
+static USER_FUNC(kpa_get_level);
+s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj);
+s32 mobj_koopa_sango_evt(MapObjectEntry* mobj);
+s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj);
+s32 mobj_koopa_blk(MapObjectEntry* mobj);
+s32 mobj_koopa_badgeblk(MapObjectEntry* mobj);
+s32 mobj_koopa_brickblk(MapObjectEntry* mobj);
+s32 mobj_koopa_stone_blk_evt(MapObjectEntry* mobj);
+s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj);
+s32 mobj_kururing_floor(MapObjectEntry* mobj);
+void kururing_capture(CameraId camId, MapObjectEntry* mobj);
+s32 mobj_breaking_floor(MapObjectEntry* mobj);
+s32 mobj_10countblk(MapObjectEntry* mobj);
+s32 mobj_brickblk(MapObjectEntry* mobj);
+s32 mobj_powerupblk(MapObjectEntry* mobj);
+s32 mobj_badgeblk(MapObjectEntry* mobj);
+s32 mobj_save_blk(MapObjectEntry* mobj);
+s32 mobj_recovery_blk(MapObjectEntry* mobj);
+s32 mobj_signboard(MapObjectEntry* mobj);
+s32 mobj_itembox(MapObjectEntry* mobj);
+s32 mobj_lock(MapObjectEntry* mobj);
+s32 mobj_switch_float_blk(MapObjectEntry* mobj);
+s32 mobj_float_blk(MapObjectEntry* mobj);
+s32 mobj_lv_blk_evt(MapObjectEntry* mobj);
+s32 mobj_jumpstand_blue(MapObjectEntry* mobj);
+s32 mobj_jumpstand_red(MapObjectEntry* mobj);
+s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj);
+s32 mobj_timerswitch(MapObjectEntry* mobj);
+s32 mobj_switch_red(MapObjectEntry* mobj);
+s32 mobj_switch_blue(MapObjectEntry* mobj);
+USER_FUNC(evt_mobj_koopa_pole);
+USER_FUNC(kpa_clear_jump_data);
+USER_FUNC(kpa_disp_pole_init);
+USER_FUNC(kpa_disp_pole_score_main);
+USER_FUNC(kpa_score_to_str);
+USER_FUNC(kpa_get_width);
+USER_FUNC(kpa_get_hata_name);
+USER_FUNC(kpa_get_pole_name);
+USER_FUNC(evt_mobj_koopa_fireber_dodai);
+USER_FUNC(evt_mobj_koopa_sango);
+USER_FUNC(fire_func);
+USER_FUNC(evt_mobj_koopa_dokan);
+USER_FUNC(evt_mobj_koopa_blk);
+USER_FUNC(evt_mobj_koopa_hidden_blk);
+USER_FUNC(evt_mobj_koopa_badgeblk);
+USER_FUNC(evt_mobj_koopa_brick);
+USER_FUNC(evt_mobj_koopa_stone_blk);
+USER_FUNC(evt_mobj_koopa_ojama_blk);
+USER_FUNC(kpa_powerup);
+USER_FUNC(evt_mobj_kururing_floor);
+USER_FUNC(evt_mobj_breaking_floor);
+USER_FUNC(evt_mobj_brick);
+USER_FUNC(evt_mobj_powerupblk);
+USER_FUNC(evt_mobj_badgeblk);
+USER_FUNC(evt_mobj_save_blk);
+USER_FUNC(evt_mobj_recovery_blk);
+USER_FUNC(evt_mobj_signboard);
+USER_FUNC(evt_mobj_itembox);
+USER_FUNC(evt_mobj_lock);
+USER_FUNC(evt_mobj_lock_unlock);
+USER_FUNC(evt_mobj_switch_float_blk);
+USER_FUNC(evt_mobj_float_blk);
+USER_FUNC(evt_mobj_lv_blk);
+USER_FUNC(evt_mobj_jumpstand_blue);
+USER_FUNC(evt_mobj_jumpstand_red);
+USER_FUNC(evt_mobj_rideswitch_lightblue);
+USER_FUNC(evt_mobj_timerswitch);
+USER_FUNC(evt_mobj_floatswitch_red);
+USER_FUNC(evt_mobj_switch_red);
+USER_FUNC(evt_mobj_tornadoswitch_blue);
+USER_FUNC(evt_mobj_floatswitch_blue);
+USER_FUNC(evt_mobj_switch_blue);
+USER_FUNC(evt_mobj_hit_onoff);
+USER_FUNC(evt_mobj_hitevt_onoff);
+USER_FUNC(evt_mobj_set_camid);
+USER_FUNC(evt_mobj_wait_animation_end);
+USER_FUNC(evt_mobj_set_anim);
+USER_FUNC(evt_mobj_set_gravity_bound);
+USER_FUNC(evt_mobj_exec_cancel);
+USER_FUNC(evt_mobj_set_z_position);
+USER_FUNC(evt_mobj_set_y_position);
+USER_FUNC(evt_mobj_set_x_position);
+USER_FUNC(evt_mobj_set_position);
+USER_FUNC(evt_mobj_get_z_position);
+USER_FUNC(evt_mobj_get_y_position);
+USER_FUNC(evt_mobj_get_x_position);
+USER_FUNC(evt_mobj_get_position);
+USER_FUNC(evt_mobj_set_scale);
+USER_FUNC(evt_mobj_get_kindname);
+USER_FUNC(evt_mobj_flag_onoff);
+USER_FUNC(evt_mobj_check);
+USER_FUNC(evt_mobj_delete);
+USER_FUNC(evt_mobj_entry);
 
 extern s32 mobjEntry(const char* name, const char* animPoseName);
 extern void mobjDelete(const char* name);
@@ -47,7 +147,6 @@ __declspec(section ".data") u64 fd_evt_mobj_one_negone_359 = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 lbl_80309D20 = 0x3F800000BF800000;
 
-
 extern s32 evt_cam_shake(EventEntry* event, BOOL isFirstCall);
 static s32 evt_shake[] = {0x0005005B, (s32)evt_cam_shake, 4, 0xF24A7A80, 0xF24A7A8A, 200, 2, 1};
 const char* _switch_anim[] = {"A_1", "A_2", "A_3", "A_4", "A_5", "S_1"};
@@ -57,13 +156,12 @@ extern void marioChgJumpStandMotion(f32 power);
 extern s32 irand(s32 max);
 extern s32 psndSFXOn(const char* name);
 extern s32 marioGetPartyId(void);
-extern void* partyGetPtr(s32 id);
 
 s32 mobj_lv_blk_evt(MapObjectEntry* mobj);
 
 static inline HitEntry* blkHitCheck(MapObjectEntry* m) {
     f32 hx, hy, hz, dist, nx, ny, nz;
-    dist = 1.0f + (f32)__fabs(m->unk5C.y);
+    dist = 1.0f + (f32)__fabs(m->velocity.y);
     return hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, m->position.x, m->position.y + 0.5f, m->position.z, 0.0f, -1.0f, 0.0f);
 }
 
@@ -112,6 +210,8 @@ extern s32 evt_img_alloc_capture(EventEntry* event, BOOL isFirstCall);
 extern void test_kururing_mapdisp(s32 camId);
 extern double tan(double);
 #include "driver/npcdrv.h"
+extern void mobjSetPosition();
+extern void strcat();
 extern int sprintf(char*, const char*, ...);
 s32 mobj_kururing_floor(MapObjectEntry* mobj);
 s32 mobj_lock(MapObjectEntry* mobj);
@@ -311,8 +411,8 @@ USER_FUNC(evt_mobj_set_gravity_bound) {
     f32 a = evtGetFloat(event, args[1]);
     f32 b = evtGetFloat(event, args[2]);
     MapObjectEntry* mobj = MOBJ_PTR(event, name);
-    mobj->unk68 = a;
-    mobj->unk6C = b;
+    mobj->gravity = a;
+    mobj->bounce = b;
     return EVT_RETURN_DONE;
 }
 
@@ -381,16 +481,16 @@ USER_FUNC(evt_mobj_hit_onoff) {
 // ---- switches ----
 
 s32 mobj_switch_blue(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            if (mobj->unk1E0 == 0x200000 || mobj->unk1E0 == 0x1000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            if (mobj->hitFlag == 0x200000 || mobj->hitFlag == 0x1000000) {
                 marioChgMot(MARIO_MOTION_JUMP_SW);
             }
             psndSFXOn_3D((const char*)0x1d2, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
@@ -399,8 +499,8 @@ s32 mobj_switch_blue(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "S_1", 1);
         effSmallStarCamChg(effSmallStarEntry(0, 4, mobj->position.x, mobj->position.y + 12.5f, mobj->position.z, 0.0f, -1.0f, 0.0f), mobj->camId);
-        evtSetValue(NULL, mobj->unk1E4, 1);
-        mobj->unk1DC = 0x63;
+        evtSetValue(NULL, mobj->flagVar, 1);
+        mobj->state = 0x63;
     case 0x63:
         mobjDelete(mobj->name);
         break;
@@ -445,16 +545,16 @@ USER_FUNC(evt_mobj_switch_blue) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_blue;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 0x44;
     mobj->flags |= 0xa10000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (kind == 2) {
         mobj->flags |= 2;
     }
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
@@ -486,13 +586,13 @@ USER_FUNC(evt_mobj_floatswitch_blue) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_blue;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x400000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
@@ -524,24 +624,24 @@ USER_FUNC(evt_mobj_tornadoswitch_blue) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_blue;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x1000000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
 }
 
 s32 mobj_switch_red(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            if (mobj->unk1E0 == 0x200000 || mobj->unk1E0 == 0x1000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            if (mobj->hitFlag == 0x200000 || mobj->hitFlag == 0x1000000) {
                 marioChgMot(MARIO_MOTION_JUMP_SW);
             }
             psndSFXOn_3D((const char*)0x1d2, &mobj->position);
@@ -552,7 +652,7 @@ s32 mobj_switch_red(MapObjectEntry* mobj) {
     case 1:
         if (mobj->flags & 8) {
             psndSFXOn_3D((const char*)0x1d2, &mobj->position);
-            if (mobj->unk1E0 == 0x200000) {
+            if (mobj->hitFlag == 0x200000) {
                 marioChgMot(MARIO_MOTION_JUMP_SW);
             }
             animPoseSetAnim(mobj->poseId, "A_1", 1);
@@ -561,7 +661,7 @@ s32 mobj_switch_red(MapObjectEntry* mobj) {
         if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             mobj->flags &= ~8;
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     }
@@ -602,11 +702,11 @@ USER_FUNC(evt_mobj_switch_red) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_red;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 0x44;
     mobj->flags |= 0xa10000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
 }
@@ -637,34 +737,34 @@ USER_FUNC(evt_mobj_floatswitch_red) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_red;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x400000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
 }
 
 s32 mobj_timerswitch(MapObjectEntry* mobj) {
-    MapObjectEntry* other = mobjNameToPtr(mobj->unk1B8);
-    switch (mobj->unk1DC) {
+    MapObjectEntry* other = mobjNameToPtr(mobj->linkedName);
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
-            if (mobj->unk1E0 == 0x200000) {
+            if (mobj->hitFlag == 0x200000) {
                 marioChgMot(MARIO_MOTION_JUMP_SW);
             }
-            if (other->unk1DC != 2) {
+            if (other->state != 2) {
                 psndSFXOn_3D((const char*)0x1c1, &mobj->position);
             } else {
                 psndSFXOn_3D((const char*)0x1c2, &mobj->position);
             }
             evtEntryType(evt_shake, 0, 0, 0);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            mobj->unk1DC++;
+            mobj->state++;
             mobj->flags &= ~8;
         }
         break;
@@ -672,7 +772,7 @@ s32 mobj_timerswitch(MapObjectEntry* mobj) {
         if (mobj->flags & 8) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             animPoseSetAnim(other->poseId, "S_1", 1);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 0.3f) {
@@ -680,7 +780,7 @@ s32 mobj_timerswitch(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "A_2", 1);
         animPoseSetAnim(other->poseId, "A_2", 1);
-        mobj->unk1DC++;
+        mobj->state++;
         mobj->unk1B0 = mobj->unk1B4;
         mobj->flags &= ~8;
         break;
@@ -688,7 +788,7 @@ s32 mobj_timerswitch(MapObjectEntry* mobj) {
         if (mobj->flags & 8) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             animPoseSetAnim(other->poseId, "S_1", 1);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         mobj->unk1B0--;
@@ -696,28 +796,28 @@ s32 mobj_timerswitch(MapObjectEntry* mobj) {
             mobj->flags &= ~8;
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             animPoseSetAnim(other->poseId, "S_1", 1);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
-        if (other->unk1DC == 2) {
+        if (other->state == 2) {
             if (marioKeyOffChk() || marioCtrlOffChk()) {
-                mobj->unk1DC = 0;
+                mobj->state = 0;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            mobjRunEvent(mobj, (s32*)mobj->event);
             if (!strcmp(mobj->animName, "MOBJ_RedTimerSwitch")) {
                 mobj->flags &= ~8;
                 other->flags &= ~8;
                 animPoseSetAnim(mobj->poseId, "S_1", 1);
                 animPoseSetAnim(other->poseId, "S_1", 1);
-                mobj->unk1DC = 0;
-                other->unk1DC = 0;
+                mobj->state = 0;
+                other->state = 0;
                 break;
             }
             effSmallStarEntry(0, 8, mobj->position.x, mobj->position.y + 12.5f, mobj->position.z, 0.0f, -1.0f, 0.0f);
             effSmallStarEntry(0, 8, other->position.x, other->position.y + 12.5f, other->position.z, 0.0f, -1.0f, 0.0f);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            evtSetValue(NULL, other->unk1E4, 1);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            evtSetValue(NULL, other->flagVar, 1);
             mobjDelete(mobj->name);
             mobjDelete(other->name);
         }
@@ -761,17 +861,17 @@ USER_FUNC(evt_mobj_timerswitch) {
     for (i = 0; i < 2; i++) {
         mobjEntry(names[i], anim);
         mobjs[i] = mobjNameToPtr(names[i]);
-        strcpy(mobjs[i]->unk1B8, i == 0 ? names[1] : names[0]);
+        strcpy(mobjs[i]->linkedName, i == 0 ? names[1] : names[0]);
         mobjSetPosition(names[i], x[i], y[i], z[i]);
         mobjs[i]->mainFunc = mobj_timerswitch;
-        mobjs[i]->unk1D4 = val;
+        mobjs[i]->event = val;
         mobjs[i]->flags |= 0x44;
         mobjs[i]->flags |= 0xa10000;
-        mobjs[i]->unk1E4 = arg;
-        mobjs[i]->unk1DC = 0;
+        mobjs[i]->flagVar = arg;
+        mobjs[i]->state = 0;
         mobjs[i]->unk1B4 = time;
         if (evtGetValue(event, arg)) {
-            mobjs[i]->unk1DC = 99;
+            mobjs[i]->state = 99;
         }
         mobjCalcMtx(mobjs[i]);
     }
@@ -789,13 +889,13 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
         Vec d3 = (Vec){x, y, z};
         Vec d4 = (Vec){x, y, z};
     }
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            mobjRunEvent(mobj, (s32*)mobj->event);
             psndSFXOn_3D((const char*)0x1d3, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            mobj->unk1DC = 1;
+            mobj->state = 1;
         }
         break;
     case 1:
@@ -803,7 +903,7 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
         x = mobj->scale2.x;
         z = mobj->scale2.z;
         if (y <= 0.2f) {
-            mobj->unk1DC = 2;
+            mobj->state = 2;
             y = 0.2f;
             mobj->flags &= ~8;
         }
@@ -816,10 +916,10 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
         mag = PSVECMag(&size);
         if (PSVECDistance(&mobj->position, &FLD(Vec, marioGetPtr(), 0x8c)) > mag) {
             if (!(mobj->flags & 8)) {
-                mobj->unk1DC = 3;
+                mobj->state = 3;
                 animPoseSetAnim(mobj->poseId, "A_2", 1);
                 psndSFXOn_3D((const char*)0x1d4, &mobj->position);
-                mobjRunEvent(mobj, (s32*)mobj->unk1D8);
+                mobjRunEvent(mobj, (s32*)mobj->extraEvent);
             } else {
                 mobj->flags &= ~8;
             }
@@ -831,7 +931,7 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
         z = mobj->scale2.z;
         y += 0.9f;
         if (y >= 15.0f) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             y = 15.0f;
         }
         mobj->scale2 = (Vec){x, y, z};
@@ -843,12 +943,6 @@ s32 mobj_rideswitch_lightblue(MapObjectEntry* mobj) {
     }
     return 0;
 }
-
-
-
-
-
-
 
 void evt_mobj_rideswitch(void) {
     mobjNameToPtr("MOBJ_RideSwitchB");
@@ -882,12 +976,12 @@ USER_FUNC(evt_mobj_rideswitch_lightblue) {
     mobj->scale2.z *= 0.8f;
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_rideswitch_lightblue;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = val2;
+    mobj->event = val;
+    mobj->extraEvent = val2;
     mobj->flags |= 4;
     mobj->flags |= 0x200000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     mobjCalcMtx2(mobj);
     return EVT_RETURN_DONE;
 }
@@ -896,11 +990,11 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
     void* mario = marioGetPtr();
     EventEntry* ev;
     partyGetPtr(marioGetPartyId());
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             FLD(s32, gp, 0x18) |= 0x10;
-            ev = mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            ev = mobjRunEvent(mobj, (s32*)mobj->event);
             if (ev) {
                 FLD(s32, ev, 0x9c) = FLD(f32, mario, 0xd8) < FLD(f32, mario, 0x90) ? 0 : (FLD(f32, mario, 0xd8) < mobj->position.y + FLD(f32, mario, 0x1b8) ? 0 : 1);
             }
@@ -935,13 +1029,13 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
             }
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             mobj->flags &= ~8;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
         if ((mobj->flags & 8) && evtCheckID(mobj->eventId) == 0) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (evtCheckID(mobj->eventId) == 1) {
@@ -952,7 +1046,7 @@ s32 mobj_jumpstand_red(MapObjectEntry* mobj) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         break;
     }
     return 0;
@@ -977,23 +1071,23 @@ USER_FUNC(evt_mobj_jumpstand_red) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_jumpstand_red;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 0x44;
     mobj->flags |= 0x200000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
 }
 
 s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
     void* mario = marioGetPtr();
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             FLD(s32, gp, 0x18) |= 0x10;
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            if (mobj->unk1E0 == 0x200000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            if (mobj->hitFlag == 0x200000) {
                 marioChgJumpStandMotion(FLD(f32, mobj, 0x1ac));
             }
             if (FLD(s8, mario, 0x3c) != 2) {
@@ -1026,13 +1120,13 @@ s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
             }
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             mobj->flags &= ~8;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
         if (mobj->flags & 8) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (evtCheckID(mobj->eventId) == 1) {
@@ -1043,7 +1137,7 @@ s32 mobj_jumpstand_blue(MapObjectEntry* mobj) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         break;
     }
     return 0;
@@ -1069,11 +1163,11 @@ USER_FUNC(evt_mobj_jumpstand_blue) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_jumpstand_blue;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 0x44;
     mobj->flags |= 0x200000;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
     FLD(f32, mobj, 0x1ac) = power;
     mobjCalcMtx(mobj);
     return EVT_RETURN_DONE;
@@ -1091,7 +1185,7 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
     void* mario = marioGetPtr();
     strcat(oname, mobj->name);
     strcat(iname, mobj->name);
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         animGroupBaseAsync("P_box_y", type, NULL);
         if (mobj->flags & 8) {
@@ -1115,9 +1209,9 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            mobj->unk1DC = 10;
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            mobj->state = 10;
         }
         break;
     case 10:
@@ -1135,7 +1229,7 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
         evt_img_alloc_capture(&ev2, TRUE);
         img = imgNameToPtr(iname, type);
         img->poseId = animPaperPoseGetId("P_box_y", type);
-        img->field_0x108 = (s32)"A_1";
+        img->animName = (s32)"A_1";
         FLD(OSTime, img, 0x110) = animTimeGetTime(type);
         imgSetShadow(img, 2);
         if (!strcmp(mobj->animName, "MOBJ_Lv1Block") || !strcmp(mobj->animName, "MOBJ_Lv2Block")) {
@@ -1145,15 +1239,15 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
         } else if (!strcmp(mobj->animName, "MOBJ_Lv1BigBigBlock") || !strcmp(mobj->animName, "MOBJ_Lv2BigBigBlock")) {
             psndSFXOn_3D((const char*)0x1c9, &mobj->position);
         }
-        mobj->unk1DC = 11;
+        mobj->state = 11;
         break;
     case 11:
         img = imgNameToPtr(iname, type);
-        if (img->field_0x118 >= 1.0f) {
-            mobj->unk1DC = 12;
+        if (img->loopTimes >= 1.0f) {
+            mobj->state = 12;
         }
         if (img->flags & 0x10000000) {
-            mobj->unk1DC = 12;
+            mobj->state = 12;
         }
         mobj->position = (Vec){0.0f, -2000.0f, 0.0f};
         mobj->flags |= 4;
@@ -1167,7 +1261,7 @@ s32 mobj_lv_blk_evt(MapObjectEntry* mobj) {
         imgRelease(img, type);
         offscreenDelete(oname);
         mobj->offscreenId = -1;
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 99:
         mobjDelete(mobj->name);
@@ -1207,20 +1301,20 @@ USER_FUNC(evt_mobj_lv_blk) {
     mobj->flags |= 0x44;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_lv_blk_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = 0;
+    mobj->event = val;
+    mobj->extraEvent = 0;
     mobj->flags |= 0x10000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     return EVT_RETURN_DONE;
 }
 
 s32 mobj_float_blk(MapObjectEntry* mobj) {
     MapObjectEntry* other;
     const char* cur;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 99:
-        if (((s8*)mobj->unk1B8)[0] == 0) {
+        if (((s8*)mobj->linkedName)[0] == 0) {
             if ((s32)blkHitCheck(mobj)) {
                 if (strcmp((const char*)animPoseGetCurrentAnim(mobj->poseId), "S_1")) {
                     animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -1231,7 +1325,7 @@ s32 mobj_float_blk(MapObjectEntry* mobj) {
                 mobj->flags &= ~2;
             }
         } else {
-            other = mobjNameToPtr(mobj->unk1B8);
+            other = mobjNameToPtr(mobj->linkedName);
             cur = (const char*)animPoseGetCurrentAnim(other->poseId);
             if (((const s8*)cur)[0] == 'A' && ((const s8*)cur)[2] >= '1' && ((const s8*)cur)[2] <= '3') {
                 animPoseSetAnim(mobj->poseId, "A_1", 0);
@@ -1312,8 +1406,8 @@ USER_FUNC(evt_mobj_float_blk) {
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_float_blk;
     mobj->flags |= 4;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 99;
+    mobj->flagVar = arg7;
+    mobj->state = 99;
     mobjCalcMtx(mobj);
     if ((s32)blkHitCheck(mobj)) {
         animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -1324,6 +1418,23 @@ USER_FUNC(evt_mobj_float_blk) {
     return EVT_RETURN_DONE;
 }
 
+static inline s32 switchAnimIdx(s32 poseId) {
+    const char** p;
+    const s8* cur;
+    s32 idx;
+    s32 i;
+    cur = (const s8*)animPoseGetCurrentAnim(poseId);
+    idx = 0;
+    p = (const char**)_switch_anim;
+    for (i = idx; i < 6; i++, p++) {
+        if (!strcmp(*p, (const char*)cur)) {
+            idx = i;
+            break;
+        }
+    }
+    return idx;
+}
+
 s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
     s32 i;
     s32 idx;
@@ -1331,24 +1442,14 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
     const char** p;
     s32 anim;
     BOOL a;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
         }
-        cur = (const s8*)animPoseGetCurrentAnim(mobj->poseId);
-        idx = 0;
-        p = (const char**)_switch_anim;
-        i = idx;
-        for (; i < 6; i++, p++) {
-            if (!strcmp(*p, (const char*)cur)) {
-                idx = i;
-                break;
-            }
-        }
-        FLD(s32, mobj, 0x1a4) = (FLD(s32, mobj, 0x1a4) & 0x40000000) | idx;
-        if (((s8*)mobj->unk1B8)[0]) {
-            if ((s32)blkHitCheck(mobjNameToPtr(mobj->unk1B8))) {
+        mobj->typeData[1] = (mobj->typeData[1] & 0x40000000) | switchAnimIdx(mobj->poseId);
+        if (((s8*)mobj->linkedName)[0]) {
+            if ((s32)blkHitCheck(mobjNameToPtr(mobj->linkedName))) {
                 if (evtCheckID(mobj->eventId)) {
                     if (isAnimA13((const s8*)animPoseGetCurrentAnim(mobj->poseId))) {
                         anim = 0;
@@ -1356,7 +1457,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
                         anim = 3;
                     }
                 } else {
-                    FLD(u32, mobj, 0x1a4) |= 0x80000000;
+                    mobj->typeDataU[1] |= 0x80000000;
                     anim = 0;
                 }
             } else if (evtCheckID(mobj->eventId)) {
@@ -1364,7 +1465,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
                 if (cur[0] == 'A' && cur[2] >= '1' && cur[2] <= '2') {
                     anim = 0;
                 } else if (cur[0] == 'A' && cur[2] == '3') {
-                    FLD(u32, mobj, 0x1a4) |= 0x40000000;
+                    mobj->typeDataU[1] |= 0x40000000;
                     anim = 0;
                 } else if (cur[0] == 'A' && cur[2] >= '4' && cur[2] <= '5') {
                     anim = 3;
@@ -1372,20 +1473,20 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
                     anim = 3;
                 }
             } else {
-                FLD(u32, mobj, 0x1a4) |= 0x80000000;
+                mobj->typeDataU[1] |= 0x80000000;
                 anim = 3;
             }
         } else {
             a = isAnimA13((const s8*)animPoseGetCurrentAnim(mobj->poseId));
             anim = a ? 3 : 0;
-            FLD(u32, mobj, 0x1a4) |= 0x80000000;
+            mobj->typeDataU[1] |= 0x80000000;
         }
-        mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-        if (mobj->unk1E0 == 0x200000) {
+        mobjRunEvent(mobj, (s32*)mobj->event);
+        if (mobj->hitFlag == 0x200000) {
             marioChgMot(MARIO_MOTION_JUMP_SW);
         }
         psndSFXOn_3D((const char*)0x1b5, &mobj->position);
-        switch (mobj->unk1E0) {
+        switch (mobj->hitFlag) {
         case 0x400000:
             animPoseSetAnim(mobj->poseId, _switch_anim[anim + 1], 1);
             break;
@@ -1395,50 +1496,50 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
         }
         mobj->flags &= ~8;
         if (mobj->unk1B0) {
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         } else {
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
         if (mobj->flags & 8) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (mobj->flags & 0x1000) {
             mobj->flags &= ~0x1000;
-            mobj->unk1DC = 10;
+            mobj->state = 10;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
-        if (((s8*)mobj->unk1B8)[0]) {
-            mobjNameToPtr(mobj->unk1B8);
+        if (((s8*)mobj->linkedName)[0]) {
+            mobjNameToPtr(mobj->linkedName);
         }
         {
             const char* a = isAnimA13((const s8*)animPoseGetCurrentAnim(mobj->poseId)) ? "A_3" : "S_1";
             animPoseSetAnim(mobj->poseId, a, 1);
         }
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 2:
         if (mobj->flags & 8) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (mobj->flags & 0x1000) {
             mobj->flags &= ~0x1000;
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         if (evtCheckID(mobj->eventId) == 0) {
-            mobj->unk1DC = 0;
-            FLD(s32, mobj, 0x1a4) = 0;
+            mobj->state = 0;
+            mobj->typeData[1] = 0;
         }
         break;
     case 10:
         if (mobj->flags & 8) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
@@ -1450,18 +1551,18 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
         }
         mobj->unk1B0 = 120;
-        mobj->unk1DC++;
+        mobj->state++;
     case 11:
         if (mobj->flags & 8) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         mobj->unk1B0--;
         if (mobj->unk1B0 != 0) {
             break;
         }
-        if (((s8*)mobj->unk1B8)[0]) {
-            if ((s32)blkHitCheck(mobjNameToPtr(mobj->unk1B8))) {
+        if (((s8*)mobj->linkedName)[0]) {
+            if ((s32)blkHitCheck(mobjNameToPtr(mobj->linkedName))) {
                 animPoseSetAnim(mobj->poseId, "S_1", 0);
             } else {
                 animPoseSetAnim(mobj->poseId, "A_3", 0);
@@ -1471,7 +1572,7 @@ s32 mobj_switch_float_blk(MapObjectEntry* mobj) {
         } else {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
         }
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         break;
     }
     return 0;
@@ -1522,17 +1623,17 @@ USER_FUNC(evt_mobj_switch_float_blk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_switch_float_blk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0xe10000;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
     mobj->unk1B0 = 0;
     mobjCalcMtx(mobj);
-    strcpy(mobj->unk1B8, (const char*)partner);
-    if ((s32)(s8)mobj->unk1B8[0]) {
-        other = mobjNameToPtr(mobj->unk1B8);
-        strcpy(other->unk1B8, mobj->name);
+    strcpy(mobj->linkedName, (const char*)partner);
+    if ((s32)(s8)mobj->linkedName[0]) {
+        other = mobjNameToPtr(mobj->linkedName);
+        strcpy(other->linkedName, mobj->name);
         if ((s32)blkHitCheck(other)) {
             animPoseSetAnim(mobj->poseId, "S_1", 1);
         } else {
@@ -1554,7 +1655,7 @@ USER_FUNC(evt_mobj_lock_unlock) {
     marioKeyOff();
     partyKeyOff();
     marioStSystemLevel(1);
-    mobj->unk1DC = 3;
+    mobj->state = 3;
     return EVT_RETURN_DONE;
 }
 
@@ -1576,14 +1677,14 @@ s32 mobj_lock(MapObjectEntry* mobj) {
     s32 i;
     EventEntry* ev;
     f32 hx, hy, hz, dist, nx, ny, nz;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             marioKeyOff();
             partyKeyOff();
             marioStSystemLevel(1);
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            mobj->unk1DC++;
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            mobj->state++;
         }
         break;
     case 1:
@@ -1595,20 +1696,20 @@ s32 mobj_lock(MapObjectEntry* mobj) {
                 partyKeyOn();
                 marioStSystemLevel(0);
                 mobj->eventId = 0;
-                mobj->unk1DC = 0;
+                mobj->state = 0;
             } else {
                 mobj->eventId = 0;
-                mobj->unk1DC++;
+                mobj->state++;
             }
         }
         break;
         if (mobj) {
         }
     case 2:
-        if (FLD(u32, mobj, 0x1a0) & 0x80000000) {
+        if (mobj->typeDataU[0] & 0x80000000) {
             item = 0;
             for (i = 0; ; i++) {
-                s32 it = FLD(s32*, mobj, 0x1a0)[i];
+                s32 it = ((s32*)mobj->typeDataP[0])[i];
                 s32 r;
                 if (it == -1) {
                     break;
@@ -1619,17 +1720,17 @@ s32 mobj_lock(MapObjectEntry* mobj) {
                     break;
                 }
             }
-        } else if ((i = pouchCheckItem(FLD(s32, mobj, 0x1a0))) != 0) {
-            item = FLD(s32, mobj, 0x1a0);
+        } else if ((i = pouchCheckItem(mobj->typeData[0])) != 0) {
+            item = mobj->typeData[0];
         } else {
             item = 0;
         }
         if (item) {
             pouchRemoveItem((ItemType)item);
-            mobj->unk1DC++;
+            mobj->state++;
         } else {
-            FLD(s32, mobj, 0x1a8) = msgWindow_Entry(msgSearch("sys_no_key"), 0, 0);
-            mobj->unk1DC = 10;
+            mobj->typeData[2] = msgWindow_Entry(msgSearch("sys_no_key"), 0, 0);
+            mobj->state = 10;
         }
         break;
     case 3:
@@ -1638,33 +1739,33 @@ s32 mobj_lock(MapObjectEntry* mobj) {
         ev->lwData[1] = (s32)(1024.0f * mobj->position.y) + 0xF24A7A80;
         ev->lwData[2] = (s32)(1024.0f * mobj->position.z) + 0xF24A7A80;
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 4:
         if (!(animPoseGetLoopTimes(mobj->poseId) < 1.0f)) {
-            mobj->unk5C.y = 0.0f;
-            mobj->unk68 = 0.5f;
-            mobj->unk6C = 0.0f;
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            mobjRunEvent(mobj, (s32*)mobj->unk1D8);
-            mobj->unk1DC++;
+            mobj->velocity.y = 0.0f;
+            mobj->gravity = 0.5f;
+            mobj->bounce = 0.0f;
+            evtSetValue(NULL, mobj->flagVar, 1);
+            mobjRunEvent(mobj, (s32*)mobj->extraEvent);
+            mobj->state++;
         }
         break;
     case 5:
-        dist = 1.0f + (f32)__fabs(mobj->unk5C.y);
-        if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, mobj->position.x, 1.0f + mobj->position.y, mobj->position.z, 0.0f, mobj->unk5C.y, 0.0f)) {
+        dist = 1.0f + (f32)__fabs(mobj->velocity.y);
+        if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, mobj->position.x, 1.0f + mobj->position.y, mobj->position.z, 0.0f, mobj->velocity.y, 0.0f)) {
             mobj->position.y = hy;
-            mobj->unk5C.y *= -0.8f;
-            mobj->unk6C += 1.0f;
-            if (mobj->unk6C < 4.0f) {
+            mobj->velocity.y *= -0.8f;
+            mobj->bounce += 1.0f;
+            if (mobj->bounce < 4.0f) {
                 psndSFXOn_3D((const char*)0x1e6, &mobj->position);
             }
         } else {
-            mobj->position.y += mobj->unk5C.y;
-            mobj->unk5C.y -= mobj->unk68;
+            mobj->position.y += mobj->velocity.y;
+            mobj->velocity.y -= mobj->gravity;
         }
-        if (!(mobj->unk6C < 4.0f) && evtCheckID(mobj->eventId) != 1) {
-            mobj->unk1DC++;
+        if (!(mobj->bounce < 4.0f) && evtCheckID(mobj->eventId) != 1) {
+            mobj->state++;
             mobj->unk1B0 = 20;
         }
         break;
@@ -1676,16 +1777,16 @@ s32 mobj_lock(MapObjectEntry* mobj) {
             mobj->flags &= ~0x4000;
         }
         if (mobj->unk1B0 == 0) {
-            mobj->unk1DC = 99;
+            mobj->state = 99;
         }
         break;
     case 10:
-        if (!windowCheckID(FLD(s32, mobj, 0x1a8))) {
+        if (!windowCheckID(mobj->typeData[2])) {
             mobj->flags &= ~8;
             marioKeyOn();
             partyKeyOn();
             marioStSystemLevel(0);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     case 99:
@@ -1730,16 +1831,16 @@ USER_FUNC(evt_mobj_lock) {
     mobjEntry(name, anim);
     mobj = mobjNameToPtr(name);
     mobjHitEntry(mobj, 2);
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->typeData[0] = item;
     mobjSetPosition(name, x, y, z);
     mobj->rotation.y = rot;
     mobj->mainFunc = mobj_lock;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = val2;
+    mobj->event = val;
+    mobj->extraEvent = val2;
     mobj->flags |= 0x26;
     mobj->flags |= 0x40000;
-    mobj->unk1E4 = arg8;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg8;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "Z_1", 1);
     return EVT_RETURN_DONE;
@@ -1788,15 +1889,15 @@ s32 mobj_itembox(MapObjectEntry* mobj);
 
 s32 mobj_itembox(MapObjectEntry* mobj) {
     EventEntry* ev;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             marioKeyOff();
             partyKeyOff();
             marioStSystemLevel(1);
             mobj->eventId = 0;
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            mobj->unk1DC++;
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            mobj->state++;
         }
         break;
     case 1:
@@ -1811,11 +1912,11 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
                 partyKeyOn();
                 marioStSystemLevel(0);
                 mobj->eventId = 0;
-                mobj->unk1DC = 0;
+                mobj->state = 0;
                 break;
             }
         }
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 2:
         if (!strcmp(mobj->animName, "MOBJ_TreasureBox") || !strcmp(mobj->animName, "MOBJ_GrayTreasureBox")) {
@@ -1836,8 +1937,8 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "A_1", 1);
         mobj->eventId = 0;
-        mobjRunEvent(mobj, (s32*)mobj->unk1D8);
-        mobj->unk1DC++;
+        mobjRunEvent(mobj, (s32*)mobj->extraEvent);
+        mobj->state++;
         break;
     case 3:
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
@@ -1855,11 +1956,11 @@ s32 mobj_itembox(MapObjectEntry* mobj) {
             partyKeyOn();
             marioStSystemLevel(0);
             mobj->eventId = 0;
-            mobj->unk1DC = 99;
+            mobj->state = 99;
         }
         break;
     case 99:
-        evtSetValue(NULL, mobj->unk1E4, 1);
+        evtSetValue(NULL, mobj->flagVar, 1);
         mobj->flags |= 8;
         mobj->flags &= ~0x20;
         if (!strcmp(mobj->animName, "MOBJ_BlackTreasureBox")) {
@@ -1916,18 +2017,18 @@ USER_FUNC(evt_mobj_itembox) {
     mobjHitEntry(mobj, 2);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_itembox;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = val2;
+    mobj->event = val;
+    mobj->extraEvent = val2;
     mobj->flags |= 0x64;
     mobj->flags |= 0x40000;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     if (evtGetValue(event, arg7)) {
         mobj_itemb(mobj);
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
-    dist = 5.0f + (f32)__fabs(mobj->unk5C.y);
+    dist = 5.0f + (f32)__fabs(mobj->velocity.y);
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, mobj->position.x, 1.0f + mobj->position.y, mobj->position.z, 0.0f, -1.0f, 0.0f)) {
         mobj->flags |= 2;
         mobj->flags &= ~0x40;
@@ -1936,12 +2037,12 @@ USER_FUNC(evt_mobj_itembox) {
 }
 
 s32 mobj_signboard(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             marioKeyOff();
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            mobj->unk1DC++;
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            mobj->state++;
         }
         break;
     case 1:
@@ -1949,7 +2050,7 @@ s32 mobj_signboard(MapObjectEntry* mobj) {
             marioKeyOn();
             mobj->eventId = 0;
             mobj->flags &= ~8;
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     }
@@ -1981,21 +2082,13 @@ USER_FUNC(evt_mobj_signboard) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_signboard;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 0x24;
     mobj->flags |= 0x40000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     return EVT_RETURN_DONE;
 }
-
-
-
-
-
-
-
-
 
 void mobj_sign(void) {
     mobjNameToPtr("MOBJ_Arrow");
@@ -2014,16 +2107,34 @@ extern const char* msgSearch(const char* tag);
 extern s32 msgWindow_Entry(const char* msg, s32 a, s32 b);
 extern s32 windowCheckID(s32 id);
 
+// case 3 heal sequence; case 4 spells the same steps out inline (only this split reproduces the target registers)
+static inline void recoveryHeal(void) {
+    PouchPartyData* party;
+    MarioWork* mario;
+    s32 i;
+    mario = marioGetPtr();
+    party = (PouchPartyData*)pouchGetPtr();
+    effStardustEntry(2, 50, 100, mario->position.x, mario->position.y, mario->position.z, 50.0f, 50.0f);
+    marioChgPose("M_I_1");
+    ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
+    ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
+    for (i = 0; i < 8; party++, i++) {
+        if ((party->flags & 1) && !(party->flags & 2)) {
+            party->currentHP = party->maximumHP;
+        }
+    }
+}
+
 s32 mobj_recovery_blk(MapObjectEntry* mobj) {
     MarioWork* mario;
     PouchData* pouch;
     PouchPartyData* party;
     s32 i;
     s32 kind;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case -1:
-        FLD(EffectEntry*, mobj, 0x1c8) = effCoinFukidashiEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z - 10.0f, 0, FLD(s32, mobj, 0x1a4), 0);
-        mobj->unk1DC++;
+        mobj->effect = effCoinFukidashiEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z - 10.0f, 0, mobj->typeData[1], 0);
+        mobj->state++;
         break;
     case 0:
         if (!(mobj->flags & 8)) {
@@ -2032,64 +2143,55 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
         marioKeyOff();
         FLD(u16, camGetPtr((CameraId)8), 0) |= 0x200;
         psndSFXOn_3D((const char*)0x1d9, &mobj->position);
-        mobj->unk1DC++;
+        mobj->state++;
     case 1:
         if (!(FLD(u32, gp, 0) & 0x1000) && swGet(0xea) == 0) {
             swSet(0xea);
-            mobj->unk1DC = 20;
+            mobj->state = 20;
             break;
         }
-        mobj->unk1DC++;
+        mobj->state++;
     case 2:
-        if (pouchGetCoin() < FLD(s32, mobj, 0x1a4)) {
-            mobj->unk1DC = 10;
+        kind = pouchGetCoin(); // kind reused for the coin count (matches the target codegen)
+        if (kind < mobj->typeData[1]) {
+            mobj->state = 10;
             break;
         }
-        if (FLD(EffectEntry*, mobj, 0x1c8)) {
-            effSoftDelete(FLD(EffectEntry*, mobj, 0x1c8));
-            FLD(EffectEntry*, mobj, 0x1c8) = NULL;
+        if (mobj->effect) {
+            effSoftDelete(mobj->effect);
+            mobj->effect = NULL;
         }
         psndSFXOn_3D((const char*)0x1da, &mobj->position);
-        animPoseSetAnim(mobj->poseId, "A_1", 1);
-        if (FLD(s32, mobj, 0x1a4) == 0) {
-            mobj->unk1DC = 3;
+        animPoseSetAnim(mobj->poseId, "A_2", 1);  // correctness: target str_8041A11C
+        if (mobj->typeData[1] == 0) {
+            mobj->state = 3;
         } else {
-            mobj->unk1DC = 4;
+            mobj->state = 4;
             statusWinForceOpen();
         }
-        FLD(s32, mobj, 0x1b0) = 120;
+        mobj->unk1B0 = 120;
         break;
     case 3:
-        if (FLD(s32, mobj, 0x1b0) == 100) {
+        if (mobj->unk1B0 == 100) {
             effStardustEntry(1, 30, 60, mobj->position.x, 45.0f + mobj->position.y, mobj->position.z, 50.0f, 50.0f);
             psndSFXOn_3D((const char*)0x1db, &mobj->position);
         }
-        if (FLD(s32, mobj, 0x1b0) == 100) {
-            mario = marioGetPtr();
-            party = (PouchPartyData*)pouchGetPtr();
-            effStardustEntry(2, 50, 100, mario->position.x, mario->position.y, mario->position.z, 50.0f, 50.0f);
-            marioChgPose("M_I_1");
-            ((PouchData*)party)->currentHP = ((PouchData*)party)->maximumHP;
-            ((PouchData*)party)->currentFP = ((PouchData*)party)->maximumFP;
-            for (i = 0; i < 8; party++, i++) {
-                if ((party->flags & 1) && !(party->flags & 2)) {
-                    party->currentHP = party->maximumHP;
-                }
-            }
+        if (mobj->unk1B0 == 100) {
+            recoveryHeal();
             pouchAddCoin(0);
         }
-        FLD(s32, mobj, 0x1b0)--;
-        if (FLD(s32, mobj, 0x1b0) <= 0) {
-            mobj->unk1DC = 5;
+        mobj->unk1B0--;
+        if (mobj->unk1B0 <= 0) {
+            mobj->state = 5;
         }
         break;
     case 4:
-        if (FLD(s32, mobj, 0x1b0) == 100) {
+        if (mobj->unk1B0 == 100) {
             effStardustEntry(1, 30, 60, mobj->position.x, 45.0f + mobj->position.y, mobj->position.z, 50.0f, 50.0f);
             psndSFXOn_3D((const char*)0x1db, &mobj->position);
         }
-        if (FLD(s32, mobj, 0x1b0) == 100) {
-            kind = FLD(s32, mobj, 0x1a4);
+        if (mobj->unk1B0 == 100) {
+            kind = mobj->typeData[1];
             mario = marioGetPtr();
             party = (PouchPartyData*)pouchGetPtr();
             effStardustEntry(2, 50, 100, mario->position.x, mario->position.y, mario->position.z, 50.0f, 50.0f);
@@ -2103,55 +2205,55 @@ s32 mobj_recovery_blk(MapObjectEntry* mobj) {
             }
             ((s32 (*)(s32))pouchAddCoin)(-kind);
         }
-        FLD(s32, mobj, 0x1b0)--;
-        if (FLD(s32, mobj, 0x1b0) <= 0) {
-            mobj->unk1DC = 5;
+        mobj->unk1B0--;
+        if (mobj->unk1B0 <= 0) {
+            mobj->state = 5;
         }
         break;
     case 5:
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
-        animPoseSetAnim(mobj->poseId, "S_1", 1);
+        animPoseSetAnim(mobj->poseId, "A_1", 1);  // correctness: target str_8041A118
         marioChgPose("M_S_1");
         marioKeyOn();
         statusWinForceOff();
         FLD(u16, camGetPtr((CameraId)8), 0) &= ~0x200;
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 6:
-        if (FLD(EffectEntry*, mobj, 0x1c8) == NULL) {
-            FLD(EffectEntry*, mobj, 0x1c8) = effCoinFukidashiEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z - 10.0f, 0, FLD(s32, mobj, 0x1a4), 0);
+        if (mobj->effect == NULL) {
+            mobj->effect = effCoinFukidashiEntry(mobj->position.x, 25.0f + mobj->position.y, mobj->position.z - 10.0f, 0, mobj->typeData[1], 0);
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
-        animPoseSetAnim(mobj->poseId, "A_2", 1);
+        animPoseSetAnim(mobj->poseId, "S_1", 1);  // correctness: target str_8041A12C
         mobj->flags &= ~8;
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         break;
     case 10:
-        FLD(s32, mobj, 0x1a8) = msgWindow_Entry(msgSearch("sys_no_coin"), 0, 0);
-        mobj->unk1DC++;
+        mobj->typeData[2] = msgWindow_Entry(msgSearch("sys_no_coin"), 0, 0);
+        mobj->state++;
         break;
     case 11:
-        if (windowCheckID(FLD(s32, mobj, 0x1a8)) == 0) {
+        if (windowCheckID(mobj->typeData[2]) == 0) {
             marioKeyOn();
             FLD(u16, camGetPtr((CameraId)8), 0) &= ~0x200;
             mobj->flags &= ~8;
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     case 20:
-        FLD(s32, mobj, 0x1a8) = msgWindow_Entry(msgSearch("kaifuku_first_hit"), 0, 0);
-        mobj->unk1DC++;
+        mobj->typeData[2] = msgWindow_Entry(msgSearch("kaifuku_first_hit"), 0, 0);
+        mobj->state++;
         break;
     case 21:
-        if (windowCheckID(FLD(s32, mobj, 0x1a8)) == 0) {
+        if (windowCheckID(mobj->typeData[2]) == 0) {
             marioKeyOn();
             FLD(u16, camGetPtr((CameraId)8), 0) &= ~0x200;
             mobj->flags &= ~8;
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     }
@@ -2181,19 +2283,19 @@ USER_FUNC(evt_mobj_recovery_blk) {
     }
     mobjEntry(name, anim);
     mobj = mobjNameToPtr(name);
-    FLD(s32, mobj, 0x1a4) = kind;
+    mobj->typeData[1] = kind;
     mobjSetPosition(name, x, y, z);
     mobj->flags |= 4;
     mobj->mainFunc = mobj_recovery_blk;
-    mobj->unk1D4 = 0;
-    mobj->unk1D8 = 0;
+    mobj->event = 0;
+    mobj->extraEvent = 0;
     mobj->flags |= 4;
     mobj->flags |= 0x400000;
-    mobj->unk1E4 = arg6;
+    mobj->flagVar = arg6;
     if (kind == 0) {
-        mobj->unk1DC = 0;
+        mobj->state = 0;
     } else {
-        mobj->unk1DC = -1;
+        mobj->state = -1;
     }
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -2219,7 +2321,7 @@ EVT_BEGIN(mobj_save_blk_sysevt)
 EVT_END()
 
 s32 mobj_save_blk(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             marioKeyOff();
@@ -2227,7 +2329,7 @@ s32 mobj_save_blk(MapObjectEntry* mobj) {
             psndSFXOn_3D((const char*)0x1af, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             FLD(u16, camGetPtr((CameraId)8), 0) |= 0x200;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
@@ -2235,22 +2337,22 @@ s32 mobj_save_blk(MapObjectEntry* mobj) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        if ((void*)mobj->unk1D4) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            mobj->unk1DC++;
+        if ((void*)mobj->event) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            mobj->state++;
         } else {
-            mobj->unk1DC = 3;
+            mobj->state = 3;
         }
         break;
     case 2:
         if (evtCheckID(mobj->eventId) != 1) {
             mobj->eventId = 0;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 3:
-        mobjRunEvent(mobj, (s32*)mobj->unk1D8);
-        mobj->unk1DC++;
+        mobjRunEvent(mobj, (s32*)mobj->extraEvent);
+        mobj->state++;
         break;
     case 4:
         if (evtCheckID(mobj->eventId) != 1) {
@@ -2258,7 +2360,7 @@ s32 mobj_save_blk(MapObjectEntry* mobj) {
             FLD(u16, camGetPtr((CameraId)8), 0) &= ~0x200;
             mobj->flags &= ~8;
             marioKeyOn();
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     }
@@ -2292,12 +2394,12 @@ USER_FUNC(evt_mobj_save_blk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_save_blk;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = (s32)mobj_save_blk_sysevt;
+    mobj->event = val;
+    mobj->extraEvent = (s32)mobj_save_blk_sysevt;
     mobj->flags |= 0x84;
     mobj->flags |= 0x400000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     return EVT_RETURN_DONE;
@@ -2305,7 +2407,7 @@ USER_FUNC(evt_mobj_save_blk) {
 
 s32 mobj_badgeblk(MapObjectEntry* mobj) {
     void* item;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             if (!strcmp(mobj->animName, "MOBJ_BadgeBlock") || !strcmp(mobj->animName, "MOBJ_BrickBadgeBlock") ||
@@ -2319,9 +2421,9 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
             }
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             if (FLD(u32, mobj, 0x1d4) != 0) {
-                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            } else if (FLD(s32, mobj, 0x1a0) != 0x79) {
-                itemEntry(mobj->position.x, 40.0f + mobj->position.y, mobj->position.z, mobj->name, FLD(s32, mobj, 0x1a0), 4, FLD(s32, mobj, 0x1e4), NULL);
+                mobjRunEvent(mobj, (s32*)mobj->event);
+            } else if (mobj->typeData[0] != 0x79) {
+                itemEntry(mobj->position.x, 40.0f + mobj->position.y, mobj->position.z, mobj->name, mobj->typeData[0], 4, mobj->flagVar, NULL);
                 item = itemNameToPtr(mobj->name);
                 itemFlagOn(item, 0x10);
                 FLD(f32, item, 0x80) = 0.7f;
@@ -2332,10 +2434,10 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
             } else {
                 pouchAddCoin(1);
                 itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, 0xf, -1, NULL);
-                evtSetValue(NULL, mobj->unk1E4, 1);
+                evtSetValue(NULL, mobj->flagVar, 1);
                 psndSFXOn_3D((const char*)0x5b, &mobj->position);
             }
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 1:
@@ -2344,7 +2446,7 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "S_2", 1);
         mobj->flags &= ~8;
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         if (!strcmp(mobj->animName, "MOBJ_HatenaBlock") || !strcmp(mobj->animName, "MOBJ_BrickHatenaBlock") ||
             !strcmp(mobj->animName, "MOBJ_HiddenHatenaBlock")) {
             strcpy(mobj->animName, "MOBJ_Block");
@@ -2357,19 +2459,19 @@ s32 mobj_badgeblk(MapObjectEntry* mobj) {
             mobj->flags &= ~8;
             animPoseSetAnim(mobj->poseId, "A_2", 1);
             psndSFXOn_3D((const char*)0x1b7, &mobj->position);
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 91:
         if (!(mobj->flags & 8)) {
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_2", 1);
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         mobj->flags &= ~8;
         break;
     }
@@ -2404,16 +2506,16 @@ USER_FUNC(evt_mobj_badgeblk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_badgeblk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0xc10000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
+    mobj->typeData[0] = item;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         animPoseSetAnim(mobj->poseId, "S_2", 1);
         strcpy(mobj->animName, kind != 0 ? "MOBJ_PinkBlock" : "MOBJ_Block");
     }
@@ -2421,7 +2523,7 @@ USER_FUNC(evt_mobj_badgeblk) {
 }
 
 s32 mobj_powerupblk(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
@@ -2433,14 +2535,14 @@ s32 mobj_powerupblk(MapObjectEntry* mobj) {
         marioKeyOff();
         if (!strcmp((char*)gp + 0x12c, "dou_02")) {
             marioCtrlOff();
-        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->unk1E0 == 0x800000) {
+        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->hitFlag == 0x800000) {
             marioCtrlOff();
         }
         FLD(s32, gp, 0x18) |= 3;
         psndSFXOn_3D((const char*)0x201c0, &mobj->position);
         animPoseSetAnim(mobj->poseId, "A_1", 1);
         itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, "pwrblk1", 0x57, 0xf, -1, NULL);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 1:
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
@@ -2448,23 +2550,23 @@ s32 mobj_powerupblk(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "A_2", 1);
         mobj->flags &= ~8;
-        FLD(s32, mobj, 0x1a4) = 1;
-        mobj->unk1DC++;
+        mobj->typeData[1] = 1;
+        mobj->state++;
         break;
     case 2:
-        if (FLD(s32, mobj, 0x1a4)) {
-            FLD(s32, mobj, 0x1a4)--;
+        if (mobj->typeData[1]) {
+            mobj->typeData[1]--;
             break;
         }
         itemForceGet(itemEntry(mobj->position.x, 40.0f + mobj->position.y, mobj->position.z, "pwrblk2", 0x57, 0x11, -1, NULL));
-        evtSetValue(NULL, mobj->unk1E4, 1);
+        evtSetValue(NULL, mobj->flagVar, 1);
         marioKeyOn();
         if (!strcmp((char*)gp + 0x12c, "dou_02")) {
             marioCtrlOn();
-        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->unk1E0 == 0x800000) {
+        } else if ((!strcmp((char*)gp + 0x12c, "dou_05") || !strcmp((char*)gp + 0x12c, "dou_10")) && mobj->hitFlag == 0x800000) {
             marioCtrlOn();
         }
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         break;
     case 90:
         mobjDelete(mobj->name);
@@ -2497,16 +2599,16 @@ USER_FUNC(evt_mobj_powerupblk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_powerupblk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0xc10000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     mobj->rotation.y = rot;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     if (evtGetValue(event, arg5)) {
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         animPoseSetAnim(mobj->poseId, "A_2", 1);
     }
     return EVT_RETURN_DONE;
@@ -2523,13 +2625,13 @@ s32 mobj_brickblk(MapObjectEntry* mobj) {
     s32 type = gp->inBattle != 0;
     strcat(oname, mobj->name);
     strcat(iname, mobj->name);
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         animGroupBaseAsync("P_box_y", type, NULL);
         if (mobj->flags & 8) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            mobj->unk1DC = 10;
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            mobj->state = 10;
         }
         break;
     case 10:
@@ -2547,19 +2649,19 @@ s32 mobj_brickblk(MapObjectEntry* mobj) {
         evt_img_alloc_capture(&ev2, TRUE);
         img = imgNameToPtr(iname, type);
         img->poseId = animPaperPoseGetId("P_box_y", type);
-        img->field_0x108 = (s32)"A_1";
+        img->animName = (s32)"A_1";
         FLD(OSTime, img, 0x110) = animTimeGetTime(type);
         imgSetShadow(img, 2);
         psndSFXOn_3D((const char*)0x1b8, &mobj->position);
-        mobj->unk1DC = 11;
+        mobj->state = 11;
         break;
     case 11:
         img = imgNameToPtr(iname, type);
-        if (img->field_0x118 >= 1.0f) {
-            mobj->unk1DC = 12;
+        if (img->loopTimes >= 1.0f) {
+            mobj->state = 12;
         }
         if (img->flags & 0x10000000) {
-            mobj->unk1DC = 12;
+            mobj->state = 12;
         }
         mobj->position = (Vec){0.0f, -2000.0f, 0.0f};
         mobj->flags |= 4;
@@ -2573,7 +2675,7 @@ s32 mobj_brickblk(MapObjectEntry* mobj) {
         imgRelease(img, type);
         offscreenDelete(oname);
         mobj->offscreenId = -1;
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 99:
         mobjDelete(mobj->name);
@@ -2583,7 +2685,7 @@ s32 mobj_brickblk(MapObjectEntry* mobj) {
 }
 
 s32 mobj_10countblk(MapObjectEntry* mobj) {
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             if (mobj->flags & 0x800) {
@@ -2592,15 +2694,15 @@ s32 mobj_10countblk(MapObjectEntry* mobj) {
             }
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             psndSFXOn_3D((const char*)0x1be, &mobj->position);
-            evtSetValue(NULL, mobj->unk1E4, 1);
+            evtSetValue(NULL, mobj->flagVar, 1);
             if (FLD(u32, mobj, 0x1d4) != 0) {
-                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+                mobjRunEvent(mobj, (s32*)mobj->event);
             } else {
                 pouchAddCoin(1);
                 itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, 0xf, -1, NULL);
                 mobj->unk1B0 = 200;
             }
-            mobj->unk1DC++;
+            mobj->state++;
             mobj->flags &= ~8;
         }
         break;
@@ -2609,7 +2711,7 @@ s32 mobj_10countblk(MapObjectEntry* mobj) {
             mobj->unk1B0--;
         }
         if (mobj->unk1B0 <= 0) {
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             animPoseSetAnim(mobj->poseId, "S_2", 1);
             strcpy(mobj->animName, "MOBJ_Block");
             break;
@@ -2627,19 +2729,19 @@ s32 mobj_10countblk(MapObjectEntry* mobj) {
             psndSFXOn_3D((const char*)0x1b7, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_3", 1);
             mobj->flags &= ~8;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 91:
         if (!(mobj->flags & 8)) {
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_2", 1);
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         mobj->flags &= ~8;
         break;
     }
@@ -2722,12 +2824,12 @@ USER_FUNC(evt_mobj_brick) {
         mobj->mainFunc = mobj_10countblk;
         break;
     }
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0xc10000;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 0;
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
+    mobj->typeData[0] = item;
     mobjCalcMtx(mobj);
     if ((s32)kind < 10) {
         animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -2742,25 +2844,25 @@ USER_FUNC(evt_mobj_brick) {
         case 0:
         case 10:
             animPoseSetAnim(mobj->poseId, "S_1", 1);
-            mobj->unk1DC = 99;
+            mobj->state = 99;
             break;
         case 1:
         case 11:
             animPoseSetAnim(mobj->poseId, "S_2", 1);
             anim2 = "MOBJ_Block";
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             break;
         case 2:
         case 12:
             animPoseSetAnim(mobj->poseId, "S_2", 1);
             anim2 = "MOBJ_PinkBlock";
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             break;
         case 3:
         case 13:
             animPoseSetAnim(mobj->poseId, "S_2", 1);
             anim2 = "MOBJ_Block";
-            mobj->unk1DC = 90;
+            mobj->state = 90;
             break;
         }
         if (anim2) {
@@ -2778,20 +2880,20 @@ s32 mobj_breaking_floor(MapObjectEntry* mobj) {
     GXColor c1 = {0xff, 0xff, 0xff, 0xff};
     c2 = c1;
     c3 = c1;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             psndSFXOn_3D((const char*)0x401e8, &mobj->position);
             animPoseSetAnim(mobj->poseId, "A_1", 1);
-            if ((u32)mobj->unk1D4 != 0U) {
-                mobjRunEvent(mobj, (s32*)mobj->unk1D4);
+            if ((u32)mobj->event != 0U) {
+                mobjRunEvent(mobj, (s32*)mobj->event);
             }
             if (mobj->hitObj[0].hitObject) {
                 FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
             }
             mobj->flags |= 2;
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            mobj->unk1DC = 1;
+            evtSetValue(NULL, mobj->flagVar, 1);
+            mobj->state = 1;
             animPoseSetMaterialFlagOn(mobj->poseId, 0x40);
             animPoseSetMaterialEvtColor(mobj->poseId, c2);
             mobj->unk1B0 = 64;
@@ -2803,12 +2905,12 @@ s32 mobj_breaking_floor(MapObjectEntry* mobj) {
             c3.a -= 4;
         } else {
             c3.a = 0;
-            mobj->unk1DC = 99;
+            mobj->state = 99;
         }
         animPoseSetMaterialEvtColor(mobj->poseId, c3);
         mobj->unk1B0--;
         if (mobj->unk1B0 <= 0) {
-            mobj->unk1DC = 99;
+            mobj->state = 99;
         }
         break;
     case 99:
@@ -2854,14 +2956,14 @@ USER_FUNC(evt_mobj_breaking_floor) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_breaking_floor;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x1000000;
-    mobj->unk1E4 = arg6;
+    mobj->flagVar = arg6;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     } else {
-        mobj->unk1DC = 0;
+        mobj->state = 0;
     }
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
@@ -2877,7 +2979,7 @@ typedef struct KpaPoleScoreWork {
     f32 z;
 } KpaPoleScoreWork;
 
-u32 gap_08_80418714_sbss;
+static u32 gap_08_80418714_sbss;
 static KpaPoleScoreWork* psw;
 
 void kururing_capture(CameraId camId, MapObjectEntry* mobj) {
@@ -2927,7 +3029,6 @@ void kururing_capture(CameraId camId, MapObjectEntry* mobj) {
     memcpy(camGetPtr(camId), saved, 0x260);
 }
 
-
 extern s32 pouchGetJumpLv(void);
 extern void* itemHitCheck(f32 x, f32 y, f32 z, f32 r);
 extern void* npcNearDistCheck(f32 x, f32 y, f32 z, f32 r);
@@ -2945,24 +3046,24 @@ static inline BOOL kururing_in_box(f32 x, f32 z, f32 px, f32 pz, f32 r) {
 #define KURU_POSE_FLAGS(m) FLD(s32, FLD(u8*, animGetPtr(), 0x10), (m)->poseId * 0x170)
 
 s32 mobj_kururing_floor(MapObjectEntry* mobj) {
-    void* party;
-    void* mario = marioGetPtr();
+    PartyEntry* party;
+    MarioWork* mario = marioGetPtr();
     s32 mode;
     f32 dist;
     void* item;
     void* p;
     void* cur2;
     party = partyGetPtr(marioGetPartyId());
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
         }
-        dist = distABf(FLD(f32, mario, 0x8c), FLD(f32, mario, 0x94), mobj->position.x, mobj->position.z);
-        if (__fabsf(FLD(f32, mario, 0x90) - mobj->position.y) > 10.0f) {
+        dist = distABf(mario->position.x, mario->position.z, mobj->position.x, mobj->position.z);
+        if (__fabsf(mario->position.y - mobj->position.y) > 10.0f) {
             dist = 100000.0f;
         }
-        if (mobj->unk1E0 == 0x1000000) {
+        if (mobj->hitFlag == 0x1000000) {
             if (pouchGetJumpLv() < 2) {
                 mode = 0;
             } else if (dist < 60.0f) {
@@ -2973,18 +3074,18 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
                 mode = 0;
             }
         }
-        if (mobj->unk1E0 == 0x10000) {
+        if (mobj->hitFlag == 0x10000) {
             mode = 1;
         }
         if (mode == 0) {
             mobj->flags &= ~8;
             break;
         }
-        if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, mario, 0x8c), FLD(f32, mario, 0x94), 30.0f)) {
+        if (kururing_in_box(mobj->position.x, mobj->position.z, mario->position.x, mario->position.z, 30.0f)) {
             mode = 1;
         }
         if (party) {
-            if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, party, 0x58), FLD(f32, party, 0x60), 30.0f)) {
+            if (kururing_in_box(mobj->position.x, mobj->position.z, party->position.x, party->position.z, 30.0f)) {
                 mode = 1;
             }
         }
@@ -3001,14 +3102,14 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
         if (mode == 1) {
             animPoseSetAnim(mobj->poseId, "A_1", 1);
             psndSFXOnEx_3D((const char*)0x1ee, &mobj->position, 0xff, 0xff, 100, 0x10);
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         } else if (mode == 2) {
             animPoseSetAnim(mobj->poseId, "A_2", 1);
             psndSFXOn_3D((const char*)0x1ef, &mobj->position);
-            mobj->unk1DC = 1;
+            mobj->state = 1;
             item = itemNameToPtr(mobj->name);
             if (item == NULL || !(FLD(u16, item, 0) & 1)) {
-                if (itemEntry(mobj->position.x, 30.0f + mobj->position.y, mobj->position.z, mobj->name, 0x7d, 4, mobj->unk1E4, NULL)) {
+                if (itemEntry(mobj->position.x, 30.0f + mobj->position.y, mobj->position.z, mobj->name, 0x7d, 4, mobj->flagVar, NULL)) {
                     item = itemNameToPtr(mobj->name);
                     itemFlagOn(item, 0x10);
                     FLD(f32, item, 0x80) = 0.6f;
@@ -3032,7 +3133,7 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             mobj->flags &= ~8;
             animPoseSetAnim(mobj->poseId, "S_1", 1);
             psndSFXOn_3D((const char*)0x1f0, &mobj->position);
-            mobj->unk1DC = 0;
+            mobj->state = 0;
         }
         break;
     case 10:
@@ -3082,17 +3183,17 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
         animPoseSetAnim(mobj->poseId, "S_1", 1);
         psndSFXOn_3D((const char*)0x1f0, &mobj->position);
         mobj->unk1B0 = 20;
-        mobj->unk1DC++;
+        mobj->state++;
     }
     case 11:
         mobj->unk1B0--;
         if (mobj->unk1B0 == 0) {
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 12:
         mobj->flags &= ~8;
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         break;
     }
     return 0;
@@ -3120,8 +3221,8 @@ USER_FUNC(evt_mobj_kururing_floor) {
     mobj = mobjNameToPtr(name);
     mobj->position = (Vec){x, 0.1f + y, z};
     mobj->mainFunc = mobj_kururing_floor;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     mobj->flags |= 0x1010000;
     mobj->flags |= 2;
     mobjCalcMtx(mobj);
@@ -3158,18 +3259,18 @@ s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
     {
         Vec dv = (Vec){0.0f, -2000.0f, 0.0f};
     }
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             switch (kpaGetLevel()) {
             case 0:
             case 1:
-                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x4000000) {
+                if (mobj->hitFlag == 0x20000000 || mobj->hitFlag == 0x4000000) {
                     ok = TRUE;
                 }
                 break;
             case 2:
-                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x10000000 || mobj->unk1E0 == 0x4000000) {
+                if (mobj->hitFlag == 0x20000000 || mobj->hitFlag == 0x10000000 || mobj->hitFlag == 0x4000000) {
                     ok = TRUE;
                 }
                 break;
@@ -3181,9 +3282,9 @@ s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            if (mobj->unk1E0 == 0x4000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
@@ -3191,7 +3292,7 @@ s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
             }
             mobj->flags |= 2;
             kpaAddScore(kpaMutekiCheck() ? 500 : 400);
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         break;
     case 10:
@@ -3211,7 +3312,7 @@ s32 mobj_koopa_ojama_blk_evt(MapObjectEntry* mobj) {
             FLD(s32, item, 0x54) = 90;
             psndSFXOn_3D((const char*)0x836, &mobj->position);
         }
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 99:
         mobjDelete(mobj->name);
@@ -3243,24 +3344,16 @@ USER_FUNC(evt_mobj_koopa_ojama_blk) {
     mobj->flags |= 4;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_ojama_blk_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = 0;
+    mobj->event = val;
+    mobj->extraEvent = 0;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     if (evtGetValue(event, arg5)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     return EVT_RETURN_DONE;
 }
-
-
-
-
-
-
-
-
 
 void mobj_koopa_stone_blk(void) {
     mobjNameToPtr("MOBJ_BombRock");
@@ -3298,31 +3391,31 @@ USER_FUNC(evt_mobj_koopa_stone_blk) {
     mobj->flags |= 4;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_stone_blk_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = 0;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 99;
+    mobj->event = val;
+    mobj->extraEvent = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 99;
     return EVT_RETURN_DONE;
 }
 
 s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             switch (kpaGetLevel()) {
             case 0:
-                if (mobj->unk1E0 == 0x20000000) {
+                if (mobj->hitFlag == 0x20000000) {
                     ok = TRUE;
                 }
                 break;
             case 1:
-                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x4000000) {
+                if (mobj->hitFlag == 0x20000000 || mobj->hitFlag == 0x4000000) {
                     ok = TRUE;
                 }
                 break;
             case 2:
-                if (mobj->unk1E0 == 0x20000000 || mobj->unk1E0 == 0x10000000 || mobj->unk1E0 == 0x4000000) {
+                if (mobj->hitFlag == 0x20000000 || mobj->hitFlag == 0x10000000 || mobj->hitFlag == 0x4000000) {
                     ok = TRUE;
                 }
                 break;
@@ -3331,17 +3424,17 @@ s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
                 break;
             }
             if (!ok) {
-                if (mobj->unk1E0 == 0x4000000) {
+                if (mobj->hitFlag == 0x4000000) {
                     npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
-                    mobj->unk1DC = 20;
+                    mobj->state = 20;
                     break;
                 }
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            if (mobj->unk1E0 == 0x4000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
@@ -3349,7 +3442,7 @@ s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
             }
             mobj->flags |= 2;
             kpaAddScore(kpaMutekiCheck() ? 500 : 400);
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         break;
     case 10:
@@ -3363,23 +3456,23 @@ s32 mobj_koopa_brickblk(MapObjectEntry* mobj) {
         } else if (!strcmp(mobj->animName, "MOBJ_bigblock_02")) {
             effMObjBrokenEntry(4, mobj->position.x, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
         }
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 20:
         psndSFXOn_3D((const char*)0x1b7, &mobj->position);
         animPoseSetAnim(mobj->poseId, "A_1", 1);
-        mobj->unk1DC = 21;
+        mobj->state = 21;
         break;
     case 21:
         if (!(mobj->flags & 8)) {
-            mobj->unk1DC = 0;
+            mobj->state = 0;
             break;
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
             break;
         }
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        mobj->unk1DC = 0;
+        mobj->state = 0;
         mobj->flags &= ~8;
         break;
     case 99:
@@ -3396,7 +3489,6 @@ USER_FUNC(evt_mobj_koopa_brick) {
     s32* args = event->args;
     s32 item;
     s32 kind;
-    s32 new_var;
     const char* anim;
     s32 inBattle;
     f32 x, y, z;
@@ -3408,8 +3500,7 @@ USER_FUNC(evt_mobj_koopa_brick) {
     item = evtGetValue(event, args[4]);
     kind = args[5];
     val = evtGetValue(event, args[6]);
-    new_var = args[7];
-    arg7 = new_var;
+    arg7 = args[7];
     inBattle = 0;
     inBattle = gp->inBattle != inBattle;
     switch (kind) {
@@ -3434,17 +3525,17 @@ USER_FUNC(evt_mobj_koopa_brick) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_koopa_brickblk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = new_var;
-    mobj->unk1DC = 0;
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
+    mobj->typeData[0] = item;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     if (evtGetValue(event, arg7)) {
         animPoseSetAnim(mobj->poseId, "S_1", 1);
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     return EVT_RETURN_DONE;
 }
@@ -3454,12 +3545,12 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
     BOOL ok;
     marioGetPtr();
     ok = FALSE;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
         }
-        if (mobj->unk1E0 != 0x4000000) {
+        if (mobj->hitFlag != 0x4000000) {
             mobj->flags &= ~8;
             break;
         }
@@ -3467,10 +3558,10 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
             mobjHitEntry(mobj, 0);
         }
         animPoseSetAnim(mobj->poseId, "A_1", 1);
-        if ((s32*)mobj->unk1D4 != NULL) {
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-        } else if (FLD(s32, mobj, 0x1a0) == 0x59) {
-            itemEntry(mobj->position.x, 12.5f + mobj->position.y, mobj->position.z, mobj->name, FLD(s32, mobj, 0x1a0), 4, -1, kpa_powerup_evt);
+        if ((s32*)mobj->event != NULL) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+        } else if (mobj->typeData[0] == 0x59) {
+            itemEntry(mobj->position.x, 12.5f + mobj->position.y, mobj->position.z, mobj->name, mobj->typeData[0], 4, -1, kpa_powerup_evt);
             item = itemNameToPtr(mobj->name);
             itemStatusOn(item, 0x10);
             itemFlagOn(item, 0x14);
@@ -3486,13 +3577,13 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
         } else {
             kpaAddCoin(1);
             itemEntry(mobj->position.x, mobj->position.y, mobj->position.z, NULL, 0x79, 0xf, -1, NULL);
-            evtSetValue(NULL, mobj->unk1E4, 1);
+            evtSetValue(NULL, mobj->flagVar, 1);
             psndSFXOn_3D((const char*)0x5b, &mobj->position);
         }
-        if (mobj->unk1E0 == 0x4000000) {
+        if (mobj->hitFlag == 0x4000000) {
             npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
         }
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 1:
         if (animPoseGetLoopTimes(mobj->poseId) < 1.0f) {
@@ -3500,7 +3591,7 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
         }
         animPoseSetAnim(mobj->poseId, "S_2", 1);
         mobj->flags &= ~8;
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         strcpy(mobj->animName, "MOBJ_Block");
         break;
     case 90:
@@ -3515,20 +3606,20 @@ s32 mobj_koopa_badgeblk(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            if (mobj->unk1E0 == 0x4000000) {
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
                 FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
             }
             mobj->flags |= 2;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 91:
         psndSFXOn_3D((const char*)0x1b8, &mobj->position);
         effMObjBrokenEntry(2, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 99:
         mobjDelete(mobj->name);
@@ -3542,7 +3633,7 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     s32 item;
     s32* args = event->args;
     s32 arg6;
-    int new_var;
+    int new_var; // FAKE: separate inBattle temp needed for the target register allocation
     const char* name;
     MapObjectEntry* mobj;
     const char* anim;
@@ -3564,16 +3655,16 @@ USER_FUNC(evt_mobj_koopa_badgeblk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_koopa_badgeblk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
+    mobj->typeData[0] = item;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         animPoseSetAnim(mobj->poseId, "S_2", 1);
     }
     return EVT_RETURN_DONE;
@@ -3608,16 +3699,16 @@ USER_FUNC(evt_mobj_koopa_hidden_blk) {
     mobj->flags |= 0x800;
     mobjHitEntry(mobj, 1);
     mobj->mainFunc = mobj_koopa_badgeblk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg7;
-    mobj->unk1DC = 0;
-    FLD(s32, mobj, 0x1a0) = item;
+    mobj->flagVar = arg7;
+    mobj->state = 0;
+    mobj->typeData[0] = item;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     if (evtGetValue(event, arg7)) {
-        mobj->unk1DC = 90;
+        mobj->state = 90;
         animPoseSetAnim(mobj->poseId, "S_2", 1);
     }
     return EVT_RETURN_DONE;
@@ -3625,7 +3716,7 @@ USER_FUNC(evt_mobj_koopa_hidden_blk) {
 
 s32 mobj_koopa_blk(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             switch (kpaGetLevel()) {
@@ -3639,22 +3730,22 @@ s32 mobj_koopa_blk(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            if (mobj->unk1E0 == 0x4000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
                 FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
             }
             mobj->flags |= 2;
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         break;
     case 10:
         psndSFXOn_3D((const char*)0x1b8, &mobj->position);
         effMObjBrokenEntry(2, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     case 99:
         mobjDelete(mobj->name);
         break;
@@ -3682,11 +3773,11 @@ USER_FUNC(evt_mobj_koopa_blk) {
     mobj = mobjNameToPtr(name);
     mobjSetPosition(name, x, y, z);
     mobj->mainFunc = mobj_koopa_blk;
-    mobj->unk1D4 = val;
+    mobj->event = val;
     mobj->flags |= 4;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     return EVT_RETURN_DONE;
@@ -3694,7 +3785,7 @@ USER_FUNC(evt_mobj_koopa_blk) {
 
 s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             switch (kpaGetLevel()) {
@@ -3702,7 +3793,7 @@ s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
                 break;
             case 1:
             case 2:
-                if (mobj->unk1E0 == 0x20000000) {
+                if (mobj->hitFlag == 0x20000000) {
                     ok = TRUE;
                 }
                 break;
@@ -3714,9 +3805,9 @@ s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            if (mobj->unk1E0 == 0x4000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
@@ -3724,7 +3815,7 @@ s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
             }
             mobj->flags |= 2;
             kpaAddScore(kpaMutekiCheck() ? 500 : 400);
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         break;
     case 10:
@@ -3736,7 +3827,7 @@ s32 mobj_koopa_dokan_evt(MapObjectEntry* mobj) {
             effMObjBrokenEntry(6, mobj->position.x - 25.0f, 25.0f + mobj->position.y, 25.0f + mobj->position.z);
         }
         psndSFXOn_3D((const char*)0x834, &mobj->position);
-        mobj->unk1DC = 99;
+        mobj->state = 99;
         break;
     case 99:
         mobjDelete(mobj->name);
@@ -3782,15 +3873,15 @@ USER_FUNC(evt_mobj_koopa_dokan) {
     mobj->flags |= 6;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_dokan_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = 0;
+    mobj->event = val;
+    mobj->extraEvent = 0;
     mobjCalcMtx(mobj);
     animPoseSetAnim(mobj->poseId, "S_1", 1);
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     return EVT_RETURN_DONE;
 }
@@ -3829,14 +3920,14 @@ USER_FUNC(fire_func) {
 s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
     BOOL ok = FALSE;
     EventEntry* ev;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (mobj->flags & 8) {
             switch (kpaGetLevel()) {
             case 0:
             case 1:
             case 2:
-                if (mobj->unk1E0 == 0x20000000) {
+                if (mobj->hitFlag == 0x20000000) {
                     ok = TRUE;
                 }
                 break;
@@ -3848,9 +3939,9 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
                 mobj->flags &= ~8;
                 break;
             }
-            mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-            evtSetValue(NULL, mobj->unk1E4, 1);
-            if (mobj->unk1E0 == 0x4000000) {
+            mobjRunEvent(mobj, (s32*)mobj->event);
+            evtSetValue(NULL, mobj->flagVar, 1);
+            if (mobj->hitFlag == 0x4000000) {
                 npcKoopaModeMobjBoundDeadCheck(mobj->hitObj[0].hitObject);
             }
             if (mobj->hitObj[0].hitObject) {
@@ -3858,11 +3949,11 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
             }
             mobj->flags |= 2;
             kpaAddScore(kpaMutekiCheck() ? 500 : 400);
-            mobj->unk1DC = 10;
+            mobj->state = 10;
         }
         break;
     case 10:
-        if (mobj->unk1E0 == 0x20000000) {
+        if (mobj->hitFlag == 0x20000000) {
             psndSFXOn_3D((const char*)0xb67, &mobj->position);
         }
         ev = evtEntry(evt_fire, 0, 0);
@@ -3870,7 +3961,7 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
         ev->lwData[1] = (s32)(1024.0f * mobj->position.y) + 0xF24A7A80;
         ev->lwData[2] = (s32)(1024.0f * (10.0f + mobj->position.z)) + 0xF24A7A80;
         ev->lwData[3] = 90;
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 20:
         ev = evtEntry(evt_fire, 0, 0);
@@ -3878,7 +3969,7 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
         ev->lwData[1] = (s32)(1024.0f * (30.0f + mobj->position.y)) + 0xF24A7A80;
         ev->lwData[2] = (s32)(1024.0f * (10.0f + mobj->position.z)) + 0xF24A7A80;
         ev->lwData[3] = 80;
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 30:
         ev = evtEntry(evt_fire, 0, 0);
@@ -3886,17 +3977,17 @@ s32 mobj_koopa_sango_evt(MapObjectEntry* mobj) {
         ev->lwData[1] = (s32)(1024.0f * (60.0f + mobj->position.y)) + 0xF24A7A80;
         ev->lwData[2] = (s32)(1024.0f * (10.0f + mobj->position.z)) + 0xF24A7A80;
         ev->lwData[3] = 70;
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 98:
         effMObjBrokenEntry(7, mobj->position.x, mobj->position.y, 10.0f + mobj->position.z);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 99:
         mobjDelete(mobj->name);
         break;
     default:
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     }
     return 0;
@@ -3923,13 +4014,13 @@ USER_FUNC(evt_mobj_koopa_sango) {
     mobj->flags |= 0x84;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_sango_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = 0;
+    mobj->event = val;
+    mobj->extraEvent = 0;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg5;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg5;
+    mobj->state = 0;
     if (evtGetValue(event, arg5)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     return EVT_RETURN_DONE;
 }
@@ -3947,7 +4038,7 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
     NpcEntry* npc;
     s32 i;
     MarioWork* mario = marioGetPtr();
-    if (mobj->unk1DC < 10) {
+    if (mobj->state < 10) {
         if (distABf(mario->position.x, mario->position.y, mobj->position.x, mobj->position.y) < 150.0f) {
             if (psndSFXChk(mobj->unk1B4)) {
                 mobj->unk1B4 = psndSFXOn_3D((const char*)0x1cd, &mobj->position);
@@ -3961,13 +4052,13 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
         PSMTXRotRad(rot, 'Z', 0.017453292f * FLD(f32, mobj, 0x1ac));
         PSMTXConcat(rot, mtx, mtx);
         PSMTXTransApply(mtx, mtx, mobj->position.x, mobj->position.y, mobj->position.z);
-        for (i = 0; i < FLD(s32, mobj, 0x1a4); i++) {
+        for (i = 0; i < mobj->typeData[1]; i++) {
             sprintf(buf, "%s%2x", mobj->name, i);
             npc = npcNameToPtr(buf);
             PSMTXMultVec(mtx, &FLD(Vec, npc, 0x8c), &FLD(Vec, npc, 0x8c));
         }
     }
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
@@ -3976,7 +4067,7 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
         case 0:
         case 1:
         case 2:
-            if (mobj->unk1E0 == 0x20000000) {
+            if (mobj->hitFlag == 0x20000000) {
                 ok = TRUE;
             }
             break;
@@ -3988,23 +4079,23 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
             mobj->flags &= ~8;
             break;
         }
-        mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-        evtSetValue(NULL, mobj->unk1E4, 1);
+        mobjRunEvent(mobj, (s32*)mobj->event);
+        evtSetValue(NULL, mobj->flagVar, 1);
         if (mobj->hitObj[0].hitObject) {
             FLD(u16, mobj->hitObj[0].hitObject, 0) |= 1;
         }
         mobj->flags |= 2;
         kpaAddScore(kpaMutekiCheck() ? 500 : 400);
-        mobj->unk1DC = 10;
+        mobj->state = 10;
         break;
     case 10:
         psndSFXOn_3D((const char*)0x1b8, &mobj->position);
         effMObjBrokenEntry(0, mobj->position.x, 12.5f + mobj->position.y, 12.5f + mobj->position.z);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 11:
         mobj->position.y = -1000.0f;
-        for (i = 0; i < FLD(s32, mobj, 0x1a4); i++) {
+        for (i = 0; i < mobj->typeData[1]; i++) {
             sprintf(buf, "%s%2x", mobj->name, i);
             npc = npcNameToPtr(buf);
             FLD(s32, npc, 0x18c) = 0;
@@ -4020,10 +4111,10 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
             psndSFXOff(mobj->unk1B4);
             mobj->unk1B4 = -1;
         }
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 12:
-        for (i = 0; i < FLD(s32, mobj, 0x1a4); i++) {
+        for (i = 0; i < mobj->typeData[1]; i++) {
             sprintf(buf, "%s%2x", mobj->name, i);
             npc = npcNameToPtr(buf);
             FLD(f32, npc, 0x1b4) += FLD(f32, npc, 0x164);
@@ -4037,12 +4128,12 @@ s32 mobj_koopa_fireber_dodai_evt(MapObjectEntry* mobj) {
             FLD(f32, npc, 0x168) -= 0.2f;
         }
         if (FLD(f32, npc, 0x1c0) <= FLD(f32, npc, 0x1a0)) {
-            mobj->unk1DC = 99;
+            mobj->state = 99;
         }
         break;
     case 99: {
         s32 j;
-        for (j = 0; j < FLD(s32, mobj, 0x1a4); j++) {
+        for (j = 0; j < mobj->typeData[1]; j++) {
             sprintf(buf2, "%s%2x", mobj->name, j);
             npcDelete(npcNameToPtr(buf2));
         }
@@ -4083,18 +4174,18 @@ USER_FUNC(evt_mobj_koopa_fireber_dodai) {
     mobj->flags |= 4;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_fireber_dodai_evt;
-    mobj->unk1D4 = arg7;
-    mobj->unk1D8 = 0;
+    mobj->event = arg7;
+    mobj->extraEvent = 0;
     mobj->flags |= 0x3c000000;
-    mobj->unk1E4 = arg8;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg8;
+    mobj->state = 0;
     if (evtGetValue(event, arg8)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
     if (spd == 0.0f) {
         spd = 1.0f;
     }
-    FLD(s32, mobj, 0x1a4) = count;
+    mobj->typeData[1] = count;
     FLD(f32, mobj, 0x1ac) = dir ? __fabsf(spd) : -__fabsf(spd);
     mobj->unk1B4 = 0;
     for (i = 0; i < count; i++) {
@@ -4127,7 +4218,7 @@ USER_FUNC(kpa_get_hata_name) {
     MapObjectEntry* mobj = event->thisMapObj;
     s32* args = event->args;
     if (mobj != NULL) {
-        evtSetValue(event, args[0], (s32)mobj->unk1B8);
+        evtSetValue(event, args[0], (s32)mobj->linkedName);
     } else {
         evtSetValue(event, args[0], 0);
     }
@@ -4383,7 +4474,6 @@ EVT_BEGIN(kpa_move_to_toride)
     RETURN
 EVT_END()
 
-
 s32 mobj_koopa_pole_evt(MapObjectEntry* mobj);
 
 s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
@@ -4392,19 +4482,19 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
     s32 next = 0;
     s32 off;
     s32 i;
-    switch (mobj->unk1DC) {
+    switch (mobj->state) {
     case 0:
         if (!(mobj->flags & 8)) {
             break;
         }
-        if (FLD(s8, mario, 0x3c) != 2) {
+        if (mario->characterId != 2) {
             mobj->flags &= ~8;
             break;
         }
         switch (kpaGetLevel()) {
         case 0:
         case 1:
-            if (FLD(f32, mario, 0x90) < 25.0f) {
+            if (mario->position.y < 25.0f) {
                 mobj->flags &= ~8;
                 break;
             }
@@ -4426,9 +4516,9 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
             }
         }
         marioKeyOff();
-        evtSetValue(NULL, mobj->unk1E4, 1);
+        evtSetValue(NULL, mobj->flagVar, 1);
         FLD(s16, mario, 0x78) = 0;
-        mobj->unk1DC = next;
+        mobj->state = next;
         break;
     case 10:
         mario = marioGetPtr();
@@ -4438,11 +4528,11 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
         } else if (kpaGetLevel() >= 2) {
             kpaAddScore(1000);
         } else {
-            if (FLD(f32, mario, 0x90) >= 170.0f) {
+            if (mario->position.y >= 170.0f) {
                 score = 1000;
-            } else if (FLD(f32, mario, 0x90) >= 100.0f) {
+            } else if (mario->position.y >= 100.0f) {
                 score = 500;
-            } else if (FLD(f32, mario, 0x90) >= 50.0f) {
+            } else if (mario->position.y >= 50.0f) {
                 score = 200;
             } else {
                 score = 100;
@@ -4450,11 +4540,11 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
             kpaAddScore(score);
         }
         mobjRunEvent(mobj, kpa_pole)->lwData[0] = score;
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 11:
         if (evtCheckID(mobj->eventId) != 1) {
-            mobj->unk1DC = 90;
+            mobj->state = 90;
         }
         break;
     case 50:
@@ -4464,11 +4554,11 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
         } else if (kpaGetLevel() >= 2) {
             kpaAddScore(1000);
         } else {
-            if (FLD(f32, mario, 0x90) >= 170.0f) {
+            if (mario->position.y >= 170.0f) {
                 score = 1000;
-            } else if (FLD(f32, mario, 0x90) >= 100.0f) {
+            } else if (mario->position.y >= 100.0f) {
                 score = 500;
-            } else if (FLD(f32, mario, 0x90) >= 50.0f) {
+            } else if (mario->position.y >= 50.0f) {
                 score = 200;
             } else {
                 score = 100;
@@ -4476,36 +4566,36 @@ s32 mobj_koopa_pole_evt(MapObjectEntry* mobj) {
             kpaAddScore(score);
         }
         mobjRunEvent(mobj, kpa_pole_move);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 51:
         if (evtCheckID(mobj->eventId) != 1) {
-            mobj->unk1DC = 90;
+            mobj->state = 90;
         }
         break;
     case 90:
         mobjRunEvent(mobj, kpa_move_to_toride);
-        mobj->unk1DC++;
+        mobj->state++;
         break;
     case 91:
         if (evtCheckID(mobj->eventId) != 1) {
             mobj->eventId = 0;
-            mobj->unk1DC++;
+            mobj->state++;
         }
         break;
     case 92:
-        mobjRunEvent(mobj, (s32*)mobj->unk1D8);
-        mobj->unk1DC++;
+        mobjRunEvent(mobj, (s32*)mobj->extraEvent);
+        mobj->state++;
         break;
     case 93:
         if (evtCheckID(mobj->eventId) == 1) {
             break;
         }
         mobj->eventId = 0;
-        mobj->unk1DC++;
+        mobj->state++;
     case 94:
-        mobjRunEvent(mobj, (s32*)mobj->unk1D4);
-        mobj->unk1DC++;
+        mobjRunEvent(mobj, (s32*)mobj->event);
+        mobj->state++;
         break;
     case 95:
         break;
@@ -4543,31 +4633,29 @@ USER_FUNC(evt_mobj_koopa_pole) {
     mobj->flags |= 0x84;
     mobj->position = (Vec){x, y, z};
     mobj->mainFunc = mobj_koopa_pole_evt;
-    mobj->unk1D4 = val;
-    mobj->unk1D8 = val2;
+    mobj->event = val;
+    mobj->extraEvent = val2;
     mobj->flags |= 0x1c280000;
-    mobj->unk1E4 = arg6;
-    mobj->unk1DC = 0;
+    mobj->flagVar = arg6;
+    mobj->state = 0;
     if (evtGetValue(event, arg6)) {
-        mobj->unk1DC = 99;
+        mobj->state = 99;
     }
-    strcpy(mobj->unk1B8, name);
-    strcat(mobj->unk1B8, "_h");
-    mobjEntry(mobj->unk1B8, "MOBJ_goal_hata");
-    hata = mobjNameToPtr(mobj->unk1B8);
+    strcpy(mobj->linkedName, name);
+    strcat(mobj->linkedName, "_h");
+    mobjEntry(mobj->linkedName, "MOBJ_goal_hata");
+    hata = mobjNameToPtr(mobj->linkedName);
     hata->position = (Vec){x, 180.0f + y, z};
     hata->mainFunc = NULL;
-    hata->unk1D4 = 0;
-    hata->unk1D8 = 0;
-    hata->unk1E4 = 0;
-    hata->unk1DC = 0;
-    strcpy(hata->unk1B8, name);
+    hata->event = 0;
+    hata->extraEvent = 0;
+    hata->flagVar = 0;
+    hata->state = 0;
+    strcpy(hata->linkedName, name);
     if (hata->hitObj[0].hitObject) {
         FLD(u16, hata->hitObj[0].hitObject, 0) |= 1;
     }
     return EVT_RETURN_DONE;
 }
 
-#pragma force_active on
 __declspec(section ".sdata") u32 gap_07_80410304_sdata[1] = {0};
-#pragma force_active reset

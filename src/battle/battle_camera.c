@@ -218,11 +218,10 @@ void battleCameraMain(void) {
     if (t < 0.5f) {
       t = 0.5f;
     }
-    zz = 2.0f * wp->cameraWork.zoom;
-    w2 = w + w2;
-    zz = (1.0f - t) * (zz - 1.5f * w2);
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
+    zz = 2.0f * wp->cameraWork.zoom;
+    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
     ofs = -zz / 10.0f;
     if (yy > 100.0f) {
       yy = 100.0f;
@@ -332,11 +331,10 @@ void battleCameraMain(void) {
     if (t < 0.5f) {
       t = 0.5f;
     }
-    zz = 2.0f * wp->cameraWork.zoom;
-    w2 = w + w2;
-    zz = (1.0f - t) * (zz - 1.5f * w2);
     yy = (wp->cameraWork.homingOffset2.y / 80.0f) * (pos.y - wp->cameraWork.homingOffset2.y);
     atX = (1.0f - t) * wp->cameraWork.homingOffset2.x;
+    zz = 2.0f * wp->cameraWork.zoom;
+    zz = (1.0f - t) * (zz - 1.5f * (w + w2));
     ofs = -zz / 10.0f;
     if (yy > 100.0f) {
       yy = 100.0f;
@@ -829,7 +827,6 @@ USER_FUNC(evt_btl_camera_set_homing_unitparts) {
   return 2;
 }
 
-
 USER_FUNC(evt_btl_camera_set_homing_unit_audience) {
   s32 audId;
   BattleWork* wp;
@@ -1130,3 +1127,4 @@ USER_FUNC(evt_btl_camera_wait_move_end) {
   }
   return 2;
 }
+

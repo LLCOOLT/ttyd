@@ -382,7 +382,6 @@ void FontDrawStringMtx(Mtx mtx, const char* msg) {
 	}
 }
 
-
 static inline void fontDrawCodeEdgeX(u16 code, f32 x) {
 	if (fontEdge) {
 		GXColor save = fontColor;
@@ -551,7 +550,6 @@ void FontDrawMessage(s32 x, s32 y, const char* msg) {
 	}
 }
 
-
 void FontDrawMessageMtx(Mtx mtx, const char* msg) {
 	CameraEntry* camera;
 	u16 code;
@@ -651,7 +649,6 @@ u16 kanjiSearch(u32 code) {
 u16 kanjiGetWidth(u16 code) {
 	return fontGetWidth(code)->width;
 }
-
 
 u16 FontGetMessageWidthLine(const char* msg, u16* lines) {
 	u16 code;
@@ -918,9 +915,6 @@ void JUTFont_DrawStart(GXColor color) {
 	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
 }
 
-
-
-
 #pragma opt_lifetimes off
 void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	s16 x0, y0, y1;
@@ -1006,3 +1000,4 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 
 #pragma opt_lifetimes reset
 #pragma opt_common_subs reset
+

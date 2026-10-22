@@ -581,7 +581,7 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 			for (counter = 0, i = 0; i < 200; i++) {
 				member = BattleAudienceGetPtr(i);
 				if ((u8)BattleAudience_GetSysCtrl(i) == 1 && member->type == AUDIENCE_BULKY_BOBOMB &&
-						member->status == 18 && (member->field_0x12C--, member->field_0x12C <= 0)) {
+						member->status == 18 && (member->statusTimer--, member->statusTimer <= 0)) {
 					BattleAudience_ChangeStatus(i, 19);
 					counter++;
 				}
@@ -748,7 +748,7 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 						for (i = 0; i < 200; i++) {
 							if (check_exe_phase_evt_status(i, 8) && BattleAudienceGetPtr(i)->status != 17) {
 								BattleAudience_ChangeStatus(i, 17);
-								BattleAudienceGetPtr(i)->field_0x12C = 5;
+								BattleAudienceGetPtr(i)->statusTimer = 5;
 							}
 						}
 						CLR
@@ -866,7 +866,7 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 						k = list[irand(counter)];
 						member = BattleAudienceGetPtr(k);
 						BattleAudience_ChangeStatus(k, 18);
-						member->field_0x12C = 5;
+						member->statusTimer = 5;
 						CLR
 						break;
 					case 12:
@@ -915,7 +915,7 @@ BOOL BattleAudience_CheckReactionPerPhase(void) {
 			for (i = 0; i < 200; i++) {
 				member = BattleAudienceGetPtr(i);
 				if ((u8)BattleAudience_GetSysCtrl(i) == 1 && member->type == 8 && member->status == 17 &&
-						(member->field_0x12C--, member->field_0x12C <= 0)) {
+						(member->statusTimer--, member->statusTimer <= 0)) {
 					member->field_0x4 = 4;
 				}
 			}
@@ -2147,35 +2147,35 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 	nhw = -hw;
 	for (; i < 200; i++, m++) {
 		if (((u8*)dispGetCurWork())[1] != 2) {
-			if (m->field_0x44 != 0xFF) continue;
+			if (m->colorA != 0xFF) continue;
 		} else {
-			if (m->field_0x44 == 0xFF) continue;
+			if (m->colorA == 0xFF) continue;
 		}
 		if (!(m->flags & 1) || !(m->flags & 4)) continue;
 		if (m->type <= 11) {
 			TEXGetGXTexObjFromPalette((TEXPalette*)*audience->normalTex->data, &tex, m->field_0x1A);
 			GXLoadTexObj(&tex, GX_TEXMAP0);
-			AUD_F32(m, 0x54) = AUD_F32(m, 0x60) * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
-			AUD_F32(m, 0x58) = AUD_F32(m, 0x64) * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
+			m->scale.x = m->baseScale.x * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
+			m->scale.y = m->baseScale.y * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
 		} else {
 			for (k = 0; k < 2; k++) {
 				if (m->type == audience->guestType[k]) {
 					TEXGetGXTexObjFromPalette((TEXPalette*)*audience->guestTex[k]->data, &tex, m->field_0x1A);
 					GXLoadTexObj(&tex, GX_TEXMAP0);
-					AUD_F32(m, 0x54) = AUD_F32(m, 0x60) * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
-					AUD_F32(m, 0x58) = AUD_F32(m, 0x64) * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
+					m->scale.x = m->baseScale.x * ((AUD_F32(audience_kind + m->type * 8, 0x18) * (f32)GXGetTexObjWidth(&tex)) / 64.0f);
+					m->scale.y = m->baseScale.y * ((AUD_F32(audience_kind + m->type * 8, 0x1C) * (f32)GXGetTexObjHeight(&tex)) / 64.0f);
 					break;
 				}
 			}
 		}
-		ox = AUD_F32(m, 0xA8) * AUD_F32(m, 0x54);
-		oy = AUD_F32(m, 0xAC) * AUD_F32(m, 0x58);
-		oz = AUD_F32(m, 0xB0) * AUD_F32(m, 0x5C);
-		PSMTXScale(scl, AUD_F32(m, 0x54), AUD_F32(m, 0x58), AUD_F32(m, 0x5C));
+		ox = m->mRotationOffset.x * m->scale.x;
+		oy = m->mRotationOffset.y * m->scale.y;
+		oz = m->mRotationOffset.z * m->scale.z;
+		PSMTXScale(scl, m->scale.x, m->scale.y, m->scale.z);
 		{ f32 k = 0.017453289f;
-		a0 = AUD_F32(m, 0x9C) * k;
-		a1 = AUD_F32(m, 0xA0) * k;
-		a2 = AUD_F32(m, 0xA4) * k; }
+		a0 = m->mRotation.x * k;
+		a1 = m->mRotation.y * k;
+		a2 = m->mRotation.z * k; }
 		sx = sin(a0); cx = cos(a0);
 		sy = sin(a1); cy = cos(a1);
 		sz = sin(a2); cz = cos(a2);
@@ -2191,8 +2191,8 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		rot[2][0] = sy * cz + t1 * sz;
 		rot[2][1] = -sy * sz + t1 * cz;
 		rot[2][2] = cx * cy;
-		m->field_0x90 = (Vec){0.0f, 0.0f, -1.0f};
-		PSMTXMultVec(rot, &m->field_0x90, &m->field_0x90);
+		m->facingDir = (Vec){0.0f, 0.0f, -1.0f};
+		PSMTXMultVec(rot, &m->facingDir, &m->facingDir);
 		scl[0][3] += ox;
 		scl[1][3] += oy;
 		scl[2][3] += oz;
@@ -2215,17 +2215,17 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 	};
 		off = 0;
 		front = BattleAudience_GetFront(i);
-		cr = m->field_0x41; cg = m->field_0x42; cb = m->field_0x43; ca = m->field_0x44;
+		cr = m->colorR; cg = m->colorG; cb = m->colorB; ca = m->colorA;
 				if ((s32*)AUD_S32(m, 0x24) == m->animTable[9]) off = 8;
-		t0 = AUD_F32(m, 0xE8);
+		t0 = m->angle;
 		if (t0 >= 360.0f) {
-			AUD_F32(m, 0xE8) = t0 - 360.0f * (f32)(s32)(t0 / 360.0f);
+			m->angle = t0 - 360.0f * (f32)(s32)(t0 / 360.0f);
 		}
-		t0 = AUD_F32(m, 0xE8);
+		t0 = m->angle;
 		if (t0 < 0.0f) {
-			AUD_F32(m, 0xE8) = t0 + 360.0f * (f32)(1 - (s32)(t0 / 360.0f));
+			m->angle = t0 + 360.0f * (f32)(1 - (s32)(t0 / 360.0f));
 		}
-		t0 = AUD_F32(m, 0xE8);
+		t0 = m->angle;
 		if (t0 > 0.0f && t0 <= 180.0f) flip = 1;
 		if (t0 == 0.0f || (t0 > 180.0f && t0 < 360.0f)) flip = 0;
 		if ((u8)front == 1 && (cur = (s32*)AUD_S32(m, 0x24)) != m->animTable[9] && cur != m->animTable[8] && cur != m->animTable[7]) {
@@ -2234,9 +2234,9 @@ void BattleAudienceDispAudience(CameraId camId, void* param) {
 		if (flip == 1) off += 4;
 		GXSetChanMatColor(GX_COLOR0A0, (GXColor){cr, cg, cb, ca});
 		GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-		AUD_POS(nhw + AUD_F32(m, 0x6C), 40.0f + AUD_F32(m, 0x70), AUD_F32(m, 0x74));
+		AUD_POS(nhw + m->dispOffset.x, 40.0f + m->dispOffset.y, m->dispOffset.z);
 		AUD_TEX(uvs[off * 2], uvs[off * 2 + 1]);
-		AUD_POS(hw + AUD_F32(m, 0x6C), 40.0f + AUD_F32(m, 0x70), AUD_F32(m, 0x74));
+		AUD_POS(hw + m->dispOffset.x, 40.0f + m->dispOffset.y, m->dispOffset.z);
 		AUD_TEX(uvs[(off + 1) * 2], uvs[(off + 1) * 2 + 1]);
 		AUD_POSS(hw, 0.0f, 0.0f);
 		AUD_TEX(uvs[(off + 2) * 2], uvs[(off + 2) * 2 + 1]);
@@ -2385,10 +2385,10 @@ void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
 	m->field_0x30 = 0;
 	BattleAudience_SetAnim(index, 1, TRUE);
 	*((u8*)m + 0x40) = 0;
-	m->field_0x43 = 0;
-	m->field_0x42 = 0;
-	m->field_0x41 = 0;
-	m->field_0x44 = 255;
+	m->colorB = 0;
+	m->colorG = 0;
+	m->colorR = 0;
+	m->colorA = 255;
 	row = index / 20;
 	y = *(f32*)(stage + 0xB34);
 	m->position.y = y;
@@ -2405,13 +2405,13 @@ void BattleAudience_Entry_Sub(s32 index, s32 type, u8 status) {
 	}
 	*(Vec*)m->field_0x84 = (Vec){0.0f, 0.0f, 0.0f};
 	m->field_0x78 = *(Vec*)m->field_0x84;
-	m->field_0x90 = (Vec){0.0f, 0.0f, -1.0f};
+	m->facingDir = (Vec){0.0f, 0.0f, -1.0f};
 	m->mRotation = (Vec){0.0f, 0.0f, 0.0f};
 	m->mRotationOffset = (Vec){0.0f, 0.0f, 0.0f};
-	*(Vec*)m->field_0x54 = (Vec){1.0f, 1.0f, 1.0f};
-	m->field_0x60 = (Vec){1.0f, 1.0f, 1.0f};
-	m->field_0x6C = (Vec){0.0f, 0.0f, 0.0f};
-	m->field_0xE8 = 270.0f;
+	m->scale = (Vec){1.0f, 1.0f, 1.0f};
+	m->baseScale = (Vec){1.0f, 1.0f, 1.0f};
+	m->dispOffset = (Vec){0.0f, 0.0f, 0.0f};
+	m->angle = 270.0f;
 	if ((index >= 4 && index <= 15) || (index >= 24 && index <= 35) || (index >= 44 && index <= 55)) {
 		m->flags |= 8;
 	}
@@ -2637,7 +2637,7 @@ BOOL BattleAudience_GetFront(s32 index) {
 	dir.x = camera->cameraAt.x - camera->cameraPos.x;
 	dir.y = camera->cameraAt.y - camera->cameraPos.y;
 	dir.z = camera->cameraAt.z - camera->cameraPos.z;
-	return !(dir.x * member->field_0x90.x + dir.y * member->field_0x90.y + dir.z * member->field_0x90.z >= 0.0f);
+	return !(dir.x * member->facingDir.x + dir.y * member->facingDir.y + dir.z * member->facingDir.z >= 0.0f);
 }
 
 //@@ BattleAudience_ChangeStatus
@@ -2653,13 +2653,13 @@ void BattleAudience_ChangeStatus(s32 index, s32 status) {
 			}
 		}
 		else {
-			member->field_0x43 = 0;
-			member->field_0x42 = 0;
-			member->field_0x41 = 0;
-			member->field_0x44 = 0xFF;
+			member->colorB = 0;
+			member->colorG = 0;
+			member->colorR = 0;
+			member->colorA = 0xFF;
 			member->mRotation = (Vec){0.0f, 0.0f, 0.0f};
-			member->field_0x6C = (Vec){0.0f, 0.0f, 0.0f};
-			member->field_0x60 = (Vec){1.0f, 1.0f, 1.0f};
+			member->dispOffset = (Vec){0.0f, 0.0f, 0.0f};
+			member->baseScale = (Vec){1.0f, 1.0f, 1.0f};
 			member->field_0x78 = (Vec){0.0f, 0.0f, 0.0f};
 			member->field_0x30 = 0;
 			member->field_0x4 = 0;

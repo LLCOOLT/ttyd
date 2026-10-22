@@ -2101,7 +2101,7 @@ USER_FUNC(check_tabemono) {
 USER_FUNC(chk_fuki) {
     s32* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
-    NpcEntry* npc = npcGetWorkPtr()->field_0x10;
+    NpcEntry* npc = npcGetWorkPtr()->talkTarget;
 
     if (npc != NULL && strcmp(npc->description, name) == 0) {
         evtSetValue(event, args[1], TRUE);

@@ -25,43 +25,23 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
 
     cam = camGetCurPtr();
     switch (type) {
-    case 0: {
-        GXColor ca = { 0xDE, 0x0B, 0x16, 0 };
-        GXColor cb = { 0xFF, 0xF0, 0xF1, 0 };
-        ca.a = alpha;
-        cb.a = alpha;
-        cols[1] = ca;
-        cols[0] = cb;
+    case 0:
+        cols[1] = (GXColor){ 0xDE, 0x0B, 0x16, alpha };
+        cols[0] = (GXColor){ 0xFF, 0xF0, 0xF1, alpha };
         break;
-    }
-    case 1: {
-        GXColor ca = { 0x68, 0xC0, 0x03, 0 };
-        GXColor cb = { 0xEB, 0xFE, 0x6F, 0 };
-        ca.a = alpha;
-        cb.a = alpha;
-        cols[1] = ca;
-        cols[0] = cb;
+    case 1:
+        cols[1] = (GXColor){ 0x68, 0xC0, 0x03, alpha };
+        cols[0] = (GXColor){ 0xEB, 0xFE, 0x6F, alpha };
         break;
-    }
-    case 2: {
-        GXColor ca = { 0xFF, 0x56, 0x27, 0 };
-        GXColor cb = { 0xFF, 0xC5, 0x18, 0 };
-        ca.a = alpha;
-        cb.a = alpha;
-        cols[1] = ca;
-        cols[0] = cb;
+    case 2:
+        cols[1] = (GXColor){ 0xFF, 0x56, 0x27, alpha };
+        cols[0] = (GXColor){ 0xFF, 0xC5, 0x18, alpha };
         break;
-    }
     case 3:
-    default: {
-        GXColor ca = { 0xFF, 0xFF, 0xFF, 0 };
-        GXColor cb = { 0xFF, 0xFF, 0xFF, 0 };
-        ca.a = alpha;
-        cb.a = alpha;
-        cols[1] = ca;
-        cols[0] = cb;
+    default:
+        cols[1] = (GXColor){ 0xFF, 0xFF, 0xFF, alpha };
+        cols[0] = (GXColor){ 0xFF, 0xFF, 0xFF, alpha };
         break;
-    }
     }
 
     GXSetNumChans(1);
@@ -76,7 +56,6 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-
 
     lo = -24.0f;
     hi = 24.0f;
@@ -155,3 +134,4 @@ void effNumberGX(Mtx mtx, s32 type, s32 number, u8 alpha, s32 extra) {
     GXSetTevSwapModeTable(GX_TEV_SWAP1, GX_CH_RED, GX_CH_GREEN, GX_CH_BLUE, GX_CH_ALPHA);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
 }
+

@@ -60,10 +60,10 @@ typedef struct {
     CARDStat status; //0x30
     s32 result; //0x9C
     s32 currSlot; //0xA0
-    s32 unkA4; //0xA4
+    s32 opSlot; //0xA4, slot an operation reads (memcard_read offsets)
     CardData* data; //0xA8
-    void* unkAC; //0xAC, can be either metadata or save
-    CardSaveSlot* unkB0; //0xB0
+    void* readBuf; //0xAC, read buffer, holds metadata or a save slot
+    CardSaveSlot* writeBuf; //0xB0, save slot staged for writing
     BOOL validSave1; //0xB4, is main save valid?
     BOOL validSave2; //0xB8, is backup save valid?
     s32 unkBC; //0xBC
@@ -71,12 +71,12 @@ typedef struct {
     u8 unkC4[0xC8 - 0xC4]; //0xC4
     OSTime lastSaveTime1; //0xC8
     OSTime lastSaveTime2; //0xD0
-    s32 unkD8; //0xD8
+    s32 opStep; //0xD8, step within the current operation
     u8 unkDC[0xE0 - 0xDC]; //0xDC
-    s32 unkE0; //0xE0
-    s32 unkE4; //0xE4
+    s32 op; //0xE0, current operation (0 = idle, 8 = finishing/error)
+    s32 prevInserted; //0xE4, last CARDProbe result; a change sets flag 0x4000
     u8 unkE8[0xEC - 0xE8]; //0xE8
-    s32 unkEC; //0xEC
+    s32 busyFrames; //0xEC, counts down; nonzero keeps cardIsExec returning TRUE
 } CardWork;
 
 CardData* cardGetFilePtr(void);

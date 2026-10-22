@@ -270,6 +270,13 @@ void effFunemizuMain(EffectEntry* effect) {
     }
 }
 
+static inline void funemizuCallDL(u32 *p_u) {
+    u32 u = *p_u;
+    for (u = 0; u < 3; u++) {
+        GXCallDisplayList(funemizu_dl_0_tbl[u], funemizu_dl_0_size_tbl[u] * 32);
+    }
+    *p_u = u;
+}
 void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
     EffFunemizuWork* work = effect->userdata;
     Mtx trans;
@@ -350,9 +357,7 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 12);
             GXSetArray(GX_VA_TEX0, funemizu_texcoord0_tbl, 4);
-            { u8* sz2; u8** t2; for (u = 0, sz2 = funemizu_dl_0_size_tbl, t2 = funemizu_dl_0_tbl; u < 3; u++, sz2++, t2++) {
-                GXCallDisplayList(*t2, *sz2 * 32);
-            }}
+            funemizuCallDL(&u);
         } else {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
@@ -367,9 +372,9 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, gor_fune_texcoord0_tbl, 4);
-            { u8* sz2; u8** t2; for (u = 0, sz2 = gor_fune_dl_0_size_tbl, t2 = gor_fune_dl_0_tbl; u < 2; u++, sz2++, t2++) {
-                GXCallDisplayList(*t2, *sz2 * 32);
-            }}
+            for (u = 0; u < 2; u++) {
+                GXCallDisplayList(gor_fune_dl_0_tbl[u], gor_fune_dl_0_size_tbl[u] * 32);
+            }
         }
         PSMTXScale(scale, work->f1c, work->f24, work->f1c);
         PSMTXConcat(trans, scale, scale);
@@ -391,9 +396,9 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 12);
             GXSetArray(GX_VA_TEX0, funemizu_texcoord0_tbl, 4);
-            { u8* sz2; u8** t2; for (u = 0, sz2 = funemizu_dl_1_size_tbl, t2 = funemizu_dl_1_tbl; u < 4; u++, sz2++, t2++) {
-                GXCallDisplayList(*t2, *sz2 * 32);
-            }}
+            for (u = 0; u < 4; u++) {
+                GXCallDisplayList(funemizu_dl_1_tbl[u], funemizu_dl_1_size_tbl[u] * 32);
+            }
         } else {
             GXClearVtxDesc();
             GXSetVtxDesc(GX_VA_POS, GX_INDEX8);
@@ -408,9 +413,9 @@ void effFunemizuDisp(CameraId cameraId, EffectEntry* effect) {
             GXSetVtxDesc(GX_VA_TEX0, GX_INDEX8);
             GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_S16, 14);
             GXSetArray(GX_VA_TEX0, gor_fune_texcoord0_tbl, 4);
-            { u8* sz2; u8** t2; for (u = 0, sz2 = gor_fune_dl_1_size_tbl, t2 = gor_fune_dl_1_tbl; u < 2; u++, sz2++, t2++) {
-                GXCallDisplayList(*t2, *sz2 * 32);
-            }}
+            for (u = 0; u < 2; u++) {
+                GXCallDisplayList(gor_fune_dl_1_tbl[u], gor_fune_dl_1_size_tbl[u] * 32);
+            }
         }
     }
 }

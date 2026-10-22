@@ -12,6 +12,60 @@
 #include "system.h"
 #include <string.h>
 #include <stdlib.h>
+__declspec(section ".sdata2") u32 unk_80422fe4;
+__declspec(section ".sdata2") u32 unk_80422fe0;
+#define EXT_LIT(sym, val) (val)
+__declspec(section ".rodata") const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>\000\000\000";
+__declspec(section ".rodata") const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>\000\000";
+__declspec(section ".rodata") const char str_802C4E4C[12] = "\123\124\111\103\113\137\114\105\106\124\000";
+__declspec(section ".rodata") const char str_802C4E58[12] = "\102\125\124\124\117\116\137\114\000\000\000";
+__declspec(section ".rodata") const char str_802C4E64[12] = "\102\125\124\124\117\116\137\122\000\000\000";
+__declspec(section ".rodata") const char str_802C4E70[12] = "\120\101\104\137\130\137\117\116\000\000\000";
+__declspec(section ".rodata") const char str_802C4E7C[12] = "\120\101\104\137\131\137\117\116\000\000\000";
+__declspec(section ".rodata") const char str_802C4E88[12] = "\120\101\104\137\132\137\117\106\106\000\000";
+__declspec(section ".rodata") const char str_802C4E94[12] = "\120\101\104\137\123\124\137\117\106\106\000";
+__declspec(section ".rodata") const char str_802C4EA0[12] = "\142\154\141\143\153\137\153\145\171\000\000";
+__declspec(section ".rodata") const char str_802C4EAC[12] = "\101\116\115\137\120\101\104\137\101\000\000";
+__declspec(section ".rodata") const char str_802C4EB8[16] = "\101\116\115\137\123\124\111\103\113\137\122\111\107\110\124";
+__declspec(section ".rodata") const char str_802C4EC8[16] = "\101\116\115\137\120\101\104\137\123\124\101\122\124\000\000";
+__declspec(section ".rodata") const char str_802C4ED8[8] = "\120\115\137\131\137\061\102";
+__declspec(section ".rodata") const char str_802C4EE0[8] = "\120\115\137\131\137\062\102";
+__declspec(section ".rodata") const char str_802C4EE8[8] = "\120\115\137\106\137\061\102";
+__declspec(section ".rodata") const char str_802C4EF0[8] = "\120\115\137\106\137\063\102";
+__declspec(section ".rodata") const char str_802C4EF8[8] = "\120\115\137\103\137\061\102";
+__declspec(section ".rodata") const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
+__declspec(section ".rodata") const f64 double_to_int_802c4f08 = 4503601774854144;
+__declspec(section ".rodata") const f64 double_to_int_mask_802c4f10 = 4503599627370496;
+__declspec(section ".rodata") const char str_802C4F18[8] = "\153\145\171\170\157\156\000";
+__declspec(section ".rodata") const char str_802C4F20[12] = "\163\143\162\154\137\141\165\164\157\000\000";
+__declspec(section ".rodata") const char str_802C4F2C[12] = "\157\156\143\145\137\163\164\157\160\000\000";
+__declspec(section ".rodata") const char str_802C4F38[8] = "\057\163\143\141\154\145\000";
+__declspec(section ".rodata") const char str_802C4F40[8] = "\057\163\160\145\145\144\000";
+__declspec(section ".rodata") const char str_802C4F48[8] = "\144\171\156\141\155\151\143";
+__declspec(section ".rodata") const char str_802C4F50[12] = "\057\144\171\156\141\155\151\143\000\000\000";
+__declspec(section ".rodata") const char str_802C4F5C[8] = "\057\163\150\141\153\145\000";
+__declspec(section ".rodata") const char str_802C4F64[8] = "\057\156\157\151\163\145\000";
+__declspec(section ".rodata") const char str_802C4F6C[8] = "\163\171\163\164\145\155\000";
+__declspec(section ".rodata") const char str_802C4F74[8] = "\150\157\165\163\157\165\000";
+__declspec(section ".rodata") const char str_802C4F7C[8] = "\153\141\156\142\141\156\000";
+__declspec(section ".rodata") const char str_802C4F84[16] = "\045\150\144\045\150\144\045\150\144\045\150\144\000\000\000";
+__declspec(section ".rodata") const char str_802C4F94[8] = "\163\145\154\145\143\164\000";
+__declspec(section ".rodata") const char str_802C4F9C[16] = "\045\150\144\045\150\144\045\150\144\045\150\144\045\150\144";
+__declspec(section ".rodata") const char str_802C4FAC[8] = "\156\157\167\151\156\163\145";
+__declspec(section ".rodata") const char str_802C4FB4[12] = "\045\144\045\146\045\144\045\144\045\144\000";
+__declspec(section ".rodata") const char str_802C4FC0[12] = "\045\163\045\146\045\144\045\144\045\144\000";
+__declspec(section ".rodata") const char str_802C4FCC[16] = "\045\163\045\163\045\144\045\144\045\146\045\144\000\000\000";
+__declspec(section ".rodata") const char str_802C4FDC[8] = "\057\160\141\160\145\162\000";
+__declspec(section ".rodata") const char str_802C4FE4[8] = "\160\137\142\137\163\164\000";
+__declspec(section ".rodata") const char str_802C4FEC[12] = "\056\057\045\163\057\045\163\056\164\170\164";
+__declspec(section ".rodata") const char str_802C4FF8[8] = "\150\157\163\150\151\137\062";
+__declspec(section ".rodata") const char str_802C5000[8] = "\110\117\123\137\103\137\061";
+__declspec(section ".rodata") const char str_802C5008[8] = "\147\154\157\142\141\154\000";
+
+extern const char R_no_messages_JP[];
+extern const char R_no_messages_US[];
+// target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
+#pragma force_active on
 
 extern GlobalWork* gp;
 extern int sprintf(char* str, const char* format, ...);
@@ -22,8 +76,8 @@ extern int sscanf(const char* str, const char* format, ...);
 typedef struct MsgChar {
 	u32 value; //0x0
 	u16 glyph; //0x4
-	s16 field_0x6; //0x6
-	s16 field_0x8; //0x8
+	s16 x; //0x6 (page-break entries: page number)
+	s16 y; //0x8 (page-scroll entries: scroll amount)
 	u8 field_0xA[0xC - 0xA]; //0xA
 	u32 time; //0xC
 	u8 field_0x10[0x18 - 0x10]; //0x10
@@ -32,36 +86,36 @@ typedef struct MsgChar {
 typedef struct MsgWinData {
 	const char* tag; //0x0
 	u32 flags; //0x4
-	u16 field_0x8; //0x8
-	u16 field_0xA; //0xA
-	u16 field_0xC; //0xC
+	u16 curPage; //0x8, page being shown (page-break entries carry their page number)
+	u16 pageState; //0xA, 1: waiting for the key, 2: advance to the next page
+	u16 pageAdvanced; //0xC
 	u8 field_0xE[0x10 - 0xE]; //0xE
-	s32 field_0x10; //0x10
+	s32 nextEntry; //0x10, index into entries
 	u8 field_0x14[0x18 - 0x14]; //0x14
 	OSTime time18; //0x18
-	s32 field_0x20; //0x20
-	s32 field_0x24; //0x24
-	s32 field_0x28; //0x28
+	s32 playTime; //0x20, playback clock (ms) compared with entries[].time
+	s32 scrollTarget; //0x24
+	s32 scrollPos; //0x28, eases toward scrollTarget
 	u8 field_0x2C[0x30 - 0x2C]; //0x2C
 	OSTime time30; //0x30
 	s32 count; //0x38
 	MsgChar entries[0x500]; //0x3C
 	s32 page; //0x783C
-	s32 field_0x7840; //0x7840
+	s32 pageCount; //0x7840, number of pageY entries
 	s32 pageY[(0x79FC - 0x7844) / 4]; //0x7844
-	s32 field_0x79FC; //0x79FC
+	s32 callback; //0x79FC, void (*)(s32 event, smartEntry*), see MSG_CB
 	u8 field_0x7A00[0x7A04 - 0x7A00]; //0x7A00
 	char stayPose[0x20]; //0x7A04
 	s32 unitId; //0x7A24
 	s32 field_0x7A28; //0x7A28
-	u8 field_0x7A2C; //0x7A2C
+	u8 sfxVolume; //0x7A2C, default 0x7F
 	u8 field_0x7A2D[0x7A30 - 0x7A2D]; //0x7A2D
-	s32 field_0x7A30; //0x7A30
-	s16 field_0x7A34; //0x7A34
-	s16 field_0x7A36; //0x7A36
+	s32 parseTime; //0x7A30, msgAnalize state
+	s16 parseX; //0x7A34
+	s16 parseY; //0x7A36
 	s16 field_0x7A38; //0x7A38
 	s16 field_0x7A3A; //0x7A3A
-	s32 field_0x7A3C; //0x7A3C
+	s32 parseSpeed; //0x7A3C, text speed (default 25)
 	s8 numSel; //0x7A40
 	s8 defSel; //0x7A41
 	s8 cancel; //0x7A42
@@ -70,11 +124,11 @@ typedef struct MsgWinData {
 	s16 selY; //0x7A46
 	f32 cursorY; //0x7A48
 	WindowEntry* window; //0x7A4C
-	s32 field_0x7A50; //0x7A50
-	s32 field_0x7A54; //0x7A54
+	s32 talkTimer; //0x7A50, frames until the talk pose is set
+	s32 talkPoseSet; //0x7A54
 } MsgWinData;
 
-#define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->field_0x79FC)
+#define MSG_CB(d) (*(void (**)(s32, smartEntry*))&(d)->callback)
 #define WIN_DATA(w) ((MsgWinData*)(w)->userdata->address)
 #define WIN_TIME(w) (*(OSTime*)((u8*)(w) + 0x20))
 void msgWindow_Disp(CameraId camId, void* param);
@@ -102,28 +156,27 @@ typedef struct MsgIcon {
 	s32 value; //0x4
 } MsgIcon;
 
-const char R_no_messages_JP[] = "<col ff0000ff>\x83\x81\x83\x62\x83\x5A\x81\x5B\x83\x57\x82\xAA\x82\xA0\x82\xE8\x82\xDC\x82\xB9\x82\xF1</col>\n<key>";
-const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>";
 //.data
+#define STR(sym, lit) lit
 MsgIcon msgIcon[] = {
-	{"PAD_A", 0x64},
-	{"PAD_B", 0x66},
-	{"STICK_LEFT", 0x78},
-	{"STICK", 0x79},
-	{"AC_ON", 0x95},
-	{"BUTTON_L", 0x7E},
-	{"BUTTON_R", 0x80},
-	{"HM", 0x19F},
-	{"PAD_X", 0x68},
-	{"PAD_X_ON", 0x69},
-	{"PAD_Y", 0x6A},
-	{"PAD_Y_ON", 0x6B},
-	{"PAD_Z_OFF", 0x82},
-	{"PAD_ST_OFF", 0x84},
-	{"black_key", 0x130},
-	{"ANM_PAD_A", 0x20B},
-	{"ANM_STICK_RIGHT", 0x20C},
-	{"ANM_PAD_START", 0x20D}
+	{STR(str_8041A4B0, "PAD_A"), 0x64},
+	{STR(str_8041A4B8, "PAD_B"), 0x66},
+	{str_802C4E4C, 0x78},
+	{STR(str_8041A4C0, "STICK"), 0x79},
+	{STR(str_8041A4C8, "AC_ON"), 0x95},
+	{str_802C4E58, 0x7E},
+	{str_802C4E64, 0x80},
+	{STR(str_8041A4D0, "HM"), 0x19F},
+	{STR(str_8041A4D4, "PAD_X"), 0x68},
+	{str_802C4E70, 0x69},
+	{STR(str_8041A4DC, "PAD_Y"), 0x6A},
+	{str_802C4E7C, 0x6B},
+	{str_802C4E88, 0x82},
+	{str_802C4E94, 0x84},
+	{str_802C4EA0, 0x130},
+	{str_802C4EAC, 0x20B},
+	{str_802C4EB8, 0x20C},
+	{str_802C4EC8, 0x20D}
 };
 
 s32 msgWindowOpen_SE_Data[] = {
@@ -136,27 +189,24 @@ s32 msgWindowOpen_SE_Data[] = {
 MessageWork msgWork;
 BOOL msgSEflag; //msgSEInit and related functions are unused
 void* msgSortDvdData; //TODO: re-type
+__declspec(section ".sdata") u16 g5_active_s772;
 
 //.sdata
 MessageWork* msgw = &msgWork;
 const char* ErrMessage[2] = {R_no_messages_JP, R_no_messages_US};
-const char* paperPoseTbl[6] = {
-	"PM_Y_1B", "PM_Y_2B", "PM_F_1B",
-	"PM_F_3B", "PM_C_1B", "PM_C_2B"
+__declspec(section ".sdata") const char* paperPoseTbl[6] = {
+	str_802C4ED8, str_802C4EE0, str_802C4EE8,
+	str_802C4EF0, str_802C4EF8, str_802C4F00
 };
-const char* language_dir[2] = {"msg", "emsg"};
-
-
-
-
+const char* language_dir[2] = {STR(str_8041A4E4, "msg"), STR(str_8041A4E8, "emsg")};
 
 //local prototypes
 int msg_compare(const void* a, const void* b);
 void msgDispKeyWait_render(s32 wXluStage);
 
 void msgInit(void) {
-	msgw->poseId = animPoseEntry("hoshi_2", 2);
-	animPoseSetAnim(msgw->poseId, "HOS_C_1", TRUE);
+	msgw->poseId = animPoseEntry(str_802C4FF8, 2);
+	animPoseSetAnim(msgw->poseId, str_802C5000, TRUE);
 	animPoseSetMaterialFlagOn(msgw->poseId, 0x1800);
 	animPoseSetMaterialFlagOff(msgw->poseId, 0x40);
 	animPoseSetGXFunc(msgw->poseId, msgDispKeyWait_render, 0);
@@ -164,7 +214,7 @@ void msgInit(void) {
 	msgw->entries[0].lookup = NULL;
 	msgw->entries[1].address = NULL;
 	msgw->entries[1].lookup = NULL;
-	msgLoad("global\0", 1);
+	msgLoad(str_802C5008, 1);
 }
 
 void msgLoad(const char* filename, s32 index) {
@@ -180,7 +230,7 @@ void msgLoad(const char* filename, s32 index) {
 	char dvdpath[128]; //TODO: double check size
 
 	entry = &msgw->entries[index];
-	sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
+	sprintf(filepath, str_802C4FEC, language_dir[gp->language], filename);
 	
 	if (entry->address) {
 		if (index == 1) {
@@ -191,7 +241,7 @@ void msgLoad(const char* filename, s32 index) {
 	entry->length = 0;
 
 	if (!entry->address) {
-		sprintf(dvdpath, "%s/%s", getMarioStDvdRoot(), filepath);
+		sprintf(dvdpath, STR(str_8041A6A4, "%s/%s"), getMarioStDvdRoot(), filepath);
 		dvd = DVDMgrOpen(dvdpath, 2, 0);
 		if (dvd) {
 			entry->length = DVDMgrGetLength(dvd);
@@ -248,9 +298,9 @@ void msgLoad(const char* filename, s32 index) {
 
 static inline void msgAddPage(smartEntry* smart, s32 y) {
 	MsgWinData* d = smart->address;
-	if (!(d->flags & 0x200) && d->field_0x7840 < 110) {
-		if (d->field_0x7840 == 0 || d->pageY[d->field_0x7840 - 1] != y) {
-			d->pageY[d->field_0x7840++] = y;
+	if (!(d->flags & 0x200) && d->pageCount < 110) {
+		if (d->pageCount == 0 || d->pageY[d->pageCount - 1] != y) {
+			d->pageY[d->pageCount++] = y;
 		}
 	}
 }
@@ -272,7 +322,7 @@ static inline void msgCheckSkip(smartEntry* smart, MsgWinData* data) {
 static inline void msgVoiceSE(smartEntry* smart) {
 	MsgWinData* d = smart->address;
 	if (d->window->type != 1 && !msgSEflag) {
-		psndSFXOnVol((const char*)0x20044, d->field_0x7A2C);
+		psndSFXOnVol((const char*)0x20044, d->sfxVolume);
 		msgSEflag = 1;
 	}
 }
@@ -292,27 +342,27 @@ s32 msgMain(smartEntry* smart) {
 		data->flags &= ~2;
 		msgAddPage(smart, 0);
 	}
-	if (data->field_0x24 > data->field_0x28) {
-		data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+	if (data->scrollTarget > data->scrollPos) {
+		data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		msgCheckSkip(smart, data);
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
-			data->field_0x28 += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
+			data->scrollPos += 0.36f * OSTicksToMilliseconds(gp->renderTime - data->time30);
 		}
-		if (data->field_0x24 < data->field_0x28) {
-			data->field_0x28 = data->field_0x24;
+		if (data->scrollTarget < data->scrollPos) {
+			data->scrollPos = data->scrollTarget;
 		}
 		data->time30 = gp->renderTime;
 		return 3;
 	}
-	switch (data->field_0xA) {
+	switch (data->pageState) {
 	case 1:
 		return 2;
 	case 2:
-		data->field_0xC = 1;
-		data->field_0x8++;
-		data->field_0xA = 0;
+		data->pageAdvanced = 1;
+		data->curPage++;
+		data->pageState = 0;
 		psndSFXOn((const char*)0x2003D);
-		data->field_0x20 += 100;
+		data->playTime += 100;
 		if (MSG_CB(data)) {
 			MSG_CB(data)(3, smart);
 		}
@@ -323,13 +373,13 @@ s32 msgMain(smartEntry* smart) {
 		if (!(data->flags & 0x10) && (data->flags & 4)) {
 			ms *= 100;
 		}
-		data->field_0x20 += ms;
+		data->playTime += ms;
 		break;
 	}
 	data->time30 = gp->renderTime;
-	entry = &data->entries[data->field_0x10];
-	for (i = data->field_0x10; i < 0x500; i++, entry++) {
-		if (entry->time > data->field_0x20) {
+	entry = &data->entries[data->nextEntry];
+	for (i = data->nextEntry; i < 0x500; i++, entry++) {
+		if (entry->time > data->playTime) {
 			break;
 		}
 		switch (entry->glyph) {
@@ -337,12 +387,12 @@ s32 msgMain(smartEntry* smart) {
 			if (MSG_CB(data)) {
 				MSG_CB(data)(1, smart);
 			}
-			data->field_0x10 = i;
+			data->nextEntry = i;
 			return 0;
 		case 0xFFFE:
-			if (entry->field_0x6 == data->field_0x8) {
-				data->field_0xA = 1;
-				data->field_0x20 = entry->time;
+			if (entry->x == data->curPage) {
+				data->pageState = 1;
+				data->playTime = entry->time;
 				data->flags &= ~4;
 				if (MSG_CB(data)) {
 					MSG_CB(data)(2, smart);
@@ -350,13 +400,13 @@ s32 msgMain(smartEntry* smart) {
 			}
 			break;
 		case 0xFFFD:
-			data->field_0x24 -= entry->field_0x8;
-			data->field_0x20 = entry->time;
-			msgAddPage(smart, data->field_0x24);
+			data->scrollTarget -= entry->y;
+			data->playTime = entry->time;
+			msgAddPage(smart, data->scrollTarget);
 			break;
 		case 0xFFFC:
-			data->field_0x10 = i + 1;
-			data->field_0x20 = entry->time;
+			data->nextEntry = i + 1;
+			data->playTime = entry->time;
 			data->flags &= ~4;
 			return 1;
 		case 0xFFFB:
@@ -368,13 +418,13 @@ s32 msgMain(smartEntry* smart) {
 			data->field_0x7A28 = entry->value;
 			break;
 		case 0xFFF9:
-			data->field_0x7A2C = entry->value;
+			data->sfxVolume = entry->value;
 			break;
 		case 0xFFF5:
 			if (entry->value) {
 				data->flags |= 0x80;
 				data->flags &= ~4;
-				data->field_0x20 = entry->time;
+				data->playTime = entry->time;
 			}
 			else {
 				data->flags &= ~0x80;
@@ -385,13 +435,13 @@ s32 msgMain(smartEntry* smart) {
 			if (!npc) {
 				npc = npcNameToPtr(data->stayPose);
 			}
-			animPoseSetPaperAnimGroup(npc->poseId, "p_b_st", 1);
+			animPoseSetPaperAnimGroup(npc->poseId, str_802C4FE4, 1);
 			animPosePaperPeraOn(npc->poseId);
 			animPoseSetPaperAnim(npc->poseId, paperPoseTbl[entry->time], 1);
 			break;
 		case 0xFFF2:
 			npc = (NpcEntry*)entry->value;
-			if (data->field_0xA) {
+			if (data->pageState) {
 				i--;
 				break;
 			}
@@ -412,20 +462,19 @@ s32 msgMain(smartEntry* smart) {
 			}
 			else if (entry->value & 8) {
 				if (((MsgWinData*)smart->address)->window->type != 3) {
-					((MsgWinData*)smart->address)->field_0x7A50 = 15;
+					((MsgWinData*)smart->address)->talkTimer = 15;
 				}
 				msgVoiceSE(smart);
 			}
 			break;
 		}
 	}
-	data->field_0x10 = i;
-	if (data->field_0xA) {
+	data->nextEntry = i;
+	if (data->pageState) {
 		return 2;
 	}
 	return 3;
 }
-
 
 typedef struct MsgDispChar {
 	u32 value; //0x0
@@ -454,6 +503,7 @@ void FontDrawCode(f32 x, f32 y, u16 code);
 void FontDrawCodeMtx(Mtx mtx, u16 code);
 
 #pragma dont_inline on
+BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y);
 BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 	s32 hide;
 	s32 al;
@@ -472,12 +522,12 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 
 	FontDrawStart_alpha(alpha);
 	al = alpha;
-	for (i = 0; i < data->field_0x10; i++, c++) {
+	for (i = 0; i < data->nextEntry; i++, c++) {
 		switch (c->glyph) {
 			case 0xFFFF:
 				return FALSE;
 			case 0xFFFE:
-				if (data->field_0x8 == c->x) {
+				if (data->curPage == c->x) {
 					ret = TRUE;
 				}
 				break;
@@ -495,10 +545,10 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 			case 0xFFF4:
 				col = FontGetDrawColor();
 				PSMTXIdentity(m);
-				if (c->rot >= 90.0f && c->rot <= 270.0f) {
+				if (c->rot >= EXT_LIT(float_90_8041a680, 90.0f) && c->rot <= EXT_LIT(float_270_8041a684, 270.0f)) {
 					PSMTXScaleApply(m, m, 1.0f, 1.0f, -1.0f);
 				}
-				PSMTXTransApply(m, m, x + c->x, c->y + (y + data->field_0x28) - 40.0f, 0.0f);
+				PSMTXTransApply(m, m, x + c->x, c->y + (y + data->scrollPos) - 40.0f, EXT_LIT(float_0_8041a514, 0.0f));
 				animPoseMain((s32)c->value);
 				animPoseDrawMtx((s32)c->value, m, 2, c->rot, c->scale);
 				FontDrawStart_alpha(alpha);
@@ -515,27 +565,27 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				hide = 0;
 				a = 0xFF;
 				sx = x + c->x;
-				sy = c->y + (y + data->field_0x28);
+				sy = c->y + (y + data->scrollPos);
 				if (data->flags & 0x40) {
 					page = data->page;
 					py = data->pageY[page];
-					if (data->field_0x28 == py) {
+					if (data->scrollPos == py) {
 						if (c->y + data->pageY[page + 1] <= 0) {
 							break;
 						}
 						hide = 1;
 					}
-					else if (data->field_0x28 < py) {
+					else if (data->scrollPos < py) {
 						if (c->y + py > 0) {
 							hide = 1;
 						}
 						else {
-							d = py - data->field_0x28;
+							d = py - data->scrollPos;
 							if (d > 100) {
 								d = 100;
 							}
 							a = (100 - d) * 255 / 100;
-							if (page != data->field_0x7840 - 1) {
+							if (page != data->pageCount - 1) {
 								if (c->y + data->pageY[page + 1] <= 0) {
 									break;
 								}
@@ -553,12 +603,12 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 							hide = 1;
 						}
 						else {
-							d = data->field_0x28 - py;
+							d = data->scrollPos - py;
 							if (d > 100) {
 								d = 100;
 							}
 							a = d * 255 / 100;
-							if (page != data->field_0x7840 - 2) {
+							if (page != data->pageCount - 2) {
 								if (c->y + data->pageY[page + 2] <= 0) {
 									break;
 								}
@@ -574,15 +624,15 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 				}
 				if (c->glyph == 0xFFF8) {
 					col4 = FontGetDrawColor();
-					pos.x = 20.0f + (x + c->x);
-					pos.y = c->iconY + (c->y + (y + data->field_0x28) - 40.0f);
-					pos.z = 0.0f;
+					pos.x = EXT_LIT(float_28_8041a550, 20.0f) + (x + c->x);
+					pos.y = c->iconY + (c->y + (y + data->scrollPos) - 40.0f);
+					pos.z = EXT_LIT(float_0_8041a514, 0.0f);
 					iconDispGxAlpha(&pos, 0x10, (u16)c->value, a * al / 255, c->scale);
 					FontDrawStart_alpha(alpha);
 					FontDrawColor(col4);
 					break;
 				}
-				if ((f32)(c->y + data->field_0x28) >= 32.0f * c->scale - 10.0f) {
+				if ((f32)(c->y + data->scrollPos) >= EXT_LIT(float_32_8041a588, 32.0f) * c->scale - 10.0f) {
 					break;
 				}
 				if (hide) {
@@ -610,13 +660,13 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 						hx = sx + irand(10000) % 3;
 						hy = sy + irand(10000) % 3;
 					}
-					PSMTXTrans(m2, -w, 12.0f, 0.0f);
+					PSMTXTrans(m2, -w, EXT_LIT(float_12_8041a68c, 12.0f), EXT_LIT(float_0_8041a514, 0.0f));
 					PSMTXScaleApply(m2, m2, c->rot, c->rot, c->rot);
-					PSMTXTransApply(m2, m2, (u32)w, -12.0f, 0.0f);
+					PSMTXTransApply(m2, m2, (u32)w, EXT_LIT(float_neg12_8041a690, -12.0f), EXT_LIT(float_0_8041a514, 0.0f));
 					PSMTXScaleApply(m2, m2, c->scale, c->scale, c->scale);
-					PSMTXTransApply(m2, m2, hx, hy, 0.0f);
+					PSMTXTransApply(m2, m2, hx, hy, EXT_LIT(float_0_8041a514, 0.0f));
 					FontDrawCodeMtx(m2, c->glyph);
-					c->rot = 1.0f + 0.5f * (c->rot - 1.0f);
+					c->rot = EXT_LIT(float_1_8041a52c, 1.0f) + EXT_LIT(float_0p5_8041a534, 0.5f) * (c->rot - 1.0f);
 				}
 				else if (c->value & 2) {
 					hy = sx + irand(10000) % 3;
@@ -629,12 +679,12 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 					hx = cos(t);
 					hy = sin(t);
 					FontDrawScale(c->scale);
-					FontDrawCode(sx + 3.2f * hx, sy - 3.2f * hy, c->glyph);
+					FontDrawCode(sx + EXT_LIT(float_3p2_8041a69c, 3.2f) * hx, sy - 3.2f * hy, c->glyph);
 				}
 				else if (c->value & (0x100 << data->sel)) {
 					f32 hx2;
-					t = 0.01f * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
-					hx2 = sx + 3.2f * (f32)cos(t);
+					t = EXT_LIT(float_0p01_8041a694, 0.01f) * OSTicksToMilliseconds(gp->renderTime - data->time18) - 0.02f * sx;
+					hx2 = sx + EXT_LIT(float_3p2_8041a69c, 3.2f) * (f32)cos(t);
 					hy = sy - 3.2f * (f32)sin(t);
 					FontDrawScale(c->scale);
 					{
@@ -648,7 +698,7 @@ BOOL msgDisp(smartEntry* smart, u8 alpha, f32 x, f32 y) {
 						GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 						FontDrawColor(white);
 					}
-					FontDrawCode(hx2 - 4.0f, 4.0f + hy, c->glyph);
+					FontDrawCode(hx2 - 4.0f, EXT_LIT(float_4_8041a67c, 4.0f) + hy, c->glyph);
 					FontDrawEdgeOff();
 					FontDrawRainbowColorOff();
 					FontDrawColorIDX(0);
@@ -701,7 +751,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	u16 width;
 	u32 flags;
 	s16 x;
-	s32 y;
+	s16 y; // s16 in the original: extsh before every int->float use (0x20b0, 0x2b98) and after <pos> (0x23b0)
 	s32 time;
 	s16 rubyX;
 	char tag[0x80];
@@ -722,9 +772,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 i34;
 	MsgWinData* data2;
 	s32 i30;
-	f32 iconScale;
 	s32 i28;
 	s32 i24;
+	f32 iconScale;
 	s32 i20;
 	f32 f1c;
 	s32 i18;
@@ -752,18 +802,18 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	window = data->window;
 	entry = (MsgAChar*)(&data->entries[data->count]);
 	flags = 0;
-	maxScale = 0.0f;
-	scale = 1.0f;
+	maxScale = EXT_LIT(float_0_8041a514, 0.0f);
+	scale = EXT_LIT(float_1_8041a52c, 1.0f);
 	if (window->type < 0) {
 		window->type = 0;
 	}
-	time = data->field_0x7A30;
+	time = data->parseTime;
 	s234 = 0;
 	s232 = data->field_0x7A38;
-	x = data->field_0x7A34;
+	x = data->parseX;
 	s230 = data->field_0x7A3A;
-	y = data->field_0x7A36;
-	step = data->field_0x7A3C;
+	y = data->parseY;
+	step = data->parseSpeed;
 	switch (window->type) {
 	case 3:
 	case 8:
@@ -796,7 +846,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			ww = scale * (( f32)(width + 4) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (( s32)(10.0f * scale) );
+			entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
 			entry->scale = scale;
 			entry->value = flags;
 			if (( *( (u16*)msg )) == 0x8145) {
@@ -822,9 +872,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 		case 0:
 			entry->glyph = 0xFFFF;
 			entry->time = time;
-			data->field_0x7A30 = time;
-			data->field_0x7A34 = x;
-			data->field_0x7A36 = y;
+			data->parseTime = time;
+			data->parseX = x;
+			data->parseY = y;
 			data->field_0x7A38 = s232;
 			data->field_0x7A3A = s230;
 			return;
@@ -832,16 +882,16 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			entry->glyph = 0xFFFB;
 			entry->time = time;
 			x = 0;
-			if (0.0f == maxScale) {
+			if (EXT_LIT(float_0_8041a514, 0.0f) == maxScale) {
 				maxScale = 1.0f;
 			}
-			y -= 32.0f * maxScale;
-			s230 -= 32.0f * maxScale;
+			y -= EXT_LIT(float_32_8041a588, 32.0f) * maxScale;
+			s230 -= EXT_LIT(float_32_8041a588, 32.0f) * maxScale;
 			msg++;
 			entry++;
 			time += step;
 			data->count++;
-			maxScale = 0.0f;
+			maxScale = EXT_LIT(float_0_8041a514, 0.0f);
 			if (data->flags & 0x20) {
 				flags = (flags & (~0xFF00)) | (0x100 << data->numSel);
 				data->numSel++;
@@ -858,9 +908,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry++;
 				data->count++;
 				s232++;
-			} else if (strcmp(tag, "keyxon") == 0) {
+			} else if (strcmp(tag, str_802C4F18) == 0) {
 				data->flags |= 0x100;
-			} else if (( strcmp(tag, "p") == 0 ) || ( strcmp(tag, "scrl_auto") == 0) ) {
+			} else if (( strcmp(tag, "p") == 0 ) || ( strcmp(tag, str_802C4F20) == 0) ) {
 				if (s230 != 0) {
 					entry->glyph = 0xFFFD;
 					entry->y = s230 - 3;
@@ -872,7 +922,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					s230 = 0;
 					data->count++;
 				}
-			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, "once_stop") == 0) ) {
+			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, str_802C4F2C) == 0) ) {
 				entry->glyph = 0xFFFC;
 				entry->time = time;
 				time += 0x32;
@@ -887,23 +937,23 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				s230 = -v44;
 			} else if (strcmp(tag, "scale") == 0) {
 				sscanf(args, "%f", &scale);
-			} else if (strcmp(tag, "/scale") == 0) {
+			} else if (strcmp(tag, str_802C4F38) == 0) {
 				scale = 1.0f;
 			} else if (strcmp(tag, "wait") == 0) {
 				sscanf(args, "%d", &v40);
 				time += v40;
 			} else if (strcmp(tag, "speed") == 0) {
 				sscanf(args, "%d", &step);
-			} else if (strcmp(tag, "/speed") == 0) {
-				step = data->field_0x7A3C;
-			} else if (strcmp(tag, "dynamic") == 0) {
+			} else if (strcmp(tag, str_802C4F40) == 0) {
+				step = data->parseSpeed;
+			} else if (strcmp(tag, str_802C4F48) == 0) {
 				sscanf(args, "%f", &fv);
 				flags |= 1;
-			} else if (strcmp(tag, "/dynamic") == 0) {
+			} else if (strcmp(tag, str_802C4F50) == 0) {
 				flags &= ~1;
 			} else if (strcmp(tag, "shake") == 0) {
 				flags |= 2;
-			} else if (strcmp(tag, "/shake") == 0) {
+			} else if (strcmp(tag, str_802C4F5C) == 0) {
 				flags &= ~2;
 			} else if (strcmp(tag, "wave") == 0) {
 				flags |= 4;
@@ -927,7 +977,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->time = time;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, "/noise") == 0) {
+			} else if (strcmp(tag, str_802C4F64) == 0) {
 				entry->value = 0;
 				entry->glyph = 0xFFF6;
 				entry++;
@@ -947,8 +997,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "plate") == 0) {
 				window->type = 2;
 				step = 0;
-				data->field_0x7A3C = 0;
-			} else if (strcmp(tag, "system") == 0) {
+				data->parseSpeed = 0;
+			} else if (strcmp(tag, str_802C4F6C) == 0) {
 				static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
 				window->type = 3;
 				entry->value = *(( u32*)(&c) );
@@ -968,30 +1018,30 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				window->type = 9;
 			} else if (strcmp(tag, "diary") == 0) {
 				window->type = 7;
-			} else if (strcmp(tag, "housou") == 0) {
+			} else if (strcmp(tag, str_802C4F74) == 0) {
 				window->type = 10;
 			} else if (strcmp(tag, "boss") == 0) {
 				window->type = 6;
-			} else if (strcmp(tag, "kanban") == 0) {
+			} else if (strcmp(tag, str_802C4F7C) == 0) {
 				window->type = 4;
 				step = 0;
-				data->field_0x7A3C = 0;
+				data->parseSpeed = 0;
 			} else if (strcmp(tag, "small") == 0) {
 				window->type = 1;
 				data->flags |= 0x10;
 			} else if (strcmp(tag, "clear") == 0) {
 				window->type = 11;
 			} else if (strcmp(tag, "wpos") == 0) {
-				sscanf(args, "%hd%hd%hd%hd", &w16, &w14, &w12, &w10);
+				sscanf(args, str_802C4F84, &w16, &w14, &w12, &w10);
 				window->flags |= 4;
 				window->x = w16;
 				window->y = w14;
 				window->height = w12;
 				window->width = w10;
-			} else if (strcmp(tag, "select") == 0) {
+			} else if (strcmp(tag, str_802C4F94) == 0) {
 				window->type = 5;
 				data->flags |= 0x20;
-				sscanf(args, "%hd%hd%hd%hd%hd", &sel0, &sel1, &data->selWidth, &data->selY);
+				sscanf(args, str_802C4F9C, &sel0, &sel1, &data->selWidth, &data->selY);
 				flags |= 0x100;
 				data->defSel = sel0;
 				data->cancel = sel1;
@@ -1007,14 +1057,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->glyph = 0xFFF9;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, "nowinse") == 0) {
+			} else if (strcmp(tag, str_802C4FAC) == 0) {
 				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
-				isHM =(unsigned long long)  FALSE;
+				isHM = FALSE;
 				if ((( (s8) args [0] ) >= '0') && (((s8) args [0]) <= '9') ) {
-					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
+					sscanf(args, str_802C4FB4, &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
-					sscanf(args, "%s%f%d%d%d", name, &iconScale, &i38, &i34, &i30);
+					sscanf(args, str_802C4FC0, name, &iconScale, &i38, &i34, &i30);
 					if (strcmp(name, "HM") == 0) {
 						isHM = TRUE;
 					}
@@ -1027,7 +1077,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					entry->value = iconId;
 					iconGetWidthHight(&iw, &ih, (u16)iconId);
 					entry->glyph = 0xFFF8;
-					entry->x = (x + (( 0.5f * iw ) * iconScale) ) + i38;
+					entry->x = (x + (( EXT_LIT(float_0p5_8041a534, 0.5f) * iw ) * iconScale) ) + i38;
 					x += 0x28;
 					entry->y = y - ( ih * iconScale) ;
 					entry->extra = i34;
@@ -1042,7 +1092,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					iw = scale * (( f32)(width + 4) );
 					entry->glyph = glyph;
 					entry->x = x;
-					entry->y = y - (( s32)(10.0f * scale) );
+					entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
 					entry->scale = scale;
 					entry->value = flags;
 					entry->value |= 8;
@@ -1060,7 +1110,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					data->count++;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
-				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
+				sscanf(args, str_802C4FCC, anim1, anim2, &i28, &i24, &f1c, &i20);
 				entry->value = animPoseEntry(anim1, 2);
 				animPoseSetAnim(entry->value, anim2, 1);
 				animPoseSetMaterialFlagOn(entry->value, 0x1800);
@@ -1070,7 +1120,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->x = i28;
 				entry->y = s234 - i24;
 				entry->scale = f1c;
-				entry->dyn = (i20 == 0) ? ( 0.0f ) : ( 180.0f) ;
+				entry->dyn = (i20 == 0) ? ( EXT_LIT(float_0_8041a514, 0.0f) ) : ( EXT_LIT(float_180_8041a568, 180.0f)) ;
 				entry++;
 				time += step;
 				data->count++;
@@ -1081,7 +1131,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->time = i18;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, "/paper") == 0) {
+			} else if (strcmp(tag, str_802C4FDC) == 0) {
 				sscanf(args, "%s", paper2);
 				entry->value = (strcmp(paper2, "me") != 0) ? (( u32)npcNameToPtr(paper2) ) : ( 0) ;
 				entry->glyph = 0xFFF2;
@@ -1096,33 +1146,33 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				i = 1;
 				if (((s8*)tag)[0] != 'R') { i = 2;
 				}
-				if (data2->window->type == 1) {
+				if (data->window->type == 1) {  // correctness: data2 only set by the "r" tag branch
 					continue;
 				}
 				half = ((s32)strlen(tag + i)) / 2;
 				total = 0;
 				j = i;
-				isHM = i;
-				p = tag + isHM;
+				p = tag;
+				p = p + i;
 				for (k = 0; k < half; k++) {
 					glyph = kanjiSearch(*(( u16*)p) );
 					width = kanjiGetWidth((u16)(glyph + 0));
-					total += (s32)(0.55f * (scale * (( f32)(width + 4) )));
+					total += (s32)(EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(width + 4) )));
 					p += 2;
 					j += 2;
 				}
-				rubyW = (u16)total; rubyW = rubyW - ( 0.55f * (4.0f * scale)) ;
-				rubyX = (( ((f32)(rubyX + x) ) - ( 4.0f * scale )) - ( (f32)rubyW) ) * 0.5f;
+				rubyW = (u16)total; rubyW = rubyW - ( EXT_LIT(float_0p55_8041a678, 0.55f) * (EXT_LIT(float_4_8041a67c, 4.0f) * scale)) ;
+				rubyX = (( ((f32)(rubyX + x) ) - ( EXT_LIT(float_4_8041a67c, 4.0f) * scale )) - ( (f32)rubyW) ) * EXT_LIT(float_0p5_8041a534, 0.5f);
 				p = tag; p = p + i;
 				for (k = 0; ( k - 1) < ( half- 1) ; k++) {
 					glyph = kanjiSearch(*(( u16*)p) );
 					width = kanjiGetWidth((u16)(glyph + 0));
-					ww = 0.55f * (scale * (( f32)(width + 4) ));
+					ww = EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(width + 4) ));
 					entry->glyph = glyph;
 					entry->x = rubyX;
 					s230 = y;
 					entry->y = s230;
-					entry->scale = 0.55f * scale;
+					entry->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * scale;
 					entry->value = flags;
 					if (flags & 1) {
 						entry->dyn = fv;
@@ -1150,7 +1200,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			ww = scale * (( f32)(width + 2) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (( s32)(10.0f * scale) );
+			entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
 			entry->scale = scale;
 			entry->value = flags;
 			if (( *( (s8*)msg )) != ' ') {
@@ -1167,7 +1217,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			msg++;
 			time += step;
 			entry++;
-			data2->count++;
+			data->count++;  // correctness: data2 is only set on one branch (NULL read-modify-write of +0x38)
 			continue;
 		}
 	}
@@ -1300,18 +1350,18 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	memset(data, 0, 0x7A58);
 	data->window = window;
 	data->flags = 3;
-	data->field_0x79FC = field_0x79FC;
+	data->callback = field_0x79FC;
 	data->time30 = gp->renderTime;
 	data->time18 = gp->renderTime;
 	data->field_0x7A28 = 0;
-	data->field_0x7A2C = 0x7F;
-	data->field_0x7A30 = 0;
-	data->field_0x7A34 = 0;
-	data->field_0x7A36 = 0;
+	data->sfxVolume = 0x7F;
+	data->parseTime = 0;
+	data->parseX = 0;
+	data->parseY = 0;
 	data->field_0x7A38 = 0;
 	data->field_0x7A3A = 0;
-	data->field_0x7A3C = 25;
-	data->field_0x7840 = 0;
+	data->parseSpeed = 25;
+	data->pageCount = 0;
 	msgAnalize(smart, copy);
 	if (window->type == 1) {
 		data->flags |= 0x200;
@@ -1319,8 +1369,8 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	__memFree(HEAP_DEFAULT, copy);
 	window->userdata = smart;
 	data = window->userdata->address;
-	data->field_0x7A50 = 0;
-	data->field_0x7A54 = 0;
+	data->talkTimer = 0;
+	data->talkPoseSet = 0;
 	switch (window->type) {
 	case 11:
 		window->main = msgWindow_Clear_Main;
@@ -1335,9 +1385,9 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 	case 10:
 		if (!(window->flags & 4)) {
 			window->x = -280.0f;
-			window->y = 225.0f;
-			window->height = 560.0f;
-			window->width = 176.0f;
+			window->y = EXT_LIT(float_225_8041a578, 225.0f);
+			window->height = EXT_LIT(float_560_8041a57c, 560.0f);
+			window->width = EXT_LIT(float_176_8041a580, 176.0f);
 		}
 		break;
 	case 5:
@@ -1351,8 +1401,8 @@ s32 msgWindow_Entry(const char* msg, s32 field_0x79FC, u16 priority) {
 		break;
 	case 1:
 		window->field_0x4 = 10;
-		window->height = 0.7f * GXGetTexObjWidth(getWakuTexObj(3));
-		window->width = 0.7f * GXGetTexObjHeight(getWakuTexObj(3));
+		window->height = EXT_LIT(float_0p7_8041a584, 0.7f) * GXGetTexObjWidth(getWakuTexObj(3));
+		window->width = EXT_LIT(float_0p7_8041a584, 0.7f) * GXGetTexObjHeight(getWakuTexObj(3));
 		break;
 	}
 	return id;
@@ -1403,10 +1453,10 @@ void msgWindow_Repeat(s32 id) {
 	data = window->userdata->address;
 	data->time30 = gp->renderTime;
 	data->time18 = gp->renderTime;
-	data->field_0x20 = 0;
-	data->field_0x24 = 0;
-	data->field_0x28 = 0;
-	data->field_0x10 = 0;
+	data->playTime = 0;
+	data->scrollTarget = 0;
+	data->scrollPos = 0;
+	data->nextEntry = 0;
 }
 
 void msgWindow_ForceClose(const char* name) {
@@ -1445,7 +1495,7 @@ static inline void msgWinNextPage(WindowEntry* window) {
 	MsgWinData* d = WIN_DATA(window);
 	s32 max;
 	d->page++;
-	max = d->field_0x7840 - 1;
+	max = d->pageCount - 1;
 	if (d->page > max) {
 		d->page = max;
 	}
@@ -1459,18 +1509,18 @@ void msgWindow_Main(WindowEntry* window) {
 	s32 target;
 	u32 trg;
 
-	if (data->field_0x7A50) {
-		if (!data->field_0x7A54) {
+	if (data->talkTimer) {
+		if (!data->talkPoseSet) {
 			if (data->flags & 8) {
 				BtlUnit_ChangeTalkAnim(data->unitId);
 			}
 			else {
 				npcSetTalkPose(data->stayPose);
 			}
-			data->field_0x7A54 = 1;
+			data->talkPoseSet = 1;
 		}
-		data->field_0x7A50--;
-		if (data->field_0x7A50 == 0) {
+		data->talkTimer--;
+		if (data->talkTimer == 0) {
 			MsgWinData* d2 = smart->address;
 			if (d2->flags & 8) {
 				BtlUnit_ChangeStayAnim(d2->unitId);
@@ -1478,7 +1528,7 @@ void msgWindow_Main(WindowEntry* window) {
 			else {
 				npcSetStayPose(d2->stayPose);
 			}
-			data->field_0x7A54 = 0;
+			data->talkPoseSet = 0;
 		}
 	}
 
@@ -1557,7 +1607,7 @@ void msgWindow_Main(WindowEntry* window) {
 		trg = keyGetButtonTrg(0);
 		if (trg & (target | 0x200)) {
 			WIN_STATE(window) = 1;
-			data->field_0xA = 2;
+			data->pageState = 2;
 			if (keyGetButtonTrg(0) & 0x200) {
 				if (!(data->flags & 0x80)) {
 					data->flags |= 4;
@@ -1565,7 +1615,7 @@ void msgWindow_Main(WindowEntry* window) {
 			}
 		}
 		if (keyGetButtonTrg(0) & 0x10) {
-			data->page = data->field_0x7840 - 1;
+			data->page = data->pageCount - 1;
 			if (msgWinPrevPage(window) != 0U) {
 				WIN_STATE(window) = 9;
 				WIN_TIME(window) = gp->renderTime;
@@ -1576,23 +1626,23 @@ void msgWindow_Main(WindowEntry* window) {
 		break;
 	case 9:
 		target = data->pageY[data->page];
-		if (data->field_0x28 >= target) {
-			data->field_0x28 = data->field_0x28 - 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
+		if (data->scrollPos >= target) {
+			data->scrollPos = data->scrollPos - 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
 			WIN_TIME(window) = gp->renderTime;
-			if (data->field_0x28 <= target) {
-				data->field_0x28 = target;
+			if (data->scrollPos <= target) {
+				data->scrollPos = target;
 				WIN_STATE(window) = 11;
 			}
 		}
 		break;
 	case 10:
 		target = data->pageY[data->page];
-		if (data->field_0x28 <= target) {
-			data->field_0x28 = data->field_0x28 + 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
+		if (data->scrollPos <= target) {
+			data->scrollPos = data->scrollPos + 0.6f * OSTicksToMilliseconds(gp->renderTime - WIN_TIME(window));
 			WIN_TIME(window) = gp->renderTime;
-			if (data->field_0x28 >= target) {
-				data->field_0x28 = target;
-				if (data->page == data->field_0x7840 - 1) {
+			if (data->scrollPos >= target) {
+				data->scrollPos = target;
+				if (data->page == data->pageCount - 1) {
 					WIN_STATE(window) = 3;
 					data->flags &= ~0x40;
 				}
@@ -1617,7 +1667,7 @@ void msgWindow_Main(WindowEntry* window) {
 		if (keyGetButtonTrg(0) & 0x200) {
 			WIN_STATE(window) = 10;
 			WIN_TIME(window) = gp->renderTime;
-			data->page = data->field_0x7840 - 1;
+			data->page = data->pageCount - 1;
 			psndSFXOn((const char*)0x20041);
 		}
 		if (keyGetButtonTrg(0) & 0x10) {
@@ -1629,7 +1679,7 @@ void msgWindow_Main(WindowEntry* window) {
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, 400.0f - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
 }
 
 #pragma opt_common_subs reset
@@ -1692,9 +1742,67 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 		}
 		break;
 	}
-	dispEntry(CAMERA_2D, 400.0f - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
 }
 
+__declspec(section ".data") static void* jumptable_8030DB70[] = {
+    (char*)msgWindow_Disp + 0x88,
+    (char*)msgWindow_Disp + 0x88,
+    (char*)msgWindow_Disp + 0x420,
+    (char*)msgWindow_Disp + 0x520,
+    (char*)msgWindow_Disp + 0x420,
+    (char*)msgWindow_Disp + 0x628,
+    (char*)msgWindow_Disp + 0x88,
+    (char*)msgWindow_Disp + 0x4A0,
+    (char*)msgWindow_Disp + 0x88,
+    (char*)msgWindow_Disp + 0x88,
+    (char*)msgWindow_Disp + 0x420,
+    (char*)msgWindow_Disp + 0x5B4,
+};
+__declspec(section ".data") void* jumptable_8030DBA0[] = {
+    (char*)msgWindow_Main + 0x74C,
+    (char*)msgWindow_Main + 0x2BC,
+    (char*)msgWindow_Main + 0x74C,
+    (char*)msgWindow_Main + 0x364,
+    (char*)msgWindow_Main + 0x74C,
+    (char*)msgWindow_Main + 0xCC,
+    (char*)msgWindow_Main + 0x118,
+    (char*)msgWindow_Main + 0x1D0,
+    (char*)msgWindow_Main + 0x220,
+    (char*)msgWindow_Main + 0x454,
+    (char*)msgWindow_Main + 0x520,
+    (char*)msgWindow_Main + 0x618,
+};
+__declspec(section ".data") void* jumptable_8030DBD0[] = {
+    (char*)msgDisp + 0xE8,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0xCC,
+    (char*)msgDisp + 0xB8,
+    (char*)msgDisp + 0x1E8,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0x99C,
+    (char*)msgDisp + 0xA0,
+    (char*)msgDisp + 0x98,
+};
+__declspec(section ".data") void* jumptable_8030DC00[] = {
+    (char*)msgMain + 0x5A0,
+    (char*)msgMain + 0x54C,
+    (char*)msgMain + 0x69C,
+    (char*)msgMain + 0x50C,
+    (char*)msgMain + 0x5DC,
+    (char*)msgMain + 0x5DC,
+    (char*)msgMain + 0x69C,
+    (char*)msgMain + 0x500,
+    (char*)msgMain + 0x4F4,
+    (char*)msgMain + 0x4D4,
+    (char*)msgMain + 0x4B0,
+    (char*)msgMain + 0x440,
+    (char*)msgMain + 0x3F4,
+    (char*)msgMain + 0x3CC,
+};
 void msgWindow_Disp(CameraId camId, void* param) {
 	CameraEntry* camera = camGetCurPtr();
 	BOOL ret = FALSE;
@@ -1705,7 +1813,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 	s32 sy;
 	static u16 active;
 
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
+	GXSetFog(GX_FOG_NONE, EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), (GXColor){0, 0, 0, 0});
 
 	switch (window->type) {
 	case 0:
@@ -1724,28 +1832,28 @@ void msgWindow_Disp(CameraId camId, void* param) {
 			case 6:
 			case 8:
 			case 9:
-				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
-				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
+				ex = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.x, ( window->height / EXT_LIT(float_2_8041a524, 2.0f) ) + window->x, 0, window->alpha, 255);
+				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / EXT_LIT(float_2_8041a524, 2.0f) ), 0, window->alpha, 255);
+				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->height, 0, window->alpha, 255);
+				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->width, 0, window->alpha, 255);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					GXSetScissor(camera->scissor[0], 240.0f - (window->y - 36.0f), camera->scissor[2], 100);
-					ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+					ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 				}
 				break;
 			case 1:
-				window->x = pos.x - ( window->height / 2.0f) ;
+				window->x = pos.x - ( window->height / EXT_LIT(float_2_8041a524, 2.0f)) ;
 				if (window->field_0x2C & 8) {
 					window->y = pos.y - 80.0f;
 				} else {
 					window->y = 60.0f + pos.y;
 				}
-				ex = intplGetValue(0, window->alpha, 255, pos.x, ( window->height / 2.0f ) + window->x);
-				ey = intplGetValue(0, window->alpha, 255, pos.y, window->y - ( window->width / 2.0f ));
-				w = intplGetValue(0, window->alpha, 255, 10.0f, window->height);
-				h = intplGetValue(0, window->alpha, 255, 10.0f, window->width);
-				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / 2.0f ), ey + ( h / 2.0f ), w, h, pos.x, pos.y);
+				ex = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.x, ( window->height / EXT_LIT(float_2_8041a524, 2.0f) ) + window->x, 0, window->alpha, 255);
+				ey = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(pos.y, window->y - ( window->width / EXT_LIT(float_2_8041a524, 2.0f) ), 0, window->alpha, 255);
+				w = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->height, 0, window->alpha, 255);
+				h = ((f32 (*)(f32, f32, s32, s32, s32))intplGetValue)(EXT_LIT(float_10_8041a538, 10.0f), window->width, 0, window->alpha, 255);
+				windowDispGX_Message(window->type, window->field_0x2C, window->alpha, ex - ( w / EXT_LIT(float_2_8041a524, 2.0f) ), ey + ( h / EXT_LIT(float_2_8041a524, 2.0f) ), w, h, pos.x, pos.y);
 				if (window->alpha == 255) {
 					sy = 240 - ((( s32)window->y ) - 10);
 					if (sy < 0) { sy = 0;
@@ -1753,36 +1861,36 @@ void msgWindow_Disp(CameraId camId, void* param) {
 					if (sy > 480) { sy = 480;
 					}
 					GXSetScissor(camera->scissor[0], sy, camera->scissor[2], 0x7E);
-					msgDisp(window->userdata, window->alpha, 20.0f + window->x, window->y - 7.0f);
+					msgDisp(window->userdata, window->alpha, EXT_LIT(float_28_8041a550, 20.0f) + window->x, window->y - 7.0f);
 				}
 				break;
 			}
 		} else {
 			windowDispGX_Message(window->type, 0, window->alpha, window->x, window->y, window->height, window->width, 0.0f, 0.0f);
-			GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
-			ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+			GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
+			ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		}
 		break;
 	case 2:
 	case 4:
 	case 10:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 2.0f, camera->scissor[2], 0x68);
-		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 2.0f, camera->scissor[2], 0x68);
+		ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		break;
 	case 7:
 		windowDispGX_Kanban(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
-		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], 0x7E);
+		ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		break;
 	case 3:
 		windowDispGX_System(window->type, window->alpha, window->x, window->y, window->height, window->width);
-		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
-		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		break;
 	case 11:
-		GXSetScissor(camera->scissor[0], ( 240.0f - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
-		ret = msgDisp(window->userdata, window->alpha, 62.0f + window->x, window->y - 36.0f);
+		GXSetScissor(camera->scissor[0], ( EXT_LIT(float_240_8041a53c, 240.0f) - (window->y - 36.0f) ) - 8.0f, camera->scissor[2], window->width - 50.0f);
+		ret = msgDisp(window->userdata, window->alpha, EXT_LIT(float_62_8041a544, 62.0f) + window->x, window->y - 36.0f);
 		break;
 	case 5:
 		break;
@@ -1793,7 +1901,7 @@ void msgWindow_Disp(CameraId camId, void* param) {
 		if (active == 0) { active = 1;
 		}
 		animPoseMain(msgw->poseId);
-		animPoseDraw(msgw->poseId, ( window->x + window->height ) - 52.0f, 31.0f + (window->y - window->width), 0.0f, 180.0f, 5.0f, 2);
+		animPoseDraw(msgw->poseId, ( window->x + window->height ) - 52.0f, EXT_LIT(float_31_8041a564, 31.0f) + (window->y - window->width), EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_180_8041a568, 180.0f), EXT_LIT(float_5_8041a56c, 5.0f), 2);
 	}
 }
 
@@ -1872,7 +1980,7 @@ void selectWindow_Main(WindowEntry* window) {
 	case 4:
 		return;
 	}
-	dispEntry(CAMERA_2D, 400.0f - *(s16*)&window->field_0x4, 0, selectWindow_Disp, window);
+	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, selectWindow_Disp, window);
 }
 
 void selectWindow_Disp(CameraId camId, void* param) {
@@ -1880,12 +1988,17 @@ void selectWindow_Disp(CameraId camId, void* param) {
 	MsgWinData* data = window->userdata->address;
 	Vec pos;
 
-	GXSetFog(GX_FOG_NONE, 0.0f, 0.0f, 0.0f, 0.0f, (GXColor){0, 0, 0, 0});
-	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, window->alpha}, window->x, window->y, window->height, window->width, 30.0f);
-	msgDisp(window->userdata, window->alpha, 40.0f + window->x, window->y - 25.0f);
-	pos.x = 2.0f + window->x;
-	data->cursorY += 0.3f * (window->y - (f32)(data->sel * 31 + 58) - data->cursorY);
+	GXSetFog(GX_FOG_NONE, EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), EXT_LIT(float_0_8041a514, 0.0f), (GXColor){0, 0, 0, 0});
+	windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, window->alpha}, window->x, window->y, window->height, window->width, EXT_LIT(float_30_8041a518, 30.0f));
+	msgDisp(window->userdata, window->alpha, EXT_LIT(float_40_8041a51c, 40.0f) + window->x, window->y - 25.0f);
+	pos.x = EXT_LIT(float_2_8041a524, 2.0f) + window->x;
+	data->cursorY += EXT_LIT(float_0p3_8041a528, 0.3f) * (window->y - (f32)(data->sel * 31 + 58) - data->cursorY);
 	pos.y = data->cursorY;
-	pos.z = 0.0f;
-	iconDispGxAlpha(&pos, 0x14, 0x1F0, window->alpha, 1.0f);
+	pos.z = EXT_LIT(float_0_8041a514, 0.0f);
+	iconDispGxAlpha(&pos, 0x14, 0x1F0, window->alpha, EXT_LIT(float_1_8041a52c, 1.0f));
 }
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on
+__declspec(section ".sdata") u32 gap_07_804103F4_sdata[1] = {0};
+

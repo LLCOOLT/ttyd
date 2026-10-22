@@ -7,6 +7,7 @@
 #include <dolphin/os/OSFastCast.h>
 #include <stdlib.h>
 
+
 typedef struct effN64Vtx {
     s16 x, y, z;   // 0x0
     s16 s, t;      // 0x6
@@ -222,6 +223,4 @@ void effOpukuWcurtainDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-#pragma force_active on
-__declspec(section ".sdata2") const u32 gap_10_804231E4_sbss2;
-#pragma force_active reset
+

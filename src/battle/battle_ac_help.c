@@ -34,9 +34,8 @@ void BattleAcHelpMain(void) {
 }
 void _ac_help_disp(CameraId cameraId, void *param)
 {
-  float new_var;
   u16 lines;
-  const char *new_var3[2];
+  const char *new_var3[2]; // FAKE: register-promoted array; one msg pointer differs
   BattleWork *wp = _battleWorkPointer;
   s32 width;
   u8 alpha;

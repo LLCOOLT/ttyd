@@ -70,9 +70,9 @@ static void _partyEntry(s32 flag) {
 				off = 120.0f;
 			}
 			party->flags2 &= ~1;
-			party->field_110 = revise360(mario->unk1A8 + off);
-			party->field_10C = mario->unk1A8;
-			party->field_FC = mario->unk19C;
+			party->displayDirectionTarget = revise360(mario->displayDirection + off);
+			party->displayDirection = mario->displayDirection;
+			party->moveDir = mario->moveDirection;
 		} else {
 			party = partyGetPtr(mario->currPartySlotId[i]);
 			partyChgRunMode(party, 10);
@@ -88,9 +88,9 @@ static void _partyEntry(s32 flag) {
 				off = -120.0f;
 			}
 			party->flags2 &= ~1;
-			party->field_110 = revise360(mario->unk1A8 + off);
-			party->field_10C = mario->unk1A8;
-			party->field_FC = mario->unk19C;
+			party->displayDirectionTarget = revise360(mario->displayDirection + off);
+			party->displayDirection = mario->displayDirection;
+			party->moveDir = mario->moveDirection;
 		}
 	}
 }
@@ -105,7 +105,7 @@ void mot_dokan(void) {
 		mario->dispFlags |= 8;
 		mario->dispFlags |= 0x100;
 		MW(mario, 0x2A4, f32) = 0.0f;
-		MW(mario, 0x2A8, f32) = mario->position.z;
+		mario->wCamVal1 = mario->position.z;
 		mario->multiTimer = 0;
 		mario->airTimer = 0;
 		mario->baseSpeed = 0.0f;
@@ -120,7 +120,7 @@ void mot_dokan(void) {
 			marioPaperLightOff();
 			mario->dispFlags |= 8;
 			mario->dispFlags |= 0x100;
-			mario->unk1A8 = mario->unk1AC;
+			mario->displayDirection = mario->displayDirectionTarget;
 			mario->currSubMotionId = 20;
 			MW(mario, 0x2A0, f32) = 0.0f;
 			MW(mario, 0x2A0, f32) = 30.0f;
@@ -144,11 +144,11 @@ void mot_dokan(void) {
 			}
 			{
 				Vec v0 = {0.0f, 0.0f, 0.0f};
-				mario->field_0x98 = v0;
+				mario->dispOfs = v0;
 			}
 			{
 				Vec v1 = {0.0f, 0.0f, 0.0f};
-				mario->field_0xA4 = v1;
+				mario->dispOfs2 = v1;
 			}
 			{
 				Vec v2 = {0.0f, 0.0f, 0.0f};
@@ -163,7 +163,7 @@ void mot_dokan(void) {
 			marioPaperLightOff();
 			marioChgPaper("PM_D_1A");
 			marioChgPose("M_Z_1");
-			mario->unk1A8 = mario->unk1AC;
+			mario->displayDirection = mario->displayDirectionTarget;
 			MW(mario, 0x2A0, f32) = 30.0f;
 			mario->multiTimer = 20;
 			mario->currSubMotionId = 0;
@@ -174,11 +174,11 @@ void mot_dokan(void) {
 			}
 			{
 				Vec v1 = {0.0f, 0.0f, 0.0f};
-				mario->field_0x98 = v1;
+				mario->dispOfs = v1;
 			}
 			{
 				Vec v2 = {0.0f, 0.0f, 0.0f};
-				mario->field_0xA4 = v2;
+				mario->dispOfs2 = v2;
 			}
 			{
 				Vec v3 = {0.0f, 0.0f, 0.0f};
@@ -188,13 +188,13 @@ void mot_dokan(void) {
 				Vec v4 = {0.0f, 16.0f, 0.0f};
 				mario->rotOfs = v4;
 			}
-			mario->directionView = toMovedir(mario->unk1A8);
-			mario->unk19C = mario->directionView;
+			mario->directionView = toMovedir(mario->displayDirection);
+			mario->moveDirection = mario->directionView;
 			marioPaperOn("p_dokan_x");
 			marioPaperLightOff();
 			marioChgPaper("PM_D_1A");
 			marioChgPose("M_Z_1");
-			mario->unk1A8 = mario->unk1AC;
+			mario->displayDirection = mario->displayDirectionTarget;
 			MW(mario, 0x2A0, f32) = 30.0f;
 			mario->currSubMotionId = 40;
 			_partyEntry(1);
@@ -206,7 +206,7 @@ void mot_dokan(void) {
 
 	switch (mario->currSubMotionId) {
 	case 10:
-		mario->unk1A8 = revise360(mario->unk1A8 + MW(mario, 0x2A0, f32));
+		mario->displayDirection = revise360(mario->displayDirection + MW(mario, 0x2A0, f32));
 		mario->scale.x += -0.005f;
 		if (mario->scale.x < 0.0f) {
 			mario->scale.x = 0.0f;
@@ -219,11 +219,11 @@ void mot_dokan(void) {
 		mario->scale = v;
 		mario->currSubMotionId = 21;
 		if (mario->flags & MARIO_FLAG_BG_MODE) {
-			mario->field_0xA4.y = -2.0f;
+			mario->dispOfs2.y = -2.0f;
 		}
 	}
 	case 21:
-		mario->unk1A8 = revise360(mario->unk1A8 + MW(mario, 0x2A0, f32));
+		mario->displayDirection = revise360(mario->displayDirection + MW(mario, 0x2A0, f32));
 		if (mario->flags & MARIO_FLAG_BG_MODE) {
 			mario->scale.x += 0.03f;
 			if (mario->scale.x >= 1.0f) {
@@ -241,7 +241,7 @@ void mot_dokan(void) {
 		}
 		break;
 	case 30:
-		mario->unk1A8 = revise360(mario->unk1A8 + MW(mario, 0x2A0, f32));
+		mario->displayDirection = revise360(mario->displayDirection + MW(mario, 0x2A0, f32));
 		break;
 	case 0:
 		if (--MW(mario, 0x48, s32) <= 0) {
@@ -253,8 +253,8 @@ void mot_dokan(void) {
 			mario->scale.y = mario->scale.x;
 			mario->scale.z = mario->scale.x;
 			mario->field_0xB4 = 16.0f * mario->scale.x;
-			mario->field_0x98.y = 16.0f - mario->field_0xB4;
-			mario->field_0x98.z = -3.0f;
+			mario->dispOfs.y = 16.0f - mario->field_0xB4;
+			mario->dispOfs.z = -3.0f;
 		}
 		break;
 	case 40:
@@ -266,29 +266,29 @@ void mot_dokan(void) {
 		mario->scale.y = mario->scale.x;
 		mario->scale.z = mario->scale.x;
 		mario->field_0xB4 = 16.0f * mario->scale.x;
-		mario->field_0x98.y = 16.0f - mario->field_0xB4;
-		mario->field_0x98.z = -3.0f;
+		mario->dispOfs.y = 16.0f - mario->field_0xB4;
+		mario->dispOfs.z = -3.0f;
 		party = partyGetPtr(marioGetPartyId());
 		if (party != NULL) {
 			party->position = mario->position;
-			MW(party, 0x70, f32) = mario->scale.x;
-			MW(party, 0x74, f32) = mario->scale.y;
-			MW(party, 0x78, f32) = mario->scale.z;
-			MW(party, 0x8C, f32) = mario->field_0xB4;
-			MW(party, 0x80, f32) = mario->field_0x98.y;
-			MW(party, 0x84, f32) = mario->field_0x98.z;
+			party->scale.x = mario->scale.x;
+			party->scale.y = mario->scale.y;
+			party->scale.z = mario->scale.z;
+			party->field_8C = mario->field_0xB4;
+			MW(party, 0x80, f32) = mario->dispOfs.y;
+			MW(party, 0x84, f32) = mario->dispOfs.z;
 		}
 		party = partyGetPtr(marioGetExtraPartyId());
 		if (party != NULL) {
 			party->position = mario->position;
-			MW(party, 0x70, f32) = mario->scale.x;
-			MW(party, 0x74, f32) = mario->scale.y;
-			MW(party, 0x78, f32) = mario->scale.z;
-			MW(party, 0x8C, f32) = mario->field_0xB4;
-			MW(party, 0x80, f32) = mario->field_0x98.y;
-			MW(party, 0x84, f32) = mario->field_0x98.z;
+			party->scale.x = mario->scale.x;
+			party->scale.y = mario->scale.y;
+			party->scale.z = mario->scale.z;
+			party->field_8C = mario->field_0xB4;
+			MW(party, 0x80, f32) = mario->dispOfs.y;
+			MW(party, 0x84, f32) = mario->dispOfs.z;
 		}
-		MW(mario, 0xF0, f32) = mario->position.y;
+		mario->camTarget.y = mario->position.y;
 		break;
 	case 100:
 		if (MW(mario, 0x3E, s8) == 1) {
@@ -311,16 +311,16 @@ void mot_dokan(void) {
 		}
 		break;
 	case 101:
-		mario->unk1A8 += MW(mario, 0x2A0, f32);
-		if (mario->unk1A8 >= 540.0f) {
+		mario->displayDirection += MW(mario, 0x2A0, f32);
+		if (mario->displayDirection >= 540.0f) {
 			marioChgPaper("PM_D_1B");
 			mario->multiTimer = 20;
 			mario->currSubMotionId = 102;
 			mario->rot.x = 0.0f;
-			mario->unk1AC = revise360(180.0f + mario->unk1AC);
-			mario->unk1A8 = mario->unk1AC;
-			mario->directionView = toMovedirSimple(mario->unk1A8);
-			mario->unk19C = mario->directionView;
+			mario->displayDirectionTarget = revise360(180.0f + mario->displayDirectionTarget);
+			mario->displayDirection = mario->displayDirectionTarget;
+			mario->directionView = toMovedirSimple(mario->displayDirection);
+			mario->moveDirection = mario->directionView;
 			partyDokanEnd(marioGetPartyId(), MW(mario, 0x3E, s8));
 			partyDokanEnd(marioGetExtraPartyId(), MW(mario, 0x3E, s8));
 		}
@@ -342,13 +342,13 @@ void mot_dokan(void) {
 		mario->dispFlags &= ~0x1000;
 		marioPaperOff();
 		marioChgMot(MARIO_MOTION_STAY);
-		mario->unk1A8 = revise360(mario->unk1A8);
-		mario->unk1AC = mario->unk1A8;
-		mario->directionView = toMovedirSimple(mario->unk1A8);
-		mario->unk19C = mario->directionView;
+		mario->displayDirection = revise360(mario->displayDirection);
+		mario->displayDirectionTarget = mario->displayDirection;
+		mario->directionView = toMovedirSimple(mario->displayDirection);
+		mario->moveDirection = mario->directionView;
 		if ((s32)MW(mario, 0x3E, u8) == 4) {
 			camFollowYOn();
-			MW(mario, 0xF0, f32) = mario->position.y;
+			mario->camTarget.y = mario->position.y;
 		}
 		mario->flags &= ~0x100;
 		break;
@@ -358,14 +358,14 @@ void mot_dokan(void) {
 	switch (mario->currSubMotionId) {
 	case 110:
 		if (!(mario->flags & MARIO_FLAG_BG_MODE)) {
-			MW(mario, 0xF0, f32) = mario->position.y;
+			mario->camTarget.y = mario->position.y;
 		}
 		marioUpdateCamPos();
 		camFollowYOff();
 		mario->currSubMotionId = 111;
 	case 111:
-		mario->unk1A8 += MW(mario, 0x2A0, f32);
-		if (mario->unk1A8 >= 540.0f) {
+		mario->displayDirection += MW(mario, 0x2A0, f32);
+		if (mario->displayDirection >= 540.0f) {
 			if (!(mario->flags & MARIO_FLAG_BG_MODE)) {
 				camFollowYOn();
 			}
@@ -373,10 +373,10 @@ void mot_dokan(void) {
 			mario->multiTimer = 20;
 			mario->currSubMotionId = 112;
 			mario->rot.x = 0.0f;
-			mario->unk1AC = revise360(mario->unk1A8);
-			mario->unk1A8 = mario->unk1AC;
-			mario->directionView = toMovedirSimple(mario->unk1A8);
-			mario->unk19C = mario->directionView;
+			mario->displayDirectionTarget = revise360(mario->displayDirection);
+			mario->displayDirection = mario->displayDirectionTarget;
+			mario->directionView = toMovedirSimple(mario->displayDirection);
+			mario->moveDirection = mario->directionView;
 			partyDokanEnd(marioGetPartyId(), MW(mario, 0x3E, s8));
 			partyDokanEnd(marioGetExtraPartyId(), MW(mario, 0x3E, s8));
 		}
@@ -398,10 +398,10 @@ void mot_dokan(void) {
 		mario->dispFlags &= ~0x1000;
 		marioPaperOff();
 		marioChgMot(MARIO_MOTION_STAY);
-		mario->unk1A8 = revise360(mario->unk1A8);
-		mario->unk1AC = mario->unk1A8;
-		mario->directionView = toMovedirSimple(mario->unk1A8);
-		mario->unk19C = mario->directionView;
+		mario->displayDirection = revise360(mario->displayDirection);
+		mario->displayDirectionTarget = mario->displayDirection;
+		mario->directionView = toMovedirSimple(mario->displayDirection);
+		mario->moveDirection = mario->directionView;
 		if (!(mario->flags & MARIO_FLAG_BG_MODE)) {
 			camFollowYOn();
 		}

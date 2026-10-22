@@ -91,7 +91,7 @@ USER_FUNC(evt_cam_shake) {
         event->userdata[0] = 0;
         ((u32*)&event->userdata[1])[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->userdata[1])[1] = now & 0xFFFFFFFF;
-        *(s32*)&event->field_84 = 0;
+        *(s32*)&event->userdata3 = 0;
         ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
         ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
     }
@@ -116,11 +116,11 @@ USER_FUNC(evt_cam_shake) {
     offTime = 50.0f * (1.0f - len);
     last = event->wInterpRelatedTime;
     if (onTime && offTime) {
-        if (!*(s32*)&event->field_84) {
+        if (!*(s32*)&event->userdata3) {
             padRumbleOn(0);
             if (onTime < OSTicksToMilliseconds(now - last)) {
                 new_var = 32;
-                event->field_84 = 1 - event->field_84;
+                event->userdata3 = 1 - event->userdata3;
                 ((u32*)&event->wInterpRelatedTime)[0] = (now >> new_var) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
@@ -128,7 +128,7 @@ USER_FUNC(evt_cam_shake) {
         else {
             padRumbleOff(0);
             if (offTime < OSTicksToMilliseconds(now - last)) {
-                event->field_84 = 1 - event->field_84;
+                event->userdata3 = 1 - event->userdata3;
                 ((u32*)&event->wInterpRelatedTime)[0] = (now >> 32) & 0xFFFFFFFF;
                 ((u32*)&event->wInterpRelatedTime)[1] = now & 0xFFFFFFFF;
             }
@@ -502,8 +502,8 @@ USER_FUNC(evt_cam_road_reset) {
     camera->marioAt.x = camera->marioPos.x;
     camera->marioAt.y = camera->marioPos.y;
     camera->marioAt.z = camera->marioPos.z;
-    mario->field_EC = mario->position;
-    mario->field_F8 = mario->position;
+    mario->camTarget = mario->position;
+    mario->camCollision = mario->position;
     camRoadReset();
     camShiftReset();
     return EVT_RETURN_DONE;
@@ -528,8 +528,8 @@ USER_FUNC(evt_cam_road_reset2) {
     camera->marioAt.x = camera->marioPos.x;
     camera->marioAt.y = camera->marioPos.y;
     camera->marioAt.z = camera->marioPos.z;
-    mario->field_EC = (Vec){x, y, z};
-    mario->field_F8 = (Vec){x, y, z};
+    mario->camTarget = (Vec){x, y, z};
+    mario->camCollision = (Vec){x, y, z};
     camRoadReset();
     camShiftReset();
     return EVT_RETURN_DONE;
@@ -615,4 +615,4 @@ USER_FUNC(evt_cam_letter_box_camid) {
     return EVT_RETURN_DONE;
 }
 
-
+void __div2u();

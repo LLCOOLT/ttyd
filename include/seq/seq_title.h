@@ -7,12 +7,12 @@
 typedef struct TitleWork {
 	FileEntry* texture; //0x0
 	u8 field_0x4[0x8 - 0x4]; //0x4
-	s32 field_0x8; //0x8
-	f32 field_0xC; //0xC
-	f32 field_0x10; //0x10
-	f32 field_0x14; //0x14
-	f32 field_0x18; //0x18
-	f32 field_0x1C; //0x1C
+	s32 state; //0x8, title sequence step (switch in titleMain)
+	f32 topPosX; //0xC, texture 5 position (slides down from y 1000 to 120)
+	f32 topPosY; //0x10
+	f32 bottomPosX; //0x14, texture 6 position (slides up from y -1000 to -170)
+	f32 bottomPosY; //0x18
+	f32 fadeAlpha; //0x1C, 0..1, +/-0.1 per frame
 	union {
 		u8 field_0x20[0x30 - 0x20]; //0x20
 		struct {

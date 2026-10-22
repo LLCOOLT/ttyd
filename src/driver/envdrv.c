@@ -8,12 +8,14 @@
 #include "texPalette.h"
 #include <dolphin/dvd.h>
 #include <string.h>
-
-extern int sprintf(char* str, const char* format, ...);
+#include "memory.h"
+#include "sdk/texPalette.h"
+#define EXT_LIT(sym, val) (val)
 extern GlobalWork* gp;
 
 //.data
 // static data from an inlined header function
+#pragma force_active on // FAKE: keep asm-only-referenced data from being dead-stripped
 __declspec(section ".data") s32 lbl_80398960[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 env_negone_one_374[] = {-1082130432, 1065353216};
 __declspec(section ".data") s32 lbl_80398970[] = {1065353216, -1082130432};
@@ -121,7 +123,7 @@ void envTexSetup(void) { //1:1
     tpl = arcOpen("env.tpl", 0, 0);
     env_tpl = tpl;
     if (!tpl) {
-        sprintf(path, "%s/env.tpl\0\0\0\0\0", getMarioStDvdRoot());
+        sprintf(path, EXT_LIT(str_802F93D0, "%s/env.tpl\0\0\0\0\0"), getMarioStDvdRoot());
         entry = DVDMgrOpen(path, 2, 0);
         size = DVDMgrGetLength(entry);
         env_tpl = __memAlloc(HEAP_DEFAULT, OSRoundUp32B(size));
@@ -151,7 +153,7 @@ void envCapture(CameraId camId, void* param) { //1:1
         GXCopyTex(wp->capture->address, GX_FALSE);
         GXPixModeSync();
         GXInitTexObj(&wp->captureObj, wp->capture->address, var2, var3, GX_TF_RGBA8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&wp->captureObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&wp->captureObj, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
     if (wp->flags & 2) {
         GXSetTexCopySrc(0, 0, var0, var1);
@@ -161,7 +163,7 @@ void envCapture(CameraId camId, void* param) { //1:1
         GXCopyTex(wp->capture2->address, 0);
         GXPixModeSync();
         GXInitTexObj(&wp->captureObj2, wp->capture2->address, var2, var3, GX_TF_I8, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&wp->captureObj2, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&wp->captureObj2, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
 }
 
@@ -177,7 +179,7 @@ void envCapture2(CameraId camId, void* param) { //1:1
         GXCopyTex(wp->envBlur, GX_FALSE);
         GXPixModeSync();
         GXInitTexObj(&wp->envBlurObj, wp->envBlur, var0, var1, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-        GXInitTexObjLOD(&wp->envBlurObj, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+        GXInitTexObjLOD(&wp->envBlurObj, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), GX_FALSE, GX_FALSE, GX_ANISO_1);
     }
     if (wp->flags & 0x40000000) {
         if ((wp->unk98 & 1) && (wp->flags & 8)) {
@@ -233,31 +235,25 @@ void envDisp2(CameraId camId, void *param) { //almost 1:1, needs extra addi
 }
 
 void envMain(void) {
-    dispEntry(CAMERA_3D, 20.0f, 7, envCapture, NULL);
-    dispEntry(CAMERA_3D, 10.0f, 7, envDisp, NULL);
-    dispEntry(CAMERA_3D, 0.0f, 7, envCapture2, NULL);
-    dispEntry(CAMERA_3D, 5000.0f, 8, envDisp2, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_20_8041e588, 20.0f), 7, envCapture, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_10_8041e524, EXT_LIT(float_10_8041e524, 10.0f)), 7, envDisp, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_0_8041e53c, EXT_LIT(float_0_8041e53c, 0.0f)), 7, envCapture2, NULL);
+    dispEntry(CAMERA_3D, EXT_LIT(float_5000_8041e5cc, EXT_LIT(float_5000_8041e5cc, 5000.0f)), 8, envDisp2, NULL);
 }
-
-
-
-
-
-
 
 #define PI 3.141592653589793f
 #define TWO_PI 6.283185307179586f
-const s32 texmtx_tbl[] = {30, 33, 36, 39, 42, 45, 48, 51, 54, 57};
+static const s32 texmtx_tbl[] = {30, 33, 36, 39, 42, 45, 48, 51, 54, 57};
 
 static inline f32
 env_sin(f32 x) {
     f32 a = 0.00761f;
-    f32 b = 0.16605f;
-    f32 c = 1.0f;
+    f32 b = EXT_LIT(float_0p16605_8041e5b8, 0.16605f);
+    f32 c = EXT_LIT(float_1_8041e574, 1.0f);
     f32 y;
     f32 x2;
 
-    if (x <= 3.1415927f) {
+    if (x <= EXT_LIT(float_3p1416_8041e580, 3.1415927f)) {
         if (x <= 1.5707964f) {
             x2 = x * x;
             a = a * x2 - b;
@@ -272,7 +268,7 @@ env_sin(f32 x) {
             a = a * y;
         }
     }
-    else if (x < 4.712389f) {
+    else if (x < EXT_LIT(float_4p7124_8041e5b0, 4.712389f)) {
         y = x - 3.1415927f;
         x2 = y * y;
         a = a * x2 - b;
@@ -294,12 +290,12 @@ env_sin(f32 x) {
 static inline f32
 env_cos(f32 x) {
     f32 a = 0.03705f;
-    f32 b = 0.4967f;
-    f32 c = 1.0f;
+    f32 b = EXT_LIT(float_0p4967_8041e5a8, 0.4967f);
+    f32 c = EXT_LIT(float_1_8041e574, 1.0f);
     f32 y;
     f32 x2;
 
-    if (x <= 3.1415927f) {
+    if (x <= EXT_LIT(float_3p1416_8041e580, 3.1415927f)) {
         if (x <= 1.5707964f) {
             x2 = x * x;
             a = a * x2 - b;
@@ -313,7 +309,7 @@ env_cos(f32 x) {
             a = -a;
         }
     }
-    else if (x < 4.712389f) {
+    else if (x < EXT_LIT(float_4p7124_8041e5b0, 4.712389f)) {
         y = x - 3.1415927f;
         x2 = y * y;
         a = a * x2 - b;
@@ -332,41 +328,41 @@ env_cos(f32 x) {
 #define WGPIPE_F32(x) (*(volatile f32*)0xCC008000 = (x))
 
 #define DOF_QUAD(g, half)                                                               \
-    GXPosition3f32(-(s32)(g)->fbWidth / (half), (g)->efbHeight / (half), 0.0f);         \
-    GXTexCoord2f32(0.0f, 0.0f);                                                         \
-    GXPosition3f32((g)->fbWidth / (half), (g)->efbHeight / (half), 0.0f);               \
-    GXTexCoord2f32(1.0f, 0.0f);                                                         \
-    GXPosition3f32((g)->fbWidth / (half), -(s32)(g)->efbHeight / (half), 0.0f);         \
-    GXTexCoord2f32(1.0f, 1.0f);                                                         \
-    GXPosition3f32(-(s32)(g)->fbWidth / (half), -(s32)(g)->efbHeight / (half), 0.0f);   \
-    GXTexCoord2f32(0.0f, 1.0f)
+    GXPosition3f32(-(s32)(g)->fbWidth / (half), (g)->efbHeight / (half), (0.0f));         \
+    GXTexCoord2f32((0.0f), (0.0f));                                                         \
+    GXPosition3f32((g)->fbWidth / (half), (g)->efbHeight / (half), (0.0f));               \
+    GXTexCoord2f32((1.0f), (0.0f));                                                         \
+    GXPosition3f32((g)->fbWidth / (half), -(s32)(g)->efbHeight / (half), (0.0f));         \
+    GXTexCoord2f32((1.0f), (1.0f));                                                         \
+    GXPosition3f32(-(s32)(g)->fbWidth / (half), -(s32)(g)->efbHeight / (half), (0.0f));   \
+    GXTexCoord2f32((0.0f), (1.0f))
 
 static const GXColor white = {0xFF, 0xFF, 0xFF, 0xFF};
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 void envDisp_DepthOfField(void) {
-    CameraEntry* cam;
+    GXTevColorArg cin;
     s32 first2;
-    s32 tc;
-    const s32* tbl2;
-    s32 i;
     s32 coord2;
+    EnvironmentWork* wp = envGetWork();
+    const s32* tbl2;
+    s32 stage2;
+    s32 coord;
+    s32 stage;
     s32 first;
     const s32* tbl;
-    s32 stage2;
-    EnvironmentUnk88* dof;
-    s32 stage;
-    s32 i2;
+    s32 tc;
     s32 tc2;
-    s32 coord;
-    EnvironmentWork* wp = envGetWork();
-    GXTevColorArg cin;
-    Mtx mtx;
-    Mtx mtx2;
+    EnvironmentDof* dof;
+    CameraEntry* cam;
     GXColor color;
+    s32 i2;
+    Mtx mtx;
+    s32 i;
+    Mtx mtx2;
 
-    dof = &wp->unk88;
+    dof = &wp->dof;
     if (wp->flags & 0x80000000) {
         cam = camGetPtr(CAMERA_2D);
         GXSetProjection(camGetPtr(CAMERA_2D)->projection, cam->projType);
@@ -386,13 +382,14 @@ void envDisp_DepthOfField(void) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetCullMode(GX_CULL_NONE);
-        if ((dof->unk0 & 1) && dof->unk4) {
+        if ((dof->flags & 1) && dof->radius1) {
             coord = 0;
             stage = 0;
-            for (i = 0; i < 4; i++, stage++, coord++) {
-                PSMTXTrans(mtx, dof->unk4 * env_sin(6.2831855f * i / 4.0f) / 100.0f, dof->unk4 * env_cos(6.2831855f * i / 4.0f) / 100.0f, 0.0f);
-                GXLoadTexMtxImm(mtx, texmtx_tbl[coord], GX_MTX2x4);
-                GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[coord], GX_FALSE, GX_PTIDENTITY);
+            tbl = texmtx_tbl;
+            for (i = 0; i < 4; i++, stage++, coord++, tbl++) {
+                PSMTXTrans(mtx, dof->radius1 * env_sin(6.2831855f * i / 4.0f) / 100.0f, dof->radius1 * env_cos(6.2831855f * i / 4.0f) / 100.0f, 0.0f);
+                GXLoadTexMtxImm(mtx, *tbl, GX_MTX2x4);
+                GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, *tbl, GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage, GX_TEV_KCSEL_1_4);
                 GXSetTevKAlphaSel((GXTevStageID)stage, GX_TEV_KASEL_1_4);
                 GXSetTevOrder((GXTevStageID)stage, (GXTexCoordID)coord, GX_TEXMAP0, GX_COLOR_NULL);
@@ -406,7 +403,7 @@ void envDisp_DepthOfField(void) {
                 GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, first ? GX_CA_ZERO : GX_CA_APREV);
                 GXSetTevSwapMode((GXTevStageID)stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
             }
-            color.r = dof->unk2;
+            color.r = dof->level1;
             color.a = 0xFF;
             GXSetTevKColor(GX_KCOLOR0, color);
             GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -425,11 +422,11 @@ void envDisp_DepthOfField(void) {
             GXBegin(GX_QUADS, GX_VTXFMT0, 4);
             DOF_QUAD(gp, 2.0f);
         }
-        if ((dof->unk0 & 2) && dof->unk8) {
+        if ((dof->flags & 2) && dof->radius2) {
             coord2 = 0;
             stage2 = 0;
             for (i2 = 0; i2 < 4; i2++, stage2++, coord2++) {
-                PSMTXTrans(mtx2, dof->unk8 * env_sin(6.2831855f * i2 / 4.0f) / 100.0f, dof->unk8 * env_cos(6.2831855f * i2 / 4.0f) / 100.0f, 0.0f);
+                PSMTXTrans(mtx2, dof->radius2 * env_sin(6.2831855f * i2 / 4.0f) / 100.0f, dof->radius2 * env_cos(6.2831855f * i2 / 4.0f) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx2, texmtx_tbl[i2], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i2], GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage2, GX_TEV_KCSEL_1_4);
@@ -445,7 +442,7 @@ void envDisp_DepthOfField(void) {
                 GXSetTevAlphaIn((GXTevStageID)stage2, GX_CA_ZERO, GX_CA_TEXA, GX_CA_KONST, first2 ? GX_CA_ZERO : GX_CA_APREV);
                 GXSetTevSwapMode((GXTevStageID)stage2, GX_TEV_SWAP0, GX_TEV_SWAP0);
             }
-            color.r = dof->unk3;
+            color.r = dof->level2;
             color.a = 0xFF;
             GXSetTevKColor(GX_KCOLOR0, color);
             GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, GX_IDENTITY, GX_FALSE, GX_PTIDENTITY);
@@ -473,6 +470,7 @@ void envDisp_DepthOfField(void) {
         }
     }
 }
+
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
@@ -514,7 +512,7 @@ void envDisp_Blur(void) {
         msec = blur->msec;
         if (msec) {
             t = (f32)OSTicksToMilliseconds((u64)(gp->renderTime - blur->time)) / (f32)msec;
-            if (t > 1.0f) {
+            if (t > EXT_LIT(float_1_8041e574, 1.0f)) {
                 t = 1.0f;
             }
             if (blur->flags & 1) {
@@ -539,7 +537,7 @@ void envDisp_Blur(void) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXBegin(GX_QUADS, GX_VTXFMT0, 4);
-        DOF_QUAD(gp, 2.0f);
+        DOF_QUAD(gp, EXT_LIT(float_2_8041e590, 2.0f));
     }
 }
 
@@ -568,37 +566,41 @@ void envBlurOff(void) {
     _mapFree(wp->envBlur);
 }
 
-
 //almost 1:1, needs some regalloc work and type changes
 void envGlare(EnvironmentGlare* glare) {
     static f32 frame_cnt = 0.0f;
     EnvironmentWork* var_r4 = envGetWork();
+    s16 sx;
     EnvironmentGlareFilter* temp_r30;
-    s32 var_r23;
-    u32 var_r22_2;
-    s32 var_r22;
-    int kc1;
     u32 temp_r20;
+    u32 temp_r21;
     EnvironmentGlare* var_r21;
     EnvironmentGlare* var_r22_3;
     s32 temp_r31;
     s32 temp_r30_2;
+
+
+
+    s32 x1v;
     s32 temp_r29;
     u32 var_r23_2;
-    u32 temp_r21;
+    s16 sy;
     s32 var_r28;
-    int kc0;
+    u32 kc0;
+    u32 kc1;
     s32 var_r19_3;
     void* temp_r19;
     u16 temp_r27;
     u16 temp_r26;
     u16 temp_r0;
     u16 temp_r8;
+
     u32 size;
     Mtx44 sp88;
     Mtx sp58;
     Mtx sp28;
     GXTexObj sp8;
+
     int i;
 
     frame_cnt += 1.0f;
@@ -607,52 +609,50 @@ void envGlare(EnvironmentGlare* glare) {
     temp_r26 = var_r4->filter.x0;
     temp_r31 = (u16)(var_r4->filter.x1 - temp_r26);
     temp_r0 = (u16)(var_r4->filter.y1 - temp_r27);
-    temp_r21 = temp_r0 >> 1;
-    temp_r20 = temp_r31 >> 1;
-    size = GXGetTexBufferSize((u16)temp_r20, (u16)temp_r21, GX_TF_RGB565, GX_FALSE, 0);
+    temp_r20 = temp_r0 >> 1;
+    temp_r21 = temp_r31 >> 1;
+    size = GXGetTexBufferSize((u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_FALSE, 0);
     temp_r19 = smartAlloc(size, 3)->address;
     GXSetTexCopySrc(temp_r26, temp_r27, temp_r31, temp_r0);
-    GXSetTexCopyDst((u16)temp_r20, (u16)temp_r21, GX_TF_RGB565, GX_TRUE);
+    GXSetTexCopyDst((u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_TRUE);
     GXCopyTex(temp_r19, GX_FALSE);
     GXPixModeSync();
-    GXInitTexObj(&sp8, temp_r19, (u16)temp_r20, (u16)temp_r21, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
+    GXInitTexObj(&sp8, temp_r19, (u16)temp_r21, (u16)temp_r20, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
     GXInitTexObjLOD(&sp8, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
     GXLoadTexObj(&sp8, GX_TEXMAP0);
     temp_r29 = glare->count;
     var_r28 = 0;
-    kc0 = glare->unkC;
-    kc1 = glare->unk10;
+    temp_r21 = glare->kcolorSel0;
+    temp_r20 = glare->kcolorSel1;
     GXSetTevOrder(GX_TEVSTAGE0, GX_TEXCOORD0, GX_TEXMAP0, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE0, GX_TEV_SUB, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG1);
     GXSetTevColorIn(GX_TEVSTAGE0, GX_CC_KONST, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-    GXSetTevKColorSel(GX_TEVSTAGE0, kc0);
+    GXSetTevKColorSel(GX_TEVSTAGE0, temp_r21);
     GXSetTevSwapMode(GX_TEVSTAGE0, GX_TEV_SWAP0, GX_TEV_SWAP0);
     GXSetTevOrder(GX_TEVSTAGE1, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, GX_CC_ZERO, GX_CC_C1, GX_CC_KONST, GX_CC_ZERO);
-    GXSetTevKColorSel(GX_TEVSTAGE1, kc1);
+    GXSetTevKColorSel(GX_TEVSTAGE1, temp_r20);
     GXSetTevSwapMode(GX_TEVSTAGE1, GX_TEV_SWAP0, GX_TEV_SWAP0);
 
-    i = 0;
-    var_r23 = 2;
-    var_r22 = 3;
-    for (; i < 7; i++) {
-        GXSetTevOrder(var_r23, i + 1, 0, 0xFF);
-        GXSetTevColorOp(var_r23, 1, 0, 0, 1, 2);
-        GXSetTevColorIn(var_r23, 0xE, 0xF, 0xF, 8);
-        GXSetTevKColorSel(var_r23, kc0);
-        GXSetTevSwapMode(var_r23, 0, 0);
-        GXSetTevOrder(var_r22, 0xFF, 0xFF, 0xFF);
-        GXSetTevColorOp(var_r22, 0, 0, 0, 1, 0);
-        GXSetTevColorIn(var_r22, 0xF, 4, 0xE, 0);
-        GXSetTevKColorSel(var_r22, kc1);
-        GXSetTevSwapMode(var_r22, 0, 0);
-        var_r22 += 2;
-        var_r23 += 2;
+    for (i = 0; i < 7; i++) {
+        GXSetTevOrder(i * 2 + 2, i + 1, 0, 0xFF);
+        GXSetTevColorOp(i * 2 + 2, 1, 0, 0, 1, 2);
+        GXSetTevColorIn(i * 2 + 2, 0xE, 0xF, 0xF, 8);
+        GXSetTevKColorSel(i * 2 + 2, temp_r21);
+        GXSetTevSwapMode(i * 2 + 2, 0, 0);
+        GXSetTevOrder(i * 2 + 3, 0xFF, 0xFF, 0xFF);
+        GXSetTevColorOp(i * 2 + 3, 0, 0, 0, 1, 0);
+        GXSetTevColorIn(i * 2 + 3, 0xF, 4, 0xE, 0);
+        GXSetTevKColorSel(i * 2 + 3, temp_r20);
+        GXSetTevSwapMode(i * 2 + 3, 0, 0);
     }
 
-    for (i = 0, var_r22_2 = GX_TEXMTX0; i < 8; i++, var_r22_2 += 3) {
-        GXSetTexCoordGen(i, GX_TG_MTX2x4, GX_TG_TEX0, var_r22_2);
+    {
+        int j;
+        for (j = 0; j < 8; j++) {
+            GXSetTexCoordGen(j, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0 + j * 3);
+        }
     }
 
     if (temp_r30->flags & 1) {
@@ -678,14 +678,16 @@ void envGlare(EnvironmentGlare* glare) {
     GXSetCullMode(GX_CULL_BACK);
     GXSetZScaleOffset(1.0f, temp_r30->zscale);
     temp_r30_2 = temp_r27 + temp_r0;
-    temp_r31 = temp_r26 + temp_r31;
+    x1v = temp_r26 + temp_r31;
+    sx = temp_r26;
+    sy = temp_r27;
     var_r21 = glare;
     while (var_r28 < temp_r29) {
         var_r22_3 = var_r21;
         var_r19_3 = 0;
         var_r23_2 = 0x1E;
         while ((var_r19_3 < 8) && (var_r28 < temp_r29)) {
-            MTXTrans(sp28, (glare->unk14 * var_r22_3->coords[0].unk0) / (f32) gp->fbWidth, (glare->unk14 * var_r22_3->coords[0].unk4) / (f32) gp->efbHeight, 0.0f); //temp_r4, temp_r5_3, as 2 3 and temp_f4 as last
+            MTXTrans(sp28, (glare->coordScale * var_r22_3->coords[0].x) / (f32) gp->fbWidth, (glare->coordScale * var_r22_3->coords[0].y) / (f32) gp->efbHeight, 0.0f); //temp_r4, temp_r5_3, as 2 3 and temp_f4 as last
             GXLoadTexMtxImm(sp28, var_r23_2, 1);
             var_r23_2 += 3;
             var_r19_3 += 1;
@@ -696,17 +698,16 @@ void envGlare(EnvironmentGlare* glare) {
         GXSetNumTevStages((u8)(var_r19_3 * 2));
         GXSetNumTexGens((u8)var_r19_3);
         GXBegin(GX_QUADS, GX_VTXFMT7, 4);
-        GXPosition3s16((s16)temp_r26, (s16)temp_r27, 0);
+        GXPosition3s16(sx, sy, 0);
         GXTexCoord2u16(0, 0);
-        GXPosition3s16((s16)temp_r31, (s16)temp_r27, 0);
+        GXPosition3s16((s16)x1v, sy, 0);
         GXTexCoord2u16(1, 0);
-        GXPosition3s16((s16)temp_r31, (s16)temp_r30_2, 0);
+        GXPosition3s16((s16)x1v, (s16)temp_r30_2, 0);
         GXTexCoord2u16(1, 1);
-        GXPosition3s16((s16)temp_r26, (s16)temp_r30_2, 0);
+        GXPosition3s16(sx, (s16)temp_r30_2, 0);
         GXTexCoord2u16(0, 1);
     }
 }
-
 
 void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1) {
     EnvironmentWork* wp = envGetWork();
@@ -743,7 +744,7 @@ void envGlareFilter(s32 type, s32 y0, s32 x0, s32 y1, s32 x1) {
     f->x0 = sx0;
     f->y1 = sy1;
     f->x1 = sx1;
-    f->zscale = 0.0f;
+    f->zscale = EXT_LIT(float_0_8041e53c, 0.0f);
     f->flags &= ~1;
     wp->flags |= 0x20000000;
 }
@@ -802,11 +803,11 @@ void envDisp_FF(void) {
             angle = 6.2831855f * i / 1000.0f;
             c = env_cos(angle);
             s = env_sin(angle);
-            ofs = (rand() % 10) / 100.0f;
-            GXPosition3f32(s * r, c * r, 0.0f);
-            GXTexCoord2f32(s / 2.0f + 0.5f + ofs, -c / 2.0f + 0.5f + ofs);
-            GXPosition3f32(0.0f, 0.0f, 0.0f);
-            GXTexCoord2f32(0.5f, 0.5f);
+            ofs = (rand() % 10) / EXT_LIT(float_100_8041e5bc, 100.0f);
+            GXPosition3f32(s * r, c * r, EXT_LIT(float_0_8041e53c, 0.0f));
+            GXTexCoord2f32(s / EXT_LIT(float_2_8041e590, 2.0f) + EXT_LIT(float_0p5_8041e538, 0.5f) + ofs, -c / EXT_LIT(float_2_8041e590, 2.0f) + EXT_LIT(float_0p5_8041e538, 0.5f) + ofs);
+            GXPosition3f32(EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f));
+            GXTexCoord2f32(EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f));
         }
     }
 }
@@ -838,29 +839,29 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
 
     switch (type) {
         case 0:
-            PSMTXRotRad(m0, 'Y', 0.017453292f * tw->rotY);
-            PSMTXRotRad(m1, 'Z', 0.017453292f * -tw->rotX);
+            PSMTXRotRad(m0, 'Y', EXT_LIT(float_deg2rad_8041e570, 0.017453292f) * tw->rotY);
+            PSMTXRotRad(m1, 'Z', EXT_LIT(float_deg2rad_8041e570, 0.017453292f) * -tw->rotX);
             PSMTXConcat(m0, m1, m0);
             PSMTXInvXpose(m0, m0);
             PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
             PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
             PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
-            PSMTXScale(m2, 0.5f, 0.5f, 1.0f);
+            PSMTXScale(m2, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_1_8041e574, 1.0f));
             PSMTXConcat(m2, m0, m0);
-            PSMTXTrans(m2, 0.5f, 0.5f, 0.0f);
+            PSMTXTrans(m2, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0_8041e53c, 0.0f));
             PSMTXConcat(m2, m0, m0);
             GXLoadTexMtxImm(m0, id, mtxType);
             break;
         case 1:
-            PSMTXRotRad(m0, 'Y', -1.5707964f);
+            PSMTXRotRad(m0, 'Y', EXT_LIT(float_neg1p5708_8041e578, -1.5707964f));
             PSMTXConcat(m0, tw->model, m0);
             PSMTXInvXpose(m0, m0);
             PSVECNormalize((Vec*)m0[0], (Vec*)m0[0]);
             PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
             PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
-            PSMTXScale(m3, 0.5f - 0.25f * tw->scale, 0.5f, 1.0f);
+            PSMTXScale(m3, EXT_LIT(float_0p5_8041e538, 0.5f) - 0.25f * tw->scale, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_1_8041e574, 1.0f));
             PSMTXConcat(m3, m0, m0);
-            PSMTXTrans(m3, 0.5f, 0.5f, 0.0f);
+            PSMTXTrans(m3, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0_8041e53c, 0.0f));
             PSMTXConcat(m3, m0, m0);
             GXLoadTexMtxImm(m0, id, mtxType);
             break;
@@ -870,8 +871,8 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             Vec half;
             f32 ry2, rx2, s2;
 
-            ry2 = 3.1415927f * tw->rotY / 180.0f;
-            rx2 = 3.1415927f * tw->rotX / 180.0f;
+            ry2 = EXT_LIT(float_3p1416_8041e580, 3.1415927f) * tw->rotY / EXT_LIT(float_180_8041e584, 180.0f);
+            rx2 = EXT_LIT(float_3p1416_8041e580, 3.1415927f) * tw->rotX / EXT_LIT(float_180_8041e584, 180.0f);
             light.x = -(f32)cos(rx2) * (f32)sin(ry2);
             light.y = -(f32)sin(rx2);
             light.z = -(f32)cos(rx2) * (f32)cos(ry2);
@@ -886,10 +887,10 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             m4[0][1] = half.y;
             m4[0][2] = half.z;
             PSMTXConcat(m4, m0, m0);
-            s2 = 20.0f * tw->scale;
-            PSMTXScale(m4, s2, 1.0f, 1.0f);
+            s2 = EXT_LIT(float_20_8041e588, 20.0f) * tw->scale;
+            PSMTXScale(m4, s2, EXT_LIT(float_1_8041e574, 1.0f), EXT_LIT(float_1_8041e574, 1.0f));
             PSMTXConcat(m4, m0, m0);
-            PSMTXTrans(m4, 1.0f - s2, 0.0f, 0.0f);
+            PSMTXTrans(m4, EXT_LIT(float_1_8041e574, 1.0f) - s2, EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f));
             PSMTXConcat(m4, m0, m0);
             GXLoadTexMtxImm(m0, id, mtxType);
             break;
@@ -901,14 +902,14 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             Vec v2 = {0.0f, 0.0f, 1.0f};
             f32 ry, rx;
 
-            ry = 3.1415927f * tw->rotY / 180.0f;
-            rx = 3.1415927f * tw->rotX / 180.0f;
+            ry = EXT_LIT(float_3p1416_8041e580, 3.1415927f) * tw->rotY / EXT_LIT(float_180_8041e584, 180.0f);
+            rx = EXT_LIT(float_3p1416_8041e580, 3.1415927f) * tw->rotX / EXT_LIT(float_180_8041e584, 180.0f);
             light2.x = (f32)cos(rx) * (f32)sin(ry);
             light2.y = (f32)sin(rx);
             light2.z = (f32)cos(rx) * (f32)cos(ry);
             PSMTXMultVecSR(tw->view, &light2, &light2);
             dot = PSVECDotProduct(&light2, &v2);
-            if (dot == -1.0f) {
+            if (dot == EXT_LIT(float_neg1_8041e58c, -1.0f)) {
                 PSMTXScale(m0, 0.0f, 0.0f, 0.0f);
                 GXLoadTexMtxImm(m0, id, GX_MTX2x4);
                 break;
@@ -921,7 +922,7 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             PSVECNormalize((Vec*)m5[0], (Vec*)m5[0]);
             PSVECNormalize((Vec*)m5[1], (Vec*)m5[1]);
             PSVECNormalize((Vec*)m5[2], (Vec*)m5[2]);
-            if (dot == 1.0f) {
+            if (dot == EXT_LIT(float_1_8041e574, 1.0f)) {
                 PSMTXIdentity(m6);
             }
             else {
@@ -929,9 +930,9 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
                 PSMTXRotAxisRad(m6, &axis, (f32)acos(PSVECDotProduct(&v2, &h)));
             }
             PSMTXConcat(m6, m5, m0);
-            PSMTXScale(m6, 2.0f * tw->scale, 2.0f * tw->scale, 1.0f);
+            PSMTXScale(m6, EXT_LIT(float_2_8041e590, 2.0f) * tw->scale, EXT_LIT(float_2_8041e590, 2.0f) * tw->scale, EXT_LIT(float_1_8041e574, 1.0f));
             PSMTXConcat(m6, m0, m0);
-            PSMTXTrans(m6, 0.5f, 0.5f, 0.0f);
+            PSMTXTrans(m6, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0_8041e53c, 0.0f));
             PSMTXConcat(m6, m0, m0);
             GXLoadTexMtxImm(m0, id, mtxType);
             break;
@@ -942,8 +943,8 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             PSVECNormalize((Vec*)m0[1], (Vec*)m0[1]);
             PSVECNormalize((Vec*)m0[2], (Vec*)m0[2]);
             GXLoadTexMtxImm(m0, id, GX_MTX2x4);
-            PSMTXScale(m7, 0.5f, 0.5f, 0.0f);
-            PSMTXTrans(m0, 0.5f, 0.5f, 1.0f);
+            PSMTXScale(m7, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0_8041e53c, 0.0f));
+            PSMTXTrans(m0, EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_1_8041e574, 1.0f));
             PSMTXConcat(m0, m7, m0);
             GXLoadTexMtxImm(m0, id2, mtxType);
             break;
@@ -952,12 +953,12 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
             Vec target;
             Vec up;
 
-            a += 0.0001f;
-            camPos = (Vec){10.0f * (f32)sin(a), 100.0f, 10.0f * (f32)cos(a)};
-            target = (Vec){10.0f * (f32)sin(a), 0.0f, 10.0f * (f32)cos(a)};
-            up = (Vec){0.0f, 0.0f, -1.0f};
+            a += EXT_LIT(float_0p0001_8041e594, 0.0001f);
+            camPos = (Vec){EXT_LIT(float_10_8041e524, 10.0f) * (f32)sin(a), EXT_LIT(float_100_8041e5bc, 100.0f), EXT_LIT(float_10_8041e524, 10.0f) * (f32)cos(a)};
+            target = (Vec){EXT_LIT(float_10_8041e524, 10.0f) * (f32)sin(a), EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_10_8041e524, 10.0f) * (f32)cos(a)};
+            up = (Vec){EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_neg1_8041e58c, -1.0f)};
             C_MTXLookAt(m8, &camPos, &up, &target);
-            C_MTXLightFrustum((MtxPtr)m9, -32.0f, 32.0f, -32.0f, 32.0f, 300.0f, 0.5f, 0.5f, 0.5f, 0.5f);
+            C_MTXLightFrustum((MtxPtr)m9, EXT_LIT(float_neg32_8041e598, -32.0f), EXT_LIT(float_32_8041e59c, 32.0f), EXT_LIT(float_neg32_8041e598, -32.0f), EXT_LIT(float_32_8041e59c, 32.0f), EXT_LIT(float_300_8041e5a0, 300.0f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f));
             PSMTXInverse(tw->view, m10);
             PSMTXConcat(m8, m10, m11);
             PSMTXConcat((MtxPtr)m9, m11, m0);
@@ -966,7 +967,6 @@ void envTevLoadTexMtxImm(s32 type, GXTexMtx id, GXTexMtx id2, GXTexMtxType mtxTy
         }
     }
 }
-
 
 static inline void
 envTexObj(TEXPalette* pal, GXTexObj* to, u32 id) {
@@ -1018,18 +1018,19 @@ envLoadTex(u32 id, s32 map) {
     GXSetTexCoordGen2((GXTexCoordID)coord, gentype, GX_TG_NRM, texmtx_tbl[map], GX_FALSE, mtxsrc); \
     envTevLoadTexMtxImm(t, (GXTexMtx)texmtx_tbl[map], GX_PTTEXMTX0, mtxType)
 
+void envAddTev(s32 type, MapTevCallbackInfo *info);
 void envAddTev(s32 type, MapTevCallbackInfo *info)
 {
+  s32 stage;
+  int map;
+  int coord;
   EnvironmentWork *wp = (gp->inBattle) ? (&work[1]) : (&work[0]);
-  int tp;
-  int st[2];
-  
-  int new_var [2];
+  s32 indStage;
   Mtx mtx;
-  st[0] = info->tevStage;
-  new_var [0] = info->texCoord;
-  new_var [1] = info->texMap;
-  st[1] = info->field_0x18;
+  stage = info->tevStage;
+  map = info->texCoord; // MapTevCallbackInfo's texCoord/texMap fields are filled the other way round by mapdrv
+  coord = info->texMap;
+  indStage = info->indStage;
   if (type == 0)
   {
     return;
@@ -1038,149 +1039,147 @@ void envAddTev(s32 type, MapTevCallbackInfo *info)
   ((EnvTexMtxWork *) wp->unk70)->view = camGetCurPtr()->view;
   ((EnvTexMtxWork *) wp->unk70)->mtx = info->mtx;
   ((EnvTexMtxWork *) wp->unk70)->model = mtx;
-  GXSetTevOrder((GXTevStageID) st[0],  new_var [1], (GXTexMapID) new_var [0], GX_COLOR_NULL);
-  GXSetTevColorOp((GXTevStageID) st[0], GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
-  GXSetTevAlphaOp((GXTevStageID) st[0], GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
-  tp = type;
-  GXSetTevSwapMode((GXTevStageID) st[0], GX_TEV_SWAP0, GX_TEV_SWAP0);
-  switch (tp)
+  GXSetTevOrder((GXTevStageID) stage,  coord, (GXTexMapID) map, GX_COLOR_NULL);
+  GXSetTevColorOp((GXTevStageID) stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevAlphaOp((GXTevStageID) stage, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, (GXBool) 1, GX_TEVPREV);
+  GXSetTevSwapMode((GXTevStageID) stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
+  switch (type)
   {
     case 0:
       break;
 
     case 1:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 10.0f;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_10_8041e524, 10.0f);
       ((EnvTexMtxWork *) wp->unk70)->rotX = gp->retraceCount + 45;
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.5f;
-      envLoadTex(6, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [1]++;
-      new_var [0]++;
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p5_8041e538, 0.5f);
+      envLoadTex(6, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      coord++;
+      map++;
       break;
 
     case 2:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 10.0f;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_TEXA);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_10_8041e524, 10.0f);
       ((EnvTexMtxWork *) wp->unk70)->rotX = gp->retraceCount + 45;
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.5f;
-      envLoadTex(8, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p5_8041e538, 0.5f);
+      envLoadTex(8, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      coord++;
+      map++;
       break;
 
     case 3:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_CPREV, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ZERO);
-      GXSetTevAlphaIn((0, (GXTevStageID) st[0]), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.5f;
-      envLoadTex(0, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(1, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_TEXC, GX_CC_ZERO);
+      GXSetTevAlphaIn((0, (GXTevStageID) stage), GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p5_8041e538, 0.5f);
+      envLoadTex(0, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(1, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 4:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = (0, 0.5f);
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 45.0f;
-      ((EnvTexMtxWork *) wp->unk70)->rotX = 45.0f;
-      envLoadTex(1, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(2, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = (0, EXT_LIT(float_0p5_8041e538, 0.5f));
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_45_8041e560, 45.0f);
+      ((EnvTexMtxWork *) wp->unk70)->rotX = EXT_LIT(float_45_8041e560, 45.0f);
+      envLoadTex(1, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(2, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 5:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.5f;
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 45.0f;
-      ((EnvTexMtxWork *) wp->unk70)->rotX = 45.0f;
-      envLoadTex(2, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(3, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p5_8041e538, 0.5f);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_45_8041e560, 45.0f);
+      ((EnvTexMtxWork *) wp->unk70)->rotX = EXT_LIT(float_45_8041e560, 45.0f);
+      envLoadTex(2, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(3, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 6:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.15f;
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 0.0f;
-      ((EnvTexMtxWork *) wp->unk70)->rotX = 90.0f;
-      envLoadTex(4, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(2, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p15_8041e564, 0.15f);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_0_8041e53c, 0.0f);
+      ((EnvTexMtxWork *) wp->unk70)->rotX = EXT_LIT(float_90_8041e568, 90.0f);
+      envLoadTex(4, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(2, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 7:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.3f;
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 0.0f;
-      ((EnvTexMtxWork *) wp->unk70)->rotX = 90.0f;
-      envLoadTex(5, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(3, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_ZERO, GX_CC_ZERO, GX_CC_TEXC);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p3_8041e56c, 0.3f);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_0_8041e53c, 0.0f);
+      ((EnvTexMtxWork *) wp->unk70)->rotX = EXT_LIT(float_90_8041e568, 90.0f);
+      envLoadTex(5, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(3, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 8:
-      GXSetTevColorIn((GXTevStageID) st[0], GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      ((EnvTexMtxWork *) wp->unk70)->scale = 0.5f;
-      ((EnvTexMtxWork *) wp->unk70)->rotY = 10.0f;
-      ((EnvTexMtxWork *) wp->unk70)->rotX = 45.0f;
-      envLoadTex(10, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTIDENTITY);
-      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX2x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_ZERO, GX_CC_CPREV, GX_CC_TEXC, GX_CC_ZERO);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      ((EnvTexMtxWork *) wp->unk70)->scale = EXT_LIT(float_0p5_8041e538, 0.5f);
+      ((EnvTexMtxWork *) wp->unk70)->rotY = EXT_LIT(float_10_8041e524, 10.0f);
+      ((EnvTexMtxWork *) wp->unk70)->rotX = EXT_LIT(float_45_8041e560, 45.0f);
+      envLoadTex(10, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX2x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTIDENTITY);
+      envTevLoadTexMtxImm(0, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX2x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
     case 9:
       break;
 
     case 10:
-      tp = (GXTevStageID) st[0];
-      GXSetTevColorIn(tp, GX_CC_CPREV, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
-      GXSetTevAlphaIn((GXTevStageID) st[0], GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
-      GXSetTevKColorSel(tp, GX_TEV_KCSEL_K1);
+      GXSetTevColorIn((GXTevStageID) stage, GX_CC_CPREV, GX_CC_TEXC, GX_CC_KONST, GX_CC_ZERO);
+      GXSetTevAlphaIn((GXTevStageID) stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_APREV);
+      GXSetTevKColorSel((GXTevStageID) stage, GX_TEV_KCSEL_K1);
       GXSetTevKColor(GX_KCOLOR1, (GXColor){0x7F, 0x7F, 0x7F, 0x00});
-      envLoadTex(9, new_var [0]);
-      GXSetTexCoordGen2((GXTexCoordID) new_var [1], GX_TG_MTX3x4, GX_TG_NRM, texmtx_tbl[new_var [0]], (GXBool) 0, GX_PTTEXMTX0);
-      envTevLoadTexMtxImm(4, (GXTexMtx) texmtx_tbl[new_var [0]], GX_PTTEXMTX0, GX_MTX3x4);
-      st[0]++;
-      new_var [0]++;
-      new_var [1]++;
+      envLoadTex(9, map);
+      GXSetTexCoordGen2((GXTexCoordID) coord, GX_TG_MTX3x4, GX_TG_NRM, texmtx_tbl[map], (GXBool) 0, GX_PTTEXMTX0);
+      envTevLoadTexMtxImm(4, (GXTexMtx) texmtx_tbl[map], GX_PTTEXMTX0, GX_MTX3x4);
+      stage++;
+      map++;
+      coord++;
       break;
 
   }
 
-  info->tevStage = st[0];
-  info->texMap = new_var [1];
-  info->field_0x18 = st[1];
-  info->texCoord = new_var [0];
+  info->tevStage = stage;
+  info->texMap = coord;
+  info->indStage = indStage;
+  info->texCoord = map;
 }
 
 #undef ENV_TEX_TAIL
@@ -1188,7 +1187,8 @@ void envAddTev(s32 type, MapTevCallbackInfo *info)
 #undef tw
 
 double tan(double);
-
+static inline MapObject* envWaterObj(MapTevCallbackInfo* info) { return *(MapObject**)info->field_0x0; }
+static inline MapObject* envWaterParent(MapObject* o) { return o->parent; }
 void envSetWater(MapTevCallbackInfo* info) {
     MapObject* obj;
     GXTevStageID stage;
@@ -1215,13 +1215,13 @@ void envSetWater(MapTevCallbackInfo* info) {
     s32 x1;
     s32 y1;
 
+    obj = envWaterObj(info);
     stage = info->tevStage;
-    obj = *(MapObject**)info->field_0x0;
     map = info->texCoord;
     coord = info->texMap;
-    ind = info->field_0x18;
+    ind = info->indStage;
     if (obj->flags & 0x20) {
-        while ((obj = obj->parent) != NULL) {
+        while ((obj = envWaterParent(obj)) != NULL) {
             if (obj->flags & 0x10) {
                 if (!(obj->flags & 0x20000000)) {
                     obj->flags |= 0x20000000;
@@ -1277,28 +1277,28 @@ void envSetWater(MapTevCallbackInfo* info) {
     GXPixModeSync();
     GXTexModeSync();
     GXInitTexObj(&obj1, buf, (u16)hw, (u16)hh, GX_TF_RGB565, GX_CLAMP, GX_CLAMP, GX_FALSE);
-    GXInitTexObjLOD(&obj1, GX_NEAR, GX_NEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
+    GXInitTexObjLOD(&obj1, GX_NEAR, GX_NEAR, EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), GX_FALSE, GX_FALSE, GX_ANISO_1);
     PSMTXMultVec(info->mtx, &(*(MapObject**)info->field_0x0)->center, &pos);
-    scale = 1000.0f / PSVECDistance(&camGetCurPtr()->cameraPos, &pos);
-    if (scale < 0.0f) {
+    scale = EXT_LIT(float_1000_8041e540, 1000.0f) / PSVECDistance(&camGetCurPtr()->cameraPos, &pos);
+    if (scale < EXT_LIT(float_0_8041e53c, 0.0f)) {
         scale = 0.0f;
     }
-    if (scale > 127.0f) {
+    if (scale > EXT_LIT(float_127_8041e544, 127.0f)) {
         scale = 127.0f;
     }
     buf2 = smartAlloc(GXGetTexBufferSize(64, 64, GX_TF_IA8, GX_FALSE, 0), 3)->address;
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 s = sin((f32)gp->retraceCount / 10.0f + (18.849552f * j) / 64.0f);
-            u8* p = buf2 + ((i / 4) * 32 + (j / 4) * 512) + ((i % 4) + (j % 4) * 4) * 2;
-            p[0] = 0.6f + (scale * s + 128.0f);
+            u8* p = buf2 + (j / 4) * 512 + (i / 4) * 32 + ((i % 4) + (j % 4) * 4) * 2;
+            p[0] = EXT_LIT(float_0p6_8041e550, 0.6f) + (scale * s + EXT_LIT(float_128_8041e554, 128.0f));
             p[1] = 0x80;
         }
     }
     DCFlushRange(buf2, 0x2000);
     GXInitTexObj(&obj2, buf2, 64, 64, GX_TF_IA8, GX_REPEAT, GX_REPEAT, GX_FALSE);
-    GXInitTexObjLOD(&obj2, GX_LINEAR, GX_LINEAR, 0.0f, 0.0f, 0.0f, GX_FALSE, GX_FALSE, GX_ANISO_1);
-    t = tan(6.2831855f * (camGetPtr(4)->fovY / 2.0f) / 360.0f);
+    GXInitTexObjLOD(&obj2, GX_LINEAR, GX_LINEAR, EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), EXT_LIT(float_0_8041e53c, 0.0f), GX_FALSE, GX_FALSE, GX_ANISO_1);
+    t = tan(EXT_LIT(float_6p2832_8041e558, 6.2831855f) * (camGetPtr(4)->fovY / EXT_LIT(float_2_8041e590, 2.0f)) / EXT_LIT(float_360_8041e55c, 360.0f));
     C_MTXLightFrustum(mtx, gp->efbHeight / 2 - y1, gp->efbHeight / 2 - y0, x0 - gp->fbWidth / 2, x1 - gp->fbWidth / 2,
                       gp->efbHeight / 2.0f / t, 0.5f, 0.5f, 0.5f, 0.5f);
     PSMTXConcat(mtx, camGetCurPtr()->view, mtx);
@@ -1313,12 +1313,12 @@ void envSetWater(MapTevCallbackInfo* info) {
     GXSetTevColorIn((GXTevStageID)stage, GX_CC_TEXC, GX_CC_CPREV, GX_CC_APREV, GX_CC_ZERO);
     GXSetTevAlphaIn((GXTevStageID)stage, GX_CA_ZERO, GX_CA_ZERO, GX_CA_ZERO, GX_CA_TEXA);
     GXSetTevSwapMode((GXTevStageID)stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
-    indMtx[0][0] = 0.5f;
-    indMtx[0][1] = 0.0f;
-    indMtx[0][2] = 0.0f;
-    indMtx[1][0] = 0.0f;
-    indMtx[1][1] = 0.5f;
-    indMtx[1][2] = 0.0f;
+    indMtx[0][0] = EXT_LIT(float_0p5_8041e538, 0.5f);
+    indMtx[0][1] = EXT_LIT(float_0_8041e53c, 0.0f);
+    indMtx[0][2] = EXT_LIT(float_0_8041e53c, 0.0f);
+    indMtx[1][0] = EXT_LIT(float_0_8041e53c, 0.0f);
+    indMtx[1][1] = EXT_LIT(float_0p5_8041e538, 0.5f);
+    indMtx[1][2] = EXT_LIT(float_0_8041e53c, 0.0f);
     GXSetIndTexMtx(GX_ITM_0, indMtx, 1);
     GXSetIndTexOrder((GXIndTexStageID)ind, (GXTexCoordID)coord, (GXTexMapID)(1 + map));
     GXSetIndTexCoordScale((GXIndTexStageID)ind, GX_ITS_1, GX_ITS_1);
@@ -1329,7 +1329,7 @@ void envSetWater(MapTevCallbackInfo* info) {
     map += 2;
     info->tevStage = stage;
     info->texMap = coord;
-    info->field_0x18 = ind;
+    info->indStage = ind;
     info->texCoord = map;
 }
 
@@ -1357,28 +1357,27 @@ void envSetYami(MapTevCallbackInfo* info) {
     stage = info->tevStage;
     map = info->texCoord;
     coord = info->texMap;
-    unk18 = info->field_0x18;
-
+    unk18 = info->indStage;
 
     if (v_count != (rc = gp->retraceCount)) {
         u1 += 0.004f;
-        u2 -= 0.004f;
+        u2 -= EXT_LIT(float_0p004_8041e520, 0.004f);
         v_count = rc;
-        if (u1 > 10.0f) {
+        if (u1 > EXT_LIT(float_10_8041e524, 10.0f)) {
             u1 -= 10.0f;
         }
-        if (u2 < 10.0f) {
+        if (u2 < EXT_LIT(float_10_8041e524, 10.0f)) {
             u2 += 10.0f;
         }
     }
     GXSetTevColorOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
     GXSetTevAlphaOp(stage - 1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVREG0);
-    C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u1, 0.5f);
+    C_MTXLightOrtho(mtx, EXT_LIT(float_72_8041e528, 72.0f), EXT_LIT(float_neg72_8041e52c, -72.0f), EXT_LIT(float_neg96_8041e530, -96.0f), EXT_LIT(float_96_8041e534, 96.0f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), u1, EXT_LIT(float_0p5_8041e538, 0.5f));
     PSMTXConcat(mtx, (MtxPtr)wp->unkC0, mtx);
     PSMTXConcat(mtx, info->mtx, mtx);
     GXLoadTexMtxImm(mtx, texmtx_tbl[map], GX_MTX3x4);
     GXSetTexCoordGen2(coord, GX_TG_MTX3x4, GX_TG_POS, texmtx_tbl[map], GX_FALSE, GX_PTIDENTITY);
-    C_MTXLightOrtho(mtx, 72.0f, -72.0f, -96.0f, 96.0f, 0.5f, 0.5f, u2, 0.5f);
+    C_MTXLightOrtho(mtx, EXT_LIT(float_72_8041e528, 72.0f), EXT_LIT(float_neg72_8041e52c, -72.0f), EXT_LIT(float_neg96_8041e530, -96.0f), EXT_LIT(float_96_8041e534, 96.0f), EXT_LIT(float_0p5_8041e538, 0.5f), EXT_LIT(float_0p5_8041e538, 0.5f), u2, EXT_LIT(float_0p5_8041e538, 0.5f));
     PSMTXConcat(mtx, (MtxPtr)wp->unkC0, mtx);
     PSMTXConcat(mtx, info->mtx, mtx);
     GXLoadTexMtxImm(mtx, texmtx_tbl[map + 1], GX_MTX3x4);
@@ -1414,6 +1413,8 @@ void envSetYami(MapTevCallbackInfo* info) {
     map += 2;
     info->tevStage = stage;
     info->texMap = coord;
-    info->field_0x18 = unk18;
+    info->indStage = unk18;
     info->texCoord = map;
 }
+
+

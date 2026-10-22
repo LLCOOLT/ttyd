@@ -367,7 +367,6 @@ BattleWeapon* _GetFirstAttackWeapon(s32 type) {
 	}
 }
 
-
 BattleUnit* BattleGetMarioPtr(BattleWork* wp);
 void BattleAudience_Case_FirstAttack_Good(void);
 void BattleAudience_Case_FirstAttack_Bad(void);
@@ -438,16 +437,16 @@ void btlseqFirstAct(BattleWork* wp) {
 			BattleGetFirstAttackUnit(wp, &a, &b);
 			wp->activeUnitId = a->unitId;
 			FIELD(a, u32, 0x278) |= 0x1000;
-			evt = evtEntry(FIELD(b, s32*, 0x2AC), 10, 0x20);
+			evt = evtEntry(b->damageEventCode, 10, 0x20);
 			if (evt) {
 				evt->unitId = b->unitId;
-				FIELD(b, s32, 0x274) = 0x39;
-				FIELD(b, s32, 0x2B0) = evt->eventId;
+				b->damageCode = 0x39;
+				b->damageEventId = evt->eventId;
 			}
 			FIELD(a, u32, 0x1C) |= 0x4000000;
 			if (type < 9) {
 				FIELD(a, s32, 0x29C) = FIELD(_GetFirstAttackWeapon(type), s32, 0xB0);
-				FIELD(a, s32, 0x2A8) = 0;
+				a->attackEventFlags = 0;
 				BattleStatusWindowEventOff();
 			}
 			if (BtlUnit_GetBelong(a) == 0) {
@@ -456,10 +455,10 @@ void btlseqFirstAct(BattleWork* wp) {
 			else {
 				BattleAudience_Case_FirstAttack_Bad();
 			}
-			evt = evtEntry(FIELD(a, s32*, 0x29C), 10, 0);
+			evt = evtEntry(a->attackEventCode, 10, 0);
 			if (evt) {
 				evt->unitId = a->unitId;
-				FIELD(a, s32, 0x2A4) = evt->eventId;
+				a->attackEventId = evt->eventId;
 			}
 			switch (type) {
 			case 1: case 2: case 3: case 4: case 5: case 6:
@@ -650,26 +649,28 @@ void btlseqFirstAct(BattleWork* wp) {
 	}
 }
 
-
 //==== written below (reverse order) ====
 
 USER_FUNC(_set_effect_luck) {
 	BattleWork* wp = _battleWorkPointer;
-	BattleWeapon weapon = *(BattleWeapon*)N_weapon_lucky_start;
-	f32 z, y, x;
-	const char* sfx;
 	f32* pz;
 	f32* py;
+	BattleWeapon weapon = *(BattleWeapon*)N_weapon_lucky_start;
+	f32 z;
+	f32 y;
 	BattleWeapon* pw;
+	f32 x;
+	const char* sfx;
 	BattleUnit* unit;
 	BattleUnitPart* part;
 	NiceEffectWork* effect;
 	int i;
 
+	// FAKE: comma temps so the pointers are coloured in assignment order (r31 pw ... r28 sfx)
+	pw = (0, &weapon);
+	pz = (0, &z);
+	py = (0, &y);
 	sfx = (0, "SFX_SYSTEM_LUCKY1");
-	pw = &weapon;
-	pz = &z;
-	py = &y;
 	for (i = 0; i < 64; i++) {
 		unit = BattleGetUnitPtr(wp, i);
 		if (unit && unit->badgesEquipped.LuckyStart && !BtlUnit_CheckStatus(unit, STATUS_INSTANT_KILL)) {
@@ -720,7 +721,6 @@ USER_FUNC(_set_effect_luck) {
 	}
 	return EVT_RETURN_DONE;
 }
-
 
 #define TURN_NEXT(wp) \
 	BattleIncSeq(wp, SEQ_TURN); \
@@ -1817,7 +1817,6 @@ void btlseqTurn(BattleWork *wp)
         }
       }
 
-
       case 1:
         done = 1;
         for (i = 0; i < 64; i++)
@@ -2116,7 +2115,6 @@ void btlseqTurn(BattleWork *wp)
 
 }
 
-
 void _rule_disp(CameraId cameraId, void* param) {
 	FieldBattleInfo* info = _battleWorkPointer->fbatInfo;
 	char buf[256];
@@ -2145,7 +2143,6 @@ void _rule_disp(CameraId cameraId, void* param) {
 	y = 120.0f;
 	FontDrawMessage((s32)x, (s32)y - 29, buf);
 }
-
 
 void btlseqPhase(BattleWork* wp) {
 	switch (BattleGetSeq(wp, SEQ_PHASE)) {
@@ -2390,7 +2387,6 @@ void btlseqMove(BattleWork* wp) {
 	} while (loop);
 }
 
-
 BOOL BattlePhaseEndCheck(void) {
 	BattleWork* wp = _battleWorkPointer;
 	BattleUnit* unit;
@@ -2424,7 +2420,7 @@ void btlseqAct(BattleWork* wp) {
 
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 			effNiceAsync(1);
-			FIELD(unit, s32, 0x280) = 0;
+			unit->totalDamageDealt = 0;
 			FIELD(unit, s32, 0x2CC) = 0;
 			BattleAudience_ActInit();
 			cantMove = TRUE;
@@ -2480,40 +2476,40 @@ void btlseqAct(BattleWork* wp) {
 			break;
 		case 0x6000005:
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-			FIELD(unit, void*, 0x29C) = BtlUnit_GetData(unit, 2);
-			FIELD(unit, s32, 0x2A8) = 1;
+			unit->attackEventCode = BtlUnit_GetData(unit, 2);
+			unit->attackEventFlags = 1;
 			BattleSetSeq(wp, SEQ_ACT, 0x6000006);
 			break;
 		case 0x6000003:
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-			FIELD(unit, s32, 0x2A8) = 1;
+			unit->attackEventFlags = 1;
 			unit->flags |= 0x4000000;
 			BattleSetSeq(wp, SEQ_ACT, 0x6000006);
 			break;
 		case 0x6000004:
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-			FIELD(unit, void*, 0x29C) = BtlUnit_GetData(unit, 3);
-			FIELD(unit, s32, 0x2A8) = 0x1B;
+			unit->attackEventCode = BtlUnit_GetData(unit, 3);
+			unit->attackEventFlags = 0x1B;
 			BattleSetSeq(wp, SEQ_ACT, 0x6000006);
 			break;
 		case 0x6000006:
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
-			if (!(FIELD(unit, s32, 0x2A8) & 1)) {
+			if (!(unit->attackEventFlags & 1)) {
 				BattleStatusWindowSystemOff();
 			}
 			unit = BattleGetUnitPtr(wp, wp->activeUnitId);
 			evt = NULL;
 			if ((wp->flags & 0x40000000) && !(unit->mAttributeFlags & 0x2000) &&
-				!(FIELD(unit, s32, 0x2A8) & 8) && !(FIELD(unit, s32, 0x2A8) & 0x10)) {
+				!(unit->attackEventFlags & 8) && !(unit->attackEventFlags & 0x10)) {
 				evt = evtEntry(btldefaultevt_CantMoveZeroGravity, 10, 0);
 			}
-			else if (FIELD(unit, s32, 0x2A8) & 0x10) {
-				if (FIELD(unit, void*, 0x29C)) {
-					evt = evtEntry(FIELD(unit, void*, 0x29C), 10, 0);
+			else if (unit->attackEventFlags & 0x10) {
+				if (unit->attackEventCode) {
+					evt = evtEntry(unit->attackEventCode, 10, 0);
 				}
 			}
-			else if (FIELD(unit, s32, 0x2A8) & 2) {
-				evt = evtEntry(FIELD(unit, void*, 0x29C), 10, 0);
+			else if (unit->attackEventFlags & 2) {
+				evt = evtEntry(unit->attackEventCode, 10, 0);
 			}
 			else if (!BtlUnit_CheckStatus(unit, 1) &&
 				!BtlUnit_CheckStatus(unit, 2) &&
@@ -2524,10 +2520,10 @@ void btlseqAct(BattleWork* wp) {
 				}
 				else if (BtlUnit_CheckStatus(unit, 5) && irand(100) < 50) {
 					unit->mTokenFlags |= 0x10;
-					evt = evtEntry(FIELD(unit, void*, 0x2A0), 10, 0);
+					evt = evtEntry(unit->confusionEventCode, 10, 0);
 				}
 				else {
-					evt = evtEntry(FIELD(unit, void*, 0x29C), 10, 0);
+					evt = evtEntry(unit->attackEventCode, 10, 0);
 				}
 			}
 			if (evt) {
@@ -2675,7 +2671,6 @@ void btlseqAct(BattleWork* wp) {
 			break;
 	}
 }
-
 
 void btlseqTurnFirstProcess(BattleWork* wp) {
 	BattleUnitKind* kind;
@@ -3101,5 +3096,4 @@ USER_FUNC(_set_haikei_entry_scale) {
 	}
 	return busy ? EVT_RETURN_BLOCK : EVT_RETURN_DONE;
 }
-
 

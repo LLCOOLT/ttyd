@@ -14,6 +14,23 @@ void parseInit(void* ptr, u32 size) {
 	parse.end[0] = size;
 }
 
+int strcmp(const char *s1, const char *s2);
+// the tag copy loop was an inline: its locals take the low volatile registers (r4 j, r5 n) under the strength-reduced buf pointer (r6)
+static inline void parseCopyTag(char* buf, s8* p, s32 i, s32 end) {
+	s32 n;
+	s32 j;
+	for (j = i, n = 0; j < end; j++) {
+		if (p[j] != ' ' && p[j] != '\t' && p[j] != '\n' && p[j] != '\r') {
+			buf[n] = p[j];
+			n += 1;
+		}
+		if (n >= 127 || p[j] == '>') {
+			break;
+		}
+	}
+	*(buf + n) = 0;
+}
+
 BOOL parsePush(const char* tag) {
 	static char buf[128];
 	s32 i;
@@ -23,9 +40,6 @@ BOOL parsePush(const char* tag) {
 	s32 newStart;
 	s32 newEnd;
 	s32 depth;
-	s32 j;
-	s32 n;
-	s8 c;
 	depth = 0;
 	state = 0;
 	p = (s8*)parse.ptr;
@@ -49,17 +63,7 @@ BOOL parsePush(const char* tag) {
 			}
 			else {
 				if (state == 0 && depth == 0) {
-					for (j = i, n = 0; j < end; j++) {
-						c = p[j];
-						if (c != ' ' && c != '\t' && c != '\n' && c != '\r') {
-							buf[n] = c;
-							n += 1;
-						}
-						if (n >= 127 || p[j] == '>') {
-							break;
-						}
-					}
-					*(buf + n) = 0;
+					parseCopyTag(buf, p, i, end);
 					if (strcmp(&buf[0], tag) == 0) {
 						for (; i < end; i++) {
 							if (p[i] == '>') {

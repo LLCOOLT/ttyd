@@ -144,10 +144,10 @@ USER_FUNC(evt_audience_move_position_frame) {
 	}
 	compare = member->targetPosX - member->startPosX;
 	if (compare > 0.0f) {
-		member->field_0xE8 = 180.0f;
+		member->angle = 180.0f;
 	}
 	else if (compare < 0.0f) {
-		member->field_0xE8 = 0.0f;
+		member->angle = 0.0f;
 	}
 	x = intplGetValue(
 		member->interpType,
@@ -227,10 +227,10 @@ USER_FUNC(evt_audience_move_position_speed) {
 
 	compare = member->interpDelta.x;
 	if (compare > 0.0f) {
-		member->field_0xE8 = 180.0f;
+		member->angle = 180.0f;
 	}
 	else if (compare < 0.0f) {
-		member->field_0xE8 = 0.0f;
+		member->angle = 0.0f;
 	}
 
 	BattleAudience_SetPosition(

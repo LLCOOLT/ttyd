@@ -30,7 +30,7 @@ typedef struct ChuchuParty {
     u8 pad64[0x94 - 0x64];     // 0x64
     Vec target;                // 0x94
     u8 padA0[0xF0 - 0xA0];     // 0xA0
-    f32 field_F0;              // 0xF0
+    f32 height;                // 0xF0
     f32 field_F4;              // 0xF4
     f32 field_F8;              // 0xF8
     f32 field_FC;              // 0xFC
@@ -39,7 +39,7 @@ typedef struct ChuchuParty {
     u8 pad108[0x10C - 0x108];  // 0x108
     f32 field_10C;             // 0x10C
     f32 field_110;             // 0x110
-    f32 field_114;             // 0x114
+    f32 velY;                  // 0x114
     u8 pad118[0x160 - 0x118];  // 0x118
     MarioWork* player;         // 0x160
 } ChuchuParty;
@@ -160,11 +160,11 @@ USER_FUNC(search_result) {
             return EVT_RETURN_DONE;
         }
         psndSFXOn_3D((const char*)0x945, &party->position);
-        event->field_84 = 42;
+        event->userdata3 = 42;
         partyChgPose(party, "PCH_Y_1");
     }
     partyChkGnd(party);
-    if ((s32)--event->field_84 > 0) {
+    if ((s32)--event->userdata3 > 0) {
         return EVT_RETURN_BLOCK;
     }
     if (party) {
@@ -356,7 +356,7 @@ void chuchu_init(PartyEntry* party) {
 
     cp->field_33 = 7;
     cp->field_32 = 0;
-    cp->field_F0 = 20.0f;
+    cp->height = 20.0f;
     cp->field_F4 = 24.0f;
 }
 
@@ -395,10 +395,10 @@ void chuchu_use(PartyEntry* party) {
         cp->timer = 4;
         cp->field_FC = angleABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z);
         cp->field_100 = cp->field_FC;
-        cp->field_10C = player->unk1A8;
-        cp->field_110 = player->unk1A8;
+        cp->field_10C = player->displayDirection;
+        cp->field_110 = player->displayDirection;
         cp->field_104 = distABf(cp->position.x, cp->position.z, cp->target.x, cp->target.z) / cp->timer;
-        cp->field_114 = 0.0f;
+        cp->velY = 0.0f;
         cp->state = 1;
         break;
     case 1:
@@ -415,7 +415,7 @@ void chuchu_use(PartyEntry* party) {
         cp->state = 10;
         break;
     case 10:
-        cp->field_110 = player->unk1AC;
+        cp->field_110 = player->displayDirectionTarget;
         cp->field_FC = toMovedir(cp->field_110);
         cp->field_100 = cp->field_FC;
         cp->state = 20;

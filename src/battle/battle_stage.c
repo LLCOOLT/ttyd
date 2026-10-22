@@ -73,12 +73,12 @@ typedef struct StageWork {
 	StageLight lights[12];  // 0x4
 	StageDark stgDark;      // 0xAE4
 	StageDark audDark;      // 0xB04
-	f32 field_B24;          // 0xB24
-	f32 field_B28;          // 0xB28
-	f32 field_B2C;          // 0xB2C
-	f32 field_B30;          // 0xB30
-	f32 field_B34;          // 0xB34
-	f32 field_B38;          // 0xB38
+	f32 stageSizeX;          // 0xB24
+	f32 stageSizeY;          // 0xB28
+	f32 stageSizeZ;          // 0xB2C
+	f32 audienceSizeX;          // 0xB30
+	f32 audienceSizeY;          // 0xB34
+	f32 audienceSizeZ;          // 0xB38
 } StageWork;
 
 #define STG ((StageWork*)BattleStageGetPtr())
@@ -101,25 +101,20 @@ typedef struct ScreenWork {
 static BattleSpotWork work;
 static ScreenWork* screen_wp;
 
-
 //.sdata
 static BattleSpotWork* wp = &work;
 
-
-__declspec(section ".sdata") u32 gap_07_804117E4_sdata[7] = {0};
-static u8 inta_tex[32] = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
+static u8 inta_tex[32] ATTRIBUTE_ALIGN(32) = {0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0,0xFF,0xFF,0xFF,0xFF,0,0,0,0};
 
 USER_FUNC(screen_evt_func);
 
-__declspec(section ".sdata") EVT_BEGIN(screen_evt)
+EVT_BEGIN(screen_evt)
 	BEGIN_INLINE_EVENT
 		CALL(screen_evt_func, LW(0))
 	END_INLINE_EVENT
 	RETURN
 EVT_END()
 
-
-__declspec(section ".sdata") u32 gap_07_8041183C_sdata[1] = {0};
 
 // forward declarations
 void batSpotDisp(CameraId camId, void* param);
@@ -165,12 +160,12 @@ void BattleStageInit(void) {
 	s->audDark.target = 0;
 	s->audDark.time = 0;
 	s->audDark.max = 0;
-	s->field_B24 = 290.0f;
-	s->field_B28 = 200.0f;
-	s->field_B2C = 90.0f;
-	s->field_B30 = s->field_B24;
-	s->field_B34 = -50.0f;
-	s->field_B38 = 200.0f;
+	s->stageSizeX = 290.0f;
+	s->stageSizeY = 200.0f;
+	s->stageSizeZ = 90.0f;
+	s->audienceSizeX = s->stageSizeX;
+	s->audienceSizeY = -50.0f;
+	s->audienceSizeZ = 200.0f;
 	BattleStageObjectInit();
 	batSpotInit();
 }
@@ -930,3 +925,4 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	p->field_14 = 2;
 	p->field_10 = 2;
 }
+

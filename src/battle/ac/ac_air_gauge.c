@@ -84,9 +84,9 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
+            if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
                 if (irand(100) >= 0) {
-                    ac->field_0x8 = ACW(ac, s32, 0x44) / 2;
+                    ac->setupParam = ACW(ac, s32, 0x44) / 2;
                     ac->outputParams[0] = 0;
                     ac->outputParams[2] = 0;
                 } else {
@@ -94,17 +94,17 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
                     ac->outputParams[0] = v;
                     switch (v) {
                         case 1:
-                            ac->field_0x8 = ACW(ac, s32, 0x44) - 1;
+                            ac->setupParam = ACW(ac, s32, 0x44) - 1;
                             break;
                         case 2:
-                            ac->field_0x8 = ACW(ac, s32, 0x48) - 1;
+                            ac->setupParam = ACW(ac, s32, 0x48) - 1;
                             break;
                         case 3:
-                            ac->field_0x8 = ACW(ac, s32, 0x4C) - 1;
+                            ac->setupParam = ACW(ac, s32, 0x4C) - 1;
                             break;
                         case 4:
                         default:
-                            ac->field_0x8 = ACW(ac, s32, 0x4C) + 1;
+                            ac->setupParam = ACW(ac, s32, 0x4C) + 1;
                             break;
                     }
                     ac->outputParams[2] = 100;
@@ -175,8 +175,8 @@ s32 battleAcMain_AirGauge(BattleWork* work) {
             }
             break;
         case 1001:
-            ac->field_0x8--;
-            if (ac->field_0x8 < 0) {
+            ac->setupParam--;
+            if (ac->setupParam < 0) {
                 if ((s32)ac->outputParams[0] > 0) {
                     ac->result = 2;
                     ac->mResultCount++;

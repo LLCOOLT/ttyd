@@ -30,7 +30,6 @@
 #include "system.h"
 #include <string.h>
 
-
 inline Vec unknownVec0(void) {
     return (Vec){ 0.0f, 0.0f, 0.0f };
 }
@@ -92,8 +91,7 @@ ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
 HitEntry* itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy);
 HitEntry* itemHitCheckUp(ItemEntry* entry, f32 vy);
 
-
-HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle);
+HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle);
 void itemseq_GetItem(ItemEntry* entry);
 void itemDelete(const char* name);
 void itemModeChange(ItemEntry* entry, s32 mode);
@@ -101,8 +99,6 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 
 //.bss
 static ItemWork work[2];
-
-
 
 //.data
 WinMgrDesc itemdrv_window_desc[4] = {
@@ -138,8 +134,8 @@ static inline BOOL itemGetPouch(ItemEntry* entry) {
 	else if (entry->flags & 0x40) {
 		_swSet(entry->evtId);
 	}
-	if ((u32)entry->field_0x20 != 0) {
-		evt = evtEntry((void*)entry->field_0x20, 0, 0x20);
+	if ((u32)entry->evtCode != 0) {
+		evt = evtEntry((void*)entry->evtCode, 0, 0x20);
 		evt->lwData[0] = FLOAT(entry->position.x);
 		evt->lwData[1] = FLOAT(entry->position.y);
 		evt->lwData[2] = FLOAT(entry->position.z);
@@ -226,7 +222,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
 		if (marioStGetSystemLevel() != 0U) return FALSE;
 		if (mario->flags & 0xA) return FALSE;
 	}
-	if (*(s32*)&gp->field_0x164) return FALSE;
+	if (*(s32*)&gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
 	if (mario->currMotionId == 0x18) return FALSE;
@@ -247,7 +243,7 @@ BOOL itemGetCheck(ItemEntry* entry) {
 	switch (entry->mode) {
 		case 5:
 		case 6:
-			if (!entry->field_0x26) break;
+			if (!entry->subState) break;
 			if (entry->flags2 & 4) break;
 			if (entry->flags2 & 8) break;
 			return TRUE;
@@ -262,7 +258,6 @@ BOOL itemGetCheck(ItemEntry* entry) {
 	return FALSE;
 }
 
-#pragma dont_inline on
 BOOL itemGetNokoCheck(ItemEntry* entry) {
 	MarioWork* mario = marioGetPtr();
 
@@ -271,7 +266,7 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
 	if (marioStGetSystemLevel() != 0U) return FALSE;
 	if (mario->flags & 0xA) return FALSE;
 	if (entry->flags2 & 0x2000000) return FALSE;
-	if (*(s32*)&gp->field_0x164) return FALSE;
+	if (*(s32*)&gp->mapEventId) return FALSE;
 	if (seqGetSeq() != 2) return FALSE;
 	if (mario->currMotionId == 0x19) return FALSE;
 	if (vivianGetStatus()) return FALSE;
@@ -289,7 +284,6 @@ BOOL itemGetNokoCheck(ItemEntry* entry) {
 	}
 	return !N_fbatPreventMarioEventChk();
 }
-#pragma dont_inline reset
 
 BOOL N_itemPickUpFromFieldCheck(void) {
 	ItemWork* wp = itemGetWork();
@@ -308,7 +302,6 @@ typedef struct ItemEffPos {
 	u8 pad[8];
 	Vec position;
 } ItemEffPos;
-
 
 void itemMain(void) {
 	ItemWork* wp = itemGetWork();
@@ -346,7 +339,7 @@ void itemMain(void) {
 				break;
 		}
 		if (!active) {
-			entry->field_0x68 = gp->renderTime;
+			entry->baseTime = gp->renderTime;
 			continue;
 		}
 		if (mode != 2) {
@@ -357,7 +350,7 @@ void itemMain(void) {
 				entry->flags2 &= ~0x100;
 			}
 			else {
-				entry->timer -= (f32)OSTicksToMicroseconds(gp->renderTime - entry->field_0x68) / 1000.0f;
+				entry->timer -= (f32)OSTicksToMicroseconds(gp->renderTime - entry->baseTime) / 1000.0f;
 				if (entry->timer <= 0) {
 					itemModeChange(entry, 9);
 				}
@@ -454,7 +447,7 @@ void itemMain(void) {
 					}
 					break;
 			}
-			entry->field_0x68 = gp->renderTime;
+			entry->baseTime = gp->renderTime;
 			if (entry->itemId == 0x79 || entry->itemId == 0x7A) {
 				if (irand(1000) < 30) {
 					dx = 10 - irand(20);
@@ -468,14 +461,14 @@ void itemMain(void) {
 	wp = gp->inBattle ? &work[0] : &work[1];
 	for (entry = wp->entries, i = 0; i < wp->count; i++, entry++) {
 		if (entry->flags & 1) {
-			entry->field_0x68 = gp->renderTime;
+			entry->baseTime = gp->renderTime;
 		}
 	}
 }
 
 void itemModeChange(ItemEntry* entry, s32 mode) {
 	entry->mode = mode;
-	entry->field_0x26 = 0;
+	entry->subState = 0;
 }
 
 ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z) {
@@ -556,8 +549,8 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 	entry->position.y = y;
 	entry->position.z = z;
 	entry->itemId = itemId;
-	entry->field_0x2 = type;
-	entry->field_0x20 = a5;
+	entry->type = type;
+	entry->evtCode = a5;
 	entry->flags |= 1;
 	entry->scale = 1.0f;
 	entry->alpha = 0xFF;
@@ -587,8 +580,8 @@ ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, 
 		iconSetAlpha(entry->name, entry->alpha);
 		break;
 	}
-	entry->field_0x80 = entry->field_0x84 = 1.0f;
-	entry->field_0x68 = gp->renderTime;
+	entry->bounceFactor = entry->gravityScale = 1.0f;
+	entry->baseTime = gp->renderTime;
 	switch (entry->itemId) {
 	case 0x79: case 0x7A: case 0x7B: case 0x7C:
 		entry->flags |= 4;
@@ -836,7 +829,6 @@ void winFullDisp(WinMgrEntry* win) {
 	u16 width;
 	const char* msg;
 
-
 	if (entry->itemId >= 0xF0 && entry->itemId < 0x153) {
 		isBadge = TRUE;
 	}
@@ -855,7 +847,6 @@ void winFullDisp(WinMgrEntry* win) {
 	}
 }
 
-
 void itemseq_GetItem(ItemEntry* entry) {
 	ItemWork* wp = itemGetWork();
 	MarioWork* mario;
@@ -863,7 +854,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 	s32 select;
 
 	mario = marioGetPtr();
-	switch (entry->field_0x26) {
+	switch (entry->subState) {
 		case 0:
 			entry->flags2 &= ~0x10000;
 			if (entry->flags & 0x100) {
@@ -884,7 +875,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				}
 				break;
 			}
-			entry->field_0x26 = 1;
+			entry->subState = 1;
 			entry->timer = 0;
 			camGetPtr(8)->flags |= 0x200;
 			marioKeyOff();
@@ -903,12 +894,12 @@ void itemseq_GetItem(ItemEntry* entry) {
 					if (mario->currMotionId == 5 || (u16)(mario->currMotionId - 6) <= 2 ||
 						mario->currMotionId == 0xF || mario->currMotionId == 0xE)
 					{
-						entry->field_0x26 = 8;
+						entry->subState = 8;
 					}
 					break;
 				}
 			}
-			entry->field_0x26 = 2;
+			entry->subState = 2;
 			marioChgGetItemMotion();
 			{
 				f32 y = 50.0f + mario->position.y, z = mario->position.z;
@@ -1026,7 +1017,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				marioCtrlOff();
 				entry->flags2 |= 0x1000000;
 			}
-			entry->field_0x26 = 3;
+			entry->subState = 3;
 		case 3:
 			if (!(entry->flags & 0x8000) && !(entry->flags & 0x2000)) {
 				if (psndBGMChk(1)) {
@@ -1054,12 +1045,12 @@ void itemseq_GetItem(ItemEntry* entry) {
 				}
 			}
 			if (entry->flags2 & 0x2000) {
-				entry->field_0x26 = 6;
+				entry->subState = 6;
 				break;
 			}
 			if (entry->itemId >= 0x79 && entry->itemId < 0xEC && entry->itemId != 0x7D && !swGet(0xEB) && !(gp->flags & 0x1000)) {
 				swSet(0xEB);
-				entry->field_0x26 = 4;
+				entry->subState = 4;
 				wp->msgWindowId = msgWindow_Entry(msgSearch("item_first_hit"), 0, 0);
 				break;
 			}
@@ -1077,7 +1068,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				itemDelete(entry->name);
 				break;
 			}
-			entry->field_0x26 = 5;
+			entry->subState = 5;
 			winMgrCloseAutoDelete(entry->winId[2]);
 			marioChgStayMotion();
 			iconFlagOn(entry->name, 2);
@@ -1117,7 +1108,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 				itemGetPouch(entry);
 				entry->flags2 &= ~1;
 				entry->itemId = select;
-				entry->field_0x20 = 0;
+				entry->evtCode = 0;
 				entry->evtId = 0;
 				entry->flags &= ~0x60;
 				iconChange(entry->name, itemDataTable[entry->itemId].icon_id);
@@ -1129,8 +1120,8 @@ void itemseq_GetItem(ItemEntry* entry) {
 			entry->flags &= ~0x1000;
 			entry->speed = 85.0f;
 			entry->velocityY = 120.0f;
-			entry->field_0x80 = 0.7f;
-			entry->field_0x84 = 1.0f;
+			entry->bounceFactor = 0.7f;
+			entry->gravityScale = 1.0f;
 			entry->winId[0] = winMgrEntry(&itemdrv_window_desc[3]);
 			winMgrOpen(entry->winId[0]);
 			winMgrSetParam(entry->winId[0], entry);
@@ -1139,14 +1130,14 @@ void itemseq_GetItem(ItemEntry* entry) {
 			if (mario->flags & 0x2000000) {
 				entry->flags2 |= 0x8000;
 			}
-			entry->field_0x26 = 9;
+			entry->subState = 9;
 			break;
 		case 6:
 			wp->lectureEvt = evtEntryType(all_juyoitem_lecture, 0, 0, 0);
 			wp->lectureEvt->lwData[8] = (s32)entry;
 			wp->lectureEvt->lwData[9] = (s32)wp->effect;
 			psndClearFlag(0x80);
-			entry->field_0x26 = 7;
+			entry->subState = 7;
 			break;
 		case 7:
 			if (evtCheckID(wp->lectureEvt->eventId)) {
@@ -1193,8 +1184,8 @@ void itemseq_GetItem(ItemEntry* entry) {
 			else {
 				entry->speed = 85.0f;
 				entry->velocityY = 120.0f;
-				entry->field_0x80 = 0.7f;
-				entry->field_0x84 = 1.0f;
+				entry->bounceFactor = 0.7f;
+				entry->gravityScale = 1.0f;
 				entry->flags2 |= 8;
 				itemModeChange(entry, 6);
 				entry->flags &= ~0x10;
@@ -1213,6 +1204,7 @@ void itemseq_GetItem(ItemEntry* entry) {
 	}
 }
 
+static s32 _move_dir_1090;
 void itemseq_Bound(ItemEntry* entry) {
 	static s32 _move_dir;
 	MarioWork* mario;
@@ -1230,13 +1222,13 @@ void itemseq_Bound(ItemEntry* entry) {
 
 	mario = marioGetPtr();
 	camera = camGetPtr(4);
-	switch (entry->field_0x26) {
+	switch (entry->subState) {
 		case 0:
-			entry->field_0x26 = 1;
+			entry->subState = 1;
 			entry->airTime = 0;
-			entry->field_0x68 = gp->renderTime;
-			entry->field_0x70 = gp->renderTime;
-			entry->field_0x8C = 0;
+			entry->baseTime = gp->renderTime;
+			entry->curTime = gp->renderTime;
+			entry->bounceCount = 0;
 			if (entry->flags2 & 0x10) {
 				break;
 			}
@@ -1245,9 +1237,9 @@ void itemseq_Bound(ItemEntry* entry) {
 					entry->flags2 |= 4;
 				case 5:
 					if (!(entry->flags & 0x10)) {
-						entry->field_0x80 = 1.0f;
-						entry->field_0x84 = 1.0f;
-						entry->field_0x88 = 0;
+						entry->bounceFactor = 1.0f;
+						entry->gravityScale = 1.0f;
+						entry->maxBounces = 0;
 						entry->velocityY = 500.0f;
 					}
 					if (!(entry->flags2 & 0x40)) {
@@ -1287,18 +1279,18 @@ void itemseq_Bound(ItemEntry* entry) {
 					entry->flags2 |= 8;
 				case 3:
 					if (!(entry->flags & 0x10)) {
-						entry->field_0x80 = 1.0f;
-						entry->field_0x84 = 1.0f;
-						entry->field_0x88 = 0;
+						entry->bounceFactor = 1.0f;
+						entry->gravityScale = 1.0f;
+						entry->maxBounces = 0;
 					}
 					entry->speed = 0.0f;
 					entry->direction = 0;
 					entry->velocityY = 0.0f;
 					break;
 				case 10:
-					entry->field_0x80 = 1.0f;
-					entry->field_0x84 = 1.0f;
-					entry->field_0x88 = 0;
+					entry->bounceFactor = 1.0f;
+					entry->gravityScale = 1.0f;
+					entry->maxBounces = 0;
 					entry->velocityY = 500.0f;
 					entry->speed = 0.0f;
 					entry->direction = 0;
@@ -1308,8 +1300,8 @@ void itemseq_Bound(ItemEntry* entry) {
 			}
 			break;
 		case 1:
-			entry->field_0x70 = gp->renderTime;
-			delta = entry->field_0x70 - entry->field_0x68;
+			entry->curTime = gp->renderTime;
+			delta = entry->curTime - entry->baseTime;
 			dt = OSTicksToMicroseconds(delta) / 1000000.0f;
 			t1 = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
 			t2 = OSTicksToMicroseconds(entry->airTime + delta) / 1000000.0f;
@@ -1319,13 +1311,13 @@ void itemseq_Bound(ItemEntry* entry) {
 				dz = 0.0f;
 			}
 			t2sq = t2 * t2;
-			dy = entry->velocityY * dt + (-980.0f * entry->field_0x84) * (t2sq - t1 * t1);
+			dy = entry->velocityY * dt + (-980.0f * entry->gravityScale) * (t2sq - t1 * t1);
 			if (entry->flags2 & 4) {
-				if (entry->field_0x8C != 0 || dy < 0.0f) {
+				if (entry->bounceCount != 0 || dy < 0.0f) {
 					entry->flags2 &= ~4;
 				}
 			}
-			if (entry->flags2 & 8 && entry->field_0x8C != 0) {
+			if (entry->flags2 & 8 && entry->bounceCount != 0) {
 				entry->flags2 &= ~8;
 			}
 			if (entry->flags2 & 0x20 && dy < 0.0f) {
@@ -1334,7 +1326,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				return;
 			}
 			newDir = entry->direction;
-			hit = itemHitCheckSide(entry, dx, dz, &newX, &newZ, &newDir);
+			hit = itemHitCheckSide(entry, &newX, dx, &newZ, dz, &newDir);
 			entry->position.x = newX;
 			entry->position.z = newZ;
 			entry->direction = newDir;
@@ -1347,7 +1339,7 @@ void itemseq_Bound(ItemEntry* entry) {
 					entry->velocityY = -entry->velocityY * 0.25f;
 					dy = 0.0f;
 					entry->airTime = 0;
-					entry->field_0x68 = entry->field_0x70;
+					entry->baseTime = entry->curTime;
 				}
 			}
 			if (entry->flags2 & 0x100000 && entry->position.y <= -1000.0f) {
@@ -1373,7 +1365,7 @@ void itemseq_Bound(ItemEntry* entry) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
-			else if (entry->flags2 & 0x100000U) {
+			else if (entry->flags2 & 0x100000) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
@@ -1394,8 +1386,8 @@ void itemseq_Bound(ItemEntry* entry) {
 					entry->flags |= 2;
 				}
 				else {
-					entry->field_0x8C++;
-					if (!(hitGetAttr(hit) & 0x80000000) && entry->field_0x88 != 0 && entry->field_0x8C >= entry->field_0x88) {
+					entry->bounceCount++;
+					if (!(hitGetAttr(hit) & 0x80000000) && entry->maxBounces != 0 && entry->bounceCount >= entry->maxBounces) {
 						itemModeChange(entry, 1);
 						entry->flags2 &= ~4;
 						entry->flags2 &= ~8;
@@ -1455,29 +1447,29 @@ void itemseq_Bound(ItemEntry* entry) {
 						bounce = FALSE;
 					}
 					if (!bounce) {
-						v = entry->velocityY * dt + (-980.0f * entry->field_0x84) * ((t2 + dt) * (t2 + dt) - t2sq);
-						entry->velocityY = 0.7f * (entry->field_0x80 * (-v / dt));
+						v = entry->velocityY * dt + (-980.0f * entry->gravityScale) * ((t2 + dt) * (t2 + dt) - t2sq);
+						entry->velocityY = 0.7f * (entry->bounceFactor * (-v / dt));
 					}
-					peak = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->field_0x84)));
-					height = entry->velocityY * peak + peak * ((-980.0f * entry->field_0x84) * peak);
+					peak = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->gravityScale)));
+					height = entry->velocityY * peak + peak * ((-980.0f * entry->gravityScale) * peak);
 					if (!isFloor && height <= 8.0f) {
 						itemModeChange(entry, 1);
 						entry->flags2 &= ~4;
 						entry->flags2 &= ~8;
 						entry->flags2 &= ~0x4000;
 					}
-					if (entry->flags & 0x200 && entry->field_0x8C <= 1) {
-						entry->direction = entry->field_0x90;
-						entry->speed = entry->field_0x94;
+					if (entry->flags & 0x200 && entry->bounceCount <= 1) {
+						entry->direction = entry->savedDirection;
+						entry->speed = entry->savedSpeed;
 						entry->flags &= ~0x200;
 					}
 					entry->airTime = 0;
-					entry->field_0x68 = gp->renderTime;
+					entry->baseTime = gp->renderTime;
 					break;
 				}
 			}
 			entry->airTime += delta;
-			entry->field_0x68 = entry->field_0x70;
+			entry->baseTime = entry->curTime;
 			break;
 	}
 	entry->flags2 &= ~0x10;
@@ -1488,10 +1480,6 @@ void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z) {
 	entry->position.y = y;
 	entry->position.z = z;
 }
-
-
-
-
 
 void itemGetSound(ItemEntry* entry) {
 	Vec pos;
@@ -1517,7 +1505,7 @@ void itemGetSound(ItemEntry* entry) {
 	}
 }
 
-HitEntry* itemHitCheckSide(ItemEntry* entry, f32 dx, f32 dz, f32* outX, f32* outZ, s32* angle) {
+HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle) {
 	HitEntry* hit;
 	f32 a, b;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
@@ -1654,6 +1642,34 @@ void itemPickUp(ItemEntry* entry) {
 	entry->flags2 &= ~0x100;
 }
 
-
-
-
+// prototypes for asm stopgap forward references
+void itemPickUp(ItemEntry* entry);
+u32 itemStatus(ItemEntry* entry, u32 flags);
+void itemStatusOn(ItemEntry* entry, u32 flags);
+u16 itemFlag(ItemEntry* entry, u16 flags);
+void itemFlagOff(ItemEntry* entry, u16 flags);
+void itemFlagOn(ItemEntry* entry, u16 flags);
+void itemNokoForceGet(ItemEntry* entry);
+void itemForceGet(ItemEntry* entry);
+HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 dz, s32* angle);
+void itemSetPosition(ItemEntry* entry, f32 x, f32 y, f32 z);
+void itemseq_Bound(ItemEntry* entry);
+void itemseq_GetItem(ItemEntry* entry);
+void winFullDisp(WinMgrEntry* win);
+void winHelpDisp(WinMgrEntry* win);
+void winHelpMain(WinMgrEntry* win);
+void winNameDisp2(WinMgrEntry* win);
+void winNameDisp(WinMgrEntry* win);
+ItemEntry* itemNearDistCheck(f32 x, f32 y, f32 z, f32 range);
+ItemEntry* itemHitCheck(f32 x, f32 y, f32 z, f32 range);
+ItemEntry* itemNameToPtr(char* name);
+void itemDelete(const char* name);
+ItemEntry* itemEntry(const char* name, s32 itemId, s32 type, s32 evtId, s32 a5, f32 x, f32 y, f32 z);
+void itemModeChange(ItemEntry* entry, s32 mode);
+void itemMain(void);
+BOOL N_itemPickUpFromFieldCheck(void);
+BOOL itemGetNokoCheck(ItemEntry* entry);
+BOOL itemGetCheck(ItemEntry* entry);
+void itemCoinDrop(Vec* position);
+void itemReInit(void);
+void itemInit(void);

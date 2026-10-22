@@ -47,7 +47,7 @@ BOOL marioChkHipAttack(void) {
 
     ret = FALSE;
     mario = marioGetPtr();
-    if (MH(0x52) >= 10 && (mario->field_0x248 & 0x100) && pouchGetJumpLv() >= 2) {
+    if (mario->jumpPeakAirTime >= 10 && (mario->buttonBuffer & 0x100) && pouchGetJumpLv() >= 2) {
         ret = TRUE;
     }
     return ret;
@@ -85,22 +85,22 @@ void mot_hip(void) {
         marioAdjustMoveDir();
         {
             s32 f = 0;
-            if (MF(0x1AC) >= 90.0f && MF(0x1AC) <= 270.0f) {
+            if (mario->displayDirectionTarget >= 90.0f && mario->displayDirectionTarget <= 270.0f) {
                 f = 1;
             }
-            MF(0x19C) = toMovedir(f ? 180.0f : 0.0f);
+            mario->moveDirection = toMovedir(f ? 180.0f : 0.0f);
         }
-        MF(0x1A0) = MF(0x19C);
+        mario->directionView = mario->moveDirection;
         marioChgPose("M_A_1A");
-        MF(0x7C) = 5.2f;
-        MF(0x80) = 0.0f;
-        MF(0x84) = 0.0f;
-        MF(0x88) = 0.0f;
+        mario->jumpVelocityY = 5.2f;
+        mario->jumpAccelerationY = 0.0f;
+        mario->jumpJerkY = 0.0f;
+        mario->jumpSnapY = 0.0f;
         d = -2.0f * marioGetScale() / 2.0f;
-        MF(0x90) += d;
+        mario->position.y += d;
         d = 14.0f * marioGetScale() / 2.0f;
-        MF(0xB4) += d;
-        MF(0xA8) = 0.0f;
+        mario->rotOfs.y += d;
+        mario->dispOfs2.y = 0.0f;
         mario->currSubMotionId = 0;
         EX->snd1 = -1;
         EX->snd2 = -1;
@@ -110,20 +110,20 @@ void mot_hip(void) {
         EX->snd1 = psndSFXOn_3D((char*)0x158, &mario->position);
         EX->snd2 = psndSFXOn_3D((char*)0xDB, &mario->position);
         EX->ang = 0.0f;
-        MF(0x180) = 0.0f;
+        mario->baseSpeed = 0.0f;
         mario->currSubMotionId = 1;
     case 1:
         if ((EX->ang += 20.0f) >= 360.0f) {
             EX->ang = 360.0f;
         }
-        MF(0x7C) -= 0.42f;
-        if (mario->field_0x1F4 == NULL) {
-            MF(0xA8) += MF(0x7C);
+        mario->jumpVelocityY -= 0.42f;
+        if (mario->hitobjHead == NULL) {
+            mario->dispOfs2.y += mario->jumpVelocityY;
         }
-        if (360.0f == EX->ang && MF(0x7C) <= 0.0f) {
+        if (360.0f == EX->ang && mario->jumpVelocityY <= 0.0f) {
             MI(0x48) = 5;
             mario->currSubMotionId = 2;
-            MF(0x7C) = 2.0f;
+            mario->jumpVelocityY = 2.0f;
         }
         switch (U_chkground()) {
         case 1:
@@ -135,10 +135,10 @@ void mot_hip(void) {
         }
         break;
     case 2:
-        if (MF(0x7C) >= 0.0f) {
-            MF(0x7C) -= 1.4f;
-            if (mario->field_0x1F4 == NULL) {
-                MF(0xA8) += MF(0x7C);
+        if (mario->jumpVelocityY >= 0.0f) {
+            mario->jumpVelocityY -= 1.4f;
+            if (mario->hitobjHead == NULL) {
+                mario->dispOfs2.y += mario->jumpVelocityY;
             }
         }
         if (--MI(0x48) <= 0) {
@@ -160,10 +160,10 @@ void mot_hip(void) {
             mario->flags |= 0x20000;
             EX->ang = 0.0f;
             mario->currSubMotionId = 20;
-            MF(0x80) = -3.4744f;
-            MF(0x84) = 0.4704f;
-            MF(0x88) = -1.1904f;
-            MF(0x7C) = MF(0x80);
+            mario->jumpAccelerationY = -3.4744f;
+            mario->jumpJerkY = 0.4704f;
+            mario->jumpSnapY = -1.1904f;
+            mario->jumpVelocityY = mario->jumpAccelerationY;
         }
         switch (U_chkground()) {
         case 1:
@@ -185,10 +185,10 @@ void mot_hip(void) {
         hit = marioSearchGround(&y, &tmp1, &tmp2, fall, fall);
         if (fall < -100.0f) {
             fall = -100.0f;
-            MF(0x88) = 0.0f;
-            MF(0x84) = 0.0f;
-            MF(0x80) = 0.0f;
-            MF(0x7C) = fall;
+            mario->jumpSnapY = 0.0f;
+            mario->jumpJerkY = 0.0f;
+            mario->jumpAccelerationY = 0.0f;
+            mario->jumpVelocityY = fall;
         }
         if (hit != NULL) {
             mario->currMotionId = MARIO_MOTION_HIP_2;
@@ -196,40 +196,40 @@ void mot_hip(void) {
             MI(0x48) = 20;
             MI(0x1E4) = (s32)hit;
             MI(0x1E8) = 0;
-            MF(0x90) = y;
+            mario->position.y = y;
             EX->ang = 0.0f;
-            MF(0xB4) = 0.0f;
-            MH(0x50) = 0;
-            MH(0x52) = 0;
-            MF(0xA8) = 0.0f;
+            mario->rotOfs.y = 0.0f;
+            mario->airTimer = 0;
+            mario->jumpPeakAirTime = 0;
+            mario->dispOfs2.y = 0.0f;
             marioChgPose("M_A_1B");
             attr = hitGetAttr(hit);
             if (attr & 0x200) {
-                set_damage_root_ypos(MF(0x90));
+                set_damage_root_ypos(mario->position.y);
                 d = -0.4f;
-                MF(0x7C) = d;
-                MF(0x80) = d;
-                MF(0x84) = 0.0f;
-                MF(0x88) = 0.0f;
+                mario->jumpVelocityY = d;
+                mario->jumpAccelerationY = d;
+                mario->jumpJerkY = 0.0f;
+                mario->jumpSnapY = 0.0f;
                 marioChgMot(MARIO_MOTION_DAMAGE);
                 return;
             }
             if (attr & 0x400) {
-                set_damage_root_ypos(MF(0x90));
+                set_damage_root_ypos(mario->position.y);
                 marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
                 return;
             }
             if (attr & 0x800) {
-                set_damage_root_ypos(MF(0x90));
+                set_damage_root_ypos(mario->position.y);
                 marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
                 return;
             }
             psndSFXOn_3D((char*)0x159, &mario->position);
             evtEntryType(marioBgmodeChk() == 0 ? quake_evt : quake_bgmode_evt, 0, 0, 0);
         } else {
-            MF(0x90) += fall;
+            mario->position.y += fall;
         }
-        if (mario->unk16C > 400 && !marioBgmodeChk()) {
+        if (mario->screenY > 400 && !marioBgmodeChk()) {
             camFollowYOn();
         }
         break;
@@ -250,18 +250,18 @@ void mot_hip(void) {
         break;
     case 50:
         marioChgPose("M_A_1A");
-        MF(0x7C) = 0.0f;
-        MF(0x80) = 0.0f;
-        MF(0x84) = 0.0f;
-        MF(0x88) = 0.0f;
+        mario->jumpVelocityY = 0.0f;
+        mario->jumpAccelerationY = 0.0f;
+        mario->jumpJerkY = 0.0f;
+        mario->jumpSnapY = 0.0f;
         EX->ang += (f32)keyGetSubStickY(2) / 10.0f;
         break;
     }
-    MF(0xC4) = EX->ang;
-    if (MH(0x50) != 0) {
-        MF(0x174) = 0.0f;
-        MF(0x17C) = 0.0f;
-        MF(0x178) = 0.0f;
+    mario->rot.z = EX->ang;
+    if (mario->airTimer != 0) {
+        mario->unk174.x = 0.0f;
+        mario->unk174.z = 0.0f;
+        mario->unk174.y = 0.0f;
     }
 }
 
@@ -278,28 +278,28 @@ s32 U_chkground(void) {
     if (hit != NULL) {
         MI(0x1E4) = (s32)hit;
         MI(0x1E8) = 0;
-        MF(0x90) = y;
+        mario->position.y = y;
         EX->ang = 0.0f;
-        MF(0xB4) = 0.0f;
-        MF(0xA8) = 0.0f;
-        MH(0x50) = 0;
-        MH(0x52) = 0;
+        mario->rotOfs.y = 0.0f;
+        mario->dispOfs2.y = 0.0f;
+        mario->airTimer = 0;
+        mario->jumpPeakAirTime = 0;
         mario->dispFlags &= ~4;
         mario->flags &= ~0x80;
         camFollowYOn();
         attr = hitGetAttr(hit);
         if (attr & 0x200) {
-            set_damage_root_ypos(MF(0x90));
+            set_damage_root_ypos(mario->position.y);
             v = -0.4f;
-            MF(0x7C) = v;
-            MF(0x80) = v;
-            MF(0x84) = 0.0f;
-            MF(0x88) = 0.0f;
+            mario->jumpVelocityY = v;
+            mario->jumpAccelerationY = v;
+            mario->jumpJerkY = 0.0f;
+            mario->jumpSnapY = 0.0f;
             marioChgMot(MARIO_MOTION_DAMAGE);
             return 1;
         }
         if (attr & 0xC00) {
-            set_damage_root_ypos(MF(0x90));
+            set_damage_root_ypos(mario->position.y);
             marioChgMot(MARIO_MOTION_DAMAGE_TOGE);
             return 1;
         }
@@ -315,8 +315,8 @@ void mot_hip_post(void) {
 
     mario = marioGetPtr();
     marioOfsRotReset();
-    MH(0x50) = 0;
-    MH(0x52) = 0;
+    mario->airTimer = 0;
+    mario->jumpPeakAirTime = 0;
     if ((u32)EX->snd1 != 0xFFFFFFFFU) {
         psndSFXOff(EX->snd1);
         EX->snd1 = -1;

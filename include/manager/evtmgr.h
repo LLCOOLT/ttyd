@@ -146,8 +146,8 @@ typedef struct EventCommand {
 
 // unknown, TODO: look at evt_msg_toge/_evt_msg_print
 typedef struct EventEntryMsg {
-    f32 field_0x0; // 0x0
-    f32 field_0x4; // 0x4
+    f32 x; // 0x0
+    f32 y; // 0x4
 } EventEntryMsg;
 
 typedef enum EventEntry_Flags {
@@ -181,7 +181,7 @@ struct EventEntry {
         f32 userdataf[3];
         void* userdatap[3];
     }; // 0x78, TODO check
-    u32 field_84;              // 0x84
+    u32 userdata3;             // 0x84, 4th scratch word after userdata[3] (state/counter/window id/float z/saved flags)
     OSTime wInterpRelatedTime; // 0x88
     u32 field_0x90[2];         // 0x90, unknown
     UserFunction userfunc;     // 0x98
@@ -207,8 +207,8 @@ struct EventEntry {
     s32 printWindowId;          // 0x178, verified
     s32 selectWindowId;         // 0x17C, verified
     u32 printWindowFlags;       // 0x180, verified, is u32, does use 0x80000000
-    EventEntryMsg unk184;       // 0x184, verified
-    u32 unk18C;                 // 0x18C
+    EventEntryMsg msgPos;       // 0x184, message window x,y (z is msgPosZ): evt_msg.c copies it to win->pos
+    u32 msgPosZ;                // 0x18C, f32 message window z
     u32 msgPriority;            // 0x190
     u32 field_0x194;            // 0x194
     OSTime savedTime;           // 0x198, TODO rename

@@ -57,7 +57,29 @@ def load(path):
         return json.load(f)
 
 
-def build_payload(report, commit, baseline, baseline_label):
+def true_c_info(root, report):
+    """(L 2026-10-19) True C: asm stand-ins are not matched. Returns (stats, asm fns by file basename,
+    baseline fuzzy by (basename, fn)) from scratch/true_c.py + paved.py, or ({}, {}, {}) if unavailable."""
+    try:
+        import importlib.util
+        sys.path.insert(0, os.path.join(root, "scratch"))
+        spec = importlib.util.spec_from_file_location("true_c", os.path.join(root, "scratch", "true_c.py"))
+        tc = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(tc)
+        import paved
+        base = load(paved.BASELINE)
+        bf = {(u["name"].rsplit("/", 1)[-1], f["name"]): num(f, "fuzzy_match_percent")
+              for u in base["units"] for f in u.get("functions") or []}
+        st = tc.stats(report)
+        st["_paved"] = {(b, n) for b, n, _ in paved.stats()["paved"]}
+        return st, paved.asm_fns_by_file(), bf
+    except Exception as e:
+        print(f"true C info unavailable ({e}); showing raw report figures")
+        return {}, {}, {}
+
+
+def build_payload(report, commit, baseline, baseline_label, root=None):
+    stats, asm, bf = true_c_info(root, report) if root else ({}, {}, {})
     units = []
     for u in report.get("units", []):
         m = u.get("measures", {})
@@ -65,15 +87,49 @@ def build_payload(report, commit, baseline, baseline_label):
         if size <= 0:
             continue
         kind, group = group_of(u)
+        mc, fz = num(m, "matched_code_percent"), num(m, "fuzzy_match_percent")
+        fn_ok, fn_tot = int(num(m, "matched_functions")), int(num(m, "total_functions"))
+        complete = bool(u.get("metadata", {}).get("complete"))
+        a = asm.get(u["name"].rsplit("/", 1)[-1], ())
+        n_asm = n_paved = 0
+        if a:
+            # L 2026-10-19: the map reflects only NEEDED asm (C that never matched). Paved asm sits over C that
+            # matched, so it counts as matched here; needed asm counts as unmatched (fuzzy at its C's score).
+            mbytes = fbytes = 0.0
+            for f in u.get("functions") or []:
+                s = num(f, "size")
+                key = (u["name"].rsplit("/", 1)[-1], f["name"])
+                if f["name"] in a:
+                    n_asm += 1
+                    if key in stats.get("_paved", ()):
+                        n_paved += 1
+                        fbytes += s * 100
+                        mbytes += s
+                    else:
+                        fbytes += s * bf.get(key, 0.0)
+                else:
+                    fbytes += s * num(f, "fuzzy_match_percent")
+                    if num(f, "fuzzy_match_percent") >= 100:
+                        mbytes += s
+            mc, fz = 100 * mbytes / size, fbytes / size
+            fn_ok -= n_asm - n_paved
+            # blue: links only thanks to needed asm; a file whose asm is all paved is green (its C matched)
+            linked_asm = complete and n_asm > n_paved
+            complete = complete and n_asm == n_paved
+        else:
+            linked_asm = False
         units.append({
             "n": u["name"],
             "k": kind,
             "g": group,
             "s": int(size),
-            "f": round(num(m, "fuzzy_match_percent"), 2),
-            "mc": round(num(m, "matched_code_percent"), 2),
-            "fn": [int(num(m, "matched_functions")), int(num(m, "total_functions"))],
-            "c": bool(u.get("metadata", {}).get("complete")),
+            "f": round(fz, 2),
+            "mc": round(mc, 2),
+            "fn": [fn_ok, fn_tot],
+            "c": complete,
+            "asm": n_asm,
+            "pv": n_paved,
+            "la": linked_asm,
             "cat": u.get("metadata", {}).get("progress_categories", []),
         })
     cats = [{"id": c["id"], "name": c["name"], "m": summarize(c.get("measures", {}))}
@@ -85,6 +141,20 @@ def build_payload(report, commit, baseline, baseline_label):
         "commit": commit,
         "generated": datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
     }
+    if stats:
+        # headline and category bars show true C too: rebuild code/function sums from the true-C unit figures
+        def resum(us, m):
+            t = sum(x["s"] for x in us) or 1
+            s = summarize(m)
+            s["code"] = [sum(x["s"] * x["mc"] / 100 for x in us), t, sum(x["s"] for x in us if x["c"])]
+            s["funcs"] = [sum(x["fn"][0] for x in us), sum(x["fn"][1] for x in us)]
+            s["units"] = [sum(1 for x in us if x["c"]), len(us)]
+            s["fuzzy"] = sum(x["s"] * x["f"] for x in us) / t
+            return s
+        # L 2026-10-19: Code/Functions bars show the build (100%) again; the map's blue cells and the true C
+        # note carry the asm distinction. resum() is kept for a true-C-bars view if wanted later.
+        payload["true"] ={k: stats[k] for k in ("true_code", "true_fuzzy", "true_linked", "c_fns", "asm_fns",
+                                                 "total_fns", "build_code", "paved_fns", "needed_fns", "paved_bytes") if k in stats}
     if baseline is not None:
         payload["baseline"] = {"label": baseline_label, "m": summarize(baseline.get("measures", {}))}
     return payload
@@ -143,6 +213,12 @@ def squarify(values, x, y, w, h):
 def cell_color(u):
     if u["c"]:
         return "#30a454"
+    if u.get("la"):
+        # linked only thanks to asm stand-ins: blue, darker the more of the file is exact C
+        import colorsys
+        t = max(0.0, min(100.0, u["mc"])) / 100
+        r, g, b = colorsys.hls_to_rgb(205 / 360, 0.72 - 0.30 * t, 0.60)
+        return "#%02x%02x%02x" % (round(r * 255), round(g * 255), round(b * 255))
     if u["f"] >= 100:
         return "#7fd38a"
     import colorsys
@@ -173,9 +249,13 @@ def render_svg(payload, width=960, height=540):
         f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{height + head}" '
         f'viewBox="0 0 {width} {height + head}" font-family="Helvetica,Arial,sans-serif">',
         f'<rect width="{width}" height="{height + head}" fill="#14181a"/>',
-        f'<text x="8" y="19" font-size="14" fill="#e8ece8">Code {pc(o["code"]):.2f}% matched · '
-        f'{100 * o["code"][2] / o["code"][1]:.2f}% fully linked · data {pc(o["data"]):.2f}% · '
-        f'functions {int(o["funcs"][0])}/{int(o["funcs"][1])}</text>',
+        (f'<text x="8" y="19" font-size="14" fill="#e8ece8">Code {pc(o["code"]):.2f}% · '
+         f'true C {t["true_code"]:.2f}% exact, {t["true_fuzzy"]:.2f}% fuzzy · '
+         f'{t.get("needed_fns", "?")} functions need asm (blue) · {t.get("paved_fns", "?")} more paved over matching C</text>'
+         if (t := payload.get("true")) and "true_fuzzy" in t else
+         f'<text x="8" y="19" font-size="14" fill="#e8ece8">Code {pc(o["code"]):.2f}% matched · '
+         f'{100 * o["code"][2] / o["code"][1]:.2f}% fully linked · data {pc(o["data"]):.2f}% · '
+         f'functions {int(o["funcs"][0])}/{int(o["funcs"][1])}</text>'),
         f'<text x="{width - 8}" y="19" font-size="11" fill="#9aa49c" text-anchor="end">'
         f'{html.escape(payload.get("commit") or "")} · {payload["generated"]}</text>',
     ]
@@ -216,12 +296,16 @@ def main():
     ap.add_argument("--baseline", help="optional older report.json to compare against")
     ap.add_argument("--baseline-label", default="baseline")
     ap.add_argument("--svg", help="also write a static SVG treemap here (for README embedding)")
+    ap.add_argument("--raw", action="store_true",
+                    help="show the report as-is (asm stand-ins counted as matched); default is true C for G8MJ01")
     args = ap.parse_args()
 
     report = load(args.report)
     baseline = load(args.baseline) if args.baseline else None
     commit = args.commit or git_head(root)
-    payload = build_payload(report, commit, baseline, args.baseline_label)
+    # true C uses the JP source scan and the JP 10-16 baseline, so it only applies to the G8MJ01 report
+    jp = "G8MJ01" in os.path.abspath(args.report)
+    payload = build_payload(report, commit, baseline, args.baseline_label, None if args.raw or not jp else root)
 
     template_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "progress_treemap.html")
     with open(template_path, "r", encoding="utf-8") as f:
@@ -229,6 +313,14 @@ def main():
     data = json.dumps(payload, separators=(",", ":")).replace("</", "<\\/")
     out = template.replace("/*__DATA__*/null", data)
     out = out.replace("__COMMIT__", html.escape(commit or "working tree"))
+    if (t := payload.get("true")) and "true_fuzzy" in t:
+        note = (f'<p class="cmp">The bars show the build, which is byte-identical. The map shows only the '
+                f'<b>{t.get("needed_fns", "?")} functions whose C never matched</b> and had to use asm to fill the gap: '
+                f'files that link only thanks to them are <b>blue</b>. Another {t.get("paved_fns", "?")} asm stand-ins '
+                f'are paved over C that already matched ({t.get("paved_bytes", 0) / 1024:.0f} KB); the map counts those '
+                f'as C, and they are being converted back. Hover a cell for its counts. True C: <b>{t["true_code"]:.2f}%</b> exact, '
+                f'<b>{t["true_fuzzy"]:.2f}%</b> fuzzy.</p>')
+        out = out.replace('<section class="bars"', note + '<section class="bars"', 1)
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)), exist_ok=True)
     with open(args.output, "w", encoding="utf-8") as f:

@@ -1484,7 +1484,7 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     tevStage = info->tevStage;
     texMap = info->texCoord;
     texCoord = info->texMap;
-    field_0x18 = info->field_0x18;
+    field_0x18 = info->indStage;
     flags = p->flags;
     if (flags & 0x20) {
         while ((p = p->parent) != NULL) {
@@ -1560,14 +1560,14 @@ void rsh_window_tev(MapTevCallbackInfo* info) {
     texMap++;
     info->tevStage = tevStage;
     info->texMap = texCoord;
-    info->field_0x18 = field_0x18;
+    info->indStage = field_0x18;
     info->texCoord = texMap;
 }
 
 BOOL img_wait(void) {
     ImageEntry* img = imgNameToPtr("capture_img", gp->inBattle != 0);
 
-    if (!(img->flags & 2) && img->field_0x118 < 1.0f) {
+    if (!(img->flags & 2) && img->loopTimes < 1.0f) {
         return FALSE;
     }
     return TRUE;

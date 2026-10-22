@@ -1596,7 +1596,7 @@ USER_FUNC(evt_sub_get_coin) {
 		event->userdata[0] = 0;
 		event->userdatap[1] = effItemGetEntry(7, a.x, a.y, a.z);
 		event->userdata[2] = 0;
-		event->field_84 = 0;
+		event->userdata3 = 0;
 		*(void**)&event->wInterpRelatedTime = _mapAlloc(8);
 	}
 	state = event->userdata[0];
@@ -1609,9 +1609,9 @@ USER_FUNC(evt_sub_get_coin) {
 		iconFlagOn("iraiCoin", 0x102);
 		((s32*)eff->userdata)[14] = 5;
 		marioChgGetItemMotion();
-		event->field_84 = winMgrEntry((WinMgrDesc*)coinget_window_desc);
-		winMgrOpen(event->field_84);
-		winMgrSetParam(event->field_84, work);
+		event->userdata3 = winMgrEntry((WinMgrDesc*)coinget_window_desc);
+		winMgrOpen(event->userdata3);
+		winMgrSetParam(event->userdata3, work);
 		work[0] = coin;
 		work[1] = 0;
 		psndBGMOff(0x3800);
@@ -1646,12 +1646,12 @@ USER_FUNC(evt_sub_get_coin) {
 		marioChgStayMotion();
 		psndBGMOn(0xa0, NULL);
 		psndBGMOff(0x201);
-		winMgrCloseAutoDelete(event->field_84);
+		winMgrCloseAutoDelete(event->userdata3);
 		work[1] = 0;
 		event->userdata[0] = 101;
 		return EVT_RETURN_DONE;
 	case 101:
-		if (!winMgrAction(event->field_84)) {
+		if (!winMgrAction(event->userdata3)) {
 			_mapFree(work);
 			return EVT_RETURN_DONE;
 		}

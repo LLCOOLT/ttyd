@@ -69,6 +69,7 @@ td.mini { width: 30%; min-width: 120px; }
   <p class="cmp" id="cmp" hidden></p>
   <div class="legend">
     <span><span class="sw" style="background:hsl(140 55% 42%)"></span>fully linked</span>
+    <span><span class="sw" style="background:hsl(205 60% 42%)"></span><span class="sw" style="background:hsl(205 60% 72%)"></span>linked with asm stand-ins (darker = more of the file is C)</span>
     <span><span class="sw" style="background:hsl(125 55% 62%)"></span>100% matched, not linked</span>
     <span style="display:inline-flex;align-items:center;gap:8px">0% <span class="grad"></span> 99%</span>
     <span>Cell size = code bytes. Hover a cell for details.</span>
@@ -89,6 +90,7 @@ if (cat !== "all" && !D.categories.some(c => c.id === cat)) cat = "all";
 
 function color(u) {
   if (u.c) return "hsl(140 55% 42%)";
+  if (u.la) return `hsl(205 60% ${(72 - 30 * Math.min(100, u.mc) / 100).toFixed(0)}%)`;
   if (u.f >= 100) return "hsl(125 55% 62%)";
   const t = Math.max(0, Math.min(99.99, u.f)) / 100;
   const h = t * 85, s = 62 + 13 * Math.sin(t * Math.PI), l = 52 + 3 * Math.sin(t * Math.PI);
@@ -199,7 +201,7 @@ function renderMap() {
       if (c.w > 56 && c.h > 30) d.textContent = u.n.split("/").pop();
       d.onmousemove = e => {
         tip.hidden = false;
-        tip.innerHTML = `<b>${u.n}</b><br>${fmtB(u.s)} code<br>match ${u.f.toFixed(2)}% · code ${u.mc.toFixed(2)}%<br>functions ${u.fn[0]} / ${u.fn[1]}<br>${u.c ? "fully linked" : "not linked"}`;
+        tip.innerHTML = `<b>${u.n}</b><br>${fmtB(u.s)} code<br>match ${u.f.toFixed(2)}% · code ${u.mc.toFixed(2)}%<br>functions ${u.fn[0]} / ${u.fn[1]}<br>${u.c ? (u.pv ? `linked; C matches, but ${u.pv} function${u.pv === 1 ? " is" : "s are"} still paved over with asm` : "fully linked (all C)") : u.la ? `linked with ${u.asm - u.pv} needed asm function${u.asm - u.pv === 1 ? "" : "s"} (C never matched)${u.pv ? `<br>+ ${u.pv} paved over matching C` : ""}` : "not linked"}`;
         const r = tip.getBoundingClientRect();
         let x = e.clientX + 14, y = e.clientY + 14;
         if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;

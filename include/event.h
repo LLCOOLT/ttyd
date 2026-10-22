@@ -6,8 +6,8 @@ typedef struct EventData {
     u8 motionType;           // 0x0
     u8 partners[2];          // 0x1, TODO verify if array or two u8
     u16 id;                  // 0x4
-    const char* field_0x8;   // 0x8
-    const char* field_0xC;   // 0xC
+    const char* textId;      // 0x8
+    const char* nameJp;      // 0xC
     const char* mapName;     // 0x10
     const char* beroName;    // 0x14
     void (*initEvent)(void); // 0x18

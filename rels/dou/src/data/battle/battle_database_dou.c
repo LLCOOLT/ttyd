@@ -717,8 +717,8 @@ static USER_FUNC(_wave_offset) {
     s32 ampY = evtGetValue(event, args[6]);
     BattleStageObject* obj = BattleSearchObjectPtr(name);
 
-    obj->field_0x10.x = ampX * sinfd(stepX * 360 / periodX);
-    obj->field_0x10.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
+    obj->positionOffset.x = ampX * sinfd(stepX * 360 / periodX);
+    obj->positionOffset.y = ampY * sinfd(stepY * 360 / periodY + 270) + ampY;
     stepX++;
     if (stepX >= periodX) {
         stepX = 0;

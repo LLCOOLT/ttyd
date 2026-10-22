@@ -148,9 +148,9 @@ void effTexSetup(void) {
 	effTexSetupN64();
 }
 
+#pragma explicit_zero_data on
 void effGetTexObj(u32 id, GXTexObj* obj) {
 #ifdef __MWERKS__
-#pragma explicit_zero_data on
 	if ((s32)id < 146) { //number of images in effect.tpl
 		if (!wp->texLoaded) {
 			static char dummy ATTRIBUTE_ALIGN(32) = '\0';
@@ -169,9 +169,9 @@ void effGetTexObj(u32 id, GXTexObj* obj) {
 			TEXGetGXTexObjFromPalette(*wp->handle->data, obj, id - 146);
 		}
 	}
-#pragma explicit_zero_data reset
 #endif
 }
+#pragma explicit_zero_data reset
 
 void effAutoRelease(BOOL inBattle) {
 	int i;
@@ -342,12 +342,54 @@ typedef struct MayaPoly {
 	s16** strips;
 } MayaPoly;
 
+// per-key interpolation and the GQR5 setup were inlines in the original: inline locals take the low registers,
+// last declared lowest (qv0 f9 .. qm1 f12 above dt f8 / s f7 / s3 f6 / s2 f5; gqr r9 under the key-offset temp r10)
+static inline void effMayaKeyInterp(MayaKey* prev, MayaKey* curr, f32 t, f32* buf) {
+	s32 i;
+	f32* out;
+	register s8* pb;
+	register s8* pa;
+	pa = (s8*)prev;
+	pb = (s8*)curr;
+	out = buf;
+	for (i = 0; i < 22; i++) {
+		register f32 qd0; register f32 qm1; f32 u; register f32 qv1; register f32 qm0; register f32 qv0; f32 dt; f32 s; f32 s3; f32 s2; f32 div;
+		asm {
+			psq_l qv0, 2(pa), 1, 5
+			} asm { psq_l qd0, 4(pa), 1, 5
+			} asm { psq_l qm0, 6(pa), 1, 5
+			} asm { psq_l qv1, 2(pb), 1, 5
+			} asm { psq_l qm1, 4(pb), 1, 5
+			} asm { psq_l qd0, 6(pb), 1, 5
+		}
+		if (pa[9] != 0) {
+			*out = qv0;
+		}
+		else {
+			u = t - prev->time;
+			dt = curr->time - prev->time;
+			div = (!dt) ? ( 0.00000001f ) : ( dt) ;
+			s = u / div;
+			s2 = s * s;
+			s3 = s2 * s;
+			*out = ((( qv0 * (1.0f + (( 2.0f * s3 ) - ( 3.0f * s2)) )) + ( qm0 * (dt * (s + (s3 - ( 2.0f * s2))) ))) + ( qv1 * ((( -2.0f ) * s3 ) + ( 3.0f * s2) ))) + ( qm1 * (dt * (s3 - s2) ));
+		}
+		pa += 8;
+		pb += 8;
+		out++;
+	}
+}
+
+static inline void effMayaSetGQR(void) {
+	register u32 gqr;
+	gqr = 0x06070607;
+	asm { mtspr GQR5, gqr }
+}
+
 void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha) {
 	f32 buf[22];
 	Mtx trans; Mtx scale; Mtx tmp2; Mtx pivot2; Mtx pivot2Inv; Mtx trans3; Mtx pivot1; Mtx pivot1Inv; Mtx trans2; Mtx rotX; Mtx rotY; Mtx rotZ; Mtx tmp;
 
-
-	register u32 gqr;
 	s32 n = list->count;
 	s32 k;
 	f32 t;
@@ -355,14 +397,9 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 	for (k = 1; k < n; k++) {
 		MayaKey* prev;
 		MayaKey* curr;
-		s32 i;
-		register s8* pb;
-		f32* out;
-		register s8* pa;
 		curr = &list->keys[k];
 		prev = &list->keys[k - 1];
-		gqr = 0x06070607;
-		asm { mtspr GQR5, gqr }
+		effMayaSetGQR();
 		if (anim->time <= curr->time) {
 			t = anim->time;
 		}
@@ -372,37 +409,7 @@ void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alp
 		else {
 			t = curr->time;
 		}
-		pa = (s8*)prev;
-		pb = (s8*)curr;
-		out = buf;
-		for (i = 0; i < 22; i++) {
-			f32 u; f32 dt; f32 s; f32 s2; f32 s3; f32 div;
-			register f32 qm0; register f32 qd0; register f32 qv1; register f32 qv0; register f32 qm1;
-			asm {
-				psq_l qv0, 2(pa), 1, 5
-				} asm { psq_l qd0, 4(pa), 1, 5
-				} asm { psq_l qm0, 6(pa), 1, 5
-				} asm { psq_l qv1, 2(pb), 1, 5
-				} asm { psq_l qm1, 4(pb), 1, 5
-				} asm { psq_l qd0, 6(pb), 1, 5
-			}
-			if (pa[9] != 0) {
-				*out = qv0;
-			}
-			else {
-				u = t - prev->time;
-				dt = curr->time - prev->time;
-				div = (!dt) ? ( 0.00000001f ) : ( dt) ;
-				s = u / div;
-				t = s;
-				s2 = s * t;
-				s3 = s2 * s;
-				*out = ((( qv0 * (1.0f + (( 2.0f * s3 ) - ( 3.0f * s2)) )) + ( qm0 * (dt * (s + (s3 - ( 2.0f * s2))) ))) + ( qv1 * ((( -2.0f ) * s3 ) + ( 3.0f * s2) ))) + ( qm1 * (dt * (s3 - s2) ));
-			}
-			pa += 8;
-			pb += 8;
-			out++;
-		}
+		effMayaKeyInterp(prev, curr, t, buf);
 		PSMTXTrans(trans, buf[0], buf[1], buf[2]);
 		PSMTXRotRad(rotX, 'x', buf[3]);
 		PSMTXRotRad(rotY, 'y', buf[4]);
@@ -485,3 +492,22 @@ void effDrawMayaPoly(MayaPoly* poly) {
 		}
 	}
 }
+
+// prototypes for asm stopgap forward references
+void effDrawMayaPoly(MayaPoly* poly);
+void effCalcMayaAnim(MayaAnim* anim);
+void effPlayMayaAnim(MayaAnim* anim);
+void effDeleteMayaAnim(MayaAnim* anim);
+MayaAnim* effMayaAnimAlloc(MayaAnimData* data);
+void effCalcMayaAnimMatrix(MayaAnim* anim, MayaKeyList* list, f32* mtx, f32* alpha);
+EffectSet* effGetSet(const char* name);
+EffectEntry* effNameToPtr(const char* name);
+void effSoftDelete(EffectEntry* effect);
+void effDelete(EffectEntry* effect);
+void effMain(void);
+void effSetName(EffectEntry* effect, const char* name);
+EffectEntry* effEntry(void);
+void effAutoRelease(BOOL inBattle);
+void effGetTexObj(u32 id, GXTexObj* obj);
+void effTexSetup(void);
+void effInit(void);

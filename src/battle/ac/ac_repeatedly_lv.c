@@ -157,7 +157,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if (!((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction))) {
+            if (!((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction))) {
                 if (p->maxMask != 0 && !RL_PadNow(p->maxMask) && !autoCmd) {
                     p->s22++;
                     if (p->s22 < 150) {
@@ -174,10 +174,10 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
             RL_AC(ac, 0x58, s32) = 1;
             ac->mAcState = 1000;
         case 1000:
-            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
-                if (ac->field_0x4 & 2) {
-                    ac->field_0x8--;
-                    if (ac->field_0x8 >= 0) {
+            if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+                if (ac->setupFlags & 2) {
+                    ac->setupParam--;
+                    if (ac->setupParam >= 0) {
                         break;
                     }
                 }
@@ -211,7 +211,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                     break;
             }
             if (p->u27) {
-                if (RL_AC(ac, 0x34, u32) & 0x20) {
+                if (ac->acFlags & 0x20) {
                     if (RL_PadNow(p->mask)) {
                         hit = 1;
                         p->s1c++;
@@ -239,7 +239,7 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                 if (p->gauge >= 100.0f) {
                     p->gauge = 100.0f;
                     p->state = 1;
-                    if (RL_AC(ac, 0x34, u32) & 0x20) {
+                    if (ac->acFlags & 0x20) {
                         p->state = -1;
                     }
                 } else {
@@ -268,10 +268,10 @@ s32 battleAcMain_RepeatedlyLv(BattleWork* work) {
                     break;
                 }
             }
-            if (p->s18 == 0 && (RL_AC(ac, 0x34, u32) & 0x40)) {
+            if (p->s18 == 0 && (ac->acFlags & 0x40)) {
                 p->s18 = 1;
             }
-            if (p->state && !(RL_AC(ac, 0x34, u32) & 1)) {
+            if (p->state && !(ac->acFlags & 1)) {
                 p->s18++;
             }
             RL_AC(ac, 0x60, s32) = p->s18;
@@ -436,24 +436,24 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     target = p->gauge / 100.0f;
     if (disp->gaugeAnim <= target) {
-        if (RL_AC(ac, 0x34, u32) & 8) {
+        if (ac->acFlags & 8) {
             disp->gaugeAnim += 0.02f;
         } else {
             disp->gaugeAnim += 0.01f;
         }
-        if (RL_AC(ac, 0x34, u32) & 0x10) {
+        if (ac->acFlags & 0x10) {
             disp->gaugeAnim = target;
         }
         if (disp->gaugeAnim > target) {
             disp->gaugeAnim = target;
         }
     } else {
-        if (RL_AC(ac, 0x34, u32) & 8) {
+        if (ac->acFlags & 8) {
             disp->gaugeAnim -= 0.02f;
         } else {
             disp->gaugeAnim -= 0.01f;
         }
-        if (RL_AC(ac, 0x34, u32) & 0x10) {
+        if (ac->acFlags & 0x10) {
             disp->gaugeAnim = target;
         }
         if (disp->gaugeAnim < target) {
@@ -486,13 +486,13 @@ static void actionCommandDisp(f32 x, f32 y) {
         }
     }
     BattleAcDrawGauge(disp->gaugeAnim, (s32)x, (s32)y, p->u24, count, arr[0], arr[1], arr[2], flags);
-    if (RL_AC(ac, 0x34, u32) & 2) {
+    if (ac->acFlags & 2) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x + (f32)(RL_AC(ac, 0x50, s32) * 0xB0) / 100.0f;
         pos.y = 45.0f + y;
         RL_IconDisp(&pos, 0x10, 0x96, 1.0f);
     }
-    if (RL_AC(ac, 0x34, u32) & 4) {
+    if (ac->acFlags & 4) {
         Mtx m3, m1, m2;
         s32 number = RL_AC(ac, 0x60, s32) + RL_AC(ac, 0x54, s32);
         { f32 w = 108.0f; PSMTXTrans(m1, -200.0f + x + w, 25.0f + y, 0.0f); }

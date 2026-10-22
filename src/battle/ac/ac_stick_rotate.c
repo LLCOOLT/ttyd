@@ -146,10 +146,10 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                     sw->iconB = 2;
                 }
             case 1000:
-                if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8--;
-                        if (ac->field_0x8 >= 0) {
+                if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
+                    if (ac->setupFlags & 2) {
+                        ac->setupParam--;
+                        if (ac->setupParam >= 0) {
                             break;
                         }
                     }
@@ -163,7 +163,7 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 }
                 sw->dir = _GetInputDir();
                 if (sw->dir == -1 || ((s32)AC_PARAMS(work)->button == 0 && sw->dir <= 0)) {
-                    if (*(s16*)&ac->field_78[0x10] <= 0) {
+                    if (ac->countdown <= 0) {
                         if (--sw->timer > 0) {
                             break;
                         }
@@ -184,8 +184,8 @@ s32 battleAcMain_StickRotate(BattleWork* work) {
                 break;
             case 1001: {
                 s32 r;
-                if (*(s16*)&ac->field_78[0x10] > 0) {
-                    (*(s16*)&ac->field_78[0x10])--;
+                if (ac->countdown > 0) {
+                    (ac->countdown)--;
                     ac->result = 2;
                     restart = TRUE;
                     ac->mAcState = 1002;

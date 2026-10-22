@@ -147,7 +147,13 @@ typedef struct MapEntry {
     u32 datSize;                   // 0x80
     void* tpl;                     // 0x84, ./map/%s/texture.tpl
     u32 tplSize;                   // 0x88
-    u8 field_0x8C[0xA8 - 0x8C];    // 0x8C
+    void* arcData;                 // 0x8C, buffer kept in ARAM (arcAram) when dat is an archive
+    u32 arcSize;                   // 0x90
+    void* textureTable;            // 0x94, "texture_table" chunk (MapTexTable*)
+    void* lightTable;              // 0x98, "light_table" chunk (MapFileLightTable*)
+    void* fogTable;                // 0x9C, "fog_table" chunk
+    void* materialNameTable;       // 0xA0, "material_name_table" chunk
+    void* vcdTable;                // 0xA4, "vcd_table" chunk (MapVtxFmtInfo*)
     MapObject* rootMapObj;         // 0xA8
     struct HitEntry* rootHitObj;     // 0xAC
     Vec bbox[8];                   // 0xB0
@@ -158,7 +164,11 @@ typedef struct MapEntry {
     struct HitEntry* hitEntries;     // 0x15C
     s32 numAnims;                  // 0x160
     MapEntryAnimData* animData;    // 0x164
-    u8 field_0x168[0x178 - 0x168]; // 0x168
+    u32 dispListSize;              // 0x168, total display-list bytes (makeDisplayList)
+    void* dispListBuf;             // 0x16C, _mapAllocTail(dispListSize); freed in bmapLoad
+    struct ARAMEntry* datAram;     // 0x170, ARAM copy of dat (bmapLoad / bmapUnLoad)
+    struct ARAMEntry* arcAram;     // 0x174, ARAM copy of arcData
+    // NB: bmapLoad/bmapUnLoad also use entry+0x178 for the tpl ARAM copy, which is past sizeof(MapEntry) (0x178)
 } MapEntry;
 
 typedef struct MapWork {
@@ -194,7 +204,7 @@ typedef struct MapTevCallbackInfo {
     s32 tevStage;      // 0xC, next free TEV stage
     s32 texCoord;      // 0x10
     s32 texMap;        // 0x14
-    s32 field_0x18;    // 0x18
+    s32 indStage;      // 0x18, next free indirect TEV stage
 } MapTevCallbackInfo;
 
 typedef void (*MapTevCallback)(MapTevCallbackInfo* info);

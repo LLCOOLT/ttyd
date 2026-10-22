@@ -96,11 +96,11 @@ void seq_mapChangeInit(SequenceWork* work) {
     int c1 = strcmp(gp->currentMapName, "gor_01");
     int c2 = strcmp(_next_map, "gor_01");
     if (c0 && c1 && c2) {
-        bdsw->field_0x114 |= 1;
-    } else if (!c2 && bdsw->field_0x114 & 1) {
+        bdsw->restockFlags |= 1;
+    } else if (!c2 && bdsw->restockFlags & 1) {
         badgeShop_bargainGeneration();
         badgeShop_bottakuruGeneration();
-        bdsw->field_0x114 &= 0xFFFE;
+        bdsw->restockFlags &= 0xFFFE;
     }
     }
 }
@@ -220,20 +220,20 @@ void seq_mapChangeMain(SequenceWork* work) {
             psndMapChange();
             evtCode = mapDataPtr(_next_map)->eventAddr;
             if (evtCode) {
-                gp->field_0x164 = evtEntry(evtCode, 0, 0)->eventId;
+                gp->mapEventId = evtEntry(evtCode, 0, 0)->eventId;
             } else {
-                gp->field_0x164 = 0;
+                gp->mapEventId = 0;
             }
             work->state++;
         }
         break;
     case 4:
-        if ((s32)gp->field_0x164 == 0) {
+        if ((s32)gp->mapEventId == 0) {
             camCtrlOn(4);
             work->state++;
-        } else if (!evtCheckID((s32)gp->field_0x164)) {
+        } else if (!evtCheckID((s32)gp->mapEventId)) {
             camCtrlOn(4);
-            gp->field_0x164 = 0;
+            gp->mapEventId = 0;
             work->state++;
         }
         break;
@@ -399,7 +399,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
         mario = marioGetPtr();
         party = partyGetPtr(marioGetPartyId());
         extraParty = partyGetPtr(marioGetExtraPartyId());
-        mario->field_EC = mario->position = gp->savePlayerPos;
+        mario->camTarget = mario->position = gp->savePlayerPos;
         camRoadReset();
         camShiftReset();
         if (party) {
@@ -458,7 +458,7 @@ void _load(const char* prevMapName, const char* newMapName, const char* beroName
     cam->marioAt.x = cam->marioPos.x;
     cam->marioAt.y = cam->marioPos.y;
     cam->marioAt.z = cam->marioPos.z;
-    mw->field_EC = mw->position;
+    mw->camTarget = mw->position;
     camRoadReset();
     camShiftReset();
     if (cam->flags & 4) {

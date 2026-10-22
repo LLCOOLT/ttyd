@@ -81,9 +81,6 @@ typedef struct UnitWinWork {
 	s32 bought;            // 0xE4
 } UnitWinWork;
 
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_08_80418A0C_sbss[1];
-#pragma force_active reset
 static s16* mario_status_point_table[3];
 s32 unk_804189fc;
 static UnitWinWork* _wp;
@@ -105,10 +102,10 @@ WinMgrDesc unk_80375478[3] = {
 
 static s32 party_id_table[8] = {1, 2, 5, 4, 6, 3, 7, 0};
 static s32 party_icon_table[7] = {0x155, 0x156, 0x15F, 0x158, 0x160, 0x157, 0x161};
-static const char* party_labelname_table[7] = {"_kur", "_nok", "_win", "_yos", "_viv", "_bom", "_chu"};
+static const char* party_labelname_table[7] = {("_kur"), ("_nok"), ("_win"), ("_yos"), ("_viv"), ("_bom"), ("_chu")};
 static s32 mario_status_icon_table[3] = {0x19F, 0x1A0, 0x1A1};
-static const char* mario_status_labelname_table[3] = {"_hp", "_fp", "_bp"};
-static const char* mario_status_name_table[3] = {"\x82\x67\x82\x6F", "\x82\x65\x82\x6F", "\x82\x61\x82\x6F"};
+static const char* mario_status_labelname_table[3] = {("_hp"), ("_fp"), ("_bp")};
+static const char* mario_status_name_table[3] = {("\202g\202o"), ("\202e\202o"), ("\202a\202o")};
 static s32 mario_status_henka_table[3] = {5, 5, 3};
 
 static EVT_BEGIN(main_evt)
@@ -150,8 +147,7 @@ void unk_8017599c(WinMgrEntry* entry) {
 	}
 }
 
-
-#define UNITWIN_UNUSED_INLINE(fn) static void fn(char* buf, const char* name, s32 n) { sprintf(buf, "%s_%04d", name, n); }
+#define UNITWIN_UNUSED_INLINE(fn) static void fn(char* buf, const char* name, s32 n) { sprintf(buf, ("%s_%04d"), name, n); }
 UNITWIN_UNUSED_INLINE(unitwin_fmt)
 
 void unk_8017597c(WinMgrEntry* entry) {
@@ -479,6 +475,8 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	s32 row;
 	s32 i;
 	char fbuf[64];
+	s32 flag;
+	s32 lv;
 
 	if (wp->flags & 1) {
 		const char* desc = itemDataTable[wp->goods[wp->goodsIdx]].description;
@@ -662,12 +660,12 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			s32* tbl;
 			const char* title;
 			s32 titleX;
-			s32 i;
 			const char* desc;
 			s32 max;
 			s32 flag;
 			u32 sl, st, sw, sh;
 
+			row = 0;
 			desc = NULL;
 			if (mode == 2 || mode == 3) {
 				h = (8 - pouchGetHaveItemCnt() > 0 ? 8 - pouchGetHaveItemCnt() : 0) * 24;
@@ -732,7 +730,7 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			}
 			GXGetScissor(&sl, &st, &sw, &sh);
 			GXSetScissor(0x120, 0xA2, 0x11C, 0xBE - h);
-			for (tbl = badge_bottakuru100_table, i = 0, row = i; i < max; i++) {
+			for (tbl = badge_bottakuru100_table, i = 0; i < max; i++) {
 				
 				GXColor color = {0x00, 0x00, 0x00, 0xFF};
 				s32 id;
@@ -858,15 +856,14 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			const char* title;
 			u32 sl, st, sw, sh;
 
-
 			h = 8 - wp->count;
 			h = (h > 0 ? h : 0) * 24;
 			if (mode == 17) {
 				title = msgSearch("msg_window_title_5");
-				tbl = jdt->unk14.unkD;
+				tbl = jdt->readFlags.perfectRead;
 			} else {
 				title = msgSearch("msg_window_title_6");
-				tbl = jdt->unk14.unk1A;
+				tbl = jdt->readFlags.luigiRead;
 			}
 			windowDispGX_Waku_col(0, (GXColor){0xFF, 0xFF, 0xFF, 0xFF}, -24.0f, 100.0f, 300.0f, 220 - h, 20.0f);
 			windowDispGX_Waku_col(0, (GXColor){0x2B, 0xA4, 0xFF, 0xFF}, 51.0f, 114.0f, 150.0f, 28.0f, 8.0f);
@@ -926,7 +923,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			u32 sl, st, sw, sh;
 			
 			s32 lv;
-			s32 flag;
 			GXColor color;
 
 			h = 8 - wp->count;
@@ -1165,7 +1161,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 			
 			s32 j;
 			s32 cnt;
-			s32 lv;
 			s32 v;
 			s32 ty;
 			GXColor color;
@@ -1410,7 +1405,6 @@ void evt_unitwin_disp_func(CameraId cameraId, void* param) {
 	}
 }
 
-
 USER_FUNC(set_new_goods_list) {
 	s32* args = event->args;
 	UnitWinWork* wp = (UnitWinWork*)evtGetValue(event, args[0]);
@@ -1485,3 +1479,4 @@ USER_FUNC(unitwin_setmariolevel) {
 	evtSetValue(event, args[3], r);
 	return EVT_RETURN_DONE;
 }
+

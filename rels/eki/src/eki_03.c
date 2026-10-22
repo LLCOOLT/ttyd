@@ -443,7 +443,7 @@ static void sun_tev(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texMap = info->texCoord;
     s32 texCoord = info->texMap;
-    s32 indStage = info->field_0x18;
+    s32 indStage = info->indStage;
     GXTexObj obj;
     f32 mtx[2][3];
     u8* buf;
@@ -483,7 +483,7 @@ static void sun_tev(MapTevCallbackInfo* info) {
     GXSetTevIndWarp(GX_TEVSTAGE0, indStage, GX_TRUE, GX_FALSE, GX_ITM_0);
     info->tevStage = stage;
     info->texMap = texCoord;
-    info->field_0x18 = indStage + 1;
+    info->indStage = indStage + 1;
     info->texCoord = texMap + 1;
 }
 

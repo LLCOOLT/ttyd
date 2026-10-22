@@ -461,7 +461,7 @@ USER_FUNC(hoshi_jump) {
         event->userdata[0] = *(s32*)&t;
         event->userdata[1] = *(s32*)&vy;
         event->userdata[2] = *(s32*)&speed;
-        event->field_84 = 0;
+        event->userdata3 = 0;
     }
     t = event->userdataf[0];
     vy = event->userdataf[1];

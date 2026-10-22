@@ -14,29 +14,29 @@ typedef struct EffFireWork {
     u8 pad11[3];
     s32 duration;  // 0x14
     s32 delay;     // 0x18
-    s32 unk1c;     // 0x1C
+    s32 sparkTimer;     // 0x1C, counts up to range, then spawns a spark
     s32 range;     // 0x20
     f32 scale;     // 0x24
-    s32 unk28;     // 0x28
-    s32 unk2c;     // 0x2C
+    s32 smokePhase0;     // 0x28
+    s32 smokePhase1;     // 0x2C
     s32 smokeInt;  // 0x30
     s32 smokeLife; // 0x34
-    s32 unk38;     // 0x38
+    s32 glowAlpha;     // 0x38, TEVREG2 level
     s32 keyIdx;    // 0x3C
     s32 keyFrame;  // 0x40
-    f32 unk44;     // 0x44
+    f32 pulseScale;     // 0x44, keyframed scale (FireScaleKey table)
     f32 pad48[1];
     f32 f4c[6];    // 0x4C
-    s32 unk64;     // 0x64
-    s32 unk68;     // 0x68
-    s32 unk6c;     // 0x6C
-    s32 unk70;     // 0x70
-    s32 unk74;     // 0x74
-    f32 unk78;     // 0x78
-    f32 unk7c;     // 0x7C
+    s32 bboxValid;     // 0x64, set once the screen bbox is computed
+    s32 scrMinX;     // 0x68, screen-space bbox
+    s32 scrMaxX;     // 0x6C
+    s32 scrMaxY;     // 0x70
+    s32 scrMinY;     // 0x74
+    f32 scaleX;     // 0x78
+    f32 scaleY;     // 0x7C
     s32 unk80;     // 0x80
     s32 unk84;     // 0x84
-    s32 unk88;     // 0x88
+    s32 useMapBlend;     // 0x88, adds the map blend-colour TEV stage
 } EffFireWork;
 
 typedef struct EffFireSmokeWork {
@@ -139,12 +139,12 @@ EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale
     work->scale = scale;
     work->duration = duration;
     work->delay = 0;
-    work->unk78 = 1.0f;
-    work->unk7c = 1.0f;
-    work->unk1c = 0;
+    work->scaleX = 1.0f;
+    work->scaleY = 1.0f;
+    work->sparkTimer = 0;
     work->range = rand() % 30 + 30;
-    work->unk28 = 0;
-    work->unk2c = 0;
+    work->smokePhase0 = 0;
+    work->smokePhase1 = 0;
     work->f4c[0] = 0.0f;
     work->f4c[1] = 0.0f;
     work->f4c[2] = 0.0f;
@@ -182,10 +182,10 @@ EffectEntry* effFireEntry(s32 type, s32 duration, f32 x, f32 y, f32 z, f32 scale
     work->delay = rand() % work->smokeInt;
     work->keyIdx = 0;
     work->keyFrame = 0;
-    work->unk44 = 0.0f;
+    work->pulseScale = 0.0f;
     work->unk80 = 0;
     work->unk84 = 0;
-    work->unk88 = 0;
+    work->useMapBlend = 0;
     return effect;
 }
 
@@ -217,15 +217,15 @@ void effFireMain(EffectEntry* effect) {
         case 6:
         case 7:
         case 8:
-            work->unk28 = (f32)work->smokeLife * (f32)work->delay / (f32)work->smokeInt;
-            work->unk2c = (f32)work->smokeLife * (f32)(work->delay + 1) / (f32)work->smokeInt;
-            if (work->unk28 >= work->smokeLife) {
-                work->unk28 = 0;
+            work->smokePhase0 = (f32)work->smokeLife * (f32)work->delay / (f32)work->smokeInt;
+            work->smokePhase1 = (f32)work->smokeLife * (f32)(work->delay + 1) / (f32)work->smokeInt;
+            if (work->smokePhase0 >= work->smokeLife) {
+                work->smokePhase0 = 0;
             }
-            if (work->unk2c >= work->smokeLife) {
-                work->unk2c = 0;
+            if (work->smokePhase1 >= work->smokeLife) {
+                work->smokePhase1 = 0;
             }
-            work->unk38 = 128;
+            work->glowAlpha = 128;
             break;
     }
     work->delay++;
@@ -262,27 +262,27 @@ void effFireMain(EffectEntry* effect) {
             }
             t = (f32)(tbl[idx].frame - kf) / (f32)(tbl[idx].frame - tbl[idx - 1].frame);
             v = (1.0f - t) * tbl[idx].value + t * tbl[idx - 1].value;
-            work->unk44 = v;
-            work->unk44 *= 1.4f;
-            work->unk44 *= 1.2f;
+            work->pulseScale = v;
+            work->pulseScale *= 1.4f;
+            work->pulseScale *= 1.2f;
             work->keyFrame++;
             break;
         }
         case 5:
         case 6:
         case 7:
-            work->unk1c++;
-            if (work->unk1c > work->range) {
+            work->sparkTimer++;
+            if (work->sparkTimer > work->range) {
                 effFireSparkN64Entry(type, 2, 200, work->position.x, 10.0f * work->scale + work->position.y,
-                                     work->position.z, 30.0f * work->unk78, 30.0f, work->scale, 1.0f,
+                                     work->position.z, 30.0f * work->scaleX, 30.0f, work->scale, 1.0f,
                                      1.0f);
-                work->unk1c = 0;
+                work->sparkTimer = 0;
                 work->range = rand() % 30 + 30;
             }
             break;
         default:
-            work->unk1c++;
-            if (work->unk1c > work->range) {
+            work->sparkTimer++;
+            if (work->sparkTimer > work->range) {
                 u8 offs[4] = { 5, 10, 10, 10 };
                 f32 px, py, pz, sc;
                 pz = work->position.z - 5.0f;
@@ -290,7 +290,7 @@ void effFireMain(EffectEntry* effect) {
                 sc = work->scale;
                 px = work->position.x;
                 effFireSmokeEntry(px, py, pz, sc);
-                work->unk1c = 0;
+                work->sparkTimer = 0;
                 work->range = rand() % 30 + 30;
             }
             break;
@@ -366,7 +366,7 @@ void effFireDisp(CameraId cameraId, EffectEntry* effect) {
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
     {
         f32 s = 20.0f * work->scale; s *= 0.03125f;
-        PSMTXScale(scaleMtx, s * work->unk78, s * work->unk7c, s);
+        PSMTXScale(scaleMtx, s * work->scaleX, s * work->scaleY, s);
     }
     PSMTXConcat(trans, rot, m6c);
     PSMTXConcat(m6c, scaleMtx, m6c);
@@ -442,16 +442,16 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
     PSMTXScale(scaleMtx, 1.0f / work->smokeLife, 1.0f, 1.0f);
-    PSMTXTrans(trans, work->unk28, 0.0f, 0.0f);
+    PSMTXTrans(trans, work->smokePhase0, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, trans, trans);
     GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
     PSMTXScale(scaleMtx, 1.0f / work->smokeLife, 1.0f, 1.0f);
-    PSMTXTrans(trans, work->unk2c, 0.0f, 0.0f);
+    PSMTXTrans(trans, work->smokePhase1, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, trans, trans);
     GXLoadTexMtxImm(trans, GX_TEXMTX1, GX_MTX2x4);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
-    PSMTXScale(scaleMtx, work->scale * work->unk78, work->scale * work->unk7c, work->scale);
+    PSMTXScale(scaleMtx, work->scale * work->scaleX, work->scale * work->scaleY, work->scale);
     PSMTXConcat(trans, rot, m54);
     PSMTXConcat(m54, scaleMtx, m54);
     PSMTXConcat(camera->view, m54, m54);
@@ -486,7 +486,7 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE1, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE1, 15, 15, 15, 0);
     GXSetTevAlphaIn(GX_TEVSTAGE1, 0, 4, 3, 7);
-    GXSetTevColor(GX_TEVREG2, (GXColor){ work->unk38, work->unk38, work->unk38, work->unk38 });
+    GXSetTevColor(GX_TEVREG2, (GXColor){ work->glowAlpha, work->glowAlpha, work->glowAlpha, work->glowAlpha });
     GXSetTevOrder(GX_TEVSTAGE2, GX_TEXCOORD_NULL, GX_TEXMAP_NULL, GX_COLOR_NULL);
     GXSetTevColorOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
@@ -520,7 +520,7 @@ void effFireDisp2(CameraId cameraId, EffectEntry* effect) {
             PSMTXTrans(trans, 0.0f, 25.0f, 0.0f);
             break;
     }
-    PSMTXScale(scaleMtx, work->unk44, work->unk44, work->unk44);
+    PSMTXScale(scaleMtx, work->pulseScale, work->pulseScale, work->pulseScale);
     PSMTXConcat(trans, scaleMtx, trans);
     if (type == 4) {
         PSMTXRotRad(rot, 'z', 0.7853982f);
@@ -613,16 +613,16 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetTexCoordGen2(GX_TEXCOORD0, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX0, GX_FALSE, GX_PTIDENTITY);
     GXSetTexCoordGen2(GX_TEXCOORD1, GX_TG_MTX2x4, GX_TG_TEX0, GX_TEXMTX1, GX_FALSE, GX_PTIDENTITY);
     PSMTXScale(scaleMtx, 1.0f / work->smokeLife, 1.0f, 1.0f);
-    PSMTXTrans(trans, work->unk28, 0.0f, 0.0f);
+    PSMTXTrans(trans, work->smokePhase0, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, trans, trans);
     GXLoadTexMtxImm(trans, GX_TEXMTX0, GX_MTX2x4);
     PSMTXScale(scaleMtx, 1.0f / work->smokeLife, 1.0f, 1.0f);
-    PSMTXTrans(trans, work->unk2c, 0.0f, 0.0f);
+    PSMTXTrans(trans, work->smokePhase1, 0.0f, 0.0f);
     PSMTXConcat(scaleMtx, trans, trans);
     GXLoadTexMtxImm(trans, GX_TEXMTX1, GX_MTX2x4);
     PSMTXTrans(trans, work->position.x, work->position.y, work->position.z);
     PSMTXRotRad(rot, 'y', MTXDegToRad(-camGetPtr(cameraId)->viewYaw));
-    PSMTXScale(scaleMtx, work->scale * work->unk78, work->scale * work->unk7c, work->scale);
+    PSMTXScale(scaleMtx, work->scale * work->scaleX, work->scale * work->scaleY, work->scale);
     PSMTXConcat(trans, rot, mb0);
     PSMTXConcat(mb0, scaleMtx, mb0);
     GXSetNumTevStages(3);
@@ -641,7 +641,7 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetTevAlphaOp(GX_TEVSTAGE2, GX_TEV_ADD, GX_TB_ZERO, GX_CS_SCALE_1, GX_TRUE, GX_TEVPREV);
     GXSetTevColorIn(GX_TEVSTAGE2, 15, 15, 15, 0);
     GXSetTevAlphaIn(GX_TEVSTAGE2, 7, 0, 1, 7);
-    if (work->unk88 && (mapGetWork()->entries[0].flags & 2)) {
+    if (work->useMapBlend && (mapGetWork()->entries[0].flags & 2)) {
         GXColor blend;
         mapGetBlend(&blend);
         GXSetNumTevStages(4);
@@ -661,10 +661,10 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_POS, GX_POS_XYZ, GX_F32, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_CLR0, GX_CLR_RGBA, GX_RGBA8, 0);
     GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
-    work->unk68 = 10000;
-    work->unk70 = -10000;
-    work->unk6c = -10000;
-    work->unk74 = 10000;
+    work->scrMinX = 10000;
+    work->scrMaxY = -10000;
+    work->scrMaxX = -10000;
+    work->scrMinY = 10000;
     col = col_tbl[type - 5];
     for (pass = 0; pass < 2; pass++) {
         switch (pass) {
@@ -705,17 +705,17 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXMultVec(m80, &p, &p);
         getScreenPoint(&p, &scr);
-        if (scr.x < work->unk68) {
-            work->unk68 = scr.x;
+        if (scr.x < work->scrMinX) {
+            work->scrMinX = scr.x;
         }
-        if (scr.x > work->unk6c) {
-            work->unk6c = scr.x;
+        if (scr.x > work->scrMaxX) {
+            work->scrMaxX = scr.x;
         }
-        if (scr.y > work->unk70) {
-            work->unk70 = scr.y;
+        if (scr.y > work->scrMaxY) {
+            work->scrMaxY = scr.y;
         }
-        if (scr.y < work->unk74) {
-            work->unk74 = scr.y;
+        if (scr.y < work->scrMinY) {
+            work->scrMinY = scr.y;
         }
         {
             Vec t = { 0.0f, 0.0f, 0.0f };
@@ -725,17 +725,17 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXMultVec(m80, &p, &p);
         getScreenPoint(&p, &scr);
-        if (scr.x < work->unk68) {
-            work->unk68 = scr.x;
+        if (scr.x < work->scrMinX) {
+            work->scrMinX = scr.x;
         }
-        if (scr.x > work->unk6c) {
-            work->unk6c = scr.x;
+        if (scr.x > work->scrMaxX) {
+            work->scrMaxX = scr.x;
         }
-        if (scr.y > work->unk70) {
-            work->unk70 = scr.y;
+        if (scr.y > work->scrMaxY) {
+            work->scrMaxY = scr.y;
         }
-        if (scr.y < work->unk74) {
-            work->unk74 = scr.y;
+        if (scr.y < work->scrMinY) {
+            work->scrMinY = scr.y;
         }
         {
             Vec t = { 0.0f, 0.0f, 0.0f };
@@ -744,17 +744,17 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXMultVec(m80, &p, &p);
         getScreenPoint(&p, &scr);
-        if (scr.x < work->unk68) {
-            work->unk68 = scr.x;
+        if (scr.x < work->scrMinX) {
+            work->scrMinX = scr.x;
         }
-        if (scr.x > work->unk6c) {
-            work->unk6c = scr.x;
+        if (scr.x > work->scrMaxX) {
+            work->scrMaxX = scr.x;
         }
-        if (scr.y > work->unk70) {
-            work->unk70 = scr.y;
+        if (scr.y > work->scrMaxY) {
+            work->scrMaxY = scr.y;
         }
-        if (scr.y < work->unk74) {
-            work->unk74 = scr.y;
+        if (scr.y < work->scrMinY) {
+            work->scrMinY = scr.y;
         }
         {
             Vec t = { 0.0f, 0.0f, 0.0f };
@@ -763,37 +763,37 @@ void effFireDisp3(CameraId cameraId, EffectEntry* effect) {
         }
         PSMTXMultVec(m80, &p, &p);
         getScreenPoint(&p, &scr);
-        if (scr.x < work->unk68) {
-            work->unk68 = scr.x;
+        if (scr.x < work->scrMinX) {
+            work->scrMinX = scr.x;
         }
-        if (scr.x > work->unk6c) {
-            work->unk6c = scr.x;
+        if (scr.x > work->scrMaxX) {
+            work->scrMaxX = scr.x;
         }
-        if (scr.y > work->unk70) {
-            work->unk70 = scr.y;
+        if (scr.y > work->scrMaxY) {
+            work->scrMaxY = scr.y;
         }
-        if (scr.y < work->unk74) {
-            work->unk74 = scr.y;
+        if (scr.y < work->scrMinY) {
+            work->scrMinY = scr.y;
         }
         col += 4;
     }
-    work->unk68 += 304;
-    work->unk6c += 304;
-    work->unk70 = 240 - work->unk70;
-    work->unk74 = 240 - work->unk74;
-    if (work->unk68 < 0) {
-        work->unk68 = 0;
+    work->scrMinX += 304;
+    work->scrMaxX += 304;
+    work->scrMaxY = 240 - work->scrMaxY;
+    work->scrMinY = 240 - work->scrMinY;
+    if (work->scrMinX < 0) {
+        work->scrMinX = 0;
     }
-    if (work->unk6c > 608) {
-        work->unk6c = 608;
+    if (work->scrMaxX > 608) {
+        work->scrMaxX = 608;
     }
-    if (work->unk70 < 0) {
-        work->unk70 = 0;
+    if (work->scrMaxY < 0) {
+        work->scrMaxY = 0;
     }
-    if (work->unk74 > 480) {
-        work->unk74 = 480;
+    if (work->scrMinY > 480) {
+        work->scrMinY = 480;
     }
-    work->unk64 = 1;
+    work->bboxValid = 1;
 }
 
 

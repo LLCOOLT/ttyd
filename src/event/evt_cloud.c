@@ -87,7 +87,7 @@ static USER_FUNC(evt_cloud_main) {
             wp->counter = 0;
             break;
         case 1:
-            if (mario->unk1AC > 90.0f && mario->unk1AC <= 270.0f) {
+            if (mario->displayDirectionTarget > 90.0f && mario->displayDirectionTarget <= 270.0f) {
                 strcpy(wp->animName, "P_oof_cloud_2");
             } else {
                 strcpy(wp->animName, "P_oof_cloud_1");
@@ -170,7 +170,7 @@ static USER_FUNC(evt_cloud_main) {
         case 3:
             img = imgNameToPtr(wp->imgName, group);
             img->flags &= ~2;
-            img->field_0x108 = (s32)"A_1";
+            img->animName = (s32)"A_1";
             *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
             mapGrpFlagOn(wp->groupName, 1);
             wp->timer = 30;
@@ -179,9 +179,9 @@ static USER_FUNC(evt_cloud_main) {
             break;
         case 4:
             img = imgNameToPtr(wp->imgName, group);
-            if (wp->lastFrame == 0.0f || wp->lastFrame + 1.0f < img->field_0x118) {
+            if (wp->lastFrame == 0.0f || wp->lastFrame + 1.0f < img->loopTimes) {
                 psndSFXOn_3D("SFX_OFF_CLAUD_WIND2", &mario->position);
-                wp->lastFrame = img->field_0x118;
+                wp->lastFrame = img->loopTimes;
             }
             if (mario->currMotionId != 27) {
                 wp->state = 10;
@@ -213,7 +213,7 @@ static USER_FUNC(evt_cloud_main) {
                 evtEntry(wp->endEvt, 0, 0);
             }
             img = imgNameToPtr(wp->imgName, group);
-            img->field_0x108 = (s32)"A_2";
+            img->animName = (s32)"A_2";
             *(OSTime*)&img->field_0x10C[4] = animTimeGetTime(group);
             hitObjFlagOn(wp->hitName, 1);
             wp->timer = 60;

@@ -141,8 +141,8 @@ void BattleStatusEffectDelete(BattleUnit* unit) {
 #include "driver/effdrv.h"
 EffectEntry* effSparkEntry(s32, s32, f32, f32, f32, f32);
 EffectEntry* effSleepEntry(s32, s32, f32, f32, f32, f32, f32);
-#define EFF_SLEEP(u) (*(EffectEntry**)((u8*)(u) + 0x320))
-#define EFF_SPARK(u) (*(EffectEntry**)((u8*)(u) + 0x32C))
+#define EFF_SLEEP(u) ((u)->sleepEff)
+#define EFF_SPARK(u) ((u)->sparkEff)
 
 #pragma optimize_for_size on
 void BSE_Sleep(BattleUnit* unit) {
@@ -222,8 +222,8 @@ void BSE_BiribiriDelete(BattleUnit* unit) {
 
 EffectEntry* effFireEntry(s32, s32, f32, f32, f32, f32);
 EffectEntry* effIceEntry(s32, s32, f32, f32, f32, f32);
-#define EFF_FIRE(u) (*(EffectEntry**)((u8*)(u) + 0x324))
-#define EFF_ICE(u) (*(EffectEntry**)((u8*)(u) + 0x328))
+#define EFF_FIRE(u) ((u)->fireEff)
+#define EFF_ICE(u) ((u)->iceEff)
 #define KIND_F(u, o) (*(f32*)((u8*)(u)->mKindParams + (o)))
 
 #pragma optimize_for_size on
@@ -301,7 +301,7 @@ void BSE_FreezeDelete(BattleUnit* unit) {
 
 #pragma optimize_for_size reset
 
-#define KAGE_ICON(u) (*(u8**)((u8*)(u) + 0x330))
+#define KAGE_ICON(u) ((u)->kageIcon)
 
 void BSE_Kagegakure(BattleUnit* unit) {
 	char name[0x10];

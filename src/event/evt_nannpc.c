@@ -9,6 +9,7 @@
 #include <dolphin/mtx.h>
 #include <dolphin/os.h>
 #include <string.h>
+extern void __div2u();
 
 extern int sprintf(char* str, const char* format, ...);
 void qqsort(void* array, s32 num, s32 size, s32 (*cmp)(void*, void*));
@@ -80,6 +81,35 @@ typedef struct NanNPCWork {
     void (*func18)();  // 0x18
     void (*func1c)();  // 0x1C
 } NanNPCWork;
+void evt_nannpc_set_animtbl_sub(NanNPC* npc, s16* tbl);
+s32 evt_nannpc_entry(EventEntry *event, BOOL isFirstCall);
+void nannpc_ext_dispent();
+void nannpc_ext_main();
+void nannpc_ext_main_sub_fast();
+void nannpc_ext_main_sub();
+void nannpc_ext_init();
+void nannpc_ext_shadow_disp();
+void nannpc_ext_disp();
+s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b);
+void nanNPCOption(void);
+USER_FUNC(evt_nannpcwork_flag_onoff);
+USER_FUNC(evt_nannpc_set_color);
+USER_FUNC(evt_nannpc_set_shadow_position);
+USER_FUNC(evt_nannpc_set_func);
+USER_FUNC(evt_nannpc_ppflag_onoff);
+USER_FUNC(evt_nannpc_flag_onoff);
+USER_FUNC(evt_nannpc_jump_position);
+USER_FUNC(evt_nannpc_move_position2);
+USER_FUNC(evt_nannpc_get_work);
+USER_FUNC(evt_nannpc_set_work);
+USER_FUNC(evt_nannpc_set_dir);
+USER_FUNC(evt_nannpc_set_animtbl);
+USER_FUNC(evt_nannpc_set_size);
+USER_FUNC(evt_nannpc_set_hosei_position);
+USER_FUNC(evt_nannpc_get_position);
+USER_FUNC(evt_nannpc_set_position);
+USER_FUNC(evt_nannpc_set_subfunc);
+USER_FUNC(evt_nannpc_init);
 
 s32 gap_08_8041899C_sbss;
 NanNPCWork* nanNPCWork;
@@ -109,26 +139,80 @@ static inline NanNPC* nanNPCSearch(char* name) {
     return NULL;
 }
 
-void nanNPCOption(void) {
+static inline void nanNPCHitMove(NanNPC* r, f32 mag) {
     s32 clear;
+    f32 hx;
+    f32 hy;
+    f32 hz;
+    f32 nx;
+    f32 ny;
+    f32 nz;
+    f32 d20;
+    Vec h;
+    Vec n;
+    Vec v3c;
+    Vec v48;
+    Vec v54;
+    Vec v60;
+    Vec v6c;
+    Vec v78;
+    Vec v84;
+    v60 = r->pos;
+    v60.y += 1.0f;
+    PSVECNormalize(&r->move, &v6c);
+    if (r->flags & 8) {
+        PSVECAdd(&r->pos, &r->move, &r->pos);
+        PSVECScale(&r->move, &r->move, 0.6f);
+    } else {
+        clear = 1;
+        v84 = v6c;
+        v78 = v60;
+        r->hit1 = NULL;
+        r->hit0 = NULL;
+        d20 = mag;
+        r->hit0 = hitCheckFilter(NULL, &h.x, &h.y, &h.z, &d20, &n.x, &n.y, &n.z,
+                                 v78.x, v78.y, v78.z, v84.x, v84.y, v84.z);
+        if (!r->hit0) {
+            PSVECAdd(&r->pos, &r->move, &r->pos);
+        } else {
+            v48 = r->pos;
+            PSVECAdd(&r->pos, &r->move, &r->pos);
+            if (r->move.y == 0.0f) {
+                n.y = 0.0f;
+            }
+            PSVECNormalize(&n, &n);
+            C_VECReflect(&v84, &n, &v54);
+            PSVECScale(&v54, &r->move, mag);
+            clear = 0;
+            { f32 dot = PSVECDotProduct(&v84, &n); PSVECScale(&n, &n, dot * -(mag - d20) + 0.1f); }
+            PSVECAdd(&r->pos, &n, &r->pos);
+            PSVECSubtract(&r->pos, &v48, &v3c);
+            d20 = PSVECMag(&v3c);
+            if ((f32)d20 > 0.0f) {
+                PSVECNormalize(&v3c, &v3c);
+                v78 = v48;
+                r->hit1 = hitCheckFilter(
+                    NULL, &hx, &hy, &hz, &d20, &nx, &ny, &nz, v48.x, 1.0f + v48.y, v48.z,
+                    v3c.x, v3c.y, v3c.z);
+                if (r->hit1) {
+                    r->pos = v78;
+                }
+            }
+        }
+        if (clear) {
+            PSVECScale(&r->move, &r->move, 0.6f);
+        }
+    }
+}
+
+void nanNPCOption(void) {
     NanNPC* q;
     void* w;
     NanNPC* p;
     NanNPC* r;
     Vec diff;
-    Vec v84;
-    Vec v78;
-    Vec v6c;
-    Vec v60;
-    Vec v54;
-    Vec v48;
-    Vec v3c;
-    Vec n;
-    Vec h;
     f32 mag;
     f32 dist;
-    f32 d20;
-    f32 nz, ny, nx, hz, hy, hx;
 
     w = nanNPCWork;
     for (p = ((NanNPCWork*)w)->npc; p < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; p++) {
@@ -172,57 +256,11 @@ void nanNPCOption(void) {
                     PSVECScale(&r->move, &r->move, 5.0f / mag);
                     mag = 5.0f;
                 }
-                v60 = r->pos;
-                v60.y += 1.0f;
-                PSVECNormalize(&r->move, &v6c);
-                if (r->flags & 8) {
-                    PSVECAdd(&r->pos, &r->move, &r->pos);
-                    PSVECScale(&r->move, &r->move, 0.6f);
-                } else {
-                    clear = 1;
-                    v84 = v6c;
-                    v78 = v60;
-                    r->hit1 = NULL;
-                    r->hit0 = NULL;
-                    d20 = mag;
-                    r->hit0 = hitCheckFilter(NULL, &h.x, &h.y, &h.z, &d20, &n.x, &n.y, &n.z,
-                                             v78.x, v78.y, v78.z, v84.x, v84.y, v84.z);
-                    if (!r->hit0) {
-                        PSVECAdd(&r->pos, &r->move, &r->pos);
-                    } else {
-                        v48 = r->pos;
-                        PSVECAdd(&r->pos, &r->move, &r->pos);
-                        if (r->move.y == 0.0f) {
-                            n.y = 0.0f;
-                        }
-                        PSVECNormalize(&n, &n);
-                        C_VECReflect(&v84, &n, &v54);
-                        PSVECScale(&v54, &r->move, mag);
-                        clear = 0;
-                        PSVECScale(&n, &n, PSVECDotProduct(&v84, &n) * -(mag - d20) + 0.1f);
-                        PSVECAdd(&r->pos, &n, &r->pos);
-                        PSVECSubtract(&r->pos, &v48, &v3c);
-                        d20 = PSVECMag(&v3c);
-                        if ((f32)d20 > 0.0f) {
-                            PSVECNormalize(&v3c, &v3c);
-                            v78 = v48;
-                            r->hit1 = hitCheckFilter(
-                                NULL, &hx, &hy, &hz, &d20, &nx, &ny, &nz, v48.x, 1.0f + v48.y, v48.z,
-                                v3c.x, v3c.y, v3c.z);
-                            if (r->hit1) {
-                                r->pos = v78;
-                            }
-                        }
-                    }
-                    if (clear) {
-                        PSVECScale(&r->move, &r->move, 0.6f);
-                    }
-                }
+                nanNPCHitMove(r, mag);
             }
         }
     }
 }
-
 
 s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
     if (a->z < b->z) {
@@ -739,6 +777,7 @@ USER_FUNC(evt_nannpcwork_flag_onoff) {
 
 #pragma force_active on
 #pragma explicit_zero_data on
-__declspec(section ".sdata") u32 gap_07_804113E8_sdata[6] = {0, 0, 0, 0, 0, 0};
 #pragma explicit_zero_data reset
+#pragma force_active reset
+
 #pragma force_active reset

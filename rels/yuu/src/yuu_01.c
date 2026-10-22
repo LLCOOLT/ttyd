@@ -783,12 +783,12 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
         break;
     }
     if (data->index != 0x15) {
-    angle = mario->unk1A8 + turn_tbl[data->index];
+    angle = mario->displayDirection + turn_tbl[data->index];
     if (data->index >= 5 && data->index < 13) {
         if (!marioChkSwirlPower()) {
             data->index = 0x15;
             mario->dispFlags &= ~0x100;
-            if (mario->unk1A8 >= -90.0f && mario->unk1A8 < 90.0f) {
+            if (mario->displayDirection >= -90.0f && mario->displayDirection < 90.0f) {
                 angle = 0.0f;
             } else {
                 angle = 180.0f;
@@ -840,8 +840,8 @@ BOOL yuuminigame2_gamerule(EventEntry* event, BOOL isFirstCall, MiniGameWork* wp
                 break;
         }
     }
-    mario->unk1AC = reviseAngle(angle);
-    mario->unk1A8 = mario->unk1AC;
+    mario->displayDirectionTarget = reviseAngle(angle);
+    mario->displayDirection = mario->displayDirectionTarget;
     }
     return FALSE;
 }

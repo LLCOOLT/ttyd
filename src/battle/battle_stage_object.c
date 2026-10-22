@@ -302,10 +302,10 @@ void BattleStageObjectInit(void) {
 					break;
 			}
 			obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
-			obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPosition = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPositionOffset = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevRotation = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPositionOffset2 = (Vec){999.0f, 999.0f, 999.0f};
 			mapGrpFlagOff(obj->data->name, 1);
 			switch (data->mSpawnSpecialUnitType) {
 				case 0:
@@ -345,10 +345,10 @@ void BattleStageObjectInit(void) {
 			obj->mBattleUnitIdx = -1;
 			obj->mPosition = data->mPosition;
 			obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
-			obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
-			obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPosition = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPositionOffset = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevRotation = (Vec){999.0f, 999.0f, 999.0f};
+			obj->prevPositionOffset2 = (Vec){999.0f, 999.0f, 999.0f};
 			mapGrpFlagOff(obj->data->name, 1);
 		}
 	}
@@ -364,12 +364,12 @@ void BattleStageObjectInit(void) {
 	obj->id = id;
 	obj->mBattleUnitIdx = -1;
 	obj->mPosition = data->mPosition;
-	obj->mPosition.y = BattleStageGetPtr()->field_0xB28;
+	obj->mPosition.y = BattleStageGetPtr()->stageSizeY;
 	obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
-	obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
-	obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
-	obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
-	obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+	obj->prevPosition = (Vec){999.0f, 999.0f, 999.0f};
+	obj->prevPositionOffset = (Vec){999.0f, 999.0f, 999.0f};
+	obj->prevRotation = (Vec){999.0f, 999.0f, 999.0f};
+	obj->prevPositionOffset2 = (Vec){999.0f, 999.0f, 999.0f};
 	mapGrpFlagOn(obj->data->name, 1);
 	obj->mFlags |= 1;
 	id++;
@@ -391,10 +391,10 @@ void BattleStageObjectInit(void) {
 		obj->mBattleUnitIdx = -1;
 		obj->mPosition = data->mPosition;
 		obj->mRotation.x = obj->mRotation.y = obj->mRotation.z = 0.0f;
-		obj->field_0x34 = (Vec){999.0f, 999.0f, 999.0f};
-		obj->field_0x40 = (Vec){999.0f, 999.0f, 999.0f};
-		obj->field_0x4C = (Vec){999.0f, 999.0f, 999.0f};
-		obj->field_0x58 = (Vec){999.0f, 999.0f, 999.0f};
+		obj->prevPosition = (Vec){999.0f, 999.0f, 999.0f};
+		obj->prevPositionOffset = (Vec){999.0f, 999.0f, 999.0f};
+		obj->prevRotation = (Vec){999.0f, 999.0f, 999.0f};
+		obj->prevPositionOffset2 = (Vec){999.0f, 999.0f, 999.0f};
 		mapGrpFlagOn(obj->data->name, 1);
 		obj->mFlags |= 1;
 		id++;
@@ -454,20 +454,20 @@ void BattleStageObjectMain(void) {
 			continue;
 		}
 		changed = FALSE;
-		if (obj->mPosition.x != obj->field_0x34.x || obj->mPosition.y != obj->field_0x34.y || obj->mPosition.z != obj->field_0x34.z) {
-			obj->field_0x34 = obj->mPosition;
+		if (obj->mPosition.x != obj->prevPosition.x || obj->mPosition.y != obj->prevPosition.y || obj->mPosition.z != obj->prevPosition.z) {
+			obj->prevPosition = obj->mPosition;
 			changed = TRUE;
 		}
-		if (obj->field_0x10.x != obj->field_0x40.x || obj->field_0x10.y != obj->field_0x40.y || obj->field_0x10.z != obj->field_0x40.z) {
-			obj->field_0x40 = obj->field_0x10;
+		if (obj->positionOffset.x != obj->prevPositionOffset.x || obj->positionOffset.y != obj->prevPositionOffset.y || obj->positionOffset.z != obj->prevPositionOffset.z) {
+			obj->prevPositionOffset = obj->positionOffset;
 			changed = TRUE;
 		}
-		if (obj->field_0x28.x != obj->field_0x58.x || obj->field_0x28.y != obj->field_0x58.y || obj->field_0x28.z != obj->field_0x58.z) {
-			obj->field_0x58 = obj->field_0x28;
+		if (obj->positionOffset2.x != obj->prevPositionOffset2.x || obj->positionOffset2.y != obj->prevPositionOffset2.y || obj->positionOffset2.z != obj->prevPositionOffset2.z) {
+			obj->prevPositionOffset2 = obj->positionOffset2;
 			changed = TRUE;
 		}
-		if (obj->mRotation.x != obj->field_0x4C.x || obj->mRotation.y != obj->field_0x4C.y || obj->mRotation.z != obj->field_0x4C.z) {
-			obj->field_0x4C = obj->mRotation;
+		if (obj->mRotation.x != obj->prevRotation.x || obj->mRotation.y != obj->prevRotation.y || obj->mRotation.z != obj->prevRotation.z) {
+			obj->prevRotation = obj->mRotation;
 			changed = TRUE;
 		}
 		if (obj->mFlags & 2) {
@@ -493,29 +493,29 @@ void BattleStageObjectMain(void) {
 			case 7:
 				if (changed) {
 					mapObjTranslate(obj->data->name,
-						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
-						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
-						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
+						obj->positionOffset2.x + (obj->mPosition.x + obj->positionOffset.x),
+						obj->positionOffset2.y + (obj->mPosition.y + obj->positionOffset.y),
+						obj->positionOffset2.z + (obj->mPosition.z + obj->positionOffset.z));
 					mapObjRotate(obj->data->name, obj->mRotation.x, obj->mRotation.y, obj->mRotation.z);
 				}
 				break;
 			case 2:
 				if (changed) {
 					mapObjTranslate(obj->data->name,
-						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
-						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
-						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
-					mapObjTranslate(obj->data->name, 0.0f, -obj->field_0x10.y, 0.0f);
+						obj->positionOffset2.x + (obj->mPosition.x + obj->positionOffset.x),
+						obj->positionOffset2.y + (obj->mPosition.y + obj->positionOffset.y),
+						obj->positionOffset2.z + (obj->mPosition.z + obj->positionOffset.z));
+					mapObjTranslate(obj->data->name, 0.0f, -obj->positionOffset.y, 0.0f);
 					mapObjRotate(obj->data->name, sw->bgRotation.x, sw->bgRotation.y, sw->bgRotation.z);
-					mapObjTranslate(obj->data->name, 0.0f, obj->field_0x10.y, 0.0f);
+					mapObjTranslate(obj->data->name, 0.0f, obj->positionOffset.y, 0.0f);
 				}
 				break;
 			case 3:
 				if (changed) {
 					mapObjTranslate(obj->data->name,
-						obj->field_0x28.x + (obj->mPosition.x + obj->field_0x10.x),
-						obj->field_0x28.y + (obj->mPosition.y + obj->field_0x10.y),
-						obj->field_0x28.z + (obj->mPosition.z + obj->field_0x10.z));
+						obj->positionOffset2.x + (obj->mPosition.x + obj->positionOffset.x),
+						obj->positionOffset2.y + (obj->mPosition.y + obj->positionOffset.y),
+						obj->positionOffset2.z + (obj->mPosition.z + obj->positionOffset.z));
 					mapObjTranslate(obj->data->name, 0.0f, -obj->mPosition.y, 0.0f);
 					mapObjRotate(obj->data->name, obj->mRotation.x, obj->mRotation.y, obj->mRotation.z);
 					mapObjTranslate(obj->data->name, 0.0f, obj->mPosition.y, 0.0f);
@@ -2349,7 +2349,6 @@ USER_FUNC(_object_fall_wait) {
 	return EVT_RETURN_DONE;
 }
 
-
 typedef struct FallObjectEntry {
 	s8 index; //0x0
 	s8 type; //0x1
@@ -2373,6 +2372,51 @@ typedef struct FallObjectWork {
 	s8 prevTypes[3]; //0x1
 	FallObjectEntry entries[1]; //0x4
 } FallObjectWork;
+extern void* jumptable_80374848[];
+s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall);
+s32 BattleStage_ObjectFallCheck(void);
+void _combine_nozzle_weapon(BOOL copy, BattleWeapon* dst, BattleWeapon* src);
+void _rate_mix_3(s8* dstChance, s8* dstTime, s8* dstStrength, s8* srcChance, s8* srcTime, s8* srcStrength);
+void _rate_mix(s8* dstChance, s8* dstTime, s8* srcChance, s8* srcTime);
+s32 _get_nozzle_attack_index(u8 index);
+BOOL BattleFogForceStop(void);
+BOOL BattleFogEndCheck(void);
+f32 _get_nozzle_dir(s32 index);
+void _nozzle_type_init(void);
+void BattleStage_NozzleWorkCheck(s32 type);
+void BattleStage_IronFrameFallCheck(void);
+void _disp_escape_wall_message(CameraId camera, void* param);
+void BattleStage_WallCloseCheck(void);
+void _Nozzle_Change_Check(u8 index, u8* rate);
+void BattleStage_NozzleDirChangeCheck(void);
+void _mobj_shake_main(BattleStageObject* obj);
+void BattleStage_DestroyB(void);
+void BattleStage_DestroyA2(void);
+void BattleStage_DestroyA1(void);
+void BattleObjectConfig(void);
+void BattleStageObjectMain(void);
+void BattleStageObjectInit(void);
+BattleStageObject* BattleSearchObjectPtr(const char* name);
+BattleStageObject* BattleGetObjectPtr(s32 id);
+USER_FUNC(_object_fall_wait);
+USER_FUNC(_nozzle_work_get_weapon_address);
+USER_FUNC(_nozzle_work_attack_set);
+USER_FUNC(_nozzle_work_effect);
+USER_FUNC(_nozzle_work_wait);
+USER_FUNC(_fall_frame_delete);
+USER_FUNC(_fall_frame);
+USER_FUNC(_fall_frame_wait_unit_ready);
+USER_FUNC(_fall_frame_wait);
+USER_FUNC(_announce_wall_message);
+USER_FUNC(_nozzle_turn);
+USER_FUNC(_set_mobj_shake);
+USER_FUNC(_set_mobj_shake_init);
+USER_FUNC(_bgset_audience_bgset_access);
+USER_FUNC(_bgset_kemuri_effect);
+USER_FUNC(_get_bgset_attack_data);
+USER_FUNC(_mobj_destroy);
+USER_FUNC(_mobj_set_alpha);
+USER_FUNC(_set_mobj_rotate_x);
 
 s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 {
@@ -2500,7 +2544,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
           return 2;
         }
         found = 1;
-        BattleChoiceSamplingEnemy(&targets, *((u32 *) (((u8 *) weapon) + 0x7C)), &unitId, &partId);
+        BattleChoiceSamplingEnemy(&targets, weapon->targetWeightFlags, &unitId, &partId);
         e->unitId = unitId;
         e->partId = partId;
         e->noAc = 1;
@@ -2595,7 +2639,7 @@ s32 _object_fall_attack(EventEntry *event, BOOL isFirstCall)
 
         case 1:
           hit.x = ((e->unitId % 20) * 25) - 230;
-          hit.y = BattleStageGetPtr()->field_0xB34;
+          hit.y = BattleStageGetPtr()->audienceSizeY;
           hit.z = (0.1f * (e->unitId % 20)) + (((e->unitId / 20) * 30) + 115);
           btl_camera_set_mode(0, 6);
           btl_camera_set_moveSpeedLv(0, 2);

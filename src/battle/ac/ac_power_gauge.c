@@ -93,13 +93,13 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
+            if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & kConfusedAction)) {
                 if (irand(100) >= 0) {
-                    ac->field_0x8 = 30;
+                    ac->setupParam = 30;
                     pw->autoFail = 0;
                 } else {
                     pw->autoFail = 1;
-                    ac->field_0x8 = 30;
+                    ac->setupParam = 30;
                 }
                 ac->outputParams[0] = 1;
                 ac->mAcState = 1002;
@@ -144,7 +144,7 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
                     }
                     break;
             }
-            if (!(ACW(ac, u32, 0x34) & 1)) {
+            if (!(ac->acFlags & 1)) {
                 pw->frame2++;
             } else if (pw->phase == 1) {
                 pw->frame2++;
@@ -190,8 +190,8 @@ s32 battleAcMain_PowerGauge(BattleWork* work) {
             }
             break;
         case 1002:
-            ac->field_0x8--;
-            if (ac->field_0x8 < 0) {
+            ac->setupParam--;
+            if (ac->setupParam < 0) {
                 if (pw->autoFail) {
                     ac->result = 2;
                     ac->mResultCount++;
@@ -285,13 +285,13 @@ static void actionCommandDisp(f32 x, f32 y) {
     }
     ACW(disp, f32, 0x28) = ratio;
 
-    if (ACW(ac, u32, 0x34) & 2) {
+    if (ac->acFlags & 2) {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 1, 100, 100, 100, 0);
     } else {
         BattleAcDrawGauge((s32)x, (s32)y, 0xB2, ratio, 2, ACW(ac, s32, 0x48), 100, 100, 0);
     }
 
-    flags = *(u32*)(ac->field_34);
+    flags = ac->acFlags;
     if (!(flags & 4)) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         pos.x = -288.0f + x + (f32)(ACW(ac, s32, 0x48) * 0xB0) / 100.0f;

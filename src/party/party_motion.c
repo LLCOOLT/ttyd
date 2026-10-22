@@ -459,15 +459,6 @@ static void partyGorFix(PartyEntry* party);
 static void partyPoseA2(PartyEntry* party);
 s32 getFrontFloor(PartyEntry* party, Vec* out, f32 dir);
 
-
-
-
-
-
-
-
-
-
 f32 partyGetTargetDist3D(s32 id, Vec* p);
 f32 partyGetTargetDist(s32 id, f32 x, f32 z);
 s32 nokonokoGetStatus(PartyEntry* party);
@@ -476,7 +467,6 @@ s32 marioChkSlitThrouh(void);
 void partyGetMoveDirSpd(PartyEntry* party, f32* dir, f32* spd);
 PartyEntry* anotherPartyGetPtr(s32 id);
 HitEntry* partySearchFrontWall(PartyEntry* party, Vec* pos, f32 dist, f32 dir);
-
 
 void party_force_reset_outofscreen(PartyEntry* party);
 
@@ -2110,10 +2100,38 @@ static inline void partyJumpWallMove(PartyEntry* party) {
     party->position.z = v.z;
 }
 
+static inline void partyJumpFrontMove(PartyEntry* party) {
+    Vec v;
+    HitEntry* hit;
+    if (party->flags & 0x1000000) {
+        movePos(&v.x, &v.z, party->unk104, party->unk100);
+        return;
+    }
+    v = party->position;
+    hit = partySearchFrontWall(party, &v, party->unk104, party->unk100);
+    if (hit) {
+        party->unk12C = hit;
+        if (party->unk104) {
+            party->unk134 = hit;
+        }
+    }
+    party->position.x = v.x;
+    party->position.z = v.z;
+}
+
+static inline f32 partyJumpHeight(f32 dy) {
+    if (__fabsf(dy) < 1.0f) {
+        return 25.0f;
+    } else if (dy >= 0.0f) {
+        return dy;
+    } else {
+        return 10.0f;
+    }
+}
+
 void party_motion_jump(PartyEntry* party) {
     PartyMarioView* mario = party->playerPtr;
     s32 id;
-    s32 w;
     HitEntry* hit;
     f32 dir;
     f32 dist;
@@ -2195,15 +2213,8 @@ void party_motion_jump(PartyEntry* party) {
         if (party->unk24 > 40) {
             party->unk24 = 40;
         }
-        dy = party->unk94.y - party->position.y;
         t = 0.5f * party->unk24;
-        if (__fabsf(dy) < 1.0f) {
-            dy = 25.0f;
-        } else if (dy >= 0.0f) {
-            x = x;
-        } else {
-            dy = 10.0f;
-        }
+        dy = partyJumpHeight(party->unk94.y - party->position.y);
         g = (dy + dy) / (t * t - t);
         party->unk114 = mario->unk224 * (g * t);
         if (party->unk114 > 13.0f) {
@@ -2262,7 +2273,7 @@ void party_motion_jump(PartyEntry* party) {
                 break;
             }
         }
-        partyJumpWallMove(party);
+        partyJumpFrontMove(party);
         break;
     }
 }
@@ -2830,48 +2841,8 @@ BOOL party_roll(PartyEntry* party) {
     return ret;
 }
 
-
-
 static inline s32 pm_fpclassifyf(f32 x) { switch (*(s32*)&x & 0x7F800000) { case 0x7F800000: if (*(s32*)&x & 0x007FFFFF) { return 1; } else { return 2; } break; case 0: if (*(s32*)&x & 0x007FFFFF) { return 5; } else { return 3; } break; default: return 4; } }
 static inline f32 pm_sqrtf(f32 x) { if (x > 0.0f) { f64 guess = __frsqrte(x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); guess = 0.5 * guess * (3.0 - guess * guess * x); return x * guess; } else if (x < 0.0) { return *(f32*)__float_nan; } else if (pm_fpclassifyf(x) == 1) { return *(f32*)__float_nan; } return x; }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static f32 partyStayDist(PartyEntry* party) {
     f32 d;
@@ -2964,24 +2935,6 @@ found:
     return hitGetAttr(hit);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static inline void partyDownDirX(HitCheckQuery* q) {
     q->targetDir = (Vec){0.0f, -1.0f, 0.0f};
 }
@@ -3041,60 +2994,6 @@ static u32 partyGetFrontAttr(PartyEntry* party, f32 dir) {
     hit = hitCheckVecFilter(&q, NULL);
     return hit ? hitGetAttr(hit) : 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 static inline u32 partyGetFrontAttrFar(PartyEntry* party) {
     HitCheckQuery q;
@@ -3227,28 +3126,6 @@ void party_force_reset_outofscreen(PartyEntry* party) {
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 static void partyGorFix(PartyEntry* party) {
     PartyMarioView* m3 = party->playerPtr;
     if (!strcmp(gp->currentMapName, "gor_01") && m3->unk1E4 && party->unk138 &&
@@ -3264,3 +3141,6 @@ static void partyPoseA2(PartyEntry* party) {
     party->unk39 = 1;
     party->unk24 = 30;
 }
+
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on

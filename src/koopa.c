@@ -79,7 +79,7 @@ static inline void kpaFireEntry2(Vec pos) {
         s32 type;
         u8* child;
         s32 t;
-        dir = (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) ? 1.0f : -1.0f;
+        dir = (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
         x = 40.0f * dir * scale + pos.x;
         t = (MU32(marioGetPtr(), 0x14) & 1) ^ 1;
@@ -104,14 +104,14 @@ static inline void kpaFireEntry2(Vec pos) {
         }
         fireefp = effGonbabaBreathEntry(type, 0, x, y, z, sz);
         flag = 0;
-        if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
+        if (mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) {
             flag = 1;
         }
         MF(*(u8**)(fireefp + 0xC), 0x48) = (f32)(flag ? 180 : 0);
         child = *(u8**)(*(u8**)(fireefp + 0xC) + 0x4C);
         if (child) {
             flag = 0;
-            if (mp->unk1AC >= 90.0f && mp->unk1AC <= 270.0f) {
+            if (mp->displayDirectionTarget >= 90.0f && mp->displayDirectionTarget <= 270.0f) {
                 flag = 1;
             }
             ang = flag ? 180 : 0;
@@ -192,8 +192,8 @@ void kpaSetLevel(s32 lv) {
         f32 s;
         MU32(KPW(mp), 4) = lv;
         s = baseScaleTbl[lv];
-        MF(mp, 0xC8) = MF(mp, 0xCC) = s;
-        MF(mp, 0xD0) = 1.0f;
+        mp->scale.x = mp->scale.y = s;
+        mp->scale.z = 1.0f;
         kpaSetSpec();
     }
 }
@@ -210,10 +210,10 @@ s32 kpaGetBodyStatus(void) {
     }
     st = 0;
     if (strcmp((char*)gp + 0x12C, "kpa_03") == 0) {
-        if (MF(mp, 0x90) > 370.0f) {
+        if (mp->position.y > 370.0f) {
             return 0;
         }
-        if (MF(mp, 0x90) + MF(mp, 0x1B8) < 370.0f) {
+        if (mp->position.y + mp->wPlayerCollisionBox.y < 370.0f) {
             st = 2;
         } else {
             st = 1;
@@ -256,7 +256,7 @@ void kpaPreInit(void) {
     MU32(KPW(mp), 0xD0) = 1;
     MU32(KPW(mp), 0xE0) = 0;
     MU32(KPW(mp), 0xD8) = 1;
-    new_var = KPW(marioGetPtr()) + 0x14C;
+    new_var = KPW(marioGetPtr()) + 0x14C; // FAKE: address temp; direct *(s32*)(KPW(..) + 0x14C) store differs
     *(s32*)new_var = -1;
     mp = marioGetPtr();
     if (strcmp((char*)gp + 0x12C, "kpa_02") == 0 || strcmp((char*)gp + 0x12C, "kpa_03") == 0 ||
@@ -316,9 +316,9 @@ void kpa2DMain(void) {
     }
     if (mp->currMotionId == 8) {
         *(Vec*)((u8*)mp + 0x110) = mp->position;
-        MF(mp, 0x174) = 0.0f;
-        MF(mp, 0x178) = 0.0f;
-        MF(mp, 0x17C) = 0.0f;
+        mp->unk174.x = 0.0f;
+        mp->unk174.y = 0.0f;
+        mp->unk174.z = 0.0f;
         marioBottomless();
         marioPreDisp();
         mario_kemuri_80130474();
@@ -348,7 +348,7 @@ void kpa2DMain(void) {
         }
         marioCheckWall(spd, ang);
     }
-    mp->position.y += MF(mp, 0x178);
+    mp->position.y += mp->unk174.y;
     PSVECSubtract(&mp->position, &saved, &diff);
     {
         f32 mag = PSVECMag(&diff);
@@ -381,9 +381,9 @@ void kpa2DMain(void) {
     marioCamMain();
     MU32(mp, 0x34)++;
     *(Vec*)((u8*)mp + 0x110) = mp->position;
-    MF(mp, 0x174) = 0.0f;
-    MF(mp, 0x178) = 0.0f;
-    MF(mp, 0x17C) = 0.0f;
+    mp->unk174.x = 0.0f;
+    mp->unk174.y = 0.0f;
+    mp->unk174.z = 0.0f;
 }
 
 void kpa3DMain(void) {
@@ -422,9 +422,9 @@ void kpa3DMain(void) {
     }
     if (mp->currMotionId == 8) {
         *(Vec*)((u8*)mp + 0x110) = mp->position;
-        MF(mp, 0x174) = 0.0f;
-        MF(mp, 0x178) = 0.0f;
-        MF(mp, 0x17C) = 0.0f;
+        mp->unk174.x = 0.0f;
+        mp->unk174.y = 0.0f;
+        mp->unk174.z = 0.0f;
         marioBottomless();
         marioPreDisp();
         marioBalloonMain();
@@ -471,9 +471,9 @@ void kpa3DMain(void) {
     marioCamMain();
     MU32(mp, 0x34)++;
     *(Vec*)((u8*)mp + 0x110) = mp->position;
-    MF(mp, 0x174) = 0.0f;
-    MF(mp, 0x178) = 0.0f;
-    MF(mp, 0x17C) = 0.0f;
+    mp->unk174.x = 0.0f;
+    mp->unk174.y = 0.0f;
+    mp->unk174.z = 0.0f;
 }
 
 #define SETPV(m, v, a, b, c, d) do { JP(m, v) = (a); JP(m, 1) = (b); JP(m, 2) = (c); JP(m, 3) = (d); } while (v)
@@ -481,7 +481,7 @@ f32 kpaSetJumpPara(void) {
     int new_var;
     f32* jd = marioJumpData;
     MarioWork* mp = marioGetPtr();
-    new_var = 0;
+    new_var = 0; // FAKE: register-held 0 for SETPV/JP index and the dead empty if below; literal 0 differs
     SETPV(mp, new_var, jd[new_var], jd[1], jd[2], jd[3]);
     switch (MU32(KPW(mp), 4)) {
     case 0:
@@ -636,7 +636,7 @@ f32 kpaSetFallPara(void);
 s32 kpaFireAttackCheck(void) {
     s32 m;
     MarioWork* mp = marioGetPtr();
-    if (!(MU32(mp, 0) & 1)) {
+    if (!(mp->flags & 1)) {
         return 0;
     }
     m = *(s32*)(KPW(mp) + 0x13C);
@@ -665,14 +665,14 @@ void kpaFireAttack(void) {
     MarioWork* mp = marioGetPtr();
     switch (*(s32*)(KPW(mp) + 0x13C)) {
     case 1:
-        MU32(mp, 0) &= ~0xF0000;
+        mp->flags &= ~0xF0000;
         *(s16*)((u8*)mp + 0x50) = 0;
         *(s32*)(KPW(mp) + 0xD8) = *(s32*)(KPW(mp) + 4) == 0 ? 12 : 8;
         *(s32*)(KPW(mp) + 0xE0) = 0;
         *(s32*)(KPW(mp) + 0x140) = 0;
         *(s32*)(KPW(mp) + 0x13C) = 20;
-        if (!(MU32(mp, 0) & 0x20)) {
-            MF(mp, 0x180) = 0.0f;
+        if (!(mp->flags & 0x20)) {
+            mp->baseSpeed = 0.0f;
             MF(mp, 0x2C4) = 0.0f;
         }
     case 20:
@@ -728,8 +728,8 @@ void kpaFireAttack(void) {
         *(s32*)(KPW(mp) + 0xE0) = 0;
         *(s32*)(KPW(mp) + 0x140) = 0;
         *(s32*)(KPW(mp) + 0x13C) = 40;
-        if (!(MU32(mp, 0) & 0x20)) {
-            MF(mp, 0x180) = 0.0f;
+        if (!(mp->flags & 0x20)) {
+            mp->baseSpeed = 0.0f;
             MF(mp, 0x2C4) = 0.0f;
         }
     case 40:
@@ -850,7 +850,7 @@ void kpaFireMain(void) {
         f32 y;
         f32 z;
         s32 t;
-        dir = (mp->unk1A8 >= 90.0f && mp->unk1A8 <= 270.0f) ? 1.0f : -1.0f;
+        dir = (mp->displayDirection >= 90.0f && mp->displayDirection <= 270.0f) ? 1.0f : -1.0f;
         scale = kpaGetBaseScale(kpaGetLevel());
         f30 = 40.0f * dir * scale + mp->position.x;
         t = (MU32(marioGetPtr(), 0x14) & 1) ^ 1;

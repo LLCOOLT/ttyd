@@ -934,7 +934,7 @@ static USER_FUNC(set_dir) {
 
     if (party != NULL) {
         s32 angle = dir > 180 ? 270 : 90;
-        party->field_110 = party->field_10C = 270 - angle;
+        party->displayDirectionTarget = party->displayDirection = 270 - angle;
     }
     return EVT_RETURN_DONE;
 }

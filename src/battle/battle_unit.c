@@ -91,8 +91,8 @@ typedef struct BtlHpGauge {
     f32 field_0x18;
 } BtlHpGauge;
 
-#define PART_FLAGS(part) (*(s32*)((u8*)(part) + 0x204))
-#define PART_POSE_SOUND(part) ((BtlPartPoseSound*)((u8*)(part) + 0x4D0))
+#define PART_FLAGS(part) ((part)->animFlags)
+#define PART_POSE_SOUND(part) ((BtlPartPoseSound*)(part)->poseSound)
 #define POSE_TIME(pose) (*(f32*)((u8*)(pose) + 0x24))
 #define POSE_LOOP(pose) (*(f32*)((u8*)(pose) + 0x84))
 #define UNIT_TALK_PART(unit) (*(s32*)((u8*)(unit) + 0x2D0))
@@ -238,9 +238,9 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         }
         part->defense = part->mKindPartParams->defense;
         part->defenseAttr = part->mKindPartParams->defenseAttr;
-        UNIT_FIELD(part, s16, 0x1A2) = part->mKindPartParams->field_0x30;
-        UNIT_FIELD(part, s16, 0x1A4) = part->mKindPartParams->field_0x32;
-        part->field_0x78 = 1.0f;
+        part->shadowSize = part->mKindPartParams->field_0x30;
+        part->field_0x1A4 = part->mKindPartParams->field_0x32;
+        part->shadowScale = 1.0f;
         part->moveDirection = 0;
         part->faceDirection = wp->alliances[unit->mAlliance].attackDirection;
         part->mPositionOffset.x = part->mKindPartParams->positionOffset.x;
@@ -251,7 +251,7 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         BtlUnit_SetPartsBaseRotate(part, 0.0f, 0.0f, 0.0f);
         BtlUnit_SetPartsRotate(part, 0.0f, 0.0f, 0.0f);
         BtlUnit_SetPartsRotateOffset(part, 0.0f, 0.0f, 0.0f);
-        UNIT_FIELD(part, u8, 0x4FC) = 0;
+        part->rotationOrder = 0;
         part->mHitBaseOffset.x = part->mKindPartParams->hitBaseOffset.x;
         part->mHitBaseOffset.y = part->mKindPartParams->hitBaseOffset.y;
         part->mHitBaseOffset.z = part->mKindPartParams->hitBaseOffset.z;
@@ -265,15 +265,15 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
         part->mHitCursorOffset.y = 0.0f;
         part->mHitCursorOffset.z = 0.0f;
         part->color = (GXColor){0xFF, 0xFF, 0xFF, 0xFF};
-        part->field_0x1A0 = SETUP_S32(setup, 0x18);
+        part->hitOffsetX = SETUP_S32(setup, 0x18);
         part->poseTable = kpart->poseTable;
         part->poseId = -1;
-        UNIT_FIELD(part, u8, 0x1C4) = 0;
-        UNIT_FIELD(part, f32, 0x208) = 1.0f;
-        UNIT_FIELD(part, f32, 0x20C) = 1.0f;
-        UNIT_FIELD(part, u8, 0x215) = 0;
-        UNIT_FIELD(part, u8, 0x214) = 0;
-        UNIT_FIELD(part, s32, 0x4E8) = -1;
+        part->poseName[0] = 0;
+        part->animSpeed = 1.0f;
+        part->animSpeed2 = 1.0f;
+        part->poseType = 0;
+        part->poseState = 0;
+        part->field_0x4E8 = -1;
         part->partName = part->mKindPartParams->partName;
         if (--n <= 0) break;
         body = part;
@@ -287,13 +287,13 @@ BattleUnit* BtlUnit_Entry(BattleUnitSetup* setup) {
     UNIT_TALK_ANIM(unit) = BtlUnit_GetPoseNameFromType(body, 0x41);
     UNIT_STAY_ANIM(unit) = BtlUnit_GetPoseNameFromType(body, 0x2B);
     unit->mMoveColorLv = 0xFF;
-    UNIT_FIELD(unit, u8, 0x30E) = 0xFF;
+    unit->moveColorLvDisp = 0xFF;
     btlDispEntAnime(unit);
-    UNIT_FIELD(unit, void*, 0x310) = NULL;
+    unit->countersetWeapon = NULL;
     UNIT_FIELD(unit, void*, 0x314) = NULL;
     switch (unit->currentKind) {
         case 0xD0:
-            UNIT_FIELD(unit, void*, 0x310) = BattleAlloc(0x44);
+            unit->countersetWeapon = BattleAlloc(0x44);
             break;
         case 0xDE:
             break;
@@ -347,11 +347,11 @@ BOOL BtlUnit_Delete(BattleUnit* unit) {
     }
     BattleStatusEffectDelete(unit);
     BattleStatusIconDelete(unit);
-    if (UNIT_FIELD(unit, void*, 0x310)) {
+    if (unit->countersetWeapon) {
         if (UNIT_FIELD(unit, UnitDeleteFunc, 0x314)) {
             UNIT_FIELD(unit, UnitDeleteFunc, 0x314)(unit);
         } else {
-            BattleFree(UNIT_FIELD(unit, void*, 0x310));
+            BattleFree(unit->countersetWeapon);
         }
     }
     if (UNIT_FIELD(unit, void*, 0x318)) {
@@ -359,8 +359,8 @@ BOOL BtlUnit_Delete(BattleUnit* unit) {
         UNIT_FIELD(unit, void*, 0x318) = NULL;
     }
     for (part = unit->mParts; part; part = part->mNextPart) {
-        if (UNIT_FIELD(part, s32, 0x4E8) != -1) {
-            UNIT_FIELD(part, s32, 0x4E8) = -1;
+        if (part->field_0x4E8 != -1) {
+            part->field_0x4E8 = -1;
         }
         if (part->poseId != -1) {
             animPoseSetEffect(part->poseId, NULL, 0);

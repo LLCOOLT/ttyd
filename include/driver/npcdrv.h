@@ -129,7 +129,7 @@ typedef struct NpcEntry {
     s32 poseId;                     // 0x104
     s32 field_108;                  // 0x108
     const char* field_10C;          // 0x10C
-    s32 field_110;                  // 0x110
+    s32 offscreenId;                // 0x110
     GXColor color;                  // 0x114
     s32 initEvtId;                  // 0x118
     s32 regularEvtId;               // 0x11C
@@ -141,12 +141,12 @@ typedef struct NpcEntry {
     void* lostEvent;                // 0x134, verified
     void* returnEvent;              // 0x138, verified
     void* blowEvent;                // 0x13C, verified
-    u32 field_140;                  // 0x140, flags
+    u32 interruptFlags;             // 0x140, why the regular event was interrupted (blow/find/...)
     f32 direction;                  // 0x144, angle we're facing at, verified
-    f32 field_148;                  // 0x148, saved direction
+    f32 savedDirection;             // 0x148, saved during field battle
     f32 width;                      // 0x14C
     f32 height;                     // 0x150
-    f32 field_154;                  // 0x154
+    f32 shadowScale;                // 0x154
     Vec jumpStartPos;               // 0x158
     Vec jumpTargetPos;              // 0x164
     u8 field_170[0x178 - 0x170];    // 0x170
@@ -186,12 +186,12 @@ typedef struct NpcEntry {
     f32 homingAngle;                // 0x22C, verified
     NpcBattleInfo battleInfo;       // 0x230
     s32 field_2F8;                  // 0x2F8
-    u32 field_2FC;                  // 0x2FC
+    u32 wallHit;                    // 0x2FC, npcHitCheckSide result (HitEntry*)
     struct HitEntry* field_0x300;   // 0x300, hit object
     void* unitWork[4];              // 0x304
-    u8 field_314;                   // 0x314
+    u8 setupIndex;                  // 0x314, slot in the setup list (dead-mask bit)
     u8 btlCoinDropCount;            // 0x315
-    u8 field_316;                   // 0x316
+    u8 baseCoinCount;               // 0x316
     u8 balloonType;                 // 0x317
     u8 field_318[0x31C - 0x318];    // 0x318
     u16 koopaEncounterType;         // 0x31C
@@ -219,7 +219,7 @@ typedef struct NpcWork {
     s32 total;            // 0x4, maximum allowed
     s32 flags;            // 0x8
     NpcEntry* entries;    // 0xC
-    NpcEntry* field_0x10; // 0x10, wTalkCheckRelatedNpc, TODO: name
+    NpcEntry* talkTarget; // 0x10, NPC that A would talk to this frame
 } NpcWork;
 
 typedef struct FirstStrikeInfo {
@@ -239,7 +239,7 @@ typedef struct FieldBattleInfo {
 	u32 partyId; //0x8
 	NpcBattleInfo* setup; //0xC
 	u32 result; //0x10
-	u32 field_0x14; //0x14
+	u32 coins; //0x14, BattleStoreCoin
 	u8 field_0x18; //0x18
 	u8 ruleKeepResult; //0x19
 	u8 field_0x1A; //0x1A

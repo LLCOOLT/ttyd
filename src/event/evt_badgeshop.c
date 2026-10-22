@@ -25,9 +25,6 @@ s32 badge_bottakuru_table[] = { //Charlieton Rogueport
 	ITEM_DOUBLE_PAIN, ITEM_JUMPMAN, ITEM_HAMMERMAN, ITEM_ATTACK_FX_G,
 	ITEM_SLOW_GO, ITEM_MEGA_RUSH, ITEM_TIMING_TUTOR, ITEM_W_EMBLEM, ITEM_NULL
 };
-#pragma force_active on
-__declspec(section ".data") u32 gap_05_803AA21C_data[1] = {0};
-#pragma force_active reset
 
 //.sdata
 s32 badge_special_table[] = { //Lovely Howz of Badges
@@ -87,16 +84,9 @@ s32 badge_bteresa_table_card_platinum[] = { //Pianta Parlor Platinum Card
 };
 
 //.bss
-#pragma force_active on
-__declspec(section ".data") u32 gap_06_803E1894_bss[1];
-#pragma force_active reset
 BadgeShopWork badgeshopwork;
 
-
 //.sbss
-#pragma force_active on
-__declspec(section ".sdata") u32 gap_08_80418B1C_sbss[1];
-#pragma force_active reset
 BadgeShopWork* bdsw;
 
 //local prototypes
@@ -127,7 +117,7 @@ void badgeShop_init(void) {
 	memset(bdsw->starmaniac_table, 0, sizeof(bdsw->starmaniac_table));
 	memset(bdsw->bottakuru_table, 0, sizeof(bdsw->bottakuru_table));
 	memset(bdsw->bteresa_table, 0, sizeof(bdsw->bteresa_table));
-	bdsw->field_0x114 = 1;
+	bdsw->restockFlags = 1;
 
 	for (ptr = badge_special_table; *ptr; ++ptr) {
 		badgeShop_add(bdsw->special_table, (s16)*ptr, 1);
@@ -312,12 +302,12 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 
 	memset(table, 0, sizeof(table));
 	count2 = count = v7 = i = 0;
-	bdsw->field_0xF8[0] = count;
-	bdsw->field_0xF8[1] = count;
-	bdsw->field_0xF8[2] = count;
-	bdsw->field_0xF8[3] = count;
-	bdsw->field_0xF8[4] = count;
-	bdsw->field_0x10C = count;
+	bdsw->bargainBadges[0] = count;
+	bdsw->bargainBadges[1] = count;
+	bdsw->bargainBadges[2] = count;
+	bdsw->bargainBadges[3] = count;
+	bdsw->bargainBadges[4] = count;
+	bdsw->bargainNum = count;
 	bdsw->field_0x110 = count;
 
 	for (; i < 99; i++) {
@@ -338,8 +328,8 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 		count3 = count2;
 	}
 	irand(0x100); //unused
-	while (bdsw->field_0x10C + bdsw->field_0x110 < count3) {
-		v28 = bdsw->field_0x10C;
+	while (bdsw->bargainNum + bdsw->field_0x110 < count3) {
+		v28 = bdsw->bargainNum;
 		if (v28 < 3 || !v7) {
 			stopcount = irand(count);
 			count4 = 0;
@@ -353,8 +343,8 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 				}
 			}
 			if (i < 99) {
-				bdsw->field_0xF8[bdsw->field_0x10C] = i + BADGE_MIN;
-				bdsw->field_0x10C++;
+				bdsw->bargainBadges[bdsw->bargainNum] = i + BADGE_MIN;
+				bdsw->bargainNum++;
 				badgeShop_set(table, (s16)(i + BADGE_MIN), 0);
 				if ((s16)badge & 1) {
 					count--;
@@ -369,7 +359,7 @@ void badgeShop_bargainGeneration(void) { //finished, needs cleanup and probably 
 		bdsw->bargain_table[i] = bdsw->special_table[i];
 	}
 	for (i = 0; i < 5; i++) {
-		item = bdsw->field_0xF8[i];
+		item = bdsw->bargainBadges[i];
 		if (item) {
 			badgeShop_add(bdsw->bargain_table, (s16)item, -1);
 		}
@@ -507,7 +497,7 @@ s32 badgeShop_add(u8* table, s16 id, s32 value) { // 1:1, can blow up in your fa
 }
 
 USER_FUNC(badgeShop_getBargainTable) {
-	evtSetValue(event, *event->args, (s32)&bdsw->field_0xF8);
+	evtSetValue(event, *event->args, (s32)&bdsw->bargainBadges);
 	return EVT_RETURN_DONE;
 }
 
@@ -643,8 +633,8 @@ s32 badgeShop_ThrowCheck(s32 itemId) {
 	int i;
 	s32 count;
 
-	for (count = 0, i = 0; i < bdsw->field_0x10C; i++) {
-		if (itemId == bdsw->field_0xF8[i + bdsw->field_0x10C]) {
+	for (count = 0, i = 0; i < bdsw->bargainNum; i++) {
+		if (itemId == bdsw->bargainBadges[i + bdsw->bargainNum]) {
 			count++;
 		}
 	}
@@ -656,9 +646,10 @@ s32 U_badgeShop_SpecialCheck(void) {
 	int i;
 
 	for (count = 0, i = 0; i < 5; i++) {
-		if (bdsw->field_0xF8[i]) {
+		if (bdsw->bargainBadges[i]) {
 			count++;
 		}
 	}
 	return count;
 }
+

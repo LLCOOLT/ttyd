@@ -21,10 +21,10 @@ extern PiantaParlorWork* yuwp;
 extern BadgeShopWork* bdsw;
 extern ItemData itemDataTable[];
 
-static PouchData* mpp;
 PouchData* mpp_gap;
-extern void qqsort(void* array, s32 num, s32 size, s32 (*compare)(s16*, s16*));
-s32 comp_aiueo(s16* a, s16* b);
+static PouchData* mpp;
+extern void qqsort(void* array, s32 num, s32 size, void* compare);
+s32 comp_aiueo(const void* a, const void* b);
 s32 comp_kind(s16* a, s16* b);
 
 s16 _party_max_hp_table[8][4] = {
@@ -37,7 +37,7 @@ s16 _party_max_hp_table[8][4] = {
 	{15, 20, 30, 200},
 	{15, 20, 25, 200}
 };
-s32 comp_aiueo_r(s16* a, s16* b);
+s32 comp_aiueo_r(const void* a, const void* b);
 s32 comp_kind_r(s16* a, s16* b);
 
 PouchData* pouchGetPtr(void) {
@@ -179,11 +179,29 @@ s32 pouchGetEmptyKeepItemCnt(void) {
 }
 
 //we have obtained an item, update the appropriate data
+static inline BOOL pouchAdd(s16 *t1, s16 *t2, s32 size, ItemType type)
+{
+  s32 j;
+  for (size--; size >= 0; size--)
+  {
+    if (t1[size] == 0)
+    {
+      for (j = size; j > 0; j--)
+      {
+        t1[j] = t1[j - 1];
+        if (t2) t2[j] = t2[j - 1];
+      }
+      t1[0] = type;
+      if (t2) t2[0] = 0;
+      return 1;
+    }
+  }
+  return 0;
+}
 BOOL pouchGetItem(ItemType type)
 {
   s16 *new_var[2];
   s32 size;
-  s32 j;
   BOOL ok;
   if (type == ITEM_COIN)
   {
@@ -221,7 +239,9 @@ BOOL pouchGetItem(ItemType type)
   {
     if (mpp->currentFP < mpp->maximumFP)
     {
-      mpp->currentFP++; new_var [1] = (void *) 0 ;
+      mpp->currentFP++;
+      // FAKE: dead store (function returns right after); steers register allocation
+      new_var[1] = (void *) 0;
     }
     return 1;
   }
@@ -284,9 +304,9 @@ BOOL pouchGetItem(ItemType type)
   {
     swSet(type - 0x70);
   }
-  new_var[1] = (void *) 0;
-  new_var[0] = (void *) 0;
   size = 0;
+  new_var[0] = (void *) 0;
+  new_var[1] = (void *) 0;
   if ((type >= 0x79) && (type < 0xEC))
   {
     new_var[0] = mpp->heldItems;
@@ -317,30 +337,9 @@ BOOL pouchGetItem(ItemType type)
   {
     return 0;
   }
-  for (size--; size >= 0; size--)
-  {
-    if (new_var[0][size] == 0)
-    {
-      for (j = size; j > 0; j--)
-      {
-        new_var[0][j] = new_var[0][j - 1];
-        if (new_var[1])
-        {
-          new_var[1][j] = new_var[1][j - 1];
-        }
-      }
-
-      new_var[0][0] = type;
-      if (new_var[1])
-      {
-        new_var[1][0] = 0;
-      }
-      return 1;
-    }
-  }
-
-  return 0;
+  return pouchAdd(new_var[0], new_var[1], size, type);
 }
+
 
 u32 pouchCheckItem(u32 itemId) {
 	s32 id = itemId;
@@ -377,66 +376,80 @@ u32 pouchCheckItem(u32 itemId) {
 	return 0;
 }
 
-BOOL pouchRemoveItem(ItemType type) {
-	s16* table1, * table2;
-	BOOL valid;
-	s32 maximum;
-	int i, j, temp;
+static inline void pouchShift(s16 *table1, s16 *table2, int i, s32 maximum)
+{
+  table1[i] = ITEM_NULL;
+  if (table2 != 0) table2[i] = ITEM_NULL;
+  for (; i < maximum - 1; i++)
+  {
+    table1[i] = table1[i + 1];
+    table1[i + 1] = ITEM_NULL;
+    if (table2 != 0)
+    {
+      table2[i] = table2[i + 1];
+      table2[i + 1] = ITEM_NULL;
+    }
+  }
+}
 
-	maximum = 0;
-	table1 = NULL;
-	table2 = NULL;
-	if (type >= ITEM_MIN && type < ITEM_MAX) {
-		table1 = mpp->heldItems;
-		table2 = NULL;
-		maximum = CHECK_ITEM(ITEM_STRANGE_SACK) ? MAX_HELD_ITEMS : HELD_ITEM_COUNT_BASE;
-		valid = TRUE;
-	}
-	else if (type >= KEY_ITEM_MIN && type < KEY_ITEM_MAX) {
-		table1 = mpp->keyItems;
-		table2 = NULL;
-		maximum = 121;
-		valid = TRUE;
-	}
-	else if (type >= BADGE_MIN && type < BADGE_MAX) {
-		table1 = mpp->badges;
-		table2 = mpp->equippedBadges;
-		maximum = 200;
-		valid = TRUE;
-	}
-	else {
-		valid = FALSE;
-	}
-	if (!valid) {
-		return FALSE;
-	}
-	for (i = 0; i < maximum; i++) {
-		if (type == table1[i]) {
-			table1[i] = ITEM_NULL;
-			if (table2 != 0) {
-				table2[i] = ITEM_NULL;
-			}
-			j = i;
-			temp = maximum - 1;
-			for (; j < temp; j++) {
-				table1[j] = table1[j + 1];
-				table1[j + 1] = ITEM_NULL;
-				if (table2 != 0) {
-					table2[j] = table2[j + 1];
-					table2[j + 1] = ITEM_NULL;
-				}
-			}
-			return TRUE;
-		}
-	}
-	return FALSE;
+BOOL pouchRemoveItem(ItemType type)
+{
+  s16 *table1;
+  s16 *table2;
+  BOOL valid;
+  s32 maximum;
+  int i;
+  maximum = 0;
+  table1 = (void *) 0;
+  table2 = (void *) 0;
+  if ((type >= ITEM_COIN) && (type < (ITEM_FRESH_JUICE + 1)))
+  {
+    table1 = mpp->heldItems;
+    table2 = (void *) 0;
+    maximum = (((s32 (*)(s32)) pouchCheckItem)(ITEM_STRANGE_SACK)) ? (20) : (10);
+    valid = 1;
+  }
+  else
+    if ((type >= ITEM_STRANGE_SACK) && (type < (ITEM_CRYSTAL_STAR + 1)))
+  {
+    table1 = mpp->keyItems;
+    table2 = (void *) 0;
+    maximum = 121;
+    valid = 1;
+  }
+  else
+    if ((type >= ITEM_POWER_JUMP) && (type < (ITEM_SUPER_CHARGE_P + 1)))
+  {
+    table1 = mpp->badges;
+    table2 = mpp->equippedBadges;
+    maximum = 200;
+    valid = 1;
+  }
+  else
+  {
+    valid = 0;
+  }
+  if (!valid)
+  {
+    return 0;
+  }
+  for (i = 0; i < maximum; i++)
+  {
+    if (type == table1[i])
+    {
+      pouchShift(table1, table2, i, maximum);
+      return 1;
+    }
+  }
+
+  return 0;
 }
 
 BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	s16* table1, * table2, * p;
 	BOOL valid;
 	s32 maximum;
-	int i, j, temp;
+	int i;
 
 	maximum = 0;
 	table1 = NULL;
@@ -471,19 +484,7 @@ BOOL pouchRemoveItemIndex(ItemType type, s32 index) {
 	}
 	for (i = index; i < maximum; p++, i++) {
 		if (type == *p) {
-			table1[i] = ITEM_NULL;
-			if (table2) {
-				table2[i] = ITEM_NULL;
-			}
-			temp = maximum - 1;
-			for (j = i; j < temp; j++) {
-				table1[j] = table1[j + 1];
-				table1[j + 1] = ITEM_NULL;
-				if (table2) {
-					table2[j] = table2[j + 1];
-					table2[j + 1] = ITEM_NULL;
-				}
-			}
+			pouchShift(table1, table2, i, maximum);
 			return TRUE;
 		}
 	}
@@ -532,11 +533,11 @@ static inline void pouchAiueoConv(const char* src, char* dst) {
 	dst[i * 2] = 0;
 }
 
-s32 comp_aiueo(s16* a, s16* b) {
+s32 comp_aiueo(const void* a, const void* b) {
 	char bufA[0x80];
 	char bufB[0x80];
-	s16 ia = *a;
-	s16 ib = *b;
+	s16 ia = *(s16*)a;
+	s16 ib = *(s16*)b;
 
 	pouchAiueoConv(msgSearch(itemDataTable[ia].name), bufA);
 	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
@@ -550,11 +551,11 @@ s32 comp_kind(s16* a, s16* b) {
 	return -(x < y);
 }
 
-s32 comp_aiueo_r(s16* a, s16* b) {
+s32 comp_aiueo_r(const void* a, const void* b) {
 	char bufA[0x80];
 	char bufB[0x80];
-	s16 ia = *a;
-	s16 ib = *b;
+	s16 ia = *(s16*)a;
+	s16 ib = *(s16*)b;
 
 	pouchAiueoConv(msgSearch(itemDataTable[ia].name), bufA);
 	pouchAiueoConv(msgSearch(itemDataTable[ib].name), bufB);
@@ -1105,3 +1106,80 @@ char* pouchGetYoshiName(void) {
 //
 //
 //
+
+// prototypes for asm stopgap forward references
+char* pouchGetYoshiName(void);
+void pouchSetYoshiName(char* name);
+void pouchSetPartyColor(PartyId partnerId, s32 color);
+s32 pouchGetPartyColor(PartyId partnerId);
+u32 pouchCheckMail(s32 mailId);
+void pouchOpenMail(s32 mailId);
+void pouchReceiveMail(s32 mailId);
+s32 pouchReceiveMailCount(void);
+void pouchGetStarStone(u32 id);
+void pouchAddKpaScore(u32 score);
+u32 pouchGetKpaScore(void);
+BOOL pouchAddKpaCoin(u8 coins);
+s32 pouchGetKpaCoin(void);
+void pouchMajinaiInit(s32 curseCount);
+s32 pouchArriveBadge(s32 id);
+BOOL N_pouchUnEquipBadgeID(s32 badgeId);
+BOOL pouchEquipBadgeID(s32 badgeId);
+BOOL pouchEquipCheckBadgeIndex(s32 index);
+s32 pouchEquipCheckBadge(s32 badgeId);
+BOOL pouchUnEquipBadgeIndex(s32 index);
+BOOL pouchEquipBadgeIndex(s32 index);
+s16 pouchGetStarPoint(void);
+void pouchRevisePartyParam(void);
+void pouchReviseMarioParam(void);
+BOOL pouchRemoveKeepItem(s32 id, s32 index);
+BOOL pouchAddKeepItem(s16 id);
+s32 pouchGetPartyAttackLv(PartyId partyId);
+s32 pouchGetHammerLv(void);
+s32 pouchGetJumpLv(void);
+void pouchSetAudienceNum(f32 num);
+f32 pouchGetAudienceNum(void);
+s16 pouchGetMaxAP(void);
+void pouchSetAP(s16 points);
+void pouchAddAP(s16 points);
+s16 pouchGetAP(void);
+void pouchSetMaxFP(s16 points);
+void pouchSetFP(s16 points);
+s16 pouchGetMaxFP(void);
+s16 pouchGetFP(void);
+void pouchSetPartyHP(PartyId partnerId, s16 points);
+s16 pouchGetPartyHP(PartyId partnerId);
+void pouchSetMaxHP(s16 points);
+void pouchSetHP(s16 points);
+s16 pouchGetMaxHP(void);
+s16 pouchGetHP(void);
+s16 pouchAddHP(s32 points);
+s16 pouchAddStarPiece(s16 count);
+s16 pouchGetStarPiece(void);
+s16 pouchSetSuperCoin(s16 count);
+s16 pouchGetSuperCoin(void);
+s32 pouchSetCoin(s32 coins);
+s16 pouchAddCoin(s16 coins);
+s32 pouchGetCoin(void);
+void pouchSortItem(s32 mode);
+s32 comp_kind_r(s16* a, s16* b);
+s32 comp_aiueo_r(const void* a, const void* b);
+s32 comp_kind(s16* a, s16* b);
+s32 comp_aiueo(const void* a, const void* b);
+void unk_800d06b4(const char* src, char* dst);
+BOOL pouchRemoveItemIndex(ItemType type, s32 index);
+BOOL pouchRemoveItem(ItemType type);
+u32 pouchCheckItem(u32 itemId);
+BOOL pouchGetItem(ItemType type);
+s32 pouchGetEmptyKeepItemCnt(void);
+s32 pouchGetEmptyHaveItemCnt(void);
+s32 pouchGetEquipBadgeCnt(void);
+s32 pouchGetHaveBadgeCnt(void);
+s32 pouchGetKeepItemCnt(void);
+s32 pouchGetHaveItemCnt(void);
+ItemType pouchHaveBadge(s32 id);
+ItemType pouchKeepItem(s32 id);
+ItemType pouchHaveItem(s32 id);
+ItemType pouchKeyItem(s32 id);
+void pouchInit(void);
+PouchData* pouchGetPtr(void);

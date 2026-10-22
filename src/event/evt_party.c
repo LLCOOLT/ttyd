@@ -152,9 +152,7 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 	pos = p->position;
 	marioGetScreenPos(pos, &sx, &sy, &sz);
 	if (marioChkInScreen((s32)sx, (s32)sy)) {
-		if (1) {
-			return EVT_RETURN_DONE;
-		}
+		return EVT_RETURN_DONE;
 	}
 	partyClearFootmark();
 	mw = p->playerPtr;
@@ -165,15 +163,15 @@ USER_FUNC(evt_party_force_reset_outofscreen) {
 		if (marioChkInScreen((s32)sx, (s32)sy)) {
 			break;
 		}
-		ang = angleABf(PF(p, 0x58), PF(p, 0x60), PF(mw, 0x8C), PF(mw, 0x94));
+		ang = angleABf(p->position.x, p->position.z, PF(mw, 0x8C), PF(mw, 0x94));
 		movePos(&p->position.x, &p->position.z, 1.0f, ang);
 		h = 100.0f;
 		from = p->position;
 		from.y += 50.0f;
 		if (partyHitCheck(p, &from, &dir, &out1, &out2, &h) != NULL) {
-			PF(p, 0x5C) = out1.y;
+			p->position.y = out1.y;
 		} else {
-			PF(p, 0x5C) = PF(mw, 0x90);
+			p->position.y = PF(mw, 0x90);
 		}
 	}
 	return EVT_RETURN_DONE;
@@ -197,9 +195,9 @@ USER_FUNC(evt_party_set_pos) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	PF(p, 0x58) = evtGetFloat(event, args[1]);
-	PF(p, 0x5C) = evtGetFloat(event, args[2]);
-	PF(p, 0x60) = evtGetFloat(event, args[3]);
+	p->position.x = evtGetFloat(event, args[1]);
+	p->position.y = evtGetFloat(event, args[2]);
+	p->position.z = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
 
@@ -210,9 +208,9 @@ USER_FUNC(evt_party_set_hosei_xyz) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	PF(p, 0xAC) = evtGetFloat(event, args[1]);
+	p->field_AC = evtGetFloat(event, args[1]);
 	PF(p, 0xB0) = evtGetFloat(event, args[2]);
-	PF(p, 0xB4) = evtGetFloat(event, args[3]);
+	p->field_B4 = evtGetFloat(event, args[3]);
 	return EVT_RETURN_DONE;
 }
 
@@ -226,9 +224,9 @@ USER_FUNC(evt_party_get_pos) {
 		evtSetFloat(event, args[3], -5000.0f);
 		return EVT_RETURN_DONE;
 	}
-	evtSetFloat(event, args[1], PF(p, 0x58));
-	evtSetFloat(event, args[2], PF(p, 0x5C));
-	evtSetFloat(event, args[3], PF(p, 0x60));
+	evtSetFloat(event, args[1], p->position.x);
+	evtSetFloat(event, args[2], p->position.y);
+	evtSetFloat(event, args[3], p->position.z);
 	return EVT_RETURN_DONE;
 }
 
@@ -237,7 +235,6 @@ inline float inline_fn(f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
 }
 
 USER_FUNC(evt_party_set_dir) {
-	f32* new_var;
 	s32* args = event->args;
 	PartyEntry* p;
 	f32 ang, t, st;
@@ -250,7 +247,7 @@ USER_FUNC(evt_party_set_dir) {
 			return EVT_RETURN_DONE;
 		}
 		event->userdata[2] = 0;
-		event->userdataf[1] = PF(p, 0x10C);
+		event->userdataf[1] = p->displayDirection;
 	} else {
 		args++;
 	}
@@ -268,21 +265,20 @@ USER_FUNC(evt_party_set_dir) {
 	if (fr > 0) {
 		t = revise360(270.0f - ang);
 		st = event->userdataf[1];
-		PF(p, 0x10C) = revise360(st + inline_fn(t, st, (f32)event->userdata[2], fr));
-		PF(p, 0x110) = PF(p, 0x10C);
-		PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+		p->displayDirection = revise360(st + inline_fn(t, st, (f32)event->userdata[2], fr));
+		p->displayDirectionTarget = p->displayDirection;
+		p->targetDir = toMovedirSimple(p->displayDirectionTarget);
 		c = event->userdata[2] + 1;
 		event->userdata[2] = c;
 		return c > fr;
 	} else {
-		new_var = &PF(p, 0x110);
 		if (fr < 0) {
-			PF(p, 0x110) = revise360(270.0f - ang);
-			PF(p, 0x100) = toMovedirSimple(PF(p, 0x110));
+			p->displayDirectionTarget = revise360(270.0f - ang);
+			p->targetDir = toMovedirSimple(p->displayDirectionTarget);
 		} else if (fr == 0) {
-			PF(p, 0x10C) = revise360(270.0f - ang);
-			*new_var = PF(p, 0x10C);
-			PF(p, 0x100) = toMovedirSimple(*new_var);
+			p->displayDirection = revise360(270.0f - ang);
+			p->displayDirectionTarget = p->displayDirection;
+			p->targetDir = toMovedirSimple(p->displayDirectionTarget);
 		}
 	}
 	return EVT_RETURN_DONE;
@@ -306,9 +302,9 @@ USER_FUNC(evt_party_set_dir_npc) {
 		x = PF(npc, 0x8C);
 		z = PF(npc, 0x94);
 		camYaw = PF(camGetPtr(4), 0x114);
-		a = revise360(angleABf(PF(p, 0x58), PF(p, 0x60), x, z) - camYaw);
-		PF(p, 0x110) = (a < 180.0f) ? 180.0f : 0.0f;
-		PF(p, 0x100) = a;
+		a = revise360(angleABf(p->position.x, p->position.z, x, z) - camYaw);
+		p->displayDirectionTarget = (a < 180.0f) ? 180.0f : 0.0f;
+		p->targetDir = a;
 	}
 	return EVT_RETURN_DONE;
 }
@@ -323,9 +319,9 @@ USER_FUNC(evt_party_set_dir_pos) {
 	x = evtGetValue(event, args[1]);
 	z = evtGetValue(event, args[2]);
 	camYaw = PF(camGetPtr(4), 0x114);
-	a = revise360(angleABf(PF(p, 0x58), PF(p, 0x60), x, z) - camYaw);
-	PF(p, 0x110) = (a < 180.0f) ? 180.0f : 0.0f;
-	PF(p, 0x100) = a;
+	a = revise360(angleABf(p->position.x, p->position.z, x, z) - camYaw);
+	p->displayDirectionTarget = (a < 180.0f) ? 180.0f : 0.0f;
+	p->targetDir = a;
 	return EVT_RETURN_DONE;
 }
 
@@ -336,7 +332,7 @@ USER_FUNC(evt_party_get_dispdir) {
 	if (p == NULL) {
 		evtSetFloat(event, args[1], 0.0f);
 	} else {
-		evtSetFloat(event, args[1], PF(p, 0x10C));
+		evtSetFloat(event, args[1], p->displayDirection);
 	}
 	return EVT_RETURN_DONE;
 }
@@ -348,8 +344,8 @@ USER_FUNC(evt_party_set_dispdir) {
 	if (p == NULL) {
 		return EVT_RETURN_DONE;
 	}
-	PF(p, 0x110) = reviseAngle(evtGetFloat(event, args[1]));
-	PF(p, 0x10C) = PF(p, 0x110);
+	p->displayDirectionTarget = reviseAngle(evtGetFloat(event, args[1]));
+	p->displayDirection = p->displayDirectionTarget;
 	return EVT_RETURN_DONE;
 }
 
@@ -382,7 +378,7 @@ USER_FUNC(evt_party_move_pos) {
 		return EVT_RETURN_DONE;
 	}
 	if (event->userdata[2] == 0) {
-		u8 t = p->field_34;
+		u8 t = p->runMode;
 		if (t != 0 && (u8)(t - 1) > 1) {
 			return EVT_RETURN_BLOCK;
 		}
@@ -390,14 +386,14 @@ USER_FUNC(evt_party_move_pos) {
 		x = evtGetFloat(event, args[1]);
 		z = evtGetFloat(event, args[2]);
 		event->userdata[1] = sysMsec2Frame(evtGetValue(event, args[3]));
-		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		p->targetDir = angleABf(p->position.x, p->position.z, x, z);
 		if (event->userdata[1] == 0) {
-			event->userdata[1] = (s32)(distABf(PF(p, 0x58), PF(p, 0x60), x, z) / PF(p, 0x104));
-			spd = PF(p, 0x104);
+			event->userdata[1] = (s32)(distABf(p->position.x, p->position.z, x, z) / p->moveSpeed);
+			spd = p->moveSpeed;
 		} else {
-			spd = distABf(PF(p, 0x58), PF(p, 0x60), x, z) / event->userdata[1];
+			spd = distABf(p->position.x, p->position.z, x, z) / event->userdata[1];
 		}
-		partySetForceMove(p, event->userdata[1], PF(p, 0x100), spd);
+		partySetForceMove(p, event->userdata[1], p->targetDir, spd);
 	}
 	if (--event->userdata[1] < 0) {
 		return EVT_RETURN_YIELD;
@@ -418,7 +414,7 @@ USER_FUNC(evt_party_move_pos2) {
 		return EVT_RETURN_DONE;
 	}
 	if (event->userdata[2] == 0) {
-		u8 t = p->field_34;
+		u8 t = p->runMode;
 		if (t != 0 && (u8)(t - 1) > 1) {
 			return EVT_RETURN_BLOCK;
 		}
@@ -426,9 +422,9 @@ USER_FUNC(evt_party_move_pos2) {
 		x = evtGetFloat(event, args[1]);
 		z = evtGetFloat(event, args[2]);
 		spd = evtGetFloat(event, args[3]);
-		dist = distABf(PF(p, 0x58), PF(p, 0x60), x, z);
-		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
-		dist = gp->framerate * (dist / spd); spd = spd / gp->framerate; partySetForceMove(p, dist, PF(p, 0x100), spd);
+		dist = distABf(p->position.x, p->position.z, x, z);
+		p->targetDir = angleABf(p->position.x, p->position.z, x, z);
+		dist = gp->framerate * (dist / spd); spd = spd / gp->framerate; partySetForceMove(p, dist, p->targetDir, spd);
 	}
 	if (p->field_28 == 0) {
 		return EVT_RETURN_DONE;
@@ -458,10 +454,10 @@ USER_FUNC(evt_party_jump_pos) {
 		if (q == NULL) {
 			return EVT_RETURN_DONE;
 		}
-		if (q->field_34 == 0xB) {
+		if (q->runMode == 0xB) {
 			return EVT_RETURN_DONE;
 		}
-		event->field_84 = 0;
+		event->userdata3 = 0;
 		partyChgMot(q, 8);
 		partyChgRunMode(q, 9);
 	} else {
@@ -480,17 +476,17 @@ USER_FUNC(evt_party_jump_pos) {
 	ff = sysMsec2Frame(ms);
 	half = 0.5f;
 	dy = 1.0f;
-	switch (event->field_84) {
+	switch (event->userdata3) {
 	case 0:
 		PU(p, 0x13C) = PU(p, 0x138);
 		PU(p, 0x138) = 0;
-		PF(p, 0x104) = distABf(PF(p, 0x58), PF(p, 0x60), x, z) / ff;
-		PF(p, 0x100) = angleABf(PF(p, 0x58), PF(p, 0x60), x, z);
+		p->moveSpeed = distABf(p->position.x, p->position.z, x, z) / ff;
+		p->targetDir = angleABf(p->position.x, p->position.z, x, z);
 		if (mode == 0) {
-			PF(p, 0xFC) = PF(p, 0x100);
+			p->moveDir = p->targetDir;
 		}
 		partyChgPoseId(p, 4);
-		dy = y - PF(p, 0x5C);
+		dy = y - p->position.y;
 		half = 0.5f * ff;
 		if (__fabsf(dy) < 1.0f) {
 			dy = hgt;
@@ -500,48 +496,48 @@ USER_FUNC(evt_party_jump_pos) {
 			dy = hgt;
 		}
 		g = (dy + dy) / (half * half - half);
-		PF(p, 0x114) = g * half;
+		p->velY = g * half;
 		PF(p, 0x174) = -g;
 		event->userdata[2] = (s32)(0.5f + half);
-		event->field_84 = 1;
+		event->userdata3 = 1;
 	case 1:
-		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), PF(p, 0x104), PF(p, 0x100));
-		PF(p, 0x5C) += PF(p, 0x114);
-		PF(p, 0x114) += PF(p, 0x174);
+		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), p->moveSpeed, p->targetDir);
+		p->position.y += p->velY;
+		p->velY += PF(p, 0x174);
 		if (--event->userdata[2] <= 0) {
 			half = 0.5f * ff;
-			dy = y - PF(p, 0x5C);
-			PF(p, 0x114) = 0.0f;
+			dy = y - p->position.y;
+			p->velY = 0.0f;
 			PF(p, 0x174) = (dy + dy) / (half * half - half);
-			PF(p, 0x11C) = 0.0f;
+			p->gravity = 0.0f;
 			event->userdata[2] = (s32)(0.5f + half);
-			event->field_84 = 2;
+			event->userdata3 = 2;
 		}
 		break;
 	case 2:
-		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), PF(p, 0x104), PF(p, 0x100));
-		PF(p, 0x114) += PF(p, 0x174);
+		movePos((f32*)((u8*)p + 0x58), (f32*)((u8*)p + 0x60), p->moveSpeed, p->targetDir);
+		p->velY += PF(p, 0x174);
 		mode = 0;
-		ff = PF(p, 0x114);
+		ff = p->velY;
 		{
 			void* hit = partySearchGround(p, __fabsf(ff), __fabsf(ff));
-			if (hit != NULL && PF(p, 0x5C) + ff <= PF(p, 0xE4)) {
+			if (hit != NULL && p->position.y + ff <= PF(p, 0xE4)) {
 				PU(p, 0x138) = (u32)hit;
 				mode = 1;
-				PF(p, 0x5C) = PF(p, 0xE4);
+				p->position.y = PF(p, 0xE4);
 				p->flags &= ~0x70;
 			}
 		}
 		if (mode) {
 			event->userdata[2] = 0;
 		} else {
-			PF(p, 0x5C) += PF(p, 0x114);
+			p->position.y += p->velY;
 		}
 		if (--event->userdata[2] <= 0) {
 			partyChgPoseId(p, 1);
-			PF(p, 0x11C) = 0.0f;
+			p->gravity = 0.0f;
 			PF(p, 0x174) = 0.0f;
-			PF(p, 0x104) = 0.0f;
+			p->moveSpeed = 0.0f;
 			unk_800ba2dc(p);
 			return EVT_RETURN_YIELD;
 		}
@@ -639,7 +635,7 @@ USER_FUNC(L_evt_party_dokan) {
 		return EVT_RETURN_DONE;
 	}
 	dst = args[1];
-	if (p->field_34 == 0xB || p->field_34 == 0xC) {
+	if (p->runMode == 0xB || p->runMode == 0xC) {
 		v = 0;
 	} else {
 		v = 1;

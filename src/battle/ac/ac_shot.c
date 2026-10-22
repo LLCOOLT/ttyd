@@ -104,7 +104,7 @@ s32 battleAcMain_Shot(BattleWork* work) {
                 sw->pos = sw->left + (f32)irand((s32)(sw->right - sw->left));
                 sw->vel = 0.1f * SH_PARAMS(ac)->e;
                 sw->idx = 0;
-                ac->field_0x8 = 30;
+                ac->setupParam = 30;
                 unit = BattleGetUnitPtr(work, SH_PARAMS(ac)->unitId);
                 BtlUnit_GetPos(unit, &sw->unitPos.x, &sw->unitPos.y, &sw->unitPos.z);
                 sw->unitPos.y = sw->unitPos.y + 0.5 * (unit->mSizeMultiplier * (f32)BtlUnit_GetHeight(unit));
@@ -126,12 +126,12 @@ s32 battleAcMain_Shot(BattleWork* work) {
                 ac->mAcState = 1000;
                 sw->sfxId = psndSFXOn(sfx);
             case 1000:
-                if ((ac->field_0x4 & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
+                if ((ac->setupFlags & 1) && (ac->mAcUnit->mTokenFlags & 0x10)) {
                     f32 range;
                     s32 r;
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8--;
-                        if (ac->field_0x8 >= 0) {
+                    if (ac->setupFlags & 2) {
+                        ac->setupParam--;
+                        if (ac->setupParam >= 0) {
                             break;
                         }
                     }
@@ -150,12 +150,12 @@ s32 battleAcMain_Shot(BattleWork* work) {
                         ac->result = 2;
                         return 0;
                     }
-                    if (ac->field_0x4 & 2) {
-                        ac->field_0x8 = 30;
+                    if (ac->setupFlags & 2) {
+                        ac->setupParam = 30;
                     }
                     break;
                 }
-                if (!BattlePadCheckTrigger(0x100) && !SH_OUT(ac)[0] && SH_S16(ac) <= 0) {
+                if (!BattlePadCheckTrigger(0x100) && !SH_OUT(ac)[0] && ac->countdown <= 0) {
                     if (--sw->timer <= 0) {
                         SH_OUT(ac)[1] = (s32)(sw->maxV * sw->speed / 100.0f);
                         if ((f32)SH_OUT(ac)[1] < sw->minV) {
@@ -188,14 +188,14 @@ s32 battleAcMain_Shot(BattleWork* work) {
                 sw->angle += 8.0f;
                 break;
             case 1001:
-                if (SH_S16(ac) > 0) {
+                if (ac->countdown > 0) {
                     SH_OUT(ac)[1] = (s32)(50.0f * sw->maxV / 100.0f);
                     if ((f32)SH_OUT(ac)[1] < sw->minV) {
                         SH_OUT(ac)[1] = (s32)sw->minV;
                     }
                     SH_RECORD(ac, sw);
                     if (sw->idx >= SH_PARAMS(ac)->count) {
-                        SH_S16(ac)--;
+                        ac->countdown--;
                         ac->result = 2;
                         ac->mAcState = 1002;
                     } else {
@@ -207,7 +207,7 @@ s32 battleAcMain_Shot(BattleWork* work) {
                 if (sw->speed > 100.0f) {
                     sw->speed = 100.0f;
                 }
-                if (SH_FLAGS(ac) & 1) {
+                if (ac->acFlags & 1) {
                     SH_OUT(ac)[1] = (s32)((sw->minV + sw->maxV) / 2.0f);
                     SH_RECORD(ac, sw);
                     if (sw->idx >= SH_PARAMS(ac)->count) {
@@ -329,7 +329,7 @@ static void actionCommandDisp(f32 x, f32 y) {
     Mtx m1;
     Mtx m2;
     f32 limit;
-    if (!(SH_FLAGS(ac) & 1)) {
+    if (!(ac->acFlags & 1)) {
         Vec pos = {0.0f, 0.0f, 0.0f};
         f32 px = -200.0f + x;
         pos.x = px;

@@ -275,13 +275,13 @@ static USER_FUNC(fune_eff) {
         event->userdatap[1] = effFunemizuEntry(2, 0.0f, -1000.0f, 0.0f, 0.0f, 0.0f);
         mapObjGetPos("S_fune_m", &pos);
         event->userdataf[2] = pos.x;
-        *(f32*)&event->field_84 = pos.z;
+        *(f32*)&event->userdata3 = pos.z;
     }
     eff1 = event->userdatap[0];
     eff2 = event->userdatap[1];
     mapObjGetPos("S_fune_m", &pos);
     event->userdataf[2] = pos.x;
-    *(f32*)&event->field_84 = pos.z;
+    *(f32*)&event->userdata3 = pos.z;
     ((f32*)eff1->userdata)[17] = 3.0f;
     ((f32*)eff1->userdata)[1] = pos.x - 81.3f;
     ((f32*)eff1->userdata)[2] = pos.y - 51.0f;

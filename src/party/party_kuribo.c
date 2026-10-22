@@ -162,7 +162,7 @@ USER_FUNC(post_kurio_use) {
 void kuribo_init_800C23B4(PartyEntry* party) {
     party->field_32[1] = 1;
     party->field_32[0] = 0;
-    party->field_F0 = 24.0f;
+    party->height = 24.0f;
     party->width = 26.0f;
     msg_ep = 0;
 }
@@ -233,7 +233,7 @@ void kuribo_use(PartyEntry* party) {
             }
             if (!wall) {
                 partyChgPoseId(party, 1);
-                party->field_104 = 0.0f;
+                party->moveSpeed = 0.0f;
                 KTIMER(party) = 100;
                 party->useMotionId = 10;
             }
@@ -247,11 +247,11 @@ void kuribo_use(PartyEntry* party) {
             party->flags |= 0x02000000;
         }
         KTIMER(party) = 4;
-        party->field_FC = angleABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z);
-        party->field_100 = party->field_FC;
-        party->field_10C = player->unk1A8;
-        party->field_110 = player->unk1A8;
-        party->field_104 = distABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z) / KTIMER(party);
+        party->moveDir = angleABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z);
+        party->targetDir = party->moveDir;
+        party->displayDirection = player->displayDirection;
+        party->displayDirectionTarget = player->displayDirection;
+        party->moveSpeed = distABf(party->position.x, party->position.z, KTARGET(party).x, KTARGET(party).z) / KTIMER(party);
         K114(party) = 0.0f;
         party->useMotionId = 1;
         break;
@@ -267,7 +267,7 @@ void kuribo_use(PartyEntry* party) {
             return;
         }
         partyChgPoseId(party, 1);
-        party->field_104 = 0.0f;
+        party->moveSpeed = 0.0f;
         KTIMER(party) = 100;
         party->useMotionId = 10;
         break;

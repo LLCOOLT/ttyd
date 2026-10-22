@@ -139,7 +139,10 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* speed);
 void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
 static inline void crCheck(BOOL b) {}
 
-void camRoadStrippedReport(const char* p, s32 a, s32 b) {
+
+// FAKE: stand-in for a debug function the linker stripped; its two strings are the last literals in the
+// target .rodata pool (codegen runs bottom-up, so it sits before the first function)
+static void camRoadStrippedReport(const char* p, s32 a, s32 b) {
     OSReport("%scam = %d\n", p, a);
     OSReport("%scurve = %d\n", p, b);
 }
@@ -148,8 +151,6 @@ s32 camRoadSetup(const char* name) {
     char path[128];
     u32 size;
     DVDEntry* entry;
-    crCheck((BOOL)"%scam = %d\n");
-    crCheck((BOOL)"%scurve = %d\n\0\0");
     memset(wp, 0, 0x210);
     wp->f_c8 = 0;
     wp->prev.on = 0;
@@ -895,7 +896,7 @@ void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32
         }
     }
     if (curve != NULL) {
-        fov = 3.1415927f * (wp->map->f_e8->x * 0.5f / 180.0f);
+        fov = 3.141592f * (wp->map->f_e8->x / 2.0f / 180.0f);
         zoom = 1.0f;
         if (g && hitCurve != NULL && prev->on) {
             cs = (f32)cos(fov);
@@ -1078,11 +1079,12 @@ u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed) {
         if (__abs(d) <= 1) {
             return 0;
         }
-        n = a->cam->f_44 - a->cam->f_40;
-        if (__abs(d) >= --n) {
+        n = a->cam->f_44 - a->cam->f_40 - 1;
+        if (__abs(d) >= n) {
             return 0;
         }
-        if (__abs(d) >= --n) {
+        n = a->cam->f_44 - a->cam->f_40 - 2;
+        if (__abs(d) >= n) {
             flags |= 0x20;
         }
     }
@@ -1349,3 +1351,18 @@ void camRoadCurveOff(const char* name) {
         }
     }
 }
+
+// prototypes for asm stopgap forward references
+void camRoadCurveOff(const char* name);
+void camRoadCurveOn(const char* name);
+void camRoadReset(void);
+f32 camRoadGetCurrentShiftXRate(void);
+void* camRoadGetWorkPtr(void);
+void camRoadMain(CamRoadOut* out, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+void calcHokanCamRoad(s32 type, CamRoadState* from, CamRoadState* to, CamRoadState* unused, CamRoadState* out, f32 t);
+u32 compareCamRoad(CamRoadState* a, CamRoadState* b, f32* outSpeed);
+void calcCamRoad(CamRoadState* out, CamRoadState* prev, f32 a, f32 b, f32 c, f32 d, f32 e, f32 f, f32 g);
+s32 collisionCurve(s32 mode, void* curve, Vec pos, CamRoadHit* hit);
+s32 collisionTri_simple(Vec P, Vec A, Vec B, Vec C, f32* dist);
+void calcCurrentCamState(CamRoadOut* out);
+s32 camRoadSetup(const char* name);

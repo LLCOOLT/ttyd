@@ -26,11 +26,16 @@
 #include "pmario_sound.h"
 #include "driver/dispdrv.h"
 #include "manager/evtmgr_cmd.h"
+#undef EXT_LIT
+#define EXT_LIT(sym, val) (val)
+// target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
+#pragma force_active on
+#pragma force_active reset
 
 typedef struct ExtPose { s32 flags; f32 rot; s32 field_0x8; f32 (*mtx)[4]; s32 frame; f32 field_0x14; f32 field_0x18; f32 field_0x1c; } ExtPose;
 typedef struct MoamoaPoseDef { char model[16]; char anim[8]; s16 loop; f32 speed; s32 start; s32 count; } MoamoaPoseDef;
-typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 field_0x28; f32 field_0x2c; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
-typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 field_0x38; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 field_0x42; EventEntry* escapeEvt; u8 field_0x48[0x4c - 0x48]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 field_0x558; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
+typedef struct Moamoa { u16 flags; s16 state; s16 timer; u8 field_0x6[2]; Vec target; f32 vy; s16 jumpTimer; u8 field_0x1a[2]; f32 speed; f32 gravity; s16 next; u8 field_0x26[2]; f32 lastX; f32 lastZ; u8 field_0x30[0x3c - 0x30]; s16 pose; u8 field_0x3e[2]; OSTime startTime; u8 field_0x48[4]; u8 kind; u8 field_0x4d[3]; } Moamoa;
+typedef struct MoamoaWork { u16 flags; u8 field_0x2[2]; s32 count; Moamoa* moa; MapObject* mobj; f32 mobjY; Vec target[3]; s16 hitCount; s16 field_0x3a[2]; s16 field_0x3e; s16 field_0x40; s16 idleFrames; EventEntry* escapeEvt; u8 field_0x48[0x4c - 0x48]; s32 numDefs; MoamoaPoseDef defs[32]; f32 angle; f32 dist; s32 bounceCount; f32 breathDir; f32 breathDist; Vec breathPos; u8 field_0x570[0x870 - 0x570]; } MoamoaWork;
 typedef struct MoamoaData { const char* model; const char* anim; f32 speed; } MoamoaData;
 static s32 bss_pad;
 static MoamoaWork* wp;
@@ -39,8 +44,12 @@ s32 extGetPoseNum(void);
 void extReset(void);
 int rand(void);
 static f32 randf(f32 min, f32 max);
+static f32 randf(f32 min, f32 max);
+static void moamoa_pose_init(void);
 static void moamoa_pose_init(void);
 static void moamoa_pose_main(void);
+static void moamoa_pose_main(void);
+static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static inline f32 moa_sin(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 moa_cos(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 y; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
@@ -48,6 +57,7 @@ static inline f32 moa_sinx(f32 x) { f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 
 static inline f32 moa_cosx(f32 x) { f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; f32 x2; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { x = 1.5707964f - (x - 1.5707964f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { x = x - 3.1415927f; x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = -a; } else { x = 1.5707964f - (x - 4.712389f); x2 = x * x; a = a * x2 - b; a = a * x2 + c; } return a; }
 double sin(double x);
 double cos(double x);
+static void ext_moamoa_main(void);
 static void ext_moamoa_main(void);
 void extLoadRenderMode(void);
 void extLoadVertex(void);
@@ -63,63 +73,74 @@ void extDrawShadow(void);
 s32 nokonokoGetStatus(PartyEntry* party);
 f32 cloudGetBreathDist(void);
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
+static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
+static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f32 x, f32 y, f32 z, f32 speed, f32 gravity);
 static void ext_disp(CameraId camera, void* param);
+static void ext_disp(CameraId camera, void* param);
+static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_shadow_disp(CameraId camera, void* param);
 
-USER_FUNC(evt_bero_get_info);
-USER_FUNC(evt_cam3d_evt_off);
-USER_FUNC(evt_cam3d_evt_set);
-USER_FUNC(evt_cam3d_evt_set_at);
-USER_FUNC(evt_cam3d_evt_set_xyz);
-USER_FUNC(evt_cam3d_evt_xyz_off);
-USER_FUNC(evt_cam3d_evt_zoom_in);
-USER_FUNC(evt_eff_fukidashi);
-USER_FUNC(evt_ext_entry);
-USER_FUNC(evt_item_entry);
-USER_FUNC(evt_item_get_item);
-USER_FUNC(evt_map_playanim);
-USER_FUNC(evt_mario_flag_onoff);
-USER_FUNC(evt_mario_get_party);
-USER_FUNC(evt_mario_get_pos);
-USER_FUNC(evt_mario_key_onoff);
-USER_FUNC(evt_mario_mov_pos2);
-USER_FUNC(evt_mario_normalize);
-USER_FUNC(evt_mario_set_dir);
-static USER_FUNC(evt_moamoa_end_wait);
-static USER_FUNC(evt_moamoa_exit);
-static USER_FUNC(evt_moamoa_flag_onoff);
-static USER_FUNC(evt_moamoa_ry_reset);
-static USER_FUNC(evt_moamoa_target_off);
-USER_FUNC(evt_msg_print);
-USER_FUNC(evt_msg_print_add);
-USER_FUNC(evt_msg_select);
-USER_FUNC(evt_npc_change_interrupt);
-USER_FUNC(evt_npc_entry);
-USER_FUNC(evt_npc_flag_onoff);
-USER_FUNC(evt_npc_get_position);
-USER_FUNC(evt_npc_move_position);
-USER_FUNC(evt_npc_set_anim);
-USER_FUNC(evt_npc_set_autotalkpose);
-USER_FUNC(evt_npc_set_position);
-USER_FUNC(evt_npc_set_ry);
-USER_FUNC(evt_npc_set_tribe);
-USER_FUNC(evt_npc_setup);
-USER_FUNC(evt_npc_status_onoff);
-USER_FUNC(evt_party_move_pos2);
-USER_FUNC(evt_party_run);
-USER_FUNC(evt_party_set_dir);
-USER_FUNC(evt_party_stop);
-USER_FUNC(evt_run_case_evt);
-USER_FUNC(evt_seq_wait);
-USER_FUNC(evt_snd_bgmoff);
-USER_FUNC(evt_snd_bgmon);
-USER_FUNC(evt_snd_envoff);
-USER_FUNC(evt_snd_envon);
-USER_FUNC(evt_snd_sfxon_3d);
-USER_FUNC(evt_sub_get_sincos);
-USER_FUNC(evt_sub_random);
-static USER_FUNC(npc_jump);
+s32 evt_bero_get_info(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_set(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_set_at(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_set_xyz(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_xyz_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_cam3d_evt_zoom_in(EventEntry* event, BOOL isFirstCall);
+s32 evt_eff_fukidashi(EventEntry* event, BOOL isFirstCall);
+s32 evt_ext_entry(EventEntry* event, BOOL isFirstCall);
+s32 evt_item_entry(EventEntry* event, BOOL isFirstCall);
+s32 evt_item_get_item(EventEntry* event, BOOL isFirstCall);
+s32 evt_map_playanim(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_party(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_get_pos(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_key_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_mov_pos2(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_normalize(EventEntry* event, BOOL isFirstCall);
+s32 evt_mario_set_dir(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall);
+s32 evt_msg_print(EventEntry* event, BOOL isFirstCall);
+s32 evt_msg_print_add(EventEntry* event, BOOL isFirstCall);
+s32 evt_msg_select(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_change_interrupt(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_entry(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_flag_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_get_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_move_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_anim(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_autotalkpose(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_position(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_ry(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_set_tribe(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_setup(EventEntry* event, BOOL isFirstCall);
+s32 evt_npc_status_onoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_move_pos2(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_run(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_set_dir(EventEntry* event, BOOL isFirstCall);
+s32 evt_party_stop(EventEntry* event, BOOL isFirstCall);
+s32 evt_run_case_evt(EventEntry* event, BOOL isFirstCall);
+s32 evt_seq_wait(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_bgmoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_bgmon(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_envoff(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_envon(EventEntry* event, BOOL isFirstCall);
+s32 evt_snd_sfxon_3d(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_get_sincos(EventEntry* event, BOOL isFirstCall);
+s32 evt_sub_random(EventEntry* event, BOOL isFirstCall);
+static s32 npc_jump(EventEntry* event, BOOL isFirstCall);
+static s32 npc_jump(EventEntry* event, BOOL isFirstCall);
+static void ext_moamoa_dispent(void);
 static void ext_moamoa_dispent(void);
 static void ext_moamoa_main(void);
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa);
@@ -127,11 +148,16 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
 static void ext_shadow_disp(CameraId camera, void* param);
 static void ext_disp(CameraId camera, void* param);
 static void ext_moamoa_init(void);
+static void ext_moamoa_init(void);
 static f32 randf(f32 min, f32 max);
-static USER_FUNC(evt_moamoa_fusion_debug);
-static USER_FUNC(evt_moamoa_blow);
-static USER_FUNC(evt_moamoa_kind_onoff);
-static USER_FUNC(evt_moamoa_fusion);
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall);
 static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim);
 static void moamoa_pose_main(void);
 static void moamoa_pose_init(void);
@@ -228,24 +254,24 @@ __declspec(section ".data") s32 fd_rsh_05_one_364[] = {
 };
 
 static s32 ext_moamoa_data[] = {
-    (s32)"c_n_moa_a", (s32)"S_1", 0, (s32)"c_n_moa_a", (s32)"S_1", 1073741824, (s32)"c_n_moa_a", (s32)"S_1",
-    1082130432, (s32)"c_n_moa_a", (s32)"S_1", 1086324736, (s32)"c_n_moa_a", (s32)"S_1", 1090519040, (s32)"c_n_moa_a",
-    (s32)"S_1", 1092616192, (s32)"c_n_moa_a", (s32)"S_1", 1094713344, (s32)"c_n_moa_a", (s32)"S_1", 1096810496,
-    (s32)"c_n_moa_a", (s32)"S_1", 1098907648, (s32)"c_n_moa_a", (s32)"S_1", 1099956224, (s32)"c_n_moa_a", (s32)"S_1",
-    1101004800, (s32)"c_n_moa_a", (s32)"S_1", 1102053376, (s32)"c_n_moa_a", (s32)"S_1", 1103101952, (s32)"c_n_moa_a",
-    (s32)"S_1", 1104150528, (s32)"c_n_moa_a", (s32)"S_1", 1105199104, (s32)"c_n_moa_a", (s32)"S_1", 1106247680,
-    (s32)"c_n_moa_a", (s32)"S_1", 1107296256, (s32)"c_n_moa_a", (s32)"S_1", 1107820544, (s32)"c_n_moa_a", (s32)"S_1",
-    1108344832, (s32)"c_n_moa_a", (s32)"S_1", 1108869120, (s32)"c_n_moa_a", (s32)"D_1", 0, (s32)"c_n_moa_a",
-    (s32)"D_1", 1082130432, (s32)"c_n_moa_a", (s32)"D_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 0,
-    (s32)"c_n_moa_b", (s32)"S_1", 1073741824, (s32)"c_n_moa_b", (s32)"S_1", 1082130432, (s32)"c_n_moa_b", (s32)"S_1",
-    1086324736, (s32)"c_n_moa_b", (s32)"S_1", 1090519040, (s32)"c_n_moa_b", (s32)"S_1", 1092616192, (s32)"c_n_moa_b",
-    (s32)"S_1", 1094713344, (s32)"c_n_moa_b", (s32)"S_1", 1096810496, (s32)"c_n_moa_b", (s32)"S_1", 1098907648,
-    (s32)"c_n_moa_b", (s32)"S_1", 1099956224, (s32)"c_n_moa_b", (s32)"S_1", 1101004800, (s32)"c_n_moa_b", (s32)"S_1",
-    1102053376, (s32)"c_n_moa_b", (s32)"S_1", 1103101952, (s32)"c_n_moa_b", (s32)"S_1", 1104150528, (s32)"c_n_moa_b",
-    (s32)"S_1", 1105199104, (s32)"c_n_moa_b", (s32)"S_1", 1106247680, (s32)"c_n_moa_b", (s32)"S_1", 1107296256,
-    (s32)"c_n_moa_b", (s32)"S_1", 1107820544, (s32)"c_n_moa_b", (s32)"S_1", 1108344832, (s32)"c_n_moa_b", (s32)"S_1",
-    1108869120, (s32)"c_n_moa_b", (s32)"D_1", 0, (s32)"c_n_moa_b", (s32)"D_1", 1082130432, (s32)"c_n_moa_b",
-    (s32)"D_1", 1090519040, 0, 0, 0,
+    (s32)("c_n_moa_a"), (s32)("S_1"), 0, (s32)("c_n_moa_a"), (s32)("S_1"), 1073741824, (s32)("c_n_moa_a"), (s32)("S_1"),
+    1082130432, (s32)("c_n_moa_a"), (s32)("S_1"), 1086324736, (s32)("c_n_moa_a"), (s32)("S_1"), 1090519040, (s32)("c_n_moa_a"),
+    (s32)("S_1"), 1092616192, (s32)("c_n_moa_a"), (s32)("S_1"), 1094713344, (s32)("c_n_moa_a"), (s32)("S_1"), 1096810496,
+    (s32)("c_n_moa_a"), (s32)("S_1"), 1098907648, (s32)("c_n_moa_a"), (s32)("S_1"), 1099956224, (s32)("c_n_moa_a"), (s32)("S_1"),
+    1101004800, (s32)("c_n_moa_a"), (s32)("S_1"), 1102053376, (s32)("c_n_moa_a"), (s32)("S_1"), 1103101952, (s32)("c_n_moa_a"),
+    (s32)("S_1"), 1104150528, (s32)("c_n_moa_a"), (s32)("S_1"), 1105199104, (s32)("c_n_moa_a"), (s32)("S_1"), 1106247680,
+    (s32)("c_n_moa_a"), (s32)("S_1"), 1107296256, (s32)("c_n_moa_a"), (s32)("S_1"), 1107820544, (s32)("c_n_moa_a"), (s32)("S_1"),
+    1108344832, (s32)("c_n_moa_a"), (s32)("S_1"), 1108869120, (s32)("c_n_moa_a"), (s32)("D_1"), 0, (s32)("c_n_moa_a"),
+    (s32)("D_1"), 1082130432, (s32)("c_n_moa_a"), (s32)("D_1"), 1090519040, (s32)("c_n_moa_b"), (s32)("S_1"), 0,
+    (s32)("c_n_moa_b"), (s32)("S_1"), 1073741824, (s32)("c_n_moa_b"), (s32)("S_1"), 1082130432, (s32)("c_n_moa_b"), (s32)("S_1"),
+    1086324736, (s32)("c_n_moa_b"), (s32)("S_1"), 1090519040, (s32)("c_n_moa_b"), (s32)("S_1"), 1092616192, (s32)("c_n_moa_b"),
+    (s32)("S_1"), 1094713344, (s32)("c_n_moa_b"), (s32)("S_1"), 1096810496, (s32)("c_n_moa_b"), (s32)("S_1"), 1098907648,
+    (s32)("c_n_moa_b"), (s32)("S_1"), 1099956224, (s32)("c_n_moa_b"), (s32)("S_1"), 1101004800, (s32)("c_n_moa_b"), (s32)("S_1"),
+    1102053376, (s32)("c_n_moa_b"), (s32)("S_1"), 1103101952, (s32)("c_n_moa_b"), (s32)("S_1"), 1104150528, (s32)("c_n_moa_b"),
+    (s32)("S_1"), 1105199104, (s32)("c_n_moa_b"), (s32)("S_1"), 1106247680, (s32)("c_n_moa_b"), (s32)("S_1"), 1107296256,
+    (s32)("c_n_moa_b"), (s32)("S_1"), 1107820544, (s32)("c_n_moa_b"), (s32)("S_1"), 1108344832, (s32)("c_n_moa_b"), (s32)("S_1"),
+    1108869120, (s32)("c_n_moa_b"), (s32)("D_1"), 0, (s32)("c_n_moa_b"), (s32)("D_1"), 1082130432, (s32)("c_n_moa_b"),
+    (s32)("D_1"), 1090519040, 0, 0, 0,
 };
 
 #pragma dont_inline on
@@ -275,7 +301,7 @@ static void moamoa_pose_init(void) {
         wp->defs[wp->numDefs].count = i - start + 1;
         wp->defs[wp->numDefs].speed = data->speed;
         wp->defs[wp->numDefs].loop = 1;
-        if (!strncmp(anim, "J\0\0", 1)) {
+        if (!strncmp(anim, "J", 1)) {
             wp->defs[wp->numDefs].loop = 0;
         }
         i++;
@@ -308,17 +334,17 @@ static void moamoa_pose_main(void) {
 #pragma dont_inline reset
 
 static const char* group_tbl[][2] = {
-    {"c_n_moa_a", "S_1"},
-    {"c_n_moa_b", "S_1"},
-    {"c_kinodebu", "G_1"},
-    {"c_puku_c", "U_1"},
-    {"c_powan", "O_1"},
-    {"c_smoko", "T_2"},
-    {"c_rose", "G_1"},
-    {"c_papab", "G_1"},
-    {"c_mamab", "G_1"},
-    {"c_konari", "G_1"},
-    {"c_n_moa_a", "S_1"},
+    {("c_n_moa_a"), ("S_1")},
+    {("c_n_moa_b"), ("S_1")},
+    {("c_kinodebu"), ("G_1")},
+    {("c_puku_c"), ("U_1")},
+    {("c_powan"), ("O_1")},
+    {("c_smoko"), ("T_2")},
+    {("c_rose"), ("G_1")},
+    {("c_papab"), ("G_1")},
+    {("c_mamab"), ("G_1")},
+    {("c_konari"), ("G_1")},
+    {("c_n_moa_a"), ("S_1")},
 };
 static inline void /**/ moamoa_pose_change_i(Moamoa* moa, const char* model, const char* anim) {
     MoamoaPoseDef* def = wp->defs;
@@ -390,7 +416,7 @@ static void moamoa_pose_change(Moamoa* moa, const char* model, const char* anim)
 }
 #pragma dont_inline reset
 
-static USER_FUNC(evt_moamoa_flag_onoff) {
+static s32 evt_moamoa_flag_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 mask = evtGetValue(event, args[1]);
@@ -403,12 +429,12 @@ static USER_FUNC(evt_moamoa_flag_onoff) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_exit) {
+static s32 evt_moamoa_exit(EventEntry* event, BOOL isFirstCall) {
     extReset();
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_ry_reset) {
+static s32 evt_moamoa_ry_reset(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
 
@@ -419,7 +445,7 @@ static USER_FUNC(evt_moamoa_ry_reset) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_end_wait) {
+static s32 evt_moamoa_end_wait(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
 
@@ -433,7 +459,7 @@ static USER_FUNC(evt_moamoa_end_wait) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_fusion) {
+static s32 evt_moamoa_fusion(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose;
     Moamoa* moa;
@@ -469,7 +495,7 @@ static USER_FUNC(evt_moamoa_fusion) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_kind_onoff) {
+static s32 evt_moamoa_kind_onoff(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     s32 on = evtGetValue(event, args[0]);
     s32 all = evtGetValue(event, args[1]);
@@ -501,7 +527,7 @@ static USER_FUNC(evt_moamoa_kind_onoff) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_blow) {
+static s32 evt_moamoa_blow(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     Moamoa* moa;
 
@@ -515,7 +541,7 @@ static USER_FUNC(evt_moamoa_blow) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_fusion_debug) {
+static s32 evt_moamoa_fusion_debug(EventEntry* event, BOOL isFirstCall) {
     s32 i;
     ExtPose* pose = extGetPosePtr();
     Moamoa* moa = wp->moa;
@@ -532,7 +558,7 @@ static USER_FUNC(evt_moamoa_fusion_debug) {
     return EVT_RETURN_DONE;
 }
 
-static USER_FUNC(evt_moamoa_target_off) {
+static s32 evt_moamoa_target_off(EventEntry* event, BOOL isFirstCall) {
     s32 i = evtGetValue(event, event->args[0]);
 
     wp->target[i] = wp->target[1 - i];
@@ -671,6 +697,7 @@ static void moamoa_jump(ExtPose* pose, Moamoa* moa, s32 next, s32 checkGround, f
     pose->flags &= ~4;
 }
 
+#pragma dont_inline reset
 #pragma opt_propagation off
 #pragma opt_lifetimes off
 static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
@@ -690,18 +717,18 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     }
     if (distABf(pose->mtx[0][3], pose->mtx[2][3], mario->position.x, mario->position.z) < (20.0f + mario->wPlayerCollisionBox.x) / 2.0f
         && mario->position.y > 10.0f + pose->mtx[1][3] && (mario->flags & 0x20000) && !(mario->flags & 0x10000)
-        && wp->field_0x558 < 2) {
+        && wp->bounceCount < 2) {
         if (mario->currMotionId != 0x16 && mario->currMotionId != 0x1a) {
             marioChgMot(5);
         }
-        wp->field_0x558++;
+        wp->bounceCount++;
         return 1;
     }
     if (!(mario->flags & 0x30000)) {
-        wp->field_0x558 = 0;
+        wp->bounceCount = 0;
     }
     if (mario->currMotionId == 0x12 && wp->field_0x40 > 10) {
-        rad = 6.2831855f * reviseAngle(camGetPtr(CAMERA_3D)->viewYaw + (mario->unk1A8 - 90.0f)) / 360.0f;
+        rad = 6.2831855f * reviseAngle(camGetPtr(CAMERA_3D)->viewYaw + (mario->displayDirection - 90.0f)) / 360.0f;
         dist = 35.0f * moa_sinx(rad) + mario->position.x;
         if (distABf(pose->mtx[0][3], pose->mtx[2][3], dist, mario->position.z - 35.0f * moa_cosx(rad)) < 35.0f) {
             return 2;
@@ -739,8 +766,8 @@ static s32 moamoa_hit_check(ExtPose* pose, Moamoa* moa) {
     f = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
     range = (20.0f + mario->wPlayerCollisionBox.x) / 2.0f;
     if (PSVECDistance(&e, &f) < range) {
-        pose->mtx[0][3] = moa->field_0x28;
-        pose->mtx[2][3] = moa->field_0x2c;
+        pose->mtx[0][3] = moa->lastX;
+        pose->mtx[2][3] = moa->lastZ;
         {
         f32 (*mtx)[4] = pose->mtx;
         f = (Vec){mtx[0][3], mtx[1][3], mtx[2][3]};
@@ -801,12 +828,12 @@ static void ext_moamoa_main(void) {
         wp->field_0x40 = 0;
     }
     if (mario->currMotionId == 0) {
-        wp->field_0x42++;
-        if (wp->field_0x42 > 1000) {
-            wp->field_0x42 = 1000;
+        wp->idleFrames++;
+        if (wp->idleFrames > 1000) {
+            wp->idleFrames = 1000;
         }
     } else {
-        wp->field_0x42 = 0;
+        wp->idleFrames = 0;
     }
     if (party->flags & 0x100) {
         wp->flags |= 0x10;
@@ -872,7 +899,7 @@ static void ext_moamoa_main(void) {
                 moa->state = 0x24;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -885,7 +912,7 @@ static void ext_moamoa_main(void) {
                 moa->state = 0x2f;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -909,7 +936,7 @@ static void ext_moamoa_main(void) {
                 moa->jumpTimer = 120;
                 {
                 s32 idx;
-                wp->field_0x38++;
+                wp->hitCount++;
                 idx = i % 3;
                 if (distABf(pose->mtx[0][3], pose->mtx[2][3], wp->target[idx].x, wp->target[idx].z) < 200.0f) {
                     wp->field_0x3a[idx]++;
@@ -930,6 +957,10 @@ static void ext_moamoa_main(void) {
             sp2_ = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]}; psndSFXOn_3D(voice, &sp2_);
         }
         switch (moa->state) {
+      {
+        f32 z;
+        f32 x;
+        f32 y;
             case 0:
                 if (i % 133 < 100) {
                     a = randf(0.0f, 6.2831855f);
@@ -953,13 +984,14 @@ static void ext_moamoa_main(void) {
                         a = randf(0.0f, 360.0f);
                     }
                     rad = 6.2831855f * a / 360.0f;
-                    x = pose->mtx[0][3] + 5.0f * moa_sinx(rad);
+                    t = pose->mtx[0][3] + 5.0f * moa_sinx(rad);
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - 5.0f * moa_cosx(rad); }
-                    { f32 k1, k2; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, r1 * (k1 = 0.5f - 0.3f) + 0.3f, r2 * (k2 = 0.8f - 0.5f) + 0.5f); }
+                    { f32 k1, k2; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, t, y, z, r1 * (k1 = 0.5f - 0.3f) + 0.3f, r2 * (k2 = 0.8f - 0.5f) + 0.5f); }
                     moa->flags &= ~1;
                 }
                 break;
+      }
             case 50:
                 if (--moa->timer < 0) {
                     moa->timer = 0;
@@ -1015,11 +1047,11 @@ static void ext_moamoa_main(void) {
                 d = wp->dist;
                 {
                 f32 rad = 6.2831855f * a / 360.0f;
-                x = pose->mtx[0][3] + 30.0f * moa_sinx(rad);
+                t = pose->mtx[0][3] + 30.0f * moa_sinx(rad);
                 }
                 y = pose->mtx[1][3];
                 z = pose->mtx[2][3];
-                { f32 a1 = 2.0f * randf(1.0f, 1.0f); f32 a2 = 2.0f * randf(0.4f, 0.4f); moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, x, y, z, a1, a2); } }
+                { f32 a1 = 2.0f * randf(1.0f, 1.0f); f32 a2 = 2.0f * randf(0.4f, 0.4f); moamoa_jump(pose, moa, d < 100.0f ? moa->state : 0, 1, t, y, z, a1, a2); } }
                 break;
             case 3:
                 pose->mtx[1][3] += moa->vy;
@@ -1103,7 +1135,7 @@ static void ext_moamoa_main(void) {
             case 49:
                 if ((wp->flags & 0x1000) && (wp->flags & 0x2000)) {
                     moa->state = 0x3e;
-                } else if (wp->field_0x38 < 500) {
+                } else if (wp->hitCount < 500) {
                     PSMTXIdentity(pose->mtx);
                     pose->mtx[0][3] = wp->target[i % 3].x;
                     pose->mtx[1][3] = wp->target[i % 3].y;
@@ -1138,11 +1170,11 @@ static void ext_moamoa_main(void) {
                 { f32 r1 = rand() / 32767.0f;
                 a = angleABf(pose->mtx[0][3], pose->mtx[2][3], -275.0f, -100.0f);
                 a += r1 * (45.0f - -45.0f) + -45.0f; }
-                if (d > 6.0f && (y = pose->mtx[1][3]) < 60.0f) {
+                if (d > 6.0f && (s = pose->mtx[1][3]) < 60.0f) {
                     f32 rad = 6.2831855f * a / 360.0f;
                     x = pose->mtx[0][3] + 15.0f * moa_sinx(rad);
                     z = pose->mtx[2][3] - 15.0f * moa_cosx(rad);
-                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, y, z, 3.0f * (r1 * (k = 1.0f - 1.0f) + 1.0f), r2 * k + 1.0f); }
+                    { f32 k; f32 r1 = rand() / 32767.0f; f32 r2 = rand() / 32767.0f; moamoa_jump(pose, moa, moa->state, 1, x, s, z, 3.0f * (r1 * (k = 1.0f - 1.0f) + 1.0f), r2 * k + 1.0f); }
                 } else {
                     moa->state++;
                 }
@@ -1210,8 +1242,8 @@ static void ext_moamoa_main(void) {
             }
         }
         pose->mtx[1][3] += wp->mobj->modelWorldMtx[1][3] - wp->mobjY;
-        moa->field_0x28 = pose->mtx[0][3];
-        moa->field_0x2c = pose->mtx[2][3];
+        moa->lastX = pose->mtx[0][3];
+        moa->lastZ = pose->mtx[2][3];
     }
     moamoa_pose_main();
     wp->mobjY = wp->mobj->modelWorldMtx[1][3];
@@ -1248,7 +1280,7 @@ static void ext_moamoa_dispent(void) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-static USER_FUNC(npc_jump) {
+static s32 npc_jump(EventEntry* event, BOOL isFirstCall) {
     s32* args = event->args;
     const char* name = (const char*)evtGetValue(event, args[0]);
     f32 x = evtGetFloat(event, args[1]);
@@ -1304,7 +1336,6 @@ static USER_FUNC(npc_jump) {
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 
-
 static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_npc_entry, STRING("moa_a"), STRING("c_n_moa_a"))
     CALL(evt_npc_set_position, STRING("moa_a"), 0, -1000, 0)
@@ -1314,11 +1345,11 @@ static EVT_BEGIN(evt_moamoa_init)
     CALL(evt_moamoa_flag_onoff, 1, 1)
     IF_INT_EQUAL(GSWF(3450), 1)
         CALL(evt_moamoa_target_off, 0)
-        CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
+        CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
     END_IF
     IF_INT_EQUAL(GSWF(3451), 1)
         CALL(evt_moamoa_target_off, 1)
-        CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
+        CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
     END_IF
     RETURN
 EVT_END()
@@ -1328,8 +1359,8 @@ static EVT_BEGIN(evt_meet_moamoa)
     CALL(evt_seq_wait, 2)
     WAIT_MS(1500)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_set_anim, STRING("ウェイトレス"), STRING("G_1"))
-    CALL(evt_npc_set_anim, STRING("車掌"), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), STRING("G_1"))
+    CALL(evt_npc_set_anim, STRING("\x8e\xd4\x8f\xb6"), STRING("G_1"))
     CALL(evt_mario_get_pos, 0, LW(0), LW(1), LW(2))
     CALL(evt_snd_sfxon_3d, STRING("SFX_VOICE_MARIO_SURPRISED2"), LW(0), LW(1), LW(2), 0)
     CALL(evt_eff_fukidashi, 0, STRING("eff0"), 0, 0, 0, 0, 0, 0, 0, 0, 0)
@@ -1380,7 +1411,7 @@ EVT_END()
 EVT_BEGIN(evt_moamoa_help)
     BEGIN_INLINE_EVENT
         CALL(evt_npc_flag_onoff, 0, LW(0), 512)
-        IF_STR_EQUAL(LW(0), STRING("車掌"))
+        IF_STR_EQUAL(LW(0), STRING("\x8e\xd4\x8f\xb6"))
             CALL(evt_msg_print, 0, STRING("stg6_rsh_249_00"), 0, LW(0))
             ELSE
             CALL(evt_msg_print, 0, STRING("stg6_rsh_249_01"), 0, LW(0))
@@ -1417,7 +1448,7 @@ EVT_BEGIN(evt_moamoa_help)
     CALL(npc_jump, LW(0), LW(1), LW(2), LW(3), FLOAT(0.0f), FLOAT(0.19921875f), 100)
     CALL(evt_npc_flag_onoff, 1, LW(0), 1024)
     CALL(evt_npc_flag_onoff, 0, LW(0), 32)
-    IF_STR_EQUAL(LW(10), STRING("車掌"))
+    IF_STR_EQUAL(LW(10), STRING("\x8e\xd4\x8f\xb6"))
         CALL(evt_npc_set_anim, LW(10), STRING("O_1"))
         ELSE
         CALL(evt_npc_set_anim, LW(10), STRING("P_1"))
@@ -1426,18 +1457,18 @@ EVT_BEGIN(evt_moamoa_help)
 EVT_END()
 
 EVT_BEGIN(evt_moamoa_escape0)
-    SET_VALUE(LW(0), STRING("ウェイトレス"))
+    SET_VALUE(LW(0), STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")))
     SPAWN_EVENT(PTR(evt_moamoa_help))
     SET_VALUE(GSWF(3450), 1)
-    CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
+    CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
     RETURN
 EVT_END()
 
 EVT_BEGIN(evt_moamoa_escape1)
-    SET_VALUE(LW(0), STRING("車掌"))
+    SET_VALUE(LW(0), STRING("\x8e\xd4\x8f\xb6"))
     SPAWN_EVENT(PTR(evt_moamoa_help))
     SET_VALUE(GSWF(3451), 1)
-    CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
+    CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
     RETURN
 EVT_END()
 
@@ -1452,17 +1483,17 @@ static EVT_BEGIN(evt_moamoa_escape)
     CALL(evt_cam3d_evt_xyz_off, 0, 11)
     WAIT_FRAMES(1)
     CALL(evt_party_stop, 0)
-    CALL(evt_npc_flag_onoff, 1, STRING("車掌"), 32)
-    CALL(evt_npc_flag_onoff, 1, STRING("ウェイトレス"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING("\x8e\xd4\x8f\xb6"), 32)
+    CALL(evt_npc_flag_onoff, 1, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 32)
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_status_onoff, 1, STRING("車掌"), 2)
-        CALL(evt_npc_move_position, STRING("車掌"), -80, 22, 1000, 0, 1)
-        CALL(evt_npc_set_ry, STRING("車掌"), 90)
+        CALL(evt_npc_status_onoff, 1, STRING("\x8e\xd4\x8f\xb6"), 2)
+        CALL(evt_npc_move_position, STRING("\x8e\xd4\x8f\xb6"), -80, 22, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING("\x8e\xd4\x8f\xb6"), 90)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
-        CALL(evt_npc_status_onoff, 1, STRING("ウェイトレス"), 2)
-        CALL(evt_npc_move_position, STRING("ウェイトレス"), 0, 15, 1000, 0, 1)
-        CALL(evt_npc_set_ry, STRING("ウェイトレス"), 270)
+        CALL(evt_npc_status_onoff, 1, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 2)
+        CALL(evt_npc_move_position, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 0, 15, 1000, 0, 1)
+        CALL(evt_npc_set_ry, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 270)
     END_INLINE_EVENT
     BEGIN_INLINE_EVENT
         CALL(evt_party_move_pos2, 0, -20, -10, FLOAT(80.0f))
@@ -1478,7 +1509,7 @@ static EVT_BEGIN(evt_moamoa_escape)
     CALL(evt_mario_flag_onoff, 0, 1024)
     CALL(evt_cam3d_evt_set, -40, 90, 283, -40, 38, -13, 500, 11)
     WAIT_MS(500)
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_00"), 0, STRING("車掌"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_00"), 0, STRING("\x8e\xd4\x8f\xb6"))
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 90, 300)
@@ -1486,7 +1517,7 @@ static EVT_BEGIN(evt_moamoa_escape)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 90, 300, 0)
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_241"), 0, STRING("ウェイトレス"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_241"), 0, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")))
     WAIT_MS(500)
     BEGIN_INLINE_EVENT
         CALL(evt_party_set_dir, 0, 270, 300)
@@ -1494,15 +1525,15 @@ static EVT_BEGIN(evt_moamoa_escape)
     BEGIN_INLINE_EVENT
         CALL(evt_mario_set_dir, 270, 300, 0)
     END_INLINE_EVENT
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_01"), 0, STRING("車掌"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_240_01"), 0, STRING("\x8e\xd4\x8f\xb6"))
     WAIT_MS(500)
     CALL(evt_cam3d_evt_off, 500, 11)
     CALL(evt_mario_key_onoff, 1)
     CALL(evt_party_run, 0)
-    CALL(evt_npc_flag_onoff, 0, STRING("車掌"), 32)
-    CALL(evt_npc_flag_onoff, 0, STRING("ウェイトレス"), 32)
-    CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
-    CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
+    CALL(evt_npc_flag_onoff, 0, STRING("\x8e\xd4\x8f\xb6"), 32)
+    CALL(evt_npc_flag_onoff, 0, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 32)
+    CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
+    CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
     SET_VALUE(GSW(0), 331)
     SET_VALUE(LW(0), STRING("w_bero"))
     CALL_CHILD(PTR(bero_case_switch_on))
@@ -1514,7 +1545,7 @@ static EVT_BEGIN(init_syashou)
         CASE_BETWEEN(329, 332)
         CALL(evt_npc_set_position, STRING("me"), -115, 0, 20)
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("O_1"), STRING("T_3"))
-        CALL(evt_npc_set_tribe, STRING("me"), STRING("車掌悲"))
+        CALL(evt_npc_set_tribe, STRING("me"), STRING("\x8e\xd4\x8f\xb6\x94\xdf"))
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     END_SWITCH
@@ -1535,7 +1566,7 @@ static EVT_BEGIN(init_waitless)
         CASE_BETWEEN(329, 332)
         CALL(evt_npc_set_position, STRING("me"), 50, 0, 0)
         CALL(evt_npc_set_autotalkpose, STRING("me"), STRING("P_1"), STRING("T_5"))
-        CALL(evt_npc_set_tribe, STRING("me"), STRING("ウェイトレス悲"))
+        CALL(evt_npc_set_tribe, STRING("me"), STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X\x94\xdf")))
         CASE_DEFAULT
         CALL(evt_npc_set_position, STRING("me"), 0, -1000, 0)
     END_SWITCH
@@ -1552,36 +1583,36 @@ static EVT_BEGIN(talk_waitless)
 EVT_END()
 
 static s32 bero_data_a[] = {
-    (s32)"e_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_a", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", (s32)"w_bero",
+    (s32)("e_bero"), 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)("rsh_04_a"), (s32)("w_bero"), 65537, (s32)("e_door_close"), (s32)("e_door_open"), (s32)("w_bero"),
     0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_06_a", (s32)"w_bero", 65537, 0, 0, 0, 0,
+    0, (s32)("rsh_06_a"), (s32)("w_bero"), 65537, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
 };
 
 static s32 bero_data_b[] = {
-    (s32)"e_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_b", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", (s32)"w_bero",
+    (s32)("e_bero"), 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)("rsh_04_b"), (s32)("w_bero"), 65537, (s32)("e_door_close"), (s32)("e_door_open"), (s32)("w_bero"),
     0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_06_a", (s32)"w_bero", 65537, 0, 0, 0, 0,
+    0, (s32)("rsh_06_a"), (s32)("w_bero"), 65537, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
 };
 
 static s32 bero_data_c[] = {
-    (s32)"e_bero", 65544, 20000, 100000, 0, 0, -1, 0,
-    -1, 0, (s32)"rsh_04_c", (s32)"w_bero", 65537, (s32)"e_door_close", (s32)"e_door_open", (s32)"w_bero",
+    (s32)("e_bero"), 65544, 20000, 100000, 0, 0, -1, 0,
+    -1, 0, (s32)("rsh_04_c"), (s32)("w_bero"), 65537, (s32)("e_door_close"), (s32)("e_door_open"), (s32)("w_bero"),
     0, 20000, 100000, 0, 0, -1, 0, -1,
-    0, (s32)"rsh_06_a", (s32)"w_bero", 65537, 0, 0, 0, 0,
+    0, (s32)("rsh_06_a"), (s32)("w_bero"), 65537, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0,
 };
 
 static s32 npc_data[] = {
-    (s32)/*"車掌"*/"\x8E\xD4\x8F\xB6", 1536, 0, (s32)init_syashou, 0, 0, 0, 0,
+    (s32)/*"車掌"*/"\x8e\xd4\x8f\xb6", 1536, 0, (s32)init_syashou, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, (s32)/*"ウェイトレス"*/"\x83\x45\x83\x46\x83\x43\x83\x67\x83\x8C\x83\x58",
+    0, 0, 0, 0, 0, 0, 0, (s32)/*"ウェイトレス"*/"\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X",
     1536, 0, (s32)init_waitless, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0,
@@ -1612,13 +1643,13 @@ EVT_BEGIN(evt_ghost_diary_read)
         RETURN
     END_IF
     CALL(evt_msg_print_add, 0, STRING("stg6_rsh_133"))
-    CALL(evt_msg_print, 0, STRING("stg6_rsh_134"), 0, STRING("ゆうれい"))
+    CALL(evt_msg_print, 0, STRING("stg6_rsh_134"), 0, STRING("\x82\xe4\x82\xa4\x82\xea\x82\xa2"))
     RETURN
 EVT_END()
 
 static s32 access_tbl[] = {
-    (s32)"kihako_1", (s32)"stg6_rsh_275", (s32)"kibako_2", (s32)"stg6_rsh_275", (s32)"bin_1", (s32)"stg6_rsh_276", (s32)"wagon", (s32)"stg6_rsh_280",
-    (s32)"hako_1", (s32)"stg6_rsh_281", (s32)"hako_2", (s32)"stg6_rsh_281", 0,
+    (s32)("kihako_1"), (s32)("stg6_rsh_275"), (s32)("kibako_2"), (s32)("stg6_rsh_275"), (s32)("bin_1"), (s32)("stg6_rsh_276"), (s32)("wagon"), (s32)("stg6_rsh_280"),
+    (s32)("hako_1"), (s32)("stg6_rsh_281"), (s32)("hako_2"), (s32)("stg6_rsh_281"), 0,
 };
 
 static EVT_BEGIN(evt_access)
@@ -1727,8 +1758,8 @@ EVT_BEGIN(rsh_05_a_init_evt)
         SET_VALUE(LW(0), STRING("w_bero"))
         CALL_CHILD(PTR(bero_case_switch_off))
         CASE_DEFAULT
-        CALL(evt_npc_change_interrupt, STRING("車掌"), 6, PTR(talk_syashou))
-        CALL(evt_npc_change_interrupt, STRING("ウェイトレス"), 6, PTR(talk_waitless))
+        CALL(evt_npc_change_interrupt, STRING("\x8e\xd4\x8f\xb6"), 6, PTR(talk_syashou))
+        CALL(evt_npc_change_interrupt, STRING(("\x83" "E\x83" "F\x83" "C\x83g\x83\x8c\x83X")), 6, PTR(talk_waitless))
     END_SWITCH
     IF_INT_LESS(GSW(0), 299)
         CALL(evt_item_entry, STRING("diary"), 78, -90, 0, -140, 0, -1, PTR(evt_ghost_diary))
@@ -1778,5 +1809,9 @@ EVT_BEGIN(rsh_05_a_init_evt_nidome)
     RETURN
 EVT_END()
 
+// target pad words (G5: section sizes must match or later DOL addresses shift)
+#pragma force_active on
+__declspec(section ".data") u32 gap_04_00015044_data[1] = {0};
+#pragma force_active reset
 
 

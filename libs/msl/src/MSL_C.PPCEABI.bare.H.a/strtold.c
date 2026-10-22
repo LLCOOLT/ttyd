@@ -111,9 +111,10 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     int hex_exp_negative = 0;
     int count = 0;
     int spaces = 0;
-    int exp_value = 0;
+    int exp_value;
     int dec_exp = 0;
     int inf_index;
+    exp_value = 0;
     *overflow = 0;
     c = fetch();
 
@@ -421,7 +422,7 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
         }
     }
 
-    if (!success(scan_state)) {
+    if (!(scan_state = success(scan_state))) {
         *chars_scanned = 0;
     } else {
         *chars_scanned = count - 1 + spaces;
@@ -478,8 +479,8 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
             hex_exp++;
             r.u >>= 1;
         }
-        r.s &= 0xf;
         hex_exp += (hex_dig_count - 1) * 4;
+        r.s &= 0xf;
         r.s |= (hex_exp + 0x3ff) << 4;
         *chars_scanned = spaces + sign_detected + hex_digits + 1 + hex_exp_digits;
         if (0.0 != r.v && r.v < __extended_min[0]) {
@@ -497,3 +498,4 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
     }
     return r.v;
 }
+

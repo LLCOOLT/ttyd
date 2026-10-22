@@ -102,13 +102,13 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
         case 99:
             break;
         case 100:
-            if ((ac->field_0x4 & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
+            if ((ac->setupFlags & 1) && (*(u32*)((u8*)ac->mAcUnit + 0x278) & 0x10)) {
                 if (irand(100) >= 0) {
-                    ac->field_0x8 = 30;
+                    ac->setupParam = 30;
                     AC_S32(ac, 0x58) = 0;
                 } else {
                     AC_S32(ac, 0x58) = irand(AC_S32(ac, 0x44) - 1) + 1;
-                    ac->field_0x8 = 30;
+                    ac->setupParam = 30;
                 }
                 ac->mAcState = 1001;
                 break;
@@ -177,8 +177,8 @@ s32 battleAcMain_PowerGaugeLv2(BattleWork* work) {
             }
             break;
         case 1001:
-            ac->field_0x8--;
-            if (ac->field_0x8 < 0) {
+            ac->setupParam--;
+            if (ac->setupParam < 0) {
                 if (AC_S32(ac, 0x58) >= AC_S32(ac, 0x48)) {
                     ac->result = 2;
                     ac->mResultCount++;

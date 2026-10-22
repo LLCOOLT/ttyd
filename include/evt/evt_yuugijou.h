@@ -3,85 +3,92 @@
 #include <dolphin/types.h>
 
 typedef struct PiantaParlorWork {
-	u32 field_0x0; //0x00
-	u32 field_0x4; //0x04
+	u32 flags; //0x00, 1: token counter shown, 2: tokens taken out (playing), 4: counter raised, 8: window closed
+	u32 keptTokens; //0x04, tokens deposited by yuugijou_montemedal_keep
 	s32 tokens; //0x08
-	u32 field_0xC; //0x0C
-	u32 field_0x10; //0x10
-	u32 field_0x14; //0x14
-	u32 field_0x18; //0x18
-	u32 field_0x1C; //0x1C
-	u32 field_0x20; //0x20
-	u32 field_0x24; //0x24
-	u32 field_0x28; //0x28
-	u32 field_0x2C; //0x2C
-	u32 field_0x30; //0x30
-	u32 field_0x34; //0x34
-	u32 field_0x38; //0x38
-	u32 field_0x3C; //0x3C
-	u32 field_0x40; //0x40
-	u32 field_0x44; //0x44
-	u32 field_0x48; //0x48
-	u32 field_0x4C; //0x4C
-	u32 field_0x50; //0x50
-	u32 field_0x54; //0x54
-	u32 field_0x58; //0x58
-	u32 field_0x5C; //0x5C
-	u32 field_0x60; //0x60
-	u32 field_0x64; //0x64
-	u32 field_0x68; //0x68
-	u32 field_0x6C; //0x6C
-	u32 field_0x70; //0x70
-	u32 field_0x74; //0x74
-	u32 field_0x78; //0x78
-	u32 field_0x7C; //0x7C
-	u32 field_0x80; //0x80
-	u32 field_0x84; //0x84
-	u32 field_0x88; //0x88
-	u32 field_0x8C; //0x8C
-	u32 field_0x90; //0x90
-	u32 field_0x94; //0x94
-	u32 field_0x98; //0x98
-	u32 field_0x9C; //0x9C
-	u32 field_0xA0; //0xA0
-	u32 field_0xA4; //0xA4
-	u32 field_0xA8; //0xA8
-	u32 field_0xAC; //0xAC
-	u32 field_0xB0; //0xB0
-	u32 field_0xB4; //0xB4
-	u32 field_0xB8; //0xB8
-	u32 field_0xBC; //0xBC
-	u32 field_0xC0; //0xC0
-	u32 field_0xC4; //0xC4
-	u32 field_0xC8; //0xC8
-	u32 field_0xCC; //0xCC
-	u32 field_0xD0; //0xD0
-	u32 field_0xD4; //0xD4
-	u32 field_0xD8; //0xD8
-	u32 field_0xDC; //0xDC
-	u32 field_0xE0; //0xE0
-	u32 field_0xE4; //0xE4
-	u32 field_0xE8; //0xE8
-	u32 field_0xEC; //0xEC
-	u32 field_0xF0; //0xF0
-	u32 field_0xF4; //0xF4
-	u32 field_0xF8; //0xF8
-	u32 field_0xFC; //0xFC
-	u32 field_0x100; //0x100
-	u32 field_0x104; //0x104
-	u32 field_0x108; //0x108
-	u32 field_0x10C; //0x10C
-	u32 field_0x110; //0x110
-	u32 field_0x114; //0x114
-	u32 field_0x118; //0x118
-	u32 field_0x11C; //0x11C
-	u32 field_0x120; //0x120
-	u32 field_0x124; //0x124
-	u32 field_0x128; //0x128
-	u32 field_0x12C; //0x12C
-	u32 field_0x130; //0x130
+	u32 dispTick; //0x0C, counter-animation tick
+	u32 dispTokens; //0x10, token count currently shown (counts toward tokens)
+	// four minigames x five ranks (+1 spare slot); defaults set in yuugijou_init
+	u32 recordOn[4][6]; //0x14, all set to 1 at init
+	u32 recordScore[4][6]; //0x74, default record values (game 1 ascending: times)
+	u32 recordParam[4][6]; //0xD4, per-rank value derived from recordScore (game 0: constants)
 	u32 field_0x134; //0x134
 } PiantaParlorWork;
+
+// Record arrays are [minigame][rank]; ranks 0-4 hold the defaults set in yuugijou_init, rank 5 is unused there.
+// Element offsets (for patching / save editing):
+//   0x014  recordOn[0][0]
+//   0x018  recordOn[0][1]
+//   0x01C  recordOn[0][2]
+//   0x020  recordOn[0][3]
+//   0x024  recordOn[0][4]
+//   0x028  recordOn[0][5]
+//   0x02C  recordOn[1][0]
+//   0x030  recordOn[1][1]
+//   0x034  recordOn[1][2]
+//   0x038  recordOn[1][3]
+//   0x03C  recordOn[1][4]
+//   0x040  recordOn[1][5]
+//   0x044  recordOn[2][0]
+//   0x048  recordOn[2][1]
+//   0x04C  recordOn[2][2]
+//   0x050  recordOn[2][3]
+//   0x054  recordOn[2][4]
+//   0x058  recordOn[2][5]
+//   0x05C  recordOn[3][0]
+//   0x060  recordOn[3][1]
+//   0x064  recordOn[3][2]
+//   0x068  recordOn[3][3]
+//   0x06C  recordOn[3][4]
+//   0x070  recordOn[3][5]
+//   0x074  recordScore[0][0]
+//   0x078  recordScore[0][1]
+//   0x07C  recordScore[0][2]
+//   0x080  recordScore[0][3]
+//   0x084  recordScore[0][4]
+//   0x088  recordScore[0][5]
+//   0x08C  recordScore[1][0]
+//   0x090  recordScore[1][1]
+//   0x094  recordScore[1][2]
+//   0x098  recordScore[1][3]
+//   0x09C  recordScore[1][4]
+//   0x0A0  recordScore[1][5]
+//   0x0A4  recordScore[2][0]
+//   0x0A8  recordScore[2][1]
+//   0x0AC  recordScore[2][2]
+//   0x0B0  recordScore[2][3]
+//   0x0B4  recordScore[2][4]
+//   0x0B8  recordScore[2][5]
+//   0x0BC  recordScore[3][0]
+//   0x0C0  recordScore[3][1]
+//   0x0C4  recordScore[3][2]
+//   0x0C8  recordScore[3][3]
+//   0x0CC  recordScore[3][4]
+//   0x0D0  recordScore[3][5]
+//   0x0D4  recordParam[0][0]
+//   0x0D8  recordParam[0][1]
+//   0x0DC  recordParam[0][2]
+//   0x0E0  recordParam[0][3]
+//   0x0E4  recordParam[0][4]
+//   0x0E8  recordParam[0][5]
+//   0x0EC  recordParam[1][0]
+//   0x0F0  recordParam[1][1]
+//   0x0F4  recordParam[1][2]
+//   0x0F8  recordParam[1][3]
+//   0x0FC  recordParam[1][4]
+//   0x100  recordParam[1][5]
+//   0x104  recordParam[2][0]
+//   0x108  recordParam[2][1]
+//   0x10C  recordParam[2][2]
+//   0x110  recordParam[2][3]
+//   0x114  recordParam[2][4]
+//   0x118  recordParam[2][5]
+//   0x11C  recordParam[3][0]
+//   0x120  recordParam[3][1]
+//   0x124  recordParam[3][2]
+//   0x128  recordParam[3][3]
+//   0x12C  recordParam[3][4]
+//   0x130  recordParam[3][5]
 
 void yuugijou_init(void);
 

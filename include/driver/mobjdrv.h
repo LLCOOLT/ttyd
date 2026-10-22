@@ -21,27 +21,32 @@ typedef struct MapObjectEntry {
     Vec position;                // 0x38
     Vec scale;                   // 0x44
     Vec rotation;                // 0x50
-    Vec unk5C;                   // 0x5C
-    f32 unk68;                   // 0x68
-    f32 unk6C;                   // 0x6C
+    Vec velocity;                   // 0x5C, y used for falling/bouncing
+    f32 gravity;                    // 0x68, subtracted from velocity.y each frame
+    f32 bounce;                     // 0x6C, restitution on landing (-0.5 * bounce * vy)
     s32 poseId;                  // 0x70
     MapObjectHitEntry hitObj[2]; // 0x74
     Vec scale2;                  // 0x184
     Vec translation;             // 0x190
     s32 offscreenId;             // 0x19C
-    u8 unk1A0[0x1B0 - 0x1A0];    // 0x1A0
+    union {                      // 0x1A0, per-block-type data (item id / item list, cost, state, ...; evt_mobj.c)
+        s32 typeData[4];
+        u32 typeDataU[4];
+        void* typeDataP[4];
+    };
     s32 unk1B0;                  // 0x1B0
     s32 unk1B4;                  // 0x1B4
-    char unk1B8[0x1CC - 0x1B8];  // 0x1B8
+    char linkedName[0x1C8 - 0x1B8]; // 0x1B8, name of a paired mobj (mobjNameToPtr)
+    struct EffectEntry* effect;  // 0x1C8, coin fukidashi effect (evt_mobj.c)
     s32 eventId;                 // 0x1CC
     s32 (*mainFunc)(struct MapObjectEntry*); // 0x1D0
-    s32 unk1D4;               // 0x1D4
-    s32 unk1D8;                  // 0x1D8
-    s32 unk1DC;                  // 0x1DC
-    s32 unk1E0;                  // 0x1E0
-    s32 unk1E4;                  // 0x1E4
+    s32 event;                 // 0x1D4
+    s32 extraEvent;                  // 0x1D8, second event script run via mobjRunEvent
+    s32 state;                    // 0x1DC
+    s32 hitFlag;                  // 0x1E0
+    s32 flagVar;                  // 0x1E4
     GXTexObj paperTexObj;        // 0x1E8
-    void* unk208;                // 0x208
+    void* paperTexData;                // 0x208, texture data for paperTexObj
     Mtx paperTexMtx;             // 0x20C
 } MapObjectEntry;
 

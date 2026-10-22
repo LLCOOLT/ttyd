@@ -1195,34 +1195,32 @@ USER_FUNC(yoshi_original_color_anim_set) {
     BattleWork* wp = _battleWorkPointer;
     BattleUnitPart* part;
     const char* name;
-    s32* new_var2;
-    s32* new_var;
+    s32* args = event->args;
     s32 id;
 
-    new_var2 = event->args;
-    if (part && part) {
+    if (part && part) { // FAKE: empty test of the uninitialised part pointer; removing it changes codegen
     }
-    id = evtGetValue(event, new_var2[0]);
+    id = evtGetValue(event, args[0]);
     id = BattleTransID(event, id);
     BattleGetUnitPtr(wp, id);
     switch (pouchGetPartyColor(4)) {
     case 1:
-        name = "c_babyyoshi2\0\0\0";
+        name = "c_babyyoshi2";
         break;
     case 2:
-        name = "c_babyyoshi3\0\0\0";
+        name = "c_babyyoshi3";
         break;
     case 3:
-        name = "c_babyyoshi4\0\0\0";
+        name = "c_babyyoshi4";
         break;
     case 4:
-        name = "c_babyyoshi5\0\0\0";
+        name = "c_babyyoshi5";
         break;
     case 5:
-        name = "c_babyyoshi6\0\0\0";
+        name = "c_babyyoshi6";
         break;
     case 6:
-        name = "c_babyyoshi7\0\0\0";
+        name = "c_babyyoshi7\0\0\0"; // FAKE: explicit padding; without it the string pool tail shifts
         break;
     case 0:
     default:
@@ -1235,9 +1233,8 @@ USER_FUNC(yoshi_original_color_anim_set) {
         }
         part = BattleGetUnitPartsPtr(id, 1);
         animPoseGetAnimPosePtr(part->poseId);
-        new_var = &part->poseId;
         if (part->poseId != -1) {
-            animPoseRelease(*new_var);
+            animPoseRelease(part->poseId);
             part->poseId = -1;
         }
     }
@@ -1311,12 +1308,12 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_calc_param) {
         unit->moveDirection = -1;
     }
     UF32(unit, 0x17C) = __fabs(tx - x);
-    US32(unit, 0x168) = 180;
-    UF32(unit, 0x180) = (f32)US32(unit, 0x168);
+    unit->moveFrames = 180;
+    UF32(unit, 0x180) = (f32)unit->moveFrames;
     unit->mMoveSpeedY = 0.0f;
-    unit->mMoveSpeedXZ = UF32(unit, 0x17C) / (f32)US32(unit, 0x168);
+    unit->mMoveSpeedXZ = UF32(unit, 0x17C) / (f32)unit->moveFrames;
     evtSetFloat(event, outSpeed, unit->mMoveSpeedXZ);
-    evtSetValue(event, outFrames, US32(unit, 0x168));
+    evtSetValue(event, outFrames, unit->moveFrames);
     return EVT_RETURN_DONE;
 }
 
@@ -1359,11 +1356,11 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
             unit->mMoveCurrentPos.z -= unit->mMoveSpeedXZ;
         }
     }
-    sweatAngle = 10.0f * sinfd(180.0f + 360.0f * (UF32(unit, 0x180) - (f32)(US32(unit, 0x168) % 90)) / 90.0f);
+    sweatAngle = 10.0f * sinfd(180.0f + 360.0f * (UF32(unit, 0x180) - (f32)(unit->moveFrames % 90)) / 90.0f);
     BtlUnit_GetPartsPtr(unit, 1);
-    unit->mMoveCurrentPos.y = unit->mMoveSpeedY + (unit->mMoveStartPos.y + (unit->mMoveTargetPos.y - unit->mMoveStartPos.y) * (UF32(unit, 0x180) - (f32)US32(unit, 0x168)) / UF32(unit, 0x180));
+    unit->mMoveCurrentPos.y = unit->mMoveSpeedY + (unit->mMoveStartPos.y + (unit->mMoveTargetPos.y - unit->mMoveStartPos.y) * (UF32(unit, 0x180) - (f32)unit->moveFrames) / UF32(unit, 0x180));
     unit->mMoveSpeedY = sweatAngle;
-    unit->work[5] = (s32)(75.0f - 25.0f * sinfd(360.0f * (UF32(unit, 0x180) - (f32)(US32(unit, 0x168) % 90)) / 90.0f));
+    unit->work[5] = (s32)(75.0f - 25.0f * sinfd(360.0f * (UF32(unit, 0x180) - (f32)(unit->moveFrames % 90)) / 90.0f));
     BtlUnit_SetPos(unit, unit->mMoveCurrentPos.x, unit->mMoveCurrentPos.y, unit->mMoveCurrentPos.z);
     event->userdata[1]++;
     if (event->userdata[1] > 20) {
@@ -1382,8 +1379,8 @@ USER_FUNC(btl_yoshi_yoroyoro_jump_move) {
             ((YoshiSweatWork*)eff->userdata)->z = unit->mMoveCurrentPos.z;
         }
     }
-    US32(unit, 0x168)--;
-    if (US32(unit, 0x168) <= 0) {
+    unit->moveFrames--;
+    if (unit->moveFrames <= 0) {
         BtlUnit_SetPos(unit, unit->mMoveTargetPos.x, unit->mMoveTargetPos.y, unit->mMoveTargetPos.z);
         return EVT_RETURN_DONE;
     }

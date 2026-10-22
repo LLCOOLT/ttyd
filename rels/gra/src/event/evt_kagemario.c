@@ -45,7 +45,7 @@ static void callback(MapTevCallbackInfo* info) {
     s32 stage = info->tevStage;
     s32 texCoord = info->texCoord;
     s32 texMap = info->texMap;
-    s32 field_0x18 = info->field_0x18;
+    s32 field_0x18 = info->indStage;
 
     if (marioGetPtr()->flags & 0x2000000) {
         GXColor color = {0, 0, 0, 255};
@@ -62,7 +62,7 @@ static void callback(MapTevCallbackInfo* info) {
     GXSetTevSwapMode(stage, GX_TEV_SWAP0, GX_TEV_SWAP0);
     info->tevStage = stage + 1;
     info->texMap = texMap;
-    info->field_0x18 = field_0x18;
+    info->indStage = field_0x18;
     info->texCoord = texCoord;
 }
 
