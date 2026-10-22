@@ -550,7 +550,7 @@ static s32 normal_attack_event[] = {
     -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229993856,
     524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
     0, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"TGZ_S_1", 65546, 250,
-    65540, 99, 65539, 98, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TOGEZO_ROLL3",
+    65540, 99, 65539, 98, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TOGEZO_ROLL3\0\0\0",
     -250000000, 0, -250000000, 262235, (s32)btlevtcmd_SetUnitWork, -2, 1, 1,
     131122, -30000000, 36, 131127, -30000000, -29999986, 262235, (s32)btlevtcmd_SetUnitWork,
     -2, 2, -30000000, 110, 65541, 0, 262235, (s32)btlevtcmd_GetUnitWork,

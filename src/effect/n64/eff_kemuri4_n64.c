@@ -35,7 +35,7 @@ typedef struct EffKemuri4N64Work {
 double sin(double);
 double cos(double);
 
-effN64Vtx flowers_v[] = {
+struct { effN64Vtx v[41]; u8 pad[2]; } flowers_v = { { // FAKE: padded to the original symbol size (trailing zero bytes, never read)
     {-9, 8, -7, 0, 512, 255, 255, 255, 255},
     {-9, 4, 2, 512, 512, 255, 255, 255, 255},
     {0, 0, 0, 512, 0, 255, 255, 255, 255},
@@ -77,7 +77,7 @@ effN64Vtx flowers_v[] = {
     {-3, -16, 0, 0, 0, 100, 160, 60, 255},
     {-4, -7, 0, 0, 0, 100, 160, 60, 255},
     {-11, -5, 0, 0, 0, 100, 160, 60, 255},
-};
+}, {0} };
 
 void effKemuri4Main(EffectEntry* effect);
 void effKemuri4Disp(CameraId cameraId, EffectEntry* effect);
@@ -195,8 +195,8 @@ void effKemuri4Disp(CameraId cameraId, EffectEntry* effect) {
 
     work = effect->userdata;
     GXSetCullMode(GX_CULL_NONE);
-    vtx1 = &flowers_v[25];
-    vtx2 = &flowers_v[35];
+    vtx1 = &flowers_v.v[25];
+    vtx2 = &flowers_v.v[35];
     for (i = 0; i < effect->count; i++, work++) {
         if (work->active == 0) {
             continue;

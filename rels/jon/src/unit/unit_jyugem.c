@@ -605,7 +605,7 @@ static s32 friend_event[] = {
     -2, 1, 1, 262235, (s32)btlevtcmd_AnimeSetPoseTable, -2, 1, (s32)pose_table,
     393307, (s32)btlevtcmd_SetHitOffset, -2, 1, 0, 0, 0, 33,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"JGM_A_3", 65545, 2, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_JUGEM_THROW2", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_OffPartsAttribute,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_JUGEM_THROW2\0\0\0", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_OffPartsAttribute,
     -2, 2, 50331648, 327771, (s32)btlevtcmd_GetPos, -2, -29999990, -29999989,
     -29999988, 131125, -29999989, 35, 393307, (s32)btlevtcmd_SetPartsPos, -2, 2,
     -29999990, -29999989, -29999988, 262235, (s32)btlevtcmd_FaceDirectionSub, -2, -30000000, 20,

@@ -97,6 +97,8 @@ static void pose_change(s32 i, const char* name);
 static s32 ext_data[93];
 static inline f32 chb_sin(f32 x) { f32 y; f32 x2; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static inline f32 chb_cos(f32 x) { f32 y; f32 x2; f32 a = 0.03705f; f32 b = 0.4967f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; } return a; }
+// FAKE: chb_sin with x2 declared before y (declaration order only; used by ext_init so its FPR colouring follows the target)
+static inline f32 chb_sin_x2(f32 x) { f32 x2; f32 y; f32 a = 0.00761f; f32 b = 0.16605f; f32 c = 1.0f; if (x <= 3.1415927f) { if (x <= 1.5707964f) { x2 = x * x; a = a * x2 - b; a = a * x2 + c; a = a * x; } else { y = 1.5707964f - (x - 1.5707964f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; } } else if (x < 4.712389f) { y = x - 3.1415927f; x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } else { y = 1.5707964f - (x - 4.712389f); x2 = y * y; a = a * x2 - b; a = a * x2 + c; a = a * y; a = -a; } return a; }
 static void pose_init(void);
 static void pose_init(void);
 void extLoadRenderMode(void);
@@ -786,13 +788,17 @@ EVT_END()
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+static inline void ext_init_pos(ExtPose* pose, f32 angle, f32 dist) {
+    pose->mtx[0][3] = dist * chb_sin_x2(angle);
+    pose->mtx[1][3] = 0.0f;
+    pose->mtx[2][3] = dist * chb_cos(angle);
+}
+
 static void ext_init(void) {
     s32 i;
     BomWork* wp;
     ExtPose* pose;
     f32 angle;
-    f32 dist;
-    f32 sv;
 
     lp = smartAlloc(sizeof(BomWork), 1);
     wp = lp->address;
@@ -808,12 +814,7 @@ static void ext_init(void) {
         pose->flags |= 7;
         PSMTXIdentity(pose->mtx);
         angle = 6.2831855f * rand() / 32767.0f;
-        dist = 500.0f + 400.0f * rand() / 32767.0f;
-        sv = chb_sin(angle);
-        pose->mtx[0][3] = dist * sv;
-        pose->mtx[1][3] = 0.0f;
-        sv = chb_cos(angle);
-        pose->mtx[2][3] = dist * sv;
+        ext_init_pos(pose, angle, 500.0f + 400.0f * rand() / 32767.0f);
         pose_change(i, "R_1");
     }
 }
@@ -848,7 +849,8 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
     pose->rot = angleABf(x, z, pose->mtx[0][3], pose->mtx[2][3]);
     if (i % 20 == 0 && !(wp->flags & 1)) {
         Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-        psndSFXOn_3D("SFX_STG7_BOMB_TOGETHER2", &pos);
+        // FAKE: (char*)(u32) cast makes the front end hoist the literal address (same pointer value)
+        psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_TOGETHER2", &pos);
     }
 }
 
@@ -856,24 +858,25 @@ void jump(s32 i, s32 next, f32 x, f32 y, f32 z, f32 speed, f32 gravity) {
 #pragma opt_lifetimes off
 static void ext_main(void) {
     
+    s32 i;
     BomWork* wp = lp->address;
     ExtPose* pose = extGetPosePtr();
-    s32 i;
+    f32 z;
+    f32 speed;
+    f32 gravity;
+    f32 new_var2;
+    f32 dist;
     f32 angle;
-    f32  speed;
-    f32 gravity; f32 new_var2 ;
-    f32 x;
-    f32 z; f32 dist ;
     f32 rad;
     Mtx m1;
     Mtx m2;
     Mtx m3;
-    const char* se = "SFX_STG7_BOMB_FALL1";
 
     for (i = 0; i < wp->count; i++, pose++) {
         Vec center = {0.0f, 0.0f, 0.0f};
         Vec pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-        Vec dir; Vec move = {0.0f, 0.0f, 0.0f};
+        Vec move = {0.0f, 0.0f, 0.0f};
+        Vec dir;
 
         switch ((s8)wp->bom[i].state) {
             case 0:
@@ -896,27 +899,28 @@ static void ext_main(void) {
                 gravity = 0.1f + (( 0.1f * rand() ) / 32767.0f) ;
                 speed = 3.0f + ( rand() / 32767.0f) ;
                 z = dist * ( -chb_cos(angle) );
-                x = dist * chb_sin(angle);
-                jump(i, 2, x, 150.0f, z, speed, gravity);
+                jump(i, 2, dist * chb_sin(angle), 150.0f, z, speed, gravity);
                 break;
             case 2:
                 angle = ( 6.2831855f * rand() ) / 32767.0f;
                 dist = 50.0f + (( 30.0f * rand() ) / 32767.0f) ;
-                x = ( 0.1f * rand() ) / 32767.0f; gravity = 0.1f + x ;
+                z = 0.1f + (( 0.1f * rand() ) / 32767.0f);
                 speed = 3.0f + ( rand() / 32767.0f) ;
-                z = dist * ( -chb_cos(angle) );
-                x = dist * chb_sin(angle);
-                jump(i, 3, x, 400.0f, z, speed, gravity);
+                gravity = dist * ( -chb_cos(angle) );
+                dist = dist * chb_sin(angle);
+                jump(i, 3, dist, 400.0f, gravity, speed, z);
                 break;
             case 3:
                 angle = ( 6.2831855f * rand() ) / 32767.0f;
                 dist = ( 70.0f * rand() ) / 32767.0f;
-                // correctness: target keeps gravity = 0.1f (+196) and speed = 3.0f; both rand() results unused
-                gravity = 0.1f + ((0.0f * rand()) / 32767.0f);
-                speed = 3.0f + ((0.0f * rand()) / 32767.0f);
-                z = dist * ( -chb_cos(angle)) ;
-                x = ( dist * chb_sin(angle) ) + (100.0f + ( i % 100) );
-                jump(i, 4, x, 350.0f + ( i % 150) , z, speed, gravity);
+                // correctness: target keeps z = 0.1f (+196) and speed = 3.0f; both rand() results unused
+                rand();
+                z = 0.1f;
+                rand();
+                speed = 3.0f;
+                gravity = dist * ( -chb_cos(angle)) ;
+                dist = ( dist * chb_sin(angle) ) + (100.0f + ( i % 100) );
+                jump(i, 4, dist, 350.0f + ( i % 150) , gravity, speed, z);
                 break;
             case 4:
                 wp->bom[i].state++;
@@ -941,7 +945,7 @@ static void ext_main(void) {
                     pose->mtx[1][3] = pose->mtx[1][3] - 2.0f;
                     pose->flags &= ~2;
                     PSMTXTrans(m1, 0.0f, -20.0f, 0.0f);
-                    PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * (( f32)sin((gp->retraceCount + i) / 100.0f) )));
+                    new_var2 = (f32)sin((i + gp->retraceCount) / 100.0f); PSMTXRotRad(m2, 'z', 0.017453292f * (10.0f * new_var2));
                     PSMTXTrans(m3, 0.0f, 20.0f, 0.0f);
                     PSMTXConcat(m1, m2, m2);
                     PSMTXConcat(m2, m3, m3);
@@ -949,7 +953,8 @@ static void ext_main(void) {
                     PSMTXConcat(m1, m3, pose->mtx);
                     if (irand(100) == 0) {
                         Vec p = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
-                        psndSFXOn_3D(se, &p);
+                        // FAKE: (char*)(u32) cast, see jump()
+                        psndSFXOn_3D((char*)(u32)"SFX_STG7_BOMB_FALL1", &p);
                     }
                 }
                 break;

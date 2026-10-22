@@ -325,7 +325,7 @@ static s32 attack_event[] = {
     (s32)"A_3", 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 196699,
     (s32)btlevtcmd_SetMoveSpeed, -2, -229989760, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 50,
     524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1,
-    0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HANNYA_MOVE3", -250000000, 0, -250000000,
+    0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_HANNYA_MOVE3\0\0\0", -250000000, 0, -250000000,
     327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetMoveSpeed,
     -2, -229994880, 262235, (s32)btlevtcmd_FaceDirectionSub, -29999997, -30000000, 30, 524379,
     (s32)btlevtcmd_MovePosition, -2, -30000000, -29999999, -29999998, 0, -1, 0,

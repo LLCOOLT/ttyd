@@ -25,7 +25,7 @@ EffectEntry* effScanningEntry(s32 int2, f32 float3, f32 float4, f32 float5) {
 	
 	
 	entry = effEntry();
-	entry->type = "Scanning";
+	entry->type = "Scanning\0\0\0";
 	entry->count = 1;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effScanningData) * entry->count);
 	entry->userdata = data;

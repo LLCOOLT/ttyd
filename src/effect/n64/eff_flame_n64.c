@@ -134,7 +134,7 @@ EffectEntry* effFlameN64Entry(s32 type, f32 x, f32 y, f32 z, f32 scale) {
     EffFlameN64Work* work;
 
     effect = effEntry();
-    effect->type = "FlameN64\0\0\0\0\0\0\0";
+    effect->type = "FlameN64\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffFlameN64Work));
     effect->userdata = work;

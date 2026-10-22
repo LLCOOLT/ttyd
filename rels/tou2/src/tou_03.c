@@ -2998,6 +2998,7 @@ void screen_tev(MapTevCallbackInfo* info) {
     s32 n;
     s32 len;
     s32 off;
+    s32 w;
     s32 start;
     u8 col;
     s32 y0;
@@ -3011,10 +3012,8 @@ void screen_tev(MapTevCallbackInfo* info) {
         if (screen_wp->mode) {
             buf = screen_wp->noise;
             for (i = 0; i < 64; i++) {
-                by = i / 4;
-                ry = i % 4;
                 for (j = 0; j < 64; j++) {
-                    off = (j / 8) * 32 + (by << 8); off += j % 8; off += (ry << 3); buf[off] = (i & 1) ? 0xFF : 0;
+                    by = i / 4; ry = i % 4; off = (j / 8) * 32 + (by << 8); buf[off + ry * 8 + j % 8] = (i & 1) ? 0xFF : 0;
                 }
                 n = rand() % 100 + 100;
                 y0 = by * 256;
@@ -3024,7 +3023,7 @@ void screen_tev(MapTevCallbackInfo* info) {
                     start = rand() % (65 - len);
                     col = rand() % 256;
                     for (j = start; j < start + len; j++) {
-                        off = j / 8 * 32; off = off + y0; off += j % 8; off += y1; buf[off] = col;
+                        off = j / 8 * 32; off = off + y0; w = off + j % 8; w += y1; buf[w] = col;
                     }
                 }
             }

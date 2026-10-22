@@ -410,7 +410,7 @@ static s32 attack_event[] = {
     -229938560, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TOGEDA_MOVE4", -250000000, 0,
     -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"TGD_N_1", 65546, 1500,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"TGD_J_1", 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_ENM_TOGEDA_MOVE5", -250000000, 0, -250000000, 65540, 98, 65539, 91,
+    (s32)"SFX_ENM_TOGEDA_MOVE5\0\0\0", -250000000, 0, -250000000, 65540, 98, 65539, 91,
     393307, (s32)evt_btl_camera_shake_h, 0, 1, 1, 8, 0, 196699,
     (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom, 0, -50, 196699,
     (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_togedaruma_attack, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,

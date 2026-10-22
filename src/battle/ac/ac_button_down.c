@@ -25,17 +25,17 @@ static u32 _button_table[7] = {0x100, 0x200, 0x400, 0x800, 0x40, 0x20, 0x10};
 static void actionCommandDisp(s32 unused, f32 x, f32 y);
 
 void *memset(void *dest, int ch, size_t count);
+// FAKE: the button[]/pressed[] indexes are cast (u32) (i, j >= 0 there, same value);
+// the cast stops IR strength reduction so the backend emits the target addi/lwzx
+// and the shared offset IV. allDone is declared first for the register order.
 s32 battleAcMain_ButtonDown(BattleWork *work)
 {
-  s32 off;
   BattleActions *ac = &work->actionCommands;
   BDWork *p = (BDWork *) (((u8 *) work) + 0x1f4c);
   u8 *disp = ((u8 *) work) + 0x1f20;
-  s32 i;
-  s32 off2;
-  s32 k;
-  s32 done;
   s32 allDone;
+  s32 i;
+  s32 done;
   s32 flag = 0;
   const char *sfx;
   if (*(((u8 *) ac->mAcUnit) + 0x303))
@@ -57,39 +57,39 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
         ((s32 *) disp)[8] = 20;
         memset(p->button, 0, 0x34);
         memset(p->pressed, 1, 0x34);
-        for (off = 0, i = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); off += 4, i++)
+        for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); i++)
         {
           switch (*((s32 *) (((u8 *) work) + 0x1cd4)))
           {
             case -2:
-              *((u32 *) (((u8 *) p) + (off + 8))) = (irand(100) < 50) ? (0x100) : (0x200);
-              *((s32 *) (((u8 *) p) + (off + 0x3c))) = 0;
+              p->button[(u32)i] = (irand(100) < 50) ? (0x100) : (0x200);
+              p->pressed[(u32)i] = 0;
               break;
 
             case -4:
-              *((u32 *) (((u8 *) p) + (off + 8))) = (irand(100) < 50) ? (0x200) : (0x400);
-              *((s32 *) (((u8 *) p) + (off + 0x3c))) = 0;
+              p->button[(u32)i] = (irand(100) < 50) ? (0x200) : (0x400);
+              p->pressed[(u32)i] = 0;
               break;
 
             case -3:
               if ((*((u32 *) (((u8 *) work) + 0x1cc4))) & 4)
             {
-              *((u32 *) (((u8 *) p) + (off + 8))) = _button_table[irand(4)];
-              *((s32 *) (((u8 *) p) + (off + 0x3c))) = 0;
+              p->button[(u32)i] = _button_table[irand(4)];
+              p->pressed[(u32)i] = 0;
             }
             else
             {
               s32 found = 0;
               u32 cand;
-              s32 ok;
               while (!found)
               {
                 s32 j;
+                s32 ok;
                 cand = _button_table[irand(4)];
                 ok = 1;
-                for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4)
+                for (j = i - 1; j >= 0; j--)
                 {
-                  if (cand == (*((u32 *) (((u8 *) p) + (k + 8)))))
+                  if (p->button[(u32)j] == cand)
                   {
                     ok = 0;
                   }
@@ -101,8 +101,8 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
                 }
               }
 
-              *((u32 *) (((u8 *) p) + (off + 8))) = cand;
-              *((s32 *) (((u8 *) p) + (off + 0x3c))) = 0;
+              p->button[(u32)i] = cand;
+              p->pressed[(u32)i] = 0;
             }
               break;
 
@@ -110,15 +110,15 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
             {
               s32 found = 0;
               u32 cand;
-              s32 ok;
               while (!found)
               {
                 s32 j;
+                s32 ok;
                 cand = _button_table[irand(7)];
                 ok = 1;
-                for (j = i - 1, k = j * 4; j >= 0; j--, k -= 4)
+                for (j = i - 1; j >= 0; j--)
                 {
-                  if (cand == (*((u32 *) (((u8 *) p) + (k + 8)))))
+                  if (p->button[(u32)j] == cand)
                   {
                     ok = 0;
                   }
@@ -130,8 +130,8 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
                 }
               }
 
-              *((u32 *) (((u8 *) p) + (off + 8))) = cand;
-              *((s32 *) (((u8 *) p) + (off + 0x3c))) = 0;
+              p->button[(u32)i] = cand;
+              p->pressed[(u32)i] = 0;
               break;
             }
 
@@ -183,18 +183,18 @@ s32 battleAcMain_ButtonDown(BattleWork *work)
       }
         *((s32 *) (&ac->outputParams[0])) = 0;
         done = 1;
-        for (i = 0, off2 = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); i++, off2 += 4)
+        for (i = 0; i < (*((s32 *) (((u8 *) work) + 0x1cd0))); i++)
       {
-        if (*((u32 *) (((u8 *) p) + (off2 + 8))))
+        if (p->button[(u32)i])
         {
-          if (*((s32 *) (((u8 *) p) + (off2 + 0x3c))))
+          if (p->pressed[(u32)i])
           {
             (*((s32 *) (&ac->outputParams[0])))++;
           }
           else
-            if (((*((u32 *) (((u8 *) p) + (off2 + 8)))) == BattlePadGetTrigger()) || flag)
+            if (((p->button[(u32)i]) == BattlePadGetTrigger()) || flag)
           {
-            *((s32 *) (((u8 *) p) + (off2 + 0x3c))) = 1;
+            p->pressed[(u32)i] = 1;
             (*((s32 *) (&ac->outputParams[0])))++;
             if ((*((s32 *) (((u8 *) work) + 0x1ccc))) == 1)
             {

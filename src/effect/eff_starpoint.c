@@ -101,6 +101,14 @@ static inline f32 _cosf(f32 x) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
+// FAKE: velocity/gravity stores moved into an inline helper with its own spd local (inline-local colouring of the sin/cos constants)
+static inline void spSetVel(EffStarPointWork* work, f32 angle) {
+    f32 spd;
+    work->velX = (spd = 2.0f) * _sinf(angle);
+    work->velZ = spd * _cosf(angle);
+    work->velY = 14.0f;
+    work->gravity = spd;
+}
 EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 delay;
     EffectEntry* effect;
@@ -108,7 +116,6 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
     s32 i;
     f32 r;
     f32 angle;
-    f32 speed;
 
     effect = effEntry();
     effect->type = "StarPoint";
@@ -129,10 +136,7 @@ EffectEntry* effStarPointEntry(s32 type, s32 count, f32 x, f32 y, f32 z) {
         work->position.y = 0.0f;
         work->position.z = 0.0f;
         angle = r * 6.2831855f / 360.0f;
-        work->velX = (speed = 2.0f) * _sinf(angle);
-        work->velZ = speed * _cosf(angle);
-        work->velY = 14.0f;
-        work->gravity = speed;
+        spSetVel(work, angle);
         work->alpha = 0;
         work->delay = delay;
     }

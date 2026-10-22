@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -80,24 +81,29 @@ extern s32 escape_chorogun_event[];
 extern s32 evt_eff[];
 extern s32 weaponGetPowerDefault[];
 
-__declspec(section ".data") u64 fd_chorobon_gundan_negone_one_374;
-__declspec(section ".data") s32 fd_chorobon_gundan_neg_one_382[1];
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PI_383[1];
-__declspec(section ".data") s32 fd_chorobon_gundan___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_chorobon_gundan_one_negone_373;
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_chorobon_gundan_one_381[1];
-__declspec(section ".data") u64 fd_chorobon_gundan_negone_one_360;
-__declspec(section ".data") s32 fd_chorobon_gundan_neg_one_365[1];
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PI_366[1];
-__declspec(section ".data") s32 fd_chorobon_gundan___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_chorobon_gundan_one_negone_359;
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_chorobon_gundan_one_364[1];
+__declspec(section ".data") u64 negone_one$374;
+__declspec(section ".data") s32 neg_one$382[1];
+__declspec(section ".data") s32 __local_PI$383[1];
+__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") u32 gap_04_0000FF9C_data[1];
+__declspec(section ".data") u64 one_negone$373;
+__declspec(section ".data") s32 __local_PIO2$384[1];
+__declspec(section ".data") s32 one$381[1];
+__declspec(section ".data") u64 negone_one$360;
+__declspec(section ".data") s32 neg_one$365[1];
+__declspec(section ".data") s32 __local_PI$366[1];
+__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") u32 gap_04_0000FFC4_data[1];
+__declspec(section ".data") u64 one_negone$359;
+__declspec(section ".data") s32 __local_PIO2$367[1];
+__declspec(section ".data") s32 one$364[1];
 BattleUnitKind unit_chorobon_gundan;
-static __declspec(section ".data") BattleUnitDefense defence;
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
-static __declspec(section ".data") StatusVulnerability regist;
+typedef struct { BattleUnitDefense v; u8 pad[3]; } DefencePad;
+typedef struct { BattleUnitDefenseAttr v; u8 pad[3]; } DefenceAttrPad;
+typedef struct { StatusVulnerability v; u8 pad[2]; } RegistPad;
+static __declspec(section ".data") DefencePad defence;
+static __declspec(section ".data") DefenceAttrPad defence_attr;
+static __declspec(section ".data") RegistPad regist;
 static PoseTableEntry pose_table[15];
 static __declspec(section ".data") BattleDataEntry data_table[2];
 static BattleUnitKindPart parts[1];
@@ -124,51 +130,55 @@ BattleUnit* chorogun_get_ptr(void) {
     return NULL;
 }
 
-__declspec(section ".data") u64 fd_chorobon_gundan_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_chorobon_gundan_neg_one_382[] = {
+__declspec(section ".data") s32 neg_one$382[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PI_383[] = {
+__declspec(section ".data") s32 __local_PI$383[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_3PIO2_385[] = {
+__declspec(section ".data") s32 __local_3PIO2$385[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_chorobon_gundan_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_0000FF9C_data[1] = {0};
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PIO2_384[] = {
+__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$384[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan_one_381[] = {
+__declspec(section ".data") s32 one$381[] = {
     1065353216,
 };
 
-__declspec(section ".data") u64 fd_chorobon_gundan_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_chorobon_gundan_neg_one_365[] = {
+__declspec(section ".data") s32 neg_one$365[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PI_366[] = {
+__declspec(section ".data") s32 __local_PI$366[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_3PIO2_368[] = {
+__declspec(section ".data") s32 __local_3PIO2$368[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_chorobon_gundan_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_0000FFC4_data[1] = {0};
 
-__declspec(section ".data") s32 fd_chorobon_gundan___local_PIO2_367[] = {
+__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$367[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_chorobon_gundan_one_364[] = {
+__declspec(section ".data") s32 one$364[] = {
     1065353216,
 };
 
@@ -231,18 +241,18 @@ BattleUnitKind unit_chorobon_gundan = {
     "SFX_BTL_DAMAGE_ICE1",
     "SFX_BTL_DAMAGE_BIRIBIRI1",
     0x240000,
-    &regist,
+    &regist.v,
     1,
     parts,
     init_event,
     data_table,
 };
 
-static __declspec(section ".data") BattleUnitDefense defence = {{0, 0, 0, 0, 0}};
+static __declspec(section ".data") DefencePad defence = {{{0, 0, 0, 0, 0}}, {0}};
 
-static __declspec(section ".data") BattleUnitDefenseAttr defence_attr = {{0, 0, 0, 0, 0}};
+static __declspec(section ".data") DefenceAttrPad defence_attr = {{{0, 0, 0, 0, 0}}, {0}};
 
-static __declspec(section ".data") StatusVulnerability regist = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+static __declspec(section ".data") RegistPad regist = {{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}, {0}};
 
 static PoseTableEntry pose_table[] = {
     {1, "CBN_N_1"},
@@ -268,7 +278,7 @@ static __declspec(section ".data") BattleDataEntry data_table[] = {
 };
 
 static BattleUnitKindPart parts[] = {
-    {1, "btl_un_chorobon_gundan", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence, &defence_attr, 0x3000009, 0, pose_table},
+    {1, "btl_un_chorobon_gundan", "c_chorobon", 0.0f, 0.0f, 0.0f, 0.0f, 25.0f, 0.0f, 0.0f, 30.0f, 0.0f, 20, 30, 255, &defence.v, &defence_attr.v, 0x3000009, 0, pose_table},
 };
 
 s32 weapon_chorobon_gundan_attack[] = {

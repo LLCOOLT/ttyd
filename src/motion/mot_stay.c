@@ -238,7 +238,7 @@ void mot_stay(void) {
 			break;
 		case 3:
 			if ((s32)--mario->multiTimer < 0) {
-				marioChgEvtPose("M_N_5A");
+				marioChgEvtPose("M_N_5A\0");
 				mario->multiTimer = 0;
 				mario->currSubMotionId = 4;
 				MW(mario, 0x2B4, s32) = 0;

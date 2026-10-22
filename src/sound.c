@@ -1105,9 +1105,12 @@ inline void SoundEfxCheckCh(s32 chan) {
     }
 }
 
+// FAKE: opt_strength_reduction off for this function only. With it on, the second loop's chan*sizeof offset becomes an
+// induction temp created before the loop's split temps and gets the highest register; the target has the effect
+// pointer (second web of the reused `effect`) r30, i r29, the offset r28 (mwregdump, phase 5).
+#pragma opt_strength_reduction off
 void SoundEfxMain(void) {
     SND_FVECTOR* dir;
-    SoundEffect* e2;
     SoundEffect* effect;
     int i;
     f32 v10;
@@ -1153,16 +1156,16 @@ void SoundEfxMain(void) {
         }
     }
 
-    for (e2 = sound.effects, i = 0; i < 40; e2++, i++) {
-        if (e2->flags) {
-            if (!(e2->flags & 0x10)) {
+    for (effect = sound.effects, i = 0; i < 40; i++, effect++) {
+        if (effect->flags) {
+            if (!(effect->flags & 0x10)) {
                 SoundEfxCheckCh(i);
             } else {
-                if (!sndCheckEmitter(&e2->emitter)) {
+                if (!sndCheckEmitter(&effect->emitter)) {
                     SoundEfxMuteCh(i);
                 }
-                if (e2->unkA) {
-                    e2->unkA--;
+                if (effect->unkA) {
+                    effect->unkA--;
                 } else {
                     SoundEfxCheckCh(i);
                 }
@@ -1170,6 +1173,7 @@ void SoundEfxMain(void) {
         }
     }
 }
+#pragma opt_strength_reduction reset
 
 inline void SoundDVDStopCh(s32 chan) {
     SoundDVD* dvd = &sound.dvds[chan];
@@ -1901,7 +1905,7 @@ void SoundSSStopCh(s32 chan) {
     SoundStream* stream;
 
     if (sound.streams[chan].flags) {
-        stream = (0, &sound.streams[chan]);
+        stream = &sound.streams[chan];
         SoundIntOff();
         if (stream->flags & 0x400) {
             sound.slotUsed[stream->slot] = 0;
@@ -1943,10 +1947,11 @@ void SoundSSContinueCh(s32 chan) {
 }
 
 void SoundSSSetPanCh(s32 chan, u8 pan) {
-    SoundStream* stream = (0, &sound.streams[chan]);
+    SoundStream* stream;
     f32 left, right;
 
-    if (stream->flags) {
+    if (sound.streams[chan].flags) {
+        stream = &sound.streams[chan];
         stream->pan = pan;
         if (stream->flags & 8) {
             if (stream->count == 1) {
@@ -2038,7 +2043,7 @@ void SoundSSMain(void) {
     SoundStream* stream;
 
     for (i = 0; (int)i < 3; i++) {
-        stream = (0, &sound.streams[i]);
+        stream = &sound.streams[i];
         if ((stream->flags & 8) && !(stream->flags & 2)) {
             if (stream->flags & 4) {
                 stream->flags &= ~4;

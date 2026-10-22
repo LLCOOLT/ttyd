@@ -2081,7 +2081,7 @@ EVT_END()
 USER_FUNC(get_password) {
     s32* args = event->args;
 
-    evtSetValue(event, args[0], (s32)msgSearch("stg7_aji_password"));
+    evtSetValue(event, args[0], (s32)msgSearch("stg7_aji_password\0\0"));
     return EVT_RETURN_DONE;
 }
 

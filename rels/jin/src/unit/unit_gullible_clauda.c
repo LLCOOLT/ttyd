@@ -303,7 +303,7 @@ static s32 attack_event_clauda[] = {
     131096, -29999994, 2, 196699, (s32)btlevtcmd_StartAvoid, -29999997, 40, 33,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PWD_A1_2", 131163, (s32)btlevtcmd_JumpContinue, -2,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PWD_D_3", 65545, 30, 65540,
-    95, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_CLAUD_ATTACK2", -250000000, 0,
+    95, 33, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_CLAUD_ATTACK2\0\0", -250000000, 0,
     -250000000, 196699, (s32)btlevtcmd_ResultACDefence, -29999997, -29999988, 458843, (s32)btlevtcmd_CheckDamage, -2,
     -29999997, -29999996, -29999988, 256, -29999995, 131163, (s32)btlevtcmd_JumpContinue, -2,
     393307, (s32)evt_btl_camera_shake_h, 0, 8, 0, 30, 13, 65647,

@@ -224,19 +224,19 @@ void btlDispTexPlainGX(u32 id, GXColor color0, GXColor color1, GXColor color2, G
 	GXBegin(GX_QUADS, GX_VTXFMT0, 4);
 
 	GXPosition3f32(-x, y, 0.0f);
-	GXWGFifo.u8 = color0.r; GXWGFifo.u8 = color0.g; GXWGFifo.u8 = color0.b; GXWGFifo.u8 = color0.a;
+	GXColor4u8(color0.r, color0.g, color0.b, color0.a);
 	GXTexCoord2f32(0.0f, 0.0f);
 
 	GXPosition3f32(x, y, 0.0f);
-	GXWGFifo.u8 = color1.r; GXWGFifo.u8 = color1.g; GXWGFifo.u8 = color1.b; GXWGFifo.u8 = color1.a;
+	GXColor4u8(color1.r, color1.g, color1.b, color1.a);
 	GXTexCoord2f32(1.0f, 0.0f);
 
 	GXPosition3f32(x, -y, 0.0f);
-	GXWGFifo.u8 = color2.r; GXWGFifo.u8 = color2.g; GXWGFifo.u8 = color2.b; GXWGFifo.u8 = color2.a;
+	GXColor4u8(color2.r, color2.g, color2.b, color2.a);
 	GXTexCoord2f32(1.0f, 1.0f);
 
 	GXPosition3f32(-x, -y, 0.0f);
-	GXWGFifo.u8 = color3.r; GXWGFifo.u8 = color3.g; GXWGFifo.u8 = color3.b; GXWGFifo.u8 = color3.a;
+	GXColor4u8(color3.r, color3.g, color3.b, color3.a);
 	GXTexCoord2f32(0.0f, 1.0f);
 }
 

@@ -149,22 +149,19 @@ s32 bottakuruComp(const void** sortA, const void** sortB) {
 
 void badgeShop_bottakuruGeneration(void) {
 	s32 table[0x11][2];
-	s32* p;
 	s32 i;
 	s32 k;
 	s32 count;
 	s32 j;
 	s32 m;
 
-	for (m = 0; m < sizeof(table) / sizeof(table[0]); m++) {
-		table[m][1] = 200;
-		table[m][0] = 0;
+	for (i = 0; i < sizeof(table) / sizeof(table[0]); i++) {
+		table[i][1] = 200;
+		table[i][0] = 0;
 	}
 
-	i = 0;
-	p = (s32*)table;
 	k = 0;
-	for (; i < BADGE_MAX - 1; i++) {
+	for (i = 0; i < BADGE_MAX - 1; i++) {
 		count = (s16)badgeShop_get(bdsw->bottakuru_table, (s16)(i + 1));
 		for (j = 0; j < count; j++) {
 			table[k][1] = irand(100);
@@ -178,15 +175,13 @@ void badgeShop_bottakuruGeneration(void) {
 
 	qqsort(table, 0x11, 8, bottakuruComp);
 
-	i = 0;
-	do {
+	for (i = 0; i < 4; i++) {
 		for (m = 0; m < sizeof(badge_bottakuru_table) / sizeof(badge_bottakuru_table[0]); m++) {
-			if (p[0] == badge_bottakuru_table[m]) {
+			if (table[i][0] == badge_bottakuru_table[m]) {
 				evtSetValue(NULL, i + GSW(118), m);
 			}
 		}
-		p += 2;
-	} while (++i < 4);
+	}
 }
 
 void badgeShop_bteresaGeneration(void) {

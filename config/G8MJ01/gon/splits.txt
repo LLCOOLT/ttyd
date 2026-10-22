@@ -30,7 +30,7 @@ gon_03.c:
 	.bss        start:0x00000000 end:0x00000018
 
 gon_04.c:
-	.rodata     start:0x00000810 end:0x00000C50
+	.rodata     start:0x00000810 end:0x00000C4C
 	.data       start:0x00003188 end:0x000057B0
 
 gon_05.c:
@@ -43,7 +43,7 @@ gon_06.c:
 	.data       start:0x000072C8 end:0x00008850
 
 gon_07.c:
-	.rodata     start:0x00001248 end:0x00001390
+	.rodata     start:0x00001248 end:0x0000138C
 	.data       start:0x00008850 end:0x00009498
 
 gon_08.c:
@@ -51,16 +51,16 @@ gon_08.c:
 	.data       start:0x00009498 end:0x0000A6A0
 
 gon_09.c:
-	.rodata     start:0x00001630 end:0x00001820
+	.rodata     start:0x00001630 end:0x0000181C
 	.data       start:0x0000A6A0 end:0x0000B460
 
 gon_10.c:
-	.rodata     start:0x00001820 end:0x000018A0
+	.rodata     start:0x00001820 end:0x0000189C
 	.data       start:0x0000B460 end:0x0000B780
 
 gon_11.c:
 	.text       start:0x000014B0 end:0x00001F70
-	.rodata     start:0x000018A0 end:0x00001D80
+	.rodata     start:0x000018A0 end:0x00001D7C
 	.data       start:0x0000B780 end:0x0000D630
 	.bss        start:0x00000018 end:0x00000020
 
@@ -88,7 +88,7 @@ unit/unit_honenoko.c:
 
 unit/unit_kuriboo.c:
 	.text       start:0x0000249C end:0x000025B4
-	.rodata     start:0x00002B98 end:0x00002CF0
+	.rodata     start:0x00002B98 end:0x00002CEC
 	.data       start:0x00016680 end:0x00017218
 
 unit/unit_red_honenoko.c:
@@ -111,7 +111,7 @@ unit/unit_patapata.c:
 
 unit/unit_togekuri.c:
 	.text       start:0x0000276C end:0x00002AA4
-	.rodata     start:0x00003600 end:0x000037C0
+	.rodata     start:0x00003600 end:0x000037BC
 	.data       start:0x0001DA38 end:0x0001EAD8
 
 gon_13.c:

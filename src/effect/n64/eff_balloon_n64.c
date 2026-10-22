@@ -94,7 +94,7 @@ EffectEntry* effBalloonN64Entry(s32 type, f32 x, f32 y, f32 z, f32 targetScale, 
     EffBalloonN64Work* work;
 
     effect = effEntry();
-    effect->type = "BalloonN64\0\0\0\0\0";
+    effect->type = "BalloonN64\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffBalloonN64Work));
     effect->userdata = work;

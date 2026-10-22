@@ -549,7 +549,7 @@ static s32 drain_attack_event[] = {
     0, 0, 0, 0, 0, 33, 327771, (s32)btlevtcmd_SetScale,
     -2, -229998976, -229998976, -229998976, 33, 65541, 2, 327771,
     (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131125, -29999999, 30,
-    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -2, (s32)"SFX_ENM_CHORO2_ATTACK3", 0, 0, -1, -1,
+    589915, (s32)btlevtcmd_SetMoveSoundDataWork, -2, (s32)"SFX_ENM_CHORO2_ATTACK3\0", 0, 0, -1, -1,
     0, 0, 65541, 2, 327771, (s32)btlevtcmd_AddScale, -2, -229999837,
     -230000245, 0, 65545, 1, 6, 327771, (s32)btlevtcmd_SetScale, -2,
     -229998976, -229998976, -229998976, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999,

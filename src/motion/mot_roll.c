@@ -522,6 +522,10 @@ void mot_roll(void) {
     f32 v27;
     f32 v26;
     f32 tcA;
+    f32 nx;
+    f32 nz;
+    f32 a31;
+    f32 b31;
     if (mario->trigFlags & 1) {
         mario->trigFlags &= ~1;
         mario->flags &= ~0xF0000;
@@ -822,24 +826,24 @@ void mot_roll(void) {
     }
     v29 = RW()->x;
     v28 = RW()->z;
-    v27 = 0.0f;
-    v30 = v27;
+    nx = 0.0f;
+    nz = nx;
     if (!(mario->flags & 0x30000)) {
         f32 a26, a30;
         a26 = (f32)(s32)(s8)mario->wStickDir1;
         a30 = (f32)(s32)(s8)mario->wStickDir2;
-        v27 = distABf(v30, v30, a26, a30);
+        nz = distABf(nx, nx, a26, a30);
         v31 = angleABf(0.0f, 0.0f, a26, a30);
         v31 = revise360(mario->targetYaw + v31);
         v26 = 3.1415927f * v31 / 180.0f;
-        v30 = v27 * (f32)sin(v26);
-        v27 = v27 * -(f32)cos(v26);
-        v31 = angleABf(0.0f, 0.0f, v30, v27);
+        nx = nz * (f32)sin(v26);
+        nz = nz * -(f32)cos(v26);
+        v31 = angleABf(0.0f, 0.0f, nx, nz);
         tcA = MF(0x1a0);
         if (angOut(tcA, 135.0f, v31) == 1) {
-            v27 = distABf(0.0f, 0.0f, v30, v27);
-            v30 = -v27 * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
-            v27 = v27 * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
+            nz = distABf(0.0f, 0.0f, nx, nz);
+            nx = -nz * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
+            nz = nz * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
         }
     }
     if (!(mario->flags & 0x30000) && !(MI(0x2a4) & 0x20)) {
@@ -847,47 +851,51 @@ void mot_roll(void) {
         if (MF(0x220) > 0.05f) {
             v26 = (v31 > 180.0f) ? rollData[5] : rollData[6];
             {
-                f32 t = (f32)sin(3.1415927f * MF(0x220) / 180.0f) * v26;
-                v30 = v30 - t;
+                f32 t = (f32)sin(3.1415927f * MF(0x220) / 180.0f);
+                t = t * v26;
+                nx = nx - t;
             }
-            if (v30 <= -100.0f) {
-                v30 = -100.0f;
+            if (nx <= -100.0f) {
+                nx = -100.0f;
             }
         } else if (MF(0x220) < -0.05f) {
             v26 = (v31 < 180.0f) ? rollData[5] : rollData[6];
             {
-                f32 t = (f32)sin(3.1415927f * MF(0x220) / 180.0f) * v26;
-                v30 = v30 - t;
+                f32 t = (f32)sin(3.1415927f * MF(0x220) / 180.0f);
+                t = t * v26;
+                nx = nx - t;
             }
-            if (v30 >= 100.0f) {
-                v30 = 100.0f;
+            if (nx >= 100.0f) {
+                nx = 100.0f;
             }
         }
         if (MF(0x218) > 0.05f) {
             v26 = (v31 > 180.0f) ? rollData[5] : rollData[6];
             {
-                f32 t = (f32)sin(3.1415927f * MF(0x218) / 180.0f) * v26;
-                v27 = v27 - t;
+                f32 t = (f32)sin(3.1415927f * MF(0x218) / 180.0f);
+                t = t * v26;
+                nz = nz - t;
             }
-            if (v27 <= -100.0f) {
-                v27 = -100.0f;
+            if (nz <= -100.0f) {
+                nz = -100.0f;
             }
         } else if (MF(0x218) < -0.05f) {
             v26 = (v31 < 180.0f) ? rollData[5] : rollData[6];
             {
-                f32 t = (f32)sin(3.1415927f * MF(0x218) / 180.0f) * v26;
-                v27 = v27 - t;
+                f32 t = (f32)sin(3.1415927f * MF(0x218) / 180.0f);
+                t = t * v26;
+                nz = nz - t;
             }
-            if (v27 >= 100.0f) {
-                v27 = 100.0f;
+            if (nz >= 100.0f) {
+                nz = 100.0f;
             }
         }
-        v31 = angleABf(0.0f, 0.0f, v30, v27);
+        v31 = angleABf(0.0f, 0.0f, nx, nz);
         tcA = MF(0x1a0);
         if (angOut(tcA, 135.0f, v31) == 1) {
-            v27 = distABf(0.0f, 0.0f, v30, -v27);
-            v30 = -v27 * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
-            v27 = v27 * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
+            nz = distABf(0.0f, 0.0f, nx, -nz);
+            nx = -nz * (f32)sin(3.1415927f * MF(0x1a0) / 180.0f);
+            nz = nz * (f32)cos(3.1415927f * MF(0x1a0) / 180.0f);
         }
     }
     if (*(void**)((u8*)mario + 0x1d8)) {
@@ -912,7 +920,7 @@ void mot_roll(void) {
             v28 = 0.0f;
         }
     }
-    if (mario->forceMoveTimer == 0 && !v30 && !v27) {
+    if (mario->forceMoveTimer == 0 && !nx && !nz) {
         if (mario->hitobjWall) {
             if (!marioChkBero(mario->hitobjWall)) {
                 f32 k = rollData[2];
@@ -961,7 +969,7 @@ void mot_roll(void) {
                 }
             }
         }
-        v31 = rollData[0] / 0.05f;
+        a31 = rollData[0] / 0.05f;
         v26 = 1.0f;
         if (mario->forceMoveTimer == 0 && __fabsf(MF(0x214)) >= v26) {
             f32 ang = angleABf(0.0f, 0.0f, v29, -v28);
@@ -980,21 +988,21 @@ void mot_roll(void) {
                 }
             }
         }
-        v31 = v31 * v26;
+        a31 = a31 * v26;
         v26 = v28 * v28;
-        if (v29 * v29 + v26 <= v31 * v31) {
-            v29 = v30 * 0.025f + v29;
+        if (v29 * v29 + v26 <= a31 * a31) {
+            v29 = nx * 0.025f + v29;
         } else {
-            f32 n = -v31;
-            v29 = v30 * 0.025f + v29;
+            f32 n = -a31;
+            v29 = nx * 0.025f + v29;
             if (v29 < n) {
                 v29 = n;
             }
-            if (v29 > v31) {
-                v29 = v31;
+            if (v29 > a31) {
+                v29 = a31;
             }
         }
-        v31 = rollData[0] / 0.05f;
+        b31 = rollData[0] / 0.05f;
         v30 = 1.0f;
         if (mario->forceMoveTimer == 0 && __fabsf(MF(0x214)) >= v30) {
             f32 ang = angleABf(0.0f, 0.0f, v29, -v28);
@@ -1013,17 +1021,17 @@ void mot_roll(void) {
                 }
             }
         }
-        v31 = v31 * v30;
-        if (v29 * v29 + v26 <= v31 * v31) {
-            v28 = v28 - v27 * 0.025f;
+        b31 = b31 * v30;
+        if (v29 * v29 + v26 <= b31 * b31) {
+            v28 = v28 - nz * 0.025f;
         } else {
-            f32 n = -v31;
-            v28 = v28 - v27 * 0.025f;
+            f32 n = -b31;
+            v28 = v28 - nz * 0.025f;
             if (v28 < n) {
                 v28 = n;
             }
-            if (v28 > v31) {
-                v28 = v31;
+            if (v28 > b31) {
+                v28 = b31;
             }
         }
     }

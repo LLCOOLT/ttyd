@@ -444,7 +444,7 @@ static s32 normal_attack_event[] = {
     (s32)"PKF_E_1", 65546, 150, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKF_A_1A",
     65546, 200, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAKKUN_ATTACK1", -250000000, 0,
     -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKF_A_1B", 65546, 200,
-    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKF_A_1C", 458843, (s32)btlevtcmd_PreCheckDamage, -2,
+    262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"PKF_A_1C\0\0\0", 458843, (s32)btlevtcmd_PreCheckDamage, -2,
     -29999997, -29999996, -29999991, 256, -29999995, 65570, -29999995, 65579,
     4, 65540, 90, 46, 65572, 3, 196699, (s32)btlevtcmd_StartAvoid,
     -29999997, 38, 65540, 90, 46, 65572, 6, 196699,

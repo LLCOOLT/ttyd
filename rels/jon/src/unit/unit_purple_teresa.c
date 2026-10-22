@@ -528,7 +528,7 @@ static s32 move_event_sub[] = {
     327771, (s32)btlevtcmd_AddRotate, -29999997, 0, -29999999, 0, 65545, 1,
     6, 112, 110, 65545, 30, 196699, (s32)btlevtcmd_GetUnitId, -2,
     -30000000, 131096, -29999997, -30000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1,
-    (s32)"T_1", 33, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE1", -250000000,
+    (s32)"T_1", 33, 112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_TELESA_MOVE1\0\0\0", -250000000,
     0, -250000000, 393307, (s32)btlevtcmd_GetPartsPos, -29999997, 1, -30000000, -29999999,
     -29999998, 131122, -29999999, 40, 655451, (s32)btlevtcmd_DivePosition, -29999997, -30000000,
     -29999999, -29999998, 60, 10, 4, 0, -1, 327771,

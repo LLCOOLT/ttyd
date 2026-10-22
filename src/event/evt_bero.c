@@ -1191,6 +1191,8 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	f32 dist;
 	f32 ox, oy;
 	BOOL xdone, ydone;
+	s32 frames;
+	f32 sx;
 
 	if (isFirstCall) {
 		event->savedTime = now;
@@ -1199,11 +1201,13 @@ USER_FUNC(evt_bero_move_mario_speed) {
 	angle = 6.2831855f * reviseAngle(angleABf(BeroSX, BeroSY, BeroEX, BeroEY)) / 360.0f;
 	s = sin(angle);
 	c = cos(angle);
-	dist = speed * sysMsec2Frame((s32)OSTicksToMilliseconds((u64)((s32)now - (s32)event->savedTime)));
+	frames = sysMsec2Frame((s32)OSTicksToMilliseconds((u64)((s32)now - (s32)event->savedTime)));
 	dx = speed * s;
 	dy = -(speed * c);
+	dist = speed * frames;
 	ox = s * dist;
-	marioGetPtr()->position.x = ox + BeroSX;
+	sx = BeroSX;
+	marioGetPtr()->position.x = sx + ox;
 	oy = -(c * dist);
 	marioGetPtr()->position.y = BeroSY + oy;
 	marioGetPtr()->position.z = BeroSZ;
@@ -1314,8 +1318,9 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	camRoadMain(&out, mario->position.x, *(f32*)((u8*)cam + 0x98), mario->position.z, mario->position.x, *(f32*)((u8*)cam + 0x98), mario->position.z, bank);
 	{
 	Vec pt = {0.0f, 0.0f, 0.0f};
-	Vec at = {0.0f, 0.0f, 0.0f};
 	pt.x = out.pos.x; pt.y = out.pos.y; pt.z = out.pos.z;
+	{
+	Vec at = {0.0f, 0.0f, 0.0f};
 	at.x = out.at.x; at.y = out.at.y; at.z = out.at.z;
 	cam->presetPos = cam->cameraPos;
 	cam->presetAt = cam->cameraAt;
@@ -1325,6 +1330,7 @@ USER_FUNC(evt_camera_change_event_from_road) {
 	cam->durationA = (u32)(500 * ((*(u32*)0x800000F8 / 4) / 1000));
 	cam->stateA = 3;
 	cam->curveA = 11;
+	}
 	}
 	return EVT_RETURN_DONE;
 }

@@ -237,7 +237,6 @@ USER_FUNC(unk_802399f8) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".sdata2") const u32 gap_10_80423334_sbss2;
 
 void winMgrInit(void) {
     static const u32 gap_09_80421AD4_sdata2 = 0;

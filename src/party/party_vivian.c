@@ -556,6 +556,5 @@ void vivian_use(VivianParty* party) {
 
 #pragma force_active on
 #pragma explicit_zero_data on
-__declspec(section ".data") u32 gap_05_8038BA54_data[1] = {0};
 #pragma explicit_zero_data reset
 #pragma force_active reset

@@ -392,4 +392,3 @@ void effPokopiThunderDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-__declspec(section ".sdata2") const u32 gap_10_80423224_sbss2;

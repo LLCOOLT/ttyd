@@ -97,7 +97,6 @@ void effSleepMain(EffectEntry* effect) {
 #pragma opt_lifetimes off
 
 void effSleepDisp(CameraId camId, EffectEntry* effect) {
-	int i;
 	s32 off;
 	f32 half;
 	f32 k;
@@ -113,8 +112,9 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 	f32 w;
 	CameraEntry* cam;
 	effSleepData* data;
-	s32 alpha;
+	int i;
 	s32 j;
+	s32 alpha;
 	f32 xh;
 	f32 s0, s1;
 
@@ -164,7 +164,7 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 			xh = x0 * half;
 			j = 0;
 			off = 0;
-			do {
+			while (j < 8) {
 				s0 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + off)) * k);
 				s1 = half * (f32)sin((tau * (f32)(u32)(gp->retraceCount + base + (j + 1) * 10)) * k);
 				GXBegin(GX_QUADS, GX_VTXFMT0, 4);
@@ -178,7 +178,7 @@ void effSleepDisp(CameraId camId, EffectEntry* effect) {
 				GXTexCoord2f32(0.0f, 0.125f * (f32)(8 - j));
 				j++;
 				off += 10;
-			} while (j < 8);
+			}
 		}
 	}
 }

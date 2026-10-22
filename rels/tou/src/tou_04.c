@@ -1087,7 +1087,7 @@ static USER_FUNC(make_list) {
     }
     sprintf(tmp, "<select %d %d %d %d>", 0, 7, 300, 140);
     for (i = 0; i < 7; i++) {
-        strcat(tmp, "\n");
+        strcat(tmp, "\n\0\0");
         strcat(tmp, msgSearch(list[i]));
     }
     evtSetValue(event, args[0], (s32)tmp);

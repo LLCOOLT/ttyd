@@ -195,7 +195,7 @@ void marioReInit_ship(void) {
 	m->wPlayerCollisionBox.x = 40.0f;
 	m->wPlayerCollisionBox.y = 40.0f;
 	marioPaperOn(paper_ship[marioGetColor()]);
-	marioChgPaper("PM_H_1B");
+	marioChgPaper("PM_H_1A");
 	marioChgPose("M_Z_1");
 	m->dispFlags |= 8;
 	MSI(m, 0x2A4) = 0x58;
@@ -275,9 +275,39 @@ static inline void shipEff(f32 s) {
 	MSF(EFFP(), 0x14) = mm->displayDirection;
 }
 
+// FAKE: case-0 block as an inline helper so hit/attr/r are inline temps numbered
+// above harborKind's k (register pick only; same behaviour as the inline block).
+static inline void shipDecideDir(MarioWork* m, Vec* pp1, Vec* pp2) {
+	MarioWork* m2;
+	s32 r;
+	f32 ff;
+		{
+			HitEntry* hit = (HitEntry*)MSP(m, 0x1E8);
+			s32 attr;
+			m2 = marioGetPtr();
+			attr = hitGetAttr(hit);
+			r = 0;
+			if (attr & 0x4000) {
+				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), pp1);
+				ff = revise360(angleABf(m2->position.x, m2->position.z, pp1->x, pp1->z) - m2->targetYaw);
+				r = (ff >= 180.0f) ? 2 : 1;
+			} else if (attr & 0x8000) {
+				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), pp2);
+				ff = revise360(angleABf(m2->position.x, m2->position.z, pp2->x, pp2->z) - m2->targetYaw);
+				r = (ff >= 180.0f) ? 2 : 1;
+			} else if (attr & 0x10000) {
+				r = 2;
+			} else if (attr & 0x20000) {
+				r = 1;
+			}
+			MSO(0) = r;
+		}
+}
+
 void mot_ship(void) {
 	MarioWork* m = marioGetPtr();
 	MarioWork* m2;
+	void* ms;
 	s32 r29, r27;
 	f32 f30, f31;
 	Vec p2;
@@ -316,27 +346,7 @@ void mot_ship(void) {
 		m->baseSpeed = 0.0f;
 		MSOF(0x1c) = 0.0f;
 		N_marioSetBottomlessRespawnPosOnBeroEntry(m->position.x, m->position.y, m->position.z);
-		{
-			HitEntry* hit = (HitEntry*)MSP(m, 0x1E8);
-			s32 attr;
-			m2 = marioGetPtr();
-			attr = hitGetAttr(hit);
-			r29 = 0;
-			if (attr & 0x4000) {
-				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), &p1);
-				f30 = revise360(angleABf(m2->position.x, m2->position.z, p1.x, p1.z) - m2->targetYaw);
-				r29 = (f30 >= 180.0f) ? 2 : 1;
-			} else if (attr & 0x8000) {
-				hitObjGetPos(hitGetName((HitEntry*)MSP(m2, 0x1E8)), &p2);
-				f30 = revise360(angleABf(m2->position.x, m2->position.z, p2.x, p2.z) - m2->targetYaw);
-				r29 = (f30 >= 180.0f) ? 2 : 1;
-			} else if (attr & 0x10000) {
-				r29 = 2;
-			} else if (attr & 0x20000) {
-				r29 = 1;
-			}
-			MSO(0) = r29;
-		}
+		shipDecideDir(m, &p1, &p2);
 		/* fallthrough */
 	case 1:
 		marioMakeJumpPara();
@@ -450,7 +460,6 @@ void mot_ship(void) {
 		break;
 	case 10: {
 		MarioWork* mm;
-		void* ms;
 		f32 fz, fx;
 
 		HitEntry* hit;
@@ -459,7 +468,8 @@ void mot_ship(void) {
 		m->displayDirection = revise360(m->displayDirection);
 		m->wPlayerCollisionBox.x = 40.0f;
 		m->wPlayerCollisionBox.y = 40.0f;
-		ms = marioGetPtr()->motStruct;
+		// FAKE: motStruct derived back from &field (same pointer) so ms is a later-numbered codegen value (target r28)
+		ms = (u8*)&MSF(marioGetPtr()->motStruct, 0x3c) - 0x3c;
 		hit = (HitEntry*)MSP(m, 0x1E8);
 		mm = marioGetPtr();
 		hitObjGetPos(hitGetName(hit), &pos);
@@ -598,9 +608,9 @@ void mot_ship(void) {
 		m->dispFlags &= ~0x1000;
 		MSOF(4) = MSOF(0x40);
 		m->baseSpeed = 2.8f;
-		ms2 = marioGetPtr()->motStruct;
+		ms2 = (u8*)&MSF(marioGetPtr()->motStruct, 0x44) - 0x44; // FAKE: same derive trick as case 10
 		n = (s32)((10.0f * (2.0f * distABf(m->position.x, m->position.z, MSOF(0x3c), MSF(ms2, 0x44)) / m->baseSpeed) + 0.5f) / 10.0f);
-		ms2 = marioGetPtr()->motStruct;
+		ms2 = (u8*)&MSF(marioGetPtr()->motStruct, 0x44) - 0x44; // FAKE: same derive trick as case 10
 		m->directionView = angleABf(m->position.x, m->position.z, MSOF(0x3c), MSF(ms2, 0x44));
 		m->moveDirection = m->directionView;
 		r29 = ((m->trigFlags >> 9) & 1) + 1;

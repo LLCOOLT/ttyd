@@ -395,7 +395,7 @@ void N__cloud_use(PartyEntry* party) {
             break;
         }
         partyChgPose(party, (s32)"PWD_A_6");
-        marioChgPose("M_A_2B");
+        marioChgPose("M_A_2B\0");
         party->useMotionId = 12;
     case 12:
         cloudCalcPos(party);

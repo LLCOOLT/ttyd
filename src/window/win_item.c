@@ -285,7 +285,7 @@ void winItemInit(ItemWork* w) {
     w->winId1 = winMgrEntry(&window_desc[1]);
     winMgrSetPriority(w->winId0, -200);
     winMgrSetPriority(w->winId1, -100);
-    fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
+    fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
 }
 
 void winItemInit2(ItemWork* w) {
@@ -591,9 +591,9 @@ s32 winItemMain(ItemWork* w) {
     case 201:
         mail = mailGetPtr(w->mail[w->f258][1]);
         if (*(u16*)mail & 0x1000) {
-            w->mailTex = (FileEntry*)fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
+            w->mailTex = (FileEntry*)fileAsyncf(4, 0, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
             if (w->mailTex) {
-                w->mailTex = fileAllocf(4, "%s/w/jp/mail.tpl\000\000\000\000\000\000\000", getMarioStDvdRoot());
+                w->mailTex = fileAllocf(4, "%s/w/jp/mail.tpl\000\000\000", getMarioStDvdRoot());
                 w->state++;
             }
         } else {

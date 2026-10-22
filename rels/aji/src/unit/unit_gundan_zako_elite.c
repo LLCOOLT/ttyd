@@ -463,7 +463,7 @@ static s32 dekadeka_event[] = {
     65545, 30, 65541, 3, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE4",
     -250000000, 0, -250000000, 65545, 20, 6, 112, 262235,
     (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_4B", 65545, 120, 107, 65545,
-    5, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE5", -250000000, 0, -250000000,
+    5, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_3RD1_BOTTLE5\0\0\0", -250000000, 0, -250000000,
     65545, 55, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 109, 196699,
     (s32)btlevtcmd_ResultACDefence, -29999997, (s32)weapon_gundan_zako_dekadeka_bottle, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996,
     (s32)weapon_gundan_zako_dekadeka_bottle, 256, -29999995, 2, 1,

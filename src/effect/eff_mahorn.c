@@ -22,7 +22,7 @@ static u8 scale_dt[] = {
 };
 static u8 scale_dt2[] = {
     0x00, 0x13, 0x29, 0x3F, 0x52, 0x5F, 0x64, 0x63, 0x5F, 0x59, 0x51,
-    0x47, 0x3D, 0x33, 0x28, 0x1E, 0x14, 0x0C, 0x06, 0x02, 0x00,
+    0x47, 0x3D, 0x33, 0x28, 0x1E, 0x14, 0x0C, 0x06, 0x02, 0x00, 0, 0, 0 // FAKE: trailing zero padding to the original symbol size (never read)
 };
 
 EffectEntry* effMahornEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, f32 z, f32 scale) {
@@ -32,7 +32,7 @@ EffectEntry* effMahornEntry(s32 type, s32 count, s32 duration, f32 x, f32 y, f32
     s32 i, num;
 
     effect = effEntry();
-    effect->type = "Mahorn";
+    effect->type = "Mahorn\0";
     num = count + 1;
     effect->count = num;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffMahornWork) * num);

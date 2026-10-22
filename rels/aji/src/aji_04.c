@@ -746,14 +746,14 @@ static void callback(s32 type, void** work) {
                 psndSFXOn("SFX_STG7_QUIZ_START1");
             } else if (evt->lwData[5] == 4) {
                 psndBGMOff(0x400);
-                psndBGMOn(1, "BGM_EVT_QUIZ2");
+                psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
             }
         }
     } else if (type == 3) {
         evt->lwData[5]++;
         if (evt->lwData[5] == 1) {
             psndBGMOff(0x400);
-            psndBGMOn(1, "BGM_EVT_QUIZ2");
+            psndBGMOn(1, "BGM_EVT_QUIZ2\0\0\0\0\0\0");
         }
     }
     evt = *(EventEntry**)((u8*)*work + 0x7A00);

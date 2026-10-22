@@ -40,7 +40,7 @@ void _prolog(void) {
     relSetEvtAddr("yuu_00", yuu_00_init_evt);
     relSetEvtAddr("yuu_01", yuu_01_init_evt);
     relSetEvtAddr("yuu_02", yuu_02_init_evt);
-    relSetEvtAddr("yuu_03", yuu_03_init_evt);
+    relSetEvtAddr("yuu_03\0", yuu_03_init_evt);
 }
 
 __declspec(section ".data") u64 fd_yuu_negone_one_374 = 0xBF8000003F800000;

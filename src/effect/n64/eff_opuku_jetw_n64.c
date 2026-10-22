@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "driver/camdrv.h"
 #include "driver/dispdrv.h"
 #include "driver/effdrv.h"
@@ -31,13 +32,13 @@ typedef struct JetwEnt {
 } JetwEnt;
 
 static __declspec(section ".data") u64 lbl_803A33D8 = 0xBF8000003F800000;
-static __declspec(section ".data") u64 fd_jetw_negone_one_374 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A33E8 = 0x3F800000BF800000;
-static __declspec(section ".data") u64 fd_jetw_one_negone_373 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803A33F8 = 0xBF8000003F800000;
-static __declspec(section ".data") u64 fd_jetw_negone_one_360 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803A3408 = 0x3F800000BF800000;
-static __declspec(section ".data") u64 fd_jetw_one_negone_359 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
 
 static JetwEnt adata[] = {
     {0, 0, 30, 140, 0, 255, 0},
@@ -317,4 +318,3 @@ void effOpukuJetwDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-__declspec(section ".sdata2") const u32 gap_10_804231D4_sbss2;

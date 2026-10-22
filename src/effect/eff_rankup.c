@@ -20,7 +20,7 @@ EffectEntry* effRankupEntry(s32 type, f32 x, f32 y, f32 z) {
     EffRankupWork* work;
 
     effect = effEntry();
-    effect->type = "Rankup";
+    effect->type = "Rankup\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffRankupWork) * effect->count);
     effect->userdata = work;

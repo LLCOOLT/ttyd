@@ -54,7 +54,7 @@ EffectEntry* effMugiKemuriEntry(f32 x, f32 y, f32 z, f32 angle) {
 	f32 rad;
 
 	effect = effEntry();
-	effect->type = "MugiKemuri\0\0\0\0\0";
+	effect->type = "MugiKemuri\0";
 	effect->count = 5;
 	data = __memAlloc(HEAP_EFFECT, sizeof(effMugiKemuriData) * 5);
 	effect->userdata = data;

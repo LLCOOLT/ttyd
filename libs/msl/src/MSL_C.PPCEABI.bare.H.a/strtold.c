@@ -85,36 +85,30 @@ enum hex_scan_states {
 #define unfetch(c) (*ReadProc)(ReadProcArg, c, __UngetAChar)
 
 long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* ReadProcArg, int* chars_scanned, int* overflow) {
-    decimal d = {0, 0, 0, {0, ""}};
-    char* ip;
     int scan_state = start;
-    short hex_exp = 0;
-    int hex_digits = 0;
-    int nan_index;
+    int hex_scan_state = not_hex;
+    int count = 0;
+    int spaces = 0;
+    int c;
+    decimal d = {0, 0, 0, {0, ""}};
+    int sign = 0;
+    int exp_negative = 0;
+    int exp_value = 0;
+    int dec_exp = 0;
     union {
         long double v;
         unsigned char b[8];
         short s;
         unsigned long long u;
     } r;
-    int radix = *(unsigned char*)__lconv.decimal_point;
-    int hex_exp_digits = 0;
-    unsigned char* buf = r.b;
-    int hex_dig_count;
-    int c;
-    int n_index;
-    char* np;
-    int sign = 0;
-    int exp_negative = 0;
-    int hex_scan_state = not_hex;
     int sign_detected = 0;
+    unsigned char* buf = r.b;
+    int hex_digits;
     int hex_exp_negative = 0;
-    int count = 0;
-    int spaces = 0;
-    int exp_value;
-    int dec_exp = 0;
-    int inf_index;
-    exp_value = 0;
+    int hex_exp_digits = 0;
+    int hex_dig_count = 0;
+    short hex_exp = 0;
+    int radix = *(unsigned char*)__lconv.decimal_point;
     *overflow = 0;
     c = fetch();
 
@@ -147,46 +141,41 @@ long double __strtold(int max_width, int (*ReadProc)(void*, int, int), void* Rea
             }
             break;
         case inf_state: {
-            char inf_string[] = "INFINITY";
-            ip = inf_string + 1;
-            inf_index = 1;
-            while (inf_index < 8 && *ip == toupper(c)) {
-                ip++;
-                inf_index++;
+            int i = 1;
+            char model[] = "INFINITY";
+            while (i < 8 && model[i] == toupper(c)) {
+                i++;
                 c = fetch();
             }
-            if (inf_index == 3 || inf_index == 8) {
+            if (i == 3 || i == 8) {
                 r.v = sign ? -__float_huge[0] : __float_huge[0];
-                *chars_scanned = spaces + (inf_index + sign_detected);
+                *chars_scanned = spaces + i + sign_detected;
                 return r.v;
             }
             scan_state = failure;
             break;
         }
         case nan_state: {
-            char nan_string[] = "NAN(";
-            np = nan_string + 1;
-            nan_index = 1;
-            n_index = 0;
-            while (nan_index < 4 && *np == toupper(c)) {
-                np++;
-                nan_index++;
+            int i = 1, j = 0;
+            char model[] = "NAN(";
+            while (i < 4 && model[i] == toupper(c)) {
+                i++;
                 c = fetch();
             }
-            if (nan_index == 3 || nan_index == 4) {
-                if (nan_index == 4) {
-                    while (n_index < 32 && (isdigit(c) || isalpha(c))) {
-                        n_index++;
+            if (i == 3 || i == 4) {
+                if (i == 4) {
+                    while (j < 32 && (isdigit(c) || isalpha(c))) {
+                        j++;
                         c = fetch();
                     }
                     if (c != ')') {
                         scan_state = failure;
                         break;
                     }
-                    n_index++;
+                    j++;
                 }
                 r.v = sign ? -__float_nan[0] : __float_nan[0];
-                *chars_scanned = spaces + nan_index + n_index + sign_detected;
+                *chars_scanned = spaces + i + j + sign_detected;
                 return r.v;
             }
             scan_state = failure;

@@ -112,7 +112,7 @@ EffectEntry* effKumokumoN64Entry(s32 type, s32 time, f32 x, f32 y, f32 z, f32 ro
     if (type == 2) {
         rot = 0.0f;
     }
-    effect->type = "KumokumoN64\0\0\0\0";
+    effect->type = "KumokumoN64";
     effect->count = count;
     work = __memAlloc(HEAP_EFFECT, count * sizeof(EffKumokumoN64Particle));
     effect->userdata = work;

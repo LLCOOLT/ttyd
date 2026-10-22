@@ -281,7 +281,7 @@ void BattleCheckAllPinchStatus(BattleWork* wp, BOOL a2) { //1:1, needs stmw forc
 			if (wp->alertTick <= 0) {
 				wp->alertTick = 60;
 				if (wp->commandMenu.field_4 & 1) {
-					psndSFXOn("SFX_BTL_PINCH1\0\0\0\0\0");
+					psndSFXOn("SFX_BTL_PINCH1\0");
 				}
 			}
 		}
@@ -822,6 +822,7 @@ void btlseqTurn(BattleWork *wp)
   EventEntry *evt;
   BOOL found;
   BOOL sfx;
+  const char *sfxName;
   BOOL ret;
   BOOL done;
   s32 count;
@@ -985,7 +986,8 @@ void btlseqTurn(BattleWork *wp)
 
       if (sfx)
     {
-      psndSFXOn("SFX_REST_CONDITION1");
+      sfxName = "SFX_REST_CONDITION1";
+      psndSFXOn(sfxName);
     }
       if (!found)
     {
@@ -1199,7 +1201,7 @@ void btlseqTurn(BattleWork *wp)
     case 0x3000020:
     {
       BattleUnit *unit;
-      const char *sfxName = (0, "SFX_CONDITION_BREAK_ICE1");
+      sfxName = "SFX_CONDITION_BREAK_ICE1";
       for (i = 0; i < 64; i++)
       {
         unit = BattleGetUnitPtr(wp, i);
@@ -2121,7 +2123,8 @@ void _rule_disp(CameraId cameraId, void* param) {
 	f32 x;
 	f32 y;
 	u16 lines;
-	u16 width;
+	// FAKE: s32 width holding the u16 result, halved as (u16)width / 2 (twin _get_item_announce_disp shape)
+	s32 width;
 
 	if (evtGetValue(NULL, GSW(0)) < 0xAC) {
 		if (evtGetValue(NULL, GSW(580)) < 11) {
@@ -2136,12 +2139,11 @@ void _rule_disp(CameraId cameraId, void* param) {
 	}
 	width = FontGetMessageWidthLine(buf, &lines);
 	lines++;
-	y = 0.0f;
-	x = y - (f32)(width / 2);
-	windowDispGX_Waku_col(0, color, x - 10.0f, 94.0f, (f32)(width + 20), (f32)(lines * 29 + 3), 10.0f);
-	FontDrawStart();
+	x = 0.0f;
 	y = 120.0f;
-	FontDrawMessage((s32)x, (s32)y - 29, buf);
+	windowDispGX_Waku_col(0, color, (x - (u16)width / 2) - 10.0f, 94.0f, width + 20, lines * 29 + 3, 10.0f);
+	FontDrawStart();
+	FontDrawMessage(x - (u16)width / 2, (s32)y - 29, buf);
 }
 
 void btlseqPhase(BattleWork* wp) {

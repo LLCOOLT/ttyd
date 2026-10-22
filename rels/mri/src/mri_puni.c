@@ -1312,12 +1312,18 @@ int puniMoveAtari(PuniData* p, Vec* start, Vec* dir, int reflect, f32 dist) {
         d = PSVECMag(&diff);
         if (d > 0.0f) {
             PSVECNormalize(&diff, &diff);
-            *(s32*)&start->y = *(s32*)&old.y;
-            { f32 t = start->y + 1.0f;
-            *(s32*)&start->x = *(s32*)&old.x;
-            start->y = t; }
-            *(s32*)&start->z = *(s32*)&old.z;
-            PF(p, 0x214) = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, old.x, 1.0f + old.y, old.z, diff.x, diff.y, diff.z);
+            {
+                f32 t;
+                f32 ay;
+                *(s32*)&start->y = *(s32*)&old.y;
+                t = start->y + 1.0f;
+                *(s32*)&start->x = *(s32*)&old.x;
+                *(s32*)&start->z = *(s32*)&old.z;
+                // FAKE: the y-arg sum held in its own temp and the start->y float store moved after the z copy (scheduling); same values stored and passed
+                ay = 1.0f + old.y;
+                start->y = t;
+                PF(p, 0x214) = hitCheckFilter(NULL, &hx, &hy, &hz, &d, &nx, &ny, &nz, old.x, ay, old.z, diff.x, diff.y, diff.z);
+            }
             if (PF(p, 0x214) != NULL) {
                 p->pos = old;
             }
@@ -1335,13 +1341,15 @@ void unk_mri_000095f0(PuniData* p, Vec* start, Vec* dir, f32 dist) {
     f32 b1, b2, b3;
     f32 c1, c2, c3;
     f32 d;
-    f32 sx = start->x;
-    f32 sy, sz;
+    f32 sx, sy, sz;
     PF(p, 0x214) = NULL;
-    PF(p, 0x210) = NULL;
+    d = dist;
+    sx = start->x;
     sy = start->y;
     sz = start->z;
-    d = dist;
+    // FAKE: the 0x210 clear placed after the start reads (scheduling); it is overwritten by the hitCheckFilter result
+    // right below, and start is a separate Vec (this function has no callers in the game)
+    PF(p, 0x210) = NULL;
     PF(p, 0x210) = hitCheckFilter(NULL, &pa.x, &pa.y, &pa.z, &d, &hit.x, &hit.y, &hit.z, sx, sy, sz, dir->x, dir->y, dir->z);
     if (PF(p, 0x210) == NULL) {
         PSVECAdd(&p->pos, &p->vel, &p->pos);
@@ -1401,12 +1409,18 @@ void unk_mri_0000980c(PuniData* p, Vec* start, Vec* dir, f32 dist) {
         d = PSVECMag(&diff);
         if (d > 0.0f) {
             PSVECNormalize(&diff, &diff);
-            *(s32*)&start->y = *(s32*)&old.y;
-            { f32 t = start->y + 1.0f;
-            *(s32*)&start->x = *(s32*)&old.x;
-            start->y = t; }
-            *(s32*)&start->z = *(s32*)&old.z;
-            PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, old.y + 1.0f, old.z, diff.x, diff.y, diff.z);
+            {
+                f32 t;
+                f32 ay;
+                *(s32*)&start->y = *(s32*)&old.y;
+                t = start->y + 1.0f;
+                *(s32*)&start->x = *(s32*)&old.x;
+                *(s32*)&start->z = *(s32*)&old.z;
+                // FAKE: the y-arg sum held in its own temp and the start->y float store moved after the z copy (scheduling); same values stored and passed
+                ay = 1.0f + old.y;
+                start->y = t;
+                PF(p, 0x214) = hitCheckFilter(NULL, &b1, &b2, &b3, &d, &c1, &c2, &c3, old.x, ay, old.z, diff.x, diff.y, diff.z);
+            }
             if (PF(p, 0x214) != NULL) {
                 p->pos = old;
             }
@@ -1713,8 +1727,22 @@ BOOL puniParaRecoverCheck(PuniData* p) {
     return p->hp >= p->maxHp;
 }
 
+// FAKE: qrnd with the abs as `v = seed1; if (v < 0) v = -seed1;` (this numbers the seed1 load web after the
+// start + count temp, so start + count is coloured first and takes r7): gives the target registers here, but
+// the standalone qrnd only matches with the ternary form, so puniSearchRandom gets its own copy. Same values.
+static inline s32 qrnd_abs_reload(s32 n) {
+    s32 v;
+    Punigp->seed0 += Punigp->seed1 + 0x1733AF91;
+    Punigp->seed1 += Punigp->seed0 + 0x21273F9C;
+    v = Punigp->seed1;
+    if (v < 0) {
+        v = -Punigp->seed1;
+    }
+    return v % n;
+}
+
 PuniData* puniSearchRandom(s32 start, s32 count) {
-    s32 idx = qrnd(count - 1) + start;
+    s32 idx = qrnd_abs_reload(count - 1) + start;
     s32 i = 0;
     PuniData* p;
 
@@ -4678,9 +4706,9 @@ void psndSFX_pos(s32 id, Vec* pos);
 #define PG_S32(o) (*(s32*)((u8*)Punigp + (o)))
 void puniSound(void)
 {
+  int i;
   PuniData *p;
   PuniData *d;
-  int i;
   int n;
   int special;
   int div;
@@ -4816,8 +4844,7 @@ void puniSound(void)
   k = 0;
   for (i = 110; i < 210; i++)
   {
-    p = &Punidat[i];
-    if ((p->unk4 & 0x400) && (((*((u16 *) (((u8 *) p) + 0x11C))) == 1) || ((*((u16 *) (((u8 *) p) + 0x11C))) == 2)))
+    if ((Punidat[i].unk4 & 0x400) && (((*((u16 *) (((u8 *) &Punidat[i]) + 0x11C))) == 1) || ((*((u16 *) (((u8 *) &Punidat[i]) + 0x11C))) == 2)))
     {
       k++;
     }
@@ -5083,6 +5110,21 @@ USER_FUNC(evt_puni_mem_init) {
 }
 
 void puniAnimationInit2(void);
+// FAKE: second copy of puniAnimationInit in its natural form (puniAnimCount for both tables); evt_puni_init
+// inlines it and reaches 100%, while the out-of-line puniAnimationInit above only matches with its hand-written
+// second loop. Same effect as the old open-coded loops (count up to the first -1/-2, store it in end[i]).
+static inline void puniAnimationInit_inl(s16** a, s16** b) {
+    PuniAnimSet* s0 = &Punigp->anim[0];
+    PuniAnimSet* s1 = &Punigp->anim[1];
+    s32 i;
+
+    for (i = 0; i < 10; i++) {
+        s0->table[i] = a[i];
+        puniAnimCount(a[i], &s0->count[i], &s0->end[i]);
+        s1->table[i] = b[i];
+        puniAnimCount(b[i], &s1->count[i], &s1->end[i]);
+    }
+}
 s32 evt_puni_init(EventEntry *event, BOOL isFirstCall)
 {
   s32 *args = event->args;
@@ -5091,58 +5133,12 @@ s32 evt_puni_init(EventEntry *event, BOOL isFirstCall)
   s32 b = evtGetValue(event, args[1]);
   s32 c = evtGetValue(event, args[2]);
   s32 d = evtGetValue(event, args[3]);
-  s32 i;
-  s16 *t;
-  s32 n;
-  PuniAnimSet *a0;
-  PuniAnimSet *a1;
   if (isFirstCall)
   {
     puniInit();
     return 0;
   }
-  a0 = &Punigp->anim[0];
-  a1 = &Punigp->anim[1];
-  for (i = 0; i < 10; i++)
-  {
-    a0->table[i] = (s16 *) puni_patern_table[i];
-    t = (s16 *) puni_patern_table[i];
-    for (n = 0;; n++)
-    {
-      s16 *e = &a0->end[i];
-      s16 v = t[n];
-      if (v == (-1))
-      {
-        *e = v;
-        break;
-      }
-      if (v == (-2))
-      {
-        *e = v;
-        break;
-      }
-    }
-    a0->count[i] = n;
-    a1->table[i] = (s16 *) toge_patern_table[i];
-    t = (s16 *) toge_patern_table[i];
-    for (n = 0;; n++)
-    {
-      s16 *e = &a1->end[i];
-      s16 v = t[n];
-      if (v == (-1))
-      {
-        *e = v;
-        break;
-      }
-      if (v == (-2))
-      {
-        *e = v;
-        break;
-      }
-    }
-    a1->count[i] = n;
-  }
-
+  puniAnimationInit_inl((s16 **) puni_patern_table, (s16 **) toge_patern_table);
   puniAnimationInit2();
   puniEntry(a, (PunidrvTexInfo *) tex, (void *) b, (void *) c, (void *) d);
   return 2;
@@ -6315,6 +6311,7 @@ USER_FUNC(evt_puni_get_lsw_index) {
 #pragma opt_dead_assignments off
 static const Vec puni_fall_dir;
 USER_FUNC(evt_puni_set_lsw_index) {
+    s32 off;
     s32* args = event->args;
     s32 base = args[0];
     s32 idx = evtGetValue(event, args[1]);
@@ -6323,7 +6320,9 @@ USER_FUNC(evt_puni_set_lsw_index) {
     pos.x = evtGetValue(event, args[3]);
     pos.y = evtGetValue(event, args[4]);
     pos.z = evtGetValue(event, args[5]);
-    puniswSetindex(base, idx, &val, &pos);
+    // FAKE: slot offset computed in the caller (named local) and passed with idx 0; same slot, numbers off below the inlined extract temps (register colouring)
+    off = base + idx * 7;
+    puniswSetindex(off, 0, &val, &pos);
     return EVT_RETURN_DONE;
 }
 #pragma pop
@@ -6522,6 +6521,26 @@ static const Vec puni_save_zero = { 0.0f, 0.0f, 0.0f };
 #pragma push
 #pragma opt_dead_assignments off
 static const Vec puni_fall_dir;
+// FAKE: copy of puni_exit_swset for evt_puni_all_save with the dead idx param reused for x (register colouring)
+static inline void puni_save_swset(s32 idx, s32 val, Vec* pos) {
+    u8 yh, xh;
+    s32 off;
+    s32 y;
+    s32 z;
+    off = (idx - 1) * 7;
+    idx = pos->x;
+    y = pos->y;
+    z = pos->z;
+    xh = ((idx & 0xFF00) >> 8) & 0xFFu;
+    yh = (y & 0xFF00) >> 8;
+    _swByteSet(off, val);
+    _swByteSet(off + 1, idx & 0xFF);
+    _swByteSet(off + 2, xh);
+    _swByteSet(off + 3, y & 0xFF);
+    _swByteSet(off + 4, yh);
+    _swByteSet(off + 5, z & 0xFF);
+    _swByteSet(off + 6, (z & 0xFF00) >> 8);
+}
 USER_FUNC(evt_puni_all_save) {
     PuniData* p = Punidat + 1;
     Vec pos;
@@ -6531,10 +6550,10 @@ USER_FUNC(evt_puni_all_save) {
             if (p->unk4 & 0x8000) {
                 puniHagurePos(p);
                 pos = p->pos;
-                puni_exit_swset(*(s16*)p->unk116, (u8)Punigp->unk328, &pos);
+                puni_save_swset(*(s16*)p->unk116, (u8)Punigp->unk328, &pos);
             } else {
                 pos = puni_save_zero;
-                puni_exit_swset(*(s16*)p->unk116, 0, &pos);
+                puni_save_swset(*(s16*)p->unk116, 0, &pos);
             }
         }
     }

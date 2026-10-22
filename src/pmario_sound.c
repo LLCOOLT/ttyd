@@ -6899,7 +6899,8 @@ BOOL psndENVOn_f_d(u32 flags, const char* name, u32 fadetime, s32 r6) {
 	idx = flags & 0xF;
 	fade = &psnd.fade[idx];
 	if (psnd.flags & 2) return FALSE;
-	env = &psnd.envId[idx];
+	// FAKE: env as a byte-offset sum (same address as &psnd.envId[idx]) so the add feeds an lhzu as in the target
+	env = (u16*)((u8*)psnd.envId + idx * 2);
 	if ((cur = *env) != 0) {
 		if (!(flags & 0x10)) {
 			if (flags & 0x20) {

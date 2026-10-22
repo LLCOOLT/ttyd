@@ -1723,5 +1723,4 @@ void monosiri_disp(CameraId camera, void* param) {
 }
 
 #pragma force_active on
-__declspec(section ".sdata2") const u32 gap_10_80423054_sbss2;
 #pragma force_active reset

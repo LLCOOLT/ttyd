@@ -12,8 +12,6 @@
 #include "system.h"
 #include <string.h>
 #include <stdlib.h>
-__declspec(section ".sdata2") u32 unk_80422fe4;
-__declspec(section ".sdata2") u32 unk_80422fe0;
 #define EXT_LIT(sym, val) (val)
 __declspec(section ".rodata") const char R_no_messages_JP[] = "<col ff0000ff>\203\201\203b\203Z\201[\203W\202\252\202\240\202\350\202\334\202\271\202\361</col>\n<key>\000\000\000";
 __declspec(section ".rodata") const char R_no_messages_US[] = "<col ff0000ff>No messages.<col>\n<key>\000\000";
@@ -34,33 +32,6 @@ __declspec(section ".rodata") const char str_802C4EE8[8] = "\120\115\137\106\137
 __declspec(section ".rodata") const char str_802C4EF0[8] = "\120\115\137\106\137\063\102";
 __declspec(section ".rodata") const char str_802C4EF8[8] = "\120\115\137\103\137\061\102";
 __declspec(section ".rodata") const char str_802C4F00[8] = "\120\115\137\103\137\062\102";
-__declspec(section ".rodata") const f64 double_to_int_802c4f08 = 4503601774854144;
-__declspec(section ".rodata") const f64 double_to_int_mask_802c4f10 = 4503599627370496;
-__declspec(section ".rodata") const char str_802C4F18[8] = "\153\145\171\170\157\156\000";
-__declspec(section ".rodata") const char str_802C4F20[12] = "\163\143\162\154\137\141\165\164\157\000\000";
-__declspec(section ".rodata") const char str_802C4F2C[12] = "\157\156\143\145\137\163\164\157\160\000\000";
-__declspec(section ".rodata") const char str_802C4F38[8] = "\057\163\143\141\154\145\000";
-__declspec(section ".rodata") const char str_802C4F40[8] = "\057\163\160\145\145\144\000";
-__declspec(section ".rodata") const char str_802C4F48[8] = "\144\171\156\141\155\151\143";
-__declspec(section ".rodata") const char str_802C4F50[12] = "\057\144\171\156\141\155\151\143\000\000\000";
-__declspec(section ".rodata") const char str_802C4F5C[8] = "\057\163\150\141\153\145\000";
-__declspec(section ".rodata") const char str_802C4F64[8] = "\057\156\157\151\163\145\000";
-__declspec(section ".rodata") const char str_802C4F6C[8] = "\163\171\163\164\145\155\000";
-__declspec(section ".rodata") const char str_802C4F74[8] = "\150\157\165\163\157\165\000";
-__declspec(section ".rodata") const char str_802C4F7C[8] = "\153\141\156\142\141\156\000";
-__declspec(section ".rodata") const char str_802C4F84[16] = "\045\150\144\045\150\144\045\150\144\045\150\144\000\000\000";
-__declspec(section ".rodata") const char str_802C4F94[8] = "\163\145\154\145\143\164\000";
-__declspec(section ".rodata") const char str_802C4F9C[16] = "\045\150\144\045\150\144\045\150\144\045\150\144\045\150\144";
-__declspec(section ".rodata") const char str_802C4FAC[8] = "\156\157\167\151\156\163\145";
-__declspec(section ".rodata") const char str_802C4FB4[12] = "\045\144\045\146\045\144\045\144\045\144\000";
-__declspec(section ".rodata") const char str_802C4FC0[12] = "\045\163\045\146\045\144\045\144\045\144\000";
-__declspec(section ".rodata") const char str_802C4FCC[16] = "\045\163\045\163\045\144\045\144\045\146\045\144\000\000\000";
-__declspec(section ".rodata") const char str_802C4FDC[8] = "\057\160\141\160\145\162\000";
-__declspec(section ".rodata") const char str_802C4FE4[8] = "\160\137\142\137\163\164\000";
-__declspec(section ".rodata") const char str_802C4FEC[12] = "\056\057\045\163\057\045\163\056\164\170\164";
-__declspec(section ".rodata") const char str_802C4FF8[8] = "\150\157\163\150\151\137\062";
-__declspec(section ".rodata") const char str_802C5000[8] = "\110\117\123\137\103\137\061";
-__declspec(section ".rodata") const char str_802C5008[8] = "\147\154\157\142\141\154\000";
 
 extern const char R_no_messages_JP[];
 extern const char R_no_messages_US[];
@@ -205,8 +176,8 @@ int msg_compare(const void* a, const void* b);
 void msgDispKeyWait_render(s32 wXluStage);
 
 void msgInit(void) {
-	msgw->poseId = animPoseEntry(str_802C4FF8, 2);
-	animPoseSetAnim(msgw->poseId, str_802C5000, TRUE);
+	msgw->poseId = animPoseEntry("hoshi_2", 2);
+	animPoseSetAnim(msgw->poseId, "HOS_C_1", TRUE);
 	animPoseSetMaterialFlagOn(msgw->poseId, 0x1800);
 	animPoseSetMaterialFlagOff(msgw->poseId, 0x40);
 	animPoseSetGXFunc(msgw->poseId, msgDispKeyWait_render, 0);
@@ -214,7 +185,7 @@ void msgInit(void) {
 	msgw->entries[0].lookup = NULL;
 	msgw->entries[1].address = NULL;
 	msgw->entries[1].lookup = NULL;
-	msgLoad(str_802C5008, 1);
+	msgLoad("global", 1);
 }
 
 void msgLoad(const char* filename, s32 index) {
@@ -230,7 +201,7 @@ void msgLoad(const char* filename, s32 index) {
 	char dvdpath[128]; //TODO: double check size
 
 	entry = &msgw->entries[index];
-	sprintf(filepath, str_802C4FEC, language_dir[gp->language], filename);
+	sprintf(filepath, "./%s/%s.txt", language_dir[gp->language], filename);
 	
 	if (entry->address) {
 		if (index == 1) {
@@ -435,7 +406,7 @@ s32 msgMain(smartEntry* smart) {
 			if (!npc) {
 				npc = npcNameToPtr(data->stayPose);
 			}
-			animPoseSetPaperAnimGroup(npc->poseId, str_802C4FE4, 1);
+			animPoseSetPaperAnimGroup(npc->poseId, "p_b_st", 1);
 			animPosePaperPeraOn(npc->poseId);
 			animPoseSetPaperAnim(npc->poseId, paperPoseTbl[entry->time], 1);
 			break;
@@ -738,6 +709,33 @@ typedef struct MsgAChar {
 	f32 dyn; //0x14
 } MsgAChar;
 
+// FAKE: the ruby text's second loop as an inline helper; its counter/index become early inline temps, giving the target's
+// register numbering and loop-2 setup order (scale/fv by pointer: they live on the stack in the target) (FAKES.md)
+static inline void msgRubyDraw(MsgWinData* data, MsgAChar** pe, s16* prx, char* tag, s32 n, s32 half, s16 y, f32* psc, u32 flags, f32* pfv) {
+	s32 k2;
+	u16 g;
+	u16 w;
+	s32 ww;
+	for (k2 = 0; k2 < half; k2++) {
+		g = kanjiSearch(*(u16*)&tag[(u32)n]);
+		w = kanjiGetWidth((u16)(g + 0));
+		ww = EXT_LIT(float_0p55_8041a678, 0.55f) * (*psc * (( f32)(w + 4) ));
+		(*pe)->glyph = g;
+		(*pe)->x = *prx;
+		(*pe)->y = (s16)y;
+		(*pe)->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * *psc;
+		(*pe)->value = flags;
+		if (flags & 1) {
+			(*pe)->dyn = *pfv;
+		}
+		(*pe)->time = 0;
+		*prx += ww;
+		n += 2;
+		data->count++;
+		(*pe)++;
+	}
+}
+
 void msgAnalize(smartEntry* smart, char* msg) {
 	s16 s230;
 	s16 s232;
@@ -749,11 +747,11 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	s32 check;
 	u16 glyph;
 	u16 width;
-	u32 flags;
 	s16 x;
 	s16 y; // s16 in the original: extsh before every int->float use (0x20b0, 0x2b98) and after <pos> (0x23b0)
-	s32 time;
 	s16 rubyX;
+	s32 time;
+	u32 flags;
 	char tag[0x80];
 	char args[0x80];
 	char name[0x20];
@@ -765,7 +763,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	f32 scale;
 	f32 fv;
 	s32 v48;
-	s32 v44;
+	// FAKE: int, not s32 (same width/sign; changes colouring)
+	int v44;
 	s32 v40;
 	s32 iconId;
 	s32 i38;
@@ -773,7 +772,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	MsgWinData* data2;
 	s32 i30;
 	s32 i28;
-	s32 i24;
+	// FAKE: int, not s32 (same width/sign; changes colouring)
+	int i24;
 	f32 iconScale;
 	s32 i20;
 	f32 f1c;
@@ -791,6 +791,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 	BOOL isHM;
 	s32 i;
 	s32 k;
+	s32 k2;
 	s32 half;
 	s32 j;
 	s32 total;
@@ -846,7 +847,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			ww = scale * (( f32)(width + 4) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
+			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 			entry->scale = scale;
 			entry->value = flags;
 			if (( *( (u16*)msg )) == 0x8145) {
@@ -893,7 +894,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			data->count++;
 			maxScale = EXT_LIT(float_0_8041a514, 0.0f);
 			if (data->flags & 0x20) {
-				flags = (flags & (~0xFF00)) | (0x100 << data->numSel);
+				flags &= ~0xFF00;
+				flags |= 0x100 << data->numSel;
 				data->numSel++;
 			}
 			continue;
@@ -908,9 +910,9 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry++;
 				data->count++;
 				s232++;
-			} else if (strcmp(tag, str_802C4F18) == 0) {
+			} else if (strcmp(tag, "keyxon") == 0) {
 				data->flags |= 0x100;
-			} else if (( strcmp(tag, "p") == 0 ) || ( strcmp(tag, str_802C4F20) == 0) ) {
+			} else if (( strcmp(tag, "p") == 0 ) || ( strcmp(tag, "scrl_auto") == 0) ) {
 				if (s230 != 0) {
 					entry->glyph = 0xFFFD;
 					entry->y = s230 - 3;
@@ -922,7 +924,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					s230 = 0;
 					data->count++;
 				}
-			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, str_802C4F2C) == 0) ) {
+			} else if (( strcmp(tag, "o") == 0 ) || ( strcmp(tag, "once_stop") == 0) ) {
 				entry->glyph = 0xFFFC;
 				entry->time = time;
 				time += 0x32;
@@ -937,23 +939,23 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				s230 = -v44;
 			} else if (strcmp(tag, "scale") == 0) {
 				sscanf(args, "%f", &scale);
-			} else if (strcmp(tag, str_802C4F38) == 0) {
+			} else if (strcmp(tag, "/scale") == 0) {
 				scale = 1.0f;
 			} else if (strcmp(tag, "wait") == 0) {
 				sscanf(args, "%d", &v40);
 				time += v40;
 			} else if (strcmp(tag, "speed") == 0) {
 				sscanf(args, "%d", &step);
-			} else if (strcmp(tag, str_802C4F40) == 0) {
+			} else if (strcmp(tag, "/speed") == 0) {
 				step = data->parseSpeed;
-			} else if (strcmp(tag, str_802C4F48) == 0) {
+			} else if (strcmp(tag, "dynamic") == 0) {
 				sscanf(args, "%f", &fv);
 				flags |= 1;
-			} else if (strcmp(tag, str_802C4F50) == 0) {
+			} else if (strcmp(tag, "/dynamic") == 0) {
 				flags &= ~1;
 			} else if (strcmp(tag, "shake") == 0) {
 				flags |= 2;
-			} else if (strcmp(tag, str_802C4F5C) == 0) {
+			} else if (strcmp(tag, "/shake") == 0) {
 				flags &= ~2;
 			} else if (strcmp(tag, "wave") == 0) {
 				flags |= 4;
@@ -977,7 +979,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->time = time;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, str_802C4F64) == 0) {
+			} else if (strcmp(tag, "/noise") == 0) {
 				entry->value = 0;
 				entry->glyph = 0xFFF6;
 				entry++;
@@ -998,7 +1000,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				window->type = 2;
 				step = 0;
 				data->parseSpeed = 0;
-			} else if (strcmp(tag, str_802C4F6C) == 0) {
+			} else if (strcmp(tag, "system") == 0) {
 				static const GXColor c = {0xDC, 0xC8, 0xDC, 0xFF};
 				window->type = 3;
 				entry->value = *(( u32*)(&c) );
@@ -1018,11 +1020,11 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				window->type = 9;
 			} else if (strcmp(tag, "diary") == 0) {
 				window->type = 7;
-			} else if (strcmp(tag, str_802C4F74) == 0) {
+			} else if (strcmp(tag, "housou") == 0) {
 				window->type = 10;
 			} else if (strcmp(tag, "boss") == 0) {
 				window->type = 6;
-			} else if (strcmp(tag, str_802C4F7C) == 0) {
+			} else if (strcmp(tag, "kanban") == 0) {
 				window->type = 4;
 				step = 0;
 				data->parseSpeed = 0;
@@ -1032,16 +1034,16 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			} else if (strcmp(tag, "clear") == 0) {
 				window->type = 11;
 			} else if (strcmp(tag, "wpos") == 0) {
-				sscanf(args, str_802C4F84, &w16, &w14, &w12, &w10);
+				sscanf(args, "%hd%hd%hd%hd", &w16, &w14, &w12, &w10);
 				window->flags |= 4;
 				window->x = w16;
 				window->y = w14;
 				window->height = w12;
 				window->width = w10;
-			} else if (strcmp(tag, str_802C4F94) == 0) {
+			} else if (strcmp(tag, "select") == 0) {
 				window->type = 5;
 				data->flags |= 0x20;
-				sscanf(args, str_802C4F9C, &sel0, &sel1, &data->selWidth, &data->selY);
+				sscanf(args, "%hd%hd%hd%hd%hd", &sel0, &sel1, &data->selWidth, &data->selY);
 				flags |= 0x100;
 				data->defSel = sel0;
 				data->cancel = sel1;
@@ -1057,14 +1059,14 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->glyph = 0xFFF9;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, str_802C4FAC) == 0) {
+			} else if (strcmp(tag, "nowinse") == 0) {
 				window->flags |= 8;
 			} else if (strcmp(tag, "icon") == 0) {
 				isHM = FALSE;
 				if ((( (s8) args [0] ) >= '0') && (((s8) args [0]) <= '9') ) {
-					sscanf(args, str_802C4FB4, &iconId, &iconScale, &i38, &i34, &i30);
+					sscanf(args, "%d%f%d%d%d", &iconId, &iconScale, &i38, &i34, &i30);
 				} else {
-					sscanf(args, str_802C4FC0, name, &iconScale, &i38, &i34, &i30);
+					sscanf(args, "%s%f%d%d%d", name, &iconScale, &i38, &i34, &i30);
 					if (strcmp(name, "HM") == 0) {
 						isHM = TRUE;
 					}
@@ -1075,7 +1077,8 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				}
 				if (!isHM) {
 					entry->value = iconId;
-					iconGetWidthHight(&iw, &ih, (u16)iconId);
+					// FAKE: called through a u16-parameter cast (target passes clrlwi r5 with no extsh to the s16 parameter)
+					((void (*)(u16*, u16*, u16))iconGetWidthHight)(&iw, &ih, iconId);
 					entry->glyph = 0xFFF8;
 					entry->x = (x + (( EXT_LIT(float_0p5_8041a534, 0.5f) * iw ) * iconScale) ) + i38;
 					x += 0x28;
@@ -1092,7 +1095,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					iw = scale * (( f32)(width + 4) );
 					entry->glyph = glyph;
 					entry->x = x;
-					entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
+					entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 					entry->scale = scale;
 					entry->value = flags;
 					entry->value |= 8;
@@ -1110,7 +1113,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 					data->count++;
 				}
 			} else if (strcmp(tag, "anim") == 0) {
-				sscanf(args, str_802C4FCC, anim1, anim2, &i28, &i24, &f1c, &i20);
+				sscanf(args, "%s%s%d%d%f%d", anim1, anim2, &i28, &i24, &f1c, &i20);
 				entry->value = animPoseEntry(anim1, 2);
 				animPoseSetAnim(entry->value, anim2, 1);
 				animPoseSetMaterialFlagOn(entry->value, 0x1800);
@@ -1131,7 +1134,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				entry->time = i18;
 				entry++;
 				data->count++;
-			} else if (strcmp(tag, str_802C4FDC) == 0) {
+			} else if (strcmp(tag, "/paper") == 0) {
 				sscanf(args, "%s", paper2);
 				entry->value = (strcmp(paper2, "me") != 0) ? (( u32)npcNameToPtr(paper2) ) : ( 0) ;
 				entry->glyph = 0xFFF2;
@@ -1152,38 +1155,17 @@ void msgAnalize(smartEntry* smart, char* msg) {
 				half = ((s32)strlen(tag + i)) / 2;
 				total = 0;
 				j = i;
-				p = tag;
-				p = p + i;
+				// FAKE: (u32) index casts here and in the second loop stop the IR optimizer from strength-reducing tag[j]/tag[i]; the backend
+				// does it instead and its pointer-IV init in the preheader keeps the dead j/i steps alive, as in the target (FAKES.md)
 				for (k = 0; k < half; k++) {
-					glyph = kanjiSearch(*(( u16*)p) );
+					glyph = kanjiSearch(*(u16*)&tag[(u32)j]);
 					width = kanjiGetWidth((u16)(glyph + 0));
 					total += (s32)(EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(width + 4) )));
-					p += 2;
 					j += 2;
 				}
 				rubyW = (u16)total; rubyW = rubyW - ( EXT_LIT(float_0p55_8041a678, 0.55f) * (EXT_LIT(float_4_8041a67c, 4.0f) * scale)) ;
 				rubyX = (( ((f32)(rubyX + x) ) - ( EXT_LIT(float_4_8041a67c, 4.0f) * scale )) - ( (f32)rubyW) ) * EXT_LIT(float_0p5_8041a534, 0.5f);
-				p = tag; p = p + i;
-				for (k = 0; ( k - 1) < ( half- 1) ; k++) {
-					glyph = kanjiSearch(*(( u16*)p) );
-					width = kanjiGetWidth((u16)(glyph + 0));
-					ww = EXT_LIT(float_0p55_8041a678, 0.55f) * (scale * (( f32)(width + 4) ));
-					entry->glyph = glyph;
-					entry->x = rubyX;
-					s230 = y;
-					entry->y = s230;
-					entry->scale = EXT_LIT(float_0p55_8041a678, 0.55f) * scale;
-					entry->value = flags;
-					if (flags & 1) {
-						entry->dyn = fv;
-					}
-					entry->time = 0;
-					rubyX += ww;
-					p += 2;
-					i += 2;
-					data->count++;
-					entry++;
-				}
+				msgRubyDraw(data, &entry, &rubyX, tag, i, half, y, &scale, flags, &fv);
 				continue;
 			}
 			if (( *( (s8*)next )) == '\n') {
@@ -1200,7 +1182,7 @@ void msgAnalize(smartEntry* smart, char* msg) {
 			ww = scale * (( f32)(width + 2) );
 			entry->glyph = glyph;
 			entry->x = x;
-			entry->y = y - (( s32)(EXT_LIT(float_10_8041a538, 10.0f) * scale) );
+			entry->y = y - (s16)(EXT_LIT(float_10_8041a538, 10.0f) * scale);
 			entry->scale = scale;
 			entry->value = flags;
 			if (( *( (s8*)msg )) != ' ') {
@@ -1745,64 +1727,6 @@ void msgWindow_Clear_Main(WindowEntry* window) {
 	dispEntry(CAMERA_2D, EXT_LIT(float_400_8041a530, 400.0f) - *(s16*)&window->field_0x4, 0, msgWindow_Disp, window);
 }
 
-__declspec(section ".data") static void* jumptable_8030DB70[] = {
-    (char*)msgWindow_Disp + 0x88,
-    (char*)msgWindow_Disp + 0x88,
-    (char*)msgWindow_Disp + 0x420,
-    (char*)msgWindow_Disp + 0x520,
-    (char*)msgWindow_Disp + 0x420,
-    (char*)msgWindow_Disp + 0x628,
-    (char*)msgWindow_Disp + 0x88,
-    (char*)msgWindow_Disp + 0x4A0,
-    (char*)msgWindow_Disp + 0x88,
-    (char*)msgWindow_Disp + 0x88,
-    (char*)msgWindow_Disp + 0x420,
-    (char*)msgWindow_Disp + 0x5B4,
-};
-__declspec(section ".data") void* jumptable_8030DBA0[] = {
-    (char*)msgWindow_Main + 0x74C,
-    (char*)msgWindow_Main + 0x2BC,
-    (char*)msgWindow_Main + 0x74C,
-    (char*)msgWindow_Main + 0x364,
-    (char*)msgWindow_Main + 0x74C,
-    (char*)msgWindow_Main + 0xCC,
-    (char*)msgWindow_Main + 0x118,
-    (char*)msgWindow_Main + 0x1D0,
-    (char*)msgWindow_Main + 0x220,
-    (char*)msgWindow_Main + 0x454,
-    (char*)msgWindow_Main + 0x520,
-    (char*)msgWindow_Main + 0x618,
-};
-__declspec(section ".data") void* jumptable_8030DBD0[] = {
-    (char*)msgDisp + 0xE8,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0xCC,
-    (char*)msgDisp + 0xB8,
-    (char*)msgDisp + 0x1E8,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0x99C,
-    (char*)msgDisp + 0xA0,
-    (char*)msgDisp + 0x98,
-};
-__declspec(section ".data") void* jumptable_8030DC00[] = {
-    (char*)msgMain + 0x5A0,
-    (char*)msgMain + 0x54C,
-    (char*)msgMain + 0x69C,
-    (char*)msgMain + 0x50C,
-    (char*)msgMain + 0x5DC,
-    (char*)msgMain + 0x5DC,
-    (char*)msgMain + 0x69C,
-    (char*)msgMain + 0x500,
-    (char*)msgMain + 0x4F4,
-    (char*)msgMain + 0x4D4,
-    (char*)msgMain + 0x4B0,
-    (char*)msgMain + 0x440,
-    (char*)msgMain + 0x3F4,
-    (char*)msgMain + 0x3CC,
-};
 void msgWindow_Disp(CameraId camId, void* param) {
 	CameraEntry* camera = camGetCurPtr();
 	BOOL ret = FALSE;

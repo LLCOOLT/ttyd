@@ -117,7 +117,7 @@ EVT_BEGIN(hom_11_init_evt)
         CALL(evt_seq_wait, 2)
         CALL(evt_cam3d_evt_set, LW(1), 300, 1400, LW(1), 125, 0, 8000, 0)
         WAIT_MS(4000)
-        CALL(evt_bero_mapchange, STRING("rsh_02_b"), STRING("nidome"))
+        CALL(evt_bero_mapchange, STRING("rsh_02_b"), STRING("nidome\0"))
     END_INLINE_EVENT
     RETURN
 EVT_END()

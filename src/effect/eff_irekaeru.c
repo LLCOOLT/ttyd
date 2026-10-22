@@ -20,7 +20,7 @@ EffectEntry* effIrekaeruEntry(s32 type, f32 x, f32 y, f32 z) {
     EffIrekaeruWork* work;
 
     effect = effEntry();
-    effect->type = "Irekaeru";
+    effect->type = "Irekaeru\0\0\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffIrekaeruWork) * effect->count);
     effect->userdata = work;

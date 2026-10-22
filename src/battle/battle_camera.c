@@ -159,7 +159,7 @@ void battleCameraMain(void) {
     strcpy(name, "\202\251\202\337\202\347\201\100\202\251\202\361\202\253\202\341\202\255");
     break;
   case 7:
-    unit2 = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
+    unit2 = (0, BattleGetUnitPtr(wp, wp->cameraWork.unitId)); // FAKE: comma makes this unit2 web a compiler temp coloured early (target r28)
     if (unit2 == NULL) {
       btl_camera_set_mode(0, 0);
       break;
@@ -188,7 +188,7 @@ void battleCameraMain(void) {
     break;
   case 8: {f32 w, w2, d, ofs, t, zz, yy, atX, y;
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-    unit2 = BattleGetUnitPtr(wp, wp->cameraWork.unitId2);
+    unit2 = (0, BattleGetUnitPtr(wp, wp->cameraWork.unitId2)); // FAKE: comma makes this unit2 web a compiler temp coloured early (target r28)
     if (unit == NULL || unit2 == NULL) {
       btl_camera_set_mode(0, 0);
       break;
@@ -298,7 +298,7 @@ void battleCameraMain(void) {
     break;
   case 11: {f32 w, w2, t, zz, yy, d, ofs, y, atX;
     unit = BattleGetUnitPtr(wp, wp->cameraWork.unitId);
-    unit2 = BattleGetUnitPtr(wp, wp->cameraWork.unitId2);
+    unit2 = (0, BattleGetUnitPtr(wp, wp->cameraWork.unitId2)); // FAKE: comma makes this unit2 web a compiler temp coloured early (target r28)
     if (unit == NULL || unit2 == NULL) {
       btl_camera_set_mode(0, 0);
       break;
@@ -365,6 +365,7 @@ void battleCameraMain(void) {
       break;
     }
     wp->cameraWork.audienceId = 10;
+    aud->mAudienceDeltaMultiplier = aud->mAudienceDeltaMultiplier; // FAKE: no code; keeps aud live into case 13 (target unit r27)
     d = wp->cameraWork.homingOffset2.x - wp->cameraWork.homingOffset.x;
     BtlUnit_GetPos(unit, &pos.x, &pos.y, &pos.z);
     ofs = wp->cameraWork.homingOffset2.x - pos.x;

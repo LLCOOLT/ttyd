@@ -1172,7 +1172,7 @@ USER_FUNC(item_chk) {
     ItemEntry* item;
 
     for (i = 0; i < 32; i++) {
-        sprintf(name, "keihin%02d", i);
+        sprintf(name, "keihin%02d\0", i);
         item = itemNameToPtr(name);
         if (item != NULL) {
             f32 dist = distABf(item->position.x, item->position.z, x, z);

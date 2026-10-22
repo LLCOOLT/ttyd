@@ -13,7 +13,7 @@ dou.c:
 
 dou_00.c:
 	.text       start:0x0000023C end:0x0000025C
-	.rodata     start:0x00000088 end:0x00000108
+	.rodata     start:0x00000088 end:0x00000104
 	.data       start:0x00000278 end:0x000005E0
 
 dou_01.c:
@@ -21,7 +21,7 @@ dou_01.c:
 	.data       start:0x000005E0 end:0x000008D0
 
 dou_02.c:
-	.rodata     start:0x000001B8 end:0x00000348
+	.rodata     start:0x000001B8 end:0x00000344
 	.data       start:0x000008D0 end:0x00001260
 
 dou_03.c:
@@ -83,7 +83,7 @@ unit/unit_bubble.c:
 	.bss        start:0x00000008 end:0x00000060
 
 unit/unit_killer.c:
-	.rodata     start:0x00002230 end:0x00002378
+	.rodata     start:0x00002230 end:0x00002374
 	.data       start:0x000136C8 end:0x00014150
 
 unit/unit_killer_cannon.c:
@@ -111,7 +111,7 @@ dou_12.c:
 	.data       start:0x00018E28 end:0x000190B0
 
 unit/unit_patamet.c:
-	.rodata     start:0x00002AB0 end:0x00002DC0
+	.rodata     start:0x00002AB0 end:0x00002DBC
 	.data       start:0x000190B0 end:0x0001B9E8
 
 event/evt_lect_dou.c:

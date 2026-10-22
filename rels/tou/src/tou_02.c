@@ -1,6 +1,8 @@
+#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
+#pragma force_active on
 #include "string.h"
 #include "mario/mariost.h"
 #include "dolphin/os.h"
@@ -22,6 +24,7 @@ typedef struct Fan { u16 flags; s16 state; s16 animIdx; u8 pad_0x6[2]; u64 time;
 typedef struct FanAnim { char name[16]; char anim[8]; s16 loop; f32 rate; s32 start; s32 count; } FanAnim;
 typedef struct FanWork { s32 num; Fan* fans; s32 animNum; FanAnim anim[32]; s32 hammerTimer; s32 count; s32 sfxId; u8 vol; } FanWork;
 typedef struct FanData { const char* name; const char* anim; f32 rate; } FanData;
+u32 gap_05_00000024_bss;
 FanWork* fan_wp;
 ExtPose* extGetPosePtr(void);
 s32 extGetPoseNum(void);
@@ -153,20 +156,22 @@ extern s32 bero_open_door_play_se[];
 extern s32 evt_bero_info_run[];
 extern s32 evt_sub_mail_vibration[];
 
-__declspec(section ".data") u64 fd_tou_02_negone_one_374;
-__declspec(section ".data") s32 fd_tou_02_neg_one_382[1];
-__declspec(section ".data") s32 fd_tou_02___local_PI_383[1];
-__declspec(section ".data") s32 fd_tou_02___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_tou_02_one_negone_373;
-__declspec(section ".data") s32 fd_tou_02___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_tou_02_one_381[1];
-__declspec(section ".data") u64 fd_tou_02_negone_one_360;
-__declspec(section ".data") s32 fd_tou_02_neg_one_365[1];
-__declspec(section ".data") s32 fd_tou_02___local_PI_366[1];
-__declspec(section ".data") s32 fd_tou_02___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_tou_02_one_negone_359;
-__declspec(section ".data") s32 fd_tou_02___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_tou_02_one_364[1];
+__declspec(section ".data") static u64 negone_one$374;
+__declspec(section ".data") static s32 neg_one$382[1];
+__declspec(section ".data") static s32 __local_PI$383[1];
+__declspec(section ".data") static s32 __local_3PIO2$385[1];
+__declspec(section ".data") u32 gap_04_0001116C_data[1];
+__declspec(section ".data") static u64 one_negone$373;
+__declspec(section ".data") static s32 __local_PIO2$384[1];
+__declspec(section ".data") static s32 one$381[1];
+__declspec(section ".data") static u64 negone_one$360;
+__declspec(section ".data") static s32 neg_one$365[1];
+__declspec(section ".data") static s32 __local_PI$366[1];
+__declspec(section ".data") static s32 __local_3PIO2$368[1];
+__declspec(section ".data") u32 gap_04_00011194_data[1];
+__declspec(section ".data") static u64 one_negone$359;
+__declspec(section ".data") static s32 __local_PIO2$367[1];
+__declspec(section ".data") static s32 one$364[1];
 static s32 s_door_open[58];
 static s32 s_door_close[58];
 s32 n_1_door_open[22];
@@ -324,51 +329,55 @@ static f32 randf(f32 min, f32 max) {
     return r * (max - min) + min;
 }
 
-__declspec(section ".data") u64 fd_tou_02_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_tou_02_neg_one_382[] = {
+__declspec(section ".data") static s32 neg_one$382[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_tou_02___local_PI_383[] = {
+__declspec(section ".data") static s32 __local_PI$383[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_tou_02___local_3PIO2_385[] = {
+__declspec(section ".data") static s32 __local_3PIO2$385[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_tou_02_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_0001116C_data[1] = {0};
 
-__declspec(section ".data") s32 fd_tou_02___local_PIO2_384[] = {
+__declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
+
+__declspec(section ".data") static s32 __local_PIO2$384[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_tou_02_one_381[] = {
+__declspec(section ".data") static s32 one$381[] = {
     1065353216,
 };
 
-__declspec(section ".data") u64 fd_tou_02_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_tou_02_neg_one_365[] = {
+__declspec(section ".data") static s32 neg_one$365[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_tou_02___local_PI_366[] = {
+__declspec(section ".data") static s32 __local_PI$366[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_tou_02___local_3PIO2_368[] = {
+__declspec(section ".data") static s32 __local_3PIO2$368[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_tou_02_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_00011194_data[1] = {0};
 
-__declspec(section ".data") s32 fd_tou_02___local_PIO2_367[] = {
+__declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
+
+__declspec(section ".data") static s32 __local_PIO2$367[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_tou_02_one_364[] = {
+__declspec(section ".data") static s32 one$364[] = {
     1065353216,
 };
 
@@ -1469,14 +1478,16 @@ void fan_disp(CameraId camera, void* param) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-static __declspec(section ".rodata") Vec fan_zero = {0.0f, 0.0f, 0.0f};
+static __declspec(section ".rodata") Vec fan_zero;
 void ext_fan_main(void) {
     MarioWork* mario = marioGetPtr();
-    Vec dir;
-    Vec target = {0.0f, 0.0f, 0.0f};
     Fan* fan;
     ExtPose* pose;
+    s32 li;
+    Fan* lfan;
     s32 i;
+    Vec dir;
+    Vec target = {0.0f, 0.0f, 0.0f};
 
     if (mario->currMotionId == 0x12) {
         fan_wp->hammerTimer++;
@@ -1561,8 +1572,6 @@ void ext_fan_main(void) {
     }
 
     {
-        const char* sfx2;
-        const char* sfx1;
         f32 angle;
         f32 dist;
         f32 dy;
@@ -1570,7 +1579,6 @@ void ext_fan_main(void) {
         f32 x;
         f32 z;
         f32 dir2;
-        sfx2 = sfx1 = "SFX_STG3_AUDIENCE_FAN_FLY1";
         for (i = 0, fan = fan_wp->fans; i < fan_wp->num; i++, fan++) {
             if (fan->state == 0) {
                 switch (check_hammer(fan)) {
@@ -1578,7 +1586,7 @@ void ext_fan_main(void) {
                         break;
                     case 1:
                         fan->state = 10;
-                        dist = 6.2831855f; angle = 6.2831855f * randf(135.0f, 225.0f) / 360.0f;
+                        { f32 k; f32 mn; f32 r = rand() / 32767.0f; angle = (6.2831855f * ((r * (k = 225.0f - 135.0f)) + (mn = 135.0f))) / 360.0f; } // FAKE: hand-inlined randf(135.0f, 225.0f) (same rand() call, r*90+135), 6.28 first so its pool address is created before 90/135 as in the target
                         dist = randf(400.0f, 500.0f);
                         x = fan->pos.x + dist * fan_sin(angle);
                         z = fan->pos.z - dist * fan_cos(angle);
@@ -1597,22 +1605,24 @@ void ext_fan_main(void) {
                         angleABf(fan->pos.x, fan->pos.z, fan->target.x, fan->target.z);
                         fan->timer = dist / fan->param.y;
                         fan->param.x = dy / fan->timer + fan->param.z * fan->timer / 2.0f;
-                        psndSFXOn_3D(sfx1, &fan->pos);
+                        // FAKE: integer cast makes the literal a CSE/loop-invariant temp (target addi r30 + mr r29 copy)
+                        psndSFXOn_3D((const char*)(u32)"SFX_STG3_AUDIENCE_FAN_FLY1", &fan->pos);
                         break;
                     case 2: {
 
                         angle = angleABf(mario->position.x, mario->position.z, fan->pos.x, fan->pos.z);
                         dir2 = cloudGetBreathDir();
                         fan->state = 20;
-                        fan->target = fan_zero;
                         angle = (angle + dir2) / 2.0f;
+                        fan->target = fan_zero;
                         spd = randf(0.1f, 0.2f);
                         angle = 6.2831855f * angle / 360.0f;
                         fan->param.x = spd * fan_sin(angle);
                         fan->param.y = randf(0.03f, 0.06f);
                         fan->param.z = spd * -fan_cos(angle);
                         fan->timer = 120;
-                        psndSFXOn_3D(sfx2, &fan->pos);
+                        // FAKE: integer cast makes the literal a CSE/loop-invariant temp (target addi r30 + mr r29 copy)
+                        psndSFXOn_3D((const char*)(u32)"SFX_STG3_AUDIENCE_FAN_FLY1", &fan->pos);
                         break;
                     }
                 }
@@ -1627,82 +1637,83 @@ void ext_fan_main(void) {
         f32 h;
 
         pose = extGetPosePtr();
-        fan = fan_wp->fans;
-        for (i = 0; i < fan_wp->num; i++, pose++, fan++) {
-            switch (fan->state) {
+        lfan = fan_wp->fans;
+        for (li = 0; li < fan_wp->num; li++, pose++, lfan++) {
+            switch (lfan->state) {
                 case 0: {
                     HitCheckQuery query;
                     HitCheckQuery* q = &query;
-                    PSVECNormalize(&fan->vel, &fan->vel);
-                    dist = PSVECMag(&fan->vel);
-                    query.targetPos = fan->pos;
+                    PSVECNormalize(&lfan->vel, &lfan->vel);
+                    dist = PSVECMag(&lfan->vel);
+                    query.targetPos = lfan->pos;
                     query.targetPos.y += 4.0f;
-                    query.targetDir = fan->vel;
+                    query.targetDir = lfan->vel;
                     query.targetDir.y = 0.0f;
                     query.targetDistance = 25.0f + dist;
                     if (hitCheckVecFilter(&query, NULL)) {
-                        C_VECReflect(&fan->vel, &q->hitNormal, &fan->vel);
+                        C_VECReflect(&lfan->vel, &q->hitNormal, &lfan->vel);
                     } else {
-                        fan->pos.x += fan->vel.x;
-                        fan->pos.z += fan->vel.z;
-                        fan->vel.x *= 0.6f;
-                        fan->vel.z *= 0.6f;
+                        lfan->pos.x += lfan->vel.x;
+                        lfan->pos.z += lfan->vel.z;
+                        lfan->vel.x *= 0.6f;
+                        lfan->vel.z *= 0.6f;
                     }
-                    if (fan->pos.x < -350.0f) {
-                        fan->pos.x = -350.0f;
+                    if (lfan->pos.x < -350.0f) {
+                        lfan->pos.x = -350.0f;
                     }
-                    if (fan->pos.x > 350.0f) {
-                        fan->pos.x = 350.0f;
+                    if (lfan->pos.x > 350.0f) {
+                        lfan->pos.x = 350.0f;
                     }
-                    if (fan->pos.z > (h = 195.0f + i / 100.0f)) {
-                        fan->pos.z = h;
+                    if (lfan->pos.z > (h = 195.0f + li / 100.0f)) {
+                        lfan->pos.z = h;
                     }
                     break;
                 }
                 case 10:
-                    fan->pos.y += fan->param.x;
-                    fan->param.x -= fan->param.z;
-                    angle = angleABf(fan->pos.x, fan->pos.z, fan->target.x, fan->target.z);
+                    lfan->pos.y += lfan->param.x;
+                    lfan->param.x -= lfan->param.z;
+                    angle = angleABf(lfan->pos.x, lfan->pos.z, lfan->target.x, lfan->target.z);
                     angle = 6.2831855f * angle / 360.0f;
-                    fan->pos.x += fan->param.y * fan_sin(angle);
-                    fan->pos.z += fan->param.y * -fan_cos(angle);
-                    if (--fan->timer < 0) {
-                        fan->state = 100;
+                    lfan->pos.x += lfan->param.y * fan_sin(angle);
+                    lfan->pos.z += lfan->param.y * -fan_cos(angle);
+                    if (--lfan->timer < 0) {
+                        lfan->state = 100;
                     }
                     break;
                 case 20:
-                    if (--fan->timer > 0) {
-                        fan->target.x += fan->param.x;
-                        fan->target.y += fan->param.y;
-                        fan->target.z += fan->param.z;
-                        fan->pos.x += fan->target.x;
-                        fan->pos.y += fan->target.y;
-                        fan->pos.z += fan->target.z;
+                    if (--lfan->timer > 0) {
+                        lfan->target.x += lfan->param.x;
+                        lfan->target.y += lfan->param.y;
+                        lfan->target.z += lfan->param.z;
+                        lfan->pos.x += lfan->target.x;
+                        lfan->pos.y += lfan->target.y;
+                        lfan->pos.z += lfan->target.z;
                     } else {
-                        fan->state = 100;
+                        lfan->state = 100;
                     }
                     break;
                 case 100:
                     pose->flags &= ~3;
-                    fan->state++;
+                    lfan->state++;
                     break;
                 case 101:
                     break;
             }
-            if (fan->flags & 1) {
+            if (lfan->flags & 1) {
                 fan_wp->count--;
-            } else if (fan->state != 0) {
+            } else if (lfan->state != 0) {
                 fan_wp->count--;
             }
-            pose->mtx[0][3] = fan->pos.x;
-            pose->mtx[1][3] = fan->pos.y;
-            pose->mtx[2][3] = fan->pos.z;
-            pose->rot = angleABf(target.x, target.z, fan->pos.x, fan->pos.z);
+            pose->mtx[0][3] = lfan->pos.x;
+            pose->mtx[1][3] = lfan->pos.y;
+            pose->mtx[2][3] = lfan->pos.z;
+            pose->rot = angleABf(target.x, target.z, lfan->pos.x, lfan->pos.z);
         }
     }
     psndSFX_pos(fan_wp->sfxId, &target);
     psndSFX_vol(fan_wp->sfxId, fan_wp->vol * fan_wp->count / fan_wp->num);
 }
+static __declspec(section ".rodata") Vec fan_zero = {0.0f, 0.0f, 0.0f};
 #pragma opt_propagation reset
 #pragma opt_lifetimes reset
 

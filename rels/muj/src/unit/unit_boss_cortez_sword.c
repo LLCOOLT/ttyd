@@ -662,7 +662,7 @@ s32 cortez_weapon_break_event[] = {
 };
 
 s32 cortez_weapon_blow_dead_event[] = {
-    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_CLAUD_BREATH3", 0, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000,
+    196699, (s32)evt_snd_sfxon, (s32)"SFX_BTL_CLAUD_BREATH3\0\0", 0, 196699, (s32)btlevtcmd_GetBodyId, -2, -30000000,
     262235, (s32)btlevtcmd_AnimeChangePoseType, -2, -30000000, 39, 110, 65539, 0,
     327771, (s32)btlevtcmd_AddRotate, -2, 0, 20, 0, 65545, 1,
     65540, 0, 112, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229997952, 327771,

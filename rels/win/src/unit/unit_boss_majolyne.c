@@ -822,7 +822,7 @@ static s32 powder_attack_event[] = {
     -29999985, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MAJO_HAND_OPEN1", -250000000, 0, -29999985,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MJR_A2_1", 65546, 700, 262235,
     (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MJR_A2_2", 65546, 100, 262235, (s32)btlevtcmd_AnimeChangePose,
-    -2, 1, (s32)"MJR_A2_3", 131163, (s32)evt_snd_sfxoff, -29999985, 458843, (s32)btlevtcmd_PreCheckDamage,
+    -2, 1, (s32)"MJR_A2_3\0\0\0", 131163, (s32)evt_snd_sfxoff, -29999985, 458843, (s32)btlevtcmd_PreCheckDamage,
     -2, -29999997, -29999996, -29999991, 256, -29999995, 65570, -29999995,
     65579, 4, 65540, 90, 46, 65572, 3, 196699,
     (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 46, 65572, 6,

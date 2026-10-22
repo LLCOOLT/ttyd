@@ -762,4 +762,3 @@ __declspec(section ".data") u32 gap_05_803AC064_data[7] = {0, 0, 0, 0, 0, 0, 0};
 #pragma force_active reset
 
 
-__declspec(section ".sdata2") const u32 gap_10_804232DC_sbss2;

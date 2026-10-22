@@ -65,7 +65,7 @@ EffectEntry* effStageClearEntry(s32 type, f32 x, f32 y, f32 z) {
     if (type % 10 == 1) {
         n = 7;
     }
-    effect->type = "StageClear\0\0\0\0\0";
+    effect->type = "StageClear\0";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, effect->count * sizeof(StageClearWork));
     effect->userdata = work;

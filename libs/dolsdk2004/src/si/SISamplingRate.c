@@ -64,7 +64,7 @@ void SISetSamplingRate(u32 msec) {
         xy = XYPAL;
         break;
     default:
-        OSReport("SISetSamplingRate: unknown TV format. Use default.");
+        OSReport("SISetSamplingRate: unknown TV format. Use default.\0");
         msec = 0;
         xy = XYNTSC;
         break;

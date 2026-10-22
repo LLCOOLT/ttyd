@@ -1285,6 +1285,5 @@ void fadeSetNarrowFast(void) {
 }
 
 __declspec(section ".sdata") u32 gap_fd_sdata2[7] = {0};
-__declspec(section ".sdata2") const u32 gap_10_80422F7C_sbss2;
 
 #pragma force_active reset

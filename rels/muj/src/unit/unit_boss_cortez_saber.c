@@ -307,7 +307,7 @@ static s32 attack_event[] = {
     -29999985, 327771, (s32)evt_sub_intpl_init, 0, -135, 60, 10, 65541,
     10, 65627, (s32)evt_sub_intpl_get_value, 327771, (s32)btlevtcmd_SetRotate, -2, -250000000, -250000000,
     -30000000, 65545, 1, 6, 112, 393307, (s32)btlevtcmd_snd_se, -2,
-    (s32)"SFX_BOSS_KOR_SWORD_DANCE3", -250000000, 0, -250000000, 65545, 7, 458843, (s32)btlevtcmd_PreCheckDamage,
+    (s32)"SFX_BOSS_KOR_SWORD_DANCE3\0\0", -250000000, 0, -250000000, 65545, 7, 458843, (s32)btlevtcmd_PreCheckDamage,
     -2, -29999997, -29999996, -29999988, 256, -29999995, 65570, -29999995,
     65579, 4, 65540, 90, 46, 65572, 3, 196699,
     (s32)btlevtcmd_StartAvoid, -29999997, 38, 65540, 90, 65572, 6, 196699,

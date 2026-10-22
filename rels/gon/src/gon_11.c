@@ -1102,4 +1102,3 @@ EVT_BEGIN(gon_11_init_evt)
     END_IF
     RETURN
 EVT_END()
-__declspec(section ".rodata") const u32 gap_03_00001D7C_rodata = 0;

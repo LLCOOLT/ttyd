@@ -349,7 +349,7 @@ static s32 escape_event[] = {
     -2, (s32)"SFX_ENM_PANSY_ESCAPE1_2", -250000000, 0, -250000000, 327771, (s32)btlevtcmd_GetPos, -2,
     -30000000, -29999999, -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -2, -229999488, 458843,
     (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, -229979520, -1, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PANSY_ESCAPE2", -250000000, 0, -250000000, 196699, (s32)btlevtcmd_SetMoveSpeed,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PANSY_ESCAPE2\0\0", -250000000, 0, -250000000, 196699, (s32)btlevtcmd_SetMoveSpeed,
     -2, -229990784, 524379, (s32)btlevtcmd_MovePosition, -2, 300, -29999999, -29999998,
     0, -1, 0, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, 1, 67108864,
     65546, 500, 196699, (s32)btlevtcmd_KillUnit, -2, 0, 2, 1,

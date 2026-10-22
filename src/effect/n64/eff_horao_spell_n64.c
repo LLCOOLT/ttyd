@@ -290,5 +290,4 @@ void effHoraoSpellDisp(CameraId cameraId, EffectEntry* effect) {
 
 #pragma force_active on
 __declspec(section ".sdata") u8 gap_07_80413A4C_sdata[4] = {0};
-__declspec(section ".sdata2") const u32 gap_10_8042315C_sbss2;
 #pragma force_active reset

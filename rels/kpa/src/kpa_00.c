@@ -264,7 +264,7 @@ static s32 npcEnt[] = {
 };
 
 s32 kpa_00_init_evt[] = {
-    131163, (s32)evt_mario_set_mode, 2, 196699, (s32)evt_snd_envon, 272, (s32)"ENV_KOOPA_KPA1", 131163,
+    131163, (s32)evt_mario_set_mode, 2, 196699, (s32)evt_snd_envon, 272, (s32)"ENV_KOOPA_KPA1\0", 131163,
     (s32)evt_npc_setup, (s32)npcEnt, 65570, -170000000, 65572, 59, 65628, (s32)kpa_00_first_evt,
     65572, 60, 65628, (s32)kpa_00_fly_evt, 49, 2, 1, 0,
 };

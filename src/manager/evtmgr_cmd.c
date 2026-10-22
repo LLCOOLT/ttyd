@@ -1891,7 +1891,7 @@ s32 evt_debug_put_reg(EventEntry* entry) { // 115
         }
     }
     else {
-        sprintf(str, "         [%d]", reg);
+        sprintf(str, "         [%d]\0\0", reg);
     }
 
     return EVT_RETURN_DONE;

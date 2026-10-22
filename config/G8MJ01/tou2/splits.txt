@@ -34,15 +34,15 @@ tou2.c:
 	.bss        start:0x00000018 end:0x00000030
 
 unit/unit_basabasa.c:
-	.rodata     start:0x00003610 end:0x00003750
+	.rodata     start:0x00003610 end:0x0000374C
 	.data       start:0x00016B10 end:0x00017BF8
 
 unit/unit_bomhei.c:
-	.rodata     start:0x00003750 end:0x00003938
+	.rodata     start:0x00003750 end:0x00003934
 	.data       start:0x00017BF8 end:0x000190D8
 
 unit/unit_boomerang_bros.c:
-	.rodata     start:0x00003938 end:0x00003A88
+	.rodata     start:0x00003938 end:0x00003A84
 	.data       start:0x000190D8 end:0x0001AEA0
 
 unit/unit_borodo.c:
@@ -51,7 +51,7 @@ unit/unit_borodo.c:
 	.data       start:0x0001AEA0 end:0x0001C7B8
 
 unit/unit_chorobon.c:
-	.rodata     start:0x00003C40 end:0x00003E00
+	.rodata     start:0x00003C40 end:0x00003DFC
 	.data       start:0x0001C7B8 end:0x0001DDF0
 
 unit/unit_dark_keeper.c:
@@ -60,11 +60,11 @@ unit/unit_dark_keeper.c:
 
 unit/unit_fire_bros.c:
 	.text       start:0x000052D0 end:0x00005458
-	.rodata     start:0x00003F88 end:0x000040B0
+	.rodata     start:0x00003F88 end:0x000040AC
 	.data       start:0x0001F090 end:0x000210E8
 
 unit/unit_flower_chorobon.c:
-	.rodata     start:0x000040B0 end:0x000042A0
+	.rodata     start:0x000040B0 end:0x0000429C
 	.data       start:0x000210E8 end:0x00022E08
 
 unit/unit_green_chorobon.c:
@@ -78,11 +78,11 @@ unit/unit_hammer_bros.c:
 	.data       start:0x000249C0 end:0x0002643C
 
 unit/unit_hennya.c:
-	.rodata     start:0x000045E8 end:0x00004708
+	.rodata     start:0x000045E8 end:0x00004704
 	.data       start:0x00026440 end:0x00027000
 
 unit/unit_hinnya.c:
-	.rodata     start:0x00004708 end:0x00004828
+	.rodata     start:0x00004708 end:0x00004824
 	.data       start:0x00027000 end:0x00027BB8
 
 unit/unit_honenoko.c:
@@ -116,11 +116,11 @@ unit/unit_piders.c:
 	.data       start:0x0002E0F0 end:0x00030230
 
 unit/unit_sambo.c:
-	.rodata     start:0x00005330 end:0x00005678
+	.rodata     start:0x00005330 end:0x00005674
 	.data       start:0x00030230 end:0x00034948
 
 unit/unit_togedaruma.c:
-	.rodata     start:0x00005678 end:0x00005870
+	.rodata     start:0x00005678 end:0x0000586C
 	.data       start:0x00034948 end:0x00035B80
 
 unit/unit_togezo.c:
@@ -138,7 +138,7 @@ unit/unit_ura_pata.c:
 	.data       start:0x000392D8 end:0x0003BF18
 
 unit/unit_hannya.c:
-	.rodata     start:0x00005FD8 end:0x000060F8
+	.rodata     start:0x00005FD8 end:0x000060F4
 	.data       start:0x0003BF18 end:0x0003CAD8
 
 unit/unit_hyper_sinnosuke.c:
@@ -191,7 +191,7 @@ unit/unit_boss_koopa_tou.c:
 
 unit/unit_borodo_king.c:
 	.text       start:0x00008FAC end:0x00009290
-	.rodata     start:0x000079E8 end:0x00007BA8
+	.rodata     start:0x000079E8 end:0x00007BA4
 	.data       start:0x00052A08 end:0x00054320
 
 unit/unit_nokonoko_fighter.c:
@@ -207,7 +207,7 @@ unit/unit_crimson_togemet.c:
 	.data       start:0x00057A38 end:0x000599B8
 
 unit/unit_monochrome_kurokumorn.c:
-	.rodata     start:0x00008240 end:0x00008400
+	.rodata     start:0x00008240 end:0x000083FC
 	.data       start:0x000599B8 end:0x0005B178
 
 unit/unit_monochrome_pakkun.c:

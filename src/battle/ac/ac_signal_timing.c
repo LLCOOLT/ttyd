@@ -72,6 +72,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   const char *sfxPone;
   const char *sfxOk;
   const char *sfxNg;
+  const char *sfxNg2; // FAKE: second name for the NG sound; the chained assignment puts its address first in the pre-loop block
   s32 j;
   s32 i;
   s32 k;
@@ -92,7 +93,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
   sfxPi = "SFX_AC_PI1";
   sfxPone = "SFX_AC_PONE1";
   sfxOk = "SFX_AC_COMMAND_OK1";
-  sfxNg = "SFX_AC_COMMAND_NG1";
+  sfxNg2 = sfxNg = "SFX_AC_COMMAND_NG1\0";
   do
   {
     loop = 0;
@@ -301,7 +302,7 @@ s32 battleAcMain_SignalTiming(BattleWork *work)
             w->results[w->index - ST_LEAD(work)] = -1;
             if (!((work->actionCommands.setupFlags & 1) && (work->actionCommands.mAcUnit->mTokenFlags & kConfusedAction)))
             {
-              psndSFXOn(sfxNg);
+              psndSFXOn(sfxNg2);
             }
             ST_OUT_RESULT(work) = -1;
           }
@@ -441,8 +442,10 @@ void battleAcDelete_SignalTiming(BattleWork* work) {
 }
 
 static void actionCommandDisp(f32 x, f32 y) {
-    BattleWork* work = _battleWorkPointer;
-    BattleActions* ac = &work->actionCommands;
+    BattleActions* ac = &_battleWorkPointer->actionCommands;
+    // FAKE: work recovered from ac (actionCommands is at 0x1C90) so its web is a codegen temp numbered above the
+    // rodata base; then work takes r31 and the base r30, as in the target
+    BattleWork* work = (BattleWork*)((u8*)ac - 0x1c90);
     SignalTimingWork* w;
     s32 i;
     s32 count;

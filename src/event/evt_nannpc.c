@@ -195,7 +195,7 @@ static inline void nanNPCHitMove(NanNPC* r, f32 mag) {
                     NULL, &hx, &hy, &hz, &d20, &nx, &ny, &nz, v48.x, 1.0f + v48.y, v48.z,
                     v3c.x, v3c.y, v3c.z);
                 if (r->hit1) {
-                    r->pos = v78;
+                    r->pos = v48; // v78 == v48 here; the target reads v48 and keeps the dead v78 copy
                 }
             }
         }
@@ -205,6 +205,9 @@ static inline void nanNPCHitMove(NanNPC* r, f32 mag) {
     }
 }
 
+// FAKE: opt_dead_assignments off keeps the dead v78 = v48 struct copy in the inlined nanNPCHitMove (the target stores it, never reads it)
+#pragma push
+#pragma opt_dead_assignments off
 void nanNPCOption(void) {
     NanNPC* q;
     void* w;
@@ -236,7 +239,8 @@ void nanNPCOption(void) {
             }
         }
     }
-    for (p = ((NanNPCWork*)w)->npc; p < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; p++) {
+    // FAKE: r (loop 3 start) assigned in loop 2's exit test, as the target loads it there (no mr copy); w->npc is not changed by loop 2
+    for (p = ((NanNPCWork*)w)->npc; p < (r = ((NanNPCWork*)w)->npc) + ((NanNPCWork*)w)->num; p++) {
         if (p->flags & 4) {
             PSVECSubtract(&p->field_30, &p->pos, &diff);
             mag = PSVECMag(&diff);
@@ -248,7 +252,7 @@ void nanNPCOption(void) {
             }
         }
     }
-    for (r = ((NanNPCWork*)w)->npc; r < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; r++) {
+    for (; r < ((NanNPCWork*)w)->npc + ((NanNPCWork*)w)->num; r++) {
         if (r->flags & 4) {
             mag = PSVECMag(&r->move);
             if (mag) {
@@ -261,6 +265,7 @@ void nanNPCOption(void) {
         }
     }
 }
+#pragma pop
 
 s32 nannpc_zcompare(NanNPCSort* a, NanNPCSort* b) {
     if (a->z < b->z) {
@@ -781,3 +786,5 @@ USER_FUNC(evt_nannpcwork_flag_onoff) {
 #pragma force_active reset
 
 #pragma force_active reset
+
+__declspec(section ".sdata") u32 gap_07_804113E8_sdata[6] = {0};

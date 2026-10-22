@@ -199,7 +199,7 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
     hit->radius = PSVECDistance(&vtmp, &hit->centerWorld);
 
     {
-        s32 numVectors, j, k;
+        s32 numVectors, j;
         s32 partIdx;
         for (numVectors = 0, partIdx = 0; partIdx < hit->joint->partCount; partIdx++) {
             MapFileMesh* mesh = hit->joint->parts[partIdx].mesh;
@@ -212,9 +212,10 @@ HitEntry* _hitEnt(MapFileJoint* joint, HitEntry* parent, Mtx parentMtx, s32 mapI
                     numVectors += *(s32*)mesh->displayLists.normalLists[j] - 2;
                 }
             } else {
-                for (k = 0; k < mesh->displayListCount; k++) {
-                    j = *(u16*)((u8*)mesh->displayLists.packedLists[k].offset + 1);
-                    numVectors += j - 2;
+                // FAKE: i (dead after the joint search) as the packed counter and j holding the list offset: their later webs become the @ temps that give the target colouring
+                for (i = 0; i < mesh->displayListCount; i++) {
+                    j = mesh->displayLists.packedLists[i].offset;
+                    numVectors += *(u16*)(j + 1) - 2;
                 }
             }
         }
@@ -551,16 +552,20 @@ static inline f32 hitDequant(register s16* base, register s32 idx) {
 
 #pragma dont_inline on
 s32 hitCalcVtxPosition(HitEntry* hit) {
-    s32 k;
-    s32 j;
     s32 i;
+    s32 k;
+    s32* list;
     Vec a;
-    s32 count = 0;
-    MapFileMesh* mesh;
     MapWork* wp;
-    Vec* pos;
     Vec b;
     Vec c;
+    s32 count = 0;
+    s16 i1;
+    s16 i2;
+    HitVector* vec;
+    Vec* pos;
+    s32 j;
+    MapFileMesh* mesh;
 
     if (hit->vectors == NULL) {
         return 0;
@@ -572,12 +577,10 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
         }
         if (!mesh->isPackedDisplay) {
             for (j = 0; j < mesh->displayListCount; j++) {
-                s32* list = (s32*)mesh->displayLists.normalLists[j];
+                list = (s32*)mesh->displayLists.normalLists[j];
                 for (k = 0; k < *list - 2; k++) {
-                    HitVector* vec;
-                    s16 i2;
-                    s16* idx = (s16*)((u8*)list + k * 0x18 + 4);
-                    s16 i1;
+                    s16* idx;
+                    idx = (s16*)((u8*)list + k * 0x18 + 4);
                     i1 = *(s16*)((u8*)list + (k + 1) * 0x18 + 4);
                     i2 = *(s16*)((u8*)list + (k + 2) * 0x18 + 4);
                     vec = &hit->vectors[count++];
@@ -596,16 +599,15 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
             s32 stride;
             u32 m;
             wp = mapGetWork();
-            stride = 0;
+            m = 0; // FAKE: popcount accumulated in m (later reused as the i0 pointer) so stride is a single-def web
             for (bit = 0; bit < 12; bit++) {
-                stride += ((u32)mesh->elementMask >> bit) & 1;
+                m += ((u32)mesh->elementMask >> bit) & 1;
             }
-            stride *= 2;
+            stride = m * 2;
             for (k = 0; k < mesh->displayListCount; k++) {
-                s32 n;
                 u8* list = (u8*)mesh->displayLists.packedLists[k].offset;
-                n = *(u16*)(list + 1) - 2;
-                for (j = 0; j < n; j++) {
+                bit = *(u16*)(list + 1) - 2; // FAKE: loop bound in the dead popcount counter (its later web becomes an @ temp); (s32) keeps the signed compare
+                for (j = 0; j < (s32)bit; j++) {
                     u16 i0;
                     s16* base;
                     BOOL even;
@@ -616,11 +618,13 @@ s32 hitCalcVtxPosition(HitEntry* hit) {
                     u16 i1;
                     register u32 gqr;
                     HitVector* v2;
-                    i0 = *(u16*)(list + j * stride + 3);
+                    v2 = &hit->vectors[count];
                     even = !(j & 1);
+                    m = (u32)list;
+                    m += j * stride;
+                    i0 = *(u16*)(m + 3);
                     i1 = *(u16*)&list[stride * (j + 1) + 3];
                     i2 = *(u16*)&list[stride * (j + 2) + 3];
-                    v2 = &hit->vectors[count];
                     base = (s16*)(*(u8**)mesh->vcdTableOffset + 4);
                     o0 = i0 * 3;
                     o1 = (u16)(even ? i2 : i1) * 3;

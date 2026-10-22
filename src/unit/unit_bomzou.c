@@ -244,7 +244,7 @@ static s32 explosion_event[] = {
     33, 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 983131,
     (s32)evt_eff, (s32)"", (s32)"hibashira", 2, -30000000, -29999999, -29999998, -30000000,
     -29999999, -29999998, 1, -229998976, 60, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_THUNDERS_BOMB2", -250000000, 0, -250000000, 65627, (s32)btlevtcmd_StageDispellFog,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_THUNDERS_BOMB2\0", -250000000, 0, -250000000, 65627, (s32)btlevtcmd_StageDispellFog,
     196699, (s32)btlevtcmd_OnAttribute, -2, 16777216, 262235, (s32)btlevtcmd_OnPartsAttribute, -2, 1,
     50331648, 393307, (s32)evt_btl_camera_shake_h, 0, 10, 0, 60, 4,
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"B_2", 262235, (s32)btlevtcmd_SamplingEnemy, -2,

@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "eff/eff_ultra_hammer.h"
 #include "driver/dispdrv.h"
 #include "memory.h"
@@ -38,13 +39,13 @@ s16 wakka_texcoord0_tbl[];
 
 #ifdef __MWERKS__
 __declspec(section ".data") u64 lbl_803B70C0 = 0xBF8000003F800000;
-static __declspec(section ".data") u64 negone_one_374 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803B70D0 = 0x3F800000BF800000;
-static __declspec(section ".data") u64 one_negone_373 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
 __declspec(section ".data") u64 lbl_803B70E0 = 0xBF8000003F800000;
-static __declspec(section ".data") u64 negone_one_360 = 0xBF8000003F800000;
+static __declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
 __declspec(section ".data") u64 lbl_803B70F0 = 0x3F800000BF800000;
-static __declspec(section ".data") u64 one_negone_359 = 0x3F800000BF800000;
+static __declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
 
 s16 wakka_vertex_tbl[] ATTRIBUTE_ALIGN(32) = {
 	24347, 0, -8825, // 0
@@ -167,7 +168,6 @@ f32 scroll_tbl[] = {
 	-2.9166667f, -3.0625f, -3.2083333f, -3.3541667f, -3.5f
 };
 
-__declspec(section ".data") u32 gap_05_803B735C_data[1] = {0};
 
 s8 wakka_normal_tbl[] ATTRIBUTE_ALIGN(32) = {
 	0, 64, 0, // 0
@@ -421,7 +421,6 @@ u8 wakka_dl_0_size_tbl[] = {
 	1, // 19
 };
 
-__declspec(section ".sdata") u32 gap_07_80418194_sdata[1] = {0};
 
 #endif
 

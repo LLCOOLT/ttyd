@@ -920,21 +920,24 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	s16 x0, y0, y1;
 	s32 x1;
 	GXColor hsv;
-	s32 idx, cell, col, row;
+	s32 idx, cell, col;
 	BinaryFontGlyph* glyph;
 	f32 cellh, cellw, tu, w, h, tw;
 	FontWidthEntry* entry;
 	u16 rows;
 	GXColor c;
 	u16 u0, u1, v1;
-	u16 v0;
+	// FAKE: v0 held as s32 = (s16)iv0 (only its low 16 bits are ever used: u16 store, (u16)v0)
+	s32 v0;
 	s16 x1s;
+	s32 row;
 	u8 t0, t1;
 	f32 tv;
 	f32 scale;
 	u8 n0, n1, hue, ew;
 	u8 kern;
 	s32 hr0, hr1;
+	s32 iv0;
 	entry = fontGetWidth(code);
 	kern = entry->kerning;
 	glyph = blockGlyph;
@@ -959,15 +962,17 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	hue = x0 - (u8)gp->retraceCount * 2;
 	hsv = (GXColor){0x00, 0xAA, 0xFF, 0xFF};
 	tv = row * cellh;
-	v0 = 1.0f + tv;
+	iv0 = 1.0f + tv;
 	GXPosition3s16(x, y0, 0);
 	hr0 = x0 + hue;
 	hsv.r = hr0;
 	c = HSV2RGB(hsv);
 	u0 = (s32)(tu);
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	GXTexCoord2u16(u0, v0);
+	GXTexCoord2u16(u0, iv0);
 	GXTexCoord2u8(n0, n1);
+	// FAKE: sign-extending copy of iv0; every use truncates back to u16
+	v0 = (s16)iv0;
 
 	x1s = x1;
 	hr1 = x1s + hue;
@@ -985,7 +990,7 @@ void _JUTFont_DrawPos(u16 code, s16 x, s16 y) {
 	hsv.r = hr1;
 	c = HSV2RGB(hsv);
 	GXColor4u8(c.r, c.g, c.b, c.a);
-	v1 = (s32)(v0 + cellh);
+	v1 = (s32)((u16)v0 + cellh);
 	t1 = (s32)(n1 + h);
 	GXTexCoord2u16(u1, v1);
 	GXTexCoord2u8(t0, t1);

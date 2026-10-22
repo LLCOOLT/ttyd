@@ -101,7 +101,7 @@ EVT_END()
 
 s32 gor_12_init_evt[] = {
     262235, (s32)evt_map_playanim, (s32)"anm_umi", 1, 0, 262235, (s32)evt_map_playanim, (s32)"anm_nami",
-    1, 0, 262235, (s32)evt_map_playanim, (s32)"anm_kirakira", 1, 0, 131163,
+    1, 0, 262235, (s32)evt_map_playanim, (s32)"anm_kirakira\0\0\0", 1, 0, 131163,
     (s32)evt_sub_get_system_flag, -30000000, 131102, -30000000, 2, 2, 33, 131096,
     -170000000, 402, 131163, (s32)evt_mario_kill_party, 0, 65628, (s32)epilogue_evt, 33,
     2, 1, 0,

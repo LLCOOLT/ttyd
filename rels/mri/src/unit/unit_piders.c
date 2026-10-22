@@ -866,7 +866,7 @@ EVT_END()
 
 static s32 piders_attack_common_event3[] = {
     393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_PAIDA_ATTACK2", -250000000, 0, -250000000, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, -29999993, (s32)"PAI_A_3a", 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
+    (s32)btlevtcmd_AnimeChangePose, -2, -29999993, (s32)"PAI_A_3a\0\0\0", 327771, (s32)btlevtcmd_GetPos, -2, -30000000,
     -29999999, -29999998, 131125, -29999999, 20, 393307, (s32)btlevtcmd_JumpPartsSetting, -2,
     -29999993, 0, -229993856, -229999744, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999993,
     -30000000, -29999999, -29999998, 262235, (s32)btlevtcmd_OffPartsAttribute, -2, -29999993, 16777216,

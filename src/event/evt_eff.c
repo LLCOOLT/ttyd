@@ -163,46 +163,51 @@ extern EffectEntry* effMajinaiEntry(s32, f32, f32, f32);
 USER_FUNC(evt_eff) {
 	s32* args = event->args;
 	s32* p;
+	s32* q;
+	s32* r;
 	const char* effName;
-	s32 int2, int3, int4, int5, int6, int7, int8, int9;
 	const char* effSet;
+	s32 int2, int3, int4, int5, int6, int7, int8, int9;
 	s32 int10, int11, int12, int13, int14;
 	EffectEntry* entry;
 	f32 float2, float3, float4, float5, float6, float7, float8,
 		float9, float10, float11, float12, float13, float14;
 
-	effName = (const char*)evtGetValue(event, args[0]);
-	evtGetValue(event, args[0]);
-	evtGetValue(event, args[0]);
-	effSet = (const char*)evtGetValue(event, args[1]);
-	evtGetValue(event, args[1]);
-	evtGetValue(event, args[1]);
-	int2 = evtGetValue(event, args[2]);
-	int3 = evtGetValue(event, args[3]);
-	int4 = evtGetValue(event, args[4]);
-	int5 = evtGetValue(event, args[5]);
-	int6 = evtGetValue(event, args[6]);
-	int7 = evtGetValue(event, args[7]);
-	int8 = evtGetValue(event, args[8]);
-	int9 = evtGetValue(event, args[9]);
-	int10 = evtGetValue(event, args[10]);
-	int11 = evtGetValue(event, args[11]);
-	int12 = evtGetValue(event, args[12]);
-	int13 = evtGetValue(event, args[13]);
-	int14 = evtGetValue(event, args[14]);
-	float2 = evtGetFloat(event, args[2]);
-	float3 = evtGetFloat(event, args[3]);
-	float4 = evtGetFloat(event, args[4]);
-	float5 = evtGetFloat(event, args[5]);
-	float6 = evtGetFloat(event, args[6]);
-	float7 = evtGetFloat(event, args[7]);
-	float8 = evtGetFloat(event, args[8]);
-	float9 = evtGetFloat(event, args[9]);
-	float10 = evtGetFloat(event, args[10]);
-	float11 = evtGetFloat(event, args[11]);
-	float12 = evtGetFloat(event, args[12]);
-	float13 = evtGetFloat(event, args[13]);
-	float14 = evtGetFloat(event, args[14]);
+	p = args;
+	q = args;
+	r = args;
+	effName = (const char*)evtGetValue(event, *(p++));
+	evtGetValue(event, *(q++));
+	evtGetValue(event, *(r++));
+	effSet = (const char*)evtGetValue(event, *(p++));
+	evtGetValue(event, *(q++));
+	evtGetValue(event, *(r++));
+	int2 = evtGetValue(event, p[0]);
+	int3 = evtGetValue(event, p[1]);
+	int4 = evtGetValue(event, p[2]);
+	int5 = evtGetValue(event, p[3]);
+	int6 = evtGetValue(event, p[4]);
+	int7 = evtGetValue(event, p[5]);
+	int8 = evtGetValue(event, p[6]);
+	int9 = evtGetValue(event, p[7]);
+	int10 = evtGetValue(event, p[8]);
+	int11 = evtGetValue(event, p[9]);
+	int12 = evtGetValue(event, p[10]);
+	int13 = evtGetValue(event, p[11]);
+	int14 = evtGetValue(event, p[12]);
+	float2 = evtGetFloat(event, q[0]);
+	float3 = evtGetFloat(event, q[1]);
+	float4 = evtGetFloat(event, q[2]);
+	float5 = evtGetFloat(event, q[3]);
+	float6 = evtGetFloat(event, q[4]);
+	float7 = evtGetFloat(event, q[5]);
+	float8 = evtGetFloat(event, q[6]);
+	float9 = evtGetFloat(event, q[7]);
+	float10 = evtGetFloat(event, q[8]);
+	float11 = evtGetFloat(event, q[9]);
+	float12 = evtGetFloat(event, q[10]);
+	float13 = evtGetFloat(event, q[11]);
+	float14 = evtGetFloat(event, q[12]);
 
 	entry = NULL;
 	switch (effGetSet(effSet)->id) {
@@ -382,8 +387,8 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
 {
   s32 *args;
   s32 *pi;
-  s32 *pf;
   s32 *pr;
+  s32 *pf;
   s32 new_var;
   const char *effName;
   const char *effSet;
@@ -420,15 +425,15 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
   s32 u1a;
   s32 u1b;
   args = event->args;
-  effName = (const char *) evtGetValue(event, args[0]);
-  evtGetValue(event, args[0]);
-  evtGetValue(event, args[0]);
-  pi = args + 2;
-  effSet = (const char *) evtGetValue(event, args[1]);
-  pr = pi;
-  u1a = evtGetValue(event, args[1]);
-  pf = pi;
-  u1b = evtGetValue(event, args[1]);
+  pi = args;
+  pr = args;
+  pf = args;
+  effName = (const char *) evtGetValue(event, *(pi++));
+  evtGetValue(event, *(pr++));
+  evtGetValue(event, *(pf++));
+  effSet = (const char *) evtGetValue(event, *(pi++));
+  u1a = evtGetValue(event, *(pr++));
+  u1b = evtGetValue(event, *(pf++));
   int2 = evtGetValue(event, *(pi++));
   int3 = evtGetValue(event, *(pi++));
   int4 = evtGetValue(event, *(pi++));
@@ -872,7 +877,7 @@ s32 evt_eff64(EventEntry *event, BOOL isFirstCall)
 
   if (effect && effName)
   {
-    if (strcmp(effName, "\0\0\0"))
+    if (strcmp(effName, ""))
     {
       effSetName(effect, effName);
     }
@@ -962,4 +967,3 @@ USER_FUNC(evt_eff_fukidashi) {
 	return EVT_RETURN_DONE;
 }
 #pragma pop
-

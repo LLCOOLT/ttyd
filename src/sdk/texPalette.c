@@ -9,7 +9,7 @@ void UnpackTexPalette(TEXPalettePtr pal) {
     u16 i;
 
     if (pal->versionNumber != PALETTE_VERSION) {
-        OSPanic(__FILE__, 0x24, "invalid version number for texture palette");
+        OSPanic(__FILE__, 0x24, "invalid version number for texture palette\0");
     }
 
     if ((u32)pal->descriptorArray <= 0x80000000) {

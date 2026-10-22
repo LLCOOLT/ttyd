@@ -451,7 +451,7 @@ static s32 normal_attack_event[] = {
     60, 655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 30,
     0, 4, 0, -1, 65545, 10, 327771, (s32)btlevtcmd_SetScale,
     -2, -229998976, -229998976, -229998976, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KUMO_MOVE2",
-    -250000000, 0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A",
+    -250000000, 0, -29999985, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"A_1A\0\0\0",
     393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999990, -29999989, -29999988, 655451,
     (s32)btlevtcmd_DivePosition, -2, -29999990, -29999989, -29999988, 40, -40, 1,
     0, -1, 131163, (s32)evt_snd_sfxoff, -29999985, 458843, (s32)btlevtcmd_PreCheckDamage, -2,

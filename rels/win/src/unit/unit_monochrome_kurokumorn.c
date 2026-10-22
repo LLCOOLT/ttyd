@@ -481,7 +481,7 @@ static s32 normal_attack_event[] = {
     393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -29999990, -29999989, -29999988, 262235,
     (s32)btlevtcmd_FaceDirectionAdd, -2, -29999990, 40, 655451, (s32)btlevtcmd_DivePosition, -2, -29999990,
     -29999999, -29999988, 40, 0, 4, 0, -1, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KUMO_MOVE3", -250000000,
+    (s32)evt_btl_camera_set_mode, 0, 0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KUMO_MOVE3\0", -250000000,
     0, -29999985, 327771, (s32)btlevtcmd_GetHomePos, -2, -30000000, -29999999, -29999998,
     655451, (s32)btlevtcmd_DivePosition, -2, -30000000, -29999999, -29999998, 40, 40,
     4, 0, -1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"S_1",

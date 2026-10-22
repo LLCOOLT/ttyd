@@ -1084,7 +1084,7 @@ static s32 call_friend_event[] = {
     -29999999, -29999998, 262235, (s32)btlevtcmd_TransStageFloorPosition, -30000000, -29999999, -29999998, 983131,
     (s32)evt_eff, 0, (s32)"kemuri_test", 14, -30000000, -29999999, -29999998, -229998464,
     0, 0, 0, 0, 0, 0, 0, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP3", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_SAMBO_SEND_GROUP3\0\0", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
     -29999997, 1, (s32)"SNB_D_1", 327771, (s32)btlevtcmd_GetPos, -29999997, -30000000, -29999999,
     -29999998, 196699, (s32)btlevtcmd_SetFallAccel, -29999997, -229999284, 458843, (s32)btlevtcmd_JumpPosition, -29999997,
     -29999994, -29999993, -29999992, 20, -1, 327771, (s32)btlevtcmd_SetHomePos, -29999997,

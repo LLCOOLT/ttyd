@@ -313,7 +313,7 @@ void BSE_Kagegakure(BattleUnit* unit) {
 	}
 	if (on) {
 		if (KAGE_ICON(unit) == NULL) {
-			sprintf(name, "_biK_%02x\0\0\0\0\0\0", *(s32*)unit);
+			sprintf(name, "_biK_%02x\0\0", *(s32*)unit);
 			iconEntry(name, 0x99);
 			KAGE_ICON(unit) = (u8*)iconNameToPtr(name);
 		}

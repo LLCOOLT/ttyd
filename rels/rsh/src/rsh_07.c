@@ -221,7 +221,7 @@ __declspec(section ".data") EVT_BEGIN(rsh_07_b_init_evt)
 EVT_END()
 
 static __declspec(section ".data") s32 window_tbl[] = {
-    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", (s32)"mado_uturi_4", 0,
+    (s32)"mado_uturi_1", (s32)"mado_uturi_2", (s32)"mado_uturi_3", (s32)"mado_uturi_4\0\0\0", 0,
 };
 
 EVT_BEGIN(rsh_07_c_init_evt)

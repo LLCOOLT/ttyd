@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "battle/battle.h"
 #include "battle/battle_database_common.h"
 #include "battle/battle_stage.h"
@@ -148,13 +149,13 @@ extern s32 weaponGetACOutputParam[];
 extern s32 weaponGetPowerFromPartyAttackLv[];
 
 __declspec(section ".data") u64 lbl_80388868;
-__declspec(section ".data") u64 fd_vivian_negone_one_374;
+__declspec(section ".data") static u64 negone_one$374;
 __declspec(section ".data") u64 lbl_80388878;
-__declspec(section ".data") u64 fd_vivian_one_negone_373;
+__declspec(section ".data") static u64 one_negone$373;
 __declspec(section ".data") u64 lbl_80388888;
-__declspec(section ".data") u64 fd_vivian_negone_one_360;
+__declspec(section ".data") static u64 negone_one$360;
 __declspec(section ".data") u64 lbl_80388898;
-__declspec(section ".data") u64 fd_vivian_one_negone_359;
+__declspec(section ".data") static u64 one_negone$359;
 PoseTableEntry pose_table_vivian_stay[24];
 static BattleDataEntry data_table[20];
 BattleUnitKindPart unitpartsdata_Party_Vivian[1];
@@ -195,19 +196,19 @@ static s32 attack_audience_event[189];
 
 __declspec(section ".data") u64 lbl_80388868 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 fd_vivian_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") static u64 negone_one$374 = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 lbl_80388878 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 fd_vivian_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") static u64 one_negone$373 = 0x3F800000BF800000;
 
 __declspec(section ".data") u64 lbl_80388888 = 0xBF8000003F800000;
 
-__declspec(section ".data") u64 fd_vivian_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") static u64 negone_one$360 = 0xBF8000003F800000;
 
 __declspec(section ".data") u64 lbl_80388898 = 0x3F800000BF800000;
 
-__declspec(section ".data") u64 fd_vivian_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") static u64 one_negone$359 = 0x3F800000BF800000;
 
 PoseTableEntry pose_table_vivian_stay[] = {
     {9, "PTR_D_4"},

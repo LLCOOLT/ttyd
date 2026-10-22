@@ -333,11 +333,17 @@ void BattleStageDispDark(CameraId camId, void* param) {
 	DarkBySquare(-640.0f, 640.0f, 640.0f, -640.0f, 105.0f, s->stgDark.cur);
 }
 
+// FAKE: copy propagation off and the 2.0f held in a named local `two`, so the constant numbers below `width`
+// (a propagated constant load is an unnamed temp numbered above every named local); `s` is taken directly
+// rather than through STG because with propagation off the inline's return temp would take its place.
+#pragma push
+#pragma opt_propagation off
 void BattleStageDispLight(CameraId camId, void* param) {
 	s32 i, j;
 	f32 width;
-	StageWork* s = STG;
+	StageWork* s = (StageWork*)&_battleWorkPointer->stage;
 	CameraEntry* cam = camGetPtr(CAMERA_3D);
+	f32 two;
 
 	GXSetCullMode(GX_CULL_BACK);
 	GXSetZCompLoc(GX_TRUE);
@@ -368,13 +374,14 @@ void BattleStageDispLight(CameraId camId, void* param) {
 			axis = (Vec){s->lights[i].target.x - s->lights[i].pos.x, s->lights[i].target.y - s->lights[i].pos.y, s->lights[i].target.z - s->lights[i].pos.z};
 			width = s->lights[i].width;
 			v = s->lights[i].up;
+			two = 2.0f;
 			for (j = 0; j < 18; j++) {
 				f32 px = s->lights[i].pos.x;
 				f32 py = s->lights[i].pos.y;
 				f32 pz = s->lights[i].pos.z;
-				f32 ex = (s->lights[i].target.x - px) * 2.0f + px;
-				f32 ey = (s->lights[i].target.y - py) * 2.0f + py;
-				f32 ez = (s->lights[i].target.z - pz) * 2.0f + pz;
+				f32 ex = (s->lights[i].target.x - px) * two + px;
+				f32 ey = (s->lights[i].target.y - py) * two + py;
+				f32 ez = (s->lights[i].target.z - pz) * two + pz;
 				f32 ax = v.x * width + ex;
 				f32 ay = v.y * width + ey;
 				f32 az = v.z * width + ez;
@@ -401,6 +408,7 @@ void BattleStageDispLight(CameraId camId, void* param) {
 		}
 	}
 }
+#pragma pop
 
 void BattleStageOnLightInCommand(void) {
 }
@@ -832,7 +840,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	Mtx m1;
 	Mtx m2;
 	u8* tex;
-	s32 i, j, n, w, s, k, idx;
+	s32 i, j, n, w, s, k, idx, o;
 	s32 rc[2];
 	u8 c;
 	f32 lim;
@@ -845,10 +853,8 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 	if (screen_wp->field_24 != 0) {
 		tex = screen_wp->tex;
 		for (i = 0; i < 64; i++) {
-			rc[1] = i / 4;
-			rc[0] = i % 4;
 			for (j = 0; j < 64; j++) {
-				idx = (j / 8) * 32 + (rc[1] << 8); idx += j % 8; idx += rc[0] << 3; tex[idx] = (i & 1) ? 0xFF : 0;
+				rc[1] = i / 4; rc[0] = i % 4; idx = (j / 8) * 32 + (rc[1] << 8); tex[idx + rc[0] * 8 + j % 8] = (i & 1) ? 0xFF : 0;
 			}
 			n = rand() % 100 + 100;
 			rc[1] = rc[1] * 256;
@@ -858,7 +864,7 @@ void tou_gamen_screen_tev(TevCbWork* p) {
 				s = rand() % (65 - w);
 				c = rand() % 256;
 				for (j = s; j < s + w; j++) {
-					idx = j / 8 * 32; idx = idx + rc[1]; idx += j % 8; idx += k; tex[idx] = c;
+					idx = j / 8 * 32; idx = idx + rc[1]; o = idx + j % 8; o += k; tex[o] = c;
 				}
 			}
 		}

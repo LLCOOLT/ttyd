@@ -76,7 +76,7 @@ EffectEntry* effMahojinEntry(s32 type, f32 x, f32 y, f32 z) {
 
     effect = effEntry();
     n = (type < 8 ? type : 7) + 2;
-    effect->type = "Mahojin\0\0\0\0";
+    effect->type = "Mahojin";
     effect->count = n;
     work = __memAlloc(HEAP_EFFECT, n * sizeof(EffMahojinWork));
     effect->userdata = work;

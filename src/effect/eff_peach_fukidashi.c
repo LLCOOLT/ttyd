@@ -53,7 +53,7 @@ EffectEntry* effPeachFukidashiEntry(s32 type, NpcEntry* npc, s32 duration, f32 x
     EffPeachFukidashiWork* work;
 
     effect = effEntry();
-    effect->type = "PeachFukidashi";
+    effect->type = "PeachFukidashi\0";
     effect->count = 1;
     work = __memAlloc(HEAP_EFFECT, sizeof(EffPeachFukidashiWork) * effect->count);
     effect->userdata = work;

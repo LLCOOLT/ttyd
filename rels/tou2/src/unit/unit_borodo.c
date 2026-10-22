@@ -611,7 +611,7 @@ static s32 escape_event[] = {
     458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, -29999999, -29999998, -229979520, -2,
     786523, (s32)btlevtcmd_SetPartsBlur, -2, 1, 255, 255, 255, 255,
     100, 100, 100, 50, 0, 262235, (s32)btlevtcmd_OnPartsAttribute, -2,
-    1, 67108864, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BORODO_ESCAPE1", -250000000, 0,
+    1, 67108864, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BORODO_ESCAPE1\0", -250000000, 0,
     -250000000, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229990784, 524379, (s32)btlevtcmd_MovePosition, -2,
     300, -29999999, -29999998, 0, 0, 0, 786523, (s32)btlevtcmd_SetPartsBlur,
     -2, 1, 0, 0, 0, 0, 0, 0,

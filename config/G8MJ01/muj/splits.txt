@@ -34,7 +34,7 @@ muj_03.c:
 
 muj_04.c:
 	.text       start:0x00003040 end:0x000030F0
-	.rodata     start:0x000024A8 end:0x00002A20
+	.rodata     start:0x000024A8 end:0x00002A1C
 	.data       start:0x00011A68 end:0x00013118
 
 muj_05.c:
@@ -49,7 +49,7 @@ muj_10.c:
 	.data       start:0x00016890 end:0x00018748
 
 muj_11.c:
-	.rodata     start:0x00003688 end:0x00003720
+	.rodata     start:0x00003688 end:0x0000371C
 	.data       start:0x00018748 end:0x00018A30
 
 muj_12.c:
@@ -75,11 +75,11 @@ unit/unit_boss_cortez.c:
 	.bss        start:0x00000038 end:0x00000068
 
 unit/unit_boss_honeduka.c:
-	.rodata     start:0x00004DC0 end:0x00004E48
+	.rodata     start:0x00004DC0 end:0x00004E44
 	.data       start:0x00028080 end:0x00028308
 
 unit/unit_boss_cortez_sword.c:
-	.rodata     start:0x00004E48 end:0x00004F90
+	.rodata     start:0x00004E48 end:0x00004F8C
 	.data       start:0x00028308 end:0x0002A228
 
 unit/unit_boss_cortez_claw.c:
@@ -87,7 +87,7 @@ unit/unit_boss_cortez_claw.c:
 	.data       start:0x0002A228 end:0x0002AC28
 
 unit/unit_boss_cortez_rapier.c:
-	.rodata     start:0x00005038 end:0x000050F8
+	.rodata     start:0x00005038 end:0x000050F4
 	.data       start:0x0002AC28 end:0x0002B9C8
 
 unit/unit_boss_cortez_saber.c:
@@ -101,7 +101,7 @@ unit/unit_kuriboo.c:
 
 unit/unit_boss_kanbu3.c:
 	.text       start:0x0000663C end:0x0000674C
-	.rodata     start:0x00005308 end:0x00005510
+	.rodata     start:0x00005308 end:0x0000550C
 	.data       start:0x0002D110 end:0x0002F3B0
 
 unit/unit_boss_gundan_zako_group1.c:
@@ -122,11 +122,11 @@ unit/unit_boss_gundan_zako_group3.c:
 
 unit/unit_gundan_zako_magician.c:
 	.text       start:0x0000B3B4 end:0x0000B46C
-	.rodata     start:0x00005BE8 end:0x00005E20
+	.rodata     start:0x00005BE8 end:0x00005E1C
 	.data       start:0x000323E8 end:0x00034798
 
 unit/unit_flower_chorobon.c:
-	.rodata     start:0x00005E20 end:0x00006010
+	.rodata     start:0x00005E20 end:0x0000600C
 	.data       start:0x00034798 end:0x000364B8
 
 unit/unit_green_chorobon.c:

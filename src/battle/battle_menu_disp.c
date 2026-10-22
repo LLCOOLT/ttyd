@@ -56,7 +56,7 @@ void DrawMultiItemWin(void);
 void DrawSubMenuCommonProcess(f32* x, f32* y, void* a, void* b, void* c, void* d);
 void DrawMainIcon(BattleSubMenu* menu, BattleCommandAct* acts, void* a, void* b, void* c);
 void DrawSubIcon(BattleSubMenu* menu, void* a, s32* enabled, s16* icons, const char** names, s32* costs, s32* p34, void* party, s32 y);
-void DrawMenuCursorAndScrollArrow(Vec* v);
+void DrawMenuCursorAndScrollArrow(const Vec* v);
 void DrawMenuHelpWin(const char* help, f32 x, f32 y);
 void DrawChangePartyWin(void);
 void DrawOperationWin(void);
@@ -795,15 +795,13 @@ void DrawMenuHelpWin(const char* msg, f32 x, f32 y) {
     }
 }
 
-void DrawMenuCursorAndScrollArrow(Vec* v) {
+void DrawMenuCursorAndScrollArrow(const Vec* v) {
     Vec pos;
     BattleWork* wp = _battleWorkPointer;
     BattleSubMenu* menu = WP_SUBMENU(wp);
     BattleCursor* cursor = menu->cursor;
     f32 bob;
     s32 n;
-    f32 ax = 155.0f;
-    f32 ay = 15.0f;
 
     bob = intplGetValue(4, menu->field_11C, 6, 0.0f, 10.0f);
     menu->field_11C++;
@@ -811,20 +809,14 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
         menu->field_11C = 0;
     }
     if (cursor->field_4 > 0) {
-        pos.y = ay + v->y;
+        pos.x = 155.0f + v->x;
+        pos.y = 15.0f + v->y + bob;
         pos.z = 0.0f;
-        {
-            f32 py = pos.y + bob;
-            pos.x = ax + v->x;
-            pos.y = py;
-        }
-
         iconDispGx(&pos, 0x10, 0x1B5, 0.75f);
     }
     if (cursor->field_4 < cursor->unk8 - 6) {
-        f32 x = 155.0f + v->x;
+        pos.x = 155.0f + v->x;
         pos.y = 20.0f + v->y - 164.0f - bob;
-        pos.x = x;
         pos.z = 0.0f;
         iconDispGx(&pos, 0x10, 0x1B6, 0.75f);
     }
@@ -835,12 +827,9 @@ void DrawMenuCursorAndScrollArrow(Vec* v) {
     if (n >= 6) {
         n = 5;
     }
-    {
-        f32 y = v->y - (f32)n * 24.0f;
-        pos.x = v->x;
-        pos.z = 0.0f;
-        pos.y = y;
-    }
+    pos.x = v->x;
+    pos.y = v->y - (f32)n * 24.0f;
+    pos.z = 0.0f;
     iconDispGx(&pos, 0x14, 0x1F0, 1.0f);
 }
 

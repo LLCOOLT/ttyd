@@ -394,14 +394,14 @@ void npcDisp_offscreen(CameraId camId, void* param) {
     offscreenAddBoundingBox(entry->offscreenId, left, top, right, bottom);
 }
 
-#pragma opt_propagation off
-#pragma opt_lifetimes off
+#pragma push
+#pragma optimization_level 2
 
 void npcDisp_blur(CameraId camId, void* param) {
+    s32 alpha;
     NpcEntry* entry = param;
     s32 i;
     s32 flag;
-    s32 alpha;
     f32 rotY;
     f32 x;
     f32 z;
@@ -412,7 +412,9 @@ void npcDisp_blur(CameraId camId, void* param) {
     x = 2.0f * npc_sin((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
     z = 2.0f * -npc_cos((6.2831855f * camGetPtr(camId)->viewYaw) / 360.0f);
     animPoseMain(entry->poseId);
-    for (i = 4, alpha = 100; i > 0; i--, alpha -= 25) {
+    i = 4;
+    alpha = 100;
+    do {
         mtx_setup(entry, mtx, i);
         MTXTransApply(mtx, mtx, x, 0.0f, z);
         animPoseSetMaterialFlagOn(entry->poseId, 0x40);
@@ -420,12 +422,13 @@ void npcDisp_blur(CameraId camId, void* param) {
         animPoseDrawMtx(entry->poseId, mtx, 1, rotY, 2.0f);
         animPoseDrawMtx(entry->poseId, mtx, 2, rotY, 2.0f);
         animPoseDrawMtx(entry->poseId, mtx, 3, rotY, 2.0f);
-    }
+        i--;
+        alpha -= 25;
+    } while (i > 0);
     animPoseSetMaterialFlagOff(entry->poseId, 0x40);
     animPoseSetMaterialFlagOn(entry->poseId, flag);
 }
-#pragma opt_propagation reset
-#pragma opt_lifetimes reset
+#pragma pop
 
 void npcInit(void) { // 1:1
     FieldBattleData* data;
@@ -1078,11 +1081,13 @@ void npcSetMarioAutoTalkPose(const char* stayPose, const char* talkPose) {
 
 #pragma opt_propagation off
 #pragma opt_lifetimes off
-void npcSetTalkPose(const char* name) {
+// name is non-const as in the original: through a const char* the scheduler moves the first load up into the
+// register saves (MWCC treats const loads as not aliasing the stores).
+void npcSetTalkPose(char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    while (*(s8*)name == 0) return;
+    if (*(s8*)name == 0) return;
     if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
@@ -1104,11 +1109,11 @@ void npcSetTalkPose(const char* name) {
     }
 }
 
-void npcSetStayPose(const char* name) {
+void npcSetStayPose(char* name) {
     PartyEntry* party;
     NpcEntry* npc;
 
-    while (*(s8*)name == 0) return;
+    if (*(s8*)name == 0) return;
     if (!strcmp(name, "(^x^)party")) return;
     if (!strcmp(name, "party")) {
         party = partyGetPtr(marioGetPartyId());
@@ -2207,19 +2212,17 @@ typedef struct { s32 v[11]; } SinTbl;
 static const SinTbl sSinTbl = {{0, 0, 0, 0, 45, 60, 90, 100, 101, 101, 101}};
 
 void* fbatHitCheck(u32 flags, void* a1) {
-    u32 f1000a;
+    s32 total;
     u32 f20;
-    u32 noJump;
-    s32 i;
-    NpcEntry* hit = NULL;
-    MarioWork* mario;
-    FbatHitResult res;
     f32 dist;
+    PartyEntry* party;
+    FbatHitResult res;
+    s32 i;
+    u32 soft;
+    MarioWork* mario;
+    NpcEntry* hit = NULL;
     NpcEntry* npc = NULL;
     NpcWork* wp = npcGetWorkPtrInline();
-    u32 soft;
-    s32 total;
-    PartyEntry* party;
 
     mario = marioGetPtr();
     res.kind = 0;
@@ -2231,6 +2234,8 @@ void* fbatHitCheck(u32 flags, void* a1) {
     }
 
     if (flags & 0x30) {
+        u32 f1000a;
+        u32 noJump;
         noJump = flags & 0x10;
         total = wp->total;
         npc = wp->entries;
@@ -2397,11 +2402,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                     if (dist >= res.dist) continue;
                     res.dist = dist;
                     hit = npc;
-                    if (pouchGetHammerLv() < 3) {
-                        res.kind = 0x200000;
-                    } else {
-                        res.kind = 0x400000;
-                    }
+                    { FbatHitResult* rp = &res; if (pouchGetHammerLv() < 3) { rp->kind = 0x200000; } else { rp->kind = 0x400000; } } // FAKE: store through a pointer to res (keeps the two branch stores, no if-conversion); same field
                     if (!soft) fbatSetAttackAnnounce(res.kind);
                     break;
                 }
@@ -2417,11 +2418,7 @@ void* fbatHitCheck(u32 flags, void* a1) {
                     if (dist >= res.dist) continue;
                     res.dist = dist;
                     hit = npc;
-                    if (pouchGetHammerLv() < 3) {
-                        res.kind = 0x200000;
-                    } else {
-                        res.kind = 0x400000;
-                    }
+                    { FbatHitResult* rp = &res; if (pouchGetHammerLv() < 3) { rp->kind = 0x200000; } else { rp->kind = 0x400000; } } // FAKE: store through a pointer to res (keeps the two branch stores, no if-conversion); same field
                     if (!soft) fbatSetAttackAnnounce(res.kind);
                     break;
                 }
@@ -3240,8 +3237,8 @@ f32 npcTransRytoFaceDir(NpcEntry* npc);
 void npcTuningRy(NpcEntry* npc, f32 angle);
 void npcMoveG(NpcEntry* npc);
 BOOL npcCheckHitMarioSide(NpcEntry* npc);
-void npcSetStayPose(const char* name);
-void npcSetTalkPose(const char* name);
+void npcSetStayPose(char* name);
+void npcSetTalkPose(char* name);
 void npcSetMarioAutoTalkPose(const char* stayPose, const char* talkPose);
 NpcEntry* npcNameToPtr_NoAssert(const char* name);
 NpcEntry* npcNameToPtr(const char* name);

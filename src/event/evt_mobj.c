@@ -535,7 +535,7 @@ USER_FUNC(evt_mobj_switch_blue) {
         break;
     case 2:
     default:
-        anim = "HOBJ_BlueSwitch\0\0\0\0";
+        anim = "HOBJ_BlueSwitch";
         break;
     }
     if (animGroupBaseAsync(anim, inBattle, NULL) == 0) {
@@ -3142,21 +3142,22 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
         KURU_POSE_FLAGS(mobj) |= 0x10;
         mobj->flags |= 0x400;
         dispEntry(CAMERA_SHADOW, 0.0f, 0, (DispCallback)kururing_capture, mobj);
-        joint = *(void**)FLD(void*, animPoseGetAnimPosePtr(mobj->poseId), 0x15c);
+        // FAKE: joint points at worldPositions[0] + 0x10 (the y read below) so its web is the unnamed add temp, not a named load (colours before mario's call temp)
+        joint = (u8*)*(void**)FLD(void*, animPoseGetAnimPosePtr(mobj->poseId), 0x15c) + 0x10;
         item = marioGetPtr();
         if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, item, 0x8c), FLD(f32, item, 0x94), 30.0f)) {
-            FLD(f32, item, 0x90) = FLD(f32, joint, 0x10);
+            FLD(f32, item, 0x90) = FLD(f32, joint, 0);
         }
         p = partyGetPtr(marioGetPartyId());
         if (p) {
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
-                FLD(f32, p, 0x5c) = FLD(f32, joint, 0x10);
+                FLD(f32, p, 0x5c) = FLD(f32, joint, 0);
             }
         }
         p = partyGetPtr(marioGetExtraPartyId());
         if (p) {
             if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, p, 0x58), FLD(f32, p, 0x60), 30.0f)) {
-                FLD(f32, p, 0x5c) = FLD(f32, joint, 0x10);
+                FLD(f32, p, 0x5c) = FLD(f32, joint, 0);
             }
         }
         {
@@ -3166,14 +3167,14 @@ s32 mobj_kururing_floor(MapObjectEntry* mobj) {
             for (i = 0; i < wp->total; i++, npc += 0x340) {
                 if (FLD(u32, npc, 0) & 1) {
                     if (kururing_in_box(mobj->position.x, mobj->position.z, FLD(f32, npc, 0x8c), FLD(f32, npc, 0x94), 42.420002f)) {
-                        FLD(f32, npc, 0x90) = FLD(f32, joint, 0x10);
+                        FLD(f32, npc, 0x90) = FLD(f32, joint, 0);
                     }
                 }
             }
         }
         p = itemNearDistCheck(mobj->position.x, mobj->position.y, mobj->position.z, 42.420002f);
         if (p) {
-            FLD(f32, p, 0x40) = FLD(f32, joint, 0x10);
+            FLD(f32, p, 0x40) = FLD(f32, joint, 0);
         }
         if (animPoseGetLoopTimes(mobj->poseId) < 2.0f) {
             break;

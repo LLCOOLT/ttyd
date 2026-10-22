@@ -338,7 +338,7 @@ static s32 evt_attack[] = {
     262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, -29999998, 65545, 1, 196699,
     (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1, 6, 65546, 1000, 131096, -70000000,
     0, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_MOVE3", -250000000, 0, -250000000,
-    32, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_MOVE3_2", -250000000, 0, -250000000,
+    32, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MOA_G_ARM_MOVE3_2\0", -250000000, 0, -250000000,
     33, 131096, -29999985, 0, 65541, 0, 65599, -29999998,
     131096, -29999998, 0, 7, 33, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
     1, -29999998, 65545, 1, 196699, (s32)btlevtcmd_AnimeWaitPlayComplete, -2, 1,

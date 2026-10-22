@@ -425,7 +425,7 @@ static s32 attack_event[] = {
     112, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_EMON_MOVE3", -250000000, 0, -250000000,
     262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
     2, 196699, (s32)evt_btl_camera_set_zoom, 0, 200, 65546, 750, 196699,
-    (s32)evt_btl_camera_set_mode, 0, 3, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_EMON_DASH1", -250000000,
+    (s32)evt_btl_camera_set_mode, 0, 3, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_EMON_DASH1\0", -250000000,
     0, -250000000, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229994880, 393307, (s32)btlevtcmd_GetHitPos,
     -29999997, -29999996, -30000000, -29999999, -29999998, 327771, (s32)btlevtcmd_GetPos, -2,
     -250000000, -29999995, -250000000, 524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999995,

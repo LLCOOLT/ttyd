@@ -301,7 +301,7 @@ static s32 weapon_basabasa_attack[] = {
 
 static s32 pose_sound_timing_table[] = {
     (s32)"BSA_S_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_W_1", 1008981770, 0,
-    (s32)"SFX_ENM_BASA_MOVE1", 1, (s32)"BSA_R_1", 1008981770, 0, (s32)"SFX_ENM_BASA_MOVE1", 1, (s32)"BSA_T_1",
+    (s32)"SFX_ENM_BASA_MOVE1\0", 1, (s32)"BSA_R_1", 1008981770, 0, (s32)"SFX_ENM_BASA_MOVE1\0", 1, (s32)"BSA_T_1",
     1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_A_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1",
     1, (s32)"BSA_N_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_K_1", 1008981770,
     0, (s32)"SFX_ENM_BASA_WAIT1", 1, (s32)"BSA_X_1", 1008981770, 0, (s32)"SFX_ENM_BASA_WAIT1", 1,

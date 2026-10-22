@@ -44,23 +44,34 @@ volatile PPCWGPipe GXWGFifo AT_ADDRESS(GXFIFO_ADDR);
 
 // inline functions
 
+// Parameter qualifiers of the inline writers. const params (as in the later SDK headers, refs/tp GXVert.h) change
+// the temporaries MWCC makes when it inlines these: const matches effNumberGX and improves _JUTFont_DrawPos, while
+// the s16 forms must stay unqualified (romFontPrintGX, envGlare). Behaviour is identical (by-value params).
+#define GX_INL_Q_u8  const
+#define GX_INL_Q_u16 const
+#define GX_INL_Q_u32 const
+#define GX_INL_Q_s8  const
+#define GX_INL_Q_s16
+#define GX_INL_Q_s32 const
+#define GX_INL_Q_f32 const
+
 #define FUNC_1PARAM(name, T) \
-static inline void name##1##T(T x) { GXWGFifo.T = x; }
+static inline void name##1##T(GX_INL_Q_##T T x) { GXWGFifo.T = x; }
 
 #define FUNC_2PARAM(name, T) \
-static inline void name##2##T(T x, T y) { GXWGFifo.T = x; GXWGFifo.T = y; }
+static inline void name##2##T(GX_INL_Q_##T T x, GX_INL_Q_##T T y) { GXWGFifo.T = x; GXWGFifo.T = y; }
 
 #define FUNC_3PARAM(name, T) \
-static inline void name##3##T(T x, T y, T z) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; }
+static inline void name##3##T(GX_INL_Q_##T T x, GX_INL_Q_##T T y, GX_INL_Q_##T T z) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; }
 
 #define FUNC_4PARAM(name, T) \
-static inline void name##4##T(T x, T y, T z, T w) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; GXWGFifo.T = w; }
+static inline void name##4##T(GX_INL_Q_##T T x, GX_INL_Q_##T T y, GX_INL_Q_##T T z, GX_INL_Q_##T T w) { GXWGFifo.T = x; GXWGFifo.T = y; GXWGFifo.T = z; GXWGFifo.T = w; }
 
 #define FUNC_INDEX8(name) \
-static inline void name##1x8(u8 x) { GXWGFifo.u8 = x; }
+static inline void name##1x8(const u8 x) { GXWGFifo.u8 = x; }
 
 #define FUNC_INDEX16(name) \
-static inline void name##1x16(u16 x) { GXWGFifo.u16 = x; }
+static inline void name##1x16(const u16 x) { GXWGFifo.u16 = x; }
 
 #endif
 

@@ -524,7 +524,7 @@ static s32 attack_event_nokotarou_shubibin[] = {
     0, 131122, -30000000, 15, 262235, (s32)btlevtcmd_SetUnitWork, -2, 9,
     45, 65630, (s32)_koura_rotate_start, 65546, 500, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
     4, 196699, (s32)evt_btl_camera_set_zoom, 0, 400, 65546, 500, 65631,
-    -29999985, 131163, (s32)evt_snd_sfxoff, -29999987, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_NOKO_SHUBIBIN2",
+    -29999985, 131163, (s32)evt_snd_sfxoff, -29999987, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BTL_NOKO_SHUBIBIN2\0",
     -250000000, 0, -29999987, 196699, (s32)evt_btl_camera_set_mode, 0, 0, 196699,
     (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 327771, (s32)evt_btl_camera_set_posoffset, 0, 0, 0,
     0, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 131122, -29999990,

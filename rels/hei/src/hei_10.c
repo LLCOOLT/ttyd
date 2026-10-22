@@ -2,6 +2,8 @@
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
+#pragma force_active on
+
 #include "memory.h"
 #include "string.h"
 #include "dolphin/mtx.h"
@@ -270,6 +272,16 @@ static inline void jump(ExtPose* pose, Chorobon* chb, s32 next, f32 x, f32 y, f3
 #pragma push
 #pragma opt_lifetimes off
 #pragma opt_dead_assignments off
+static inline void jump_r(ExtPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
+    f32 rs = rand() / 32767.0f;
+    f32 rg = rand01();
+    jump(pose, chb, chb->state, x, y, z, rs, 0.3f, 0.5f, rg, 0.5f, 0.8f);
+}
+static inline void escape_r(ExtPose* pose, Chorobon* chb, f32 x, f32 y, f32 z) {
+    f32 rs = rand() / 32767.0f;
+    f32 rg = rand01();
+    escape(pose, chb, chb->state, x, y, z, rs, 1.0f, 1.2f, rg, 0.8f, 0.8f);
+}
 static void ext_main(void) {
     MarioWork* mario = marioGetPtr();
     const char* sfx;
@@ -291,7 +303,7 @@ static void ext_main(void) {
     for (i = 0; i < wp->count; i++, pose++, chb++) {
         switch (chb->state) {
             case 0: {
-                f32 z, speed, gravity, dist, x, y;
+                f32 z, dist, x, y;
                 x = rand() / 32767.0f;
                 dist = randf(4.0f, 7.0f);
                 {
@@ -300,9 +312,7 @@ static void ext_main(void) {
                     y = pose->mtx[1][3];
                     z = pose->mtx[2][3] - dist * chb_cos(rad);
                 }
-                speed = rand() / 32767.0f;
-                gravity = rand01();
-                jump(pose, chb, chb->state, x, y, z, speed, 0.3f, 0.5f, gravity, 0.5f, 0.8f);
+                jump_r(pose, chb, x, y, z);
                 break;
             }
             case 1:
@@ -317,9 +327,7 @@ static void ext_main(void) {
                         y = pose->mtx[1][3];
                         z = pose->mtx[2][3] - dist * chb_cos(rad);
                     }
-                    speed = rand() / 32767.0f;
-                    gravity = rand01();
-                    escape(pose, chb, chb->state, x, y, z, speed, 1.0f, 1.2f, gravity, 0.8f, 0.8f);
+                    escape_r(pose, chb, x, y, z);
                     if (rand() % 150 == 0) {
                         pos = (Vec){pose->mtx[0][3], pose->mtx[1][3], pose->mtx[2][3]};
                         psndSFXOn_3D(sfx, &pos);

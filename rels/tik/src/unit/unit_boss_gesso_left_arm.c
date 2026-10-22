@@ -309,7 +309,7 @@ static s32 attack_event[] = {
     (s32)btlevtcmd_PayWeaponCost, -2, -29999988, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"GSO_A1_1",
     110, 196699, (s32)btlevtcmd_ftof, 16, -30000000, 65545, -30000000, 393307,
     (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ARM_MOVE1", -250000000, 0, -250000000, 196699, (s32)btlevtcmd_ftof,
-    44, -30000000, 65545, -30000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ATTACK2",
+    44, -30000000, 65545, -30000000, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_GESSO_ATTACK2\0",
     -250000000, 0, -250000000, 112, 196699, (s32)btlevtcmd_ftof, 64, -30000000,
     65545, -30000000, 65539, 50, 458843, (s32)btlevtcmd_PreCheckDamage, -2, -29999997,
     -29999996, -29999988, 256, -29999995, 131097, -29999995, 1, 65570,

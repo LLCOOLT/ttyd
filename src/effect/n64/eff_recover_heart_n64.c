@@ -364,4 +364,3 @@ void effRecoverHeartDisp(CameraId cameraId, EffectEntry* effect) {
     }
 }
 
-__declspec(section ".sdata2") const u32 gap_10_8042323C_sbss2;

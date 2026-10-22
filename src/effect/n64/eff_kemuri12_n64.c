@@ -109,11 +109,11 @@ void effKemuri12Main(EffectEntry* effect) {
 
 void effKemuri12Disp(CameraId cameraId, EffectEntry *effect)
 {
-  u16 type;
-  s32 idx;
-  s32 last;
+  s32 type;
   CameraEntry *camera;
+  s32 last;
   EffKemuri12N64Work *work;
+  s32 idx;
   s32 ofs;
   s32 alpha;
   effN64Vtx *vtx;
@@ -125,7 +125,8 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry *effect)
   work = effect->userdata;
   idx = (s32) work->progress;
   alpha = 256.0f * (work->progress - ((f32) idx));
-  type = work->type;
+  // FAKE: integer-cast load makes type an unnamed temp (numbered above the camera copy, coloured first)
+  type = (u16)(u32)work->type;
   last = idx == 7;
   GXSetNumChans(0);
   GXSetNumTevStages(3);
@@ -191,6 +192,8 @@ void effKemuri12Disp(CameraId cameraId, EffectEntry *effect)
 
     default:
       work->position.z = work->position.z;
+      // FAKE: float self-assign keeps the camera web live through the switch pre-RA (gives it degree >= K); emits no code
+      camera->near = camera->near;
       vtx = size32x32_tex32x32_yougan_vtx;
       break;
 

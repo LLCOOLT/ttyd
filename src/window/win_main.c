@@ -76,7 +76,6 @@ s32 evt_diary_read[];
 
 //.sbss
 #pragma force_active on
-s32 gap_08_80418A1C_sbss;
 #pragma force_active reset
 static s32 cnt;
 TEXPalette* winTexTpl;
@@ -290,7 +289,7 @@ void winMain(void) {
                 fileAsyncf(4, 0, "%s/w/jp/mail.tpl", getMarioStDvdRoot());
                 {
                     const char* name = winGetMapTplName();
-                    fileAsyncf(4, 0, "%s/w/jp/%s", getMarioStDvdRoot(), name);
+                    fileAsyncf(4, 0, "%s/w/jp/%s\0", getMarioStDvdRoot(), name);
                 }
                 wp->field_0x24_s32 = 0;
                 if (strncmp(gp->currentMapName, "yuu_", 4) == 0) {

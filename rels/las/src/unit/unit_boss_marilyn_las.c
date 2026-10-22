@@ -524,7 +524,7 @@ static s32 charge_attack_event[] = {
     196699, (s32)btlevtcmd_PayWeaponCost, -2, -29999991, 196699, (s32)evt_btl_camera_set_mode, 0, 7,
     262235, (s32)evt_btl_camera_set_homing_unit, 0, -2, -1, 196699, (s32)evt_btl_camera_set_moveSpeedLv, 0,
     2, 196699, (s32)evt_btl_camera_set_zoom, 0, 400, 65546, 300, 262235,
-    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MRR_A3_1", 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MARI_CHARGE1",
+    (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"MRR_A3_1", 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_BOSS_MARI_CHARGE1\0\0",
     -250000000, 0, -29999985, 65546, 800, 107, 65546, 1000,
     196699, (s32)evt_btl_camera_set_mode, 0, 0, 109, 131163, (s32)evt_snd_sfxoff, -29999985,
     458843, (s32)btlevtcmd_CheckDamage, -2, -2, 1, -29999991, 256, -29999995,

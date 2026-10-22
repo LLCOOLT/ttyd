@@ -30,7 +30,6 @@ void effNozleMain(EffectEntry* effect);
 void effNozleDisp(CameraId cameraId, EffectEntry* effect);
 
 
-__declspec(section ".sdata2") const u32 gap_10_80423304_sbss2;
 
 __declspec(section ".data") f32 lbl_803AE260[] = {-1.0f, 1.0f};
 static __declspec(section ".data") f32 negone_one_374[] = {-1.0f, 1.0f};

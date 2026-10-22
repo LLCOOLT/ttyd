@@ -29,7 +29,7 @@ BOOL ARCInitHandle(void* arcStart, ARCHandle* handle) {
 
 	header = (ARCHeader*)arcStart;
 	if (header->magic != 0x55AA382D) {
-		OSPanic(__FILE__, 70, "ARCInitHandle: bad archive format");
+		OSPanic(__FILE__, 70, "ARCInitHandle: bad archive format\0\0");
 	}
 	handle->archiveStartAddr = arcStart;
 	entry = (FSTEntry*)((u32)arcStart + header->fstStart);

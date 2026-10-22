@@ -174,6 +174,13 @@ void itemInit(void) { // 1:1
     wp->currId = 0;
 }
 
+// FAKE: never called (dead-stripped); stands in for a stripped function whose pooled constant is the
+// 0x18 zero bytes after double_neg1 in .rodata (MWCC pools doubles/strings in REVERSE function order,
+// so an early function lands at the tail).
+const char* itemdrvRodataPad(void) {
+    return "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+}
+
 void itemReInit(void) {
     ItemWork* wp = itemGetWork();
     ItemEntry* entry;
@@ -1306,7 +1313,7 @@ void itemseq_Bound(ItemEntry* entry) {
 			t1 = OSTicksToMicroseconds(entry->airTime) / 1000000.0f;
 			t2 = OSTicksToMicroseconds(entry->airTime + delta) / 1000000.0f;
 			dx = dt * (entry->speed * (f32)sin(6.2831855f * entry->direction / 360.0f));
-			dz = dt * (entry->speed * -(f32)cos(6.2831855f * entry->direction / 360.0f));
+			{ f32 c = (f32)cos(6.2831855f * entry->direction / 360.0f); dz = dt * (entry->speed * -c); } // FAKE: cos result in a local
 			if (entry->flags2 & 0x8000) {
 				dz = 0.0f;
 			}
@@ -1334,9 +1341,40 @@ void itemseq_Bound(ItemEntry* entry) {
 				entry->speed *= 0.25f;
 			}
 			if (!(entry->flags2 & 0x20) && !(entry->flags & 0x800)) {
-				hit = itemHitCheckUp(entry, dy);
+				{
+					// FAKE: itemHitCheckUp written out here (inlining it leaves the Y block below in the wrong stack order);
+					// h/r are the inline's result copies and keep the same register pressure. hit* declared in reverse for ascending slots.
+					HitEntry* h;
+					HitEntry* r;
+					f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
+					f32 x, y, z;
+
+					if (dy <= 0.0f) {
+						r = NULL;
+					}
+					else {
+						x = entry->position.x; y = 20.0f + entry->position.y; z = entry->position.z;
+						{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+						if (h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
+							entry->position.y = hitY - 20.0f - 4.0f;
+							r = h;
+						}
+						else {
+							x = entry->position.x; y = entry->position.y; z = entry->position.z;
+							{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+							if (h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
+								entry->position.y = hitY - 20.0f;
+								r = h;
+							}
+							else {
+								r = NULL;
+							}
+						}
+					}
+					hit = r;
+				}
 				if (hit) {
-					entry->velocityY = -entry->velocityY * 0.25f;
+					entry->velocityY = -entry->velocityY / 4.0f; // FAKE: /4.0f (exact) gives the target register order
 					dy = 0.0f;
 					entry->airTime = 0;
 					entry->baseTime = entry->curTime;
@@ -1365,12 +1403,27 @@ void itemseq_Bound(ItemEntry* entry) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
-			else if (entry->flags2 & 0x100000) {
+			// FAKE: no-op u32 cast so the earlier masked flags2 value is not reused (target reloads flags2 here)
+			else if (*(u32*)&entry->flags2 & 0x100000) {
 				hit = NULL;
 				entry->position.y += dy;
 			}
 			else {
-				hit = itemHitCheckY(entry, entry->position.z, 20.0f + entry->position.y, entry->position.x, dy);
+				// FAKE: itemHitCheckY written out here; the result goes through h so the caller's hit is set in each arm
+				// (coalesces into r26 like the target). hit* declared in reverse for ascending stack slots.
+				f32 hitNZ, hitNY, hitNX, hitDist, hitZ, hitY, hitX;
+				HitEntry* h;
+				f32 x = entry->position.x, y = 20.0f + entry->position.y, z = entry->position.z;
+				{ f64 d = __fabs(dy); hitDist = 20.0 + d; }
+				h = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f);
+				if (h) {
+					entry->position.y = hitY;
+					hit = h;
+				}
+				else {
+					hit = NULL;
+					entry->position.y += dy;
+				}
 			}
 			if (hit) {
 				if (hitGetAttr(hit) & 0x600) {
@@ -1450,7 +1503,7 @@ void itemseq_Bound(ItemEntry* entry) {
 						v = entry->velocityY * dt + (-980.0f * entry->gravityScale) * ((t2 + dt) * (t2 + dt) - t2sq);
 						entry->velocityY = 0.7f * (entry->bounceFactor * (-v / dt));
 					}
-					peak = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->gravityScale)));
+					{ f64 d = __fabs(0.5f * (entry->velocityY / (-980.0f * entry->gravityScale))); peak = d; } // FAKE: fabs result in an f64 local
 					height = entry->velocityY * peak + peak * ((-980.0f * entry->gravityScale) * peak);
 					if (!isFloor && height <= 8.0f) {
 						itemModeChange(entry, 1);
@@ -1511,6 +1564,7 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 	f32 sin, cos;
 	f32 dot, ox, oz;
+	f32 h; // FAKE: 15.0f in a local set before each hitDist store, so the y argument stays pos.y + h (a literal would be put on the left)
 
 	*outX = entry->position.x;
 	*outZ = entry->position.z;
@@ -1518,9 +1572,10 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 		return NULL;
 	}
 	sincosf(&sin, &cos, angleABf(0.0f, 0.0f, dx, dz));
+	h = 15.0f;
 	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
-		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
+		entry->position.x, entry->position.y + h, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
 		dot = dx * hitNX + dz * hitNZ;
 		ox = 0.5f * (dx - dot * hitNX);
@@ -1532,9 +1587,10 @@ HitEntry* itemHitCheckSide(ItemEntry* entry, f32* outX, f32 dx, f32* outZ, f32 d
 		*angle = reviseAngle(b + reviseAngle(b - a));
 		return hit;
 	}
+	h = 15.0f;
 	hitDist = 10.0f + item_sqrtf(dx * dx + dz * dz);
 	hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ,
-		entry->position.x, 15.0f + entry->position.y, entry->position.z, sin, 0.0f, cos);
+		entry->position.x, entry->position.y + h, entry->position.z, sin, 0.0f, cos);
 	if (hit) {
 		dot = dx * hitNX + dz * hitNZ;
 		ox = 0.5f * (dx - dot * hitNX);
@@ -1556,7 +1612,7 @@ itemHitCheckY(ItemEntry* entry, f32 z, f32 y, f32 x, f32 vy) {
 	HitEntry* hit;
 	f32 hitX, hitY, hitZ, hitDist, hitNX, hitNY, hitNZ;
 
-	hitDist = 20.0f + __fabs(vy);
+	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, -1.0f, 0.0f)) {
 		entry->position.y = hitY;
 	}
@@ -1577,13 +1633,13 @@ itemHitCheckUp(ItemEntry* entry, f32 vy) {
 		return NULL;
 	}
 	x = entry->position.x; y = 20.0f + entry->position.y; z = entry->position.z;
-	hitDist = 20.0f + __fabs(vy);
+	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 		entry->position.y = hitY - 20.0f - 4.0f;
 		return hit;
 	}
 	x = entry->position.x; y = entry->position.y; z = entry->position.z;
-	hitDist = 20.0f + __fabs(vy);
+	{ f64 d = __fabs(vy); hitDist = 20.0 + d; } // FAKE: f64 local keeps 20.0 on the left of the fadd
 	if (hit = hitCheckFilter(NULL, &hitX, &hitY, &hitZ, &hitDist, &hitNX, &hitNY, &hitNZ, x, y, z, 0.0f, 1.0f, 0.0f)) {
 		entry->position.y = hitY - 20.0f;
 		return hit;

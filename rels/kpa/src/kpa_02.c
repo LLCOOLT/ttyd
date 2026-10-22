@@ -163,7 +163,7 @@ static EVT_BEGIN(kpa_goal)
             WAIT_MS(300)
             CALL(evt_cam_letter_box_disable, 0)
         END_INLINE_EVENT
-        CALL(evt_bero_mapchange, STRING("nok_00"), STRING("w_bero"))
+        CALL(evt_bero_mapchange, STRING("nok_00"), STRING("w_bero\0"))
     END_IF
     CALL(evt_mario_key_onoff, 1)
     RETURN

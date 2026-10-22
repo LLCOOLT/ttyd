@@ -1313,7 +1313,6 @@ static inline void sndGet3DParameters(SND_3DINFO* info, SND_FVECTOR* pos, SND_FV
 }
 
 #endif
-__declspec(section ".sdata2") const u32 gap_09_80422CD4_sdata2[1] = {0};
 void s3dInit(u32 flags) {
   
   s3dEmitterRoot = 0;

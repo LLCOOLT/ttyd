@@ -457,7 +457,7 @@ static USER_FUNC(waku_main) {
     animPoseWorldPositionEvalOn(poseId);
     animPoseGetAnimBaseDataPtr(poseId);
     pose = animPoseGetAnimPosePtr(poseId);
-    idx = animPoseGetGroupIdx(poseId, "locator17");
+    idx = animPoseGetGroupIdx(poseId, "locator17\0\0");
     BtlUnit_SetPartsPos(waku, (*pose->worldPositions)[idx].x, (*pose->worldPositions)[idx].y,
                         (*pose->worldPositions)[idx].z);
     yaw = camGetPtr(CAMERA_3D)->viewYaw;

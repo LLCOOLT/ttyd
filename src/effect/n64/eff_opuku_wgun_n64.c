@@ -249,7 +249,6 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
     GXSetTevColor(GX_TEVREG1, (GXColor){work->color2R, work->color2G, work->color2B, 200});
     GXSetCullMode(GX_CULL_NONE);
     p = (effN64Vtx*)smartAlloc(sizeof(effN64Vtx) * 48, 3)->address;
-    k = 0;
     vtx = p;
     for (i = 0; i < 12; i++) {
         if (i == 0 || i == 0) {
@@ -277,7 +276,8 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] + dx);
         p->y = 20.0f * (work->y[i] + dy);
         p->z = 20.0f * (work->z[i] + zero);
-        p->s = k;
+        // FAKE: (u32)(i * 64) * 5 == i * 320 (the old k IV) for i in 0..11; the unsigned multiply is strength-reduced by the back-end loop pass, so no li k = 0 competes with the work IV copy in the block after smartAlloc (target order li r28 / mr r30)
+        p->s = (u32)(i * 64) * 5;
         p->t = 0;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;
@@ -287,14 +287,13 @@ void effOpukuWgunDisp(CameraId cameraId, EffectEntry* effect) {
         p->x = 20.0f * (work->x[i] - dx);
         p->y = 20.0f * (work->y[i] - dy);
         p->z = 20.0f * (work->z[i] + zero);
-        p->s = k;
+        p->s = (u32)(i * 64) * 5;
         p->t = 1024;
         p->r = (i & 1) * 255;
         p->g = ((i >> 1) & 1) * 255;
         p->b = ((i >> 2) & 1) * 255;
         p->a = a;
         p++;
-        k += 320;
     }
     PSMTXScale(scale, 0.05f, 0.05f, 0.05f);
     q = vtx;

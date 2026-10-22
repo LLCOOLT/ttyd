@@ -1640,5 +1640,4 @@ void _prolog(void) {
 
 
 #pragma force_active on
-__declspec(section ".rodata") const u32 gap_03_00000B74_rodata = 0;
 #pragma force_active reset

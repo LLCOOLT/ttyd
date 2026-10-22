@@ -16,7 +16,6 @@ static inline f32 sinf(f32 x) { return sin(x); }
 #include <string.h>
 // target .bss/.sbss pad (uninitialised objects are emitted in reverse order, so this sits last)
 #pragma force_active on
-#pragma force_active on
 __declspec(section ".sdata") u32 gap_08_804184BC_sbss[1];
 #pragma force_active reset
 void envReInit(void);
@@ -403,7 +402,8 @@ MapObject* _mapEnt(MapFileJoint* joint, MapObject* parent, Mtx mtx, s32 index) {
 			obj->flags |= 4;
 		}
 	} else {
-		OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n");
+		// FAKE: two trailing NULs pad the literal to the original's 0x30 bytes (the stripped data after it is gone); never read
+		OSPanic("mapdrv.c", 0x2e5, "\x83\x57\x83\x87\x83\x43\x83\x93\x83\x67\x82\xcc\x83\x66\x81\x5b\x83\x5e\x82\xcc\x8e\x77\x92\xe8\x82\xc9\x82\xa8\x82\xa9\x82\xb5\x82\xc8\x82\xe0\x82\xcc\x82\xaa\x82\xa0\x82\xe9\n\0\0");
 	}
 	if (joint->partCount) {
 		PSVECAdd(&joint->bboxMin, &joint->bboxMax, &obj->center);
@@ -759,15 +759,6 @@ static inline void* mapSearchChunk(MapHeader* header, const char* name) {
 	return NULL;
 }
 
-static inline u32* mapLoadFindChunk_(MapEntry* e2, const char* name) {
-	u32 k;
-	for (k = 0; k < e2->header.file.chunkCount; k++) {
-		if (!strcmp(&e2->header.strings[e2->header.chunks[k].string], name)) {
-			return (u32*)((u8*)e2->header.data + e2->header.chunks[k].offset);
-		}
-	}
-	return NULL;
-}
 typedef struct MapEntryOv {
 	u8 pad0[0x24];
 	s32 fogEnable;
@@ -793,6 +784,12 @@ static inline void mapLoadReloc_(MapEntry* entry) {
 		}
 	}
 }
+// MWCC swaps == operands when the left side is a computed address (wp->entries[group]...); through a pointer
+// parameter the load stays on the left, as in the original (cmplw r0,r17).
+static inline BOOL mapHdrSizeOk_(MapHeader* h, u32 size) {
+	return h->file.fileSize == size;
+}
+
 static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 	u32 datSize = wp->entries[group].datSize;
 	u8* data = (u8*)wp->entries[group].dat;
@@ -802,7 +799,7 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 		memset(header, 0, sizeof(MapHeader));
 		wp->entries[group].header.field_0x3C |= 1;
 		memcpy(header, data, sizeof(MapFileHeader));
-		if (wp->entries[group].header.file.fileSize == datSize) {
+		if (mapHdrSizeOk_(&wp->entries[group].header, datSize)) {
 			sizeCheck = sizeof(MapFileHeader);
 			if ((u32)wp->entries[group].header.file.dataSize != 0u) {
 				wp->entries[group].header.data = &data[sizeCheck];
@@ -824,18 +821,30 @@ static inline void mapLoadHeader_(MapWork* wp, BOOL group) {
 			if (sizeCheck < wp->entries[group].header.file.fileSize) {
 				wp->entries[group].header.strings = (const char*)&data[sizeCheck];
 			}
-			*(u8**)((u8*)&wp->entries[group] + 0x78) = data;
+			{ MapWorkOv* wo2 = (MapWorkOv*)wp; wo2->entries[group].hdr40 = data; } // FAKE: overlay-typed copy so the entry address is recomputed (not CSE'd with &wp->entries[group]); same store
 
 			mapLoadReloc_(&wp->entries[group]);
 		}
 	}
 }
+// FAKE: chunk search written out here (was mapLoadFindChunk_) with k declared last, for the target k/w register order; same search
 static inline void mapLoadAnim_(BOOL group) {
 	MapWork* w;
 	u32* animTbl;
 	u32 n;
+	u32 k;
 	w = &mapWork[activeGroup];
-	animTbl = mapLoadFindChunk_(&w->entries[group], "animation_table");
+	{
+		MapEntry* e2 = &w->entries[group];
+		for (k = 0; k < e2->header.file.chunkCount; k++) {
+			if (!strcmp(&e2->header.strings[e2->header.chunks[k].string], "animation_table")) {
+				animTbl = (u32*)((u8*)e2->header.data + e2->header.chunks[k].offset);
+				goto found;
+			}
+		}
+		animTbl = NULL;
+	}
+found:
 	if (animTbl != NULL) {
 		w->entries[group].numAnims = animTbl[0];
 		if (w->entries[group].numAnims != 0) {
@@ -1103,18 +1112,22 @@ void mapLoad(const char* map) {
 	wp->entries[0].count = 1;
 }
 
+// FAKE: opt_common_subs off for this function only. With CSE on, `wp = mapWork` (last loop) becomes a CSE temp created
+// before the lifetime-split temps, so wp's register lands above i's. With it off, the second web of the reused `wp` is a
+// split temp; split temps are created in order of the variables' first reference (i before wp before entry), which gives
+// the target's i r31 / wp r30 / entry r29. Code is otherwise identical (mwregdump, phase 5).
+#pragma opt_common_subs off
 void bmapUnLoad(void) {
 	MapEntry* entry2;
 	MapEntry* entry;
 	int i;
 	MapWork* wp;
-	MapWork* wp0;
 
 
 	sysWaitDrawSync();
+	i = 0;
 	wp = &mapWork[1];
 	activeGroup = 1;
-	i = 0;
 	for (entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
 		if (entry->objects) {
 			_mapFree(entry->objects);
@@ -1159,9 +1172,9 @@ void bmapUnLoad(void) {
 	arcDelete(1);
 	arcDelete(2);
 	memset(wp, 0, sizeof(MapWork));
-	wp0 = mapWork;
+	wp = mapWork;
 	activeGroup = 0;
-	for (i = 0, entry = wp0->entries; i < wp0->entries[0].count; entry++, i++) {
+	for (i = 0, entry = wp->entries; i < wp->entries[0].count; entry++, i++) {
 
 
 		// NB: +0x178 is past sizeof(MapEntry) (0x178): it is the next entry's count (or MapWork.field_2F0 for entry 1).
@@ -1182,11 +1195,12 @@ void bmapUnLoad(void) {
 		}
 		makeDisplayList(i);
 	}
-	if (wp0->entries->arcData) {
-		arcEntry(1, wp0->entries->arcData, wp0->entries->arcSize);
+	if (wp->entries->arcData) {
+		arcEntry(1, wp->entries->arcData, wp->entries->arcSize);
 
 	}
 }
+#pragma opt_common_subs reset
 
 
 void bmapLoad(const char *map, const char *map2)
@@ -4164,7 +4178,7 @@ void mapObjGetFlushColor(const char* name, u8* r, u8* g, u8* b, u8* a) {
 
 // Stand-in for a function the original linker dead-stripped; it only keeps the
 // constants that function left behind in .rodata/.sdata2 in their original order.
-void mapStrippedPool(const char** str, f32* val) {
+static void mapStrippedPool(const char** str, f32* val) {
 	str[0] = ".";
 	val[0] = 3.0f;
 	val[1] = 0.0f;

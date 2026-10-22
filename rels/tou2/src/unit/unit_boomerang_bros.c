@@ -461,7 +461,7 @@ static EVT_BEGIN(normal_attack_event)
     ADD(LW(1), 1)
     GOTO(10)
     LABEL(20)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 1)
@@ -520,13 +520,13 @@ static EVT_BEGIN(renzoku_attack_event)
     GOTO(10)
     LABEL(20)
     SET_VALUE(LW(6), PTR(weapon_boomerang_bros_renzoku_attack))
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 2)
     SET_VALUE(LW(14), 0)
     SPAWN_EVENT(PTR(boomerang_move_event))
     WAIT_MS(750)
-    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A"))
+    CALL(btlevtcmd_AnimeChangePose, -2, 1, STRING("BRO_A_2A\0\0\0"))
     WAIT_FRAMES(27)
     SET_VALUE(LW(15), 4)
     SET_VALUE(LW(14), 1)
@@ -548,7 +548,7 @@ s32 normal_attack_event_confuse[] = {
     196699, (s32)evt_btl_camera_set_mode, 0, 0, 131163, (s32)btlevtcmd_WeaponAftereffect, (s32)weapon_boomerang_bros_attack, 131163,
     (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_boomerang_bros_attack,
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131122, -29999990, 0, 196699,
-    (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"BRO_A_2A",
+    (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePose, -2, 1, (s32)"BRO_A_2A\0\0\0",
     65545, 27, 131122, -29999985, 2, 393307, (s32)btlevtcmd_snd_se, -2,
     (s32)"SFX_ENM_BOOME_ATTACK1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose, -2, -29999985,
     (s32)"BRO_A_1B", 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999, -29999998, 131125,
@@ -593,7 +593,7 @@ s32 renzoku_attack_event_confuse[] = {
     (s32)btlevtcmd_AttackDeclareAll, -2, 65627, (s32)btlevtcmd_WaitGuardMove, 196699, (s32)btlevtcmd_PayWeaponCost, -2, (s32)weapon_boomerang_bros_renzoku_attack,
     196699, (s32)btlevtcmd_GetSelectEnemy, -29999997, -29999996, 131122, -29999990, 0, 65541,
     2, 196699, (s32)btlevtcmd_ChangeFaceDirection, -2, 1, 262235, (s32)btlevtcmd_AnimeChangePose, -2,
-    1, (s32)"BRO_A_2A", 65545, 27, 131122, -29999985, 2, 393307,
+    1, (s32)"BRO_A_2A\0\0\0", 65545, 27, 131122, -29999985, 2, 393307,
     (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BOOME_ATTACK1", -250000000, 0, -250000000, 262235, (s32)btlevtcmd_AnimeChangePose,
     -2, -29999985, (s32)"BRO_A_1B", 327771, (s32)btlevtcmd_GetPos, -2, -30000000, -29999999,
     -29999998, 131125, -29999999, 20, 393307, (s32)btlevtcmd_SetPartsPos, -2, -29999985,

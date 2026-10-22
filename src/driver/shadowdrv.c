@@ -188,7 +188,6 @@ GXColor color_tbl_cube[3] ATTRIBUTE_ALIGN(32) = {
 };
 
 #pragma explicit_zero_data on
-u32 gap_07_8040F4AC_sdata = 0;
 #pragma explicit_zero_data reset
 
 

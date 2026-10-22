@@ -124,7 +124,7 @@ EffectEntry* effMagic3N64Entry(s32 type, f32 x, f32 y, f32 z, s32 life) {
     if (inv > 0.0f) {
         inv = 1.0f / sqrtf(inv);
     }
-    effect->type = "Magic3N64\0\0\0\0\0\0";
+    effect->type = "Magic3N64\0\0";
     effect->count = 5;
     nx *= 18.0f;
     ny *= 18.0f;

@@ -92,7 +92,7 @@ aji_15.c:
 
 aji_16.c:
 	.text       start:0x000043A4 end:0x000043E8
-	.rodata     start:0x00003CD0 end:0x00003F50
+	.rodata     start:0x00003CD0 end:0x00003F4C
 	.data       start:0x0001CDD0 end:0x0001E110
 
 aji_17.c:
@@ -129,7 +129,7 @@ aji_19.c:
 	.data       start:0x0002E480 end:0x0002E848
 
 unit/unit_gundan_zako.c:
-	.rodata     start:0x00005FB8 end:0x000061D8
+	.rodata     start:0x00005FB8 end:0x000061D4
 	.data       start:0x0002E848 end:0x0002FE38
 
 unit/unit_barriern_z_satellite.c:
@@ -144,17 +144,17 @@ unit/unit_barriern_z.c:
 	.bss        start:0x000001A0 end:0x000001B8
 
 unit/unit_gundan_zako_elite.c:
-	.rodata     start:0x00006658 end:0x00006880
+	.rodata     start:0x00006658 end:0x0000687C
 	.data       start:0x00033498 end:0x00034A88
 
 unit/unit_gundan_zako_magician.c:
 	.text       start:0x0000B1E0 end:0x0000B298
-	.rodata     start:0x00006880 end:0x00006AB8
+	.rodata     start:0x00006880 end:0x00006AB4
 	.data       start:0x00034A88 end:0x00036E38
 
 event/evt_shuryolight.c:
 	.text       start:0x0000B298 end:0x0000BCF4
-	.rodata     start:0x00006AB8 end:0x00006C38
+	.rodata     start:0x00006AB8 end:0x00006C34
 	.data       start:0x00036E38 end:0x00037180
 	.bss        start:0x000001B8 end:0x000001C0
 

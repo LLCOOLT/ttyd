@@ -483,7 +483,7 @@ static s32 attack_event_spark[] = {
 
 static s32 wait_event_spark[] = {
     196699, (s32)btlevtcmd_AnimeChangePoseFromTable, -2, 1, 262235, (s32)btlevtcmd_GetUnitWork, -2, 0,
-    -29999985, 131096, -29999985, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BOMB_WAIT1",
+    -29999985, 131096, -29999985, -1, 393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_BOMB_WAIT1\0",
     -250000000, 0, -29999985, 262235, (s32)btlevtcmd_SetUnitWork, -2, 0, -29999985,
     33, 2, 1,
 };

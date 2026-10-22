@@ -1027,7 +1027,8 @@ u32 lookupSafetyPos(Vec pos, f32 height, Vec* out) {
     u32 flags;
     MarioWork* player = marioGetPtr();
     w = player->wPlayerCollisionBox.x;
-    rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * revise360(toMovedir(player->displayDirectionTarget) - 180.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
+    // FAKE: comma makes the first rad web an early-coloured temp (target f31; same value)
+    rad = (0, (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * revise360(toMovedir(player->displayDirectionTarget) - 180.0f)) / EXT_LIT(float_180_8041b514, 180.0f));
     x = w * (f32)sin(rad) + pos.x;
     p[3].x = x;
     c = (f32)cos(rad);
@@ -1129,12 +1130,13 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     w = player->wPlayerCollisionBox.x;
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_90_8041b52c, 90.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
     dx = (f32)sin(rad);
-    dz = -(f32)cos(rad);
+    dz = (f32)cos(rad);
+    dz = -dz;
     dx = w * dx;
     dz = w * dz;
-    x = pos.x + dx;
+    x = dx + pos.x;
     y = pos.y;
-    z = pos.z + dz;
+    z = dz + pos.z;
     d = EXT_LIT(float_0p1_8041b518, 0.1f) + height;
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
@@ -1145,12 +1147,13 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     }
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_270_8041b5a0, 270.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
     dx = (f32)sin(rad);
-    dz = -(f32)cos(rad);
+    dz = (f32)cos(rad);
+    dz = -dz;
     dx = w * dx;
     dz = w * dz;
-    x = pos.x + dx;
+    x = dx + pos.x;
     y = pos.y;
-    z = pos.z + dz;
+    z = dz + pos.z;
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
         out->x = x;
@@ -1173,12 +1176,13 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
     }
     rad = (EXT_LIT(float_3p1416_8041b510, 3.1415927f) * EXT_LIT(float_0_8041b51c, 0.0f)) / EXT_LIT(float_180_8041b514, 180.0f);
     dx = (f32)sin(rad);
-    dz = -(f32)cos(rad);
+    dz = (f32)cos(rad);
+    dz = -dz;
     dx = w * dx;
     dz = w * dz;
-    x = pos.x + dx;
+    x = dx + pos.x;
     y = pos.y;
-    z = pos.z + dz;
+    z = dz + pos.z;
     dist = d;
     if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, EXT_LIT(float_0_8041b51c, 0.0f), EXT_LIT(float_neg1_8041b520, -1.0f), EXT_LIT(float_0_8041b51c, 0.0f)) != NULL) {
         out->x = x;
@@ -1190,26 +1194,59 @@ void lookupSafetyPos2(Vec pos, f32 height, Vec* out) {
 }
 
 void lookupSafetyPos3(Vec pos, f32 height, Vec* out) {
-    f32 y; f32 s; f32 dist; f32 z; f32 c; f32 rad; f32 hx; f32 hy; f32 hz; f32 nx; f32 ny; f32 nz;
+    f32 y;
+    f32 rad;
+    f32 dx;
+    f32 dz;
+    f32 d;
+    f32 dist;
+    f32 w;
+    f32 x;
+    f32 z;
+    f32 hx;
+    f32 hy;
+    f32 hz;
+    f32 nx;
+    f32 ny;
+    f32 nz;
     MarioWork* player = marioGetPtr();
-    f32 w = player->wPlayerCollisionBox.x;
-    rad = 1.5707964f;
-    s = (f32)sin(rad);
-    c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; s = s + pos.x; z = c + pos.z; y = pos.y;
-    dist = 0.1f + height;
-    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, s, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
-        out->x = s; out->z = z; out->y = y; return;
+
+    w = player->wPlayerCollisionBox.x;
+    rad = (3.1415927f * 90.0f) / 180.0f;
+    dx = (f32)sin(rad);
+    dz = (f32)cos(rad);
+    dz = -dz;
+    dx = w * dx;
+    dz = w * dz;
+    x = dx + pos.x;
+    y = pos.y;
+    z = dz + pos.z;
+    d = 0.1f + height;
+    dist = d;
+    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
+        out->x = x;
+        out->z = z;
+        out->y = y;
+        return;
     }
-    rad = 4.712389f;
-    s = (f32)sin(rad);
-    c = (f32)cos(rad);
-    c = -c; s = w * s; c = w * c; s = s + pos.x; z = c + pos.z; y = pos.y;
-    dist = 0.1f + height;
-    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, s, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
-        out->x = s; out->z = z; out->y = y; return;
+    rad = (3.1415927f * 270.0f) / 180.0f;
+    dx = (f32)sin(rad);
+    dz = (f32)cos(rad);
+    dz = -dz;
+    dx = w * dx;
+    dz = w * dz;
+    x = dx + pos.x;
+    y = pos.y;
+    z = dz + pos.z;
+    dist = d;
+    if (hitCheckFilter(NULL, &hx, &hy, &hz, &dist, &nx, &ny, &nz, x, y + height, z, 0.0f, -1.0f, 0.0f) != NULL) {
+        out->x = x;
+        out->z = z;
+        out->y = y;
+        return;
     }
-    *out = pos; }
+    *out = pos;
+}
 
 void lookupSafetyPosSub(Vec pos, f32 height, f32 angle, Vec* out) {
     f32 rad;

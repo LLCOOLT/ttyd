@@ -288,7 +288,7 @@ static s32 attack_event[] = {
     10, -1, 65546, 500, 65540, 95, 65539, 91,
     393307, (s32)evt_btl_camera_shake_h, 0, 1, 1, 8, 0, 196699,
     (s32)evt_btl_camera_set_moveSpeedLv, 0, 2, 196699, (s32)evt_btl_camera_add_zoom, 0, -50, 393307,
-    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KURI_ATTACK1", -250000000, 0, -250000000, 196699, (s32)btlevtcmd_ResultACDefence,
+    (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_KURI_ATTACK1\0\0\0", -250000000, 0, -250000000, 196699, (s32)btlevtcmd_ResultACDefence,
     -29999997, (s32)weapon_kuriboo_attack, 458843, (s32)btlevtcmd_CheckDamage, -2, -29999997, -29999996, (s32)weapon_kuriboo_attack,
     256, -29999995, 327771, (s32)btlevtcmd_SetRotate, -2, 0, 0, 0,
     131122, -29999985, 69, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, -29999985,

@@ -1556,7 +1556,7 @@ void coingetDisp(WinMgrEntry* entry) {
 	s32* work = entry->param;
 	char buf[0x400];
 	if (work[1]) {
-		sprintf(buf, msgSearch("msg_window_coin_get\0\0\0\0"), work[0]);
+		sprintf(buf, msgSearch("msg_window_coin_get"), work[0]);
 		FontDrawStart();
 		FontDrawColor(coin_black);
 		FontDrawMessage(-(s32)FontGetMessageWidth(buf) / 2, entry->y - 8, buf);

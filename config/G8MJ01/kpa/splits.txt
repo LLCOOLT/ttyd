@@ -40,7 +40,7 @@ kpa_04.c:
 
 kpa_05.c:
 	.text       start:0x00000F78 end:0x00000FBC
-	.rodata     start:0x000008F8 end:0x00000938
+	.rodata     start:0x000008F8 end:0x00000934
 	.data       start:0x00006070 end:0x00006740
 
 kpa_07.c:

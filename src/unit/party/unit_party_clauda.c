@@ -829,7 +829,6 @@ static EVT_BEGIN(party_win_reaction)
 EVT_END()
 
 #pragma force_active on
-__declspec(section ".sdata") u32 gap_07_804122AC_sdata[1] = {0};
 #pragma force_active reset
 
 

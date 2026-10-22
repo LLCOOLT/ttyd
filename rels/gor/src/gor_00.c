@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -273,20 +274,22 @@ extern s32 luigi_gor_first_talk[];
 extern s32 nannpc_ext_main_sub_fast[];
 extern s32 npc_init_evt[];
 
-__declspec(section ".data") u64 fd_gor_00_negone_one_374;
-__declspec(section ".data") s32 fd_gor_00_neg_one_382[1];
-__declspec(section ".data") s32 fd_gor_00___local_PI_383[1];
-__declspec(section ".data") s32 fd_gor_00___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_gor_00_one_negone_373;
-__declspec(section ".data") s32 fd_gor_00___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_gor_00_one_381[1];
-__declspec(section ".data") u64 fd_gor_00_negone_one_360;
-__declspec(section ".data") s32 fd_gor_00_neg_one_365[1];
-__declspec(section ".data") s32 fd_gor_00___local_PI_366[1];
-__declspec(section ".data") s32 fd_gor_00___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_gor_00_one_negone_359;
-__declspec(section ".data") s32 fd_gor_00___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_gor_00_one_364[1];
+__declspec(section ".data") u64 negone_one$374;
+__declspec(section ".data") s32 neg_one$382[1];
+__declspec(section ".data") s32 __local_PI$383[1];
+__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") u32 gap_04_0000086C_data[1];
+__declspec(section ".data") u64 one_negone$373;
+__declspec(section ".data") s32 __local_PIO2$384[1];
+__declspec(section ".data") s32 one$381[1];
+__declspec(section ".data") u64 negone_one$360;
+__declspec(section ".data") s32 neg_one$365[1];
+__declspec(section ".data") s32 __local_PI$366[1];
+__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") u32 gap_04_00000894_data[1];
+__declspec(section ".data") u64 one_negone$359;
+__declspec(section ".data") s32 __local_PIO2$367[1];
+__declspec(section ".data") s32 one$364[1];
 s32 nannpc_entry_data[123];
 static s32 dai3_animtbl[21];
 __declspec(section ".data") s32 dai3_run_animtbl[11];
@@ -413,51 +416,55 @@ s32 return_gorotsuki_town_init[25];
 s32 return_gorotsuki_town[625];
 s32 gor_00_init_evt[537];
 
-__declspec(section ".data") u64 fd_gor_00_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_gor_00_neg_one_382[] = {
+__declspec(section ".data") s32 neg_one$382[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_gor_00___local_PI_383[] = {
+__declspec(section ".data") s32 __local_PI$383[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_gor_00___local_3PIO2_385[] = {
+__declspec(section ".data") s32 __local_3PIO2$385[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_gor_00_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_0000086C_data[1] = {0};
 
-__declspec(section ".data") s32 fd_gor_00___local_PIO2_384[] = {
+__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$384[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_gor_00_one_381[] = {
+__declspec(section ".data") s32 one$381[] = {
     1065353216,
 };
 
-__declspec(section ".data") u64 fd_gor_00_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_gor_00_neg_one_365[] = {
+__declspec(section ".data") s32 neg_one$365[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_gor_00___local_PI_366[] = {
+__declspec(section ".data") s32 __local_PI$366[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_gor_00___local_3PIO2_368[] = {
+__declspec(section ".data") s32 __local_3PIO2$368[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_gor_00_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_00000894_data[1] = {0};
 
-__declspec(section ".data") s32 fd_gor_00___local_PIO2_367[] = {
+__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$367[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_gor_00_one_364[] = {
+__declspec(section ".data") s32 one$364[] = {
     1065353216,
 };
 

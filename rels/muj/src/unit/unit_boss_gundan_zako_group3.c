@@ -1,3 +1,4 @@
+#pragma dollar_identifiers on
 #include "battle/battle_unit.h"
 #include "evt/evt_cmd.h"
 
@@ -88,20 +89,22 @@ extern s32 subsetevt_confuse_flustered[];
 extern s32 weaponGetPowerDefault[];
 extern s32 zakogun_get_kanbu_id_evtcmd[];
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_negone_one_374;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_neg_one_382[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PI_383[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_3PIO2_385[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_one_negone_373;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PIO2_384[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_one_381[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_negone_one_360;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_neg_one_365[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PI_366[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_3PIO2_368[1];
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_one_negone_359;
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PIO2_367[1];
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_one_364[1];
+__declspec(section ".data") u64 negone_one$374;
+__declspec(section ".data") s32 neg_one$382[1];
+__declspec(section ".data") s32 __local_PI$383[1];
+__declspec(section ".data") s32 __local_3PIO2$385[1];
+__declspec(section ".data") u32 gap_04_000314E4_data[1];
+__declspec(section ".data") u64 one_negone$373;
+__declspec(section ".data") s32 __local_PIO2$384[1];
+__declspec(section ".data") s32 one$381[1];
+__declspec(section ".data") u64 negone_one$360;
+__declspec(section ".data") s32 neg_one$365[1];
+__declspec(section ".data") s32 __local_PI$366[1];
+__declspec(section ".data") s32 __local_3PIO2$368[1];
+__declspec(section ".data") u32 gap_04_0003150C_data[1];
+__declspec(section ".data") u64 one_negone$359;
+__declspec(section ".data") s32 __local_PIO2$367[1];
+__declspec(section ".data") s32 one$364[1];
 BattleUnitKind unit_boss_gundan_zako_group3;
 static __declspec(section ".data") BattleUnitDefense defence;
 static __declspec(section ".data") BattleUnitDefenseAttr defence_attr;
@@ -159,51 +162,55 @@ USER_FUNC(zakogun_ext_init3) {
     return EVT_RETURN_DONE;
 }
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_negone_one_374 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$374 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_neg_one_382[] = {
+__declspec(section ".data") s32 neg_one$382[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PI_383[] = {
+__declspec(section ".data") s32 __local_PI$383[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_3PIO2_385[] = {
+__declspec(section ".data") s32 __local_3PIO2$385[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_one_negone_373 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_000314E4_data[1] = {0};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PIO2_384[] = {
+__declspec(section ".data") u64 one_negone$373 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$384[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_one_381[] = {
+__declspec(section ".data") s32 one$381[] = {
     1065353216,
 };
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_negone_one_360 = 0xBF8000003F800000;
+__declspec(section ".data") u64 negone_one$360 = 0xBF8000003F800000;
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_neg_one_365[] = {
+__declspec(section ".data") s32 neg_one$365[] = {
     -1082130432,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PI_366[] = {
+__declspec(section ".data") s32 __local_PI$366[] = {
     1078530011,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_3PIO2_368[] = {
+__declspec(section ".data") s32 __local_3PIO2$368[] = {
     1083624420,
 };
 
-__declspec(section ".data") u64 fd_boss_gundan_zako_group3_one_negone_359 = 0x3F800000BF800000;
+__declspec(section ".data") u32 gap_04_0003150C_data[1] = {0};
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3___local_PIO2_367[] = {
+__declspec(section ".data") u64 one_negone$359 = 0x3F800000BF800000;
+
+__declspec(section ".data") s32 __local_PIO2$367[] = {
     1070141403,
 };
 
-__declspec(section ".data") s32 fd_boss_gundan_zako_group3_one_364[] = {
+__declspec(section ".data") s32 one$364[] = {
     1065353216,
 };
 

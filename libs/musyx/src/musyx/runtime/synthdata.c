@@ -703,13 +703,16 @@ void* dataGetLayer(u16 cid, u16* n) {
 static s32 fxcmp(void* p1, void* p2) { return ((FX_TAB*)p1)->id - ((FX_TAB*)p2)->id; }
 
 struct FX_TAB* dataGetFX(u16 fid) {
-  static FX_TAB key;
+  static struct {
+    FX_TAB k;
+    u16 pad;
+  } key; // original symbol is 0xC bytes (4-aligned tail pad)
   FX_TAB* ret; // r29
   long i;      // r31
 
-  key.id = fid;
+  key.k.id = fid;
   for (i = 0; i < dataFXGroupNum; ++i) {
-    if ((ret = (FX_TAB*)sndBSearch(&key, dataFXGroups[i].fxTab, dataFXGroups[i].fxNum,
+    if ((ret = (FX_TAB*)sndBSearch(&key.k, dataFXGroups[i].fxTab, dataFXGroups[i].fxNum,
                                    sizeof(FX_TAB), fxcmp))) {
       return ret;
     }

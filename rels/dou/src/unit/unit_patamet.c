@@ -775,7 +775,7 @@ static s32 attack_event_ceil[] = {
     -2, -29999990, -29999989, -29999988, 196699, (s32)btlevtcmd_SetMoveSpeed, -2, -229994880,
     524379, (s32)btlevtcmd_MovePosition, -2, -30000000, -29999989, -29999988, 60, -1,
     1, 262235, (s32)btlevtcmd_AnimeChangePoseType, -2, 1, 50, 65546, 250,
-    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MET_FALL1", -250000000, 0, -250000000, 196699,
+    393307, (s32)btlevtcmd_snd_se, -2, (s32)"SFX_ENM_MET_FALL1\0\0", -250000000, 0, -250000000, 196699,
     (s32)btlevtcmd_SetMoveSpeed, -2, 0, 196699, (s32)btlevtcmd_SetJumpSpeed, -2, 0, 196699,
     (s32)btlevtcmd_SetFallAccel, -2, -229999796, 393307, (s32)btlevtcmd_GetHitPos, -29999997, -29999996, -30000000,
     -29999999, -29999998, 458843, (s32)btlevtcmd_JumpPosition, -2, -30000000, 18, -29999998,

@@ -361,6 +361,8 @@ void envDisp_DepthOfField(void) {
     Mtx mtx;
     s32 i;
     Mtx mtx2;
+    f32 ang;
+    f32 ang2;
 
     dof = &wp->dof;
     if (wp->flags & 0x80000000) {
@@ -383,11 +385,12 @@ void envDisp_DepthOfField(void) {
         GXSetVtxAttrFmt(GX_VTXFMT0, GX_VA_TEX0, GX_TEX_ST, GX_F32, 0);
         GXSetCullMode(GX_CULL_NONE);
         if ((dof->flags & 1) && dof->radius1) {
+            tbl = texmtx_tbl;
             coord = 0;
             stage = 0;
-            tbl = texmtx_tbl;
-            for (i = 0; i < 4; i++, stage++, coord++, tbl++) {
-                PSMTXTrans(mtx, dof->radius1 * env_sin(6.2831855f * i / 4.0f) / 100.0f, dof->radius1 * env_cos(6.2831855f * i / 4.0f) / 100.0f, 0.0f);
+            for (i = 0; i < 4; i++, coord++, tbl++, stage++) {
+                ang = 6.2831855f * i / 4.0f;
+                PSMTXTrans(mtx, dof->radius1 * env_sin(ang) / 100.0f, dof->radius1 * env_cos(ang) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx, *tbl, GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord, GX_TG_MTX2x4, GX_TG_TEX0, *tbl, GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage, GX_TEV_KCSEL_1_4);
@@ -423,10 +426,9 @@ void envDisp_DepthOfField(void) {
             DOF_QUAD(gp, 2.0f);
         }
         if ((dof->flags & 2) && dof->radius2) {
-            coord2 = 0;
-            stage2 = 0;
-            for (i2 = 0; i2 < 4; i2++, stage2++, coord2++) {
-                PSMTXTrans(mtx2, dof->radius2 * env_sin(6.2831855f * i2 / 4.0f) / 100.0f, dof->radius2 * env_cos(6.2831855f * i2 / 4.0f) / 100.0f, 0.0f);
+            for (i2 = 0, stage2 = 0, coord2 = 0; i2 < 4; i2++, coord2++, stage2++) {
+                ang2 = 6.2831855f * i2 / 4.0f;
+                PSMTXTrans(mtx2, dof->radius2 * env_sin(ang2) / 100.0f, dof->radius2 * env_cos(ang2) / 100.0f, 0.0f);
                 GXLoadTexMtxImm(mtx2, texmtx_tbl[i2], GX_MTX2x4);
                 GXSetTexCoordGen2((GXTexCoordID)coord2, GX_TG_MTX2x4, GX_TG_TEX0, texmtx_tbl[i2], GX_FALSE, GX_PTIDENTITY);
                 GXSetTevKColorSel((GXTevStageID)stage2, GX_TEV_KCSEL_1_4);
@@ -1290,7 +1292,8 @@ void envSetWater(MapTevCallbackInfo* info) {
     for (i = 0; i < 64; i++) {
         for (j = 0; j < 64; j++) {
             f32 s = sin((f32)gp->retraceCount / 10.0f + (18.849552f * j) / 64.0f);
-            u8* p = buf2 + (j / 4) * 512 + (i / 4) * 32 + ((i % 4) + (j % 4) * 4) * 2;
+            // FAKE: (s16) cast on i / 4 (i is 0..63, value unchanged)
+            u8* p = buf2 + (j / 4) * 512 + (s16)(i / 4) * 32 + ((i % 4) + (j % 4) * 4) * 2;
             p[0] = EXT_LIT(float_0p6_8041e550, 0.6f) + (scale * s + EXT_LIT(float_128_8041e554, 128.0f));
             p[1] = 0x80;
         }
