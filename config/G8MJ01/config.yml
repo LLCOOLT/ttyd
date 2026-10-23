@@ -5,6 +5,9 @@ object_base: orig/G8MJ01
 symbols: config/G8MJ01/symbols.txt
 splits: config/G8MJ01/splits.txt
 mw_comment_version: 10
+# unit_party_chuchurina partyWeapon_ChuchurinaKiss+0x7C holds the flag word 0x80003500, not a pointer
+block_relocations:
+- source: 0x8037F62C
 
 extract:
 # manager/cardmgr.c
